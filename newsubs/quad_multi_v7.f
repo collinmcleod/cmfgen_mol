@@ -95,9 +95,9 @@ C FQW has C units of Hz, not 10^15 Hz.
 C
 	FOUR_PI_D_H=1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
 C
-	WSE_S(:,:)=0.0
-	WSE_CR_S(:,:)=0.0
-	dWSE_SdT(:,:)=0.0
+	WSE_S(:,:)=0.0D0
+	WSE_CR_S(:,:)=0.0D0
+	dWSE_SdT(:,:)=0.0D0
 C
 C Get photoionization cross-sections for all levels. The first call returns
 C the threshold cross-section when NU < EDGE.
