@@ -14,6 +14,7 @@ C
 	SUBROUTINE THOMAS(A,B,C,D,N1,N2)
 	IMPLICIT NONE
 C
+C Altered 08-Feb-2004 : Forced constants to be double precission.
 C Altered 29-Sep-1997 : Scaler loop code installed to improve speed on a
 C                         an Alphastation.
 C Altered 29-May-1996 : Loops reversed in forward elimination and the 
@@ -34,10 +35,10 @@ C
 C Compute quantities that will be used repeatedly if the same tridiagonal
 C system is used for many R.H. Sides.
 C
-	B(1)=1.0/B(1)
+	B(1)=1.0D0/B(1)
 	C(1)=-C(1)*B(1)
 	DO I=2,N1
-	  B(I)=1.0/(B(I)+A(I)*C(I-1))
+	  B(I)=1.0D0/(B(I)+A(I)*C(I-1))
 	  C(I)=-C(I)*B(I)
 	END DO
 C
