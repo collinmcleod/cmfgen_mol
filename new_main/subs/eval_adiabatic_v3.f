@@ -71,6 +71,7 @@
 	INTEGER LUER
 	INTEGER ISPEC
 	INTEGER ID
+	LOGICAL WRITE_CHK
 !
 ! A full linearization is now obsolete, but check to make sure.
 !
@@ -94,11 +95,12 @@
 	      TOT_ENERGY(J)=(AVE_ENERGY(ATM(ID)%EQXzV)-AVE_ENERGY(J))+T1
 	      ION_EN(J)=T2
 	    END DO
+	    J=ATM(ID)%EQXzV
+	    T1=T1+AVE_ENERGY(J)			!Adding on ionization energy
 	  END DO
 	  ID=SPECIES_END_ID(ISPEC)-1
 	  IF(ID .GT. 0)THEN
 	    J=ATM(ID)%EQXzV
-	    T1=T1+AVE_ENERGY(J)			!Adding on ionization energy
 	    TOT_ENERGY(J+ATM(ID)%NXzV)=T1
 	    ION_EN(J+ATM(ID)%NXzV)=T2
 	  END IF
@@ -227,6 +229,36 @@
 !
 	AD_CR_V=AD_CR_V*T1
 	AD_CR_DT=AD_CR_DT*T1
+!
+	WRITE_CHK=.TRUE.
+	IF(WRITE_CHK)THEN
+	  OPEN(UNIT=7,FILE='ADIABAT_CHK',STATUS='UNKNOWN')
+	    WRITE(7,'(A)')' '
+	    WRITE(7,'(A)')'  Scaling is for STEQ_VALS(NT,:). This is cgs units scaled'
+	    WRITE(7,'(A)')'  by a factor of 10^10 on 4PI. The 10^9 comes from V . T'
+	    WRITE(7,'(A)')' '
+	    WRITE(7,'(A,ES12.4)')' SCALE=1.0D+09*BOLTZMANN_CONSTANT()/4.0D0/PI=',SCALE
+	    WRITE(7,'(A)')' T1=R(I)-R(I+1)'
+	    WRITE(7,'(A)')' GAMMA=ED/POP_ATOM'
+	    WRITE(7,'(A)')' A=1.5D0*SCALE*(POP_ATOM+ED)*V/T1 * (T(I)-T(I+1)'
+	    WRITE(7,'(A)')' B=SCALE*(POP_ATOM+ED)*V*(3.0D0+SIGMA)/R * T(I)'
+	    WRITE(7,'(A)')' C=1.5D0*SCALE*POP_ATOM*V/T1 * T(I)*(GAMMA(I)-GAMMA(I+1))'
+	    WRITE(7,'(A)')' D=SCALE*POP_ATOM*V/T1* (INT_EN(I)-INT_EN(I+1))'
+	    WRITE(7,'(A)')' '
+	    WRITE(7,'(8X,A,6X,8(7X,A))')'R','     V',' SIGMA','     T',
+	1                 'NU_ION','     A','     B','     C','     D'
+	    DO I=1,ND-1
+	      WRITE(7,'(ES15.7,8(1X,ES12.4))')
+	1              R(I),V(I),SIGMA(I),T(I),INT_EN(I)/HDKT,
+	1              A(I)*(T(I)-T(I+1)),B(I)*T(I),
+	1              C(I)*T(I)*(GAMMA(I)-GAMMA(I+1)),D(I)*(INT_EN(I)-INT_EN(I+1))
+	    END DO
+	    WRITE(7,'(ES15.7,8(1X,ES12.4))')
+	1              R(ND),V(ND),SIGMA(ND),T(ND),INT_EN(ND)/HDKT,
+	1              A(ND)*(T(ND-1)-T(ND)),B(ND)*T(ND),
+	1              C(ND)*T(ND)*(GAMMA(ND-1)-GAMMA(ND)),D(ND)*(INT_EN(ND-1)-INT_EN(ND))
+	  CLOSE(UNIT=7)
+	END IF
 !
 	RETURN
 	END
