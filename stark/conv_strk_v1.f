@@ -225,10 +225,10 @@ convolution bandpass extends beyond
 	  END DO
 	  T1=T1*0.5D0*2.99794D+18
 	  PRO(1:NF)=PRO(1:NF)/T1
-	  IF(ABS(T1-1.0D0) .GT. 0.1)THEN
+	  IF(ABS(T1-1.0D0) .GT. 0.3)THEN
             LUER=ERROR_LU()
 	    WRITE(LUER,*)'Error on CONV_STRK_V1'
-	    WRITE(LUER,*)'Profile normalization constant differs from 1 by more than 10%'
+	    WRITE(LUER,*)'Profile normalization constant differs from 1 by more than 30%'
 	    WRITE(LUER,*)'Normalization constant = ',T1
 	    WRITE(LUER,*)WAVE,DLAM_THERM,DLAM_TURB
 	  END IF
@@ -243,7 +243,6 @@ convolution bandpass extends beyond
 	  END DO
 	  IF(SYM_STARK)T1=T1*2.0D0
 	  WRITE(6,*)'The area under the INTERP profile is',T1
-!
 	  DLAM_INT(1:NI)=2.998D+18/DLAM_INT(1:NI)
 	  DLAM_INT(1:NI)=DLAM_INT(1:NI)-WAVE
 	  STARK_INT(1:NI)=DLOG10(STARK_INT(1:NI))

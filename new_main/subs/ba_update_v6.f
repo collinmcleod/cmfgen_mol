@@ -1,4 +1,4 @@
-	MODULE BA_J_DATA_MOD
+	MODULE BA_J_DATA_MOD_V6
 	IMPLICIT NONE
 !
 ! Module which contains dJdN integrated over a small frequency band over
@@ -14,7 +14,7 @@
 	REAL*8, ALLOCATABLE :: VJ_T(:,:,:)
 	REAL*8, ALLOCATABLE :: RJ_SUM(:)
 !
-	END MODULE BA_J_DATA_MOD
+	END MODULE BA_J_DATA_MOD_V6
 !
 ! Subroutine to increment the variation matrix BA due to the variation of J.
 !
@@ -35,7 +35,7 @@
 	1              NU,FQW,NEW_CONT,FINAL_FREQ,
 	1              dJ_CHK_FAC,NION,
 	1              NT,NUM_BNDS,ND,DST,DEND)
-	USE BA_J_DATA_MOD
+	USE BA_J_DATA_MOD_V6
 	USE STEQ_DATA_MOD 
 	IMPLICIT NONE
 !

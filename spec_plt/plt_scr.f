@@ -38,6 +38,7 @@ C
 	INTEGER*4 IOS
 C
 	LOGICAL NEWMOD
+	LOGICAL WRITE_RVSIG
 	LOGICAL DO_ABS
 	CHARACTER*10 PLT_OPT
 	CHARACTER*80 YLABEL
@@ -78,8 +79,16 @@ C
 	CLOSE(UNIT=12)
 C
 	OPEN(UNIT=12,FILE='POINT1',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
-	  IF(IOS .EQ. 0)READ(12,*,IOSTAT=IOS)K,NIT
+	  IF(IOS .EQ. 0)READ(12,'(A)',IOSTAT=IOS)STRING
+	  IF(IOS .EQ. 0)THEN
+            IF(INDEX(STRING,'!Format date') .EQ. 0)THEN
+              READ(STRING,*,IOSTAT=IOS)K,NIT
+	    ELSE
+              READ(12,*,IOSTAT=IOS)K,NIT
+	    END IF
+	  END IF
 	  IF(IOS .NE. 0)THEN
+	    RITE_N_TIMES=1
 	    WRITE(T_OUT,*)'Possible error reading POINT1'
 	    CALL GEN_IN(NIT,'Number of iterations')
 	  END IF
@@ -103,8 +112,8 @@ C
 	ALLOCATE (Z_BIG(NT))
 C
 	DO IREC=1,NIT
-	    CALL SCR_READ(R,V,SIGMA,POPS(1,1,IREC),IREC,NITSF,
-	1              RITE_N_TIMES,LST_NG,
+	    CALL SCR_READ_V2(R,V,SIGMA,POPS(1,1,IREC),IREC,NITSF,
+	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
 	1              NT,ND,LUSCR,NEWMOD)
 	END DO
 C
@@ -232,7 +241,7 @@ C
 !
 	ELSE IF(PLT_OPT(1:2) .EQ. 'IR')THEN
 	  ID=0
-	  DO WHILE(ID .LT. 1 .AND. ID .GT. ND)
+	  DO WHILE(ID .LT. 1 .OR. ID .GT. ND)
 	    ID=ND; CALL GEN_IN(ID,'Depth index')
 	  END DO
 	  DO IT=3,NIT
@@ -342,260 +351,4 @@ C
 	  END IF
 	END DO
 C
-	END
-C
-C 
-C
-C Altered  12-Jan-1991 - By using call to DIR_ACC_PARS this version is now
-C                        compatible with both CRAY and VAX fortran.
-C Altered  3-Apr-1989 - LST_NG installed. LU now transmitted in call.
-C
-	SUBROUTINE SCR_READ(R,V,SIGMA,POPS,IREC,NITSF,
-	1                        NUM_TIMES,LST_NG,NT,ND,LU,NEWMOD)
-	IMPLICIT NONE
-C
-	LOGICAL NEWMOD
-	INTEGER*4 IREC,NITSF,NT,ND,NUM_TIMES,LST_NG,LU
-	REAL*8 R(ND),V(ND),SIGMA(ND),POPS(NT*ND)
-C
-C Local variables.
-C
-C REC_SIZE     is the (maximum) record length in bytes.
-C REC_LEN      is the record length in computer units.
-C UNIT_SIZE    is the nuber of bytes per unit that is used to specify
-C                 the record length (thus RECL=REC_SIZ_LIM/UNIT_SIZE).
-C WORD_SIZE    is the numer of bytes used to represent the number.
-C NUMRECS      is the # of records required to output POPS.
-C N_PER_REC    is the # of POPS numbers to be output per record.
-C
-	INTEGER*4 UNIT_SIZE
-	INTEGER*4 WORD_SIZE
-	INTEGER*4 REC_SIZE,REC_LEN
-	INTEGER*4 NUMRECS
-	INTEGER*4 N_PER_REC
-	INTEGER*4 ARRAYSIZE  	!Size of POPS array.
-C	
-	INTEGER*4 ST_REC_M1,RECS_FOR_RV
-	INTEGER*4 I,L,LUER,ERROR_LU
-	INTEGER*4 IOS,IST,IEND
-	EXTERNAL ERROR_LU
-C
-	NEWMOD=.FALSE.
-	LUER=ERROR_LU()
-C
-C Determine the record size, and the number of records that
-C need to be written out to fully write out the population vector.
-C These are computer dependent, hence call to DIR_ACC_PARS. NB.
-C REC_SIZE is not the same as REC_LEN --- it is REC_LEN which is
-C passed to the OPEN statement.
-
-	CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
-	IF(N_PER_REC .LT. 3*ND)THEN
-	  WRITE(LUER,*)'Record length is too small to output R,V and'//
-	1              ' sigma in SCR_RITE'
-	  WRITE(LUER,*)'3ND=',3*ND
-	  WRITE(LUER,*)'N_PER_REC=',N_PER_REC
-	  STOP
-	END IF
-	ARRAYSIZE=NT*ND
-	NUMRECS=INT( (ARRAYSIZE-1)/N_PER_REC )+1
-	REC_LEN=REC_SIZE/UNIT_SIZE
-C
-C		' OLD MODEL '
-C
-	OPEN(UNIT=LU,FILE='SCRTEMP',FORM='UNFORMATTED',
-	1       ACCESS='DIRECT',STATUS='OLD',
-	1       RECL=REC_LEN,IOSTAT=IOS)
-	  IF(IOS .NE. 0)THEN
-	    WRITE(LUER,*)'Error opening SCRTEMP for input'
-	    WRITE(LUER,*)'IOSTAT=',IOS
-	    CLOSE(UNIT=LU)
-	    NEWMOD=.TRUE.
-	    NITSF=0
-	    IREC=0
-	    LST_NG=-1000
-	    RETURN
-	  END IF
-C
-C Note that NITSF= # of successful iterations so far.
-C
-	  READ(LU,REC=1,IOSTAT=IOS)R,V,SIGMA
-	  IF(IOS .NE. 0)READ(LU,REC=2,IOSTAT=IOS)R,V,SIGMA
-	  IF(IOS .NE. 0)THEN
-	    WRITE(LUER,*)'Error reading R,V, SIGMA vectors in READ_SCRTEMP'
-	    NEWMOD=.TRUE.
-	    NITSF=0
-	    IREC=0
-	    LST_NG=-1000
-	    RETURN
-	  END IF
-	  RECS_FOR_RV=2
-C
-C Read in the population data.
-C
-500	CONTINUE		!Try to read an earlier record.
-C
-C IREC ignores the number of records that it takes to write each time.
-C Hence in POINT it will correspond to the iteration number.
-C ST_REC_M1 + 1 is the first output record.
-C
-	ST_REC_M1=(IREC-1)*NUMRECS+RECS_FOR_RV
-	DO L=1,NUMRECS
-	  IST=(L-1)*N_PER_REC+1
-	  IEND=MIN(IST+N_PER_REC-1,ARRAYSIZE)
-	  READ(LU,REC=ST_REC_M1+L,IOSTAT=IOS)(POPS(I),I=IST,IEND)
-	  IF(IOS .NE. 0)THEN
-	    WRITE(LUER,*)'Error on Scratch Read'
-	    IREC=IREC-1
-C	    IF(IREC .GE. 0)GOTO 500	!Get another record if one is available.
-	    NEWMOD=.TRUE.
-	    NITSF=0
-	    IREC=0
-	    LST_NG=-1000
-	    CLOSE(UNIT=LU)
-	    RETURN
-	  END IF
-	END DO
-C
-C Successful Read !
-C
-	CLOSE(UNIT=LU)
-	RETURN
-C
-	END
-C
-C 
-C
-C Routine  to save population data. There is no limit on the
-C size of the POPS array.
-C
-	SUBROUTINE SCR_RITE(R,V,SIGMA,POPS,
-	1                      IREC,NITSF,NUM_TIMES,LST_NG,
-	1                      NT,ND,LU,WRITFAIL)
-	IMPLICIT NONE
-C
-	LOGICAL WRITFAIL
-	INTEGER*4 IREC,NITSF,NT,ND,NUM_TIMES,LST_NG,LU
-	REAL*8 R(ND),V(ND),SIGMA(ND),POPS(NT*ND)
-C
-C Local variables.
-C
-C REC_SIZE     is the (maximum) record length in bytes.
-C REC_LEN      is the record length in computer units.
-C UNIT_SIZE    is the nuber of bytes per unit that is used to specify
-C                 the record length (thus RECL=REC_SIZ_LIM/UNIT_SIZE).
-C WORD_SIZE    is the numer of bytes used to represent the number.
-C NUMRECS      is the # of records required to output POPS.
-C N_PER_REC    is the # of POPS numbers to be output per record.
-C
-	INTEGER*4 UNIT_SIZE
-	INTEGER*4 WORD_SIZE
-	INTEGER*4 REC_SIZE,REC_LEN
-	INTEGER*4 NUMRECS
-	INTEGER*4 N_PER_REC
-	INTEGER*4 ARRAYSIZE  	!Size of POPS array.
-C	
-	INTEGER*4 ST_REC_M1,RECS_FOR_RV
-	INTEGER*4 I,K,L,LUER,ERROR_LU
-	INTEGER*4 IOS,IST,IEND
-	EXTERNAL ERROR_LU
-C
-	LUER=ERROR_LU()
-C
-C Determine the record size, and the number of records that
-C need to be written out to fully write out the population vector.
-C These are computer dependent, hence call to DIR_ACC_PARS. NB.
-C REC_SIZE is not the same as REC_LEN --- it is REC_LEN which is
-C passed to the OPEN statement.
-C
-	CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
-	IF(N_PER_REC .LT. 3*ND)THEN
-	  WRITE(LUER,*)'Record length is too small to output R,V and'//
-	1              ' sigma in SCR_RITE'
-	  WRITE(LUER,*)'3ND=',3*ND
-	  WRITE(LUER,*)'N_PER_REC=',N_PER_REC
-	  STOP
-	END IF
-	ARRAYSIZE=NT*ND			
-	NUMRECS=INT( (ARRAYSIZE-1)/N_PER_REC )+1
-	REC_LEN=REC_SIZE/UNIT_SIZE
-C
-C*************************************************************************
-C
-	OPEN(UNIT=LU,FILE='SCRTEMP',FORM='UNFORMATTED'
-	1,  ACCESS='DIRECT',STATUS='UNKNOWN'
-	1,  RECL=REC_LEN,IOSTAT=IOS)
-	  IF(IOS .NE. 0)THEN
-	    WRITE(LUER,*)'Error opening SCRTEMP in WRITE_SCRTEMP'
-	    WRITE(LUER,*)'Will try to open a new file'
-	    OPEN(UNIT=LU,FILE='SCRTEMP',FORM='UNFORMATTED',
-	1     ACCESS='DIRECT',STATUS='NEW',
-	1     RECL=REC_LEN,IOSTAT=IOS)
-	    IF(IOS .NE. 0)THEN
-	      WRITE(LUER,*)'Error opening SCRTEMP for output'
-	      WRITE(LUER,*)'IOSTAT=',IOS
-	      WRITFAIL=.TRUE.
-	      CLOSE(UNIT=LU)
-	      RETURN
-	    ELSE
-	      IF(IOS .EQ. 0)IREC=0		!Since new file.
-	    END IF
-	  END IF
-C
-	IF(IREC .EQ. 0)THEN		!Newfile or newmodel
-	  WRITE(LU,REC=1,IOSTAT=IOS)R,V,SIGMA
-	  IF(IOS .EQ. 0)WRITE(LU,REC=2,IOSTAT=IOS)R,V,SIGMA
-	  IF(IOS .NE. 0)THEN
-	    WRITE(LUER,*)'Error writing R,V etc vectors in SCR_RITE'
-	    WRITFAIL=.TRUE.
-	    RETURN
-	  END IF
-	END IF
-	RECS_FOR_RV=2
-C
-C WRITE in the population data.
-C
-	IREC=IREC+1		!Next record output
-	DO K=1,NUM_TIMES	!Write out POPS NUM_TIMES for safety.
-C
-C IREC ignores the number of records that it takes to write each time.
-C Hence in POINT it will correspond to the iteration number.
-C ST_REC_M1 + 1 is the first output record.
-C
-	  ST_REC_M1=(IREC-1)*NUMRECS+RECS_FOR_RV
-	  DO L=1,NUMRECS
-	    IST=(L-1)*N_PER_REC+1
-	    IEND=MIN(IST+N_PER_REC-1,ARRAYSIZE)
-	    WRITE(LU,REC=ST_REC_M1+L,IOSTAT=IOS)(POPS(I),I=IST,IEND)
-	    IF(IOS .NE. 0)THEN
-	      WRITFAIL=.TRUE.
-	      WRITE(LUER,*)'Error writing SCRTEMP in SCR_RITE'
-	      WRITE(LUER,*)'IOS=',IOS
-	      CLOSE(UNIT=LU)
-	      RETURN
-	    END IF
-	  END DO
-	END DO
-C
-C Successful write.
-C
-	WRITFAIL=.FALSE.
-1000	CLOSE(UNIT=LU)
-C
-C Write pointer to data files. 
-C
-	OPEN(UNIT=LU,FILE='POINT1',STATUS='UNKNOWN')
-	  WRITE(LU,'(X,4(I6,4X))')
-	1          IREC,NITSF,NUM_TIMES,LST_NG
-	  WRITE(LU,'(3X,A,5X,A,3X,A,4X,A)')
-	1          'IREC','NITSF','#_TIMES','LST_NG'
-	CLOSE(UNIT=LU)
-	OPEN(UNIT=LU,FILE='POINT2',STATUS='UNKNOWN')
-	  WRITE(LU,'(X,4(I6,4X))')
-	1          IREC,NITSF,NUM_TIMES,LST_NG
-	  WRITE(LU,'(3X,A,5X,A,3X,A,4X,A)')
-	1          'IREC','NITSF','#_TIMES','LST_NG'
-	CLOSE(UNIT=LU)
-C
-	RETURN
 	END

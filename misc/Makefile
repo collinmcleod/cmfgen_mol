@@ -9,7 +9,7 @@ LN1=tools
 LN2=subs
 LN3=pgplt
 LN4=newsubs
-#$LN5=lib_src
+
 #
 # These names refer to the full file name
 #
@@ -17,18 +17,17 @@ FN1=$(LIB_DIR)lib$(LN1).a
 FN2=$(LIB_DIR)lib$(LN2).a
 FN3=$(LIB_DIR)lib$(LN3).a
 FN4=$(LIB_DIR)lib$(LN4).a
-#FN5=$(LIB_DIR)lib$(LN5).a
+
 #
 # We only make dispgen.exe if there has been a change to the main *.f files,
 # or if the libraries have changed since the last link.
 #
  
-OBJ1  =  rd_f_to_s_ids.o rd_f_to_s_ids_v2.o rd_energy.o 
+OBJ1  =  rd_f_to_s_ids.o rd_f_to_s_ids_v2.o rd_energy.o write_osc_v2.o
  
 EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)count_phot_data.exe\
          $(EXE_DIR)chk_phot.exe\
-         $(EXE_DIR)do_ave.exe\
          $(EXE_DIR)do_ng_v2.exe\
          $(EXE_DIR)land_col_merge.exe\
          $(EXE_DIR)n_col_merge.exe\
@@ -41,6 +40,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)mass_sc.exe\
          $(EXE_DIR)plt_gf.exe\
          $(EXE_DIR)plt_cool.exe\
+         $(EXE_DIR)plt_j_comp.exe\
          $(EXE_DIR)plt_net.exe\
          $(EXE_DIR)tlusty_vel.exe
  
@@ -55,15 +55,15 @@ $(EXE_DIR)wr_f_to_s.exe : wr_f_to_s.o $(OBJ1)
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)wr_f_to_s.exe
 #
-$(EXE_DIR)chk_phot.exe : chk_phot.o recom_chk_v2.o get_exc_freq.o write_osc_v2.o $(OBJ1)
-	$(F90) chk_phot.o recom_chk_v2.o get_exc_freq.o write_osc_v2.o  \
+$(EXE_DIR)chk_phot.exe : chk_phot.o recom_chk_v2.o get_exc_freq.o $(OBJ1)
+	$(F90) chk_phot.o recom_chk_v2.o get_exc_freq.o \
               $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)chk_phot.exe
 #
-# Give the dependencies of dispgen.exe and how it is created.
+# Give the dependencies of ?.exe and how it is created.
 #
-$(EXE_DIR)%.exe : %.o 
+$(EXE_DIR)%.exe : %.o $(OBJ1) 
 	$(F90) $*.o \
               $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
@@ -78,8 +78,6 @@ USR = $(LIB_DIR)libtools.a(usr_option.o)
 GEN = $(LIB_DIR)libtools.a(gen_in.o)
 
 wr_f_to_s.o     : wr_f_to_s.f  $(USR)
-do_ng.o         : do_ng.f      $(GEN)
-do_ave.o        : do_ave.f      $(GEN)
 
 $(USR):
 	(cd ../tools; make )
@@ -90,14 +88,12 @@ $(GEN):
 $(FN1) : lib1
 $(FN2) : lib2
 $(FN3) : lib3
+$(FN3) : lib4
 
 # We now MAKE the required libraries.
 
 lib1:
 	(cd ../tools; make)
-
-#lib2:
-# (cd ../disp/subs; make)
 
 lib2:
 	(cd ../subs; make )
@@ -106,6 +102,9 @@ lib2:
 
 lib3:
 	(cd ../pgplt; make )
+
+lib4:
+	(cd ../newsubs; make )
 
 clean :
 	rm -f *.o

@@ -149,6 +149,10 @@
 	CHARACTER*10 SOLUTION_METHOD
 	LOGICAL INSERT
 	LOGICAL FIRST_TIME
+	LOGICAL NEW_R_GRID
+!
+	REAL*8 HN_VAL
+	REAL*8 HN_VAL_PREV
 !
 	DATA VDOP_FRAC_SAV/-1001.0D0/ 	!Absurd value.
 	DATA FIRST_TIME/.TRUE./
@@ -210,6 +214,8 @@
 	USE FG_J_CMF_MOD_V10
 	IMPLICIT NONE
 !
+! Altered 26-Feb-2004  : Changed to check for creating a new R_GRID etc.
+!                          Done to handle automatic grid changes.
 ! Altered 13-Sep-2002  : Check before doing PSQ SQRT installed (for INTEL compiler).
 ! Altered 03-Feb-2002  : Bug fix. Can now treat THK=.FALSE. and NP=NC+ND.
 !                          Routine was not handlling rays with NI=1 & 2 correctly.
@@ -322,12 +328,27 @@
 !
 !
 !
+! Check to see whether we have a new R grid, or the solution options have
+! changd. This can only happen when INIT is TRUE.
+!
+	NEW_R_GRID=.FALSE.
+	IF(INIT .AND. .NOT. FIRST_TIME)THEN
+	  DO I=1,ND
+	    IF(R(I) .NE. R_EXT(ND_ADD+I))THEN
+	      NEW_R_GRID=.TRUE.
+	      WRITE(171,*)'Updating RGRID in FG_J_CMF_V10'
+	      EXIT
+	    END IF
+	  END DO
+	  IF(VDOP_FRAC .NE. VDOP_FRAC_SAV
+	1       .OR.  OLD_SOLUTION_OPTIONS .NE. SOLUTION_OPTIONS)NEW_R_GRID=.TRUE.
+	END IF
+	
 ! Deallocate all allocated rays if we are using a diferent solution technique.
 ! This option will only be used when testing, since in CMFGEN we will always use
 ! the same atmospheric structure.
 !
-	IF( ALLOCATED(R_EXT) .AND.  (VDOP_FRAC .NE. VDOP_FRAC_SAV
-	1       .OR.  OLD_SOLUTION_OPTIONS .NE. SOLUTION_OPTIONS) )THEN
+	IF( ALLOCATED(R_EXT) .AND. NEW_R_GRID)THEN
 	  DEALLOCATE ( R_EXT )
 	  DEALLOCATE ( LOG_R_EXT )
 	  DEALLOCATE ( V_EXT )
@@ -835,6 +856,7 @@
 	      IF(NI_RAY(LS) .GE. I)MAX_LS(I)=LS
 	    END DO
 	  END DO
+	  HN_VAL=0.0D0
 !
 	ELSE IF(NEW_FREQ)THEN
           IF(SOLUTION_METHOD .EQ. 'DIFFERENCE')THEN
@@ -850,6 +872,7 @@
 	    WRITE(ERROR_LU(),*)'Frequencies must be monotonically decreasng'
 	    STOP
 	  END IF
+	  HN_VAL_PREV=HN_VAL
 	ELSE IF(FREQ .NE. PREVIOUS_FREQ)THEN
 	   WRITE(ERROR_LU(),*)'Error in FG_J_CMF_V10'
 	   WRITE(ERROR_LU(),*)
@@ -1522,9 +1545,15 @@ C
 !
 ! Compute the boundary Eddington factors.
 !
+	HN_VAL=HBC+SIGMA(1)*NBC
 	HBC=HBC/JNU(1)
 	NBC=NBC/JNU(1)
 	IN_HBC=IN_HBC/(2.0D0*JNU(ND)-IC)
+!
+!	NBC=(HN_VAL_PREV-HN_VAL)/JNU(1)a
+!	IN_HBC=HN_VAL_PREV
+!
+!	HBC=JNU(2)/JNU(1)
 !
 ! Compute the Eddington F and G factors, which are defined by
 ! F=K/J and G=N/H. The F and G factors are returned in KNU and NNU

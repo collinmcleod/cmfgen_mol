@@ -5,12 +5,14 @@ include ../Makefile_definitions
 # Library where object files will/are stored
          
 LIB=$(LIB_DIR)libnewsubs.a
+LIB_MOD=$(LIB_DIR)libmod.a
 
 #
 # Entries in a library
 #
 OBJ= $(LIB)(ave_level_energy.o)\
      $(LIB)(colcool_sl_v4.o)\
+     $(LIB)(cut_points_v3.o)\
      $(LIB)(ff_res_gaunt.o)\
      $(LIB)(genopaeta_v7.o)\
      $(LIB)(genopaeta_v8.o)\
@@ -20,14 +22,17 @@ OBJ= $(LIB)(ave_level_energy.o)\
      $(LIB)(omega_gen_v3.o)\
      $(LIB)(phot_data_mod.o)\
      $(LIB)(quad_multi_v7.o)\
-     $(LIB)(rdphot_gen_v1.o)\
+     $(LIB)(rayleigh_scat.o)\
+     $(LIB)(rdphot_gen_v2.o)\
      $(LIB)(rd_hyd_bf_data.o)\
      $(LIB)(rd_phot_die_v1.o)\
      $(LIB)(rd_rv_file_v2.o)\
      $(LIB)(rd_store_log.o)\
      $(LIB)(rd_xray_spec.f)\
      $(LIB)(set_edge_freq_v3.o)\
+     $(LIB)(set_edge_freq_v4.o)\
      $(LIB)(set_x_freq_v2.o)\
+     $(LIB)(sm_phot_v3.o)\
      $(LIB)(steq_multi_v4.o)\
      $(LIB)(subcol_multi_v4.o)\
      $(LIB)(sub_phot_gen.o)\
@@ -60,7 +65,7 @@ $(LIB)(rd_phot_data_v1.o) : rd_phot_data_v1.f $(LIB)(phot_data_mod.o)
 $(LIB)(rdphot_gen_v1.o)   : rdphot_gen_v1.f   $(LIB)(phot_data_mod.o)
 $(LIB)(sub_phot_gen.o)    : sub_phot_gen.f    $(LIB)(phot_data_mod.o)
 
-GEN = ../lib/libsubs.a(mod_lev_dis_blk.o)
+GEN = $(LIB_MOD)(mod_lev_dis_blk.o)
 
 $(LIB)(genopaeta_v7.o)  : genopaeta_v7.f    $(GEN)
 $(LIB)(quad_multi_v7.o) : quad_multi_v7.f   $(GEN)

@@ -16,6 +16,7 @@
 !     4 - Used for CIV rates from Leobowitz (JQSRT 1972,12,299)
 !     5 - Opacity project fits (from Peach, Sraph, and Seaton (1988)
 !     6 - Hummer fits to the opacity cross-sections for HeI
+!     7 - Modifed Seaton fit --- cross-section zero until offset edge.
 !    20 - Opacity Project: smoothed [number of data pairs]
 !    21 - Opacity Project: scaled, smoothed [number of data pairs]
 !    30 - Call XCROSS_V2 (For Lithium-like ions).
@@ -44,6 +45,7 @@
 !
 	IMPLICIT NONE
 !
+! Altered 30-Apr-2004 : Modified Seaton fit (Type 7) installed.
 ! Altered 07-Dec-2001 : EQUAL_CORFAC installed for AMD processors and PGI compiler.
 !                       Bug fix. Correct edge cross-section was not being returned for
 !                           when PHOT>100.
@@ -404,6 +406,17 @@ C
                       T1=PD(ID)%CROSS_A(LMIN+5)+PD(ID)%CROSS_A(LMIN+6)*X
 	            END IF
 	            PHOT(I)=PHOT(I)+10.0D0**(T1+LG10_CONV_FAC)
+	          END IF
+!
+! Modified seaton fit.
+!
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 7 .AND.
+	1                             PD(ID)%CROSS_A(LMIN) .NE. 0)THEN
+	          RU=EDGE/(FREQ_VEC(I)+PD(ID)%CROSS_A(LMIN+3))
+	          IF(RU .LE. 1.0D0)THEN
+	            PHOT(I)=PHOT(I) + CONV_FAC*
+	1              PD(ID)%CROSS_A(LMIN)*( PD(ID)%CROSS_A(LMIN+1) +
+	1               (1.0D0-PD(ID)%CROSS_A(LMIN+1))*RU )*( RU**PD(ID)%CROSS_A(LMIN+2) )
 	          END IF
 !
 !                                   

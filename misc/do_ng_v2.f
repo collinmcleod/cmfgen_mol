@@ -21,6 +21,8 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 28-Mar-2004 : Changed to handle new format SCRTEMP files.
+!                       Now choice of 3 options: NG, AV and SOR.
 ! Altered 01-Jul-2003 : IT_STEP inserted as option.  
 ! Altered 15-Apr-2003 : IFLAG in RD_4_ITS initialized.
 !                       NUM_BAD_NG in NG_MIT_OPST initialized.
@@ -31,7 +33,8 @@
 !                       Based on a very old version in [JDH.BASOL] and 
 !                        REWRITE_SCR.
 !
-	REAL*8, ALLOCATABLE :: RDPOPS(:,:,:)		!NT,ND
+	REAL*8, ALLOCATABLE :: RDPOPS(:,:,:)		!NT+3,ND
+	REAL*8, ALLOCATABLE :: BIG_POPS(:,:)		!NT+3,ND
 	REAL*8, ALLOCATABLE :: POPS(:,:)		!NT,ND
 	REAL*8, ALLOCATABLE :: R(:)			!ND
 	REAL*8, ALLOCATABLE :: V(:)			!ND
@@ -39,6 +42,10 @@
 !
 ! Local variables which are adjusted to match the particular model under
 ! consideration.
+!
+	REAL*8 T1,T2,T3
+	REAL*8 SCALE_FAC
+	REAL*8 BIG_FAC
 !
 	INTEGER*4 ND,NT
 	INTEGER*4 NBAND
@@ -48,7 +55,9 @@
 	INTEGER*4 NITSF
 	INTEGER*4 LST_NG
 	INTEGER*4 IFLAG
+	INTEGER*4 N_ITS_TO_RD
 	INTEGER*4 IT_STEP
+	INTEGER*4 I,J
 !
 	INTEGER*4, PARAMETER :: RITE_N_TIMES=1
 	INTEGER*4, PARAMETER :: T_OUT=6
@@ -57,7 +66,9 @@
 	LOGICAL NEWMOD
 	LOGICAL NG_DONE
 	LOGICAL DO_REGARDLESS
+	LOGICAL WRITE_RVSIG
 	LOGICAL SCALE_INDIVIDUALLY
+	CHARACTER*3 OPTION
 	CHARACTER*132 STRING
 !
 	WRITE(T_OUT,*)' '
@@ -93,168 +104,140 @@
 	END IF 
 	CLOSE(UNIT=12)
 !
-	ALLOCATE (RDPOPS(NT,ND,4))
+	ALLOCATE (RDPOPS(NT+3,ND,4))
+	ALLOCATE (BIG_POPS(NT+3,ND))
 	ALLOCATE (POPS(NT,ND))
 	ALLOCATE (R(ND))
 	ALLOCATE (V(ND))
 	ALLOCATE (SIGMA(ND))
 !
-	WRITE(T_OUT,'(A)')' '
-	WRITE(T_OUT,'(A)')' This option was inserted mainly for testing purposes.'
-	WRITE(T_OUT,'(A)')' The default value of 1 should generally be used.'
-	IT_STEP=1
-	CALL GEN_IN(IT_STEP,'Iteration step size for NG acceleration')
+	OPTION='NG'
+	CALL GEN_IN(OPTION,'Acceleration method: NG, AV(ERAGE), SOR')
+	CALL SET_CASE_UP(OPTION,0,0)
+	IF(OPTION(1:2) .EQ.'NG')THEN
+	  WRITE(T_OUT,'(A)')' '
+	  WRITE(T_OUT,'(A)')' This option was inserted mainly for testing purposes.'
+	  WRITE(T_OUT,'(A)')' The default value of 1 should generally be used.'
+	  IT_STEP=1
+	  CALL GEN_IN(IT_STEP,'Iteration step size for NG acceleration')
+	  NBAND=1
+	  DO_REGARDLESS=.FALSE.
+	  CALL GEN_IN(NBAND,'Band width for NG acceleration')
+	  CALL GEN_IN(DO_REGARDLESS,'Do acceleration independent of corection size?')
+	  SCALE_INDIVIDUALLY=.FALSE.
+	  IF(DO_REGARDLESS)THEN
+	    CALL GEN_IN(SCALE_INDIVIDUALLY,'Scale each population individually at each depth to limit change')
+	  END IF
+	  N_ITS_TO_RD=4
+	ELSE IF(OPTION(1:2) .EQ.'AV')THEN
+	  IT_STEP=1
+	  N_ITS_TO_RD=2
+	ELSE IF(OPTION(1:3) .EQ. 'SOR')THEN
+	  IT_STEP=1
+	  N_ITS_TO_RD=2
+	  CALL GEN_IN(SCALE_FAC,'Factor to scale last correction by')
+          CALL GEN_IN(BIG_FAC,'Maximum correction to any depth')
+	ELSE
+	   WRITE(6,*)'Invalid acceleration option'
+	   STOP
+	END IF
 !
 ! Read POPULATIONS that were output on last iteration. This is primarily
 ! done to get NITSF etc.
 ! 
 	NEWMOD=.FALSE.
-	CALL SCR_READ(R,V,SIGMA,POPS,IREC,NITSF,RITE_N_TIMES,LST_NG,
-	1                NT,ND,LUSCR,NEWMOD)
-!
-! Read in the last 4 estimates of the poplations, as output to SCRTEMP.
-!
-	CALL RD_4_ITS(RDPOPS,POPS,NT,ND,IT_STEP,IFLAG)
-	IF(IFLAG .NE. 0)THEN
-	  WRITE(T_OUT,*)'Unable to read scratch file'
+	IREC=0			!Get last iteration
+	CALL SCR_READ_V2(R,V,SIGMA,POPS,IREC,NITSF,RITE_N_TIMES,LST_NG,
+	1                WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
+	IF(NEWMOD)THEN
+	  WRITE(T_OUT,*)'Unable to read last iteration in scratch file'
 	  STOP
 	END IF
+	BIG_POPS(1:NT,:)=POPS(1:NT,:)
+	BIG_POPS(NT+1,:)=R(:)
+	BIG_POPS(NT+2,:)=V(:)
+	BIG_POPS(NT+3,:)=SIGMA(:)+1.0D0
+	WRITE(6,*)'Read in last iteration'
 !
-! Now perform the NG acceleration.
+! Read in the last N_ITS_TO_RD estimates of the populations, as output to SCRTEMP.
 !
-        NBAND=1
-	DO_REGARDLESS=.FALSE.
-	CALL GEN_IN(NBAND,'Band width for NG acceleration')
-	CALL GEN_IN(DO_REGARDLESS,'Do acceleration independent of corection size?')
-	SCALE_INDIVIDUALLY=.FALSE.
-	IF(DO_REGARDLESS)THEN
-	  CALL GEN_IN(SCALE_INDIVIDUALLY,'Scale each population individually at each depth to limit change')
-	END IF
-	CALL NG_MIT_OPTS(POPS,RDPOPS,ND,NT,NBAND,DO_REGARDLESS,
+	NEWMOD=.FALSE.
+	DO I=1,N_ITS_TO_RD
+	  J=IREC-(I-1)*IT_STEP
+	  WRITE(6,*)'Reading record', J
+	  CALL SCR_READ_V2(R,V,SIGMA,POPS,J,NITSF,RITE_N_TIMES,LST_NG,
+	1                WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
+	  RDPOPS(1:NT,:,I)=POPS(1:NT,1:ND)
+	  RDPOPS(NT+1,:,I)=R(:)
+	  RDPOPS(NT+2,:,I)=V(:)
+	  RDPOPS(NT+3,:,I)=SIGMA(:)+1.0D0
+	  IF(NEWMOD)THEN
+	    WRITE(T_OUT,*)'Unable to read scratch file'
+	    STOP
+	  END IF
+	END DO
+
+	WRITE(6,*)'Starting the accleration'
+	IF(OPTION(1:2) .EQ. 'NG')THEN
+!
+! Perform the NG acceleration.
+!
+	  J=NT+3
+	  CALL NG_MIT_OPTS(BIG_POPS,RDPOPS,ND,J,NBAND,DO_REGARDLESS,
 	1                     SCALE_INDIVIDUALLY,NG_DONE,T_OUT)
+!
+	  WRITE(6,*)'Finished NG accleration'
+	  NG_DONE=.TRUE.
+	ELSE IF(OPTION(1:2) .EQ. 'AV')THEN
+	  DO J=1,ND
+	    DO I=1,NT+3
+	      BIG_POPS(I,J)=0.5D0*(RDPOPS(I,J,1)+RDPOPS(I,J,2))
+	    END DO
+	  END DO
+	  NG_DONE=.TRUE.
+	ELSE IF(OPTION(1:3) .EQ. 'SOR')THEN
+	  DO J=1,ND
+	    T1=-1000.0D0
+	    T2=1000.0D0
+	    DO I=1,NT+3
+	      T1=MAX(T1,(RDPOPS(I,J,1)-RDPOPS(I,J,2))/RDPOPS(I,J,1))
+	      T2=MIN(T2,(RDPOPS(I,J,1)-RDPOPS(I,J,2))/RDPOPS(I,J,1))
+	    END DO
+	    T2=ABS(T2)+1.0D0
+	    T3=SCALE_FAC
+	    IF(T3*T1 .GT. BIG_FAC)T3=BIG_FAC/T1
+	    IF(T3*T2 .GT. (1.0D0-1.0D0/BIG_FAC))T3=BIG_FAC/T2
+	    DO I=1,NT+3
+	      BIG_POPS(I,J)=RDPOPS(I,J,1)+T3*(RDPOPS(I,J,1)-RDPOPS(I,J,2))
+	    END DO
+	  END DO
+	  NG_DONE=.TRUE.
+	END IF
+!
+	POPS(1:NT,:)=BIG_POPS(1:NT,:)
+	R(2:ND-1)=BIG_POPS(NT+1,2:ND-1)
+	V(2:ND-1)=BIG_POPS(NT+2,2:ND-1)
+	SIGMA(2:ND-1)=BIG_POPS(NT+3,2:ND-1)-1.0D0
 !
 	IF(NG_DONE)THEN
 	  NITSF=NITSF+1
 	  LST_NG=NITSF
-	  CALL SCR_RITE(R,V,SIGMA,POPS,IREC,NITSF,RITE_N_TIMES,
-	1                 LST_NG,NT,ND,LUSCR,NEWMOD)
-	  WRITE(T_OUT,*)'Results of successful NG acceleration ',
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,NITSF,RITE_N_TIMES,
+	1                 LST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
+	  IF(OPTION(1:2) .EQ.'NG')THEN
+	    WRITE(T_OUT,*)'Results of successful NG acceleration ',
 	1                 'output to SCRTEMP.'
+	  ELSE IF(OPTION(1:3) .EQ.'SOR')THEN
+	    WRITE(T_OUT,*)'Results of successful SOR output to SCRTEMP.'
+	  ELSE
+	    WRITE(T_OUT,*)'Last 2 iterations averaged and output to SCRTEMP'
+	  END IF
 	END IF
 !
 	STOP
 	END
 !
 !
-!
-	SUBROUTINE RD_4_ITS(RDPOPS,POPS,NT,ND,IT_STEP,IFLAG)
-	IMPLICIT NONE
-!
-	INTEGER*4 NT
-	INTEGER*4 ND
-	INTEGER*4 IFLAG
-!                                                                                                  <
-!Use iterations, 1, 1+IT_STEP, 1+2*IT_STEP, 1+3*IT_STEP to do the acceleration.                    <
-!Mainly for testing purposes.                                                                      <
-!                        
-	INTEGER*4 IT_STEP
-	REAL*8 RDPOPS(NT*ND,4)
-	REAL*8 POPS(NT*ND)
-!
-! Note that REC_SIZE is the size of the output record in bytes.
-!           REC_LEN  is the size of the output record in COMPUTER units.
-!           N_PER_REC is the number of numbers per record.
-!           NUM_TIME is the number of times each iteration has been written
-!                to the scratch file.
-!           WORD_SIZE is the size of the number to be output in bytes.
-!           UNIT_SIZE is the number of bytes per unit used to specify
-!           the size of a direct access file.
-!
-	INTEGER*4 ARRAYSIZE,IST,IEND
-	INTEGER*4 REC_SIZE,REC_LEN,NUM_RECS,N_PER_REC,NUM_TIME
-	INTEGER*4 UNIT_SIZE,WORD_SIZE
-!
-	INTEGER*4 I,L,NPREV,NITSF,IT_CNT
-	INTEGER*4 SRT_REC_M1
-	INTEGER*4 CHK
-	INTEGER*4 LUER,ERROR_LU
-	EXTERNAL ERROR_LU
-!
-        LUER=ERROR_LU()
-!
-! Determine the record size, and the number of records that
-! need to be written out to fully write out the population vector.
-! As this is computer and installation dependent, we call a subroutine
-! to return the parameters.
-!
-	IFLAG=0
-	CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,
-	1                 WORD_SIZE,N_PER_REC)
-	ARRAYSIZE=NT*ND
-	NUM_RECS=INT( (ARRAYSIZE-1)/N_PER_REC ) + 1
-	REC_LEN=REC_SIZE/UNIT_SIZE
-!
-! Read in pointer to data file. NB. Format has changed. IT_CNT is now
-! the iteration count (but may differ from NITSF is problems occurred
-! read/riting to SCRTEMP) where as previously it referred to the actual 
-! record.
-!
-	OPEN(UNIT=26,FILE='POINT1',IOSTAT=CHK,STATUS='OLD')
-	  IF(CHK .NE. 0)THEN
-	    WRITE(LUER,*)'Error opening POINT1 in GENACCEL: IOSTAT=',CHK
-	    IFLAG=3
-	    RETURN
-	  END IF
-	  READ(26,*,IOSTAT=CHK)IT_CNT,NITSF,NUM_TIME
-	  IF(CHK .NE. 0)THEN
-	    WRITE(LUER,*)'Error reading POINT1 in GENACCEL: IOSTAT=',CHK
-	    IFLAG=4
-	    CLOSE(UNIT=26)
-	    RETURN
-	  END IF
-	CLOSE(UNIT=26)
-!
-!		' OLD MODEL '
-!
-	OPEN(UNIT=20,FILE='SCRTEMP',FORM='UNFORMATTED',
-	1    ACCESS='DIRECT',STATUS='OLD',RECL=REC_LEN,IOSTAT=CHK)
-	  IF(CHK .NE. 0)THEN
-	    WRITE(LUER,*)'Error opening SCRTEMP for input in GENACCEL'
-	    WRITE(LUER,*)'IOSTAT=',CHK
-	    CLOSE(UNIT=20)
-	    IFLAG=5
-	    RETURN
-	  END IF
-!
-! SRT_REC_M1 + 1 is the first record for the NPREV previous iteration.
-! If output more than once, it refers to the first output.
-!
-	  DO NPREV=1,4
-	    SRT_REC_M1=(IT_CNT-1-(NPREV-1)*IT_STEP)*NUM_TIME*NUM_RECS+2
-	    DO L=1,NUM_RECS
-	      IST=(L-1)*N_PER_REC+1
-	      IEND=MIN( IST+N_PER_REC-1,ARRAYSIZE )
-	      READ(20,REC=SRT_REC_M1+L,IOSTAT=CHK)
-	1          (RDPOPS(I,NPREV),I=IST,IEND)
-	      IF(CHK .NE. 0)THEN
-	        WRITE(LUER,*)'Error on reading scratch file in GENACCEL'
-	        WRITE(LUER,200)SRT_REC_M1,CHK
-200	        FORMAT(X,'SRT_REC_M1=',I3,5X,'IOSAT=',I7)
-	        IFLAG=6
-	        CLOSE(UNIT=20)
-	        RETURN
-	      END IF
-	    END DO
-	  END DO
-	  CLOSE(UNIT=20)
-!
-	POPS(:)=RDPOPS(:,1)
-!
-	WRITE(6,*)'SCRTEMP file was successfully read'
-	RETURN
-	END
-!
-! 
 !
 ! Altered 3-April-1989. -Call changed. MAXDEC, MAXINC and IFLAG installed,
 !                        ACCELERATE flag removed.
@@ -295,6 +278,7 @@
 	END DO
 	WEIGHT=.TRUE.
 !
+	WRITE(6,*)'Calling NGACCEL'
 	CALL NGACCEL(NEWPOP,TEMP,NS,WEIGHT)
 !
 	RETURN

@@ -97,7 +97,7 @@ C
 	  DO L=ML_ST,ML_END-1
 	    T1=(NU(LST_COMP)-NU(L))/NU(L) 
 	    T2=(NU(L)-NU(ML_END))/NU(L)
-	    IF(T1 .GT. VRAT .AND. T2 .GT. VRAT)THEN
+	    IF(T1+T2 .GT. 1.25D0*VRAT .AND. T1 .GT. 0.75D0*VRAT)THEN
 	      NU_EVAL(L)=NU(L)
 	      LST_COMP=L
 	    ELSE IF(T1 .LT. T2)THEN

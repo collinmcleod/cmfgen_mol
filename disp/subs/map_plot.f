@@ -477,7 +477,7 @@ c
 	      IF(STR)THEN
 	        FILNAME=FILNAME(:L)//'.STR'
                 L=L+4
-                OPEN(UNIT=33,NAME=FILNAME(:L),STATUS='NEW')
+                OPEN(UNIT=33,FILE=FILNAME(:L),STATUS='NEW')
 	          DO I=1,MAXSTR
                     IF(FLAGSTR(I))THEN
                       WRITE(33,17)LOC(I),XSTR(I),YSTR(I),ORIENTATION(I),
@@ -494,7 +494,7 @@ c
 	          FILNAME=FILNAME(:L)//'.VEC'
                   L=L+4
 	        END IF
-                OPEN(UNIT=33,NAME=FILNAME(:L),STATUS='NEW')
+                OPEN(UNIT=33,FILE=FILNAME(:L),STATUS='NEW')
 	          DO I=1,MAXVEC
                     IF(FLAGLINE(I))THEN
 	              WRITE(33,18)LINEXST(I),LINEYST(I),
@@ -918,7 +918,7 @@ C
 	  L=LEN_TRIM(FILNAME)
 	  IF(L .NE. 0)THEN
 	    IF(INDEX(FILNAME,'.') .EQ. 0)FILNAME=FILNAME(:L)//'.STR'
-            OPEN(UNIT=33,NAME=TRIM(FILNAME),STATUS='OLD',ERR=923)
+            OPEN(UNIT=33,FILE=TRIM(FILNAME),STATUS='OLD',ERR=923)
 	    L=0
             DO ISTR=1,MAXSTR
 	      IF( .NOT. FLAGSTR(ISTR))THEN
@@ -1066,7 +1066,7 @@ C
 	  ISTR=1
 	  IF(L .NE. 0)THEN
 	    IF(INDEX(FILNAME,'.') .EQ. 0)FILNAME=FILNAME(:L)//'.VEC'
-            OPEN(UNIT=33,NAME=TRIM(FILNAME),STATUS='OLD',ERR=1100)
+            OPEN(UNIT=33,FILE=TRIM(FILNAME),STATUS='OLD',ERR=1100)
 	    DO ISTR=1,MAXVEC
 	      READ(33,*,ERR=1100)LINEXST(ISTR),LINEYST(ISTR),
 	1              LINEXEND(ISTR),LINEYEND(ISTR)
@@ -1185,7 +1185,7 @@ C
 C
 C
 	ELSE IF(ANS .EQ. 'CL')THEN
-	  IF(HARD .EQ. .FALSE.)THEN			!Terminal
+	  IF(.NOT. HARD)THEN		 	!Terminal
 	    CALL PGERAS
 	    CALL PGETXT
 	    CALL PGPAGE

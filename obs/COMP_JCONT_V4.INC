@@ -57,6 +57,8 @@ C
 	CHI_CLUMP(1:ND)=CHI(1:ND)*CLUMP_FAC(1:ND)
 	ETA_CLUMP(1:ND)=ETA(1:ND)*CLUMP_FAC(1:ND)
 	ESEC_CLUMP(1:ND)=ESEC(1:ND)*CLUMP_FAC(1:ND)
+	CHI_RAY_CLUMP(1:ND)=CHI_RAY(1:ND)*CLUMP_FAC(1:ND)
+	CHI_SCAT_CLUMP(1:ND)=CHI_SCAT(1:ND)*CLUMP_FAC(1:ND)
 C
 C 
 C                            
@@ -69,10 +71,12 @@ C
 	  CALL TUNE(IONE,'JFEAUEXT')
 	  CALL EXTEND3OPAC(CHIEXT,ETAEXT,ESECEXT,COEF,INDX,
 	1                      NDEXT,CHI_CLUMP,ETA_CLUMP,ESEC_CLUMP,ND)
+	  CALL EXTEND3OPAC(CHIEXT,CHI_RAY_EXT,CHI_SCAT_EXT,COEF,INDX,
+	1                      NDEXT,CHI_CLUMP,CHI_RAY_CLUMP,CHI_SCAT_CLUMP,ND)
 C
 	  DO I=1,NDEXT
 	    ZETAEXT(I)=ETAEXT(I)/CHIEXT(I)
-	    THETAEXT(I)=ESECEXT(I)/CHIEXT(I)
+	    THETAEXT(I)=CHI_SCAT_EXT(I)/CHIEXT(I)
 	  END DO
 C
 	  IF(COMPUTE_EDDFAC)THEN
@@ -149,20 +153,19 @@ C Update record for next frequency
 C
 	  CALL TUNE(ITWO,'JFEAUEXT')
 C
-C
 C 
 C
 	ELSE IF(CONT_VEL .AND. ACCURATE)THEN
-	  CALL TUNE(IONE,'JCONT_ACC')
 C
 C Interpolate the opacity and emissivity using a LINEAR interpolation
 C law. CHIEXT etc. will contain the opacities etc. on the transfer grid
 C with the clumping corrections. CHI_CLUMP etc refer to the appropriate
 C quantities on the population grid.
 C
-	  CALL TUNE(IONE,'JCONT_ACC')
 	  CALL EXTEND3OPAC(CHIEXT,ETAEXT,ESECEXT,COEF,INDX,NDEXT,
 	1              CHI_CLUMP,ETA_CLUMP,ESEC_CLUMP,ND)
+	  CALL EXTEND3OPAC(CHIEXT,CHI_RAY_EXT,CHI_SCAT_EXT,COEF,INDX,
+	1                      NDEXT,CHI_CLUMP,CHI_RAY_CLUMP,CHI_SCAT_CLUMP,ND)
 C
 C NB: CHI_PREV is used to refer to the continuum opacity at the previous
 C frequency. Is does not need to be multiplied by CLUMP_FAC, as it is 
@@ -236,48 +239,56 @@ C
 	  INACCURATE=.TRUE.
 	  L=0
 	  DO WHILE(INACCURATE)
-C
+!
+! We assume the Rayleigh scattering to be coherent in the CMF.
+!
 	     IF(COHERENT_ES)THEN
 	       TA(1:NDEXT)=ETAEXT(1:NDEXT) +
-	1           ESECEXT(1:NDEXT)*RJEXT(1:NDEXT)
+	1           CHI_SCAT_EXT(1:NDEXT)*RJEXT(1:NDEXT)
 	     ELSE
 	       TA(1:NDEXT)=ETAEXT(1:NDEXT) +
-	1           ESECEXT(1:NDEXT)*RJEXT_ES(1:NDEXT)
+	1           ESECEXT(1:NDEXT)*RJEXT_ES(1:NDEXT) +
+	1           CHI_RAY_EXT(1:NDEXT)*RJEXT(1:NDEXT)
 	     END IF
 C
 C NB Using TA for ETA, TC for JNU_VEC, and TB for HNU_VEC
 C
-	     CALL TUNE(IONE,'FG_J_CMF')
-	     CALL FG_J_CMF_V10(TA,CHIEXT,ESECEXT,
+	     CALL TUNE(IONE,'FG_J_CMF_ACC')
+	     CALL FG_J_CMF_V10(TA,CHIEXT,CHI_SCAT_EXT,
 	1            VEXT,SIGMAEXT,REXT,PEXT,
 	1            TC,TB,FEDD,GEDD,N_ON_J,
 	1            AQWEXT,HMIDQWEXT,KQWEXT,NMIDQWEXT,
 	1            INBC,HBC_CMF,NBC_CMF,IPLUS,
 	1            FL,dLOG_NU,DIF,DBB,IC,
-	1            VDOP_VECEXT,DELV_FG,
+	1            VDOP_VEC_EXT,DELV_FRAC_FG,
 	1            METHOD,FG_SOL_OPTIONS,THK_CONT,
 	1            FIRST_FREQ,NEW_FREQ,N_TYPE,
 	1            NCEXT,NPEXT,NDEXT)
-	     CALL TUNE(ITWO,'FG_J_CMF')
+	     CALL TUNE(ITWO,'FG_J_CMF_ACC')
 	     FG_COUNT=FG_COUNT+1
-C
+!
+! We assume Rayleigh scattering, when present, is coherent in the CMF. 
+! NB: We have to pass a non zero CHI_RAY_EXT to MOM_J_CMF_V6, since it is 
+! interpolated in the LOG plane.
+!
 	     IF(COHERENT_ES)THEN
 	       TA(1:NDEXT)=ETAEXT(1:NDEXT)
+	       TB(1:NDEXT)=CHI_SCAT_EXT(1:NDEXT)
 	     ELSE
-	       TA(1:NDEXT)=ETAEXT(1:NDEXT) +
-	1            ESECEXT(1:NDEXT)*RJEXT_ES(1:NDEXT)
+	       TA(1:NDEXT)=ETAEXT(1:NDEXT)+ESECEXT(1:NDEXT)*RJEXT_ES(1:NDEXT)
+	       TB(1:NDEXT)=CHI_RAY_EXT(1:NDEXT)
 	     END IF
-	     CALL TUNE(IONE,'MOM_J_CMF')
-	     CALL MOM_J_CMF_V6(TA,CHIEXT,ESECEXT,
+	     CALL TUNE(IONE,'MOM_J_CMF_ACC')
+	     CALL MOM_J_CMF_V6(TA,CHIEXT,TB,
 	1              VEXT,SIGMAEXT,REXT,
 	1  	       FEDD,GEDD,N_ON_J,RJEXT,RSQHNU,
-	1              VDOP_VECEXT,DELV_MOM,
+	1              VDOP_VEC_EXT,DELV_FRAC_MOM,
 	1              HBC_CMF,INBC,NBC_CMF,
 	1              FL,dLOG_NU,DIF,DBB,IC,
-	1              N_TYPE,METHOD,COHERENT_ES,
+	1              N_TYPE,METHOD,L_TRUE,
 	1              FIRST_FREQ,NEW_FREQ,
 	1              NCEXT,NPEXT,NDEXT)
-	     CALL TUNE(ITWO,'MOM_J_CMF')
+	     CALL TUNE(ITWO,'MOM_J_CMF_ACC')
 C
 C We set NEW_FREQ to false so that FG_J_CMF continues to use the same
 C AV_PREV and CV_PREV. NEW_FREQ must be set to true again outside the
@@ -325,9 +336,10 @@ C
 	    K_MOM(1:ND)=RJ(1:ND)*K_MOM(1:ND)
 C
 	    IF(COHERENT_ES)THEN
-	      SOURCE(1:ND)=ZETA(1:ND)+THETA(1:ND)*RJ(1:ND)
+	      SOURCE(1:ND)=ZETA(1:ND)+CHI_SCAT(1:ND)*RJ(1:ND)/CHI(1:ND)
 	    ELSE
-	      SOURCE(1:ND)=ZETA(1:ND)+THETA(1:ND)*RJ_ES(1:ND)
+	      SOURCE(1:ND)=ZETA(1:ND) +
+	1          (ESEC(1:ND)*RJ_ES(1:ND)+CHI_RAY(1:ND)*RJ(1:ND))/CHI(1:ND)
 	    END IF
 C
 C Update record for next frequency
@@ -380,13 +392,14 @@ C
 	      IF(COHERENT_ES)THEN
 	        TA(1:NDEXT)=ETAEXT(1:NDEXT)+ESECEXT(1:NDEXT)*RJEXT(1:NDEXT)
 	      ELSE
-	        TA(1:NDEXT)=ETAEXT(1:NDEXT)+ESECEXT(1:NDEXT)*RJEXT_ES(1:NDEXT)
+	        TA(1:NDEXT)=ETAEXT(1:NDEXT)+ESECEXT(1:NDEXT)*RJEXT_ES(1:NDEXT)+
+	1           CHI_RAY_EXT(1:NDEXT)*RJEXT(1:NDEXT)
 	      END IF
 C                             
 C NB Using TA for ETA, U for P_OBS (temporay measure), I for NP_OBS.
 C
 	      CALL TUNE(IONE,'CMF_FORM_SOL')
-	      CALL CMF_FORM_SOL(TA,CHIEXT,ESECEXT,
+	      CALL CMF_FORM_SOL(TA,CHIEXT,CHI_SCAT_EXT,
 	1                 TB,VEXT,SIGMAEXT,REXT,PEXT,
 	1                 P_OBS,IPLUS,NP_OBS,NP_OBS_MAX,
 	1                 MU_AT_RMAX,HQW_AT_RMAX,RMAX_OBS,V_AT_RMAX,
@@ -486,37 +499,45 @@ C
 	  DO WHILE(INACCURATE)
 C
 	     IF(COHERENT_ES)THEN
-	       TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ(1:ND)
+	       TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ(1:ND)
 	     ELSE
-	       TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ_ES(1:ND)
+	       TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ_ES(1:ND)+
+	1                                CHI_RAY_CLUMP(1:ND)*RJ(1:ND)
 	     END IF
 C
 C NB Using TA for ETA, TC for JNU_VEC, and TB for HNU_VEC
 C
 	     CALL TUNE(IONE,'FG_J_CMF')
-	     CALL FG_J_CMF_V10(TA,CHI_CLUMP,ESEC_CLUMP,V,SIGMA,R,P,
+	     CALL FG_J_CMF_V10(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
 	1                  TC,TB,FEDD,GEDD,N_ON_J,
 	1                  AQW,HMIDQW,KQW,NMIDQW,
 	1                  INBC,HBC_CMF,NBC_CMF,
 	1                  IPLUS,FL,dLOG_NU,DIF,DBB,IC,
-	1                  VDOP_VEC,DELV_FG,
+	1                  VDOP_VEC,DELV_FRAC_FG,
 	1                  METHOD,FG_SOL_OPTIONS,THK_CONT,
 	1                  FIRST_FREQ,NEW_FREQ,N_TYPE,NC,NP,ND)
 	     CALL TUNE(ITWO,'FG_J_CMF')
 	     FG_COUNT=FG_COUNT+1
-C
+!
+! We assume that the Rayleig scattering component is coherent.
+! Only the e.s. component may be incoherent. NB: We have to pass 
+! a non zero CHI_RAY to MOM_J_CMF_V6, since it is interpolated 
+! in the LOG plane.
+!
 	     IF(COHERENT_ES)THEN
 	       TA(1:ND)=ETA_CLUMP(1:ND)
+	       TB(1:ND)=CHI_SCAT_CLUMP(1:ND)
 	     ELSE
 	       TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ_ES(1:ND)
+               TB(1:ND)=CHI_RAY_CLUMP(1:ND)
 	     END IF
 	     CALL TUNE(IONE,'MOM_J_CMF')
-	     CALL MOM_J_CMF_V6(TA,CHI_CLUMP,ESEC_CLUMP,V,SIGMA,R,
+	     CALL MOM_J_CMF_V6(TA,CHI_CLUMP,TB,V,SIGMA,R,
 	1  	       FEDD,GEDD,N_ON_J,RJ,RSQHNU,
-	1              VDOP_VEC,DELV_MOM,
+	1              VDOP_VEC,DELV_FRAC_MOM,
 	1              HBC_CMF,INBC,NBC_CMF,
 	1              FL,dLOG_NU,DIF,DBB,IC,
-	1              N_TYPE,METHOD,COHERENT_ES,
+	1              N_TYPE,METHOD,L_TRUE,
 	1              FIRST_FREQ,NEW_FREQ,NC,NP,ND)
 	     CALL TUNE(ITWO,'MOM_J_CMF')
 C
@@ -550,9 +571,10 @@ C
 	    END DO
 C
 	    IF(COHERENT_ES)THEN
-	      SOURCE(1:ND)=ZETA(1:ND)+THETA(1:ND)*RJ(1:ND)
+	      SOURCE(1:ND)=ZETA(1:ND)+CHI_SCAT(1:ND)*RJ(1:ND)/CHI(1:ND)
 	    ELSE
-	      SOURCE(1:ND)=ZETA(1:ND)+THETA(1:ND)*RJ_ES(1:ND)
+	      SOURCE(1:ND)=ZETA(1:ND) +
+	1          (ESEC(1:ND)*RJ_ES(1:ND)+CHI_RAY(1:ND)*RJ(1:ND))/CHI(1:ND)
 	    END IF
 C
 C Output RJ for subsequent iterations.
@@ -578,15 +600,16 @@ C
 	    IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
 	1         MAXCH .LT. VAL_DO_NG) )THEN
 	      IF(COHERENT_ES)THEN
-     	        TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ(1:ND)
+     	        TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ(1:ND)
 	      ELSE
-     	        TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ_ES(1:ND)
+     	        TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ_ES(1:ND) +
+	1                                  CHI_RAY_CLUMP(1:ND)*RJ(1:ND)
 	      END IF
 C                             
 C NB Using TA for ETA, U for P_OBS (temporay measure), I for NP_OBS.
 C
 	      CALL TUNE(IONE,'CMF_FORM_SOL')
-	      CALL CMF_FORM_SOL(TA,CHI_CLUMP,ESEC_CLUMP,
+	      CALL CMF_FORM_SOL(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
 	1                 DENSITY,V,SIGMA,R,P,
 	1                 P_OBS,IPLUS,NP_OBS,NP_OBS_MAX,
 	1                 MU_AT_RMAX,HQW_AT_RMAX,RMAX_OBS,V_AT_RMAX,
@@ -696,7 +719,7 @@ C
 	    END DO
 C
 	    DO I=1,ND
-	      K_MOM(I)=K_MOM(I)*FEDD(I)
+	      K_MOM(I)=RJ(I)*FEDD(I)
 	    END DO
 C
 C Output mean intensity for subsequent iterations.
@@ -727,7 +750,7 @@ C
 	1            SOURCE,CHI_CLUMP,dCHIdR,AQW,KQW,DBB,HBC_J,HBC_S,
 	1            INBC,IC,THK_CONT,DIF,NC,ND,NP,METHOD)
 	  DO I=1,ND
-	    K_MOM(I)=K_MOM(I)*FEDD(I)
+	    K_MOM(I)=RJ(I)*FEDD(I)
 	  END DO
 	END IF
-C
+!

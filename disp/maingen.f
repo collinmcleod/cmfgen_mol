@@ -1,4 +1,3 @@
-
 !
 ! Main subroutine to examine model output from CMFGEN. Routine is called by
 ! DISPGEN. All Model and Atomic data is primarily read in by DISPGEN, and
@@ -122,6 +121,7 @@ C
 	REAL*8 TGREY(NP_MAX)
 	INTEGER*4 GRID(NP_MAX),INDX(NP_MAX)
 	LOGICAL INACCURATE,REXT_COMPUTED,GREY_COMP
+	LOGICAL GREY_WITH_V_TERMS
 C
 	REAL*8 XV(N_PLT_MAX),XNU(N_PLT_MAX)
 	REAL*8 YV(N_PLT_MAX),ZV(N_PLT_MAX),WV(N_PLT_MAX)
@@ -178,7 +178,7 @@ C
 	REAL*8 GB(ND),U(ND),VB(ND),VC(ND),CHIL(ND),ETAL(ND)
 	REAL*8 SOURCE(ND),TCHI(ND),ZETA(ND),THETA(ND)
 	REAL*8 ETA(ND),ETA_WITH_ES(ND)
-	REAL*8 ESEC(ND),EMHNUKT(ND),VT(ND)
+	REAL*8 ESEC(ND),EMHNUKT(ND),VT(ND),CHI_RAY(ND)
 	REAL*8 AV(ND),CV(ND)
 	REAL*8 FORCE_MULT(ND_MAX)
 	LOGICAL DO_DPTH(ND)
@@ -247,7 +247,7 @@ C
 C
 	INTEGER*4 LEV(10)
 	LOGICAL FLAG,LINV,TRAPFORJ,JONS,JONLY,IN_R_SUN
-	LOGICAL ELEC,DIF,SCALE,THICK,NORAD,ROSS
+	LOGICAL ELEC,DIF,SCALE,THICK,NORAD,ROSS,INC_RAY_SCAT
 	LOGICAL SPEC_FRAC,RADIAL
 	LOGICAL LST_DEPTH_ONLY
 	LOGICAL DIE_REG,DIE_WI
@@ -302,11 +302,11 @@ C
 	EXTERNAL WR_PWD
 	CHARACTER*120 WR_PWD
 C
-	REAL*8 GFF,GBF,PHI,LAMVACAIR,SPEED_OF_LIGHT
+	REAL*8 GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT
 	REAL*8 FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
 	REAL*8 ASTRONOMICAL_UNIT
 	INTEGER*4 GET_INDX_DP
-	EXTERNAL GFF,GBF,PHI,LAMVACAIR,SPEED_OF_LIGHT,GET_INDX_DP
+	EXTERNAL GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT,GET_INDX_DP
 	EXTERNAL FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
 	EXTERNAL ASTRONOMICAL_UNIT
 C
@@ -674,11 +674,13 @@ C
 	1          .OR. XOPT .EQ. 'SRCEBB'
 	1          .OR. XOPT .EQ. 'SRCEJC'
 	1          .OR. XOPT .EQ. 'EP'
+	1          .OR. XOPT .EQ. 'CHIL'
 	1          .OR. XOPT .EQ. 'TAUL'
 	1          .OR. XOPT .EQ. 'WRL'
 	1          .OR. XOPT .EQ. 'BETA')THEN
 !
 	  CALL USR_OPTION(LEV,ITWO,ITWO,'Levels',' ','NL and NUP')
+	  NL=LEV(1); NUP=LEV(2)
 !
 ! Compute line opacity and emissivity.
 !
@@ -803,7 +805,17 @@ C
 	    CALL USR_OPTION(ELEC,'ELEC','T',
 	1	 'Include electron scattering?')
 	  END IF
-C
+!
+! Compute  Rayleigh scattering contribution.
+!
+	  CALL USR_OPTION(INC_RAY_SCAT,'RAY','F','Include Rayeigh scattering')
+          IF(ATM(1)%XzV_PRES)THEN
+	    CHI_RAY(1:ND)=0.0D0
+            CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
+	1             ATM(1)%NXzV_F,FREQ,ND)
+	    CHI_RAY(1:ND)=CHI_RAY(1:ND)*CLUMP_FAC(1:ND)
+          END IF
+!
 	END IF
 C
 C 
@@ -1176,6 +1188,25 @@ C
 	  END DO
 	  XAXIS='Log(\gt\dc\u)'
 	  XAXSAV=XAXIS
+!
+	ELSE IF(XOPT .EQ. 'SET-ATM')THEN
+	  CALL USR_OPTION(TYPE_ATM,'ATM',' ','Type of atmosphere: EXP or WIND')
+	  TYPE_ATM=UC(TYPE_ATM)
+	  IF(TYPE_ATM .NE. 'EXP')THEN
+	    TYPE_ATM=' '
+	    WRITE(T_OUT,*)'Atmosphere is assumed to have a wind'
+	  ENDIF
+!
+	ELSE IF(XOPT .EQ. 'SET-METH')THEN
+	  CALL USR_OPTION(METHOD,'METH',' ','Method for derivative evaluation: LOGLOG, LOGMON, ZERO')
+	  METHOD=UC(METHOD)
+	  IF(METHOD .NE. 'ZERO' .AND.
+	1       METHOD .NE. 'LOGLOG' .AND.
+	1       METHOD .NE. 'LOGMON')THEN
+	    METHOD='LOGLOG'
+	    WRITE(T_OUT,*)'Did not recognize option'
+	    WRITE(T_OUT,*)'Setting METHOD=LOGLOG'
+	  ENDIF
 C
 C 
 C **************************************************************************
@@ -1593,68 +1624,101 @@ C
 	    CALL DP_CURVE(ND,XV,YV)
 	    YAXIS='Log(\gt\dRoss\u)'
 	  ELSE
-C
-C Compute Grey temperature distribution. The finer grid has been
-C previously defined.
-C
-C Interpolate CHIROSS onto a finer grid.
-C
-	    DO I=1,NDX
-	      CHI(I)=0.0D0
-	      DO J=0,3
-	        CHI(I)=CHI(I)+COEF(J,I)*DLOG( CHIROSS(J+INDX(I)) )
-	      END DO
-	      CHI(I)=DEXP(CHI(I))
-	    END DO
-C
-C Will use FA for F, GAM for NEWRJ, and GAMH for NEWRK
-C
-	    DO I=1,NDX
-	      FA(I)=1.0D0/3.0D0
-	    END DO
-	    HBC=1.0D0
-	    T1=1000.0
-	    DO WHILE(T1 .GT. 1.0E-05)
-	      CALL JGREY(TA,TB,TC,XM,DTAU,REXT,Z,PEXT,RJ
-	1      ,GAM,GAMH,Q,FA,CHI,dCHIdR
-	1      ,JQWEXT,KQWEXT,LUM,HBC,HBCNEW,NCX,NDX,NPX,METHOD)
-	      T1=0.0D0
-	      DO I=1,NDX
-	        T1=MAX(ABS(FA(I)-GAMH(I)),T1)
-	        FA(I)=GAMH(I)
-	      END DO
-	      T1=MAX(ABS(HBC-HBCNEW),T1)
-	      HBC=HBCNEW
-	      WRITE(T_OUT,'('' Maximum change is'',1PE11.4)')T1
-	    END DO
-C
-C Compute the temperature distribution, and the Rossland optical depth scale.
-C Assumes LTE. NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert
-C T from units of K to units of 10^4 K. We use ZV for XV so as not to corrupt
-C XV.
-C
-	    CALL TORSCL(TA,CHI,REXT,TB,TC,NDX,METHOD,TYPE_ATM)
-	    DO I=1,NDX
-	      ZV(I)=DLOG10(TA(I))
-	      YV(I)=((3.14159265/5.67E-05*RJ(I))**0.25)*1.0E-04
-	    END DO
-C
-C Store grey temperature on Model Grid.
-C
-	    GREY_COMP=.TRUE.
-	    DO I=1,ND
-	      TGREY(I)=YV(GRID(I))
-	    END DO
-C
+!
+! We have two different methods avaialable to compute the Grey Temperature
+! distribution. One takes into account the velocity terms, and is needed for
+! supernovae calculations.
+!
+	    CALL USR_HIDDEN(GREY_WITH_V_TERMS,'VT','F','File appendage')
 	    CALL USR_HIDDEN(ELEC,'LOGT','F','Log of T?')
-	    IF(ELEC)THEN
-	      DO I=1,NDX
-	        YV(I)=LOG10(YV(I))
+!
+! Compute Grey temperature distribution. 
+!
+! Will use FA for F, GAM for NEWRJ, and GAMH for NEWRK
+!
+	    YAXIS='T(10\u4 \dK)'
+	    IF(GREY_WITH_V_TERMS)THEN
+	      T2=1.0D-05          !Accuracy to converge f
+              CALL JGREY_WITH_FVT(RJ,TB,CHIROSS,R,V,SIGMA,
+	1                  P,JQW,HMIDQW,KQW,NMIDQW,
+	1                  LUM,METHOD,DIF,IC,
+	1                  T2,ND,NC,NP)
+	      CALL TORSCL(TA,CHIROSS,R,TB,TC,ND,METHOD,TYPE_ATM)
+	      DO I=1,ND
+	        ZV(I)=DLOG10(TA(I))
+	        TGREY(I)=((3.14159265D0/5.67D-05*RJ(I))**0.25D0)*1.0D-04
+	        YV(I)=TGREY(I)
 	      END DO
+!
+	      IF(ELEC)THEN
+	        YV(1:ND)=LOG10(YV(1:ND))
+	        YAXIS='Log T(10\u4 \dK)'
+	      END IF
+	      CALL DP_CURVE(ND,ZV,YV)
+	      XAXIS='Log(\gt\dRoss\u)'
+	      XAXSAV=XAXIS
+	    ELSE
+!
+! We use a finer grid here. The finer grid has been  previously defined.
+!
+! Interpolate CHIROSS onto a finer grid.
+!
+	      DO I=1,NDX
+	        CHI(I)=0.0D0
+	        DO J=0,3
+	          CHI(I)=CHI(I)+COEF(J,I)*DLOG( CHIROSS(J+INDX(I)) )
+	        END DO
+	        CHI(I)=DEXP(CHI(I))
+	      END DO
+!
+	      DO I=1,NDX
+	        FA(I)=1.0D0/3.0D0
+	      END DO
+	      HBC=1.0D0
+	      T1=1000.0
+	      DO WHILE(T1 .GT. 1.0D-05)
+	        CALL JGREY(TA,TB,TC,XM,DTAU,REXT,Z,PEXT,RJ,
+	1          GAM,GAMH,Q,FA,CHI,dCHIdR,
+	1          JQWEXT,KQWEXT,LUM,HBC,HBCNEW,NCX,NDX,NPX,METHOD)
+	        T1=0.0D0
+	        DO I=1,NDX
+	          T1=MAX(ABS(FA(I)-GAMH(I)),T1)
+	          FA(I)=GAMH(I)
+	        END DO
+	        T1=MAX(ABS(HBC-HBCNEW),T1)
+	        HBC=HBCNEW
+	        WRITE(T_OUT,'('' Maximum change is'',1PE11.4)')T1
+	      END DO
+!
+! Compute the temperature distribution, and the Rossland optical depth scale.
+! Assumes LTE. NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert
+! T from units of K to units of 10^4 K. We use ZV for XV so as not to corrupt
+! XV.
+!
+	      CALL TORSCL(TA,CHI,REXT,TB,TC,NDX,METHOD,TYPE_ATM)
+	      DO I=1,NDX
+	        ZV(I)=DLOG10(TA(I))
+	        YV(I)=((3.14159265D0/5.67D-05*RJ(I))**0.25D0)*1.0D-04
+	      END DO
+!
+! Store grey temperature on Model Grid.
+!
+	      GREY_COMP=.TRUE.
+	      DO I=1,ND
+	        TGREY(I)=YV(GRID(I))
+	      END DO
+!
+	      CALL USR_HIDDEN(ELEC,'LOGT','F','Log of T?')
+	      IF(ELEC)THEN
+	        DO I=1,NDX
+	          YV(I)=LOG10(YV(I))
+	        END DO
+	        YAXIS='Log T(10\u4 \dK)'
+	      END IF
+	      CALL DP_CURVE(NDX,ZV,YV)
+	      XAXIS='Log(\gt\dRoss\u)'
+	      XAXSAV=XAXIS
 	    END IF
-	    CALL DP_CURVE(NDX,ZV,YV)
-	    XAXIS='Log(\gt\dRoss\u)'
-	    XAXSAV=XAXIS
 C
 C Set REXT(1)=0 to insure that REXT is recomputed for the interpolation
 C section.
@@ -1685,6 +1749,17 @@ C
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log(N\de\u)'
+!
+	ELSE IF(XOPT .EQ. 'YCOLD')THEN
+	  DO I=1,ND
+	    ZETA(I)=1.0D+10*MASS_DENSITY(I)*CLUMP_FAC(I)
+	  END DO
+	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  DO I=1,ND
+	    YV(I)=DLOG10(TA(I))
+	  END DO
+	  YAXIS='m(gm cm\u-2\d)'
+	  CALL DP_CURVE(ND,XV,YV)
 C
 	ELSE IF(XOPT .EQ. 'LOGT')THEN
 	  CALL DLOGVEC(T,YV,ND)
@@ -3676,6 +3751,11 @@ C
 	      CHI(I)=CHI(I)-ESEC(I)
 	    END DO
 	  END IF
+	  IF(INC_RAY_SCAT)THEN
+	    DO I=1,ND
+	      CHI(I)=CHI(I)+CHI_RAY(I)
+	    END DO
+	  END IF
 C
 	  IF(XOPT .EQ. 'TAUC')THEN
 	    CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,TYPE_ATM)
@@ -4077,6 +4157,26 @@ C
 	    END DO
 	    YAXIS='\gt\dSob\u'
 	  END IF
+	  CALL DP_CURVE(ND,XV,YV)
+!
+! Require CHIL to have been computed in setup.
+!
+	ELSE IF(XOPT .EQ. 'CHIL')THEN
+!
+! Assumes V_D=10kms.
+!
+	  WRITE(6,*)'A Doppler velocity of 10 km/s is assumed'
+	  T1=DLOG10(1.6914D-11/FREQ)
+	  DO I=1,ND
+	    IF(CHIL(I) .GT. 0)THEN
+	      YV(I)=T1+DLOG10(CHIL(I))
+	    ELSE IF(CHIL(I) .LT. 0)THEN
+	      YV(I)=T1+DLOG10(-CHIL(I))-20.0D0
+	    ELSE
+	      YV(I)=-30.0
+	    END IF
+	  END DO
+	  YAXIS='\gx\dL\u'
 	  CALL DP_CURVE(ND,XV,YV)
 C 
 C

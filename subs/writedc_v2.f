@@ -2,6 +2,8 @@
 	1               LUM,ND,FILENAME,OPTION,FORM)
 	IMPLICIT NONE
 C
+C Altered 24-Feb-2004 : Now depth index to first line of output. Should not effect
+C                         any input files.
 C Altered 07-Jul-1997 : CLUMP_FAC inserted in call (now _V2), and now output
 C                         as last argument. R now written out with a precision
 C                         of 7 decimal digits.
@@ -52,7 +54,7 @@ C
 	      RETURN
 	    END IF
 C
-	    WRITE(9,'(/,1X,A,T40,A)')'07-JUL-1997','!Format date'
+	    WRITE(9,'(/,1X,A,T40,A)')'24-FEB-2004','!Format date'
 	    WRITE(9,2120)R(ND),LUM,NHYD,ND
 	    IF(OPTION(1:2) .EQ. 'DC')THEN
 	      DO I=1,ND
@@ -65,7 +67,7 @@ C
 	          T2=T2+DHYD(J,I)
 	        END DO
 	        T1=T1/T2
-	        WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I)
+	        WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I),I
 	        WRITE(9,FMT)((HYD(J,I)/HYDLTE(J,I)),J=1,NHYD)
 	      END DO
 	    ELSE
@@ -79,15 +81,15 @@ C
 	          T2=T2+DHYD(J,I)
 	        END DO
 	        T1=T1/T2
-	        WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I)
+	        WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I),I
 	        WRITE(9,FMT)(HYD(J,I),J=1,NHYD)
 	      END DO
 	    END IF
 	    CLOSE(UNIT=9)
 	  END IF
 C
-2120	  FORMAT(/,1X,F9.4,4X,1PE11.4,5X,0P,I4,5X,I4)
-2122	  FORMAT(/,1X,1P,E15.7,6E15.5)
+2120	  FORMAT(/,1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)
+2122	  FORMAT(/,1X,1P,E15.7,6E15.5,2X,I4)
 C
 	  RETURN
 	  END

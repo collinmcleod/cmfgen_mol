@@ -7,6 +7,7 @@
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 07-Mar-2004 - BA no longer read in if COMPUTE_BA=.TRUE.
 ! Created 02-Apr-2001 - Created to handle SE data structure.
 !                       See READBA for earlier corrections.
 !
@@ -52,7 +53,11 @@ C
           STATUS=.FALSE.
 	  RETURN
 	END IF
-C
+!
+! If we are still computing the BA matrix, there is no need to read it in.
+! 
+	IF(COMPUTE_BA)RETURN
+!
 	OPEN(UNIT=LU,FORM='UNFORMATTED',FILE=DESC,IOSTAT=IOS,ERR=500,
 	1             ACCESS='SEQUENTIAL',STATUS='OLD',ACTION='READ')
 	  DO ID=1,NION

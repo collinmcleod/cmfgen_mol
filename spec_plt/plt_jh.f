@@ -558,6 +558,35 @@
 	    CALL DP_CURVE(ND,XV,YV)
           END DO
 
+	ELSE IF(X(1:3) .EQ. 'CFD')THEN
+!
+	  I=ND/2
+	  CALL USR_OPTION(I,'Depth',' ','Depth index')
+	  DO ID=1,NUM_FILES
+	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
+	    IF(ALLOCATED(XV))DEALLOCATE(XV)
+	    IF(ALLOCATED(YV))DEALLOCATE(YV)
+	    IF(ALLOCATED(TA))DEALLOCATE(TA)
+	    ALLOCATE (XV(NCF))
+	    ALLOCATE (YV(NCF))
+	    ALLOCATE (TA(NCF))
+!
+	    TA(1:NCF)=0.0D0
+	    DO ML=2,NCF
+	      T1=0.5D0*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML))
+	      TA(ML)=TA(ML-1)+T1*(ZM(ID)%RJ(I,ML-1)+ZM(ID)%RJ(I,ML))
+	    END DO
+	    WRITE(T_OUT,*)'Luminosity is:',TA(NCF)*4.1274D+03
+	    DO ML=1,NCF
+	      XV(ML)=ZM(ID)%NU(ML)
+	      YV(ML)=TA(ML)/TA(NCF)
+	    END DO
+	    CALL DP_CNVRT_J_V2(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,'NAT',
+	1         ZM(ID)%DATA_TYPE,LAMC,XAXIS,YAXIS,L_FALSE)
+	    CALL DP_CURVE(NCF,XV,YV)
+	    YAXIS='L\g\dv\u/L'
+	  END DO
+!
 	ELSE IF(X(1:2) .EQ. 'CF')THEN
 !
 	  DO ID=1,NUM_FILES

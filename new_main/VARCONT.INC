@@ -84,7 +84,7 @@ C
 	    ELSE
 	      RAT_TOO_BIG=.FALSE.
 	      DO L=1,ND
-	        TA(L)=(CHI_PREV(L)-ESEC(L))/(CHI_CONT(L)-ESEC(L))
+	        TA(L)=(CHI_PREV(L)-CHI_SCAT(L))/(CHI_CONT(L)-CHI_SCAT(L))
 	        IF(ETA_CONT(L) .EQ. 0)THEN
                   TB(L)=1.0D0
 	        ELSE
@@ -124,7 +124,7 @@ C Use TA as temporary storage for the emissivity.
 C
 	    IF(COHERENT_ES)THEN
 	      TA(1:ND)=ETA_CLUMP(1:ND)
-	      ES_COH_VEC(1:ND)=ESEC_CLUMP(1:ND)/CHI_CLUMP(1:ND)
+	      ES_COH_VEC(1:ND)=CHI_SCAT_CLUMP(1:ND)/CHI_CLUMP(1:ND)
 	    ELSE
 C
 C Two scenarios: 
@@ -174,7 +174,7 @@ C
 	   END IF
 C
 	   CALL TUNE(1,'VAR_MOM_J')
-	   CALL VAR_MOM_J_CMF_V7(TA,CHI_CLUMP,ESEC_CLUMP,
+	   CALL VAR_MOM_J_CMF_V7(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
 	1                  ES_COH_VEC,V,SIGMA,R,
 	1                  TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR, 
 	1                  dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR, 
@@ -202,6 +202,24 @@ C
 	        END DO
 	      END DO
 	    END IF
+C
+C For many ALO like calculations, only the variation of J with the source function
+C is allowed for. The following allows us to do the same thing.
+C
+	   IF(DO_SRCE_VAR_ONLY)THEN
+	      DO J=1,ND
+	       T1=-ETA_CLUMP(J)/CHI_CLUMP(J)
+	        DO K=1,ND
+	          TX(K,J,1)=TX(K,J,2)*T1
+	        END DO
+	      END DO
+	      DO J=1,ND
+	       T1=-ETA_CLUMP(J)/CHI_CLUMP(J)
+	        DO K=1,ND-1
+	          TVX(K,J,1)=TVX(K,J,2)*T1
+	        END DO
+	      END DO
+	   END IF
 C
 C We use TB as a temporary vector for J in the electron scattering emissivity.
 C Its value depends on whether we have coherent or incoherent e.s.
@@ -307,7 +325,7 @@ C
 	    ELSE
 	      RAT_TOO_BIG=.FALSE.
 	      DO L=1,ND
-	        TA(L)=(CHI_PREV(L)-ESEC(L))/(CHI_CONT(L)-ESEC(L))
+	        TA(L)=(CHI_PREV(L)-CHI_SCAT(L))/(CHI_CONT(L)-CHI_SCAT(L))
 	        TB(L)=ETA_PREV(L)/ETA_CONT(L)
 	        IF(TA(L) .GT. 1.5)RAT_TOO_BIG=.TRUE.
 	      END DO
@@ -494,7 +512,7 @@ C
 	  ELSE IF(EDDINGTON)THEN
 	    CALL TUNE(1,'PERTJFEAU')
 	      CALL PERTJFEAU_IBC(F2DA,FC,FA,
-	1            DTAU,CHI,R,ZETA,
+	1            DTAU,CHI_CLUMP,R,ZETA,
 	1            THETA,RJ,QEDD,FEDD,dCHIdR,
 	1            TA,TB,TC,HBC_J,HBC_S,INBC,DBB,DIF,
 	1            THK_CONT,ND,METHOD)
@@ -503,8 +521,8 @@ C
 	    CALL TUNE(1,'PERTJD')
 	      CALL MULTVEC(SOURCE,ZETA,THETA,RJ,ND)
 	      CALL NEWPERTJD(F2DA,FC,FA,FB,VK,WM,AQW
-	1       ,DTAU,CHI,dCHIdR,R,Z,P,THETA,SOURCE,TA,TB,TC,XM
-	1       ,DIF,DBB,IC,ESEC,THK_CONT,NC,ND,NP,METHOD)
+	1       ,DTAU,CHI_CLUMP,dCHIdR,R,Z,P,THETA,SOURCE,TA,TB,TC,XM
+	1       ,DIF,DBB,IC,CHI_SCAT,THK_CONT,NC,ND,NP,METHOD)
 	    CALL TUNE(2,'PERTJD')
 	  END IF
 C 
@@ -514,7 +532,9 @@ C in population levels.
 C
 C
 	CALL TUNE(1,'VAROPAC')
-	INCLUDE 'VAROPAC_V4.INC'
+!	INCLUDE 'VAROPAC_V4.INC'
+	CALL COMP_VAR_OPAC(POPS,RJ,FL,CONT_FREQ,FREQ_INDX,
+	1                SECTION,ND,NT,LST_DEPTH_ONLY)
 	CALL TUNE(2,'VAROPAC')
 C 
 C
@@ -565,7 +585,10 @@ C
 	1              ( VCHI(I,L)*dJ_LOC(3,J,K) + VETA(I,L)*dJ_LOC(4,J,K) )
 	      END DO
 	      VJ(NT-1,J,K)=VJ(NT-1,J,K) + ESEC(L)*dj_LOC(5,J,K)/ED(L)
-C                    
+	      IF(ATM(1)%XzV_PRES)THEN
+	        VJ(1,J,K)=VJ(1,J,K) + CHI_RAY(L)*dj_LOC(5,J,K)/ATM(1)%XzV_F(1,L)
+	      END IF
+C
 C Now must do line terms.
 C
 	      DO I=TX_OFFSET+1,NM

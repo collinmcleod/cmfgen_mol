@@ -32,23 +32,23 @@
 	INTEGER*4, PARAMETER :: DIG_PER_NUM=11
 	INTEGER*4, PARAMETER :: IZERO=0
 !
-	WRITE(LU,'(A)'),' '
+	WRITE(LU,'(A)')' '
 	IF( TRIM(OPTION) .EQ. 'NET_RATES')THEN
-	  WRITE(LU,'(A)'),'  Net collision rate bewteen upper and lower levels'
-	  WRITE(LU,'(A)'),'  Rate is +ve when net change into lower level'
-	  WRITE(LU,'(A)'),'  I,I is the net collisional recombination rate.'
+	  WRITE(LU,'(A)')'  Net collision rate bewteen upper and lower levels'
+	  WRITE(LU,'(A)')'  Rate is +ve when net change into lower level'
+	  WRITE(LU,'(A)')'  I,I is the net collisional recombination rate.'
 	  FORM=TRIM(DESC)//'_NR_COL'
 	ELSE IF( TRIM(OPTION) .EQ. 'COOL_RATES')THEN
-	  WRITE(LU,'(A)'),'  Net electron cooling rate (cgs units) bewteen upper and lower levels'
-	  WRITE(LU,'(A)'),'  Rate is +ve when cooling thermal electrons'
-	  WRITE(LU,'(A)'),'  I,I is the net ionzation/recombination cooling rate.'
+	  WRITE(LU,'(A)')'  Net electron cooling rate (cgs units) bewteen upper and lower levels'
+	  WRITE(LU,'(A)')'  Rate is +ve when cooling thermal electrons'
+	  WRITE(LU,'(A)')'  I,I is the net ionzation/recombination cooling rate.'
 	  FORM=TRIM(DESC)//'_CR_COL'
 	ELSE
-	  WRITE(LU,'(A)'),'  collision rate down to lower level from upper leve'
-	  WRITE(LU,'(A)'),'  I,I is the collisional ionization rate.'
+	  WRITE(LU,'(A)')'  collision rate down to lower level from upper leve'
+	  WRITE(LU,'(A)')'  I,I is the collisional ionization rate.'
 	  FORM=TRIM(DESC)//'_DR_COL'
 	END IF
-	WRITE(LU,'(A)'),' '
+	WRITE(LU,'(A)')' '
 !
 	CALL GEN_ASCI_OPEN(LU,FORM,'UNKNOWN',' ',' ',IZERO,IOS)
 !

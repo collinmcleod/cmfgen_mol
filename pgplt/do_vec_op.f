@@ -175,7 +175,7 @@ C
 !
 ! The test for overflow needs improving.
 !
-	    T1=0.001*HUGE(YV(1))
+	    T1=1.0E-06*HUGE(YV(1))
 	    DO J=IL,IU
 	      IF( ABS(YV(J)) .LE. 1.0/T1 )THEN
 	        YV(J)=T1

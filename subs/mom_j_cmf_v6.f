@@ -141,6 +141,9 @@
 	USE MOD_MOM_J_V6
 	IMPLICIT NONE
 !
+! Altered :  27-Feb-2004: Bug fix with RSQHNU_PREV (not sure effect) & access to DTAU(ND)
+!                           which doesn't effect results. 
+! Altered :  26-Jan-2004: Changed to allow it to work with changes in the R grid.
 ! Altered :  01-Jan-2004: Important update: SP constants to DP constants;
 !                          Effected error messgaes to fort.47 
 ! Altered:   28-Feb-2002: Extensive modifications and cleaning.
@@ -198,13 +201,26 @@
 	REAL*8  DELTA_R
 	INTEGER*4 IT1,I,J,K
 	INTEGER*4 IOS
+	LOGICAL NEW_R_GRID
 !
 !
+!
+	NEW_R_GRID=.FALSE.
+	IF(INIT .AND. ALLOCATED(R))THEN
+	  DO I=1,ND_SM
+	    IF(LOG(R_SM(I)) .NE. LOG_R_SM(I))THEN
+	      NEW_R_GRID=.TRUE.
+	      WRITE(171,*)'Updating RGRID in MOM_J_CMF_V6'
+	      EXIT
+	    END IF
+	  END DO
+          IF(VDOP_FRAC .NE. VDOP_FRAC_SAV)NEW_R_GRID=.TRUE.
+	END IF
 !
 ! Deallocate all arrayes if we have changed VDOP_FRAC. This will only
 ! be done in testing this routine (e.g., using DISPGEN).
 !
-	IF(ALLOCATED(R) .AND. VDOP_FRAC .NE. VDOP_FRAC_SAV)THEN
+	IF(ALLOCATED(R) .AND. NEW_R_GRID)THEN
 	  DEALLOCATE ( R )
 	  DEALLOCATE ( R_PNT )
 	  DEALLOCATE ( LOG_R_SM )
@@ -507,7 +523,7 @@
 	  G_PREV(1:ND)=G_SAV(1:ND)
 	  RSQN_ON_RSQJ_PREV(1:ND)=RSQN_ON_RSQJ_SAV(1:ND)
 	  RSQJNU_PREV(1:ND)=RSQJNU(1:ND)
-	  RSQHNU_PREV(1:ND-1)=RSQHNU(1:ND)
+	  RSQHNU_PREV(1:ND)=RSQHNU(1:ND)
 	  HBC_PREV=HBC_SAV;  IN_HBC_PREV=IN_HBC_SAV
 	  NBC_PREV=NBC_SAV
 	END IF
@@ -574,7 +590,7 @@
 !
 ! 
 !
-	DO I=2,ND
+	DO I=2,ND-1
 	  DTAUONQ(I)=0.5D0*(DTAU(I)+DTAU(I-1))/Q(I)
 	  PSI(I)=DTAUONQ(I)*GAM(I)*( 1.0D0+SIGMA(I)*F(I) )
 	  PSIPREV(I)=DTAUONQ(I)*GAM(I)*(  1.0D0+SIGMA(I)*F_PREV(I) )
@@ -654,6 +670,22 @@
 	  XM(ND)=XM(ND)
 	END IF
 !
+!	TC(1)=-F(2)*Q(2)/DTAU(1)
+!	TB(1)=F(1)*Q(1)/DTAU(1) + PSI(1)  + HBC
+!	XM(1)=PSIPREV(1)*IN_HBC
+!
+!	TC(1)=-F(2)*Q(2)/DTAU(1)
+!	TB(1)=F(1)*Q(1)/DTAU(1) - GAM(1)*NBC + HBC
+!	XM(1)=0.0D0
+!
+!	TB(1)=F(1)/(R(1)-R(2)) + (F(1)-1.0D0)/R(1) + CHI(1)*HBC + PSI(1)*CHI(1)
+!	TC(1)=-F(2)/(R(1)-R(2))
+!	XM(1)=CHI(1)*PSIPREV(1)*RSQJNU_PREV(1)
+!
+!	TB(1)=-HBC/R(1)/R(1)
+!	TC(1)=1.0D0/R(2)/R(2)
+!	XM(1)=0.0D0
+!
 ! Solve for the radiation field along ray for this frequency.
 !
 	CALL THOMAS(TA,TB,TC,XM,ND,1)
@@ -722,6 +754,8 @@
 	HBC_SAV=HBC
 	IN_HBC_SAV=IN_HBC
 	NBC_SAV=NBC
+!
+	IF(NEW_R_GRID)WRITE(171,*)'Exiting MOM_J_CMF_V7'
 !
 	RETURN
 	END

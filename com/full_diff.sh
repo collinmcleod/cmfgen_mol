@@ -60,6 +60,9 @@ cat Diff_output >> Diff_sum
 $cmfdist/com/main_diff.sh $X1/new_main $X2/new_main
 cat Diff_output >> Diff_sum
 
+$cmfdist/com/main_diff.sh $X1/new_main/mod_subs $X2/new_main/mod_subs
+cat Diff_output >> Diff_sum
+
 $cmfdist/com/main_diff.sh $X1/new_main/subs $X2/new_main/subs
 cat Diff_output >> Diff_sum
 

@@ -14,7 +14,7 @@ LIB=$(LIB_DIR)libsubs.a
 OBJ= $(LIB)(dir_acc_pars_gen.o)\
      $(LIB)(date_time.o)\
      $(LIB)(wr_pwd.o)\
-     $(LIB)(tune_osf.o)\
+     $(LIB)(tune.o)\
      $(LIB)(gen_asci_open.o)\
      $(LIB)(f01btf.o)\
      $(LIB)(f04ayf.o)\

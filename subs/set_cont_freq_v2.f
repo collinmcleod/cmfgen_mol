@@ -84,6 +84,9 @@
 ! Sort frequencies into numerical order. NEW_FREQ is used as a
 ! work array.
 !
+	DO I=1,N
+	   WRITE(168,*)I,EDGE(I),TYPE(I)
+	END DO
 	N=N+2
 	EDGE(N-1)=MIN_FREQ;   TYPE(N-1)=' '
 	EDGE(N)=MAX_FREQ;     TYPE(N)=' '
@@ -91,6 +94,10 @@
 	CALL INDEXX(N,EDGE,INDX,NUMER)
 	CALL SORTDP(N,EDGE,INDX,NEW_FREQ)
 	CALL SORTCHAR(N,TYPE,INDX,CHAR_WRK)
+!
+	DO I=1,N
+	  WRITE(167,*)I,EDGE(I),TYPE(I)
+	END DO
 !
 ! Do a quick check that sort was done correctly.
 ! Not equal as MIN_FREQ, and MAX_FREQ have been inserted in FREQ array.

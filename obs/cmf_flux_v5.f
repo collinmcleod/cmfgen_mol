@@ -48,7 +48,14 @@
 	INTEGER*4 EQ_TEMP
 	REAL*8 T1,T2
 	REAL*8 RMDOT
+!
+! Used for dynamic smoothing of th ephotoioization cross-sections.
+!
 	REAL*8 VSM_DIE_KMS
+	REAL*8 SIG_GAU_KMS
+	REAL*8 FRAC_SIG_GAU
+	REAL*8 CUT_ACCURACY
+	LOGICAL ABOVE_EDGE
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
@@ -73,8 +80,8 @@
 	INTEGER*4 ERROR_LU
 	EXTERNAL ERROR_LU
 !
-!	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
-!	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
+	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
+	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 !
 	DATA BLANK/' '/
 !
@@ -365,7 +372,6 @@
 	CALL RD_DBLE(STARS_MASS,'MASS',T_IN,LUER,'Stars mass')
 	IF(STARS_MASS .EQ. 0)CALL RD_MODEL_DBLE(STARS_MASS,'MASS')
 	CALL RD_MODEL_LOG(DIE_AS_LINE,'DIE_AS_LINE')
-	CALL RD_MODEL_DBLE(VSM_DIE_KMS,'VSM_DIE')
 !
 ! Read in other parameters from batch file. These must be in order.
 !
@@ -486,7 +492,33 @@
 !
 ! 
 !
-! Read in oscilator and photoionization data.
+! Read options into store. Most of these will be read in CMF_FLUX_SUB_V5, but a few
+! are needed in order to handle the photoioization data correct.
+!
+	CALL GEN_ASCI_OPEN(LUIN,'CMF_FLUX_PARAM','OLD',' ','READ',IZERO,IOS)
+        IF(IOS .NE. 0)THEN
+          WRITE(LUER,*)'Error opening CMF_FLUX_PARAM in CMFFLUX_SUB_V5, IOS=',IOS
+          STOP
+        END IF
+        CALL GEN_ASCI_OPEN(LUMOD,'OUT_PARAMS','UNKNOWN',' ','WRITE',IZERO,IOS)
+        CALL RD_OPTIONS_INTO_STORE(LUIN,LUMOD)
+	CLOSE(LUIN)
+!
+! Ideally, VSM_DIE_KMS and SIG_GAU_KMS will have the same value.
+!
+	CALL RD_STORE_DBLE(VSM_DIE_KMS,'VSM_DIE',L_TRUE,
+	1         'Sigma of Gaussian used for dielectronic lines that are read in')
+	CALL RD_STORE_DBLE(SIG_GAU_KMS,'SIG_GAU_KMS',L_TRUE,
+	1         'Sigma of Gaussian used to smooth photoionization data')
+	FRAC_SIG_GAU=0.25D0
+	CALL RD_STORE_DBLE(FRAC_SIG_GAU,'FRAC_SIG',L_FALSE,
+	1         'Fractional spacing a across smoothing Gauusian (use 0.25)')
+	CUT_ACCURACY=0.02
+	CALL RD_STORE_DBLE(CUT_ACCURACY,'CUT_ACC',L_FALSE,
+	1         'Accuracy to retain data when omitting data points to save space (use 0.02)')
+	ABOVE_EDGE=.TRUE.
+	CALL RD_STORE_LOG(ABOVE_EDGE,'ABV_EDGE',L_FALSE,
+	1         'Use only data above edge when smoothing (TRUE)')
 !
 	GF_CUT=0.0D0
 	GF_LEV_CUT=1000
@@ -514,13 +546,14 @@
 	    CALL RD_F_TO_S_IDS(ATM(ID)%F_TO_S_XzV,ATM(ID)%INT_SEQ_XzV,
 	1           ATM(ID)%XzVLEVNAME_F,
 	1           ATM(ID)%NXzV_F,ATM(ID)%NXzV,LUIN,FILENAME)
-	    CALL RDPHOT_GEN_V1(ATM(ID)%EDGEXzV_F, ATM(ID)%XzVLEVNAME_F,
+	    CALL RDPHOT_GEN_V2(ATM(ID)%EDGEXzV_F, ATM(ID)%XzVLEVNAME_F,
 	1            ATM(ID)%GIONXzV_F,      AT_NO(SPECIES_LNK(ID)),
 	1            ATM(ID)%ZXzV,           ATM(ID)%NXzV_F,
 	1            ATM(ID)%XzV_ION_LEV_ID, ATM(ID)%N_XzV_PHOT, NPHOT_MAX,
 	1            ATM(ID+1)%XzV_PRES,     ATM(ID+1)%EDGEXzV_F,
 	1            ATM(ID+1)%GXzV_F,       ATM(ID+1)%F_TO_S_XzV,
 	1            ATM(ID+1)%XzVLEVNAME_F, ATM(ID)%NXzV_F, 
+	1            SIG_GAU_KMS,FRAC_SIG_GAU,CUT_ACCURACY,ABOVE_EDGE,
 	1            XRAYS,ID,ION_ID(ID),LUIN,LU_TMP)
             IF(ATM(ID+1)%XzV_PRES)ATM(ID)%GIONXzV_F=ATM(ID+1)%GXzV_F(1)
  	    IF(.NOT. DIE_AS_LINE .AND. (ATM(ID)%DIE_AUTO_XzV .OR. ATM(ID)%DIE_WI_XzV) )THEN

@@ -8,6 +8,7 @@
       USE STEQ_DATA_MOD
       IMPLICIT NONE
 !
+! Altered 01-Apr-2004 : BA matrices allocated after all STEQ matrices.
 ! Created 05-Apr-2001
 !
       INTEGER*4 NT
@@ -55,8 +56,6 @@
                       ALLOCATE (SE(ID)%STEQ(NX,ND),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE (SE(ID)%QFV_R(NX,ND),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE (SE(ID)%QFV_P(NX,ND),STAT=IOS)
-        IF(IOS .EQ. 0)ALLOCATE (SE(ID)%BA(NX,NY,NUM_BNDS,ND),STAT=IOS)
-        IF(IOS .EQ. 0)ALLOCATE (SE(ID)%BA_PAR(NX,NY,ND),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE (SE(ID)%EQ_IN_BA(NX),STAT=IOS)
         MEMORY=MEMORY+NX*NY*ND*(NUM_BNDS+1)
 !
@@ -76,18 +75,46 @@
 	SE(ID)%NUMBER_BAL_EQ=SE(ID)%N_SE
       END DO
 !
-! Use to store Charge Equilibrium, and Radiative Equilibrium equations.
-!
-                    ALLOCATE (STEQ_ED(ND),STAT=IOS)
+	            ALLOCATE (STEQ_ED(ND),STAT=IOS)
       IF(IOS .EQ. 0)ALLOCATE (STEQ_T(ND),STAT=IOS)
-      IF(IOS .EQ. 0)ALLOCATE (BA_ED(NT,NUM_BNDS,ND),STAT=IOS)
-      IF(IOS .EQ. 0)ALLOCATE (BA_T(NT,NUM_BNDS,ND),STAT=IOS)
-      IF(IOS .EQ. 0)ALLOCATE (BA_T_PAR(NT,ND),STAT=IOS)
       IF(IOS .NE. 0)THEN
         WRITE(LU_ER,*)'Unable to allocate STEQ_ED etc in SET_BA_STORAGE'
         WRITE(LU_ER,*)'STAT=',IOS,'ID=',ID
         STOP
       END IF
+!
+! We try allocate the BA matrices separately, as this might 
+! improve memory management.
+!
+      DO ID=1,NION
+	IF(SE(ID)%XzV_PRES)THEN
+	  NX=SE(ID)%N_SE
+	  NY=SE(ID)%N_IV
+	ELSE
+	  NX=1; NY=1
+	END IF
+	IOS=0
+        IF(IOS .EQ. 0)ALLOCATE (SE(ID)%BA_PAR(NX,NY,ND),STAT=IOS)
+        IF(IOS .EQ. 0)ALLOCATE (SE(ID)%BA(NX,NY,NUM_BNDS,ND),STAT=IOS)
+!
+        IF(IOS .NE. 0)THEN
+          WRITE(LU_ER,*)'Unable to allocate memory in SET_BA_STORAGE'
+          WRITE(LU_ER,*)'STAT=',IOS,'ID=',ID
+          STOP
+        END IF
+      END DO
+!
+! Use to store Charge Equilibrium, and Radiative Equilibrium equations.
+!
+      IF(IOS .EQ. 0)ALLOCATE (BA_ED(NT,NUM_BNDS,ND),STAT=IOS)
+      IF(IOS .EQ. 0)ALLOCATE (BA_T(NT,NUM_BNDS,ND),STAT=IOS)
+      IF(IOS .EQ. 0)ALLOCATE (BA_T_PAR(NT,ND),STAT=IOS)
+      IF(IOS .NE. 0)THEN
+        WRITE(LU_ER,*)'Unable to allocate BA_ED etc in SET_BA_STORAGE'
+        WRITE(LU_ER,*)'STAT=',IOS,'ID=',ID
+        STOP
+      END IF
+!
       MEMORY=MEMORY+2*NT*ND*NUM_BNDS+NT*ND
       WRITE(LU_ER,*)'Amount of memory allocated for BA is:  ',MEMORY,' words'
       MEMORY=NT*NT*(NUM_BNDS+1)*ND

@@ -71,7 +71,7 @@
 	CHARACTER*80 WK_STR,OPTION
 	CHARACTER*6 TO_TEK
 	CHARACTER*2 TO_VT
-	CHARACTER*50 PLT_ID,RD_PLT_ID
+	CHARACTER*50 PLT_ID,RD_PLT_ID,PLT_ID_SAV
 !
 ! Vector arrays
 !
@@ -239,7 +239,7 @@
 	  EXPMARK_SCALE=1.0   		!Symbol size on plots.
 	  TICK_FAC_SCALE=1.0D0
 	  PLT_LINE_WGT=1
-          PLT_ST_FILENAME='PLT_ST'
+          PLT_ST_FILENAME=' '
 	END IF
 	TITLE(1:N_TITLE)=' '
 !
@@ -1359,8 +1359,13 @@ C
 	    READ(T_IN,'(A)')ANS
 	  END IF
 	  GOTO 1000
-	ELSE IF(ANS .EQ. 'WP')THEN
-	  CALL NEW_GEN_IN(PLT_ST_FILENAME,'Name of file with stored plots')
+	ELSE IF(ANS .EQ. 'WP' .OR. ANS .EQ. 'WPF')THEN
+	  IF(PLT_ST_FILENAME .EQ. ' ')THEN
+	    PLT_ST_FILENAME='PLT_ST'
+	    CALL NEW_GEN_IN(PLT_ST_FILENAME,'Name of file with stored plots')
+	  ELSE IF(ANS .EQ. 'WPF')THEN
+	    CALL NEW_GEN_IN(PLT_ST_FILENAME,'Name of file with stored plots')
+	  END IF
 	  OPEN(UNIT=30,FORM='UNFORMATTED',FILE=PLT_ST_FILENAME,STATUS='UNKNOWN'
 	1,       IOSTAT=IOS,POSITION='APPEND')
 	  IF(IOS .NE. 0)THEN
@@ -1394,69 +1399,80 @@ C
 	  CLOSE(UNIT=30)
 	  GOTO 1000
 !
-	ELSE IF(ANS .EQ. 'RP')THEN
-	  CALL NEW_GEN_IN(PLT_ST_FILENAME,'Name of file with stored plots')
+	ELSE IF(ANS .EQ. 'RP' .OR. ANS .EQ. 'RPF')THEN
+	  IF(PLT_ST_FILENAME .EQ. ' ')THEN
+	    PLT_ST_FILENAME='PLT_ST'
+	    CALL NEW_GEN_IN(PLT_ST_FILENAME,'Name of file with stored plots')
+	  ELSE IF(ANS .EQ. 'RPF')THEN
+	    CALL NEW_GEN_IN(PLT_ST_FILENAME,'Name of file with stored plots')
+	  END IF
 	  OPEN(UNIT=30,FORM='UNFORMATTED',FILE=PLT_ST_FILENAME,STATUS='OLD',
 	1          IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(T_OUT,*)'Error opening file'
 	    GOTO 1000
 	  END IF
-	  CALL NEW_GEN_IN(PLT_ID,'PLT_ID=')
+	  PLT_ID_SAV=' '
 !
-	  RD_PLT_ID=' '
-	  DO WHILE(RD_PLT_ID .NE. 'PLT_ID='//PLT_ID)
-	    READ(30,IOSTAT=IOS)RD_PLT_ID
-	    IF(IOS .EQ. -1)THEN
-	      WRITE(T_OUT,*)'Unable to identify plot --- IOS',IOS
-	      WRITE(T_OUT,*)'Available plots are as follows:'
-	      REWIND(UNIT=30)
-	      IOS=0
-              DO WHILE(IOS .NE. -1)
-	        RD_PLT_ID=' '
-	        READ(30,IOSTAT=IOS)RD_PLT_ID
-	        IF(RD_PLT_ID(1:7) .EQ. 'PLT_ID=')THEN
-	           WRITE(T_OUT,'(35X,A)')TRIM(RD_PLT_ID(8:))
-	        END IF
-	      END DO
-	      CLOSE(UNIT=30)
+	  DO WHILE(1 .EQ. 1)
+	    CALL NEW_GEN_IN(PLT_ID,'PLT_ID=')
+	    IF(PLT_ID .EQ. ' ' .OR. PLT_ID .EQ. PLT_ID_SAV)EXIT
+	    RD_PLT_ID=' '
+	    DO WHILE(RD_PLT_ID .NE. 'PLT_ID='//PLT_ID)
+	      READ(30,IOSTAT=IOS)RD_PLT_ID
+	      IF(IOS .EQ. -1)THEN
+	        WRITE(T_OUT,*)'Unable to identify plot --- IOS',IOS
+	        WRITE(T_OUT,*)'Available plots are as follows:'
+	        REWIND(UNIT=30)
+	        IOS=0
+                DO WHILE(IOS .NE. -1)
+	          RD_PLT_ID=' '
+	          READ(30,IOSTAT=IOS)RD_PLT_ID
+	          IF(RD_PLT_ID(1:7) .EQ. 'PLT_ID=')THEN
+	             WRITE(T_OUT,'(35X,A)')TRIM(RD_PLT_ID(8:))
+	          END IF
+	        END DO
+	        CLOSE(UNIT=30)
+	        GOTO 1000
+	      END IF
+	    END DO
+	    IP=NPLTS+1
+	    IF(IP .GT. MAX_PLTS)THEN
+	      WRITE(T_OUT,*)'Error in GRAMON_PGPLOT'
+	      WRITE(T_OUT,*)'Too many plots have ben stored'
 	      GOTO 1000
 	    END IF
-	  END DO
-	  IP=NPLTS+1
-	  IF(IP .GT. MAX_PLTS)THEN
-	    WRITE(T_OUT,*)'Error in GRAMON_PGPLOT'
-	    WRITE(T_OUT,*)'Too many plots have ben stored'
-	    GOTO 1000
-	  END IF
-	  READ(30)NPTS(IP)
-	  READ(30)ERR(IP)
-	  ALLOCATE (CD(IP)%XVEC(NPTS(IP)))
-	  ALLOCATE (CD(IP)%DATA(NPTS(IP)))
-	  DO K=1,(NPTS(IP)+N_REC_SIZE-1)/N_REC_SIZE
-	    IST=N_REC_SIZE*(K-1)+1
-	    IEND=MIN(IST+N_REC_SIZE-1,NPTS(IP))
-	    READ(30)(CD(IP)%XVEC(I),I=IST,IEND)
-	    READ(30)(CD(IP)%DATA(I),I=IST,IEND)
-	    IF(ERR(IP))THEN
-	      ALLOCATE (CD(IP)%EMIN(NPTS(IP)))
-	      ALLOCATE (CD(IP)%EMAX(NPTS(IP)))
-	      READ(30)(CD(IP)%EMAX(I),I=IST,IEND)
-	      READ(30)(CD(IP)%EMIN(I),I=IST,IEND)
+	    READ(30)NPTS(IP)
+	    READ(30)ERR(IP)
+	    ALLOCATE (CD(IP)%XVEC(NPTS(IP)))
+	    ALLOCATE (CD(IP)%DATA(NPTS(IP)))
+	    DO K=1,(NPTS(IP)+N_REC_SIZE-1)/N_REC_SIZE
+	      IST=N_REC_SIZE*(K-1)+1
+	      IEND=MIN(IST+N_REC_SIZE-1,NPTS(IP))
+	      READ(30)(CD(IP)%XVEC(I),I=IST,IEND)
+	      READ(30)(CD(IP)%DATA(I),I=IST,IEND)
+	      IF(ERR(IP))THEN
+	        ALLOCATE (CD(IP)%EMIN(NPTS(IP)))
+	        ALLOCATE (CD(IP)%EMAX(NPTS(IP)))
+	        READ(30)(CD(IP)%EMAX(I),I=IST,IEND)
+	        READ(30)(CD(IP)%EMIN(I),I=IST,IEND)
+	      END IF
+	    END DO
+	    NPLTS=NPLTS+1			!Successfully read.
+	    TYPE_CURVE(IP)='L'
+	    LINE_WGT(IP)=1
+	    IF(IP .NE. 1)THEN
+	      LINE_STYLE(IP)=MOD(LINE_STYLE(IP-1),5)+1
+              PEN_COL(IP)=PEN_COL(IP-1)+1
+            ELSE
+	      LINE_STYLE(IP)=1
+	      PEN_COL(IP)=2
 	    END IF
-	  END DO
-	  NPLTS=NPLTS+1			!Successfully read.
-	  TYPE_CURVE(IP)='L'
-	  LINE_WGT(IP)=1
-	  IF(IP .NE. 1)THEN
-	    LINE_STYLE(IP)=MOD(LINE_STYLE(IP-1),5)+1
-            PEN_COL(IP)=PEN_COL(IP-1)+1
-          ELSE
 	    LINE_STYLE(IP)=1
-	    PEN_COL(IP)=2
-	  END IF
-	  LINE_STYLE(IP)=1
-	  IF(DASH)LINE_STYLE(IP)=MOD(IP-1,5)+1
+	    IF(DASH)LINE_STYLE(IP)=MOD(IP-1,5)+1
+	    PLT_ID_SAV=PLT_ID
+	    REWIND(UNIT=30)
+	  END DO
 !
 	  CLOSE(UNIT=30)
 	  GOTO 1000
@@ -1741,29 +1757,34 @@ C
 	ELSE IF(ANS .EQ. 'NM')THEN
 	  VAR_PLT1=1
 	  CALL NEW_GEN_IN(VAR_PLT1,'Input plot to nomalize to?')
-	  IF(VAR_PLT1 .LE. 0 .OR. VAR_PLT1 .GT. NPLTS)THEN
+	  IF(VAR_PLT1 .LT. 0 .OR. VAR_PLT1 .GT. NPLTS)THEN
 	    WRITE(6,*)'Bad plot number'
 	    GOTO 1000
 	  END IF
+	  IF(VAR_PLT1 .EQ. 0)WRITE(6,*)'Normalizing plots to 1.0'
 	  XT(1)=XPAR(1); CALL NEW_GEN_IN(XT(1),'Beginning of normalization range')
 	  XT(2)=XPAR(1)+0.1*(XPAR(2)-XPAR(1))
 	  CALL NEW_GEN_IN(XT(2),'End of normalization range')
 	  MEAN=0.0D0
 	  CNT=0.0D0
 	  IP=VAR_PLT1
-	  DO J=1,NPTS(VAR_PLT1)
-	    T1=(CD(IP)%XVEC(J)-XT(1))*(XT(2)-CD(IP)%XVEC(J))
-	    IF(T1 .GT. 0)THEN
-	       MEAN=MEAN+CD(IP)%DATA(J)
-	       CNT=CNT+1
+	  IF(VAR_PLT1 .NE. 0)THEN
+	    DO J=1,NPTS(VAR_PLT1)
+	      T1=(CD(IP)%XVEC(J)-XT(1))*(XT(2)-CD(IP)%XVEC(J))
+	      IF(T1 .GT. 0)THEN
+	         MEAN=MEAN+CD(IP)%DATA(J)
+	         CNT=CNT+1
+	      END IF
+	    END DO
+	    IF(MEAN .EQ. 0 .OR. CNT .EQ. 0)THEN
+	      WRITE(6,*)'No normalization will be done'
+	      WRITE(6,*)'Bad range of data'
+	      GOTO 1000
+	    ELSE
+	      MEAN=MEAN/CNT
 	    END IF
-	  END DO
-	  IF(MEAN .EQ. 0 .OR. CNT .EQ. 0)THEN
-	    WRITE(6,*)'No normalization will be done'
-	    WRITE(6,*)'Bad range of data'
-	    GOTO 1000
 	  ELSE
-	    MEAN=MEAN/CNT
+	      MEAN=1.0D0
 	  END IF
 	  DO IP=1,NPLTS
 	    IF(IP .NE. VAR_PLT1 .AND. TYPE_CURVE(IP) .NE. 'I')THEN

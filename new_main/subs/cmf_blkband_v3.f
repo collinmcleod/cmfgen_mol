@@ -532,7 +532,7 @@
 ! the LU decomposition of BA.
 !
 	WRITE(6,*)'Beginning TRI solution in CMF_BLKBAND'
-        !
+!
 	ALLOCATE (B_MAT(N,N),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE (C_MAT(N,N),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE (D_MAT(N,N),STAT=IOS)

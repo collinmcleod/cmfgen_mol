@@ -5,11 +5,12 @@ include ../Makefile_definitions
 #
 # These names are for the fortran linker
 #
-LN1=tools
-LN2=pgplt
+LN1=mod
+LN2=tools
 LN3=subs
-LN4=newsubs
-LN5=disp
+LN4=pgplt
+LN5=newsubs
+LN6=disp
 #
 # These names refer to the full file name
 #
@@ -18,6 +19,7 @@ FN2=$(LIB_DIR)lib$(LN2).a
 FN3=$(LIB_DIR)lib$(LN3).a
 FN4=$(LIB_DIR)lib$(LN4).a
 FN5=$(LIB_DIR)lib$(LN5).a
+FN6=$(LIB_DIR)lib$(LN6).a
 
 #
 # We only make dispgen.exe if there has been a changen to the main *.f files,
@@ -30,56 +32,59 @@ all : $(EXE_DIR)dispgen.exe
 # Give the depeedencies of dispgen.exe and how it is created.
 #
 
-$(EXE_DIR)dispgen.exe : mod_disp.o dispgen.o maingen.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) 
+$(EXE_DIR)dispgen.exe : mod_disp.o dispgen.o maingen.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
 	$(F90) dispgen.o mod_disp.o maingen.o \
-             -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) \
+             -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
                $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)/dispgen.exe
 
 mod_disp.o : mod_disp.f
 	$(F90) -c $(FG) mod_disp.f 
 
-# Module dependencies for DISPGEN
+#Module dependencies for DISPGEN, MAINGEN
 
-DGEN =  $(LIB_DIR)libtools.a(gen_in.o)\
-             $(LIB_DIR)libtools.a(usr_option.o)
+GEN =  $(LIB_DIR)libtools.a(gen_in.o)\
+               $(LIB_DIR)libtools.a(usr_option.o)\
+               $(LIB_DIR)libtools.a(usr_hidden.o)\
+               $(LIB_DIR)libmod.a(mod_lev_dis_blk.o)\
+               $(LIB_DIR)libtools.a(wr_string.o)
 
-dispgen.o : dispgen.f mod_disp.o $(DGEN)
+dispgen.o : dispgen.f mod_disp.o $(GEN)
 	$(F90) -c $(FG) dispgen.f 
 
-#Module dependencies for MAINGEN
 
-MGEN =  $(LIB_DIR)libtools.a(gen_in.o) $(LIB_DIR)libtools.a(usr_option.o)\
-               $(LIB_DIR)libtools.a(usr_hidden.o)\
-               $(LIB_DIR)libsubs.a(mod_lev_dis_blk.o)
-
-maingen.o : maingen.f mod_disp.o $(MGEN)
+maingen.o : maingen.f mod_disp.o $(GEN) \
+               EVAL_LTE_FULL.INC  OPACITIES.INC \
+               PAR_OPACITIES.INC  XOPAC.INC
 	$(F90) -c $(FG) maingen.f 
 
-$(DGEN):
+$(GEN):
 	(cd ../tools; make )
+	(cd ../new_main/mod_subs; make )
 
-$(MGEN):
-	(cd ../tools; make )
-	(cd ../subs; make )
 
-$(FN1) : lib1
-$(FN2) : lib2
-$(FN3) : lib3
-$(FN4) : lib4
-$(FN5) : lib5
-
-# We now MAKE the required libraries.
+# We now MAKE the required libraries. Note that this double
+# dependence is required to ensure that the libraries are updated.
+# Otherwise MAKE simple checks the date of the library.
+ 
+$(FN1): lib1
+$(FN2): lib2
+$(FN3): lib3
+$(FN4): lib4
+$(FN5): lib5
+$(FN6): lib6
 
 lib1:
-	(cd ../tools; make )
+	(cd ../new_main/mod_subs; make )
 lib2:
-	(cd ../pgplt; make )
+	(cd ../tools; make )
 lib3:
 	(cd ../subs; make )
 lib4:
-	(cd ../newsubs; make )
+	(cd ../pgplt; make )
 lib5:
+	(cd ../newsubs; make )
+lib6:
 	(cd subs; make )
 
 clean :

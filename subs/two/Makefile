@@ -5,12 +5,12 @@ include ../../Makefile_definitions
 # Library where object files will/are stored
 
 LIB=$(LIB_DIR)libsubs.a
+LIB_MOD=$(LIB_DIR)libmod.a
 
 #
 # Entries for library
 #
-OBJ = $(LIB)(two_phot_mod.o)\
-      $(LIB)(steq_ba_two_phot.o)\
+OBJ = $(LIB)(steq_ba_two_phot.o)\
       $(LIB)(two_phot_rate.o)\
       $(LIB)(set_two_phot.o)\
       $(LIB)(two_phot_opac.o)\
@@ -24,7 +24,7 @@ $(LIB) : $(OBJ)
 
 # General rules to make obects in a library and object files
 
-$(LIB)(%.o) : %.f $(LIB)(two_phot_mod.o) 
+$(LIB)(%.o) : %.f $(LIB_MOD)(two_phot_mod.o) 
 	$(F90) -c $(FG)  $< 
 	ar ruv $(LIB) $*.o
 
@@ -32,9 +32,8 @@ $(LIB)(%.o) : %.f $(LIB)(two_phot_mod.o)
 # fortran moudles. (The order of compilation matters.)
 
 
-$(LIB)(two_phot_mod.o) : two_phot_mod.f 
-	$(F90) -c $(FG) two_phot_mod.f 
-	ar ruv $(LIB) two_phot_mod.o
+$(LIB_MOD)(two_phot_mod.o):
+	(cd ../new_main/mod_subs; make)
 
 clean :
 	rm -f *.o 

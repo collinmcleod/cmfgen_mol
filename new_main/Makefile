@@ -12,6 +12,7 @@ LN2=pgplt
 LN3=subs
 LN4=newsubs
 LN5=dev
+LN6=mod
 #
 # These names refer to the full file name
 #
@@ -20,6 +21,7 @@ FN2=$(LIB_DIR)lib$(LN2).a
 FN3=$(LIB_DIR)lib$(LN3).a
 FN4=$(LIB_DIR)lib$(LN4).a
 FN5=$(LIB_DIR)lib$(LN5).a
+FN6=$(LIB_DIR)lib$(LN6).a
 #
 # We only make dispgen.exe if there has been a change to the main *.f files,
 # or if the libraries have changed since the last link.
@@ -27,47 +29,55 @@ FN5=$(LIB_DIR)lib$(LN5).a
   
 all : $(EXE_DIR)cmfgen_dev.exe
 
-mod: mod_cmfgen.o
-
 #
 # Give the dependencies of dispgen.exe and how it is created.
 #
 
-$(EXE_DIR)cmfgen_dev.exe : cmfgen.o cmfgen_sub.o mod_cmfgen.o\
-                                  $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
-	$(F90) cmfgen.o cmfgen_sub.o mod_cmfgen.o \
-             -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) \
+$(EXE_DIR)cmfgen_dev.exe : cmfgen.o cmfgen_sub.o \
+                                  $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
+	$(F90) cmfgen.o cmfgen_sub.o \
+             -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN6) \
                $(LOCLIB) $(LAPACK) $(BLAS) \
               -o $(EXE_DIR)cmfgen_dev.exe
 
-mod_cmfgen.o : mod_cmfgen.f 
-	$(F90) -c $(FG) mod_cmfgen.f 
+USR=$(LIB_DIR)libtools.a(usr_option.o)
 
-cmfgen.o : cmfgen.f mod_cmfgen.o
+MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
+      $(LIB_DIR)libmod.a(control_variable_mod.o)\
+      $(LIB_DIR)libmod.a(opac_mod.o)\
+      $(LIB_DIR)libmod.a(steq_data_mod.o)\
+      $(LIB_DIR)libmod.a(mod_lev_dis_blk.o)
+
+cmfgen.o : cmfgen.f $(MODS) $(USR)
 	$(F90) -c $(FG) cmfgen.f 
 
-GEN = $(LIB_DIR)libsubs.a(mod_lev_dis_blk.o)
-STEQ = $(LIB_DIR)libdev.a(steq_data_mod.o)
+#cmfgen.o : cmfgen.f $(MODS)
+#	$(F90) -c $(FG) cmfgen.f 
 
-cmfgen_sub.o : cmfgen_sub.f mod_cmfgen.f $(GEN) $(STEQ) \
-    COMP_JCONT_V4.INC    LINEGEN.INC         VARCONT.INC        XOPAC_V4.INC \
-    EVAL_LTE_INC_V4.INC  OPACITIES_V4.INC    VAROPAC_V4.INC \
-    GET_J_CHI.INC        SUP_TO_FULL_V4.INC  VAR_XOPACH_V4.INC
-	$(F90) -c $(FG) -Isubs cmfgen_sub.f 
+cmfgen_sub.o : cmfgen_sub.f $(MODS) \
+    COMP_JCONT_V4.INC    LINEGEN.INC         EVAL_LTE_INC_V4.INC \
+    GET_J_CHI.INC        VARCONT.INC         SUP_TO_FULL_V4.INC
+	$(F90) -c $(FG) cmfgen_sub.f 
 
-$(GEN):
-	(cd ../subs; make )
- 
-$(STEQ):
-	(cd subs; make mod)
- 
-$(FN1) : lib1
-$(FN2) : lib2
-$(FN3) : lib3
-$(FN4) : lib4
-$(FN5) : lib5
+$(USR):
+	(cd ../tools ; make )
 
-# We now MAKE the required libraries.
+$(MODS): mod
+
+mod:
+	(cd mod_subs ; make )
+
+
+# We now MAKE the required libraries. Note that this double
+# dependence is rquired to ensure that the libraries are updated.
+# Otherwise Makfile simple checks date of library.
+
+$(FN1): lib1
+$(FN2): lib2
+$(FN3): lib3
+$(FN4): lib4
+$(FN5): lib5
+$(FN6): lib6
 
 lib1:
 	(cd ../tools; make )
@@ -79,6 +89,9 @@ lib4:
 	(cd ../newsubs; make )
 lib5:
 	(cd subs; make )
+lib6:
+	(cd mod_subs; make )
+
 
 clean :
 	rm -f *.o

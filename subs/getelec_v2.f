@@ -1,15 +1,20 @@
-C
+!
 	SUBROUTINE GETELEC_V2(SPEC_DENS,AT_NO,N_SPEC,ED,ND,LU,FILNAME)
 	IMPLICIT NONE
-C
-C Altered 11-Jun-1996 : Populations of all specied no passed through matrix
-C                         SPEC_DENS. AT_NO must also be passed.
-C                        
-C Altered 24-May-1996 : Dynamic memmoray allocation now used.
-C                       ERROR_LU and LUER installed.
-C Altered 18-Apr-1990 - Change correction had bug. Comparing ED(log)
-C                       with non log ED.
-C
+!
+! Altered 24-Apr-2004 : Check monoticty of ED. Bug fixed on 24th.
+! Altered 04-Mar-2003 : Use grid index, rather than average gamma, to provide
+!                         first estimated for the electron density. This is
+!                         taken as the final estimate if the electron density
+!                         is not monotonic.
+! Altered 11-Jun-1996 : Populations of all specied no passed through matrix
+!                         SPEC_DENS. AT_NO must also be passed.
+!                        
+! Altered 24-May-1996 : Dynamic memmoray allocation now used.
+!                       ERROR_LU and LUER installed.
+! Altered 18-Apr-1990 - Change correction had bug. Comparing ED(log)
+!                       with non log ED.
+!
 	INTEGER*4 N_SPEC,ND,LU
 	REAL*8 ED(ND)
 	REAL*8 SPEC_DENS(ND,N_SPEC)
@@ -18,7 +23,6 @@ C
 C
 	REAL*8, ALLOCATABLE :: OLD_ED(:)		!NGAM
 	REAL*8, ALLOCATABLE :: OLD_GAM(:,:)		!NGAM,N_SPEC
-	REAL*8, ALLOCATABLE :: AVE_GAM(:)		!N_SPEC
 	REAL*8, ALLOCATABLE :: NEW_GAM(:)		!ND
 	REAL*8, ALLOCATABLE :: NEW_ED(:)		!ND
 C
@@ -44,7 +48,6 @@ C Now allocate required stroage.
 C
 	  ALLOCATE (OLD_ED(NGAM))
 	  ALLOCATE (OLD_GAM(NGAM,N_SPEC))
-	  ALLOCATE (AVE_GAM(N_SPEC))
 	  ALLOCATE (NEW_GAM(ND))
 	  ALLOCATE (NEW_ED(ND))
 C
@@ -55,7 +58,6 @@ C
 	    READ(LU,'(A)')STRING
 	  END DO
 	  READ(LU,*)(OLD_ED(J),J=1,NGAM)
-	  OLD_ED(:)=LOG(OLD_ED(:))
 C
 C Read in the gammas for species present in the input file. We link
 C them with the populations stored in SPEC_DENS via their atomic number.
@@ -77,32 +79,31 @@ C
 	  END DO
 100	  CONTINUE		!End of file
 	CLOSE(UNIT=LU)
-C
-C Determine the average gamma (over depth) for each species to get an initial 
-C estimate for the electron density.
-C
-	DO J=1,N_SPEC
-	  AVE_GAM(J)=0.0D0
-	  DO I=1,NGAM
-	    AVE_GAM(J)=AVE_GAM(J)+OLD_GAM(I,J)
-	  END DO
-	  AVE_GAM(J)=AVE_GAM(J)/NGAM
-	END DO
-C
-C Species not present are assumed to have GAM=0!
-C
-	DO J=1,N_SPEC
-	  IF(AVE_GAM(J) .EQ. 0)THEN
-	    WRITE(LUER,*)'Warning - no gamma present for AT_NO',AT_NO(J)
-	  END IF
-	END DO 
-C
+!
+! Estimate the GAMMAS by simply using the grid index.
+!
 	ED(:)=0.0D0	  
-	DO J=1,N_SPEC
+	DO ID=1,N_SPEC
 	  DO I=1,ND
-	    ED(I)=ED(I) + SPEC_DENS(I,J)*AVE_GAM(J)
+	    J=I+(NGAM-ND)
+	    IF(J .LT. 1)J=1
+	    IF(J .GT. NGAM)J=NGAM
+	    ED(I)=ED(I)+OLD_GAM(J,ID)*SPEC_DENS(I,ID)
 	  END DO
 	END DO
+!
+! Ie ED is non-monotnoic, we have no method implemented to improve the
+! ED estimate.
+!
+	DO I=1,NGAM-2
+	  IF( (OLD_ED(I)-OLD_ED(I+1))*(OLD_ED(I+1)-OLD_ED(I+2)) .LE. 0 )THEN
+	    WRITE(LUER,*)'Warning ED in GETELEC_V2 is non-monotonic'
+	    WRITE(LUER,*)'We estimated the gammas using the grid index.'
+	    RETURN
+	  END IF
+	END DO
+!
+	OLD_ED(:)=LOG(OLD_ED(:))
 	ED(:)=LOG(ED(:))
 C
 C Improve estimate of the electron density. We do this loop a maximum of
@@ -155,7 +156,6 @@ C
 	    END DO
 	    NEW_ED(I)=NEW_ED(XEND)*T1/T2
 	  END DO
-	  
 C
 	  CHANGE=0.0D0
 	  DO I=1,ND
@@ -178,7 +178,6 @@ C Deallocate requested storage.
 C
 	DEALLOCATE (OLD_ED)
 	DEALLOCATE (OLD_GAM)
-	DEALLOCATE (AVE_GAM)
 	DEALLOCATE (NEW_GAM)
 	DEALLOCATE (NEW_ED)
 C

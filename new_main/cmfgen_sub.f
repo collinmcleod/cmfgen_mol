@@ -25,6 +25,9 @@ C
 	1                     NDMAX,NPMAX,NCF_MAX,NLINE_MAX,
 	1                     TX_OFFSET,MAX_SIM,NM,NM_KI,NLF)
 	USE MOD_CMFGEN
+	USE ANG_QW_MOD
+	USE CONTROL_VARIABLE_MOD
+	USE OPAC_MOD
 	USE STEQ_DATA_MOD
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
@@ -40,92 +43,29 @@ C
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 C
 	CHARACTER*12 PRODATE
-	PARAMETER (PRODATE='17-Jun-2003')	!Must be changed after alterations
+	PARAMETER (PRODATE='02-May-2004')	!Must be changed after alterations
 C
 C 
 C
 	REAL*8 SOL(NT,ND)		!Temp. stor. area for ST. EQ.
 	INTEGER*4 DST,DEND
 C
-C These routines are used a temporary arrays for computing the BA and BA_ION 
-C arrays. These are updated, rather than the full arrays, on each frequency
-C in order to ensure better cancelation of large continuum terms.
-C
-C NB: BA_PAR now replaces TBA in call to SOLVEBA.
-C
-C N_PAR is used to indicate how often the BA matrices should be incremented
-C by BA_PAR. After the incrementation, the PAR matrices are zeroed.
-C
-	INTEGER*4 N_PAR
-C
-C Statements to restart program.
-C
 C Constants for opacity etc.
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	COMMON/LINE/ OPLIN,EMLIN
-C
-	INTEGER*4, PARAMETER :: IZERO=0
-	INTEGER*4, PARAMETER :: IONE=1
-	INTEGER*4, PARAMETER :: ITWO=2
-	INTEGER*4, PARAMETER :: ITHREE=3
-!	INTEGER*4, PARAMETER :: IFOUR=4
-!	INTEGER*4, PARAMETER :: IFIVE=5
-	INTEGER*4, PARAMETER :: ISIX=6
-	INTEGER*4, PARAMETER :: ITEN=10
-!
-!	REAL*8, PARAMETER :: RZERO=0.0
-!	REAL*8, PARAMETER :: RONE=1.0
-!	REAL*8, PARAMETER :: RTWO=2.0
-!
 C
 C Internally used variables
 C
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
 	REAL*8 OPLIN,EMLIN
 	REAL*8 DTDR,DBB,DDBBDT
-	REAL*8 TSTAR,S1,IC,REPA,EPS
+	REAL*8 S1,REPA
 	REAL*8 MAXCH,MAXCH_SUM
-	REAL*8 MAX_LAM_COR	!Maximum fractional change for Lambda iteration.
-	REAL*8 MAX_LIN_COR	!Maximum fractional change for linearization.
-	REAL*8 MAX_CHNG_LIM
 	REAL*8 T1,T2,T3,T4,SRAT
 	REAL*8 FL,AMASS,FL_OLD
 	REAL*8 FG_COUNT
 C
-C Used to determine the accuracy with which the BA and BAION matrices are
-C computed. 1.0D-10 < BA_CHK_FAC < 0.1. Smaller number means higher acuracy,
-C but slower computation. Too large a value may affect convergence. Most
-C models run with 1.0D-04. Basically updates to BA ignored if their effect
-C on RJ is less than BA_CHK_FAC*RJ.
-C
-	REAL*8 BA_CHK_FAC
-C
 	LOGICAL LST_DEPTH_ONLY
-C
-C Star and velocity specifications
-C
-	REAL*8 RP,RMAX
-	REAL*8 RMDOT,LUM
-      	REAL*8 VRP,RN,VINF,EPPS1,GAMMA1
-	REAL*8 RP2,VRP2,RN2,VINF2,EPPS2,GAMMA2
-	REAL*8 CONS_FOR_R_GRID,EXP_FOR_R_GRID
-	INTEGER*4 NBND_INS
-	INTEGER*4, PARAMETER :: NUM_V_OPTS=1
-	CHARACTER*10 VEL_OPTION(NUM_V_OPTS)
-C
-C Parameters for VELTYPE=3 or VELTYPE=6 (STARPCYG_V2)
-C
-	REAL*8 SCL_HT,VCORE,VPHOT
-	REAL*8 VINF1,V_BETA1,V_EPPS1
-	REAL*8 V_BETA2,V_EPPS2		!VINF2 above
-	INTEGER*4 VELTYPE
-!
-! Supernova variables
-!
-	REAL*8 RHO_ZERO		!Density at core in atmos/cm^3
-	REAL*8 N_RHO		!Exponent for density (+ve)
-	LOGICAL SN_MODEL
 C
 C REC_SIZE     is the (maximum) record length in bytes.
 C UNIT_SIZE    is the number of bytes per unit that is used to specify
@@ -188,7 +128,7 @@ C
 	INTEGER*4 MNL,MNUP
 	INTEGER*4 MNL_F,MNUP_F
 	INTEGER*4 PHOT_ID
-	INTEGER*4 I,J,K,L,ML,LS,IOS,LINE_INDX,NEXT_LOC
+	INTEGER*4 I,J,K,L,ML,LS,LINE_INDX,NEXT_LOC
 	INTEGER*4 IREC,MATELIM
 !
 	CHARACTER*80 TMP_STRING
@@ -212,8 +152,6 @@ C
 	REAL*8 ATOMIC_MASS_UNIT
 	REAL*8 SPEED_OF_LIGHT
 	LOGICAL EQUAL
-	EXTERNAL JWEIGHT,HWEIGHT,KWEIGHT,NWEIGHT
-	EXTERNAL JTRPWGT,HTRPWGT,KTRPWGT,NTRPWGT
 	EXTERNAL ICHRLEN,ERROR_LU,SPEED_OF_LIGHT
 !
 	INTEGER*4 GET_DIAG
@@ -230,16 +168,8 @@ C
 C Wind variablity arrays.
 !
 	REAL*8 POPS(NT,ND)		!Population for all species.
-	REAL*8 VCHI(NT,ND)		!Variation of CHI array.
-	REAL*8 VETA(NT,ND)		!Variation of ETA array.
 	REAL*8 MEAN_ATOMIC_WEIGHT	!Mean atomic weight of atoms  (neutrals
 C                          		! and ions) in atomic mass units.
-	REAL*8 VCHI_SAV(NT,ND)
-	REAL*8 VETA_SAV(NT,ND)
-!
-	REAL*8 VCHI_ALL(NT,ND),VCHI_ALL_SAV(NT,ND)
-	REAL*8 VETA_ALL(NT,ND),VETA_ALL_SAV(NT,ND)
-C
 	REAL*8 ABUND_SUM
 !
 C
@@ -252,8 +182,6 @@ C
 C
 	REAL*8 TGREY(ND)
 	REAL*8 T_SAVE(ND)
-	REAL*8 GREY_PAR,T_INIT_TAU
-	LOGICAL ITERATE_INIT_T
 !
 ! Variables for scaling the line cooling rates in oder that the radiative
 ! equilibrium equation is more consistent with the electron heating/cooling 
@@ -261,8 +189,6 @@ C
 ! of SCL_LINE_HT_FAC of the tmean frequency for the super-level under 
 ! consideration. 0.5 is presently the prefered value.
 !
-	LOGICAL SCL_LINE_COOL_RATES
-	REAL*8 SCL_LINE_HT_FAC
 	REAL*8 AVE_ENERGY(NT)		!Average energy of each super level
 C 
 C
@@ -285,8 +211,6 @@ C
 	CHARACTER*35 DIENAME(NMAXDIE)
 C
 	INTEGER*4 NDIETOT
-	LOGICAL DIE_AS_LINE
-	REAL*8 VSM_DIE_KMS
 C
 C Arrays and variables used for both Dielectronic recombination, and
 C the implicit recombination.
@@ -301,33 +225,16 @@ C
 C 
 C
 C Opacity/emissivity
-	REAL*8 CHI(ND)			!Continuum opacity (all sources)
-	REAL*8 ETA(ND)			!Continuum emissivity (all sources)
-	REAL*8 CHIL(ND)			!Line opacity (without prof.)
-	REAL*8 ETAL(ND)			!Line emissivity (without prof.)
-	REAL*8 ESEC(ND)			!Continuum electron scattering coef.
-	REAL*8 ZETA(ND)			!Source func. (all except elec. scat.)
-	REAL*8 THETA(ND)		!Elec. scat. source coef.
-	REAL*8 SOURCE(ND)		!Complete source function.
-	REAL*8 TCHI(ND)			!Total opacity (contin. + lines)
-	REAL*8 DTAU(NDMAX)		!Optical depth (used in error calcs)
-C		DTAU(I)=0.5*(CHI(I)+CHI(I+1))*(Z(I)-Z(I+1))
+!
+	REAL*8 CHIL(ND)                 !Line opacity (without prof.)
+	REAL*8 ETAL(ND)                 !Line emissivity (without prof.)
+	REAL*8 DTAU(NDMAX)              !Optical depth (used in error calcs)
+!               DTAU(I)=0.5*(CHI(I)+CHI(I+1))*(Z(I)-Z(I+1))
 	REAL*8 dCHIdR(NDMAX) 		!Derivative of opacity.
 !
-	REAL*8 P(NP)			!Impact parameters
-C
-C Quadrature weights.
+! Quadrature weights.
+!
 	REAL*8 FQW(NCF_MAX)		!Frequency weights
-	REAL*8 AQW(ND,NP)		!Angular quad. weights. (indep. of v)
-	REAL*8 HQW(ND,NP)		!Angular quad. weights. (indep. of v)
-                                        !for flux integration.
-	REAL*8 KQW(ND,NP)		!Angular quad. weights for K integration.
-	REAL*8 HMIDQW(ND,NP)		!Angular quad. weights. (indep. of v)
-                                        !for flux integration. Defined at the
-                                        !mid points of the radius mesh.
-	REAL*8 NMIDQW(ND,NP)		!Angular quad. weights. (indep. of v)
-                                        !for N integration. Defined at the
-                                        !mid points of the radius mesh.
 	REAL*8 LFQW(NLF)		!Quad. weights assoc. with line prof.
 C
 C Continuum matrices
@@ -343,6 +250,7 @@ C Transfer equation vectors
 	REAL*8 TB(NDMAX)
 	REAL*8 TC(NDMAX)
 	REAL*8 XM(NDMAX)		!R.H.S. (SOURCE VECTOR)
+	REAL*8 R_OLD(NDMAX)		!Used to store previous R grid in SN models.
 C
 C Line vectors
 	REAL*8 JBAR(ND)			!Mean line intensity.
@@ -361,8 +269,6 @@ C using Eddington factors. This is separate to the "inclusion of
 C additional points".
 C
 	LOGICAL EDDINGTON
-	LOGICAL EDD_CONT
-	LOGICAL EDD_LINECONT
 	REAL*8 FEDD(NDMAX)
 	REAL*8 QEDD(NDMAX)
 C
@@ -391,33 +297,13 @@ C record containing the continuum values.
 C
 	INTEGER*4 ACCESS_F
 	INTEGER*4, PARAMETER :: EDD_CONT_REC=3
-	LOGICAL COMPUTE_EDDFAC
 C
-C Arrays and variables required for  additional points into
-C the depth grid. Allows an increase in program accuracy to overcome
-C rapid ionization changes. The vectors are used throughout,
-C and hence should not be equivalenced or put into scratch.
-C
-	LOGICAL ACCURATE,INACCURATE
-	LOGICAL THIS_FREQ_EXT  		!Frequency specific.
-	LOGICAL ALL_FREQ
-	REAL*8 ACC_FREQ_END
-	INTEGER*4 NPINS			!Points inserted for error calc.
-	INTEGER*4 ST_INTERP_INDX	!Interp from ST_INT.. to END_INTERP..
-	INTEGER*4 END_INTERP_INDX
-	CHARACTER*10 INTERP_TYPE
-C
-C ND-DEEP to DEEP we use a quadratic interpolation scheme so as to try
-C and preserve "FLUX" in the diffusion approximation.
-C
-	INTEGER*4 DEEP
 	INTEGER*4 NDEXT,NCEXT,NPEXT
 	INTEGER*4 INDX(NDMAX),POS_IN_NEW_GRID(ND)
 	REAL*8 COEF(0:3,NDMAX)
 	REAL*8 INBC,HBC_J,HBC_S			!Bound. Cond. for JFEAU
-	REAL*8 ACC_EDD_FAC
 C
-	REAL*8 REXT(NDMAX),PEXT(NPMAX),VEXT(NDMAX)
+	REAL*8 REXT(NDMAX),VEXT(NDMAX)
 	REAL*8 TEXT(NDMAX),SIGMAEXT(NDMAX)
 	REAL*8 VDOP_VEC_EXT(NDMAX)
 	REAL*8 CHIEXT(NDMAX),ESECEXT(NDMAX),ETAEXT(NDMAX)
@@ -432,13 +318,6 @@ C
 	REAL*8 FCEXT(NDMAX,NDMAX) 	!contiguous as for PERTJD.
 	REAL*8 FAEXT(NDMAX)
 C
-C If required, these arrays shoukd have size NDEXT*NPEXT
-C
-	REAL*8, ALLOCATABLE :: AQWEXT(:,:)	!Angular quad. weights. (indep. of v)
-	REAL*8, ALLOCATABLE :: HQWEXT(:,:)	!Angular quad. weights for flux integration.
-	REAL*8, ALLOCATABLE :: KQWEXT(:,:)	!Angular quad. weights for K integration.
-	REAL*8, ALLOCATABLE :: HMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
-	REAL*8, ALLOCATABLE :: NMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
 C
 C Variation arrays
 C Variable,depth of variable,depth of J. If NUM_BNDS .ne. ND the
@@ -463,7 +342,6 @@ C                                            (to calculate ROSSMEAN)
 C
 C Other arrays
 	REAL*8 Z(NDMAX)			!Z displacement along a given array
-	REAL*8 EMHNUKT(ND)		!EXP(-hv/kT)
 	REAL*8 RLUMST(ND)		!Luminosity as a function of depth
 	REAL*8 J_INT(ND)		!Frequency integrated J
 	REAL*8 K_INT(ND)		!Frequency integrated K
@@ -480,49 +358,16 @@ C Line profile arrays and variables.
 C
 	REAL*8 PF(NLF)			!Prof. freq. for line computations
 	REAL*8 PROF(NLF)			!Line profile
-	REAL*8 TDOP
-	REAL*8 VTURB
-	REAL*8 AMASS_DOP
 	REAL*8 VDOP_VEC(ND)
-	REAL*8 DELV_FRAC_FG
-	REAL*8 DELV_FRAC_MOM
 C
 C Continuum frequency variables and arrays.
 C
 	REAL*8 NU(NCF_MAX)		!Continuum and line frequencies
 	REAL*8 NU_EVAL_CONT(NCF_MAX)	!Frequencies to evaluate continuum
 	REAL*8 OBS(NCF_MAX)		!Observers spectrum
-	REAL*8 MIN_CONT_FREQ 		!Minimum continuum frequency.
-	REAL*8 MAX_CONT_FREQ    	!Maximum continuum frequency.
-	REAL*8 SMALL_FREQ_RAT 		!Fractional spacing for small frequencies'
-	REAL*8 dFREQ_bf_MAX		!Maximum spacing close to bf edge.
-	REAL*8 BIG_FREQ_AMP		!Amplification factor
-	REAL*8 dV_LEV_DIS		!dV on low side of bound-free edge.
-	REAL*8 AMP_DIS			!Amplification factor
-	REAL*8 MIN_FREQ_LEV_DIS		!Minimum frequency for lev dissolution.
-	LOGICAL RD_CONT_FREQ		!Read in cont. frequencies from file.
-C
-C Parameters, vectors, and arrays for computing the observed flux.
-C
-	INTEGER*4, PARAMETER :: NST_CMF=1000
-	INTEGER*4 NP_OBS_MAX
-	INTEGER*4 NP_OBS
-	REAL*8  NU_STORE(NST_CMF)
-	REAL*8 V_AT_RMAX		!Used if we extend the atmosphere.
-	REAL*8 RMAX_OBS
-	REAL*8 H_OUT,H_IN
-C
-C We allocate memory for the following vectors as we use them for the regular
-C flux computation, and when extra depth points are inserted (ACCURATE=.TRUE.)
-C
-	REAL*8, ALLOCATABLE :: IPLUS_STORE(:,:)
-	REAL*8, ALLOCATABLE :: P_OBS(:)
-	REAL*8, ALLOCATABLE :: IPLUS(:)
-	REAL*8, ALLOCATABLE :: MU_AT_RMAX(:)
-	REAL*8, ALLOCATABLE :: HQW_AT_RMAX(:)
-C
-C Supercedes OBS
-C
+!
+! Vectors and arrays used for the observed flux.
+!
 	INTEGER*4 N_OBS
 	REAL*8 OBS_FREQ(NCF_MAX)		!Since N_OBS < NCF =< NCF_MAX
 	REAL*8 OBS_FLUX(NCF_MAX)
@@ -553,11 +398,8 @@ C	EQUIVALENCE (RKB(1),BETA(1)),(RKC(1),BETAC(1))
 	REAL*8 DIFFW(NT)
 	REAL*8 ERF(NLF)
 C
-	CHARACTER FG_SOL_OPTIONS*10
-	CHARACTER CMF_FORM_OPTIONS*10
-	CHARACTER NEG_OPAC_OPTION*10
-	CHARACTER TIME*20,METHOD*6
-	CHARACTER METH_SOL*6,SCALE_OPT*6,FMT*120,N_TYPE*6
+	CHARACTER TIME*20
+	CHARACTER FMT*120
 	CHARACTER*20 SECTION,FORMAT_DATE*20
 	CHARACTER STRING*132
 	CHARACTER EW_STRING*132
@@ -612,11 +454,6 @@ C
 	CHARACTER*50 TRANS_NAME_SIM(MAX_SIM)
 C
 	INTEGER*4 NUM_SIM_LINES,SIM_INDX,TMP_MAX_SIM
-	REAL*8 OVER_FREQ_DIF
-	REAL*8 WEAK_LINE_LIMIT
-	LOGICAL OVERLAP
-	LOGICAL WEAK_WITH_NET
-	INTEGER NUM_OF_WEAK_LINES
 C
 C Temporary variables used only local to compute quantities associated with
 C the opacity and emissivity, and the rate equations.
@@ -665,60 +502,16 @@ C
 	REAL*8 dU_RAT_dT(ND,MAX_SIM)
 	REAL*8 LOW_OCC_PROB(ND)
 C
-C GLOBAL_LINE_SWITCH provides an option to handle all LINE by the same method.
-C The local species setting only takes precedence when it is set to NONE.
-C
-	CHARACTER*6 GLOBAL_LINE_SWITCH
-	REAL*8 FLUX_CAL_LAM_BEG
-	REAL*8 FLUX_CAL_LAM_END
-	LOGICAL SET_TRANS_TYPE_BY_LAM
-	LOGICAL DO_SOBOLEV_LINES
-C
-C FLUX_CAL_ONLY provides a method for computing the continuous spectrum
-C only (i.e. no linearization or population corrections):
-C    To get a BLANKETED spectrum FLUX_CAL_ONLY should be set to
-C       TRUE and GLOBAL_LINE_SWITCH to BLANK
-C    To get a pure UNBLANKETED spectrum FLUX_CAL_ONLY should be set to
-C       TRUE and GLOBAL_LINE_SWITCH to SOB
-C
-	LOGICAL FLUX_CAL_ONLY
-C
-C Indicates whether lines treated in SOB and CMF mode are allowed for when
-C constructing the observers frame grid.
-C
-	LOGICAL SOB_FREQ_IN_OBS
-C
-C
 C Variables, vectors and arrays for treating lines simultaneously with the
 C continuum.
 C
-	REAL*8 V_DOP
-	REAL*8 MAX_DOP
-	REAL*8 FRAC_DOP
-	REAL*8 dV_CMF_PROF
-	REAL*8 dV_CMF_WING
-	REAL*8 ES_WING_EXT
-	REAL*8 R_CMF_WING_EXT
-	REAL*8 NU_DOP
-	REAL*8 EXT_LINE_VAR
-	REAL*8 ZNET_VAR_LIMIT
 	INTEGER*4 LINES_THIS_FREQ(NCF_MAX)
 	INTEGER*4 LINE_ST_INDX_IN_NU(NLINE_MAX)
 	INTEGER*4 LINE_END_INDX_IN_NU(NLINE_MAX)
 	REAL*8 LINE_PROF_SIM(MAX_SIM)
 	REAL*8 LINE_QW_SIM(MAX_SIM)
 	REAL*8 NEG_OPAC_FAC(ND)
-C
-	REAL*8 NU_MAX_OBS
-	REAL*8 NU_MIN_OBS
-	REAL*8 OBS_PRO_EXT_RAT
-	REAL*8 dV_OBS_PROF
-	REAL*8 dV_OBS_WING
-	REAL*8 dV_OBS_BIG
-C
-	LOGICAL EXTEND_FRM_SOL
-	LOGICAL INSERT_FREQ_FRM_SOL
-C
+
 	REAL*8 LINE_OPAC_CON(MAX_SIM)
 	REAL*8 LINE_EMIS_CON(MAX_SIM)
 C
@@ -727,6 +520,14 @@ C
 	LOGICAL DO_THIS_TX_MATRIX(NM)
 	LOGICAL LINE_STORAGE_USED(MAX_SIM)
 C
+	REAL*8 dJ_LOC(NM,NUM_BNDS,ND)
+	REAL*8 dZ(NM,NUM_BNDS,ND,MAX_SIM)
+	REAL*8 dZ_POPS(NT,NUM_BNDS,ND)
+C
+	REAL*8 NU_DOP
+	REAL*8 NU_MAX_OBS
+	REAL*8 NU_MIN_OBS
+C
 	INTEGER*4 FREQ_INDX
 	INTEGER*4 X_INDX
 	INTEGER*4 FIRST_LINE
@@ -734,22 +535,8 @@ C
 	INTEGER*4 LINE_LOC(NLINE_MAX)
 	INTEGER*4 SIM_LINE_POINTER(MAX_SIM)
 C
-	REAL*8 dJ_LOC(NM,NUM_BNDS,ND)
-	REAL*8 dZ(NM,NUM_BNDS,ND,MAX_SIM)
-	REAL*8 dZ_POPS(NT,NUM_BNDS,ND)
-C                                         
-	REAL*8 CHI_CONT(ND)
-	REAL*8 ETA_CONT(ND)
-C
-C To allow the variation of non-coherent electron scattering to be treated
-C in a partially coherent approximation.
-C
-	REAL*8 ES_COH_VEC(ND)		!Similar to THETA
-	REAL*8 ES_VAR_FAC
-	LOGICAL MIXED_ES_VAR
-C
-C Variables to limit the computation of the continuum opacities and 
-C emissivities. 
+C Variables to limit the computation of the continuum opacities and
+C emissivities.
 C
 	REAL*8 JREC(ND)
 	REAL*8 dJRECdT(ND)
@@ -757,52 +544,16 @@ C
 	REAL*8 JREC_CR(ND)
 	REAL*8 JPHOT_CR(ND)
 	REAL*8 BPHOT_CR(ND)
-	REAL*8 EMHNUKT_CONT(ND)
-	REAL*8 ETA_C_EVAL(ND)
-	REAL*8 CHI_C_EVAL(ND)
 C
 	REAL*8 CONT_FREQ
-	REAL*8 DELV_CONT
-	LOGICAL COMPUTE_ALL_CROSS
-	LOGICAL COMPUTE_NEW_CROSS
 	LOGICAL FINAL_CONSTANT_CROSS
 !
 ! Indicates whether APRXzV, FFXzZ etc should be zeroed.
 !
 	LOGICAL ZERO_REC_COOL_ARRAYS 
 C
-C Variables for performing NG acceleration.
-C
-	INTEGER*4 LAST_NG   		!Indicates iteration on which last
-C                                          NG acceleration occurred.
-	INTEGER*4 NEXT_NG   		!Indicates iteration on which next
-C                                          NG acceleration is to occur.
-	INTEGER*4 IT_TO_BEG_NG          !Iteration to beg NG acceleration
-	INTEGER*4 ITS_PER_NG  		!Iterations between NG accelerations.
-	INTEGER*4 NG_BAND_WIDTH         !Number of depths to acclerate simultaneously
-	REAL*8 VAL_DO_NG 		!Begin NG when MAXCH < VAL_DO_NG
-	LOGICAL NG_DONE			!iIndicates successfull completion of NG
-	LOGICAL NG_DO			!Switch on NG acceleration.
-C
-C Fix BA variation matrix if % change less than VAL_FIX_BA.
-C
-	REAL*8 VAL_FIX_BA
-	INTEGER*4 N_ITS_TO_FIX_BA
-	INTEGER*4 CNT_FIX_BA
-	LOGICAL COMPUTE_BARDIN,COMPUTE_BA
-	LOGICAL WRBAMAT,WRBAMAT_RDIN
-	LOGICAL WR_BA_INV
-	LOGICAL WR_PART_OF_INV
-C
-C Performs a lambda iteration if % change > VAL_DO_LAM
-C
-	REAL*8 VAL_DO_LAM
-	INTEGER*4 CNT_LAM,RD_CNT_LAM
-	LOGICAL OLD_RD_LAMBDA,RD_LAMBDA,LAMBDA_ITERATION
-C
 C 
 C
-	LOGICAL DO_LEV_DISSOLUTION
 	REAL*8 Z_POP(NT)		!Ionic charge for each species
 C
 C Variables etc for computation of continuum in comoving frame.
@@ -810,9 +561,6 @@ C
 	LOGICAL CONT_VEL
 	LOGICAL FIRST_FREQ
 	LOGICAL RAT_TOO_BIG
-	LOGICAL COHERENT_ES
-	LOGICAL RD_COHERENT_ES
-	LOGICAL USE_OLDJ_FOR_ES
 	LOGICAL NEW_FREQ
 	REAL*8 dLOG_NU			!Step in frequency in Log plane
 	REAL*8 FEDD_PREV(NDMAX)
@@ -836,60 +584,14 @@ C
 	REAL*8 NBC_CMF(3),NBC_PREV(3),INBC_PREV
 C
 C 
-C
-C Variables for including clumping under the assumption that the clumping
-C occurs on scales much smaller than any of the transfer scales. Valid
-C for the continuum --- likely to be invalid for lines due to the
-C shortness of the SObolev length.
-C
-C CLUMP_FAC represents the fractional volume occupied by material. Thus its
-C value is always less than unity. The remaining volume is assumed to be a 
-C vacuum. In practice we are assuming dense spherical shells separated by
-C a vacuum.
-C
-	INTEGER*4 N_CLUMP_PAR_MAX,N_CLUMP_PAR
-	PARAMETER (N_CLUMP_PAR_MAX=4)
-	REAL*8 CLUMP_PAR(N_CLUMP_PAR_MAX)
-	LOGICAL DO_CLUMP_MODEL
-	CHARACTER*6 CLUMP_LAW
-C
-C These parameters are used when computing J and the variation of J.
-C
-	REAL*8 CHI_CLUMP(ND)		!==CHI(I)*CLUMP_FAC(I)
-	REAL*8 ETA_CLUMP(ND)		!==ETA(I)*CLUMP_FAC(I)
-	REAL*8 ESEC_CLUMP(ND)		!==ESEC(I)*CLUMP_FAC(I)
-C
-C 
 !
-! X-ray variables. XRAYS indicates whether or not to include X-ray emission 
-! from shocks in the wind? If FF_XRAYS is true, we assume the X-rays are 
-! generated by free-free proceses. If XRAY_SMOOTH_WIND is set, we factor out the
-! effect of cluming when computing the effect of the X-ray emissivity.
-!
-	LOGICAL XRAYS
-	LOGICAL ADD_XRAYS_SLOWLY
-	LOGICAL FF_XRAYS
-	LOGICAL XRAY_SMOOTH_WIND
-!
+! X-ray variables.
 ! We dimension from 0 so that we can access a Null vector for the 1st included
 ! ioinization stage of each species.
 ! 
 	REAL*8 X_RECOM(ND,0:NION)			!Next X-ray recombination rate
 	REAL*8 X_COOL(ND,0:NION)			!Next X-ray cooling
 !
-! The shocks are characterized by up to 2 temperatures.
-!
-	REAL*8 FILL_FAC_XRAYS_1,T_SHOCK_1,V_SHOCK_1
-	REAL*8 FILL_FAC_XRAYS_2,T_SHOCK_2,V_SHOCK_2
-	REAL*8 FILL_FAC_X1_BEG,FILL_X1_SAV
-	REAL*8 FILL_FAC_X2_BEG,FILL_X2_SAV
-	REAL*8 SLOW_XRAY_SCL_FAC
-	REAL*8 XRAY_EMISS_1,XRAY_EMISS_2
-	REAL*8 VSMOOTH_XRAYS
-!
-	REAL*8 XRAY_LUM_TOT(ND)         !Total X-ray luminosity
-	REAL*8 XRAY_LUM_0P1(ND)         !X-ray luminosity above 0.1 KeV
-	REAL*8 XRAY_LUM_1KEV(ND)	!X-ray luminosity above 1keV
 	REAL*8 OBS_XRAY_LUM_0P1
 	REAL*8 OBS_XRAY_LUM_1KEV
 	REAL*8 GFF,XCROSS_V2
@@ -898,13 +600,8 @@ C
 	REAL*8 SPEC_DEN(ND,NUM_SPECIES)		!Used by ELEC_PREP
 	REAL*8 AT_NO_VEC(ND,NUM_SPECIES)
 C
-	LOGICAL INCL_ADIABATIC
-	LOGICAL INCL_ADVECTION
 	REAL*8 AD_COOL_V(ND)
 	REAL*8 AD_COOL_DT(ND)
-C
-	LOGICAL INCL_CHG_EXCH		!Include charge exchange reactions.
-	LOGICAL INCL_TWO_PHOT		!Include two-photon transitions
 C
 C Indicates number of time POPS array is to be written to scratch
 C file per iteration.
@@ -912,32 +609,12 @@ C
 	INTEGER*4 RITE_N_TIMES
 	PARAMETER (RITE_N_TIMES=1)
 C
-C Variables used to define what transitions are neglected. Cut is
-C presently by the gf value, and the lower level of the transition.
-C
-	REAL*8 GF_CUT
-	REAL*8 AT_NO_GF_CUT
-	INTEGER*4 GF_LEV_CUT
-	INTEGER*4 MIN_NUM_TRANS
-C
-C Variables for determining whether some populations are held fixed
-C when the new populations are solved for.
-C
-	REAL*8 CON_SCL_T
-	REAL*8 TAU_SCL_T
-	LOGICAL RD_FIX_T,RD_FIX_IMP
-	LOGICAL FIXED_T,FIXED_NE,FIX_IMPURITY
-	LOGICAL VARFIXT
-C
-	LOGICAL CHK,SUCCESS,NEWMOD,DIF
-	LOGICAL RDTHK_CONT,THK_CONT,THK_LINE
-	LOGICAL GRID,FIRST,SETZERO,DO_POP_SCALE
-	LOGICAL TRAPFORJ,RDINR,RDINSOL,CHECK_LINE_OPAC
-        LOGICAL SOBOLEV,VAR_SOB_JC
+	LOGICAL WRITE_RVSIG
+	LOGICAL FIRST
+	LOGICAL CHK,SUCCESS,NEWMOD
+        LOGICAL VAR_SOB_JC
 	LOGICAL NEG_OPACITY(ND),FIRST_NEG
 	LOGICAL AT_LEAST_ONE_NEG_OPAC
-	LOGICAL L_TRUE,L_FALSE
-	PARAMETER (L_TRUE=.TRUE.,L_FALSE=.FALSE.)
 C
 C Inidicates approximate frequencies for which TAU at outer boundary is written
 C to OUTGEN on the last iteration.
@@ -1075,568 +752,7 @@ C	2) If old model, populations are read in from scratch file
 C previous radius scale etc are used. Ponit1 and point2
 C point to the input data record (Note : Single Record)
 C
-	CALL GEN_ASCI_OPEN(LUIN,'VADAT','OLD',' ','READ',IZERO,IOS)
-	IF(IOS .NE. 0)THEN
-	  WRITE(LUER,*)'Error opening VADAT in CMFGEN, IOS=',IOS
-	  STOP
-	END IF
-	CALL RD_OPTIONS_INTO_STORE(LUIN,LUSCR)
-C 
-C
-C Input model parameters and modelling specifications.
-C
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_DBLE(RP,'RSTAR',L_TRUE,
-	1           'Stellar radius (in 10^10 cm)')
-	  CALL RD_STORE_DBLE(RMAX,'RMAX',L_TRUE,
-	1           'Maximum radius (in R*)')
-	  RMAX=RMAX*RP
-C
-	  CALL RD_STORE_INT(VELTYPE,'VEL_LAW',L_TRUE,
-	1           'Velocity Law to be used')
-	  IF(VELTYPE .EQ. 1 .OR. VELTYPE .EQ. 2)THEN
-	    CALL RD_STORE_DBLE(VRP,'VRP',L_TRUE,'First velocity component')
-	    CALL RD_STORE_DBLE(RN,'RN',L_TRUE,' ')
-	    CALL RD_STORE_DBLE(VINF,'VINF',L_TRUE,' ')
-	    CALL RD_STORE_DBLE(EPPS1,'EPSS1',L_TRUE,' ')
-	    CALL RD_STORE_DBLE(GAMMA1,'GAMMA1',L_TRUE,' ')
-!
-	    CALL RD_STORE_DBLE(RP2,'RP2',L_TRUE,'Second velocity component')
-	    CALL RD_STORE_DBLE(VRP2,'VRP2',L_TRUE,' ')
-	    CALL RD_STORE_DBLE(RN2,'RN2',L_TRUE,' ')
-	    CALL RD_STORE_DBLE(VINF2,'VINF2',L_TRUE,' ')
-	    CALL RD_STORE_DBLE(EPPS2,'EPPS2',L_TRUE,' ')
-	    CALL RD_STORE_DBLE(GAMMA2,'GAMMA2',L_TRUE,' ')
-	    RN=RN*RP
-	    RP2=RP*RP2
-	    RN2=RN2*RP2
-	  ELSE IF(VELTYPE .EQ. 3)THEN
-	    CALL RD_STORE_DBLE(VCORE,'VCORE',L_TRUE,
-	1           'Core velocity (km/s)')
-	    CALL RD_STORE_DBLE(VPHOT,'VPHOT',L_TRUE,
-	1           'Photospheric velocity (km/s)')
-	    CALL RD_STORE_DBLE(VINF1,'VINF',L_TRUE,
-	1           'Terminal velocity (km/s)')
-	    CALL RD_STORE_DBLE(SCL_HT,'SCL_HT',L_TRUE,
-	1           'Scale Height (in R*) of photosphere')
-	    CALL RD_STORE_DBLE(V_BETA1,'BETA',L_TRUE,
-	1           'Speed of velocity Law')
-	    V_EPPS1=1.0D0
-	    VINF=VINF1
-	    VINF2=VINF1                !i.e. no 2nd component
-	    V_BETA2=1.0D0
-	    V_EPPS2=1.0D0
-	    NBND_INS=1                 !Old default
-	    CONS_FOR_R_GRID=1.0D0
-	    EXP_FOR_R_GRID=0.0D0
-	  ELSE IF(VELTYPE .EQ. 4)THEN
-!
-! No parameters required
-!
-	  ELSE IF(VELTYPE .EQ. 5)THEN
-	    WRITE(LUER,*)'Velocity law 5 not implemented in this version',
-	1                 ' of CMFGEN'
-	    STOP
-	  ELSE IF(VELTYPE .EQ. 6)THEN
-	    CALL RD_STORE_DBLE(VCORE,'VCORE',L_TRUE,
-	1           'Core velocity (km/s)')
-	    CALL RD_STORE_DBLE(VPHOT,'VPHOT',L_TRUE,
-	1           'Photospheric velocity (km/s)')
-	    CALL RD_STORE_DBLE(SCL_HT,'SCL_HT',L_TRUE,
-	1           'Scale Height (in R*) of photosphere')
-	    CALL RD_STORE_DBLE(VINF1,'VINF1',L_TRUE,
-	1            'Terminal velocity (km/s) if no 2nd comp.')
-	    CALL RD_STORE_DBLE(V_BETA1,'BETA1',L_TRUE,
-	1           'Speed of 1st Beta velocity Law')
-	    CALL RD_STORE_DBLE(V_EPPS1,'EPPS1',L_TRUE,
-	1           'Scale factor for 1s Beta velocity Law')
-	    CALL RD_STORE_DBLE(VINF2,'VINF2',L_TRUE,
-	1           'True terminal velocity (km/s)')
-	    CALL RD_STORE_DBLE(V_BETA2,'BETA2',L_TRUE,
-	1           'Speed of 2nd Beta velocity Law')
-	    CALL RD_STORE_DBLE(V_EPPS2,'EPPS2',L_TRUE,
-	1           'Scale factor for 2nd Beta V law')
-!
-	    NBND_INS=1          !Old default
-	    CONS_FOR_R_GRID=-1.0D0
-	    CALL RD_STORE_INT(NBND_INS,'NBND_INS',L_FALSE,
-	1           'Number of additional points to insert in radius grid at boundary')
-	    CALL RD_STORE_DBLE(CONS_FOR_R_GRID,'C_R_GRID',L_FALSE,
-	1           'Constant to allow imprved shoice of R grid')
-	    IF(CONS_FOR_R_GRID .GT. 0)THEN
-	      CALL RD_STORE_DBLE(EXP_FOR_R_GRID,'E_R_GRID',L_TRUE,
-	1           'Constant to allow imprved shoice of R grid')
-	    ELSE
-	      CONS_FOR_R_GRID=1.0D0
-	      EXP_FOR_R_GRID=0.0D0
-	    END IF
-C
-C !Required by routines other than STARPCYG
-C
-	    VINF=VINF2	
-	  ELSE IF(VELTYPE .EQ. 7)THEN
-	    CALL RD_STORE_NCHAR(VEL_OPTION,'VEL_OPT',ITEN,L_TRUE,
-	1                        'Velocity option: RVSIG_COL or deKOTER')
-	    CALL RD_STORE_DBLE(VINF1,'VINF',L_TRUE,
-	1           'Terminal velocity (km/s)')
-	    VCORE=0.0D0		!Not used but initialized
-	    VPHOT=0.0D0
-	    SCL_HT=0.0D0
-	    V_BETA1=0.0D0
-	    V_EPPS1=1.0D0
-	    VINF=VINF1
-	    VINF2=VINF1		!i.e. no 2nd component
-	    V_BETA2=1.0D0
-	    V_EPPS2=1.0D0
-	  ELSE IF(VELTYPE .EQ. 10)THEN
-	    SN_MODEL=.TRUE.
-	    CALL RD_STORE_DBLE(VCORE,'VCORE',L_TRUE,'Initial velocity (km/s)')
-	    CALL RD_STORE_DBLE(V_BETA1,'BETA1',L_TRUE,'Power of velocity Law')
-	    CALL RD_STORE_DBLE(RHO_ZERO,'RHO_ZERO',L_TRUE,'Initial density (gm/cm^3)')
-	    RHO_ZERO=RHO_ZERO/ATOMIC_MASS_UNIT()
-	    CALL RD_STORE_DBLE(N_RHO,'N_RHO',L_TRUE,'Density exponent (+ve)')
-	    VINF=VCORE*(RMAX/RP)**V_BETA1
-	  ELSE
-	    WRITE(LUER,*)'Velocity law ',VELTYPE, ' not implemented',
-	1                ' in this version of CMFGEN'
-	    STOP
-	  END IF
-C
-	  CALL RD_STORE_DBLE(RMDOT,'MDOT',L_TRUE,
-	1            'Mass Loss rate (Msun/yr) ')
-	  CALL RD_STORE_DBLE(LUM,'LSTAR',L_TRUE,
-	1      'Stellar luminosity (Lsun)')
-	  CALL RD_STORE_DBLE(STARS_MASS,'MASS',L_TRUE,
-	1      'Stellar mass (Msun)')
-C
-C All clumping parameters are read in, even when CLUMPING is switched off.
-C
-	  CALL RD_STORE_LOG(DO_CLUMP_MODEL,'DO_CL',L_TRUE,
-	1            'Calculate a model with clumping?')
-	  CALL RD_STORE_NCHAR(CLUMP_LAW,'CL_LAW',ISIX,L_TRUE,
-	1      'Which clumping law is being utilized?')
-	  CALL SET_CASE_UP(CLUMP_LAW,IZERO,IZERO)
-	  CALL RD_STORE_INT(N_CLUMP_PAR,'N_CL_PAR',L_TRUE,
-	1          'Number of clumping parameters')
-	  IF(N_CLUMP_PAR .GT. N_CLUMP_PAR_MAX)THEN
-	    WRITE(LUER,*)'Error in CMFGEN'
-	    WRITE(LUER,*)'N_CLUMP_PAR too large: N_CLUMP_PAR=',N_CLUMP_PAR
-	    STOP
-	  END IF
-	  CLUMP_PAR(:)=0.0D0
-	  DO I=1,N_CLUMP_PAR			!Should be less than 10
-	    TEMP_CHAR='CL_PAR_'
-	    WRITE(TEMP_CHAR(8:8),'(I1)')I
-	    CALL RD_STORE_DBLE(CLUMP_PAR(I),TEMP_CHAR(1:8),L_TRUE,
-	1             'Clumping parameters:')
-	  END DO
-C
-C Read in the un-normalized fractional abundances.
-C
-	  DO ISPEC=1,NUM_SPECIES
-	    TMP_KEY=TRIM(SPECIES(ISPEC))//'/X'
-	    TMP_STRING=TRIM(SPECIES(ISPEC))//
-	1            '/X fractional abundance by number (un-normalized)'
-	    CALL RD_STORE_DBLE(AT_ABUND(ISPEC),TMP_KEY,SPECIES_PRES(ISPEC),
-	1            TMP_STRING)
-	  END DO
-	  WRITE(LUSCR,'()')
-C
-	  CALL RD_STORE_LOG(RD_CONT_FREQ,'RD_CF_FILE',L_TRUE,
-	1            'Read in continuum frequencies from file')
-	  CALL RD_STORE_DBLE(MIN_CONT_FREQ,'MIN_CF',L_TRUE,
-	1            'Minimum continuum frequency if calculating NU')
-	  CALL RD_STORE_DBLE(MAX_CONT_FREQ,'MAX_CF',L_TRUE,
-	1            'Maximum continuum frequency if calculating NU')
-	  CALL RD_STORE_DBLE(SMALL_FREQ_RAT,'FRAC_SP',L_TRUE,
-	1            'Fractional spacing for small frequencies')
-	  CALL RD_STORE_DBLE(BIG_FREQ_AMP,'AMP_FAC',L_TRUE,
-	1            'Amplification factor for large frequency ranges')
-	  CALL RD_STORE_DBLE(dFREQ_bf_MAX,'MAX_BF',L_TRUE,
-	1            'Maximum frequency spacing close to bf edge')
-C
-	  CALL RD_STORE_LOG(DO_LEV_DISSOLUTION,'DO_DIS',L_TRUE,
-	1            'Allow for level dissolution of upper levels?')
-	  CALL RD_STORE_DBLE(dV_LEV_DIS,'dV_LEV',L_TRUE,
-	1             'Spacing (in km/s) on low side of bf edge for'//
-	1             ' level dissolution')
-	  CALL RD_STORE_DBLE(AMP_DIS,'AMP_DIS',L_TRUE,
-	1            'Amplification factor on low side bf edge')
-	  CALL RD_STORE_DBLE(MIN_FREQ_LEV_DIS,'MIN_DIS',L_TRUE,
-	1            'Minimum frequency for level dissolution')
-C
-	  CALL RD_STORE_LOG(COMPUTE_ALL_CROSS,'CROSS',L_TRUE,
-	1            'Compute all photoionization cross-sections?')
-	  CALL RD_STORE_DBLE(DELV_CONT,'V_CROSS',L_TRUE,
-	1            'Max. vel. sep. (km/s) between evaluations of all'//
-	1            '  phot. cross-sections?')
-	  CALL RD_STORE_DBLE(EXT_LINE_VAR,'EXT_LINE_VAR',L_TRUE,
-	1            'Extent of line variation zone (V/INF) beyond'//
-	1             'the resonancze zone')
-          IF(EXT_LINE_VAR .LT. 0.0D0 .OR. EXT_LINE_VAR .GT. 2.0D0)THEN
-	    WRITE(LUER,*)'Error in CMFGEN --- invalid range for EXT_LINE_VAR'
-	    STOP
-	  END IF
-!
-! NB: An ideal vale for ZNET_VAR_LIMIT is probably 0.01 or 0.001. If 
-! ZNET_VAR_LIMIT is zero, all depths will be included in the linearization, 
-! independent of ZNET. A very large value of ZNET (i.e. 10^4), will imply
-! an interation on the NET_RATES, with no linearization.
-!
-	  CALL RD_STORE_DBLE(ZNET_VAR_LIMIT,'ZNET_VAR_LIM',L_TRUE,
-	1            'Include lines in full varaition when '//
-	1            ' ABS(ZNET-1) > ZNET_VAR_LIM')
-	  CALL RD_STORE_LOG(WEAK_WITH_NET,'WNET',L_TRUE,
-	1            'Use Lambda iteration for weak lines?')
-	  CALL RD_STORE_DBLE(WEAK_LINE_LIMIT,'WK_LIM',L_TRUE,
-	1            'Maximum opacity ratio for weak lines (0.01)?')
-C
-	  CALL RD_STORE_LOG(DIF,'DIF',L_TRUE,
-	1            'Use Diffusion approximation at inner boundary ?')
-C
-	  CALL RD_STORE_LOG(RD_COHERENT_ES,'COH_ES',L_TRUE,
-	1            'Assume coherent electron scattering? ')
-	  CALL RD_STORE_LOG(USE_OLDJ_FOR_ES,'OLD_J',L_TRUE,
-	1            'Use old file to provide initial estimate of J_ES?')
-	  COHERENT_ES=RD_COHERENT_ES
-	  CALL RD_STORE_LOG(MIXED_ES_VAR,'MIX_COH',L_TRUE,
-	1            'Mix coherent/non-coherent e.s. in linearization?')
-	  CALL RD_STORE_DBLE(ES_VAR_FAC,'ES_FAC',L_TRUE,
-	1            'Fractional proximity of RJ and RJ_ES for coherent'//
-	1            ' variation')
-C
-	  CALL RD_STORE_NCHAR(METHOD,'METHOD',ISIX,L_TRUE,
-	1         'Which method for continuum tau'//
-	1         ' loglog, loglin, linear or zero ?')
-	  CALL RD_STORE_NCHAR(N_TYPE,'N_TYPE',ISIX,L_TRUE,
-	1         'Method for to handle N for MOM_J_CMF -- '//
-	1         'N_ON_J, MIXED, or G_ONLY')
-	  CALL RD_STORE_NCHAR(FG_SOL_OPTIONS,'FG_OPT',ITEN,L_TRUE,
-	1         'Solution options for FG_J_CMF: DIFF/INS and INT/INS')
-	  CALL RD_STORE_DBLE(DELV_FRAC_FG,'VFRAC_FG',L_TRUE,
-	1         'Maximum velocity spacing (Doppler units) in FG_J_CMF_V10')
-	  CALL RD_STORE_DBLE(DELV_FRAC_MOM,'VFRAC_MOM',L_TRUE,
-	1         'Maximum velocity spacing (Doppler units) in MOM_J_CMF_V10')
-											
-	  CALL RD_STORE_LOG(RDTHK_CONT,'THK_CONT',L_TRUE,
-	1           'Use thick boundary condition for continuum ? ')
-	  CALL RD_STORE_LOG(TRAPFORJ,'TRAP_J',L_TRUE,
-	1           'Use trapazoidal weights to compute J? ')
-C
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_DBLE(TDOP,'TDOP',L_TRUE,
-	1      'Temperature to be used in Doppler profile (10^4K)')
-	  CALL RD_STORE_DBLE(AMASS_DOP,'AMASS_DOP',L_TRUE,
-	1      'Atomic mass to be used in Doppler profile (amu''s)')
-	  CALL RD_STORE_DBLE(VTURB,'VTURB',L_TRUE,
-	1      'Turbulent velocity to be used in Doppler profile (km/s)')
-C
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_DBLE(MAX_DOP,'MAX_DOP',L_TRUE,
-	1      'Maximum half-width of resonance zone (in Doppler widths)')
-	  CALL RD_STORE_DBLE(FRAC_DOP,'FRAC_DOP',L_TRUE,
-	1      'Spacing in resonance zone (in Doppler widths)')
-	  CALL RD_STORE_DBLE(dV_CMF_PROF,'dV_CMF_PROF',L_TRUE,
-	1      'Spacing across cmf profile (in km/s)')
-	  CALL RD_STORE_DBLE(dV_CMF_WING,'dV_CMF_WING',L_TRUE,
-	1      'Spacing across e.s. wings of cmf profile(in km/s)')
-	  CALL RD_STORE_DBLE(ES_WING_EXT,'ES_WING_EXT',L_TRUE,
-	1      'Extent of BLUE e.s. wings from resonance core (in km/s)')
-	  CALL RD_STORE_DBLE(R_CMF_WING_EXT,'R_CMF_WING_EXT',L_TRUE,
-	1      'Extent of RED e.s. wings from RESONANCE core (in Vinf)')
-C
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_DBLE(OBS_PRO_EXT_RAT,'OBS_EXT_RAT',L_TRUE,
-	1      'Half width of profile in Vinf.')
-	  CALL RD_STORE_DBLE(dV_OBS_PROF,'dV_OBS_PROF',L_TRUE,
-	1      'Spacing across observed profile (in km/s)')
-	  CALL RD_STORE_DBLE(dV_OBS_WING,'dV_OBS_WING',L_TRUE,
-	1      'Spacing across e.s. wings of observed profile(in km/s)')
-	  CALL RD_STORE_DBLE(dV_OBS_BIG,'dV_OBS_BIG',L_TRUE,
-	1      'Frequency spacing between lines (in km/s)')
-C
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_LOG(FLUX_CAL_ONLY,'FLUX_CAL_ONLY',L_TRUE,
-	1           'Compute the observers frame flux only ?')
-	  CALL RD_STORE_LOG(EXTEND_FRM_SOL,'EXT_FRM_SOL',L_TRUE,
-	1           'Extrapolate the formal solution to larger radii?')
-	  CALL RD_STORE_LOG(INSERT_FREQ_FRM_SOL,'INS_F_FRM_SOL',L_TRUE,
-	1           'Insert extra frequencies for formal solution?')
-	  CALL RD_STORE_NCHAR(CMF_FORM_OPTIONS,'FRM_OPT',ITEN,L_TRUE,
-	1           'Solution options for CMF_FORM_SOL')
-	  CALL RD_STORE_LOG(DO_SOBOLEV_LINES,'DO_SOB_LINES',L_TRUE,
-	1        'Compute Sobolev rates and EWs for flux calculation?')
-	  CALL RD_STORE_LOG(SOB_FREQ_IN_OBS,'SOB_FREQ_IN_OBS',L_TRUE,
-	1        ' Allow for SOB & CMF lines in defining observers'//
-	1        ' frequencies?')
-C
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_NCHAR(GLOBAL_LINE_SWITCH,'GLOBAL_LINE',ISIX,L_TRUE,
-	1            'Global switch to indicate handeling of line')
-	  CALL SET_CASE_UP(GLOBAL_LINE_SWITCH,IZERO,IZERO)
-	  IF( GLOBAL_LINE_SWITCH(1:3) .NE. 'SOB' .AND.
-	1       GLOBAL_LINE_SWITCH(1:3) .NE. 'CMF' .AND.
-	1       GLOBAL_LINE_SWITCH(1:4) .NE. 'NONE' .AND.
-	1       GLOBAL_LINE_SWITCH(1:5) .NE. 'BLANK')THEN
-	    WRITE(LUER,*)'Invalid GLOBAL_LINE SWITCH parameter'
-	    STOP
-	  END IF
-	  CALL RD_STORE_LOG(SET_TRANS_TYPE_BY_LAM,'LAM_SET',L_TRUE,
-	1         'Set long wavelengths to SOBOLEV approximation')
-	  CALL RD_STORE_DBLE(FLUX_CAL_LAM_BEG,'F_LAM_BEG',L_TRUE,
-	1         'Inital wavelength (A) for blanketed flux calculation')
-	  CALL RD_STORE_DBLE(FLUX_CAL_LAM_END,'F_LAM_END',L_TRUE,
-	1         'Final wavelength (A) for blanketed flux calculation')
-	  CALL RD_STORE_DBLE(GF_CUT,'GF_CUT',L_TRUE,
-	1          'gf value to omit transitions')
-	  CALL RD_STORE_DBLE(AT_NO_GF_CUT,'AT_CUT',L_TRUE,
-	1          'Only omit transitions if AT_NO >= AT_CUT')
-	  CALL RD_STORE_INT(GF_LEV_CUT,'GF_LEV_CUT',L_TRUE,
-	1          'Level above whit transitions omitted if gf < GF_CUT')
-	  CALL RD_STORE_INT(MIN_NUM_TRANS,'MIN_TRANS',L_TRUE,
-	1          'Minimum number of transitions from each level')
-C
-	  CALL RD_STORE_LOG(THK_LINE,'THK_LINE',L_TRUE,
-	1           'Use thick boundary condition for lines?')
-	  CALL RD_STORE_LOG(CHECK_LINE_OPAC,'CHK_L_POS',L_TRUE,
-	1      'Ensure Line opacity is positive (SOB & CMF modes only)?')
-	  CALL RD_STORE_NCHAR(NEG_OPAC_OPTION,'NEG_OPAC_OPT',ITEN,L_TRUE,
-	1            'Method for negative opacities in BLANKETING mode')
-	  CALL SET_CASE_UP(NEG_OPAC_OPTION,IZERO,IZERO)
-	  IF(NEG_OPAC_OPTION .NE. 'SRCE_CHK' .AND. 
-	1                           NEG_OPAC_OPTION .NE. 'ESEC_CHK')THEN
-	     WRITE(LUER,*)'Error in CMFGEN_SUB'
-	     WRITE(LUER,*)'Invalid NEG_OPAC_OPTION'
-	     WRITE(LUER,*)'Valid options are SRCE_CHK and ESEC_CHK'
-	     STOP
-	  END IF
-	  CALL RD_STORE_LOG(SETZERO,'He2_RES=0',L_TRUE,
-	1           'Set rates in He2 resonance lines to zero ?')
-C
-	  CALL RD_STORE_LOG(OVERLAP,'ALLOW_OL',L_TRUE,
-	1           'Allow for overlap of close lines (SOB only) ?')
-	  CALL RD_STORE_DBLE(OVER_FREQ_DIF,'OL_DIF',L_TRUE,
-	1           'Max. difference (in km/s) for overlap')
-	  OVER_FREQ_DIF=OVER_FREQ_DIF/2.998E+05
-C
-	  CALL RD_STORE_LOG(INCL_CHG_EXCH,'INC_CHG',L_TRUE,
-	1           'Include charge exchange reactions?')
-	  CALL RD_STORE_LOG(INCL_TWO_PHOT,'INC_TWO',L_TRUE,
-	1           'Include two photon transitions?')
-	  CALL RD_STORE_LOG(INCL_ADVECTION,'INC_ADV',L_TRUE,
-	1           'Include advection terms in rate equations?')
-	  CALL RD_STORE_LOG(INCL_ADIABATIC,'INC_AD',L_TRUE,
-	1           'Include adiabatic cooling in energy equation')
-	  CALL RD_STORE_LOG(SCL_LINE_COOL_RATES,'SCL_LN',L_TRUE,
-	1            'Scale line cooling rate for Rad. Eq. equation?')
-	  CALL RD_STORE_DBLE(SCL_LINE_HT_FAC,'SCL_LN_FAC',L_TRUE,
-	1            'Scale line cooling rate for Rad. Eq. equation?')
-!
-! Except for the X-ray switch, the X-ray options are only needed if we 
-! are including X-rays.
-!
-	  CALL RD_STORE_LOG(XRAYS,'INC_XRAYS',L_TRUE,
-	1           'Include X-ray emission')
-	  CALL RD_STORE_LOG(FF_XRAYS,'FF_XRAYS',XRAYS,
-	1           'Use free-free processes to compute X-ray emission')
-	  CALL RD_STORE_LOG(XRAY_SMOOTH_WIND,'X_SM_WIND',XRAYS,
-	1           'Ignore clumping when computing X-ray emission')
-	  CALL RD_STORE_DBLE(VSMOOTH_XRAYS,'VS_XRAYS',XRAYS,
-	1           'X-ray smoothing width for SOB/CMF options')
-	  CALL RD_STORE_DBLE(FILL_FAC_XRAYS_1,'FIL_FAC_1',XRAYS,
-	1           'Filling factor for X-ray emission [1]')
-	  CALL RD_STORE_DBLE(T_SHOCK_1,'T_SHOCK_1',XRAYS,
-	1           'Shock T for X-ray emission [1]')
-	  CALL RD_STORE_DBLE(V_SHOCK_1,'V_SHOCK_1',XRAYS,
-	1           'Cut off velocity for X-ray emission [1]')
-	  CALL RD_STORE_DBLE(FILL_FAC_XRAYS_2,'FIL_FAC_2',XRAYS,
-	1           'Filling factor for X-ray emission [2]')
-	  CALL RD_STORE_DBLE(T_SHOCK_2,'T_SHOCK_2',XRAYS,
-	1           'Shock T for X-ray emission [2]')
-	  CALL RD_STORE_DBLE(V_SHOCK_2,'V_SHOCK_2',XRAYS,
-	1           'Cut off velocity for X-ray emission [2]')
-	  CALL RD_STORE_LOG(ADD_XRAYS_SLOWLY,'XSLOW',XRAYS,
-	1           'Add X-rays by slowly increasing filling factors?')
-	  CALL RD_STORE_DBLE(FILL_FAC_X1_BEG,'XFI1_BEG',ADD_XRAYS_SLOWLY,
-	1           'Initial filling factor for X-ray emission [1]')
-	  CALL RD_STORE_DBLE(FILL_FAC_X2_BEG,'XFI2_BEG',ADD_XRAYS_SLOWLY,
-	1           'Initial filling factor for X-ray emission [2]')
-	  CALL RD_STORE_DBLE(SLOW_XRAY_SCL_FAC,'XSCL_FAC',ADD_XRAYS_SLOWLY,
-	1           'Rate to increase X-ray filling factor')
-	  
-C
-	  WRITE(LUSCR,'()')
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_LOG( RDINR,'RD_IN_R_GRID',L_TRUE,
-	1        'Read in a predetermined R grid ?')
-	  CALL RD_STORE_LOG(GRID,'LIN_INT',L_TRUE,
-	1        'Use direct linear interpolation if  new model ?')
-	  CALL RD_STORE_LOG(DO_POP_SCALE,'POP_SCALE',L_TRUE,
-	1        'Scale populations so that cons. Eq. satisfied ?')
-	  CALL RD_STORE_DBLE(T_INIT_TAU,'T_INIT_TAU',L_TRUE,
-	1        'Tau above which T is set exactly to T(spherical)')
-	  CALL RD_STORE_LOG(ITERATE_INIT_T,'IT_ON_T',L_TRUE,
-	1        'Improve initial T estimate by iteration ?')
-	  CALL RD_STORE_DBLE(GREY_PAR,'GREY_TAU',L_TRUE,
-	1        'SpecifysTau above which T is set to TGREY in iterative process')
-C
-	  WRITE(LUSCR,'()')
-	  DO ID=1,NUM_IONS-1
-	    TMP_KEY='TRANS_'//TRIM(ION_ID(ID))
-	    TMP_STRING='Method for treating '//TRIM(ION_ID(ID))//' lines?'
-	    CALL RD_STORE_NCHAR(ATM(ID)%XzV_TRANS_TYPE,TMP_KEY,
-	1          ISIX,ATM(ID)%XZV_PRES,TMP_STRING)
-	  END DO
-C
-	  WRITE(LUSCR,'()')
-
-	  CALL RD_STORE_LOG(DIE_AS_LINE,'DIE_AS_LINE',L_TRUE,
-	1        'Treat the dielectronic transitions as individual lines?')
-	  CALL RD_STORE_DBLE(VSM_DIE_KMS,'VSM_DIE',L_TRUE,
-	1       'Velocity (km/s) for smoothing dielectronic transitions')
-!
-	  WRITE(LUSCR,'()')
-	  DO ID=1,NUM_IONS-1
-	    TMP_KEY='DIE_'//TRIM(ION_ID(ID))
-	    TMP_STRING='Include (?) LTDR AUOT, WI calc.s for '//TRIM(ION_ID(ID))
-	    CALL RD_STORE_2LOG(ATM(ID)%DIE_AUTO_XzV,ATM(ID)%DIE_WI_XzV,
-	1         TMP_KEY,ATM(ID)%XZV_PRES,TMP_STRING)
-	  END DO
-C
-	  DO ISPEC=1,NUM_SPECIES
-	    WRITE(LUSCR,'()')
-	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
-	      TMP_KEY='FIX_'//TRIM(ION_ID(ID))
-	      TMP_STRING='Fix ? levels of '//TRIM(ION_ID(ID))
-	      CALL RD_STORE_INT(ATM(ID)%FIX_NXzV,TMP_KEY,ATM(ID)%XZV_PRES,
-	1           TMP_STRING)
-	    END DO
-	    TMP_KEY='FIX_'//TRIM(SPECIES(ISPEC))
-	    TMP_STRING='Fix (?) highest ionization stage in '//TRIM(SPECIES(ISPEC))
-	    CALL RD_STORE_INT(FIX_SPECIES(ISPEC),TMP_KEY,SPECIES_PRES(ISPEC),
-	1           TMP_STRING)
-	  END DO
-C
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_LOG(FIXED_NE,'FIX_NE',L_TRUE,
-	1                     'Fix the electron density ?')
-C
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_LOG(RD_FIX_IMP,'FIX_IMP',L_TRUE,
-	1            'Automatically fix impurity species?')
-C
-	  WRITE(LUSCR,'()')                             
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_LOG(RD_FIX_T,'FIX_T',L_TRUE,
-	1            'Keep the Temperature fixed ?')
-	  CALL RD_STORE_LOG(VARFIXT,'FIX_T_AUTO',L_TRUE,
-	1            'Fix the Temperature automatically ?')
-	  CALL RD_STORE_DBLE(TAU_SCL_T,'TAU_SCL_T',L_TRUE,
-	1      'Electron scattering optical depth from which to fix T')
-	  IF(TAU_SCL_T .EQ. 0.0D0)THEN
-	    CON_SCL_T=0.0D0
-	  ELSE
-	    CON_SCL_T=1000.0D0
-	  END IF
-C
-	  CALL RD_STORE_NCHAR(METH_SOL,'SOL_METH',ISIX,L_TRUE,
-	1            'Which Method To solve Matrix Equations'//
-	1            ' DIAG, TRI, PEN, GSIT or MIN')
-	  IF(NUM_BNDS .EQ. 1 .AND. METH_SOL .NE. 'DIAG')THEN
-	    WRITE(LUER,*)'****************************************'
-	    WRITE(LUER,*)'******WARNING in CMFGEN*****************'
-	    WRITE(LUER,*)'Solution method inconsistent with NUM_BNDS'
-	    WRITE(LUER,*)'METH_SOL=',METH_SOL,'NUM_BNDS=',NUM_BNDS
-	    METH_SOL='DIAG'
-	  END IF
-	  CALL RD_STORE_NCHAR(SCALE_OPT,'SCALE_OPT',ISIX,L_TRUE,
-	1           'Scale option (LOCAL, NONE or GLOBAL) ? ')
-	  CALL RD_STORE_DBLE(EPS,'EPS_TERM',L_TRUE,
-	1      'If maximum fractional % change < EPS terminate model ')
-	  CALL RD_STORE_DBLE(MAX_LIN_COR,'MAX_LIN',L_TRUE,
-	1      'Maximum fractional change for linearization ')
-	  CALL RD_STORE_DBLE(MAX_LAM_COR,'MAX_LAM',L_TRUE,
-	1      'Maximum fractional change for lambda iteration ')
-	  CALL RD_STORE_DBLE(MAX_CHNG_LIM,'MAX_CHNG',L_TRUE,
-	1      'If maximum % fractional change > MAX_CHNG terminate model ')
-!
-	  CALL RD_STORE_LOG(COMPUTE_BARDIN,'COMP_BA',L_TRUE,
-	1            'Compute BA matrix ?')
-	  CALL RD_STORE_LOG(WRBAMAT_RDIN,'STORE_BA',L_TRUE,
-	1      'Store the BA matrix for/during each iteration ? ')
-	  CALL RD_STORE_LOG(WR_BA_INV,'STORE_BA_INV',L_TRUE,
-	1      'Store the INVERSE of the BA matrix on each iteration ? ')
-	  CALL RD_STORE_LOG(WR_PART_OF_INV,'WR_PRT_INV',L_TRUE,
-	1      'Store part of the INVERSE to reduce storage TRIDIAG only)?')
-	  CALL RD_STORE_INT(N_ITS_TO_FIX_BA,'N_FIX_BA',L_TRUE,
-	1      'Number of iterations to hold BA fixed')
-	  CALL RD_STORE_DBLE(BA_CHK_FAC,'BA_CHK_FAC',L_TRUE,
-	1      'If dJ < BA_CHK_FAC*RJ, ignore correction to BA')
-	  CALL RD_STORE_DBLE(VAL_FIX_BA,'FIX_BA',L_TRUE,
-	1      'Switch off BA computation if MAXCH< VAL_FIX_BA ')
-	  CALL RD_STORE_DBLE(VAL_DO_LAM,'LAM_VAL',L_TRUE,
-	1      'Do Lambda iterations if MAXCH > VAL_DO_LAM')
-	  CALL RD_STORE_INT(RD_CNT_LAM,'NUM_LAM',L_TRUE,
-	1      '# of Lambda iterations if MAXCH > VAL_DO_LAM')
-	  CNT_LAM=0
-	  CALL RD_STORE_LOG(RDINSOL,'RD_SOL',L_TRUE,
-	1            'RD in solution vector to update populations')
-C
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_LOG(EDD_CONT,'JC_W_EDD',L_TRUE,
-	1        'Compute continuum intensity using Eddington factors')
-	  CALL RD_STORE_LOG(EDD_LINECONT,'JBAR_W_EDD',L_TRUE,
-	1    'Compute line continuum intensity using Eddington factors')
-	
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_LOG(ACCURATE,'INC_GRID',L_TRUE,
-	1          'Increase grid size to improve accuracy? ')
-	  CALL RD_STORE_LOG(ALL_FREQ,'ALL_FREQ',L_TRUE,
-	1          'Increase accuracy for all frequencies?')
-	  CALL RD_STORE_DBLE(ACC_FREQ_END,'ACC_END',L_TRUE,
-	1          'Increase accuracy for all frequencies < ACC_END?')
-	  CALL RD_STORE_INT(NPINS,'N_INS',L_TRUE,
-	1          'Number of points to be inserted in higher'//
-	1          ' accuracy grid (1, 2 or 3) ')
-	  CALL RD_STORE_INT(ST_INTERP_INDX,'ST_INT',L_TRUE,
-	1          'Interpolate from ? ')
-	  CALL RD_STORE_INT(END_INTERP_INDX,'END_INT',L_TRUE,
-	1          'Interpolate to ? ')
-	  CALL RD_STORE_INT(DEEP,'ND_QUAD',L_TRUE,
-	1         'Quadratic interpolation from ND-? to ND')
-	  CALL RD_STORE_NCHAR(INTERP_TYPE,'INTERP_TYPE',10,L_TRUE,
-	1         'Perform interpolations in LOG or LIN plane')
-C
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_INT(N_PAR,'N_PAR',L_TRUE,
-	1    'Rate of BA incrementation by BA_PAR in cont. loop (# of freq)')
-C
-C Next two variables apply for both ACCURATE and EDDINGTON.
-C
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_LOG(COMPUTE_EDDFAC,'COMP_F',L_TRUE,
-	1      'Compute new Eddington factors (f)')
-	  CALL RD_STORE_DBLE(ACC_EDD_FAC,'ACC_F',L_TRUE,
-	1      'Accuracy with which to compute the eddington factor f')
-C
-	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_LOG(NG_DO,'DO_NG',L_TRUE,
-	1         'Perform NG acceleration when applicable ?')
-	  CALL RD_STORE_DBLE(VAL_DO_NG,'BEG_NG',L_TRUE,
-	1       'Percentage accuracy at which to begin NG acceleration')
-	  CALL RD_STORE_INT(IT_TO_BEG_NG,'IBEG_NG',L_TRUE,
-	1       'Iteration at which to begin NG acceleration')
-	  CALL RD_STORE_INT(NG_BAND_WIDTH,'BW_NG',L_TRUE,
-	1       'Depth band width for NG acceleration')
-	  CALL RD_STORE_INT(ITS_PER_NG,'ITS/NG',L_TRUE,
-	1         'Number of iterations between NG accelerations (>=4)')
-	  IF(ITS_PER_NG .LT. 4)THEN
-	     WRITE(LUER,*)'Error in CMFGEN - ITS_PER_NG too small'
-	     STOP
-	  END IF
-	  CALL CLEAN_RD_STORE()
-C
-	CLOSE(UNIT=7)
+	CALL RD_CONTROL_VARIABLES(LUIN,LUSCR,LUER,NUM_BNDS)
 C
 C RMDOT is the density at R=10dex10 cm and V=1km/s (atomic mass units)
 C
@@ -1728,13 +844,14 @@ C
 	      CALL RD_F_TO_S_IDS( ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
 	1           ATM(ID)%XzVLEVNAME_F, ATM(ID)%NXzV_F, ATM(ID)%NXzV,
 	1           LUIN,TMP_STRING)
-	      CALL RDPHOT_GEN_V1( ATM(ID)%EDGEXzV_F, ATM(ID)%XzVLEVNAME_F,
+	      CALL RDPHOT_GEN_V2( ATM(ID)%EDGEXzV_F, ATM(ID)%XzVLEVNAME_F,
 	1           ATM(ID)%GIONXzV_F,AT_NO(SPECIES_LNK(ID)),
 	1           ATM(ID)%ZXzV, ATM(ID)%NXzV_F,
 	1           ATM(ID)%XzV_ION_LEV_ID, ATM(ID)%N_XzV_PHOT,  NPHOT_MAX,
 	1           ATM(ID+1)%XzV_PRES,     ATM(ID+1)%EDGEXzV_F, ATM(ID+1)%GXzV_F,
-	1           ATM(ID+1)%F_TO_S_XzV,   ATM(ID+1)%XzVLEVNAME_F,
-	1           ATM(ID+1)%NXzV_F,XRAYS,ID,ION_ID(ID),LUIN,LUSCR)   
+	1           ATM(ID+1)%F_TO_S_XzV,   ATM(ID+1)%XzVLEVNAME_F, ATM(ID+1)%NXzV_F,
+	1           SIG_GAU_KMS,FRAC_SIG_GAU,CUT_ACCURACY,ABOVE_EDGE,
+	1           XRAYS,ID,ION_ID(ID),LUIN,LUSCR)   
               IF(ATM(ID+1)%XzV_PRES) ATM(ID)%GIONXzV_F= ATM(ID+1)%GXzV_F(1)
  	      IF(DIE_AS_LINE .AND. (ATM(ID)%DIE_AUTO_XzV .OR.  ATM(ID)%DIE_WI_XzV) )THEN
 	        TMP_STRING='DIE'//TRIM(ION_ID(ID))
@@ -1921,10 +1038,11 @@ C we know it has the correct length since it is the same size as NU.
 C LUIN --- Used as temporary LU (opened and closed).
 C
 	  J=NCF
-	  CALL SET_CONT_FREQ(NU,OBS,FQW,
+	  CALL SET_CONT_FREQ_V3(NU,OBS,FQW,
 	1                        SMALL_FREQ_RAT,BIG_FREQ_AMP,dFREQ_BF_MAX,
 	1                        MAX_CONT_FREQ,MIN_CONT_FREQ,
 	1                        dV_LEV_DIS,AMP_DIS,MIN_FREQ_LEV_DIS,
+	1                        DELV_CONT,DELV_XRAY,NU_XRAY_END,
 	1                        J,NCF,NCF_MAX,LUIN)
 C                                             
 	END IF
@@ -2098,17 +1216,17 @@ C
 	K=NCF		!# of continuum frequencies: Need for DET_MAIN...
 	NCF=I		!Revised
 C
+	CALL DET_MAIN_CONT_FREQ(NU,NCF,FQW,K,NU_EVAL_CONT,
+	1         V_DOP,DELV_CONT,COMPUTE_ALL_CROSS)
+C
 	WRITE(LUER,*)' '
 	WRITE(LUER,'(A,T40,I6)')' Number of line frequencies is:',N_LINE_FREQ
-	WRITE(LUER,'(A,T40,I6)')' Number of continuum frequencies is:',NCF
+	WRITE(LUER,'(A,T40,I6)')' Number of frequencies is:',NCF
 	WRITE(LUER,*)' '
-C
-	CALL DET_MAIN_CONT_FREQ(NU,NCF,FQW,K,NU_EVAL_CONT,
-	1             V_DOP,DELV_CONT,COMPUTE_ALL_CROSS)
 C
 C Redefine frequency quadrature weights.
 C
-	CALL SMPTRP(NU,FQW,NCF)
+	CALL TRAPUNEQ(NU,FQW,NCF)
 	DO ML=1,NCF                                           
 	  FQW(ML)=FQW(ML)*1.0D+15
 	END DO
@@ -2149,11 +1267,25 @@ C
 C 
 C
 C Check to see if old model. If so, read in R,V, SIGMA and POPS arrays.
-C If not, set NEWMOD to .TRUE.
+C If not, set NEWMOD to .TRUE. We also check the format of the file,
+C in case we are revising the R grid.
 C
 	NLBEGIN=0		! Initialize for lines.
-	CALL SCR_READ(R,V,SIGMA,POPS,IREC,NITSF,RITE_N_TIMES,LAST_NG,
-	1                NT,ND,LUSCR,NEWMOD)
+	IREC=0                  ! Get last iteration
+	CALL SCR_READ_V2(R,V,SIGMA,POPS,IREC,NITSF,RITE_N_TIMES,LAST_NG,
+	1                 WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
+        IF(REVISE_R_GRID .AND. NEWMOD)THEN
+	  WRITE_RVSIG=.TRUE.
+	ELSE IF(NEWMOD)THEN
+	  WRITE_RVSIG=.FALSE.
+	ELSE IF(REVISE_R_GRID)THEN
+	   IF(.NOT. WRITE_RVSIG)THEN
+	     WRITE(LUER,*)'Error in CMFGEN_SUB with SCRTEMP'
+	     WRITE(LUER,*)'Inconsistent request for output to SCRTEMP'
+	     WRITE(LUER,*)'Restart a fresh model'
+	     STOP
+	   END IF
+	END IF
 C
 C		' OLD MODEL '
 C
@@ -2341,40 +1473,9 @@ C
 	DO I=1,ND
 	  DENSITY(I)=POP_ATOM(I)*T1			!gm/cm^3
 	END DO
-C
-C 
-C
-C Need to calculate impact parameters, and angular quadrature weights here
-C as these may be required when setting up the initial temperature
-C distribution of the atmosphere (i.e. required by JGREY).
-C
-C
-C Compute impact parameter values P
-C
-	CALL IMPAR(P,R,RP,NC,ND,NP)
-C
-C Compute the angular quadrature weights
-C
-	IF(TRAPFORJ)THEN
-	  CALL NORDANGQW(AQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,JTRPWGT)
-	  CALL NORDANGQW(HQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,HTRPWGT)
-	  CALL NORDANGQW(KQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,KTRPWGT)
-	  MID=.TRUE.
-	  CALL GENANGQW(HMIDQW,R,P,WM(1,1),WM(1,3),WM(1,5),
-	1               NC,ND,NP,HTRPWGT,MID)
-	  CALL GENANGQW(NMIDQW,R,P,WM(1,1),WM(1,3),WM(1,5),
-	1               NC,ND,NP,NTRPWGT,MID)
-	ELSE
-	  CALL NORDANGQW(AQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,JWEIGHT)
-	  CALL NORDANGQW(HQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,HWEIGHT)
-	  CALL NORDANGQW(KQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,KWEIGHT)
-	  MID=.TRUE.
-	  CALL GENANGQW(HMIDQW,R,P,WM(1,1),WM(1,3),WM(1,5),
-	1               NC,ND,NP,HWEIGHT,MID)
-	  CALL GENANGQW(NMIDQW,R,P,WM(1,1),WM(1,3),WM(1,5),
-	1               NC,ND,NP,NWEIGHT,MID)
-	END IF
-C
+!
+! 
+!
 	IF(ACCURATE)THEN
 !
 ! We first verify that the interpolation range is valid.
@@ -2409,78 +1510,27 @@ C
 	  TA(1:ND)=1.0D0	!TEXT not required, T currently zero
 	  CALL EXTEND_VTSIGMA(VEXT,TEXT,SIGMAEXT,COEF,INDX,NDEXT,
 	1        V,TA,SIGMA,ND)
-	  CALL IMPAR(PEXT,REXT,RP,NCEXT,NDEXT,NPEXT)
-C
-C Allocate TX_EXT and TVX_EXT arrays for use in VARCONT.
-C
+!
+! Allocate TX_EXT and TVX_EXT arrays for use in VARCONT.
+!
 	  ALLOCATE (TX_EXT(NDEXT,ND,NM))
 	  ALLOCATE (TVX_EXT(NDEXT-1,ND,NM))
-	  ALLOCATE (AQWEXT(NDEXT,NPEXT))
-	  ALLOCATE (HQWEXT(NDEXT,NPEXT))
-	  ALLOCATE (KQWEXT(NDEXT,NPEXT))
-	  ALLOCATE (HMIDQWEXT(NDEXT,NPEXT))
-	  ALLOCATE (NMIDQWEXT(NDEXT,NPEXT))
-C
-C Note that the F2DAEXT vectors (here used as dummy variables) must be at least
-C NPEXT long.
-C
-	  IF(TRAPFORJ)THEN
-	    CALL NORDANGQW(AQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
-	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,JTRPWGT)
-	    CALL NORDANGQW(HQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
-	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,HTRPWGT)
-	    CALL NORDANGQW(KQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
-	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,KTRPWGT)
-	    MID=.TRUE.
-	    CALL GENANGQW(HMIDQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
-	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,HTRPWGT,MID)
-	    CALL GENANGQW(NMIDQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
-	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,NTRPWGT,MID)
-	  ELSE
-	    CALL NORDANGQW(AQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
-	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,JWEIGHT)
-	    CALL NORDANGQW(HQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
-	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,HWEIGHT)
-	    CALL NORDANGQW(KQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
-	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,KWEIGHT)
-	    MID=.TRUE.
-	    CALL GENANGQW(HMIDQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
-	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,HWEIGHT,MID)
-	    CALL GENANGQW(NMIDQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
-	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,NWEIGHT,MID)
-	  END IF
-	   VDOP_VEC_EXT(1:NDEXT)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
+!
+          VDOP_VEC_EXT(1:NDEXT)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
+!
 	ELSE
 	  NDEXT=ND ; NCEXT=NC; NPEXT=NP
 	END IF
-C
-C Allocate arrays and vectors for computing observed fluxes.
-C
-	IF(ACCURATE)THEN
-	  NP_OBS_MAX=NPEXT+12
-	ELSE
-	  NP_OBS_MAX=NP+12
-	END IF
-	ALLOCATE (IPLUS_STORE(NST_CMF,NP_OBS_MAX))
-	ALLOCATE (P_OBS(NP_OBS_MAX))
-	ALLOCATE (IPLUS(NP_OBS_MAX))
-	ALLOCATE (MU_AT_RMAX(NP_OBS_MAX))
-	ALLOCATE (HQW_AT_RMAX(NP_OBS_MAX))
-C
-C Used when computing the observed fluxes. These will get overwritten
-C if we do an accurate comoving frame soluton using CMF_FORM_SOL.
-C
-	IF(ACCURATE)THEN
-	  DO LS=1,NPEXT
-	    MU_AT_RMAX(LS)=SQRT( 1.0D0 -(PEXT(LS)/REXT(1))**2 )
-	    HQW_AT_RMAX(LS)=HQWEXT(1,LS)
-	  END DO
-	ELSE
-	  DO LS=1,NP
-	    MU_AT_RMAX(LS)=SQRT( 1.0D0 -(P(LS)/R(1))**2 )
-	    HQW_AT_RMAX(LS)=HQW(1,LS)
-	  END DO
-	END IF
+!
+! Need to calculate impact parameters, and angular quadrature weights here
+! as these may be required when setting up the initial temperature
+! distribution of the atmosphere (i.e. required by JGREY).
+!
+	CALL SET_ANG_QW(R,NC,ND,NP,REXT,NCEXT,NDEXT,NPEXT,TRAPFORJ,ACCURATE)
+!
+! Allocate memory for opacities.
+!
+        CALL INIT_OPAC_MOD(ND,NT,L_TRUE)
 C 
 C
 C		'NEW MODEL'
@@ -2736,7 +1786,10 @@ C
 	        COMPUTE_NEW_CROSS=.FALSE.
 	      END IF
 C
-	      INCLUDE 'OPACITIES_V4.INC'
+C	      INCLUDE 'OPACITIES_V4.INC'
+	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
+	1                FL,CONT_FREQ,FREQ_INDX,NCF,
+	1                SECTION,ND,NT,LST_DEPTH_ONLY)
 C
 C 
 C
@@ -3006,39 +2059,43 @@ C
 	        WRITE(LUER,*)('*',I=1,70)
 	      END IF
 	    END IF
-C
-C Will use FEDD for F, GAM for NEWRJ, GAMH for NEWRK, and T2 for NEWHBC.
-C Will use HBC_J for HBC. No need to modify JGREY, as outer boundary
-C will always be optically thin.
-C
-	    DO I=1,ND
-	      FEDD(I)=1.0D0/3.0D0
-	      CHI(I)=ROSSMEAN(I)
-	    END DO
-	    HBC_J=1.0D0
-	    T1=1000.0
-	    DO WHILE(T1 .GT. 1.0E-05)
-	      CALL JGREY(TA,TB,TC,XM,DTAU,R,Z,P,RJ,
-	1        GAM,GAMH,Q,FEDD,CHI,dCHIdR,
-	1        AQW,KQW,LUM,HBC_J,T2,NC,ND,NP,METHOD)
-	      T1=0.0D0
-	      DO I=1,ND
-	        T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
-	        FEDD(I)=GAMH(I)
-	      END DO
-	      T1=MAX(ABS(HBC_J-T2),T1)
-	      HBC_J=T2
-	      WRITE(LUER,'('' Maximum change in Grey F is '',1P,E11.4)')T1
-	    END DO
+!
+	    CHI(1:ND)=ROSSMEAN(1:ND)
+	    IF(JGREY_WITH_V_TERMS)THEN
 !
 ! This routine will supercede the one above, and included to zeor
-! order the ffect of the velocity field.
+! order the effect of the velocity field.
 !
-	    T2=1.0D-05		!Accuracy to converge f
-	    CALL JGREY_WITH_FVT(RJ,SOB,CHI,R,V,SIGMA,
+	      T2=1.0D-05		!Accuracy to converge f
+	      CALL JGREY_WITH_FVT(RJ,SOB,CHI,R,V,SIGMA,
 	1                  P,AQW,HMIDQW,KQW,NMIDQW,
 	1                  LUM,METHOD,DIF,IC,
 	1                  T2,ND,NC,NP)
+	    ELSE
+!
+! Will use FEDD for F, GAM for NEWRJ, GAMH for NEWRK, and T2 for NEWHBC.
+! Will use HBC_J for HBC. No need to modify JGREY, as outer boundary
+! will always be optically thin.
+!
+	      DO I=1,ND
+	        FEDD(I)=1.0D0/3.0D0
+	      END DO
+	      HBC_J=1.0D0
+	      T1=1000.0
+	      DO WHILE(T1 .GT. 1.0E-05)
+	        CALL JGREY(TA,TB,TC,XM,DTAU,R,Z,P,RJ,
+	1          GAM,GAMH,Q,FEDD,CHI,dCHIdR,
+	1          AQW,KQW,LUM,HBC_J,T2,NC,ND,NP,METHOD)
+	        T1=0.0D0
+	        DO I=1,ND
+	          T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
+	          FEDD(I)=GAMH(I)
+	        END DO
+	        T1=MAX(ABS(HBC_J-T2),T1)
+	        HBC_J=T2
+	        WRITE(LUER,'('' Maximum change in Grey F is '',1P,E11.4)')T1
+	      END DO
+	    END IF
 C
 C Compute the temperature distribution, and the Rossland optical depth scale.
 C NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert T from units of 
@@ -3048,7 +2105,7 @@ C at boundary.
 C 
 	    CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,' ')
 	    DO I=1,ND
-	      TGREY(I)=((3.14159265/5.67E-05*RJ(I))**0.25)*1.0E-04
+	      TGREY(I)=((3.14159265D0/5.67D-05*RJ(I))**0.25D0)*1.0D-04
 	    END DO
 	    CALL SCALE_GREY(TGREY,TA,LUIN,ND)
 C
@@ -3280,8 +2337,8 @@ C iteration.
 C
 	  IF(RDINSOL .OR. NEWMOD)THEN
 	    MAIN_COUNTER=NITSF+1
-	    CALL SCR_RITE(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,RITE_N_TIMES,
-	1                LAST_NG,NT,ND,LUSCR,NEWMOD)
+	    CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,RITE_N_TIMES,
+	1                  LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
 	  END IF
 	  LST_ITERATION=.TRUE.
 	  GOTO 9999			!End (write out POPS.)
@@ -3550,7 +2607,10 @@ C
 	    END IF
 C
 	    CALL TUNE(1,'DTDR_OPAC')
-	    INCLUDE 'OPACITIES_V4.INC'
+	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
+	1                FL,CONT_FREQ,FREQ_INDX,NCF,
+	1                SECTION,ND,NT,LST_DEPTH_ONLY)
+!	    INCLUDE 'OPACITIES_V4.INC'
 	    CALL TUNE(2,'DTDR_OPAC')
 C
 C 
@@ -3558,7 +2618,9 @@ C
 C Compute variation of opacity/emissivity. Store in VCHI and VETA.
 C
 	    CALL TUNE(1,'DTDR_VOPAC')
-	    INCLUDE 'VAROPAC_V4.INC'
+!	    INCLUDE 'VAROPAC_V4.INC'
+	    CALL COMP_VAR_OPAC(POPS,RJ,FL,CONT_FREQ,FREQ_INDX,
+	1                SECTION,ND,NT,LST_DEPTH_ONLY)
 	    CALL TUNE(2,'DTDR_VOPAC')
 C 
 C
@@ -4013,7 +3075,10 @@ C
 C
 C Compute continuum opacity and emissivity at the line frequency.
 C
-	    INCLUDE 'OPACITIES_V4.INC'
+	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
+	1                FL,CONT_FREQ,FREQ_INDX,NCF,
+	1                SECTION,ND,NT,LST_DEPTH_ONLY)
+!	    INCLUDE 'OPACITIES_V4.INC'
 C
 C Solve for the continuous radiation field.
 C
@@ -4158,7 +3223,7 @@ C for display purposes. Variable after THK_CONT is true as we
 C want to assume the line opacity is zero --- since dielectronic
 C transition.
 C
-	    CALL SOBEW(SOURCE,CHI,ESEC,CHIL,ETAL,
+	    CALL SOBEW(SOURCE,CHI,CHI_SCAT,CHIL,ETAL,
 	1              V,SIGMA,R,P,AQW,HQW,TA,EW,CONT_INT,
 	1              FL,DIF,DBB,IC,THK_CONT,L_TRUE,NC,NP,ND,METHOD)
 C
@@ -4722,7 +3787,10 @@ C
 C Compute opacity and emissivity.
 C
 	    CALL TUNE(IONE,'C_OPAC')
-	    INCLUDE 'OPACITIES_V4.INC'
+	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
+	1                FL,CONT_FREQ,FREQ_INDX,NCF,
+	1                SECTION,ND,NT,LST_DEPTH_ONlY)
+!	    INCLUDE 'OPACITIES_V4.INC'
 	    CALL TUNE(ITWO,'C_OPAC')
 C
 C Since resonance zones included, we must add the line opacity and 
@@ -4743,6 +3811,14 @@ C
 	        END DO
 	      END IF
 	    END DO
+!
+!	    DO I=1,ND
+!	      IF(CHI(I)*R(I) .LT. 1.0D-04)THEN
+!	         CHI(I)=CHI(I)-CHI_SCAT(I)
+!	         CHI_SCAT(I)=1.0D-04/R(I)
+!	         CHI(I)=CHI(I)+CHI_SCAT(I)
+!	      END IF
+!	    END DO
 C
 C CHECK for negative line opacities. NEG_OPAC_FAC is the factor we
 C multiply the line opacities by so that the total opacity is positive.
@@ -4759,13 +3835,13 @@ C
 	    IF(NEG_OPAC_OPTION .EQ. 'SRCE_CHK')THEN
 	      DO I=1,ND
 	        IF(CHI(I) .LT. CHI_CONT(I) .AND.
-	1            CHI(I) .LT. 0.1D0*ETA(I)*(CHI_CONT(I)-ESEC(I))/ETA_CONT(I) )THEN
-	          CHI(I)=0.1D0*ETA(I)*(CHI_CONT(I)-ESEC(I))/ETA_CONT(I)
+	1            CHI(I) .LT. 0.1D0*ETA(I)*(CHI_CONT(I)-CHI_SCAT(I))/ETA_CONT(I) )THEN
+	          CHI(I)=0.1D0*ETA(I)*(CHI_CONT(I)-CHI_SCAT(I))/ETA_CONT(I)
 	          NEG_OPACITY(I)=.TRUE.
 	          NEG_OPAC_FAC(I)=0.0D0
 	          AT_LEAST_ONE_NEG_OPAC=.TRUE.
-	        ELSE IF(CHI(I) .LT. 0.1D0*ESEC(I))THEN
-	          CHI(I)=0.1D0*ESEC(I)
+	        ELSE IF(CHI(I) .LT. 0.1D0*CHI_SCAT(I))THEN
+	          CHI(I)=0.1D0*CHI_SCAT(I)
 	          NEG_OPACITY(I)=.TRUE.
 	          NEG_OPAC_FAC(I)=0.0D0
 	          AT_LEAST_ONE_NEG_OPAC=.TRUE.
@@ -4773,9 +3849,9 @@ C
 	      END DO
 	    ELSE IF(NEG_OPAC_OPTION .EQ. 'ESEC_CHK')THEN
 	      DO I=1,ND
-	        IF(CHI(I) .LT. 0.1D0*ESEC(I))THEN
+	        IF(CHI(I) .LT. 0.1D0*CHI_SCAT(I))THEN
 	          T1=CHI(I)
-	          CHI(I)=0.1D0*ESEC(I)
+	          CHI(I)=0.1D0*CHI_SCAT(I)
 	          NEG_OPACITY(I)=.TRUE.
 C	          NEG_OPAC_FAC(I)=(CHI(I)-CHI_CONT(I))/(T1-CHI_CONT(I))
 	          NEG_OPAC_FAC(I)=0.0D0
@@ -4804,7 +3880,7 @@ C	          NEG_OPAC_FAC(I)=(CHI(I)-CHI_CONT(I))/(T1-CHI_CONT(I))
 C
 	    DO I=1,ND
 	      ZETA(I)=ETA(I)/CHI(I)
-	      THETA(I)=ESEC(I)/CHI(I)
+	      THETA(I)=CHI_SCAT(I)/CHI(I)
 	    END DO
 C
 	    IF(LST_ITERATION .AND. ML .NE. NCF)THEN
@@ -4832,7 +3908,7 @@ C ESEC*RJ.
 C
 	  DO K=1,ND
 	    STEQ_T(K)=STEQ_T(K)+ FQW(ML)*( 
-	1       (CHI_CONT(K)-ESEC(K))*RJ(K) - ETA_CONT(K) )
+	1       (CHI_CONT(K)-CHI_SCAT(K))*RJ(K) - ETA_CONT(K) )
 	  END DO
 	  IF(.NOT. COHERENT_ES)THEN
 	    STEQ_T(:)=STEQ_T(:)+FQW(ML)*ESEC(:)*(RJ(:)-RJ_ES(:))
@@ -4902,7 +3978,7 @@ C
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
-	        CALL PRRR_SL_V4(
+	        CALL PRRR_SL_V5(
 	1          ATM(ID)%APRXzV,        ATM(ID)%ARRXzV, 
 	1          ATM(ID)%BFCRXzV,      ATM(ID)%FFXzV,
 	1          ATM(ID)%WSXzV(1,1,J), ATM(ID)%WCRXzV(1,1,J),
@@ -4911,7 +3987,7 @@ C
 	1          ATM(ID+1)%XzV,        ATM(ID+1)%XzVLTE, 
 	1          ATM(ID+1)%NXzV, J,    ATM(ID)%XzV_ION_LEV_ID(J),
 	1          ED,T,JREC,JPHOT,JREC_CR,JPHOT_CR,BPHOT_CR,
-	1          CONT_FREQ,ZERO_REC_COOL_ARRAYS,ND)
+	1          FL,CONT_FREQ,ZERO_REC_COOL_ARRAYS,ND)
 	      END DO
 	    END IF
 !
@@ -5071,9 +4147,9 @@ C (i.e BA(I,J,K,L) with L .NE. DIAG_INDX) are presently updated for
 C every frequency.
 C
 	    IF( .NOT. LAMBDA_ITERATION)THEN
-              CALL BA_UPDATE_V6(VJ,VCHI_ALL,VETA_ALL,
-	1             CHI_CONT,ESEC,T,POPS,RJ,NU(ML),FQW(ML),
-	1             COMPUTE_NEW_CROSS,FINAL_CONSTANT_CROSS,
+              CALL BA_UPDATE_V7(VJ,VCHI_ALL,VETA_ALL,
+	1             ETA_CONT,CHI_CONT,CHI_SCAT,T,POPS,RJ,NU(ML),FQW(ML),
+	1             COMPUTE_NEW_CROSS,FINAL_CONSTANT_CROSS,DO_SRCE_VAR_ONLY,
 	1             BA_CHK_FAC,NION,NT,NUM_BNDS,ND,DST,DEND)
 	    END IF
 C
@@ -5260,6 +4336,16 @@ C
 C
 C NOPS= ND*NUM_BNDS*( 4NT + 2 + 7NUM_SIM )
 C
+!
+! Set up a temporary vector to handle Rayleigh scattering.
+!
+	      TA(1:ND)=0.0D0
+	      IF(ATM(1)%XzV_PRES)THEN
+	        DO L=1,ND
+	          TA(L)=CHI_RAY(L)/ATM(1)%XzV_F(1,L)	          
+	        END DO
+	      END IF
+!
 	      DO K=1,ND
 		T4=ABS(ZNET_SIM(K,SIM_INDX)-1.0D0)
 	          IF(T4 .GT. ZNET_VAR_LIMIT)THEN
@@ -5273,6 +4359,8 @@ C
 	            END DO
 	            dZ_POPS(NT-1,J,K)=dZ_POPS(NT-1,J,K) +
 	1                            ESEC(L)*dZ(5,J,K,SIM_INDX)/ED(L)
+	            dZ_POPS(1,J,K)=dZ_POPS(1,J,K) +
+	1                            TA(L)*dZ(5,J,K,SIM_INDX)
 C
 C Now must do line terms.
 C
@@ -5431,7 +4519,7 @@ C
 C Since ETAEXT is not required any more, it will be used
 C flux.
 C
-	  S1=(ETA(1)+RJ(1)*ESEC(1))/CHI(1)
+	  S1=(ETA(1)+RJ(1)*CHI_SCAT(1))/CHI(1)
 	  CALL MULTVEC(SOURCEEXT,ZETAEXT,THETAEXT,RJEXT,NDEXT)
 	  CALL NORDFLUX(TA,TB,TC,XM,DTAU,REXT,Z,PEXT,
 	1               SOURCEEXT,CHIEXT,dCHIdR,HQWEXT,ETAEXT,
@@ -5465,7 +4553,7 @@ C
 	1           FIRST_OBS_COMP,NP_OBS)
 C
 	ELSE                          
-	  S1=(ETA(1)+RJ(1)*ESEC(1))/CHI(1)
+	  S1=(ETA(1)+RJ(1)*CHI_SCAT(1))/CHI(1)
 	  CALL MULTVEC(SOURCE,ZETA,THETA,RJ,ND)
 	  CALL NORDFLUX(TA,TB,TC,XM,DTAU,R,Z,P,SOURCE,CHI,THETA,HQW,SOB,
 	1               S1,THK_CONT,DIF,DBB,IC,NC,ND,NP,METHOD)
@@ -5602,8 +4690,8 @@ C
 	  DO ID=1,NUM_IONS-1
 	    ID_SAV=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
-	      CALL STEQ_ADVEC_V1(ID_SAV,ATM(ID)%XzV,ATM(ID)%DXzV,ATM(ID)%NXzV,
-	1                          R,V,NUM_BNDS,ND,LAMBDA_ITERATION,COMPUTE_BA)
+	      CALL STEQ_ADVEC_V3(ID_SAV,ATM(ID)%XzV,ATM(ID)%DXzV,ATM(ID)%ADVEC_RR_XzV,ATM(ID)%NXzV,
+	1                 R,V,NUM_BNDS,ND,LAMBDA_ITERATION,COMPUTE_BA,LINEAR_ADV)
 	    END IF
 	  END DO
 	END IF
@@ -5640,9 +4728,9 @@ C
 	      J=0
 	      IF(ID .NE. 1)J=ATM(ID-1)%INDX_XzV
 	      TMP_STRING=TRIM(ION_ID(ID))//'PRRR'
-	      CALL WRRECOMCHK_V2(ATM(ID)%APRXzV, ATM(ID)%ARRXzV,
+	      CALL WRRECOMCHK_V3(ATM(ID)%APRXzV, ATM(ID)%ARRXzV,
 	1          ATM(ID)%CPRXzV, ATM(ID)%CRRXzV,
-	1          ATM(ID)%CHG_PRXzV, ATM(ID)%CHG_RRXzV,
+	1          ATM(ID)%CHG_PRXzV, ATM(ID)%CHG_RRXzV, ATM(ID)%ADVEC_RR_XzV,
 	1          DIERECOM(1,ATM(ID)%INDX_XzV),ADDRECOM(1,ATM(ID)%INDX_XzV),
 	1          X_RECOM(1,J),X_RECOM(1,ATM(ID)%INDX_XzV),
 	1          R,T,ED,ATM(ID)%DXzV,TA,TB, ATM(ID)%NXzV,
@@ -6020,7 +5108,11 @@ C
 C
 C Compute continuum opacity and emissivity at the line frequency.
 C
-	    INCLUDE 'OPACITIES_V4.INC'
+!	    INCLUDE 'OPACITIES_V4.INC'
+	    CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
+	1                FL,CONT_FREQ,FREQ_INDX,NCF,
+	1                SECTION,ND,NT,LST_DEPTH_ONLY)
+
 C
 C Compute continuum intensity.
 C
@@ -6146,7 +5238,7 @@ C by CMFJBAR
 C
 C
 	  DO I=1,ND
-	    ETA(I)=ETA(I)+RJ(I)*ESEC(I)
+	    ETA(I)=ETA(I)+RJ(I)*CHI_SCAT(I)
 	  END DO
 C
 C NB - If COMPUTE_JEW is true, we set JEW to zero. It is then  initialized
@@ -6185,7 +5277,7 @@ C
 	    END DO
 C
 	    CALL TUNE(IONE,'FG_COMP')
-	    CALL FG_COMP(ETA,CHI,ESEC,RJ,
+	    CALL FG_COMP(ETA,CHI,CHI_SCAT,RJ,
 	1                  CHIL,ETAL,V,SIGMA,R,P,
 	1                  JNU,HNU,F_LINE,G_LINE,
 	1                  AQW,HMIDQW,KQW,NMIDQW,
@@ -6199,7 +5291,7 @@ C
 C We use TA for RADEQ, and TB for the FLUX vectors returned by the
 C EW computation.
 C
-	    CALL MOMJBAR(ETA,CHI,ESEC,THETA,RJ,CHIL,ETAL,
+	    CALL MOMJBAR(ETA,CHI,CHI_SCAT,THETA,RJ,CHIL,ETAL,
 	1                  V,SIGMA,R,JBAR,ZNET,
 	1                  JNU,HNU,F_LINE,G_LINE,
 	1                  HBC_LINE,IN_HBC_LINE,NBC_LINE,JBLANK,HBLANK,
@@ -6215,7 +5307,7 @@ C
 	    CALL TUNE(ITWO,'MOMJBAR')
 	  ELSE
 	    CALL TUNE(IONE,'FORMSOL')
-	    CALL FORMSOL(ETA,CHI,ESEC,CHIL,ETAL,V,SIGMA,R,P,
+	    CALL FORMSOL(ETA,CHI,CHI_SCAT,CHIL,ETAL,V,SIGMA,R,P,
 	1                JBAR,ZNET,
 	1                TA,TB,TC,COMPUTE_LAM,
 	1                RJ,JBLANK,HBLANK,JEW,
@@ -6352,7 +5444,7 @@ C We use TA as a temporary vector which indicates the origin
 C of the line emission. Not required in this code as used only
 C for display purposes.
 C
-	    CALL SOBEW(SOURCE,CHI,ESEC,CHIL,ETAL,
+	    CALL SOBEW(SOURCE,CHI,CHI_SCAT,CHIL,ETAL,
 	1              V,SIGMA,R,P,AQW,HQW,TA,EW,CONT_INT,
 	1              FL,DIF,DBB,IC,THK_CONT,L_FALSE,NC,NP,ND,METHOD)
 C
@@ -6954,12 +6046,24 @@ C
 	     FIX_IMPURITY=.FALSE.
 	  END IF
 	END IF
+!
+! Automatically adjust R grid, so that grid is uniformally spaced on the 
+! FLUX optical depth scale. Used for SN models with very sharp ioinization
+! fronts. By doing it before the output to SCRTEMP, we ensure that
+! a continuuing model starts with the revised R grid.
+!
+	IF(REVISE_R_GRID)THEN
+	  R_OLD(1:ND)=R(1:ND)
+	  CALL ESOPAC(ESEC,ED,ND)               !Electron scattering emission factor.
+	  CALL ADJUST_R_GRID_V2(POPS,P,FLUXMEAN,ESEC,
+	1     NEW_RGRID_TYPE,RG_PAR,N_RG_PAR,ND,NT,NC,NP)
+	END IF
 C
 C Write pointer file and output data necessary to begin a new
 C iteration.
 C
-	CALL SCR_RITE(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,RITE_N_TIMES,
-	1                LAST_NG,NT,ND,LUSCR,NEWMOD)
+	CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,RITE_N_TIMES,
+	1                LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
 C 
 C
 C Perform the acceleration. T1 and T2 return the percentage changes
@@ -6973,14 +6077,14 @@ C the next full iteration.
 C  
 	IF(NG_DO .AND. (.NOT. LST_ITERATION) .AND.
 	1       (NEXT_NG .EQ. MAIN_COUNTER) )THEN
-	  CALL DO_NG_BAND_ACCEL_V1(POPS,NT,ND,NG_BAND_WIDTH,NG_DONE,
-	1                  T1,T2,LUSCR,LUER)
+	  CALL DO_NG_BAND_ACCEL_V2(POPS,R,V,SIGMA,R_OLD,
+	1         NT,ND,NG_BAND_WIDTH,NG_DONE,T1,T2,LUSCR,LUER)
 	  IF(NG_DONE)THEN
 	    MAIN_COUNTER=MAIN_COUNTER+1
 	    LAST_NG=MAIN_COUNTER
 	    NEXT_NG=MAIN_COUNTER+ITS_PER_NG
-	    CALL SCR_RITE(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,
-	1                 RITE_N_TIMES,LAST_NG,NT,ND,LUSCR,NEWMOD)
+	    CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,
+	1             RITE_N_TIMES,LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
 	    IF(T1 .GT. 50.0 .AND. T2 .GT. 50.0)THEN
 	      LAMBDA_ITERATION=.TRUE.
 	      CNT_LAM=0
@@ -6995,6 +6099,15 @@ C
 	    WRITE(LUER,*)'Error flag=',I
 	  END IF
 	END IF
+!
+! If we have changed the R grid, we need to recomput the angular quadrature weitghts,
+! and put the atom density ect on the new radius grid.
+!
+	IF(REVISE_R_GRID)THEN
+	  CALL SET_ANG_QW(R,NC,ND,NP,REXT,NCEXT,NDEXT,NPEXT,TRAPFORJ,ACCURATE)
+	  CALL ADJUST_DEN_VECS(R_OLD,ND)
+	END IF
+
 C 
 C
 C Store populations back into individual arrays. At present, program stops
@@ -7274,7 +6387,7 @@ C
 	    WRITE(LU_POP,'(1X,A,T30,I5)')'ND:',ND
 	    WRITE(LU_POP,'(1X,A,T30,I5)')'NC:',NC
 	    WRITE(LU_POP,'(1X,A,T30,I5)')'NP:',NP
-	    WRITE(LU_POP,'(1X,A,T30,I5)')'NCF:',N_OBS
+	    WRITE(LU_POP,'(1X,A,T30,I6)')'NCF:',N_OBS
 C
 	    WRITE(LU_POP,'(1X,A,T30,1P,E12.5)')'Mdot(Msun/yr):',
 	1                                   RMDOT/3.02286D+23

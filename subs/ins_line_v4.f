@@ -217,6 +217,10 @@ C
 	  END IF
 	  I=I+1
 	END DO
+!
+	DO I=1,NCF
+	   WRITE(161,*)I,NU_CONT(I),EDGE_FREQ(I)
+	END DO
 C
 C Find the first line that is to be included as a blanketed line.
 C

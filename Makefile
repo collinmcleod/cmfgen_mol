@@ -9,7 +9,7 @@ include Makefile_definitions
 # libraries and executables.
 #
 all : d_blas d_lpack d_tools d_unix d_subs d_newsubs d_pgplt d_disp\
-         d_spec_plt d_main d_new_main d_obs d_misc
+         d_spec_plt d_new_main d_obs d_misc
 
 # We now MAKE the required libraries and executables.
 
@@ -34,8 +34,6 @@ d_disp:
 	(cd disp; make ) 
 d_spec_plt:
 	(cd spec_plt; make )
-d_main:
-	(cd main; make )
 d_new_main:
 	(cd new_main; make )
 d_obs:
@@ -52,6 +50,6 @@ clean:
 	rm -f lib/*.a
 	rm -f */*.o
 	rm -f */*/*.o
-	rm */*.mod
-	rm */*/*.mod
+	rm -f */*.mod
+	rm -f */*/*.mod
 	rm exe/*.exe

@@ -4,7 +4,10 @@ C
 	USE MOD_USR_OPTION
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
-C
+!
+! Altered 20-Apr-2004 : Use RDHOTGEN_V2 will allows for dynamic smoothing of 
+!                         photoioization cross-sections.
+!
 	INTEGER*4 ND,NP,NC
 	INTEGER*4 N_MAX,ND_MAX,NC_MAX,NP_MAX
 	INTEGER*4 N_LINE_MAX,N_PLT_MAX
@@ -26,6 +29,13 @@ C
 	INTEGER*4 GF_LEV_CUT
 	REAL*8 T1,T2
 	REAL*8 RMDOT,RLUM
+!
+! Variables for reading in photoioization data.
+!
+	REAL*8 SIG_GAU_KMS
+	REAL*8 FRAC_SIG_GAU
+	REAL*8 CUT_ACCURACY
+	LOGICAL ABOVE_EDGE
 !
 	CHARACTER*80 TMP_STRING
 	INTEGER*4 ID,ISPEC
@@ -405,6 +415,13 @@ C
 	XRAYS=.FALSE.
 	T2=0.0D0
 !
+! Default values for reading in photoioization cross-sections.
+!
+	SIG_GAU_KMS=1000.0D0
+	FRAC_SIG_GAU=0.25
+	CUT_ACCURACY=0.02
+	ABOVE_EDGE=.TRUE.
+!
 	WRITE(T_OUT,*)' '
 	DO ID=NUM_IONS,1,-1
 	  IF(ATM(ID)%XzV_PRES)THEN
@@ -419,14 +436,15 @@ C
 	       WRITE(T_OUT,*)'Old oscilator date:',ATM(ID)%XzV_OSCDATE
 	       WRITE(T_OUT,*)'New oscilator date:',ATM(ID)%NEW_XzV_OSCDATE
 	    END IF
-	    CALL RDPHOT_GEN_V1(ATM(ID)%EDGEXzV_F,ATM(ID)%XzVLEVNAME_F,
+	    CALL RDPHOT_GEN_V2(ATM(ID)%EDGEXzV_F,ATM(ID)%XzVLEVNAME_F,
 	1        ATM(ID)%GIONXzV_F,AT_NO(SPECIES_LNK(ID)),
 	1        ATM(ID)%ZXzV,ATM(ID)%NXzV_F,
 	1        ATM(ID)%XzV_ION_LEV_ID,ATM(ID)%N_XzV_PHOT,NPHOT_MAX,
 	1        ATM(ID+1)%XzV_PRES,ATM(ID+1)%EDGEXzV_F,
 	1        ATM(ID+1)%GXzV_F,ATM(ID+1)%F_TO_S_XzV,
-	1        ATM(ID+1)%XzVLEVNAME_F,ATM(ID)%NXzV_F,XRAYS,
-	1        ID,ION_ID(ID),LUIN,LU_TMP)
+	1        ATM(ID+1)%XzVLEVNAME_F,ATM(ID)%NXzV_F,
+	1        SIG_GAU_KMS,FRAC_SIG_GAU,CUT_ACCURACY,ABOVE_EDGE,
+	1        XRAYS,ID,ION_ID(ID),LUIN,LU_TMP)
             IF(ATM(ID+1)%XzV_PRES)ATM(ID)%GIONXzV_F=ATM(ID+1)%GXzV_F(1)
 	    WRITE(T_OUT,*)'Successfully read atomic data for species ',ION_ID(ID)
 	  END IF

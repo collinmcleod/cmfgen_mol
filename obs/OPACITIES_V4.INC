@@ -21,13 +21,25 @@ C
 C Compute continuum intensity incident from the core assuming a TSTAR
 C blackbody.
 C
-	  IC=TWOHCSQ*(CONT_FREQ**3)/(EXP(HDKT*CONT_FREQ/TSTAR)-1.0D0)
+	  T1=EXP(-HDKT*CONT_FREQ/TSTAR)
+	  IC=TWOHCSQ*T1*(CONT_FREQ**3)/(1.0D0-T1)
 C
 C Compute opacity and emissivity. ESOPAC must be call first since
 C CHI is effectively zeroed in that routine.
 C
 	  CALL ESOPAC(ESEC,ED,ND)		!Electron scattering emission factor.
-	  CALL ESOPAC(CHI,ED,ND)		!Electron scattering opacity.
+!
+! Add in Rayleigh scattering contribution. We set the Rayleigh vector to a negligble,
+! but non-zero value, since it can then be interpolated in the LOG plane.
+!
+	  T1=1.0D+06/HUGE(T1)
+          CHI_RAY(1:ND)=T1
+          IF(ATM(1)%XzV_PRES .AND. INCL_RAY_SCAT)THEN
+	    CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
+	1             ATM(1)%NXzV_F,CONT_FREQ,ND)
+	  END IF
+	  CHI_SCAT(1:ND)=ESEC(1:ND)+CHI_RAY(1:ND)
+	  CHI(1:ND)=CHI_SCAT(1:ND)
 C
 C Free-free and bound-free opacities.
 C
@@ -154,10 +166,11 @@ C The continuum source function is defined by:
 C                                              S= ZETA + THETA.J
 	DO I=1,ND
 	  ZETA(I)=ETA(I)/CHI(I)
-	  THETA(I)=ESEC(I)/CHI(I)
+	  THETA(I)=CHI_SCAT(I)/CHI(I)
 	END DO
 C
 C Store TOTAL continuum line emissivity and opacity.
 C
 	ETA_CONT(:)=ETA(:)
 	CHI_CONT(:)=CHI(:)
+!

@@ -13,6 +13,8 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered: 03-May-2004 : Options are now read into store in CMF_FLUX.
+!                          STORE cleaned after use.
 ! Altered: 05-Jun-2002 : Min bug fix: Changed value of VDOP passed to
 !                          DET_MAIN_CONT_FREQ. Reduces number of continuum frequencies.
 ! Altered: 16-Aug-2002 : Bug fix, NU_OBS_MAX was not always chosen correctly.
@@ -120,7 +122,7 @@ C
 	INTEGER*4 MNL,MNUP
 	INTEGER*4 MNL_F,MNUP_F
 	INTEGER*4 I,J,K,L,ML,LS,IOS,LINE_INDX
-	INTEGER*4 ID,ISPEC
+	INTEGER*4 ID,ID_SAV,ISPEC
 	INTEGER*4 ES_COUNTER
 	INTEGER*4 NUM_ES_ITERATIONS
 C
@@ -291,6 +293,8 @@ C
 C
 C Opacity/emissivity
 	REAL*8 CHI(ND)			!Continuum opacity (all sources)
+	REAL*8 CHI_RAY(ND)
+	REAL*8 CHI_SCAT(ND)
 	REAL*8 ETA(ND)			!Continuum emissivity (all sources)
 	REAL*8 CHIL(ND)			!Line opacity (without prof.)
 	REAL*8 ETAL(ND)			!Line emissivity (without prof.)
@@ -310,6 +314,8 @@ C
 C These parameters are used when computing J and the variation of J.
 C
 	LOGICAL DO_CLUMP_MODEL
+	REAL*8 CHI_SCAT_CLUMP(ND)
+	REAL*8 CHI_RAY_CLUMP(ND)
 	REAL*8 CHI_CLUMP(ND)		!==CHI(I)*CLUMP_FAC(I)
 	REAL*8 ETA_CLUMP(ND)		!==ETA(I)*CLUMP_FAC(I)
 	REAL*8 ESEC_CLUMP(ND)		!==ESEC(I)*CLUMP_FAC(I)
@@ -387,6 +393,7 @@ C
 	LOGICAL DIF
 	LOGICAL MID
 	LOGICAL INCL_TWO_PHOT
+	LOGICAL INCL_RAY_SCAT
 	LOGICAL CHECK_LINE_OPAC
 	LOGICAL FIRST
 	LOGICAL THK_CONT
@@ -440,8 +447,8 @@ C
 ! These are used to insert extra points alonga  ray, and provide additional
 ! freedom to using the ACCURATE option.
 !
-	REAL*8 DELV_FG
-	REAL*8 DELV_MOM
+	REAL*8 DELV_FRAC_FG
+	REAL*8 DELV_FRAC_MOM
 C
 C ND-DEEP to DEEP we use a quadratic interpolation scheme so as to try
 C and preserve "FLUX" in the diffusion approximation.
@@ -456,10 +463,11 @@ C
 	REAL*8 REXT(NDMAX),PEXT(NPMAX),VEXT(NDMAX)
 	REAL*8 TEXT(NDMAX),SIGMAEXT(NDMAX)
 	REAL*8 CHIEXT(NDMAX),ESECEXT(NDMAX),ETAEXT(NDMAX)
+	REAL*8 CHI_RAY_EXT(NDMAX),CHI_SCAT_EXT(NDMAX)
 	REAL*8 ZETAEXT(NDMAX),THETAEXT(NDMAX)
 	REAL*8 RJEXT(NDMAX),RJEXT_ES(NDMAX)
 	REAL*8 FOLD(NDMAX),FEXT(NDMAX),QEXT(NDMAX),SOURCEEXT(NDMAX)
-	REAL*8 VDOP_VECEXT(NDMAX)
+	REAL*8 VDOP_VEC_EXT(NDMAX)
 C
 C
 	REAL*8 F2DAEXT(NDMAX,NDMAX)     !These arrays don't need to be
@@ -650,17 +658,11 @@ C
 	  IF(ATM(ID)%XzV_PRES)AMASS_ALL(ATM(ID)%EQXzV:ATM(ID)%EQXzV+ATM(ID)%NXzV)=
 	1              AT_MASS(SPECIES_LNK(ID))
 	END DO
-C
-C
-	CALL GEN_ASCI_OPEN(LUIN,'CMF_FLUX_PARAM','OLD',' ','READ',IZERO,IOS)
-	IF(IOS .NE. 0)THEN
-	  WRITE(LUER,*)'Error opening CMF_FLUX_PARAM in CMFGEN, IOS=',IOS
-	  STOP
-	END IF
-	CALL GEN_ASCI_OPEN(LUMOD,'OUT_PARAMS','UNKNOWN',' ','WRITE',IZERO,IOS)
-	CALL RD_OPTIONS_INTO_STORE(LUIN,LUMOD)
-C 
-C
+!
+!
+! All options are now read into store in CMF_FLUX, as some options are needed in that
+! routine.
+!
 	  CALL RD_STORE_DBLE(MIN_CONT_FREQ,'MIN_CF',L_TRUE,
 	1            'Minimum continuum frequency if calculating NU')
 	  CALL RD_STORE_DBLE(MAX_CONT_FREQ,'MAX_CF',L_TRUE,
@@ -819,6 +821,8 @@ C
 C
 	  CALL RD_STORE_LOG(INCL_TWO_PHOT,'INC_TWO',L_TRUE,
 	1           'Include two photon transitions?')
+	  CALL RD_STORE_LOG(INCL_RAY_SCAT,'INC_RAY',L_TRUE,
+	1           'Include Rayeligh scattering?')
 	  CALL RD_STORE_LOG(XRAYS,'INC_XRAYS',L_TRUE,
 	1           'Include X-ray emission')
 	  CALL RD_STORE_DBLE(FILL_FAC_XRAYS,'FIL_FAC',L_TRUE,
@@ -910,9 +914,9 @@ C
 	1         'Quadratic interpolation from ND-? to ND')
 	  CALL RD_STORE_NCHAR(INTERP_TYPE,'INTERP_TYPE',10,L_TRUE,
 	1         'Perform interpolations in LOG or LIN plane')
-	  CALL RD_STORE_DBLE(DELV_FG,'DELV_FG',L_TRUE,
+	  CALL RD_STORE_DBLE(DELV_FRAC_FG,'DELV_FG',L_TRUE,
 	1         'Maximum velocity separation (Doppler widths) for FG_J_CMF')
-	  CALL RD_STORE_DBLE(DELV_MOM,'DELV_MOM',L_TRUE,
+	  CALL RD_STORE_DBLE(DELV_FRAC_MOM,'DELV_MOM',L_TRUE,
 	1         'Maximum velocity separation (Doppler widths) for MOM_J_CMF')
 C
 C Next two variables apply for both ACCURATE and EDDINGTON.
@@ -929,8 +933,10 @@ C
 	1      'Factor to scale abundance by')
 	  END DO
 !
-C
-	CLOSE(UNIT=7)
+! Memory and options in STORE are no longer required.
+!
+	  CALL CLEAN_RD_STORE
+!
 C 
 !
 ! Scale abunances of species if desired. This should only be done for exploratory
@@ -1381,7 +1387,7 @@ C
 ! For the later, the iron mass of 55.8amu is assumed.
 !
 	  TA(1:NDEXT)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*VEXT(1:NDEXT)/VEXT(1)
-	  VDOP_VECEXT(1:NDEXT)=SQRT( TA(1:NDEXT)**2 + 2.96*TEXT(1:NDEXT) )
+	  VDOP_VEC_EXT(1:NDEXT)=SQRT( TA(1:NDEXT)**2 + 2.96*TEXT(1:NDEXT) )
 C
 C Note that the F2DAEXT vectors (here used as dummy variables) must be at least
 C NPEXT long.
@@ -1464,7 +1470,8 @@ C
 C Set 2-photon data with current atomic models and populations.
 C
 	DO ID=1,NUM_IONS
-	  CALL SET_TWO_PHOT(TRIM(ION_ID(ID)), 
+	  ID_SAV=ID
+	  CALL SET_TWO_PHOT_V2(TRIM(ION_ID(ID)),ID_SAV,
 	1       ATM(ID)%XzVLTE,   ATM(ID)%NXzV,
 	1       ATM(ID)%XzVLTE_F, ATM(ID)%XzVLEVNAME_F, ATM(ID)%EDGEXzV_F,
 	1       ATM(ID)%GXzV_F,   ATM(ID)%F_TO_S_XzV,   ATM(ID)%NXzV_F, ND,
@@ -1912,7 +1919,7 @@ C
 C
 	  DO I=1,ND
 	    ZETA(I)=ETA(I)/CHI(I)
-	    THETA(I)=ESEC(I)/CHI(I)
+	    THETA(I)=CHI_SCAT(I)/CHI(I)
 	  END DO
 C
 	  IF(LST_ITERATION .AND. ML .NE. NCF)THEN
@@ -1953,7 +1960,7 @@ C
 C Since ETAEXT is not required any more, it will be used
 C flux.
 C
-	  S1=(ETA(1)+RJ(1)*ESEC(1))/CHI(1)
+	  S1=(ETA(1)+RJ(1)*CHI_SCAT(1))/CHI(1)
 	  CALL MULTVEC(SOURCEEXT,ZETAEXT,THETAEXT,RJEXT,NDEXT)
 	  CALL NORDFLUX(TA,TB,TC,XM,DTAU,REXT,Z,PEXT,
 	1               SOURCEEXT,CHIEXT,dCHIdR,HQWEXT,ETAEXT,
@@ -2004,7 +2011,7 @@ C
 	1           FIRST_OBS_COMP,NP_OBS)
 C
 	ELSE                          
-	  S1=(ETA(1)+RJ(1)*ESEC(1))/CHI(1)
+	  S1=(ETA(1)+RJ(1)*CHI_SCAT(1))/CHI(1)
 	  CALL MULTVEC(SOURCE,ZETA,THETA,RJ,ND)
 	  CALL NORDFLUX(TA,TB,TC,XM,DTAU,R,Z,P,SOURCE,CHI,THETA,HQW,SOB,
 	1               S1,THK_CONT,DIF,DBB,IC,NC,ND,NP,METHOD)
@@ -2070,9 +2077,13 @@ C
 	END DO
 !
 ! Store opacities and emissivities for use in observer's frame 
-! calculation.
+! calculation. Rayleigh scattering is assumed to be coherent.
 !
-	ETA_CMF_ST(1:ND,ML)=ETA(1:ND)
+	IF(INCL_RAY_SCAT)THEN
+	  ETA_CMF_ST(1:ND,ML)=ETA(1:ND)+CHI_RAY(1:ND)*RJ(1:ND)
+	ELSE
+	  ETA_CMF_ST(1:ND,ML)=ETA(1:ND)
+	END IF
 	CHI_CMF_ST(1:ND,ML)=CHI(1:ND)
 	RJ_CMF_ST(1:ND,ML)=RJ(1:ND)
 !
@@ -2532,6 +2543,7 @@ C
 	CHI_CLUMP(1:ND)=CHI(1:ND)*CLUMP_FAC(1:ND)
 	ETA_CLUMP(1:ND)=ETA(1:ND)*CLUMP_FAC(1:ND)
 	ESEC_CLUMP(1:ND)=ESEC(1:ND)*CLUMP_FAC(1:ND)
+	CHI_SCAT_CLUMP(1:ND)=CHI_SCAT(1:ND)*CLUMP_FAC(1:ND)
 !
 	CHIL(1:ND)=CHIL(1:ND)*CLUMP_FAC(1:ND)
 	ETAL(1:ND)=ETAL(1:ND)*CLUMP_FAC(1:ND)
@@ -2555,7 +2567,7 @@ C
 ! of the line emission. Not required in this code as used only
 ! for display purposes.
 !
-	CALL SOBEW_GRAD(SOURCE,CHI_CLUMP,ESEC_CLUMP,CHIL,ETAL,
+	CALL SOBEW_GRAD(SOURCE,CHI_CLUMP,CHI_SCAT_CLUMP,CHIL,ETAL,
 	1              V,SIGMA,R,P,FORCE_MULT,STARS_LUM,AQW,HQW,TA,EW,CONT_INT,
 	1              FL,DIF,DBB,IC,THK_CONT,L_FALSE,NC,NP,ND,METHOD)
 !

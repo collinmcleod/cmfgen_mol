@@ -3,6 +3,7 @@ include ../Makefile_definitions
 # Library where object files will/are stored
 
 LIB=$(LIB_DIR)libsubs.a
+LIB_MOD=$(LIB_DIR)libmod.a
 
 #
 # Entries for library
@@ -58,7 +59,6 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(gen_omega_rd_v2.o)\
       $(LIB)(genaccel.o)\
       $(LIB)(genangqw.o)\
-      $(LIB)(genopaeta_v6.o)\
       $(LIB)(genosc_v5.o)\
       $(LIB)(genosc_v6.o)\
       $(LIB)(getelec_v2.o)\
@@ -102,7 +102,6 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(marupv.o)\
       $(LIB)(mat5pen.o)\
       $(LIB)(mess.o)\
-      $(LIB)(mod_lev_dis_blk.o)\
       $(LIB)(mod_trap_derivatives.o)\
       $(LIB)(modifyba.o)\
       $(LIB)(mom_j_cmf_v5.o)\
@@ -132,10 +131,9 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(pertjfeau_ibc.o)\
       $(LIB)(phys_con.o)\
       $(LIB)(poptoion.o)\
-      $(LIB)(prrr_sl_v4.o)\
+      $(LIB)(prrr_sl_v5.o)\
       $(LIB)(qfromf.o)\
       $(LIB)(qkim.o)\
-      $(LIB)(quad_multi_v5.o)\
       $(LIB)(quad_x_gen_v4.o)\
       $(LIB)(quad_x_lit_v3.o)\
       $(LIB)(rd_f_to_s_ids.o)\
@@ -157,9 +155,10 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(same_n.o)\
       $(LIB)(scale_grey.o)\
       $(LIB)(scale_pops.o)\
-      $(LIB)(scr_read.o)\
+      $(LIB)(scr_read_v2.o)\
       $(LIB)(set_case.o)\
       $(LIB)(set_cont_freq.o)\
+      $(LIB)(set_cont_freq_v3.o)\
       $(LIB)(set_edge_freq_v2.o)\
       $(LIB)(set_x_freq.o)\
       $(LIB)(set_gm_all.o)\
@@ -227,8 +226,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(write_direct_info_v3.o)\
       $(LIB)(writv.o)\
       $(LIB)(writv_v2.o)\
-      $(LIB)(wrrecomchk.o)\
-      $(LIB)(wrrecomchk_v2.o)\
+      $(LIB)(wrrecomchk_v3.o)\
       $(LIB)(x02ajf.o)\
       $(LIB)(x_rrr_cool_v5.o)\
       $(LIB)(xcross.o)\
@@ -236,7 +234,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(zalongp.o)\
       $(LIB)(zero.o)
 
-all : $(LIB) TWO CHG UNIX
+all : $(LIB) UNIX
 	cp -f $(INSTALL_DIR)perm_mod_file jnk.mod
 	mv -f *.mod $(MOD_DIR)
 	rm -f *.o
@@ -252,24 +250,23 @@ $(LIB)(%.o) : %.f
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)
 #
+DIS=$(LIB_MOD)(mod_lev_dis_blk.o)
 
 $(LIB)(baion_update.o) : baion_update.f $(LIB)(ba_update_v4.o) 
 	$(F90) -c $(FG) baion_update.f
 	ar ruv $(LIB) baion_update.o
+
 $(LIB)(dspheredchi.o) : dspheredchi.f $(LIB)(mod_trap_derivatives.o) 
 	$(F90) -c $(FG) dspheredchi.f
 	ar ruv $(LIB) dspheredchi.o
-$(LIB)(genopaeta_v6.o) : genopaeta_v6.f $(LIB)(mod_lev_dis_blk.o) 
-	$(F90) -c $(FG) genopaeta_v6.f
-	ar ruv $(LIB) genopaeta_v6.o
-$(LIB)(occupation_prob.o) : occupation_prob.f $(LIB)(mod_lev_dis_blk.o) 
+
+$(LIB)(occupation_prob.o) : occupation_prob.f $(DIS)
 	$(F90) -c $(FG) occupation_prob.f
 	ar ruv $(LIB) occupation_prob.o
 
-TWO: 
-	(cd two; make)
-CHG: 
-	(cd chg; make)
+$(DIS):
+	(cd ../new_main/mod_subs ; make)
+
 UNIX: 
 	(cd ../unix; make)
 

@@ -29,7 +29,7 @@
 	        I=ND
 	        T2=0.0D0			!Temporary CHI
 	        T3=0.0D0			!Temporary ETA
-	        T4=ATM(ID+1)%XzVLTE_F(1,I)/ATM(ID+1)%XzV_F(1,I)*EMHNUKT(I)
+	        T4=ATM(ID+1)%XzVLTE_F(1,I)/ATM(ID+1)%XzV_F(1,I)*EMHNUKT_CONT(I)
 	        DO J=1,ATM(ID)%NXzV_F
 		  T2=T2+ATM(ID)%XzV_F(J,I)
 	          T3=T3+ATM(ID)%XzVLTE_F(J,I)
@@ -48,7 +48,7 @@
 	        DO I=1,ND
 	          T2=0.0D0			!Temporary CHI
 	          T3=0.0D0			!Temporary ETA
-	          T4=ATM(ID+1)%XzVLTE_F(1,I)/ATM(ID+1)%XzV_F(1,I)*EMHNUKT(I)
+	          T4=ATM(ID+1)%XzVLTE_F(1,I)/ATM(ID+1)%XzV_F(1,I)*EMHNUKT_CONT(I)
 	          DO J=1,ATM(ID)%NXzV_F
 		    T2=T2+ATM(ID)%XzV_F(J,I)
 	            T3=T3+ATM(ID)%XzVLTE_F(J,I)

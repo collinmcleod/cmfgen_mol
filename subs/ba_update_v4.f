@@ -1,4 +1,4 @@
-	MODULE BA_J_DATA_MOD
+	MODULE BA_J_DATA_MOD_V4
 	IMPLICIT NONE
 C
 C Module which contains dJdN integrated over a small frequency band over
@@ -14,7 +14,7 @@ C
 	REAL*8, ALLOCATABLE :: VJ_T(:,:,:)
 	REAL*8, ALLOCATABLE :: RJ_SUM(:)
 C
-	END MODULE BA_J_DATA_MOD
+	END MODULE BA_J_DATA_MOD_V4
 C
 C Subroutine to increment the variation matrix BA due to the variation of J.
 C
@@ -34,7 +34,7 @@ C
 	1              CHI_CONT,ESEC,T,POPS,RJ,
 	1              NU,FQW,NEW_CONT,FINAL_FREQ,
 	1              dJ_CHK_FAC,NT,NUM_BNDS,ND,DST,DEND)
-	USE BA_J_DATA_MOD
+	USE BA_J_DATA_MOD_V4
 	IMPLICIT NONE
 C
 C Altered: 17-Sep-1997 :: QFV_R and QFV_P installed so that BA is not updated

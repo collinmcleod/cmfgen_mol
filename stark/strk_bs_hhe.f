@@ -101,7 +101,12 @@ C
           ED_WGT = (ELOG-STKTA_ES(ED_INDX))/
 	1                 (STKTA_ES(ED_INDX+1)-STKTA_ES(ED_INDX))
 !                           
-! Obtain the interpolated profile.
+! Obtain the interpolated profile. NB: The porifles aren't tabulated
+! on a fine enough grid. Thus interpolated profiles can be inaccurate.
+! As a result of the inaccuracy, profiles need to be normalized, by
+! up to a factor of 1.2
+!
+! Test value: T=3.1, Log Ne=13.3 (obviously not table value)
 !
 	  L0 = STKTA_NWS* (T_INDX-1+STKTA_NTS*(ED_INDX-1))
 	  L1 = STKTA_NWS* (T_INDX+STKTA_NTS*(ED_INDX-1))

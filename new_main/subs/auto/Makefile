@@ -5,6 +5,7 @@ include ../../../Makefile_definitions
 # Library where object files will/are stored
 
 LIB=$(LIB_DIR)libdev.a
+LIB_MOD=$(LIB_DIR)libmod.a
 
 #
 # Entries for library
@@ -25,14 +26,14 @@ $(LIB)(%.o) : %.f
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)
 
-UP = $(LIB)(steq_data_mod.o)
+ST = $(LIB_MOD)(steq_data_mod.o)
 
-$(LIB)(steq_auto_v2.o) : steq_auto_v2.f  $(UP) 
-	$(F90) -c $(FG) -I.. steq_auto_v2.f
+$(LIB)(steq_auto_v2.o) : steq_auto_v2.f  $(ST)
+	$(F90) -c $(FG) steq_auto_v2.f
 	ar ruv $(LIB) steq_auto_v2.o
 
-$(UP):
-	(cd .. ; make mod)
+$(ST):
+	(cd ../mod_subs ; make)
 
 clean :
 	rm -f *.o 

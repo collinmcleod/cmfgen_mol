@@ -58,6 +58,7 @@ C
 	CHI_CLUMP(1:ND)=CHI(1:ND)*CLUMP_FAC(1:ND)
 	ETA_CLUMP(1:ND)=ETA(1:ND)*CLUMP_FAC(1:ND)
 	ESEC_CLUMP(1:ND)=ESEC(1:ND)*CLUMP_FAC(1:ND)
+	CHI_SCAT_CLUMP(1:ND)=CHI_SCAT(1:ND)*CLUMP_FAC(1:ND)
 C
 C 
 C                            
@@ -69,7 +70,7 @@ C grid points.
 C
 	  CALL TUNE(IONE,'JFEAUEXT')
 	  CALL EXTEND3OPAC(CHIEXT,ETAEXT,ESECEXT,COEF,INDX,
-	1                      NDEXT,CHI_CLUMP,ETA_CLUMP,ESEC_CLUMP,ND)
+	1                      NDEXT,CHI_CLUMP,ETA_CLUMP,CHI_SCAT_CLUMP,ND)
 C
 	  DO I=1,NDEXT
 	    ZETAEXT(I)=ETAEXT(I)/CHIEXT(I)
@@ -154,16 +155,14 @@ C
 C 
 C
 	ELSE IF(CONT_VEL .AND. ACCURATE)THEN
-	  CALL TUNE(IONE,'JCONT_ACC')
 C
 C Interpolate the opacity and emissivity using a LINEAR interpolation
 C law. CHIEXT etc. will contain the opacities etc. on the transfer grid
 C with the clumping corrections. CHI_CLUMP etc refer to the appropriate
 C quantities on the population grid.
 C
-	  CALL TUNE(IONE,'JCONT_ACC')
 	  CALL EXTEND3OPAC(CHIEXT,ETAEXT,ESECEXT,COEF,INDX,NDEXT,
-	1              CHI_CLUMP,ETA_CLUMP,ESEC_CLUMP,ND)
+	1              CHI_CLUMP,ETA_CLUMP,CHI_SCAT_CLUMP,ND)
 C
 C NB: CHI_PREV is used to refer to the continuum opacity at the previous
 C frequency. Is does not need to be multiplied by CLUMP_FAC, as it is 
@@ -248,7 +247,7 @@ C
 C
 C NB Using TA for ETA, TC for JNU_VEC, and TB for HNU_VEC
 C
-	     CALL TUNE(IONE,'FG_J_CMF')
+	     CALL TUNE(IONE,'FG_J_CMF_ACC')
 	     CALL FG_J_CMF_V10(TA,CHIEXT,ESECEXT,
 	1            VEXT,SIGMAEXT,REXT,PEXT,
 	1            TC,TB,FEDD,GEDD,N_ON_J,
@@ -259,7 +258,7 @@ C
 	1            METHOD,FG_SOL_OPTIONS,THK_CONT,
 	1            FIRST_FREQ,NEW_FREQ,N_TYPE,
 	1            NCEXT,NPEXT,NDEXT)
-	     CALL TUNE(ITWO,'FG_J_CMF')
+	     CALL TUNE(ITWO,'FG_J_CMF_ACC')
 	     FG_COUNT=FG_COUNT+1
 C
 	     IF(COHERENT_ES)THEN
@@ -268,7 +267,7 @@ C
 	       TA(1:NDEXT)=ETAEXT(1:NDEXT) +
 	1            ESECEXT(1:NDEXT)*RJEXT_ES(1:NDEXT)
 	     END IF
-	     CALL TUNE(IONE,'MOM_J_CMF')
+	     CALL TUNE(IONE,'MOM_J_CMF_ACC')
 	     CALL MOM_J_CMF_V6(TA,CHIEXT,ESECEXT,
 	1              VEXT,SIGMAEXT,REXT,
 	1  	       FEDD,GEDD,N_ON_J,RJEXT,RSQHNU,
@@ -278,7 +277,7 @@ C
 	1              N_TYPE,METHOD,COHERENT_ES,
 	1              FIRST_FREQ,NEW_FREQ,
 	1              NCEXT,NPEXT,NDEXT)
-	     CALL TUNE(ITWO,'MOM_J_CMF')
+	     CALL TUNE(ITWO,'MOM_J_CMF_ACC')
 C
 C We set NEW_FREQ to false so that FG_J_CMF continues to use the same
 C AV_PREV and CV_PREV. NEW_FREQ must be set to true again outside the
@@ -487,15 +486,15 @@ C
 	  DO WHILE(INACCURATE)
 C
 	     IF(COHERENT_ES)THEN
-	       TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ(1:ND)
+	       TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ(1:ND)
 	     ELSE
-	       TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ_ES(1:ND)
+	       TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ_ES(1:ND)
 	     END IF
 C
 C NB Using TA for ETA, TC for JNU_VEC, and TB for HNU_VEC
 C
 	     CALL TUNE(IONE,'FG_J_CMF')
-	     CALL FG_J_CMF_V10(TA,CHI_CLUMP,ESEC_CLUMP,V,SIGMA,R,P,
+	     CALL FG_J_CMF_V10(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
 	1                  TC,TB,FEDD,GEDD,N_ON_J,
 	1                  AQW,HMIDQW,KQW,NMIDQW,
 	1                  INBC,HBC_CMF,NBC_CMF,
@@ -509,10 +508,10 @@ C
 	     IF(COHERENT_ES)THEN
 	       TA(1:ND)=ETA_CLUMP(1:ND)
 	     ELSE
-	       TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ_ES(1:ND)
+	       TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ_ES(1:ND)
 	     END IF
 	     CALL TUNE(IONE,'MOM_J_CMF')
-	     CALL MOM_J_CMF_V6(TA,CHI_CLUMP,ESEC_CLUMP,V,SIGMA,R,
+	     CALL MOM_J_CMF_V6(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
 	1  	       FEDD,GEDD,N_ON_J,RJ,RSQHNU,
 	1              VDOP_VEC,DELV_FRAC_MOM,
 	1              HBC_CMF,INBC,NBC_CMF,
@@ -578,15 +577,15 @@ C
 	    IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
 	1         MAXCH .LT. VAL_DO_NG) )THEN
 	      IF(COHERENT_ES)THEN
-     	        TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ(1:ND)
+     	        TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ(1:ND)
 	      ELSE
-     	        TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ_ES(1:ND)
+     	        TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ_ES(1:ND)
 	      END IF
 C                             
 C NB Using TA for ETA, U for P_OBS (temporay measure), I for NP_OBS.
 C
 	      CALL TUNE(IONE,'CMF_FORM_SOL')
-	      CALL CMF_FORM_SOL_V2(TA,CHI_CLUMP,ESEC_CLUMP,
+	      CALL CMF_FORM_SOL_V2(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
 	1                 DENSITY,V,SIGMA,R,P,
 	1                 P_OBS,IPLUS,NP_OBS,NP_OBS_MAX,
 	1                 MU_AT_RMAX,HQW_AT_RMAX,RMAX_OBS,V_AT_RMAX,

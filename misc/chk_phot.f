@@ -75,7 +75,14 @@
 	LOGICAL DO_DIE
 	LOGICAL DO_DIE_REG
 	LOGICAL DO_DIE_WI
-        REAL*8  VSM_DIE_KMS
+!
+! Used for dynamic smoothing of th ephotoioization cross-sections.
+!
+	REAL*8 VSM_DIE_KMS
+	REAL*8 SIG_GAU_KMS
+	REAL*8 FRAC_SIG_GAU
+	REAL*8 CUT_ACCURACY
+	LOGICAL ABOVE_EDGE
 !
 	CHARACTER*30 LS_NAME(N_MAX)	!Term (LS) designation
 	CHARACTER*1 LEV_ANG(N_MAX)	!Total angular momentum
@@ -168,23 +175,23 @@
 	TEMP(3)=4.0D0
 	TEMP(4)=8.0D0
 !
-	WRITE(T_OUT,' ')
+	WRITE(T_OUT,'()')
 	WRITE(T_OUT,'(70A)')('*',I=1,70)
-	WRITE(T_OUT,' ')
+	WRITE(T_OUT,'()')
 	WRITE(T_OUT,'(A)')' To run the code the photoionization files must be called:' 
 	WRITE(T_OUT,'(A)')'         PHOTCIV_A,'
 	WRITE(T_OUT,'(A)')'         PHOTCIV_B, etc'
 	WRITE(T_OUT,'(A)')' This can be done using soft links to the actual files'
 	WRITE(T_OUT,'(A)')' The names of the oscillator and dielectronic files are prompted for'
-	WRITE(T_OUT,' ')
+	WRITE(T_OUT,'()')
 	WRITE(T_OUT,'(A)')' The following diagnostic file are output:'
 	WRITE(T_OUT,'(A)')'         ERROR_CHK_FOR_XzV,'
 	WRITE(T_OUT,'(A)')'         RECOM_CHK_FOR_XzV,'
 	WRITE(T_OUT,'(A)')'         NAME_CHK_FOR_XzV,'
 	WRITE(T_OUT,'(A)')'         PACK_CHK_FOR_XzV,'
-	WRITE(T_OUT,' ')
+	WRITE(T_OUT,'()')
 	WRITE(T_OUT,'(70A)')('*',I=1,70)
-	WRITE(T_OUT,' ')
+	WRITE(T_OUT,'()')
 !
 	ION_ID=' '
 	CALL GEN_IN(ION_ID,'Ionization identification (e.g., CIV)')
@@ -325,9 +332,9 @@
 	END DO
 !
 	FILENAME='NAME_CHK_FOR_'//TRIM(ION_ID)
-	OPEN(UNIT=30,STATUS='UNKNOWN',NAME=FILENAME)
-	WRITE(30,' ')
-	WRITE(30,' ')
+	OPEN(UNIT=30,STATUS='UNKNOWN',FILE=FILENAME)
+	WRITE(30,'()')
+	WRITE(30,'()')
 	WRITE(30,'(A)')' Summary file with information on oscillator strength and Einstein A values.'
 	WRITE(30,'(A)')'   FL_SUM is the sum of f from lower state to the given state.'
 	WRITE(30,'(A)')'   AL_SUM is the sum of the decay rates from the given state.'
@@ -336,7 +343,7 @@
 	WRITE(30,'(A)')' These sums may be weighted by the statistical weights.'
 	USE_G_WEIGHTING=.FALSE.
 	CALL GEN_IN(USE_G_WEIGHTING,'Weight f,A sums by g?')
-	WRITE(30,' ')
+	WRITE(30,'()')
 	IF(USE_G_WEIGHTING)THEN
 	  WRITE(30,'(30X,3(X,A),8X,A,3X,4(3X,A,4X))')
 	1           'S','L','P','G','GFL_SUM','GFH_SUM','GAL_SUM','GAH_SUM'
@@ -344,7 +351,7 @@
 	  WRITE(30,'(30X,3(X,A),8X,A,3X,4(4X,A,4X))')
 	1           'S','L','P','G','FL_SUM','FH_SUM','AL_SUM','AH_SUM'
 	END IF
-	WRITE(30,' ')
+	WRITE(30,'()')
 !
 	ALLOCATE (FLOW_SUM(NLEV))
 	ALLOCATE (ALOW_SUM(NLEV))
@@ -497,10 +504,21 @@
 	  STOP
 	END IF
 !
-	CALL RDPHOT_GEN_V1(FEDGE,NAME,GION,AT_NO,ZION,NLEV,
+	SIG_GAU_KMS=3000.0D0
+	CALL GEN_IN(SIG_GAU_KMS,'Sigma of Gaussian used to smooth photoionization data')
+	FRAC_SIG_GAU=0.25D0
+	CALL GEN_IN(FRAC_SIG_GAU,'Fractional spacing across smoothing Gaussian')
+	CUT_ACCURACY=0.02
+	CALL GEN_IN(CUT_ACCURACY,'Accuracy to retain data when omitting data points to save space')
+	ABOVE_EDGE=.TRUE.
+	CALL GEN_IN(ABOVE_EDGE,'Use only data above edge when smoothing')
+!
+	CALL RDPHOT_GEN_V2(FEDGE,NAME,GION,AT_NO,ZION,NLEV,
 	1          XzV_LEV_ID,N_PHOT,N_PHOT_MAX,
 	1          L_FALSE,EDGEXzSIX,GXzSIX,F_TO_S_XzSIX,
-	1          XzSIX_LEV_NAME,NXzSIX,XRAYS,ID,ION_ID,LUIN,LUOUT)
+	1          XzSIX_LEV_NAME,NXzSIX,
+	1          SIG_GAU_KMS,FRAC_SIG_GAU,CUT_ACCURACY,ABOVE_EDGE,
+	1          XRAYS,ID,ION_ID,LUIN,LUOUT)
 	WRITE(T_OUT,*)'Successfully read in the photoionization data'
 !
 ! DO you want to print out the different photoionization routes separately?
@@ -537,7 +555,7 @@
 	END IF
 !
 	FILENAME='RECOM_CHK_FOR_'//TRIM(ION_ID)
-	OPEN(UNIT=45,STATUS='UNKNOWN',NAME=FILENAME)
+	OPEN(UNIT=45,STATUS='UNKNOWN',FILE=FILENAME)
 	WRITE(45,'()')
 	WRITE(45,'(A,A)')' Recombination rates for ',TRIM(ION_ID)
 	WRITE(45,'()')
