@@ -38,6 +38,7 @@
 	INTEGER*4 EQION
 !
 	REAL*8 T1,T2
+	REAL*8 DERIV_FAC
 	REAL*8 DERIV_CONST
 	REAL*8 LOG_DERIV
 !
@@ -53,12 +54,19 @@
 !
 ! NB: The factor of 1.0D-05 arises from V/R.
 !
+	WRITE(6,*)'**************************'
+	WRITE(6,*)'**************************'
+	WRITE(6,*)'WARNNG IN STEQ_ADVEC_V3 --- reduced advection TERMS'
+	WRITE(6,*)'**************************'
+	WRITE(6,*)'**************************'
+	DERIV_FAC=1.0D-05                         !Should be 1.0D-05
+!
 	IF(LINEAR)THEN
 	  DO K=1,ND
 	    ADVEC_RR(K)=0.0D0
 	    KP1=K+1
 	    IF(K .EQ. ND)KP1=ND-1
-	    DERIV_CONST=1.0D-05/R(K)/R(K)/(R(K)-R(KP1))
+	    DERIV_CONST=DERIV_FAC/R(K)/R(K)/(R(K)-R(KP1))
 	    DO I=1,N_S			!Which S.E. equationa
 	      T1=R(K)*R(K)*VEL(K)*HN_S(I,K)
 	      T2=R(KP1)*R(KP1)*VEL(KP1)*HN_S(I,KP1)
@@ -79,7 +87,7 @@
 	        MP1=M-1
 	      END IF
 !
-	      DERIV_CONST=1.0D-05/(R(K)-R(KP1))
+	      DERIV_CONST=DERIV_FAC/(R(K)-R(KP1))
 	      T1= DERIV_CONST*VEL(K)
 	      T2= DERIV_CONST*R(KP1)*R(KP1)*VEL(KP1)/R(K)/R(K)
 	      DO I=1,N_S			!Which S.E. equation
@@ -107,7 +115,7 @@
 	    ADVEC_RR(K)=0.0D0
 	    KP1=K+1
 	    IF(K .EQ. ND)KP1=ND-1
-	    DERIV_CONST=1.0D-05*VEL(K)/R(K)
+	    DERIV_CONST=DERIV_FAC*VEL(K)/R(K)
 	    DO I=1,N_S			!Which S.E. equation
 	      LOG_DERIV=LOG( (R(K)/R(KP1))**2 * (VEL(K)/VEL(KP1)) * (HN_S(I,K)/HN_S(I,KP1)) ) / LOG(R(K)/R(KP1))
 	      SE(ID)%STEQ(I,K)=SE(ID)%STEQ(I,K)-DERIV_CONST*LOG_DERIV*HN_S(I,K)
@@ -126,7 +134,7 @@
 	        MP1=M-1
 	      END IF
 !
-	      DERIV_CONST=1.0D-05*VEL(K)/R(K)
+	      DERIV_CONST=DERIV_FAC*VEL(K)/R(K)
 	      DO I=1,N_S			!Which S.E. equation
 	        T1= (R(K)/R(KP1))**2 * (VEL(K)/VEL(KP1)) * (HN_S(I,K)/HN_S(I,KP1))
 	        T2=LOG(R(K)/R(KP1))

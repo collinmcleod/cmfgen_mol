@@ -30,6 +30,7 @@ C
 	USE OPAC_MOD
 	USE STEQ_DATA_MOD
 	USE MOD_LEV_DIS_BLK
+	USE LINE_VEC_MOD
 	IMPLICIT NONE
 !
 	INTEGER*4 ND,NC,NP,NT
@@ -409,24 +410,6 @@ C
 C Global vectors:
 C
 	REAL*8 AMASS_ALL(NT)
-C
-C Arrays for performing LINE frequencies in numerical order
-C
-	REAL*8 VEC_FREQ(NLINE_MAX)
-	REAL*8 VEC_OSCIL(NLINE_MAX)
-	REAL*8 VEC_EINA(NLINE_MAX)
-	REAL*8 VEC_DP_WRK(NLINE_MAX)
-	INTEGER*4 VEC_INDX(NLINE_MAX)
-	INTEGER*4 VEC_ID(NLINE_MAX)
-	INTEGER*4 VEC_NL(NLINE_MAX)
-	INTEGER*4 VEC_NUP(NLINE_MAX)
-	INTEGER*4 VEC_MNL_F(NLINE_MAX)
-	INTEGER*4 VEC_MNUP_F(NLINE_MAX)
-	INTEGER*4 VEC_INT_WRK(NLINE_MAX)
-	CHARACTER*6 VEC_SPEC(NLINE_MAX)
-	CHARACTER*6 VEC_CHAR_WRK(NLINE_MAX)
-	CHARACTER*6 VEC_TRANS_TYPE(NLINE_MAX)
-	CHARACTER*80, ALLOCATABLE :: VEC_TRANS_NAME(:)
 	INTEGER*4 N_LINE_FREQ
 C
 C Arrays and variables for treating lines simultaneously.
@@ -506,8 +489,6 @@ C Variables, vectors and arrays for treating lines simultaneously with the
 C continuum.
 C
 	INTEGER*4 LINES_THIS_FREQ(NCF_MAX)
-	INTEGER*4 LINE_ST_INDX_IN_NU(NLINE_MAX)
-	INTEGER*4 LINE_END_INDX_IN_NU(NLINE_MAX)
 	REAL*8 LINE_PROF_SIM(MAX_SIM)
 	REAL*8 LINE_QW_SIM(MAX_SIM)
 	REAL*8 NEG_OPAC_FAC(ND)
@@ -532,7 +513,6 @@ C
 	INTEGER*4 X_INDX
 	INTEGER*4 FIRST_LINE
 	INTEGER*4 LAST_LINE
-	INTEGER*4 LINE_LOC(NLINE_MAX)
 	INTEGER*4 SIM_LINE_POINTER(MAX_SIM)
 C
 C Variables to limit the computation of the continuum opacities and
@@ -578,8 +558,6 @@ C
 	REAL*8 RHS_dHdCHI(NDMAX,ND)
 	REAL*8 dRSQH_DIF_d_T(NDMAX)
 	REAL*8 dRSQH_DIF_d_dTdR(NDMAX)
-	REAL*8 CHI_PREV(ND)
-	REAL*8 ETA_PREV(ND)
 	REAL*8 HBC_CMF(3),HBC_PREV(3)
 	REAL*8 NBC_CMF(3),NBC_PREV(3),INBC_PREV
 C
@@ -984,270 +962,14 @@ C
 	  PF(I)=PF(I)*T1
 	END DO
         VDOP_VEC(1:ND)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
-C
-C Read in or calculate continuum frequency values.
-C
-	IF(RD_CONT_FREQ .OR. IMPURITY_CODE)THEN
-	  CALL GEN_ASCI_OPEN(LUIN,'CFDAT','OLD',' ','READ',IZERO,IOS)
-	    IF(IOS .NE. 0)THEN
-	      WRITE(LUER,*)'Error opening CFDAT in CMFGEN, IOS=',IOS
-	      STOP
-	    END IF
-	    TEMP_CHAR=' '
-	    DO WHILE(INDEX(TEMP_CHAR,'!Number of continuum frequencies') 
-	1                                              .EQ. 0)
-	      READ(LUIN,'(A)',IOSTAT=IOS)TEMP_CHAR
-	      IF(IOS .NE. 0)THEN
-                WRITE(LUER,*)'Error reading in number of continuum ',
-	1                        'frequencies in CMFGEN'
-	        STOP
-	      END IF
-	    END DO
-	    READ(TEMP_CHAR,*)NCF
-	    IF(NCF .GT. NCF_MAX)THEN
-	      WRITE(LUER,*)'Error - NCF > NCF_MAX in CMFGEN'
-	      STOP
-	    END IF
-	    READ(LUIN,*)(NU(I),I=1,NCF)
-	  CLOSE(UNIT=LUIN)
-	ELSE
-	  FIRST=.TRUE.		!Check cross section at edge is non-zero.
-	  NCF=0 		!Initialize number of continuum frequencies.
 !
-	  DO ID=1,NUM_IONS-1
-	    CALL SET_EDGE_FREQ_V3(ID,OBS,NCF,NCF_MAX,
-	1            ATM(ID)%EDGEXzV_F, ATM(ID)%NXzV_F, ATM(ID)%XzV_PRES,
-	1            ATM(ID)%F_TO_S_XzV, ATM(ID)%NXzV, ATM(ID)%N_XzV_PHOT)
-	  END DO
-C
-	  IF(XRAYS)THEN
-	    DO ID=1,NUM_IONS-1
-	      CALL SET_X_FREQ_V2(OBS,NCF,NCF_MAX, MAX_CONT_FREQ,
-	1             AT_NO(SPECIES_LNK(ID)),ATM(ID)%ZXzV,
-	1             ATM(ID)%XzV_PRES, ATM(ID+1)%XzV_PRES)
-	    END DO
-	  END IF
-C
-C Now insert addition points into frequency array. WSCI is used as a
-C work array - okay since of length NCF_MAX, and zeroed in QUADSE.
-C OBSF contains the bound-free edges - its contents are zero on
-C subroutine exit. J is used as temporary variable for the number of
-C frequencies transmitted to SET_CONT_FREQ. NCF is returned as the number 
-C of frequency points. FQW is used a an integer array for the sorting ---
-C we know it has the correct length since it is the same size as NU.
-C LUIN --- Used as temporary LU (opened and closed).
-C
-	  J=NCF
-	  CALL SET_CONT_FREQ_V3(NU,OBS,FQW,
-	1                        SMALL_FREQ_RAT,BIG_FREQ_AMP,dFREQ_BF_MAX,
-	1                        MAX_CONT_FREQ,MIN_CONT_FREQ,
-	1                        dV_LEV_DIS,AMP_DIS,MIN_FREQ_LEV_DIS,
-	1                        DELV_CONT,DELV_XRAY,NU_XRAY_END,
-	1                        J,NCF,NCF_MAX,LUIN)
-C                                             
-	END IF
-C
-C                         
-C 
-C Set up lines that will be treated with the continuum calculation.
-C This section of code is also used by the code treating purely lines
-C (either single transition Sobolev or CMF, or overlapping Sobolev).
-C
-C To define the line transitions we need to operate on the FULL atom models.
-C We thus perform separate loops for each species. VEV_TRANS_NAME is
-C allocated temporaruly so that we can output the full transitions name
-C to TRANS_INFO.
-C
-	ML=0			!Initialize line counter.
-	ALLOCATE (VEC_TRANS_NAME(NLINE_MAX))
-C
-	DO ID=1,NUM_IONS-1
-	  IF(ATM(ID)%XzV_PRES)THEN
-	    DO MNL=1,ATM(ID)%NXzV_F-1
-	      DO MNUP=MNL+1,ATM(ID)%NXzV_F
-	        NL= ATM(ID)%F_TO_S_XzV(MNL)+ ATM(ID)%EQXzV-1
-	        NUP= ATM(ID)%F_TO_S_XzV(MNUP)+ ATM(ID)%EQXzV-1
-	        IF( ATM(ID)%AXzV_F(MNL,MNUP) .NE. 0)THEN
-	          ML=ML+1
-	          IF(ML .GT. NLINE_MAX)THEN
-	              WRITE(LUER,*)'NLINE_MAX is too small in CMFGEN'
-	            STOP
-	          END IF
-	          VEC_FREQ(ML)= ATM(ID)%EDGEXzV_F(MNL)- ATM(ID)%EDGEXzV_F(MNUP)
-	          VEC_SPEC(ML)=ION_ID(ID)
-	          VEC_ID(ML)=ID
-	          VEC_NL(ML)=NL
-	          VEC_NUP(ML)=NUP     
-	          VEC_MNL_F(ML)=MNL
-	          VEC_MNUP_F(ML)=MNUP     
-	          VEC_OSCIL(ML)=ATM(ID)%AXzV_F(MNL,MNUP)
-	          VEC_EINA(ML)=ATM(ID)%AXzV_F(MNUP,MNL)
-	          VEC_TRANS_TYPE(ML)=ATM(ID)%XzV_TRANS_TYPE
-	          VEC_TRANS_NAME(ML)=TRIM(VEC_SPEC(ML))//
-	1           '('//TRIM(ATM(ID)%XzVLEVNAME_F(MNUP))//'-'//
-	1           TRIM( ATM(ID)%XzVLEVNAME_F(MNL))//')'
-	        END IF
-	      END DO
-	    END DO
-	  END IF
-	END DO
-C
-C
-C 
-C
-C
-C Get lines and arrange in numerically decreasing frequency. This will
-C allow us to consider line overlap, and to include lines with continuum
-C frequencies so that the can be handled automatically.
-C
-	N_LINE_FREQ=ML
-C
-	CALL INDEXX(N_LINE_FREQ,VEC_FREQ,VEC_INDX,L_FALSE)
-	CALL SORTDP(N_LINE_FREQ,VEC_FREQ,VEC_INDX,VEC_DP_WRK)
-	CALL SORTDP(N_LINE_FREQ,VEC_OSCIL,VEC_INDX,VEC_DP_WRK)
-	CALL SORTDP(N_LINE_FREQ,VEC_EINA,VEC_INDX,VEC_DP_WRK)
-	CALL SORTINT(N_LINE_FREQ,VEC_ID,VEC_INDX,VEC_INT_WRK)
-	CALL SORTINT(N_LINE_FREQ,VEC_NL,VEC_INDX,VEC_INT_WRK)
-	CALL SORTINT(N_LINE_FREQ,VEC_NUP,VEC_INDX,VEC_INT_WRK)
-	CALL SORTINT(N_LINE_FREQ,VEC_MNL_F,VEC_INDX,VEC_INT_WRK)
-	CALL SORTINT(N_LINE_FREQ,VEC_MNUP_F,VEC_INDX,VEC_INT_WRK)
-	CALL SORTCHAR(N_LINE_FREQ,VEC_SPEC,VEC_INDX,VEC_CHAR_WRK)
-	CALL SORTCHAR(N_LINE_FREQ,VEC_TRANS_TYPE,VEC_INDX,VEC_CHAR_WRK)
-C
-	I=160	!Record length - allow for long names
-	CALL GEN_ASCI_OPEN(LUIN,'TRANS_INFO','UNKNOWN',' ','WRITE',I,IOS)
-	  WRITE(LUIN,*)
-	1     '     I    NL_F  NUP_F        Nu',
-	1     '       Lam(A)    /\V(km/s)    Transition' 
-	  WRITE(LUIN,
-	1    '(1X,I6,2(1X,I6),2X,F10.6,2X,F10.3,16X,A)')
-	1         IONE,VEC_MNL_F(1),VEC_MNUP_F(1),
-	1         VEC_FREQ(1),LAMVACAIR(VEC_FREQ(1)),
-	1         TRIM(VEC_TRANS_NAME(VEC_INDX(1)))
-	  DO ML=2,N_LINE_FREQ
-	    T1=LAMVACAIR(VEC_FREQ(ML))
-	    T2=2.998D+05*(VEC_FREQ(ML-1)-VEC_FREQ(ML))/VEC_FREQ(ML)
-	    IF(T2 .GT. 2.998E+05)T2=2.998E+05
-	    IF(T1 .LT. 1.0E+04)THEN
-	      WRITE(LUIN,
-	1      '(1X,I6,2(1X,I6),2X,F10.6,2X,F10.3,2X,F10.2,4X,A)')
-	1         ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
-	1         VEC_FREQ(ML),T1,T2,TRIM(VEC_TRANS_NAME(VEC_INDX(ML)))
-	    ELSE             
-	      WRITE(LUIN,
-	1      '(1X,I6,2(1X,I6),2X,F10.6,X,1P,E11.4,0P,2X,F10.2,4X,A)')
-	1         ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
-	1         VEC_FREQ(ML),T1,T2,TRIM(VEC_TRANS_NAME(VEC_INDX(ML)))
-	    END IF
-	  END DO
-	CLOSE(UNIT=LUIN)
-C
-	DEALLOCATE (VEC_TRANS_NAME)
-C
-C 
-C
-C GLOBAL_LINE_SWITCH provides an option to handle all LINE by the same method.
-C The local species setting only takes precedence when it is set to NONE.
-C
-	IF(GLOBAL_LINE_SWITCH(1:4) .NE. 'NONE')THEN
-	  DO I=1,N_LINE_FREQ
-	    VEC_TRANS_TYPE(I)=GLOBAL_LINE_SWITCH
-	  END DO
-	ELSE
-	  DO I=1,N_LINE_FREQ
-	    CALL SET_CASE_UP(VEC_TRANS_TYPE(I),IZERO,IZERO)
-	  END DO
-	END IF
-C
-C If desired, we can set transitions with:
-C      wavelengths > FLUX_CAL_LAM_END (in A) to the SOBOLEV option.
-C      wavelengths < FLUX_CAL_LAM_BEG (in A) to the SOBOLEV option.
-C
-C The region defined by FLUX_CAL_LAM_BEG < LAM < FLUX_CAL_LAM_END will be computed using
-C transition types determined by the earlier species and global options.
-C
-C Option has 2 uses:
-C
-C 1. Allows use of SOBOLEV approximation in IR where details of radiative
-C    transfer is unimportant. In this case FLUX_CAL_LAM_BEG should be set to zero.
-C 2. Allows a full flux calculation to be done in a limited wavelength region
-C    as defined by FLUX_CAL_LAM_END and FLUX_CAL_LAM_BEG. 
-C
-	IF(SET_TRANS_TYPE_BY_LAM)THEN
-	  IF(FLUX_CAL_LAM_END .LT. FLUX_CAL_LAM_BEG)THEN
-	    WRITE(LUER,*)'Error in CMFGEN'
-	    WRITE(LUER,*)'FLUX_CAL_LAM_END must be > FLUX_CAL_LAM_BEG'
-	    STOP
-	  END IF
-	  IF( (.NOT. FLUX_CAL_ONLY) .AND. FLUX_CAL_LAM_BEG .NE. 0)THEN
-	    WRITE(LUER,*)'WARNING in CMFGEN'
-	    WRITE(LUER,*)'WARNING in CMFGEN'
-	    WRITE(LUER,*)'FLUX_CAL_LAM_BEG is normally zero for non-FLUX'
-	    WRITE(LUER,*)'calculations:'
-	  END IF
-	  GLOBAL_LINE_SWITCH='NONE'
-	  T1=SPEED_OF_LIGHT()*1.0D-07
-	  DO I=1,N_LINE_FREQ
-	    IF(T1/VEC_FREQ(I) .GE. FLUX_CAL_LAM_END)THEN
-	      VEC_TRANS_TYPE(I)='SOB'
-	    END IF
-	    IF(T1/VEC_FREQ(I) .LE. FLUX_CAL_LAM_BEG)THEN
-	      VEC_TRANS_TYPE(I)='SOB'
-	    END IF
-	  END DO
-	END IF
-C
-C We have found all lines. If we are doing a blanketing calculation for this
-C line we insert them into the continuum frequency set, otherwise the
-C line is not included.
-C
-	DO ML=1,NCF                                          
-	  FQW(ML)=NU(ML)	!FQW has temporary storage of continuum freq.
-	END DO                    
-	V_DOP=12.85*SQRT( TDOP/AMASS_DOP + (VTURB/12.85)**2 )
-	CALL INS_LINE_V4(  NU,LINES_THIS_FREQ,I,NCF_MAX,
-	1		  VEC_FREQ,VEC_TRANS_TYPE,
-	1                 LINE_ST_INDX_IN_NU,LINE_END_INDX_IN_NU,
-	1                 N_LINE_FREQ,FQW,NCF,
-	1   		  V_DOP,FRAC_DOP,MAX_DOP,VINF,
-	1                 dV_CMF_PROF,dV_CMF_WING,
-	1                 ES_WING_EXT,R_CMF_WING_EXT  )
-C
-	K=NCF		!# of continuum frequencies: Need for DET_MAIN...
-	NCF=I		!Revised
-C
-	CALL DET_MAIN_CONT_FREQ(NU,NCF,FQW,K,NU_EVAL_CONT,
-	1         V_DOP,DELV_CONT,COMPUTE_ALL_CROSS)
-C
-	WRITE(LUER,*)' '
-	WRITE(LUER,'(A,T40,I6)')' Number of line frequencies is:',N_LINE_FREQ
-	WRITE(LUER,'(A,T40,I6)')' Number of frequencies is:',NCF
-	WRITE(LUER,*)' '
-C
-C Redefine frequency quadrature weights.
-C
-	CALL TRAPUNEQ(NU,FQW,NCF)
-	DO ML=1,NCF                                           
-	  FQW(ML)=FQW(ML)*1.0D+15
-	END DO
-C
-C Set observers frequencies. The slight fiddling in setting NU_MAX and NU_MIN 
-C is done so that the CMF frequencies encompass all observers frame 
-C frequencies. This allows computation of all observers fluxes allowing for 
-C velocity effects.
-C
-C We always insert lines into the observers frame frequencies. This allows
-C a blanketed model spectrum to be divided by an unblanketed model
-C spectrum.
-C
-	NU_MAX_OBS=NU(3)		!3 Ensure 
-	T1=NU(NCF)*(1.0+2.0*VINF/2.998D+05)
-	NU_MIN_OBS=MAX(NU(NCF-3),T1)
-	CALL INS_LINE_OBS_V3(OBS_FREQ,N_OBS,NCF_MAX,
-	1               VEC_FREQ,VEC_TRANS_TYPE,N_LINE_FREQ,SOB_FREQ_IN_OBS,
-	1		NU_MAX_OBS,NU_MIN_OBS,VINF,
-	1               dV_OBS_PROF,dV_OBS_WING,dV_OBS_BIG,
-	1               OBS_PRO_EXT_RAT,ES_WING_EXT,V_DOP)
+! Compute the frequency grid for CMFGEN. Routine also allocates the vectors 
+! needed for the line data, sets the line data, and puts the line data into 
+! numerical order.
+! 
+	CALL SET_FREQUENCY_GRID(NU,FQW,LINES_THIS_FREQ,NU_EVAL_CONT,
+	1               NCF,NCF_MAX,N_LINE_FREQ,
+	1               OBS_FREQ,OBS,N_OBS,LUIN,IMPURITY_CODE)
 !
 ! Define the average energy of each super level. At present this is
 ! depth independent, which should be adequate for most models.
@@ -1286,6 +1008,10 @@ C
 	     STOP
 	   END IF
 	END IF
+!
+! Now does accurate flux calculation for a single iteration provided not a new model.
+!
+	IF(.NOT. NEWMOD)MAXCH=0.0D0
 C
 C		' OLD MODEL '
 C
@@ -4340,7 +4066,7 @@ C
 ! Set up a temporary vector to handle Rayleigh scattering.
 !
 	      TA(1:ND)=0.0D0
-	      IF(ATM(1)%XzV_PRES)THEN
+	      IF(SPECIES_PRES(1))THEN			!If H present!
 	        DO L=1,ND
 	          TA(L)=CHI_RAY(L)/ATM(1)%XzV_F(1,L)	          
 	        END DO
@@ -4613,6 +4339,7 @@ C radiation field at the next frequency.
 C                                                  
 	DO I=1,ND
 	  CHI_PREV(I)=CHI_CONT(I)
+	  CHI_SCAT_PREV(I)=CHI_SCAT(I)
 	  ETA_PREV(I)=ETA_CONT(I)
 	END DO
 C
@@ -4686,21 +4413,14 @@ C
 !
 ! Allow for advection terms.
 !
-	IF(INCL_ADVECTION)THEN
-	  DO ID=1,NUM_IONS-1
-	    ID_SAV=ID
-	    IF(ATM(ID)%XzV_PRES)THEN
-	      CALL STEQ_ADVEC_V3(ID_SAV,ATM(ID)%XzV,ATM(ID)%DXzV,ATM(ID)%ADVEC_RR_XzV,ATM(ID)%NXzV,
-	1                 R,V,NUM_BNDS,ND,LAMBDA_ITERATION,COMPUTE_BA,LINEAR_ADV)
-	    END IF
-	  END DO
-	END IF
-C
-C Allow for adiabatic cooling, if requested.
-C
-	CALL EVAL_ADIABATIC_V2(AD_COOL_V,AD_COOL_DT,
+	CALL STEQ_ADVEC_V4(ADVEC_RELAX_PARAM,LINEAR_ADV,NUM_BNDS,ND,
+	1            INCL_ADVECTION,LAMBDA_ITERATION,COMPUTE_BA)
+!
+! Allow for adiabatic cooling, if requested.
+!
+	CALL EVAL_ADIABATIC_V3(AD_COOL_V,AD_COOL_DT,
+	1                       POPS,AVE_ENERGY,HDKT,
 	1                       COMPUTE_BA,INCL_ADIABATIC,
-	1                       POP_ATOM,ED,T,R,V,SIGMA,DTDR,DIFFW,TA,
 	1                       DIAG_INDX,NUM_BNDS,NT,ND)
 C
 C Write pointer file and store BA, BA_ED and B_T matrices.
@@ -4730,7 +4450,7 @@ C
 	      TMP_STRING=TRIM(ION_ID(ID))//'PRRR'
 	      CALL WRRECOMCHK_V3(ATM(ID)%APRXzV, ATM(ID)%ARRXzV,
 	1          ATM(ID)%CPRXzV, ATM(ID)%CRRXzV,
-	1          ATM(ID)%CHG_PRXzV, ATM(ID)%CHG_RRXzV, ATM(ID)%ADVEC_RR_XzV,
+	1          ATM(ID)%CHG_PRXzV, ATM(ID)%CHG_RRXzV, SE(ID)%STEQ_ADV,
 	1          DIERECOM(1,ATM(ID)%INDX_XzV),ADDRECOM(1,ATM(ID)%INDX_XzV),
 	1          X_RECOM(1,J),X_RECOM(1,ATM(ID)%INDX_XzV),
 	1          R,T,ED,ATM(ID)%DXzV,TA,TB, ATM(ID)%NXzV,
@@ -6569,10 +6289,16 @@ C
 	       MAXCH=100			!To force run to continue
 	    END IF
 	  END IF
+	  IF(INCL_ADVECTION .AND. ADVEC_RELAX_PARAM .LT. 1.0D0 .AND. MAXCH .LT. 100)THEN
+	    COMPUTE_BA=.TRUE.
+	    ADVEC_RELAX_PARAM=MIN(1.0D0,ADVEC_RELAX_PARAM*2.0D0)
+	    WRITE(LUER,*)'Have adjuseted advection relaxation parameter to:',ADVEC_RELAX_PARAM
+	    MAXCH=100
+	  END IF
 !
-C If we have reached desired convergence, we do one final loop
-C so as to write out all relevant model data.  
-C
+! If we have reached desired convergence, we do one final loop
+! so as to write out all relevant model data.  
+!
 	  IF( (RD_LAMBDA .OR. .NOT. LAMBDA_ITERATION) .AND.
 	1      MAXCH .LT. EPS .AND. NUM_ITS_TO_DO .NE. 0)THEN
 	      NUM_ITS_TO_DO=1

@@ -255,6 +255,11 @@
 	CALL RD_STORE_INT(NLF,'NLF',L_TRUE,
 	1        'Number of frequencies per Doppler profile in CMF mode (21)')
 !
+! We now get the number of atomic levels. Old MODEL_SPEC files, with NSF in the
+! keyword can be read. ISF take's precident over NSF, and there is no check that 
+! there is not both an effectively identical NSF and ISF keyowrd. In this
+! case, the number of important variables is assumed to be the same as NS.
+!
 	ID=0
 	NUM_IONS_RD=0
 	EQ_TEMP=1
@@ -265,6 +270,11 @@
 	    TEMP_KEY=TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(J))//'_ISF'
 	    NS=0
 	    CALL RD_STORE_3INT(NV,NS,NF,TEMP_KEY,L_FALSE,' ')
+	    IF(NS .EQ .0)THEN
+	      TEMP_KEY=TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(J))//'_NSF'
+	      CALL RD_STORE_2INT(NS,NF,TEMP_KEY,L_FALSE,' ')
+	      NV=NS
+	    END IF
 	    IF(NS .NE. 0)THEN
 	      ID=ID+1
 	      ION_ID(ID)=TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(J))
@@ -427,9 +437,7 @@
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%CHG_PRXzV(ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%CHG_RRXzV(ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%COOLXzV(ND),STAT=IOS)
-	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%ADVEC_RR_XzV(ND),STAT=IOS)
-          ATM(ID)%ADVEC_RR_XZV(:)=0.0D0
-
+!
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'Error in CMF_FLUX'
 	    WRITE(LUER,*)'Unable to allocate arrays for species XzV'

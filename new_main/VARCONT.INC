@@ -84,7 +84,7 @@ C
 	    ELSE
 	      RAT_TOO_BIG=.FALSE.
 	      DO L=1,ND
-	        TA(L)=(CHI_PREV(L)-CHI_SCAT(L))/(CHI_CONT(L)-CHI_SCAT(L))
+	        TA(L)=(CHI_PREV(L)-CHI_SCAT_PREV(L))/(CHI_CONT(L)-CHI_SCAT(L))
 	        IF(ETA_CONT(L) .EQ. 0)THEN
                   TB(L)=1.0D0
 	        ELSE
@@ -325,7 +325,7 @@ C
 	    ELSE
 	      RAT_TOO_BIG=.FALSE.
 	      DO L=1,ND
-	        TA(L)=(CHI_PREV(L)-CHI_SCAT(L))/(CHI_CONT(L)-CHI_SCAT(L))
+	        TA(L)=(CHI_PREV(L)-CHI_SCAT_PREV(L))/(CHI_CONT(L)-CHI_SCAT(L))
 	        TB(L)=ETA_PREV(L)/ETA_CONT(L)
 	        IF(TA(L) .GT. 1.5)RAT_TOO_BIG=.TRUE.
 	      END DO
@@ -585,7 +585,7 @@ C
 	1              ( VCHI(I,L)*dJ_LOC(3,J,K) + VETA(I,L)*dJ_LOC(4,J,K) )
 	      END DO
 	      VJ(NT-1,J,K)=VJ(NT-1,J,K) + ESEC(L)*dj_LOC(5,J,K)/ED(L)
-	      IF(ATM(1)%XzV_PRES)THEN
+	      IF(SPECIES_PRES(1))THEN
 	        VJ(1,J,K)=VJ(1,J,K) + CHI_RAY(L)*dj_LOC(5,J,K)/ATM(1)%XzV_F(1,L)
 	      END IF
 C

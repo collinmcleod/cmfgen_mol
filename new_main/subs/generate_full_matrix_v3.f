@@ -4,7 +4,7 @@
 ! The conversion is done one depth at a time. At each depth, the DIAGONAL
 ! matrix should be passed first.
 !
-	SUBROUTINE GENERATE_FULL_MATRIX_V2(C_MAT,STEQ_VEC,POPS,
+	SUBROUTINE GENERATE_FULL_MATRIX_V3(C_MAT,STEQ_VEC,POPS,
 	1                REPLACE,ZERO_STEQ,
 	1                NT,ND,NION,NUM_BNDS,BAND_INDX,DIAG_INDX,DEPTH_INDX,
 	1                FIRST_MATRIX,LAST_MATRIX,USE_PASSED_REP)
@@ -36,7 +36,7 @@
 	LOGICAL LAST_MATRIX		!Last call to   "       "    "
 !
 ! When true we replace those equations indicated by the passed logical vector REPLACE.
-! We always use the passsed logical vector REPLACE if not updating the diagonal band.
+! We always use the passed logical vector REPLACE if not updating the diagonal band.
 !
 	LOGICAL USE_PASSED_REP
 !
@@ -70,7 +70,7 @@
 !
 ! For consistency with the old version of CMFGEN, we only replace the
 ! ground-state equations over a continuous set of depths. REPLACE
-! is used to indicate whether the current depth is to be rplaced
+! is used to indicate whether the current depth is to be replaced
 ! (as determined from the DIAGONAL band). Replace now passed.
 !
 	INTEGER*4, SAVE, ALLOCATABLE ::  REP_CNT(:)
@@ -128,7 +128,7 @@
 !
 ! NB: C_ION(1,:) refers to to the ionization/recombination equation
 !                for ion 1 (e.g. CI in the carbon sequence). It is
-!                dN(CI)/dt. Since the eqaution (i.e. BA(I,:,:,:) with 
+!                dN(CI)/dt. Since the equation (i.e. BA(I,:,:,:) with 
 !                I > ATMD(ID)%NXzV refers to dN/dt for the recombining 
 !                level (i.e. C2) we need a - sign when we evaluate 
 !                C_ION and STEQ_ION.
@@ -186,6 +186,48 @@
 	  END DO
 	END DO
 !
+! Allow for advection terms in the ionization equations. 
+!
+	IF(DIAG_BAND)THEN
+	  DO ISPEC=1,NUM_SPECIES
+	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	      STEQ_ION(ID)=STEQ_ION(ID)+SE(ID)%STEQ_ADV(K)
+	    END DO
+	  END DO
+	END IF
+!
+! Allow for advection terms in the ionization equations. Since we are using linear derivatives,
+! the terms, at each depth, are identical. We only need to worry about the sign of the terms.
+!
+	IF(BA_ADV_TERM(DIAG_INDX,1) .NE. 0)THEN
+	  DO ISPEC=1,NUM_SPECIES
+	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	      IF(SE(ID)%STRT_ADV_ID(K) .EQ. SPECIES_BEG_ID(ISPEC))THEN
+	        DO L=SE(ID)%STRT_ADV_ID(K),ID
+	          DO J=1,ATM(L)%NXzV
+	            JJ=SE(L)%LNK_TO_F(J)
+	            C_ION(ID,JJ)=C_ION(ID,JJ)-BA_ADV_TERM(BAND_INDX,K)
+	          END DO
+	        END DO
+	      ELSE
+	        DO L=ID+1,SE(ID)%END_ADV_ID(K)
+	          DO J=1,ATM(L)%NXzV
+	            JJ=SE(L)%LNK_TO_F(J)
+	            C_ION(ID,JJ)=C_ION(ID,JJ)+BA_ADV_TERM(BAND_INDX,K)
+	          END DO
+	        END DO
+!
+!Including DxZV for last ionization state
+!
+	        L=SE(ID)%END_ADV_ID(K)
+	        J=ATM(L)%NXzV
+	        JJ=SE(L)%LNK_TO_F(J)+1
+	        C_ION(ID,JJ)=C_ION(ID,JJ)+BA_ADV_TERM(BAND_INDX,K)
+	      END IF
+	    END DO
+	  END DO
+	END IF
+!
 ! We now replace any equations that need replacing.
 !
 ! Insert the number conservation equation for each species.
@@ -204,7 +246,7 @@
 	  END IF
 	END DO
 !
-! Charge conse:rvation and radiative equilibrium equations.
+! Charge conservation and radiative equilibrium equations.
 !
 	C_MAT(NT-1,:)=BA_ED(:,BAND_INDX,DEPTH_INDX)
 	C_MAT(NT,:)  =BA_T(:,BAND_INDX,DEPTH_INDX)
@@ -328,11 +370,11 @@
 	  END DO
 	END DO
 !
-	IF(K .EQ. 1 .AND. DIAG_BAND)THEN
+	IF(K .EQ. 11 .AND. DIAG_BAND)THEN
 	  OPEN(UNIT=96,FILE='BA_ASCI_N_D1',STATUS='UNKNOWN')
-	    CALL WR2D_MA(POPS(1,61),NT,1,'POPS_D61',96)
-	    CALL WR2D_MA(STEQ_VEC,NT,1,'STEQ_VEC_D61',96)
-	    CALL WR2D_MA(C_MAT,NT,NT,'C_MAT_D61',96)
+	    CALL WR2D_MA(POPS(1,61),NT,1,'POPS_D11',96)
+	    CALL WR2D_MA(STEQ_VEC,NT,1,'STEQ_VEC_D11',96)
+	    CALL WR2D_MA(C_MAT,NT,NT,'C_MAT_D11',96)
 	  CLOSE(UNIT=96)
 	END IF
 !
