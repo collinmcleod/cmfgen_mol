@@ -80,7 +80,7 @@ $(LIB)(fixpop_in_ba_v3.o) : fixpop_in_ba_v3.f $(LIB)(steq_data_mod.o) $(MGEN)
 	$(F90) -c $(FG) -I.. fixpop_in_ba_v3.f
 	ar ruv $(LIB) fixpop_in_ba_v3.o
 
-$(LIB)(generate_full_matrix_v2.o) : generate_full_matrix.f $(LIB)(steq_data_mod.o) $(MGEN)
+$(LIB)(generate_full_matrix_v2.o) : generate_full_matrix_v2.f $(LIB)(steq_data_mod.o) $(MGEN)
 	$(F90) -c $(FG) -I.. generate_full_matrix_v2.f
 	ar ruv $(LIB) generate_full_matrix_v2.o
 
