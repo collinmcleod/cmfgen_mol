@@ -537,7 +537,7 @@ C
 C
 C Parameters, vectors, and arrays for computing the observed flux.
 C
-	INTEGER*4, PARAMETER :: NST_CMF=2000
+	INTEGER*4, PARAMETER :: NST_CMF=4000
 	INTEGER*4 NP_OBS_MAX
 	INTEGER*4 NP_OBS
 	REAL*8  NU_STORE(NST_CMF)
@@ -1449,11 +1449,13 @@ C
 	    MU_AT_RMAX(LS)=SQRT( 1.0D0 -(PEXT(LS)/REXT(1))**2 )
 	    HQW_AT_RMAX(LS)=HQWEXT(1,LS)
 	  END DO
+	  IF(PEXT(NPEXT) .EQ. REXT(1))MU_AT_RMAX(NPEXT)=0.0D0
 	ELSE
 	  DO LS=1,NP
 	    MU_AT_RMAX(LS)=SQRT( 1.0D0 -(P(LS)/R(1))**2 )
 	    HQW_AT_RMAX(LS)=HQW(1,LS)
 	  END DO
+	  IF(P(NP) .EQ. R(1))MU_AT_RMAX(NP)=0.0D0
 	END IF
 C
 	ALLOCATE (ETA_CMF_ST(ND,NCF),STAT=IOS)
@@ -2268,7 +2270,7 @@ C By definition, p * dp equals R**2 * mu * dmu. Integration over mu is
 C more stable, and is to be preferred. 
 C
 	DO LS=1,NP
-	  MU_AT_RMAX(LS)=SQRT(R(1)*R(1)-P(LS)*P(LS))/R(1)
+	  MU_AT_RMAX(LS)=SQRT((R(1)-P(LS))*(R(1)+P(LS)))/R(1)
 	END DO
 	CALL HWEIGHT(MU_AT_RMAX,HQW_AT_RMAX,NP)
 C

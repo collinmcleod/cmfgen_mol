@@ -304,7 +304,10 @@
 	    Z(I)=SQRT( (R(I)+P(LS))*(R(I)-P(LS)) )
 	    VMU(I)=V(I)*Z(I)/R(I)
 	  END DO
-	  IF(LS .GT. NC)Z(NI)=0.0D0
+	  IF(LS .GT. NC)THEN
+	    Z(NI)=0.0D0
+	    VMU(NI)=0.0D0
+	  END IF
 !
 ! Compute optical depth increments in Electron scattering optical depth.
 !
