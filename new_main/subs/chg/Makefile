@@ -12,8 +12,8 @@ LIB=$(LIB_DIR)libdev.a
 #
 OBJ = $(LIB)(chg_exch_mod_v3.o)\
       $(LIB)(eval_chg_rates_v3.o)\
-      $(LIB)(set_chg_exch_v3.o)\
-      $(LIB)(set_chg_lev_id_v3.o)\
+      $(LIB)(set_chg_exch_v4.o)\
+      $(LIB)(set_chg_lev_id_v4.o)\
       $(LIB)(verify_chg_exch_v3.o)\
       $(LIB)(steq_ba_chg_exch_v3.o)\
       $(LIB)(wr_chg_cool_v3.o)
@@ -24,11 +24,12 @@ all : $(LIB)
 $(LIB) : $(OBJ)	
 
 UP = $(LIB_DIR)libdev.a(steq_data_mod.o)
+MOD= ../../mod_cmfgen.o
 
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f $(LIB)(chg_exch_mod_v3.o) 
-	$(F90) -c $(FG) $< 
+	$(F90) -c -I../../ $(FG) $< 
 	ar ruv $(LIB) $*.o
 
 # Specific rules
@@ -39,12 +40,19 @@ $(LIB)(steq_ba_chg_exch_v3.o) : steq_ba_chg_exch_v3.f $(LIB)(chg_exch_mod_v3.o) 
 	$(F90) -c $(FG) -I.. steq_ba_chg_exch_v3.f
 	ar ruv $(LIB) steq_ba_chg_exch_v3.o
 
+$(LIB)(set_chg_lev_id_v4.o) : set_chg_lev_id_v4.f $(LIB)(chg_exch_mod_v3.o) $(UP) $(MOD)
+	$(F90) -c $(FG) -I.. -I../.. set_chg_lev_id_v4.f
+	ar ruv $(LIB) set_chg_lev_id_v4.o
+
 $(LIB)(chg_exch_mod_v3.o) : chg_exch_mod_v3.f 
 	$(F90) -c $(FG) chg_exch_mod_v3.f
 	ar ruv $(LIB) chg_exch_mod_v3.o
 
 $(UP):
 	(cd .. ; make mod)
+
+$(MOD):
+	(cd ../.. ; make mod)
 
 clean :
 	rm -f *.o 
