@@ -326,7 +326,7 @@ C
 	        X(K)=FLOAT(K)
 	      END DO
 	      NY=NIT
-	      YLABEL='Y(K) [%]'
+	      YLABEL='Y(K)'
 	    ELSE
 	      WRITE(T_OUT,*)' Option not recognized: try again'
 	      GOTO 1000
