@@ -30,7 +30,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)chk_phot.exe\
          $(EXE_DIR)do_ave.exe\
          $(EXE_DIR)do_ng_v2.exe\
-         $(EXE_DIR)n_col_merge.exe\
+         $(EXE_DIR)land_col_merge.exe\
          $(EXE_DIR)n_col_merge.exe\
          $(EXE_DIR)n_multi_merge.exe\
          $(EXE_DIR)rewrite_scr.exe\
