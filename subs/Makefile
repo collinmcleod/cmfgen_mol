@@ -83,6 +83,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(interp_knowncoeef.o)\
       $(LIB)(jfeau_ibc.o)\
       $(LIB)(jgrey.o)\
+      $(LIB)(jgrey_with_fvt.o)\
       $(LIB)(jtrpwgt.o)\
       $(LIB)(jweight.o)\
       $(LIB)(kivarnm.o)\
@@ -212,6 +213,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(vsebyj_x_v3.o)\
       $(LIB)(vsebyj_x_v4.o)\
       $(LIB)(weight.o)\
+      $(LIB)(wr2d_ma.o)\
       $(LIB)(wr2d.o)\
       $(LIB)(wr2d_v2.o)\
       $(LIB)(wr_ad_cool.o)\
