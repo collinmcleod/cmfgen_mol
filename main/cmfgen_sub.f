@@ -37,9 +37,11 @@ C
 !
 	INTEGER*4 NCF
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
-C
+!
+! Altered 05-Feb-2004 VELYTYPE=10 and other SN stuff inserted.
+!
 	CHARACTER*12 PRODATE
-	PARAMETER (PRODATE='22-Jan-2003')	!Must be changed after alterations
+	PARAMETER (PRODATE='05-Feb-2004')		!Must be changed after alterations
 C
 C 
 C
@@ -138,6 +140,12 @@ C
 	REAL*8 V_BETA2,V_EPPS2		!VINF2 above
 	REAL*8 V_REF_RADIUS
 	INTEGER*4 VELTYPE
+!
+! Supernova variables
+!
+	REAL*8 RHO_ZERO         !Density at core in atmos/cm^3
+	REAL*8 N_RHO            !Exponent for density (+ve)
+	LOGICAL SN_MODEL
 C
 C REC_SIZE     is the (maximum) record length in bytes.
 C UNIT_SIZE    is the number of bytes per unit that is used to specify
@@ -970,6 +978,7 @@ C
 	COMPUTE_EW=.TRUE.
 	ZERO_REC_COOL_ARRAYS=.TRUE.
 	FULL_ES=.TRUE.
+	SN_MODEL=.FALSE.
 	I=12
 	FORMFEED=' '//CHAR(I)
         CNT_FIX_BA=0
@@ -1179,6 +1188,14 @@ C
 	    V_BETA2=1.0D0
 	    V_EPPS2=1.0D0
 	    V_REF_RADIUS=RP
+	  ELSE IF(VELTYPE .EQ. 10)THEN
+	    SN_MODEL=.TRUE.
+	    CALL RD_STORE_DBLE(VCORE,'VCORE',L_TRUE,'Initial velocity (km/s)')
+	    CALL RD_STORE_DBLE(V_BETA1,'BETA1',L_TRUE,'Power of velocity Law')
+	    CALL RD_STORE_DBLE(RHO_ZERO,'RHO_ZERO',L_TRUE,'Initial density (gm/cm^3)')
+	    RHO_ZERO=RHO_ZERO/ATOMIC_MASS_UNIT()
+	    CALL RD_STORE_DBLE(N_RHO,'N_RHO',L_TRUE,'Density exponent (+ve)')
+	    VINF=VCORE*(RMAX/RP)**V_BETA1
 	  ELSE
 	    WRITE(LUER,*)'Velocity law ',VELTYPE, ' not implemented',
 	1                ' in this version of CMFGEN'
@@ -2158,6 +2175,8 @@ C
             CALL STARRAVE(R,V,SIGMA,ND,LUIN,RMAX,RP)
           ELSE IF(VELTYPE .EQ. 7)THEN
 	    CALL RD_RV_FILE_V2(R,V,SIGMA,RMAX,RP,VINF,LUIN,ND,VEL_OPTION,NUM_V_OPTS)
+         ELSE IF(VELTYPE .EQ. 10)THEN
+            CALL RV_SN_MODEL_V2(R,V,SIGMA,RMAX,RP,VCORE,V_BETA1,RDINR,LUIN,ND)
 	  ELSE
 	    WRITE(LUER,*)'Invalid Velocity Law'
 	    STOP
@@ -2260,9 +2279,16 @@ C
 	  ABUND_SUM=ABUND_SUM+AT_ABUND(ISPEC)
 	END DO
 !
-	DO K=1,ND
-	  POP_ATOM(K)=RMDOT/MEAN_ATOMIC_WEIGHT/(V(K)*R(K)*R(K)*CLUMP_FAC(K))
-	END DO
+	IF(SN_MODEL)THEN
+	  DO K=1,ND
+	    POP_ATOM(K)=(RHO_ZERO/MEAN_ATOMIC_WEIGHT)*(R(ND)/R(K))**N_RHO
+	    WRITE(127,'(3ES14.4)')R(K),V(K),POP_ATOM(K)
+	  END DO
+	ELSE
+	  DO K=1,ND
+	    POP_ATOM(K)=RMDOT/MEAN_ATOMIC_WEIGHT/(V(K)*R(K)*R(K)*CLUMP_FAC(K))
+	  END DO
+	END IF
 !
 	DO ISPEC=1,NUM_SPECIES
 	  DO K=1,ND
