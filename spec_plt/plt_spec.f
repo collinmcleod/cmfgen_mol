@@ -262,6 +262,7 @@ C
 	DEFAULT='GR'
 	DESCRIPTION=' '					!Obvious main option
 	CALL USR_OPTION(MAIN_OPT_STR,'OPTION',DEFAULT,DESCRIPTION)
+	IF(MAIN_OPT_STR .EQ. ' ')GOTO 3
 C
 C   If the main option begins with a '.', a previously
 C   written .sve file is read.
