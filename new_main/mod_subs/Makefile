@@ -17,6 +17,7 @@ MOD = $(LIB_MOD)(mod_cmfgen.o)\
       $(LIB_MOD)(steq_data_mod.o)\
       $(LIB_MOD)(two_phot_mod.o)\
       $(LIB_MOD)(mod_lev_dis_blk.o)\
+      $(LIB_MOD)(line_vec_mod.o)\
       $(LIB_MOD)(chg_exch_mod_v3.o)
 
 OBJ = $(LIB)(adjust_r_grid_v2.o)\
@@ -25,6 +26,7 @@ OBJ = $(LIB)(adjust_r_grid_v2.o)\
       $(LIB)(comp_var_opac.o)\
       $(LIB)(init_opac_mod.o)\
       $(LIB)(rd_control_variables.o)\
+      $(LIB)(set_frequency_grid.o)\
       $(LIB)(set_ang_qw.o)
 
 all : $(LIB)

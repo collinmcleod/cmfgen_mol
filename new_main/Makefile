@@ -46,6 +46,7 @@ MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
       $(LIB_DIR)libmod.a(control_variable_mod.o)\
       $(LIB_DIR)libmod.a(opac_mod.o)\
       $(LIB_DIR)libmod.a(steq_data_mod.o)\
+      $(LIB_DIR)libmod.a(line_vec_mod.o)\
       $(LIB_DIR)libmod.a(mod_lev_dis_blk.o)
 
 cmfgen.o : cmfgen.f $(MODS) $(USR)

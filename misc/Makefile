@@ -42,6 +42,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)plt_cool.exe\
          $(EXE_DIR)plt_j_comp.exe\
          $(EXE_DIR)plt_net.exe\
+         $(EXE_DIR)solve_ba_mat.exe\
          $(EXE_DIR)tlusty_vel.exe
  
 all: OBJ ALLEXE 
@@ -68,6 +69,10 @@ $(EXE_DIR)%.exe : %.o $(OBJ1)
               $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)$*.exe
+
+$(EXE_DIR)solve_ba_mat.exe : solve_ba_mat.o
+	$(F90) solve_ba_mat.o -L$(LIB_DIR) $(LAPACK) $(BLAS) -l$(LN2) -l$(LN1) \
+              -o $(EXE_DIR)solve_ba_mat.exe
 
 # General rule to compile a fortran ".f" file.
 

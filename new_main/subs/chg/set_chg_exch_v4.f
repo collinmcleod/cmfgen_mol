@@ -54,8 +54,7 @@
 	CHARACTER(LEN=30) LOC_NAME
 	LOGICAL LEVEL_SET
 !
-	WRITE(LUER,*)'Entering SET_CHG_EXCH_LEV_ID'
-!
+!	WRITE(LUER,*)'Entering SET_CHG_EXCH_LEV_ID'
 	IF(.NOT. DO_CHG_EXCH)RETURN
 !
 ! We must set AI_AR_CHG to unity, as we multiply it by data for each

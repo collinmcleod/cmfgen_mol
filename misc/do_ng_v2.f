@@ -21,6 +21,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 19-May-2004 : Bug fix: NG_DONE set to true, even when no NG done.
 ! Altered 28-Mar-2004 : Changed to handle new format SCRTEMP files.
 !                       Now choice of 3 options: NG, AV and SOR.
 ! Altered 01-Jul-2003 : IT_STEP inserted as option.  
@@ -187,7 +188,6 @@
 	1                     SCALE_INDIVIDUALLY,NG_DONE,T_OUT)
 !
 	  WRITE(6,*)'Finished NG accleration'
-	  NG_DONE=.TRUE.
 	ELSE IF(OPTION(1:2) .EQ. 'AV')THEN
 	  DO J=1,ND
 	    DO I=1,NT+3

@@ -121,6 +121,7 @@
 	REAL*8 AMP_DIS			!Amplification factor
 	REAL*8 MIN_FREQ_LEV_DIS		!Minimum frequency for lev dissolution.
 	LOGICAL RD_CONT_FREQ		!Read in cont. frequencies from file.
+	INTEGER FREQ_GRID_OPTION	!Which frequency grid
 !
 ! Used to describe the Doppler lines profile, which is currently assumed
 ! to be constant at all depths.
@@ -348,11 +349,13 @@
 	LOGICAL DIF		  	! Use diffusion approximation?
 !
 	LOGICAL INCL_ADIABATIC   	!Include adiabatic cooling
-	LOGICAL INCL_ADVECTION          !Include advection terms in rate equations.
 	LOGICAL INCL_CHG_EXCH		!Include charge exchange reactions.
 	LOGICAL INCL_TWO_PHOT		!Include two-photon transitions
 	LOGICAL INCL_RAY_SCAT           !Include Rayleigh scattering.
 	LOGICAL LINEAR_ADV              !Comput derivatives using linear approximation.
+!
+	LOGICAL INCL_ADVECTION          !Include advection terms in rate equations.
+	REAL*8  ADVEC_RELAX_PARAM       !Allows advection terms to be added slowly
 !
 ! Variables specifying computaion of e.s. souce function.
 !

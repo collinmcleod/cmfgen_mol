@@ -18,6 +18,15 @@
 	REAL*8, ALLOCATABLE :: ESEC_CLUMP(:)
 	REAL*8, ALLOCATABLE :: CHI_SCAT_CLUMP(:)
 !
+! Use to relate opacities at the current frequency to that at last frequency.
+! They store the opacities at the previous frequency. Note that CHI_SCAT is
+! only constant when we have pure electron scattering --- it varies if we allow
+! for Rayleigh scattering.
+!
+	REAL*8, ALLOCATABLE ::  CHI_PREV(:)
+	REAL*8, ALLOCATABLE ::  CHI_SCAT_PREV(:)
+	REAL*8, ALLOCATABLE ::  ETA_PREV(:)
+!
 ! To allow the variation of non-coherent electron scattering to be treated
 ! in a partially coherent approximation.
 !

@@ -232,6 +232,13 @@ C
 	1            'Amplification factor for large frequency ranges')
 	  CALL RD_STORE_DBLE(dFREQ_bf_MAX,'MAX_BF',L_TRUE,
 	1            'Maximum frequency spacing close to bf edge')
+!
+! Installed to allow earlier frequency grids to be used. 0 uses the
+! the latest default grid.
+!
+	  FREQ_GRID_OPTION=0
+	  CALL RD_STORE_INT(FREQ_GRID_OPTION,'FR_GRID',L_FALSE,
+	1            'Which method to compute frequency grid?')
 C
 	  CALL RD_STORE_LOG(DO_LEV_DISSOLUTION,'DO_DIS',L_TRUE,
 	1            'Allow for level dissolution of upper levels?')
@@ -431,6 +438,9 @@ C
 	  LINEAR_ADV=.TRUE.
 	  CALL RD_STORE_LOG(LINEAR_ADV,'LIN_ADV',L_FALSE,
 	1           'Compute advection terms using derivatives in linear plane?')
+	  ADVEC_RELAX_PARAM=1.0D0
+	  CALL RD_STORE_DBLE(ADVEC_RELAX_PARAM,'ADV_RELAX',L_FALSE,
+	1           'Parameter to allow advection terms to be included slowly')
 !
 ! Except for the X-ray switch, the X-ray options are only needed if we 
 ! are including X-rays.

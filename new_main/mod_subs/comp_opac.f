@@ -78,7 +78,7 @@ C
 ! Add in Rayleigh scattering contribution.
 !
 	  CHI_RAY(1:ND)=0.0D0
-	  IF(ATM(1)%XzV_PRES .AND. INCL_RAY_SCAT)THEN
+	  IF(SPECIES_PRES(1) .AND. INCL_RAY_SCAT)THEN
 	    CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
 	1             ATM(1)%NXzV_F,CONT_FREQ,ND)
 	  END IF

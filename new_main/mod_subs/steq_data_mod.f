@@ -1,11 +1,10 @@
-
 !
 ! Module containing basic data for:
 !                   (i) Each species
 !          	   (ii) Model atom data (populations etc)
 !		  (iii) Basic atmospheric structure.
 !
-      MODULE STEQ_DATA_MOD 
+      MODULE STEQ_DATA_MOD
 !                            
 ! Number of atomic species (e.g. H, C, N is 3 species).
 !
@@ -27,6 +26,7 @@
 !
 	TYPE STAT_EQ_DATA 
           REAL*8, POINTER :: STEQ(:,:)  		!Statistical equilibrium Eqns. for XzV
+          REAL*8, POINTER :: STEQ_ADV(:)  		!Statistical equilibrium ion eqns. for advection terms
           REAL*8, POINTER :: QFV_P(:,:)  		!
           REAL*8, POINTER :: QFV_R(:,:)  		!
           REAL*8, POINTER :: BA(:,:,:,:)		!BA matrix for XzV
@@ -36,6 +36,8 @@
 	  INTEGER*4, POINTER :: EQ_IN_BA(:)     	!
 	  INTEGER*4, POINTER :: EQ_TO_ION_LEV_PNT(:)	!
 	  INTEGER*4, POINTER :: ION_LEV_TO_EQ_PNT(:)	!
+	  INTEGER*4, POINTER :: STRT_ADV_ID(:)
+	  INTEGER*4, POINTER :: END_ADV_ID(:)
 	  INTEGER*4 N_SE                        	!Number of S.E. Eqns. for XzV
 	  INTEGER*4 N_IV                        	!Number of important variables for XzV
 	  INTEGER*4 NUMBER_BAL_EQ			!Conservation equation
@@ -48,6 +50,7 @@
         REAL*8, ALLOCATABLE :: STEQ_ED(:)
         REAL*8, ALLOCATABLE :: BA_T(:,:,:)
         REAL*8, ALLOCATABLE :: BA_ED(:,:,:)
+        REAL*8, ALLOCATABLE :: BA_ADV_TERM(:,:)
 !
         REAL*8, ALLOCATABLE :: BA_T_PAR(:,:)
 !

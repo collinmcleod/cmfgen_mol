@@ -114,7 +114,6 @@
 	  REAL*8, ALLOCATABLE :: CRRXzV(:)
 	  REAL*8, ALLOCATABLE :: CPRXzV(:)
 	  REAL*8, ALLOCATABLE :: COOLXzV(:)
-	  REAL*8, ALLOCATABLE :: ADVEC_RR_XzV(:)
 !
 ! Data vectors to check charge recombination rates.
 !
