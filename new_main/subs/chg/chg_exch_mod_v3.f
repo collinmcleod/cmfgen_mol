@@ -3,6 +3,7 @@
 ! is also located here.
 !
 	MODULE CHG_EXCH_MOD_V3
+	  INTEGER*4 N_CHG_RD
 	  INTEGER*4 N_CHG
 	  INTEGER*4 LUER
 !
@@ -15,8 +16,18 @@
 !
 ! Reaction data
 !
+          INTEGER*4, ALLOCATABLE :: TYPE_CHG_RD(:)
+          REAL*8, ALLOCATABLE :: COEF_CHG_RD(:,:)
+          REAL*8, ALLOCATABLE :: TLO_CHG_RD(:)
+          REAL*8, ALLOCATABLE :: THI_CHG_RD(:)
+          LOGICAL, ALLOCATABLE :: CHG_INCLUDED_RD(:)
+	  CHARACTER*8, ALLOCATABLE :: SPEC_ID_CHG_RD(:,:)
+	  CHARACTER*30, ALLOCATABLE :: LEV_NAME_CHG_RD(:,:)
+	  CHARACTER*30, ALLOCATABLE :: ALT_LEV_NAME_CHG_RD(:,:)
+!
           INTEGER*4, ALLOCATABLE :: TYPE_CHG(:)
           REAL*8, ALLOCATABLE :: COEF_CHG(:,:)
+          REAL*8, ALLOCATABLE :: G_CHG(:,:)
           REAL*8, ALLOCATABLE :: TLO_CHG(:)
           REAL*8, ALLOCATABLE :: THI_CHG(:)
 	  CHARACTER*8, ALLOCATABLE :: SPEC_ID_CHG(:,:)
@@ -89,6 +100,7 @@
 	END IF
 !
 	LUER=ERROR_LU()
+	WRITE(LUER,*)'Beginning to read Charge data'
 	CALL GEN_ASCI_OPEN(LUIN,'CHG_EXCH_DATA','OLD',' ','READ',IZERO,IOS)
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Unable to open CHG_EXCH_DATA in RD_CHG_EXCH'
@@ -113,7 +125,7 @@
 	  WRITE(LUER,*)'Number of charge exchange reactions sting not found'
 	  STOP
 	ELSE
-	 READ(STRING,*)N_CHG
+	 READ(STRING,*)N_CHG_RD
 	END IF
 !
 	FORMAT_DATE=' '
@@ -137,23 +149,24 @@
 ! We only allocate arrays necessary to store the atomic data which
 ! is read in.
 !
-	IF(.NOT. ALLOCATED(TYPE_CHG))THEN
-          ALLOCATE (TYPE_CHG(N_CHG),STAT=IOS)
-          IF(IOS .EQ. 0)ALLOCATE (TLO_CHG(N_CHG),STAT=IOS)
-          IF(IOS .EQ. 0)ALLOCATE (THI_CHG(N_CHG),STAT=IOS)
-          IF(IOS .EQ. 0)ALLOCATE (COEF_CHG(N_CHG,N_COEF_MAX),STAT=IOS)
-	  IF(IOS .EQ. 0)ALLOCATE (SPEC_ID_CHG(N_CHG,4),STAT=IOS)
-	  IF(IOS .EQ. 0)ALLOCATE (LEV_NAME_CHG(N_CHG,4),STAT=IOS)
-	  IF(IOS .EQ. 0)ALLOCATE (ALT_LEV_NAME_CHG(N_CHG,4),STAT=IOS)
+	IF(.NOT. ALLOCATED(TYPE_CHG_RD))THEN
+          ALLOCATE (TYPE_CHG_RD(N_CHG_RD),STAT=IOS)
+          IF(IOS .EQ. 0)ALLOCATE (TLO_CHG_RD(N_CHG_RD),STAT=IOS)
+          IF(IOS .EQ. 0)ALLOCATE (THI_CHG_RD(N_CHG_RD),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (CHG_INCLUDED_RD(N_CHG_RD),STAT=IOS)
+          IF(IOS .EQ. 0)ALLOCATE (COEF_CHG_RD(N_CHG_RD,N_COEF_MAX),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (SPEC_ID_CHG_RD(N_CHG_RD,4),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (LEV_NAME_CHG_RD(N_CHG_RD,4),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (ALT_LEV_NAME_CHG_RD(N_CHG_RD,4),STAT=IOS)
 	END IF
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error in RD_CHG_EXCH'
 	  WRITE(LUER,*)'Unable to allocate all vectors in RD_CHG_EXCH'
 	  STOP
 	END IF
-        ALT_LEV_NAME_CHG(1:N_CHG,1:4)='No_alternative_level_name'
+        ALT_LEV_NAME_CHG_RD(1:N_CHG_RD,1:4)='No_alternative_level_name'
 !
-	DO I=1,N_CHG
+	DO I=1,N_CHG_RD
 	  STRING=' '
 	  DO WHILE(STRING .EQ. ' ' .OR. STRING(1:1) .EQ. '!')
 	    READ(LUIN,'(A)',IOSTAT=IOS)STRING
@@ -173,7 +186,7 @@
 	      WRITE(LUER,*)'Use at least 2 spaces to separate reaction data'
 	      STOP
 	    END IF
-	    SPEC_ID_CHG(I,K)=STRING(1:L-1)
+	    SPEC_ID_CHG_RD(I,K)=STRING(1:L-1)
 	    STRING(1:)=STRING(L+1:)
 	    IF(STRING .EQ. ' ')THEN
 	      WRITE(LUER,*)'Insufficient information in reaction string (2).'
@@ -191,7 +204,7 @@
 	    IF(FORMAT_DATE .EQ. '01-Oct-1999')THEN
 	      LB=INDEX(STRING(1:L-1),'{')
 	      IF(LB .EQ. 0)THEN
-	        LEV_NAME_CHG(I,K)=STRING(1:L-1)
+	        LEV_NAME_CHG_RD(I,K)=STRING(1:L-1)
 	      ELSE
 	        RB=INDEX(STRING(1:L-1),'}')
 	        IF(RB .LE. LB+2)THEN
@@ -200,22 +213,22 @@
 	1            'Inavlid number of } for alternative level name'
 	          STOP
 	        END IF
-	        LEV_NAME_CHG(I,K)=STRING(1:LB-1)
-	        ALT_LEV_NAME_CHG(I,K)=STRING(LB+1:RB-1)
+	        LEV_NAME_CHG_RD(I,K)=STRING(1:LB-1)
+	        ALT_LEV_NAME_CHG_RD(I,K)=STRING(LB+1:RB-1)
 	      END IF
 	    ELSE
 	      LB=INDEX(STRING(1:L-1),'/')
 	      IF(LB .EQ. 0)THEN
-	        LEV_NAME_CHG(I,K)=STRING(1:L-1)
+	        LEV_NAME_CHG_RD(I,K)=STRING(1:L-1)
 	      ELSE
-	        LEV_NAME_CHG(I,K)=STRING(1:LB-1)
-	        ALT_LEV_NAME_CHG(I,K)=STRING(LB+1:L-1)
+	        LEV_NAME_CHG_RD(I,K)=STRING(1:LB-1)
+	        ALT_LEV_NAME_CHG_RD(I,K)=STRING(LB+1:L-1)
 	      END IF
 	    END IF
 	    STRING(1:)=STRING(L+1:)
 	  END DO
 !
-	  READ(LUIN,*,IOSTAT=IOS)TYPE_CHG(I)
+	  READ(LUIN,*,IOSTAT=IOS)TYPE_CHG_RD(I)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'Error reading TYPE of charge reaction for the following reaction'
 	    WRITE(LUER,*)' ',TRIM(OLD_STRING)
@@ -234,11 +247,11 @@
 	  END IF
 !
 	  IF(FORMAT_DATE .EQ. ' ')THEN
-	    READ(LUIN,*,IOSTAT=IOS)(COEF_CHG(I,K),K=1,N_COEF)
-	    TLO_CHG(I)=0.0D0
-	    THI_CHG(I)=100.0D0
+	    READ(LUIN,*,IOSTAT=IOS)(COEF_CHG_RD(I,K),K=1,N_COEF)
+	    TLO_CHG_RD(I)=0.0D0
+	    THI_CHG_RD(I)=100.0D0
 	  ELSE
-	    READ(LUIN,*,IOSTAT=IOS)(COEF_CHG(I,K),K=1,N_COEF),TLO_CHG(I),THI_CHG(I)
+	    READ(LUIN,*,IOSTAT=IOS)(COEF_CHG_RD(I,K),K=1,N_COEF),TLO_CHG_RD(I),THI_CHG_RD(I)
 	  END IF
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'Error reading charge coefficients for the following reaction'
@@ -252,7 +265,7 @@
 !
 	  DO K=1,3
 	    DO L=K+1,4
-	      IF(SPEC_ID_CHG(I,L) .EQ. SPEC_ID_CHG(I,K))THEN
+	      IF(SPEC_ID_CHG_RD(I,L) .EQ. SPEC_ID_CHG_RD(I,K))THEN
 	        WRITE(LUER,*)'Error in RD_CHG_EXCH'
 	        WRITE(LUER,*)'Duplication of species ID, reaction:',I
 	        STOP
@@ -261,18 +274,18 @@
 	  END DO
 !
 	  L=1
-	  IF(SPEC_ID_CHG(I,1)(2:2) .GE. 'a' .AND. 
-	1             SPEC_ID_CHG(I,1)(2:2) .LE. 'z')L=2
-	  IF(SPEC_ID_CHG(I,1)(1:L) .NE. SPEC_ID_CHG(I,3)(1:L))THEN
+	  IF(SPEC_ID_CHG_RD(I,1)(2:2) .GE. 'a' .AND. 
+	1             SPEC_ID_CHG_RD(I,1)(2:2) .LE. 'z')L=2
+	  IF(SPEC_ID_CHG_RD(I,1)(1:L) .NE. SPEC_ID_CHG_RD(I,3)(1:L))THEN
 	    WRITE(LUER,*)'Error in RD_CHG_EXCH',
 	1        ' SPECIES 1 and 3 don''t match for reaction',I
 	    STOP
 	  END IF
 !
 	  L=1
-	  IF(SPEC_ID_CHG(I,2)(2:2) .GE. 'a' .AND. 
-	1              SPEC_ID_CHG(I,2)(2:2) .LE. 'z')L=2
-	  IF(SPEC_ID_CHG(I,2)(1:L) .NE. SPEC_ID_CHG(I,4)(1:L))THEN
+	  IF(SPEC_ID_CHG_RD(I,2)(2:2) .GE. 'a' .AND. 
+	1              SPEC_ID_CHG_RD(I,2)(2:2) .LE. 'z')L=2
+	  IF(SPEC_ID_CHG_RD(I,2)(1:L) .NE. SPEC_ID_CHG_RD(I,4)(1:L))THEN
 	    WRITE(LUER,*)'Error in RD_CHG_EXCH',
 	1	' SPECIES 3 and 4 don''t match for reaction',I
 	    STOP
@@ -280,6 +293,11 @@
 !
 	END DO
 !
+! This will be reset later.
+!
+	CHG_INCLUDED_RD(:)=.TRUE.
+!
+	WRITE(LUER,*)'Charge data successfully read'
 	CLOSE(LUIN)
 !
 	RETURN
