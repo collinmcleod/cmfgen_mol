@@ -100,7 +100,7 @@ C
 	REAL*8 SCED,XED
 	INTEGER*4 NXED
 	CHARACTER*30 TOPLABEL
-	COMMON /TOPBORD/ SCED(25),XED(25),NXED,TOPLABEL
+	COMMON /TOPBORD/ SCED(31),XED(31),NXED,TOPLABEL
 C
 C Two options are available with  logarithmic axis. The default is to
 C label the axes with the actual Log values. the alterenate is to
@@ -231,7 +231,9 @@ C
 C
 C Draw a box without labels.
 C
-	CALL PGSCI(IONE)			!Set default color of axes
+! Assume border color is set outside of MONBORD_V3
+!
+!	CALL PGSCI(IONE)			!Set default color of axes
 	CALL PGBOX('BC',RZERO,IZERO,'BC',RZERO,IZERO)
 C
 C Tick marks and scale
