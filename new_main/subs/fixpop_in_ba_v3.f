@@ -81,7 +81,7 @@
 	   IF(I .EQ. ND)THEN
               WRITE(LUER,'(A)')' Temperature held fixed at all depths.'
 	   ELSE
-              WRITE(LUER,'(A,F10.3)')
+              WRITE(LUER,'(A,ES12.3)')
 	1              ' Temperature held partially fixed: TAU_SCL_T=',MOD_TAU_SCL_T
               WRITE(LUER,'(A,I3,A)')' Temperature held fixed at ',I,' depths.'
 	   END IF
