@@ -17,6 +17,7 @@ C
 	1             LU_OUT,FILE_OUT)
 	IMPLICIT NONE
 C
+C Altered 20-Oct-2003 : No scaling peformed when PLANCK_FN has zero's.
 C Altered 18-Aug-2003 : FILE_DATE inserted into INFO call.
 C Altered 17-Oct-2002 : Computation of BB changed to avoid floating overflow.
 C Altered 16-Jun-2000 : Record length can no be obtained form INFO files.
@@ -267,6 +268,7 @@ C
 	  BETA=1.84E-03*SQRT(TEMP(K))
 	  T3=0.5D0*HDKT*NU(1)/TEMP(K)
 	  IF(T3 .LT. 1)T3=0.0D0
+	  IF(T3 .GT. 700.0D0)T3=700.0D0
 	  DO ML=1,NCF
 	    T1=EXP( -HDKT*NU(ML)/TEMP(K) )
 	    T2=EXP( T3-HDKT*NU(ML)/TEMP(K) )
@@ -292,35 +294,36 @@ C
 C
 C Derive the wavelength shift so that the electron scattered planck function
 C gives the Planck function. This is only done on the Wien side of the
-C BB curve. At longer wavelengths we will use s a simple scaling.
+C BB curve. At longer wavelengths we will use a simple scaling.
 C
 C Because of the steep variation of B on the Wien side, we operate on Log(B).
 C
-	  PLANCK_ES(:)=LOG(PLANCK_ES(:))
-	  PLANCK_FN(:)=LOG(PLANCK_FN(:))
+	  IF( MINVAL(PLANCK_FN) .GT. 0.0D0)THEN
+	    PLANCK_ES(:)=LOG(PLANCK_ES(:))
+	    PLANCK_FN(:)=LOG(PLANCK_FN(:))
 C
-	  PLANCK_NU(1)=NU(1)
-	  I=2
-	  ML=1
-	  DO WHILE(NU(I) .GT. 1.5D0*TEMP(K))
-	    DO WHILE(PLANCK_ES(I) .GT. PLANCK_FN(ML))
-	      ML=ML+1
+	    PLANCK_NU(1)=NU(1)
+	    I=2
+	    ML=1
+	    DO WHILE(NU(I) .GT. 1.5D0*TEMP(K))
+	      DO WHILE(PLANCK_ES(I) .GT. PLANCK_FN(ML))
+	        ML=ML+1
+	      END DO
+	      DO WHILE(PLANCK_ES(I) .LT. PLANCK_FN(ML-1))
+	         ML=ML+1
+	      END DO
+	      T1=(PLANCK_ES(I)-PLANCK_FN(ML))/(PLANCK_FN(ML-1)-PLANCK_FN(ML))
+              PLANCK_NU(I)=T1*NU(ML-1)+(1.0D0-T1)*NU(ML)
+	      I=I+1
 	    END DO
-	    DO WHILE(PLANCK_ES(I) .LT. PLANCK_FN(ML-1))
-	      ML=ML+1
-	    END DO
-	    T1=(PLANCK_ES(I)-PLANCK_FN(ML))/(PLANCK_FN(ML-1)-PLANCK_FN(ML))
-            PLANCK_NU(I)=T1*NU(ML-1)+(1.0D0-T1)*NU(ML)
-	    I=I+1
-	  END DO
 C
 C Apply same wavelength shift as for our last (i.e. lowest)
 C frequency as determined by matching the Planck function.
 C
-	  T1=1.0D0/NU(I-1)-1.0D0/PLANCK_NU(I-1)		!Wavelength shift
-	  DO ML=I,NCF
-	    PLANCK_NU(ML)=1.0D0/( 1.0D0/NU(ML) - T1)
-	  END DO
+	    T1=1.0D0/NU(I-1)-1.0D0/PLANCK_NU(I-1)		!Wavelength shift
+	    DO ML=I,NCF
+	      PLANCK_NU(ML)=1.0D0/( 1.0D0/NU(ML) - T1)
+	    END DO
 C
 C We now perform a simple linear interpolation of the electron scattered 
 C Planck function back onto the old frequency grid. We apply the same
@@ -330,24 +333,26 @@ C
 C No interpolation is done for the end points (which have coherent scattering).
 C The immediate interior points, if necessary, are handled by extrapolation.
 C
-	  A(:)=DLOG(J_ES(:))
-	  J_ES(1)=A(1)		!Must be in LOG form: not modified by interp.
-	  J_ES(NCF)=A(NCF)
-	  C(:)=PLANCK_ES(:)	!Already taken LOG
-	  I=1
-	  DO ML=2,NCF-1
-	    DO WHILE (NU(ML) .LT. PLANCK_NU(I+1) .AND. I .LT. NCF-1)
-	       I=I+1
+	    A(:)=DLOG(J_ES(:))
+	    J_ES(1)=A(1)		!Must be in LOG form: not modified by interp.
+	    J_ES(NCF)=A(NCF)
+	    C(:)=PLANCK_ES(:)	!Already taken LOG
+	    I=1
+	    DO ML=2,NCF-1
+	      DO WHILE (NU(ML) .LT. PLANCK_NU(I+1) .AND. I .LT. NCF-1)
+	         I=I+1
+	      END DO
+	      T1=(NU(ML)-PLANCK_NU(I))/(PLANCK_NU(I+1)-PLANCK_NU(I))
+	      PLANCK_ES(ML)=T1*C(I+1)+(1.0D0-T1)*C(I)
+	      J_ES(ML)=T1*A(I+1)+(1.0D0-T1)*A(I)
 	    END DO
-	    T1=(NU(ML)-PLANCK_NU(I))/(PLANCK_NU(I+1)-PLANCK_NU(I))
-	    PLANCK_ES(ML)=T1*C(I+1)+(1.0D0-T1)*C(I)
-	    J_ES(ML)=T1*A(I+1)+(1.0D0-T1)*A(I)
-	  END DO
 C
 C To remove any residual variations (primarily at low frequencies) we now
 C scale J according the the ratio of the PLANCK functions.
 C
-	  J_ES(:)=EXP( J_ES(:)+ (PLANCK_FN(:)-PLANCK_ES(:)) )
+	     J_ES(:)=EXP( J_ES(:)+ (PLANCK_FN(:)-PLANCK_ES(:)) )
+!
+	END IF
 C                       
 C Store the computed  J to be used to treat the electron scattering. We 
 C overwrite J_STORE since the mean intensity is no longer required in this 
