@@ -101,6 +101,7 @@ C
 	USE CMF_FORM_MOD
 	IMPLICIT NONE
 C
+C Altered 10-Oct-2004 : Replaced R*R-P*P by (R-P)*(R+P) in Z sqrt calculation.
 C Altered 21-Aug-1997 : New version (V2) on NEW_R_SCALE called. This has a 
 C                         finer grid spacing a the outer boundary which
 C                         overcomes numerical difficulties with P Cygni models.
@@ -417,7 +418,7 @@ C
 	    NI_RAY(LS)=NRAY
 	    NI=NI_RAY(LS)
 	    DO I=1,NI_RAY(LS)
-	      Z(I,LS)=SQRT(R_RAY(I,LS)*R_RAY(I,LS)-P_EXT(LS)*P_EXT(LS))
+	      Z(I,LS)=SQRT( (R_RAY(I,LS)-P_EXT(LS))*(R_RAY(I,LS)+P_EXT(LS)) )
 	    END DO
 C
 C We now have the new radius grid. We now need to interpolate V and SIGMA onto
@@ -520,6 +521,7 @@ C
 	  DO LS=1,NP_EXT
 	    MU_AT_RMAX(LS)=SQRT(1.0D0-(P_EXT(LS)/R_EXT(1))**2)
 	  END DO
+	  IF(P_EXT(NP_EXT) .EQ. R_EXT(1))MU_AT_RMAX(NP_EXT)=0.0D0
 	  CALL HTRPWGT(MU_AT_RMAX,HQW_AT_RMAX,NP_EXT)
 C
 	  FIRST_TIME=.FALSE.

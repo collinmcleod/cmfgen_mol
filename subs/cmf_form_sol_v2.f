@@ -104,6 +104,7 @@ C
 	USE CMF_FORM_MOD_V2
 	IMPLICIT NONE
 C
+C Altered 10-Oct-2004 : Adjusted SQRT in computation oz to use (R-P)*(R+P).
 C Altered 22-Jun-2000 : Changed to V2. SOLUTION_OPTION inserted in call. Can
 C                           now use INTEGRAL method to get IPLUS_P. Method
 C                           adapted from FG_J_CMF_V9.  
@@ -201,7 +202,7 @@ C ND+ND_ADD_MAX (=NRAY) is the (MAXIMUM) number of points along a ray.
 C PNT_FAC can be adjusted to different integer values so that more points
 C can be inserted along a ray.
 C
-	INTEGER*4, PARAMETER :: PNT_FAC=1
+	INTEGER*4, PARAMETER :: PNT_FAC=3
 	REAL*8 TA(PNT_FAC*(ND+ND_ADD_MAX))
 	REAL*8 TB(PNT_FAC*(ND+ND_ADD_MAX))
 	REAL*8 TC(PNT_FAC*(ND+ND_ADD_MAX))
@@ -456,15 +457,31 @@ C
 C
 	    NI_ORIG=ND_EXT-(LS-NC-1)
 	    IF(LS .LE. NC)NI_ORIG=ND_EXT
-	    CALL NEW_R_SCALE_V2(R_RAY(1,LS),NRAY,R_EXT,NI_ORIG,ROH_EXT,
-	1                  P_EXT(LS),L_FALSE,L_TRUE)
+!
+	    T1=1.0D0/PNT_FAC
+	    DO I=1,NI_ORIG-1
+	      DO J=1,PNT_FAC
+	        K=(I-1)*PNT_FAC+J
+	        R_RAY(K,LS)=R_EXT(I)-(J-1)*T1*(R_EXT(I)-R_EXT(I+1))
+	      END DO
+	    END DO
+	    NRAY=(NI_ORIG-1)*PNT_FAC+1
+	    R_RAY(NRAY,LS)=R_EXT(NI_ORIG)
+!
+!	    IF(LS .LE. NC)THEN
+!	      NI_ORIG=ND_EXT
+!	      R_RAY(1:ND_EXT,LS)=R_EXT(1:ND_EXT)
+!	    ELSE
+!	      CALL NEW_R_SCALE_V2(R_RAY(1,LS),NRAY,R_EXT,NI_ORIG,ROH_EXT,
+!	1                  P_EXT(LS),L_FALSE,L_TRUE)
+!	    END IF
 C
 C NI and NI_RAY(LS) will now refer the NEW number of points along the ray.
 C
 	    NI_RAY(LS)=NRAY
 	    NI=NI_RAY(LS)
 	    DO I=1,NI_RAY(LS)
-	      Z(I,LS)=SQRT(R_RAY(I,LS)*R_RAY(I,LS)-P_EXT(LS)*P_EXT(LS))
+	      Z(I,LS)=SQRT( (R_RAY(I,LS)-P_EXT(LS))*(R_RAY(I,LS)+P_EXT(LS)) )
 	    END DO
 C
 C We now have the new radius grid. We now need to interpolate V and SIGMA onto
@@ -578,6 +595,7 @@ C
 	  DO LS=1,NP_EXT
 	    MU_AT_RMAX(LS)=SQRT(1.0D0-(P_EXT(LS)/R_EXT(1))**2)
 	  END DO
+	  IF(P_EXT(NP_EXT) .EQ. R_EXT(1))MU_AT_RMAX(NP_EXT)=0.0D0
 	  CALL HTRPWGT(MU_AT_RMAX,HQW_AT_RMAX,NP_EXT)
 C
 	  FIRST_TIME=.FALSE.

@@ -2,6 +2,7 @@ C
 C Program section to compute the continuum intnesity. Opacities must have
 C previuosly been evaluated.
 C
+C Altered 11-Oct-2004 - No longer use CMF_FOR_SOL_V2 until fix bug.
 C Altered -0-Feb-2004 - Bug fixed in Eddington section, which is no longer used.
 C Altered 21-Apr-2001 - J [ TC(NDEXT) ] was not being output to J_COMP correctly
 C                         when extra points were being inserted. Now access
@@ -370,7 +371,8 @@ C TRUE if FLUX_CAL_ONLY is true (single iteration with coherent,
 C last iteration if non-coherent).
 C
 	    IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
-	1         MAXCH .LT. VAL_DO_NG) )THEN
+	1         MAXCH .LT. -100.0D0) )THEN
+C	1         MAXCH .LT. VAL_DO_NG) )THEN
 C
 C Quick and dirty method to ge an extended DENSITY vector. Will use TB in
 C the call to CMF_FORM_SOL.
@@ -575,7 +577,8 @@ C TRUE if FLUX_CAL_ONLY is true (single iteration with coherent,
 C last iteration if non-coherent).
 C
 	    IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
-	1         MAXCH .LT. VAL_DO_NG) )THEN
+	1         MAXCH .LT. -100.0D0) )THEN
+C	1         MAXCH .LT. VAL_DO_NG) )THEN
 	      IF(COHERENT_ES)THEN
      	        TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ(1:ND)
 	      ELSE

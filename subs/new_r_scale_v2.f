@@ -6,6 +6,7 @@ C
 	SUBROUTINE NEW_R_SCALE_V2(R_NEW,ND,R,NI,CHI,P,RAMP_IN,RAMP_OUT)
 	IMPLICIT NONE
 C
+C Altered 10-Oct-2004 --- Changed SQRT to (R-P)*(R+P)
 C Altered 21-AUg-1997 --- Called V2, RAMP_IN and RAMP_OUT variables installed.
 C                           Done to fix numerical problems with CMF_FORM_SOL.
 C                           To evaluate TAU at outer boundary, CHI is now 
@@ -45,7 +46,7 @@ C
 C Compute path length variable Z.
 C
 	DO I=1,NI
-	  Z(I)=SQRT(R(I)*R(I)-P*P)
+	  Z(I)=SQRT( (R(I)-P)*(R(I)+P) )
 	END DO
 C
 C Evaluate Tau at outer boundary, assuming that CHI scales as a power law,
@@ -70,7 +71,7 @@ C
 	  CHI_SMALL=CHI_BIG
 	  CHI_BIG=CHI(1)*(R(1)/R_BIG)**ALPHA
 	  Z_SMALL=Z_BIG
-	  Z_BIG=SQRT(R_BIG*R_BIG-P*P)
+	  Z_BIG=SQRT( (R_BIG-P)*(R_BIG+P) )
 	  TAU(1)=TAU(1)+0.5D0*(Z_BIG-Z_SMALL)*(CHI_BIG+CHI_SMALL)
 	END DO
 C

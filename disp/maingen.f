@@ -1057,7 +1057,8 @@ C
 ! contribute signifcantly to the emissivity.
 !
 	  DO I=1,ND
-	    ETA_WITH_ES(I)=ETA(I)+RJ(I)*ED(I)*6.65E-15
+!	    ETA_WITH_ES(I)=ETA(I)+RJ(I)*ED(I)*6.65E-15
+	    ETA_WITH_ES(I)=ETA(I)+RJ(I)*ESEC(I)
 	  END DO
 C
 	END IF

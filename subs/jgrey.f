@@ -68,8 +68,7 @@ C
 	  NI=ND-(LS-NC-1)
 	  IF(LS .LE. NC)THEN
 	    NI=ND
-	    DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))
-	1   /R(ND)
+	    DBC=DBB*SQRT( (R(ND)-P(LS))*(R(ND)+P(LS)) )/R(ND)
 	  END IF
 C
 C Compute Z for this imapct parameter
@@ -100,7 +99,7 @@ C
 	ELSE IF(NI .EQ. 1)THEN
 	  XM(1)=0.0
 	ELSE IF(NI .EQ. 2)THEN
-	  Z(1)=SQRT(R(1)*R(1)-P(LS)*P(LS))
+	  Z(1)=SQRT( (R(1)-P(LS))*(R(1)+P(LS)) )
 	  DTAU(1)=0.5D0*Z(1)*(CHI(1)+CHI(2))		!Z(2)=0.0
 	  E1=DEXP(-DTAU(1))
 	  E2=1.0D0-(1.0D0-E1)/DTAU(1)
