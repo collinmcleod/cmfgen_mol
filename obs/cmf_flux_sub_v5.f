@@ -594,6 +594,7 @@ C
 	  END IF
 	END DO
 !
+	LUER=ERROR_LU()
 	IF(EQNE .NE. I)THEN
 	  WRITE(LUER,*)'Error - EQNE has wrong value in CMFGEN'
 	  STOP

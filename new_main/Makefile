@@ -43,16 +43,15 @@ $(EXE_DIR)cmfgen_dev.exe : cmfgen.o cmfgen_sub.o \
 USR=$(LIB_DIR)libtools.a(usr_option.o)
 
 MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
+      $(LIB_DIR)libmod.a(cmf_sob_mod.o)\
       $(LIB_DIR)libmod.a(control_variable_mod.o)\
-      $(LIB_DIR)libmod.a(opac_mod.o)\
-      $(LIB_DIR)libmod.a(steq_data_mod.o)\
-      $(LIB_DIR)libmod.a(line_vec_mod.o)\
-      $(LIB_DIR)libmod.a(mod_lev_dis_blk.o)
-
-MODT= $(LIB_DIR)libmod.a(radiation_mod.o)\
-      $(LIB_DIR)libmod.a(var_rad_mod.o)\
       $(LIB_DIR)libmod.a(line_mod.o)\
-      $(LIB_DIR)libmod.a(cmf_sob_mod.o)
+      $(LIB_DIR)libmod.a(line_vec_mod.o)\
+      $(LIB_DIR)libmod.a(mod_lev_dis_blk.o)\
+      $(LIB_DIR)libmod.a(opac_mod.o)\
+      $(LIB_DIR)libmod.a(radiation_mod.o)\
+      $(LIB_DIR)libmod.a(steq_data_mod.o)\
+      $(LIB_DIR)libmod.a(var_rad_mod.o)
 
 cmfgen.o : cmfgen.f $(MODS) $(USR)
 	$(F90) -c $(FG) cmfgen.f 
@@ -70,12 +69,6 @@ $(MODS): mod
 
 mod:
 	(cd mod_subs ; make )
-
-$(MODT): modt
-
-modt:
-	(cd tmp ; make )
-
 
 # We now MAKE the required libraries. Note that this double
 # dependence is rquired to ensure that the libraries are updated.
