@@ -45,6 +45,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(write_line.o)\
       $(LIB)(writscrat.o)\
       $(LIB)(wr_col.o)\
+      $(LIB)(wr_col_rates.o)\
       $(LIB)(xvecfeau.o)
 
 all : $(LIB)
