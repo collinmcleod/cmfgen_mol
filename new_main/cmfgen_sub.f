@@ -580,6 +580,7 @@ C
 C
 	REAL*8 AD_COOL_V(ND)
 	REAL*8 AD_COOL_DT(ND)
+	REAL*8 ARTIFICIAL_HEAT_TERM(ND)
 C
 C Indicates number of time POPS array is to be written to scratch
 C file per iteration.
@@ -4428,6 +4429,11 @@ C
 	1                       POPS,AVE_ENERGY,HDKT,
 	1                       COMPUTE_BA,INCL_ADIABATIC,
 	1                       DIAG_INDX,NUM_BNDS,NT,ND)
+!
+! Prevent T from becoming too small by adding a extra heating term.
+!
+	CALL PREVENT_LOW_T(ARTIFICIAL_HEAT_TERM,T_MIN,COMPUTE_BA,LAMBDA_ITERATION,
+	1                       T_MIN_BA_EXTRAP,DIAG_INDX,NUM_BNDS,ND,NT)
 C
 C Write pointer file and store BA, BA_ED and B_T matrices.
 C
@@ -4471,9 +4477,9 @@ C
 	    CALL FSTCOOL(R,T,ED,TA,TB,ML,ND,LU_REC_CHK)
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
-	        CALL WRCOOLGEN(ATM(ID)%BFCRXzV, ATM(ID)%FFXzV, ATM(ID)%COOLXzV,
+	        CALL WRCOOLGEN_V2(ATM(ID)%BFCRXzV, ATM(ID)%FFXzV, ATM(ID)%COOLXzV,
 	1           DIECOOL(1,ATM(ID)%INDX_XzV), X_COOL(1,ATM(ID)%INDX_XzV),
-	1           ATM(ID)%XzV_PRES, ATM(ID)%NXzV, ION_ID(ID),
+	1           ARTIFICIAL_HEAT_TERM,ATM(ID)%XzV_PRES, ATM(ID)%NXzV, ION_ID(ID),
 	1           TA,TB,LS,ND,LU_REC_CHK)
 	      END IF
 	    END DO
@@ -5675,6 +5681,7 @@ C
 	    WRBAMAT=.TRUE.
 	  END IF
 	END IF
+	IF(T_MIN_BA_EXTRAP)COMPUTE_BA=.TRUE.
 C
 C The STEQ array contains the percentage changes in the populations.
 C Shall now determine whether the population changes are too large.

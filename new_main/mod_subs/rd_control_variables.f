@@ -550,6 +550,8 @@ C
 	  ELSE
 	    CON_SCL_T=1000.0D0
 	  END IF
+	  T_MIN=0.0D0
+	  CALL RD_STORE_DBLE(T_MIN,'T_MIN',L_FALSE,'Minimum electron temperature')
 	  DO_SRCE_VAR_ONLY=.FALSE. 
 	  CALL RD_STORE_LOG(DO_SRCE_VAR_ONLY,'SRCE_ONLY',L_FALSE,
 	1            'Allow only ths source function to vary?')

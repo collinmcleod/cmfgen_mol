@@ -3204,12 +3204,13 @@ C
 	        DO I=1,ND
 	          TA(I)=POPDUM(I,ISPEC)
 	        END DO
-	        YAXIS=TRIM(SPECIES_ABR(ISPEC))//'\un+\d/N('//TRIM(SPECIES_ABR(ISPEC))//')'
+	        YAXIS='Log '//TRIM(SPECIES_ABR(ISPEC))//
+	1                       '\un+\d/N('//TRIM(SPECIES_ABR(ISPEC))//')'
 	      ELSE
 	        DO I=1,ND
 	          TA(I)=POP_ATOM(I)
 	        END DO
-	        YAXIS=TRIM(SPECIES_ABR(ISPEC))//'\un+\d/N(total)'
+	        YAXIS='Log '//TRIM(SPECIES_ABR(ISPEC))//'\un+\d/N(total)'
 	      END IF
 	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
 	        IF(ATM(ID)%XzV_PRES)THEN

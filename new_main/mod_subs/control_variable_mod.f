@@ -88,7 +88,9 @@
 !
 	REAL*8 GREY_PAR
 	REAL*8 T_INIT_TAU
+	REAL*8 T_MIN
 	LOGICAL ITERATE_INIT_T
+	LOGICAL T_MIN_BA_EXTRAP
 !
 ! Indicates that the R grid for the NEWMODEL should be rad in from a file --
 ! ist is not computed.

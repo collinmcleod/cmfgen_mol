@@ -25,6 +25,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(fixpop_t.o)\
       $(LIB)(fixpop_in_ba_v3.o)\
       $(LIB)(generate_full_matrix_v3.o)\
+      $(LIB)(prevent_low_t.o)\
       $(LIB)(read_ba_data_v2.o)\
       $(LIB)(read_bcd_mat.o)\
       $(LIB)(set_ba_storage.o)\
