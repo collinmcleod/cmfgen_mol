@@ -126,15 +126,16 @@ C
 	ELSE
 	  OLDR(NDOLD)=R(ND)
 	END IF
-	IF(R(1)/OLDR(1)-1.0D0 .GT. 0.0001)THEN
-	  WRITE(LUER,*)'Error in REGRIDWSC'
-	  WRITE(LUER,*)'Model boundary radius greater than that of input model'
-	  STOP
-	ELSE IF(R(2) .GT. OLDR(1))THEN
-	  WRITE(LUER,*)'Error in REGRIDWSC'
-	  WRITE(LUER,*)'Boundary radius R(2) too large'
-	  STOP
-	ELSE IF(R(1) .GT. OLDR(1))THEN
+!
+!	IF(R(1)/OLDR(1)-1.0D0 .GT. 0.0001)THEN
+!	  WRITE(LUER,*)'Error in REGRIDWSC'
+!	  WRITE(LUER,*)'Model boundary radius greater than that of input model'
+!	  STOP
+!	ELSE IF(R(2) .GT. OLDR(1))THEN
+!	  WRITE(LUER,*)'Error in REGRIDWSC'
+!	  WRITE(LUER,*)'Boundary radius R(2) too large'
+!	  STOP
+	IF(R(1) .GT. OLDR(1))THEN
 	  OLDR(1)=R(1)
 	END IF
 	NXST=1
