@@ -39,6 +39,9 @@
 	USE STEQ_DATA_MOD 
 	IMPLICIT NONE
 !
+! Altered 11-Feb-2005 :: Rewrite setion in BA_FF.
+!                        Done to try an improve memory access when using very
+!                           large arrays.
 ! Altered 04-Apr-2004 :: Changed to V7
 !                        ETA_CONT and DO_SRCE_VAR_ONLY inserted into call.
 !                        It is now possible to vary the SOURCE function, and not the 
@@ -100,7 +103,7 @@
 	LOGICAL NEW_CONT
 	LOGICAL DO_SRCE_VAR_ONLY
 !
-	REAL*8 COMP_VEC(NT)
+	REAL*8 COMP_VEC(NT,NUM_BNDS,ND)
 !
 ! Constants for opacity etc.
 !
@@ -247,39 +250,50 @@
 	        END DO
 	      END IF
  	    END DO
+	  END DO
 C
+	  DO L=DST,DEND
 	    BNDST=MAX( 1+DIAG_INDX-L, 1 )
 	    BNDEND=MIN( ND+DIAG_INDX-L, NUM_BNDS )
 	    DO K=BNDST,BNDEND	  			!Variable depth.
 	      LS=L+K-DIAG_INDX
 	      DO J=1,NT
-	        COMP_VEC(J)=ABS(VJ(J,K,L)*POPS(J,LS))-RJ(L)*dJ_CHK_FAC
+	        COMP_VEC(J,K,L)=ABS(VJ(J,K,L)*POPS(J,LS))-RJ(L)*dJ_CHK_FAC
 	      END DO
-	      DO ID=1,NION
-	        IF(SE(ID)%XzV_PRES .AND. K .EQ. DIAG_INDX)THEN
-   	          DO  JJ=1,SE(ID)%N_IV	  	  	  !Variable
-  	            J=SE(ID)%LNK_TO_F(JJ)
-	            IF( COMP_VEC(J) .GE. 0.0D0 )THEN
-	              DO  I=1,SE(ID)%N_SE	  	  !Which S.E.
-	                SE(ID)%BA_PAR(I,JJ,L)=SE(ID)%BA_PAR(I,JJ,L) +
+	    END DO
+	  END DO
+!
+	  DO ID=1,NION
+	    IF(SE(ID)%XzV_PRES)THEN
+	      DO L=DST,DEND
+	        BNDST=MAX( 1+DIAG_INDX-L, 1 )
+	        BNDEND=MIN( ND+DIAG_INDX-L, NUM_BNDS )
+	        DO K=BNDST,BNDEND	  			!Variable depth.
+	          IF(K .EQ. DIAG_INDX)THEN
+   	            DO  JJ=1,SE(ID)%N_IV	  	  	  !Variable
+  	              J=SE(ID)%LNK_TO_F(JJ)
+	              IF( COMP_VEC(J,K,L) .GE. 0.0D0 )THEN
+	                DO  I=1,SE(ID)%N_SE	  	  !Which S.E.
+	                  SE(ID)%BA_PAR(I,JJ,L)=SE(ID)%BA_PAR(I,JJ,L) +
 	1                           SE(ID)%QFV_R(I,L)*VJ(J,K,L)
-	              END DO
-	            END IF
-	          END DO
-	        ELSE IF(SE(ID)%XzV_PRES)THEN
-   	          DO JJ=1,SE(ID)%N_IV	  	  	  !Variable
-  	            J=SE(ID)%LNK_TO_F(JJ)
-	            IF( COMP_VEC(J) .GE. 0.0D0 )THEN
-	              DO I=1,SE(ID)%N_SE	  	  !Which S.E.
-	                 SE(ID)%BA(I,JJ,K,L)=SE(ID)%BA(I,JJ,K,L) +
+	                END DO
+	              END IF
+	            END DO
+	          ELSE 
+   	            DO JJ=1,SE(ID)%N_IV	  	  	  !Variable
+  	              J=SE(ID)%LNK_TO_F(JJ)
+	              IF( COMP_VEC(J,K,L) .GE. 0.0D0 )THEN
+	                DO I=1,SE(ID)%N_SE	  	  !Which S.E.
+	                  SE(ID)%BA(I,JJ,K,L)=SE(ID)%BA(I,JJ,K,L) +
 	1                          SE(ID)%QFV_R(I,L)*VJ(J,K,L)
-	              END DO
-	            END IF
-	          END DO	!Loop over variable
-	        END IF
-	      END DO		!Loop over species
-	    END DO		!Loop over band
-	  END DO					!Do DST to DEND
+	                END DO
+	              END IF
+	            END DO	!Loop over variable
+	          END IF
+	        END DO		!Loop over band
+	      END DO		!Do DST to DEND
+	    END IF		!Is species present
+	  END DO		!Loop over species
 	  CALL TUNE(2,'BA_UP_BANF')
 C
 C Update BA matrices for several frequencies at once.
@@ -300,40 +314,58 @@ C
 	        END DO
 	      END IF
 	    END DO
+	  END DO
 C
 C NB: We use VJ_P to compute COMP_VEC as this is defined a Int[ (VJ/v) dv].
 C            RJ_SUM is defined in the same way (i..e., Int[ (J/v) dv]
 C
+	  DO L=DST,DEND
+	    BNDST=MAX( 1+DIAG_INDX-L, 1 )
+	    BNDEND=MIN( ND+DIAG_INDX-L, NUM_BNDS )
 	    DO K=BNDST,BNDEND	  			!Variable depth.
 	      LS=L+K-DIAG_INDX
 	      DO J=1,NT
-	        COMP_VEC(J)=ABS(VJ_P(J,K,L)*POPS(J,LS))-RJ_SUM(L)*dJ_CHK_FAC
+	        COMP_VEC(J,K,L)=ABS(VJ_P(J,K,L)*POPS(J,LS))-RJ_SUM(L)*dJ_CHK_FAC
 	      END DO
-	      DO ID=1,NION
-	        IF(K .EQ. DIAG_INDX .AND. SE(ID)%XzV_PRES)THEN
-   	          DO JJ=1,SE(ID)%N_IV	  	  	  !Variable
-  	            J=SE(ID)%LNK_TO_F(JJ)
-                    IF( COMP_VEC(J) .GE. 0.0D0 )THEN
-	              DO  I=1,SE(ID)%N_SE	  	  !Which S.E.
-	                SE(ID)%BA_PAR(I,JJ,L)=SE(ID)%BA_PAR(I,JJ,L)+
+	    END DO
+	  END DO
+!
+	  DO ID=1,NION
+	    IF(SE(ID)%XzV_PRES)THEN
+!
+	      DO L=DST,DEND
+	        K=DIAG_INDX
+   	        DO JJ=1,SE(ID)%N_IV	  	  	  !Variable
+  	          J=SE(ID)%LNK_TO_F(JJ)
+                  IF( COMP_VEC(J,K,L) .GE. 0.0D0 )THEN
+	            DO  I=1,SE(ID)%N_SE	  	  !Which S.E.
+	              SE(ID)%BA_PAR(I,JJ,L)=SE(ID)%BA_PAR(I,JJ,L)+
+	1                ( SE(ID)%QFV_R(I,L)*VJ_R(J,K,L) - SE(ID)%QFV_P(I,L)*VJ_P(J,K,L) )
+	            END DO
+	          END IF
+	        END DO
+	      END DO
+!
+	      DO L=DST,DEND
+	        BNDST=MAX( 1+DIAG_INDX-L, 1 )
+	        BNDEND=MIN( ND+DIAG_INDX-L, NUM_BNDS )
+	        DO K=BNDST,BNDEND	  			!Variable depth.
+	          IF(K .NE. DIAG_INDX)THEN
+   	            DO JJ=1,SE(ID)%N_IV	  	  	  !Variable
+  	              J=SE(ID)%LNK_TO_F(JJ)
+                      IF( COMP_VEC(J,K,L) .GE. 0.0D0)THEN
+	                DO  I=1,SE(ID)%N_SE	  	  !Which S.E.
+	                  SE(ID)%BA(I,JJ,K,L)=SE(ID)%BA(I,JJ,K,L)+
 	1                 ( SE(ID)%QFV_R(I,L)*VJ_R(J,K,L) - SE(ID)%QFV_P(I,L)*VJ_P(J,K,L) )
-	              END DO
-	            END IF
-	          END DO
-	        ELSE IF(SE(ID)%XzV_PRES)THEN
-   	          DO JJ=1,SE(ID)%N_IV	  	  	  !Variable
-  	            J=SE(ID)%LNK_TO_F(JJ)
-                    IF( COMP_VEC(J) .GE. 0.0D0)THEN
-	              DO  I=1,SE(ID)%N_SE	  	  !Which S.E.
-	                SE(ID)%BA(I,JJ,K,L)=SE(ID)%BA(I,JJ,K,L)+
-	1               ( SE(ID)%QFV_R(I,L)*VJ_R(J,K,L) - SE(ID)%QFV_P(I,L)*VJ_P(J,K,L) )
-	              END DO
-	            END IF
-	          END DO
-	        END IF
-	      END DO			!Loop over ion
-	    END DO			!Loop over K (band index)
-	  END DO			!Loop over depth (DST to DEND)
+	                END DO
+	              END IF
+	            END DO
+	          END IF
+	        END DO			!Loop over K (band index)
+	      END DO			!Loop over depth (DST to DEND)
+!
+	    END IF			!Is species present
+	  END DO			!Loop over ion
 	  CALL TUNE(2,'BA_FF')
 	END IF
 	CALL TUNE(ITWO,'BA_UP')

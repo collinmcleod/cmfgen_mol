@@ -1656,7 +1656,7 @@ C
 	    WRITE(111,*)'FREQ=',FREQ
 	    WRITE(111,'(3X,A,5X,4(5X,A,5X))')'I','JNU','ETA','CHI','ESEC'
 	    DO J=1,ND
-	      WRITE(111,*)I,JNU(I),ETA(I),CHI(I),ESEC(I)
+	      WRITE(111,'(X,I5,4ES16.6)')J,JNU(J),ETA(J),CHI(J),ESEC(J)
 	    END DO
 	    J=ERROR_LU()
 	    WRITE(J,*)'Error on FG_J_CMF_V10 --- negative mean intensities.'

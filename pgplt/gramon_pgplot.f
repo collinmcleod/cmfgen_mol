@@ -6,6 +6,7 @@
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
+! Altered:  26-Jan-2005 : Change default margins to give more room on borders.
 ! Altered:  30-May-2003 : Improvements to YAR and XAR options.
 ! Altered:  11-Feb-2002 : Bug fixed with EW option for reversed data.
 ! Altered:  04-Apr-2001 : Include option for differen PLT_ST filename.
@@ -288,6 +289,7 @@
 !
 	LINE_STYLE(:)=1
 	LINE_WGT(:)=1
+	MARKER_STYLE(:)=1
 	DASH=.FALSE.
 !
 ! Assign a color index to each pen. Keep previus assignments if they have been
@@ -392,6 +394,11 @@
 	  CALL PGENV(XPAR(1),XPAR(2),YPAR(1),YPAR(2),IZERO,IZERO)
 	  CALL PGQVP(0.,MARGINX(1),MARGINX(2),MARGINY(1),MARGINY(2))
 	  IF (MARGINX(1) .LT. (.9)) MARGINX(1)=MARGINX(1)+.05
+!
+! Increase default border size.
+!
+	  MARGINX(1)=0.15; MARGINX(2)=0.9
+          MARGINY(1)=0.15; MARGINY(2)=0.9
 !
 ! Set preferred defaults for pen colors.
 !

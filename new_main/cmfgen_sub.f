@@ -48,7 +48,7 @@ C
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 C
 	CHARACTER*12 PRODATE
-	PARAMETER (PRODATE='13-Sep-2004')	!Must be changed after alterations
+	PARAMETER (PRODATE='15-Sep-2005')	!Must be changed after alterations
 C
 C 
 C
@@ -2319,10 +2319,13 @@ C
 ! NB: We do not set VB(I) to if NEG_OPACITY(I)=.TRUE. as we have not altered
 !     CHIL : We have only changed CHI which effects JBAR only.
 !
+! Altered 15-Feb-2005: No longer need VC. We now xplicitly cancel NU/ETAL depdence with
+! Nu.
+!
 	      DO I=1,ND
 	        VB(I)=-JBAR_SIM(I,SIM_INDX)/ETAL_MAT(I,SIM_INDX)
-	        VC(I)=JBAR_SIM(I,SIM_INDX)*CHIL_MAT(I,SIM_INDX) /
-	1                       ETAL_MAT(I,SIM_INDX)/ETAL_MAT(I,SIM_INDX)
+!	        VC(I)=JBAR_SIM(I,SIM_INDX)*CHIL_MAT(I,SIM_INDX) /
+!	1                       ETAL_MAT(I,SIM_INDX)/ETAL_MAT(I,SIM_INDX)
 	      END DO
 !
 	      OPAC_FAC=OSCIL(SIM_INDX)*OPLIN
@@ -2346,9 +2349,7 @@ C
 	      END IF
 	      DO K=1,ND
 	        dRATE_dUP=EINA(SIM_INDX)*U_STAR_RATIO(K,SIM_INDX)*
-	1            ( ZNET_SIM(K,SIM_INDX)+
-	1              U_STAR_RATIO(K,SIM_INDX)*
-	1              POPS(NUP,K)*(STIM_FAC*VB(K)+EMIS_FAC*VC(K)) )
+	1            (1.0D0+U_STAR_RATIO(K,SIM_INDX)*POPS(NUP,K)*STIM_FAC*VB(K))
 	        dRATE_dLOW=EINA(SIM_INDX)*U_STAR_RATIO(K,SIM_INDX)*
 	1              L_STAR_RATIO(K,SIM_INDX)*OPAC_FAC*POPS(NUP,K)*VB(K)
 	        L=GET_DIAG(K)
@@ -3526,7 +3527,7 @@ C
 	  CALL WRITV(LLUMST,ND,'Line Emission',LU_FLUX)
 	  CALL WRITV(MECH_LUM,ND,'Mechanical Luminosity',LU_FLUX)
 	  CALL WRITV(RLUMST,ND,'Total Radiative Luminosity',LU_FLUX)
-	  CALL WRITV(XRAY_LUM_TOT,ND,'Total Schock Luminosity',LU_FLUX)
+	  CALL WRITV(XRAY_LUM_TOT,ND,'Total Schock Luminosity (Lsun)',LU_FLUX)
 C
 C Include the machanical luminosity imprted to the wind by the radiation 
 C field in the total luminozity.
@@ -3547,7 +3548,7 @@ C
 ! The seocnd XRAY flux printed is the OBSERVED XRAY luminosity. Its should be very similar
 ! to the eralier value for optically thin winds.
 !
-	  WRITE(LU_FLUX,'(A,T60,ES12.4)')'Total Shock Luminosity:',SUM(XRAY_LUM_TOT)
+	  WRITE(LU_FLUX,'(A,T60,ES12.4)')'Total Shock Luminosity (Lsun):',SUM(XRAY_LUM_TOT)
 	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'X-ray Luminosity (> 0.1 keV) :',SUM(XRAY_LUM_0P1),OBS_XRAY_LUM_0P1
 	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'X-ray Luminosity (> 1 keV):',SUM(XRAY_LUM_1KEV),OBS_XRAY_LUM_1KEV
 	CLOSE(UNIT=LU_FLUX)

@@ -299,9 +299,10 @@ C
 	  IF(.NOT. LOG_X)WRITE(T_OUT,*)'Now using Linear X axis'
 	ELSE IF(X(1:2) .EQ.'XU' .OR. X(1:6) .EQ. 'XUNITS')THEN
 	  CALL USR_OPTION(X_UNIT,'X_UNIT','Ang',
-	1                  'Ang, um, eV, keV, Hz, Mm/s, km/s')
+	1                  'Ang, AA[Air Ang], um, eV, keV, Hz, Mm/s, km/s')
 	  CALL SET_CASE_UP(X_UNIT,IZERO,IZERO)
 	  IF(X_UNIT .NE. 'ANG' .AND.
+	1        X_UNIT .NE. 'AA' .AND.
 	1        X_UNIT .NE. 'UM' .AND.
 	1        X_UNIT .NE. 'EV' .AND.
 	1        X_UNIT .NE. 'KEV' .AND.
@@ -1355,7 +1356,12 @@ C
 	    DNU=DLOG10(NU(NCF)/NU(1))/(NBB-1)
 	    DO I=1,NBB
 	      T1=NU(1)*10.0**(DNU*(I-1))
-	      YV(I)=TWOHCSQ*(T1**3)/(DEXP(HDKT*T1/TEMP)-1.0D0)
+	       T3=HDKT*T1/TEMP
+	       IF(T3 .GT. 1.0D0)THEN
+	         YV(I)=TWOHCSQ*(T1**3)*DEXP(-T3)/(1.0D0-DEXP(-T3))
+	       ELSE
+	         YV(I)=TWOHCSQ*(T1**3)/(DEXP(T3)-1.0D0)
+	       END IF
 	      XV(I)=T1
 	    END DO         
 	    IF(NORM_WAVE .GT. 200)THEN

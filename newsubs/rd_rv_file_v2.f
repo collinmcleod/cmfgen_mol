@@ -9,6 +9,8 @@
 !
 	SUBROUTINE RD_RV_FILE_V2(R,V,SIGMA,RMAX,RP,VINF,LUIN,ND,OPTIONS,N_OPT)
 !
+! Modified 02-Feb-2005: Blank lines and comments can now appear after ND string
+!                         but before main data set.
 ! Modified 27-Apr-2000: VINF inserted in call.
 ! Modified 10-Feb-2000: Option string now utilized.
 !                         RVSIG_COL format inserted.
@@ -69,6 +71,14 @@
 	    WRITE(LUER,*)'Routine can''t yet handle a differnet number of depth points'
 	    STOP
 	  END IF
+!
+! Skip any further blank strings or comments.
+!
+	  STRING=' '
+	  DO WHILE(STRING .EQ. ' ' .OR. STRING(1:1) .EQ. '!')
+	    READ(LUIN,'(A)')STRING
+	  END DO
+	  BACKSPACE(LUIN)
 !
 	  DO I=1,ND
 	    READ(LUIN,*)R(I),V(I),SIGMA(I)

@@ -115,7 +115,11 @@
 !
 ! 
 !                            
-	IF(.NOT. CONT_VEL .AND. THIS_FREQ_EXT)THEN
+	IF(CONT_VEL .AND. USE_FIXED_J)THEN
+	  CALL RD_CONT_J(FL,FREQ_INDX,FIRST_FREQ,LST_ITERATION,
+	1          ACCURATE,LUER,LU_EDD,ACCESS_F,ND,NP)
+!
+	ELSE IF(.NOT. CONT_VEL .AND. THIS_FREQ_EXT)THEN
 C
 C Solve for the mean intensity J . We can either solve for J with or without
 C Eddington factors. Generally use Eddington factors when there is many 

@@ -358,6 +358,9 @@ C
 	1      'Frequency spacing between lines (in km/s)')
 C
 	  WRITE(LUSCR,'()')
+	  USE_FIXED_J=.FALSE.
+	  CALL RD_STORE_LOG(USE_FIXED_J,'USE_FIXED_J',L_FALSE,
+	1           'Use previously computed J to evaluate ALL rates?')
 	  CALL RD_STORE_LOG(FLUX_CAL_ONLY,'FLUX_CAL_ONLY',L_TRUE,
 	1           'Compute the observers frame flux only ?')
 	  CALL RD_STORE_LOG(EXTEND_FRM_SOL,'EXT_FRM_SOL',L_TRUE,

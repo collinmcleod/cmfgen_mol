@@ -27,7 +27,7 @@
 	INTEGER*4 N_PLTS
 !
 	WRITE(LU_TERM,*)' '
-	WRITE(LU_TERM,*)'For N=2: EXPAND_CHAR=1.3; EXPAND_TICK=1.3; ASR=0.35; Plot Size=20 cm'
+	WRITE(LU_TERM,*)'For N=2: EXPAND_CHAR=1.6; EXPAND_TICK=1.6; ASR=0.35; Plot Size=20 cm'
 	WRITE(LU_TERM,*)'For N=3: EXPAND_CHAR=3.0; EXPAND_TICK=3.0; ASR=0.25; Plot Size=20 cm'
 	WRITE(LU_TERM,*)'For N=3: EXPAND_CHAR=3.0; EXPAND_TICK=3.0; ASR=0.23; Plot Size=20 cm (xlab on all plots)'
 	WRITE(LU_TERM,*)' '
@@ -56,7 +56,7 @@ C
 !
 !	  WRITE(LU_OUT,'(A)')'  0.8 0.8 scale'
 	  IF(N_PLTS .EQ. 2)THEN
-	    WRITE(LU_OUT,'(A)')'  0 0 translate'
+	    WRITE(LU_OUT,'(A)')'  0 -500 translate'
 	  ELSE IF(N_PLTS .EQ. 3)THEN
 	    WRITE(LU_OUT,'(A)')'  0 -500 translate'
 	  ELSE IF(N_PLTS .EQ. 4)THEN

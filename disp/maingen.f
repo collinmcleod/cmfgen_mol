@@ -304,11 +304,11 @@ C
 C
 	REAL*8 GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT
 	REAL*8 FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
-	REAL*8 ASTRONOMICAL_UNIT
+	REAL*8 ASTRONOMICAL_UNIT,RAD_SUN
 	INTEGER*4 GET_INDX_DP
 	EXTERNAL GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT,GET_INDX_DP
 	EXTERNAL FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
-	EXTERNAL ASTRONOMICAL_UNIT
+	EXTERNAL ASTRONOMICAL_UNIT,RAD_SUN
 C
 	LOGICAL PRESENT			!indicates whether species is linked
 	LOGICAL EQUAL
@@ -1107,6 +1107,19 @@ C
 	  END IF
 	  XAXSAV=XAXIS
 !
+	ELSE IF(XOPT .EQ. 'XRSUN')THEN
+	  FLAG=.FALSE.
+	  CALL USR_HIDDEN(FLAG,'LIN','F','Linear axis (def=F)')
+	  T1=1.0D+10/RAD_SUN()
+	  XV(1:ND)=T1*R(1:ND)
+	  IF(FLAG)THEN
+	    XAXIS='r(R\dsun\u)'
+	  ELSE
+	    XV(1:ND)=LOG10(XV(1:ND))
+	    XAXIS='Log r(R\d\sun\u)'
+	  END IF
+	  XAXSAV=XAXIS
+!
 	ELSE IF(XOPT .EQ. 'XARC')THEN
 !
 ! NB: 1 AU corresponds to exactly 1" at 1kpc.
@@ -1162,7 +1175,7 @@ C
 C
 	ELSE IF(XOPT .EQ. 'XLOGV')THEN
 	  CALL DLOGVEC(V,XV,ND)
-	  XAXIS='Log(V(kms\u-1\d))'
+	  XAXIS='Log V(kms\u-1\d)'
 	  XAXSAV=XAXIS
 C
 	ELSE IF(XOPT .EQ. 'XCOLD')THEN
@@ -1851,7 +1864,7 @@ C
 	ELSE IF(XOPT .EQ. 'LOGV') THEN
 	  CALL DLOGVEC(V,YV,ND)
 	  CALL DP_CURVE(ND,XV,YV)
-	  YAXIS='Log(V(kms\u-1\d))'
+	  YAXIS='Log V(kms\u-1\d) '
 !
 ! Allows various velocity parameters to be varied to test their
 ! effect on the velocity law.
@@ -1899,6 +1912,17 @@ C
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log(\gs+1)'
+!
+	ELSE IF(XOPT .EQ. 'FONR')THEN
+	  IF(ROSS_MEAN(1) .NE. 0.0D0)THEN
+	    DO I=1,ND
+	      YV(I)=FLUX_MEAN(I)/ROSS_MEAN(I)
+	    END DO
+	    CALL DP_CURVE(ND,XV,YV)
+	    YAXIS='\gx(Flux)/gx(Ross)'
+	  ELSE
+	    WRITE(6,*)'Error --- Rosseland mean opacity not defined'
+	  END IF
 !
 	ELSE IF(XOPT .EQ. 'CAKT')THEN
 	  CALL USR_HIDDEN(T1,'VTH','10.0','Thermal doppler velocity (km/s)')
@@ -2492,6 +2516,33 @@ C
 	      IF(ATM(ID)%ZXzV .LE. 9)WRITE(TYPE,'(I1)')ATM(ID)%ZXzV
 	      IF(ATM(ID)%ZXzV .GE. 10)WRITE(TYPE,'(I2)')ATM(ID)%ZXzV
 	      YAXIS='Log(H\u'//TRIM(TYPE)//'\d+)'
+	      YV(1:ND)=ATM(ID)%DXzV(1:ND)
+	    END IF
+	  END DO
+!
+	ELSE IF(XOPT .EQ. 'NION')THEN
+	  CALL USR_OPTION(EXC_EN,'IE',' ','Ionization energy in 10^15 Hz')
+	  CALL USR_OPTION(T1,'POP',' ','Fractional population relative to lower iozation stage')
+	  CALL USR_OPTION(T2,'GUP',' ','Statistical weight for upper level')
+	  TYPE=' '
+	  DO ID=1,NUM_IONS
+	    IF(XSPEC .EQ. TRIM(ION_ID(ID))) THEN
+	      TA(1:ND)=ATM(ID)%DXzV_F(1:ND)		!Ground state pop.
+	      TB(1:ND)=TA(1:ND)*T1			!New ion pop
+	      T3=ATM(ID)%GIONXzV_F/T2
+	      DO I=1,ND
+	        TEMP=DLOG( 2.07D-22*ED(I)*TB(I)/(T(I)**1.5D0) )
+	        TC(I)=T3*EXP(EXC_EN*HDKT/T(I)+TEMP)	!Lte ground state pop.
+	      END DO
+	      YV(1:ND)=1.0D0		!Level dissolution
+	      DO_DPTH(1:ND)=.TRUE.
+	      TYPE='DC'
+	      FILENAME='NEW_DC'
+	      CALL NEW_WRITEDC_V4(TA,TC,YV,
+	1           EXC_EN,ATM(ID)%GIONXzV_F,IONE,
+	1           TB,T2,IONE,R,T,ED,V,CLUMP_FAC,
+	1           DO_DPTH,LUM,ND,FILENAME,TYPE,IONE)
+	      EXIT
 	    END IF
 	  END DO
 C 
@@ -2521,28 +2572,39 @@ C
 C 
 C
 	ELSE IF (XOPT .EQ. 'FIXT')THEN
-	  CALL USR_HIDDEN(T1,'SCALE','1.0',
-	1   'Optical Depth below which T is held approximately constant')
+!
+	  CALL USR_OPTION(ELEC,'DT','F','Set T values at certain depths?')
+	  IF(ELEC)THEN
+	    CALL USR_OPTION(LEV,ITEN,ITWO,'OWIN','0,0,0,0,0,0,0,0,0,0',
+	1        'Depth section  to be changed [Max of 2]')
+	    CALL USR_OPTION(T1,'TEMP','1.0','Revise temperature')
+            DO I=LEV(1),LEV(2)
+	      T(I)=T1
+	    END DO
+	  ELSE
+	    CALL USR_HIDDEN(T1,'SCALE','1.0',
+	1      'Optical Depth below which T is held approximately constant')
 C
 C As we don't require the old T, we can overite it straight away.
 C
-	  DO I=1,ND
-	    IF(T1 .LE. 0)THEN
-	     T1=1.0D0
-	    ELSE
-	      T1=TAUROSS(I)/T1
-	      T1=1.0D0-EXP(-T1)
-	    END IF
-	    T(I)=T1*TGREY(I)+(1.0-T1)*T(I)
-	  END DO
+	    DO I=1,ND
+	      IF(T1 .LE. 0)THEN
+	        T1=1.0D0
+	      ELSE
+	        T1=TAUROSS(I)/T1
+	        T1=1.0D0-EXP(-T1)
+	      END IF
+	      T(I)=T1*TGREY(I)+(1.0-T1)*T(I)
+	    END DO
 !
-	  DO ID=1,NUM_IONS
-	    CALL UPDATE_POPS(ATM(ID)%XzV_F,ATM(ID)%XzVLTE_F,
+	    DO ID=1,NUM_IONS
+	      CALL UPDATE_POPS(ATM(ID)%XzV_F,ATM(ID)%XzVLTE_F,
 	1                    ATM(ID)%NXzV_F,ND,T,TA)
-	  END DO
-	  DO I=1,ND
-	    T(I)=TA(I)
-	  END DO
+	    END DO
+	    DO I=1,ND
+	      T(I)=TA(I)
+	    END DO
+	  END IF
 	  ROSS=.FALSE.
 	  GREY_COMP=.FALSE.
 C

@@ -35,6 +35,7 @@ OBJ = $(LIB)(adjust_r_grid_v2.o)\
       $(LIB)(init_opac_mod.o)\
       $(LIB)(init_line_opac_var.o)\
       $(LIB)(rd_control_variables.o)\
+      $(LIB)(rd_cont_j.o)\
       $(LIB)(set_line_opac.o)\
       $(LIB)(set_ang_qw.o)\
       $(LIB)(set_frequency_grid.o)\

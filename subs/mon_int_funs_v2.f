@@ -23,6 +23,13 @@ C
 	SUBROUTINE MON_INT_FUNS_V2(COEF,CHI,R,ND)
 	IMPLICIT NONE
 C
+C Altered 16-Jan-2005 - COEF(ND,1:4) was previously zero. For ease of use
+C                         elsewhere, COEF(ND,4) now contains CHI(ND) and
+C                         COEF(ND,3) contains dCHIdR for the last point. The
+C                         other two coefficients are zero. These two
+C                         assignments are consistent with those at other depths.
+C                         The other coefficients are left zero. CHI(ND,:) should
+C                         not be used for function fitting.
 C Altered 25-Sep-1997 - Rewritten for speed and to vectorize efficiently.
 C Created 25-Mar-1996 - Based on MON_INTERP
 C
@@ -75,6 +82,9 @@ C
 	  COEF(I,3)=D(I)
 	  COEF(I,4)=CHI(I)
 	END DO
+	COEF(ND,1:2)=0.0D0
+	COEF(ND,3)=D(ND)
+	COEF(ND,4)=CHI(ND)
 C
 	RETURN
 	END

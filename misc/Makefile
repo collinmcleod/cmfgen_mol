@@ -36,7 +36,9 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)n_multi_merge.exe\
          $(EXE_DIR)rewrite_scr.exe\
          $(EXE_DIR)rewrite_dc.exe\
+         $(EXE_DIR)rev_rvsig.exe\
          $(EXE_DIR)append_dc.exe\
+         $(EXE_DIR)append_r_dc.exe\
          $(EXE_DIR)rev_hydro_file.exe\
          $(EXE_DIR)rev_hydro_turb.exe\
          $(EXE_DIR)mass_sc.exe\

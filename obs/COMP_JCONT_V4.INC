@@ -265,6 +265,7 @@ C
 	1            FIRST_FREQ,NEW_FREQ,N_TYPE,
 	1            NCEXT,NPEXT,NDEXT)
 	     CALL TUNE(ITWO,'FG_J_CMF_ACC')
+	     CALL UNGRID(RSQHNU,ND,TB,NDEXT,POS_IN_NEW_GRID)
 	     FG_COUNT=FG_COUNT+1
 !
 ! We assume Rayleigh scattering, when present, is coherent in the CMF. 

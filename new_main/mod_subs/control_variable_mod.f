@@ -167,6 +167,7 @@
 	REAL*8 DELV_CONT
 	LOGICAL COMPUTE_ALL_CROSS
 	LOGICAL COMPUTE_NEW_CROSS
+	LOGICAL USE_FIXED_J
 !
 !***************************************************************************************
 !
