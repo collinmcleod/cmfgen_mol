@@ -1,0 +1,126 @@
+ 
+Comparing files in /export/home/jdh/cur_cmf/disp with those in  /export/home/jdh/cmf_dist/cur_cmf/disp/
+ 
+dispgen.f
+	        IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%DXzV_F(ND),STAT=IOS)				   |		        IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%DXzV_F(ND),STAT=IOS)         ;ATM(ID)%DXzV_F(:)=
+	        IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%DXzV(ND),STAT=IOS)				   |		        IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%DXzV(ND),STAT=IOS)           ;ATM(ID)%DXzV(:)=0.
+!												   <
+	        ATM(ID)%DXzV_F(:)=0.0D0								   <
+	        ATM(ID)%DXzV(:)=0.0D0								   <
+!												   <
+maingen.f
+! Aleterd  15-Aug-2003 :  QF option installed. Allows ion column densities to be compared.	   <
+!                         Option added to PLTPHOT to allow photoioization cross-section		   <
+!                           to be compted at a particular electron desnity. This allows the	   <
+!                           effects of level dissolution to be seen.				   <
+	REAL*8 RVAL,TAU_VAL,ED_VAL								   |		REAL*8 RVAL,TAU_VAL
+	REAL*8 XDIS,YDIS,DIS_CONST								   <
+	REXT_COMPUTED=.FALSE.									   <
+	ELSE IF(XOPT .EQ. 'EXTRAP')THEN								   <
+!												   <
+	  CALL USR_OPTION(LEV,ITWO,ITWO,'EWIN','1,1',						   <
+	1        'Depth band to be extrapolated over')						   <
+	  DO ID=1,NUM_IONS									   <
+	    IF(ATM(ID)%XzV_PRES)THEN								   <
+	      DO I=LEV(1),LEV(2)								   <
+	        T1=POP_ATOM(I)/POP_ATOM(LEV(2)+1)						   <
+	        DO J=1,ATM(ID)%NXzV_F								   <
+	          ATM(ID)%XzV_F(J,I)=T1*ATM(ID)%XzV_F(J,LEV(2)+1)				   <
+	        END DO										   <
+	        ATM(ID)%DXzV_F(I)=T1*ATM(ID)%DXzV_F(LEV(2)+1)					   <
+	      END DO										   <
+	    END IF										   <
+	  END DO										   <
+	  T(LEV(1):LEV(2))=T(LEV(2)+1)								   <
+!												   <
+	  INCLUDE 'EVAL_LTE_FULL.INC'								   <
+!												   <
+C ^L												   <
+C												   <
+C Computes the column density for 2 successive ionization stages, and for			   <
+C the atom. If XV is the column desnity for species XzVxI, the program routine			   <
+C XV/X and XSIX/X where X is psecies column density. Inserted for comparison			   <
+C with SETI results.										   <
+C												   <
+	ELSE IF(XOPT .EQ. 'QF') THEN								   <
+	  DO ISPEC=1,NSPEC									   <
+	    IF(XSPEC .EQ. SPECIES(ISPEC))THEN							   <
+	      ZV(ND)=0.0D0									   <
+	      YAXIS='q'										   <
+	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)					   <
+	        IF(ATM(ID)%XzV_PRES)THEN							   <
+	          DO I=1,ND									   <
+	            T2=0.0D0									   <
+	            DO J=1,ATM(ID)%NXzV_F							   <
+	              T2=T2+ATM(ID)%XzV_F(J,I)							   <
+	            END DO									   <
+	            TA(I)=POPDUM(I,ISPEC)							   <
+	            TB(I)=T2									   <
+	            TC(I)=ATM(ID)%DXzV_F(I)							   <
+	          END DO									   <
+	          CALL TORSCL(DTAU,TA,R,Z,XM,ND,METHOD,TYPE_ATM)				   <
+	          TA(1:ND)=DTAU(1:ND)								   <
+	          CALL TORSCL(DTAU,TB,R,Z,XM,ND,METHOD,TYPE_ATM)				   <
+	          TB(1:ND)=DTAU(1:ND)								   <
+	          CALL TORSCL(DTAU,TC,R,Z,XM,ND,METHOD,TYPE_ATM)				   <
+	          TC(1:ND)=DTAU(1:ND)								   <
+!												   <
+	          DO I=1,ND									   <
+	            YV(I)=LOG10(TB(I)/TA(I))							   <
+	            ZV(I)=LOG10(TC(I)/TA(I))							   <
+	          END DO									   <
+	          CALL DP_CURVE(ND,XV,YV)							   <
+	        END IF										   <
+	      END DO										   <
+	      IF(ZV(ND) .NE. 0.0D0)CALL DP_CURVE(ND,XV,ZV)					   <
+	      YAXIS='CD(XV)/CD(X); CD(XSIX)/CD(X)'						   <
+	    END IF										   <
+	  END DO										   <
+												   >	C 
+C 												   <
+	  ED_VAL=0.0D0										   |		  CALL USR_OPTION(PHOT_ID,'PHOT_ID','1','Photoionization route')
+	  IF(PHOT_ID .EQ. 1)CALL USR_OPTION(ED_VAL,'ED_VAL','0.0D0','Approximate Ne value')	   <
+	  IF(ED_VAL .GT. 0)THEN									   <
+	    IF(ED_VAL .LT. ED(1))THEN								   <
+	      ED_VAL=ED(1)									   <
+	      CNT=1										   <
+	    ELSE IF(ED_VAL .GT. ED(ND))THEN							   <
+	      ED_VAL=ED(ND)									   <
+	      CNT=ND										   <
+	    ELSE										   <
+	      DO J=1,ND-1									   <
+	       IF(ED_VAL .GT. ED(J) .AND. ED_VAL .LE. ED(J+1))THEN				   <
+	         CNT=J										   <
+	         IF( LOG(ED_VAL/ED(J)) .GT. LOG(ED(J+1)/ED_VAL))CNT=J+1				   <
+	         EXIT										   <
+	       END IF										   <
+	      END DO										   <
+	    END IF										   <
+	    WRITE(T_OUT,'(A,ES10.2)')'Photioization cross-section evaluated at Ne=',ED_VAL	   <
+	  END IF										   <
+	      IF(ED_VAL .NE. 0.0D0)FLAG=.TRUE.							   <
+	      IF(FLAG)TEMP=0.7D0*ATM(ID)%EDGEXzV_F(I)						   |		      J=0       
+	      J=0										   <
+	        IF(FLAG .AND. TEMP .LT. ATM(ID)%EDGEXzV_F(I))THEN				   <
+	          T1=ATM(ID)%ZXzV**3								   <
+	          T2=SQRT(3.289395*ATM(ID)%ZXzV*ATM(ID)%ZXzV/(ATM(ID)%EDGEXzV_F(I)-TEMP))	   <
+	          IF(T2 .GT. 2*ATM(ID)%ZXzV)THEN						   <
+	            T3=MIN(1.0D0,16.0D0*T1/(1.0D0+T2)/(1.0D0+T2)/3.0D0)				   <
+	            DIS_CONST=( T3*ATM(ID)%ZXzV*T1/(T2**4) )**1.5D0				   <
+	            K=CNT									   <
+	            YDIS=1.091*(X_LEV_DIS(K)+4.0D0*(ATM(ID)%ZXzV-1)*A_LEV_DIS(K))*		   <
+	1                           B_LEV_DIS(K)*B_LEV_DIS(K)					   <
+	            XDIS=B_LEV_DIS(K)*X_LEV_DIS(K)						   <
+	            T1=7.782+XDIS*DIS_CONST							   <
+		    T2=T1/(T1+YDIS*DIS_CONST*DIS_CONST)						   <
+	            OMEGA_F(I,1)=OMEGA_F(I,1)*T2						   <
+	          ELSE										   <
+	            OMEGA_F(I,1)=0.0D0								   <
+	          END IF									   <
+	        END IF										   <
+	        IF(TEMP .LT. ATM(ID)%EDGEXzV_F(I))THEN						   |		        TEMP=TEMP*(1.0D0+FREQ_RES)
+	           TEMP=TEMP*(1.0D0+10.0D0/3.0D+05)						   <
+	         ELSE										   <
+	           TEMP=TEMP*(1.0D0+FREQ_RES)							   <
+	         END IF										   <
+mod_disp.f

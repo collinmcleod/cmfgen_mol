@@ -1,0 +1,28 @@
+Hi Paco, Fabrice
+
+The following EMAIL contains a very slightly revised version of
+cmf_flux_sub_v5.f and obs_frame_sub_v4.f . These should over
+come problems with ringing in the core of Ha.
+
+Basically I've inserted an extra parameter to allow extra points
+to be inserted in the observer's frame calculation. NB: The NINS 
+parameter only refers to the CMF calculation (this was done
+to avoid double interpolations). 
+
+The problem occurs mainly when using ETAZ as the INT_METH.
+STAU gives higher accuracy for these models. For the model PACO 
+sent me, ETAZ and STAU give very similar profiles with N_INS_OBS=2.
+You could problem get away with N_INS_OBS=1 for STAU.
+
+Note that in the model Paco sent me, there was very
+poor spatial sampling around where Ha formed. Since
+the model was static in this region, no extra points were 
+being inserted.
+
+As the change was extremly straightforward, I only did
+2 check calculations. Can you pleasse confirm all is okay
+with some additional calculations.
+
+Cheers
+
+John

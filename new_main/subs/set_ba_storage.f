@@ -1,0 +1,97 @@
+!
+! Routine to create most of the storage for STEQ_DATA_MOD.
+! The LNK_TO_IV and LNK_TO_F vectors were allocated in
+! CREATE_IV_LINKS_V2.
+!
+      SUBROUTINE SET_BA_STORAGE(NT,NUM_BNDS,ND,NION)
+      USE MOD_CMFGEN
+      USE STEQ_DATA_MOD
+      IMPLICIT NONE
+!
+! Created 05-Apr-2001
+!
+      INTEGER*4 NT
+      INTEGER*4 NUM_BNDS
+      INTEGER*4 ND
+      INTEGER*4 NION
+!
+      INTEGER*4 ID
+      INTEGER*4 ISPEC
+      INTEGER*4 IOS
+      INTEGER*4 NSUM
+      INTEGER*4 LU_ER,ERROR_LU
+      EXTERNAL ERROR_LU
+!
+      INTEGER*4 MEMORY
+      INTEGER*4 I,NX,NY
+!
+      LU_ER=ERROR_LU()
+!
+! Check consistency of parameters between two modules.
+!
+      IF(  BA_NUM_SPECIES          .NE. NUM_SPECIES              .OR.
+     &     BA_MAX_IONS_PER_SPECIES .NE. MAX_IONS_PER_SPECIES     .OR.
+     &     BA_MAX_NUM_IONS         .NE. MAX_NUM_IONS             .OR.
+     &     BA_NPHOT_MAX            .NE. NPHOT_MAX)               THEN
+        WRITE(LU_ER,*)'Inconsistency in parameters SET_BA_STORAGE'
+        WRITE(LU_ER,*)'Check MOD_CMFGEN and STEQ_DATA_MOD for consistency of'
+        WRITE(LU_ER,*)'NUM_SPECIES, NPHOT_MAX etc'
+      STOP
+      END IF
+!
+! Will need to add an extra equation for X-rays.
+!
+      MEMORY=0
+      DO ID=1,NION
+	IF(SE(ID)%XzV_PRES)THEN
+	  NX=SE(ID)%N_SE
+	  NY=SE(ID)%N_IV
+	ELSE
+	  NX=1; NY=1
+	END IF
+	SE(ID)%IMPURITY_SPECIES=.FALSE.
+	IF(ATM(ID)%NXzV_IV .EQ. 0)SE(ID)%IMPURITY_SPECIES=.TRUE.
+!
+                      ALLOCATE (SE(ID)%STEQ(NX,ND),STAT=IOS)
+        IF(IOS .EQ. 0)ALLOCATE (SE(ID)%QFV_R(NX,ND),STAT=IOS)
+        IF(IOS .EQ. 0)ALLOCATE (SE(ID)%QFV_P(NX,ND),STAT=IOS)
+        IF(IOS .EQ. 0)ALLOCATE (SE(ID)%BA(NX,NY,NUM_BNDS,ND),STAT=IOS)
+        IF(IOS .EQ. 0)ALLOCATE (SE(ID)%BA_PAR(NX,NY,ND),STAT=IOS)
+        IF(IOS .EQ. 0)ALLOCATE (SE(ID)%EQ_IN_BA(NX),STAT=IOS)
+        MEMORY=MEMORY+NX*NY*ND*(NUM_BNDS+1)
+!
+        IF(IOS .NE. 0)THEN
+          WRITE(LU_ER,*)'Unable to allocate memory in SET_BA_STORAGE'
+          WRITE(LU_ER,*)'STAT=',IOS,'ID=',ID
+          STOP
+        END IF
+!
+	DO I=1,ATM(ID)%NxZV
+	  SE(ID)%EQ_IN_BA(I)=ATM(ID)%EQXzV+I-1
+	END DO
+	DO I=ATM(ID)%NXzV+1,NX-1
+	  SE(ID)%EQ_IN_BA(I)=ATM(ID)%EQXzV+ATM(ID)%NXzV+(SE(ID)%EQ_TO_ION_LEV_PNT(I)-1)
+	END DO
+        SE(ID)%EQ_IN_BA(NX)=EQ_SPECIES(SPECIES_LNK(ID))
+	SE(ID)%NUMBER_BAL_EQ=SE(ID)%N_SE
+      END DO
+!
+! Use to store Charge Equilibrium, and Radiative Equilibrium equations.
+!
+                    ALLOCATE (STEQ_ED(ND),STAT=IOS)
+      IF(IOS .EQ. 0)ALLOCATE (STEQ_T(ND),STAT=IOS)
+      IF(IOS .EQ. 0)ALLOCATE (BA_ED(NT,NUM_BNDS,ND),STAT=IOS)
+      IF(IOS .EQ. 0)ALLOCATE (BA_T(NT,NUM_BNDS,ND),STAT=IOS)
+      IF(IOS .EQ. 0)ALLOCATE (BA_T_PAR(NT,ND),STAT=IOS)
+      IF(IOS .NE. 0)THEN
+        WRITE(LU_ER,*)'Unable to allocate STEQ_ED etc in SET_BA_STORAGE'
+        WRITE(LU_ER,*)'STAT=',IOS,'ID=',ID
+        STOP
+      END IF
+      MEMORY=MEMORY+2*NT*ND*NUM_BNDS+NT*ND
+      WRITE(LU_ER,*)'Amount of memory allocated for BA is:  ',MEMORY,' words'
+      MEMORY=NT*NT*(NUM_BNDS+1)*ND
+      WRITE(LU_ER,*)'Memory needed with full dependence is: ',MEMORY,' words'
+!
+      RETURN
+      END

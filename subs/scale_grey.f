@@ -1,0 +1,74 @@
+!
+! Routine reads in the ratio of T/TGREY for an old model. This
+! ratio is then applied to the passed GREY temperature distributon.
+!
+	SUBROUTINE SCALE_GREY(TGREY,TAUROSS,LUIN,ND)
+	IMPLICIT NONE
+!
+! Altered 24-Aug-2002: Bug fixed with handling of boundary values.
+!
+	INTEGER*4 ND
+	INTEGER*4 LUIN 
+	REAL*8 TGREY(ND)
+	REAL*8 TAUROSS(ND)
+!
+	INTEGER*4 LU_ER
+	INTEGER*4 ERROR_LU
+	EXTERNAL ERROR_LU
+!
+	REAL*8 LOG_TAU(ND)
+	REAL*8 SCALE_FAC(ND)
+	REAL*8, ALLOCATABLE :: OLD_TAU(:)
+	REAL*8, ALLOCATABLE :: OLD_SCALE_FAC(:)
+	CHARACTER*80 STRING
+!
+	INTEGER*4 I
+	INTEGER*4 IOS
+	INTEGER*4 ND_RD
+!
+	OPEN(UNIT=LUIN,FILE='GREY_SCL_FAC',IOSTAT=IOS,STATUS='OLD',ACTION='READ')
+	IF(IOS .NE. 0)THEN
+	   LU_ER=ERROR_LU()
+	   WRITE(LU_ER,*)'Unable to open file GREY_SCL_FAC'
+	   WRITE(LU_ER,*)'No scaling of TGREY performed in SCALE_GREY'
+	   RETURN
+	END IF
+	LOG_TAU(1:ND)=LOG10(TAUROSS(1:ND))
+!
+! Skip comments and blank lines
+!
+	STRING=' '
+	DO WHILE(STRING .EQ. ' ' .OR. STRING(1:1) .EQ. '!')
+	  READ(LUIN,'(A)')STRING
+	END DO
+!
+! The first non-comment or blank line should be the number of depth points.
+!
+	READ(STRING,*)ND_RD
+	ND_RD=ND_RD+2
+	ALLOCATE (OLD_TAU(ND_RD))
+	ALLOCATE (OLD_SCALE_FAC(ND_RD))
+	DO I=2,ND_RD-1
+	   READ(LUIN,*)OLD_TAU(I),OLD_SCALE_FAC(I)
+	END DO
+!
+	OLD_TAU(ND_RD)=MAX(LOG_TAU(ND),OLD_TAU(ND_RD-1)+0.1)
+	OLD_SCALE_FAC(ND_RD)=1.0D0
+!
+	OLD_TAU(1)=MIN(LOG_TAU(1),OLD_TAU(2)-0.1)
+	OLD_SCALE_FAC(1)=OLD_SCALE_FAC(2)
+!
+	CALL LIN_INTERP(LOG_TAU,SCALE_FAC,ND,OLD_TAU,OLD_SCALE_FAC,ND_RD)
+!
+	DO I=1,ND
+	  TGREY(I)=TGREY(I)*SCALE_FAC(I)
+	END DO
+!
+! Clean up
+!
+	DEALLOCATE (OLD_TAU)
+	DEALLOCATE (OLD_SCALE_FAC)
+	CLOSE(LUIN)
+!
+	RETURN
+	END

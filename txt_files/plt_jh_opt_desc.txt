@@ -1,0 +1,58 @@
+22,16   		!Output formatting parameters.
+
+General listing of options in PLT_SPEC Options are ordered under subject.
+Associated with each option are requested inputs. Some inputs are not
+prompted for, and can only be changed from their default values by specifying
+them in the call. eg.
+
+		       RD_MOD(OVER=T)
+
+Such inputs are placed in [ ].
+
+SVE and BOX file:
+	Default is to write file MAIN_OPT_STR.sve
+	Append sve=filename to write a new .sve file (no brackets)
+	Type box=filename to write a .box file containing several .sve files
+	Type .filename to read .sve file
+	Type #filename to read .box file
+
+        NB: RD_OBS and RD_OBS1 (etc) are presnetly treated as the same option,
+            but write different sve files with different names.
+
+Input/output:
+
+    RD_MOD  	Read in new data into MODEL B. Any previous model B data is lost.
+                Data may be fluxes, or RJ.
+
+    MOD_A	Switch to model A as the default. B data is not destroyed.
+
+    MOD_B	Switch to model B as the default. A data is not destroyed.
+                     
+X Axis Options
+    LX		Switch between logarithmic and linear X-AXIS
+    LOGX        (i.e. do opposite to current setting)
+    LINX
+
+    XU		Change units for X-axis. Options are:
+    XUNITS	   Hz
+		   um
+		   Ang
+		   keV
+	           eV
+		   km/s
+
+Y Axis Options
+    LY		Switch between logarithmic and linear Y-AXIS
+    LOGY        (i.e. do opposite to current setting)
+    LINY
+
+    YU		   Change Y plot parameter. Options are:
+    Y_UNITS 	      Flam    (ergs/cm^2/s/Ang)
+		      FNU     (Jy)
+		      NU_FNU  (ergs/cm^2/s)
+
+Main options.
+    JD		Plot J or H at a given depth as a function of Lambda
+    CF		Plots the integrated flux (H) as a function of depth.
+
+Miscellaneous options.

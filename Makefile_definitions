@@ -1,0 +1,101 @@
+#
+# General Makefile defintions to allow CMFGEN etc to
+# be compiled and linked.
+#
+# NOTE WELL: 
+#      FG are options for f90 files in fixed format
+#      FFREE are options for f90 files in free format.
+#      FD are options for f90 files in fixed format with debug.
+#      FFREED are options for f90 files in free format with debug.
+#      The debug commands are generally not defined, and are not used
+#         unless you manually edit the Makefiles.
+#
+# Installation directory for CMFGEN
+# Site dependent.
+
+INSTALL_DIR=/export/home/jdh/cur_cmf/
+
+#
+# These statements should not be altered.
+#
+
+LIB_DIR=$(INSTALL_DIR)lib/
+MOD_DIR=$(INSTALL_DIR)mod/
+EXE_DIR=$(INSTALL_DIR)exe/
+ 
+# Options for FORTRAN compile:
+#        FG are the FORTRAN comiler options
+#        Site dependent.
+
+
+#********************************************************************
+# Fujitsu Fortran 90/95 compiler 
+#********************************************************************
+#
+# F90     = f95
+# FG  = -w -Fixed -X 9 -AmE -I$(MOD_DIR) 
+
+#********************************************************************
+# Intel compiler
+#********************************************************************
+#
+# F90 = ifc
+# FG = -cm -extend_source -w95 -w90 -tpp7 -nbs -I$(MOD_DIR)  
+# FFREE =  -I$(MOD_DIR)
+
+#********************************************************************
+# DEC OSF FORTRAN for ALpha
+#********************************************************************
+
+ F90 = fort
+ FG  = -extend_source -I$(MOD_DIR)
+# FG  = -extend_source -g -ladebug -I$(MOD_DIR)
+ FFREE  = -I$(MOD_DIR)
+
+#********************************************************************
+# PGF90 compiler
+#********************************************************************
+#
+# F90 = pgf90 
+# FG  = -Mextend -Mbackslash    -Ktrap=fp -I$(MOD_DIR)
+# FD  = -Mextend -Mbackslash -g -Ktrap=fp -I$(MOD_DIR)
+# FFREE  = -Mbackslash    -Ktrap=fp -I$(MOD_DIR)
+# FFRED  = -Mbackslash -g -Ktrap=fp -I$(MOD_DIR)
+
+#********************************************************************
+# Locations of system dependent libraries. 
+# Use system routines for BLAS and LPACK when avialble. Fortran 
+# versions are packed with the cMFGEN distribution.
+#********************************************************************
+#
+# For Rosella
+#
+LOCLIB=-L/usr/lib
+PGLIB=-L/usr/local/lib -lpgplot 
+G2CLIB=-L/usr/lib/gcc-lib/alpha-redhat-linux/egcs-2.91.66 -lg2c
+X11LIB=-L/usr/X11R6/lib -lX11
+
+BLAS=-lcxml
+LAPACK=-lcxml
+
+#
+# For Kookaburra
+#
+#LOCLIB = -L/usr/lib
+#PGLIB = -L/usr/local/pgplot -lpgplot -lcpgplot
+#G2CLIB = -L/usr/lib/gcc-lib/i386-glibc21-linux/egcs-2.91.66 -lg2c
+#X11LIB = -L/usr/X11R6/lib -lX11
+#
+#BLAS = /usr/intel/mkl/lib/32/libmkl_p4.a -lguide -lpthread
+#LAPACK = /usr/intel/mkl/lib/32/libmkl_lapack.a
+
+#
+# For Correla
+#
+#LOCLIB=-L/usr/lib
+#PGLIB=-g77libs -L/usr/local/build/pgplot -lpgplot 
+#G2CLIB=-L/usr/lib/gcc-lib/i386-glibc21-linux/egcs-2.91.66 -lg2c
+#X11LIB=-L/usr/X11R6/lib -lX11
+#
+#BLAS=-g77libs -lpthread -L/usr/local/intel/mkl/LIB  -lmkl32_def 
+#LAPACK=-L/usr/local/intel/mkl/LIB  -lmkl32_lapack
