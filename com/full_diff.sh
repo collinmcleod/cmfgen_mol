@@ -75,13 +75,13 @@ cat Diff_output >> Diff_sum
 $cmfdist/com/main_diff.sh $X1/new_main/subs/two $X2/new_main/subs/two
 cat Diff_output >> Diff_sum
 
-$cmfdist/com/main_diff.sh $X1/newsubs $cmfdist/newsubs
+$cmfdist/com/main_diff.sh $X1/newsubs $X2/newsubs
 cat Diff_output >> Diff_sum
 
 $cmfdist/com/main_diff.sh $X1/obs $X2/obs
 cat Diff_output >> Diff_sum
 
-$cmfdist/com/main_diff.sh $X1/pgplt $cmfdist/pgplt
+$cmfdist/com/main_diff.sh $X1/pgplt $X2/pgplt
 cat Diff_output >> Diff_sum
 
 $cmfdist/com/main_diff.sh $X1/spec_plt $X2/spec_plt
