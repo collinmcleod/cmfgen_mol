@@ -12,6 +12,8 @@ C
 	1              LUIN,LUOUT,FILNAME)
 	IMPLICIT NONE
 C
+C Altered 21-Dec-2004 - Check on ENERGY level ordering, and name matching when
+C                          reading in transitions included.
 C Created 02-Feb-1998 - GF_ACTION and MIN_NUM_TRANS installed. Renamed from V5.
 C
 	INTEGER*4 N,NTRET,LUIN,LUOUT
@@ -40,7 +42,8 @@ C
 C
 C Local variables
 C
-	CHARACTER*30 LOCNAME(N)
+	CHARACTER*40 LOCNAME(N)
+	CHARACTER*40 LOW_NAME,UP_NAME
 	REAL*8 T1,SPEED_LIGHT
 	INTEGER*4 I,J,K,NW,L1,L2,IOS,BIGLEN,MAXLEN,LUER,CUT_CNT
 	CHARACTER*132 STRING
@@ -210,11 +213,23 @@ C
 	      L1=INDEX(STRING,'  ')-1
 	      IF( L1 .LE. 0 .OR. L1 .GT. MAXLEN )THEN
 	        WRITE(LUER,*)
-	1             'Error eading in Level Names from '//FILNAME
+	1             'Error reading in Level Names from '//FILNAME
 	        STOP
 	      END IF
 	    END DO
 	  END IF
+!
+! Check the energy levels are in order.
+!
+	  DO I=2,N
+	    IF(FEDGE(I) .GT. FEDGE(I-1))THEN
+	      WRITE(LUER,*)'****************************************************'
+              WRITE(LUER,*)'Error reading in Level Names from '//FILNAME
+	      WRITE(LUER,*)'Energy levels are out of order'
+	      WRITE(LUER,*)'Levels are:',I-1,I
+	      WRITE(LUER,*)'****************************************************'
+	    END IF
+	  END DO
 !
 ! If GF_CUT is large, we assume we just want the ENERGY levels.
 !
@@ -254,8 +269,10 @@ C
 	  READ(LUIN,'(A)')STRING
 C
 	  L1=INDEX(STRING,'-')			!In case 2 spaces at end of name
-	  STRING(1:)=STRING(L1:)
+	  LOW_NAME=ADJUSTL(STRING(1:L1-1))
+	  STRING(1:)=STRING(L1+1:)
 	  L1=INDEX(STRING,'  ')
+	  UP_NAME=ADJUSTL(STRING(1:L1-1))
 	  STRING(1:)=STRING(L1:)
 	  READ(STRING,*)T1		!Oscilator value
 	  DO L2=1,3
@@ -268,7 +285,16 @@ C
 	  L1=INDEX(STRING,'-')
 	  READ(STRING(1:L1-1),*)I
 	  READ(STRING(L1+1:),*)J
-	  IF(I .LE. N .AND. J .LE. N)EINA(I,J)=T1
+	  IF(I .LE. N .AND. J .LE. N)THEN
+	    EINA(I,J)=T1
+	    IF(LOW_NAME .NE. LEVNAME(I) .OR. 
+	1       UP_NAME .NE. LEVNAME(J) .OR. I .GE. J)THEN
+	      WRITE(LUER,*)'Invalid transition format in '//FILNAME
+	      WRITE(LUER,*)'Indices and level names don''t match'
+	      WRITE(LUER,*)'I,J=',I,J
+	      STOP
+	    END IF
+	  END IF
 	END DO			!K (Reading loop)
 C
 	CLOSE(UNIT=LUIN)

@@ -6,6 +6,8 @@ C
 	SUBROUTINE GENANGQW(QW,R,P,TA,TB,TC,NC,ND,NP,MOMWEIGHT,AT_HALF)
 	IMPLICIT NONE
 C
+C 23-Dec-2004 : Only print out warning message when AT_HALF is FALSE.
+C                 When AT_HALF is true, we always do extrapolation.
 C 04-Sep-2002 : Check before doing SQRT installed (for INTEL compiler).
 C 26-May-1996 : Call to DP_ZERO removed
 C               ERROR_LU installed.
@@ -39,17 +41,17 @@ C If AT_HALF is TRUE the angular quadrature weight are computed at the
 C midpoints of the mesh.
 C
 C Quadrature weights are to be stored in QW(I,J) where I=1,ND-1
-C signifies the radius midpoint (=I+0.5) and J=1,NW signfies which ray.
-C This section of the routine is prinarily used to compute the H and N
+C signifies the radius midpoint (=I+0.5) and J=1,NW signifies which ray.
+C This section of the routine is primarily used to compute the H and N
 C quadrature weights for the routines where H and N are discretized
 C at the mid points of the mesh.
 C***********************************************************************
 C***********************************************************************
 C If AT_HALF is FALSE the angular quadrature weights are computed on
-C the mwsh.
+C the mesh.
 C
 C Quadrature weights are to be stored in QW(I,J) where I=1,ND
-C signifies which radius and J=1,NW signfies which ray.
+C signifies which radius and J=1,NW signifies which ray.
 C
 C***********************************************************************
 C
@@ -74,13 +76,13 @@ C
 	    IF(R(I) .NE. P(J))TB(J)=SQRT(T1-TA(J))/T2
 100	  CONTINUE
 	  CALL MOMWEIGHT(TB,TC,NW)
-	  IF(TB(NW) .NE. 0)COUNTER=COUNTER+1
+	  IF(TB(NW) .NE. 0.0D0)COUNTER=COUNTER+1
 	  DO 200 J=1,NW
 	    QW(I,J)=TC(J)
 200	  CONTINUE
 300	CONTINUE
 C
-	IF(COUNTER .NE. 0)THEN
+	IF(COUNTER .NE. 0 .AND. .NOT. AT_HALF)THEN
 	  LUER=ERROR_LU()
 	  WRITE(LUER,500)COUNTER
 500	  FORMAT(1X,'Warning -',I3,' extrapolations to zero in GENANGQW')

@@ -747,20 +747,15 @@
 !
 	CLOSE(UNIT=LUIN)
 !
-	WRITE(LUER,*)'Closed file'
-!
 ! Sort the dielectronic transitions according to their lower level (stored
 ! in DIELEV).
 !
-	WRITE(LUER,*)'CNT=',CNT
 	PD(ID)%NUM_DIE=CNT			!Required in PHOT_XzV (Mod variable)
 	CALL INDEXX(CNT,DIELEV,VEC_INDX,.TRUE.)
 	CALL SORTDP(CNT,DIELEV,VEC_INDX,VEC_DP_WRK)
 	CALL SORTDP(CNT,PD(ID)%OSC,VEC_INDX,VEC_DP_WRK)
 	CALL SORTDP(CNT,PD(ID)%GAMMA,VEC_INDX,VEC_DP_WRK)
 	CALL SORTDP(CNT,PD(ID)%NU_ZERO,VEC_INDX,VEC_DP_WRK)
-!
-	WRITE(LUER,*)'Sorted arrays'
 !
 ! Now count the nuber of dielectronic transitions associated with each
 ! lower level, and store the start and end indexs for transitions to a
@@ -784,8 +779,6 @@
           END DO
 	END DO
 !
-	WRITE(LUER,*)'DOne indexin'
-!
 ! Throughout the program, Frequency is in units of 10^15 Hz. We therefore
 ! put GAMMA in the same units.
 !
@@ -806,7 +799,6 @@
 	  PD(ID)%NU_MIN(I)=MAX(PD(ID)%NU_MIN(I),EDGE( NINT(DIELEV(I)) ))
 	  PD(ID)%NU_MAX(I)=PD(ID)%NU_ZERO(I)+DEL_NU
 	END DO
-	WRITE(LUER,*)'Dnne units'
 !
 	IF(NUM_FREE_FREE .NE. 0)THEN
 !

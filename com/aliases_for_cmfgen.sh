@@ -7,8 +7,8 @@
 # cmfdist will be defined for general use (e.g. cd cmfdist)
 # Change to you local distribution directory
 
-set cmfdist = ~jdh/cur_cmf
-set CMFDIST = ~jdh/cur_cmf
+set cmfdist = ~jdh/major
+set CMFDIST = ~jdh/major
 set atomic  = ~jdh/atomic 
 set ATOMIC  = ~jdh/atomic 
 

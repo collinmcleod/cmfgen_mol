@@ -3,14 +3,16 @@ C This routine is used to compute the perturbations to
 C Jv (1 ... ND) as a function of the population levels and T .
 C Uses Schuster or diffusion approximation for lower boundary
 C condition. Subroutine may be used with or without a variable
-C temperature. Note that F2DA , FC and FA must be stored sequentially
-C for the guassian elimination routine.
+C temperature. 
 C
 	SUBROUTINE NEWPERTJD(F2DA,FC,FA,FB,VK,WM,AQW,
 	1    DTAU,CHI,dCHIdR,R,Z,P,THETA,SOURCE,TA,TB,TC,XM,
 	1    DIFF,DBB,IC,ESEC,THK,NC,ND,NP,METHOD)
 	IMPLICIT NONE
 C
+C Altered 08-Dec-04  Introduce CONTIG array. Thus F2DA , FC and FA no longer
+C                      have to be stored sequentially for the guassian 
+C                      elimination routine.
 C Altered 28-Oct-96  Bug fix: COS converted back to ACOS in TOR expression.
 C Altered 24-May-96  DOUBLE PRECISION declarations removed.
 C                    CALL to DP_ZERO removed.
@@ -45,14 +47,16 @@ C
 C
 	INTEGER*4, PARAMETER :: IONE=1
 C
-	INTEGER*4 I,J,KS,NI,LS
+	REAL*8 CONTIG(ND,2*ND+1)
 	REAL*8 IBOUND,TOR,DBC
+	INTEGER*4 I,J,KS,NI,LS
 C
 C Zero F2DA and FC matrices and FA vector. NB: These matrices should
 C be stored sequentially,
 C
 	F2DA(:,:)=0.0D0
 	FC(:,:)=0.0D0
+	FA(:)=0.0D0
 C
 C Compute dCHI/dR for use in computation of optical depth scale.
 C Compute d[dCHI/dR]/dCHI for use in linearization.
@@ -168,9 +172,19 @@ C
 	END DO
 C
 C Solve for mean intensity J as a function of depth.
+C CONTIG is used as a dummary array, as otherwise F2DA, FC and
+C FA would have to occupy a contiguous are of memory.
 C
+	CONTIG(1:ND,1:ND)=F2DA
+	CONTIG(1:ND,ND+1:2*ND)=FC
+	CONTIG(1:ND,2*ND+1)=FA
+!
 	I=2*ND+1
-	CALL GAUSEL(FB,F2DA,TA,ND,I,KS)
+	CALL GAUSEL(FB,CONTIG,TA,ND,I,KS)
+!
+	F2DA=CONTIG(1:ND,1:ND)
+	FC=CONTIG(1:ND,ND+1:2*ND)
+	FA=CONTIG(1:ND,2*ND+1)
 C
 	RETURN
 	END

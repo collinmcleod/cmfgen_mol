@@ -49,15 +49,18 @@ MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
       $(LIB_DIR)libmod.a(line_vec_mod.o)\
       $(LIB_DIR)libmod.a(mod_lev_dis_blk.o)
 
+MODT= $(LIB_DIR)libmod.a(radiation_mod.o)\
+      $(LIB_DIR)libmod.a(var_rad_mod.o)\
+      $(LIB_DIR)libmod.a(line_mod.o)\
+      $(LIB_DIR)libmod.a(cmf_sob_mod.o)
+
 cmfgen.o : cmfgen.f $(MODS) $(USR)
 	$(F90) -c $(FG) cmfgen.f 
 
 #cmfgen.o : cmfgen.f $(MODS)
 #	$(F90) -c $(FG) cmfgen.f 
 
-cmfgen_sub.o : cmfgen_sub.f $(MODS) \
-    COMP_JCONT_V4.INC    LINEGEN.INC         EVAL_LTE_INC_V4.INC \
-    GET_J_CHI.INC        VARCONT.INC         SUP_TO_FULL_V4.INC
+cmfgen_sub.o : cmfgen_sub.f $(MODS) $(MODT) GET_J_CHI.INC  
 	$(F90) -c $(FG) cmfgen_sub.f 
 
 $(USR):
@@ -67,6 +70,11 @@ $(MODS): mod
 
 mod:
 	(cd mod_subs ; make )
+
+$(MODT): modt
+
+modt:
+	(cd tmp ; make )
 
 
 # We now MAKE the required libraries. Note that this double

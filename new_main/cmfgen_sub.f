@@ -26,11 +26,15 @@ C
 	1                     TX_OFFSET,MAX_SIM,NM,NM_KI,NLF)
 	USE MOD_CMFGEN
 	USE ANG_QW_MOD
+	USE CMF_SOB_MOD
 	USE CONTROL_VARIABLE_MOD
 	USE OPAC_MOD
 	USE STEQ_DATA_MOD
 	USE MOD_LEV_DIS_BLK
 	USE LINE_VEC_MOD
+	USE LINE_MOD
+	USE RADIATION_MOD
+	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
 	INTEGER*4 ND,NC,NP,NT
@@ -51,15 +55,15 @@ C
 	REAL*8 SOL(NT,ND)		!Temp. stor. area for ST. EQ.
 	INTEGER*4 DST,DEND
 C
-C Constants for opacity etc.
+C Constants for opacity etc. These are set in CMFGEN.
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
+	COMMON/LINE/ OPLIN,EMLIN
+	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL*8 OPLIN,EMLIN
 C
 C Internally used variables
 C
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 OPLIN,EMLIN
-	REAL*8 DTDR,DBB,DDBBDT
 	REAL*8 S1,REPA
 	REAL*8 MAXCH,MAXCH_SUM
 	REAL*8 T1,T2,T3,T4,SRAT
@@ -229,32 +233,15 @@ C Opacity/emissivity
 !
 	REAL*8 CHIL(ND)                 !Line opacity (without prof.)
 	REAL*8 ETAL(ND)                 !Line emissivity (without prof.)
-	REAL*8 DTAU(NDMAX)              !Optical depth (used in error calcs)
-!               DTAU(I)=0.5*(CHI(I)+CHI(I+1))*(Z(I)-Z(I+1))
-	REAL*8 dCHIdR(NDMAX) 		!Derivative of opacity.
 !
 ! Quadrature weights.
 !
 	REAL*8 FQW(NCF_MAX)		!Frequency weights
-	REAL*8 LFQW(NLF)		!Quad. weights assoc. with line prof.
-C
-C Continuum matrices
-	REAL*8 WM(ND,ND)		!Coef. matrix of J & %J vector
-	REAL*8 FB(ND,ND)		!Coef. of J & %J vects in angular equ.
-	REAL*8 VK(ND,ND)		!Coef. matrix of %CHI vector
-	REAL*8 FC(ND,ND)		!Coef. of %EMIS vector in angular equ.
-	REAL*8 F2DA(ND,ND)		!Coef. of %CHi in angular equ.
-	REAL*8 FA(ND)			!R.H.S. of angular equ.
 C
 C Transfer equation vectors
-	REAL*8 TA(NDMAX)
-	REAL*8 TB(NDMAX)
-	REAL*8 TC(NDMAX)
-	REAL*8 XM(NDMAX)		!R.H.S. (SOURCE VECTOR)
 	REAL*8 R_OLD(NDMAX)		!Used to store previous R grid in SN models.
 C
 C Line vectors
-	REAL*8 JBAR(ND)			!Mean line intensity.
 	REAL*8 AV(ND)
 	REAL*8 VB(NDMAX)		!Used for error calculations
 	REAL*8 VC(NDMAX)		!Used for error calculations
@@ -270,24 +257,9 @@ C using Eddington factors. This is separate to the "inclusion of
 C additional points".
 C
 	LOGICAL EDDINGTON
-	REAL*8 FEDD(NDMAX)
-	REAL*8 QEDD(NDMAX)
 C
-C Arrays for computation of JBAR using moment equations.
+C Variables for EW's and LINE blanketing.
 C
-	REAL*8 JNU(ND,NLF+1)
-	REAL*8 HNU(ND,NLF+1)
-	REAL*8 F_LINE(ND,NLF+1)
-	REAL*8 G_LINE(ND,NLF+1)
-	REAL*8 HBC_LINE(3,NLF+1)
-	REAL*8 NBC_LINE(3,NLF+1)
-	REAL*8 IN_HBC_LINE(NLF+1)
-C
-C Variables and Vectors for EW's and LINE blanketing.
-C
-	REAL*8 JBLANK(ND)
-	REAL*8 HBLANK(ND)
-	REAL*8 JEW(ND)    			!Used to compute line Ew's.
 	REAL*8 CONT_INT,EW
 	INTEGER*4 ACCESS_JEW
 	LOGICAL COMPUTE_EW,COMPUTE_JEW,COMPUTE_LAM,MID,FULL_ES
@@ -300,39 +272,10 @@ C
 	INTEGER*4, PARAMETER :: EDD_CONT_REC=3
 C
 	INTEGER*4 NDEXT,NCEXT,NPEXT
-	INTEGER*4 INDX(NDMAX),POS_IN_NEW_GRID(ND)
-	REAL*8 COEF(0:3,NDMAX)
-	REAL*8 INBC,HBC_J,HBC_S			!Bound. Cond. for JFEAU
-C
-	REAL*8 REXT(NDMAX),VEXT(NDMAX)
-	REAL*8 TEXT(NDMAX),SIGMAEXT(NDMAX)
-	REAL*8 VDOP_VEC_EXT(NDMAX)
-	REAL*8 CHIEXT(NDMAX),ESECEXT(NDMAX),ETAEXT(NDMAX)
-	REAL*8 ZETAEXT(NDMAX),THETAEXT(NDMAX)
-	REAL*8 RJEXT(NDMAX),RJEXT_ES(NDMAX)
-	REAL*8 FOLD(NDMAX),FEXT(NDMAX),QEXT(NDMAX),SOURCEEXT(NDMAX)
 C
 	REAL*8 CNM(NDMAX,NDMAX)		!For collisions cross-section in
 	REAL*8 DCNM(NDMAX,NDMAX)	!STEQGEN
 C
-	REAL*8 F2DAEXT(NDMAX,NDMAX)     !These arrays don't need to be
-	REAL*8 FCEXT(NDMAX,NDMAX) 	!contiguous as for PERTJD.
-	REAL*8 FAEXT(NDMAX)
-C
-C
-C Variation arrays
-C Variable,depth of variable,depth of J. If NUM_BNDS .ne. ND the
-C the variable depth is given by [ VJ(I1,I2,I3) ] I3+I2-NDIAG.
-C
-	REAL*8 VJ(NT,NUM_BNDS,ND),VZNET(NT,NUM_BNDS,ND)
-C	EQUIVALENCE (VJ(1,1,1),VZNET(1,1,1))
-C
-C Arrays for calculating mean opacities.
-C
-	REAL*8 FLUXMEAN(ND) 		!Flux mean opacity
-	REAL*8 ROSSMEAN(ND)  		!Rosseland mean opacity
-	REAL*8 INT_dBdT(ND)  		!Integral of dB/dT over nu 
-C                                            (to calculate ROSSMEAN)
 !
 	INTEGER*4, PARAMETER :: N_FLUXMEAN_BANDS=12
 	REAL*8     LAM_FLUXMEAN_BAND_END(N_FLUXMEAN_BANDS)
@@ -341,25 +284,6 @@ C                                            (to calculate ROSSMEAN)
 	DATA LAM_FLUXMEAN_BAND_END/100.0D0,150.0D0,200.0D0,227.83D0,258.90D0,300.0D0,504.25D0,911.75D0,
 	1                         1200.0D0,1500.0D0,2000.0D0,1.0D+08/
 C
-C Other arrays
-	REAL*8 Z(NDMAX)			!Z displacement along a given array
-	REAL*8 RLUMST(ND)		!Luminosity as a function of depth
-	REAL*8 J_INT(ND)		!Frequency integrated J
-	REAL*8 K_INT(ND)		!Frequency integrated K
-	REAL*8 K_MOM(ND)		!Frequency dependent K moment
-	REAL*8 MECH_LUM(ND)		!Mechanical luminosity
-	REAL*8 SOB(ND)   	    	!Used in computing continuum flux
-	REAL*8 LLUMST(ND)    		!Line luminosity.
-	REAL*8 DIELUM(ND)    		!Dielectronic line emission luminosity.
-	REAL*8 RJ(ND)			!Mean intensity
-	REAL*8 RJ_ES(ND)		!Convolution of RJ with e.s. R(v'v')
-	REAL*8 ZNET(ND)			!Net radiative rate
-C
-C Line profile arrays and variables.
-C
-	REAL*8 PF(NLF)			!Prof. freq. for line computations
-	REAL*8 PROF(NLF)			!Line profile
-	REAL*8 VDOP_VEC(ND)
 C
 C Continuum frequency variables and arrays.
 C
@@ -374,31 +298,6 @@ C
 	REAL*8 OBS_FLUX(NCF_MAX)
 	LOGICAL FIRST_OBS_COMP
 C
-C Variation line arrays
-	REAL*8 TX(ND,ND,NM)
-	REAL*8 TVX(ND-1,ND,NM)
-	REAL*8 FQAFD(ND)
-C
-C We make TX_EXT and TVX_EXT allocatable as they are accessed directly
-C in VARCONT and thus must have the correct dimensions.
-C
-	REAL*8, ALLOCATABLE :: TX_EXT(:,:,:)
-	REAL*8, ALLOCATABLE :: TVX_EXT(:,:,:)
-C
-C KI is assumed to be of dimension:
-C                         (ND,3,NM_KI) in VAR_FORMSOL (NM >= 4)
-C                         (ND,ND,NM_KI) in VAR_MOMHAM (NM >= 4)
-C                         (ND,ND,NM_KI) in VAR_MOM_J_CMF_V6 (NM >= 2)
-C
-	REAL*8 KI(NDMAX,ND,NM_KI)
-	REAL*8 FQAF(ND,ND,NM_KI)	!Used only in LINEGEN.INC
-C
-	REAL*8 BETA(NDMAX),BETAC(NDMAX)		!Used for varaition of J in
-                                                !Sobolev approximation.
-C	EQUIVALENCE (RKB(1),BETA(1)),(RKC(1),BETAC(1))
-	REAL*8 DIFFW(NT)
-	REAL*8 ERF(NLF)
-C
 	CHARACTER TIME*20
 	CHARACTER FMT*120
 	CHARACTER*20 SECTION,FORMAT_DATE*20
@@ -412,98 +311,7 @@ C
 	REAL*8 AMASS_ALL(NT)
 	INTEGER*4 N_LINE_FREQ
 C
-C Arrays and variables for treating lines simultaneously.
-C
-	REAL*8 EINA(MAX_SIM)
-	REAL*8 OSCIL(MAX_SIM)
-	REAL*8 GLDGU(MAX_SIM)
-	REAL*8 AMASS_SIM(MAX_SIM)
-	REAL*8 FL_SIM(MAX_SIM)
-	INTEGER*4 SIM_NL(MAX_SIM)
-	INTEGER*4 SIM_NUP(MAX_SIM)
-	LOGICAL WEAK_LINE(MAX_SIM)
-C
-	REAL*8 CHIL_MAT(ND,MAX_SIM)
-	REAL*8 ETAL_MAT(ND,MAX_SIM)
-	REAL*8 BB_COR(ND,MAX_SIM)
-C
-	REAL*8 VB_SIM(ND,MAX_SIM)
-	REAL*8 VC_SIM(ND,MAX_SIM)
-	REAL*8 VB_2(ND),VC_2(ND)
-	REAL*8 BETAC_SIM(ND,MAX_SIM)
-	REAL*8 ZNET_SIM(ND,MAX_SIM)
-	REAL*8 JBAR_SIM(ND,MAX_SIM)
-C
-	CHARACTER*50 TRANS_NAME_SIM(MAX_SIM)
-C
-	INTEGER*4 NUM_SIM_LINES,SIM_INDX,TMP_MAX_SIM
-C
-C Temporary variables used only local to compute quantities associated with
-C the opacity and emissivity, and the rate equations.
-C
-	REAL*8 OPAC_FAC
-	REAL*8 EMIS_FAC
-	REAL*8 STIM_FAC
-	REAL*8 MUL_FAC
-	REAL*8 dRATE_dT
-	REAL*8 dRATE_dLOW
-	REAL*8 dRATE_dUP
-	REAL*8 RATE_FAC
-C
-C These pointers are used to indicate which locations are being used in
-C the SIM variation arrays. LOW refers to the lower level of the transition,
-C UP the upper level.
-C 
-	INTEGER*4 LOW_POINTER(MAX_SIM)
-	INTEGER*4 UP_POINTER(MAX_SIM)
-C
-C Used to count how many different lines are using an individual storage
-C location.
-C
-	INTEGER*4 VAR_IN_USE_CNT(NM)
-C
-C Indicates the variable (e.g. 1 to NT-2) occupying a particular storage
-C location in the the variation arrays (e.g. TX)
-C
-	INTEGER*4 VAR_LEV_ID(NM)
-!
-	LOGICAL USE_THIS_VAR_MAT(NM)
-	LOGICAL IMP_TRANS_VEC(NM)
-	LOGICAL THIS_TRANS_IMP
-C
-C The following matrices are required to handle the treatment of super levels.
-C
-C ?_STAR_RATIO is defined by:
-C
-C       [LTE Pop. of uncombined level / LTE Pop. of SUPER level]
-C                        
-C L refers to the lower level, U to the upper level.
-C
-	REAL*8 L_STAR_RATIO(ND,MAX_SIM)
-	REAL*8 U_STAR_RATIO(ND,MAX_SIM)
-	REAL*8 dL_RAT_dT(ND,MAX_SIM)
-	REAL*8 dU_RAT_dT(ND,MAX_SIM)
-	REAL*8 LOW_OCC_PROB(ND)
-C
-C Variables, vectors and arrays for treating lines simultaneously with the
-C continuum.
-C
 	INTEGER*4 LINES_THIS_FREQ(NCF_MAX)
-	REAL*8 LINE_PROF_SIM(MAX_SIM)
-	REAL*8 LINE_QW_SIM(MAX_SIM)
-	REAL*8 NEG_OPAC_FAC(ND)
-
-	REAL*8 LINE_OPAC_CON(MAX_SIM)
-	REAL*8 LINE_EMIS_CON(MAX_SIM)
-C
-	LOGICAL RESONANCE_ZONE(MAX_SIM)
-	LOGICAL END_RES_ZONE(MAX_SIM)
-	LOGICAL DO_THIS_TX_MATRIX(NM)
-	LOGICAL LINE_STORAGE_USED(MAX_SIM)
-C
-	REAL*8 dJ_LOC(NM,NUM_BNDS,ND)
-	REAL*8 dZ(NM,NUM_BNDS,ND,MAX_SIM)
-	REAL*8 dZ_POPS(NT,NUM_BNDS,ND)
 C
 	REAL*8 NU_DOP
 	REAL*8 NU_MAX_OBS
@@ -513,7 +321,6 @@ C
 	INTEGER*4 X_INDX
 	INTEGER*4 FIRST_LINE
 	INTEGER*4 LAST_LINE
-	INTEGER*4 SIM_LINE_POINTER(MAX_SIM)
 C
 C Variables to limit the computation of the continuum opacities and
 C emissivities.
@@ -538,28 +345,9 @@ C
 C
 C Variables etc for computation of continuum in comoving frame.
 C
-	LOGICAL CONT_VEL
 	LOGICAL FIRST_FREQ
 	LOGICAL RAT_TOO_BIG
 	LOGICAL NEW_FREQ
-	REAL*8 dLOG_NU			!Step in frequency in Log plane
-	REAL*8 FEDD_PREV(NDMAX)
-	REAL*8 GEDD_PREV(NDMAX)
-	REAL*8 N_ON_J(NDMAX)
-	REAL*8 N_ON_J_PREV(NDMAX)
-	REAL*8 JNU_PREV(NDMAX)
-	REAL*8 RSQHNU_PREV(NDMAX)
-	REAL*8 GEDD(NDMAX)
-	REAL*8 dJ_DIF_d_T_EXT(NDMAX)
-	REAL*8 dJ_DIF_d_dTdR_EXT(NDMAX)
-	REAL*8 RSQHNU(NDMAX)
-	REAL*8 dJ_DIF_d_T(NDMAX)
-	REAL*8 dJ_DIF_d_dTdR(NDMAX)
-	REAL*8 RHS_dHdCHI(NDMAX,ND)
-	REAL*8 dRSQH_DIF_d_T(NDMAX)
-	REAL*8 dRSQH_DIF_d_dTdR(NDMAX)
-	REAL*8 HBC_CMF(3),HBC_PREV(3)
-	REAL*8 NBC_CMF(3),NBC_PREV(3),INBC_PREV
 C
 C 
 !
@@ -632,14 +420,7 @@ C
 C
 C****************************************************************************
 C
-C Set constants
-C
-	CHIBF=2.815E-06
-	CHIFF=3.69E-29
-	HDKT=4.7994145
-	TWOHCSQ=0.0147452575
-	OPLIN=2.6540081E+08		!pi*e*e/m/c*1.0E+10
-	EMLIN=5.27296E-03		!pc*1.0E+025/4.0/pi
+C Initialization section
 C
 	LUER=ERROR_LU()
 	ACCESS_F=5
@@ -652,11 +433,6 @@ C
 	FORMFEED=' '//CHAR(I)
 	CNT_FIX_BA=0
 	MAXCH_SUM=0.0D0
-!
-	T1=10.0/(NLF-1)
-	DO ML=1,NLF
-	  PF(ML)=5.0D0-T1*(ML-1)
-	END DO
 !
 C
 C When TRUE, FIXED_T indicated that T is to be heled fixed (at least at some
@@ -750,6 +526,46 @@ C
 	ELSE
 	  FIX_IMPURITY=RD_FIX_IMP
 	END IF
+C
+C 
+C
+	IF(ACCURATE)THEN
+!
+! We first verify that the interpolation range is valid.
+!
+	  IF(END_INTERP_INDX .GT. ND)END_INTERP_INDX=ND
+	  IF(DEEP .GT. ND)DEEP=MIN(5,ND)
+	  NDEXT=(END_INTERP_INDX-ST_INTERP_INDX)*NPINS+ND
+	  IF(NDEXT .GT. NDMAX)THEN
+	    WRITE(LUER,*)' Error - NDEXT larger than NDMAX in CMFGEN'
+	    WRITE(LUER,*)' Need to increase NDMAX in CMFGEN'
+	    STOP
+	  END IF
+	  NCEXT=NC
+C
+C NB: The following expression guarentees that NPEXT has the same relationship
+C to NDEXT and NCEXT as does NP to ND and NC.
+C
+	  NPEXT=NDEXT+NCEXT+(NP-ND-NC)
+	  IF(NPEXT .GT. NPMAX)THEN
+	    WRITE(LUER,*)' Error - NPEXT larger than NPMAX in CMFGEN'
+	    WRITE(LUER,*)' Need to increase NPMAX in CMFGEN'
+	    STOP
+	  END IF
+	ELSE
+	  NDEXT=ND; NCEXT=NC; NPEXT=NP
+	END IF
+!
+	CALL SET_RADIATION_MOD(ND,NDMAX,NPMAX)
+	CALL SET_LINE_MOD(ND,MAX_SIM,NM)
+        CALL SET_VAR_RAD_MOD(ND,NDEXT,
+	1        NT,NUM_BNDS,NM,MAX_SIM,NM_KI,ACCURATE)
+	CALL SET_CMF_SOB_MOD(ND,NUM_BNDS,NT,NM_KI,NLF,LUER)
+!
+	T1=10.0/(NLF-1)
+	DO ML=1,NLF
+	  PF(ML)=5.0D0-T1*(ML-1)
+	END DO
 C 
 C
 C Read in bound-free gaunt factors for individual n states of hydrogen,
@@ -1009,6 +825,10 @@ C
 	     STOP
 	   END IF
 	END IF
+	IF(NEWMOD)THEN
+	  WRITE(LUER,*)'Starting a new model.'
+	  WRITE(LUER,*)'*_IN files will be used to start model'
+	END IF
 !
 ! Now does accurate flux calculation for a single iteration provided not a new model.
 !
@@ -1048,7 +868,8 @@ C
 	    END DO
 	  END DO
 C
-	  INCLUDE 'SUP_TO_FULL_V4.INC'
+	  CALL SUP_TO_FULL_V4(POPS,Z_POP,DO_LEV_DISSOLUTION,ND,NT)
+!	  INCLUDE 'SUP_TO_FULL_V4.INC'
 C
 	ELSE
 C
@@ -1079,153 +900,18 @@ C
 	    STOP
 	  END IF
 	END IF
-C
-C 
-C
-C Allow for the possibility that the material in the wind is clumped. The
-C assumtion that goes into our treatment are not rigorous --- rather this
-C treatment should be used as a gauge to discern the errors arising by treating
-C O and W-R winds as homogeneous.
-C
-	IF(DO_CLUMP_MODEL)THEN
-	  IF(GLOBAL_LINE_SWITCH .NE. 'BLANK' .AND.
-	1                        .NOT. FLUX_CAL_ONLY)THEN
-	    WRITE(LUER,*)'Error in CMFGEN'
-	    WRITE(LUER,*)'Clumping is only treated for a fully blanketd model'
-	    STOP
-	  ELSE IF(GLOBAL_LINE_SWITCH .NE. 'BLANK')THEN
-	    WRITE(LUER,*)'Warning in CMFGEN'
-	    WRITE(LUER,*)'Clumping is only treated for a fully blanketd model'
-	    WRITE(LUER,*)'EW in EWDATA file are incorect'
-	    WRITE(LUER,*)'Continuum fluxes will be okay'
-	  END IF
-	  IF(CLUMP_LAW(1:4) .EQ. 'EXPO')THEN
-C
-C CLUMP_PAR(1) is the clumping factor at infinity.
-C CLUMP_PAR(2) is a velcity, and determins how fast the clumping factor
-C approach CLUMP_PAR(1).
-C
-	    IF(CLUMP_PAR(3) .EQ. 0.0D0)CLUMP_PAR(4)=1.0D0
-	    DO K=1,ND
-	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1)-CLUMP_PAR(3))*
-	1                     EXP(-V(K)/CLUMP_PAR(2))+
-	1                     CLUMP_PAR(3)*EXP(-V(K)/CLUMP_PAR(4))
-	    END DO
-	  ELSE
-	    WRITE(LUER,*)'Error in CMFGEN'
-	    WRITE(LUER,*)'Invalid law for computing clumping factor'
-	    STOP
-	  END IF
-	ELSE
-	  DO K=1,ND
-	    CLUMP_FAC(K)=1.0D0
-	  END DO
-	END IF
+!
 ! 
-! Compute the atomic number density as function of radius. The abundances 
-! can be specified in two ways:
-!     (1) As a fractional abundance relative to some arbitrary species X.
-!     (2) As a mass fraction: Assumed when the abundance is negative.
 !
-!      N#= SUM[ Xi/X ]            ; Xi/X > 0
-!      mu#= SUM[ Ai Xi/X ] / N#   ; Xi/X > 0
-!      F#= SUM[Fi]=SUM[ Xi/X ]    ; Xi/X < 0
-!      1/mu = f#/mu# + SUM[Fi/Ai]
+! Compute CLUMP_FAC(1:ND) which allow for the possibility that the wind is
+! clumped. At the sime time, we compute the vectors which give the density,
+! the atom density, and the species density at each depth.
 !
-	T1=0.0D0		!Sum of abundance fractions (-> N#)
-	T2=0.0D0		!Sum of A_i * abundance fractions
-	T3=0.0D0		!Sum of mass fractions      (-> F#)
-	T4=0.0D0                !Sum of f/A
-!
-	DO ISPEC=1,NUM_SPECIES
-	  IF(AT_ABUND(ISPEC) .GT. 0)THEN
-	    T1=T1+AT_ABUND(ISPEC)
-            T2=T2+AT_MASS(ISPEC)*AT_ABUND(ISPEC)
-	  ELSE
-	    T3=T3+ABS(AT_ABUND(ISPEC))
-	    T4=T4+ABS(AT_ABUND(ISPEC))/AT_MASS(ISPEC)
-	  END IF
-	END DO
-	IF(T1 .NE. 0 .AND. T3 .GT. 1.0D0)THEN
-	  WRITE(LUER,*)'Error in CMFGEN'
-	  WRITE(LUER,*)'Sum of mass fractions should be less than unity'
-	  WRITE(LUER,*)'Mass fraction=',T3
-	  STOP
-	END IF
-	IF(T1 .EQ. 0.0D0 .AND. ABS(T3-1.0D0) .GT. 0.001D0)THEN
-	  WRITE(LUER,*)'Error in CMFGEN'
-	  WRITE(LUER,*)'Sum of mass fractions should be unity'
-	  WRITE(LUER,*)'Mass fraction=',T3
-	  STOP
-	END IF
-!
-!NB: 1-T3 is the mass fraction of species whose abundances were specified in
-!          terms of fractional number densities.
-!
-	IF(T2 .NE. 0)T2=(1.0D0-T3)*T1/T2		!f#/mu#
-	MEAN_ATOMIC_WEIGHT=1.0D0/(T2+T4)
-!
-! Convert any mass fractions to number fractions. If no number fractions
-! are present, the first species with non-zero abundance is arbitrarily set 
-! to have an abundance of unity.
-!
-	ABUND_SUM=0.0D0
-	IF(T1 .EQ. 0)T1=1.0D0
-	DO ISPEC=1,NUM_SPECIES
-	  IF(T2 .EQ. 0)T2=ABS(AT_ABUND(ISPEC))/AT_MASS(ISPEC)
-	  IF(AT_ABUND(ISPEC) .LT. 0)AT_ABUND(ISPEC)=
-	1         T1*ABS(AT_ABUND(ISPEC))/T2/AT_MASS(ISPEC)
-	  ABUND_SUM=ABUND_SUM+AT_ABUND(ISPEC)
-	END DO
-!
-	IF(SN_MODEL)THEN
-	  DO K=1,ND
-	    POP_ATOM(K)=(RHO_ZERO/MEAN_ATOMIC_WEIGHT)*(R(ND)/R(K))**N_RHO
-	    WRITE(127,'(3ES14.4)')R(K),V(K),POP_ATOM(K)
-	  END DO
-	ELSE
-	  DO K=1,ND
-	    POP_ATOM(K)=RMDOT/MEAN_ATOMIC_WEIGHT/(V(K)*R(K)*R(K)*CLUMP_FAC(K))
-	  END DO
-	END IF
-!
-	DO ISPEC=1,NUM_SPECIES
-	  DO K=1,ND
-	    POP_SPECIES(K,ISPEC)=AT_ABUND(ISPEC)*POP_ATOM(K)/ABUND_SUM
-	  END DO
-	END DO
-	T1=ATOMIC_MASS_UNIT()*MEAN_ATOMIC_WEIGHT
-C
-	T1=ATOMIC_MASS_UNIT()*MEAN_ATOMIC_WEIGHT
-	DO I=1,ND
-	  DENSITY(I)=POP_ATOM(I)*T1			!gm/cm^3
-	END DO
+	CALL SET_ABUND_CLUMP(MEAN_ATOMIC_WEIGHT,ABUND_SUM,LUER,ND)
 !
 ! 
 !
 	IF(ACCURATE)THEN
-!
-! We first verify that the interpolation range is valid.
-!
-	  IF(END_INTERP_INDX .GT. ND)END_INTERP_INDX=ND
-	  IF(DEEP .GT. ND)DEEP=MIN(5,ND)
-	  NDEXT=(END_INTERP_INDX-ST_INTERP_INDX)*NPINS+ND
-	  IF(NDEXT .GT. NDMAX)THEN
-	    WRITE(LUER,*)' Error - NDEXT larger than NDMAX in CMFGEN'
-	    WRITE(LUER,*)' Need to increase NDMAX in CMFGEN'
-	    STOP
-	  END IF
-	  NCEXT=NC
-C
-C NB: The following expression guarentees that NPEXT has the same relationship
-C to NDEXT and NCEXT as does NP to ND and NC.
-C
-	  NPEXT=NDEXT+NCEXT+(NP-ND-NC)
-	  IF(NPEXT .GT. NPMAX)THEN
-	    WRITE(LUER,*)' Error - NPEXT larger than NPMAX in CMFGEN'
-	    WRITE(LUER,*)' Need to increase NPMAX in CMFGEN'
-	    STOP
-	  END IF
 	  I=ND-DEEP
 	  IF(INTERP_TYPE .NE. 'LOG')THEN
 	    WRITE(LUER,*)'Error in CMFGEN_SUB'
@@ -1238,15 +924,8 @@ C
 	  CALL EXTEND_VTSIGMA(VEXT,TEXT,SIGMAEXT,COEF,INDX,NDEXT,
 	1        V,TA,SIGMA,ND)
 !
-! Allocate TX_EXT and TVX_EXT arrays for use in VARCONT.
-!
-	  ALLOCATE (TX_EXT(NDEXT,ND,NM))
-	  ALLOCATE (TVX_EXT(NDEXT-1,ND,NM))
-!
           VDOP_VEC_EXT(1:NDEXT)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
 !
-	ELSE
-	  NDEXT=ND ; NCEXT=NC; NPEXT=NP
 	END IF
 !
 ! Need to calculate impact parameters, and angular quadrature weights here
@@ -1258,767 +937,21 @@ C
 ! Allocate memory for opacities.
 !
         CALL INIT_OPAC_MOD(ND,NT,L_TRUE)
-C 
-C
-C		'NEW MODEL'
-C
+! 
+!
+!		'NEW MODEL'
+!
+! Read in old estimates for the departure coefficents for the new model.
+! T and ED are also estimated.
+!
 	IF(NEWMOD)THEN
 	  NITSF=0
 	  IREC=0
 	  LAST_NG=-1000  			!Must be -1000
 	  NEXT_NG=1000				!Must be initialized to 1000
-C
-C Compute temperature distribution and populations. The call ' 'WSC are
-C too allow NDOLD in the input files to be larger than ND.
-C The first call to REGRIDWS is effectively used to compute DHeI only.
-C
-	  IF(GRID) THEN
-	    WRITE(LUER,*)'Warning - using direct interpolation '//
-	1                'option (i.e. GRID) for new model.'
-C
-	     DO ID=1,NUM_IONS-1
-	       IF(ATM(ID)%XzV_PRES)THEN
-	          TMP_STRING=TRIM(ION_ID(ID))//'_IN'
-	          CALL REGRIDWSC_V2( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,
-	1                 ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
-	1                 ATM(ID)%NXzV_F,ND,TMP_STRING)
-	       END IF
-	     END DO
-C
-C Regrid the temperature and the electron density. By using this call the
-C last species can be taken from a different model to the H, He populations 
-C etc. Normally T_IN can be the same as He2_IN (i.e. any input departure
-C coefficent file). TA, TB, and TC are used as dummy vectors.
-C
-	     CALL REGRIDWSC(TA,R,ED,T,TB,TC,IONE,ND,'T_IN')
-C
-	  ELSE
-	    WRITE(LUER,*)'Warning - using NON-GRID option for new model.'
-	    IF(.NOT. DO_POP_SCALE)THEN
-	      DO_POP_SCALE=.TRUE.
-	      WRITE(LUER,*)'Warning - setting DO_POP_SCALE=.TRUE. in CMFGEN'
-	      WRITE(LUER,*)'DO_POP_SCALE adjusted as non-GRID option.'
-	    END IF
-!
-! SPEC_DEN will contain the density of each species, while
-! AT_NO_VEC will contain the the atomic number. These are set at all depths.
-!
-	    I=0
-	    DO ISPEC=1,NUM_SPECIES
-	      CALL ELEC_PREP(SPEC_DEN,AT_NO_VEC,I,NUM_SPECIES,
-	1                POP_SPECIES(1,ISPEC),AT_NO(ISPEC),SPECIES_PRES(ISPEC),ND)
-	    END DO
-	    CALL GETELEC_V2(SPEC_DEN,AT_NO_VEC,I,ED,ND,LUIN,'GAMMAS_IN')
-C                         
-C The INIT_TEMP routine assumes that the T can interpolated using 
-C a Sphecrical TAU scale computed using the electron scattering opacity.
-C
-	    CALL INIT_TEMP_V2(R,ED,CLUMP_FAC,T,LUM,T_INIT_TAU,ND,LUIN,'T_IN')
-C
-C If clumping is present we interpret on the departure coefficeints using the
-C electron density as the independent varaible. At presemt we correct the
-C electron density for clumping (i.e. ED(I)*CLUMP_FAC(I)), which we store in TC.
-C It may be better to regrid on the actual electron densities.
-C
-	    TC(1:ND)=ED(1:ND)*CLUMP_FAC(1:ND)
-	    DO ID=1,NUM_IONS-1
-	      IF(ATM(ID)%XzV_PRES)THEN
-	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
-		CALL REGRID_B_ON_NE(ATM(ID)%XzV_F,TC,ATM(ID)%DXzV_F,TA,
-	1              ATM(ID)%NXzV_F, IONE,
-	1              ATM(ID)%NXzV_F,ND,LUIN,TMP_STRING)
-	      END IF
-	    END DO
-C
-	  END IF
-C
-C 
-C
-C
-C Compute vector constants for evaluating the level dissolution. These
-C constants are the same for all species. These are stored in a common block,
-C and are required by SUP_TO_FULL and LTE_POP_WLD.
-C
-C As a first estimate of POPION, we assume all species are fully ionized.
-C The POPION is just the number of atoms.
-C
-	  DO I=1,ND
-	    POPION(I)=POP_ATOM(I)
-	  END DO
-	  CALL COMP_LEV_DIS_BLK(ED,POPION,T,DO_LEV_DISSOLUTION,ND)
-C
-C Compute the LTE populations and convert from departure coefficients to
-C populations. The populations are scaled to ensure number conservation -
-C during the scaling the ionization remains fixed. On each call to CNVT_FR_DC,
-C TA is incremented by the population. IF FIRST is .TRUE., TA is zeroed first.
-C The second flag indicates whether to add in the ION contribution, which
-C will also be added as the ground state population of the next species.
-C If it is FALSE, the higher ionization stage is assumed not to be present,
-C and DION is added in.
-C
-C TB is used as a dummy vector when we are dealing with the lowest ionization
-C stage. It is returned with the ground state population.
-C
-	  DO ISPEC=1,NUM_SPECIES
-	    FIRST=.TRUE.
-	    DO ID=SPECIES_END_ID(ISPEC),SPECIES_BEG_ID(ISPEC),-1
-	      IF(ATM(ID)%XzV_PRES)THEN
-	        CALL LTEPOP_WLD_V1(ATM(ID)%XzVLTE_F, ATM(ID)%W_XzV_F,
-	1              ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,
-	1              ATM(ID)%ZXzV,      ATM(ID)%GIONXzV_F,
-	1              ATM(ID)%NXzV_F,    ATM(ID)%DXzV_F,     ED,T,ND)
-	        CALL CNVT_FR_DC(ATM(ID)%XzV_F, ATM(ID)%XzVLTE_F,
-	1              ATM(ID)%DXzV_F,    ATM(ID)%NXzV_F,
-	1              TB,                TA,ND,
-	1              FIRST,             ATM(ID+1)%XzV_PRES)
-	        IF(ID .NE. SPECIES_BEG_ID(ISPEC))ATM(ID-1)%DXzV_F(1:ND)=TB(1:ND)
-  	      END IF
-	    END DO
-C
-C Now scale the population for EACH species to ensure that the species
-C conservation equation is satisfied.
-C
-C This option should always be set if new model with T iteration 
-C and correction. With the GRID=T option it may provide a convenient
-C method for reducing the populations temporarily (in conjunction with
-C DISPGEN) in the outer layers to overcome a large jum in optical
-C depth.
-C
-	    IF(DO_POP_SCALE)THEN
-	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
-	        CALL SCALE_POPS(ATM(ID)%XzV_F,ATM(ID)%DXzV_F,
-	1                POP_SPECIES(1,ISPEC),TA,ATM(ID)%NXzV_F,ND)
-	      END DO
-	    END IF
-	  END DO			!ISPEC
-C                     
-C We now need to compute the populations for the model atom with Super-levels.
-C We do this in reverse order (i.e. highest ionization stage first) in order
-C that we the ion density for the lower ionization stage is available for
-C the next call.
-C
-C For 1st call to FULL_TO_SUP, Last line contains FeX etc as FeXI not installed.
-C
-	    DO ID=NUM_IONS-1,1,-1
-	     CALL FULL_TO_SUP(
-	1      ATM(ID)%XzV,   ATM(ID)%NXzV,       ATM(ID)%DXzV,   ATM(ID)%XzV_PRES,
-	1      ATM(ID)%XzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%NXzV_F, ATM(ID)%DXzV_F,
-	1      ATM(ID+1)%XzV, ATM(ID+1)%NXzV,     ATM(ID+1)%XzV_PRES,  ND)
-	    END DO
-C
-C Store all quantities in POPS array. This is done here as it enables POPION 
-C to be readily computed. It also ensures that POS is correct if we don't
-C iterate on T.
-C
-	    DO ID=1,NUM_IONS-1
-	      CALL IONTOPOP(POPS,  ATM(ID)%XzV, ATM(ID)%DXzV, ED,T,
-	1            ATM(ID)%EQXzV, ATM(ID)%NXzV, NT,ND, ATM(ID)%XzV_PRES)
-	    END DO
-C
-C Compute the ion population at each depth.
-C These are required when evaluation the occupation probabilities.
-C
-	    DO J=1,ND
-	      POPION(J)=0.0D0
-	      DO I=1,NT
-	        IF(Z_POP(I) .GT. 0)POPION(J)=POPION(J)+POPS(I,J)
-	      END DO
-	    END DO
-C
-C Evaluates LTE populations for both the FULL atom, and super levels.
-C
-	    INCLUDE 'EVAL_LTE_INC_V4.INC'
-C
-C 
-C 
-C Iterate on the initial temperature distribution so that the
-C temperature distribution at depth corresponds to the GREY solution.
-C We use the Rosseland mean opacities to evaluate the GREY temperature
-C distribution. We then compute non-LTE partition functions which
-C are used to estimate the ED density. The new ED is then used to compute
-C the new populations, assuming the departure coefficients remain fixed.
-C We then iterate several times so that the populations and GREY temperature
-C structure are self consistent (at some undetermined level). This process
-C should be convergent provided electron scattering is a dominant opacity
-C source. If divergent, an addition parameter could be inserted in code to
-C damp the corrections.
-C
-C This page computes the Rosseland mean opacity from the temperature
-C distribution and the population levels. TA is a working vector. The
-C Rossland opacity is given in ROSSMEAN. 
-C
-	  CALL TUNE(1,'T_ITERATE')
-	  MAIN_COUNTER=1
-	  DO WHILE (ITERATE_INIT_T .AND. .NOT. GRID .AND.
-	1                                 MAIN_COUNTER .LE. 5)
-!
-	    IF(.NOT. ALLOCATED(U_PAR_FN))THEN
-	      ALLOCATE (U_PAR_FN(ND,NUM_IONS),STAT=IOS)
-	      IF(IOS .EQ. 0)ALLOCATE (PHI_PAR_FN(ND,NUM_IONS),STAT=IOS)
-	      IF(IOS .EQ. 0)ALLOCATE (Z_PAR_FN(NUM_IONS),STAT=IOS)
-	      IF(IOS .NE. 0)THEN
-	        WRITE(LUER,*)'Unable to allocate PHI_PAR_FN in CMFGEN_SUB'
-	        STOP
-	      END IF
-	    END IF
-C 
-C
-C Set 2-photon data with current atomic models and populations.
-C
-	     DO ID=1,NUM_IONS-1
-	       ID_SAV=ID
-	       CALL SET_TWO_PHOT_V2(ION_ID(ID), ID_SAV, ATM(ID)%XzVLTE, ATM(ID)%NXzV,
-	1        ATM(ID)%XzVLTE_F,   ATM(ID)%XzVLEVNAME_F,
-	1        ATM(ID)%EDGEXzV_F,  ATM(ID)%GXzV_F,
-	1        ATM(ID)%F_TO_S_XzV, ATM(ID)%NXzV_F, ND,
-	1        ATM(ID)%ZXzV,       ATM(ID)%EQXzV,  ATM(ID)%XzV_PRES)
-	     END DO
-C
-C 
-C
-C We ensure that LAST_LINE points to the first LINE that is going to
-C be handled in the BLANKETING portion of the code.
-C
-	    LAST_LINE=0	    		!Updated as each line is done
-	    DO WHILE(LAST_LINE .LT. N_LINE_FREQ .AND.
-	1             VEC_TRANS_TYPE(LAST_LINE+1)(1:4) .NE. 'BLAN')
-	            LAST_LINE=LAST_LINE+1
-	    END DO
-	    DO SIM_INDX=1,MAX_SIM
-	      LINE_STORAGE_USED(SIM_INDX)=.FALSE.
-	    END DO
-C
-C Ensure none of the storage location for the variation of J with CHIL etc
-C are being pointed at.
-C
-	    DO SIM_INDX=1,MAX_SIM
-	      LOW_POINTER(SIM_INDX)=0
-	      UP_POINTER(SIM_INDX)=0
-	    END DO
-C
-C ROSSMEAN is initially used to accumulate the integral of 1/chi (weighted 
-C by dB/DT). After the frequency loop it is corrected so that it contains
-C Rosseland mean opacity.
-C
-	    CALL DP_ZERO(ROSSMEAN,ND)
-	    TSTAR=T(ND)			!Required for IC in OPACITIES
-	    CONT_FREQ=0.0D0
-	    DO ML=1,NCF
-	      FREQ_INDX=ML
-	      FL=NU(ML)
-C
-	      IF(NU_EVAL_CONT(ML) .NE. CONT_FREQ)THEN
-	        COMPUTE_NEW_CROSS=.TRUE.
-	        CONT_FREQ=NU_EVAL_CONT(ML)
-	      ELSE
-	        COMPUTE_NEW_CROSS=.FALSE.
-	      END IF
-C
-C	      INCLUDE 'OPACITIES_V4.INC'
-	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
-	1                FL,CONT_FREQ,FREQ_INDX,NCF,
-	1                SECTION,ND,NT,LST_DEPTH_ONLY)
-C
-C 
-C
-C Section to include lines automatically with the continuum.
-C
-C
-C  LINES_THIS_FREQ --- Logical vector [NCF] indicating whether this frequency
-C                        is part of the resonance zone (i.e. Doppler profile) of 
-C                        one (or more) lines.
-C
-C LINE_ST_INDX_IN_NU --- Integer vector [N_LINES] which specifies the starting
-C                          frequency index for this lines resonance zone.
-C
-C LINE_END_INDX_IN_NU --- Integer vector [N_LINES] which specifies the final
-C                          frequency index for this lines resonance zone.
-C
-C FIRST_LINE   ---- Integer specifying the index of the highest frequency
-C                         line which we are taking into account in the
-C                         transfer.
-C
-C LAST_LINE  ---- Integer specifying the index of the lowest frequency
-C                         line which we are taking into account in the
-C                         transfer.
-C                                        
-C LINE_LOC   ---- Integer array. Used to locate location of a particular line
-C                         in the SIM vectors/arrays.
-C
-C SIM_LINE_POINTER --- Integer array --- locates the line corresponding to
-C                         the indicated storage location in the SIM vectors/
-C                         arrays.
-C
-C Check whether we have to treat another line. We use a DO WHILE, rather
-C than an IF statement, to handle lines which begin at the same (upper)
-C frequency.
-C
-C
-	      DO WHILE(  LAST_LINE .LT. N_LINE_FREQ .AND. ML 
-	1          .EQ. LINE_ST_INDX_IN_NU( MIN(N_LINE_FREQ,LAST_LINE+1) )  )
-C
-C Have another line --- need to find its storage location.
-C
-	        I=1
-	        DO WHILE(LINE_STORAGE_USED(I))
-	          I=I+1
-	          IF(I .GT. MAX_SIM)THEN
-	            FIRST_LINE=N_LINE_FREQ
-	            DO SIM_INDX=1,MAX_SIM		!Not 0 as used!
-	              FIRST_LINE=MIN(FIRST_LINE,SIM_LINE_POINTER(SIM_INDX)) 
-	            END DO
-	            IF( ML .GT. LINE_END_INDX_IN_NU(FIRST_LINE))THEN
-C
-C Free up storage location for line.
-C
-	              I=LINE_LOC(FIRST_LINE)
-	              LINE_STORAGE_USED(I)=.FALSE.
-	              SIM_LINE_POINTER(I)=0
-	            ELSE
-	              WRITE(LUER,*)'Too many lines have overlapping '//
-	1                      'resonance zones'
-	              WRITE(LUER,*)'Current frequency is:',FL
-	              STOP
-	            END IF
-	          END IF
-	        END DO
-	        SIM_INDX=I
-	        LAST_LINE=LAST_LINE+1
-	        LINE_STORAGE_USED(SIM_INDX)=.TRUE.
-	        LINE_LOC(LAST_LINE)=SIM_INDX
-	        SIM_LINE_POINTER(SIM_INDX)=LAST_LINE
-C
-C Have located a storage location. Now must compute all relevant quantities
-C necessary to include this line in the transfer calculations.
-C
-	        SIM_NL(SIM_INDX)=VEC_NL(LAST_LINE)
-	        SIM_NUP(SIM_INDX)=VEC_NUP(LAST_LINE)
-	        NL=SIM_NL(SIM_INDX)
-	        NUP=SIM_NUP(SIM_INDX)
-C
-	        EINA(SIM_INDX)=VEC_EINA(LAST_LINE)
-	        OSCIL(SIM_INDX)=VEC_OSCIL(LAST_LINE)
-	        FL_SIM(SIM_INDX)=VEC_FREQ(LAST_LINE)
-C
-	        TRANS_NAME_SIM(SIM_INDX)=TRIM(VEC_SPEC(LAST_LINE))
-C
-C This is a temporary measure. We currently set AMASS to AMASS_DOP for all
-C species.
-C 
-	        AMASS_SIM(SIM_INDX)=AMASS_ALL(NL)
-	        AMASS_SIM(SIM_INDX)=AMASS_DOP
-C
-C 
-C
-C Compute U_STAR_RATIO and L_STAR_RATIO which are used to switch from
-C the opacity/emissivity computed with a FULL_ATOM to an equivalent form
-C but written in terms of the SUPER-LEVELS. 
-C
-C L refers to the lower level of the transition.
-C U refers to the upper level of the transition.
-C
-C At present we must treat each species separately (for those with both FULL
-C and SUPER_LEVEL model atoms).
-C
-C MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
-C MNL (MNUP) denotes the lower (upper) level in the super level model atom.
-C
-	        MNL_F=VEC_MNL_F(LAST_LINE)
-	        MNUP_F=VEC_MNUP_F(LAST_LINE)
-	        DO K=1,ND
-	          L_STAR_RATIO(K,SIM_INDX)=1.0D0
-	          U_STAR_RATIO(K,SIM_INDX)=1.0D0
-	        END DO
-C
-C T1 is used to represent b(level)/b(super level). If no interpolation of
-C the b values in a super level has been performed, this ratio will be unity .
-C This ratio is NOT treated in the linearization.
-C
-	        DO ID=1,NUM_IONS-1
-	          IF(VEC_SPEC(LAST_LINE) .EQ. ION_ID(ID))THEN
-	            MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
-	            MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
-	            DO K=1,ND
-	              T1=(ATM(ID)%XzV_F(MNL_F,K)/ATM(ID)%XzVLTE_F(MNL_F,K)) /
-	1                  (ATM(ID)%XzV(MNL,K)/ATM(ID)%XzVLTE(MNL,K))
-	              L_STAR_RATIO(K,SIM_INDX)=T1*ATM(ID)%W_XzV_F(MNUP_F,K)*
-	1                  ATM(ID)%XzVLTE_F(MNL_F,K)/ATM(ID)%XzVLTE(MNL,K)/
-	1                  ATM(ID)%W_XzV_F(MNL_F,K)
-	              T2=(ATM(ID)%XzV_F(MNUP_F,K)/ATM(ID)%XzVLTE_F(MNUP_F,K)) /
-	1                  (ATM(ID)%XzV(MNUP,K)/ATM(ID)%XzVLTE(MNUP,K))
-	              U_STAR_RATIO(K,SIM_INDX)=T2*ATM(ID)%XzVLTE_F(MNUP_F,K)/
-	1                  ATM(ID)%XzVLTE(MNUP,K)
-	            END DO
-	            GLDGU(SIM_INDX)=ATM(ID)%GXzV_F(MNL_F)/ATM(ID)%GXzV_F(MNUP_F)
-	            TRANS_NAME_SIM(SIM_INDX)=TRIM(TRANS_NAME_SIM(SIM_INDX))//
-	1             '('//TRIM(ATM(ID)%XzVLEVNAME_F(MNUP_F))//'-'//
-	1                TRIM(ATM(ID)%XzVLEVNAME_F(MNL_F))//')'
-	            EXIT
-	          END IF
-	        END DO
-C 
-C
-C Compute line opacity and emissivity for this line.
-C
-	        T1=OSCIL(SIM_INDX)*OPLIN
-	        T2=FL_SIM(SIM_INDX)*EINA(SIM_INDX)*EMLIN
-	        NL=SIM_NL(SIM_INDX)
-	        NUP=SIM_NUP(SIM_INDX)
-	        DO I=1,ND
-	          CHIL_MAT(I,SIM_INDX)=
-	1           T1*(L_STAR_RATIO(I,SIM_INDX)*POPS(NL,I)-
-	1           GLDGU(SIM_INDX)*U_STAR_RATIO(I,SIM_INDX)*POPS(NUP,I))
-	          ETAL_MAT(I,SIM_INDX)=T2*POPS(NUP,I)*
-	1           U_STAR_RATIO(I,SIM_INDX)
-	        END DO
-C
-C Ensure that LAST_LINE points to the next LINE that is going to be handled 
-C in the BLANKETING portion of the code.
-C
-	        DO WHILE(LAST_LINE .LT. N_LINE_FREQ.AND.
-	1            VEC_TRANS_TYPE(LAST_LINE+1)(1:4) .NE. 'BLAN')
-	           LAST_LINE=LAST_LINE+1
-	        END DO
-	      END DO				!Inclusion of new line.
-C
-C Check whether current frequency is a resonance frequency for each line.
-C
-	      DO SIM_INDX=1,MAX_SIM
-	        RESONANCE_ZONE(SIM_INDX)=.FALSE.
-	        END_RES_ZONE(SIM_INDX)=.FALSE.
-	        IF(LINE_STORAGE_USED(SIM_INDX))THEN
-	          L=SIM_LINE_POINTER(SIM_INDX)
-	          IF( FREQ_INDX .GE. LINE_ST_INDX_IN_NU(L) .AND.
-	1           FREQ_INDX .LT. LINE_END_INDX_IN_NU(L))THEN
-	            RESONANCE_ZONE(SIM_INDX)=.TRUE.
-	          ELSE IF(FREQ_INDX .EQ. LINE_END_INDX_IN_NU(L))THEN
- 	            RESONANCE_ZONE(SIM_INDX)=.TRUE.
-	            END_RES_ZONE(SIM_INDX)=.TRUE.
-	          END IF
-	        END IF
-	      END DO
-C
-C Compute Doppler profile. At present this is assumed, for simplicity, to be
-C depth independent.
-C
-	      T1=1.0D-15/1.77245385095516D0		!1.0D-15/SQRT(PI)
-	      DO SIM_INDX=1,MAX_SIM
-	        IF(RESONANCE_ZONE(SIM_INDX))THEN
-	          NU_DOP=FL_SIM(SIM_INDX)*12.85*
-	1         SQRT( TDOP/AMASS_SIM(SIM_INDX) +
-	1                        (VTURB/12.85)**2 )/2.998D+05
-	          LINE_PROF_SIM(SIM_INDX)=EXP( -( (FL-FL_SIM(SIM_INDX))/
-	1              NU_DOP )**2 )*T1/NU_DOP
-	        ELSE
-	           LINE_PROF_SIM(SIM_INDX)=0.0D0
-	        END IF
-	      END DO                                    
-
-C
-C Now add in line opacity to continuum opacity.
-C
-	      DO SIM_INDX=1,MAX_SIM
-	        IF(RESONANCE_ZONE(SIM_INDX))THEN
-	          DO I=1,ND
-	            CHI(I)=CHI(I) +
-	1             CHIL_MAT(I,SIM_INDX)*LINE_PROF_SIM(SIM_INDX)
-	            ETA(I)=ETA(I) +
-	1             ETAL_MAT(I,SIM_INDX)*LINE_PROF_SIM(SIM_INDX)
-	          END DO
-	        END IF
-	      END DO
-C
-C CHECK for negative line opacities. 
-C
-	      DO I=1,ND
-	        IF(CHI(I) .LT. 0.1D0*ESEC(I))THEN
-	          T1=CHI(I)
-	          CHI(I)=0.1D0*ESEC(I)
-	        END IF
-	      END DO
-C
-C Note division by T**2 is included with Stefan-Boltzman constant.
-C
-	      T1=-HDKT*NU(ML)
-	      T2=-T1*FQW(ML)*TWOHCSQ*(NU(ML)**3)
-	      DO I=1,ND
-	        ROSSMEAN(I)=ROSSMEAN(I) +
-	1           T2*EMHNUKT(I)/CHI(I)/(1.0D0-EMHNUKT(I))**2
-	      END DO
-	    END DO
-C
-C Compute CHI, and then optical depth scale.
-C Stefan-Boltzman constant *1E-15*1E+16/PI (T**4/PI). NB --- T1 is a factor
-C of 10^15 larger than in MAINGEN as FQW has already been multiplied by
-C 10^15 for dv integrations.
-C
-C If clumping is important, we need to correct the Rosseland mean opacity 
-C for clumping. Since it is a simple scale factor at each depth, we can do
-C it here, rather than adjust CHI for each frequency.
-C
-	    T1=1.8047E+11
-	    DO I=1,ND
-	      ROSSMEAN(I)=4.0D0*CLUMP_FAC(I)*T1*(T(I)**5)/ROSSMEAN(I)
-	    END DO
-C
-	    CALL WRITV(ROSSMEAN,ND,'Rosseland Mean Opacity',88)
-! 
-!
-! Check that inner boundary is deep enogh so that LTE can be fully recovered. SOURCE and
-! TC are used as temporary vectors.
-!
-	    IF(MAIN_COUNTER .EQ. 1)THEN
-	      CALL TORSCL(TA,ROSSMEAN,R,TB,TC,ND,METHOD,' ')
-	      CALL ESOPAC(ESEC,ED,ND)
-	      CALL TORSCL(TB,ESEC,R,SOURCE,TC,ND,METHOD,' ')
-	      WRITE(LUER,*)' '
-	      WRITE(LUER,'(A,ES10.3)')' Thompson scattering optical depth at inner boundary is:',TB(ND)
-	      WRITE(LUER,'(A,ES10.3)')' Rosseland optical depth at inner boundary is:           ',TA(ND)
-	      WRITE(LUER,'(A,ES10.3)')' Rosseland optical depth at outer boundary is:           ',TA(1)
-	      WRITE(LUER,*)' '
-	      IF(TA(ND) .LT. 10.0D0)THEN
-	        WRITE(LUER,*)('*',I=1,70)
-	        WRITE(LUER,*)('*',I=1,70)
-	        WRITE(LUER,*)' '
-	        WRITE(LUER,*)'Warning --- your core optical depth is proably too low'
-	        WRITE(LUER,*)'You should use a value in excess of 10'
-	        WRITE(LUER,*)' '
-	        WRITE(LUER,*)('*',I=1,70)
-	        WRITE(LUER,*)('*',I=1,70)
-	      END IF
-	    END IF
-!
-	    CHI(1:ND)=ROSSMEAN(1:ND)
-	    IF(JGREY_WITH_V_TERMS)THEN
-!
-! This routine will supercede the one above, and included to zeor
-! order the effect of the velocity field.
-!
-	      T2=1.0D-05		!Accuracy to converge f
-	      CALL JGREY_WITH_FVT(RJ,SOB,CHI,R,V,SIGMA,
-	1                  P,AQW,HMIDQW,KQW,NMIDQW,
-	1                  LUM,METHOD,DIF,IC,
-	1                  T2,ND,NC,NP)
-	    ELSE
-!
-! Will use FEDD for F, GAM for NEWRJ, GAMH for NEWRK, and T2 for NEWHBC.
-! Will use HBC_J for HBC. No need to modify JGREY, as outer boundary
-! will always be optically thin.
-!
-	      DO I=1,ND
-	        FEDD(I)=1.0D0/3.0D0
-	      END DO
-	      HBC_J=1.0D0
-	      T1=1000.0
-	      DO WHILE(T1 .GT. 1.0E-05)
-	        CALL JGREY(TA,TB,TC,XM,DTAU,R,Z,P,RJ,
-	1          GAM,GAMH,Q,FEDD,CHI,dCHIdR,
-	1          AQW,KQW,LUM,HBC_J,T2,NC,ND,NP,METHOD)
-	        T1=0.0D0
-	        DO I=1,ND
-	          T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
-	          FEDD(I)=GAMH(I)
-	        END DO
-	        T1=MAX(ABS(HBC_J-T2),T1)
-	        HBC_J=T2
-	        WRITE(LUER,'('' Maximum change in Grey F is '',1P,E11.4)')T1
-	      END DO
-	    END IF
-C
-C Compute the temperature distribution, and the Rossland optical depth scale.
-C NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert T from units of 
-C K to units of 10^4 K. The ' ' in TORSCL indicates TYPE of atmosphere,
-C and here is set to ' ' so as TORSCL assumes a 1/r^2 density dependance
-C at boundary.
-C 
-	    CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,' ')
-	    DO I=1,ND
-	      TGREY(I)=((3.14159265D0/5.67D-05*RJ(I))**0.25D0)*1.0D-04
-	    END DO
-	    CALL SCALE_GREY(TGREY,TA,LUIN,ND)
-C
-C Now correct T distribution towards grey value.
-C As we don't require the old T, we can overwrite it straight away.
-C If we multiplied T1 by a number less than  unity, this would be
-C equivalent to only a partial correction of T towards TGREY.
-C GREY_PAR=0 set T=TGREY
-C GREY_PAR=INFINITY leaves T=T.
-C
-C T3 and T2 are used to determine the current largest correction.
-C
-	    IF( MAIN_COUNTER .EQ. 1)THEN
-	      DO I=1,ND
-	        T_SAVE(I)=T(I)		!Save original T for use when
-	      END DO                    !correcting T towards TGREY.
-	    END IF
- 	    T2=0.0
-	    DO I=1,ND
-	      IF(GREY_PAR .LE. 0)then
-	        T1=1.0D0
-	      ELSE
-	        T1=1.0D0-EXP(-TA(I)/GREY_PAR)
-	      END IF
-	      IF(T1 .LT. 0.1*GREY_PAR)T1=0.0
-	      T3=ABS( T1*(TGREY(I)-T(I)) )
-	      T(I)=T1*TGREY(I)+(1.0-T1)*T_SAVE(I)
-	      T2=MAX(T3/T(I),T2)
-	    END DO
-	    WRITE(LUER,'('' Largest correction to T in GREY initialization loop '//
-	1              'is '',1P,E9.2,'' %'')')100.0*T2
-C
-C Now compute non-LTE partition functions. These assume that the
-C departure coefficients are independent of Temperature. This
-C is a good assumption at depth where b is approximately unity.
-C
-C GAM_SPECIES is used as a storage location for the population of the
-C highest ionization stage. Must be done in forward direction.
-C
-	    DO ID=1,NUM_IONS
-	      J=ID-1			!1 is added in PAR_FUN_V2
-	      ISPEC=SPECIES_LNK(ID)
-	      CALL PAR_FUN_V2(U_PAR_FN, PHI_PAR_FN, Z_PAR_FN,
-	1          GAM_SPECIES(1,ISPEC),
-	1          ATM(ID)%XzV_F,     ATM(ID)%XzVLTE_F,  ATM(ID)%W_XzV_F,
-	1          ATM(ID)%DXzV_F,    ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,
-	1          ATM(ID)%GIONXzV_F, ATM(ID)%ZXzV,T,    ATM(ID)%NXzV_F,
-	1          ND,J,NUM_IONS, ATM(ID)%XzV_PRES)
-	   END DO
-C
-C The non-LTE partition functions are density independent, provided
-C we assume the departure coefficients remain fixed.
-C
-C We now evaluate the contribution to the electron density by each
-C species, using the non-LTE partition functions.
-C
-C We use H for ED(est)
-C We use QH for dED(est)/dT.
-C
-	    T1=1.0
-	    J=0
-	    DO WHILE (T1 .GT. 1.0E-04)
-	      FIRST=.TRUE.
-C
-C Recall GAM_SPECIES is set to be the population of the highest ionization
-C stage.
-C
-	      DO ISPEC=1,NUM_SPECIES
-	        ID=SPECIES_BEG_ID(ISPEC)
-	        J=SPECIES_END_ID(ISPEC)-SPECIES_BEG_ID(ISPEC)+1
-	        IF(SPECIES_PRES(ISPEC))THEN
-	          CALL EVAL_ED(H,QH,U_PAR_FN(1,ID),PHI_PAR_FN(1,ID),
-	1                  Z_PAR_FN(ID),ED,POP_SPECIES(1,ISPEC),
-	1                  GAM_SPECIES(1,ISPEC),XM,TB,TC,J,ND,FIRST)
-	        END IF
-	      END DO
-C
-	      T1=0.0
-	      DO I=1,ND
-	        TA(I)=-(H(I)-ED(I))/(QH(I)-1.0D0)/ED(I)
-	        T1=MAX(T1,ABS(TA(I)))
-	        IF(TA(I) .LT. -0.9)TA(I)=-0.9
-	        IF(TA(I) .GT. 9.0)TA(I)=9.0
-	        ED(I)=ED(I)*(1.0D0+TA(I))
-	      END DO
-	      J=J+1
-	      IF(J .GT. 20)THEN
-	        WRITE(LUER,*)'Error --- Computation of ED in EVAL_ED section'//
-	1                 ' has taken more than 20 iterations'
-	        STOP
-	      END IF
-	    END DO
-C 
-C
-C Now need to compute LTE populations, and populations.
-C Since T and Ne have altered, we revise the vectors for evaluating the 
-C level dissolution. These constants are the same for all species. These are 
-C stored in a common block, and are required by SUP_TO_FULL and LTE_POP_WLD.
-C
-C NB: POPION will also alter but in W-R and LBV's all species will be ionized,
-C and hence POPION will not change from iteration to iteration. In any event,
-C it has a smalled effect than changes in Ne.
-C
-	    CALL COMP_LEV_DIS_BLK(ED,POPION,T,DO_LEV_DISSOLUTION,ND)
-C
-C We do low ionization species second, as first need DION.
-C
-	    DO ISPEC=1,NUM_SPECIES
-	      FIRST=.TRUE.   
-	      DO ID=SPECIES_END_ID(ISPEC),SPECIES_BEG_ID(ISPEC),-1
-	        IF(ATM(ID)%XzV_PRES)THEN
-	          CALL LTEPOP_WLD_V1(ATM(ID)%XzVLTE_F, ATM(ID)%W_XzV_F,
-	1               ATM(ID)%EDGEXzV_F,  ATM(ID)%GXzV_F,  ATM(ID)%ZXzV,
-	1               ATM(ID)%GIONXzV_F,  ATM(ID)%NXzV_F,  ATM(ID)%DXzV_F,
-	1               ED,T,ND)
-	          CALL CNVT_FR_DC(ATM(ID)%XzV_F, ATM(ID)%XzVLTE_F,
-	1               ATM(ID)%DXzV_F,   ATM(ID)%NXzV_F,
-	1               TB,               TA,ND,FIRST,      ATM(ID+1)%XzV_PRES)
-	          IF(ID .NE. SPECIES_BEG_ID(ISPEC))ATM(ID-1)%DXzV_F(1:ND)=TB(1:ND)
-	        END IF
-	      END DO
-C
-C We need to scale the populations to ensure that the change in temperature
-C   has not causes some population to blow up. We always do this --- the
-C DO_POP_SCALE option has noe effect.
-C
-	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
-	        CALL SCALE_POPS(ATM(ID)%XzV_F, ATM(ID)%DXzV_F,
-	1           POP_SPECIES(1,SPECIES_LNK(ID)),TA, ATM(ID)%NXzV_F,ND)
-	      END DO
-	    END DO
-C
-	    MAIN_COUNTER=MAIN_COUNTER+1
-C
-C We now need to compute the populations for the model atom with Super-levels.
-C We do this in reverse order (i.e. highest ionization stage first) in order
-C that we the ion density for the lower ionization stage is available for
-C the next call.
-C
-C For 1st call to FULL_TO_SUP, Last line contains FeX etc as FeXI not installed.
-C
-	    DO ID=NUM_IONS-1,1,-1
-	      CALL FULL_TO_SUP(
-	1      ATM(ID)%XzV,   ATM(ID)%NXzV,       ATM(ID)%DXzV,      ATM(ID)%XzV_PRES,
-	1      ATM(ID)%XzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%NXzV_F,    ATM(ID)%DXzV_F,
-	1      ATM(ID+1)%XzV, ATM(ID+1)%NXzV,     ATM(ID+1)%XzV_PRES, ND)
-	    END DO
-C
-C Store all quantities in POPS array. This is done here (rather than
-C after final iteration) as it enable POPION to be readily computed.
-C
-	    DO ID=1,NUM_IONS-1
-	      CALL IONTOPOP(POPS, ATM(ID)%XzV, ATM(ID)%DXzV, ED,T,
-	1         ATM(ID)%EQXzV, ATM(ID)%NXzV, NT,ND,
-	1         ATM(ID)%XzV_PRES)
-	    END DO
-C
-C Compute the ion population at each depth.
-C These are required when evaluation the occupation probabilities.
-C
-	    DO J=1,ND
-	      POPION(J)=0.0D0
-	      DO I=1,NT        
-	        IF(Z_POP(I) .GT. 0)POPION(J)=POPION(J)+POPS(I,J)
-	      END DO
-	    END DO
-C
-C Revise vector constants for evaluating the level dissolution. These
-C constants are the same for all species. These are stored in a common block,
-C and are required by SUP_TO_FULL and LTE_POP_WLD.
-C
-	    CALL COMP_LEV_DIS_BLK(ED,POPION,T,DO_LEV_DISSOLUTION,ND)
-C
-C Revise ALL LTE populations.
-C
-	    INCLUDE 'EVAL_LTE_INC_V4.INC'
-C
-	  END DO		!ITERATE_INIT_T
-	  IF(ALLOCATED(U_PAR_FN))THEN
-	    DEALLOCATE (U_PAR_FN,STAT=IOS)
-	    DEALLOCATE (PHI_PAR_FN,STAT=IOS)
-	    DEALLOCATE (Z_PAR_FN,STAT=IOS)
-	  END IF 
-	  CALL TUNE(2,'T_ITERATE')
-	END IF			!NEWMOD
+	  CALL SET_NEW_MODEL_ESTIMATES(POPS,Z_POP,NU,NU_EVAL_CONT,FQW,
+	1            LUER,LUIN,NC,ND,NP,NT,NCF,N_LINE_FREQ,MAX_SIM)
+	END IF
 C
 C VEXT and SIGMAEXT have already been computed. We need TEXT for
 C convolving J with the electron scattering redistribution function.
@@ -2057,7 +990,8 @@ C
 C This include block also compute the LTE populations of the FULL model atom,
 C and the SUPER level model atom.
 C
-	    INCLUDE 'SUP_TO_FULL_V4.INC'
+	    CALL SUP_TO_FULL_V4(POPS,Z_POP,DO_LEV_DISSOLUTION,ND,NT)
+!	    INCLUDE 'SUP_TO_FULL_V4.INC'
 	  END IF
 C
 C Write pointer file and output data necessary to begin a new
@@ -2088,9 +1022,13 @@ C
 !
         CALL SET_BA_STORAGE(NT,NUM_BNDS,ND,NION)
 !
-! Read in BA and STEQ arrays
+! Read in BA and STEQ arrays. We only attempt this if we have an existing
+! model.
 !
-        CALL READ_BA_DATA_V2(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,CHK,'BAMAT')
+	CHK=.FALSE.
+	IF(.NOT. NEWMOD)THEN
+          CALL READ_BA_DATA_V2(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,CHK,'BAMAT')
+	END IF
 	IF(.NOT. CHK .OR. LAMBDA_ITERATION)THEN
 	  NLBEGIN=0
           COMPUTE_BA=.TRUE.
@@ -2183,8 +1121,9 @@ C
 	          COMPUTE_EDDFAC=.TRUE.
 	        END IF
 	      ELSE
-	        WRITE(LUER,*)'Error opening EDDFACTOR'//
-	1                    ' - will compute new F'
+	        IF(.NOT. NEWMOD)THEN
+	          WRITE(LUER,*)'Error opening EDDFACTOR - will compute new F'
+	        END IF
 	        COMPUTE_EDDFAC=.TRUE.
 	      END IF
 	    END IF
@@ -2231,7 +1170,9 @@ C
 	  OPEN(UNIT=LU_JEW,FILE='JEW',FORM='UNFORMATTED',
 	1      ACCESS='DIRECT',STATUS='OLD',RECL=I,IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
-	    WRITE(LUER,*)'Error opening JEW - will compute new JEW'
+	    IF(.NOT. NEWMOD)THEN
+	      WRITE(LUER,*)'Error opening JEW - will compute new JEW'
+	    END IF
 	    COMPUTE_JEW=.TRUE.
 	  END IF
 	END IF
@@ -2256,7 +1197,7 @@ C
 C This routine not only evaluates the LTE populations of both model atoms, but
 C it also evaluates the dln(LTE Super level Pop)/dT.
 C
-	INCLUDE 'EVAL_LTE_INC_V4.INC'
+	CALL EVAL_LTE_V4(DO_LEV_DISSOLUTION,ND)
 C
 C 
 C
@@ -2354,8 +1295,6 @@ C
 C
 C Compute contribution to CHI and VCHI by lines.
 C
-C
-C
 C Section to include lines automatically with the continuum.
 C Only computes line opacity at final depth point. This is used in the
 C computation of dTdR.
@@ -2363,181 +1302,8 @@ C
 C NB: Care must taken to ensure that this section remains consistent
 C      with that in continuum calculation section.
 C
-C LINES_THIS_FREQ --- Logical vector [NCF] indicating whether this frequency
-C                        is part of the resonance zone (i.e. Doppler profile) of 
-C                        one (or more) lines.
-C
-C LINE_ST_INDX_IN_NU --- Integer vector [N_LINES] which specifies the starting
-C                          frequency index for this lines resonance zone.
-C
-C LINE_END_INDX_IN_NU --- Integer vector [N_LINES] which specifies the final
-C                          frequency index for this lines resonance zone.
-C
-C FIRST_LINE   ---- Integer specifying the index of the highest frequency
-C                         line which we are taking into account in the
-C                         transfer.
-C
-C LAST_LINE  ---- Integer specifying the index of the lowest frequency
-C                         line which we are taking into account in the
-C                         transfer.
-C                                        
-C LINE_LOC   ---- Integer array. Used to locate location of a particular line
-C                         in the SIM vectors/arrays.
-C
-C SIM_LINE_POINTER --- Integer array --- locates the line corresponding to
-C                         the indicated storage location in the SIM vectors/
-C                         arrays.
-C
-C Check whether we have to treat another line. We use a DO WHILE, rather
-C than an IF statement, to handle lines which begin at the same (upper)
-C frequency.
-C
-C
-	  DO WHILE( LAST_LINE .LT. N_LINE_FREQ .AND.
-	1                ML .EQ. LINE_ST_INDX_IN_NU(LAST_LINE+1) )
-C
-C Have another line --- need to find its storage location.
-C
-	    I=1
-	    DO WHILE(LINE_STORAGE_USED(I))
-	      I=I+1
-	      IF(I .GT. MAX_SIM)THEN
-	        FIRST_LINE=N_LINE_FREQ
-	        DO SIM_INDX=1,MAX_SIM	  	!Not 0 as used!
-	          FIRST_LINE=MIN(FIRST_LINE,SIM_LINE_POINTER(SIM_INDX)) 
-	        END DO
-	        IF( ML .GT. LINE_END_INDX_IN_NU(FIRST_LINE))THEN
-C
-C Free up storage location for line.
-C
-	          I=LINE_LOC(FIRST_LINE)
-	          LINE_STORAGE_USED(I)=.FALSE.
-	          SIM_LINE_POINTER(I)=0
-	        ELSE
-	          WRITE(LUER,*)'Too many lines have overlapping '//
-	1                      'resonance zones'
-	          WRITE(LUER,*)'Current frequency is:',FL
-	          STOP
-	        END IF
-	      END IF
-	    END DO
-	    SIM_INDX=I
-	    LAST_LINE=LAST_LINE+1
-	    LINE_STORAGE_USED(SIM_INDX)=.TRUE.
-	    LINE_LOC(LAST_LINE)=SIM_INDX
-	    SIM_LINE_POINTER(SIM_INDX)=LAST_LINE
-C
-C Have located a storage location. Now must compute all relevant quantities
-C necessary to include this line in the transfer calculations.
-C
-	    SIM_NL(SIM_INDX)=VEC_NL(LAST_LINE)
-	    SIM_NUP(SIM_INDX)=VEC_NUP(LAST_LINE)
-	    NL=SIM_NL(SIM_INDX)
-	    NUP=SIM_NUP(SIM_INDX)
-C
-	    EINA(SIM_INDX)=VEC_EINA(LAST_LINE)
-	    OSCIL(SIM_INDX)=VEC_OSCIL(LAST_LINE)
-	    FL_SIM(SIM_INDX)=VEC_FREQ(LAST_LINE)
-C
-C This is a temporary measure. We currently set AMASS to AMASS_DOP for all
-C species.
-C
-	    AMASS_SIM(SIM_INDX)=AMASS_ALL(NL)
-	    AMASS_SIM(SIM_INDX)=AMASS_DOP
-C
-C 
-C
-C Compute U_STAR_RATIO and L_STAR_RATIO which are used to switch from
-C the opacity/emissivity computed with a FULL_ATOM to an equivalent form
-C but written in of the SUPER-LEVELS. 
-C
-C L refers to the lower level of the transition.
-C U refers to the upper level of the transition.
-C
-C At present we must treat each species separately (for those with both FULL
-C and SUPER_LEVEL model atoms).
-C
-C MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
-C MNL (MNUP) denotes the lower (upper) level in the super level model atom.
-C
-	    MNL_F=VEC_MNL_F(LAST_LINE)
-	    MNUP_F=VEC_MNUP_F(LAST_LINE)
-	    L_STAR_RATIO(ND,SIM_INDX)=1.0D0
-	    U_STAR_RATIO(ND,SIM_INDX)=1.0D0
-C
-	    DO ID=1,NUM_IONS-1
-	      IF(VEC_SPEC(LAST_LINE) .EQ. ION_ID(ID))THEN
-	        MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
-	        MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
-	        L_STAR_RATIO(ND,SIM_INDX)=ATM(ID)%W_XzV_F(MNUP_F,ND)*
-	1         ATM(ID)%XzVLTE_F(MNL_F,ND)/ATM(ID)%XzVLTE(MNL,ND)/
-	1         ATM(ID)%W_XzV_F(MNL_F,ND)
-	        U_STAR_RATIO(ND,SIM_INDX)=ATM(ID)%XzVLTE_F(MNUP_F,ND)/
-	1         ATM(ID)%XzVLTE(MNUP,ND)
-	        GLDGU(SIM_INDX)=ATM(ID)%GXzV_F(MNL_F)/ATM(ID)%GXzV_F(MNUP_F)
-	        EXIT
-	      END IF
-	    END DO
-C
-C 
-C
-C Compute line opacity.
-C
-	    T1=OSCIL(SIM_INDX)*OPLIN
-	    NL=SIM_NL(SIM_INDX)
-	    NUP=SIM_NUP(SIM_INDX)
-	    CHIL_MAT(ND,SIM_INDX)=T1*( 
-	1       L_STAR_RATIO(ND,SIM_INDX)*POPS(NL,ND)-
-	1      GLDGU(SIM_INDX)*U_STAR_RATIO(ND,SIM_INDX)*POPS(NUP,ND) )
-C
-	    LINE_OPAC_CON(SIM_INDX)=T1
-C
-C
-C Ensure that LAST_LINE points to the next LINE that is going to be handled 
-C in the BLANKETING portion of the code.
-C
-	    DO WHILE(LAST_LINE .LT. N_LINE_FREQ.AND.
-	1            VEC_TRANS_TYPE(LAST_LINE+1)(1:4) .NE. 'BLAN')
-	       LAST_LINE=LAST_LINE+1
-	    END DO
-C	   
-	  END DO	!Checking whether a new line is being added.
-C
-C 
-C
-C Check whether current frequency is a resonance frequency for each line.
-C
-	  DO SIM_INDX=1,MAX_SIM
-	    RESONANCE_ZONE(SIM_INDX)=.FALSE.
-	    END_RES_ZONE(SIM_INDX)=.FALSE.
-	    IF(LINE_STORAGE_USED(SIM_INDX))THEN
-	      L=SIM_LINE_POINTER(SIM_INDX)
-	      IF( FREQ_INDX .GE. LINE_ST_INDX_IN_NU(L) .AND.
-	1          FREQ_INDX .LT. LINE_END_INDX_IN_NU(L))THEN
-	        RESONANCE_ZONE(SIM_INDX)=.TRUE.
-	      ELSE IF(FREQ_INDX .EQ. LINE_END_INDX_IN_NU(L))THEN
- 	        RESONANCE_ZONE(SIM_INDX)=.TRUE.
-	        END_RES_ZONE(SIM_INDX)=.TRUE.
-	      END IF
-	    END IF
-	  END DO
-C
-C Compute Doppler profile. At present this is assumed, for simplicity, to be
-C depth independent.
-C
-	  CALL TUNE(1,'DTDR_LIN')
-	  T1=1.0D-15/1.77245385095516D0	  	!1.0D-15/SQRT(PI)
-	  DO SIM_INDX=1,MAX_SIM
-	    IF(RESONANCE_ZONE(SIM_INDX))THEN
-	      NU_DOP=FL_SIM(SIM_INDX)*12.85*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
-	1                        (VTURB/12.85)**2 )/2.998D+05
-	      LINE_PROF_SIM(SIM_INDX)=EXP( -( (FL-FL_SIM(SIM_INDX))/
-	1              NU_DOP )**2 )*T1/NU_DOP
-	    ELSE
-	      LINE_PROF_SIM(SIM_INDX)=0.0D0
-	    END IF
-	  END DO
-	  CALL TUNE(2,'DTDR_LIN')
+	    CALL SET_LINE_OPAC(POPS,NU,FREQ_INDX,LAST_LINE,N_LINE_FREQ,
+	1          LST_DEPTH_ONLY,LUER,ND,NT,NCF,MAX_SIM)
 C
 C Add in line opacity.
 C
@@ -2810,7 +1576,10 @@ C
 C
 C Solve for the continuous radiation field.
 C
-	    INCLUDE 'COMP_JCONT_V4.INC'
+C	    INCLUDE 'COMP_JCONT_V4.INC'
+            CALL COMP_J_BLANK(SECTION,EDDINGTON,FL,FREQ_INDX,FIRST_FREQ,LST_ITERATION,
+	1                              MAXCH,LUER,LU_ES,LU_JCOMP,LU_EDD,ACCESS_F,
+	1                              ND,NC,NP,NCF,NDEXT,NCEXT,NPEXT)
 	  END IF
 C
 C SOURCE is used by SOBJBAR and in VARCONT. Note that SOURCE is corrupted 
@@ -2908,7 +1677,11 @@ C
 	      BETAC(I)=CHIL(I)/ETAL(I)
 	    END DO
 C
-	    INCLUDE 'VARCONT.INC'
+C	    INCLUDE 'VARCONT.INC'
+            CALL DO_VAR_CONT(POPS,SECTION,EDDINGTON,
+	1                  FL,CONT_FREQ,FREQ_INDX,FIRST_FREQ,TX_OFFSET,
+	1                  ND,NC,NP,NUM_BNDS,DIAG_INDX,NT,NM,
+	1                  NDEXT,NCEXT,NPEXT,MAX_SIM,NM_KI)
 C
 C Increment the large simultaneous perturbation matrix due to a variation
 C in the continuum. This is only incremented if ZNET is not within 1% of
@@ -3112,388 +1885,12 @@ C
 C
 C 
 C
-C Section to include lines automatically with the continuum.
+C Include lines 
 C
+        CALL SET_LINE_OPAC(POPS,NU,ML,LAST_LINE,N_LINE_FREQ,
+	1         LST_DEPTH_ONLY,LUER,ND,NT,NCF,MAX_SIM)
 C
-C  LINES_THIS_FREQ --- Logical vector [NCF] indicating whether this frequency
-C                        is part of the resonance zone (i.e. Doppler profile) of 
-C                        one (or more) lines.
-C
-C LINE_ST_INDX_IN_NU --- Integer vector [N_LINES] which specifies the starting
-C                          frequency index for this lines resonance zone.
-C
-C LINE_END_INDX_IN_NU --- Integer vector [N_LINES] which specifies the final
-C                          frequency index for this lines resonance zone.
-C
-C FIRST_LINE   ---- Integer specifying the index of the highest frequency
-C                         line which we are taking into account in the
-C                         transfer.
-C
-C LAST_LINE  ---- Integer specifying the index of the lowest frequency
-C                         line which we are taking into account in the
-C                         transfer.
-C                                        
-C LINE_LOC   ---- Integer array. Used to locate location of a particular line
-C                         in the SIM vectors/arrays.
-C
-C SIM_LINE_POINTER --- Integer array --- locates the line corresponding to
-C                         the indicated storage location in the SIM vectors/
-C                         arrays.
-C
-C Check whether we have to treat another line. We use a DO WHILE, rather
-C than an IF statement, to handle lines which begin at the same (upper)
-C frequency.
-C
-	DO WHILE( LAST_LINE .LT. N_LINE_FREQ .AND.
-	1                ML .EQ. LINE_ST_INDX_IN_NU(LAST_LINE+1) )
-C
-C Have another line --- need to find its storage location.
-C
-	  I=1
-	  DO WHILE(LINE_STORAGE_USED(I))
-	    I=I+1
-	    IF(I .GT. MAX_SIM)THEN
-	      FIRST_LINE=N_LINE_FREQ
-	      DO SIM_INDX=1,MAX_SIM		!Not 0 as used!
-	        FIRST_LINE=MIN(FIRST_LINE,SIM_LINE_POINTER(SIM_INDX)) 
-	      END DO
-	      IF( ML .GT. LINE_END_INDX_IN_NU(FIRST_LINE))THEN
-C
-C Free up storage location for line.
-C
-	        I=LINE_LOC(FIRST_LINE)
-	        LINE_STORAGE_USED(I)=.FALSE.
-	        SIM_LINE_POINTER(I)=0
-C
-C Free up storage location for variation with respect to lower and upper
-C levels.
-C
-	        NL=LOW_POINTER(I)
-	        IF(.NOT. WEAK_LINE(I))THEN
-	          VAR_IN_USE_CNT(NL)=VAR_IN_USE_CNT(NL)-1
-	          IF(VAR_IN_USE_CNT(NL) .EQ. 0)VAR_LEV_ID(NL)=0
-	        END IF
-	        LOW_POINTER(I)=0
-C
-	        NUP=UP_POINTER(I)
-	        IF(.NOT. WEAK_LINE(I))THEN
-	          VAR_IN_USE_CNT(NUP)=VAR_IN_USE_CNT(NUP)-1
-	          IF(VAR_IN_USE_CNT(NUP) .EQ. 0)VAR_LEV_ID(NUP)=0
-	        END IF
-	        UP_POINTER(I)=0
-	      ELSE
-	        WRITE(LUER,*)'Too many lines have overlapping '//
-	1                      'resonance zones'
-	        WRITE(LUER,*)'Current frequency is:',FL
-	        STOP
-	      END IF
-	    END IF
-	  END DO
-	  SIM_INDX=I
-	  LAST_LINE=LAST_LINE+1
-	  LINE_STORAGE_USED(SIM_INDX)=.TRUE.
-	  LINE_LOC(LAST_LINE)=SIM_INDX
-	  SIM_LINE_POINTER(SIM_INDX)=LAST_LINE
-C
-C Have located a storage location. Now must compute all relevant quantities
-C necessary to include this line in the transfer calculations.
-C
-	  SIM_NL(SIM_INDX)=VEC_NL(LAST_LINE)
-	  SIM_NUP(SIM_INDX)=VEC_NUP(LAST_LINE)
-	  NL=SIM_NL(SIM_INDX)
-	  NUP=SIM_NUP(SIM_INDX)
-C
-	  EINA(SIM_INDX)=VEC_EINA(LAST_LINE)
-	  OSCIL(SIM_INDX)=VEC_OSCIL(LAST_LINE)
-	  FL_SIM(SIM_INDX)=VEC_FREQ(LAST_LINE)
-C
-	  TRANS_NAME_SIM(SIM_INDX)=TRIM(VEC_SPEC(LAST_LINE))
-C
-C This is a temporary measure. We currently set AMASS to AMASS_DOP for all
-C species.
-C
-	  AMASS_SIM(SIM_INDX)=AMASS_ALL(NL)
-	  AMASS_SIM(SIM_INDX)=AMASS_DOP
-C
-C 
-C
-C Compute U_STAR_RATIO and L_STAR_RATIO which are used to switch from
-C the opacity/emissivity computed with a FULL_ATOM to an equivalent form
-C but written in terms of the SUPER-LEVELS. 
-C
-C L refers to the lower level of the transition.
-C U refers to the upper level of the transition.
-C
-C At present we must treat each species separately (for those with both FULL
-C and SUPER_LEVEL model atoms).
-C
-C MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
-C MNL (MNUP) denotes the lower (upper) level in the super level model atom.
-C
-	MNL_F=VEC_MNL_F(LAST_LINE)
-	MNUP_F=VEC_MNUP_F(LAST_LINE)
-	DO K=1,ND
-	  L_STAR_RATIO(K,SIM_INDX)=1.0D0
-	  U_STAR_RATIO(K,SIM_INDX)=1.0D0
-	END DO
-C
-C T1 is used to represent b(level)/b(super level). If no interpolation of
-C the b values in a super level has been performed, this ratio will be unity .
-C This ratio is NOT treated in the linearization.
-C
-	  DO ID=1,NUM_IONS-1
-	    IF(VEC_SPEC(LAST_LINE) .EQ.ION_ID(ID))THEN
-	      MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
-	      MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
-	      DO K=1,ND
-	        T1=(ATM(ID)%XzV_F(MNL_F,K)/ATM(ID)%XzVLTE_F(MNL_F,K)) /
-	1             (ATM(ID)%XzV(MNL,K)/ATM(ID)%XzVLTE(MNL,K))
-	        L_STAR_RATIO(K,SIM_INDX)=T1*ATM(ID)%W_XzV_F(MNUP_F,K)*
-	1          ATM(ID)%XzVLTE_F(MNL_F,K)/ATM(ID)%XzVLTE(MNL,K)/
-	1          ATM(ID)%W_XzV_F(MNL_F,K)
-	        T2=(ATM(ID)%XzV_F(MNUP_F,K)/ATM(ID)%XzVLTE_F(MNUP_F,K)) /
-	1             (ATM(ID)%XzV(MNUP,K)/ATM(ID)%XzVLTE(MNUP,K))
-	        U_STAR_RATIO(K,SIM_INDX)=T2*ATM(ID)%XzVLTE_F(MNUP_F,K)/
-	1              ATM(ID)%XzVLTE(MNUP,K)
-	      END DO
-	      GLDGU(SIM_INDX)=ATM(ID)%GXzV_F(MNL_F)/ATM(ID)%GXzV_F(MNUP_F)
-	      TRANS_NAME_SIM(SIM_INDX)=TRIM(TRANS_NAME_SIM(SIM_INDX))//
-	1     '('//TRIM(ATM(ID)%XzVLEVNAME_F(MNUP_F))//'-'//
-	1         TRIM(ATM(ID)%XzVLEVNAME_F(MNL_F))//')'
-	      EXIT
-	    END IF
-	  END DO
-C 
-C
-C Compute line opacity and emissivity for this line.
-C
-	  T1=OSCIL(SIM_INDX)*OPLIN
-	  T2=FL_SIM(SIM_INDX)*EINA(SIM_INDX)*EMLIN
-	  NL=SIM_NL(SIM_INDX)
-	  NUP=SIM_NUP(SIM_INDX)
-	  DO I=1,ND
-	    CHIL_MAT(I,SIM_INDX)=T1*(L_STAR_RATIO(I,SIM_INDX)*POPS(NL,I)-
-	1            GLDGU(SIM_INDX)*U_STAR_RATIO(I,SIM_INDX)*POPS(NUP,I))
-	    ETAL_MAT(I,SIM_INDX)=T2*POPS(NUP,I)*U_STAR_RATIO(I,SIM_INDX)
-	    IF(CHIL_MAT(I,SIM_INDX) .EQ. 0)THEN
-	      CHIL_MAT(I,SIM_INDX)=0.01*T1*POPS(NL,I)*L_STAR_RATIO(I,SIM_INDX)
-	      WRITE(LUER,*)'Zero line opacity in CMFGEN_SUB'
-	      WRITE(LUER,*)'This needs to be fixed'
-	      J=ICHRLEN(TRANS_NAME_SIM(SIM_INDX))
-	      WRITE(LUER,'(1X,A)')TRANS_NAME_SIM(SIM_INDX)(1:J)
-	    END IF
-	  END DO
-C
-	  LINE_OPAC_CON(SIM_INDX)=T1
-	  LINE_EMIS_CON(SIM_INDX)=T2
-C
-C Zero arrays which is used to store the net rate (ZNET_SIM) and mean intensity
-C for each line (JBAR_SIM).
-C
-	  DO I=1,ND
-	    ZNET_SIM(I,SIM_INDX)=0.0D0
-	    JBAR_SIM(I,SIM_INDX)=0.0D0
-	  END DO
-!
-! Decide if line is weak, and hence whether we can iterate on the net rates
-! rather than use a full linearization.
-!
-	  IF(WEAK_WITH_NET)THEN
-!
-! Compute optical depth at line center.
-!
-	    T1=1.0D-15/1.77245385095516D0		!1.0D-15/SQRT(PI)
-	    NU_DOP=FL_SIM(SIM_INDX)*12.85*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
-	1                        (VTURB/12.85)**2 )/2.998D+05
-	    T2=T1/NU_DOP
-	    WEAK_LINE(SIM_INDX)=.TRUE.
-	    DO I=1,ND
-	     IF( ABS(CHIL_MAT(I,SIM_INDX))*T2/ESEC(I) .GT. WEAK_LINE_LIMIT)
-	1                            WEAK_LINE(SIM_INDX)=.FALSE.
-	    END DO
-	    IF(WEAK_LINE(SIM_INDX))NUM_OF_WEAK_LINES=NUM_OF_WEAK_LINES+1
-	  ELSE
-	    WEAK_LINE(SIM_INDX)=.FALSE.
-	  END IF
-C 
-C
-C Now need to determine the storage location for the 2 variation parameters.
-C NB: Because of our coding, SIM_NL(SIM_INDX) must be set before we can 
-C     do this.
-C
-C NB: TX_OFFSET refers to the number or arrays used (=5 if chi,eta, chi_old,
-C eta_old, and esec) when computing the variation of J.
-C
-! We could provide two separate storage locations for each line. However,
-! because of the use of super-levels, many transitions involve the same levels.
-! We can therefore use the same storage area. To maintain consistency in the
-! linearization we slpit transitions into two groups --- those where both
-! levels are regarded as important, and those where at least one level is
-! unimportant. Levels in thest two seaprate classes are kept distinct.
-! The variable THIS_TRANS_IMP and the vector IMP_TRANS_VEC are used to
-! distinguish betwene the two classes.
-!
-	  CALL TUNE(IONE,'VLSETUP')
-	  IF(COMPUTE_BA .AND. .NOT. LAMBDA_ITERATION .AND.
-	1                     .NOT. WEAK_LINE(SIM_INDX))THEN
-	    THIS_TRANS_IMP=IMP_VAR(SIM_NL(SIM_INDX)) .AND. IMP_VAR(SIM_NUP(SIM_INDX))
-	    I=TX_OFFSET+1
-	    DO WHILE( VAR_LEV_ID(I) .NE. SIM_NL(SIM_INDX)  .OR.
-	1                                IMP_TRANS_VEC(I) .NE. THIS_TRANS_IMP )
-	      I=I+1
-	      IF(I .GT. NM)THEN
-C
-C This variable currently does not have a storage location. Therefore
-C find first available location.
-C
-	        I=TX_OFFSET+1
-	        DO WHILE( VAR_LEV_ID(I) .NE. 0 )
-	          I=I+1
-	          IF(I .GT. NM)THEN
-	            WRITE(LUER,*)'Error in CMFGEN_SUB --- '//
-	1                       'not enough storage locations'
-	            WRITE(LUER,*)'LAST_LINE=',LAST_LINE
-	            STOP
-	          END IF
-	        END DO
-	        VAR_LEV_ID(I)=SIM_NL(SIM_INDX)
-	        IMP_TRANS_VEC(I)=THIS_TRANS_IMP
-	      END IF
-	    END DO
-	    LOW_POINTER(SIM_INDX)=I
-	    VAR_IN_USE_CNT(I)=VAR_IN_USE_CNT(I)+1
-C
-C Now do the upper level.
-C
-	    I=TX_OFFSET+1
-	    DO WHILE( VAR_LEV_ID(I) .NE. SIM_NUP(SIM_INDX) .OR.
-	1                                IMP_TRANS_VEC(I) .NE. THIS_TRANS_IMP)
-	      I=I+1
-	      IF(I .GT. NM)THEN
-C
-C This variable currently does not have a storage location. Therefore
-C find first available location.
-C
-	        I=TX_OFFSET+1
-	        DO WHILE( VAR_LEV_ID(I) .NE. 0 )
-	          I=I+1
-	          IF(I .GT. NM)THEN
-	            WRITE(LUER,*)'Error in CMFGEN_SUB --- '//
-	1                       'not enough storage locations'
-	            WRITE(LUER,*)'LAST_LINE=',LAST_LINE
-	            STOP
-	          END IF
-	        END DO
-	        VAR_LEV_ID(I)=SIM_NUP(SIM_INDX)
-	        IMP_TRANS_VEC(I)=THIS_TRANS_IMP
-	      END IF
-	    END DO
-	    UP_POINTER(SIM_INDX)=I
-	    VAR_IN_USE_CNT(I)=VAR_IN_USE_CNT(I)+1
-
-C 
-C
-C Zero the appropriate dNL and dNUP matrices in TX and TVX IFF they are
-C not already in use by another line.
-C
-	    J=LOW_POINTER(SIM_INDX)
-	    IF(VAR_IN_USE_CNT(J) .EQ. 1)THEN	  !Just this line using store.
-	      TX(:,:,J)=0.0D0
-	      TVX(:,:,J)=0.0D0
-	      IF(ACCURATE)TX_EXT(:,:,J)=0.0D0
-	      IF(ACCURATE)TVX_EXT(:,:,J)=0.0D0
-	    END IF
-	    J=UP_POINTER(SIM_INDX)
-	    IF(VAR_IN_USE_CNT(J) .EQ. 1)THEN	  !Just this line using store.
-	      TX(:,:,J)=0.0D0
-	      TVX(:,:,J)=0.0D0
-	      IF(ACCURATE)TX_EXT(:,:,J)=0.0D0
-	      IF(ACCURATE)TVX_EXT(:,:,J)=0.0D0
-	    END IF
-C
-C Zero the appropriate dCHIL and dETAL matrices in dZ, since we will no
-C longer be including the variation of the deleted line.
-C
-	    J=LOW_POINTER(SIM_INDX)
-	    IF(VAR_IN_USE_CNT(J) .EQ. 1)THEN	  !Just this line using store.
-	      dZ(J,:,:,:)=0.0D0		!NM,NUM_BANDS,ND,MAX_SIM
-	    END IF
-	    J=UP_POINTER(SIM_INDX)
-	    IF(VAR_IN_USE_CNT(J) .EQ. 1)THEN	  !Just this line using store.
-	      dZ(J,:,:,:)=0.0D0		!NM,NUM_BANDS,ND,MAX_SIM
-	    END IF
-C
-C Ensure dZ for this line is zeroed.
-C
-	    dZ(:,:,:,SIM_INDX)=0.0D0	!NM,NUM_BANDS,ND,MAX_SIM	
-	    CALL TUNE(ITWO,'VLSETUP')
-C
-	  END IF			!Weak line
-C
-C Ensure that LAST_LINE points to the next LINE that is going to be handled 
-C in the BLANKETING portion of the code.
-C
-	  DO WHILE(LAST_LINE .LT. N_LINE_FREQ.AND.
-	1            VEC_TRANS_TYPE(LAST_LINE+1)(1:4) .NE. 'BLAN')
-	       LAST_LINE=LAST_LINE+1
-	  END DO
-C	   
-	END DO	!Checking whether a  new line is being added.
-C
-C 
-C
-C Check whether current frequency is a resonance frequency for each line.
-C
-	DO SIM_INDX=1,MAX_SIM
-	  RESONANCE_ZONE(SIM_INDX)=.FALSE.
-	  END_RES_ZONE(SIM_INDX)=.FALSE.
-	  IF(LINE_STORAGE_USED(SIM_INDX))THEN
-	    L=SIM_LINE_POINTER(SIM_INDX)
-	    IF( FREQ_INDX .GE. LINE_ST_INDX_IN_NU(L) .AND.
-	1          FREQ_INDX .LT. LINE_END_INDX_IN_NU(L))THEN
-	      RESONANCE_ZONE(SIM_INDX)=.TRUE.
-	    ELSE IF(FREQ_INDX .EQ. LINE_END_INDX_IN_NU(L))THEN
- 	      RESONANCE_ZONE(SIM_INDX)=.TRUE.
-	      END_RES_ZONE(SIM_INDX)=.TRUE.
-	    END IF
-	  END IF
-	END DO
-C
-C Compute Doppler profile. At present this is assumed, for simplicity, to be
-C depth independent.
-C
-	T1=1.0D-15/1.77245385095516D0		!1.0D-15/SQRT(PI)
-	DO SIM_INDX=1,MAX_SIM
-	  IF(RESONANCE_ZONE(SIM_INDX))THEN
-	    NU_DOP=FL_SIM(SIM_INDX)*12.85*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
-	1                        (VTURB/12.85)**2 )/2.998D+05
-	    LINE_PROF_SIM(SIM_INDX)=EXP( -( (FL-FL_SIM(SIM_INDX))/
-	1              NU_DOP )**2 )*T1/NU_DOP
-	  ELSE
-	    LINE_PROF_SIM(SIM_INDX)=0.0D0
-	  END IF
-	END DO                                    
-C
-C Compute the LINE quadrature weights. Defined so that JBAR= SUM[LINE_QW*J]
-C
-	IF(FREQ_INDX .EQ. 1)THEN
-	  DO SIM_INDX=1,MAX_SIM
-	    LINE_QW_SIM(SIM_INDX)=LINE_PROF_SIM(SIM_INDX)*
-	1         (NU(1)-NU(2))*0.5D+15
-	  END DO
-	ELSE IF(FREQ_INDX .EQ. NCF)THEN
-	  DO SIM_INDX=1,MAX_SIM
-	    LINE_QW_SIM(SIM_INDX)=LINE_PROF_SIM(SIM_INDX)*
-	1         (NU(NCF-1)-NU(NCF))*0.5D+15
-	  END DO
-	ELSE
-	  DO SIM_INDX=1,MAX_SIM
-	    LINE_QW_SIM(SIM_INDX)=LINE_PROF_SIM(SIM_INDX)*
-	1         (NU(FREQ_INDX-1)-NU(FREQ_INDX+1))*0.5D+15
-	  END DO
-	END IF
-C
-C 
+	CALL INIT_LINE_OPAC_VAR(LAST_LINE,LUER,ND,TX_OFFSET,MAX_SIM,NM)
 C
 C Determine which method will be used to compute continuum intensity.
 C
@@ -3624,7 +2021,10 @@ C
 C Compute continuum intensity.
 C
 	    CALL TUNE(IONE,'COMP_J')
-	    INCLUDE 'COMP_JCONT_V4.INC'	
+C	    INCLUDE 'COMP_JCONT_V4.INC'	
+            CALL COMP_J_BLANK(SECTION,EDDINGTON,FL,FREQ_INDX,FIRST_FREQ,LST_ITERATION,
+	1                              MAXCH,LUER,LU_ES,LU_JCOMP,LU_EDD,ACCESS_F,
+	1                              ND,NC,NP,NCF,NDEXT,NCEXT,NPEXT)
 	    CALL TUNE(ITWO,'COMP_J')
 	  END IF
 C 
@@ -3797,7 +2197,11 @@ C Solve for the perturbations to J in terms of the perturbations
 C to CHI and ETA. 
 C            
 	    CALL TUNE(IONE,'C_VARCONT')
-	      INCLUDE 'VARCONT.INC'
+C	      INCLUDE 'VARCONT.INC'
+              CALL DO_VAR_CONT(POPS,SECTION,EDDINGTON,
+	1                    FL,CONT_FREQ,FREQ_INDX,FIRST_FREQ,TX_OFFSET,
+	1                    ND,NC,NP,NUM_BNDS,DIAG_INDX,NT,NM,
+	1                    NDEXT,NCEXT,NPEXT,MAX_SIM,NM_KI)
 	    CALL TUNE(ITWO,'C_VARCONT')
 C
 C NB: VJ, VCHI, and VETA must not be modified until we have updated the
@@ -4581,51 +2985,12 @@ C
 	CLOSE(UNIT=LU_OPAC)
 !
 	IF(LST_ITERATION)THEN
+!
+! Compute the grey temperature distribution and the Rosseland optical 
+! depth scale (returned in TA).
+!
 	  CHI(1:ND)=ROSSMEAN(1:ND)*CLUMP_FAC(1:ND)
-	  IF(JGREY_WITH_V_TERMS)THEN
-!
-! This routine will supercede the one above, and included to zeor
-! order the effect of the velocity field.
-!
-	    T2=1.0D-05		!Accuracy to converge f
-	    CALL JGREY_WITH_FVT(RJ,SOB,CHI,R,V,SIGMA,
-	1                  P,AQW,HMIDQW,KQW,NMIDQW,
-	1                  LUM,METHOD,DIF,IC,T2,ND,NC,NP)
-	  ELSE
-!
-! Will use FEDD for F, GAM for NEWRJ, GAMH for NEWRK, and T2 for NEWHBC.
-! Will use HBC_J for HBC. No need to modify JGREY, as outer boundary
-! will always be optically thin.
-!
-	    DO I=1,ND
-	      FEDD(I)=1.0D0/3.0D0
-	    END DO
-	    HBC_J=1.0D0
-	    T1=1000.0
-	    DO WHILE(T1 .GT. 1.0E-05)
-	      CALL JGREY(TA,TB,TC,XM,DTAU,R,Z,P,RJ,
-	1        GAM,GAMH,Q,FEDD,CHI,dCHIdR,
-	1        AQW,KQW,LUM,HBC_J,T2,NC,ND,NP,METHOD)
-	      T1=0.0D0
-	      DO I=1,ND
-	        T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
-	        FEDD(I)=GAMH(I)
-	      END DO
-	      T1=MAX(ABS(HBC_J-T2),T1)
-	      HBC_J=T2
-	    END DO
-	  END IF
-C
-C Compute the temperature distribution, and the Rossland optical depth scale.
-C NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert T from units of 
-C K to units of 10^4 K. The ' ' in TORSCL indicates TYPE of atmosphere,
-C and here is set to ' ' so as TORSCL assumes a 1/r^2 density dependance
-C at boundary.
-C 
-	  CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,' ')
-	  DO I=1,ND
-	    TGREY(I)=((3.14159265D0/5.67D-05*RJ(I))**0.25D0)*1.0D-04
-	  END DO
+	  CALL COMP_GREY(TGREY,TA,CHI,LUER,NC,ND,NP)
 !
 	  OPEN(UNIT=LUIN,FILE='GREY_SCL_FACOUT',STATUS='UNKNOWN')
 	    WRITE(LUIN,'(A)')'!'
@@ -4913,7 +3278,10 @@ C
 C
 C Compute continuum intensity.
 C
-	    INCLUDE 'COMP_JCONT_V4.INC'	
+C	    INCLUDE 'COMP_JCONT_V4.INC'	
+            CALL COMP_J_BLANK(SECTION,EDDINGTON,FL,FREQ_INDX,FIRST_FREQ,LST_ITERATION,
+	1                              MAXCH,LUER,LU_ES,LU_JCOMP,LU_EDD,ACCESS_F,
+	1                              ND,NC,NP,NCF,NDEXT,NCEXT,NPEXT)
 C
 	  END IF
 C
@@ -5021,420 +3389,35 @@ C
 	    VB(I)=0.0D0
 	    VC(I)=0.0D0
 	  END DO
-	  GOTO 49000			!See below
 	ELSE IF(.NOT. SOBOLEV)THEN
-	  IF(NNM .NE. 2 .AND. NNM .NE. 4)THEN
-	    WRITE(LUER,*)'Error NNM .NE. (2 .OR. 4) in CMFGEN'
-	    STOP
-	  END IF
-C
-C Increment emissivity due to electron scattering from the continuum.
-C It is assumed that electron scattering from the line does not
-C contribute significantly to the emissivity. The new ETA(I) is used
-C by CMFJBAR
-C
-C
-	  DO I=1,ND
-	    ETA(I)=ETA(I)+RJ(I)*CHI_SCAT(I)
-	  END DO
-C
-C NB - If COMPUTE_JEW is true, we set JEW to zero. It is then  initialized
-C in the line subroutine (eg FORMSOL) to DNU*RJ.
-C
-	  IF(COMPUTE_EW)THEN
-	    IF(COMPUTE_JEW)THEN
-	      CALL DP_ZERO(JEW,ND)
-	    ELSE
-	      READ(LU_JEW,REC=ACCESS_JEW)(JEW(I),I=1,ND),T1
-	      IF(T1 .NE. FL)THEN
-	        WRITE(LUER,*)'Error - incorrect reading of JEW'
-	        WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
-	        WRITE(LUER,*)'Error occurred in '//SECTION
-	        STOP
-	      END IF
-	    END IF
-	  END IF
-C
-C At present, higher accuracy computation for comoving frame
-C calculation is not implemented. Will assume that can use
-C accurate RJ from continuum source function. Thus eta and
-C continuum source function are from accurate calculation.
-C
-	  IF(EDDINGTON)THEN
-	    CALL TUNE(IONE,'MOMJBAR')
-	    CALL DP_ZERO(JNU,ND*(NLF+1))
-C
-C As ETAL and CHIL are known, the FORMAL solution gives FEDD and GEDD
-C directly. We only need to iterate to obtain a reliable EW value in
-C the presence of electron scattering. Since the EW computation requires
-C JEW to compute f, we need to save this for subsequent iterations.
-C
-	    DO I=1,ND
-	      JNU(I,NLF+1)=JEW(I)
-	    END DO
-C
-	    CALL TUNE(IONE,'FG_COMP')
-	    CALL FG_COMP(ETA,CHI,CHI_SCAT,RJ,
-	1                  CHIL,ETAL,V,SIGMA,R,P,
-	1                  JNU,HNU,F_LINE,G_LINE,
-	1                  AQW,HMIDQW,KQW,NMIDQW,
-	1                  IN_HBC_LINE,HBC_LINE,NBC_LINE,
-	1                  PF,PROF,LFQW,ERF,FL,
-	1                  EW,CONT_INT,COMPUTE_EW,
-	1                  DIF,DBB,IC,METHOD,
-	1                  THK_CONT,THK_LINE,NLF,NC,NP,ND)
-	    CALL TUNE(ITWO,'FG_COMP')
-C
-C We use TA for RADEQ, and TB for the FLUX vectors returned by the
-C EW computation.
-C
-	    CALL MOMJBAR(ETA,CHI,CHI_SCAT,THETA,RJ,CHIL,ETAL,
-	1                  V,SIGMA,R,JBAR,ZNET,
-	1                  JNU,HNU,F_LINE,G_LINE,
-	1                  HBC_LINE,IN_HBC_LINE,NBC_LINE,JBLANK,HBLANK,
-	1                  PF,PROF,LFQW,FL,DIF,DBB,IC,METHOD,
-	1                  EW,CONT_INT,COMPUTE_EW,FULL_ES,
-	1                  NLF,NC,NP,ND)
-C
-C Store J for EW computation in JEW for output to file.
-C
-	    DO I=1,ND
-	      JEW(I)=JNU(I,NLF+1)
-	    END DO
-	    CALL TUNE(ITWO,'MOMJBAR')
-	  ELSE
-	    CALL TUNE(IONE,'FORMSOL')
-	    CALL FORMSOL(ETA,CHI,CHI_SCAT,CHIL,ETAL,V,SIGMA,R,P,
-	1                JBAR,ZNET,
-	1                TA,TB,TC,COMPUTE_LAM,
-	1                RJ,JBLANK,HBLANK,JEW,
-	1                EW,CONT_INT,COMPUTE_EW,FULL_ES,
-	1                AQW,HMIDQW,
-	1                PF,PROF,LFQW,ERF,FL,DIF,DBB,IC,AMASS,
-	1                THK_LINE,THK_CONT,NLF,NC,NP,ND,METHOD)
-	    CALL TUNE(ITWO,'FORMSOL')
-	  END IF
-C
-C Store ZNET in ZNET_SIM for output on last iteration. We note simultaneous
-C lines is not treated in CMF section.
-C
-	  DO K=1,ND
-	    ZNET_SIM(K,1)=ZNET(K)
-	  END DO
-C
-C
-C Output JEW to file for use on subsequent iterations.
-C
-	  IF(COMPUTE_EW)THEN
-	    WRITE(LU_JEW,REC=ACCESS_JEW)(JEW(I),I=1,ND),FL
-	    ACCESS_JEW=ACCESS_JEW+1
-	  END IF
-C
-C Increment the STEQ matrices due to Jmn line terms.
-C
-	  T1=FL*EMLIN
-	  I=SIM_LINE_POINTER(1)
-	  ID=VEC_ID(I)
-	  MNL_F=VEC_MNL_F(I);     MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
-	  MNUP_F=VEC_MNUP_F(I);   MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
-	  DO K=1,ND					!Equation depth
-	    T2=ETAL_MAT(K,1)*ZNET(K)
-	    SE(ID)%STEQ(MNUP,K)=SE(ID)%STEQ(MNUP,K) - T2/T1
-	    SE(ID)%STEQ(MNL,K )=SE(ID)%STEQ(MNL,K) + T2/T1
-	    STEQ_T(K)=STEQ_T(K) - T2
-	  END DO
-C
-	  IF(COMPUTE_BA .AND. .NOT. LAMBDA_ITERATION)THEN
-	    CALL TUNE(IONE,'LINEGEN')
-	      INCLUDE 'LINEGEN.INC'
-	    CALL TUNE(ITWO,'LINEGEN')
-	  ELSE IF(COMPUTE_BA)THEN
-C
-C If we are doing a lambda iteration, we are assuming that JBAR is fixed.
-C Thus, dZ/dCHIL and dZ/dETAL is given by the following.
-C
-	    DO I=1,ND
-	      VB(I)=-JBAR(I)/ETAL(I)
-	      IF(NEG_OPACITY(I))VB(I)=0.0D0
-	      VC(I)=JBAR(I)*CHIL(I)/ETAL(I)/ETAL(I)
-	    END DO
-C
-C
-C NB: We now include the temperature variation of L_STAR_RATIO and U_STAR_RATIO
-C     in the variation of the net rate.
-C
-C Definitions:
-C     RATE_FAC : Factor which multiplies the net rate to form the total
-C                       rate from the upper level.
-C     K          Depth index
-C
-	    NL=SIM_NL(1)
-	    NUP=SIM_NUP(1)
-	    I=SIM_LINE_POINTER(1)
-	    ID=VEC_ID(I)
-	    MNL_F=VEC_MNL_F(I)
-	    MNUP_F=VEC_MNUP_F(I)
-	    MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
-	    MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
-	    MNT=SE(ID)%N_IV
 !
-	    T4=FL_SIM(1)*EMLIN
-	    DO K=1,ND
-	      L=GET_DIAG(K)
-	      RATE_FAC=EINA(1)*POPS(NUP,K)*U_STAR_RATIO(K,1)
-	      OPAC_FAC=OSCIL(1)*OPLIN
-	      STIM_FAC=-GLDGU(1)*OPAC_FAC
-	      EMIS_FAC=EINA(1)*FL_SIM(1)*EMLIN
-	      dRATE_dUP=RATE_FAC*( ZNET(K)/POPS(NUP,K) +
-	1               U_STAR_RATIO(K,1)*
-	1              (STIM_FAC*VB(K)+EMIS_FAC*VC(K)) )
-	      dRATE_dLOW=RATE_FAC*OPAC_FAC*VB(K)*
-	1               L_STAR_RATIO(K,1)
-	      dRATE_dT=RATE_FAC*
-	1            (  OPAC_FAC*POPS(NL,K)*VB(K)*dL_RAT_dT(K,1)+
-	1                POPS(NUP,K)*dU_RAT_dT(K,1)*(
-	1                  EMIS_FAC*VC(K)+
-	1                      STIM_FAC*VB(K) ) +
-	1               ZNET(K)*dU_RAT_dT(K,1)
-	1                          /U_STAR_RATIO(K,1)
-	1            )
+	  CALL SUB_CMF_LINE(SECTION,POPS,CHIL,ETAL,NEG_OPACITY,
+	1                    FL,CONT_FREQ,AMASS,
+	1                    EDDINGTON,IMPURITY_CODE,
+	1                    EW,CONT_INT,COMPUTE_EW,
+	1                    COMPUTE_JEW,LU_JEW,ACCESS_JEW,
+	1                    NL,NUP,NT,ND,NC,NP,
+	1                    NDEXT,NCEXT,NPEXT,
+	1                    NLF,NNM,
+	1                    DIAG_INDX,NUM_BNDS)
 !
-	      SE(ID)%BA(MNUP,MNUP,L,K)=SE(ID)%BA(MNUP,MNUP,L,K) - dRATE_dUP
-	      SE(ID)%BA(MNUP,MNL,L,K) =SE(ID)%BA(MNUP,MNL,L,K) - dRATE_dLOW
-	      SE(ID)%BA(MNUP,MNT,L,K) =SE(ID)%BA(MNUP,MNT,L,K) - dRATE_dT
-	      SE(ID)%BA(MNL,MNUP,L,K) =SE(ID)%BA(MNL,MNUP,L,K)  + dRATE_dUP
-	      SE(ID)%BA(MNL,MNL,L,K)  =SE(ID)%BA(MNL,MNL,L,K)  + dRATE_dLOW
-	      SE(ID)%BA(MNL,MNT,L,K)  =SE(ID)%BA(MNL,MNT,L,K)  + dRATE_dT
-!
-	      BA_T(NL,L,K) =BA_T(NL,L,K)  - T4*dRATE_dLOW
-	      BA_T(NUP,L,K)=BA_T(NUP,L,K) - T4*dRATE_dUP
-	      BA_T(NT,L,K) =BA_T(NT,L,K)  - T4*dRATE_dT
-	    END DO
-C
-	  END IF
-C
-C Write out rates and exit from NUP loop. Note that BA and STEQ have
-C already been updated.
-C
-	  GO TO 49000
-C 
-C
 	ELSE
 C
 C Use the escape probability approximation for lines originating
 C in all levels.
 C
-	  CALL TUNE(IONE,'SOBOLEV')
-	    CALL SOBJBAR_SIM(SOURCE,CHI,CHIL,ETAL,V,SIGMA,R,P,AQW,
-	1                  JBAR,BETA,
-	1                  ZNET_SIM,VB_SIM,VC_SIM,VB_2,VC_2,BETAC_SIM,
-	1                  CHIL_MAT,ETAL_MAT,BB_COR,
-	1                  FL,DIF,DBB,IC,THK_CONT,
-	1                  NLF,NC,NP,ND,NUM_SIM_LINES,METHOD)
-	  CALL TUNE(ITWO,'SOBOLEV')
-C
-C Estimate the line EW using a Modified SObolev approximation.
-C
-	  IF(LST_ITERATION)THEN
-C
-C We use TA as a temporary vector which indicates the origin
-C of the line emission. Not required in this code as used only
-C for display purposes.
-C
-	    CALL SOBEW(SOURCE,CHI,CHI_SCAT,CHIL,ETAL,
-	1              V,SIGMA,R,P,AQW,HQW,TA,EW,CONT_INT,
-	1              FL,DIF,DBB,IC,THK_CONT,L_FALSE,NC,NP,ND,METHOD)
-C
-	  END IF
-C
-C If the line opacity was negative, we set the variation of JBAR
-C with CHIL to zero.
-C
-	  DO SIM_INDX=1,NUM_SIM_LINES
-	    DO I=1,ND
-	      IF(NEG_OPACITY(I))THEN
-	        VB_SIM(I,SIM_INDX)=0.0D0
-	        VB_2(I)=0.0D0
-	      END IF
-	    END DO
-	  END DO
-C
-C Allow for the variation of the continuous radiation field.
-C
-	  IF(COMPUTE_BA .AND. VAR_SOB_JC .AND. .NOT. 
-	1                LAMBDA_ITERATION .AND. .NOT. IMPURITY_CODE)THEN
-C
-	    INCLUDE 'VARCONT.INC'
-C
-	    DO SIM_INDX=1,NUM_SIM_LINES
-	      DO I=1,ND
-	        BETAC_SIM(I,SIM_INDX)=BETAC_SIM(I,SIM_INDX)/RJ(I)
-	      END DO
-	    END DO
-C
-C Increment the large simultaneous perturbation matrix. Note that terms are
-C
-C EINA*POPS(NUP,L)*BETAC*VJ(J,K,L) 
-C
-C        and
-C
-C ETAL(L)*BETAC(L)*VJ(J,K,L) but 
-C
-C ETAL=FL*EINA(1)*EMLIN*POPS. Therefore use FL*EMLIN as constant.
-C
-	    CALL TUNE(IONE,'SOBCONTBA')
-	    DO SIM_INDX=1,NUM_SIM_LINES
-	      NL=SIM_NL(SIM_INDX)
-	      NUP=SIM_NUP(SIM_INDX)
-	      I=SIM_LINE_POINTER(SIM_INDX)
-	      ID=VEC_ID(I)
-	      MNL_F=VEC_MNL_F(I)
-	      MNUP_F=VEC_MNUP_F(I)
-	      MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
-	      MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
+	  CALL SUB_SOB_LINE(SECTION,POPS,CHIL,ETAL,NEG_OPACITY,
+	1                    FL,CONT_FREQ,AMASS,
+	1                    EDDINGTON,IMPURITY_CODE,VAR_SOB_JC,LST_ITERATION,
+	1                    EW,CONT_INT,
+	1                    NL,NUP,NT,ND,NC,NP,
+	1                    NDEXT,NCEXT,NPEXT,
+	1                    NLF,DIAG_INDX,NUM_BNDS)
 !
-	      T1=FL_SIM(SIM_INDX)*EMLIN
-	      DO L=1,ND	  		  	!S.E. equation depth
-	        T2=ETAL_MAT(L,SIM_INDX)*BETAC_SIM(L,SIM_INDX)
-	        T3=1.0D-06*RJ(L)
-	        DO K=BNDST(L),BNDEND(L)	 	!Variable depth.
-	          LS=BND_TO_FULL(K,L)
-!**********************************
-!*********************************
-   	          DO  J=1,SE(ID)%N_IV	    		!Variable
-	            JJ=SE(ID)%LNK_TO_F(J)
-!   	          DO  J=1,NT	    		!Variable
-!	            IF( DABS(VJ(J,K,L)*POPS(J,LS)) .GE. T3 )THEN
-	              T4=T2*VJ(JJ,K,L)
-	              SE(ID)%BA(MNL,J,K,L) =SE(ID)%BA(MNL,J,K,L) - T4/T1
-	              SE(ID)%BA(MNUP,J,K,L)=SE(ID)%BA(MNUP,J,K,L) + T4/T1
-	              BA_T(JJ,K,L)=BA_T(JJ,K,L) + T4
-!	            END IF
-	          END DO
-	        END DO
-	      END DO
-	    END DO
-	    CALL TUNE(ITWO,'SOBCONTBA')
-	  END IF			!BA Matrix computed (compute_ba).
-C
-	END IF		!Which method to compute line rates.
-C
-C If we are doing a lambda iteration, we are assuming that JBAR is fixed.
-C Thus, dZ/dCHIL and dZ/dETAL is given by the following.
-C
-	IF(COMPUTE_BA .AND. LAMBDA_ITERATION)THEN
-	  DO SIM_INDX=1,NUM_SIM_LINES
-	    DO I=1,ND
-	      VB_SIM(I,SIM_INDX)=-JBAR(I)/ETAL_MAT(I,SIM_INDX)
-	      IF(NEG_OPACITY(I))VB_SIM(I,SIM_INDX)=0.0D0
-	      VC_SIM(I,SIM_INDX)=JBAR(I)*CHIL_MAT(I,SIM_INDX)/
-	1                 ETAL_MAT(I,SIM_INDX)/ETAL_MAT(I,SIM_INDX)
-	    END DO
-	  END DO
-	  DO I=1,ND
-	    VB_2(I)=0.0D0
-	    VC_2(I)=0.0D0
-	  END DO
 	END IF
-C
-C Evaluate contribution to statistical equilibrium equation, and
-C and increment variation matrices.
-C
-	DO SIM_INDX=1,NUM_SIM_LINES
-	  T1=FL_SIM(SIM_INDX)*EMLIN
-	  NUP=SIM_NUP(SIM_INDX)
-	  NL=SIM_NL(SIM_INDX)
-	  I=SIM_LINE_POINTER(SIM_INDX)
-	  ID=VEC_ID(I)
-	  MNL_F=VEC_MNL_F(I);     MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
-	  MNUP_F=VEC_MNUP_F(I);   MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
-	  DO K=1,ND
-	    T2=ETAL_MAT(K,SIM_INDX)*ZNET_SIM(K,SIM_INDX)
-	    SE(ID)%STEQ(MNUP,K)=SE(ID)%STEQ(MNUP,K) - T2/T1
-	    SE(ID)%STEQ(MNL,K) =SE(ID)%STEQ(MNL,K) + T2/T1
-	    STEQ_T(K)=STEQ_T(K) - T2
-	  END DO
-	END DO
-C
-C NB: We now include the temperature variation of L_STAR_RATIO and U_STAR_RATIO
-C     in the variation of the net rate. 
-C
-C Definitions:
-C            RATE_FAC : Factor which multiplies the net rate to form the total
-C                       rate from the upper level.
-C            SRAT:      Ratio of total source function to individual source
-C                       function corrected for any difference in frequency.
-C            SIM_INDX   is used to refer to the transition of interest.
-C            K          Depth index
-C            J          Line opacity/emissivity identifier
-C                                    
-	IF(COMPUTE_BA)THEN
-	  DO SIM_INDX=1,NUM_SIM_LINES
-	    NL=SIM_NL(SIM_INDX)
-	    NUP=SIM_NUP(SIM_INDX)
-	    I=SIM_LINE_POINTER(SIM_INDX)
-	    ID=VEC_ID(I)
-	    MNL_F=VEC_MNL_F(I)
-	    MNUP_F=VEC_MNUP_F(I)
-	    MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
-	    MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
-	    IT=SE(ID)%N_IV
 !
-	    T4=FL_SIM(SIM_INDX)*EMLIN
-	    DO K=1,ND
-	      L=GET_DIAG(K)
-	      SRAT=(ETAL(K)/ETAL_MAT(K,SIM_INDX)/BB_COR(K,SIM_INDX))*
-	1          (CHIL_MAT(K,SIM_INDX)/CHIL(K))
-	      RATE_FAC=EINA(SIM_INDX)*POPS(NUP,K)*U_STAR_RATIO(K,SIM_INDX)
-	      DO J=1,NUM_SIM_LINES
-	        OPAC_FAC=OSCIL(J)*OPLIN
-	        STIM_FAC=-GLDGU(J)*OPAC_FAC
-	        EMIS_FAC=EINA(J)*FL_SIM(J)*EMLIN
-	        L1=SIM_NL(J);    L2=SE(ID)%LNK_TO_IV(L1)
-	        U1=SIM_NUP(J);   U2=SE(ID)%LNK_TO_IV(U1)
+! Outpute line EW, net rate, total rate, contribution of line to the luminosisty.
 !
-	        IF(L2 .NE. 0 .AND. U2 .NE. 0)THEN
-	          IF(J .EQ. SIM_INDX)THEN
-	            dRATE_dUP=RATE_FAC*( ZNET_SIM(K,SIM_INDX)/POPS(NUP,K) +
-	1                 U_STAR_RATIO(K,J)*
-	1                (STIM_FAC*VB_SIM(K,J)+EMIS_FAC*VC_SIM(K,J)) )
-	            dRATE_dLOW=RATE_FAC*OPAC_FAC*VB_SIM(K,J)*
-	1                 L_STAR_RATIO(K,J)
-	            dRATE_dT=RATE_FAC*
-	1              (  OPAC_FAC*POPS(NL,K)*VB_SIM(K,J)*dL_RAT_dT(K,J)+
-	1                  POPS(NUP,K)*dU_RAT_dT(K,J)*(
-	1                    EMIS_FAC*VC_SIM(K,J)+
-	1                        STIM_FAC*VB_SIM(K,J) ) +
-	1                 ZNET_SIM(K,SIM_INDX)*dU_RAT_dT(K,J)
-	1                            /U_STAR_RATIO(K,J)
-	1              )
-	          ELSE
-	            dRATE_dUP=RATE_FAC*SRAT*U_STAR_RATIO(K,J)*
-	1                     ( STIM_FAC*VB_2(K)+EMIS_FAC*VC_2(K)*BB_COR(K,J) )
-	            dRATE_dLOW=RATE_FAC*OPAC_FAC*VB_2(K)*SRAT*L_STAR_RATIO(K,J)
-	            dRATE_dT=RATE_FAC*SRAT*
-	1               ( OPAC_FAC*POPS(SIM_NL(J),K)*VB_2(K)*dL_RAT_dT(K,J)+
-	1                 POPS(SIM_NUP(J),K)*dU_RAT_dT(K,J)*(
-	1                 EMIS_FAC*VC_2(K)*BB_COR(K,J)+STIM_FAC*VB_2(K)) )
-	          END IF
-!
-	          SE(ID)%BA(MNUP,U2,L,K) = SE(ID)%BA(MNUP,U2,L,K)  - dRATE_dUP
-	          SE(ID)%BA(MNUP,L2,L,K) = SE(ID)%BA(MNUP,L2,L,K) - dRATE_dLOW
-	          SE(ID)%BA(MNUP,IT,L,K) = SE(ID)%BA(MNUP,IT,L,K) - dRATE_dT
-	          SE(ID)%BA(MNL,U2,L,K ) = SE(ID)%BA(MNL,U2,L,K)  + dRATE_dUP
-	          SE(ID)%BA(MNL,L2,L,K)  = SE(ID)%BA(MNL,L2,L,K)  + dRATE_dLOW
-	          SE(ID)%BA(MNL,IT,L,K)  = SE(ID)%BA(MNL,IT,L,K)  + dRATE_dT
-	          BA_T(SIM_NL(J),L,K) =BA_T(SIM_NL(J),L,K) - T4*dRATE_dLOW
-	          BA_T(SIM_NUP(J),L,K)=BA_T(SIM_NUP(J),L,K) - T4*dRATE_dUP
-	          BA_T(NT,L,K)=BA_T(NT,L,K) - T4*dRATE_dT
-	       END IF
-	      END DO
-	    END DO
-	  END DO
-	END IF
-C
-C
-49000	CONTINUE
 	IF(LST_ITERATION)THEN
 	  T1=LAMVACAIR(FL_SIM(1)) 		!Wavelength(Angstroms)
 	  DO SIM_INDX=1,NUM_SIM_LINES
@@ -5450,16 +3433,10 @@ C
 	    WRITE(LU_NET,40002)EW_STRING(1:L)
 	    WRITE(LU_DR,40002)EW_STRING(1:L)
 	    WRITE(LU_EW,40005)EW_STRING(1:L)
+	    WRITE(LU_HT,40002)EW_STRING(1:L)
 	    WRITE(LU_NET,40003)(ZNET_SIM(I,SIM_INDX),I=1,ND)
 	    WRITE(LU_DR,40003)((ZNET_SIM(I,SIM_INDX)*POPS(NUP,I)*
 	1                        EINA(SIM_INDX)),I=1,ND)
-C
-C Increment the Emission vector due to this line.
-C
-	    DO I=1,ND
-	      LLUMST(I)=LLUMST(I)+ZNET_SIM(I,SIM_INDX)*ETAL_MAT(I,SIM_INDX)
-	    END DO
-	    WRITE(LU_HT,40002)EW_STRING(1:L)
 	    WRITE(LU_HT,40003)
 	1        (ZNET_SIM(I,SIM_INDX)*ETAL_MAT(I,SIM_INDX),I=1,ND)
 	  END DO
@@ -5467,6 +3444,14 @@ C
 40003	  FORMAT(3X,1P,5E16.5)
 40005	  FORMAT(A)
 	END IF
+!
+! Update line luminosity.
+!
+	DO SIM_INDX=1,NUM_SIM_LINES
+	  DO I=1,ND
+	    LLUMST(I)=LLUMST(I)+ZNET_SIM(I,SIM_INDX)*ETAL_MAT(I,SIM_INDX)
+	  END DO
+	END DO
 C
 50000	CONTINUE
 	LINE_INDX=LINE_INDX+NUM_SIM_LINES
@@ -5903,7 +3888,14 @@ C
 !
 	IF(REVISE_R_GRID)THEN
 	  CALL SET_ANG_QW(R,NC,ND,NP,REXT,NCEXT,NDEXT,NPEXT,TRAPFORJ,ACCURATE)
-	  CALL ADJUST_DEN_VECS(R_OLD,ND)
+!
+! Compute CLUM_FAC(1:ND) which allow for the possibility that the wind is
+! clumped. At the sime time, we compute the vectors which give the density,
+! the atom density, and the species density at each depth.
+! The new call replaces the interpolation done in
+!				  CALL ADJUST_DEN_VECS(R_OLD,ND)
+!
+	  CALL SET_ABUND_CLUMP(MEAN_ATOMIC_WEIGHT,ABUND_SUM,LUER,ND)
 	END IF
 
 C 
@@ -5946,7 +3938,8 @@ C and are required by SUP_TO_FULL and LTE_POP_WLD.
 C
 	CALL COMP_LEV_DIS_BLK(ED,POPION,T,DO_LEV_DISSOLUTION,ND)
 C
-	INCLUDE 'SUP_TO_FULL_V4.INC'
+	CALL SUP_TO_FULL_V4(POPS,Z_POP,DO_LEV_DISSOLUTION,ND,NT)
+!	INCLUDE 'SUP_TO_FULL_V4.INC'
 C
 C Initialize pointer file for storage of BA matrix.
 C
@@ -6097,8 +4090,7 @@ C
 	  NEXT_LOC=1  ;   STRING=' '
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'Vinf1',VINF1)
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'Beta1',V_BETA1)
-	  T1=SCL_HT/RP
-	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'SCL_HT/RP',T1)
+	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'SCL_HT/RP',SCL_HT)
 	  WRITE(LUMOD,'(A)')TRIM(STRING)
 C
 	  NEXT_LOC=1  ;   STRING=' '
@@ -6300,7 +4292,7 @@ C NB - 1 refers to dimension of DHYD (i.e. DHYD(1,nd)
 C      1 refers to format for output.
 C      1,NHY - For use with HeI.
 C
-	  INCLUDE 'EVAL_LTE_INC_V4.INC'              
+	CALL EVAL_LTE_V4(DO_LEV_DISSOLUTION,ND)
 C      
 C GAM_SPECIES refers to the number of electrons arising from each species (eg
 C carbon).

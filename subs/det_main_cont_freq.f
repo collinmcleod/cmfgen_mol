@@ -47,6 +47,7 @@ C
 	LU_OUT=ERROR_LU()
 	IF(COMPUTE_ALL_CROSS .OR. DELV_CONT .EQ. 0)THEN
 	  NU_EVAL(:)=NU(:)
+	  WRITE(LU_OUT,'(A)')' '
 	  WRITE(LU_OUT,'(A)')'The continuum will be evaluated at all',
 	1                        ' frequencies.'
 	  RETURN
@@ -115,9 +116,9 @@ C
 	  IF(NU(ML) .EQ. NU_EVAL(ML))K=K+1
 	END DO
 C
+	WRITE(LU_OUT,'(A)')' '
 	WRITE(LU_OUT,'(A,I5,A)')' The continuum will be evaluated at ',
 	1                        K,' frequencies'
-	WRITE(LU_OUT,'(A)')' '
 !
 	OPEN(UNIT=17,FILE='CONT_FREQ',STATUS='UNKNOWN')
 	   WRITE(17,*)NCF,'        !NCF'

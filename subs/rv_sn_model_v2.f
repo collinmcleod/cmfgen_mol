@@ -8,6 +8,8 @@
 	SUBROUTINE RV_SN_MODEL_V2(R,V,SIGMA,RMAX,RP,VCORE,BETA1,RDINR,LU,ND)
 	IMPLICIT NONE
 !
+! Altered 27-Dec-2004 : Error message output if error occurs reading R grid.
+!
 	INTEGER ND
 	INTEGER LU
 	REAL*8 R(ND)
@@ -27,7 +29,7 @@
 !
 	INTEGER NBND_INS
 	INTEGER I,J,MND
-	INTEGER NOLD,NDOLD
+	INTEGER IOS,NOLD,NDOLD
 !
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -50,7 +52,13 @@
 	END IF
 !
 	IF(RDINR)THEN
-	  OPEN(UNIT=LU,STATUS='OLD',FILE='RDINR')
+	  OPEN(UNIT=LU,STATUS='OLD',FILE='RDINR',IOSTAT=IOS)
+          IF(IOS .NE. 0)THEN
+            LUER=ERROR_LU()
+            WRITE(LUER,*)'Error in RV_SN_MODEL_02 --- File with R grid not found'
+            WRITE(LUER,*)'Create file or EDIT option in VADAT'
+            STOP
+           END IF
 !
 ! Check whether the file has a record containing 'Format date'. Its presence
 ! effects the way we read the file.
@@ -63,18 +71,32 @@
 	  END DO
 	  IF( INDEX(STRING,'!Format date') .EQ. 0)REWIND(LU)
 !
-	  READ(LU,*)TA(1),TA(1),NOLD,NDOLD
+	  READ(LU,*,IOSTAT=IOS)TA(1),TA(1),NOLD,NDOLD
+	  IF(IOS .NE. 0)THEN
+	    LUER=ERROR_LU()
+	    WRITE(LUER,*)'Error in RV_SN_MODEL_02 --- unable to read header in file with R grid'
+	    STOP
+	  END IF
+!
 ! Check relative values.
+!
 	  IF(ND .NE. NDOLD)THEN
 	    LUER=ERROR_LU()
 	    WRITE(LUER,*)'Error-NDOLD and ND are not equal in RDINR'
 	    WRITE(LUER,*)'NDOLD=',NDOLD,' ND=',ND
 	    STOP
 	  END IF
+!
 ! TA is used for everything but R which is all we want.
+!
 	  DO I=1,ND
-	    READ(LU,*)R(I),TA(I),TA(I),TA(I)
-	    READ(LU,*)(TA(J),J=1,NOLD)
+	    READ(LU,*,IOSTAT=IOS)R(I),TA(I),TA(I),TA(I)
+	    IF(IOS .EQ. 0)READ(LU,*,IOSTAT=IOS)(TA(J),J=1,NOLD)
+	    IF(IOS .NE. 0)THEN
+	      LUER=ERROR_LU()
+	      WRITE(LUER,*)'Error in RV_SN_MODEL_02 --- unable to read R grid from file'
+	      STOP
+	    END IF
 	  END DO
 	  R(1)=RMAX
 !

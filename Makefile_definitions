@@ -13,7 +13,7 @@
 # Installation directory for CMFGEN
 # Site dependent.
 
-INSTALL_DIR=/export/home/jdh/cur_cmf/
+INSTALL_DIR=/export/home/jdh/major/
 
 #
 # These statements should not be altered.

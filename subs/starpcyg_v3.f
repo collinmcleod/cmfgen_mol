@@ -11,12 +11,15 @@ C
 C The Teminal velcoity is VINF1+VEXT
 C
 	SUBROUTINE STARPCYG_V3(R,V,SIGMA,RMAX,RP,
-	1                 SCLHT,VCORE,VPHOT,VINF1,BETA1,EPS1,
+	1                 SCLHT_ON_RP,VCORE,VPHOT,VINF1,BETA1,EPS1,
 	1                 VINF2,BETA2,EPS2,
 	1                 NBND_INS,CONS_FOR_TAU_SCL,EXP_FOR_TAU_SCL,
 	1                 ND,TA,TB,TC,RDINR,LU)
 	IMPLICIT NONE
 C
+C Altered 27-Dec-2004 - Error now routined if file with R grid not found.
+C Altered 20-Dec-2004 - SCLHT_ON_RP is unchanged by this routine. Previusly
+C                         SCLHT(_ON_RP) was multipled by RP.
 C Altered 07-Jul-1997 - We check RDINR file for '!Format date'
 C Altered 05-Jun-1996 - T1 in second loop defining radius grid in vector TA
 C                         was not set.
@@ -29,11 +32,11 @@ C                       LU for RDINR incorporated into call.
 C Altered 05-Mar-1987 - R valus can be read in from file)
 C Created 26-Feb-1987 - Based on STARNEW)
 C
-	INTEGER*4 ND,LU
+	INTEGER ND,LU
 	REAL*8 R(ND),V(ND),SIGMA(ND),TA(ND),TB(ND),TC(ND)
 C
 	REAL*8 RMAX,RP
-	REAL*8 SCLHT
+	REAL*8 SCLHT_ON_RP
 	REAL*8 VCORE
 	REAL*8 VPHOT
 	REAL*8 VINF1
@@ -43,16 +46,18 @@ C
 	REAL*8 BETA2
 	REAL*8 EPS2
 !
-	INTEGER*4 NBND_INS
+	INTEGER NBND_INS
 	REAL*8 CONS_FOR_TAU_SCL
 	REAL*8 EXP_FOR_TAU_SCL
 !
 	REAL*8 RP1,RP2,VEXT
 	REAL*8 V_RAT
+	REAL*8 SCLHT
 	REAL*8 RPHOT
-	INTEGER*4 I,J,LOOP,MND,NUMSCL,NOLD,NDOLD
+	INTEGER I,J,LOOP,MND,NUMSCL
+	INTEGER IOS,NOLD,NDOLD
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 	REAL*8 T1,DLNR,DLT
@@ -60,7 +65,7 @@ C
 	CHARACTER*80 STRING
 C
 	MND=ND-2*NBND_INS
-	SCLHT=RP*SCLHT
+	SCLHT=RP*SCLHT_ON_RP
 	VEXT=VINF2-VINF1
 	IF(VEXT .LT. 1.0D-06*VINF1)VEXT=0.0D0
 	RP1=RP*EPS1
@@ -111,7 +116,13 @@ C
 	END IF
 C
 	IF(RDINR)THEN
-	  OPEN(UNIT=LU,STATUS='OLD',FILE='RDINR')
+	  OPEN(UNIT=LU,STATUS='OLD',FILE='RDINR',IOSTAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    LUER=ERROR_LU()
+            WRITE(LUER,*)'Error in STARPCYG_V3 --- File with R grid not found'
+            WRITE(LUER,*)'Create file or EDIT option in VADAT'
+	    STOP
+	   END IF
 C
 C Check whether the file has a record containing 'Format date'. Its presence
 C effects the way we read the file.
@@ -123,19 +134,33 @@ C
 	    READ(LU,'(A)')STRING
 	  END DO
 	  IF( INDEX(STRING,'!Format date') .EQ. 0)REWIND(LU)
-C
-	  READ(LU,*)TA(1),TA(1),NOLD,NDOLD
-C Check relative values.
+!
+	  READ(LU,*,IOSTAT=IOS)TA(1),TA(1),NOLD,NDOLD
+	  IF(IOS .NE. 0)THEN
+	    LUER=ERROR_LU()
+            WRITE(LUER,*)'Error in STARPCYG_V3 --- unable to read header in file with R grid'
+	    STOP
+	   END IF
+!
+! Check relative values.
+!
 	  IF(ND .NE. NDOLD)THEN
 	    LUER=ERROR_LU()
 	    WRITE(LUER,*)'Error-NDOLD and ND are not equal in RDINR'
 	    WRITE(LUER,*)'NDOLD=',NDOLD,' ND=',ND
 	    STOP
 	  END IF
-C TA is used for everything but R which is all we want.
+!
+! TA is used for everything but R which is all we want.
+!
 	  DO I=1,ND
-	    READ(LU,*)R(I),TA(I),TA(I),TA(I)
-	    READ(LU,*)(TA(J),J=1,NOLD)
+	    READ(LU,*,IOSTAT=IOS)R(I),TA(I),TA(I),TA(I)
+	    IF(IOS .EQ. 0)READ(LU,*,IOSTAT=IOS)(TA(J),J=1,NOLD)
+	    IF(IOS .NE. 0)THEN
+	      LUER=ERROR_LU()
+              WRITE(LUER,*)'Error in STARPCYG_V3 --- unable to R grid in file with R grid'
+	      STOP
+	     END IF
 	  END DO
 	  R(1)=RMAX
 C

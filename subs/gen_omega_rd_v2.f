@@ -17,6 +17,8 @@
 	1                      MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE)
 	IMPLICIT NONE
 !
+! Altered 20-Dec-2004 : Eror message now output if error occurs reading
+!                         the actual collison values.
 ! Altered 02-Mar-1998 : Ientifying the connection betwen table and model 
 !                         levels improved. Routine can now handle split and
 !                         combined LS stars in both the model and input data.
@@ -367,7 +369,14 @@
 !
 ! OMEGA = SUM(i) SUM(J)  Omega(i,j)
 !
-	  READ(STRING,*)(COL_VEC(I),I=1,NUM_TVALS)
+	  READ(STRING,*,IOSTAT=IOS)(COL_VEC(I),I=1,NUM_TVALS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(LUER,*)'Error in GEN_OMEGA_RD_V2'  
+	    WRITE(LUER,*)'Error reading collisional data from',FILE_NAME
+	    WRITE(LUER,*)TRIM(STRING)
+	    WRITE(LUER,*)'IOS=',IOS
+	    STOP
+	  END IF
 	  COL_VEC(1:NUM_TVALS)=COL_VEC(1:NUM_TVALS)*NORM_FAC
 	  IF(UP_LEV .EQ. 'I')THEN
 	    DO NL=1,NL_CNT

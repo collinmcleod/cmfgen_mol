@@ -7,7 +7,8 @@
 	USE XRAY_DATA_MOD
 	IMPLICIT NONE
 !
-! Created  23-Oct-2000: Bsed on SET_X_FRQ
+! Altered 22-Dec-2004: Error message improved.
+! Created 23-Oct-2000: Bsed on SET_X_FRQ
 !
 	INTEGER*4 NCF,NCF_MAX
 	REAL*8 MAX_CONT_FREQ		!Units 10^15 Hz
@@ -21,6 +22,7 @@
 	REAL*8 CONV_FAC
 	INTEGER*4 I,J,LOOP_PQN_MAX
 	INTEGER*4 IZ,NE
+	LOGICAL, SAVE :: FIRST=.TRUE.
 !
 	IF( .NOT. NI_PRES)RETURN
 	IF( .NOT. N2_PRES)RETURN
@@ -58,9 +60,22 @@
 	      FREQ(NCF)=E_THRESH_X(IZ,NE,I,J)*CONV_FAC
               IF(FREQ(NCF) .GT. MAX_CONT_FREQ)THEN
 	        LUER=ERROR_LU()
-	        WRITE(LUER,*)'**** Warning -- Warning -- Warning ****'
-	        WRITE(LUER,*)'Max. cont. freq may be too small in in SET_X_FREQ'
-	        WRITE(LUER,*)'IZ=',IZ,'NE=',NE,'PQN=',I,'ANG=',J
+!
+	        IF(FIRST)THEN
+	          FIRST=.FALSE.
+	          WRITE(LUER,*)' '
+	          WRITE(LUER,*)'*************** Warning -- Warning -- Warning ****************'
+	          WRITE(LUER,*)'Max. cont. freq may be too small in in SET_X_FREQ_V2'
+	          WRITE(LUER,*)'Max. cont. should generally be set to 1000 when X-rays present'
+	          WRITE(LUER,*)'Need to allow for ionization from inner shells. Generally can'
+	          WRITE(LUER,*)'ignore ionization from n=1 (=PQN) state of iron group elements'
+	          WRITE(LUER,*)'since these can also ionize from n=2 sate. A list of effected'
+	          WRITE(LUER,*)'ionization routes follows:'
+	          WRITE(LUER,*)
+	          FIRST=.FALSE.
+	        END IF
+	        WRITE(LUER,'(X,4(A4,I2,3X),3X,A,ES10.2)')' IZ=',IZ,' NE=',NE,'PQN=',I,
+	1                   'ANG=',J,'Edge Freq(10^15 Hz)=',FREQ(NCF)
                 NCF=NCF-1
 	      END IF
 	    END IF

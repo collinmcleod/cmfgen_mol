@@ -30,6 +30,8 @@
 	1              LUIN,LUOUT,FILNAME)
 	IMPLICIT NONE
 !
+! Altered 23-Dec-2004 - Check on ENERGY level ordering, and name matching when
+!                          reading in transitions included.
 ! Altered 21-Nov-2000 - Changed to V8
 !                       Option ONLY_OBS_LINES inserted.
 ! Altered 19-Oct-2000 - Changed to V7
@@ -77,7 +79,8 @@
 !
 ! Local variables
 !
-	CHARACTER*30 LOCNAME(N)
+	CHARACTER*40 LOCNAME(N)
+	CHARACTER*40 LOW_NAME,UP_NAME
 	CHARACTER*11 FORMAT_DATE
 	REAL*8 T1,T2,T3,SPEED_LIGHT
 	INTEGER*4 I,J,K,NW,L1,L2,IOS,LEV_ID
@@ -290,6 +293,16 @@
 	    END DO
 	  END IF
 !
+! Check the energy levels are in order.
+!
+	  DO I=2,N
+	   IF(FEDGE(I) .GT. FEDGE(I-1))THEN
+	      WRITE(LUER,*)'Warning/error reading in Level Names from '//FILNAME
+	      WRITE(LUER,*)'Energy levels are out of order'
+	      WRITE(LUER,*)'Levels are:',I-1,I
+	    END IF
+	  END DO
+!
 ! If GF_CUT is large, we assume we just want the ENERGY levels.
 !
 	IF(GF_CUT .GT. 1000.0 .OR. NTRET .EQ. 0)THEN
@@ -332,8 +345,10 @@
 	DO K=1,NTRET
 	  READ(LUIN,'(A)')STRING
 	  L1=INDEX(STRING,'-')			!In case 2 spaces at end of name
-	  STRING(1:)=STRING(L1:)
+	  LOW_NAME=ADJUSTL(STRING(1:L1-1))
+	  STRING(1:)=STRING(L1+1:)
 	  L1=INDEX(STRING,'  ')			!skip over upper level
+          UP_NAME=ADJUSTL(STRING(1:L1-1))
 	  STRING(1:)=STRING(L1:)
 !
 	  READ(STRING,*)T1			!Oscillator value
@@ -345,7 +360,16 @@
 	  L1=INDEX(STRING,'-')
 	  READ(STRING(1:L1-1),*)I
 	  READ(STRING(L1+1:),*)J
-	  IF(I .LE. N .AND. J .LE. N)EINA(I,J)=ABS(T1)
+	  IF(I .LE. N .AND. J .LE. N)THEN
+	    EINA(I,J)=ABS(T1)
+	    IF(LOW_NAME .NE. LEVNAME(I) .OR.
+	1       UP_NAME .NE. LEVNAME(J) .OR. I .GE. J)THEN
+	      WRITE(LUER,*)'Invalid transition format in '//FILNAME
+	      WRITE(LUER,*)'Indices and level names don''t match'
+	      WRITE(LUER,*)'I,J=',I,J
+	      STOP
+	    END IF
+	  END IF
 	END DO			!K (Reading loop)
 !
 	CLOSE(UNIT=LUIN)

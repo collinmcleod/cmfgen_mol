@@ -2,14 +2,16 @@
 ! Routine reads in the ratio of T/TGREY for an old model. This
 ! ratio is then applied to the passed GREY temperature distributon.
 !
-	SUBROUTINE SCALE_GREY(TGREY,TAUROSS,LUIN,ND)
+	SUBROUTINE SCALE_GREY(TGREY,TAUROSS,IOS,LUIN,ND)
 	IMPLICIT NONE
 !
+! Altered 21-Dec-2004: Call changed. Routine now returns IOS is successful.
 ! Altered 02-Oct-2004: GREY_SCL_FAC_IN is now default input file.
 ! Altered 24-Aug-2002: Bug fixed with handling of boundary values.
 !
-	INTEGER*4 ND
-	INTEGER*4 LUIN 
+	INTEGER ND
+	INTEGER LUIN 
+	INTEGER IOS
 	REAL*8 TGREY(ND)
 	REAL*8 TAUROSS(ND)
 !
@@ -24,18 +26,18 @@
 	CHARACTER*80 STRING
 !
 	INTEGER*4 I
-	INTEGER*4 IOS
 	INTEGER*4 ND_RD
 !
+	IOS=0
 	OPEN(UNIT=LUIN,FILE='GREY_SCL_FAC_IN',IOSTAT=IOS,STATUS='OLD',ACTION='READ')
 	IF(IOS .NE. 0)THEN
 	   LU_ER=ERROR_LU()
-	   WRITE(LU_ER,*)'Unable to open file GREY_SCL_FAC_IN'
+	   WRITE(LU_ER,*)'Warning: unable to open file GREY_SCL_FAC_IN'
 	   WRITE(LU_ER,*)'Will try to open GREY_SCL_FAC (older file name)'
 	   OPEN(UNIT=LUIN,FILE='GREY_SCL_FAC',IOSTAT=IOS,STATUS='OLD',ACTION='READ')
 	   IF(IOS .NE. 0)THEN
 	     LU_ER=ERROR_LU()
-	     WRITE(LU_ER,*)'Unable to open file GREY_SCL_FAC'
+	     WRITE(LU_ER,*)'Warning: unable to open file GREY_SCL_FAC'
 	     WRITE(LU_ER,*)'No scaling of TGREY performed in SCALE_GREY'
 	     RETURN
 	  END IF
@@ -47,7 +49,12 @@
 !
 	STRING=' '
 	DO WHILE(STRING .EQ. ' ' .OR. STRING(1:1) .EQ. '!')
-	  READ(LUIN,'(A)')STRING
+	  READ(LUIN,'(A)',IOSTAT=IOS)STRING
+	  IF(IOS .NE. 0)THEN
+	    LU_ER=ERROR_LU()
+	    WRITE(LU_ER,*)'Error reading GREY_SCL_FAC_IN: IOSTAT=',IOS
+	    RETURN
+	  END IF
 	END DO
 !
 ! The first non-comment or blank line should be the number of depth points.
@@ -57,7 +64,12 @@
 	ALLOCATE (OLD_TAU(ND_RD))
 	ALLOCATE (OLD_SCALE_FAC(ND_RD))
 	DO I=2,ND_RD-1
-	   READ(LUIN,*)OLD_TAU(I),OLD_SCALE_FAC(I)
+	  READ(LUIN,*)OLD_TAU(I),OLD_SCALE_FAC(I)
+	  IF(IOS .NE. 0)THEN
+	    LU_ER=ERROR_LU()
+	    WRITE(LU_ER,*)'Error reading Tau & T from GREY_SCL_FAC_IN: IOSTAT=',IOS
+	    RETURN
+	  END IF 
 	END DO
 !
 	OLD_TAU(ND_RD)=MAX(LOG_TAU(ND),OLD_TAU(ND_RD-1)+0.1)
