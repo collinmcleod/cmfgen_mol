@@ -102,6 +102,9 @@ cat Diff_output >> Diff_sum
 $cmfdist/com/main_diff.sh $X1/stark $X2/stark
 cat Diff_output >> Diff_sum
 
+$cmfdist/com/main_diff.sh $X1/txt_files $X2/txt_files
+cat Diff_output >> Diff_sum
+
 $cmfdist/com/main_diff.sh $X1/tools $X2/tools
 cat Diff_output >> Diff_sum
 
