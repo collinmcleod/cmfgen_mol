@@ -237,11 +237,11 @@ C
 C
 	CHARACTER*80 NAME,XAXIS,YAXIS,XAXSAV
 C
-	COMMON/TOPBORD/ SCED(25),XED(25),NXED,TOPLABEL
+	COMMON/TOPBORD/ SCED(31),XED(31),NXED,TOPLABEL
 	REAL*8 SCED,XED
 	INTEGER*4 NXED
 	CHARACTER*30 TOPLABEL
-	DATA SCED/5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,
+	DATA SCED/2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,
 	1         10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15,15.5,
 	1         16,16.5,17.0/
 C
@@ -1539,7 +1539,7 @@ C
 	1        'Depth bands (pairs)NOT to be output [Max of 5]')
 	  DO I=1,9,2
 	    IF(LEV(I) .GT. 0 .AND. LEV(I+1) .GE. LEV(I) .AND.
-	1        LEV(I+1) .LE. ND-1)THEN
+	1        LEV(I+1) .LE. ND)THEN
 	      DO_DPTH(LEV(I):LEV(I+1))=.FALSE.
 	    END IF
 	  END DO      
@@ -3303,6 +3303,37 @@ C
 	1     1X,'Velocity at R* is ',1PE14.5,'km/s')
 	  END IF
 C
+	ELSE IF(XOPT .EQ. 'COLR')THEN
+	  CALL USR_OPTION(I,'Depth','1','Input depth to check col. rates')
+	  STRING=' '
+	  CALL USR_OPTION(STRING,'TYPE','NR',
+	1       'Output net rates (NR), Downward rate (DR), CR')
+	  IF(UC(STRING(1:2)) .EQ. 'NR')THEN
+	    STRING='NET_RATES'
+	  ELSE IF(UC(STRING(1:2)) .EQ. 'CR')THEN
+	    STRING='COOL_RATES'
+	  ELSE
+	    STRING=' '
+	  END IF
+	  TMP_ED=ED(I)
+	  T1=T(I)
+	  DO ID=1,NUM_IONS
+	    IF(XSPEC .EQ. UC(ION_ID(ID)))THEN
+	      CALL SUBCOL_MULTI_V4(
+	1         OMEGA_F,dln_OMEGA_F_dlnT,
+	1         OMEGA_S,dln_OMEGA_S_dlnT,
+	1         ATM(ID)%XzV_F(1,I),ATM(ID)%XzVLTE_F(1,I),UNIT_VEC,ATM(ID)%NXzV_F,
+	1         ATM(ID)%XzV_F(1,I),ATM(ID)%XzVLTE_F(1,I),ATM(ID)%W_XzV_F(1,I),
+	1         ATM(ID)%EDGEXzV_F,ATM(ID)%AXzV_F,ATM(ID)%GXzV_F,
+	1         ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,ATM(ID)%ZXzV,
+	1         ID,TRIM(ION_ID(ID))//'_COL_DATA',OMEGA_GEN_V3,
+	1         ATM(ID)%F_TO_S_XzV,TEMP,T1,TMP_ED,IONE)
+	      CALL WR_COL_RATES(OMEGA_S,ATM(ID)%XzV_F(1,I),ATM(ID)%XzVLTE_F(1,I),
+	1             ATM(ID)%EDGEXzV_F,ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,
+	1             TRIM(XSPEC)//'R',LU_COL,STRING)
+	    END IF
+	  END DO
+!
 	ELSE IF(XOPT .EQ. 'COL')THEN
 	  TMP_ED=1.0D0
 	  CALL USR_OPTION(T1,'T','1.0','Input T')
