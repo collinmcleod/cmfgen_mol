@@ -4,6 +4,7 @@
 	1              BA_COMPUTED,WR_BA_INV,WR_PRT_INV,LAMBDA_IT)
 	IMPLICIT NONE
 !
+! Altered 11-Feb-2004 : Bug fixed with calculation of SCALE in 'GLOBAL' scale option.  
 ! Altered 30-Mar-2003 : Output to CORRECTION_SUM file included.
 ! Altered 28-Jan-2002 : Changed to V& as BA_COMPUTED and WR_BA_INV now passed in the CALL.
 !                       CMF_BLKBAND_V3 now used.
@@ -94,6 +95,11 @@ C whose population is significantly less then the Electron density. In case IV
 C (GLOBAL), the biggest change at any depth is used to scale all changes.
 C This option is probaly obsolete.
 C
+	IF(CHANGE_LIM .LE. 1.0D0)THEN
+          WRITE(LUER,'(A,1PE12.4)')' Error in SOLVE_BA_V7'
+          WRITE(LUER,'(A,1PE12.4)')' Maximum change for normal iteration must be > 1.'
+	  STOP
+	END IF
 	BIG_LIM=(CHANGE_LIM-1.0D0)/CHANGE_LIM
 	LIT_LIM=-CHANGE_LIM
 	MINSCALE=1.0D0
@@ -184,7 +190,9 @@ C
 C
 C Limit the change in T to a maximum of 20%.
 C
-	  T3=MAX( 0.2D0,ABS(STEQ(NT,I)) )
+	  DO I=1,ND
+	    T3=MAX( 0.2D0,ABS(STEQ(NT,I)) )
+	  END DO
 	  SCALE=MIN( 0.2D0/T3,SCALE )
 	  WRITE(LUER,'(A,1PE12.4)')' The value of scale is:',SCALE
 C
