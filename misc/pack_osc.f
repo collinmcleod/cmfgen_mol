@@ -1,45 +1,100 @@
 !
-! Routine to perform checks on atomic data files"
-!          Oscillator file
-!          Photoionization file.
+! Routine to pack levels: Packing can be done for
+!          States with LS nomenclature.
+!          States with JL nomenclature.
 !
-! If LS terms are split into individual levels, a new oscillator file with states
-! packed into LS states is output.
+! Needs oscillator file
 !
 	PROGRAM PACK_OSC
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+	INTEGER NLEV
+	INTEGER IOS
+	INTEGER, PARAMETER :: T_OUT=6
+	INTEGER, PARAMETER :: LUIN=7
+	INTEGER, PARAMETER :: IZERO=0
+	INTEGER I
+!
+	CHARACTER(LEN=10) ION_ID
+	CHARACTER(LEN=132) STRING
+	CHARACTER(LEN=132) OSC_FILE
+!
+! Cleaned 23-Dec-2004
 ! Created 02-Jun-2003
 !
-	INTEGER, PARAMETER :: N_MAX=2000
-	INTEGER, PARAMETER :: N_TEMP=4
-	INTEGER, PARAMETER :: N_PHOT_MAX=5
+	WRITE(T_OUT,'()')
+	WRITE(T_OUT,'(70A)')('*',I=1,70)
+	WRITE(T_OUT,'()')
+	WRITE(T_OUT,'(A)')' The name of the oscillator file is prompted.'
+	WRITE(T_OUT,'()')
+	WRITE(T_OUT,'(A)')' The following diagnostic file are output:'
+	WRITE(T_OUT,'(A)')'                  XzV_PACK,'
+	WRITE(T_OUT,'(A)')'          SLP_CHK_FOR_XzV,'
+	WRITE(T_OUT,'(A)')'         ERROR_CHK_FOR_XzV,'
+	WRITE(T_OUT,'()')
+	WRITE(T_OUT,'(70A)')('*',I=1,70)
+	WRITE(T_OUT,'()')
+!
+	ION_ID=' '
+	CALL GEN_IN(ION_ID,'Ionization identification (e.g., CIV)')
+!
+! Get number of levels in Oscilator file.
+!
+	IOS=1
+	DO WHILE(IOS .NE. 0)
+	  OSC_FILE=' '
+	  CALL GEN_IN(OSC_FILE,'File with oscilator strengths')
+	  CALL GEN_ASCI_OPEN(LUIN,OSC_FILE,'OLD',' ','READ',IZERO,IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(T_OUT,*)'Error occurred reading Oscillator file: try again'
+	  END IF
+	END DO
+	STRING=' '
+	DO WHILE( INDEX(STRING,'!Number of energy levels') .EQ. 0)
+	  READ(LUIN,'(A)')STRING
+	END DO
+	CLOSE(LUIN)
+	READ(STRING,*)NLEV
+	CLOSE(LUIN)
+	WRITE(T_OUT,*)'Number of atomic levels is',NLEV
+!
+	CALL PACK_OSC_SUB(OSC_FILE,ION_ID,NLEV)
+!
+	STOP
+	END
+!
+!
+!
+	SUBROUTINE PACK_OSC_SUB(OSC_FILE,ION_ID,NLEV)
+	USE GEN_IN_INTERFACE
+	IMPLICIT NONE
+!
+	INTEGER NLEV
+	CHARACTER(LEN=*) ION_ID
+	CHARACTER(LEN=*) OSC_FILE
 !
 ! Atomic data variables for main species.
 !
-	REAL*8 FEDGE(N_MAX)
-	REAL*8 ENERGY(N_MAX)
-	REAL*8 G(N_MAX)
-	REAL*8 LAM_EDGE(N_MAX)
-	REAL*8 E_STRT(N_MAX)
+	REAL*8 FEDGE(NLEV)
+	REAL*8 ENERGY(NLEV)
+	REAL*8 G(NLEV)
+	REAL*8 LAM_EDGE(NLEV)
+	REAL*8 E_STRT(NLEV)
 !
-	REAL*8 EDGE_SUM(N_MAX)
-	REAL*8 G_SUM(N_MAX)
-!
-	REAL*8, ALLOCATABLE :: FOSC(:,:)
+	REAL*8 EDGE_SUM(NLEV)
+	REAL*8 G_SUM(NLEV)
+	REAL*8 FOSC(NLEV,NLEV)
 !
 	REAL*8 GF_CUT
 	INTEGER GF_LEV_CUT
 	INTEGER MIN_NUM_TRANS
 !
-	INTEGER CROSS_TYPE(N_MAX)
-	INTEGER F_TO_S(N_MAX)
-	INTEGER XzV_LEV_ID(N_PHOT_MAX)
-	INTEGER N_PHOT
-	CHARACTER*30 NAME(N_MAX)
-	CHARACTER*10 ION_ID
+	INTEGER CROSS_TYPE(NLEV)
+	INTEGER F_TO_S(NLEV)
+	CHARACTER*30 NAME(NLEV)
 	CHARACTER*80 FIN_STATE
+	CHARACTER*80 FILENAME
 !
 	REAL*8 AT_NO
 	REAL*8 ZION
@@ -48,26 +103,10 @@
 	REAL*8 PHOT_GION
 	REAL*8 EXC_EN
 	REAL*8 ION_EN
-	INTEGER NLEV
 	CHARACTER*20 EN_DATE
 !
-! For use with next ionization stage. Needed on call to RDPHOT, but
-! not used otherwise.
-!
-	REAL*8 EDGEXzSIX(1)
-	REAL*8 GXzSIX(1)
-	REAL*8 F_TO_S_XzSIX(1)
-	INTEGER NXzSIX
-	CHARACTER*30 XzSIX_LEV_NAME(1)
-!
-! Variables/vectors for computing recombination rates.
-!
-	REAL*8 TEMP(N_TEMP)
-	REAL*8 RECOM(N_MAX,N_TEMP)
-!
-	LOGICAL XRAYS
+	LOGICAL AF_CHK
 	LOGICAL PACK
-	LOGICAL DO_PHOT_SEP
 	LOGICAL USE_G_WEIGHTING
 !
 ! Variables to read in dielectronic lines.
@@ -75,7 +114,6 @@
 	LOGICAL DO_DIE
 	LOGICAL DO_DIE_REG
 	LOGICAL DO_DIE_WI
-!
 !
 ! Used for dynamic smoothing of th ephotoioization cross-sections.
 !
@@ -85,10 +123,10 @@
 	REAL*8 CUT_ACCURACY
 	LOGICAL ABOVE_EDGE
 !
-	CHARACTER*30 LS_NAME(N_MAX)	!Term (LS) designation
-	CHARACTER*1 LEV_ANG(N_MAX)	!Total angular momentum
-	CHARACTER*1 LEV_SPIN(N_MAX)	!Multiplicity
-	CHARACTER*1 LEV_PARITY(N_MAX)	!Parity
+	CHARACTER*30 LS_NAME(NLEV)	!Term (LS) designation
+	CHARACTER*1 LEV_ANG(NLEV)	!Total angular momentum
+	CHARACTER*1 LEV_SPIN(NLEV)	!Multiplicity
+	CHARACTER*1 LEV_PARITY(NLEV)	!Parity
 !
 ! Functions to return parity and multiplicity..
 !
@@ -100,8 +138,11 @@
 	INTEGER IMIN_PACK
 !
 ! For atom packed according to terms (generally LS).
+! We allocate NLEV for NAME_PACK, since NLEV is a maximum, 
+! an we ned the storage before we know how many packed levels
+! we have.
 !
-	CHARACTER(LEN=30) NAME_PACK(N_MAX)
+	CHARACTER(LEN=30) NAME_PACK(NLEV)
 	REAL*8, ALLOCATABLE :: EDGE_PACK(:)
 	REAL*8, ALLOCATABLE :: FOSC_PACK(:,:)
 	REAL*8, ALLOCATABLE :: G_PACK(:)
@@ -132,7 +173,6 @@
 	COMMON/LINE/ OPLIN,EMLIN               
 	DOUBLE PRECISION CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 !
-	CHARACTER(LEN=80) FILENAME
 	CHARACTER(LEN=1) FORMFEED
 	LOGICAL FILE_OPEN
 !
@@ -165,77 +205,34 @@
 	EXTERNAL SPIN
 	EXTERNAL PARITY
 	EXTERNAL ERROR_LU
-	EXTERNAL SUB_PHOT_GEN
 !
 ! 
-!
 ! Set constants.
 !
-	CHIBF=2.815E-06
-	CHIFF=3.69E-29
-	HDKT=4.7994145
-	TWOHCSQ=0.0147452575
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
+	CHIBF=2.815D-06
+	CHIFF=3.69D-29
+	HDKT=4.7994145D0
+	TWOHCSQ=0.0147452575D0
+	OPLIN=2.6540081D+08
+	EMLIN=5.27296D-03
 	FORMFEED=''
 !
-! Set temperature (units of 10^4 K) at which recombination rates are to be evaluated.
-!
-	TEMP(1)=1.0D0
-	TEMP(2)=2.0D0
-	TEMP(3)=4.0D0
-	TEMP(4)=8.0D0
-!
-	WRITE(T_OUT,'()')
-	WRITE(T_OUT,'(70A)')('*',I=1,70)
-	WRITE(T_OUT,'()')
-	WRITE(T_OUT,'(A)')' The name of the oscillator file is prompted.'
-	WRITE(T_OUT,'()')
-	WRITE(T_OUT,'(A)')' The following diagnostic file are output:'
-	WRITE(T_OUT,'(A)')'         ERROR_CHK_FOR_XzV,'
-	WRITE(T_OUT,'(A)')'         RECOM_CHK_FOR_XzV,'
-	WRITE(T_OUT,'(A)')'         NAME_CHK_FOR_XzV,'
-	WRITE(T_OUT,'(A)')'         PACK_CHK_FOR_XzV,'
-	WRITE(T_OUT,'()')
-	WRITE(T_OUT,'(70A)')('*',I=1,70)
-	WRITE(T_OUT,'()')
-!
-	ION_ID=' '
-	CALL GEN_IN(ION_ID,'Ionization identification (e.g., CIV)')
-!
-	LUER=2      !ERROR_LU()
-	WRITE(6,*)LUER
+	LUER=2      					!ERROR_LU()
 	FILENAME='ERROR_CHK_FOR_'//TRIM(ION_ID)
 	OPEN(UNIT=LUER,FILE=FILENAME,STATUS='UNKNOWN')
 !
-!  
-! Read in Level Names and Energies from file containing oscillator
-! strengths. This also returns the total number of levels in the
-! oscillator file.
+! Read in all the atomic data. Some of these are superfluous.
 !
-	IOS=100
-	DO WHILE(IOS .NE. 0)
-	  FILENAME=TRIM(ION_ID)//'OSC'
-	  CALL GEN_IN(FILENAME,'Name of oscillator file')
-	  CALL RD_ENERGY(NAME,G,ENERGY,FEDGE,NLEV,N_MAX,
-	1       ION_EN,ZION,EN_DATE,FILENAME,LUIN,LUOUT,IOS)
-	  IF(IOS .NE. 0)THEN
-	    WRITE(T_OUT,*)'Error occurred reading Oscillator file: try again'
-	  END IF
-	  CLOSE(LUIN)
-	END DO
-	WRITE(T_OUT,*)'Number of atomic levels is',NLEV
-!
-! Now read in all the atomic data. Some of these are superfluous.
-!
-	ALLOCATE (FOSC(NLEV,NLEV))
 	GF_CUT=0.0D0			!These ensure we get all transitions.
 	GF_LEV_CUT=NLEV+1
 	MIN_NUM_TRANS=NLEV*NLEV
 	EN_DATE=' '
+        CALL RD_ENERGY(NAME,G,ENERGY,FEDGE,NLEV,NLEV,			!To get ENERGY
+	1       ION_EN,ZION,EN_DATE,OSC_FILE,LUIN,LUOUT,IOS)
+	CLOSE(LUIN)
 	CALL GENOSC_V6(FOSC,FEDGE,G,NAME,ION_EN,ZION,EN_DATE,NLEV,I,
 	1        'SET_ZERO',GF_CUT,GF_LEV_CUT,MIN_NUM_TRANS,
-	1        LUIN,LUOUT,FILENAME)
+	1        LUIN,LUOUT,OSC_FILE)
 !
 !
 ! Check that the states with [] have correct statistical weight.
@@ -334,69 +331,87 @@
 	  END IF
 	END DO
 !
-	FILENAME='NAME_CHK_FOR_'//TRIM(ION_ID)
-	OPEN(UNIT=30,STATUS='UNKNOWN',FILE=FILENAME)
-	WRITE(30,'()')
-	WRITE(30,'()')
-	WRITE(30,'(A)')' Summary file with information on oscillator strength and Einstein A values.'
-	WRITE(30,'(A)')'   FL_SUM is the sum of f from lower state to the given state.'
-	WRITE(30,'(A)')'   AL_SUM is the sum of the decay rates from the given state.'
-	WRITE(30,'(A)')'   FH_SUM is the sum of f from higher states to the given state.'
-	WRITE(30,'(A)')'   AH_SUM is the sum of A from higher states to the given state.'
-	WRITE(30,'(A)')' These sums may be weighted by the statistical weights.'
-	USE_G_WEIGHTING=.FALSE.
-	CALL GEN_IN(USE_G_WEIGHTING,'Weight f,A sums by g?')
-	WRITE(30,'()')
-	IF(USE_G_WEIGHTING)THEN
-	  WRITE(30,'(30X,3(X,A),8X,A,3X,4(3X,A,4X))')
-	1           'S','L','P','G','GFL_SUM','GFH_SUM','GAL_SUM','GAH_SUM'
-	ELSE
-	  WRITE(30,'(30X,3(X,A),8X,A,3X,4(4X,A,4X))')
-	1           'S','L','P','G','FL_SUM','FH_SUM','AL_SUM','AH_SUM'
-	END IF
-	WRITE(30,'()')
+! Create a summary file with f and A values summed over transitions to individual leveles
 !
-	ALLOCATE (FLOW_SUM(NLEV))
-	ALLOCATE (ALOW_SUM(NLEV))
-	ALLOCATE (FHIGH_SUM(NLEV))
-	ALLOCATE (AHIGH_SUM(NLEV))
-	FLOW_SUM=0; FHIGH_SUM=0
-	ALOW_SUM=0; AHIGH_SUM=0
-!
-	DO I=1,NLEV
+	AF_CHK=.FALSE.
+	CALL GEN_IN(AF_CHK,'Create check file with A & F summed over levels?')
+	IF(AF_CHK)THEN
+	  FILENAME='AF_CHK_FOR_'//TRIM(ION_ID)
+	  OPEN(UNIT=30,STATUS='UNKNOWN',FILE=FILENAME)
+	  WRITE(30,'()')
+	  WRITE(30,'()')
+	  WRITE(30,'(A)')' Summary file with information on oscillator strength'//
+	1                     ' and Einstein A values.'
+	  WRITE(30,'(A)')'   FL_SUM is the sum of f from lower state to the given state.'
+	  WRITE(30,'(A)')'   AL_SUM is the sum of the decay rates from the given state.'
+	  WRITE(30,'(A)')'   FH_SUM is the sum of f from higher states to the given state.'
+	  WRITE(30,'(A)')'   AH_SUM is the sum of A from higher states to the given state.'
+	  WRITE(30,'(A)')' These sums may be weighted by the statistical weights.'
+	  USE_G_WEIGHTING=.FALSE.
+	  CALL GEN_IN(USE_G_WEIGHTING,'Weight f,A sums by g?')
+	  WRITE(30,'()')
+	  STRING='Name'
+	  
 	  IF(USE_G_WEIGHTING)THEN
-	    FLOW_SUM(I)=SUM(G(1:I-1)*FOSC(1:I-1,I))
-	    ALOW_SUM(I)=SUM(G(I)*FOSC(I,1:I-1))
-	    FHIGH_SUM(I)=SUM(G(I)*FOSC(I,I+1:NLEV))
-	    AHIGH_SUM(I)=SUM(G(I+1:NLEV)*FOSC(I+1:NLEV,I))
+	    WRITE(30,'(A,3X,3(X,A),8X,A,3X,4(3X,A,4X))')STRING(1:MAX_NAME_LNGTH),
+	1           'S','L','P','G','GFL_SUM','GFH_SUM','GAL_SUM','GAH_SUM'
 	  ELSE
-	    FLOW_SUM(I)=SUM(FOSC(1:I-1,I))
-	    ALOW_SUM(I)=SUM(FOSC(I,1:I-1))
-	    FHIGH_SUM(I)=SUM(FOSC(I,I+1:NLEV))
-	    AHIGH_SUM(I)=SUM(FOSC(I+1:NLEV,I))
+	     WRITE(30,'(A,3X,3(X,A),8X,A,3X,4(4X,A,4X))')STRING(1:MAX_NAME_LNGTH),
+	1           'S','L','P','G','FL_SUM','FH_SUM','AL_SUM','AH_SUM'
 	  END IF
-	  WRITE(30,'(A,T30,3(A,2X),3X,F5.0,4ES14.4)')TRIM(NAME(I)),LEV_SPIN(I),LEV_ANG(I),LEV_PARITY(I),
+	  WRITE(30,'()')
+!
+	  ALLOCATE (FLOW_SUM(NLEV))
+	  ALLOCATE (ALOW_SUM(NLEV))
+	  ALLOCATE (FHIGH_SUM(NLEV))
+	  ALLOCATE (AHIGH_SUM(NLEV))
+	  FLOW_SUM=0; FHIGH_SUM=0
+	  ALOW_SUM=0; AHIGH_SUM=0
+!
+	  DO I=1,NLEV
+	    IF(USE_G_WEIGHTING)THEN
+	      FLOW_SUM(I)=SUM(G(1:I-1)*FOSC(1:I-1,I))
+	      ALOW_SUM(I)=SUM(G(I)*FOSC(I,1:I-1))
+	      FHIGH_SUM(I)=SUM(G(I)*FOSC(I,I+1:NLEV))
+	      AHIGH_SUM(I)=SUM(G(I+1:NLEV)*FOSC(I+1:NLEV,I))
+	    ELSE
+	      FLOW_SUM(I)=SUM(FOSC(1:I-1,I))
+	      ALOW_SUM(I)=SUM(FOSC(I,1:I-1))
+	      FHIGH_SUM(I)=SUM(FOSC(I,I+1:NLEV))
+	      AHIGH_SUM(I)=SUM(FOSC(I+1:NLEV,I))
+	    END IF
+	    WRITE(30,'(A,3X,3(A,2X),3X,F5.0,4ES14.4)')NAME(I)(1:MAX_NAME_LNGTH),
+	1                  LEV_SPIN(I),LEV_ANG(I),LEV_PARITY(I),
 	1                  G(I),FLOW_SUM(I),FHIGH_SUM(I),ALOW_SUM(I),AHIGH_SUM(I)
-	END DO
-	CLOSE(UNIT=30)
+	  END DO
+	  CLOSE(UNIT=30)
+	END IF
 !
 	PACK=.TRUE.
 	PACK_LJ_STATES=.TRUE.
-	EMIN_PACK=0.0D0
-	CALL GEN_IN(PACK,'Pack states')
-	CALL GEN_IN(EMIN_PACK,'Pack when states above this energy')
+	EMIN_PACK=-1.0D0			!i.e. pack all states
+	CALL GEN_IN(PACK,'Pack states?')
+	CALL GEN_IN(EMIN_PACK,'Pack when states above this energy (in cm^{-1})')
 	CALL GEN_IN(PACK_LJ_STATES,'Pack states in intermediate coupling?')
 !
-	ALLOCATE (LEVEL_DONE(NLEV));LEVEL_DONE=.FALSE.
+	ALLOCATE (LEVEL_DONE(NLEV))
+	LEVEL_DONE=.FALSE.
+!
+! Write summary of levels with S, L & parity. Levels are groupe according to
+! their multiplet name.
+!
 	IF(PACK)THEN
-	  WRITE(45,'(X,A)')FORMFEED
-	  WRITE(45,'()')
+	  FILENAME='SLP_CHK_FOR_'//TRIM(ION_ID)
+	  OPEN(UNIT=30,STATUS='UNKNOWN',FILE=FILENAME)
+	  WRITE(30,'()')
+	  STRING='Level'
+	  WRITE(30,'(A,3X,3(2X,A))')STRING(1:MAX_NAME_LNGTH),'S','L','P'
 	  DO J=1,NLEV
 	    IF(.NOT. LEVEL_DONE(J))THEN
 	      DO I=J,NLEV
 	        IF(LS_NAME(J) .EQ. LS_NAME(I))THEN
-	          WRITE(30,'(A,T30,3(A,2X),3X,F5.0,4ES14.4)')TRIM(NAME(I)),LEV_SPIN(I),LEV_ANG(I),LEV_PARITY(I),
-	1                  G(I),FLOW_SUM(I),FHIGH_SUM(I),ALOW_SUM(I),AHIGH_SUM(I)
+	          WRITE(30,'(A,3X,3(2X,A))')NAME(I)(1:MAX_NAME_LNGTH),
+	1                                LEV_SPIN(I),LEV_ANG(I),LEV_PARITY(I)
 	          LEVEL_DONE(I)=.TRUE.
 	        END IF
 	      END DO
@@ -407,17 +422,17 @@
 ! Pack levels
 !
 	IF(PACK)THEN
-!
 	  F_TO_S(:)=0
 	  CNT=1
 !
 	  DO I=1,NLEV
+	    WRITE(41,*)I,ENERGY(I),EMIN_PACK
 	    IF(ENERGY(I) .GT. EMIN_PACK)THEN
 	      IMIN_PACK=I
 	      EXIT
 	    END IF
 	  END DO
-	  WRITE(6,*)'IMIN_PACK is ',IMIN_PACK
+	  WRITE(6,'(A,I5,A)')'Packing levels',IMIN_PACK,' and above.'
 !
 	  CNT=0
 	  DO I=1,IMIN_PACK-1
@@ -510,16 +525,12 @@
 	  DO I=1,CNT
 	    FOSC_PACK(I,:)=FOSC_TMP(VEC_INDX(I),:)
 	  END DO
-	  FOSC_PACK=FOSC_TMP
-	  DO J=1,CNT
-	    CALL SORTDP(CNT,FOSC_PACK(1,J),VEC_INDX,VEC_DP_WRK)
+	  FOSC_TMP=FOSC_PACK
+	  DO I=1,CNT
+	    FOSC_PACK(:,I)=FOSC_TMP(:,VEC_INDX(I))
 	  END DO
 	  WRITE(6,*)'Finished sorting levels'
 !
-	  WRITE(51,*)ION_EN,ZION
-	  DO I=1,CNT
-	    WRITE(51,*)TRIM(NAME_PACK(I)),G_PACK(I),EDGE_PACK(I)
-	  END DO
 	  ALLOCATE (KNOWN_ENERGY_LEVEL(CNT))
 	  ALLOCATE (ARAD(CNT))
 	  ALLOCATE (GAM2(CNT))
@@ -528,7 +539,7 @@
 	  ALLOCATE (SECND(CNT,CNT))
 	  ARAD=0.0D0; GAM2=0.0D0; GAM4=0.0D0
 	  KNOWN_ENERGY_LEVEL=.TRUE.
-	  FILENAME='PACK_CHK_FOR_'//TRIM(ION_ID)
+	  FILENAME=TRIM(ION_ID)//'_PACK'
 	  CALL WRITE_OSC_V2(FOSC_PACK,TRANS,SECND,EDGE_PACK,G_PACK,
 	1            NAME_PACK,ARAD,GAM2,GAM4,KNOWN_ENERGY_LEVEL,
 	1            ION_EN,ZION,LUIN,CNT,L_TRUE,L_TRUE,EN_DATE,
@@ -539,15 +550,16 @@
 	STOP
 	END
 !
+!
 	FUNCTION PARITY(NAME)
 	IMPLICIT NONE
-C
+!
 	CHARACTER*(*) NAME
 	CHARACTER*1 PARITY
-C
+!
 	EXTERNAL ICHRLEN
 	INTEGER ICHRLEN,J,T_OUT
-C
+!
 	T_OUT=6
 	J=INDEX(NAME,'[')-1
 	IF(J .LE. 0)J=ICHRLEN(NAME)
@@ -561,7 +573,7 @@ C
 	RETURN
 	END
 !
-!
+!
 	FUNCTION SPIN(NAME)
 	IMPLICIT NONE
 !
