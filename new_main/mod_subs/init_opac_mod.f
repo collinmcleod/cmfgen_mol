@@ -75,7 +75,5 @@
 	  END IF
 	END IF
 !
-	WRITE(LUER,*)'Initialized OPAC_MOD'
-!
 	RETURN
 	END

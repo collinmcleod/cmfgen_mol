@@ -355,7 +355,6 @@
 	CALL DET_MAIN_CONT_FREQ(NU,NCF,FQW,K,NU_EVAL_CONT,
 	1         V_DOP,DELV_CONT,COMPUTE_ALL_CROSS)
 !
-	WRITE(LUER,*)' '
 	WRITE(LUER,'(A,T40,I6)')' Number of line frequencies is:',N_LINE_FREQ
 	WRITE(LUER,'(A,T40,I6)')' Number of frequencies is:',NCF
 	WRITE(LUER,*)' '

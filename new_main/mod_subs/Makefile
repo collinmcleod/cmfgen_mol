@@ -12,22 +12,37 @@ LIB_MOD=$(LIB_DIR)libmod.a
 #
 MOD = $(LIB_MOD)(mod_cmfgen.o)\
       $(LIB_MOD)(ang_qw_mod.o)\
-      $(LIB_MOD)(opac_mod.o)\
+      $(LIB_MOD)(chg_exch_mod_v3.o)\
+      $(LIB_MOD)(cmf_sob_mod.o)\
       $(LIB_MOD)(control_variable_mod.o)\
+      $(LIB_MOD)(line_mod.o)\
+      $(LIB_MOD)(line_vec_mod.o)\
+      $(LIB_MOD)(mod_lev_dis_blk.o)\
+      $(LIB_MOD)(opac_mod.o)\
+      $(LIB_MOD)(radiation_mod.o)\
       $(LIB_MOD)(steq_data_mod.o)\
       $(LIB_MOD)(two_phot_mod.o)\
-      $(LIB_MOD)(mod_lev_dis_blk.o)\
-      $(LIB_MOD)(line_vec_mod.o)\
-      $(LIB_MOD)(chg_exch_mod_v3.o)
+      $(LIB_MOD)(var_rad_mod.o)
 
 OBJ = $(LIB)(adjust_r_grid_v2.o)\
       $(LIB)(adjust_den_vecs.o)\
+      $(LIB)(comp_j_blank.o)\
+      $(LIB)(comp_grey.o)\
       $(LIB)(comp_opac.o)\
       $(LIB)(comp_var_opac.o)\
+      $(LIB)(do_var_cont.o)\
+      $(LIB)(eval_lte_v4.o)\
       $(LIB)(init_opac_mod.o)\
+      $(LIB)(init_line_opac_var.o)\
       $(LIB)(rd_control_variables.o)\
+      $(LIB)(set_line_opac.o)\
+      $(LIB)(set_ang_qw.o)\
       $(LIB)(set_frequency_grid.o)\
-      $(LIB)(set_ang_qw.o)
+      $(LIB)(set_new_model_estimates.o)\
+      $(LIB)(set_abund_clump.o)\
+      $(LIB)(sub_cmf_line.o)\
+      $(LIB)(sub_sob_line.o)\
+      $(LIB)(sup_to_full_v4.o)
 
 all : $(LIB)
 	cp -f $(INSTALL_DIR)perm_mod_file jnk.mod
@@ -60,6 +75,52 @@ $(LIB)(comp_var_opac.o) : comp_var_opac.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_
 $(LIB)(rd_control_variables.o) : rd_control_variables.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)
 	$(F90) -c $(FG) rd_control_variables.f
 	ar ruv $(LIB) rd_control_variables.o
+
+$(LIB)(comp_j_blank.o) : comp_j_blank.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(ang_qw_mod.o)
+	$(F90) -c $(FG) comp_j_blank.f
+	ar ruv $(LIB) comp_j_blank.o
+                                                                                                                      
+$(LIB)(set_new_model_estimates.o) : set_new_model_estimates.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
+$(LIB_MOD)(line_mod.o) $(LIB_MOD)(line_vec_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(ang_qw_mod.o)
+	$(F90) -c $(FG) set_new_model_estimates.f
+	ar ruv $(LIB) set_new_model_estimates.o
+                                                                                                                      
+$(LIB)(do_var_cont.o) : do_var_cont.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
+$(LIB_MOD)(line_mod.o) $(LIB_MOD)(var_rad_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
+$(LIB_MOD)(ang_qw_mod.o)
+	$(F90) -c $(FG) do_var_cont.f
+	ar ruv $(LIB) do_var_cont.o
+                                                                                                                      
+$(LIB)(sub_cmf_line.o) : sub_cmf_line.f LINEGEN.INC $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
+$(LIB_MOD)(line_mod.o) $(LIB_MOD)(var_rad_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
+$(LIB_MOD)(cmf_sob_mod.o) $(LIB_MOD)(steq_data_mod.o) $(LIB_MOD)(ang_qw_mod.o) $(LIB_MOD)(line_vec_mod.o)
+	$(F90) -c $(FG) sub_cmf_line.f
+	ar ruv $(LIB) sub_cmf_line.o
+                                                                                                                      
+$(LIB)(sub_sob_line.o) : sub_sob_line.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
+$(LIB_MOD)(line_mod.o) $(LIB_MOD)(var_rad_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
+$(LIB_MOD)(cmf_sob_mod.o) $(LIB_MOD)(steq_data_mod.o) $(LIB_MOD)(ang_qw_mod.o) $(LIB_MOD)(line_vec_mod.o)
+	$(F90) -c $(FG) sub_sob_line.f
+	ar ruv $(LIB) sub_sob_line.o
+                                                                                                                      
+$(LIB)(set_line_opac.o) : set_line_opac.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
+$(LIB_MOD)(line_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(line_vec_mod.o)
+	$(F90) -c $(FG) set_line_opac.f
+	ar ruv $(LIB) set_line_opac.o
+                                                                                                                      
+$(LIB)(init_line_opac_var.o) : init_line_opac_var.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
+$(LIB_MOD)(line_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(var_rad_mod.o)
+	$(F90) -c $(FG) init_line_opac_var.f
+	ar ruv $(LIB) init_line_opac_var.o
+                                                                                                                      
+$(LIB)(set_abund_clump.o) : set_abund_clump.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)
+	$(F90) -c $(FG) set_abund_clump.f
+	ar ruv $(LIB) set_abund_clump.o
+                                                                                                                      
+$(LIB)(comp_grey.o) : comp_grey.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
+                                  $(LIB_MOD)(ang_qw_mod.o)
+	$(F90) -c $(FG) comp_grey.f
+	ar ruv $(LIB) comp_grey.o
 
 clean :
 	rm -f *.o 
