@@ -1223,6 +1223,7 @@ C
 	    WRITE(LUER,*)'N_CLUMP_PAR too large: N_CLUMP_PAR=',N_CLUMP_PAR
 	    STOP
 	  END IF
+	  CLUMP_PAR(:)=0.0D0
 	  DO I=1,N_CLUMP_PAR			!Should be less than 10
 	    TEMP_CHAR='CL_PAR_'
 	    WRITE(TEMP_CHAR(8:8),'(I1)')I
@@ -2213,7 +2214,7 @@ C
          ELSE IF(VELTYPE .EQ. 7)THEN
 	    CALL RD_RV_FILE_V2(R,V,SIGMA,RMAX,RP,VINF,LUIN,ND,VEL_OPTION,NUM_V_OPTS)
          ELSE IF(VELTYPE .EQ. 10)THEN
-	    CALL RV_SN_MODEL(R,V,SIGMA,RMAX,RP,VCORE,V_BETA1,LUIN,ND)
+	    CALL RV_SN_MODEL_V2(R,V,SIGMA,RMAX,RP,VCORE,V_BETA1,RDINR,LUIN,ND)
 	  ELSE
 	    WRITE(LUER,*)'Invalid Velocity Law'
 	    STOP
@@ -2245,9 +2246,11 @@ C CLUMP_PAR(1) is the clumping factor at infinity.
 C CLUMP_PAR(2) is a velcity, and determins how fast the clumping factor
 C approach CLUMP_PAR(1).
 C
+	    IF(CLUMP_PAR(3) .EQ. 0.0D0)CLUMP_PAR(4)=1.0D0
 	    DO K=1,ND
-	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
-	1                     EXP(-V(K)/CLUMP_PAR(2))
+	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1)-CLUMP_PAR(3))*
+	1                     EXP(-V(K)/CLUMP_PAR(2))+
+	1                     CLUMP_PAR(3)*EXP(-V(K)/CLUMP_PAR(4))
 	    END DO
 	  ELSE
 	    WRITE(LUER,*)'Error in CMFGEN'
@@ -3027,6 +3030,15 @@ C
 	      HBC_J=T2
 	      WRITE(LUER,'('' Maximum change in Grey F is '',1P,E11.4)')T1
 	    END DO
+!
+! This routine will supercede the one above, and included to zeor
+! order the ffect of the velocity field.
+!
+	    T2=1.0D-05		!Accuracy to converge f
+	    CALL JGREY_WITH_FVT(RJ,SOB,CHI,R,V,SIGMA,
+	1                  P,AQW,HMIDQW,KQW,NMIDQW,
+	1                  LUM,METHOD,DIF,IC,
+	1                  T2,ND,NC,NP)
 C
 C Compute the temperature distribution, and the Rossland optical depth scale.
 C NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert T from units of 
@@ -3278,14 +3290,7 @@ C
 !
 ! Associate charge exchange reactions with levels in the model atoms.
 !
-	DO ID=1,NUM_IONS-1
-	  ID_SAV=ID
-	  IF(ATM(ID)%XzV_PRES)THEN
-	    CALL SET_CHG_LEV_ID_V3(ID_SAV, ION_ID(ID), ATM(ID)%XzVLEVNAME_F,
-	1       ATM(ID)%F_TO_S_XzV, ATM(ID)%NXzV_F, ATM(ID)%NXzV, ND, ATM(ID)%ZXzV, 
-	1       ATM(ID)%EQXzV, ATM(ID)%EQXzVBAL, EQ_SPECIES(SPECIES_LNK(ID)))
-	  END IF
-	END DO
+	CALL SET_CHG_LEV_ID_V4(ND,LUMOD)
 	CALL VERIFY_CHG_EXCH_V3()
 !
 ! Determine the number of important variables for each species, and
@@ -5571,7 +5576,7 @@ C
 	DO ID=1,NUM_IONS-1
 	  ID_SAV=ID
 	  IF(ATM(ID)%XzV_PRES)THEN
-	    CALL SET_CHG_EXCH_V3(ID_SAV, ATM(ID)%XzVLEVNAME_F,
+	    CALL SET_CHG_EXCH_V4(ID_SAV, ATM(ID)%XzVLEVNAME_F,
 	1       ATM(ID)%EDGEXzV_F,  ATM(ID)%GXzV_F,
 	1       ATM(ID)%F_TO_S_XzV, ATM(ID)%GIONXzV_F, 
 	1       ATM(ID)%NXzV_F, ATM(ID)%NXzV, ND, 
@@ -7440,7 +7445,7 @@ C
 ! We adjust MAXCH to ensure that NUM_ITS_TO_DO is not set to 1.
 !
 	  IF(XRAYS .AND. ADD_XRAYS_SLOWLY .AND. RD_LAMBDA .AND. MAXCH .LT. 100)THEN
-	     IF(FILL_FAC_XRAYS_1 .NE. FILL_X1_SAV .AND.  FILL_FAC_XRAYS_2 .NE. FILL_X2_SAV)THEN
+	     IF(FILL_FAC_XRAYS_1 .NE. FILL_X1_SAV .OR.  FILL_FAC_XRAYS_2 .NE. FILL_X2_SAV)THEN
 	       FILL_FAC_XRAYS_1=MIN(FILL_FAC_XRAYS_1*SLOW_XRAY_SCL_FAC,FILL_X1_SAV)
 	       FILL_FAC_XRAYS_2=MIN(FILL_FAC_XRAYS_2*SLOW_XRAY_SCL_FAC,FILL_X2_SAV)
 	       WRITE(LUER,*)'Have adjuseted X-ray values closer to the desired values'
