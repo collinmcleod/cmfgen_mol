@@ -8,7 +8,11 @@ C
 	1                     HN_A,HNST_A,N_A,HN_B,HNST_B,N_B,
 	1                     JREC,JPHOT,JREC_CR,JPHOT_CR,INIT_ARRAYS,ND,FLAG)
 	IMPLICIT NONE
-C
+!
+! Altered 12-Oct-2003 : If JREC is zero, the recombination term is not computed.
+!                         This is to avoid floating overflows at low temperatures.
+!                         In practice, the X-ray recombination term will be effectively zero
+!                           at such temperatures, and hence can be neglected.
 C Altered 11-Jun-2002 : Bug fix: Factor of H was dropped from X_BFCR.
 C Altered 14-May-2001 : Bug fixed. Arrays were not being initialized
 C                         correctly. Using continuum bands, ML may not be
@@ -60,10 +64,13 @@ C
 C IF WSE_X_A(I,1) is zero, then it is zero for all depths since the weights
 C are depth independent.
 C
+! The check on A1 prevents overflow.
+!
 	DO I=1,N_A
 	  IF(WSE_X_A(I,1) .NE. 0)THEN
 	    DO J=1,ND
-	      A1=HNST_A(I,J)*HNST_B(1,J)/HN_B(1,J)
+	      A1=0.0D0
+	      IF(JREC(J) .NE. 0)A1=HNST_A(I,J)*HNST_B(1,J)/HN_B(1,J)
 	      NET_X_RR(J)=NET_X_RR(J) + 
 	1       WSE_X_A(I,J)*( A1*JREC(J)-HN_A(I,J)*JPHOT(J) )
 	      X_BFCR(J)=X_BFCR(J)   +   
