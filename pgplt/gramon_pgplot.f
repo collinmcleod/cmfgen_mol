@@ -288,6 +288,7 @@
 !
 	LINE_STYLE(:)=1
 	LINE_WGT(:)=1
+	DASH=.FALSE.
 !
 ! Assign a color index to each pen. Keep previus assignments if they have been
 ! made.
@@ -1454,6 +1455,9 @@ C
 	    LINE_STYLE(IP)=1
 	    PEN_COL(IP)=2
 	  END IF
+	  LINE_STYLE(IP)=1
+	  IF(DASH)LINE_STYLE(IP)=MOD(IP-1,5)+1
+!
 	  CLOSE(UNIT=30)
 	  GOTO 1000
 !
@@ -1776,6 +1780,7 @@ C
 	      ELSE
 	        T1=T1/T2
 	        T3=MEAN/T1
+	        WRITE(6,*)'Normalization parameter for plot',IP,' is',T3
 	        DO J=1,NPTS(IP)
 	          CD(IP)%DATA(J)=CD(IP)%DATA(J)*T3
 	        END DO
