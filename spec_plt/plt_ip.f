@@ -55,15 +55,28 @@
 !
 	REAL*4, ALLOCATABLE :: XV(:)
 	REAL*4, ALLOCATABLE :: YV(:)
+	REAL*4, ALLOCATABLE :: WV(:)
 	REAL*4, ALLOCATABLE :: ZV(:)
 !
 	CHARACTER*80 NAME		!Default title for plot
 	CHARACTER*80 XAXIS,XAXSAV	!Label for Absisca
 	CHARACTER*80 YAXIS		!Label for Ordinate
 !
+	REAL*8 SCALE_FAC
+	REAL*8 RAD_VEL
+	REAL*8 ADD_FAC
+	REAL*8 WT(30)
+	INTEGER*4 NCF_MAX
+	INTEGER*4 IST,IEND
+	INTEGER*4 OBS_COLS(2)
+	LOGICAL SMOOTH
+	LOGICAL CLEAN
+	LOGICAL NON_MONOTONIC
+!
 	REAL*8 ANG_TO_HZ
 	REAL*8 KEV_TO_HZ
 	REAL*8 C_CMS
+	REAL*8 C_KMS
 !
 	LOGICAL LOG_X,LOG_Y
 	CHARACTER*10 Y_PLT_OPT,X_UNIT
@@ -77,14 +90,25 @@
 	REAL*8 SLIT_WIDTH		!arcseconds
 	REAL*8 PIXEL_LENGTH		!arcseconds
 !
+	REAL*8 X_CENT
+	REAL*8 Y_CENT
+	REAL*8 S_WIDTH
+	REAL*8 S_LNGTH
+	REAL*8 APP_SIZE
+!
 ! Miscellaneous variables.
 !
 	INTEGER*4 IOS			!Used for Input/Output errors.
 	INTEGER*4 I,J,K,L,ML
 	INTEGER*4 ST_REC
 	INTEGER*4 REC_LENGTH
+	INTEGER*4 NX
+	INTEGER*4 NINS
+	INTEGER*4 K_ST,K_END
 	REAL*8 T1,T2
 	REAL*8 LAMC
+	REAL*8 DELV
+	REAL*8 FRAC
 	REAL*8 PI
 	REAL*8 T_ELEC
 	LOGICAL AIR_LAM
@@ -134,6 +158,7 @@
 	EMLIN=5.27296E-03
 !
 	C_CMS=SPEED_OF_LIGHT()
+	C_KMS=1.0D-05*C_CMS
 	PI=ACOS(-1.0D0)
 !
 ! Set defaults.
@@ -422,7 +447,8 @@
 	  J=INDEX(YAXIS,')')
 	  YAXIS(J:)=' Jy'
 !
-	ELSE IF(X(1:2) .EQ. 'IP' .OR. X(1:2) .EQ. 'FP')THEN
+	ELSE IF(X(1:2) .EQ. 'IP' .OR. X(1:2) .EQ. 'FP' .OR.
+	1          X(1:3) .EQ. 'FAP')THEN
 	  CALL USR_OPTION(I,'P',' ','Impact parameter index')
 	  IF(I .GT. NP)THEN
 	    WRITE(T_OUT,*)'Invalid depth; maximum value is',NP
@@ -442,11 +468,19 @@
 	  XV(1:NCF)=NU(1:NCF)
 	  YV(1:NCF)=IP(I,1:NCF)
 !
-! Convert to per/pixel
+! 2.3504D-11 = (AU[cm])^2 / d(cm)^2
 !
 	  IF(X(1:2) .EQ. 'FP')THEN
+!
+! Convert to flux per/pixel
+!
 	    YV=YV*SLIT_WIDTH*PIXEL_LENGTH*2.3504D-11
-	    YAXIS='F'
+!
+	  ELSE IF(X(1:3) .EQ. 'FAP')THEN
+!
+! Convert to flux per/arcsecond.
+!
+	    YV=YV*2.3504D-11
 	  END IF
 !
 ! NB: J and I have the same units, apart from per steradian/
@@ -456,17 +490,116 @@
 !
 	  J=INDEX(YAXIS,'J')
 	  IF(X(1:2) .EQ. 'FP')THEN
-	    YAXIS(J:J)='F'
-	    J=INDEX(YAXIS,')')
-	    YAXIS(J:)=' pixel\u-1\d)'
+            IF(Y_PLT_OPT .EQ. 'FNU')THEN
+	      YAXIS='F(Jy\d \upixel\u-1\d)'
+              IF(LOG_Y)YAXIS='Log F(Jy\d \upixel\u-1\d)'
+	      YV(1:NCF)=YV(1:NCF)*1.0D+23
+	    END IF
+	  ELSE IF(X(1:3) .EQ. 'FAP')THEN
+            IF(Y_PLT_OPT .EQ. 'FNU')THEN
+	      YAXIS='F(Jy\d \uarcsec\u-2\d)'
+              IF(LOG_Y)YAXIS='Log F(Jy\d \uarcsec\u-2\d)'
+	      YV(1:NCF)=YV(1:NCF)*1.0D+23
+	    END IF
 	  ELSE
 	    YAXIS(J:J)='I'
 	    J=INDEX(YAXIS,')')
 	    YAXIS(J:)=' \gW\u-1\d)'
 	  END IF
-	  
 !
 	  CALL CURVE(NCF,XV,YV)
+!
+	ELSE IF(X(1:4) .EQ. 'SZ')THEN
+	  CALL USR_OPTION(T1,'Lambda',' ','Start wavelength in Ang')
+	  T1=0.299794D+04/T1
+          I=GET_INDX_DP(T1,NU,NCF)
+	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
+!
+	  CALL USR_OPTION(T1,'Lambda',' ','End wavelength in Ang')
+	  T1=0.299794D+04/T1
+          J=GET_INDX_DP(T1,NU,NCF)
+	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
+!
+	  CALL USR_OPTION(DELV,'/\V','0.0D0','Smoothing size in km/s')
+	  CALL USR_OPTION(FRAC,'/\V','0.5D0',
+	1            'Fraction used to define radius (0<FRAC<1)')
+!
+	  K_ST=MIN(I,J)
+	  K_END=MAX(I,J)
+	  NX=K_END-K_ST+1
+!
+	  IF(ALLOCATED(XV))DEALLOCATE(XV)
+	  IF(ALLOCATED(YV))DEALLOCATE(YV)
+	  IF(ALLOCATED(ZV))DEALLOCATE(WV)
+	  IF(ALLOCATED(ZV))DEALLOCATE(ZV)
+	  ALLOCATE (XV(NX))
+	  ALLOCATE (YV(NX))
+	  ALLOCATE (ZV(NP))
+	  ALLOCATE (WV(NP))
+!
+          WRITE(6,*)'Allocated arrays'
+          WRITE(6,*)K_ST,K_END
+          WRITE(6,*)NU(1),NU(NCF)
+          WRITE(6,*)DELV
+!
+	  DO K=K_ST,K_END
+	    XV(K-K_ST+1)=0.299794D+04/NU(K)
+!
+	    IF(DELV .EQ. 0.0D0)THEN
+	      ZV(1:NP)=IP(1:NP,K)
+	    ELSE
+	      ZV(:)=0.0D0
+	      DO ML=K-1,1,-1
+	        IF( C_KMS*(NU(ML)/NU(K)-1.0D0) .GT. DELV)EXIT
+                ZV(1:NP)=ZV(1:NP)+0.5D0*(NU(ML)-NU(ML+1))*(IP(1:NP,ML)+IP(1:NP,ML+1))
+	      END DO
+	      DO ML=K+1,NCF
+	        IF( C_KMS*(NU(K)/NU(ML)-1.0D0) .GT. DELV)EXIT
+                ZV(1:NP)=ZV(1:NP)+0.5D0*(NU(ML-1)-NU(ML))*(IP(1:NP,ML)+IP(1:NP,ML-1))
+	      END DO
+	    END IF
+!
+	    WV(1:NP)=0.0D0
+	    DO I=1,NP-1
+	      T1=0.5D0*(P(I)*ZV(I)+P(I+1)*ZV(I+1))*(P(I+1)-P(I))
+	      WV(I+1)=WV(I)+T1
+	    END DO
+!
+	    T1=WV(NP)
+	    DO I=2,NP
+	      WV(I-1)=WV(I)/T1
+	    END DO
+!
+! If FRAC=0.8, we get the radius below which 80% of the light is emitted.
+!
+	    DO I=2,NP
+	      IF(WV(I) .GT. FRAC)THEN
+                 T1=(FRAC-WV(I-1))/(WV(I)-WV(I-1))
+	         YV(K-K_ST+1)=(1.0D0-T1)*P(I-1)+T1*P(I)
+	         EXIT
+	      END IF
+	    END DO
+!
+	  END DO 
+!
+          WRITE(6,*)'Found radii'
+!
+	  CALL USR_OPTION(USE_ARCSEC,'Arcsec','T','Use arcseconds?')
+!
+	  IF(USE_ARCSEC)THEN
+	    T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	    DO K=1,NX
+	      YV(K)=LOG10(YV(K)*T1)
+	    END DO
+	    YAXIS='Log P(")'
+	  ELSE
+	    T2=R(ND)
+	    YV(1:NX)=LOG10(YV(1:NX)/T2)
+	    YAXIS='Log P/R\d*\u'
+	  END IF
+	  XAXIS='\gl(\V)'
+!
+	  CALL CURVE(NX,XV,YV)
 !
 	ELSE IF(X(1:4) .EQ. 'IF2')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Start wavelength in Ang')
@@ -630,6 +763,175 @@
 !
 	  YAXIS='I(ergs cm\u-2\d s\u-1\d steradian\u-1\d)' 
 	  CALL CURVE(ND,XV,YV)
+! 
+!
+! Read in observation data as done in PLT_SPEC
+!
+	ELSE IF(X(1:6) .EQ. 'RD_OBS')THEN
+	  FILENAME=' ' 
+	  CALL USR_OPTION(FILENAME,'File',' ',' ')
+!
+	  SCALE_FAC=1.0D0
+	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
+	  ADD_FAC=0.0D0
+	  CALL USR_HIDDEN(ADD_FAC,'ADD','0.0D0',' ')
+!
+	  RAD_VEL=0.0D0
+	  CALL USR_HIDDEN(RAD_VEL,'RAD_VEL','0.0D0',
+	1             'Radial velcoity (+ve if away)')
+!
+	  CLEAN=.FALSE.
+	  CALL USR_HIDDEN(CLEAN,'CLEAN','F',' ')
+!
+	  SMOOTH=.FALSE.
+	  CALL USR_HIDDEN(SMOOTH,'SMOOTH','F',' ')
+!
+	  IF(SMOOTH)THEN
+	    K=5
+	    CALL USR_OPTION(K,'HAN','5','Number of points for HAN [ODD]')
+	    K=2*(K/2)+1 !Ensures odd.
+	  END IF
+!
+	  IF(ALLOCATED(XV))DEALLOCATE(XV)
+	  IF(ALLOCATED(YV))DEALLOCATE(YV)
+	  IF(ALLOCATED(ZV))DEALLOCATE(ZV)
+	  NCF_MAX=100000
+	  ALLOCATE (XV(NCF_MAX))
+	  ALLOCATE (YV(NCF_MAX))
+!
+	  CALL USR_HIDDEN(OBS_COLS,2,2,'COLS','1,2','Columns with data')
+	  CALL RD_OBS_DATA_V2(XV,YV,NCF_MAX,J,FILENAME,OBS_COLS,IOS)
+	  IF(IOS .NE. 0)GOTO 1          !Get another option
+	  DO I=1,J
+	    XV(I)=ANG_TO_HZ/XV(I)
+	    YV(I)=YV(I)*SCALE_FAC+ADD_FAC
+	  END DO
+!
+	  IF(RAD_VEL .NE. 0)THEN
+	    DO I=1,J
+	      XV(I)=XV(I)*(1.0D0-1.0D+05*RAD_VEL/C_CMS)
+	    END DO
+	  END IF
+!
+! Procdure to remove single pizels that are zero due quirks with IUE.
+!
+	  IF(CLEAN)THEN
+	    DO I=1,J
+	      ZV(I)=YV(I)
+	    END DO
+	    DO I=2,J-1
+	      IF(YV(I) .EQ. 0)THEN
+	        YV(I)=0.5D0*(ZV(I-1)+ZV(I+1))
+	      END IF
+	    END DO
+	  END IF
+!
+! We check whether the X axis is monotonic. If not, we smooth each section
+! separately. Designed for non-merged overlapping ECHELLE orders.
+!
+	  NON_MONOTONIC=.FALSE.
+	  IF(SMOOTH)THEN
+	    T2=XV(2)-XV(1)
+	    DO I=1,J-1
+	      IF( (XV(I)-XV(I+1))*T2 .LT. 0)THEN
+	        NON_MONOTONIC=.TRUE.
+	        EXIT
+	      END IF
+	    END DO
+	  END IF
+!
+          IF(SMOOTH .AND. NON_MONOTONIC)THEN
+	    ALLOCATE (ZV(J))
+            ZV(1:J)=YV(1:J)
+            DO I=1,K
+              WT(I)=FAC(K-1)/FAC(I-1)/FAC(K-I)
+            END DO
+            IST=1
+            IEND=0
+            T2=XV(2)-XV(1)
+            DO WHILE(IEND .LT. J)
+              IEND=J
+              DO I=IST,J-1
+                IF( (XV(I+1)-XV(I))*T2 .LT. 0)THEN
+                  IEND=I
+                  EXIT
+                END IF
+              END DO
+              WRITE(6,*)IST,IEND
+              DO I=IST,IEND
+                T1=0.0D0
+                YV(I)=0.0D0
+                DO L=MAX(IST,I-K/2),MIN(IEND,I+k/2)
+                  ML=L-I+K/2+1
+                  T1=T1+WT(ML)
+                  YV(I)=YV(I)+ZV(L)*WT(ML)
+                END DO
+                YV(I)=YV(I)/T1
+              END DO
+              IST=IEND+1
+            END DO
+          ELSE IF(SMOOTH)THEN
+            DO I=1,J
+              ZV(I)=YV(I)
+            END DO
+            DO I=1,K
+              WT(I)=FAC(K-1)/FAC(I-1)/FAC(K-I)
+            END DO
+            DO I=1,J
+              T1=0.0D0
+              YV(I)=0.0D0
+              DO L=MAX(1,I-K/2),MIN(J,I+k/2)
+                ML=L-I+K/2+1
+                T1=T1+WT(ML)
+                YV(I)=YV(I)+ZV(L)*WT(ML)
+              END DO
+              YV(I)=YV(I)/T1
+            END DO
+          END IF
+!
+	  CALL CNVRT(XV,YV,J,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	1                 LAMC,XAXIS,YAXIS,L_FALSE)
+          CALL CURVE(J,XV,YV)
+!
+	ELSE IF(X(1:2) .EQ. 'SQ')THEN
+	  CALL USR_OPTION(X_CENT,'XC','0.0D0','X center of aperture (across width)')
+	  CALL USR_OPTION(Y_CENT,'YC','0.0D0','Y center of aperture (along length)')
+	  CALL USR_OPTION(S_WIDTH,'SW','0.1D0','Slit width (arcsec)')
+	  CALL USR_OPTION(S_LNGTH,'SL','0.2D0','Slit length (arcsec)')
+	  APP_SIZE=S_WIDTH*S_LNGTH 		!In square arcseconds
+	  CALL USR_OPTION(NINS,'NINS','2','# of points to insert to improve accuracy')
+!
+	  T1=1.0D+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	  X_CENT=X_CENT/T1	
+	  Y_CENT=Y_CENT/T1	
+	  S_WIDTH=S_WIDTH/T1	
+	  S_LNGTH=S_LNGTH/T1	
+!
+	  IF(ALLOCATED(XV))DEALLOCATE(XV)
+	  IF(ALLOCATED(YV))DEALLOCATE(YV)
+	  ALLOCATE (XV(NCF))
+	  ALLOCATE (YV(NCF))
+	  XV(1:NCF)=NU(1:NCF)
+!
+	  WRITE(6,*)'Calling INT_SEQ'
+	  WRITE(6,*)X_CENT,Y_CENT,S_WIDTH,S_LNGTH
+	  CALL INT_REC_AP(IP,P,YV,X_CENT,Y_CENT,S_WIDTH,S_LNGTH,
+	1               NP,NCF,NINS)
+!
+! NB: J and I have the same units, apart from per steradian/
+!
+	  CALL CNVRT_J(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	1         LAMC,XAXIS,YAXIS,L_FALSE)
+!
+	  T2=1.0D+03*PARSEC()*DISTANCE
+	  T1=1.0D+20/T2/T2/APP_SIZE
+	  YV(1:NCF)=YV(1:NCF)*T1
+          IF(Y_PLT_OPT .EQ. 'FNU')THEN
+	    YV(1:NCF)=YV(1:NCF)*1.0D+23
+	    YAXIS='F(Jy\d \uarcsec\u-2\d)'
+            IF(LOG_Y)YAXIS='Log F(Jy\d \uarcsec\u-2\d)'
+	  END IF
+	  CALL CURVE(NCF,XV,YV)
 !
 ! 
 ! Plot section:
