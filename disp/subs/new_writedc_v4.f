@@ -5,6 +5,7 @@ C
 	1               DO_DPTH,LUM,ND,FILENAME,OPTION,FORM)
 	IMPLICIT NONE
 C
+C 20-jan-2004 - Changed so that inner boundary radius can also be omitted.
 C 28-May-2003 - Minor bug fix: Now correctly omits depths for TX and POP options.
 C 20-Jul-2002 - ' qutes installed to avoid breaking strings across lines (FORM).
 C 19-Jun-2000 - DO_DPTH inserted (changed to V4)
@@ -31,6 +32,7 @@ C
 	CHARACTER*30 NEWNAME
 	CHARACTER*90 FMT
 !
+	REAL*8 RCORE
 	REAL*8 T1,T2,DELTA_T
 	REAL*8 TEXCITE(NHYD)
 	INTEGER*4 I,J,COUNT,ND_CNT
@@ -64,11 +66,14 @@ C
 !
 	    ND_CNT=0
 	    DO I=1,ND
-	      IF(DO_DPTH(I))ND_CNT=ND_CNT+1
+	      IF(DO_DPTH(I))THEN
+	        ND_CNT=ND_CNT+1
+	        RCORE=R(I)
+	      END IF
 	    END DO
 !
 	    WRITE(9,'(/,X,A,T40,A)')'07-Jul-1997','!Format date'
-	    WRITE(9,2120)R(ND),LUM,NHYD,ND_CNT
+	    WRITE(9,2120)RCORE,LUM,NHYD,ND_CNT
 	    IF(OPTION .EQ. 'DC')THEN
 	      DO I=1,ND
 	        IF(DO_DPTH(I))THEN
