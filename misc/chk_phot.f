@@ -189,13 +189,15 @@
 	ION_ID=' '
 	CALL GEN_IN(ION_ID,'Ionization identification (e.g., CIV)')
 !
-	LUER=ERROR_LU()
+	LUER=2      !ERROR_LU()
+	WRITE(6,*)LUER
 	FILENAME='ERROR_CHK_FOR_'//TRIM(ION_ID)
 	OPEN(UNIT=LUER,FILE=FILENAME,STATUS='UNKNOWN')
 !
 ! Read in the gaunt factors for individual l states of hydrogen.
 !
 	CALL RD_HYD_BF_DATA(LUIN,LUOUT,T_OUT)
+	WRITE(6,*)'Successfully read in hydrogenic data'
 !  
 ! Read in Level Names and Energies from file containing oscillator
 ! strengths. This also returns the total number of levels in the
