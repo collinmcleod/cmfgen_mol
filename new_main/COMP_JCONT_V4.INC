@@ -2,6 +2,7 @@ C
 C Program section to compute the continuum intnesity. Opacities must have
 C previuosly been evaluated.
 C
+C Altered -0-Feb-2004 - Bug fixed in Eddington section, which is no longer used.
 C Altered 21-Apr-2001 - J [ TC(NDEXT) ] was not being output to J_COMP correctly
 C                         when extra points were being inserted. Now access
 C                         TC(NDEXT), and use it before TC is corrupted.
@@ -695,7 +696,7 @@ C
 	    END DO
 C
 	    DO I=1,ND
-	      K_MOM(I)=K_MOM(I)*FEDD(I)
+	      K_MOM(I)=RJ(I)*FEDD(I)
 	    END DO
 C
 C Output mean intensity for subsequent iterations.

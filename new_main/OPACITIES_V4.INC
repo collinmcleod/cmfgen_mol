@@ -27,7 +27,8 @@ C
 C Compute continuum intensity incident from the core assuming a TSTAR
 C blackbody.
 C
-	  IC=TWOHCSQ*(CONT_FREQ**3)/(EXP(HDKT*CONT_FREQ/TSTAR)-1.0D0)
+          T1=EXP(-HDKT*CONT_FREQ/TSTAR)
+	  IC=TWOHCSQ*T1*(CONT_FREQ**3)/(1.0D0-T1)
 C
 C Compute opacity and emissivity. ESOPAC must be call first since
 C CHI is effectively zeroed in that routine.
@@ -84,7 +85,8 @@ C
 C Compute continuum intensity incident from the core assuming a TSTAR
 C blackbody.
 C
-	  IC=TWOHCSQ*(FL**3)/(EXP(HDKT*FL/TSTAR)-1.0D0)
+          T1=EXP(-HDKT*FL/TSTAR)
+	  IC=TWOHCSQ*T1*(FL**3)/(1.0D0-T1)
 C
 C We assume that the photoionization cross-section has not changed since the
 C last iteration. Using the result that the stimulated emission occurs in
