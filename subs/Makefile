@@ -151,7 +151,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(rite_asc.o)\
       $(LIB)(rite_atmdes_v2.o)\
       $(LIB)(rite_gam_v2.o)\
-      $(LIB)(rv_sn_model.o)\
+      $(LIB)(rv_sn_model_v2.o)\
       $(LIB)(s15adf.o)\
       $(LIB)(same_n.o)\
       $(LIB)(scale_grey.o)\
