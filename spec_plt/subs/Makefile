@@ -10,8 +10,10 @@ LIB=$(LIB_DIR)libspec.a
 # or if the libraries have changed since the last link.
 #
 OBJ    = $(LIB)(convolve.o)\
+         $(LIB)(do_int_rec_ap.o)\
          $(LIB)(hiabs.o)\
          $(LIB)(h2abs.o)\
+         $(LIB)(int_rec_ap.o)\
          $(LIB)(is_line_abs.o)\
          $(LIB)(num_rec.o)\
          $(LIB)(uvabs.o)\
