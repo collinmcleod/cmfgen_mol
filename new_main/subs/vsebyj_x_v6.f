@@ -14,11 +14,15 @@
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 12-Oct-2003 : If JREC is zero, the recombination term is not computed.
+!                         This is to avoid floating overflows at low temperatures.
+!                         In practice, the X-ray recombination term will be effectively zero
+!                           at such temperatures, and hence can be neglected.
 ! Altered 15-May-2001 : Changed to V5; Uses JREC, JPHOT and dJRECdT
 ! Altered 12-Apr-2001 : Changed to use STEQ_DATA_MOD.
 !                       Changed to V5.
 ! Altered 27-OCt-1995 : Changed to be compatible with super levels.
-!                        Call chnaged --- Now _V3.
+!                        Call changed --- Now _V3.
 ! Altered 06-Mar-1995 : Dimensions of WSE_X changed to (N,ND) from (N,NCF).
 !                       _V2 append to call.
 ! Testing 22-Jul-1994 : Minor mods.
@@ -76,8 +80,13 @@
 	ION_V=SE(ID)%LNK_TO_IV(ION_EQ_IN_BA)
 !
 	DO I=DST,DEND			!Which depth point.
-	  RECIP_B_ION=HNST_B(1,I)/HN_B(1,I)
-	  BSTIM=JREC(I)*RECIP_B_ION
+	  IF(JREC(I) .NE. 0.0D0)THEN
+	    RECIP_B_ION=HNST_B(1,I)/HN_B(1,I)
+	    BSTIM=JREC(I)*RECIP_B_ION
+	  ELSE
+	    RECIP_B_ION=0.0D0
+	    BSTIM=0.0D0
+	  END IF
 	  DO J=1,N_A			!Which equation (for S.E. only)
 	    IF(WSE_X(J,I) .NE. 0)THEN
 	      WSE_BY_RJ=WSE_X(J,I)*JPHOT(I)

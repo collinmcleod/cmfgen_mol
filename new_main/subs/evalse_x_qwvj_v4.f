@@ -16,6 +16,10 @@
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 12-Oct-2003 : If JREC is zero, the recombination term is not computed.
+!                         This is to avoid floating overflows at low temperatures.
+!                         In practice, the X-ray recombination term will be effectively zero
+!                           at such temperatures, and hence can be neglected.
 ! Altered 12-Apr-2001 : Changed to utilize STEQ_DATA_MOD
 !                       Changed to V4.
 ! Altered 17-Sep-1997 : QFV matix split into QFV_R and QFV_B so that a
@@ -57,7 +61,8 @@
 	REAL*8 J_B_ION,B_ION
 !
 	ION_EQ=SE(ID)%XRAY_EQ
-	 ION_V=SE(ID)%LNK_TO_IV(ION_EQ_IN_BA)
+	ION_V=SE(ID)%LNK_TO_IV(ION_EQ_IN_BA)
+	IF(SUM(WSE_X) .EQ. 0D0)RETURN
 !
 ! Note that the product HNST_A(j, )*HNST_B(1, )/HN_B(1, ) is effectively the
 ! LTE population  of the state j with respect to the g.s. of the (I+2)th
@@ -67,8 +72,13 @@
 	  SUM_SE=0.0D0
 	  SUM_VJ_R=0.0D0
 	  SUM_VJ_P=0.0D0
-	  B_ION=HNST_B(1,J)/HN_B(1,J)		!1/b
-	  J_B_ION=JREC(J)*B_ION
+	  IF(JREC(J) .NE. 0.0D0)THEN
+	    B_ION=HNST_B(1,J)/HN_B(1,J)		!1/b
+	    J_B_ION=JREC(J)*B_ION
+	  ELSE
+	    B_ION=0.0D0
+	    J_B_ION=0.0D0
+	  END IF
 	  DO I=1,N_A
 	    NETR=WSE_X(I,J)*( HNST_A(I,J)*J_B_ION-HN_A(I,J)*JPHOT(J) )
 	    SUM_SE  =SUM_SE+NETR
