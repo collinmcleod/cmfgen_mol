@@ -961,6 +961,10 @@ c altered  3/17/97  DLM  Change open() to generic gen_asci_open
 c                        Use upper_case instead of condit_string to create all
 c                        capital letter string
 c
+c altered 27/01/04  DJH  Installed FILE_SHOULD_EXIT variable so that routine
+c                        does not create a sve file when using the .option.
+c                        Designed to prevent the creation of empty .sve files.
+c 
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       use mod_sve_file
@@ -971,6 +975,7 @@ c
       character(len=*) :: answer
       character(len=120) :: filename,ending,all_caps
 c
+      logical :: file_should_exist
       logical :: present
 c
       external upper_case
@@ -989,10 +994,12 @@ c
 c Determine start and end of filename to open and
 c the ending (.sve or .box)
 c
+      file_should_exist=.false.
       if(answer(1:1).eq.'.')then
         o_start=2
         ending=".sve"
         unit=unit_sve
+        file_should_exist=.true.
       elseif(answer(1:1).eq.'#')then
         o_start=2
         ending=".box"
@@ -1038,12 +1045,15 @@ c
       else
         filename=answer(o_start:o_end)//trim(ending)
       endif
+!
       inquire(file=filename,exist=present)
+      if(file_should_exist .and. .not. present)then
+        return
+      end if
 c
       call gen_asci_open(unit,filename,'unknown',' ',' ',0,ios)
       if(ios.ne.0)
      *     print*,' error opening file ',trim(filename)
-c
       return
 c
       end subroutine open_sve_file

@@ -583,6 +583,9 @@ c                          use another variable, all_caps, to create
 c                          an all upper case string (SGI will allow
 c                          change to var_name, but VMS will not!).
 c
+c  altered  27/01/04  DJH  Changed to prevent .XXX option creating
+c                          an empty .sve file when it doesn't exist.
+c  
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       implicit none
@@ -617,7 +620,20 @@ c
       endif
       read(*,"(a)")answer
       call post_sve_file(answer,all_caps,present)
-      if(.not.present)goto 300
+c
+!     if(.not.present)goto 300
+c
+c If the conditions in the if statement are met, we are trying to read
+c in the options through a .sve file which does not exist.
+c
+      if(.not. present .and. answer(1:1) .eq. '.' .and. 
+     *    description .eq. ' ')then
+          answer=' '
+          return
+      else if(.not. present)then
+        goto 300
+      end if
+c
  400  l=len_trim(answer)
       if(answer .eq. '""')then
         input=' '
