@@ -1276,6 +1276,12 @@ C
 	  END DO
 
 	ELSE IF(X(1:3) .EQ. 'MAG')THEN
+!
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'The magnitudes computed here are NOT accurate.'
+	  WRITE(T_OUT,*)'Filter convolutions need to be implemented.'
+	  WRITE(T_OUT,*)'Originally designed for crude estimates using continuum fluxe.s'
+	  WRITE(T_OUT,*)' '
 	  DIST=1.0
 	  CALL USR_OPTION(DIST,'DIST','1.0D0',' (in kpc) ')
 	  CALL GEN_ASCI_OPEN(LU_OUT,'MAG','UNKNOWN',' ',' ',IZERO,IOS)

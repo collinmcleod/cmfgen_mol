@@ -4579,6 +4579,70 @@ C
 	1     'NB: Mean opacities do not include effect of clumping',
 	1     'NB: Optical depth scale includes effect of clumping'
 	CLOSE(UNIT=LU_OPAC)
+!
+	IF(LST_ITERATION)THEN
+	  CHI(1:ND)=ROSSMEAN(1:ND)*CLUMP_FAC(1:ND)
+	  IF(JGREY_WITH_V_TERMS)THEN
+!
+! This routine will supercede the one above, and included to zeor
+! order the effect of the velocity field.
+!
+	    T2=1.0D-05		!Accuracy to converge f
+	    CALL JGREY_WITH_FVT(RJ,SOB,CHI,R,V,SIGMA,
+	1                  P,AQW,HMIDQW,KQW,NMIDQW,
+	1                  LUM,METHOD,DIF,IC,T2,ND,NC,NP)
+	  ELSE
+!
+! Will use FEDD for F, GAM for NEWRJ, GAMH for NEWRK, and T2 for NEWHBC.
+! Will use HBC_J for HBC. No need to modify JGREY, as outer boundary
+! will always be optically thin.
+!
+	    DO I=1,ND
+	      FEDD(I)=1.0D0/3.0D0
+	    END DO
+	    HBC_J=1.0D0
+	    T1=1000.0
+	    DO WHILE(T1 .GT. 1.0E-05)
+	      CALL JGREY(TA,TB,TC,XM,DTAU,R,Z,P,RJ,
+	1        GAM,GAMH,Q,FEDD,CHI,dCHIdR,
+	1        AQW,KQW,LUM,HBC_J,T2,NC,ND,NP,METHOD)
+	      T1=0.0D0
+	      DO I=1,ND
+	        T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
+	        FEDD(I)=GAMH(I)
+	      END DO
+	      T1=MAX(ABS(HBC_J-T2),T1)
+	      HBC_J=T2
+	    END DO
+	  END IF
+C
+C Compute the temperature distribution, and the Rossland optical depth scale.
+C NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert T from units of 
+C K to units of 10^4 K. The ' ' in TORSCL indicates TYPE of atmosphere,
+C and here is set to ' ' so as TORSCL assumes a 1/r^2 density dependance
+C at boundary.
+C 
+	  CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,' ')
+	  DO I=1,ND
+	    TGREY(I)=((3.14159265D0/5.67D-05*RJ(I))**0.25D0)*1.0D-04
+	  END DO
+!
+	  OPEN(UNIT=LUIN,FILE='GREY_SCL_FACOUT',STATUS='UNKNOWN')
+	    WRITE(LUIN,'(A)')'!'
+	    WRITE(LUIN,'(A,8X,A,7X,A,7X,A,6X,A)')'!','Log(Tau)','T/T(grey)','T(10^4 K)','L'
+	    WRITE(LUIN,'(A)')'!'
+	    WRITE(LUIN,*)ND
+	    DO I=1,ND
+	      IF(TA(I) .GT. 0)THEN
+	        WRITE(LUIN,'(2X,3ES16.6,4X,I3)')LOG10(TA(I)),T(I)/TGREY(I),T(I),I
+	      ELSE
+	        WRITE(LUER,'(A)')' Bad Roseeland optical depth scale for T/TGREY output'
+	        WRITE(LUIN,'(A)')' Bad Roseeland optical depth scale for T/TGREY output'
+	        EXIT
+	      END IF
+            END DO
+	  CLOSE(LUIN)
+	END IF
 C
 C Output hydrodynamical terms to allow check on radiation driving of the wind.
 C

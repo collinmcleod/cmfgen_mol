@@ -52,4 +52,5 @@ clean:
 	rm -f */*/*.o
 	rm -f */*.mod
 	rm -f */*/*.mod
-	rm exe/*.exe
+	rm -f */*/*/*.mod
+	rm -f exe/*.exe

@@ -5,6 +5,7 @@
 	SUBROUTINE SCALE_GREY(TGREY,TAUROSS,LUIN,ND)
 	IMPLICIT NONE
 !
+! Altered 02-Oct-2004: GREY_SCL_FAC_IN is now default input file.
 ! Altered 24-Aug-2002: Bug fixed with handling of boundary values.
 !
 	INTEGER*4 ND
@@ -26,12 +27,19 @@
 	INTEGER*4 IOS
 	INTEGER*4 ND_RD
 !
-	OPEN(UNIT=LUIN,FILE='GREY_SCL_FAC',IOSTAT=IOS,STATUS='OLD',ACTION='READ')
+	OPEN(UNIT=LUIN,FILE='GREY_SCL_FAC_IN',IOSTAT=IOS,STATUS='OLD',ACTION='READ')
 	IF(IOS .NE. 0)THEN
 	   LU_ER=ERROR_LU()
-	   WRITE(LU_ER,*)'Unable to open file GREY_SCL_FAC'
-	   WRITE(LU_ER,*)'No scaling of TGREY performed in SCALE_GREY'
-	   RETURN
+	   WRITE(LU_ER,*)'Unable to open file GREY_SCL_FAC_IN'
+	   WRITE(LU_ER,*)'Will try to open GREY_SCL_FAC (older file name)'
+	   OPEN(UNIT=LUIN,FILE='GREY_SCL_FAC',IOSTAT=IOS,STATUS='OLD',ACTION='READ')
+	   IF(IOS .NE. 0)THEN
+	     LU_ER=ERROR_LU()
+	     WRITE(LU_ER,*)'Unable to open file GREY_SCL_FAC'
+	     WRITE(LU_ER,*)'No scaling of TGREY performed in SCALE_GREY'
+	     RETURN
+	  END IF
+	  WRITE(LU_ER,*)'GREY_SCL_FAC successfully opened'
 	END IF
 	LOG_TAU(1:ND)=LOG10(TAUROSS(1:ND))
 !

@@ -2,6 +2,7 @@
 	1               LUM,ND,FILENAME,OPTION,FORM)
 	IMPLICIT NONE
 C
+C Altered 04-Oct-2004 : Output space after depth index so easier to search for.
 C Altered 24-Feb-2004 : Now depth index to first line of output. Should not effect
 C                         any input files.
 C Altered 07-Jul-1997 : CLUMP_FAC inserted in call (now _V2), and now output
@@ -67,7 +68,7 @@ C
 	          T2=T2+DHYD(J,I)
 	        END DO
 	        T1=T1/T2
-	        WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I),I
+	        WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I),I,' '
 	        WRITE(9,FMT)((HYD(J,I)/HYDLTE(J,I)),J=1,NHYD)
 	      END DO
 	    ELSE
@@ -81,7 +82,7 @@ C
 	          T2=T2+DHYD(J,I)
 	        END DO
 	        T1=T1/T2
-	        WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I),I
+	        WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I),I,' '
 	        WRITE(9,FMT)(HYD(J,I),J=1,NHYD)
 	      END DO
 	    END IF
@@ -89,7 +90,7 @@ C
 	  END IF
 C
 2120	  FORMAT(/,1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)
-2122	  FORMAT(/,1X,1P,E15.7,6E15.5,2X,I4)
+2122	  FORMAT(/,1X,1P,E15.7,6E15.5,2X,I4,A1)
 C
 	  RETURN
 	  END

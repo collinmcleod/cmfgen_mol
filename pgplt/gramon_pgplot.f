@@ -1582,7 +1582,7 @@ C
 	  CLOSE(UNIT=30)
 !
 ! 
-! Convert from Ang to velocity space. Data must have been originally
+!
 	ELSE IF(ANS .EQ. 'SXY')THEN
 	  DO IP=1,NPLTS
 	    DO J=1,NPTS(IP)
@@ -1763,7 +1763,7 @@ C
 	  END IF
 	  IF(VAR_PLT1 .EQ. 0)WRITE(6,*)'Normalizing plots to 1.0'
 	  XT(1)=XPAR(1); CALL NEW_GEN_IN(XT(1),'Beginning of normalization range')
-	  XT(2)=XPAR(1)+0.1*(XPAR(2)-XPAR(1))
+	  XT(2)=XT(1)+0.1*(XPAR(2)-XPAR(1))
 	  CALL NEW_GEN_IN(XT(2),'End of normalization range')
 	  MEAN=0.0D0
 	  CNT=0.0D0
