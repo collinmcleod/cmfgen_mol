@@ -141,6 +141,8 @@
 	USE MOD_MOM_J_V6
 	IMPLICIT NONE
 !
+! Altered :  01-Jan-2004: Important update: SP constants to DP constants;
+!                          Effected error messgaes to fort.47 
 ! Altered:   28-Feb-2002: Extensive modifications and cleaning.
 !                         Routine now allow variable VDOP_FRAC for testing 
 !                           purposes. This option shoul NOT be used with CMFGEN.
@@ -658,7 +660,7 @@
 !
 ! Check that no negative mean intensities have been computed.
 !
-	IF(MINVAL(XM(1:ND)) .LE. 0)THEN
+	IF(MINVAL(XM(1:ND)) .LE. 0.0D0)THEN
 	   WRITE(47,*)'Freq=',FREQ
 	   TA(1:ND)=XM(1:ND)/R(1:ND)/R(1:ND)
 	   CALL WRITV(TA,ND,'XM Vec',47)
@@ -670,7 +672,7 @@
 	END IF
 !
 	DO I=1,ND
-	  IF(XM(I) .LT. 0)THEN
+	  IF(XM(I) .LT. 0.0D0)THEN
 	    XM(I)=ABS(XM(I))/10.0D0
 	    RECORDED_ERROR=.FALSE.
 	    J=1
