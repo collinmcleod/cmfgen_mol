@@ -41,6 +41,9 @@ C
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 30-Jan-2004 : Replaced by 0.0 by 0.0D0 everywhere.
+!                         Important in cool objects where collisions are more 
+!                         important than the radiation field.
 ! Altered 01-Arp-2001 : Changed to V7
 !                       Use STEQ_DATA_MOD. Call changed.
 ! Altered 14-Mar-2001 : Changed to V6
@@ -159,8 +162,8 @@ C
 !
 ! 
 	  DO J=1,N_S			!Which S.E. equation
-	    T1=0.0
-	    T2=0.0
+	    T1=0.0D0
+	    T2=0.0D0
 	    DO L=1,N_S
 	      T1=T1+( HN_S(L,I)*CNM(L,J)-HN_S(J,I)*CNM(J,L) )
 	      T2=T2+( HN_S(L,I)*DCNM(L,J)-HN_S(J,I)*DCNM(J,L) )
@@ -182,8 +185,8 @@ C
 	        END IF
 	      END DO
 !
-	      T1=0.0
-	      T2=0.0
+	      T1=0.0D0
+	      T2=0.0D0
 	      DO L=1,N_S
 	        T1=T1+( HN_S(L,I)*CNM(L,J)-HN_S(J,I)*CNM(J,L) )
 	        T2=T2+( HN_S(L,I)*DCNM(L,J)-HN_S(J,I)*DCNM(J,L) )
@@ -227,7 +230,7 @@ C
 	    END DO
 	  END IF
 !
-	  T1=0.0
+	  T1=0.0D0
 	  DO L=1,N_S
 	    T1=T1+HN_S(L,I)
 	  END DO
