@@ -146,6 +146,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(regrid_dchi.o)\
       $(LIB)(regrid_h.o)\
       $(LIB)(regridwsc.o)\
+      $(LIB)(regridwsc_v2.o)\
       $(LIB)(rext_coef_v2.o)\
       $(LIB)(rite_asc.o)\
       $(LIB)(rite_atmdes_v2.o)\
@@ -159,6 +160,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(set_case.o)\
       $(LIB)(set_cont_freq.o)\
       $(LIB)(set_cont_freq_v3.o)\
+      $(LIB)(set_cont_freq_v4.o)\
       $(LIB)(set_edge_freq_v2.o)\
       $(LIB)(set_x_freq.o)\
       $(LIB)(set_gm_all.o)\

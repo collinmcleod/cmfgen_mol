@@ -145,7 +145,7 @@ C
 	    NETRR(J)=200.0D0*(NETRR(J)+(CRR(J)-CPR(J))+
 	1                    (CHG_RR(J)-CHG_PR(J))+
 	1                    DIERECOM(J)+ADDRECOM(J)+ADVEC_RR(J)+
-	1                    +X_RECOM_1(J)+X_RECOM_2(J))/ABS_SUM
+	1                    X_RECOM_1(J)+X_RECOM_2(J))/ABS_SUM
 	    DIERECOM(J)=DIERECOM(J)/(TOTRR(J)+ADDRECOM(J))
 	    ADDRECOM(J)=ADDRECOM(J)/ED(J)/DHYD(J)
 	    TOTRR(J)=TOTRR(J)/ED(J)/DHYD(J)

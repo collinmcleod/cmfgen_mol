@@ -300,16 +300,28 @@
 ! we know it has the correct length since it is the same size as NU.
 ! LUIN --- Used as temporary LU (opened and closed).
 !
+	  J=NCF
 	  IF(FREQ_GRID_OPTION .EQ. 1)THEN
-	    J=NCF
 	    CALL SET_CONT_FREQ(NU,OBS,FQW,
 	1                        SMALL_FREQ_RAT,BIG_FREQ_AMP,dFREQ_BF_MAX,
 	1                        MAX_CONT_FREQ,MIN_CONT_FREQ,
 	1                        dV_LEV_DIS,AMP_DIS,MIN_FREQ_LEV_DIS,
 	1                        J,NCF,NCF_MAX,LUIN)
-	  ELSE
-	    J=NCF
+	  ELSE IF(FREQ_GRID_OPTION .EQ. 2)THEN
 	    CALL SET_CONT_FREQ_V3(NU,OBS,FQW,
+	1                        SMALL_FREQ_RAT,BIG_FREQ_AMP,dFREQ_BF_MAX,
+	1                        MAX_CONT_FREQ,MIN_CONT_FREQ,
+	1                        dV_LEV_DIS,AMP_DIS,MIN_FREQ_LEV_DIS,
+	1                        DELV_CONT,DELV_XRAY,NU_XRAY_END,
+	1                        J,NCF,NCF_MAX,LUIN)
+	  ELSE
+!
+! Checks if BIG_FREQ_AMP was set to old definition.
+!
+	    IF(BIG_FREQ_AMP .LT. 0.0D0 .OR. BIG_FREQ_AMP .GT. 1.0D0)THEN
+	      BIG_FREQ_AMP=0.5D0
+	    END IF
+	    CALL SET_CONT_FREQ_V4(NU,OBS,FQW,
 	1                        SMALL_FREQ_RAT,BIG_FREQ_AMP,dFREQ_BF_MAX,
 	1                        MAX_CONT_FREQ,MIN_CONT_FREQ,
 	1                        dV_LEV_DIS,AMP_DIS,MIN_FREQ_LEV_DIS,

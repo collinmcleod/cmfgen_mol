@@ -19,6 +19,7 @@
 !
 	IMPLICIT NONE
 !
+! Altered 02-Sep-2004 : Reinserted writing out header infromation located before date.
 ! Altered 18-MAr-2002 : Bug fix for profile with negligble Doppler core.
 ! Altered 12-Mar-2002 : Warning written if DO_AUTO is true and if using
 !                         Opacity Project cross-sections
@@ -159,6 +160,7 @@
 	  L1=0; L2=0
 	  DO WHILE (L1 .EQ. 0 .AND. L2 .EQ. 0)
 	    READ(LUIN,'(A)',IOSTAT=IOS)STRING
+	    WRITE(LUOUT,'(A)')STRING
 	    IF(IOS .NE. 0)THEN
 	      WRITE(LUER,*)'Error reading ''DATE'' from '//FILENAME
 	      WRITE(LUER,*)'IOSTAT=',IOS

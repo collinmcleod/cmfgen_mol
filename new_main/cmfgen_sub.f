@@ -44,7 +44,7 @@ C
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 C
 	CHARACTER*12 PRODATE
-	PARAMETER (PRODATE='02-May-2004')	!Must be changed after alterations
+	PARAMETER (PRODATE='13-Sep-2004')	!Must be changed after alterations
 C
 C 
 C
@@ -1278,8 +1278,9 @@ C
 	     DO ID=1,NUM_IONS-1
 	       IF(ATM(ID)%XzV_PRES)THEN
 	          TMP_STRING=TRIM(ION_ID(ID))//'_IN'
-	          CALL REGRIDWSC( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,
-	1                 ATM(ID)%EDGEXzV_F, ATM(ID)%NXzV_F,ND,TMP_STRING)
+	          CALL REGRIDWSC_V2( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,
+	1                 ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
+	1                 ATM(ID)%NXzV_F,ND,TMP_STRING)
 	       END IF
 	     END DO
 C
@@ -3632,9 +3633,14 @@ C frequency. The correction for non-coherent electron scattering allows
 C for the fact that the electron-scattering emissivity is ESEC*RJ_ES, not
 C ESEC*RJ.
 C
+C ETA_CONT includes all emissivity sources, including X-ray emission produced
+C by mechanical or magnetic energy deposition. This should not be included
+C in the radiatively equilibrium equation, hence we subtract out the
+C emissivity due to mechanical processes.
+C
 	  DO K=1,ND
 	    STEQ_T(K)=STEQ_T(K)+ FQW(ML)*( 
-	1       (CHI_CONT(K)-CHI_SCAT(K))*RJ(K) - ETA_CONT(K) )
+	1       (CHI_CONT(K)-CHI_SCAT(K))*RJ(K) - (ETA_CONT(K)-ETA_MECH(K)) )
 	  END DO
 	  IF(.NOT. COHERENT_ES)THEN
 	    STEQ_T(:)=STEQ_T(:)+FQW(ML)*ESEC(:)*(RJ(:)-RJ_ES(:))

@@ -79,13 +79,13 @@ C
 C Not equal as MIN_FREQ, and MAX_FREQ have been inserted in FREQ array.
 C
 	IF(MIN_FREQ .NE. FREQ(1))THEN
-	  WRITE(LUER,*)'Error in SET_CONT_FREQ - MIN_FREQ too big'
+	  WRITE(LUER,*)'Error in SET_CONT_FREQ_V3 - MIN_FREQ too big'
 	  WRITE(LUER,*)'MIN_FREQ =',MIN_FREQ
 	  WRITE(LUER,*)'FREQ(1) =',FREQ(1)
 	  STOP
 	END IF
 	IF(MAX_FREQ .NE. FREQ(N))THEN
-	  WRITE(LUER,*)'Error in SET_CONT_FREQ - MAX_FREQ too small'
+	  WRITE(LUER,*)'Error in SET_CONT_FREQ_V3 - MAX_FREQ too small'
 	  WRITE(LUER,*)'MAX_FREQ =',MAX_FREQ
 	  WRITE(LUER,*)'FREQ(N) =',FREQ(N)
 	  STOP
@@ -99,7 +99,7 @@ C small frequencies (frequencies less than 1.0 approximately).
 C Two points are inserted so that simpsons rule can be used.
 C
 	IF(SMALL_RAT .LE. RONE .OR. SMALL_RAT .GT. 3)THEN
-	  WRITE(LUER,*)'Error in SET_CONT_FREQ - SMALL_RAT Outside ',
+	  WRITE(LUER,*)'Error in SET_CONT_FREQ_V3 - SMALL_RAT Outside ',
 	1           'valid range ',SMALL_RAT
 	  STOP
 	END IF
@@ -109,7 +109,7 @@ C to a bound-free edge. For large v, we require constant spacing since
 C error in integral is a function of {del v }.
 C
 	IF(DNU_MAX .LE. RZERO .OR. DNU_MAX .GT. RTWO)THEN
-	  WRITE(LUER,*)'Error in SET_CONT_FREQ - DNU_MAX Outside ',
+	  WRITE(LUER,*)'Error in SET_CONT_FREQ_V3 - DNU_MAX Outside ',
 	1           'valid range ',DNU_MAX
 	  STOP
 	END IF
@@ -119,7 +119,7 @@ C to the edge, the spacing is less than DNU_MAX, but for every
 C two points, the spacing increases by a factor of G.
 C
 	IF(BIG_AMP .LT. RONE .OR. BIG_AMP .GT. 3)THEN
-	  WRITE(LUER,*)'Error in SET_CONT_FREQ - BIG_AMP ',
+	  WRITE(LUER,*)'Error in SET_CONT_FREQ_V3 - BIG_AMP ',
 	1                 'Outside valid range ',BIG_AMP
 	  STOP
 	END IF
@@ -223,7 +223,7 @@ C
 	  END IF
 C
 	  IF(K .GT. NCF_MAX)THEN
-	    WRITE(LUER,*)'Error NCF too small in SET_CONT_FREQ'
+	    WRITE(LUER,*)'Error NCF too small in SET_CONT_FREQ_V3'
 	    WRITE(LUER,*)N,NCF_MAX,SMALL_RAT,BIG_AMP,DNU_MAX
 	    OPEN(UNIT=LUOUT,FILE='CFDAT_OUT',STATUS='UNKNOWN')
 	      DO J=1,NCF
@@ -308,7 +308,7 @@ C
 C
 	DO I=1,NCF-1
 	  IF( NEW_FREQ(I) .LE. NEW_FREQ(I+1) )THEN
-	    WRITE(LUER,*)'Error in SET_CONT_FREQ - frequency array not',
+	    WRITE(LUER,*)'Error in SET_CONT_FREQ_V3 - frequency array not',
 	1             ' monotonic'
 	    STOP
 	  END IF

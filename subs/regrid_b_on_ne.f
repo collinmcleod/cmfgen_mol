@@ -162,6 +162,13 @@ C
 	      DHEN(J,I)=EXP(TB(3)+(EDLOG(I)-OLDED(3))
 	1        /(OLDED(1)-OLDED(3))*(TB(1)-TB(3)))
 	    END DO
+!
+! Assume d.c. is constant in outer region. This option is more
+! consistent with the assumption of constant T.
+!
+	    DO I=1,NXST-1
+	      DHEN(J,I)=EXP(TB(1))
+	    END DO
 	  END IF
 	  IF(NX_END .LT. ND)THEN
 	    DO I=ND,NX_END+1,-1

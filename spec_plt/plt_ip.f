@@ -25,12 +25,17 @@
 	REAL*8, ALLOCATABLE :: IP(:,:)
 	REAL*8, ALLOCATABLE :: NU(:)
 	REAL*8, ALLOCATABLE :: P(:)
+	REAL*8, ALLOCATABLE :: IP_NEW(:)
+	REAL*8, ALLOCATABLE :: P_NEW(:)
 !
 	REAL*8, ALLOCATABLE :: TA(:)
 	REAL*8, ALLOCATABLE :: TB(:)
 	REAL*8, ALLOCATABLE :: TC(:)
 	REAL*8, ALLOCATABLE :: TAU_ROSS(:)
 	REAL*8, ALLOCATABLE :: TAU_ES(:)
+!
+	REAL*8, ALLOCATABLE :: TEMP_P(:)
+	REAL*8, ALLOCATABLE :: TEMP_IP(:)
 !
 	REAL*8 RMDOT
 	REAL*8 RLUM
@@ -95,15 +100,19 @@
 	REAL*8 S_WIDTH
 	REAL*8 S_LNGTH
 	REAL*8 APP_SIZE
+	REAL*8 TEL_FWHM
+	REAL*8 MOD_RES
 !
 ! Miscellaneous variables.
 !
 	INTEGER*4 IOS			!Used for Input/Output errors.
-	INTEGER*4 I,J,K,L,ML
+	INTEGER*4 I,J,K,L,ML,LS
 	INTEGER*4 ST_REC
 	INTEGER*4 REC_LENGTH
 	INTEGER*4 NX
+	INTEGER*4 NP_NEW
 	INTEGER*4 NINS
+	INTEGER*4 NTMP
 	INTEGER*4 K_ST,K_END
 	REAL*8 T1,T2
 	REAL*8 LAMC
@@ -115,7 +124,9 @@
 	LOGICAL COMPUTE_P
 	LOGICAL USE_ARCSEC
 	LOGICAL MULT_BY_PSQ
+	LOGICAL MULT_BY_P
 !
+	REAL*8, PARAMETER :: RZERO=0.0D0
 	INTEGER*4, PARAMETER :: IZERO=0
 	INTEGER*4, PARAMETER :: IONE=1
 	INTEGER*4, PARAMETER :: T_IN=5		!For file I/O
@@ -655,49 +666,89 @@
 	  CALL CURVE(NP-1,XV,ZV)
 !
 	ELSE IF(X(1:4) .EQ. 'JNU2')THEN
-	  CALL USR_OPTION(T1,'Lambda',' ','Start wavelength in Ang')
+	  CALL USR_OPTION(T1,'lam_st',' ','Start wavelength in Ang')
 	  T1=0.299794D+04/T1
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
-	  CALL USR_OPTION(T1,'Lambda',' ','End wavelength in Ang')
+	  CALL USR_OPTION(T1,'lam_end',' ','End wavelength in Ang')
 	  T1=0.299794D+04/T1
           J=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
 !
 	  CALL USR_OPTION(USE_ARCSEC,'Arcsec','T','Use arcseconds?')
 	  CALL USR_OPTION(MULT_BY_PSQ,'PSQ','F','Multiply by P^2?')
+	  MULT_BY_P=.FALSE.
+	  IF(MULT_BY_PSQ .EQ. .FALSE.)THEN
+	    CALL USR_OPTION(MULT_BY_P,'P','F','Multiply by P?')
+	  END IF
 	  IF(ALLOCATED(XV))DEALLOCATE(XV)
 	  IF(ALLOCATED(YV))DEALLOCATE(YV)
 	  ALLOCATE (XV(NP))
 	  ALLOCATE (YV(NP))
 !
-	  IF(USE_ARCSEC)THEN
-	    T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
-	    DO K=1,NP-2
-	      XV(K)=LOG10(P(K+1)*T1)
+! In this case we return linear axes --- usefule for SN.
+!
+	  IF(MULT_BY_P)THEN
+	    IF(USE_ARCSEC)THEN
+	      T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	      XV(1:NP)=P(1:NP)*T1 
+	      XAXIS='P(")'
+	    ELSE
+	      XV(1:NP)=P(1:NP)/R(ND)
+	      XAXIS='P/R\d*\u'
+	    END IF
+!
+! Average I(p) over frequnecy.
+!
+	    YV(:)=0.0D0
+	    K=MIN(I,J); J=MAX(I,J); I=K
+	    IF(J .EQ. I)J=I+1
+	    DO K=I,J-1
+	      YV(1:NP-1)=YV(1:NP-1)+0.5D0*(IP(1:NP-1,K)+IP(1:NP-1,K+1))*
+	1                                 (NU(K)-NU(K+1))
 	    END DO
-	    XAXIS='Log P(")'
+	    T1=ABS(NU(I)-NU(J))
+	    YV(1:NP-1)=YV(1:NP-1)/T1
+!
+! Now multilply by P. We keep out the factor of 10^10 (arsing from the
+! units of P) as it keep the numbers closer to 1.
+!
+	    YV(1:NP-1)=YV(1:NP-1)*P(1:NP-1)
+	    YAXIS='10\u-10 \dpI(ergs cm\u-1\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	    CALL CURVE(NP-1,XV,YV)
+!
 	  ELSE
-	    T2=R(ND)
-	    XV(1:NP-2)=LOG10(P(2:NP-1)/T2)
-	    XAXIS='Log P/R\d*\u'
-	  END IF
-	  YV(:)=0.0D0
-	  DO K=MIN(I,J),MAX(I,J)
-	    YV(1:NP-2)=YV(1:NP-2)+IP(2:NP-1,K)*0.5D0*(NU(K-1)-NU(K+1))
-	  END DO
-	  T1=ABS(NU(I)-NU(J))
-	  YV(1:NP-2)=LOG10(YV(1:NP-2)/T1)
-	  IF(MULT_BY_PSQ)THEN
-	    DO I=1,NP-2
-	     YV(I)=YV(I)+2.0D0*LOG10(P(I+1))+20.0D0
+	    IF(USE_ARCSEC)THEN
+	      T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	      DO K=1,NP-2
+	        XV(K)=LOG10(P(K+1)*T1)
+	      END DO
+	      XAXIS='Log P(")'
+	    ELSE
+	      T2=R(ND)
+	      XV(1:NP-2)=LOG10(P(2:NP-1)/T2)
+	      XAXIS='Log P/R\d*\u'
+	    END IF
+	    YV(:)=0.0D0
+	    K=MIN(I,J); J=MAX(I,J); I=K
+	    IF(J .EQ. I)J=I+1
+	    DO K=I,J-1
+	      YV(1:NP-2)=YV(1:NP-2)+0.5D0*(IP(2:NP-1,K)+IP(2:NP-1,K+1))*
+	1                                 (NU(K)-NU(K+1))
 	    END DO
-	    YAXIS='p\u2\dI(ergs \u-1\d Hz\u-1\d steradian\u-1\d)' 
-	  ELSE
-	    YAXIS='I(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	    T1=ABS(NU(I)-NU(J))
+	    YV(1:NP-2)=LOG10(YV(1:NP-2)/T1)
+	    IF(MULT_BY_PSQ)THEN
+	      DO I=1,NP-2
+	        YV(I)=YV(I)+2.0D0*LOG10(P(I+1))+20.0D0
+	      END DO
+	      YAXIS='Log p\u2\dI(ergs s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	    ELSE
+	      YAXIS='Log I(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	    END IF
+	    CALL CURVE(NP-2,XV,YV)
 	  END IF
-	  CALL CURVE(NP-2,XV,YV)
 !
 	ELSE IF(X(1:3) .EQ. 'JNU')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
@@ -892,6 +943,111 @@
 	  CALL CNVRT(XV,YV,J,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1                 LAMC,XAXIS,YAXIS,L_FALSE)
           CALL CURVE(J,XV,YV)
+!
+	ELSE IF(X(1:3) .EQ. 'SLT')THEN
+	  CALL USR_OPTION(X_CENT,'XC','0.0D0','X center of aperture (across width)')
+	  CALL USR_OPTION(Y_CENT,'YC','0.0D0','Y center of aperture (along length)')
+	  CALL USR_OPTION(S_WIDTH,'SW','0.05D0','Slit width (arcsec)')
+	  CALL USR_OPTION(S_LNGTH,'SL','0.1D0','Slit length (arcsec)')
+	  CALL USR_OPTION(TEL_FWHM,'FWHM','0.1D0','Telescope FWHM (arcsec)')
+	  APP_SIZE=S_WIDTH*S_LNGTH 		!In square arcseconds
+	  CALL USR_OPTION(NINS,'NINS','2','# of points to insert to improve accuracy')
+!
+	  CALL USR_OPTION(T1,'lam_st',' ','Start wavelength in Ang')
+	  T1=0.299794D+04/T1
+          I=GET_INDX_DP(T1,NU,NCF)
+	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
+!
+	  CALL USR_OPTION(T1,'lam_end',' ','End wavelength in Ang')
+	  T1=0.299794D+04/T1
+          J=GET_INDX_DP(T1,NU,NCF)
+	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
+!
+! Compute the intensity across the band.
+!
+	  IF(ALLOCATED(P_NEW))DEALLOCATE(P_NEW)
+	  IF(ALLOCATED(IP_NEW))DEALLOCATE(IP_NEW)
+!
+	  IF(TEL_FWHM .EQ. 0.0D0)THEN
+	    ALLOCATE (P_NEW(NP))
+	    ALLOCATE (IP_NEW(NP))
+	    IP_NEW=0.0D0
+	    DO ML=I,J
+	      IP_NEW(:)=IP_NEW(:)+IP(:,ML)
+	    END DO
+	    P_NEW=P
+	    NP_NEW=NP
+	  ELSE
+!
+	    NP_NEW=2*NP-1
+	    ALLOCATE (P_NEW(NP_NEW))
+	    ALLOCATE (IP_NEW(NP_NEW))
+	    IP_NEW=0.0D0
+	    DO ML=I,J
+	      DO LS=1,NP
+	        IP_NEW(NP+LS-1)=IP_NEW(NP+LS-1)+IP(LS,ML)
+	      END DO
+	    END DO
+	    DO LS=1,NP
+	      IP_NEW(NP-LS+1)=IP_NEW(NP+LS-1)
+	      P_NEW(NP+LS-1)=P(LS)
+	      P_NEW(NP-LS+1)=-P_NEW(NP+LS-1)
+	    END DO
+!
+	    T1=1.0D+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	    MOD_RES=0.1D0*TEL_FWHM
+	    WRITE(6,*)'MOD_RES=',MOD_RES
+	    NTMP=T1*2*P(NP)/MOD_RES+1
+	    IF(NTMP .LT. 2*NP)NTMP=2*NP
+	    NP_NEW=2*NP-1
+!
+	    ALLOCATE (TEMP_P(NTMP))
+	    ALLOCATE (TEMP_IP(NTMP))
+	    WRITE(6,*)'NTMP=',NTMP
+!
+	    TEMP_P(1:NP_NEW)=T1*P_NEW(1:NP_NEW)
+	    TEMP_IP(1:NP_NEW)=IP_NEW(1:NP_NEW)
+	    CALL DP_CURVE(NP_NEW,TEMP_P,TEMP_IP)
+	    WRITE(6,*)'Begin linearize'
+	    CALL LINEARIZE_V2(TEMP_P,TEMP_IP,NP_NEW,NTMP,MOD_RES)
+	    WRITE(6,*)'Done linearize'
+	    T1=TEL_FWHM/2.35482
+	    CALL CONVOLVE(TEMP_P,TEMP_IP,NTMP,T1,RZERO,RZERO,L_FALSE)
+	    CALL DP_CURVE(NTMP,TEMP_P,TEMP_IP)
+	    WRITE(6,*)'Done convolution'
+	    T1=1.0D+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	    TEMP_P=TEMP_P/T1
+	    IP_NEW=0.0D0
+	    CALL MAP(TEMP_P,TEMP_IP,NTMP,P,IP_NEW,NP)
+	    TEMP_P(1:NP)=P(1:NP)*T1
+	    CALL DP_CURVE(NP,TEMP_P,IP_NEW)
+	    CALL GRAMON_PGPLOT(' ',' ',' ',' ')
+!
+	    DEALLOCATE (TEMP_P)
+	    DEALLOCATE (TEMP_IP)
+	  END IF
+!
+	  IF(ALLOCATED(XV))DEALLOCATE(XV)
+	  IF(ALLOCATED(YV))DEALLOCATE(YV)
+	  ALLOCATE (XV(NCF))
+	  ALLOCATE (YV(NCF))
+!
+	  WRITE(6,*)'Calling INT_SEQ'
+	  WRITE(6,*)X_CENT,Y_CENT,S_WIDTH,S_LNGTH
+!
+	  K=1.0D0/S_WIDTH+1
+	  T1=1.0D+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	  Y_CENT=Y_CENT/T1	
+	  S_WIDTH=S_WIDTH/T1	
+	  S_LNGTH=S_LNGTH/T1	
+!
+	  DO I=1,K
+	    XV(I)=X_CENT+S_WIDTH*(I-1)*T1
+	    T2=(X_CENT+T1*S_WIDTH*(I-1))/T1
+	    CALL INT_REC_AP(IP_NEW,P,YV(I),T2,Y_CENT,S_WIDTH,S_LNGTH,
+	1                     NP,IONE,NINS)
+	  END DO
+	  CALL CURVE(K,XV,YV)
 !
 	ELSE IF(X(1:2) .EQ. 'SQ')THEN
 	  CALL USR_OPTION(X_CENT,'XC','0.0D0','X center of aperture (across width)')

@@ -13,6 +13,9 @@
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered : 08-Sep-2004 Bug fix. ION_V is now set to ION_EQ, rather than NLEV+ION_LEV.
+!                         This is corect because of the way the important variables are
+!                         assigned in CREATE_IV_LINKS.
 ! Altered : 01-Apr-2001 Changed to use STEQ_DATA_MOD
 !                       Extensive chnages in call (changed to V6).
 ! Altered : 08-Jun-1995 EDGE frequency delted from call.
@@ -72,8 +75,8 @@
 	IF(ION_LEV .EQ. 0)RETURN
 !
 	NT=SE(ID)%N_IV
-	ION_V=NLEV+ION_LEV
         ION_EQ=SE(ID)%ION_LEV_TO_EQ_PNT(ION_LEV)
+	ION_V=ION_EQ
 	L=(NUM_BNDS/2)+1
 !
 	DO K=DST,DEND			!Which depth point.

@@ -9,6 +9,8 @@ C
 	1                     JREC,JPHOT,JREC_CR,JPHOT_CR,INIT_ARRAYS,ND,FLAG)
 	IMPLICIT NONE
 !
+! Altered 10-Sep-2003 : Bug fix. I had the wrong J associated with the quadrature weights
+!                         W in the expression for X_BFCR.
 ! Altered 12-Oct-2003 : If JREC is zero, the recombination term is not computed.
 !                         This is to avoid floating overflows at low temperatures.
 !                         In practice, the X-ray recombination term will be effectively zero
@@ -74,8 +76,8 @@ C
 	      NET_X_RR(J)=NET_X_RR(J) + 
 	1       WSE_X_A(I,J)*( A1*JREC(J)-HN_A(I,J)*JPHOT(J) )
 	      X_BFCR(J)=X_BFCR(J)   +   
-	1       (  A1*( WCR_X_A(I,J)*JREC_CR(J) + WSE_X_A(I,J)*JREC(J) ) -
-	1       HN_A(I,J)*( WCR_X_A(I,J)*JPHOT_CR(J) + WSE_X_A(I,J)*JPHOT(J) )  )*H
+	1       (  A1*( WCR_X_A(I,J)*JREC(J) + WSE_X_A(I,J)*JREC_CR(J) ) -
+	1       HN_A(I,J)*( WCR_X_A(I,J)*JPHOT(J) + WSE_X_A(I,J)*JPHOT_CR(J) )  )*H
 	    END DO
 	  END IF
 	END DO

@@ -571,15 +571,6 @@ C
 	DATA TAU_EDGE/13.16D0,11.60D0,5.95D0,3.29D0,0.83D0/
 C
 C
-C Open output file for all errors and comments.
-C
-	LUER=ERROR_LU()
-	CALL GEN_ASCI_OPEN(LUER,'OUT_FLUX','UNKNOWN','APPEND',' ',IZERO,IOS)
-	IF(IOS .NE. 0)THEN
-	  WRITE(LUER,*)'Error opening OUTGEN in CMFGEN, IOS=',IOS
-	  STOP
-	END IF
-C
 C Check whether EQUATION LABELLING is consistent. ' I ' is used as the
 C number of the current equation. We also set the variable SPEC_PRES which 
 C indicates whether at least one ioization stage of a species is present.

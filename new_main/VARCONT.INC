@@ -559,8 +559,10 @@ C
 C We only treat Z_INDX from 3 onwards as the first refer to CHI and ETA which
 C have been zeroed.
 C
+	  I=0					!Temporary check
 	  DO X_INDX=3,NM
 	    IF(DO_THIS_TX_MATRIX(X_INDX))THEN
+	      I=I+1
 	      DO K=1,ND
 	        DO J=BNDST(K),BNDEND(K)
 	          L=BND_TO_FULL(J,K)
@@ -569,6 +571,7 @@ C
 	      END DO
 	    END IF
 	  END DO
+	  WRITE(183,'(2X,I6,ES14.6,2X,I4)')ML,FL,I
 C
 C Compute VJ which gives the variation of J with respect to the atomic
 C populations. NB: Electron scattering cross-section (6.65D-15) was replaced 

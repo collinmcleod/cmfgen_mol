@@ -9,6 +9,8 @@
 	USE OPAC_MOD
 	IMPLICIT NONE
 !
+! Altered 13-Sep-2004: Installed ETA_MECH to keep track of mechanical
+!                        energy input.
 ! Altered 03-Mar-2004: Bug fix. EMHNUKT was not being computed when
 !                        COMPUTE_NEW_CROSS=.FALSE. and NU=NU_CONT.
 !                        Value at earlier frequncy was being used.
@@ -197,7 +199,7 @@ C The shock emission is added separately since it does not occur at the
 C local electron temperature.
 C
 	IF(XRAYS)THEN
-!i
+!
 	  IF(FF_XRAYS)THEN
 !
 ! Since T_SHOCK is depth indpendent, Z^2 * (the free-free Gaunt factors) 
@@ -258,6 +260,7 @@ C
 !
 	  IF(XRAY_SMOOTH_WIND)ZETA(1:ND)=ZETA(1:ND)*CLUMP_FAC(1:ND)
           ETA(1:ND)=ETA(1:ND)+ZETA(1:ND)
+	  ETA_MECH(1:ND)=ZETA(1:ND)
 !
 ! Changed 06-Aug-2003: Clumping was not beeing allowed for when computing
 ! the shock luminosity.
@@ -274,6 +277,8 @@ C
 	    IF(FL .GE. 100.0D0*T1)XRAY_LUM_0P1(1:ND)=XRAY_LUM_0P1(1:ND)+TA(1:ND)
 	    IF(FL .GE. 1000.0D0*T1)XRAY_LUM_1KEV(1:ND)=XRAY_LUM_1KEV(1:ND)+TA(1:ND)
 	  END IF
+	ELSE
+	  ETA_MECH(1:ND)=0.0D0
 	END IF
 !
 ! Set a minimum emissivity. Mainly important when X-rays are not present.

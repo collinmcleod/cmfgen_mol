@@ -29,6 +29,11 @@
 !
       INTEGER*4, ALLOCATABLE :: ION_LEV_PNT(:)
 !
+      WRITE(93,*)' '
+      WRITE(93,*)'Summary of photoiization routes'
+      WRITE(93,*)'Eqn. in Spec BA ',' Lev in ion ',' Equation #'
+      WRITE(93,*)' '
+!
       DO ID=1,NION
 !
 	IF(ATM(ID)%XzV_PRES)THEN
@@ -49,7 +54,7 @@
           SE(ID)%N_SE=ATM(ID)%NXzV+ATM(ID)%N_XzV_PHOT
 	  DO J=1,ATM(ID)%N_XzV_PHOT
 	    ION_LEV_PNT(ATM(ID)%NXzV+J)=ATM(ID)%XzV_ION_LEV_ID(J)
-	    WRITE(6,'(A,X,I2,A)')TRIM(ION_ID(ID)),ATM(ID)%XzV_ION_LEV_ID(J),
+	    WRITE(93,'(X,A,X,I2,A)')TRIM(ION_ID(ID)),ATM(ID)%XzV_ION_LEV_ID(J),
 	1                         ' photoionization route'
 	  END DO
 !
@@ -103,7 +108,7 @@
 	   SE(ID)%ION_LEV_TO_EQ_PNT(:)=0
 	   DO I=ATM(ID)%NXzV+1,SE(ID)%N_SE-1
 	     SE(ID)%ION_LEV_TO_EQ_PNT(ION_LEV_PNT(I))=I
-	     WRITE(6,*)SE(ID)%ION_LEV_TO_EQ_PNT(ION_LEV_PNT(I)),ION_LEV_PNT(I),I
+	     WRITE(93,*)SE(ID)%ION_LEV_TO_EQ_PNT(ION_LEV_PNT(I)),ION_LEV_PNT(I),I
 	   END DO
 	   DEALLOCATE (ION_LEV_PNT)
 !

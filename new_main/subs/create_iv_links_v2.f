@@ -12,6 +12,7 @@
       USE STEQ_DATA_MOD
       IMPLICIT NONE
 !
+! Altered output format.
 ! Created 17-Mar-2001
 !
       INTEGER*4 NT
@@ -21,7 +22,12 @@
       INTEGER*4 I,J,ID
       LOGICAL LOC_IMP_VAR(NT)
 !
-	WRITE(93,*)IMP_VAR
+      WRITE(93,*)' '
+      WRITE(93,*)'Summary of important variables'
+      WRITE(93,*)' '
+      DO I=1,NT,20
+	WRITE(93,'(X,I5,20(2X,L1))')I,(IMP_VAR(J),J=I,MIN(I+19,NT))
+      END DO
 !
       DO ID=1,NION
 !
@@ -41,8 +47,12 @@
           END DO
           NIV=ATM(ID)%NXzV
 !
-! Include all possible ionization states (includeing those reached by
+! Include all possible ionization states (including those reached by
 ! X-ray ionization, and charge exchange reactions.
+!
+! NB: This associates equation J with impurity species J (i.e., the ion).
+!     If you change this association, you will need to change VSEBYJ_MULTI.
+!     In SE(ID)%BA_PAR ION_E refers to the equation and variable.
 !
           DO I=ATM(ID)%NXzV+1,SE(ID)%N_SE-1
 	    J=ATM(ID)%EQXzV+ATM(ID)%NXzV+(SE(ID)%EQ_TO_ION_LEV_PNT(I)-1)
@@ -72,9 +82,19 @@
 	    IF(J .NE. 0)SE(ID)%LNK_TO_F(J)=I
 	  END DO
 !
-	  WRITE(93,*)SE(ID)%LNK_TO_F
-	  WRITE(93,*)' '
-	  WRITE(93,*)SE(ID)%LNK_TO_IV
+          WRITE(93,*)' '
+          WRITE(93,*)'Summary of links for species ID=',ID
+          WRITE(93,*)'LNK_TO_F'
+	  DO I=1,NIV,10
+	    WRITE(93,'(X,I5,A1,10(2X,I5))')
+	1        I,'*',(SE(ID)%LNK_TO_F(J),J=I,MIN(I+9,NIV))
+	  END DO
+          WRITE(93,*)' '
+	  WRITE(93,*)'LNK_TO_IV'
+	  DO I=1,NT,10
+	    WRITE(93,'(X,I5,A1,10(2X,I5))')
+	1        I,'*',(SE(ID)%LNK_TO_IV(J),J=I,MIN(I+9,NT))
+	  END DO
 !
         ELSE
           SE(ID)%XzV_PRES=.FALSE.
