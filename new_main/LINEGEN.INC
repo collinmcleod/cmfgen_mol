@@ -63,7 +63,7 @@ C
 	1                  PF,PROF,LFQW,FL,DIF,DBB,IC,METHOD,
 	1                  NLF,ND,NNM)
 	  CALL TUNE(2,'VARMOM')
-	ELSE
+    	ELSE
 	  CALL TUNE(1,'VARFOR')
 	  CALL VAR_FORMSOL(ETA,CHI,ESEC,CHIL,ETAL,V,SIGMA,R,P,
 	1                      FQAF,FQAFD,TX,TVX,KI,AQW,
@@ -195,7 +195,9 @@ C
 C Compute the opacity AND emisisvity variation as a function of the changes 
 C in the population levels. 
 C
-	  INCLUDE 'VAROPAC_V4.INC'
+C	  INCLUDE 'VAROPAC_V4.INC'
+	  CALL COMP_VAR_OPAC(POPS,RJ,FL,CONT_FREQ,FREQ_INDX,
+	1                SECTION,ND,NT,LST_DEPTH_ONLY)
 C 
 C
 C	  Increment the J variation matrices due to opacity variation
@@ -250,16 +252,17 @@ C
 	  BA_T(NUP,K,L)=BA_T(NUP,K,L) - EMLIN*FL*T2
 	  T2=EINA(1)*ZNET(L)*dU_RAT_dT(L,1)*POPS(NUP,L)
           J=SE(ID)%N_IV
-	  SE(ID)%BA(MNL,J,K,L)=SE(ID)%BA(NL,J,K,L) + T2
-	  SE(ID)%BA(MNUP,J,K,L)=SE(ID)%BA(NUP,J,K,L) - T2
+	  SE(ID)%BA(MNL,J,K,L)=SE(ID)%BA(MNL,J,K,L) + T2
+	  SE(ID)%BA(MNUP,J,K,L)=SE(ID)%BA(MNUP,J,K,L) - T2
 	  BA_T(NT,K,L)=BA_T(NT,K,L) - EMLIN*FL*T2
 	  T1=EINA(1)*U_STAR_RATIO(L,1)*POPS(NUP,L)
 	  DO K=1,NUM_BNDS				!Variable depth
 	    DO J=1,SE(ID)%N_IV
 	      JJ=SE(ID)%LNK_TO_F(J)
-	      SE(ID)%BA(NL,J,K,L) =SE(ID)%BA(NL,J,K,L) +VZNET(JJ,K,L)*T1
-	      SE(ID)%BA(NUP,J,K,L)=SE(ID)%BA(NUP,J,K,L)-VZNET(JJ,K,L)*T1
+	      SE(ID)%BA(MNL,J,K,L) =SE(ID)%BA(MNL,J,K,L) +VZNET(JJ,K,L)*T1
+	      SE(ID)%BA(MNUP,J,K,L)=SE(ID)%BA(MNUP,J,K,L)-VZNET(JJ,K,L)*T1
 	      BA_T(JJ,K,L)=BA_T(JJ,K,L)-VZNET(JJ,K,L)*ETAL(L)
 	    END DO
 	  END DO
 	END DO
+

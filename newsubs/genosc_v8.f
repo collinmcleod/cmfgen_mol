@@ -254,12 +254,18 @@
 	    LEVNAME(I)=STRING(1:L1)
 	    LOCNAME(I)=LEVNAME(I)
 !
+	    IOS=0
 	    IF(FORMAT_DATE .EQ. '17-Oct-2000')THEN
-	      READ(STRING(L1+1:),*)STAT_WT(I),FEDGE(I),T1,T2,T3,LEV_ID,
+	      READ(STRING(L1+1:),*,IOSTAT=IOS)STAT_WT(I),FEDGE(I),T1,T2,T3,LEV_ID,
 	1                         ARAD(I),GAM2(I),GAM4(I)
 	      IF(ABS(LEV_ID) .NE. I)THEN
 	         WRITE(LUER,*)'Error reading levels in GENOSC_V8'
 	         WRITE(LUER,*)'Invalid level ID'
+	         WRITE(LUER,*)TRIM(STRING)
+	         STOP
+	      ELSE IF(IOS .NE. 0)THEN
+	         WRITE(LUER,*)'Error reading levels in GENOSC_V8'
+	         WRITE(LUER,*)'IOS=',IOS
 	         WRITE(LUER,*)TRIM(STRING)
 	         STOP
 	      END IF

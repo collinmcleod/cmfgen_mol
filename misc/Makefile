@@ -28,6 +28,7 @@ OBJ1  =  rd_f_to_s_ids.o rd_f_to_s_ids_v2.o rd_energy.o write_osc_v2.o
 EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)count_phot_data.exe\
          $(EXE_DIR)chk_phot.exe\
+         $(EXE_DIR)pack_osc.exe\
          $(EXE_DIR)do_ng_v2.exe\
          $(EXE_DIR)land_col_merge.exe\
          $(EXE_DIR)land_multi_merge.exe\
@@ -62,6 +63,12 @@ $(EXE_DIR)chk_phot.exe : chk_phot.o recom_chk_v2.o get_exc_freq.o $(OBJ1)
               $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)chk_phot.exe
+#
+$(EXE_DIR)pack_osc.exe : pack_osc.o $(OBJ1)
+	$(F90) pack_osc.o \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
+              $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
+              -o $(EXE_DIR)pack_osc.exe
 #
 # Give the dependencies of ?.exe and how it is created.
 #
