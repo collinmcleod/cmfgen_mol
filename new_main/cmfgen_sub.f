@@ -4477,9 +4477,9 @@ C
 	    CALL FSTCOOL(R,T,ED,TA,TB,ML,ND,LU_REC_CHK)
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
-	        CALL WRCOOLGEN_V2(ATM(ID)%BFCRXzV, ATM(ID)%FFXzV, ATM(ID)%COOLXzV,
+	        CALL WRCOOLGEN(ATM(ID)%BFCRXzV, ATM(ID)%FFXzV, ATM(ID)%COOLXzV,
 	1           DIECOOL(1,ATM(ID)%INDX_XzV), X_COOL(1,ATM(ID)%INDX_XzV),
-	1           ARTIFICIAL_HEAT_TERM,ATM(ID)%XzV_PRES, ATM(ID)%NXzV, ION_ID(ID),
+	1           ATM(ID)%XzV_PRES, ATM(ID)%NXzV, ION_ID(ID),
 	1           TA,TB,LS,ND,LU_REC_CHK)
 	      END IF
 	    END DO
@@ -4489,11 +4489,12 @@ C
 	    CALL WR_AD_COOL(AD_COOL_V,AD_COOL_DT,TA,TB,
 	1            INCL_ADIABATIC,LS,ND,LU_REC_CHK)
 C
-C Output charge exchange cooling rate.
+C Output charge exchange cooling rate, and artificial heating term.
 C
-	    CALL WR_CHG_COOL_V3(TA,TB,LS,ND,LU_REC_CHK)
+	    CALL WR_CHG_COOL_V3( TA,TB,LS,ND,LU_REC_CHK)
+	    CALL WR_ART_HEAT(ARTIFICIAL_HEAT_TERM,TA,TB,LS,ND,LU_REC_CHK)
 C
-	    CALL ENDCOOL(TA,TB,ML,ND,LU_REC_CHK)
+	    CALL ENDCOOL(TA,TB,LS,ND,LU_REC_CHK)
 	  END DO
 	END IF		!Only output if last iteration.
 C 

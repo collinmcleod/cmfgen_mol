@@ -218,8 +218,9 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(wr2d.o)\
       $(LIB)(wr2d_v2.o)\
       $(LIB)(wr_ad_cool.o)\
+      $(LIB)(wr_art_heat.o)\
       $(LIB)(wr_x_info.o)\
-      $(LIB)(wrcoolgen_v2.o)\
+      $(LIB)(wrcoolgen.o)\
       $(LIB)(write_j_cmf_err.o)\
       $(LIB)(writedc.o)\
       $(LIB)(writedc_v2.o)\
