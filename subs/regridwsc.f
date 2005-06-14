@@ -21,7 +21,7 @@ C                         allocation used.
 C                       ERROR_LU installed.
 C                       Generic call for OOG and EXP.
 C
-C Altered 02-Aug-1994 - PROGRDESC change from INTEGER*4 to REAL*8. Corrects
+C Altered 02-Aug-1994 - PROGRDESC change from INTEGER to REAL*8. Corrects
 C                       alignment problem. PROGDESC is now check for
 C                       corruption, even if too many iterations occur.
 C Altered 3-May-1989 - NV and check installed.
@@ -38,7 +38,7 @@ C                         NDOLD can be grater than ND)
 C Altered 30-APR-1985 - (Bug fixed in error messages - import when ND .ne. NDOLD)
 C Altered 28-FEB-1984
 C
-	INTEGER*4 N,ND
+	INTEGER N,ND
 	REAL*8 DHEN(N,ND),R(ND),T(ND),ED(ND),DI(ND),EDGE(N)
 C
 	REAL*8, ALLOCATABLE :: DPOP(:,:)
@@ -52,12 +52,12 @@ C
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 C Local Variables.
 C
-	INTEGER*4 I,J,NOLD,NDOLD,COUNT,NX,NXST,NZ,IOS
+	INTEGER I,J,NOLD,NDOLD,COUNT,NX,NXST,NZ,IOS
 	REAL*8 RPOLD,TX,DELTA_T,T1,ADD1
 	CHARACTER*80 STRING
 	CHARACTER*(*) FILNAME

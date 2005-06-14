@@ -68,8 +68,10 @@
 	CHARACTER*80  XLABEL,YLABEL,TITLE(N_TITLE)
 	CHARACTER*(*) XLAB,YLAB,TITL,PASSED_OPT
         CHARACTER*80 FILNAME
+        CHARACTER*80 ID_FILNAME
         CHARACTER*80 PLT_ST_FILENAME
 	CHARACTER*80 WK_STR,OPTION
+	CHARACTER*80 TMP_STR
 	CHARACTER*6 TO_TEK
 	CHARACTER*2 TO_VT
 	CHARACTER*50 PLT_ID,RD_PLT_ID,PLT_ID_SAV
@@ -81,6 +83,26 @@
 	LOGICAL VEC,FLAGLINE(MAXVEC),INIT
 	LOGICAL QUERYFLAG
 	INTEGER VECPEN(MAXVEC)
+!
+	INTEGER N_LINE_IDS
+	CHARACTER*10 LINE_ID(5000)
+	REAL*4 ID_WAVE(5000)
+	REAL*4 ID_WAVE_OFF(5000)
+	REAL*4 ID_Y_OFF(5000)
+	REAL*4 TAU(5000)
+	REAL*4 TAU_CUT
+	REAL*4 ID_ORIENT
+	REAL*4 ID_SCL
+	REAL*4 ID_VEC_BEG
+	REAL*4 ID_VEC_END
+	REAL*4 ID_EXPCHAR
+	INTEGER ID_LOC
+	INTEGER ID_LOC_PG
+	CHARACTER*10 OMIT_ID(10)
+	CHARACTER*10 INC_ID(10)
+	INTEGER N_OMIT_ID
+	INTEGER N_INC_ID
+	LOGICAL WR_ID
 !
 ! String arrays (not labels or titles)
 !
@@ -114,6 +136,8 @@
 	REAL*4 XCUR(2),YCUR(2),SLOPE
 	INTEGER PLOT_ID,CURSERR
 	INTEGER L_CHAN(2)
+	INTEGER, SAVE :: LU_EW=30
+	LOGICAL, SAVE :: FIRST_EW=.TRUE.
 	CHARACTER*1 CURSVAL
 	LOGICAL CONTINUUM_DEFINED
 !
@@ -190,10 +214,13 @@
 	CHARACTER*20 HARD_TYPE
 	CHARACTER*20 HARD_FMT_STR
 	INTEGER HARD_CNT
-	SAVE HARD_CNT,HARD_FMT_STR
+	SAVE HARD_CNT
+	SAVE HARD_FMT_STR
+	SAVE HARD_TYPE
 !
 	INTEGER PGOPEN,PLT_LINE_WGT
 	INTEGER ID
+	SAVE ID
 	REAL*4 TOTXMM,TOTYMM,SCALEFACY,SCALEFAC
 	REAL*4 PRINTX1,PRINTX2,PRINTY1,PRINTY2
 !
@@ -201,7 +228,7 @@
 !
 	INTEGER IST,IEND,N_REC_SIZE
 !
-	SAVE ASR
+	SAVE XCM,ASR
 	SAVE EXPCHAR_SCALE,EXPMARK_SCALE,TICK_FAC_SCALE
 	SAVE RED,BLUE,GREEN
 	SAVE FSTOPEN,PEN_COL,DASH,PRINTER
@@ -217,6 +244,15 @@
 	  WRITE(T_OUT,*)'Error - No calls made to curve'
 	  RETURN
 	END IF
+	N_LINE_IDS=0
+	ID_SCL=1.05D0
+	ID_VEC_BEG=1.04D0
+	ID_VEC_END=1.01D0
+	ID_EXPCHAR=1.0D0
+	ID_FILNAME='LINE_ID'
+	TAU_CUT=0.1D0
+	N_OMIT_ID=0
+	N_INC_ID=0
 !
 ! Define character strings for switching between VT and TEK modes.
 !
@@ -1138,6 +1174,56 @@ C
 	    ISTR=ISTR+1
 	  END DO
 	  GOTO 1000
+	ELSE IF(ANS .EQ. 'RID')THEN
+	  N_LINE_IDS=0
+	  J=0
+	  CALL NEW_GEN_IN(TAU_CUT,'Omit lines with central optical depth <')
+	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs')
+	  CALL SET_CASE_UP(ID_FILNAME,1,0)
+          OPEN(UNIT=33,FILE=TRIM(ID_FILNAME),STATUS='OLD',IOSTAT=IOS)
+	  IF(IOS .EQ. 0)THEN
+	    TMP_STR='!'
+	    DO WHILE(TMP_STR(1:1) .EQ. '!')
+	      READ(33,'(A)')TMP_STR
+	    END DO
+	    BACKSPACE(33)
+	    DO WHILE(J+1 .LE. 5000)
+	      READ(33,*,END=1500)LINE_ID(J+1),ID_WAVE(J+1),TAU(J+1),ID_WAVE_OFF(J+1),ID_Y_OFF(J+1)
+	      IF( (ID_WAVE(J+1)-XPAR(1))*(XPAR(2)-ID_WAVE(J+1)) .GT. 0 .AND.
+	1                   TAU(J+1) .GT. TAU_CUT)THEN
+	         J=J+1
+	         N_LINE_IDS=J
+	      END IF
+	    END DO
+	  ELSE
+	    WRITE(6,*)'Unable top open file'
+	    GOTO 1000
+	  END IF
+1500	  CONTINUE
+	  CLOSE(UNIT=33)
+	  WRITE(6,*)'Number of lines read in is',N_LINE_IDS
+	  CALL NEW_GEN_IN(ID_SCL,'Factor to scale line location')
+	  CALL NEW_GEN_IN(ID_EXPCHAR,'Factor to scale size of ID')
+	  GOTO 1000
+	ELSE IF(ANS .EQ. 'SID')THEN
+	  CALL NEW_GEN_IN(ID_SCL,'Factor to scale line location')
+	  CALL NEW_GEN_IN(ID_VEC_BEG,'Location to start ID line')
+	  CALL NEW_GEN_IN(ID_VEC_END,'Location to end ID line')
+	  CALL NEW_GEN_IN(ID_EXPCHAR,'Factor to scale size of ID')
+	  N_OMIT_ID=0
+	  DO I=1,10
+	    OMIT_ID(I)='ZZ'
+	    CALL NEW_GEN_IN(OMIT_ID(I),'Species ID to OMIT from labels')
+	    IF(OMIT_ID(I) .EQ. 'ZZ')EXIT
+	    N_OMIT_ID=I
+	  END DO
+	  N_INC_ID=0
+	  DO I=1,10
+	    INC_ID(I)='ZZ'
+	    CALL NEW_GEN_IN(INC_ID(I),'Species ID to INC in labels')
+	    IF(INC_ID(I) .EQ. 'ZZ')EXIT
+	    N_INC_ID=I
+	  END DO
 !
 ! 
 !
@@ -1208,7 +1294,7 @@ C
 !
 	  ELSE
 !
-	    QUERYFLAG=.TRUE.
+	    QUERYFLAG=.FALSE.
 	    CALL NEW_GEN_IN(QUERYFLAG,'Compute area?')
 	    IF(.NOT. QUERYFLAG)THEN
               WRITE(T_OUT,*)'Continuum not defined'
@@ -1223,8 +1309,11 @@ C
 !
 ! Get the location of the line.
 !
-	    CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
-	    CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
+	    DO WHILE(1 .EQ. 1)
+	      CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
+	      IF(END_CURS(CURSVAL))GOTO 1000
+	      CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
+	      IF(END_CURS(CURSVAL))GOTO 1000
 !
 ! We do all plot provided the cover the range indicated by the cursors.
 ! Find nearest channels to curser positions.
@@ -1274,6 +1363,7 @@ C
 	          END DO
 	          CENTROID=CENTROID/EW
 	          WRITE(T_OUT,'(A,I3,3X,5X,A,1PE10.3,A,A,1PE14.6)')' Plot ID=',IP,'  AREA=',EW,' X(units);','  Centroid=',CENTROID
+	          WRITE(LU_EW,'(A,I3,3X,5X,A,1PE10.3,A,A,1PE14.6)')' Plot ID=',IP,'  AREA=',EW,' X(units);','  Centroid=',CENTROID
 	        ELSE
 !
 ! Compute EW
@@ -1288,10 +1378,34 @@ C
 	1                 (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
 	          END DO
 	          CENTROID=CENTROID/EW
-	          WRITE(T_OUT,'(A,I3,3X,5X,A,1PE10.3,A,A,1PE14.6)')' Plot ID=',IP,'  EW=',EW,' X(units);','  Centroid=',CENTROID
+!
+	          IF(FIRST_EW)THEN
+	            OPEN(UNIT=LU_EW,FILE='EW_FR_SPEC_PLT',STATUS='UNKNOWN')
+	            FIRST_EW=.FALSE.
+	            WRITE(LU_EW,'(5A14)')'     Plot ID',' EW(X units)',' X(centroid)',
+	1                        '    X(start)','      X(end)'
+	          END IF
+	          WRITE(T_OUT,'(A,I3,5X,A,1PE10.3,A,A,ES14.6,2ES14.4)')
+	1            ' Plot ID=',IP,'  EW=',EW,' X(units);','  Centroid=',CENTROID,
+	1                  CD(IP)%XVEC(L_CHAN(1)),CD(IP)%XVEC(L_CHAN(2))
+	          IF(IP .EQ. 1)THEN
+	            WRITE(LU_EW,'(A)')' '
+	            TMP_STR=' '
+	            CALL NEW_GEN_IN(TMP_STR,'Comment=')
+	            IF(TMP_STR .NE. ' ')THEN
+	              WRITE(LU_EW,'(A)')TRIM(TMP_STR)
+	              WRITE(LU_EW,'(A)')' '
+	              TMP_STR=' '
+	              CALL NEW_GEN_IN(TMP_STR,'Comment=')
+	              IF(TMP_STR .NE. ' ')WRITE(LU_EW,'(A)')TRIM(TMP_STR)
+	            END IF
+	          END IF
+	          WRITE(LU_EW,'(10X,I4,4ES14.6)')
+	1            IP,EW,CENTROID,CD(IP)%XVEC(L_CHAN(1)),CD(IP)%XVEC(L_CHAN(2))
 	        END IF
 	      END IF
 	    END DO
+	    END DO		!Multiple plots
 	    GOTO 1000
 	  END IF
 !
@@ -1770,7 +1884,7 @@ C
 	  END IF
 	  IF(VAR_PLT1 .EQ. 0)WRITE(6,*)'Normalizing plots to 1.0'
 	  XT(1)=XPAR(1); CALL NEW_GEN_IN(XT(1),'Beginning of normalization range')
-	  XT(2)=XT(1)+0.1*(XPAR(2)-XPAR(1))
+	  XT(2)=XPAR(2)
 	  CALL NEW_GEN_IN(XT(2),'End of normalization range')
 	  MEAN=0.0D0
 	  CNT=0.0D0
@@ -2085,15 +2199,55 @@ C
 	IF(STR)THEN
 	  CALL JUSTIFY_CONVERT_V2(XSTR,YSTR,LOC,LOC_PG,ORIENTATION,FLAGSTR,
      *    XSTRPOS,YSTRPOS,STRING,MAXSTR)
+	  T1=(XSTRPOS(I)-XPAR(1))*(XPAR(2)-XSTRPOS(I))
+	  T2=(YSTRPOS(I)-YPAR(1))*(YPAR(2)-YSTRPOS(I))
 	  DO I=1,MAXSTR
-	    T1=(XSTRPOS(I)-XPAR(1))*(XPAR(2)-XSTRPOS(I))
-	    T2=(YSTRPOS(I)-YPAR(1))*(YPAR(2)-YSTRPOS(I))
 	    IF(LOC(I) .LT. 0)THEN ; T1=1.0; T2=1.0; END IF
 	    IF(FLAGSTR(I) .AND. T1 .GT. 0 .AND. T2 .GT. 0)THEN
 	      CALL PGSCI(STR_COL(I))
 	      CALL PGSCH(EXPCHAR*STR_EXP(I))
 	      CALL PGPTXT(XSTRPOS(I),YSTRPOS(I),ORIENTATION(I),
 	1                            LOC_PG(I),STRING(I))
+	    END IF
+	  END DO
+	END IF
+!
+	IF(N_LINE_IDS .NE. 0)THEN
+	  CALL PGSCI(IONE)
+	  ID_LOC=4
+	  ID_ORIENT=90.0D0
+	  ID_LOC_PG=1.0D0
+	  DO I=1,N_LINE_IDS
+	    T1=ID_SCL*ID_Y_OFF(I)
+	    TMP_STR=' '
+	    WRITE(TMP_STR,'(F12.2)')ID_WAVE(I)
+	    TMP_STR=TRIM(LINE_ID(I))//'-'//ADJUSTL(TMP_STR)
+	    CALL JUSTIFY_CONVERT_V2(ID_WAVE_OFF(I),T1,ID_LOC,ID_LOC_PG,ID_ORIENT,.TRUE.,
+	1                  XSTRPOS(1),YSTRPOS(1),TMP_STR,IONE)
+	    T1=(XSTRPOS(1)-XPAR(1))*(XPAR(2)-XSTRPOS(1))
+	    T2=(YSTRPOS(1)-YPAR(1))*(YPAR(2)-YSTRPOS(1))
+	    IF(T1 .GT. 0 .AND. T2 .GT. 0)THEN
+	      WR_ID=.TRUE.
+	      DO J=1,N_OMIT_ID
+	        IF( INDEX(LINE_ID(I),TRIM(OMIT_ID(J))) .NE. 0 )THEN
+	          WR_ID=.FALSE.
+	          EXIT
+	        END IF
+	      END DO
+	      DO J=1,N_INC_ID
+	        IF(J .EQ. 1)WR_ID=.FALSE.
+	        IF( INDEX(LINE_ID(I),TRIM(INC_ID(J))) .NE. 0 )THEN
+	          WR_ID=.TRUE.
+	        END IF
+	      END DO
+	      IF(WR_ID)THEN
+	        CALL PGSCI(ITWO)
+	        CALL PGSCH(EXPCHAR*ID_EXPCHAR)
+	        CALL PGPTXT(XSTRPOS(1),YSTRPOS(1),ID_ORIENT,ID_LOC_PG,TMP_STR)
+	        T1=ID_SCL*ID_Y_OFF(I)
+	        CALL PGMOVE(ID_WAVE(I),ID_VEC_BEG)
+	        CALL PGDRAW(ID_WAVE(I),ID_VEC_END)
+	      END IF
 	    END IF
 	  END DO
 	END IF

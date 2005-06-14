@@ -31,12 +31,12 @@
 !                       Call unchanged.
 ! Created 19-Jul-1993 : Based on EVALSE_QWVJ
 !
-	INTEGER*4 ID            !Ion identifier
-	INTEGER*4 N_A		!Number of levles in ionizations state i
-	INTEGER*4 N_B		!Number of levles in ionizations state i+1
-	INTEGER*4 ION_EQ_IN_BA	!Eqn. # of target species [gs. of (i+2)th ]
-	INTEGER*4 NION		!Total number of IONS
-	INTEGER*4 ND		!Number of depth points
+	INTEGER ID            !Ion identifier
+	INTEGER N_A		!Number of levles in ionizations state i
+	INTEGER N_B		!Number of levles in ionizations state i+1
+	INTEGER ION_EQ_IN_BA	!Eqn. # of target species [gs. of (i+2)th ]
+	INTEGER NION		!Total number of IONS
+	INTEGER ND		!Number of depth points
 !
 	REAL*8 HN_A(N_A,ND)		!    Pops. of ith ionzation stage
 	REAL*8 HNST_A(N_A,ND)		!LTE   "    "  "      "       "
@@ -52,9 +52,9 @@
 !
 ! Local variables.
 !
-	INTEGER*4 ION_EQ		!Ion eqation in SE(ID)%BA matrix.
-	INTEGER*4 ION_V                 !Location of ion variable in SE(ID)%BA.
-	INTEGER*4 I,J
+	INTEGER ION_EQ		!Ion eqation in SE(ID)%BA matrix.
+	INTEGER ION_V                 !Location of ion variable in SE(ID)%BA.
+	INTEGER I,J
 	REAL*8 NETR
 	REAL*8 SUM_SE
 	REAL*8 SUM_VJ_R,SUM_VJ_P

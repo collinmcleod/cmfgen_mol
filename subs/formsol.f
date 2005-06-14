@@ -72,7 +72,7 @@ C Altered       -1989 - Blanketing and EW section included.
 C Created 31-Jan-1989 - Based on CMFJBAR (and LAMDIAG)
 C
 C
-	INTEGER*4 NLF,NC,NP,ND
+	INTEGER NLF,NC,NP,ND
 	REAL*8 ETA(ND),CHI(ND),ESEC(ND),CHIL(ND),ETAL(ND)
 	REAL*8 V(ND),SIGMA(ND),R(ND),P(NP)
 	REAL*8 JBAR(ND),ZNET(ND)
@@ -96,7 +96,7 @@ C
 C
 C Local variables.
 C
-	INTEGER*4 I,LS,ML,NI,NIEXT
+	INTEGER I,LS,ML,NI,NIEXT
 	REAL*8 OLDCHI,T1,T2,DBC,DNU,TOR,IBOUND,WERF_EXP,SCALE
 C
 C DNU is the frequency bandwidth over which we integrate to obtain

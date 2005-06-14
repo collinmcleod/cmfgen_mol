@@ -16,9 +16,9 @@
 !
 ! Finalized 14-Jan-2003: Gives ame answer as JGREY in limit of VEL=0
 !
-	INTEGER*4 NC
-	INTEGER*4 ND
-	INTEGER*4 NP
+	INTEGER NC
+	INTEGER ND
+	INTEGER NP
 !
 	REAL*8 RJ(ND)			!Mean intensity (computed and returned)
 	REAL*8 RSQ_HFLUX(ND)            !r^2 . Flux
@@ -74,7 +74,7 @@
 	REAL*8 DBC
 	REAL*8 C_KMS
 !
-	INTEGER*4, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: IONE=1
 	REAL*8 PI
 	REAL*8 T1,T2
 	REAL*8 E1,E2,E3

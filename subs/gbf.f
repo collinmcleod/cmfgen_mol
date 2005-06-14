@@ -13,7 +13,7 @@ C
 C Altered 24-May-1996 : IMPLICIT NONE installed.
 C                       A now declared REAL*8
 C
-	INTEGER*4 N
+	INTEGER N
 	REAL*8 GBF,RNU,ZHE
 C
 	REAL*8 A(0:6,10),T1

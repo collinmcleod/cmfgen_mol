@@ -19,7 +19,7 @@ C Altered 16-APRIL-85 - Nag rouitines called to solve the similtaneous
 C                        equations. This routine assumes a paged enviroment.
 C Changed 22-JUL-82 -total number of variables passed
 C
-	INTEGER*4 ND,NV
+	INTEGER ND,NV
 	REAL*8 BA(NV,NV,ND,ND),STEQ(NV,ND)
 	REAL*8 ABT(NV*NV*ND),FQ(NV*ND)
 C
@@ -27,11 +27,11 @@ C Local variables.
 C
 	REAL*8 DP
 C
-	INTEGER*4, PARAMETER :: IONE=1
-	INTEGER*4, PARAMETER :: ITWO=2
+	INTEGER, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: ITWO=2
 C
-	INTEGER*4 I,J,NU,IFAIL
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER I,J,NU,IFAIL
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 	NU=ND*NV

@@ -489,10 +489,13 @@ C
 C
 	  WRITE(LUSCR,'()')
 	  WRITE(LUSCR,'()')
+	  INTERP_DC_SPH_TAU=.FALSE.
 	  CALL RD_STORE_LOG( RDINR,'RD_IN_R_GRID',L_TRUE,
 	1        'Read in a predetermined R grid ?')
 	  CALL RD_STORE_LOG(GRID,'LIN_INT',L_TRUE,
 	1        'Use direct linear interpolation if  new model ?')
+	  CALL RD_STORE_LOG(INTERP_DC_SPH_TAU,'DC_SPH_TAU',L_FALSE,
+	1        'Interpolate d.c''s on the spherical TAU scale?')
 	  CALL RD_STORE_LOG(DO_POP_SCALE,'POP_SCALE',L_TRUE,
 	1        'Scale populations so that cons. Eq. satisfied ?')
 	  CALL RD_STORE_DBLE(T_INIT_TAU,'T_INIT_TAU',L_TRUE,

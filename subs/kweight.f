@@ -17,10 +17,10 @@ C                      handled correctly. Program assumes that U is of the
 C                      for U= a + b*mu*mu .
 C Created 25-Nov-1986 (Based on NORDWEIGHT)
 C
-	INTEGER*4 N,I
+	INTEGER N,I
 	REAL*8 X(N),W(N),H,HN,RE,RF,SUM
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 	W(:)=0.0D0

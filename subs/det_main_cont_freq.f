@@ -10,7 +10,7 @@ C NCF represents the toal number of frequencies at which we solve the radiative
 C transfer equation. The frequencies are stored in the vector NU which
 C has been chosen to sample all lines and continuum edges adequately.
 C
-	INTEGER*4 NCF
+	INTEGER NCF
 	REAL*8 NU(NCF)
 C
 C For each frequncy NU(I), the continuum cross-section will be evaluated at
@@ -23,7 +23,7 @@ C insertion. NU_CONT contains these frequencies, and has been chosen to
 C sample continuum cross-sections (with allowance for level dissolution and 
 C important bound-free edges) adequately. 
 C
-	INTEGER*4 NCF_CONT
+	INTEGER NCF_CONT
 	REAL*8 NU_CONT(NCF_CONT)
 C
 	REAL*8 DOPV		!Doppler spacing across lines
@@ -36,12 +36,12 @@ C
 	LOGICAL COMPUTE_ALL_CROSS
 C
 	REAL*8 SPEED_OF_LIGHT
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	EXTERNAL SPEED_OF_LIGHT,ERROR_LU
 C
 C Local variables:
 C
-	INTEGER*4 LU_OUT,L,K,ML,ML_ST,ML_END,LST_COMP
+	INTEGER LU_OUT,L,K,ML,ML_ST,ML_END,LST_COMP
 	REAL*8 T1,T2,T3,T4,DOP_RAT,VRAT,C_KMS
 C
 	LU_OUT=ERROR_LU()

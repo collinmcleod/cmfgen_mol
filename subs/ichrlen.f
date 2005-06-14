@@ -4,7 +4,7 @@ C string are not counted. The string is not modified.
 C
 	FUNCTION ICHRLEN(A)
 	IMPLICIT NONE
-	INTEGER*4 ICHRLEN,I,L
+	INTEGER ICHRLEN,I,L
 	CHARACTER*(*) A
 C
 	L=LEN(A)

@@ -30,11 +30,11 @@
 !
 ! Parameters, vectors, and arrays for computing the observed flux.
 !
-        INTEGER*4, PARAMETER :: NST_CMF=1000
+        INTEGER, PARAMETER :: NST_CMF=1000
         REAL*8  NU_STORE(NST_CMF)
 !
-        INTEGER*4 NP_OBS_MAX
-        INTEGER*4 NP_OBS
+        INTEGER NP_OBS_MAX
+        INTEGER NP_OBS
         REAL*8 V_AT_RMAX                !Used if we extend the atmosphere.
         REAL*8 RMAX_OBS
         REAL*8 H_OUT,H_IN

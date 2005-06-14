@@ -14,7 +14,7 @@ C
 C
 C Altered 25-NOV-1986 (Based on TAU)
 C
-	INTEGER*4 NI,I
+	INTEGER NI,I
 	REAL*8 DTAU(NI),CHI(NI),Z(NI),R(NI),dCHIdR(NI)
 C
 	DO I=1,NI-1
@@ -68,14 +68,14 @@ C ALtered 24-May-1996 ; ERROR_LU installed.
 C ALtered 25-JAn-88 - Boundary condition checked.
 C Altered 20-Feb-1987 (Method option installed)
 C
-	INTEGER*4 ND,I
+	INTEGER ND,I
 	REAL*8 CHI(ND),dCHIdR(ND),R(ND),LIM
 	CHARACTER*6 METHOD
 C                        
 	REAL*8 H(ND),SLOPE(ND)
 	REAL*8, PARAMETER :: ONE=1.0D0
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 	LIM=3.0D0
@@ -230,11 +230,11 @@ C                         linear-linear plane to ensure monotocity of the
 C                         fitting cubic. 
 C ALtered 24-May-1996 ; ERROR_LU installed.
 C
-	INTEGER*4 ND,I
+	INTEGER ND,I
 	REAL*8 CHI(ND),dCHIdR(ND),R(ND),LIM
 	CHARACTER*6 METHOD
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 	REAL*8 SLOPE(ND),H(ND)

@@ -17,12 +17,12 @@
 !                         velocities (> 200 km/s). Routine may be somewhat
 !                         slower.
 !
-	INTEGER*4 NF
+	INTEGER NF
 !
 	REAL*8 PRO(NF)		!Should contain LOG10 of the STARK profile. 
 	REAL*8 PROF_LAM(NF)	!Offset from line center in Angstroms.
 !
-	INTEGER*4 NWS
+	INTEGER NWS
 	REAL*8 STARK(NWS)
 	REAL*8 DWS(NWS)
 	LOGICAL SYM_STARK
@@ -60,10 +60,10 @@
 	REAL*8, ALLOCATABLE :: STARK_INT(:)
 	SAVE DLAM_INT,STARK_INT
 !
-	INTEGER*4 NI,NG
-	INTEGER*4 I,J,K,L,IOS
+	INTEGER NI,NG
+	INTEGER I,J,K,L,IOS
 !
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 !
 	LOGICAL SIMP_QUAD

@@ -31,17 +31,17 @@
           REAL*8, POINTER :: QFV_R(:,:)  		!
           REAL*8, POINTER :: BA(:,:,:,:)		!BA matrix for XzV
           REAL*8, POINTER :: BA_PAR(:,:,:)		!BA matrix for XzV (diagonal terms)
-	  INTEGER*4, POINTER :: LNK_TO_IV(:)    	!
-	  INTEGER*4, POINTER :: LNK_TO_F(:)     	!
-	  INTEGER*4, POINTER :: EQ_IN_BA(:)     	!
-	  INTEGER*4, POINTER :: EQ_TO_ION_LEV_PNT(:)	!
-	  INTEGER*4, POINTER :: ION_LEV_TO_EQ_PNT(:)	!
-	  INTEGER*4, POINTER :: STRT_ADV_ID(:)
-	  INTEGER*4, POINTER :: END_ADV_ID(:)
-	  INTEGER*4 N_SE                        	!Number of S.E. Eqns. for XzV
-	  INTEGER*4 N_IV                        	!Number of important variables for XzV
-	  INTEGER*4 NUMBER_BAL_EQ			!Conservation equation
-	  INTEGER*4 XRAY_EQ				!Equation for Auger ionizations
+	  INTEGER, POINTER :: LNK_TO_IV(:)    	!
+	  INTEGER, POINTER :: LNK_TO_F(:)     	!
+	  INTEGER, POINTER :: EQ_IN_BA(:)     	!
+	  INTEGER, POINTER :: EQ_TO_ION_LEV_PNT(:)	!
+	  INTEGER, POINTER :: ION_LEV_TO_EQ_PNT(:)	!
+	  INTEGER, POINTER :: STRT_ADV_ID(:)
+	  INTEGER, POINTER :: END_ADV_ID(:)
+	  INTEGER N_SE                        	!Number of S.E. Eqns. for XzV
+	  INTEGER N_IV                        	!Number of important variables for XzV
+	  INTEGER NUMBER_BAL_EQ			!Conservation equation
+	  INTEGER XRAY_EQ				!Equation for Auger ionizations
 	  LOGICAL Xzv_PRES                      	!Indicates whether ion is present.
           LOGICAL IMPURITY_SPECIES
 	END TYPE STAT_EQ_DATA

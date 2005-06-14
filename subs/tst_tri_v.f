@@ -1,13 +1,13 @@
 	PROGRAM TST_TRI
 	IMPLICIT NONE
 C
-	INTEGER*4 N,NRHS,I,J
+	INTEGER N,NRHS,I,J
 	PARAMETER (N=60)
 	PARAMETER (NRHS=10000)
 	REAL*8 A(N),B(N),C(N),D(N),F(N)
 	REAL*8 X(N),W(N,NRHS),GAM(N),T1
 !
-	INTEGER*4 INFO,IPIV(N)
+	INTEGER INFO,IPIV(N)
 !
 C
 	DO I=1,N
@@ -115,12 +115,12 @@ C
 !                       Wall time now returened as in original VMS routine.
 !                       Counters now initialized if LRUN=0 is passed.
 !
-	INTEGER*4 LRUN
+	INTEGER LRUN
 	CHARACTER*(*) IDENT
 !
-	INTEGER*4, PARAMETER :: MAX_IDS=50
-!	INTEGER*4, PARAMETER :: LUOUT=55
-	INTEGER*4, PARAMETER :: LUOUT=6
+	INTEGER, PARAMETER :: MAX_IDS=50
+!	INTEGER, PARAMETER :: LUOUT=55
+	INTEGER, PARAMETER :: LUOUT=6
 !
         REAL*8 T0,OVERHEAD
         REAL*8 ST_CPU(MAX_IDS)
@@ -247,12 +247,12 @@ C Altered 29-May-1996 : Loops reversed in forward elimination and the
 C                         backward substitution to allow CRAY vectorization.
 C Altered 21-Feb-1995 :  Cleaned
 C
-	INTEGER*4 N1,N2
+	INTEGER N1,N2
 	REAL*8 A(N1),B(N1),C(N1),D(N1,N2)
 C
 C Local variables
 C
-	INTEGER*4 I,J
+	INTEGER I,J
 C
 C Change the following statement to TRUE if running on a VECTOR machine.
 C

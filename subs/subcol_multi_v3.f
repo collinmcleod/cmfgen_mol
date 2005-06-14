@@ -44,7 +44,7 @@ C                         compute OMEGA in the FULL atom is distinct.
 C                       Vector COOL was installed to enable checking of 
 C                         collisonal cooling rates.
 C
-	INTEGER*4 N_S,N_F,ND  
+	INTEGER N_S,N_F,ND  
 	REAL*8 OMEGA_F(N_F,N_F),dln_OMEGA_dlnT(N_F,N_F)
 	REAL*8 COL_S(N_S,N_S,ND),DCOL_S(N_S,N_S,ND)
 C
@@ -63,7 +63,7 @@ C
 	CHARACTER*(*) LEVNAME_F(N_F)	!Level names in FULL ATOM.
 	EXTERNAL SUB_PHOT
 C
-	INTEGER*4 F_TO_S_MAPPING(N_F)
+	INTEGER F_TO_S_MAPPING(N_F)
 C
 	REAL*8 T(ND)			!Temperature (10^4 K)
 	REAL*8 ED(ND)			!Electron density
@@ -77,8 +77,8 @@ C
 C
 	EXTERNAL OMEGA_COL
 C
-	INTEGER*4 I,J,K
-	INTEGER*4 L,U
+	INTEGER I,J,K
+	INTEGER L,U
 	REAL*8 X
 	REAL*8 BRAT
 	REAL*8 CIJ,CJI,CII

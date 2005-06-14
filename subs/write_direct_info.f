@@ -7,9 +7,9 @@
 !
 ! Created 16-Jun-2000
 !
-	INTEGER*4 ND			!Number of depth points written
-	INTEGER*4 RECL			!Record length (system dependent)
-	INTEGER*4 LU_EDD
+	INTEGER ND			!Number of depth points written
+	INTEGER RECL			!Record length (system dependent)
+	INTEGER LU_EDD
 	CHARACTER*(*) FILENAME
 !
 	CHARACTER*80 NEW_FILENAME
@@ -31,13 +31,13 @@
 !
 ! Created 16-Jun-2000
 !
-	INTEGER*4 ND			!Number of depth points written
-	INTEGER*4 RECL			!Record length (system dependent)
-	INTEGER*4 LU_EDD
+	INTEGER ND			!Number of depth points written
+	INTEGER RECL			!Record length (system dependent)
+	INTEGER LU_EDD
 	CHARACTER*(*) FILENAME
 !
 	CHARACTER*80 NEW_FILENAME
-	INTEGER*4 IOS,ERROR_LU
+	INTEGER IOS,ERROR_LU
 	EXTERNAL ERROR_LU
 !                      
 	NEW_FILENAME=TRIM(FILENAME)//'_INFO'

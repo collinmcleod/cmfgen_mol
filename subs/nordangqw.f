@@ -10,12 +10,12 @@ C Altered 06-Sep-2002 - Check before taking SQRT installed (for INTEL compiler).
 C Altered 24-May-1996 - IMPLICIT NONE installed.
 C Created 25-Nov-1986
 C
-	INTEGER*4 NC,ND,NP
+	INTEGER NC,ND,NP
 	REAL*8 QW(ND,NP),R(ND),TA(NP),TB(NP),TC(NP),P(NP)
 C
 C Local variables
 C
-	INTEGER*4 I,J,NW
+	INTEGER I,J,NW
 	REAL*8 T1
 C
 	DO 10 I=1,NP

@@ -18,8 +18,8 @@ C                         handle P Cygni stars.
 C	                OBS_PRO_EXT_RAT,ES_WING_EXT,V_DOP parameters inserted.
 C                       Now V2.
 C
-	INTEGER*4 NFREQ_MAX,N_LINES
-	INTEGER*4 NFREQ				!Returned
+	INTEGER NFREQ_MAX,N_LINES
+	INTEGER NFREQ				!Returned
 C
 C Vecters returned by subroutine:
 C
@@ -55,20 +55,20 @@ C
 	REAL*8 BIG_SPACING
 	REAL*8 T1
 C
-	INTEGER*4 INDX		!Current frequency index.
-	INTEGER*4 LN_INDX	!Current line whose frequencies we are 
+	INTEGER INDX		!Current frequency index.
+	INTEGER LN_INDX	!Current line whose frequencies we are 
 				!   installing.
-	INTEGER*4 LST_LN_INDX	!Index of last line whose frequencies we
+	INTEGER LST_LN_INDX	!Index of last line whose frequencies we
 				!   installed. Needed as lines computed in
                                 !   SOB or CMF mode may not be included.
 C
-	INTEGER*4 I,J		!Micellaneous loop variables.
-	INTEGER*4 LU_ER
+	INTEGER I,J		!Micellaneous loop variables.
+	INTEGER LU_ER
 	REAL*8 C_KMS,MIN_FREQ
 C
 C External functions
 C
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	REAL*8 SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 C

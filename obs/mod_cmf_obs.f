@@ -8,22 +8,22 @@
 !
 ! Number of atomic species (e.g. H, C, N is 3 species).
 !
-	INTEGER*4, PARAMETER :: NUM_SPECIES=22
+	INTEGER, PARAMETER :: NUM_SPECIES=22
 !
 ! Maximum number of ionization stages per species. For H, need at this number
 ! has to be 2 or higher (as I and II). A setting of 10 implies that we can treat
 ! full atoms for ION_IX.
 !
-	INTEGER*4, PARAMETER :: MAX_IONS_PER_SPECIES=15
-	INTEGER*4, PARAMETER :: MAX_NUM_IONS=NUM_SPECIES*MAX_IONS_PER_SPECIES
+	INTEGER, PARAMETER :: MAX_IONS_PER_SPECIES=15
+	INTEGER, PARAMETER :: MAX_NUM_IONS=NUM_SPECIES*MAX_IONS_PER_SPECIES
 !
 ! Maximum number of photoionization routes for each species.
 !
-	INTEGER*4, PARAMETER :: NPHOT_MAX=4
+	INTEGER, PARAMETER :: NPHOT_MAX=4
 !
 ! Actual number of ions in calculation. Stored sequentially.
 !
-	INTEGER*4 NUM_IONS
+	INTEGER NUM_IONS
 !
 	REAL*8 AT_MASS(NUM_SPECIES)		!Atomic mass in amu
 	REAL*8 AT_NO(NUM_SPECIES)		!Atomic number of species
@@ -38,13 +38,13 @@
 !
 ! Conservation equation for each species.
 !
-	INTEGER*4 EQ_SPECIES(NUM_SPECIES)
+	INTEGER EQ_SPECIES(NUM_SPECIES)
 !
 ! Indicate at what location in the ion arrays each species starts
 ! an ends. This includes the highest ionization stage (e.g. H+).
 !
-	INTEGER*4 SPECIES_BEG_ID(NUM_SPECIES)
-	INTEGER*4 SPECIES_END_ID(NUM_SPECIES)
+	INTEGER SPECIES_BEG_ID(NUM_SPECIES)
+	INTEGER SPECIES_END_ID(NUM_SPECIES)
 !
 ! Principal species abbreviation (e.g. CARB for carbon)
 !
@@ -58,7 +58,7 @@
 !
 ! Link from ion identification to parent species.
 !
-	INTEGER*4 SPECIES_LNK(MAX_NUM_IONS)
+	INTEGER SPECIES_LNK(MAX_NUM_IONS)
 !
 ! Identification of ion.
 !
@@ -95,14 +95,14 @@
 !
 ! Identifications corresponding to each photoionization route.
 !
-	  INTEGER*4 XzV_ION_LEV_ID(NPHOT_MAX)
-	  INTEGER*4, POINTER :: F_TO_S_XzV(:)	!Link of full levels to super levels
-	  INTEGER*4, POINTER :: INT_SEQ_XzV(:)
+	  INTEGER XzV_ION_LEV_ID(NPHOT_MAX)
+	  INTEGER, POINTER :: F_TO_S_XzV(:)	!Link of full levels to super levels
+	  INTEGER, POINTER :: INT_SEQ_XzV(:)
 !
-	  INTEGER*4 NXzV_F		!Number of levels in full atom
-	  INTEGER*4 NXzV		!Number of levels in SL atom
-	  INTEGER*4 EQXzV		!Equation in BA matrix for g.s. of atom
-	  INTEGER*4 N_XzV_PHOT		!Number of states species can ionize to.
+	  INTEGER NXzV_F		!Number of levels in full atom
+	  INTEGER NXzV		!Number of levels in SL atom
+	  INTEGER EQXzV		!Equation in BA matrix for g.s. of atom
+	  INTEGER N_XzV_PHOT		!Number of states species can ionize to.
 !
 	  LOGICAL, POINTER :: OBSERVED_LEVEL(:)	!Link of full levels to super levels
 	  
@@ -127,7 +127,7 @@
 	END TYPE MODEL_ATOM_DATA
 !
 !
-	INTEGER*4 EQNE		!Electron conservation equation
+	INTEGER EQNE		!Electron conservation equation
 !
 	REAL*8, ALLOCATABLE :: R(:)		!Radius in units of 10^10 cm
 	REAL*8, ALLOCATABLE :: V(:)		!V in units of km/s

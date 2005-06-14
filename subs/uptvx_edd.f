@@ -17,7 +17,7 @@ C                       H vectors at I=ND are (should be) zero.
 C                       
 C Created  6-Jun-1989 - Based on UPDATE_TVX which in turn was based on UPVNOT.
 C
-	INTEGER*4 NI,NM
+	INTEGER NI,NM
 	REAL*8 TVX(NI-1,NI,NM)
 	REAL*8 TX(NI,NI,NM)
 	REAL*8 HU(NI),HL(NI),HS(NI)
@@ -26,7 +26,7 @@ C
 C
 C Local varaiables.
 C
-	INTEGER*4 I,J,K
+	INTEGER I,J,K
 C
 	DO K=1,NM
 	  DO J=1,NI

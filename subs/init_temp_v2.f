@@ -27,7 +27,7 @@ C Altered 07-Jul-1997 - CLUMP_FAC_OLD is read in and used, if it is present.
 C Altered 24-May-1996 - Work arrays made allocateable.
 C Created 07-Apr-1989 - Based on TEMPDIST
 C
-	INTEGER*4 ND,LU
+	INTEGER ND,LU
 	REAL*8 LUM               !Luminosity of star in Lsun
         REAL*8 R(ND)             !Radius Units 10^10 cm)
         REAL*8 ED(ND)            !Electron density
@@ -50,10 +50,10 @@ C
 !
 ! Local variables.
 !
-	INTEGER*4 ERROR_LU,LU_ER
+	INTEGER ERROR_LU,LU_ER
 	EXTERNAL ERROR_LU
 !
-        INTEGER*4 I,K,NOLD,NDOLD,IOS
+        INTEGER I,K,NOLD,NDOLD,IOS
         REAL*8 LUMOLD                  !Luminosity of old model in Lsun
         REAL*8 LDL,MLDL                !Used for interpolation.
         REAL*8 T1,DI,ION_FRAC,VEL      !Used when reading T_IN

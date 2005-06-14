@@ -22,16 +22,16 @@
 !                      Now use / to allow the specification of one alternate
 !                      name (not {} since some names now contain these 
 !                      brackets).
-	INTEGER*4 LUIN
+	INTEGER LUIN
 	LOGICAL INCL_CHG_EXCH
 !
 ! Local variables
 !
-	INTEGER*4, PARAMETER :: IZERO=0
-	INTEGER*4 IOS
-	INTEGER*4 N_COEF
-	INTEGER*4 I,K,L,LB,RB
-	INTEGER*4 ERROR_LU
+	INTEGER, PARAMETER :: IZERO=0
+	INTEGER IOS
+	INTEGER N_COEF
+	INTEGER I,K,L,LB,RB
+	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 	CHARACTER*132 STRING,OLD_STRING
 	CHARACTER*11  FORMAT_DATE 

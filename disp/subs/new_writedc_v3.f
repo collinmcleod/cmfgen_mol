@@ -12,7 +12,7 @@ C 07-Jul-1997 - CLUMP_FAC installed in call, and called _V2.
 C                 R now written with 7 digits of precision.
 C 17-Nov-1989 -Based on WRITEDC : TX option installed.
 C
-	INTEGER*4 NHYD,NION,ND,FORM,I,J,COUNT
+	INTEGER NHYD,NION,ND,FORM,I,J,COUNT
 	REAL*8 HYD(NHYD,ND),HYDLTE(NHYD,ND),WHYD(NHYD,ND)
 	REAL*8 EDGEHYD(NHYD),GHYD(NHYD)
 	REAL*8 DHYD(NION,ND),R(ND),T(ND),ED(ND),V(ND),CLUMP_FAC(ND)

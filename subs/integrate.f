@@ -12,11 +12,11 @@ C                     of total integrand.
 C Altered 29-Jan-1987 - Error handling for non monotonic function inserted.
 C Created 29-APR-1985
 C
-	INTEGER*4 ND,I,IFAIL
+	INTEGER ND,I,IFAIL
 	REAL*8 X(ND),F(ND),TA(ND)
 	REAL*8 H0,H1,H2,F01,F12,F23,F012,F123,F0123
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 	IF(ND .LT. 4)THEN

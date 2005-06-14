@@ -12,12 +12,12 @@ C                        format (Different DO loops should not end on the
 C                        same statement).
 C Altered 24-May-1996 : IMPLICIT NONE installed
 C
-	INTEGER*4 N,NR,KS
+	INTEGER N,NR,KS
 	REAL*8 A(N,N),B(N,NR),C(N)
 C
 	REAL*8, PARAMETER :: TOL=1.0D-30
 C
-	INTEGER*4 I,J,L,M,JM
+	INTEGER I,J,L,M,JM
 	REAL*8 BIG,RBIG,T1
 C
 C NOTE THAT C IS A WORKING ARRAY.

@@ -19,13 +19,13 @@
 !
 !******************************************************************************
 !
-	INTEGER*4 NT
-	INTEGER*4 ND
-	INTEGER*4 NION
-	INTEGER*4 NUM_BNDS
-	INTEGER*4 BAND_INDX 
-	INTEGER*4 DIAG_INDX
-	INTEGER*4 DEPTH_INDX
+	INTEGER NT
+	INTEGER ND
+	INTEGER NION
+	INTEGER NUM_BNDS
+	INTEGER BAND_INDX 
+	INTEGER DIAG_INDX
+	INTEGER DEPTH_INDX
 !
         REAL*8 POPS(NT,ND)
         REAL*8 C_MAT(NT,NT)
@@ -58,7 +58,7 @@
 	REAL*8 G_SUM(NT)
 	REAL*8 EDGE_SUM(NT)
 	REAL*8 SUM,T1
-	INTEGER*4 NS
+	INTEGER NS
 !
 ! FAC is used as a scale factor to determine at what depth the ground-state
 ! equilibrium equation is replaced by the ionization equation.
@@ -73,16 +73,16 @@
 ! is used to indicate whether the current depth is to be replaced
 ! (as determined from the DIAGONAL band). Replace now passed.
 !
-	INTEGER*4, SAVE, ALLOCATABLE ::  REP_CNT(:)
+	INTEGER, SAVE, ALLOCATABLE ::  REP_CNT(:)
 !
-	INTEGER*4, SAVE :: LST_DEPTH_INDX=0
+	INTEGER, SAVE :: LST_DEPTH_INDX=0
 !
-	INTEGER*4 I,J,K,L,JJ,N
-	INTEGER*4 EQ
-	INTEGER*4 ID
-	INTEGER*4 ISPEC
+	INTEGER I,J,K,L,JJ,N
+	INTEGER EQ
+	INTEGER ID
+	INTEGER ISPEC
 !
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 !
 ! To save typing.
@@ -370,9 +370,9 @@
 	  END DO
 	END DO
 !
-	IF(K .EQ. 1 .AND. DIAG_BAND)THEN
+	IF(K .EQ. 32 .AND. DIAG_BAND)THEN
 	  OPEN(UNIT=96,FILE='BA_ASCI_N_D1',STATUS='UNKNOWN')
-	    CALL WR2D_MA(POPS(1,1),NT,1,'POPS_D1',96)
+	    CALL WR2D_MA(POPS(1,K),NT,1,'POPS_D1',96)
 	    CALL WR2D_MA(STEQ_VEC,NT,1,'STEQ_VEC_D1',96)
 	    CALL WR2D_MA(C_MAT,NT,NT,'C_MAT_D1',96)
 	  CLOSE(UNIT=96)

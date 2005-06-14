@@ -11,17 +11,17 @@ C Altered 05-Oct-1989 :  DST,DEND variable installed to avoid reading in
 C                          enitre BA matrix for each ion.
 C Created 15-Feb-1989
 C
-	INTEGER*4 EQNE,NT,NUM_BNDS,ND,DST,DEND
+	INTEGER EQNE,NT,NUM_BNDS,ND,DST,DEND
 C
 	REAL*8 BA(NT,NT,NUM_BNDS,ND)
 	REAL*8 STEQ(NT,ND),ED(ND)
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 C Local varaiables.
 C
-	INTEGER*4 K,M
+	INTEGER K,M
 C
 C NB - all S. E. routines assume EQNE = NT-1
 C

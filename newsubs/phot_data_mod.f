@@ -10,9 +10,9 @@
 ! Altered Sep-18-1996 : Dimension of LST_U, LST_CROSS, LST_LOC changed.
 !                       (LST_U renamed to LST_FREQ).
 !
- 	   INTEGER*4 MAX_TERMS		!# of cross sections/term.
-	   INTEGER*4 MAX_CROSS		!# of cross sections/term.
-	   INTEGER*4 NUM_PHOT_ROUTES	!# of photioization routes
+ 	   INTEGER MAX_TERMS		!# of cross sections/term.
+	   INTEGER MAX_CROSS		!# of cross sections/term.
+	   INTEGER NUM_PHOT_ROUTES	!# of photioization routes
 !
 ! For clarity define NLOC as the maximum number of levels in ion.
 !                    NS ar the numer of photoionization paths (NUM_PHOT_ROUTES).
@@ -25,10 +25,10 @@
           REAL*8, POINTER :: NEF(:,:)                 !NLOC,NS
 	  REAL*8, POINTER :: EXC_FREQ(:)              !NS
 	  REAL*8, POINTER :: GION(:)              	!NS
-	  INTEGER*4, POINTER :: A_ID(:,:)    		!NLOC,NS
-	  INTEGER*4, POINTER :: ST_LOC(:,:)    	!MAX_TERMS,NS
-	  INTEGER*4, POINTER :: END_LOC(:,:)    	!MAX_TERMS,NS
-	  INTEGER*4, POINTER :: CROSS_TYPE(:,:)    	!MAX_TERMS,NS
+	  INTEGER, POINTER :: A_ID(:,:)    		!NLOC,NS
+	  INTEGER, POINTER :: ST_LOC(:,:)    	!MAX_TERMS,NS
+	  INTEGER, POINTER :: END_LOC(:,:)    	!MAX_TERMS,NS
+	  INTEGER, POINTER :: CROSS_TYPE(:,:)    	!MAX_TERMS,NS
 	  LOGICAL*4, POINTER :: DO_PHOT(:,:)    	!NS,NS
 !
 	  REAL*8, POINTER :: LST_CROSS(:,:)		!NLOC,NS
@@ -44,7 +44,7 @@
 ! Data block for dielectronic transitions. Arrays are allocated when the
 ! dielectronic data is read in.
 !
-	  INTEGER*4 NDIE_MAX
+	  INTEGER NDIE_MAX
 	  REAL*8, POINTER :: OSC(:)			!NDIE_MAX
 	  REAL*8, POINTER :: GAMMA(:)			!NDIE_MAX
 !
@@ -62,16 +62,16 @@
 ! ST_INDEX refers to the first dielectronic line associated with level I.
 ! END_INDX refers to the final dielectronic line associated with level I.
 !
-	  INTEGER*4, POINTER :: ST_INDEX(:)		!NLOC
-	  INTEGER*4, POINTER :: END_INDEX(:)		!NLOC
+	  INTEGER, POINTER :: ST_INDEX(:)		!NLOC
+	  INTEGER, POINTER :: END_INDEX(:)		!NLOC
 !
 	  REAL*8 VSM_KMS
-	  INTEGER*4 NUM_DIE
+	  INTEGER NUM_DIE
 !
 ! Data block for free-free dielectronic transitions. Arrays are allocated when the
 ! free-free dielectronic data is read in.
 !
-	  INTEGER*4 NUM_FF
+	  INTEGER NUM_FF
 !
 ! FF_GF    is the gf value for the line.
 ! FF_GAMMA is the Lorentz paramter, normalized by 10^{-15}

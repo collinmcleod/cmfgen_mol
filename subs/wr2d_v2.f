@@ -10,14 +10,14 @@ C
 !                      Changed to V2
 ! Altered 13-Dec-1989 - Implicit none installed. I index written out.
 !
-	INTEGER*4 N,M,LU
+	INTEGER N,M,LU
 	REAL*8 A(N,M)
 	LOGICAL WR_INDEX
 	CHARACTER*(*) MES
 	CHARACTER*(*) SYMB
 C
 	REAL*8 T1
-	INTEGER*4 MS,MF,ML,I,J
+	INTEGER MS,MF,ML,I,J
 	CHARACTER*80 FORM
 C
 	WRITE(LU,'(/,1X,A)')MES

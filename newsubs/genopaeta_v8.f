@@ -12,6 +12,8 @@ C
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 C
+C Altered 27-May-2005 - Added check to get minimum frequency, in case levels
+C                         are out of order.
 C Altered 22-Feb-2000 - ID added to call.
 C                       SUB_PHOT_GEN deleted.
 C Altered 15-Dec-1997 - MOD_LEV_DIS_BLK replaces include file. Level
@@ -43,7 +45,7 @@ C Altered 30-Oct-1989 - EXTERNAL specification installed for UNIX
 C                       compatibility.
 C Created 20-Mar-1989 - Based on OPAGEN and CHIGEN
 C
-	INTEGER*4 ID,N,N_DI,ND
+	INTEGER ID,N,N_DI,ND
 	LOGICAL IONFF,LST_DEPTH_ONLY
 C
 C Constants for opacity etc.
@@ -71,8 +73,8 @@ C
 	REAL*8 ZION			!Charge on resultiong ion.
 	REAL*8 GION			!Charge on resultiong ion.
 C
-	INTEGER*4 PHOT_ID		!Photoionization ID (path)
-	INTEGER*4 ION_LEV		!Target level for ionizations in ion.
+	INTEGER PHOT_ID		!Photoionization ID (path)
+	INTEGER ION_LEV		!Target level for ionizations in ion.
 C
 C Vectors to save computational effort.
 C
@@ -90,7 +92,7 @@ C
 C
 C Local constants.
 C
-	INTEGER*4 I,K,K_ST,ND_LOC,NO_NON_ZERO_PHOT
+	INTEGER I,K,K_ST,ND_LOC,NO_NON_ZERO_PHOT
 	REAL*8 ALPHA,TCHI1,TETA1,TETA2
 	REAL*8 T1,T2,ZION_CUBED,NEFF
 C
@@ -148,7 +150,11 @@ C TMP_HNST=HNST(I,K)*(DI(ION_LEV,K)/DIST(ION_LEV,K))*(DIST(1,K)/DI(1,K))
 C CHI(K)=CHI(K)+ALPHA*(HN(I,K)-TMP_HNST*EMHNUKT(K))
 C ETA(K)=ETA(K)+TETA2*TMP_HNST*EMHNUKT(K)
 C
-	IF(NU .GE. EDGE(N))THEN
+C In case some levels are out of order, we get make sure we get the minimum edge
+C frequency.
+C
+	T1=MINVAL(EDGE(1:N))
+	IF(NU .GE. T1)THEN
 	  DO K=K_ST,ND
 	    COR_FAC(K)=(DI(ION_LEV,K)/DIST(ION_LEV,K))*
 	1                   (DIST(1,K)/DI(1,K))*EMHNUKT(K)

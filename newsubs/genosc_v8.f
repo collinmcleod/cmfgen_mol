@@ -39,12 +39,12 @@
 !                       FORMAT date is now search for in data file.
 ! Created 02-Feb-1998 - GF_ACTION and MIN_NUM_TRANS installed. Renamed from V5.
 !
-	INTEGER*4 N			!Number of levels to be returned.
-	INTEGER*4 LUIN,LUOUT
+	INTEGER N			!Number of levels to be returned.
+	INTEGER LUIN,LUOUT
 !
 ! The following data values are returned.
 !
-	INTEGER*4 NTRET			!Number of transitions returned
+	INTEGER NTRET			!Number of transitions returned
 	REAL*8 EINA(N,N)		!f(i,j)/A(j,i) values (i < j)
 	REAL*8 FEDGE(N)			!Level ionization energy (10^15 Hz)
 	REAL*8 STAT_WT(N)		!Statistical weight of level
@@ -66,8 +66,8 @@
 ! whether to set the f values of the weak transitions to zero, or negative.
 !
 	REAL*8    GF_CUT
-	INTEGER*4 LEV_CUT
-	INTEGER*4 MIN_NUM_TRANS
+	INTEGER LEV_CUT
+	INTEGER MIN_NUM_TRANS
 	CHARACTER*(*) GF_ACTION
 	LOGICAL   ONLY_OBS_LINES
 !
@@ -75,7 +75,7 @@
 !
 	EXTERNAL SPEED_OF_LIGHT,ICHRLEN,RD_FREE_VAL,ERROR_LU
 	REAL*8 SPEED_OF_LIGHT,RD_FREE_VAL
-	INTEGER*4 ICHRLEN,ERROR_LU
+	INTEGER ICHRLEN,ERROR_LU
 !
 ! Local variables
 !
@@ -83,21 +83,21 @@
 	CHARACTER*40 LOW_NAME,UP_NAME
 	CHARACTER*11 FORMAT_DATE
 	REAL*8 T1,T2,T3,SPEED_LIGHT
-	INTEGER*4 I,J,K,NW,L1,L2,IOS,LEV_ID
-	INTEGER*4 MAXLEN,LUER,CUT_CNT
+	INTEGER I,J,K,NW,L1,L2,IOS,LEV_ID
+	INTEGER MAXLEN,LUER,CUT_CNT
 	CHARACTER*132 STRING
-	INTEGER*4, PARAMETER :: IZERO=0
-	INTEGER*4, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IONE=1
 !
 ! Variables for deleting weak transitions.
 !
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 	REAL*8 DOWN(N)
-	INTEGER*4 INDX(N)
+	INTEGER INDX(N)
 !
 ! Variables for free-format internal reads.
 !
-	INTEGER*4 NEXT,STR_LEN
+	INTEGER NEXT,STR_LEN
 	CHARACTER*80 DESC
 	DATA STR_LEN/80/
 !

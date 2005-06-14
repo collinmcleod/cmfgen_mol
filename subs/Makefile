@@ -143,6 +143,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(rdgendie_v4.o)\
       $(LIB)(readba.o)\
       $(LIB)(regrid_b_on_ne.o)\
+      $(LIB)(regrid_b_on_sph_tau.o)\
       $(LIB)(regrid_dchi.o)\
       $(LIB)(regrid_h.o)\
       $(LIB)(regridwsc.o)\

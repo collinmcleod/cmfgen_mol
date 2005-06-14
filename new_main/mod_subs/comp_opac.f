@@ -9,6 +9,8 @@
 	USE OPAC_MOD
 	IMPLICIT NONE
 !
+! Altered 11-Jun-2005: Bug fix: X-ray opacity/emissivity was not being
+!                        added correctly.
 ! Altered 13-Sep-2004: Installed ETA_MECH to keep track of mechanical
 !                        energy input.
 ! Altered 03-Mar-2004: Bug fix. EMHNUKT was not being computed when
@@ -126,7 +128,8 @@ C
 	        T2=AT_NO(SPECIES_LNK(ID))+1-ATM(ID)%ZXzV
 	        T1=XCROSS_V2(CONT_FREQ,AT_NO(SPECIES_LNK(ID)),T2,IZERO,IZERO,L_FALSE,L_FALSE)
 	        IF(T1 .NE. 0.0D0)THEN
-	          IF(LST_DEPTH_ONLY)J=1
+	          J=1
+	          IF(LST_DEPTH_ONLY)J=ND
 	          DO I=J,ND
 	            T2=0.0D0			!Temporary CHI
 	            T3=0.0D0			!Temporary ETA

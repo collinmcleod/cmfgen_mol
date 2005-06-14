@@ -32,7 +32,7 @@ C                       gave invalid f values (i.e not 0.33333) at inner
 C                       boundary since only trapazoidal weights.
 C Created 17-FEB-1986
 C
-	INTEGER*4 ND,I
+	INTEGER ND,I
 	REAL*8 TA(ND),TB(ND),TC(ND),R(ND),ZETA(ND)
 	REAL*8 RJ(ND),DTAU(ND),Q(ND),F(ND)
 	REAL*8 THETA(ND),CHI(ND)
@@ -40,7 +40,7 @@ C
 	CHARACTER*6 METHOD
 	LOGICAL DIFF,THK
 C
-	INTEGER*4, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: IONE=1
 C
 	RJ(:)=0.0D0
 C

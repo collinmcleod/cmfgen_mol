@@ -12,12 +12,12 @@ C
 C Altered 24-May-1996 : ND_MAX removed (was unused).
 C Created 30-May-1995 : Based on LTEPOP.
 C             
-	INTEGER*4 ND
+	INTEGER ND
 	REAL*8 ED(ND)			!Electron density
 	REAL*8 T(ND)			!Temperature 10^4K
 	REAL*8 DIC2(ND)			!Ion density (Full model atom)
 C
-	INTEGER*4 NC2
+	INTEGER NC2
 	REAL*8 C2LTE(NC2,ND)
 	REAL*8 W_C2(NC2,ND)
 	REAL*8 EDGEC2(NC2)
@@ -28,12 +28,12 @@ C
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
 C Local variables.
 C
-	INTEGER*4 I,K
+	INTEGER I,K
 	REAL*8 X,Y,RGU
 C
 C Compute the occupation probabilities.

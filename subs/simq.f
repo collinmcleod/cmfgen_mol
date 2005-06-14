@@ -50,7 +50,7 @@ C Altered 05-Dec-1996: Aritmetic if's  removed. END DO used to terminate all
 C                         DO LOOPS. Changes verified.
 C Altered 26-May-1996: Implicit none installed.
 C
-      INTEGER*4 N,KS
+      INTEGER N,KS
       REAL*8 A(N),B(N)
 C
 C Local variables.
@@ -59,10 +59,10 @@ C
       REAL*8 BIGA
       REAL*8 SAVE
 C
-      INTEGER*4 I,J,K
-      INTEGER*4 I1,I2,IJ,IT,IA,IB,IC,IX
-      INTEGER*4 IQS,IMAX,IXJ,IXJX
-      INTEGER*4 JJ,JY,JX,JJX,NY
+      INTEGER I,J,K
+      INTEGER I1,I2,IJ,IT,IA,IB,IC,IX
+      INTEGER IQS,IMAX,IXJ,IXJX
+      INTEGER JJ,JY,JX,JJX,NY
 C
 C Forward solution
 C 

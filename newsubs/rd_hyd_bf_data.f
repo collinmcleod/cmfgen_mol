@@ -3,19 +3,19 @@ C Routine to read in the logarithmic (base) 10 photoionization cross
 C sections for (n,l) and merged n states of hydrogen.
 C
 	MODULE HYD_BF_PHOT_DATA
-	  INTEGER*4 MAX_L_PQN
-	  INTEGER*4 N_PER_L
+	  INTEGER MAX_L_PQN
+	  INTEGER N_PER_L
 	  REAL*8 L_ST_U
 	  REAL*8 L_DEL_U
 	  REAL*8,    ALLOCATABLE ::  BF_L_CROSS(:)
-	  INTEGER*4, ALLOCATABLE :: BF_L_INDX(:,:)
+	  INTEGER, ALLOCATABLE :: BF_L_INDX(:,:)
 C
-	  INTEGER*4 MAX_N_PQN
-	  INTEGER*4 N_PER_N
+	  INTEGER MAX_N_PQN
+	  INTEGER N_PER_N
 	  REAL*8 N_ST_U
 	  REAL*8 N_DEL_U
 	  REAL*8,    ALLOCATABLE ::  BF_N_GAUNT(:)
-	  INTEGER*4, ALLOCATABLE :: BF_N_INDX(:)
+	  INTEGER, ALLOCATABLE :: BF_N_INDX(:)
 	END MODULE HYD_BF_PHOT_DATA
 C
 	SUBROUTINE RD_HYD_BF_DATA(LUIN,LUOUT,LUER)
@@ -25,10 +25,10 @@ C
 ! Altered 22-Jun-2000 : Error ouput when HYD_L_DATA or GBF_N_DATA cannot be
 !                        successfully opened.
 !
-	INTEGER*4, PARAMETER :: IZERO=0
-	INTEGER*4 LUIN,LUOUT,LUER
-	INTEGER*4 I,L,N,CNT,IOS
-	INTEGER*4 RD_L,RD_N
+	INTEGER, PARAMETER :: IZERO=0
+	INTEGER LUIN,LUOUT,LUER
+	INTEGER I,L,N,CNT,IOS
+	INTEGER RD_L,RD_N
 	CHARACTER*132 STRING
 C
 C Read in hydrogenic cross-section for (n,l) states.

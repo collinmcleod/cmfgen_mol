@@ -326,10 +326,10 @@
 !                         the MODEL_SPEC file.
 ! Created 07-Jun-2000
 !
-	INTEGER*4 CNT
+	INTEGER CNT
 	CHARACTER*(*) SUB_KEY
 !
-	INTEGER*4 I,BEG_CNT,END_CNT
+	INTEGER I,BEG_CNT,END_CNT
 !
 ! Note that the sub-string defined by KEY_ST, KEY_END do not incorporate 
 ! the []'s.

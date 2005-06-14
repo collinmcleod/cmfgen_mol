@@ -28,6 +28,8 @@
 !        CROSS_SM    Smoothed Cross-Section
 !        NSM         Number of frequency points in smooth cross-section.
 !
+! Altered 24-May-2005 : Fixed to handle case where mirroring of cross-section
+!                        about NU=1 gives negative frequencies.
 ! Created 19-Apr-2004 : Based on SM_PHOT_V2
 !                       Designed to be incorporated into CMFGEN
 !                       Some cleaning.
@@ -102,6 +104,10 @@
 	  N_INS=I-IBEG+1
 !
 ! How we proceed depends on whether NU=1 is present.
+! If there is a large step size in NU near NU=1, we may get -ve frequencies
+! This will not effect the answer, since we are just integrating the
+! cross-section. For reasonable a reasonable SIG_GAU (< 10,000 km/s) we
+! will only integrate in the positive frequency range anyway.
 !
 	  IF(NU(IBEG) .NE. 1.0D0)THEN
 	    IF(IBEG .EQ. 1)THEN
@@ -179,13 +185,16 @@
 ! interpolation. This is satisfactory given the accuracy of the cross-sections.
 !
 ! NB: The Gaussian is assumed to have constant width in velocity space.
-!     For this reason SIG_GAU is mutipled by NU(ML).
+!     For this reason SIG_GAU is mutipled by NU(ML). For frequencies < 1,
+!     we use SIG_GAU. This prevents DIFF from becoming arbitrarily small if
+!     NU should approach zero.
 !
 	I=1
 	NU_FINE(1)=NU(1)
 	CROSS_FINE(1)=CROSS(1)
 	DO ML=2,NCROSS
 	  MAX_DEL=SIG_GAU*NU(ML)/PTS_PER_SIG
+	  IF(NU(ML) .LE. 1.0D0)MAX_DEL=SIG_GAU/PTS_PER_SIG
 	  DIFF=NU(ML)-NU(ML-1)
 	  IF( DIFF .GT. MAX_DEL)THEN
             J=DIFF/MAX_DEL+1
@@ -278,19 +287,19 @@ C
 	    WRITE(6,*)'NU_FINE(IST)=',NU_FINE(IST)
 	    WRITE(6,*)'NU_FINE(IEND)=',NU_FINE(IEND)
 	    WRITE(6,*)'SIG_GAU=',SIG_GAU
+	    DO J=1,NCROSS
+	      WRITE(30,'(I6,2ES16.6)')J,NU(J),CROSS(J) 
+	    END DO
 	    STOP
 	  END IF
 	END DO				!Frequency loop
 !
-!	CALL DP_CURVE(NSM,NU_SM,CROSS_SM)
-!
-! Omit pints that are uneessary to maintyain an accuracy of CUT_ACCURACY in the
+! Omit pints that are uneessary to maintain an accuracy of CUT_ACCURACY in the
 ! cross-section assuming linear interpolation.
 !
         CALL CUT_POINTS_V3(NU,CROSS,NCROSS,
 	1                NU_SM,CROSS_SM,NSM,CUT_ACCURACY)
 !
-	WRITE(6,*)NCROSS
 	RETURN
 !
 999	WRITE(6,*)'Error --- NLOC too small in SM_PHOT_V3'

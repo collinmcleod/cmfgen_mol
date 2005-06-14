@@ -7,17 +7,17 @@ C                                too short.
 C Altered 28-May-1996 : IMPLICIT NONE installed.
 C Altered 30-APR-1985 : Now writes 10 columns instead of five across a page.)
 C
-	INTEGER*4 ND
-	INTEGER*4 LU
-	INTEGER*4 NDEC		!Number of decimal digits.
+	INTEGER ND
+	INTEGER LU
+	INTEGER NDEC		!Number of decimal digits.
 	REAL*8 F(ND)
 	CHARACTER*(*) A
 C
 C Local variables.
 C
-	INTEGER*4 I,J,L
-	INTEGER*4 N_PER_LINE
-	INTEGER*4 NX
+	INTEGER I,J,L
+	INTEGER N_PER_LINE
+	INTEGER NX
 	CHARACTER*16 FORM
 C
 	NX=NDEC+8

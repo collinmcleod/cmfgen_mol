@@ -10,8 +10,8 @@
 	USE MOD_XRAY_FLUXES
 	IMPLICIT NONE
 !
-	INTEGER*4 NFREQ		!Number of frequencies
-	INTEGER*4 ML
+	INTEGER NFREQ		!Number of frequencies
+	INTEGER ML
 	REAL*8 VSMOOTH
 !
 ! NB: CONT_FREQ, NFREQ, and ML are ignored if SECTION =/ 'CONTINUUM'
@@ -35,8 +35,8 @@
 	REAL*8 HIGH_F
 	REAL*8 LOW_F
 	REAL*8 T1
-	INTEGER*4 J
-	INTEGER*4 LOC_LF,LOC_HF
+	INTEGER J
+	INTEGER LOC_LF,LOC_HF
 !
 ! ******************************************************************
 ! ******************************************************************

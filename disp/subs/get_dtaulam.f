@@ -19,10 +19,10 @@ C Altered 02-Mar-1999. Module MOD_TRAP_DERIVARTIVES replace COMMON block
 C                        TRAPDERIVATIVES. Same variable names (A, B and C).
 C Created 04-May-1989.
 C
-	INTEGER*4 NI
+	INTEGER NI
 	REAL*8 WA(NI),WB(NI),Z(NI),R(NI)
 C
-	INTEGER*4 I,K
+	INTEGER I,K
 	REAL*8 ALPHA
 C
 	DO I=1,NI

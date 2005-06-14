@@ -108,7 +108,7 @@
 	  REAL*8, ALLOCATABLE :: ARRXzV(:,:)		!equations are satisfied.
 	  REAL*8, ALLOCATABLE :: BFCRXzV(:,:)		
 !
-! Data vectors to check cooling and recombination rates.
+! Data vectors to check cooling rates.
 !
 	  REAL*8, ALLOCATABLE :: FFXzV(:)
 	  REAL*8, ALLOCATABLE :: CRRXzV(:)
@@ -187,8 +187,8 @@
 ! when the new populations are solved for.
 !
 	REAL*8 MOD_TAU_SCL_T
-	INTEGER*4 MOD_FIX_T_D_ST
-	INTEGER*4 MOD_FIX_T_D_END
+	INTEGER MOD_FIX_T_D_ST
+	INTEGER MOD_FIX_T_D_END
 	LOGICAL MOD_FIXED_NE
 	LOGICAL MOD_FIXED_T
 	LOGICAL MOD_FIX_IMPURITY

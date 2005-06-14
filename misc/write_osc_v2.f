@@ -25,7 +25,7 @@ C Altered 19-Jul-1989 - FORMAT 120 altered. Check that no level names
 C                       are identical.
 C Altered 17-Mar-1989 - Extensively modifed.
 C
-	INTEGER*4 LU,NCIV
+	INTEGER LU,NCIV
 C
 C Constants for opacity etc.
 C
@@ -51,7 +51,7 @@ C
 C SECND is not altered. IF secnd is TRUE, the oscilator strength is output
 C as negative values.
 C
-	INTEGER*4 TRANS(NCIV,NCIV)	
+	INTEGER TRANS(NCIV,NCIV)	
 	LOGICAL  SECND(NCIV,NCIV)	
 	CHARACTER*(*) CIVOSC_DATE
 	CHARACTER*(*) CIVLEV(NCIV)
@@ -80,8 +80,8 @@ C Local Variables
 C
 	REAL*8 C_LIGHT,T1,T2
 	REAL*8 NU_TO_EV
-	INTEGER*4 LNGTH,I,J,IOS
-	INTEGER*4 FMTGAP,NUM_TRAN,NMAX
+	INTEGER LNGTH,I,J,IOS
+	INTEGER FMTGAP,NUM_TRAN,NMAX
 	CHARACTER*1   FORMFEED
 	CHARACTER*120 STARS
 	CHARACTER*132 HEAD1
@@ -89,8 +89,8 @@ C
 	CHARACTER*80 FMT_STR
 !	DATA FORMFEED/Z'0C'/
 C
-	INTEGER*4, PARAMETER :: IZERO=0
-	INTEGER*4, PARAMETER :: T_OUT=6
+	INTEGER, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: T_OUT=6
 C
 	FORMFEED=CHAR(12)                                
 	C_LIGHT=SPEED_OF_LIGHT()		!cm s^-1

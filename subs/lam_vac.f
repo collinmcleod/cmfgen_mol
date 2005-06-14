@@ -14,7 +14,7 @@ C
 	REAL*8 LAM_VAC			!Vacuum wavelength in Ang.
 	REAL*8 LAM_AIR			!Air wavelength in Ang.
 	REAL*8 T1
-	INTEGER*4 I
+	INTEGER I
 C
 	IF(LAM_AIR .LT. 1999.352)THEN
 	  WRITE(6,*)' ERROR --- in LAM_VAC'

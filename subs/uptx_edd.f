@@ -17,7 +17,7 @@ C Altered 28-May-1996 - Call to DP_ZERO removed.
 C Created 06-Jun-1989 - Based on UPDATE_TX which was originally
 C                       based on UPDATEU.
 C
-	INTEGER*4 NI,NM
+	INTEGER NI,NM
 	REAL*8 TX(NI,NI,NM)
 	REAL*8 TVX(NI-1,NI,NM)
 	REAL*8 KI(NI,NI,NM)
@@ -27,7 +27,7 @@ C
 C
 C Local varables.
 C
-	INTEGER*4 I,J,K
+	INTEGER I,J,K
 C
 	IF( .NOT. ML_NE_ONE)TX(:,:,:)=0.0D0
 C

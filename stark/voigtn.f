@@ -18,7 +18,7 @@
       REAL*8 X,W
       REAL*8 C1,C2
 !
-      INTEGER*4 I,J
+      INTEGER I,J
 !
       REAL*8 DAWSON
       EXTERNAL DAWSON

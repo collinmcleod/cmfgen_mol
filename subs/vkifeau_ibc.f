@@ -23,7 +23,7 @@ C                       in trapderivitives extended to 200.
 C Altered 26-Feb-1986 (Bug fixed)
 C Created 18-Feb-1986
 C
-	INTEGER*4 ND
+	INTEGER ND
 	REAL*8 W(ND,ND),DTAU(ND),RJ(ND),R(ND),F(ND),Q(ND),CHI(ND)
 	REAL*8 ZETA(ND),THETA(ND),TA(ND),TB(ND),TC(ND)
 	REAL*8 HBC_S,DBB
@@ -31,7 +31,7 @@ C
 C
 C Local varaibles.
 C
-	INTEGER*4 I,J,K
+	INTEGER I,J,K
 	REAL*8 ALPHA,BETA,T1,UIJ,UIK
 C
 	W(:,:)=0.0D0

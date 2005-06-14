@@ -53,9 +53,9 @@
 !                         by zero.
 !
 	IMPLICIT NONE
-	INTEGER*4 ND
-	INTEGER*4 NL
-	INTEGER*4 NUP
+	INTEGER ND
+	INTEGER NL
+	INTEGER NUP
 !
 	REAL*8 VEC_STRT_FREQ
 	REAL*8 VEC_VDOP_MIN
@@ -79,7 +79,7 @@
 
 ! Local variables
 !
-	INTEGER*4 I
+	INTEGER I
 	REAL*8 ESEC(ND)
 	REAL*8 TMP_VEC(ND)
 	REAL*8 NU_DOP(ND)
@@ -89,7 +89,7 @@
 	REAL*8 C_KMS
 	REAL*8 PROF_LINE_CENTER
 !
-	INTEGER*4, PARAMETER :: NUM_DOP=6
+	INTEGER, PARAMETER :: NUM_DOP=6
 !
 	C_KMS=2.998D+05			!Doesn't need to be very accurate
 !

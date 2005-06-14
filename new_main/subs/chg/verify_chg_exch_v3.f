@@ -11,7 +11,7 @@
 ! Altered 20-Aug-1998
 ! Created  20-Jun-1998
 !
-	INTEGER*4 J
+	INTEGER J
 !
 	DO J=1,N_CHG
 !

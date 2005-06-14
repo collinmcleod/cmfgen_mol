@@ -31,7 +31,7 @@ C Altered 06-Mar-1995 : Dimensioniong of WSE changed to (N,ND) from (N,NCF).
 C                        _V2 append to name.
 C Created 18-Jul-1994 : Based on PRRRCOOL
 C
-	INTEGER*4 N_A,N_B,ND
+	INTEGER N_A,N_B,ND
 	REAL*8 NET_X_RR(ND),X_BFCR(ND)
 	REAL*8 HN_A(N_A,ND),HNST_A(N_A,ND)
 	REAL*8 HN_B(N_B,ND),HNST_B(N_B,ND)
@@ -43,7 +43,7 @@ C
 	REAL*8 JPHOT_CR(ND)		!In J dv
 	LOGICAL INIT_ARRAYS
 C
-	INTEGER*4 I,J
+	INTEGER I,J
 	REAL*8 A1
 	REAL*8 H
 	LOGICAL FLAG

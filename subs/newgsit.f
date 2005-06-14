@@ -16,16 +16,16 @@ C Altered 04-Mar-1988 - MATELIM variable installed. Indicates the number
 C                         of sub-matrices below the diagonal to be eliminated.
 C Created  1/Dec/1987 - Based on NAGGSIT
 C
-	INTEGER*4 NV,ND,MATELIM
+	INTEGER NV,ND,MATELIM
 	REAL*8 BA(NV,NV,ND,ND),STEQ(NV,ND),PIVOT(NV,ND)
 	REAL*8 FQ(NV,ND),TBA(NV,NV,ND),REPA
 	LOGICAL MSOL,TEST
 C
-	INTEGER*4 I,J,K,L,LIMIT,IT
+	INTEGER I,J,K,L,LIMIT,IT
 	REAL*8 RELAX
 	REAL*8 WXX(NV)
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 	LUER=ERROR_LU()

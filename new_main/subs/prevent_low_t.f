@@ -28,7 +28,7 @@
 	REAL*8 T_MIN
 !
 	INTEGER GET_DIAG
-	INTEGER*4 L,K
+	INTEGER L,K
 	REAL*8 TA(ND)             !Temporary work vector
 	REAL*8 T1
 !

@@ -34,6 +34,8 @@
 	IMPLICIT NONE
 !
 ! Created 17-Dec-2004
+! Altered 06-Jun-2005 : Call to SUP_TO FULL inserted to get better consistency.
+!                          Only done when GRID=.FALSE.
 !
 	INTEGER NC
 	INTEGER ND
@@ -178,15 +180,25 @@
 ! electron density for clumping (i.e. ED(I)*CLUMP_FAC(I)), which we store in TC.
 ! It may be better to regrid on the actual electron densities.
 !
-	  TC(1:ND)=ED(1:ND)*CLUMP_FAC(1:ND)
-	  DO ID=1,NUM_IONS-1
-	    IF(ATM(ID)%XzV_PRES)THEN
-	      TMP_STRING=TRIM(ION_ID(ID))//'_IN'
-	      CALL REGRID_B_ON_NE(ATM(ID)%XzV_F,TC,ATM(ID)%DXzV_F,TA,
+	  IF(INTERP_DC_SPH_TAU)THEN
+	    DO ID=1,NUM_IONS-1
+	      IF(ATM(ID)%XzV_PRES)THEN
+	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
+	        CALL REGRID_B_ON_SPH_TAU(ATM(ID)%XzV_F,ATM(ID)%DXzV_F,ED,CLUMP_FAC,
+	1            R,ATM(ID)%NXzV_F,ND,LUIN,TMP_STRING)
+	      END IF
+	    END DO
+	  ELSE
+	    TC(1:ND)=ED(1:ND)*CLUMP_FAC(1:ND)
+	    DO ID=1,NUM_IONS-1
+	      IF(ATM(ID)%XzV_PRES)THEN
+	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
+	        CALL REGRID_B_ON_NE(ATM(ID)%XzV_F,TC,ATM(ID)%DXzV_F,TA,
 	1            ATM(ID)%NXzV_F, IONE,
 	1            ATM(ID)%NXzV_F,ND,LUIN,TMP_STRING)
-	    END IF
-	  END DO
+	      END IF
+	    END DO
+	  END IF
 !
 	END IF				!if(grid)
 !
@@ -615,6 +627,12 @@
 	        IF(Z_POP(I) .GT. 0)POPION(J)=POPION(J)+POPS(I,J)
 	      END DO
 	    END DO
+!
+! While the following may seem superfolous, it ensures absolute consistency. Its possible
+! that, for H, He etc that the upper levels with interpolating sequences may not be fully
+! consistent (due to rounding errors, from another model, etc).
+!
+	    CALL SUP_TO_FULL_V4(POPS,Z_POP,DO_LEV_DISSOLUTION,ND,NT)
 !
 ! Revise ALL LTE populations.
 !

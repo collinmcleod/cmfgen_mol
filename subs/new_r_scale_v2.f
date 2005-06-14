@@ -13,7 +13,7 @@ C                           To evaluate TAU at outer boundary, CHI is now
 C                             assumed to vary as a powr law (rather than 1/r^2).
 C                             Based on NEW_R_SCALE_V1.
 C
-	INTEGER*4 ND,NI
+	INTEGER ND,NI
 	REAL*8 R_NEW(ND)	!New radius grid
 	REAL*8 R(NI)		!Old radius grid
 	REAL*8 CHI(NI)		!Opacity
@@ -33,14 +33,14 @@ C
 	REAL*8 R_MAX,R_BIG,R_SMALL
 	REAL*8 Z_BIG,Z_SMALL
 	REAL*8 CHI_BIG,CHI_SMALL
-	INTEGER*4 IEND
+	INTEGER IEND
 C
 C Variables to compute new TAU scale.
 C
-	INTEGER*4 I,IST,ND_DIV,lU_ER
+	INTEGER I,IST,ND_DIV,lU_ER
 	REAL*8 DTAU
 C
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C                             
 C Compute path length variable Z.

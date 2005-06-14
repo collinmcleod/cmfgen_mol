@@ -8,7 +8,7 @@ C
 C Altered 24-May-1996 -DEXP replaced bu EXP
 C Altered 13-Apr-1988 - Bug fix.
 C
-	INTEGER*4 NI
+	INTEGER NI
 	REAL*8 VK(NI,NI),SOURCE(NI),CHI(NI),DTAU(NI),Z(NI)
 	REAL*8 E1,E2,E3,DE1,DE2,DE3,TOR,T1,U2
 C

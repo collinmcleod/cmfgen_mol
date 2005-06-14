@@ -24,7 +24,7 @@ C
 C
 C Used to compute the boundary iteration factors (HBC and NBC).
 C
-	INTEGER*4, ALLOCATABLE :: NI_RAY(:)
+	INTEGER, ALLOCATABLE :: NI_RAY(:)
 C
 C Interpolations from the original R grid are initially performed using
 C monotonic cubic polynomials. To save time, interpolations in CHI and ETA
@@ -35,36 +35,36 @@ C
 	REAL*8, ALLOCATABLE :: CHI_FINE(:)
 	REAL*8, ALLOCATABLE :: ETA_FINE(:)
 	REAL*8, ALLOCATABLE :: dCHIdR_FINE(:)
-	INTEGER*4, ALLOCATABLE :: INDX_FINE(:,:)
+	INTEGER, ALLOCATABLE :: INDX_FINE(:,:)
 C
 C INDX(I) gives the location of R_RAY(I,...) in R. It is also used to give the
 C location of R_FINE(I) in R.
 C
-	INTEGER*4, ALLOCATABLE :: INDX(:)
+	INTEGER, ALLOCATABLE :: INDX(:)
 C
 	REAL*8 BETA
 	REAL*8 VINF
 	REAL*8 C_KMS
 	REAL*8 FL_PREV
 	REAL*8 OLD_CHI_AT_IN_BND
-	INTEGER*4 I_START
+	INTEGER I_START
 C
 	LOGICAL FIRST_TIME
 	DATA FIRST_TIME/.TRUE./
 C
-	INTEGER*4 ND_EXT
-	INTEGER*4 ND_ADD
-	INTEGER*4 NRAY
-	INTEGER*4 ND_FINE
+	INTEGER ND_EXT
+	INTEGER ND_ADD
+	INTEGER NRAY
+	INTEGER ND_FINE
 C
 C Used to check for consistency with initialization call.
 C
-	INTEGER*4 ND_SAV
-	INTEGER*4 NC_SAV
-	INTEGER*4 NP_SAV
+	INTEGER ND_SAV
+	INTEGER NC_SAV
+	INTEGER NP_SAV
 	LOGICAL EXTEND_SAV
 C
-	INTEGER*4 NFINE_INS
+	INTEGER NFINE_INS
 	PARAMETER (NFINE_INS=10)
 C
 	END MODULE CMF_FORM_MOD
@@ -125,11 +125,11 @@ C                             ETA_OLD, ESEC_OLD, CHIL_OLD initialized
 C                               to NEW values when INITis true.
 C Finalized 01-Apr-1996
 C
-	INTEGER*4 ND
-	INTEGER*4 NC
-	INTEGER*4 NP
-	INTEGER*4 NP_OBS
-	INTEGER*4 NP_OBS_MAX
+	INTEGER ND
+	INTEGER NC
+	INTEGER NP
+	INTEGER NP_OBS
+	INTEGER NP_OBS_MAX
 C
 C _NEW refer to the opacities/emissivities at the frequency passed in the
 C call. They are to be distinguished from the opacities/emissivities on the
@@ -177,10 +177,10 @@ C
 	LOGICAL INSERT_ADD_FREQ
 C
 	REAL*8 EXT_FAC
-	INTEGER*4 ND_ADD_MAX
+	INTEGER ND_ADD_MAX
 	PARAMETER (EXT_FAC=10.0D0)
 	PARAMETER (ND_ADD_MAX=10)		!10*LOG10(EXT_FAC))
-	INTEGER*4 NP_EXT
+	INTEGER NP_EXT
 C
 C Intermediate opacities/emissivities. They are obtained by linear
 C extrapolation in frequency from .._NEW and ..._OLD.
@@ -195,7 +195,7 @@ C ND+ND_ADD_MAX (=NRAY) is the (MAXIMUM) number of points along a ray.
 C PNT_FAC can be adjusted to different integer values so that more points
 C can be inserted along a ray.
 C
-	INTEGER*4, PARAMETER :: PNT_FAC=1
+	INTEGER, PARAMETER :: PNT_FAC=1
 	REAL*8 TA(PNT_FAC*(ND+ND_ADD_MAX))
 	REAL*8 TB(PNT_FAC*(ND+ND_ADD_MAX))
 	REAL*8 TC(PNT_FAC*(ND+ND_ADD_MAX))
@@ -230,16 +230,16 @@ C
 	REAL*8 LOG_CHI(ND)
 	REAL*8 LOG_ETA(ND)
 C
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
 C Local variables.
 C
-	INTEGER*4 LU_ER
-	INTEGER*4 NI
-	INTEGER*4 NI_ORIG
-	INTEGER*4 I,J,K,L,ML,LS
-	INTEGER*4 N_FREQ
+	INTEGER LU_ER
+	INTEGER NI
+	INTEGER NI_ORIG
+	INTEGER I,J,K,L,ML,LS
+	INTEGER N_FREQ
 	REAL*8 DBC
 	REAL*8 IBOUND			!Incident intensity on outer boundary.
 	REAL*8 T1,T2

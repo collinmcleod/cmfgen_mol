@@ -19,15 +19,15 @@ C                       accuracy) installed. Before just checked whether
 C                       DIVISOR was zero. Computation of D1 and D2 improved
 C                       to help preserve precsion.
 C
-	INTEGER*4 ND
+	INTEGER ND
 	REAL*8 RJ(ND),PREVRJ(4,ND)
 	LOGICAL WEIGHT,EQUAL
 C
-	INTEGER*4 I
+	INTEGER I
 	REAL*8 A,B,A1,B1,B2,C1,C2,D0,D1,D2,W,DIVISOR
 	REAL*8 DIV1,DIV2,PRECIS,X02AJF
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 C X02AJF returns the machine precision.

@@ -55,13 +55,13 @@ C
 C
 	REAL*8 HNST_F(N_F,ND)
 	REAL*8 EDGE_F(N_F)			!In 10^15 Hz
-	INTEGER*4 F_TO_S_MAPPING(N_F)
+	INTEGER F_TO_S_MAPPING(N_F)
 	REAL*8 T(ND)
 C
 	REAL*8 NU_CONT
 	REAL*8 ZION
 	CHARACTER*(*) DESC
-	INTEGER*4 PHOT_ID
+	INTEGER PHOT_ID
 C
 	REAL*8 YDIS(ND)		!Constant for computing level dissolution/
 	REAL*8 XDIS(ND)		!Constant for computing level dissolution/
@@ -78,7 +78,7 @@ C
 C
 C Local Variables,
 C
-	INTEGER*4 I_S,I_F,J
+	INTEGER I_S,I_F,J
 	REAL*8 T1,T2,T3,ZION_CUBED,NEFF,FOUR_PI_D_H
 C
 C NB: WSE_OLD=WSE*FQW/NU

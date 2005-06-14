@@ -61,10 +61,10 @@ C Created 25-May-1997: Based  on VAR_MOM_J_CMF_V5
 c                      Primary alteration is to handle the different
 C                         grids (.i.e. ND_SM installed).
 C
-	INTEGER*4 ND
-	INTEGER*4 ND_SM
-	INTEGER*4 NM
-	INTEGER*4 NM_KI
+	INTEGER ND
+	INTEGER ND_SM
+	INTEGER NM
+	INTEGER NM_KI
 C
 C Emissivities etc on the transfer grid.
 C
@@ -74,7 +74,7 @@ C
 C Emissivities etc on the (small) population grid.
 C
 	REAL*8 ETA_SM(ND_SM),CHI_SM(ND_SM),ESEC_SM(ND_SM)
-	INTEGER*4 INDX(ND)
+	INTEGER INDX(ND)
 	REAL*8 COEF(0:3,ND)
 	CHARACTER*(*) INTERP_TYPE
 C
@@ -118,7 +118,7 @@ C
 C
 C Vectors required by future calls to VAR_MOM_J_CMF.
 C
-	INTEGER*4 NV
+	INTEGER NV
 	PARAMETER (NV=200)
 	REAL*8 JNUM1(NV),RSQ_HNUM1(NV)
 	SAVE JNUM1,RSQ_HNUM1
@@ -148,12 +148,12 @@ C
 	REAL*8 PROGDESC	
 	REAL*8, PARAMETER :: PROG_ID=3.4281463D+08  !Must be unique (VAR_MOM_)
 C
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
 C Local variables.
 C
-	INTEGER*4 I
+	INTEGER I
 	REAL*8 AV_SIGMA
 C
 C PROGDESC is a variable used to confirm that the scratch block is not

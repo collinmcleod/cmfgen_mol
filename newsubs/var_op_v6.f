@@ -51,13 +51,13 @@ C                         only. This is usefule when computing dTdR.
 C                         Call was changed, hence call _V2
 C Created 16-May-1995 - Based on VAR_GEN_V3
 C
-	INTEGER*4 ID
-	INTEGER*4 N_S
-	INTEGER*4 N_F
-	INTEGER*4 N_DI		!Number of levels in ion
-	INTEGER*4 EQHN
-	INTEGER*4 GS_ION_EQ
-	INTEGER*4 NT,ND
+	INTEGER ID
+	INTEGER N_S
+	INTEGER N_F
+	INTEGER N_DI		!Number of levels in ion
+	INTEGER EQHN
+	INTEGER GS_ION_EQ
+	INTEGER NT,ND
 	LOGICAL IONFF			!Include free-free opacity for level?
 	LOGICAL LST_DEPTH_ONLY	!for computing dTdR
 C
@@ -75,7 +75,7 @@ C
 C
 	REAL*8 HNST_F(N_F,ND)
 	REAL*8 EDGE_F(N_F)
-	INTEGER*4 F_TO_S_MAPPING(N_F)
+	INTEGER F_TO_S_MAPPING(N_F)
 C
 C Ion population information.
 C
@@ -83,8 +83,8 @@ C
 	REAL*8 DIST_S(N_DI,ND)
 	REAL*8 dlnDIST_S_dlnT(N_DI,ND)
 C
-	INTEGER*4 PHOT_ID		!Photoionization ID
-	INTEGER*4 ION_LEV		!target level in ION for ionizations.
+	INTEGER PHOT_ID		!Photoionization ID
+	INTEGER ION_LEV		!target level in ION for ionizations.
 C
 	REAL*8 NU			!Frequency (10^15 Hz)
 	REAL*8 Z			!Charge on ion
@@ -112,13 +112,13 @@ C
 	REAL*8 SUM_T2
 	REAL*8 NEFF,ZION_CUBED,T1,T2
 C
-	INTEGER*4 ND_LOC
-	INTEGER*4 I                     !Used as level index (same) in atom.
-	INTEGER*4 L			!index of level in full atom.
-	INTEGER*4 K_ST,K		!Used as depth index.
-	INTEGER*4 GENLEV		!Level index in VCHI, VETA
-	INTEGER*4 EQION			!Ion variable in VCHI,VETA
-	INTEGER*4 NO_NON_ZERO_PHOT
+	INTEGER ND_LOC
+	INTEGER I                     !Used as level index (same) in atom.
+	INTEGER L			!index of level in full atom.
+	INTEGER K_ST,K		!Used as depth index.
+	INTEGER GENLEV		!Level index in VCHI, VETA
+	INTEGER EQION			!Ion variable in VCHI,VETA
+	INTEGER NO_NON_ZERO_PHOT
 C
 	REAL*8 TCHI1,TCHI2,TETA1,TETA2,TETA3
 	REAL*8 HNUONK,ALPHA

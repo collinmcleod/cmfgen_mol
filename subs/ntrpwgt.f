@@ -17,10 +17,10 @@ C Altered 25-May-1996 - Call to DP_ZERO removed.
 C                       ERROR_LU inserted.
 C Created 26-Apr-1989 - Based on HWEIGHT
 C
-	INTEGER*4 N,I
+	INTEGER N,I
 	REAL*8 X(N),W(N),T1,T2,SUM
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 	W(:)=0.0D0

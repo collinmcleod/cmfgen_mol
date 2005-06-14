@@ -17,7 +17,7 @@
 !
 	IMPLICIT NONE
 !
-	INTEGER*4 ND
+	INTEGER ND
 	REAL*8 R(ND)			!Radial grin in 10^10 cm
 	REAL*8 V(ND)			!V in km/s
 	REAL*8 SIGMA(ND)		!dlnV/dlnr-1
@@ -28,7 +28,7 @@
 ! Only OPTIONS(1) is presently utilized. This indicates the format
 ! of the data in the file.
 !
-	INTEGER*4 N_OPT
+	INTEGER N_OPT
 	CHARACTER*(*) OPTIONS(N_OPT)
 !
 ! Local vectors.
@@ -40,13 +40,13 @@
 ! Local variables.
 !
 	REAL*8 T1
-	INTEGER*4 LUIN
-	INTEGER*4 LUER
-	INTEGER*4 I
-	INTEGER*4 IOS
-	INTEGER*4 ND_LOC
-	INTEGER*4 ERROR_LU
-	INTEGER*4, PARAMETER :: IZERO=0
+	INTEGER LUIN
+	INTEGER LUER
+	INTEGER I
+	INTEGER IOS
+	INTEGER ND_LOC
+	INTEGER ERROR_LU
+	INTEGER, PARAMETER :: IZERO=0
 	CHARACTER*132 STRING
 !
 	LUER=ERROR_LU()

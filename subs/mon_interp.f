@@ -24,19 +24,19 @@ C Altered 24-May-1996 : ERROR_LU installed
 C Created 01-Apr-1992 : Code may need recoding for optimal speed, and for
 C                         vectorization.
 C
-	INTEGER*4 NQ,LIN_END,NX,NV,ND
+	INTEGER NQ,LIN_END,NX,NV,ND
 	REAL*8 QZ(NQ,LIN_END),QZR(NX)
 	REAL*8 VARRAY(NV,LIN_END),R(ND)
 C
 	REAL*8 ONE
 	PARAMETER (ONE=1.0D0)
-	INTEGER*4 I,J,M
+	INTEGER I,J,M
 	REAL*8 T1
 	REAL*8 HI,HIM1,HIP1
 	REAL*8 SI,SIM1,SIP1
 	REAL*8 A,B,C,D,DYI,DYIP1,SGN
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 C The array R may be either monotonically increasing, or decreasing.

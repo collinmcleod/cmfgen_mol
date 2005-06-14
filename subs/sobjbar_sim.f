@@ -44,7 +44,7 @@ C Altered 15-Jan-1992 VB_2, VC_2 inserted. Bug fixes.
 C Created 13-Nov-1992 Allows for the simultaenous treatment of several
 C                     lines. Based on SOBJBAR.
 C
-	INTEGER*4 NLF,NC,NP,ND,NSIM
+	INTEGER NLF,NC,NP,ND,NSIM
 	REAL*8 SOURCE(ND),CHI(ND),CHIL(ND),ETAL(ND)
 	REAL*8 V(ND),SIGMA(ND),R(ND),P(NP),AQW(ND,NP)
 C
@@ -77,8 +77,8 @@ C
 C
 C Local variables.
 C
-	INTEGER*4, PARAMETER :: IONE=1
-	INTEGER*4 I,J,LS,NI
+	INTEGER, PARAMETER :: IONE=1
+	INTEGER I,J,LS,NI
 	REAL*8 T1,T2,DBC,TOR
 	REAL*8 IBOUND,E1,E2,E3  		!To handle NI=2
 C

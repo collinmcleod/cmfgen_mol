@@ -22,17 +22,17 @@
 !                       Change from _V1 to _V2 as call changed.
 ! Created - May 1995 
 !
-	INTEGER*4 ID		!Number of ionization stage
-	INTEGER*4 NLEV		!Numer of levls in HN
-        INTEGER*4 N_DI		!Number of levels in target ion
-	INTEGER*4 ION_LEV	!Super level target in ION
-	INTEGER*4 ND		!Number of depth points
-        INTEGER*4 NION		!Numer of Eqns. in ionization matrix.
+	INTEGER ID		!Number of ionization stage
+	INTEGER NLEV		!Numer of levls in HN
+        INTEGER N_DI		!Number of levels in target ion
+	INTEGER ION_LEV	!Super level target in ION
+	INTEGER ND		!Number of depth points
+        INTEGER NION		!Numer of Eqns. in ionization matrix.
 !
 ! NB --- NION is the total number of ionic species i.e. for
 ! HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and CV).
 !
-	INTEGER*4 NUM_BNDS,DST,DEND
+	INTEGER NUM_BNDS,DST,DEND
 !
 	REAL*8 WSE(NLEV,ND),dWSEdT(NLEV,ND)
 !
@@ -57,10 +57,10 @@
 !
 ! Local variables
 !
-	INTEGER*4 J,K,L
-	INTEGER*4 NT
-	INTEGER*4 ION_V
-	INTEGER*4 ION_EQ
+	INTEGER J,K,L
+	INTEGER NT
+	INTEGER ION_V
+	INTEGER ION_EQ
 	REAL*8 T3
 	REAL*8 B_RAT
 !

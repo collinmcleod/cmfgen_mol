@@ -18,21 +18,21 @@ C Altered : 08-Jun-1995 EDGE frequency delted from call.
 C                       Change from _V1 to _V2 as call changed.
 C Created - May 1995 
 C
-	INTEGER*4 NLEV		!Numer of levls in HN
-        INTEGER*4 N_DI		!Number of levels in target ion
-	INTEGER*4 FRST_EQ	!Equation number for species
-	INTEGER*4 GS_ION_EQ	!Equation number of g.s target species
-	INTEGER*4 ION_LEV	!Super level target in ION
-	INTEGER*4 SPEC_EQ	!Equation number of abundance equation
-	INTEGER*4 NT		!Total number of levels
-	INTEGER*4 ND		!Number of depth points
-	INTEGER*4 EQUAT		!Equation number in ioization matrix
-        INTEGER*4 NION		!Numer of Eqns. in ionization matrix.
+	INTEGER NLEV		!Numer of levls in HN
+        INTEGER N_DI		!Number of levels in target ion
+	INTEGER FRST_EQ	!Equation number for species
+	INTEGER GS_ION_EQ	!Equation number of g.s target species
+	INTEGER ION_LEV	!Super level target in ION
+	INTEGER SPEC_EQ	!Equation number of abundance equation
+	INTEGER NT		!Total number of levels
+	INTEGER ND		!Number of depth points
+	INTEGER EQUAT		!Equation number in ioization matrix
+        INTEGER NION		!Numer of Eqns. in ionization matrix.
 C
 C NB --- NION is the total number of ionic species i.e. for
 C HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and CV).
 C
-	INTEGER*4 NUM_BNDS,DST,DEND
+	INTEGER NUM_BNDS,DST,DEND
 C
 	REAL*8 BA(NT,NT,NUM_BNDS,ND),BAION(NION,NT,NUM_BNDS,ND)
 	REAL*8 WSE(NLEV,ND),dWSEdT(NLEV,ND)
@@ -58,7 +58,7 @@ C
 C
 C Local variables
 C
-	INTEGER*4 J,K,L,NJ,ION_EQ
+	INTEGER J,K,L,NJ,ION_EQ
 	REAL*8 T3
 	REAL*8 B_RAT
 C

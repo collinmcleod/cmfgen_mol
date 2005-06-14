@@ -9,7 +9,7 @@
 ! Created: 02-Mar-1998. Allows arbitrarily large dimensions.
 !
 	MODULE MOD_TRAP_DERIVATIVES
-	  INTEGER*4 ND_TRAP
+	  INTEGER ND_TRAP
 	  REAL*8, ALLOCATABLE :: A(:)
 	  REAL*8, ALLOCATABLE :: B(:)
 	  REAL*8, ALLOCATABLE :: C(:)

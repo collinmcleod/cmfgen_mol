@@ -9,6 +9,7 @@ C
 	1            INBCNEW,IC,THK,DIFF,NC,ND,NP,METHOD)
 	IMPLICIT NONE
 C
+C Altered 26-May-2005 --- R*R-P*P replaved by (R-P)*(R+P)
 C Altered 09-Dec-2001 --- PP replaced by P(LS)*P(LS)
 C Altered 28-Oct-1997 --- Bug fix: COS corrected back to ACOS in TOR expression.
 C Altered 24-May-1996 --- Call to DP_ZERO eliminated.
@@ -24,12 +25,12 @@ C                         option was off. Only effected direct computation of
 C                         HBCNEW.
 C Created 24-FEB-1987
 C
-	INTEGER*4 NC,ND,NP,I,NI,LS
+	INTEGER NC,ND,NP,I,NI,LS
 	REAL*8 TA(ND),TB(ND),TC(ND),XM(ND),R(ND),Z(ND)
 	REAL*8 NEWRJ(ND),NEWRK(ND),DTAU(ND),dCHIdR(ND)
 	REAL*8 SOURCE(ND),CHI(ND),AQW(ND,NP),AQW3(ND,NP),P(NP)
 C
-	INTEGER*4, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: IONE=1
 C
 	REAL*8 DBB,DBC,IBOUND,TOR,HBC_J,HBC_S,INBCNEW,IC,E1,E2,E3
 	LOGICAL DIFF,THK
@@ -51,8 +52,7 @@ C
 	  NI=ND-(LS-NC-1)
 	  IF(LS .LE. NC)THEN
 	    NI=ND
-	    DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))
-	1   /R(ND)/CHI(ND)
+	    DBC=DBB*DSQRT( (R(ND)-P(LS))*(R(ND)+P(LS)) )/R(ND)/CHI(ND)
 	  END IF
 C
 	  IF(THK)THEN
@@ -72,7 +72,7 @@ C
 C	    CALL ZALONGP(R,Z,P(LS),NI)
 C	    CALL NORDTAU(DTAU,CHI,Z,R,dCHIdr,NI)
 	    DO I=1,NI
-	      Z(I)=DSQRT(R(I)*R(I)-P(LS)*P(LS))
+	      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
 	    END DO
 	    DO I=1,NI-1
 	      DTAU(I)=0.5*(Z(I)-Z(I+1))*(CHI(I)+CHI(I+1)+(Z(I)-Z(I+1))

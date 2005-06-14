@@ -8,7 +8,7 @@ C Altered 24-May-1996 - CALL to DP_ZERO removed.
 C                       Calls to EXP replaced by generic calls.
 C Altered  9-Dec-1986 - Thick boundary condition installed.
 C
-	INTEGER*4 LS,NC,NI,I
+	INTEGER LS,NC,NI,I
 	REAL*8 W(NI,NI),DTAU(NI),THETA(NI),TOR
 C
 	W(:,:)=0.0D0

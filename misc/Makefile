@@ -30,6 +30,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)chk_phot.exe\
          $(EXE_DIR)pack_osc.exe\
          $(EXE_DIR)do_ng_v2.exe\
+         $(EXE_DIR)guess_dc.exe\
          $(EXE_DIR)land_col_merge.exe\
          $(EXE_DIR)land_multi_merge.exe\
          $(EXE_DIR)n_col_merge.exe\
@@ -47,6 +48,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)plt_j_comp.exe\
          $(EXE_DIR)plt_net.exe\
          $(EXE_DIR)solve_ba_mat.exe\
+         $(EXE_DIR)tst_ba_mat_sol.exe\
          $(EXE_DIR)tlusty_vel.exe
  
 all: OBJ ALLEXE 
@@ -54,19 +56,21 @@ all: OBJ ALLEXE
 ALLEXE : $(EXE)
 OBJ    :  $(OBJ1) $(FN1) $(FN2) $(FN3)
 
-$(EXE_DIR)wr_f_to_s.exe : wr_f_to_s.o $(OBJ1)
+OANDF = $(OBJ1) $(FN1) $(FN2) $(FN3) $(FN4)
+
+$(EXE_DIR)wr_f_to_s.exe : wr_f_to_s.o $(OANDF)
 	$(F90) wr_f_to_s.o \
               $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)wr_f_to_s.exe
 #
-$(EXE_DIR)chk_phot.exe : chk_phot.o recom_chk_v2.o get_exc_freq.o $(OBJ1)
+$(EXE_DIR)chk_phot.exe : chk_phot.o recom_chk_v2.o get_exc_freq.o $(OANDF)
 	$(F90) chk_phot.o recom_chk_v2.o get_exc_freq.o \
               $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)chk_phot.exe
 #
-$(EXE_DIR)pack_osc.exe : pack_osc.o $(OBJ1)
+$(EXE_DIR)pack_osc.exe : pack_osc.o $(OANDF)
 	$(F90) pack_osc.o \
               $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
@@ -74,11 +78,18 @@ $(EXE_DIR)pack_osc.exe : pack_osc.o $(OBJ1)
 #
 # Give the dependencies of ?.exe and how it is created.
 #
-$(EXE_DIR)%.exe : %.o $(OBJ1) 
+$(EXE_DIR)%.exe : %.o $(OANDF) 
 	$(F90) $*.o \
               $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) \
-              $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
+              $(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)$*.exe
+
+
+$(EXE_DIR)guess_dc.exe : guess_dc.o $(OANDF) 
+	$(F90) guess_dc.o \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) -ldisp \
+              $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
+              -o $(EXE_DIR)guess_dc.exe
 
 $(EXE_DIR)solve_ba_mat.exe : solve_ba_mat.o
 	$(F90) solve_ba_mat.o -L$(LIB_DIR) $(LAPACK) $(BLAS) -l$(LN2) -l$(LN1) \

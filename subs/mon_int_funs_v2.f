@@ -33,14 +33,14 @@ C                         not be used for function fitting.
 C Altered 25-Sep-1997 - Rewritten for speed and to vectorize efficiently.
 C Created 25-Mar-1996 - Based on MON_INTERP
 C
-	INTEGER*4 ND
+	INTEGER ND
 	REAL*8 COEF(ND,4)
 	REAL*8 R(ND)
 	REAL*8 CHI(ND)
 C
 	REAL*8 ONE
 	PARAMETER (ONE=1.0D0)
-	INTEGER*4 I
+	INTEGER I
 C
 	REAL*8 H(ND)			!Delta R [ R(I+1)-R(I) ]
 	REAL*8 S(ND)			!Slope in interval (I to I+1)

@@ -27,6 +27,7 @@
 	INTEGER ND
 !
 	REAL*8 RX
+	REAL*8 NEW_RSTAR
 	REAL*8 T1,T2
 	REAL*8 BETA
 	REAL*8 VINF
@@ -82,6 +83,7 @@
 	WRITE(6,'(A)')'         EXTR: extend grid to larger radii'
 	WRITE(6,'(A)')'         MDOT: change mass-loss rate'
 	WRITE(6,'(A)')'         NEWG: revise grid'
+	WRITE(6,'(A)')'         SCLR: revise R grid'
 	WRITE(6,'(A)')
 
 	CALL GEN_IN(OPTION,'Enter option for revised RVSIG file')
@@ -364,6 +366,99 @@
 	    SIGMA(J)=OLD_SIGMA(I)
 	  END DO
 	  ND=NN+ND_OLD
+	ELSE IF(OPTION .EQ. 'SCLR')THEN
+!
+	  ND=ND_OLD
+	  NEW_RSTAR=OLD_R(ND_OLD)
+	  V_TRANS=4.0D0
+	  CALL GEN_IN(NEW_RSTAR,'New radius')
+	  CALL GEN_IN(V_TRANS,'Connection velocity in km/s')
+!
+	  WRITE(6,'(A)')
+	  WRITE(6,'(A)')'Type 1: W(r).V(r) = 2V(t) + (Vinf-2V(t))*(1-r(t)/r))**BETA'
+	  WRITE(6,'(A)')'Type 2: W(r).V(r) = Vinf*(1-rx/r)**BETA'
+	  WRITE(6,'(A)')'        with W(r) = 1.0D0+exp( (r(t)-r)/h )'
+	  WRITE(6,'(A)')
+!
+	  VEL_TYPE=1
+	  CALL GEN_IN(VEL_TYPE,'Velocity law to be used: 1 or 2')
+	  VINF=1000.0D0
+	  CALL GEN_IN(VINF,'Velocity at infinity in km/s')
+	  BETA=1.0D0
+	  CALL GEN_IN(BETA,'Beta for velocity law')
+!
+! Find conection velocity and index.
+!
+	  DO I=1,ND_OLD
+	    IF(V_TRANS .LE. OLD_V(I) .AND. V_TRANS .GE. OLD_V(I+1))THEN
+	      TRANS_I=I
+	      EXIT
+	    END IF
+	  END DO
+	  IF( OLD_V(TRANS_I)-V_TRANS .GT. V_TRANS-OLD_V(TRANS_I+1))TRANS_I=TRANS_I+1
+	  V_TRANS=OLD_V(TRANS_I)
+	  R(1:ND)=OLD_R(1:ND_OLD)+(NEW_RSTAR-OLD_R(ND_OLD))
+	  R(ND)=NEW_RSTAR
+!
+! In the hydrostatic region, the velocity is simply scaled so as to keep the
+! density constant.
+!
+	  T1=R(ND)/OLD_R(ND_OLD)
+	  DO I=TRANS_I,ND
+	    V(I)=OLD_V(I)/T1/T1
+	    SIGMA(I)=(OLD_SIGMA(I)+1.0D0)*R(I)/OLD_R(I)-1.0D0
+	  END DO
+	  V_TRANS=V(TRANS_I)
+!
+! Now do the new wind law, keeping the same radius grid.
+!
+	  R_TRANS=R(TRANS_I)
+	  dVdR_TRANS=(SIGMA(TRANS_I)+1.0D0)*V_TRANS/R_TRANS
+!
+	  IF(VEL_TYPE .EQ. 1)THEN
+	    RO = R_TRANS * (1.0D0 - (2.0D0*V_TRANS/VINF)**(1.0D0/BETA) )
+	    T1= R_TRANS * dVdR_TRANS / V_TRANS
+	    SCALE_HEIGHT =  0.5D0*R_TRANS / (T1 - BETA*RO/(R_TRANS-RO) )
+! 
+	    WRITE(6,*)'  Transition radius is',R_TRANS
+	    WRITE(6,*)'Transition velocity is',V_TRANS
+	    WRITE(6,*)'                 R0 is',RO
+	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
+!
+	    DO I=1,TRANS_I-1
+              T1=RO/R(I)
+              T2=1.0D0-T1
+              TOP = VINF* (T2**BETA)
+              BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
+              V(I) = TOP/BOT
+                                                                                
+!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
+                                                                                
+              dTOPdR = VINF * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
+              dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT )  / SCALE_HEIGHT
+              dVdR = dTOPdR / BOT  + V(I)*dBOTdR/BOT
+              SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
+	    END DO
+	  ELSE
+	    SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
+	    WRITE(6,*)'  Transition radius is',R_TRANS
+	    WRITE(6,*)'Transition velocity is',V_TRANS
+	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
+	    DO I=1,TRANS_I-1
+	      T1=R_TRANS/R(I)
+	      T2=1.0D0-T1
+	      TOP = 2.0D0*V_TRANS + (VINF-2.0D0*V_TRANS) * T2**BETA
+	      BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
+	      V(I) = TOP/BOT
+                                                                                
+!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
+                                                                                
+	      dTOPdR = (VINF - 2.0D0*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
+	      dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
+	      dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
+              SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
+	    END DO
+	  END IF
 	ELSE IF(OPTION .EQ. 'MDOT')THEN
 !
 	  ND=ND_OLD
@@ -471,6 +566,11 @@
 	    WRITE(10,'(F18.8,ES17.7,F17.7,4X,I4)')R(I),V(I),SIGMA(I),I
 	  END DO
 	CLOSE(UNIT=10)
+!
+	CALL DP_CURVE(ND,R,V)
+	CALL GRAMON_PGPLOT('Radius','V(km/s)',' ',' ')
+	CALL DP_CURVE(ND,R,SIGMA)
+	CALL GRAMON_PGPLOT('Radius','SIGMA',' ',' ')
 !
 	STOP
 	END

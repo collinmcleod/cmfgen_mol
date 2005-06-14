@@ -8,7 +8,7 @@ C Abundances of individual species can be adjusted. Species not adjusted
 C are held fixed at a constant mass-fraction, and a revised X/He abundace
 C output.
 C
-	INTEGER*4, PARAMETER :: MAX_EL=92
+	INTEGER, PARAMETER :: MAX_EL=92
 C
 	REAL*8 AT_NO(MAX_EL)			!Atomic number
 	REAL*8 AT_MASS(MAX_EL)			!Atomic mass(amu)
@@ -31,7 +31,7 @@ C
 	REAL*8 OLD_MASS_SUM
 	REAL*8 NEW_MASS_SUM
 	REAL*8 NHE
-	INTEGER*4 I,N
+	INTEGER I,N
 C
 C Input abundance data from approproiately formated file. Strings must
 C be enclosed in quotes to allow free format read.

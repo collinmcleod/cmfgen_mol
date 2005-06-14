@@ -24,11 +24,11 @@
 !                       Allows for models in which R, V, and SIGMA are also output to
 !                          SCRTEMP on every iteration.
 !                       Renamed from V1: R, V, SIGMA, and ROLD added to call.
-	INTEGER*4 NT
-	INTEGER*4 ND
-	INTEGER*4 NG_BAND
-	INTEGER*4 LUSCR
-	INTEGER*4 LUER
+	INTEGER NT
+	INTEGER ND
+	INTEGER NG_BAND
+	INTEGER LUSCR
+	INTEGER LUER
 !
 	REAL*8 POPS(NT,ND)
 	REAL*8 ROLD(ND)
@@ -49,16 +49,16 @@
 ! Local variables which are adjusted to match the particular model under
 ! consideration.
 !
-	INTEGER*4 IOS
-	INTEGER*4 IREC
-	INTEGER*4 NITSF
-	INTEGER*4 IT_STEP
-	INTEGER*4 LST_NG
-	INTEGER*4 IFLAG
+	INTEGER IOS
+	INTEGER IREC
+	INTEGER NITSF
+	INTEGER IT_STEP
+	INTEGER LST_NG
+	INTEGER IFLAG
 !
 	INTEGER NT_MOD
 	INTEGER I,J
-	INTEGER*4, PARAMETER :: RITE_N_TIMES=1
+	INTEGER, PARAMETER :: RITE_N_TIMES=1
 !
 	LOGICAL NEWMOD
 	LOGICAL WRITE_RVSIG
@@ -129,10 +129,10 @@
 !
 ! Altered 01-Jun-2003: NUM_BAD_NG now correctly initialized to zero.
 !
-	INTEGER*4 ND
-	INTEGER*4 NT
-	INTEGER*4 NBAND
-	INTEGER*4 LUER
+	INTEGER ND
+	INTEGER NT
+	INTEGER NBAND
+	INTEGER LUER
 	REAL*8 POPS(NT,ND)              !Initial/corrected populations (I/O) 
 	REAL*8 RDPOPS(NT,ND,4)		!Populations to be accelerated
 !
@@ -155,13 +155,13 @@
 	REAL*8 T1
 	REAL*8 LOCINC,LOCDEC
 !
-	INTEGER*4 NS
-	INTEGER*4 NUM_BAD_NG
-	INTEGER*4 DEC_LOC,INC_LOC
-	INTEGER*4 I,K,L
-	INTEGER*4 LST,LEND
-	INTEGER*4 LOC_NBAND
-	INTEGER*4, PARAMETER :: IONE=1
+	INTEGER NS
+	INTEGER NUM_BAD_NG
+	INTEGER DEC_LOC,INC_LOC
+	INTEGER I,K,L
+	INTEGER LST,LEND
+	INTEGER LOC_NBAND
+	INTEGER, PARAMETER :: IONE=1
 !
 	NUM_BAD_NG=0
 	IF(NBAND .LE. 0 .OR. NBAND .GE. ND)THEN
@@ -258,22 +258,22 @@
 	SUBROUTINE DO_TRANS_AND_NG_V1(NEWPOP,RDPOPS,LST,LEND,NT,ND,NS)
 	IMPLICIT NONE
 !
-	INTEGER*4 LST            !Start depth
-	INTEGER*4 LEND           !Final depth
-	INTEGER*4 NT
-	INTEGER*4 ND
+	INTEGER LST            !Start depth
+	INTEGER LEND           !Final depth
+	INTEGER NT
+	INTEGER ND
 !
 ! Total number of populations to be accelerated.
 ! This is simplye (LEND-LST+1)*NT
 !
-	INTEGER*4 NS
+	INTEGER NS
 !
 	REAL*8 NEWPOP(NS)             !Returned with new estimates.
 	REAL*8 RDPOPS(NT,ND,4)
 !
 	REAL*8 TEMP(4,NS)
-	INTEGER*4 I,J,K,L
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER I,J,K,L
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 	LOGICAL WEIGHT
 !

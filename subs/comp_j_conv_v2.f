@@ -43,12 +43,12 @@ c                          SQRT(T) to compute BETA. Effect would have been
 C                          for P Cygni type models, but large at depth where
 C                          T is large.
 C
-	INTEGER*4 J_SIZE	!Total number of elements in J_STORE
-	INTEGER*4 ND		!Number of depth points.
-	INTEGER*4 NCF		!Number of continuum frequencies
-	INTEGER*4 LU_IN
-	INTEGER*4 LU_OUT
-	INTEGER*4 CONT_REC	!Record in file that points to beginning of Jc
+	INTEGER J_SIZE	!Total number of elements in J_STORE
+	INTEGER ND		!Number of depth points.
+	INTEGER NCF		!Number of continuum frequencies
+	INTEGER LU_IN
+	INTEGER LU_OUT
+	INTEGER CONT_REC	!Record in file that points to beginning of Jc
 	LOGICAL RD_NU
 	LOGICAL ALLOW_UNEQUAL_FREQ
 C
@@ -84,22 +84,22 @@ C enough.
 C
 	REAL*8, ALLOCATABLE :: EXTRA_J_ST(:,:)
 C
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 	LOGICAL FILE_OPEN
 	LOGICAL UNEQUAL_FREQ
 C
-	INTEGER*4 IONE
+	INTEGER IONE
 	PARAMETER (IONE=1)
 C
 	REAL*8 BETA
 	REAL*8 T1,T2,T3
 	REAL*8 D1,D2,DH
-	INTEGER*4 I,K,L,ML,INIT_REC,IOS
-	INTEGER*4 IREC_LEN
-	INTEGER*4 J_DIM
-	INTEGER*4 NCF_RD
-	INTEGER*4 ND_RD
+	INTEGER I,K,L,ML,INIT_REC,IOS
+	INTEGER IREC_LEN
+	INTEGER J_DIM
+	INTEGER NCF_RD
+	INTEGER ND_RD
 	CHARACTER*20 FILE_DATE
 C
 C Constants for opacity etc [Set in CMFGEN].
@@ -112,7 +112,7 @@ C
 C Parameters for fit to Electrons Scattering redistribution function
 C (dipole form). From Rybicki and Hummer (A&A, 290,553)
 C
-	INTEGER*4 NCOEF
+	INTEGER NCOEF
 	PARAMETER (NCOEF=2)
 	REAL*8 ACOEF(2),BCOEF(2)
 	DATA ACOEF/1.690703717290D0,-0.690703717290D0/

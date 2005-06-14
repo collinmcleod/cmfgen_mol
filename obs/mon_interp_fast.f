@@ -22,19 +22,19 @@ C Created 09-Dec-1998 : Based on MON_INTERP.
 C                       Design to be fast when from creating a large 
 C                           array from a much smaller array.
 C
-	INTEGER*4 NQ,LIN_END,NX,NV,ND
+	INTEGER NQ,LIN_END,NX,NV,ND
 	REAL*8 QZ(NQ,LIN_END),QZR(NX)
 	REAL*8 VARRAY(NV,LIN_END),R(ND)
 C
 	REAL*8 S(ND)		!Slopes
 	REAL*8 H(ND)
-	INTEGER*4 LST_INTERVAL
-	INTEGER*4 ND_SM
-	INTEGER*4 IVEC(NX)
+	INTEGER LST_INTERVAL
+	INTEGER ND_SM
+	INTEGER IVEC(NX)
 C
 	REAL*8 ONE
 	PARAMETER (ONE=1.0D0)
-	INTEGER*4 I,J,ML
+	INTEGER I,J,ML
 	REAL*8 T1
 	REAL*8 A(ND)
 	REAL*8 B(ND)
@@ -43,7 +43,7 @@ C
 	REAL*8 E(ND)
 	REAL*8 SGN
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 C The array R may be either monotonically increasing, or decreasing.

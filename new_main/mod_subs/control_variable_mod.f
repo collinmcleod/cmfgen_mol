@@ -2,14 +2,14 @@
 !
 ! Set constants that are regularly used, and passed to subroutines.
 !
-	INTEGER*4, PARAMETER :: IZERO=0
-	INTEGER*4, PARAMETER :: IONE=1
-	INTEGER*4, PARAMETER :: ITWO=2
-	INTEGER*4, PARAMETER :: ITHREE=3
-	INTEGER*4, PARAMETER :: IFOUR=4
-	INTEGER*4, PARAMETER :: IFIVE=5
-	INTEGER*4, PARAMETER :: ISIX=6
-	INTEGER*4, PARAMETER :: ITEN=10
+	INTEGER, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: ITWO=2
+	INTEGER, PARAMETER :: ITHREE=3
+	INTEGER, PARAMETER :: IFOUR=4
+	INTEGER, PARAMETER :: IFIVE=5
+	INTEGER, PARAMETER :: ISIX=6
+	INTEGER, PARAMETER :: ITEN=10
 !
 	REAL*8, PARAMETER :: RZERO=0.0D0
 	REAL*8, PARAMETER :: RONE=1.0D0
@@ -35,8 +35,8 @@
 	REAL*8 CONS_FOR_R_GRID
 	REAL*8 EXP_FOR_R_GRID
 !
-	INTEGER*4 NBND_INS
-	INTEGER*4, PARAMETER :: NUM_V_OPTS=1
+	INTEGER NBND_INS
+	INTEGER, PARAMETER :: NUM_V_OPTS=1
 	CHARACTER*10 VEL_OPTION(NUM_V_OPTS)
 !
 ! Parameters for VELTYPE=3 or VELTYPE=6 (STARPCYG_V2)
@@ -44,7 +44,7 @@
 	REAL*8 SCL_HT,VCORE,VPHOT
 	REAL*8 VINF1,V_BETA1,V_EPPS1
 	REAL*8 V_BETA2,V_EPPS2		!VINF2 above
-	INTEGER*4 VELTYPE
+	INTEGER VELTYPE
 !
 ! Supernova variables
 !
@@ -73,7 +73,7 @@
 !
 	INTEGER, PARAMETER ::  N_CLUMP_PAR_MAX=4
 	REAL*8 CLUMP_PAR(N_CLUMP_PAR_MAX)
-	INTEGER*4 N_CLUMP_PAR
+	INTEGER N_CLUMP_PAR
 	LOGICAL DO_CLUMP_MODEL
 	CHARACTER(LEN=6) CLUMP_LAW
 !
@@ -82,6 +82,7 @@
 ! IF GRID is TRUE, variables are interpolated directly on old grid.
 !
 	LOGICAL GRID
+	LOGICAL INTERP_DC_SPH_TAU
 !
 ! Used when constructing the Temperature distribution on the first
 ! iteration.
@@ -137,8 +138,8 @@
 !
 	REAL*8 GF_CUT
 	REAL*8 AT_NO_GF_CUT
-	INTEGER*4 GF_LEV_CUT
-	INTEGER*4 MIN_NUM_TRANS
+	INTEGER GF_LEV_CUT
+	INTEGER MIN_NUM_TRANS
 !
 ! Variables for treating lines simultaneously with the continuum.
 !
@@ -239,9 +240,9 @@
 ! rapid ionization changes.
 !
 	REAL*8 ACC_FREQ_END
-	INTEGER*4 NPINS			!Points inserted for error calc.
-        INTEGER*4 ST_INTERP_INDX        !Interp from ST_INT.. to END_INTERP..
-        INTEGER*4 END_INTERP_INDX
+	INTEGER NPINS			!Points inserted for error calc.
+        INTEGER ST_INTERP_INDX        !Interp from ST_INT.. to END_INTERP..
+        INTEGER END_INTERP_INDX
         LOGICAL ACCURATE 
 	LOGICAL ALL_FREQ
 	CHARACTER*10 INTERP_TYPE
@@ -254,7 +255,7 @@
 ! ND-DEEP to DEEP we use a quadratic interpolation scheme so as to try
 ! and preserve "FLUX" in the diffusion approximation.
 !
-	INTEGER*4 DEEP
+	INTEGER DEEP
 	REAL*8 ACC_EDD_FAC
 !
 	LOGICAL EXTEND_FRM_SOL
@@ -266,13 +267,13 @@
 !***********************************************************************************
 ! Variables for performing NG acceleration.
 !
-	INTEGER*4 LAST_NG   		!Indicates iteration on which last
+	INTEGER LAST_NG   		!Indicates iteration on which last
 !                                          NG acceleration occurred.
-	INTEGER*4 NEXT_NG   		!Indicates iteration on which next
+	INTEGER NEXT_NG   		!Indicates iteration on which next
 !                                          NG acceleration is to occur.
-	INTEGER*4 IT_TO_BEG_NG          !Iteration to beg NG acceleration
-	INTEGER*4 ITS_PER_NG  		!Iterations between NG accelerations.
-	INTEGER*4 NG_BAND_WIDTH         !Number of depths to acclerate simultaneously
+	INTEGER IT_TO_BEG_NG          !Iteration to beg NG acceleration
+	INTEGER ITS_PER_NG  		!Iterations between NG accelerations.
+	INTEGER NG_BAND_WIDTH         !Number of depths to acclerate simultaneously
 	REAL*8 VAL_DO_NG 		!Begin NG when MAXCH < VAL_DO_NG
 	LOGICAL NG_DONE			!iIndicates successfull completion of NG
 	LOGICAL NG_DO			!Switch on NG acceleration.
@@ -280,7 +281,7 @@
 ! N_PAR is used to indicate how often the BA matrices should be incremented
 ! by BA_PAR. After the incrementation, the PAR matrices are zeroed.
 !
-	INTEGER*4 N_PAR
+	INTEGER N_PAR
 	REAL*8 MAX_LAM_COR	!Maximum fractional change for Lambda iteration.
 	REAL*8 MAX_LIN_COR	!Maximum fractional change for linearization.
 	REAL*8 MAX_CHNG_LIM
@@ -313,8 +314,8 @@
 ! Fix BA variation matrix if % change less than VAL_FIX_BA.
 !
 	REAL*8 VAL_FIX_BA
-	INTEGER*4 N_ITS_TO_FIX_BA
-	INTEGER*4 CNT_FIX_BA
+	INTEGER N_ITS_TO_FIX_BA
+	INTEGER CNT_FIX_BA
 	LOGICAL COMPUTE_BARDIN,COMPUTE_BA
 	LOGICAL WRBAMAT,WRBAMAT_RDIN
 !
@@ -328,8 +329,8 @@
 ! Performs a lambda iteration if % change > VAL_DO_LAM
 !
 	REAL*8 VAL_DO_LAM
-	INTEGER*4 CNT_LAM
-	INTEGER*4 RD_CNT_LAM
+	INTEGER CNT_LAM
+	INTEGER RD_CNT_LAM
 	LOGICAL OLD_RD_LAMBDA
 	LOGICAL RD_LAMBDA
 	LOGICAL LAMBDA_ITERATION

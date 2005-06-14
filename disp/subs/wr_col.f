@@ -8,14 +8,14 @@ C
 C
 C Created 11-Aug-1997
 C
-	INTEGER*4 N,LU
+	INTEGER N,LU
 	REAL*8 OMEGA(N,N)
 	CHARACTER*(*) LEV_NAME(N),OPTION,DESC
 C
 C Internal variables.
 C
-	INTEGER*4 I,J,K,L,M,IOS
-	INTEGER*4 N_PER_LINE,LMAX,LIM,ST_POS
+	INTEGER I,J,K,L,M,IOS
+	INTEGER N_PER_LINE,LMAX,LIM,ST_POS
 	CHARACTER*80 FORM
 	CHARACTER*132 STRING
 	CHARACTER*30 TMP_NAME
@@ -24,8 +24,8 @@ C Number of digits to output OMEGA. Must include spaces used to separate
 C number from proceeding number. Must be the same as the number X in
 C EX.3                                 
 c
-	INTEGER*4, PARAMETER :: DIG_PER_NUM=11
-	INTEGER*4, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: DIG_PER_NUM=11
+	INTEGER, PARAMETER :: IZERO=0
 C
 	FORM=TRIM(DESC)//'_COL'
 	CALL GEN_ASCI_OPEN(LU,FORM,'UNKNOWN',' ',' ',IZERO,IOS)

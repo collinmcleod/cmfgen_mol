@@ -12,11 +12,11 @@ C Altered 27-May-1996 : IMPLICIT NONE installed.
 C Altered 07-Jan-91 - TA,TB,TC loop split so CRAY vectorizes loop.
 C Altered 28-JUL-82
 C
-	INTEGER*4 LS,NC,ND,NI
+	INTEGER LS,NC,ND,NI
 	REAL*8 TA(NI),TB(NI),TC(NI),DTAU(NI)
 	LOGICAL DIFF
 C
-	INTEGER*4 I
+	INTEGER I
 C
 	TA(1)=0.0
 	TC(1)=1./DTAU(1)

@@ -25,7 +25,7 @@ C Altered 06-Mar-1995 : Dimensioning of WSE changed. New WSE for each
 C                         frequency.
 C Created 20-Jul-1993 : Based on QUADGEN
 C
-	INTEGER*4 N_S,N_B,N_F,ND
+	INTEGER N_S,N_B,N_F,ND
 	REAL*8 ZCORE,NUM_ELEC
 C
 C N_S refers to the model atom with SUPER levels.
@@ -38,7 +38,7 @@ C _F refers to populations in the full atom.
 C
 	REAL*8 HNST_F(N_F,ND)
 	REAL*8 EDGE_F(N_F)
-	INTEGER*4 F_TO_S(N_F)
+	INTEGER F_TO_S(N_F)
 C
 C _B Refers to FULL atom in nest ionization stage.
 C
@@ -48,10 +48,10 @@ C
 	EXTERNAL XCROSS_V2
 	REAL*8 XCROSS_V2
 C
-	INTEGER*4 I_F,I_S,K
+	INTEGER I_F,I_S,K
 	REAL*8 WEIGHT
 	REAL*8 FOUR_PI_ON_H
-	INTEGER*4, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IZERO=0
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 C
 C NB: WSE represents the statistical weight

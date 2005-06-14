@@ -14,20 +14,20 @@
 !                          doesn't match.
 ! Created 17-Mar-2001
 !
-      INTEGER*4 NION            !Total number of ioization stages.
+      INTEGER NION            !Total number of ioization stages.
       LOGICAL XRAYS
 !
 ! Local variables
 !
-      INTEGER*4 ID
-      INTEGER*4 I
-      INTEGER*4 J
-      INTEGER*4 K
-      INTEGER*4 MK
-      INTEGER*4 L
+      INTEGER ID
+      INTEGER I
+      INTEGER J
+      INTEGER K
+      INTEGER MK
+      INTEGER L
       LOGICAL IONIZING_LEVEL_FOUND
 !
-      INTEGER*4, ALLOCATABLE :: ION_LEV_PNT(:)
+      INTEGER, ALLOCATABLE :: ION_LEV_PNT(:)
 !
       WRITE(93,*)' '
       WRITE(93,*)'Summary of photoiization routes'

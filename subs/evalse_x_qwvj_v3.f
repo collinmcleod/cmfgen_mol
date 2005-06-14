@@ -24,18 +24,18 @@ C                        _V2 append to name.
 C                       Call unchanged.
 C Created 19-Jul-1993 : Based on EVALSE_QWVJ
 C
-	INTEGER*4 N_A		!Number of levles in ionizations state i
-	INTEGER*4 N_B		!Number of levles in ionizations state i+1
-	INTEGER*4 EQ_A		!Eqn. for ground state of ion. state i
-	INTEGER*4 ION_EQ	!Eqn. # of target species [gs. of (i+2)th ]
-	INTEGER*4 SPEC_EQ	!Eqn. # of abundance equation
+	INTEGER N_A		!Number of levles in ionizations state i
+	INTEGER N_B		!Number of levles in ionizations state i+1
+	INTEGER EQ_A		!Eqn. for ground state of ion. state i
+	INTEGER ION_EQ	!Eqn. # of target species [gs. of (i+2)th ]
+	INTEGER SPEC_EQ	!Eqn. # of abundance equation
 C
-	INTEGER*4 NT		!Total number of levels
-	INTEGER*4 ND		!Number of depth points
+	INTEGER NT		!Total number of levels
+	INTEGER ND		!Number of depth points
 C
-	INTEGER*4 EQ_A_BAL	!Eqn. # for     ith ion. stage in ion. matrix
-	INTEGER*4 EQ_B_BAL	!Eqn. # for (i+1)th ion. stage in ion. matrix
-        INTEGER*4 NION		!Numer of Eqns. in ionization matrix.
+	INTEGER EQ_A_BAL	!Eqn. # for     ith ion. stage in ion. matrix
+	INTEGER EQ_B_BAL	!Eqn. # for (i+1)th ion. stage in ion. matrix
+        INTEGER NION		!Numer of Eqns. in ionization matrix.
 C
 C NB --- NION is the total number of ionic species i.e. for
 C HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and 
@@ -67,7 +67,7 @@ C
 C
 C Local variables.
 C
-	INTEGER*4 I,J
+	INTEGER I,J
 	REAL*8 NETR
 	REAL*8 SUM_SE
 	REAL*8 SUM_VJ_R,SUM_VJ_P

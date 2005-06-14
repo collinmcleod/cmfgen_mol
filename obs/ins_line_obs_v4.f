@@ -23,8 +23,8 @@
 !	                OBS_PRO_EXT_RAT,ES_WING_EXT,V_DOP parameters inserted.
 !                       Now V2.
 !
-	INTEGER*4 NFREQ_MAX,N_LINES
-	INTEGER*4 NFREQ				!Returned
+	INTEGER NFREQ_MAX,N_LINES
+	INTEGER NFREQ				!Returned
 !
 ! Vecters returned by subroutine:
 !
@@ -67,17 +67,17 @@
 	REAL*8 dNU
 	REAL*8 NU_END_LINE
 !
-	INTEGER*4 INDX		!Current frequency index.
-	INTEGER*4 LN_INDX	!Current line whose frequencies we are 
+	INTEGER INDX		!Current frequency index.
+	INTEGER LN_INDX	!Current line whose frequencies we are 
 				!   installing.
 !
-	INTEGER*4 I,J,K		!Micellaneous loop variables.
-	INTEGER*4 LU_ER
+	INTEGER I,J,K		!Micellaneous loop variables.
+	INTEGER LU_ER
 	REAL*8 C_KMS
 !
 ! External functions
 !
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	REAL*8 SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
@@ -230,7 +230,7 @@
 ! INDX+1 since INDX+1 refers to index of the next frequency.
 !
 	  IF(INDX+1 .GT. NFREQ_MAX)THEN
-	    WRITE(LU_ER,*)'Error in OBS_INS_LINE_V4'
+	    WRITE(LU_ER,*)'Error in INS_LINE_OBS_V4'
 	    WRITE(LU_ER,*)'Insufficent storage locations'
 	    WRITE(LU_ER,*)'NFREQ_MAX=',NFREQ_MAX
 	    WRITE(LU_ER,*)'Current frequency is',FREQ(INDX)

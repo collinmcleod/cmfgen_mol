@@ -34,16 +34,16 @@ C                     and ionizations to excited states.
 C                     Note the call has 4 additional variables wrt
 C                     EVALSE.
 C
-	INTEGER*4 NLEV          !Number of atomic levels
-	INTEGER*4 N_DI          !Number of atomic levels in ION
-	INTEGER*4 NST		!Equation number for species
-	INTEGER*4 GS_IONEQ	!Equation number of target species (if G.S)
-	INTEGER*4 ION_LEV	!Levl ID of target in DI (i.e. the ION).
-	INTEGER*4 SPEC_EQ	!Equation number of abundance equation
-	INTEGER*4 NT		!Total number of levels
-	INTEGER*4 ND		!Number of depth points
-	INTEGER*4 EQUAT		!Equation number in ioization matrix
-        INTEGER*4 NION		!Numer of Eqns. in ionization matrix.
+	INTEGER NLEV          !Number of atomic levels
+	INTEGER N_DI          !Number of atomic levels in ION
+	INTEGER NST		!Equation number for species
+	INTEGER GS_IONEQ	!Equation number of target species (if G.S)
+	INTEGER ION_LEV	!Levl ID of target in DI (i.e. the ION).
+	INTEGER SPEC_EQ	!Equation number of abundance equation
+	INTEGER NT		!Total number of levels
+	INTEGER ND		!Number of depth points
+	INTEGER EQUAT		!Equation number in ioization matrix
+        INTEGER NION		!Numer of Eqns. in ionization matrix.
 C
 C NB --- NION is the total number of ionic species i.e. for
 C HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and CV).
@@ -64,7 +64,7 @@ C
 C
 C Local variables.
 C
-	INTEGER*4 I,J
+	INTEGER I,J
 	REAL*8 NETR
 C
 C REV_HNST referes to the LTE population  of the level defined with respect

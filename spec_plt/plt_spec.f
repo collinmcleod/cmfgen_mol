@@ -26,27 +26,27 @@ C
 C
 C Determines largest single plot that can read in.
 C
-	INTEGER*4, PARAMETER :: NCF_MAX=1000000
+	INTEGER, PARAMETER :: NCF_MAX=1000000
 C
 C Used to indicate number of data points in BB spectrum
 c
-	INTEGER*4, PARAMETER :: NBB=2000
+	INTEGER, PARAMETER :: NBB=2000
 C
-	INTEGER*4 NCF		!Number of data points in default data
-	INTEGER*4 NCF_MOD	!Used when plotting another model data set
+	INTEGER NCF		!Number of data points in default data
+	INTEGER NCF_MOD	!Used when plotting another model data set
 c
 	REAL*8 NU(NCF_MAX)
 	REAL*8 OBSF(NCF_MAX)
 	REAL*8 FQW(NCF_MAX)
 	REAL*8 AL_D_EBmV(NCF_MAX)
 C
-	INTEGER*4 NCF_CONT
+	INTEGER NCF_CONT
 	REAL*8 NU_CONT(NCF_MAX)
 	REAL*8 OBSF_CONT(NCF_MAX)
 C
 C Indicates which columns the observatoinal data is in.
 C
-	INTEGER*4 OBS_COLS(2)
+	INTEGER OBS_COLS(2)
 C
 C Vectors for passing data to plot package via calls to CURVE.
 C
@@ -116,20 +116,20 @@ C
 C
 C Miscellaneous variables.
 C
-	INTEGER*4 IOS			!Used for Input/Output errors.
-	INTEGER*4 I,J,K,L,ML,MLST
-	INTEGER*4 IST,IEND
+	INTEGER IOS			!Used for Input/Output errors.
+	INTEGER I,J,K,L,ML,MLST
+	INTEGER IST,IEND
 	REAL*8 T1,T2,T3
 	REAL*8 SUM
 	REAL*8 TEMP
 	REAL*8 TMP_FREQ
 C
-	INTEGER*4, PARAMETER :: IZERO=0
-	INTEGER*4, PARAMETER :: IONE=1
-	INTEGER*4, PARAMETER :: T_IN=5		!For file I/O
-	INTEGER*4, PARAMETER :: T_OUT=6
-	INTEGER*4, PARAMETER :: LU_IN=10	!For file I/O
-	INTEGER*4, PARAMETER :: LU_OUT=11
+	INTEGER, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: T_IN=5		!For file I/O
+	INTEGER, PARAMETER :: T_OUT=6
+	INTEGER, PARAMETER :: LU_IN=10	!For file I/O
+	INTEGER, PARAMETER :: LU_OUT=11
 C
 	REAL*8, PARAMETER :: EDGE_HYD=3.28808662499619D0
 	REAL*8, PARAMETER :: EDGE_HEI=5.94520701882481D0
@@ -157,9 +157,10 @@ C
 	CHARACTER*120 DESCRIPTION
 C
 	REAL*8 SPEED_OF_LIGHT,FAC,LAM_VAC
-	INTEGER*4 GET_INDX_SP
+	INTEGER GET_INDX_SP
 	LOGICAL EQUAL
 	CHARACTER*30 UC
+	CHARACTER*30 FILTER_SET 
 	EXTERNAL SPEED_OF_LIGHT,EQUAL,FAC,UC,LAM_VAC,GET_INDX_DP
 C
 C 
@@ -178,9 +179,9 @@ C
 	REAL*8 RESPONSE1
 	REAL*8 RESPONSE2
 	REAL*8 FILT_INT_BEG
-	INTEGER*4 IF
-	INTEGER*4 ML_ST 
-	INTEGER*4 ML_END
+	INTEGER IF
+	INTEGER ML_ST 
+	INTEGER ML_END
 
 C
 	DATA FILT/' ','u','b','v','r','J','H','K'/
@@ -722,6 +723,13 @@ C
 !
 	ELSE IF(X(1:5) .EQ. 'CNVLV') THEN
 !
+	 IF(NCF .EQ. 0)THEN
+	    WRITE(T_OUT,*)'Error: no data in buffer to operate on.'
+	    WRITE(T_OUT,*)'Use rd_mod(OVER=T) with rd_mod option, or'
+	    WRITE(T_OUT,*)'Use rd_obs(MOD=T) wit rd_obs option.'
+	    GOTO 1		!Get another option
+	 END IF
+!
 ! Instrumental profiles is assumed to be Gaussian.
 !
 	 CALL USR_OPTION(INST_RES,'INST_RES','3d0',
@@ -753,6 +761,13 @@ C
 	1             MIN_RES_KMS,NUM_RES,FFT_CONVOLVE)
 !
 	ELSE IF(X(1:3) .EQ. 'ROT') THEN
+!
+	  IF(NCF .EQ. 0)THEN
+	    WRITE(T_OUT,*)'Error: no data in buffer to operate on.'
+	    WRITE(T_OUT,*)'Use rd_mod(OVER=T) with rd_mod option, or'
+	    WRITE(T_OUT,*)'Use rd_obs(MOD=T) wit rd_obs option.'
+	    GOTO 1		!Get another option
+	  END IF
 !
 ! Perform a crude rotational broadening. This is not meant to be rigorous.
 !
@@ -1285,43 +1300,55 @@ C
 	  WRITE(T_OUT,*)' '
 	  DIST=1.0
 	  CALL USR_OPTION(DIST,'DIST','1.0D0',' (in kpc) ')
+	  CALL USR_OPTION(FILTER_SET,'FSET','uvby','Filter set (case sensitive)')
 	  CALL GEN_ASCI_OPEN(LU_OUT,'MAG','UNKNOWN',' ',' ',IZERO,IOS)
-	  WRITE(LU_OUT,104)DIST	  
-	  DO L=1,8
-	    MLST=1
-	    DO ML=MLST,NCF
-	      IF(NU(ML) .LT. 0.2998/FILTLAM(L))THEN
-	        T1=DLOG10(OBSF(ML-1))-DLOG10(NU(ML-1)*FILTLAM(L)/0.2998)
-	1       *(DLOG10(OBSF(ML)/OBSF(ML-1))/(DLOG10(NU(ML)/NU(ML-1))))
-	        T1=5.0*DLOG10(DIST)-2.5*T1+2.5*DLOG10(FILTZP(L))
-	        MLST=ML         
-	        GOTO 102
-	       END IF
-	    END DO
-102	  CONTINUE         
-	    WRITE(LU_OUT,103)FILTLAM(L),FILTZP(L),FILT(L),T1
-103	    FORMAT(2X,F7.4,5X,F7.1,8X,A1,5X,F6.2)
-104	    FORMAT(2X,' Assumed Distance is',F5.1,' kpc',/
-	1  ,/,2x,'    Lam          ZP     Filt        Mag'//)
-	  END DO
-	  WRITE(LU_OUT,107)
-	  DO L=1,24
-	    MLST=1
-	    DO ML=MLST,NCF
-	      IF(NU(ML) .LT. 0.2998/FLAM(L))THEN
-	        T1=DLOG10(OBSF(ML-1))-DLOG10(NU(ML-1)*FLAM(L)/0.2998)
-	1       *(DLOG10(OBSF(ML)/OBSF(ML-1))/(DLOG10(NU(ML)/NU(ML-1))))
-	        T1=5.0*DLOG10(DIST)-2.5*T1+2.5*DLOG10(ZERO_POINT)
-	        MLST=ML
-	        GOTO 105
-	       END IF
-	    END DO
-105	  CONTINUE
-	    WRITE(LU_OUT,106)FLAM(L),ZERO_POINT,T1
-106	    FORMAT(2X,F7.4,5X,F7.1,5X,F6.2)
-107	    FORMAT(//,'     Lam          ZP     Mag//')
-	  END DO
-	  CLOSE(UNIT=LU_OUT)
+!
+	  IF( UC(FILTER_SET) .EQ. 'ALL')THEN
+	    FILTER_SET='ubvy'
+	    CALL GET_MAG(NU,OBSF,NCF,DIST,FILTER_SET,LU_OUT)
+	    FILTER_SET='UBV'
+	    CALL GET_MAG(NU,OBSF,NCF,DIST,FILTER_SET,LU_OUT)
+	  ELSE
+	    CALL GET_MAG(NU,OBSF,NCF,DIST,FILTER_SET,LU_OUT)
+	  END IF 
+!
+!	  WRITE(LU_OUT,104)DIST	  
+!	  DO L=1,8
+!	    MLST=1
+!	    DO ML=MLST,NCF
+!	      IF(NU(ML) .LT. 0.2998/FILTLAM(L))THEN
+!	        T1=DLOG10(OBSF(ML-1))-DLOG10(NU(ML-1)*FILTLAM(L)/0.2998)
+!	1       *(DLOG10(OBSF(ML)/OBSF(ML-1))/(DLOG10(NU(ML)/NU(ML-1))))
+!	        T1=5.0*DLOG10(DIST)-2.5*T1+2.5*DLOG10(FILTZP(L))
+!	        MLST=ML         
+!	        GOTO 102
+!	       END IF
+!	    END DO
+!102	  CONTINUE         
+!	    WRITE(LU_OUT,103)FILTLAM(L),FILTZP(L),FILT(L),T1
+!103	    FORMAT(2X,F7.4,5X,F7.1,8X,A1,5X,F6.2)
+!104	    FORMAT(2X,' Assumed Distance is',F5.1,' kpc',/
+!	1  ,/,2x,'    Lam          ZP     Filt        Mag'//)
+!	  END DO
+!	  WRITE(LU_OUT,107)
+!	  DO L=1,24
+!	    MLST=1
+!	    DO ML=MLST,NCF
+!	      IF(NU(ML) .LT. 0.2998/FLAM(L))THEN
+!	        T1=DLOG10(OBSF(ML-1))-DLOG10(NU(ML-1)*FLAM(L)/0.2998)
+!	1       *(DLOG10(OBSF(ML)/OBSF(ML-1))/(DLOG10(NU(ML)/NU(ML-1))))
+!	        T1=5.0*DLOG10(DIST)-2.5*T1+2.5*DLOG10(ZERO_POINT)
+!	        MLST=ML
+!	        GOTO 105
+!	       END IF
+!	    END DO
+!105	  CONTINUE
+!	    WRITE(LU_OUT,106)FLAM(L),ZERO_POINT,T1
+!106	    FORMAT(2X,F7.4,5X,F7.1,5X,F6.2)
+!107	    FORMAT(//,'     Lam          ZP     Mag//')
+!	  END DO
+!	  CLOSE(UNIT=LU_OUT)
+!
 C
 	ELSE IF(X .EQ. 'BB')THEN
 	  
@@ -1469,8 +1496,8 @@ C
 C
 	FUNCTION FAC(N)
 	REAL*8 FAC
-	INTEGER*4 N
-	INTEGER*4, PARAMETER :: T_OUT=5
+	INTEGER N
+	INTEGER, PARAMETER :: T_OUT=5
 C
 	IF(N .EQ. 0)THEN
 	  FAC=1

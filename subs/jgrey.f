@@ -17,7 +17,7 @@ C Altered 13-Mar-1987 - Method option installed. Correct units installed for
 C                          so that J has the units of B.
 C Created 2-DEC-1986 - Based on JFEAU
 C
-	INTEGER*4 NC,ND,NP,I,NI,LS
+	INTEGER NC,ND,NP,I,NI,LS
 	REAL*8 TA(ND),TB(ND),TC(ND),XM(ND),R(ND),Z(ND),CHI(ND),dCHIdr(ND)
 	REAL*8 RJ(ND),NEWRJ(ND),NEWRK(ND),DTAU(ND),Q(ND),F(ND)
 	REAL*8 AQW(ND,NP),AQW3(ND,NP),P(NP),LUM,HBC,HBCNEW,E1,E2,E3
@@ -25,7 +25,7 @@ C
 	CHARACTER*6 METHOD
 	LOGICAL DIFF
 C
-	INTEGER*4, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: IONE=1
 C
 	DIFF=.TRUE.
 	RJ(:)=0.0D0

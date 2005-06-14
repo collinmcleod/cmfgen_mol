@@ -25,8 +25,8 @@
 ! Altered 22-Jan-1998 : Treatment of optically thick lines at the outer 
 !                         boundary improved.
 !
-	INTEGER*4 ND
-	INTEGER*4 NCF
+	INTEGER ND
+	INTEGER NCF
 !
 ! Contain J, ETA and CHI from the Comoving-frame computations. Must be
 ! supplied by calling routine. At present it is assumed that these are
@@ -44,15 +44,15 @@
 ! Impact prameters: For rays not striking the core, P must be defined by
 ! the R grid. NP should be ND+NC
 !
-	INTEGER*4 NC
-	INTEGER*4 NP
+	INTEGER NC
+	INTEGER NP
 	REAL*8 P(NP)
 	REAL*8 HQW_AT_RMAX(NP)
 !
 ! Observer's frame frequencies in units of 10^15 Hz. Should be monontonically
 ! decreasing.
 !
-	INTEGER*4 NOS
+	INTEGER NOS
 	REAL*8 OBS_FREQ(NOS)
 	REAL*8 OBS_FLUX(NOS)
 !
@@ -63,7 +63,7 @@
 !
 	REAL*8 TAU_MAX
 	REAL*8 ES_DTAU
-	INTEGER*4 N_INS_OBS
+	INTEGER N_INS_OBS
 	CHARACTER*(*) INT_METHOD
 !
 ! Local vectors and arrays.
@@ -120,36 +120,36 @@
 	REAL*8, ALLOCATABLE ::  S(:)
 	REAL*8, ALLOCATABLE ::  dS(:)
 !
-	INTEGER*4 NOS_INC
-	INTEGER*4 OUT_ML
-	INTEGER*4 SM_NCF
-	INTEGER*4 NUM_BANDS
-	INTEGER*4, ALLOCATABLE :: STRT_INDX_CMF(:)       !NUM_BANDS
-	INTEGER*4, ALLOCATABLE :: END_INDX_CMF(:)        !NUM_BANDS
-	INTEGER*4, ALLOCATABLE :: INDX(:)                !NRAY
+	INTEGER NOS_INC
+	INTEGER OUT_ML
+	INTEGER SM_NCF
+	INTEGER NUM_BANDS
+	INTEGER, ALLOCATABLE :: STRT_INDX_CMF(:)       !NUM_BANDS
+	INTEGER, ALLOCATABLE :: END_INDX_CMF(:)        !NUM_BANDS
+	INTEGER, ALLOCATABLE :: INDX(:)                !NRAY
 !
 ! NR is the numter of points along a ray for Z .GE. 0. It is a function
 ! of LS.
 !
-	INTEGER*4 NR
+	INTEGER NR
 !
 ! NRAY total number of points along ray. For rays stringing the core,
 ! NRAY=NR, otherwise NRAY=2*NR-1
 !
-	INTEGER*4 NRAY
-	INTEGER*4 SM_NRAY
+	INTEGER NRAY
+	INTEGER SM_NRAY
 !
-	INTEGER*4 I,J,K,ML,LS
-	INTEGER*4 IOS
-	INTEGER*4 NINS
-	INTEGER*4 NINS_CONT
+	INTEGER I,J,K,ML,LS
+	INTEGER IOS
+	INTEGER NINS
+	INTEGER NINS_CONT
 !
-	INTEGER*4 LUER
-	INTEGER*4 NI
-	INTEGER*4 NI_MAX
-	INTEGER*4 ERR_COUNT
-	INTEGER*4 REC_SIZE,UNIT_SIZE
-	INTEGER*4 WORD_SIZE,N_PER_REC,ACCESS_F
+	INTEGER LUER
+	INTEGER NI
+	INTEGER NI_MAX
+	INTEGER ERR_COUNT
+	INTEGER REC_SIZE,UNIT_SIZE
+	INTEGER WORD_SIZE,N_PER_REC,ACCESS_F
 !
 	REAL*8 MAX_VMU
 	REAL*8 T1,T2,T3,T4
@@ -157,13 +157,13 @@
 	REAL*8 C_KMS
 	REAL*8 PAR_FLUX
 !
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	REAL*8 SPEED_OF_LIGHT,FUN_PI,PI
 	EXTERNAL SPEED_OF_LIGHT,FUN_PI,ERROR_LU
 !
 	REAL*8, PARAMETER :: ONE=1
-	INTEGER*4, PARAMETER :: IZERO=0
-	INTEGER*4, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IONE=1
 !
 	CALL TUNE(1,'OBS_FRAME_SUB')
 !

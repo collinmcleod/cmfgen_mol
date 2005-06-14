@@ -28,15 +28,15 @@
 ! Testing 22-Jul-1994 : Minor mods.
 ! Created 19-Jul-1993 : Based on VSEBYJ_COM and EVALSE_QWVJ.
 !
-	INTEGER*4 ID		!Ion identification
-	INTEGER*4 N_A		!Number of levels in ionizations state i
-	INTEGER*4 N_B		!Number of levels in ionizations state i+1
-	INTEGER*4 ML		!Indicates current freqency in vector NU
-	INTEGER*4 ND		!Number of depth points
-        INTEGER*4 NION		!Total Number of ions in model.
-        INTEGER*4 ION_EQ_IN_BA  !
+	INTEGER ID		!Ion identification
+	INTEGER N_A		!Number of levels in ionizations state i
+	INTEGER N_B		!Number of levels in ionizations state i+1
+	INTEGER ML		!Indicates current freqency in vector NU
+	INTEGER ND		!Number of depth points
+        INTEGER NION		!Total Number of ions in model.
+        INTEGER ION_EQ_IN_BA  !
 !
-	INTEGER*4 DST,DEND
+	INTEGER DST,DEND
 !
 	REAL*8 WSE_X(N_A,ND)		!Quadrature weights (incl. cross. sec.)
 !
@@ -67,10 +67,10 @@
 !
 ! Local variables
 !
-	INTEGER*4 NIV
-	INTEGER*4 ION_EQ		!Ion eqation in SE(ID)%BA matrix.
-	INTEGER*4 ION_V                 !Location of ion variable in SE(ID)%BA.
-	INTEGER*4 I,J
+	INTEGER NIV
+	INTEGER ION_EQ		!Ion eqation in SE(ID)%BA matrix.
+	INTEGER ION_V                 !Location of ion variable in SE(ID)%BA.
+	INTEGER I,J
 	REAL*8 T3,T4
 	REAL*8 RECIP_B_ION,BSTIM
 	REAL*8 WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC

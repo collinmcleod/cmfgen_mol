@@ -24,7 +24,7 @@ C
       REAL*8 P(5),Q(4),P1(9),Q1(8),P2(6),Q2(5)              
       REAL*8 XMIN,XLARGE,SQRPI,X,           
      *                   RES,XSQ,XNUM,XDEN,XI,XBIG                      
-      INTEGER*4            ISW,I,IFAIL                                          
+      INTEGER            ISW,I,IFAIL                                          
 C
 C Coefficients for 0.0 .LE. Y .LT.     
 C                                  .477                                 

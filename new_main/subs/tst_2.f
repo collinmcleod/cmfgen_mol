@@ -1,8 +1,8 @@
 	PROGRAM TST_1
 	IMPLICIT NONE
 !
-	INTEGER*4, PARAMETER :: IONE=1
-	INTEGER*4  N,NR,I,J,K,L
+	INTEGER, PARAMETER :: IONE=1
+	INTEGER  N,NR,I,J,K,L
 	REAL*8, ALLOCATABLE :: A(:,:)
 	REAL*8, ALLOCATABLE :: B(:,:)
 	REAL*8, ALLOCATABLE :: C(:,:)
@@ -120,12 +120,12 @@ C
 !                       Wall time now returened as in original VMS routine.
 !                       Counters now initialized if LRUN=0 is passed.
 !
-	INTEGER*4 LRUN
+	INTEGER LRUN
 	CHARACTER*(*) IDENT
 !
-	INTEGER*4, PARAMETER :: MAX_IDS=50
-!	INTEGER*4, PARAMETER :: LUOUT=55
-	INTEGER*4, PARAMETER :: LUOUT=6
+	INTEGER, PARAMETER :: MAX_IDS=50
+!	INTEGER, PARAMETER :: LUOUT=55
+	INTEGER, PARAMETER :: LUOUT=6
 !
         REAL*8 T0,OVERHEAD
         REAL*8 ST_CPU(MAX_IDS)

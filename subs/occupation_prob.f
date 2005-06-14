@@ -22,14 +22,14 @@ C                         dissolution can be switched off completely.
 C Altered 27-Aug-1995 - K was declared integer instead of REAL
 C Created 23-May-1995
 C
-	INTEGER*4 NC2,ND
+	INTEGER NC2,ND
 	REAL*8 W_C2(NC2,ND)		!Occupation probability
 	REAL*8 EDGE_C2(NC2)		!Ionization frequency (10^15 Hz)
 	REAL*8 ZC2			!Charge in ion
 C
 C Local variables.
 C
-	INTEGER*4 I,LEV
+	INTEGER I,LEV
 	REAL*8 NEFF,F,Y,BETA,REAL_K,T1
 C
 	IF(MOD_DO_LEV_DIS)THEN

@@ -22,7 +22,7 @@ C                       is also retrned. Since this is identically equal
 C                       to RKB, we hav negelected it.
 C
 	LOGICAL THK_LINE
-	INTEGER*4 LS,NC,NI
+	INTEGER LS,NC,NI
 	REAL*8 TERF
 	REAL*8 KI(NI),VSRCE(NI),RKB(NI),LINE_PRO(NI)
 	REAL*8 DTAU(NI),Q(NI),QH(NI),UK(NI),UKM1(NI),Z(NI)
@@ -31,7 +31,7 @@ C
 C Local variables
 C
 	REAL*8, PARAMETER :: ONE=1.0D0
-	INTEGER*4 I,J,K
+	INTEGER I,J,K
 	REAL*8 T1,T2,T3,T4,T5,T6,T7,KIP,KIM
 C
 C 

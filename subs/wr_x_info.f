@@ -7,9 +7,9 @@ C
 	SUBROUTINE WR_SL_INFO(STRING,NS,NF,ZION,DESC,LUOUT)
 	IMPLICIT NONE
 C
-	INTEGER*4 NF		!Number of level in full atom
-	INTEGER*4 NS		!Number of super levels
-	INTEGER*4 LUOUT		!Output unit for string if ``full''
+	INTEGER NF		!Number of level in full atom
+	INTEGER NS		!Number of super levels
+	INTEGER LUOUT		!Output unit for string if ``full''
 	REAL*8 ZION		!Charge on ion (or core)
 	CHARACTER*(*) STRING	!Output string
 	CHARACTER*(*) DESC	!Species description (i.e. C2)
@@ -17,12 +17,12 @@ C
 C Number of descriptors written per line, and the length each descriptor
 C is assigned.
 C
-	INTEGER*4, PARAMETER :: NVAR_PER_LINE=4
-	INTEGER*4, PARAMETER :: FIELD_LENGTH=20
+	INTEGER, PARAMETER :: NVAR_PER_LINE=4
+	INTEGER, PARAMETER :: FIELD_LENGTH=20
 C
-	INTEGER*4 NEXT_LOC
-	INTEGER*4 J
-	INTEGER*4 I_NF,I_NS
+	INTEGER NEXT_LOC
+	INTEGER J
+	INTEGER I_NF,I_NS
 	REAL*8 T1
 	CHARACTER*15 FMT
 C
@@ -47,18 +47,18 @@ C Routine to output ND etc
 C
 	SUBROUTINE WR_INT_INFO(STRING,NEXT_LOC,DESC,IVAL)
 	IMPLICIT NONE
-	INTEGER*4 NEXT_LOC	!Next location for output (updated)
-	INTEGER*4 IVAL		!Integer value to be output to string
+	INTEGER NEXT_LOC	!Next location for output (updated)
+	INTEGER IVAL		!Integer value to be output to string
 	CHARACTER*(*) STRING	!Output string
 	CHARACTER*(*) DESC	!Species description (i.e. C2)
 C
 C Number of descriptors written per line, and the length each descriptor
 C is assigned.
 C
-!	INTEGER*4, PARAMETER :: NVAR_PER_LINE=4
-	INTEGER*4, PARAMETER :: FIELD_LENGTH=20
+!	INTEGER, PARAMETER :: NVAR_PER_LINE=4
+	INTEGER, PARAMETER :: FIELD_LENGTH=20
 C
-	INTEGER*4 I,J
+	INTEGER I,J
 	CHARACTER*15 FMT
 C
 C Output format is ND[60] etc
@@ -79,7 +79,7 @@ C Routine to output Rstar etc,
 C
 	SUBROUTINE WR_VAL_INFO(STRING,NEXT_LOC,DESC,VAL)
 	IMPLICIT NONE
-	INTEGER*4 NEXT_LOC	!Next location for output (updated)
+	INTEGER NEXT_LOC	!Next location for output (updated)
 	REAL*8 VAL		!Real value to be output to string
 	CHARACTER*(*) STRING	!Output string
 	CHARACTER*(*) DESC	!Species description (i.e. C2)
@@ -87,10 +87,10 @@ C
 C Number of descriptors written per line, and the length each descriptor
 C is assigned.
 C
-!	INTEGER*4, PARAMETER :: NVAR_PER_LINE=4
-	INTEGER*4, PARAMETER :: FIELD_LENGTH=20
+!	INTEGER, PARAMETER :: NVAR_PER_LINE=4
+	INTEGER, PARAMETER :: FIELD_LENGTH=20
 C
-	INTEGER*4 I,J
+	INTEGER I,J
 	CHARACTER*15 FMT
 C
 C Ouput of the form R*=100.002 of Mdot=1.0E-05 
@@ -124,7 +124,7 @@ C
 	REAL*8 MASS			!Mass in atomic mass units
 	REAL*8 MEAN_ATOMIC_WEIGHT	!Mean ioic atomic weight (all)
 	REAL*8 SOL_MASS_FRAC
-	INTEGER*4 LUOUT
+	INTEGER LUOUT
 	CHARACTER*(*) SPECIES		!e.g. HYD or CARB
 C
 	REAL*8 T1

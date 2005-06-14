@@ -24,19 +24,19 @@ C Created: 22-Dec-1998: Complete rewrite of INS_LINE_V4.
 C                       Written to handle lines with different intrinsic
 C                         profile extents.
 C
-	INTEGER*4 NCF,NFREQ_MAX,N_LINES
-	INTEGER*4 NFREQ				!Returned
+	INTEGER NCF,NFREQ_MAX,N_LINES
+	INTEGER NFREQ				!Returned
 C
 C Vectors returned by subroutine:
 C
 C Line+continuum frequencies
 	REAL*8 FREQ(NFREQ_MAX)			!Continuum frequencies
-	INTEGER*4 LINES_THIS_FREQ(NFREQ_MAX)	!Indicates that this frequency 
+	INTEGER LINES_THIS_FREQ(NFREQ_MAX)	!Indicates that this frequency 
 						!  has line contributions,
 C
-	INTEGER*4 LINE_ST_INDX(N_LINES)		!Start index for the line 
+	INTEGER LINE_ST_INDX(N_LINES)		!Start index for the line 
 						!  in the NEW frequency array.
-	INTEGER*4 LINE_END_INDX(N_LINES)	!End index for the line 
+	INTEGER LINE_END_INDX(N_LINES)	!End index for the line 
 						! in the NEW frequency array.
 C
 C Passed vectors.
@@ -82,15 +82,15 @@ C
 	REAL*8 EDGE_SEP_FAC
 	REAL*8 MIN_FREQ_RAT
 C
-	INTEGER*4 INDX		!Current frequency index.
-	INTEGER*4 LN_INDX	!Current line whose frequencies we are 
+	INTEGER INDX		!Current frequency index.
+	INTEGER LN_INDX	!Current line whose frequencies we are 
 				!   installing.
-	INTEGER*4 NUM_RES_LINES
-	INTEGER*4 LOCAL_N_LINES
+	INTEGER NUM_RES_LINES
+	INTEGER LOCAL_N_LINES
 C
-	INTEGER*4 ML		!Continuum frequency index
-	INTEGER*4 I,K		!Miscellaneous loop variables.
-	INTEGER*4 LU_ER
+	INTEGER ML		!Continuum frequency index
+	INTEGER I,K		!Miscellaneous loop variables.
+	INTEGER LU_ER
 	REAL*8 C_KMS
 	REAL*8 dNU
 	REAL*8 dNU_NEXT
@@ -100,7 +100,7 @@ C
 C
 C External functions
 C
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	REAL*8 SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 C

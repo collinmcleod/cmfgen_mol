@@ -3,7 +3,7 @@
 C
 C Altered 20-Mar-1998: YV now passed as REAL*8
 C
-	INTEGER*4 ND,I
+	INTEGER ND,I
 	REAL*8 X(ND)
 	REAL*8 YV(ND)
 C

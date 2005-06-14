@@ -14,11 +14,11 @@ C Altered 31-AUG-1982 (Major bug fixed)
 C Altered 23-AUG-1982 (FC changed to pure dETA matrix)
 C Created 27-JUL-1982
 C
-	INTEGER*4 NM,ND
+	INTEGER NM,ND
 	REAL*8 FQAF(ND,ND,NM),F2DA(ND,ND),FC(ND,ND)
 	REAL*8 W(ND,ND),ESEC(ND)
 C
-	INTEGER*4 I,J,K
+	INTEGER I,J,K
 C
 	DO J=1,ND
 	  DO I=1,ND

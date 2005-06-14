@@ -23,7 +23,7 @@ C                       IONE inserted in call to SIMPTH
 C                       Genrical calls for EXP.
 C Created 12-May-1989 - Based on part of [JDH.FINAL]LINEGEN.FOR and FORMSOL.
 C
-	INTEGER*4 NLF,NC,NP,ND,NM
+	INTEGER NLF,NC,NP,ND,NM
 	REAL*8 ETA(ND),CHI(ND),ESEC(ND),CHIL(ND),ETAL(ND)
 	REAL*8 V(ND),SIGMA(ND),R(ND),P(NP)
 	REAL*8 FQAF(ND,ND,NM),FQAFD(ND)
@@ -44,10 +44,10 @@ C
 C
 C Local variables.
 C
-	INTEGER*4, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: IONE=1
 C
 	LOGICAL MLNE1
-	INTEGER*4 I,LS,ML,NI
+	INTEGER I,LS,ML,NI
 	REAL*8 OLDCHI,T1,T2,DBC,DBC_ON_DBB,TOR,IBOUND,WERF_EXP
 C
 	FQAF(:,:,:)=0.0D0               !NM,ND,ND

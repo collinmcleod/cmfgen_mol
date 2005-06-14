@@ -5,11 +5,11 @@ C
 	1                     V,T,SIGMA,ND)
 C
 	IMPLICIT NONE
-	INTEGER*4 NX,ND,INDX(NX)
+	INTEGER NX,ND,INDX(NX)
 	REAL*8 VEXT(NX),SIGMAEXT(NX),TEXT(NX),COEF(0:3,NX)
 	REAL*8 V(ND),SIGMA(ND),T(ND)
 C
-	INTEGER*4 I,J
+	INTEGER I,J
 C
 C Do intepolation in the log plane - need to add 1 to Sigma as it can be
 C negative.

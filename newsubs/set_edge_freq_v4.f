@@ -29,21 +29,21 @@
 ! Altered 24-Oct-1995
 ! Created 29-Mar-1990
 !
-	INTEGER*4 ID
+	INTEGER ID
 !
 ! NCF is the number of edges found (IN/OUT). On entry, it contains the number of
 ! edges found on all previous calls to SET_EDGE_FREQ_V4. On exit, it
 ! contains the updated value.
 !
-	INTEGER*4 NCF
-        INTEGER*4 NCF_MAX               !Maximum number of edges from ALL species.
-	INTEGER*4 NHI_F                 !Number of full levels for species.
-	INTEGER*4 NHI_S                 !Number of super-levels for species.
-	INTEGER*4 NPHOT			!Number of photoionization routes.
-	INTEGER*4 NUM_IMP_LEVELS	!Number of level which must have a continuum edge.
+	INTEGER NCF
+        INTEGER NCF_MAX               !Maximum number of edges from ALL species.
+	INTEGER NHI_F                 !Number of full levels for species.
+	INTEGER NHI_S                 !Number of super-levels for species.
+	INTEGER NPHOT			!Number of photoionization routes.
+	INTEGER NUM_IMP_LEVELS	!Number of level which must have a continuum edge.
 !
 	REAL*8 EDGEHI_F(NHI_F)
-	INTEGER*4 F_TO_S_HI(NHI_F)
+	INTEGER F_TO_S_HI(NHI_F)
 	LOGICAL HI_PRES
 !
 	REAL*8 EDGE_FREQ(NCF_MAX)
@@ -76,11 +76,11 @@
 ! Local variables.
 !
 	REAL*8 T1
-	INTEGER*4 NEW_ID
-	INTEGER*4 PHOT_ID
-	INTEGER*4 J
-	INTEGER*4 IS
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER NEW_ID
+	INTEGER PHOT_ID
+	INTEGER J
+	INTEGER IS
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 !
 	REAL*8, PARAMETER :: ZERO=0.0D0

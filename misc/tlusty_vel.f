@@ -34,9 +34,9 @@
 !
 ! TLUSTY input
 !
-	INTEGER*4 ND				!Number of TLUSTY depths input
-	INTEGER*4 ND_MAX			!Maximum number of TLUSTY depths in file
-	INTEGER*4, ALLOCATABLE :: INDX(:)
+	INTEGER ND				!Number of TLUSTY depths input
+	INTEGER ND_MAX			!Maximum number of TLUSTY depths in file
+	INTEGER, ALLOCATABLE :: INDX(:)
 	REAL*8, ALLOCATABLE :: DM(:)		!Column mass density
 	REAL*8, ALLOCATABLE :: TAUR(:)		!Rosseland optical depth
 	REAL*8, ALLOCATABLE :: AROSS(:)		!Absorption Rosseland optical depth scale
@@ -55,7 +55,7 @@
 !
 ! Arrays used to generate a FINE grid of the TLUSTY hydrostatic data data.
 !
-	INTEGER*4, PARAMETER :: NBIG=2500
+	INTEGER, PARAMETER :: NBIG=2500
 
 	REAL*8, ALLOCATABLE :: RA(:)
 	REAL*8, ALLOCATABLE :: TA(:)
@@ -70,8 +70,8 @@
 ! the Beta-Velocity. Below the connection point TLUSTY structure is used.
 ! Above the connection point, the Beta-velocity law is used.
 !
-	INTEGER*4, PARAMETER :: NEXT=1000	!Number of points used to extend R-grid
-	INTEGER*4 NF				!Number of points in merged model
+	INTEGER, PARAMETER :: NEXT=1000	!Number of points used to extend R-grid
+	INTEGER NF				!Number of points in merged model
 	REAL*8, ALLOCATABLE :: R_F(:)
 	REAL*8, ALLOCATABLE :: T_F(:)
 	REAL*8, ALLOCATABLE :: VW_F(:)
@@ -82,9 +82,9 @@
 !
 ! Grid for CMFGEN
 !
-	INTEGER*4 ND_CMF
-	INTEGER*4 ND_SM
-	INTEGER*4 ND_BEL
+	INTEGER ND_CMF
+	INTEGER ND_SM
+	INTEGER ND_BEL
 	REAL*8, ALLOCATABLE :: R_CMF(:)
 	REAL*8, ALLOCATABLE :: DENS_CMF(:)
 	REAL*8, ALLOCATABLE :: V_CMF(:)
@@ -109,9 +109,9 @@
 	REAL*8 CONS,EPS
 	REAL*8 DELR
 	REAL*8 R0
-	INTEGER*4 IND0
-	INTEGER*4 C_INDX
-	INTEGER*4 NV_WIND 		!Index in *_F arrays at wind/photosphere interface 
+	INTEGER IND0
+	INTEGER C_INDX
+	INTEGER NV_WIND 		!Index in *_F arrays at wind/photosphere interface 
 !                                                  when defining CMFGEN grid.
 !
 	CHARACTER*80 FILENAME
@@ -123,14 +123,14 @@
 	LOGICAL FLAG
 	LOGICAL REMOVE
 	LOGICAL ANS
-	INTEGER*4, PARAMETER :: IZERO=0
-	INTEGER*4, PARAMETER :: IONE=1
-	INTEGER*4, PARAMETER :: LUV=11
+	INTEGER, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: LUV=11
 !
 	REAL*8 FUN_PI,PI
 	EXTERNAL FUN_PI
 !
-	INTEGER*4 I,ID,K,IOS
+	INTEGER I,ID,K,IOS
 !
 ! Set up a velocity law connecting an hydrostatic
 !  density structure in the photosphere and a beta-law wind

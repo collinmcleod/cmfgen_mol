@@ -11,11 +11,11 @@ C
 !                       Designed to use TSEQ_DATAMOD.
 !                       See REABA for earlier changes.
 !
-	INTEGER*4 NION  	!Number of ions treated
-	INTEGER*4 NUM_BANDS  	!Number of bands in matrix
-	INTEGER*4 ND  		!Number of depth points
-	INTEGER*4 LU		!Logical unit for BA output.
-        INTEGER*4 LU1		!LU+1 is used for BAPNT1
+	INTEGER NION  	!Number of ions treated
+	INTEGER NUM_BANDS  	!Number of bands in matrix
+	INTEGER ND  		!Number of depth points
+	INTEGER LU		!Logical unit for BA output.
+        INTEGER LU1		!LU+1 is used for BAPNT1
 C
 C COMPUTE_BA is used to indicate whether BA been computed. This must be
 C included since it changes during program execution, and hence is not
@@ -25,8 +25,8 @@ C
 	CHARACTER DESC*(*)		!File name for BA &STEQ output.
 C
 	LOGICAL FILE_OPEN
-	INTEGER*4 IOS,ID,LUER,ERROR_LU
-	INTEGER*4, PARAMETER :: IZERO=0
+	INTEGER IOS,ID,LUER,ERROR_LU
+	INTEGER, PARAMETER :: IZERO=0
 	EXTERNAL ERROR_LU
 C
 	LUER=ERROR_LU()

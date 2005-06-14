@@ -66,9 +66,9 @@ C
 C Finalized: 04-Nov-1994
 C Created:   27-Sep-1995 : Diffusion approximation not tested yet.
 C
-	INTEGER*4 ND
-	INTEGER*4 NM
-	INTEGER*4 NM_KI
+	INTEGER ND
+	INTEGER NM
+	INTEGER NM_KI
 	REAL*8 ETA(ND),CHI(ND),ESEC(ND),THETA(ND)
 	REAL*8 V(ND),SIGMA(ND),R(ND)
 C
@@ -100,7 +100,7 @@ C
 C
 C Vectors required by future calls to VAR_MOM_J_CMF.
 C
-	INTEGER*4 NV
+	INTEGER NV
 	PARAMETER (NV=200)
 	REAL*8 JNUM1(NV),RSQ_HNUM1(NV)
 	SAVE JNUM1,RSQ_HNUM1
@@ -126,12 +126,12 @@ C
 	REAL*8 PROGDESC	
 	REAL*8, PARAMETER :: PROG_ID=2.2281463D+08  !Must be unique (VAR_MOM_)
 C
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
 C Local variables.
 C
-	INTEGER*4 I
+	INTEGER I
 	REAL*8 AV_SIGMA
 C
 C PROGDESC is a variable use to confirm that the scratch block is not

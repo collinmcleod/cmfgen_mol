@@ -4,6 +4,8 @@
 ! when we have poor population estimates for some ionization stages/species.
 ! For use with CMFGEN only.
 !
+! Altered 8-Mar-2005 : Bux fix.
+!
 	SUBROUTINE RD_CONT_J(FL,FREQ_INDX,FIRST_FREQ,LST_ITERATION,
 	1               ACCURATE,LUER,LU_EDD,ACCESS_F,ND,NP)
 !
@@ -23,6 +25,7 @@
 	INTEGER LUER
 	INTEGER ND
 	INTEGER NP
+	INTEGER IOS
 !
 	LOGICAL LST_ITERATION
 	LOGICAL ACCURATE
@@ -73,8 +76,19 @@
 ! that frequencies are ordered from highest to lowest.
 !
 	DO WHILE(FL .LT. LOW_FREQ)
-	  READ(LU_EDD,REC=ACCESS_F)(RJ_LOW(I),I=1,ND),LOW_FREQ
-          ACCESS_F=ACCESS_F+1
+	  HIGH_FREQ=LOW_FREQ
+	  RJ_HIGH(1:ND)=RJ_LOW(1:ND)
+	  READ(LU_EDD,REC=ACCESS_F,IOSTAT=IOS)(RJ_LOW(I),I=1,ND),LOW_FREQ
+          IF(IOS. NE. 0)THEN
+	    LOW_FREQ=HIGH_FREQ
+	    RJ_LOW(1:ND)=RJ_HIGH(1:ND)
+	    WRITE(LUER,*)'Error reading EDDFACTOR in RD_CONT_J'
+	    WRITE(LUER,*)'LOW_FREQ=',LOW_FREQ
+	    WRITE(LUER,*)'FL=',FL
+	    WRITE(LUER,*)'ACCESS_F=',ACCESS_F
+	    EXIT
+	  END IF
+	  ACCESS_F=ACCESS_F+1
 	END DO
 !
 ! Do the interpolation: We use simple linear interpolation.
@@ -83,10 +97,12 @@
 !
         IF(FL .GE. HIGH_FREQ)THEN
 	   RJ(1:ND)=RJ_HIGH(1:ND)
+        ELSE IF(FL .LE. LOW_FREQ)THEN
+	   RJ(1:ND)=RJ_LOW(1:ND)
 	ELSE 
 	  T1=(FL-LOW_FREQ)/(HIGH_FREQ-LOW_FREQ)
 	  DO I=1,ND
-	    RJ(I)=(1.0D0-T1)*RJ_LOW(I)+1.0D0*RJ_HIGH(I)
+	    RJ(I)=(1.0D0-T1)*RJ_LOW(I)+T1*RJ_HIGH(I)
 	  END DO
 	END IF
 	K_MOM(1:ND)=RJ(1:ND)/3.0D0

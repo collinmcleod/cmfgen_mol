@@ -29,12 +29,12 @@ C                          arrays extended to 200.
 C Created 21-Jan-1988 - Based on VKIMD. Program does full linearization
 C                           allowing for the corrections to the trapazoidal rule.
 C
-	INTEGER*4 LS,NC,ND,NI
+	INTEGER LS,NC,ND,NI
 	REAL*8 W(NI,NI),DTAU(NI),S(NI),U(NI),Z(NI)
 	REAL*8 R(ND),RKI(ND),DBC
 	LOGICAL DIFF
 C
-	INTEGER*4 I,J,K
+	INTEGER I,J,K
 	REAL*8 ALPHA,BETA
 C
 	W(:,:)=0.0D0

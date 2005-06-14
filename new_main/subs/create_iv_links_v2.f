@@ -15,11 +15,11 @@
 ! Altered output format.
 ! Created 17-Mar-2001
 !
-      INTEGER*4 NT
-      INTEGER*4 NION            !Total number of species (Phot/recom balance equations)
+      INTEGER NT
+      INTEGER NION            !Total number of species (Phot/recom balance equations)
 !
-      INTEGER*4 NIV		!Maximum number of IV allocations.
-      INTEGER*4 I,J,ID
+      INTEGER NIV		!Maximum number of IV allocations.
+      INTEGER I,J,ID
       LOGICAL LOC_IMP_VAR(NT)
 !
       WRITE(93,*)' '

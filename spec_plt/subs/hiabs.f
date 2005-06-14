@@ -22,7 +22,7 @@ C
 C
 C Altered 21-Dec-2001: Error in VTURB (**2 insetad of *2) fixed
 C
-	INTEGER*4 NLAM
+	INTEGER NLAM
 	REAL*8 WAVE(NLAM)
 	REAL*8 FLUX(NLAM)
 	REAL*8 V_TURB		!km/s
@@ -31,7 +31,7 @@ C
 C
 C Local variables
 C
-	INTEGER*4 NHYD
+	INTEGER NHYD
 	PARAMETER (NHYD=49)
 	REAL*8 HYD_LAM(NHYD)
 	REAL*8 HYD_FREQ(NHYD)
@@ -52,7 +52,7 @@ C
 	REAL*8 v
 	REAL*8 T1
 C
-	INTEGER*4 I,J
+	INTEGER I,J
 C
 C Functions
 C

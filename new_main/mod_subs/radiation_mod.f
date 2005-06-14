@@ -15,8 +15,6 @@
 !
 ! Arrays for calculating mean opacities.
 !
-	REAL*8, ALLOCATABLE :: FLUXMEAN(:)     	!ND - Flux mean opacity
-	REAL*8, ALLOCATABLE :: ROSSMEAN(:)     	!ND - Rosseland mean opacity
 	REAL*8, ALLOCATABLE :: INT_dBdT(:)     	!ND - Int. of dB/dT dv (to calculate ROSSMEAN)
 !
 	REAL*8, ALLOCATABLE :: RLUMST(:)      	!ND - Luminosity as a function of depth
@@ -127,8 +125,6 @@
 !
 ! Arrays for calculating mean opacities.
 !
-	IF(IOS .EQ. 0)ALLOCATE ( FLUXMEAN(ND),STAT=IOS ) 	!Flux mean opacity
-	IF(IOS .EQ. 0)ALLOCATE ( ROSSMEAN(ND),STAT=IOS )  	!Rosseland mean opacity
 	IF(IOS .EQ. 0)ALLOCATE ( INT_dBdT(ND),STAT=IOS )  	!Integral of dB/dT over nu (to calculate ROSSMEAN)
 !
 	IF(IOS .EQ. 0)ALLOCATE ( RLUMST(ND),STAT=IOS )		!Luminosity as a function of depth

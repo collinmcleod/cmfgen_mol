@@ -7,13 +7,13 @@
 !                                            
 ! Created 26-Aug-1998 : based on WR_AD_COOL
 !
-	INTEGER*4 COUNTER
-	INTEGER*4 ND,LU
+	INTEGER COUNTER
+	INTEGER ND,LU
 	REAL*8 NETCR(ND)	!Accumlated net cooling rate
 	REAL*8 TOTCR(ND)	!Accumulated sum of absoulte cooling rates.
 !                 
-	INTEGER*4 I,J
-	INTEGER*4 MS,MF
+	INTEGER I,J
+	INTEGER MS,MF
 !
 	MS=(COUNTER-1)*10+1	
 	MF=COUNTER*10

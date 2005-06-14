@@ -18,7 +18,7 @@ C
 C Altered 14-Dec-1996 : Bug fix for MON_INTER option. NU_STORE was being
 C                         accesd outside valid range (1 to NEXT_ST_LOC-1).
 C
-	INTEGER*4 NP
+	INTEGER NP
 	REAL*8 NEW_IPLUS(NP)		!RAW CMF intensities as a function of
 					!  impact parameter.
 	REAL*8 NEW_NU			!Current CMF frequency.
@@ -26,13 +26,13 @@ C
 	REAL*8 MU(NP)
 	REAL*8 FLUX_WGHTS(NP)
 C
-	INTEGER*4 N_OBS
+	INTEGER N_OBS
 	REAL*8 OBS_FREQ(N_OBS)
 	REAL*8 OBS_FLUX(N_OBS)
 C
 C Storage arrays
 C
-	INTEGER*4 NST_CMF
+	INTEGER NST_CMF
 	REAL*8 IPLUS_STORE(NST_CMF,NP)
 	REAL*8 NU_STORE(NST_CMF)
 C
@@ -46,21 +46,21 @@ C Local variables passed from one call to the next.
 C
 	REAL*8 C_KMS
 	REAL*8 FLUX_CONST
-	INTEGER*4 NEXT_ST_LOC		!Keeps track of storage location.
-	INTEGER*4 OBS_INDX		!Current observers frequency
-	INTEGER*4 LUER
+	INTEGER NEXT_ST_LOC		!Keeps track of storage location.
+	INTEGER OBS_INDX		!Current observers frequency
+	INTEGER LUER
 	SAVE C_KMS,NEXT_ST_LOC,OBS_INDX,LUER,FLUX_CONST
 C
 C External functions.
 C
 	REAL*8 SPEED_OF_LIGHT,PARSEC,FUN_PI
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	EXTERNAL SPEED_OF_LIGHT,ERROR_LU,PARSEC,FUN_PI
 C
 C Local variables
 C
 	REAL*8 NU_SM_CMF
-	INTEGER*4 L,LS,ML,ML_ST,ML_END
+	INTEGER L,LS,ML,ML_ST,ML_END
 C
 C Variables for interpolation.
 C

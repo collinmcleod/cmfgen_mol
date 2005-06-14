@@ -4,10 +4,10 @@ C
 C Altered 05-Dec-1996 : END DO used to terminate DO LOOPs.
 C ALtered 24-May-1996 : Implict none installed.
 C
-	INTEGER*4 ND,NI,NM
+	INTEGER ND,NI,NM
 	REAL*8 FB(ND,ND,NM),TB(NI),W(NI,NI,NM)
 C
-	INTEGER*4 I,J,K
+	INTEGER I,J,K
 C
 	DO K=1,NM
 	  DO J=1,NI

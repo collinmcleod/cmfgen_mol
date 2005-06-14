@@ -24,7 +24,7 @@ C
 C
 C Created 26-Sep-1997 - Based on MON_INTERP
 C
-	INTEGER*4 ND,NINS
+	INTEGER ND,NINS
 C
 C NB: These arrays are dimensioned ND-1 since there are ONLY ND-1
 C intervals. By doing this we can use MATRIX operations, and operate
@@ -53,7 +53,7 @@ C
 	REAL*8 ONE
 	REAL*8 DELR
 	PARAMETER (ONE=1.0D0)
-	INTEGER*4 I,K
+	INTEGER I,K
 C
 C Choose the correct plane for the interpolations.
 C

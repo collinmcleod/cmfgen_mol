@@ -16,12 +16,12 @@ C                       4000 elemnts (eg > 60* 66).
 C                       IMPLICIT NONE installed.
 C
 C
-	INTEGER*4 NT  			!Dimension of BA matrix
-	INTEGER*4 NS  			!Dimension of STEQ matrix
-        INTEGER*4 NL			!Indicates lower levels that have
+	INTEGER NT  			!Dimension of BA matrix
+	INTEGER NS  			!Dimension of STEQ matrix
+        INTEGER NL			!Indicates lower levels that have
                                         !been computed successfully so far.
-	INTEGER*4 LU			!Logical unit for BA output.
-        INTEGER*4 LU1			!LU+1 is used for BAPNT1
+	INTEGER LU			!Logical unit for BA output.
+        INTEGER LU1			!LU+1 is used for BAPNT1
 C
 C COMPUTE_BA is used to indicate whether BA been computed. This must be
 C included since it changes during program execution, and hence is not
@@ -32,8 +32,8 @@ C
 	CHARACTER DESC*(*)		!File name for BA &STEQ output.
 C
 	LOGICAL FILE_OPEN
-	INTEGER*4 IOS,LUER,ERROR_LU
-	INTEGER*4, PARAMETER :: IZERO=0
+	INTEGER IOS,LUER,ERROR_LU
+	INTEGER, PARAMETER :: IZERO=0
 	EXTERNAL ERROR_LU
 C
 	LUER=ERROR_LU()

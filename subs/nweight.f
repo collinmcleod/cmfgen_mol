@@ -16,10 +16,10 @@ C Altered 25-May-1996 - CALL to DP_ZERO deleted
 C                       ERROR_LU inserted.     
 C Created 11-JAN-1988 - Based on KWEIGHT.
 C
-	INTEGER*4 N,I
+	INTEGER N,I
 	REAL*8 X(N),W(N),H,R,RE,RF,T1,SUM
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 	W(:)=0.0D0

@@ -8,7 +8,7 @@ C Altered 05-Dec-1996 - END DO used to terminate DO loops.
 C Altered 24-May-1996 - IONE inserted
 C Altered 17-Feb-1986 - Core rays distributed equally in mu rather than p.
 C
-	INTEGER*4 NC,ND,NP,I
+	INTEGER NC,ND,NP,I
 	REAL*8 P(NP),R(ND),RP,DELMU
 	REAL*8, PARAMETER :: RONE=1.0D0
 C

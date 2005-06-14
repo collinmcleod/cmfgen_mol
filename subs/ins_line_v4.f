@@ -45,20 +45,20 @@
 ! Altered 28-Feb-1995 : dv_CMF_WING,CMF_WING_EXT inserted (_V2)
 ! Altered 02-Feb-1995 : Not correctly inserting all continuum points.
 !
-	INTEGER*4 NCF,NFREQ_MAX,N_LINES
-	INTEGER*4 NFREQ				!Returned
+	INTEGER NCF,NFREQ_MAX,N_LINES
+	INTEGER NFREQ				!Returned
 !
 ! Vectors returned by subroutine:
 !
 ! Line+continuum frequencies
 !
 	REAL*8 FREQ(NFREQ_MAX)			!Continuum frequencies
-	INTEGER*4 LINES_THIS_FREQ(NFREQ_MAX)	!Indicates that this frequency 
+	INTEGER LINES_THIS_FREQ(NFREQ_MAX)	!Indicates that this frequency 
 						!  has line contributions,
 !
-	INTEGER*4 LINE_ST_INDX(N_LINES)		!Start index for the line 
+	INTEGER LINE_ST_INDX(N_LINES)		!Start index for the line 
 						!  in the NEW frequency array.
-	INTEGER*4 LINE_END_INDX(N_LINES)	!End index for the line 
+	INTEGER LINE_END_INDX(N_LINES)	!End index for the line 
 						! in the NEW frequency array.
 !
 ! Passed vectors.
@@ -93,7 +93,7 @@
 !
 	REAL*8 dNU_on_NU	!Actual spacing used across intrinsic line 
 				!  profile given by dNU =NU*dNU_on_NU
-	INTEGER*4 NDOP		!Number of frequencies across intrinsic 
+	INTEGER NDOP		!Number of frequencies across intrinsic 
 				!  profile.
 	REAL*8 RES_EXTENT	!Maximum frequency in line is NU*RES_EXTENT
 !
@@ -104,15 +104,15 @@
 	REAL*8 EDGE_SEP_FAC
 	REAL*8 MIN_FREQ_RAT
 !
-	INTEGER*4 INDX		!Current frequency index.
-	INTEGER*4 LN_INDX	!Current line whose frequencies we are 
+	INTEGER INDX		!Current frequency index.
+	INTEGER LN_INDX	!Current line whose frequencies we are 
 				!   installing.
-	INTEGER*4 LST_LN_INDX	!Last line whose frequencies we 
+	INTEGER LST_LN_INDX	!Last line whose frequencies we 
 				!   installed.
 !
-	INTEGER*4 ML		!Continuum frequency index
-	INTEGER*4 I,J,K		!Miscellaneous loop variables.
-	INTEGER*4 LU_ER
+	INTEGER ML		!Continuum frequency index
+	INTEGER I,J,K		!Miscellaneous loop variables.
+	INTEGER LU_ER
 	REAL*8 C_KMS
 	REAL*8 DELF
 	REAL*8 MIN_FREQ
@@ -124,7 +124,7 @@
 !
 ! External functions
 !
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	REAL*8 SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !

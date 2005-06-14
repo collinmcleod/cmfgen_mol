@@ -18,15 +18,15 @@ C                       Method is now also a passed parameter.
 C Altered 10-Feb-1987 - NI=2 is now handled correctly. Dont have to
 C                       consider the case NI=1 since the flux is zero.
 C
-	INTEGER*4 NC,ND,NP
+	INTEGER NC,ND,NP
 	REAL*8 TA(ND),TB(ND),TC(ND),XM(ND),DTAU(ND),dCHIdr(ND)
 	REAL*8 R(ND),Z(ND),P(NP),SOURCE(ND),CHI(ND),SOB(ND)
 	REAL*8 HAQW(ND,NP),S1,DBB,IC
 	LOGICAL THICK,DIF
 	CHARACTER*6 METHOD
 C
-	INTEGER*4, PARAMETER :: IONE=1
-	INTEGER*4  LS,I,NI
+	INTEGER, PARAMETER :: IONE=1
+	INTEGER  LS,I,NI
 	REAL*8 IBOUND,TOR,DBC
 	REAL*8 E1,E2,E3,PP
 C

@@ -10,10 +10,10 @@ C                         opitimization problems.
 C Altered 09-Dec-2001 : PP removed and repplaced directly in SQRT by P*P
 C Altered 28-May-1996 : IMPLCIT NONE installed.
 C
-	INTEGER*4 NI
+	INTEGER NI
 	REAL*8 X(NI),R(NI),P
 C
-	INTEGER*4 I
+	INTEGER I
 C
 	DO 10 I=1,NI
 	  X(I)=SQRT( (R(I)-P)*(R(I)+P) )

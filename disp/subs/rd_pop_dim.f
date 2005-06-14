@@ -16,8 +16,8 @@ C                         and HEI to HeI.
 C Altered 27-Jan-1996 : Number of lvels descriptor no longer has to be present
 C                         for a species not included in model.
 C
-	INTEGER*4 NCIII
-	INTEGER*4 LUIN
+	INTEGER NCIII
+	INTEGER LUIN
 	LOGICAL CIII_PRES
 	CHARACTER*(*) DESC,FORMAT_DATE
 	CHARACTER*30 UC
@@ -26,7 +26,7 @@ C
 C Local variables.
 C
 	CHARACTER*132 STRING
-	INTEGER*4 IOS,LUER,ERROR_LU,INDx
+	INTEGER IOS,LUER,ERROR_LU,INDx
 	EXTERNAL ERROR_LU
 C
 	LUER=ERROR_LU()

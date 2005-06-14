@@ -7,8 +7,8 @@
 	USE PHOT_DATA_MOD
 	IMPLICIT NONE
 !
-	INTEGER*4 ID		!Species identifier
-	INTEGER*4 ND		!Number of depth points
+	INTEGER ID		!Species identifier
+	INTEGER ND		!Number of depth points
 	REAL*8 FREQ		!Frequency in units of 10^15 Hz
 	REAL*8 GION		!Ion statistical weight
 	REAL*8 ZION		!Charge on ion.
@@ -33,7 +33,7 @@
 	REAL*8 CONST
 	REAL*8 T1
 !
-	INTEGER*4 I,K
+	INTEGER I,K
 !
 ! Check if any free-free resonances for this species.
 !

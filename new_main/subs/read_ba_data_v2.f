@@ -11,22 +11,22 @@
 ! Created 02-Apr-2001 - Created to handle SE data structure.
 !                       See READBA for earlier corrections.
 !
-	INTEGER*4 NION
-	INTEGER*4 NUM_BNDS
-	INTEGER*4 ND
-        INTEGER*4 LU                    !Input unit for BA and STEQ
+	INTEGER NION
+	INTEGER NUM_BNDS
+	INTEGER ND
+        INTEGER LU                    !Input unit for BA and STEQ
 	LOGICAL COMPUTE_BA  		!Indicates whether BA is being computed.
 	LOGICAL STATUS                  !Indicates whether BA/STEQ read successful
 	CHARACTER DESC*(*)              !Used for filename
 C
 C Local Variables and external functions.
 C
-	INTEGER*4 NUM_BNDS_RD,ND_RD,NION_RD
-	INTEGER*4 ID
-	INTEGER*4 LUER,ERROR_LU,IOS
+	INTEGER NUM_BNDS_RD,ND_RD,NION_RD
+	INTEGER ID
+	INTEGER LUER,ERROR_LU,IOS
 	EXTERNAL ERROR_LU
 	LOGICAL FILE_OPEN
-	INTEGER*4, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IZERO=0
 C
 	LUER=ERROR_LU()
 	CALL GEN_ASCI_OPEN(LU,DESC//'PNT','OLD',' ','READ',IZERO,IOS)

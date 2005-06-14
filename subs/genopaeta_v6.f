@@ -43,7 +43,7 @@ C Created 20-Mar-1989 - Based on OPAGEN and CHIGEN
 C
 	EXTERNAL SUB_PHOT_GEN
 C
-	INTEGER*4 N,N_DI,ND
+	INTEGER N,N_DI,ND
 	LOGICAL IONFF,LST_DEPTH_ONLY
 C
 C Constants for opacity etc.
@@ -70,8 +70,8 @@ C
 	REAL*8 NU			!Frequency (10^15 Hz)
 	REAL*8 ZION			!Charge on resultiong ion.
 C
-	INTEGER*4 PHOT_ID		!Photoionization ID (path)
-	INTEGER*4 ION_LEV		!Target level for ionizations in ion.
+	INTEGER PHOT_ID		!Photoionization ID (path)
+	INTEGER ION_LEV		!Target level for ionizations in ion.
 C
 C Vectors to save computational effort.
 C
@@ -89,7 +89,7 @@ C
 C
 C Local constants.
 C
-	INTEGER*4 I,K,K_ST,ND_LOC,NO_NON_ZERO_PHOT
+	INTEGER I,K,K_ST,ND_LOC,NO_NON_ZERO_PHOT
 	REAL*8 ALPHA,TCHI1,TETA1,TETA2
 	REAL*8 T1,T2,ZION_CUBED,NEFF
 C

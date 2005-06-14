@@ -183,7 +183,7 @@ C
 C
 C******************************************************************************
 C
-	INTEGER*4 N,NION,ND,NUM_BNDS,DIAG_INDX
+	INTEGER N,NION,ND,NUM_BNDS,DIAG_INDX
 	CHARACTER*(*) SOL_TYPE
 	REAL*8 STEQ_STORE(N,ND)
         REAL*8 STEQ(N,ND)
@@ -203,28 +203,28 @@ C
         REAL*8 ROW_CND,COL_CND,MAX_VAL
         REAL*8 RUB	      !Not accessed when passed.
 !
-	INTEGER*4 DEPTH_INDX
-	INTEGER*4 BAND_INDX
+	INTEGER DEPTH_INDX
+	INTEGER BAND_INDX
 C
 C NB: We cheat and use VEC as an intger array in the called subroutines. It
 C     doesn't matter as its only a work vector.
 C
-        INTEGER*4 I,J,K,JJ
-        INTEGER*4 IOS,IFAIL
+        INTEGER I,J,K,JJ
+        INTEGER IOS,IFAIL
 	CHARACTER*10 DESC
 	LOGICAL ANONZERO,ENONZERO
 	LOGICAL FIRST_MATRIX,LAST_MATRIX
 !
-	INTEGER*4 KD
+	INTEGER KD
 	LOGICAL SMALL_D_MAT
 C
         REAL*8,      PARAMETER :: DP_NEG_ONE=-1.0D0
         REAL*8,      PARAMETER :: DP_ONE=1.0D0
-        INTEGER*4,   PARAMETER :: INT_ONE=1
-        INTEGER*4,   PARAMETER :: NSNG=1
+        INTEGER,   PARAMETER :: INT_ONE=1
+        INTEGER,   PARAMETER :: NSNG=1
         CHARACTER*1, PARAMETER :: NO_TRANS='N'
 C
-	INTEGER*4 LUER,ERROR_LU
+	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
 C
 	LUER=ERROR_LU()

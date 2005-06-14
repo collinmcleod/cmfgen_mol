@@ -19,11 +19,11 @@ C                     - All routines checked to see if they give the correct
 C                       answers for a linear function (also quadratic and cubic).
 C Altered 28-SEP-1982 (6.9 in simuneq replaced by 6.0)
 C
-	INTEGER*4 N,I
+	INTEGER N,I
 	REAL*8 U(N),W(N)
 	REAL*8 T1,T2,TT
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
  
 C

@@ -14,7 +14,7 @@ C
 C Altered 24-May-1996 - RONE etc inserted.
 C Created 29-Aug-1989 - Verified against tbales of Karzas and Latter.
 C
-	INTEGER*4 N,I1,I2
+	INTEGER N,I1,I2
 	REAL*8 SIGMA(0:N-1),KSQ
 	REAL*8 G(0:N-1,0:N+1)
 C
@@ -22,7 +22,7 @@ C
 C
 C Local variables
 C
-	INTEGER*4 L
+	INTEGER L
 	REAL*8 G0,NKSQ,MULT,K,ROOT3
 C
 	REAL*8, PARAMETER :: PI=3.1415926535897932384D0

@@ -33,7 +33,7 @@ C
 	1                  NLF,NC,NP,ND)
 	IMPLICIT NONE
 C
-	INTEGER*4 NLF,NC,NP,ND,NV
+	INTEGER NLF,NC,NP,ND,NV
 	PARAMETER (NV=100)
 	REAL*8 ETA(ND),CHI(ND),THETA(ND),ESEC(ND)
 	REAL*8 CHIL(ND),ETAL(ND),JCONT(ND)
@@ -69,7 +69,7 @@ C
 C
 C Local variables.
 C
-	INTEGER*4 I,ML
+	INTEGER I,ML
 	REAL*8 T1,T2,T3,DNU,SCALE,MID_PRO
 C
 C PROGDESC is a variable use to confirm that the scratch block is not

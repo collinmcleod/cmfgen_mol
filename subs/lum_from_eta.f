@@ -14,12 +14,12 @@ C Altered 30-Mar-2000 : Bug fixed with derivative computation. Derivatives were
 C                         offset.
 C Created 25-Jun-1998
 C
-	INTEGER*4 ND
+	INTEGER ND
 	REAL*8 LINE_LUM(ND)
 	REAL*8 R(ND)
 C
 	REAL*8 DERIV(ND)
-	INTEGER*4 I
+	INTEGER I
 C
 C We compute the amount of energy emitted between R(I) and R(I+1), and
 C store it in LINE(I). This is computed using the Euler-McLaurin summation

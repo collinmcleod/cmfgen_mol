@@ -32,12 +32,12 @@ C CONSTANTS FOR OPACITY ETC.
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
-	INTEGER*4 NLEV			!Number of levels in species
-	INTEGER*4 N_DI			!Number of levels in final ion
-	INTEGER*4 ML			!Used to signify initialization
-	INTEGER*4 ND			!Number of depth points.
-	INTEGER*4 PHOT_ID		!Photoionization ID
-	INTEGER*4 ION_LEV		!Final (destination) level in ion.
+	INTEGER NLEV			!Number of levels in species
+	INTEGER N_DI			!Number of levels in final ion
+	INTEGER ML			!Used to signify initialization
+	INTEGER ND			!Number of depth points.
+	INTEGER PHOT_ID		!Photoionization ID
+	INTEGER ION_LEV		!Final (destination) level in ion.
 C
 	REAL*8 PR(NLEV,ND),RR(NLEV,ND),BFCR(NLEV,ND),FF(ND)
 	REAL*8 HN(NLEV,ND),HNST(NLEV,ND),WSE(NLEV,ND),WCR(NLEV,ND)
@@ -51,7 +51,7 @@ C
 	REAL*8 BPHOT_CR(ND)
 	REAL*8 NU_CONT
 C
-	INTEGER*4 I,J
+	INTEGER I,J
 	REAL*8 T2,A1,TMP_HNST,B_RAT
 	REAL*8 H,ZHYD,CHIBF,CHIFF,HDKT,TWOHCSQ
 C

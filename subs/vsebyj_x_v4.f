@@ -23,24 +23,24 @@ C                       _V2 append to call.
 C Testing 22-Jul-1994 : Minor mods.
 C Created 19-Jul-1993 : Based on VSEBYJ_COM and EVALSE_QWVJ.
 C
-	INTEGER*4 N_A		!Number of levles in ionizations state i
-	INTEGER*4 N_B		!Number of levles in ionizations state i+1
-	INTEGER*4 EQ_A		!Eqn. for ground state of ion. state i
-	INTEGER*4 ION_EQ	!Eqn. # of target species [gs. of (i+2)th ]
-	INTEGER*4 SPEC_EQ	!Eqn. # of abundance equation
+	INTEGER N_A		!Number of levles in ionizations state i
+	INTEGER N_B		!Number of levles in ionizations state i+1
+	INTEGER EQ_A		!Eqn. for ground state of ion. state i
+	INTEGER ION_EQ	!Eqn. # of target species [gs. of (i+2)th ]
+	INTEGER SPEC_EQ	!Eqn. # of abundance equation
 C
-	INTEGER*4 ML		!Inidcates current freqency in vector NU
-	INTEGER*4 NT		!Total number of levels
-	INTEGER*4 ND		!Number of depth points
+	INTEGER ML		!Inidcates current freqency in vector NU
+	INTEGER NT		!Total number of levels
+	INTEGER ND		!Number of depth points
 C
-	INTEGER*4 EQ_A_BAL	!Eqn. # for     ith ion. stage in ion. matrix
-	INTEGER*4 EQ_B_BAL	!Eqn. # for (i+1)th ion. stage in ion. matrix
-        INTEGER*4 NION		!Numer of Eqns. in ionization matrix.
+	INTEGER EQ_A_BAL	!Eqn. # for     ith ion. stage in ion. matrix
+	INTEGER EQ_B_BAL	!Eqn. # for (i+1)th ion. stage in ion. matrix
+        INTEGER NION		!Numer of Eqns. in ionization matrix.
 C
 C NB --- NION is the total number of ionic species i.e. for
 C HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and CV).
 C
-	INTEGER*4 NUM_BNDS,DST,DEND
+	INTEGER NUM_BNDS,DST,DEND
 	REAL*8 BA(NT,NT,NUM_BNDS,ND)
 	REAL*8 BAION(NION,NT,NUM_BNDS,ND)
 	REAL*8 WSE_X(N_A,ND)
@@ -72,7 +72,7 @@ C
 C
 C Local variables
 C
-	INTEGER*4 I,J,L,NJ
+	INTEGER I,J,L,NJ
 	REAL*8 T3,T4
 	REAL*8 BSTIM,RECIP_B_ION
 	REAL*8 WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC

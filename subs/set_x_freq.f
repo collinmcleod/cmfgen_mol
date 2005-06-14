@@ -13,12 +13,12 @@ C Altered 26-May-1996 : ERROR_LU installed.
 C                       Warning for non CNO species installed.
 C Created 18-Jul-1994
 C
-	INTEGER*4 NCF,NCF_MAX,J
+	INTEGER NCF,NCF_MAX,J
 	REAL*8 FREQ(NCF_MAX)
 	REAL*8 ZCORE,ZION,CON_FAC
 	LOGICAL NI_PRES,N2_PRES
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 C Data variables. C, N, AND O

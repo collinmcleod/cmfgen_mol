@@ -16,7 +16,7 @@ C                        by the METHOD option in the calling routine.
 C                        A [ -THETA(1)*T1 ] term was inadvertantly
 C                        omitted from the WM(1,1) term.
 C
-	INTEGER*4 NI
+	INTEGER NI
 	REAL*8 XM(NI),WM(NI,NI),THETA(NI),CHI(NI),P
 	REAL*8 DTAU(NI),R(NI),Z(NI),ZETA(NI)
 	REAL*8 TOR,E1,E2,E3,T1,IBOUND

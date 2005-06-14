@@ -2,9 +2,9 @@
 ! Module containing DATA for charge exchange reactions.
 !
 	MODULE CHG_EXCH_MOD_V3
-	  INTEGER*4 N_CHG_RD
-	  INTEGER*4 N_CHG
-	  INTEGER*4 LUER
+	  INTEGER N_CHG_RD
+	  INTEGER N_CHG
+	  INTEGER LUER
 !
 ! Altered 10-Sep-2000 : Bug fix. THI_CHG was not beeing set is not read in.
 ! Altered 01-Oct-1998 : Fitting range and FORMAT date is now read in. 
@@ -15,7 +15,7 @@
 !
 ! Reaction data
 !
-          INTEGER*4, ALLOCATABLE :: TYPE_CHG_RD(:)
+          INTEGER, ALLOCATABLE :: TYPE_CHG_RD(:)
           REAL*8, ALLOCATABLE :: COEF_CHG_RD(:,:)
           REAL*8, ALLOCATABLE :: TLO_CHG_RD(:)
           REAL*8, ALLOCATABLE :: THI_CHG_RD(:)
@@ -24,7 +24,7 @@
 	  CHARACTER*30, ALLOCATABLE :: LEV_NAME_CHG_RD(:,:)
 	  CHARACTER*30, ALLOCATABLE :: ALT_LEV_NAME_CHG_RD(:,:)
 !
-          INTEGER*4, ALLOCATABLE :: TYPE_CHG(:)
+          INTEGER, ALLOCATABLE :: TYPE_CHG(:)
           REAL*8, ALLOCATABLE :: COEF_CHG(:,:)
           REAL*8, ALLOCATABLE :: G_CHG(:,:)
           REAL*8, ALLOCATABLE :: TLO_CHG(:)
@@ -41,12 +41,12 @@
           REAL*8, ALLOCATABLE :: dlnAI_AR_CHG_dlnT(:,:)
           REAL*8, ALLOCATABLE :: COOL_CHG(:,:)
 !
-	  INTEGER*4, ALLOCATABLE ::  ID_ION_CHG(:,:)
-	  INTEGER*4, ALLOCATABLE ::  LEV_IN_POPS_CHG(:,:)
-	  INTEGER*4, ALLOCATABLE ::  LEV_IN_ION_CHG(:,:)
+	  INTEGER, ALLOCATABLE ::  ID_ION_CHG(:,:)
+	  INTEGER, ALLOCATABLE ::  LEV_IN_POPS_CHG(:,:)
+	  INTEGER, ALLOCATABLE ::  LEV_IN_ION_CHG(:,:)
 	  LOGICAL, ALLOCATABLE ::  CHG_REACTION_AVAILABLE(:)
 !
-	  INTEGER*4, PARAMETER :: N_COEF_MAX=5
+	  INTEGER, PARAMETER :: N_COEF_MAX=5
 !
 	  LOGICAL INITIALIZE_ARRAYS
 	  LOGICAL DO_CHG_EXCH

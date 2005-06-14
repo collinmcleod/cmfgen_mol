@@ -35,7 +35,7 @@ C Altered 11-AUG-82 (form of diff vector altered to include CHI)
 C Altered 5-AUG-82
 C
 	LOGICAL DIFF,THK
-	INTEGER*4 NC,ND,NP
+	INTEGER NC,ND,NP
 	CHARACTER*(*) METHOD
 C
 	REAL*8 F2DA(ND,ND),FC(ND,ND),FB(ND,ND),VK(ND,ND)
@@ -48,9 +48,9 @@ C
 	REAL*8 F2DAT(ND,2*ND+1)
 !
 C
-	INTEGER*4, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: IONE=1
 C
-	INTEGER*4 I,J,KS,NI,LS
+	INTEGER I,J,KS,NI,LS
 	REAL*8 IBOUND,TOR,DBC
 C
 C Zero F2DA and FC matrices and FA vector. NB: These matrices should

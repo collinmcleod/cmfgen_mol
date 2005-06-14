@@ -18,7 +18,7 @@ C Altered 26-May-1996 : IMPLICIT NONE installed.
 C                     : Generic calls for EXP and LOG installed.
 C Created 10-FEB-83
 C
-	INTEGER*4 ND
+	INTEGER ND
 	REAL*8 R(ND),V(ND),SIGMA(ND)
 	REAL*8 TA(ND),TB(ND),TC(ND)
 C
@@ -33,7 +33,7 @@ C
 	REAL*8 ALPHA1,BETA1
 	REAL*8 ALPHA2,BETA2
 C
-	INTEGER*4 I,MND
+	INTEGER I,MND
 C
 	VF1=0.5D0*(1.0D0+EPS1+GAM1)*VINF1
 	VF2=0.5D0*(1.0D0+EPS2+GAM2)*VINF2

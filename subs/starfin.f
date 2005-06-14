@@ -20,7 +20,7 @@ C Altered 10-MAR-1986 : Tau at boundary computed differently so that
 C                        57 will have the same depth points as 30.
 C Created 10-FEB-1983
 C
-	INTEGER*4 ND
+	INTEGER ND
 	REAL*8 R(ND),V(ND),SIGMA(ND)
 	REAL*8 TA(ND),TB(ND),TC(ND)
 	REAL*8 RMAX,RP1,RN1,VRP1,VINF1
@@ -34,7 +34,7 @@ C
 	REAL*8 DLNR,DLT
 	REAL*8 ALPHA1,BETA1
 C
-	INTEGER*4 I,MND
+	INTEGER I,MND
 C
 	X=RP2/RP1		!To correct for old velocity law (Change made
 	Y=VRP2			! in main program

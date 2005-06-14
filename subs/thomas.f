@@ -21,12 +21,12 @@ C Altered 29-May-1996 : Loops reversed in forward elimination and the
 C                         backward substitution to allow CRAY vectorization.
 C Altered 21-Feb-1995 :  Cleaned
 C
-	INTEGER*4 N1,N2
+	INTEGER N1,N2
 	REAL*8 A(N1),B(N1),C(N1),D(N1,N2)
 C
 C Local variables
 C
-	INTEGER*4 I,J
+	INTEGER I,J
 C
 C Change the following statement to TRUE if running on a VECTOR machine.
 C

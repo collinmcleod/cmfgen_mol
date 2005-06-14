@@ -36,12 +36,12 @@
 !                     Note the call has 4 additional variables wrt
 !                     EVALSE.
 !
-	INTEGER*4 ID            !Ionic species identifier.
-	INTEGER*4 NLEV          !Number of atomic levels
-	INTEGER*4 N_DI          !Number of atomic levels in next ioization satge.
-	INTEGER*4 ION_LEV	!Levl ID of target in DI (i.e. the ION).
-	INTEGER*4 NT		!Total number of levels
-	INTEGER*4 ND		!Number of depth points
+	INTEGER ID            !Ionic species identifier.
+	INTEGER NLEV          !Number of atomic levels
+	INTEGER N_DI          !Number of atomic levels in next ioization satge.
+	INTEGER ION_LEV	!Levl ID of target in DI (i.e. the ION).
+	INTEGER NT		!Total number of levels
+	INTEGER ND		!Number of depth points
 !
 ! NB --- NION is the total number of ionic species i.e. for
 ! HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and CV).
@@ -59,7 +59,7 @@
 !
 ! Local variables.
 !
-	INTEGER*4 I,J
+	INTEGER I,J
 	REAL*8 NETR
 !
 ! REV_HNST referes to the LTE population  of the level defined with respect

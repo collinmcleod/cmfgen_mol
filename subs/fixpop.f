@@ -15,15 +15,15 @@ C                         option installed.
 C Created 18-Oct-1989.
 C
 	LOGICAL FIX_IMPURITY,SPEC_PRES
-	INTEGER*4 NT,ND,NUM_BNDS,DST,DEND
-	INTEGER*4 EQSPEC,NSPEC,FIX_NSPEC
+	INTEGER NT,ND,NUM_BNDS,DST,DEND
+	INTEGER EQSPEC,NSPEC,FIX_NSPEC
 	REAL*8 BA(NT,NT,NUM_BNDS,ND),STEQ(NT,ND)
 	REAL*8 POP(NSPEC,ND),POPVEC(ND)
 	CHARACTER*(*) DESC	
 C
 C Local variables.
 C
-	INTEGER*4 I,J,K,L,NDIAG,FIX_N,ERROR_LU,LUER
+	INTEGER I,J,K,L,NDIAG,FIX_N,ERROR_LU,LUER
 	LOGICAL LOC_IMP
 	EXTERNAL ERROR_LU
 C
@@ -31,7 +31,7 @@ C Varaibles to allow information to be output regarding the number
 C of levels and depths where a population was held fixed.
 C
 	REAL*8 T1
-	INTEGER*4, SAVE, ALLOCATABLE :: CNT(:)
+	INTEGER, SAVE, ALLOCATABLE :: CNT(:)
  
 C FIX_NSPEC takes priority in determining the number of levels
 C to be fixed. This is necessary to fix T, for example. For this

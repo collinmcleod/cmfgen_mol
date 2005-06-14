@@ -62,7 +62,36 @@ C
 C
 C 
 C                            
-	IF(.NOT. CONT_VEL .AND. THIS_FREQ_EXT)THEN
+	IF(CONT_VEL .AND. USE_FIXED_J)THEN
+	  IF(ACCURATE)THEN
+	    CALL RD_CONT_J_OBS(RJEXT,FL,FREQ_INDX,FIRST_FREQ,
+	1          LST_ITERATION,LUER,LU_EDD,ACCESS_F,NDEXT)
+	    CALL UNGRID(RJ,ND,RJEXT,NDEXT,POS_IN_NEW_GRID)
+	    RSQHNU(1:NDEXT)=1.0D-20
+	  ELSE
+	    CALL RD_CONT_J_OBS(RJ,FL,FREQ_INDX,FIRST_FREQ,
+	1          LST_ITERATION,,LUER,LU_EDD,ACCESS_F,ND)
+	    RSQHNU(1:ND)=1.0D-20
+	  END IF
+!
+! Evaluate other quantities that are set but not really needed.
+!
+	  RJ_ES(1:ND)=RJ(1:ND)
+	  K_MOM(1:ND)=RJ(1:ND)/3.0D0
+          SOURCE(1:ND)=ZETA(1:ND)+THETA(1:ND)*RJ(1:ND)
+!
+! So as defined for normal OBSFLUX calculation.
+!
+	  IF(FIRST_FREQ)THEN
+	    NP_OBS=NP
+	    P_OBS(1:NP)=P(1:NP)
+	    RMAX_OBS=R(1)
+	    V_AT_RMAX=V(1)
+	  END IF
+	  IPLUS(1:NP)=1.0D-10             !Arbitrary value
+	  HBC_CMF(1)=1.0D0
+!
+	ELSE IF(.NOT. CONT_VEL .AND. THIS_FREQ_EXT)THEN
 C
 C Solve for the mean intensity J . We can either solve for J with or without
 C Eddington factors. Generally use Eddington factors when there is many 

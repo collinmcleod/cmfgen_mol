@@ -40,21 +40,21 @@
 !
 ! 
 !
-	INTEGER*4 NC,NP,ND
-	INTEGER*4 N_MAX,ND_MAX,NC_MAX,NP_MAX
-	INTEGER*4 N_LINE_MAX,N_PLT_MAX
-C
+	INTEGER NC,NP,ND
+	INTEGER N_MAX,ND_MAX,NC_MAX,NP_MAX
+	INTEGER N_LINE_MAX,N_PLT_MAX
+!
 	REAL*8 LUM,RMDOT
-C
-	INTEGER*4, PARAMETER :: NLF_MAX=1001
-C
+!
+	INTEGER, PARAMETER :: NLF_MAX=1001
+!
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 	DOUBLE PRECISION CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
-C
-C
-C 
-C
+!
+!
+! 
+!
 	REAL*8 EINA
 	REAL*8 OSCIL
 	REAL*8 GUPDIE
@@ -62,27 +62,27 @@ C
 	REAL*8 EDGEDIE
 	REAL*8 GLOW
 	REAL*8 NUST(ND)
-C 
-C
-C Arrays containing LINE frequencies in numerical order.
-C
+! 
+!
+! Arrays containing LINE frequencies in numerical order.
+!
 	REAL*8 VEC_FREQ(N_LINE_MAX)
 	REAL*8 VEC_OSCIL(N_LINE_MAX)
 	REAL*8 VEC_EINA(N_LINE_MAX)
 	REAL*8 VEC_DP_WRK(N_LINE_MAX)
-	INTEGER*4 VEC_INDX(N_LINE_MAX)
-	INTEGER*4 VEC_ION_INDX(N_LINE_MAX)
-	INTEGER*4 VEC_MNL_F(N_LINE_MAX)
-	INTEGER*4 VEC_MNUP_F(N_LINE_MAX)
-	INTEGER*4 VEC_INT_WRK(N_LINE_MAX)
+	INTEGER VEC_INDX(N_LINE_MAX)
+	INTEGER VEC_ION_INDX(N_LINE_MAX)
+	INTEGER VEC_MNL_F(N_LINE_MAX)
+	INTEGER VEC_MNUP_F(N_LINE_MAX)
+	INTEGER VEC_INT_WRK(N_LINE_MAX)
 	CHARACTER*6 VEC_SPEC(N_LINE_MAX)
 	CHARACTER*6 VEC_CHAR_WRK(N_LINE_MAX)
 	CHARACTER*6 VEC_TRANS_TYPE(N_LINE_MAX)
 	CHARACTER*80, ALLOCATABLE :: VEC_TRANS_NAME(:)
 	CHARACTER*80, ALLOCATABLE :: TMP_TRANS_NAME(:)
-	INTEGER*4 N_LINE_FREQ
-	INTEGER*4 MNL_F
-	INTEGER*4 MNUP_F
+	INTEGER N_LINE_FREQ
+	INTEGER MNL_F
+	INTEGER MNUP_F
 !
 ! Angular quadrature weights.
 !
@@ -90,10 +90,10 @@ C
 	REAL*8 JQW(ND,NP),HMIDQW(ND,NP)
 	REAL*8 KQW(ND,NP),NMIDQW(ND,NP)
 	REAL*8 HQW(ND,NP)
-C
-C Note that PFDOP contains the lineprofile in doppler units, whilst
-C PF is use for the line profile in frequency units.
-C
+!
+! Note that PFDOP contains the lineprofile in doppler units, whilst
+! PF is use for the line profile in frequency units.
+!
 	REAL*8 LINE_PRO(NLF_MAX),LFQW(NLF_MAX),PF(NLF_MAX)
 	REAL*8 ERF(NLF_MAX),PFDOP(NLF_MAX)
 	REAL*8 JNU(ND,NLF_MAX+1),HNU(ND,NLF_MAX+1)
@@ -101,12 +101,12 @@ C
 	REAL*8 HBC_VEC(3,NLF_MAX+1),NBC_VEC(3,NLF_MAX+1)
 	REAL*8 INBC_VEC(NLF_MAX+1)
 	REAL*8 TDOP,VTURB
-C
+!
 	REAL*8 JBAR(ND),ZNET(ND)
 	REAL*8 CHIROSS(ND),TAUROSS(ND)
-C
-C Variables required to compute TGREY and for interpolations.
-C
+!
+! Variables required to compute TGREY and for interpolations.
+!
 	REAL*8 JQWEXT(NP_MAX,NP_MAX),KQWEXT(NP_MAX,NP_MAX),PEXT(NP_MAX)
 	REAL*8 TA(NP_MAX),TB(NP_MAX),TC(NP_MAX)
 	REAL*8 Z(NP_MAX),DTAU(NP_MAX),XM(NP_MAX),RJ(NP_MAX)
@@ -119,42 +119,42 @@ C
 	REAL*8 ZETAEXT(NP_MAX),THETAEXT(NP_MAX)
 	REAL*8 COEF(0:3,NP_MAX)
 	REAL*8 TGREY(NP_MAX)
-	INTEGER*4 GRID(NP_MAX),INDX(NP_MAX)
+	INTEGER GRID(NP_MAX),INDX(NP_MAX)
 	LOGICAL INACCURATE,REXT_COMPUTED,GREY_COMP
 	LOGICAL GREY_WITH_V_TERMS
-C
+!
 	REAL*8 XV(N_PLT_MAX),XNU(N_PLT_MAX)
 	REAL*8 YV(N_PLT_MAX),ZV(N_PLT_MAX),WV(N_PLT_MAX)
-C
-C 
-C
-C Collisional matrices.
-C
+!
+! 
+!
+! Collisional matrices.
+!
 	REAL*8 OMEGA_F(N_MAX,N_MAX)
 	REAL*8 dln_OMEGA_F_dlnT(N_MAX,N_MAX)
 	REAL*8 OMEGA_S(N_MAX,N_MAX)
 	REAL*8 dln_OMEGA_S_dlnT(N_MAX,N_MAX)
 	EXTERNAL OMEGA_GEN_V3
-C
+!
 	REAL*8 UNIT_VEC(N_MAX)
 	REAL*8 ZERO_VEC(N_MAX)
-C
+!
 	REAL*8 DOP_PRO
 	REAL*8 S15ADF,XCROSS
 	EXTERNAL JTRPWGT,HTRPWGT,KTRPWGT,NTRPWGT
 	EXTERNAL JWEIGHT,HWEIGHT,KWEIGHT,NWEIGHT,XCROSS
-C
-C Photoionization cross-section routines.
-C
+!
+! Photoionization cross-section routines.
+!
 	EXTERNAL SUB_PHOT_GEN
-C
+!
 	CHARACTER*30 UC
 	EXTERNAL UC
 	REAL*8 KEV_TO_HZ,ANG_TO_HZ
 	REAL*8 PI
 	REAL*8 C_CMS
 	REAL*8 C_KMS
-C
+!
 	CHARACTER*6 METHOD,TYPE_ATM
 !
 	REAL*8, ALLOCATABLE :: CHI_PAR(:,:)
@@ -169,11 +169,11 @@ C
 	REAL*8, ALLOCATABLE :: CHI_TOT_LAM(:)
 	REAL*8, ALLOCATABLE :: ETA_TOT_LAM(:)
 	REAL*8, ALLOCATABLE :: LAM_VEC(:)
-	INTEGER*4 NLAM
-	INTEGER*4 NION
-C
-C Local variables
-C
+	INTEGER NLAM
+	INTEGER NION
+!
+! Local variables
+!
 	REAL*8 FB(ND,ND),WM(ND,ND)
 	REAL*8 GB(ND),U(ND),VB(ND),VC(ND),CHIL(ND),ETAL(ND)
 	REAL*8 SOURCE(ND),TCHI(ND),ZETA(ND),THETA(ND)
@@ -186,7 +186,7 @@ C
 ! Used for computing distrbution of lines with respect to the Sobolev Line
 ! optical depth.
 !
-	INTEGER*4 NBINS
+	INTEGER NBINS
 	REAL*8 DELTA_TAU
 	REAL*8 TAU_BEG
 	REAL*8 TAU_MIN
@@ -195,18 +195,18 @@ C
 	LOGICAL MEAN_TAU
 	LOGICAL RADIAL_TAU
 !
-	INTEGER*4 I,J,K,L
-	INTEGER*4 ISPEC,ID
-	INTEGER*4 NLF,ML
-	INTEGER*4 IOS,NFREQ,R_INDX
-	INTEGER*4 NL,NUP
-	INTEGER*4 NEXT_LOC
-	INTEGER*4 PHOT_ID
-	INTEGER*4 DPTH_INDX
-	INTEGER*4 LINE_INDX
+	INTEGER I,J,K,L
+	INTEGER ISPEC,ID
+	INTEGER NLF,ML
+	INTEGER IOS,NFREQ,R_INDX
+	INTEGER NL,NUP
+	INTEGER NEXT_LOC
+	INTEGER PHOT_ID
+	INTEGER DPTH_INDX
+	INTEGER LINE_INDX
 !
-	INTEGER*4, PARAMETER :: ITAU_GRT_LIM=6
-	INTEGER*4 TAU_GRT_LOGX(-ITAU_GRT_LIM:ITAU_GRT_LIM)
+	INTEGER, PARAMETER :: ITAU_GRT_LIM=6
+	INTEGER TAU_GRT_LOGX(-ITAU_GRT_LIM:ITAU_GRT_LIM)
 !
 	REAL*8 DTDR,DBB,S1,IC
 	REAL*8 EXC_EN
@@ -215,37 +215,38 @@ C
 	REAL*8 LAM_ST,LAM_EN,DEL_NU
 	REAL*8 NU_ST,NU_EN,FREQ_RES
 	REAL*8 T1,T2,T3,TMP_ED
+	REAL*8 TAU_LIM
 	REAL*8 TEMP,TSTAR,NEW_RSTAR,NEW_VSTAR
 	REAL*8 VSM_DIE_KMS
 	REAL*8 DIST_KPC
 !
-	INTEGER*4 NPINS,NCX,NDX,NPX
-	INTEGER*4 ND_TMP
+	INTEGER NPINS,NCX,NDX,NPX
+	INTEGER ND_TMP
 	REAL*8 FREQ,FL
 	REAL*8 TAU_SOB
 	REAL*8  TMP_GION
 	EQUIVALENCE (FREQ,FL)
-C
-C
+!
+!
 	REAL*8 SCLHT,VCORE,VPHOT,VINF1,V_BETA1,V_EPS1
 	REAL*8 VINF2,V_BETA2,V_EPS2
-C
-C Storage for constants used for evaluating the level disolution.
-C Required by SUP_TO_FULL and LTE_POP_WLD.
-C
+!
+! Storage for constants used for evaluating the level disolution.
+! Required by SUP_TO_FULL and LTE_POP_WLD.
+!
 	LOGICAL LEVEL_DISSOLUTION
-C
+!
 	CHARACTER*80 NAME,XAXIS,YAXIS,XAXSAV
-C
+!
 	COMMON/TOPBORD/ SCED(31),XED(31),NXED,TOPLABEL
 	REAL*8 SCED,XED
-	INTEGER*4 NXED
+	INTEGER NXED
 	CHARACTER*30 TOPLABEL
 	DATA SCED/2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,
 	1         10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15,15.5,
 	1         16,16.5,17.0/
-C
-	INTEGER*4 LEV(10)
+!
+	INTEGER LEV(10)
 	LOGICAL FLAG,LINV,TRAPFORJ,JONS,JONLY,IN_R_SUN
 	LOGICAL ELEC,DIF,SCALE,THICK,NORAD,ROSS,INC_RAY_SCAT
 	LOGICAL SPEC_FRAC,RADIAL
@@ -258,7 +259,7 @@ C
 	LOGICAL DONE_LINE
 	LOGICAL LINE_STRENGTH
 	LOGICAL PLT_J,PLT_H,PLT_LF,PLT_FM
-C
+!
 	REAL*8 RED_EXT
 	REAL*8 VDOP_FG_FRAC
 	REAL*8 VDOP_MOM_FRAC
@@ -273,19 +274,19 @@ C
 	LOGICAL L_TRUE,L_FALSE
 	DATA L_TRUE/.TRUE./
 	DATA L_FALSE/.FALSE./
-C
+!
 	LOGICAL XRAYS
 	REAL*8 FILL_FAC_XRAYS,T_SHOCK,V_SHOCK
 	REAL*8 FILL_VEC_SQ(ND)
-C
-C Equivalent width and flux variables.
-C
-	INTEGER*4 CNT
+!
+! Equivalent width and flux variables.
+!
+	INTEGER CNT
 	REAL*8 ERR(ND),EWACC
 	REAL*8 EW,EWOLD,MOMEW,CONT_INT,MOMCONT_INT
-C
+!
 	REAL*8 AMASS
-C
+!
 	CHARACTER MAIN_OPT_STR*80
 	CHARACTER X*20
 	CHARACTER XOPT*10
@@ -296,38 +297,38 @@ C
 	CHARACTER FMT*80
 	CHARACTER*120 DEFAULT
 	CHARACTER*120 DESCRIPTION
-C
-C External functions
-C
+!
+! External functions
+!
 	EXTERNAL WR_PWD
 	CHARACTER*120 WR_PWD
-C
+!
 	REAL*8 GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT
 	REAL*8 FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
 	REAL*8 ASTRONOMICAL_UNIT,RAD_SUN
-	INTEGER*4 GET_INDX_DP
+	INTEGER GET_INDX_DP
 	EXTERNAL GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT,GET_INDX_DP
 	EXTERNAL FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
 	EXTERNAL ASTRONOMICAL_UNIT,RAD_SUN
-C
+!
 	LOGICAL PRESENT			!indicates whether species is linked
 	LOGICAL EQUAL
-C
-	INTEGER*4, PARAMETER :: LU_IN=10		!File input (open/close)
-	INTEGER*4, PARAMETER :: LU_OUT=11		!File input (open/close)
-	INTEGER*4, PARAMETER :: LU_LOG=7
-	INTEGER*4, PARAMETER :: LU_CROSS=15
-	INTEGER*4, PARAMETER :: LU_NET=17
-	INTEGER*4, PARAMETER :: LU_REC=18
-	INTEGER*4, PARAMETER :: LU_COL=20		!Collisonal
-	INTEGER*4, PARAMETER :: T_IN=5                 !Terminal input
-	INTEGER*4, PARAMETER :: T_OUT=6                !Terminal output
-C
-	INTEGER*4, PARAMETER :: IZERO=0
-	INTEGER*4, PARAMETER :: IONE=1
-	INTEGER*4, PARAMETER :: ITWO=2
-	INTEGER*4, PARAMETER :: ITEN=10
-	INTEGER*4, PARAMETER :: ITHREE=3
+!
+	INTEGER, PARAMETER :: LU_IN=10		!File input (open/close)
+	INTEGER, PARAMETER :: LU_OUT=11		!File input (open/close)
+	INTEGER, PARAMETER :: LU_LOG=7
+	INTEGER, PARAMETER :: LU_CROSS=15
+	INTEGER, PARAMETER :: LU_NET=17
+	INTEGER, PARAMETER :: LU_REC=18
+	INTEGER, PARAMETER :: LU_COL=20		!Collisonal
+	INTEGER, PARAMETER :: T_IN=5                 !Terminal input
+	INTEGER, PARAMETER :: T_OUT=6                !Terminal output
+!
+	INTEGER, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: ITWO=2
+	INTEGER, PARAMETER :: ITEN=10
+	INTEGER, PARAMETER :: ITHREE=3
 !
 	REAL*8, PARAMETER :: RZERO=0.0D0
 	REAL*8, PARAMETER :: RONE=1.0D0
@@ -352,7 +353,7 @@ C
 	DIST_KPC=1.0D0
 	VSM_DIE_KMS=3000.0D0
 	REXT_COMPUTED=.FALSE.
-C
+!
 	LST_DEPTH_ONLY=.FALSE.
 !
 	LAM_ST=0.0D0
@@ -708,7 +709,7 @@ C
 	    WRITE(T_OUT,*)' Invalid population type or species unavailable.'
 	    GOTO 1
 	  END IF
-C
+!
 	  IF(OSCIL .EQ. 0)THEN
 	    WRITE(T_OUT,*)'Oscillator zero for this transition'
 	    WRITE(T_OUT,*)'Rerturning to main loop for new option'
@@ -817,18 +818,18 @@ C
           END IF
 !
 	END IF
-C
-C 
-C
-C **************************************************************************
-C **************************************************************************
-C
-C Compute continuum opacity for options which require continuum
-C opacity.
-C
-C **************************************************************************
-C **************************************************************************
-C
+!
+! 
+!
+! **************************************************************************
+! **************************************************************************
+!
+! Compute continuum opacity for options which require continuum
+! opacity.
+!
+! **************************************************************************
+! **************************************************************************
+!
 	IF(  (XOPT .EQ. 'NETR'
 	1          .OR. XOPT .EQ. 'MOMR'
 	1          .OR. XOPT .EQ. 'SOBR'
@@ -847,44 +848,44 @@ C
 	1          .OR. XOPT .EQ. 'CJBB'
 	1          .OR. XOPT .EQ. 'DIE')
 	1          .AND. FL .NE. 0  )THEN
-C
-C Compute continuum opacity and emissivity at the line frequency.
-C
+!
+! Compute continuum opacity and emissivity at the line frequency.
+!
 	  INCLUDE 'OPACITIES.INC'
-C	  INCLUDE 'HOME:[jdh.cmf.carb.test]OPACITIES.INC'
-C
-C Compute DBB and DDBBDT for diffusion approximation. DBB=dB/dR
-C and DDBBDT= dB/dTR .
-C
+!	  INCLUDE 'HOME:[jdh.cmf.carb.test]OPACITIES.INC'
+!
+! Compute DBB and DDBBDT for diffusion approximation. DBB=dB/dR
+! and DDBBDT= dB/dTR .
+!
 	  T1=HDKT*FL/T(ND)
 	  T2=1.0D0-EMHNUKT(ND)
 	  DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
-C
-C Solve for the continuum radiation field at the line frequency.
-C
+!
+! Solve for the continuum radiation field at the line frequency.
+!
 	  THICK=.TRUE.
 	  S1=ETA(1)/CHI(1)
-C
-C Adjust the opacities and emissivities for the influence of clumping.
-C
+!
+! Adjust the opacities and emissivities for the influence of clumping.
+!
 	  DO I=1,ND
 	    CHI(I)=CHI(I)*CLUMP_FAC(I)
 	    ESEC(I)=ESEC(I)*CLUMP_FAC(I)
 	    ETA(I)=ETA(I)*CLUMP_FAC(I)
 	  END DO
-C
+!
 	END IF
-C 
-C
-C **************************************************************************
-C **************************************************************************
-C
-C Define reinded radius grid, and evaluate quadrature weights for angular
-C integrations.
-C
-C **************************************************************************
-C **************************************************************************
-C
+! 
+!
+! **************************************************************************
+! **************************************************************************
+!
+! Define reinded radius grid, and evaluate quadrature weights for angular
+! integrations.
+!
+! **************************************************************************
+! **************************************************************************
+!
 	IF(   (XOPT .EQ. 'GREY' .OR. XOPT .EQ. 'JEXT'
 	1                         .OR. XOPT .EQ. 'EWEXT'
 	1                         .OR. XOPT .EQ. 'INTERP')
@@ -893,18 +894,18 @@ C
 	  CALL USR_HIDDEN(NPINS,'NPINS','2','0, 1 or 2')
 	  NDX=(ND-1)*NPINS+ND
 	  I=ND-10		!Parabolic interp for > I
-C
-C NTERP has been set to ND
-C
+!
+! NTERP has been set to ND
+!
 	  CALL REXT_COEF_V2(REXT,COEF,INDX,NDX,R,GRID,ND,
 	1                     NPINS,.TRUE.,I,IONE,ND)
 	  NCX=NC+10
 	  NPX=NDX+NCX-2
 	  CALL IMPAR(PEXT,REXT,R(ND),NCX,NDX,NPX)
-C
-C Note that the T? vectors (here used as dummy variables) must be at least
-C NPX long.
-C
+!
+! Note that the T? vectors (here used as dummy variables) must be at least
+! NPX long.
+!
 	  IF(TRAPFORJ)THEN
 	    CALL GENANGQW(JQWEXT,REXT,PEXT,TA,TB,TC,NCX,NDX,NPX,
 	1                 JTRPWGT,.FALSE.)
@@ -917,51 +918,51 @@ C
 	1                 KWEIGHT,.FALSE.)
 	  END IF
 	END IF
-C
-C 
-C
+!
+! 
+!
 	IF(  (XOPT .EQ. 'NETR'
 	1          .OR. XOPT .EQ. 'MOMR'
 	1          .OR. XOPT .EQ. 'SOBR') .AND. FIRST_RATE)THEN
 	  FIRST_RATE=.FALSE.
 	  CALL GEN_ASCI_OPEN(LU_NET,'RATES','UNKNOWN',' ',' ',IZERO,IOS)
 	END IF
-C
+!
 	IF(XOPT .EQ. 'NETR'
 	1          .OR. XOPT .EQ. 'MOMR')THEN
-C
+!
 	  CALL USR_OPTION(NLF,'NLF','25','Number of requency points in line profile?')
 	  IF(NLF .GT. NLF_MAX)THEN
 	    WRITE(T_OUT,*)'Error - NLF is too large - Maximum values is',
 	1	 NLF_MAX
 	    GOTO 1
 	  END IF
-C
-C Set frequencies equally spaced in frequency.
-C
+!
+! Set frequencies equally spaced in frequency.
+!
 	  T1=12.0D0/(NLF-1)
 	  DO I=1,NLF
 	    PFDOP(I)=6.0D0-(I-1)*T1
 	  END DO
-C
-C ERF is used in computin the Sobolev incident intensity at the
-C outer boudary. ERF = int from -inf to x of e(-x^2)/sqrt(pi).
-C Note that ERF is not the error function. ERF is related to the
-C complementary error function by ERF =-0.5D0 . erfc(X).
-C S15ADF is a NAG routine which returns erfc(x).
-C
-C The incident Sobolev intensity is S[ 1.0-exp(-tau(sob)*ERF) ]
-C
+!
+! ERF is used in computin the Sobolev incident intensity at the
+! outer boudary. ERF = int from -inf to x of e(-x^2)/sqrt(pi).
+! Note that ERF is not the error function. ERF is related to the
+! complementary error function by ERF =-0.5D0 . erfc(X).
+! S15ADF is a NAG routine which returns erfc(x).
+!
+! The incident Sobolev intensity is S[ 1.0-exp(-tau(sob)*ERF) ]
+!
 	  J=0
 	  DO I=1,NLF
 	    ERF(I)=-0.5D0*S15ADF(PFDOP(I),J)
 	  END DO
-C
+!
 	  CALL USR_OPTION(TDOP,'TDOP','0.0',
 	1    'Doppler temperature for Line profile (units 10^4K)?')
 	  CALL USR_OPTION(VTURB,'VTURB','10.0',
 	1      'Turbulent velcity for Line profile (units km/s)?')
-C
+!
 	  T1=4.286299D-05*SQRT( TDOP/AMASS + (VTURB/12.85)**2 )
 	  DO I=1,NLF
 	    PF(I)=PFDOP(I)*T1
@@ -973,15 +974,15 @@ C
 	    LINE_PRO(ML)=DOP_PRO(PF(ML),FL,TDOP,VTURB,AMASS)
 	    T1=T1+LFQW(ML)*LINE_PRO(ML)
 	  END DO
-C
-C Normalize frequency weights.
-C
+!
+! Normalize frequency weights.
+!
 	  DO ML=1,NLF
 	    LFQW(ML)=LFQW(ML)/T1
 	  END DO
-C
-C Ensure total opacity is positive.
-C
+!
+! Ensure total opacity is positive.
+!
 	  J=(NLF+1)/2.0D0
 	  DO I=1,ND
 	    T2=CHI(I)+CHIL(I)*LINE_PRO(J)
@@ -994,12 +995,12 @@ C
 	    END IF
 	  END DO
 	END IF
-C
-C 
-C
-C This section compute the CONTINUUM mean intensity using EDDINGTON factors, or
-C a full ray-by ray solution.
-C
+!
+! 
+!
+! This section compute the CONTINUUM mean intensity using EDDINGTON factors, or
+! a full ray-by ray solution.
+!
 	IF(XOPT .EQ. 'NETR'
 	1          .OR. XOPT .EQ. 'MOMR'
 	1          .OR. XOPT .EQ. 'SOBR'
@@ -1007,7 +1008,7 @@ C
 	1          .OR. XOPT .EQ. 'CJBB'
 	1          .OR. XOPT .EQ. 'DIE'
 	1          .OR. ( XOPT .EQ. 'EW' .AND. XOPT .NE. 'EWEXT' ))THEN
-C
+!
 	  EDDC=.TRUE.
 	  DEFAULT='T'
 	  IF(XOPT .EQ. 'MOMR')THEN
@@ -1016,7 +1017,7 @@ C
 	  ENDIF
 	  CALL USR_OPTION(EDDC,'EDDC',DEFAULT,
 	1             'Use Eddington factors to compute Jc ?')
-C
+!
 	  IF(EDDC)THEN
 	    S1=ZETA(1)
 	    DO I=1,ND
@@ -1041,12 +1042,12 @@ C
 	      IF(T1 .GT. 1.0E-05)INACCURATE=.TRUE.
 	      WRITE(T_OUT,'('' Maximum fractional change is'',1PE11.4)')T1
 	    END DO
-C
+!
 	  ELSE
-C
-C Compute J. DBB and S1 have been previously evaluated. VT is used
-C for dCHI_dR.
-C
+!
+! Compute J. DBB and S1 have been previously evaluated. VT is used
+! for dCHI_dR.
+!
 	    CALL NEWJSOLD(TA,TB,TC,XM,WM,FB,RJ,DTAU,R,Z,P,
 	1               ZETA,THETA,CHI,VT,JQW,
 	1               THK_CONT,DIF,DBB,IC,NC,ND,NP,METHOD)
@@ -1060,33 +1061,33 @@ C
 !	    ETA_WITH_ES(I)=ETA(I)+RJ(I)*ED(I)*6.65E-15
 	    ETA_WITH_ES(I)=ETA(I)+RJ(I)*ESEC(I)
 	  END DO
-C
+!
 	END IF
-C 
-C
-C ****************************************************************************
-C ****************************************************************************
-C
-C Begin the individual option section.
-C
-C *****************************************************************************
-C *****************************************************************************
-C
-C ****************************************************************************
-C ****************************************************************************
-C
-C Set up X axis options -  Log(R/RP),R/RP,LOG(T(rossland)) or Ne .
-C
-C ****************************************************************************
-C ****************************************************************************
-C
+! 
+!
+! ****************************************************************************
+! ****************************************************************************
+!
+! Begin the individual option section.
+!
+! *****************************************************************************
+! *****************************************************************************
+!
+! ****************************************************************************
+! ****************************************************************************
+!
+! Set up X axis options -  Log(R/RP),R/RP,LOG(T(rossland)) or Ne .
+!
+! ****************************************************************************
+! ****************************************************************************
+!
 	IF(XOPT .EQ. 'XLOGR')THEN
 	  DO I=1,ND
 	    XV(I)=LOG10(R(I)/R(ND))
 	  END DO
 	  XAXIS='Log(r/R\d*\u)'
 	  XAXSAV=XAXIS
-C
+!
 	ELSE IF(XOPT .EQ. 'XLINR')THEN
 	  DO I=1,ND
 	    XV(I)=R(I)/R(ND)
@@ -1137,49 +1138,49 @@ C
 	    XAXIS='Log r(")'
 	  END IF
 	  XAXSAV=XAXIS
-C
+!
 	ELSE IF(XOPT .EQ. 'XED')THEN
 	  DO I=1,ND
 	    XV(I)=LOG10(ED(I))
 	  END DO
 	  XAXIS='Log(N\de\u)'
 	  XAXSAV=XAXIS
-C
+!
 	ELSE IF(XOPT .EQ. 'XTEMP')THEN
 	  DO I=1,ND
 	    XV(I)=T(I)
 	  END DO
 	  XAXIS='T(10\u4\dK)'
 	  XAXSAV=XAXIS
-C
+!
 	ELSE IF(XOPT .EQ. 'XN')THEN
 	  DO I=1,ND
 	    XV(I)=I
 	  END DO
 	  XAXIS='I'
 	  XAXSAV=XAXIS
-C
+!
 	ELSE IF(XOPT .EQ. 'XATOM')THEN
 	  DO I=1,ND
 	    XV(I)=LOG10(POP_ATOM(I))
 	  END DO
 	  XAXIS='Log(N\di\u)'
 	  XAXSAV=XAXIS
-C
+!
 	ELSE IF(XOPT .EQ. 'XVEL')THEN
 	  DO I=1,ND
 	    XV(I)=V(I)
 	  END DO
 	  XAXIS='V(km s\u-1\d)'
 	  XAXSAV=XAXIS
-C
+!
 	ELSE IF(XOPT .EQ. 'XLOGV')THEN
 	  CALL DLOGVEC(V,XV,ND)
 	  XAXIS='Log V(kms\u-1\d)'
 	  XAXSAV=XAXIS
-C
+!
 	ELSE IF(XOPT .EQ. 'XCOLD')THEN
-C
+!
 	  DO I=1,ND
 	    ZETA(I)=1.0D+10*MASS_DENSITY(I)*CLUMP_FAC(I)
 	  END DO
@@ -1189,7 +1190,7 @@ C
 	  END DO
 	  XAXIS='m(gm cm\u-2\d)'
 	  XAXSAV=XAXIS
-C
+!
 	ELSE  IF(XOPT .EQ. 'XTAUC')THEN
 	  IF(.NOT. ELEC)THEN
 	    DO I=1,ND
@@ -1221,17 +1222,17 @@ C
 	    WRITE(T_OUT,*)'Did not recognize option'
 	    WRITE(T_OUT,*)'Setting METHOD=LOGLOG'
 	  ENDIF
-C
-C 
-C **************************************************************************
-C **************************************************************************
-C
-C Information options. Provide a means of obtaining information about the
-C model without using the debug option.
-C
-C **************************************************************************
-C **************************************************************************
-C
+!
+! 
+! **************************************************************************
+! **************************************************************************
+!
+! Information options. Provide a means of obtaining information about the
+! model without using the debug option.
+!
+! **************************************************************************
+! **************************************************************************
+!
 
         ELSE IF(XOPT .EQ. 'WRFREQ')THEN
 	  OPEN(UNIT=10,FILE='EDGE_FREQ',STATUS='NEW')
@@ -1241,18 +1242,18 @@ C
 	    END DO
 	  CLOSE(UNIT=10)
 	  WRITE(T_OUT,*)'Edge frequencie written to unit 10'
-C 
+! 
         ELSE IF(XOPT .EQ. 'WRN')THEN
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES)WRITE(6,'(X,A,T43,A,I4)')
 	1        'Number of levels in FULL'//TRIM(ION_ID(ID)),
 	1        ' model atom is:',ATM(ID)%NXzV_F
 	  END DO
-C
+!
         ELSE IF(XOPT .EQ. 'WRID')THEN
-C
+!
 	  CALL USR_HIDDEN(LEV,2,2,'LIMS','1,0','Imin, Imax')
-C
+!
 	  FLAG=.FALSE.
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES .AND. XSPEC .EQ. UC(ION_ID(ID)))THEN
@@ -1264,32 +1265,32 @@ C
 	  IF(.NOT. FLAG)THEN
 	    WRITE(T_OUT,*)'Error --- invalid species identification'
 	  END IF
-C
-C 
-C
-C Change units for input of frequencies/waevengths.
-C
-	ELSE IF(XOPT .EQ. 'KEV_IN')THEN
+!
+! 
+!
+! Change units for input of frequencies/waevengths.
+!
+	ELSE IF(XOPT .EQ. 'XKEV')THEN
 	  KEV_INPUT=.TRUE.
 	  HZ_INPUT=.FALSE.
 	  ANG_INPUT=.FALSE.
 	  WRITE(T_OUT,*)'Frequencies are now input in keV'
 	  FREQ_INPUT='Units are keV'
-	ELSE IF(XOPT .EQ. 'HZ_IN')THEN
+	ELSE IF(XOPT .EQ. 'XHZ')THEN
 	  KEV_INPUT=.FALSE.
 	  HZ_INPUT=.TRUE.
 	  ANG_INPUT=.FALSE.
 	  WRITE(T_OUT,*)'Frequencies are now input in Hz'
 	  FREQ_INPUT='Units are 10^15 Hz'
-	ELSE IF(XOPT .EQ. 'ANG_IN')THEN
+	ELSE IF(XOPT .EQ. 'XANG')THEN
 	  KEV_INPUT=.FALSE.
 	  HZ_INPUT=.FALSE.
 	  ANG_INPUT=.TRUE.
 	  WRITE(T_OUT,*)'Frequencies are now input in Angstroms.'
 	  FREQ_INPUT='Units are Angstroms'
-C
-C 
-C
+!
+! 
+!
 	ELSE IF(XOPT .EQ. 'DIE')THEN
 	  DO I=1,ND
 	    ZNET(I)=1.0D0-RJ(I)*CHIL(I)/ETAL(I)
@@ -1298,10 +1299,10 @@ C
 	  WRITE(LU_NET,40002)LEV(1)
 	  WRITE(LU_NET,40003)(ZNET(I),I=1,ND)
 	  WRITE(T_OUT,40003)(ZNET(I),I=1,ND)
-C
-C 
+!
+! 
 	ELSE IF(XOPT .EQ. 'NETR')THEN
-C
+!
 	  CALL USR_OPTION(SOL_OPT,'FORM','FG','Method: FORM, FG, or HAM?')
 !
 	  IF(SOL_OPT(1:2) .EQ. 'FG')THEN
@@ -1350,20 +1351,20 @@ C
 	1        'Include line photons scatterd in resonace zone ?')
 	    CALL USR_HIDDEN(SKIPEW,'SKIPEW','F',
 	1        'Skip accurate EW computation ?')
-C
+!
 	    CALL USR_HIDDEN(EWACC,'EWACC','0.05',
 	1         'required % accuracy in EW')
-C
+!
 	    INACCURATE=.TRUE.
 	    CNT=0
 	    EWOLD=1.0D+37
 	    CALL DP_ZERO(GAM,ND)
 	    DO WHILE(INACCURATE)
-C
-C The .FALSE. option is use to indicate that we do not require the
-C approximate ANR operator to be computed. Use TA for APPROX_LAM
-C which is not computed anyway.
-C
+!
+! The .FALSE. option is use to indicate that we do not require the
+! approximate ANR operator to be computed. Use TA for APPROX_LAM
+! which is not computed anyway.
+!
 	      IF(SOL_OPT(1:3) .EQ. 'HAM')THEN
 	        CALL HAM_FORMSOL(ETA_WITH_ES,CHI,ESEC,CHIL,ETAL,V,SIGMA,R,P,
 	1                  JBAR,ZNET,TA,TB,TC,.FALSE.,
@@ -1383,16 +1384,16 @@ C
 	      END IF
 	      WRITE(T_OUT,180)EW,CONT_INT,LAMVACAIR(FL)
 180	      FORMAT(1X,'EW=',1PE14.6,3X,'Ic=',E14.6,3X,'Lam=',E14.6)
-C
-C Use a NG acceleration every four iterations to speed up convergence.
-C We use FEDD for JPREV since it is not used with FORMSOL.
-C
+!
+! Use a NG acceleration every four iterations to speed up convergence.
+! We use FEDD for JPREV since it is not used with FORMSOL.
+!
 	      CNT=CNT+1
 	      L=5-MOD(CNT,4)
 	      IF(L .EQ. 5)L=1
 	      CALL SETFORNG(GAM,FEDD,L,ND)
 	      IF(L .EQ. 1)CALL NGACCEL(GAM,FEDD,ND,.TRUE.)
-C
+!
 	      ERR(CNT)=200.0D0*(EW-EWOLD)/(EW+EWOLD)
 	      EWOLD=EW
 	      IF( ABS(ERR(CNT)) .LT. EWACC )INACCURATE=.FALSE.
@@ -1402,39 +1403,39 @@ C
 	        INACCURATE=.FALSE.
 	      END IF
 	      IF(SKIPEW)INACCURATE=.FALSE.
-C
+!
 	    END DO
 	  END IF
-C
+!
 	  DO I=1,ND
 	    YV(I)=LOG10(JBAR(I))
 	  END DO
 	  IF(LEV(1) .EQ. 0)CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log(Jbar)'
-C
+!
 	  WRITE(LU_NET,40001)'FORMSOL Transfer Solution'
 	  WRITE(LU_NET,40002)LEV(1),LEV(2)
 	  WRITE(LU_NET,40003)(ZNET(I),I=1,ND)
-C 
+! 
 	ELSE IF(XOPT .EQ. 'MOMR')THEN
-C
+!
 	  CALL USR_HIDDEN(HAM,'HAM','F','Use second order differencing ?')
 	  CALL USR_OPTION(FULL_ES,'ALLES','T',
 	1      'Include line photons scatterd in resonace zone ?')
 	  CALL USR_HIDDEN(SKIPEW,'SKIPEW','F','Skip accurate EW computation ?')
-C
+!
 	  INACCURATE=.TRUE.
 	  CNT=0
 	  EWOLD=1.0D+37
 	  CALL DP_ZERO(JNU,ND*(NLF+1))
 	  DO WHILE(INACCURATE)
-C
-C As ETAL and CHIL are known, the FORMAL solution gives FEDD and GEDD
-C directly. We only need to iterate to obtian a reliable EW value in
-C the presnece of electron scattering. We use ETAEDD for consistency
-C purposes - ETAEDD contains the continuum electron scattering term
-C computed using Eddington Factors.
-C
+!
+! As ETAL and CHIL are known, the FORMAL solution gives FEDD and GEDD
+! directly. We only need to iterate to obtian a reliable EW value in
+! the presnece of electron scattering. We use ETAEDD for consistency
+! purposes - ETAEDD contains the continuum electron scattering term
+! computed using Eddington Factors.
+!
 	    IF(HAM)THEN
 	      CALL FG_HAM(ETA_WITH_ES,CHI,ESEC,RJ,
 	1                  CHIL,ETAL,V,SIGMA,R,P,
@@ -1446,10 +1447,10 @@ C
 	1                  DIF,DBB,IC,METHOD,
 	1                  THK_CONT,THK_LINE,NLF,NC,NP,ND)
 	      WRITE(T_OUT,*)'FGHAM_EW=',EW,'Ic=',CONT_INT
-C
-C We use TA for RADEQ, and TB for the FLUX vectors returned by the
-C EW computation.
-C
+!
+! We use TA for RADEQ, and TB for the FLUX vectors returned by the
+! EW computation.
+!
 	      CALL MOMHAM(ETA_WITH_ES,CHI,ESEC,THETA,RJ,CHIL,ETAL,
 	1                  V,SIGMA,R,JBAR,ZNET,
 	1                  JNU,HNU,FEDD,GEDD,
@@ -1469,10 +1470,10 @@ C
 	1                  DIF,DBB,IC,METHOD,
 	1                  THK_CONT,THK_LINE,NLF,NC,NP,ND)
 	      WRITE(T_OUT,*)'FGCOMP_EW=',EW,'Ic=',CONT_INT
-C
-C We use TA for RADEQ, and TB for the FLUX vectors returned by the
-C EW computation.
-C
+!
+! We use TA for RADEQ, and TB for the FLUX vectors returned by the
+! EW computation.
+!
 	      CALL MOMJBAR(ETA_WITH_ES,CHI,ESEC,THETA,RJ,CHIL,ETAL,
 	1                  V,SIGMA,R,JBAR,ZNET,
 	1                  JNU,HNU,FEDD,GEDD,
@@ -1482,7 +1483,7 @@ C
 	1                  NLF,NC,NP,ND)
 	      WRITE(T_OUT,180)MOMEW,MOMCONT_INT,LAMVACAIR(FL)
 	    END IF
-C
+!
 	    CNT=CNT+1
 	    ERR(CNT)=200.0D0*(MOMEW-EWOLD)/(MOMEW+EWOLD)
 	    EWOLD=MOMEW
@@ -1493,36 +1494,36 @@ C
 	      INACCURATE=.FALSE.
 	    END IF
 	    IF(SKIPEW)INACCURATE=.FALSE.
-C
+!
 	  END DO
-C
+!
 	  WRITE(LU_NET,40001)'MOMHAM Transfer Solution'
 	  WRITE(LU_NET,40002)LEV(1),LEV(2)
 	  WRITE(LU_NET,40003)(ZNET(I),I=1,ND)
-C
-C 
-C
+!
+! 
+!
 	ELSE IF( XOPT .EQ. 'SOBR' )THEN
-C
+!
 	  CALL USR_HIDDEN(NORAD,'NORAD','F','Ignore radiation filed ?')
-C
+!
 	  DO I=1,ND
 	    SOURCE(I)=ETA_WITH_ES(I)/CHI(I)
 	  END DO
-C
-C We use U and GB for BETA and BETAC respectively.
-C
+!
+! We use U and GB for BETA and BETAC respectively.
+!
 	  CALL SOBJBAR(SOURCE,CHI,CHIL,ETAL,
 	1                V,SIGMA,R,P,JQW,
 	1                JBAR,ZNET,VB,VC,U,GB,
 	1                FL,DIF,DBB,IC,THK_CONT,NLF,NC,NP,ND,METHOD)
-C
+!
 	  DO I=1,ND
 	    YV(I)=LOG10(JBAR(I))
 	  END DO
 	  YAXIS='Log(Jbar)'
 	  CALL DP_CURVE(ND,XV,YV)
-C
+!
 	  IF(NORAD)THEN
 	    WRITE(LU_NET,40001)
 	1           'Sobolev Approx but radiation field not included'
@@ -1533,18 +1534,18 @@ C
 	    WRITE(LU_NET,40002)LEV(1),LEV(2)
 	    WRITE(LU_NET,40003)(ZNET(I),I=1,ND)
 	  END IF
-C
-C 
-C
-C This section recomputes the LTE populations. Useful for adjusting
-C the Temperature and hence the population levels to assist in obtaining
-C a converged model.
-C
+!
+! 
+!
+! This section recomputes the LTE populations. Useful for adjusting
+! the Temperature and hence the population levels to assist in obtaining
+! a converged model.
+!
 	ELSE IF(XOPT .EQ. 'LTE')THEN
 	  INCLUDE 'EVAL_LTE_FULL.INC'
-C
-C 
-C
+!
+! 
+!
 	ELSE IF(XOPT .EQ. 'EXTRAP')THEN
 !
 	  CALL USR_OPTION(LEV,ITWO,ITWO,'EWIN','1,1',
@@ -1588,12 +1589,12 @@ C
 	      DO_DPTH(LEV(I):LEV(I+1))=.FALSE.
 	    END IF
 	  END DO      
-C
-C Write out departure coefficients to ASCI file.
-C NB - 1 refers to dimension of DHYD (i.e. DHYD(1,nd)
-C      1 refers to format for output.
-C      1,NHY - For use with HEI.
-C
+!
+! Write out departure coefficients to ASCI file.
+! NB - 1 refers to dimension of DHYD (i.e. DHYD(1,nd)
+!      1 refers to format for output.
+!      1,NHY - For use with HEI.
+!
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      FILENAME=TRIM(ION_ID(ID))//TRIM(STRING)
@@ -1603,17 +1604,17 @@ C
 	1           DO_DPTH,LUM,ND,FILENAME,TYPE,IONE)
 	    END IF
 	  END DO
-C
-C
-C 
-C
-C This page computes the Rosseland mean opacity from the temperature
-C distribution and the population levels. An option allows the electron
-C scattering opacity to be excluded from the calculations. The Rossland
-C optical depth scale is giben in TAUROSS, and TA is a working vector. The
-C Rossland opacity is given in CHIROSS. Not written as a subroutine to allow
-C easy inclusion of additional opacity sources.
-C
+!
+!
+! 
+!
+! This page computes the Rosseland mean opacity from the temperature
+! distribution and the population levels. An option allows the electron
+! scattering opacity to be excluded from the calculations. The Rossland
+! optical depth scale is giben in TAUROSS, and TA is a working vector. The
+! Rossland opacity is given in CHIROSS. Not written as a subroutine to allow
+! easy inclusion of additional opacity sources.
+!
 
 	ELSE IF(XOPT .EQ. 'XROSS' .OR. XOPT .EQ. 'YROSS' .OR.
 	1                                 XOPT .EQ. 'GREY')THEN
@@ -1623,8 +1624,8 @@ C
 	  CALL TORSCL(TAUROSS,CHIROSS,R,TB,TC,ND,METHOD,TYPE_ATM)
 	  ROSS=.TRUE.
 	  WRITE(T_OUT,*)'Rossland optical depth is : ',TAUROSS(ND)
-C
-C 
+!
+! 
 	  IF(X .EQ. 'XROSS')THEN
 	    DO I=1,ND
 	      XV(I)=LOG10(TAUROSS(I))
@@ -1733,30 +1734,30 @@ C
 	      XAXIS='Log(\gt\dRoss\u)'
 	      XAXSAV=XAXIS
 	    END IF
-C
-C Set REXT(1)=0 to insure that REXT is recomputed for the interpolation
-C section.
-C
-C	    REXT(1)=0.0
+!
+! Set REXT(1)=0 to insure that REXT is recomputed for the interpolation
+! section.
+!
+!	    REXT(1)=0.0
 	  END IF
-C
-C 
-C
-C ****************************************************************************
-C ****************************************************************************
-C
-C Y axis options.
-C
-C ****************************************************************************
-C ****************************************************************************
-C
+!
+! 
+!
+! ****************************************************************************
+! ****************************************************************************
+!
+! Y axis options.
+!
+! ****************************************************************************
+! ****************************************************************************
+!
 	ELSE IF(XOPT .EQ. 'YR')THEN
 	  DO I=1,ND
 	    YV(I)=DLOG10(R(I)/R(ND))
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log(r/R\d*\u)'
-C
+!
 	ELSE IF(XOPT .EQ. 'ED')THEN
 	  DO I=1,ND
 	    YV(I)=DLOG10(ED(I))
@@ -1774,12 +1775,12 @@ C
 	  END DO
 	  YAXIS='m(gm cm\u-2\d)'
 	  CALL DP_CURVE(ND,XV,YV)
-C
+!
 	ELSE IF(XOPT .EQ. 'LOGT')THEN
 	  CALL DLOGVEC(T,YV,ND)
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log(T[10\u4\dK])'
-C
+!
 	ELSE IF(XOPT .EQ. 'TGREY')THEN
 	  IF(GREY_COMP)THEN
 	    CALL DP_CURVE(ND,XV,TGREY)
@@ -1820,7 +1821,7 @@ C
 	    YV(I)=T1
 	  END DO
 	  CALL DP_CURVE(ND,TA,YV)
-C
+!
 	ELSE IF(XOPT .EQ. 'TRAT')THEN
 !
 ! Plots the ration of the ACTUAL T distribution to the GREY value.
@@ -1835,7 +1836,7 @@ C
 	    WRITE(T_OUT,*)'Error -Grey Temperature distribution not available'
 	    WRITE(T_OUT,*)'Call GREY option first --- '
 	  END IF
-C
+!
 	ELSE IF(XOPT .EQ. 'T')THEN
 	  DO I=1,ND
 	    YV(I)=T(I)
@@ -1880,13 +1881,13 @@ C
 	  CALL USR_OPTION(V_EPS2,'EPS2','1.0D0',' ')
 	  DEFAULT=WR_STRING(VINF1)
 	  CALL USR_OPTION(VINF2,'VINF2',DEFAULT,' ')
-C
+!
 	  CALL USR_OPTION(TYPE,'PLOT','VEL','VEL, SIG, LOGV, LOGS')
-C
+!
 	  CALL STARPCYG_TST(Z,DTAU,ZV,R(1),R(ND),
 	1                   SCLHT,VCORE,VPHOT,VINF1,V_BETA1,V_EPS1,
 	1                   VINF2,V_BETA2,V_EPS2,ND,TA,TB,TC,L_FALSE,LU_IN)
-C
+!
 	  Z(1:ND)=DLOG10(Z(1:ND)/R(ND))
 	  TYPE=UC( TRIM(TYPE) )
 	  IF(TYPE .EQ. 'LOGV')THEN
@@ -1947,14 +1948,14 @@ C
 	  CALL DP_CURVE(ND,XV,YV)
 	  CALL DP_CURVE(ND,XV,ZV)
 	  YAXIS='Log(\gt\dSob\u/fX)'
-C
+!
 	ELSE IF(XOPT .EQ. 'YATOM')THEN
 	  DO I=1,ND
 	    YV(I)=LOG10(POP_ATOM(I))
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log(N\di\u)'
-C
+!
 	ELSE IF(XOPT .EQ. 'YION')THEN
 	  DO I=1,ND
 	    YV(I)=LOG10(POPION(I))
@@ -1962,7 +1963,7 @@ C
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log(N\di\u)'
 	  WRITE(T_OUT,*)'Warning: this option plots ionized species only'
-C
+!
 	ELSE IF(XOPT .EQ. 'CLUMP')THEN
 	  
 	  CALL USR_HIDDEN(ELEC,'RECIP','F','Plot 1 / fillingfactor')
@@ -1975,6 +1976,93 @@ C
 	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
 !
+!
+!
+
+	ELSE IF(XOPT .EQ. 'LNID')THEN
+!
+	  WRITE(T_OUT,'(A)')' '
+	  WRITE(T_OUT,'(A)')'Create line ID file for stars with weak winds.'
+	  WRITE(T_OUT,'(A)')' '
+	  DO I=1,ND
+	    ESEC(I)=6.65D-15*ED(I)
+	  END DO
+          CALL TORSCL(TA,ESEC,R,TB,TC,ND,METHOD,TYPE_ATM)
+!
+	  DO I=1,ND
+	    J=I
+	    IF(TA(I) .GT. 0.67)THEN
+	      EXIT
+	    END IF
+	  END DO
+	  DPTH_INDX=I-1
+!
+	  DEFAULT='0.01'
+	  CALL USR_OPTION(TAU_LIM,'TAU',DEFAULT,'Line optical deth at tau_c=2/3')
+!
+          WRITE(T_OUT,'(X,A,1P,E14.6)')'    R(I)/R*=',R(DPTH_INDX)/R(ND)
+          WRITE(T_OUT,'(X,A,1P,E14.6)')'       V(I)=',V(DPTH_INDX)
+          WRITE(T_OUT,'(X,A,1P,E14.6)')'       T(I)=',T(DPTH_INDX)
+          WRITE(T_OUT,'(X,A,1P,E14.6)')'      ED(I)=',ED(DPTH_INDX)
+!
+	  DEFAULT=WR_STRING(LAM_ST)
+	  CALL USR_OPTION(LAM_ST,'LAMST',DEFAULT,FREQ_INPUT)
+	  DEFAULT=WR_STRING(LAM_EN)
+	  CALL USR_OPTION(LAM_EN,'LAMEN',DEFAULT,FREQ_INPUT)
+	  DEFAULT='LINE_ID'
+	  CALL USR_OPTION(FILENAME,'FILE',DEFAULT,'Output file for line IDs')
+	  CALL GEN_ASCI_OPEN(73,FILENAME,'UNKNOWN',' ',' ',IZERO,IOS)
+!
+! MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
+!
+	  CNT=0
+!
+! Determine index range encompassing desired wavelength range.
+!
+	  NU_ST=ANG_TO_HZ/LAM_ST
+	  IF(NU_ST .LT. VEC_FREQ(1))THEN
+	    NL=GET_INDX_DP(NU_ST,VEC_FREQ,N_LINE_FREQ)
+	    IF(VEC_FREQ(NL) .GT. NU_ST)NL=NL+1
+	  ELSE
+	    NL=1
+	  END IF
+!
+	  NU_EN=ANG_TO_HZ/LAM_EN
+	  IF(NU_EN .GT. VEC_FREQ(N_LINE_FREQ))THEN
+	    NUP=GET_INDX_DP(NU_EN,VEC_FREQ,N_LINE_FREQ)
+	    IF(VEC_FREQ(NUP) .LT. NU_EN)NUP=NUP-1
+	  ELSE
+	    NUP=N_LINE_FREQ
+	  END IF
+!
+	  DO LINE_INDX=NL,NUP
+	    MNL_F=VEC_MNL_F(LINE_INDX)
+	    MNUP_F=VEC_MNUP_F(LINE_INDX)
+	    FL=VEC_FREQ(LINE_INDX)
+	    I=DPTH_INDX
+!
+	    IF(ANG_TO_HZ/FL .GT. LAM_ST .AND. ANG_TO_HZ/FL .LT. LAM_EN)THEN
+	      DO ID=1,NUM_IONS
+	        TAU_SOB=0.0D0
+	        IF(VEC_SPEC(LINE_INDX) .EQ. ION_ID(ID) .AND.
+	1           (XSPEC .EQ. ' ' .OR. XSPEC .EQ. UC(ION_ID(ID))) )THEN
+	          DO I=1,DPTH_INDX
+	            T1=ATM(ID)%W_XzV_F(MNUP_F,I)/ATM(ID)%W_XzV_F(MNL_F,I)
+	            CHIL(I)=OPLIN*VEC_OSCIL(LINE_INDX)*( T1*ATM(ID)%XzV_F(MNL_F,I)-
+	1               ATM(ID)%GXzV_F(MNL_F)*ATM(ID)%XzV_F(MNUP_F,I)/ATM(ID)%GXzV_F(MNUP_F) )
+	            CHIL(I)=MAX(1.0D-15*CHIL(I)/(FL/2.998D+04)/SQRT(PI),1.0D-10)
+	          END DO
+                  CALL TORSCL(TA,CHIL,R,TB,TC,DPTH_INDX,'ZERO',TYPE_ATM)
+	          TAU_SOB=TA(DPTH_INDX)
+	          IF(TAU_SOB .GT. TAU_LIM)THEN
+	            WRITE(73,'(A,3ES14.5,3X,F3.0,I6)')ION_ID(ID),ANG_TO_HZ/FL,
+	1                                                TAU_SOB,ANG_TO_HZ/FL,1.0,2
+	          END IF
+	        END IF
+	      END DO
+	    END IF
+	  END DO
+	  CLOSE(UNIT=73)
 ! 
 !
 ! Section to allow various line optical deph and wavelength distributions to be examined.
@@ -2066,9 +2154,9 @@ C
 	    CALL USR_OPTION(TAU_MIN,'TAU_MIN','1.0D0','Minimum Tau')
 	    WRITE(T_OUT,'(X,A,1P,E11.4)')'Velocity is:',V(DPTH_INDX),' km/s'
 	  END IF
-C
-C MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
-C
+!
+! MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
+!
 	  CNT=0
 !
 ! Determine index range encompassing desired wavelength range.
@@ -2140,7 +2228,7 @@ C
 	             END IF
 	          END DO
 	        END IF
-C
+!
 	        CNT=CNT+1
 	        IF(XOPT .EQ. 'DIST')THEN
 	          ZV(2*CNT-1)=0.2998E+04/FL		!Angstroms
@@ -2187,7 +2275,7 @@ C
 	      WRITE(T_OUT,'(X,A,I2,A,I9)')'Tau > 10**(',I,'):',TAU_GRT_LOGX(I)
 	    END DO
 	  END IF
-C
+!
 	  IF(XOPT .EQ. 'DIST')THEN
 	    I=2*CNT
 	    CALL DP_CURVE(I,ZV,YV)
@@ -2220,17 +2308,17 @@ C
 	    END DO
 	    CALL DP_CURVE(NBINS,ZV,YV)
 	  END IF
-C
-C 
-C
+!
+! 
+!
 	ELSE IF(XOPT .EQ. 'GF')THEN
-C
+!
 	   I=0
 	   DO LINE_INDX=1,N_LINE_FREQ
 	     MNL_F=VEC_MNL_F(LINE_INDX)
 	     MNUP_F=VEC_MNUP_F(LINE_INDX)
 	     FL=VEC_FREQ(LINE_INDX)
-C
+!
 	     T1=0
 	     IF( XSPEC .EQ. UC(VEC_SPEC(LINE_INDX)) )THEN
 	       DO ID=1,NUM_IONS
@@ -2239,7 +2327,7 @@ C
 	         END IF
 	       END DO
 	     END IF
-C
+!
 	     IF(T1 .GT. 0)THEN
 	       I=I+1
 	       ZV(2*I-1)=0.2998E+04/FL			!Angstroms
@@ -2248,7 +2336,7 @@ C
 	       YV(2*I)=DLOG10(T1)
 	     END IF
 	   END DO
-C
+!
 	   IF(I .EQ. 0)THEN
 	     WRITE(T_OUT,*)'Error no matching ioization stage'
 	   ELSE
@@ -2256,8 +2344,8 @@ C
 	     I=2*I
 	     CALL DP_CURVE(I,ZV,YV)
 	   END IF
-C
-C 
+!
+! 
 	ELSE IF(XOPT .EQ. 'CJBB')THEN
 !
 ! RJ has previously been computed.
@@ -2288,7 +2376,7 @@ C
 	    END DO
 	    YAXIS='J\dc\u/B(T\de\u)'
 	  END IF
-C
+!
 	  IF(NORAD)THEN
 	    IF(.NOT. ELEC)THEN
 	      DO I=1,ND
@@ -2313,44 +2401,44 @@ C
 	      END DO
 	    CLOSE(UNIT=37)
 	  END IF
-C
-C 
-C **************************************************************************
-C **************************************************************************
-C
-C To enable a comparison of J (continuum) compared with that computed on a
-C finer depth grid.
-C
-C **************************************************************************
-C **************************************************************************
-C
+!
+! 
+! **************************************************************************
+! **************************************************************************
+!
+! To enable a comparison of J (continuum) compared with that computed on a
+! finer depth grid.
+!
+! **************************************************************************
+! **************************************************************************
+!
 	ELSE IF(XOPT .EQ. 'JEXT'
 	1  .OR. XOPT .EQ. 'EWEXT')THEN
-C
-C Compute J. DBB and S1 have been previously evaluated. VT is used
-C for dCHI_dR.
-C
+!
+! Compute J. DBB and S1 have been previously evaluated. VT is used
+! for dCHI_dR.
+!
 	  CALL NEWJSOLD(TA,TB,TC,XM,WM,FB,RJ,DTAU,R,Z,P,
 	1               ZETA,THETA,CHI,VT,JQW,
 	1               THICK,DIF,DBB,IC,NC,ND,NP,METHOD)
-C
+!
 	  S1=(ETA(1)+RJ(1)*ESEC(1))/CHI(1)
 	  DO I=1,ND
 	    SOURCE(I)=(ETA(I)+ESEC(I)*RJ(I))/CHI(I)
 	  END DO
 	  CALL NORDFLUX(TA,TB,TC,XM,DTAU,R,Z,P,SOURCE,CHI,dCHIdR,HQW,VT,
 	1               S1,THICK,DIF,DBB,IC,NC,ND,NP,METHOD)
-C
-C Compute observed flux in Janskys for an object at 1 kpc .
-C	(const=dex(23)*2*pi*dex(20)/(3.0856dex(21))**2 )
-C
+!
+! Compute observed flux in Janskys for an object at 1 kpc .
+!	(const=dex(23)*2*pi*dex(20)/(3.0856dex(21))**2 )
+!
 	  T1=6.599341D0*VT(1)*2.0D0		!2 DUE TO 0.5U
           WRITE(T_OUT,'('' Observed Flux is'',1Pe12.4,''Jy'')')T1
           WRITE(LU_LOG,'('' Observed Flux is'',1Pe12.4,''Jy'')')T1
-C
+!
 	  CALL EXTEND_OPAC(CHIEXT,ETAEXT,ESECEXT,RJEXT,COEF,INDX,NDX
 	1                     ,CHI,ETA,ESEC,RJ,ND)
-C
+!
 	  DO I=1,NDX
 	    ZETAEXT(I)=ETAEXT(I)/CHIEXT(I)
 	    THETAEXT(I)=ESECEXT(I)/CHIEXT(I)
@@ -2358,7 +2446,7 @@ C
 	    FOLD(I)=1.0D0/3.0D0
 	  END DO
 	  S1=SOURCE(1)
-C
+!
 	  INACCURATE=.TRUE.
 	  J=0				!Loop counter
 	  DO WHILE(INACCURATE)
@@ -2381,35 +2469,35 @@ C
 	    IF(T1 .GT. 1.0E-05)INACCURATE=.TRUE.
 	    WRITE(T_OUT,'('' Maximum fractional change is'',1PE11.4)')T1
 	  END DO
-C
+!
 	  IF(XOPT .EQ. 'JEXT')THEN
-C
-C Will use AV for the new RJ
-C
+!
+! Will use AV for the new RJ
+!
 	    CALL UNGRID(AV,ND,RJEXT,NDX,GRID)
-C
+!
 	    S1=(ETA(1)+AV(1)*ESEC(1))/CHI(1)
 	    DO I=1,ND
 	      SOURCE(I)=(ETA(I)+ESEC(I)*AV(I))/CHI(I)
 	    END DO
 	    CALL NORDFLUX(TA,TB,TC,XM,DTAU,R,Z,P,SOURCE,CHI,dCHIdR,HQW,VT,
 	1                 S1,THICK,DIF,DBB,IC,NC,ND,NP,METHOD)
-C
-C Compute observed flux in Janskys for an object at 1 kpc .
-C	(const=dex(23)*2*pi*dex(20)/(3.0856dex(21))**2 )
-C
+!
+! Compute observed flux in Janskys for an object at 1 kpc .
+!	(const=dex(23)*2*pi*dex(20)/(3.0856dex(21))**2 )
+!
 	    T1=6.599341D0*VT(1)*2.0D0		!2 DUE TO 0.5U
             WRITE(T_OUT,'('' Observed Flux[Ext] is'',1Pe12.4,''Jy'')')T1
             WRITE(LU_LOG,'('' Observed Flux[Ext] is'',1Pe12.4,''Jy'')')T1
-C
-C With this definition for YV, can never get an error worse than 200%.
-C An error of 100% implies that RJ and RJEXT differ by a factor of 3.
-C
+!
+! With this definition for YV, can never get an error worse than 200%.
+! An error of 100% implies that RJ and RJEXT differ by a factor of 3.
+!
 	    DO I=1,ND
 	      YV(I)=200.0D0*(AV(I)-RJ(I))/(AV(I)+RJ(I))
 	    END DO
 	    YAXIS='% error'
-C
+!
 	    CALL USR_HIDDEN(ELEC,'LOGE','F','Log of error?')
 	    IF(ELEC)THEN
 	      DO I=1,ND
@@ -2417,17 +2505,17 @@ C
 	      END DO
 	      YAXIS='Log(% error)'
 	    END IF
-C
+!
 	    CALL DP_CURVE(ND,XV,YV)
 	  ELSE IF(XOPT .EQ. 'EWEXT')THEN
-C
+!
 	    DO I=1,ND
 	      SOURCE(I)=ZETA(I)+THETA(I)*RJEXT(GRID(I))
 	    END DO
-C
-C TA is used for the line flux. Integral of TA dlog(r) is
-C the line EW.
-C
+!
+! TA is used for the line flux. Integral of TA dlog(r) is
+! the line EW.
+!
 	    CALL SOBEW_GRAD(SOURCE,CHI,ESEC,CHIL,ETAL,
 	1              FORCE_MULT,LUM,
 	1              V,SIGMA,R,P,JQW,HQW,TA,T1,S1,
@@ -2442,30 +2530,30 @@ C
                 WRITE(18,'(X,I3,3X,3ES14.6)')I, R(I),V(I),FORCE_MULT(I)
               END DO
             CLOSE(UNIT=18)
-C
-C S1 is the continuum flux in Jy for an object at 1kpc.
-C EW is the line equivalent width in Angstroms.
-C
+!
+! S1 is the continuum flux in Jy for an object at 1kpc.
+! EW is the line equivalent width in Angstroms.
+!
 	    T2=LAMVACAIR(FREQ)		!Wavelength(Angstroms)
 	    WRITE(T_OUT,40008)T1,S1,T2
 	    WRITE(LU_NET,40008)T1,S1,T2
 40008	    FORMAT(1X,'EW =',1PE10.3,' Ang',5X,'I =',E10.3,' Jy',5X,
 	1             'Lambda =',E11.4,' Ang')
 	  END IF
-C
-C 
-C **************************************************************************
-C **************************************************************************
-C
-C Comparison of line source function with Jc and B.
-C
-C **************************************************************************
-C **************************************************************************
-C
+!
+! 
+! **************************************************************************
+! **************************************************************************
+!
+! Comparison of line source function with Jc and B.
+!
+! **************************************************************************
+! **************************************************************************
+!
 	ELSE IF(XOPT .EQ. 'SRCEBB')THEN
-C
-C Assumes line opacity and emissivity have been computed in the set up.
-C
+!
+! Assumes line opacity and emissivity have been computed in the set up.
+!
 	  DO I=1,ND
 	    IF(CHIL(I).LT. 1.0D-30)THEN
 	      YV(I)=-30
@@ -2476,11 +2564,11 @@ C
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='S/B(T\de\u)'
-C
+!
 	ELSE IF(XOPT .EQ. 'SRCEJC')THEN
-C
-C RJ has previously been computed, as have the Line opacity and emissivity.
-C
+!
+! RJ has previously been computed, as have the Line opacity and emissivity.
+!
 	  DO I=1,ND
 	    IF(CHIL(I).LT. 1.0D-30)THEN
 	      YV(I)=-30
@@ -2490,11 +2578,11 @@ C
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='S/J\dc\u'
-C
+!
 	ELSE IF(XOPT .EQ. 'SRCE')THEN
-C
-C Assumes line opacity and emissivity have been computed in the set up.
-C
+!
+! Assumes line opacity and emissivity have been computed in the set up.
+!
 	  DO I=1,ND
 	    IF(CHIL(I).LT. 1.0D-30)THEN
 	      YV(I)=-30
@@ -2504,8 +2592,8 @@ C
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='S'
-C 
-C
+! 
+!
 
 	ELSE IF(XOPT .EQ. 'DION')THEN
 	  TYPE=' '
@@ -2520,39 +2608,14 @@ C
 	    END IF
 	  END DO
 !
-	ELSE IF(XOPT .EQ. 'NION')THEN
-	  CALL USR_OPTION(EXC_EN,'IE',' ','Ionization energy in 10^15 Hz')
-	  CALL USR_OPTION(T1,'POP',' ','Fractional population relative to lower iozation stage')
-	  CALL USR_OPTION(T2,'GUP',' ','Statistical weight for upper level')
-	  TYPE=' '
-	  DO ID=1,NUM_IONS
-	    IF(XSPEC .EQ. TRIM(ION_ID(ID))) THEN
-	      TA(1:ND)=ATM(ID)%DXzV_F(1:ND)		!Ground state pop.
-	      TB(1:ND)=TA(1:ND)*T1			!New ion pop
-	      T3=ATM(ID)%GIONXzV_F/T2
-	      DO I=1,ND
-	        TEMP=DLOG( 2.07D-22*ED(I)*TB(I)/(T(I)**1.5D0) )
-	        TC(I)=T3*EXP(EXC_EN*HDKT/T(I)+TEMP)	!Lte ground state pop.
-	      END DO
-	      YV(1:ND)=1.0D0		!Level dissolution
-	      DO_DPTH(1:ND)=.TRUE.
-	      TYPE='DC'
-	      FILENAME='NEW_DC'
-	      CALL NEW_WRITEDC_V4(TA,TC,YV,
-	1           EXC_EN,ATM(ID)%GIONXzV_F,IONE,
-	1           TB,T2,IONE,R,T,ED,V,CLUMP_FAC,
-	1           DO_DPTH,LUM,ND,FILENAME,TYPE,IONE)
-	      EXIT
-	    END IF
-	  END DO
-C 
-C
+! 
+!
 	ELSE IF(XOPT .EQ. 'SCL')THEN
 	  CALL USR_OPTION(T1,'SCL_FAC',' ',
 	1   'Factor to multiply POPULATIONS by (<1)')
 	  CALL USR_OPTION(K,'DEPTH',' ',
 	1   'Depth index below which [for 1 to I] populations are reduced.')
-C
+!
 	  DO ISPEC=1,NSPEC
 	    IF(XSPEC .EQ. SPECIES(ISPEC))THEN
 	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
@@ -2569,24 +2632,26 @@ C
 	      END DO
 	    END IF
 	  END DO
-C 
-C
+! 
+!
 	ELSE IF (XOPT .EQ. 'FIXT')THEN
 !
 	  CALL USR_OPTION(ELEC,'DT','F','Set T values at certain depths?')
 	  IF(ELEC)THEN
 	    CALL USR_OPTION(LEV,ITEN,ITWO,'OWIN','0,0,0,0,0,0,0,0,0,0',
-	1        'Depth section  to be changed [Max of 2]')
-	    CALL USR_OPTION(T1,'TEMP','1.0','Revise temperature')
-            DO I=LEV(1),LEV(2)
+	1        'Depth section to be changed [2: lower and upper limit]')
+            DEFAULT='1.0'
+	    DO I=LEV(1),LEV(2)
+	      CALL USR_OPTION(T1,'TEMP',DEFAULT,'Revised temperature')
 	      T(I)=T1
+	      DEFAULT=WR_STRING(T1)
 	    END DO
 	  ELSE
 	    CALL USR_HIDDEN(T1,'SCALE','1.0',
 	1      'Optical Depth below which T is held approximately constant')
-C
-C As we don't require the old T, we can overite it straight away.
-C
+!
+! As we don't require the old T, we can overite it straight away.
+!
 	    DO I=1,ND
 	      IF(T1 .LE. 0)THEN
 	        T1=1.0D0
@@ -2607,8 +2672,8 @@ C
 	  END IF
 	  ROSS=.FALSE.
 	  GREY_COMP=.FALSE.
-C
-C 
+!
+! 
 	ELSE IF(XOPT .EQ.'XRAY')THEN
 	  XRAYS=.NOT. XRAYS
 	  IF(XRAYS)THEN
@@ -2622,9 +2687,9 @@ C
 	  ELSE
 	    WRITE(T_OUT,*)'Xray opacities NOT included'
 	  END IF
-C
-C Swith on/of level dissolution.
-C
+!
+! Swith on/of level dissolution.
+!
 	ELSE IF(XOPT .EQ. 'DIS')THEN
 	  LEVEL_DISSOLUTION= .NOT. LEVEL_DISSOLUTION
 	  CALL COMP_LEV_DIS_BLK(ED,POPION,T,LEVEL_DISSOLUTION,ND)
@@ -2646,7 +2711,7 @@ C
 ! depth is used.
 !
 	ELSE IF(XOPT .EQ. 'LTAU')THEN
-C
+!
 	  I=ND/2
 	  DEFAULT=WR_STRING(I)
 	  VALID_VALUE=.FALSE.
@@ -2716,7 +2781,7 @@ C
 	    XAXIS='\gl(\gV)'
 	  END IF
 	  YAXIS='Log(\gt)'
-C
+!
 	  IF(J .NE. 0)WRITE(T_OUT,*)J,' lines plotted'
 	  IF(J  .NE. 0)CALL DP_CURVE(J,XV,YV)
 !
@@ -3001,18 +3066,18 @@ C
 	  DEALLOCATE (LAM_VEC)
 	  DEALLOCATE (CHI_TOT_LAM)
 	  DEALLOCATE (ETA_TOT_LAM)
-C 
-C
-C Graphical options.
-C
+! 
+!
+! Graphical options.
+!
 	ELSE IF(XOPT .EQ. 'GR') THEN
 	  CALL GRAMON_PGPLOT(XAXIS,YAXIS,NAME,' ')
 	  XAXIS=XAXSAV
-C
+!
 	ELSE IF(XOPT .EQ. 'GRNL') THEN
 	  CALL GRAMON_PGPLOT(' ',' ',' ',' ')
 	  XAXIS=XAXSAV
-C
+!
 	ELSE IF(XOPT .EQ. 'GRED')THEN
 	  TA(1:ND)=XV(1:ND)
 !
@@ -3022,10 +3087,10 @@ C
 	      SCED=SCED-0.5
 	    END DO
 	  END IF
-C
-C We extrapolate model to lower Ne assuming Log Ne is a linear function
+!
+! We extrapolate model to lower Ne assuming Log Ne is a linear function
 c of Xv. This will work best when XV is Log R or Log Tau.
-C
+!
 	  IF(SCED(1) .LT. DLOG10(ED(1)))THEN
 	    DO I=ND,1,-1
 	      TA(I+1)=TA(I)
@@ -3046,7 +3111,7 @@ C
 	    NXED=NXED-1
 	  END DO
 	  CALL LININT(SCED,XED,NXED,TB,TA,J)
-C
+!
 	  CALL USR_HIDDEN(T1,'MAX_ED','14.0D0','Maximum Ne Along top axis ')
 	  DO WHILE(SCED(NXED) .GT. T1*1.00001)
 	     NXED=NXED-1
@@ -3054,12 +3119,12 @@ C
 	  TOPLABEL='Log(N\de\u)'
 	  CALL GRAMON_PGPLOT(XAXIS,YAXIS,NAME,'TOPLAB')
 	  XAXIS=XAXSAV
-C
-C 
+!
+! 
 	ELSE IF(XOPT .EQ. 'SM')THEN
 	  FLAG=.FALSE.
 	  CALL USR_OPTION(T1,'VAL','3.0','Fractional change allowed.')
-C
+!
 	  DEFAULT=WR_STRING(ND/2)
 	  CALL USR_OPTION(K,'DEPTH',DEFAULT,'Smooth from DEPTH to 1')
 	  CALL USR_HIDDEN(TYPE,'TYPE','POP','Smooth in POP (def) or DC')
@@ -3083,11 +3148,11 @@ C
 	  IF(.NOT. FLAG)THEN
 	    WRITE(T_OUT,*)'Warning - invalid SM extension.'
 	  END IF
-C
-C 
-C
-C Allow the OCCUPATION PROBAILITIES to be plotted.
-C
+!
+! 
+!
+! Allow the OCCUPATION PROBAILITIES to be plotted.
+!
 	ELSE IF(XOPT .EQ. 'WLD')THEN
 	  CALL USR_OPTION(LEV,ITEN,IONE,'LEVS','1,2,3,4,5,6,7,8,9,10',
 	1      'Levels to plot (10 max)')
@@ -3109,23 +3174,23 @@ C
 	    CALL DP_CURVE(ND,XV,YV)
 	    YAXIS='WLD'
 	  END DO
-C
-C 
-C
-C ***********************************************************************
-C ***********************************************************************
-C
-C DC  --- Plot of Log(departure coefficient).
-C           IF(LIN_DC is TRUE, a linear plot is preseneted)
-C
-C POP --- LOG plot of the population of an individual level.
-C
-C RAT --- Plot of the ionization fraction of a species. Fraction can be
-C           relative to the ion density, or the total species density.
-C
-C ***********************************************************************
-C ***********************************************************************
-C
+!
+! 
+!
+! ***********************************************************************
+! ***********************************************************************
+!
+! DC  --- Plot of Log(departure coefficient).
+!           IF(LIN_DC is TRUE, a linear plot is preseneted)
+!
+! POP --- LOG plot of the population of an individual level.
+!
+! RAT --- Plot of the ionization fraction of a species. Fraction can be
+!           relative to the ion density, or the total species density.
+!
+! ***********************************************************************
+! ***********************************************************************
+!
 	ELSE IF(XOPT .EQ.'DC' .OR. XOPT .EQ. 'POP'
 	1                       .OR. XOPT .EQ. 'RAT') THEN
 	  DO I=1,10
@@ -3180,19 +3245,19 @@ C
 	        ELSE
 	          YAXIS='Log(N)'
 	        END IF
-C
+!
 	        CALL DP_CURVE(ND,XV,YV)
 	      END DO
 	    END IF
 	  END DO
-C
-C 
-C
-C Compute the ionization ratio for the total population of one ionization
-C state to the total population of the next ionization state.
-C
+!
+! 
+!
+! Compute the ionization ratio for the total population of one ionization
+! state to the total population of the next ionization state.
+!
 	ELSE IF(XOPT .EQ.'ION') THEN
-C
+!
 	  FOUND=.FALSE.
 	  DO ID=1,NUM_IONS
 	    IF(XSPEC .EQ. ION_ID(ID))THEN
@@ -3211,14 +3276,14 @@ C
 	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log(X\u(n-1)+\d/X\un+\d)'
-C 
-C ^L
-C
-C Computes the column density for 2 successive ionization stages, and for
-C the atom. If XV is the column desnity for species XzVxI, the program routine
-C XV/X and XSIX/X where X is psecies column density. Inserted for comparison
-C with SETI results.
-C
+! 
+! ^L
+!
+! Computes the column density for 2 successive ionization stages, and for
+! the atom. If XV is the column desnity for species XzVxI, the program routine
+! XV/X and XSIX/X where X is psecies column density. Inserted for comparison
+! with SETI results.
+!
 	ELSE IF(XOPT .EQ. 'QF') THEN
 	  DO ISPEC=1,NSPEC
 	    IF(XSPEC .EQ. SPECIES(ISPEC))THEN
@@ -3253,11 +3318,11 @@ C
 	      YAXIS='CD(XV)/CD(X); CD(XSIX)/CD(X)'
 	    END IF
 	  END DO
-C 
-C
-C Compute the ionization ratio for the total population of one ionization
-C state to the total population of the next ionization state.
-C
+! 
+!
+! Compute the ionization ratio for the total population of one ionization
+! state to the total population of the next ionization state.
+!
 	ELSE IF(XOPT .EQ. 'IF') THEN
 	  CALL USR_HIDDEN(SPEC_FRAC,'SPEC_FRAC','F',
 	1      'Species fraction?')
@@ -3291,7 +3356,7 @@ C
 	      CALL DP_CURVE(ND,XV,ZV)
 	    END IF
 	  END DO
-C 
+! 
 	ELSE IF(XOPT .EQ. 'MODSUM')THEN
 !
 ! This option was installed to revise the incorrect vaules of R(Tau) and
@@ -3308,7 +3373,7 @@ C
 	  TB(1)=2.0D0/3.0D0  ; TB(2)=10.0D0
 	  CALL MON_INTERP(TC,ITWO,IONE,TB,ITWO,R,ND,TA,ND)
 	  CALL MON_INTERP(AV,ITWO,IONE,TB,ITWO,V,ND,TA,ND)
-C
+!
 	  OPEN(UNIT=LU_IN,FILE='MOD_SUM',STATUS='OLD',ACTION='READ')
 	  OPEN(UNIT=LU_OUT,FILE='REV_MOD_SUM',STATUS='UNKNOWN')
 	   READ(LU_IN,'(A)')STRING
@@ -3316,9 +3381,9 @@ C
 	     WRITE(LU_OUT,'(A)')TRIM(STRING)
 	     READ(LU_IN,'(A)')STRING
 	   END DO
-C
-C Output summary of Teff, R, and V at RSTAR, Tau=10, and TAU=2/3.
-C
+!
+! Output summary of Teff, R, and V at RSTAR, Tau=10, and TAU=2/3.
+!
 	   NEXT_LOC=1  ;   STRING=' '
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TA(ND))
 	   T1=R(ND)/6.96D0 ; CALL WR_VAL_INFO(STRING,NEXT_LOC,'R*/Rsun',T1)
@@ -3326,7 +3391,7 @@ C
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'T*  ',T1)
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',V(ND))
 	   WRITE(LU_OUT,'(A)')TRIM(STRING)
-C
+!
 	   NEXT_LOC=1  ;   STRING=' '
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(2))		!10.0D0
 	   T1=TC(2)/6.96D0
@@ -3335,7 +3400,7 @@ C
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff',T1)
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(2))
 	   WRITE(LU_OUT,'(A)')TRIM(STRING)
-C
+!
 	   NEXT_LOC=1  ;   STRING=' '
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(1))		!0.67D0
 	   T1=TC(1)/6.96D0
@@ -3344,10 +3409,10 @@ C
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff',T1)
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(1))
 	   WRITE(LU_OUT,'(A)')TRIM(STRING)
-C
+!
 	   READ(LU_IN,'(A)')STRING		!Tau=10 string
 	   READ(LU_IN,'(A)')STRING		!Tau=1 string
-C
+!
 	   IOS=0
 	   READ(LU_IN,'(A)',IOSTAT=IOS)STRING
 	   DO WHILE(IOS .EQ. 0)
@@ -3409,15 +3474,15 @@ C
 	1       'NB: Optical depth scale includes effect of clumping.',
 	1       'INT_dBdT(opacity) set to ROSS_MEAN.'
 	  CLOSE(UNIT=LU_OUT)
-C
-C Option to determine the velocity and radius of a star at a give
-C Rosseland optical depth.
-C
+!
+! Option to determine the velocity and radius of a star at a give
+! Rosseland optical depth.
+!
 	ELSE IF(XOPT .EQ. 'CHKV')THEN
 	  CALL USR_HIDDEN(T1,'TAU','100.0',' ')
-C
-C Determine radius where TAUROSS=T1
-C
+!
+! Determine radius where TAUROSS=T1
+!
 	  IF(.NOT. ROSS)THEN
 	    WRITE(T_OUT,*)'Error - Roesseland optical depth not computed'
 	  ELSE
@@ -3441,7 +3506,7 @@ C
 	1     F8.2,' is ',F10.4,/,
 	1     1X,'Velocity at R* is ',1PE14.5,'km/s')
 	  END IF
-C
+!
 	ELSE IF(XOPT .EQ. 'COLR')THEN
 	  CALL USR_OPTION(I,'Depth','1','Input depth to check col. rates')
 	  STRING=' '
@@ -3490,9 +3555,9 @@ C
 	      CALL WR_COL(OMEGA_F,ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,XSPEC,LU_COL,' ')
 	    END IF
 	  END DO
-C
-C 
-C
+!
+! 
+!
 	ELSE IF(XOPT .EQ. 'PHOT')THEN
 	  CALL USR_OPTION(TEMP,'Nu','0.0','Input frequency (10^15)Hz')
 	  CALL USR_OPTION(PHOT_ID,'Nu','1','Photoionization route')
@@ -3523,8 +3588,8 @@ C
 	  DO I=1,K
 	    WRITE(LU_CROSS,'(X,I4,3X,1P,E12.5)')I,OMEGA_F(I,1)/1.0D-08
 	  END DO
-C 
-C  
+! 
+!  
 	ELSE IF(XOPT .EQ. 'PLTPHOT')THEN
 	  CALL USR_OPTION(I,'LEV','1','Level ID: Use WRID to check levs')
 	  CALL USR_OPTION(PHOT_ID,'PHOT_ID','1','Photoionization route')
@@ -3660,14 +3725,14 @@ C
 	      END IF
 	    END IF
 	  END DO
-C  
+!  
 c 
-C
-C Section to compute the recombination rates for various species.
-C Default is for ionizatio to the ground state. The photionzation route
-C is a hidden parameters. Both GION and EXC_EN must be specified. These
-C are input to accomodate TERM spitting.
-C
+!
+! Section to compute the recombination rates for various species.
+! Default is for ionizatio to the ground state. The photionzation route
+! is a hidden parameters. Both GION and EXC_EN must be specified. These
+! are input to accomodate TERM spitting.
+!
 	ELSE IF(XOPT .EQ. 'NRR')THEN
 	  CALL USR_OPTION(T1,'T','1.0','Input T (in 10^4 K)')
 	  CALL USR_HIDDEN(PHOT_ID,'PHOT_ID','1',
@@ -3712,16 +3777,16 @@ C
 	    WRITE(LU_REC,'(X,A,X,1PE12.4)')'Total recombination rate is:',T1
 	    WRITE(LU_REC,'(X,A,X,1PE10.2)')'Value for GION used was:',TMP_GION
 	  END IF
-C
-C 
-C
+!
+! 
+!
 	ELSE IF(XOPT .EQ. 'GNTFF')THEN
 	    CALL USR_OPTION(CHI,3,3,'GNT',' ','LAM(um) , T & Z')
 	    CHI(1)=1.0D-04*ANG_TO_HZ/CHI(1)
 	    CHI(4)=GFF(CHI(1),CHI(2),CHI(3))
 	    WRITE(T_OUT,2000)CHI(4)
 2000	    FORMAT(3X,'The Free-free gaunt factor is',1X,1PE10.3)
-C
+!
 	ELSE IF(XOPT .EQ. 'GNTBF')THEN
 	  CALL USR_OPTION(CHI,3,3,'GNT',' ','Lam(um) ,Level & Z')
 	    CHI(1)=1.0D-04*ANG_TO_HZ/CHI(1)
@@ -3729,11 +3794,11 @@ C
 	    CHI(4)=GBF(CHI(1),I,CHI(3))
 	    WRITE(T_OUT,2001)CHI(4)
 2001	    FORMAT(3X,'The Bound-free gaunt factor is',1X,1PE10.3)
-C
+!
 	ELSE IF(XOPT .EQ. 'LAM')THEN
-C
-C NB. FL and FREQ have been equivalenced.
-C
+!
+! NB. FL and FREQ have been equivalenced.
+!
 	  DEFAULT=WR_STRING(FREQ)
 	  CALL USR_HIDDEN(T1,'FREQ',DEFAULT,' ')
 	  T2=LAMVACAIR(T1)		!Wavelength(Angstroms)
@@ -3743,12 +3808,12 @@ C
 	  CALL USR_OPTION(NAME,'Title',' ','Title for all graphs')
 	ELSE IF(XOPT .EQ. 'METHOD')THEN
 	  CALL USR_OPTION(METHOD,'LOGLOG',' ','Tau option (LOGLOG,LOGMON, ZERO')
-C
-C 
-C
-C SETREC sets TA to DCI if DCI is non-zero, otherwise TA is set to C2(1, ).
-C Thus can compute C2-CI recombination rate even if CI is not present.
-C
+!
+! 
+!
+! SETREC sets TA to DCI if DCI is non-zero, otherwise TA is set to C2(1, ).
+! Thus can compute C2-CI recombination rate even if CI is not present.
+!
 	ELSE IF(XOPT .EQ. 'RR')THEN
 	   FOUND=.FALSE.
 	   DO ID=1,NUM_IONS
@@ -3761,29 +3826,29 @@ C
 	     WRITE(T_OUT,*)'Invalid Recombination Request'
 	     GOTO 3
 	   END IF
-C
-C Compute the recombination rate. Two recombination rates will be
-C computed. The first will ignore the temperature variation, whilst the
-C second will normalize the number of recombinations to 10^4K by assuming
-C that the recombintion rate goes as T^{-0.8}. For d=1kpc, alpha=10^{-12}
-C the recombination rate will have the units ergs/cm^2/s . (need to
-C divide bu the transition wavelength in mum)
-C
+!
+! Compute the recombination rate. Two recombination rates will be
+! computed. The first will ignore the temperature variation, whilst the
+! second will normalize the number of recombinations to 10^4K by assuming
+! that the recombintion rate goes as T^{-0.8}. For d=1kpc, alpha=10^{-12}
+! the recombination rate will have the units ergs/cm^2/s . (need to
+! divide bu the transition wavelength in mum)
+!
 	   CALL USR_HIDDEN(ELEC,'TVAR','T','Include T variation?')
 	   CALL USR_HIDDEN(T2,'EXP','0.8',
 	1	'Exponent for T variation?')
-C
+!
 	   T1=-26.68059
-C        
+!        
 	   DO I=1,ND
 	     TA(I)=(ED(I)/1.0D+10)*TA(I)*( R(I)**3 )
 	     TB(I)=TA(I)*( T(I)**(-T2) )
 	   END DO
 	   IF(ELEC)THEN
-C
-C Need to use TC to compute YV as can get floating point underflow
-C at outer boundary.
-C
+!
+! Need to use TC to compute YV as can get floating point underflow
+! at outer boundary.
+!
 	     TC(1)=TB(1)
 	     DO I=2,ND
 	       TC(I)=TC(I-1)+(TB(I)+TB(I-1))*
@@ -3804,12 +3869,55 @@ C
 	     CALL DP_CURVE(ND,XV,YV)
 	     YAXIS='Log(c.Ne.X\uN+\d)'
 	   END IF
-C
-C 
+!
+! 
+!
+	ELSE IF(XOPT .EQ. 'RAY')THEN
+	  CALL USR_OPTION(FREQ,'LAM','0.0',FREQ_INPUT)
+	  IF(FREQ .EQ. 0)THEN
+	  ELSE IF(KEV_INPUT)THEN
+	      FREQ=FREQ*KEV_TO_HZ
+	  ELSE IF(ANG_INPUT)THEN
+	      FREQ=ANG_TO_HZ/FREQ
+	  END IF
+          IF(ATM(1)%XzV_PRES)THEN
+	    CHI_RAY(1:ND)=0.0D0
+            CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
+	1             ATM(1)%NXzV_F,FREQ,ND)
+	    CHI_RAY(1:ND)=CHI_RAY(1:ND)*CLUMP_FAC(1:ND)
+          END IF
+	  CALL DP_CURVE(ND,XV,CHI_RAY)
+!
+	ELSE IF(XOPT .EQ. 'RAYL')THEN
+	  CALL USR_OPTION(LAM_ST,'LAM_ST','100.0',FREQ_INPUT)
+	  CALL USR_OPTION(LAM_EN,'LAM_EN','10000.0',FREQ_INPUT)
+	  CALL USR_OPTION(K,'NPNTS=','1000','Number of points')
+	  K=MIN(K,N_PLT_MAX)
+	  T2=EXP(LOG(LAM_EN/LAM_ST)/(K-1))
+	  T1=LAM_ST
+	  I=0
+	  DO WHILE(I .LT. K)
+	    I=I+1
+	    FREQ=ANG_TO_HZ/T1
+	    WV(I)=T1
+            IF(ATM(1)%XzV_PRES)THEN
+	      YV(I)=0.0D0
+              CALL RAYLEIGH_SCAT(YV(I),ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
+	1             ATM(1)%NXzV_F,FREQ,IONE)
+	    ELSE
+	      GOTO 1
+            END IF
+	    T1=T1*T2
+	  END DO
+	  YV(1:K)=YV(1:K)/ATM(1)%XzV_F(1,1)/6.65D-15
+	  CALL DP_CURVE(K,WV,YV)
+	  XAXIS='\gl(\V)'
+	  YAXIS='\gs/gs_dT\u'
+!
 	ELSE IF(XOPT .EQ.'OP' .OR.
 	1       XOPT .EQ. 'TAUC' .OR.
 	1       XOPT .EQ. 'DTAUC') THEN
-C
+!
 	  IF(.NOT. ELEC)THEN
 	    DO I=1,ND
 	      CHI(I)=CHI(I)-ESEC(I)
@@ -3820,7 +3928,7 @@ C
 	      CHI(I)=CHI(I)+CHI_RAY(I)
 	    END DO
 	  END IF
-C
+!
 	  IF(XOPT .EQ. 'TAUC')THEN
 	    CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,TYPE_ATM)
 	    DO I=1,ND
@@ -3882,7 +3990,7 @@ C
 	    END DO
 	  END IF
 	  CALL USR_OPTION(ELEC,'ELEC','T','Include elec?')
-C
+!
 	  CALL USR_HIDDEN(LINX,'LINX','F','Linear X Axis')
 	  IF(KEV_INPUT)THEN
 	    DO I=1,NFREQ
@@ -3904,7 +4012,7 @@ C
 	    END DO
 	  END IF
 	  CALL USR_HIDDEN(LINY,'LINY','F','Linear Y Axis')
-C
+!
 	  IF(XOPT .EQ. 'TAUR')THEN
 	    CALL USR_OPTION(RVAL,'RAD',' ','Radius in R*')
 	    RVAL=RVAL*R(ND)
@@ -3923,35 +4031,35 @@ C
 	    YAXIS='Log(R[\gt]/R\d*\u)'
 	    IF(LINY)YAXIS='R[\gt]/R\d*\u'
 	  END IF
-C
+!
 	  CALL USR_HIDDEN(IN_R_SUN,'IN_R_SUN','F','Y In R_SUN?')
 	  IF(IN_R_SUN)THEN
 	    IF(LINY)YAXIS='R/R\dO\u'
 	    IF(.NOT. LINY)YAXIS='Log(R/R\dO\u)'
 	  END IF
-C
+!
 	  DO ML=1,NFREQ
-C
-C Compute continuum opacity and emissivity at the line frequency.
-C
+!
+! Compute continuum opacity and emissivity at the line frequency.
+!
 	    FL=Q(ML)
 	    INCLUDE 'OPACITIES.INC'
-C	    INCLUDE 'HOME:[jdh.cmf.carb.test]OPACITIES.INC'
-C
+!	    INCLUDE 'HOME:[jdh.cmf.carb.test]OPACITIES.INC'
+!
 	    IF(.NOT. ELEC)THEN
 	      DO I=1,ND
 	        CHI(I)=CHI(I)-ESEC(I)
 	      END DO
 	    END IF
-C
-C Adjust opacities for the effect of clumping.
-C
+!
+! Adjust opacities for the effect of clumping.
+!
 	    DO I=1,ND
 	      CHI(I)=CHI(I)*CLUMP_FAC(I)
 	      ESEC(I)=ESEC(I)*CLUMP_FAC(I)
 	      ETA(I)=ETA(I)*CLUMP_FAC(I)
 	    END DO
-C
+!
 	    CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,TYPE_ATM)
 	    IF(XOPT .EQ. 'TAUR')THEN
 	      T2=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
@@ -3977,17 +4085,17 @@ C
 	  CALL DP_CURVE(NFREQ,ZV,YV)
 
 	ELSE IF(XOPT .EQ. 'INTERP')THEN
-C
-C Routine interpolates the last varible plotted. Variable can only
-C be plotted against R. Crude, but effective.
-C Routine assumes YV is in the correct form for the interpolation.
-C
+!
+! Routine interpolates the last varible plotted. Variable can only
+! be plotted against R. Crude, but effective.
+! Routine assumes YV is in the correct form for the interpolation.
+!
 	  DO I=1,ND
 	    TA(I)=YV(I)
 	  END DO
-C
-C Do the interpolation - Based on INTERPTHREE.
-C
+!
+! Do the interpolation - Based on INTERPTHREE.
+!
 	  DO I=1,NDX
 	    TB(I)=0.0D0
 	    DO J=0,3
@@ -3995,7 +4103,7 @@ C
 	    END DO
 	    YV(I)=TB(I)
 	  END DO
-C
+!
 	  DO I=1,NDX
 	    XNU(I)=DLOG10( REXT(I)/REXT(NDX) )
 	  END DO
@@ -4134,16 +4242,16 @@ C
 	  END IF
 	  CALL USR_HIDDEN(ELEC,'NEW','T','Continuum included?')
 	  CALL USR_HIDDEN(LINV,'LINV','F','Linear R Scale?')
-C
-C We are using ETA for BETA, the escape probability.
-C
+!
+! We are using ETA for BETA, the escape probability.
+!
 	  IF(ELEC)THEN
 	    CALL BETANEW(CHI,CHIL,SIGMA,ETA,R,Z,V,FREQ,ND)
 	  ELSE
-C	    CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,TYPE_ATM)
+!	    CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,TYPE_ATM)
  	    CALL WRBETA(CHIL,SIGMA,ETA,R,V,FREQ,ND)
 	  END IF
-C
+!
 	  IF(XOPT .EQ. 'EP')THEN
 	    YAXIS='\gc'
 	    IF(LINV)THEN
@@ -4155,7 +4263,7 @@ C
 	    ELSE
 	      DO I=1,ND
 	        ZV(I)=DLOG10(R(I)/R(ND))
-C	        YV(I)=ETA(I)*R(I)*R(I)*R(I)*ETAL(I)*DEXP(-TA(I))
+!	        YV(I)=ETA(I)*R(I)*R(I)*R(I)*ETAL(I)*DEXP(-TA(I))
 	        YV(I)=ETA(I)*R(I)*R(I)*R(I)*ETAL(I)
 	      END DO
 	      XAXIS='Log(r/R\d*\u)'
@@ -4164,9 +4272,9 @@ C	        YV(I)=ETA(I)*R(I)*R(I)*R(I)*ETAL(I)*DEXP(-TA(I))
 	    DO I=1,ND-1
 	      T1=T1+0.5*(YV(I)+YV(I+1))*(ZV(I)-ZV(I+1))
 	    END DO
-C
-C Normalize to unit area.
-C
+!
+! Normalize to unit area.
+!
 	    CALL USR_HIDDEN(SCALE,'SCL','T','Your scalinge for EP?')
 	    IF(.NOT. SCALE)THEN
 	      WRITE(T_OUT,*)'SCALE PARAM=',T1
@@ -4175,7 +4283,7 @@ C
 	    DO I=1,ND
 	      YV(I)=YV(I)/T1
 	    END DO
-C
+!
 	  ELSE
 	    Yaxis='\gb'
 	    XAXIS='Log(r/R\d*\u)'
@@ -4185,19 +4293,19 @@ C
 	    END DO
 	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
-C
-C 
-C
-C Require CHIL to have been computed in setup.
-C
+!
+! 
+!
+! Require CHIL to have been computed in setup.
+!
 	ELSE IF(XOPT .EQ. 'TAUL')THEN
 	  CALL USR_HIDDEN(ELEC,'STAT','F','Stationary opactical depth?')
 	  CALL USR_HIDDEN(RADIAL,'RADS','F','Radial Sobolev optical depth?')
 	  IF(ELEC)THEN
 	    CALL TORSCL(TA,CHIL,R,TB,TC,ND,METHOD,TYPE_ATM)
-C
-C Assumes V_D=10kms.
-C
+!
+! Assumes V_D=10kms.
+!
 	    T1=DLOG10(1.6914D-11/FREQ)
 	    DO I=1,ND
 	      IF(TA(I) .GT. 0)THEN
@@ -4242,11 +4350,11 @@ C
 	  END DO
 	  YAXIS='\gx\dL\u'
 	  CALL DP_CURVE(ND,XV,YV)
-C 
-C
-C Write out line/continuum opacities and emissivities for use with
-C the polarization codes, or profile codes.
-C
+! 
+!
+! Write out line/continuum opacities and emissivities for use with
+! the polarization codes, or profile codes.
+!
 	ELSE IF(XOPT .EQ. 'WRC' .OR. XOPT .EQ. 'WRL')THEN
 	  CONT_INT=TWOHCSQ*(FREQ**3)/( EXP(HDKT*FREQ/T(ND))-1.0D0 )
 	  CALL USR_OPTION(NEW_FORMAT,'NEW_FORM','F',
@@ -4254,7 +4362,7 @@ C
 	  IF(NEW_FORMAT)THEN
 	    CALL USR_OPTION(NEW_FILE,'NEW_FILE','F','Open new file?')
 	  END IF
-C
+!
 	  IF(NEW_FORMAT .AND. NEW_FILE)THEN
 	    OPEN(UNIT=25,FILE='LINEDATA',STATUS='NEW')
    	    WRITE(25,'(X,A,T25,A,T40,A)')'12-May-1998',
@@ -4266,14 +4374,14 @@ C
 	    WRITE(25,'(X,1PE15.8,T25,A,T40,A)')CONT_INT,
 	1            '[IC]','Schuster intensity'
 	    WRITE(25,*)' '
-C
+!
 	    WRITE(25,'(X,A,T25,A,T40,A)')'Continuum:',
 	1               '[TR_ID]','Transition identification'
 	    WRITE(25,'(X,1PE15.8,T25,A,T40,A)')FREQ,
 	1            '[FREQ]','Frequency (10^15 Hz)'
 	    WRITE(25,'(X,1PE12.5,T25,A,T40,A)')LAMVACAIR(FREQ),
 	1            '[LAM]','Wavelength (Ang)'
-C
+!
 	    WRITE(25,*)' '
 	    WRITE(25,'(X,A,/,(1P,X,9E14.6))')'R',(R(I),I=1,ND)
 	    WRITE(25,'(X,A,/,(1P,X,9E14.6))')'T',(T(I),I=1,ND)
@@ -4284,7 +4392,7 @@ C
 	1                              ( (CHI(I)-ESEC(I)) ,I=1,ND)
 	    WRITE(25,'(X,A,/,(1P,X,9E14.6))')'ESEC',(ESEC(I),I=1,ND)
 	  END IF
-C
+!
 	  IF(NEW_FORMAT .AND. XOPT .EQ. 'WRL')THEN
 	    IF(.NOT. NEW_FILE)THEN
 	      OPEN(UNIT=25,FILE='LINEDATA',STATUS='OLD',IOSTAT=IOS)
@@ -4307,11 +4415,14 @@ C
 	  END IF
 
 	  IF(.NOT. NEW_FORMAT)THEN
-	    OPEN(UNIT=25,FILE='LINEDATA',STATUS='NEW')
-   	    WRITE(25,'(X,A,T25,A,T40,A)')'09-Mar-1994',
-	1            '[Date]','Revised format date'
-   	    WRITE(25,'(X,A,T25,A,T40,A)')TRIM(NAME),
-	1   '[MOD_ID]','Model'
+	    OPEN(UNIT=25,FILE='LINEDATA',STATUS='NEW',IOSTAT=IOS)
+	    IF(IOS .NE. 0)THEN
+	      WRITE(T_OUT,*)'Error opening LINEDATA file: probably because file exists'
+	      DEFAULT='LINEDATA_1'
+	      CALL USR_OPTION(FILENAME,'FILE',DEFAULT,
+	1                  'File name (existing file will be overwrittem')
+	      OPEN(UNIT=25,FILE=FILENAME,STATUS='UNKNOWN')
+	    END IF
    	    WRITE(25,'(X,A,T25,A,T40,A)')'09-Mar-1994',
 	1            '[Date]','Revised format date'
    	    WRITE(25,'(X,A,T25,A,T40,A)')TRIM(NAME),
@@ -4439,7 +4550,7 @@ C
 	    CALL GEN_ASCI_OPEN(LU_IN,'MAINGEN_OPTIONS','OLD',' ','READ',
 	1                  IZERO,IOS)
 	  END IF
-C
+!
 	  IF(IOS .NE. 0)THEN
 	    WRITE(T_OUT,*)'Error opening description file'
 	    GOTO 1
@@ -4463,7 +4574,7 @@ C
 	  END DO
 700	  CONTINUE
 	  CLOSE(UNIT=LU_IN)
-C
+!
 	ELSE IF(XOPT .EQ. 'EX' .OR. XOPT .EQ. 'EXIT') THEN
 	  STOP
 	ELSE IF(X(1:4) .EQ. 'BOX=') THEN
@@ -4471,13 +4582,13 @@ C
 	ELSE
 	  PRINT*,'OPTION REQUESTED DOES NOT EXIST'
 	END IF
-C
+!
  1	  GO TO 3
-C
-C Formats used for writing out headers, net rates tec.
-C
+!
+! Formats used for writing out headers, net rates tec.
+!
 40001	  FORMAT(/,1X,A70)
 40002	  FORMAT(1X,'NL=',I3,5X,'NUP=',I3)
 40003	  FORMAT(3X,1P5E16.5)
-C
+!
 	  END

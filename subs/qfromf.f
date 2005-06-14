@@ -9,7 +9,7 @@ C Altered 26-May-1996 - GENERIC calls now used for DLOG and DEXp
 C                       TWO used.
 C Created 17-FEB-1986
 C
-	INTEGER*4 ND,I,IFAIL
+	INTEGER ND,I,IFAIL
 	REAL*8 F(ND),Q(ND),R(ND),TA(ND),TB(ND)
 C
 	REAL*8, PARAMETER :: TWO=2.0D0

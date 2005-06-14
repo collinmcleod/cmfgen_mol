@@ -25,13 +25,13 @@ c                          SQRT(T) to compute BETA. Effect would have been
 C                          for P Cygni type models, but large at depth where
 C                          T is large.
 C
-	INTEGER*4 NT		!Number of S.E. constraints (1st BA dimension)
-	INTEGER*4 ND		!Number of depth points.
-	INTEGER*4 NUM_BNDS	!Band dimension of BA matrix (in CMF)
-	INTEGER*4 NCF		!Number of continuum frequencies
-	INTEGER*4 LU_IN
-	INTEGER*4 LU_OUT
-	INTEGER*4 CONT_REC	!Record in file that points to begining of Jc
+	INTEGER NT		!Number of S.E. constraints (1st BA dimension)
+	INTEGER ND		!Number of depth points.
+	INTEGER NUM_BNDS	!Band dimension of BA matrix (in CMF)
+	INTEGER NCF		!Number of continuum frequencies
+	INTEGER LU_IN
+	INTEGER LU_OUT
+	INTEGER CONT_REC	!Record in file that points to begining of Jc
 	LOGICAL RD_NU
 C
 C It is assumed that BA can be passed for J_STORE. If not the vector should
@@ -67,19 +67,19 @@ C enough.
 C
 	REAL*8, ALLOCATABLE :: EXTRA_J_ST(:,:)
 C
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 	LOGICAL FILE_OPEN
 C
-	INTEGER*4 IONE
+	INTEGER IONE
 	PARAMETER (IONE=1)
 C
 	REAL*8 BETA
 	REAL*8 T1
 	REAL*8 D1,D2,DH
-	INTEGER*4 I,K,L,ML,INIT_REC,IOS
-	INTEGER*4 IREC_LEN
-	INTEGER*4 J_DIM
+	INTEGER I,K,L,ML,INIT_REC,IOS
+	INTEGER IREC_LEN
+	INTEGER J_DIM
 C
 C Constants for opacity etc [Set in CMFGEN].
 C
@@ -91,7 +91,7 @@ C
 C Parameters for fit to Electrons Scattering redistribution function
 C (dipole form). From Rybicki and Hummer (A&A, 290,553)
 C
-	INTEGER*4 NCOEF
+	INTEGER NCOEF
 	PARAMETER (NCOEF=2)
 	REAL*8 ACOEF(2),BCOEF(2)
 	DATA ACOEF/1.690703717290D0,-0.690703717290D0/

@@ -20,7 +20,7 @@ C Altered 13-Nov-1988 : LINEFLUX returned in call. Can be used to illustrate
 C                           line origin.
 C Created 6-Oct-1988  : Based on SOBJBARANDEW which in turn based on SOBJBAR
 C
-	INTEGER*4 NC,NP,ND
+	INTEGER NC,NP,ND
 	REAL*8 SOURCE(ND),CHI(ND),ESEC(ND),CHIL(ND),ETAL(ND)
 	REAL*8 V(ND),SIGMA(ND),R(ND),P(NP),AQW(ND,NP),HAQW(ND,NP)
 	REAL*8 DBB,IC,FL,EW,CONT_FLUX,LINE_FLUX(ND)
@@ -36,9 +36,9 @@ C
 C
 C Local variables.
 C
-	INTEGER*4, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: IONE=1
 C
-	INTEGER*4 I,LS,NI
+	INTEGER I,LS,NI
 	REAL*8 T1,T2,T3,T4,DBC,TOR
 	REAL*8 E1,E2,E3
 	REAL*8 IBOUND

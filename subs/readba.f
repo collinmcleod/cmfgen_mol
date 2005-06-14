@@ -12,11 +12,11 @@ C                       will allow this routine to write out both BA and
 C                       BASOL. DESC should only be the first part of the
 C                       filname as PNT is appended.
 C
-	INTEGER*4 NT   			!Dimension of BA array
-	INTEGER*4 NS  			!Dimension of STEQ array
-	INTEGER*4 NLBEGIN		!Lower level (i.e. NL) for
+	INTEGER NT   			!Dimension of BA array
+	INTEGER NS  			!Dimension of STEQ array
+	INTEGER NLBEGIN		!Lower level (i.e. NL) for
                                         !which line calculations are complete
-        INTEGER*4 LU                    !Input unit for BA and STEQ
+        INTEGER LU                    !Input unit for BA and STEQ
 	LOGICAL COMPUTE_BA  		!Indicates whether BA is being computed.
 	LOGICAL STATUS                !Indicates whether BA/STEQ read successful
 	CHARACTER DESC*(*)              !Used for filename
@@ -24,10 +24,10 @@ C
 C
 C Local Variables and external functions.
 C
-	INTEGER*4 LUER,ERROR_LU,IOS,NT1,NS1
+	INTEGER LUER,ERROR_LU,IOS,NT1,NS1
 	EXTERNAL ERROR_LU
 	LOGICAL FILE_OPEN
-	INTEGER*4, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IZERO=0
 C
 	LUER=ERROR_LU()
 	CALL GEN_ASCI_OPEN(LU,DESC//'PNT','OLD',' ','READ',IZERO,IOS)

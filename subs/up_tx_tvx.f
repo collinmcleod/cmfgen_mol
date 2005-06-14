@@ -35,7 +35,7 @@ C                        Argument odering altered.
 C                        TX and TVX modified in the same routine, since
 C                          TVX may depend on TX at the previus frequency.
 C
-	INTEGER*4 ND,NM_TX,NM_KI
+	INTEGER ND,NM_TX,NM_KI
 	REAL*8 TX(ND,ND,NM_TX)
 	REAL*8 TVX(ND-1,ND,NM_TX)
 	REAL*8 KI(ND,ND,NM_KI)
@@ -55,12 +55,12 @@ C Work Array.
 C
 	REAL*8 OLD_TX(ND,ND)
 C
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
 C Local varables.
 C
-	INTEGER*4 I,J,K
+	INTEGER I,J,K
 	LOGICAL USE_EPS
 C
 C Determine whether we are using the G eddington factor to describe N

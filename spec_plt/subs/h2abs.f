@@ -23,7 +23,7 @@ C
 C Altered 21-Dec-2001: Error in VTURB (**2 insetad of *2) fixed
 C Altered 21-Apr-2000: H2_L_J made INTEGER.
 C
-	INTEGER*4 NLAM
+	INTEGER NLAM
 	REAL*8 WAVE(NLAM)
 	REAL*8 FLUX(NLAM)
 	REAL*8 V_TURB		!km/s
@@ -32,7 +32,7 @@ C
 C
 C Local variables
 C
-	INTEGER*4 NH2
+	INTEGER NH2
 	PARAMETER (NH2=420)
 	REAL*8 H2_LAM(NH2)
 	REAL*8 H2_FREQ(NH2)
@@ -41,7 +41,7 @@ C
 	REAL*8 H2_G(NH2)
 	REAL*8 NU_DOP(NH2)
 C
-	INTEGER*4 H2_L_J(NH2)
+	INTEGER H2_L_J(NH2)
 C
 	REAL*8 G_J(0:7)
 	REAL*8 N_J(0:7)
@@ -61,7 +61,7 @@ C
 	REAL*8 B
 	REAL*8 POP_SUM
 C
-	INTEGER*4 I,J
+	INTEGER I,J
 C
 C Functions
 C

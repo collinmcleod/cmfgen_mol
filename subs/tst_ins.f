@@ -1,8 +1,8 @@
 	PROGRAM TST_LINE
 	IMPLICIT NONE
 C
- 	INTEGER*4 NCF,NFREQ_MAX,N_LINES
-	INTEGER*4 NFREQ
+ 	INTEGER NCF,NFREQ_MAX,N_LINES
+	INTEGER NFREQ
 	PARAMETER (NCF=2000)
 	PARAMETER (N_LINES=1000)
 	PARAMETER (NFREQ_MAX=NCF+N_LINES*21)
@@ -11,13 +11,13 @@ C Vecters returned by subroutine:
 C
 C Line+continuum frequencies
 	REAL*8 FREQ(NFREQ_MAX)			!Continuum frequencies
-	INTEGER*4 LINES_THIS_FREQ(NFREQ_MAX) !Indicates that this 
+	INTEGER LINES_THIS_FREQ(NFREQ_MAX) !Indicates that this 
 						!  frequency has line 
 						!  contriubutions,
 C
-	INTEGER*4 LINE_ST_INDX(N_LINES)		!Start index for the line 
+	INTEGER LINE_ST_INDX(N_LINES)		!Start index for the line 
 						!  in the NEW frequency array.
-	INTEGER*4 LINE_END_INDX(N_LINES)	!End index for the line 
+	INTEGER LINE_END_INDX(N_LINES)	!End index for the line 
 						! in the NEW frequency array.
 	CHARACTER*6 TRANS_TYPE(N_LINES)		!End index for the line 
 C
@@ -37,8 +37,8 @@ C
 	REAL*8 dV_CMF_WING
 	REAL*8 ES_WING_ExT
 	REAL*8 R_CMF_WING_EXT
-	INTEGER*4 NCF1,N_LINES1
-	INTEGER*4 ML
+	INTEGER NCF1,N_LINES1
+	INTEGER ML
 	REAL*8 C_KMS
 C
 C External functions

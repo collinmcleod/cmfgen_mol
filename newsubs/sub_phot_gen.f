@@ -65,9 +65,9 @@
 !                         is greater than tabulated value.
 ! Created 18-Sep-1996 : Based on PHOT_XzV
 !
-	INTEGER*4 ID
-	INTEGER*4 NLEVS			!Number of levels
-	INTEGER*4 PHOT_ID		!Which photoionization route.
+	INTEGER ID
+	INTEGER NLEVS			!Number of levels
+	INTEGER PHOT_ID		!Which photoionization route.
 	REAL*8 PHOT(NLEVS)		!Cross-section
 	REAL*8 GS_EDGE(NLEVS)		!Energy for ionization to Ground State!
 	REAL*8 FREQ
@@ -75,7 +75,7 @@
 !
 ! External functions.
 !
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	REAL*8 VOIGT,HYDCROSSL,XCROSS_V2,GBF
 	EXTERNAL VOIGT,HYDCROSSL,XCROSS_V2,GBF,ERROR_LU
 !
@@ -92,10 +92,10 @@
 !
 ! Local variables.
 !
-	INTEGER*4 I,J,K,l,N,TERM
-	INTEGER*4 LMIN,LMAX,LMID
-	INTEGER*4 INC,INC_SAV
-	INTEGER*4 LST,LEND
+	INTEGER I,J,K,l,N,TERM
+	INTEGER LMIN,LMAX,LMID
+	INTEGER INC,INC_SAV
+	INTEGER LST,LEND
 !
 	REAL*8 U			!Defined as FREQ/EDGE
 	REAL*8 RU			!Defined as EDGE/FREQ
@@ -110,7 +110,7 @@
 	REAL*8 SUM
 !
 	REAL*8, PARAMETER :: EQUAL_COR_FAC=1.0D0+1.0D-14
-	INTEGER*4, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IZERO=0
 	LOGICAL ALL_DONE
 	LOGICAL DO_PURE_EDGE
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.

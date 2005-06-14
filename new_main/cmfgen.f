@@ -12,54 +12,56 @@
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
+! Altered: 20-Mar-2005: FLUX_MEAN & ROSS_MEAN now zeroed. These vectors now
+!                         used in CMFGEN_SUB.
 ! Altered: 03-Mar-2000: Variable type ATM installed to simplify handling
 !	                   of multiple species.
 !
 ! Created:  5-Jan-1998=9 (Progran began late Dec, 1998)
 !
-	INTEGER*4 ND		!Actual number of depth points in atmosphere
-	INTEGER*4 NC		!Actual number of core rays 
-	INTEGER*4 NP		!Total number of rays (ND+NC)
-	INTEGER*4 NUM_BNDS	!Number of bans in linearization matrix
-	INTEGER*4 MAX_SIM	!Maximum number of lines that can be treated sim.
-	INTEGER*4 NCF_MAX	!Maximum number of frequencies that can be treated.
+	INTEGER ND		!Actual number of depth points in atmosphere
+	INTEGER NC		!Actual number of core rays 
+	INTEGER NP		!Total number of rays (ND+NC)
+	INTEGER NUM_BNDS	!Number of bans in linearization matrix
+	INTEGER MAX_SIM	!Maximum number of lines that can be treated sim.
+	INTEGER NCF_MAX	!Maximum number of frequencies that can be treated.
 !
-	INTEGER*4 ND_MAX,NP_MAX
-	INTEGER*4 N_LINE_MAX
+	INTEGER ND_MAX,NP_MAX
+	INTEGER N_LINE_MAX
 !
-	INTEGER*4 NM
-	INTEGER*4 NLF
-	INTEGER*4 NM_KI
-	INTEGER*4 TX_OFFSET
-	INTEGER*4 NION
-	INTEGER*4 DIAG_INDX
+	INTEGER NM
+	INTEGER NLF
+	INTEGER NM_KI
+	INTEGER TX_OFFSET
+	INTEGER NION
+	INTEGER DIAG_INDX
 !
 	CHARACTEr*20 TEMP_KEY
 !
 	REAL*8 T1		!Temporary variable
-	INTEGER*4 I,J,IOS,NT
-	INTEGER*4 EQ_TEMP
+	INTEGER I,J,IOS,NT
+	INTEGER EQ_TEMP
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 !
-	INTEGER*4, PARAMETER :: IZERO=0
-	INTEGER*4, PARAMETER :: IONE=1
-	INTEGER*4, PARAMETER :: LU_IN=7
-	INTEGER*4, PARAMETER :: LU_OUT=8
+	INTEGER, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: LU_IN=7
+	INTEGER, PARAMETER :: LU_OUT=8
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 !
-	INTEGER*4 NF
-	INTEGER*4 NS
-	INTEGER*4 NV
-	INTEGER*4 ID
-	INTEGER*4 ISPEC
-	INTEGER*4 NUM_IONS_RD
+	INTEGER NF
+	INTEGER NS
+	INTEGER NV
+	INTEGER ID
+	INTEGER ISPEC
+	INTEGER NUM_IONS_RD
 !
-	INTEGER*4 LUER
-	INTEGER*4 ERROR_LU
+	INTEGER LUER
+	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 !
 	LOGICAL AT_LEAST_ONE_ION_PRES
@@ -388,6 +390,8 @@
 	  WRITE(LUER,*)'STATUS=',IOS
 	  STOP
 	END IF
+	FLUX_MEAN(:)=0.0D0
+	ROSS_MEAN(:)=0.0D0
 !
 ! Allocate population vectors.
 !

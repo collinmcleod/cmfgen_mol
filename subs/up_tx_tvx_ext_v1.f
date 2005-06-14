@@ -33,7 +33,7 @@ C
 C
 C Created : 15-May-1987  Based on UP_TX_TVX
 C
-	INTEGER*4 NDEXT,ND,NM_TX,NM_KI
+	INTEGER NDEXT,ND,NM_TX,NM_KI
 	REAL*8 TX(NDEXT,ND,NM_TX)
 	REAL*8 TVX(NDEXT-1,ND,NM_TX)
 	REAL*8 KI(NDEXT,ND,NM_KI)
@@ -53,12 +53,12 @@ C Work Array.
 C
 	REAL*8 OLD_TX(NDEXT,ND)
 C
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
 C Local varables.
 C
-	INTEGER*4 I,J,K
+	INTEGER I,J,K
 	LOGICAL USE_EPS
 C
 C Determine whether we are using the G eddington factor to describe N

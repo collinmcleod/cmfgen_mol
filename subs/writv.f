@@ -5,12 +5,12 @@ C
 C Altered 28-May-1996 : IMPLICIT NONE installed.
 C Altered 30-APR-1985 : Now writes 10 columns instead of five across a page.)
 C
-	INTEGER*4 ND,LU
+	INTEGER ND,LU
 	REAL*8 F(ND)
 C
 C Local variables.
 C
-	INTEGER*4 I,J,L
+	INTEGER I,J,L
 C
 	CHARACTER*(*) A
 	L=1

@@ -23,7 +23,7 @@ C                         allows for recombinations to levels not explicitly
 C                         included.
 C Created  5-Oct-1987 (Based on WRPRRRGEN)
 C
-	INTEGER*4 N,ND,LU,ML,MF,I,MS,J,IOS
+	INTEGER N,ND,LU,ML,MF,I,MS,J,IOS
 	REAL*8 PR(N,ND)			!Radiative photioization rate
 	REAL*8 RR(N,ND)			!Radiative recombination rate
 	REAL*8 CPR(ND)			!Collisional ioization rate
@@ -40,8 +40,8 @@ C
 	REAL*8 ABS_SUM
 	REAL*8 ADVEC_SUM
 C
-	INTEGER*4 ERROR_LU,LUER
-	INTEGER*4, PARAMETER :: IZERO=0
+	INTEGER ERROR_LU,LUER
+	INTEGER, PARAMETER :: IZERO=0
 	EXTERNAL ERROR_LU
 C
 	NETRR(:)=0.0D0                 !ND

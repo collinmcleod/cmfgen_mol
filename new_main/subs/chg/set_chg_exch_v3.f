@@ -21,16 +21,16 @@
 ! Created 20-Aug-1998 : BASED on V1. Very different calls and a change in
 !                          philosiphy of how super levels are managed.
 !
-	INTEGER*4 ID    	!Ion identifier
-	INTEGER*4 N_S		!Number of super levels in atom
-	INTEGER*4 N_F		!Number of full levels in atom
-	INTEGER*4 ND		!Number of depth points
-	INTEGER*4 EQSPEC	!Eqaution of G.S. in BA matrix
-	INTEGER*4 EQHYD		!Sepecies equation in BA amtrix
+	INTEGER ID    	!Ion identifier
+	INTEGER N_S		!Number of super levels in atom
+	INTEGER N_F		!Number of full levels in atom
+	INTEGER ND		!Number of depth points
+	INTEGER EQSPEC	!Eqaution of G.S. in BA matrix
+	INTEGER EQHYD		!Sepecies equation in BA amtrix
 !
 	REAL*8 EDGE_F(N_F)
 	REAL*8 G_F(N_F)
-	INTEGER*4 F_TO_S(N_F)
+	INTEGER F_TO_S(N_F)
 !
 	CHARACTER*(*) LEVEL_NAMES(N_F)
 !
@@ -47,8 +47,8 @@
 	REAL*8 T_VEC(ND)
 	REAL*8 T1
 !
-	INTEGER*4 I,J,K,L
-	INTEGER*4 I_S,I_F
+	INTEGER I,J,K,L
+	INTEGER I_S,I_F
 	CHARACTER*(30) LOC_NAME
 	LOGICAL LEVEL_SET
 !

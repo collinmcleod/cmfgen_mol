@@ -11,20 +11,20 @@
 ! Altered 01-Apr-2004 : BA matrices allocated after all STEQ matrices.
 ! Created 05-Apr-2001
 !
-      INTEGER*4 NT
-      INTEGER*4 NUM_BNDS
-      INTEGER*4 ND
-      INTEGER*4 NION
+      INTEGER NT
+      INTEGER NUM_BNDS
+      INTEGER ND
+      INTEGER NION
 !
-      INTEGER*4 ID
-      INTEGER*4 ISPEC
-      INTEGER*4 IOS
-      INTEGER*4 NSUM
-      INTEGER*4 LU_ER,ERROR_LU
+      INTEGER ID
+      INTEGER ISPEC
+      INTEGER IOS
+      INTEGER NSUM
+      INTEGER LU_ER,ERROR_LU
       EXTERNAL ERROR_LU
 !
-      INTEGER*4 MEMORY
-      INTEGER*4 I,NX,NY
+      INTEGER MEMORY
+      INTEGER I,NX,NY
 !
       LU_ER=ERROR_LU()
 !

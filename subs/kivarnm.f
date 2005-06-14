@@ -16,7 +16,7 @@ C Altered 24-May-1996 - IMPLCIT NONE installed.
 C                         Initialization of VK now done using F90.
 C Altered 7-SEP-1982 (variable NM)
 C
-	INTEGER*4 LS,NC,NI,NM
+	INTEGER LS,NC,NI,NM
 C
 	REAL*8 VK(NI,3,NM),RKB(NI),RKC(NI),X(NI)
 	REAL*8 DTAU(NI),Q(NI),QH(NI),UK(NI),UKM1(NI),Z(NI)
@@ -27,7 +27,7 @@ C
 C Local variables.
 C
 	REAL*8 T1,T2,T3,T4,T5,T6,T7
-	INTEGER*4 I,J,K
+	INTEGER I,J,K
 C
 	VK(:,:,:)=0.0D0
 C

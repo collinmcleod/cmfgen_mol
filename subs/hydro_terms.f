@@ -14,7 +14,7 @@ C Altered 24-May-1996 : L GEN_ASCI_OPEN and ERROR_LU installed.
 C Altered 06-Mar-1996 : Description of terms added to output.
 C Created 28-Mar-1994
 C
-	INTEGER*4 ND,LU_OUT
+	INTEGER ND,LU_OUT
 C
 	REAL*8 POP_ATOM(ND)
 	REAL*8 R(ND)
@@ -58,7 +58,7 @@ C
 	REAL*8 RAD_CON
 C
 	CHARACTER*80 FMT
-	INTEGER*4 I,IOS,ERROR_LU
+	INTEGER I,IOS,ERROR_LU
 	EXTERNAL ERROR_LU
 C
 	I=0

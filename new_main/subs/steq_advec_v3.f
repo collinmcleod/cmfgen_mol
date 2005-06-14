@@ -15,10 +15,10 @@
 ! Altered 05-May-2004 - Bug fix when updating BA for k=ND: MP1=M-1 not ND-1 
 ! Created 20-Jan-2003
 !
-	INTEGER*4 ID
-	INTEGER*4 N_S
-	INTEGER*4 NUM_BNDS
-	INTEGER*4 ND
+	INTEGER ID
+	INTEGER N_S
+	INTEGER NUM_BNDS
+	INTEGER ND
 !
 	REAL*8 HN_S(N_S,ND)
 	REAL*8 DI_S(ND)
@@ -32,10 +32,10 @@
 !
 ! Local variables.
 !
-	INTEGER*4 K,KP1			!Depth index
-	INTEGER*4 M,MP1			!Band index
-	INTEGER*4 I			!Variable index
-	INTEGER*4 EQION
+	INTEGER K,KP1			!Depth index
+	INTEGER M,MP1			!Band index
+	INTEGER I			!Variable index
+	INTEGER EQION
 !
 	REAL*8 T1,T2
 	REAL*8 DERIV_FAC

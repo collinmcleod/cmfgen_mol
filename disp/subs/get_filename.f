@@ -19,14 +19,14 @@ C 10-Nov-1990 --- Bug fix, cleaned.
 C 11-Oct-1990 --- Extensively altered (Name changed to GET_FILENAME)
 C 28-Nov-1989 --- Created .
 C
-	INTEGER*4 LUIN,LUOUT,EXIST
+	INTEGER LUIN,LUOUT,EXIST
 	CHARACTER*(*) FILNAME,DESC2,MARK
 	CHARACTER*80 DIRNAME,DESC
 	DATA DIRNAME/' '/		!Initialize first time
 	SAVE DIRNAME			!Need on subsequent calls
 C
 	EXTERNAL ICHRLEN,TERMINAL_LU
-	INTEGER*4 ICHRLEN,LFIL,LDIR,LENFIL,LENDIR,LDESC
+	INTEGER ICHRLEN,LFIL,LDIR,LENFIL,LENDIR,LDESC
 	LOGICAL TERMINAL_LU,INTERACTIVE,FILE_PRES
 C
 C If interactive, we promft for file name again if an error has occurred.

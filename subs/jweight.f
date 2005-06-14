@@ -16,9 +16,9 @@ C Altered 18-Feb-1987 - Quadratic extrapolation to zero if X(N) .NE. 0
 C Altered 25-Feb-1987 - Normalization implemented.
 C
 	IMPLICIT NONE
-	INTEGER*4 N,I
+	INTEGER N,I
 	REAL*8 X(N),W(N),H,HN,RE,RF,SUM
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 	W(:)=0.0D0

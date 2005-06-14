@@ -1,18 +1,18 @@
 	MODULE STRK_MOD_HHE
 	IMPLICIT NONE
 !
-	INTEGER*4 STKTA_NWS		!Number of frequencies prof. tabulated at.
-	INTEGER*4 STKTA_NTS		!Number of temperatues prof. tabulated at.
-	INTEGER*4 STKTA_NES		!Number of Ne densities prof. tabulated at.
-	INTEGER*4 STKTA_NPS		!Number of Ne densities prof. tabulated at.
+	INTEGER STKTA_NWS		!Number of frequencies prof. tabulated at.
+	INTEGER STKTA_NTS		!Number of temperatues prof. tabulated at.
+	INTEGER STKTA_NES		!Number of Ne densities prof. tabulated at.
+	INTEGER STKTA_NPS		!Number of Ne densities prof. tabulated at.
 !
 	REAL*8, ALLOCATABLE :: STKTA_DWS(:)	!Offset from line center (Ang)
 	REAL*8, ALLOCATABLE :: STKTA_TS(:)	!Temperature (Log T(K))
 	REAL*8, ALLOCATABLE :: STKTA_ES(:)	!Log Ne (cgs units) 
 	REAL*8, ALLOCATABLE :: STKTA_PS(:)	!Phi(v)
 !
-	INTEGER*4 NL_STRK	!Lower levels
-	INTEGER*4 NUP_STRK	!Upper level
+	INTEGER NL_STRK	!Lower levels
+	INTEGER NUP_STRK	!Upper level
 !
 	LOGICAL STKTA_QHALF	!If TRUE, on half of profile tabulated
 	LOGICAL STKTA_WSCA      ! Lambda (in A) o
@@ -28,16 +28,16 @@
 	REAL*8 NU_ZERO
 	CHARACTER*(*) SPECIES
 	CHARACTER*(*) PROF_TYPE
-	INTEGER*4 NL,NUP
-	INTEGER*4 PROF_ID
-	INTEGER*4 LUSTK
+	INTEGER NL,NUP
+	INTEGER PROF_ID
+	INTEGER LUSTK
 !
-	INTEGER*4 ERROR_LU
+	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 !
 	CHARACTER*3 LOCAL_SPECIES
-	INTEGER*4 LTBL
-	INTEGER*4 I
+	INTEGER LTBL
+	INTEGER I
 !
 ! I profile was found, we read in the tabulated data
 !

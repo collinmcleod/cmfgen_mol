@@ -23,10 +23,10 @@ C                     assume X(N+1)=0 with W(N+1)=0.0 with out loss of
 C                     accuracy.
 C Created 25-Nov-1986 (Based on KWEIGHT)
 C
-	INTEGER*4 N,I
+	INTEGER N,I
 	REAL*8 X(N),W(N),T1,T2,SUM
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 	W(:)=0.0D0

@@ -19,7 +19,7 @@ C                         successive calls. CALL altered.
 C Altered 27-Sep-1990 - HE2 is now converted to departure coefficients
 C                       in routine.
 C
-	INTEGER*4 N,ND,NSPEC,NSPEC_MAX
+	INTEGER N,ND,NSPEC,NSPEC_MAX
 	REAL*8 HE2(N,ND)
 	REAL*8 HE2LTE(N,ND)
 	REAL*8 W_HE2(N,ND)
@@ -34,10 +34,10 @@ C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
 C
-	INTEGER*4 I,J
+	INTEGER I,J
 	REAL*8 T1,T2
 C
-	INTEGER*4 ERROR_LU,LUER
+	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
 	IF(.NOT. PRES)RETURN

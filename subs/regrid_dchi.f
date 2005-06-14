@@ -17,12 +17,12 @@ C Altered  4-May-1988 - Bug fix - was not incrememting F2DA(I,K+3) correctly.
 C Altered 26-Apr-1988 - Bug fix. F2DA now zeroed.
 C Created  5-Apr-1988
 C
-	INTEGER*4 ND,NDEXT,INDX(NDEXT),GRID(ND)
+	INTEGER ND,NDEXT,INDX(NDEXT),GRID(ND)
 	REAL*8 F2DA(ND,ND),CHI(ND),T1
 	REAL*8 F2DAEXT(NDEXT,NDEXT)
 	REAL*8 CHIEXT(NDEXT),COEF(0:3,NDEXT)
 C
-	INTEGER*4 I,J,K
+	INTEGER I,J,K
 C
 	F2DA(:,:)=0.0D0
 	DO J=1,NDEXT

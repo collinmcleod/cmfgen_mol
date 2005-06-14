@@ -9,12 +9,12 @@
 ! Input: Note that NLINES only has to be large enough to handle overlapping
 !        HI and HeII profiles.
 !
-	INTEGER*4 ND		!Number of depth points
-	INTEGER*4 NLINES	!Maximum number of profiles to be stored
-	INTEGER*4 NFREQ		!Maximum number of frequencies / profile
+	INTEGER ND		!Number of depth points
+	INTEGER NLINES	!Maximum number of profiles to be stored
+	INTEGER NFREQ		!Maximum number of frequencies / profile
 !
-	INTEGER*4 IOS
-	INTEGER*4 ERROR_LU
+	INTEGER IOS
+	INTEGER ERROR_LU
 	REAL*8 SPEED_OF_LIGHT
 	REAL*8 FUN_PI
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT

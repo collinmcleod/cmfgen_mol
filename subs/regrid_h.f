@@ -9,7 +9,7 @@ C Altered  : 29-MAy-1996 : Bug fix. Incorrect dimension passed to MON_INTERP.
 C                            No effect on computation.
 C Finalized 05-Jan-1995
 C
-	INTEGER*4 ND
+	INTEGER ND
 	REAL*8 HNU(ND)		!Returned - Flux on nodes
 C
 	REAL*8 R(ND)
@@ -23,7 +23,7 @@ C
 C
 C Local variables
 C
-	INTEGER*4 ND_M1,ND_M2,I,IONE
+	INTEGER ND_M1,ND_M2,I,IONE
 	PARAMETER (IONE=1)
 C
 C Compute points of radius grid. RSQHNU is defined on this grid.

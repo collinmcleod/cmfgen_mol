@@ -11,14 +11,14 @@
 ! Altered 26-Mar-2002: Data_TYPE inserted into call.
 !                      Changed to version V2
 !
-	INTEGER*4 NBB
+	INTEGER NBB
 	REAL*8 XV(NBB),YV(NBB)
 	LOGICAL LOG_X,LOG_Y,X_ONLY
 	CHARACTER*(*) DATA_TYPE
 	CHARACTER*(*) X_UNIT,Y_PLT_OPT
 	CHARACTER*(*) X_LAB,Y_LAB
 C
-	INTEGER*4 I
+	INTEGER I
 	REAL*8 LAMC
 	REAL*8 T1
 C              

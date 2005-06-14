@@ -45,7 +45,7 @@ C                       are now returned with the continuum subtracted out.
 C Finalized and Tested 28-Apr-1989.
 C Created 10-JAN-1989
 C
-	INTEGER*4 NLF,NC,NP,ND
+	INTEGER NLF,NC,NP,ND
 	REAL*8 ETA(ND),CHI(ND),THETA(ND),ESEC(ND)
 	REAL*8 CHIL(ND),ETAL(ND),JCONT(ND)
 	REAL*8 V(ND),SIGMA(ND),R(ND)
@@ -73,8 +73,8 @@ C
 C
 C Local variables.
 C
-	INTEGER*4, PARAMETER :: IONE=1
-	INTEGER*4 I,ML
+	INTEGER, PARAMETER :: IONE=1
+	INTEGER I,ML
 	REAL*8 T1,T2,DNU,SCALE
 C
 C Zero vecters. These were originally zerroed in a common block. There is
