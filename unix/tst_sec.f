@@ -1,6 +1,6 @@
         PROGRAM TST_SEC
         REAL*8 T1
-        INTEGER*4 IC0,IC,IR,IM
+        INTEGER IC0,IC,IR,IM
         CALL SYSTEM_CLOCK(IC0,IR,IM)
 !
         WRITE(6,*)'IC=',IC0

@@ -28,11 +28,11 @@ C
 !                       Wall time now returened as in original VMS routine.
 !                       Counters now initialized if LRUN=0 is passed.
 !
-	INTEGER*4 LRUN
+	INTEGER LRUN
 	CHARACTER*(*) IDENT
 !
-	INTEGER*4, PARAMETER :: MAX_IDS=50
-	INTEGER*4, PARAMETER :: LUOUT=55
+	INTEGER, PARAMETER :: MAX_IDS=50
+	INTEGER, PARAMETER :: LUOUT=55
 !
         REAL*8 T0,OVERHEAD
         REAL*8 ST_CPU(MAX_IDS)
