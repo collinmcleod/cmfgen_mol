@@ -466,6 +466,7 @@
           WRITE(T_OUT,*)'E=EXIT from PLOT package'
 	  WRITE(T_OUT,*)'Z=Hardcopy (ZN=Asks for new hard device)'
           WRITE(T_OUT,*)'A=Define Axis Parameters'
+          WRITE(T_OUT,*)'2A=Define labeling of right-hand axis'
           WRITE(T_OUT,*)'F=Change default axis parameters'
 	  WRITE(T_OUT,*)'L=Modify Axis Labels and Titles'
  	  WRITE(T_OUT,*)'D=Switch dashed lines on/off'
@@ -491,13 +492,34 @@
           WRITE(T_OUT,*)'SC=Define strings using cursor'
           WRITE(T_OUT,*)'SF=Define strings using file input'
           WRITE(T_OUT,*)'SE=Online edit of strings'
+          WRITE(T_OUT,*)'RID=REad line ID''s'
+          WRITE(T_OUT,*)'SID=Change defaults for writing line ID''s'
 	  WRITE(T_OUT,*)'CL=Clear Graphics Screen'
-	  WRITE(T_OUT,*)'WP=Write plots to file'
-	  WRITE(T_OUT,*)'RP=Read plots from file'
+	  READ(T_IN,'(A)')ANS				!can use ANS here.
+	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
+!
 	  WRITE(T_OUT,*)'VEL=Convert X axis to km/s space'
 	  WRITE(T_OUT,*)'XAR=Simple X axis arithmetic'
 	  WRITE(T_OUT,*)'YAR=Simple Y axis arithmetic'
 	  WRITE(T_OUT,*)'VAR=Simple arithmetic on two plots'
+	  WRITE(T_OUT,*)'SIG=Compute mean and standard deviation'
+	  WRITE(T_OUT,*)'NM=Scale average to 1 or to another plot'
+!
+	  WRITE(T_OUT,*)'RXY=Read plot from asci file'
+	  WRITE(T_OUT,*)'WXY=Write plot to asci file'
+	  WRITE(T_OUT,*)'SXY=Write section of data to terminal'
+	  WRITE(T_OUT,*)'RP=Read labeled plots from firct accecs file'
+	  WRITE(T_OUT,*)'RPF=Similar to RP but asks for filename'
+	  WRITE(T_OUT,*)'WP=Write labeled plots to direct access file'
+	  WRITE(T_OUT,*)'WPF=Similar to WP but asks for filename'
+	  READ(T_IN,'(A)')ANS				!can use ANS here.
+	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
+!
+	  WRITE(T_OUT,*)'OLF=Open LOG file'
+	  WRITE(T_OUT,*)'OIF=Open input file'
+	  WRITE(T_OUT,*)'CLF=Close LOG file'
+	  WRITE(T_OUT,*)'CIF=Close inpit file'
+!
 	  WRITE(T_OUT,*)'NOI=Leave data intact on exit (switch)'
 	  WRITE(T_OUT,*)'H=Help'
           GOTO 1000
