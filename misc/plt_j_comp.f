@@ -2,7 +2,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
-	INTEGER, PARAMETER :: NCF_MAX=150000
+	INTEGER, PARAMETER :: NCF_MAX=400000
 !
 	REAL*8 INDX(NCF_MAX)
 	REAL*8 NU(NCF_MAX)
@@ -18,10 +18,13 @@
 !
 	CHARACTER*80 FILENAME
 	CHARACTER*80 STRING
+        CHARACTER*30 UC
+        EXTERNAL UC
 !
 	REAL*8 SUM1
 	REAL*8 SUM2
 	REAL*8 SUM3
+	CHARACTER*20 PLT_OPT
 !
 	INTEGER I,IBEG
 	INTEGER NCF
@@ -58,15 +61,6 @@
 	  NCF=I-1
 	CLOSE(UNIT=11)
 !
-	CALL DP_CURVE(NCF,NU,DIFF_OUT)
-	CALL GRAMON_PGPLOT('\gn(10\u15\ \dHz)','% Difference',' ',' ')
-!
-	DO I=1,NCF
-	  NU(I)=DLOG10(NU(I))
-	END DO
-	CALL DP_CURVE(NCF,NU,DIFF_OUT)
-	CALL GRAMON_PGPLOT('\gn(10\u15\ \dHz)','% Difference',' ',' ')
-!
 	SUM1=0.0D0
 	SUM2=0.0D0
 	SUM3=0.0D0
@@ -78,7 +72,21 @@
 	WRITE(6,*)'Mean difference is ', SUM1
 	WRITE(6,*)'Mean absolute difference is ', SUM3
 	WRITE(6,*)'Root mean square is',SUM2
-	  SUM1=SUM1
 !
-	STOP
+	WRITE(6,*)' '
+	WRITE(6,*)'Plot options are:'
+	WRITE(6,*)' JF:  J against frequency at outer boundary'
+	WRITE(6,*)' DF:  Error are frequency at outer boundary'
+	WRITE(6,*)' E(X):  Exit routine'
+	CALL GEN_IN(PLT_OPT,'Plot option')
+	IF(UC(PLT_OPT) .EQ. 'JF')THEN
+	  CALL DP_CURVE(NCF,NU,JR_OUT)
+	  CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J',' ',' ')
+	ELSE IF(UC(PLT_OPT) .EQ. 'DF')THEN
+	  CALL DP_CURVE(NCF,NU,DIFF_OUT)
+	  CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','% Difference',' ',' ')
+	ELSE
+	 STOP
+	END IF
+!
 	END

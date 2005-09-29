@@ -123,8 +123,7 @@ C
 	  ELSE IF(VELTYPE .EQ. 7)THEN
 	    CALL RD_STORE_NCHAR(VEL_OPTION,'VEL_OPT',ITEN,L_TRUE,
 	1                        'Velocity option: RVSIG_COL or deKOTER')
-	    CALL RD_STORE_DBLE(VINF1,'VINF',L_TRUE,
-	1           'Terminal velocity (km/s)')
+	    CALL RD_STORE_DBLE(VINF1,'VINF',L_TRUE,'Terminal velocity (km/s)')
 	    VCORE=0.0D0		!Not used but initialized
 	    VPHOT=0.0D0
 	    SCL_HT=0.0D0
@@ -147,13 +146,21 @@ C
 	1                ' in this version of CMFGEN'
 	    STOP
 	  END IF
+!
+	  VAR_MDOT=.FALSE.
+	  IF(VELTYPE .EQ. 7)THEN
+	    CALL RD_STORE_LOG(VAR_MDOT,'VAR_MDOT','L_FALSE','Variable mass-loss rate model?') 
+	    CALL RD_STORE_NCHAR(VAR_MDOT_FILE,'VM_FILE',ITEN,VAR_MDOT,
+	1                        'File with density and clumping info')
+	  END IF
 C
-	  CALL RD_STORE_DBLE(RMDOT,'MDOT',L_TRUE,
-	1            'Mass Loss rate (Msun/yr) ')
-	  CALL RD_STORE_DBLE(LUM,'LSTAR',L_TRUE,
-	1      'Stellar luminosity (Lsun)')
-	  CALL RD_STORE_DBLE(STARS_MASS,'MASS',L_TRUE,
-	1      'Stellar mass (Msun)')
+	  IF(VAR_MDOT .OR. SN_MODEL)THEN
+	    RMDOT=1.0D-20
+	  ELSE
+	    CALL RD_STORE_DBLE(RMDOT,'MDOT',L_TRUE,'Mass Loss rate (Msun/yr) ')
+	  END IF
+	  CALL RD_STORE_DBLE(LUM,'LSTAR',L_TRUE,'Stellar luminosity (Lsun)')
+	  CALL RD_STORE_DBLE(STARS_MASS,'MASS',L_TRUE,'Stellar mass (Msun)')
 C
 C All clumping parameters are read in, even when CLUMPING is switched off.
 C

@@ -278,7 +278,12 @@ C
 	  DO I=NLST+1,NMAX
 	    READ(10,'(A)',END=1000)STRING(1)
 	    IF(INDEX(STRING(1),'********************') .NE. 0)GOTO 2000
-	    READ(STRING(1),*,END=1000)(TEMP_STORE(J),J=1,K)
+	    READ(STRING(1),*,END=1000,IOSTAT=IOS)(TEMP_STORE(J),J=1,K)
+	    IF(IOS .NE. 0)THEN
+	     WRITE(T_OUT,*)'Error reading observational data. String is:'
+	     WRITE(T_OUT,*)TRIM(STRING(1))
+	     RETURN
+	    END IF
 	    LAM(I)=TEMP_STORE(COLS(1))
 	    FLUX(I)=TEMP_STORE(COLS(2))
 	    NPTS=I

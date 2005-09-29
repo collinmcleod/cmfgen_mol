@@ -216,6 +216,11 @@
 	  END DO
           IF(VDOP_FRAC .NE. VDOP_FRAC_SAV)NEW_R_GRID=.TRUE.
 	END IF
+	IF(FIRST_TIME)THEN
+          OPEN(UNIT=47,FILE='MOM_J_ERRORS',STATUS='UNKNOWN')
+        ELSE IF(INIT)THEN
+	  REWIND(47)
+	END IF
 !
 ! Deallocate all arrayes if we have changed VDOP_FRAC. This will only
 ! be done in testing this routine (e.g., using DISPGEN).

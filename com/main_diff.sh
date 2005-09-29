@@ -37,5 +37,5 @@ echo " " >> Diff_output
 
 foreach i ($main) 
     echo $i >> Diff_output 
-    sdiff -s -w200 $i $second >> Diff_output ;            #rename file on disk
+    sdiff -s -w150 $i $second >> Diff_output ;            #rename file on disk
 end

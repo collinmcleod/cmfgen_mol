@@ -16,6 +16,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(do_vec_op.o)\
       $(LIB)(draw_right_y_axis.o)\
       $(LIB)(fntick.o)\
+      $(LIB)(get_gramon_min_max.o)\
       $(LIB)(gramon_pgplot.o)\
       $(LIB)(hist_adj.o)\
       $(LIB)(justify_convert_v2.o)\
@@ -23,7 +24,10 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(monbord_v3.o)\
       $(LIB)(moninside.o)\
       $(LIB)(spacing.o)\
-      $(LIB)(vectorpen.o)
+      $(LIB)(vectorpen.o)\
+      $(LIB)(gaus_fit_data.o)\
+      $(LIB)(do_gaus_fit.o)\
+      $(LIB)(gaus_fit_func.o)
 
 all : $(LIB)
 	rm -f *.o
@@ -51,6 +55,7 @@ $(LIB)(gramon_pgplot.o)   : gramon_pgplot.f $(LIB)(mod_curve_data.o) $(GEN)
 $(LIB)(curve.o)           : curve.f         $(LIB)(mod_curve_data.o) $(GEN)
 $(LIB)(vectorpen.o)       : vectorpen.f     $(LIB)(mod_curve_data.o) $(GEN)
 
+$(LIB)(gaus_fit_func.o)   : gaus_fit_func.f $(LIB)(gaus_fit_data.o)
 $(GEN):
 	(cd ../tools; make )
 

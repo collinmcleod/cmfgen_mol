@@ -6,6 +6,7 @@
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
+! Altered:  23-Aug-2005 : Grey pen option installed.
 ! Altered:  26-Jan-2005 : Change default margins to give more room on borders.
 ! Altered:  30-May-2003 : Improvements to YAR and XAR options.
 ! Altered:  11-Feb-2002 : Bug fixed with EW option for reversed data.
@@ -194,7 +195,7 @@
 	INTEGER, PARAMETER :: T_OUT=6
 !
 ! Loop variables
-	INTEGER I,J,K,L,CNT,IP
+	INTEGER I,J,K,L,CNT,IP,OP
 	INTEGER IP_ST,IP_END
 !
 ! Color variables
@@ -357,48 +358,9 @@
 	ANS='P'
 	FIRST=.TRUE.
 !
-! Look for absica limits
+! Get absica and ordinate limits.
 !
-	XMIN=CD(1)%XVEC(1)
-	XMAX=CD(1)%XVEC(1)
-	DO IP=1,NPLTS
-	  T1=MINVAl(CD(IP)%XVEC)
-	  XMIN=MIN(XMIN,T1)
-	  T1=MAXVAL(CD(IP)%XVEC)
-	  XMAX=MAX(XMAX,T1)
-	END DO
-!
-! Look for ordinate limits
-!
-	YMIN=CD(1)%DATA(1)
-	YMAX=CD(1)%DATA(1)
-	DO IP=1,NPLTS
-	  T1=MINVAL(CD(IP)%DATA)
-	  YMIN=MIN(YMIN,T1)
-	  T1=MAXVAL(CD(IP)%DATA)
-	  YMAX=MAX(YMAX,T1)
-	END DO
-!
-! Check range of validity
-!
-	IF(YMAX .EQ. 0 .AND. YMIN .EQ. 0)THEN
-	  YMIN=0.0
-	  YMAX=1.0
-	  WRITE(T_OUT,*)'Y limits are zero - setting default values'
-	ELSE IF(ABS(YMAX-YMIN)/MAX(ABS(YMAX),ABS(YMIN)) .LT. 1.0D-08)THEN
-	  YMIN=0.0
-	  YMAX=1.0
-	  WRITE(T_OUT,*)'Invalid Y limits - setting default values'
-	END IF
-	IF(XMAX .EQ. 0 .AND. XMIN .EQ. 0)THEN
-	  XMIN=0.0
-	  XMAX=1.0
-	  WRITE(T_OUT,*)'X limits are zero - setting default values'
-	ELSE IF(ABS(XMAX-XMIN)/MAX(ABS(XMAX),ABS(XMIN)) .LT. 1.0D-08)THEN
-	  XMIN=0.0
-	  XMAX=1.0
-	  WRITE(T_OUT,*)'Invalid X limits - setting default values'
-	END IF
+	CALL GET_GRAMON_MIN_MAX(XMIN,XMAX,YMIN,YMAX,TYPE_CURVE,T_OUT) 
 !
 	XPAR(1)=XMIN
 	XPAR(2)=XMAX
@@ -525,8 +487,9 @@
           GOTO 1000
 !
 ! Exit from Ploting package, saving STRING and VECTOR information.
-! IF the NOI option has been issued, the plots will still be 
+! If the NOI option has been issued, the plots will still be 
 ! retained.
+!
 	ELSE IF(ANS .EQ. 'E')THEN
 	  IF(INITIALIZE_ON_EXIT)THEN
 	    DO IP=1,NPLTS
@@ -622,6 +585,11 @@ C Determine number of decimals
 	END IF
 C
 	IF(ANS .EQ. 'A' .OR. ANS .EQ. 'F')THEN
+!
+! Get absica and ordinate limits.
+!
+	  CALL GET_GRAMON_MIN_MAX(XMIN,XMAX,YMIN,YMAX,TYPE_CURVE,T_OUT) 
+!
 	  WRITE(T_OUT,4) XMIN,XMAX
 	  CALL NEW_GEN_IN(XPAR,I,ITWO,'XST,XEND')
 C
@@ -815,6 +783,36 @@ C
 	  GOTO 1000
 	ELSE IF(ANS .EQ. 'CP')THEN
 	  CALL CHANGE_PEN(PEN_COL,MAXPEN,NPLTS)
+	  GOTO 1000
+!
+! Reset default pen color. Useful after GP option.
+!
+	ELSE IF(ANS .EQ. 'RCP')THEN
+	  CALL PGSCR(0,.7,.7,.7)     !set color representations
+	  CALL PGSCR(1,0.0,0.0,0.0)
+	  CALL PGSCR(2,1.0,0.0,0.0)
+	  CALL PGSCR(3,0.0,0.0,1.0)
+	  CALL PGSCR(4,0.0,0.6,0.3)
+	  CALL PGSCR(5,.5,0.0,.7)
+	  CALL PGSCR(13,0.0,1.0,1.0)
+	  CALL PGSCR(15,.95,.95,.95)
+          DO I=0,15                  !Get these + def color representations.
+            CALL PGQCR(I,RED(I),GREEN(I),BLUE(I))
+          END DO
+	ELSE IF(ANS .EQ. 'GP')THEN
+!
+! Set preferred defaults for grey pens.
+!
+	  CALL PGSCR(0,1.0,1.0,1.0)     !set color representations
+	  CALL PGSCR(1,0.0,0.0,0.0)
+	  CALL PGSCR(2,0.0,0.0,0.0)
+	  CALL PGSCR(3,0.4,0.4,0.4)
+	  CALL PGSCR(4,0.8,0.8,0.8)
+	  CALL PGSCR(5,0.2,0.2,0.2)
+	  CALL PGSCR(6,0.6,0.6,0.6)
+          DO I=0,15                  !Get these + def color representations.
+            CALL PGQCR(I,RED(I),GREEN(I),BLUE(I))
+          END DO
 	  GOTO 1000
 !
 !Option to adjust the shape of the box, and the tick marks tec.
@@ -1271,6 +1269,14 @@ C
 	  CONTINUUM_DEFINED=.TRUE.
 	  GOTO 1000
 C
+	ELSE IF(ANS .EQ. 'GF')THEN
+	  CALL DO_GAUS_FIT(XPAR(1),XPAR(2))
+	  GOTO 1000
+!
+	ELSE IF(ANS .EQ. 'DG')THEN
+	  CALL DRAW_GAUS()
+	  GOTO 1000
+!
 	ELSE IF(ANS .EQ. 'EW')THEN
 !
 	  IF(CONTINUUM_DEFINED)THEN
@@ -1895,6 +1901,33 @@ C
 	  TYPE_CURVE(VAR_PLT3)='L'
 	  CALL NEW_GEN_IN(VAR_PLT3,'Output plot?')
 	  CALL DO_VEC_OP(VAR_PLT1,VAR_PLT2,VAR_PLT3,.TRUE.,VAR_OPERATION)
+	  GOTO 1000
+!
+	ELSE IF (ANS .EQ. 'CUM')THEN
+	  CALL NEW_GEN_IN(IP,'Input plot 1?')
+	  OP=NPLTS+1
+	  CALL NEW_GEN_IN(OP,'Output plot?')
+	  TYPE_CURVE(OP)='L'
+	  IF(OP .NE. IP .AND. ASSOCIATED(CD(OP)%XVEC))THEN
+            DEALLOCATE (CD(OP)%XVEC)
+            DEALLOCATE (CD(OP)%DATA)
+          END IF
+          IF(.NOT. ASSOCIATED(CD(OP)%XVEC))THEN
+	    ALLOCATE (CD(OP)%XVEC(NPTS(IP)),STAT=IOS)
+            IF(IOS .EQ. 0)ALLOCATE (CD(OP)%DATA(NPTS(IP)),STAT=IOS)
+	  END IF
+	  T1=CD(IP)%DATA(1)
+          CD(OP)%DATA(1)=0
+          DO I=2,NPTS(IP)
+	    T2=CD(IP)%DATA(I)
+	    CD(OP)%DATA(I)=CD(OP)%DATA(I-1)+0.5D0*(T1+T2)*
+	1              ABS(CD(IP)%XVEC(I)-CD(IP)%XVEC(I-1))
+	    T1=T2
+	  END DO
+	  IF(IP .NE. OP)CD(OP)%XVEC=CD(IP)%XVEC
+	  NPTS(OP)=NPTS(IP)
+	  ERR(OP)=.FALSE.
+	  IF(OP .GT. NPLTS)NPLTS=OP
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'NM')THEN

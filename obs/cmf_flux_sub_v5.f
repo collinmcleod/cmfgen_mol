@@ -415,8 +415,8 @@ C
 	REAL*8 FILL_FAC_XRAYS,T_SHOCK,V_SHOCK
 	REAL*8 FILL_VEC_SQ(ND)
 	REAL*8 XRAY_LUM(ND)
-	REAL*8 GFF,XCROSS
-	EXTERNAL GFF,XCROSS
+	REAL*8 GFF,XCROSS_V2
+	EXTERNAL GFF,XCROSS_V2
 C
 C
 C
@@ -963,7 +963,15 @@ C
 	IF(RD_STARK_FILE .OR. GLOBAL_LINE_PROF(1:4) .EQ. 'LIST')THEN
 	  CALL RD_STRK_LIST(LUIN)
 	END IF
-!                     
+!
+! Read in atomic data for 2-photon transitions.
+!
+	CALL RD_TWO_PHOT(LUIN,INCL_TWO_PHOT)
+!
+! Read in X-ray photoionization cross-sections.
+!
+	CALL RD_XRAY_FITS(LUIN)
+!
 ! We now need to compute the populations for the model atom with Super-levels.
 ! We do this in reverse order (i.e. highest ionization stage first) in order
 ! that we the ion density for the lower ionization stage is available for
@@ -973,7 +981,7 @@ C
 ! We only do to NUM_IONS-1 to avoid access arror, and since the ion
 ! corresponding to NUM_IONS contains only 1 level and is done with NUM_IONS-1
 !
-	  DO ID=1,NUM_IONS-1
+	  DO ID=NUM_IONS-1,1,-1
 	    CALL FULL_TO_SUP( 
 	1        ATM(ID)%XzV,        ATM(ID)%NXzV,   ATM(ID)%DXzV,
 	1        ATM(ID)%XzV_PRES,   ATM(ID)%XzV_F,
@@ -1036,10 +1044,17 @@ C we know it has the correct length since it is the same size as NU.
 C LUIN --- Used as temporary LU (opened and closed).
 C
 	  J=NCF
-	  CALL SET_CONT_FREQ(NU,OBS,FQW,
+!	  CALL SET_CONT_FREQ(NU,OBS,FQW,
+!	1                        SMALL_FREQ_RAT,BIG_FREQ_AMP,dFREQ_BF_MAX,
+!	1                        MAX_CONT_FREQ,MIN_CONT_FREQ,
+!	1                        dV_LEV_DIS,AMP_DIS,MIN_FREQ_LEV_DIS,
+!	1                        J,NCF,NCF_MAX,LUIN)
+	T1=5000.0D0
+	  CALL SET_CONT_FREQ_V4(NU,OBS,FQW,
 	1                        SMALL_FREQ_RAT,BIG_FREQ_AMP,dFREQ_BF_MAX,
 	1                        MAX_CONT_FREQ,MIN_CONT_FREQ,
 	1                        dV_LEV_DIS,AMP_DIS,MIN_FREQ_LEV_DIS,
+	1                        DELV_CONT,DELV_CONT,T1,
 	1                        J,NCF,NCF_MAX,LUIN)
 C                                             
 C                         

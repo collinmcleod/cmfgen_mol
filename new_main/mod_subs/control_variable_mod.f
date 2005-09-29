@@ -46,6 +46,11 @@
 	REAL*8 V_BETA2,V_EPPS2		!VINF2 above
 	INTEGER VELTYPE
 !
+! Variable Mdot parameters
+!
+	LOGICAL VAR_MDOT
+	CHARACTER*80 VAR_MDOT_FILE
+!
 ! Supernova variables
 !
 	REAL*8 RHO_ZERO			!Density at core in atmos/cm^3

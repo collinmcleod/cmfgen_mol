@@ -20,7 +20,7 @@ c
 	IMPLICIT NONE
 C
 C Altered: 13-Apr-2003: Bug fix: dNU replaced by dNU_NEXT in if statement (line 287)
-C Created: 22-Dec-1998: Complete rewrite of INS_LINE_V4.
+C Created: 22-Dec-1998: Complete rewrite of INS_LINE_V5.
 C                       Written to handle lines with different intrinsic
 C                         profile extents.
 C
@@ -89,7 +89,7 @@ C
 	INTEGER LOCAL_N_LINES
 C
 	INTEGER ML		!Continuum frequency index
-	INTEGER I,K		!Miscellaneous loop variables.
+	INTEGER I,J,K		!Miscellaneous loop variables.
 	INTEGER LU_ER
 	REAL*8 C_KMS
 	REAL*8 dNU
@@ -136,7 +136,7 @@ C
 	  LOCAL_N_LINES=LOCAL_N_LINES-1
 	END DO
 	IF(N_LINES .NE. LOCAL_N_LINES)THEN
-	  WRITE(LU_ER,*)'Warning from INS_LINE_V4'
+	  WRITE(LU_ER,*)'Warning from INS_LINE_V5'
 	  WRITE(LU_ER,'(X,I5,A,A)')N_LINES-LOCAL_N_LINES,
 	1        ' weak lines in extreme ',
 	1        'IR will be ignored as outside continuum range.'
@@ -179,7 +179,7 @@ C edge are EDGE_SEP_FAC*FRAC_DOP Doppler widths appart. We adjust the lower
 C frequency to ensure this. MIN_FREQ_RAT is the minimum ratio allowed between
 C successive frequencies.
 C
-	EDGE_SEP_FAC=0.1D0
+	EDGE_SEP_FAC=0.5D0                              !was 0.1
 	MIN_FREQ_RAT=1.0D0+EDGE_SEP_FAC*dNU_on_NU
 C
 C Define edges of the e.s blue and red wings.
@@ -227,10 +227,23 @@ C If no lines to be included, set FREQ directly to continuum frequencies
 C and return.
 C
 	IF(LN_INDX .GT. N_LINES)THEN
-	  FREQ(1:NCF)=NU_CONT(1:NCF)
-	  NFREQ=NCF
+!	  FREQ(1:NCF)=NU_CONT(1:NCF)
+!	  NFREQ=NCF
+	  FREQ(1:2)=NU_CONT(1:2)
+	  J=2
+	  I=3
+	  DO WHILE(I .LE. NCF)
+	    IF( (FREQ(J)-NU_CONT(I)) .GT. 2.5D0*(FREQ(J-1)-FREQ(J)))THEN
+	      FREQ(J+1)=FREQ(J)-2.0D0*(FREQ(J-1)-FREQ(J))
+	    ELSE
+	      FREQ(J+1)=NU_CONT(I)
+	      I=I+1
+	    END IF
+	    J=J+1
+	  END DO 
+	  NFREQ=J
 	  LU_ER=ERROR_LU()
-	  WRITE(LU_ER,*)'Warning --- no line inserted in INS_LINE_V4'
+	  WRITE(LU_ER,*)'Warning --- no line inserted in INS_LINE_V5'
 	  RETURN
 	END IF
 C 
@@ -272,6 +285,10 @@ C
 	  ELSE IF( LN_INDX .GT. LOCAL_N_LINES)THEN
 !
 	    dNU_NEXT=FREQ(INDX)-NU_CONT(ML)
+	    IF(INDX .GT. 1)THEN
+	      T1=2.0D0*(FREQ(INDX-1)-FREQ(INDX))
+	      dNU_NEXT=MIN(dNU_NEXT,T1)
+	    END IF
 	    IF(NU_CONT(ML) .GT. CUR_RED_PROF_EXT)THEN
 	      T1=FREQ(INDX)*dV_CMF_PROF/C_KMS
 	      dNU_NEXT=MIN(dNU_NEXT,T1)
@@ -286,6 +303,10 @@ C
 	  ELSE
 C
 	    dNU_NEXT=FREQ(INDX)-NU_CONT(ML)
+	    IF(INDX .GT. 1)THEN
+	      T1=2.0D0*(FREQ(INDX-1)-FREQ(INDX))
+	      dNU_NEXT=MIN(dNU_NEXT,T1)
+	    END IF
 C
 C Spacing for electron-scattering wings.
 C
@@ -387,7 +408,7 @@ C
 	DO ML=1,NFREQ-1
 	  T1=MIN( T1 , C_KMS*(FREQ(ML)-FREQ(ML+1))/FREQ(ML) )
 	  IF(FREQ(ML) .LE. FREQ(ML+1))THEN
-	    WRITE(LU_ER,*)' Invalid frequency grid computed in INS_LINE_V4'
+	    WRITE(LU_ER,*)' Invalid frequency grid computed in INS_LINE_V5'
 	    WRITE(LU_ER,*)' ML=',ML
 	    DO I=MAX(1,ML-20),MIN(NCF,ML+20)
 	      WRITE(LU_ER,*)I,FREQ(I)

@@ -1307,7 +1307,8 @@ C
 !
 	      DO I=1,NI-1
 	        T1=DTAU(I,LS)
-	        EE(I)=EXP(-T1)
+	        EE(I)=0.0D0
+	        IF(T1 .LT. 700.0D0)EE(I)=EXP(-T1)
 	        IF(T1 .GT. 0.5)THEN
 	          E0(I)=1.0D0-EE(I)
 	          E1(I)=1.0D0-E0(I)/T1

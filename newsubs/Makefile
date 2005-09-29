@@ -27,6 +27,7 @@ OBJ= $(LIB)(ave_level_energy.o)\
      $(LIB)(rd_hyd_bf_data.o)\
      $(LIB)(rd_phot_die_v1.o)\
      $(LIB)(rd_rv_file_v2.o)\
+     $(LIB)(rd_mod_density.o)\
      $(LIB)(rd_store_log.o)\
      $(LIB)(rd_xray_spec.f)\
      $(LIB)(set_edge_freq_v3.o)\

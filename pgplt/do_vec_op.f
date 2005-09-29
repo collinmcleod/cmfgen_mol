@@ -191,7 +191,7 @@ C
 	    WRITE(T_OUT,*)'Invalid operation in DO_VEC_OP'
 	    RETURN
 	  END IF
-	  WRITE(6,*)'FInished division'
+	  WRITE(6,*)'Finished division'
 !
 	IF(ASSOCIATED(CD(OUT)%XVEC))THEN
 	  DEALLOCATE (CD(OUT)%XVEC)

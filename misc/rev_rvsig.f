@@ -57,6 +57,9 @@
 	INTEGER I,J,K
 	INTEGER I_ST,I_END
 !
+        CHARACTER*30 UC
+        EXTERNAL UC
+!
 	CHARACTER(LEN=10) OPTION
 	CHARACTER(LEN=80) OLD_RVSIG_FILE
 	CHARACTER(LEN=80) NEW_RVSIG_FILE
@@ -78,15 +81,17 @@
 	OPTION='NEW_ND'
 	WRITE(6,'(A)')
 	WRITE(6,'(A)')'Current options are:'
-	WRITE(6,'(A)')'       NEW_ND: revise number of depth points'
-	WRITE(6,'(A)')'         ADDR: add extra grid points'
+	WRITE(6,'(A)')'       NEW_ND: revise number of depth points by simple scaling'
+	WRITE(6,'(A)')'         ADDR: explicitly add extra grid points'
 	WRITE(6,'(A)')'         EXTR: extend grid to larger radii'
-	WRITE(6,'(A)')'         MDOT: change mass-loss rate'
-	WRITE(6,'(A)')'         NEWG: revise grid'
-	WRITE(6,'(A)')'         SCLR: revise R grid'
+	WRITE(6,'(A)')'         MDOT: change the mass-loss rate'
+	WRITE(6,'(A)')'         NEWG: revise grid between two velocities'
+	WRITE(6,'(A)')'         SCLR: scale radius of star to new value'
+	WRITE(6,'(A)')'         PLOT: plot V and SIGMA from old RVSIG file'
 	WRITE(6,'(A)')
 
 	CALL GEN_IN(OPTION,'Enter option for revised RVSIG file')
+	OPTION=UC(TRIM(OPTION))
 	IF(OPTION .EQ. 'NEW_ND')THEN
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')'This option allows a new R grid to be output'
@@ -547,30 +552,43 @@
               SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
 	    END DO
 	  END IF
+	ELSE IF(OPTION .EQ. 'PLOT')THEN
+	  ND=ND_OLD 
+	  DO I=1,ND
+	    R(I)=OLD_R(I)
+	    V(I)=OLD_V(I)
+	    SIGMA(I)=OLD_SIGMA(I)
+	  END DO
 	ELSE
 	  WRITE(6,'(A)')'Option not recognixed'
 	  STOP
 	END IF
 !
-	NEW_RVSIG_FILE='RVSIG_COL_NEW'
-	CALL GEN_IN(NEW_RVSIG_FILE,'File for new R, V and sigma values')
-	OPEN(UNIT=10,FILE=NEW_RVSIG_FILE,STATUS='UNKNOWN',ACTION='WRITE')
-	  WRITE(10,'(A)')'!'
-	  WRITE(10,'(A)')'!'
-	  WRITE(10,'(A,7X,A,9X,10X,A,11X,A,3X,A)')'!','R','V(km/s)','Sigma','Depth'
-	  WRITE(10,'(A)')'!'
-	  WRITE(10,'(A)')' '
-	  WRITE(10,'(I4,20X,A)')ND,'!Number of depth points`'
-	  WRITE(10,'(A)')' '
-	  DO I=1,ND
-	    WRITE(10,'(F18.8,ES17.7,F17.7,4X,I4)')R(I),V(I),SIGMA(I),I
-	  END DO
-	CLOSE(UNIT=10)
+	IF(OPTION .NE. 'PLOT')THEN
+	  NEW_RVSIG_FILE='RVSIG_COL_NEW'
+	  CALL GEN_IN(NEW_RVSIG_FILE,'File for new R, V and sigma values')
+	  OPEN(UNIT=10,FILE=NEW_RVSIG_FILE,STATUS='UNKNOWN',ACTION='WRITE')
+	    WRITE(10,'(A)')'!'
+	    WRITE(10,'(A)')'!'
+	    WRITE(10,'(A,7X,A,9X,10X,A,11X,A,3X,A)')'!','R','V(km/s)','Sigma','Depth'
+	    WRITE(10,'(A)')'!'
+	    WRITE(10,'(A)')' '
+	    WRITE(10,'(I4,20X,A)')ND,'!Number of depth points`'
+	    WRITE(10,'(A)')' '
+	    DO I=1,ND
+	      WRITE(10,'(F18.8,ES17.7,F17.7,4X,I4)')R(I),V(I),SIGMA(I),I
+	    END DO
+	  CLOSE(UNIT=10)
+	END IF
 !
+	T1=R(ND)
+	R(1:ND)=R(1:ND)/T1
+	WRITE(6,*)'Plotting V versus R/R*'
 	CALL DP_CURVE(ND,R,V)
-	CALL GRAMON_PGPLOT('Radius','V(km/s)',' ',' ')
+	CALL GRAMON_PGPLOT('R/R\d*\u','V(km/s)',' ',' ')
+	WRITE(6,*)'Plotting Sigma versus R/R*'
 	CALL DP_CURVE(ND,R,SIGMA)
-	CALL GRAMON_PGPLOT('Radius','SIGMA',' ',' ')
+	CALL GRAMON_PGPLOT('R/R\d*\u','SIGMA',' ',' ')
 !
 	STOP
 	END

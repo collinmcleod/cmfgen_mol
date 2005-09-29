@@ -121,24 +121,25 @@ C The shock emission is added separately since it does not occur at the
 C local electron temperature.
 C
 	IF(XRAYS)THEN
-	  IF(FILL_VEC_SQ(1) .EQ. 0)THEN
+!	  IF(FILL_VEC_SQ(1) .EQ. 0)THEN
 	    DO I=1,ND
 	      FILL_VEC_SQ(I)=4.0*FILL_FAC_XRAYS*FILL_FAC_XRAYS*
 	1                   EXP(-V_SHOCK/V(I))
 	    END DO
-	  END IF
-	  T1=CHIFF*TWOHCSQ*EXP(-HDKT*CONT_FREQ/T_SHOCK)/SQRT(T_SHOCK)
+!	  END IF
 C
 C Since T_SHOCK is depth indpendent, we can compute the free-free
 C Gaunt factors are depth independent.
 C
 C ####
 C
-	  DO I=1,20
+	  DO I=1,ND
 	    T2=I
+	    IF(I .GT. 6.0D0)T2=6.0D0
 	    TA(I)=GFF(CONT_FREQ,T_SHOCK,T2)
 	  END DO
 C
+	  T1=CHIFF*TWOHCSQ*EXP(-HDKT*CONT_FREQ/T_SHOCK)/SQRT(T_SHOCK)
 	  DO I=1,ND
 	    T2=0.0D0
 	    DO ID=1,NUM_IONS

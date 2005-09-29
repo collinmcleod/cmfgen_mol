@@ -7,6 +7,7 @@
 	1                             N,ND,FILNAME)
 	IMPLICIT NONE
 !
+! Altered 23-Jun-2005 - Fixed computation of the excitation temperature.
 ! Altered 20-Feb-2005 - CHECK_DC installed.
 ! Altered 04-Jul-2004 - Altered so that levels in the same super level
 !                          all have the same departure coeficient.
@@ -64,7 +65,7 @@
 ! Local Variables.
 !
 	INTEGER I,J,NOLD,NDOLD,COUNT,NX,NXST,NZ,IOS
-	REAL*8 RPOLD,TX,DELTA_T,T1,ADD1
+	REAL*8 RPOLD,TX,DELTA_T,T1,ADD1,DC_MOD
 	LOGICAL CHECK_DC
 	CHARACTER*80 STRING
 	CHARACTER*(*) FILNAME
@@ -198,17 +199,30 @@
 	    TX=T(I)
 	    DELTA_T=10.0D0
 	    COUNT=0
+	    DC_MOD=LOG(DHEN(NZ,I)) + HDKT*EDGE(NZ)/T(I) - 1.5D0*LOG(T(I))
 	    DO WHILE( ABS(DELTA_T) .GT. 1.0E-06 .AND. COUNT .LT. 100 )
-	      T1=( (T(I)/TX)**(1.5) )*EXP(HDKT*EDGE(NZ)*(T(I)-TX)/T(I)/TX)
-	      COUNT=COUNT+1
-	      DELTA_T= (DHEN(NZ,I)-T1)*TX/T1/(1.0D0+HDKT*EDGE(NZ)/TX)
-	      IF(ABS(DELTA_T) .GT. 0.8*TX)DELTA_T=0.5D0*DELTA_T
-	      TX=TX-DELTA_T
+	     T1=TX
+             IF(HDKT*EDGE(NZ)/TX .GT. 1.5D0)THEN
+               TX=HDKT*EDGE(NZ)/(DC_MOD+1.5D0*LOG(TX))
+             ELSE
+               TX= ( EXP(HDKT*EDGE(NZ)/TX-DC_MOD) )**(2.0D0/3.0D0)
+             END IF
+             COUNT=COUNT+1
+             DELTA_T=ABS(TX-T1)
 	    END DO
+!
+!	    DO WHILE( ABS(DELTA_T) .GT. 1.0E-06 .AND. COUNT .LT. 100 )
+!	      T1=( (T(I)/TX)**(1.5) )*EXP(HDKT*EDGE(NZ)*(T(I)-TX)/T(I)/TX)
+!	      COUNT=COUNT+1
+!	      DELTA_T= (DHEN(NZ,I)-T1)*TX/T1/(1.0D0+HDKT*EDGE(NZ)/TX)
+!	      IF(ABS(DELTA_T) .GT. 0.8*TX)DELTA_T=0.5D0*DELTA_T
+!	      TX=TX-DELTA_T
+!	    END DO
+!
 	    IF(COUNT .EQ. 100)THEN
 	      WRITE(LUER,*)'Error in REGRIDWSC - TX didnt converge ',
 	1               'in 100 iterations'
-	      WRITE(LUER,*)'I,J=',I,J
+	      WRITE(LUER,*)'Depth=',I
 	      DO J=NZ+1,N
 	        DHEN(J,I)=DHEN(NZ,I)
 	      END DO

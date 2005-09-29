@@ -5,7 +5,9 @@
 	SUBROUTINE RD_AUTO_V1(AUTO,FEDGE,STAT_WT,LEVNAME,NLEV,FILE_NAME)
 	IMPLICIT NONE
 !
-! Created 17-Jul-2001
+! Aletered 23-Sep-2005 : Bug fix -- AUTO not correctly normalized by STAT_WT
+!                                     in the case on unsplit levels.
+! Created  17-Jul-2001
 !
 	INTEGER NLEV
 	REAL*8 AUTO(NLEV)
@@ -21,9 +23,9 @@
 !
 ! Local variables and arrays.
 !
+	REAL*8 G_SUM(NLEV)
 	REAL*8 TMP_AUTO
 	REAL*8 DEFAULT_AUTO_RATE
-	REAL*8 G_SUM
 !
 	INTEGER I,J,K
 	INTEGER NL
@@ -45,6 +47,8 @@
 	  IF(K .NE. 0)LOCNAME(NL)(K:)=' '
 	END DO
 	AUTO(1:NLEV)=0.0D0
+	TMP_AUTO=0.0D0
+	G_SUM(1:NLEV)=0.0D0
 !
 ! Find first autoionizing level.
 !
@@ -147,7 +151,6 @@
 !
 	  K=INDEX(TMP_NAME,'[')
 	  IF(K  .NE. 0)THEN
-	    G_SUM=0.0D0
 	    DO I=IBEG,NLEV
 	      IF(TMP_NAME .EQ. LEVNAME(I))THEN
 	        AUTO(I)=TMP_AUTO
@@ -155,10 +158,9 @@
 	      END IF
 	      IF(TMP_NAME(1:K-1) .EQ. LEVNAME(I))THEN
 	        AUTO(I)=AUTO(I)+STAT_WT(I)*TMP_AUTO
-                G_SUM=G_SUM+STAT_WT(I)
+                G_SUM(I)=G_SUM(I)+STAT_WT(I)
 	      END IF
 	    END DO
-	    IF(G_SUM .NE. 0)AUTO(I)=AUTO(I)/G_SUM
 	  ELSE
 	    DO I=IBEG,NLEV
 	      IF(TMP_NAME .EQ. LOCNAME(I) .OR. TMP_NAME .EQ. LEVNAME(I))THEN
@@ -170,8 +172,18 @@
 	CLOSE(LUIN)
 !
 	DO I=IBEG,NLEV
-	  IF(AUTO(I) .EQ. 0)AUTO(I)=DEFAULT_AUTO_RATE
-	END DO 
+	  IF(G_SUM(I) .NE. 0.0D0)AUTO(I)=AUTO(I)/G_SUM(I)
+	END DO
+!
+	J=INDEX(FILE_NAME,'_')-1
+	IF(J .LE. 1)J=LEN_TRIM(FILE_NAME)
+	OPEN(LUIN,FILE='AUTO_CHK_'//FILE_NAME(1:J),STATUS='UNKNOWN')
+	  WRITE(LUIN,*)'Utilized autoionization rates associated with FILE',FILE_NAME
+	  DO I=IBEG,NLEV
+	    IF(AUTO(I) .LE. 1.0D-20)AUTO(I)=DEFAULT_AUTO_RATE
+	    WRITE(LUIN,'(X,I4,3X,A,T35,ES12.4)')I,TRIM(LEVNAME(I)),AUTO(I)
+	  END DO 
+	CLOSE(LUIN)
 !
 	RETURN
 	END

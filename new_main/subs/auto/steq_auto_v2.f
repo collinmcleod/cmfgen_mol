@@ -28,6 +28,7 @@
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 23-Sep-2005 " Bug fix for dT term in computation of BA.
 ! Altered 13-Sep-2002 : Bug fix & cooling term added.
 !                       DIECOOL included in call hence changed to V2
 !                       STEQ(EQION, ) was not being computed.
@@ -138,9 +139,9 @@
 	      SE(ID)%BA(J,VED,M,I)     =SE(ID)%BA(J,VED,M,I)      +AUTO(K)*HNST_F(K,I)/ED(I)
 	      SE(ID)%BA(EQION,VED,M,I) =SE(ID)%BA(EQION,VED,M,I)  -AUTO(K)*HNST_F(K,I)/ED(I)
 ! 
-	      SE(ID)%BA(J,VT,M,I)      =SE(ID)%BA(J,VT,M,I)       -AUTO(J)*HNST_F(J,I)*
+	      SE(ID)%BA(J,VT,M,I)      =SE(ID)%BA(J,VT,M,I)       -AUTO(K)*HNST_F(K,I)*
 	1                                                               (1.5D0+HDKT*FEDGE_F(K)/T(I))/T(I)
-	      SE(ID)%BA(EQION,VT,M,I)  =SE(ID)%BA(EQION,VT,M,I)   +AUTO(J)*HNST_F(J,I)*
+	      SE(ID)%BA(EQION,VT,M,I)  =SE(ID)%BA(EQION,VT,M,I)   +AUTO(K)*HNST_F(K,I)*
 	1                                                               (1.5D0+HDKT*FEDGE_F(K)/T(I))/T(I)
 !
 	     END DO          		!Over level variable

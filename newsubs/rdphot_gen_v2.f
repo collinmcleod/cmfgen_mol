@@ -274,6 +274,7 @@
 	PD(ID)%EXC_FREQ(:)=0.0D0
 	XzV_ION_LEV_ID(:)=0
 	PD(ID)%A_ID(:,:)=0
+	PD(ID)%DO_KSHELL_W_GS=.FALSE.
 !
 ! Set values for ionizations to the XzSIX ground state.
 !
@@ -291,8 +292,13 @@
 !
 ! If the XzSIX ground state is not present (hence XzSIX_PRES is .FALSE.) we
 ! include the X-RAY opacity with the regular photoionization cross-section.
+! We also include the K-shell cross-section for lithium ions, since
+! only one electron is ejected. Strictly speaking, should have 1s2.nl going
+! to 1s nl state (rather than 1s^2) state of the HeI-like ion. 
 !
 	IF(X_RAYS .AND. .NOT. XzSIX_PRES)THEN
+	  PD(ID)%DO_KSHELL_W_GS=.TRUE.
+	ELSE IF(NINT(AT_NO_DUM-ZXzV) .EQ. 2)THEN
 	  PD(ID)%DO_KSHELL_W_GS=.TRUE.
 	END IF
 !

@@ -515,6 +515,14 @@
 	ABOVE_EDGE=.TRUE.
 	CALL GEN_IN(ABOVE_EDGE,'Use only data above edge when smoothing')
 !
+	WRITE(6,*)' '
+	WRITE(6,*)' '
+	WRITE(6,*)' About to read photoionization data:'
+	WRITE(6,*)' Data files should be called PHOTXzV_A, PHOTXzV_B etc'
+	WRITE(6,*)' XzV is NIV, CIII etc.'
+	WRITE(6,*)' '
+	WRITE(6,*)' '
+! 
 	CALL RDPHOT_GEN_V2(FEDGE,NAME,GION,AT_NO,ZION,NLEV,
 	1          XzV_LEV_ID,N_PHOT,N_PHOT_MAX,
 	1          L_FALSE,EDGEXzSIX,GXzSIX,F_TO_S_XzSIX,
@@ -598,6 +606,7 @@
 	  CLOSE(LUIN)
 !
 	  DO I=1,N_TEMP
+	     WRITE(6,*)'Doing T=',TEMP(I)
 	     CALL RECOM_CHK_V2(RECOM(1,I),FEDGE,G,PHOT_GION,NLEV,
 	1             EXC_EN,PHOT_ID,SUB_PHOT_GEN,ID,TEMP(I))
 	  END DO

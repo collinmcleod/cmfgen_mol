@@ -16,6 +16,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 05-Sep-2005 : VAR_MDOT section included.
 ! Created 19-Dec-2004
 !
 	INTEGER ND
@@ -135,6 +136,16 @@
 	  DO K=1,ND
 	    POP_ATOM(K)=(RHO_ZERO/MEAN_ATOMIC_WEIGHT)*(R(ND)/R(K))**N_RHO
 	    POP_ATOM(K)=POP_ATOM(K)/CLUMP_FAC(K)
+	  END DO
+	ELSE IF(VAR_MDOT)THEN
+!
+! Treat a model where the mass-loss might be variable as a function of time.
+! e.g, For a model of AG Car. We also read in the clumping factor.
+! R, V, and SIGMA should be read in with VEL_LAW option 7.
+!
+	  CALL RD_MOD_DENSITY(DENSITY,CLUMP_FAC,R,ND,VAR_MDOT_FILE)
+	  DO K=1,ND
+	    POP_ATOM(K)=DENSITY(K)/MEAN_ATOMIC_WEIGHT/ATOMIC_MASS_UNIT()
 	  END DO
 	ELSE
 	  DO K=1,ND

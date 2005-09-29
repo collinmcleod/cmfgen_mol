@@ -112,7 +112,7 @@ C
 	  DO I=1,NBB
 	    XV(I)=1.0D+03*XV(I)/KEV_TO_HZ
 	  END DO
-	  X_LAB='\gl(eV)'
+	  X_LAB='\gn(eV)'
 	  IF(LOG_X)X_LAB='Log \gn(eV)'
 	ELSE IF(X_UNIT .EQ. 'HZ')THEN
 	  X_LAB='\gn(10\u15 \dHz)'

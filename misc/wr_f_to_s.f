@@ -10,6 +10,7 @@ C
 	USE MOD_USR_HIDDEN
 	IMPLICIT NONE
 C
+C Altered 23-Jun-2005 : FIX_DI option installed for WR_DC
 C Altered 25-Oct-2002 : CL option changed.
 C                         Level without SL designation is given one.
 C Altered 03-Nov-2000 : E%LS option installed. Designed to give
@@ -91,8 +92,9 @@ C
 C
 	LOGICAL CHK_PARITY
 	LOGICAL CHK_SPIN
-	LOGICAL  SORT_LEVS
+	LOGICAL SORT_LEVS
 	LOGICAL OKAY_TO_COMBINE
+	LOGICAL FIX_DI
 C
 	CHARACTER TIME*24
 	CHARACTER STRING*80
@@ -811,8 +813,14 @@ C
 ! Because of level splitting, G_GS may be larger than G(1). That is, G_GS usually
 ! refers to the statistical weight of the full term.
 !
-	  CALL USR_OPTION(G_GS,'G_GS','1.0D0','Input GION for T excitation file')
-	  CALL USR_OPTION(G_ION,'G_ION','1.0D0','Input GION for next ionzation stage')
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'Set FIX_DI=T if input and output species are identical'
+	  WRITE(T_OUT,*)' '
+	  CALL USR_OPTION(FIX_DI,'FIX_DI','F','Keep ion density fixed')
+	  IF(.NOT. FIX_DI)THEN
+	    CALL USR_OPTION(G_GS,'G_GS','1.0D0','Input GION for T excitation file')
+	    CALL USR_OPTION(G_ION,'G_ION','1.0D0','Input GION for next ionzation stage')
+	  END IF
 	  DO J=1,ND_RD
 	    READ(LUIN,*)RVAL,DI,ED(1),TEMP(1),R_IR,V1,CL_FAC
 	    READ(LUIN,*)(DC(I,1),I=1,NLEV_RD)
@@ -820,8 +828,10 @@ C
 ! Compute ion population.
 !
 	    T_EXCITE=DC(1,1)
-	    T1=2.07D-22*ED(1)*(G_GS/G_ION)*EXP(HDKT*FEDGE(1)/T_EXCITE)/(T_EXCITE**1.50)
-	    DI=DI/T1
+	    IF(.NOT. FIX_DI)THEN
+	      T1=2.07D-22*ED(1)*(G_GS/G_ION)*EXP(HDKT*FEDGE(1)/T_EXCITE)/(T_EXCITE**1.50)
+	      DI=DI/T1
+	    END IF
 !
 	    WRITE(LUOUT,'(A)')' '
 	    WRITE(LUOUT,'(ES16.7,6ES15.4)')RVAL,DI,ED(1),TEMP(1),0.0D0,V1,CL_FAC

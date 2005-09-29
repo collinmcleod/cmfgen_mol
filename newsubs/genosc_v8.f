@@ -114,6 +114,9 @@
 ! Initialize arrays.
 !
 	EINA(1:N,1:N)=0.0D0
+	GAM2(1:N)=0.0D0
+	GAM4(1:N)=0.0D0
+	ARAD(1:N)=0.0D0
 	OBSERVED_LEVEL(1:N)=.TRUE.
 !
 ! CUT_CNT is used to determine the number of transitions cut from the

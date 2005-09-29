@@ -140,7 +140,7 @@
 	REAL*8 ZERO_VEC(N_MAX)
 !
 	REAL*8 DOP_PRO
-	REAL*8 S15ADF,XCROSS
+	REAL*8 S15ADF,XCROSS_V2
 	EXTERNAL JTRPWGT,HTRPWGT,KTRPWGT,NTRPWGT
 	EXTERNAL JWEIGHT,HWEIGHT,KWEIGHT,NWEIGHT,XCROSS
 !
@@ -209,11 +209,12 @@
 	INTEGER TAU_GRT_LOGX(-ITAU_GRT_LIM:ITAU_GRT_LIM)
 !
 	REAL*8 DTDR,DBB,S1,IC
-	REAL*8 EXC_EN
+	REAL*8 EXC_EN,EDGE_FREQ
 	REAL*8 RVAL,TAU_VAL,ED_VAL
 	REAL*8 XDIS,YDIS,DIS_CONST
 	REAL*8 LAM_ST,LAM_EN,DEL_NU
-	REAL*8 NU_ST,NU_EN,FREQ_RES
+	REAL*8 NU_ST,NU_EN
+	REAL*8 FREQ_RES,FREQ_MAX
 	REAL*8 T1,T2,T3,TMP_ED
 	REAL*8 TAU_LIM
 	REAL*8 TEMP,TSTAR,NEW_RSTAR,NEW_VSTAR
@@ -1751,6 +1752,25 @@
 ! ****************************************************************************
 ! ****************************************************************************
 !
+	ELSE IF(XOPT .EQ. 'ROSS')THEN
+	  WRITE(T_OUT,*)'Volume filling factor not allowed for.'
+	  CALL USR_OPTION(ELEC,'ON_NE','T','Normalize by the electron scattering opacity?')
+	  IF(ROSS_MEAN(1) .NE. 0.0D0)THEN
+	    IF(ELEC)THEN
+	      DO I=1,ND
+	        YV(I)=DLOG10(ROSS_MEAN(I))-10
+	      END DO
+	      YAXIS='Rosseland Mean Opacity (cm\u-1\d)'
+	    ELSE
+	      DO I=1,ND
+	        YV(I)=ROSS_MEAN(I)/(6.65D-15*ED(I))
+	      END DO
+	      YAXIS='Rosseland Mean Opacity/ \gsNe'           ! (cm\u-1\d)'
+	    END IF
+	    CALL DP_CURVE(ND,XV,YV)
+	  ELSE
+	    WRITE(T_OUT,*)'Rosseland opacity not available.'
+	  END IF!
 	ELSE IF(XOPT .EQ. 'YR')THEN
 	  DO I=1,ND
 	    YV(I)=DLOG10(R(I)/R(ND))
@@ -3280,8 +3300,8 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 ! ^L
 !
 ! Computes the column density for 2 successive ionization stages, and for
-! the atom. If XV is the column desnity for species XzVxI, the program routine
-! XV/X and XSIX/X where X is psecies column density. Inserted for comparison
+! the atom. If XV is the column density for species XzV, the program returns
+! XV/X and XSIX/X where X is the species column density. Inserted for comparison
 ! with SETI results.
 !
 	ELSE IF(XOPT .EQ. 'QF') THEN
@@ -3593,7 +3613,13 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	ELSE IF(XOPT .EQ. 'PLTPHOT')THEN
 	  CALL USR_OPTION(I,'LEV','1','Level ID: Use WRID to check levs')
 	  CALL USR_OPTION(PHOT_ID,'PHOT_ID','1','Photoionization route')
+!
+! For taking into account level dissolution.
+!
 	  ED_VAL=0.0D0
+	  WRITE(T_OUT,'(A)')' '
+	  WRITE(T_OUT,'(A)')' Input non-zero Ne for level-dissolution.'
+	  WRITE(T_OUT,'(A)')' '
 	  IF(PHOT_ID .EQ. 1)CALL USR_OPTION(ED_VAL,'ED_VAL','0.0D0','Approximate Ne value')
 	  IF(ED_VAL .GT. 0)THEN
 	    IF(ED_VAL .LT. ED(1))THEN
@@ -3611,7 +3637,7 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	       END IF
 	      END DO
 	    END IF
-	    WRITE(T_OUT,'(A,ES10.2)')'Photioization cross-section evaluated at Ne=',ED_VAL
+	    WRITE(T_OUT,'(A,ES10.2)')'Photoionization cross-section evaluated at Ne=',ED_VAL
 	  END IF
 	  FREQ_RES=MIN(3000.0D0,VSM_DIE_KMS)/2.0D0
 	  DEFAULT=WR_STRING(FREQ_RES)
@@ -3632,10 +3658,13 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	      TEMP=ATM(ID)%EDGEXzV_F(I)
 	      IF(FLAG)TEMP=0.7D0*ATM(ID)%EDGEXzV_F(I)
 	      J=0
-	      DO WHILE(TEMP .LT. 20.0*ATM(ID)%EDGEXzV_F(I))
+	      FREQ_MAX=20.0D0*ATM(ID)%EDGEXzV_F(I)
+	      DEFAULT=WR_STRING(FREQ_MAX)
+	      CALL USR_HIDDEN(FREQ_MAX,'FREQ_MAX',DEFAULT,'Maximum frequency in units of 10^15 Hz')
+	      DO WHILE(TEMP .LT. FREQ_MAX)
 	        CALL SUB_PHOT_GEN(ID,OMEGA_F,TEMP,ATM(ID)%EDGEXzV_F,
 	1             ATM(ID)%NXzV_F,PHOT_ID,FLAG)
-	        IF(FLAG .AND. TEMP .LT. ATM(ID)%EDGEXzV_F(I))THEN
+	        IF(FLAG .AND. TEMP .LT. FREQ_MAX)THEN
 	          T1=ATM(ID)%ZXzV**3
 	          T2=SQRT(3.289395*ATM(ID)%ZXzV*ATM(ID)%ZXzV/(ATM(ID)%EDGEXzV_F(I)-TEMP))
 	          IF(T2 .GT. 2*ATM(ID)%ZXzV)THEN
@@ -3652,6 +3681,13 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	            OMEGA_F(I,1)=0.0D0
 	          END IF
 	        END IF
+!
+	        IF(XRAYS .AND. ATM(ID)%XzV_PRES .AND. ATM(ID+1)%XzV_PRES)THEN
+                  T2=AT_NO(SPECIES_LNK(ID))+1-ATM(ID)%ZXzV
+                  T1=XCROSS_V2(TEMP,AT_NO(SPECIES_LNK(ID)),T2,IZERO,IZERO,L_FALSE,L_FALSE)
+	          OMEGA_F(I,1)=OMEGA_F(I,1)+T1
+	        END IF
+!
 	        J=J+1
 	        ZV(J)=TEMP/ATM(ID)%EDGEXzV_F(I)
 	        YV(J)=1.0D+08*OMEGA_F(I,1)
@@ -3662,6 +3698,7 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	           TEMP=TEMP*(1.0D0+FREQ_RES)
 	         END IF
 	      END DO
+	      EDGE_FREQ=ATM(ID)%EDGEXzV_F(I)
 	      EXIT
 	    END IF
 	  END DO
@@ -3707,6 +3744,12 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	      ZV(K)=ANG_TO_HZ/(ZV(K)*ATM(ID)%EDGEXzV_F(I))
 	    END DO
 	    XAXIS='\gl(\A)'
+	  ELSE
+	    CALL USR_OPTION(FLAG,'LAM','F','Plot against non-normalized frequency?')
+	    IF(FLAG)THEN
+	      ZV(1:J)=ZV(1:J)*EDGE_FREQ
+	      XAXIS='\gn(10\u15 \dHz)'
+	    END IF
 	  END IF
 	  CALL DP_CURVE(J,ZV,YV)
 !

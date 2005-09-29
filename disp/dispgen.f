@@ -5,6 +5,7 @@ C
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 07-Sep-2005 : XRAYS option set to TRUE. Lithium cross-sections will be set.
 ! Altered 20-Apr-2004 : Use RDHOTGEN_V2 will allows for dynamic smoothing of 
 !                         photoioization cross-sections.
 !
@@ -207,6 +208,10 @@ C
 !
 	CALL RD_HYD_BF_DATA(LUIN,LUMOD,T_OUT)
 !
+! Read in X-ray photoionization cross-sections.
+!
+        CALL RD_XRAY_FITS(LUIN)
+!
 ! *************************************************************************
 !
 ! Read in basic model [i.e. H, HeI, He2, V, T, SIGMA etc ] from RVTJ file.
@@ -256,6 +261,7 @@ C
 C
 C Get default extension.
 C
+	FILE_EXTENT=' '
 	J=LEN(FILENAME)
 	DO WHILE(J .GT. LEN_DIR)
 	  IF( FILENAME(J:J) .EQ. '.' )THEN
@@ -412,7 +418,7 @@ C
 ! Read in oscilator and photoionization data.
 !
 	GF_LEV_CUT=5
-	XRAYS=.FALSE.
+	XRAYS=.TRUE.              !.FALSE.
 	T2=0.0D0
 !
 ! Default values for reading in photoioization cross-sections.
