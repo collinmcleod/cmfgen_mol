@@ -10,6 +10,8 @@ LIB=$(LIB_DIR)libpgplt.a
 # Entries in a library
 #
 OBJ = $(LIB)(mod_curve_data.o)\
+      $(LIB)(amoeba.o)\
+      $(LIB)(amotry.o)\
       $(LIB)(change_color.o)\
       $(LIB)(change_pen.o)\
       $(LIB)(curve.o)\
