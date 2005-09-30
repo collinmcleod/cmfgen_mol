@@ -296,7 +296,7 @@ C
 	      STRING=ADJUSTL(STRING)
 	      FORMAT_DATE=STRING(1:11)
 	      READ(LU,*)I,I,I,I,LOC_WR_RVSIG
-	      IF(LOC_WR_RVSIG .NE. WRITE_RVSIG)THEN
+	      IF(LOC_WR_RVSIG .NEQV. WRITE_RVSIG)THEN
 	        WRITE(LUER,*)'Error in SCR_RITE_V2 -- inconsistent WR_RVSIG option'
 	        WRITE(LUER,*)'Restart a fresh model by deleting SCRTEMP etc.'
 	        STOP
