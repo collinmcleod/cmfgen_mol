@@ -66,6 +66,7 @@
 !
 	LOGICAL AT_LEAST_ONE_ION_PRES
 	LOGICAL FND_END_OF_IONS
+	LOGICAL DO_TERM_OUT
 !
 ! Set constants.
 !
@@ -77,13 +78,16 @@
 	EMLIN=5.27296D-03
 	LUER=ERROR_LU()
 !
+! Open output file for all errors and comments. Change DO_TERM_OUT to
+! have the output go to the terminal/batch log file.
 !
-! Open output file for all errors and comments.
-!
-	CALL GEN_ASCI_OPEN(LUER,'OUTGEN','UNKNOWN','APPEND',' ',IZERO,IOS)
-	IF(IOS .NE. 0)THEN
-	  WRITE(LUER,*)'Error opening OUTGEN in CMFGEN, IOS=',IOS
-	  STOP
+	DO_TERM_OUT=.FALSE.                   !TRUE.
+	IF(.NOT. DO_TERM_OUT)THEN
+	  CALL GEN_ASCI_OPEN(LUER,'OUTGEN','UNKNOWN','APPEND',' ',IZERO,IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(LUER,*)'Error opening OUTGEN in CMFGEN, IOS=',IOS
+	    STOP
+	  END IF
 	END IF
 !
 ! Set all atomic data. New species can be simple added by insertion.

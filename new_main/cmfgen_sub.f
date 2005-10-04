@@ -52,7 +52,7 @@
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
 	CHARACTER*12 PRODATE
-	PARAMETER (PRODATE='15-Sep-2005')	!Must be changed after alterations
+	PARAMETER (PRODATE='02-Oct-2005')	!Must be changed after alterations
 !
 ! 
 !
@@ -386,6 +386,7 @@
         LOGICAL VAR_SOB_JC
 	LOGICAL NEG_OPACITY(ND),FIRST_NEG
 	LOGICAL AT_LEAST_ONE_NEG_OPAC
+	LOGICAL FILE_OPEN
 !
 ! Inidicates approximate frequencies for which TAU at outer boundary is written
 ! to OUTGEN on the last iteration.
@@ -788,7 +789,7 @@
 ! Compute the frequency grid for CMFGEN. Routine also allocates the vectors 
 ! needed for the line data, sets the line data, and puts the line data into 
 ! numerical order.
-! 
+!
 	CALL SET_FREQUENCY_GRID(NU,FQW,LINES_THIS_FREQ,NU_EVAL_CONT,
 	1               NCF,NCF_MAX,N_LINE_FREQ,
 	1               OBS_FREQ,OBS,N_OBS,LUIN,IMPURITY_CODE)
@@ -4343,11 +4344,16 @@
 !*****************************************************************************
 !*****************************************************************************
 !
-! Close units 2 and 16 to force writing of information.
+! Close units 2 and 16 to force writing of information. We check if OUTGEN
+! has been opened --- if not we are writing to the terminal and nothing
+! needs to be done.
 !
-	  CLOSE(UNIT=LUER)
+	  INQUIRE(FILE='OUTGEN',OPENED=FILE_OPEN)
+	  IF(FILE_OPEN)THEN
+	    CLOSE(UNIT=LUER)
+	    CALL GEN_ASCI_OPEN(LUER,'OUTGEN','OLD','APPEND',' ',IZERO,IOS)
+	  END IF
 	  CLOSE(UNIT=LU_SE)
-	  CALL GEN_ASCI_OPEN(LUER,'OUTGEN','OLD','APPEND',' ',IZERO,IOS)
 	  CALL GEN_ASCI_OPEN(LU_SE,'STEQ_VALS','OLD','APPEND',' ',IZERO,IOS)
 !
 ! Adjust X-ray filling factors upwards if within a factor of 100 of convergence.

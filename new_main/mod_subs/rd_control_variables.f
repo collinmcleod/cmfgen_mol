@@ -149,7 +149,7 @@ C
 !
 	  VAR_MDOT=.FALSE.
 	  IF(VELTYPE .EQ. 7)THEN
-	    CALL RD_STORE_LOG(VAR_MDOT,'VAR_MDOT','L_FALSE','Variable mass-loss rate model?') 
+	    CALL RD_STORE_LOG(VAR_MDOT,'VAR_MDOT',L_FALSE,'Variable mass-loss rate model?') 
 	    CALL RD_STORE_NCHAR(VAR_MDOT_FILE,'VM_FILE',ITEN,VAR_MDOT,
 	1                        'File with density and clumping info')
 	  END IF
@@ -511,14 +511,18 @@ C
 	1        'Improve initial T estimate by iteration ?')
 	  CALL RD_STORE_DBLE(GREY_PAR,'GREY_TAU',L_TRUE,
 	1        'SpecifysTau above which T is set to TGREY in iterative process')
-C
-	  WRITE(LUSCR,'()')
-	  DO ID=1,NUM_IONS-1
-	    TMP_KEY='TRANS_'//TRIM(ION_ID(ID))
-	    TMP_STRING='Method for treating '//TRIM(ION_ID(ID))//' lines?'
-	    CALL RD_STORE_NCHAR(ATM(ID)%XzV_TRANS_TYPE,TMP_KEY,
+!
+! We only need to specify the TRANSITION type if GLOBAL_LINE_SWITCH is NONE.
+!
+	  IF(GLOBAL_LINE_SWITCH(1:4) .EQ. 'NONE')THEN
+	    WRITE(LUSCR,'()')
+	    DO ID=1,NUM_IONS-1
+	      TMP_KEY='TRANS_'//TRIM(ION_ID(ID))
+	      TMP_STRING='Method for treating '//TRIM(ION_ID(ID))//' lines?'
+	      CALL RD_STORE_NCHAR(ATM(ID)%XzV_TRANS_TYPE,TMP_KEY,
 	1          ISIX,ATM(ID)%XZV_PRES,TMP_STRING)
-	  END DO
+	    END DO
+	  END IF
 C
 	  WRITE(LUSCR,'()')
 	  DO ID=1,NUM_IONS-1
@@ -527,28 +531,28 @@ C
 	    CALL RD_STORE_2LOG(ATM(ID)%DIE_AUTO_XzV,ATM(ID)%DIE_WI_XzV,
 	1         TMP_KEY,ATM(ID)%XZV_PRES,TMP_STRING)
 	  END DO
-C
+!
+! Since we don't use FIX_XzV very much, these have been changed to a hidden variable.
+!
 	  DO ISPEC=1,NUM_SPECIES
-	    WRITE(LUSCR,'()')
 	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
+	      IF(ID .EQ. SPECIES_BEG_ID(ISPEC))WRITE(LUSCR,'()')
 	      TMP_KEY='FIX_'//TRIM(ION_ID(ID))
 	      TMP_STRING='Fix ? levels of '//TRIM(ION_ID(ID))
-	      CALL RD_STORE_INT(ATM(ID)%FIX_NXzV,TMP_KEY,ATM(ID)%XZV_PRES,
-	1           TMP_STRING)
+	      ATM(ID)%FIX_NXzV=0
+	      CALL RD_STORE_INT(ATM(ID)%FIX_NXzV,TMP_KEY,L_FALSE,TMP_STRING)
 	    END DO
 	    TMP_KEY='FIX_'//TRIM(SPECIES(ISPEC))
 	    TMP_STRING='Fix (?) highest ionization stage in '//TRIM(SPECIES(ISPEC))
-	    CALL RD_STORE_INT(FIX_SPECIES(ISPEC),TMP_KEY,SPECIES_PRES(ISPEC),
-	1           TMP_STRING)
+	    FIX_SPECIES(ISPEC)=0
+	    CALL RD_STORE_INT(FIX_SPECIES(ISPEC),TMP_KEY,L_FALSE,TMP_STRING)
 	  END DO
 C
 	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_LOG(FIXED_NE,'FIX_NE',L_TRUE,
-	1                     'Fix the electron density ?')
+	  CALL RD_STORE_LOG(FIXED_NE,'FIX_NE',L_TRUE,'Fix the electron density ?')
 C
 	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_LOG(RD_FIX_IMP,'FIX_IMP',L_TRUE,
-	1            'Automatically fix impurity species?')
+	  CALL RD_STORE_LOG(RD_FIX_IMP,'FIX_IMP',L_TRUE,'Automatically fix impurity species?')
 C
 	  WRITE(LUSCR,'()')                             
 	  WRITE(LUSCR,'()')

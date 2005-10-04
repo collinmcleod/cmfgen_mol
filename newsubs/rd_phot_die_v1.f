@@ -19,6 +19,7 @@
 !
 	IMPLICIT NONE
 !
+! Altered 02-Oct-2005 : Changed eallocation section and have to compile with -g for pgf95
 ! Altered 02-Sep-2004 : Reinserted writing out header infromation located before date.
 ! Altered 18-MAr-2002 : Bug fix for profile with negligble Doppler core.
 ! Altered 12-Mar-2002 : Warning written if DO_AUTO is true and if using
@@ -429,7 +430,7 @@
 !
 	     DO J=CNT_BEG,CNT
 	       PD(ID)%GAMMA(J)=DIE_LEV_AUTO(UP_PNT)/4.0D0/FUN_PI()
-	       PD(ID)%NU_ZERO(J)=1.0E-10*C_KMS*
+	       PD(ID)%NU_ZERO(J)=1.0D-10*C_KMS*
 	1             (DIE_LEV_ENERGY(UP_PNT)-IONIZATION_ENERGY)+EDGE(DIELEV(J))
 	       WRITE(LUER,*) PD(ID)%OSC(J),PD(ID)%GAMMA(J),PD(ID)%NU_ZERO(J),DIELEV(J)
 	     END DO      
@@ -829,12 +830,10 @@
 !
 ! Clean up allocated memory.
 !
-	IF(ALLOCATED(DIE_LEV_G))THEN
-	  DEALLOCATE(DIE_LEV_NAME)
-	  DEALLOCATE(DIE_LEV_G)
-	  DEALLOCATE(DIE_LEV_ENERGY)
-	  DEALLOCATE(DIE_LEV_AUTO)
-	END IF
+	IF(ALLOCATED(DIE_LEV_G))DEALLOCATE(DIE_LEV_G)
+	IF(ALLOCATED(DIE_LEV_NAME))DEALLOCATE(DIE_LEV_NAME)
+	IF(ALLOCATED(DIE_LEV_ENERGY))DEALLOCATE(DIE_LEV_ENERGY)
+	IF(ALLOCATED(DIE_LEV_AUTO))DEALLOCATE(DIE_LEV_AUTO)
 !
 	RETURN
 	END

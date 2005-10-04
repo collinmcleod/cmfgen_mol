@@ -223,11 +223,11 @@ C
 !
 	  DO I=2,N
 	    IF(FEDGE(I) .GT. FEDGE(I-1))THEN
-	      WRITE(LUER,*)'****************************************************'
-              WRITE(LUER,*)'Error reading in Level Names from '//FILNAME
-	      WRITE(LUER,*)'Energy levels are out of order'
+	      WRITE(LUER,*)'**********************************************************'
+              WRITE(LUER,*)'Warning reading in Level Names from '//TRIM(FILNAME)
+	      WRITE(LUER,*)'Energy levels are out of order. Should not cause a problem'
 	      WRITE(LUER,*)'Levels are:',I-1,I
-	      WRITE(LUER,*)'****************************************************'
+	      WRITE(LUER,*)'**********************************************************'
 	    END IF
 	  END DO
 !
@@ -352,7 +352,7 @@ C
 !
 	  IF(CUT_CNT .NE. 0)THEN
 	    WRITE(LUER,'(1X,A,I5,A,A)')'***Warning**** --- ',CUT_CNT,
-	1     ' transitions cut in GENOSC_V6 --- ',TRIM(FILNAME)
+	1     ' weak transitions cut in GENOSC_V6 --- ',TRIM(FILNAME)
  	  END IF
 	END IF
 !

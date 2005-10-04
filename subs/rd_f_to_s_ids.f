@@ -6,6 +6,7 @@ C
 	1               LEVNAME_F,N_F,N_S,LUIN,FILENAME)
 	IMPLICIT NONE
 C
+C Altered 30-Sep-2005 : Removed warning about mixed parity.
 C Altered 31-Jan-1997 : Only a warning is output if SUPER-LEVELS are defined
 C                          with mixed parity.
 C                       Improved error reporting for bad super-level ID.
@@ -152,20 +153,20 @@ C
 	     PAR(I)=PAR(I)-1
 	  END IF
 	END DO
-C
-	J=0
-	DO I=1,N_S
-	  PAR(I)=ABS(PAR(I))/CNT(I)
-	  IF(PAR(I) .NE. 1)THEN
-	    IF(J .EQ. 0)THEN
-	      WRITE(LUER,*)'Warning in RD_F_TO_S_IDS'
-	      WRITE(LUER,*)'Currently treating ',FILENAME
-	    END IF
-	    J=J+1
-	    WRITE(LUER,'(4X,A,I5,A)')'Super level ',
-	1                 I,' has a mix of odd and even levels'
-	  END IF
-	END DO
-C
+!
+!	J=0
+!	DO I=1,N_S
+!	  PAR(I)=ABS(PAR(I))/CNT(I)
+!	  IF(PAR(I) .NE. 1)THEN
+!	    IF(J .EQ. 0)THEN
+!	      WRITE(LUER,*)'Warning in RD_F_TO_S_IDS'
+!	      WRITE(LUER,*)'Currently treating ',FILENAME
+!	    END IF
+!	    J=J+1
+!	    WRITE(LUER,'(4X,A,I5,A)')'Super level ',
+!	1                 I,' has a mix of odd and even levels'
+!	  END IF
+!	END DO
+!
 	RETURN
 	END
