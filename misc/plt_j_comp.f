@@ -6,6 +6,7 @@
 !
 	REAL*8 INDX(NCF_MAX)
 	REAL*8 NU(NCF_MAX)
+	REAL*8 LAM(NCF_MAX)
 !
 	REAL*8 JM_OUT(NCF_MAX)
 	REAL*8 JR_OUT(NCF_MAX)
@@ -60,6 +61,7 @@
 100	  CONTINUE
 	  NCF=I-1
 	CLOSE(UNIT=11)
+	LAM(1:NCF)=2.99702458D+03/NU(1:NCF)
 !
 	SUM1=0.0D0
 	SUM2=0.0D0
@@ -69,24 +71,36 @@
 	SUM2=SUM(DIFF_OUT(1:NCF)*DIFF_OUT(1:NCF))
 	SUM2=SQRT(SUM2/NCF)
 !
-	WRITE(6,*)'Mean difference is ', SUM1
-	WRITE(6,*)'Mean absolute difference is ', SUM3
-	WRITE(6,*)'Root mean square is',SUM2
 !
 	WRITE(6,*)' '
-	WRITE(6,*)'Plot options are:'
-	WRITE(6,*)' JF:  J against frequency at outer boundary'
-	WRITE(6,*)' DF:  Error are frequency at outer boundary'
-	WRITE(6,*)' E(X):  Exit routine'
-	CALL GEN_IN(PLT_OPT,'Plot option')
-	IF(UC(PLT_OPT) .EQ. 'JF')THEN
-	  CALL DP_CURVE(NCF,NU,JR_OUT)
-	  CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J',' ',' ')
-	ELSE IF(UC(PLT_OPT) .EQ. 'DF')THEN
-	  CALL DP_CURVE(NCF,NU,DIFF_OUT)
-	  CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','% Difference',' ',' ')
-	ELSE
-	 STOP
-	END IF
+	WRITE(6,'(A,F6.2,A)')'Mean difference is:          ',SUM1,'%'
+	WRITE(6,'(A,F6.2,A)')'Mean absolute difference is: ',SUM3,'%'
+	WRITE(6,'(A,F6.2,A)')'Root mean square is:         ',SUM2,'%'
+!
+	DO WHILE(1 .EQ. 1)
+	  WRITE(6,*)' '
+	  WRITE(6,*)'Plot options are:'
+	  WRITE(6,*)' JF:  Plot J against frequency at outer boundary'
+	  WRITE(6,*)' JW:  Plot J against wavelength at outer boundary'
+	  WRITE(6,*)' DF:  Plot Error against frequency at outer boundary'
+	  WRITE(6,*)' DW:  Plot Error against wavelength at outer boundary'
+	  WRITE(6,*)' E(X):  Exit routine'
+	  CALL GEN_IN(PLT_OPT,'Plot option')
+	  IF(UC(PLT_OPT) .EQ. 'JF')THEN
+	    CALL DP_CURVE(NCF,NU,JR_OUT)
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'JW')THEN
+	    CALL DP_CURVE(NCF,LAM,JR_OUT)
+	    CALL GRAMON_PGPLOT('\g(\A)','J',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'DF')THEN
+	    CALL DP_CURVE(NCF,NU,DIFF_OUT)
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','% Difference',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'DW')THEN
+	    CALL DP_CURVE(NCF,LAM,DIFF_OUT)
+	    CALL GRAMON_PGPLOT('\gl(\A)','% Difference',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'EX' .OR. UC(PLT_OPT) .EQ. 'E')THEN
+	    STOP
+	  END IF
+	END DO
 !
 	END

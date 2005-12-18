@@ -61,6 +61,7 @@
 	REAL*4 YNUMST_R_AX
 	REAL*4 YINC_R_AX
 	LOGICAL NORMAL_R_Y_AXIS
+	LOGICAL DO_BORDER
 	INTEGER IDY_R_AX,IYTICK_R_AX
 	CHARACTER*1 WHICH_Y_AX(MAX_PLTS)
 	CHARACTER*80 YLABEL_R_AX
@@ -254,6 +255,7 @@
 	TAU_CUT=0.1D0
 	N_OMIT_ID=0
 	N_INC_ID=0
+	DO_BORDER=.TRUE.
 !
 ! Define character strings for switching between VT and TEK modes.
 !
@@ -532,8 +534,8 @@
 	          DO I=1,MAXVEC
                     IF(FLAGLINE(I))THEN
 	              WRITE(33,18)LINEXST(I),LINEYST(I),
-	1                         LINEXEND(I),LINEYEND(I)
-18	              FORMAT(X,1P,4E18.8)
+	1                         LINEXEND(I),LINEYEND(I),VECPEN(I)
+18	              FORMAT(X,1P,4E18.8,3X,I3)
 	            END IF
 	          END DO
                 CLOSE(UNIT=33)
@@ -912,6 +914,16 @@ C
 	  END IF
 	  GOTO 1000
 !
+ 	ELSE IF(ANS .EQ. 'BRD')THEN
+	  IF(DO_BORDER)THEN
+            WRITE(T_OUT,*)'Switching off border'
+	    DO_BORDER=.FALSE.
+	  ELSE
+	    WRITE(T_OUT,*)'Switching on border'
+	    DO_BORDER=.TRUE.
+	  END IF
+	  GOTO 1000
+!
 ! Edit each dashed pen separately.
 C
  	ELSE IF( ANS .EQ. 'DE')THEN
@@ -1267,6 +1279,28 @@ C
 	  WRITE(T_OUT,*)XCUR(1:2),YCUR(1:2)
 	  CALL PGLINE(NPTS(PLOT_ID),CD(PLOT_ID)%XVEC,CONT)
 	  CONTINUUM_DEFINED=.TRUE.
+	  IP=NPLTS+1
+	  CALL NEW_GEN_IN(IP,'Output plot?')
+	  IF(IP .NE. 0)THEN
+	    I=NPTS(PLOT_ID)
+	    TYPE_CURVE(IP)='L'
+	    IF(ASSOCIATED(CD(IP)%XVEC))THEN
+	      DEALLOCATE (CD(IP)%XVEC)
+	      DEALLOCATE (CD(IP)%DATA)
+	    END IF
+            ALLOCATE (CD(IP)%XVEC(I),STAT=IOS)
+            IF(IOS .EQ. 0)ALLOCATE (CD(IP)%DATA(I),STAT=IOS)
+	    IF(IOS .NE. 0)THEN
+	      WRITE(T_OUT,*)'Error: unable to allocate new data vectors'
+	      WRITE(T_OUT,*)'IOS=',IOS
+	      STOP
+	    END IF
+	    CD(IP)%XVEC(1:I)=CD(PLOT_ID)%XVEC(1:I)
+            CD(IP)%DATA(1:I)=CONT(1:I)
+            NPTS(IP)=I
+            ERR(IP)=.FALSE.
+            IF(IP .GT. NPLTS)NPLTS=IP
+	  END IF
 	  GOTO 1000
 C
 	ELSE IF(ANS .EQ. 'GF')THEN
@@ -1315,7 +1349,11 @@ C
 	1               + CD(IP)%XVEC(I)*(CD(IP)%DATA(I+1)-CONT(I+1))/CONT(I+1) )*
 	1                 (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
 	    END DO
-	    CENTROID=CENTROID/EW
+	    IF(EW .NE. 0.0)THEN
+	      CENTROID=CENTROID/EW
+	    ELSE
+	      CENTROID=0.0D0
+	    END IF
 	    WRITE(T_OUT,*)'The equivalent width of the line is =',EW,'X(units)'
 	    WRITE(T_OUT,*)'The central postion of the line is   ',CENTROID
 	    GOTO 1000
@@ -1389,7 +1427,11 @@ C
 	1               + CD(IP)%XVEC(I)*CD(IP)%DATA(I+1) )*
 	1                 (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
 	          END DO
-	          CENTROID=CENTROID/EW
+	          IF(EW .NE. 0.0)THEN
+	            CENTROID=CENTROID/EW
+	          ELSE
+	            CENTROID=0.0
+	          END IF
 	          WRITE(T_OUT,'(A,I3,3X,5X,A,1PE10.3,A,A,1PE14.6)')' Plot ID=',IP,'  AREA=',EW,' X(units);','  Centroid=',CENTROID
 	          WRITE(LU_EW,'(A,I3,3X,5X,A,1PE10.3,A,A,1PE14.6)')' Plot ID=',IP,'  AREA=',EW,' X(units);','  Centroid=',CENTROID
 	        ELSE
@@ -1405,7 +1447,11 @@ C
 	1               + CD(IP)%XVEC(I)*(CD(IP)%DATA(I+1)-1.0) )*
 	1                 (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
 	          END DO
-	          CENTROID=CENTROID/EW
+	          IF(EW .NE. 0.0)THEN
+	            CENTROID=CENTROID/EW
+	          ELSE
+	            CENTROID=0.0
+	          END IF
 !
 	          IF(FIRST_EW)THEN
 	            OPEN(UNIT=LU_EW,FILE='EW_FR_SPEC_PLT',STATUS='UNKNOWN')
@@ -1898,8 +1944,8 @@ C
 	  CALL SET_CASE_UP(VAR_OPERATION,IZERO,IZERO)
 	  CALL NEW_GEN_IN(VAR_PLT2,'Input plot 2?')
 	  VAR_PLT3=NPLTS+1
-	  TYPE_CURVE(VAR_PLT3)='L'
 	  CALL NEW_GEN_IN(VAR_PLT3,'Output plot?')
+	  TYPE_CURVE(VAR_PLT3)='L'
 	  CALL DO_VEC_OP(VAR_PLT1,VAR_PLT2,VAR_PLT3,.TRUE.,VAR_OPERATION)
 	  GOTO 1000
 !
@@ -2236,15 +2282,17 @@ C
 !
 !	CALL PGBOX('ABCNT',0.0,0,'ABCNT',0.0,0)
 !
-	CALL MONBORD_V3(XPAR,XINC,XNUMST,IXTICK,IDX,
+	IF(DO_BORDER)THEN
+	  CALL MONBORD_V3(XPAR,XINC,XNUMST,IXTICK,IDX,
 	1             YPAR,YINC,YNUMST,IYTICK,IDY,
 	1             TICK_FAC,EXPCHAR,
 	1             XLABEL,YLABEL,TITLE,N_TITLE,TITONRHS,
 	1             LOG_AXIS,OPTION,NORMAL_R_Y_AXIS)
-	IF(.NOT. NORMAL_R_Y_AXIS)THEN
-	  CALL DRAW_RIGHT_Y_AXIS(YPAR_R_AX,YINC_R_AX,YNUMST_R_AX,
-	1        IYTICK_R_AX,IDY_R_AX,TICK_FAC,
-	1        EXPCHAR,YLABEL_R_AX,LOG_AXIS) 
+	  IF(.NOT. NORMAL_R_Y_AXIS)THEN
+	    CALL DRAW_RIGHT_Y_AXIS(YPAR_R_AX,YINC_R_AX,YNUMST_R_AX,
+	1          IYTICK_R_AX,IDY_R_AX,TICK_FAC,
+	1          EXPCHAR,YLABEL_R_AX,LOG_AXIS) 
+	  END IF
 	END IF
 !
 ! Draw strings on graph. The parameters T1 and T2 ensure that only strings

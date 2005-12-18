@@ -1,4 +1,5 @@
       SUBROUTINE amoeba(p,y,mp,np,ndim,ftol,funk,iter)
+      IMPLICIT NONE
       INTEGER iter,mp,ndim,np
       REAL*8 ftol
       REAL*8 p(mp,np)
@@ -14,11 +15,11 @@
       REAL*8 rtol,sum,swap,ysave,ytry,psum(NMAX),amotry
 !
       iter=0
-      do j=1,ndim
-	do i=1,3
-	   write(15,*)p(i,j)
-        end do
-      end do
+!      do j=1,ndim
+!	do i=1,ndim+1
+!	   write(15,*)p(i,j)
+!        end do
+!      end do
 !
 ! Main iteration loop.
 !
@@ -77,6 +78,7 @@
 !
       iter=iter+2
       ytry=amotry(p,y,psum,mp,np,ndim,funk,ihi,-1.0D0)
+      write(6,*)'done one'
       if (ytry.le.y(ilo)) then
         ytry=amotry(p,y,psum,mp,np,ndim,funk,ihi,2.0D0)
       else if (ytry.ge.y(inhi)) then

@@ -128,8 +128,11 @@ C
 	WRITE(T_OUT,*)'D   :: Z(K)=100.0D0*(Y(K)-Y(NIT))/Y(NIT)'
 	WRITE(T_OUT,*)'Y   :: Z(K)=Y(K)'
 	WRITE(T_OUT,*)' '
-	WRITE(T_OUT,*)'MR  :: Z(K)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
-	WRITE(T_OUT,*)'IR  :: Z(ID)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
+	WRITE(T_OUT,*)'PD  :: Plot a variable as a function of depth.'
+	WRITE(T_OUT,*)' '
+	WRITE(T_OUT,*)'MED_R  :: Median corection as a function of depth'
+	WRITE(T_OUT,*)'MR     :: Z(K)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
+	WRITE(T_OUT,*)'IR     :: Z(ID)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'E   :: EXIT'
 	WRITE(T_OUT,*)' '
@@ -208,7 +211,7 @@ C
 	  DO WHILE(IT .LT. 1 .OR. IT .GT. NIT)
 	    IT=NIT
 	    CALL GEN_IN(IT,'Iteration #')
-	  END DO 
+	  END DO
 	  ID=0
 	  DO WHILE(ID .LT. 1 .OR. ID .GT. ND)
 	    ID=ND/2; CALL GEN_IN(ID,'Depth index')
@@ -233,7 +236,7 @@ C
 	    ELSE
 	      Y(1)=Y(1)+1
 	    END IF
-	   Ylabel='N(r)'
+	    Ylabel='N(r)'
 	  END DO
 	  CALL DP_CURVE(K,X,Y)
 	  CALL GRAMON_PGPLOT('100(r-1)',Ylabel,' ',' ')
@@ -263,6 +266,23 @@ C
 	  IT=NIT-2
 	  CALL DP_CURVE(IT,X(3),Y(3))
 	  CALL GRAMON_PGPLOT('Iteration',Ylabel,' ',' ')
+	  GOTO 200
+	ELSE IF(PLT_OPT(1:2) .EQ. 'PD')THEN
+	  IT=NIT
+	  DO WHILE(1 .EQ. 1)
+	    CALL GEN_IN(IT,'Iteration # (zero to exit)')
+	    IF(IT .EQ. 0)EXIT
+	    IVAR=NT
+	    CALL GEN_IN(IVAR,'Variable # (zero to exit)')
+	    IF(IVAR .EQ. 0)EXIT
+	    DO ID=1,ND
+	      Y(ID)=POPS(IVAR,ID,IT)
+	      X(ID)=ID
+	    END DO
+	    CALL DP_CURVE(ND,X,Y)
+	  END DO
+	  Ylabel=''
+	  CALL GRAMON_PGPLOT('Depth',Ylabel,' ',' ')
 	  GOTO 200
 	END IF
 C

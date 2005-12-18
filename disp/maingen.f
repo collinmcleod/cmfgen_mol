@@ -3745,7 +3745,7 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	    END DO
 	    XAXIS='\gl(\A)'
 	  ELSE
-	    CALL USR_OPTION(FLAG,'LAM','F','Plot against non-normalized frequency?')
+	    CALL USR_OPTION(FLAG,'NNF','F','Plot against non-normalized frequency?')
 	    IF(FLAG)THEN
 	      ZV(1:J)=ZV(1:J)*EDGE_FREQ
 	      XAXIS='\gn(10\u15 \dHz)'
@@ -4571,6 +4571,11 @@ c
 	  END DO
 	CLOSE(UNIT=LU_OUT)
 
+	ELSE IF(XOPT .EQ. 'WRRTK')THEN
+	  DO I=1,ND
+	    WRITE(25,'(I3,ES15.5,3ES14.4)'),I,R(I)*1.0D+10,T(I)*1.0D+04,
+	1          MASS_DENSITY(I),1.0D-10*ROSS_MEAN(I)/MASS_DENSITY(I)
+	  END DO
 	ELSE IF(XOPT .EQ. 'WRPLOT')THEN
 	  WRITE(T_OUT,*)' OPTION `WRPLOT` NOT AVAILABLE'
 	  WRITE(T_OUT,*)' Use WP option in plot package'
