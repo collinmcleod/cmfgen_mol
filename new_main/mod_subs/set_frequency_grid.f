@@ -370,6 +370,22 @@
 	  FQW(ML)=FQW(ML)*1.0D+15
 	END DO
 !
+! Revise number of lines so only those in frequency grid are included.
+!
+	I=N_LINE_FREQ
+	DO ML=I,1,-1
+	  N_LINE_FREQ=ML
+	  IF(VEC_FREQ(ML) .GT. MIN_CONT_FREQ*(1.0D0+1.1*VINF/2.998D+05))EXIT
+	END DO
+	I=I-N_LINE_FREQ
+	IF(I .NE. 0)THEN
+	  WRITE(LUER,*)' Warning from SET_FREQUENCY_GRID'
+	  WRITE(LUER,'(1X,I5,A,A)')I,' weak lines in ',
+	1        'extreme IR will be ignored as outside continuum range.'
+	  WRITE(LUER,*)'Min(Nu_CONT)=',NU(NCF)
+	  WRITE(LUER,*)'Min(Nu_LINE)=',VEC_FREQ(I+N_LINE_FREQ)
+	END IF
+!
 ! Set observers frequencies. The slight fiddling in setting NU_MAX and NU_MIN 
 ! is done so that the CMF frequencies encompass all observers frame 
 ! frequencies. This allows computation of all observers fluxes allowing for 

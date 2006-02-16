@@ -10,7 +10,9 @@
 	1            WRITE_IP,DO_REL_CORRECTIONS)
 	IMPLICIT NONE
 !
-! Altered 29-Aug-2003:  Relativistic corrections included. Corrections were
+! Altered 11-Fev-2006 : Minor bug fix which caused some frequency acces to go
+!                         outside arrays. Error detecting inserted.
+! Altered 29-Aug-2003 : Relativistic corrections included. Corrections were
 !                         inserted in a manner so as not to effect the operation 
 !                         of the code when relativistic corrections were 
 !                         switched off.
@@ -481,9 +483,10 @@
 ! window slightly.
 !
 	    MAX_VMU=MAXVAL(VMU_RAY)
-	    T2=1.0D0+2.0D0*MAX_VMU
+	    T2=1.0D0+1.2D0*MAX_VMU
 	    IF(DO_REL_CORRECTIONS)THEN
-	       T2=(MAXVAL((1.0D0-VMU_RAY)*GAM_RAY) -1.0D0)*1.05D0+1.0D0
+!	       T2=(MAXVAL((1.0D0-VMU_RAY)*GAM_RAY) -1.0D0)*1.05D0+1.0D0
+	       T2=MAXVAL((1.0D0-VMU_RAY)*GAM_RAY)
 	    END IF
 	    I=MIN(NOS,1+(OUT_ML-1)*NOS_INC)
 	    T1=OBS_FREQ(I)*T2
@@ -491,11 +494,12 @@
 	    DO WHILE (T1 .LT. FREQ_CMF(J))
 	      J=J+1
 	    END DO
-	    STRT_INDX_CMF(OUT_ML)=MAX(1,J-5)
+	    STRT_INDX_CMF(OUT_ML)=MAX(1,J-10)
 !
-	    T2=1.0D0-2.0D0*MAX_VMU
+	    T2=1.0D0-1.2D0*MAX_VMU
 	    IF(DO_REL_CORRECTIONS)THEN
-	      T2=(MINVAL((1.0D0-VMU_RAY)*GAM_RAY) -1.0D0)*1.05D0+1.0D0
+!	      T2=(MINVAL((1.0D0-VMU_RAY)*GAM_RAY) -1.0D0)*1.05D0+1.0D0
+	      T2=MINVAL((1.0D0-VMU_RAY)*GAM_RAY)
 	    END IF
 	    I=MIN(NOS,OUT_ML*NOS_INC)
 	    T1=OBS_FREQ(I)*T2
@@ -503,7 +507,7 @@
 	    DO WHILE (T1 .GT. FREQ_CMF(J))
 	      J=J-1
 	    END DO
-	    END_INDX_CMF(OUT_ML)=MIN(NCF,J+5)
+	    END_INDX_CMF(OUT_ML)=MIN(NCF,J+10)
 	    SM_NCF=MAX(SM_NCF,END_INDX_CMF(OUT_ML)-STRT_INDX_CMF(OUT_ML)+1)
 	  END DO
 !
@@ -555,6 +559,12 @@
 	    T1=OBS_FREQ(ML)*(1.0D0-VMU_RAY(1))*GAM_RAY(1)
 	    DO WHILE(T1 .LT. SM_FREQ_CMF(K))
 	      K=K+1
+	      IF(K .GT. SM_NCF)THEN
+	        WRITE(LUER,*)'Error in OBS_FRAME_SUB_V5'
+	        WRITE(LUER,*)'Bad K indx: K=',K
+	        WRITE(LUER,*)T1,SM_FREQ_CMF(1),SM_FREQ_CMF(SM_NCF)
+	        WRITE(LUER,*)'LS, OUT_ML, ML=',LS,OUT_ML,ML
+	      END IF
 	    END DO
 	    INDX(1)=K
 	    T2=(T1-SM_FREQ_CMF(K))/(SM_FREQ_CMF(K-1)-SM_FREQ_CMF(K))
@@ -587,6 +597,12 @@
 	      T1=OBS_FREQ(ML)*(1.0D0-VMU_RAY(I))*GAM_RAY(I)
 	      DO WHILE(T1 .LT. SM_FREQ_CMF(K))
 	        K=K+1
+	        IF(K .GT. SM_NCF)THEN
+	          WRITE(LUER,*)'Error in OBS_FRAME_SUB_V5'
+	          WRITE(LUER,*)'Bad K indx: K=',K
+	          WRITE(LUER,*)T1,SM_FREQ_CMF(1),SM_FREQ_CMF(SM_NCF)
+	          WRITE(LUER,*)'LS, OUT_ML, ML, I=',LS,OUT_ML,ML,I
+	        END IF
 	      END DO
 	      INDX(I)=K
 	      T2=(T1-SM_FREQ_CMF(K))/(SM_FREQ_CMF(K-1)-SM_FREQ_CMF(K))
@@ -813,7 +829,8 @@
 	  CALL TUNE(2,'ML')      
 45000	  CONTINUE
 !
-	  WRITE(LUER,'(A,I3,A)')' LS loop',LS,' is finished.'
+	  WRITE(LUER,'(A,I3,A,I5)')
+	1            ' LS loop',LS,' is finished. Number of points along ray=',NRAY
 50000	CONTINUE
 !
 ! Convert the fluxes to Janskies for an object at 1kpc.

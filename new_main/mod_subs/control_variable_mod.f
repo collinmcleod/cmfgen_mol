@@ -1,5 +1,8 @@
 	MODULE CONTROL_VARIABLE_MOD
 !
+! Altered : 29-Jan-2006 : Control variable fors relativistic transfer and time
+!                          dependent statistical equilibrium equations installed.
+! 
 ! Set constants that are regularly used, and passed to subroutines.
 !
 	INTEGER, PARAMETER :: IZERO=0
@@ -53,10 +56,15 @@
 !
 ! Supernova variables
 !
-	REAL*8 RHO_ZERO			!Density at core in atmos/cm^3
+	REAL*8 RHO_ZERO			!Density at core in gm/cm^3
+	REAL*8 RCUB_RHO_ZERO            !r^3 . density at core in (in 10^{-30} gm}
 	REAL*8 N_RHO			!Exponent for density (+ve)
+	INTEGER TIME_SEQ_NO             !Number of model in time sequence.
 	LOGICAL SN_MODEL
 	LOGICAL JGREY_WITH_V_TERMS 	!Include velocity terms when comuting T(grey).
+	LOGICAL DO_CO_MOV_DDT		!Include comoving drivative in SE equations.
+	LOGICAL DO_FULL_REL_OBS         !Include all relativistic terms in obs. frame computation.
+	LOGICAL DO_FULL_REL_CMF         !Include all relativistic terms in CMF obs. frame computation.
 !
 ! Used to revise the R_GRID automatically after each iteration.
 !
@@ -397,6 +405,16 @@
 !
 	REAL*8 NU_XRAY_END
 	REAL*8 DELV_XRAY
+!
+! Indicates number of time POPS array is to be written to scratch
+! file per iteration.
+!
+        INTEGER RITE_N_TIMES
+        PARAMETER (RITE_N_TIMES=1)
+!
+	INTEGER NLBEGIN
+        LOGICAL NEWMOD
+        LOGICAL WRITE_RVSIG
 !
 	LOGICAL RDTHK_CONT,THK_CONT,THK_LINE
 	LOGICAL SETZERO

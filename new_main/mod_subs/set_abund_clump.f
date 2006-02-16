@@ -16,6 +16,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 08-Feb-2006 : New clumping law installed (used by PACO for P Cygni).
 ! Altered 05-Sep-2005 : VAR_MDOT section included.
 ! Created 19-Dec-2004
 !
@@ -64,6 +65,17 @@
 	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1)-CLUMP_PAR(3))*
 	1                     EXP(-V(K)/CLUMP_PAR(2))+
 	1                     CLUMP_PAR(3)*EXP(-V(K)/CLUMP_PAR(4))
+	    END DO
+	  ELSE IF(CLUMP_LAW(1:4) .EQ. 'REXP')THEN
+	    IF(N_CLUMP_PAR .NE. 3)THEN
+	      WRITE(LUER,*)'Error in CMFGEN'
+	      WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
+	      STOP
+	    END IF
+	    DO K=1,ND
+	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
+	1          EXP(-V(K)/CLUMP_PAR(2))+
+	1	   (1.0D0-CLUMP_PAR(1))*EXP( (V(K)-V(1))/CLUMP_PAR(3))
 	    END DO
 	  ELSE
 	    WRITE(LUER,*)'Error in SET_ABUND_CLUMP'

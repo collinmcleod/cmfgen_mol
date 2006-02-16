@@ -1,6 +1,6 @@
 !
 ! Simple program to plot data from the SCRTEMP file. This can be used to check
-!   Convergence of a proram.
+!   Convergence of a program.
 !   Convergence as a function of depth etc.
 !
 	PROGRAM PLT_SCR
@@ -8,7 +8,9 @@
 	IMPLICIT NONE
 	INTEGER ND,NT,NIT
 C
-	REAL*8, ALLOCATABLE :: POPS(:,:,:)		!NT,ND
+	REAL*8, ALLOCATABLE :: POPS(:,:,:)		!NT,ND,NIT
+	REAL*8, ALLOCATABLE :: R_MAT(:,:)		!ND,NIT
+!
 	REAL*8, ALLOCATABLE :: R(:)			!ND
 	REAL*8, ALLOCATABLE :: V(:)			!ND
 	REAL*8, ALLOCATABLE :: SIGMA(:)			!ND
@@ -95,6 +97,8 @@ C
 	CLOSE(UNIT=12)
 C
 	ALLOCATE (POPS(NT,ND,NIT))
+	ALLOCATE (R_MAT(ND,NIT))
+!
 	ALLOCATE (R(ND))
 	ALLOCATE (V(ND))
 	ALLOCATE (SIGMA(ND))
@@ -112,9 +116,10 @@ C
 	ALLOCATE (Z_BIG(NT))
 C
 	DO IREC=1,NIT
-	    CALL SCR_READ_V2(R,V,SIGMA,POPS(1,1,IREC),IREC,NITSF,
+	  CALL SCR_READ_V2(R,V,SIGMA,POPS(1,1,IREC),IREC,NITSF,
 	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
 	1              NT,ND,LUSCR,NEWMOD)
+	  R_MAT(:,IREC)=R(:) 
 	END DO
 C
 200	CONTINUE
@@ -141,7 +146,32 @@ C
 	CALL SET_CASE_UP(PLT_OPT,0,0)
 !
 	IF(PLT_OPT(1:2) .EQ. 'E ' .OR. PLT_OPT(1:2) .EQ. 'EX')STOP
-	IF(PLT_OPT(1:5) .EQ. 'MED_R')THEN
+	IF(PLT_OPT(1:5) .EQ. 'CHK_R')THEN
+	  DO IT=1,NIT
+	    WRITE(6,'(2ES16.6)')R_MAT(1,IT),R_MAT(ND,IT)
+	  END DO
+	ELSE IF(PLT_OPT(1:4) .EQ. 'CHNG')THEN
+	  IT=0
+	  DO WHILE(IT .LT. 1 .OR. IT .GT. NIT)
+	    IT=NIT
+	    CALL GEN_IN(IT,'Iteraton # of lower iteration')
+	  END DO
+	  ID=ND
+	  CALL GEN_IN(ID,'Depth index')
+	  DO IVAR=1,NT
+	    X(IVAR)=IVAR
+	    T2=POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1)
+	    T1=POPS(IVAR,ID,NIT)-POPS(IVAR,ID,IT-1)
+	    IF(ABS(T2). GT. 1.0D-50*ABS(T1))THEN
+	     Y(IVAR)=T1/T2
+	    ELSE
+	     Y(IVAR)=20000
+	    END IF
+	  END DO
+	  CALL DP_CURVE(NT,X,Y)
+	  CALL GRAMON_PGPLOT('Depth ID','Ratio',' ',' ')
+	  GOTO 200
+	ELSE IF(PLT_OPT(1:5) .EQ. 'MED_R')THEN
 	  IT=0
 	  DO WHILE(IT .LT. 1 .OR. IT .GT. NIT)
 	    IT=NIT; CALL GEN_IN(IT,'Iteraton #')
@@ -169,7 +199,9 @@ C
 !	    IF(ID .EQ. 30)THEN
 	      WRITE(74,*)'ID=',ID
 	      DO J=1,NT
-	        WRITE(74,*)J,I_BIG(J),Z_BIG(I_BIG(J))
+	        K=I_BIG(J)
+!	        WRITE(74,*)J,I_BIG(J),Z_BIG(I_BIG(J))
+	        WRITE(74,'(2I4,4ES16.8)')J,K,Z_BIG(K),POPS(K,ID,IT),POPS(K,ID,IT-1),POPS(K,ID,IT-2)
 	      END DO
 !	    END IF
 	  END DO
@@ -268,7 +300,7 @@ C
 	  CALL GRAMON_PGPLOT('Iteration',Ylabel,' ',' ')
 	  GOTO 200
 	ELSE IF(PLT_OPT(1:2) .EQ. 'PD')THEN
-	  IT=NIT
+	  IT=NIT; ID=ND
 	  DO WHILE(1 .EQ. 1)
 	    CALL GEN_IN(IT,'Iteration # (zero to exit)')
 	    IF(IT .EQ. 0)EXIT
@@ -286,6 +318,7 @@ C
 	  GOTO 200
 	END IF
 C
+	ID=ND
 	DO WHILE(0 .EQ. 0)	
 	  NPLTS=0
 	  IVAR=1

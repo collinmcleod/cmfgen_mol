@@ -25,6 +25,7 @@ MOD = $(LIB_MOD)(mod_cmfgen.o)\
       $(LIB_MOD)(var_rad_mod.o)
 
 OBJ = $(LIB)(adjust_r_grid_v2.o)\
+      $(LIB)(adjust_r_grid_v3.o)\
       $(LIB)(adjust_den_vecs.o)\
       $(LIB)(comp_j_blank.o)\
       $(LIB)(comp_grey.o)\
@@ -41,6 +42,7 @@ OBJ = $(LIB)(adjust_r_grid_v2.o)\
       $(LIB)(set_frequency_grid.o)\
       $(LIB)(set_new_model_estimates.o)\
       $(LIB)(set_abund_clump.o)\
+      $(LIB)(solve_for_pops.o)\
       $(LIB)(sub_cmf_line.o)\
       $(LIB)(sub_sob_line.o)\
       $(LIB)(sup_to_full_v4.o)
@@ -122,6 +124,17 @@ $(LIB)(comp_grey.o) : comp_grey.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(
                                   $(LIB_MOD)(ang_qw_mod.o)
 	$(F90) -c $(FG) comp_grey.f
 	ar ruv $(LIB) comp_grey.o
+
+$(LIB)(solve_for_pops.o) : solve_for_pops.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
+                                  $(LIB_MOD)(ang_qw_mod.o)
+	$(F90) -c $(FG) solve_for_pops.f
+	ar ruv $(LIB) solve_for_pops.o
+
+$(LIB)(set_frequency_grid.o) : set_frequency_grid.f $(LIB_MOD)(control_variable_mod.o)\
+ $(LIB_MOD)(line_vec_mod.o) $(LIB_MOD)(mod_cmfgen.o) 
+	$(F90) -c $(FG) set_frequency_grid.f
+	ar ruv $(LIB) set_frequency_grid.o
+                                                                                                                      
 
 clean :
 	rm -f *.o 

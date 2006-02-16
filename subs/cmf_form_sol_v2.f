@@ -104,6 +104,8 @@ C
 	USE CMF_FORM_MOD_V2
 	IMPLICIT NONE
 C
+C Altered 03-Feb-2006 : Adjust regriding treatment. Extra points are inserted
+C                         qually spaced in z, rather than R.
 C Altered 10-Oct-2004 : Adjusted SQRT in computation oz to use (R-P)*(R+P).
 C Altered 22-Jun-2000 : Changed to V2. SOLUTION_OPTION inserted in call. Can
 C                           now use INTEGRAL method to get IPLUS_P. Method
@@ -272,6 +274,7 @@ C
 	REAL*8 IBOUND			!Incident intensity on outer boundary.
 	REAL*8 T1,T2
 	REAL*8 DELR
+	REAL*8 DELZ
 	REAL*8 I_CORE
 C
 	REAL*8 NEW_dLOG_NU		!dv
@@ -451,21 +454,30 @@ C the frequency (and hence the opacity and emissivity) are evaluated. These
 C data are stored in the module, and will be available for subsequent
 C calls.
 C
-C Don't do the very last ray, as single point.
+! Don't do the very last ray, as single point.
 C
 	  DO LS=1,MIN(NP_OBS,NC+ND_EXT-1)
 C
 	    NI_ORIG=ND_EXT-(LS-NC-1)
 	    IF(LS .LE. NC)NI_ORIG=ND_EXT
 !
+! Alomg the ray, we insert points equally spaced in z.
+!
 	    T1=1.0D0/PNT_FAC
 	    DO I=1,NI_ORIG-1
-	      DO J=1,PNT_FAC
+	      T1=SQRT( (R_EXT(I)+P_EXT(LS))*(R_EXT(I)-P_EXT(LS)) )
+	      T2=SQRT( (R_EXT(I+1)+P_EXT(LS))*(R_EXT(I+1)-P_EXT(LS)) )
+	      DELZ=(T1-T2)/PNT_FAC
+	      K=(I-1)*PNT_FAC+1
+	      R_RAY(K,LS)=R_EXT(I)
+	      DO J=2,PNT_FAC
 	        K=(I-1)*PNT_FAC+J
-	        R_RAY(K,LS)=R_EXT(I)-(J-1)*T1*(R_EXT(I)-R_EXT(I+1))
+	        T2=T1-(J-1)*DELZ
+	        R_RAY(K,LS)=SQRT(T2*T2+P_EXT(LS)*P_EXT(LS))
 	      END DO
 	    END DO
 	    NRAY=(NI_ORIG-1)*PNT_FAC+1
+	    R_RAY(1,LS)=R_EXT(1)
 	    R_RAY(NRAY,LS)=R_EXT(NI_ORIG)
 !
 !	    IF(LS .LE. NC)THEN
@@ -919,7 +931,11 @@ C
 !
 	      DO I=1,NI-1
 	        T1=DTAU(I)
-	        EE(I)=EXP(-T1)
+	        IF(T1 .LT. 1000.0D0)THEN
+	          EE(I)=EXP(-T1)
+	        ELSE
+	          EE(I)=0.0D0
+	        END IF
 	        IF(T1 .GT. 0.5)THEN
 	          E0(I)=1.0D0-EE(I)
 	          E1(I)=1.0D0-E0(I)/T1

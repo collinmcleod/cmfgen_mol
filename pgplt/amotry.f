@@ -1,31 +1,31 @@
-      FUNCTION amotry(p,y,psum,mp,np,ndim,funk,ihi,fac)
+      FUNCTION AMOTRY(P,Y,PSUM,MP,NP,NDIM,FUNK,IHI,FAC)
       IMPLICIT NONE
-      INTEGER ihi,mp,ndim,np
-      REAL*8 amotry,fac,p(mp,np),psum(np),y(mp),funk
+      INTEGER IHI,MP,NDIM,NP
+      REAL*8 AMOTRY,FAC,P(MP,NP),PSUM(NP),Y(MP),FUNK
       INTEGER, PARAMETER :: NMAX=20
-      EXTERNAL funk
+      EXTERNAL FUNK
 !
-! Uses funk
+! Uses function FUNK
 !
-      INTEGER j
-      REAL*8 fac1,fac2,ytry,ptry(NMAX)
+      INTEGER J
+      REAL*8 FAC1,FAC2,YTRY,PTRY(NMAX)
 !
-      fac1=(1.D0-fac)/ndim
-      fac2=fac1-fac
-      write(6,'(3ES14.4,I4)')fac,fac1,fac2,ndim
-      do 11 j=1,ndim
-        ptry(j)=psum(j)*fac1-p(ihi,j)*fac2
-11    continue
-      ytry=funk(ptry)
+      FAC1=(1.D0-FAC)/NDIM
+      FAC2=FAC1-FAC
+      DO J=1,NDIM
+        PTRY(J)=PSUM(J)*FAC1-P(IHI,J)*FAC2
+      END DO
+      YTRY=FUNK(PTRY)
 !
-      if (ytry.lt.y(ihi)) then
-        y(ihi)=ytry
-        do 12 j=1,ndim
-          psum(j)=psum(j)-p(ihi,j)+ptry(j)
-          p(ihi,j)=ptry(j)
-12      continue
-      endif
-      amotry=ytry
-      return
+      IF (YTRY .LT. Y(IHI)) THEN
+        Y(IHI)=YTRY
+        DO J=1,NDIM
+          PSUM(J)=PSUM(J)-P(IHI,J)+PTRY(J)
+          P(IHI,J)=PTRY(J)
+	END DO
+      END IF
+      AMOTRY=YTRY
+      RETURN
+!
       END
 C  (C) Copr. 1986-92 Numerical Recipes Software 5

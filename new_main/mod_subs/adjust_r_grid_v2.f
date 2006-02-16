@@ -8,6 +8,9 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered : 10-Jan-2006 Added extra point at inner boundary.
+!                         Boundary problems, arising because of rounding
+!                         error were fixed.
 ! Altered : 02-May-2004 Now only change, R, V, SIGMA and POPS.
 ! Altered : 18-Mar-2004 FLUXMEAN passed insted of dTAU_OLD
 !                       ESEC passed in call.
@@ -88,6 +91,7 @@
 ! Save existing grid, which will be used for the interplations.
 !
 	R_OLD(1:ND)=R(1:ND)
+	LOG_R_OLD=LOG(R_OLD)
 !
 ! Compute optical depth scale. Note that we are passed the optical detph 
 ! increments, not the optical depth scale.
@@ -108,8 +112,8 @@
 	FG_MAX=1.50D0
 	FG_RANGE=FG_MAX-FG_MIN
 !
-	IF( TRIM(GRID_TYPE) .EQ. 'UNIFORM')THEN
-	  DTAU=(TAU_OLD(ND)-TAU_OLD(1))/(ND-5)
+	IF( TRIM(GRID_TYPE(1:6)) .EQ. 'UNIFOR')THEN
+	  DTAU=(TAU_OLD(ND)-TAU_OLD(1))/(ND-6)
 	  IF(N_PARS .EQ. 2)THEN
 	    FG_MIN=RG_PARS(1)
 	    FG_MAX=RG_PARS(2)
@@ -135,7 +139,7 @@
 ! points at either boundary, which are placed separately.
 !
 	T1=TAU_OLD(ND)-TAU_OLD(1)-FG_RANGE
-        DTAU=T1/(ND-4-NX)
+        DTAU=T1/(ND-5-NX)
 	I1=(FG_MIN-TAU_OLD(1))/DTAU
 	DTAU=(FG_MIN-TAU_OLD(1))/I1
         I1=I1+2
@@ -155,20 +159,28 @@
 !
 ! Now do the last section, towards the inner boundary.
 !
-	I2=ND-(NX+I1+2)
+	I2=ND-(NX+I1+3)
 	T1=(TAU_OLD(ND)-FG_MAX)
 	DTAU=T1/I2
-	DO I=I1+NX+1,ND-3
+	DO I=I1+NX+1,ND-4
 	  TAU(I)=TAU(I-1)+DTAU
 	END DO
 	TAU(ND)=TAU_OLD(ND)
-	TAU(ND-1)=MAX(TAU_OLD(ND-1),TAU(ND)-0.1D00*DTAU)
-	TAU(ND-2)=TAU(ND)-0.5D00*DTAU
+	T1=1.0D0-10.0D0**(-DTAU)
+	TAU(ND-1)=MAX(TAU_OLD(ND-1),TAU(ND)+LOG10(1.0D0-0.0667D0*T1))
+	TAU(ND-2)=TAU(ND)+LOG10(1.0D0-0.201D0*T1)
+	TAU(ND-3)=TAU(ND)+LOG10(1.0D0-0.467D0*T1)
 !
-! Compute the new radius grid. Linear interpolation is
+!	DO I=1,ND
+!	  WRITE(6,'(I4,4E16.8)')I,TAU(I),TAU_OLD(I),LOG_R_OLD(I)
+!	END DO
+!
+! Compute the new radius grid. Linear interpolation in the log-log plane
 ! more than adequate, since we're just defining a new grid.
 !
-	CALL LININT(TAU,R,ND,TAU_OLD,R_OLD,ND)
+	CALL LININT(TAU,LOG_R,ND,TAU_OLD,LOG_R_OLD,ND)
+	R=EXP(LOG_R); R(1)=R_OLD(1); R(ND)=R_OLD(ND)
+	LOG_R(1)=LOG_R_OLD(1); LOG_R(ND)=LOG_R_OLD(ND)
 !
 ! We now need to regrid all the populations. All interpolations (except 
 ! sigma) are performed in the LOG-LOG plane. For SN this is ideal, since
@@ -177,9 +189,6 @@
 !
 ! We do not need to interpolate T, and ED directly, since these are part
 ! of POPS.
-!
-	LOG_R_OLD=LOG(R_OLD)
-	LOG_R=LOG(R)
 !
 	TA(1:ND)=LOG(V(1:ND))
 	CALL MON_INTERP(V,ND,IONE,LOG_R,ND,TA,ND,LOG_R_OLD,ND)

@@ -1,25 +1,20 @@
-      SUBROUTINE amoeba(p,y,mp,np,ndim,ftol,funk,iter)
+      SUBROUTINE AMOEBA(P,Y,MP,NP,NDIM,FTOL,FUNK,ITER)
       IMPLICIT NONE
-      INTEGER iter,mp,ndim,np
-      REAL*8 ftol
-      REAL*8 p(mp,np)
-      REAL*8 y(mp)
-      REAL*8 funk
+      INTEGER ITER,MP,NDIM,NP
+      REAL*8 FTOL
+      REAL*8 P(MP,NP)
+      REAL*8 Y(MP)
+      REAL*8 FUNK
       INTEGER, PARAMETER :: NMAX=20
       INTEGER, PARAMETER :: ITMAX=20000
-      EXTERNAL funk
+      EXTERNAL FUNK
 !
-! Subroutine uses amotry,funk
+! Subroutine uses AMOTRY, FUNK
 !
-      INTEGER i,ihi,ilo,inhi,j,m,n
-      REAL*8 rtol,sum,swap,ysave,ytry,psum(NMAX),amotry
+      INTEGER I,IHI,ILO,INHI,J,M,N
+      REAL*8 RTOL,SUM,SWAP,YSAVE,YTRY,PSUM(NMAX),AMOTRY
 !
-      iter=0
-!      do j=1,ndim
-!	do i=1,ndim+1
-!	   write(15,*)p(i,j)
-!        end do
-!      end do
+      ITER=0
 !
 ! Main iteration loop.
 !

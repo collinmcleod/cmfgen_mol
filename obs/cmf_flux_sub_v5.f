@@ -13,6 +13,9 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered: 01-Feb-2006 : COMP_OBS_V2 installed. Frequency transformation between
+!                          comoving and observing franes is now accuratle for all speeds.
+!                          Frequency scaling of intensities currently switched off.
 ! Altered: 03-May-2004 : Options are now read into store in CMF_FLUX.
 !                          STORE cleaned after use.
 ! Altered: 05-Jun-2002 : Min bug fix: Changed value of VDOP passed to
@@ -538,7 +541,7 @@ C
 C
 C Parameters, vectors, and arrays for computing the observed flux.
 C
-	INTEGER, PARAMETER :: NST_CMF=4000
+	INTEGER, PARAMETER :: NST_CMF=6000
 	INTEGER NP_OBS_MAX
 	INTEGER NP_OBS
 	REAL*8  NU_STORE(NST_CMF)
@@ -2017,10 +2020,10 @@ C
 	     WRITE(LU_FLUX,REC=EDD_CONT_REC+ML)(SOB(I),I=1,ND),FL
 	   END IF
 !
-	   CALL COMP_OBS(IPLUS,FL,
+	   CALL COMP_OBS_V2(IPLUS,FL,
 	1           IPLUS_STORE,NU_STORE,NST_CMF,
 	1           MU_AT_RMAX,HQW_AT_RMAX,OBS_FREQ,OBS_FLUX,N_OBS,
-	1           V_AT_RMAX,RMAX_OBS,'IPLUS','LIN_INT',
+	1           V_AT_RMAX,RMAX_OBS,'IPLUS','LIN_INT',L_FALSE,
 	1           FIRST_OBS_COMP,NP_OBS)
 C
 	ELSE                          

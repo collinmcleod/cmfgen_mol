@@ -37,6 +37,12 @@
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
+! Altered 16-Feb-2006 : Changed and modified over 2 month period. Section solving for
+!                         populations and performing NG acceleration etc removed to
+!                         subroutine (SOLVE_FOR_POPS). Routines added to allow time 
+!                         variability of the statistical equilibrium equations. 
+!                         Currently these are only for a Hubble law flow. Relativistic 
+!                         terms added to COMP_OBS (now COMP_OBS_V2).
 ! Altered 20-Feb-2005 : Changed to use FLUX_MEAN & ROSS_MEAN which are defined in
 !                         MOD_CMFGEN. Previusly used FLUXMEAN & ROSSMEAN defined in
 !                         RADIATION_MOD.
@@ -52,7 +58,7 @@
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
 	CHARACTER*12 PRODATE
-	PARAMETER (PRODATE='02-Oct-2005')	!Must be changed after alterations
+	PARAMETER (PRODATE='16-Feb-2006')	!Must be changed after alterations
 !
 ! 
 !
@@ -133,7 +139,7 @@
 ! 
 !
 	INTEGER NNM				!Include cont. var in line var.
-	INTEGER NLBEGIN,NL,NUP
+	INTEGER NL,NUP
 	INTEGER MNL,MNUP
 	INTEGER MNL_F,MNUP_F
 	INTEGER PHOT_ID
@@ -199,6 +205,8 @@
 ! consideration. 0.5 is presently the prefered value.
 !
 	REAL*8 AVE_ENERGY(NT)		!Average energy of each super level
+	REAL*8 STEQ_T_SCL(ND)
+	REAL*8 STEQ_T_NO_SCL(ND)
 ! 
 !
 ! Dielectronic recombination variables and arrays.
@@ -374,15 +382,8 @@
 	REAL*8 AD_COOL_DT(ND)
 	REAL*8 ARTIFICIAL_HEAT_TERM(ND)
 !
-! Indicates number of time POPS array is to be written to scratch
-! file per iteration.
-!
-	INTEGER RITE_N_TIMES
-	PARAMETER (RITE_N_TIMES=1)
-!
-	LOGICAL WRITE_RVSIG
 	LOGICAL FIRST
-	LOGICAL CHK,SUCCESS,NEWMOD
+	LOGICAL CHK,SUCCESS
         LOGICAL VAR_SOB_JC
 	LOGICAL NEG_OPACITY(ND),FIRST_NEG
 	LOGICAL AT_LEAST_ONE_NEG_OPAC
@@ -1384,6 +1385,8 @@
 	END DO
 	STEQ_ED=0.0D0
 	STEQ_T=0.0D0
+	STEQ_T_SCL=0.0D0
+	STEQ_T_NO_SCL=0.0D0
         BA_ED   = 0.0D0
         BA_T    = 0.0D0
         BA_T_PAR=0.0D0
@@ -2018,8 +2021,9 @@
 	      DO I=1,N_TAU_EDGE
 	        IF(NU(ML) .GE. TAU_EDGE(I) .AND. 
 	1                       NU(ML+1) .LT. TAU_EDGE(I))THEN
+	          T1=LOG(CHI_CONT(5)/CHI_CONT(1))/LOG(R(1)/R(5))
 	          WRITE(LUER,'(A,1P,E11.4,A,E10.3)')' Tau(Nu=',NU(ML),
-	1            ') at outer boundary is:',CHI_CONT(1)*R(1)
+	1            ') at outer boundary is:',CHI_CONT(1)*R(1)/MAX(T1-1.0D0,1.0D0)
 	        END IF
 	      END DO
 	    END IF
@@ -2690,10 +2694,10 @@
 	   ELSE
 	     CALL REGRID_H(SOB,R,RSQHNU,H_OUT,H_IN,ND,TA)
 	   END IF
-	   CALL COMP_OBS(IPLUS,FL,
+	   CALL COMP_OBS_V2(IPLUS,FL,
 	1           IPLUS_STORE,NU_STORE,NST_CMF,
 	1           MU_AT_RMAX,HQW_AT_RMAX,OBS_FREQ,OBS_FLUX,N_OBS,
-	1           V_AT_RMAX,RMAX_OBS,'IPLUS','LIN_INT',
+	1           V_AT_RMAX,RMAX_OBS,'IPLUS','LIN_INT',DO_FULL_REL_OBS,
 	1           FIRST_OBS_COMP,NP_OBS)
 !
 	ELSE                          
@@ -2787,6 +2791,13 @@
 	      END IF
 	      WRITE(LU_HT,'(X,1P,5E12.4)')(
 	1         T3*ZNET_SIM(I,SIM_INDX)*ETAL_MAT(I,SIM_INDX), I=1,ND)
+	      DO K=1,ND
+	        T2=ETAL_MAT(K,SIM_INDX)*ZNET_SIM(K,SIM_INDX)
+	        STEQ_T_SCL(K)=STEQ_T_SCL(K) - T2*T3
+	        STEQ_T_NO_SCL(K)=STEQ_T_NO_SCL(K) - T2
+	      END DO
+	      WRITE(LU_HT,'(/,(X,1P,5E12.4))')(STEQ_T_SCL(I), I=1,ND)
+	      WRITE(LU_HT,'(/,(X,1P,5E12.4))')(STEQ_T_NO_SCL(I), I=1,ND)
 	    END IF
 	  END DO
 	END IF
@@ -2831,15 +2842,28 @@
 !
 ! Allow for advection terms.
 !
-	CALL STEQ_ADVEC_V4(ADVEC_RELAX_PARAM,LINEAR_ADV,NUM_BNDS,ND,
+	IF(SN_MODEL .AND. DO_CO_MOV_DDT)THEN
+          CALL STEQ_CO_MOV_DERIV_V1(ADVEC_RELAX_PARAM,LINEAR_ADV,
+	1             L_TRUE,DO_CO_MOV_DDT,LAMBDA_ITERATION,COMPUTE_BA,
+	1             TIME_SEQ_NO,NUM_BNDS,ND,NT)
+	ELSE
+	  CALL STEQ_ADVEC_V4(ADVEC_RELAX_PARAM,LINEAR_ADV,NUM_BNDS,ND,
 	1            INCL_ADVECTION,LAMBDA_ITERATION,COMPUTE_BA)
+	END IF
 !
 ! Allow for adiabatic cooling, if requested.
 !
-	CALL EVAL_ADIABATIC_V3(AD_COOL_V,AD_COOL_DT,
+	IF(SN_MODEL .AND. DO_CO_MOV_DDT)THEN
+	  CALL EVAL_TEMP_DDT_V1(AD_COOL_V,AD_COOL_DT,
+	1                       POPS,AVE_ENERGY,HDKT,
+	1                       COMPUTE_BA,INCL_ADIABATIC,
+	1                       TIME_SEQ_NO,DIAG_INDX,NUM_BNDS,NT,ND)
+	ELSE
+	  CALL EVAL_ADIABATIC_V3(AD_COOL_V,AD_COOL_DT,
 	1                       POPS,AVE_ENERGY,HDKT,
 	1                       COMPUTE_BA,INCL_ADIABATIC,
 	1                       DIAG_INDX,NUM_BNDS,NT,ND)
+	END IF
 !
 ! Prevent T from becoming too small by adding a extra heating term.
 !
@@ -2970,9 +2994,13 @@
 	  END IF
 	  DO I=1,ND
 	    IF(I .EQ. 1)THEN
-	      T1=0.0D0		!Rosseland optical depth scale
-	      T2=0.0D0		!Flux optical depth scale
-	      T3=0.0D0		!Electron scattering optical depth scale.
+	      T1=LOG(ROSS_MEAN(1)*CLUMP_FAC(1)/ROSS_MEAN(4)/CLUMP_FAC(4))/LOG(R(4)/R(1))
+	      T1=ROSS_MEAN(1)*CLUMP_FAC(1)*R(1)/(T1-1.0D0)		!Rosseland optical depth scale
+	      T2=LOG(ABS(FLUX_MEAN(1)*CLUMP_FAC(1)/FLUX_MEAN(4)/CLUMP_FAC(4)))/LOG(R(4)/R(1))
+	      IF(T2 .LT. 2.0)T2=2.0D0
+	      T2=FLUX_MEAN(1)*CLUMP_FAC(1)*R(1)/(T2-1.0D0)		!Flux optical depth scale
+	      T3=LOG(ESEC(1)*CLUMP_FAC(1)/ESEC(4)/CLUMP_FAC(4))/LOG(R(4)/R(1))
+	      T3=ESEC(1)*CLUMP_FAC(1)*R(1)/(T3-1.0D0)			!Electon scattering optical depth scale
 	      TC(1:3)=0.0D0
 	    ELSE
 	      T1=T1+TA(I-1)
@@ -2984,7 +3012,7 @@
 	    END IF
 	    WRITE(LU_OPAC,FMT)R(I),I,T1,TA(I),TC(1),
 	1      ROSS_MEAN(I),INT_dBdT(I),FLUX_MEAN(I),ESEC(I),
-	1      T2,T3,TC(1),TC(2)
+	1      T2,T3,TC(2),TC(3)
 	  END DO
 	  WRITE(LU_OPAC,'(//,A,A)')
 	1     'NB: Mean opacities do not include effect of clumping',
@@ -3605,290 +3633,9 @@
 	   IF(.NOT. LST_ITERATION)GOTO 20000
 	   STOP
 	END IF
-! 
 !
-! We can adjust the BA/STEQ equations so that certain species are
-! held fixed. For all species, this now done using FIXPOP_IN_BA_V2 
-! called by GENERATE_FULL_MATRIX.
-!
-	MOD_FIXED_NE=FIXED_NE
-	MOD_FIX_IMPURITY=FIX_IMPURITY
-	MOD_FIXED_T=.FALSE.
-!
-! Determine those depths where the temperature is to be held fixed.
-! If either FIXED_T of RD_FIX_T is true, the temperature is fixed independent 
-! of VARFIXT. We zero all elements of the R.E. Eq. except the local variation 
-! with respect to T. For a LAMBDA iteration this element is zero, and hence 
-! must be set. 
-!
-	MOD_TAU_SCL_T=TAU_SCL_T
-	MOD_FIX_T_D_ST=0
-	MOD_FIX_T_D_END=0
-	IF(FIXED_T .OR. RD_FIX_T)THEN
-	  MOD_FIXED_T=.TRUE.
-	  MOD_FIX_T_D_ST=1
-	  MOD_FIX_T_D_END=ND
-	  CALL ESTAU(TA,R,ED,TB,ND)
-	ELSE IF(VARFIXT .AND. CON_SCL_T .NE. 0.0D0)THEN
-	  CALL ESTAU(TA,R,ED,TB,ND)
-	  MOD_FIXED_T=.TRUE.
-	  MOD_FIX_T_D_ST=1
-	  DO I=1,ND
-	    IF(TA(I) .LT. TAU_SCL_T)THEN
-	      MOD_FIX_T_D_END=I
-	    END IF
-	  END DO
-	END IF
-! 
-!
-	IF(LAMBDA_ITERATION)THEN
-	  WRITE(LUER,*)'LAMBDA iteration used'
-	END IF
-!
-	IF(COMPUTE_BA)THEN
-	  WRITE(LUER,*)'BA matrix computed'
-	ELSE
-	  WRITE(LUER,*)'BA matrix **NOT** computed'
-	END IF
-!
-	NLBEGIN=0	!Initialize for next iteration
-	CONTINUE
-	CALL WR_ASCI_STEQ(NION,ND,'STEQ ARRAY',LU_SE)
-!
-!	OPEN(UNIT=LU_BA,FILE='BA_STEQ',STATUS='REPLACE',FORM='UNFORMATTED')
-!	  WRITE(LU_BA)(POPS(I,37),I=1,NT)
-!	  WRITE(LU_BA)(STEQ(I,37),I=1,NT)
-!	  WRITE(LU_BA)( (BA(I,J,DIAG_INDX,37),I=1,NT),J=1,NT )
-!	CLOSE(UNIT=LU_BA)
-!
-! If we are currently doing a LAMBDA iteration we allow for bigger
-! changes - up to a factor of 100. Otherwise changes are limited to
-! a factor of 10.0D0. (Installed 28-Dec-1989). Specified by parameter
-! T1 in SOLVEBA call. TEMP_CHAR is used to utilize the BLK_DIAGONAL
-! nature of the BA matrix when performing a LAMBDA iteration.
-!
-	IF(LAMBDA_ITERATION)THEN
-	  T1=MAX_LAM_COR
-	  TEMP_CHAR='DIAG'
-	ELSE
-	  T1=MAX_LIN_COR
-	  TEMP_CHAR=METH_SOL
-	END IF
-	CALL SOLVEBA_V8(SOL,POPS,
-	1       DIAG_INDX,NT,NION,NUM_BNDS,ND,
-	1       MAXCH,TEMP_CHAR,SUCCESS,SCALE_OPT,T1,T_MIN,
-	1       COMPUTE_BA,WR_BA_INV,WR_PART_OF_INV,LAMBDA_ITERATION)
-!
-! Complicated algorithim to decide when to switch off BA computation.
-! We only switch off BA computation in WRBAMAT_RDIN is TRUE.
-!
-! 1. We can switch off the BA computation, once we are no longer doing
-!       LAMBDA iteartions. This is only done for N_ITS_TO_FIX_BA iterations.
-!
-! 2. We switch of the BA computation semi-permanently once the corrections
-!       are less than VAL_FIX_BA.
-!
-! 3. We recompute BA if the accumulated sum of the maximum corrections
-!       exceeds 3*VAL_FIX_BA.
-!
-	IF(N_ITS_TO_FIX_BA .GT. 0 .AND. .NOT. LAMBDA_ITERATION)THEN
-	  IF(COMPUTE_BA)THEN
-	    CNT_FIX_BA=0
-	    MAXCH_SUM=0.0D0
-	  END IF
-	  MAXCH_SUM=MAXCH_SUM+MAXCH
-	  CNT_FIX_BA=CNT_FIX_BA+1
-	  IF(CNT_FIX_BA .GT. N_ITS_TO_FIX_BA .AND. MAXCH .GT. VAL_FIX_BA)THEN
-	    COMPUTE_BA=L_TRUE
-	    WRBAMAT=WRBAMAT_RDIN
-	  ELSE 
-	    IF(WRBAMAT_RDIN)COMPUTE_BA=L_FALSE
-	  END IF
-	  IF(CNT_FIX_BA .GT. N_ITS_TO_FIX_BA .AND. MAXCH_SUM .GT. 3.0*VAL_FIX_BA)THEN
-	    MAXCH_SUM=0.0D0
-	    COMPUTE_BA=L_TRUE
-	    WRBAMAT=WRBAMAT_RDIN
-	  END IF 
-!
-! This will force BA to be recomuted again, after N_ITS_TO_FIX_BA, because T was variable
-! at some depths.
-!
-	  IF(CON_SCL_T .NE. 0)THEN
-	    MAXCH_SUM=1000.0D0*VAL_FIX_BA
-	  END IF
-	ELSE
-!
-! Switch off BA computation of MAXCH if less than VAL_FIX_BA.
-! We only do this provided the last iteration was not a LAMBDA
-! iteration, and if T was not partially held fixed at some depths.
-!
-! We now only right out the BA matrix if we are nearing the correct solution,
-! and assuming that it is a full solution matrix (i.e. not from a 
-! LAMBDA iteration and CON_SCL_T was not set).
-!
-	  COMPUTE_BA=L_TRUE
-	  IF( MAXCH .LT. VAL_FIX_BA .AND. WRBAMAT 
-	1          .AND. .NOT. LAMBDA_ITERATION
-	1          .AND. CON_SCL_T .EQ. 0.0D0)THEN
-	    COMPUTE_BA=COMPUTE_BARDIN
-	  END IF
-	  IF(WRBAMAT_RDIN .AND. MAXCH .LT. 2.0*VAL_FIX_BA 
-	1         .AND. .NOT. LAMBDA_ITERATION
-	1          .AND. CON_SCL_T .EQ. 0.0D0)THEN
-	    WRBAMAT=.TRUE.
-	  END IF
-	END IF
-	IF(T_MIN_BA_EXTRAP)COMPUTE_BA=.TRUE.
-!
-! The STEQ array contains the percentage changes in the populations.
-! Shall now determine whether the population changes are too large.
-! If so we fix T. Two optical depth ranges are considered. We allow
-! for bigger population changes at depth (Tau(es) > 1) so that the
-! model converges to the right luminosity rapidly.
-!
-!**************************************************************************
-!             More sophistication may be required.
-!**************************************************************************
-!
-	IF(.NOT. LAMBDA_ITERATION)THEN
-	  CON_SCL_T=0.0D0
-	  CALL ESTAU(TA,R,ED,TB,ND)
-	  DO I=1,ND
-	    DO J=1,NT
-	      IF( (SOL(J,I) .GT. 0.8D0 .OR.
-	1          SOL(J,I) .LT. -5.0D0) .AND. TA(I) .LT. 1.0)THEN
-	            TAU_SCL_T=TA(I)
-	            CON_SCL_T=1000.0D0
-	      END IF
-	      IF( (SOL(J,I) .GT. 10.0D0 .OR.
-	1          SOL(J,I) .LT. -20.0D0) .AND. TA(I) .GE. 1.0)THEN
-	            TAU_SCL_T=TA(I)
-	            CON_SCL_T=1000.0D0
-	      END IF
-	    END DO
-	  END DO
-	END IF
-!	IF(CON_SCL_T .NE. 0.0D0)THEN
-!	   WRBAMAT=L_FALSE
-!	   COMPUTE_BA=L_TRUE
-!	END IF
-!
-        CALL WR2D_V2(SOL,NT,ND,'STEQ SOLUTION ARRAY','#',L_TRUE,LU_SE)
-!
-! Determine whether convergence is sufficient to consider using
-! NG acceleration. The first NG acceleration is done 4 iterations after
-! the iteration on which MAXCH < VAL_DO_NG. IST_PER_NG must be greater
-! than, or equal to, 4. LAST_NG now always indicates the last iteration
-! on which an NG acceleration was performed. NEXT_NG is used to indicate
-! the next iteration on which an NG acceleration is to occur.
-!
-! NEXT_NG=1000 indicates a NEW model
-! NEXT_NG=1500 indicates that MAXCH is again above VAL_DO_NG
-! NEXT_NG=2000 indicates a CONTINUING model.
-!
-! A NG acceleration can be forced after 1 iteration if LAST_NG is set to
-! some vale .LE. MAIN_COUNTER-ITE_PER_NG in the POINT1 file, and provide the 
-! change on that iteration is less than VAL_DO_NG.
-!
-	IF(MAIN_COUNTER .LT. IT_TO_BEG_NG-3)THEN
-	  NEXT_NG=1000
-	ELSE IF(MAIN_COUNTER .GE. IT_TO_BEG_NG-3 .AND. NEXT_NG .EQ. 1000)THEN
-	  IF( MAXCH .LE. VAL_DO_NG )NEXT_NG=MAX(LAST_NG+ITS_PER_NG,MAIN_COUNTER+4)
-	ELSE IF(MAXCH .LT. VAL_DO_NG .AND. NEXT_NG .EQ. 1500)THEN
-	  NEXT_NG=MAX(LAST_NG+ITS_PER_NG,MAIN_COUNTER+4)
-	ELSE IF(MAXCH .LT. VAL_DO_NG .AND. NEXT_NG .EQ. 2000)THEN
-	  NEXT_NG=MAX(LAST_NG+ITS_PER_NG,MAIN_COUNTER+1)
-	  IF(LAST_NG .EQ. -1000)NEXT_NG=MAIN_COUNTER+4
-	ELSE IF( MAXCH .GE. VAL_DO_NG )THEN
-	  NEXT_NG=1500
-	END IF
-!
-! We switch between LINEARIZATION and LAMBDA iterations until the
-! maximum percentage change is less  than VAL_DO_LAM. RD_CNT_LAM iterations
-! are performed per full linearization. RD_LAMBDA overrides this section if 
-! TRUE. We only do a LAMBDA iteration with T fixed. NB --- FIX_IMPURITY
-! is a soft option --- is removed when convergence nearly obtained.
-!
-	IF(.NOT. RD_LAMBDA)THEN
-	  IF( MAXCH .LT. VAL_DO_LAM )THEN
-	     FIX_IMPURITY=RD_FIX_IMP .AND. LAMBDA_ITERATION
-	     LAMBDA_ITERATION=.FALSE.
-	     FIXED_T=RD_FIX_T
-	     CNT_LAM=0
-	  ELSE IF(LAMBDA_ITERATION)THEN
-	     CNT_LAM=CNT_LAM+1
-	     IF(CNT_LAM .GE. RD_CNT_LAM)THEN
-	       LAMBDA_ITERATION=.FALSE.
-	       FIX_IMPURITY=RD_FIX_IMP
-	       FIXED_T=RD_FIX_T
-	     END IF
-	     IF(MAXCH .GT. 1.0D+05)THEN
-	       LAMBDA_ITERATION=.TRUE.
-	       COMPUTE_BA=.TRUE.
-	       FIX_IMPURITY=.FALSE.
-	       FIXED_T=.TRUE.
-	     END IF
-	  ELSE
-	     LAMBDA_ITERATION=.TRUE.
-	     COMPUTE_BA=.TRUE.
-	     CNT_LAM=0
-	     FIXED_T=.TRUE.
-	     FIX_IMPURITY=.FALSE.
-	  END IF
-	END IF
-!
-! Automatically adjust R grid, so that grid is uniformally spaced on the 
-! FLUX optical depth scale. Used for SN models with very sharp ioinization
-! fronts. By doing it before the output to SCRTEMP, we ensure that
-! a continuuing model starts with the revised R grid.
-!
-	IF(REVISE_R_GRID)THEN
-	  R_OLD(1:ND)=R(1:ND)
-	  CALL ESOPAC(ESEC,ED,ND)               !Electron scattering emission factor.
-	  CALL ADJUST_R_GRID_V2(POPS,P,FLUX_MEAN,ESEC,
-	1     NEW_RGRID_TYPE,RG_PAR,N_RG_PAR,ND,NT,NC,NP)
-	END IF
-!
-! Write pointer file and output data necessary to begin a new
-! iteration.
-!
-	CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,RITE_N_TIMES,
-	1                LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
-! 
-!
-! Perform the acceleration. T1 and T2 return the percentage changes
-! in the populations. I is used as an INTEGER error flag. We never do
-! an NG acceleration on the last iteration.
-!
-! We perform a LAMBDA iteration after the NG acceleration in the
-! case the where the NG acceleration has caused population changes
-! > 20%. In this case, the BA matrix will also be recaluated on
-! the next full iteration.
-!  
-	IF(NG_DO .AND. (.NOT. LST_ITERATION) .AND.
-	1       (NEXT_NG .EQ. MAIN_COUNTER) )THEN
-	  CALL DO_NG_BAND_ACCEL_V2(POPS,R,V,SIGMA,R_OLD,
-	1         NT,ND,NG_BAND_WIDTH,NG_DONE,T1,T2,LUSCR,LUER)
-	  IF(NG_DONE)THEN
-	    MAIN_COUNTER=MAIN_COUNTER+1
-	    LAST_NG=MAIN_COUNTER
-	    NEXT_NG=MAIN_COUNTER+ITS_PER_NG
-	    CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,
-	1             RITE_N_TIMES,LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
-	    IF(T1 .GT. 50.0 .AND. T2 .GT. 50.0)THEN
-	      LAMBDA_ITERATION=.TRUE.
-	      CNT_LAM=0
-	      FIXED_T=.TRUE.
-	      FIX_IMPURITY=.FALSE.
-	      COMPUTE_BA=.TRUE.
-	    END IF
-	  ELSE
-	    NEXT_NG=MAIN_COUNTER+8
-	    WRITE(LUER,*)'Error performing NG acceleration.'
-	    WRITE(LUER,*)'Will try again in 8 iterations.'
-	    WRITE(LUER,*)'Error flag=',I
-	  END IF
-	END IF
+	CALL SOLVE_FOR_POPS(POPS,NT,NION,ND,NC,NP,NUM_BNDS,DIAG_INDX,
+	1      MAXCH,MAIN_COUNTER,IREC,LU_SE,LUSCR,LST_ITERATION)
 !
 ! If we have changed the R grid, we need to recomput the angular quadrature weitghts,
 ! and put the atom density ect on the new radius grid.
@@ -4330,6 +4077,16 @@
 	1                       AT_NO(ISPEC),SPECIES(ISPEC),ND,LUIN)
 	  END DO
 	  CLOSE(LUIN)
+!
+! If we have a time variability model, we output the model so it can be used by the
+! next model in the time sequence. IREC is the ouput record, and is thus simply
+! the current TIME_SEQ_NO.
+!
+	  IF(SN_MODEL .AND. TIME_SEQ_NO .NE. 0)THEN
+	    IREC=TIME_SEQ_NO
+	    CALL RITE_TIME_MODEL(R,V,SIGMA,POPS,IREC,L_FALSE,L_TRUE,
+	1               NT,ND,LUSCR,CHK)
+	  END IF
 !
 	  CLOSE(UNIT=LUER)
 	  CLOSE(UNIT=LU_SE)

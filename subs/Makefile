@@ -21,6 +21,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(comp_j_conv.o)\
       $(LIB)(comp_j_conv_v2.o)\
       $(LIB)(comp_obs.o)\
+      $(LIB)(comp_obs_v2.o)\
       $(LIB)(comp_var_jrec.o)\
       $(LIB)(det_main_cont_freq.o)\
       $(LIB)(dop_pro.o)\

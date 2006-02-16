@@ -9,6 +9,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Revised: 20-Jan-2006 : Updated so that R, V, & SIGMA writing option can be altered.
 ! Revised: 06-May-2004 : Updated reading of SCRTEMP to SCR_READ_V2
 ! Revised: 13-Feb-2002
 !
@@ -34,7 +35,8 @@
 	INTEGER I,K,J,L
 !
 	LOGICAL NEWMOD
-	LOGICAL WRITE_RVSIG
+	LOGICAL READ_WRITE_RVSIG	!Indicates if R, V & SIGMA were output for each iteration.
+	LOGICAL WRITE_RVSIG             !As above, but for new file.
 !
 	CHARACTER*132 STRING
 !
@@ -108,11 +110,15 @@
 	DO I=1,NIT_WR
 	   IREC=NIT-(NIT_WR-I)
 	   CALL SCR_READ_V2(R,V,SIGMA,POPS,IREC,NITSF,
-	1              WRITEN_N_TIMES,LST_NG,WRITE_RVSIG,
+	1              WRITEN_N_TIMES,LST_NG,READ_WRITE_RVSIG,
 	1              NT,ND,LUSCR,NEWMOD)
 	   IF(NEWMOD)THEN
 	      WRITE(6,'(A,I4,A)')' Unable to read iteration # ',IREC,' from SCRTEMP'
 	      STOP
+	   END IF
+	   IF(I .EQ. 1)THEN
+	     WRITE_RVSIG=READ_WRITE_RVSIG
+	     CALL GEN_IN(WRITE_RVSIG,'Write R, V & SIGMA for each iteration')
 	   END IF
 !
 	   LST_NG=-1000

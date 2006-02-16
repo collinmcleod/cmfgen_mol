@@ -3,6 +3,9 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 29-Jan-2006 : Control variable fors relativistic transfer and time
+!                          dependent statistical equilibrium equations installed.
+! 
 	INTEGER LUIN
 	INTEGER LUSCR
 	INTEGER LUER
@@ -137,7 +140,12 @@ C
 	    SN_MODEL=.TRUE.
 	    CALL RD_STORE_DBLE(VCORE,'VCORE',L_TRUE,'Initial velocity (km/s)')
 	    CALL RD_STORE_DBLE(V_BETA1,'BETA1',L_TRUE,'Power of velocity Law')
-	    CALL RD_STORE_DBLE(RHO_ZERO,'RHO_ZERO',L_TRUE,'Initial density (gm/cm^3)')
+	    RHO_ZERO=0.0D0
+	    CALL RD_STORE_DBLE(RHO_ZERO,'RHO_ZERO',L_FALSE,'Initial density (gm/cm^3)')
+	    IF(RHO_ZERO .EQ. 0.0D0)THEN
+	      CALL RD_STORE_DBLE(RCUB_RHO_ZERO,'RCUB_RHO',L_TRUE,'r^3 . initial density 10^{-30} gm)')
+	      RHO_ZERO=RCUB_RHO_ZERO/(RP**3)
+	    END IF
 	    RHO_ZERO=RHO_ZERO/ATOMIC_MASS_UNIT()
 	    CALL RD_STORE_DBLE(N_RHO,'N_RHO',L_TRUE,'Density exponent (+ve)')
 	    VINF=VCORE*(RMAX/RP)**V_BETA1
@@ -191,6 +199,7 @@ C
 	  REVISE_R_GRID=.FALSE.
 	  JGREY_WITH_V_TERMS=.FALSE.
 	  N_RG_PAR=0
+	  TIME_SEQ_NO=0
 	  IF(SN_MODEL)THEN
 	    CALL RD_STORE_LOG(REVISE_R_GRID,'REV_RGRID',L_TRUE,
 	1            'Automatically revise R grid?')
@@ -214,7 +223,19 @@ C
 	    JGREY_WITH_V_TERMS=.TRUE.
 	    CALL RD_STORE_LOG(JGREY_WITH_V_TERMS,'JG_W_V',L_FALSE,
 	1            'Include V terms when computing Grey temperature?')
+	    DO_CO_MOV_DDT=.FALSE.
+	    CALL RD_STORE_LOG(DO_CO_MOV_DDT,'DO_DDT',L_FALSE,
+	1            'Include comoving derivative in SE equations?')
+	    TIME_SEQ_NO=1
+	    CALL RD_STORE_LOG(TIME_SEQ_NO,'TS_NO',DO_CO_MOV_DDT,
+	1            'Time sequence number: 1 for inital model')
 	  END IF	  
+	  DO_FULL_REL_OBS=.FALSE.
+	  DO_FULL_REL_CMF=.FALSE.
+	  CALL RD_STORE_LOG(DO_FULL_REL_OBS,'REL_OBS',L_FALSE,
+	1          'Include all reltivistic terms in observer''s frame solution')
+	  CALL RD_STORE_LOG(DO_FULL_REL_CMF,'REL_CMF',L_FALSE,
+	1        'Include all reltivistic terms in CMF solution for observed intensity')
 C
 C Read in the un-normalized fractional abundances.
 C

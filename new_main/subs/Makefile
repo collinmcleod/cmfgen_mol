@@ -21,13 +21,16 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(eval_adiabatic_v3.o)\
       $(LIB)(evalse_qwvj_v6.o)\
       $(LIB)(evalse_x_qwvj_v4.o)\
+      $(LIB)(eval_temp_ddt_v1.o)\
       $(LIB)(fixpop_in_ba_v2.o)\
       $(LIB)(fixpop_t.o)\
       $(LIB)(fixpop_in_ba_v3.o)\
       $(LIB)(generate_full_matrix_v3.o)\
+      $(LIB)(get_pops_at_prev_time_step.o)\
       $(LIB)(prevent_low_t.o)\
       $(LIB)(read_ba_data_v2.o)\
       $(LIB)(read_bcd_mat.o)\
+      $(LIB)(read_time_model_v1.o)\
       $(LIB)(set_ba_storage.o)\
       $(LIB)(set_imp_vec.o)\
       $(LIB)(solveba_v6.o)\
@@ -36,6 +39,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(steq_multi_v7.o)\
       $(LIB)(steqne_v4.o)\
       $(LIB)(steq_advec_v4.o)\
+      $(LIB)(steq_co_mov_deriv_v1.o)\
       $(LIB)(store_ba_data_v2.o)\
       $(LIB)(var_op_v8.o)\
       $(LIB)(var_x_opa_eta_v3.o)\
@@ -73,7 +77,7 @@ $(LIB)(create_iv_links_v2.o) : create_iv_links_v2.f $(STEQ) $(MOD)
 	ar ruv $(LIB) create_iv_links_v2.o
 
 $(LIB)(fixpop_in_ba_v3.o) : fixpop_in_ba_v3.f $(STEQ) $(MOD)
-	$(F90) -c $(FG)  fixpop_in_ba_v3.f
+	$(F90) -c $(FG) -I$(MOD_DIR) fixpop_in_ba_v3.f
 	ar ruv $(LIB) fixpop_in_ba_v3.o
 
 $(LIB)(generate_full_matrix_v3.o) : generate_full_matrix_v3.f $(STEQ) $(MOD)
@@ -83,6 +87,14 @@ $(LIB)(generate_full_matrix_v3.o) : generate_full_matrix_v3.f $(STEQ) $(MOD)
 $(LIB)(set_ba_storage.o) : set_ba_storage.f $(STEQ) $(MOD)
 	$(F90) -c $(FG)  set_ba_storage.f
 	ar ruv $(LIB) set_ba_storage.o
+
+$(LIB)(eval_temp_ddt_v1.o) : eval_temp_ddt_v1.f $(STEQ) $(MOD)
+	$(F90) -c $(FG)  eval_temp_ddt_v1.f
+	ar ruv $(LIB) eval_temp_ddt_v1.o
+
+$(LIB)(steq_co_mov_deriv_v1.o) : steq_co_mov_deriv_v1.f $(STEQ) $(MOD)
+	$(F90) -c $(FG)  steq_co_mov_deriv_v1.f
+	ar ruv $(LIB) steq_co_mov_deriv_v1.o
 
 $(LIB)(var_op_v8.o) : var_op_v8.f $(DIS)
 	$(F90) -c $(FG)  var_op_v8.f

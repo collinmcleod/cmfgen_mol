@@ -1570,7 +1570,7 @@ C
 	  L=-1
 	  CALL NEW_GEN_IN(L,'Plot to output (def=-1=ALL)')
 !
-	  CNT=0
+	  CNT=0; PLT_ID=' '
 	  DO IP=1,NPLTS
 	    IF(L .EQ. -1 .OR. L .EQ. IP)THEN
 	      CNT=CNT+1
@@ -1607,6 +1607,7 @@ C
 	    WRITE(T_OUT,*)'Error opening file'
 	    GOTO 1000
 	  END IF
+	  PLT_ID=' '
 	  PLT_ID_SAV=' '
 !
 	  DO WHILE(1 .EQ. 1)

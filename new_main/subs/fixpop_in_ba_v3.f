@@ -119,9 +119,12 @@
 	    IF(ATM(ID)%FIX_NXzV .NE. 0)THEN
 	      FIX_N=MIN( ABS(ATM(ID)%FIX_NXzV),ATM(ID)%NXzV )
 	      LOC_IMP=.FALSE.
-	    ELSE
+	    ELSE IF(MOD_FIX_IMPURITY)THEN
 	      FIX_N=ATM(ID)%NXzV
 	      LOC_IMP=.TRUE.
+	    ELSE
+	      FIX_N=-10
+	      LOC_IMP=.FALSE.
 	    END IF
 	    IF(FIRST_MATRIX .AND. DIAG_BAND)CNT(LOC_EQ)=0
 !
@@ -139,19 +142,24 @@
 	    LOC_EQ=ATM(ID)%EQXzV
 	    IF(DIAG_BAND .AND. FIX_N .GT. 0)CNT(LOC_EQ)=CNT(LOC_EQ)+1
 !
-	    DO J=1,NT
-	      DO I=ATM(ID)%EQXZV,ATM(ID)%EQXZV+FIX_N-1
-	        BA(I,J)=0.0D0
-	      END DO
-	    END DO
+! Zero requested equations.
 !
-	    IF(DIAG_BAND)THEN
-	      DO I=ATM(ID)%EQXZV,ATM(ID)%EQXZV+FIX_N-1
-	        BA(I,I)=1.0D0
-	        STEQ(I)=0.0D0
-	        ZERO_STEQ(I)=.TRUE.
- 	      END DO
+	    IF(FIX_N .GT. 0)THEN
+	      DO J=1,NT
+	        DO I=ATM(ID)%EQXZV,ATM(ID)%EQXZV+FIX_N-1
+	          BA(I,J)=0.0D0
+	        END DO
+	      END DO
+!
+	      IF(DIAG_BAND)THEN
+	        DO I=ATM(ID)%EQXZV,ATM(ID)%EQXZV+FIX_N-1
+	          BA(I,I)=1.0D0
+	          STEQ(I)=0.0D0
+	          ZERO_STEQ(I)=.TRUE.
+ 	        END DO
+	      END IF
 	    END IF
+!	
 	  END IF
 !
 	  IF(LAST_MATRIX .AND. CNT(ATM(ID)%EQXZV) .NE. 0)THEN

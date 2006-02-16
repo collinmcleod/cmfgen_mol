@@ -77,6 +77,7 @@
 	WRITE(6,'(A,F6.2,A)')'Mean absolute difference is: ',SUM3,'%'
 	WRITE(6,'(A,F6.2,A)')'Root mean square is:         ',SUM2,'%'
 !
+	PLT_OPT='DW'
 	DO WHILE(1 .EQ. 1)
 	  WRITE(6,*)' '
 	  WRITE(6,*)'Plot options are:'

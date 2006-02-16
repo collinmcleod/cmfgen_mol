@@ -35,6 +35,10 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Aletered : 16-Feb-2006 " CMF_FORM_SOL_V2 used for last iteration when MAXCH<100, and
+!                            not LAMBDA iteration. Sometimes it might be useful to
+!                            change so that CMF_FORM_SOL_V2 is also called when LMABDA 
+!                            iteration used. FG_COUNt was not being initialized.
 ! Finalized: 17-Dec-2004
 !
 	REAL*8 FL
@@ -65,7 +69,11 @@
 	REAL*8, SAVE :: FL_OLD
 	REAL*8 S1
 	REAL*8 T1,T2
-	INTEGER FG_COUNT
+!
+! FG_COUNT is used to determine the average number of calls to FG_J_CMF_V10 per
+! frequency.
+!
+	INTEGER, SAVE :: FG_COUNT
 	INTEGER I
 	INTEGER L
 	LOGICAL NEW_FREQ
@@ -428,8 +436,7 @@ C TRUE if FLUX_CAL_ONLY is true (single iteration with coherent,
 C last iteration if non-coherent).
 C
 	    IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
-	1         MAXCH .LT. -100.0D0) )THEN
-C	1         MAXCH .LT. VAL_DO_NG) )THEN
+	1         MAXCH .LT. 100.0D0) )THEN
 C
 C Quick and dirty method to ge an extended DENSITY vector. Will use TB in
 C the call to CMF_FORM_SOL.
@@ -636,8 +643,7 @@ C TRUE if FLUX_CAL_ONLY is true (single iteration with coherent,
 C last iteration if non-coherent).
 C
 	    IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
-	1         MAXCH .LT. -100.0D0) )THEN
-C	1         MAXCH .LT. VAL_DO_NG) )THEN
+	1         MAXCH .LT.  100.0D0) )THEN
 	      IF(COHERENT_ES)THEN
      	        TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ(1:ND)
 	      ELSE

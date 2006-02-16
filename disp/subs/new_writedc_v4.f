@@ -5,6 +5,7 @@ C
 	1               DO_DPTH,LUM,ND,FILENAME,OPTION,FORM)
 	IMPLICIT NONE
 C
+C 11-Jan-2006 - Improved output format for R (useful for SN).
 C 20-jan-2004 - Changed so that inner boundary radius can also be omitted.
 C 28-May-2003 - Minor bug fix: Now correctly omits depths for TX and POP options.
 C 20-Jul-2002 - ' qutes installed to avoid breaking strings across lines (FORM).
@@ -147,8 +148,8 @@ C
 	    CLOSE(UNIT=9)
 	  END IF
 C
-2120	  FORMAT(/,X,F11.6,5X,1PE12.6,5X,0P,I4,5X,I4)
-2122	  FORMAT(/,X,1P,E16.8,6E17.8)
+2120	  FORMAT(/,X,ES16.8,5X,ES12.6,5X,I4,5X,I4)
+2122	  FORMAT(/,X,ES16.8,6ES17.8)
 C
 	  RETURN
 	  END

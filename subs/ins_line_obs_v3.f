@@ -17,6 +17,7 @@ C                         coherent and noncoherent electron scattering, and to
 C                         handle P Cygni stars.
 C	                OBS_PRO_EXT_RAT,ES_WING_EXT,V_DOP parameters inserted.
 C                       Now V2.
+C Altered 12-Feb-2006 : Fixed bug to ensure that last frequency is NU_MIN.
 C
 	INTEGER NFREQ_MAX,N_LINES
 	INTEGER NFREQ				!Returned
@@ -132,11 +133,13 @@ C
 	     INDX=INDX+1
 	     IF(INDX .GT. NFREQ_MAX)GOTO 9999
 	     FREQ(INDX)=FREQ(INDX-1)*BIG_SPACING
+	     IF(FREQ(INDX) .LT. NU_MIN)GOTO 1000
 	  ELSE
 	     IF(FREQ(INDX) .GT. NU_LINE(LN_INDX)*MAX_BW_EXTENT)THEN
 	       INDX=INDX+1             
 	       IF(INDX .GT. NFREQ_MAX)GOTO 9999
 	       FREQ(INDX)=NU_LINE(LN_INDX)*MAX_BW_EXTENT
+	       IF(FREQ(INDX) .LT. NU_MIN)GOTO 1000
 	     END IF
 C
 	     IF(FREQ(INDX) .GT. NU_LINE(LN_INDX)*MAX_B_EXTENT)THEN
@@ -151,6 +154,7 @@ C
 	       INDX=INDX+1
 	       IF(INDX .GT. NFREQ_MAX)GOTO 9999
 	       FREQ(INDX)=NU_LINE(LN_INDX)*MAX_B_EXTENT
+	       IF(FREQ(INDX) .LT. NU_MIN)GOTO 1000
 	     END IF
 C
 C Now do the spacing across the main line profile.
@@ -160,6 +164,7 @@ C
 	        INDX=INDX+1
 	        IF(INDX .GT. NFREQ_MAX)GOTO 9999
 	        FREQ(INDX)=FREQ(INDX-1)*PROF_SPACING
+	        IF(FREQ(INDX) .LT. NU_MIN)GOTO 1000
 	     END DO
 C
 C As we're still not to the red edge, we do one more.
@@ -189,6 +194,7 @@ C
 	         INDX=INDX+1
 	         IF(INDX .GT. NFREQ_MAX)GOTO 9999
 	         FREQ(INDX)=FREQ(INDX-1)*PROF_SPACING
+	         IF(FREQ(INDX) .LT. NU_MIN)GOTO 1000
 	      END DO
 C
 C As we're still not to the red edge, we do one more.
@@ -197,6 +203,7 @@ C
 	        INDX=INDX+1
 	        IF(INDX .GT. NFREQ_MAX)GOTO 9999
 	        FREQ(INDX)=FREQ(INDX-1)*PROF_SPACING
+	        IF(FREQ(INDX) .LT. NU_MIN)GOTO 1000
 	      END IF
 	      LST_LN_INDX=LN_INDX
 	      LN_INDX=LN_INDX+1
@@ -221,12 +228,15 @@ C
 	      INDX=INDX+1
 	      IF(INDX .GT. NFREQ_MAX)GOTO 9999
 	      FREQ(INDX)=FREQ(INDX-1)*WING_SPACING
+	      IF(FREQ(INDX) .LT. NU_MIN)GOTO 1000
 	    END DO
 	  END IF
 	END DO
 C
 C Set the number of frequencies.
 C
+1000	CONTINUE
+	IF(FREQ(INDX-1) .GT. NU_MIN)FREQ(INDX)=NU_MIN
 	NFREQ=INDX
 C
 C Test for monotocity of frequencies.

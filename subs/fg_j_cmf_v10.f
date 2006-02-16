@@ -214,6 +214,8 @@
 	USE FG_J_CMF_MOD_V10
 	IMPLICIT NONE
 !
+! Altered 16-Feb-2006  : Setting of RMAX altered so that it is not dependent on the
+!                          number of grid points. Diferent setting for SN and winds.
 ! Altered 26-Feb-2004  : Changed to check for creating a new R_GRID etc.
 !                          Done to handle automatic grid changes.
 ! Altered 13-Sep-2002  : Check before doing PSQ SQRT installed (for INTEL compiler).
@@ -308,6 +310,7 @@
 !                
 	INTEGER NI_SMALL
 	INTEGER I,J,K,LS
+	INTEGER IDMIN,IDMAX
 	INTEGER NI
 !
 	REAL*8 DBC
@@ -490,7 +493,13 @@
 	    R_EXT(ND_ADD+I)=R(I)
 	  END DO
 	  IF(THK)THEN
-	    RMAX=MIN(10.0D0,R(1)/R(15))*R(1)
+	    IF(V(ND) .LT. 10.0D0 .AND. R(1)/R(ND) .GE. 9.99D0)THEN
+	      RMAX=10.0D0*R(1)		!Stellar wind
+	    ELSE IF(V(ND) .GT. 10.0D0 .OR. V(1) .GT. 2.0D+04)THEN
+	      RMAX=1.5D0*R(1)		!SN model
+	    ELSE
+	      RMAX=MIN(10.0D0,SQRT(R(1)/R(ND)))*R(1)
+	    END IF
 	    ALPHA=R(1)+(R(1)-R(2))                               
 	    DEL_R_FAC=EXP( LOG(RMAX/ALPHA)/(ND_ADD-3) )
 	    R_EXT(1)=RMAX
@@ -900,22 +909,23 @@
 !
 	CALL TUNE(1,'FG_CHI_BEG')
 	IF(ND_ADD .NE. 0)THEN
-	  IF(CHI(1) .LE. ESEC(1) .OR. CHI(4) .LE. ESEC(4))THEN
-	    ESEC_POW=LOG(ESEC(4)/ESEC(1))/LOG(R(1)/R(4))
+	  IDMIN=1; IDMAX=4
+	  IF(CHI(IDMIN) .LE. ESEC(IDMIN) .OR. CHI(IDMAX) .LE. ESEC(IDMAX))THEN
+	    ESEC_POW=LOG(ESEC(IDMAX)/ESEC(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
 	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
 	    DO I=1,ND_ADD
-	      CHI_EXT(I)=CHI(1)*(R(1)/R_EXT(I))**ESEC_POW
+	      CHI_EXT(I)=CHI(IDMIN)*(R(IDMIN)/R_EXT(I))**ESEC_POW
 	      dCHIdR(I)= -ESEC_POW*CHI_EXT(I)/R_EXT(I)
 	    END DO
 	  ELSE
-	    ALPHA=LOG( (CHI(4)-ESEC(4)) / (CHI(1)-ESEC(1)) )
-	1          /LOG(R(1)/R(4))
+	    ALPHA=LOG( (CHI(IDMAX)-ESEC(IDMAX)) / (CHI(IDMIN)-ESEC(IDMIN)) )
+	1          /LOG(R(IDMIN)/R(IDMAX))
 	    IF(ALPHA .LT. 2.)ALPHA=2.0
-	    ESEC_POW=LOG(ESEC(4)/ESEC(1))/LOG(R(1)/R(4))
+	    ESEC_POW=LOG(ESEC(IDMAX)/ESEC(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
 	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
    	    DO I=1,ND_ADD
-	      T1=(CHI(1)-ESEC(1))*(R(1)/R_EXT(I))**ALPHA
-	      T2=ESEC(1)*(R(1)/R_EXT(I))**ESEC_POW
+	      T1=(CHI(IDMIN)-ESEC(IDMIN))*(R(IDMIN)/R_EXT(I))**ALPHA
+	      T2=ESEC(IDMIN)*(R(IDMIN)/R_EXT(I))**ESEC_POW
 	      CHI_EXT(I)=T1+T2
 	      dCHIdR(I)=(-ALPHA*T1-ESEC_POW*T2)/R_EXT(I)
 	    END DO
