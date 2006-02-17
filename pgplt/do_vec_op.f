@@ -82,8 +82,8 @@
 !
 	    IF(ALLOCATED(XV))DEALLOCATE(XV)
 	    IF(ALLOCATED(ZV))DEALLOCATE(ZV)
-	    ALLOCATE (XV(N2),STAT=IOS)
-	    IF(IOS .EQ. 0)ALLOCATE (ZV(N2),STAT=IOS)
+	    ALLOCATE (XV(MAX(N1,N2)),STAT=IOS)
+	    IF(IOS .EQ. 0)ALLOCATE (ZV(MAX(N1,N2)),STAT=IOS)
 	    IF(IOS .NE. 0)THEN
 	      WRITE(T_OUT,*)'Error in DO_VEC_OP --- unable to allocate XV,ZV'
 	      WRITE(T_OUT,*)'IOS=',IOS
@@ -191,7 +191,6 @@ C
 	    WRITE(T_OUT,*)'Invalid operation in DO_VEC_OP'
 	    RETURN
 	  END IF
-	  WRITE(6,*)'Finished division'
 !
 	IF(.NOT. ALLOCATED(XV))ALLOCATE (XV(1:IU))
 	XV(IL:IU)=CD(IN1)%XVEC(IL:IU)
