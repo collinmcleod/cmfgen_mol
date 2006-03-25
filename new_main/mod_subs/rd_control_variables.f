@@ -689,6 +689,12 @@ C
 	     WRITE(LUER,*)'Error in CMFGEN - ITS_PER_NG too small'
 	     STOP
 	  END IF
+!
+	  WRITE(LUSCR,'()')
+	  AVERAGE_DO=.FALSE.; NUM_OSC_AV=4; ITS_PER_AV=8
+	  CALL RD_STORE_LOG(AVERAGE_DO,'DO_AV',L_FALSE,'Perform averaging of oscillating pops')
+	  CALL RD_STORE_INT(NUM_OSC_AV,'NOSC_AV',L_FALSE,'# of consecquitive oscillations')
+	  CALL RD_STORE_INT(ITS_PER_AV,'ITS/AV',L_FALSE,'# of iterations between averaging')
 	  CALL CLEAN_RD_STORE()
 C
 	CLOSE(UNIT=7)

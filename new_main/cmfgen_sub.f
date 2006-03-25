@@ -1081,6 +1081,9 @@
 ! should be written out. Its equivalent to NUM_ITS_TO_DO=0 in the loop.
 !
 	MAIN_COUNTER=NITSF			!Initialize main loop counter
+	LAST_LAMBDA=NITSF
+	LAST_AV=NITSF
+	NEXT_AV=0
 20000	CONTINUE
 	NUM_ITS_TO_DO=NUM_ITS_TO_DO-1
 	IF(NUM_ITS_TO_DO .EQ. 0)LST_ITERATION=.TRUE.
@@ -3441,7 +3444,7 @@
 ! Use the escape probability approximation for lines originating
 ! in all levels.
 !
-	  CALL SUB_SOB_LINE(SECTION,POPS,CHIL,ETAL,NEG_OPACITY,
+	  CALL SUB_SOB_LINE_V2(SECTION,POPS,AVE_ENERGY,CHIL,ETAL,NEG_OPACITY,
 	1                    FL,CONT_FREQ,AMASS,
 	1                    EDDINGTON,IMPURITY_CODE,VAR_SOB_JC,LST_ITERATION,
 	1                    EW,CONT_INT,

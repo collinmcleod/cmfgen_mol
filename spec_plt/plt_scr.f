@@ -10,6 +10,7 @@
 C
 	REAL*8, ALLOCATABLE :: POPS(:,:,:)		!NT,ND,NIT
 	REAL*8, ALLOCATABLE :: R_MAT(:,:)		!ND,NIT
+	REAL*8, ALLOCATABLE :: RAT(:,:)			!NT,ND
 !
 	REAL*8, ALLOCATABLE :: R(:)			!ND
 	REAL*8, ALLOCATABLE :: V(:)			!ND
@@ -42,6 +43,7 @@ C
 	LOGICAL NEWMOD
 	LOGICAL WRITE_RVSIG
 	LOGICAL DO_ABS
+	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	CHARACTER*10 PLT_OPT
 	CHARACTER*80 YLABEL
 	CHARACTER*132 STRING
@@ -98,6 +100,7 @@ C
 C
 	ALLOCATE (POPS(NT,ND,NIT))
 	ALLOCATE (R_MAT(ND,NIT))
+	ALLOCATE (RAT(NT,ND))
 !
 	ALLOCATE (R(ND))
 	ALLOCATE (V(ND))
@@ -138,6 +141,7 @@ C
 	WRITE(T_OUT,*)'MED_R  :: Median corection as a function of depth'
 	WRITE(T_OUT,*)'MR     :: Z(K)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
 	WRITE(T_OUT,*)'IR     :: Z(ID)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
+	WRITE(T_OUT,*)'WRST   :: Writes fractional corections to file (same format as STEQ_VALS'
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'E   :: EXIT'
 	WRITE(T_OUT,*)' '
@@ -150,6 +154,12 @@ C
 	  DO IT=1,NIT
 	    WRITE(6,'(2ES16.6)')R_MAT(1,IT),R_MAT(ND,IT)
 	  END DO
+	ELSE IF(PLT_OPT(1:4) .EQ. 'WRST')THEN
+	  RAT(:,:)=(POPS(:,:,1)-POPS(:,:,NIT))/POPS(:,:,1)
+	  OPEN(UNIT=11,FILE='POP_RATIOS',STATUS='UNKNOWN')
+          CALL WR2D_V2(RAT,NT,ND,'Fractional changes from starting solution','#',L_TRUE,11)
+	  CLOSE(UNIT=11)
+	  GOTO 200
 	ELSE IF(PLT_OPT(1:4) .EQ. 'CHNG')THEN
 	  IT=0
 	  DO WHILE(IT .LT. 1 .OR. IT .GT. NIT)

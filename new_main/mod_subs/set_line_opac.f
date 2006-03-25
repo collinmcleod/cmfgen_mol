@@ -19,6 +19,7 @@
 	USE LINE_MOD
         IMPLICIT NONE
 !
+! Altered 20-Feb-2006 : Minor bug fix --- incorrect acces VAR_IN_USE_CNT when BA not being computed
 ! Created 21-Dec-2004
 !
 	INTEGER ND
@@ -140,14 +141,14 @@
 ! levels.
 !
 	        NL=LOW_POINTER(I)
-	        IF(.NOT. WEAK_LINE(I))THEN
+	        IF(NL .NE. 0 .AND. .NOT. WEAK_LINE(I))THEN
 	          VAR_IN_USE_CNT(NL)=VAR_IN_USE_CNT(NL)-1
 	          IF(VAR_IN_USE_CNT(NL) .EQ. 0)VAR_LEV_ID(NL)=0
 	        END IF
 	        LOW_POINTER(I)=0
 !
 	        NUP=UP_POINTER(I)
-	        IF(.NOT. WEAK_LINE(I))THEN
+	        IF(NUP .NE. 0 .AND. .NOT. WEAK_LINE(I))THEN
 	          VAR_IN_USE_CNT(NUP)=VAR_IN_USE_CNT(NUP)-1
 	          IF(VAR_IN_USE_CNT(NUP) .EQ. 0)VAR_LEV_ID(NUP)=0
 	        END IF

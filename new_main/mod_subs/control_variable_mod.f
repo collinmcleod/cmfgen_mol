@@ -1,5 +1,6 @@
 	MODULE CONTROL_VARIABLE_MOD
 !
+! Altered : 20-Feb-2006 : ABOVE_EDGE changed to LOGICAL from REAL*8
 ! Altered : 29-Jan-2006 : Control variable fors relativistic transfer and time
 !                          dependent statistical equilibrium equations installed.
 ! 
@@ -122,9 +123,9 @@
 	REAL*8 SIG_GAU_KMS
 	REAL*8 FRAC_SIG_GAU
 	REAL*8 CUT_ACCURACY
-	REAL*8 ABOVE_EDGE
 	REAL*8 VSM_DIE_KMS
 	LOGICAL DIE_AS_LINE
+	LOGICAL ABOVE_EDGE
 !
 ! Variables for controlling the frequcny grid.
 !
@@ -290,6 +291,16 @@
 	REAL*8 VAL_DO_NG 		!Begin NG when MAXCH < VAL_DO_NG
 	LOGICAL NG_DONE			!iIndicates successfull completion of NG
 	LOGICAL NG_DO			!Switch on NG acceleration.
+!
+! Variables for performing averaging of oscilating populations.
+!
+	INTEGER LAST_LAMBDA
+	INTEGER LAST_AV
+	INTEGER NEXT_AV
+	INTEGER ITS_PER_AV
+	INTEGER NUM_OSC_AV
+	LOGICAL AVERAGE_DONE
+	LOGICAL AVERAGE_DO
 !
 ! N_PAR is used to indicate how often the BA matrices should be incremented
 ! by BA_PAR. After the incrementation, the PAR matrices are zeroed.

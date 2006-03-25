@@ -1,4 +1,4 @@
-!
+
 ! Routine to perform an NG accleration for a Comoving-Frame Model. Progam
 ! uses the last 4 iterations which are stored in the last "4 records" 
 ! (effectively) of SCRTEMP.
@@ -21,6 +21,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 07-Mar-2006 : Acceleratiion can now start at ND_ST.
 ! Altered 19-May-2004 : Bug fix: NG_DONE set to true, even when no NG done.
 ! Altered 28-Mar-2004 : Changed to handle new format SCRTEMP files.
 !                       Now choice of 3 options: NG, AV and SOR.
@@ -50,6 +51,7 @@
 !
 	INTEGER ND,NT
 	INTEGER NBAND
+	INTEGER ND_ST
 !
 	INTEGER IOS
 	INTEGER IREC
@@ -122,8 +124,10 @@
 	  IT_STEP=1
 	  CALL GEN_IN(IT_STEP,'Iteration step size for NG acceleration')
 	  NBAND=1
+	  ND_ST=1
 	  DO_REGARDLESS=.FALSE.
 	  CALL GEN_IN(NBAND,'Band width for NG acceleration')
+	  CALL GEN_IN(ND_ST,'Only do NG acceleration for the depth in .GE. ND_ST')
 	  CALL GEN_IN(DO_REGARDLESS,'Do acceleration independent of corection size?')
 	  SCALE_INDIVIDUALLY=.FALSE.
 	  IF(DO_REGARDLESS)THEN
@@ -184,7 +188,7 @@
 ! Perform the NG acceleration.
 !
 	  J=NT+3
-	  CALL NG_MIT_OPTS(BIG_POPS,RDPOPS,ND,J,NBAND,DO_REGARDLESS,
+	  CALL NG_MIT_OPTS(BIG_POPS,RDPOPS,ND,J,NBAND,ND_ST,DO_REGARDLESS,
 	1                     SCALE_INDIVIDUALLY,NG_DONE,T_OUT)
 !
 	  WRITE(6,*)'Finished NG accleration'
@@ -285,17 +289,19 @@
 	END
 !
 !
-	SUBROUTINE NG_MIT_OPTS(POPS,RDPOPS,ND,NT,NBAND,DO_REGARDLESS,
+	SUBROUTINE NG_MIT_OPTS(POPS,RDPOPS,ND,NT,NBAND,ND_ST,DO_REGARDLESS,
 	1                           SCALE_INDIVIDUALLY,NG_DONE,LUER)
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 07-MAr-2006: ND_ST inserted in call (Name not changed: alrady have _V1).
 ! Altered 30-May-2003: Bug fix: When SCALE_INDIVIDUALLY was true, not all
 !                         populations were being accelerated.
 !
 	INTEGER ND
 	INTEGER NT
 	INTEGER NBAND
+	INTEGER ND_ST
 	INTEGER LUER
 	REAL*8 POPS(NT,ND)
 	REAL*8 RDPOPS(NT,ND,4)
@@ -330,12 +336,13 @@
 	  NS=NT*ND
 	  CALL GENACCEL_V2(NEWPOP,RDPOPS,IONE,ND,NT,ND,NS)
 	ELSE
-	  DO K=ND,1,-NBAND
-	    LST=MAX(K-NBAND+1,1)
+	  DO K=ND,ND_ST,-NBAND
+	    LST=MAX(K-NBAND+1,ND_ST)
 	    LEND=LST+NBAND-1
 	    NS=(LEND-LST+1)*NT
 	    CALL GENACCEL_V2(NEWPOP(1,LST),RDPOPS,LST,LEND,NT,ND,NS)
 	  END DO
+	  IF(ND_ST .GT. 1)NEWPOP(:,1:ND_ST-1)=POPS(:,1:ND_ST-1)
 	END IF
 !
 	WRITE(6,*)' '

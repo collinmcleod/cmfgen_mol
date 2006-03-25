@@ -610,7 +610,7 @@ C
 	        IF(T1 .GT. ACC_EDD_FAC)INACCURATE=.TRUE.
 	      END IF
 C
-	      IF(L .GT. 10)THEN
+	      IF(L .GT. 20)THEN
 	         WRITE(LUER,*)'Possible error converging f - T1 is',T1
 	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION 
 	      	 INACCURATE=.FALSE.

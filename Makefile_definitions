@@ -49,7 +49,7 @@ EXE_DIR=$(INSTALL_DIR)exe/
 
  F90 = fort
  FG  = -extend_source -I$(MOD_DIR)
-# FG  = -extend_source -g -ladebug -I$(MOD_DIR)
+ FD  = -extend_source -g -ladebug -I$(MOD_DIR)
  FFREE  = -I$(MOD_DIR)
 
 #********************************************************************

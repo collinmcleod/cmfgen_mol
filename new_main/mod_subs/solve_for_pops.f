@@ -246,6 +246,7 @@
 ! TRUE. We only do a LAMBDA iteration with T fixed. NB --- FIX_IMPURITY
 ! is a soft option --- is removed when convergence nearly obtained.
 !
+	IF(LAMBDA_ITERATION)LAST_LAMBDA=MAIN_COUNTER
 	IF(.NOT. RD_LAMBDA)THEN
 	  IF( MAXCH .LT. VAL_DO_LAM )THEN
 	     FIX_IMPURITY=RD_FIX_IMP .AND. LAMBDA_ITERATION
@@ -301,7 +302,32 @@
 ! case the where the NG acceleration has caused population changes
 ! > 20%. In this case, the BA matrix will also be recaluated on
 ! the next full iteration.
-!  
+!
+	WRITE(6,*)MAIN_COUNTER,NEXT_AV,LAST_LAMBDA+NUM_OSC_AV+2  
+	WRITE(6,*)NEXT_NG-4,LAST_AV+ITS_PER_AV
+	WRITE(6,*)AVERAGE_DO,LST_ITERATION 
+	IF(AVERAGE_DO .AND. MAIN_COUNTER .GE. NEXT_AV
+	1             .AND. MAIN_COUNTER .GT. LAST_LAMBDA+NUM_OSC_AV+2 
+	1             .AND. (MAIN_COUNTER .LT. NEXT_NG-4 .OR. .NOT. NG_DO)
+	1             .AND. MAIN_COUNTER .GE. LAST_AV+ITS_PER_AV
+	1             .AND. .NOT. LST_ITERATION)THEN
+	  CALL AVE_FLIPS(SOL,POPS,NT,ND,MAIN_COUNTER,NUM_OSC_AV,L_TRUE,AVERAGE_DONE)
+	  IF(AVERAGE_DONE)THEN
+	    POPS=SOL
+	    MAIN_COUNTER=MAIN_COUNTER+1
+	    LAST_AV=MAIN_COUNTER
+	    NEXT_AV=MAIN_COUNTER+ITS_PER_AV
+	    CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,
+	1             RITE_N_TIMES,LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
+	    WRITE(LUER,*)'Averaging of oscilating populations',
+	1                   ' performed on iteration',MAIN_COUNTER
+	  ELSE
+	    NEXT_AV=MAIN_COUNTER+8
+	    WRITE(LUER,*)'Error performing AV acceleration.'
+	    WRITE(LUER,*)'Will try again in 8 iterations.'
+	  END IF
+	END IF
+!
 	IF(NG_DO .AND. (.NOT. LST_ITERATION) .AND.
 	1       (NEXT_NG .EQ. MAIN_COUNTER) )THEN
 	  CALL DO_NG_BAND_ACCEL_V2(POPS,R,V,SIGMA,R_OLD,

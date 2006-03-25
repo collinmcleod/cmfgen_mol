@@ -19,6 +19,7 @@
 !
 	IMPLICIT NONE
 !
+! Altered 18-Feb-2006 : Minor bug fix -- accessed outside array when checking CROSS_TYPE.
 ! Altered 02-Oct-2005 : Changed eallocation section and have to compile with -g for pgf95
 ! Altered 02-Sep-2004 : Reinserted writing out header infromation located before date.
 ! Altered 18-MAr-2002 : Bug fix for profile with negligble Doppler core.
@@ -126,7 +127,7 @@
 ! to double check atomic data assignments etc.
 !
 	IF(DO_AUTO)THEN
-	  DO I=1,NXzV
+	  DO I=1,PD(ID)%MAX_TERMS
 	    L1=PD(ID)%CROSS_TYPE(I,1)
 	    IF(L1 .EQ. 20 .OR. L1 .EQ. 21)THEN
 	      WRITE(LUER,'(A)')' '
@@ -262,7 +263,7 @@
 	ELSE
 	  PD(ID)%NDIE_MAX=3*NUM_D_RD
 	END IF
-	ALLOCATE (PD(ID)%OSC(PD(ID)%NDIE_MAX))
+	ALLOCATE (PD(ID)%OSC(PD(ID)%NDIE_MAX),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (PD(ID)%GAMMA(PD(ID)%NDIE_MAX),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (PD(ID)%NU_ZERO(PD(ID)%NDIE_MAX),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (PD(ID)%NU_MIN(PD(ID)%NDIE_MAX),STAT=IOS)
@@ -431,7 +432,7 @@
 	     DO J=CNT_BEG,CNT
 	       PD(ID)%GAMMA(J)=DIE_LEV_AUTO(UP_PNT)/4.0D0/FUN_PI()
 	       PD(ID)%NU_ZERO(J)=1.0D-10*C_KMS*
-	1             (DIE_LEV_ENERGY(UP_PNT)-IONIZATION_ENERGY)+EDGE(DIELEV(J))
+	1             (DIE_LEV_ENERGY(UP_PNT)-IONIZATION_ENERGY)+EDGE(NINT(DIELEV(J)))
 	       WRITE(LUER,*) PD(ID)%OSC(J),PD(ID)%GAMMA(J),PD(ID)%NU_ZERO(J),DIELEV(J)
 	     END DO      
 	  END DO 
@@ -769,7 +770,7 @@
 	PD(ID)%END_INDEX(:)=0
 	J=1
 	DO I=1,NXzV
-	  DO WHILE(J .LE. CNT .AND. DIELEV(MIN(J,CNT)) .EQ. I)
+	  DO WHILE(J .LE. CNT .AND. NINT(DIELEV(MIN(J,CNT))) .EQ. I)
 	    IF(PD(ID)%END_INDEX(I) .EQ. 0)THEN
 	      PD(ID)%ST_INDEX(I)=J
 	      PD(ID)%END_INDEX(I)=J

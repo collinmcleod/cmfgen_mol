@@ -85,6 +85,7 @@ alias rmrrr     'rm -vf *PRRR'
 alias rmin      'rm -vf *_IN'
 alias dfort     'rm -vf fort.*'
 alias dsve      'rm -vf *.sve'
+alias dlog      'rm -vf *.log'
 alias dscratch  'rm -vf *SCRATCH*'
 #
 # Removes soft links from current directory

@@ -3,9 +3,10 @@
 ! for use with RDINR. IF THEN ELSE structure, so additional options can easily
 ! be included.
 ! Current options:
+!                 IR           Insert additional points betwen I=FST and I=LST
 !                 FG_OB:       Finer grid near outer boundary.
 !                 DOUB:        Doubel radius grid
-!                 SCAL_R:      Doubel radius grid
+!                 SCAL_R:      Scale radius grid
 !
 	PROGRAM REV_RDINR
 	USE GEN_IN_INTERFACE
@@ -25,7 +26,9 @@
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER I,J
+	INTEGER FST,LST
 	INTEGER NI,NG
+	INTEGER ICOUNT
 	INTEGER N,ND,NEW_ND
 	REAL*8 RMIN,LUM
 	REAL*8 GRID_FACTOR,GRID_RATIO
@@ -39,8 +42,14 @@
 	FILE_IN='HIOUT'; FILE_OUT='RDINR'
 	CALL GEN_IN(FILE_IN,'Input file: DC file format')
 	CALL GEN_IN(FILE_OUT,'Output file: DC file format')
+!
+	WRITE(6,'(A)')'Current available options are:'
+	WRITE(6,'(A)')'   IR           Insert additional points betwen I=FST and I=LST'
+        WRITE(6,'(A)')'   FG_OB:       Finer grid near outer boundary'
+	WRITE(6,'(A)')'   DOUB:        Doubel radius grid'
+	WRITE(6,'(A)')'   SCALE_R:     Scale radius grid'
 	OPTION='FG_OB'
-	CALL GEN_IN(OPTION,'Action to be taken: FG_OB, DOUB, SCALE_R')
+	CALL GEN_IN(OPTION,'Action to be taken:')
 	
 	OPEN(UNIT=9,FILE=FILE_IN,STATUS='OLD',ACTION='READ')
 	OPEN(UNIT=10,FILE=FILE_OUT,STATUS='UNKNOWN',ACTION='WRITE')
@@ -101,6 +110,61 @@
 	    WRITE(10,'(F7.1)')1.0D0
 	  END DO
 !
+! Make a fine grid at certain depths.
+!
+	ELSE IF(OPTION .EQ. 'IR')THEN
+	  WRITE(6,*)'Input range of depths to be revised'
+	  CALL GEN_IN(FST,'First grid point for revision')
+	  CALL GEN_IN(LST,'Last grid point for revision')
+	  WRITE(6,'(2X,A,4(8X,A6,4X))')'I',' R(I) ','R(I+1)',' Delr',' Ratio'
+	  DO I=FST,LST
+	    WRITE(6,'(I3,4ES18.8)')I,R(I),R(I+1),R(I)-R(I+1),(R(I+2)-R(I+1))/(R(I+1)-R(I))
+	  END DO
+!
+	  WRITE(10,'(1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)')RMIN,LUM,1,ND+NG
+	  DO I=1,FST
+	    WRITE(10,'(A)')' '
+	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),
+	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I
+	    WRITE(10,'(F7.1)')1.0D0
+	  END DO
+	  ICOUNT=FST
+	  NEW_ND=ND
+!
+! Now do the insertion.
+!
+	  NG=1
+	  DO I=FST,LST-1
+	    WRITE(6,'(I3,2ES16.8)')I,R(I),R(I+1)
+	    CALL GEN_IN(NG,'Number of additinal grid points for this interval')
+	    DO J=1,NG
+	      ICOUNT=ICOUNT+1
+	      T1=R(I)-J*(R(I)-R(I+1))/(NG+1)
+	      WRITE(10,'(A)')' '
+	      WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')T1,
+	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),ICOUNT
+	      WRITE(10,'(F7.1)')1.0D0
+	    END DO
+	    NEW_ND=NEW_ND+NG
+	    J=I+1
+	    ICOUNT=ICOUNT+1
+	    WRITE(10,'(A)')' '
+	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(J),
+	1                DI(J),ED(J),T(J),IRAT(J),VEL(J),CLUMP_FAC(J),ICOUNT
+	    WRITE(10,'(F7.1)')1.0D0
+	  END DO
+!
+! Output remaining grid.
+!
+	  DO I=LST+1,ND 
+	    ICOUNT=ICOUNT+1
+	    WRITE(10,'(A)')' '
+	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),
+	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),ICOUNT
+	    WRITE(10,'(F7.1)')1.0D0
+	  END DO
+	  WRITE(6,*)'New number of depth points is:',NEW_ND,ICOUNT
+!
 ! Make a fine grid near the outer boundary.
 !
 	ELSE IF(OPTION .EQ. 'FG_OB')THEN
@@ -160,7 +224,6 @@
 	  END DO
 	ELSE
 	  WRITE(6,*)TRIM(OPTION),' not recognized as valid option.'
-
 	END IF
 !
 	STOP
