@@ -9,6 +9,7 @@ LIB_MOD=$(LIB_DIR)libmod.a
 # Entries for library
 #
 OBJ = $(LIB)(add_par_to_full.o)\
+      $(LIB)(ave_flips.o)\
       $(LIB)(ba_replace.o)\
       $(LIB)(ba_update_v4.o)\
       $(LIB)(baion_update_v4.o)\
@@ -128,6 +129,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(nweight.o)\
       $(LIB)(occupation_prob.o)\
       $(LIB)(omega_gen_v2.o)\
+      $(LIB)(open_dir_acc_v1.o)\
       $(LIB)(par_fun_v2.o)\
       $(LIB)(pertjfeau_ibc.o)\
       $(LIB)(phys_con.o)\

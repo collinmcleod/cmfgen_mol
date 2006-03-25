@@ -10,6 +10,7 @@ C
 	1             T,N,ND,NSPEC,NSPEC_MAX,PRES)
 	IMPLICIT NONE
 C
+C Altered 07-MAr-2006 - 2.07D-22 pulled into exponential.
 C Altered 25-May-1996 - ERROR_LU inserted.
 C Altered 16-Jan-1995 - Occupation probabilities included in calculation of
 C                         partition function. CALL altered, but still V2.
@@ -35,7 +36,7 @@ C
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 	INTEGER I,J
-	REAL*8 T1,T2
+	REAL*8 T1,T2,RGU
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -66,12 +67,14 @@ C
 C
 	ZPFN(NSPEC)=ZION-1
 	ZPFN(NSPEC+1)=ZION
+	RGU=2.07078D-22
+	RGU=LOG(RGU)
 	T1=HDKT*EDGE(1)
 	DO I=1,ND
 	  U(I,NSPEC)=GHE2(1)
 	  U(I,NSPEC+1)=GION
 	  PHI(I,NSPEC+1)=0.0D0
-	  PHI(I,NSPEC)=2.07078D-22*HE2(1,I)*EXP( T1/T(I) )/T(I)/SQRT(T(I))
+	  PHI(I,NSPEC)=HE2(1,I)*EXP( RGU+T1/T(I) )/T(I)/SQRT(T(I))
 	  DO J=2,N
 	    T2=HDKT*(EDGE(J)-EDGE(1))
 	    U(I,NSPEC)=U(I,NSPEC) + GHE2(J)*EXP(T2/T(I))*

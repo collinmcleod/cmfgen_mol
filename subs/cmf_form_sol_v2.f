@@ -59,6 +59,7 @@ C
 	INTEGER ND_EXT
 	INTEGER ND_ADD
 	INTEGER NRAY
+	INTEGER NRAY_MAX
 	INTEGER ND_FINE
 C
 C Used to check for consistency with initialization call.
@@ -69,6 +70,7 @@ C
 	LOGICAL EXTEND_SAV
 C
 	INTEGER, PARAMETER :: NFINE_INS=10
+	CHARACTER(LEN=12) SOLUTION_METHOD
 C
 	END MODULE CMF_FORM_MOD_V2
 C
@@ -104,6 +106,8 @@ C
 	USE CMF_FORM_MOD_V2
 	IMPLICIT NONE
 C
+C Altered 20-Feb-2006 : SOLUTION_METHOD placed in module file. It was not being
+C                         saved between calls.
 C Altered 03-Feb-2006 : Adjust regriding treatment. Extra points are inserted
 C                         qually spaced in z, rather than R.
 C Altered 10-Oct-2004 : Adjusted SQRT in computation oz to use (R-P)*(R+P).
@@ -175,7 +179,6 @@ C
 C First frequency -- no frequency coupling.
  
 	LOGICAL INIT
-	CHARACTER*12 SOLUTION_METHOD
 C
 	REAL*8,  PARAMETER :: ONE=1.0D0
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
@@ -270,6 +273,7 @@ C
 	INTEGER NI_ORIG
 	INTEGER I,J,K,L,ML,LS
 	INTEGER N_FREQ
+	INTEGER TMP_PNT_FAC
 	REAL*8 DBC
 	REAL*8 IBOUND			!Incident intensity on outer boundary.
 	REAL*8 T1,T2
@@ -456,27 +460,53 @@ C calls.
 C
 ! Don't do the very last ray, as single point.
 C
+	  NRAY_MAX=PNT_FAC*(ND+ND_ADD)
 	  DO LS=1,MIN(NP_OBS,NC+ND_EXT-1)
 C
 	    NI_ORIG=ND_EXT-(LS-NC-1)
 	    IF(LS .LE. NC)NI_ORIG=ND_EXT
 !
-! Alomg the ray, we insert points equally spaced in z.
+! Along the ray, we insert points equally spaced in z, except right at the
+! outer boundary. Because of the first order boundary condition, we use a
+! a slightly smeller step at the outer boundary. We insert additional
+! points for the last few rays.
 !
-	    T1=1.0D0/PNT_FAC
-	    DO I=1,NI_ORIG-1
+	    TMP_PNT_FAC=PNT_FAC
+	    IF(LS .EQ. NP-3)TMP_PNT_FAC=PNT_FAC+1
+	    IF(LS .LE. NP-2)TMP_PNT_FAC=PNT_FAC+2
+	    DO WHILE( ((NI_ORIG-1)*TMP_PNT_FAC+1) .GT. NRAY_MAX)
+	      TMP_PNT_FAC=TMP_PNT_FAC-1
+	    END DO
+!
+	    IF(TMP_PNT_FAC .EQ. 1)THEN
+	      R_RAY(1,LS)=R_EXT(1)
+	    ELSE
+	      T1=SQRT( (R_EXT(1)+P_EXT(LS))*(R_EXT(1)-P_EXT(LS)) )
+	      T2=SQRT( (R_EXT(2)+P_EXT(LS))*(R_EXT(2)-P_EXT(LS)) )
+	      DELZ=(T1-T2)/(TMP_PNT_FAC-1)
+	      R_RAY(1,LS)=R_EXT(1)
+	      T2=T1-DELZ/20.0D0
+	      IF(SOLUTION_METHOD .EQ. 'INTEGRAL')T2=T1-DELZ/2.0D0
+	      R_RAY(2,LS)=SQRT(T2*T2+P_EXT(LS)*P_EXT(LS))
+	      DO J=3,TMP_PNT_FAC
+	        T2=T1-(J-2)*DELZ
+	        R_RAY(J,LS)=SQRT(T2*T2+P_EXT(LS)*P_EXT(LS))
+	      END DO
+	    END IF
+!
+	    DO I=2,NI_ORIG-1
 	      T1=SQRT( (R_EXT(I)+P_EXT(LS))*(R_EXT(I)-P_EXT(LS)) )
 	      T2=SQRT( (R_EXT(I+1)+P_EXT(LS))*(R_EXT(I+1)-P_EXT(LS)) )
-	      DELZ=(T1-T2)/PNT_FAC
-	      K=(I-1)*PNT_FAC+1
+	      DELZ=(T1-T2)/TMP_PNT_FAC
+	      K=(I-1)*TMP_PNT_FAC+1
 	      R_RAY(K,LS)=R_EXT(I)
-	      DO J=2,PNT_FAC
-	        K=(I-1)*PNT_FAC+J
+	      DO J=2,TMP_PNT_FAC
+	        K=(I-1)*TMP_PNT_FAC+J
 	        T2=T1-(J-1)*DELZ
 	        R_RAY(K,LS)=SQRT(T2*T2+P_EXT(LS)*P_EXT(LS))
 	      END DO
 	    END DO
-	    NRAY=(NI_ORIG-1)*PNT_FAC+1
+	    NRAY=(NI_ORIG-1)*TMP_PNT_FAC+1
 	    R_RAY(1,LS)=R_EXT(1)
 	    R_RAY(NRAY,LS)=R_EXT(NI_ORIG)
 !
@@ -1069,6 +1099,9 @@ C
 	ESEC_OLD(1:ND)=ESEC_NEW(1:ND)
 	ETA_OLD(1:ND)=ETA_NEW(1:ND)
 	FL_PREV=FL
+!	IF(FL .LT. 0.2)THEN
+!	  WRITE(6,'(5ES14.5)')FL,IPLUS_P(NP-3:NP-1)
+!	END IF
 C
 	RETURN
 	END

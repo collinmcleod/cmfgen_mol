@@ -17,6 +17,8 @@
 	1                      MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE)
 	IMPLICIT NONE
 !
+! Altered 20-Dec-2006 : Minor bug fix. Incorrect ray access after reading in
+!                         collisonal ioization term. LST_NUP was being set to 0.
 ! Altered 20-Dec-2004 : Eror message now output if error occurs reading
 !                         the actual collison values.
 ! Altered 02-Mar-1998 : Ientifying the connection betwen table and model 
@@ -328,6 +330,10 @@
 	  ELSE
 	    DO LOOP=1,NLEV
 	      NUP=MOD(LOOP+LST_NUP-2,NLEV)+1
+	      IF(LST_NUP .LT. 1)THEN
+	        WRITE(6,*)LST_NUP,FILE_NAME
+	        WRITE(6,*)LOW_LEV,UP_LEV
+	      END IF
 	      K=INDEX(LOCNAME(NUP),'[')
 	      IF(K .EQ. 0)THEN
 	        IF(UP_LEV .EQ. LOCNAME(NUP))THEN
@@ -357,7 +363,7 @@
 !
 200	  NORM_FAC=1.0D0/GL_SUM/GU_SUM
 	  LST_NL=NL_VEC(1)
-	  LST_NUP=NUP_VEC(1)
+	  IF(UP_LEV .NE. 'I')LST_NUP=NUP_VEC(1)
 	  STRING(1:)=STRING(L:)
 !
 ! The multiplet collision strengths are converted to individual collision 
