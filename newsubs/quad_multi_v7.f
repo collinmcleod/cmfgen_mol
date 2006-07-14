@@ -93,7 +93,7 @@ C
 C Note FOUR_PI_D_H differs by 10^-15 from original constant in QUADGEN because
 C FQW has C units of Hz, not 10^15 Hz.
 C
-	FOUR_PI_D_H=1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
+	FOUR_PI_D_H=1.0D0/5.27296D-03                    !1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
 C
 	WSE_S(:,:)=0.0D0
 	WSE_CR_S(:,:)=0.0D0

@@ -1,26 +1,33 @@
 !
-! General routine to guess the departure coefficients for  a new species or
+! General routine to guess the departure coefficients for a new species or
 ! ionization stage. The following files are required:
 !
 !     EDDFACTOR
 !     RVTJ
 !     XzV_F_OSCDAT
+!     XzIVOUT   (for high ionization species only)
 !
 ! These can come from a similar model but the frequency range must be sufficient.
-! Program estimate th e ground state departure coefficient, and use the same
-! excitation coefficient for all other levels.
+! For high ionization species, the model should be identical, since the departure
+! coefficients are very sensitive to the electron temperature.  Program estimates 
+! the ground state departure coefficient, and use the same excitation temperature
+! for all other levels. If adding a whole new species, start with lowest ioization
+! species.
 !
 	PROGRAM GUESS_DC
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 14-May-2006 : For a high ionization species, ground state population is 
+!                       read in from file. This allows estimate of ion population 
+!                       to be made.
+!
 	INTEGER NCF
 	INTEGER ND
-	REAL*8, POINTER :: RJ(:,:)
-	REAL*8, POINTER :: NU(:)
 	CHARACTER*10 DATA_TYPE
 	CHARACTER*40 FILE_DATE
 	CHARACTER*80 FILENAME
+	CHARACTER*132 STRING
 !
 	INTEGER NUM_FILES
 	INTEGER ID
@@ -37,6 +44,16 @@
 	REAL*8, ALLOCATABLE :: DC(:,:)
 	REAL*8, ALLOCATABLE :: T_EXC(:)
 !
+	REAL*8, ALLOCATABLE :: GS_ION_POP(:)
+	REAL*8, ALLOCATABLE :: DC_RUB(:)
+!
+! Needed when reading EDDFACTOR
+!
+	REAL*8, POINTER :: RJ(:,:)
+	REAL*8, POINTER :: NU(:)
+!
+! Needed when reading RVTJ.
+!
 	REAL*8 RMDOT
 	REAL*8 RLUM
 	REAL*8 ABUND_HYD
@@ -46,6 +63,7 @@
 	REAL*8, ALLOCATABLE :: V(:)
 	REAL*8, ALLOCATABLE :: SIGMA(:)
 	REAL*8, ALLOCATABLE :: T(:)
+	REAL*8, ALLOCATABLE :: ION_POP(:)
 	REAL*8, ALLOCATABLE :: ED(:)
 	REAL*8, ALLOCATABLE :: ROSS_MEAN(:)
 	REAL*8, ALLOCATABLE :: FLUX_MEAN(:)
@@ -53,6 +71,9 @@
 	REAL*8, ALLOCATABLE :: MASS_DENSITY(:)
 	REAL*8, ALLOCATABLE :: POPION(:)
 	REAL*8, ALLOCATABLE :: CLUMP_FAC(:)
+!
+! Used when reading file containing energy levels, oscillator strengths, etc
+! (e.g. CV_F_OSCDAT)
 !
 	INTEGER, PARAMETER :: N_MAX=2000
 	CHARACTER*30 NAME(N_MAX)
@@ -80,26 +101,25 @@
         INTEGER UNIT_SIZE
         INTEGER WORD_SIZE
         INTEGER N_PER_REC
-
+!
 ! Miscellaneous variables.
 !
 	INTEGER IOS			!Used for Input/Output errors.
-	INTEGER I,J,K,L,ML,ISAV
+	INTEGER I,J,ML
+	INTEGER EDGE_ML
 	INTEGER ST_REC
 	INTEGER REC_LENGTH
-	REAL*8 SCALE_FAC
-	REAL*8 TEMP
-	REAL*8 T1,T2,T3
-	REAL*8 LAMC
-	REAL*8 T_ELEC
-	LOGICAL AIR_LAM
-	LOGICAL USE_V
+	INTEGER ND_RD,NLEV_RD
+	INTEGER GION_LOW,GION_UP
+	REAL*8 NU1,NU2
+	REAL*8 RJ1,RJ2
+	REAL*8 T1,T2,T3,T4
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
-	INTEGER, PARAMETER :: T_IN=5		!For file I/O
-	INTEGER, PARAMETER :: T_OUT=6
-	INTEGER, PARAMETER :: LU_IN=10	!For file I/O
+	INTEGER, PARAMETER :: T_IN=5		!For terminal input 
+	INTEGER, PARAMETER :: T_OUT=6           !For terminal output
+	INTEGER, PARAMETER :: LU_IN=10		!For file I/O
 	INTEGER, PARAMETER :: LU_OUT=11
 	INTEGER, PARAMETER :: LU_HEAD=12
 !
@@ -197,6 +217,7 @@
 	ALLOCATE (V(ND_ATM))
 	ALLOCATE (SIGMA(ND_ATM))
 	ALLOCATE (T(ND_ATM))
+	ALLOCATE (ION_POP(ND_ATM))
 	ALLOCATE (ED(ND_ATM))
 	ALLOCATE (ROSS_MEAN(ND_ATM))
 	ALLOCATE (FLUX_MEAN(ND_ATM))
@@ -250,16 +271,27 @@
 	WRITE(T_OUT,*)'Successfully read oscillator file'
 	WRITE(T_OUT,*)' '
 !
+! Check EDDFACTOR file extends to high enough frequencies.
+!
+	IF(FEDGE(1) .GT. NU(1))THEN
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'Error --- maximum frequency in EDDFACTOR too small '
+	  WRITE(T_OUT,*)'EDDFACTOR NU_MAX=',NU(1)
+	  WRITE(T_OUT,*)'Required  NU_MAX>',FEDGE(1)
+	  WRITE(T_OUT,*)' '
+	  STOP
+	END IF
+!
 	ML=1
 	DO WHILE(FEDGE(1) .LT. NU(ML))
 	  ML=ML+1
 	END DO
-	J=ML-1
+	EDGE_ML=ML-1
 !
 ! Compute the recombination and photoionization rate to the ground state.
 ! For simplicity we assume the ground state population is set by a balance
 ! between photoionizations and recombinations. We ignore the frequency
-! dependence of the photoionization cross-section, and not that its numerical
+! dependence of the photoionization cross-section, and note that its numerical
 ! value does not matter.
 !
 	IF(.NOT. ALLOCATED(PHOT_SUM))THEN
@@ -268,7 +300,7 @@
 	END IF
 	PHOT_SUM(1:ND)=0.0D0
 	RECOM_SUM(1:ND)=0.0D0
-	DO ML=1,J-1
+	DO ML=1,EDGE_ML-1
 	  DO I=1,ND
 	    PHOT_SUM(I)=PHOT_SUM(I)+0.5D0*(NU(ML)-NU(ML+1))*(RJ(I,ML)+RJ(I,ML+1))
 	    T1=(TWOHCSQ*(NU(ML)**3)+RJ(I,ML))*EXP(-HDKT*NU(ML)/T(I))
@@ -276,6 +308,25 @@
 	    RECOM_SUM(I)=RECOM_SUM(I)+0.5D0*(NU(ML)-NU(ML+1))*(T1+T2)
 	  END DO
 	END DO
+!
+! Add contribution where NU(EDGE_ML) is very different from FEDGE(1)
+!
+	IF(NU(EDGE_ML) .GT. 1.00000001D0*FEDGE(1))THEN
+	  DO ML=1,10
+	    NU1=NU(EDGE_ML)-(ML-1)*(NU(EDGE_ML)-FEDGE(1))/10
+	    NU2=NU(EDGE_ML)-ML*(NU(EDGE_ML)-FEDGE(1))/10
+	    T1=(NU(EDGE_ML)-NU1)/(NU(EDGE_ML)-NU(EDGE_ML+1))
+	    T2=(NU(EDGE_ML)-NU2)/(NU(EDGE_ML)-NU(EDGE_ML+1))
+	    DO I=1,ND
+	      RJ1=(1.0D0-T1)*RJ(I,EDGE_ML)+T1*RJ(I,EDGE_ML+1)
+	      RJ2=(1.0D0-T2)*RJ(I,EDGE_ML)+T2*RJ(I,EDGE_ML+1)
+	      PHOT_SUM(I)=PHOT_SUM(I)+0.5D0*(NU1-NU2)*(RJ1+RJ2)
+	      T3=(TWOHCSQ*(NU1**3)+RJ1)*EXP(-HDKT*NU1/T(I))
+	      T4=(TWOHCSQ*(NU2**3)+RJ2)*EXP(-HDKT*NU2/T(I))
+	      RECOM_SUM(I)=RECOM_SUM(I)+0.5D0*(NU1-NU2)*(T3+T4)
+	    END DO
+	  END DO
+	END IF
 !
 ! Compute the ground-state departure coefficient, and the excitation temperature
 ! of the ground state.
@@ -309,20 +360,69 @@
 	   END DO
 	END DO
 !
+! Read in ION file to get ground state population. For a lower ionization species,
+! ion population does not matter, since the actal ion population gets used when
+! species is read into CMFGEN.
+!
+	WRITE(6,*)' '
+	WRITE(6,*)'If adding CV to model with C2, CIII, CIV enter CIVOUT '
+	WRITE(6,*)'If adding CI to model with C2, CIII, CIV enter "" '
+	WRITE(6,*)' '
+	FILENAME=' '
+	CALL GEN_IN(FILENAME,'File with ground state population ')
+	  IF(FILENAME .NE. ' ')THEN
+            CALL GEN_ASCI_OPEN(LU_IN,FILENAME,'OLD',' ','READ',IZERO,IOS)
+            I=0
+            STRING=' '
+            DO WHILE(INDEX(STRING,'!Format date') .EQ. 0 .AND. I .LE. 10)
+              I=I+1
+              READ(LU_IN,'(A)')STRING
+            END DO
+            IF( INDEX(STRING,'!Format date') .EQ. 0)REWIND(LU_IN)
+            READ(LU_IN,*)T1,T2,NLEV_RD,ND_RD
+	    IF(ALLOCATED(DC_RUB))DEALLOCATE(DC_RUB)
+	    ALLOCATE (DC_RUB(NLEV_RD))
+            IF(ND_RD .NE. ND)THEN
+	      WRITE(T_OUT,*)'ND in ion file must be same as current ND'
+	      STOP
+	    END IF
+	    IF(.NOT. ALLOCATED(GS_ION_POP))ALLOCATE (GS_ION_POP(ND))
+            DO J=1,ND_RD
+              READ(LU_IN,*)T1,GS_ION_POP(J)
+              READ(LU_IN,*)(DC_RUB(I),I=1,NLEV_RD)
+	    END DO
+	  CLOSE(LU_IN)
+	  GION_UP=1; GION_LOW=1
+	  CALL GEN_IN(GION_UP,'Statistical weight for upper ion level (i.e., 2 for CV [=G(CVI)])')
+	  CALL GEN_IN(GION_LOW,'Statistical weight for lower ion level(i.e., 1 for CV)')
+!
+	  DO I=1,ND
+	    T1=DLOG(2.07D-22*ED(I)*DC(1,I))
+	    T1=GION_LOW*EXP(T1+HDKT*FEDGE(1)/T(I))/(T(I)**1.5D0)/GION_UP
+	    ION_POP(I)=GS_ION_POP(I)/T1
+	  END DO
+	ELSE
+	  ION_POP(1:ND)=1.0D-10
+	END IF
+!
 	FILENAME=TRIM(SPECIES)//'_IN'
 	CALL GEN_IN(FILENAME,'Output file for DCs --- old file will be overwritten')
+	CALL GEN_IN(NLEV,'Number of levels to be output to file')
 	CALL GEN_ASCI_OPEN(LU_OUT,FILENAME,'UNKNOWN',' ','WRITE',IZERO,IOS)
 	  WRITE(LU_OUT,'(/,X,A,T40,A)')'07-Jul-1997','!Format date'
 	  WRITE(LU_OUT,2120)R(ND),RLUM,NLEV,ND
 	  DO I=1,ND
-	    WRITE(LU_OUT,2122)R(I),1.0D-100,ED(I),T(I),0.0,V(I),CLUMP_FAC(I)
+	    WRITE(LU_OUT,2122)R(I),ION_POP(I),ED(I),T(I),0.0,V(I),CLUMP_FAC(I)
 	    WRITE(LU_OUT,'(1X,1P,5E17.7)')(DC(J,I),J=1,NLEV)
 	  END DO
 	CLOSE(LU_OUT)
+	WRITE(T_OUT,*)
+	WRITE(T_OUT,*)' Check output file to ensure d.c''s ---> 1 at depth'
+	WRITE(T_OUT,*)
 2120	FORMAT(/,X,F11.6,5X,1PE12.6,5X,0P,I4,5X,I4)
 2122	FORMAT(/,X,1P,E16.8,6E17.8)
 !
-! Loop back to do addition species and ionization stages.
+! Loop back to do additional species and ionization stages.
 !
 	SPECIES='EXIT'
 	GOTO 5000

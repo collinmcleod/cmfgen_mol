@@ -127,7 +127,7 @@
 	LOGICAL DIE_AS_LINE
 	LOGICAL ABOVE_EDGE
 !
-! Variables for controlling the frequcny grid.
+! Variables for controlling the frequency grid.
 !
 	REAL*8 MIN_CONT_FREQ 		!Minimum continuum frequency.
 	REAL*8 MAX_CONT_FREQ    	!Maximum continuum frequency.
@@ -218,7 +218,7 @@
 	LOGICAL WEAK_WITH_NET
 	INTEGER NUM_OF_WEAK_LINES    !COunter in CMFGEN_SUB only
 !
-! Indicates whether how ALL lines are to btreated.
+! Indicates whether how ALL lines are to be treated.
 !
 	CHARACTER*6 GLOBAL_LINE_SWITCH
 	LOGICAL SET_TRANS_TYPE_BY_LAM
@@ -248,6 +248,12 @@
 	LOGICAL EDD_CONT
 	LOGICAL COMPUTE_EDDFAC
 	LOGICAL EDD_LINECONT
+	LOGICAL NO_VEL_FOR_CONTINUUM
+!
+! Indicate whether the atmosphere is to be treated in plane-parallel mode
+!
+	LOGICAL PLANE_PARALLEL_NO_V
+	LOGICAL PLANE_PARALLEL
 !
 ! Variables required for adding additional points into the depth 
 ! grid. Allows an increase in program accuracy to overcome
@@ -427,11 +433,15 @@
         LOGICAL NEWMOD
         LOGICAL WRITE_RVSIG
 !
-	LOGICAL RDTHK_CONT,THK_CONT,THK_LINE
+	LOGICAL RDTHK_CONT
+	LOGICAL THK_CONT
+	LOGICAL THK_LINE
+	LOGICAL INCL_INCID_RAD
 	LOGICAL SETZERO
 	lOGICAL DO_POP_SCALE
 	LOGICAL TRAPFORJ
 	LOGICAL CHECK_LINE_OPAC
         LOGICAL SOBOLEV
+        LOGICAL VERBOSE_OUTPUT
 !
 	END MODULE CONTROL_VARIABLE_MOD

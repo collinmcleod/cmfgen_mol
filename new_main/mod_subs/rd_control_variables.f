@@ -350,6 +350,9 @@ C
 											
 	  CALL RD_STORE_LOG(RDTHK_CONT,'THK_CONT',L_TRUE,
 	1           'Use thick boundary condition for continuum ? ')
+	  INCL_INCID_RAD=.FALSE.
+	  CALL RD_STORE_LOG(INCL_INCID_RAD,'INCID_RAD',L_FALSE,
+	1           'Include incident radiation for plane-parellel mod with V?')
 	  CALL RD_STORE_LOG(TRAPFORJ,'TRAP_J',L_TRUE,
 	1           'Use trapazoidal weights to compute J? ')
 C
@@ -402,6 +405,9 @@ C
 	  CALL RD_STORE_LOG(SOB_FREQ_IN_OBS,'SOB_FREQ_IN_OBS',L_TRUE,
 	1        ' Allow for SOB & CMF lines in defining observers'//
 	1        ' frequencies?')
+	  VERBOSE_OUTPUT=.FALSE.
+	  CALL RD_STORE_LOG(VERBOSE_OUTPUT,'VERBOSE_OUT',L_FALSE,
+	1        'Switch on enhanced diagnostic output')
 C
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_NCHAR(GLOBAL_LINE_SWITCH,'GLOBAL_LINE',ISIX,L_TRUE,
@@ -640,8 +646,18 @@ C
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(EDD_CONT,'JC_W_EDD',L_TRUE,
 	1        'Compute continuum intensity using Eddington factors')
+	  NO_VEL_FOR_CONTINUUM=.FALSE.
+	  CALL RD_STORE_LOG(NO_VEL_FOR_CONTINUUM,'NOV_CONT',L_FALSE,
+	1        'In non-blanketed mode, ignore velocity terms when computing cntinuum')
 	  CALL RD_STORE_LOG(EDD_LINECONT,'JBAR_W_EDD',L_TRUE,
 	1    'Compute line continuum intensity using Eddington factors')
+!
+	  PLANE_PARALLEL_NO_V=.FALSE.
+	  CALL RD_STORE_LOG(PLANE_PARALLEL_NO_V,'PP_NOV',L_FALSE,
+	1    'Plane-paralle geometry WITHOUT velocity field?')
+	  PLANE_PARALLEL=.FALSE.
+	  CALL RD_STORE_LOG(PLANE_PARALLEL,'PP_MOD',L_FALSE,
+	1    'Plane-paralle geometry with velocity field?')
 	
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(ACCURATE,'INC_GRID',L_TRUE,

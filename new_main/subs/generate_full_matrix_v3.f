@@ -272,7 +272,7 @@
                   DO I=1,ATM(ID)%NXzV
                     T1=EDGE_SUM(I)/G_SUM(I)
 	            EQ=SE(ID)%EQ_IN_BA(I)
-	            SUM=SUM+5.27296E-03*T1*STEQ_VEC(EQ)
+	            SUM=SUM+5.27296D-03*T1*STEQ_VEC(EQ)
 	          END DO
 	          STEQ_VEC(NT)=STEQ_VEC(NT)+SUM
 	          IF(DEPTH_INDX .EQ. 1)WRITE(114,*)ATM(ID)%NXzV_F,ATM(ID)%NXzV,STEQ_VEC(NT),SUM
@@ -283,7 +283,7 @@
                   DO I=1,ATM(ID)%NXzV
                     T1=EDGE_SUM(I)/G_SUM(I)
 	            EQ=SE(ID)%EQ_IN_BA(I)
-	            SUM=SUM+5.27296E-03*T1*C_MAT(EQ,J)
+	            SUM=SUM+5.27296D-03*T1*C_MAT(EQ,J)
 	          END DO
 	          C_MAT(NT,J)=C_MAT(NT,J)+SUM
 	        END DO
@@ -370,8 +370,15 @@
 	  END DO
 	END DO
 !
-	IF(K .EQ. 32 .AND. DIAG_BAND)THEN
+	IF(K .EQ. 1 .AND. DIAG_BAND)THEN
 	  OPEN(UNIT=96,FILE='BA_ASCI_N_D1',STATUS='UNKNOWN')
+	    CALL WR2D_MA(POPS(1,K),NT,1,'POPS_D1',96)
+	    CALL WR2D_MA(STEQ_VEC,NT,1,'STEQ_VEC_D1',96)
+	    CALL WR2D_MA(C_MAT,NT,NT,'C_MAT_D1',96)
+	  CLOSE(UNIT=96)
+	END IF
+	IF(K .EQ. 2 .AND. DIAG_BAND)THEN
+	  OPEN(UNIT=96,FILE='BA_ASCI_N_D2',STATUS='UNKNOWN')
 	    CALL WR2D_MA(POPS(1,K),NT,1,'POPS_D1',96)
 	    CALL WR2D_MA(STEQ_VEC,NT,1,'STEQ_VEC_D1',96)
 	    CALL WR2D_MA(C_MAT,NT,NT,'C_MAT_D1',96)

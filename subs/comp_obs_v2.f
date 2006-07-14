@@ -15,6 +15,9 @@
 	1                       INTERP_PROC,DO_FULL_REL,FIRST_OBS_COMP,NP)
 	IMPLICIT NONE
 !
+! Altered 03-Apr-2006 : Changed to handle plane parallel atmosphere where
+!                         MU(1) < MU(2) etc (opposite to spherical case).
+!                         Replaced FREQ_CONV_FAC(1) by MIN_FREQ_CONV_FAC.
 ! Altered 18-Jan-2006 : Changed to V2, and DO_FULL_REL option installed.
 !                        Routine is now full relativistic.
 ! Altered 14-Dec-1996 : Bug fix for MON_INTER option. NU_STORE was being
@@ -38,9 +41,9 @@
 	REAL*8 IPLUS_STORE(NST_CMF,NP)
 	REAL*8 NU_STORE(NST_CMF)
 !
-	REAL*8, ALLOCATABLE :: FREQ_CONV_FAC(:)
-	REAL*8, ALLOCATABLE :: INTEN_CONV_FAC(:)
-	SAVE FREQ_CONV_FAC,INTEN_CONV_FAC
+	REAL*8, SAVE, ALLOCATABLE :: FREQ_CONV_FAC(:)
+	REAL*8, SAVE, ALLOCATABLE :: INTEN_CONV_FAC(:)
+	REAL*8, SAVE :: MIN_FREQ_CONV_FAC
 !
 	REAL*8 VINF			!
 	REAL*8 RMAX			!Radius at outer boundary.
@@ -133,6 +136,7 @@
               INTEN_CONV_FAC(LS)=1.0D0
 	    END DO
 	  END IF
+	  MIN_FREQ_CONV_FAC=MINVAL(FREQ_CONV_FAC)
 	END IF
 !
 	IF(OBS_INDX .GT. N_OBS)RETURN		!Finished
@@ -179,7 +183,7 @@
 ! We ensure that the vector can be stored into the array.
 !
 	DO LS=1,NP
-	  IF(NEW_IPLUS(LS) .LE. 0)NEW_IPLUS(LS)=0.0
+	  IF(NEW_IPLUS(LS) .LE. 0.0D0)NEW_IPLUS(LS)=0.0D0
 	  IPLUS_STORE(NEXT_ST_LOC,LS)=NEW_IPLUS(LS)
 	END DO
 	NU_STORE(NEXT_ST_LOC)=NEW_NU
@@ -196,7 +200,7 @@
 	  WRITE(LUER,*)'OBS_INDX=',OBS_INDX
 	  STOP
 	END IF
-	NU_SM_CMF=OBS_FREQ(OBS_INDX)*FREQ_CONV_FAC(1)
+	NU_SM_CMF=OBS_FREQ(OBS_INDX)*MIN_FREQ_CONV_FAC
 	DO WHILE(NU_STORE(NEXT_ST_LOC-2) .LT. NU_SM_CMF)
 !
 ! We can successfully perform the interpolation, and evaluate the flux
@@ -268,7 +272,7 @@
 !
 	  OBS_INDX=OBS_INDX+1
 	  IF(OBS_INDX .GT. N_OBS)RETURN		!Finished
-	  NU_SM_CMF=OBS_FREQ(OBS_INDX)*FREQ_CONV_FAC(1)
+	  NU_SM_CMF=OBS_FREQ(OBS_INDX)*MIN_FREQ_CONV_FAC
 	END DO
 !
 	RETURN

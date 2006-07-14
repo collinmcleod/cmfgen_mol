@@ -45,6 +45,7 @@ USR=$(LIB_DIR)libtools.a(usr_option.o)
 MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
       $(LIB_DIR)libmod.a(cmf_sob_mod.o)\
       $(LIB_DIR)libmod.a(control_variable_mod.o)\
+      $(LIB_DIR)libmod.a(ang_qw_mod.o)\
       $(LIB_DIR)libmod.a(line_mod.o)\
       $(LIB_DIR)libmod.a(line_vec_mod.o)\
       $(LIB_DIR)libmod.a(mod_lev_dis_blk.o)\

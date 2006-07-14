@@ -92,6 +92,7 @@
 	  IF(ABS(R(1)-RMAX) .GT. 0.1D0*(R(1)-R(2)))THEN
 	    WRITE(LUER,*)'Error in RD_RV_FILE'
 	    WRITE(LUER,*)'R(1)/R(ND) must match RMAX/RP'
+	    WRITE(LUER,*)'R(1)/R(ND)=',R(1)/R(ND)
 	    STOP
           END IF	
 	  R(1)=RMAX

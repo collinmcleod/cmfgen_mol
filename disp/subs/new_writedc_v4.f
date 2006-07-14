@@ -87,7 +87,7 @@ C
 	            T2=T2+DHYD(J,I)
 	          END DO
 	          T1=T1/T2
-	          WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I)
+	          WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I),I
 	          WRITE(9,FMT)((HYD(J,I)/HYDLTE(J,I)),J=1,NHYD)
 	        END IF
 	      END DO
@@ -103,7 +103,7 @@ C
 	            T2=T2+DHYD(J,I)
 	          END DO
 	          T1=T1/T2
-	          WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I)
+	          WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I),I
 	          DO J=1,NHYD
 	            T1=LOG( HYD(J,I)*GION/GHYD(J)/WHYD(J,I)/
 	1                             2.07D-22/ED(I)/DHYD(1,I) )
@@ -140,7 +140,7 @@ C
 	            T2=T2+DHYD(J,I)
 	          END DO
 	          T1=T1/T2
-	          WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I)
+	          WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I),I
 	          WRITE(9,FMT)(HYD(J,I),J=1,NHYD)
 	        END IF
 	      END DO
@@ -149,7 +149,7 @@ C
 	  END IF
 C
 2120	  FORMAT(/,X,ES16.8,5X,ES12.6,5X,I4,5X,I4)
-2122	  FORMAT(/,X,ES16.8,6ES17.8)
+2122	  FORMAT(/,X,ES16.8,6ES17.8,3X,I4)
 C
 	  RETURN
 	  END

@@ -298,7 +298,7 @@ C BB curve. At longer wavelengths we will use a simple scaling.
 C
 C Because of the steep variation of B on the Wien side, we operate on Log(B).
 C
-	  IF( MINVAL(PLANCK_FN) .GT. 0.0D0)THEN
+	  IF( MINVAL(PLANCK_FN) .GT. 0.0D0 .AND. MINVAL(PLANCK_ES) .GT. 0.0D0)THEN
 	    PLANCK_ES(:)=LOG(PLANCK_ES(:))
 	    PLANCK_FN(:)=LOG(PLANCK_FN(:))
 C

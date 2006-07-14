@@ -1758,14 +1758,14 @@
 	  IF(ROSS_MEAN(1) .NE. 0.0D0)THEN
 	    IF(ELEC)THEN
 	      DO I=1,ND
-	        YV(I)=DLOG10(ROSS_MEAN(I))-10
-	      END DO
-	      YAXIS='Rosseland Mean Opacity (cm\u-1\d)'
-	    ELSE
-	      DO I=1,ND
 	        YV(I)=ROSS_MEAN(I)/(6.65D-15*ED(I))
 	      END DO
 	      YAXIS='Rosseland Mean Opacity/ \gsNe'           ! (cm\u-1\d)'
+	    ELSE
+	      DO I=1,ND
+	        YV(I)=DLOG10(ROSS_MEAN(I))-10
+	      END DO
+	      YAXIS='Rosseland Mean Opacity (cm\u-1\d)'
 	    END IF
 	    CALL DP_CURVE(ND,XV,YV)
 	  ELSE
@@ -3119,18 +3119,16 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	    TB(1)=SCED(1)
 	    T1=( DLOG10(ED(2))-SCED(1) )/( DLOG10(ED(2))-DLOG10(ED(1)) )
 	    TA(1)=T1*TA(2)+(1.0D0-T1)*TA(3)
-	    J=ND+1
 	  ELSE
 	    DO I=1,ND
 	      TB(I)=DLOG10(ED(I))
 	    END DO
-	    J=ND
 	  END IF
-	  NXED=25
-	  DO WHILE( SCED(NXED) .GT. TB(J) )
+	  NXED=31
+	  DO WHILE( SCED(NXED) .GT. TB(ND) )
 	    NXED=NXED-1
 	  END DO
-	  CALL LININT(SCED,XED,NXED,TB,TA,J)
+	  CALL LININT(SCED,XED,NXED,TB,TA,ND)
 !
 	  CALL USR_HIDDEN(T1,'MAX_ED','14.0D0','Maximum Ne Along top axis ')
 	  DO WHILE(SCED(NXED) .GT. T1*1.00001)
@@ -3264,6 +3262,13 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	          END IF
 	        ELSE
 	          YAXIS='Log(N)'
+	          IF(SPEC_FRAC)THEN
+	            ISPEC=SPECIES_LNK(ID)
+	            DO J=1,ND
+	              YV(J)=YV(J)-LOG10(POPDUM(J,ISPEC))
+	            END DO
+	            YAXIS='Log(N/Nsp)'
+	          END IF
 	        END IF
 !
 	        CALL DP_CURVE(ND,XV,YV)

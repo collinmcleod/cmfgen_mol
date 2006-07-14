@@ -101,6 +101,9 @@
        	IF(SECTION .EQ. 'CONTINUUM')THEN
 	  CONT_VEL=.TRUE.
 	  THK_CONT=RDTHK_CONT
+	  IF(GLOBAL_LINE_SWITCH(1:5) .NE. 'BLANK' .AND. NO_VEL_FOR_CONTINUUM)THEN
+	    CONT_VEL=.FALSE.
+	  END IF
 	ELSE
 	  CONT_VEL=.FALSE.
 	END IF
@@ -142,6 +145,7 @@ C
 	    THETAEXT(I)=ESECEXT(I)/CHIEXT(I)
 	  END DO
 C
+	  IF(SECTION .EQ. 'CONTINUUM' .AND. FREQ_INDX .EQ. 1)FEDD=0.0D0
 	  IF(COMPUTE_EDDFAC)THEN
 	    DO I=1,NDEXT
 	      RJEXT(I)=0.0D0
@@ -562,7 +566,21 @@ C
 C NB Using TA for ETA, TC for JNU_VEC, and TB for HNU_VEC
 C
 	     CALL TUNE(IONE,'FG_J_CMF')
-	     CALL FG_J_CMF_V10(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
+	     IF(PLANE_PARALLEL_NO_V)THEN
+	        IF(FIRST_FREQ)WRITE(LUER,*)'Calling FCOMP_PP'
+	        SOURCE(1:ND)=TA(1:ND)/CHI_CLUMP(1:ND)
+	        CALL FCOMP_PP_V2(R,TC,FEDD,SOURCE,CHI_CLUMP,IPLUS,HBC_CMF,
+	1               NBC_CMF,INBC,DBB,IC,THK_CONT,DIF,ND,NC,METHOD)
+	     ELSE IF(PLANE_PARALLEL)THEN
+	        CALL PP_FORM_CMF_V2(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
+	1               TC,TB,FEDD,GEDD,N_ON_J,INBC,
+	1               HBC_CMF(1),HBC_CMF(2),NBC_CMF(1),NBC_CMF(2),
+	1               IPLUS,FL,dLOG_NU,DIF,DBB,IC,VDOP_VEC,DELV_FRAC_FG,
+	1               METHOD,FG_SOL_OPTIONS,THK_CONT,INCL_INCID_RAD,
+	1               FIRST_FREQ,NEW_FREQ,N_TYPE,NC,ND)
+	     ELSE
+	        IF(FIRST_FREQ)WRITE(LUER,*)'Calling FG_J_CMF_V10'
+	        CALL FG_J_CMF_V10(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
 	1                  TC,TB,FEDD,GEDD,N_ON_J,
 	1                  AQW,HMIDQW,KQW,NMIDQW,
 	1                  INBC,HBC_CMF,NBC_CMF,
@@ -570,6 +588,7 @@ C
 	1                  VDOP_VEC,DELV_FRAC_FG,
 	1                  METHOD,FG_SOL_OPTIONS,THK_CONT,
 	1                  FIRST_FREQ,NEW_FREQ,N_TYPE,NC,NP,ND)
+	     END IF
 	     CALL TUNE(ITWO,'FG_J_CMF')
 	     FG_COUNT=FG_COUNT+1
 C
@@ -579,13 +598,28 @@ C
 	       TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ_ES(1:ND)
 	     END IF
 	     CALL TUNE(IONE,'MOM_J_CMF')
-	     CALL MOM_J_CMF_V6(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
+	     IF(PLANE_PARALLEL_NO_V)THEN
+	       CALL MOM_J_PP_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
+	1                  R,FEDD,RJ,RSQHNU,HBC_CMF,NBC_CMF,INBC,
+	1                  FL,DIF,DBB,IC,METHOD,COHERENT_ES,
+	1                  IZERO,FIRST_FREQ,NEW_FREQ,ND)
+	     ELSE IF(PLANE_PARALLEL)THEN
+	       CALL PP_MOM_CMF_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
+	1                  FEDD,GEDD,N_ON_J,RJ,RSQHNU,
+	1                  VDOP_VEC,DELV_FRAC_MOM,
+	1                  INBC,HBC_CMF(1),HBC_CMF(2),NBC_CMF(1),NBC_CMF(2),
+	1                  FL,dLOG_NU,DIF,DBB,IC,
+	1                  N_TYPE,METHOD,COHERENT_ES,
+	1                  FIRST_FREQ,NEW_FREQ,ND)
+	     ELSE
+	       CALL MOM_J_CMF_V6(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
 	1  	       FEDD,GEDD,N_ON_J,RJ,RSQHNU,
 	1              VDOP_VEC,DELV_FRAC_MOM,
 	1              HBC_CMF,INBC,NBC_CMF,
 	1              FL,dLOG_NU,DIF,DBB,IC,
 	1              N_TYPE,METHOD,COHERENT_ES,
 	1              FIRST_FREQ,NEW_FREQ,NC,NP,ND)
+	     END IF
 	     CALL TUNE(ITWO,'MOM_J_CMF')
 C
 C We set NEW_FREQ to false so that FG_J_CMF continues to use the same
@@ -642,7 +676,23 @@ C Set up for the compuation of the observes flux. LST_ITERATION is
 C TRUE if FLUX_CAL_ONLY is true (single iteration with coherent,
 C last iteration if non-coherent).
 C
-	    IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
+	    IF(PLANE_PARALLEL .OR. PLANE_PARALLEL_NO_V)THEN
+!
+! So as defined for normal OBSFLUX calculation. HQW_AT_RMAX is initially set 
+! to JQW. Thus we need to multiply by MU to get the actual H weights at the
+! outer boundary. For a plane-parallel atmosphere, RMAX_OBS is only scaling 
+! constant. Setting its value to ND means that the observed luminosity should 
+! correspond to the luminosity in VADAT (in absence of significant velocity 
+! effects).
+!
+	      IF(FIRST_FREQ)THEN
+	        NP_OBS=NC
+	        CALL GAULEG(RZERO,RONE,MU_AT_RMAX,HQW_AT_RMAX,NC)
+	        HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*MU_AT_RMAX(1:NC)
+	        RMAX_OBS=R(ND)
+	        V_AT_RMAX=V(1)
+	      END IF
+	    ELSE IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
 	1         MAXCH .LT.  100.0D0) )THEN
 	      IF(COHERENT_ES)THEN
      	        TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ(1:ND)
@@ -663,9 +713,9 @@ C
 	1                 FIRST_FREQ,NC,NP,ND)
 	      CALL TUNE(ITWO,'CMF_FORM_SOL')
 	    ELSE IF(FIRST_FREQ)THEN
-C
-C So as defined for normal OBSFLUX calculation.
-C
+!
+! So as defined for normal OBSFLUX calculation. 
+!
 	      NP_OBS=NP
 	      P_OBS(1:NP)=P(1:NP)
 	      RMAX_OBS=R(1)
@@ -706,6 +756,7 @@ C
 C Calculation of "static" J in the continuum using Edington factors.
 C
 	  CALL TUNE(IONE,'JFEAU')
+	  IF(SECTION .EQ. 'CONTINUUM' .AND. FREQ_INDX .EQ. 1)FEDD=0.0D0
 	  IF(COMPUTE_EDDFAC)THEN
 	    DO I=1,ND
 	      RJ(I)=0.0D0

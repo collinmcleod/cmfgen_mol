@@ -244,6 +244,9 @@ C
 	LOGICAL WRITE_CMF_FORCE
 	LOGICAL WRITE_SOB_FORCE
 	LOGICAL DO_REL_IN_OBSFRAME
+	LOGICAL INCL_INCID_RAD
+	LOGICAL PLANE_PARALLEL_NO_V
+	LOGICAL PLANE_PARALLEL
 C
 	REAL*8, ALLOCATABLE :: ETA_CMF_ST(:,:)
 	REAL*8, ALLOCATABLE :: CHI_CMF_ST(:,:)
@@ -894,6 +897,14 @@ C
 	1        'Compute continuum intensity using Eddington factors')
 	  CALL RD_STORE_LOG(EDD_LINECONT,'JBAR_W_EDD',L_TRUE,
 	1    'Compute line continuum intensity using Eddington factors')
+	  INCL_INCID_RAD=.FALSE.
+	  PLANE_PARALLEL_NO_V=.FALSE.
+	  CALL RD_STORE_LOG(PLANE_PARALLEL_NO_V,'PP_NOV',L_FALSE,
+	1    'Plane-paralle geometry WITHOUT velocity field?')
+	  PLANE_PARALLEL=.FALSE.
+	  CALL RD_STORE_LOG(PLANE_PARALLEL,'PP_MOD',L_FALSE,
+	1    'Plane-paralle geometry with velocity field?')
+                                                                                
 	
 	  WRITE(LUMOD,'()')
 	  CALL RD_STORE_LOG(ACCURATE,'INC_GRID',L_TRUE,
@@ -2002,6 +2013,11 @@ C
 	     END DO
 	   ELSE
 	     CALL REGRID_H(SOB,R,RSQHNU,H_OUT,H_IN,ND,TA)
+	   END IF
+	   IF(PLANE_PARALLEL .OR. PLANE_PARALLEL_NO_V)THEN
+	     H_OUT=H_OUT-HBC_CMF(2)
+	     SOB(1)=H_OUT; SOB(ND)=H_IN
+	     SOB(1:ND)=SOB(1:ND)*R(ND)*R(ND)
 	   END IF
 !
 	   IF(WRITE_FLUX .AND. ES_COUNTER .EQ. NUM_ES_ITERATIONS)THEN

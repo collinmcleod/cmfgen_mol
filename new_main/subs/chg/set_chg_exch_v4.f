@@ -51,11 +51,29 @@
 !
 	INTEGER I,J,K,L
 	INTEGER I_S,I_F
+	INTEGER, PARAMETER :: LU=119
 	CHARACTER(LEN=30) LOC_NAME
 	LOGICAL LEVEL_SET
+	LOGICAL, SAVE :: FIRST_TIME
+	DATA FIRST_TIME/.TRUE./
 !
 !	WRITE(LUER,*)'Entering SET_CHG_EXCH_LEV_ID'
 	IF(.NOT. DO_CHG_EXCH)RETURN
+!
+	IF(FIRST_TIME)THEN
+	  WRITE(LU,*)' '
+	  WRITE(LU,*)'Check of reverse charge exchange factors at depth 1.'
+	  WRITE(LU,*)'To check, regroup according to reaction ID (but same order'
+	  WRITE(LU,*)'within a reaction). The first column is the reaction number'
+          WRITE(LU,*)'as given in CHG_EXCH_CHK. The 2nd column indicates the column'
+	  WRITE(LU,*)'in charge exchange data list, while ID indicates the ion.'
+	  WRITE(LU,*)'The last AI/AR ratio is the relevant conversion factor for a '
+	  WRITE(LU,*)'given charge exchange reacton.'
+	  WRITE(LU,*)' '
+	  WRITE(LU,'(X,A,2X,A,2X,A,6X,A,9X,A,8X,A)')
+	1               'Reaction','Col','ID','AI/AR','G_EXP','GION'
+	  FIRST_TIME=.FALSE.
+	END IF
 !
 ! We must set AI_AR_CHG to unity, as we multiply it by data for each
 ! species in the charge exchange reaction. AI_AR_CHG allows the inverse
@@ -67,6 +85,9 @@
 	  dlnAI_AR_CHG_dlnT(:,:)=0.0D0
 	  COOL_CHG(:,:)=0.0D0
 	  INITIALIZE_ARRAYS=.FALSE.
+	  WRITE(LU,*)' '
+	  WRITE(LU,'(X,A,ES14.4)')'Temperature/10^4 K=',T(1)
+	  WRITE(LU,*)' '
 	END IF
 !
 ! Redetermine the level for each ionic species. This is done so we
@@ -122,18 +143,18 @@
 ! K=2 or 3.
 !
 	        IF( (K .EQ. 2 .OR. K .EQ. 3) .AND. EQSPEC+N_S .EQ. EQHYD)THEN
-	          G_CHG_VEC(1:ND)=G_CHG_VEC(1:ND)*GION
-	          dG_CHG_VEC(1:ND)=dG_CHG_VEC(1:ND)*GION
+	          G_CHG_VEC(1:ND)=G_CHG_VEC(1:ND)/GION
+	          dG_CHG_VEC(1:ND)=dG_CHG_VEC(1:ND)/GION
 	        END IF
 !
 	        IF(K .EQ. 1 .OR. K .EQ. 2)THEN
 	          AI_AR_CHG(J,1:ND)=AI_AR_CHG(J,1:ND)*G_CHG_VEC(1:ND)
-	          WRITE(119,*)K,AI_AR_CHG(J,1),G_CHG_VEC(1)
+	          WRITE(LU,'(X,3I6,3ES14.4)')J,K,ID_ION_CHG(J,K),AI_AR_CHG(J,1),G_CHG_VEC(1),GION
 	          dlnAI_AR_CHG_dlnT(J,1:ND)=dlnAI_AR_CHG_dlnT(J,1:ND) + 
 	1                            dG_CHG_VEC(1:ND)/G_CHG_VEC(1:ND)
 	        ELSE 
 	          AI_AR_CHG(J,1:ND)=AI_AR_CHG(J,1:ND)/G_CHG_VEC(1:ND)
-	          WRITE(119,*)K,AI_AR_CHG(J,1),G_CHG_VEC(1)
+	          WRITE(LU,'(X,3I6,3ES14.4)')J,K,ID_ION_CHG(J,K),AI_AR_CHG(J,1),G_CHG_VEC(1),GION
 	          dlnAI_AR_CHG_dlnT(J,1:ND)=dlnAI_AR_CHG_dlnT(J,1:ND) -
 	1                            dG_CHG_VEC(1:ND)/G_CHG_VEC(1:ND)
 	        END IF

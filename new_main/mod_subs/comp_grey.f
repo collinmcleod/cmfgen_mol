@@ -40,23 +40,76 @@
 	REAL*8 GAMH(ND)
 	REAL*8 SOB(ND)
 	REAL*8 XM(ND)
+	REAL*8 SOURCE(ND)
 	REAL*8 FEDD(ND)
 !
 	REAL*8 T1,T2
 	REAL*8 HBC_J
+	REAL*8 HBC_CMF
+	REAL*8 NBC_CMF
+	REAL*8 INBC
+	REAL*8 DBB
+	REAL*8 FL
+	REAL*8 PI
+	REAL*8 HFLUX
 !
 	INTEGER I,J,K,L
 !
 	LOGICAL LST_DEPTH_ONLY
-	LOGICAL FIRST
+	LOGICAL FIRST_FREQ
+	LOGICAL NEW_FREQ
 !
 ! Constants for opacity etc.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
 !
+	PI=4.0D0*ATAN(1.0D0)
 	CHI(1:ND)=ROSSMEAN(1:ND)
-	IF(JGREY_WITH_V_TERMS)THEN
+!
+	IF(PLANE_PARALLEL_NO_V)THEN
+           FEDD=0.3333D0
+	   HBC_CMF=0.7D0; NBC_CMF=0.0D0; FL=1.0D0; INBC=0.1D0
+	   NEW_FREQ=.TRUE.; FIRST_FREQ=.TRUE.
+!
+! Note HFLUX=LUM*Lsun/16/(PI*PI)/10**2 (10**2 for 1/R**2).
+! DBB =3L/16(piR)**2 and is used for the lower boundary diffusion 
+! approximation. Since we are dealing with a plane-parallel
+! atmopshere, we divide HFLUX by R*^2.
+!
+	   HFLUX=3.826D+13*LUM/16.0D0/PI**2/R(ND)/R(ND)
+           DBB=3.0D0*HFLUX
+	   T1=1000.0D0
+!
+! Compute radial (vertical) optical depth increments.
+!
+	   CALL DERIVCHI(TB,CHI,R,ND,METHOD)
+           CALL NORDTAU(DTAU,CHI,R,R,TB,ND)
+!
+	   DO WHILE(T1 .GT. 1.0D-05)
+!
+! Compute the solution vector. Note that the units need to be
+! eventually included. The following follows direcly from d2K/d2Tau=0.
+!
+	     T2=FEDD(1)/HBC_CMF
+	     RJ(1)=HFLUX/HBC_CMF
+	     DO I=2,ND
+	       T2=T2+DTAU(I-1)
+	       RJ(I)=T2*HFLUX/FEDD(I)
+	     END DO
+!
+	     SOURCE(1:ND)=RJ
+	     CALL FCOMP_PP_V2(R,TC,GAMH,SOURCE,CHI,IPLUS,HBC_CMF,
+	1               NBC_CMF,INBC,DBB,IC,THK_CONT,DIF,ND,NC,METHOD)
+	     T1=0.0D0
+	     DO I=1,ND
+	       T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
+	       FEDD(I)=GAMH(I)
+	     END DO
+	     NEW_FREQ=.FALSE.
+	   END DO
+!
+	ELSE IF(JGREY_WITH_V_TERMS)THEN
 !
 ! This routine will supersede the one above, and included to zero
 ! order the effect of the velocity field.
@@ -65,7 +118,7 @@
 	   CALL JGREY_WITH_FVT(RJ,SOB,CHI,R,V,SIGMA,
 	1           P,AQW,HMIDQW,KQW,NMIDQW,
 	1           LUM,METHOD,DIF,IC,T2,ND,NC,NP)
-	 ELSE
+	ELSE
 !
 ! Will use FEDD for F, GAM for NEWRJ, GAMH for NEWRK, and T2 for NEWHBC.
 ! Will use HBC_J for HBC. No need to modify JGREY, as outer boundary
@@ -89,7 +142,7 @@
 	      HBC_J=T2
 !	      WRITE(LUER,'('' Maximum change in Grey F is '',1P,E11.4)')T1
 	    END DO
-	  END IF
+	END IF
 !
 ! Compute the temperature distribution, and the Rosseland optical depth scale.
 ! NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert T from units of 
@@ -98,7 +151,7 @@
 ! at boundary.
 ! 
 	DO I=1,ND
-	  TGREY(I)=((3.14159265D0/5.67D-05*RJ(I))**0.25D0)*1.0D-04
+	  TGREY(I)=((PI/5.67D-05*RJ(I))**0.25D0)*1.0D-04
 	END DO
 !
 ! Compute the Rosseland optical depth scale. The ' ' in TORSCL indicates TYPE of atmosphere,

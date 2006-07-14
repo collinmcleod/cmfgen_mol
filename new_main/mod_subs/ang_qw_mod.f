@@ -30,7 +30,7 @@
 !
 ! Parameters, vectors, and arrays for computing the observed flux.
 !
-        INTEGER, PARAMETER :: NST_CMF=1000
+        INTEGER, PARAMETER :: NST_CMF=2000
         REAL*8  NU_STORE(NST_CMF)
 !
         INTEGER NP_OBS_MAX

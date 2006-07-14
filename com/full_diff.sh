@@ -84,6 +84,9 @@ cat Diff_output >> Diff_sum
 $cmfdist/com/main_diff.sh $X1/pgplt $X2/pgplt
 cat Diff_output >> Diff_sum
 
+$cmfdist/com/main_diff.sh $X1/plane $X2/plane
+cat Diff_output >> Diff_sum
+
 $cmfdist/com/main_diff.sh $X1/spec_plt $X2/spec_plt
 cat Diff_output >> Diff_sum
 

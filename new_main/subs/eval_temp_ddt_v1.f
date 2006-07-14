@@ -17,6 +17,10 @@
  	USE STEQ_DATA_MOD
  	IMPLICIT NONE
 !
+! Altered 23-Jun-2006 : R, V removed from call to GET_POPS_AT_PREV_TIME_STEP_V2 since
+!                         passed by module MOD_CMFGEN.
+! Altered 05-Jun-2006 : Bug fixed with evaluation of terms for electron cooling
+!                           equation.
 ! Created 13-Dec-2005 : Based on EVAL_ADIABATIC_V3
 !
 	INTEGER NT
@@ -67,9 +71,9 @@
 	EXTERNAL BOLTZMANN_CONSTANT,FUN_PI,ERROR_LU
 !
 	REAL*8 SCALE
-	REAL*8 T1,T2,PI
+	REAL*8 T1,T2,T3,T4,PI
 	REAL*8 DELTA_T_SECS
-	INTEGER I,J,L
+	INTEGER I,J,K,L
 	INTEGER LUER
 	INTEGER ISPEC
 	INTEGER ID
@@ -113,13 +117,34 @@
 ! V grid as the curent model.
 !
 	LU=7
-	CALL GET_POPS_AT_PREV_TIME_STEP(R,V,OLD_POPS,OLD_R,TIME_SEQ_NO,ND,NT,LU)
+	CALL GET_POPS_AT_PREV_TIME_STEP_V2(OLD_POPS,OLD_R,TIME_SEQ_NO,ND,NT,LU)
 	OLD_ED(:)=OLD_POPS(NT-1,:)
 	OLD_T(:)=OLD_POPS(NT,:)
 	OLD_POP_ATOM=0.0D0
 	DO I=1,ND
 	  DO J=1,NT-2
 	    OLD_POP_ATOM(I)=OLD_POP_ATOM(I)+OLD_POPS(J,I)
+	  END DO
+	END DO
+!
+	DO ISPEC=1,NUM_SPECIES
+	  DO J=1,ND
+	    T1=0.0D0
+	    T2=0.0D0
+	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	      DO I=1,ATM(ID)%NXzV
+	        K=ATM(ID)%EQXzV+I-1
+	        T1=T1+POPS(K,J)
+	        T2=T2+OLD_POPS(K,J)
+	      END DO
+	    END DO
+	    IF(SPECIES_BEG_ID(ISPEC) .GT. 0)THEN
+	      ID=SPECIES_END_ID(ISPEC)-1
+	      I=ATM(ID)%EQXzV+ATM(ID)%NXzV
+	      T1=T1+POPS(I,J)
+	      T2=T2+OLD_POPS(I,J)
+	      WRITE(155,'(I5,I5,2ES16.8)')ISPEC,J,T1*(R(J)**3),T2*(OLD_R(J)**3)
+	    END IF
 	  END DO
 	END DO
 !
@@ -207,19 +232,36 @@
 ! density (velocity) term. This split was useful for diagnostic purposes,
 ! but has now been kept for simplicity so that GENCOOL does not need to be changed.
 !
+! NB: The EI_VEC*COL_EN terms cancel out, and were originally incorrectly included.
+!
 	T1=4.0D-10*PI
 	DO I=1,ND
 	  AD_CR_V(I) =P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I)) 
-	  AD_CR_DT(I)=EK_VEC(I)*( (1.0D0+GAMMA(I))*T(I)- (1.0D0+OLD_GAMMA(I))*OLD_T(I) ) +
-	1             EI_VEC(I)*(COL_EN(I)-COL_EN(I+1))
+	  AD_CR_DT(I)=EK_VEC(I)*( (1.0D0+GAMMA(I))*T(I)- (1.0D0+OLD_GAMMA(I))*OLD_T(I) )
+!	1              + EI_VEC(I)*(COL_EN(I)-OLD_COL_EN(I))
 	END DO
 !
 	AD_CR_V=AD_CR_V*T1
 	AD_CR_DT=AD_CR_DT*T1
 !
-	WRITE_CHK=.FALSE.            !TRUE.
+	WRITE_CHK=.TRUE.      !FALSE.            !TRUE.
 	IF(WRITE_CHK)THEN
 	  OPEN(UNIT=7,FILE='ADIABAT_CHK',STATUS='UNKNOWN')
+	   WRITE(7,'(A,ES14.4)')'DELTA_T_SECS=',DELTA_T_SECS
+	   WRITE(7,'(A,ES14.4)')'SCALE_FAC=',SCALE
+	    DO I=1,ND
+	      T1=EK_VEC(I)*(1.0D0+GAMMA(I))*T(I)
+	      T2=EK_VEC(I)*(1.0D0+OLD_GAMMA(I))*OLD_T(I)
+	      T3=EI_VEC(I)*COL_EN(I)
+	      T4=EI_VEC(I)*OLD_COL_EN(I)
+	      WRITE(7,'(I4,9ES14.5)')I,V(I),R(I),OLD_R(I),T(I),OLD_T(I),GAMMA(I),OLD_GAMMA(I),
+	1                                  POP_ATOM(I)*(R(I)**3),OLD_POP_ATOM(I)*(OLD_R(I)**3)
+	      WRITE(7,'(I4,10ES14.5)')I,EK_VEC(I),EI_VEC(I),INT_EN(I),COL_EN(I),T1,T2,T3,T4,
+	1                                   EI_VEC(I)*INT_EN(I),EI_VEC(I)*OLD_INT_EN(I)
+	      WRITE(7,'(I4,10ES14.5)')I,P_VEC(I),POP_ATOM(I),OLD_POP_ATOM(I)
+	   END DO
+	   CALL WR2D_V2(POPS,NT,ND,'POPS','*',.TRUE.,7)
+	   CALL WR2D_V2(OLD_POPS,NT,ND,'OLD_POPS','*',.TRUE.,7)
 	  CLOSE(UNIT=7)
 	END IF
 !

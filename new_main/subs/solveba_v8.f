@@ -4,6 +4,7 @@
 	1              BA_COMPUTED,WR_BA_INV,WR_PRT_INV,LAMBDA_IT)
 	IMPLICIT NONE
 !
+! Altered 23-May-2006 : Extra column output to CORRECTION_SUM.
 ! Altered 19-May-2005 : T_MIN inserted into call.
 ! Altered 11-Feb-2004 : Bug fixed with calculation of SCALE in 'GLOBAL' scale option.  
 ! Altered 30-Mar-2003 : Output to CORRECTION_SUM file included.
@@ -43,7 +44,7 @@
 	REAL*8 INCREASE,DECREASE
 	REAL*8 BIG_LIM,LIT_LIM
 	INTEGER I,J,K,IINC,IDEC,IOS,LU_SUM
-	INTEGER COUNT(6)
+	INTEGER COUNT(7)
 	LOGICAL LOC_WR_BA_INV
 !
 	LUER=ERROR_LU()
@@ -232,8 +233,8 @@
 	WRITE(LU_SUM,'(A)')' Summary of changes at each depth '
 	WRITE(LU_SUM,'(A,I6)')' NT=',NT
 	WRITE(LU_SUM,'(A)')' '
-	WRITE(LU_SUM,'(3X,A,6(2X,A))')'Depth',
-	1        '100.0%',' 10.0%','  1.0%','  0.1%',' 0.01%','0.001%'
+	WRITE(LU_SUM,'(3X,A,7(X,A))')'Depth',' 100.0%','  10.0%','   1.0%',
+	1        '   0.1%','  0.01%',' 0.001%','0.0001%'
 !
 !   STEQ is +ve when the populations are to decrease.
 !   STEQ is -ve when the populations are to increase.
@@ -252,11 +253,11 @@
 	      INCREASE=STEQ(J,I)
 	      IINC=I
 	    END IF
-	    T1=1.0D+05*ABS(STEQ(J,I))+1.0D-31		!to ensure non-zero.
-	    K=LOG10(T1)+1; K=MIN(6,K)
+	    T1=1.0D+06*ABS(STEQ(J,I))+1.0D-31		!to ensure non-zero.
+	    K=LOG10(T1)+1; K=MIN(7,K)
 	    IF(K > 0)COUNT(1:K)=COUNT(1:K)+1
 	  END DO
-	  WRITE(LU_SUM,'(7I8)')I,COUNT(6:1:-1)
+	  WRITE(LU_SUM,'(8I8)')I,COUNT(7:1:-1)
 	END DO
 	CLOSE(LU_SUM)
 !

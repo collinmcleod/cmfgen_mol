@@ -26,7 +26,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(fixpop_t.o)\
       $(LIB)(fixpop_in_ba_v3.o)\
       $(LIB)(generate_full_matrix_v3.o)\
-      $(LIB)(get_pops_at_prev_time_step.o)\
+      $(LIB)(get_pops_at_prev_time_step_v2.o)\
       $(LIB)(prevent_low_t.o)\
       $(LIB)(read_ba_data_v2.o)\
       $(LIB)(read_bcd_mat.o)\
@@ -77,7 +77,7 @@ $(LIB)(create_iv_links_v2.o) : create_iv_links_v2.f $(STEQ) $(MOD)
 	ar ruv $(LIB) create_iv_links_v2.o
 
 $(LIB)(fixpop_in_ba_v3.o) : fixpop_in_ba_v3.f $(STEQ) $(MOD)
-	$(F90) -c $(FG) -I$(MOD_DIR) fixpop_in_ba_v3.f
+	$(F90) -c $(FG) fixpop_in_ba_v3.f
 	ar ruv $(LIB) fixpop_in_ba_v3.o
 
 $(LIB)(generate_full_matrix_v3.o) : generate_full_matrix_v3.f $(STEQ) $(MOD)

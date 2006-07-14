@@ -1,4 +1,4 @@
-
+!
 ! Routine to perform an NG accleration for a Comoving-Frame Model. Progam
 ! uses the last 4 iterations which are stored in the last "4 records" 
 ! (effectively) of SCRTEMP.
@@ -52,6 +52,7 @@
 	INTEGER ND,NT
 	INTEGER NBAND
 	INTEGER ND_ST
+	INTEGER ND_END
 !
 	INTEGER IOS
 	INTEGER IREC
@@ -60,7 +61,7 @@
 	INTEGER IFLAG
 	INTEGER N_ITS_TO_RD
 	INTEGER IT_STEP
-	INTEGER I,J
+	INTEGER I,J,K
 !
 	INTEGER, PARAMETER :: RITE_N_TIMES=1
 	INTEGER, PARAMETER :: T_OUT=6
@@ -107,45 +108,70 @@
 	END IF 
 	CLOSE(UNIT=12)
 !
-	ALLOCATE (RDPOPS(NT+3,ND,4))
 	ALLOCATE (BIG_POPS(NT+3,ND))
 	ALLOCATE (POPS(NT,ND))
 	ALLOCATE (R(ND))
 	ALLOCATE (V(ND))
 	ALLOCATE (SIGMA(ND))
 !
+! Set def values.
+!
+	ND_ST=1
+	ND_END=ND
+	NBAND=1
+	IT_STEP=1
+	N_ITS_TO_RD=4
+!
 	OPTION='NG'
-	CALL GEN_IN(OPTION,'Acceleration method: NG, AV(ERAGE), SOR')
+	WRITE(T_OUT,*)'Options are:'
+	WRITE(T_OUT,*)'         NG: NG acceleration'
+	WRITE(T_OUT,*)'         AV: Average last 2 iterations'
+	WRITE(T_OUT,*)'        SOR: Succesive over relaxation (scale last corrections)'
+	WRITE(T_OUT,*)'        NSR: Succesive over relaxation (power scale corrections)'
+	WRITE(T_OUT,*)'        REP: Repeat the last N corrections'
+	CALL GEN_IN(OPTION,'Acceleration method:')
 	CALL SET_CASE_UP(OPTION,0,0)
 	IF(OPTION(1:2) .EQ.'NG')THEN
 	  WRITE(T_OUT,'(A)')' '
 	  WRITE(T_OUT,'(A)')' This option was inserted mainly for testing purposes.'
 	  WRITE(T_OUT,'(A)')' The default value of 1 should generally be used.'
-	  IT_STEP=1
 	  CALL GEN_IN(IT_STEP,'Iteration step size for NG acceleration')
-	  NBAND=1
-	  ND_ST=1
 	  DO_REGARDLESS=.FALSE.
 	  CALL GEN_IN(NBAND,'Band width for NG acceleration')
 	  CALL GEN_IN(ND_ST,'Only do NG acceleration for the depth in .GE. ND_ST')
+	  CALL GEN_IN(ND_END,'Only do NG acceleration for the depth in .LE. ND_END')
 	  CALL GEN_IN(DO_REGARDLESS,'Do acceleration independent of corection size?')
 	  SCALE_INDIVIDUALLY=.FALSE.
 	  IF(DO_REGARDLESS)THEN
 	    CALL GEN_IN(SCALE_INDIVIDUALLY,'Scale each population individually at each depth to limit change')
 	  END IF
-	  N_ITS_TO_RD=4
 	ELSE IF(OPTION(1:2) .EQ.'AV')THEN
-	  IT_STEP=1
 	  N_ITS_TO_RD=2
+	  CALL GEN_IN(ND_ST,'Only do AVeraging if depth is .GE. ND_ST')
+	  CALL GEN_IN(ND_END,'Only do AVeraging if depth is .LE. ND_END')
+	ELSE IF(OPTION(1:3) .EQ. 'NSR')THEN
+	  N_ITS_TO_RD=2
+	  SCALE_FAC=2.0D0
+	  CALL GEN_IN(SCALE_FAC,'Factor to scale last correction by')
+	  CALL GEN_IN(ND_ST,'Only do NG acceleration for the depth in .GE. ND_ST')
+	  CALL GEN_IN(ND_END,'Only do NG acceleration for the depth in .LE. ND_END')
 	ELSE IF(OPTION(1:3) .EQ. 'SOR')THEN
-	  IT_STEP=1
 	  N_ITS_TO_RD=2
+	  SCALE_FAC=2.0D0
+	  BIG_FAC=5.0D0
 	  CALL GEN_IN(SCALE_FAC,'Factor to scale last correction by')
           CALL GEN_IN(BIG_FAC,'Maximum correction to any depth')
+	  CALL GEN_IN(ND_ST,'Only do NG acceleration for the depth in .GE. ND_ST')
+	  CALL GEN_IN(ND_END,'Only do NG acceleration for the depth in .LE. ND_END')
+	ELSE IF(OPTION(1:3) .EQ. 'REP')THEN
+	  CALL GEN_IN(N_ITS_TO_RD,'# of iteration to step back')
+	  CALL GEN_IN(ND_ST,'Only do REP option if the depth is .GE. ND_ST')
+	  CALL GEN_IN(ND_END,'Only do REP option if the depth is .LE. ND_END')
 	ELSE
 	   WRITE(6,*)'Invalid acceleration option'
 	   STOP
 	END IF
+	ALLOCATE (RDPOPS(NT+3,ND,N_ITS_TO_RD))
 !
 ! Read POPULATIONS that were output on last iteration. This is primarily
 ! done to get NITSF etc.
@@ -188,19 +214,29 @@
 ! Perform the NG acceleration.
 !
 	  J=NT+3
-	  CALL NG_MIT_OPTS(BIG_POPS,RDPOPS,ND,J,NBAND,ND_ST,DO_REGARDLESS,
+	  CALL NG_MIT_OPTS(BIG_POPS,RDPOPS,ND,J,NBAND,ND_ST,ND_END,DO_REGARDLESS,
 	1                     SCALE_INDIVIDUALLY,NG_DONE,T_OUT)
 !
 	  WRITE(6,*)'Finished NG accleration'
 	ELSE IF(OPTION(1:2) .EQ. 'AV')THEN
-	  DO J=1,ND
+	  BIG_POPS=RDPOPS(:,:,1)
+	  DO J=ND_ST,ND_END
 	    DO I=1,NT+3
 	      BIG_POPS(I,J)=0.5D0*(RDPOPS(I,J,1)+RDPOPS(I,J,2))
 	    END DO
 	  END DO
 	  NG_DONE=.TRUE.
+	ELSE IF(OPTION(1:3) .EQ. 'NSR')THEN
+	  K=NINT(SCALE_FAC)
+	  DO J=ND_ST,ND_END
+	    DO I=1,NT+3
+	      T1=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/RDPOPS(I,J,2)
+	      BIG_POPS(I,J)=RDPOPS(I,J,1)*(1.0D0+T1)**K
+	    END DO
+	  END DO
+	  NG_DONE=.TRUE.
 	ELSE IF(OPTION(1:3) .EQ. 'SOR')THEN
-	  DO J=1,ND
+	  DO J=ND_ST,ND_END
 	    T1=-1000.0D0
 	    T2=1000.0D0
 	    DO I=1,NT+3
@@ -213,6 +249,17 @@
 	    IF(T3*T2 .GT. (1.0D0-1.0D0/BIG_FAC))T3=BIG_FAC/T2
 	    DO I=1,NT+3
 	      BIG_POPS(I,J)=RDPOPS(I,J,1)+T3*(RDPOPS(I,J,1)-RDPOPS(I,J,2))
+	    END DO
+	  END DO
+	  NG_DONE=.TRUE.
+	ELSE IF(OPTION(1:3) .EQ. 'REP')THEN
+	  BIG_POPS=RDPOPS(:,:,1)
+	  DO J=ND_ST,ND_END
+	    DO I=1,NT+3
+	      T1=(RDPOPS(I,J,1)-RDPOPS(I,J,N_ITS_TO_RD))/BIG_POPS(I,J)
+	      IF(T1 .LT. -0.9)T1=-0.9
+	      IF(T1 .GT. 10.0)T1=10.0
+	      BIG_POPS(I,J)=BIG_POPS(I,J)*(1.0D0+T1)
 	    END DO
 	  END DO
 	  NG_DONE=.TRUE.
@@ -231,8 +278,12 @@
 	  IF(OPTION(1:2) .EQ.'NG')THEN
 	    WRITE(T_OUT,*)'Results of successful NG acceleration ',
 	1                 'output to SCRTEMP.'
+	  ELSE IF(OPTION(1:3) .EQ. 'NSR')THEN
+	    WRITE(T_OUT,*)'Results of successful power SOR (NSR) output to SCRTEMP.'
 	  ELSE IF(OPTION(1:3) .EQ.'SOR')THEN
 	    WRITE(T_OUT,*)'Results of successful SOR output to SCRTEMP.'
+	  ELSE IF(OPTION(1:3) .EQ.'REP')THEN
+	    WRITE(T_OUT,*)'Successful extrapolation (REP) output to SCRTEMP.'
 	  ELSE
 	    WRITE(T_OUT,*)'Last 2 iterations averaged and output to SCRTEMP'
 	  END IF
@@ -289,7 +340,7 @@
 	END
 !
 !
-	SUBROUTINE NG_MIT_OPTS(POPS,RDPOPS,ND,NT,NBAND,ND_ST,DO_REGARDLESS,
+	SUBROUTINE NG_MIT_OPTS(POPS,RDPOPS,ND,NT,NBAND,ND_ST,ND_END,DO_REGARDLESS,
 	1                           SCALE_INDIVIDUALLY,NG_DONE,LUER)
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
@@ -302,6 +353,7 @@
 	INTEGER NT
 	INTEGER NBAND
 	INTEGER ND_ST
+	INTEGER ND_END
 	INTEGER LUER
 	REAL*8 POPS(NT,ND)
 	REAL*8 RDPOPS(NT,ND,4)
@@ -336,13 +388,14 @@
 	  NS=NT*ND
 	  CALL GENACCEL_V2(NEWPOP,RDPOPS,IONE,ND,NT,ND,NS)
 	ELSE
-	  DO K=ND,ND_ST,-NBAND
+	  DO K=ND_END,ND_ST,-NBAND
 	    LST=MAX(K-NBAND+1,ND_ST)
 	    LEND=LST+NBAND-1
 	    NS=(LEND-LST+1)*NT
 	    CALL GENACCEL_V2(NEWPOP(1,LST),RDPOPS,LST,LEND,NT,ND,NS)
 	  END DO
 	  IF(ND_ST .GT. 1)NEWPOP(:,1:ND_ST-1)=POPS(:,1:ND_ST-1)
+	  IF(ND_END .LT. ND)NEWPOP(:,ND_END+1:ND)=POPS(:,ND_END+1:ND)
 	END IF
 !
 	WRITE(6,*)' '
@@ -372,14 +425,16 @@
 	WRITE(6,*)' '
 !
 ! Now check whether the NG acceleation has been reasonable.
+! NB: POPS(K,L) is only likely to be zero for sigma.
 !
 	MAXINC=-1000.0
 	MAXDEC=1000.0
 	DO L=1,ND 
 	  LOCINC=-1000.0
-	  LOCDEC=1000.0
+	  LOCDEC=1000.0	
+	  T1=LOCDEC
 	  DO K=1,NT
-	    T1=NEWPOP(K,L)/POPS(K,L)
+	    IF(POPS(K,L) .NE. 0.0D0)T1=NEWPOP(K,L)/POPS(K,L)
 	    LOCINC=MAX(LOCINC,T1)
 	    LOCDEC=MIN(LOCDEC,T1)
 	  END DO

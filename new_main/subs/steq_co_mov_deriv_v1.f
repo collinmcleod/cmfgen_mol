@@ -11,6 +11,8 @@
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 23-Jun-2006 : R, V removed from call to GET_POPS_AT_PREV_TIME_STEP_V2 since
+!                         passed by module MOD_CMFGEN.
 ! Created 12-Dec-2005: Based on STEQ_ADVEC_V4
 !
 	REAL*8 RELAXATION_PARAMETER
@@ -67,7 +69,7 @@
 	END IF
 !
 	LU=7
-	CALL GET_POPS_AT_PREV_TIME_STEP(R,V,OLD_POPS,OLD_R,TIME_SEQ_NO,ND,NT,LU)
+	CALL GET_POPS_AT_PREV_TIME_STEP_V2(OLD_POPS,OLD_R,TIME_SEQ_NO,ND,NT,LU)
 !
 ! The relaxation factor should be < 1, and is used to adjust the importance of the
 ! advection terms. It should be 1 for the final model. It should only be used to

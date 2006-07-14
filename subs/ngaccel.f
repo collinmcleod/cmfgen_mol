@@ -13,6 +13,7 @@ C
 	SUBROUTINE NGACCEL(RJ,PREVRJ,ND,WEIGHT)
 	IMPLICIT NONE
 C
+C Altered 10-Apr-2006 - Check if weight is zero (possible for sigma)
 C Altered 24-May-1996 - ERROR_LU installed.
 C Altered 23-Jun-1989 - Test for singularity (relative to machine
 C                       accuracy) installed. Before just checked whether
@@ -43,7 +44,7 @@ C
 C
 	DO I=1,ND
 	  W=1.0D0
-	  IF(WEIGHT)W=1.0D0/PREVRJ(1,I)
+          IF(WEIGHT .AND. PREVRJ(1,I) .NE. 0.0D0)W=1.0D0/PREVRJ(1,I)
 C
 	  D0=PREVRJ(1,I)-PREVRJ(2,I)
 	  D1=D0 + (PREVRJ(3,I)-PREVRJ(2,I))

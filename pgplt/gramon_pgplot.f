@@ -6,6 +6,8 @@
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
+! Altered:  08-Apr-2006 : In NM option, normalization now correctly handles unequeally 
+!                            spaced data.
 ! Altered:  23-Aug-2005 : Grey pen option installed.
 ! Altered:  26-Jan-2005 : Change default margins to give more room on borders.
 ! Altered:  30-May-2003 : Improvements to YAR and XAR options.
@@ -1979,7 +1981,7 @@ C
 !
 	ELSE IF(ANS .EQ. 'NM')THEN
 	  VAR_PLT1=1
-	  CALL NEW_GEN_IN(VAR_PLT1,'Input plot to nomalize to?')
+	  CALL NEW_GEN_IN(VAR_PLT1,'Reference plot for normalization (0 to norm to 1.0')
 	  IF(VAR_PLT1 .LT. 0 .OR. VAR_PLT1 .GT. NPLTS)THEN
 	    WRITE(6,*)'Bad plot number'
 	    GOTO 1000
@@ -1989,22 +1991,23 @@ C
 	  XT(2)=XPAR(2)
 	  CALL NEW_GEN_IN(XT(2),'End of normalization range')
 	  MEAN=0.0D0
-	  CNT=0.0D0
+	  T2=0.0D0
 	  IP=VAR_PLT1
 	  IF(VAR_PLT1 .NE. 0)THEN
-	    DO J=1,NPTS(VAR_PLT1)
+	    DO J=2,NPTS(VAR_PLT1)-1
 	      T1=(CD(IP)%XVEC(J)-XT(1))*(XT(2)-CD(IP)%XVEC(J))
 	      IF(T1 .GT. 0)THEN
-	         MEAN=MEAN+CD(IP)%DATA(J)
-	         CNT=CNT+1
+	         MEAN=MEAN+CD(IP)%DATA(J)*ABS(CD(IP)%XVEC(J-1)-CD(IP)%XVEC(J+1))
+	         T2=T2+ABS(CD(IP)%XVEC(J-1)-CD(IP)%XVEC(J+1))
 	      END IF
 	    END DO
-	    IF(MEAN .EQ. 0 .OR. CNT .EQ. 0)THEN
+	    MEAN=0.5D0*MEAN; T2=0.5D0*T2
+	    IF(MEAN .EQ. 0 .OR. T2 .EQ. 0)THEN
 	      WRITE(6,*)'No normalization will be done'
 	      WRITE(6,*)'Bad range of data'
 	      GOTO 1000
 	    ELSE
-	      MEAN=MEAN/CNT
+	      MEAN=MEAN/T2
 	    END IF
 	  ELSE
 	      MEAN=1.0D0
@@ -2015,10 +2018,11 @@ C
 	      DO J=1,NPTS(IP)
 	        T3=(CD(IP)%XVEC(J)-XT(1))*(XT(2)-CD(IP)%XVEC(J))
 	        IF(T3 .GT. 0)THEN
-	          T1=T1+CD(IP)%DATA(J)
-	          T2=T2+1
+	          T1=T1+CD(IP)%DATA(J)*ABS(CD(IP)%XVEC(J-1)-CD(IP)%XVEC(J+1))
+	          T2=T2+ABS(CD(IP)%XVEC(J-1)-CD(IP)%XVEC(J+1))
 	        END IF
 	      END DO
+	      T1=0.5D0*T1; T2=0.5D0*T2
 	      IF(T2 .EQ. 0 .OR. T1 .EQ. 0)THEN
 	        WRITE(6,*)IP,' not normalized'
 	      ELSE

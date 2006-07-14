@@ -84,7 +84,7 @@
 	WRITE(6,'(A)')'       NEW_ND: revise number of depth points by simple scaling'
 	WRITE(6,'(A)')'         ADDR: explicitly add extra grid points'
 	WRITE(6,'(A)')'         EXTR: extend grid to larger radii'
-	WRITE(6,'(A)')'         MDOT: change the mass-loss rate'
+	WRITE(6,'(A)')'         MDOT: change the mass-loss rate or velocity law'
 	WRITE(6,'(A)')'         NEWG: revise grid between two velocities'
 	WRITE(6,'(A)')'         SCLR: scale radius of star to new value'
 	WRITE(6,'(A)')'         PLOT: plot V and SIGMA from old RVSIG file'
@@ -467,7 +467,9 @@
 	ELSE IF(OPTION .EQ. 'MDOT')THEN
 !
 	  ND=ND_OLD
+	  OLD_MDOT=0.0D0; VINF=0.0D0; BETA=1.0D0; V_TRANS=10.0D0
 	  CALL GEN_IN(OLD_MDOT,'Old mass-loss rate in Msun/yr')
+	  MDOT=OLD_MDOT
 	  CALL GEN_IN(MDOT,'New mass-loss rate in Msun/yr')
 	  CALL GEN_IN(VINF,'Velocity at infinity in km/s')
 	  CALL GEN_IN(BETA,'Beta for velocity law')
@@ -479,6 +481,7 @@
 	  WRITE(6,'(A)')'        with W(r) = 1.0D0+exp( (r(t)-r)/h )'
 	  WRITE(6,'(A)')
 !
+	  VEL_TYPE=2
 	  CALL GEN_IN(VEL_TYPE,'Velocity law to be used: 1 or 2')
 !
 ! Find conection velocity and index.
@@ -569,6 +572,14 @@
 	  CALL GEN_IN(NEW_RVSIG_FILE,'File for new R, V and sigma values')
 	  OPEN(UNIT=10,FILE=NEW_RVSIG_FILE,STATUS='UNKNOWN',ACTION='WRITE')
 	    WRITE(10,'(A)')'!'
+	    IF(OPTION .EQ. 'MDOT')THEN
+	      WRITE(10,'(A,ES12.4)')'! Old mass-loss rate in Msun/yr=',OLD_MDOT
+	      WRITE(10,'(A,ES12.4)')'! New mass-loss rate in Msun/yr=',MDOT 
+	      WRITE(10,'(A,ES12.4)')'! Velocity at infinity in km/s =',VINF
+	      WRITE(10,'(A,ES12.4)')'! Beta for velocity law        =',BETA
+	      WRITE(10,'(A,I)'     )'! Velocity law (type)          =',VEL_TYPE
+	      WRITE(10,'(A,ES12.4)')'! Transition velocity is       =',V_TRANS
+	    END IF
 	    WRITE(10,'(A)')'!'
 	    WRITE(10,'(A,7X,A,9X,10X,A,11X,A,3X,A)')'!','R','V(km/s)','Sigma','Depth'
 	    WRITE(10,'(A)')'!'

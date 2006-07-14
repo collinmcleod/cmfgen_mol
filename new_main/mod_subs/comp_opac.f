@@ -9,6 +9,9 @@
 	USE OPAC_MOD
 	IMPLICIT NONE
 !
+! Altered 11-Jun-2006: Installed CHI_NOSCAT and ETA_NOSCAT. Scattering
+!                        opacity now computed after bound-free, free-free,
+!                        two photon, and X-ray opacity have been computed.
 ! Altered 11-Jun-2005: Bug fix: X-ray opacity/emissivity was not being
 !                        added correctly.
 ! Altered 13-Sep-2004: Installed ETA_MECH to keep track of mechanical
@@ -51,46 +54,32 @@
 	INTEGER I,J
 	INTEGER ID
 	INTEGER PHOT_ID
-C
-C Compute opacity and emissivity. This is a general include file
-C provided program uses exactly the same variables. Can be achieved
-C by copying declaration statements from CMFGEN. Always advisable
-C to use ``IMPLICIT NONE''.
-C
+!
+! Compute opacity and emissivity. This is a general include file
+! provided program uses exactly the same variables. Can be achieved
+! by copying declaration statements from CMFGEN. Always advisable
+! to use ``IMPLICIT NONE''.
+!
 	IF(COMPUTE_NEW_CROSS)THEN
-C
-C Compute EXP(-hv/kT) and zero CHI, and ETA.
-C
+!
+! Compute EXP(-hv/kT) and zero CHI, and ETA.
+!
 	  T1=-HDKT*CONT_FREQ
 	  DO I=1,ND
 	    EMHNUKT_CONT(I)=EXP(T1/T(I))
 	    CHI(I)=0.0D0
+	    ESEC(I)=0.0D0
 	    ETA(I)=0.0D0
 	  END DO
-C
-C Compute continuum intensity incident from the core assuming a TSTAR
-C blackbody.
-C
+!
+! Compute continuum intensity incident from the core assuming a TSTAR
+! blackbody.
+!
           T1=EXP(-HDKT*CONT_FREQ/TSTAR)
 	  IC=TWOHCSQ*T1*(CONT_FREQ**3)/(1.0D0-T1)
-C
-C Compute opacity and emissivity. ESOPAC must be call first since
-C CHI is effectively zeroed in that routine.
-C
-	  CALL ESOPAC(ESEC,ED,ND)		!Electron scattering emission factor.
 !
-! Add in Rayleigh scattering contribution.
+! Free-free and bound-free opacities.
 !
-	  CHI_RAY(1:ND)=0.0D0
-	  IF(SPECIES_PRES(1) .AND. INCL_RAY_SCAT)THEN
-	    CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
-	1             ATM(1)%NXzV_F,CONT_FREQ,ND)
-	  END IF
-	  CHI_SCAT(1:ND)=ESEC(1:ND)+CHI_RAY(1:ND)
-	  CHI(1:ND)=CHI_SCAT(1:ND)
-C
-C Free-free and bound-free opacities.
-C
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
@@ -105,10 +94,10 @@ C
 	    END IF
 	  END DO
 !
-C 
-C
-C Add in 2-photon emissivity and opacity.
-C
+! 
+!
+! Add in 2-photon emissivity and opacity.
+!
 	  CALL TWO_PHOT_OPAC(ETA,CHI,POPS,T,CONT_FREQ,ND,NT)
 !
 ! Compute X-ray opacities and emissivities due to K (& L) shell ionization. In all cases
@@ -144,42 +133,64 @@ C
 	        END IF
 	      END IF
 	    END DO
-	  END IF 
-C
+	  END IF
+!
+	  CHI_NOSCAT(1:ND)=CHI(1:ND)
+	  ETA_NOSCAT(1:ND)=ETA(1:ND)
+!
+! Compute scattering opacity. ESEC is zeroed in ESOPAC.
+!
+	  CALL ESOPAC(ESEC,ED,ND)		!Electron scattering emission factor.
+!
+! Add in Rayleigh scattering contribution.
+!
+	  CHI_RAY(1:ND)=0.0D0
+	  IF(SPECIES_PRES(1) .AND. INCL_RAY_SCAT)THEN
+	    CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
+	1             ATM(1)%NXzV_F,CONT_FREQ,ND)
+	  END IF
+	  CHI_SCAT(1:ND)=ESEC(1:ND)+CHI_RAY(1:ND)
+!
+! Now compute total opacity --- scattering + non scattering.
+!
+	  CHI(1:ND)=CHI(1:ND)+CHI_SCAT(1:ND)
+!
 	  CHI_C_EVAL(:)=CHI(:)
 	  ETA_C_EVAL(:)=ETA(:)
-C
+	  CHI_NOSCAT_EVAL(:)=CHI_NOSCAT(:)
+	  ETA_NOSCAT_EVAL(:)=ETA_NOSCAT(:)
+!
 	END IF
-C
-C 
-C
-C Evaluate EXP(-hv/kT) for current frequency. This is needed by routines 
-C such as COMP_VAR_JREC etc.
-C
+!
+! 
+!
+! Evaluate EXP(-hv/kT) for current frequency. This is needed by routines 
+! such as COMP_VAR_JREC etc.
+!
 	  DO J=1,ND
 	    EMHNUKT(J)=EXP(-HDKT*FL/T(J))
 	  END DO
-C
-C Section to revise continuum opacities etc so that they are computed at
-C the correct frequency. We have stored the orginal continuum opacity and
-C emissivity in CHI_C_EVAL and ETA_C_EVAL, which were computed at CONT_FREQ.
-C
+!
+! Section to revise continuum opacities etc so that they are computed at
+! the correct frequency. We have stored the orginal continuum opacity and
+! emissivity in CHI_C_EVAL and ETA_C_EVAL, which were computed at CONT_FREQ.
+!
 	IF(FL .NE. CONT_FREQ)THEN
-C
-C Compute continuum intensity incident from the core assuming a TSTAR
-C blackbody.
-C
+!
+! Compute continuum intensity incident from the core assuming a TSTAR
+! blackbody.
+!
           T1=EXP(-HDKT*FL/TSTAR)
 	  IC=TWOHCSQ*T1*(FL**3)/(1.0D0-T1)
-C
-C We assume that the photoionization cross-section has not changed since the
-C last iteration. Using the result that the stimulated emission occurs in
-C LTE and is given by
-C                     ETA/(2hv^3/c^2)
-C we can adjust CHI and ETA so that the condition of constant photoionization
-C cross-section is met. This adjustment automatically ensures that ETA/CHI 
-C gives the Planck function in LTE. 
-C
+!
+! We assume that the photoionization cross-section has not changed since the
+! last iteration. Using the result that the stimulated emission occurs in
+! LTE and is given by
+!                     ETA/(2hv^3/c^2)
+! we can adjust CHI and ETA so that the condition of constant photoionization
+! cross-section is met. This adjustment automatically ensures that ETA/CHI 
+! gives the Planck function in LTE. 
+!
 	  T1=(FL/CONT_FREQ)**3
 	  T2=TWOHCSQ*(CONT_FREQ**3)
 	  T3=TWOHCSQ*(FL**3)
@@ -187,20 +198,26 @@ C
 	    T4=ETA_C_EVAL(J)*T1*EXP(-HDKT*(FL-CONT_FREQ)/T(J))
 	    CHI(J)=CHI_C_EVAL(J)+(ETA_C_EVAL(J)/T2-T4/T3)
 	    ETA(J)=T4
+	    CHI_NOSCAT(J)=CHI_NOSCAT_EVAL(J)+(ETA_C_EVAL(J)/T2-T4/T3)
+	    ETA_NOSCAT(J)=T4
 	  END DO
+!
 	ELSE
-C
-C We reset CHI and ETA in case shock X-ray emission has been added to ETA.
-C
+!
+! We reset CHI and ETA in case shock X-ray emission has been added to ETA,
+! or CONT_FREQ was not the first frequency.
+!
 	  CHI(1:ND)=CHI_C_EVAL(1:ND)
 	  ETA(1:ND)=ETA_C_EVAL(1:ND)
+	  CHI_NOSCAT(1:ND)=CHI_NOSCAT_EVAL(1:ND)
+	  ETA_NOSCAT(1:ND)=ETA_NOSCAT_EVAL(1:ND)
 	END IF
 !
-C 
-C
-C The shock emission is added separately since it does not occur at the
-C local electron temperature.
-C
+! 
+!
+! The shock emission is added separately since it does not occur at the
+! local electron temperature.
+!
 	IF(XRAYS)THEN
 !
 	  IF(FF_XRAYS)THEN
@@ -287,18 +304,21 @@ C
 ! Set a minimum emissivity. Mainly important when X-rays are not present.
 !
 	DO I=1,ND
-	  IF(ETA(I) .LT. 1.0D-280)ETA(I)=1.0D-280
+	  IF(ETA(I) .LT. 1.0D-280)THEN
+	    ETA(I)=1.0D-280
+	    ETA_NOSCAT(I)=1.0D-280
+	  END IF
 	END DO
-C
-C The continuum source function is defined by:
-C                                              S= ZETA + THETA.J
+!
+! The continuum source function is defined by:
+!                                              S= ZETA + THETA.J
 	DO I=1,ND
 	  ZETA(I)=ETA(I)/CHI(I)
 	  THETA(I)=CHI_SCAT(I)/CHI(I)
 	END DO
-C
-C Store TOTAL continuum line emissivity and opacity.
-C
+!
+! Store TOTAL continuum line emissivity and opacity.
+!
 	ETA_CONT(:)=ETA(:)
 	CHI_CONT(:)=CHI(:)
 !

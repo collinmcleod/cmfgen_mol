@@ -1935,11 +1935,6 @@
 ! opacity and emissivity. These are used in carrying the variation of J from 
 ! one frequency to the next.
 !
-	    DO I=1,ND
-	      CHI_CONT(I)=CHI(I)
-	      ETA_CONT(I)=ETA(I)
-	    END DO
-!
 	    DO SIM_INDX=1,MAX_SIM
 	      IF(RESONANCE_ZONE(SIM_INDX))THEN
 	        DO I=1,ND
@@ -1972,8 +1967,8 @@
 	    IF(NEG_OPAC_OPTION .EQ. 'SRCE_CHK')THEN
 	      DO I=1,ND
 	        IF(CHI(I) .LT. CHI_CONT(I) .AND.
-	1            CHI(I) .LT. 0.1D0*ETA(I)*(CHI_CONT(I)-CHI_SCAT(I))/ETA_CONT(I) )THEN
-	          CHI(I)=0.1D0*ETA(I)*(CHI_CONT(I)-CHI_SCAT(I))/ETA_CONT(I)
+	1            CHI(I) .LT. 0.1D0*ETA(I)*CHI_NOSCAT(I)/ETA_CONT(I) )THEN
+	          CHI(I)=0.1D0*ETA(I)*CHI_NOSCAT(I)/ETA_CONT(I)
 	          NEG_OPACITY(I)=.TRUE.
 	          NEG_OPAC_FAC(I)=0.0D0
 	          AT_LEAST_ONE_NEG_OPAC=.TRUE.
@@ -2050,11 +2045,11 @@
 ! ETA_CONT includes all emissivity sources, including X-ray emission produced
 ! by mechanical or magnetic energy deposition. This should not be included
 ! in the radiatively equilibrium equation, hence we subtract out the
-! emissivity due to mechanical processes.
+! emissivity due to mechanical processes. NB: ETA_NOSCAT does not include
+! mechanical term.
 !
 	  DO K=1,ND
-	    STEQ_T(K)=STEQ_T(K)+ FQW(ML)*( 
-	1       (CHI_CONT(K)-CHI_SCAT(K))*RJ(K) - (ETA_CONT(K)-ETA_MECH(K)) )
+	    STEQ_T(K)=STEQ_T(K)+ FQW(ML)*(CHI_NOSCAT(K)*RJ(K) - ETA_NOSCAT(K))
 	  END DO
 	  IF(.NOT. COHERENT_ES)THEN
 	    STEQ_T(:)=STEQ_T(:)+FQW(ML)*ESEC(:)*(RJ(:)-RJ_ES(:))
@@ -2296,9 +2291,14 @@
 ! (i.e BA(I,J,K,L) with L .NE. DIAG_INDX) are presently updated for
 ! every frequency.
 !
+! We now pass the continuum emissivity and opacity without any scattering 
+! contribution. We use TA as a zeroed vec for ESEC, which was subtracted
+! from CHI_CONT inside BA_UPDATE_V7.
+!
 	    IF( .NOT. LAMBDA_ITERATION)THEN
+	      TA(1:ND)=0.0D0
               CALL BA_UPDATE_V7(VJ,VCHI_ALL,VETA_ALL,
-	1             ETA_CONT,CHI_CONT,CHI_SCAT,T,POPS,RJ,NU(ML),FQW(ML),
+	1             ETA_NOSCAT,CHI_NOSCAT,TA,T,POPS,RJ,NU(ML),FQW(ML),
 	1             COMPUTE_NEW_CROSS,FINAL_CONSTANT_CROSS,DO_SRCE_VAR_ONLY,
 	1             BA_CHK_FAC,NION,NT,NUM_BNDS,ND,DST,DEND)
 	    END IF
@@ -2681,6 +2681,8 @@
 ! Compute observed flux in Janskys for an object at 1 kpc .
 !	(const=dex(23)*2*pi*dex(20)/(3.0856dex(21))**2 )
 !
+	  N_OBS=NCF
+	  OBS_FREQ(ML)=FL
 	  OBS_FLUX(ML)=6.599341D0*SOB(1)*2.0D0		!2 DUE TO 0.5U
 	ELSE IF(CONT_VEL)THEN
 	   H_IN=DBB/CHI(ND)/3.0
@@ -2697,6 +2699,11 @@
 	   ELSE
 	     CALL REGRID_H(SOB,R,RSQHNU,H_OUT,H_IN,ND,TA)
 	   END IF
+	   IF(PLANE_PARALLEL .OR. PLANE_PARALLEL_NO_V)THEN
+	     H_OUT=H_OUT-HBC_CMF(2)
+	     SOB(1)=H_OUT; SOB(ND)=H_IN
+	     SOB(1:ND)=SOB(1:ND)*R(ND)*R(ND)
+	   END IF
 	   CALL COMP_OBS_V2(IPLUS,FL,
 	1           IPLUS_STORE,NU_STORE,NST_CMF,
 	1           MU_AT_RMAX,HQW_AT_RMAX,OBS_FREQ,OBS_FLUX,N_OBS,
@@ -2712,6 +2719,8 @@
 ! Compute observed flux in Janskys for an object at 1 kpc .
 !	(const=dex(23)*2*pi*dex(20)/(3.0856dex(21))**2 )
 !
+	  N_OBS=NCF
+	  OBS_FREQ(ML)=FL
 	  OBS_FLUX(ML)=6.599341D0*SOB(1)*2.0D0		!2 DUE TO 0.5U
 	END IF
 !
@@ -2764,6 +2773,7 @@
 !                                                  
 	DO I=1,ND
 	  CHI_PREV(I)=CHI_CONT(I)
+	  CHI_NOSCAT_PREV(I)=CHI_NOSCAT(I)
 	  CHI_SCAT_PREV(I)=CHI_SCAT(I)
 	  ETA_PREV(I)=ETA_CONT(I)
 	END DO
@@ -3537,10 +3547,19 @@
 	CALL LUM_FROM_ETA(XRAY_LUM_0P1,R,ND)
 	CALL LUM_FROM_ETA(XRAY_LUM_1KeV,R,ND)
 !
-	T1=1.0D+05/SPEED_OF_LIGHT()	!As V in km/s, c in cgs units.
-	DO I=1,ND
-	  MECH_LUM(I)=T1*R(I)*V(I)*(J_INT(I)+SIGMA(I)*K_INT(I))
-	END DO
+	IF(PLANE_PARALLEL_NO_V)THEN
+	  MECH_LUM(1:ND)=0.0D0
+	ELSE IF(PLANE_PARALLEL)THEN
+	  T1=R(ND)*R(ND)*1.0D+05/SPEED_OF_LIGHT()	!As V in km/s, c in cgs units.
+	  DO I=1,ND
+	    MECH_LUM(I)=T1*V(I)*(1.0D0+SIGMA(I))*K_INT(I)/R(I)
+	  END DO
+	ELSE
+	  T1=1.0D+05/SPEED_OF_LIGHT()	!As V in km/s, c in cgs units.
+	  DO I=1,ND
+	    MECH_LUM(I)=T1*R(I)*V(I)*(J_INT(I)+SIGMA(I)*K_INT(I))
+	  END DO
+	END IF
 	CALL LUM_FROM_ETA(MECH_LUM,R,ND)
 !
 ! Increment the continuum luminosity by the total line luminosity.

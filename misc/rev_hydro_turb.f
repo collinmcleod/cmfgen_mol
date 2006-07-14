@@ -156,6 +156,7 @@ C
 	1          'Surface gravity is: ',GSUR_NEW,' (i.e., log g=',LOG10(GSUR_NEW),')'
 	WRITE(LU_OUT,'(1X,A,F8.2,A)')
 	1          'Stars mass is: ',MASS_NEW,' Msun'
+	CLOSE(LU_OUT)
 !
 	P_REQ(1:ND)=P_REQ(1:ND)/P_GELEC(1:ND)
 	P_GRAD(1:ND)=P_GRAD(1:ND)/P_GELEC(1:ND)
@@ -164,6 +165,10 @@ C
 	CALL DP_CURVE(ND,P_VEL,P_GRAD)
 	CALL GRAMON_PGPLOT('V(km/s)','g/g_elec',' ',' ')
 !
+	DO I=1,ND
+	  WRITE(40,'(I,3ES16.6)')I,P_REQ(I),P_GELEC(I),P_GRAD(I)
+	END DO
+	CLOSE(UNIT=40)
 	P_REQ(1:ND)=DLOG10(P_REQ(1:ND)*P_GELEC(1:ND))
 	P_GRAD(1:ND)=DLOG10(P_GRAD(1:ND)*P_GELEC(1:ND))
 	P_GELEC(1:ND)=DLOG10(P_GELEC(1:ND))

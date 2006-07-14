@@ -326,6 +326,23 @@ C
 	  Ylabel=''
 	  CALL GRAMON_PGPLOT('Depth',Ylabel,' ',' ')
 	  GOTO 200
+	ELSE IF(PLT_OPT(1:2) .EQ. 'PV')THEN
+	  IT=NIT; ID=ND
+	  DO WHILE(1 .EQ. 1)
+	    CALL GEN_IN(IT,'Iteration # (zero to exit)')
+	    IF(IT .EQ. 0)EXIT
+	    IVAR=NT
+	    CALL GEN_IN(IVAR,'Variable # (zero to exit)')
+	    IF(IVAR .EQ. 0)EXIT
+	    DO ID=1,ND
+	      Y(ID)=POPS(IVAR,ID,IT)
+	      X(ID)=V(ID)
+	    END DO
+	    CALL DP_CURVE(ND,X,Y)
+	  END DO
+	  Ylabel=''
+	  CALL GRAMON_PGPLOT('V(km/s)',Ylabel,' ',' ')
+	  GOTO 200
 	END IF
 C
 	ID=ND

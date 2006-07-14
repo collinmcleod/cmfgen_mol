@@ -152,7 +152,7 @@
 !
 ! Do the insertion in the crtical section.
 !
-	DTAU=4.5D0/(NX-1)
+	DTAU=FG_RANGE/(NX-1)
 	DO I=I1+1,I1+NX
 	  TAU(I)=FG_MIN+DTAU*(I-I1-1)
 	END DO
@@ -161,6 +161,12 @@
 !
 	I2=ND-(NX+I1+3)
 	T1=(TAU_OLD(ND)-FG_MAX)
+	IF(I2 .LE. 0)THEN
+	  WRITE(LUER,*)'Error in REVISE_R_GRID_V2'
+	  WRITE(LUER,*)'Maximum TAU set is likely too high for model'
+	  WRITE(LUER,*)'Change value in VADAT file'
+	  STOP
+	END IF
 	DTAU=T1/I2
 	DO I=I1+NX+1,ND-4
 	  TAU(I)=TAU(I-1)+DTAU

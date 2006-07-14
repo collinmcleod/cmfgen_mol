@@ -40,6 +40,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)rewrite_dc.exe\
          $(EXE_DIR)rev_rdinr.exe\
          $(EXE_DIR)rev_rvsig.exe\
+         $(EXE_DIR)recomz.exe\
          $(EXE_DIR)append_dc.exe\
          $(EXE_DIR)append_r_dc.exe\
          $(EXE_DIR)rev_hydro_file.exe\

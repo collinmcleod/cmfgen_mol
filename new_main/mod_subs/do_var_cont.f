@@ -182,7 +182,7 @@ C
 	    ELSE
 	      RAT_TOO_BIG=.FALSE.
 	      DO L=1,ND
-	        TA(L)=(CHI_PREV(L)-CHI_SCAT_PREV(L))/(CHI_CONT(L)-CHI_SCAT(L))
+	        TA(L)=CHI_NOSCAT_PREV(L)/CHI_NOSCAT(L)
 	        IF(ETA_CONT(L) .EQ. 0)THEN
                   TB(L)=1.0D0
 	        ELSE
@@ -272,16 +272,30 @@ C
 	   END IF
 C
 	   CALL TUNE(1,'VAR_MOM_J')
-	   CALL VAR_MOM_J_CMF_V7(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
-	1                  ES_COH_VEC,V,SIGMA,R,
-	1                  TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR, 
-	1                  dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR, 
-	1                  KI,WM,RHS_dHdCHI,
-	1                  FEDD,GEDD,N_ON_J,HBC_CMF,INBC,NBC_CMF,
-	1                  FEDD_PREV,GEDD_PREV,N_ON_J_PREV,
-	1                  HBC_PREV,INBC_PREV,NBC_PREV,
-	1                  FIRST_FREQ,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
-	1                  DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
+	   IF(PLANE_PARALLEL_NO_V)THEN
+	     CALL VAR_MOM_PP_V1(R,TA,CHI_CLUMP,CHI_SCAT_CLUMP,FEDD,
+	1           TX,dJ_DIF_d_T,dJ_DIF_d_dTdR,DO_THIS_TX_MATRIX,
+	1           HBC_CMF,NBC_CMF,INBC,
+	1           DIF,DBB,dDBBdT,dTdR,IC,METHOD,COHERENT_ES,ND,NM)
+	   ELSE IF(PLANE_PARALLEL)THEN
+	     CALL PP_VAR_MOM_CMF_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
+	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR, 
+	1           dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR,FEDD,GEDD,N_ON_J,
+	1           INBC,HBC_CMF(1),HBC_CMF(2),NBC_CMF(1),NBC_CMF(2),
+	1           FIRST_FREQ,L_FALSE,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
+	1           DO_THIS_TX_MATRIX,METHOD,COHERENT_ES,ND,NM)
+	   ELSE
+	     CALL VAR_MOM_J_CMF_V7(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
+	1           ES_COH_VEC,V,SIGMA,R,
+	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR, 
+	1           dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR, 
+	1           KI,WM,RHS_dHdCHI,
+	1           FEDD,GEDD,N_ON_J,HBC_CMF,INBC,NBC_CMF,
+	1           FEDD_PREV,GEDD_PREV,N_ON_J_PREV,
+	1           HBC_PREV,INBC_PREV,NBC_PREV,
+	1           FIRST_FREQ,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
+	1           DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
+	   END IF
 	   CALL TUNE(2,'VAR_MOM_J')
 C
 C Correcting for clumping this way does it for both the continuum and lines.
@@ -423,7 +437,7 @@ C
 	    ELSE
 	      RAT_TOO_BIG=.FALSE.
 	      DO L=1,ND
-	        TA(L)=(CHI_PREV(L)-CHI_SCAT_PREV(L))/(CHI_CONT(L)-CHI_SCAT(L))
+	        TA(L)=CHI_NOSCAT_PREV(L)/CHI_NOSCAT(L)
 	        TB(L)=ETA_PREV(L)/ETA_CONT(L)
 	        IF(TA(L) .GT. 1.5)RAT_TOO_BIG=.TRUE.
 	      END DO
