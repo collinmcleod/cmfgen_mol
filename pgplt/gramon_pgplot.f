@@ -278,9 +278,9 @@
 !
 	IF(FSTOPEN)THEN
 	  ASR=0.0			!Leave as is
-	  EXPCHAR_SCALE=1.0   		!Was 1.01 to prevent crashes.
-	  EXPMARK_SCALE=1.0   		!Symbol size on plots.
-	  TICK_FAC_SCALE=1.0D0
+	  EXPCHAR_SCALE=1.5   		!Was 1.01 to prevent crashes.
+	  EXPMARK_SCALE=1.5   		!Symbol size on plots.
+	  TICK_FAC_SCALE=1.5D0
 	  PLT_LINE_WGT=1
           PLT_ST_FILENAME=' '
 	END IF

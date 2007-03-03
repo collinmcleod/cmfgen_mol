@@ -1,0 +1,105 @@
+	PROGRAM PLT_LN_HEAT
+	USE GEN_IN_INTERFACE
+	IMPLICIT NONE
+!
+	INTEGER, PARAMETER :: NMAX=400000
+!
+	REAL*8 NU(NMAX)
+	REAL*8 LAM(NMAX)
+	REAL*8 XV(NMAX)
+	REAL*8 Y(NMAX)
+!
+	REAL*8, ALLOCATABLE :: LH(:,:)
+	REAL*8, ALLOCATABLE :: SE_SCL(:,:)
+	REAL*8, ALLOCATABLE :: SE_NOSCL(:,:)
+!
+	INTEGER ND
+	INTEGER N_LINES
+	INTEGER I,K,ML,IBEG
+!
+	CHARACTER*80 FILENAME
+	CHARACTER*80 STRING
+        CHARACTER*30 UC
+        EXTERNAL UC
+	CHARACTER*20 PLT_OPT
+!
+1000	CONTINUE
+ 	FILENAME='LINEHEAT'
+	CALL GEN_IN(FILENAME,'File with data to be plotted')
+	IF(FILENAME .EQ. ' ')GOTO 1000
+!
+	ND=104; N_LINES=102066
+	CALL GEN_IN(ND,'Number of data points')
+	CALL GEN_IN(N_LINES,'Number of lines')
+!
+	ALLOCATE (LH(ND,N_LINES))
+	ALLOCATE (SE_SCL(ND,N_LINES))
+	ALLOCATE (SE_NOSCL(ND,N_LINES))
+!
+	OPEN(UNIT=11,FILE=FILENAME,STATUS='OLD',ACTION='READ')
+!
+	DO ML=1,N_LINES
+	  STRING=' '
+	  DO WHILE(STRING .EQ. ' ')
+	    READ(11,'(A)')STRING
+	  END DO
+	  K=INDEX(STRING,')')
+	  DO WHILE(K .NE. 0)
+	    STRING(1:)=STRING(K+1:)
+	    K=INDEX(STRING,')')
+	  END DO
+	  K=INDEX(STRING,'  ')
+	  STRING(1:)=STRING(K:)
+	  READ(STRING,*,ERR=200)NU(ML)
+	  READ(11,*)(LH(1:ND,ML))
+	  READ(11,*)(SE_SCL(1:ND,ML))
+	  READ(11,*)(SE_NOSCL(1:ND,ML))
+	END DO
+!
+	LAM(1:N_LINES)=2.99702458D+03/NU(1:N_LINES)
+!
+	PLT_OPT='SS'
+	DO WHILE(1 .EQ. 1)
+	  WRITE(6,*)' '
+	  WRITE(6,*)'Plot options are:'
+	  WRITE(6,*)' LH:  Plot LH  at given depth'
+	  WRITE(6,*)' SS:  Plot STEQ (scaling) at given depth'
+	  WRITE(6,*)' SN:  Plot STEQ (no scaling) at a given depth'
+	  WRITE(6,*)' E(X):  Exit routine'
+	  CALL GEN_IN(PLT_OPT,'Plot option')
+	  IF(UC(PLT_OPT) .EQ. 'LH')THEN
+	    K=ND
+	    CALL GEN_IN(K,'Depth for plotting')
+	    Y(1:N_LINES)=LH(K,1:N_LINES)
+	    CALL DP_CURVE(N_LINES,NU,Y)
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','LH',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'SS')THEN
+	    K=ND
+	    CALL GEN_IN(K,'Depth for plotting')
+	    Y(1:N_LINES)=SE_SCL(K,1:N_LINES)
+	    CALL DP_CURVE(N_LINES,NU,Y)
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','STEQ(scaled)',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'SN')THEN
+	    K=ND
+	    CALL GEN_IN(K,'Depth for plotting')
+	    Y(1:N_LINES)=SE_NOSCL(K,1:N_LINES)
+	    CALL DP_CURVE(N_LINES,NU,Y)
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','STEQ(scaled)',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'FV')THEN
+	    DO I=1,ND
+	      XV(I)=I
+	    END DO
+	    Y(1:ND)=SE_SCL(1:ND,N_LINES)
+	    CALL DP_CURVE(ND,XV,Y)
+	    Y(1:ND)=SE_NOSCL(1:ND,N_LINES)
+	    CALL DP_CURVE(ND,XV,Y)
+	    CALL GRAMON_PGPLOT('Depth Index','STEQ(sc,scl)',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'EX' .OR. UC(PLT_OPT) .EQ. 'E')THEN
+	    STOP
+	  END IF
+	END DO
+!
+200	WRITE(6,*)STRING
+	STOP
+!
+	END

@@ -140,6 +140,7 @@
 	USE PP_MOM_CMF_MOD
 	IMPLICIT NONE
 !
+! Altered:   17-Feb-2007 : dNBC_INCID was not zeroed on when INIT set.
 ! Created:   02-Mar-2006 : Based on MOM_J_CMF_V6
 !
 	INTEGER ND_SM
@@ -484,6 +485,7 @@
 	    EPS_PREV(I)=0.0D0
 	  END DO
 	  HBC_PREV=0.0D0;  IN_HBC_PREV=0.0D0; NBC_PREV=0.0D0
+	  dNBC_INCID=0.0D0
 	ELSE
 !
 ! Assume (1)	SIGMAd+1/2 = 0.5*( SIGMAd+1+SIGMAd )

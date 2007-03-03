@@ -140,6 +140,7 @@
 	INTEGER NP_SAV
 	INTEGER NRAY_MAX
 	INTEGER NI_RAY
+	INTEGER NI
 !
 	CHARACTER*10 OLD_SOLUTION_OPTIONS
 	CHARACTER*10 SOLUTION_METHOD
@@ -201,6 +202,8 @@
 	USE PP_FORM_CMF_MOD_V2
 	IMPLICIT NONE
 !
+! Altered 17-Feb-2007 : Bug fix. NI was not in module block.
+!                          Two irrelevant lines left over from FG_CMF_V10 deleted.
 ! Created 01-Mar-2006 : Based on FG_J_CMF_V10
 !
 	INTEGER ND				!Number of depth points
@@ -287,7 +290,6 @@
 	INTEGER NI_SMALL
 	INTEGER I,J,K,LS
 	INTEGER IDMIN,IDMAX
-	INTEGER NI
 !
 	REAL*8 DBC
 	REAL*8 I_CORE
@@ -514,7 +516,6 @@
 	  K=1
 	  DO I=1,ND_EXT-1
 	    T1=(V_EXT(I)-V_EXT(I+1))/T2
-	    IF(.NOT. THK .AND. NI_SMALL .EQ. 2)T1=MAX(2.01D0,T1)
 	    IF(T1 .GT. 1)K=K+INT(T1)
 	    K=K+1
 	  END DO
@@ -533,7 +534,6 @@
 	  T2=VDOP_FRAC*MINVAL(VDOP_VEC)
 	  DO I=1,ND_EXT-1
 	    T1=(V_EXT(I)-V_EXT(I+1))/T2
-	    IF(.NOT. THK .AND. NI_SMALL .EQ. 2)T1=MAX(2.01D0,T1)
 	    IF(T1 .GT. 1)THEN
 	      dR=(R_EXT(I+1)-R_EXT(I))/(INT(T1)+1)
 	      DO J=1,INT(T1)
@@ -543,6 +543,12 @@
 	      END DO
 	    END IF
 	    K=K+1
+	    IF(K .GT. NRAY_MAX)THEN
+	      J=ERROR_LU()
+	      WRITE(J,*)'Error in PP_FORM_CMF_V2'
+	      WRITE(J,*)K,NRAY_MAX,ND
+	      STOP
+	    END IF
 	    R_RAY(K)=R_EXT(I+1)
 	    RAY_PNT(K)=I
 	  END DO
