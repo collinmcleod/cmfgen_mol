@@ -1,0 +1,132 @@
+	MODULE MOD_LTE_ROSS_TAB
+	IMPLICIT NONE
+!
+	REAL*8, ALLOCATABLE :: CHI(:,:)
+	REAL*8, ALLOCATABLE :: ESEC(:,:)
+	REAL*8, ALLOCATABLE :: KAP(:,:)
+	REAL*8, ALLOCATABLE :: KES(:,:)
+	REAL*8, ALLOCATABLE :: POP_ATOM(:,:)
+	REAL*8, ALLOCATABLE :: ED(:,:)
+	REAL*8, ALLOCATABLE :: RHO(:)
+	REAL*8, ALLOCATABLE :: TEMP(:)
+!
+	INTEGER N_T,I_T
+	INTEGER N_D,I_D
+!
+	LOGICAL, SAVE :: FIRST_TIME=.TRUE.
+!
+	END MODULE MOD_LTE_ROSS_TAB
+!
+	SUBROUTINE GET_LTE_ROSS_V2(KAP_VAL,KAP_ES,LTE_ED,ATOM_DEN,TVAL)
+	USE MOD_LTE_ROSS_TAB
+	IMPLICIT NONE
+!
+	REAL*8 ATOM_DEN
+	REAL*8 KAP_VAL
+	REAL*8 KAP_ES
+	REAL*8 LTE_ED
+	REAL*8 TVAL
+	REAL*8 DENSITY
+!
+	REAL*8 T1,T2
+	REAL*8 D1,D2
+	CHARACTER*132 STRING
+!
+	IF(FIRST_TIME)THEN
+	  OPEN(UNIT=10,FILE='ROSSELAND_LTE_TAB',STATUS='OLD',ACTION='READ')
+	    STRING=' '
+	    DO WHILE(STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ')
+	      READ(10,'(A)')STRING
+	    END DO
+	    IF(INDEX(STRING,'!Number of temperatures') .NE. 0)THEN
+	      READ(STRING,*)N_T
+	    ELSE IF(INDEX(STRING,'!Number of densities') .NE. 0)THEN
+	      READ(STRING,*)N_D
+	    ELSE
+	      WRITE(6,*)'Error reading ROSSELAND_LTE_TAB'
+	      WRITE(6,*)'Unrecognized record'
+	      WRITE(6,'(A)')TRIM(STRING)
+	      STOP
+	    END IF
+	    STRING=' '
+	    DO WHILE(STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ')
+	      READ(10,'(A)')STRING
+	    END DO
+	    IF(INDEX(STRING,'Number of temperatures') .NE. 0)THEN
+	      READ(STRING,*)N_T
+	    ELSE IF(INDEX(STRING,'Number of densities') .NE. 0)THEN
+	      READ(STRING,*)N_D
+	    ELSE
+	      WRITE(6,*)'Error reading ROSSELAND_LTE_TAB'
+	      WRITE(6,*)'Unrecognized record'
+	      WRITE(6,'(A)')TRIM(STRING)
+	      STOP
+	    END IF
+	    STRING=' '
+	    DO WHILE(STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ')
+	      READ(10,'(A)')STRING
+	    END DO
+	    BACKSPACE(10)
+!
+	    IF(N_D .EQ. 0)THEN
+	      WRITE(6,*)'Error reading N_D from ROSSELAND_LTE_TAB'
+	      STOP
+	    ELSE IF(N_T .EQ. 0)THEN
+	      WRITE(6,*)'Error reading N_T from ROSSELAND_LTE_TAB'
+	      STOP
+	    END IF
+!
+	    ALLOCATE (CHI(N_T,N_D))
+	    ALLOCATE (ESEC(N_T,N_D))
+	    ALLOCATE (KAP(N_T,N_D))
+	    ALLOCATE (KES(N_T,N_D))
+	    ALLOCATE (ED(N_T,N_D))
+	    ALLOCATE (POP_ATOM(N_T,N_D))
+	    ALLOCATE (RHO(N_D))
+	    ALLOCATE (TEMP(N_T))
+!
+	    DO I_D=1,N_D
+	      DO I_T=1,N_T
+	        READ(10,*)TEMP(I_T),RHO(I_D),POP_ATOM(I_T,I_D),ED(I_T,I_D),
+	1                 CHI(I_T,I_D),ESEC(I_T,I_D),
+	1                 KAP(I_T,I_D),KES(I_T,I_D)
+	      END DO
+	    END DO
+!
+	  CLOSE(UNIT=10)
+!
+	  FIRST_TIME=.FALSE.
+	END IF
+!
+	DENSITY=ATOM_DEN*RHO(1)/POP_ATOM(1,1)
+	I_D=1
+	DO I_D=2,N_D
+	  IF(DENSITY .LT. RHO(I_D))EXIT
+	END DO
+!
+	I_T=1
+	DO I_T=2,N_T
+	  IF(TVAL .LT. TEMP(I_T))EXIT
+	END DO
+!	WRITE(6,*)I_T,I_D
+	IF(I_T .GT. N_T)I_T=N_T-1
+!
+!	WRITE(6,*)TVAL,TEMP(I_T-1),TEMP(I_T)
+	T1=LOG(TEMP(I_T)/TVAL)/LOG(TEMP(I_T)/TEMP(I_T-1))
+!	WRITE(6,*)DENSITY,RHO(I_D-1),RHO(I_D)
+	T2=LOG(RHO(I_D)/DENSITY)/LOG(RHO(I_D)/RHO(I_D-1))
+!
+	D1=T1*LOG(KAP(I_T-1,I_D-1))+(1.0D0-T1)*LOG(KAP(I_T,I_D-1))
+	D2=T1*LOG(KAP(I_T-1,I_D))+(1.0D0-T1)*LOG(KAP(I_T,I_D))
+	KAP_VAL=EXP(T2*D1+(1.0D0-T2)*D2)
+!
+	D1=T1*LOG(KES(I_T-1,I_D-1))+(1.0D0-T1)*LOG(KES(I_T,I_D-1))
+	D2=T1*LOG(KES(I_T-1,I_D))+(1.0D0-T1)*LOG(KES(I_T,I_D))
+	KAP_ES=EXP(T2*D1+(1.0D0-T2)*D2)
+!
+	D1=T1*LOG(ED(I_T-1,I_D-1))+(1.0D0-T1)*LOG(ED(I_T,I_D-1))
+	D2=T1*LOG(ED(I_T-1,I_D))+(1.0D0-T1)*LOG(ED(I_T,I_D))
+	LTE_ED=EXP(T2*D1+(1.0D0-T2)*D2)
+!
+	RETURN
+	END
