@@ -13,6 +13,7 @@
 	IMPLICIT NONE
 !
 ! Created : 23-Jan-2006
+! Altered : 24-Sep-2006  --- FG option added.
 !
 	INTEGER, PARAMETER :: MAX_ND=500
 	REAL*8 R(MAX_ND)
@@ -23,13 +24,17 @@
 	REAL*8 VEL(MAX_ND)
 	REAL*8 CLUMP_FAC(MAX_ND)
 	REAL*8 RTMP(MAX_ND)
+	REAL*8 OLD_XV(MAX_ND)
+	REAL*8 NEW_XV(MAX_ND)
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER I,J
 	INTEGER FST,LST
+	INTEGER IST,IEND
 	INTEGER NI,NG
 	INTEGER ICOUNT
 	INTEGER N,ND,NEW_ND
+	INTEGER, PARAMETER :: IONE=1
 	REAL*8 RMIN,LUM
 	REAL*8 GRID_FACTOR,GRID_RATIO
 	REAL*8 T1,T2,SCALE_FACTOR,DELR
@@ -45,6 +50,7 @@
 !
 	WRITE(6,'(A)')'Current available options are:'
 	WRITE(6,'(A)')'   IR           Insert additional points betwen I=FST and I=LST'
+	WRITE(6,'(A)')'   FG:          Fine grid over specified range'
         WRITE(6,'(A)')'   FG_OB:       Finer grid near outer boundary'
 	WRITE(6,'(A)')'   DOUB:        Doubel radius grid'
 	WRITE(6,'(A)')'   SCALE_R:     Scale radius grid'
@@ -164,6 +170,49 @@
 	    WRITE(10,'(F7.1)')1.0D0
 	  END DO
 	  WRITE(6,*)'New number of depth points is:',NEW_ND,ICOUNT
+	    CALL GEN_IN(NG,'Number of additinal grid points for this interval')
+!
+	ELSE IF(OPTION .EQ. 'FG')THEN
+	  IST=1; IEND=ND
+	  CALL GEN_IN(IST,'Start index for fine grid')
+	  CALL GEN_IN(IEND,'End index for fine grid')
+	  WRITE(6,*)'Number of points in requeted interval is',IEND-IST-1
+	  NG=IEND-IST
+	  CALL GEN_IN(NG,'New number of grid points for this interval')
+	  DO I=1,IST
+	    NEW_XV(I)=I
+	  END DO
+	  T1=(IEND-IST)/(NG+1.0D0)
+	  DO I=1,NG
+	    NEW_XV(IST+I)=IST+I*T1
+	  END DO
+	  DO I=IEND,ND
+	    NEW_XV(IST+NG+I+1-IEND)=I
+	  END DO
+	  NEW_XV(IST+NG+1)=0.5D0*(NEW_XV(IST+NG)+IEND+1)
+	  DO I=1,ND
+	    OLD_XV(I)=I
+	  END DO
+	  NEW_ND=IST+NG+(ND-IEND)+1
+	  CALL MON_INTERP(RTMP,NEW_ND,IONE,NEW_XV,NEW_ND,R,ND,OLD_XV,ND)
+	  WRITE(10,'(1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)')RMIN,LUM,1,NEW_ND
+	  DO I=1,NEW_ND
+	    WRITE(10,'(A)')' '
+	    IF(I .GT. IST .AND. I .LE. IST+NG)THEN
+	      J=NEW_XV(I)
+	      T1=NEW_XV(I)-J; T2=1.0D0-T1
+	      WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')RTMP(I),
+	1                T2*DI(J)+T1*DI(J+1),T2*ED(J)+T1*ED(J+1),
+	1                T2*T(J)+T1*T(J+1),  T2*IRAT(J)+T1*IRAT(J+1),
+	1                T2*VEL(J)+T1*VEL(J+1),
+	1                T2*CLUMP_FAC(J)+T1*CLUMP_FAC(J+1),I
+	    ELSE
+	      J=I; IF(I .GT. IST)J=I-IST-NG+IEND-1
+	      WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')RTMP(I),
+	1                DI(J),ED(J),T(J),IRAT(J),VEL(J),CLUMP_FAC(J),I
+	    END IF
+	    WRITE(10,'(F7.1)')1.0D0
+	  END DO
 !
 ! Make a fine grid near the outer boundary.
 !

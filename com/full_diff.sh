@@ -51,6 +51,9 @@ cat Diff_output >> Diff_sum
 $cmfdist/com/main_diff.sh $X1/lpack $X2/lpack
 cat Diff_output >> Diff_sum
 
+$cmfdist/com/main_diff.sh $X1/lte_hydro $X2/lte_hydro
+cat Diff_output >> Diff_sum
+
 $cmfdist/com/main_diff.sh $X1/main $X2/main
 cat Diff_output >> Diff_sum
 

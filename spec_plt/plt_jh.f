@@ -466,6 +466,31 @@
 	   STOP
 	  END IF
 !
+	ELSE IF(X(1:3) .EQ. 'R3J')THEN
+	  ID=1; ND=ZM(ID)%ND
+	  IF(ALLOCATED(XV))DEALLOCATE(XV)
+	  IF(ALLOCATED(YV))DEALLOCATE(YV)
+	  ALLOCATE (XV(ND))
+	  ALLOCATE (YV(ND))
+!
+	  CALL USR_OPTION(USE_V,'USE_V','F','Use V for x-axis (otherwise R)')
+	  IF(USE_V)THEN
+	    XV(1:ND)=V(1:ND)
+	    XAXIS='V(km/s)'
+	  ELSE
+	    XV(1:ND)=R(1:ND)
+	    XAXIS='R(10\u10\dcm)'
+	  END IF
+	  TA=0.0D0
+	  DO ML=1,NCF
+	    DO I=1,ND
+	      TA(I)=TA(I)+ZM(ID)%RJ(I,ML)
+	    END DO
+	  END DO
+	  YV(1:ND)=TA(1:ND)*(R(1:ND)**3)
+	  YV(1:ND)=YV(1:ND)
+	  CALL DP_CURVE(ND,XV,YV)
+	  YAXIS='r\u3\dJ'
 	ELSE IF(X(1:2) .EQ. 'JD')THEN
 !
 	  SCALE_FAC=1.0D0
@@ -505,7 +530,10 @@
 	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
 	  T1=0.299794E+04/T1
 !
+	  SCALE_FAC=1.0D0
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE',' ','Scale factor to prevent overflow')
+	  CALL USR_OPTION(USE_V,'USE_V','F','Use V for x-axis (otherwise R)')
+!
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
 !
@@ -518,10 +546,15 @@
 	    ALLOCATE (XV(ND))
 	    ALLOCATE (YV(ND))
 !
-	    WRITE(6,*)'R(1)=',R(1)
-	    WRITE(6,*)'R(ND)=',R(ND)
-	    T2=R(ND)
-	    XV(1:ND)=DLOG10(R(1:ND)/T2)
+	    IF(USE_V)THEN
+	      XV(1:ND)=V(1:ND)
+	    ELSE
+	      WRITE(6,*)'R(1)=',R(1)
+	      WRITE(6,*)'R(ND)=',R(ND)
+	      T2=R(ND)
+	      XV(1:ND)=DLOG10(R(1:ND)/T2)
+	    END IF
+!
 	    DO J=1,ND
 	      WRITE(6,*)J,ZM(ID)%RJ(J,I)
 	      IF(ZM(ID)%RJ(J,I) .GT. 0)THEN
@@ -533,7 +566,7 @@
 	    CALL DP_CURVE(ND,XV,YV)
           END DO
 !
-	ELSE IF(X(1:3) .EQ. 'MT')THEN
+	ELSE IF(X(1:2) .EQ. 'MT')THEN
 	  CALL USR_OPTION(USE_V,'USE_V','T','Use V for x-axis (otherwise R)')
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF

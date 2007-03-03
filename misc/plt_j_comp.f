@@ -17,6 +17,8 @@
 	REAL*8 JR_IN(NCF_MAX)
 	REAL*8 DIFF_IN(NCF_MAX)
 !
+	REAL*8 Y(NCF_MAX)
+!
 	CHARACTER*80 FILENAME
 	CHARACTER*80 STRING
         CHARACTER*30 UC
@@ -83,6 +85,8 @@
 	  WRITE(6,*)'Plot options are:'
 	  WRITE(6,*)' JF:  Plot J against frequency at outer boundary'
 	  WRITE(6,*)' JW:  Plot J against wavelength at outer boundary'
+	  WRITE(6,*)' dJF: Plot J-J against frequency at outer boundary'
+	  WRITE(6,*)' dJW: Plot J-J against wavelength at outer boundary'
 	  WRITE(6,*)' DF:  Plot Error against frequency at outer boundary'
 	  WRITE(6,*)' DW:  Plot Error against wavelength at outer boundary'
 	  WRITE(6,*)' E(X):  Exit routine'
@@ -93,6 +97,14 @@
 	  ELSE IF(UC(PLT_OPT) .EQ. 'JW')THEN
 	    CALL DP_CURVE(NCF,LAM,JR_OUT)
 	    CALL GRAMON_PGPLOT('\g(\A)','J',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'DJW')THEN
+	    Y(1:NCF)=JR_OUT(1:NCF)-JM_OUT(1:NCF)
+	    CALL DP_CURVE(NCF,LAM,Y)
+	    CALL GRAMON_PGPLOT('\g(\A)','J(ray)-J(mom)',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'DJF')THEN
+	    Y(1:NCF)=JR_OUT(1:NCF)-JM_OUT(1:NCF)
+	    CALL DP_CURVE(NCF,NU,Y)
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(ray)-J(mom)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'DF')THEN
 	    CALL DP_CURVE(NCF,NU,DIFF_OUT)
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','% Difference',' ',' ')

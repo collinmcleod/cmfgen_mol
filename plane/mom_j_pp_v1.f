@@ -41,7 +41,7 @@
 	REAL*8, ALLOCATABLE :: COH_VEC(:)
 !
 	INTEGER ND
-	INTEGER NINS_SAV
+	INTEGER, SAVE :: NINS_SAV=0
 !
 ! R_PNT(K) defines the interpolation for the variable at depth K.
 !
@@ -131,6 +131,16 @@
 !
 !
 !
+! Determine the number of points for the expanded R grid. With out
+! a velocity field, this is imply related to NINS and ND.
+! We always insert an EVEN number of points. This guarentees that
+! H_SM (defined at the midpoints of the pass grid) has an exact correspondence
+! with H defined on the extended gid.
+!
+	NINS=PASSED_NINS
+	IF(MOD(NINS,2) .NE. 0)NINS=NINS+1
+	ND=(ND_SM-1)*(NINS+1)+1
+!
 ! Deallocate all arrayes if we have changed VDOP_FRAC. This will only
 ! be done in testing this routine (e.g., using DISPGEN).
 !
@@ -167,16 +177,6 @@
 ! data arrays.
 !
 	IF( FIRST_TIME .OR. .NOT. ALLOCATED(R) )THEN
-!
-! Determine the number of points for the expanded R grid. With out
-! a velocity field, this is imply related to NINS and ND.
-! We always insert an EVEN number of points. This guarentees that
-! H_SM (defined at the midpoints of the pass grid) has an exact correspondence
-! with H defined on the extended gid.
-!
-	  NINS=PASSED_NINS
-	  IF(MOD(NINS,2) .NE. 0)NINS=NINS+1
-          ND=(ND_SM-1)*(NINS+1)+1
 !
 	  ALLOCATE ( R(ND) )
 	  ALLOCATE ( R_PNT(ND) )

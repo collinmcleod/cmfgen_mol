@@ -48,6 +48,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)mass_sc.exe\
          $(EXE_DIR)plt_gf.exe\
          $(EXE_DIR)plt_cool.exe\
+         $(EXE_DIR)plt_ln_heat.exe\
          $(EXE_DIR)plt_j_comp.exe\
          $(EXE_DIR)plt_net.exe\
          $(EXE_DIR)solve_ba_mat.exe\

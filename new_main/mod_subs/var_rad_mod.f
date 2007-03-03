@@ -1,6 +1,6 @@
 !
 ! This moduls declares vectors and arrays required to compute dJ in the continuum section of
-! the code. Storage is allocated by a call to SET_VAR_RAD_MOD.
+! the code. Storage is allocated by a call to SET_VAR_RAD_MOD_V2.
 !
 	MODULE VAR_RAD_MOD
 !
@@ -50,7 +50,8 @@
 ! 
 ! Subroutine to allocate vectors and arrays.
 !
-	SUBROUTINE SET_VAR_RAD_MOD(ND,NDEXT,NT,NUM_BNDS,NM,MAX_SIM,NM_KI,ACCURATE)
+	SUBROUTINE SET_VAR_RAD_MOD_V2(ND,NDEXT,NT,NUM_BNDS,NM,MAX_SIM,NM_KI,
+	1                ACCURATE,ALLOCATE_TX)
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
@@ -62,6 +63,7 @@
 	INTEGER NM_KI
 	INTEGER MAX_SIM
 	LOGICAL ACCURATE
+	LOGICAL ALLOCATE_TX
 !
 	INTEGER IOS
 	INTEGER LUER
@@ -89,15 +91,17 @@
 !
 ! Variation line arrays
 !
-	IF(IOS .EQ. 0)ALLOCATE( TX(ND,ND,NM),STAT=IOS)
-	IF(IOS .EQ. 0)ALLOCATE( TVX(ND-1,ND,NM),STAT=IOS)
+	IF(ALLOCATE_TX)THEN
+	  IF(IOS .EQ. 0)ALLOCATE( TX(ND,ND,NM),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE( TVX(ND-1,ND,NM),STAT=IOS)
 !
 ! We make TX_EXT and TVX_EXT allocatable as they are accessed directly
 ! in VARCONT and thus must have the correct dimensions.
 !
-	IF(ACCURATE)THEN
-	  IF(IOS .EQ. 0)ALLOCATE( TX_EXT(NDEXT,ND,NM), STAT=IOS)
-	  IF(IOS .EQ. 0)ALLOCATE( TVX_EXT(NDEXT-1,ND,NM), STAT=IOS)
+	  IF(ACCURATE)THEN
+	    IF(IOS .EQ. 0)ALLOCATE( TX_EXT(NDEXT,ND,NM), STAT=IOS)
+	    IF(IOS .EQ. 0)ALLOCATE( TVX_EXT(NDEXT-1,ND,NM), STAT=IOS)
+	  END IF
 	END IF
 !
 ! KI is assumed to be of dimension:
@@ -121,7 +125,7 @@
 !
 	IF(IOS .NE. 0)THEN
 	  LUER=ERROR_LU()
-	  WRITE(LUER,*)'Error in SET_VAR_RAD_MOD'
+	  WRITE(LUER,*)'Error in SET_VAR_RAD_MOD_V2'
 	  WRITE(LUER,*)'Unable to allocate required memory'
 	  WRITE(LUER,*)'IOS=',IOS
 	  STOP

@@ -262,8 +262,14 @@
           END DO
           ND=K
 !
-	  ALLOCATE ( R(ND) )
-	  ALLOCATE ( R_PNT(ND) )
+	  ALLOCATE ( R(ND), STAT=IOS )
+	  IF(IOS .EQ. 0)ALLOCATE ( R_PNT(ND), STAT=IOS )
+	  IF(IOS .NE. 0)THEN
+	    LUER=ERROR_LU()
+	    WRITE(LUER,*)'Unable to allocate R & R_PNT in PP_MOM_CMF_V1'
+	    WRITE(LUER,*)'Status=',IOS
+	  END IF  
+! 
           K=1
 	  R(1)=R_SM(1)
           R_PNT(1)=1
@@ -328,8 +334,15 @@
             SIGMA(I)=((SIGMA_COEF(K,1)*T1+SIGMA_COEF(K,2))*T1+SIGMA_COEF(K,3))*T1+SIGMA_COEF(K,4)
           END DO
 !
-	  ALLOCATE ( J_INDX(ND_SM) );       J_INDX(1:ND_SM)=0
-	  ALLOCATE ( H_INDX(ND_SM) );       H_INDX(1:ND_SM)=0
+	  ALLOCATE ( J_INDX(ND_SM),STAT=IOS )
+	  IF(IOS .EQ. 0)ALLOCATE ( H_INDX(ND_SM),STAT=IOS )
+	  IF(IOS .NE. 0)THEN
+	    LUER=ERROR_LU()
+	    WRITE(LUER,*)'Unable to allocate J_INDX & H_INDX in PP_MOM_CMF_V1'
+	    WRITE(LUER,*)'Status=',IOS
+	  END IF
+	  J_INDX(1:ND_SM)=0;    H_INDX(1:ND_SM)=0
+!  
 	  K=1
 	  DO I=1,ND_SM
 	    DO WHILE(J_INDX(I) .EQ. 0)

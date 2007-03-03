@@ -99,10 +99,12 @@
           CALL RD_AUTO_V1(AUTO,FEDGE_F,G_F,LEVNAME_F,N_F,AUTO_FILE)
         ELSE
           LUER=ERROR_LU()
+          WRITE(LUER,*)' '
           WRITE(LUER,*)'Warning: possible error in STEQ_AUTO_V1'
           WRITE(LUER,*)'No autoionization probabilities available'
           WRITE(LUER,*)'Model has states above the ionization limit'
-          WRITE(LUER,*)'AUTO_FILE is',AUTO_FILE
+          WRITE(LUER,'(A,A)')' AUTO_FILE is ',TRIM(AUTO_FILE)
+          WRITE(LUER,*)' '
           RETURN
         END IF
 !

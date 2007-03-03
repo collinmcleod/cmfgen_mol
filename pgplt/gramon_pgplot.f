@@ -58,6 +58,7 @@
 	REAL*4 XPAR(2),YPAR(2),XT(2),YT(2)
 	REAL*4 XMIN,XMAX,YMIN,YMAX
 	REAL*4 XPAR_SAV(2)
+	REAL*8 YMIN_SAV,YMAX_SAV
 !
 	REAL*4 YPAR_R_AX(2)
 	REAL*4 YNUMST_R_AX
@@ -73,7 +74,7 @@
 	CHARACTER*(*) XLAB,YLAB,TITL,PASSED_OPT
         CHARACTER*80 FILNAME
         CHARACTER*80 ID_FILNAME
-        CHARACTER*80 PLT_ST_FILENAME
+        CHARACTER*80, SAVE :: PLT_ST_FILENAME
 	CHARACTER*80 WK_STR,OPTION
 	CHARACTER*80 TMP_STR
 	CHARACTER*6 TO_TEK
@@ -372,6 +373,7 @@
 	YPAR(2)=YMAX
 	XPAR_SAV(1)=XPAR(1)		!Indicate value limits evaluated for.
 	XPAR_SAV(2)=XPAR(2)
+	YMAX_SAV=YMAX; YMIN_SAV=YMIN
 !
 ! Open user set workstation (default is set into the system).
 ! We only ask
@@ -602,7 +604,6 @@ C roughly the correct scaling even though the oridinates values may be vastly
 C different outside the plot window. We only use those plots that will be
 C displayed.
 C
-	  IF(XPAR(2) .NE. XPAR_SAV(2) .OR. XPAR(1) .NE. XPAR_SAV(1))THEN
 	    YMIN=1.0E+32
 	    YMAX=-1.0E+32
 	    DO IP=1,NPLTS
@@ -628,6 +629,9 @@ C
 !	      YMIN=0.0
 !	      YMAX=1.0
 	    END IF
+!
+	  IF(XPAR(2) .NE. XPAR_SAV(2) .OR. XPAR(1) .NE. XPAR_SAV(1) .OR.
+	1    YMAX .NE. YMAX_SAV .OR. YMIN .NE. YMIN_SAV)THEN
 	    YINC=SPACING(YMIN,YMAX)
 	    IYTICK=2
 	    V1=1000
@@ -635,6 +639,7 @@ C
 	    YPAR(2)=ABS(YINC)*(AINT(YMAX/ABS(YINC)-V1)+V1)
 	    XPAR_SAV(1)=XPAR(1)		!Indicate value limits evaluated for.
 	    XPAR_SAV(2)=XPAR(2)
+	    YMIN_SAV=YMIN; YMAX_SAV=YMAX
 	  END IF
 C
 	  WRITE(T_OUT,11)YMIN,YMAX
@@ -1570,7 +1575,7 @@ C
 	    GOTO 1000
 	  END IF
 	  L=-1
-	  CALL NEW_GEN_IN(L,'Plot to output (def=-1=ALL)')
+	  IF(NPLTS .NE. 1)CALL NEW_GEN_IN(L,'Plot to output (def=-1=ALL)')
 !
 	  CNT=0; PLT_ID=' '
 	  DO IP=1,NPLTS

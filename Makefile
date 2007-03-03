@@ -42,7 +42,8 @@ d_obs:
 	(cd obs; make )
 d_misc:
 	(cd misc; make)
-
+d_lte:
+	(cd lte_hydro; make)
 #
 # To use the following command enter"
 #         make -i clean
