@@ -2,7 +2,7 @@ C
 C Returns index value J such that RVAL lies between R(J) and
 C R(J+1).
 C
-	INTEGER*4 FUNCTION GET_INDX_DP(RVAL,R,NW)
+	INTEGER FUNCTION GET_INDX_DP(RVAL,R,NW)
 	IMPLICIT NONE
 C                              
 C Altered 02-May-1990 - Bug fix: If on two consecutive calls, RVAL was the
@@ -18,10 +18,10 @@ C Altered 12-Nov-1990 = RVAL check altered. Routine nolonger STOPS program.
 C Altered 23-Apr-1990 - Check that RVAL is inside range given by R included.
 C Created 11-Apr-1990
 C
-	INTEGER*4 NW
+	INTEGER NW
 	REAL*8 R(NW),RVAL
 C
-	INTEGER*4 J,ILOW,IHIGH,ILOW_SAV
+	INTEGER J,ILOW,IHIGH,ILOW_SAV
 	SAVE ILOW_SAV
 	DATA ILOW_SAV/1/
 C
@@ -122,7 +122,7 @@ C
 C Returns index value J such that RVAL lies between R(J) and
 C R(J+1).
 C
-	INTEGER*4 FUNCTION GET_INDX_SP(RVAL,R,NW)
+	INTEGER FUNCTION GET_INDX_SP(RVAL,R,NW)
 	IMPLICIT NONE
 C
 C Altered 02-May-1990 - Bug fix: If on two consecutive calls, RVAL was the
@@ -138,10 +138,10 @@ C Altered 12-Nov-1990 = RVAL check altered. Routine nolonger STOPS program.
 C Altered 23-Apr-1990 - Check that RVAL is inside range given by R included.
 C Created 11-Apr-1990
 C
-	INTEGER*4 NW
+	INTEGER NW
 	REAL*4 R(NW),RVAL
 C
-	INTEGER*4 J,ILOW,IHIGH,ILOW_SAV
+	INTEGER J,ILOW,IHIGH,ILOW_SAV
 	SAVE ILOW_SAV
 	DATA ILOW_SAV/1/
 C

@@ -72,7 +72,7 @@
 	LOGICAL DO_REGARDLESS
 	LOGICAL WRITE_RVSIG
 	LOGICAL SCALE_INDIVIDUALLY
-	CHARACTER*3 OPTION
+	CHARACTER*4 OPTION
 	CHARACTER*132 STRING
 !
 	WRITE(T_OUT,*)' '
@@ -129,6 +129,7 @@
 	WRITE(T_OUT,*)'        SOR: Succesive over relaxation (scale last corrections)'
 	WRITE(T_OUT,*)'        NSR: Succesive over relaxation (power scale corrections)'
 	WRITE(T_OUT,*)'        REP: Repeat the last N corrections'
+	WRITE(T_OUT,*)'       UNDO: Undo part of the last correction'
 	CALL GEN_IN(OPTION,'Acceleration method:')
 	CALL SET_CASE_UP(OPTION,0,0)
 	IF(OPTION(1:2) .EQ.'NG')THEN
@@ -166,7 +167,11 @@
 	ELSE IF(OPTION(1:3) .EQ. 'REP')THEN
 	  CALL GEN_IN(N_ITS_TO_RD,'# of iteration to step back')
 	  CALL GEN_IN(ND_ST,'Only do REP option if the depth is .GE. ND_ST')
-	  CALL GEN_IN(ND_END,'Only do REP option if the depth is .LE. ND_END')
+	  CALL GEN_IN(ND_END,'Only do UNDO option if the depth is .LE. ND_END')
+	ELSE IF(OPTION(1:4) .EQ. 'UNDO')THEN
+	  N_ITS_TO_RD=2
+	  CALL GEN_IN(ND_ST,'Only do UNDO option if the depth is .GE. ND_ST')
+	  CALL GEN_IN(ND_END,'Only do UNDO option if the depth is .LE. ND_END')
 	ELSE
 	   WRITE(6,*)'Invalid acceleration option'
 	   STOP
@@ -243,10 +248,11 @@
 	      T1=MAX(T1,(RDPOPS(I,J,1)-RDPOPS(I,J,2))/RDPOPS(I,J,1))
 	      T2=MIN(T2,(RDPOPS(I,J,1)-RDPOPS(I,J,2))/RDPOPS(I,J,1))
 	    END DO
-	    T2=ABS(T2)+1.0D0
+	    T2=ABS(T2)
 	    T3=SCALE_FAC
 	    IF(T3*T1 .GT. BIG_FAC)T3=BIG_FAC/T1
-	    IF(T3*T2 .GT. (1.0D0-1.0D0/BIG_FAC))T3=BIG_FAC/T2
+	    IF(T3*T2 .GT. (1.0D0-1.0D0/BIG_FAC))T3=(1.0D0-1.0D0/BIG_FAC)/T2
+	    WRITE(6,'(I4,3ES14.4)')J,T1,T2,T3
 	    DO I=1,NT+3
 	      BIG_POPS(I,J)=RDPOPS(I,J,1)+T3*(RDPOPS(I,J,1)-RDPOPS(I,J,2))
 	    END DO
@@ -260,6 +266,14 @@
 	      IF(T1 .LT. -0.9)T1=-0.9
 	      IF(T1 .GT. 10.0)T1=10.0
 	      BIG_POPS(I,J)=BIG_POPS(I,J)*(1.0D0+T1)
+	    END DO
+	  END DO
+	  NG_DONE=.TRUE.
+	ELSE IF(OPTION(1:4) .EQ. 'UNDO')THEN
+	  BIG_POPS=RDPOPS(:,:,1)
+	  DO J=ND_ST,ND_END
+	    DO I=1,NT+3
+	      BIG_POPS(I,J)=RDPOPS(I,J,2)
 	    END DO
 	  END DO
 	  NG_DONE=.TRUE.
@@ -284,8 +298,10 @@
 	    WRITE(T_OUT,*)'Results of successful SOR output to SCRTEMP.'
 	  ELSE IF(OPTION(1:3) .EQ.'REP')THEN
 	    WRITE(T_OUT,*)'Successful extrapolation (REP) output to SCRTEMP.'
+	  ELSE IF(OPTION(1:4) .EQ.'UNDO')THEN
+	    WRITE(T_OUT,*)'Successfully undid part of the last correction.'
 	  ELSE
-	    WRITE(T_OUT,*)'Last 2 iterations averaged and output to SCRTEMP'
+	    WRITE(T_OUT,*)'Last 2 iterations averaged and output to SCRTEMP.'
 	  END IF
 	END IF
 !

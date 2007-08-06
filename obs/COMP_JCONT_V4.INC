@@ -2,6 +2,10 @@ C
 C Program section to compute the continuum intnesity. Opacities must have
 C previuosly been evaluated.
 C
+C Altered 13-Apr-2006 - Fixed routine so that V_AT_RMAX=0 for plane-parallel model
+C                          without V, even if V is set. Useful for testing.
+C Altered 20-Mar-2007 - Installed plane-parallel routines for Accurate grid.
+C Altered 26-Apr-2006 - Installed plane-parallel routines (no EXT only)
 C Altered 21-Apr-2001 - J [ (TC(NDEXT) ] was not being output to J_COMP correctly
 C                         when extra points were being inserted. Now access
 C                         TC(NDEXT), and use it before TC is corrupted.
@@ -284,11 +288,12 @@ C NB Using TA for ETA, TC for JNU_VEC, and TB for HNU_VEC
 C
 	     CALL TUNE(IONE,'FG_J_CMF_ACC')
 	     IF(PLANE_PARALLEL_NO_V)THEN
-	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling FCOMP_PP'
-	       SOURCE(1:ND)=TA(1:NDEXT)/CHIEXT(1:NDEXT)
-	       CALL FCOMP_PP_V2(R,TC,FEDD,SOURCE,CHIEXT,IPLUS,HBC_CMF,
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling FCOMP_PP_V2 with accurate grid'
+	       SOURCEEXT(1:NDEXT)=TA(1:NDEXT)/CHIEXT(1:NDEXT)
+	       CALL FCOMP_PP_V2(REXT,TC,FEDD,SOURCEEXT,CHIEXT,IPLUS,HBC_CMF,
 	1               NBC_CMF,INBC,DBB,IC,THK_CONT,DIF,NDEXT,NC,METHOD)
 	     ELSE IF(PLANE_PARALLEL)THEN
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling PP_FORM_CMF_V2 with accurate grid'
 	       CALL PP_FORM_CMF_V2(TA,CHIEXT,CHI_SCAT_EXT,VEXT,SIGMAEXT,REXT,
 	1               TC,TB,FEDD,GEDD,N_ON_J,INBC,
 	1               HBC_CMF(1),HBC_CMF(2),NBC_CMF(1),NBC_CMF(2),
@@ -296,6 +301,7 @@ C
 	1               METHOD,FG_SOL_OPTIONS,THK_CONT,L_FALSE,
 	1               FIRST_FREQ,NEW_FREQ,N_TYPE,NC,NDEXT)
 	     ELSE
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling FG_J_CMF_V10 with accurate grid'
 	       CALL FG_J_CMF_V10(TA,CHIEXT,CHI_SCAT_EXT,
 	1            VEXT,SIGMAEXT,REXT,PEXT,
 	1            TC,TB,FEDD,GEDD,N_ON_J,
@@ -324,11 +330,13 @@ C
 	     END IF
 	     CALL TUNE(IONE,'MOM_J_CMF_ACC')
              IF(PLANE_PARALLEL_NO_V)THEN
-	       CALL MOM_J_PP_V1(TA,CHIEXT,CHI_SCAT_EXT,
-	1                  R,FEDD,RJEXT,RSQHNU,HBC_CMF,NBC_CMF,INBC,
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_PP_V1 with accurate grid'
+	       CALL MOM_J_PP_V1(TA,CHIEXT,TB,
+	1                  REXT,FEDD,RJEXT,RSQHNU,HBC_CMF,NBC_CMF,INBC,
 	1                  FL,DIF,DBB,IC,METHOD,L_TRUE,
 	1                  IZERO,FIRST_FREQ,NEW_FREQ,NDEXT)
              ELSE IF(PLANE_PARALLEL)THEN
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling PP_MOM_CMF_V1 with accurate grid'
                CALL PP_MOM_CMF_V1(TA,CHIEXT,TB,VEXT,SIGMAEXT,REXT,
 	1                  FEDD,GEDD,N_ON_J,RJEXT,RSQHNU,
 	1                  VDOP_VEC_EXT,DELV_FRAC_MOM,
@@ -337,6 +345,7 @@ C
 	1                  N_TYPE,METHOD,L_TRUE,
 	1                  FIRST_FREQ,NEW_FREQ,NDEXT)
 	     ELSE
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_CMF_V6 with accurate grid'
 	       CALL MOM_J_CMF_V6(TA,CHIEXT,TB,
 	1              VEXT,SIGMAEXT,REXT,
 	1  	       FEDD,GEDD,N_ON_J,RJEXT,RSQHNU,
@@ -454,6 +463,7 @@ C
 	        HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*MU_AT_RMAX(1:NC)
 	        RMAX_OBS=R(ND)
 	        V_AT_RMAX=V(1)
+	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0D0
 	      END IF
 	    ELSE IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
 	1         MAXCH .LT. VAL_DO_NG) )THEN
@@ -625,7 +635,7 @@ C
 	     CALL TUNE(IONE,'MOM_J_CMF')
              IF(PLANE_PARALLEL_NO_V)THEN
 	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_PP_V1'
-	       CALL MOM_J_PP_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
+	       CALL MOM_J_PP_V1(TA,CHI_CLUMP,TB,
 	1                  R,FEDD,RJ,RSQHNU,HBC_CMF,NBC_CMF,INBC,
 	1                  FL,DIF,DBB,IC,METHOD,L_TRUE,
 	1                  IZERO,FIRST_FREQ,NEW_FREQ,ND)
@@ -721,6 +731,7 @@ C
 	        HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*MU_AT_RMAX(1:NC)
 	        RMAX_OBS=R(ND)
 	        V_AT_RMAX=V(1)
+	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0D0
 	      END IF
 	    ELSE IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
 	1         MAXCH .LT. VAL_DO_NG) )THEN

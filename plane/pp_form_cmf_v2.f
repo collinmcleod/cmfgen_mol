@@ -202,6 +202,8 @@
 	USE PP_FORM_CMF_MOD_V2
 	IMPLICIT NONE
 !
+! Altered 08-Feb-2008 : Bug fix: NI_SMALL not set, and is no longer required as all rays have
+!                                    same number of points.
 ! Altered 17-Feb-2007 : Bug fix. NI was not in module block.
 !                          Two irrelevant lines left over from FG_CMF_V10 deleted.
 ! Created 01-Mar-2006 : Based on FG_J_CMF_V10
@@ -287,7 +289,6 @@
 	LOGICAL, PARAMETER :: LFALSE=.FALSE.
 	LOGICAL, PARAMETER :: LTRUE=.TRUE.
 !                
-	INTEGER NI_SMALL
 	INTEGER I,J,K,LS
 	INTEGER IDMIN,IDMAX
 !
@@ -583,8 +584,7 @@
 ! CV is defined on the nodes. Need to interpolate to the midpoint of R.
 !
 	    K=1
-	    NI_SMALL=NI_RAY-ND_ADD
-	    DO I=1,NI_SMALL-1
+	    DO I=1,ND-1
 	      DO WHILE(H_PNT(I) .EQ. 0)
 	        T1=0.5D0*(R(I)+R(I+1))
 	        IF(T1 .LE. R_RAY(K) .AND. T1 .GE. R_RAY(K+1))THEN

@@ -45,9 +45,6 @@
 	           WRITE(6,*)'Warning in cross-section: equal frequencis'
 	           WRITE(6,*)'      TYPE=',TYPE,'        NC=',NC
 	           WRITE(6,*)' LOW_FREQ=',OLD_FREQ,'HIGH_FREQ=',FREQ
-	           WRITE(20,*)'      TYPE=',TYPE,'        NC=',NC
-	           WRITE(20,*)OLD_FREQ,OLD_CROSS
-	           WRITE(20,*)FREQ,CROSS
 	        END IF
 	      END DO
 	    END IF

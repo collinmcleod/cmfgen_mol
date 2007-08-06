@@ -29,6 +29,7 @@
 ! R, V, and SIGMA in column format, with simple header.
 ! As output by NEWRG in DISPGEN
 !
+	LUIN=7
 	CALL GEN_ASCI_OPEN(LUIN,DENSITY_FILE,'OLD',' ','READ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'Error in RD_MOD_CLUMP: IOSTAT=',IOS

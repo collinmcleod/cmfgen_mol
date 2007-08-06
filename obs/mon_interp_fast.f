@@ -66,15 +66,31 @@ C Check that R and QZR vectors are monotonic.
 C
 	DO I=1,ND-2
 	  IF(H(I)*H(I+1) .LE. 0)THEN
+	    LUER=ERROR_LU()
 	    WRITE(LUER,*)'Error in MON_INTERP_FAST'
 	    WRITE(LUER,*)'R values must be monotonic'
+	    WRITE(LUER,*)'I value is',I
+	    H(ND)=0.0D0
+	    WRITE(LUER,*)'J, R, dR follows'
+	    DO J=1,ND
+	      WRITE(LUER,*)J,R(J),H(J)
+	    END DO
 	    STOP
 	  END IF
 	END DO
 	DO I=1,NX-2
 	  IF( (QZR(I+2)-QZR(I+1))*(QZR(I+1)-QZR(I)) .LE. 0)THEN
+	    LUER=ERROR_LU()
 	    WRITE(LUER,*)'Error in MON_INTERP_FAST'
 	    WRITE(LUER,*)'QZR values must be monotonic'
+	    WRITE(LUER,*)'I value is',I
+	    WRITE(LUER,*)'J, QZR, dQZR follows'
+	    DO J=1,NX-1
+	      WRITE(LUER,*)J,QZR(J),QZR(J+1)-QZR(J)
+	    END DO
+	    WRITE(LUER,*)NX,QZR(NX)
+	    WRITE(LUER,*)NV,ND
+	    WRITE(LUER,*)R(1),R(ND)
 	    STOP
 	  END IF
 	END DO

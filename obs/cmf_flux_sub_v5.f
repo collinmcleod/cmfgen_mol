@@ -2294,29 +2294,52 @@ C
 	    CHI_CMF_ST(:,ML)=CHI_CMF_ST(:,ML)*CLUMP_FAC(:)
 	  END DO
 	END IF
-C
-C
-C Ensure thsure that H is defined on the regular grid. 
-C By definition, p * dp equals R**2 * mu * dmu. Integration over mu is
-C more stable, and is to be preferred. 
-C
-	DO LS=1,NP
-	  MU_AT_RMAX(LS)=SQRT((R(1)-P(LS))*(R(1)+P(LS)))/R(1)
-	END DO
-	CALL HWEIGHT(MU_AT_RMAX,HQW_AT_RMAX,NP)
-C
-cC ***************************************************************************
-C ***************************************************************************
-C
-C Compute the observer's frame fluxes. The fluxes are returned in Janskies.
-C
-	CALL OBS_FRAME_SUB_V5(ETA_CMF_ST,CHI_CMF_ST,NU,
-	1            R,V,T,ED,ND,NCF,
-	1            P,HQW_AT_RMAX,NC,NP,
+!
+!
+! Ensure that MU and the quadrature weights are correctly defined.
+! By definition, p * dp equals R**2 * mu * dmu. Integration over mu is
+! more stable, and is to be preferred.
+!
+! For a plane-parallel model, we only have NC integration angles.
+!
+	IF(PLANE_PARALLEL_NO_V .OR. PLANE_PARALLEL)THEN
+	  HQW_AT_RMAX(:)=0.0D0
+	  CALL GAULEG(RZERO,RONE,MU_AT_RMAX,HQW_AT_RMAX,NC)
+	  HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*MU_AT_RMAX(1:NC)
+	  HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*R(ND)*R(ND)/R(1)/R(1)
+	  P(1:NC)=R(ND)*SQRT( (1.0D0-MU_AT_RMAX(1:NC))*(1.0D0+MU_AT_RMAX(1:NC)) )
+	  NP_OBS=NC
+	ELSE
+	  DO LS=1,NP
+	    MU_AT_RMAX(LS)=SQRT((R(1)-P(LS))*(R(1)+P(LS)))/R(1)
+	  END DO
+	  CALL HWEIGHT(MU_AT_RMAX,HQW_AT_RMAX,NP)
+	  NP_OBS=NP
+	END IF
+!
+! ***************************************************************************
+! ***************************************************************************
+!
+! Compute the observer's frame fluxes. The fluxes are returned in Janskies.
+! V6 of the observer's frame code can now handle a plane-parallel model atmosphere,
+! with, or without, a velocity field.
+!
+! We use TA for V in the call to OBS_FRAME_SUB_V6.
+!
+	TMP_LOG=.FALSE.
+	IF(PLANE_PARALLEL_NO_V .OR. PLANE_PARALLEL)TMP_LOG=.TRUE.
+	IF(PLANE_PARALLEL_NO_V)THEN
+	   TA(1:ND)=0.0D0
+	ELSE
+	   TA(1:ND)=V(1:ND)
+	END IF
+	CALL OBS_FRAME_SUB_V6(ETA_CMF_ST,CHI_CMF_ST,NU,
+	1            R,TA,T,ED,ND,NCF,
+	1            P,MU_AT_RMAX,HQW_AT_RMAX,NC,NP_OBS,
 	1            OBS_FREQ,OBS_FLUX,N_OBS,
 	1            MAX_DEL_V_RES_ZONE,OBS_TAU_MAX,OBS_ES_DTAU,
 	1            N_INS_OBS,OBS_INT_METHOD,
-	1            WRITE_IP,DO_REL_IN_OBSFRAME)
+	1            WRITE_IP,DO_REL_IN_OBSFRAME,TMP_LOG)
 !
 	CALL GEN_ASCI_OPEN(LU_FLUX,'OBSFRAME','UNKNOWN',' ',' ',IZERO,IOS)
 	  WRITE(STRING,'(I10)')N_OBS

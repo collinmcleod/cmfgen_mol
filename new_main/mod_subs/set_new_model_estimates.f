@@ -150,6 +150,18 @@
 !
 	  CALL REGRIDWSC(TA,R,ED,T,TB,TC,IONE,ND,'T_IN')
 !
+! SPEC_DEN will contain the density of each species, while
+! AT_NO_VEC will contain the the atomic number. These are set at all depths.
+!
+	  IF(VAR_MDOT)THEN
+	    I=0
+	    DO ISPEC=1,NUM_SPECIES
+	      CALL ELEC_PREP(SPEC_DEN,AT_NO_VEC,I,NUM_SPECIES,
+	1                POP_SPECIES(1,ISPEC),AT_NO(ISPEC),SPECIES_PRES(ISPEC),ND)
+	    END DO
+	    CALL GETELEC_V2(SPEC_DEN,AT_NO_VEC,I,ED,ND,LUIN,'GAMMAS_IN')
+	  END IF
+!
 ! 
 	ELSE
 	  WRITE(LUER,*)'Using NON-GRID option for new model.'

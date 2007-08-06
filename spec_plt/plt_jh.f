@@ -103,6 +103,8 @@
 	INTEGER REC_LENGTH
 	REAL*8 SCALE_FAC
 	REAL*8 TEMP
+	REAL*8 DTDR
+	REAL*8 RADIUS
 	REAL*8 T1,T2,T3
 	REAL*8 LAMC
 	REAL*8 T_ELEC
@@ -174,6 +176,7 @@
 !
 	KEV_TO_HZ=0.241838E+03
 	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07  	!10^8/10^15
+	RADIUS=1.0D0; DTDR=1.0D0; TEMP=5.0D0 	!Non zero defaults
 !
 !  Read in default model.
 !
@@ -506,6 +509,8 @@
 	      GOTO 1
 	    END IF
 	    IF(ID .EQ. 1 .AND. ND .EQ. ND_ATM)THEN
+	      CALL DERIVCHI(TB,T,R,ND,'LOGLOG')
+	      TEMP=T(I); DTDR=TB(I); RADIUS=R(I)
 	      WRITE(T_OUT,'(X,A,1P,E14.6)')'    R(I)/R*=',R(I)/R(ND)
 	      WRITE(T_OUT,'(X,A,1P,E14.6)')'       V(I)=',V(I)
 	      WRITE(T_OUT,'(X,A,1P,E14.6)')'       T(I)=',T(I)
@@ -714,6 +719,41 @@
          END DO
 	 CALL DP_CNVRT_J_V2(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         'J',LAMC,XAXIS,YAXIS,L_FALSE)
+	 CALL DP_CURVE(NCF,XV,YV)
+	
+	ELSE IF(X(1:4) .EQ. 'DBDR') THEN
+!
+! This option is designed to compute 1/3 . dB/dr. This can
+! be compared directly with chi.flux. They should be equal if
+! the diffusion approximation is valid.
+!
+! You should call JD option first.
+!
+	  WRITE(6,*)'Calculating diffusive flux: 1/3. dB/dr'
+	  WRITE(6,*)'Call JD option first to set R, T, DTDR'
+	  NCF=ZM(1)%NCF
+	  IF(ALLOCATED(XV))DEALLOCATE(XV)
+	  IF(ALLOCATED(YV))DEALLOCATE(YV)
+	  ALLOCATE (XV(NCF))
+	  ALLOCATE (YV(NCF))
+	  DEFAULT=WR_STRING(TEMP)
+          CALL USR_OPTION(TEMP,'TEMP',DEFAULT,'(Program units)')
+	  DEFAULT=WR_STRING(DTDR)
+          CALL USR_OPTION(DTDR,'DTDR',DEFAULT,'(Program units)')
+	  DEFAULT=WR_STRING(RADIUS)
+          CALL USR_OPTION(RADIUS,'RADIUS',DEFAULT,'(Program units)')
+          DO I=1,ZM(1)%NCF
+            T3=HDKT*ZM(1)%NU(I)/TEMP
+	    YV(I)=RADIUS*RADIUS*ABS(DTDR)*TWOHCSQ*T3*(ZM(1)%NU(I)**3)/TEMP/3.0D0
+            IF(T3 .GT. 1.0D0)THEN
+              YV(I)=YV(I)*DEXP(-T3)/(1.0D0-DEXP(-T3))/(1.0D0-DEXP(-T3))
+            ELSE
+              YV(I)=YV(I)*DEXP(T3)/(DEXP(T3)-1.0D0)/(DEXP(T3)-1.0D0)
+            END IF
+            XV(I)=ZM(1)%NU(I)
+         END DO
+	 CALL DP_CNVRT_J_V2(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	1         'H',LAMC,XAXIS,YAXIS,L_FALSE)
 	 CALL DP_CURVE(NCF,XV,YV)
 !
 ! 
