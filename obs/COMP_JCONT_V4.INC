@@ -283,7 +283,20 @@ C
 C NB Using TA for ETA, TC for JNU_VEC, and TB for HNU_VEC
 C
 	     CALL TUNE(IONE,'FG_J_CMF_ACC')
-	     CALL FG_J_CMF_V10(TA,CHIEXT,CHI_SCAT_EXT,
+	     IF(PLANE_PARALLEL_NO_V)THEN
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling FCOMP_PP'
+	       SOURCE(1:ND)=TA(1:NDEXT)/CHIEXT(1:NDEXT)
+	       CALL FCOMP_PP_V2(R,TC,FEDD,SOURCE,CHIEXT,IPLUS,HBC_CMF,
+	1               NBC_CMF,INBC,DBB,IC,THK_CONT,DIF,NDEXT,NC,METHOD)
+	     ELSE IF(PLANE_PARALLEL)THEN
+	       CALL PP_FORM_CMF_V2(TA,CHIEXT,CHI_SCAT_EXT,VEXT,SIGMAEXT,REXT,
+	1               TC,TB,FEDD,GEDD,N_ON_J,INBC,
+	1               HBC_CMF(1),HBC_CMF(2),NBC_CMF(1),NBC_CMF(2),
+	1               IPLUS,FL,dLOG_NU,DIF,DBB,IC,VDOP_VEC_EXT,DELV_FRAC_FG,
+	1               METHOD,FG_SOL_OPTIONS,THK_CONT,L_FALSE,
+	1               FIRST_FREQ,NEW_FREQ,N_TYPE,NC,NDEXT)
+	     ELSE
+	       CALL FG_J_CMF_V10(TA,CHIEXT,CHI_SCAT_EXT,
 	1            VEXT,SIGMAEXT,REXT,PEXT,
 	1            TC,TB,FEDD,GEDD,N_ON_J,
 	1            AQWEXT,HMIDQWEXT,KQWEXT,NMIDQWEXT,
@@ -293,6 +306,7 @@ C
 	1            METHOD,FG_SOL_OPTIONS,THK_CONT,
 	1            FIRST_FREQ,NEW_FREQ,N_TYPE,
 	1            NCEXT,NPEXT,NDEXT)
+	     END IF
 	     CALL TUNE(ITWO,'FG_J_CMF_ACC')
 	     CALL UNGRID(RSQHNU,ND,TB,NDEXT,POS_IN_NEW_GRID)
 	     FG_COUNT=FG_COUNT+1
@@ -309,7 +323,21 @@ C
 	       TB(1:NDEXT)=CHI_RAY_EXT(1:NDEXT)
 	     END IF
 	     CALL TUNE(IONE,'MOM_J_CMF_ACC')
-	     CALL MOM_J_CMF_V6(TA,CHIEXT,TB,
+             IF(PLANE_PARALLEL_NO_V)THEN
+	       CALL MOM_J_PP_V1(TA,CHIEXT,CHI_SCAT_EXT,
+	1                  R,FEDD,RJEXT,RSQHNU,HBC_CMF,NBC_CMF,INBC,
+	1                  FL,DIF,DBB,IC,METHOD,L_TRUE,
+	1                  IZERO,FIRST_FREQ,NEW_FREQ,NDEXT)
+             ELSE IF(PLANE_PARALLEL)THEN
+               CALL PP_MOM_CMF_V1(TA,CHIEXT,TB,VEXT,SIGMAEXT,REXT,
+	1                  FEDD,GEDD,N_ON_J,RJEXT,RSQHNU,
+	1                  VDOP_VEC_EXT,DELV_FRAC_MOM,
+	1                  INBC,HBC_CMF(1),HBC_CMF(2),NBC_CMF(1),NBC_CMF(2),
+	1                  FL,dLOG_NU,DIF,DBB,IC,
+	1                  N_TYPE,METHOD,L_TRUE,
+	1                  FIRST_FREQ,NEW_FREQ,NDEXT)
+	     ELSE
+	       CALL MOM_J_CMF_V6(TA,CHIEXT,TB,
 	1              VEXT,SIGMAEXT,REXT,
 	1  	       FEDD,GEDD,N_ON_J,RJEXT,RSQHNU,
 	1              VDOP_VEC_EXT,DELV_FRAC_MOM,
@@ -318,6 +346,7 @@ C
 	1              N_TYPE,METHOD,L_TRUE,
 	1              FIRST_FREQ,NEW_FREQ,
 	1              NCEXT,NPEXT,NDEXT)
+	     END IF
 	     CALL TUNE(ITWO,'MOM_J_CMF_ACC')
 C
 C We set NEW_FREQ to false so that FG_J_CMF continues to use the same
@@ -410,7 +439,23 @@ C Set up for the compuation of the observes flux. LST_ITERATION is
 C TRUE if FLUX_CAL_ONLY is true (single iteration with coherent,
 C last iteration if non-coherent).
 C
-	    IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
+	   IF(PLANE_PARALLEL .OR. PLANE_PARALLEL_NO_V)THEN
+!
+! So as defined for normal OBSFLUX calculation. HQW_AT_RMAX is initially set
+! to JQW. Thus we need to multiply by MU to get the actual H weights at the
+! outer boundary. For a plane-parallel atmosphere, RMAX_OBS is only scaling
+! constant. Setting its value to ND means that the observed luminosity should
+! correspond to the luminosity in VADAT (in absence of significant velocity
+! effects).
+!
+	     IF(FIRST_FREQ)THEN
+	        NP_OBS=NC
+	        CALL GAULEG(RZERO,RONE,MU_AT_RMAX,HQW_AT_RMAX,NC)
+	        HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*MU_AT_RMAX(1:NC)
+	        RMAX_OBS=R(ND)
+	        V_AT_RMAX=V(1)
+	      END IF
+	    ELSE IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
 	1         MAXCH .LT. VAL_DO_NG) )THEN
 C
 C Quick and dirty method to ge an extended DENSITY vector. Will use TB in
@@ -544,6 +589,7 @@ C
 	       CALL FCOMP_PP_V2(R,TC,FEDD,SOURCE,CHI_CLUMP,IPLUS,HBC_CMF,
 	1               NBC_CMF,INBC,DBB,IC,THK_CONT,DIF,ND,NC,METHOD)
 	     ELSE IF(PLANE_PARALLEL)THEN
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling PP_FORM_CMF_V2'
 	       CALL PP_FORM_CMF_V2(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
 	1               TC,TB,FEDD,GEDD,N_ON_J,INBC,
 	1               HBC_CMF(1),HBC_CMF(2),NBC_CMF(1),NBC_CMF(2),
@@ -551,6 +597,7 @@ C
 	1               METHOD,FG_SOL_OPTIONS,THK_CONT,L_FALSE,
 	1               FIRST_FREQ,NEW_FREQ,N_TYPE,NC,ND)
 	     ELSE 
+	        IF(FIRST_FREQ)WRITE(LUER,*)'Calling FG_J_CMF_V10'
 	        CALL FG_J_CMF_V10(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
 	1                  TC,TB,FEDD,GEDD,N_ON_J,
 	1                  AQW,HMIDQW,KQW,NMIDQW,
@@ -577,19 +624,22 @@ C
 	     END IF
 	     CALL TUNE(IONE,'MOM_J_CMF')
              IF(PLANE_PARALLEL_NO_V)THEN
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_PP_V1'
 	       CALL MOM_J_PP_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
 	1                  R,FEDD,RJ,RSQHNU,HBC_CMF,NBC_CMF,INBC,
-	1                  FL,DIF,DBB,IC,METHOD,COHERENT_ES,
+	1                  FL,DIF,DBB,IC,METHOD,L_TRUE,
 	1                  IZERO,FIRST_FREQ,NEW_FREQ,ND)
              ELSE IF(PLANE_PARALLEL)THEN
-	       CALL PP_MOM_CMF_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling PP_MOM_CMF_V1'
+	       CALL PP_MOM_CMF_V1(TA,CHI_CLUMP,TB,V,SIGMA,R,
 	1                  FEDD,GEDD,N_ON_J,RJ,RSQHNU,
 	1                  VDOP_VEC,DELV_FRAC_MOM,
 	1                  INBC,HBC_CMF(1),HBC_CMF(2),NBC_CMF(1),NBC_CMF(2),
 	1                  FL,dLOG_NU,DIF,DBB,IC,
-	1                  N_TYPE,METHOD,COHERENT_ES,
+	1                  N_TYPE,METHOD,L_TRUE,
 	1                  FIRST_FREQ,NEW_FREQ,ND)
 	     ELSE
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_CMF_V6'
 	       CALL MOM_J_CMF_V6(TA,CHI_CLUMP,TB,V,SIGMA,R,
 	1  	       FEDD,GEDD,N_ON_J,RJ,RSQHNU,
 	1              VDOP_VEC,DELV_FRAC_MOM,

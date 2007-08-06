@@ -33,13 +33,21 @@
 	      DO I=2,NC
 	        OLD_FREQ=FREQ; OLD_CROSS=CROSS
 	        READ(10,*)FREQ,CROSS
-	        IF(FREQ .LE. OLD_FREQ)THEN
+	        IF(FREQ .LT. OLD_FREQ)THEN
 	           WRITE(6,*)'Error in cross-section: frequency grid is non-monotonic'
 	           WRITE(6,*)'      TYPE=',TYPE
 	           WRITE(6,*)'        NC=',NC
 	           WRITE(6,*)' LOW_FREQ=',OLD_FREQ
 	           WRITE(6,*)'HIGH_FREQ=',FREQ
 	           STOP
+	        END IF
+	        IF(FREQ .EQ. OLD_FREQ)THEN
+	           WRITE(6,*)'Warning in cross-section: equal frequencis'
+	           WRITE(6,*)'      TYPE=',TYPE,'        NC=',NC
+	           WRITE(6,*)' LOW_FREQ=',OLD_FREQ,'HIGH_FREQ=',FREQ
+	           WRITE(20,*)'      TYPE=',TYPE,'        NC=',NC
+	           WRITE(20,*)OLD_FREQ,OLD_CROSS
+	           WRITE(20,*)FREQ,CROSS
 	        END IF
 	      END DO
 	    END IF

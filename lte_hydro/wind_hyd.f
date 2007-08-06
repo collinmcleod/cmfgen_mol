@@ -12,6 +12,7 @@
 	  REAL*8 GRAV_CON
 	  REAL*8 REFERENCE_RADIUS
 	  REAL*8 PREV_REF_RADIUS
+	  REAL*8 RADIUS_AT_TAU_23
 !
 ! The following quantities are used when integrating the hydrostatic equation.
 ! KAP is used to refer to mass absorption opacities.
@@ -56,6 +57,7 @@
 	  LOGICAL PURE_LTE_EST
 	  LOGICAL OLD_MODEL
 	  LOGICAL WIND_PRESENT 
+	  LOGICAL RESET_REF_RADIUS
 !
 	END MODULE HYDRO_PARAM_MODULE 	
 !
@@ -68,6 +70,8 @@
 	USE GEN_IN_INTERFACE
 	USE HYDRO_PARAM_MODULE
 	IMPLICIT NONE
+!
+! Altered Mar2007: Minor bug fixes.
 !
 	INTEGER NP,NC
 !
@@ -132,7 +136,7 @@
 	INTEGER I,J,IOS,SCRATREC
 	INTEGER FILE_OPT
 	INTEGER LEN_DIR
-	REAL*8 T1,T2
+	REAL*8 T1,T2,T3
 	REAL*8 NI_ZERO
 	REAL*8 OLD_TAU_MAX
 	REAL*8 SCL_HT
@@ -221,10 +225,12 @@
 	CALL RD_STORE_DBLE(VINF,'VINF',L_TEMP,'Terminal velocity of wind in km/s')
 	CALL RD_STORE_DBLE(BETA,'BETA',L_TEMP,'Beta exponent for velocity law')
 	CALL RD_STORE_DBLE(CONNECTION_RADIUS,'CON_R',WIND_PRESENT,'Connection radius (10^10cm)')
-	CALL RD_STORE_DBLE(REFERENCE_RADIUS,'REF_R',L_TRUE,'Connection radius (10^10cm)')
+	CALL RD_STORE_DBLE(REFERENCE_RADIUS,'REF_R',L_TRUE,'Reference radius (10^10cm)')
 	CALL RD_STORE_DBLE(RMAX,'MAX_R',L_TEMP,'Maximum radius in terms of Connection radius')
 	RMAX=RMAX*CONNECTION_RADIUS
 	CALL RD_STORE_DBLE(CONNECTION_VEL,'CON_V',WIND_PRESENT,'Connection velocity (km/s)')
+	RESET_REF_RADIUS=.TRUE.
+	CALL RD_STORE_LOG(RESET_REF_RADIUS,'RES_REF',USE_OLD_VEL,'Reset reference radius if using old velocity law')
         CALL CLEAN_RD_STORE()
 C
         CLOSE(UNIT=LUIN)
@@ -332,6 +338,15 @@ C
 	  WRITE(15,'(A,ES14.4)')' Old TEFF is',OLD_TEFF
 	  WRITE(15,'(A,ES14.4)')' Optical depth at inner boundary (om):',OLD_TAU(OLD_ND)
 	  WRITE(15,*)' '
+!
+	  IF(USE_OLD_VEL)THEN
+	    WRITE(6,*)'            MU_ATOM from input file is',MU_ATOM
+	    MU_ATOM=OLD_MASS_DENSITY(OLD_ND)/OLD_POP_ATOM(OLD_ND)/AMU
+	    WRITE(6,*)'Adjusted MU_ATOM based on RVTJ file is',MU_ATOM
+	    WRITE(6,*)'            Mass loss from input file is',MDOT/MASS_LOSS_SCALE_FACTOR
+	    MDOT=MU_ATOM*OLD_V(OLD_ND)*OLD_POP_ATOM(OLD_ND)*OLD_R(OLD_ND)*OLD_R(OLD_ND)
+	    WRITE(6,*)'Adjusted mass loss based on RVTJ file is',MDOT/MASS_LOSS_SCALE_FACTOR
+	  END IF
 !
 	END IF			!Old model is present
 !
@@ -622,12 +637,13 @@ C
 	ELSE
 	  OPEN(UNIT=18,FILE='NEW_CALC_GRID',STATUS='UNKNOWN',ACTION='WRITE')
 	END IF
-	WRITE(18,'(A,8(7X,A))')' Index','     R','   Tau','    Na',' Ne/Na','     T',
+	WRITE(18,'(A,8(7X,A))')' Index','     R','  Vel','   Tau','    Na',' Ne/Na','     T',
 	1                  ' Kross','Kr/Kes',' Gamma'
 	DO I=1,ND
 	   T1=1.0D+10*POP_ATOM(I)*AMU*MU_ATOM
 	   T2=SIGMA_TH*POP_ATOM(I)*ED_ON_NA(I)
-	   WRITE(18,'(I6,8ES13.4)')I,R(I),TAU(I),POP_ATOM(I),ED_ON_NA(I),
+	   T3=MDOT/MU_ATOM/POP_ATOM(I)/R(I)/R(I)
+	   WRITE(18,'(I6,9ES13.4)')I,R(I),T3,TAU(I),POP_ATOM(I),ED_ON_NA(I),
 	1              T(I),CHI_ROSS(I)/T1,CHI_ROSS(I)/T2,GAMMA_FULL(I)
 	END DO
 !
@@ -639,6 +655,7 @@ C
 	  T2=(LOG(T1)-LOG(TAU(I)))/(LOG(TAU(I+1))-LOG(TAU(I)))
 	  T2=(1.0D0-T1)*R(I)+T1*R(I+1)
 	  T1=T2-REFERENCE_RADIUS
+	  RADIUS_AT_TAU_23=T2
 	  IF(WIND_PRESENT .AND. USE_OLD_VEL)THEN
 	    PREV_REF_RADIUS=REFERENCE_RADIUS
 	  ELSE IF(WIND_PRESENT)THEN
@@ -659,6 +676,10 @@ C
 	  END IF
 
 	END DO
+!
+	IF(WIND_PRESENT .AND. USE_OLD_VEL .AND. RESET_REF_RADIUS)THEN
+	  REFERENCE_RADIUS=RADIUS_AT_TAU_23
+	END IF
 !
 	CLOSE(UNIT=18)
 	CLOSE(UNIT=19)
@@ -697,10 +718,6 @@ C
 	  TAU_MAX=TAU(ND)
 	END IF 
 !
-	IF(USE_OLD_VEL)THEN
-	  T1=OLD_MASS_DENSITY(OLD_ND)/OLD_POP_ATOM(OLD_ND)/AMU
-	  MDOT=OLD_V(OLD_ND)*OLD_POP_ATOM(OLD_ND)*OLD_R(OLD_ND)*OLD_R(OLD_ND)
-	END IF
 	DO I=1,ND
 	  V(I)=MDOT/MU_ATOM/POP_ATOM(I)/R(I)/R(I)
 	END DO
@@ -715,17 +732,23 @@ C
 	ELSE
 	  CALL DET_R_GRID_V1(REV_TAU,NEW_ND,ND_MAX,TAU_MAX,L_TRUE,R,V,TAU,ND)
 	END IF
+!	DO I=1,ND
+!	  WRITE(191,'(I5,3ES16.6)')I,R(I),V(I),POP_ATOM(I)
+!	END DO
+!
+! We now compute the revised R grid. We then interplate on Log (r^2.rho) which 
+! is equivalent to interpolating on log V. This guarentees monotocity of V.
 !
 	WRITE(T_OUT,*)'Calling mon_interp'
 	TAU(1:ND)=LOG(TAU(1:ND))
 	REV_TAU(1:NEW_ND)=LOG(REV_TAU(1:NEW_ND))
 	CALL MON_INTERP(REV_R,NEW_ND,IONE,REV_TAU,NEW_ND,R,ND,TAU,ND)
-	POP_ATOM(1:ND)=LOG(POP_ATOM(1:ND))
+	POP_ATOM(1:ND)=LOG(POP_ATOM(1:ND)*R(1:ND)*R(1:ND))
 	CALL MON_INTERP(REV_POP_ATOM,NEW_ND,IONE,REV_R,NEW_ND,POP_ATOM,ND,R,ND)
-	REV_POP_ATOM(1:NEW_ND)=EXP(REV_POP_ATOM(1:NEW_ND))
-	WRITE(6,*)POP_ATOM(1:ND)
-	POP_ATOM(1:ND)=EXP(POP_ATOM(1:ND))
-	WRITE(6,*)'Done EXP)'
+	REV_POP_ATOM(1:NEW_ND)=EXP(REV_POP_ATOM(1:NEW_ND))/REV_R(1:ND)/REV_R(1:ND)
+!	WRITE(6,*)POP_ATOM(1:ND)
+	POP_ATOM(1:ND)=EXP(POP_ATOM(1:ND))/R(1:ND)/R(1:ND)
+	WRITE(6,*)'Done final inteprolation of atom density'
 !
 ! Compute revised velocity.
 !

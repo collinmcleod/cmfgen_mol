@@ -616,9 +616,10 @@
 ! we need to make a correction.
 !
 	  IF(EXC_EN .NE. 0.0D0)THEN
+	    WRITE(6,'(5(5X,A))')'        T','     GION','PHOT_GION','   EXC_EN','       T1'
 	    DO I=1,N_TEMP
 	      T1=PHOT_GION*EXP(-HDKT*EXC_EN/TEMP(I))/GION
-	      WRITE(6,*)GION,PHOT_GION,EXC_EN,T1
+	      WRITE(6,'(5ES14.4)')TEMP(I),GION,PHOT_GION,EXC_EN,T1
 	      RECOM(:,I)=RECOM(:,I)*T1
 	    END DO
 	  END IF

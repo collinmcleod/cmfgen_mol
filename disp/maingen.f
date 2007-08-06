@@ -784,6 +784,7 @@
 ! **************************************************************************
 !
 	IF( XOPT .EQ. 'OP'
+	1          .OR. XOPT .EQ. 'ETA'
 	1          .OR. XOPT .EQ. 'XTAUC'
 	1          .OR. XOPT .EQ. 'TAUC'
 	1          .OR. XOPT .EQ. 'NEWRG'
@@ -838,6 +839,7 @@
 	1          .OR. XOPT .EQ. 'SRCE'
 	1          .OR. XOPT .EQ. 'EP'
 	1          .OR. XOPT .EQ. 'BETA'
+	1          .OR. XOPT .EQ. 'ETA'
 	1          .OR. XOPT .EQ. 'OP'
 	1          .OR. XOPT .EQ. 'TAUC'
 	1          .OR. XOPT .EQ. 'DTAUC'
@@ -1975,6 +1977,34 @@
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log(N\di\u)'
+	ELSE IF(XOPT .EQ. 'YSPEC')THEN
+	  FOUND=.FALSE.
+	  ELEC=.FALSE.
+	  CALL USR_HIDDEN(ELEC,'FRAC','F','Fractional abundance')
+	  IF(ELEC)THEN
+	    DO ISPEC=1,NSPEC
+	      IF(XSPEC .EQ. SPECIES(ISPEC))THEN
+	        YV(1:ND)=LOG10(POPDUM(1:ND,ISPEC)/POP_ATOM(1:ND)+1.0D-100)
+	        FOUND=.TRUE.
+	        EXIT
+	      END IF
+	    END DO
+	  ELSE
+	    DO ISPEC=1,NSPEC
+	      IF(XSPEC .EQ. SPECIES(ISPEC))THEN
+	        YV(1:ND)=LOG10(POPDUM(1:ND,ISPEC)+1.0D-100)
+	        FOUND=.TRUE.
+	        EXIT
+	      END IF
+	    END DO
+	  END IF
+	  IF(.NOT. FOUND)THEN
+	    WRITE(T_OUT,*)'Error --- unrecognized species'
+	  ELSE
+	    YAXIS='Fractional abundance'
+	    CALL DP_CURVE(ND,XV,YV)
+	  END IF
+	
 !
 	ELSE IF(XOPT .EQ. 'YION')THEN
 	  DO I=1,ND
@@ -2122,6 +2152,8 @@
 !
 	  IF(XOPT .EQ. 'POW')THEN
 	    CALL USR_OPTION(DO_TAU,'TAU','T','Plot versus TAU or Line strength')
+	  ELSE IF(XOPT .EQ. 'DIST')THEN
+	    CALL USR_OPTION(DO_TAU,'SRCE','F','Plot source function instead of tau')
 	  END IF
 	  CALL USR_HIDDEN(WEIGHT_NV,'WGT','T','Weight Tau by [1.0D0-E(-Tau)]?')
 	  CALL USR_HIDDEN(MEAN_TAU,'MEAN','F','Use MEAN instead of radial Tau?')
@@ -2213,6 +2245,7 @@
 	1            T1*ATM(ID)%XzV_F(MNL_F,I)-
 	1            ATM(ID)%GXzV_F(MNL_F)*ATM(ID)%XzV_F(MNUP_F,I)/
 	1            ATM(ID)%GXzV_F(MNUP_F) )
+	          ETAL(I)=EMLIN*FL*ATM(ID)%AXzV_F(MNUP_F,MNL_F)*ATM(ID)%XzV_F(MNUP_F,I)
 	          DONE_LINE=.TRUE.
 	        END IF
 	      END DO
@@ -2250,14 +2283,34 @@
 	        END IF
 !
 	        CNT=CNT+1
-	        IF(XOPT .EQ. 'DIST')THEN
+	        IF(XOPT .EQ. 'DIST' .AND. DO_TAU)THEN
+	          ZV(2*CNT-1)=0.2998E+04/FL		!Angstroms
+	          ZV(2*CNT)=0.2998E+04/FL
+	          YV(2*CNT-1)=-30.0D0
+	          T1=ETAL(DPTH_INDX)/CHIL(DPTH_INDX)
+	          IF(T1 .GT. 1.0D-30)THEN
+	            YV(2*CNT)=DLOG10(T1)
+	          ELSE IF(T1 .GE. 0.0D0)THEN
+	            YV(2*CNT)=-30.0D0
+	          ELSE IF(T1 .GT. -1.0D-30)THEN
+	            YV(2*CNT)=-30.0D0
+	          ELSE
+	            YV(2*CNT)=-60.0D0-DLOG10(-T1)
+	          END IF
+	          TAU_SOB=1.0D-15*CHIL(DPTH_INDX)/(FL/2.998D+04)/(6.65D-15*ED(DPTH_INDX))
+	          WRITE(66,'(6ES14.4)')FL,0.29979D+04/FL,TAU_SOB,T1,YV(2*CNT-1),YV(2*CNT)
+	        ELSE IF(XOPT .EQ. 'DIST')THEN
 	          ZV(2*CNT-1)=0.2998E+04/FL		!Angstroms
 	          ZV(2*CNT)=0.2998E+04/FL
 	          YV(2*CNT-1)=-10.0D0
-	          IF(TAU_SOB .GT. 0)THEN
+	          IF(TAU_SOB .GT. 1.0D-10)THEN
 	            YV(2*CNT)=DLOG10(TAU_SOB)
+	          ELSE IF(TAU_SOB .GE. 0.0D0)THEN
+	            YV(2*CNT)=-10.0D0
+	          ELSE IF(TAU_SOB .GT. -1.0D-10)THEN
+	            YV(2*CNT)=-10.0D0
 	          ELSE
-	            YV(2*CNT)=-20.0D0
+	            YV(2*CNT)=-10.0D0-DLOG10(-1.0D0+10*TAU_SOB)
 	          END IF
 	        ELSE IF(XOPT .EQ. 'NV')THEN
 	          IF(TAU_SOB .GT. TAU_MIN)THEN
@@ -3961,6 +4014,13 @@ c
 	  CALL DP_CURVE(K,WV,YV)
 	  XAXIS='\gl(\V)'
 	  YAXIS='\gs/gs_dT\u'
+!
+	ELSE IF(XOPT .EQ. 'ETA')THEN
+	  DO I=1,ND
+	    YV(I)=DLOG10(ETA(I)+1.0D-250)
+	  END DO
+	  CALL DP_CURVE(ND,XV,YV)
+	  YAXIS='Log(\ge)'
 !
 	ELSE IF(XOPT .EQ.'OP' .OR.
 	1       XOPT .EQ. 'TAUC' .OR.
