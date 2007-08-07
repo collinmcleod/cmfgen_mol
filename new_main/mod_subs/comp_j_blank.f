@@ -41,6 +41,10 @@
 !                            iteration used. FG_COUNt was not being initialized.
 ! Finalized: 17-Dec-2004
 !
+	REAL*8 C_KMS
+	REAL*8 SPEED_OF_LIGHT
+	EXTERNAL SPEED_OF_LIGHT
+!
 	REAL*8 FL
 	REAL*8 MAXCH
 !
@@ -97,6 +101,13 @@
 	  ELSE
 	    THK_CONT=.FALSE.
 	  END IF
+	  C_KMS=SPEED_OF_LIGHT(I)
+!
+! Option only avaialble for non-reativistic soultion, and no additinal
+! points inserted.
+!
+	  OUT_BC_TYPE=1
+	  IF(FL .LE. OUT_BC_PARAM_ONE)OUT_BC_TYPE=RD_OUT_BC_TYPE
 !
        	IF(SECTION .EQ. 'CONTINUUM')THEN
 	  CONT_VEL=.TRUE.
@@ -578,8 +589,27 @@ C
 	1               IPLUS,FL,dLOG_NU,DIF,DBB,IC,VDOP_VEC,DELV_FRAC_FG,
 	1               METHOD,FG_SOL_OPTIONS,THK_CONT,INCL_INCID_RAD,
 	1               FIRST_FREQ,NEW_FREQ,N_TYPE,NC,ND)
+	     ELSE IF(USE_J_REL)THEN
+!
+! This routine needs to be replaced by routine allowing for all terms.
+!
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling FG_J_CMF_V10 in USE_J_REL'
+	       CALL FG_J_CMF_V10(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
+	1                  TC,TB,FEDD,GEDD,N_ON_J,
+	1                  AQW,HMIDQW,KQW,NMIDQW,
+	1                  INBC,HBC_CMF,NBC_CMF,
+	1                  IPLUS,FL,dLOG_NU,DIF,DBB,IC,
+	1                  VDOP_VEC,DELV_FRAC_FG,
+	1                  METHOD,FG_SOL_OPTIONS,THK_CONT,
+	1                  FIRST_FREQ,NEW_FREQ,N_TYPE,NC,NP,ND)
+!
+	        CALL COMPUTE_ADD_EDD_FACTS(
+	1              H_ON_J,N_ON_J_NODE,KMID_ON_J,
+	1              TC,TB,FEDD,GEDD,N_ON_J,HBC_CMF,NBC_CMF,INBC,
+	1              IC,DBB,DIF,R,V,CHI_CLUMP,ND)
+!
 	     ELSE
-	        IF(FIRST_FREQ)WRITE(LUER,*)'Calling FG_J_CMF_V10'
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling FG_J_CMF_V10'
 	        CALL FG_J_CMF_V10(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
 	1                  TC,TB,FEDD,GEDD,N_ON_J,
 	1                  AQW,HMIDQW,KQW,NMIDQW,
@@ -611,13 +641,28 @@ C
 	1                  FL,dLOG_NU,DIF,DBB,IC,
 	1                  N_TYPE,METHOD,COHERENT_ES,
 	1                  FIRST_FREQ,NEW_FREQ,ND)
+	     ELSE IF(USE_DJDT_RTE)THEN
+	       CALL MOM_J_DDT_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
+	1              V,R,FEDD,RJ,RSQHNU,DJDt_TERM,
+	1              VDOP_VEC,DELV_FRAC_MOM,
+	1              HBC_CMF,INBC,
+	1              FL,dLOG_NU,DIF,DBB,IC,
+	1              METHOD,COHERENT_ES,FIRST_FREQ,NEW_FREQ,
+	1              INCL_DJDT_TERMS,DJDT_RELAX_PARAM,NC,NP,ND,NCF)
+	     ELSE IF(USE_J_REL)THEN
+	       CALL MOM_JREL_V3(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
+	1             RJ,RSQHNU,dlnJdlnR,
+	1             FEDD,GEDD,H_ON_J,N_ON_J_NODE,N_ON_J,KMID_ON_J,
+	1             HBC_CMF,INBC,NBC_CMF,FL,dLOG_NU,
+	1             DIF,DBB,IC,METHOD,COHERENT_ES,
+	1             INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,FIRST_FREQ,ND)
 	     ELSE
-	       CALL MOM_J_CMF_V6(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
+	       CALL MOM_J_CMF_V7(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
 	1  	       FEDD,GEDD,N_ON_J,RJ,RSQHNU,
 	1              VDOP_VEC,DELV_FRAC_MOM,
 	1              HBC_CMF,INBC,NBC_CMF,
 	1              FL,dLOG_NU,DIF,DBB,IC,
-	1              N_TYPE,METHOD,COHERENT_ES,
+	1              N_TYPE,METHOD,COHERENT_ES,OUT_BC_TYPE,
 	1              FIRST_FREQ,NEW_FREQ,NC,NP,ND)
 	     END IF
 	     CALL TUNE(ITWO,'MOM_J_CMF')

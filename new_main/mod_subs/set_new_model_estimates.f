@@ -137,18 +137,20 @@
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      TMP_STRING=TRIM(ION_ID(ID))//'_IN'
-	      CALL REGRIDWSC_V2( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,
+	      ISPEC=SPECIES_LNK(ID)
+	      CALL REGRIDWSC_V3( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,
 	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
-	1             ATM(ID)%NXzV_F,ND,TMP_STRING)
+	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,TMP_STRING)
 	    END IF
 	  END DO
 !
 ! Regrid the temperature and the electron density. By using this call the
 ! last species can be taken from a different model to the H, He populations 
 ! etc. Normally T_IN can be the same as He2_IN (i.e. any input departure
-! coefficient file). TA, TB, and TC are used as dummy vectors.
+! coefficient file). 
 !
-	  CALL REGRIDWSC(TA,R,ED,T,TB,TC,IONE,ND,'T_IN')
+	  CALL REGRID_T_ED(R,ED,T,POP_ATOM,ND,'T_IN')
+!
 !
 ! SPEC_DEN will contain the density of each species, while
 ! AT_NO_VEC will contain the the atomic number. These are set at all depths.
@@ -172,27 +174,43 @@
 	     WRITE(LUER,*)'DO_POP_SCALE adjusted as non-GRID option.'
 	  END IF
 !
+	  IF(SN_HYDRO_MODEL)THEN
+!
+! We do nothing as T and ED were set by SET_ABUND_CLUMP.
+!
+	  ELSE
+!
 ! SPEC_DEN will contain the density of each species, while
 ! AT_NO_VEC will contain the the atomic number. These are set at all depths.
 !
-	  I=0
-	  DO ISPEC=1,NUM_SPECIES
-	    CALL ELEC_PREP(SPEC_DEN,AT_NO_VEC,I,NUM_SPECIES,
+	    I=0
+	    DO ISPEC=1,NUM_SPECIES
+	      CALL ELEC_PREP(SPEC_DEN,AT_NO_VEC,I,NUM_SPECIES,
 	1                POP_SPECIES(1,ISPEC),AT_NO(ISPEC),SPECIES_PRES(ISPEC),ND)
-	  END DO
-	  CALL GETELEC_V2(SPEC_DEN,AT_NO_VEC,I,ED,ND,LUIN,'GAMMAS_IN')
+	    END DO
+	    CALL GETELEC_V2(SPEC_DEN,AT_NO_VEC,I,ED,ND,LUIN,'GAMMAS_IN')
 !                         
 ! The INIT_TEMP routine assumes that the T can interpolated using 
 ! a Spherical TAU scale computed using the electron scattering opacity.
 !
-	  CALL INIT_TEMP_V2(R,ED,CLUMP_FAC,T,LUM,T_INIT_TAU,ND,LUIN,'T_IN')
+	    CALL INIT_TEMP_V2(R,ED,CLUMP_FAC,T,LUM,T_INIT_TAU,ND,LUIN,'T_IN')
+	  END IF
 !
 ! If clumping is present we interpret on the departure coefficients using the
 ! electron density as the independent variable. At present we correct the
 ! electron density for clumping (i.e. ED(I)*CLUMP_FAC(I)), which we store in TC.
 ! It may be better to regrid on the actual electron densities.
 !
-	  IF(INTERP_DC_SPH_TAU)THEN
+	  IF(SET_LTE_AS_INIT_ESTIMATES)THEN
+	    T1=0.2D0
+	    CALL DET_LTE_ED(T1,ND,DO_LEV_DISSOLUTION)
+	    DO ID=1,NUM_IONS-1
+	      IF(ATM(ID)%XzV_PRES)THEN
+	        CALL SET_DC_LTE(ATM(ID)%XzV_F,ATM(ID)%DXzV_F,ATM(ID)%EDGEXzV_F,ATM(ID)%NXzV_F,T,T1,ND)
+	        ATM(ID)%DXzV_F=1.0D-200
+	      END IF
+	    END DO
+	  ELSE IF(INTERP_DC_SPH_TAU)THEN
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
@@ -465,6 +483,7 @@
 ! ROSSMEAN already includes the effect of clumping.
 !
 	    CHI(1:ND)=ROSSMEAN(1:ND)
+	    WRITE(6,*)'Callng COMP_GREY in SET_NEW'
 	    CALL COMP_GREY(TGREY,TA,ROSSMEAN,LUER,NC,ND,NP)
 !
 ! SCALE_GREY modifies the computed grey temperature distribution according

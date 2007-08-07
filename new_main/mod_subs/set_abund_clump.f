@@ -87,6 +87,13 @@
 	    CLUMP_FAC(K)=1.0D0
 	  END DO
 	END IF
+!
+	IF(SN_HYDRO_MODEL)THEN
+	  CALL RD_SN_DATA(ND,NEWMOD,7)
+	  ABUND_SUM=1.0D0
+	  MEAN_ATOMIC_WEIGHT=1.0D0
+	  RETURN
+	END IF
 ! 
 ! Compute the atomic number density as function of radius. The abundances 
 ! can be specified in two ways:

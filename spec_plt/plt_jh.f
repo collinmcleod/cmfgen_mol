@@ -66,6 +66,7 @@
 !
 	REAL*8, ALLOCATABLE :: XV(:)
 	REAL*8, ALLOCATABLE :: YV(:)
+	REAL*8, ALLOCATABLE :: ZV(:)
 !
 	CHARACTER*80 NAME		!Default title for plot
 	CHARACTER*80 XAXIS,XAXSAV	!Label for Absisca
@@ -74,6 +75,7 @@
 	REAL*8 ANG_TO_HZ
 	REAL*8 KEV_TO_HZ
 	REAL*8 C_CMS
+	REAL*8 C_KMS
 !
 	LOGICAL LOG_X,LOG_Y
 	CHARACTER*10 Y_PLT_OPT,X_UNIT
@@ -110,6 +112,7 @@
 	REAL*8 T_ELEC
 	LOGICAL AIR_LAM
 	LOGICAL USE_V
+	LOGICAL PLOT_RSQJ
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
@@ -154,6 +157,7 @@
 	EMLIN=5.27296E-03
 !
 	C_CMS=SPEED_OF_LIGHT()
+	C_KMS=1.0D-05*C_CMS
 !
         CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
 !
@@ -536,7 +540,9 @@
 	  T1=0.299794E+04/T1
 !
 	  SCALE_FAC=1.0D0
+	  PLOT_RSQJ=.FALSE.
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE',' ','Scale factor to prevent overflow')
+	  CALL USR_HIDDEN(PLOT_RSQJ,'RSQJ','F','Plot r^2 Gamma J?')
 	  CALL USR_OPTION(USE_V,'USE_V','F','Use V for x-axis (otherwise R)')
 !
 	  DO ID=1,NUM_FILES
@@ -563,7 +569,11 @@
 	    DO J=1,ND
 	      WRITE(6,*)J,ZM(ID)%RJ(J,I)
 	      IF(ZM(ID)%RJ(J,I) .GT. 0)THEN
-	        YV(J)=DLOG10(ZM(ID)%RJ(J,I))
+	        IF(PLOT_RSQJ)THEN
+	          YV(J)=DLOG10(ZM(ID)%RJ(J,I)*R(J)*R(J)/SQRT(1.0D0-V(J)*V(J)/C_KMS/C_KMS))
+	        ELSE
+	          YV(J)=DLOG10(ZM(ID)%RJ(J,I))
+	        END IF
 	      ELSE
 	        YV(J)=-100.0
 	      END IF
@@ -720,8 +730,8 @@
 	 CALL DP_CNVRT_J_V2(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         'J',LAMC,XAXIS,YAXIS,L_FALSE)
 	 CALL DP_CURVE(NCF,XV,YV)
-	
-	ELSE IF(X(1:4) .EQ. 'DBDR') THEN
+!
+        ELSE IF(X(1:4) .EQ. 'DBDR')THEN
 !
 ! This option is designed to compute 1/3 . dB/dr. This can
 ! be compared directly with chi.flux. They should be equal if
@@ -737,24 +747,63 @@
 	  ALLOCATE (XV(NCF))
 	  ALLOCATE (YV(NCF))
 	  DEFAULT=WR_STRING(TEMP)
-          CALL USR_OPTION(TEMP,'TEMP',DEFAULT,'(Program units)')
+	  CALL USR_OPTION(TEMP,'TEMP',DEFAULT,'(Program units)')
 	  DEFAULT=WR_STRING(DTDR)
-          CALL USR_OPTION(DTDR,'DTDR',DEFAULT,'(Program units)')
+	  CALL USR_OPTION(DTDR,'DTDR',DEFAULT,'(Program units)')
 	  DEFAULT=WR_STRING(RADIUS)
-          CALL USR_OPTION(RADIUS,'RADIUS',DEFAULT,'(Program units)')
-          DO I=1,ZM(1)%NCF
-            T3=HDKT*ZM(1)%NU(I)/TEMP
+	  CALL USR_OPTION(RADIUS,'RADIUS',DEFAULT,'(Program units)')
+	  DO I=1,ZM(1)%NCF
+	    T3=HDKT*ZM(1)%NU(I)/TEMP
 	    YV(I)=RADIUS*RADIUS*ABS(DTDR)*TWOHCSQ*T3*(ZM(1)%NU(I)**3)/TEMP/3.0D0
-            IF(T3 .GT. 1.0D0)THEN
-              YV(I)=YV(I)*DEXP(-T3)/(1.0D0-DEXP(-T3))/(1.0D0-DEXP(-T3))
-            ELSE
-              YV(I)=YV(I)*DEXP(T3)/(DEXP(T3)-1.0D0)/(DEXP(T3)-1.0D0)
-            END IF
-            XV(I)=ZM(1)%NU(I)
-         END DO
-	 CALL DP_CNVRT_J_V2(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	    IF(T3 .GT. 1.0D0)THEN
+	      YV(I)=YV(I)*DEXP(-T3)/(1.0D0-DEXP(-T3))/(1.0D0-DEXP(-T3))
+	    ELSE
+	      YV(I)=YV(I)*DEXP(T3)/(DEXP(T3)-1.0D0)/(DEXP(T3)-1.0D0)
+	    END IF
+	    XV(I)=ZM(1)%NU(I)
+	  END DO
+	  CALL DP_CNVRT_J_V2(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         'H',LAMC,XAXIS,YAXIS,L_FALSE)
-	 CALL DP_CURVE(NCF,XV,YV)
+	  CALL DP_CURVE(NCF,XV,YV)
+!
+	ELSE IF(X(1:3) .EQ. 'INT') THEN
+!
+	  DO ID=1,NUM_FILES
+	    ND=ZM(ID)%ND
+	    IF(ALLOCATED(XV))DEALLOCATE(XV)
+	    IF(ALLOCATED(YV))DEALLOCATE(YV)
+	    IF(ALLOCATED(ZV))DEALLOCATE(ZV)
+	    ALLOCATE (XV(ND),YV(ND),ZV(ND))
+!
+            XV(1:ND)=R(1:ND)/R(ND)
+            YV(1:ND)=0.0D0; ZV(1:ND)=0.0D0
+            DO ML=2,NCF-1
+              DO I=1,ND
+                YV(I)=YV(I)+ZM(ID)%RJ(I,ML)*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML+1))
+                T1=(ZM(ID)%RJ(I,ML-1)-ZM(ID)%RJ(I,ML))/LOG(ZM(ID)%NU(ML)/ZM(ID)%NU(ML-1))
+	        ZV(I)=ZV(I)+T1*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML+1))
+              END DO
+            END DO
+            YV=0.5D0*YV; ZV=0.5D0*ZV
+            CALL DP_CURVE(ND,XV,YV)
+            CALL DP_CURVE(ND,XV,ZV)
+          END DO
+!
+	ELSE IF(X(1:3) .EQ. 'DNU') THEN
+!
+	  DO ID=1,NUM_FILES
+	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
+	    IF(ALLOCATED(XV))DEALLOCATE(XV)
+	    IF(ALLOCATED(YV))DEALLOCATE(YV)
+	    ALLOCATE (XV(NCF),YV(NCF))
+!
+            XV(1:NCF)=ZM(ID)%NU(1:NCF)
+            DO ML=1,NCF-1
+               YV(ML)=(ZM(ID)%NU(ML)-ZM(ID)%NU(ML+1))/(ZM(ID)%NU(ML)+ZM(ID)%NU(ML+1))
+            END DO
+            YV=0.5D0*YV
+            CALL DP_CURVE(NCF-1,XV,YV)
+          END DO
 !
 ! 
 ! Plot section:

@@ -381,6 +381,8 @@
 	REAL*8 AD_COOL_V(ND)
 	REAL*8 AD_COOL_DT(ND)
 	REAL*8 ARTIFICIAL_HEAT_TERM(ND)
+	REAL*8 dE_RAD_DECAY(ND)
+	REAL*8 dE_WORK(ND)
 !
 	LOGICAL FIRST
 	LOGICAL CHK,SUCCESS
@@ -603,6 +605,8 @@
 	   FILL_FAC_XRAYS_1=FILL_FAC_X1_BEG
 	   FILL_FAC_XRAYS_2=FILL_FAC_X2_BEG
 	END IF
+!
+	CALL RD_NUC_DECAY_DATA(INCL_RADIOACTIVE_DECAY,ND,LUIN)
 !
 ! 
 !
@@ -902,8 +906,11 @@
 	    CALL RD_RV_FILE_V2(R,V,SIGMA,RMAX,RP,VINF,LUIN,ND,VEL_OPTION,NUM_V_OPTS)
          ELSE IF(VELTYPE .EQ. 10)THEN
 	    CALL RV_SN_MODEL_V2(R,V,SIGMA,RMAX,RP,VCORE,V_BETA1,RDINR,LUIN,ND)
-	  ELSE
-	    WRITE(LUER,*)'Invalid Velocity Law'
+	 ELSE IF(VELTYPE .EQ. 11)THEN
+	   CALL SET_RV_HYDRO_MODEL(R,V,SIGMA,SN_AGE_DAYS,RMAX,RP,RDINR,ND,LUIN)
+           VINF=V(1)
+	 ELSE
+	   WRITE(LUER,*)'Invalid Velocity Law'
 	    STOP
 	  END IF
 	END IF
@@ -1058,6 +1065,11 @@
 !
            IF(RD_COHERENT_ES)NUM_ITS_TO_DO=1
 	END IF
+!
+! Temporary check
+!
+!	CALL WRITE_SEQ_TIME_FILE_V1(SN_AGE_DAYS,ND,LUIN)
+!	CALL TST_RD_EQ_FILE(POPS,ND,NT,LUIN)
 !
 ! 
 !
@@ -1253,7 +1265,7 @@
 	CALL TUNE(1,'DTDR')
 	DTDR=0.0D0
 	SECTION='DTDR'
-	IF(IMPURITY_CODE .OR. FLUX_CAL_ONLY .OR. (RD_LAMBDA .AND. NEWMOD))THEN
+	IF(IMPURITY_CODE .OR. FLUX_CAL_ONLY .OR. (RD_LAMBDA .AND. NEWMOD .AND. .NOT. SN_MODEL))THEN
 	  DTDR=(T(ND)-T(ND-1))/(R(ND-1)-R(ND))
 	  DIFFW(1:NT)=0.0D0
 	ELSE
@@ -2186,6 +2198,7 @@
 	      T3=1.0D0
 	    END IF
 	    DO K=1,ND					!Equation depth
+	      IF(POP_ATOM(K) .GE. SCL_LINE_DENSITY_LIMIT .AND. K .NE. ND+1)T3=1.0D0
 	      T2=ETAL_MAT(K,SIM_INDX)*ZNET_SIM(K,SIM_INDX)
 	      SE(ID)%STEQ(MNUP,K)=SE(ID)%STEQ(MNUP,K) - T2/T1
 	      SE(ID)%STEQ(MNL,K) =SE(ID)%STEQ(MNL,K) + T2/T1
@@ -2361,6 +2374,7 @@
 	        T4=T4*T3
 	      END IF
 	      DO K=1,ND
+	        IF(POP_ATOM(K) .GE. SCL_LINE_DENSITY_LIMIT .AND. K .NE. ND+1)T4=FL_SIM(SIM_INDX)*EMLIN
 	        dRATE_dUP=EINA(SIM_INDX)*U_STAR_RATIO(K,SIM_INDX)*
 	1            (1.0D0+U_STAR_RATIO(K,SIM_INDX)*POPS(NUP,K)*STIM_FAC*VB(K))
 	        dRATE_dLOW=EINA(SIM_INDX)*U_STAR_RATIO(K,SIM_INDX)*
@@ -2550,6 +2564,7 @@
 	        T3=1.0D0
 	      END IF
 	      DO L=1,ND					!Equation depth
+	        IF(POP_ATOM(L) .GE. SCL_LINE_DENSITY_LIMIT .AND. L .NE. ND+1)T3=1.0D0
 	        T1=EINA(SIM_INDX)*U_STAR_RATIO(L,SIM_INDX)*POPS(NUP,L)
 	        K=GET_DIAG(L)
 	        SE(ID)%BA(MNL,MNUP,K,L)=SE(ID)%BA(MNL,MNUP,K,L) +
@@ -2741,6 +2756,8 @@
 	  DO I=1,ND
 	    RLUMST(I)=0.0D0
 	    J_INT(I)=0.0D0
+	    DJDt_TERM(I)=0.0D0
+	    DJDt_FLUX(I)=0.0D0
 	    K_INT(I)=0.0D0
 	    FLUX_MEAN(I)=0.0D0
 	    ROSS_MEAN(I)=0.0D0
@@ -2752,6 +2769,7 @@
 	  T2=SOB(I)*FQW(ML)*4.1274D-12
 	  RLUMST(I)=RLUMST(I)+T2
 	  J_INT(I)=J_INT(I)+RJ(I)*FQW(ML)*4.1274D-12
+	  DJDt_FLUX(I)=DJDt_FLUX(I)+DJDt_TERM(I)*FQW(ML)*4.1274D-12
 	  K_INT(I)=K_INT(I)+K_MOM(I)*FQW(ML)*4.1274D-12
 	  FLUX_MEAN(I)=FLUX_MEAN(I)+T2*CHI(I)
 	  T2=T1*EMHNUKT(I)/(  ( (1.0D0-EMHNUKT(I))*T(I) )**2  )
@@ -2788,9 +2806,11 @@
 	      WRITE(LU_DR,'(/,1X,I6,2X,A,2X,F10.6,2X,I6,2X,I6)')
 	1         LS,TRANS_NAME_SIM(SIM_INDX),VEC_FREQ(LS),
 	1            VEC_NL(LS),VEC_NUP(LS)
-	      WRITE(LU_HT,'(/,1X,I6,2X,A,2X,F10.6,2X,I6,2X,I6)')
+	      T3=(AVE_ENERGY(SIM_NL(SIM_INDX))-
+	1            AVE_ENERGY(SIM_NUP(SIM_INDX)))/VEC_FREQ(LS)
+	      WRITE(LU_HT,'(/,1X,I6,2X,A,2X,F10.6,2X,I6,2X,I6,ES14.4)')
 	1         LS,TRANS_NAME_SIM(SIM_INDX),VEC_FREQ(LS),
-	1            VEC_NL(LS),VEC_NUP(LS)
+	1            VEC_NL(LS),VEC_NUP(LS),T3
 	      WRITE(LU_NET,'(1P,5E14.6)')(ZNET_SIM(I,SIM_INDX),I=1,ND)
 	      WRITE(LU_DR,40003)((ZNET_SIM(I,SIM_INDX)*
 	1                        POPS(SIM_NUP(SIM_INDX),I)*U_STAR_RATIO(I,SIM_INDX)*
@@ -2815,6 +2835,7 @@
 	  END DO
 	END IF
 !
+	WRITE(199,*)ML,STEQ_T(ND-4)
 10000	CONTINUE
 	CALL TUNE(ITWO,'10000')
 !
@@ -2826,6 +2847,13 @@
 !
 	CALL STEQ_BA_TWO_PHOT_RATE_V3(POPS,NT,ND,
 	1         DIAG_INDX,COMPUTE_BA,LUMOD,LST_ITERATION)
+	WRITE(199,*)ML,STEQ_T(ND-4),'two'
+!
+! Store radiative equlibrium equation (radiative terms only) so
+! we can check influence on radiation field.
+!
+	DEP_RAD_EQ(1:ND)=STEQ_T(1:ND)
+!
 ! 
 !
 ! Include influence of charge exchange reactions.
@@ -2842,6 +2870,7 @@
 	END DO
 !
 	CALL STEQ_BA_CHG_EXCH_V3(POPS,T,NT,ND,DIAG_INDX,COMPUTE_BA)
+	WRITE(199,*)ML,STEQ_T(ND-4),'chg'
 !
 	DO ID=1,NUM_IONS-1
 	  CALL EVAL_CHG_RATES_V3(ATM(ID)%CHG_PRXzV, ATM(ID)%CHG_RRXzV,
@@ -2859,6 +2888,7 @@
           CALL STEQ_CO_MOV_DERIV_V1(ADVEC_RELAX_PARAM,LINEAR_ADV,
 	1             L_TRUE,DO_CO_MOV_DDT,LAMBDA_ITERATION,COMPUTE_BA,
 	1             TIME_SEQ_NO,NUM_BNDS,ND,NT)
+	  WRITE(199,*)ML,STEQ_T(ND-4),'SN_DDT'
 	ELSE
 	  CALL STEQ_ADVEC_V4(ADVEC_RELAX_PARAM,LINEAR_ADV,NUM_BNDS,ND,
 	1            INCL_ADVECTION,LAMBDA_ITERATION,COMPUTE_BA)
@@ -2867,15 +2897,22 @@
 ! Allow for adiabatic cooling, if requested.
 !
 	IF(SN_MODEL .AND. DO_CO_MOV_DDT)THEN
-	  CALL EVAL_TEMP_DDT_V1(AD_COOL_V,AD_COOL_DT,
+	  CALL EVAL_TEMP_DDT_V2(dE_WORK,AD_COOL_V,AD_COOL_DT,
 	1                       POPS,AVE_ENERGY,HDKT,
 	1                       COMPUTE_BA,INCL_ADIABATIC,
 	1                       TIME_SEQ_NO,DIAG_INDX,NUM_BNDS,NT,ND)
+	  WRITE(199,*)ML,STEQ_T(ND-4),'SN_ADD'
 	ELSE
+	  dE_WORK=0.0D0
 	  CALL EVAL_ADIABATIC_V3(AD_COOL_V,AD_COOL_DT,
 	1                       POPS,AVE_ENERGY,HDKT,
 	1                       COMPUTE_BA,INCL_ADIABATIC,
 	1                       DIAG_INDX,NUM_BNDS,NT,ND)
+	END IF
+!
+	IF(SN_MODEL .AND. INCL_RADIOACTIVE_DECAY)THEN
+	  CALL EVAL_RAD_DECAY_V1(dE_RAD_DECAY,NT,ND)
+	  WRITE(199,*)ML,STEQ_T(ND-4),'SN_RAD'
 	END IF
 !
 ! Prevent T from becoming too small by adding a extra heating term.
@@ -2885,6 +2922,9 @@
 !
 ! Write pointer file and store BA, BA_ED and B_T matrices.
 !
+!	BA_T(:,:,ND)=0.0D0; STEQ_T(ND)=T(ND)-T(ND-1)
+!	BA_T(NT,DIAG_INDX,ND)=1.0D0
+!	IF(DIAG_INDX .NE. 1)BA_T(NT,DIAG_INDX-1,ND)=-1.0D0
 	IF(COMPUTE_BA .AND. WRBAMAT .AND. .NOT. FLUX_CAL_ONLY .AND. .NOT. LAMBDA_ITERATION)THEN
 	  CALL STORE_BA_DATA_V2(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,'BAMAT')
 	END IF
@@ -2920,6 +2960,9 @@
 !
 ! 
 !
+! We use TA for NETCR (the net cooling rate).
+! We use TB for TOTCR (the sum[absolute cooling rates]).
+!
 	  DO ML=1,(ND+9)/10
 	    LS=ML                
 	    CALL FSTCOOL(R,T,ED,TA,TB,ML,ND,LU_REC_CHK)
@@ -2937,9 +2980,12 @@
 	    CALL WR_AD_COOL(AD_COOL_V,AD_COOL_DT,TA,TB,
 	1            INCL_ADIABATIC,LS,ND,LU_REC_CHK)
 !
-! Output charge exchange cooling rate, and artificial heating term.
+! Output charge exchange cooling rate, radioactive heating team
+! (hence option L_FALSE), and artificial heating term.
 !
-	    CALL WR_CHG_COOL_V3( TA,TB,LS,ND,LU_REC_CHK)
+	    CALL WR_CHG_COOL_V3(TA,TB,LS,ND,LU_REC_CHK)
+	    CALL WR_COOLING_TERM(dE_RAD_DECAY,TA,TB,L_FALSE,
+	1             'Radiative decay heating term',LS,ND,LU_REC_CHK)
 	    CALL WR_ART_HEAT(ARTIFICIAL_HEAT_TERM,TA,TB,LS,ND,LU_REC_CHK)
 !
 	    CALL ENDCOOL(TA,TB,LS,ND,LU_REC_CHK)
@@ -2997,22 +3043,24 @@
 	  WRITE(LU_OPAC,
 	1  '( ''     R        I   Tau(Ross)   /\Tau   Rat(Ross)'//
 	1  '  Chi(Ross)  Chi(ross)  Chi(Flux)   Chi(es) '//
-	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)'' )' )
+	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)     Kappa'' )' )
 	  IF(R(1) .GE. 1.0D+05)THEN
 	    FMT='( 1X,1P,E10.4,2X,I3,1X,1P,E9.3,2(2X,E8.2),1X,'//
-	1        '4(2X,E9.3),2(2X,E8.2),2(2X,E8.2) )'
+	1        '4(2X,E9.3),2(2X,E8.2),3(2X,E8.2) )'
 	  ELSE
 	    FMT='( 1X,F10.4,2X,I3,1X,1P,E9.3,2(2X,E8.2),1X,'//
-	1        '4(2X,E9.3),2(2X,E8.2),2(2X,E8.2) )'
+	1        '4(2X,E9.3),2(2X,E8.2),3(2X,E8.2) )'
 	  END IF
 	  DO I=1,ND
 	    IF(I .EQ. 1)THEN
 	      T1=LOG(ROSS_MEAN(1)*CLUMP_FAC(1)/ROSS_MEAN(4)/CLUMP_FAC(4))/LOG(R(4)/R(1))
+	      IF(T1 .LT. 2.0)T1=2.0D0
 	      T1=ROSS_MEAN(1)*CLUMP_FAC(1)*R(1)/(T1-1.0D0)		!Rosseland optical depth scale
 	      T2=LOG(ABS(FLUX_MEAN(1)*CLUMP_FAC(1)/FLUX_MEAN(4)/CLUMP_FAC(4)))/LOG(R(4)/R(1))
 	      IF(T2 .LT. 2.0)T2=2.0D0
 	      T2=FLUX_MEAN(1)*CLUMP_FAC(1)*R(1)/(T2-1.0D0)		!Flux optical depth scale
 	      T3=LOG(ESEC(1)*CLUMP_FAC(1)/ESEC(4)/CLUMP_FAC(4))/LOG(R(4)/R(1))
+	      IF(T3 .LT. 2.0)T3=2.0D0
 	      T3=ESEC(1)*CLUMP_FAC(1)*R(1)/(T3-1.0D0)			!Electon scattering optical depth scale
 	      TC(1:3)=0.0D0
 	    ELSE
@@ -3025,7 +3073,7 @@
 	    END IF
 	    WRITE(LU_OPAC,FMT)R(I),I,T1,TA(I),TC(1),
 	1      ROSS_MEAN(I),INT_dBdT(I),FLUX_MEAN(I),ESEC(I),
-	1      T2,T3,TC(2),TC(3)
+	1      T2,T3,TC(2),TC(3),1.0D-10*ROSS_MEAN(I)/DENSITY(I)
 	  END DO
 	  WRITE(LU_OPAC,'(//,A,A)')
 	1     'NB: Mean opacities do not include effect of clumping',
@@ -3059,12 +3107,14 @@
 !
 ! Output hydrodynamical terms to allow check on radiation driving of the wind.
 !
-	I=18
-	CALL HYDRO_TERMS_V2(POP_ATOM,R,V,T,SIGMA,ED,RLUMST,
+	IF(.NOT. SN_MODEL)THEN
+	  I=18
+	  CALL HYDRO_TERMS_V2(POP_ATOM,R,V,T,SIGMA,ED,RLUMST,
 	1                 STARS_MASS,MEAN_ATOMIC_WEIGHT,
 	1		  FLUX_MEAN,ESEC,
 	1                 LAM_FLUX_MEAN_BAND_END,BAND_FLUX_MEAN,
 	1                 BAND_FLUX,N_FLUX_MEAN_BANDS,I,ND)
+	END IF
 !
 	IF(LST_ITERATION)
 	1     CALL WR_ASCI_STEQ(NION,ND,'STEQ ARRAY- Continuum Terms',19)
@@ -3533,16 +3583,24 @@
 	  XRAY_LUM_0P1(1:ND)=0.0D0
 	  XRAY_LUM_1KEV(1:ND)=0.0D0
 	END IF
+	T1=4.1274D-12
+	T2=1.0D+10*T1/4.0D0/ACOS(-1.0D0)
 	DO I=1,ND
-	  LLUMST(I)=LLUMST(I)*R(I)*R(I)*4.1274D-12
-	  DIELUM(I)=DIELUM(I)*R(I)*R(I)*4.1274D-12
-	  XRAY_LUM_TOT(I)=XRAY_LUM_TOT(I)*R(I)*R(I)*4.1274D-12
-	  XRAY_LUM_0P1(I)=XRAY_LUM_0P1(I)*R(I)*R(I)*4.1274D-12
-	  XRAY_LUM_1KEV(I)=XRAY_LUM_1KEV(I)*R(I)*R(I)*4.1274D-12
+	  LLUMST(I)=LLUMST(I)*R(I)*R(I)*T1
+	  DIELUM(I)=DIELUM(I)*R(I)*R(I)*T1
+	  DEP_RAD_EQ(I)=DEP_RAD_EQ(I)*R(I)*R(I)*T1
+	  XRAY_LUM_TOT(I)=XRAY_LUM_TOT(I)*R(I)*R(I)*T1
+	  XRAY_LUM_0P1(I)=XRAY_LUM_0P1(I)*R(I)*R(I)*T1
+	  XRAY_LUM_1KEV(I)=XRAY_LUM_1KEV(I)*R(I)*R(I)*T1
+	  dE_WORK(I)=dE_WORK(I)*R(I)*R(I)*T1
+	  dE_RAD_DECAY(I)=dE_RAD_DECAY(I)*R(I)*R(I)*T2		!As ergs/cm^3
 	END DO
 !
 	CALL LUM_FROM_ETA(LLUMST,R,ND)
 	CALL LUM_FROM_ETA(DIELUM,R,ND)
+	CALL LUM_FROM_ETA(DEP_RAD_EQ,R,ND)
+	CALL LUM_FROM_ETA(dE_WORK,R,ND)
+	CALL LUM_FROM_ETA(dE_RAD_DECAY,R,ND)
 	CALL LUM_FROM_ETA(XRAY_LUM_TOT,R,ND)
 	CALL LUM_FROM_ETA(XRAY_LUM_0P1,R,ND)
 	CALL LUM_FROM_ETA(XRAY_LUM_1KeV,R,ND)
@@ -3554,6 +3612,17 @@
 	  DO I=1,ND
 	    MECH_LUM(I)=T1*V(I)*(1.0D0+SIGMA(I))*K_INT(I)/R(I)
 	  END DO
+	ELSE IF(USE_J_REL .AND. INCL_REL_TERMS)THEN
+	  T1=1.0D+05/SPEED_OF_LIGHT()			!As V in km/s, c in cgs units.
+	  DO I=1,ND
+	    T2=1.0D0/(1.0D0-(T1*V(I))**2)		!Gamma^2
+	    T3=SQRT(T2)					!Gamma
+	    WRITE(205,'(3ES16.6)')T1,T2,T3
+	    WRITE(205,'(I5,3ES14.4)')I,J_INT(I),K_INT(I),T1*V(I)*RLUMST(I)/R(I)/R(I)/T3
+	    MECH_LUM(I)=T1*R(I)*V(I)*T3*( J_INT(I)-K_INT(I) +
+	1          T2*(SIGMA(I)+1.0D0)*(K_INT(I)+T1*V(I)*RLUMST(I)/R(I)/R(I)) )
+	    RLUMST(I)=T3*(RLUMST(I)+T1*V(I)*J_INT(I)*R(I)*R(I))
+	  END DO
 	ELSE
 	  T1=1.0D+05/SPEED_OF_LIGHT()	!As V in km/s, c in cgs units.
 	  DO I=1,ND
@@ -3561,6 +3630,7 @@
 	  END DO
 	END IF
 	CALL LUM_FROM_ETA(MECH_LUM,R,ND)
+	CALL LUM_FROM_ETA(DJDT_FLUX,R,ND)
 !
 ! Increment the continuum luminosity by the total line luminosity.
 !
@@ -3578,22 +3648,35 @@
 	    WRITE(LUER,*)'Error opening OBSFLUX to output Rec emission'
 	    WRITE(LUER,*)'IOS=',IOS
 	  END IF
-	  CALL WRITV(DIELUM,ND,
-	1   'Dielectronic and Implicit Recombination Line Emission',LU_FLUX)
-	  CALL WRITV(LLUMST,ND,'Line Emission',LU_FLUX)
+	  IF(USE_J_REL)CALL WRITV(RLUMST,ND,'Luminosity [g.r^2.H + beta.g.r^2.J]',LU_FLUX)
+	  IF(SUM(DIELUM) .NE. 0.0D0)CALL WRITV(DIELUM,ND,
+	1    'Dielectronic and Implicit Recombination Line Emission',LU_FLUX)
+	  IF(SUM(LLUMST) .NE. 0.0D0)CALL WRITV(LLUMST,ND,'Line Emission',LU_FLUX)
 	  CALL WRITV(MECH_LUM,ND,'Mechanical Luminosity',LU_FLUX)
+	  IF(SUM(de_WORK) .NE. 0.0D0)CALL WRITV(dE_WORK,ND,'Internal/adiabatic term',LU_FLUX)
+	  IF(SUM(DJDt_FLUX) .NE. 0.0D0)CALL WRITV(DJDt_FLUX,ND,'Flux arrising from Dr^3J/Dt term',LU_FLUX)
+	  IF(SUM(dE_RAD_DECAY) .NE. 0.0D0)
+	1     CALL WRITV(dE_RAD_DECAY,ND,'Energy deposited locally due to radioactive decay',LU_FLUX)
+	  CALL WRITV(DEP_RAD_EQ,ND,'Departure from Rad Equilibrium Correction',LU_FLUX)
 	  CALL WRITV(RLUMST,ND,'Total Radiative Luminosity',LU_FLUX)
-	  CALL WRITV(XRAY_LUM_TOT,ND,'Total Schock Luminosity (Lsun)',LU_FLUX)
+	  IF(SUM(XRAY_LUM_TOT) .NE. 0.0D0)CALL WRITV(XRAY_LUM_TOT,ND,'Total Shock Luminosity (Lsun)',LU_FLUX)
 !
-! Include the machanical luminosity imprted to the wind by the radiation 
-! field in the total luminozity.
+! Include the machanical luminosity imparted to the wind by the radiation 
+! field in the total luminosity, and subtract out radioactive energy deposition..
 !
 	  T3=0.0D0
 	  DO I=ND-1,1,-1
-	    T3=T3+MECH_LUM(I)
+	    T3=T3+MECH_LUM(I)+DJDT_FLUX(I)+dE_WORK(I)-dE_RAD_DECAY(J)
 	    RLUMST(I)=RLUMST(I) + T3
 	  END DO
-	  CALL WRITV(RLUMST,ND,'Total (Rad. + Mech.) Luminosity',LU_FLUX)
+	  CALL WRITV(RLUMST,ND,'Luminosity Check (not observed luminosity)',LU_FLUX)
+!
+	  T3=0.0D0
+	  DO I=ND-1,1,-1
+	    T3=T3+DEP_RAD_EQ(I)
+	    RLUMST(I)=RLUMST(I) + T3
+	  END DO
+	  CALL WRITV(RLUMST,ND,'Consistency check (include dep. from rad. equil.)',LU_FLUX)
 !
 	  WRITE(LU_FLUX,'(A)')' '
 	  WRITE(LU_FLUX,'(A,T60,1PE12.4)')'Total Line luminosity:',T1
@@ -3608,6 +3691,20 @@
 	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'X-ray Luminosity (> 0.1 keV) :',SUM(XRAY_LUM_0P1),OBS_XRAY_LUM_0P1
 	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'X-ray Luminosity (> 1 keV):',SUM(XRAY_LUM_1KEV),OBS_XRAY_LUM_1KEV
 	CLOSE(UNIT=LU_FLUX)
+!
+! Because of the use of SL's, it is possible that a error in Luminosity
+! can occur at depth, particulary in SN models where line escape is 
+! enhanced because of the velocity field. TA provides an estimate of
+! this error. This error is not relevant in the outer regions.
+!
+	IF(LST_ITERATION)THEN
+	  DO I=1,ND
+	    TA(I)=4.1274D-12*(STEQ_T_NO_SCL(I)-STEQ_T_SCL(I))*R(I)*R(I)
+	  END DO
+	  CALL LUM_FROM_ETA(TA,R,ND)
+	  WRITE(LU_HT,'(//,A)')'Estimaed error in L due to use of SLs'
+	  WRITE(LU_HT,'(/,(X,1P,5E12.4))')(TA(I), I=1,ND)
+	END IF
 !
 ! Insure Eddington factor file is closed, and indicate all f's successfully
 ! computed. If COMPUTE_EDDFAC is true we can safely write to record 5
@@ -3656,6 +3753,8 @@
 	   STOP
 	END IF
 !
+	CALL WRITV(STEQ_T,ND,'Radiative Equlibrium Equation',LU_SE)
+	
 	CALL SOLVE_FOR_POPS(POPS,NT,NION,ND,NC,NP,NUM_BNDS,DIAG_INDX,
 	1      MAXCH,MAIN_COUNTER,IREC,LU_SE,LUSCR,LST_ITERATION)
 !
@@ -3814,7 +3913,7 @@
 	  NEXT_LOC=1  ;   STRING=' '
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TA(ND))
 	  T1=RP/6.96D0 ; CALL WR_VAL_INFO(STRING,NEXT_LOC,'R*/Rsun',T1)
-	  T1=5784.0D0*(ABS(LUM)/T1**2)**0.25
+	  T1=5784.0D0*(ABS(LUM)/T1**2)**0.25					!ABS for SN
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'T*  ',T1)
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',V(ND))
 	  WRITE(LUMOD,'(A)')TRIM(STRING)
@@ -3824,7 +3923,7 @@
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(3))		!20.0D0
 	    T1=TC(3)/6.96D0
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'R /Rsun',T1)
-	    T1=5784.0D0*(ABS(LUM)/T1**2)**0.25                          !ABS for D/Dt SN models
+	    T1=5784.0D0*(ABS(LUM)/T1**2)**0.25
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff',T1)
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(3))
 	    WRITE(LUMOD,'(A)')TRIM(STRING)
@@ -4105,9 +4204,10 @@
 ! the current TIME_SEQ_NO.
 !
 	  IF(SN_MODEL .AND. TIME_SEQ_NO .NE. 0)THEN
-	    IREC=TIME_SEQ_NO
-	    CALL RITE_TIME_MODEL(R,V,SIGMA,POPS,IREC,L_FALSE,L_TRUE,
-	1               NT,ND,LUSCR,CHK)
+!	    IREC=TIME_SEQ_NO
+!	    CALL RITE_TIME_MODEL(R,V,SIGMA,POPS,IREC,L_FALSE,L_TRUE,
+!	1               NT,ND,LUSCR,CHK)
+	    CALL WRITE_SEQ_TIME_FILE_V1(SN_AGE_DAYS,ND,LUSCR)
 	  END IF
 !
 	  CLOSE(UNIT=LUER)

@@ -11,6 +11,7 @@
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 22-Mar-2007 : Call GET_POPS_AT_PREV_TIME_STEP_V4
 ! Altered 23-Jun-2006 : R, V removed from call to GET_POPS_AT_PREV_TIME_STEP_V2 since
 !                         passed by module MOD_CMFGEN.
 ! Created 12-Dec-2005: Based on STEQ_ADVEC_V4
@@ -36,7 +37,6 @@
 	REAL*8 SUM(NUM_IONS,ND)
 	REAL*8 T1,T2
 	REAL*8 DERIV_CONST
-	REAL*8 UNIT_CONST
 	REAL*8 DELTA_TIME_SECS			!Time step
 !
 	INTEGER K			!Depth index
@@ -51,6 +51,7 @@
 	INTEGER ISPEC
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
+	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 !
 	SUM(:,:)=0.0D0
 	DO ID=1,NUM_IONS
@@ -68,15 +69,20 @@
 	  LINEAR=.TRUE.
 	END IF
 !
+! The three L_TRUE indicate that we correct OLD_POPS for both advection (ie., the expansions
+! of the SN), radioactive decay, and that we normalize the population of each species so
+! that the continuity equation is exactly satisifed.
+!
 	LU=7
-	CALL GET_POPS_AT_PREV_TIME_STEP_V2(OLD_POPS,OLD_R,TIME_SEQ_NO,ND,NT,LU)
+	CALL GET_POPS_AT_PREV_TIME_STEP_V4(OLD_POPS,OLD_R,
+	1         L_TRUE,L_TRUE,L_TRUE,TIME_SEQ_NO,ND,NT,LU)
 !
 ! The relaxation factor should be < 1, and is used to adjust the importance of the
 ! advection terms. It should be 1 for the final model. It should only be used to
 ! help converge a model in which advection terms are very important.
 !
 	DELTA_TIME_SECS=1.0D+05*(R(ND)-OLD_R(ND))/V(ND)
-	UNIT_CONST=RELAXATION_PARAMETER/DELTA_TIME_SECS
+	DERIV_CONST=RELAXATION_PARAMETER/DELTA_TIME_SECS
 !
 ! We use backward linear differencing. At present we assume a Hubble
 ! Law. Thus r^3n is conserved in the absence of source/sink terms.
@@ -87,17 +93,13 @@
 	      IVAR=ATM(ID)%EQXzV
 	      ION_IVAR=IVAR+ATM(ID)%NXzV
 	      DO K=1,ND
-	        DERIV_CONST=UNIT_CONST/R(K)/R(K)/R(K)
 	        DO I=1,ATM(ID)%NXzV                                !Which S.E. equationa
-	          T1=R(K)*R(K)*R(K)*ATM(ID)%XzV(I,K)
-	          T2=OLD_R(K)*OLD_R(K)*OLD_R(K)*OLD_POPS(IVAR+I-1,K)
-	          SE(ID)%STEQ(I,K)=SE(ID)%STEQ(I,K) - DERIV_CONST*(T1-T2)
-	          SUM(ID,K)=SUM(ID,K)+DERIV_CONST*(T1-T2)
+	          T1=DERIV_CONST*(ATM(ID)%XzV(I,K)-OLD_POPS(IVAR+I-1,K))
+	          SE(ID)%STEQ(I,K)=SE(ID)%STEQ(I,K) - T1
+	          SUM(ID,K)=SUM(ID,K) + T1
 	        END DO
 	        IF(ID .EQ. SPECIES_END_ID(ISPEC)-1)THEN
-	          T1=R(K)*R(K)*R(K)*ATM(ID)%DXzV(K)
-	          T2=OLD_R(K)*OLD_R(K)*OLD_R(K)*OLD_POPS(ION_IVAR,K)
-	          SUM(ID+1,K)=SUM(ID+1,K)+DERIV_CONST*(T1-T2)
+	          SUM(ID+1,K)=SUM(ID+1,K)+DERIV_CONST*(ATM(ID)%DXzV(K)-OLD_POPS(ION_IVAR,K))
 	        END IF
 	      END DO
 	    END DO
@@ -161,7 +163,7 @@
 !
 	M=(NUM_BNDS/2)+1				!Diagonal index
         DO K=1,ND
-          BA_ADV_TERM(M,K)=UNIT_CONST
+          BA_ADV_TERM(M,K)=DERIV_CONST
 	END DO
 	IF(COMPUTE_BA)THEN
 	  DO ISPEC=1,NUM_SPECIES
@@ -169,10 +171,8 @@
 	    ID_END=SPECIES_END_ID(ISPEC)
 	    DO ID=ID_STRT,ID_END-1
 	      DO K=1,ND
-	        DERIV_CONST=UNIT_CONST
-	        T1=DERIV_CONST
 	        DO I=1,ATM(ID)%NXzV			!Which S.E. equation
-	          SE(ID)%BA(I,I,M,K)=SE(ID)%BA(I,I,M,K)-T1
+	          SE(ID)%BA(I,I,M,K)=SE(ID)%BA(I,I,M,K)-DERIV_CONST
 	        END DO
 	      END DO		!loop over depth
 	    END DO

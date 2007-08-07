@@ -149,6 +149,10 @@ C
 	    RHO_ZERO=RHO_ZERO/ATOMIC_MASS_UNIT()
 	    CALL RD_STORE_DBLE(N_RHO,'N_RHO',L_TRUE,'Density exponent (+ve)')
 	    VINF=VCORE*(RMAX/RP)**V_BETA1
+	  ELSE IF(VELTYPE .EQ. 11)THEN
+	    CALL RD_STORE_DBLE(VINF1,'VINF',L_TRUE,'Terminal velocity (km/s)')
+	    SN_MODEL=.TRUE.
+	    SN_HYDRO_MODEL=.TRUE.
 	  ELSE
 	    WRITE(LUER,*)'Velocity law ',VELTYPE, ' not implemented',
 	1                ' in this version of CMFGEN'
@@ -227,8 +231,11 @@ C
 	    CALL RD_STORE_LOG(DO_CO_MOV_DDT,'DO_DDT',L_FALSE,
 	1            'Include comoving derivative in SE equations?')
 	    TIME_SEQ_NO=1
-	    CALL RD_STORE_LOG(TIME_SEQ_NO,'TS_NO',DO_CO_MOV_DDT,
+	    CALL RD_STORE_INT(TIME_SEQ_NO,'TS_NO',DO_CO_MOV_DDT,
 	1            'Time sequence number: 1 for inital model')
+	    CALL RD_STORE_DBLE(SN_AGE_DAYS,'SN_AGE',DO_CO_MOV_DDT,'Age of SN in days')
+	    CALL RD_STORE_LOG(INCL_RADIOACTIVE_DECAY,'INC_RAD_DECAYS',L_TRUE,
+	1            'Allow for radiactive decays')
 	  END IF	  
 	  DO_FULL_REL_OBS=.FALSE.
 	  DO_FULL_REL_CMF=.FALSE.
@@ -350,6 +357,12 @@ C
 											
 	  CALL RD_STORE_LOG(RDTHK_CONT,'THK_CONT',L_TRUE,
 	1           'Use thick boundary condition for continuum ? ')
+	  RD_OUT_BC_TYPE=1
+	  OUT_BC_TYPE=1 
+	  OUT_BC_PARAM_ONE=0.299794D0
+	  CALL RD_STORE_INT(RD_OUT_BC_TYPE,'OBC_TYPE',L_FALSE,
+	1           'Outer boundary condition type: 1=def=old')
+	  CALL RD_STORE_INT(OUT_BC_PARAM_ONE,'BC_PAR1',L_FALSE,'Frequency to switch to new BC')
 	  INCL_INCID_RAD=.FALSE.
 	  CALL RD_STORE_LOG(INCL_INCID_RAD,'INCID_RAD',L_FALSE,
 	1           'Include incident radiation for plane-parellel mod with V?')
@@ -472,6 +485,9 @@ C
 	1            'Scale line cooling rate for Rad. Eq. equation?')
 	  CALL RD_STORE_DBLE(SCL_LINE_HT_FAC,'SCL_LN_FAC',L_TRUE,
 	1            'Scale line cooling rate for Rad. Eq. equation?')
+	  SCL_LINE_DENSITY_LIMIT=1.0D+30
+	  CALL RD_STORE_DBLE(SCL_LINE_DENSITY_LIMIT,'SCL_DEN_LIM',L_FALSE,
+	1            'Density beyond which line cooling scaling is switched off')
 	  LINEAR_ADV=.TRUE.
 	  CALL RD_STORE_LOG(LINEAR_ADV,'LIN_ADV',L_FALSE,
 	1           'Compute advection terms using derivatives in linear plane?')
@@ -524,12 +540,15 @@ C
 	  WRITE(LUSCR,'()')
 	  WRITE(LUSCR,'()')
 	  INTERP_DC_SPH_TAU=.FALSE.
+	  SET_LTE_AS_INIT_ESTIMATES=.FALSE.
 	  CALL RD_STORE_LOG( RDINR,'RD_IN_R_GRID',L_TRUE,
 	1        'Read in a predetermined R grid ?')
 	  CALL RD_STORE_LOG(GRID,'LIN_INT',L_TRUE,
 	1        'Use direct linear interpolation if  new model ?')
 	  CALL RD_STORE_LOG(INTERP_DC_SPH_TAU,'DC_SPH_TAU',L_FALSE,
 	1        'Interpolate d.c''s on the spherical TAU scale?')
+	  CALL RD_STORE_LOG(SET_LTE_AS_INIT_ESTIMATES,'LTE_EST',L_FALSE,
+	1        'Use LTE for the initial estimates')
 	  CALL RD_STORE_LOG(DO_POP_SCALE,'POP_SCALE',L_TRUE,
 	1        'Scale populations so that cons. Eq. satisfied ?')
 	  CALL RD_STORE_DBLE(T_INIT_TAU,'T_INIT_TAU',L_TRUE,
@@ -585,6 +604,12 @@ C
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(RD_FIX_T,'FIX_T',L_TRUE,
 	1            'Keep the Temperature fixed ?')
+          FIX_IN_BOUND_T=.FALSE.
+          CALL RD_STORE_LOG(FIX_IN_BOUND_T,'FIX_INB_T',L_FALSE,
+	1            'Fix the Temperature at the inner boundary ?')
+          FIX_LST_X_DPTHS=1
+	  CALL RD_STORE_INT(FIX_LST_X_DPTHS,'FIX_X_DPTH',L_FALSE,
+	1            'Fix the Temperature at the last ? depths')
 	  CALL RD_STORE_LOG(VARFIXT,'FIX_T_AUTO',L_TRUE,
 	1            'Fix the Temperature automatically ?')
 	  CALL RD_STORE_DBLE(TAU_SCL_T,'TAU_SCL_T',L_TRUE,
@@ -599,6 +624,12 @@ C
 	  DO_SRCE_VAR_ONLY=.FALSE. 
 	  CALL RD_STORE_LOG(DO_SRCE_VAR_ONLY,'SRCE_ONLY',L_FALSE,
 	1            'Allow only ths source function to vary?')
+	  ADD_ADDITIONAL_OPACITY=.FALSE.
+	  ADD_OPAC_SCL_FAC=0.0D0
+	  CALL RD_STORE_LOG(ADD_ADDITIONAL_OPACITY,'ADD_OPAC',L_FALSE,
+	1            'Add additional pacity to help converge model?')
+	  CALL RD_STORE_DBLE(ADD_OPAC_SCL_FAC,'OP_SCL_FAC',ADD_ADDITIONAL_OPACITY,
+	1            'Scale factor for addition of extra opacity')
 C
 	  CALL RD_STORE_NCHAR(METH_SOL,'SOL_METH',ISIX,L_TRUE,
 	1            'Which Method To solve Matrix Equations'//
@@ -658,7 +689,30 @@ C
 	  PLANE_PARALLEL=.FALSE.
 	  CALL RD_STORE_LOG(PLANE_PARALLEL,'PP_MOD',L_FALSE,
 	1    'Plane-paralle geometry with velocity field?')
-	
+	  INCL_DJDT_TERMS=.FALSE.
+	  CALL RD_STORE_LOG(INCL_DJDT_TERMS,'INCL_DJDT',L_FALSE,
+	1    'DJDt terms in transfer equaton for SN models?')
+	  IF(INCL_DJDT_TERMS)THEN
+	    USE_DJDT_RTE=.TRUE.
+	  ELSE
+	    USE_DJDT_RTE=.FALSE.
+	    CALL RD_STORE_LOG(USE_DJDT_RTE,'USE_DJDT_RTE',L_FALSE,
+	1    'Use solver which has DJDt terms in transfer equaton for SN models?')
+	  END IF
+	  DJDT_RELAX_PARAM=1.0D0
+	  CALL RD_STORE_DBLE(DJDT_RELAX_PARAM,'DJDT_RELAX',L_FALSE,
+	1          'Factor to scale DJDT terms to assist initial convergence')
+!
+	  USE_J_REL=.FALSE.
+	  INCL_REL_TERMS=.FALSE.
+	  INCL_ADVEC_TERMS_IN_TRANS_EQ=.FALSE.
+	  CALL RD_STORE_LOG(USE_J_REL,'USE_J_REL',L_FALSE,
+	1    'Use MOM_J_REL_VN to solve the moment equations?')
+	  CALL RD_STORE_LOG(INCL_REL_TERMS,'INCL_REL',USE_J_REL,
+	1    'Include relativistic terms in the transfer equaton?')
+	  CALL RD_STORE_LOG(INCL_ADVEC_TERMS_IN_TRANS_EQ,'INCL_ADV_TRANS',USE_J_REL,
+	1    'Include advection terms in the transfer equaton?')
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(ACCURATE,'INC_GRID',L_TRUE,
 	1          'Increase grid size to improve accuracy? ')
@@ -711,6 +765,10 @@ C
 	  CALL RD_STORE_LOG(AVERAGE_DO,'DO_AV',L_FALSE,'Perform averaging of oscillating pops')
 	  CALL RD_STORE_INT(NUM_OSC_AV,'NOSC_AV',L_FALSE,'# of consecquitive oscillations')
 	  CALL RD_STORE_INT(ITS_PER_AV,'ITS/AV',L_FALSE,'# of iterations between averaging')
+!
+	  UNDO_LAST_IT=.FALSE.
+	  CALL RD_STORE_LOG(UNDO_LAST_IT,'DO_UNDO',L_FALSE,'Undo corrections at last 5 depths')
+
 	  CALL CLEAN_RD_STORE()
 C
 	CLOSE(UNIT=7)

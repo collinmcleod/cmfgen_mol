@@ -4,6 +4,8 @@
 
 include ../Makefile_definitions
 
+OPTIONS=$(FG)
+
 #
 # These names are for the fortran linker
 #
@@ -36,9 +38,9 @@ all : $(EXE_DIR)cmfgen_dev.exe
 $(EXE_DIR)cmfgen_dev.exe : cmfgen.o cmfgen_sub.o \
                                   $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
 	$(F90) cmfgen.o cmfgen_sub.o \
-             -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN6) \
+             -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN5) -l$(LN3) -l$(LN1) -l$(LN6) \
                $(LOCLIB) $(LAPACK) $(BLAS) \
-               -o $(EXE_DIR)cmfgen_dev.exe
+               -g -o $(EXE_DIR)cmfgen_dev.exe
 
 USR=$(LIB_DIR)libtools.a(usr_option.o)
 
@@ -55,13 +57,13 @@ MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
       $(LIB_DIR)libmod.a(var_rad_mod.o)
 
 cmfgen.o : cmfgen.f $(MODS) $(USR)
-	$(F90) -c $(FG) cmfgen.f 
+	$(F90) -c $(OPTIONS) cmfgen.f 
 
 #cmfgen.o : cmfgen.f $(MODS)
-#	$(F90) -c $(FG) cmfgen.f 
+#	$(F90) -c $(OPTIONS) cmfgen.f 
 
 cmfgen_sub.o : cmfgen_sub.f $(MODS) $(MODT) GET_J_CHI.INC  
-	$(F90) -c $(FG) cmfgen_sub.f 
+	$(F90) -c $(OPTIONS) cmfgen_sub.f 
 
 $(USR):
 	(cd ../tools ; make )

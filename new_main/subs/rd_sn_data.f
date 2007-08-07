@@ -1,0 +1,308 @@
+!
+! Subroutine to read in hydrodynamical data data from a SN model.
+! Routine reads in T, Density, and mass-fractions, and interopolates
+! them onto the CMFGEN grid.
+!
+	SUBROUTINE RD_SN_DATA(ND,NEW_MODEL,LU)
+	USE CONTROL_VARIABLE_MOD
+	USE NUC_ISO_MOD
+	USE MOD_CMFGEN
+	IMPLICIT NONE
+!
+	INTEGER LU
+	INTEGER ND
+	LOGICAL NEW_MODEL
+!
+! Local arrays & variables.
+!
+	REAL*8, ALLOCATABLE :: R_HYDRO(:)
+	REAL*8, ALLOCATABLE :: LOG_R_HYDRO(:)
+	REAL*8, ALLOCATABLE :: T_HYDRO(:)
+	REAL*8, ALLOCATABLE :: DENSITY_HYDRO(:)
+	REAL*8, ALLOCATABLE :: ATOM_DEN_HYDRO(:)
+	REAL*8, ALLOCATABLE :: ELEC_DEN_HYDRO(:)
+	REAL*8, ALLOCATABLE :: POP_HYDRO(:,:)
+	REAL*8, ALLOCATABLE :: ISO_HYDRO(:,:)
+	REAL*8, ALLOCATABLE :: WRK_HYDRO(:)
+	INTEGER, ALLOCATABLE :: BARY_HYDRO(:)
+	CHARACTER(LEN=10), ALLOCATABLE :: SPEC_HYDRO(:)
+	CHARACTER(LEN=10), ALLOCATABLE :: ISO_SPEC_HYDRO(:)
+!
+	REAL*8 WRK(ND)
+	REAL*8 LOG_R(ND)
+	REAL*8 DELTA_T_SECS
+	REAL*8 OLD_SN_AGE_DAYS
+	REAL*8 SN_EXP_FACTOR
+	INTEGER NX
+	INTEGER NSP
+	INTEGER NISO
+	INTEGER I,L,K
+	INTEGER IS,IP
+	INTEGER LUER,ERROR_LU
+	EXTERNAL ERROR_LU
+	CHARACTER(LEN=200) STRING
+	LOGICAL, SAVE :: FIRST=.TRUE.
+	LOGICAL DONE
+!
+	LUER=ERROR_LU()
+	WRITE(6,*)'Entering RD_SN_DATA'
+	OPEN(UNIT=LU,FILE='SN_HYDRO_DATA',STATUS='OLD')
+!
+! Get the number of data points in the HYDRO model, and the number 
+! of species.
+!
+	  DO WHILE (1 .EQ. 1)
+	    STRING=' '
+	    DO WHILE (STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ')
+	      READ(LU,'(A)')STRING 
+	    END DO
+	    IF(INDEX(STRING,'Number of data points:') .NE. 0)THEN
+	      I=INDEX(STRING,'points:')+7
+	      READ(STRING(I:),*)NX
+	    ELSE IF(INDEX(STRING,'Number of mass fractions:') .NE. 0)THEN
+	      I=INDEX(STRING,'fractions:')+10
+	      READ(STRING(I:),*)NSP
+	    ELSE IF(INDEX(STRING,'Number of isotopes:') .NE. 0)THEN
+	      I=INDEX(STRING,'isotopes:')+9
+	      READ(STRING(I:),*)NISO
+	    ELSE IF(INDEX(STRING,'Time(days) since explosion:') .NE. 0)THEN
+	      I=INDEX(STRING,'explosion:')+10
+	      READ(STRING(I:),*)OLD_SN_AGE_DAYS
+	    ELSE IF(INDEX(STRING,'Radius grid') .NE. 0)THEN
+	      IF(NSP .EQ. 0 .OR. NX .EQ. 0 .OR. NISO .EQ. 0 .OR. OLD_SN_AGE_DAYS.EQ. 0.0D0)THEN
+	        WRITE(LUER,*)'Error in RD_SN_DATA'
+	        WRITE(LUER,*)'ND, NSP, NISO or model time undefined'
+	        STOP
+	      ELSE
+	        EXIT
+	      END IF
+   	    END IF
+	  END DO
+	  WRITE(6,*)'Read NX, NSP in RD_SN_DATA'
+!
+	  ALLOCATE (R_HYDRO(NX));         R_HYDRO=0.0D0
+	  ALLOCATE (LOG_R_HYDRO(NX));     LOG_R_HYDRO=0.0D0
+	  ALLOCATE (T_HYDRO(NX));         T_HYDRO=0.0D0
+	  ALLOCATE (ELEC_DEN_HYDRO(NX));  ELEC_DEN_HYDRO=0.0D0
+	  ALLOCATE (ATOM_DEN_HYDRO(NX));  ATOM_DEN_HYDRO=0.0D0
+	  ALLOCATE (DENSITY_HYDRO(NX));   DENSITY_HYDRO=0.0D0
+	  ALLOCATE (WRK_HYDRO(NX));      WRK_HYDRO=' '
+	  ALLOCATE (SPEC_HYDRO(NSP));     SPEC_HYDRO=' '
+	  ALLOCATE (POP_HYDRO(NX,NSP));   POP_HYDRO=0.0D0
+!
+	  ALLOCATE (ISO_HYDRO(NX,NISO));   ISO_HYDRO=0.0D0
+	  ALLOCATE (BARY_HYDRO(NISO));   BARY_HYDRO=0
+	  ALLOCATE (ISO_SPEC_HYDRO(NISO));   ISO_SPEC_HYDRO=' '
+!
+! Get basic HYDRO grid vectors.
+!
+	 DO WHILE (1 .EQ. 1)
+	    DO WHILE (STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ')
+	      READ(LU,'(A)')STRING 
+	    END DO
+	    IF(INDEX(STRING,'Radius grid') .NE. 0)THEN
+	      READ(LU,*)R_HYDRO
+	    ELSE IF(INDEX(STRING,'Temperature') .NE. 0)THEN
+	      READ(LU,*)T_HYDRO
+	    ELSE IF(INDEX(STRING,'Density') .NE. 0)THEN
+	      READ(LU,*)DENSITY_HYDRO
+	    ELSE IF(INDEX(STRING,'Electron density') .NE. 0)THEN
+	      READ(LU,*)ELEC_DEN_HYDRO
+	    ELSE IF(INDEX(STRING,'Atom density') .NE. 0)THEN
+	      READ(LU,*)ATOM_DEN_HYDRO
+	    ELSE IF(INDEX(STRING,'ass fraction') .NE. 0)THEN
+	      IF(R_HYDRO(1) .EQ. 0.0D0 .OR. 
+	1	      T_HYDRO(1) .EQ. 0.0D0 .OR.
+	1	      ATOM_DEN_HYDRO(1) .EQ. 0.0D0 .OR.
+	1	      ELEC_DEN_HYDRO(1) .EQ. 0.0D0)THEN
+	        WRITE(LUER,*)'Error reading SN datat'
+	        WRITE(LUER,*)'R, or T is zero'
+	        STOP
+	       ELSE
+	         EXIT
+	       END IF
+	   END IF
+	   STRING=' '
+	 END DO
+	 WRITE(6,*)'Obtained non-POP vectors in RD_SN_DATA'
+!
+! We can now read in the mass-fractions.
+!
+	  DO L=1,NSP
+	    DO WHILE( INDEX(STRING,'mass fraction') .EQ. 0)
+	      READ(LU,'(A)')STRING 
+	    END DO
+	    STRING=ADJUSTL(STRING)
+	    SPEC_HYDRO(L)=STRING(1:INDEX(STRING,' '))
+	    READ(LU,*)(POP_HYDRO(I,L), I=1,NX)
+	    WRITE(6,*)TRIM(SPEC_HYDRO(L)),POP_HYDRO(1,L),POP_HYDRO(ND,L)
+	    STRING=' '
+	  END DO
+!
+! We can now read in the isotope mass-fractions.
+!
+	  DO L=1,NISO
+	    DO WHILE( INDEX(STRING,'mass fraction') .EQ. 0)
+	      READ(LU,'(A)')STRING 
+	    END DO
+	    STRING=ADJUSTL(STRING)
+	    I=INDEX(STRING,' ')
+	    ISO_SPEC_HYDRO(L)=STRING(1:I-1)
+	    READ(STRING(I:),*)BARY_HYDRO(L)
+	    WRITE(6,'(A)')TRIM(ISO_SPEC_HYDRO(L))
+	    READ(LU,*)(ISO_HYDRO(I,L), I=1,NX)
+	    STRING=' '
+	  END DO
+!
+! Correct populations for SN expansion.
+!
+	IF(SUM(SIGMA) .EQ. 0.0D0)THEN
+	  SN_EXP_FACTOR=SN_AGE_DAYS/OLD_SN_AGE_DAYS
+	  R_HYDRO=R_HYDRO*SN_EXP_FACTOR
+	  POP_HYDRO=POP_HYDRO/(SN_EXP_FACTOR**3)
+	  ISO_HYDRO=ISO_HYDRO/(SN_EXP_FACTOR**3)
+	  DENSITY_HYDRO=DENSITY_HYDRO/(SN_EXP_FACTOR**3)
+	  ATOM_DEN_HYDRO=ATOM_DEN_HYDRO/(SN_EXP_FACTOR**3)
+	  ELEC_DEN_HYDRO=ELEC_DEN_HYDRO/(SN_EXP_FACTOR**3)
+	ELSE
+	  WRITE(LUER,*)'Error in RD_SN_DATA'
+	  WRITE(LUER,*)'Code presently assumes a pure Hubble law expansion'
+	  STOP
+	END IF
+!
+! We can now interpolate from the HYDRO grid to the CMFGEN grid.
+! Interpolations are don in R, in the log-log plane.
+!
+	LOG_R_HYDRO=LOG(R_HYDRO)
+	LOG_R=LOG(R)
+	IF(FIRST .AND. NEW_MODEL)THEN
+	  T_HYDRO=LOG(T_HYDRO) 
+	  CALL MON_INTERP(T,ND,IONE,LOG_R,ND,T_HYDRO,NX,LOG_R_HYDRO,NX)
+	  T=EXP(T)
+	  ELEC_DEN_HYDRO=LOG(ELEC_DEN_HYDRO) 
+	  CALL MON_INTERP(ED,ND,IONE,LOG_R,ND,ELEC_DEN_HYDRO,NX,LOG_R_HYDRO,NX)
+	  ED=EXP(ED)
+	END IF
+	WRITE(6,*)'Done ED and T'
+!
+	DO I=1,NX
+	   WRITE(175,'(I8,3ES14.4)')I,R_HYDRO(I),DENSITY_HYDRO(I)
+	END Do
+	WRK_HYDRO=LOG(DENSITY_HYDRO) 
+	CALL MON_INTERP(DENSITY,ND,IONE,LOG_R,ND,WRK_HYDRO,NX,LOG_R_HYDRO,NX)
+	DENSITY=EXP(DENSITY)
+	WRITE(175,*)'New density'
+	DO I=1,ND
+	  WRITE(175,'(I5,3ES14.4)')I,R(I),V(I),DENSITY(I)
+	END DO
+!
+	POP_SPECIES=0.0D0
+	DO L=1,NSP
+	  DO K=1,NUM_SPECIES
+	    IF(SPEC_HYDRO(L) .EQ. SPECIES(K))THEN
+	      CALL MON_INTERP(POP_SPECIES(1,K),ND,IONE,LOG_R,ND,POP_HYDRO(1,L),NX,LOG_R_HYDRO,NX)
+	    END IF
+	  END DO
+	END DO
+	WRITE(6,*)'Done populations'
+!
+	DO IS=1,NUM_ISOTOPES
+	  ISO(IS)%OLD_POP_DECAY=ISO(IS)%OLD_POP
+	END DO
+	DO L=1,NISO
+	  DONE=.FALSE.
+	  DO K=1,NUM_ISOTOPES
+	    IF(ISO_SPEC_HYDRO(L) .EQ. ISO(K)%SPECIES .AND. 
+	1               BARY_HYDRO(L) .EQ. ISO(K)%BARYON_NUMBER)THEN
+	       CALL MON_INTERP(ISO(K)%OLD_POP,ND,IONE,LOG_R,ND,ISO_HYDRO(1,L),NX,LOG_R_HYDRO,NX)
+	       DONE=.TRUE.
+	       EXIT
+	    END IF
+	  END DO
+	  IF(.NOT. DONE)THEN
+	    WRITE(LUER,*)'Error in RD_SN_DATA: isotope data not recognized'
+	    WRITE(LUER,*)L,ISO_SPEC_HYDRO(L),BARY_HYDRO(L)
+	    STOP
+	  END IF
+	END DO
+	WRITE(6,*)'Done isotope populations'
+!
+! Ensure mass-fractions sum to unity.
+!
+	WRK(:)=0.0D0
+	DO L=1,NUM_SPECIES
+	  WRK(:)=WRK(:)+POP_SPECIES(:,L)
+	END DO
+	DO L=1,NUM_SPECIES
+	  POP_SPECIES(:,L)=POP_SPECIES(:,L)/WRK(:)
+	END DO
+	WRITE(6,*)'Normalized mass fractions'
+!
+! Now compute the atomic population of each species.
+!
+	DO L=1,NUM_SPECIES
+	  POP_SPECIES(:,L)=POP_SPECIES(:,L)*DENSITY(:)/AT_MASS(L)/1.66D-24
+	  WRITE(6,*)L,POP_SPECIES(1,L),POP_SPECIES(ND,L)
+	END DO
+	DO IS=1,NUM_ISOTOPES
+	  ISO(IS)%OLD_POP=ISO(IS)%OLD_POP*DENSITY/ISO(IS)%MASS/1.66D-24
+	END DO
+!
+! Ensure isotope populations sum exactly to total species population
+!
+	DO IP=1,NUM_PARENTS
+	  WRK(1:ND)=0.0D0
+	  DO IS=1,NUM_ISOTOPES
+	    IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC)THEN
+	      WRK=WRK+ISO(IS)%OLD_POP
+	    END IF
+	  END DO
+	  DO IS=1,NUM_ISOTOPES
+	    IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC)THEN
+	      ISO(IS)%OLD_POP=ISO(IS)%OLD_POP*(POP_SPECIES(:,ISO(IS)%ISPEC)/WRK)
+	    END IF
+	  END DO
+	END DO
+!
+! If population is zero at some depths, but species is present, we will
+! set to small value.
+!
+	DO L=1,NUM_SPECIES
+	  IF(SPECIES_PRES(L))THEN
+	    DO K=1,ND
+	      POP_SPECIES(K,L)=MAX(1.0D-20,POP_SPECIES(K,L))
+	    END DO
+	  END IF
+	END DO
+!
+	IF(SN_AGE_DAYS.LT. OLD_SN_AGE_DAYS)THEN
+	  WRITE(LUER,*)'Error in RD_SN_DATA'
+	  WRITE(LUER,*)'Invalid epochs'
+	  WRITE(LUER,*)SN_AGE_DAYS,OLD_SN_AGE_DAYS
+	  STOP
+	END IF
+	DELTA_T_SECS=24.0D0*3600.0D0*(SN_AGE_DAYS-OLD_SN_AGE_DAYS)
+	CALL DO_SPECIES_DECAYS(DELTA_T_SECS,ND)
+        DO IS=1,NUM_ISOTOPES
+          ISO(IS)%POP=ISO(IS)%OLD_POP_DECAY
+	  WRITE(6,*)'IS',IS, ISO(IS)%OLD_POP_DECAY(ND),ISO(IS)%OLD_POP(ND)
+        END DO
+	DO IP=1,NUM_PARENTS
+	  POP_SPECIES(1:ND,PAR(IP)%ISPEC)=PAR(IP)%OLD_POP_DECAY
+	END DO
+!
+! Compute total ATOM population.
+!
+	POP_ATOM(:)=0.0D0
+	DO L=1,NUM_SPECIES
+	  POP_ATOM(:)=POP_ATOM(:)+POP_SPECIES(:,L)
+	END DO
+!
+	CALL OUT_SN_POPS(ND,LU)
+!
+	DEALLOCATE (R_HYDRO, LOG_R_HYDRO, T_HYDRO,DENSITY_HYDRO, WRK_HYDRO)
+	DEALLOCATE (SPEC_HYDRO, POP_HYDRO, ATOM_DEN_HYDRO, ELEC_DEN_HYDRO)
+	WRITE(6,*)'Exiting RD_SN_DATA'
+!
+	RETURN
+	END

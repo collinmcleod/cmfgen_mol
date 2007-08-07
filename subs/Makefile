@@ -10,6 +10,7 @@ LIB_MOD=$(LIB_DIR)libmod.a
 #
 OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(ave_flips.o)\
+      $(LIB)(undo_it.o)\
       $(LIB)(ba_replace.o)\
       $(LIB)(ba_update_v4.o)\
       $(LIB)(baion_update_v4.o)\
@@ -30,6 +31,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(dspheredchi.o)\
       $(LIB)(edd_j_var_v4.o)\
       $(LIB)(edd_j_var_v5.o)\
+      $(LIB)(edd_j_var_v6.o)\
       $(LIB)(eddline_var.o)\
       $(LIB)(elec_prep.o)\
       $(LIB)(equal.o)\
@@ -108,10 +110,12 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(modifyba.o)\
       $(LIB)(mom_j_cmf_v5.o)\
       $(LIB)(mom_j_cmf_v6.o)\
+      $(LIB)(mom_j_cmf_v7.o)\
       $(LIB)(momjbar.o)\
       $(LIB)(mon_int_funs_v2.o)\
       $(LIB)(mon_int_ins_v1.o)\
       $(LIB)(mon_interp.o)\
+      $(LIB)(monotonic_integrate.o)\
       $(LIB)(mult2d.o)\
       $(LIB)(multvec.o)\
       $(LIB)(nagminsol.o)\
@@ -149,8 +153,10 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(regrid_b_on_sph_tau.o)\
       $(LIB)(regrid_dchi.o)\
       $(LIB)(regrid_h.o)\
+      $(LIB)(regrid_t_ed.o)\
       $(LIB)(regridwsc.o)\
       $(LIB)(regridwsc_v2.o)\
+      $(LIB)(regridwsc_v3.o)\
       $(LIB)(rext_coef_v2.o)\
       $(LIB)(rite_asc.o)\
       $(LIB)(rite_atmdes_v2.o)\
@@ -165,6 +171,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(set_cont_freq.o)\
       $(LIB)(set_cont_freq_v3.o)\
       $(LIB)(set_cont_freq_v4.o)\
+      $(LIB)(set_dc_lte.o)\
       $(LIB)(set_edge_freq_v2.o)\
       $(LIB)(set_x_freq.o)\
       $(LIB)(set_gm_all.o)\
@@ -191,6 +198,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(term_io.o)\
       $(LIB)(tfeau.o)\
       $(LIB)(thomas.o)\
+      $(LIB)(thomas_pone.o)\
       $(LIB)(thomas_rh.o)\
       $(LIB)(torscl.o)\
       $(LIB)(transposeba.o)\
@@ -198,6 +206,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(tuvghd_rh.o)\
       $(LIB)(ungrid.o)\
       $(LIB)(up_tx_tvx.o)\
+      $(LIB)(up_tx_tvx_v2.o)\
       $(LIB)(up_tx_tvx_ext_v1.o)\
       $(LIB)(update_gam.o)\
       $(LIB)(updateu.o)\
@@ -207,6 +216,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(var_formsol.o)\
       $(LIB)(var_mom_j_cmf_v6.o)\
       $(LIB)(var_mom_j_cmf_v7.o)\
+      $(LIB)(var_mom_j_cmf_v8.o)\
       $(LIB)(var_mom_jext_cmf_v2.o)\
       $(LIB)(var_momjbar.o)\
       $(LIB)(var_op_v4.o)\
@@ -223,6 +233,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(wr2d_v2.o)\
       $(LIB)(wr_ad_cool.o)\
       $(LIB)(wr_art_heat.o)\
+      $(LIB)(wr_cooling_term.o)\
       $(LIB)(wr_x_info.o)\
       $(LIB)(wrcoolgen.o)\
       $(LIB)(write_j_cmf_err.o)\

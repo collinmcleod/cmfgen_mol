@@ -87,6 +87,18 @@
 	   END IF
 	 END IF
 !
+	IF( FIX_IN_BOUND_T .AND. DEPTH_INDX .GE. (ND+1-FIX_LST_X_DPTHS) )THEN
+	  BA(NT,:)=0.0D0
+	  IF(DIAG_BAND)THEN
+	    BA(NT,NT)=1.0D0
+	    STEQ(NT)=0.0D0
+	    ZERO_STEQ(NT)=.TRUE.
+	    IF(DEPTH_INDX .EQ. ND)THEN
+              WRITE(LUER,'(A)')' Temperature held fixed at',FIX_LST_X_DPTHS,'at inner boundary'
+	    END IF
+	  END IF
+	END IF
+!
 ! This section handles the final ionization stage of each species.
 !
 	DO ISPEC=1,NUM_SPECIES

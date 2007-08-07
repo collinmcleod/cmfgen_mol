@@ -22,6 +22,9 @@
 	REAL*8, ALLOCATABLE :: SOB(:)      	!ND - Used in computing continuum flux
 	REAL*8, ALLOCATABLE :: LLUMST(:)      	!ND - Line luminosity.
 	REAL*8, ALLOCATABLE :: DIELUM(:)      	!ND - Dielectronic line emission luminosity.
+	REAL*8, ALLOCATABLE :: DEP_RAD_EQ(:)    !ND - Integrated departure from radiative equilibrium
+	REAL*8, ALLOCATABLE :: DJDt_FLUX(:)     !ND - DJDT correction to integrated flux.
+	REAL*8, ALLOCATABLE :: DJDt_TERM(:)     !ND - 
 !
 ! Vector giving the MINIMUM Doppler width at each depth.
 !
@@ -51,6 +54,14 @@
 	REAL*8, ALLOCATABLE :: QEDD(:)        	!NDMAX -
 	REAL*8, ALLOCATABLE :: N_ON_J(:)        !NDMAX -
 	REAL*8, ALLOCATABLE :: RSQHNU(:)        !NDMAX -
+!
+! For MOM_J_REL_V2 --- i.e., the inclusion of relatvistic, but not time
+! dependence, for the computation of J.
+!
+	REAL*8, ALLOCATABLE :: N_ON_J_NODE(:)		!
+	REAL*8, ALLOCATABLE :: H_ON_J(:)		!
+	REAL*8, ALLOCATABLE :: KMID_ON_J(:)		!
+	REAL*8, ALLOCATABLE :: dlnJdlNR(:)		!
 !
 ! Boundary conditions.
 !
@@ -132,6 +143,9 @@
 	IF(IOS .EQ. 0)ALLOCATE ( SOB(ND),STAT=IOS )   		!Used in computing continuum flux
 	IF(IOS .EQ. 0)ALLOCATE ( LLUMST(ND),STAT=IOS )    	!Line luminosity.
 	IF(IOS .EQ. 0)ALLOCATE ( DIELUM(ND),STAT=IOS )    	!Dielectronic line emission luminosity.
+	IF(IOS .EQ. 0)ALLOCATE ( DEP_RAD_EQ(ND),STAT=IOS )    	!Depature from radiative equilibrium.
+	IF(IOS .EQ. 0)ALLOCATE ( DJDt_TERM(ND),STAT=IOS )	!
+	IF(IOS .EQ. 0)ALLOCATE ( DJDt_FLUX(ND),STAT=IOS )    	!DJDt correction to integrated flux.
 	IF(IOS .EQ. 0)ALLOCATE ( VDOP_VEC(ND),STAT=IOS )
 !
 ! Transfer equation vectors
@@ -158,6 +172,11 @@
 	IF(IOS .EQ. 0)ALLOCATE ( QEDD(NDMAX),STAT=IOS )
 	IF(IOS .EQ. 0)ALLOCATE ( N_ON_J(NDMAX),STAT=IOS )
 	IF(IOS .EQ. 0)ALLOCATE ( RSQHNU(NDMAX),STAT=IOS )
+!
+	IF(IOS .EQ. 0)ALLOCATE ( N_ON_J_NODE(NDMAX),STAT=IOS )
+	IF(IOS .EQ. 0)ALLOCATE ( H_ON_J(NDMAX),STAT=IOS )
+	IF(IOS .EQ. 0)ALLOCATE ( KMID_ON_J(NDMAX),STAT=IOS )
+	IF(IOS .EQ. 0)ALLOCATE ( dlnJdlnR(NDMAX),STAT=IOS )
 !
 	IF(IOS .EQ. 0)ALLOCATE ( FEDD_PREV(NDMAX),STAT=IOS )
 	IF(IOS .EQ. 0)ALLOCATE ( GEDD_PREV(NDMAX),STAT=IOS )

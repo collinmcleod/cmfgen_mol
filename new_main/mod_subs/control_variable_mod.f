@@ -60,12 +60,22 @@
 	REAL*8 RHO_ZERO			!Density at core in gm/cm^3
 	REAL*8 RCUB_RHO_ZERO            !r^3 . density at core in (in 10^{-30} gm}
 	REAL*8 N_RHO			!Exponent for density (+ve)
+	REAL*8 DJDT_RELAX_PARAM         !Factor to assist inclusion of DJDT terms.
+	REAL*8 SN_AGE_DAYS              !Age of SN in days.
 	INTEGER TIME_SEQ_NO             !Number of model in time sequence.
 	LOGICAL SN_MODEL
+	LOGICAL SN_HYDRO_MODEL		!Use HYDRO model for SN input
+	LOGICAL INCL_RADIOACTIVE_DECAY	!Allow for radioactive decay.
 	LOGICAL JGREY_WITH_V_TERMS 	!Include velocity terms when comuting T(grey).
+	LOGICAL INCL_DJDT_TERMS         !Include DJDt terms in radiative transfer equation
+	LOGICAL USE_DJDT_RTE            !Use the radiative transfer equation solver which includes DJDt terms
 	LOGICAL DO_CO_MOV_DDT		!Include comoving drivative in SE equations.
 	LOGICAL DO_FULL_REL_OBS         !Include all relativistic terms in obs. frame computation.
 	LOGICAL DO_FULL_REL_CMF         !Include all relativistic terms in CMF obs. frame computation.
+!
+	LOGICAL USE_J_REL
+	LOGICAL INCL_REL_TERMS
+	LOGICAL INCL_ADVEC_TERMS_IN_TRANS_EQ
 !
 ! Used to revise the R_GRID automatically after each iteration.
 !
@@ -97,6 +107,7 @@
 !
 	LOGICAL GRID
 	LOGICAL INTERP_DC_SPH_TAU
+	LOGICAL SET_LTE_AS_INIT_ESTIMATES
 !
 ! Used when constructing the Temperature distribution on the first
 ! iteration.
@@ -307,6 +318,7 @@
 	INTEGER NUM_OSC_AV
 	LOGICAL AVERAGE_DONE
 	LOGICAL AVERAGE_DO
+	LOGICAL UNDO_LAST_IT
 !
 ! N_PAR is used to indicate how often the BA matrices should be incremented
 ! by BA_PAR. After the incrementation, the PAR matrices are zeroed.
@@ -339,6 +351,7 @@
 !
 	LOGICAL SCL_LINE_COOL_RATES
 	REAL*8 SCL_LINE_HT_FAC
+	REAL*8 SCL_LINE_DENSITY_LIMIT
 	REAL*8 EPS                    !If maximum fractional % change < EPS we terminate model
 !
 ! Fix BA variation matrix if % change less than VAL_FIX_BA.
@@ -374,6 +387,9 @@
 	LOGICAL FIXED_T,FIXED_NE,FIX_IMPURITY
 	LOGICAL VARFIXT
 	LOGICAL DO_SRCE_VAR_ONLY
+!
+	REAL*8 ADD_OPAC_SCL_FAC
+ 	LOGICAL ADD_ADDITIONAL_OPACITY
 !
 ! 
 ! Indicates whether level dissolution should be included in the model.
@@ -433,10 +449,14 @@
         LOGICAL NEWMOD
         LOGICAL WRITE_RVSIG
 !
+	REAL*8  OUT_BC_PARAM_ONE
+	INTEGER RD_OUT_BC_TYPE
+	INTEGER OUT_BC_TYPE
 	LOGICAL RDTHK_CONT
 	LOGICAL THK_CONT
 	LOGICAL THK_LINE
 	LOGICAL INCL_INCID_RAD
+!
 	LOGICAL SETZERO
 	lOGICAL DO_POP_SCALE
 	LOGICAL TRAPFORJ

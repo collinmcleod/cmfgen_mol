@@ -42,6 +42,9 @@
 	REAL*8 XM(ND)
 	REAL*8 SOURCE(ND)
 	REAL*8 FEDD(ND)
+	REAL*8 H_ON_J(ND)
+	REAL*8 RSQHNU(ND)
+	REAL*8 dlnJdlnR(ND)
 !
 	REAL*8 T1,T2
 	REAL*8 HBC_J
@@ -64,6 +67,7 @@
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
 !
+	WRITE(6,*)'BEGIN COMP_GREY',ND,NC,NP
 	PI=4.0D0*ATAN(1.0D0)
 	CHI(1:ND)=ROSSMEAN(1:ND)
 !
@@ -118,6 +122,51 @@
 	   CALL JGREY_WITH_FVT(RJ,SOB,CHI,R,V,SIGMA,
 	1           P,AQW,HMIDQW,KQW,NMIDQW,
 	1           LUM,METHOD,DIF,IC,T2,ND,NC,NP)
+!
+	ELSE IF(USE_J_REL)THEN
+!
+	  FEDD(1:ND)=0.3D0		!Initial guess
+	  H_ON_J(1:ND)=0.0D0		!Initial guess
+	  GAMH(1:ND)=0.0D0		!Old FEDD
+	  XM(1:ND)=0.0D0		!As grey solution, not needed (ETA)
+	  dlnJdlnR=0.0D0
+	  NEW_FREQ=.TRUE.
+	  WRITE(LUER,*)'Using MOM_JREL_GREY_V1 for grey solution'
+!
+! Note
+!   HFLUX=LUM*Lsun/16/(PI*PI)/10**2/R**2 (10**2 for 1/R**2).
+!   DBB =3L/16(piR)**2 
+! DBB is used for the lower boundary diffusion approximation. 
+!
+	  HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
+          DBB=3.0D0*HFLUX
+	  T1=1.0D0
+	  DO WHILE(T1 .GT. 1.0D-05)
+            CALL MOM_JREL_GREY_V1(XM,CHI,CHI,V,SIGMA,R,
+	1              H_ON_J,FEDD,dlnJdlnR,
+	1              RJ,RSQHNU,HBC_CMF,INBC,
+	1              DIF,DBB,IC,METHOD,
+	1              L_TRUE,L_TRUE,NEW_FREQ,ND)
+!
+	    CALL FGREY_NOREL_V1(FEDD,H_ON_J,RJ,CHI,R,V,SIGMA,
+	1              P,AQW,HMIDQW,KQW,LUM,IC,METHOD,
+	1              HBC_CMF,INBC,DIF,ND,NC,NP)
+	    T1=0.0D0
+	    DO I=1,ND
+	      T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
+	      GAMH(I)=FEDD(I)
+	    END DO
+	    NEW_FREQ=.FALSE.
+	    WRITE(LUER,*)'Current grey iteration accuracy is',T1
+	  END DO
+!
+	ELSE IF(USE_DJDT_RTE)THEN
+!
+	   T2=1.0D-05		!Accuracy to converge f
+	   WRITE(6,*)'BEF',ND,NC,NP
+	   CALL JGREY_HUB_DDT_V1(RJ,SOB,CHI,R,V,SIGMA,
+	1              P,AQW,HMIDQW,KQW,LUM,METHOD,DIF,IC,
+	1              T2,L_TRUE,ND,NC,NP)
 	ELSE
 !
 ! Will use FEDD for F, GAM for NEWRJ, GAMH for NEWRK, and T2 for NEWHBC.

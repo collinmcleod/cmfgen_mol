@@ -10,13 +10,14 @@
 !       the specific energy term, and the density term. This is done for diagnostic
 !       purposes.
 !
-	SUBROUTINE EVAL_TEMP_DDT_V1(AD_CR_V,AD_CR_DT,
+	SUBROUTINE EVAL_TEMP_DDT_V2(WORK,AD_CR_V,AD_CR_DT,
 	1               POPS,AVE_ENERGY,HDKT,COMPUTE_BA,INCL_ADIABATIC,
 	1               TIME_SEQ_NO,DIAG_INDX,NUM_BNDS,NT,ND)
 	USE MOD_CMFGEN
  	USE STEQ_DATA_MOD
  	IMPLICIT NONE
 !
+! Altered 22-Mar-2007 : Call GET_POPS_AT_PREV_TIME_STEP_V4
 ! Altered 04-Feb-2007 : Bug fixed in d(STEQ_T)/dNe
 ! Altered 23-Jun-2006 : R, V removed from call to GET_POPS_AT_PREV_TIME_STEP_V2 since
 !                         passed by module MOD_CMFGEN.
@@ -39,6 +40,7 @@
 !
 	REAL*8 POPS(NT,ND)
 	REAL*8 AVE_ENERGY(NT)
+	REAL*8 WORK(ND)
 	REAL*8 HDKT
 !
 ! Local vectors.
@@ -49,7 +51,6 @@
 	REAL*8 GAMMA(ND)
 	REAL*8 INT_EN(ND)
 	REAL*8 COL_EN(ND)
-	REAL*8 WORK(ND)
 !
 	REAL*8 OLD_POPS(NT,ND)
 	REAL*8 OLD_R(ND)
@@ -120,7 +121,7 @@
 ! for advection, radioactive decayse, are not normalized.
 !
 	LU=7
-	CALL GET_POPS_AT_PREV_TIME_STEP_V3(OLD_POPS,OLD_R,
+	CALL GET_POPS_AT_PREV_TIME_STEP_V4(OLD_POPS,OLD_R,
 	1      L_FALSE,L_FALSE,L_FALSE,TIME_SEQ_NO,ND,NT,LU)
 	OLD_ED(:)=OLD_POPS(NT-1,:)
 	OLD_T(:)=OLD_POPS(NT,:)

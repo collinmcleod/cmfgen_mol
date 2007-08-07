@@ -365,7 +365,12 @@
 	    CALL DGETRF(N,N,C_MAT,N,IPIVOT,IFAIL)
 	    IF(IFAIL .NE. 0)THEN
 	      DESC='DGETRF_DIAG'
-	      GOTO 9999
+	      WRITE(LUER,*)'Error in CMF_BLKBAND_V3'
+	      WRITE(LUER,*)'Unable to get solution at depth',K
+	      WRITE(LUER,*)'Setting fractional corrections to zero'
+	      WRITE(LUER,*)'IFAIL=',IFAIL
+	      STEQ(:,K)=0.0D0
+	      GOTO 500			!9999
 	    END IF
 	    IF(WR_BA_INV)THEN
 	      CALL WRITE_BCD_MAT(RUB,C_MAT,RUB,ROW_SF,COL_SF,IPIVOT,
@@ -380,8 +385,13 @@
 	    END DO
 	    IF(IFAIL .NE. 0)THEN
 	      DESC='DGETRS_DIAG'
-	      GOTO 9999
+	      WRITE(LUER,*)'Error in CMF_BLKBAND_V3'
+	      WRITE(LUER,*)'Unable to get solution at depth',K
+	      WRITE(LUER,*)'Setting fractional corrections to zero'
+	      WRITE(LUER,*)'IFAIL=',IFAIL
+	      STEQ(:,K)=0.0D0
 	    END IF
+500	    CONTINUE
 	  END DO
           FLAG=.TRUE.
           DEALLOCATE (C_MAT)

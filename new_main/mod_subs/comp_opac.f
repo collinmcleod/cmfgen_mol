@@ -54,6 +54,8 @@
 	INTEGER I,J
 	INTEGER ID
 	INTEGER PHOT_ID
+	INTEGER LUER,ERROR_LU
+	EXTERNAL ERROR_LU
 !
 ! Compute opacity and emissivity. This is a general include file
 ! provided program uses exactly the same variables. Can be achieved
@@ -93,6 +95,19 @@
 	      END DO
 	    END IF
 	  END DO
+!
+	  IF(ADD_ADDITIONAL_OPACITY)THEN
+	     DO I=1,ND
+	       T1=ADD_OPAC_SCL_FAC*6.65D-15*POP_ATOM(I)
+	       CHI(I)=CHI(I)+T1
+	       ETA(I)=ETA(I)+T1*TWOHCSQ*(CONT_FREQ**3)*EMHNUKT_CONT(I)/(1.0D0-EMHNUKT_CONT(I))
+	     END DO
+	     IF(FREQ_INDX .EQ. 1)THEN
+	       LUER=ERROR_LU()
+	       WRITE(LUER,*)'Warning --- adding additional opacity to model'
+	       WRITE(LUER,*)'Remember to remove additional opacity for final model'
+	     END IF
+	  END IF
 !
 ! 
 !

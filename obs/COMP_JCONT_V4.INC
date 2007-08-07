@@ -2,7 +2,8 @@ C
 C Program section to compute the continuum intnesity. Opacities must have
 C previuosly been evaluated.
 C
-C Altered 13-Apr-2006 - Fixed routine so that V_AT_RMAX=0 for plane-parallel model
+C Altered 31-Jul-2007 - Call to MOM_JREL_V3 etc installed.
+C Altered 13-Apr-2007 - Fixed routine so that V_AT_RMAX=0 for plane-parallel model
 C                          without V, even if V is set. Useful for testing.
 C Altered 20-Mar-2007 - Installed plane-parallel routines for Accurate grid.
 C Altered 26-Apr-2006 - Installed plane-parallel routines (no EXT only)
@@ -617,6 +618,14 @@ C
 	1                  METHOD,FG_SOL_OPTIONS,THK_CONT,
 	1                  FIRST_FREQ,NEW_FREQ,N_TYPE,NC,NP,ND)
 	     END IF
+!
+	     IF(USE_J_REL .AND. INCL_REL_TERMS)THEN 
+	       CALL COMPUTE_ADD_EDD_FACTS(
+	1              H_ON_J,N_ON_J_NODE,KMID_ON_J,
+	1              TC,TB,FEDD,GEDD,N_ON_J,HBC_CMF,NBC_CMF,INBC, 
+	1              IC,DBB,DIF,R,V,CHI_CLUMP,ND)
+	     END IF
+!
 	     CALL TUNE(ITWO,'FG_J_CMF')
 	     FG_COUNT=FG_COUNT+1
 !
@@ -648,6 +657,14 @@ C
 	1                  FL,dLOG_NU,DIF,DBB,IC,
 	1                  N_TYPE,METHOD,L_TRUE,
 	1                  FIRST_FREQ,NEW_FREQ,ND)
+             ELSE IF(USE_J_REL)THEN
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_JREL_V3'
+	       CALL MOM_JREL_V3(TA,CHI_CLUMP,TB,V,SIGMA,R,
+	1             RJ,RSQHNU,dlnJdlnR,
+	1             FEDD,GEDD,H_ON_J,N_ON_J_NODE,N_ON_J,KMID_ON_J,
+	1             HBC_CMF,INBC,NBC_CMF,FL,dLOG_NU,
+	1             DIF,DBB,IC,METHOD,L_TRUE,
+	1             INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,FIRST_FREQ,ND)
 	     ELSE
 	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_CMF_V6'
 	       CALL MOM_J_CMF_V6(TA,CHI_CLUMP,TB,V,SIGMA,R,

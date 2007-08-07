@@ -8,7 +8,8 @@
 ! NB: TIME_SEQ_NO refers to the current model. This routine reads the populations
 ! corresponding to model TIME_SEQ_NO-1
 !
-        SUBROUTINE GET_POPS_AT_PREV_TIME_STEP_V2(OLD_POPS,OLD_R,TIME_SEQ_NO,ND,NT,LU)
+        SUBROUTINE GET_POPS_AT_PREV_TIME_STEP_V3(OLD_POPS,OLD_R,DO_ADVECT,DO_RAD_DECAYS,
+	1                      NORMALIZE_POPS,TIME_SEQ_NO,ND,NT,LU)
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -21,12 +22,15 @@
 	INTEGER NT
 	INTEGER LU
 	INTEGER TIME_SEQ_NO
+	LOGICAL DO_ADVECT
+	LOGICAL DO_RAD_DECAYS
+	LOGICAL NORMALIZE_POPS
 !
 	REAL*8 OLD_R(ND)
-	REAL*8 OLD_SIGMA(ND)
 	REAL*8 OLD_POPS(NT,ND)
 !
 	REAL*8 OLD_V(ND)
+	REAL*8 OLD_SIGMA(ND)
 	REAL*8 LOG_OLD_V(ND)
 	REAL*8 LOG_V(ND)
 	REAL*8 NEW_VEC(ND)
@@ -58,7 +62,7 @@
 	  OLD_V(ND)=V(ND)
 	ELSE 
 	  LUER=ERROR_LU()
-	  WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V2' 
+	  WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V3' 
 	  WRITE(LUER,*)'Velocities at inner boundary are unequal'
 	  WRITE(LUER,*)'V(ND)=',V(ND)
 	  WRITE(LUER,*)'OLD_V(ND)=',OLD_V(ND)
@@ -68,7 +72,7 @@
 	  OLD_V(1)=V(1)
 	ELSE IF(OLD_V(1) .LT. V(1))THEN
 	  LUER=ERROR_LU()
-	  WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V2' 
+	  WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V3' 
 	  WRITE(LUER,*)'Old velocity at outer boundary is too small'
 	  WRITE(LUER,*)'V(1)=',V(1)
 	  WRITE(LUER,*)'OLD_V(1)=',OLD_V(1)
@@ -86,37 +90,69 @@
 	  OLD_POPS(I,:)=EXP(NEW_VEC)
 	END DO
 !
+! Get the interpolated radius scale in the old model. This radius scale will 
+! have the same velocity coordinates as the current model. Since we have a 
+! Hubble law, linear interpolation is accurate.
+!
+	CALL MON_INTERP(NEW_VEC,ND,IONE,V,ND,OLD_R,ND,OLD_V,ND)
+	OLD_R(1:ND-1)=NEW_VEC(1:ND-1)
+!
+!
+! Advect the populations assumubg a pure Hubble Law. This will need to be changed
+! when using more sophisticated expansion laws. A change will also need to be made
+! to the nomalization section.
+!
+	IF(DO_ADVECT)THEN
+	  T1=(OLD_R(ND)/R(ND))**3
+	  OLD_POPS(1:NT-1,:)=OLD_POPS(1:NT-1,:)*T1
+	END IF
+!
+! Adjust the populations for radioactive decays.
+!
+	IF(DO_RAD_DECAYS)THEN
+	  CALL DO_LEV_POP_DECAYS(OLD_POPS,ND,NT)
+	END IF
+!
 ! Normalize the populations to ensure continuity equation is satisfied.
+! This removes any slight variations introduced by the non-monotonic
+! interpolation. It should not be done if radioactive decayse are important,
+! and DO_RAD_DECAYS is false.
 !
-	DO ISPEC=1,NUM_SPECIES
-	  DO J=1,ND
-	    T2=0.0D0
-	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
-	      DO I=1,ATM(ID)%NXzV
-	        K=ATM(ID)%EQXzV+I-1
-	        T2=T2+OLD_POPS(K,J)
-	      END DO
-	    END DO
-	    IF(SPECIES_BEG_ID(ISPEC) .GT. 0)THEN
-	      ID=SPECIES_END_ID(ISPEC)-1
-	      K=ATM(ID)%EQXzV+ATM(ID)%NXzV
-	      T2=T2+OLD_POPS(K,J)
-!
-! Can now do the normalization. Only valid for a Hubble flow.
-!
-	      T2=POP_SPECIES(J,ISPEC)/T2*(R(ND)/OLD_R(ND))**3
+	IF(NORMALIZE_POPS)THEN
+	  DO ISPEC=1,NUM_SPECIES
+	    DO J=1,ND
+	      T2=0.0D0
 	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	        DO I=1,ATM(ID)%NXzV
 	          K=ATM(ID)%EQXzV+I-1
-	          OLD_POPS(K,J)=OLD_POPS(K,J)*T2
+	          T2=T2+OLD_POPS(K,J)
 	        END DO
 	      END DO
-	      ID=SPECIES_END_ID(ISPEC)-1
-	      K=ATM(ID)%EQXzV+ATM(ID)%NXzV
-	      OLD_POPS(K,J)=OLD_POPS(K,J)*T2
-	    END IF
+	      IF(SPECIES_BEG_ID(ISPEC) .GT. 0)THEN
+	        ID=SPECIES_END_ID(ISPEC)-1
+	        K=ATM(ID)%EQXzV+ATM(ID)%NXzV
+	        T2=T2+OLD_POPS(K,J)
+!
+! Can now do the normalization. Only valid for a Hubble flow.
+!
+	        IF(DO_ADVECT)THEN
+	          T2=POP_SPECIES(J,ISPEC)/T2
+	        ELSE
+	          T2=POP_SPECIES(J,ISPEC)/T2*(R(ND)/OLD_R(ND))**3
+	        END IF
+	        DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	          DO I=1,ATM(ID)%NXzV
+	            K=ATM(ID)%EQXzV+I-1
+	            OLD_POPS(K,J)=OLD_POPS(K,J)*T2
+	          END DO
+	        END DO
+	        ID=SPECIES_END_ID(ISPEC)-1
+	        K=ATM(ID)%EQXzV+ATM(ID)%NXzV
+	        OLD_POPS(K,J)=OLD_POPS(K,J)*T2
+	      END IF
+	    END DO
 	  END DO
-	END DO
+	END IF
 !
 ! Now determine the electron density. Since we determine Ne from the scaled
 ! populations, no scaling is necessary.
@@ -140,14 +176,6 @@
 	DO J=1,ND
 	  OLD_POPS(NT-1,J)=OLD_ED(J)
 	END DO
-!
-! Now get the interpolated radius scale in the old model.
-! This radius scale will have the same velocity coordinates as the
-! current model. Since we have a Hubble law, linear interpolation
-! is accurate.
-!
-	CALL MON_INTERP(NEW_VEC,ND,IONE,V,ND,OLD_R,ND,OLD_V,ND)
-	OLD_R(1:ND-1)=NEW_VEC(1:ND-1)
 !
 	RETURN
 	END

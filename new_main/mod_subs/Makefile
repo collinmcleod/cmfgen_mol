@@ -18,6 +18,7 @@ MOD = $(LIB_MOD)(mod_cmfgen.o)\
       $(LIB_MOD)(line_mod.o)\
       $(LIB_MOD)(line_vec_mod.o)\
       $(LIB_MOD)(mod_lev_dis_blk.o)\
+      $(LIB_MOD)(nuc_iso_mod.o)\
       $(LIB_MOD)(opac_mod.o)\
       $(LIB_MOD)(radiation_mod.o)\
       $(LIB_MOD)(steq_data_mod.o)\

@@ -13,6 +13,8 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered: 31-Jul-2007 : Call to MOM_JREL_V3 included in INCLUDE file.
+!                          Variabled and control variables for rel. trans. installed.
 ! Altered: 01-Feb-2006 : COMP_OBS_V2 installed. Frequency transformation between
 !                          comoving and observing franes is now accuratle for all speeds.
 !                          Frequency scaling of intensities currently switched off.
@@ -247,6 +249,9 @@ C
 	LOGICAL INCL_INCID_RAD
 	LOGICAL PLANE_PARALLEL_NO_V
 	LOGICAL PLANE_PARALLEL
+	LOGICAL USE_J_REL
+	LOGICAL INCL_REL_TERMS
+	LOGICAL INCL_ADVEC_TERMS_IN_TRANS_EQ
 C
 	REAL*8, ALLOCATABLE :: ETA_CMF_ST(:,:)
 	REAL*8, ALLOCATABLE :: CHI_CMF_ST(:,:)
@@ -350,6 +355,10 @@ C
 	REAL*8 dLOG_NU			!Step in frequency in Log plane
 	REAL*8 FEDD_PREV(NDMAX)
 	REAL*8 GEDD_PREV(NDMAX)
+	REAL*8 H_ON_J(NDMAX)
+	REAL*8 N_ON_J_NODE(NDMAX)
+	REAL*8 dlnJdlnR(NDMAX)
+	REAL*8 KMID_ON_J(NDMAX)
 	REAL*8 N_ON_J(NDMAX)
 	REAL*8 N_ON_J_PREV(NDMAX)
 	REAL*8 JNU_PREV(NDMAX)
@@ -904,8 +913,16 @@ C
 	  PLANE_PARALLEL=.FALSE.
 	  CALL RD_STORE_LOG(PLANE_PARALLEL,'PP_MOD',L_FALSE,
 	1    'Plane-paralle geometry with velocity field?')
-                                                                                
-	
+	  USE_J_REL=.FALSE.
+	  INCL_REL_TERMS=.FALSE.
+	  INCL_ADVEC_TERMS_IN_TRANS_EQ=.FALSE.
+	  CALL RD_STORE_LOG(USE_J_REL,'USE_J_REL',L_FALSE,
+	1    'Use relativistic moment solver?')
+	  CALL RD_STORE_LOG(INCL_REL_TERMS,'INCL_REL',L_FALSE,
+	1    'Include relativistic terms?')
+	  CALL RD_STORE_LOG(INCL_ADVEC_TERMS_IN_TRANS_EQ,'INCL_ADV_TRANS',L_FALSE,
+	1    'Include advection terms in transfer equation?')
+!
 	  WRITE(LUMOD,'()')
 	  CALL RD_STORE_LOG(ACCURATE,'INC_GRID',L_TRUE,
 	1          'Increase grid size to improve accuracy? ')
