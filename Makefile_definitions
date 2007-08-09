@@ -47,20 +47,22 @@ EXE_DIR=$(INSTALL_DIR)exe/
 # DEC OSF FORTRAN for ALpha
 #********************************************************************
 
- F90 = fort
- FG  = -extend_source -I$(MOD_DIR)
- FD  = -extend_source -g -ladebug -I$(MOD_DIR)
- FFREE  = -I$(MOD_DIR)
+# F90 = fort
+# FG  = -extend_source -I$(MOD_DIR)
+# FG  = -extend_source -g -ladebug -I$(MOD_DIR)
+# FFREE  = -I$(MOD_DIR)
 
 #********************************************************************
 # PGF90 compiler
 #********************************************************************
 #
-# F90 = pgf90 
-# FG  = -Mextend -Mbackslash    -Ktrap=fp -I$(MOD_DIR)
-# FD  = -Mextend -Mbackslash -g -Ktrap=fp -I$(MOD_DIR)
-# FFREE  = -Mbackslash    -Ktrap=fp -I$(MOD_DIR)
-# FFRED  = -Mbackslash -g -Ktrap=fp -I$(MOD_DIR)
+# F90 = pgf95 -Mconcur  
+ F90 = pgf95  
+ FG  = -O2 -Mextend -Mbackslash -Ktrap=fp -I$(MOD_DIR)
+ FD  = -Mextend -Mbackslash -g -Ktrap=fp -I$(MOD_DIR)
+ FH  = -Mextend -Mbackslash -O1 -Ktrap=fp -I$(MOD_DIR)
+ FFREE  = -Mbackslash -Ktrap=fp -I$(MOD_DIR)
+ FFRED  = -Mbackslash -g -Ktrap=fp -I$(MOD_DIR)
 
 #********************************************************************
 # Locations of system dependent libraries. 
@@ -70,13 +72,13 @@ EXE_DIR=$(INSTALL_DIR)exe/
 #
 # For Rosella
 #
-LOCLIB=-L/usr/lib
-PGLIB=-L/usr/local/lib -lpgplot 
-G2CLIB=-L/usr/lib/gcc-lib/alpha-redhat-linux/egcs-2.91.66 -lg2c
-X11LIB=-L/usr/X11R6/lib -lX11
+#LOCLIB=-L/usr/lib
+#PGLIB=-L/usr/local/lib -lpgplot 
+#G2CLIB=-L/usr/lib/gcc-lib/alpha-redhat-linux/egcs-2.91.66 -lg2c
+#X11LIB=-L/usr/X11R6/lib -lX11
 
-BLAS=-lcxml
-LAPACK=-lcxml
+#BLAS=-lcxml
+#LAPACK=-lcxml
 
 #
 # For Kookaburra
@@ -97,5 +99,12 @@ LAPACK=-lcxml
 #G2CLIB=-L/usr/lib/gcc-lib/i386-glibc21-linux/egcs-2.91.66 -lg2c
 #X11LIB=-L/usr/X11R6/lib -lX11
 #
-#BLAS=-g77libs -lpthread -L/usr/local/intel/mkl/LIB  -lmkl32_def 
-#LAPACK=-L/usr/local/intel/mkl/LIB  -lmkl32_lapack
+BLAS=-g77libs -lpthread -L/usr/lib64 -lblas
+LAPACK=-L/usr/lib64 -llapack
+
+#For lyrebird
+
+LOCLIB=-L/usr/lib64
+PGLIB=-g77libs -L/usr/local/pgplot -lpgplot 
+X11LIB=-L/usr/X11R6/lib64 -lX11
+G2CLIB=-L/usr/lib/gcc-lib/x86_64-redhat-linux/3.4.3 -lg2c

@@ -768,6 +768,9 @@
 !
 	ELSE IF(X(1:3) .EQ. 'INT') THEN
 !
+! For diagnostic purposes. Designed specifically to computes
+! Int J dv & Int dJ/dlnv dv, and plot as a function of depth.
+!
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND
 	    IF(ALLOCATED(XV))DEALLOCATE(XV)
@@ -784,10 +787,14 @@
 	        ZV(I)=ZV(I)+T1*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML+1))
               END DO
             END DO
-            YV=0.5D0*YV; ZV=0.5D0*ZV
+            YV=0.5D+15*YV; ZV=0.5D+15*ZV
             CALL DP_CURVE(ND,XV,YV)
             CALL DP_CURVE(ND,XV,ZV)
           END DO
+	  XAXIS='R/R\d*\u'
+	  YAXIS='Int J dv; Int dJ/dlnv dv'
+!
+! For testing and diagnostic purposes. Plots c.dNU/NU as a function on NU.
 !
 	ELSE IF(X(1:3) .EQ. 'DNU') THEN
 !
@@ -801,9 +808,10 @@
             DO ML=1,NCF-1
                YV(ML)=(ZM(ID)%NU(ML)-ZM(ID)%NU(ML+1))/(ZM(ID)%NU(ML)+ZM(ID)%NU(ML+1))
             END DO
-            YV=0.5D0*YV
+            YV=2.0D0*YV*C_KMS
             CALL DP_CURVE(NCF-1,XV,YV)
-          END DO
+          END DO	
+	  YAXIS='c.dNU/NU(km/s)'
 !
 ! 
 ! Plot section:

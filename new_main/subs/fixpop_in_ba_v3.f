@@ -87,15 +87,18 @@
 	   END IF
 	 END IF
 !
+! We only write the information mesage out if STEQ has not been zeroed already.
+!
 	IF( FIX_IN_BOUND_T .AND. DEPTH_INDX .GE. (ND+1-FIX_LST_X_DPTHS) )THEN
 	  BA(NT,:)=0.0D0
 	  IF(DIAG_BAND)THEN
+	    IF(DEPTH_INDX .EQ. ND .AND. .NOT. ZERO_STEQ(NT))THEN
+              WRITE(LUER,'(A,I4,A)')' Temperature held fixed at',
+	1                 FIX_LST_X_DPTHS,'depths at inner boundary'
+	    END IF
 	    BA(NT,NT)=1.0D0
 	    STEQ(NT)=0.0D0
 	    ZERO_STEQ(NT)=.TRUE.
-	    IF(DEPTH_INDX .EQ. ND)THEN
-              WRITE(LUER,'(A)')' Temperature held fixed at',FIX_LST_X_DPTHS,'at inner boundary'
-	    END IF
 	  END IF
 	END IF
 !

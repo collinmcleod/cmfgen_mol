@@ -524,7 +524,7 @@
 	      V_EXT(I)=VINF*(1.0D0-R_EXT(ND_EXT)/R_EXT(I))**BETA
 	      SIGMA_EXT(I)=BETA/(R_EXT(I)/R_EXT(ND_EXT)-1.0D0)-1.0D0
 	    END DO
-	    WRITE(J,' ')
+	    WRITE(J,'(A)')' '
 	    WRITE(J,*)'Using thick boundary condition in FG_J_CMF_V10'
 	    WRITE(J,'(2(A,ES16.8,3X))')' R(1)=',R(1),'RMAX=',RMAX
 	    WRITE(J,'(2(A,ES16.8,3X))')' V(1)=',V(1),'VMAX=',V_EXT(1)

@@ -95,8 +95,12 @@ $(LIB)(create_iv_links_v2.o) : create_iv_links_v2.f $(STEQ) $(MOD)
 	$(F90) -c $(FG)  create_iv_links_v2.f
 	ar ruv $(LIB) create_iv_links_v2.o
 
+#
+# Optimizaton seems not to work with PGF95 compiler for next routine
+#
+
 $(LIB)(fixpop_in_ba_v3.o) : fixpop_in_ba_v3.f $(STEQ) $(MOD)
-	$(F90) -c $(FG) -I$(MOD_DIR) fixpop_in_ba_v3.f
+	$(F90) -c $(FD) -I$(MOD_DIR) fixpop_in_ba_v3.f
 	ar ruv $(LIB) fixpop_in_ba_v3.o
 
 $(LIB)(generate_full_matrix_v3.o) : generate_full_matrix_v3.f $(STEQ) $(MOD)

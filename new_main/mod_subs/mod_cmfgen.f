@@ -82,43 +82,43 @@
 !
 	TYPE MODEL_ATOM_DATA
 !
-	  REAL*8, ALLOCATABLE :: XzV_F(:,:)		!Level populations in FULL atom
-	  REAL*8, ALLOCATABLE :: XzVLTE_F(:,:)	!LTE level populations in FULL atom
-	  REAL*8, ALLOCATABLE :: W_XzV_F(:,:)	!Level dissolution factors
-	  REAL*8, ALLOCATABLE :: DXzV_F(:)		!Ion population for full atom
-	  REAL*8, ALLOCATABLE :: AXzV_F(:,:)	!Oscillator strength (A(I,j), i<j)
-	  REAL*8, ALLOCATABLE :: EDGEXzV_F(:)	!Ionization energy to g.s. (10^15 Hz)
-	  REAL*8, ALLOCATABLE :: GXzV_F(:)		!Level statistical weights in full atom
-	  INTEGER, ALLOCATABLE :: F_TO_S_XzV(:)	!Link of full levels to super levels
-	  INTEGER, ALLOCATABLE :: INT_SEQ_XzV(:)
-	  CHARACTER*30, ALLOCATABLE :: XzVLEVNAME_F(:)	!Level name
+	  REAL*8, POINTER :: XzV_F(:,:)		!Level populations in FULL atom
+	  REAL*8, POINTER :: XzVLTE_F(:,:)	!LTE level populations in FULL atom
+	  REAL*8, POINTER :: W_XzV_F(:,:)	!Level dissolution factors
+	  REAL*8, POINTER :: DXzV_F(:)		!Ion population for full atom
+	  REAL*8, POINTER :: AXzV_F(:,:)	!Oscillator strength (A(I,j), i<j)
+	  REAL*8, POINTER :: EDGEXzV_F(:)	!Ionization energy to g.s. (10^15 Hz)
+	  REAL*8, POINTER :: GXzV_F(:)		!Level statistical weights in full atom
+	  INTEGER, POINTER :: F_TO_S_XzV(:)	!Link of full levels to super levels
+	  INTEGER, POINTER :: INT_SEQ_XzV(:)
+	  CHARACTER*30, POINTER :: XzVLEVNAME_F(:)	!Level name
 !
-	  REAL*8, ALLOCATABLE :: DXzV(:)		!Ion population for super level
-	  REAL*8, ALLOCATABLE :: XzV(:,:)		!Level population in SL atom
-	  REAL*8, ALLOCATABLE :: XzVLTE(:,:)	!LTE populations in SL atom
-	  REAL*8, ALLOCATABLE :: dlnXzVLTE_dlnT(:,:)
+	  REAL*8, POINTER :: DXzV(:)		!Ion population for super level
+	  REAL*8, POINTER :: XzV(:,:)		!Level population in SL atom
+	  REAL*8, POINTER :: XzVLTE(:,:)	!LTE populations in SL atom
+	  REAL*8, POINTER :: dlnXzVLTE_dlnT(:,:)
 !
-	  REAL*8, ALLOCATABLE :: WSXzV(:,:,:)		!Weights assoc. with s.e. eval.
-	  REAL*8, ALLOCATABLE :: WCRXzV(:,:,:)		!Weights assoc. with cooling.
-	  REAL*8, ALLOCATABLE :: dWSXzVdT(:,:,:)		!Weights assoc. with d(S.E. Eqn)/dT
-	  REAL*8, ALLOCATABLE :: WSE_X_XzV(:,:)		!X-ray photoionization weights.
-	  REAL*8, ALLOCATABLE :: WCR_X_XzV(:,:)		!
+	  REAL*8, POINTER :: WSXzV(:,:,:)		!Weights assoc. with s.e. eval.
+	  REAL*8, POINTER :: WCRXzV(:,:,:)		!Weights assoc. with cooling.
+	  REAL*8, POINTER :: dWSXzVdT(:,:,:)		!Weights assoc. with d(S.E. Eqn)/dT
+	  REAL*8, POINTER :: WSE_X_XzV(:,:)		!X-ray photoionization weights.
+	  REAL*8, POINTER :: WCR_X_XzV(:,:)		!
 !
-	  REAL*8, ALLOCATABLE :: APRXzV(:,:)		!Arrays for confirming the SE and RE
-	  REAL*8, ALLOCATABLE :: ARRXzV(:,:)		!equations are satisfied.
-	  REAL*8, ALLOCATABLE :: BFCRXzV(:,:)		
+	  REAL*8, POINTER :: APRXzV(:,:)		!Arrays for confirming the SE and RE
+	  REAL*8, POINTER :: ARRXzV(:,:)		!equations are satisfied.
+	  REAL*8, POINTER :: BFCRXzV(:,:)		
 !
 ! Data vectors to check cooling rates.
 !
-	  REAL*8, ALLOCATABLE :: FFXzV(:)
-	  REAL*8, ALLOCATABLE :: CRRXzV(:)
-	  REAL*8, ALLOCATABLE :: CPRXzV(:)
-	  REAL*8, ALLOCATABLE :: COOLXzV(:)
+	  REAL*8, POINTER :: FFXzV(:)
+	  REAL*8, POINTER :: CRRXzV(:)
+	  REAL*8, POINTER :: CPRXzV(:)
+	  REAL*8, POINTER :: COOLXzV(:)
 !
 ! Data vectors to check charge recombination rates.
 !
-	  REAL*8, ALLOCATABLE :: CHG_RRXzV(:)
-	  REAL*8, ALLOCATABLE :: CHG_PRXzV(:)
+	  REAL*8, POINTER :: CHG_RRXzV(:)
+	  REAL*8, POINTER :: CHG_PRXzV(:)
 !
 	  REAL*8 ZXzV			!Charge on ion (=1 for HI)
 	  REAL*8 GIONXzV_F		!Statistical weight of ion

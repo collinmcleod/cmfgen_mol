@@ -1,5 +1,5 @@
 !
-! General routine for plotting and comparing I ) obtained from IP_DATA.
+! General routine for plotting and comparing I(p,nu) obtained from IP_DATA.
 !
 ! Various options are available to redden and normalize the model spectra. 
 ! Several different units can be used for the X and Y axes.

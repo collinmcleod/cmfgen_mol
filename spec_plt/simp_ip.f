@@ -1,8 +1,13 @@
 !
-! General routine for plotting and comparing I ) obtained from IP_DATA.
+! Simple routine for outputing, in asci format, I(p) as a function of p.
+! Based in IP_DATA.
 !
-! Various options are available to redden and normalize the model spectra. 
-! Several different units can be used for the X and Y axes.
+! I(p) can either be output at a single frequency, of averaged over a
+! band of freqencies.
+!
+!Output:
+!       IP_TXT_DATA
+!       SPECTRUM (obtained by integrating I(p) over p).
 !
 	PROGRAM SIMP_IP
 	IMPLICIT NONE
@@ -128,6 +133,9 @@
 	  YV(1:NP)=IP(1:NP,I)
 	END IF
 !
+! Ouput I as a function of p. If LAM_ST=LAM_END, this is output at a single
+! frequency. Otherwise I(p,nu) has been averaged over the frequency band.
+!
 	OPEN(UNIT=12,FILE='IP_TXT_DATA',ACTION='WRITE',STATUS='UNKNOWN')
 	  WRITE(12,*)'Lambda start:',LAM_ST
 	  WRITE(12,*)'Lambda end:',LAM_END
@@ -138,6 +146,8 @@
 	    WRITE(12,*)I,P(I),YV(I)
 	  END DO
 	CLOSE(UNIT=12)
+!
+! Compute spectrum over the interval LAM_ST to LAM_END.
 !
 	IF(LAM_END .GT. LAM_ST)THEN
 	  NX=INDX_END-INDX_ST+1
