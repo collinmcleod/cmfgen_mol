@@ -99,21 +99,35 @@
 	END IF
 !
 	DENSITY=ATOM_DEN*RHO(1)/POP_ATOM(1,1)
+	IF(DENSITY .GT. RHO(N_D))THEN
+	   WRITE(6,*)'Error in GET_LTE_ROSS_V2'
+	   WRITE(6,*)'Density outside range'
+	   WRITE(6,*)'Maximum density=',RHO(N_D)
+	   WRITE(6,*)'Requested =',DENSITY
+	   STOP
+	END IF
 	I_D=1
 	DO I_D=2,N_D
 	  IF(DENSITY .LT. RHO(I_D))EXIT
 	END DO
 !
+	IF(TVAL .GT. TEMP(N_T))THEN
+	   WRITE(6,*)'Error in GET_LTE_ROSS_V2'
+	   WRITE(6,*)'Temperature outside range'
+	   WRITE(6,*)'Maximum temperature=',TEMP(N_T)
+	   WRITE(6,*)'Requested temperature=',TVAL
+	   STOP
+	END IF
 	I_T=1
 	DO I_T=2,N_T
 	  IF(TVAL .LT. TEMP(I_T))EXIT
 	END DO
-!	WRITE(6,*)I_T,I_D
+	WRITE(6,*)I_T,I_D
 	IF(I_T .GT. N_T)I_T=N_T-1
 !
-!	WRITE(6,*)TVAL,TEMP(I_T-1),TEMP(I_T)
+	WRITE(6,*)TVAL,TEMP(I_T-1),TEMP(I_T)
 	T1=LOG(TEMP(I_T)/TVAL)/LOG(TEMP(I_T)/TEMP(I_T-1))
-!	WRITE(6,*)DENSITY,RHO(I_D-1),RHO(I_D)
+	WRITE(6,*)DENSITY,RHO(I_D-1),RHO(I_D)
 	T2=LOG(RHO(I_D)/DENSITY)/LOG(RHO(I_D)/RHO(I_D-1))
 !
 	D1=T1*LOG(KAP(I_T-1,I_D-1))+(1.0D0-T1)*LOG(KAP(I_T,I_D-1))

@@ -304,13 +304,13 @@
 	EXTERNAL WR_PWD
 	CHARACTER*120 WR_PWD
 !
-	REAL*8 GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT
+	REAL*8 GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT,BOLTZMANN_CONSTANT
 	REAL*8 FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
 	REAL*8 ASTRONOMICAL_UNIT,RAD_SUN
 	INTEGER GET_INDX_DP
 	EXTERNAL GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT,GET_INDX_DP
 	EXTERNAL FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
-	EXTERNAL ASTRONOMICAL_UNIT,RAD_SUN
+	EXTERNAL ASTRONOMICAL_UNIT,RAD_SUN,BOLTZMANN_CONSTANT
 !
 	LOGICAL PRESENT			!indicates whether species is linked
 	LOGICAL EQUAL
@@ -702,6 +702,10 @@
 	        CALL WRITE_LINE(LEV(1),LEV(2),FREQ,ION_ID(ID))
 	        AMASS=AT_MASS(SPECIES_LNK(ID))
 	        FLAG=.TRUE.
+	      ELSE
+	        WRITE(T_OUT,*)'Levels outside valid range'
+	        WRITE(T_OUT,*)'Maximum level is',ATM(ID)%NXzV_F
+	        GOTO 1
 	      END IF
 	    END IF
 	  END DO
@@ -1206,6 +1210,14 @@
 	  END DO
 	  XAXIS='Log(\gt\dc\u)'
 	  XAXSAV=XAXIS
+!
+	ELSE IF(XOPT .EQ. 'XCAKT')THEN
+	  CALL USR_HIDDEN(T1,'VTH','10.0','Thermal doppler velocity (km/s)')
+	  DO I=1,ND
+	    T2=(SIGMA(I)+1.0D0)*V(I)/R(I)
+	    XV(I)=DLOG10(6.65D-15*ED(I)*CLUMP_FAC(I)*T1/T2)
+	  END DO
+	  XAXIS='Log(t)'
 !
 	ELSE IF(XOPT .EQ. 'SET-ATM')THEN
 	  CALL USR_OPTION(TYPE_ATM,'ATM',' ','Type of atmosphere: EXP or WIND')
@@ -1773,7 +1785,7 @@
 	  ELSE
 	    WRITE(T_OUT,*)'Rosseland opacity not available.'
 	  END IF!
-	ELSE IF(XOPT .EQ. 'YR')THEN
+	ELSE IF(XOPT .EQ. 'YLOGR')THEN
 	  DO I=1,ND
 	    YV(I)=DLOG10(R(I)/R(ND))
 	  END DO
@@ -1935,6 +1947,16 @@
 	  CALL DP_CURVE(ND,Z,YV)
 	  XAXSAV=XAXIS
 	  XAXIS='Log(r/R\d*\u)'
+!
+! To convert from cm/s to km/s we cale the sound speed by a factor of 10^{-5}. However,
+! T in units of 10^4 K, thus the scale factor is on 10^{-3}.
+!
+	ELSE IF(XOPT .EQ. 'ISOC')THEN
+	  DO I=1,ND
+	    YV(I)=1.0D-03*SQRT(BOLTZMANN_CONSTANT()*(POP_ATOM(I)+ED(I))*T(I)/MASS_DENSITY(I))
+	  END DO
+	  CALL DP_CURVE(ND,XV,YV)
+	  YAXIS='c(km/s)'
 !
 	ELSE IF(XOPT .EQ. 'SIGMA')THEN
 	  DO I=1,ND
@@ -1962,6 +1984,19 @@
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log(t)'
+!
+! We subtract 1 since M(t), by definition, does not include the
+! force on the elctrons. With the present definition, it does include
+! bound-free and free contributins (only important at depth.)
+!
+	ELSE IF(XOPT .EQ. 'MT')THEN
+	  T1=1.0D-30*LUM_SUN()*LUM/4.0D0/PI/C_CMS
+	  T2=T1*6.65D-15
+	  DO I=1,ND
+	    YV(I)=FLUX_MEAN(I)/ED(I)/6.65D-15 - 1.0D0
+	  END DO
+	  CALL DP_CURVE(ND,XV,YV)
+	  YAXIS='M(t)'
 !
 ! Sobolev radial optical depth scale. Assumes fg=1, POP_ATOM for the
 ! levelp population.
@@ -4022,12 +4057,13 @@ c
 	  XAXIS='\gl(\V)'
 	  YAXIS='\gs/gs_dT\u'
 !
+!
 	ELSE IF(XOPT .EQ. 'ETA')THEN
 	  DO I=1,ND
-	    YV(I)=DLOG10(ETA(I)+1.0D-250)
+	    YV(I)=DLOG10(ETA(I)+1.0D-250)-10.0D0
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
-	  YAXIS='Log(\ge)'
+	  YAXIS='Log(\ge(ergs/cm\u3\d/s/Hz)'
 !
 	ELSE IF(XOPT .EQ.'OP' .OR.
 	1       XOPT .EQ. 'TAUC' .OR.
@@ -4129,15 +4165,22 @@ c
 	  CALL USR_HIDDEN(LINY,'LINY','F','Linear Y Axis')
 !
 	  IF(XOPT .EQ. 'TAUR')THEN
-	    CALL USR_OPTION(RVAL,'RAD',' ','Radius in R*')
-	    RVAL=RVAL*R(ND)
-	    IF(RVAL .GT. R(1))RVAL=R(1)
-	    IF(RVAL .LT. R(ND))RVAL=R(ND)
-	    R_INDX=ND
-	    DO WHILE(RVAL .GT. R(R_INDX))
-	      R_INDX=R_INDX-1
-	    END DO
-	    R_INDX=MIN(R_INDX,ND-1)
+	    CALL USR_OPTION(RVAL,'RAD',' ','Radius in R* (-ve for depth index)')
+	    IF(RVAL .LT. 0)THEN
+	      RVAL=RVAL*R(ND)
+	      IF(RVAL .GT. R(1))RVAL=R(1)
+	      IF(RVAL .LT. R(ND))RVAL=R(ND)
+	      R_INDX=ND
+	      DO WHILE(RVAL .GT. R(R_INDX))
+	        R_INDX=R_INDX-1
+	      END DO
+	      R_INDX=MIN(R_INDX,ND-1)
+	    ELSE
+	      R_INDX=NINT(ABS(RVAL))
+	      R_INDX=MAX(1,R_INDX)
+	      R_INDX=MIN(R_INDX,ND-1)
+	      RVAL=R(R_INDX)
+	    END IF
 	    YAXIS='Log(\gt[R])'
 	    IF(LINY)YAXIS='\gt[R]'
 	  ELSE
@@ -4648,6 +4691,19 @@ c
 	    WRITE(25,'(I3,ES15.5,3ES14.4)'),I,R(I)*1.0D+10,T(I)*1.0D+04,
 	1          MASS_DENSITY(I),1.0D-10*ROSS_MEAN(I)/MASS_DENSITY(I)
 	  END DO
+	ELSE IF(XOPT .EQ. 'WRRVSIG')THEN
+	  CALL GEN_ASCI_OPEN(LU_OUT,'NEW_RVSIG','UNKNOWN',' ','WRITE',I,IOS)
+	  WRITE(LU_OUT,'(A)')'!'
+	  WRITE(LU_OUT,'(A,7X,A,9X,10X,A,11X,A,3X,A)')'!','R','V(km/s)','Sigma','Depth'
+	  WRITE(LU_OUT,'(A)')'!'
+	  WRITE(LU_OUT,'(A)')' '
+	  WRITE(LU_OUT,'(I4,20X,A)')ND,'!Number of depth points`'
+	  WRITE(LU_OUT,'(A)')' '
+	  DO I=1,ND
+	    WRITE(LU_OUT,'(F18.8,ES17.7,F17.7,4X,I4)')R(I),V(I),SIGMA(I),I
+	  END DO
+	  CLOSE(LU_OUT)
+	  WRITE(T_OUT)'RVSIG data output to NEW_RVSIG'
 	ELSE IF(XOPT .EQ. 'WRPLOT')THEN
 	  WRITE(T_OUT,*)' OPTION `WRPLOT` NOT AVAILABLE'
 	  WRITE(T_OUT,*)' Use WP option in plot package'

@@ -37,10 +37,10 @@ all : $(EXE_DIR)cmfgen_dev.exe
 
 $(EXE_DIR)cmfgen_dev.exe : cmfgen.o cmfgen_sub.o \
                                   $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
-	$(F90) cmfgen.o cmfgen_sub.o \
+	$(F90) -g cmfgen.o cmfgen_sub.o \
              -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN5) -l$(LN3) -l$(LN1) -l$(LN6) \
                $(LOCLIB) $(LAPACK) $(BLAS) \
-               -g -o $(EXE_DIR)cmfgen_dev.exe
+               -o $(EXE_DIR)cmfgen_dev.exe
 
 USR=$(LIB_DIR)libtools.a(usr_option.o)
 

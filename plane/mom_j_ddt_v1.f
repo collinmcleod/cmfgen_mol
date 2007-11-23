@@ -669,7 +669,7 @@
 	  HFLUX_AT_INB=DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
 	  TB(ND)=F(ND)/DTAU(ND-1)
 	  XM(ND)=HFLUX_AT_INB+DJDt(ND)*(HFLUX_AT_INB-ROLD_ON_R*HFLUX_AT_INB_OLDt)
-	1              +GAM(ND)*(HFLUX_AT_INB-HFLUX_AT_INB_PREV)
+!	1              +GAM(ND)*(HFLUX_AT_INB-HFLUX_AT_INB_PREV)
 	ELSE
 	  LUER=ERROR_LU()
 	  WRITE(LUER,*)'Error: only the diffusion approximation is implemented in MOM_J_DDT_V1'

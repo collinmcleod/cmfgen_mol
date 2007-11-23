@@ -184,6 +184,11 @@
 	SOL_ABUND_HSCL(ID)=4.99D0
 !
 	ID=ID+1
+	AT_NO(ID)=23.0D0;           AT_MASS(ID)=50.94D0         !Vandium
+	SPECIES(ID)='VAN';          SPECIES_ABR(ID)='V'         !Actual symbol is V 
+	SOL_ABUND_HSCL(ID)=4.00D0
+!
+	ID=ID+1
 	AT_NO(ID)=24.0D0;	    AT_MASS(ID)=52.0D0		!Chromium
 	SPECIES(ID)='CHRO';	    SPECIES_ABR(ID)='Cr'
 	SOL_ABUND_HSCL(ID)=5.67D0

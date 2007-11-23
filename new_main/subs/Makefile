@@ -95,6 +95,10 @@ $(LIB)(create_iv_links_v2.o) : create_iv_links_v2.f $(STEQ) $(MOD)
 	$(F90) -c $(FG)  create_iv_links_v2.f
 	ar ruv $(LIB) create_iv_links_v2.o
 
+$(LIB)(det_lte_ed.o) : det_lte_ed.f $(MOD)
+	$(F90) -c $(FG)  det_lte_ed.f
+	ar ruv $(LIB) det_lte_ed.o
+
 #
 # Optimizaton seems not to work with PGF95 compiler for next routine
 #

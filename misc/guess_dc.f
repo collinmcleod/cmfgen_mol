@@ -18,6 +18,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 19-Sep-2007 : Species length increased from 5 to 6 (handle ArVIII).
 ! Altered 14-May-2006 : For a high ionization species, ground state population is 
 !                       read in from file. This allows estimate of ion population 
 !                       to be made.
@@ -133,7 +134,7 @@
 	INTEGER GET_INDX_DP
 !
 	CHARACTER*80 RVTJ_FILE_NAME
-	CHARACTER*5 SPECIES
+	CHARACTER*6 SPECIES
 !
 	REAL*8 SPEED_OF_LIGHT
 	CHARACTER*30 UC

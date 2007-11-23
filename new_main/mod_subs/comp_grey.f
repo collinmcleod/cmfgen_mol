@@ -15,6 +15,9 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered 30_Aug-2007 : Bug fix. Invalid lower boundary condition flux for
+!                         MOM_JREL and for FCOMP_PP_V2i. Forgot factor of CHI. 
+!                         
 ! Created 21-Dec-2004
 !
 	INTEGER NC
@@ -77,12 +80,12 @@
 	   NEW_FREQ=.TRUE.; FIRST_FREQ=.TRUE.
 !
 ! Note HFLUX=LUM*Lsun/16/(PI*PI)/10**2 (10**2 for 1/R**2).
-! DBB =3L/16(piR)**2 and is used for the lower boundary diffusion 
-! approximation. Since we are dealing with a plane-parallel
+! DBB - dBdR = 3. Chi. L/16(piR)**2 and is used for the lower boundary
+! diffusion approximation. Since we are dealing with a plane-parallel
 ! atmopshere, we divide HFLUX by R*^2.
 !
 	   HFLUX=3.826D+13*LUM/16.0D0/PI**2/R(ND)/R(ND)
-           DBB=3.0D0*HFLUX
+           DBB=3.0D0*CHI(ND)*HFLUX
 	   T1=1000.0D0
 !
 ! Compute radial (vertical) optical depth increments.
@@ -90,11 +93,11 @@
 	   CALL DERIVCHI(TB,CHI,R,ND,METHOD)
            CALL NORDTAU(DTAU,CHI,R,R,TB,ND)
 !
-	   DO WHILE(T1 .GT. 1.0D-05)
 !
 ! Compute the solution vector. Note that the units need to be
 ! eventually included. The following follows direcly from d2K/d2Tau=0.
 !
+	   DO WHILE(T1 .GT. 1.0D-08)
 	     T2=FEDD(1)/HBC_CMF
 	     RJ(1)=HFLUX/HBC_CMF
 	     DO I=2,ND
@@ -112,6 +115,16 @@
 	     END DO
 	     NEW_FREQ=.FALSE.
 	   END DO
+!
+	   OPEN(UNIT=7,FILE='GREY_CHK',STATUS='UNKNOWN')
+	     WRITE(7,'(A)')
+	     WRITE(7,'(A)')'Check for plane-parallel grey atmosphere calculation'
+	     WRITE(7,'(A)')
+	     WRITE(7,'(4X,A,4(12X,A))')'I','    R','    J','Ray J','    f'
+	     DO I=1,ND
+	       WRITE(7,'(X,I4,4(ES16.6))')I,R(I),RJ(I),TC(I),GAMH(I)
+	     END DO
+	   CLOSE(UNIT=7)
 !
 	ELSE IF(JGREY_WITH_V_TERMS)THEN
 !
@@ -135,11 +148,11 @@
 !
 ! Note
 !   HFLUX=LUM*Lsun/16/(PI*PI)/10**2/R**2 (10**2 for 1/R**2).
-!   DBB =3L/16(piR)**2 
-! DBB is used for the lower boundary diffusion approximation. 
+!   DBB = dBdR = 3.Chi.L/16(piR)**2 
+!   DBB is used for the lower boundary diffusion approximation. 
 !
 	  HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
-          DBB=3.0D0*HFLUX
+          DBB=3.0D0*HFLUX*CHI(ND)
 	  T1=1.0D0
 	  DO WHILE(T1 .GT. 1.0D-05)
             CALL MOM_JREL_GREY_V1(XM,CHI,CHI,V,SIGMA,R,
@@ -162,7 +175,7 @@
 !
 	ELSE IF(USE_DJDT_RTE)THEN
 !
-	   T2=1.0D-05		!Accuracy to converge f
+	   T2=1.0D-06		!Accuracy to converge f
 	   WRITE(6,*)'BEF',ND,NC,NP
 	   CALL JGREY_HUB_DDT_V1(RJ,SOB,CHI,R,V,SIGMA,
 	1              P,AQW,HMIDQW,KQW,LUM,METHOD,DIF,IC,
@@ -178,7 +191,7 @@
 	    END DO
 	    HBC_J=1.0D0
 	    T1=1000.0D0
-	    DO WHILE(T1 .GT. 1.0D-05)
+	    DO WHILE(T1 .GT. 1.0D-06)
 	      CALL JGREY(TA,TB,TC,XM,DTAU,R,Z,P,RJ,
 	1        GAM,GAMH,Q,FEDD,CHI,dCHIdR,
 	1        AQW,KQW,LUM,HBC_J,T2,NC,ND,NP,METHOD)

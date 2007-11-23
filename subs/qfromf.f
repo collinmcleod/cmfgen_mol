@@ -5,7 +5,6 @@ C
 	SUBROUTINE QFROMF(F,Q,R,TA,TB,ND)
 	IMPLICIT NONE
 C
-C Altered   -Jan-2007 - Remove 2/r from integration.
 C Altered 26-May-1996 - GENERIC calls now used for DLOG and DEXp
 C                       TWO used.
 C Created 17-FEB-1986
@@ -21,8 +20,7 @@ C Reverse ordering of arrays so the we integrate outwards from the
 C surface of the star.
 C
 	DO I=1,ND
-!	  TA(ND-I+1)=(3.0D0*F(I)-1.0D0)/R(I)/F(I)
-	  TA(ND-I+1)=(F(I)-1.0D0)/R(I)/F(I)
+	  TA(ND-I+1)=(3.0D0*F(I)-1.0D0)/R(I)/F(I)
 	  TB(ND-I+1)=R(I)
 	END DO
 C
@@ -35,8 +33,7 @@ C
 	END DO
 C
 	DO I=1,ND-1
-!	  Q(I)=EXP(TB(I)+TWO*LOG(R(ND)/R(I)))
-	  Q(I)=EXP(TB(I))
+	  Q(I)=EXP(TB(I)+TWO*LOG(R(ND)/R(I)))
 	END DO
 	Q(ND)=1.0D0
 C

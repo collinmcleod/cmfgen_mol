@@ -250,6 +250,13 @@ C
 	    WRITE(LS,'(I5,ES14.5,11ES13.4)')I,R(I),VEL(I),CHI(I),VEL(I)/R(I)/C_KMS,
 	1                                RJ(I),FS_J(I),FS_H(I),FEDD(I),H_ON_J(I)
 	  END DO
+	  T1=4.1274D-12*R(1)*R(1)*( FS_H(1)+BETA(1)*FS_J(1)*
+	1         (1.0D0+FEDD(1))/(1.0D0-BETA(1)*BETA(1)) )
+	  WRITE(LS,'(A)')' '
+	  WRITE(LS,'(A,ES14.5)')' Observed flux computed by EDD routine is ',T1
+	  T1=4.1274D-12*R(1)*R(1)*FS_H(1)
+	  WRITE(LS,'(A,ES14.5)')' Comoving-frame flux computed by EDD routine is ',T1
+	  WRITE(LS,'(A)')' '
 	CLOSE(UNIT=LS)
 !
 	RETURN

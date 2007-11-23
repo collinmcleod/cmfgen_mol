@@ -512,6 +512,9 @@ C
 !
 ! No old model. The guesses in the outer region may need improving.
 !
+	    WRITE(6,*)' '
+	    WRITE(6,*)' Using LTE plane-parallel structure'
+	    WRITE(6,*)' '
 	    POP_ATOM(1)=NI_ZERO
 	    T(1)=0.75D0*TEFF
 	    CALL GET_LTE_ROSS_V2(KAP_ROSS,KAP_ES,T1,POP_ATOM(1),T(1))

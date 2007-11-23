@@ -81,7 +81,7 @@
 ! Open output file for all errors and comments. Change DO_TERM_OUT to
 ! have the output go to the terminal/batch log file.
 !
-	DO_TERM_OUT=.FALSE.                   !TRUE.
+	DO_TERM_OUT=.FALSE.                                   !TRUE.
 	IF(.NOT. DO_TERM_OUT)THEN
 	  CALL GEN_ASCI_OPEN(LUER,'OUTGEN','UNKNOWN','APPEND',' ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN
@@ -182,6 +182,11 @@
 	AT_NO(ID)=22.0D0;	    AT_MASS(ID)=47.88D0		!Titanium
 	SPECIES(ID)='TIT';	    SPECIES_ABR(ID)='Tk'	!Actual symbol is Ti
 	SOL_ABUND_HSCL(ID)=4.99D0
+!
+	ID=ID+1
+	AT_NO(ID)=23.0D0;	    AT_MASS(ID)=50.94D0		!Vandium
+	SPECIES(ID)='VAN';	    SPECIES_ABR(ID)='V'		!Actual symbol is V 
+	SOL_ABUND_HSCL(ID)=4.00D0
 !
 	ID=ID+1
 	AT_NO(ID)=24.0D0;	    AT_MASS(ID)=52.0D0		!Chromium
@@ -327,9 +332,10 @@
 ! specified by [XzV_NSF] are valid.
 !
 	CALL CNT_NUM_KEYS(I,'_ISF]')
-	IF(I .NE. NUM_IONS_RD)THEN
+	CALL CNT_NUM_KEYS(J,'_NSF]')
+	IF(I+J .NE. NUM_IONS_RD)THEN
 	  WRITE(LUER,*)'Error in CMFGEN'
-	  WRITE(LUER,*)'You have an invalid [XzV_ISF] key in MODEL_SPEC'
+	  WRITE(LUER,*)'You have an invalid [XzV_ISF] or [XZV_NsF] key in MODEL_SPEC'
 	  WRITE(LUER,*)'NUM_IONS=',NUM_IONS
 	  WRITE(LUER,*)'NUM_IONS_RD=',NUM_IONS_RD
 	  WRITE(LUER,*)'No IONS in MODEL_SPEC',I

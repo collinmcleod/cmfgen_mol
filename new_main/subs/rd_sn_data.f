@@ -1,6 +1,6 @@
 !
 ! Subroutine to read in hydrodynamical data data from a SN model.
-! Routine reads in T, Density, and mass-fractions, and interopolates
+! Routine reads in T, Density, and mass-fractions, and interpolates
 ! them onto the CMFGEN grid.
 !
 	SUBROUTINE RD_SN_DATA(ND,NEW_MODEL,LU)
@@ -45,7 +45,7 @@
 	LOGICAL DONE
 !
 	LUER=ERROR_LU()
-	WRITE(6,*)'Entering RD_SN_DATA'
+	WRITE(LUER,*)'Entering RD_SN_DATA'
 	OPEN(UNIT=LU,FILE='SN_HYDRO_DATA',STATUS='OLD')
 !
 ! Get the number of data points in the HYDRO model, and the number 
@@ -78,21 +78,20 @@
 	      END IF
    	    END IF
 	  END DO
-	  WRITE(6,*)'Read NX, NSP in RD_SN_DATA'
 !
-	  ALLOCATE (R_HYDRO(NX));         R_HYDRO=0.0D0
-	  ALLOCATE (LOG_R_HYDRO(NX));     LOG_R_HYDRO=0.0D0
-	  ALLOCATE (T_HYDRO(NX));         T_HYDRO=0.0D0
-	  ALLOCATE (ELEC_DEN_HYDRO(NX));  ELEC_DEN_HYDRO=0.0D0
-	  ALLOCATE (ATOM_DEN_HYDRO(NX));  ATOM_DEN_HYDRO=0.0D0
-	  ALLOCATE (DENSITY_HYDRO(NX));   DENSITY_HYDRO=0.0D0
-	  ALLOCATE (WRK_HYDRO(NX));      WRK_HYDRO=' '
-	  ALLOCATE (SPEC_HYDRO(NSP));     SPEC_HYDRO=' '
-	  ALLOCATE (POP_HYDRO(NX,NSP));   POP_HYDRO=0.0D0
+	  ALLOCATE (R_HYDRO(NX));           R_HYDRO=0.0D0
+	  ALLOCATE (LOG_R_HYDRO(NX));       LOG_R_HYDRO=0.0D0
+	  ALLOCATE (T_HYDRO(NX));           T_HYDRO=0.0D0
+	  ALLOCATE (ELEC_DEN_HYDRO(NX));    ELEC_DEN_HYDRO=0.0D0
+	  ALLOCATE (ATOM_DEN_HYDRO(NX));    ATOM_DEN_HYDRO=0.0D0
+	  ALLOCATE (DENSITY_HYDRO(NX));     DENSITY_HYDRO=0.0D0
+	  ALLOCATE (WRK_HYDRO(NX));         WRK_HYDRO=' '
+	  ALLOCATE (SPEC_HYDRO(NSP));       SPEC_HYDRO=' '
+	  ALLOCATE (POP_HYDRO(NX,NSP));     POP_HYDRO=0.0D0
 !
-	  ALLOCATE (ISO_HYDRO(NX,NISO));   ISO_HYDRO=0.0D0
-	  ALLOCATE (BARY_HYDRO(NISO));   BARY_HYDRO=0
-	  ALLOCATE (ISO_SPEC_HYDRO(NISO));   ISO_SPEC_HYDRO=' '
+	  ALLOCATE (ISO_HYDRO(NX,NISO));    ISO_HYDRO=0.0D0
+	  ALLOCATE (BARY_HYDRO(NISO));      BARY_HYDRO=0
+	  ALLOCATE (ISO_SPEC_HYDRO(NISO));  ISO_SPEC_HYDRO=' '
 !
 ! Get basic HYDRO grid vectors.
 !
@@ -124,7 +123,7 @@
 	   END IF
 	   STRING=' '
 	 END DO
-	 WRITE(6,*)'Obtained non-POP vectors in RD_SN_DATA'
+	 WRITE(LUER,*)'Obtained non-POP vectors in RD_SN_DATA'
 !
 ! We can now read in the mass-fractions.
 !
@@ -135,7 +134,6 @@
 	    STRING=ADJUSTL(STRING)
 	    SPEC_HYDRO(L)=STRING(1:INDEX(STRING,' '))
 	    READ(LU,*)(POP_HYDRO(I,L), I=1,NX)
-	    WRITE(6,*)TRIM(SPEC_HYDRO(L)),POP_HYDRO(1,L),POP_HYDRO(ND,L)
 	    STRING=' '
 	  END DO
 !
@@ -149,8 +147,8 @@
 	    I=INDEX(STRING,' ')
 	    ISO_SPEC_HYDRO(L)=STRING(1:I-1)
 	    READ(STRING(I:),*)BARY_HYDRO(L)
-	    WRITE(6,'(A)')TRIM(ISO_SPEC_HYDRO(L))
 	    READ(LU,*)(ISO_HYDRO(I,L), I=1,NX)
+!	    WRITE(LUER,'(I5,A,I5,2ES14.4)')L,TRIM(ISO_SPEC_HYDRO(L)),BARY_HYDRO(L),ISO_HYDRO(1,L),ISO_HYDRO(NX,L)
 	    STRING=' '
 	  END DO
 !
@@ -173,6 +171,9 @@
 ! We can now interpolate from the HYDRO grid to the CMFGEN grid.
 ! Interpolations are don in R, in the log-log plane.
 !
+! If the model is not a NEW_MODEL, ED and T are set elsewhere, and thus we 
+! don't want to corrupt them.
+!
 	LOG_R_HYDRO=LOG(R_HYDRO)
 	LOG_R=LOG(R)
 	IF(FIRST .AND. NEW_MODEL)THEN
@@ -182,9 +183,10 @@
 	  ELEC_DEN_HYDRO=LOG(ELEC_DEN_HYDRO) 
 	  CALL MON_INTERP(ED,ND,IONE,LOG_R,ND,ELEC_DEN_HYDRO,NX,LOG_R_HYDRO,NX)
 	  ED=EXP(ED)
+	  WRITE(LUER,*)'RD_SN_DATA has read ED and T'
 	END IF
-	WRITE(6,*)'Done ED and T'
 !
+	WRITE(175,*)'Old density'
 	DO I=1,NX
 	   WRITE(175,'(I8,3ES14.4)')I,R_HYDRO(I),DENSITY_HYDRO(I)
 	END Do
@@ -193,7 +195,7 @@
 	DENSITY=EXP(DENSITY)
 	WRITE(175,*)'New density'
 	DO I=1,ND
-	  WRITE(175,'(I5,3ES14.4)')I,R(I),V(I),DENSITY(I)
+	  WRITE(175,'(I5,4ES14.4)')I,R(I),V(I),DENSITY(I),ED(I)
 	END DO
 !
 	POP_SPECIES=0.0D0
@@ -204,7 +206,7 @@
 	    END IF
 	  END DO
 	END DO
-	WRITE(6,*)'Done populations'
+	WRITE(LUER,*)'Read SN populations in RD_SN_DATA'
 !
 	DO IS=1,NUM_ISOTOPES
 	  ISO(IS)%OLD_POP_DECAY=ISO(IS)%OLD_POP
@@ -225,7 +227,7 @@
 	    STOP
 	  END IF
 	END DO
-	WRITE(6,*)'Done isotope populations'
+	WRITE(LUER,*)'Read SN isotope populations in RD_SN_DATA'
 !
 ! Ensure mass-fractions sum to unity.
 !
@@ -236,13 +238,12 @@
 	DO L=1,NUM_SPECIES
 	  POP_SPECIES(:,L)=POP_SPECIES(:,L)/WRK(:)
 	END DO
-	WRITE(6,*)'Normalized mass fractions'
+	WRITE(6,*)'Normalized mass fractions in RD_SN_DATA'
 !
 ! Now compute the atomic population of each species.
 !
 	DO L=1,NUM_SPECIES
 	  POP_SPECIES(:,L)=POP_SPECIES(:,L)*DENSITY(:)/AT_MASS(L)/1.66D-24
-	  WRITE(6,*)L,POP_SPECIES(1,L),POP_SPECIES(ND,L)
 	END DO
 	DO IS=1,NUM_ISOTOPES
 	  ISO(IS)%OLD_POP=ISO(IS)%OLD_POP*DENSITY/ISO(IS)%MASS/1.66D-24
@@ -263,6 +264,7 @@
 	    END IF
 	  END DO
 	END DO
+	WRITE(LUER,*)'Normalized isotope populations in RD_SN_DATA'
 !
 ! If population is zero at some depths, but species is present, we will
 ! set to small value.
@@ -285,7 +287,6 @@
 	CALL DO_SPECIES_DECAYS(DELTA_T_SECS,ND)
         DO IS=1,NUM_ISOTOPES
           ISO(IS)%POP=ISO(IS)%OLD_POP_DECAY
-	  WRITE(6,*)'IS',IS, ISO(IS)%OLD_POP_DECAY(ND),ISO(IS)%OLD_POP(ND)
         END DO
 	DO IP=1,NUM_PARENTS
 	  POP_SPECIES(1:ND,PAR(IP)%ISPEC)=PAR(IP)%OLD_POP_DECAY
@@ -298,11 +299,11 @@
 	  POP_ATOM(:)=POP_ATOM(:)+POP_SPECIES(:,L)
 	END DO
 !
-	CALL OUT_SN_POPS(ND,LU)
+	CALL OUT_SN_POPS_V2('SN_DATA_INPUT_CHK',SN_AGE_DAYS,ND,LU)
 !
 	DEALLOCATE (R_HYDRO, LOG_R_HYDRO, T_HYDRO,DENSITY_HYDRO, WRK_HYDRO)
 	DEALLOCATE (SPEC_HYDRO, POP_HYDRO, ATOM_DEN_HYDRO, ELEC_DEN_HYDRO)
-	WRITE(6,*)'Exiting RD_SN_DATA'
+	WRITE(LUER,*)'Exiting RD_SN_DATA'
 !
 	RETURN
 	END

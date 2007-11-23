@@ -10,7 +10,8 @@
 	1            WRITE_IP,DO_REL_CORRECTIONS,PLANE_PARALLEL)
 	IMPLICIT NONE
 !
-! Altered 11-Fev-2006 : Minor bug fix which caused some frequency acces to go
+! Altered 26-Aug-2007 : Added additional deallocation of ETA_RAY_CMF etc.
+! Altered 11-Feb-2006 : Minor bug fix which caused some frequency acces to go
 !                         outside arrays. Error detecting inserted.
 ! Altered 29-Aug-2003 : Relativistic corrections included. Corrections were
 !                         inserted in a manner so as not to effect the operation 
@@ -390,6 +391,14 @@
 	    DEALLOCATE (DTAU)
 	    DEALLOCATE (S)
 	    DEALLOCATE (dS)
+!
+! We deallocate ETA_CMF_RAY etc here to keep allocated data contiguous.
+!
+	    IF(ALLOCATED(ETA_CMF_RAY))THEN
+	      DEALLOCATE (ETA_CMF_RAY)
+	      DEALLOCATE (CHI_CMF_RAY)
+	      DEALLOCATE (SM_FREQ_CMF)
+	    END IF
 	  END IF
 !
 	  NRAY=2*NR-1
@@ -532,6 +541,9 @@
 	      J=J-1
 	    END DO
 	    END_INDX_CMF(OUT_ML)=MIN(NCF,J+10)
+	    WRITE(301,'(5(A,I7))')'LS=',LS,'OUT_ML=',OUT_ML,
+	1           'IST=',STRT_INDX_CMF(OUT_ML),'IND=',END_INDX_CMF(OUT_ML),
+	1           'SM_NCF=',END_INDX_CMF(OUT_ML)-STRT_INDX_CMF(OUT_ML)
 	    SM_NCF=MAX(SM_NCF,END_INDX_CMF(OUT_ML)-STRT_INDX_CMF(OUT_ML)+1)
 	  END DO
 !

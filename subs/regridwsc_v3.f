@@ -7,6 +7,8 @@
 	1                             POPATOM,N,ND,FILNAME)
 	IMPLICIT NONE
 !
+! Altered 20-Sep-2007 - Bug fix. T not being correctly sent when outer boundary 
+!                         extends beyond grid boundary.
 ! Altered 20-Sep-2006 - Changed so that Ne and DI are scaled by the atom
 !                         density when extrapolating at the outer boundary.
 !                         T is held fixed.
@@ -181,7 +183,7 @@
 	END DO
 !
 	DO I=1,NXST-1
-	  T(I)=T(I-1)
+	  T(I)=T(NXST)
 	  ED(I)=POPATOM(I)*ED(NXST)/POPATOM(NXST)
 	  DI(I)=POPATOM(I)*DI(NXST)/POPATOM(NXST)
 	END DO

@@ -22,6 +22,10 @@ rm NETRATE
 rm TOTRATE
 rm TRANS_INFO
 #
+rm CFDAT_OUT
+rm CONT_FREQ
+rm *SCRATCH*
+#
 rm fort.63
 rm fort.88
 rm fort.53

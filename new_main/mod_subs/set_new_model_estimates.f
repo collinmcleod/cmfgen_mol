@@ -178,22 +178,36 @@
 !
 ! We do nothing as T and ED were set by SET_ABUND_CLUMP.
 !
+!	    IF(TIME_SEQ_NO .GT. 1)THEN
+!	      CALL REGRID_T_ED(R,ED,T,POP_ATOM,ND,'T_IN')
+!	    END IF
 	  ELSE
+!
+	    IF(SET_LTE_AS_INIT_ESTIMATES)THEN
+	      OPEN(UNIT=LUIN,STATUS='OLD',ACTION='READ',FILE='FIN_CAL_GRID')
+	        READ(LUIN,'(A)')TMP_STRING
+		DO I=1,ND
+	          READ(LUIN,*)T1,T1,T1,T1,T(I),T2,ED(I)
+	          ED(I)=ED(I)*T2
+		END DO
+	      CLOSE(LUIN)
+	    ELSE
 !
 ! SPEC_DEN will contain the density of each species, while
 ! AT_NO_VEC will contain the the atomic number. These are set at all depths.
 !
-	    I=0
-	    DO ISPEC=1,NUM_SPECIES
-	      CALL ELEC_PREP(SPEC_DEN,AT_NO_VEC,I,NUM_SPECIES,
+	      I=0
+	      DO ISPEC=1,NUM_SPECIES
+	        CALL ELEC_PREP(SPEC_DEN,AT_NO_VEC,I,NUM_SPECIES,
 	1                POP_SPECIES(1,ISPEC),AT_NO(ISPEC),SPECIES_PRES(ISPEC),ND)
-	    END DO
-	    CALL GETELEC_V2(SPEC_DEN,AT_NO_VEC,I,ED,ND,LUIN,'GAMMAS_IN')
+	      END DO
+	      CALL GETELEC_V2(SPEC_DEN,AT_NO_VEC,I,ED,ND,LUIN,'GAMMAS_IN')
 !                         
 ! The INIT_TEMP routine assumes that the T can interpolated using 
 ! a Spherical TAU scale computed using the electron scattering opacity.
 !
-	    CALL INIT_TEMP_V2(R,ED,CLUMP_FAC,T,LUM,T_INIT_TAU,ND,LUIN,'T_IN')
+	      CALL INIT_TEMP_V2(R,ED,CLUMP_FAC,T,LUM,T_INIT_TAU,ND,LUIN,'T_IN')
+	    END IF
 	  END IF
 !
 ! If clumping is present we interpret on the departure coefficients using the
@@ -483,7 +497,7 @@
 ! ROSSMEAN already includes the effect of clumping.
 !
 	    CHI(1:ND)=ROSSMEAN(1:ND)
-	    WRITE(6,*)'Callng COMP_GREY in SET_NEW'
+	    WRITE(LUER,*)'Callng COMP_GREY in SET_NEW'
 	    CALL COMP_GREY(TGREY,TA,ROSSMEAN,LUER,NC,ND,NP)
 !
 ! SCALE_GREY modifies the computed grey temperature distribution according
@@ -519,6 +533,7 @@
 	      IF(T1 .LT. 0.1*GREY_PAR)T1=0.0
 	      T3=ABS( T1*(TGREY(I)-T(I)) )
 	      T(I)=T1*TGREY(I)+(1.0-T1)*T_SAVE(I)
+	      T(I)=MAX(T(I),T_MIN)
 	      T2=MAX(T3/T(I),T2)
 	    END DO
 	    WRITE(LUER,'('' Largest correction to T in GREY initialization loop '//

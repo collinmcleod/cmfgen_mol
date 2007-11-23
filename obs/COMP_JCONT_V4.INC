@@ -314,6 +314,14 @@ C
 	1            FIRST_FREQ,NEW_FREQ,N_TYPE,
 	1            NCEXT,NPEXT,NDEXT)
 	     END IF
+!
+	     IF(USE_J_REL .AND. INCL_REL_TERMS)THEN
+	       CALL COMPUTE_ADD_EDD_FACTS(
+	1              H_ON_J,N_ON_J_NODE,KMID_ON_J,
+	1              TC,TB,FEDD,GEDD,N_ON_J,HBC_CMF,NBC_CMF,INBC,
+	1              IC,DBB,DIF,REXT,VEXT,CHIEXT,NDEXT)
+             END IF
+!
 	     CALL TUNE(ITWO,'FG_J_CMF_ACC')
 	     CALL UNGRID(RSQHNU,ND,TB,NDEXT,POS_IN_NEW_GRID)
 	     FG_COUNT=FG_COUNT+1
@@ -345,6 +353,14 @@ C
 	1                  FL,dLOG_NU,DIF,DBB,IC,
 	1                  N_TYPE,METHOD,L_TRUE,
 	1                  FIRST_FREQ,NEW_FREQ,NDEXT)
+             ELSE IF(USE_J_REL)THEN
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_JREL_V3 with accurate grid'
+	       CALL MOM_JREL_V3(TA,CHIEXT,TB,VEXT,SIGMAEXT,REXT,
+	1             RJEXT,RSQHNU,dlnJdlnR,
+	1             FEDD,GEDD,H_ON_J,N_ON_J_NODE,N_ON_J,KMID_ON_J,
+	1             HBC_CMF,INBC,NBC_CMF,FL,dLOG_NU,
+	1             DIF,DBB,IC,METHOD,L_TRUE,
+	1             INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,FIRST_FREQ,NDEXT)
 	     ELSE
 	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_CMF_V6 with accurate grid'
 	       CALL MOM_J_CMF_V6(TA,CHIEXT,TB,

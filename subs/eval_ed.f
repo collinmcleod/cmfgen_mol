@@ -39,6 +39,7 @@ C
 C
 	DO I=1,ND
 	  DO J=1,NSPEC-1
+	    WRITE(6,'(I3,4ES14.4)')J,PHI(I,J),U(I,J),U(I,J+1),DION(I)
 	    T1=PHI(I,J)*( U(I,J)/U(I,J+1) )
             DION(I)=T1*ED(I)*( 1.0D0+DION(I) )
 	    dDIONdNe(I)=T1*( (NSPEC-1) + ED(I)*dDIONdNe(I) )

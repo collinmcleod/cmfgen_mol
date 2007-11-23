@@ -6,6 +6,9 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 27-Aug-2007: Revised file read so as all ! (1st character) 
+! comments are ignored.
+!
 	INTEGER, PARAMETER :: NMAX=5000
 	INTEGER, PARAMETER :: IONE=1
 !
@@ -73,7 +76,12 @@
 	    READ(10,'(A)')STRING
 	  END DO
 	  READ(STRING,*)ND_OLD
-	  DO I=1,ND_OLD
+	  STRING=' '
+	  DO WHILE (STRING .EQ. ' ' .OR. STRING(1:1) .EQ. '!')
+	    READ(10,'(A)')STRING
+	  END DO
+	  READ(STRING,*)OLD_R(1),OLD_V(1),OLD_SIGMA(1)
+	  DO I=2,ND_OLD
 	    READ(10,*)OLD_R(I),OLD_V(I),OLD_SIGMA(I)
 	  END DO
 	CLOSE(UNIT=10)
@@ -84,6 +92,7 @@
 	WRITE(6,'(A)')'       NEW_ND: revise number of depth points by simple scaling'
 	WRITE(6,'(A)')'         ADDR: explicitly add extra grid points'
 	WRITE(6,'(A)')'         EXTR: extend grid to larger radii'
+	WRITE(6,'(A)')'         FGOB: insert N points at outer boundary (to make finer grid)'
 	WRITE(6,'(A)')'         MDOT: change the mass-loss rate or velocity law'
 	WRITE(6,'(A)')'         NEWG: revise grid between two velocities'
 	WRITE(6,'(A)')'         SCLR: scale radius of star to new value'
@@ -211,7 +220,7 @@
 !
 	ELSE IF(OPTION .EQ. 'NEWG')THEN
 	  WRITE(6,'(A)')' '
-	  WRITE(6,'(A)')'This option allows ithe grid to be redeifined'
+	  WRITE(6,'(A)')'This option allows the grid to be redeifined'
 !
 	  CALL GEN_IN(V_MAX,'Maximum velocity for grid refinement')
 	  CALL GEN_IN(V_MIN,'Initial velocity for grid refinement')
@@ -271,6 +280,35 @@
 	    ELSE
 	      J=J+1
 	    END IF
+	  END DO
+	  DEALLOCATE (COEF)
+	  
+	ELSE IF(OPTION .EQ. 'FGOB')THEN
+	  WRITE(6,'(A)')' '
+	  WRITE(6,'(A)')'This option allows the grid to be redefined at the outer boundary'
+	  WRITE(6,'(A)')'Adding N points decreases the spacing at the outer boundary by 3^N'
+!
+	  N_ADD=1
+	  CALL GEN_IN(N_ADD,'Number of grid points to be added at outer boundary')
+	  ND=ND_OLD+N_ADD
+	  R(N_ADD+2:ND)=OLD_R(2:ND_OLD)
+	  R(1)=OLD_R(1)
+	  DO I=N_ADD,1,-1
+	    R(I+1)=R(1)-0.3333D0*(R(1)-R(I+2))
+	    WRITE(6,*)I,R(1),R(I+1)
+	  END DO
+!
+! Now compute the revised V & SIGMA. The new points lie in the first interval.
+!
+	  V(1)=OLD_V(1); V(N_ADD+2:ND)=OLD_V(2:ND_OLD)
+	  SIGMA(1)=OLD_SIGMA(1); SIGMA(N_ADD+2:ND)=OLD_SIGMA(2:ND_OLD)
+	  ALLOCATE (COEF(ND_OLD,4))
+	  CALL MON_INT_FUNS_V2(COEF,OLD_V,OLD_R,ND_OLD)
+	  DO I=2,N_ADD+1
+	    T1=R(I)-OLD_R(1)
+	    V(I)=COEF(1,4)+T1*(COEF(1,3)+T1*(COEF(1,2)+T1*COEF(1,1)))
+	    SIGMA(I)=COEF(1,3)+T1*(2.0D0*COEF(1,2)+3.0*T1*COEF(1,1))
+	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
 	  END DO
 	  DEALLOCATE (COEF)
 	  

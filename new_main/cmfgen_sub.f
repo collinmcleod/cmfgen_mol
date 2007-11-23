@@ -479,7 +479,7 @@
 !
 	CALL GEN_ASCI_OPEN(LUSCR,'MODEL_SCR','UNKNOWN',' ',' ',IZERO,IOS)
 	IF(IOS .NE. 0)THEN
-	  WRITE(LUER,*)'Error opening MODEL in CMFGEN, IOS=',IOS
+	  WRITE(LUER,*)'Error opening MODEL_SCR in CMFGEN, IOS=',IOS
 	  STOP
 	END IF
 	WRITE(LUSCR,'()')
@@ -493,11 +493,14 @@
 	     WRITE(LUER,*)'Error opening IN_ITS in CMFGEN, IOS=',IOS
 	     STOP
 	  END IF
-	  CALL RD_INT(NUM_ITS_TO_DO,'NUM_ITS',LUIN,LUSCR,
-	1              'Number of iterations to perform')
-	  CALL RD_LOG(RD_LAMBDA,'DO_LAM_IT',LUIN,LUSCR,
-	1              'Do LAMBDA iterations ?')
-	CLOSE(UNIT=LUIN)
+	  CALL RD_OPTIONS_INTO_STORE(LUIN,LUSCR)
+	  CALL RD_STORE_INT(NUM_ITS_TO_DO,'NUM_ITS',L_TRUE,'Number of iterations to perform')
+	  CALL RD_STORE_LOG(RD_LAMBDA,'DO_LAM_IT',L_TRUE,'Do LAMBDA iterations ?')
+	  DO_RD_LAMBDA_AUTO=.TRUE.
+	  CALL RD_STORE_LOG(DO_RD_LAMBDA_AUTO,'DO_LAM_AUTO',L_FALSE,
+	1                         'Start non-lambda iterations automatically?')
+	  CALL CLEAN_RD_STORE()
+	  CLOSE(UNIT=LUIN)
 	NUM_ITS_RD=NUM_ITS_TO_DO
 !
 ! These two parameters were originally read in from IN_ITS, however they
@@ -3687,8 +3690,14 @@
 ! to the eralier value for optically thin winds.
 !
 	  WRITE(LU_FLUX,'(A,T60,ES12.4)')'Total Shock Luminosity (Lsun):',SUM(XRAY_LUM_TOT)
-	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'X-ray Luminosity (> 0.1 keV) :',SUM(XRAY_LUM_0P1),OBS_XRAY_LUM_0P1
-	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'X-ray Luminosity (> 1 keV):',SUM(XRAY_LUM_1KEV),OBS_XRAY_LUM_1KEV
+	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emitted & observed X-ray Luminosity (> 0.1 keV, Lsun) :',
+	1                                     SUM(XRAY_LUM_0P1),OBS_XRAY_LUM_0P1
+	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emitted & observed X-ray Luminosity (> 1 keV, Lsun):',
+	1                                     SUM(XRAY_LUM_1KEV),OBS_XRAY_LUM_1KEV
+	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emitted & observed X-ray Luminosity (> 0.1 keV, Lstar) :',
+	1                                     SUM(XRAY_LUM_0P1)/LUM,OBS_XRAY_LUM_0P1/LUM
+	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emiited & observed X-ray Luminosity (> 1 keV, Lstar):',
+	1                                     SUM(XRAY_LUM_1KEV)/LUM,OBS_XRAY_LUM_1KEV/LUM
 	CLOSE(UNIT=LU_FLUX)
 !
 ! Because of the use of SL's, it is possible that a error in Luminosity
@@ -4139,6 +4148,10 @@
 	    END IF
 !
 	  CLOSE(UNIT=LU_POP)
+!
+	  IF(SN_HYDRO_MODEL)THEN
+	    CALL OUT_SN_POPS_V2('SN_HYDRO_FOR_NEXT_MODEL',SN_AGE_DAYS,ND,LUMOD)
+	  END IF
 ! 
 !
 	  FORMAT_DATE='27-JAN-1992'
@@ -4247,7 +4260,11 @@
 	       WRITE(LUER,*)'Current on desired (1st component)=',FILL_FAC_XRAYS_1/FILL_X1_SAV
 	       WRITE(LUER,*)'Current on desired (2nd component)=',FILL_FAC_XRAYS_2/FILL_X2_SAV
 	       MAXCH=100			!To force run to continue
+	    ELSE
+	       IF(DO_RD_LAMBDA_AUTO)RD_LAMBDA=.FALSE.
 	    END IF
+	  ELSE IF(MAXCH .LT. 50.0D0)THEN
+	    IF(DO_RD_LAMBDA_AUTO)RD_LAMBDA=.FALSE.
 	  END IF
 	  IF(INCL_ADVECTION .AND. ADVEC_RELAX_PARAM .LT. 1.0D0 .AND. MAXCH .LT. 100)THEN
 	    COMPUTE_BA=.TRUE.

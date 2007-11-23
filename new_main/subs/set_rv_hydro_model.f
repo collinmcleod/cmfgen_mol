@@ -49,11 +49,11 @@
 	INTEGER, PARAMETER :: IONE=1
 	CHARACTER(LEN=200) STRING
 !
-	WRITE(6,*)'Entering SET_RV_HYDRO'
+	WRITE(6,*)'Entering SET_RV_HYDRO',RDINR
 	OPEN(UNIT=LU,FILE='SN_HYDRO_DATA',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
 	    LUER=ERROR_LU()
-	    WRITE(LUER,*)'Error in SET_RV_HYDRO_MODEL --- File with R grid not found'
+	    WRITE(LUER,*)'Error in SET_RV_HYDRO_MODEL --- SN_HYDRO_DATA file not found'
 	    WRITE(LUER,*)'Create file or EDIT option in VADAT'
 	    STOP
 	  END IF
@@ -87,6 +87,7 @@
 	    END IF
 	  END IF
 	END DO
+	WRITE(6,*)NX,NSP,OLD_SN_AGE_DAYS
 !
 	SN_EXP_FACTOR=SN_AGE_DAYS/OLD_SN_AGE_DAYS
 !
@@ -118,13 +119,17 @@
 	    READ(LU,*)KAPPA_HYDRO
 	  ELSE IF(INDEX(STRING,'ass fraction') .NE. 0)THEN
 	    IF(R_HYDRO(1) .EQ. 0.0D0 .OR. 
-	1	      V_HYDRO(1) .EQ. 0.0D0 .OR. 
-	1	      KAPPA_HYDRO(1) .EQ. 0.0D0 .OR. 
-	1	      DENSITY_HYDRO(1) .EQ. 0.0D0)THEN
+	1             V_HYDRO(1) .EQ. 0.0D0 .OR.
+	1             DENSITY_HYDRO(1) .EQ. 0.0D0)THEN
 	      LUER=ERROR_LU()
 	      WRITE(LUER,*)'Error reading SN data in SET_RV_HYDRO_MODEL'
-	      WRITE(LUER,*)'R, V, KAPPA or the DENSITY is zero'
+	      WRITE(LUER,*)'R, V, the DENSITY is zero'
 	      STOP
+	    ELSE IF(KAPPA_HYDRO(1) .EQ. 0.0D0)THEN
+	      LUER=ERROR_LU()
+	      WRITE(LUER,*)'Warning: reading SN data in SET_RV_HYDRO_MODEL'
+	      WRITE(LUER,*)'KAPPA is zero'
+	      EXIT
 	    ELSE
 	      EXIT
 	    END IF

@@ -709,6 +709,12 @@
 	END IF
 !
 	DO I=1,ND
+	  IF(XM(1) .LT. 0.0D0)THEN
+	    WRITE(6,'(A)')'Warning: XM(1) is negative in FG_J_CMF_V10'
+	    WRITE(6,'(A,ES16.6,A,3ES16.6)')'FREQ=',FREQ,'XM(1:3)=',XM(1:3)
+	    WRITE(6,'(3(A,ES16.6))')'HBC=',HBC,'PSI(1)=',PSI(1),'PSIPREV(1)=',PSIPREV(1)
+	    WRITE(6,'(2(A,ES16.6))')'-FQ(2)/DATU=',-F(2)*Q(2)/DTAU(1),'-FQ(1)/DATU=',F(1)*Q(1)/DTAU(1)
+	  END IF
 	  IF(XM(I) .LT. 0.0D0)THEN
 	    XM(I)=ABS(XM(I))/10.0D0
 	    RECORDED_ERROR=.FALSE.

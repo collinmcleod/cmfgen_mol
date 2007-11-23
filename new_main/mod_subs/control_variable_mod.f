@@ -376,6 +376,7 @@
 	INTEGER RD_CNT_LAM
 	LOGICAL OLD_RD_LAMBDA
 	LOGICAL RD_LAMBDA
+	LOGICAL DO_RD_LAMBDA_AUTO
 	LOGICAL LAMBDA_ITERATION
 !
 ! Variables for determining whether some populations are held fixed

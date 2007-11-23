@@ -14,7 +14,7 @@ OBJ = $(LIB)(do_lev_pop_decays.o)\
       $(LIB)(do_species_decays.o)\
       $(LIB)(get_rad_decay_energy.o)\
       $(LIB)(eval_rad_decay_v1.o)\
-      $(LIB)(out_sn_pops.o)\
+      $(LIB)(out_sn_pops_v2.o)\
       $(LIB)(rd_sn_data.o)\
       $(LIB)(rd_nuc_decay_data.o)
 

@@ -556,6 +556,8 @@
 	    END DO
             NRAY_MAX=MAX(NRAY_MAX,K)
 	  END DO
+	  J=ERROR_LU()
+	  WRITE(J,'(A,I6)')'Maximum number of pints along ray in FG_J_CMF_V10 is',NRAY_MAX
 !
 	  ALLOCATE ( Z(NRAY_MAX,NP) )
 	  ALLOCATE ( RAY_PNT(NRAY_MAX,NP) )

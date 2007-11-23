@@ -301,6 +301,7 @@
 	    T1=0.5D0*(BETA(I)+BETA(I+1))
 	    RSQHNU(I)=(HU(I)*XM(I+1)-HL(I)*XM(I))*(1.0D0-T1*T1)
 	  END DO
+	  RSQHNU(ND)=0.0D0
 !
 ! Determine if J has converged. Not known if have included advections terms
 ! and are thus iterating on dlnJdlnR.
@@ -373,6 +374,12 @@
 	    WRITE(LU_DIAG,'(I5,2X,ES12.5,8ES12.3)')I,R(I),BETA(I),XM(I),RSQHNU(I),
 	1                            TB(I),TC(I),TA(I),Q(I),TC(I)+Q(I)
 	  END DO
+	  T1=4.1274D-12*( TB(1)/GAM_REL(1) + GAM_REL(1)*BETA(1)*XM(1)*(1.0D0+F(1)) )
+	  WRITE(LU_DIAG,'(A)')' '
+	  WRITE(LU_DIAG,'(A,ES14.5)')'Observed flux computed by JREL_GREY_MOM_V1',T1
+	  T1=4.1274D-12*TB(1)/GAM_REL(1)
+	  WRITE(LU_DIAG,'(A,ES14.5)')'Comoving-frame flux computed by JREL_GREY_MOM_V1',T1
+	  WRITE(LU_DIAG,'(A)')' '
 	CLOSE(UNIT=LU_DIAG)
 !
 	RETURN

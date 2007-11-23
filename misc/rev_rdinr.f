@@ -4,6 +4,7 @@
 ! be included.
 ! Current options:
 !                 IR           Insert additional points betwen I=FST and I=LST
+!                 FG_IB:       Finer grid near inner boundary.
 !                 FG_OB:       Finer grid near outer boundary.
 !                 DOUB:        Doubel radius grid
 !                 SCAL_R:      Scale radius grid
@@ -51,6 +52,7 @@
 	WRITE(6,'(A)')'Current available options are:'
 	WRITE(6,'(A)')'   IR           Insert additional points betwen I=FST and I=LST'
 	WRITE(6,'(A)')'   FG:          Fine grid over specified range'
+        WRITE(6,'(A)')'   FG_IB:       Finer grid near inner boundary'
         WRITE(6,'(A)')'   FG_OB:       Finer grid near outer boundary'
 	WRITE(6,'(A)')'   DOUB:        Doubel radius grid'
 	WRITE(6,'(A)')'   SCALE_R:     Scale radius grid'
@@ -120,6 +122,9 @@
 !
 	ELSE IF(OPTION .EQ. 'IR')THEN
 	  WRITE(6,*)'Input range of depths to be revised'
+	  WRITE(6,*)'You specify the number of points for each interval'
+	  WRITE(6,*)'Use the FG option to uniformly improve a band'
+	  FST=1; LST=ND
 	  CALL GEN_IN(FST,'First grid point for revision')
 	  CALL GEN_IN(LST,'Last grid point for revision')
 	  WRITE(6,'(2X,A,4(8X,A6,4X))')'I',' R(I) ','R(I+1)',' Delr',' Ratio'
@@ -170,7 +175,7 @@
 	    WRITE(10,'(F7.1)')1.0D0
 	  END DO
 	  WRITE(6,*)'New number of depth points is:',NEW_ND,ICOUNT
-	    CALL GEN_IN(NG,'Number of additinal grid points for this interval')
+	  CALL GEN_IN(NG,'Number of additinal grid points for this interval')
 !
 	ELSE IF(OPTION .EQ. 'FG')THEN
 	  IST=1; IEND=ND
@@ -212,6 +217,40 @@
 	1                DI(J),ED(J),T(J),IRAT(J),VEL(J),CLUMP_FAC(J),I
 	    END IF
 	    WRITE(10,'(F7.1)')1.0D0
+	  END DO
+!
+	ELSE IF(OPTION .EQ. 'FG_IB')THEN
+	  WRITE(6,*)'Current grid near outer boundary'
+	  WRITE(6,'(2X,A,4(8X,A6,4X))')'I',' R(I) ','R(I+1)',' Delr',' Ratio'
+	  DO I=ND-6,ND
+	    WRITE(6,'(I3,4ES18.8)')I,R(I),R(I+1),R(I-1)-R(I),(R(I-2)-R(I-1))/(R(I-1)-R(I))
+	  END DO
+	  NI=ND-1; NG=3; GRID_RATIO=1.5
+	  CALL GEN_IN(NI,'1st depth to replace (e.g. ND-1):')
+	  CALL GEN_IN(NG,'Numer of additional points:')
+	  CALL GEN_IN(GRID_RATIO,'Ratio of succesive interval sizes: > 1:')
+!
+	  GRID_RATIO=1.0D0/GRID_RATIO
+	  RTMP(1:ND)=R(1:ND)
+	  DELR=(R(NI-1)-R(ND))*(1.0D0-GRID_RATIO)/(1.0D0-GRID_RATIO**(ND-NI+NG+1))
+	  DO I=NI,ND+NG-1
+	    RTMP(I)=RTMP(I-1)-DELR
+	    DELR=DELR*GRID_RATIO
+	  END DO
+	  RTMP(ND+NG)=R(ND)
+!
+	  WRITE(10,'(1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)')RMIN,LUM,1,ND+NG
+	  DO I=1,ND+NG
+	    J=MIN(I,ND)
+	    WRITE(10,'(A)')' '
+	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')RTMP(I),
+	1                DI(J),ED(J),T(J),IRAT(J),VEL(J),CLUMP_FAC(J),I
+	    WRITE(10,'(F7.1)')1.0D0
+	  END DO
+!
+	  DO I=NI-2,ND+NG
+	    WRITE(6,'(I3,4ES18.8)')I,RTMP(I),RTMP(I+1),
+	1              RTMP(I-1)-RTMP(I),(RTMP(I-2)-RTMP(I-1))/(RTMP(I-1)-RTMP(I))
 	  END DO
 !
 ! Make a fine grid near the outer boundary.

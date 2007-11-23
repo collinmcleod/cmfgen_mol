@@ -278,8 +278,8 @@ C If continuum frequency is within 0.2*FRAC_DOP doppler widths of the last set
 C frequency, C there is no need to use it, unless it is a bound-free edge 
 C frequency.
 C
-          ELSE IF( NU_CONT(ML) .GE. FREQ(INDX)/(1.0D0+0.2D0*dNU_on_NU) 
-	1                       .AND. .NOT. EDGE_FREQ(ML) )THEN
+          ELSE IF( NU_CONT(ML) .GE. FREQ(INDX)/(1.0D0+0.2D0*dNU_on_NU) )THEN
+!	1                       .AND. .NOT. EDGE_FREQ(ML) )THEN
 	     ML=ML+1			!Use current set frequency.
 C
 	  ELSE IF( LN_INDX .GT. LOCAL_N_LINES)THEN

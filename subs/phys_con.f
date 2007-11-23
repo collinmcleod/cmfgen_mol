@@ -3,6 +3,7 @@ C File contains physical and astrophysical constants of general interest.
 C Each constant can be obtained by a FUNCTION call, and all units are CGS
 C unless otherwise is specified in the function name.
 C
+C Altered 29-Oct-2007: Stefan Boltzman constant added.
 C Altered 29-Apr-1991: ALL routines. REAL*8 now specified in separate
 C                      statement for CRAY compatibility.
 C Altered 8_Oct-1990 : RYDBERG_CARBON (and NITROGEN) wre returning zero.
@@ -54,6 +55,13 @@ C
 	IMPLICIT NONE
 	REAL*8 BOLTZMANN_CONSTANT
 	BOLTZMANN_CONSTANT=1.380658D-16			!erg/K
+	RETURN
+	END
+
+	FUNCTION STEFAN_BOLTZ()
+	IMPLICIT NONE
+	REAL*8 STEFAN_BOLTZ
+	STEFAN_BOLTZ=5.670400D-05			!ergs/cm^2/K^4
 	RETURN
 	END
 

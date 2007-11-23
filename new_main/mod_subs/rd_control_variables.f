@@ -679,7 +679,7 @@ C
 	1        'Compute continuum intensity using Eddington factors')
 	  NO_VEL_FOR_CONTINUUM=.FALSE.
 	  CALL RD_STORE_LOG(NO_VEL_FOR_CONTINUUM,'NOV_CONT',L_FALSE,
-	1        'In non-blanketed mode, ignore velocity terms when computing cntinuum')
+	1        'In non-blanketed mode, ignore velocity terms when computing continuum')
 	  CALL RD_STORE_LOG(EDD_LINECONT,'JBAR_W_EDD',L_TRUE,
 	1    'Compute line continuum intensity using Eddington factors')
 !
@@ -710,8 +710,19 @@ C
 	1    'Use MOM_J_REL_VN to solve the moment equations?')
 	  CALL RD_STORE_LOG(INCL_REL_TERMS,'INCL_REL',USE_J_REL,
 	1    'Include relativistic terms in the transfer equaton?')
+	  IF(INCL_REL_TERMS .AND. .NOT. USE_J_REL)THEN
+	    WRITE(LUER,*)'Error in control parameters in VADAT'
+	    WRITE(LUER,*)'Can only include relativistic terms if USE_J_REL is set to TRUE'
+	    STOP
+	  END IF
+	  IF(USE_J_REL .AND. INCL_REL_TERMS)INCL_ADVEC_TERMS_IN_TRANS_EQ=.TRUE.
 	  CALL RD_STORE_LOG(INCL_ADVEC_TERMS_IN_TRANS_EQ,'INCL_ADV_TRANS',USE_J_REL,
 	1    'Include advection terms in the transfer equaton?')
+	  IF(INCL_ADVEC_TERMS_IN_TRANS_EQ .AND. .NOT. USE_J_REL)THEN
+	    WRITE(LUER,*)'Error in control parameters in VADAT'
+	    WRITE(LUER,*)'Can only include advection terms in transfer equation if USE_J_REL is set to TRUE'
+	    STOP
+	  END IF
 !
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(ACCURATE,'INC_GRID',L_TRUE,

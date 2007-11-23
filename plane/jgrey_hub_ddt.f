@@ -238,8 +238,8 @@
 	LU=122
 	OPEN(UNIT=LU,FILE='SN_GREY_CHK',STATUS='UNKNOWN')
 	  WRITE(LU,'(A,ES12.4)')'RECIP_CDELTAT=',RECIP_CDELTAT
-	  WRITE(LU,'(12A)')'       R','     CHI','    RSQJ','RSQJ_OLD','    RSQH','    DJDT',
-	1                   '   HTERM','  MHTERM','   RSQdE','     SUM'
+	  WRITE(LU,'(10(A12))')'       R','     CHI','    RSQJ','RSQJ_OLD','    RSQH','    DJDT',
+	1                      '   HTERM','  MHTERM','   RSQdE','     SUM'
 	  DO I=2,ND-1
 	    T1=RECIP_CDELTAT*(XM(I)-ROLD_ON_R*ROLD_ON_R*RSQ_J_OLDT(I))
 	    T2=-2.0D0*Q(I)*CHI(I)*(RSQ_HFLUX(I)-RSQ_HFLUX(I-1))/(DTAU(I-1)+DTAU(I))
@@ -412,19 +412,20 @@ C
 	  GOTO 1000
 	END IF
 !
-	WRITE(6,'(A,13X,A,12X,A,10X,A,9(1X,A))')'    I','R','V','CHI','        V/cR',
+	OPEN(UNIT=LU,FILE='SN_GREY_CHK',STATUS='UNKNOWN', POSITION='APPEND')
+	WRITE(LU,'(A,13X,A,12X,A,10X,A,9(1X,A))')'    I','R','V','CHI','        V/cR',
 	1           '   RSQE(rad)','        RSQJ','RSQ(J+E/CHI)','   RSQJ(old)',
 	1           '        RSQH','   RSQH(old)','           T','       T(old)'
 	T1=1.0D-04*(3.14159265D0/5.67D-05)**0.25
 	DO I=1,ND
 	  T2=R(I)-1.0D-05*DELTA_TIME_SECS*VEL(I)
 	  T2=RSQ_J_OLDt(I)/T2/T2
-	  WRITE(6,'(I5,ES14.5,11ES13.4)')I,R(I),VEL(I),CHI(I),BETA(I)/R(I),
+	  WRITE(LU,'(I5,ES14.5,11ES13.4)')I,R(I),VEL(I),CHI(I),BETA(I)/R(I),
 	1       R(I)*R(I)*E_RAD_DECAY(I),R(I)*R(I)*RJ(I),
 	1       R(I)*R(I)*(RJ(I)+E_RAD_DECAY(I)/CHI(I)),RSQ_J_OLDt(I),
 	1       RSQ_HFLUX(I),RSQ_H_OLDt(I),T1*(RJ(I)**0.25),T1*(T2 **0.25) 
 	END DO
-	WRITE(6,'(A,13X,A,12X,A,10X,A,9(1X,A))')'    I','R','V','CHI','        V/cR',
+	WRITE(LU,'(A,13X,A,12X,A,10X,A,9(1X,A))')'    I','R','V','CHI','        V/cR',
 	1           '   RSQE(rad)','        RSQJ','RSQ(J+E/CHI)','   RSQJ(old)',
 	1           '        RSQH','   RSQH(old)','           T','       T(old)'
         IF(DIFF_APPROX)THEN
@@ -434,13 +435,14 @@ C
           XM(ND)=H_INBC*T1 - ROLD_ON_R*ROLD_ON_R*RECIP_CDELTAT*H_INBC_OLDT/CHI(ND)
 	  I=ND
 	  T1=TA(I)*RJ(I-1)*R(I-1)*R(I-1)+TB(I)*RJ(I)*R(I)*R(I)
-	  WRITE(6,'(A,13X,A,12X,A,10X,A,9(1X,A))')'    I','R','V','CHI','        V/cR',
+	  WRITE(LU,'(A,13X,A,12X,A,10X,A,9(1X,A))')'    I','R','V','CHI','        V/cR',
 	1           '   RSQE(rad)','        RSQJ','      H_INBC','  H_INBC(old)',
 	1           '         LHS','         RHS','         SUM'
-	  WRITE(6,'(I5,ES14.5,11ES13.4)')I,R(I),VEL(I),CHI(I),BETA(I)/R(I),
+	  WRITE(LU,'(I5,ES14.5,11ES13.4)')I,R(I),VEL(I),CHI(I),BETA(I)/R(I),
 	1       R(I)*R(I)*E_RAD_DECAY(I),R(I)*R(I)*RJ(I),H_INBC,H_INBC_OLDT,
 	1       T1,XM(ND),T1-XM(ND)
 	END IF
+	CLOSE(UNIT=LU)
 !
 ! We really want to return B which is J+E(radio decay)/CHI
 !

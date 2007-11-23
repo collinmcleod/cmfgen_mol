@@ -435,14 +435,32 @@ C
 	1       'Indx','Nu','J(mom)','J(ray)','%Diff','HBC_CMF',
 	1       'J(mom)','J(ray)','%Diff'
 	    END IF
-	    WRITE(LU_JCOMP,'(I7,1P3E12.4,0P,F10.2,1P,3E12.4,0P,F10.2)')
+	    WRITE(LU_JCOMP,'(I7,ES16.6,2ES12.4,F10.2,3ES12.4,F10.2)')
 	1                       FREQ_INDX,FL,
 	1                       RJ(1),TC(1),T1,HBC_CMF(1),
 	1                       RJ(ND),TC(NDEXT),T2
 	    IF(FREQ_INDX .EQ. NCF)CLOSE(UNIT=LU_JCOMP)
 	  END IF
 	  IF(FREQ_INDX .EQ. NCF)THEN
-	     WRITE(LUER,*)'Average number of calls to FG_J_CMF is',FLOAT(FG_COUNT)/FLOAT(NCF)
+	    WRITE(LUER,*)'Average number of calls to FG_J_CMF is',FLOAT(FG_COUNT)/FLOAT(NCF)
+	    T1=ABS(RJ(1))+ABS(TC(1))
+	    IF(T1 .NE. 0)T1=ABS(200.0D0*(RJ(1)-TC(1))/T1)
+	    IF(T1 .GT. 100.0D0)THEN
+	      WRITE(LUER,'(A)')'***************************************************************************'
+	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 100% for last frequency'
+	      WRITE(LUER,'(A)')' It is suggested that you use a finer grid at the outer boundary'
+	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error and/or use plt_jh'
+	      WRITE(LUER,'(A)')'***************************************************************************'
+	    ELSE IF(T1 .GT. 50.0D0)THEN
+	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 50% for last frequency'
+	      WRITE(LUER,'(A)')' It is strongly suggested that you use a finer grid at the outer boundary'
+	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error'
+	    ELSE IF(T1 .GT. 20.0D0)THEN
+	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 20% for last frequency'
+	      WRITE(LUER,'(A)')' Although this is nlikely to effect the colution, it is suggested that'
+	      WRITE(LUER,'(A)')' you use a finer grid at the outer boundary'
+	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error'
+	    END IF
 	  END IF
 	  CALL TUNE(ITWO,'CONT_VEL')
 C
@@ -784,14 +802,31 @@ C
 	1       'Indx','Nu','J(mom)','J(ray)','%Diff','HBC_CMF',
 	1       'J(mom)','J(ray)','%Diff'
 	    END IF
-	    WRITE(LU_JCOMP,'(I7,1P3E12.4,0P,F10.2,1P,3E12.4,0P,F10.2)')
+	    WRITE(LU_JCOMP,'(I7,ES16.6,2ES12.4,F10.2,3ES12.4,F10.2)')
 	1                       FREQ_INDX,FL,
 	1                       RJ(1),TC(1),T1,HBC_CMF(1),
 	1                       RJ(ND),TC(ND),T2
 	    IF(FREQ_INDX .EQ. NCF)CLOSE(UNIT=LU_JCOMP)
 	  END IF
 	  IF(FREQ_INDX .EQ. NCF)THEN
-	     WRITE(LUER,*)'Average number of calls to FG_J_CMF is',FLOAT(FG_COUNT)/FLOAT(NCF)
+	    WRITE(LUER,*)'Average number of calls to FG_J_CMF is',FLOAT(FG_COUNT)/FLOAT(NCF)
+	    T1=ABS(RJ(1))+ABS(TC(1))
+	    IF(T1 .NE. 0)T1=ABS(200.0D0*(RJ(1)-TC(1))/T1)
+	    IF(T1 .GT. 100.0D0)THEN
+	      WRITE(LUER,'(A)')'Error --- J(mom) and J(ray) differ by more than 1000% for last frequency'
+	      WRITE(LUER,'(A)')'It is suggested that you use a finer grid at the outer boundary'
+	      WRITE(LUER,'(A)')'Tail J__COMP to see bundary error and/or use plt_jh'
+	      STOP
+	    ELSE IF(T1 .GT. 50.0D0)THEN
+	      WRITE(LUER,'(A)')'Error --- J(mom) and J(ray) differ by more than 50% for last frequency'
+	      WRITE(LUER,'(A)')'It is strongly suggested that you use a finer grid at the outer boundary'
+	      WRITE(LUER,'(A)')'Tail J__COMP to see bundary error'
+	    ELSE IF(T1 .GT. 20.0D0)THEN
+	      WRITE(LUER,'(A)')'Error --- J(mom) and J(ray) differ by more than 20% for last frequency'
+	      WRITE(LUER,'(A)')'Although this is nlikely to effect the colution, it is suggested that'
+	      WRITE(LUER,'(A)')'you use a finer grid at the outer boundary'
+	      WRITE(LUER,'(A)')'Tail J__COMP to see bundary error'
+	    END IF
 	  END IF
 	  CALL TUNE(ITWO,'CONT_VEL')
 C
