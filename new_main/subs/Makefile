@@ -18,6 +18,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(create_iv_links_v2.o)\
       $(LIB)(determine_nse.o)\
       $(LIB)(det_lte_ed.o)\
+      $(LIB)(ddt_work.o)\
       $(LIB)(do_ng_accel_band_v2.o)\
       $(LIB)(eval_adiabatic_v3.o)\
       $(LIB)(evalse_qwvj_v6.o)\
@@ -35,12 +36,13 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(read_bcd_mat.o)\
       $(LIB)(read_time_model_v1.o)\
       $(LIB)(read_seq_time_file_v1.o)\
+      $(LIB)(rd_sn_data.o)\
       $(LIB)(set_ba_storage.o)\
       $(LIB)(set_rv_hydro_model.o)\
       $(LIB)(set_imp_vec.o)\
       $(LIB)(solveba_v6.o)\
       $(LIB)(solveba_v7.o)\
-      $(LIB)(solveba_v8.o)\
+      $(LIB)(solveba_v9.o)\
       $(LIB)(steq_multi_v7.o)\
       $(LIB)(steqne_v4.o)\
       $(LIB)(steq_advec_v4.o)\
@@ -66,6 +68,7 @@ STEQ=$(LIB_MOD)(steq_data_mod.o)
 CHG=$(LIB_MOD)(chg_exch_mod_v3.o)
 MOD=$(LIB_MOD)(mod_cmfgen.o)
 DIS=$(LIB_MOD)(mod_lev_dis_blk.o)
+CONT=$(LIB_MOD)(control_variable_mod.o)
 
 $(LIB)(%.o) : %.f  $(STEQ)
 	$(F90) -c $(FG) $<
@@ -74,6 +77,10 @@ $(LIB)(%.o) : %.f  $(STEQ)
 # General rules to make obects in a library and object files
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)
+
+$(LIB)(rd_sn_data.o) : rd_sn_data.f $(CONT) $(MOD)
+	$(F90) -c $(FG) rd_sn_data.f
+	ar ruv $(LIB) rd_sn_data.o
 
 $(LIB)(read_seq_time_file_v1.o) : read_seq_time_file_v1.f $(MOD)
 	$(F90) -c $(FG) read_seq_time_file_v1.f
@@ -102,6 +109,10 @@ $(LIB)(det_lte_ed.o) : det_lte_ed.f $(MOD)
 #
 # Optimizaton seems not to work with PGF95 compiler for next routine
 #
+
+$(LIB)(ddt_work.o) : ddt_work.f $(MOD)
+	$(F90) -c $(FD) -I$(MOD_DIR) ddt_work.f
+	ar ruv $(LIB) ddt_work.o
 
 $(LIB)(fixpop_in_ba_v3.o) : fixpop_in_ba_v3.f $(STEQ) $(MOD)
 	$(F90) -c $(FD) -I$(MOD_DIR) fixpop_in_ba_v3.f
