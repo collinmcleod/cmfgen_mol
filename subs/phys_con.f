@@ -3,6 +3,7 @@ C File contains physical and astrophysical constants of general interest.
 C Each constant can be obtained by a FUNCTION call, and all units are CGS
 C unless otherwise is specified in the function name.
 C
+C Altered 07-Jan-2008: Rsun revised very slightly, TEFF_SUN inserted
 C Altered 29-Oct-2007: Stefan Boltzman constant added.
 C Altered 29-Apr-1991: ALL routines. REAL*8 now specified in separate
 C                      statement for CRAY compatibility.
@@ -118,7 +119,8 @@ C
 	FUNCTION RAD_SUN()
 	IMPLICIT NONE
 	REAL*8 RAD_SUN
-	RAD_SUN=6.96D+10				!cm
+!	RAD_SUN=6.96D+10		!cm
+	RAD_SUN=6.9599D+10		!cm (changed 7-Jan-2008)
 	RETURN
 	END
 
@@ -126,6 +128,13 @@ C
 	IMPLICIT NONE
 	REAL*8 LUM_SUN
 	LUM_SUN=3.826D+33				!erg/s
+	RETURN
+	END
+
+	FUNCTION TEFF_SUN()
+	IMPLICIT NONE
+	REAL*8 TEFF_SUN
+	TEFF_SUN=5770.0D0				!K
 	RETURN
 	END
 
