@@ -1,6 +1,7 @@
 	MODULE HYDRO_PARAM_MODULE
 !
 	  REAL*8 GAM_EDD
+	  REAL*8 GAM_LIM
 	  REAL*8 GAM_FULL
 	  REAL*8 AMU			!Atomic mass unit
 	  REAL*8 MU_ATOM		!Mean atomic mass in amu
@@ -57,6 +58,7 @@
 	  LOGICAL PURE_LTE_EST
 	  LOGICAL OLD_MODEL
 	  LOGICAL WIND_PRESENT 
+	  LOGICAL PLANE_PARALLEL_MOD
 	  LOGICAL RESET_REF_RADIUS
 !
 	END MODULE HYDRO_PARAM_MODULE 	
@@ -88,6 +90,7 @@
         REAL*8 TAU(ND_MAX)
         REAL*8 P(ND_MAX)
         REAL*8 ED_ON_NA(ND_MAX)
+	REAL*8 dPdR_VEC(ND_MAX)
 !
         REAL*8 ROSS_MEAN(ND_MAX)
         REAL*8 FLUX_MEAN(ND_MAX)
@@ -190,6 +193,7 @@
 	SIGMA_TH=6.65D-15			!cm^{-2} x 10^10
 	STEFAN_BC=5.67D-05
 	MASS_LOSS_SCALE_FACTOR=3.02286D+23
+	PLANE_PARALLEL_MOD=.FALSE.
 !
 ! These are the default settings if no old model.
 !
@@ -211,6 +215,7 @@
 	CALL RD_STORE_DBLE(LOGG,'LOG_G',L_TRUE,'Log surface gravity (cgs units)')
 	CALL RD_STORE_DBLE(MU_ATOM,'MU_ATOM',L_TRUE,'Mean atomic mass (amu)')
 	CALL RD_STORE_DBLE(TEFF,'TEFF',L_TRUE,'New effective temperature (10^4K)')
+	CALL RD_STORE_LOG(PLANE_PARALLEL_MOD,'PP_MOD',L_FALSE,'Plane parallel model?')
 	CALL RD_STORE_LOG(OLD_MODEL,'OLD_MOD',L_TRUE,'Does a model exist')
 	L_TEMP=.TRUE.; IF(OLD_MODEL)L_TEMP=.FALSE.
 	CALL RD_STORE_LOG(WIND_PRESENT,'WIND_PRES',L_TRUE,'Is a wind present?')
@@ -231,6 +236,8 @@
 	CALL RD_STORE_DBLE(CONNECTION_VEL,'CON_V',WIND_PRESENT,'Connection velocity (km/s)')
 	RESET_REF_RADIUS=.TRUE.
 	CALL RD_STORE_LOG(RESET_REF_RADIUS,'RES_REF',USE_OLD_VEL,'Reset reference radius if using old velocity law')
+	GAM_LIM=0.98D0
+	CALL RD_STORE_DBLE(GAM_LIM,'GAM_LIM',L_FALSE,'Limiting Eddington factor')
         CALL CLEAN_RD_STORE()
 C
         CLOSE(UNIT=LUIN)
@@ -285,7 +292,7 @@ C
 	  IF(IOS .EQ. 0)ALLOCATE (OLD_TAU(OLD_ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (OLD_SF(OLD_ND),STAT=IOS)
 	  IF(IOS .NE. 0)THEN
-	    WRITE(T_OUT,*)'Error in DISPGEN -- error allocating atmospheric vectors'
+	    WRITE(T_OUT,*)'Error in WIND_HYD -- error allocating atmospheric vectors'
 	    WRITE(T_OUT,*)'STATUS=',IOS
 	    STOP
 	  END IF
@@ -313,26 +320,35 @@ C
 	  OLD_REF_RADIUS=(1.0D0-T1)*OLD_R(I)+T1*OLD_R(I+1)
 	  WRITE(T_OUT,*)'Reference radius (Tau=2/3) of of old model is',OLD_REF_RADIUS
 !
-	  T1=OLD_REF_RADIUS/6.96D0
-	  OLD_TEFF=0.5784D0*(RLUM/T1/T1)**0.25           !in 10^4 K
+	  OPEN(UNIT=23,FILE='OLD_GRID',STATUS='UNKNOWN',ACTION='WRITE')
+	    WRITE(23,'(/,A,ES14.4,/)')'Reference radius (Tau=2/3) of of old model is',OLD_REF_RADIUS
+	    WRITE(23,'(A,17X,A,3(5X,A))')' Depth','R','        V','Tau(Ross)','    Gamma'
+	    GAM_EDD=1.0D+06*SIGMA_TH*STEFAN_BC*(TEFF**4)/MU_ATOM/C_CMS/(10**LOGG)/AMU
+	    DO I=1,OLD_ND
+              T1=OLD_ED(I)/OLD_POP_ATOM(I)
+	      WRITE(23,'(I6,2X,ES16.6,3ES14.4)')I,OLD_R(I),OLD_V(I),OLD_TAU(I),
+	1                   T1*GAM_EDD*(OLD_FLUX_MEAN(I)/OLD_ESEC(I))
+	    END DO
 !
-	  OLD_SF(1:OLD_ND)=OLD_T(1:OLD_ND)/OLD_TEFF/(OLD_TAU(1:OLD_ND)+0.67D0)**0.25D0
-	  OLD_TAU_MAX=OLD_TAU(OLD_ND)
+	    T1=OLD_REF_RADIUS/6.9599D0
+	    OLD_TEFF=0.5770D0*(RLUM/T1/T1)**0.25           !in 10^4 K
 !
-	  OPEN(UNIT=19,FILE='OLD_GRID',STATUS='UNKNOWN',ACTION='WRITE')
-	    WRITE(19,'(A,8(7X,A))')' Index','     R','   Tau','    Na',' Ne/Na','     T',
+	    OLD_SF(1:OLD_ND)=OLD_T(1:OLD_ND)/OLD_TEFF/(OLD_TAU(1:OLD_ND)+0.67D0)**0.25D0
+	    OLD_TAU_MAX=OLD_TAU(OLD_ND)
+!
+	    WRITE(23,'(/,A,8(7X,A))')' Index','     R','   Tau','    Na',' Ne/Na','     T',
 	1                  ' Kross','Kr/Kes','Kf/Kes'
 	    DO I=1,OLD_ND
-	      WRITE(19,'(I6,8ES13.4)')I,OLD_R(I),OLD_TAU(I),OLD_POP_ATOM(I),OLD_ED(I)/OLD_POP_ATOM(I),
+	      WRITE(23,'(I6,8ES13.4)')I,OLD_R(I),OLD_TAU(I),OLD_POP_ATOM(I),OLD_ED(I)/OLD_POP_ATOM(I),
 	1        OLD_T(I),OLD_KAP_ROSS(I),OLD_ROSS_MEAN(I)/OLD_ESEC(I),OLD_FLUX_MEAN(I)/OLD_ESEC(I)
 	    END DO
 !
-	    WRITE(19,'(/,A,/,A)')FORMFEED,' Old model mass absorption coeficients'
-	    WRITE(19,'(A,3(8X,A))')' Index',' Kross',' Kflux','  Kes'
+	    WRITE(23,'(/,A,/,A)')FORMFEED,' Old model mass absorption coeficients'
+	    WRITE(23,'(A,3(8X,A))')' Index',' Kross',' Kflux','  Kes'
 	    DO I=1,OLD_ND
-	      WRITE(19,'(I6,3ES14.5)')I,OLD_KAP_ROSS(I),OLD_KAP_FLUX(I),OLD_KAP_ESEC(I)
+	      WRITE(23,'(I6,3ES14.5)')I,OLD_KAP_ROSS(I),OLD_KAP_FLUX(I),OLD_KAP_ESEC(I)
 	    END DO
-	  CLOSE(UNIT=19)
+	  CLOSE(UNIT=23)
 !
 	  WRITE(15,*)' '
 	  WRITE(15,'(A,ES14.4)')' Old TEFF is',OLD_TEFF
@@ -355,20 +371,20 @@ C
 !
 	PREV_REF_RADIUS=-1.0
 	DO WHILE(ABS(REFERENCE_RADIUS/PREV_REF_RADIUS-1.0) .GT. 1.0D-05)
-	WRITE(15,*)' Beginning new hydro loop'
-	WRITE(T_OUT,'(/,A)')' Beginning new hydro loop'
+	  WRITE(15,*)' Beginning new hydro loop'
+	  WRITE(T_OUT,'(/,A)')' Beginning new hydro loop'
 !
 ! Compute Eddington ratio. This formulae is set for one electron per ion.
 ! This formula holds at all radii, since g and Teff both scale as 1/r^2.
 !
-	GAM_EDD=1.0D+06*SIGMA_TH*STEFAN_BC*(TEFF**4)/MU_ATOM/C_CMS/(10**LOGG)/AMU
+	  GAM_EDD=1.0D+06*SIGMA_TH*STEFAN_BC*(TEFF**4)/MU_ATOM/C_CMS/(10**LOGG)/AMU
 !
-	WRITE(15,'(A,ES14.4)')'          Surface gravity is:',LOGG
-	WRITE(15,'(A,ES14.4)')'             Mass of star is:',10**(LOGG)*(REFERENCE_RADIUS**2)/GRAV_CON
-	WRITE(15,'(A,ES14.4)')'         Mean atomic mass is:',MU_ATOM
-	WRITE(15,'(A,ES14.4)')'             Atom density is:',NI_ZERO
-	WRITE(15,'(A,ES14.4)')'New effective temperature is:',TEFF
-	WRITE(15,'(A,ES14.4)')'      Eddington parameter is:',GAM_EDD
+	  WRITE(15,'(A,ES14.4)')'          Surface gravity is:',LOGG
+	  WRITE(15,'(A,ES14.4)')'             Mass of star is:',10**(LOGG)*(REFERENCE_RADIUS**2)/GRAV_CON
+	  WRITE(15,'(A,ES14.4)')'         Mean atomic mass is:',MU_ATOM
+	  WRITE(15,'(A,ES14.4)')'             Atom density is:',NI_ZERO
+	  WRITE(15,'(A,ES14.4)')'New effective temperature is:',TEFF
+	  WRITE(15,'(A,ES14.4)')'      Eddington parameter is:',GAM_EDD
 !
 !
 ! Set parameters/initial conditions at the outer boundary of the
@@ -379,33 +395,33 @@ C
 !   (2) We have an old model, but will input a new wind.
 !   (3) We don't have an old model.
 !
-	IF(WIND_PRESENT)THEN
+	  IF(WIND_PRESENT)THEN
 !
 ! In this case will use exactly the same grid as for the old model beyond
 ! the connection velocity (i.e., at larger V in the wind).
 !
-	  IF(OLD_MODEL .AND. USE_OLD_VEL)THEN
-	    DO I=1,OLD_ND
-	      IF(OLD_V(I) .LT. CONNECTION_VEL)EXIT
-	    END DO
-	    IF( OLD_V(I+1)/CONNECTION_VEL .LT. CONNECTION_VEL/OLD_V(I))I=I+1
-	    J=I
-	    CONNECTION_INDX=I
-	    WRITE(T_OUT,*)'Connection index is',CONNECTION_INDX
-	    DO I=1,J
-	      POP_ATOM(I)=OLD_POP_ATOM(I)
-	      T(I)=OLD_T(I)                   !(TEFF/OLD_TEFF)*OLD_T(I)
-	      P(I)=BC*T(I)*POP_ATOM(I)*(1.0D0+OLD_ED(I)/OLD_POP_ATOM(I))
-	      R(I)=OLD_R(I)
-	      TAU(I)=OLD_TAU(I)
-	      ED_ON_NA(I)=OLD_ED(I)/OLD_POP_ATOM(I)
-	      ROSS_ON_ES=OLD_ROSS_MEAN(I)/OLD_ESEC(I)
-	      GAM_FULL=MIN( 0.95,GAM_EDD*ED_ON_NA(I)*(OLD_FLUX_MEAN(I)/OLD_ESEC(I)) )
-	      ED(I)=ED_ON_NA(1)*POP_ATOM(I)
-	      CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*ROSS_ON_ES
-	      GAMMA_FULL(I)=GAM_FULL
-	     END DO
-	     I=J
+	    IF(OLD_MODEL .AND. USE_OLD_VEL)THEN
+	      DO I=1,OLD_ND
+	        IF(OLD_V(I) .LT. CONNECTION_VEL)EXIT
+	      END DO
+	      IF( OLD_V(I+1)/CONNECTION_VEL .LT. CONNECTION_VEL/OLD_V(I))I=I+1
+	      J=I
+	      CONNECTION_INDX=I
+	      WRITE(T_OUT,*)'Connection index is',CONNECTION_INDX
+	      DO I=1,J
+	        POP_ATOM(I)=OLD_POP_ATOM(I)
+	        T(I)=OLD_T(I)                   !(TEFF/OLD_TEFF)*OLD_T(I)
+	        P(I)=BC*T(I)*POP_ATOM(I)*(1.0D0+OLD_ED(I)/OLD_POP_ATOM(I))
+	        R(I)=OLD_R(I)
+	        TAU(I)=OLD_TAU(I)
+	        ED_ON_NA(I)=OLD_ED(I)/OLD_POP_ATOM(I)
+	        ROSS_ON_ES=OLD_ROSS_MEAN(I)/OLD_ESEC(I)
+	        GAM_FULL=MIN( GAM_LIM,GAM_EDD*ED_ON_NA(I)*(OLD_FLUX_MEAN(I)/OLD_ESEC(I)) )
+	        ED(I)=ED_ON_NA(1)*POP_ATOM(I)
+	        CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*ROSS_ON_ES
+	        GAMMA_FULL(I)=GAM_FULL
+	       END DO
+	       I=J
 !
 ! In this case we simply adopt the parameters at the connection velocity to help
 ! define the initial conditions for integration of the hydrostatic equation.
@@ -413,242 +429,263 @@ C
 ! We also need to define the dp/dr so as to get the correct slope on the
 ! velocity law at the connection point.
 !
-	  ELSE IF(OLD_MODEL)THEN
-	    DO I=1,OLD_ND
-	      IF(OLD_V(I) .LT. CONNECTION_VEL)EXIT
-	    END DO
-	    IF( OLD_V(I+1)/CONNECTION_VEL .LT. CONNECTION_VEL/OLD_V(I))I=I+1
-	    CONNECTION_INDX=I
-	    ED_ON_NA_EST=OLD_ED(I)/OLD_POP_ATOM(I)
-	    ROSS_ON_ES=OLD_ROSS_MEAN(I)/OLD_ESEC(I)
-	    GAM_FULL=MIN( 0.95,GAM_EDD*ED_ON_NA_EST*(OLD_FLUX_MEAN(I)/OLD_ESEC(I)) )
-	    T1=1.0D-10*BC*TEFF*(1+ED_ON_NA_EST)/( (10.0**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU )
-	    WRITE(T_OUT,*)'      Scale height is',T1
-	    T2=CONNECTION_VEL*(1.0D0/T1-2.0D0/CONNECTION_RADIUS)
-	    CALL WIND_VEL_LAW_V1(R,V,SIGMA,VINF,BETA,RMAX,
+	    ELSE IF(OLD_MODEL)THEN
+	      DO I=1,OLD_ND
+	        IF(OLD_V(I) .LT. CONNECTION_VEL)EXIT
+	      END DO
+	      IF( OLD_V(I+1)/CONNECTION_VEL .LT. CONNECTION_VEL/OLD_V(I))I=I+1
+	      CONNECTION_INDX=I
+	      ED_ON_NA_EST=OLD_ED(I)/OLD_POP_ATOM(I)
+	      ROSS_ON_ES=OLD_ROSS_MEAN(I)/OLD_ESEC(I)
+	      GAM_FULL=MIN( GAM_LIM,GAM_EDD*ED_ON_NA_EST*(OLD_FLUX_MEAN(I)/OLD_ESEC(I)) )
+	      T1=1.0D-10*BC*TEFF*(1+ED_ON_NA_EST)/( (10.0**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU )
+	      WRITE(T_OUT,*)'      Scale height is',T1
+	      T2=CONNECTION_VEL*(1.0D0/T1-2.0D0/CONNECTION_RADIUS)
+	      CALL WIND_VEL_LAW_V1(R,V,SIGMA,VINF,BETA,RMAX,
 	1          CONNECTION_RADIUS,CONNECTION_VEL,T2,ITWO,J,ND_MAX)
-	    DO I=1,J
-	      POP_ATOM(I)=MDOT/MU_ATOM/R(I)/R(I)/V(I)
-	    END DO
+	      DO I=1,J
+	        POP_ATOM(I)=MDOT/MU_ATOM/R(I)/R(I)/V(I)
+	      END DO
 !
 ! To get other quantities we interpolate as a function of density.
 ! The atom density should be monotonic. At the outer boundary,
 ! we simply use the boundary value.
 !
-	    TA(1:OLD_ND)=LOG(OLD_POP_ATOM(1:OLD_ND))
-	    TB(1:OLD_ND)=OLD_POP_ATOM(1:OLD_ND)/OLD_ED(1:OLD_ND)
-	    TC(1:J)=LOG(POP_ATOM(1:J))
-	    DO I=1,J
-	      IF(TC(I) .LT. TA(1))TC(I)=TA(1)
-	    END DO
-	    CALL MON_INTERP(ED_ON_NA,J,IONE,TC,J,TB,OLD_ND,TA,OLD_ND)
-	    TB(1:OLD_ND)=OLD_T(1:OLD_ND)*TEFF/OLD_TEFF
-	    CALL MON_INTERP(T,J,IONE,TC,J,TB,OLD_ND,TA,OLD_ND)
-	    TB(1:OLD_ND)=OLD_ROSS_MEAN(1:OLD_ND)/OLD_ESEC(1:OLD_ND)
-	    CALL MON_INTERP(CHI_ROSS,J,IONE,TC,J,TB,OLD_ND,TA,OLD_ND)
-	    DO I=1,J
-	      ED(I)=ED_ON_NA(I)*POP_ATOM(I)
-	      GAMMA_FULL(I)=GAM_FULL
-	      CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*CHI_ROSS(I)
-	      P(I)=BC*T(I)*POP_ATOM(I)*(1.0D0+ED(I)/POP_ATOM(I))
-	    END DO
-	    CALL TORSCL(TAU,CHI_ROSS,R,TB,TC,J,'LOGMON',' ')
-	    I=J
-	  ELSE
-	    T(1)=0.75D0*TEFF
-	    POP_ATOM(1)=MDOT/CONNECTION_RADIUS/CONNECTION_RADIUS/CONNECTION_VEL/MU_ATOM
-	    CALL GET_LTE_ROSS_V2(KAP_ROSS,KAP_ES,T1,POP_ATOM(1),T(1))
-	    ED_ON_NA(1)=T1/POP_ATOM(1)
-	    P(1)=BC*T(1)*POP_ATOM(1)*(1.0D0+ED_ON_NA(1))
-	    V(1)=CONNECTION_VEL
-	    ROSS_ON_ES=KAP_ROSS/KAP_ES
-	    GAM_FULL=MIN( 0.95,GAM_EDD*ED_ON_NA(1)*(KAP_ROSS/KAP_ES))
-	    T1=1.0D-10*BC*TEFF*(1+ED_ON_NA_EST)/( (10.0**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU )
-	    WRITE(T_OUT,*)'Scale height is',T1
-	    T2=CONNECTION_VEL*(1.0D0/T1-2.0D0/CONNECTION_RADIUS)
-	    CALL WIND_VEL_LAW_V1(R,V,SIGMA,VINF,BETA,RMAX,
-	1          CONNECTION_RADIUS,CONNECTION_VEL,T2,ITWO,J,ND_MAX)
-	    DO I=1,J
-	      WRITE(73,'(4ES14.4)')R(I),V(I)
-	    END DO
-	    DO I=1,J
-	      POP_ATOM(I)=MDOT/MU_ATOM/R(I)/R(I)/V(I)
-	      GAMMA_FULL(I)=GAM_FULL
-	      CHI_ROSS(I)=ED_ON_NA(1)*SIGMA_TH*POP_ATOM(I)*ROSS_ON_ES
-	      ED_ON_NA(I)=ED_ON_NA(1)
-	      ED(I)=ED_ON_NA(I)*POP_ATOM(I)
-	      T(I)=TEFF
-	      P(I)=BC*T(I)*POP_ATOM(I)*(1.0D0+ED(I)/POP_ATOM(I))
-	    END DO
-	    DO I=1,J
-	      WRITE(73,'(8ES14.4)')R(I),POP_ATOM(I),GAMMA_FULL(I),CHI_ROSS(I),ED_ON_NA(I),ED(I),T(I),P(I)
-	    END DO
-	    CALL TORSCL(TAU,CHI_ROSS,R,TB,TC,J,'LOGMON',' ')
-	    WRITE(T_OUT,*)'Optical depth ar connection point is',TAU(J)
-	    I=J
-	  END IF
+	      TA(1:OLD_ND)=LOG(OLD_POP_ATOM(1:OLD_ND))
+	      TB(1:OLD_ND)=OLD_POP_ATOM(1:OLD_ND)/OLD_ED(1:OLD_ND)
+	      TC(1:J)=LOG(POP_ATOM(1:J))
+	      DO I=1,J
+	        IF(TC(I) .LT. TA(1))TC(I)=TA(1)
+	      END DO
+	      CALL MON_INTERP(ED_ON_NA,J,IONE,TC,J,TB,OLD_ND,TA,OLD_ND)
+	      TB(1:OLD_ND)=OLD_T(1:OLD_ND)*TEFF/OLD_TEFF
+	      CALL MON_INTERP(T,J,IONE,TC,J,TB,OLD_ND,TA,OLD_ND)
+	      TB(1:OLD_ND)=OLD_ROSS_MEAN(1:OLD_ND)/OLD_ESEC(1:OLD_ND)
+	      CALL MON_INTERP(CHI_ROSS,J,IONE,TC,J,TB,OLD_ND,TA,OLD_ND)
+	      DO I=1,J
+	        ED(I)=ED_ON_NA(I)*POP_ATOM(I)
+	        GAMMA_FULL(I)=GAM_FULL
+	        CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*CHI_ROSS(I)
+	        P(I)=BC*T(I)*POP_ATOM(I)*(1.0D0+ED(I)/POP_ATOM(I))
+	      END DO
+	      CALL TORSCL(TAU,CHI_ROSS,R,TB,TC,J,'LOGMON',' ')
+	      I=J
+	    ELSE
+	      T(1)=0.75D0*TEFF
+	      POP_ATOM(1)=MDOT/CONNECTION_RADIUS/CONNECTION_RADIUS/CONNECTION_VEL/MU_ATOM
+	      CALL GET_LTE_ROSS_V2(KAP_ROSS,KAP_ES,T1,POP_ATOM(1),T(1))
+	      ED_ON_NA(1)=T1/POP_ATOM(1)
+	      P(1)=BC*T(1)*POP_ATOM(1)*(1.0D0+ED_ON_NA(1))
+	      V(1)=CONNECTION_VEL
+	      ROSS_ON_ES=KAP_ROSS/KAP_ES
+	      GAM_FULL=MIN( GAM_LIM,GAM_EDD*ED_ON_NA(1)*(KAP_ROSS/KAP_ES))
+	      T1=1.0D-10*BC*TEFF*(1+ED_ON_NA_EST)/( (10.0**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU )
+	      WRITE(T_OUT,*)'Scale height is',T1
+	      T2=CONNECTION_VEL*(1.0D0/T1-2.0D0/CONNECTION_RADIUS)
+	      CALL WIND_VEL_LAW_V1(R,V,SIGMA,VINF,BETA,RMAX,
+	1            CONNECTION_RADIUS,CONNECTION_VEL,T2,ITWO,J,ND_MAX)
+	      DO I=1,J
+	        WRITE(73,'(4ES14.4)')R(I),V(I)
+	      END DO
+	      DO I=1,J
+	        POP_ATOM(I)=MDOT/MU_ATOM/R(I)/R(I)/V(I)
+	        GAMMA_FULL(I)=GAM_FULL
+	        CHI_ROSS(I)=ED_ON_NA(1)*SIGMA_TH*POP_ATOM(I)*ROSS_ON_ES
+	        ED_ON_NA(I)=ED_ON_NA(1)
+	        ED(I)=ED_ON_NA(I)*POP_ATOM(I)
+	        T(I)=TEFF
+	        P(I)=BC*T(I)*POP_ATOM(I)*(1.0D0+ED(I)/POP_ATOM(I))
+	      END DO
+	      DO I=1,J
+	        WRITE(73,'(8ES14.4)')R(I),POP_ATOM(I),GAMMA_FULL(I),CHI_ROSS(I),ED_ON_NA(I),ED(I),T(I),P(I)
+	      END DO
+	      CALL TORSCL(TAU,CHI_ROSS,R,TB,TC,J,'LOGMON',' ')
+	      WRITE(T_OUT,*)'Optical depth ar connection point is',TAU(J)
+	      I=J
+	    END IF
 !
 ! The following section is for the case of no wind.
 !
-	ELSE
+	  ELSE
 !
 ! This option is for a pure spherical or plane-parallel model. The depth variation
 ! of gravity is taken into account.
 ! 
-	  IF(OLD_MODEL)THEN
-	    POP_ATOM(1)=NI_ZERO
-	    T(1)=(TEFF/OLD_TEFF)*OLD_T(1)
-	    P(1)=BC*T(1)*POP_ATOM(1)*(1.0D0+OLD_ED(1)/OLD_POP_ATOM(1))
-	    IF(RBOUND .EQ. 0.0D0)RBOUND=OLD_R(1)
-	    R(1)=RBOUND
-	    TAU(1)=OLD_TAU(1)
-	    ED_ON_NA(1)=OLD_ED(1)/OLD_POP_ATOM(1)
-	    ROSS_ON_ES=OLD_ROSS_MEAN(1)/OLD_ESEC(1)
-	    GAM_FULL=MIN( 0.95,GAM_EDD*ED_ON_NA(1)*(OLD_FLUX_MEAN(1)/OLD_ESEC(1)) )
-	    ED(1)=ED_ON_NA(1)*POP_ATOM(1)
-	    CHI_ROSS(1)=ED_ON_NA(1)*SIGMA_TH*POP_ATOM(1)*ROSS_ON_ES
-	    GAMMA_FULL(1)=GAM_FULL
-	  ELSE
+	    IF(OLD_MODEL)THEN
+	      POP_ATOM(1)=NI_ZERO
+	      T(1)=(TEFF/OLD_TEFF)*OLD_T(1)
+	      P(1)=BC*T(1)*POP_ATOM(1)*(1.0D0+OLD_ED(1)/OLD_POP_ATOM(1))
+	      IF(RBOUND .EQ. 0.0D0)RBOUND=OLD_R(1)
+	      R(1)=RBOUND
+	      TAU(1)=OLD_TAU(1)
+	      ED_ON_NA(1)=OLD_ED(1)/OLD_POP_ATOM(1)
+	      ROSS_ON_ES=OLD_ROSS_MEAN(1)/OLD_ESEC(1)
+	      GAM_FULL=MIN( GAM_LIM,GAM_EDD*ED_ON_NA(1)*(OLD_FLUX_MEAN(1)/OLD_ESEC(1)) )
+	      ED(1)=ED_ON_NA(1)*POP_ATOM(1)
+	      CHI_ROSS(1)=ED_ON_NA(1)*SIGMA_TH*POP_ATOM(1)*ROSS_ON_ES
+	      GAMMA_FULL(1)=GAM_FULL
+	    ELSE
 !
 ! No old model. The guesses in the outer region may need improving.
 !
-	    WRITE(6,*)' '
-	    WRITE(6,*)' Using LTE plane-parallel structure'
-	    WRITE(6,*)' '
-	    POP_ATOM(1)=NI_ZERO
-	    T(1)=0.75D0*TEFF
-	    CALL GET_LTE_ROSS_V2(KAP_ROSS,KAP_ES,T1,POP_ATOM(1),T(1))
-	    ED_ON_NA(1)=T1/POP_ATOM(1)
-	    P(1)=BC*T(1)*POP_ATOM(1)*(1.0D0+ED_ON_NA(1))
-	    ROSS_ON_ES=KAP_ROSS/KAP_ES
-	    GAM_FULL=MIN(0.95,GAM_EDD*ROSS_ON_ES*ED_ON_NA(1))
-	    SCL_HT=(10**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU/BC/(1.0D0+ED_ON_NA(1))/T(1)
-	    SCL_HT=1.0D-10/SCL_HT
-	    IF(RBOUND .EQ. 0.0D0)RBOUND=REFERENCE_RADIUS+12*SCL_HT
-	    R(1)=RBOUND
-	    TAU(1)=R(1)*SCL_HT*6.65D-15*POP_ATOM(1)*ED_ON_NA(1)*(KAP_ROSS/KAP_ES)
-	    ED(1)=ED_ON_NA(1)*POP_ATOM(1)
-	    CHI_ROSS(1)=ED_ON_NA(1)*SIGMA_TH*POP_ATOM(1)*ROSS_ON_ES
-	    GAMMA_FULL(1)=GAM_FULL
+	      WRITE(6,*)' '
+	      WRITE(6,*)' Using LTE plane-parallel structure'
+	      WRITE(6,*)' '
+	      POP_ATOM(1)=NI_ZERO
+	      T(1)=0.75D0*TEFF
+	      CALL GET_LTE_ROSS_V2(KAP_ROSS,KAP_ES,T1,POP_ATOM(1),T(1))
+	      ED_ON_NA(1)=T1/POP_ATOM(1)
+	      P(1)=BC*T(1)*POP_ATOM(1)*(1.0D0+ED_ON_NA(1))
+	      ROSS_ON_ES=KAP_ROSS/KAP_ES
+	      GAM_FULL=MIN(GAM_LIM,GAM_EDD*ROSS_ON_ES*ED_ON_NA(1))
+	      SCL_HT=(10**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU/BC/(1.0D0+ED_ON_NA(1))/T(1)
+	      SCL_HT=1.0D-10/SCL_HT
+	      IF(RBOUND .EQ. 0.0D0)RBOUND=REFERENCE_RADIUS+12*SCL_HT
+	      R(1)=RBOUND
+	      TAU(1)=R(1)*SCL_HT*6.65D-15*POP_ATOM(1)*ED_ON_NA(1)*(KAP_ROSS/KAP_ES)
+	      ED(1)=ED_ON_NA(1)*POP_ATOM(1)
+	      CHI_ROSS(1)=ED_ON_NA(1)*SIGMA_TH*POP_ATOM(1)*ROSS_ON_ES
+	      GAMMA_FULL(1)=GAM_FULL
+	    END IF
+	    I=1
 	  END IF
-	  I=1
-	END IF
 !
+!
+! Units 75 & 76 are used in NEW_ESTIMATES
+!
+	  OPEN(UNIT=75,STATUS='UNKNOWN',ACTION='WRITE',FILE='DIAGNOSTIC_EST_1')
+	  WRITE(75,'(4X,9(4X,A))')'   R_EST','GAM_FULL',' GAM_EST','     TAU','      FM',
+	1                         '      RM','KAP_ROSS','  KAP_ES','   ED/NA'
+!
+	  OPEN(UNIT=76,STATUS='UNKNOWN',ACTION='WRITE',FILE='DIAGNOSTIC_EST_2')
+	  WRITE(76,'(4X,8(4X,A))')'   R_EST','  KR_OLD',' KES_OLD','   OLD_T',
+	1                         ' OLD_TAU','     KES','       T','      KR'
+!
 ! The boudary condition for the integration of the hydrostatic equation
 ! has been set, either at the outer boundary, or at the wind connection point.
 ! we can now perform the integration of the hydrostatic equation.
 !
-	DO WHILE( TAU(I) .LT. MAX(100.0D0,OLD_TAU_MAX) )
-	  I=I+1
+	  DO WHILE( TAU(I) .LT. MAX(100.0D0,OLD_TAU_MAX) )
+	    I=I+1
 !
 ! Compute the atmospheric pressure scale height. We use this to determine the
 ! step size.
 !
-	 SCL_HT=(10**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU/BC/(1.0D0+ED_ON_NA(I-1))/T(I-1)
-	 SCL_HT=1.0D-10/SCL_HT
+	    SCL_HT=(10**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU/BC/(1.0D0+ED_ON_NA(I-1))/T(I-1)
+	    SCL_HT=1.0D-10/SCL_HT
 !
-	 WRITE(15,*)' '
-	 WRITE(15,'(A,ES12.4,A)')'       Scale height is',SCL_HT,' 10^10 cm'
-	 WRITE(15,*)'I=',I
-	 WRITE(15,*)'P(I-1)=',P(I-1)
-	 WRITE(15,*)'R(I-1)=',R(I-1)
-	 WRITE(15,*)'T(I-1)=',T(I-1)
-	 WRITE(15,*)'TAU(I-1)=',TAU(I-1)
-	 WRITE(15,*)'ED_ON_NA(I-1)=',ED_ON_NA(I-1)
-	 WRITE(15,*)'POP_ATOM(I-1)=',POP_ATOM(I-1)
-	 WRITE(15,*)'GAMMA_FULL=',GAM_FULL
+	    WRITE(15,*)' '
+	    WRITE(15,'(A,ES12.4,A)')'       Scale height is',SCL_HT,' 10^10 cm'
+	    WRITE(15,*)'I=',I
+	    WRITE(15,*)'P(I-1)=',P(I-1)
+	    WRITE(15,*)'R(I-1)=',R(I-1)
+	    WRITE(15,*)'T(I-1)=',T(I-1)
+	    WRITE(15,*)'TAU(I-1)=',TAU(I-1)
+	    WRITE(15,*)'ED_ON_NA(I-1)=',ED_ON_NA(I-1)
+	    WRITE(15,*)'POP_ATOM(I-1)=',POP_ATOM(I-1)
+	    WRITE(15,*)'GAMMA_FULL=',GAM_FULL
 !
 ! We set the step size to the pressure scale height on 5.
 !
-	 H=SCL_HT/5.0D0
+	    H=SCL_HT/10.0D0
 !
 ! Set estimates at current location. Then integrate hydrostatic
 ! equation using 4th order Runge-Kutta.
 !
-	 P_EST=P(I-1)
-	 TAU_EST=TAU(I-1)
-	 T_EST=T(I-1)
-	 ED_ON_NA_EST=ED_ON_NA(I-1)
-	 ATOM_EST=POP_ATOM(I-1)
-	 R_EST=R(I-1)-H
-	 CALL DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
-	 dP1=H*dPdR
-	 dTAU1=H*dTAUdR
-	 WRITE(15,*)dPdR,dTAUdR,T_EST,dP1,dTAU1
+	    P_EST=P(I-1)
+	    TAU_EST=TAU(I-1)
+	    T_EST=T(I-1)
+	    ED_ON_NA_EST=ED_ON_NA(I-1)
+	    ATOM_EST=POP_ATOM(I-1)
+	    R_EST=R(I-1)-H
+	    CALL DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
+	    dP1=H*dPdR
+	    dTAU1=H*dTAUdR
+	    WRITE(15,*)dPdR,dTAUdR,T_EST,dP1,dTAU1
 !
-	 P_EST=P(I-1)+dP1/2
-	 TAU_EST=TAU(I-1)+dTAU1/2
-	 ATOM_EST=P_EST/BC/T_EST/(1+ED_ON_NA_EST)
-	 R_EST=R(I-1)-0.5D0*H
-	 CALL DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
-	 dP2=H*dPdR
-	 dTAU2=H*dTAUdR
-	 WRITE(15,*)dPdR,dTAUdR,T_EST,dP2,dTAU2
+	    P_EST=P(I-1)+dP1/2
+	    TAU_EST=TAU(I-1)+dTAU1/2
+	    ATOM_EST=P_EST/BC/T_EST/(1+ED_ON_NA_EST)
+	    R_EST=R(I-1)-0.5D0*H
+	    CALL DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
+	    dP2=H*dPdR
+	    dTAU2=H*dTAUdR
+	    WRITE(15,*)dPdR,dTAUdR,T_EST,dP2,dTAU2
 !
-	 P_EST=P(I-1)+dP2/2
-	 TAU_EST=TAU(I-1)+dTAU2/2
-	 ATOM_EST=P_EST/BC/T_EST/(1+ED_ON_NA_EST)
-	 R_EST=R(I-1)-0.5D0*H
-	 CALL DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
-	 dP3=H*dPdR
-	 dTAU3=H*dTAUdR
-	 WRITE(15,*)dPdR,dTAUdR,T_EST,dP3,dTAU3
+	    P_EST=P(I-1)+dP2/2
+	    TAU_EST=TAU(I-1)+dTAU2/2
+	    ATOM_EST=P_EST/BC/T_EST/(1+ED_ON_NA_EST)
+	    R_EST=R(I-1)-0.5D0*H
+	    CALL DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
+	    dP3=H*dPdR
+	    dTAU3=H*dTAUdR
+	    WRITE(15,*)dPdR,dTAUdR,T_EST,dP3,dTAU3
 !
-	 P_EST=P(I-1)+dP3
-	 TAU_EST=TAU(I-1)+dTAU2
-	 ATOM_EST=P_EST/BC/T_EST/(1+ED_ON_NA_EST)
-	 R_EST=R(I-1)-H
-	 CALL DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
-	 dP4=H*dPdR
-	 dTAU4=H*dTAUdR
-	 WRITE(15,*)dPdR,dTAUdR,T_EST,dP4,dTAU4
+	    P_EST=P(I-1)+dP3
+	    TAU_EST=TAU(I-1)+dTAU2
+	    ATOM_EST=P_EST/BC/T_EST/(1+ED_ON_NA_EST)
+	    R_EST=R(I-1)-H
+	    CALL DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
+	    dP4=H*dPdR
+	    dTAU4=H*dTAUdR
+	    WRITE(15,*)dPdR,dTAUdR,T_EST,dP4,dTAU4
 !
 ! Update values at next grid point.
 !
-	  TAU(I)=TAU(I-1)+(dTAU1+2*dTAU2+2*dTAU3+dTAU4)/6.0D0
-	  P(I)=P(I-1)+(dP1+2*dP2+2*dP3+dP4)/6.0D0
+	    TAU(I)=TAU(I-1)+(dTAU1+2*dTAU2+2*dTAU3+dTAU4)/6.0D0
+	    P(I)=P(I-1)+(dP1+2*dP2+2*dP3+dP4)/6.0D0
 !
-	  CALL NEW_ESTIMATES(TAU(I),T_EST)
-	  R(I)=R(I-1)-H
-	  T(I)=T_EST
-	  ED_ON_NA(I)=ED_ON_NA_EST
-	  POP_ATOM(I)=P(I)/BC/T(I)/(1.0D0+ED_ON_NA(I))
-	  ED(I)=ED_ON_NA(I)*POP_ATOM(I)
-	  CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*ROSS_ON_ES
-	  GAMMA_FULL(I)=GAM_FULL
-	  ND=I
+	    CALL NEW_ESTIMATES(TAU(I),T_EST)
+	    R(I)=R(I-1)-H
+	    T(I)=T_EST
+	    ED_ON_NA(I)=ED_ON_NA_EST
+	    POP_ATOM(I)=P(I)/BC/T(I)/(1.0D0+ED_ON_NA(I))
+	    ED(I)=ED_ON_NA(I)*POP_ATOM(I)
+	    CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*ROSS_ON_ES
+	    GAMMA_FULL(I)=GAM_FULL
+	    ND=I
+	    WRITE(6,*)I,T(I),TAU(I)
 !
-	END DO
+	  END DO		!Loop over intire inner atmosphere
+	  CLOSE(UNIT=75)
+	  CLOSE(UNIT=76)
 !
 ! Output estimates at the last depth.
 !
-	I=ND
-	WRITE(15,*)'I=',I
-	WRITE(15,*)'P(I)=',P(I)
-	WRITE(15,*)'R(I)=',R(I)
-	WRITE(15,*)'T(I)=',T(I)
-	WRITE(15,*)'TAU(I)=',TAU(I)
-	WRITE(15,*)'ED_ON_NA(I)=',ED_ON_NA(I)
-	WRITE(15,*)'POP_ATOM(I)=',POP_ATOM(I)
+	  I=ND
+	  WRITE(15,*)'I=',I
+	  WRITE(15,*)'P(I)=',P(I)
+	  WRITE(15,*)'R(I)=',R(I)
+	  WRITE(15,*)'T(I)=',T(I)
+	  WRITE(15,*)'TAU(I)=',TAU(I)
+	  WRITE(15,*)'ED_ON_NA(I)=',ED_ON_NA(I)
+	  WRITE(15,*)'POP_ATOM(I)=',POP_ATOM(I)
 !
 ! Output diagnostic files. These are on the calculate grid --- not the final
 ! grid.
 !
-	INQUIRE(UNIT=18,OPENED=FILE_OPEN)
-	IF(FILE_OPEN)THEN
-	  WRITE(18,'(/,A,/)')FORMFEED
-	ELSE
-	  OPEN(UNIT=18,FILE='NEW_CALC_GRID',STATUS='UNKNOWN',ACTION='WRITE')
-	END IF
-	WRITE(18,'(A,8(7X,A))')' Index','     R','  Vel','   Tau','    Na',' Ne/Na','     T',
-	1                  ' Kross','Kr/Kes',' Gamma'
-	DO I=1,ND
-	   T1=1.0D+10*POP_ATOM(I)*AMU*MU_ATOM
-	   T2=SIGMA_TH*POP_ATOM(I)*ED_ON_NA(I)
-	   T3=MDOT/MU_ATOM/POP_ATOM(I)/R(I)/R(I)
-	   WRITE(18,'(I6,9ES13.4)')I,R(I),T3,TAU(I),POP_ATOM(I),ED_ON_NA(I),
-	1              T(I),CHI_ROSS(I)/T1,CHI_ROSS(I)/T2,GAMMA_FULL(I)
-	END DO
+	  ALLOCATE(COEF(ND,4))
+	  CALL MON_INT_FUNS_V2(COEF,P,R,ND)
+	  DO I=1,ND
+	    dPdR_VEC(I)=1.0D-10*COEF(I,3)/POP_ATOM(I)/AMU/MU_ATOM
+	  END DO
+	  DEALLOCATE(COEF)
+!
+	  INQUIRE(UNIT=18,OPENED=FILE_OPEN)
+	  IF(FILE_OPEN)THEN
+	    WRITE(18,'(/,A,/)')FORMFEED
+	  ELSE
+	    OPEN(UNIT=18,FILE='NEW_CALC_GRID',STATUS='UNKNOWN',ACTION='WRITE')
+	  END IF
+	  WRITE(18,'(A,10(7X,A))')' Index','     R','  Vel','   Tau','    Na',' Ne/Na','     T',
+	1                  ' Kross','Kr/Kes',' Gamma','dpdR/ROH'
+	  DO I=1,ND
+	    T1=1.0D+10*POP_ATOM(I)*AMU*MU_ATOM
+	    T2=SIGMA_TH*POP_ATOM(I)*ED_ON_NA(I)
+	    T3=MDOT/MU_ATOM/POP_ATOM(I)/R(I)/R(I)
+	    WRITE(18,'(I6,10ES13.4)')I,R(I),T3,TAU(I),POP_ATOM(I),ED_ON_NA(I),
+	1              T(I),CHI_ROSS(I)/T1,CHI_ROSS(I)/T2,GAMMA_FULL(I),dPdR_VEC(I)
+	  END DO
 !
 ! Adjust the grid so that we get the correct reference radius,
 ! defined as Tau(Ross)=2/3.
@@ -678,7 +715,7 @@ C
 	    WRITE(T_OUT,*)'Desired reference radius is',REFERENCE_RADIUS
 	  END IF
 
-	END DO
+	END DO			!Loop to set R(Tau=2/3)=REFERENCE_RADIUS
 !
 	IF(WIND_PRESENT .AND. USE_OLD_VEL .AND. RESET_REF_RADIUS)THEN
 	  REFERENCE_RADIUS=RADIUS_AT_TAU_23
@@ -735,9 +772,6 @@ C
 	ELSE
 	  CALL DET_R_GRID_V1(REV_TAU,NEW_ND,ND_MAX,TAU_MAX,L_TRUE,R,V,TAU,ND)
 	END IF
-!	DO I=1,ND
-!	  WRITE(191,'(I5,3ES16.6)')I,R(I),V(I),POP_ATOM(I)
-!	END DO
 !
 ! We now compute the revised R grid. We then interplate on Log (r^2.rho) which 
 ! is equivalent to interpolating on log V. This guarentees monotocity of V.
@@ -749,7 +783,6 @@ C
 	POP_ATOM(1:ND)=LOG(POP_ATOM(1:ND)*R(1:ND)*R(1:ND))
 	CALL MON_INTERP(REV_POP_ATOM,NEW_ND,IONE,REV_R,NEW_ND,POP_ATOM,ND,R,ND)
 	REV_POP_ATOM(1:NEW_ND)=EXP(REV_POP_ATOM(1:NEW_ND))/REV_R(1:ND)/REV_R(1:ND)
-!	WRITE(6,*)POP_ATOM(1:ND)
 	POP_ATOM(1:ND)=EXP(POP_ATOM(1:ND))/R(1:ND)/R(1:ND)
 	WRITE(6,*)'Done final inteprolation of atom density'
 !
@@ -786,7 +819,7 @@ C
 	  WRITE(40,'(A,ES16.6)')'!      Log surface gravity (cgs) is:',LOGG
 	  WRITE(40,'(A,ES16.6)')'!         Core radius (10^10 cm) is:',REV_R(NEW_ND)
 	  WRITE(40,'(A,ES16.6)')'!    Reference radius (10^10 cm) is:',REFERENCE_RADIUS
-	  WRITE(40,'(A,ES16.6)')'!              Luminosity (Lsun) is:',( (TEFF/0.5784D0)**4 )*( (REFERENCE_RADIUS/6.96)**2 )
+	  WRITE(40,'(A,ES16.6)')'!              Luminosity (Lsun) is:',( (TEFF/0.5770D0)**4 )*( (REFERENCE_RADIUS/6.9599)**2 )
 	  WRITE(40,'(A,ES16.6)')'!            Mass (Msun) of star is:',10**(LOGG)*REFERENCE_RADIUS*REFERENCE_RADIUS/GRAV_CON
 	  WRITE(40,'(A,ES16.6)')'!       Mass loss rate (Msun/yr) is:',MDOT/MASS_LOSS_SCALE_FACTOR
 	  WRITE(40,'(A,ES16.6)')'!         Mean atomic mass (amu) is:',MU_ATOM
@@ -796,9 +829,9 @@ C
 	  WRITE(40,'(A)')'!'
 	  WRITE(40,'(3X,I5,10X,A)')NEW_ND,'!Number of depth points'
 	  WRITE(40,'(A)')'!'
-	  WRITE(40,'(A,3X,A,3(7X,A),3X,A)')'!','R(10^10cm)','V(km/s)','  Sigma','    Tau','  Index'
+	  WRITE(40,'(A,4X,A,3(7X,A),3X,A)')'!','R(10^10cm)','V(km/s)','  Sigma','    Tau','  Index'
 	  DO I=1,NEW_ND
-	    WRITE(40,'(F14.8,3ES14.6,6X,I4)')REV_R(I),REV_V(I),REV_SIGMA(I),EXP(REV_TAU(I)),I
+	    WRITE(40,'(F15.8,3ES14.6,6X,I4)')REV_R(I),REV_V(I),REV_SIGMA(I),EXP(REV_TAU(I)),I
 	  END DO
 	CLOSE(UNIT=40)
 !
@@ -840,7 +873,11 @@ C
 !
 	CALL NEW_ESTIMATES(TAU,TEMP)
 !
-	T1=(10.0**LOGG)*(1.0D0-GAM_FULL)*(REFERENCE_RADIUS/R_EST)**2
+	IF(PLANE_PARALLEL_MOD)THEN
+	  T1=(10.0**LOGG)*(1.0D0-GAM_FULL)
+	ELSE
+	  T1=(10.0**LOGG)*(1.0D0-GAM_FULL)*(REFERENCE_RADIUS/R_EST)**2
+	END IF
 	dPdR=1.0D+10*T1*MU_ATOM*AMU*P/BC/TEMP/(1+ED_ON_NA)
 	dTAUdR=ED_ON_NA*POP_ATOM*SIGMA_TH*ROSS_ON_ES
 !
@@ -887,7 +924,7 @@ C
 	  ED_ON_NA_EST=LTE_ED/ATOM_EST
 	  GAM_FULL=GAM_EDD*(KAP_ROSS/KAP_ES)*ED_ON_NA_EST
 	  ROSS_ON_ES=KAP_ROSS/KAP_ES
-	  GAM_FULL=MIN(0.95D0,GAM_FULL)
+	  GAM_FULL=MIN(GAM_LIM,GAM_FULL)
 	  RETURN
 	END IF
 !
@@ -906,13 +943,13 @@ C
 	  ED_ON_NA_EST=OLD_ED(1)/OLD_POP_ATOM(1)
 	  ROSS_ON_ES=OLD_KAP_ROSS(1)/OLD_KAP_ESEC(1)
 	  GAM_FULL=GAM_EDD*(OLD_KAP_FLUX(1)/OLD_KAP_ESEC(1))*ED_ON_NA_EST
-	  GAM_FULL=MIN(0.95D0,GAM_FULL)
+	  GAM_FULL=MIN(GAM_LIM,GAM_FULL)
 	ELSE IF(TAU .GE. OLD_TAU(OLD_ND))THEN
 	  TEMP=TEFF*OLD_SF(OLD_ND)*(TAU+0.67D0)**0.25D0
 	  ED_ON_NA_EST=OLD_ED(OLD_ND)/OLD_POP_ATOM(OLD_ND)
 	  ROSS_ON_ES=OLD_KAP_ROSS(OLD_ND)/OLD_KAP_ESEC(OLD_ND)
 	  GAM_FULL=GAM_EDD*(OLD_KAP_FLUX(OLD_ND)/OLD_KAP_ESEC(OLD_ND))*ED_ON_NA_EST
-	  GAM_FULL=MIN(0.95D0,GAM_FULL)
+	  GAM_FULL=MIN(GAM_LIM,GAM_FULL)
 	ELSE
 !
 ! Determine parameters at current TAU in old model.
@@ -935,20 +972,23 @@ C
 ! Some fiddling may be required here to choose the optimal density for
 ! switching.
 !
-	  IF(ATOM_EST .GT. 1.0D+10)THEN
+	  IF(ATOM_EST .GT. 1.0D+09)THEN
 	    CALL GET_LTE_ROSS_V2(KAP_ROSS_OLD,KAP_ES_OLD,LTE_ED,OLD_ATOM,OLD_TEMP)
 	    CALL GET_LTE_ROSS_V2(T1,KAP_ES,LTE_ED,ATOM_EST,TEMP)
+            KAP_ROSS=(T1-KAP_ES)*( (RM-ES)/(KAP_ROSS_OLD-KAP_ES_OLD))+KAP_ES
 !            KAP_ROSS=(T1-KAP_ES)*(RM/KAP_ROSS_OLD)+KAP_ES
-            KAP_ROSS=T1*(RM/KAP_ROSS_OLD)
-	    GAM_FULL=GAM_EDD*(FM/RM)*(KAP_ROSS/KAP_ES)*ED_ON_NA_EST
+!            KAP_ROSS=T1*(RM/KAP_ROSS_OLD)
+!	     GAM_FULL=GAM_EDD*(FM/RM)*(KAP_ROSS/KAP_ES)*ED_ON_NA_EST
+	     KAP_ROSS=RM; KAP_ES=ES
+	     GAM_FULL=GAM_EDD*(FM/RM)*(KAP_ROSS/KAP_ES)*ED_ON_NA_EST
 	    ROSS_ON_ES=KAP_ROSS/KAP_ES
 	   ELSE
 	    GAM_FULL=GAM_EDD*(FM/ES)*ED_ON_NA_EST
 	    ROSS_ON_ES=RM/ES
 	   END IF
-	   GAM_FULL=MIN(0.95D0,GAM_FULL)
-	   WRITE(76,'(9ES14.4)')R_EST,KAP_ROSS_OLD,KAP_ES_OLD,OLD_TEMP,T1,KAP_ES,TEMP,KAP_ROSS
-	   WRITE(75,'(9ES14.4)')R_EST,GAM_FULL,TAU,FM,RM,KAP_ROSS,KAP_ES,ED_ON_NA_EST
+	   GAM_FULL=MIN(GAM_LIM,GAM_FULL)
+	   WRITE(76,'(ES16.8,8ES12.3)')R_EST,KAP_ROSS_OLD,KAP_ES_OLD,OLD_TEMP,T1,KAP_ES,TEMP,KAP_ROSS
+	   WRITE(75,'(ES16.9,8ES12.3)')R_EST,GAM_FULL,ED_ON_NA_EST*GAM_EDD*FM/ES,TAU,FM,RM,KAP_ROSS,KAP_ES,ED_ON_NA_EST
 	END IF
 !  
 	RETURN
