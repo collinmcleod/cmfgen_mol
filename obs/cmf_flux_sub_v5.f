@@ -532,6 +532,7 @@ C
 	REAL*8 VTURB_VEC(ND)
 	REAL*8 VDOP_VEC(ND)
 	REAL*8 MAX_DEL_V_RES_ZONE(ND)
+	CHARACTER(LEN=10) TURB_LAW
 !
 	REAL*8 OBS_TAU_MAX
 	REAL*8 OBS_ES_DTAU
@@ -722,6 +723,9 @@ C
 	1           'Use trapazoidal weights to compute J? ')
 C
 	  WRITE(LUMOD,'()')
+	  TURB_LAW='LAW_V1'
+	  CALL RD_STORE_NCHAR(TURB_LAW,'TURB_LAW',ITEN,L_FALSE,
+	1      'Turbulent velocity law: LAW_V1, LAW_TAU1')
 	  CALL RD_STORE_DBLE(VTURB_FIX,'VTURB_FIX',L_TRUE,
 	1      'Doppler velocity for DOP_FIX Doppler profiles (km/s)')
 	  CALL RD_STORE_DBLE(VTURB_MIN,'VTURB_MIN',L_TRUE,
@@ -1035,7 +1039,20 @@ C
 C Compute the turbulent velocity and MINIMUM Doppler velocity as a function of depth.
 C For the later, the iron mas of 55.8amu is assumed.
 C
-	VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*V(1:ND)/V(1)
+	IF(TURB_LAW .EQ. 'LAW_V1')THEN
+	  VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*V(1:ND)/V(1)
+	ELSE IF(TURB_LAW .EQ. 'LAW_TAU1')THEN
+	  ESEC(1:ND)=6.65D-15*ED(1:ND)*CLUMP_FAC(1:ND)
+	  TA(1)=1.0D0
+	  DO I=1,ND
+	    TA(I)=TA(1)+0.5D0*(R(I)-R(I+1))*(ESEC(I)+ESEC(I+1))
+	  END DO
+	  VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)/(1.0D0+TA(1:ND))
+	ELSE
+	  WRITE(LUER,'(A)')' Error --- TURBULENT velocity law not recognized'
+	  WRITE(LUER,'(A)')TRIM(TURB_LAW)
+	  STOP
+	END IF
 	VDOP_VEC(1:ND)=SQRT( VTURB_VEC(1:ND)**2 + 2.96*T(1:ND) )
 C
 	TA(1:ND)=ABS( CLUMP_FAC(1:ND)-1.0D0 )
