@@ -10,6 +10,7 @@ LIB=$(LIB_DIR)libtools.a
 # Entries for library
 #
 OBJ = $(LIB)(usr_option.o)\
+      $(LIB)(constants_mod.o)\
       $(LIB)(condit_string.o)\
       $(LIB)(form_sp_num.o)\
       $(LIB)(gen_in.o)\
@@ -18,6 +19,7 @@ OBJ = $(LIB)(usr_option.o)\
       $(LIB)(get_indx.o)\
       $(LIB)(set_case_fn.o)\
       $(LIB)(sve_file.o)\
+      $(LIB)(update_keyword.o)\
       $(LIB)(upper_case.o)\
       $(LIB)(usr_hidden.o)\
       $(LIB)(wr_fmt_string.o)\
@@ -35,7 +37,6 @@ $(LIB) : $(OBJ)
 $(LIB)(%.o) : %.f 
 	$(F90) -c $(FG)  $<
 	ar ruv $(LIB) $*.o
-
 
 $(LIB)(usr_option.o) : usr_option.f $(LIB)(wr_string.o) 
 $(LIB)(usr_hidden.o) : usr_hidden.f $(LIB)(wr_string.o) $(LIB)(sve_file.o)
