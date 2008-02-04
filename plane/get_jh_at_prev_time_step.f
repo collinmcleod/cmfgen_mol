@@ -154,7 +154,7 @@
 	  LOG_MIDV(1)=LOG_V(1)
 	  LOG_MIDV(ND_P1)=LOG_V(ND)
 !
-	  T1=1.0D-14
+	  T1=1.0D-07					!Altered 3-Feb-2008 
 	  IF(EQUAL(V(ND),OLD_V(ND_OLD),T1))THEN
 	    OLD_V(ND_OLD)=V(ND)
 	    LOG_OLD_V(ND_OLD)=LOG_V(ND)
