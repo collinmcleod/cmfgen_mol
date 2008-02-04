@@ -7,6 +7,8 @@
 !
 	PROGRAM PLT_JH
 !
+! Altered 23-Nov-2007 :  New option inserted to allow J (in EDDFACTOR File) to be extended to
+!                           larger radii assuming simple dilution. (alteration done 14-Nov-2007).
 ! Altered 16-Jun-2000 : DIRECT_INFO call inserted.
 !
 ! Interface routines for IO routines.
@@ -69,7 +71,7 @@
 	REAL*8, ALLOCATABLE :: ZV(:)
 !
 	CHARACTER*80 NAME		!Default title for plot
-	CHARACTER*80 XAXIS,XAXSAV	!Label for Absisca
+	CHARACTER*80 XAXIS,XAXSAV	!Label for Abscissa
 	CHARACTER*80 YAXIS		!Label for Ordinate
 !
 	REAL*8 ANG_TO_HZ
@@ -103,6 +105,7 @@
 	INTEGER I,J,K,L,ML,ISAV
 	INTEGER ST_REC
 	INTEGER REC_LENGTH
+	INTEGER NEW_ND
 	REAL*8 SCALE_FAC
 	REAL*8 TEMP
 	REAL*8 DTDR
@@ -110,9 +113,14 @@
 	REAL*8 T1,T2,T3
 	REAL*8 LAMC
 	REAL*8 T_ELEC
+	REAL*8, ALLOCATABLE :: NEW_R(:)
 	LOGICAL AIR_LAM
 	LOGICAL USE_V
 	LOGICAL PLOT_RSQJ
+	LOGICAL FILE_PRES
+!
+	INTEGER LEN_DIR
+	CHARACTER(LEN=80) DIR_NAME
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
@@ -132,8 +140,8 @@
 !
 ! USR_OPTION variables
 !
-	CHARACTER MAIN_OPT_STR*80	!Used for input of the main otion
-	CHARACTER X*10			!Used for the idividual option
+	CHARACTER MAIN_OPT_STR*80	!Used for input of the main option
+	CHARACTER X*10			!Used for the individual option
 	CHARACTER STRING*80
 	CHARACTER*120 DEFAULT
 	CHARACTER*120 DESCRIPTION
@@ -191,7 +199,7 @@
 	CALL READ_DIRECT_INFO_V3(I,REC_LENGTH,ZM(ID)%FILE_DATE,ZM(ID)%FILENAME,LU_IN,IOS)
 	IF(IOS .NE. 0)THEN
 	  WRITE(T_OUT,*)'Error opening/reading INFO file: check format'
-	  WRITE(T_OUT,*)'Also check eroror file or fort.2'
+	  WRITE(T_OUT,*)'Also check error file or fort.2'
 	  GOTO 5
 	END IF
 	OPEN(UNIT=LU_IN,FILE=ZM(ID)%FILENAME,STATUS='OLD',ACTION='READ',
@@ -247,7 +255,23 @@
 !
 ! *************************************************************************
 !
-10	RVTJ_FILE_NAME='RVTJ'
+! Get default directory.
+!
+	DIR_NAME=' '            !Valid DIR_NAME if not present.
+	LEN_DIR=0
+	J=LEN(ZM(1)%FILENAME)
+	DO WHILE(J .GT. 0)
+	  IF( ZM(1)%FILENAME(J:J) .EQ. ']' .OR.
+	1     ZM(1)%FILENAME(J:J) .EQ. ':' .OR.
+	1     ZM(1)%FILENAME(J:J) .EQ. '/'        )THEN
+	  DIR_NAME=ZM(1)%FILENAME(1:J)
+	    LEN_DIR=J
+	    J=0
+	  END IF
+	  J=J-1
+	END DO
+!
+10	RVTJ_FILE_NAME=DIR_NAME(1:LEN_DIR)//'RVTJ'
 	CALL GEN_IN(RVTJ_FILE_NAME,'File with R, V, T etc (RVTJ)')
 	OPEN(UNIT=LU_IN,FILE=RVTJ_FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
@@ -319,7 +343,7 @@
 !   If the main option begins with a '#', a previously
 !   written .box file is read.
 !
-!   If sve= is apended to the end of this main option, a new .sve file
+!   If sve= is appended to the end of this main option, a new .sve file
 !   is opened with the given name and the main option and all subsequent
 !   sub-options are written to this file.
 !
@@ -339,7 +363,7 @@
 	IF(X(1:3) .EQ. 'TIT')THEN
 	  CALL USR_OPTION(NAME,'Title',' ',' ')
 !                    
-! Set X-Ais plotting options.
+! Set X-Axis plotting options.
 !
 	ELSE IF(X(1:2) .EQ.'LX' .OR. X(1:4) .EQ. 'LOGX' .OR. 
 	1                            X(1:4) .EQ. 'LINX')THEN
@@ -361,8 +385,8 @@
 	   END IF
 !
 ! NB: We offer the option to use the central frequency to avoid
-! air/vacuum confusions. Model data is in vacuum wavelngths, which
-! we use in plotting at all wavelngths.
+! air/vacuum confusions. Model data is in vacuum wavelengths, which
+! we use in plotting at all wavelengths.
 !
 	   IF(X_UNIT .EQ. 'MM/S' .OR. X_UNIT .EQ. 'KM/S')THEN
 	     CALL USR_OPTION(LAMC,'LAMC','0.0',
@@ -446,6 +470,89 @@
 	    ZM(ID)%DATA_TYPE='CHI'
 	  ELSE
 	    ZM(ID)%DATA_TYPE='UNKNOWN'
+	  END IF
+!
+	ELSE IF(X(1:4) .EQ. 'EXTJ')THEN
+!
+! Quick and dirty option to extend J onto a larger grid. For best results, grid in inner
+! region should be identical to grid in outer region.
+!
+	  STRING='NEW_R_GRID'
+	  CALL GEN_IN(STRING,'File with new R grid')
+	  OPEN(UNIT=LU_IN,FILE=TRIM(STRING),STATUS='OLD',ACTION='READ')
+	    READ(LU_IN,'(A)')STRING
+	    READ(LU_IN,'(A)')STRING
+	    READ(LU_IN,'(A)')STRING
+	    READ(LU_IN,*)T1,T1,K,NEW_ND
+	    IF(ALLOCATED(NEW_R))DEALLOCATE(NEW_R)
+	    ALLOCATE(NEW_R(NEW_ND))
+	    DO I=1,NEW_ND
+	      READ(LU_IN,*)NEW_R(I)
+	      READ(LU_IN,*)(T1,J=1,K)
+	    END DO
+	   CLOSE(LU_IN)
+!
+! Make sure the temporary vectors are of sufficient length.
+!
+	  IF(NEW_ND .GT. ND_ATM)THEN
+	    DEALLOCATE (TA,TB,TC)
+	    ALLOCATE (TA(NEW_ND),TB(NEW_ND),TC(NEW_ND))
+	  END IF
+!
+! Set up the extension & interpolation vectors.
+!
+	  DO I=1,NEW_ND
+	    IF(NEW_R(I) .GT. R(1))THEN
+	      TA(I)=(R(1)/NEW_R(I))**2
+	      K=I
+	    ELSE
+	      DO L=2,ZM(1)%ND
+	        IF(NEW_R(I) .GE. R(L))THEN
+	          TC(I)=L-1
+	          IF( ABS(NEW_R(I)/R(L-1)-1.0D0) .LT. 1.0D-06)THEN
+	            TA(I)=1.0D0     
+	          ELSE IF( ABS(NEW_R(I)/R(L)-1.0D0) .LT. 1.0D-06)THEN
+	            TA(I)=0.0D0
+	          ELSE
+	            TA(I)=(NEW_R(I)-R(L))/(R(L-1)-R(L))
+	          END IF
+	          EXIT
+	        END IF
+	      END DO
+	    END IF
+	  END DO
+!
+	  ACCESS_F=5
+	  I=WORD_SIZE*(NEW_ND+1)/UNIT_SIZE; J=83
+	  ZM(1)%FILE_DATE='20-Aug-2000'
+	  I=WORD_SIZE*(NEW_ND+1)/UNIT_SIZE; J=83
+	  INQUIRE(FILE='EDDFACTOR',EXIST=FILE_PRES)
+	  IF(FILE_PRES)THEN
+	    CALL WRITE_DIRECT_INFO_V3(NEW_ND,I,ZM(1)%FILE_DATE,'J_DATA',J)
+	    OPEN(UNIT=83,FILE='J_DATA',FORM='UNFORMATTED',
+	1       ACCESS='DIRECT',STATUS='NEW',RECL=I,IOSTAT=IOS)
+	  ELSE
+	    CALL WRITE_DIRECT_INFO_V3(NEW_ND,I,ZM(1)%FILE_DATE,'EDDFACTOR',J)
+	    OPEN(UNIT=83,FILE='EDDFACTOR',FORM='UNFORMATTED',
+	1       ACCESS='DIRECT',STATUS='NEW',RECL=I,IOSTAT=IOS)
+	  END IF
+	  WRITE(83,REC=EDD_CONT_REC)ACCESS_F,NCF,NEW_ND
+	    DO ML=1,ZM(1)%NCF
+	      DO I=1,K
+	        TB(I)=TA(I)*ZM(1)%RJ(1,ML)
+	      END DO
+	      DO I=K+1,NEW_ND
+	        J=NINT(TC(I))
+	        TB(I)=TA(I)*ZM(1)%RJ(J,ML)+(1.0D0-TA(I))*ZM(1)%RJ(J+1,ML)
+	      END DO
+	      WRITE(83,REC=ACCESS_F-1+ML)(TB(I),I=1,NEW_ND),ZM(ID)%NU(ML)
+	    END DO
+	  CLOSE(UNIT=83)
+	  IF(FILE_PRES)THEN
+	    WRITE(6,*)'New J data written to J_DATA and J_DATA_INFO'
+	    WRITE(6,*)'Use these to replace EDDFACTOR and EDDFACTOR_INFO if extending R grid'
+	  ELSE
+	    WRITE(6,*)'New J data written to EDDFACTOR and EDDFACTOR_INFO in the current directory'
 	  END IF
 !
 	ELSE IF(X(1:4) .EQ. 'WSMJ')THEN
@@ -837,7 +944,7 @@
 	1                  IZERO,IOS)
 	  END IF
 	  IF(IOS .NE. 0)THEN
-	    WRITE(T_OUT,*)'Error opening HELP or DESCRIPTER file for PLT_JH'
+	    WRITE(T_OUT,*)'Error opening HELP or DESCRIPTOR file for PLT_JH'
 	    GOTO 1
 	  END IF
 	  READ(LU_IN,*)I,K			!For page formating (I=22,K=12)
