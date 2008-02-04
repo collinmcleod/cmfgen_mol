@@ -9,7 +9,7 @@ LIB2=$(LIB_DIR)libsubs.a
                          
 OBJ = prof_mod.o init_prof_module.o set_prof_v3.o \
       griem_stark_mod.o griem_v2.o set_prof_limits_v2.o \
-      conv_strk_v1.o rd_strk_list.o strk_bs_hhe.o \
+      conv_strk_v2.o rd_strk_list.o strk_bs_hhe.o \
       rd_bs_strk_tab.o voigtn.o
 
 NEWF = strk_hei_ir.o strk_ds.o

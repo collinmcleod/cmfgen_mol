@@ -28,6 +28,13 @@ Input/output:
 
     MOD_B	Switch to model B as the default. A data is not destroyed.
                      
+Output
+
+   EXTJ         Extends J (from A model) in R, creating a new data file J_DATA
+                and its corresponding file J_DATA_INFO. These can be used to
+                help facilitate convergence when extending model to much
+                larger radii.
+
 X Axis Options
     LX		Switch between logarithmic and linear X-AXIS
     LOGX        (i.e. do opposite to current setting)

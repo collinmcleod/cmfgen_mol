@@ -3,7 +3,7 @@
 
 include ../Makefile_definitions
 
-OPTION=$(FG)
+OPTION=$(FD)
 
 # Library where object files will/are stored
 
@@ -21,7 +21,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(edd_j_hub_var_v1.o)\
       $(LIB)(edd_jrel_var_v1.o)\
       $(LIB)(fgrey_norel_v1.o)\
-      $(LIB)(jgrey_hub_ddt.o)\
+      $(LIB)(jgrey_hub_ddt_v2.o)\
       $(LIB)(out_jh.o)\
       $(LIB)(get_jh_at_prev_time_step.o)\
       $(LIB)(mom_j_ddt_v1.o)\
