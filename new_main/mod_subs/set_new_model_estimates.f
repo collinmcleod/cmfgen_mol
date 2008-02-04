@@ -176,11 +176,19 @@
 !
 	  IF(SN_HYDRO_MODEL)THEN
 !
-! We do nothing as T and ED were set by SET_ABUND_CLUMP.
+! Set T and ED
 !
-!	    IF(TIME_SEQ_NO .GT. 1)THEN
-!	      CALL REGRID_T_ED(R,ED,T,POP_ATOM,ND,'T_IN')
-!	    END IF
+	    IF(SN_T_OPTION .EQ. 'USE_T_IN')THEN
+	      CALL REGRID_T_ED(R,ED,T,POP_ATOM,ND,'T_IN')
+	    ELSE IF(SN_T_OPTION .EQ. 'USE_HYDRO') THEN
+!
+! For this options, we need to do nothing as T and ED were set by SET_ABUND_CLUMP.
+!
+	    ELSE
+	      WRITE(LUER,'(A)')'Unrecognized SN option for determin initial T'
+	      WRITE(LUER,'(A)')'Availabvle options are USE_T_IN and USE_HYDRO'
+	      STOP
+	    END IF
 	  ELSE
 !
 	    IF(SET_LTE_AS_INIT_ESTIMATES)THEN
@@ -215,7 +223,7 @@
 ! electron density for clumping (i.e. ED(I)*CLUMP_FAC(I)), which we store in TC.
 ! It may be better to regrid on the actual electron densities.
 !
-	  IF(SET_LTE_AS_INIT_ESTIMATES)THEN
+	  IF(DC_INTERP_METHOD .EQ. 'LTE')THEN
 	    T1=0.2D0
 	    CALL DET_LTE_ED(T1,ND,DO_LEV_DISSOLUTION)
 	    DO ID=1,NUM_IONS-1
@@ -224,7 +232,7 @@
 	        ATM(ID)%DXzV_F=1.0D-200
 	      END IF
 	    END DO
-	  ELSE IF(INTERP_DC_SPH_TAU)THEN
+	  ELSE IF(DC_INTERP_METHOD .EQ. 'SPH_TAU')THEN
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
@@ -232,7 +240,7 @@
 	1            R,ATM(ID)%NXzV_F,ND,LUIN,TMP_STRING)
 	      END IF
 	    END DO
-	  ELSE
+	  ELSE IF(DC_INTERP_METHOD .EQ. 'ED')THEN
 	    TC(1:ND)=ED(1:ND)*CLUMP_FAC(1:ND)
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
@@ -240,6 +248,16 @@
 	        CALL REGRID_B_ON_NE(ATM(ID)%XzV_F,TC,ATM(ID)%DXzV_F,TA,
 	1            ATM(ID)%NXzV_F, IONE,
 	1            ATM(ID)%NXzV_F,ND,LUIN,TMP_STRING)
+	      END IF
+	    END DO
+	  ELSE IF(DC_INTERP_METHOD .EQ. 'R')THEN
+	    DO ID=1,NUM_IONS-1
+	      IF(ATM(ID)%XzV_PRES)THEN
+	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
+	        ISPEC=SPECIES_LNK(ID)
+	        CALL REGRIDWSC_V3( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,
+	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
+	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,TMP_STRING)
 	      END IF
 	    END DO
 	  END IF
@@ -498,7 +516,7 @@
 !
 	    CHI(1:ND)=ROSSMEAN(1:ND)
 	    WRITE(LUER,*)'Callng COMP_GREY in SET_NEW'
-	    CALL COMP_GREY(TGREY,TA,ROSSMEAN,LUER,NC,ND,NP)
+	    CALL COMP_GREY_V2(POPS,TGREY,TA,ROSSMEAN,LUER,NC,ND,NP,NT)
 !
 ! SCALE_GREY modifies the computed grey temperature distribution according
 ! to that computed in a previous model.
