@@ -5,14 +5,15 @@
       REAL*8 P(MP,NP)
       REAL*8 Y(MP)
       REAL*8 FUNK
-      INTEGER, PARAMETER :: NMAX=20
       INTEGER, PARAMETER :: ITMAX=20000
       EXTERNAL FUNK
 !
 ! Subroutine uses AMOTRY, FUNK
 !
       INTEGER I,IHI,ILO,INHI,J,M,N
-      REAL*8 RTOL,SUM,SWAP,YSAVE,YTRY,PSUM(NMAX),AMOTRY
+      REAL*8 RTOL,SUM,SWAP,YSAVE,YTRY
+      REAL*8 PSUM(NDIM)
+      REAL*8 AMOTRY
 !
       ITER=0
 !
@@ -73,7 +74,7 @@
 !
       iter=iter+2
       ytry=amotry(p,y,psum,mp,np,ndim,funk,ihi,-1.0D0)
-      write(6,*)'done one'
+      if(mod(iter,100) .EQ. 0)write(6,*)'done 100'
       if (ytry.le.y(ilo)) then
         ytry=amotry(p,y,psum,mp,np,ndim,funk,ihi,2.0D0)
       else if (ytry.ge.y(inhi)) then
