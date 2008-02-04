@@ -163,7 +163,7 @@ C
 !
 	CALL DP_CURVE(ND,P_VEL,P_REQ)
 	CALL DP_CURVE(ND,P_VEL,P_GRAD)
-	CALL GRAMON_PGPLOT('V(km/s)','g/g_elec',' ',' ')
+	CALL GRAMON_PGPLOT('V(km/s)','g/g\delec\u','(vdv/dr + \gr\u-1\d dP/dr + g )/g\delec\u \p2',' ')
 !
 	DO I=1,ND
 	  WRITE(40,'(I,3ES16.6)')I,P_REQ(I),P_GELEC(I),P_GRAD(I)
@@ -176,6 +176,6 @@ C
 	CALL DP_CURVE(ND,P_VEL,P_REQ)
 	CALL DP_CURVE(ND,P_VEL,P_GRAD)
 	CALL DP_CURVE(ND,P_VEL,P_GELEC)
-	CALL GRAMON_PGPLOT('V(km/s)','Log g','( vdv/dr + \gr\u-1\d dP/dr + g )/g\uelec/d',' ')
+	CALL GRAMON_PGPLOT('V(km/s)','Log g','( vdv/dr + \gr\u-1\d dP/dr + g )',' ')
 	STOP
 	END
