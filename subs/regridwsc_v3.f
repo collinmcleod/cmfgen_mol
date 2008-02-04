@@ -7,6 +7,9 @@
 	1                             POPATOM,N,ND,FILNAME)
 	IMPLICIT NONE
 !
+! Altered 23-Nov-2007 - Procedure for extending populations to larger radii changes.
+!                         We now fiddle departure coefficient to try to ensure
+!                         constant ionization (actual alteration date 14-Nov-2007). 
 ! Altered 20-Sep-2007 - Bug fix. T not being correctly sent when outer boundary 
 !                         extends beyond grid boundary.
 ! Altered 20-Sep-2006 - Changed so that Ne and DI are scaled by the atom
@@ -15,21 +18,21 @@
 ! Altered 23-Jun-2005 - Fixed computation of the excitation temperature.
 ! Altered 20-Feb-2005 - CHECK_DC installed.
 ! Altered 04-Jul-2004 - Altered so that levels in the same super level
-!                          all have the same departure coeficient.
+!                          all have the same departure coefficient.
 ! Altered 15-Feb-2002 - Altered so that we can input files where the 
-!                          outer radius ig reater than the outer radius of
+!                          outer radius is greater than the outer radius of
 !                          the new model.
 ! Altered 14-Jun-2000 - Error check when file opened.
 ! Altered 07-Jul-1997 - We check the file for a '!Format date' as this
 !                          effect our free-format read.
 ! Altered 13-Nov-1996 - Bug fix. Typo in setting maximum allocation for
-!                         vectors --- error occrrs when NOLD is the
+!                         vectors --- error occurs when NOLD is the
 !                         largest value.
 !
 ! Altered 26-May-1996 - Access to scratch block removed. Dynamic memory
 !                         allocation used.
 !                       ERROR_LU installed.
-!                       Generic call for OOG and EXP.
+!                       Generic call for LOG and EXP.
 !
 ! Altered 02-Aug-1994 - PROGRDESC change from INTEGER to REAL*8. Corrects
 !                       alignment problem. PROGDESC is now check for
@@ -37,7 +40,7 @@
 ! Altered 3-May-1989 - NV and check installed.
 !
 ! Altered 29-Nov-1989 - EDGE installed to enable departure coefficients for
-!                        unknow levels to be computed assuming the same
+!                        unknown levels to be computed assuming the same
 !                        excitation temperature as the last known level.
 !                        NB - Call was changed. Implicit none installed.
 ! Altered 08-Oct-1987 - Handles departure coefficients, OR b-1.
@@ -71,7 +74,7 @@
 ! Local Variables.
 !
 	INTEGER I,J,NOLD,NDOLD,COUNT,NX,NXST,NZ,IOS
-	REAL*8 RPOLD,TX,DELTA_T,T1,ADD1,DC_MOD
+	REAL*8 RPOLD,TX,DELTA_T,T1,T2,ADD1,DC_MOD
 	LOGICAL CHECK_DC
 	CHARACTER*80 STRING
 	CHARACTER*(*) FILNAME
@@ -191,18 +194,29 @@
 ! Interpolate the populations assuming that the departure
 ! coefficients remain constant.
 !
+! When extending to larger radii, we assume that the ionization
+! state of the gas does not change. This supersedes the earlier assumption
+! of a fixed departure coefficient. Excited populations are adjusted
+! logarithmically. Code assumes ED is proportional to POP_ATOM, and
+! hence may break down for SN models (with variable composition).
+!
+	DPOP=DPOP+ADD1			!Insure never negative
 	DO J=1,NZ
 	  DO I=1,NDOLD
-	    OLDT(I)=LOG(DPOP(J,I)+ADD1)	!insures that never neg.
+	    OLDT(I)=LOG(DPOP(J,I))
 	  END DO
 	  CALL LINPOP(RLOG(NXST),TA(NXST),NX,OLDR,OLDT,NDOLD)
 	  DO I=NXST,ND
 	    DHEN(J,I)=EXP(TA(I))
 	  END DO
-	  DHEN(J,1:NXST-1)=DHEN(J,NXST)
+	  DO I=1,NXST-1
+	    T1=POPATOM(NXST)/POPATOM(I)
+	    T2=MIN(1.0D0, ABS(LOG(DPOP(J,1)))/ABS(DLOG(DPOP(1,1))) )
+	    DHEN(J,I)=DPOP(J,1)*(T1**T2)
+	  END DO
 	END DO
 !
-! Compute departure coefficints for N>NZ . New levels are set to have thes
+! Compute departure coefficients for N>NZ . New levels are set to have these
 ! same excitation temperature as the highest level/
 !
 	IF(N .GT. NZ)THEN
