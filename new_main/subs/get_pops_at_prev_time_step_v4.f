@@ -85,25 +85,29 @@
 ! As a Hubble law, we can use V to interpolate. Note that 
 ! V is a comoving variable.
 !
-	T1=1.0D-12
+	T1=1.0D-06
 	IF(EQUAL(TMP_V(ND_OLD),V(ND),T1))THEN
 	  TMP_V(ND_OLD)=V(ND)
 	ELSE 
 	  LUER=ERROR_LU()
-	  WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V3' 
+	  WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V4' 
 	  WRITE(LUER,*)'Velocities at inner boundary are unequal'
 	  WRITE(LUER,*)'V(ND)=',V(ND)
 	  WRITE(LUER,*)'OLD_V(ND_OLD)=',TMP_V(ND_OLD)
+	  WRITE(LUER,*)'V(ND)/OLD_V(ND)=',V(ND)/TMP_V(ND)
+	  WRITE(LUER,*)'Accuracy indicator=',T1
 	  STOP
 	END IF
 	IF(EQUAL(TMP_V(1),V(1),T1))THEN
 	  TMP_V(1)=V(1)
 	ELSE IF(TMP_V(1) .LT. V(1))THEN
 	  LUER=ERROR_LU()
-	  WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V3' 
+	  WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V4' 
 	  WRITE(LUER,*)'Old velocity at outer boundary is too small'
 	  WRITE(LUER,*)'V(1)=',V(1)
 	  WRITE(LUER,*)'OLD_V(1)=',TMP_V(1)
+	  WRITE(LUER,*)'V(1)/OLD_V(1)=',V(1)/TMP_V(1)
+	  WRITE(LUER,*)'Accuracy indicator=',T1
 	END IF
 !
 ! Perform interpolations in Log-Log plane, with V as the independent variable.

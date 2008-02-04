@@ -57,7 +57,7 @@
 ! As a Hubble law, we can use V to interpolate. Note that 
 ! V is a comoving variable.
 !
-	T1=1.0D-12
+	T1=1.0D-06
 	IF(EQUAL(OLD_V(ND),V(ND),T1))THEN
 	  OLD_V(ND)=V(ND)
 	ELSE 
@@ -66,6 +66,8 @@
 	  WRITE(LUER,*)'Velocities at inner boundary are unequal'
 	  WRITE(LUER,*)'V(ND)=',V(ND)
 	  WRITE(LUER,*)'OLD_V(ND)=',OLD_V(ND)
+	  WRITE(LUER,*)'V(ND)/OLD_V(ND)=',V(ND)/OLD_V(ND)
+	  WRITE(LUER,*)'T1=',T1
 	  STOP
 	END IF
 	IF(EQUAL(OLD_V(1),V(1),T1))THEN
@@ -76,6 +78,8 @@
 	  WRITE(LUER,*)'Old velocity at outer boundary is too small'
 	  WRITE(LUER,*)'V(1)=',V(1)
 	  WRITE(LUER,*)'OLD_V(1)=',OLD_V(1)
+	  WRITE(LUER,*)'V(1)/OLD_V(1)=',V(1)/OLD_V(1)
+	  WRITE(LUER,*)'T1=',T1
 	END IF
 !
 ! Perform interpolations in Log-Log plane, with V as the independent variable.
