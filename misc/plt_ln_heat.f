@@ -8,6 +8,7 @@
 	REAL*8 LAM(NMAX)
 	REAL*8 XV(NMAX)
 	REAL*8 Y(NMAX)
+	CHARACTER*40 NAME(NMAX)
 !
 	REAL*8, ALLOCATABLE :: LH(:,:)
 	REAL*8, ALLOCATABLE :: SE_SCL(:,:)
@@ -15,6 +16,7 @@
 !
 	INTEGER ND
 	INTEGER N_LINES
+	INTEGER COUNT
 	INTEGER I,K,ML,IBEG
 !
 	CHARACTER*80 FILENAME
@@ -23,14 +25,21 @@
         EXTERNAL UC
 	CHARACTER*20 PLT_OPT
 !
-1000	CONTINUE
+	WRITE(6,'(A)')' '
+	WRITE(6,'(A)')' Program to plot the radiative equilibrium equation.'
+	WRITE(6,'(A)')' Can be used to show how RE changes as we integrate from blue to red.'
+	WRITE(6,'(A)')' Designed to see effect of scaling the heating rates.'
+	WRITE(6,'(A)')' Can be used to identify SL assignments that might be changed.'
+	WRITE(6,'(A)')' '
+!
+100	CONTINUE
  	FILENAME='LINEHEAT'
 	CALL GEN_IN(FILENAME,'File with data to be plotted')
-	IF(FILENAME .EQ. ' ')GOTO 1000
+	IF(FILENAME .EQ. ' ')GOTO 100
 !
 	ND=104; N_LINES=102066
-	CALL GEN_IN(ND,'Number of data points')
-	CALL GEN_IN(N_LINES,'Number of lines')
+	CALL GEN_IN(ND,'Number of data points (must be exact)')
+	CALL GEN_IN(N_LINES,'Maximum number of lines to be read')
 !
 	ALLOCATE (LH(ND,N_LINES))
 	ALLOCATE (SE_SCL(ND,N_LINES))
@@ -38,11 +47,18 @@
 !
 	OPEN(UNIT=11,FILE=FILENAME,STATUS='OLD',ACTION='READ')
 !
+	COUNT=0
 	DO ML=1,N_LINES
 	  STRING=' '
 	  DO WHILE(STRING .EQ. ' ')
-	    READ(11,'(A)')STRING
+	    READ(11,'(A)',END=5000)STRING
 	  END DO
+	  IF(INDEX(STRING,'error in L due to') .NE. 0)GOTO 5000
+	  STRING=ADJUSTL(STRING)
+	  K=INDEX(STRING,' ')
+	  STRING=ADJUSTL(STRING(K:))
+	  K=INDEX(STRING,' ')
+	  NAME(ML)=STRING(1:K-1) 
 	  K=INDEX(STRING,')')
 	  DO WHILE(K .NE. 0)
 	    STRING(1:)=STRING(K+1:)
@@ -52,9 +68,21 @@
 	  STRING(1:)=STRING(K:)
 	  READ(STRING,*,ERR=200)NU(ML)
 	  READ(11,*)(LH(1:ND,ML))
+	  READ(11,'(A)')STRING
+	  IF(STRING .NE. ' ')THEN
+	    WRITE(6,'(A)')' '
+	    WRITE(6,*)'Error: invalid data format'
+	    WRITE(6,*)'Check ND values'
+	    WRITE(6,*)'Current line count is',COUNT
+	    WRITE(6,'(A)')' '
+	    STOP
+	  END IF
 	  READ(11,*)(SE_SCL(1:ND,ML))
 	  READ(11,*)(SE_NOSCL(1:ND,ML))
+	  COUNT=COUNT+1
 	END DO
+5000	CONTINUE
+	N_LINES=COUNT
 !
 	LAM(1:N_LINES)=2.99702458D+03/NU(1:N_LINES)
 !
@@ -62,9 +90,11 @@
 	DO WHILE(1 .EQ. 1)
 	  WRITE(6,*)' '
 	  WRITE(6,*)'Plot options are:'
-	  WRITE(6,*)' LH:  Plot LH  at given depth'
-	  WRITE(6,*)' SS:  Plot STEQ (scaling) at given depth'
-	  WRITE(6,*)' SN:  Plot STEQ (no scaling) at a given depth'
+	  WRITE(6,*)' LH:    Plot LH  at given depth'
+	  WRITE(6,*)' SS:    Plot STEQ (scaling) at given depth'
+	  WRITE(6,*)' SN:    Plot STEQ (no scaling) at a given depth'
+	  WRITE(6,*)' FV:    Plot final values (SCL, NO SCL) as a function of depth'
+	  WRITE(6,*)' WR:    Write SS & SN data at a single depth to file'
 	  WRITE(6,*)' E(X):  Exit routine'
 	  CALL GEN_IN(PLT_OPT,'Plot option')
 	  IF(UC(PLT_OPT) .EQ. 'LH')THEN
@@ -77,6 +107,7 @@
 	    K=ND
 	    CALL GEN_IN(K,'Depth for plotting')
 	    Y(1:N_LINES)=SE_SCL(K,1:N_LINES)
+	    WRITE(6,*)Y(N_LINES)
 	    CALL DP_CURVE(N_LINES,NU,Y)
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','STEQ(scaled)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'SN')THEN
@@ -94,6 +125,13 @@
 	    Y(1:ND)=SE_NOSCL(1:ND,N_LINES)
 	    CALL DP_CURVE(ND,XV,Y)
 	    CALL GRAMON_PGPLOT('Depth Index','STEQ(sc,scl)',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'WR')THEN
+	    K=ND
+	    CALL GEN_IN(K,'Depth for plotting')
+	    DO I=1,N_LINES
+	      WRITE(100,'(I7,4ES14.4,3X,A)')I,NU(I),SE_NOSCL(K,I)-SE_SCL(K,I),
+	1                SE_NOSCL(K,I),SE_SCL(K,I),TRIM(NAME(I))
+	    END DO
 	  ELSE IF(UC(PLT_OPT) .EQ. 'EX' .OR. UC(PLT_OPT) .EQ. 'E')THEN
 	    STOP
 	  END IF
