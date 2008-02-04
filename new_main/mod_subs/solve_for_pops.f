@@ -11,6 +11,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered:   23-Feb-2007 : Call to SOLVEBA_V8 changed to SOLVEBA_V9; LAM_SCALE_OPT inserted
+!                            into SOLVEBA_V9 call.
 ! Finalized: 15-Feb-2006
 !
 	INTEGER NT
@@ -111,9 +113,9 @@
 	  T1=MAX_LIN_COR
 	  TEMP_CHAR=METH_SOL
 	END IF
-	CALL SOLVEBA_V8(SOL,POPS,
+	CALL SOLVEBA_V9(SOL,POPS,
 	1       DIAG_INDX,NT,NION,NUM_BNDS,ND,
-	1       MAXCH,TEMP_CHAR,SUCCESS,SCALE_OPT,T1,T_MIN,
+	1       MAXCH,TEMP_CHAR,SUCCESS,SCALE_OPT,LAM_SCALE_OPT,T1,T_MIN,
 	1       COMPUTE_BA,WR_BA_INV,WR_PART_OF_INV,LAMBDA_ITERATION)
 !
 ! Complicated algorithim to decide when to switch off BA computation.
