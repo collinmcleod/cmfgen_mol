@@ -76,6 +76,7 @@ C
 C
 	CHARACTER*80 FILENAME
 	LOGICAL FILE_OPEN
+	LOGICAL FILE_PRES
 C
 	INTEGER IZERO
 	PARAMETER (IZERO=0)
@@ -682,7 +683,12 @@ C Read in a previously existing link file. If this file has been edited,
 C and the links numbering is all mixed up, the 'CL' option should be 
 C issued.
 C
-	  CALL USR_OPTION(FILENAME,'File',' ','F_TO_S links')
+	  FILE_PRES=.FALSE.
+	  DO WHILE(.NOT. FILE_PRES)
+	    CALL USR_OPTION(FILENAME,'File',' ','F_TO_S links')
+	    INQUIRE(FILE=TRIM(FILENAME),EXIST=FILE_PRES)
+	    IF(.NOT. FILE_PRES)WRITE(T_OUT,*)'File ',TRIM(FILENAME),' not found. Try again.'
+	  END DO
 	  CALL USR_OPTION(SORT_LEVS,'SORT','F','Sort levels if F_TO_FILE?')
 	  CALL RD_F_TO_S_IDS_V2(F_TO_S,INT_SEQ,NAME,NLEV,IZERO,
 	1               LUIN,SORT_LEVS,FILENAME)
