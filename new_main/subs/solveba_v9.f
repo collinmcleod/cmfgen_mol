@@ -4,7 +4,7 @@
 	1              BA_COMPUTED,WR_BA_INV,WR_PRT_INV,LAMBDA_IT)
 	IMPLICIT NONE
 !
-! Altered 22-Nov-2007 : Changed to V9
+! Altered 23-Nov-2007 : Changed to V9
 !                       LAM_SCALE_OPT inserted in call.
 ! Altered 23-May-2006 : Extra column output to CORRECTION_SUM.
 ! Altered 19-May-2005 : T_MIN inserted into call.
@@ -104,7 +104,8 @@
 	      END IF
 	    END DO
 	  END DO
-	  IF(COUNT(1) .NE. 0)WRITE(lUER,*)'Warning -- fiddle in SOLVEBA_V9.f'
+	  IF(COUNT(1) .NE. 0)
+	1   WRITE(LUER,*)'Warning -- using  LIMIT option for LAMBDA iteration in SOLVEBA_V9.f'
 	END IF
 !
 ! Adjust scale parameter so that the biggest decrease in any variable
