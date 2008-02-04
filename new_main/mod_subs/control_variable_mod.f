@@ -1,5 +1,6 @@
 	MODULE CONTROL_VARIABLE_MOD
 !
+! Altered : 23-Nov-2007 : LAM_SCALE_OPT included.
 ! Altered : 20-Feb-2006 : ABOVE_EDGE changed to LOGICAL from REAL*8
 ! Altered : 29-Jan-2006 : Control variable fors relativistic transfer and time
 !                          dependent statistical equilibrium equations installed.
@@ -84,6 +85,7 @@
 	REAL*8 RG_PAR(N_RG_PAR_MAX)
 	LOGICAL REVISE_R_GRID
 	CHARACTER(LEN=10) NEW_RGRID_TYPE
+	CHARACTER(LEN=10) SN_T_OPTION
 !
 ! Variables for including clumping under the assumption that the clumping
 ! occurs on scales much smaller than any of the transfer scales. Valid
@@ -108,6 +110,7 @@
 	LOGICAL GRID
 	LOGICAL INTERP_DC_SPH_TAU
 	LOGICAL SET_LTE_AS_INIT_ESTIMATES
+	CHARACTER(LEN=10) DC_INTERP_METHOD
 !
 ! Used when constructing the Temperature distribution on the first
 ! iteration.
@@ -335,6 +338,11 @@
 !
 	CHARACTER(LEN=6)  SCALE_OPT
 !
+! Introduced Nov-2003 to limit LAMBDA changes prior to normal scaling of corrections.
+! Option only has an effect if LAM_SCALE_OPT='LIMIT'
+!
+	CHARACTER(LEN=6)  LAM_SCALE_OPT
+!
 ! Used to determine the accuracy with which the BA and BAION matrices are
 ! computed. 1.0D-10 < BA_CHK_FAC < 0.1. Smaller number means higher acuracy,
 ! but slower computation. Too large a value may affect convergence. Most
@@ -376,7 +384,7 @@
 	INTEGER RD_CNT_LAM
 	LOGICAL OLD_RD_LAMBDA
 	LOGICAL RD_LAMBDA
-	LOGICAL DO_RD_LAMBDA_AUTO
+	LOGICAL DO_LAMBDA_AUTO
 	LOGICAL LAMBDA_ITERATION
 !
 ! Variables for determining whether some populations are held fixed
