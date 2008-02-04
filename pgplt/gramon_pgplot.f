@@ -331,7 +331,9 @@
 !
 	LINE_STYLE(:)=1
 	LINE_WGT(:)=1
-	MARKER_STYLE(:)=1
+	DO I=1,MAX_PLTS
+	  MARKER_STYLE(I)=MOD(I,5)
+	END DO
 	DASH=.FALSE.
 !
 ! Assign a color index to each pen. Keep previus assignments if they have been
@@ -1233,6 +1235,9 @@ C
 	         J=J+1
 	         N_LINE_IDS=J
 	      END IF
+	      IF(LINE_ID(J)(2:2) .EQ. 'k')LINE_ID(J)(2:2)='i'
+	      IF(LINE_ID(J)(2:2) .EQ. '2')LINE_ID(J)(2:)='II'//LINE_ID(J)(3:)
+	      IF(LINE_ID(J)(3:3) .EQ. '2')LINE_ID(J)(3:)='II'//LINE_ID(J)(4:)
 	    END DO
 	  ELSE
 	    WRITE(6,*)'Unable top open file'
@@ -1312,6 +1317,19 @@ C
 C
 	ELSE IF(ANS .EQ. 'GF')THEN
 	  CALL DO_GAUS_FIT(XPAR(1),XPAR(2))
+	  GOTO 1000
+!
+	ELSE IF(ANS .EQ. 'MGF')THEN
+	  CALL DO_MULT_GF(XPAR(1),XPAR(2))
+	  GOTO 1000
+!
+	ELSE IF(ANS .EQ. 'EG')THEN
+	  CALL ED_GAUS_FIT()
+	  GOTO 1000
+!
+	ELSE IF(ANS .EQ. 'SEW')THEN
+	  T1=0.002D0
+	  CALL SIMP_EW(CD(1)%DATA(1),CD(1)%XVEC(1),NPTS(1),XPAR(1),XPAR(2),T1)
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'DG')THEN
@@ -2330,6 +2348,21 @@ C
 	  ID_LOC=4
 	  ID_ORIENT=90.0D0
 	  ID_LOC_PG=1.0D0
+!
+	  ID_WAVE_OFF(1:N_LINE_IDS)=ID_WAVE(1:N_LINE_IDS)
+	  CALL PGQCS(IFOUR,XCHAR_SIZE,YCHAR_SIZE)
+	  WRITE(6,*)'XCHAR_SIZE=',XCHAR_SIZE
+	  DO L=1,5
+	    DO I=1,N_LINE_IDS
+	      T1=(ID_WAVE(I)-XPAR(1))*(XPAR(2)-ID_WAVE(2))
+	      IF(T1 .GT. 0)THEN
+	        IF(ID_WAVE_OFF(I)+XCHAR_SIZE .GT. ID_WAVE_OFF(I+1))THEN
+	          ID_WAVE_OFF(I)=ID_WAVE_OFF(I+1)-1.1*XCHAR_SIZE
+	        END IF
+	      END IF
+	    END DO
+	  END DO
+!
 	  DO I=1,N_LINE_IDS
 	    T1=ID_SCL*ID_Y_OFF(I)
 	    TMP_STR=' '
@@ -2358,7 +2391,7 @@ C
 	        CALL PGSCH(EXPCHAR*ID_EXPCHAR)
 	        CALL PGPTXT(XSTRPOS(1),YSTRPOS(1),ID_ORIENT,ID_LOC_PG,TMP_STR)
 	        T1=ID_SCL*ID_Y_OFF(I)
-	        CALL PGMOVE(ID_WAVE(I),ID_VEC_BEG)
+	        CALL PGMOVE(ID_WAVE_OFF(I),ID_VEC_BEG)
 	        CALL PGDRAW(ID_WAVE(I),ID_VEC_END)
 	      END IF
 	    END IF
