@@ -111,7 +111,7 @@
 	REAL*8 TA(NP_MAX),TB(NP_MAX),TC(NP_MAX)
 	REAL*8 Z(NP_MAX),DTAU(NP_MAX),XM(NP_MAX),RJ(NP_MAX)
 	REAL*8 CHI(NP_MAX),REXT(NP_MAX),dCHIdr(NP_MAX)
-	REAL*8 INBC,HBC,HBCNEW,FA(NP_MAX),GAM(NP_MAX),GAMH(NP_MAX)
+	REAL*8 INBC,HBC,HBCNEW,NBC,FA(NP_MAX),GAM(NP_MAX),GAMH(NP_MAX)
 
 	REAL*8 RJEXT(NP_MAX),FEXT(NP_MAX),Q(NP_MAX),FOLD(NP_MAX)
 	REAL*8 CHIEXT(NP_MAX),ETAEXT(NP_MAX),ESECEXT(NP_MAX)
@@ -122,6 +122,7 @@
 	INTEGER GRID(NP_MAX),INDX(NP_MAX)
 	LOGICAL INACCURATE,REXT_COMPUTED,GREY_COMP
 	LOGICAL GREY_WITH_V_TERMS
+	LOGICAL PLANE_PARALLEL_NOV
 !
 	REAL*8 XV(N_PLT_MAX),XNU(N_PLT_MAX)
 	REAL*8 YV(N_PLT_MAX),ZV(N_PLT_MAX),WV(N_PLT_MAX)
@@ -209,6 +210,7 @@
 	INTEGER TAU_GRT_LOGX(-ITAU_GRT_LIM:ITAU_GRT_LIM)
 !
 	REAL*8 DTDR,DBB,S1,IC
+	REAL*8 HFLUX
 	REAL*8 EXC_EN,EDGE_FREQ
 	REAL*8 RVAL,TAU_VAL,ED_VAL
 	REAL*8 XDIS,YDIS,DIS_CONST
@@ -306,11 +308,11 @@
 !
 	REAL*8 GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT,BOLTZMANN_CONSTANT
 	REAL*8 FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
-	REAL*8 ASTRONOMICAL_UNIT,RAD_SUN
+	REAL*8 ASTRONOMICAL_UNIT,RAD_SUN,TEFF_SUN,STEFAN_BOLTZ
 	INTEGER GET_INDX_DP
 	EXTERNAL GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT,GET_INDX_DP
 	EXTERNAL FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
-	EXTERNAL ASTRONOMICAL_UNIT,RAD_SUN,BOLTZMANN_CONSTANT
+	EXTERNAL ASTRONOMICAL_UNIT,RAD_SUN,TEFF_SUN,BOLTZMANN_CONSTANT,STEFAN_BOLTZ
 !
 	LOGICAL PRESENT			!indicates whether species is linked
 	LOGICAL EQUAL
@@ -348,7 +350,12 @@
 	TSTAR=T(ND)
 	GREY_COMP=.FALSE.
 	FIRST_RATE=.TRUE.
-	XRAYS=.FALSE.
+!
+	XRAYS=.TRUE.                    !Changed def .FALSE.
+	FILL_FAC_XRAYS=1.0D0
+	T_SHOCK=300.0D0
+	V_SHOCK=200.0D0
+!
 	LEVEL_DISSOLUTION=.TRUE.
 	PI=FUN_PI()
 	DIST_KPC=1.0D0
@@ -1630,7 +1637,26 @@
 ! Rossland opacity is given in CHIROSS. Not written as a subroutine to allow
 ! easy inclusion of additional opacity sources.
 !
-
+	ELSE IF(XOPT .EQ. 'SXROSS' .OR. XOPT .EQ. 'SYROSS')THEN
+	  DO I=1,ND
+	    TA(I)=CLUMP_FAC(I)*ROSS_MEAN(I)*(R(ND)/R(I))**2
+	  END DO
+	  CALL TORSCL(TAUROSS,TA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  WRITE(T_OUT,*)'Spherical rossland optical depth is : ',TAUROSS(ND)
+	  IF(X .EQ. 'SXROSS')THEN
+	    DO I=1,ND
+	      XV(I)=LOG10(TAUROSS(I))
+	    END DO
+	    XAXIS='Log(\gt\dSRoss\u)'
+	    XAXSAV=XAXIS
+	  ELSE IF(XOPT .EQ. 'SYROSS')THEN
+	    DO I=1,ND
+	      YV(I)=LOG10(TAUROSS(I))
+	    END DO
+	    CALL DP_CURVE(ND,XV,YV)
+	    YAXIS='Log(\gt\dSRoss\u)'
+	  END IF
+!
 	ELSE IF(XOPT .EQ. 'XROSS' .OR. XOPT .EQ. 'YROSS' .OR.
 	1                                 XOPT .EQ. 'GREY')THEN
 	  DO I=1,ND
@@ -1661,6 +1687,11 @@
 !
 	    CALL USR_HIDDEN(GREY_WITH_V_TERMS,'VT','F','File appendage')
 	    CALL USR_HIDDEN(ELEC,'LOGT','F','Log of T?')
+	    IF(R(1)/R(ND) .LT. 2.0 .AND. V(1) .LT. 1.0D0)THEN
+	      CALL USR_OPTION(PLANE_PARALLEL_NOV,'PPNOV','T','Plane parallel model no V?')
+	    ELSE
+	      CALL USR_HIDDEN(PLANE_PARALLEL_NOV,'PPNOV','F','Plane parallel model no V?')
+	    END IF
 !
 ! Compute Grey temperature distribution. 
 !
@@ -1679,6 +1710,7 @@
 	        TGREY(I)=((3.14159265D0/5.67D-05*RJ(I))**0.25D0)*1.0D-04
 	        YV(I)=TGREY(I)
 	      END DO
+	      GREY_COMP=.TRUE.
 !
 	      IF(ELEC)THEN
 	        YV(1:ND)=LOG10(YV(1:ND))
@@ -1687,6 +1719,57 @@
 	      CALL DP_CURVE(ND,ZV,YV)
 	      XAXIS='Log(\gt\dRoss\u)'
 	      XAXSAV=XAXIS
+	    ELSE IF(PLANE_PARALLEL_NOV)THEN
+	      FOLD=0.3333D0
+	      HBC=0.7D0; NBC=0.0D0; FL=1.0D0; INBC=0.1D0
+!
+! Note HFLUX=LUM*Lsun/16/(PI*PI)/10**2 (10**2 for 1/R**2).
+! DBB - dBdR = 3. Chi. L/16(piR)**2 and is used for the lower boundary
+! diffusion approximation. Since we are dealing with a plane-parallel
+! atmopshere, we divide HFLUX by R*^2.
+!
+              HFLUX=3.826D+13*LUM/16.0D0/PI**2/R(ND)/R(ND)
+              DBB=3.0D0*CHIROSS(ND)*HFLUX
+              T1=1000.0D0
+!
+! Compute radial (vertical) optical depth increments.
+!
+	      CALL DERIVCHI(TB,CHIROSS,R,ND,METHOD)
+	      CALL NORDTAU(DTAU,CHIROSS,R,R,TB,ND)
+!
+! Compute the solution vector. Note that the units need to be
+! eventually included. The following follows direcly from d2K/d2Tau=0.
+!
+	      DO WHILE(T1 .GT. 1.0D-08)
+	        T2=FOLD(1)/HBC
+	        RJ(1)=HFLUX/HBC
+	        DO I=2,ND
+	          T2=T2+DTAU(I-1)
+	          RJ(I)=T2*HFLUX/FOLD(I)
+	        END DO
+!
+! Will use TA for IPLUS.
+!
+	        SOURCE(1:ND)=RJ
+	        CALL FCOMP_PP_V2(R,TC,GAMH,SOURCE,CHIROSS,TA,HBC,
+	1               NBC,INBC,DBB,IC,THK_CONT,DIF,ND,NC,METHOD)
+	        T1=0.0D0
+                DO I=1,ND
+                  T1=MAX(ABS(FOLD(I)-GAMH(I)),T1)
+                  FOLD(I)=GAMH(I)
+                END DO
+              END DO
+!
+! Compute the temperature distribution, and the Rossland optical depth scale.
+! Assumes LTE. NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert
+! T from units of K to units of 10^4 K. 
+!
+	      GREY_COMP=.TRUE.
+	      DO I=1,ND
+	        TGREY(I)=((3.14159265D0/5.67D-05*RJ(I))**0.25D0)*1.0D-04
+	      END DO
+	      WRITE(T_OUT,*)'Use TGREY to plot T' 
+!
 	    ELSE
 !
 ! We use a finer grid here. The finer grid has been  previously defined.
@@ -1854,8 +1937,8 @@
 	    K=K+1
 	  END DO
 !	  Q0=1.0D0; QINF=0.5D0; GAM_HOPF=1.0
-          T2=R(ND)/6.96D0
-          T2=0.5784D0*(LUM/T2**2)**0.25                !Units of 10^4 K
+          T2=1.0D+10*R(ND)/RAD_SUN()
+          T2=1.0D-04*TEFF_SUN()*(LUM/T2**2)**0.25                !Units of 10^4 K
 	  DO I=1,ND
 	    T1=1.3333333D0*( (T(I)/T2)**4 )*TAUROSS(I)/TA(I)-TAUROSS(I)
 	    WRITE(6,*)I,TAUROSS(I),TA(I),T(I),T2
@@ -1894,6 +1977,14 @@
 	  YV(1:ND)=TC(1:ND)
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='dlnT/dlnP'
+!
+	ELSE IF(XOPT .EQ. 'PGONP')THEN
+	  TA(1:ND)=1.0D+04*BOLTZMANN_CONSTANT()*(ED(1:ND)+POP_ATOM(1:ND))*T(1:ND)
+	  T1=4.0D+16*STEFAN_BOLTZ()/SPEED_OF_LIGHT()/3.0D0
+	  TB(1:ND)=T1*T(1:ND)**4
+	  YV(1:ND)=TA(1:ND)/TB(1:ND)
+	  CALL DP_CURVE(ND,XV,YV)
+	  YAXIS='Pgas/P'
 !
 !
 	ELSE IF(XOPT .EQ. 'VEL')THEN
@@ -2713,7 +2804,7 @@
 	ELSE IF(XOPT .EQ. 'DION')THEN
 	  TYPE=' '
 	  DO ID=1,NUM_IONS
-	    IF(XSPEC .EQ. TRIM(ION_ID(ID))) THEN
+	    IF(XSPEC .EQ. UC(TRIM(ION_ID(ID))) ) THEN
 	      CALL DLOGVEC(ATM(ID)%DXzV_F,YV,ND)
 	      CALL DP_CURVE(ND,XV,YV)	
 	      IF(ATM(ID)%ZXzV .LE. 9)WRITE(TYPE,'(I1)')NINT(ATM(ID)%ZXzV)
@@ -2803,7 +2894,7 @@
 	    WRITE(T_OUT,*)'Xray opacities NOT included'
 	  END IF
 !
-! Swith on/of level dissolution.
+! Switch on/of level dissolution.
 !
 	ELSE IF(XOPT .EQ. 'DIS')THEN
 	  LEVEL_DISSOLUTION= .NOT. LEVEL_DISSOLUTION
@@ -3506,26 +3597,26 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 !
 	   NEXT_LOC=1  ;   STRING=' '
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TA(ND))
-	   T1=R(ND)/6.96D0 ; CALL WR_VAL_INFO(STRING,NEXT_LOC,'R*/Rsun',T1)
-	   T1=5784.0D0*(LUM/T1**2)**0.25
+	   T1=1.0D+10*R(ND)/RAD_SUN(); CALL WR_VAL_INFO(STRING,NEXT_LOC,'R*/Rsun',T1)
+	   T1=TEFF_SUN()*(LUM/T1**2)**0.25
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'T*  ',T1)
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',V(ND))
 	   WRITE(LU_OUT,'(A)')TRIM(STRING)
 !
 	   NEXT_LOC=1  ;   STRING=' '
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(2))		!10.0D0
-	   T1=TC(2)/6.96D0
+	   T1=1.0D+10*TC(2)/RAD_SUN()
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'R /Rsun',T1)
-	   T1=5784.0D0*(LUM/T1**2)**0.25
+	   T1=TEFF_SUN()*(LUM/T1**2)**0.25
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff',T1)
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(2))
 	   WRITE(LU_OUT,'(A)')TRIM(STRING)
 !
 	   NEXT_LOC=1  ;   STRING=' '
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(1))		!0.67D0
-	   T1=TC(1)/6.96D0
+	   T1=1.0D+10*TC(1)/RAD_SUN()
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'R /Rsun',T1)
-	   T1=5784.0D0*(LUM/T1**2)**0.25
+	   T1=TEFF_SUN()*(LUM/T1**2)**0.25
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff',T1)
 	   CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(1))
 	   WRITE(LU_OUT,'(A)')TRIM(STRING)
@@ -4109,9 +4200,14 @@ c
 ! These options allow you to plot tau at a particular R (TAUR), or
 ! alternatively, R at a given value of Tau (RTAU).
 !
+! We can also write out the continuum opacities as a function of
+! wavelength.
+!
 ! To be read TAU_at_R and R_at_TAU respectively.
 !
-	ELSE IF(XOPT .EQ. 'RTAU' .OR. XOPT .EQ. 'TAUR')THEN
+	ELSE IF(XOPT .EQ. 'RTAU' .OR. XOPT .EQ. 'TAUR' .OR. XOPT .EQ. 'WROPAC')THEN
+	  IF(XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are included'
+	  IF(.NOT. XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are NOT included'
 	  CALL USR_OPTION(LAM_ST,'LAMST',' ',FREQ_INPUT)
 	  CALL USR_OPTION(LAM_EN,'LAMEN',' ',FREQ_INPUT)
 	  IF(KEV_INPUT)THEN
@@ -4142,7 +4238,7 @@ c
 	  END IF
 	  CALL USR_OPTION(ELEC,'ELEC','T','Include elec?')
 !
-	  CALL USR_HIDDEN(LINX,'LINX','F','Linear X Axis')
+	  CALL USR_HIDDEN(LINX,'LINX','F','Linear X spacing?')
 	  IF(KEV_INPUT)THEN
 	    DO I=1,NFREQ
 	      ZV(I)=ZV(I)/KEV_TO_HZ
@@ -4164,7 +4260,28 @@ c
 	  END IF
 	  CALL USR_HIDDEN(LINY,'LINY','F','Linear Y Axis')
 !
-	  IF(XOPT .EQ. 'TAUR')THEN
+	  IF(XOPT .EQ. 'WROPAC')THEN
+	    WRITE(6,*)' '
+	    WRITE(6,*)'Writing contiinuum opacities to CONT_OPAC '
+	    WRITE(6,*)' '
+	    OPEN(LU_OUT,FILE='CONT_OPAC',STATUS='UNKNOWN')
+	      WRITE(LU_OUT,'(I5,T30,A)')ND,'!Number of depth points'
+	      WRITE(LU_OUT,'(I5,T30,A)')NFREQ,'!Number of frequency points'
+	      WRITE(LU_OUT,'(A)')' '
+	      WRITE(LU_OUT,'(A)')' Radius grid'
+	      WRITE(LU_OUT,'(6ES14.6)')R(1:ND)
+	      WRITE(LU_OUT,'(A)')' '
+	      WRITE(LU_OUT,'(A)')' Velocity(km/s)'
+	      WRITE(LU_OUT,'(6ES14.6)')V(1:ND)
+	      WRITE(LU_OUT,'(A)')' '
+	      WRITE(LU_OUT,'(A)')' Density (gm/cm^3)'
+	      WRITE(LU_OUT,'(6ES14.6)')MASS_DENSITY(1:ND)
+	      WRITE(LU_OUT,'(A)')' '
+	      WRITE(LU_OUT,'(A)')' Clumping factor'
+	      WRITE(LU_OUT,'(6ES14.6)')CLUMP_FAC(1:ND)
+	      WRITE(LU_OUT,'(A)')' '
+	      WRITE(LU_OUT,'(A)')' Kappa Table (cm^2/gm)'
+	  ELSE IF(XOPT .EQ. 'TAUR')THEN
 	    CALL USR_OPTION(RVAL,'RAD',' ','Radius in R* (-ve for depth index)')
 	    IF(RVAL .LT. 0)THEN
 	      RVAL=RVAL*R(ND)
@@ -4218,30 +4335,35 @@ c
 	      ETA(I)=ETA(I)*CLUMP_FAC(I)
 	    END DO
 !
-	    CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,TYPE_ATM)
-	    IF(XOPT .EQ. 'TAUR')THEN
-	      T2=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
-	      YV(ML)=T2*TA(R_INDX+1) + (1.0-T2)*TA(R_INDX)
-	      IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
-	    ELSE
-	      I=1
-	      DO WHILE(TAU_VAL .GT. TA(I) .AND. I .LT. ND)
-	        I=I+1
-	      END DO
-	      IF(TAU_VAL .GT. TA(ND-1))THEN
-	         YV(ML)=1.0
-	      ELSE IF(TAU_VAL .LE. TA(1))THEN
-	         YV(ML)=R(1)*TA(1)/TAU_VAL/R(ND)
+	    IF(XOPT .EQ. 'WROPAC')THEN
+	      WRITE(LU_OUT,'(/,ES16.6)')ANG_TO_HZ/FL
+	      WRITE(LU_OUT,'(6ES14.4)')1.0D-10*CHI(1:ND)/CLUMP_FAC(1:ND)/MASS_DENSITY(1:ND)
+	    ELSE 
+	      CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,TYPE_ATM)
+	      IF(XOPT .EQ. 'TAUR')THEN
+	        T2=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
+	        YV(ML)=T2*TA(R_INDX+1) + (1.0-T2)*TA(R_INDX)
+	        IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
 	      ELSE
-	        T2=(TA(I)-TAU_VAL)/(TA(I)-TA(I-1))
-                YV(ML)=( (1.0-T2)*R(I)+T2*R(I-1) )/R(ND)
+	        I=1
+	        DO WHILE(TAU_VAL .GT. TA(I) .AND. I .LT. ND)
+	          I=I+1
+	        END DO
+	        IF(TAU_VAL .GT. TA(ND-1))THEN
+	          YV(ML)=1.0
+	        ELSE IF(TAU_VAL .LE. TA(1))THEN
+	          YV(ML)=R(1)*TA(1)/TAU_VAL/R(ND)
+	        ELSE
+	          T2=(TA(I)-TAU_VAL)/(TA(I)-TA(I-1))
+                  YV(ML)=( (1.0-T2)*R(I)+T2*R(I-1) )/R(ND)
+	        END IF
+	        IF(IN_R_SUN)YV(ML)=YV(ML)*R(ND)/6.96
+	        IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
 	      END IF
-	      IF(IN_R_SUN)YV(ML)=YV(ML)*R(ND)/6.96
-	      IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
 	    END IF
 	  END DO
-	  CALL DP_CURVE(NFREQ,ZV,YV)
-
+	  IF(XOPT .NE. 'WROPAC')CALL DP_CURVE(NFREQ,ZV,YV)
+!
 	ELSE IF(XOPT .EQ. 'INTERP')THEN
 !
 ! Routine interpolates the last varible plotted. Variable can only
