@@ -118,6 +118,8 @@ C
 	SUBROUTINE WR_ABUND_INFO_V2(SPECIES,MASS,ABUND,ABUND_SUM,
 	1           MEAN_ATOMIC_WEIGHT,SOL_MASS_FRAC,LUOUT)
 C
+C Altered 17-Dec-2007: Now output mean atomic mass.
+C
 	IMPLICIT NONE
 	REAL*8 ABUND			!Relative abundance by number
 	REAL*8 ABUND_SUM		!Sum of relative abundances
@@ -132,6 +134,8 @@ C
 	DATA FIRST/.TRUE./		!    be output.
 C
 	IF(FIRST)THEN
+	  WRITE(LUOUT,'(A)')' '
+	  WRITE(LUOUT,'(A,F7.4)')'Mean atomic mass (amu) is: ',MEAN_ATOMIC_WEIGHT
 	  WRITE(LUOUT,'(A)')' '
 	  WRITE(LUOUT,'(3X,A,5X,A,5X,A,4X,A,6X,A)')
 	1    'SPECIES','Rel. # Fraction','Mass Fraction','Z/Z(sun)','Z(sun)'
