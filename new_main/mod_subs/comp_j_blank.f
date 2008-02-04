@@ -448,7 +448,7 @@ C
 	    IF(T1 .GT. 100.0D0)THEN
 	      WRITE(LUER,'(A)')'***************************************************************************'
 	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 100% for last frequency'
-	      WRITE(LUER,'(A)')' It is suggested that you use a finer grid at the outer boundary'
+	      WRITE(LUER,'(A)')' It is STRONGLY suggested that you use a finer grid at the outer boundary'
 	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error and/or use plt_jh'
 	      WRITE(LUER,'(A)')'***************************************************************************'
 	    ELSE IF(T1 .GT. 50.0D0)THEN
@@ -813,19 +813,19 @@ C
 	    T1=ABS(RJ(1))+ABS(TC(1))
 	    IF(T1 .NE. 0)T1=ABS(200.0D0*(RJ(1)-TC(1))/T1)
 	    IF(T1 .GT. 100.0D0)THEN
-	      WRITE(LUER,'(A)')'Error --- J(mom) and J(ray) differ by more than 1000% for last frequency'
-	      WRITE(LUER,'(A)')'It is suggested that you use a finer grid at the outer boundary'
-	      WRITE(LUER,'(A)')'Tail J__COMP to see bundary error and/or use plt_jh'
+	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 1000% for last frequency'
+	      WRITE(LUER,'(A)')' It is STRONGLY suggested that you use a finer grid at the outer boundary'
+	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error and/or use plt_jh'
 	      STOP
 	    ELSE IF(T1 .GT. 50.0D0)THEN
-	      WRITE(LUER,'(A)')'Error --- J(mom) and J(ray) differ by more than 50% for last frequency'
-	      WRITE(LUER,'(A)')'It is strongly suggested that you use a finer grid at the outer boundary'
-	      WRITE(LUER,'(A)')'Tail J__COMP to see bundary error'
+	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 50% for last frequency'
+	      WRITE(LUER,'(A)')' It is strongly suggested that you use a finer grid at the outer boundary'
+	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error'
 	    ELSE IF(T1 .GT. 20.0D0)THEN
-	      WRITE(LUER,'(A)')'Error --- J(mom) and J(ray) differ by more than 20% for last frequency'
-	      WRITE(LUER,'(A)')'Although this is nlikely to effect the colution, it is suggested that'
-	      WRITE(LUER,'(A)')'you use a finer grid at the outer boundary'
-	      WRITE(LUER,'(A)')'Tail J__COMP to see bundary error'
+	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 20% for last frequency'
+	      WRITE(LUER,'(A)')' Although this is ulikely to effect the colution, it is suggested that'
+	      WRITE(LUER,'(A)')' you use a finer grid at the outer boundary'
+	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error'
 	    END IF
 	  END IF
 	  CALL TUNE(ITWO,'CONT_VEL')
