@@ -232,7 +232,6 @@
 	    WRITE(6,*)'Error: can''t insert grid points outside velociy grid'
 	    STOP
 	  END IF
-	  CALL GEN_IN(N_ADD,'Number of points in interval (exclusive)')
 !
 ! Find interval
 !
@@ -253,6 +252,8 @@
 	  IF(V_MIN-OLD_V(I+1) .LT. OLD_V(I)-V_MIN)I_END=I+1
 	  WRITE(6,*)' I_ST=',I_ST,OLD_V(I_ST)
 	  WRITE(6,*)'I_END=',I_END,OLD_V(I_END)
+	  WRITE(6,*)'Current number of points in interval is',I_END-I_ST-1
+	  CALL GEN_IN(N_ADD,'Number of points in interval (exclusive)')
 !
 	  ND=N_ADD+ND_OLD-(I_END-I_ST-1)
 	  V(1:I_ST)=OLD_V(1:I_ST)
