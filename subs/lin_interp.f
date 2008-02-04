@@ -32,6 +32,9 @@ C
 	  IF(R(ND) .GT. U(NIN) .OR. R(1) .LT. U(1))THEN
 	    J=ERROR_LU()
 	    WRITE(J,*)'Error in LIN_INTERP/LINPOP - values outside range'
+	    WRITE(J,*)R(ND),'should be LE',U(NIN)
+	    WRITE(J,*)R(1),'should be GE ',U(1)
+	    WRITE(J,*)'ND=',ND,'NIN=',NIN
 	    STOP
 	  END IF
 	  L=2
@@ -52,6 +55,9 @@ C
 	  IF(R(1) .GT. U(1) .OR. R(ND) .LT. U(NIN))THEN
 	    J=ERROR_LU()
 	    WRITE(J,*)'Error in LIN_INTERP/LINPOP - values outside range'
+	    WRITE(J,*)R(ND),'should be GE',U(NIN)
+	    WRITE(J,*)R(1),'should be LE ',U(1)
+	    WRITE(J,*)'ND=',ND,'NIN=',NIN
 	    STOP
 	  END IF
 	  L=NIN-1		!-1 to stay in array bounds
