@@ -3,7 +3,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
-! Altered : 29-Jan-2006 : Control variable fors relativistic transfer and time
+! Altered : 23-Nov-2007 : Optional LAM_SCALE_OPT variable included.
+! Altered : 29-Jan-2006 : Control variables for relativistic transfer and time
 !                          dependent statistical equilibrium equations installed.
 ! 
 	INTEGER LUIN
@@ -236,6 +237,8 @@ C
 	    CALL RD_STORE_DBLE(SN_AGE_DAYS,'SN_AGE',DO_CO_MOV_DDT,'Age of SN in days')
 	    CALL RD_STORE_LOG(INCL_RADIOACTIVE_DECAY,'INC_RAD_DECAYS',L_TRUE,
 	1            'Allow for radiactive decays')
+	    CALL RD_STORE_NCHAR(SN_T_OPTION,'SN_T_OPT',ITEN,L_TRUE,
+	1           'Method to get T with non-GRID option (USE_T_IN or USE_HYDRO)')
 	  END IF	  
 	  DO_FULL_REL_OBS=.FALSE.
 	  DO_FULL_REL_CMF=.FALSE.
@@ -421,6 +424,7 @@ C
 	  VERBOSE_OUTPUT=.FALSE.
 	  CALL RD_STORE_LOG(VERBOSE_OUTPUT,'VERBOSE_OUT',L_FALSE,
 	1        'Switch on enhanced diagnostic output')
+	  CALL SET_VERBOSE_INFO(VERBOSE_OUTPUT)
 C
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_NCHAR(GLOBAL_LINE_SWITCH,'GLOBAL_LINE',ISIX,L_TRUE,
@@ -545,10 +549,15 @@ C
 	1        'Read in a predetermined R grid ?')
 	  CALL RD_STORE_LOG(GRID,'LIN_INT',L_TRUE,
 	1        'Use direct linear interpolation if  new model ?')
+	  DC_INTERP_METHOD='ED'
+	  CALL RD_STORE_NCHAR(DC_INTERP_METHOD,'DC_METH',ITEN,L_FALSE,
+	1        'Interpolation method: ED, R, LTE, SPH_TAU')
 	  CALL RD_STORE_LOG(INTERP_DC_SPH_TAU,'DC_SPH_TAU',L_FALSE,
 	1        'Interpolate d.c''s on the spherical TAU scale?')
+	  IF(INTERP_DC_SPH_TAU)DC_INTERP_METHOD='SPH_TAU'
 	  CALL RD_STORE_LOG(SET_LTE_AS_INIT_ESTIMATES,'LTE_EST',L_FALSE,
 	1        'Use LTE for the initial estimates')
+	  IF(SET_LTE_AS_INIT_ESTIMATES)DC_INTERP_METHOD='LTE'
 	  CALL RD_STORE_LOG(DO_POP_SCALE,'POP_SCALE',L_TRUE,
 	1        'Scale populations so that cons. Eq. satisfied ?')
 	  CALL RD_STORE_DBLE(T_INIT_TAU,'T_INIT_TAU',L_TRUE,
@@ -643,6 +652,9 @@ C
 	  END IF
 	  CALL RD_STORE_NCHAR(SCALE_OPT,'SCALE_OPT',ISIX,L_TRUE,
 	1           'Scale option (LOCAL, NONE or GLOBAL) ? ')
+	  LAM_SCALE_OPT='LIMIT'
+	  CALL RD_STORE_NCHAR(LAM_SCALE_OPT,'LAM_SCALE_OPT',ISIX,L_FALSE,
+	1           'Only has an effect if set to LIMIT')
 	  CALL RD_STORE_DBLE(EPS,'EPS_TERM',L_TRUE,
 	1      'If maximum fractional % change < EPS terminate model ')
 	  CALL RD_STORE_DBLE(MAX_LIN_COR,'MAX_LIN',L_TRUE,
@@ -695,6 +707,7 @@ C
 	  IF(INCL_DJDT_TERMS)THEN
 	    USE_DJDT_RTE=.TRUE.
 	  ELSE
+	    JGREY_WITH_V_TERMS=.FALSE.
 	    USE_DJDT_RTE=.FALSE.
 	    CALL RD_STORE_LOG(USE_DJDT_RTE,'USE_DJDT_RTE',L_FALSE,
 	1    'Use solver which has DJDt terms in transfer equaton for SN models?')
