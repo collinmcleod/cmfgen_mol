@@ -1,6 +1,7 @@
 	MODULE GAUS_FIT_DATA
 !
-	INTEGER NG_PAR				!Number of parameters in fit
+	INTEGER NUM_GAUS			!Number of Gaussians
+	INTEGER NG_PAR				!Total number of parameters in fit
 	INTEGER NG_DATA				!Number of data points
 !
 	REAL*8, ALLOCATABLE :: X_GAUS(:)	!Absica data as stored in module
@@ -9,23 +10,26 @@
 	REAL*8, ALLOCATABLE :: SIM(:,:)		!Simplex (NG_PAR+1 parameter set estimates)
 	REAL*8, ALLOCATABLE :: PAR(:)		!Single parameter set
 	REAL*8, ALLOCATABLE :: SUM_SQ(:)
+	REAL*8, ALLOCATABLE :: SCALE(:)
+	REAL*8, ALLOCATABLE :: EW(:)
+	REAL*8, ALLOCATABLE :: EW_ERROR(:)
+	INTEGER, ALLOCATABLE :: INDX_VEC(:)
 !
 	REAL*4, ALLOCATABLE :: XFIT(:)		!Same as X_GAUS but for PGPLOT routines
 	REAL*4, ALLOCATABLE :: YFIT(:)		!Function fit (evaluated by GAUS_FIT_FUNC)
+	REAL*4, ALLOCATABLE :: FIT_DIF(:)	!Function fit (evaluated by GAUS_FIT_FUNC)
 !
 	END MODULE GAUS_FIT_DATA
 !
-! This subroutined defines the approriate arrrays ans store the data for the
+! This subroutined defines the approriate arrrays and stores the data for the
 ! Gaussin fitting routine. Note the XVEC and YVEC are assumed to be single
 ! precision as routines is for use with GRAMON_PGPLOT.
 !
-	SUBROUTINE SET_GAUS_DATA(XVEC,YVEC,XST,XEND,NX,N_PAR,YST,YEND,NDATA)
+	SUBROUTINE SET_GAUS_DATA(XVEC,YVEC,XST,XEND,NX,YST,YEND)
 	USE GAUS_FIT_DATA
 	IMPLICIT NONE
 !
 	INTEGER NX
-	INTEGER N_PAR
-	INTEGER NDATA
 	REAL*4 XVEC(NX)
 	REAL*4 YVEC(NX)
 	REAL*8 XST,XEND
@@ -67,14 +71,13 @@
 	YEND=YVEC(IXEND)
 !
 	NG_DATA=IXEND-IXST+1
-	NDATA=NG_DATA
-	NG_PAR=N_PAR
 	IF(ALLOCATED(X_GAUS))DEALLOCATE(X_GAUS)
 	IF(ALLOCATED(Y_GAUS))DEALLOCATE(Y_GAUS)
 	IF(ALLOCATED(XFIT))DEALLOCATE(XFIT)
 	IF(ALLOCATED(YFIT))DEALLOCATE(YFIT)
+	IF(ALLOCATED(FIT_DIF))DEALLOCATE(FIT_DIF)
 	ALLOCATE (X_GAUS(NG_DATA),Y_GAUS(NG_DATA))
-	ALLOCATE (XFIT(NG_DATA),YFIT(NG_DATA))
+	ALLOCATE (XFIT(NG_DATA),YFIT(NG_DATA),FIT_DIF(NG_DATA))
 	DO I=IXST,IXEND
 	  X_GAUS(I-IXST+1)=XVEC(I)
 	  Y_GAUS(I-IXST+1)=YVEC(I)
