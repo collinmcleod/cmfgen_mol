@@ -13,6 +13,7 @@
 	1                       ID,FILE_NAME)
 	IMPLICIT NONE
 !
+! Altered 23-Nov-2007 : MAX_TVALS adjusted upwards from 21 to 40 (20-Nov-2007).
 ! Altered 23-Feb-1999 : Access of collison table increased to improve speed
 !                         for Fe2. Old method very inefficient. Now loop
 !                         over TABLE entries rather than NL(I) and NUP(J).
@@ -53,7 +54,7 @@
 !
 	INTEGER MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE
 	PARAMETER (MAX_TRANS=30000)
-	PARAMETER (MAX_TVALS=21)
+	PARAMETER (MAX_TVALS=40)
 	PARAMETER (MAX_TAB_SIZE=MAX_TVALS*MAX_TRANS)
 	INTEGER, SAVE :: ID_LOW(MAX_TRANS)
 	INTEGER, SAVE :: ID_UP(MAX_TRANS)
