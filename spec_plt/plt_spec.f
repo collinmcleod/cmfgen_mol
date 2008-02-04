@@ -355,7 +355,7 @@ C
 	ELSE IF(X(1:6) .EQ. 'RD_MOD')THEN
 	  FILENAME=' '
 	  CALL USR_OPTION(FILENAME,'File',' ','Model file')
-	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model data')
+	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
 	  IF(OVER)THEN
 C
@@ -517,7 +517,7 @@ C
 	  CALL USR_HIDDEN(WR_PLT,'WR','F','Write data to file')
 	  CALL USR_HIDDEN(ADD_NOISE,'ADD','F','Add poisonian noise?')
 	  OVER=.FALSE.
-	  CALL USR_OPTION(OVER,'OVER','F','Overwrite existing model data')
+	  CALL USR_OPTION(OVER,'OVER','F','Overwrite existing model (buffer) data')
 	  IF(ADD_NOISE)THEN
 	    CALL USR_OPTION(COUNTS,'CNTS','100','Counts in continuum')
 	    CALL USR_OPTION(R_SEED,'R_SEED','0.2',
@@ -579,7 +579,7 @@ C a model. Thus can reden the data etc. No plot is done, and the model
 C is overwritten.
 C
 	  TREAT_AS_MOD=.FALSE.
-	  CALL USR_HIDDEN(TREAT_AS_MOD,'MOD','F',' ')
+	  CALL USR_HIDDEN(TREAT_AS_MOD,'OVER','F',' ')
 C
 	  IF(SMOOTH)THEN
 	    K=5
@@ -1443,42 +1443,9 @@ C
 	ELSE IF(X(1:2) .EQ. 'LI' .OR. X(1:4) .EQ. 'LIST' .OR. 
 	1                             X(1:2) .EQ. 'HE' 
 	1          .OR. X(1:4) .EQ. 'HELP')THEN
-	  IF(X(1:2) .EQ. 'LI')THEN
-	    CALL GEN_ASCI_OPEN(LU_IN,'PLT_SPEC_OPT_DESC','OLD',' ','READ',
-	1                  IZERO,IOS)
-	    IF(IOS .NE. 0)THEN
-              WRITE(T_OUT,*)'Unable to open PLT_SPEC_OPT_DESC file'
-	      WRITE(T_OUT,*)'IOS=',IOS
-	      GOTO 1
-	    END IF
-	  ELSE 
-	    CALL GEN_ASCI_OPEN(LU_IN,'PLT_SPEC_OPTIONS','OLD',' ','READ',
-	1                  IZERO,IOS)
-	    IF(IOS .NE. 0)THEN
-              WRITE(T_OUT,*)'Unable to open PLT_SPEC_OPTIONS file'
-	      WRITE(T_OUT,*)'IOS=',IOS
-	      GOTO 1
-	    END IF
-	  END IF
-	  READ(LU_IN,*)I,K			!For page formating (I=22,K=12)
-	  DO WHILE(1.EQ. 1)
-	    DO J=1,I
-	      READ(LU_IN,'(A)',END=700)STRING
-	      L=LEN(TRIM(STRING))
-	      IF(L .EQ. 0)THEN
-	        WRITE(T_OUT,'(1X)')
-	      ELSE
-	        WRITE(T_OUT,'(1X,A)')STRING(1:L)
-	      END IF
-	    END DO
-	    READ(5,'(A)')STRING
-	    IF(STRING(1:1) .EQ. 'E' .OR.
-	1       STRING(1:1) .EQ. 'e')GOTO 700		!Exit from listing.
-	    I=K
-	  END DO
-700	  CONTINUE
-	  CLOSE(UNIT=LU_IN)
-C
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'Please see the HTML web pages in $CMFDIST/txt_files for help'
+	  WRITE(T_OUT,*)' '
 	ELSE IF(X(1:2) .EQ. 'EX') THEN
 	  CALL CURVE(0,XV,YV)
 	  STOP
