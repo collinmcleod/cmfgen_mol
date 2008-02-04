@@ -37,7 +37,7 @@ C 3 = HeI triplets, CIV,NV
 C 4 = CIII,NIV
 C 5 = HeI (Singlets and Triplets)
 C
-	    IF(FORM .EQ. 1)FMT='(1X,1P,5E15.5)'
+	    IF(FORM .EQ. 1)FMT='(5ES16.7)'
 	    IF(FORM .EQ. 2)FMT='(1X,1P,1E15.5,:/,1X,2E15.5,:/,1X,3E15.5,
 	1                        :/,(1X,4E15.5))'
 	    IF(FORM .EQ. 3)FMT='(1X,1P,2E15.5,:/,1X,3E15.5,:/,(1X,4E15.5))'
@@ -90,7 +90,7 @@ C
 	  END IF
 C
 2120	  FORMAT(/,1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)
-2122	  FORMAT(/,1X,1P,E15.7,6E15.5,2X,I4,A1)
+2122	  FORMAT(/,1X,ES15.7,6ES16.7,2X,I4,A1)
 C
 	  RETURN
 	  END
