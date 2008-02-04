@@ -152,13 +152,12 @@
 	    STRING=' '
 	  END DO
 !
-! Correct populations for SN expansion.
+! Correct populations for SN expansion. We do not correct
+! POP_HYDRO and ISO_HYDRO as these are mass-fractions.
 !
 	IF(SUM(SIGMA) .EQ. 0.0D0)THEN
 	  SN_EXP_FACTOR=SN_AGE_DAYS/OLD_SN_AGE_DAYS
 	  R_HYDRO=R_HYDRO*SN_EXP_FACTOR
-	  POP_HYDRO=POP_HYDRO/(SN_EXP_FACTOR**3)
-	  ISO_HYDRO=ISO_HYDRO/(SN_EXP_FACTOR**3)
 	  DENSITY_HYDRO=DENSITY_HYDRO/(SN_EXP_FACTOR**3)
 	  ATOM_DEN_HYDRO=ATOM_DEN_HYDRO/(SN_EXP_FACTOR**3)
 	  ELEC_DEN_HYDRO=ELEC_DEN_HYDRO/(SN_EXP_FACTOR**3)
@@ -186,24 +185,20 @@
 	  WRITE(LUER,*)'RD_SN_DATA has read ED and T'
 	END IF
 !
-	WRITE(175,*)'Old density'
-	DO I=1,NX
-	   WRITE(175,'(I8,3ES14.4)')I,R_HYDRO(I),DENSITY_HYDRO(I)
-	END Do
 	WRK_HYDRO=LOG(DENSITY_HYDRO) 
 	CALL MON_INTERP(DENSITY,ND,IONE,LOG_R,ND,WRK_HYDRO,NX,LOG_R_HYDRO,NX)
 	DENSITY=EXP(DENSITY)
-	WRITE(175,*)'New density'
-	DO I=1,ND
-	  WRITE(175,'(I5,4ES14.4)')I,R(I),V(I),DENSITY(I),ED(I)
-	END DO
 !
+! Changed to LIN_INTERP as some models have humungus grid changes across
+! grid points which can cause -ve values due to roundoff errors.
+! 
 	POP_SPECIES=0.0D0
 	DO L=1,NSP
 	  DO K=1,NUM_SPECIES
 	    IF(SPEC_HYDRO(L) .EQ. SPECIES(K))THEN
-	      CALL MON_INTERP(POP_SPECIES(1,K),ND,IONE,LOG_R,ND,POP_HYDRO(1,L),NX,LOG_R_HYDRO,NX)
-	    END IF
+!	      CALL MON_INTERP(POP_SPECIES(1,K),ND,IONE,LOG_R,ND,POP_HYDRO(1,L),NX,LOG_R_HYDRO,NX)
+	      CALL LIN_INTERP(LOG_R,POP_SPECIES(1,K),ND,LOG_R_HYDRO,POP_HYDRO(1,L),NX)
+	   END IF
 	  END DO
 	END DO
 	WRITE(LUER,*)'Read SN populations in RD_SN_DATA'
@@ -216,7 +211,8 @@
 	  DO K=1,NUM_ISOTOPES
 	    IF(ISO_SPEC_HYDRO(L) .EQ. ISO(K)%SPECIES .AND. 
 	1               BARY_HYDRO(L) .EQ. ISO(K)%BARYON_NUMBER)THEN
-	       CALL MON_INTERP(ISO(K)%OLD_POP,ND,IONE,LOG_R,ND,ISO_HYDRO(1,L),NX,LOG_R_HYDRO,NX)
+!	       CALL MON_INTERP(ISO(K)%OLD_POP,ND,IONE,LOG_R,ND,ISO_HYDRO(1:NX,L),NX,LOG_R_HYDRO,NX)
+	       CALL LIN_INTERP(LOG_R,ISO(K)%OLD_POP,ND,LOG_R_HYDRO,ISO_HYDRO(1:NX,L),NX)
 	       DONE=.TRUE.
 	       EXIT
 	    END IF
@@ -239,6 +235,8 @@
 	  POP_SPECIES(:,L)=POP_SPECIES(:,L)/WRK(:)
 	END DO
 	WRITE(6,*)'Normalized mass fractions in RD_SN_DATA'
+	WRITE(6,*)'Maximum normalization factor was',MAXVAL(WRK)
+	WRITE(6,*)'Minimum normalization factor was',MINVAL(WRK)
 !
 ! Now compute the atomic population of each species.
 !
