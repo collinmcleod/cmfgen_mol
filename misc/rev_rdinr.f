@@ -3,10 +3,12 @@
 ! for use with RDINR. IF THEN ELSE structure, so additional options can easily
 ! be included.
 ! Current options:
-!                 IR           Insert additional points betwen I=FST and I=LST
+!                 DOUB:        Doubel radius grid
+!                 EXTR         Extend grid in R
+!                 FG:          Finer grid over specified interval.
 !                 FG_IB:       Finer grid near inner boundary.
 !                 FG_OB:       Finer grid near outer boundary.
-!                 DOUB:        Doubel radius grid
+!                 IR           Insert additional points betwen I=FST and I=LST
 !                 SCAL_R:      Scale radius grid
 !
 	PROGRAM REV_RDINR
@@ -14,7 +16,8 @@
 	IMPLICIT NONE
 !
 ! Created : 23-Jan-2006
-! Altered : 24-Sep-2006  --- FG option added.
+! Altered : 24-Sep-2006 --- FG option added.
+! Altered : 26-Nov-2007 --- EXTR option installed.
 !
 	INTEGER, PARAMETER :: MAX_ND=500
 	REAL*8 R(MAX_ND)
@@ -36,7 +39,7 @@
 	INTEGER ICOUNT
 	INTEGER N,ND,NEW_ND
 	INTEGER, PARAMETER :: IONE=1
-	REAL*8 RMIN,LUM
+	REAL*8 RMIN,RMAX,LUM
 	REAL*8 GRID_FACTOR,GRID_RATIO
 	REAL*8 T1,T2,SCALE_FACTOR,DELR
 	CHARACTER*132 STRING
@@ -50,11 +53,12 @@
 	CALL GEN_IN(FILE_OUT,'Output file: DC file format')
 !
 	WRITE(6,'(A)')'Current available options are:'
-	WRITE(6,'(A)')'   IR           Insert additional points betwen I=FST and I=LST'
+	WRITE(6,'(A)')'   DOUB:        Doubel radius grid'
+	WRITE(6,'(A)')'   EXTR:        Extend grid to larger radii'
 	WRITE(6,'(A)')'   FG:          Fine grid over specified range'
         WRITE(6,'(A)')'   FG_IB:       Finer grid near inner boundary'
         WRITE(6,'(A)')'   FG_OB:       Finer grid near outer boundary'
-	WRITE(6,'(A)')'   DOUB:        Doubel radius grid'
+	WRITE(6,'(A)')'   IR           Insert additional points betwen I=FST and I=LST'
 	WRITE(6,'(A)')'   SCALE_R:     Scale radius grid'
 	OPTION='FG_OB'
 	CALL GEN_IN(OPTION,'Action to be taken:')
@@ -176,6 +180,89 @@
 	  END DO
 	  WRITE(6,*)'New number of depth points is:',NEW_ND,ICOUNT
 	  CALL GEN_IN(NG,'Number of additinal grid points for this interval')
+!
+
+	ELSE IF(OPTION .EQ. 'EXTR')THEN
+!
+	  WRITE(6,*)' '
+	  WRITE(6,*)' We currently assume that at outer boundary V is close to Vinf'
+	  WRITE(6,*)' Grid is extended logarithmically in Log r'
+	  WRITE(6,*)' '
+!
+	  RMAX=2.0D0
+	  CALL GEN_IN(RMAX,'Factor to extend RMAX by')
+          RMAX=RMAX*R(1)
+!
+	  WRITE(6,*)' '
+	  WRITE(6,*)'Outputing old grid near outer boundary.'
+	  WRITE(6,*)'Use this information to choose depth at which extended grid is attached.'
+	  WRITE(6,*)'Ratio at attachment depth will be default spacing ratio.'
+	  WRITE(6,*)' '
+	  WRITE(6,*)' Depth       R Ratio'
+	  DO I=1,10
+	    WRITE(6,'(X,I5,ES14.4)')I,R(I)/R(I+1)
+	  END DO
+!
+	  IST=5
+	  CALL GEN_IN(IST,'Depth index to begin new grid')
+	  GRID_RATIO=R(IST)/R(IST+1)
+	  CALL GEN_IN(GRID_RATIO,'Scale factor --- will use logarithimic spacing in R')
+!
+! Reverse grid so easier to extend.
+!
+	  RTMP(1:ND)=R(1:ND)
+	  DO I=IST,ND
+	    R(ND-I+1)=RTMP(I)
+	  END DO
+	  NEW_ND=ND-IST+1
+!
+! Now extend the grid.
+!
+	  I=NEW_ND
+	  DO WHILE(R(I)*GRID_RATIO .LT. RMAX)
+	    I=I+1
+	    R(I)=R(I-1)*GRID_RATIO
+	  END DO
+	  IF( R(I)*(1.0D0+(GRID_RATIO-1.0D0)/3) .GT. RMAX)I=I-1
+	  NEW_ND=I
+!
+	  NI=4
+	  CALL GEN_IN(NI,'Number of points used at outer boundary to refine grid')
+!
+	  DO J=1,NI-1
+	    R(NEW_ND+J)=R(NEW_ND+J-1)+0.6D0*(RMAX-R(NEW_ND+J-1))
+	  END DO
+	  NEW_ND=NEW_ND+NI
+	  R(NEW_ND)=RMAX-0.01D0*(RMAX-R(NEW_ND-1))
+	  NEW_ND=NEW_ND+1
+	  R(NEW_ND)=RMAX
+!
+! Reverse grid to conventional form.
+!
+	  DO I=1,NEW_ND/2
+	    T1=R(I)
+	    R(I)=R(NEW_ND-I+1)
+	    R(NEW_ND-I+1)=T1
+	  END DO
+!
+! We simply scale ED and DI for illustration purposes only --- only the R grid is 
+! important.
+!
+          WRITE(10,'(1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)')RMIN,LUM,1,NEW_ND
+          DO I=1,NEW_ND-(ND+1-IST)
+            T1=(RTMP(1)/R(I))**2
+	    WRITE(10,'(A)')' '
+            WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),
+	1                T1*DI(1),T1*ED(1),T(1),IRAT(1),VEL(1),CLUMP_FAC(1),I
+            WRITE(10,'(F7.1)')1.0D0
+	  END DO
+	  DO I=IST,ND
+            WRITE(10,'(A)')' '
+            WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')RTMP(I),
+	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I+(NEW_ND-ND)
+            WRITE(10,'(F7.1)')1.0D0
+          END DO
+
 !
 	ELSE IF(OPTION .EQ. 'FG')THEN
 	  IST=1; IEND=ND
