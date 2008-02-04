@@ -7,25 +7,25 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 15-Jan-2008 : TYPE_1 etc changed to allocatable arrays.
+!                       Errors returned if files cannot be opened.
 ! Created 09-Jun-1999
-!
-	INTEGER, PARAMETER :: NMAX=500
 !
 	INTEGER NPAIRS_1
 	INTEGER NLEV_1
-	INTEGER TYPE_1(NMAX)
-	INTEGER NUM_VALS_1(NMAX)
-	INTEGER LOC_1(NMAX)
-	CHARACTER*30 NAME_1(NMAX)
+	INTEGER, ALLOCATABLE :: TYPE_1(:)
+	INTEGER, ALLOCATABLE ::  NUM_VALS_1(:)
+	INTEGER, ALLOCATABLE ::  LOC_1(:)
+	CHARACTER(LEN=30), ALLOCATABLE :: NAME_1(:)
 	REAL*8, ALLOCATABLE :: NU_1(:)
 	REAL*8, ALLOCATABLE :: CROSS_1(:)
 !
 	INTEGER NPAIRS_2
 	INTEGER NLEV_2
-	INTEGER TYPE_2(NMAX)
-	INTEGER NUM_VALS_2(NMAX)
-	INTEGER LOC_2(NMAX)
-	CHARACTER*30 NAME_2(NMAX)
+	INTEGER, ALLOCATABLE :: TYPE_2(:)
+	INTEGER, ALLOCATABLE ::  NUM_VALS_2(:)
+	INTEGER, ALLOCATABLE ::  LOC_2(:)
+	CHARACTER(LEN=30), ALLOCATABLE :: NAME_2(:)
 	REAL*8, ALLOCATABLE :: NU_2(:)
 	REAL*8, ALLOCATABLE :: CROSS_2(:)
 !
@@ -35,6 +35,7 @@
 	INTEGER I,J,K
 	INTEGER INDX_1,INDX_2,NV
 	INTEGER NXT_LOC
+	INTEGER IOS
 	LOGICAL OKAY
 	CHARACTER*132 STRING,FILENAME
 !
@@ -42,14 +43,36 @@
 !
 	REAL*8 STAT_WT,GION,EDGE,TOTAL_REC,TEMP
 !
-	FILENAME='PHOT1'
+	WRITE(6,'(A)')' '
+	WRITE(6,'(A)')'Program designed to plot/compare opacity project data from photoionization files '
+	WRITE(6,'(A)')'Use DISPGEN to plot no tabulated cross-sections '
+	WRITE(6,'(A)')' '
+!
+10	FILENAME='PHOT1'
 	CALL GEN_IN(FILENAME,'First photoionization file1:')
 	NPAIRS_1=0
-	OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME)
+	OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME,IOSTAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(6,*)'Unable to open file: ',TRIM(FILENAME)
+	    WRITE(6,*)'IOSTAT=',IOS
+	    GOTO 10
+	  END IF
 	  DO WHILE(NPAIRS_1 .EQ. 0)
-	    READ(10,'(A)')STRING
+	    READ(10,'(A)',IOSTAT=IOS)STRING
+	    IF(IOS .NE. 0)THEN
+	      WRITE(6,*)'Error reading file: ',TRIM(FILENAME)
+	      WRITE(6,*)'IOSTAT=',IOS
+	      STOP
+	    END IF
 	    IF( INDEX(STRING,'!Number of energy levels') .NE. 0)THEN
 	      READ(STRING,*)NLEV_1
+	      ALLOCATE (TYPE_1(NLEV_1),NUM_VALS_1(NLEV_1),LOC_1(NLEV_1), NAME_1(NLEV_1),STAT=IOS)
+	      IF(IOS .NE. 0)THEN
+	        WRITE(6,*)'Error in PLT_PHOT_RAW -- unable to allocate storage (1)'
+	        WRITE(6,*)'STAT=',IOS
+	        WRITE(6,*)'NLEV_1=',NLEV_1
+	        STOP
+	      END IF
 	    END IF
 	    IF( INDEX(STRING,'!Total number of data pairs') .NE. 0)THEN
 	      READ(STRING,*)NPAIRS_1
@@ -83,15 +106,32 @@
 !
 !
 !
-	NPAIRS_2=0
+20	NPAIRS_2=0
 	FILENAME='PHOT2'
-	CALL GEN_IN(FILENAME,'Second photoionization file1:')
+	CALL GEN_IN(FILENAME,'Second photoionization file1 ("" for null):')
 	IF(FILENAME .EQ. ' ')GOTO 1000
-	OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME)
+	OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME,IOSTAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(6,*)'Unable to open file: ',TRIM(FILENAME)
+	    WRITE(6,*)'IOSTAT=',IOS
+	    GOTO 20
+	  END IF
 	  DO WHILE(NPAIRS_2 .EQ. 0)
-	    READ(10,'(A)')STRING
+	    READ(10,'(A)',IOSTAT=IOS)STRING
+	    IF(IOS .NE. 0)THEN
+	      WRITE(6,*)'Error reading file: ',TRIM(FILENAME)
+	      WRITE(6,*)'IOSTAT=',IOS
+	      STOP
+	    END IF
 	    IF( INDEX(STRING,'!Number of energy levels') .NE. 0)THEN
 	      READ(STRING,*)NLEV_2
+	      ALLOCATE (TYPE_1(NLEV_2),NUM_VALS_1(NLEV_2),LOC_1(NLEV_2), NAME_1(NLEV_2),STAT=IOS)
+	      IF(IOS .NE. 0)THEN
+	        WRITE(6,*)'Error in PLT_PHOT_RAW -- unable to allocate storage (2)'
+	        WRITE(6,*)'STAT=',IOS
+	        WRITE(6,*)'NLEV_2=',NLEV_2
+	        STOP
+	      END IF
 	    END IF
 	    IF( INDEX(STRING,'!Total number of data pairs') .NE. 0)THEN
 	      READ(STRING,*)NPAIRS_2
@@ -150,6 +190,10 @@
 	  STAT_WT=1
 	  GION=1 
 	  EDGE=0
+	  WRITE(6,'(A)')' '
+	  WRITE(6,'(A)')'A non-zero ionization energy is only required to compute'
+	  WRITE(6,'(A)')'the recombination rate.'
+	  WRITE(6,'(A)')' '
 	  CALL GEN_IN(EDGE,'Ionization energy (10^15 Hz)')
 	  IF(EDGE .NE. 0)THEN
 	    CALL GEN_IN(TEMP,'Temperature in 10^4K')
