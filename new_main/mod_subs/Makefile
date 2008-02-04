@@ -29,7 +29,7 @@ OBJ = $(LIB)(adjust_r_grid_v2.o)\
       $(LIB)(adjust_r_grid_v3.o)\
       $(LIB)(adjust_den_vecs.o)\
       $(LIB)(comp_j_blank.o)\
-      $(LIB)(comp_grey.o)\
+      $(LIB)(comp_grey_v2.o)\
       $(LIB)(comp_opac.o)\
       $(LIB)(comp_var_opac.o)\
       $(LIB)(do_var_cont.o)\
@@ -72,10 +72,10 @@ $(LIB)(comp_j_blank.o) : comp_j_blank.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_va
 	$(F90) -c $(FG) comp_j_blank.f
 	ar ruv $(LIB) comp_j_blank.o
                                                                                                                       
-$(LIB)(comp_grey.o) : comp_grey.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
+$(LIB)(comp_grey_v2.o) : comp_grey_v2.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
                                   $(LIB_MOD)(ang_qw_mod.o)
-	$(F90) -c $(FG) comp_grey.f
-	ar ruv $(LIB) comp_grey.o
+	$(F90) -c $(FG) comp_grey_v2.f
+	ar ruv $(LIB) comp_grey_v2.o
 
 $(LIB)(comp_opac.o) : comp_opac.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)
 	$(F90) -c $(FG) comp_opac.f
