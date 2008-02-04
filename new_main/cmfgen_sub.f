@@ -34,6 +34,7 @@
 	USE LINE_VEC_MOD
 	USE LINE_MOD
 	USE RADIATION_MOD
+	USE UPDATE_KEYWORD_INTERFACE
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
@@ -57,7 +58,7 @@
 	INTEGER NCF
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
-	CHARACTER(LEN=12), PARAMETER :: PRODATE='08-Aug-2007'		!Must be changed after alterations
+	CHARACTER(LEN=12), PARAMETER :: PRODATE='23-Nov-2007'		!Must be changed after alterations
 !
 ! 
 !
@@ -165,8 +166,10 @@
 	REAL*8 LAMVACAIR
 	REAL*8 ATOMIC_MASS_UNIT
 	REAL*8 SPEED_OF_LIGHT
+	REAL*8 RAD_SUN
+	REAL*8 TEFF_SUN
 	LOGICAL EQUAL
-	EXTERNAL ICHRLEN,ERROR_LU,SPEED_OF_LIGHT
+	EXTERNAL ICHRLEN,ERROR_LU,SPEED_OF_LIGHT,RAD_SUN,TEFF_SUN
 !
 	INTEGER GET_DIAG
 	INTEGER BNDST
@@ -496,8 +499,8 @@
 	  CALL RD_OPTIONS_INTO_STORE(LUIN,LUSCR)
 	  CALL RD_STORE_INT(NUM_ITS_TO_DO,'NUM_ITS',L_TRUE,'Number of iterations to perform')
 	  CALL RD_STORE_LOG(RD_LAMBDA,'DO_LAM_IT',L_TRUE,'Do LAMBDA iterations ?')
-	  DO_RD_LAMBDA_AUTO=.TRUE.
-	  CALL RD_STORE_LOG(DO_RD_LAMBDA_AUTO,'DO_LAM_AUTO',L_FALSE,
+	  DO_LAMBDA_AUTO=.TRUE.
+	  CALL RD_STORE_LOG(DO_LAMBDA_AUTO,'DO_LAM_AUTO',L_FALSE,
 	1                         'Start non-lambda iterations automatically?')
 	  CALL CLEAN_RD_STORE()
 	  CLOSE(UNIT=LUIN)
@@ -3088,7 +3091,7 @@
 ! depth scale (returned in TA).
 !
 	  CHI(1:ND)=ROSS_MEAN(1:ND)*CLUMP_FAC(1:ND)
-	  CALL COMP_GREY(TGREY,TA,CHI,LUER,NC,ND,NP)
+	  CALL COMP_GREY_V2(POPS,TGREY,TA,CHI,LUER,NC,ND,NP,NT)
 !
 	  OPEN(UNIT=LUIN,FILE='GREY_SCL_FACOUT',STATUS='UNKNOWN')
 	    WRITE(LUIN,'(A)')'!'
@@ -3710,7 +3713,7 @@
 	    TA(I)=4.1274D-12*(STEQ_T_NO_SCL(I)-STEQ_T_SCL(I))*R(I)*R(I)
 	  END DO
 	  CALL LUM_FROM_ETA(TA,R,ND)
-	  WRITE(LU_HT,'(//,A)')'Estimaed error in L due to use of SLs'
+	  WRITE(LU_HT,'(//,A)')' Estimated error in L due to use of SLs'
 	  WRITE(LU_HT,'(/,(X,1P,5E12.4))')(TA(I), I=1,ND)
 	END IF
 !
@@ -3844,9 +3847,9 @@
 	END IF
 	COHERENT_ES=RD_COHERENT_ES
 	IF(.NOT. COHERENT_ES)THEN
-	     I=ND*NT*NT*NUM_BNDS
-!	     CALL COMP_J_CONV_V2(BA,I,NU,TEXT,NDEXT,NCF,LU_EDD,'EDDFACTOR',
-!	1             EDD_CONT_REC,L_FALSE,L_FALSE,LU_ES,'ES_J_CONV')
+	  I=SIZE(VJ)
+	  CALL COMP_J_CONV_V2(VJ,I,NU,TEXT,NDEXT,NCF,LU_EDD,'EDDFACTOR',
+	1             EDD_CONT_REC,L_FALSE,L_FALSE,LU_ES,'ES_J_CONV')
 	END IF          
 !
 ! 
@@ -3920,8 +3923,8 @@
 !
 	  NEXT_LOC=1  ;   STRING=' '
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TA(ND))
-	  T1=RP/6.96D0 ; CALL WR_VAL_INFO(STRING,NEXT_LOC,'R*/Rsun',T1)
-	  T1=5784.0D0*(ABS(LUM)/T1**2)**0.25					!ABS for SN
+	  T1=1.0D+10*RP/RAD_SUN() ; CALL WR_VAL_INFO(STRING,NEXT_LOC,'R*/Rsun',T1)
+	  T1=TEFF_SUN()*(ABS(LUM)/T1**2)**0.25					!ABS for SN
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'T*  ',T1)
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',V(ND))
 	  WRITE(LUMOD,'(A)')TRIM(STRING)
@@ -3929,9 +3932,9 @@
 	  IF(TA(ND) .GT. 20.0D0)THEN
 	    NEXT_LOC=1  ;   STRING=' '
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(3))		!20.0D0
-	    T1=TC(3)/6.96D0
+	    T1=1.0D+10*TC(3)/RAD_SUN()
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'R /Rsun',T1)
-	    T1=5784.0D0*(ABS(LUM)/T1**2)**0.25
+	    T1=TEFF_SUN()*(ABS(LUM)/T1**2)**0.25
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff',T1)
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(3))
 	    WRITE(LUMOD,'(A)')TRIM(STRING)
@@ -3940,9 +3943,9 @@
 	  IF(TA(ND) .GT. 10.0D0)THEN
 	    NEXT_LOC=1  ;   STRING=' '
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(2))		!10.0D0
-	    T1=TC(2)/6.96D0
+	    T1=1.0D+10*TC(2)/RAD_SUN()
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'R /Rsun',T1)
-	    T1=5784.0D0*(ABS(LUM)/T1**2)**0.25
+	    T1=TEFF_SUN()*(ABS(LUM)/T1**2)**0.25
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff',T1)
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(2))
 	    WRITE(LUMOD,'(A)')TRIM(STRING)
@@ -3951,9 +3954,9 @@
 	  IF(TA(ND) .GT. 0.67D0)THEN
 	    NEXT_LOC=1  ;   STRING=' '
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(1))		!0.67D0
-	    T1=TC(1)/6.96D0
+	    T1=1.0D+10*TC(1)/RAD_SUN()
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'R /Rsun',T1)
-	    T1=5784.0D0*(ABS(LUM)/T1**2)**0.25
+	    T1=TEFF_SUN()*(ABS(LUM)/T1**2)**0.25
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff',T1)
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(1))
 	    WRITE(LUMOD,'(A)')TRIM(STRING)
@@ -4254,17 +4257,18 @@
 	     IF(FILL_FAC_XRAYS_1 .NE. FILL_X1_SAV .OR.  FILL_FAC_XRAYS_2 .NE. FILL_X2_SAV)THEN
 	       FILL_FAC_XRAYS_1=MIN(FILL_FAC_XRAYS_1*SLOW_XRAY_SCL_FAC,FILL_X1_SAV)
 	       FILL_FAC_XRAYS_2=MIN(FILL_FAC_XRAYS_2*SLOW_XRAY_SCL_FAC,FILL_X2_SAV)
-	       WRITE(LUER,*)'Have adjuseted X-ray values closer to the desired values'
+	       WRITE(LUER,*)'Have adjusted X-ray values closer to the desired values'
 	       WRITE(LUER,*)'Current filling factor is (1st component)',FILL_FAC_XRAYS_1
 	       WRITE(LUER,*)'Current filling factor is (2nd component)',FILL_FAC_XRAYS_2
 	       WRITE(LUER,*)'Current on desired (1st component)=',FILL_FAC_XRAYS_1/FILL_X1_SAV
 	       WRITE(LUER,*)'Current on desired (2nd component)=',FILL_FAC_XRAYS_2/FILL_X2_SAV
+	       CALL UPDATE_KEYWORD(FILL_FAC_XRAYS_1,'[XFI1_BEG]','VADAT',L_TRUE,L_FALSE,LUIN)
+	       CALL UPDATE_KEYWORD(FILL_FAC_XRAYS_2,'[XFI2_BEG]','VADAT',L_FALSE,L_TRUE,LUIN)
 	       MAXCH=100			!To force run to continue
 	    ELSE
-	       IF(DO_RD_LAMBDA_AUTO)RD_LAMBDA=.FALSE.
+	       CALL UPDATE_KEYWORD(L_FALSE,'[XSLOW]','VADAT',L_TRUE,L_TRUE,LUIN)
+	       IF(DO_LAMBDA_AUTO)RD_LAMBDA=.FALSE.
 	    END IF
-	  ELSE IF(MAXCH .LT. 50.0D0)THEN
-	    IF(DO_RD_LAMBDA_AUTO)RD_LAMBDA=.FALSE.
 	  END IF
 	  IF(INCL_ADVECTION .AND. ADVEC_RELAX_PARAM .LT. 1.0D0 .AND. MAXCH .LT. 100)THEN
 	    COMPUTE_BA=.TRUE.
@@ -4276,10 +4280,36 @@
 ! If we have reached desired convergence, we do one final loop
 ! so as to write out all relevant model data.  
 !
-	  IF( (RD_LAMBDA .OR. .NOT. LAMBDA_ITERATION) .AND.
+	  IF( ( (RD_LAMBDA .AND. .NOT. DO_LAMBDA_AUTO) .OR. .NOT. LAMBDA_ITERATION) .AND.
 	1      MAXCH .LT. EPS .AND. NUM_ITS_TO_DO .NE. 0)THEN
 	      NUM_ITS_TO_DO=1
 	  ELSE
+!
+! If we are USING a fixed J, autmatically switched to variable J when convergence achieved.
+! We switch when the convergence is 20%.
+!
+	    IF(USE_FIXED_J .AND. DO_LAMBDA_AUTO .AND. RD_LAMBDA .AND. MAXCH .LT. 50.0D0)THEN
+	       USE_FIXED_J=.FALSE.
+	       CALL UPDATE_KEYWORD(L_FALSE,'[USE_FIXED_J]','VADAT',L_TRUE,L_TRUE,LUIN)
+	       I=WORD_SIZE*(NDEXT+1)/UNIT_SIZE
+	       CALL WRITE_DIRECT_INFO_V3(NDEXT,I,'20-Aug-2000','EDDFACTOR',LU_EDD)
+	       COMPUTE_EDDFAC=.TRUE.
+	       OPEN(UNIT=LU_EDD,FILE='EDDFACTOR',FORM='UNFORMATTED',ACCESS='DIRECT',STATUS='REPLACE',RECL=I)
+	       WRITE(LU_EDD,REC=1)0; WRITE(LU_EDD,REC=2)0
+	       WRITE(LU_EDD,REC=3)0; WRITE(LU_EDD,REC=4)0
+	       T1=0.0
+	       WRITE(LU_EDD,REC=5)T1
+	       COHERENT_ES=.TRUE.
+!
+! If RD_LABDA is TRUE., switch to full iteration when convergence has been achieved.
+! We switch when the convergence is 20%.
+!
+	    ELSE IF(DO_LAMBDA_AUTO .AND. RD_LAMBDA .AND. MAXCH .LT. 50.0D0)THEN
+	       CALL UPDATE_KEYWORD(L_FALSE,'[DO_LAM_IT]','IN_ITS',L_TRUE,L_TRUE,LUIN)
+	       RD_LAMBDA=.FALSE.
+	       LAMBDA_ITERATION=.FALSE.
+	       FIXED_T=RD_FIX_T
+	    END IF
 !
 ! Check to see if the user has changed IN_ITS to modify the number of iterations being
 ! undertaken. If the file has not been modified, no action will be taken. The use may
