@@ -2,7 +2,7 @@
 
 #Include file with system dependent definitions
 
-include ~jdh/cur_cmf/Makefile_definitions
+include ../Makefile_definitions
 
 #
 # These names are for the fortran linker
