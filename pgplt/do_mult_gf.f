@@ -28,7 +28,7 @@
 	REAL*8 YST,YEND
 !
 	REAL*8 TOL
-	REAL*8 T1
+	REAL*8 T1,T2
 	REAL*8 FWHM
 	INTEGER ITER
 !
@@ -198,9 +198,9 @@
 	      DO I=1,NUM_GAUS
 	        K=2+(I-1)*4+1
 	        T1=2.99794D+05*SIM(1,K+1)/SIM(1,K)
-	        FWHM=2.0D0*T1*(ALOG(2))**(1.0D0/SIM(I,K+3))
+	        T2=2.0D0; FWHM=2.0D0*T1*(ALOG(T2))**(1.0D0/SIM(I,K+3))
 	        WRITE(6,'(2X,ES16.6,5ES14.4,2F10.2)')SIM(I,K),SIM(1,K+2),SIM(1,K+1),SIM(I,K+3),
-	1               T1/SQRT(2.0D0),FWHM,EW(I),EW_ERROR(I)
+	1               T1/SQRT(T2),FWHM,EW(I),EW_ERROR(I)
 	      END DO
 	    END IF
 !
@@ -221,15 +221,15 @@
 !
 	    WRITE(LU_OUT,'(A)')' '
 	    WRITE(LU_OUT,'(I3,8X,A)')NUM_GAUS,'!Number of Gaussians'
-	    WRITE(LU_OUT,'(2X,2ES16,5X,IP)')XST,XEND,IP
+	    WRITE(LU_OUT,'(2X,2ES16,5X,I)')XST,XEND,IP
 	    WRITE(LU_OUT,'(2X,2ES16.6)')PAR(1:2)
 	    DO J=1,NUM_GAUS
 	      I=INDX_VEC(J)
 	      K=2+(I-1)*4+1
 	      T1=2.99794D+05*SIM(1,K+1)/SIM(1,K)
-	      FWHM=2.0D0*T1*(ALOG(2))**(1.0D0/SIM(I,K+3))
+	      T2=2.0D0; FWHM=2.0D0*T1*(ALOG(T2))**(1.0D0/SIM(I,K+3))
 	      WRITE(LU_OUT,'(2X,ES16.6,5ES16.4,2F10.2)')SIM(I,K),SIM(1,K+2),SIM(1,K+1),SIM(I,K+3),
-	1            T1/SQRT(2.0D0),FWHM,EW(I),EW_ERROR(I)
+	1            T1/SQRT(T2),FWHM,EW(I),EW_ERROR(I)
 	    END DO
 	    FLUSH(UNIT=LU_OUT)
 	    IF(VERBOSE)THEN
