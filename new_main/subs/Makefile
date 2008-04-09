@@ -155,9 +155,9 @@ $(LIB)(eval_temp_ddt_v2.o) : eval_temp_ddt_v2.f $(STEQ) $(MOD)
 	$(F90) -c $(OPTION)  eval_temp_ddt_v2.f
 	ar ruv $(LIB) eval_temp_ddt_v2.o
 
-$(LIB)(steq_co_mov_deriv_v1.o) : steq_co_mov_deriv_v1.f $(STEQ) $(MOD)
-	$(F90) -c $(OPTION)  steq_co_mov_deriv_v1.f
-	ar ruv $(LIB) steq_co_mov_deriv_v1.o
+$(LIB)(steq_co_mov_deriv_v2.o) : steq_co_mov_deriv_v2.f $(STEQ) $(MOD)
+	$(F90) -c $(OPTION)  steq_co_mov_deriv_v2.f
+	ar ruv $(LIB) steq_co_mov_deriv_v2.o
 
 $(LIB)(var_op_v8.o) : var_op_v8.f $(DIS)
 	$(F90) -c $(OPTION)  var_op_v8.f
