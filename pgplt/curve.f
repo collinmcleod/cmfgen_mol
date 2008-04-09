@@ -11,10 +11,10 @@
 ! Modified 20-Jul-1994 : Now automatically allows for NUM to be > 2048.
 ! Previous version was lost - this version created 12-NOV-85
 !
-	INTEGER*4 NUM
+	INTEGER NUM
 	REAL X(NUM),Y(NUM)
 !
-	INTEGER*4 J
+	INTEGER J
 !
 	IF(NUM .EQ. 0)THEN
 	  WRITE(LU_ER,*)'Error - no data passed to curve'
@@ -59,7 +59,7 @@
 	CHARACTER*(*) OPT
 !
 	REAL T1
-	INTEGER*4 I,J
+	INTEGER I,J
 !
 	IF(NUM .EQ. 0)THEN
 	  WRITE(LU_ER,*)'Error - no data passed to curve'
@@ -125,10 +125,10 @@
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
-	INTEGER*4 NUM
+	INTEGER NUM
 	REAL*8 X(NUM),Y(NUM)
 !
-	INTEGER*4 J
+	INTEGER J
 !
 	IF(NUM .EQ. 0)THEN
 	  WRITE(LU_ER,*)'Error - no data passed to curve'
@@ -168,12 +168,12 @@
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
-	INTEGER*4 NUM
+	INTEGER NUM
 	REAL*8 X(NUM),Y(NUM),SIGMA(NUM)
 	CHARACTER*(*) OPT
 C
 	REAL T1
-	INTEGER*4 I,J
+	INTEGER I,J
 !
 	IF(NUM .EQ. 0)THEN
 	  WRITE(LU_ER,*)'Error - no data passed to curve'

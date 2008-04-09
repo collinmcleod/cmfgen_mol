@@ -34,6 +34,7 @@ OBJ = $(LIB)(adjust_r_grid_v2.o)\
       $(LIB)(comp_var_opac.o)\
       $(LIB)(do_var_cont.o)\
       $(LIB)(eval_lte_v4.o)\
+      $(LIB)(grey_t_iterate.o)\
       $(LIB)(init_opac_mod.o)\
       $(LIB)(init_line_opac_var.o)\
       $(LIB)(rd_control_variables.o)\

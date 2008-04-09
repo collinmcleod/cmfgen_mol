@@ -26,7 +26,7 @@
 	REAL*8 T1,T2
 	REAL*8 MEAN,SLOPE
 	INTEGER NSM
-	INTEGER I,J
+	INTEGER I,J,K,ICOUNT
 	INTEGER IST,IEND
 	INTEGER GET_INDX_SP
 	EXTERNAL GET_INDX_SP
@@ -47,13 +47,6 @@
 	  XV(I-IST+1)=WAVE(I)
 	  YV(I-IST+1)=NORM(I)
 	END DO
-	CALL MON_INT_FUNS_V2(COEF,YV,XV,NSM)
-	WRITE(6,*)XV(1),XV(NSM)
-	WRITE(6,*)YV(1),YV(NSM)
-!
-	DO I=1,NSM
-	  DERIV(I)=COEF(I,3)
-	END DO
 !
 	T1=0.0D0; T2=0.0D0
 	DO I=1,5
@@ -66,6 +59,37 @@
 	DO I=1,NSM
 	  CONT(I)=T1+(XV(I)-XV(1))*SLOPE
 	END DO
+!
+! Smooth noise level so that too many Gaussians are not found.
+! We smooth if we find more than 10 Gaussians, or if the pixel to pixel variation 
+! is to high.
+!
+	J=100; K=0
+	DO WHILE(J .GT. 10 .AND. K .LT. 10)
+	  J=0; ICOUNT=0
+	  DO I=2,NSM-1
+	    IF( (YV(I)-YV(I-1))*(YV(I+1)-YV(I)) .LT. 0 .AND. ABS(YV(I)-CONT(I)) .GT. TOLERANCE)J=J+1
+	    IF( (YV(I)-YV(I-1))*(YV(I+1)-YV(I)) .LT. 0 )ICOUNT=ICOUNT+1
+          END DO
+	  IF(J .GT. 10 .OR. ICOUNT .GT. NSM/4)THEN
+	    DERIV(1)=0.75*YV(1)+0.25*YV(2)
+	    DO I=2,NSM-1
+	      DERIV(I)=0.25*YV(I-1)+0.5D0*YV(I)+0.25D0*YV(I+1)
+	    END DO
+	    DERIV(NSM)=0.75*YV(NSM)+0.25*YV(NSM-1)
+	    YV=DERIV
+	  END IF
+	  K=K+1
+	  WRITE(6,*)'Smoothing data: J=,J'
+	END DO
+!
+	CALL MON_INT_FUNS_V2(COEF,YV,XV,NSM)
+	DO I=1,NSM
+	  DERIV(I)=COEF(I,3)
+	END DO
+!
+	WRITE(6,*)XV(1),XV(NSM)
+	WRITE(6,*)YV(1),YV(NSM)
 !
 	NO_LINES=0
 	DO I=1,NSM
@@ -91,12 +115,12 @@
 100	  CONTINUE
 	END DO
 !
-	WRITE(6,*)'Number of lines found is',NO_LINES
-	WRITE(6,*)'Mean continuum level is',MEAN
-	WRITE(6,*)'Variation across fit band is',SLOPE*(XV(NSM)-XV(1))
 	DO I=1,NO_LINES
 	   WRITE(6,'(F12.6,2ES16.4)')LINE_CENTER(I),LINE_HEIGHT(I),LINE_SIGMA(I)
 	END DO
+	WRITE(6,*)'    Number of lines found is',NO_LINES
+	WRITE(6,*)'     Mean continuum level is',MEAN
+	WRITE(6,*)'Variation across fit band is',SLOPE*(XV(NSM)-XV(1))
 !
 	RETURN
 	END

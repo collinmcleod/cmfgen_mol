@@ -59,6 +59,7 @@
 
 	REAL*8, ALLOCATABLE :: RA(:)
 	REAL*8, ALLOCATABLE :: TA(:)
+	REAL*8, ALLOCATABLE :: TB(:)
 	REAL*8, ALLOCATABLE :: RA_NORM(:)
 	REAL*8, ALLOCATABLE :: VPA(:)		!Velocity deduced from density structure
 	REAL*8, ALLOCATABLE :: VW(:)		!Beta-wind velocity
@@ -123,9 +124,15 @@
 	LOGICAL FLAG
 	LOGICAL REMOVE
 	LOGICAL ANS
+	LOGICAL PP_NOV
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
-	INTEGER, PARAMETER :: LUV=11
+	INTEGER, PARAMETER :: LU_IN=7
+	INTEGER, PARAMETER :: LU_OUT=8
+	INTEGER, PARAMETER :: LU_SCR=9
+	INTEGER, PARAMETER :: LU_V=9
+	INTEGER, PARAMETER :: LU_PHOT=11
+	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 !
 	REAL*8 FUN_PI,PI
 	EXTERNAL FUN_PI
@@ -148,67 +155,80 @@
 	WRITE(6,*)' This file can be edited with a standard text editor'
 	WRITE(6,*)' If file is not available, standard parameters are used.'
 	WRITE(6,*)' '
-	OPEN(UNIT=12,FILE='RV_PARAMS',STATUS='OLD',IOSTAT=IOS)
-	  IF(IOS .NE. 0)THEN
 !
-	    FILENAME='ATM_1'
-50	    CALL GEN_IN(FILENAME,'Filename with photospheric model')
-	    OPEN(FILE=FILENAME,STATUS='OLD',ACTION='READ',UNIT=10,IOSTAT=IOS)
-	    IF(IOS .NE. 0)THEN
-	       WRITE(6,*)'Error opening atmosphere file: try again'
-	       WRITE(6,*)'IOSTAT=',IOS
-	       GOTO 50
-	    END IF
-	    RSTAR=18.48D0;     CALL GEN_IN(RSTAR,'RSTAR')
-	    RMAX=50;           CALL GEN_IN(RMAX,'RMAX')
-	    MDOT=1.0D-06;      CALL GEN_IN(MDOT,'MDOT')
-	    VINF=800.D0;       CALL GEN_IN(VINF,'VINF')
-	    BETA=1.0D0;        CALL GEN_IN(BETA,'BETA in outer wind')
-	    BETA_MIN=BETA;     CALL GEN_IN(BETA_MIN,'BETA in inner wind')
-	    BETA_SCL=0.2;      CALL GEN_IN(BETA_SCL,'BETA Scale height (in R*)')
-	    ND_CMF=50;         CALL GEN_IN(ND_CMF,'Number of depth points')
-	!
-	    OPEN(UNIT=12,FILE='RV_PARAMS',STATUS='UNKNOWN')
-	      WRITE(12,*)TRIM(FILENAME),' [FILE]'
-	      WRITE(12,*)RSTAR,' [RSTAR]'
-	      WRITE(12,*)RMAX,' [RMAX]'
-	      WRITE(12,*)MDOT,' [MDOT]'
-	      WRITE(12,*)VINF,' [VINF]'
-	      WRITE(12,*)BETA,' [BETA]'
-	      WRITE(12,*)BETA_MIN,' [BETA_MIN]'
-	      WRITE(12,*)BETA_SCL,' [BETA_SCL]'
-	      WRITE(12,*)ND_CMF,' [ND]'
-	  ELSE
+! Set defaults
 !
-	    READ(12,'(A)')FILENAME
+	FILENAME=' '
+	PP_NOV=.FALSE.
+	RSTAR=18.48D0
+	RMAX=50.0D0
+	MDOT=1.0D-06
+	VINF=800.D0
+	BETA=1.0D0
+	BETA_MIN=BETA
+	BETA_SCL=0.2D0
+	ND_CMF=50
+!
+! Read in revised defaults if available.
+!
+	OPEN(UNIT=LU_IN,FILE='RV_PARAMS',STATUS='OLD',IOSTAT=IOS)
+	  IF(IOS .EQ. 0)THEN
+	    CALL RD_OPTIONS_INTO_STORE(LU_IN,LU_SCR)
+	    CALL RD_STORE_NCHAR(FILENAME,'FILE',80,L_TRUE,'File with photospheric model')
 	    FILENAME=ADJUSTL(FILENAME)
 	    FILENAME=FILENAME(1:INDEX(FILENAME,' '))
-60	    CALL GEN_IN(FILENAME,'Filename with photospheric model')
-	    OPEN(FILE=FILENAME,STATUS='OLD',ACTION='READ',UNIT=10,IOSTAT=IOS)
-	    IF(IOS .NE. 0)THEN
-	       WRITE(6,*)'Error opening atmosphere file: try again'
-	       WRITE(6,*)'IOSTAT=',IOS
-	       GOTO 60
+	    CALL RD_STORE_LOG(PP_NOV,'PP_NOV',L_TRUE,'Plane parallel model (no wind)?')
+	    CALL RD_STORE_DBLE(RSTAR,'RSTAR',L_TRUE,'Radius of star')
+	    IF(PP_NOV)THEN
+	      MDOT=1.0D-22
+	    ELSE
+	      CALL RD_STORE_DBLE(RMAX,'RMAX',L_TRUE,'Radius of star')
+	      CALL RD_STORE_DBLE(MDOT,'MDOT',L_TRUE,'Mass loss in Msun/yr')
+	      CALL RD_STORE_DBLE(VINF,'VINF',L_TRUE,'Terminal velocity (km/s)')
+	      CALL RD_STORE_DBLE(BETA,'BETA',L_TRUE,'Beta ')
+	      CALL RD_STORE_DBLE(BETA_MIN,'BETA_MIN',L_TRUE,'Beta in photosphere')
+	      CALL RD_STORE_DBLE(BETA_SCL,'BETA_SCL',L_TRUE,'Beta scale height')
 	    END IF
-	    READ(12,*)RSTAR
-	    READ(12,*)RMAX
-	    READ(12,*)MDOT
-	    READ(12,*)VINF
-	    READ(12,*)BETA
-	    READ(12,*)BETA_MIN
-	    READ(12,*)BETA_SCL
-	    READ(12,*)ND_CMF
-!
-	    CALL GEN_IN(RSTAR,'RSTAR')
-	    CALL GEN_IN(RMAX,'RMAX')
-	    CALL GEN_IN(MDOT,'MDOT')
-	    CALL GEN_IN(VINF,'VINF')
-	    CALL GEN_IN(BETA,'BETA in outer wind')
-	    CALL GEN_IN(BETA_MIN,'BETA in inner wind')
-	    CALL GEN_IN(BETA_SCL,'BETA Scale height (in R*)')
-	    CALL GEN_IN(ND_CMF,'Number of depth points')
+	    CALL RD_STORE_INT(ND_CMF,'ND',L_TRUE,'Number of depths for new model')
+	    CALL CLEAN_RD_STORE
 	  END IF
-	CLOSE(UNIT=12)
+	CLOSE(LU_IN)
+	CLOSE(LU_SCR)
+!
+! Now read in parameters from terminal.
+!
+20	CALL GEN_IN(FILENAME,'Filename with photospheric model')
+        OPEN(FILE=FILENAME,STATUS='OLD',ACTION='READ',UNIT=LU_PHOT,IOSTAT=IOS)
+	IF(IOS .NE. 0)THEN
+	  WRITE(6,*)'Error openening file with photospheric model'
+	  GOTO 20
+	END IF
+	CALL GEN_IN(PP_NOV,'Plane parallel model (no wind)?')
+	CALL GEN_IN(RSTAR,'RSTAR')
+	IF(PP_NOV)THEN
+	  MDOT=1.0D-22
+	ELSE 
+	  CALL GEN_IN(RMAX,'RMAX')
+	  CALL GEN_IN(MDOT,'MDOT')
+	  CALL GEN_IN(VINF,'VINF')
+	  CALL GEN_IN(BETA,'BETA in outer wind')
+	  CALL GEN_IN(BETA_MIN,'BETA in inner wind')
+	  CALL GEN_IN(BETA_SCL,'BETA Scale height (in R*)')
+	END IF
+	CALL GEN_IN(ND_CMF,'Number of depth points')
+!
+	OPEN(UNIT=LU_OUT,FILE='REV_RV_PARAMS',STATUS='UNKNOWN')
+	  WRITE(LU_OUT,*)TRIM(FILENAME),'  [FILE]'
+	  WRITE(LU_OUT,*)PP_NOV,'  [PP_NOV]'
+	  WRITE(LU_OUT,*)RSTAR,'  [RSTAR]'
+	  WRITE(LU_OUT,*)RMAX,'  [RMAX]'
+	  WRITE(LU_OUT,*)MDOT,'  [MDOT]'
+	  WRITE(LU_OUT,*)VINF,'  [VINF]'
+	  WRITE(LU_OUT,*)BETA,'  [BETA]'
+	  WRITE(LU_OUT,*)BETA_MIN,'  [BETA_MIN]'
+	  WRITE(LU_OUT,*)BETA_SCL,'  [BETA_SCL]'
+	  WRITE(LU_OUT,*)ND_CMF,'  [ND]'
+	CLOSE(UNIT=LU_OUT)
 !
 ! Will use program units of 10^10 cm, V in km/s
 !
@@ -216,9 +236,6 @@
 	AMDOT=MDOT*6.3029D0
 	RMAX=RMAX*RCORE
 	PI=FUN_PI()
-!
-! Photospheric model
-!
 !
 	ND_MAX=100
 	CALL GEN_IN(ND_MAX,'Maximum number of points in Photospheric model')
@@ -236,12 +253,12 @@
 !
 	STRING(1:1)='!'
 	DO WHILE(STRING(1:1) .EQ. '!')
-	  READ(10,'(A)')STRING
+	  READ(LU_PHOT,'(A)')STRING
 	END DO
-	BACKSPACE(10)
+	BACKSPACE(LU_PHOT)
 	ANS=.FALSE.
 	DO WHILE(.NOT. ANS)
-	  READ(10,'(A)')STRING
+	  READ(LU_PHOT,'(A)')STRING
 	  WRITE(6,'(A)')TRIM(STRING)
 	  ANS=.TRUE.
 	  CALL GEN_IN(ANS,'Is the above the first READABLE record')
@@ -250,12 +267,14 @@
 !	
 	I=1
 	DO WHILE(TAUR(I) .LT. 100)
-	  READ(10,*,END=250)INDX(I+1),DM(I+1),TAUR(I+1),AROSS(I+1),
+	  READ(LU_PHOT,*,END=250)INDX(I+1),DM(I+1),TAUR(I+1),AROSS(I+1),
 	1                   T(I+1),ED(I+1),DSH(I+1)
 	  I=I+1
 	END DO
 250	CONTINUE
+	CLOSE(LU_PHOT)
 	ND=I
+!
 	WRITE(6,*)' '
 	WRITE(6,*)' Typically we extend model atmosphere to TAU=100'
 	WRITE(6,*)' This option allows you to omit the depth with Tau > 100'
@@ -304,21 +323,21 @@
 	  END DO
 	CLOSE(UNIT=22)
 !
-	CALL GEN_ASCI_OPEN(LUV,'RV_OLD_ATM','REPLACE',' ',' ',IZERO,IOS)
-	  WRITE(LUV,'(71A)')'!',('*',I=1,70)
-	  WRITE(LUV,'(71A)')'!',('*',I=1,70)
-	  WRITE(LUV,'(A)')'!'
-	  WRITE(LUV,'(A,A)')'! TLUSTY data read from file: ',TRIM(FILENAME)
-	  WRITE(LUV,'(A)')'!'
-	  WRITE(LUV,'(A)')'!'
-	  WRITE(LUV,'(71A)')'!',('*',I=1,70)
-	  WRITE(LUV,'(71A)')'!',('*',I=1,70)
-	  WRITE(LUV,'(X,I4,2X,A)')ND,'!Number of depth points'
+	CALL GEN_ASCI_OPEN(LU_V,'RV_OLD_ATM','REPLACE',' ',' ',IZERO,IOS)
+	  WRITE(LU_V,'(71A)')'!',('*',I=1,70)
+	  WRITE(LU_V,'(71A)')'!',('*',I=1,70)
+	  WRITE(LU_V,'(A)')'!'
+	  WRITE(LU_V,'(A,A)')'! TLUSTY data read from file: ',TRIM(FILENAME)
+	  WRITE(LU_V,'(A)')'!'
+	  WRITE(LU_V,'(A)')'!'
+	  WRITE(LU_V,'(71A)')'!',('*',I=1,70)
+	  WRITE(LU_V,'(71A)')'!',('*',I=1,70)
+	  WRITE(LU_V,'(X,I4,2X,A)')ND,'!Number of depth points'
 	  DO I=1,ND
-	    WRITE(LUV,'(F18.8,2ES14.6,F12.4,ES12.2)')RD(I),VPH(I),
+	    WRITE(LU_V,'(F18.8,2ES14.6,F12.4,ES12.2)')RD(I),VPH(I),
 	1             dVdR_PH(I)-1.0D0,T(I),TAUR(I)
 	  END DO
-	CLOSE(LUV)
+	CLOSE(LU_V)
 !
 	WRITE(6,*)' '
 	WRITE(6,*)' The graph plotting is primarily for diagnostic purposes'
@@ -328,6 +347,64 @@
 	RD_NORM=RD/RCORE
 	CALL DP_CURVE(ND,RD_NORM,VPH)
 	CALL GRAMON_PGPLOT(' ',' ',' ',' ')
+!
+	IF(PP_NOV)THEN
+!
+	  ALLOCATE (TB(ND))
+	  ALLOCATE (TA(ND_CMF))
+	  ALLOCATE (DENS_CMF(ND_CMF))
+	  ALLOCATE (R_CMF(ND_CMF))
+	  ALLOCATE (V_CMF(ND_CMF))
+	  ALLOCATE (dVdR_CMF(ND_CMF))
+	  ALLOCATE (T_CMF(ND_CMF))
+	  ALLOCATE (TAUR_CMF(ND_CMF))
+!
+	  DO I=1,ND
+	    TB(I)=I
+	  END DO
+	  DO I=1,ND_CMF
+	    TA(I)=1.0D0+ND*(I-1.0D0)/ND_CMF
+	  END DO
+	  TA(1)=1.0D0; TA(ND_CMF)=ND
+!
+	  CALL MON_INTERP(R_CMF,ND_CMF,IONE,TA,ND_CMF,RD,ND,TB,ND)
+	  VPH(1:ND)=LOG(VPH(1:ND))
+	  CALL MON_INTERP(V_CMF,ND_CMF,IONE,R_CMF,ND_CMF,VPH,ND,RD,ND)
+	  V_CMF(1:ND_CMF)=EXP(V_CMF(1:ND_CMF))
+	  CALL MON_INTERP(T_CMF,ND_CMF,IONE,R_CMF,ND_CMF,T,ND,RD,ND)
+	  CALL MON_INTERP(TAUR_CMF,ND_CMF,IONE,R_CMF,ND_CMF,TAUR,ND,RD,ND)
+!
+! Compute dVdR_CMF
+!
+	  dVdR_CMF(1)=LOG(V_CMF(1)/V_CMF(2))/LOG(RD(1)/RD(2))
+	  DO I=2,ND-1
+	    dVdR_CMF(I)=LOG(V_CMF(I-1)/V_CMF(I+1))/LOG(RD(I-1)/RD(I+1))
+	  END DO
+	  dVdR_CMF(ND)=LOG(V_CMF(ND-1)/V_CMF(ND))/LOG(RD(ND-1)/RD(ND))
+!
+	  FILENAME_CMF='RVSIG_COL'
+	  CALL GEN_IN(FILENAME_CMF,'File for CMFGEN results')
+	  CALL GEN_ASCI_OPEN(LU_V,FILENAME_CMF,'REPLACE',' ',' ',IZERO,IOS)
+	  WRITE(LU_V,'(71A)')'!',('*',I=1,70)
+	  WRITE(LU_V,'(71A)')'!',('*',I=1,70)
+	  WRITE(LU_V,'(A)')'!'
+	  WRITE(LU_V,'(A,A)')'! TLUSTY data read from file: ',TRIM(FILENAME)
+	  WRITE(LU_V,'(A)')'! Output for plane parallel model'
+	  WRITE(LU_V,'(A)')'!'
+	  WRITE(LU_V,'(A,ES10.4,A)')'!          R*=',RSTAR,' Rsun'
+	  WRITE(LU_V,'(A,ES10.4,A)')'!        Mdot=',Mdot,' Msun/yr'
+	  WRITE(LU_V,'(A)')'!'
+	  WRITE(LU_V,'(71A)')'!',('*',I=1,70)
+	  WRITE(LU_V,'(71A)')'!',('*',I=1,70)
+	  WRITE(LU_V,'(X,I4,2X,A)')ND_CMF,'!Number of depth points'
+	  DO I=1,ND_CMF
+	    WRITE(LU_V,'(F18.8,2ES14.6,F12.4,ES12.2)')R_CMF(I),V_CMF(I),
+	1             dVdR_CMF(I)-1.0D0,T_CMF(I),TAUR_CMF(I)
+	  END DO
+	  CLOSE(LU_V)
+	  WRITE(6,*)'Model structure for CMFGEN written to ',TRIM(FILENAME_CMF)
+	  STOP
+	END IF
 !
 	ALLOCATE (RA(NBIG))
 	ALLOCATE (TA(NBIG))
@@ -626,48 +703,48 @@
 !
 	FILENAME_CMF='RVSIG_COL'
 	CALL GEN_IN(FILENAME_CMF,'File for CMFGEN results')
-	CALL GEN_ASCI_OPEN(LUV,FILENAME_CMF,'REPLACE',' ',' ',IZERO,IOS)
-	WRITE(LUV,'(71A)')'!',('*',I=1,70)
-	WRITE(LUV,'(71A)')'!',('*',I=1,70)
-	WRITE(LUV,'(A)')'!'
-	WRITE(LUV,'(A,A)')'! TLUSTY data read from file: ',TRIM(FILENAME)
-	WRITE(LUV,'(A)')'!'
-	WRITE(LUV,'(A,ES10.4,A)')'!          R*=',RSTAR,' Rsun'
-	WRITE(LUV,'(A,ES10.4,A)')'!        Mdot=',Mdot,' Msun/yr'
-	WRITE(LUV,'(A,ES10.4,A)')'!        Vinf=',VINF,' km/s'
-	WRITE(LUV,'(A,ES10.4,A)')'!        Beta=',BETA
+	CALL GEN_ASCI_OPEN(LU_V,FILENAME_CMF,'REPLACE',' ',' ',IZERO,IOS)
+	WRITE(LU_V,'(71A)')'!',('*',I=1,70)
+	WRITE(LU_V,'(71A)')'!',('*',I=1,70)
+	WRITE(LU_V,'(A)')'!'
+	WRITE(LU_V,'(A,A)')'! TLUSTY data read from file: ',TRIM(FILENAME)
+	WRITE(LU_V,'(A)')'!'
+	WRITE(LU_V,'(A,ES10.4,A)')'!          R*=',RSTAR,' Rsun'
+	WRITE(LU_V,'(A,ES10.4,A)')'!        Mdot=',Mdot,' Msun/yr'
+	WRITE(LU_V,'(A,ES10.4,A)')'!        Vinf=',VINF,' km/s'
+	WRITE(LU_V,'(A,ES10.4,A)')'!        Beta=',BETA
 	IF(BETA .NE. BETA_MIN)THEN
-	  WRITE(LUV,'(A,ES10.4,A)')'!    Beta_min=',BETA_MIN
-	  WRITE(LUV,'(A,ES10.4,A)')'!    Beta_scl=',BETA_SCL,
+	  WRITE(LU_V,'(A,ES10.4,A)')'!    Beta_min=',BETA_MIN
+	  WRITE(LU_V,'(A,ES10.4,A)')'!    Beta_scl=',BETA_SCL,
 	1                 ' (Scale height for beta in R*)'
 	END IF
-	WRITE(LUV,'(A)')'!'
-	WRITE(LUV,'(A,X,2ES12.4)')'!      R0 for Beta-velocity law is',R0,R0/RCORE
-	WRITE(LUV,'(A,X,2ES12.4)')'!             Connection radius is',
+	WRITE(LU_V,'(A)')'!'
+	WRITE(LU_V,'(A,X,2ES12.4)')'!      R0 for Beta-velocity law is',R0,R0/RCORE
+	WRITE(LU_V,'(A,X,2ES12.4)')'!             Connection radius is',
 	1                           RA(C_INDX),RA(C_INDX)/RCORE
-	WRITE(LUV,'(A,X, ES12.4,A)')'! Velocity at connection radius is',
+	WRITE(LU_V,'(A,X, ES12.4,A)')'! Velocity at connection radius is',
 	1                          VPA(C_INDX),' km/s'
-	WRITE(LUV,'(A,X, ES12.4)')'!       Tau at connection depth is',
+	WRITE(LU_V,'(A,X, ES12.4)')'!       Tau at connection depth is',
 	1                          TAUR_A(C_INDX)
-	WRITE(LUV,'(A)')'!'
+	WRITE(LU_V,'(A)')'!'
 	IF(NEW_DEF_OPT)THEN
-	  WRITE(LUV,'(A)')'! Chosen r grid equally spaced in Log Density in wind.'
-	  WRITE(LUV,'(A)')'! Chosen r grid equally spaced in Log Tau in photosphere.'
-	  WRITE(LUV,'(A,I4)')'! Number of points in wind is:',ND_SM
-	  WRITE(LUV,'(A,ES9.2,A)')'! Wind grid starts at:',VW_BEG,' km/s'
+	  WRITE(LU_V,'(A)')'! Chosen r grid equally spaced in Log Density in wind.'
+	  WRITE(LU_V,'(A)')'! Chosen r grid equally spaced in Log Tau in photosphere.'
+	  WRITE(LU_V,'(A,I4)')'! Number of points in wind is:',ND_SM
+	  WRITE(LU_V,'(A,ES9.2,A)')'! Wind grid starts at:',VW_BEG,' km/s'
 	ELSE IF(USE_TAU)THEN
-	  WRITE(LUV,'(A)')'! Chosen r grid equally spaced in Log Tau.'
-	  WRITE(LUV,'(A)')'! Tau scale modified by velocity with:'
-	  WRITE(LUV,'(A,F5.2,3X,A,F5.2)')'! CONS=',CONS,'EPS=',EPS
+	  WRITE(LU_V,'(A)')'! Chosen r grid equally spaced in Log Tau.'
+	  WRITE(LU_V,'(A)')'! Tau scale modified by velocity with:'
+	  WRITE(LU_V,'(A,F5.2,3X,A,F5.2)')'! CONS=',CONS,'EPS=',EPS
 	ELSE
-         WRITE(LUV,'(A)')'! Chosen r grid equally spaced in Log Density.'
+         WRITE(LU_V,'(A)')'! Chosen r grid equally spaced in Log Density.'
 	END IF
-	WRITE(LUV,'(A)')'!'
-	WRITE(LUV,'(71A)')'!',('*',I=1,70)
-	WRITE(LUV,'(71A)')'!',('*',I=1,70)
-	WRITE(LUV,'(X,I4,2X,A)')ND_CMF,'!Number of depth points'
+	WRITE(LU_V,'(A)')'!'
+	WRITE(LU_V,'(71A)')'!',('*',I=1,70)
+	WRITE(LU_V,'(71A)')'!',('*',I=1,70)
+	WRITE(LU_V,'(X,I4,2X,A)')ND_CMF,'!Number of depth points'
 	DO I=1,ND_CMF
-	  WRITE(LUV,'(F18.8,2ES14.6,F12.4,ES12.2)')R_CMF(I),V_CMF(I),
+	  WRITE(LU_V,'(F18.8,2ES14.6,F12.4,ES12.2)')R_CMF(I),V_CMF(I),
 	1             dVdR_CMF(I)-1.0D0,T_CMF(I),TAUR_CMF(I)
 	END DO
 !

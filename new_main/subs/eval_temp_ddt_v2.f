@@ -16,7 +16,10 @@
 	USE MOD_CMFGEN
  	USE STEQ_DATA_MOD
 	USE NUC_ISO_MOD
+	IMPLICIT NONE
 !
+! Altered 12-Feb-2008 : VOL_EXP_FAC used. Now valid for all expansion laws.
+!                       Returned populations are corrected for decays and adiabatic expansion.
 ! Altered 22-Mar-2007 : Call GET_POPS_AT_PREV_TIME_STEP_V4
 ! Altered 04-Feb-2007 : Bug fixed in d(STEQ_T)/dNe
 ! Altered 23-Jun-2006 : R, V removed from call to GET_POPS_AT_PREV_TIME_STEP_V2 since
@@ -50,7 +53,6 @@
 	REAL*8 P_VEC(ND)
 	REAL*8 GAMMA(ND)
 	REAL*8 INT_EN(ND)
-	REAL*8 COL_EN(ND)
 !
 	REAL*8 OLD_POPS(NT,ND)
 	REAL*8 OLD_R(ND)
@@ -59,13 +61,13 @@
 	REAL*8 OLD_GAMMA(ND)
 	REAL*8 OLD_POP_ATOM(ND)
 	REAL*8 OLD_INT_EN(ND)
-	REAL*8 OLD_COL_EN(ND)
 !
 	REAL*8 ION_EN(NT)
 	REAL*8 TOT_ENERGY(NT)
 !
 ! Local variables.
 !
+	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 	LOGICAL COMPUTE_BA,INCL_ADIABATIC
 !
@@ -117,12 +119,12 @@
 	END DO
 !
 ! Get the populations at the previous time step. These are put onto the same
-! V grid as the curent model. The returned populations are not corected
-! for advection, radioactive decayse, are not normalized.
+! V grid as the current model. The returned populations are CORRECTED for 
+! advection, radioactive decays, and are normalized.
 !
 	LU=7
 	CALL GET_POPS_AT_PREV_TIME_STEP_V4(OLD_POPS,OLD_R,
-	1      L_FALSE,L_FALSE,L_FALSE,TIME_SEQ_NO,ND,NT,LU)
+	1      L_TRUE,L_TRUE,L_TRUE,TIME_SEQ_NO,ND,NT,LU)
 	OLD_ED(:)=OLD_POPS(NT-1,:)
 	OLD_T(:)=OLD_POPS(NT,:)
 	OLD_POP_ATOM=0.0D0
@@ -148,7 +150,7 @@
 	      I=ATM(ID)%EQXzV+ATM(ID)%NXzV
 	      T1=T1+POPS(I,J)
 	      T2=T2+OLD_POPS(I,J)
-	      WRITE(155,'(I5,I5,2ES16.8)')ISPEC,J,T1*(R(J)**3),T2*(OLD_R(J)**3)
+	      WRITE(155,'(I5,I5,2ES16.8)')ISPEC,J,T1,T2
 	    END IF
 	  END DO
 	END DO
@@ -161,21 +163,20 @@
 ! Compute the mean energy per atom. At first it is units of 10^15Hz.
 !
 	INT_EN(:)=0.0D0
-	COL_EN(:)=0.0D0
 	OLD_INT_EN(:)=0.0D0
-	OLD_COL_EN(:)=0.0D0
 	DO I=1,ND
 	  DO J=1,NT-2
 	     INT_EN(I)=INT_EN(I)+POPS(J,I)*TOT_ENERGY(J)
-	     COL_EN(I)=COL_EN(I)+POPS(J,I)*ION_EN(J)
 	     OLD_INT_EN(I)=OLD_INT_EN(I)+OLD_POPS(J,I)*TOT_ENERGY(J)
-	     OLD_COL_EN(I)=OLD_COL_EN(I)+OLD_POPS(J,I)*ION_EN(J)
+	     IF(I .EQ. 1)THEN
+	       T1=POPS(J,I)*TOT_ENERGY(J)/POP_ATOM(I)
+	       T2=OLD_POPS(J,I)*TOT_ENERGY(J)/OLD_POP_ATOM(I)
+	       WRITE(220,'(I5,5ES14.6)')J,POPS(J,I),OLD_POPS(J,I),TOT_ENERGY(J),T1,T2
+	     END IF
 	  END DO
 	END DO
 	INT_EN=HDKT*INT_EN/POP_ATOM
-	COL_EN=HDKT*COL_EN/POP_ATOM
 	OLD_INT_EN=HDKT*OLD_INT_EN/OLD_POP_ATOM
-	OLD_COL_EN=HDKT*OLD_COL_EN/OLD_POP_ATOM
 !
 ! We now compute constants for each of the 4 terms. These make
 ! it simpler and cleaner for the evaluation of the linearization.
@@ -191,7 +192,7 @@
 	DO I=1,ND
 	  EK_VEC(I)=1.5D0*SCALE*POP_ATOM(I)/DELTA_T_SECS
 	  EI_VEC(I)=SCALE*POP_ATOM(I)/DELTA_T_SECS
-          P_VEC(I)=-SCALE*(POP_ATOM(I)+ED(I))*T(I)/DELTA_T_SECS
+          P_VEC(I)=SCALE*(POP_ATOM(I)+ED(I))*T(I)/DELTA_T_SECS
 	END DO
 !
 	DO I=1,ND
@@ -203,7 +204,7 @@
 	  DO I=1,ND
  	    WORK(I)=EK_VEC(I)*( (1.0D0+GAMMA(I))*T(I)- (1.0D0+OLD_GAMMA(I))*OLD_T(I) ) +
 	1           EI_VEC(I)*(INT_EN(I)-OLD_INT_EN(I))      +
-	1           P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I)) 
+	1           P_VEC(I)*LOG(VOL_EXP_FAC(I))
 	  END DO
 	  DO I=1,ND
 	    STEQ_T(I)=STEQ_T(I)-WORK(I)
@@ -216,9 +217,9 @@
 	  DO I=1,ND-1
 	    L=DIAG_INDX
 	    BA_T(NT,L,I)=BA_T(NT,L,I)-EK_VEC(I)*(1+GAMMA(I)) -
-	1                    P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I))/T(I)
+	1                    P_VEC(I)*LOG(VOL_EXP_FAC(I))/T(I)
 	    BA_T(NT-1,L,I)=BA_T(NT-1,L,I)-T(I)*EK_VEC(I)/POP_ATOM(I) -
-	1                    P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I))/(POP_ATOM(I)+ED(I))
+	1                    P_VEC(I)*LOG(VOL_EXP_FAC(I))/(POP_ATOM(I)+ED(I))
 	    T1=HDKT*EI_VEC(I)/POP_ATOM(I)
 	    DO J=1,NT-2
 	      BA_T(J,L,I)=BA_T(J,L,I)-T1*TOT_ENERGY(J)
@@ -227,7 +228,7 @@
 	END IF            !End COMPUTE_BA
 !
 ! Now compute the adiabatic cooling rate (in ergs/cm^3/sec) for diagnostic
-! purposes. The rate is output to the COOLGEN file.
+! purposes. The rate is output to the GENCOOL file.
 !
 ! The factor of 4.0D-10*PI arises from the fact that A, B etc were computed
 ! for the radiative equilibrium equation. That equation has units a factor of 10^10/4Pi
@@ -237,19 +238,17 @@
 ! density (velocity) term. This split was useful for diagnostic purposes,
 ! but has now been kept for simplicity so that GENCOOL does not need to be changed.
 !
-! NB: The EI_VEC*COL_EN terms cancel out, and were originally incorrectly included.
-!
 	T1=4.0D-10*PI
 	DO I=1,ND
-	  AD_CR_V(I) =P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I)) 
+	  AD_CR_V(I) =P_VEC(I)*LOG(VOL_EXP_FAC(I))
 	  AD_CR_DT(I)=EK_VEC(I)*( (1.0D0+GAMMA(I))*T(I)- (1.0D0+OLD_GAMMA(I))*OLD_T(I) )
-!	1              + EI_VEC(I)*(COL_EN(I)-OLD_COL_EN(I))
 	END DO
-!
 	AD_CR_V=AD_CR_V*T1
 	AD_CR_DT=AD_CR_DT*T1
 !
-	WRITE_CHK=.TRUE.      !FALSE.            !TRUE.
+! Output diagnostic information.
+!
+	WRITE_CHK=.TRUE.
 	IF(WRITE_CHK)THEN
 	  OPEN(UNIT=7,FILE='ADIABAT_CHK',STATUS='UNKNOWN')
 	   WRITE(7,'(A,ES14.4)')'DELTA_T_SECS=',DELTA_T_SECS
@@ -266,7 +265,7 @@
 	    WRITE(7,'(I5,8ES14.5)')I,V(I),R(I),OLD_R(I),T(I),OLD_T(I),GAMMA(I),OLD_GAMMA(I),
 	1                    (POP_ATOM(I)/OLD_POP_ATOM(I))*((R(I)/OLD_R(I))**3)-1.0D0
 	    WRITE(7,'(5X,7ES14.5)')1.5D0*T(I)*8.6174D-01,INT_EN(I)*8.6174D-01,T1,T2,T3,T4,
-	1                    P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I))
+	1                    P_VEC(I)*LOG(VOL_EXP_FAC(I))
 	   END DO
 	   CALL WR2D_V2(POPS,NT,ND,'POPS','*',.TRUE.,7)
 	   CALL WR2D_V2(OLD_POPS,NT,ND,'OLD_POPS','*',.TRUE.,7)
@@ -276,6 +275,8 @@
 	    WRITE(7,'(A)')'!'
 	    WRITE(7,'(A)')'! Energy summery (ergs/cm^3)'
 	    WRITE(7,'(A,E10.4)')'! Delta t=',DELTA_T_SECS
+	    WRITE(7,'(A)')'!'
+	    WRITE(7,'(A)')'! NB: Radiative energy density assumes a BB at T(elec).'
 	    WRITE(7,'(A)')'!'
 	    WRITE(7,'(A,2(15X,A),5(9X,A))'),'Depth','R','V','    Ek','    Ei',
 	1                                   '  Erad','Enuc/s','  Enuc'

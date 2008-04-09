@@ -816,7 +816,6 @@ C
 	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 1000% for last frequency'
 	      WRITE(LUER,'(A)')' It is STRONGLY suggested that you use a finer grid at the outer boundary'
 	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error and/or use plt_jh'
-	      STOP
 	    ELSE IF(T1 .GT. 50.0D0)THEN
 	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 50% for last frequency'
 	      WRITE(LUER,'(A)')' It is strongly suggested that you use a finer grid at the outer boundary'

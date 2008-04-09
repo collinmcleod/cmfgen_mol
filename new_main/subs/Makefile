@@ -2,6 +2,8 @@
 
 include ../../Makefile_definitions
 
+OPTION=$(FG)
+
 # Library where object files will/are stored
 
 LIB=$(LIB_DIR)libdev.a
@@ -11,6 +13,7 @@ LIB_MOD=$(LIB_DIR)libmod.a
 # Entries for library
 #
 OBJ = $(LIB)(add_par_to_full_v2.o)\
+      $(LIB)(adjust_pops.o)\
       $(LIB)(ba_update_v6.o)\
       $(LIB)(ba_update_v7.o)\
       $(LIB)(cmf_blkband_v2.o)\
@@ -19,6 +22,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(determine_nse.o)\
       $(LIB)(det_lte_ed.o)\
       $(LIB)(ddt_work.o)\
+      $(LIB)(do_cmf_hydro.o)\
       $(LIB)(do_ng_accel_band_v2.o)\
       $(LIB)(eval_adiabatic_v3.o)\
       $(LIB)(evalse_qwvj_v6.o)\
@@ -31,6 +35,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(get_pops_at_prev_time_step_v2.o)\
       $(LIB)(get_pops_at_prev_time_step_v3.o)\
       $(LIB)(get_pops_at_prev_time_step_v4.o)\
+      $(LIB)(old_grid_module.o)\
       $(LIB)(prevent_low_t.o)\
       $(LIB)(read_ba_data_v2.o)\
       $(LIB)(read_bcd_mat.o)\
@@ -40,13 +45,15 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(set_ba_storage.o)\
       $(LIB)(set_rv_hydro_model.o)\
       $(LIB)(set_imp_vec.o)\
+      $(LIB)(set_new_grid.o)\
       $(LIB)(solveba_v6.o)\
       $(LIB)(solveba_v7.o)\
       $(LIB)(solveba_v9.o)\
       $(LIB)(steq_multi_v7.o)\
       $(LIB)(steqne_v4.o)\
       $(LIB)(steq_advec_v4.o)\
-      $(LIB)(steq_co_mov_deriv_v1.o)\
+      $(LIB)(steq_co_mov_deriv_v2.o)\
+      $(LIB)(store_old_grid.o)\
       $(LIB)(store_ba_data_v2.o)\
       $(LIB)(var_op_v8.o)\
       $(LIB)(var_x_opa_eta_v3.o)\
@@ -70,40 +77,58 @@ MOD=$(LIB_MOD)(mod_cmfgen.o)
 DIS=$(LIB_MOD)(mod_lev_dis_blk.o)
 CONT=$(LIB_MOD)(control_variable_mod.o)
 
+HYD=$(LIB_MOD)(cmf_hydro_module.o)
+
 $(LIB)(%.o) : %.f  $(STEQ)
-	$(F90) -c $(FG) $<
+	$(F90) -c $(OPTION) $<
 	ar ruv $(LIB) $*.o
 
 # General rules to make obects in a library and object files
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)
 
-$(LIB)(rd_sn_data.o) : rd_sn_data.f $(CONT) $(MOD)
-	$(F90) -c $(FG) rd_sn_data.f
+$(LIB)(adjust_pops.o) : adjust_pops.f $(LIB)(old_grid_module.o) $(MOD) $(CONT)
+	$(F90) -c $(OPTION) adjust_pops.f
+	ar ruv $(LIB) adjust_pops.o
+
+$(LIB)(do_cmf_hydro.o) : do_cmf_hydro.f $(LIB)(old_grid_module.o) $(LIB)(cmf_hydro_module.o)
+	$(F90) -c $(OPTION) do_cmf_hydro.f
+	ar ruv $(LIB) do_cmf_hydro.o
+
+$(LIB)(store_old_grid.o) : store_old_grid.f $(MOD)  $(LIB)(old_grid_module.o)
+	$(F90) -c $(OPTION) store_old_grid.f
+	ar ruv $(LIB) store_old_grid.o
+
+$(LIB)(set_new_grid.o) : set_new_grid.f $(MOD)
+	$(F90) -c $(OPTION) set_new_grid.f
+	ar ruv $(LIB) set_new_grid.o
+
+$(LIB)(rd_sn_data.o) : rd_sn_data.f $(CONT)
+	$(F90) -c $(OPTION) rd_sn_data.f
 	ar ruv $(LIB) rd_sn_data.o
 
 $(LIB)(read_seq_time_file_v1.o) : read_seq_time_file_v1.f $(MOD)
-	$(F90) -c $(FG) read_seq_time_file_v1.f
+	$(F90) -c $(OPTION) read_seq_time_file_v1.f
 	ar ruv $(LIB) read_seq_time_file_v1.o
 
 $(LIB)(tst_rd_seq.o) : tst_rd_seq.f $(MOD)
-	$(F90) -c $(FG) tst_rd_seq.f
+	$(F90) -c $(OPTION) tst_rd_seq.f
 	ar ruv $(LIB) tst_rd_seq.o
 
 $(LIB)(write_seq_time_file_v1.o) : write_seq_time_file_v1.f $(MOD)
-	$(F90) -c $(FG) write_seq_time_file_v1.f
+	$(F90) -c $(OPTION) write_seq_time_file_v1.f
 	ar ruv $(LIB) write_seq_time_file_v1.o
 
 $(LIB)(determine_nse.o) : determine_nse.f $(STEQ) $(CHG) $(MOD)
-	$(F90) -c $(FG) determine_nse.f
+	$(F90) -c $(OPTION) determine_nse.f
 	ar ruv $(LIB) determine_nse.o
 
 $(LIB)(create_iv_links_v2.o) : create_iv_links_v2.f $(STEQ) $(MOD)
-	$(F90) -c $(FG)  create_iv_links_v2.f
+	$(F90) -c $(OPTION)  create_iv_links_v2.f
 	ar ruv $(LIB) create_iv_links_v2.o
 
 $(LIB)(det_lte_ed.o) : det_lte_ed.f $(MOD)
-	$(F90) -c $(FG)  det_lte_ed.f
+	$(F90) -c $(OPTION)  det_lte_ed.f
 	ar ruv $(LIB) det_lte_ed.o
 
 #
@@ -111,31 +136,31 @@ $(LIB)(det_lte_ed.o) : det_lte_ed.f $(MOD)
 #
 
 $(LIB)(ddt_work.o) : ddt_work.f $(MOD)
-	$(F90) -c $(FD) -I$(MOD_DIR) ddt_work.f
+	$(F90) -c $(OPTION) -I$(MOD_DIR) ddt_work.f
 	ar ruv $(LIB) ddt_work.o
 
 $(LIB)(fixpop_in_ba_v3.o) : fixpop_in_ba_v3.f $(STEQ) $(MOD)
-	$(F90) -c $(FD) -I$(MOD_DIR) fixpop_in_ba_v3.f
+	$(F90) -c $(OPTION) -I$(MOD_DIR) fixpop_in_ba_v3.f
 	ar ruv $(LIB) fixpop_in_ba_v3.o
 
 $(LIB)(generate_full_matrix_v3.o) : generate_full_matrix_v3.f $(STEQ) $(MOD)
-	$(F90) -c $(FG)  generate_full_matrix_v3.f
+	$(F90) -c $(OPTION)  generate_full_matrix_v3.f
 	ar ruv $(LIB) generate_full_matrix_v3.o
 
 $(LIB)(set_ba_storage.o) : set_ba_storage.f $(STEQ) $(MOD)
-	$(F90) -c $(FG)  set_ba_storage.f
+	$(F90) -c $(OPTION)  set_ba_storage.f
 	ar ruv $(LIB) set_ba_storage.o
 
-$(LIB)(eval_temp_ddt_v1.o) : eval_temp_ddt_v1.f $(STEQ) $(MOD)
-	$(F90) -c $(FG)  eval_temp_ddt_v1.f
-	ar ruv $(LIB) eval_temp_ddt_v1.o
+$(LIB)(eval_temp_ddt_v2.o) : eval_temp_ddt_v2.f $(STEQ) $(MOD)
+	$(F90) -c $(OPTION)  eval_temp_ddt_v2.f
+	ar ruv $(LIB) eval_temp_ddt_v2.o
 
 $(LIB)(steq_co_mov_deriv_v1.o) : steq_co_mov_deriv_v1.f $(STEQ) $(MOD)
-	$(F90) -c $(FG)  steq_co_mov_deriv_v1.f
+	$(F90) -c $(OPTION)  steq_co_mov_deriv_v1.f
 	ar ruv $(LIB) steq_co_mov_deriv_v1.o
 
 $(LIB)(var_op_v8.o) : var_op_v8.f $(DIS)
-	$(F90) -c $(FG)  var_op_v8.f
+	$(F90) -c $(OPTION)  var_op_v8.f
 	ar ruv $(LIB) var_op_v8.o
 
 $(STEQ):

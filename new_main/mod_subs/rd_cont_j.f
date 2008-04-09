@@ -4,6 +4,7 @@
 ! when we have poor population estimates for some ionization stages/species.
 ! For use with CMFGEN only.
 !
+! Aleterd 2-Apr-2008 : Now set HBC_CMF to small, non-zero, value.
 ! Altered 8-Mar-2005 : Bux fix.
 !
 	SUBROUTINE RD_CONT_J(FL,FREQ_INDX,FIRST_FREQ,LST_ITERATION,
@@ -107,6 +108,7 @@
 	END IF
 	K_MOM(1:ND)=RJ(1:ND)/3.0D0
 	RSQHNU(1:ND)=1.0D-20
+	HBC_CMF(:)=1.0D0
 !
 ! Update the source function.
 !

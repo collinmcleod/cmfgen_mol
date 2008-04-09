@@ -756,9 +756,26 @@
 	    ELSE
 	      YAXIS='Log I(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
 	    END IF
+	    XAXIS='\gm'
 	    CALL CURVE(NP-2,XV,YV)
 	  END IF
 !
+	ELSE IF(X(1:3) .EQ. 'IMU')THEN
+	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
+	  T1=0.299794E+04/T1
+          I=GET_INDX_DP(T1,NU,NCF)
+	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
+!
+	  IF(ALLOCATED(XV))DEALLOCATE(XV)
+	  IF(ALLOCATED(YV))DEALLOCATE(YV)
+	  ALLOCATE (XV(NP))
+	  ALLOCATE (YV(NP))
+!
+	  XV(1:NP)=MU(1:NP)
+	  YV(1:NP)=IP(1:NP,I)
+	  YAXIS='I(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	  CALL CURVE(NP,XV,YV)
+
 	ELSE IF(X(1:3) .EQ. 'JNU')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
 	  T1=0.299794E+04/T1

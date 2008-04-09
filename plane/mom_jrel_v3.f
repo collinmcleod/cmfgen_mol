@@ -377,6 +377,10 @@
 	  KMID_ON_J(1:ND)=0.0D0
           RSQN_ON_RSQJ(1:ND)=0.0D0
 !
+	  WRITE(LUER,*)'Using MOM_JREL_V3 for the solution o the radiative transfer equation'
+	  WRITE(LUER,*)'INCL_ADVEC_TERMS in MOM_JREL_V3 is',INCL_ADVEC_TERMS
+	  WRITE(LUER,*)'  INCL_REL_TERMS in MOM_JREL_V3 is',INCL_REL_TERMS
+!
 	END IF
 !
 ! If new frequency, we need to update PREV vectors which refer to the previous

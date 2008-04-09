@@ -61,7 +61,7 @@ C
 C
 	  INCLUDE 'XOPAC.INC'
 C
-	  IF(FILL_VEC_SQ(1) .EQ. 0)THEN
+	  IF(FILL_VEC_SQ(1) .EQ. 0.0D0)THEN
 	    DO I=1,ND
 	      FILL_VEC_SQ(I)=4.0*FILL_FAC_XRAYS*FILL_FAC_XRAYS*
 	1                     EXP(-V_SHOCK/V(I))

@@ -4,6 +4,16 @@
 
 include ../Makefile_definitions
 
+LIB=$(LIB_DIR)libsubs.a
+
+#
+# Entries for library
+#
+
+OBJ = $(LIB)(det_r_grid_v1.o)\
+      $(LIB)(det_r_grid_v2.o)\
+      $(LIB)(get_lte_ross_v2.o)\
+      $(LIB)(wind_vel_law_v1.o)
 #
 # These names are for the fortran linker
 #
@@ -32,7 +42,16 @@ FN7=$(LIB_DIR)lib$(LN7).a
 # or if the libraries have changed since the last link.
 #
   
-all : $(EXE_DIR)main_lte.exe $(EXE_DIR)wind_hyd.exe
+all : $(OBJ)   $(EXE_DIR)main_lte.exe $(EXE_DIR)wind_hyd.exe
+	cp -f $(INSTALL_DIR)perm_mod_file jnk.mod
+	mv -f *.mod $(MOD_DIR)
+$(LIB) : $(OBJ)
+
+# General rules to make obects in a library and object files
+
+$(LIB)(%.o) : %.f 
+	$(F90) -c $(FG)  $<
+	ar ruv $(LIB) $*.o
 
 #
 # Give the dependencies of dispgen.exe and how it is created.
@@ -47,9 +66,9 @@ $(EXE_DIR)main_lte.exe : lte.o lte_sub.o set_lte_est.o det_ed.o lte_pop_sl.o \
                $(LOCLIB) $(LAPACK) $(BLAS) \
                -o $(EXE_DIR)main_lte.exe
 
-$(EXE_DIR)wind_hyd.exe : wind_hyd.o get_lte_ross_v2.o wind_vel_law_v1.o det_r_grid_v1.o \
+$(EXE_DIR)wind_hyd.exe : wind_hyd.o \
                           $(FN1) $(FN3) $(FN4) $(FN5) $(FN6) $(FN7)
-	$(F90) wind_hyd.o get_lte_ross_v2.o wind_vel_law_v1.o det_r_grid_v1.o \
+	$(F90)-g  wind_hyd.o get_lte_ross_v2.o wind_vel_law_v1.o det_r_grid_v1.o \
              -L$(LIB_DIR) -l$(LN7) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN6) \
                $(LOCLIB) $(LAPACK) $(BLAS) $(PGLIB) $(G2CLIB) $(X11LIB) \
                -o $(EXE_DIR)wind_hyd.exe
@@ -76,7 +95,7 @@ lte_sub.o : lte_sub.f $(MODS)
 	$(F90) -c $(FG) lte_sub.f 
 
 %.o : %.f 
-	$(F90) -c $(FG) $< 
+	$(F90) -g -c $(FG) $< 
 
 $(USR):
 	(cd ../tools ; make )

@@ -89,6 +89,7 @@ C
 	TWOHCSQ=0.0147452575
 	OPLIN=2.6540081E+08		!pi*e*e/m/c*1.0E+10
 	EMLIN=5.27296E-03		!pc*1.0E+025/4.0/pi
+	DC_FILE=' '
 C
 	IOS=1
 	DO WHILE(IOS .NE. 0)
@@ -120,6 +121,7 @@ C
 	ALLOCATE (LEVNAME_O(N_O))
 C
 	OLD_OSC_EXIST=.FALSE.
+	OLD_OSC_FILE=' '
 	DO WHILE(.NOT. OLD_OSC_EXIST)
 	  CALL GEN_IN(OLD_OSC_FILE,
 	1       'Oscillator file assoc. with old D.C. file')
@@ -140,6 +142,7 @@ C
 C                                        
 200	WRITE(T_OUT,'(A)',ADVANCE='NO')
 	IOS=1
+	NEW_OSC_FILE=' '
 	DO WHILE(IOS .NE. 0)
 	  CALL GEN_IN(NEW_OSC_FILE,
 	1    'Oscillator file to be assoc. with NEW D.C. file')

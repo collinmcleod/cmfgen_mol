@@ -394,6 +394,7 @@
 	IF(IOS .EQ. 0)ALLOCATE (DENSITY(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (POPION(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (CLUMP_FAC(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (VOL_EXP_FAC(ND),STAT=IOS)
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error in CMF_FLUX'
 	  WRITE(LUER,*)'Unable to allocate Atmosphere arrays'
@@ -402,6 +403,7 @@
 	END IF
 	FLUX_MEAN(:)=0.0D0
 	ROSS_MEAN(:)=0.0D0
+	VOL_EXP_FAC(:)=0.0D0
 !
 ! Allocate population vectors.
 !

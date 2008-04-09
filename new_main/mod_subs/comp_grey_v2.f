@@ -79,6 +79,12 @@
 	PI=4.0D0*ATAN(1.0D0)
 	CHI(1:ND)=ROSSMEAN(1:ND)
 !
+! Compute the Rosseland optical depth scale. The ' ' in TORSCL indicates TYPE of atmosphere,
+! and here is set to ' ' so that TORSCL assumes a power law dependence. If CHI(3) .LT. CHI(1),
+! an 1/r^2 density dependence at the outer boundary is assumed.
+!
+        CALL TORSCL(TAU_ROSS,CHI,R,TB,TC,ND,METHOD,' ')
+!
 	IF(PLANE_PARALLEL_NO_V)THEN
            FEDD=0.3333D0
 	   HBC_CMF=0.7D0; NBC_CMF=0.0D0; FL=1.0D0; INBC=0.1D0
@@ -125,9 +131,9 @@
 	     WRITE(7,'(A)')
 	     WRITE(7,'(A)')'Check for plane-parallel grey atmosphere calculation'
 	     WRITE(7,'(A)')
-	     WRITE(7,'(4X,A,4(12X,A))')'I','    R','    J','Ray J','    f'
+	     WRITE(7,'(4X,A,5(11X,A))')'I','    R','    J','Ray J','    f','  Tau'
 	     DO I=1,ND
-	       WRITE(7,'(X,I4,4(ES16.6))')I,R(I),RJ(I),TC(I),GAMH(I)
+	       WRITE(7,'(X,I4,5(ES16.6))')I,R(I),RJ(I),TC(I),GAMH(I),TAU_ROSS(I)
 	     END DO
 	   CLOSE(UNIT=7)
 !
@@ -186,7 +192,7 @@
 	   T2=1.0D-06		!Accuracy to converge f
 	   CALL JGREY_HUB_DDT_V2(RJ,SOB,CHI,R,V,SIGMA,POPS,
 	1              P,AQW,HMIDQW,KQW,LUM,METHOD,DIF,IC,
-	1              T2,L_TRUE,TIME_SEQ_NO,ND,NC,NP,NT)
+	1              T2,INCL_DJDT_TERMS,TIME_SEQ_NO,ND,NC,NP,NT)
 !
 	ELSE
 !
@@ -223,12 +229,6 @@
 	DO I=1,ND
 	  TGREY(I)=((PI/5.67D-05*RJ(I))**0.25D0)*1.0D-04
 	END DO
-!
-! Compute the Rosseland optical depth scale. The ' ' in TORSCL indicates TYPE of atmosphere,
-! and here is set to ' ' so that TORSCL assumes a power law dependence. If CHI(3) .LT. CHI(1),
-! an 1/r^2 density dependence at the outer boundary is assumed.
-!
-        CALL TORSCL(TAU_ROSS,CHI,R,TB,TC,ND,METHOD,' ')
 !
 	RETURN
 	END

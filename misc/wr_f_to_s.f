@@ -31,6 +31,7 @@ C
 	CHARACTER*1 LEV_PARITY(N_MAX)
 C
 	INTEGER F_TO_S(N_MAX)
+	INTEGER INT_LEV(N_MAX)
 	REAL*8 FEDGE(N_MAX)
 	REAL*8 ENERGY(N_MAX)
 	REAL*8 G(N_MAX)
@@ -110,7 +111,7 @@ C
 C
 C USR_OPTION variables
 C
-	CHARACTER B*80		!Contains full option string
+	CHARACTER MAIN_OPT_STR*80		!Contains full option string
 	CHARACTER X*10		!Option
 	CHARACTER*120 DEFAULT	!String to be used for default values
 	CHARACTER*120 DESCRIPTION
@@ -140,6 +141,7 @@ C
 	EMLIN=5.27296E-03
 	OPLIN=2.6540081E+08
 	EMLIN=5.27296E-03
+	INT_LEV(:)=0
 C
 C  
 C Read in Level Names and Energies from file containing oscillator
@@ -213,9 +215,9 @@ C
 3	CONTINUE
 	CALL SVE_FILE('RESET')
 C
-	B='  '
+	MAIN_OPT_STR='  '
 	DEFAULT=' '
-	CALL USR_OPTION(B,'OPTION',DEFAULT,DESCRIPTION)
+	CALL USR_OPTION(MAIN_OPT_STR,'OPTION',DEFAULT,DESCRIPTION)
 C
 C   If the main option begins with a '.', a previously
 C   written .sve file is read.
@@ -234,7 +236,24 @@ C   If only a main option is given, the option and subsequent sub-options
 C   are saved in a file called 'main option.sve'.  All following main
 C   options are saved in separate files.
 C
-	X=UC(B)
+!
+! Remove variable changes from main option.
+!
+        I=INDEX(MAIN_OPT_STR,'(')
+        IF(I .EQ. 0)THEN
+          X=UC(TRIM(MAIN_OPT_STR))
+        ELSE
+          X=UC(MAIN_OPT_STR(1:I-1))     !Remove line variables.
+        END IF
+!
+! Remove possile file names etc.
+!          
+        I=INDEX(X,' ')
+        IF(I .EQ. 0)THEN
+          X=UC(TRIM(X))
+        ELSE
+          X=UC(X(1:I-1))        !Remove file names
+        END IF
 C
 C                           
 C Group all terms belonging to the same LS multiplet.
@@ -266,6 +285,57 @@ C
 	  WRITE(T_OUT,*)'Number of levels in full atom is    ',NLEV
 	  WRITE(T_OUT,*)'Number of LS terms in full atom is  ',N_LS_TERMS
 	  WRITE(T_OUT,*)'Number of levels in SUPER atom is   ',CNT
+C
+C Group all terms belonging to the same LS multiplet.
+C               
+	ELSE IF(X(1:3) .EQ. 'TLS')THEN	!LS coupling
+	  F_TO_S(:)=0
+	  F_TO_S(1)=1
+	  CNT=1
+	  DO I=2,NLEV
+	    J=INDEX(NAME(I),'[')
+	    IF(J .EQ. 0)THEN
+	      CNT=CNT+1
+	      F_TO_S(I)=CNT
+	    ELSE
+	      J=1
+	      DO WHILE(F_TO_S(I) .EQ. 0 .AND. J .LE. I-1)
+	        IF( LS_NAME(I) .EQ. LS_NAME(J) )THEN
+                  F_TO_S(I)=F_TO_S(J)
+	        END IF
+	        J=J+1
+	      END DO
+	      IF(F_TO_S(I) .EQ. 0)THEN
+	        CNT=CNT+1
+	        F_TO_S(I)=CNT
+	      END IF
+	    END IF
+	  END DO
+!
+	  DO I=1,NLEV-1
+	   IF(INDEX(NAME(I),'[') .EQ. 0 .AND. INT_LEV(I) .EQ. 0)THEN
+	     L=LEN_TRIM(NAME(I))
+	     PRES=.TRUE.
+	     DO J=I+1,NLEV
+	       IF(INDEX(NAME(J),'[') .EQ. 0)THEN
+	           K=LEN_TRIM(NAME(J))
+	         IF(NAME(J)(K-4:K) .EQ. NAME(I)(L-4:L))THEN
+	           IF(PRES)THEN
+	             ID=I
+	             INT_LEV(I)=ID 
+	             INT_LEV(J)=ID
+	             PRES=.FALSE.
+	             CNT=J
+	           ELSE
+	             F_TO_S(J)=F_TO_S(CNT)
+	             INT_LEV(J)=ID
+	           END IF
+                 END IF
+	       END IF
+	     END DO
+	   END IF
+	  END DO
+	  WRITE(6,*)'Now do a clean'
 C
 	ELSE IF(X(1:3) .EQ. 'AVE')THEN
           G_SUM(:)=0.0D0
@@ -523,11 +593,11 @@ C
 	        LAM_EDGE(I)=1.0D+08/(ION_EN-ENERGY(I))
 	        IF(WRITE_DC)THEN
 	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
-	1                      LAM_EDGE(I),F_TO_S(I),IZERO,I,DC(I,1),
+	1                      LAM_EDGE(I),F_TO_S(I),INT_LEV(I),I,DC(I,1),
 	1                      DC(I,2),DC(I,3)
 	        ELSE
 	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
-	1                      LAM_EDGE(I),F_TO_S(I),IZERO,I
+	1                      LAM_EDGE(I),F_TO_S(I),INT_LEV(I),I
 	        END IF
 	      END IF
 	    END DO
@@ -588,7 +658,7 @@ C
 	    LAM_EDGE(I)=1.0D+08/(ION_EN-ENERGY(I))
 	    IF(WRITE_DC)THEN
 	      WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
-	1                      LAM_EDGE(I),F_TO_S(I),IZERO,I,DC(I,1),
+	1                      LAM_EDGE(I),F_TO_S(I),INT_LEV(I),I,DC(I,1),
 	1                      DC(I,2),DC(I,3)
 	    ELSE
 	      WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
@@ -648,6 +718,10 @@ C
 	      OLD_F_TO_S=F_TO_S(I)
 	      F_TO_S(I)=ID
 	    END IF
+	  END DO
+!
+	  DO I=1,NLEV
+	    IF(INT_LEV(I) .NE. 0)INT_LEV(I)=F_TO_S(INT_LEV(I))
 	  END DO 
 	  WRITE(T_OUT,*)'Cleaning level links '
 	  WRITE(T_OUT,'(A,X,I5)')' Number of super levels is:',ID
@@ -891,7 +965,7 @@ C
 	ELSE IF(X(1:2) .EQ.'EX') THEN
 	  STOP
 	ELSE IF(X(1:3) .EQ. 'BOX') THEN
-	  CALL WR_BOX_FILE(B)
+	  CALL WR_BOX_FILE(MAIN_OPT_STR)
 	ELSE
 	  PRINT*,'OPTION REQUESTED DOES NOT EXIST'
 	END IF

@@ -19,8 +19,8 @@ C
 	REAL*8 Z(NSPEC),ED(ND),POPOXY(ND)
 	REAL*8 DION(ND),LOC_CH(ND),dDIONdNe(ND),dLOC_CH_dNe(ND)
 C
-	INTEGER I,J
 	REAL*8 T1
+	INTEGER I,J
 C
 	IF(FIRST)THEN
 	  DO I=1,ND
@@ -36,10 +36,9 @@ C
 	  LOC_CH(I)=0.0
 	  dLOC_CH_dNe(I)=0.0
 	END DO
-C
+!
 	DO I=1,ND
 	  DO J=1,NSPEC-1
-	    WRITE(6,'(I3,4ES14.4)')J,PHI(I,J),U(I,J),U(I,J+1),DION(I)
 	    T1=PHI(I,J)*( U(I,J)/U(I,J+1) )
             DION(I)=T1*ED(I)*( 1.0D0+DION(I) )
 	    dDIONdNe(I)=T1*( (NSPEC-1) + ED(I)*dDIONdNe(I) )

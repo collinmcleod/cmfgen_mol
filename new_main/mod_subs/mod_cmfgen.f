@@ -180,6 +180,7 @@
 	REAL*8, ALLOCATABLE :: DENSITY(:)	!Mass density (gm/cm^3)
 	REAL*8, ALLOCATABLE :: CLUMP_FAC(:)	!Volume filling factor for clumps
 	REAL*8, ALLOCATABLE :: POPION(:)	!Ion density
+	REAL*8, ALLOCATABLE :: VOL_EXP_FAC(:)	!Volume expansion factor (for time dependent SN models).
 !
 	REAL*8 STARS_MASS			!In Msun
 !

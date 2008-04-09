@@ -76,6 +76,7 @@
 	USE MOD_MOM_PP_J_V1
 	IMPLICIT NONE
 !
+! Altered 3-Feb-2008 : Changed to allow for a variable R grid,
 !
 	INTEGER ND_SM
 	REAL*8 ETA_SM(ND_SM)
@@ -180,20 +181,6 @@
 !
 	  ALLOCATE ( R(ND) )
 	  ALLOCATE ( R_PNT(ND) )
-          K=1
-	  R(1)=R_SM(1)
-          R_PNT(1)=1
-	  DO I=1,ND_SM-1
-            DELTA_R=(R_SM(I+1)-R_SM(I))/(NINS+1)
-            DO J=1,NINS
-              K=K+1
-              R(K)=R(K-1)+DELTA_R
-              R_PNT(K)=I
-            END DO
-            K=K+1
-            R(K)=R_SM(I+1)
-            R_PNT(K)=I
-	  END DO
 !
 	  ALLOCATE ( LOG_R_SM(ND_SM),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE ( ETA_COEF(ND_SM,4),STAT=IOS)
@@ -224,9 +211,32 @@
 	  ALLOCATE ( HL(ND) )
 	  ALLOCATE ( COH_VEC(ND) )
 !
+	  ALLOCATE ( J_INDX(ND_SM) )
+	  ALLOCATE ( H_INDX(ND_SM) )
+!
+	  FIRST_TIME=.FALSE.
+	END IF
+!
 !
-	  ALLOCATE ( J_INDX(ND_SM) );       J_INDX(1:ND_SM)=0
-	  ALLOCATE ( H_INDX(ND_SM) );       H_INDX(1:ND_SM)=0
+	IF(INIT)THEN
+!
+	  K=1
+	  R(1)=R_SM(1)
+          R_PNT(1)=1
+	  DO I=1,ND_SM-1
+            DELTA_R=(R_SM(I+1)-R_SM(I))/(NINS+1)
+            DO J=1,NINS
+              K=K+1
+              R(K)=R(K-1)+DELTA_R
+              R_PNT(K)=I
+            END DO
+            K=K+1
+            R(K)=R_SM(I+1)
+            R_PNT(K)=I
+	  END DO
+	  LOG_R_SM(1:ND_SM)=LOG(R_SM(1:ND_SM))
+!
+	  J_INDX(1:ND_SM)=0
 	  K=1
 	  DO I=1,ND_SM
 	    DO WHILE(J_INDX(I) .EQ. 0)
@@ -242,6 +252,7 @@
 	    END DO
 	  END DO
 !
+	  H_INDX(1:ND_SM)=0
 	  K=1
 	  DO I=1,ND_SM-1
 	    T1=0.5D0*(R_SM(I)+R_SM(I+1))
@@ -253,8 +264,6 @@
 	      END IF
 	    END DO
 	  END DO
-!
-	  FIRST_TIME=.FALSE.
 	END IF
 !
 !

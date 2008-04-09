@@ -40,6 +40,8 @@
 	LOGICAL, SAVE :: FIRST_WRITE=.TRUE.
 	LOGICAL NEW_FILE
 	LOGICAL WRITE_FIT
+	LOGICAL FILE_EXISTS
+	LOGICAL DO_FIND
 !
 	INTEGER I,J,K
 	LOGICAL GUESSED
@@ -66,13 +68,20 @@
 	CALL GEN_IN(NUM_GAUS,'Number of gaussians to fit: (0 to find)')
 	GUESSED=.FALSE.
 	IF(NUM_GAUS .EQ. 0)THEN
-	   CALL GEN_IN(FIND_LINE_TOLERANCE,'Departure from unity for lines')
-	   SP_XST=XST; SP_XEND=XEND
-	   WRITE(6,*)IP,NPTS(IP),SP_XST,SP_XEND,T1
-	   CALL FIND_LINES(LINE_CENTER, LINE_HEIGHT, LINE_SIGMA, NUM_GAUS, NL_MAX,
+	   DO_FIND=.TRUE.
+	   DO WHILE(DO_FIND)
+	     CALL GEN_IN(FIND_LINE_TOLERANCE,'Departure from unity for lines')
+	     FIND_LINE_TOLERANCE=ABS(FIND_LINE_TOLERANCE)
+	     SP_XST=XST; SP_XEND=XEND
+	     WRITE(6,*)IP,NPTS(IP),SP_XST,SP_XEND,T1
+	     CALL FIND_LINES(LINE_CENTER, LINE_HEIGHT, LINE_SIGMA, NUM_GAUS, NL_MAX,
 	1                 CD(IP)%DATA(1),CD(IP)%XVEC(1),NPTS(IP),
 	1                 SP_XST,SP_XEND,FIND_LINE_TOLERANCE)
-	   GUESSED=.TRUE.
+	      DO_FIND=.FALSE.
+	      WRITE(6,*)'You may hand edit individual Gaussians or do auto find again'
+	      CALL GEN_IN(DO_FIND,'Do automatic find again with different tolerance?')
+	    END DO
+	    GUESSED=.TRUE.
 	END IF              
 !
 ! If possible, we use previous fit parameters as default.
@@ -97,7 +106,7 @@
 	  NUM_GAUS=(NG_PAR-2)/4
 	ELSE IF(NEW_REGION)THEN
 	  IF(ALLOCATED(PAR))DEALLOCATE(PAR)
-	  ALLOCATE (PAR(NG_PAR)); PAR=0.0D0
+	  ALLOCATE (PAR(NG_PAR)); PAR=0.0D0; PAR(1)=1.0D0
 	  CALL GEN_IN(PAR(1),'Mean value')
 	  CALL GEN_IN(PAR(2),'Continuum slope')
 	  NG_PAR_OLD=NG_PAR
@@ -183,7 +192,8 @@
 	END DO
 	EW=EW*1000.0D0			!mAng
         PAR(1:NG_PAR)=SIM(1,1:NG_PAR)
-	CALL GAUS_FIT_ER(PAR);	EW_ERROR=EW_ERROR*1000.0D0
+	CALL GAUS_FIT_ER(PAR)
+	EW_ERROR=EW_ERROR*1000.0D0; ALT_ERROR=ALT_ERROR*1000.0D0; MIN_ERROR=MIN_ERROR*1000.0D0
 !
 	WRITE(6,*)'Called AMOEBA'
 	WRITE(6,*)'Fit parameters are (NB SIGMA is not Stan. Dev.):'
@@ -195,8 +205,8 @@
 	  K=2+(I-1)*4+1
 	  T1=2.99794D+05*SIM(1,K+1)/SIM(1,K)
 	  FWHM=2.0D0*T1*(DLOG(2.0D0))**(1.0D0/SIM(I,K+3))
-	  WRITE(6,'(2X,ES16.6,5ES14.4,2F10.2)')SIM(I,K),SIM(1,K+2),SIM(1,K+1),SIM(I,K+3),
-	1               T1/SQRT(2.0D0),FWHM,EW(I),EW_ERROR(I)
+	  WRITE(6,'(2X,ES16.6,5ES14.4,4F10.2)')SIM(I,K),SIM(1,K+2),SIM(1,K+1),SIM(I,K+3),
+	1               T1/SQRT(2.0D0),FWHM,EW(I),EW_ERROR(I),ALT_ERROR(I),MIN_ERROR(I)
 	END DO
 !
         SUM_SQ(:)=0.0D0
@@ -207,12 +217,17 @@
 	I=1
 	CALL PGSCI(I)
 	CALL PGLINE(NG_DATA,XFIT,YFIT)
+	CALL PGEBUF				!Clear buffer
 !
 	CALL GEN_IN(WRITE_FIT,'Write fit to file')
 	IF(WRITE_FIT)THEN
 	  IF(FIRST_WRITE)THEN
 	    FIRST_WRITE=.FALSE.
-	    CALL GEN_IN(NEW_FILE,'Open new file (T) or append data (F)')
+	    INQUIRE(FILE='GAUSS_FITS',EXIST=NEW_FILE); NEW_FILE=.NOT. NEW_FILE
+	    IF(.NOT. NEW_FILE)THEN
+	      WRITE(6,*)'If file GAUS_FITS exists: Default is to append new fits'
+	      CALL GEN_IN(NEW_FILE,'Open new file (T) or append data (F)')
+	    END IF
 	    IF(NEW_FILE)THEN
 	      OPEN(UNIT=35,FILE='GAUSS_FITS',STATUS='UNKNOWN')
 	      WRITE(35,'(2X,(5X,A),5(5X,A),2(3X,A))')
@@ -235,7 +250,11 @@
 	    K=3+(I-1)*4
 	    LINE_CENTER(I)=PAR(K)
 	  END DO
-	  CALL INDEXX(NUM_GAUS,LINE_CENTER,INDX_VEC,L_TRUE)
+	  IF(NUM_GAUS .EQ. 1)THEN
+	    INDX_VEC(1)=1
+	  ELSE
+	    CALL INDEXX(NUM_GAUS,LINE_CENTER,INDX_VEC,L_TRUE)
+	  END IF
 !
 	  WRITE(35,'(A)')' '
 	  WRITE(35,'(I3,8X,A)')NUM_GAUS,'!Number of Gaussians'
@@ -246,13 +265,14 @@
 	     K=2+(I-1)*4+1
 	     T1=2.99794D+05*SIM(1,K+1)/SIM(1,K)
 	     FWHM=2.0D0*T1*(DLOG(2.0D0))**(1.0D0/SIM(I,K+3))
-	     WRITE(35,'(2X,ES16.6,5ES16.4,2F10.2)')SIM(I,K),SIM(1,K+2),SIM(1,K+1),SIM(I,K+3),
-	1               T1/SQRT(2.0D0),FWHM,EW(I),EW_ERROR(I)
+	     WRITE(35,'(2X,ES16.6,5ES16.4,4F10.2)')SIM(I,K),SIM(1,K+2),SIM(1,K+1),SIM(I,K+3),
+	1               T1/SQRT(2.0D0),FWHM,EW(I),EW_ERROR(I),ALT_ERROR(I),MIN_ERROR(I)
 	  END DO
 	  CLOSE(UNIT=35)
 	 END IF
 	WRITE(6,*)'Final SUM_SQ=',SUM_SQ(1)
 	WRITE(6,*)'Use P, then DG to redraw Gauss fit'
+	WRITE(6,*)'Use GF to edit and redo the Gauss fit'
 !	
 	RETURN
 	END

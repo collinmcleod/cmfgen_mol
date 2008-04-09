@@ -28,6 +28,8 @@
 	  REAL*8 ROSS_ON_ES
 	  REAL*8 KAP_ROSS
 	  REAL*8 KAP_ES
+	  REAL*8 SOUND_SPEED
+	  REAL*8 MDOT
 !
 	  REAL*8 dPdR
 	  REAL*8 dTAUdR
@@ -80,7 +82,7 @@
 ! The following vectors are used for the atmospheric structure resulting
 ! from the solution of the hydrostatic and tau equations.
 ! 
-	INTEGER, PARAMETER :: ND_MAX=500
+	INTEGER, PARAMETER :: ND_MAX=1000
 	INTEGER ND
         REAL*8 R(ND_MAX)
         REAL*8 V(ND_MAX)
@@ -122,13 +124,20 @@
 !
 ! Wind parameters:
 !
-	REAL*8 MDOT
 	REAL*8 VINF
 	REAL*8 BETA
 	REAL*8 RMAX
 	REAL*8 CONNECTION_RADIUS
 	REAL*8 CONNECTION_VEL
 	INTEGER CONNECTION_INDX
+!
+! Parameters for for cumputing the final R grid.
+!	
+	REAL*8 dLOG_TAU
+	REAL*8 V_SCL_FAC
+	REAL*8 OBND_PARS(20)
+	INTEGER NUM_OBND_PARAMS
+	CHARACTER(LEN=16) OUT_BND_OPT
 !
 	CHARACTER(LEN=20) TIME
 	CHARACTER(LEN=80) FILENAME,DIR_NAME,STRING
@@ -169,7 +178,7 @@
 	REAL*8 ATOMIC_MASS_UNIT,BOLTZMANN_CONSTANT,STEFAN_BOLTZ
 	REAL*8 GRAVITATIONAL_CONSTANT,MASS_SUN,SPEED_OF_LIGHT
 	INTEGER GET_INDX_DP
-	EXTERNAL ATOMIC_MASS_UNIT,BOLTZMANN_CONSTANT,GET_INDX_DP,STEFAN_BOLTZ
+	EXTERNAL ATOMIC_MASS_UNIT,BOLTZMANN_CONSTANT,STEFAN_BOLTZ,GET_INDX_DP
 	EXTERNAL GRAVITATIONAL_CONSTANT,MASS_SUN,SPEED_OF_LIGHT
 !
 	INTEGER, PARAMETER :: IZERO=0
@@ -200,6 +209,12 @@
 	PURE_LTE_EST=.TRUE.
 	OLD_TAU_MAX=100.0D0
 	RBOUND=0.0D0
+	dLOG_TAU=0.25D0
+	V_SCL_FAC=0.67D00
+	OBND_PARS(:)=0.0D0
+	NUM_OBND_PARAMS=1
+	OUT_BND_OPT='DEFAULT'
+!
 !
 ! *************************************************************************
 !
@@ -238,7 +253,19 @@
 	CALL RD_STORE_LOG(RESET_REF_RADIUS,'RES_REF',USE_OLD_VEL,'Reset reference radius if using old velocity law')
 	GAM_LIM=0.98D0
 	CALL RD_STORE_DBLE(GAM_LIM,'GAM_LIM',L_FALSE,'Limiting Eddington factor')
-        CALL CLEAN_RD_STORE()
+!
+	CALL RD_STORE_DBLE(dLOG_TAU,'dLOG_TAU',L_FALSE,'Lograritihmic spacing in Tau for new R grid')
+	CALL RD_STORE_DBLE(V_SCL_FAC,'VSCL_FAC',L_FALSE,'Maximum V(I-1)/V(I) for new R grid (<1)')
+	I=10
+	CALL RD_STORE_NCHAR(OUT_BND_OPT,'OB_OPT',I,L_FALSE,'Outer boundary option: POW, SPECIFY, DEFAULT, NONE')
+	J=0; CALL RD_STORE_INT(J,'NOB_PARS',L_FALSE,'Number of outer boudary parameters')
+	DO I=1,J
+	  NUM_OBND_PARAMS=J
+	  WRITE(STRING,'(I)')I
+	  STRING='OB_P'//ADJUSTL(STRING)
+	  CALL RD_STORE_DBLE(OBND_PARS(I),TRIM(STRING),L_TRUE,'Paremeters for outer boundary condition')
+	END DO  
+	CALL CLEAN_RD_STORE()
 C
         CLOSE(UNIT=LUIN)
         CLOSE(UNIT=LUSCR)
@@ -317,8 +344,13 @@ C
 	  T1=2.0D0/3.0D0
 	  I=GET_INDX_DP(T1,OLD_TAU,OLD_ND)
 	  T2=(LOG(T1)-LOG(OLD_TAU(I)))/(LOG(OLD_TAU(I+1))-LOG(OLD_TAU(I)))
-	  OLD_REF_RADIUS=(1.0D0-T1)*OLD_R(I)+T1*OLD_R(I+1)
-	  WRITE(T_OUT,*)'Reference radius (Tau=2/3) of of old model is',OLD_REF_RADIUS
+	  IF(PLANE_PARALLEL_MOD)THEN
+	    OLD_REF_RADIUS=OLD_R(OLD_ND)
+	    WRITE(T_OUT,*)'Reference radius of of old model is',OLD_REF_RADIUS
+	  ELSE
+	    OLD_REF_RADIUS=(1.0D0-T1)*OLD_R(I)+T1*OLD_R(I+1)
+	    WRITE(T_OUT,*)'Reference radius (Tau=2/3) of of old model is',OLD_REF_RADIUS
+	  END IF
 !
 	  OPEN(UNIT=23,FILE='OLD_GRID',STATUS='UNKNOWN',ACTION='WRITE')
 	    WRITE(23,'(/,A,ES14.4,/)')'Reference radius (Tau=2/3) of of old model is',OLD_REF_RADIUS
@@ -332,6 +364,8 @@ C
 !
 	    T1=OLD_REF_RADIUS/6.9599D0
 	    OLD_TEFF=0.5770D0*(RLUM/T1/T1)**0.25           !in 10^4 K
+	    WRITE(6,*)'Fudging OLD_TEFF'
+	    OLD_TEFF=TEFF
 !
 	    OLD_SF(1:OLD_ND)=OLD_T(1:OLD_ND)/OLD_TEFF/(OLD_TAU(1:OLD_ND)+0.67D0)**0.25D0
 	    OLD_TAU_MAX=OLD_TAU(OLD_ND)
@@ -379,12 +413,12 @@ C
 !
 	  GAM_EDD=1.0D+06*SIGMA_TH*STEFAN_BC*(TEFF**4)/MU_ATOM/C_CMS/(10**LOGG)/AMU
 !
-	  WRITE(15,'(A,ES14.4)')'          Surface gravity is:',LOGG
-	  WRITE(15,'(A,ES14.4)')'             Mass of star is:',10**(LOGG)*(REFERENCE_RADIUS**2)/GRAV_CON
-	  WRITE(15,'(A,ES14.4)')'         Mean atomic mass is:',MU_ATOM
-	  WRITE(15,'(A,ES14.4)')'             Atom density is:',NI_ZERO
-	  WRITE(15,'(A,ES14.4)')'New effective temperature is:',TEFF
-	  WRITE(15,'(A,ES14.4)')'      Eddington parameter is:',GAM_EDD
+	  WRITE(15,'(A,ES14.6)')'          Surface gravity is:',LOGG
+	  WRITE(15,'(A,ES14.6)')'             Mass of star is:',10**(LOGG)*(REFERENCE_RADIUS**2)/GRAV_CON
+	  WRITE(15,'(A,ES14.6)')'         Mean atomic mass is:',MU_ATOM
+	  WRITE(15,'(A,ES14.6)')'             Atom density is:',NI_ZERO
+	  WRITE(15,'(A,ES14.6)')'New effective temperature is:',TEFF
+	  WRITE(15,'(A,ES14.6)')'      Eddington parameter is:',GAM_EDD
 !
 !
 ! Set parameters/initial conditions at the outer boundary of the
@@ -452,16 +486,19 @@ C
 ! we simply use the boundary value.
 !
 	      TA(1:OLD_ND)=LOG(OLD_POP_ATOM(1:OLD_ND))
-	      TB(1:OLD_ND)=OLD_POP_ATOM(1:OLD_ND)/OLD_ED(1:OLD_ND)
+	      TB(1:OLD_ND)=OLD_ED(1:OLD_ND)/OLD_POP_ATOM(1:OLD_ND)
 	      TC(1:J)=LOG(POP_ATOM(1:J))
 	      DO I=1,J
 	        IF(TC(I) .LT. TA(1))TC(I)=TA(1)
 	      END DO
 	      CALL MON_INTERP(ED_ON_NA,J,IONE,TC,J,TB,OLD_ND,TA,OLD_ND)
+	      WRITE(6,*)'MON1'
 	      TB(1:OLD_ND)=OLD_T(1:OLD_ND)*TEFF/OLD_TEFF
 	      CALL MON_INTERP(T,J,IONE,TC,J,TB,OLD_ND,TA,OLD_ND)
+	      WRITE(6,*)'MON2'
 	      TB(1:OLD_ND)=OLD_ROSS_MEAN(1:OLD_ND)/OLD_ESEC(1:OLD_ND)
 	      CALL MON_INTERP(CHI_ROSS,J,IONE,TC,J,TB,OLD_ND,TA,OLD_ND)
+	      WRITE(6,*)'MON3'
 	      DO I=1,J
 	        ED(I)=ED_ON_NA(I)*POP_ATOM(I)
 	        GAMMA_FULL(I)=GAM_FULL
@@ -549,6 +586,14 @@ C
 	    END IF
 	    I=1
 	  END IF
+!
+	  SOUND_SPEED=1.0D+10
+	  IF(WIND_PRESENT)THEN
+	    SOUND_SPEED=1.0D+04*(1.0D0+ED_ON_NA(I))*BOLTZMANN_CONSTANT()*T(I)/MU_ATOM/ATOMIC_MASS_UNIT()
+	    SOUND_SPEED=1.0D-05*SQRT(SOUND_SPEED)
+!	    SOUND_SPEED=1.0D+10
+	    WRITE(6,'(A,3ES14.4)')'SOUND_SPEED',SOUND_SPEED
+	  END IF
 !
 !
 ! Units 75 & 76 are used in NEW_ESTIMATES
@@ -569,10 +614,17 @@ C
 	    I=I+1
 !
 ! Compute the atmospheric pressure scale height. We use this to determine the
-! step size.
+! step size. We use GAM_EDD as this provides a smaller and more consistent step
+! size. It is only used to determine the step size.
 !
-	    SCL_HT=(10**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU/BC/(1.0D0+ED_ON_NA(I-1))/T(I-1)
+!	    SCL_HT=(10**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU/BC/(1.0D0+ED_ON_NA(I-1))/T(I-1)
+	    SCL_HT=(10**LOGG)*(1.0D0-GAM_EDD)*MU_ATOM*AMU/BC/(1.0D0+ED_ON_NA(I-1))/T(I-1)
 	    SCL_HT=1.0D-10/SCL_HT
+!
+! We set the step size to the pressure scale height on 5.
+!
+	    H=SCL_HT/10.0D0
+!
 !
 	    WRITE(15,*)' '
 	    WRITE(15,'(A,ES12.4,A)')'       Scale height is',SCL_HT,' 10^10 cm'
@@ -585,10 +637,6 @@ C
 	    WRITE(15,*)'POP_ATOM(I-1)=',POP_ATOM(I-1)
 	    WRITE(15,*)'GAMMA_FULL=',GAM_FULL
 !
-! We set the step size to the pressure scale height on 5.
-!
-	    H=SCL_HT/10.0D0
-!
 ! Set estimates at current location. Then integrate hydrostatic
 ! equation using 4th order Runge-Kutta.
 !
@@ -597,11 +645,13 @@ C
 	    T_EST=T(I-1)
 	    ED_ON_NA_EST=ED_ON_NA(I-1)
 	    ATOM_EST=POP_ATOM(I-1)
+	    WRITE(15,*)ATOM_EST,P_EST/BC/T_EST/(1+ED_ON_NA_EST)
 	    R_EST=R(I-1)-H
 	    CALL DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
 	    dP1=H*dPdR
 	    dTAU1=H*dTAUdR
-	    WRITE(15,*)dPdR,dTAUdR,T_EST,dP1,dTAU1
+	    WRITE(15,'(4ES14.5)')R_EST,P_EST,ATOM_EST,ED_ON_NA_EST
+	    WRITE(15,'(5ES14.5)')dPdR,dTAUdR,T_EST,dP1,dTAU1
 !
 	    P_EST=P(I-1)+dP1/2
 	    TAU_EST=TAU(I-1)+dTAU1/2
@@ -610,7 +660,8 @@ C
 	    CALL DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
 	    dP2=H*dPdR
 	    dTAU2=H*dTAUdR
-	    WRITE(15,*)dPdR,dTAUdR,T_EST,dP2,dTAU2
+	    WRITE(15,'(4ES14.5)')R_EST,P_EST,ATOM_EST,ED_ON_NA_EST
+	    WRITE(15,'(5ES14.5)')dPdR,dTAUdR,T_EST,dP2,dTAU2
 !
 	    P_EST=P(I-1)+dP2/2
 	    TAU_EST=TAU(I-1)+dTAU2/2
@@ -619,7 +670,8 @@ C
 	    CALL DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
 	    dP3=H*dPdR
 	    dTAU3=H*dTAUdR
-	    WRITE(15,*)dPdR,dTAUdR,T_EST,dP3,dTAU3
+	    WRITE(15,'(4ES14.5)')R_EST,P_EST,ATOM_EST,ED_ON_NA_EST
+	    WRITE(15,'(5ES14.5)')dPdR,dTAUdR,T_EST,dP3,dTAU3
 !
 	    P_EST=P(I-1)+dP3
 	    TAU_EST=TAU(I-1)+dTAU2
@@ -628,7 +680,8 @@ C
 	    CALL DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
 	    dP4=H*dPdR
 	    dTAU4=H*dTAUdR
-	    WRITE(15,*)dPdR,dTAUdR,T_EST,dP4,dTAU4
+	    WRITE(15,'(4ES14.5)')R_EST,P_EST,ATOM_EST,ED_ON_NA_EST
+	    WRITE(15,'(5ES14.5)')dPdR,dTAUdR,T_EST,dP4,dTAU4
 !
 ! Update values at next grid point.
 !
@@ -644,7 +697,6 @@ C
 	    CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*ROSS_ON_ES
 	    GAMMA_FULL(I)=GAM_FULL
 	    ND=I
-	    WRITE(6,*)I,T(I),TAU(I)
 !
 	  END DO		!Loop over intire inner atmosphere
 	  CLOSE(UNIT=75)
@@ -665,7 +717,13 @@ C
 ! grid.
 !
 	  ALLOCATE(COEF(ND,4))
+	  WRITE(6,*)'H8'
+	  DO I=1,ND
+	  WRITE(170,*)I,P(I),R(I)
+	  END DO
+	  CLOSE(UNIT=170)
 	  CALL MON_INT_FUNS_V2(COEF,P,R,ND)
+	  WRITE(6,*)'H8'
 	  DO I=1,ND
 	    dPdR_VEC(I)=1.0D-10*COEF(I,3)/POP_ATOM(I)/AMU/MU_ATOM
 	  END DO
@@ -703,6 +761,7 @@ C
 	    CONNECTION_RADIUS=CONNECTION_RADIUS-T1
 	    WRITE(15,*)'    Old reference radius is',T2
 	    WRITE(15,*)'Desired reference radius is',REFERENCE_RADIUS
+	    WRITE(15,*)'Current sound speed (reference)',SOUND_SPEED
 	    WRITE(T_OUT,*)'    Old reference radius is',T2
 	    WRITE(T_OUT,*)'Desired reference radius is',REFERENCE_RADIUS
 	  ELSE
@@ -764,13 +823,16 @@ C
 	IF(WIND_PRESENT .AND. USE_OLD_VEL)THEN
 	  J=CONNECTION_INDX
 	  I=NEW_ND-J+1
-	  CALL DET_R_GRID_V1(REV_TAU(J),I,ND_MAX,TAU_MAX,L_FALSE,R(J),V(J),TAU(J),ND-J+1)
-	  REV_TAU(1:J)=TAU(1:J)
+	  CALL DET_R_GRID_V2(REV_TAU(J),I,ND_MAX,TAU_MAX,
+	1           dLOG_TAU,V_SCL_FAC,'NONE',OBND_PARS,NUM_OBND_PARAMS,
+	1           R(J),V(J),TAU(J),ND-J+1)
 	  DO I=1,NEW_ND
 	     WRITE(82,*)I,REV_TAU(I)
 	  END DO
 	ELSE
-	  CALL DET_R_GRID_V1(REV_TAU,NEW_ND,ND_MAX,TAU_MAX,L_TRUE,R,V,TAU,ND)
+	  CALL DET_R_GRID_V2(REV_TAU,NEW_ND,ND_MAX,TAU_MAX,
+	1           dLOG_TAU,V_SCL_FAC,OUT_BND_OPT,OBND_PARS,NUM_OBND_PARAMS,
+	1           R,V,TAU,ND)
 	END IF
 !
 ! We now compute the revised R grid. We then interplate on Log (r^2.rho) which 
@@ -787,6 +849,12 @@ C
 	WRITE(6,*)'Done final inteprolation of atom density'
 !
 ! Compute revised velocity.
+!
+	IF(PLANE_PARALLEL_MOD)THEN
+	  T1=REFERENCE_RADIUS-REV_R(NEW_ND)
+	  R(1:ND)=R(1:ND)+T1
+	  REV_R(1:NEW_ND)=REV_R(1:NEW_ND)+T1
+	END IF
 !
 	IF(WIND_PRESENT .AND. USE_OLD_VEL)THEN
 	  REV_V(1:CONNECTION_INDX)=OLD_V(1:CONNECTION_INDX)
@@ -869,7 +937,7 @@ C
 	REAL*8 TEMP
 	REAL*8 ED_ON_NA
 	REAL*8 POP_ATOM
-	REAL*8 T1
+	REAL*8 T1,T2,T3
 !
 	CALL NEW_ESTIMATES(TAU,TEMP)
 !
@@ -878,7 +946,9 @@ C
 	ELSE
 	  T1=(10.0**LOGG)*(1.0D0-GAM_FULL)*(REFERENCE_RADIUS/R_EST)**2
 	END IF
-	dPdR=1.0D+10*T1*MU_ATOM*AMU*P/BC/TEMP/(1+ED_ON_NA)
+	T2=MDOT/MU_ATOM/POP_ATOM/R_EST/R_EST
+	T3=(T2/SOUND_SPEED)**2
+	dPdR=1.0D+10*T1*MU_ATOM*AMU*P/BC/TEMP/(1+ED_ON_NA)/(1.0D0-T3)
 	dTAUdR=ED_ON_NA*POP_ATOM*SIGMA_TH*ROSS_ON_ES
 !
 	WRITE(17,'(A,ES14.4)')'      P_EST=',P
@@ -939,7 +1009,7 @@ C
 	  INDX=INDX+1
 	END DO
 	IF(INDX .EQ. 1)THEN
-	  TEMP=TEMP						!Set outside routine
+	  TEMP=TEMP				!Ue passed value !OLD_SF(1)*TEFF
 	  ED_ON_NA_EST=OLD_ED(1)/OLD_POP_ATOM(1)
 	  ROSS_ON_ES=OLD_KAP_ROSS(1)/OLD_KAP_ESEC(1)
 	  GAM_FULL=GAM_EDD*(OLD_KAP_FLUX(1)/OLD_KAP_ESEC(1))*ED_ON_NA_EST

@@ -252,10 +252,12 @@ C
 	LOGICAL USE_J_REL
 	LOGICAL INCL_REL_TERMS
 	LOGICAL INCL_ADVEC_TERMS_IN_TRANS_EQ
+	LOGICAL WR_ION_LINE_FORCE
 C
 	REAL*8, ALLOCATABLE :: ETA_CMF_ST(:,:)
 	REAL*8, ALLOCATABLE :: CHI_CMF_ST(:,:)
 	REAL*8, ALLOCATABLE :: RJ_CMF_ST(:,:)
+	REAL*8, ALLOCATABLE :: ION_LINE_FORCE(:,:)
 C
 C
 C Variables, vectors and rrays for treating lines simultaneously with the
@@ -798,6 +800,9 @@ C
 	1        'Output CMF line-force multiplier as a function of depth? ')
 	  CALL RD_STORE_LOG(WRITE_SOB_FORCE,'WR_SOB_FORCE',L_TRUE,
 	1        'Output SOBOLEV line-force multiplier as a function of depth? ')
+	  WR_ION_LINE_FORCE=.FALSE.
+	  CALL RD_STORE_LOG(WR_ION_LINE_FORCE,'WR_ION_FORCE',L_FALSE,
+	1        'Output line-force multiplier as a function of ion & depth? ')
 	  CALL RD_STORE_LOG(WRITE_IP,'WR_IP',L_TRUE,
 	1        'Output I as a functio of p and frequency?')
 C
@@ -966,6 +971,7 @@ C
 !
 ! Memory and options in STORE are no longer required.
 !
+	  CLOSE(UNIT=LUMOD)
 	  CALL CLEAN_RD_STORE
 !
 C 
@@ -973,13 +979,15 @@ C
 ! Scale abunances of species if desired. This should only be done for exploratory
 ! spectral calculations, and only for IMPURITY species (i.e. not H or He).
 !
+	  K=0
 	  DO ISPEC=1,NUM_SPECIES
 	    IF(SPECIES_PRES(ISPEC) .AND. ABUND_SCALE_FAC(ISPEC) .NE. 1.0D0)THEN
-	      WRITE(LUER,'(A)')' '
-	      WRITE(LUER,'(A)')'******************Warning**********************'
-	      WRITE(LUER,'(A)')'Abundance of species ',TRIM(SPECIES(ISPEC)),' scaled'
-	      WRITE(LUER,'(A)')'******************Warning**********************'
-	      WRITE(LUER,'(A)')' '
+	      IF(K .EQ. 0)THEN
+	        WRITE(LUER,'(A)')' '
+	        WRITE(LUER,'(A)')'******************Warning**********************'
+	      END IF
+	      K=1
+	      WRITE(LUER,'(A,A,A)')'Abundance of species ',TRIM(SPECIES(ISPEC)),' scaled'
 	      AT_ABUND(ISPEC)=AT_ABUND(ISPEC)*ABUND_SCALE_FAC(ISPEC)
 	      POP_SPECIES(:,ISPEC)=POP_SPECIES(:,ISPEC)*ABUND_SCALE_FAC(ISPEC)
 	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
@@ -988,6 +996,10 @@ C
 	      END DO
 	    END IF
 	  END DO
+	  IF(K .NE. 0)THEN
+	    WRITE(LUER,'(A)')'******************Warning**********************'
+	    WRITE(LUER,'(A)')' '
+	  END IF
 !
 ! Evaluate constants used for level-dissolution calculations.
 !
@@ -2102,7 +2114,6 @@ C
 	  ML_FORCE=ML_FORCE+1
 	  NU_FORCE=NU_FORCE*NU_FORCE_FAC
 	END IF
-
 C
 C Compute the luminosity, the FLUX mean opacity, and the ROSSELAND
 C mean opacities.
@@ -2131,6 +2142,46 @@ C
 	  ROSSMEAN(I)=ROSSMEAN(I)+T2/CHI(I)
 	END DO
 	CALL TUNE(ITWO,'FLUX_DIST')
+!
+! Compute and output line force contributed by each species.
+!
+	IF(WR_ION_LINE_FORCE)THEN
+	  IF(.NOT. ALLOCATED(ION_LINE_FORCE))ALLOCATE (ION_LINE_FORCE(ND,NUM_IONS))
+	  IF(ML .EQ. 1)ION_LINE_FORCE=0.0D0
+	  DO SIM_INDX=1,MAX_SIM
+	    IF(RESONANCE_ZONE(SIM_INDX))THEN
+	      K=SIM_LINE_POINTER(SIM_INDX)
+	      DO ID=1,NUM_IONS
+	        IF(VEC_SPEC(K) .EQ. ION_ID(ID))THEN
+	          DO I=1,ND
+	            ION_LINE_FORCE(I,ID)=ION_LINE_FORCE(I,ID)+4.1274D-12*FQW(ML)*SOB(I)*
+	1                CHIL_MAT(I,SIM_INDX)*LINE_PROF_SIM(I,SIM_INDX)
+	          END DO
+	          EXIT
+	        END IF
+	      END DO
+	    END IF
+	  END DO
+	  IF(ML .EQ. NCF)THEN
+	    DO I=1,ND
+	       ION_LINE_FORCE(I,:)=ION_LINE_FORCE(I,:)/ESEC(I)/STARS_LUM
+	       TA(I)=FLUXMEAN(I)/ESEC(I)/STARS_LUM
+	    END DO
+	    OPEN(UNIT=LUIN,FILE='ION_LINE_FORCE',STATUS='UNKNOWN',ACTION='WRITE')
+	      WRITE(LUIN,'(A)')' '
+	      WRITE(LUIN,'(A)')' Summary of line force contributions by individual ions.'
+	      WRITE(LUIN,'(A)')' Ion contributions are expressed as a % of total radiation force.'
+	      WRITE(LUIN,'(A)')' At depth, continuum opacities will also be important.'
+	      WRITE(LUIN,'(A)')' '
+	      WRITE(LUIN,'(3X,A,500(A8)))')'d',' V(km/s)','    M(t)',(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
+	      DO I=1,ND
+	        WRITE(LUIN,'(I4,X,F8.3,500(F8.2))')I,V(I),TA(I),
+	1                    (100.0D0*ION_LINE_FORCE(I,ID)/TA(I),ID=1,NUM_IONS)
+	      END DO
+	      WRITE(LUIN,'(5X,8X,500(A8)))')(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
+	    CLOSE(LUIN)
+	  END IF
+	END IF
 C
 C The current opacities and emissivities are stored for the variation of the
 C radiation field at the next frequency.

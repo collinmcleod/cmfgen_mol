@@ -1,32 +1,39 @@
 ******************************************************************************
 
- Solar abundace ratios taken from "Allen's Astrophysical Quantities"
-  by A.N Cox (2000): Page 29:31
+  Column 5: Solar abundace ratios taken from "Allen's Astrophysical Quantities"
+            by A.N Cox (2000): Page 29:31. See references therein. Results differ
+            by up to about 20% from earlier tabulation.
 
- See references therein. Results differ by up to about 20%
- from earlier tabulation.
+  Column 6: Solar abundance ratios taken from Asplund, Greveese & Sauval, 2005,
+            ASP Conf. Ser., Cosmic Abundances as Records of Stellar Evolution
+            and Nucleosynthesis, ed F. N. Bash & T .G. Barnes
 
 *****************************************************************************
 
-  1.0D0   "H"   "Hydrogen"       1.0D0    12.0  
-  2.0D0	  "He"  "Helium"         4.0D0    11.0
-  6.0D0	  "C"   "Carbon"        12.0D0    8.56
-  7.0D0   "N"   "Nitrogen"      14.0D0    8.05
-  8.0D0	  "O"   "Oxygen"        16.0D0    8.93
- 10.0D0	  "Ne"  "Neon"          20.2D0    8.09
- 11.0D0	  "Na"  "Sodium"        23.0D0    6.33
- 12.0D0	  "Mg"  "Magnesium"     24.3D0    7.58
- 13.0D0	  "Al"  "Aluminium"     27.0D0    6.47
- 14.0D0	  "Si"  "Silicon"       28.1D0    7.55
- 15.0D0	  "P"   "Phosphorous"   31.0D0    5.45
- 16.0D0	  "S"   "Sulpher"       32.1D0    7.21
- 17.0D0   "Cl"  "Chlorine"      35.5D0    5.5
- 18.0D0   "Ar"  "Argon"         39.9D0    6.56
- 19.0D0   "K"   "Potassium"     39.1D0    5.12
- 20.0D0   "Ca"  "Calcium"       40.1D0    6.34
- 22.0D0   "Ti"  "Titanium"      47.9D0    4.99
- 24.0D0   "Cr"  "Chromium"      52.0D0    5.67
- 25.0D0   "Mn"  "Maganese"      54.9D0    5.39
- 26.0D0	  "Fe"  "Iron"          55.8D0    7.54
- 27.0D0	  "Co"  "Cobalt"        58.9D0    4.92
- 28.0D0	  "Ni"  "Nickel"        58.7D0    6.25
+  2            !Number of abundance columns
+
+  1.0D0   "H"   "Hydrogen"       1.0D0    12.0    12.0 
+  2.0D0	  "He"  "Helium"         4.0D0    11.0    11.0
+  6.0D0	  "C"   "Carbon"        12.0D0    8.56    8.39
+  7.0D0   "N"   "Nitrogen"      14.0D0    8.05    7.78
+  8.0D0	  "O"   "Oxygen"        16.0D0    8.93    8.66
+  9.0D0   "F"   "Fluorine"      19.00D0   0.00    4.56
+ 10.0D0	  "Ne"  "Neon"          20.2D0    8.09    7.84
+ 11.0D0	  "Na"  "Sodium"        23.0D0    6.33    6.17
+ 12.0D0	  "Mg"  "Magnesium"     24.3D0    7.58    7.53
+ 13.0D0	  "Al"  "Aluminium"     27.0D0    6.47    6.37
+ 14.0D0	  "Si"  "Silicon"       28.1D0    7.55    7.51
+ 15.0D0	  "P"   "Phosphorous"   31.0D0    5.45    5.36
+ 16.0D0	  "S"   "Sulpher"       32.1D0    7.21    7.14
+ 17.0D0   "Cl"  "Chlorine"      35.5D0    5.5     5.50
+ 18.0D0   "Ar"  "Argon"         39.9D0    6.56    6.18
+ 19.0D0   "K"   "Potassium"     39.1D0    5.12    5.08
+ 20.0D0   "Ca"  "Calcium"       40.1D0    6.34    6.31
+ 21.0D0   "Sc"  "Scandium"      44.96D0   0.00    3.05
+ 22.0D0   "Ti"  "Titanium"      47.88D0   4.99    4.90
+ 23.00    "V"   "Vandium"       50.94D0   0.00    4.00
+ 24.0D0   "Cr"  "Chromium"      52.0D0    5.67    5.64
+ 25.0D0   "Mn"  "Maganese"      54.9D0    5.39    5.39
+ 26.0D0	  "Fe"  "Iron"          55.8D0    7.54    7.45
+ 27.0D0	  "Co"  "Cobalt"        58.9D0    4.92    4.92
+ 28.0D0	  "Ni"  "Nickel"        58.7D0    6.25    6.23

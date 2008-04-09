@@ -35,6 +35,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(vectorpen.o)\
       $(LIB)(gaus_fit_data.o)\
       $(LIB)(do_gaus_fit.o)\
+      $(LIB)(wr_gaus_fit.o)\
       $(LIB)(gaus_fit_func.o)
 
 all : $(LIB)
@@ -63,6 +64,7 @@ $(LIB)(gramon_pgplot.o)   : gramon_pgplot.f $(LIB)(mod_curve_data.o) $(GEN)
 $(LIB)(curve.o)           : curve.f         $(LIB)(mod_curve_data.o) $(GEN)
 $(LIB)(vectorpen.o)       : vectorpen.f     $(LIB)(mod_curve_data.o) $(GEN)
 
+$(LIB)(wr_gaus_fit.o)     : wr_gaus_fit.f   $(LIB)(gaus_fit_data.o)
 $(LIB)(do_gaus_fit.o)     : do_gaus_fit.f   $(LIB)(gaus_fit_data.o)
 $(LIB)(do_mult_gf.o)      : do_mult_gf.f    $(LIB)(gaus_fit_data.o)
 $(LIB)(gaus_fit_func.o)   : gaus_fit_func.f $(LIB)(gaus_fit_data.o)

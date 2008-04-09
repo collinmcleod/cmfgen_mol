@@ -12,6 +12,7 @@
 !
 	INTEGER N_T,I_T
 	INTEGER N_D,I_D
+	INTEGER LUER
 !
 	LOGICAL, SAVE :: FIRST_TIME=.TRUE.
 !
@@ -30,49 +31,54 @@
 !
 	REAL*8 T1,T2
 	REAL*8 D1,D2
+	INTEGER LU
+	INTEGER ERROR_LU
+	EXTERNAL ERROR_LU
 	CHARACTER*132 STRING
 !
+	LU=10
 	IF(FIRST_TIME)THEN
-	  OPEN(UNIT=10,FILE='ROSSELAND_LTE_TAB',STATUS='OLD',ACTION='READ')
+	  LUER=ERROR_LU()
+	  OPEN(UNIT=LU,FILE='ROSSELAND_LTE_TAB',STATUS='OLD',ACTION='READ')
 	    STRING=' '
 	    DO WHILE(STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ')
-	      READ(10,'(A)')STRING
+	      READ(LU,'(A)')STRING
 	    END DO
 	    IF(INDEX(STRING,'!Number of temperatures') .NE. 0)THEN
 	      READ(STRING,*)N_T
 	    ELSE IF(INDEX(STRING,'!Number of densities') .NE. 0)THEN
 	      READ(STRING,*)N_D
 	    ELSE
-	      WRITE(6,*)'Error reading ROSSELAND_LTE_TAB'
-	      WRITE(6,*)'Unrecognized record'
-	      WRITE(6,'(A)')TRIM(STRING)
+	      WRITE(LUER,*)'Error reading ROSSELAND_LTE_TAB'
+	      WRITE(LUER,*)'Unrecognized record'
+	      WRITE(LUER,'(A)')TRIM(STRING)
 	      STOP
 	    END IF
 	    STRING=' '
 	    DO WHILE(STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ')
-	      READ(10,'(A)')STRING
+	      READ(LU,'(A)')STRING
 	    END DO
 	    IF(INDEX(STRING,'Number of temperatures') .NE. 0)THEN
 	      READ(STRING,*)N_T
 	    ELSE IF(INDEX(STRING,'Number of densities') .NE. 0)THEN
 	      READ(STRING,*)N_D
 	    ELSE
-	      WRITE(6,*)'Error reading ROSSELAND_LTE_TAB'
-	      WRITE(6,*)'Unrecognized record'
-	      WRITE(6,'(A)')TRIM(STRING)
+	      WRITE(LUER,*)'Error reading ROSSELAND_LTE_TAB'
+	      WRITE(LUER,*)'Unrecognized record'
+	      WRITE(LUER,'(A)')TRIM(STRING)
 	      STOP
 	    END IF
 	    STRING=' '
 	    DO WHILE(STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ')
-	      READ(10,'(A)')STRING
+	      READ(LU,'(A)')STRING
 	    END DO
-	    BACKSPACE(10)
+	    BACKSPACE(LU)
 !
 	    IF(N_D .EQ. 0)THEN
-	      WRITE(6,*)'Error reading N_D from ROSSELAND_LTE_TAB'
+	      WRITE(LUER,*)'Error reading N_D from ROSSELAND_LTE_TAB'
 	      STOP
 	    ELSE IF(N_T .EQ. 0)THEN
-	      WRITE(6,*)'Error reading N_T from ROSSELAND_LTE_TAB'
+	      WRITE(LUER,*)'Error reading N_T from ROSSELAND_LTE_TAB'
 	      STOP
 	    END IF
 !
@@ -87,23 +93,23 @@
 !
 	    DO I_D=1,N_D
 	      DO I_T=1,N_T
-	        READ(10,*)TEMP(I_T),RHO(I_D),POP_ATOM(I_T,I_D),ED(I_T,I_D),
+	        READ(LU,*)TEMP(I_T),RHO(I_D),POP_ATOM(I_T,I_D),ED(I_T,I_D),
 	1                 CHI(I_T,I_D),ESEC(I_T,I_D),
 	1                 KAP(I_T,I_D),KES(I_T,I_D)
 	      END DO
 	    END DO
 !
-	  CLOSE(UNIT=10)
+	  CLOSE(UNIT=LU)
 !
 	  FIRST_TIME=.FALSE.
 	END IF
 !
 	DENSITY=ATOM_DEN*RHO(1)/POP_ATOM(1,1)
 	IF(DENSITY .GT. RHO(N_D))THEN
-	   WRITE(6,*)'Error in GET_LTE_ROSS_V2'
-	   WRITE(6,*)'Density outside range'
-	   WRITE(6,*)'Maximum density=',RHO(N_D)
-	   WRITE(6,*)'Requested =',DENSITY
+	   WRITE(LUER,*)'Error in GET_LTE_ROSS_V2'
+	   WRITE(LUER,*)'Density outside range'
+	   WRITE(LUER,*)'Maximum density=',RHO(N_D)
+	   WRITE(LUER,*)'Requested =',DENSITY
 	   STOP
 	END IF
 	I_D=1
@@ -112,22 +118,19 @@
 	END DO
 !
 	IF(TVAL .GT. TEMP(N_T))THEN
-	   WRITE(6,*)'Error in GET_LTE_ROSS_V2'
-	   WRITE(6,*)'Temperature outside range'
-	   WRITE(6,*)'Maximum temperature=',TEMP(N_T)
-	   WRITE(6,*)'Requested temperature=',TVAL
+	   WRITE(LUER,*)'Error in GET_LTE_ROSS_V2'
+	   WRITE(LUER,*)'Temperature outside range'
+	   WRITE(LUER,*)'Maximum temperature=',TEMP(N_T)
+	   WRITE(LUER,*)'Requested temperature=',TVAL
 	   STOP
 	END IF
 	I_T=1
 	DO I_T=2,N_T
 	  IF(TVAL .LT. TEMP(I_T))EXIT
 	END DO
-	WRITE(6,*)I_T,I_D
 	IF(I_T .GT. N_T)I_T=N_T-1
 !
-	WRITE(6,*)TVAL,TEMP(I_T-1),TEMP(I_T)
 	T1=LOG(TEMP(I_T)/TVAL)/LOG(TEMP(I_T)/TEMP(I_T-1))
-	WRITE(6,*)DENSITY,RHO(I_D-1),RHO(I_D)
 	T2=LOG(RHO(I_D)/DENSITY)/LOG(RHO(I_D)/RHO(I_D-1))
 !
 	D1=T1*LOG(KAP(I_T-1,I_D-1))+(1.0D0-T1)*LOG(KAP(I_T,I_D-1))

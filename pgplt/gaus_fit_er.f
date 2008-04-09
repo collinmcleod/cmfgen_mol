@@ -32,9 +32,9 @@
 ! Conservative error estimate based on fit quality. We use abs value, with 1.0-03 of
 ! line center. Possible influence of multiple lines is ignored.
 !
-	IF(ALLOCATED(EW_ERROR))DEALLOCATE(EW_ERROR)
-	ALLOCATE (EW_ERROR(NUM_GAUS))
-	EW_ERROR(1:NUM_GAUS)=0.0D0
+	IF(ALLOCATED(EW_ERROR))DEALLOCATE(EW_ERROR,ALT_ERROR,MIN_ERROR)
+	ALLOCATE (EW_ERROR(NUM_GAUS),ALT_ERROR(NUM_GAUS),MIN_ERROR(NUM_GAUS))
+	EW_ERROR(:)=0.0D0; ALT_ERROR(:)=0.0D0; MIN_ERROR(:)=0.0D0
 	DO J=1,NG_DATA
 	  DO I=1,NUM_GAUS
 	    K=3+4*(I-1)
@@ -43,9 +43,17 @@
 	      EW_ERROR(I)=EW_ERROR(I)+(X_GAUS(MIN(J+1,NG_DATA))-X_GAUS(MAX(1,J-1)))*
 	1                ABS(Y_GAUS(J)-YFIT(J))
 	    END IF
+	    IF(ABS((X_GAUS(J)-PARAMS(K))/PARAMS(K+1)) .LT. 4)THEN
+	      ALT_ERROR(I)=ALT_ERROR(I)+(X_GAUS(MIN(J+1,NG_DATA))-X_GAUS(MAX(1,J-1)))*
+	1                ABS(Y_GAUS(J)-YFIT(J))
+	      MIN_ERROR(I)=MIN_ERROR(I)+(X_GAUS(MIN(J+1,NG_DATA))-X_GAUS(MAX(1,J-1)))*
+	1                (Y_GAUS(J)-YFIT(J))
+	    END IF
 	  END DO
 	END DO
 	EW_ERROR=0.5D0*EW_ERROR
+	ALT_ERROR=0.5D0*ALT_ERROR
+	MIN_ERROR=0.5D0*ABS(MIN_ERROR)
 !
 	RETURN
 	END

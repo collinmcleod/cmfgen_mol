@@ -36,14 +36,13 @@ C
 C Input model parameters and modelling specifications.
 C
 	  WRITE(LUSCR,'()')
-	  CALL RD_STORE_DBLE(RP,'RSTAR',L_TRUE,
-	1           'Stellar radius (in 10^10 cm)')
-	  CALL RD_STORE_DBLE(RMAX,'RMAX',L_TRUE,
-	1           'Maximum radius (in R*)')
+	  CALL RD_STORE_DBLE(RP,'RSTAR',L_TRUE,'Stellar radius (in 10^10 cm)')
+	  CALL RD_STORE_DBLE(RMAX,'RMAX',L_TRUE,'Maximum radius (in R*)')
 	  RMAX=RMAX*RP
-C
-	  CALL RD_STORE_INT(VELTYPE,'VEL_LAW',L_TRUE,
-	1           'Velocity Law to be used')
+	  DO_HYDRO=.FALSE.
+	  CALL RD_STORE_LOG(DO_HYDRO,'DO_HYDRO',L_FALSE,'Adjust hydrostatic structure')
+!
+	  CALL RD_STORE_INT(VELTYPE,'VEL_LAW',L_TRUE,'Velocity Law to be used')
 	  IF(VELTYPE .EQ. 1 .OR. VELTYPE .EQ. 2)THEN
 	    CALL RD_STORE_DBLE(VRP,'VRP',L_TRUE,'First velocity component')
 	    CALL RD_STORE_DBLE(RN,'RN',L_TRUE,' ')
@@ -173,6 +172,13 @@ C
 	    CALL RD_STORE_DBLE(RMDOT,'MDOT',L_TRUE,'Mass Loss rate (Msun/yr) ')
 	  END IF
 	  CALL RD_STORE_DBLE(LUM,'LSTAR',L_TRUE,'Stellar luminosity (Lsun)')
+	  IF(DO_HYDRO)THEN
+	    CALL RD_STORE_DBLE(TEFF,'TEFF',L_TRUE,'Effective temperature (10^4 K)')
+	    CALL RD_STORE_DBLE(LOGG,'LOGG',L_TRUE,'Log surface gravity (cgs units)')
+	    CALL RD_STORE_DBLE(V_BETA1,'BETA',L_TRUE,'Beta exponent for velocity law')
+	    PRESSURE_VTURB=0.0D0
+	    CALL RD_STORE_DBLE(PRESSURE_VTURB,'P_VTURB',L_FALSE,'Beta exponent for velocity law')
+	  END IF
 	  CALL RD_STORE_DBLE(STARS_MASS,'MASS',L_TRUE,'Stellar mass (Msun)')
 C
 C All clumping parameters are read in, even when CLUMPING is switched off.
@@ -696,14 +702,17 @@ C
 	1    'Compute line continuum intensity using Eddington factors')
 !
 	  PLANE_PARALLEL_NO_V=.FALSE.
-	  CALL RD_STORE_LOG(PLANE_PARALLEL_NO_V,'PP_NOV',L_FALSE,
-	1    'Plane-paralle geometry WITHOUT velocity field?')
 	  PLANE_PARALLEL=.FALSE.
-	  CALL RD_STORE_LOG(PLANE_PARALLEL,'PP_MOD',L_FALSE,
-	1    'Plane-paralle geometry with velocity field?')
+	  CALL RD_STORE_LOG(PLANE_PARALLEL_NO_V,'PP_NOV',L_FALSE,'Plane-paralle geometry WITHOUT velocity field?')
+	  CALL RD_STORE_LOG(PLANE_PARALLEL,'PP_MOD',L_FALSE,'Plane-paralle geometry with velocity field?')
+	  IF(PLANE_PARALLEL_NO_V .AND. PLANE_PARALLEL)THEN
+	    WRITE(LUER,*)'Error in control parameters in VADAT'
+	    WRITE(LUER,*)'PP_NOV and PP_MOD cannot both be true at the sdame time'
+	    STOP
+	  END IF
+!
 	  INCL_DJDT_TERMS=.FALSE.
-	  CALL RD_STORE_LOG(INCL_DJDT_TERMS,'INCL_DJDT',L_FALSE,
-	1    'DJDt terms in transfer equaton for SN models?')
+	  CALL RD_STORE_LOG(INCL_DJDT_TERMS,'INCL_DJDT',L_FALSE,'DJDt terms in transfer equaton for SN models?')
 	  IF(INCL_DJDT_TERMS)THEN
 	    USE_DJDT_RTE=.TRUE.
 	  ELSE
@@ -719,10 +728,8 @@ C
 	  USE_J_REL=.FALSE.
 	  INCL_REL_TERMS=.FALSE.
 	  INCL_ADVEC_TERMS_IN_TRANS_EQ=.FALSE.
-	  CALL RD_STORE_LOG(USE_J_REL,'USE_J_REL',L_FALSE,
-	1    'Use MOM_J_REL_VN to solve the moment equations?')
-	  CALL RD_STORE_LOG(INCL_REL_TERMS,'INCL_REL',USE_J_REL,
-	1    'Include relativistic terms in the transfer equaton?')
+	  CALL RD_STORE_LOG(USE_J_REL,'USE_J_REL',L_FALSE,'Use MOM_J_REL_VN to solve the moment equations?')
+	  CALL RD_STORE_LOG(INCL_REL_TERMS,'INCL_REL',USE_J_REL,'Include relativistic terms in the transfer equaton?')
 	  IF(INCL_REL_TERMS .AND. .NOT. USE_J_REL)THEN
 	    WRITE(LUER,*)'Error in control parameters in VADAT'
 	    WRITE(LUER,*)'Can only include relativistic terms if USE_J_REL is set to TRUE'
@@ -734,6 +741,16 @@ C
 	  IF(INCL_ADVEC_TERMS_IN_TRANS_EQ .AND. .NOT. USE_J_REL)THEN
 	    WRITE(LUER,*)'Error in control parameters in VADAT'
 	    WRITE(LUER,*)'Can only include advection terms in transfer equation if USE_J_REL is set to TRUE'
+	    STOP
+	  END IF
+	  IF(USE_DJDT_RTE .AND. USE_J_REL)THEN
+	    WRITE(LUER,*)'Error in control parameters in VADAT'
+	    WRITE(LUER,*)'USE_DJDT_RTE and USE_J_REL cannot be TRUE at the same time'
+	    STOP
+	  END IF
+	  IF( (PLANE_PARALLEL .OR. PLANE_PARALLEL_NO_V) .AND. (USE_DJDT_RTE .OR. USE_J_REL) )THEN
+	    WRITE(LUER,*)'Error in control parameters in VADAT'
+	    WRITE(LUER,*)'USE_DJDT_RET and USE_J_REL cannot be TRUE at the same time'
 	    STOP
 	  END IF
 !

@@ -107,7 +107,12 @@
 	CHARACTER*10 INC_ID(10)
 	INTEGER N_OMIT_ID
 	INTEGER N_INC_ID
+	LOGICAL AIR_WAVELENGTHS
 	LOGICAL WR_ID
+	LOGICAL DRAW_GAUSS_HARD
+	EXTERNAL LAM_AIR
+	REAL*8 LAM_AIR
+	REAL*8 DP_T1
 !
 ! String arrays (not labels or titles)
 !
@@ -259,6 +264,7 @@
 	N_OMIT_ID=0
 	N_INC_ID=0
 	DO_BORDER=.TRUE.
+	DRAW_GAUSS_HARD=.FALSE.
 !
 ! Define character strings for switching between VT and TEK modes.
 !
@@ -307,6 +313,7 @@
 	CENTRAL_LAM=1548.20			!CIV
 	OLD_CENTRAL_LAM=0.0D0
 	CONTINUUM_DEFINED=.FALSE.
+	AIR_WAVELENGTHS=.FALSE.
 	PLOT_ID=1
 !
 	YPAR_R_AX(1)=0.0D0 ; YPAR_R_AX(2)=0.0D0
@@ -1220,6 +1227,7 @@ C
 	  J=0
 	  CALL NEW_GEN_IN(TAU_CUT,'Omit lines with central optical depth <')
 	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs')
+	  CALL NEW_GEN_IN(AIR_WAVELENGTHS,'Air wavelengths?')
 	  CALL SET_CASE_UP(ID_FILNAME,1,0)
           OPEN(UNIT=33,FILE=TRIM(ID_FILNAME),STATUS='OLD',IOSTAT=IOS)
 	  IF(IOS .EQ. 0)THEN
@@ -1230,6 +1238,10 @@ C
 	    BACKSPACE(33)
 	    DO WHILE(J+1 .LE. 5000)
 	      READ(33,*,END=1500)LINE_ID(J+1),ID_WAVE(J+1),TAU(J+1),ID_WAVE_OFF(J+1),ID_Y_OFF(J+1)
+	      IF(AIR_WAVELENGTHS)THEN
+	         DP_T1=ID_WAVE(J+1)
+	         ID_WAVE(J+1)=LAM_AIR(DP_T1)
+	      END IF
 	      IF( (ID_WAVE(J+1)-XPAR(1))*(XPAR(2)-ID_WAVE(J+1)) .GT. 0 .AND.
 	1                   TAU(J+1) .GT. TAU_CUT)THEN
 	         J=J+1
@@ -1316,7 +1328,12 @@ C
 	  GOTO 1000
 C
 	ELSE IF(ANS .EQ. 'GF')THEN
+	  DRAW_GAUSS_HARD=.TRUE.
 	  CALL DO_GAUS_FIT(XPAR(1),XPAR(2))
+	  GOTO 1000
+!
+	ELSE IF(ANS .EQ. 'WGF')THEN
+	  CALL WR_GAUS_FIT
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'MGF')THEN
@@ -2259,6 +2276,10 @@ C
 !
 	END DO
 	CALL PGSLW(PLT_LINE_WGT)
+!
+! Draw Gaussian fits if needed.
+!
+	IF(HARD .AND. DRAW_GAUSS_HARD)CALL DRAW_GAUS()
 !
 ! Draw error bars if required.
 !

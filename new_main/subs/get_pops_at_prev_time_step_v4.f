@@ -130,12 +130,12 @@
 !
 ! From now on the OLD models has the same length as the new model: ND
 !
-! When using more sophisticated expansion laws. A change will also need to be made
-! to the nomalization section.
+! The following works for an arbitrary expansion factor.
 !
 	IF(DO_ADVECT)THEN
-	  T1=(OLD_R(ND)/R(ND))**3
-	  OLD_POPS(1:NT-1,:)=OLD_POPS(1:NT-1,:)*T1
+	  DO I=1,ND
+	    OLD_POPS(1:NT-1,I)=OLD_POPS(1:NT-1,I)/VOL_EXP_FAC(I)
+	  END DO
 	END IF
 !
 ! Adjust the populations for radioactive decays.
@@ -146,10 +146,17 @@
 !
 ! Normalize the populations to ensure continuity equation is satisfied.
 ! This removes any slight variations introduced by the non-monotonic
-! interpolation. It should not be done if radioactive decayse are important,
-! and DO_RAD_DECAYS is false.
+! interpolation, rounding errors, and the numerical accuracy of the
+! data files used for input. The normalization should not be done if
+! radioactive decays are important and DO_RAD_DECAYS is false.
 !
 	IF(NORMALIZE_POPS)THEN
+	  IF(.NOT. DO_RAD_DECAYS)THEN
+	    LUER=ERROR_LU()
+	    WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V4' 
+	    WRITE(LUER,*)'You should not normalize pops when DO_RAD_DECAYS is FALSE.'
+	    STOP
+	  END IF
 	  DO ISPEC=1,NUM_SPECIES
 	    DO J=1,ND
 	      T2=0.0D0
@@ -164,12 +171,12 @@
 	        K=ATM(ID)%EQXzV+ATM(ID)%NXzV
 	        T2=T2+OLD_POPS(K,J)
 !
-! Can now do the normalization. Only valid for a Hubble flow.
+! Can now do the normalization. Valid for all expansion laws.
 !
 	        IF(DO_ADVECT)THEN
 	          T2=POP_SPECIES(J,ISPEC)/T2
 	        ELSE
-	          T2=POP_SPECIES(J,ISPEC)/T2*(R(ND)/OLD_R(ND))**3
+	          T2=POP_SPECIES(J,ISPEC)*VOL_EXP_FAC(I)/T2
 	        END IF
 	        DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	          DO I=1,ATM(ID)%NXzV

@@ -8,6 +8,8 @@
 	PROGRAM MOD_COOL
 	IMPLICIT NONE
 !
+! Altered: 08-Feb-2008: Extra terms (such as V term) sheck and output.
+!
 	INTEGER, PARAMETER :: MAX_RECS=1000
 !
 	CHARACTER*132 TMP_STR
@@ -71,6 +73,30 @@
 	        K=INDEX(TMP_STR,' ')
 	        READ(20,'(A)')STRING
 	        WRITE(21,'(A,T10,A)')TMP_STR(1:K)//'XKS ',TRIM(STRING)
+	      ELSE IF( INDEX(STRING,'V term') .NE. 0)THEN
+	        TMP_STR=STRING
+	        TMP_STR=ADJUSTL(TMP_STR)
+	        K=INDEX(TMP_STR,' ')
+	        READ(20,'(A)')STRING
+	        WRITE(21,'(A,T10,A)')'AC.R(V).',TRIM(STRING)
+	      ELSE IF( INDEX(STRING,'dTdR term') .NE. 0)THEN
+	        TMP_STR=STRING
+	        TMP_STR=ADJUSTL(TMP_STR)
+	        K=INDEX(TMP_STR,' ')
+	        READ(20,'(A)')STRING
+	        WRITE(21,'(A,T10,A)')'AC.R(dT).',TRIM(STRING)
+	      ELSE IF( INDEX(STRING,'decay') .NE. 0)THEN
+	        TMP_STR=STRING
+	        TMP_STR=ADJUSTL(TMP_STR)
+	        K=INDEX(TMP_STR,' ')
+	        READ(20,'(A)')STRING
+	        WRITE(21,'(A,T10,A)')'R. decay',TRIM(STRING)
+	      ELSE IF( INDEX(STRING,'Artificial') .NE. 0)THEN
+	        TMP_STR=STRING
+	        TMP_STR=ADJUSTL(TMP_STR)
+	        K=INDEX(TMP_STR,' ')
+	        READ(20,'(A)')STRING
+	        WRITE(21,'(A,T10,A)')'Art. HT',TRIM(STRING)
 	      ELSE IF( INDEX(STRING,'Rate') .NE. 0)THEN
 	        TMP_STR=STRING
 	        TMP_STR=ADJUSTL(TMP_STR)
@@ -113,11 +139,11 @@
 	WRITE(6,'(A)')' '
 	WRITE(6,'(A)')'Cooling data has been written to GENCOOL_SUM'
 	WRITE(6,'(A)')'Will now sort data to display most important terms'
-	WRITE(6,'(A)')' '
+	WRITE(6,'(A)')'12 records is a reasonable number to output '
 !
 	OPEN(UNIT=20,FILE='GENCOOL_SUM',STATUS='UNKNOWN',ACTION='READ')
 	OPEN(UNIT=21,FILE='GENCOOL_SORT',STATUS='UNKNOWN',ACTION='WRITE')
-	WRITE(6,'(A)',ADVANCE='NO')'Input maximum number of recors to be output to sorted file: '
+	WRITE(6,'(A)',ADVANCE='NO')'Input maximum number of records per depth to be output to sorted file: '
 	READ(5,*)NRECS
 !
 	N_INIT_RECS=5

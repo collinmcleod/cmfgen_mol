@@ -34,8 +34,9 @@
 !
 	DO WHILE(1 .EQ. 1)
 !
+	  WRITE(6,'(A,4(8X,A))')'Index','  Lambda','  Height','Sigma(a)','Exponent'
 	  DO K=3,NG_PAR,4
-	    WRITE(6,'(I4,4ES16.6)')1+(K-3)/4,TMP_PAR(K),TMP_PAR(K+2),TMP_PAR(K+1),TMP_PAR(K+3)
+	    WRITE(6,'(I5,4ES16.6)')1+(K-3)/4,TMP_PAR(K),TMP_PAR(K+2),TMP_PAR(K+1),TMP_PAR(K+3)
 	  END DO
 	  IP=0
 	  IF(NG_PAR .EQ. NG_PAR_MAX)THEN

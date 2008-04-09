@@ -217,7 +217,8 @@
 	REAL*8 LAM_ST,LAM_EN,DEL_NU
 	REAL*8 NU_ST,NU_EN
 	REAL*8 FREQ_RES,FREQ_MAX
-	REAL*8 T1,T2,T3,TMP_ED
+	REAL*8 T1,T2,T3,T4
+	REAL*8 TMP_ED
 	REAL*8 TAU_LIM
 	REAL*8 TEMP,TSTAR,NEW_RSTAR,NEW_VSTAR
 	REAL*8 VSM_DIE_KMS
@@ -352,9 +353,10 @@
 	FIRST_RATE=.TRUE.
 !
 	XRAYS=.TRUE.                    !Changed def .FALSE.
-	FILL_FAC_XRAYS=1.0D0
+	FILL_FAC_XRAYS=1.0D-100
 	T_SHOCK=300.0D0
 	V_SHOCK=200.0D0
+	FILL_VEC_SQ(:)=0.0D0
 !
 	LEVEL_DISSOLUTION=.TRUE.
 	PI=FUN_PI()
@@ -4217,8 +4219,7 @@ c
 	    LAM_ST=ANG_TO_HZ/LAM_ST
 	    LAM_EN=ANG_TO_HZ/LAM_EN
 	  END IF
-	  CALL USR_OPTION(NFREQ,'NPTS','10',
-	1      '+ve lin. spacing, -ve log')
+	  CALL USR_OPTION(NFREQ,'NPTS','10','+ve lin. spacing, -ve log')
 !
 	  IF(NFREQ .LT. 0)THEN
 	    LINX=.FALSE.
@@ -4283,7 +4284,7 @@ c
 	      WRITE(LU_OUT,'(A)')' Kappa Table (cm^2/gm)'
 	  ELSE IF(XOPT .EQ. 'TAUR')THEN
 	    CALL USR_OPTION(RVAL,'RAD',' ','Radius in R* (-ve for depth index)')
-	    IF(RVAL .LT. 0)THEN
+	    IF(RVAL .GT. 0)THEN
 	      RVAL=RVAL*R(ND)
 	      IF(RVAL .GT. R(1))RVAL=R(1)
 	      IF(RVAL .LT. R(ND))RVAL=R(ND)
@@ -4298,6 +4299,8 @@ c
 	      R_INDX=MIN(R_INDX,ND-1)
 	      RVAL=R(R_INDX)
 	    END IF
+	    WRITE(6,*)'   RVAL is',RVAL
+	    WRITE(6,*)'RVAL/R* is',RVAL/R(ND)
 	    YAXIS='Log(\gt[R])'
 	    IF(LINY)YAXIS='\gt[R]'
 	  ELSE
@@ -4825,7 +4828,9 @@ c
 	    WRITE(LU_OUT,'(F18.8,ES17.7,F17.7,4X,I4)')R(I),V(I),SIGMA(I),I
 	  END DO
 	  CLOSE(LU_OUT)
-	  WRITE(T_OUT)'RVSIG data output to NEW_RVSIG'
+	  WRITE(T_OUT,'(A,ES17.10)')'     R(ND)=',R(ND)
+	  WRITE(T_OUT,'(A,ES17.10)')'RMAX/R(ND)=',R(1)/R(ND)
+	  WRITE(T_OUT,'(A)')'RVSIG data output to NEW_RVSIG'
 	ELSE IF(XOPT .EQ. 'WRPLOT')THEN
 	  WRITE(T_OUT,*)' OPTION `WRPLOT` NOT AVAILABLE'
 	  WRITE(T_OUT,*)' Use WP option in plot package'

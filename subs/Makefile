@@ -5,6 +5,8 @@ include ../Makefile_definitions
 LIB=$(LIB_DIR)libsubs.a
 LIB_MOD=$(LIB_DIR)libmod.a
 
+OPTION=$(FG)
+
 #
 # Entries for library
 #
@@ -73,7 +75,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(hydanggaunt.o)\
       $(LIB)(hydcrossl.o)\
       $(LIB)(hydro_terms.o)\
-      $(LIB)(hydro_terms_v2.o)\
+      $(LIB)(hydro_terms_v3.o)\
       $(LIB)(hyper.o)\
       $(LIB)(ichrlen.o)\
       $(LIB)(impar.o)\
@@ -261,7 +263,7 @@ $(LIB) : $(OBJ)
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f 
-	$(F90) -c $(FG)  $<
+	$(F90) -c $(OPTION)  $<
 	ar ruv $(LIB) $*.o
 
 # 
@@ -271,15 +273,15 @@ $(LIB)(%.o) : %.f
 DIS=$(LIB_MOD)(mod_lev_dis_blk.o)
 
 $(LIB)(baion_update.o) : baion_update.f $(LIB)(ba_update_v4.o) 
-	$(F90) -c $(FG) baion_update.f
+	$(F90) -c $(OPTION) baion_update.f
 	ar ruv $(LIB) baion_update.o
 
 $(LIB)(dspheredchi.o) : dspheredchi.f $(LIB)(mod_trap_derivatives.o) 
-	$(F90) -c $(FG) dspheredchi.f
+	$(F90) -c $(OPTION) dspheredchi.f
 	ar ruv $(LIB) dspheredchi.o
 
 $(LIB)(occupation_prob.o) : occupation_prob.f $(DIS)
-	$(F90) -c $(FG) occupation_prob.f
+	$(F90) -c $(OPTION) occupation_prob.f
 	ar ruv $(LIB) occupation_prob.o
 
 $(DIS):

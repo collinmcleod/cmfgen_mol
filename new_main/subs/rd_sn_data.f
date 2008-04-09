@@ -9,6 +9,9 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 12-Feb-2008: Fixed pop in calculation of POP_ATOM (only counts species present).
+!                      Now set species not present to have zero populaton.
+!
 	INTEGER LU
 	INTEGER ND
 	LOGICAL NEW_MODEL
@@ -161,9 +164,10 @@
 	  DENSITY_HYDRO=DENSITY_HYDRO/(SN_EXP_FACTOR**3)
 	  ATOM_DEN_HYDRO=ATOM_DEN_HYDRO/(SN_EXP_FACTOR**3)
 	  ELEC_DEN_HYDRO=ELEC_DEN_HYDRO/(SN_EXP_FACTOR**3)
+	  VOL_EXP_FAC(1:ND)=(SN_EXP_FACTOR**3)
 	ELSE
 	  WRITE(LUER,*)'Error in RD_SN_DATA'
-	  WRITE(LUER,*)'Code presently assumes a pure Hubble law expansion'
+	  WRITE(LUER,*)'RD_SN_DATA presently assumes a pure Hubble law expansion'
 	  STOP
 	END IF
 !
@@ -225,11 +229,18 @@
 	END DO
 	WRITE(LUER,*)'Read SN isotope populations in RD_SN_DATA'
 !
-! Ensure mass-fractions sum to unity.
+! Ensure mass-fractions sum to unity. Two options: scale either
+! the mass-fractions or the density. Here we scale the mass-fractions.
+! To avoid possible confusion, we only allow for species explicitly
+! included in the model.
 !
 	WRK(:)=0.0D0
 	DO L=1,NUM_SPECIES
-	  WRK(:)=WRK(:)+POP_SPECIES(:,L)
+	  IF(SPECIES_PRES(L))THEN
+	    WRK(:)=WRK(:)+POP_SPECIES(:,L)
+	  ELSE
+	    POP_SPECIES(:,L)=0.0D0
+	  END IF
 	END DO
 	DO L=1,NUM_SPECIES
 	  POP_SPECIES(:,L)=POP_SPECIES(:,L)/WRK(:)
@@ -248,6 +259,7 @@
 	END DO
 !
 ! Ensure isotope populations sum exactly to total species population
+! Isotope populations of species not-present get set to zero.
 !
 	DO IP=1,NUM_PARENTS
 	  WRK(1:ND)=0.0D0
@@ -258,7 +270,11 @@
 	  END DO
 	  DO IS=1,NUM_ISOTOPES
 	    IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC)THEN
-	      ISO(IS)%OLD_POP=ISO(IS)%OLD_POP*(POP_SPECIES(:,ISO(IS)%ISPEC)/WRK)
+	      IF(SPECIES_PRES(ISO(IS)%ISPEC))THEN
+	        ISO(IS)%OLD_POP=ISO(IS)%OLD_POP*(POP_SPECIES(:,ISO(IS)%ISPEC)/WRK)
+	      ELSE
+	        ISO(IS)%OLD_POP=0.0D0
+	      END IF
 	    END IF
 	  END DO
 	END DO
@@ -274,6 +290,8 @@
 	    END DO
 	  END IF
 	END DO
+!
+! Correct populations for radioactive decays.
 !
 	IF(SN_AGE_DAYS.LT. OLD_SN_AGE_DAYS)THEN
 	  WRITE(LUER,*)'Error in RD_SN_DATA'
@@ -294,7 +312,9 @@
 !
 	POP_ATOM(:)=0.0D0
 	DO L=1,NUM_SPECIES
-	  POP_ATOM(:)=POP_ATOM(:)+POP_SPECIES(:,L)
+	  IF(SPECIES_PRES(L))THEN
+	    POP_ATOM(:)=POP_ATOM(:)+POP_SPECIES(:,L)
+	  END IF
 	END DO
 !
 	CALL OUT_SN_POPS_V2('SN_DATA_INPUT_CHK',SN_AGE_DAYS,ND,LU)

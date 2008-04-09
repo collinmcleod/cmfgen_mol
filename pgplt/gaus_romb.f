@@ -17,6 +17,7 @@
 	SUBROUTINE GAUS_ROMB(ANSWER,HEIGHT,SCALE,EXPONENT,TOLERANCE)
 	IMPLICIT NONE
 !
+! Altered 02-Apr-2008 : Use convention that EWs are +ve for absorption lines
 ! Created 28-Sep-2007
 !
 	REAL*8 ANSWER
@@ -43,7 +44,8 @@
 	  WRITE(6,*)'Error in GAUS_ROMB'
 	  WRITE(6,*)'Unable to integrate the modified Gaussian if'//
 	1                      ' its exponent is < 0.5'
-	  STOP
+	  ANSWER=1000
+	  RETURN
 	END IF
 !
 	TESTING=.TRUE.
@@ -82,8 +84,11 @@
 	    IF( ABS(R(1,K)-R(1,K-1)) .LT. TOLERANCE)EXIT
 	  END IF	
 	END DO
+!
+! We now use the convention that EWs are +ve for absorption lines.
+!
 	K=MIN(K,M)
-	ANSWER=R(1,K)*ABS(SCALE)*HEIGHT
+	ANSWER=-R(1,K)*ABS(SCALE)*HEIGHT
 	IF(TESTING)THEN
 	  WRITE(6,'(A,ES14.6)')'Final unscaled integeral is:',R(1,K)
 	  WRITE(6,'(A,ES14.6)')'          Final integral is:',ANSWER

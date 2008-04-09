@@ -9,6 +9,8 @@
 !
 	SUBROUTINE RD_RV_FILE_V2(R,V,SIGMA,RMAX,RP,VINF,LUIN,ND,OPTIONS,N_OPT)
 !
+! Altered  31-Mar-2008: Check on VINF is now set to 10% accuracy. Done as V(1) is normally
+!                         < Vinf as radius grid does not extend to infinity.
 ! Altered  16-Jan-2007: VINF only checked of > 0.1 km/s (not important for pp models)
 ! Modified 02-Feb-2005: Blank lines and comments can now appear after ND string
 !                         but before main data set.
@@ -159,7 +161,7 @@ C
 	  STOP
 	END IF
 !
-	IF( ABS(V(1)-VINF)/V(1) .GT. 0.01 .AND. VINF .GT. 0.1D0)THEN
+	IF( ABS(V(1)-VINF)/V(1) .GT. 0.1 .AND. VINF .GT. 0.1D0)THEN
 	  WRITE(LUER,*)'VINF in VADAT file and velocity file are inconsistent'
 	  WRITE(LUER,*)'V(1)=',V(1)
 	  WRITE(LUER,*)'VINF',VINF
