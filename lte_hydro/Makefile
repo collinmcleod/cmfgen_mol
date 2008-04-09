@@ -68,7 +68,7 @@ $(EXE_DIR)main_lte.exe : lte.o lte_sub.o set_lte_est.o det_ed.o lte_pop_sl.o \
 
 $(EXE_DIR)wind_hyd.exe : wind_hyd.o \
                           $(FN1) $(FN3) $(FN4) $(FN5) $(FN6) $(FN7)
-	$(F90)-g  wind_hyd.o get_lte_ross_v2.o wind_vel_law_v1.o det_r_grid_v1.o \
+	$(F90)  wind_hyd.o get_lte_ross_v2.o wind_vel_law_v1.o det_r_grid_v1.o \
              -L$(LIB_DIR) -l$(LN7) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN6) \
                $(LOCLIB) $(LAPACK) $(BLAS) $(PGLIB) $(G2CLIB) $(X11LIB) \
                -o $(EXE_DIR)wind_hyd.exe
@@ -95,7 +95,7 @@ lte_sub.o : lte_sub.f $(MODS)
 	$(F90) -c $(FG) lte_sub.f 
 
 %.o : %.f 
-	$(F90) -g -c $(FG) $< 
+	$(F90) -c $(FG) $< 
 
 $(USR):
 	(cd ../tools ; make )

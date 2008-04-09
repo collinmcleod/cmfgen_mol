@@ -109,7 +109,7 @@ $(EXE_DIR)solve_ba_mat.exe : solve_ba_mat.o
 # General rule to compile a fortran ".f" file.
 
 %.o : %.f
-	$(F90) -c -g $(FG)  $<
+	$(F90) -c $(FG)  $<
 
 USR = $(LIB_DIR)libtools.a(usr_option.o)
 GEN = $(LIB_DIR)libtools.a(gen_in.o)
