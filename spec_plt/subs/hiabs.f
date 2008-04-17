@@ -20,6 +20,7 @@ C
 	SUBROUTINE HIABS(WAVE,FLUX,NLAM,V_TURB,LOG_NTOT,T_IN_K)
 	IMPLICIT NONE
 C
+C Altered 16-Apr-2008: PAUSE used if cannot find file with line list.
 C Altered 21-Dec-2001: Error in VTURB (**2 insetad of *2) fixed
 C
 	INTEGER NLAM
@@ -52,7 +53,7 @@ C
 	REAL*8 v
 	REAL*8 T1
 C
-	INTEGER I,J
+	INTEGER I,J,IOS
 C
 C Functions
 C
@@ -70,7 +71,14 @@ C 6th column: Oscilator strength
 C 7th column: G (ground state)
 C 8th column: Damping parameter
 C
-	OPEN(UNIT=10,FILE='HI_IS_LINE_LIST',ACTION='READ',STATUS='OLD')
+100	CONTINUE
+	OPEN(UNIT=10,FILE='HI_IS_LINE_LIST',ACTION='READ',STATUS='OLD',IOSTAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(6,*)'HI_IS_LINE_LIST file not found'
+	    WRITE(6,*)'Use astxt to assign file, then hit return/enter'
+	    PAUSE
+	    GOTO 100
+	  END IF
 	  DO I=1,NHYD
 	    READ(10,*)T1,T1,T1,T1,HYD_LAM(I),HYD_OSC(I),HYD_G(I),HYD_GAM(I)
 	  END DO

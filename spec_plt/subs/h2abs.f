@@ -20,6 +20,7 @@ C
 	SUBROUTINE H2ABS(WAVE,FLUX,NLAM,V_TURB,LOG_NTOT,T_IN_K)
 	IMPLICIT NONE
 C
+C Altered 16-Apr-2008: PAUSE used if cannot find file with line list.
 C Altered 21-Dec-2001: Error in VTURB (**2 insetad of *2) fixed
 C Altered 21-Apr-2000: H2_L_J made INTEGER.
 C
@@ -61,7 +62,7 @@ C
 	REAL*8 B
 	REAL*8 POP_SUM
 C
-	INTEGER I,J
+	INTEGER I,J,IOS
 C
 C Functions
 C
@@ -79,7 +80,14 @@ C 6th column: Oscilator strength
 C 7th column: G (ground state)
 C 8th column: Damping parameter
 C
-	OPEN(UNIT=10,FILE='H2_IS_LINE_LIST',ACTION='READ',STATUS='OLD')
+100	CONTINUE
+	OPEN(UNIT=10,FILE='H2_IS_LINE_LIST',ACTION='READ',STATUS='OLD',IOSTAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(6,*)'H2_IS_LINE_LIST file not found'
+	    WRITE(6,*)'Use astxt to assign file, then hit return/enter'
+	    PAUSE
+	    GOTO 100
+	  END IF
 	  DO I=1,NH2
 	    READ(10,*)T1,T1,T1,H2_L_J(I),H2_LAM(I),H2_OSC(I),H2_G(I),H2_GAM(I)
 	  END DO
