@@ -112,6 +112,7 @@
 	REAL*8 TAU_MAX
 	REAL*8 OLD_TAU_MAX
 	REAL*8 T1,T2,T3
+	REAL*8 GAM_LIM_STORE
 !
 ! Runge-Kutta estimates
 !
@@ -201,6 +202,7 @@
 	END IF
 	USE_OLD_VEL=.FALSE.
 	GAM_LIM=0.98
+	GAM_LIM_STORE=GAM_LIM
 !
 ! These are the default settings if no old model.
 !
@@ -520,7 +522,7 @@
 ! Set estimates at current location. Then integrate hydrostatic
 ! equation using 4th order Runge-Kutta.
 !
-	    P_EST=P(I-1)
+100	    P_EST=P(I-1)
 	    TAU_EST=TAU(I-1)
 	    T_EST=T(I-1)
 	    ED_ON_NA_EST=ED_ON_NA(I-1)
@@ -571,6 +573,15 @@
 	    ED(I)=ED_ON_NA(I)*POP_ATOM(I)
 	    CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*ROSS_ON_ES
 	    GAMMA_FULL(I)=GAM_FULL
+	    V(I)=MDOT/MU_ATOM/POP_ATOM(I)/R(I)/R(I)
+	    IF(.NOT. PLANE_PARALLEL)THEN
+	      IF(V(I) .GE. V(I-1))THEN
+	        GAM_LIM=GAM_LIM-0.01
+	        IF(VERBOSE_OUTPUT)WRITE(LUV,*)'Resetting GAM_LIM due to -ve velocity gradient'
+	        GOTO 100
+	      END IF 
+	    END IF
+	    GAM_LIM=GAM_LIM_STORE
 	    ND=I
 !
 	  END DO		!Loop over inner atmosphere
