@@ -25,7 +25,8 @@
 !
 	OPEN(UNIT=LUIN,FILE='REVISED_LAMBDAS',STATUS='OLD',IOSTAT=IOS,ACTION='READ')
 	IF(IOS .NE. 0)THEN
-	  WRITE(LUER,*)'Wrning: file with accurate wavelengths not found'
+	  LUER=ERROR_LU()
+	  WRITE(LUER,*)'Warning: file with accurate wavelengths not found'
 	  RETURN
 	END IF
 !
