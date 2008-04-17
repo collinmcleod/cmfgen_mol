@@ -1282,7 +1282,7 @@
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES .AND. XSPEC .EQ. UC(ION_ID(ID)))THEN
 	      IF(LEV(2) .EQ. 0)LEV(2)=ATM(ID)%NXzV_F
-	      WRITE(T_OUT,'(X,I4,3X,A)')(I,ATM(ID)%XzVLEVNAME_F(I),I=LEV(1),LEV(2))
+	      WRITE(T_OUT,'(5(2X,A16,X,I3))')(TRIM(ATM(ID)%XzVLEVNAME_F(I)),I,I=LEV(1),LEV(2))
 	      FLAG=.TRUE.
 	    END IF
 	  END DO
@@ -3177,7 +3177,7 @@
 ! This section creates an image of the fractional contribution to the opacity
 !              as a function of species and wavelength.
 !
-	ELSE IF(XOPT .EQ. 'LCHI')THEN
+	ELSE IF(XOPT .EQ. 'LCHI' .OR. XOPT .EQ. 'PPHOT')THEN
 	  CALL USR_OPTION(LAM_ST,'LAM_ST','50.0',FREQ_INPUT)
 	  CALL USR_OPTION(LAM_EN,'LAM_END','10000.0',FREQ_INPUT)
 	  CALL USR_OPTION(K,'DEPTH','20.0','Depth for opacities')
@@ -3225,11 +3225,12 @@
 	        WRITE(6,*)' '
 	        WRITE(6,'(A3)',ADVANCE='NO')'ML='
 	    END IF
+	    IF(ML .EQ. NLAM)WRITE(6,'(A)')' '
 	    IF(MOD(ML,20) .EQ. 0)WRITE(6,'(X,I5)',ADVANCE='NO')ML
 	    FREQ=NU_ST*(DEL_NU**(ML-1))
 	    LAM_VEC(ML)=LOG10(ANG_TO_HZ/FREQ)
 	    INCLUDE 'PAR_OPACITIES.INC'
-	    J=0
+	    J=0; CNT=0
 	    DO ID=1,NUM_IONS
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        J=J+1
@@ -3238,7 +3239,14 @@
 	        LAST_NON_ZERO=.TRUE.
 	        CHI_TOT_LAM(ML)=CHI_TOT_LAM(ML)+CHI_LAM(ML,J)
 	        ETA_TOT_LAM(ML)=ETA_TOT_LAM(ML)+ETA_LAM(ML,J)
-	        IF(ML .EQ. NLAM)WRITE(6,*)J,ION_ID(ID)
+	        IF(XOPT .NE. 'PPHOT' .AND. ML .EQ. NLAM)THEN
+	          CNT=CNT+1
+	          IF(MOD(CNT-1,5) .EQ. 0)THEN
+	            WRITE(6,'(4X,A5,X,I3)')TRIM(ION_ID(ID)),J
+	          ELSE
+	            WRITE(6,'(4X,A5,X,I3)',ADVANCE='NO')TRIM(ION_ID(ID)),J
+	          END IF
+	        END IF
 	      ELSE IF(LAST_NON_ZERO)THEN
 	        J=J+1
                 CHI_LAM(ML,J)=0.0D0
@@ -3248,26 +3256,50 @@
 	      END IF
 	    END DO
 	  END DO
+	  IF(XOPT .NE. 'PPHOT')WRITE(6,'(A,/)')' '
 	  NION=J
 !
+	  CALL ESOPAC(ESEC,ED,ND)
 	  IF(ELEC)THEN
-	    CALL ESOPAC(CHI,ED,ND)
-	    CHI_TOT_LAM(1:NLAM)=CHI_TOT_LAM(1:NLAM)+CHI(K)
+	    CHI_TOT_LAM(1:NLAM)=CHI_TOT_LAM(1:NLAM)+ESEC(K)
 	  END IF 
 !
-	  DO ID=1,NION
-	    DO ML=1,NLAM
-	      CHI_LAM(ML,ID)=CHI_LAM(ML,ID)/CHI_TOT_LAM(ML)
-	      ETA_LAM(ML,ID)=ETA_LAM(ML,ID)/ETA_TOT_LAM(ML)
+	  IF(XOPT .EQ. 'PPHOT')THEN
+	    WRITE(6,*)'Total opacity is plotted in red'
+	    XV(1:NLAM)=10**(LAM_VEC(1:NLAM))
+	    YV(1:NLAM)=CHI_TOT_LAM(1:NLAM)/ESEC(K)
+	    CALL DP_CURVE(NLAM,XV,YV)
+	    YAXIS='Opacity/(e.s. opacity)'
+	    DO ID=1,NUM_IONS
+	      IF(ATM(ID)%XzV_PRES .AND. XSPEC .EQ. UC(ION_ID(ID)) )THEN
+	        YV(1:NLAM)=CHI_LAM(1:NLAM,ID)
+	        CALL DP_CURVE(NLAM,XV,YV)
+	        EXIT
+	      END IF
 	    END DO
-	  END DO
+	    DO ISPEC=1,NSPEC
+	      IF(XSPEC .EQ. UC(SPECIES(ISPEC)) )THEN
+	        DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
+	          YV(1:NLAM)=CHI_LAM(1:NLAM,ID)
+	          CALL DP_CURVE(NLAM,XV,YV)
+	        END DO
+	      END IF
+	    END DO
+	  ELSE
+	    DO ID=1,NION
+	      DO ML=1,NLAM
+	        CHI_LAM(ML,ID)=CHI_LAM(ML,ID)/CHI_TOT_LAM(ML)
+	        ETA_LAM(ML,ID)=ETA_LAM(ML,ID)/ETA_TOT_LAM(ML)
+	      END DO
+	    END DO
 !
-	  DO ID=1,NION
-            YMAPV(ID)=ID
-	  END DO
+	    DO ID=1,NION
+              YMAPV(ID)=ID
+	    END DO
 !
-	  CALL MAP_PLOT(CHI_LAM,ETA_LAM,LAM_VEC,YMAPV,NLAM,NION,
+	    CALL MAP_PLOT(CHI_LAM,ETA_LAM,LAM_VEC,YMAPV,NLAM,NION,
 	1               " "," "," "," ")
+	  END IF
 !
 	  DEALLOCATE (CHI_LAM)
 	  DEALLOCATE (ETA_LAM)
@@ -3991,11 +4023,13 @@ c
 	1            ATM(ID)% NXzV_F,EXC_EN,PHOT_ID,SUB_PHOT_GEN,I,T1)
 	      STRING=ION_ID(ID)
               J=ATM(ID)%NXzV_F
+	      EXIT
 	    END IF
 	  END DO
 !
 	  IF(J .NE. 0)THEN
 	    WRITE(LU_REC,*)' '
+	    WRITE(LU_REC,*)'Temperatre (10^4 K) is',T1
 	    WRITE(T_OUT,*)'Recombination rates for ',TRIM(STRING)
 	    WRITE(LU_REC,*)'Recombination rates for ',TRIM(STRING)
 	    WRITE(T_OUT,'(X,A,X,I3)')'Photoionization route number is',PHOT_ID
@@ -4004,8 +4038,8 @@ c
 	    WRITE(LU_REC,*)' '
 	    T1=0.0D0
 	    DO I=1,J
-	      WRITE(T_OUT,*)I,TA(I)
-	      WRITE(LU_REC,*)I,TA(I)
+	      WRITE(T_OUT, '(I4,ES12.4,2X,A)')I,TA(I),TRIM(ATM(ID)%XzVLEVNAME_F(I))
+	      WRITE(LU_REC,'(I4,ES12.4,2X,A)')I,TA(I),TRIM(ATM(ID)%XzVLEVNAME_F(I))
 	      T1=T1+TA(I)
 	    END DO
 	    WRITE(T_OUT,'(X,A,X,1PE12.4)')'Total recombination rate is:',T1
