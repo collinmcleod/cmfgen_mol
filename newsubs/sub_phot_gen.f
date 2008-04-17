@@ -17,6 +17,7 @@
 !     5 - Opacity project fits (from Peach, Sraph, and Seaton (1988)
 !     6 - Hummer fits to the opacity cross-sections for HeI
 !     7 - Modifed Seaton fit --- cross-section zero until offset edge.
+!     8 - Modifed Hydrogenic split l: cross-section zero until offset edge.
 !    20 - Opacity Project: smoothed [number of data pairs]
 !    21 - Opacity Project: scaled, smoothed [number of data pairs]
 !    30 - Call XCROSS_V2 (For Lithium-like ions).
@@ -45,6 +46,7 @@
 !
 	IMPLICIT NONE
 !
+! Altered 17-Apr-2008 : Installed fit Type 8:
 ! Altered 30-Apr-2004 : Modified Seaton fit (Type 7) installed.
 ! Altered 07-Dec-2001 : EQUAL_CORFAC installed for AMD processors and PGI compiler.
 !                       Bug fix. Correct edge cross-section was not being returned for
@@ -273,6 +275,43 @@ C
 	          END DO
 	          SUM=SUM*( PD(ID)%NEF(I,K)/(N*PD(ID)%ZION) )**2
 	          PHOT(I)=PHOT(I) + SUM/( (LEND-LST+1)*(LEND+LST+1) )
+!
+! Hydrogenic transitions.
+!
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 8)THEN
+!
+! N, LST and LEND must be integer - all other values are double precision.
+! If it wasn't for the loop over l, this could be done in the main loop.
+!
+! BF_CROSS contains the LOG10 hydrogenic cross-section.
+!
+	          IF(FREQ_VEC(I) .GE. EDGE+PD(ID)%CROSS_A(LMIN+3))THEN
+	            U=FREQ_VEC(I)/(EDGE+PD(ID)%CROSS_A(LMIN+3))
+	            N=NINT( PD(ID)%CROSS_A(LMIN) )
+	            LST=NINT( PD(ID)%CROSS_A(LMIN+1) )
+	            LEND=NINT( PD(ID)%CROSS_A(LMIN+2) )
+!
+	            X=LOG10(U)
+	            RJ=X/L_DEL_U
+	            J=RJ
+	            T1=RJ-J
+	            J=J+1
+	            SUM=0.0D0
+	            DO L=LST,LEND
+	              IF(J .LT. N_PER_L)THEN
+	                J=J+BF_L_INDX(N,L)-1
+	                T2=T1*BF_L_CROSS(J+1)+(1.0D0-T1)*BF_L_CROSS(J)
+	              ELSE
+	                J=BF_L_INDX(N,L)+N_PER_L-1
+	                T2=(BF_L_CROSS(J)-BF_L_CROSS(J-1))*
+	1                   (RJ-N_PER_L)+BF_L_CROSS(J)
+	              END IF
+	              SUM=SUM+(2*L+1)*(10.0D0**T2)
+		      J=RJ+1 		!Restore as corrupted	
+	            END DO
+	            SUM=SUM/PD(ID)%ZION/PD(ID)%ZION	!Ignore neff correction :( PD(ID)%NEF(I,K)/(N*PD(ID)%ZION) )**2
+	            PHOT(I)=PHOT(I) + SUM/( (LEND-LST+1)*(LEND+LST+1) )
+	          END IF	!Above threshold
 !
 	        END IF		!Type of cross-section
 	      END IF		!Non zero
