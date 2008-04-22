@@ -10,6 +10,7 @@ C
 	USE MOD_USR_HIDDEN
 	IMPLICIT NONE
 C
+C Altered 21-Apr-2008 : SEQ_WR installed; Improved handling of INT_SEQ.
 C Altered 23-Jun-2005 : FIX_DI option installed for WR_DC
 C Altered 25-Oct-2002 : CL option changed.
 C                         Level without SL designation is given one.
@@ -31,12 +32,13 @@ C
 	CHARACTER*1 LEV_PARITY(N_MAX)
 C
 	INTEGER F_TO_S(N_MAX)
-	INTEGER INT_LEV(N_MAX)
+	INTEGER INT_SEQ(N_MAX)
 	REAL*8 FEDGE(N_MAX)
 	REAL*8 ENERGY(N_MAX)
 	REAL*8 G(N_MAX)
 	REAL*8 LAM_EDGE(N_MAX)
 	REAL*8 E_STRT(N_MAX)
+	LOGICAL DONE_LEV(N_MAX)
 C
 	REAL*8 EDGE_SUM(N_MAX)
 	REAL*8 G_SUM(N_MAX)
@@ -62,7 +64,6 @@ C
 	REAL*8 DC(N_MAX,3),ED(3),TEMP(3)
 	REAL*8 DI,RVAL,RSTAR,RLUM
 	REAL*8 T_EXCITE,G_GS,G_ION
-	INTEGER INT_SEQ(N_MAX)
 	INTEGER NLEV_RD,ND_RD
 	LOGICAL WRITE_DC
 C
@@ -141,7 +142,7 @@ C
 	EMLIN=5.27296E-03
 	OPLIN=2.6540081E+08
 	EMLIN=5.27296E-03
-	INT_LEV(:)=0
+	INT_SEQ(:)=0
 C
 C  
 C Read in Level Names and Energies from file containing oscillator
@@ -313,7 +314,7 @@ C
 	  END DO
 !
 	  DO I=1,NLEV-1
-	   IF(INDEX(NAME(I),'[') .EQ. 0 .AND. INT_LEV(I) .EQ. 0)THEN
+	   IF(INDEX(NAME(I),'[') .EQ. 0 .AND. INT_SEQ(I) .EQ. 0)THEN
 	     L=LEN_TRIM(NAME(I))
 	     PRES=.TRUE.
 	     DO J=I+1,NLEV
@@ -322,13 +323,13 @@ C
 	         IF(NAME(J)(K-4:K) .EQ. NAME(I)(L-4:L))THEN
 	           IF(PRES)THEN
 	             ID=I
-	             INT_LEV(I)=ID 
-	             INT_LEV(J)=ID
+	             INT_SEQ(I)=ID 
+	             INT_SEQ(J)=ID
 	             PRES=.FALSE.
 	             CNT=J
 	           ELSE
 	             F_TO_S(J)=F_TO_S(CNT)
-	             INT_LEV(J)=ID
+	             INT_SEQ(J)=ID
 	           END IF
                  END IF
 	       END IF
@@ -593,15 +594,50 @@ C
 	        LAM_EDGE(I)=1.0D+08/(ION_EN-ENERGY(I))
 	        IF(WRITE_DC)THEN
 	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
-	1                      LAM_EDGE(I),F_TO_S(I),INT_LEV(I),I,DC(I,1),
+	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I,DC(I,1),
 	1                      DC(I,2),DC(I,3)
 	        ELSE
 	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
-	1                      LAM_EDGE(I),F_TO_S(I),INT_LEV(I),I
+	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I
 	        END IF
 	      END IF
 	    END DO
 	    WRITE(LUOUT,*)' '
+	  END DO
+	  CLOSE(LUOUT)
+!
+! The following option allows levels belonging to a single seqence
+! to be output together as a group. The level departure coefficients can 
+! also be output.
+!
+	ELSE IF(X(1:6) .EQ. 'SEQ_WR')THEN
+	  CALL USR_OPTION(FILENAME,'File','SEQ_LNKS','Link check file')
+	  CALL USR_HIDDEN(WRITE_DC,'DC','F',' ')
+	  CALL GEN_ASCI_OPEN(LUOUT,FILENAME,'UNKNOWN',' ','WRITE',IZERO,IOS)
+C
+	  J=0
+	  DO I=1,NLEV
+	     J=MAX(J,LEN_TRIM(NAME(I)))
+	  END DO
+	  WRITE(LUOUT,'(A)')'  '
+	  L=MAXVAL(F_TO_S(1:NLEV))
+	  DONE_LEV(1:NLEV)=.FALSE.
+	  DO K=1,NLEV
+	    IF(.NOT. DONE_LEV(K))WRITE(LUOUT,*)' '
+	    DO I=K,NLEV
+	      IF(INT_SEQ(I) .EQ. INT_SEQ(K) .AND. .NOT. DONE_LEV(I))THEN
+	        DONE_LEV(I)=.TRUE.
+	        LAM_EDGE(I)=1.0D+08/(ION_EN-ENERGY(I))
+	        IF(WRITE_DC)THEN
+	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
+	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I,DC(I,1),
+	1                      DC(I,2),DC(I,3)
+	        ELSE
+	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
+	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I
+	        END IF
+	      END IF
+	    END DO
 	  END DO
 	  CLOSE(LUOUT)
 C                           
@@ -658,11 +694,11 @@ C
 	    LAM_EDGE(I)=1.0D+08/(ION_EN-ENERGY(I))
 	    IF(WRITE_DC)THEN
 	      WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
-	1                      LAM_EDGE(I),F_TO_S(I),INT_LEV(I),I,DC(I,1),
+	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I,DC(I,1),
 	1                      DC(I,2),DC(I,3)
 	    ELSE
 	      WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
-	1                      LAM_EDGE(I),F_TO_S(I),IZERO,I
+	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I
 	    END IF
 	  END DO
 	  CLOSE(LUOUT)
@@ -705,6 +741,7 @@ C
 C
 	  ID=0
 	  F_TO_S(1:NLEV)=-F_TO_S(1:NLEV)
+	  INT_SEQ(1:NLEV)=-INT_SEQ(1:NLEV)
 	  DO I=1,NLEV
 	   IF(F_TO_S(I) .LT. 0)THEN
 	      ID=ID+1
@@ -712,6 +749,9 @@ C
 	      F_TO_S(I)=ID
 	      DO J=I+1,NLEV
 	        IF(F_TO_S(J) .EQ. OLD_F_TO_S)F_TO_S(J)=ID
+	      END DO
+	      DO J=1,NLEV
+	        IF(INT_SEQ(J) .EQ. OLD_F_TO_S)INT_SEQ(J)=F_TO_S(I)
 	      END DO
 	    ELSE IF(F_TO_S(I) .EQ. 0)THEN
 	      ID=ID+1
@@ -721,7 +761,10 @@ C
 	  END DO
 !
 	  DO I=1,NLEV
-	    IF(INT_LEV(I) .NE. 0)INT_LEV(I)=F_TO_S(INT_LEV(I))
+	    IF(INT_SEQ(I) .NE. 0)THEN
+	      WRITE(6,*)INT_SEQ(I)
+!	      INT_SEQ(I)=F_TO_S(INT_SEQ(I))
+	    END IF
 	  END DO 
 	  WRITE(T_OUT,*)'Cleaning level links '
 	  WRITE(T_OUT,'(A,X,I5)')' Number of super levels is:',ID
@@ -766,7 +809,9 @@ C
 	  CALL USR_OPTION(SORT_LEVS,'SORT','F','Sort levels if F_TO_FILE?')
 	  CALL RD_F_TO_S_IDS_V2(F_TO_S,INT_SEQ,NAME,NLEV,IZERO,
 	1               LUIN,SORT_LEVS,FILENAME)
-	
+	   DO I=1,NLEV
+	     IF(INT_SEQ(I) .NE. 0)WRITE(6,*)I,INT_SEQ(I)
+	    END DO	
 C
 	ELSE IF(X(1:9) .EQ. 'RD_SM_LNK')THEN
 C

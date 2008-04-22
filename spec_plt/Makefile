@@ -42,7 +42,7 @@ ALLEXE    : $(EXE)
 #
 
 $(EXE_DIR)plt_spec.exe : plt_spec.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
-	$(F90) plt_spec.o \
+	$(F90)  plt_spec.o \
              -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
                $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)plt_spec.exe

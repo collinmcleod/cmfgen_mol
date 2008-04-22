@@ -25,6 +25,7 @@
 	implicit none
 	include 'constants.inc'
 !
+! Altered 18-Apr-2008 : tempwave & tempflux now allocated with max(Nmod,Ntmp)
 ! 27-Jan-2000 : Cleaned; Converted to version 2.
 !               Rotation option installed.
 !
@@ -125,8 +126,8 @@
 	ntmp=(modwave(nmod)-modwave(1))/model_res+1
 	if(allocated(tempwave))deallocate(tempwave)
 	if(allocated(tempflux))deallocate(tempflux)
-	allocate (tempwave(Ntmp),stat=ios)
-	if(ios .eq. 0)allocate (tempflux(Ntmp),stat=ios)
+	allocate (tempwave(Max(Ntmp,Nmod)),stat=ios)
+	if(ios .eq. 0)allocate (tempflux(Max(Ntmp,Nmod)),stat=ios)
 	if(ios .ne. 0)then
 	  write(6,*)'Error allocating memory for tempwave in smear'
 	  return

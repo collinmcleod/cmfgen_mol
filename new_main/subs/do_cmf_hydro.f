@@ -796,9 +796,15 @@
 	  WRITE(LU,'(3X,I5,10X,A)')NEW_ND,'!Number of depth points'
 	  WRITE(LU,'(A)')'!'
 	  WRITE(LU,'(A,4X,A,3(7X,A),3X,A)')'!','R(10^10cm)','V(km/s)','  Sigma','    Tau','  Index'
-	  DO I=1,NEW_ND
-	    WRITE(LU,'(F15.8,3ES14.6,6X,I4)')REV_R(I),REV_V(I),REV_SIGMA(I),EXP(REV_TAU(I)),I
-	  END DO
+	  IF(REV_R(1) .GT. 999999.0D0)THEN
+	    DO I=1,NEW_ND
+	      WRITE(LU,'(F18.8,3ES14.6,6X,I4)')REV_R(I),REV_V(I),REV_SIGMA(I),EXP(REV_TAU(I)),I
+	    END DO
+	  ELSE
+	    DO I=1,NEW_ND
+	      WRITE(LU,'(F15.8,3ES14.6,6X,I4)')REV_R(I),REV_V(I),REV_SIGMA(I),EXP(REV_TAU(I)),I
+	    END DO
+	  END IF
 	CLOSE(UNIT=LU)
 !
 !

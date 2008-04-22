@@ -745,7 +745,7 @@ C
 ! resolution at all wavelengths.
 !
 	 CALL USR_HIDDEN(RESOLUTION,'RES','0d0',
-	1           'Resolution [Lam/dLam]')
+	1           'Resolution [Lam/dLam(FWHM)]')
 	 CALL USR_HIDDEN(MIN_RES_KMS,'MIN_RES','1.0d0',
 	1           'Minimum Model Resolution (km/s)')
 	 CALL USR_HIDDEN(NUM_RES,'NUM_RES','5.0d0',

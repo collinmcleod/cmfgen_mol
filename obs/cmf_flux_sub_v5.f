@@ -2179,7 +2179,7 @@ C
 	        WRITE(LUIN,'(I4,X,F8.3,500(F8.2))')I,V(I),TA(I),
 	1                    (100.0D0*ION_LINE_FORCE(I,ID)/TA(I),ID=1,NUM_IONS)
 	      END DO
-	      WRITE(LUIN,'(5X,8X,500(A8)))')(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
+	      WRITE(LUIN,'(3X,A,500(A8)))')'d',' V(km/s)','    M(t)',(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
 	    CLOSE(LUIN)
 	  END IF
 	END IF
