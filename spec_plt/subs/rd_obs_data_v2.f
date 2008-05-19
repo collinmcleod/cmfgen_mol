@@ -41,6 +41,7 @@ C
 	1                         FILENAME,COLS,IOS)
 	IMPLICIT NONE
 C
+C Altered 11-May-2008 : Altered to handle blank lines/comments at end of file.
 C Altered 18-Nov-1999 : Altered to allow for multiple data sets in the same
 C                        file.
 C Altered 18-Jun-1995 : COLS inserted to allow reading of data in different
@@ -268,16 +269,20 @@ C
 	  END DO
 	ELSE IF(COLS(1) .EQ. 1 .AND. COLS(2) .EQ. 2)THEN
 	  DO I=NLST+1,NMAX
-	    READ(10,'(A)',END=1000)STRING(1)
+10	    READ(10,'(A)',END=1000)STRING(1)
 	    IF(INDEX(STRING(1),'********************') .NE. 0)GOTO 2000
+	    IF(INDEX(STRING(1)(1:1),'!').NE. 0)GOTO 10
+	    IF(STRING(1) .EQ. ' ')GOTO 10
 	    READ(STRING(1),*)LAM(I),FLUX(I)
 	    NPTS=I
 	  END DO
 	ELSE
 	  K=MAX(COLS(1),COLS(2))
 	  DO I=NLST+1,NMAX
-	    READ(10,'(A)',END=1000)STRING(1)
+20	    READ(10,'(A)',END=1000)STRING(1)
 	    IF(INDEX(STRING(1),'********************') .NE. 0)GOTO 2000
+	    IF(INDEX(STRING(1)(1:1),'!').NE. 0)GOTO 20
+	    IF(STRING(1) .EQ. ' ')GOTO 20
 	    READ(STRING(1),*,END=1000,IOSTAT=IOS)(TEMP_STORE(J),J=1,K)
 	    IF(IOS .NE. 0)THEN
 	     WRITE(T_OUT,*)'Error reading observational data. String is:'

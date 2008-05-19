@@ -5,7 +5,7 @@
 !                       Extra species installed. More consistent with CMFGEN.
 !
 	INTEGER, PARAMETER :: NSPEC=22
-	INTEGER, PARAMETER :: NION_MAX=15
+	INTEGER, PARAMETER :: NION_MAX=20
 	INTEGER, PARAMETER :: NPHOT_MAX=4
 	INTEGER, PARAMETER :: MAX_ION=NSPEC*NION_MAX
 	INTEGER  NUM_IONS			!Total number of ions present
@@ -74,6 +74,6 @@ C
 !
 	DATA GEN_ION_ID /'I','2','III','IV','V',
 	1                'SIX','SEV','VIII','IX','X','XI','XII',
-	1                'XIII','XIV','XV'/
+	1                'XIII','XIV','XV','XSIX','XSEV','X8','X9','XX'/
 !
 	END MODULE MOD_DISP

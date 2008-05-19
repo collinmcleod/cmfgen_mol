@@ -1250,6 +1250,14 @@ C
 	      IF(LINE_ID(J)(2:2) .EQ. 'k')LINE_ID(J)(2:2)='i'
 	      IF(LINE_ID(J)(2:2) .EQ. '2')LINE_ID(J)(2:)='II'//LINE_ID(J)(3:)
 	      IF(LINE_ID(J)(3:3) .EQ. '2')LINE_ID(J)(3:)='II'//LINE_ID(J)(4:)
+	      IF(LINE_ID(J)(2:5) .EQ. 'XSIX')LINE_ID(J)(2:)='XVI'//LINE_ID(J)(6:)
+	      IF(LINE_ID(J)(2:5) .EQ. 'XSEV')LINE_ID(J)(2:)='XVII'//LINE_ID(J)(6:)
+	      IF(LINE_ID(J)(3:6) .EQ. 'XSIX')LINE_ID(J)(3:)='XVI'//LINE_ID(J)(7:)
+	      IF(LINE_ID(J)(3:6) .EQ. 'XSEV')LINE_ID(J)(3:)='XVII'//LINE_ID(J)(7:)
+	      IF(LINE_ID(J)(2:4) .EQ. 'SIX')LINE_ID(J)(2:)='VI'//LINE_ID(J)(5:)
+	      IF(LINE_ID(J)(2:4) .EQ. 'SEV')LINE_ID(J)(2:)='VII'//LINE_ID(J)(5:)
+	      IF(LINE_ID(J)(3:5) .EQ. 'SIX')LINE_ID(J)(3:)='VI'//LINE_ID(J)(6:)
+	      IF(LINE_ID(J)(3:5) .EQ. 'SEV')LINE_ID(J)(3:)='VII'//LINE_ID(J)(6:)
 	    END DO
 	  ELSE
 	    WRITE(6,*)'Unable top open file'

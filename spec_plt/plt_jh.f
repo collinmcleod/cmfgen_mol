@@ -555,6 +555,51 @@
 	    WRITE(6,*)'New J data written to EDDFACTOR and EDDFACTOR_INFO in the current directory'
 	  END IF
 !
+	ELSE IF(X(1:4) .EQ. 'SPHJ')THEN
+!
+! Quick and dirty option to modify J in outer wind for sphericity effects.
+! Code assumes same grid.
+!
+	  T1=R(ND)
+	  CALL GEN_IN(T1,'Radius at Tau=1')
+	  DO I=1,ND
+	    IF(R(I) .GT. T1)THEN
+	      T2=(T1/R(I))**2
+	      TA(I)=SQRT(1.0D0-SQRT(1.0D0-T2))
+	    ELSE
+	      TA(I)=1.0D0
+	    END IF
+	  END DO
+!
+	  ACCESS_F=5
+	  I=WORD_SIZE*(ND+1)/UNIT_SIZE; J=83
+	  ZM(1)%FILE_DATE='20-Aug-2000'
+	  I=WORD_SIZE*(ND+1)/UNIT_SIZE; J=83
+	  INQUIRE(FILE='EDDFACTOR',EXIST=FILE_PRES)
+	  IF(FILE_PRES)THEN
+	    CALL WRITE_DIRECT_INFO_V3(ND,I,ZM(1)%FILE_DATE,'J_DATA',J)
+	    OPEN(UNIT=83,FILE='J_DATA',FORM='UNFORMATTED',
+	1       ACCESS='DIRECT',STATUS='NEW',RECL=I,IOSTAT=IOS)
+	  ELSE
+	    CALL WRITE_DIRECT_INFO_V3(ND,I,ZM(1)%FILE_DATE,'EDDFACTOR',J)
+	    OPEN(UNIT=83,FILE='EDDFACTOR',FORM='UNFORMATTED',
+	1       ACCESS='DIRECT',STATUS='NEW',RECL=I,IOSTAT=IOS)
+	  END IF
+	  WRITE(83,REC=EDD_CONT_REC)ACCESS_F,NCF,ND
+	    DO ML=1,ZM(1)%NCF
+	      DO I=1,ND
+	        TB(I)=TA(I)*ZM(1)%RJ(I,ML)
+	      END DO
+	      WRITE(83,REC=ACCESS_F-1+ML)(TB(I),I=1,ND),ZM(ID)%NU(ML)
+	    END DO
+	  CLOSE(UNIT=83)
+	  IF(FILE_PRES)THEN
+	    WRITE(6,*)'New J data written to J_DATA and J_DATA_INFO'
+	    WRITE(6,*)'Use these to replace EDDFACTOR and EDDFACTOR_INFO if extending R grid'
+	  ELSE
+	    WRITE(6,*)'New J data written to EDDFACTOR and EDDFACTOR_INFO in the current directory'
+	  END IF
+!
 	ELSE IF(X(1:4) .EQ. 'WSMJ')THEN
 !
 ! Quick and dirty option to write out J on the normal size grid.

@@ -14,7 +14,7 @@
 ! has to be 2 or higher (as I and II). A setting of 10 implies that we can treat
 ! full atoms for ION_IX.
 !
-	INTEGER, PARAMETER :: BA_MAX_IONS_PER_SPECIES=15
+	INTEGER, PARAMETER :: BA_MAX_IONS_PER_SPECIES=20
 	INTEGER, PARAMETER :: BA_MAX_NUM_IONS=BA_NUM_SPECIES*BA_MAX_IONS_PER_SPECIES
 !
 ! Maximum number of photoionization routes for each species.

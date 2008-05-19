@@ -14,7 +14,7 @@
 ! has to be 2 or higher (as I and II). A setting of 10 implies that we can treat
 ! full atoms for ION_IX.
 !
-	INTEGER, PARAMETER :: MAX_IONS_PER_SPECIES=15
+	INTEGER, PARAMETER :: MAX_IONS_PER_SPECIES=20
 	INTEGER, PARAMETER :: MAX_NUM_IONS=NUM_SPECIES*MAX_IONS_PER_SPECIES
 !
 ! Maximum number of photoionization routes for each species.
@@ -151,6 +151,6 @@
 !
 	DATA GEN_ION_ID /'I','2','III','IV','V',
 	1                'SIX','SEV','VIII','IX','X','XI','XII',
-	1                'XIII','XIV','XV'/
+	1                'XIII','XIV','XV','XSIX','XSEV','X8','X9','XX'/
 !
 	END MODULE MOD_CMF_OBS

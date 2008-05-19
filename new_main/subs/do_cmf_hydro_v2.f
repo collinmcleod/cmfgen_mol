@@ -6,8 +6,8 @@
 !                      (a) A correction for the vdv/dr dynamical term below the sonic point.
 !                      (b) A contributin by turbulent pressure.
 !
-	SUBROUTINE DO_CMF_HYDRO(POPS,MOD_LUM,MOD_TEFF,MOD_LOGG,MOD_MASS,MOD_RMAX,
-	1                 MOD_MDOT,MOD_VINF,MOD_BETA,
+	SUBROUTINE DO_CMF_HYDRO_V2(POPS,MOD_LUM,MOD_TEFF,MOD_LOGG,MOD_MASS,MOD_RSTAR,
+	1		  MOD_RMAX,MOD_MDOT,MOD_VINF,MOD_BETA,
 	1                 MOD_VTURB,PLANE_PARALLEL,PLANE_PARALLEL_NO_V,
 	1                 MAIN_COUNTER,DONE_HYDRO,MOD_NC,MOD_ND,MOD_NP,NT)
 	USE CMF_HYDRO_MODULE
@@ -15,6 +15,8 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 18-May-2008 : Insert a limit as to the number of iterations (ITERATION_COUNT).
+! Altered 11-May-2008 : Inserted MOD_RSTAR and changed to _V2.
 ! Created 15-Feb-2008 :
 !
 	INTEGER MOD_NC			!Model numbr of core rays
@@ -29,6 +31,7 @@
 	REAL*8 MOD_TEFF			!In unitos of 10^4 K
 	REAL*8 MOD_LOGG			!In cgs units
 	REAL*8 MOD_MASS			!Mass of star in Msun (returned and output to VADAT)
+	REAL*8 MOD_RSTAR		!Returned
 	REAL*8 MOD_RMAX			!R(ND) on input
 	REAL*8 MOD_VINF			!km/s
 	REAL*8 MOD_BETA			!Classic velocity law exponent
@@ -143,6 +146,7 @@
 	INTEGER  STRT_HYDRO_ITS
 	INTEGER  FREQ_HYDRO_ITS
 	INTEGER  NO_HYDRO_ITS
+	INTEGER  ITERATION_COUNTER
 !
 	INTEGER  LU
 	INTEGER  LUV
@@ -362,7 +366,9 @@
 !
 !
 	PREV_REF_RADIUS=-1.0
+	ITERATION_COUNTER=0
 	DO WHILE(ABS(REFERENCE_RADIUS/PREV_REF_RADIUS-1.0) .GT. 1.0D-05)
+	  ITERATION_COUNTER=ITERATION_COUNTER+1
 	  IF(VERBOSE_OUTPUT)WRITE(LUV,*)' Beginning new hydro loop'
 !
 ! Compute Eddington ratio. This formulae is set for one electron per ion.
@@ -674,6 +680,12 @@
 	      WRITE(LUV,*)'Desired reference radius is',REFERENCE_RADIUS
 	    END IF
 	  END IF
+!
+	  IF(ITERATION_COUNTER .GE. 20)THEN
+	    WRITE(LU_ERR,*)'Exceed iteration count in DO_CMF_HYDRO_V2.'
+	    WRITE(LU_ERR,*)'Aborting update of the hydro structure.'
+	    RETURN
+	  END IF
 	END DO			!Loop to set R(Tau=2/3)=REFERENCE_RADIUS
 !
 	IF(WIND_PRESENT .AND. USE_OLD_VEL .AND. RESET_REF_RADIUS)THEN
@@ -831,8 +843,9 @@
 	CALL ADJUST_POPS(POPS,LU_ERR,NEW_ND,NT)
 !
 ! Make sure VADAT is consitent with revised RGRID & parameters in HYDRO_PARAMS.
-! We also return the correct RMAX and stellar mass.
+! We also return the correct RSTAR, RMAX and stellar mass.
 !
+	MOD_RSTAR=REV_R(NEW_ND)
 	MOD_RMAX=REV_R(1)
 	MOD_MASS=10**(LOGG)*(REFERENCE_RADIUS**2)/GRAV_CON
 	CALL UPDATE_KEYWORD(REV_R(NEW_ND),'[RSTAR]','VADAT',L_TRUE,L_FALSE,LUIN)

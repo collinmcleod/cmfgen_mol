@@ -21,6 +21,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 05-May-2007 : Fixed bug when do NG accleration with band size < ND
 ! Altered 07-Mar-2006 : Acceleratiion can now start at ND_ST.
 ! Altered 19-May-2004 : Bug fix: NG_DONE set to true, even when no NG done.
 ! Altered 28-Mar-2004 : Changed to handle new format SCRTEMP files.
@@ -135,9 +136,12 @@
 	IF(OPTION(1:2) .EQ.'NG')THEN
 	  WRITE(T_OUT,'(A)')' '
 	  WRITE(T_OUT,'(A)')' This option was inserted mainly for testing purposes.'
+	  WRITE(T_OUT,'(A)')' Code uses LAST, LAST-IT_SEP, LAST-2*IT_STEP and LAST-3*IT_STEP for the acceleration'
 	  WRITE(T_OUT,'(A)')' The default value of 1 should generally be used.'
 	  CALL GEN_IN(IT_STEP,'Iteration step size for NG acceleration')
 	  DO_REGARDLESS=.FALSE.
+	  WRITE(T_OUT,'(/,A)')' The next parameter indicates the number of depths treated simultaneously'
+	  WRITE(T_OUT,'(A)')' The acceleration starts in blocks from the inner boundary'
 	  CALL GEN_IN(NBAND,'Band width for NG acceleration')
 	  CALL GEN_IN(ND_ST,'Only do NG acceleration for the depth in .GE. ND_ST')
 	  CALL GEN_IN(ND_END,'Only do NG acceleration for the depth in .LE. ND_END')
@@ -153,7 +157,7 @@
 	ELSE IF(OPTION(1:3) .EQ. 'NSR')THEN
 	  N_ITS_TO_RD=2
 	  SCALE_FAC=2.0D0
-	  CALL GEN_IN(SCALE_FAC,'Factor to scale last correction by')
+	  CALL GEN_IN(SCALE_FAC,'Exponent (N) to power scale (i.e., (1+T1)**N last correction')
 	  CALL GEN_IN(ND_ST,'Only do NG acceleration for the depth in .GE. ND_ST')
 	  CALL GEN_IN(ND_END,'Only do NG acceleration for the depth in .LE. ND_END')
 	ELSE IF(OPTION(1:3) .EQ. 'SOR')THEN
@@ -400,13 +404,13 @@
 	NUM_BAD_NG=0
 	VEC_INC(1:ND)=0.0D0
 	VEC_DEC(1:ND)=0.0D0
-	IF(NBAND .GE. ND)THEN
+	IF(NBAND .GE. ND .AND. ND_ST .EQ. 1 .AND. ND_END .EQ. ND)THEN
 	  NS=NT*ND
 	  CALL GENACCEL_V2(NEWPOP,RDPOPS,IONE,ND,NT,ND,NS)
 	ELSE
 	  DO K=ND_END,ND_ST,-NBAND
 	    LST=MAX(K-NBAND+1,ND_ST)
-	    LEND=LST+NBAND-1
+	    LEND=K				!LST+NBAND-1
 	    NS=(LEND-LST+1)*NT
 	    CALL GENACCEL_V2(NEWPOP(1,LST),RDPOPS,LST,LEND,NT,ND,NS)
 	  END DO

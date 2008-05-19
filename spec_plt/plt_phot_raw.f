@@ -71,7 +71,7 @@
 10	FILENAME='PHOT1'
 	CALL GEN_IN(FILENAME,'First photoionization file1:')
 	NPAIRS_1=0
-	OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME,IOSTAT=IOS)
+	OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME,ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(6,*)'Unable to open file: ',TRIM(FILENAME)
 	    WRITE(6,*)'IOSTAT=',IOS
@@ -112,6 +112,7 @@
 	    NAME_1(J)=STRING(1:K-1)
 	    READ(10,*)TYPE_1(J)
 	    READ(10,*)NUM_VALS_1(J)
+	    WRITE(16,*)TRIM(NAME_1(J)),TYPE_1(J),NUM_VALS_1(J)
 	    DO I=NXT_LOC,NXT_LOC+NUM_VALS_1(J)-1
 	      IF(TYPE_1(J) .EQ. 20 .OR. TYPE_1(J) .EQ. 21)THEN
 	        READ(10,*)NU_1(I),CROSS_1(I)
@@ -139,7 +140,7 @@
 14	CONTINUE
 	CALL GEN_IN(FILENAME,'File with oscillator data: "" to type in indivdual level energies')
 	IF(FILENAME .NE. " ")THEN
-	  OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME,IOSTAT=IOS)
+	  OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME,ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(6,*)'Unable to open file: ',TRIM(FILENAME)
 	    WRITE(6,*)'IOSTAT=',IOS
@@ -177,10 +178,8 @@
 	      K=INDEX(E_NAME(I),'[')
 	      E_NAME(I)(K:)=' '
 	    END IF
-	    WRITE(6,*)G(I),ENERGY(I)
 	  END DO
 	  CLOSE(UNIT=10)
-	  PAUSE
 !
 ! Now need to match names. We assume photoionzation files do not
 ! have [].
@@ -207,7 +206,7 @@
 	FILENAME='PHOT2'
 	CALL GEN_IN(FILENAME,'Second photoionization file1 ("" for null):')
 	IF(FILENAME .EQ. ' ')GOTO 1000
-	OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME,IOSTAT=IOS)
+	OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME,ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(6,*)'Unable to open file: ',TRIM(FILENAME)
 	    WRITE(6,*)'IOSTAT=',IOS
@@ -222,7 +221,7 @@
 	    END IF
 	    IF( INDEX(STRING,'!Number of energy levels') .NE. 0)THEN
 	      READ(STRING,*)NLEV_2
-	      ALLOCATE (TYPE_1(NLEV_2),NUM_VALS_1(NLEV_2),LOC_1(NLEV_2), NAME_1(NLEV_2),STAT=IOS)
+	      ALLOCATE (TYPE_2(NLEV_2),NUM_VALS_2(NLEV_2),LOC_2(NLEV_2), NAME_2(NLEV_2),STAT=IOS)
 	      IF(IOS .NE. 0)THEN
 	        WRITE(6,*)'Error in PLT_PHOT_RAW -- unable to allocate storage (2)'
 	        WRITE(6,*)'STAT=',IOS
@@ -270,6 +269,7 @@
 	  INDX_1=0
 	  LEVEL_NAME1='1'
 	  DO WHILE(INDX_1 .EQ. 0)
+	    WRITE(6,'(A)')' '
 	    CALL GEN_IN(LEVEL_NAME1,'Level name [or index] for File 1')
 	    IF(LEVEL_NAME1 .EQ. ' ')STOP
 	    DO J=1,NLEV_1
@@ -287,6 +287,10 @@
 	        END DO
 	        INDX_1=0
 	      END IF
+	    END IF
+	    IF(TYPE_1(INDX_1) .NE. 20 .OR. TYPE_1(INDX_1) .NE. 21)THEN
+	      INDX_1=0
+	      WRITE(6,*)'Not opacity-type cross section; see DISPGEN'
 	    END IF
 	  END DO
 	  WRITE(6,*)'Level_1 name is: ',NAME_1(INDX_1)
@@ -313,15 +317,17 @@
 	    CALL GEN_IN(DO_RECOM,'Compute recombination rate?')
 	  END IF
 	  IF(DO_RECOM)THEN
+	    TEMP=1.0D0
 	    CALL GEN_IN(TEMP,'Temperature in 10^4K')
 	    IF(TEMP .NE. 0)THEN
+	      WRITE(6,*)EDGE,STAT_WEIGHT,GION,NV,TEMP
 	      CALL RECOM_OPAC(YV,XV,EDGE,STAT_WEIGHT,GION,NV,NV,TOTAL_REC,TEMP)
 	      WRITE(6,*)'Total Rec=',TOTAL_REC
 	    END IF
 	  END IF
 !
 	  IF(NPAIRS_2 .NE. 0)THEN
-	    LEVEL_NAME2=LEVEL_NAME1
+	    LEVEL_NAME2=NAME_1(INDX_1)
 	    INDX_2=0
 	    DO WHILE(INDX_2 .EQ. 0)
 	      CALL GEN_IN(LEVEL_NAME2,'Level name for File 2')
@@ -332,15 +338,21 @@
 	        END IF
 	      END DO
 	      IF(INDX_2 .EQ. 0)WRITE(6,*)'Error - level name not found'
+	      IF(TYPE_2(INDX_2) .NE. 20 .OR. TYPE_2(INDX_2) .NE. 21)THEN
+	        INDX_2=-1
+	        WRITE(6,*)'Not opacity-type cross section; see DISPGEN'
+	      END IF
 	    END DO
-	    NV=NUM_VALS_2(INDX_2)
-	    XV(1:NV)=NU_2(LOC_2(INDX_2):LOC_2(INDX_2)+NV-1)
-	    YV(1:NV)=CROSS_2(LOC_2(INDX_2):LOC_2(INDX_2)+NV-1)
-	    CALL DP_CURVE(NV,XV,YV)
-	    IF(DO_RECOM)THEN
-	      IF(TEMP .NE. 0)THEN
-	        CALL RECOM_OPAC(YV,XV,EDGE,STAT_WEIGHT,GION,NV,NV,TOTAL_REC,TEMP)
-	        WRITE(6,*)'Total Rec=',TOTAL_REC
+	    IF(INDX_2 .GT. 0)THEN
+	      NV=NUM_VALS_2(INDX_2)
+	      XV(1:NV)=NU_2(LOC_2(INDX_2):LOC_2(INDX_2)+NV-1)
+	      YV(1:NV)=CROSS_2(LOC_2(INDX_2):LOC_2(INDX_2)+NV-1)
+	      CALL DP_CURVE(NV,XV,YV)
+	      IF(DO_RECOM)THEN
+	        IF(TEMP .NE. 0)THEN
+	          CALL RECOM_OPAC(YV,XV,EDGE,STAT_WEIGHT,GION,NV,NV,TOTAL_REC,TEMP)
+	          WRITE(6,*)'Total Rec=',TOTAL_REC
+	        END IF
 	      END IF
 	    END IF
 	  END IF

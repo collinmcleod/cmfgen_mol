@@ -22,7 +22,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(determine_nse.o)\
       $(LIB)(det_lte_ed.o)\
       $(LIB)(ddt_work.o)\
-      $(LIB)(do_cmf_hydro.o)\
+      $(LIB)(do_cmf_hydro_v2.o)\
       $(LIB)(do_ng_accel_band_v2.o)\
       $(LIB)(eval_adiabatic_v3.o)\
       $(LIB)(evalse_qwvj_v6.o)\
@@ -91,9 +91,9 @@ $(LIB)(adjust_pops.o) : adjust_pops.f $(LIB)(old_grid_module.o) $(MOD) $(CONT)
 	$(F90) -c $(OPTION) adjust_pops.f
 	ar ruv $(LIB) adjust_pops.o
 
-$(LIB)(do_cmf_hydro.o) : do_cmf_hydro.f $(LIB)(old_grid_module.o) $(LIB)(cmf_hydro_module.o)
-	$(F90) -c $(OPTION) do_cmf_hydro.f
-	ar ruv $(LIB) do_cmf_hydro.o
+$(LIB)(do_cmf_hydro_v2.o) : do_cmf_hydro_v2.f $(LIB)(old_grid_module.o) $(LIB)(cmf_hydro_module.o)
+	$(F90) -c $(OPTION) do_cmf_hydro_v2.f
+	ar ruv $(LIB) do_cmf_hydro_v2.o
 
 $(LIB)(store_old_grid.o) : store_old_grid.f $(MOD)  $(LIB)(old_grid_module.o)
 	$(F90) -c $(OPTION) store_old_grid.f
