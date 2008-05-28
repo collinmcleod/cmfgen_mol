@@ -86,6 +86,7 @@
 	  DO I=1,ND
 	    READ(LUIN,*)R(I),V(I),SIGMA(I)
 	  END DO
+	  CLOSE(LUIN)
 !
 ! Now scale to match radius. V is assumed to be fixed on a r/R(ND) scale.
 ! SIGMA does not change with a simple scaling in r.
@@ -102,7 +103,7 @@
 !
 	ELSE IF(OPTIONS(1) .EQ. 'deKOTER')THEN
 C
-C Read data from Alex Dekoter's program.
+C Read data from Alex Dekoter''s program.
 C
 	  CALL GEN_ASCI_OPEN(LUIN,'deKOTER','OLD',' ','READ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN
@@ -139,6 +140,7 @@ C
 	    READ(STRING(58:68),*)VEL(I)
 	    READ(STRING(70:81),*)dVdR(I)
 	  END DO
+	  CLOSE(LUIN)
 C
 	  R(1)=(HT(1)+1.0D0)*RP
 	  SIGMA(1)=dVDR(1)*(HT(1)+1.0D0)/VEL(1)-1.0D0
@@ -149,6 +151,7 @@ C
 	    V(I)=VEL(I-1)
 	  END DO
 !
+	  CLOSE(LUIN)
 ! Insert extra point near outer boundary, as use first order
 ! boundary condition.
 !
