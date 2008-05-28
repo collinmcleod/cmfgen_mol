@@ -375,6 +375,11 @@
 ! This formula holds at all radii, since g and Teff both scale as 1/r^2.
 !
 	  GAM_EDD=1.0D+06*SIGMA_TH*STEFAN_BC*(TEFF**4)/MU_ATOM/C_CMS/(10**LOGG)/AMU
+	  IF(GAM_EDD .GT. 1.0D0)THEN
+	    WRITE(LU_ERR,*)'An invalid Eddington parameter has been computed in DO_CMF_HYDRO_V2'
+	    WRITE(LU_ERR,*)'Check the validity of Teff and Log G'
+	    STOP
+	  END IF
 !
 	  IF(VERBOSE_OUTPUT)THEN
 	    WRITE(LUV,'(A,ES14.6)')'          Surface gravity is:',LOGG

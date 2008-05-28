@@ -2445,7 +2445,7 @@
 	          ELSE IF(TAU_SOB .GT. -1.0D-10)THEN
 	            YV(2*CNT)=-10.0D0
 	          ELSE
-	            YV(2*CNT)=-10.0D0-DLOG10(-1.0D0+10*TAU_SOB)
+	            YV(2*CNT)=-10.0D0-DLOG10(-1.0D+10*TAU_SOB)
 	          END IF
 	        ELSE IF(XOPT .EQ. 'NV')THEN
 	          IF(TAU_SOB .GT. TAU_MIN)THEN

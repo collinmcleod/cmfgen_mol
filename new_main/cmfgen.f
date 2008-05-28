@@ -81,7 +81,7 @@
 ! Open output file for all errors and comments. Change DO_TERM_OUT to
 ! have the output go to the terminal/batch log file.
 !
-	DO_TERM_OUT=.FALSE.                                   !TRUE.
+	DO_TERM_OUT=.TRUE.   !FALSE.                                   !TRUE.
 	IF(.NOT. DO_TERM_OUT)THEN
 	  CALL GEN_ASCI_OPEN(LUER,'OUTGEN','UNKNOWN','APPEND',' ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN

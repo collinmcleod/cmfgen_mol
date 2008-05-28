@@ -3705,6 +3705,14 @@
 	1                                     SUM(XRAY_LUM_1KEV)/LUM,OBS_XRAY_LUM_1KEV/LUM
 	CLOSE(UNIT=LU_FLUX)
 !
+! Quick and dirty way of ensuring people don't take notic of OBSFLUX when USE_FIXED_J is TRUE.
+!
+	IF(USE_FIXED_J)THEN
+	  CALL GEN_ASCI_OPEN(LU_FLUX,'OBSFLUX','OLD',' ',' ',IZERO,IOS)
+	  WRITE(LU_FLUX,'(///,A)')'THIS FILE IS USELESS WHEN USE_FIXED_J is TRUE'
+	  CLOSE(UNIT=LU_FLUX)
+	END IF
+!
 ! Because of the use of SL's, it is possible that a error in Luminosity
 ! can occur at depth, particulary in SN models where line escape is 
 ! enhanced because of the velocity field. TA provides an estimate of

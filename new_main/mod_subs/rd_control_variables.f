@@ -414,6 +414,11 @@ C
 	  USE_FIXED_J=.FALSE.
 	  CALL RD_STORE_LOG(USE_FIXED_J,'USE_FIXED_J',L_FALSE,
 	1           'Use previously computed J to evaluate ALL rates?')
+	  IF(USE_FIXED_J .AND. .NOT. RD_LAMBDA)THEN
+	    WRITE(LUER,'(A)')' Warning: RD_LAMBDA must be TRUE when USE_FIXED_J is TRUE.'
+	    WRITE(LUER,'(A)')' Setting RD_LAMBDA to TRUE.'
+	    RD_LAMBDA=.TRUE.
+	  END IF
 	  CALL RD_STORE_LOG(FLUX_CAL_ONLY,'FLUX_CAL_ONLY',L_TRUE,
 	1           'Compute the observers frame flux only ?')
 	  CALL RD_STORE_LOG(EXTEND_FRM_SOL,'EXT_FRM_SOL',L_TRUE,
