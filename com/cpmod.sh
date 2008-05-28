@@ -49,6 +49,28 @@ cp $1/*OUT               $2/
 cp $1/GAMMAS             $2/GAMMAS_IN
 cp $1/MODEL_SPEC         $2/
 
+echo " "
+echo " Copyed startup files"
+
+if(-e $1/RVSIG_COL)then
+  cp $1/RVSIG_COL          $2/
+  echo " "
+  echo " Copyed RVSIG_COL: This file may need to be edited for a new model"
+endif
+
+if(-e $1/HYDRO_DEFAULTS)then
+  cp $1/HYDRO_DEFAULTS     $2/
+  echo " "
+  echo " Copyed HYDRO_DEFAULTS: needed for calculations of the hydro structure"
+  echo " Remember to edit the number of iterations"
+endif
+
+if(-e $1/ROSSELAND_LTE_TAB)then
+  cp $1/ROSSELAND_LTE_TAB  $2/
+  echo " "
+  echo " Copyed ROSSELAND_LTE_TAB: needed for calculations of the hydro structure"
+endif
+
 #
 
 cd $2
@@ -56,3 +78,7 @@ cd $2
 # Now rename the *OUT files to *IN
 
 out2in
+echo " "
+echo " Renamed *OUT files to *_IN"
+echo " "
+

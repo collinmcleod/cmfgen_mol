@@ -58,7 +58,7 @@
 	  DO I=1,ND
 	    READ(LUIN,*)T1,T2,T3,DENSITY(I),CLUMP_FAC(I)
 	    IF( ABS(T1-R(I))/R(I) .GT. 1.0D-06)THEN
-	      WRITE(LUER,*)'Error in RD_MOD_DEDNSITY'
+	      WRITE(LUER,*)'Error in RD_MOD_DENSITY'
 	      WRITE(LUER,*)'R scales don''t agree'
 	      WRITE(LUER,*)R(I),T1
 	      STOP

@@ -4851,16 +4851,28 @@ c
 	1          MASS_DENSITY(I),1.0D-10*ROSS_MEAN(I)/MASS_DENSITY(I)
 	  END DO
 	ELSE IF(XOPT .EQ. 'WRRVSIG')THEN
+	  CALL USR_OPTION(ELEC,'DCF','F','Include the density and clumping factor in file?')
 	  CALL GEN_ASCI_OPEN(LU_OUT,'NEW_RVSIG','UNKNOWN',' ','WRITE',I,IOS)
 	  WRITE(LU_OUT,'(A)')'!'
-	  WRITE(LU_OUT,'(A,7X,A,9X,10X,A,11X,A,3X,A)')'!','R','V(km/s)','Sigma','Depth'
+	  IF(ELEC)THEN
+	    WRITE(LU_OUT,'(A,7X,A,9X,10X,A,12X,A,2(7X,A),3X,A)')'!','R','V(km/s)','Sigma',
+	1                   '    Density','Clump. Fac.','Depth'
+	  ELSE
+	    WRITE(LU_OUT,'(A,7X,A,9X,10X,A,12X,A,3X,A)')'!','R','V(km/s)','Sigma','Depth'
+	  END IF
 	  WRITE(LU_OUT,'(A)')'!'
 	  WRITE(LU_OUT,'(A)')' '
 	  WRITE(LU_OUT,'(I4,20X,A)')ND,'!Number of depth points`'
 	  WRITE(LU_OUT,'(A)')' '
-	  DO I=1,ND
-	    WRITE(LU_OUT,'(F18.8,ES17.7,F17.7,4X,I4)')R(I),V(I),SIGMA(I),I
-	  END DO
+	  IF(ELEC)THEN
+	    DO I=1,ND
+	      WRITE(LU_OUT,'(F18.8,ES17.7,F17.7,2ES18.8,4X,I4)')R(I),V(I),SIGMA(I),MASS_DENSITY(I),CLUMP_FAC(I),I
+	    END DO
+	  ELSE
+	    DO I=1,ND
+	      WRITE(LU_OUT,'(F18.8,ES17.7,F17.7,4X,I4)')R(I),V(I),SIGMA(I),I
+	    END DO
+	  END IF
 	  CLOSE(LU_OUT)
 	  WRITE(T_OUT,'(A,ES17.10)')'     R(ND)=',R(ND)
 	  WRITE(T_OUT,'(A,ES17.10)')'RMAX/R(ND)=',R(1)/R(ND)

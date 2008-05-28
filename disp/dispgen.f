@@ -427,7 +427,7 @@ C
 	FRAC_SIG_GAU=0.25
 	CUT_ACCURACY=0.02
 	ABOVE_EDGE=.TRUE.
-	CALL GEN_IN(SIG_GAU_KMS,'Defaults smoothing for photoionization cross-sections (km/s)')
+	CALL GEN_IN(SIG_GAU_KMS,'Default smoothing for photoionization cross-sections (km/s)')
 !
 	WRITE(T_OUT,*)' '
 	DO ID=NUM_IONS,1,-1
