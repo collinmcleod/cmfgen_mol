@@ -5,6 +5,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered 20-Jun-2008: Z_POP now set (was not set)a
+!                      Improved handling at boundaries.
 ! Created 
 !
 	INTEGER ND
@@ -95,10 +97,10 @@
 ! Now do the boudaries which may extend outside the old grid.
 !
 	    J=ATM(ID)%NXzV_F
-	    DO L=1,NXST-1
+	    DO L=2,NXST-1
 	      ATM(ID)%XzV_F(1:J,L)=ATM(ID)%XzV_F(1:J,1)
 	    END DO
-	    DO L=NX+1,ND
+	    DO L=NX+1,ND-1
 	      ATM(ID)%XzV_F(1:J,L)=ATM(ID)%XzV_F(1:J,ND)
 	    END DO
 !
@@ -111,8 +113,10 @@
 	    TB(1:OLD_ND)=LOG(ATM(ID)%DXzV_F(1:OLD_ND))
 	    CALL LINPOP(LOG_TAU(NXST),TA(NXST),N_INT,LOG_OLD_TAU,TB,OLD_ND)
 	    ATM(ID)%DXzV_F(NXST:NX)=EXP(TA(NXST:NX))
-	    ATM(ID)%DXzV_F(1:NXST-1)=ATM(ID)%DXzV_F(1)*DENSITY(1)/OLD_MASS_DENSITY(1)
-	    ATM(ID)%DXzV_F(NX+1:ND)=ATM(ID)%DXzV_F(OLD_ND)*DENSITY(ND)/OLD_MASS_DENSITY(OLD_ND)
+	    T1=ATM(ID)%DXzV_F(1)/OLD_MASS_DENSITY(1)
+	    ATM(ID)%DXzV_F(1:NXST-1)=T1*DENSITY(1:NXST-1)
+	    T1=ATM(ID)%DXzV_F(OLD_ND)/OLD_MASS_DENSITY(OLD_ND)
+	    ATM(ID)%DXzV_F(NX+1:ND)=T1*DENSITY(NX+1:ND)
 	  END IF
 !
 	END DO		!Species loop
@@ -191,6 +195,11 @@
 !
 ! Compute the ion population at each depth.
 ! These are required when evaluation the occupation probabilities.
+!
+        DO ID=1,NUM_IONS-1
+	  CALL SET_Z_POP(Z_POP, ATM(ID)%ZXzV, ATM(ID)%EQXzV,
+	1              ATM(ID)%NXzV, NT, ATM(ID)%XzV_PRES)
+        END DO
 !
 	DO J=1,ND
 	  POPION(J)=0.0D0

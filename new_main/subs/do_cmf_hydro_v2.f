@@ -469,6 +469,7 @@
 	      ED(1)=ED_ON_NA(1)*POP_ATOM(1)
 	      CHI_ROSS(1)=ED_ON_NA(1)*SIGMA_TH*POP_ATOM(1)*ROSS_ON_ES
 	      GAMMA_FULL(1)=GAM_FULL
+	      V(1)=MDOT/MU_ATOM/POP_ATOM(1)/R(1)/R(1)
 	      I=1
 	  END IF
 !
@@ -523,6 +524,7 @@
 	      WRITE(LUV,*)'I=',I
 	      WRITE(LUV,*)'P(I-1)=',P(I-1)
 	      WRITE(LUV,*)'R(I-1)=',R(I-1)
+	      WRITE(LUV,*)'V(I-1)=',V(I-1)
 	      WRITE(LUV,*)'T(I-1)=',T(I-1)
 	      WRITE(LUV,*)'TAU(I-1)=',TAU(I-1)
 	      WRITE(LUV,*)'ED_ON_NA(I-1)=',ED_ON_NA(I-1)
@@ -585,7 +587,7 @@
 	    CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*ROSS_ON_ES
 	    GAMMA_FULL(I)=GAM_FULL
 	    V(I)=MDOT/MU_ATOM/POP_ATOM(I)/R(I)/R(I)
-	    IF(.NOT. PLANE_PARALLEL)THEN
+	    IF(.NOT. PLANE_PARALLEL_NO_V)THEN
 	      IF(V(I) .GE. V(I-1))THEN
 	        GAM_LIM=GAM_LIM-0.01
 	        IF(VERBOSE_OUTPUT)WRITE(LUV,*)'Resetting GAM_LIM due to -ve velocity gradient'
