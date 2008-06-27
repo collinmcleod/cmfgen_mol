@@ -2176,7 +2176,7 @@ C
 	      WRITE(LUIN,'(A)')' '
 	      WRITE(LUIN,'(3X,A,500(A8)))')'d',' V(km/s)','    M(t)',(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
 	      DO I=1,ND
-	        WRITE(LUIN,'(I4,X,F8.3,500(F8.2))')I,V(I),TA(I),
+	        WRITE(LUIN,'(I4,1X,F8.3,500(F8.2))')I,V(I),TA(I),
 	1                    (100.0D0*ION_LINE_FORCE(I,ID)/TA(I),ID=1,NUM_IONS)
 	      END DO
 	      WRITE(LUIN,'(3X,A,500(A8)))')'d',' V(km/s)','    M(t)',(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
@@ -2744,7 +2744,7 @@ C
 	  CLOSE(UNIT=82)
 	  OPEN(UNIT=82,FILE='SOB_FORCE_MULT',STATUS='UNKNOWN')
 	   DO I=1,ND
-	      WRITE(82,'(X,I3,2X,3ES14.6)')I,R(I),V(I),FORCE_MULT(I)
+	      WRITE(82,'(1X,I3,2X,3ES14.6)')I,R(I),V(I),FORCE_MULT(I)
 	    END DO
 	  CLOSE(UNIT=82)
 	END IF

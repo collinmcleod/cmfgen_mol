@@ -161,7 +161,7 @@ C
 	DO K=1,ND_N
 	  WRITE(DCOUT,'(A)')' '
 	  WRITE(DCOUT,'(A)')TRIM(HEAD(K))
-	  WRITE(DCOUT,'(X,1P,5E15.5)')(DC_N(I,K),I=1,N_N),
+	  WRITE(DCOUT,'(1X,1P,5E15.5)')(DC_N(I,K),I=1,N_N),
 	1                           (DC_O(I,K),I=N_N+1,N_O)
 	END DO
 C

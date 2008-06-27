@@ -73,7 +73,7 @@
 	    J=INDEX(STRING(I),':')
 	    READ(STRING(I)(J+1:),*)GSUR_OLD
 	    MASS_OLD=GSUR_OLD/GRAV_CON*RND*RND
-	    WRITE(T_OUT,'(X,A,F6.2)')'Old mass is ',MASS_OLD
+	    WRITE(T_OUT,'(1X,A,F6.2)')'Old mass is ',MASS_OLD
 	    MASS_NEW=MASS_OLD
 	    CALL GEN_IN(MASS_NEW,'New mass in solar units')
 	    GSUR_NEW=GSUR_OLD*MASS_NEW/MASS_OLD
@@ -89,9 +89,9 @@
 	  MT=g_rad/g_elec-1.0D0
 !
 	  IF(R .GT. 9.99E+04)THEN
-	    FMT='(X,1PE10.4,0PF12.2,F9.2,1P,5(E14.4),0P,2F11.2)'
+	    FMT='(1X,1PE10.4,0PF12.2,F9.2,1P,5(E14.4),0P,2F11.2)'
 	  ELSE
-	    FMT='(X,F10.4,F12.2,F9.2,1P,5(E14.4),0P,2F11.3)'
+	    FMT='(1X,F10.4,F12.2,F9.2,1P,5(E14.4),0P,2F11.3)'
 	  END IF                    
 	  WRITE(LU_OUT,FMT)R,V,E,VdVdR,dPdR,g_TOT,g_RAD,g_ELEC,Gamma,MT
 	END DO

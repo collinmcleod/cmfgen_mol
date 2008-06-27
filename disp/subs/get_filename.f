@@ -139,5 +139,5 @@ C
 	  END IF
 	END IF
 C
-999	FORMAT(' Error in GET_FILENAME --- ',A,X,A)
+999	FORMAT(' Error in GET_FILENAME --- ',A,1X,A)
 	END

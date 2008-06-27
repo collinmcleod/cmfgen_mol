@@ -327,7 +327,7 @@
 	IF(DIAG_BAND .AND. DEPTH_INDX .EQ. ND)THEN
 	  DO ID=1,NION
 	    IF(REP_CNT(ID) .GT. 0)THEN
-              WRITE(LUER,'(X,A,T9,A,I3,A)')
+              WRITE(LUER,'(1X,A,T9,A,I3,A)')
 	1         TRIM(ION_ID(ID)),' g.s. eq. replaced by ionization eq. at ',
 	1         REP_CNT(ID),' depths.'
 	      END IF

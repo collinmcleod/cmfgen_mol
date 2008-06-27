@@ -419,13 +419,13 @@
 	END IF
 !
 	WRITE(6,*)' '
-	WRITE(6,'(X,70A)')('*',I=1,70)
+	WRITE(6,'(1X,70A)')('*',I=1,70)
 	WRITE(6,*)' '
         WRITE(6,*)'Plotting Y(NG accel)/Y(old) for each depth'
         WRITE(6,*)'Ten depths plotted each time.'
         WRITE(6,*)'These plots are for diagnostic purposes only'
         WRITE(6,*)' '
-	WRITE(6,'(X,70A)')('*',I=1,70)
+	WRITE(6,'(1X,70A)')('*',I=1,70)
         WRITE(6,*)' '
 	DO_PLTS=.FALSE.
         CALL GEN_IN(DO_PLTS,'Plot the above diagnostic information?')
@@ -485,8 +485,8 @@
                 POPS(K,L)=POPS(K,L)+T1*(NEWPOP(K,L)-POPS(K,L))
               END DO
 	      IF(T1 .NE. 1.0D0)WRITE(LUER,8000)L,LOCINC,LOCDEC
-8000	      FORMAT(X,'Scaling performed at depth ',I3,':',
-	1          X,'Biggest increase/decrease was ',2ES12.2)
+8000	      FORMAT(1X,'Scaling performed at depth ',I3,':',
+	1          1X,'Biggest increase/decrease was ',2ES12.2)
 	    END IF
 !
 	    IF(LOCINC .GT. MAXINC)THEN
@@ -505,9 +505,9 @@
 	    NUM_BAD_NG=NUM_BAD_NG+1
 	    WRITE(LUER,*)'NUM_BAD_NG=',NUM_BAD_NG
 	    WRITE(LUER,9000)L,LOCINC,LOCDEC
-9000	    FORMAT(X,'No NG acceleration performed at depth ',I3,/,
-	1          X,'Biggest increase was ',1PE10.2,/,
-	1          X,'Biggest decrease was ',E10.2)
+9000	    FORMAT(1X,'No NG acceleration performed at depth ',I3,/,
+	1          1X,'Biggest increase was ',1PE10.2,/,
+	1          1X,'Biggest decrease was ',E10.2)
 	
 	  ELSE
 	    DO K=1,NT
@@ -541,11 +541,11 @@
 	END IF
 !
 	WRITE(6,*)' '
-	WRITE(6,'(X,70A)')('*',I=1,70)
+	WRITE(6,'(1X,70A)')('*',I=1,70)
 	WRITE(6,*)' '
 	WRITE(6,*)'Plotting largest % decrease and increase at each depth.'
 	WRITE(6,*)' '
-	WRITE(6,'(X,70A)')('*',I=1,70)
+	WRITE(6,'(1X,70A)')('*',I=1,70)
 	WRITE(6,*)' '
 	DO I=1,ND
 	  INT_ARRAY(I)=I
@@ -561,9 +561,9 @@
 	MAXINC=100.0D0*(MAXINC-1.0D0)
 	MAXDEC=100.0D0*(1.0D0/MAXDEC-1.0D0)
 	WRITE(LUER,9800)INC_LOC,MAXINC
-9800	FORMAT(X,'Max NG % increase at depth ',I3,' is',1PE10.2)
+9800	FORMAT(1X,'Max NG % increase at depth ',I3,' is',1PE10.2)
 	WRITE(LUER,9900)DEC_LOC,MAXDEC
-9900	FORMAT(X,'Max NG % decrease at depth ',I3,' is',1PE10.2)
+9900	FORMAT(1X,'Max NG % decrease at depth ',I3,' is',1PE10.2)
 C
 	NG_DONE=.TRUE.  		!Successful acceleration
 C

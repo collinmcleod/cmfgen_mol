@@ -70,7 +70,7 @@
 	  WRITE(LU,*)'The last AI/AR ratio is the relevant conversion factor for a '
 	  WRITE(LU,*)'given charge exchange reacton.'
 	  WRITE(LU,*)' '
-	  WRITE(LU,'(X,A,2X,A,2X,A,6X,A,9X,A,8X,A)')
+	  WRITE(LU,'(1X,A,2X,A,2X,A,6X,A,9X,A,8X,A)')
 	1               'Reaction','Col','ID','AI/AR','G_EXP','GION'
 	  FIRST_TIME=.FALSE.
 	END IF
@@ -86,7 +86,7 @@
 	  COOL_CHG(:,:)=0.0D0
 	  INITIALIZE_ARRAYS=.FALSE.
 	  WRITE(LU,*)' '
-	  WRITE(LU,'(X,A,ES14.4)')'Temperature/10^4 K=',T(1)
+	  WRITE(LU,'(1X,A,ES14.4)')'Temperature/10^4 K=',T(1)
 	  WRITE(LU,*)' '
 	END IF
 !
@@ -149,12 +149,12 @@
 !
 	        IF(K .EQ. 1 .OR. K .EQ. 2)THEN
 	          AI_AR_CHG(J,1:ND)=AI_AR_CHG(J,1:ND)*G_CHG_VEC(1:ND)
-	          WRITE(LU,'(X,3I6,3ES14.4)')J,K,ID_ION_CHG(J,K),AI_AR_CHG(J,1),G_CHG_VEC(1),GION
+	          WRITE(LU,'(1X,3I6,3ES14.4)')J,K,ID_ION_CHG(J,K),AI_AR_CHG(J,1),G_CHG_VEC(1),GION
 	          dlnAI_AR_CHG_dlnT(J,1:ND)=dlnAI_AR_CHG_dlnT(J,1:ND) + 
 	1                            dG_CHG_VEC(1:ND)/G_CHG_VEC(1:ND)
 	        ELSE 
 	          AI_AR_CHG(J,1:ND)=AI_AR_CHG(J,1:ND)/G_CHG_VEC(1:ND)
-	          WRITE(LU,'(X,3I6,3ES14.4)')J,K,ID_ION_CHG(J,K),AI_AR_CHG(J,1),G_CHG_VEC(1),GION
+	          WRITE(LU,'(1X,3I6,3ES14.4)')J,K,ID_ION_CHG(J,K),AI_AR_CHG(J,1),G_CHG_VEC(1),GION
 	          dlnAI_AR_CHG_dlnT(J,1:ND)=dlnAI_AR_CHG_dlnT(J,1:ND) -
 	1                            dG_CHG_VEC(1:ND)/G_CHG_VEC(1:ND)
 	        END IF

@@ -347,10 +347,10 @@
 	CALL GEN_IN(USE_G_WEIGHTING,'Weight f,A sums by g?')
 	WRITE(30,'()')
 	IF(USE_G_WEIGHTING)THEN
-	  WRITE(30,'(30X,3(X,A),8X,A,3X,4(3X,A,4X))')
+	  WRITE(30,'(30X,3(1X,A),8X,A,3X,4(3X,A,4X))')
 	1           'S','L','P','G','GFL_SUM','GFH_SUM','GAL_SUM','GAH_SUM'
 	ELSE
-	  WRITE(30,'(30X,3(X,A),8X,A,3X,4(4X,A,4X))')
+	  WRITE(30,'(30X,3(1X,A),8X,A,3X,4(4X,A,4X))')
 	1           'S','L','P','G','FL_SUM','FH_SUM','AL_SUM','AH_SUM'
 	END IF
 	WRITE(30,'()')
@@ -389,7 +389,7 @@
 !
 	ALLOCATE (LEVEL_DONE(NLEV));LEVEL_DONE=.FALSE.
 	IF(PACK)THEN
-	  WRITE(45,'(X,A)')FORMFEED
+	  WRITE(45,'(1X,A)')FORMFEED
 	  WRITE(45,'()')
 	  DO J=1,NLEV
 	    IF(.NOT. LEVEL_DONE(J))THEN
@@ -499,7 +499,7 @@
 	  WRITE(T_OUT,'(A)')' Error - ion charge does not match that read in by GENOSC'
 	  WRITE(T_OUT,'(A,ES5.1)')' ZION=',ZION
 	  WRITE(T_OUT,'(A,ES5.1)')' ZION_RD=',ZION_RD
-	  WRITE(LUER,'(X,A)')' '
+	  WRITE(LUER,'(1X,A)')' '
 	  WRITE(LUER,'(A)')' Error - ion charge does not match that read in by GENOSC'
 	  WRITE(LUER,'(A,ES5.1)')' ZION=',ZION
 	  WRITE(LUER,'(A,ES5.1)')' ZION_RD=',ZION_RD
@@ -625,7 +625,7 @@
 	  END IF
 !
 	  IF(PHOT_ID .GT. 1)THEN
-	    WRITE(45,'(X,A)')FORMFEED
+	    WRITE(45,'(1X,A)')FORMFEED
 	    WRITE(45,'()')
 	  END IF
 	  WRITE(45,'(A,I2)')' Photoionization route is',PHOT_ID
@@ -643,7 +643,7 @@
 	  WRITE(45,'(7X,A,T35,A,4ES14.4)')'T(10^4K)','Type',(TEMP(J),J=1,N_TEMP)
 	  WRITE(45,'()')
 	  DO I=1,NLEV
-	    WRITE(45,'(X,I5,2X,A,T35,I4,4ES14.4)')I,NAME(I),CROSS_TYPE(I),(RECOM(I,J),J=1,N_TEMP)
+	    WRITE(45,'(1X,I5,2X,A,T35,I4,4ES14.4)')I,NAME(I),CROSS_TYPE(I),(RECOM(I,J),J=1,N_TEMP)
 	  END DO
 	  WRITE(45,'()')
 	  WRITE(45,'(8X,A,T35,4X,4ES14.4)')'Sum',(SUM(RECOM(:,J)),J=1,N_TEMP)
@@ -661,7 +661,7 @@
 	        CROSS_TYPE_PACK(IS)=CROSS_TYPE(I)
 	      END DO
 	    END DO
-	    WRITE(45,'(X,A)')FORMFEED
+	    WRITE(45,'(1X,A)')FORMFEED
 	    WRITE(45,'()')
 	    WRITE(45,'()')
 	    WRITE(45,'(A)')' Summary of recombination rates for packed levels.'
@@ -669,7 +669,7 @@
 	    WRITE(45,'(7X,A,T35,A,4ES14.4)')'T(10^4K)','Type',(TEMP(J),J=1,N_TEMP)
 	    WRITE(45,'()')
 	    DO I=1,CNT
-	      WRITE(45,'(X,I5,2X,A,T35,I4,4ES14.4)')I,NAME_PACK(I),CROSS_TYPE_PACK(I),(RECOM_PACK(I,J),J=1,N_TEMP)
+	      WRITE(45,'(1X,I5,2X,A,T35,I4,4ES14.4)')I,NAME_PACK(I),CROSS_TYPE_PACK(I),(RECOM_PACK(I,J),J=1,N_TEMP)
 	    END DO
 	    WRITE(45,'()')
 	    WRITE(45,'(8X,A,T35,4X,4ES14.4)')'Sum',(SUM(RECOM_PACK(:,J)),J=1,N_TEMP)

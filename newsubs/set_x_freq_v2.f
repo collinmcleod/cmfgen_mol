@@ -74,7 +74,7 @@
 	          WRITE(LUER,*)
 	          FIRST=.FALSE.
 	        END IF
-	        WRITE(LUER,'(X,4(A4,I2,3X),3X,A,ES10.2)')' IZ=',IZ,' NE=',NE,'PQN=',I,
+	        WRITE(LUER,'(1X,4(A4,I2,3X),3X,A,ES10.2)')' IZ=',IZ,' NE=',NE,'PQN=',I,
 	1                   'ANG=',J,'Edge Freq(10^15 Hz)=',FREQ(NCF)
                 NCF=NCF-1
 	      END IF

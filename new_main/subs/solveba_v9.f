@@ -254,7 +254,7 @@
 	WRITE(LU_SUM,'(A)')' Summary of changes at each depth '
 	WRITE(LU_SUM,'(A,I6)')' NT=',NT
 	WRITE(LU_SUM,'(A)')' '
-	WRITE(LU_SUM,'(3X,A,7(X,A))')'Depth',' 100.0%','  10.0%','   1.0%',
+	WRITE(LU_SUM,'(3X,A,7(1X,A))')'Depth',' 100.0%','  10.0%','   1.0%',
 	1        '   0.1%','  0.01%',' 0.001%','0.0001%'
 !
 !   STEQ is +ve when the populations are to decrease.

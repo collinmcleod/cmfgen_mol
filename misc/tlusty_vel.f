@@ -332,7 +332,7 @@
 	  WRITE(LU_V,'(A)')'!'
 	  WRITE(LU_V,'(71A)')'!',('*',I=1,70)
 	  WRITE(LU_V,'(71A)')'!',('*',I=1,70)
-	  WRITE(LU_V,'(X,I4,2X,A)')ND,'!Number of depth points'
+	  WRITE(LU_V,'(1X,I4,2X,A)')ND,'!Number of depth points'
 	  DO I=1,ND
 	    WRITE(LU_V,'(F18.8,2ES14.6,F12.4,ES12.2)')RD(I),VPH(I),
 	1             dVdR_PH(I)-1.0D0,T(I),TAUR(I)
@@ -396,7 +396,7 @@
 	  WRITE(LU_V,'(A)')'!'
 	  WRITE(LU_V,'(71A)')'!',('*',I=1,70)
 	  WRITE(LU_V,'(71A)')'!',('*',I=1,70)
-	  WRITE(LU_V,'(X,I4,2X,A)')ND_CMF,'!Number of depth points'
+	  WRITE(LU_V,'(1X,I4,2X,A)')ND_CMF,'!Number of depth points'
 	  DO I=1,ND_CMF
 	    WRITE(LU_V,'(F18.8,2ES14.6,F12.4,ES12.2)')R_CMF(I),V_CMF(I),
 	1             dVdR_CMF(I)-1.0D0,T_CMF(I),TAUR_CMF(I)
@@ -719,12 +719,12 @@
 	1                 ' (Scale height for beta in R*)'
 	END IF
 	WRITE(LU_V,'(A)')'!'
-	WRITE(LU_V,'(A,X,2ES12.4)')'!      R0 for Beta-velocity law is',R0,R0/RCORE
-	WRITE(LU_V,'(A,X,2ES12.4)')'!             Connection radius is',
+	WRITE(LU_V,'(A,1X,2ES12.4)')'!      R0 for Beta-velocity law is',R0,R0/RCORE
+	WRITE(LU_V,'(A,1X,2ES12.4)')'!             Connection radius is',
 	1                           RA(C_INDX),RA(C_INDX)/RCORE
-	WRITE(LU_V,'(A,X, ES12.4,A)')'! Velocity at connection radius is',
+	WRITE(LU_V,'(A,1X, ES12.4,A)')'! Velocity at connection radius is',
 	1                          VPA(C_INDX),' km/s'
-	WRITE(LU_V,'(A,X, ES12.4)')'!       Tau at connection depth is',
+	WRITE(LU_V,'(A,1X, ES12.4)')'!       Tau at connection depth is',
 	1                          TAUR_A(C_INDX)
 	WRITE(LU_V,'(A)')'!'
 	IF(NEW_DEF_OPT)THEN
@@ -742,7 +742,7 @@
 	WRITE(LU_V,'(A)')'!'
 	WRITE(LU_V,'(71A)')'!',('*',I=1,70)
 	WRITE(LU_V,'(71A)')'!',('*',I=1,70)
-	WRITE(LU_V,'(X,I4,2X,A)')ND_CMF,'!Number of depth points'
+	WRITE(LU_V,'(1X,I4,2X,A)')ND_CMF,'!Number of depth points'
 	DO I=1,ND_CMF
 	  WRITE(LU_V,'(F18.8,2ES14.6,F12.4,ES12.2)')R_CMF(I),V_CMF(I),
 	1             dVdR_CMF(I)-1.0D0,T_CMF(I),TAUR_CMF(I)

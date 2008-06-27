@@ -131,14 +131,14 @@
 	    L1=PD(ID)%CROSS_TYPE(I,1)
 	    IF(L1 .EQ. 20 .OR. L1 .EQ. 21)THEN
 	      WRITE(LUER,'(A)')' '
-	      WRITE(LUER,'(X,79A)')('*',J=1,79)
-	      WRITE(LUER,'(X,79A)')('*',J=1,79)
-	      WRITE(LUER,'(X,A,A)')'WARNING when reading ',TRIM(FILENAME)
-	      WRITE(LUER,'(X,A)')'You have indicated that you wish to include permitted dielectronic transitions.'
-	      WRITE(LUER,'(X,A)')'However, the photoionization file contains OPACITY-PROJECT cross-sections.'
-	      WRITE(LUER,'(X,A)')'These may already contain the deilectronic transitions as resonances.'
-	      WRITE(LUER,'(X,79A)')('*',J=1,79)
-	      WRITE(LUER,'(X,79A)')('*',J=1,79)
+	      WRITE(LUER,'(1X,79A)')('*',J=1,79)
+	      WRITE(LUER,'(1X,79A)')('*',J=1,79)
+	      WRITE(LUER,'(1X,A,A)')'WARNING when reading ',TRIM(FILENAME)
+	      WRITE(LUER,'(1X,A)')'You have indicated that you wish to include permitted dielectronic transitions.'
+	      WRITE(LUER,'(1X,A)')'However, the photoionization file contains OPACITY-PROJECT cross-sections.'
+	      WRITE(LUER,'(1X,A)')'These may already contain the deilectronic transitions as resonances.'
+	      WRITE(LUER,'(1X,79A)')('*',J=1,79)
+	      WRITE(LUER,'(1X,79A)')('*',J=1,79)
 	      EXIT
 	    END IF
 	  END DO

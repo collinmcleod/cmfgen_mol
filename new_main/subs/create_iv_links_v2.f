@@ -26,7 +26,7 @@
       WRITE(93,*)'Summary of important variables'
       WRITE(93,*)' '
       DO I=1,NT,20
-	WRITE(93,'(X,I5,20(2X,L1))')I,(IMP_VAR(J),J=I,MIN(I+19,NT))
+	WRITE(93,'(1X,I5,20(2X,L1))')I,(IMP_VAR(J),J=I,MIN(I+19,NT))
       END DO
 !
       DO ID=1,NION
@@ -86,13 +86,13 @@
           WRITE(93,*)'Summary of links for species ID=',ID
           WRITE(93,*)'LNK_TO_F'
 	  DO I=1,NIV,10
-	    WRITE(93,'(X,I5,A1,10(2X,I5))')
+	    WRITE(93,'(1X,I5,A1,10(2X,I5))')
 	1        I,'*',(SE(ID)%LNK_TO_F(J),J=I,MIN(I+9,NIV))
 	  END DO
           WRITE(93,*)' '
 	  WRITE(93,*)'LNK_TO_IV'
 	  DO I=1,NT,10
-	    WRITE(93,'(X,I5,A1,10(2X,I5))')
+	    WRITE(93,'(1X,I5,A1,10(2X,I5))')
 	1        I,'*',(SE(ID)%LNK_TO_IV(J),J=I,MIN(I+9,NT))
 	  END DO
 !

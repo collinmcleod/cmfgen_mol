@@ -244,7 +244,7 @@
 	  NEW_POPS(N-1)=ED_NEW
 	  NEW_POPS(N)=T_NEW
 	  DO I=1,N
-	    WRITE(6,'(X,I3,4ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I),
+	    WRITE(6,'(1X,I3,4ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I),
 	1                          1.0D0-NEW_POPS(I)/POPS(I)
 	  END DO
 	
@@ -254,13 +254,13 @@
 !
 	  IF(N .LT. 20)THEN
 	    DO I=1,N
-	      WRITE(6,'(X,I3,3ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I)
+	      WRITE(6,'(1X,I3,3ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I)
 	    END DO
 	  END IF
-	  WRITE(12,'(X,A,5(4X,A))')
+	  WRITE(12,'(1X,A,5(4X,A))')
 	1          'Depth','    Sol   ','Old RHS   ','Eval. RHS ','Lgest Term','Error     '
 	  DO I=1,N
-	    WRITE(12,'(X,I5,5ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I),
+	    WRITE(12,'(1X,I5,5ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I),
 	1             LARGEST_VAL(I),ABS(SAV_STEQ(I)-RHS(I))/LARGEST_VAL(I)
 	  END DO
 	END IF
@@ -290,10 +290,10 @@
 	WRITE(12,*)' '
 	WRITE(12,*)'Improved solution after 1 iteration on the residuals'
 	WRITE(12,*)' '
-	WRITE(12,'(X,A,5(4X,A))')
+	WRITE(12,'(1X,A,5(4X,A))')
 	1          'Depth','    Sol   ','Old RHS   ','Eval. RHS ','Lgest Term','Error     '
 	DO I=1,N
-	  WRITE(12,'(X,I5,5ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I),
+	  WRITE(12,'(1X,I5,5ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I),
 	1             LARGEST_VAL(I),ABS(SAV_STEQ(I)-RHS(I))/LARGEST_VAL(I)
 	END DO
 !
@@ -348,15 +348,15 @@
 	WRITE(12,*)' '
 	WRITE(12,*)'Solution using a different scaling of CMAT'
 	WRITE(12,*)' '
-	WRITE(12,'(X,A,5(4X,A))')
+	WRITE(12,'(1X,A,5(4X,A))')
 	1          'Depth','    Sol   ','Old RHS   ','Eval. RHS ','Lgest Term','Error     '
 	DO I=1,N
-	  WRITE(12,'(X,I5,5ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I),
+	  WRITE(12,'(1X,I5,5ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I),
 	1             LARGEST_VAL(I),ABS(SAV_STEQ(I)-RHS(I))/LARGEST_VAL(I)
 	END DO
 !
 	DO I=1,NT
-	  WRITE(30,'(X,I5,3ES14.4)')I,STEQ(I),STEQ(I)*CMAT_RD(NT,I)
+	  WRITE(30,'(1X,I5,3ES14.4)')I,STEQ(I),STEQ(I)*CMAT_RD(NT,I)
 	END DO
 !
 	STOP

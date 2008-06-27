@@ -54,7 +54,7 @@
           SE(ID)%N_SE=ATM(ID)%NXzV+ATM(ID)%N_XzV_PHOT
 	  DO J=1,ATM(ID)%N_XzV_PHOT
 	    ION_LEV_PNT(ATM(ID)%NXzV+J)=ATM(ID)%XzV_ION_LEV_ID(J)
-	    WRITE(93,'(X,A,X,I2,A)')TRIM(ION_ID(ID)),ATM(ID)%XzV_ION_LEV_ID(J),
+	    WRITE(93,'(1X,A,1X,I2,A)')TRIM(ION_ID(ID)),ATM(ID)%XzV_ION_LEV_ID(J),
 	1                         ' photoionization route'
 	  END DO
 !

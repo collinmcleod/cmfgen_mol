@@ -58,7 +58,7 @@ C
 	IF(TIME .NE. TIMECHK)THEN
 	  WRITE(6,860)DESC,TIME,DESC,TIMECHK
 860	  FORMAT(' WARNING ',A,' and main model times unequal',
-	1   /,X,'MAIN TIME= ',A20,/X,A20,'Time=',A20)
+	1   /,1X,'MAIN TIME= ',A20,/X,A20,'Time=',A20)
 	END IF
 	WRITE(6,'(A,A,T31,A,1P,E14.6)')
 	1            ' Fractional abundance of ',TRIM(DESC),' is',ABUND_SPEC

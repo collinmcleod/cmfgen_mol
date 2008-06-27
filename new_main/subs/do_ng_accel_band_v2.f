@@ -201,9 +201,9 @@
 	    NUM_BAD_NG=NUM_BAD_NG+1
 	    WRITE(LUER,*)'NUM_BAD_NG=',NUM_BAD_NG
 	    WRITE(LUER,9000)L,LOCINC,LOCDEC
-9000	    FORMAT(X,'No NG acceleration performed at depth ',I3,/,
-	1          X,'Biggest increase was ',1PE10.2,/,
-	1          X,'Biggest decrease was ',E10.2)
+9000	    FORMAT(1X,'No NG acceleration performed at depth ',I3,/,
+	1          1X,'Biggest increase was ',1PE10.2,/,
+	1          1X,'Biggest decrease was ',E10.2)
 	
 	  ELSE
 	    DO K=1,NT

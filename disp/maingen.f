@@ -1269,7 +1269,7 @@
 ! 
         ELSE IF(XOPT .EQ. 'WRN')THEN
 	  DO ID=1,NUM_IONS
-	    IF(ATM(ID)%XzV_PRES)WRITE(6,'(X,A,T43,A,I4)')
+	    IF(ATM(ID)%XzV_PRES)WRITE(6,'(1X,A,T43,A,I4)')
 	1        'Number of levels in FULL'//TRIM(ION_ID(ID)),
 	1        ' model atom is:',ATM(ID)%NXzV_F
 	  END DO
@@ -1282,7 +1282,7 @@
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES .AND. XSPEC .EQ. UC(ION_ID(ID)))THEN
 	      IF(LEV(2) .EQ. 0)LEV(2)=ATM(ID)%NXzV_F
-	      WRITE(T_OUT,'(5(2X,A16,X,I3))')(TRIM(ATM(ID)%XzVLEVNAME_F(I)),I,I=LEV(1),LEV(2))
+	      WRITE(T_OUT,'(5(2X,A16,1X,I3))')(TRIM(ATM(ID)%XzVLEVNAME_F(I)),I,I=LEV(1),LEV(2))
 	      FLAG=.TRUE.
 	    END IF
 	  END DO
@@ -1422,7 +1422,7 @@
 	      EWOLD=EW
 	      IF( ABS(ERR(CNT)) .LT. EWACC )INACCURATE=.FALSE.
 	      IF(CNT .GT. 20)THEN
-	        WRITE(T_OUT,'(X,'' Max changes for looop '',I3)')
+	        WRITE(T_OUT,'(1X,'' Max changes for looop '',I3)')
 	        WRITE(T_OUT,'(1P,(2X,5E12.3))')(ERR(I),I=1,CNT)
 	        INACCURATE=.FALSE.
 	      END IF
@@ -1513,7 +1513,7 @@
 	    EWOLD=MOMEW
 	    IF( ABS(ERR(CNT)) .LT. 0.001 )INACCURATE=.FALSE.
 	    IF(CNT .GT. 20)THEN
-	      WRITE(T_OUT,'(X,'' Max changes for looop '',I3)')
+	      WRITE(T_OUT,'(1X,'' Max changes for looop '',I3)')
 	      WRITE(T_OUT,'(1P,(2X,5E12.3))')(ERR(I),I=1,CNT)
 	      INACCURATE=.FALSE.
 	    END IF
@@ -2185,10 +2185,10 @@
 	  DEFAULT='0.01'
 	  CALL USR_OPTION(TAU_LIM,'TAU',DEFAULT,'Line optical deth at tau_c=2/3')
 !
-          WRITE(T_OUT,'(X,A,1P,E14.6)')'    R(I)/R*=',R(DPTH_INDX)/R(ND)
-          WRITE(T_OUT,'(X,A,1P,E14.6)')'       V(I)=',V(DPTH_INDX)
-          WRITE(T_OUT,'(X,A,1P,E14.6)')'       T(I)=',T(DPTH_INDX)
-          WRITE(T_OUT,'(X,A,1P,E14.6)')'      ED(I)=',ED(DPTH_INDX)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'    R(I)/R*=',R(DPTH_INDX)/R(ND)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'       V(I)=',V(DPTH_INDX)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'       T(I)=',T(DPTH_INDX)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'      ED(I)=',ED(DPTH_INDX)
 !
 	  DEFAULT=WR_STRING(LAM_ST)
 	  CALL USR_OPTION(LAM_ST,'LAMST',DEFAULT,FREQ_INPUT)
@@ -2277,13 +2277,13 @@
 !
 ! Ouput summary of model data at depth point
 !
-          WRITE(T_OUT,'(X,A,1P,E14.6)')'    R(I)/R*=',R(DPTH_INDX)/R(ND)
-          WRITE(T_OUT,'(X,A,1P,E14.6)')'       V(I)=',V(DPTH_INDX)
-          WRITE(T_OUT,'(X,A,1P,E14.6)')'       T(I)=',T(DPTH_INDX)
-          WRITE(T_OUT,'(X,A,1P,E14.6)')'      ED(I)=',ED(DPTH_INDX)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'    R(I)/R*=',R(DPTH_INDX)/R(ND)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'       V(I)=',V(DPTH_INDX)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'       T(I)=',T(DPTH_INDX)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'      ED(I)=',ED(DPTH_INDX)
           TA(1:ND)=5.65D-15*ED(1:ND)
           CALL TORSCL(DTAU,TA,R,TB,TC,ND,METHOD,TYPE_ATM)
-          WRITE(T_OUT,'(X,A,1P,E14.6)')'  TAU_ES(I)=',DTAU(DPTH_INDX)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'  TAU_ES(I)=',DTAU(DPTH_INDX)
 !
 	  IF(XOPT .EQ. 'POW')THEN
 	    CALL USR_OPTION(DO_TAU,'TAU','T','Plot versus TAU or Line strength')
@@ -2339,7 +2339,7 @@
 	    END DO
 	    YV(:)=0.0D0
 	    CALL USR_OPTION(TAU_MIN,'TAU_MIN','1.0D0','Minimum Tau')
-	    WRITE(T_OUT,'(X,A,1P,E11.4)')'Velocity is:',V(DPTH_INDX),' km/s'
+	    WRITE(T_OUT,'(1X,A,1P,E11.4)')'Velocity is:',V(DPTH_INDX),' km/s'
 	  END IF
 !
 ! MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
@@ -2464,23 +2464,23 @@
 	    END IF			!Line between LAM_ST and LAM_END
 	  END DO			!Loop overlines
 !
-	  WRITE(T_OUT,'(X,A,1PE12.4,A)')'ED:   ',ED(DPTH_INDX),'/cm^3'
-	  WRITE(T_OUT,'(X,A,1PE12.4,A)')'Vel:  ',V(DPTH_INDX),'km/s'
+	  WRITE(T_OUT,'(1X,A,1PE12.4,A)')'ED:   ',ED(DPTH_INDX),'/cm^3'
+	  WRITE(T_OUT,'(1X,A,1PE12.4,A)')'Vel:  ',V(DPTH_INDX),'km/s'
 	  IF(XOPT .EQ. 'POW' .AND. .NOT. DO_TAU)THEN
-	    WRITE(T_OUT,'(X,A,F9.4)')'/\Line_strength=',DELTA_TAU
+	    WRITE(T_OUT,'(1X,A,F9.4)')'/\Line_strength=',DELTA_TAU
 	    DO I=ITAU_GRT_LIM,-ITAU_GRT_LIM,-1
 	      T1=10.0D0**I
-	      WRITE(T_OUT,'(X,A,I2,A,I9)')'CHIL(Vo)/CHI_ES > 10**(',I,'):',TAU_GRT_LOGX(I)
+	      WRITE(T_OUT,'(1X,A,I2,A,I9)')'CHIL(Vo)/CHI_ES > 10**(',I,'):',TAU_GRT_LOGX(I)
 	    END DO
 	  ELSE
-	    WRITE(T_OUT,'(X,A,F9.4)')'/\Tau=',DELTA_TAU
+	    WRITE(T_OUT,'(1X,A,F9.4)')'/\Tau=',DELTA_TAU
 	    WRITE(T_OUT,'(A)')' '
-	    WRITE(T_OUT,'(X,A,I7)')' Total number of lines in interval is',NUP-NL+1
-	    WRITE(T_OUT,'(X,A)')' Number of lines in each decade of optical depth (NOT cummualtive).'
+	    WRITE(T_OUT,'(1X,A,I7)')' Total number of lines in interval is',NUP-NL+1
+	    WRITE(T_OUT,'(1X,A)')' Number of lines in each decade of optical depth (NOT cummualtive).'
 	    WRITE(T_OUT,'(A)')' '
 	    DO I=ITAU_GRT_LIM,-ITAU_GRT_LIM,-1
 	      T1=10.0D0**I
-	      WRITE(T_OUT,'(X,A,I2,A,I9)')'Tau > 10**(',I,'):',TAU_GRT_LOGX(I)
+	      WRITE(T_OUT,'(1X,A,I2,A,I9)')'Tau > 10**(',I,'):',TAU_GRT_LOGX(I)
 	    END DO
 	  END IF
 !
@@ -2735,7 +2735,7 @@
 	    OPEN(UNIT=18,FILE='DSOB_FORCE_MULT',STATUS='UNKNOWN')
 	      WRITE(18,'(3X,A1,10X,A1,15X,A1,13X,A1)')'I','R','V','M'
               DO I=1,ND
-                WRITE(18,'(X,I3,3X,3ES14.6)')I, R(I),V(I),FORCE_MULT(I)
+                WRITE(18,'(1X,I3,3X,3ES14.6)')I, R(I),V(I),FORCE_MULT(I)
               END DO
             CLOSE(UNIT=18)
 !
@@ -3226,7 +3226,7 @@
 	        WRITE(6,'(A3)',ADVANCE='NO')'ML='
 	    END IF
 	    IF(ML .EQ. NLAM)WRITE(6,'(A)')' '
-	    IF(MOD(ML,20) .EQ. 0)WRITE(6,'(X,I5)',ADVANCE='NO')ML
+	    IF(MOD(ML,20) .EQ. 0)WRITE(6,'(1X,I5)',ADVANCE='NO')ML
 	    FREQ=NU_ST*(DEL_NU**(ML-1))
 	    LAM_VEC(ML)=LOG10(ANG_TO_HZ/FREQ)
 	    INCLUDE 'PAR_OPACITIES.INC'
@@ -3242,9 +3242,9 @@
 	        IF(XOPT .NE. 'PPHOT' .AND. ML .EQ. NLAM)THEN
 	          CNT=CNT+1
 	          IF(MOD(CNT-1,5) .EQ. 0)THEN
-	            WRITE(6,'(4X,A5,X,I3)')TRIM(ION_ID(ID)),J
+	            WRITE(6,'(4X,A5,1X,I3)')TRIM(ION_ID(ID)),J
 	          ELSE
-	            WRITE(6,'(4X,A5,X,I3)',ADVANCE='NO')TRIM(ION_ID(ID)),J
+	            WRITE(6,'(4X,A5,1X,I3)',ADVANCE='NO')TRIM(ION_ID(ID)),J
 	          END IF
 	        END IF
 	      ELSE IF(LAST_NON_ZERO)THEN
@@ -3827,11 +3827,11 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 !
 	  WRITE(T_OUT,*)'Cross sections (Mbarns) for frequency ',TEMP
 	  DO I=1,K
-	    WRITE(T_OUT,'(X,I4,3X,1P,E12.5)')I,OMEGA_F(I,1)/1.0D-08
+	    WRITE(T_OUT,'(1X,I4,3X,1P,E12.5)')I,OMEGA_F(I,1)/1.0D-08
 	  END DO
 	  WRITE(LU_CROSS,*)'Cross sections (Mbarns) for frequency ',TEMP
 	  DO I=1,K
-	    WRITE(LU_CROSS,'(X,I4,3X,1P,E12.5)')I,OMEGA_F(I,1)/1.0D-08
+	    WRITE(LU_CROSS,'(1X,I4,3X,1P,E12.5)')I,OMEGA_F(I,1)/1.0D-08
 	  END DO
 ! 
 !  
@@ -4032,8 +4032,8 @@ c
 	    WRITE(LU_REC,*)'Temperatre (10^4 K) is',T1
 	    WRITE(T_OUT,*)'Recombination rates for ',TRIM(STRING)
 	    WRITE(LU_REC,*)'Recombination rates for ',TRIM(STRING)
-	    WRITE(T_OUT,'(X,A,X,I3)')'Photoionization route number is',PHOT_ID
-	    WRITE(LU_REC,'(X,A,X,I3)')'Photoionization route number is',PHOT_ID
+	    WRITE(T_OUT,'(1X,A,1X,I3)')'Photoionization route number is',PHOT_ID
+	    WRITE(LU_REC,'(1X,A,1X,I3)')'Photoionization route number is',PHOT_ID
 	    WRITE(T_OUT,*)' '
 	    WRITE(LU_REC,*)' '
 	    T1=0.0D0
@@ -4042,10 +4042,10 @@ c
 	      WRITE(LU_REC,'(I4,ES12.4,2X,A)')I,TA(I),TRIM(ATM(ID)%XzVLEVNAME_F(I))
 	      T1=T1+TA(I)
 	    END DO
-	    WRITE(T_OUT,'(X,A,X,1PE12.4)')'Total recombination rate is:',T1
-	    WRITE(T_OUT,'(X,A,X,1PE10.2)')'Value for GION used was:',TMP_GION
-	    WRITE(LU_REC,'(X,A,X,1PE12.4)')'Total recombination rate is:',T1
-	    WRITE(LU_REC,'(X,A,X,1PE10.2)')'Value for GION used was:',TMP_GION
+	    WRITE(T_OUT,'(1X,A,1X,1PE12.4)')'Total recombination rate is:',T1
+	    WRITE(T_OUT,'(1X,A,1X,1PE10.2)')'Value for GION used was:',TMP_GION
+	    WRITE(LU_REC,'(1X,A,1X,1PE12.4)')'Total recombination rate is:',T1
+	    WRITE(LU_REC,'(1X,A,1X,1PE10.2)')'Value for GION used was:',TMP_GION
 	  END IF
 !
 ! 
@@ -4072,8 +4072,8 @@ c
 	  DEFAULT=WR_STRING(FREQ)
 	  CALL USR_HIDDEN(T1,'FREQ',DEFAULT,' ')
 	  T2=LAMVACAIR(T1)		!Wavelength(Angstroms)
-	  WRITE(T_OUT,'(X,''Lambda(in air)='',1PE14.6)')T2
-	  WRITE(T_OUT,'(X,''Lambda(in vac)='',1PE14.6)')ANG_TO_HZ/T1
+	  WRITE(T_OUT,'(1X,''Lambda(in air)='',1PE14.6)')T2
+	  WRITE(T_OUT,'(1X,''Lambda(in vac)='',1PE14.6)')ANG_TO_HZ/T1
 	ELSE IF(XOPT .EQ. 'TIT')THEN
 	  CALL USR_OPTION(NAME,'Title',' ','Title for all graphs')
 	ELSE IF(XOPT .EQ. 'METHOD')THEN
@@ -4513,7 +4513,7 @@ c
           OPEN(UNIT=18,FILE='DSOB_FORCE_MULT',STATUS='UNKNOWN')
 	    WRITE(18,'(3X,A1,10X,A1,15X,A1,13X,A1)')'I','R','V','M'
             DO I=1,ND
-              WRITE(18,'(X,I3,3X,3ES14.6)')I, R(I),V(I),FORCE_MULT(I)
+              WRITE(18,'(1X,I3,3X,3ES14.6)')I, R(I),V(I),FORCE_MULT(I)
             END DO
           CLOSE(UNIT=18)
 !
@@ -4682,32 +4682,32 @@ c
 !
 	  IF(NEW_FORMAT .AND. NEW_FILE)THEN
 	    OPEN(UNIT=25,FILE='LINEDATA',STATUS='NEW')
-   	    WRITE(25,'(X,A,T25,A,T40,A)')'12-May-1998',
+   	    WRITE(25,'(1X,A,T25,A,T40,A)')'12-May-1998',
 	1            '[Date]','Revised format date'
-   	    WRITE(25,'(X,A,T25,A,T40,A)')TRIM(NAME),
+   	    WRITE(25,'(1X,A,T25,A,T40,A)')TRIM(NAME),
 	1             '[MOD_ID]','Model'
- 	    WRITE(25,'(X,A,T25,A,T40,A)')'TRUE',
+ 	    WRITE(25,'(1X,A,T25,A,T40,A)')'TRUE',
 	1            '[DIF]','Diffusion approximation'
-	    WRITE(25,'(X,1PE15.8,T25,A,T40,A)')CONT_INT,
+	    WRITE(25,'(1X,1PE15.8,T25,A,T40,A)')CONT_INT,
 	1            '[IC]','Schuster intensity'
 	    WRITE(25,*)' '
 !
-	    WRITE(25,'(X,A,T25,A,T40,A)')'Continuum:',
+	    WRITE(25,'(1X,A,T25,A,T40,A)')'Continuum:',
 	1               '[TR_ID]','Transition identification'
-	    WRITE(25,'(X,1PE15.8,T25,A,T40,A)')FREQ,
+	    WRITE(25,'(1X,1PE15.8,T25,A,T40,A)')FREQ,
 	1            '[FREQ]','Frequency (10^15 Hz)'
-	    WRITE(25,'(X,1PE12.5,T25,A,T40,A)')LAMVACAIR(FREQ),
+	    WRITE(25,'(1X,1PE12.5,T25,A,T40,A)')LAMVACAIR(FREQ),
 	1            '[LAM]','Wavelength (Ang)'
 !
 	    WRITE(25,*)' '
-	    WRITE(25,'(X,A,/,(1P,X,9E14.6))')'R',(R(I),I=1,ND)
-	    WRITE(25,'(X,A,/,(1P,X,9E14.6))')'T',(T(I),I=1,ND)
-	    WRITE(25,'(X,A,/,(1P,X,9E14.6))')'SIGMA',(SIGMA(I),I=1,ND)
-	    WRITE(25,'(X,A,/,(1P,X,9E14.6))')'V',(V(I),I=1,ND)
-	    WRITE(25,'(X,A,/,(1P,X,9E14.6))')'ETA',(ETA(I),I=1,ND)
-	    WRITE(25,'(X,A,/,(1P,X,9E14.6))')'CHI_TH',
+	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'R',(R(I),I=1,ND)
+	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'T',(T(I),I=1,ND)
+	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'SIGMA',(SIGMA(I),I=1,ND)
+	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'V',(V(I),I=1,ND)
+	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'ETA',(ETA(I),I=1,ND)
+	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'CHI_TH',
 	1                              ( (CHI(I)-ESEC(I)) ,I=1,ND)
-	    WRITE(25,'(X,A,/,(1P,X,9E14.6))')'ESEC',(ESEC(I),I=1,ND)
+	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'ESEC',(ESEC(I),I=1,ND)
 	  END IF
 !
 	  IF(NEW_FORMAT .AND. XOPT .EQ. 'WRL')THEN
@@ -4718,17 +4718,17 @@ c
 	      END IF
 	    END IF
 	    WRITE(25,*)' '
-	    WRITE(25,'(X,A,A,I3,A,I3,A,T25,A,T40,A)')
+	    WRITE(25,'(1X,A,A,I3,A,I3,A,T25,A,T40,A)')
 	1            TRIM(XSPEC),'(',LEV(2),'-',LEV(1),')',
 	1            '[TR_ID]','Transition identification'
-	    WRITE(25,'(X,1PE15.8,T25,A,T40,A)')FREQ,
+	    WRITE(25,'(1X,1PE15.8,T25,A,T40,A)')FREQ,
 	1            '[FREQ]','Frequency (10^15 Hz)'
-	    WRITE(25,'(X,1PE12.5,T25,A,T40,A)')LAMVACAIR(FREQ),
+	    WRITE(25,'(1X,1PE12.5,T25,A,T40,A)')LAMVACAIR(FREQ),
 	1            '[LAM]','Wavelength (Ang)'
-	    WRITE(25,'(X,F6.2,T25,A,T40,A)')AMASS,'[AMASS]','Atomic mass'
+	    WRITE(25,'(1X,F6.2,T25,A,T40,A)')AMASS,'[AMASS]','Atomic mass'
 	    WRITE(25,*)' '
-	    WRITE(25,'(X,A,/,(1P,X,9E14.6))')'ETAL',(ETAL(I),I=1,ND)
-	    WRITE(25,'(X,A,/,(1P,X,9E14.6))')'CHIL',(CHIL(I),I=1,ND)
+	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'ETAL',(ETAL(I),I=1,ND)
+	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'CHIL',(CHIL(I),I=1,ND)
 	  END IF
 
 	  IF(.NOT. NEW_FORMAT)THEN
@@ -4740,33 +4740,33 @@ c
 	1                  'File name (existing file will be overwrittem')
 	      OPEN(UNIT=25,FILE=FILENAME,STATUS='UNKNOWN')
 	    END IF
-   	    WRITE(25,'(X,A,T25,A,T40,A)')'09-Mar-1994',
+   	    WRITE(25,'(1X,A,T25,A,T40,A)')'09-Mar-1994',
 	1            '[Date]','Revised format date'
-   	    WRITE(25,'(X,A,T25,A,T40,A)')TRIM(NAME),
+   	    WRITE(25,'(1X,A,T25,A,T40,A)')TRIM(NAME),
 	1            '[MOD_ID]','Model'
 	    IF(XOPT .EQ. 'WRL')THEN
-	        WRITE(25,'(X,A,A,I3,A,I3,A,T25,A,T40,A)')
+	        WRITE(25,'(1X,A,A,I3,A,I3,A,T25,A,T40,A)')
 	1            TRIM(XSPEC),'(',LEV(2),'-',LEV(1),')',
 	1            '[TR_ID]','Transition identification'
 	      ELSE
-	        WRITE(25,'(X,A,T25,A,T40,A)')'Continuum:',
+	        WRITE(25,'(1X,A,T25,A,T40,A)')'Continuum:',
 	1               '[TR_ID]','Transition identification'
 	      END IF
- 	      WRITE(25,'(X,A,T25,A,T40,A)')'TRUE',
+ 	      WRITE(25,'(1X,A,T25,A,T40,A)')'TRUE',
 	1            '[DIF]','Diffusion approximation'
-	      WRITE(25,'(X,1PE15.8,T25,A,T40,A)')FREQ,
+	      WRITE(25,'(1X,1PE15.8,T25,A,T40,A)')FREQ,
 	1            '[FREQ]','Frequency (10^15 Hz)'
-	      WRITE(25,'(X,1PE12.5,T25,A,T40,A)')LAMVACAIR(FREQ),
+	      WRITE(25,'(1X,1PE12.5,T25,A,T40,A)')LAMVACAIR(FREQ),
 	1            '[LAM]','Wavelength (Ang)'
-	      WRITE(25,'(X,F6.2,T25,A,T40,A)')AMASS,
+	      WRITE(25,'(1X,F6.2,T25,A,T40,A)')AMASS,
 	1            '[AMASS]','Atomic mass'
-	      WRITE(25,'(X,1PE15.8,T25,A,T40,A)')CONT_INT,
+	      WRITE(25,'(1X,1PE15.8,T25,A,T40,A)')CONT_INT,
 	1            '[IC]','Schuster intensity'
-	      WRITE(25,'(X,I3,T25,A,T40,A)')ND,
+	      WRITE(25,'(1X,I3,T25,A,T40,A)')ND,
 	1            '[ND]','Number of depth points'
 	      WRITE(25,*)' '
 	      WRITE(25,
-	1       '(X,T9,A,T23,A,T35,A,T51,A,T64,A,T76,A,T91,A,T105,A,T119,A)')
+	1       '(1X,T9,A,T23,A,T35,A,T51,A,T64,A,T76,A,T91,A,T105,A,T119,A)')
 	1            'R','T','SIGMA','V','ETA','CHI_TH','ESEC',
 	1            'ETAL','CHIL'
 	      IF(XOPT .EQ. 'WRC')THEN
@@ -4825,20 +4825,20 @@ c
 	    T3=VEC_OSCIL(ML)*ATM(ID)%GXzV_F(VEC_MNL_F(ML))	!gf
 	    IF(T1 .LT. 1.0E+04)THEN
 	      WRITE(LU_OUT,
-	1      '(1X,I6,2I6,F10.6,2X,F10.3,ES10.2,X,F10.2,4X,A)')
+	1      '(1X,I6,2I6,F10.6,2X,F10.3,ES10.2,1X,F10.2,4X,A)')
 	1         ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
 	1         VEC_FREQ(ML),T1,T3,T2,TRIM(VEC_TRANS_NAME(ML))
 	      IF(NUP-NL .LT. 50)WRITE(T_OUT,
-	1      '(1X,I6,2I6,F10.6,2X,F10.3,ES10.2,X,F10.2,4X,A)')
+	1      '(1X,I6,2I6,F10.6,2X,F10.3,ES10.2,1X,F10.2,4X,A)')
 	1         ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
 	1         VEC_FREQ(ML),T1,T3,T2,TRIM(VEC_TRANS_NAME(ML))
 	    ELSE             
 	      WRITE(LU_OUT,
-	1      '(1X,I6,2(1X,I6),F10.6,X,ES11.4,ES10.2,X,F10.2,4X,A)')
+	1      '(1X,I6,2(1X,I6),F10.6,1X,ES11.4,ES10.2,1X,F10.2,4X,A)')
 	1         ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
 	1         VEC_FREQ(ML),T1,T3,T2,TRIM(VEC_TRANS_NAME(ML))
 	      IF(NUP-NL .LT. 50)WRITE(T_OUT,
-	1      '(1X,I6,2(1X,I6),F10.6,X,ES11.4,ES10.2,X,F10.2,4X,A)')
+	1      '(1X,I6,2(1X,I6),F10.6,1X,ES11.4,ES10.2,1X,F10.2,4X,A)')
 	1         ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
 	1         VEC_FREQ(ML),T1,T3,T2,TRIM(VEC_TRANS_NAME(ML))
 	    END IF
@@ -4910,9 +4910,9 @@ c
 	      READ(LU_IN,'(A)',END=700)STRING
 	      L=LEN_TRIM(STRING)
 	      IF(L .EQ. 0)THEN
-	        WRITE(T_OUT,'(X)')
+	        WRITE(T_OUT,'(1X)')
 	      ELSE
-	        WRITE(T_OUT,'(X,A)')STRING(1:L)
+	        WRITE(T_OUT,'(1X,A)')STRING(1:L)
 	      END IF
 	    END DO
 	    READ(T_IN,'(A)')STRING

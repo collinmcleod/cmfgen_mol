@@ -200,7 +200,7 @@
 	  WRITE(6,*)' '
 	  WRITE(6,*)' Depth       R Ratio'
 	  DO I=1,10
-	    WRITE(6,'(X,I5,ES14.4)')I,R(I)/R(I+1)
+	    WRITE(6,'(1X,I5,ES14.4)')I,R(I)/R(I+1)
 	  END DO
 !
 	  IST=5

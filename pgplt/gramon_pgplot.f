@@ -531,7 +531,7 @@
                     IF(FLAGSTR(I))THEN
                       WRITE(33,17)LOC(I),XSTR(I),YSTR(I),ORIENTATION(I),
 	1                   STR_EXP(I),STR_COL(I),TRIM(STRING(I))
-17	              FORMAT(X,I1,', ',4(F9.4,','),I3,',',X,1H',A,1H')
+17	              FORMAT(1X,I1,', ',4(F9.4,','),I3,',',1X,1H',A,1H')
 	           END IF
 	         END DO
                 CLOSE(UNIT=33)
@@ -548,7 +548,7 @@
                     IF(FLAGLINE(I))THEN
 	              WRITE(33,18)LINEXST(I),LINEYST(I),
 	1                         LINEXEND(I),LINEYEND(I),VECPEN(I)
-18	              FORMAT(X,1P,4E18.8,3X,I3)
+18	              FORMAT(1X,1P,4E18.8,3X,I3)
 	            END IF
 	          END DO
                 CLOSE(UNIT=33)
@@ -1035,7 +1035,7 @@ C
               STR=.TRUE.
 	    END IF
           END IF
-932	  FORMAT(X,I3,2X,(A))
+932	  FORMAT(1X,I3,2X,(A))
 !
 	  GOTO 1000
 !
@@ -1046,7 +1046,7 @@ C
 	  DO I=1,MAXSTR
 	    IF(FLAGSTR(I))THEN
 	      WRITE(T_OUT,955)I,TRIM(STRING(I))
-955	      FORMAT(X,I2,3X,A)
+955	      FORMAT(1X,I2,3X,A)
 	    END IF
 	  END DO
 !
@@ -1082,20 +1082,20 @@ C
 	    END DO
 	  END IF
 	      WRITE(T_OUT,820)
- 820	      FORMAT(X,'LOC: 1-9, 1=lef bot, 2=cent bot, 3=rit bot')
+ 820	      FORMAT(1X,'LOC: 1-9, 1=lef bot, 2=cent bot, 3=rit bot')
 	      WRITE(T_OUT,821)
- 821	      FORMAT(X,'          4=lef mid, 5=cent mid, 6=rit mid')
+ 821	      FORMAT(1X,'          4=lef mid, 5=cent mid, 6=rit mid')
 	      WRITE(T_OUT,822)
- 822	      FORMAT(X,'          7=lef top, 8=cent top, 9=rit top')
+ 822	      FORMAT(1X,'          7=lef top, 8=cent top, 9=rit top')
 	      WRITE(T_OUT,840)
- 840	      FORMAT(X,'ORI= AN ANGLE FROM 0.0 TO 360')
+ 840	      FORMAT(1X,'ORI= AN ANGLE FROM 0.0 TO 360')
 	  ISTR=1
 	  DO WHILE(ISTR .LE. MAXSTR)
 	    IF(.NOT. FLAGSTR(ISTR))THEN
 	      CURSERR = PGCURS(XSTR(ISTR),YSTR(ISTR),CURSVAL)
 	      IF(END_CURS(CURSVAL))GOTO 1000
 830	      WRITE(T_OUT,810,ADVANCE='NO')
-810	      FORMAT(X,'Desc(LOC,ORI,''STRING''): ')
+810	      FORMAT(1X,'Desc(LOC,ORI,''STRING''): ')
 	      READ(T_IN,'(A)',ERR=830)WK_STR
 	      READ(WK_STR,*,ERR=830)LOC(ISTR)
 	      IF(LOC(ISTR) .EQ. 0)GOTO 1000
@@ -1172,7 +1172,7 @@ C
 !
 	  DO I=1,MAXVEC
 	    IF(FLAGLINE(I))THEN
-	      WRITE(T_OUT,'(X,I2,4(3X,E14.6),I4)')I,
+	      WRITE(T_OUT,'(1X,I2,4(3X,E14.6),I4)')I,
 	1               LINEXST(I),LINEXEND(I),
 	1               LINEYST(I),LINEYEND(I),VECPEN(I)
 	    END IF

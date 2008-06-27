@@ -115,7 +115,7 @@
 	1              ABUND(I,J),MASS_FRAC(I,J),J=1,N_ABUND)
 	END DO
 	WRITE(6,'(A)')' '
-200	FORMAT(X,F4.1,3X,A2,3X,A10,4X,F5.1,5(F8.2,ES10.2,ES10.2))
+200	FORMAT(1X,F4.1,3X,A2,3X,A10,4X,F5.1,5(F8.2,ES10.2,ES10.2))
 !
 ! We now begin the section to allow individual abundances to be varied.
 ! Each species can be separately changed by using it chenical abbreviation.
@@ -201,7 +201,7 @@
 	    WRITE(6,300)AT_NO(I),SYMB(I),NAME(I),AT_MASS(I),ABUND(I,J),
 	1              MASS_FRAC(I,J),NEW_ABUND(I,J),NEW_MASS_FRAC(I,J)
 	  END DO
-300	  FORMAT(X,F4.1,3X,A2,3X,A10,4X,F5.1,3X,1PE8.2,3X,E8.2,3X,E8.2,
+300	  FORMAT(1X,F4.1,3X,A2,3X,A10,4X,F5.1,3X,1PE8.2,3X,E8.2,3X,E8.2,
 	1       3X,E8.2)
 !
 	  WRITE(10,'(34X,A,A)')'  N(old)     M(old)  ',

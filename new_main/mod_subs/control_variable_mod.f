@@ -390,6 +390,7 @@
 	LOGICAL OLD_RD_LAMBDA
 	LOGICAL RD_LAMBDA
 	LOGICAL DO_LAMBDA_AUTO
+	LOGICAL DO_GREY_T_AUTO
 	LOGICAL LAMBDA_ITERATION
 !
 ! Variables for determining whether some populations are held fixed

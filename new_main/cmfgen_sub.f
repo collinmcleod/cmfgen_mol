@@ -505,6 +505,9 @@
 	  DO_LAMBDA_AUTO=.TRUE.
 	  CALL RD_STORE_LOG(DO_LAMBDA_AUTO,'DO_LAM_AUTO',L_FALSE,
 	1                         'Start non-lambda iterations automatically?')
+	  DO_GREY_T_AUTO=.TRUE.
+	  CALL RD_STORE_LOG(DO_GREY_T_AUTO,'DO_GT_AUTO',L_FALSE,
+	1                         'Do a grey temperature iteration after revising USE_FIXED_J?')
 	  CALL CLEAN_RD_STORE()
 	  CLOSE(UNIT=LUIN)
 	NUM_ITS_RD=NUM_ITS_TO_DO
@@ -2830,15 +2833,15 @@
 	      ELSE
 	        T3=1.0D0
 	      END IF
-	      WRITE(LU_HT,'(X,1P,5E12.4)')(
+	      WRITE(LU_HT,'(1X,1P,5E12.4)')(
 	1         T3*ZNET_SIM(I,SIM_INDX)*ETAL_MAT(I,SIM_INDX), I=1,ND)
 	      DO K=1,ND
 	        T2=ETAL_MAT(K,SIM_INDX)*ZNET_SIM(K,SIM_INDX)
 	        STEQ_T_SCL(K)=STEQ_T_SCL(K) - T2*T3
 	        STEQ_T_NO_SCL(K)=STEQ_T_NO_SCL(K) - T2
 	      END DO
-	      WRITE(LU_HT,'(/,(X,1P,5E12.4))')(STEQ_T_SCL(I), I=1,ND)
-	      WRITE(LU_HT,'(/,(X,1P,5E12.4))')(STEQ_T_NO_SCL(I), I=1,ND)
+	      WRITE(LU_HT,'(/,(1X,1P,5E12.4))')(STEQ_T_SCL(I), I=1,ND)
+	      WRITE(LU_HT,'(/,(1X,1P,5E12.4))')(STEQ_T_NO_SCL(I), I=1,ND)
 	    END IF
 	  END DO
 	END IF
@@ -3727,7 +3730,7 @@
 	  END DO
 	  CALL LUM_FROM_ETA(TA,R,ND)
 	  WRITE(LU_HT,'(//,A)')' Estimated error in L due to use of SLs'
-	  WRITE(LU_HT,'(/,(X,1P,5E12.4))')(TA(I), I=1,ND)
+	  WRITE(LU_HT,'(/,(1X,1P,5E12.4))')(TA(I), I=1,ND)
 	END IF
 !
 ! Insure Eddington factor file is closed, and indicate all f's successfully
@@ -4358,6 +4361,12 @@
 	    IF(USE_FIXED_J .AND. DO_LAMBDA_AUTO .AND. RD_LAMBDA .AND. MAXCH .LT. 50.0D0)THEN
 	       USE_FIXED_J=.FALSE.
 	       CALL UPDATE_KEYWORD(L_FALSE,'[USE_FIXED_J]','VADAT',L_TRUE,L_TRUE,LUIN)
+	       IF(DO_GREY_T_AUTO)THEN
+	         CALL GREY_T_ITERATE(POPS,Z_POP,NU,NU_EVAL_CONT,FQW,
+	1               LUER,LUIN,NC,ND,NP,NT,NCF,N_LINE_FREQ,MAX_SIM)
+	         CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,RITE_N_TIMES,
+	1               LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
+	       END IF
 	       I=WORD_SIZE*(NDEXT+1)/UNIT_SIZE
 	       CALL WRITE_DIRECT_INFO_V3(NDEXT,I,'20-Aug-2000','EDDFACTOR',LU_EDD)
 	       COMPUTE_EDDFAC=.TRUE.

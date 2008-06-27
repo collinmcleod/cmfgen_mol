@@ -37,18 +37,18 @@ C 3 = HeI triplets, CIV,NV
 C 4 = CIII,NIV
 C 5 = HeI (Singlets and Triplets)
 C
-	    IF(FORM .EQ. 1)FMT='(X,1P5E15.5)'
-	    IF(FORM .EQ. 2)FMT='(X,1P1E15.5,:/X,2E15.5,:/X,3E15.5,
-	1                        :/,(X4E15.5))'
-	    IF(FORM .EQ. 3)FMT='(X,1P2E15.5,:/X,3E15.5,:/,(X4E15.5))'
-	    IF(FORM .EQ. 4)FMT='(X,1P1E15.5,:/X,2E15.5,:/X,3E15.5,
-	1                        :/,(X6E15.5))'
-	    IF(FORM .EQ. 5)FMT='(X,1P1E15.5,:/X,2E15.5,:/X,2E15.5,:/X,
-	1            3E15.5,:/X,3E15.5,/:,(X,6E15.5))'
+	    IF(FORM .EQ. 1)FMT='(1X,1P5E15.5)'
+	    IF(FORM .EQ. 2)FMT='(1X,1P1E15.5,:/,1X,2E15.5,:/,1X,3E15.5,
+	1                        :/,(1X,4E15.5))'
+	    IF(FORM .EQ. 3)FMT='(1X,1P2E15.5,:/,1X,3E15.5,:/,(1X,4E15.5))'
+	    IF(FORM .EQ. 4)FMT='(1X,1P1E15.5,:/,1X,2E15.5,:/,1X,3E15.5,
+	1                        :/,(1X,6E15.5))'
+	    IF(FORM .EQ. 5)FMT='(1X,1P1E15.5,:/,1X,2E15.5,:/,1X,2E15.5,:/,1X,
+	1            3E15.5,:/,1X,3E15.5,/:,(1X,6E15.5))'
 C
 	    OPEN(UNIT=9,STATUS='NEW',FILE=NEWNAME)
 C
-	    WRITE(9,'(/,X,A,T40,A)')'07-Jul-1997','!Format date'
+	    WRITE(9,'(/,1X,A,T40,A)')'07-Jul-1997','!Format date'
 	    WRITE(9,2120)R(ND),LUM,NHYD,ND
 	    IF(OPTION .EQ. 'DC')THEN
 	      DO I=1,ND
@@ -116,8 +116,8 @@ C
 	    CLOSE(UNIT=9)
 	  END IF
 C
-2120	  FORMAT(/,X,F9.4,5X,1PE10.4,5X,0P,I4,5X,I4)
-2122	  FORMAT(/,X,1P,E15.7,6E15.5)
+2120	  FORMAT(/,1X,F9.4,5X,1PE10.4,5X,0P,I4,5X,I4)
+2122	  FORMAT(/,1X,1P,E15.7,6E15.5)
 C
 	  RETURN
 	  END

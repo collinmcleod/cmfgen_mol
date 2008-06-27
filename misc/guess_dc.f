@@ -410,7 +410,7 @@
 	CALL GEN_IN(FILENAME,'Output file for DCs --- old file will be overwritten')
 	CALL GEN_IN(NLEV,'Number of levels to be output to file')
 	CALL GEN_ASCI_OPEN(LU_OUT,FILENAME,'UNKNOWN',' ','WRITE',IZERO,IOS)
-	  WRITE(LU_OUT,'(/,X,A,T40,A)')'07-Jul-1997','!Format date'
+	  WRITE(LU_OUT,'(/,1X,A,T40,A)')'07-Jul-1997','!Format date'
 	  WRITE(LU_OUT,2120)R(ND),RLUM,NLEV,ND
 	  DO I=1,ND
 	    WRITE(LU_OUT,2122)R(I),ION_POP(I),ED(I),T(I),0.0,V(I),CLUMP_FAC(I)
@@ -420,8 +420,8 @@
 	WRITE(T_OUT,*)
 	WRITE(T_OUT,*)' Check output file to ensure d.c''s ---> 1 at depth'
 	WRITE(T_OUT,*)
-2120	FORMAT(/,X,F11.6,5X,1PE12.6,5X,0P,I4,5X,I4)
-2122	FORMAT(/,X,1P,E16.8,6E17.8)
+2120	FORMAT(/,1X,F11.6,5X,1PE12.6,5X,0P,I4,5X,I4)
+2122	FORMAT(/,1X,1P,E16.8,6E17.8)
 !
 ! Loop back to do additional species and ionization stages.
 !

@@ -756,10 +756,10 @@
 ! Output summary of photoionization routes.
 !
 	WRITE(LUOUT,*)'Summary of Photoionization routes for ',TRIM(DESC)
-	WRITE(LUOUT,'(X,A,T40,(2X,I2))')
+	WRITE(LUOUT,'(1X,A,T40,(2X,I2))')
 	1            'Final State/Phot ID',(I,I=1,N_PHOT)
 	DO PHOT_ID=1,N_PHOT
-	  WRITE(LUOUT,'(X,A,T40,(3X,L1))')
+	  WRITE(LUOUT,'(1X,A,T40,(3X,L1))')
 	1    FINAL_STATE(PHOT_ID,1),(PD(ID)%DO_PHOT(PHOT_ID,I),I=1,N_PHOT)
 	END DO
 !

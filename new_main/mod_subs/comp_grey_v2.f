@@ -133,7 +133,7 @@
 	     WRITE(7,'(A)')
 	     WRITE(7,'(4X,A,5(11X,A))')'I','    R','    J','Ray J','    f','  Tau'
 	     DO I=1,ND
-	       WRITE(7,'(X,I4,5(ES16.6))')I,R(I),RJ(I),TC(I),GAMH(I),TAU_ROSS(I)
+	       WRITE(7,'(1X,I4,5(ES16.6))')I,R(I),RJ(I),TC(I),GAMH(I),TAU_ROSS(I)
 	     END DO
 	   CLOSE(UNIT=7)
 !

@@ -70,7 +70,7 @@
 	WRITE(T_OUT,*)'Number of filters is'
 !
 	WRITE(LU_OUT,'(A)')' '
-	WRITE(LU_OUT,'(3(X,A9,3X))')'Filter ID','Filter ZP','Magnitude'
+	WRITE(LU_OUT,'(3(1X,A9,3X))')'Filter ID','Filter ZP','Magnitude'
 !
 ! Loop over all filters. We first read in paperameters describing the filter:
 ! The filter identifcation, its zero point, and the number of points in the
@@ -193,7 +193,7 @@
 	  MAG=MAG/NORM
 !
           MAG=5.0*LOG10(DIST)-2.5D0*LOG10(MAG)+FILT_ZP
-          WRITE(LU_OUT,'(X,A,T10,4X,F9.3,4X,F9.3)')TRIM(FILT_ID),FILT_ZP,MAG
+          WRITE(LU_OUT,'(1X,A,T10,4X,F9.3,4X,F9.3)')TRIM(FILT_ID),FILT_ZP,MAG
 !
 	END DO
 	CLOSE(LU_IN)

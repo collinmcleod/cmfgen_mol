@@ -83,7 +83,7 @@ C
 	    WRITE(LU_OUT,*)' '
 	    WRITE(LU_OUT,*)' '
 	    IF(TWO_PHOT_AVAILABLE(J))THEN
-	      WRITE(LU_OUT,'(X,I4,3X,L1,A,3X,A,3X,A)')
+	      WRITE(LU_OUT,'(1X,I4,3X,L1,A,3X,A,3X,A)')
 	1             J,.TRUE.,TRIM(SPEC_ID_TWO(J)),
 	1             TRIM(LOW_NAME_TWO(J)),TRIM(UP_NAME_TWO(J))
 	      WRITE(LU_OUT,*)'Down rate:'
@@ -96,7 +96,7 @@ C
 	      TA(1:ND)=UP_RATE_TWO(1:ND,J)*POPS(NL,1:ND)
 	      CALL WRITV(TA,ND,'Total # of upward transitions',LU_OUT)
 	    ELSE
-	      WRITE(LU_OUT,'(X,I4,3X,L1,A,3X,A,3X,A)')
+	      WRITE(LU_OUT,'(1X,I4,3X,L1,A,3X,A,3X,A)')
 	1             J,.FALSE.,TRIM(SPEC_ID_TWO(J)),
 	1             TRIM(LOW_NAME_TWO(J)),TRIM(UP_NAME_TWO(J))
 	    END IF

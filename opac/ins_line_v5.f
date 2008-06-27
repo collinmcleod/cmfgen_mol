@@ -136,7 +136,7 @@ C
 	END DO
 	IF(N_LINES .NE. LOCAL_N_LINES)THEN
 	  WRITE(LU_ER,*)'Warning from INS_LINE_V4'
-	  WRITE(LU_ER,'(X,I5,A,A)')N_LINES-LOCAL_N_LINES,
+	  WRITE(LU_ER,'(1X,I5,A,A)')N_LINES-LOCAL_N_LINES,
 	1        ' weak lines in extreme ',
 	1        'IR will be ignored as outside continuum range.'
 	  WRITE(LU_ER,*)'Min(Nu_CONT)=',NU_CONT(NCF)
@@ -394,7 +394,7 @@ C
 	    STOP
 	  END IF
 	END DO
-	WRITE(LU_ER,'(X,A,1PE9.2,A)')
+	WRITE(LU_ER,'(1X,A,1PE9.2,A)')
 	1          'Minimum frequency spacing is:',T1,'km/s'
 C
 C Test that all lines treated in blanketing mode hane LINE_ST_INDX and
@@ -417,7 +417,7 @@ C
 	END DO
 C
 	DO I=2,NFREQ
-	  WRITE(63,'(X,I6,1P,2E12.4)')I,FREQ(I),
+	  WRITE(63,'(1X,I6,1P,2E12.4)')I,FREQ(I),
 	1            3.0D+05*(FREQ(I-1)-FREQ(I))/FREQ(I-1)
 	END DO
 C

@@ -226,7 +226,7 @@
 	  DO I=1,N
 	    T1=0.0D0
 	    IF(NEW_SOL(I) .NE. 0)T1=100.0D0*(NEW_SOL(I)-STEQ(I))/NEW_SOL(I)
-	    WRITE(49,'(X,I5,2X,ES12.4,3X,2ES24.14)')I,T1,STEQ(I),NEW_SOL(I)
+	    WRITE(49,'(1X,I5,2X,ES12.4,3X,2ES24.14)')I,T1,STEQ(I),NEW_SOL(I)
 	  END DO  
 	  STEQ=NEW_SOL
 	END IF
@@ -248,7 +248,7 @@
 	  NEW_POPS(N-1)=ED_NEW
 	  NEW_POPS(N)=T_NEW
 	  DO I=1,N
-	    WRITE(6,'(X,I3,4ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I),
+	    WRITE(6,'(1X,I3,4ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I),
 	1                          1.0D0-NEW_POPS(I)/POPS(I)
 	  END DO
 	
@@ -269,7 +269,7 @@
 	  END DO
 	  WRITE(51,'(4X,A,6X,A,11X,A,14X,A)')'I','Solution','Input RHS','Output RHS'
 	  DO I=1,N
-	    WRITE(51,'(X,I4,ES14.4,3X,2ES24.15)')I,STEQ(I),SAV_STEQ(I),RHS(I)
+	    WRITE(51,'(1X,I4,ES14.4,3X,2ES24.15)')I,STEQ(I),SAV_STEQ(I),RHS(I)
 	  END DO
 	  WRITE(6,*)'Solution and RHS vectors written to unit 51'
 	END IF

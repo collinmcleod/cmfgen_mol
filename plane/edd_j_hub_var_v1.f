@@ -213,7 +213,7 @@
 	    RHS_dHdCHI(I,L)=RHS_dHdCHI(I,L)+T1*dTAUdCHI(I,L)
 	  END DO
 	  T1=dHUdCHI(I)*JNU(I+1) - dHLdCHI(I)*JNU(I)
-	1                       + dHSdCHI(I)*RSQ_HNUM1(I) +
+	1                       + dHSdCHI(I)*RSQ_HNUM1(I)
 	1                       + dHTdCHI(I)*RSQ_HNU_OLDT(I)
 	  RHS_dHdCHI(I,I)=RHS_dHdCHI(I,I) + T1
 	  RHS_dHdCHI(I,I+1)=RHS_dHdCHI(I,I+1) + T1

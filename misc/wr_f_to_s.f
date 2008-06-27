@@ -651,7 +651,7 @@ C
 	    DO I=1,NLEV
 	      J=F_TO_S(I)
 	      IF(.NOT. LS_DONE(J))THEN
-	        WRITE(16,'(X,A,T31,A)')TRIM(LS_NAME(I)),TRIM(LS_NAME(I))
+	        WRITE(16,'(1X,A,T31,A)')TRIM(LS_NAME(I)),TRIM(LS_NAME(I))
 	        LS_DONE(J)=.TRUE.
 	      END IF
 	    END DO
@@ -731,7 +731,7 @@ C
 	1       ANS(1:1) .EQ. 'e')GOTO 500		!Exit from listing.
 	  END DO
 500	  CONTINUE
-120	  FORMAT(X,A,5X,F6.1,F20.8,3X,I4,3X,I4,2X,1PE11.4)
+120	  FORMAT(1X,A,5X,F6.1,F20.8,3X,I4,3X,I4,2X,1PE11.4)
 C
 C Option to re-label the links between super-levels and the full levels
 C The only requirement in the raw link is that they are unique, and +ve.
@@ -767,7 +767,7 @@ C
 	    END IF
 	  END DO 
 	  WRITE(T_OUT,*)'Cleaning level links '
-	  WRITE(T_OUT,'(A,X,I5)')' Number of super levels is:',ID
+	  WRITE(T_OUT,'(A,1X,I5)')' Number of super levels is:',ID
 !
 ! Option simply outputs SUPER states in groups, and indicates the
 ! maximum energy width of the fgroup.
@@ -780,8 +780,8 @@ C
 	      IF(F_TO_S(J) .EQ. I)THEN
 	        T1=ENERGY(J)
 	        IF(DEL_E_CM .EQ. 0)DEL_E_CM=T1
-	        WRITE(6,'(X,A20,5X,F20.8)')NAME(J),ENERGY(J)
-	        WRITE(21,'(X,A20,5X,F20.8)')NAME(J),ENERGY(J)
+	        WRITE(6,'(1X,A20,5X,F20.8)')NAME(J),ENERGY(J)
+	        WRITE(21,'(1X,A20,5X,F20.8)')NAME(J),ENERGY(J)
 	      END IF
 	    END DO
 	    IF(T1 .NE. DEL_E_CM)THEN
@@ -993,9 +993,9 @@ C
 	      READ(30,'(A)',END=700)STRING
 	      L=ICHRLEN(STRING)
 	      IF(L .EQ. 0)THEN
-	        WRITE(T_OUT,'(X)')
+	        WRITE(T_OUT,'(1X)')
 	      ELSE
-	        WRITE(T_OUT,'(X,A)')STRING(1:L)
+	        WRITE(T_OUT,'(1X,A)')STRING(1:L)
 	      END IF
 	    END DO
 	    READ(T_IN,'(A)')STRING
