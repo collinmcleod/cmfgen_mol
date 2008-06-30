@@ -67,7 +67,7 @@
 	  K=INDEX(STRING,'  ')
 	  STRING(1:)=STRING(K:)
 	  READ(STRING,*,ERR=200)NU(ML)
-	  READ(11,*)(LH(1:ND,ML))
+	  READ(11,*)LH(1:ND,ML)
 	  READ(11,'(A)')STRING
 	  IF(STRING .NE. ' ')THEN
 	    WRITE(6,'(A)')' '
@@ -77,8 +77,8 @@
 	    WRITE(6,'(A)')' '
 	    STOP
 	  END IF
-	  READ(11,*)(SE_SCL(1:ND,ML))
-	  READ(11,*)(SE_NOSCL(1:ND,ML))
+	  READ(11,*)SE_SCL(1:ND,ML)
+	  READ(11,*)SE_NOSCL(1:ND,ML)
 	  COUNT=COUNT+1
 	END DO
 5000	CONTINUE

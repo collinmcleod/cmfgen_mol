@@ -1061,7 +1061,7 @@
 	  END DO
 	  OPEN(UNIT=150,FILE='ROSSELAND_LTE_TAB',STATUS='UNKNOWN',ACTION='WRITE')
 	    WRITE(150,'(A)')'!'
-	    WRITE(150,'(A,F8.5)'),'! Mean atomic weight (atoms/ions only)',MEAN_ATOMIC_WEIGHT
+	    WRITE(150,'(A,F8.5)')'! Mean atomic weight (atoms/ions only)',MEAN_ATOMIC_WEIGHT
 	    WRITE(150,'(A)')'!'
 	    WRITE(150,'(I5,20X,A)')I,'!Number of temperatures'
 	    WRITE(150,'(I5,20X,A)')ND/I,'!Number of densities'

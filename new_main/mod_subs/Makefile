@@ -86,6 +86,11 @@ $(LIB)(comp_var_opac.o) : comp_var_opac.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_
 	$(F90) -c $(FG) comp_var_opac.f
 	ar ruv $(LIB) comp_var_opac.o
 
+$(LIB)(grey_t_iterate.o) : grey_t_iterate.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
+$(LIB_MOD)(line_mod.o) $(LIB_MOD)(line_vec_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(ang_qw_mod.o)
+	$(F90) -c $(FG) grey_t_iterate.f
+	ar ruv $(LIB) grey_t_iterate.o
+                                                                                                                      
 $(LIB)(rd_cont_j.o) : rd_cont_j.f $(LIB)(opac_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
 $(LIB_MOD)(ang_qw_mod.o)
 	$(F90) -c $(FG) rd_cont_j.f

@@ -278,7 +278,7 @@
 	    WRITE(7,'(A)')'!'
 	    WRITE(7,'(A)')'! NB: Radiative energy density assumes a BB at T(elec).'
 	    WRITE(7,'(A)')'!'
-	    WRITE(7,'(A,2(15X,A),5(9X,A))'),'Depth','R','V','    Ek','    Ei',
+	    WRITE(7,'(A,2(15X,A),5(9X,A))')'Depth','R','V','    Ek','    Ei',
 	1                                   '  Erad','Enuc/s','  Enuc'
 	    T1=4*ACOS(-1.0D0)*1.0D-10
 	    DO I=1,ND
