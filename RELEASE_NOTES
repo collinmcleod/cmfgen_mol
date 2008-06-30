@@ -1,0 +1,84 @@
+                   RELEASE NOTES
+
+Please run a few test models and report any difficulties.
+
+Please report any compile difficulties. I cannot fix bugs/features
+if I don't know about them.
+
+If using PGF95 on the MAC_PRO please contact me. There are a couple
+of tricks you need to know about to get the code to run successfully.
+Hopefully the features/bugs will be fixed in the next version of the
+compiler.
+
+                    30-Jun-2008
+
+(1) Bug fix to $cmfdist/new_main/subs/adjust_pops.f
+     (could cause a crash on some machines).
+
+(2) Fixed a stack of write statements: replaced ,X, by ,1X, etc.
+    A simple X cause troubles on some compilers.
+    Also fixed a few other compiler sensitive statements.
+
+(3) Altered CMFGEN so that a new species can be added almost automatically.
+    Proceed as in documentation, but code will now automatically switch from
+    USE_FIXED_J=T to USE_FIXED_J=F. Before doing the switch, the code will 
+    NOW automatically do a gray temperature correction unless the hidden variable,
+    DO_GT_AUTO, is set to false in IN_ITS. Make sure GREY_SCL_FAC_IN is valid.
+
+(4) Some other cleaning. You can always use diff to find out what changes have 
+      been made to the code.
+
+(5) If you alter any module files, and have trouble running the code,
+      do a clean, and recompile the code. Its possible I may have missed
+      the dependencies of some routines on some modules.
+
+                    27-May-2008
+
+(1) As always there are minor bug fixes, changes etc. None should
+    significantly affect modeling.
+
+(2) Further improvements to Gauss-fitting option in PLT_SPEC. Designed to measure
+    EWs in normalized multiple model spectra in a semi-automatic and automatic fashion.
+
+(3) Options installed to allow hydrostatic structure to be updated automatically
+    in CMFGEN. Seems to work fine provided not to close to L(edd).
+ 
+(4) Users wishing to use the relativistic and time-dependent SN routines should
+    contact me and/or Luc Dessart. These are still under development and testing. 
+
+                     4-Feb-2008
+
+(1) As always there are minor bug fixes, changes etc. None should
+    significantly affect modeling.
+
+(2) Improvements to plane-parallel routines.
+
+(3) DO_AUTO_LAMBDA placed in IN_ITS. Does not have to be present --
+default is TRUE. Allows CMFGEN to automatically switch from LAMBDA
+iterations, FIXED_J_.TRUE. etc automatically after sufficient
+convergence has been obtained. Starting a model with DO_LAMBDA=T
+(and DO_AUTO_LAMBDA=T) is now a preferred option.
+
+(4) Improved convergence when there are extremely large corrections
+using LAMBDA iterations (e.g., when including X-rays).
+
+(5) Significant changes to allow SN models to be computed including:
+      (a) Time variations of statistical equilibrium equations, 
+      (b) Inclusion of relativistic terms in transfer equation (moment
+             equations only)
+      (c) Time dependent radiative transfer.
+    These procedures are still under development and refinement, and
+    still need rigorous testing (especially the last 2).
+
+(6) Improvements to WIND_HYD to facilitate construction of RVSIG_COL
+files assuming a hydrostatic structure. Next version will have the
+hydrostructure option included in CMFGEN.
+
+(7) Improved Gauss-fitting option in PLT_SPEC. Designed to measure
+    EWs in normalized multiple model spectra in a semi-automatic
+    fashion.
+
+(8) Help files for DISPGEN, PLT_SPEC, WR_F_TO_S etc are now now
+    accessible by a web page in $cmfdist/web.
+
+Please report any problems or errors. 
