@@ -196,6 +196,7 @@
 !
 	  V=R*(V_HYDRO(1)/R(1))
 	  SIGMA=0.0D0
+	  WRITE(6,*)'Read in R grid from RDINR'
 !
 	ELSE
 !
@@ -282,9 +283,9 @@
 	  V=R*(V_HYDRO(1)/R_HYDRO(1))
 	  SIGMA=0.0D0
 	  RMAX=R(1); RCORE=R(ND)
+	  WRITE(6,*)'Computed R grid'
 !
 	END IF
-	WRITE(6,*)'Computed R grid'
 !
 	DEALLOCATE (R_HYDRO, V_HYDRO, SIGMA_HYDRO)
 	DEALLOCATE (DENSITY_HYDRO, KAPPA_HYDRO, TAU_HYDRO, LOG_R_HYDRO)

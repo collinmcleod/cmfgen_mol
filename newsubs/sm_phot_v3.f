@@ -4,6 +4,10 @@
 	1                        SIG_GAU_KMS,FRAC_SIG_GAU,
 	1                        CUT_ACCURACY,ABOVE)
 !
+! Altered: 8-Oct-2008 : Bug fixed 
+!                       Ensure cross section falls off at least as 1/nu
+!                         in extrapolation region.
+!
 !============================================================================
 !
 ! Routine to smooth an arbitrary photionization cross-section. Cross-section
@@ -170,12 +174,14 @@
 	  STOP
 	END IF
 !
-! Extend cross-sections at high frequencies.
+! Extend cross-sections at high frequencies. We ensure cross-section
+! falls off as least as 1/nu.
 !
 	NCROSS=NCROSS+1
 	NU(NCROSS)=NU(NCROSS-1)*(1.0D0+6.0D0*SIG_GAU)
 	T1=LOG(NU(NCROSS-1)/NU(NCROSS-2))
 	T2=LOG(CROSS(NCROSS-1)/CROSS(NCROSS-2))/T1
+	IF(T2 .GT. -1.0D0)T2=-1.0D0
 	CROSS(NCROSS)=CROSS(NCROSS-1)*(NU(NCROSS)/NU(NCROSS-1))**T2
 !
 !	CALL DP_CURVE(NCROSS,NU,CROSS)

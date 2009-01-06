@@ -1139,10 +1139,23 @@
 	  IF(ACCURATE .OR. EDD_CONT .OR. EDD_LINECONT)THEN
 !
 ! NB: If not ACCURATE, NDEXT was set to ND. The +1 arises since we write
-! NU on the same line as RJ.
+! NU on the same line as RJ. J is used to get the REC_LENGTH, while string
+! will contain the date.
 !
 	    I=WORD_SIZE*(NDEXT+1)/UNIT_SIZE
-	    CALL WRITE_DIRECT_INFO_V3(NDEXT,I,'20-Aug-2000','EDDFACTOR',LU_EDD)
+	    CALL READ_DIRECT_INFO_V3(K,J,STRING,'EDDFACTOR',LU_EDD,IOS)
+	    IF(IOS .NE. 0)THEN
+	      WRITE(LUER,*)'Error --- unable to open EDDFACTOR_INFO'
+	      WRITE(LUER,*)'Will compute new f'
+	      COMPUTE_EDDFAC=.TRUE.
+	      IOS=0
+	    ELSE IF(.NOT. COMPUTE_EDDFAC .AND. K .NE. ND)THEN
+	      WRITE(LUER,*)'Error with EDDFACTOR_INFO'
+	      WRITE(LUER,*)'Incompatible number of depth points'
+	      WRITE(LUER,*)'ND is',ND 
+	      WRITE(LUER,*)'ND is EDDFACTOR_INFO is',K
+	      STOP
+	    END IF
 	    IF(.NOT. COMPUTE_EDDFAC)THEN
 	      OPEN(UNIT=LU_EDD,FILE='EDDFACTOR',FORM='UNFORMATTED',
 	1       ACCESS='DIRECT',STATUS='OLD',RECL=I,IOSTAT=IOS)
@@ -1161,6 +1174,13 @@
 	      END IF
 	    END IF
 	    IF(COMPUTE_EDDFAC)THEN
+	      IF(USE_FIXED_J)THEN
+	        WRITE(LUER,*)'Error in CMFGEN_SUB'
+	        WRITE(LUER,*)'Program will compute EDDFACTOR but this is'//
+	1                      ' incompatable with US_FIXED_J=T'
+	        STOP
+	      END IF
+	      CALL WRITE_DIRECT_INFO_V3(NDEXT,I,'20-Aug-2000','EDDFACTOR',LU_EDD)
 	      OPEN(UNIT=LU_EDD,FILE='EDDFACTOR',FORM='UNFORMATTED',
 	1       ACCESS='DIRECT',STATUS='REPLACE',RECL=I)
 	      WRITE(LU_EDD,REC=1)0

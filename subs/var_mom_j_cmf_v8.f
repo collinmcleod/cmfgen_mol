@@ -107,7 +107,7 @@
 ! Vectors required by future calls to VAR_MOM_J_CMF.
 !
 	INTEGER NV
-	PARAMETER (NV=200)
+	PARAMETER (NV=1000)
 	REAL*8 JNUM1(NV),RSQ_HNUM1(NV)
 	SAVE JNUM1,RSQ_HNUM1
 !

@@ -6,13 +6,15 @@
 	PROGRAM RECOMZ
 	IMPLICIT NONE
 !
+! Altered 07-Jul-2008: changed input LU from 6 to 5.
+!
 	INTEGER I
 	REAL*8 Z,A,GAMMA,T,N,E,ALPHA
 !
 	GAMMA=0.5772
 !
 100	WRITE(6,*)'Input Z,T and N '
-	READ(6,*)Z,T,I
+	READ(5,*)Z,T,I
 	IF(Z .EQ. 0)STOP
 	IF(I .LE. 1)THEN
 	  WRITE(6,*)'Error, N must be greater than 1'

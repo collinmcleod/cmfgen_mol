@@ -378,6 +378,7 @@
 	  IF(GAM_EDD .GT. 1.0D0)THEN
 	    WRITE(LU_ERR,*)'An invalid Eddington parameter has been computed in DO_CMF_HYDRO_V2'
 	    WRITE(LU_ERR,*)'Check the validity of Teff and Log G'
+	    WRITE(LU_ERR,*)'The computed Eddington parameter is ',GAM_EDD
 	    STOP
 	  END IF
 !
