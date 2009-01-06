@@ -53,6 +53,7 @@ C and DDBBDT= dB/dTR .
 C
 	T1=HDKT*FL/T(ND)
 	T2=1.0D0-EMHNUKT(ND)
+	BNUE=TWOHCSQ*( FL**3 )*EMHNUKT(ND)/T2
 	DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
 	DDBBDT=DBB*(T1*(1.0D0+EMHNUKT(ND))/T2-2.0D0)/T(ND)
 C
@@ -301,29 +302,30 @@ C
 	1               IPLUS,FL,dLOG_NU,DIF,DBB,IC,VDOP_VEC_EXT,DELV_FRAC_FG,
 	1               METHOD,FG_SOL_OPTIONS,THK_CONT,L_FALSE,
 	1               FIRST_FREQ,NEW_FREQ,N_TYPE,NC,NDEXT)
+             ELSE IF(USE_FORMAL_REL)THEN
+               IF(FIRST_FREQ)WRITE(LUER,*)'Calling CMF_FORMAL_REL with accurate grid in COMP_JCONT_V4.INC'
+               CALL CMF_FORMAL_REL_V2
+	1              (TA,CHIEXT,CHI_SCAT_EXT,VEXT,SIGMAEXT,REXT,PEXT,
+	1              TC,FEDD,INBC,HBC_CMF(1),IPLUS,FL,dLOG_NU,DIF,
+	1              BNUE,DBB,IC,THK_CONT,VDOP_VEC_EXT,DELV_FRAC_FG,
+	1              METHOD,FIRST_FREQ,NEW_FREQ,NCEXT,NPEXT,NDEXT)
 	     ELSE
-	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling FG_J_CMF_V10 with accurate grid'
-	       CALL FG_J_CMF_V10(TA,CHIEXT,CHI_SCAT_EXT,
-	1            VEXT,SIGMAEXT,REXT,PEXT,
-	1            TC,TB,FEDD,GEDD,N_ON_J,
-	1            AQWEXT,HMIDQWEXT,KQWEXT,NMIDQWEXT,
-	1            INBC,HBC_CMF,NBC_CMF,IPLUS,
-	1            FL,dLOG_NU,DIF,DBB,IC,
-	1            VDOP_VEC_EXT,DELV_FRAC_FG,
-	1            METHOD,FG_SOL_OPTIONS,THK_CONT,
-	1            FIRST_FREQ,NEW_FREQ,N_TYPE,
-	1            NCEXT,NPEXT,NDEXT)
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling FG_J_CMF_V11 with accurate grid'
+	       CALL FG_J_CMF_V11(TA,CHIEXT,CHI_SCAT_EXT,
+	1              VEXT,SIGMAEXT,REXT,PEXT,TC,FEDD,
+	1              AQWEXT,HQWEXT,KQWEXT,NQWEXT,HMIDQWEXT,NMIDQWEXT,
+	1              INBC,HBC_CMF(1),IPLUS,FL,dLOG_NU,DIF,DBB,IC,
+	1              VDOP_VEC_EXT,DELV_FRAC_FG,
+	1              METHOD,FG_SOL_OPTIONS,THK_CONT,
+	1              FIRST_FREQ,NEW_FREQ,
+	1              NCEXT,NPEXT,NDEXT)
 	     END IF
 !
-	     IF(USE_J_REL .AND. INCL_REL_TERMS)THEN
-	       CALL COMPUTE_ADD_EDD_FACTS(
-	1              H_ON_J,N_ON_J_NODE,KMID_ON_J,
-	1              TC,TB,FEDD,GEDD,N_ON_J,HBC_CMF,NBC_CMF,INBC,
-	1              IC,DBB,DIF,REXT,VEXT,CHIEXT,NDEXT)
-             END IF
-!
 	     CALL TUNE(ITWO,'FG_J_CMF_ACC')
-	     CALL UNGRID(RSQHNU,ND,TB,NDEXT,POS_IN_NEW_GRID)
+!
+! RSQHNU/TB not needed as computed by MOM routines.
+!	     CALL UNGRID(RSQHNU,ND,TB,NDEXT,POS_IN_NEW_GRID)
+!
 	     FG_COUNT=FG_COUNT+1
 !
 ! We assume Rayleigh scattering, when present, is coherent in the CMF. 
@@ -354,22 +356,17 @@ C
 	1                  N_TYPE,METHOD,L_TRUE,
 	1                  FIRST_FREQ,NEW_FREQ,NDEXT)
              ELSE IF(USE_J_REL)THEN
-	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_JREL_V3 with accurate grid'
-	       CALL MOM_JREL_V3(TA,CHIEXT,TB,VEXT,SIGMAEXT,REXT,
-	1             RJEXT,RSQHNU,dlnJdlnR,
-	1             FEDD,GEDD,H_ON_J,N_ON_J_NODE,N_ON_J,KMID_ON_J,
-	1             HBC_CMF,INBC,NBC_CMF,FL,dLOG_NU,
-	1             DIF,DBB,IC,METHOD,L_TRUE,
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_JREL_V5 with accurate grid'
+	       CALL MOM_JREL_V5(TA,CHIEXT,TB,VEXT,SIGMAEXT,REXT,
+	1             RJEXT,RSQHNU,VDOP_VEC_EXT,DELV_FRAC_MOM,
+	1             FL,dLOG_NU,DIF,DBB,IC,METHOD,L_TRUE,N_TYPE,
 	1             INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,FIRST_FREQ,NDEXT)
 	     ELSE
-	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_CMF_V6 with accurate grid'
-	       CALL MOM_J_CMF_V6(TA,CHIEXT,TB,
-	1              VEXT,SIGMAEXT,REXT,
-	1  	       FEDD,GEDD,N_ON_J,RJEXT,RSQHNU,
-	1              VDOP_VEC_EXT,DELV_FRAC_MOM,
-	1              HBC_CMF,INBC,NBC_CMF,
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_CMF_V8 with accurate grid'
+	       CALL MOM_J_CMF_V8(TA,CHIEXT,TB,VEXT,SIGMAEXT,REXT,
+	1  	       RJEXT,RSQHNU,VDOP_VEC_EXT,DELV_FRAC_MOM,
 	1              FL,dLOG_NU,DIF,DBB,IC,
-	1              N_TYPE,METHOD,L_TRUE,
+	1              N_TYPE,METHOD,L_TRUE,IONE,           !IONE => old outer bc
 	1              FIRST_FREQ,NEW_FREQ,
 	1              NCEXT,NPEXT,NDEXT)
 	     END IF
@@ -483,7 +480,7 @@ C
 	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0D0
 	      END IF
 	    ELSE IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
-	1         MAXCH .LT. VAL_DO_NG) )THEN
+	1         MAXCH .LT. VAL_DO_NG .AND. .NOT. USE_FORMAL_REL)  )THEN
 C
 C Quick and dirty method to ge an extended DENSITY vector. Will use TB in
 C the call to CMF_FORM_SOL.
@@ -623,23 +620,22 @@ C
 	1               IPLUS,FL,dLOG_NU,DIF,DBB,IC,VDOP_VEC,DELV_FRAC_FG,
 	1               METHOD,FG_SOL_OPTIONS,THK_CONT,L_FALSE,
 	1               FIRST_FREQ,NEW_FREQ,N_TYPE,NC,ND)
+             ELSE IF(USE_FORMAL_REL)THEN
+               IF(FIRST_FREQ)WRITE(LUER,*)'Calling CMF_FORMAL_REL in COMP_JCONT_V4.INC'
+               CALL CMF_FORMAL_REL_v2
+	1                 (TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
+	1                  TC,FEDD,INBC,HBC_CMF(1),IPLUS,
+	1                  FL,dLOG_NU,DIF,BNUE,DBB,IC,THK_CONT,
+	1                  VDOP_VEC,DELV_FRAC_FG,
+	1                  METHOD,FIRST_FREQ,NEW_FREQ,NC,NP,ND)
 	     ELSE 
 	        IF(FIRST_FREQ)WRITE(LUER,*)'Calling FG_J_CMF_V10'
-	        CALL FG_J_CMF_V10(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
-	1                  TC,TB,FEDD,GEDD,N_ON_J,
-	1                  AQW,HMIDQW,KQW,NMIDQW,
-	1                  INBC,HBC_CMF,NBC_CMF,
-	1                  IPLUS,FL,dLOG_NU,DIF,DBB,IC,
+	        CALL FG_J_CMF_V11(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
+	1                  TC,FEDD,AQW,HQW,KQW,NQW,HMIDQW,NMIDQW,
+	1                  INBC,HBC_CMF(1),IPLUS,FL,dLOG_NU,DIF,DBB,IC,
 	1                  VDOP_VEC,DELV_FRAC_FG,
 	1                  METHOD,FG_SOL_OPTIONS,THK_CONT,
-	1                  FIRST_FREQ,NEW_FREQ,N_TYPE,NC,NP,ND)
-	     END IF
-!
-	     IF(USE_J_REL .AND. INCL_REL_TERMS)THEN 
-	       CALL COMPUTE_ADD_EDD_FACTS(
-	1              H_ON_J,N_ON_J_NODE,KMID_ON_J,
-	1              TC,TB,FEDD,GEDD,N_ON_J,HBC_CMF,NBC_CMF,INBC, 
-	1              IC,DBB,DIF,R,V,CHI_CLUMP,ND)
+	1                  FIRST_FREQ,NEW_FREQ,NC,NP,ND)
 	     END IF
 !
 	     CALL TUNE(ITWO,'FG_J_CMF')
@@ -674,21 +670,17 @@ C
 	1                  N_TYPE,METHOD,L_TRUE,
 	1                  FIRST_FREQ,NEW_FREQ,ND)
              ELSE IF(USE_J_REL)THEN
-	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_JREL_V3'
-	       CALL MOM_JREL_V3(TA,CHI_CLUMP,TB,V,SIGMA,R,
-	1             RJ,RSQHNU,dlnJdlnR,
-	1             FEDD,GEDD,H_ON_J,N_ON_J_NODE,N_ON_J,KMID_ON_J,
-	1             HBC_CMF,INBC,NBC_CMF,FL,dLOG_NU,
-	1             DIF,DBB,IC,METHOD,L_TRUE,
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_JREL_V5'
+	       CALL MOM_JREL_V5(TA,CHI_CLUMP,TB,V,SIGMA,R,
+	1             RJ,RSQHNU,VDOP_VEC,DELV_FRAC_MOM,
+	1             FL,dLOG_NU,DIF,DBB,IC,METHOD,L_TRUE,N_TYPE,
 	1             INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,FIRST_FREQ,ND)
 	     ELSE
 	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_CMF_V6'
-	       CALL MOM_J_CMF_V6(TA,CHI_CLUMP,TB,V,SIGMA,R,
-	1  	       FEDD,GEDD,N_ON_J,RJ,RSQHNU,
-	1              VDOP_VEC,DELV_FRAC_MOM,
-	1              HBC_CMF,INBC,NBC_CMF,
+	       CALL MOM_J_CMF_V8(TA,CHI_CLUMP,TB,V,SIGMA,R,
+	1  	       RJ,RSQHNU,VDOP_VEC,DELV_FRAC_MOM,
 	1              FL,dLOG_NU,DIF,DBB,IC,
-	1              N_TYPE,METHOD,L_TRUE,
+	1              N_TYPE,METHOD,L_TRUE,IONE,
 	1              FIRST_FREQ,NEW_FREQ,NC,NP,ND)
 	     END IF
 	     CALL TUNE(ITWO,'MOM_J_CMF')
@@ -748,7 +740,6 @@ C Set up for the compuation of the observes flux. LST_ITERATION is
 C TRUE if FLUX_CAL_ONLY is true (single iteration with coherent,
 C last iteration if non-coherent).
 C
-	    LAMBDA_ITERATION=.TRUE.
 	   IF(PLANE_PARALLEL .OR. PLANE_PARALLEL_NO_V)THEN
 !
 ! So as defined for normal OBSFLUX calculation. HQW_AT_RMAX is initially set
@@ -767,7 +758,7 @@ C
 	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0D0
 	      END IF
 	    ELSE IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
-	1         MAXCH .LT. VAL_DO_NG) )THEN
+	1         MAXCH .LT. VAL_DO_NG .AND. .NOT. USE_FORMAL_REL) )THEN
 	      IF(COHERENT_ES)THEN
      	        TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ(1:ND)
 	      ELSE

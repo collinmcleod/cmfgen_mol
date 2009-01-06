@@ -18,6 +18,9 @@
 	1              ACCURACY,DO_TIME_VAR,TIME_SEQ_NO,ND,NC,NP,NT)
 	IMPLICIT NONE
 !
+! Altered 17-July-2008: Fixed bug with check SUM written to SN_GREY_CHK.
+!                          Replaced T1+T2-T3-E3 with T1+T2+T3-E3 (.ie., -T3 --> +T3).
+!                          Included BAD_J_COUNTER and F_LOOP_COUNTER
 ! Created 22-July-2006
 !
 	INTEGER NC
@@ -106,15 +109,19 @@
 	EXTERNAL SPEED_OF_LIGHT
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	INTEGER LUER,ERROR_LU,LU
+	INTEGER BAD_J_COUNTER
+	INTEGER F_LOOP_COUNTER
 	EXTERNAL ERROR_LU
 	LOGICAL DO_TIME_VAR
 	LOGICAL BAD_J
+	LOGICAL VERBOSE_OUTPUT
 !
 ! Set initial values.
 !
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()
 	PI=ACOS(-1.0D0)
 	LUER=ERROR_LU()
+        CALL GET_VERBOSE_INFO(VERBOSE_OUTPUT)
 	DO I=1,ND
 	  F(I)=0.33333D0
 	  BETA(I)=VEL(I)/C_KMS
@@ -157,6 +164,8 @@
 	OLD_T(1:ND)=0.0D0
 	TSTORE(1:ND)=0.0D0
 	REDUCTION_FACTOR=40.0D0
+        BAD_J_COUNTER=0
+        F_LOOP_COUNTER=0
 !
 1000	CONTINUE
 !
@@ -245,12 +254,14 @@
         END IF
         TC(ND)=0.0D0
 !
-	WRITE(121,'(2ES16.6)')RECIP_CDELTAT,ROLD_ON_R
-	WRITE(121,'(2ES16.6)')H_INBC,H_INBC_OLDT
-	WRITE(121,'(3ES16.6)')H_OUTBC,H_OUTBC_OLDT,RSQ_J_OLDt(1)
-	DO I=1,ND
-	  WRITE(121,'(I4,6ES16.6)')I,TA(I),TB(I),TC(I),JFAC(I),JT(I),XM(I)
-	END DO
+	IF(VERBOSE_OUTPUT)THEN
+	  WRITE(121,'(2ES16.6)')RECIP_CDELTAT,ROLD_ON_R
+	  WRITE(121,'(2ES16.6)')H_INBC,H_INBC_OLDT
+	  WRITE(121,'(3ES16.6)')H_OUTBC,H_OUTBC_OLDT,RSQ_J_OLDt(1)
+	  DO I=1,ND
+	    WRITE(121,'(I4,6ES16.6)')I,TA(I),TB(I),TC(I),JFAC(I),JT(I),XM(I)
+	  END DO
+	END IF
 	CALL THOMAS(TA,TB,TC,XM,ND,1)
 !
 	DO I=1,ND-1
@@ -260,18 +271,22 @@
 !
 	LU=122
 	OPEN(UNIT=LU,FILE='SN_GREY_CHK',STATUS='UNKNOWN')
-	  WRITE(LU,'(A,ES12.4)')'RECIP_CDELTAT=',RECIP_CDELTAT
-	  WRITE(LU,'(11(A12))')'       R','     CHI','    RSQJ','RSQJ_OLD','    RSQH','    DJDT',
+	  WRITE(LU,'(A,ES12.4)')'  RECIP_CDELTAT=',RECIP_CDELTAT
+	  WRITE(LU,'(A,ES12.4)')'      R_ON_ROLD=',1.0D0/ROLD_ON_R
+	  WRITE(LU,'(4X,A1,11(A12))')'I','       R','     CHI','    RSQJ','RSQJ_OLD','    RSQH','    DJDT',
 	1                      '   HTERM','  MHTERM','   RSQdE','    WORK','     SUM'
+	  WRITE(LU,'(I5,11ES12.4)')1,R(1),CHI(1),XM(1),ROLD_ON_R*ROLD_ON_R*RSQ_J_OLDt(1),RSQ_HFLUX(1)
 	  DO I=2,ND-1
 	    T1=RECIP_CDELTAT*(XM(I)-ROLD_ON_R*ROLD_ON_R*RSQ_J_OLDT(I))
 	    T2=-2.0D0*Q(I)*CHI(I)*(RSQ_HFLUX(I)-RSQ_HFLUX(I-1))/(DTAU(I-1)+DTAU(I))
 	    E3=R(I)*R(I)*E_RAD_DECAY(I) 
 	    T3=R(I)*R(I)*WORK(I) 
-	    WRITE(LU,'(11ES12.4)')R(I),CHI(I),XM(I),ROLD_ON_R*ROLD_ON_R*RSQ_J_OLDt(I),RSQ_HFLUX(I),
-	1         T1,T2,2.0D0*(RSQ_HFLUX(I-1)-RSQ_HFLUX(I))/(R(I-1)-R(I+1)),E3,T3,(T1+T2-T3-E3)
+	    WRITE(LU,'(I5,11ES12.4)')I,R(I),CHI(I),XM(I),ROLD_ON_R*ROLD_ON_R*RSQ_J_OLDt(I),RSQ_HFLUX(I),
+	1         T1,T2,2.0D0*(RSQ_HFLUX(I-1)-RSQ_HFLUX(I))/(R(I-1)-R(I+1)),E3,T3,(T1+T2+T3-E3)
 	  END DO
-	  WRITE(LU,'(11(A12))')'       R','     CHI','    RSQJ','RSQJ_OLD','    RSQH','    DJDT',
+	  I=ND
+	  WRITE(LU,'(I5,11ES12.4)')I,R(I),CHI(I),XM(I),ROLD_ON_R*ROLD_ON_R*RSQ_J_OLDt(I),RSQ_HFLUX(I)
+	  WRITE(LU,'(4X,A1,11(A12))')'I','       R','     CHI','    RSQJ','RSQJ_OLD','    RSQH','    DJDT',
 	1                      '   HTERM','  MHTERM','   RSQdE','    WORK','     SUM'
 	  WRITE(LU,'(A)')' '
 	  WRITE(LU,'(A)')' NB: RSQJ_OLD has been scaled by ROLD_ON_R^2'
@@ -291,8 +306,9 @@
 ! K to units of 10^4 K. 
 !
 	BAD_J=.FALSE.
-        DO I=1,ND
+	DO I=1,ND
 	  IF(TA(I) .LE. 0.0D0 .OR. RJ(I) .LE. 0.0D0)THEN
+            BAD_J_COUNTER=BAD_J_COUNTER+1
 	    BAD_J=.TRUE.
 	    IF(WORK(I) .GT. 0)THEN
 	      T_FROM_J(I)=0.5D0*(OLD_T(I)*ROLD_ON_R+T_FROM_J(I))
@@ -307,7 +323,12 @@
 	      END DO
 	      STOP
 	    END IF
-	  ELSE
+	    IF(BAD_J_COUNTER .GT. 50)THEN
+	      WRITE(6,*)'Exceeded 50 iterations on a BAD_J_COUNTER'
+	      WRITE(6,*)'Check starting conditions'
+	      STOP
+	    END IF
+	 ELSE
             T_FROM_J(I)=0.9D0*T_FROM_J(I)+0.1D0*((PI/5.67D-05*TA(I))**0.25D0)*1.0D-04
 	  END IF
         END DO
@@ -324,6 +345,7 @@
 	  REDUCTION_FACTOR=MAX(1.0D0,REDUCTION_FACTOR-1.0D0)
 	  GOTO 1000
 	END IF	
+	BAD_J_COUNTER=0
 !
 ! Output gray fluxes and boundary Eddington factors for next model in time sequence.
 !
@@ -426,7 +448,7 @@
 ! Solve the tridiagonal system of equations.
 !
 	    CALL THOMAS(TA,TB,TC,XM,NI,IONE)
-C
+!
 	  ELSE IF(NI .EQ. 1)THEN
 	    XM(1)=0.0D0
 	  ELSE IF(NI .EQ. 2)THEN
@@ -439,7 +461,6 @@ C
 	      E2=DTAU(1)*0.5D0+DTAU(1)*DTAU(1)/6.0D0
 	      E3=DTAU(1)*0.5D0-DTAU(1)*DTAU(1)/3.0D0
 	    END IF
-C
 	    XM(2)=TA(2)*E2+TA(1)*E3
             XM(1)=0.5D0*(XM(2)*E1+TA(1)*E2+TA(2)*E3)
 	  END IF
@@ -475,7 +496,12 @@ C
 !
 	T1=MAXVAL( ABS(F(1:ND)-FS_RSQK(1:ND)) )
 	WRITE(6,*)'Current accuracy in JGREY_HUB_DDT_V2 is', T1
-	IF(T1 .GT. ACCURACY)THEN
+	F_LOOP_COUNTER=F_LOOP_COUNTER+1
+	IF(F_LOOP_COUNTER .GT. 50)THEN
+	   WRITE(6,*)'Exceeded 50 iterations or F inJGREY_HUB_DDT_V2'
+	   WRITE(6,*)'Check starting conditions'
+	   STOP
+	ELSE IF(T1 .GT. ACCURACY)THEN
 	  F(1:ND)=FS_RSQK(1:ND)
 	  GOTO 1000
 	END IF

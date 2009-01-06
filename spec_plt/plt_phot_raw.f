@@ -288,7 +288,7 @@
 	        INDX_1=0
 	      END IF
 	    END IF
-	    IF(TYPE_1(INDX_1) .NE. 20 .OR. TYPE_1(INDX_1) .NE. 21)THEN
+	    IF(TYPE_1(INDX_1) .NE. 20 .AND. TYPE_1(INDX_1) .NE. 21)THEN
 	      INDX_1=0
 	      WRITE(6,*)'Not opacity-type cross section; see DISPGEN'
 	    END IF

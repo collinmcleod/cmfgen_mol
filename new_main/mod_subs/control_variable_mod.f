@@ -43,7 +43,8 @@
 	REAL*8 CONS_FOR_R_GRID
 	REAL*8 EXP_FOR_R_GRID
 !
-	INTEGER NBND_INS
+	INTEGER N_IB_INS			!Number of points for fine grid at inner boundary
+	INTEGER N_OB_INS			!Number of points for fine grid at outer boundary
 	INTEGER, PARAMETER :: NUM_V_OPTS=1
 	CHARACTER*10 VEL_OPTION(NUM_V_OPTS)
 !
@@ -66,6 +67,8 @@
 	REAL*8 N_RHO			!Exponent for density (+ve)
 	REAL*8 DJDT_RELAX_PARAM         !Factor to assist inclusion of DJDT terms.
 	REAL*8 SN_AGE_DAYS              !Age of SN in days.
+	REAL*8 RMAX_ON_RCORE
+!
 	INTEGER TIME_SEQ_NO             !Number of model in time sequence.
 	LOGICAL SN_MODEL
 	LOGICAL SN_HYDRO_MODEL		!Use HYDRO model for SN input
@@ -78,6 +81,7 @@
 	LOGICAL DO_FULL_REL_CMF         !Include all relativistic terms in CMF obs. frame computation.
 !
 	LOGICAL USE_J_REL
+	LOGICAL USE_FORMAL_REL
 	LOGICAL INCL_REL_TERMS
 	LOGICAL INCL_ADVEC_TERMS_IN_TRANS_EQ
 !

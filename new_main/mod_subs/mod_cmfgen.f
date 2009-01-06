@@ -6,7 +6,8 @@
 !
 	MODULE MOD_CMFGEN
 !
-! Altered 31-Jan2002 : FIXEDT etc inserted.
+! Altered 06-Aug-2008 : PLANCK_MEAN inserted.
+! Altered 31-Jan-2002 : FIXEDT etc inserted.
 !                            
 ! Number of atomic species (e.g. H, C, N is 3 species).
 !
@@ -175,6 +176,7 @@
 	REAL*8, ALLOCATABLE :: ED(:)		!Electron density (#/cm^3)
 !
 	REAL*8, ALLOCATABLE :: ROSS_MEAN(:)	!Rosseland mean opacity.
+	REAL*8, ALLOCATABLE :: PLANCK_MEAN(:)	!Planck mean opacity.
 	REAL*8, ALLOCATABLE :: FLUX_MEAN(:)	!Flux mean opacity
 	REAL*8, ALLOCATABLE :: POP_ATOM(:)	!Total atom density (#/cm^3)
 	REAL*8, ALLOCATABLE :: DENSITY(:)	!Mass density (gm/cm^3)

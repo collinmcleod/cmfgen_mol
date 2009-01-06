@@ -28,8 +28,10 @@ MOD = $(LIB_MOD)(mod_cmfgen.o)\
 OBJ = $(LIB)(adjust_r_grid_v2.o)\
       $(LIB)(adjust_r_grid_v3.o)\
       $(LIB)(adjust_den_vecs.o)\
+      $(LIB)(check_param_consistency.o)\
       $(LIB)(comp_j_blank.o)\
       $(LIB)(comp_grey_v2.o)\
+      $(LIB)(comp_grey_v3.o)\
       $(LIB)(comp_opac.o)\
       $(LIB)(comp_var_opac.o)\
       $(LIB)(do_var_cont.o)\
@@ -72,6 +74,11 @@ $(LIB)(%.o) : %.f
 $(LIB)(comp_j_blank.o) : comp_j_blank.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(ang_qw_mod.o)
 	$(F90) -c $(FG) comp_j_blank.f
 	ar ruv $(LIB) comp_j_blank.o
+
+$(LIB)(check_param_consistency.o) : check_param_consistency.f $(LIB_MOD)(control_variable_mod.o)\
+                                  $(LIB_MOD)(ang_qw_mod.o)
+	$(F90) -c $(FG) check_param_consistency.f
+	ar ruv $(LIB) check_param_consistency.o
                                                                                                                       
 $(LIB)(comp_grey_v2.o) : comp_grey_v2.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
                                   $(LIB_MOD)(ang_qw_mod.o)

@@ -65,6 +65,7 @@
 	INTEGER LU
 	INTEGER LUIN
 	LOGICAL WRITE_CHK
+	LOGICAL VERBOSE_OUTPUT
 !
 	LOGICAL, SAVE :: FIRST=.TRUE.
 !
@@ -74,7 +75,8 @@
         REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	CALL GET_LU(LU)
-	IF(FIRST)THEN
+	CALL GET_VERBOSE_INFO(VERBOSE_OUTPUT)
+	IF(FIRST .OR. .NOT. VERBOSE_OUTPUT)THEN
 	  OPEN(UNIT=LU,FILE='DDT_WORK_CHK',STATUS='UNKNOWN')
 	ELSE
 	  OPEN(UNIT=LU,FILE='DDT_WORK_CHK',STATUS='OLD',POSITION='APPEND')
@@ -153,9 +155,11 @@
 	  END DO
 	END DO
 !
-	WRITE(LU,'(A,6ES14.4)')'OLD_T',OLD_T(ND-5:ND)
-	WRITE(LU,'(A,6ES14.4)')'    T',T(ND-5:ND)
-	WRITE(LU,'(A,6ES14.4)')'CUR_T',TCUR(ND-5:ND)
+!	IF(VERBOSE_OUTPUT)THEN
+!	  WRITE(LU,'(A,6ES14.4)')'OLD_T',OLD_T(ND-5:ND)
+!	  WRITE(LU,'(A,6ES14.4)')'    T',T(ND-5:ND)
+!	  WRITE(LU,'(A,6ES14.4)')'CUR_T',TCUR(ND-5:ND)
+!	END IF
 !
 	DO ISPEC=1,NUM_SPECIES
 	  DO J=1,ND
@@ -276,23 +280,26 @@
 	OLD_T_RET(1:ND)=OLD_T(1:ND)
 !
 	WRITE(LU,'(A)')' '
+	WRITE(LU,'(A,F9.6))')'OLD_R/R=',OLD_R(ND)/R(ND)
 	WRITE(LU,'(A)')'Term comparisons'
 	WRITE(LU,'(A)')' '
-	WRITE(LU,'(A,11(4X,A))')'    I','  Cur. T','   Old T','  Ek(cur)','  Ek(old)','  IE(cur)','  IE(old)',
-	1               'Rek(cur)','Rek(old)','RIE(cur)','RIE(old)','   Pterm'
+	WRITE(LU,'(A,14(4X,A))')'   I','  Cur. T','   Old T',' ER(cur)',' ER(old)',
+	1                   ' Ek(cur)',' Ek(old)',' IE(cur)',' IE(old)',
+	1                   'Rek(cur)','Rek(old)','RIE(cur)','RIE(old)','   Pterm','    Work'
 	T1=16.0D0*1.0D+16*5.67D-05/2.998D+10
 	DO I=1,ND
 	    T2=1.0D+04*BOLTZMANN_CONSTANT()*POP_ATOM(I)
-	    WRITE(45,'(I4,15ES12.4)')I,TCUR(I),OLD_T(I),
+	    WRITE(LU,'(I4,14ES12.4)')I,TCUR(I),OLD_T(I),
 	1           T1*TCUR(I)**4,T1*OLD_T(I)**4,
 	1           1.5D0*T2*(1.0D0+GAMMA(I))*TCUR(I), 1.5D0*T2*(1.0D0+OLD_GAMMA(I))*OLD_T(I),
 	1           T2*INT_EN(I), T2*OLD_INT_EN(I),
 	1           EK_VEC(I)*(1.0D0+GAMMA(I))*TCUR(I), EK_VEC(I)*(1.0D0+OLD_GAMMA(I))*OLD_T(I),
 	1           EI_VEC(I)*INT_EN(I), EI_VEC(I)*OLD_INT_EN(I),
-	1           P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I))
+	1           P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I)),WORK(I)
 	END DO
-	WRITE(LU,'(A,11(4X,A))')'    I','  Cur. T','   Old T','  Ek(cur)','  Ek(old)','  IE(cur)','  IE(old)',
-	1               'Rek(cur)','Rek(old)','RIE(cur)','RIE(old)','   Pterm'
+	WRITE(LU,'(A,15(4X,A))')'   I','  Cur. T','   Old T',' ER(cur)',' ER(old)',
+	1                   ' Ek(cur)',' Ek(old)',' IE(cur)',' IE(old)',
+	1                   'Rek(cur)','Rek(old)','RIE(cur)','RIE(old)','   Pterm','    Work'
 	CLOSE(UNIT=LU)
 !
 	FIRST=.FALSE.

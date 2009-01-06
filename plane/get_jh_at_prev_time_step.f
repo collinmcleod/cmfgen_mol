@@ -52,6 +52,10 @@
 	USE MOD_GET_JH
 	IMPLICIT NONE
 !
+! Altered 26-July-2008 : Allow NU > NU(old).
+! Altered 17-July-2008 : Fixed DELTA_TIME_SECS which was wrong when ND and ND_OLD
+!                             were unequal.
+!
 	INTEGER ND
 	REAL*8 NU
 	REAL*8 DELTA_TIME_SECS
@@ -184,7 +188,7 @@
 ! Compute elapsed time between the two models. The factor of 10^5 arises because
 ! R is in units of 10^10 cm, and V is in units of kms/s (i.e., 10^5 cm/s).
 !
-	DELTA_TIME_SECS=1.0D+05*(R(ND)-OLD_R(ND))/V(ND)
+	DELTA_TIME_SECS=1.0D+05*(R(ND)-OLD_R(ND_OLD))/V(ND)
 !
 	IF(PRESENT(OPTION))THEN
 	  IF(OPTION .EQ. 'GREY')THEN
@@ -290,25 +294,34 @@
 	END DO
 !
 	IF(INIT .AND. NU .GT. NUST(1))THEN
-	  WRITE(LU_ER,*)'Error in GET_JH_AT_PREV_TIME_STEP'
+	  WRITE(LU_ER,*)'Warning in GET_JH_AT_PREV_TIME_STEP'
 	  WRITE(LU_ER,*)'Invalid maximum frequency --- outside range'
-	  WRITE(LU_ER,*)'NU=',NU
-	  WRITE(LU_ER,*)'NUST=',NUST(1)
-	  STOP
+	  WRITE(LU_ER,*)'Seeting flux at value for maximum frequency.'
+	  WRITE(LU_ER,'(A,ES16.6,A,ES16.6)')'NU=',NU,'NUST=',NUST(1)
 	END IF
+!
+	IF(NU .GT. NUST(1))THEN
+	  DO I=1,ND_OLD
+	    OLD_J(I)=JST(I,1)
+	    OLD_H(I)=HST(I,1)
+	  END DO
+	  H_INBC_OLDT=H_INBC_ST(1)
+	  H_OUTBC_OLDT=H_OUTBC_ST(1)
+	ELSE
 !
 ! We initially use linear interpolation in frequency.
 !
-	DO WHILE(NU .LT. NUST(INDX))
-	  INDX=INDX+1
-	END DO
-	T1=(NU-NUST(INDX))/(NUST(INDX-1)-NUST(INDX))
-	DO I=1,ND_OLD
-	  OLD_J(I)=(1.0D0-T1)*JST(I,INDX) + T1*JST(I,INDX-1)
-	  OLD_H(I)=(1.0D0-T1)*HST(I,INDX) + T1*HST(I,INDX-1)
-	END DO
-	H_INBC_OLDT=(1.0D0-T1)*H_INBC_ST(INDX) + T1*H_INBC_ST(INDX-1)
-	H_OUTBC_OLDT=(1.0D0-T1)*H_OUTBC_ST(INDX) + T1*H_OUTBC_ST(INDX-1)
+	  DO WHILE(NU .LT. NUST(INDX))
+	    INDX=INDX+1
+	  END DO
+	  T1=(NU-NUST(INDX))/(NUST(INDX-1)-NUST(INDX))
+	  DO I=1,ND_OLD
+	    OLD_J(I)=(1.0D0-T1)*JST(I,INDX) + T1*JST(I,INDX-1)
+	    OLD_H(I)=(1.0D0-T1)*HST(I,INDX) + T1*HST(I,INDX-1)
+	  END DO
+	  H_INBC_OLDT=(1.0D0-T1)*H_INBC_ST(INDX) + T1*H_INBC_ST(INDX-1)
+	  H_OUTBC_OLDT=(1.0D0-T1)*H_OUTBC_ST(INDX) + T1*H_OUTBC_ST(INDX-1)
+	END IF
 !
 ! Now need to interpolate in R space.
 !

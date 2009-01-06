@@ -45,7 +45,7 @@
 ! The following vectors are used for the atmospheric structure resulting
 ! from the solution of the hydrostatic and tau equations.
 ! 
-	INTEGER, PARAMETER :: ND_MAX=1000
+	INTEGER, PARAMETER :: ND_MAX=4000
         REAL*8 R(ND_MAX)
         REAL*8 V(ND_MAX)
         REAL*8 SIGMA(ND_MAX)
@@ -689,7 +689,7 @@
 	    END IF
 	  END IF
 !
-	  IF(ITERATION_COUNTER .GE. 20)THEN
+	  IF(ITERATION_COUNTER .GE. 100)THEN
 	    WRITE(LU_ERR,*)'Exceed iteration count in DO_CMF_HYDRO_V2.'
 	    WRITE(LU_ERR,*)'Aborting update of the hydro structure.'
 	    RETURN

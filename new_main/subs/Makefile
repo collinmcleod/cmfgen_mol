@@ -43,7 +43,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(read_seq_time_file_v1.o)\
       $(LIB)(rd_sn_data.o)\
       $(LIB)(set_ba_storage.o)\
-      $(LIB)(set_rv_hydro_model.o)\
+      $(LIB)(set_rv_hydro_model_v2.o)\
       $(LIB)(set_imp_vec.o)\
       $(LIB)(set_new_grid.o)\
       $(LIB)(solveba_v6.o)\
@@ -64,7 +64,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(tst_rd_seq.o)\
       $(LIB)(wr_asci_steq.o)
 
-all : $(LIB) NUC AUTO CHG TWO
+all : $(LIB) XNUC XAUTO XCHG XTWO
 	cp -f $(INSTALL_DIR)perm_mod_file jnk.mod
 	mv -f *.mod $(MOD_DIR)
 	rm -f *.o
@@ -175,14 +175,14 @@ $(DIS):
 $(CHG):
 	(cd chg ; make)
 
-NUC:
+XNUC:
 	(make -f Make_nuc)
 
-AUTO:
+XAUTO:
 	(cd auto; make)
-CHG:
+XCHG:
 	(cd chg; make)
-TWO:
+XTWO:
 	(cd two; make)
 
 clean :

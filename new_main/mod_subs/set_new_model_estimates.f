@@ -72,6 +72,7 @@
 	REAL*8 TGREY(ND)			!Grey temperature structure
 	REAL*8 T_SAVE(ND)
 	REAL*8 ROSSMEAN(ND)			!Rosseland mean opacity
+	REAL*8 PLANCKMEAN(ND)			!Planck mean opacity
 !
 ! These are all work vectors.
 !
@@ -155,19 +156,20 @@
 ! SPEC_DEN will contain the density of each species, while
 ! AT_NO_VEC will contain the the atomic number. These are set at all depths.
 !
-	  IF(VAR_MDOT)THEN
-	    DO I=1,ND
-	      ED(I)=POP_SPECIES(I,1)+2.0D0*POP_SPECIES(I,2)
-	    END DO
-	  END IF
-!	IF(VAR_MDOT)THEN
-!	    I=0
-!	    DO ISPEC=1,NUM_SPECIES
-!	      CALL ELEC_PREP(SPEC_DEN,AT_NO_VEC,I,NUM_SPECIES,
-!	1                POP_SPECIES(1,ISPEC),AT_NO(ISPEC),SPECIES_PRES(ISPEC),ND)
+!	  IF(VAR_MDOT)THEN
+!	    DO I=1,ND
+!	      ED(I)=POP_SPECIES(I,1)+2.0D0*POP_SPECIES(I,2)
 !	    END DO
-!	    CALL GETELEC_V2(SPEC_DEN,AT_NO_VEC,I,ED,ND,LUIN,'GAMMAS_IN')
 !	  END IF
+!
+	  IF(VAR_MDOT)THEN
+	    I=0
+	    DO ISPEC=1,NUM_SPECIES
+	      CALL ELEC_PREP(SPEC_DEN,AT_NO_VEC,I,NUM_SPECIES,
+	1                POP_SPECIES(1,ISPEC),AT_NO(ISPEC),SPECIES_PRES(ISPEC),ND)
+	    END DO
+	    CALL GETELEC_V2(SPEC_DEN,AT_NO_VEC,I,ED,ND,LUIN,'GAMMAS_IN')
+	  END IF
 !
 ! 
 	ELSE
@@ -419,6 +421,7 @@
 ! Rosseland mean opacity.
 !
 	    CALL DP_ZERO(ROSSMEAN,ND)
+	    CALL DP_ZERO(PLANCKMEAN,ND)
 	    TSTAR=T(ND)			!Required for IC in OPACITIES
 	    CONT_FREQ=0.0D0
 	    DO ML=1,NCF
@@ -459,19 +462,18 @@
 ! CHECK for negative line opacities. 
 !
 	      DO I=1,ND
-	        IF(CHI(I) .LT. 0.1D0*ESEC(I))THEN
-	          T1=CHI(I)
-	          CHI(I)=0.1D0*ESEC(I)
-	        END IF
+	        CHI_NOSCAT(I)=MAX(0.0D0,CHI(I)-ESEC(I))
+	        IF(CHI(I) .LT. 0.1D0*ESEC(I))CHI(I)=0.1D0*ESEC(I)
 	      END DO
 !
 ! Note division by T**2 is included with Stefan-Boltzman constant.
 !
 	      T1=-HDKT*NU(ML)
-	      T2=-T1*FQW(ML)*TWOHCSQ*(NU(ML)**3)
+	      T2=FQW(ML)*TWOHCSQ*(NU(ML)**3)
+	      T3=-T1*FQW(ML)*TWOHCSQ*(NU(ML)**3)
 	      DO I=1,ND
-	        ROSSMEAN(I)=ROSSMEAN(I) +
-	1           T2*EMHNUKT(I)/CHI(I)/(1.0D0-EMHNUKT(I))**2
+	        PLANCKMEAN(I)=PLANCKMEAN(I) + T2*CHI_NOSCAT(I)*EMHNUKT(I)/(1.0D0-EMHNUKT(I))
+	        ROSSMEAN(I)=ROSSMEAN(I) + T3*EMHNUKT(I)/CHI(I)/(1.0D0-EMHNUKT(I))**2
 	      END DO
 	    END DO
 !
@@ -487,9 +489,15 @@
 	    T1=1.8047D+11
 	    DO I=1,ND
 	      ROSSMEAN(I)=4.0D0*CLUMP_FAC(I)*T1*(T(I)**5)/ROSSMEAN(I)
+	      PLANCKMEAN(I)=CLUMP_FAC(I)*PLANCKMEAN(I)/T1/(T(I)**4)
 	    END DO
 !
 	    CALL WRITV(ROSSMEAN,ND,'Rosseland Mean Opacity',88)
+	    CALL WRITV(PLANCKMEAN,ND,'Planck Mean Opacity',88)
+	    TA(1:ND)=1.0D-10*ROSSMEAN(1:ND)/DENSITY(1:ND)
+	    TB(1:ND)=1.0D-10*PLANCKMEAN(1:ND)/DENSITY(1:ND)
+	    CALL WRITV(TA,ND,'Rosseland mean mass absorption coefficient',88)
+	    CALL WRITV(TB,ND,'Planck mean mass absorption coefficient',88)
 ! 
 !
 ! Check that inner boundary is deep enough so that LTE can be fully recovered. SOURCE and
@@ -520,8 +528,8 @@
 ! ROSSMEAN already includes the effect of clumping.
 !
 	    CHI(1:ND)=ROSSMEAN(1:ND)
-	    WRITE(LUER,*)'Callng COMP_GREY in SET_NEW'
-	    CALL COMP_GREY_V2(POPS,TGREY,TA,ROSSMEAN,LUER,NC,ND,NP,NT)
+	    WRITE(LUER,*)'Callng COMP_GREY_V3 in SET_NEW'
+	    CALL COMP_GREY_V3(POPS,TGREY,TA,ROSSMEAN,PLANCKMEAN,LUER,NC,ND,NP,NT)
 !
 ! SCALE_GREY modifies the computed grey temperature distribution according
 ! to that computed in a previous model.

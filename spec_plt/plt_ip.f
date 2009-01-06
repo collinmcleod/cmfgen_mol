@@ -421,9 +421,9 @@
 	  END IF
 !
 	  T1=P(I)*1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
-	  WRITE(T_OUT,'(X,A,1P,E14.6,A)')'       P(I)=',P(I)*1.0E+10,' cm'
-	  WRITE(T_OUT,'(X,A,1P,E14.6,A)')'       P(I)=',T1,' arcsec'
-	  WRITE(T_OUT,'(X,A,1P,E14.6)')'    P(I)/R*=',P(I)/R(ND)
+	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',P(I)*1.0E+10,' cm'
+	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',T1,' arcsec'
+	  WRITE(T_OUT,'(1X,A,1P,E14.6)')'    P(I)/R*=',P(I)/R(ND)
 !
 	  IF(ALLOCATED(XV))DEALLOCATE(XV)
 	  IF(ALLOCATED(YV))DEALLOCATE(YV)
@@ -474,11 +474,21 @@
 	    WRITE(T_OUT,*)'Invalid depth; maximum value is',NP
 	    GOTO 1
 	  END IF
+	  IF(X(1:2) .EQ. 'IP')THEN
+	    WRITE(6,*)'Option to plot the intensity for a given impact parameter'
+	  END IF
 !
-	  T1=P(I)*1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
-	  WRITE(T_OUT,'(X,A,1P,E14.6,A)')'       P(I)=',P(I)*1.0E+10,' cm'
-	  WRITE(T_OUT,'(X,A,1P,E14.6,A)')'       P(I)=',T1,' arcsec'
-	  WRITE(T_OUT,'(X,A,1P,E14.6)')'    P(I)/R*=',P(I)/R(ND)
+! If NP < ND, we must have a plane-parallel model.
+!
+	  IF(NP .LT. ND)THEN
+	    WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       MU(I)=',MU(I)
+	    WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'  P(I)/R(ND)=',P(I)/R(ND)
+	  ELSE
+	    T1=P(I)*1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	    WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',P(I)*1.0E+10,' cm'
+	    WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',T1,' arcsec'
+	    WRITE(T_OUT,'(1X,A,1P,E14.6)')'    P(I)/R*=',P(I)/R(ND)
+	  END IF
 !
 	  IF(ALLOCATED(XV))DEALLOCATE(XV)
 	  IF(ALLOCATED(YV))DEALLOCATE(YV)
@@ -1160,7 +1170,7 @@
 	      IF(L .EQ. 0)THEN
 	        WRITE(T_OUT,'(X)')
 	      ELSE
-	        WRITE(T_OUT,'(X,A)')STRING(1:L)
+	        WRITE(T_OUT,'(1X,A)')STRING(1:L)
 	      END IF
 	    END DO
 	    READ(T_IN,'(A)')STRING

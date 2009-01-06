@@ -96,6 +96,7 @@
 	WRITE(6,'(A)')'         MDOT: change the mass-loss rate or velocity law'
 	WRITE(6,'(A)')'         NEWG: revise grid between two velocities'
 	WRITE(6,'(A)')'         SCLR: scale radius of star to new value'
+	WRITE(6,'(A)')'         SCLV: scale velociy law to new value'
 	WRITE(6,'(A)')'         PLOT: plot V and SIGMA from old RVSIG file'
 	WRITE(6,'(A)')
 
@@ -137,6 +138,18 @@
 	  END DO
 	  DEALLOCATE (COEF)
 !
+	ELSE IF(OPTION .EQ. 'SCLV')THEN
+	  WRITE(6,'(A)')' '
+	  WRITE(6,'(A)')'This option simply scales V'
+	  WRITE(6,'(A)')'Sigma will not be changed by this operation.'
+	  WRITE(6,'(A)')' '
+	  T1=1.1D0
+	  ND=ND_OLD
+	  CALL GEN_IN(T1,'Factor to sclae velocity')
+	  V(1:ND)=T1*OLD_V(1:ND)
+	  R(1:ND)=OLD_R(1:ND)
+	  SIGMA(1:ND)=OLD_SIGMA(1:ND)
+ 
 	ELSE IF(OPTION .EQ. 'ADDR')THEN
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')'This option allows extra grid points to be added'

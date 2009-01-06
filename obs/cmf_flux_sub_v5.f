@@ -81,7 +81,7 @@ C Internally used variables
 C
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
 	REAL*8 OPLIN,EMLIN
-	REAL*8 DTDR,DBB,DDBBDT
+	REAL*8 DTDR,BNUE,DBB,DDBBDT
 	REAL*8 MEAN_ATOMIC_WEIGHT
 	REAL*8 TSTAR,S1,IC,MAXCH
 	REAL*8 C_KMS
@@ -246,10 +246,12 @@ C
 	LOGICAL WRITE_CMF_FORCE
 	LOGICAL WRITE_SOB_FORCE
 	LOGICAL DO_REL_IN_OBSFRAME
+	LOGICAL DO_CMF_REL_OBS 
 	LOGICAL INCL_INCID_RAD
 	LOGICAL PLANE_PARALLEL_NO_V
 	LOGICAL PLANE_PARALLEL
 	LOGICAL USE_J_REL
+	LOGICAL USE_FORMAL_REL
 	LOGICAL INCL_REL_TERMS
 	LOGICAL INCL_ADVEC_TERMS_IN_TRANS_EQ
 	LOGICAL WR_ION_LINE_FORCE
@@ -375,9 +377,9 @@ C
 C Quadrature weights.
 	REAL*8 FQW(NCF_MAX)		!Frequency weights
 	REAL*8 AQW(ND,NP)		!Angular quad. weights. (indep. of v)
-	REAL*8 HQW(ND,NP)		!Angular quad. weights. (indep. of v)
-                                        !for flux integration.
+	REAL*8 HQW(ND,NP)		!Angular quad. weights. (indep. of v) for flux integration.
 	REAL*8 KQW(ND,NP)		!Angular quad. weights for K integration.
+	REAL*8 NQW(ND,NP)		!Angular quad. weights. (indep. of v) for N integration.
 	REAL*8 HMIDQW(ND,NP)		!Angular quad. weights. (indep. of v)
                                         !for flux integration. Defined at the
                                         !mid points of the radius mesh.
@@ -495,6 +497,7 @@ C
 	REAL*8, ALLOCATABLE :: AQWEXT(:,:)	!Angular quad. weights. (indep. of v)
 	REAL*8, ALLOCATABLE :: HQWEXT(:,:)	!Angular quad. weights for flux integration.
 	REAL*8, ALLOCATABLE :: KQWEXT(:,:)	!Angular quad. weights for K integration.
+	REAL*8, ALLOCATABLE :: NQWEXT(:,:)	!Angular quad. weights for N integration.
 	REAL*8, ALLOCATABLE :: HMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
 	REAL*8, ALLOCATABLE :: NMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
 C
@@ -772,6 +775,8 @@ C
 	1          ' observers frame grid (>= 0)')
 	  CALL RD_STORE_LOG(DO_REL_IN_OBSFRAME,'DO_RELO',L_FALSE,
 	1        'Use all relativistic terms in Observer''s frame calculation.')
+	  CALL RD_STORE_LOG(DO_CMF_REL_OBS,'DO_CMF_RELO',L_FALSE,
+	1        'Use all relativistic terms in CMF Observer''s frame calculation.')
 C
 	  WRITE(LUMOD,'()')
 	  USE_FIXED_J=.FALSE.
@@ -923,14 +928,14 @@ C
 	  CALL RD_STORE_LOG(PLANE_PARALLEL,'PP_MOD',L_FALSE,
 	1    'Plane-paralle geometry with velocity field?')
 	  USE_J_REL=.FALSE.
+	  USE_FORMAL_REL=.FALSE.
 	  INCL_REL_TERMS=.FALSE.
 	  INCL_ADVEC_TERMS_IN_TRANS_EQ=.FALSE.
-	  CALL RD_STORE_LOG(USE_J_REL,'USE_J_REL',L_FALSE,
-	1    'Use relativistic moment solver?')
-	  CALL RD_STORE_LOG(INCL_REL_TERMS,'INCL_REL',L_FALSE,
-	1    'Include relativistic terms?')
+	  CALL RD_STORE_LOG(USE_J_REL,'USE_J_REL',L_FALSE,'Use relativistic moment solver?')
+	  CALL RD_STORE_LOG(INCL_REL_TERMS,'INCL_REL',L_FALSE,'Include relativistic terms?')
 	  CALL RD_STORE_LOG(INCL_ADVEC_TERMS_IN_TRANS_EQ,'INCL_ADV_TRANS',L_FALSE,
 	1    'Include advection terms in transfer equation?')
+	  CALL RD_STORE_LOG(USE_FORMAL_REL,'USE_FRM_REL',L_FALSE,'Use CMF_FORMAL_REL to compute F etc?')
 !
 	  WRITE(LUMOD,'()')
 	  CALL RD_STORE_LOG(ACCURATE,'INC_GRID',L_TRUE,
@@ -1397,6 +1402,7 @@ C
 	  CALL NORDANGQW(AQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,JTRPWGT)
 	  CALL NORDANGQW(HQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,HTRPWGT)
 	  CALL NORDANGQW(KQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,KTRPWGT)
+	  CALL NORDANGQW(NQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,NTRPWGT)
 	  MID=.TRUE.
 	  CALL GENANGQW(HMIDQW,R,P,WM(1,1),WM(1,3),WM(1,5),
 	1               NC,ND,NP,HTRPWGT,MID)
@@ -1406,6 +1412,7 @@ C
 	  CALL NORDANGQW(AQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,JWEIGHT)
 	  CALL NORDANGQW(HQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,HWEIGHT)
 	  CALL NORDANGQW(KQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,KWEIGHT)
+	  CALL NORDANGQW(NQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,NWEIGHT)
 	  MID=.TRUE.
 	  CALL GENANGQW(HMIDQW,R,P,WM(1,1),WM(1,3),WM(1,5),
 	1               NC,ND,NP,HWEIGHT,MID)
@@ -1446,6 +1453,7 @@ C
 	  ALLOCATE (AQWEXT(NDEXT,NPEXT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (HQWEXT(NDEXT,NPEXT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (KQWEXT(NDEXT,NPEXT),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (NQWEXT(NDEXT,NPEXT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (HMIDQWEXT(NDEXT,NPEXT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (NMIDQWEXT(NDEXT,NPEXT),STAT=IOS)
 	  IF(IOS .NE. 0)THEN
@@ -1471,6 +1479,8 @@ C
 	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,HTRPWGT)
 	    CALL NORDANGQW(KQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
 	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,KTRPWGT)
+	    CALL NORDANGQW(NQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
+	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,NTRPWGT)
 	    MID=.TRUE.
 	    CALL GENANGQW(HMIDQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
 	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,HTRPWGT,MID)
@@ -1483,6 +1493,8 @@ C
 	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,HWEIGHT)
 	    CALL NORDANGQW(KQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
 	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,KWEIGHT)
+	    CALL NORDANGQW(NQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
+	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,NWEIGHT)
 	    MID=.TRUE.
 	    CALL GENANGQW(HMIDQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
 	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,HWEIGHT,MID)
@@ -2086,7 +2098,7 @@ C
 	   CALL COMP_OBS_V2(IPLUS,FL,
 	1           IPLUS_STORE,NU_STORE,NST_CMF,
 	1           MU_AT_RMAX,HQW_AT_RMAX,OBS_FREQ,OBS_FLUX,N_OBS,
-	1           V_AT_RMAX,RMAX_OBS,'IPLUS','LIN_INT',L_FALSE,
+	1           V_AT_RMAX,RMAX_OBS,'IPLUS','LIN_INT',DO_CMF_REL_OBS,
 	1           FIRST_OBS_COMP,NP_OBS)
 C
 	ELSE                          
@@ -2174,12 +2186,12 @@ C
 	      WRITE(LUIN,'(A)')' Ion contributions are expressed as a % of total radiation force.'
 	      WRITE(LUIN,'(A)')' At depth, continuum opacities will also be important.'
 	      WRITE(LUIN,'(A)')' '
-	      WRITE(LUIN,'(3X,A,500(A8)))')'d',' V(km/s)','    M(t)',(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
+	      WRITE(LUIN,'(3X,A,500(A8))')'d',' V(km/s)','    M(t)',(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
 	      DO I=1,ND
 	        WRITE(LUIN,'(I4,1X,F8.3,500(F8.2))')I,V(I),TA(I),
 	1                    (100.0D0*ION_LINE_FORCE(I,ID)/TA(I),ID=1,NUM_IONS)
 	      END DO
-	      WRITE(LUIN,'(3X,A,500(A8)))')'d',' V(km/s)','    M(t)',(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
+	      WRITE(LUIN,'(3X,A,500(A8))')'d',' V(km/s)','    M(t)',(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
 	    CLOSE(LUIN)
 	  END IF
 	END IF
@@ -2234,6 +2246,7 @@ C
 	  CALL WRITV_V2(OBS_FREQ,N_OBS,ISIX,TRIM(STRING),LU_FLUX)
 	  CALL WRITV_V2(OBS_FLUX,N_OBS,IFOUR,
 	1                    'Observed intensity (Janskys)',LU_FLUX)
+	  CALL WRITV(RLUMST,ND,'Luminosity',LU_FLUX)
 	CLOSE(UNIT=LU_FLUX)
 !
 ! Make sure ALL frequencies have been output to CMF_FORCE_MULT

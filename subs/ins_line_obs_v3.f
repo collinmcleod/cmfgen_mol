@@ -6,6 +6,7 @@
 	1               OBS_PRO_EXT_RAT,ES_WING_EXT,V_DOP)
 	IMPLICIT NONE
 C
+C Altered 16-Jul-2008 : Adjusted MAX_B_EXTENT etc to accomodate velocities close to C. 
 C Created 23-Nov-1998 : Based on INS_LINE_OBS_V2.
 C                       Variable TRANS_TYPE and INC_ALL_LINES included in call.
 C                       If INC_ALL_LINES is FALSE, only LINES treated in BLANK mode 
@@ -34,22 +35,22 @@ C
 	LOGICAL      INCL_ALL_LINES
 C
 C Passed constants:
-	REAL*8 VINF		!Terminal velocity of wind.
-	REAL*8 dV_OBS_PROF
-	REAL*8 dV_OBS_WING
-	REAL*8 dV_OBS_BIG
-	REAL*8 NU_MIN
-	REAL*8 NU_MAX
+	REAL*8 VINF			!Terminal velocity of wind.
+	REAL*8 dV_OBS_PROF		!Spcing across line profile
+	REAL*8 dV_OBS_WING		!Spacing in e.s. wing
+	REAL*8 dV_OBS_BIG		!Spacing between lines (i.e., in continuum)
+	REAL*8 NU_MIN			!Minimum frequency
+	REAL*8 NU_MAX			!Maximum frequency
 	REAL*8 OBS_PRO_EXT_RAT
-	REAL*8 ES_WING_EXT
+	REAL*8 ES_WING_EXT		!Extent of e.s. wing (thermal; in km/s)
 	REAL*8 V_DOP
 C
 C Local variables.
 C
-	REAL*8 MAX_B_EXTENT
-	REAL*8 MAX_R_EXTENT
-	REAL*8 MAX_BW_EXTENT
-	REAL*8 MAX_RW_EXTENT
+	REAL*8 MAX_B_EXTENT		!Blue profile extent
+	REAL*8 MAX_R_EXTENT		!Red profile extent
+	REAL*8 MAX_BW_EXTENT		!Blue e.s. wing extent (from line core)
+	REAL*8 MAX_RW_EXTENT		!Red e.s. wing etent (from line core)
 C
 	REAL*8 PROF_SPACING
 	REAL*8 WING_SPACING
@@ -57,7 +58,7 @@ C
 	REAL*8 T1
 C
 	INTEGER INDX		!Current frequency index.
-	INTEGER LN_INDX	!Current line whose frequencies we are 
+	INTEGER LN_INDX		!Current line whose frequencies we are 
 				!   installing.
 	INTEGER LST_LN_INDX	!Index of last line whose frequencies we
 				!   installed. Needed as lines computed in
@@ -111,6 +112,11 @@ C
 C Ensures BW extent is bigger than profile extent.
 C
 	MAX_BW_EXTENT = MAX(MAX_BW_EXTENT,MAX_B_EXTENT+2.0D0*dV_OBS_BIG/C_KMS)
+C
+	MAX_R_EXTENT=MAX(0.2D0,MAX_R_EXTENT)
+	MAX_B_EXTENT=MIN(1.8D0,MAX_B_EXTENT)
+	MAX_RW_EXTENT=MAX(0.19D0,MAX_RW_EXTENT)
+	MAX_BW_EXTENT=MIN(1.81D0,MAX_BW_EXTENT)
 C
 	PROF_SPACING = 1.0D0-dV_OBS_PROF/C_KMS
 	WING_SPACING = 1.0D0-dV_OBS_WING/C_KMS

@@ -46,8 +46,8 @@ C
 	1   (SGN*QZR(NX) .GT. SGN*R(ND)) )THEN
 	  LUER=ERROR_LU()
 	  WRITE(LUER,*)'Error in MON_INTERP - values outside range'
-	  WRITE(LUER,'(X,2(A,ES16.6),A,I4)')'  R(1)=',R(1),'  R(ND)= ',R(ND),'ND=',ND
-	  WRITE(LUER,'(X,2(A,ES16.6),A,I4)')'QZR(1)=',QZR(1),'QZR(NX)=',QZR(NX),'NX=',NX
+	  WRITE(LUER,'(1X,2(A,ES20.12),A,I4)')'  R(1)=',R(1),'    R(ND)= ',R(ND),'ND=',ND
+	  WRITE(LUER,'(1X,2(A,ES20.12),A,I4)')'QZR(1)=',QZR(1),'  QZR(NX)=',QZR(NX),'NX=',NX
 	  STOP
 	END IF
 	I=1

@@ -260,6 +260,7 @@
 	LOGICAL FOUND
 	LOGICAL NEW_FORMAT,NEW_FILE
 	LOGICAL DO_TAU
+	LOGICAL DO_KAP
 	LOGICAL DONE_LINE
 	LOGICAL LINE_STRENGTH
 	LOGICAL PLT_J,PLT_H,PLT_LF,PLT_FM
@@ -797,6 +798,7 @@
 ! **************************************************************************
 !
 	IF( XOPT .EQ. 'OP'
+	1          .OR. XOPT .EQ. 'KAPPA'
 	1          .OR. XOPT .EQ. 'ETA'
 	1          .OR. XOPT .EQ. 'XTAUC'
 	1          .OR. XOPT .EQ. 'TAUC'
@@ -854,6 +856,7 @@
 	1          .OR. XOPT .EQ. 'BETA'
 	1          .OR. XOPT .EQ. 'ETA'
 	1          .OR. XOPT .EQ. 'OP'
+	1          .OR. XOPT .EQ. 'KAPPA'
 	1          .OR. XOPT .EQ. 'TAUC'
 	1          .OR. XOPT .EQ. 'DTAUC'
 	1          .OR. XOPT .EQ. 'XTAUC'
@@ -2851,6 +2854,51 @@
 	  END DO
 ! 
 !
+	ELSE IF(XOPT .EQ. 'AV')THEN
+	  CALL USR_OPTION(K,'DEPTH',' ','Depth index for averaging')
+	  DO ID=1,NUM_IONS
+            IF(XSPEC .EQ. UC(ION_ID(ID)) .AND. ATM(ID)%XzV_PRES)THEN
+	      DO J=1,ATM(ID)%NXzV_F
+	        ATM(ID)%XzV_F(J,K)=SQRT(ATM(ID)%XzV_F(J,K-1)*ATM(ID)%XzV_F(J,K+1) )
+	      END DO
+	      IF(ID .NE. 1)THEN
+	        IF(ATM(ID-1)%XzV_PRES)THEN
+                  ATM(ID-1)%DXzV_F(K)=SQRT(ATM(ID-1)%DXzV_F(K-1)*ATM(ID-1)%DXzV_F(K+1))
+	        END IF
+	      END IF
+	      IF(ID .NE. NUM_IONS)THEN
+	        IF(.NOT. ATM(ID+1)%XzV_PRES)THEN
+                  ATM(ID)%DXzV_F(K)=SQRT(ATM(ID)%DXzV_F(K-1)*ATM(ID)%DXzV_F(K+1))
+	        END IF
+	      END IF
+	      EXIT
+	    END IF
+	  END DO
+!
+	ELSE IF(XOPT .EQ. 'REP')THEN
+	  CALL USR_OPTION(K,'DEPTH',' ','Depth to replace')
+	  I=K+1
+	  CALL USR_OPTION(I,'DEPTH',' ','Replacement depth')
+	  DO ID=1,NUM_IONS
+            IF(XSPEC .EQ. UC(ION_ID(ID)) .AND. ATM(ID)%XzV_PRES)THEN
+	      DO J=1,ATM(ID)%NXzV_F
+	        ATM(ID)%XzV_F(J,K)=ATM(ID)%XzV_F(J,I)*MASS_DENSITY(K)/MASS_DENSITY(I)
+	      END DO
+	      IF(ID .NE. 1)THEN
+	        IF(ATM(ID-1)%XzV_PRES)THEN
+                  ATM(ID-1)%DXzV_F(K)=ATM(ID-1)%DXzV_F(I)*MASS_DENSITY(K)/MASS_DENSITY(I)
+	        END IF
+	      END IF
+	      IF(ID .NE. NUM_IONS)THEN
+	        IF(.NOT. ATM(ID+1)%XzV_PRES)THEN
+                  ATM(ID)%DXzV_F(K)=ATM(ID)%DXzV_F(I)*MASS_DENSITY(K)/MASS_DENSITY(I)
+	        END IF
+	      END IF
+	      EXIT
+	    END IF
+	  END DO
+! 
+!
 	ELSE IF (XOPT .EQ. 'FIXT')THEN
 !
 	  CALL USR_OPTION(ELEC,'DT','F','Set T values at certain depths?')
@@ -3071,15 +3119,20 @@
 !              wavelength.
 !           2. When no species is specified, the maximum fractional contribution
 !               of each species at ANY depth is ouput to the terminal
-!
+!           3. Plot species dependent contributions at a given depth.
+!           
 	ELSE IF(XOPT .EQ. 'MCHI')THEN
 	  CALL USR_OPTION(LAM_ST,'LAM_ST','50.0',FREQ_INPUT)
 	  CALL USR_OPTION(LAM_EN,'LAM_END','10000.0',FREQ_INPUT)
 	  CALL USR_OPTION(NLAM,'NLAM','1000.0','# of wavlengths')
 	  CALL USR_OPTION(ELEC,'ELEC','F','Include electron scattering?')
+	  CALL USR_OPTION(DO_KAP,'DO_KAP','F','Plot species dependent contributions?')
+	  IF(DO_KAP)THEN
+	    CALL USR_OPTION(DPTH_INDX,'DPTH','30','Depth index?')
+	  END IF
 !
 	  LOC_ION_ID='$$'
-	  DO WHILE(LOC_ION_ID .EQ. '$$')
+	  DO WHILE(LOC_ION_ID .EQ. '$$' .AND. .NOT. DO_KAP)
 	    CALL USR_OPTION(LOC_ION_ID,'ION',' ','Ion ID (eg HI)')
 	    DO ID=1,NUM_IONS
 	      IF(LOC_ION_ID .EQ. ION_ID(ID) .OR. LOC_ION_ID .EQ. ' ')THEN
@@ -3108,6 +3161,10 @@
 	    ALLOCATE (CHI_LAM(NLAM,ND))
 	    ALLOCATE (ETA_LAM(NLAM,ND))
 	    ALLOCATE (LAM_VEC(NLAM));     LAM_VEC(:)=0.0D0
+	  ELSE IF(DO_KAP)THEN
+	    ALLOCATE (CHI_LAM(NLAM,NUM_IONS))
+	    ALLOCATE (ETA_LAM(NLAM,NUM_IONS))
+	    ALLOCATE (LAM_VEC(NLAM));     LAM_VEC(:)=0.0D0
 	  ELSE
 	    ALLOCATE (CHI_TOT_LAM(NUM_IONS)); CHI_TOT_LAM(:)=0.0D0
 	    ALLOCATE (LAM_VEC(NUM_IONS));     LAM_VEC(:)=0.0D0
@@ -3135,11 +3192,13 @@
 !
 ! NB: First dimension of CHI_PAR is ND.
 !
-	    DO ID=1,NUM_IONS
-	      CHI_PAR(:,ID)=CHI_PAR(:,ID)/CHI(1:ND)
-	      ETA_PAR(:,ID)=ETA_PAR(:,ID)/ETA(1:ND)
-              YMAPV(ID)=ID
-	    END DO
+	    IF(.NOT. DO_KAP)THEN
+	      DO ID=1,NUM_IONS
+	        CHI_PAR(:,ID)=CHI_PAR(:,ID)/CHI(1:ND)
+	        ETA_PAR(:,ID)=ETA_PAR(:,ID)/ETA(1:ND)
+                YMAPV(ID)=ID
+	      END DO
+	    END IF
 !
 	    IF(LOC_ION_ID .EQ. ' ')THEN
 	      DO ID=1,NUM_IONS
@@ -3148,6 +3207,12 @@
 	        CHI_TOT_LAM(ID)=MAX(T1,CHI_TOT_LAM(ID))
 	        LAM_VEC(ID)=MAX(T2,LAM_VEC(ID))
 	      END DO
+	    ELSE IF(DO_KAP)THEN
+	       LAM_VEC(ML)=LOG10(ANG_TO_HZ/FREQ)
+	       DO ID=1,NUM_IONS
+	         CHI_LAM(ML,ID)=CHI_PAR(DPTH_INDX,ID)
+	         ETA_LAM(ML,ID)=ETA_PAR(DPTH_INDX,ID)
+	       END DO
 	    ELSE
 	       LAM_VEC(ML)=LOG10(ANG_TO_HZ/FREQ)
 	       DO ID=1,NUM_IONS
@@ -3170,6 +3235,22 @@
 	    END DO
 	    DEALLOCATE (CHI_TOT_LAM)
 	    DEALLOCATE (LAM_VEC)
+	  ELSE IF(DO_KAP)THEN
+	    DO ID=1,NUM_IONS
+	      CHI_LAM(:,ID)=1.0D-10*CHI_LAM(:,ID)/MASS_DENSITY(DPTH_INDX)
+	    END DO
+	    DO ISPEC=1,NSPEC
+	      YV(1:NLAM)=0.0D0
+	      ELEC=.FALSE.
+	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	        YV(1:NLAM)=YV(1:NLAM)+CHI_LAM(1:NLAM,ID)
+	        ELEC=.TRUE.
+	      END DO
+	      IF(ELEC)THEN
+	        CALL DP_CURVE(NLAM,LAM_VEC,YV)
+	        WRITE(6,*)ISPEC,SPECIES(ISPEC)
+	      END IF
+	    END DO
 	  ELSE
 	    DO I=1,ND
               XMAPV(I)=I
@@ -3792,7 +3873,7 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	    END IF
 	  END DO
 !
-	ELSE IF(XOPT .EQ. 'COL')THEN
+	ELSE IF(XOPT .EQ. 'COL' .OR. XOPT .EQ. 'CRIT')THEN
 	  TMP_ED=1.0D0
 	  CALL USR_OPTION(T1,'T','1.0','Input T')
 	  DO ID=1,NUM_IONS
@@ -3806,7 +3887,12 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	1         ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,ATM(ID)%ZXzV,
 	1         ID,TRIM(ION_ID(ID))//'_COL_DATA',OMEGA_GEN_V3,
 	1         ATM(ID)%F_TO_S_XzV,TEMP,T1,TMP_ED,IONE)
-	      CALL WR_COL(OMEGA_F,ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,XSPEC,LU_COL,' ')
+	          IF(XOPT .EQ. 'COL')THEN
+	            CALL WR_COL(OMEGA_F,ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,XSPEC,LU_COL,' ')
+	          ELSE
+	            CALL WR_CRIT(OMEGA_F,T1,HDKT,ATM(ID)%AXzV_F,ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,
+	1                    ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,XSPEC,LU_COL)
+	         END IF
 	    END IF
 	  END DO
 !
@@ -4202,6 +4288,7 @@ c
 	  YAXIS='Log(\ge(ergs/cm\u3\d/s/Hz)'
 !
 	ELSE IF(XOPT .EQ.'OP' .OR.
+	1       XOPT .EQ. 'KAPPA' .OR.
 	1       XOPT .EQ. 'TAUC' .OR.
 	1       XOPT .EQ. 'DTAUC') THEN
 !
@@ -4231,6 +4318,10 @@ c
 	    I=ND-1
 	    CALL DP_CURVE(I,XV,YV)
 	    YAXIS='Log(\gD\gt)'
+	  ELSE IF(XOPT .EQ. 'KAPPA')THEN
+	     YV(1:ND)=1.0D-10*CHI(1:ND)/MASS_DENSITY(1:ND)/CLUMP_FAC(1:ND)
+	     CALL DP_CURVE(ND,XV,YV)
+	     YAXIS='Log(\kx(cm\u3 \d/g)'
 	  ELSE
 !
 ! We subtract 10 to put CHI in units of cm-1

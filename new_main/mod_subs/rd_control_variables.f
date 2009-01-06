@@ -75,7 +75,7 @@ C
 	    VINF2=VINF1                !i.e. no 2nd component
 	    V_BETA2=1.0D0
 	    V_EPPS2=1.0D0
-	    NBND_INS=1                 !Old default
+	    N_OB_INS=1                 !Old default
 	    CONS_FOR_R_GRID=1.0D0
 	    EXP_FOR_R_GRID=0.0D0
 	  ELSE IF(VELTYPE .EQ. 4)THEN
@@ -106,9 +106,10 @@ C
 	    CALL RD_STORE_DBLE(V_EPPS2,'EPPS2',L_TRUE,
 	1           'Scale factor for 2nd Beta V law')
 !
-	    NBND_INS=1          !Old default
+	    N_OB_INS=1          !Old default
+	    N_IB_INS=2
 	    CONS_FOR_R_GRID=-1.0D0
-	    CALL RD_STORE_INT(NBND_INS,'NBND_INS',L_FALSE,
+	    CALL RD_STORE_INT(N_OB_INS,'NBND_INS',L_FALSE,
 	1           'Number of additional points to insert in radius grid at boundary')
 	    CALL RD_STORE_DBLE(CONS_FOR_R_GRID,'C_R_GRID',L_FALSE,
 	1           'Constant to allow imprved shoice of R grid')
@@ -245,6 +246,12 @@ C
 	1            'Allow for radiactive decays')
 	    CALL RD_STORE_NCHAR(SN_T_OPTION,'SN_T_OPT',ITEN,L_TRUE,
 	1           'Method to get T with non-GRID option (USE_T_IN or USE_HYDRO)')
+	    N_IB_INS=2
+	    N_OB_INS=3
+	    RMAX_ON_RCORE=-1.0D0		!Implies use default.
+	    CALL RD_STORE_INT(N_IB_INS,'N_IB_INS',L_FALSE,'# of points for fine grid at inner boundary')
+	    CALL RD_STORE_INT(N_OB_INS,'N_OB_INS',L_FALSE,'# of points for fine grid at outer boundary')
+	    CALL RD_STORE_DBLE(RMAX_ON_RCORE,'RMAX_ON_RCORE',L_FALSE,'RMAX/RCORE for SN if shrinking radius')
 	  END IF	  
 	  DO_FULL_REL_OBS=.FALSE.
 	  DO_FULL_REL_CMF=.FALSE.
@@ -734,6 +741,7 @@ C
 	  INCL_REL_TERMS=.FALSE.
 	  INCL_ADVEC_TERMS_IN_TRANS_EQ=.FALSE.
 	  CALL RD_STORE_LOG(USE_J_REL,'USE_J_REL',L_FALSE,'Use MOM_J_REL_VN to solve the moment equations?')
+	  CALL RD_STORE_LOG(USE_FORMAL_REL,'USE_FRM_REL',L_FALSE,'Use CMF_FORMAL_REL to compute F etc?')
 	  CALL RD_STORE_LOG(INCL_REL_TERMS,'INCL_REL',USE_J_REL,'Include relativistic terms in the transfer equaton?')
 	  IF(INCL_REL_TERMS .AND. .NOT. USE_J_REL)THEN
 	    WRITE(LUER,*)'Error in control parameters in VADAT'

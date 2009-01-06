@@ -285,12 +285,9 @@ C
 	1           FIRST_FREQ,L_FALSE,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
 	1           DO_THIS_TX_MATRIX,METHOD,COHERENT_ES,ND,NM)
            ELSE IF(USE_J_REL)THEN
-             CALL VAR_JREL_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,ES_COH_VEC,V,SIGMA,R,
+             CALL VAR_JREL_V2(TA,CHI_CLUMP,CHI_SCAT_CLUMP,ES_COH_VEC,V,SIGMA,R,
 	1                  TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR,
-	1                  dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR,
-	1                  KI,WM,RHS_dHdCHI,dlnJdlnR,
-	1                  FEDD,GEDD,H_ON_J,N_ON_J_NODE,N_ON_J,KMID_ON_J,
-	1                  HBC_CMF,INBC,NBC_CMF,
+	1                  dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR,KI,WM,RHS_dHdCHI,
 	1                  FIRST_FREQ,FL,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
 	1                  INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,
 	1                  DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
@@ -303,14 +300,11 @@ C
 	1           FIRST_FREQ,FL,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
 	1           DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
 	   ELSE
-	    CALL VAR_MOM_J_CMF_V8(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
+	    CALL VAR_MOM_J_CMF_V9(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
 	1           ES_COH_VEC,V,SIGMA,R,
 	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR, 
 	1           dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR, 
 	1           KI,WM,RHS_dHdCHI,
-	1           FEDD,GEDD,N_ON_J,HBC_CMF,INBC,NBC_CMF,
-	1           FEDD_PREV,GEDD_PREV,N_ON_J_PREV,
-	1           HBC_PREV,INBC_PREV,NBC_PREV,
 	1           FIRST_FREQ,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,FL,
 	1           OUT_BC_TYPE,DO_THIS_TX_MATRIX,
 	1           METHOD,ND,NM,NM_KI)
@@ -496,7 +490,7 @@ C
 	      TA(1:NDEXT)=ETAEXT(1:NDEXT)+
 	1                 ESECEXT(1:NDEXT)*RJEXT_ES(1:NDEXT)
 	    END IF
-	    CALL VAR_MOM_JEXT_CMF_V2(TA,CHIEXT,ESECEXT,
+	    CALL VAR_MOM_JEXT_CMF_V3(TA,CHIEXT,ESECEXT,
 	1                  VEXT,SIGMAEXT,REXT,
 	1                  ETA_CLUMP,CHI_CLUMP,ESEC_CLUMP,
 	1                  INDX,COEF,INTERP_TYPE,ND,
@@ -504,9 +498,6 @@ C
 	1                  dJ_DIF_d_T_EXT,dJ_DIF_d_dTdR_EXT,
 	1                  dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR, 
 	1                  KI,RHS_dHdCHI,
-	1                  FEDD,GEDD,N_ON_J,HBC_CMF,INBC,NBC_CMF,
-	1                  FEDD_PREV,GEDD_PREV,N_ON_J_PREV,
-	1                  HBC_PREV,INBC_PREV,NBC_PREV,
 	1                  FIRST_FREQ,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
 	1                  DO_THIS_TX_MATRIX,METHOD,COHERENT_ES,NDEXT,NM,NM_KI)
 C

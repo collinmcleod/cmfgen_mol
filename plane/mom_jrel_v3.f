@@ -478,6 +478,12 @@
 	END DO
 	CALL INTEGRATE(TB,TA,Q,IFAIL,ND)
 !
+	OPEN(UNIT=147,FILE='Q_CHECK')
+	  DO I=ND,1,-1
+	    WRITE(147,'(I5,10ES14.4)')I,TB(ND-I+1),FEDD(I),H_ON_J(I),N_ON_J(I),TA(ND-I+1),Q(ND-I+1),
+	1                 BETA(I),SIGMA(I),GAM_REL_SQ(I),VdHdR_TERM(I)
+	  END DO
+!
 	DO I=1,ND-1		!Q(ND) undefined after exiting INTEGRATE
 	  TB(I)=EXP(Q(ND-I))
 	END DO
@@ -488,6 +494,12 @@
 	  Q(I)=TB(I)/(R(I)/R(ND))**2
 	END DO
 	Q(ND)=1.0D0
+!
+!	OPEN(UNIT=147,FILE='Q_CHECK')
+	  DO I=1,ND
+	    WRITE(147,'(I5,10ES14.4)')I,FEDD(I),H_ON_J(I),N_ON_J(I),TA(I),Q(I),BETA(I),SIGMA(I),VdHdR_TERM(I)
+	  END DO
+	CLOSE(UNIT=147)
 !
 ! Compute optical depth scales.
 !

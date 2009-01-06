@@ -19,6 +19,8 @@ c
 	1               INCLUDE_LINE_CENTERS)
 	IMPLICIT NONE
 C
+C Altered: 18-Jul-2008: Changed terms of the form 1-a*Vinf/C_kms to 1/(1-a*Vinf/C_kms).
+C                         This is to prevent problems when Vinf is close to c. 
 C Altered: 13-Apr-2003: Bug fix: dNU replaced by dNU_NEXT in if statement (line 287)
 C Created: 22-Dec-1998: Complete rewrite of INS_LINE_V5.
 C                       Written to handle lines with different intrinsic
@@ -182,10 +184,11 @@ C
 	EDGE_SEP_FAC=0.5D0                              !was 0.1
 	MIN_FREQ_RAT=1.0D0+EDGE_SEP_FAC*dNU_on_NU
 C
-C Define edges of the e.s blue and red wings.
+C Define edges of the e.s blue and red wings. The form of ES_RED_WING_EXTENT
+C ensures that it is always positive, even when VINF is clse to c.
 C
 	ES_BLUE_WING_EXT=1.0D0+ES_WING_EXT/C_KMS		!v/v(o)
-	ES_RED_WING_EXT=1.0D0-(ES_WING_EXT+R_CMF_WING_EXT*VINF)/C_KMS
+	ES_RED_WING_EXT=1.0D0/( 1.0D0+(ES_WING_EXT+R_CMF_WING_EXT*VINF)/C_KMS)
 C
 C Determine continuum frequencies bracketing bound-free edges. We keep
 C these in our final continuum list. To avoid numerical instabilities
@@ -292,8 +295,8 @@ C
 	    IF(NU_CONT(ML) .GT. CUR_RED_PROF_EXT)THEN
 	      T1=FREQ(INDX)*dV_CMF_PROF/C_KMS
 	      dNU_NEXT=MIN(dNU_NEXT,T1)
-	    ELSE IF(NU_CONT(ML) .GT. CUR_RED_PROF_EXT*ES_RED_WING_EXT/
-	1                    (1.0D0-2.0D0*VINF/C_KMS) )THEN
+	    ELSE IF(NU_CONT(ML) .GT. CUR_RED_PROF_EXT*ES_RED_WING_EXT*
+	1                    (1.0D0+2.0D0*VINF/C_KMS) )THEN
 	      T1=FREQ(INDX)*dV_CMF_WING/C_KMS
 	      dNU_NEXT=MIN(dNU_NEXT,T1)
 	    END IF
@@ -381,7 +384,7 @@ C
 	    DO WHILE( LN_INDX .LE. N_LINES .AND. FREQ(INDX) .LE. 
 	1         NU_END_LINE(LN_INDX) )
 	      IF(TRANS_TYPE(LN_INDX)(1:3) .EQ. 'BLA')THEN
-	        T1=NU_END_LINE(LN_INDX)*(1.0D0-2.0D0*VINF/C_KMS)
+	        T1=NU_END_LINE(LN_INDX)/(1.0D0+2.0D0*VINF/C_KMS)
 	        CUR_RED_PROF_EXT=MIN(CUR_RED_PROF_EXT,T1)
 	      END IF
 	      LN_INDX=LN_INDX+1

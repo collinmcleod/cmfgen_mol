@@ -13,6 +13,7 @@
 	REAL*8, ALLOCATABLE :: AQW(:,:)          !ND,NP
 	REAL*8, ALLOCATABLE :: HQW(:,:)          !ND,NP
 	REAL*8, ALLOCATABLE :: KQW(:,:)          !ND,NP
+	REAL*8, ALLOCATABLE :: NQW(:,:)          !ND,NP
 !
 ! Defined at the mid points of the mesh.
 !
@@ -25,6 +26,7 @@
 	REAL*8, ALLOCATABLE :: AQWEXT(:,:)
 	REAL*8, ALLOCATABLE :: HQWEXT(:,:)
 	REAL*8, ALLOCATABLE :: KQWEXT(:,:)
+	REAL*8, ALLOCATABLE :: NQWEXT(:,:)
 	REAL*8, ALLOCATABLE :: HMIDQWEXT(:,:)
 	REAL*8, ALLOCATABLE :: NMIDQWEXT(:,:)
 !
