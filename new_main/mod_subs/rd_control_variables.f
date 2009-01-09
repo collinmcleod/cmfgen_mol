@@ -822,8 +822,16 @@ C
 !
 	  UNDO_LAST_IT=.FALSE.
 	  CALL RD_STORE_LOG(UNDO_LAST_IT,'DO_UNDO',L_FALSE,'Undo corrections at last 5 depths')
+!
+	  STOP_IF_BAD_PARAM=.TRUE.
+	  CALL RD_STORE_LOG(STOP_IF_BAD_PARAM,'STOP_IF_BP',L_FALSE,'Undo corrections at last 5 depths')
 
 	  CALL CLEAN_RD_STORE()
-C
+!
 	CLOSE(UNIT=7)
+!
+! Check consistency of parameters.
+!
+	CALL CHECK_PARAM_CONSISTENCY()
+!
 	END

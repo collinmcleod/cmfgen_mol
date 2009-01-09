@@ -396,6 +396,7 @@
 	LOGICAL DO_LAMBDA_AUTO
 	LOGICAL DO_GREY_T_AUTO
 	LOGICAL LAMBDA_ITERATION
+	LOGICAL STOP_IF_BAD_PARAM
 !
 ! Variables for determining whether some populations are held fixed
 ! when the new populations are solved for.

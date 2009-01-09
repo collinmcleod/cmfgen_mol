@@ -3808,10 +3808,8 @@
 !
 	CALL WRITV(STEQ_T,ND,'Radiative Equlibrium Equation',LU_SE)
 !
-	CALL TUNE(1,'SOLVE_BA')	
 	CALL SOLVE_FOR_POPS(POPS,NT,NION,ND,NC,NP,NUM_BNDS,DIAG_INDX,
 	1      MAXCH,MAIN_COUNTER,IREC,LU_SE,LUSCR,LST_ITERATION)
-	CALL TUNE(2,'SOLVE_BA')	
 !
 ! If we have changed the R grid, we need to recomput the angular quadrature weitghts,
 ! and put the atom density ect on the new radius grid.

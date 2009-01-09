@@ -13,6 +13,12 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered: 07-Jul-2008 : Substantial changes over a period of time to include
+!                          relativistic radiative transfer. Lots of changes to
+!                          COMP_JCONT.INC. NCEXT is now increased according to 
+!                          NPINS when ACCURATE option is used.
+! Altered: 31-Jul-2007 : Call to MOM_JREL_V3 included in INCLUDE file.
+!                          Variabled and control variables for rel. trans. installed.
 ! Altered: 31-Jul-2007 : Call to MOM_JREL_V3 included in INCLUDE file.
 !                          Variabled and control variables for rel. trans. installed.
 ! Altered: 01-Feb-2006 : COMP_OBS_V2 installed. Frequency transformation between
@@ -1432,7 +1438,7 @@ C
 	    WRITE(LUER,*)' Need to increase NDMAX in CMFGEN'
 	    STOP
 	  END IF
-	  NCEXT=NC
+	  NCEXT=NC*(NPINS+1)
 C
 C NB: The following expression guarentees that NPEXT has the same relationship
 C to NDEXT and NCEXT as does NP to ND and NC.
