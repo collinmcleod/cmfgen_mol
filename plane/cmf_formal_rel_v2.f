@@ -28,7 +28,7 @@
 !
 	SUBROUTINE CMF_FORMAL_REL_V2
 	1           (ETA,CHI,ESEC,V,SIGMA,R,P,
-	1            JNU,K_ON_J,RETURNED_IN_HBC,RETURNED_OUT_HBC,IPLUS,
+	1            JNU,FEDD,RETURNED_IN_HBC,RETURNED_OUT_HBC,IPLUS,
 	1            FREQ,dLOG_NU,DIF,B_PLANCK,DBB,IC,THICK_OB,
 	1            VDOP_VEC,VDOP_FRAC,
 	1            METHOD,INITIALIZE,NEW_FREQ,NC,NP,ND)
@@ -57,7 +57,7 @@
 ! NB: J,H,K,N refer to the first 4 moments of the radiation field.
 !
         REAL*8 JNU(ND)
-	REAL*8 K_ON_J(ND)
+	REAL*8 FEDD(ND)
         REAL*8 IPLUS(NP)
 !
 	REAL*8 B_PLANCK
@@ -457,7 +457,7 @@
 	END DO
 !
 	JNU=JNU_STORE
-	K_ON_J=KNU_STORE/JNU_STORE
+	FEDD=KNU_STORE/JNU_STORE
 	HN_DEF_ON_NODES=.TRUE.
 	HNU_AT_OB=Hnu_store(1);  NNU_AT_OB=Nnu_store(1)
 	HNU_AT_IB=Hnu_store(ND); NNU_AT_IB=Nnu_store(ND)

@@ -525,21 +525,27 @@
 	END IF
 !
 	OPEN(UNIT=LU,FILE='SN_GREY_CHK',STATUS='UNKNOWN', POSITION='APPEND')
-	WRITE(LU,'(A,13X,A,11X,A,9X,A,10(A))')'    I','R','V','CHI','        V/cR',
+	WRITE(LU,'(A,13X,A,11X,A,9X,A,13(A))')'    I','R','V','CHI','  CHI_PLANCK','        V/cR',
 	1           '   RSQE(rad)','        RSQW','      RSQJ  ','RSQ(W+E)/CHI','   RSQJ(old)',
-	1           '        RSQH','   RSQH(old)','           T','      T(old)'
+	1           '        RSQH','   RSQH(old)',
+	1           '        TMOD','        T(B)',
+	1           '           T','      T(old)'
 	T1=1.0D-04*(3.14159265D0/5.67D-05)**0.25
 	DO I=1,ND
 	  T2=R(I)-1.0D-05*DELTA_TIME_SECS*VEL(I)
 	  T2=RSQ_J_OLDt(I)/T2/T2
-	  WRITE(LU,'(I5,ES14.5,12ES12.4)')I,R(I),VEL(I),CHI(I),BETA(I)/R(I),
+	  T3=T1*( RJ(I)+(E_RAD_DECAY(I)-WORK(I))/MAX(0.1D0*CHI(I),CHI_PLANCK(I)) )**0.25
+	  WRITE(LU,'(I5,ES14.5,15ES12.4)')I,R(I),VEL(I),CHI(I),CHI_PLANCK(I),BETA(I)/R(I),
 	1       R(I)*R(I)*E_RAD_DECAY(I),R(I)*R(I)*WORK(I),R(I)*R(I)*RJ(I),
 	1       R(I)*R(I)*(WORK(I)+E_RAD_DECAY(I))/CHI(I),RSQ_J_OLDt(I),
-	1       RSQ_HFLUX(I),RSQ_H_OLDt(I),T1*(RJ(I)**0.25),T1*(T2 **0.25) 
+	1       RSQ_HFLUX(I),RSQ_H_OLDt(I),
+	1       POPS(NT,I),T3,T1*(RJ(I)**0.25),T1*(T2 **0.25) 
 	END DO
-	WRITE(LU,'(A,13X,A,11X,A,9X,A,10(A))')'    I','R','V','CHI','        V/cR',
+	WRITE(LU,'(A,13X,A,11X,A,9X,A,13(A))')'    I','R','V','CHI','  CHI_PLANCK','        V/cR',
 	1           '   RSQE(rad)','        RSQW','      RSQJ  ','RSQ(W+E)/CHI','   RSQJ(old)',
-	1           '        RSQH','   RSQH(old)','           T','      T(old)'
+	1           '        RSQH','   RSQH(old)',
+	1           '        TMOD','        T(B)',
+	1           '           T','      T(old)'
 !
         IF(DIFF_APPROX)THEN
 	  T1=1.0D0+RECIP_CDELTAT/CHI(ND)

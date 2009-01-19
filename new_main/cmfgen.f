@@ -12,6 +12,8 @@
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
+! Altered: 19-Jan-2008: SL_OPTION installed. Allows number of SL's to be
+!                         automatically changed.
 ! Altered: 20-Mar-2005: FLUX_MEAN & ROSS_MEAN now zeroed. These vectors now
 !                         used in CMFGEN_SUB.
 ! Altered: 03-Mar-2000: Variable type ATM installed to simplify handling
@@ -36,7 +38,7 @@
 	INTEGER NION
 	INTEGER DIAG_INDX
 !
-	CHARACTEr*20 TEMP_KEY
+	CHARACTER*20 TEMP_KEY
 !
 	REAL*8 T1		!Temporary variable
 	INTEGER I,J,IOS,NT
@@ -263,6 +265,9 @@
 	1        'Maximum # of frequencies that can be treated')
 	CALL RD_STORE_INT(NLF,'NLF',L_TRUE,
 	1        'Number of frequencies per Doppler profile in CMF mode (21)')
+	SL_OPTION=' '; I=20
+	CALL RD_STORE_NCHAR(SL_OPTION,'SL_OPT',I,L_FALSE,
+	1        'Option to automatically fudge number of SLs in all species')
 !
 ! We now get the number of atomic levels. Old MODEL_SPEC files, with NSF in the
 ! keyword can be read. ISF take's precident over NSF, and there is no check that 
@@ -285,6 +290,8 @@
 	      NV=NS
 	    END IF
 	    IF(NS .NE. 0)THEN
+	      TEMP_KEY=TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(J))//'_F_TO_S'
+	      CALL FDG_F_TO_S_NS(NF,NS,NV,SL_OPTION,LU_IN,TEMP_KEY)
 	      ID=ID+1
 	      ION_ID(ID)=TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(J))
 	      ATM(ID)%XzV_PRES=.TRUE.

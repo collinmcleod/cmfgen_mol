@@ -50,6 +50,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(extend3opac.o)\
       $(LIB)(extend_opac.o)\
       $(LIB)(extend_vtsigma.o)\
+      $(LIB)(fdg_f_to_s_ns_v1.o)\
       $(LIB)(fg_comp.o)\
       $(LIB)(fg_j_cmf_v7.o)\
       $(LIB)(fg_j_cmf_v9.o)\
@@ -147,6 +148,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(quad_x_gen_v4.o)\
       $(LIB)(quad_x_lit_v3.o)\
       $(LIB)(rd_f_to_s_ids.o)\
+      $(LIB)(rd_f_to_s_ids_v2.o)\
       $(LIB)(rd_free_val.o)\
       $(LIB)(rd_log.o)\
       $(LIB)(rdgendie_v3.o)\

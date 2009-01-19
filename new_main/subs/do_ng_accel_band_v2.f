@@ -20,6 +20,8 @@
 	1             NT,ND,NG_BAND,NG_DONE,MAXDEC,MAXINC,LUSCR,LUER)
 	IMPLICIT NONE
 !
+! Altered 15-Jan-2009 : Minor bug fixed.
+!                       Populations were reset to IREC-3 iteration if NG acceleration failed.
 ! Altered 02-May-2004 : Changed to handle new SCRTEMP file format.
 !                       Allows for models in which R, V, and SIGMA are also output to
 !                          SCRTEMP on every iteration.
@@ -75,6 +77,8 @@
 	1                    WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
 	IF(NEWMOD)THEN
 	  WRITE(LUER,*)'Unable to read last iteration in scratch file in DO_NG_BAND_ACCEL_V2'
+	  WRITE(LUER,*)'Unrecoverable error (1) as these should have been written recently'
+	  STOP
 	  NG_DONE=.FALSE.
 	  RETURN
 	END IF
@@ -84,9 +88,14 @@
 	BIG_POPS(NT+3,:)=SIGMA(:)+1.0D0
 !
 ! Read in the last 4 estimates of the poplations, as output to SCRTEMP.
+! We read in the data backwards so that POPS, R, V and SIGMA contain
+! the current iteration values on the last read.
+!
+! If the read fails, we try to recover the current POPS, R, V and SIGMA.
+! We should not get a failure here.
 !
 	NEWMOD=.FALSE.
-	DO I=1,4
+	DO I=4,1,-1
 	  J=IREC-(I-1)*IT_STEP
 	  CALL SCR_READ_V2(R,V,SIGMA,POPS,J,NITSF,RITE_N_TIMES,LST_NG,
 	1                WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
@@ -96,16 +105,27 @@
 	  RDPOPS(NT+3,:,I)=SIGMA(:)+1.0D0
 	  IF(NEWMOD)THEN
 	    WRITE(LUER,*)'Unable to read scratch file in DO_NG_BAND_ACCEL_V2'
-	    NG_DONE=.FALSE.
+	    WRITE(LUER,*)'Trying to read IREC ',J
+	    CALL SCR_READ_V2(R,V,SIGMA,POPS,IREC,NITSF,RITE_N_TIMES,LST_NG,
+	1                WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
+	    IF(NEWMOD)THEN
+	      WRITE(LUER,*)'Error is not recoverable'
+	      STOP
+	    END IF
+            NG_DONE=.FALSE.
 	    RETURN
 	  END IF
 	END DO
 !
 ! Now perform the NG acceleration. The accelerated estimates for the populations
-! are returned in POPS.
+! are returned in BIG_POPS.
 !
 	NT_MOD=NT+3
 	CALL NG_MIT_BAND_OPT_V1(BIG_POPS,RDPOPS,ND,NT_MOD,NG_BAND,NG_DONE,MAXDEC,MAXINC,LUER)
+!
+! We don't set R(1), R(ND) etc, so as to make sure these remain identical
+! to the initial values., These should not change, even if we are changing the
+! R grid.
 !
 	IF(NG_DONE)THEN
 	  ROLD(1:ND)=R(1:ND)

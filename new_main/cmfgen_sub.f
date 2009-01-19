@@ -38,6 +38,7 @@
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
+! Altered 19-Jan-2009 : SL otion inserted; rd_f_to_s_ids_v2.f now used.
 ! Altered 16-Feb-2006 : Changed and modified over 2 month period. Section solving for
 !                         populations and performing NG acceleration etc removed to
 !                         subroutine (SOLVE_FOR_POPS). Routines added to allow time 
@@ -658,9 +659,9 @@
 	1                 'SET_ZERO',T2,GF_LEV_CUT,MIN_NUM_TRANS,
 	1                 LUIN,LUSCR,TMP_STRING)
 	      TMP_STRING=TRIM(ION_ID(ID))//'_F_TO_S'
-	      CALL RD_F_TO_S_IDS( ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
-	1           ATM(ID)%XzVLEVNAME_F, ATM(ID)%NXzV_F, ATM(ID)%NXzV,
-	1           LUIN,TMP_STRING)
+	      CALL RD_F_TO_S_IDS_V2( ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
+	1           ATM(ID)%XzVLEVNAME_F, ATM(ID)%NXzV_F, ATM(ID)%NXzV, ATM(ID)%NXzV_IV,
+	1           LUIN,TMP_STRING,SL_OPTION)
 	      CALL RDPHOT_GEN_V2( ATM(ID)%EDGEXzV_F, ATM(ID)%XzVLEVNAME_F,
 	1           ATM(ID)%GIONXzV_F,AT_NO(SPECIES_LNK(ID)),
 	1           ATM(ID)%ZXzV, ATM(ID)%NXzV_F,
@@ -700,6 +701,7 @@
 	  WRITE(LUER,*)'Error opening MODEL in CMFGEN, IOS=',IOS
 	  STOP
 	END IF
+	WRITE(6,*)'Opened MODEL'
 !
 ! Output description of model. This is done after the reading of most data
 ! since some of the model information is read in.

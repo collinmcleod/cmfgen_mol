@@ -33,6 +33,8 @@
 	USE LINE_MOD
 	IMPLICIT NONE
 !
+! Altered 15-Jan-2009 : Changed REGRID_T_ED to V2
+!                          'R' option in with non 'GRID' option no longer effects T & ED.
 ! Created 17-Dec-2004
 ! Altered 06-Jun-2005 : Call to SUP_TO FULL inserted to get better consistency.
 !                          Only done when GRID=.FALSE.
@@ -186,7 +188,7 @@
 ! Set T and ED
 !
 	    IF(SN_T_OPTION .EQ. 'USE_T_IN')THEN
-	      CALL REGRID_T_ED(R,ED,T,POP_ATOM,ND,'T_IN')
+	      CALL REGRID_T_ED_V2(R,ED,T,POP_ATOM,VOL_EXP_FAC,ND,'T_IN')
 	    ELSE IF(SN_T_OPTION .EQ. 'USE_HYDRO') THEN
 !
 ! For this options, we need to do nothing as T and ED were set by SET_ABUND_CLUMP.
@@ -258,11 +260,14 @@
 	      END IF
 	    END DO
 	  ELSE IF(DC_INTERP_METHOD .EQ. 'R')THEN
+!
+! We use TA for ED and TB for T since ED and T have already been set.
+!
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
 	        ISPEC=SPECIES_LNK(ID)
-	        CALL REGRIDWSC_V3( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,
+	        CALL REGRIDWSC_V3( ATM(ID)%XzV_F,R,TA,TB, ATM(ID)%DXzV_F,
 	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
 	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,TMP_STRING)
 	      END IF
@@ -561,7 +566,7 @@
 	      ELSE
 	        T1=1.0D0-EXP(-TA(I)/GREY_PAR)
 	      END IF
-	      IF(T1 .LT. 0.1*GREY_PAR)T1=0.0
+	      IF(TA(I) .LT. 0.1*GREY_PAR)T1=0.0     !Changed T1 to TA(I) [14-Jan-2009]
 	      T3=ABS( T1*(TGREY(I)-T(I)) )
 	      T(I)=T1*TGREY(I)+(1.0-T1)*T_SAVE(I)
 	      T(I)=MAX(T(I),T_MIN)
@@ -576,6 +581,9 @@
 !
 ! GAM_SPECIES is used as a storage location for the population of the
 ! highest ionization stage. Must be done in forward direction.
+!
+! NB: After calling PAR_FUN_V2, ATM(ID)%XzV_F will contain DCs -
+!       NOT populatons.
 !
 	    DO ID=1,NUM_IONS
 	      J=ID-1			!1 is added in PAR_FUN_V2

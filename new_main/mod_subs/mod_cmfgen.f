@@ -6,6 +6,7 @@
 !
 	MODULE MOD_CMFGEN
 !
+! Altered 19-Jan-2009 : SL_OPTION inserted
 ! Altered 06-Aug-2008 : PLANCK_MEAN inserted.
 ! Altered 31-Jan-2002 : FIXEDT etc inserted.
 !                            
@@ -200,7 +201,8 @@
 !
 	LOGICAL, ALLOCATABLE :: IMP_VAR(:)
 !
-	CHARACTER*7, PARAMETER :: NAME_CONVENTION='K_FOR_I'
+	CHARACTER(LEN=7), PARAMETER :: NAME_CONVENTION='K_FOR_I'
+	CHARACTER(LEN=20) SL_OPTION
 !
 ! For unknown reasons, the DEC OSF alpha compiler requires this declaration
 ! to be at the end of the data module in order not to get alignment problems.

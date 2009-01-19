@@ -1338,14 +1338,6 @@
 	    IF(UC(N_TYPE(1:1)) .EQ. 'N')N_TYPE='N_ON_J'
 	    IF(UC(N_TYPE(1:1)) .EQ. 'G')N_TYPE='G_ONLY'
 !
-!	    CALL USR_OPTION(FLAG,'FDG_CHI','F','Fudge CHI')
-!	    IF(FLAG)THEN
-!	      DO I=1,ND
-!	         CHI(I)=MAX(CHI(I),CHI(30))
-!	         ESEC(I)=MAX(ESEC(I),ESEC(30))
-!	      END DO
-!	    END IF
-!
 	    CALL USR_OPTION(LEV,10,1,'DEPTHS','0','Depths to be plotted ')
 	    CALL USR_OPTION(RED_EXT,'RED_EXT','14.0D0','Redward extension in Doppler widths' )
 	    CALL USR_OPTION(VDOP_FG_FRAC,'FG_FRAC','0','Doppler fraction for FG[V10] ')
@@ -1353,10 +1345,17 @@
 	    CALL USR_HIDDEN(ELEC,'THK','T','Thick outer boundary in continuum & line')
 	    CALL USR_OPTION(FG_SOL_OPT,'SOL_METH','INT/INS','FG solution method: INT/INS or DIFF/INS')
 !
-	    CALL USR_OPTION(PLT_J,'PLT_J','F','Plot J')
-	    CALL USR_OPTION(PLT_H,'PLT_H','F','Plot H')
-	    CALL USR_OPTION(PLT_LF,'PLT_LF','F','Plot chi(L).H')
-	    CALL USR_OPTION(PLT_FM,'PLT_FM','T','Plot force multiplier')
+	    PLT_J=.FALSE.; PLT_H=.FALSE.; PLT_LF=.FALSE.; PLT_LF=.FALSE.; PLT_FM=.FALSE.
+	    IF(LEV(1) .EQ. 0)THEN
+	    ELSE
+	      CALL USR_OPTION(PLT_J,'PLT_J','F','Plot J')
+	      CALL USR_OPTION(PLT_H,'PLT_H','F','Plot H')
+	      CALL USR_OPTION(PLT_LF,'PLT_LF','F','Plot chi(L).H')
+	      IF(PLT_J .OR. PLT_H .OR. PLT_FM)THEN
+	      ELSE
+	        CALL USR_OPTION(PLT_FM,'PLT_FM','T','Plot force multiplier')
+	      END IF
+	    END IF
 !
 ! Note that CLUMP_FAC has already been included in ETA, CHI, ESEC, ETAL, and CHIL.
 !
@@ -1372,15 +1371,19 @@
 	        DO I=1,ND
 	          ZNET(I)=1.0D0-JBAR(I)*CHIL(I)/ETAL(I)
 	        END DO
+	      YAXIS=' '
+	      IF(PLT_J)YAXIS='R\u2\dJ'
+	      IF(PLT_H .AND. YAXIS .NE. ' ')YAXIS=TRIM(YAXIS)//'; R\u2\ddH'
+	      IF(PLT_H .AND. YAXIS .EQ. ' ')YAXIS='R\u2\dH'
+	      IF(PLT_LF .AND. YAXIS .NE. ' ')YAXIS=TRIM(YAXIS)//'; R\u2\dLF'
+	      IF(PLT_LF .AND. YAXIS .EQ. ' ')YAXIS='R\u2\d^LF'
+	      IF(PLT_LF .AND. YAXIS .EQ. ' ')YAXIS='MT'
 	   ELSE
 	    LEV(1)=0
 	    CALL USR_OPTION(FULL_ES,'ALLES','T',
 	1        'Include line photons scatterd in resonace zone ?')
-	    CALL USR_HIDDEN(SKIPEW,'SKIPEW','F',
-	1        'Skip accurate EW computation ?')
-!
-	    CALL USR_HIDDEN(EWACC,'EWACC','0.05',
-	1         'required % accuracy in EW')
+	    CALL USR_HIDDEN(SKIPEW,'SKIPEW','F','Skip accurate EW computation ?')
+	    CALL USR_HIDDEN(EWACC,'EWACC','0.05','required % accuracy in EW')
 !
 	    INACCURATE=.TRUE.
 	    CNT=0
@@ -1437,8 +1440,10 @@
 	  DO I=1,ND
 	    YV(I)=LOG10(JBAR(I))
 	  END DO
-	  IF(LEV(1) .EQ. 0)CALL DP_CURVE(ND,XV,YV)
-	  YAXIS='Log(Jbar)'
+	  IF(LEV(1) .EQ. 0)THEN
+	    CALL DP_CURVE(ND,XV,YV)
+	    YAXIS='Log(Jbar)'
+	  END IF
 !
 	  WRITE(LU_NET,40001)'FORMSOL Transfer Solution'
 	  WRITE(LU_NET,40002)LEV(1),LEV(2)
@@ -4279,13 +4284,37 @@ c
 	  XAXIS='\gl(\V)'
 	  YAXIS='\gs/gs_dT\u'
 !
-!
 	ELSE IF(XOPT .EQ. 'ETA')THEN
 	  DO I=1,ND
 	    YV(I)=DLOG10(ETA(I)+1.0D-250)-10.0D0
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log(\ge(ergs/cm\u3\d/s/Hz)'
+!
+	ELSE IF(XOPT .EQ. 'DIFFT')THEN
+	  ELEC=.FALSE.
+	  CALL USR_OPTION(ELEC,'DB','T','Diffusion time to outer boundary?')
+	  DO I=1,ND
+	    CHIROSS(I)=CLUMP_FAC(I)*ROSS_MEAN(I)
+	  END DO
+	  CALL TORSCL(TAUROSS,CHIROSS,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  WRITE(T_OUT,*)'Rossland optical depth is : ',TAUROSS(ND)
+	  DO I=1,ND-1
+	    YV(I)=(1.0D0+TAUROSS(I+1)-TAUROSS(I))*(R(I)-R(I+1))*1.0D+05/C_KMS/24.0D0/3600.0D0
+	  END DO
+	  J=ND-1
+	  IF(ELEC)THEN
+	    ZV(1)=0.0D0
+	    DO I=2,ND
+	      ZV(I)=ZV(I-1)+YV(I-1) 
+	    END DO
+	    CALL DP_CURVE(J,XV,ZV)
+	    YAXIS='Diffusion time to outer boundary (days)'
+	  ELSE
+	    WRITE(6,*)'Computed diffusion time between grid points'
+	    CALL DP_CURVE(J,XV,YV)
+	    YAXIS='Diffusion time (days)'
+	  END IF
 !
 	ELSE IF(XOPT .EQ.'OP' .OR.
 	1       XOPT .EQ. 'KAPPA' .OR.
