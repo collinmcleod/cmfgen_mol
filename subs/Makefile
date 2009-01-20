@@ -159,6 +159,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(regrid_dchi.o)\
       $(LIB)(regrid_h.o)\
       $(LIB)(regrid_t_ed.o)\
+      $(LIB)(regrid_t_ed_v2.o)\
       $(LIB)(regridwsc.o)\
       $(LIB)(regridwsc_v2.o)\
       $(LIB)(regridwsc_v3.o)\

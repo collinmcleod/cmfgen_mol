@@ -1,8 +1,7 @@
 !
 ! Program reads in population estimates from a normal DC file,
 ! and uses linear interpolation in the log plane to deduce T and ED.
-! If R(model) > R(model), T  and Gamma (Ne/POPATOM) are held fixed.
-!
+! If R(model) > R(model), R is scaled to match.
 !
 	SUBROUTINE REGRID_T_ED_V2(R,ED,T,POPATOM,VOL_EXP_FAC,ND,FILNAME)
 	IMPLICIT NONE
