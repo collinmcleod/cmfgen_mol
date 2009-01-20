@@ -10,6 +10,7 @@
 !
 	SUBROUTINE CMF_FLUX_SUB_V5(ND,NC,NP,NDMAX,NPMAX,NT,NLINE_MAX)
 	USE MOD_CMF_OBS
+	USE CMF_FLUX_CNTRL_VAR_MOD
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
@@ -67,22 +68,6 @@ C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 C
-	INTEGER, PARAMETER :: IZERO=0
-	INTEGER, PARAMETER :: IONE=1
-	INTEGER, PARAMETER :: ITWO=2
-	INTEGER, PARAMETER :: ITHREE=3
-	INTEGER, PARAMETER :: IFOUR=4
-	INTEGER, PARAMETER :: IFIVE=5
-	INTEGER, PARAMETER :: ISIX=6
-	INTEGER, PARAMETER :: ITEN=10
-C
-	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
-	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
-C
-	REAL*8, PARAMETER :: RZERO=0.0
-	REAL*8, PARAMETER :: RONE=1.0
-	REAL*8, PARAMETER :: RTWO=2.0
-C
 C Internally used variables
 C
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
@@ -132,10 +117,9 @@ C
 	INTEGER NL,NUP
 	INTEGER MNL,MNUP
 	INTEGER MNL_F,MNUP_F
-	INTEGER I,J,K,L,ML,LS,IOS,LINE_INDX
+	INTEGER I,J,K,L,ML,LS,LINE_INDX
 	INTEGER ID,ID_SAV,ISPEC
 	INTEGER ES_COUNTER
-	INTEGER NUM_ES_ITERATIONS
 C
 C Functions called
 C
@@ -149,11 +133,7 @@ C
 	EXTERNAL LAMVACAIR,ATOMIC_MASS_UNIT
 C
 C 
-	CHARACTER FG_SOL_OPTIONS*10
-	CHARACTER CMF_FORM_OPTIONS*10
-	CHARACTER NEG_OPAC_OPTION*10
-	CHARACTER METHOD*6
-	CHARACTER FMT*120,N_TYPE*6
+	CHARACTER FMT*120
 	CHARACTER SECTION*20
 	CHARACTER TMP_KEY*20
 	CHARACTER STRING*132
@@ -188,11 +168,6 @@ C
 	CHARACTER*80, ALLOCATABLE :: VEC_TRANS_NAME(:)
 	INTEGER N_LINE_FREQ
 !
-	CHARACTER*10 GLOBAL_LINE_PROF
-	REAL*8 DOP_PROF_LIMIT
-	REAL*8 VOIGT_PROF_LIMIT
-	LOGICAL SET_PROF_LIMS_BY_OPACITY
-	LOGICAL RD_STARK_FILE
 C
 C Arrays and variables for treating lines simultaneously.
 C
@@ -213,7 +188,6 @@ C
 	INTEGER TMP_MAX_SIM
 	REAL*8 OVER_FREQ_DIF
 	REAL*8 EW
-	REAL*8 EW_CUT_OFF
 	REAL*8 CONT_INT
 	LOGICAL OVERLAP
 	LOGICAL SOBOLEV
@@ -223,61 +197,13 @@ C
 	REAL*8 L_STAR_RATIO(ND,MAX_SIM)
 	REAL*8 U_STAR_RATIO(ND,MAX_SIM)
 C
-C GLOBAL_LINE_SWITCH provides an option to handle all LINE by the same method.
-C The local species setting only takes precedence when it is set to NONE.
-C
-	CHARACTER*10 GLOBAL_LINE_SWITCH
-	REAL*8 FLUX_CAL_LAM_BEG
-	REAL*8 FLUX_CAL_LAM_END
-	LOGICAL SET_TRANS_TYPE_BY_LAM
-	LOGICAL DO_SOBOLEV_LINES
-C
-C FLUX_CAL_ONLY provides a method for computing the continuous spectrum
-C only (i.e. no linearization or population corrections):
-C    To get a BLANKETED spectrum FLUX_CAL_ONLY should be set to
-C       TRUE and GLOBAL_LINE_SWITCH to BLANK
-C    To get a pure UNBLANKETED spectrum FLUX_CAL_ONLY should be set to
-C       TRUE and GLOBAL_LINE_SWITCH to SOB
-C
-	LOGICAL FLUX_CAL_ONLY
-	LOGICAL USE_FIXED_J
-C
-C Indicates whether lines treated in SOB and CMF mode are allowed for when
-C constructing the observers frame grid.
-C
-	LOGICAL SOB_FREQ_IN_OBS
-	LOGICAL WRITE_ETA_AND_CHI
-	LOGICAL WRITE_IP
-	LOGICAL WRITE_FLUX
-	LOGICAL WRITE_CMF_FORCE
-	LOGICAL WRITE_SOB_FORCE
-	LOGICAL DO_REL_IN_OBSFRAME
-	LOGICAL DO_CMF_REL_OBS 
-	LOGICAL INCL_INCID_RAD
-	LOGICAL PLANE_PARALLEL_NO_V
-	LOGICAL PLANE_PARALLEL
-	LOGICAL USE_J_REL
-	LOGICAL USE_FORMAL_REL
-	LOGICAL INCL_REL_TERMS
-	LOGICAL INCL_ADVEC_TERMS_IN_TRANS_EQ
-	LOGICAL WR_ION_LINE_FORCE
-C
 	REAL*8, ALLOCATABLE :: ETA_CMF_ST(:,:)
 	REAL*8, ALLOCATABLE :: CHI_CMF_ST(:,:)
 	REAL*8, ALLOCATABLE :: RJ_CMF_ST(:,:)
 	REAL*8, ALLOCATABLE :: ION_LINE_FORCE(:,:)
 C
+C Vectors for treating lines simultaneously with the continuum.
 C
-C Variables, vectors and rrays for treating lines simultaneously with the
-C continuum.
-C
-	REAL*8 V_DOP 
-	REAL*8 MAX_DOP
-	REAL*8 FRAC_DOP
-	REAL*8 dV_CMF_PROF
-	REAL*8 dV_CMF_WING
-	REAL*8 ES_WING_EXT
-	REAL*8 R_CMF_WING_EXT
 	INTEGER LINES_THIS_FREQ(NCF_MAX)
 	INTEGER LINE_ST_INDX_IN_NU(NLINE_MAX)
 	INTEGER LINE_END_INDX_IN_NU(NLINE_MAX)
@@ -285,19 +211,8 @@ C
 C
 	REAL*8 NU_MAX_OBS
 	REAL*8 NU_MIN_OBS
-	REAL*8 OBS_PRO_EXT_RAT
-	REAL*8 FRAC_DOP_OBS
-	REAL*8 dV_OBS_PROF
-	REAL*8 dV_OBS_WING
-	REAL*8 dV_OBS_BIG
 C
 	REAL*8 CONT_FREQ
-	REAL*8 DELV_CONT
-	LOGICAL COMPUTE_ALL_CROSS
-	LOGICAL COMPUTE_NEW_CROSS
-C
-	LOGICAL EXTEND_FRM_SOL
-	LOGICAL INSERT_FREQ_FRM_SOL
 C
 	CHARACTER*50 TRANS_NAME_SIM(MAX_SIM)
 C
@@ -335,7 +250,6 @@ C
 C
 C These parameters are used when computing J and the variation of J.
 C
-	LOGICAL DO_CLUMP_MODEL
 	REAL*8 CHI_SCAT_CLUMP(ND)
 	REAL*8 CHI_RAY_CLUMP(ND)
 	REAL*8 CHI_CLUMP(ND)		!==CHI(I)*CLUMP_FAC(I)
@@ -351,16 +265,11 @@ C
 C
 C 
 C
-	LOGICAL DO_LEV_DISSOLUTION
 	REAL*8 Z_POP(NT)		!Ionic charge for each species
 C
 C Variables etc for computation of continuum in comoving frame.
 C
-	LOGICAL CONT_VEL
 	LOGICAL FIRST_FREQ
-	LOGICAL COHERENT_ES
-	LOGICAL RD_COHERENT_ES
-	LOGICAL USE_OLDJ_FOR_ES
 	LOGICAL NEW_FREQ
 	REAL*8 dLOG_NU			!Step in frequency in Log plane
 	REAL*8 FEDD_PREV(NDMAX)
@@ -409,23 +318,11 @@ C Arrays and variables for computation of the continuum intensity
 C using Eddington factors. This is separate to the "inclusion of
 C additional points".
 C
-	LOGICAL EDDINGTON
-	LOGICAL EDD_CONT
-	LOGICAL EDD_LINECONT
 	REAL*8 FEDD(NDMAX)
 	REAL*8 QEDD(NDMAX)
 C
-	LOGICAL AT_LEAST_ONE_NEG_OPAC
-	LOGICAL DIF
 	LOGICAL MID
-	LOGICAL INCL_TWO_PHOT
-	LOGICAL INCL_RAY_SCAT
-	LOGICAL CHECK_LINE_OPAC
 	LOGICAL FIRST
-	LOGICAL THK_CONT
-	LOGICAL THK_LINE
-	LOGICAL TRAPFORJ
-	LOGICAL RDTHK_CONT
 	LOGICAL NEG_OPACITY(ND)
 	LOGICAL FIRST_NEG
 	LOGICAL LAMBDA_ITERATION
@@ -436,8 +333,6 @@ C
 C
 C X-ray variables.
 C
-	LOGICAL XRAYS
-	REAL*8 FILL_FAC_XRAYS,T_SHOCK,V_SHOCK
 	REAL*8 FILL_VEC_SQ(ND)
 	REAL*8 XRAY_LUM(ND)
 	REAL*8 GFF,XCROSS_V2
@@ -451,40 +346,12 @@ C record containing the continuum values.
 C
 	INTEGER ACCESS_F
 	INTEGER, PARAMETER :: EDD_CONT_REC=3
-	LOGICAL COMPUTE_EDDFAC
 	CHARACTER(LEN=20) DA_FILE_DATE
 C
-C Arrays and variables required for  additional points into
-C the depth grid. Allows an increase in program accuracy to overcome
-C rapid ionization changes. The vectors are used throughout,
-C and hence should not be equivalenced or put into scratch.
-C
-	LOGICAL ACCURATE,INACCURATE
-	LOGICAL THIS_FREQ_EXT  		!Frequency specific.
-	LOGICAL ALL_FREQ
-        REAL*8 ACC_FREQ_END
-	INTEGER NPINS			!Points inserted for error calc (CMF).
-	INTEGER N_INS_OBS		!Points inserted for error calc (Observers Frame).
-	INTEGER ST_INTERP_INDX	!Interp from ST_INT.. to END_INTERP..
-	INTEGER END_INTERP_INDX
-	CHARACTER*10 INTERP_TYPE
-!
-! Minimum velocity step size (Doppler widths) for FG_J_CMF and MOM_J_CMF.
-! These are used to insert extra points alonga  ray, and provide additional
-! freedom to using the ACCURATE option.
-!
-	REAL*8 DELV_FRAC_FG
-	REAL*8 DELV_FRAC_MOM
-C
-C ND-DEEP to DEEP we use a quadratic interpolation scheme so as to try
-C and preserve "FLUX" in the diffusion approximation.
-C
-	INTEGER DEEP
 	INTEGER NDEXT,NCEXT,NPEXT
 	INTEGER INDX(NDMAX),POS_IN_NEW_GRID(ND)
 	REAL*8 COEF(0:3,NDMAX)
 	REAL*8 INBC,HBC_J,HBC_S			!Bound. Cond. for JFEAU
-	REAL*8 ACC_EDD_FAC
 C
 	REAL*8 REXT(NDMAX),PEXT(NPMAX),VEXT(NDMAX)
 	REAL*8 TEXT(NDMAX),SIGMAEXT(NDMAX)
@@ -537,31 +404,15 @@ C
 	REAL*8 VAL_DO_NG
 	REAL*8 RP
 	REAL*8 VINF
-	REAL*8 VTURB_FIX
-	REAL*8 VTURB_MIN
-	REAL*8 VTURB_MAX
 	REAL*8 VTURB_VEC(ND)
 	REAL*8 VDOP_VEC(ND)
 	REAL*8 MAX_DEL_V_RES_ZONE(ND)
-	CHARACTER(LEN=10) TURB_LAW
-!
-	REAL*8 OBS_TAU_MAX
-	REAL*8 OBS_ES_DTAU
-	CHARACTER*10 OBS_INT_METHOD
 C
 C Continuum frequency variables and arrays.
 C
 	REAL*8 NU(NCF_MAX)		!Continuum and line frequencies
 	REAL*8 NU_EVAL_CONT(NCF_MAX)	!Frequencies to evaluate continuum
 	REAL*8 OBS(NCF_MAX)		!Observers spectrum
-	REAL*8 MIN_CONT_FREQ 		!Minimum continuum frequency.
-	REAL*8 MAX_CONT_FREQ    	!Maximum continuum frequency.
-	REAL*8 SMALL_FREQ_RAT 		!Fractional spacing for small frequencies'
-	REAL*8 dFREQ_bf_MAX		!Maximum spacing close to bf edge.
-	REAL*8 BIG_FREQ_AMP		!Amplification factor
-	REAL*8 dV_LEV_DIS		!dV on low side of bound-free edge.
-	REAL*8 AMP_DIS			!Amplification factor
-	REAL*8 MIN_FREQ_LEV_DIS		!Minimum frequency for lev dissolution.
 C
 C Parameters, vectors, and arrays for computing the observed flux.
 C
@@ -680,310 +531,10 @@ C
 	END DO
 !
 !
-! All options are now read into store in CMF_FLUX, as some options are needed in that
-! routine.
+! Read in all options controlling the spectrum computation.
+! As subroutine exits, it also cleans and releases the STORE.
 !
-	  CALL RD_STORE_DBLE(MIN_CONT_FREQ,'MIN_CF',L_TRUE,
-	1            'Minimum continuum frequency if calculating NU')
-	  CALL RD_STORE_DBLE(MAX_CONT_FREQ,'MAX_CF',L_TRUE,
-	1            'Maximum continuum frequency if calculating NU')
-	  CALL RD_STORE_DBLE(SMALL_FREQ_RAT,'FRAC_SP',L_TRUE,
-	1            'Fractional spacing for small frequencies')
-	  CALL RD_STORE_DBLE(BIG_FREQ_AMP,'AMP_FAC',L_TRUE,
-	1            'Amplification factor for large frequency ranges')
-	  CALL RD_STORE_DBLE(dFREQ_bf_MAX,'MAX_BF',L_TRUE,
-	1            'Maximum frequency spacing close to bf edge')
-C
-	  CALL RD_STORE_LOG(DO_LEV_DISSOLUTION,'DO_DIS',L_TRUE,
-	1            'Allow for level dissolution of upper levels?')
-	  CALL RD_STORE_DBLE(dV_LEV_DIS,'dV_LEV',L_TRUE,
-	1             'Spacing (in km/s) on low side of bf edge for'//
-	1             ' level dissolution')
-	  CALL RD_STORE_DBLE(AMP_DIS,'AMP_DIS',L_TRUE,
-	1            'Amplification factor on low side bf edge')
-	  CALL RD_STORE_DBLE(MIN_FREQ_LEV_DIS,'MIN_DIS',L_TRUE,
-	1            'Minimum frequency for level dissolution')
-C
-	  CALL RD_STORE_LOG(COMPUTE_ALL_CROSS,'CROSS',L_TRUE,
-	1            'Compute all photoionization cross-sections?')
-	  CALL RD_STORE_DBLE(DELV_CONT,'V_CROSS',L_TRUE,
-	1            'Max. vel. sep. (km/s) between evaluations of all'//
-	1            '  phot. cross-sections?')
-C
-	  CALL RD_STORE_LOG(DIF,'DIF',L_TRUE,
-	1            'Use Diffusion approximation at inner boundary ?')
-	  CALL RD_STORE_INT(NUM_ES_ITERATIONS,'NUM_ES',L_TRUE,
-	1            'Number of electron scattering iterations?')
-	  CALL RD_STORE_LOG(RD_COHERENT_ES,'COH_ES',L_TRUE,
-	1            'Assume coherent electron scattering? ')
-	  CALL RD_STORE_LOG(USE_OLDJ_FOR_ES,'OLD_J',L_TRUE,
-	1            'Use old file to provide initial estimate of J_ES?')
-	  COHERENT_ES=RD_COHERENT_ES
-C
-	  CALL RD_STORE_NCHAR(METHOD,'METHOD',ISIX,L_TRUE,
-	1           'Which method for continuum tau'//
-	1          ' loglog, loglin, linear or zero ?')
-	  CALL RD_STORE_NCHAR(N_TYPE,'N_TYPE',ISIX,L_TRUE,
-	1           'Method for to handle N for MOM_J_CMF -- '//
-	1           'N_ON_J, MIXED, or G_ONLY')
-	  CALL RD_STORE_NCHAR(FG_SOL_OPTIONS,'FG_OPT',ITEN,L_TRUE,
-	1           'Solution options for FG_J_CMF: DIFF/INS and INT/INS')
-	  CALL RD_STORE_LOG(RDTHK_CONT,'THK_CONT',L_TRUE,
-	1           'Use thick boundary condition for continuum ? ')
-	  CALL RD_STORE_LOG(TRAPFORJ,'TRAP_J',L_TRUE,
-	1           'Use trapazoidal weights to compute J? ')
-C
-	  WRITE(LUMOD,'()')
-	  TURB_LAW='LAW_V1'
-	  CALL RD_STORE_NCHAR(TURB_LAW,'TURB_LAW',ITEN,L_FALSE,
-	1      'Turbulent velocity law: LAW_V1, LAW_TAU1')
-	  CALL RD_STORE_DBLE(VTURB_FIX,'VTURB_FIX',L_TRUE,
-	1      'Doppler velocity for DOP_FIX Doppler profiles (km/s)')
-	  CALL RD_STORE_DBLE(VTURB_MIN,'VTURB_MIN',L_TRUE,
-	1      'Minimum turbulent velocity for Doppler profile (km/s)')
-	  CALL RD_STORE_DBLE(VTURB_MAX,'VTURB_MAX',L_TRUE,
-	1      'Maximum turbulent velocity for Doppler profile (km/s)')
-C
-	  WRITE(LUMOD,'()')
-	  CALL RD_STORE_DBLE(MAX_DOP,'MAX_DOP',L_TRUE,
-	1      'Maximum half-width of resonance zone (in Doppler widths)')
-	  CALL RD_STORE_DBLE(FRAC_DOP,'FRAC_DOP',L_TRUE,
-	1      'Spacing in resonance zone (in Doppler widths)')
-	  CALL RD_STORE_DBLE(dV_CMF_PROF,'dV_CMF_PROF',L_TRUE,
-	1      'Spacing across cmf profile (in km/s)')
-	  CALL RD_STORE_DBLE(dV_CMF_WING,'dV_CMF_WING',L_TRUE,
-	1      'Spacing across e.s. wings of cmf profile(in km/s)')
-	  CALL RD_STORE_DBLE(ES_WING_EXT,'ES_WING_EXT',L_TRUE,
-	1      'Extent of BLUE e.s. wings from resonance core (in km/s)')
-	  CALL RD_STORE_DBLE(R_CMF_WING_EXT,'R_CMF_WING_EXT',L_TRUE,
-	1      'Extent of RED e.s. wings from RESONANCE core (in Vinf)')
-C
-	  WRITE(LUMOD,'()')
-	  CALL RD_STORE_DBLE(OBS_PRO_EXT_RAT,'OBS_EXT_RAT',L_TRUE,
-	1      'Half width of profile in Vinf.')
-	  CALL RD_STORE_DBLE(FRAC_DOP_OBS,'FRAC_DOP_OBS',L_TRUE,
-	1      'Spacing across intrinsic profile zone (in Doppler widths)')
-	  CALL RD_STORE_DBLE(dV_OBS_PROF,'dV_OBS_PROF',L_TRUE,
-	1      'Spacing across observed profile (in km/s)')
-	  CALL RD_STORE_DBLE(dV_OBS_WING,'dV_OBS_WING',L_TRUE,
-	1      'Spacing across e.s. wings of observed profile(in km/s)')
-	  CALL RD_STORE_DBLE(dV_OBS_BIG,'dV_OBS_BIG',L_TRUE,
-	1      'Frequency spacing between lines (in km/s)')
-C
-	  CALL RD_STORE_DBLE(OBS_TAU_MAX,'TAU_MAX',L_TRUE,
-	1    'Optical depth at which observers frame integration is terminated')
-	  CALL RD_STORE_DBLE(OBS_ES_DTAU,'ES_DTAU',L_TRUE,
-	1      'Maximum increments in e.s. optical depth scale')
-	  CALL RD_STORE_NCHAR(OBS_INT_METHOD,'INT_METH',ITEN,L_TRUE,
-	1            'Integration method for computing I along ray')
-	  CALL RD_STORE_INT(N_INS_OBS,'N_INS_OBS',L_TRUE,
-	1          'Mininum number of points to be inserted in '//
-	1          ' observers frame grid (>= 0)')
-	  CALL RD_STORE_LOG(DO_REL_IN_OBSFRAME,'DO_RELO',L_FALSE,
-	1        'Use all relativistic terms in Observer''s frame calculation.')
-	  CALL RD_STORE_LOG(DO_CMF_REL_OBS,'DO_CMF_RELO',L_FALSE,
-	1        'Use all relativistic terms in CMF Observer''s frame calculation.')
-C
-	  WRITE(LUMOD,'()')
-	  USE_FIXED_J=.FALSE.
-	  CALL RD_STORE_LOG(USE_FIXED_J,'USE_FIXED_J',L_FALSE,
-	1           'Use previously computed J to evaluate ALL rates?')
-	  CALL RD_STORE_LOG(FLUX_CAL_ONLY,'FLUX_CAL_ONLY',L_TRUE,
-	1           'Compute the observers frame flux only ?')
-	  CALL RD_STORE_LOG(EXTEND_FRM_SOL,'EXT_FRM_SOL',L_TRUE,
-	1           'Extrapolate the formal solution to larger radii?')
-	  CALL RD_STORE_LOG(INSERT_FREQ_FRM_SOL,'INS_F_FRM_SOL',L_TRUE,
-	1           'Extrapolate the formal solution to larger radii?')
-	  CALL RD_STORE_NCHAR(CMF_FORM_OPTIONS,'FRM_OPT',ITEN,L_TRUE,
-	1           'Solution options for CMF_FORM_SOL')
-	  CALL RD_STORE_LOG(DO_SOBOLEV_LINES,'DO_SOB_LINES',L_TRUE,
-	1        'Compute Sobolev EWs?')
-	  CALL RD_STORE_DBLE(EW_CUT_OFF,'EW_CUT',L_TRUE,
-	1        'Output EW info only if ABS(EW) > EW_CUT')
-	  CALL RD_STORE_LOG(SOB_FREQ_IN_OBS,'SOB_FREQ_IN_OBS',L_TRUE,
-	1        ' Allow for SOB & CMF lines in defining observers'//
-	1        ' frequencies?')
-	  CALL RD_STORE_LOG(WRITE_ETA_AND_CHI,'WR_ETA',L_TRUE,
-	1        'Output ETA and CHI? ')
-	  CALL RD_STORE_LOG(WRITE_FLUX,'WR_FLUX',L_TRUE,
-	1        'Output Flux as a function of depth? ')
-	  CALL RD_STORE_LOG(WRITE_CMF_FORCE,'WR_CMF_FORCE',L_TRUE,
-	1        'Output CMF line-force multiplier as a function of depth? ')
-	  CALL RD_STORE_LOG(WRITE_SOB_FORCE,'WR_SOB_FORCE',L_TRUE,
-	1        'Output SOBOLEV line-force multiplier as a function of depth? ')
-	  WR_ION_LINE_FORCE=.FALSE.
-	  CALL RD_STORE_LOG(WR_ION_LINE_FORCE,'WR_ION_FORCE',L_FALSE,
-	1        'Output line-force multiplier as a function of ion & depth? ')
-	  CALL RD_STORE_LOG(WRITE_IP,'WR_IP',L_TRUE,
-	1        'Output I as a functio of p and frequency?')
-C
-	  WRITE(LUMOD,'()')
-	  CALL RD_STORE_NCHAR(GLOBAL_LINE_SWITCH,'GLOBAL_LINE',ISIX,L_TRUE,
-	1            'Global switch to indicate handeling of line')
-	  CALL SET_CASE_UP(GLOBAL_LINE_SWITCH,IZERO,IZERO)
-	  IF( GLOBAL_LINE_SWITCH(1:3) .NE. 'SOB' .AND.
-	1       GLOBAL_LINE_SWITCH(1:3) .NE. 'CMF' .AND.
-	1       GLOBAL_LINE_SWITCH(1:4) .NE. 'NONE' .AND.
-	1       GLOBAL_LINE_SWITCH(1:5) .NE. 'BLANK')THEN
-	    WRITE(LUER,*)'Invalid GLOBAL_LINE SWITCH parameter'
-	    STOP
-	  END IF
-	  CALL RD_STORE_LOG(SET_TRANS_TYPE_BY_LAM,'LAM_SET',L_TRUE,
-	1         'Set long wavelengths to SOBOLEV approximation')
-	  CALL RD_STORE_DBLE(FLUX_CAL_LAM_BEG,'F_LAM_BEG',L_TRUE,
-	1         'Inital wavelength (A) for blanketed flux calculation')
-	  CALL RD_STORE_DBLE(FLUX_CAL_LAM_END,'F_LAM_END',L_TRUE,
-	1         'Final wavelength (A) for blanketed flux calculation')
-C
-	  CALL RD_STORE_LOG(THK_LINE,'THK_LINE',L_TRUE,
-	1           'Use thick boundary condition for lines?')
-	  CALL RD_STORE_LOG(CHECK_LINE_OPAC,'CHK_L_POS',L_TRUE,
-	1      'Ensure Line opacity is positive ?')
-	  CALL RD_STORE_NCHAR(NEG_OPAC_OPTION,'NEG_OPAC_OPT',ITEN,L_TRUE,
-	1            'Method for negative opacities in BLANKETING mode')
-	  CALL SET_CASE_UP(NEG_OPAC_OPTION,IZERO,IZERO)
-	  IF(NEG_OPAC_OPTION .NE. 'SRCE_CHK' .AND.
-	1                           NEG_OPAC_OPTION .NE. 'ESEC_CHK')THEN
-	    WRITE(LUER,*)'Error in CMF_FLUX_SUB'
-	    WRITE(LUER,*)'Invalid NEG_OPAC_OPTION'
-	    WRITE(LUER,*)'Valid options are SRCE_CHK and ESEC_CHK'
-	    STOP
-	  END IF
-C
-	  CALL RD_STORE_LOG(INCL_TWO_PHOT,'INC_TWO',L_TRUE,
-	1           'Include two photon transitions?')
-	  CALL RD_STORE_LOG(INCL_RAY_SCAT,'INC_RAY',L_TRUE,
-	1           'Include Rayeligh scattering?')
-	  CALL RD_STORE_LOG(XRAYS,'INC_XRAYS',L_TRUE,
-	1           'Include X-ray emission')
-	  CALL RD_STORE_DBLE(FILL_FAC_XRAYS,'FIL_FAC',L_TRUE,
-	1           'Filling factor for X-ray emission')
-	  CALL RD_STORE_DBLE(T_SHOCK,'T_SHOCK',L_TRUE,
-	1           'Shock T for X-ray emission')
-	  CALL RD_STORE_DBLE(V_SHOCK,'V_SHOCK',L_TRUE,
-	1           'Cut off velocity for X-ray emission')
-C
-	  IF(GLOBAL_LINE_SWITCH .EQ. 'NONE')THEN
-	    WRITE(LUMOD,'()')
-	    DO ID=1,NUM_IONS
-	      IF(ATM(ID)%XzV_PRES)THEN
-	        TEMP_CHAR='TRANS_'//ION_ID(ID)
-	        STRING='Method for treating '//TRIM(ION_ID(ID))//' lines?'
-	        CALL RD_STORE_NCHAR( ATM(ID)%XzV_TRANS_TYPE,TEMP_CHAR,
-	1                          ITEN,L_TRUE,STRING)
-	      END IF
-	    END DO
-	  END IF
-C
-	  WRITE(LUMOD,'()')
-	  CALL RD_STORE_NCHAR(GLOBAL_LINE_PROF,'GLOBAL_PROF',ITEN,L_TRUE,
-	1        'Global switch for intrinsic line absorption profile')
-	  CALL SET_CASE_UP(GLOBAL_LINE_PROF,IZERO,IZERO)
-	  IF( GLOBAL_LINE_PROF .NE. 'NONE' .AND.
-	1       GLOBAL_LINE_PROF .NE. 'DOP_FIX' .AND.
-	1       GLOBAL_LINE_PROF .NE. 'DOPPLER' .AND.
-	1       GLOBAL_LINE_PROF .NE. 'LIST' .AND.
-	1       GLOBAL_LINE_PROF .NE. 'LIST_VGT' .AND.
-	1       GLOBAL_LINE_PROF .NE. 'VOIGT' .AND.
-	1       GLOBAL_LINE_PROF .NE. 'HZ_STARK')THEN
-	    WRITE(LUER,*)'Invalid GLOBAL_LINE_PROF parameter'
-	    STOP
-	  END IF
-	  CALL RD_STORE_LOG(SET_PROF_LIMS_BY_OPACITY,'OPAC_LIMS',L_TRUE,
-	1           'Set prof limits by line to cont. ratio?')
-	  CALL RD_STORE_DBLE(DOP_PROF_LIMIT,'DOP_LIM',L_TRUE,
-	1           'Edge limits for Doppler line profile')
-	  CALL RD_STORE_DBLE(VOIGT_PROF_LIMIT,'VOIGT_LIM',L_TRUE,
-	1           'Edge limits for Voigt line profile')
-!
-! Verify validity of profile option. We also check whether we need to leed
-! in the file which links certain types of profiles to individual lines.
-!
-	  IF(GLOBAL_LINE_PROF .EQ. 'NONE')THEN
-	    WRITE(LUMOD,'()')
-	    DO ID=1,NUM_IONS
-	      IF(ATM(ID)%XzV_PRES)THEN
-	        TEMP_CHAR='PROF_'//ION_ID(ID)
-	        STRING='Intrinsic profile for treating '//TRIM(ION_ID(ID))//' lines?'
-	        CALL RD_STORE_NCHAR(ATM(ID)%XzV_PROF_TYPE,TEMP_CHAR,ITEN,
-	1               L_TRUE,STRING)
-	        IF( ATM(ID)%XzV_PROF_TYPE .NE. 'DOPPLER' .AND.
-	1           ATM(ID)%XzV_PROF_TYPE .NE. 'VOIGT' .AND.
-	1           ATM(ID)%XzV_PROF_TYPE .NE. 'LIST' .AND.
-	1           ATM(ID)%XzV_PROF_TYPE .NE. 'LIST_VGT' .AND.
-	1           ATM(ID)%XzV_PROF_TYPE .NE. 'HZ_STARK')THEN
-	          WRITE(LUER,*)'Invalid ATM(ID)%XzV_PROF_TYPE SWITCH parameter'
-	          STOP
-	        END IF
-	        IF(ATM(ID)%XzV_PROF_TYPE(1:4) .EQ. 'LIST')RD_STARK_FILE=.TRUE.
-	      END IF
-	    END DO
-	  END IF
-!
-	  WRITE(LUMOD,'()')
-	  WRITE(LUMOD,'()')
-	  CALL RD_STORE_LOG(EDD_CONT,'JC_W_EDD',L_TRUE,
-	1        'Compute continuum intensity using Eddington factors')
-	  CALL RD_STORE_LOG(EDD_LINECONT,'JBAR_W_EDD',L_TRUE,
-	1    'Compute line continuum intensity using Eddington factors')
-	  INCL_INCID_RAD=.FALSE.
-	  PLANE_PARALLEL_NO_V=.FALSE.
-	  CALL RD_STORE_LOG(PLANE_PARALLEL_NO_V,'PP_NOV',L_FALSE,
-	1    'Plane-paralle geometry WITHOUT velocity field?')
-	  PLANE_PARALLEL=.FALSE.
-	  CALL RD_STORE_LOG(PLANE_PARALLEL,'PP_MOD',L_FALSE,
-	1    'Plane-paralle geometry with velocity field?')
-	  USE_J_REL=.FALSE.
-	  USE_FORMAL_REL=.FALSE.
-	  INCL_REL_TERMS=.FALSE.
-	  INCL_ADVEC_TERMS_IN_TRANS_EQ=.FALSE.
-	  CALL RD_STORE_LOG(USE_J_REL,'USE_J_REL',L_FALSE,'Use relativistic moment solver?')
-	  CALL RD_STORE_LOG(INCL_REL_TERMS,'INCL_REL',L_FALSE,'Include relativistic terms?')
-	  CALL RD_STORE_LOG(INCL_ADVEC_TERMS_IN_TRANS_EQ,'INCL_ADV_TRANS',L_FALSE,
-	1    'Include advection terms in transfer equation?')
-	  CALL RD_STORE_LOG(USE_FORMAL_REL,'USE_FRM_REL',L_FALSE,'Use CMF_FORMAL_REL to compute F etc?')
-!
-	  WRITE(LUMOD,'()')
-	  CALL RD_STORE_LOG(ACCURATE,'INC_GRID',L_TRUE,
-	1          'Increase grid size to improve accuracy? ')
-	  CALL RD_STORE_LOG(ALL_FREQ,'ALL_FREQ',L_TRUE,
-	1          'Increase accuracy for all frequencies?')
-	  CALL RD_STORE_DBLE(ACC_FREQ_END,'ACC_END',L_TRUE,
-	1          'Increase accuracy for all frequencies > ACC_END?')
-	  CALL RD_STORE_INT(NPINS,'N_INS',L_TRUE,
-	1          'Number of points to be inserted in higher'//
-	1          ' accuracy grid (1, 2 or 3) ')
-	  CALL RD_STORE_INT(ST_INTERP_INDX,'ST_INT',L_TRUE,
-	1          'Interpolate from ? ')
-	  CALL RD_STORE_INT(END_INTERP_INDX,'END_INT',L_TRUE,
-	1          'Interpolate to ? ')
-	  CALL RD_STORE_INT(DEEP,'ND_QUAD',L_TRUE,
-	1         'Quadratic interpolation from ND-? to ND')
-	  CALL RD_STORE_NCHAR(INTERP_TYPE,'INTERP_TYPE',10,L_TRUE,
-	1         'Perform interpolations in LOG or LIN plane')
-	  CALL RD_STORE_DBLE(DELV_FRAC_FG,'DELV_FG',L_TRUE,
-	1         'Maximum velocity separation (Doppler widths) for FG_J_CMF')
-	  CALL RD_STORE_DBLE(DELV_FRAC_MOM,'DELV_MOM',L_TRUE,
-	1         'Maximum velocity separation (Doppler widths) for MOM_J_CMF')
-C
-C Next two variables apply for both ACCURATE and EDDINGTON.
-C
-	  WRITE(LUMOD,'()')
-	  CALL RD_STORE_LOG(COMPUTE_EDDFAC,'COMP_F',L_TRUE,
-	1      'Compute new Eddington factors (f)')
-	  CALL RD_STORE_DBLE(ACC_EDD_FAC,'ACC_F',L_TRUE,
-	1      'Accuracy with which to compute the eddington factor f')
-!
-	  DO ISPEC=1,NUM_SPECIES
-	    TMP_KEY='SCL_'//TRIM(SPECIES(ISPEC))//'_ABUND'
-	    CALL RD_STORE_DBLE(ABUND_SCALE_FAC(ISPEC),TMP_KEY,L_FALSE,
-	1      'Factor to scale abundance by')
-	  END DO
-!
-! Memory and options in STORE are no longer required.
-!
-	  CLOSE(UNIT=LUMOD)
-	  CALL CLEAN_RD_STORE
+	  CALL RD_CMF_FLUX_CONTROLS(ND,LUMOD,LUER)
 !
 C 
 !

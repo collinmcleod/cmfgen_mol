@@ -147,6 +147,7 @@
 	LOGICAL INSERT
 	LOGICAL FIRST_TIME
 	LOGICAL NEW_R_GRID
+	LOGICAL WRITE_IP
 !
 	DATA VDOP_FRAC_SAV/-1001.0D0/ 	!Absurd value.
 	DATA FIRST_TIME/.TRUE./
@@ -202,6 +203,9 @@
 	USE PP_FORM_CMF_MOD_V2
 	IMPLICIT NONE
 !
+!
+! Altered 19-Jan-2009: Changed IP_DATA to IP_PP_DATA which must exist for I(p)
+!                        to be output.
 ! Altered 08-Feb-2008 : Bug fix: NI_SMALL not set, and is no longer required as all rays have
 !                                    same number of points.
 ! Altered 17-Feb-2007 : Bug fix. NI was not in module block.
@@ -258,9 +262,9 @@
 	PARAMETER (ND_ADD_MAX=24)
 !
 	INTEGER, SAVE :: FREQ_CNT
+	INTEGER LU_IP
 	INTEGER ACCESS_F
         INTEGER IOS,REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC
-	LOGICAL WRITE_IP
 !
 ! The following arrays do not need to be stored, and hence can be created 
 ! each time.
@@ -1567,25 +1571,26 @@ C
 !
 	WRITE_IP=.TRUE.
         ACCESS_F=5
-	J=56
-	INQUIRE(FILE='IP_DATA',EXIST=WRITE_IP)
-        IF(WRITE_IP .AND. INIT)THEN
-          CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
-          I=WORD_SIZE*(NP+1)/UNIT_SIZE; J=56
-          CALL WRITE_DIRECT_INFO_V3(NP,I,'20-Aug-2000','IP_DATA',J)
-          OPEN(UNIT=56,FILE='IP_DATA',FORM='UNFORMATTED',
+	LU_IP=56
+	IF(INIT)THEN
+	  INQUIRE(FILE='IP_PP_DATA',EXIST=WRITE_IP)
+          IF(WRITE_IP)THEN
+            CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
+            I=WORD_SIZE*(NP+1)/UNIT_SIZE
+            CALL WRITE_DIRECT_INFO_V3(NP,I,'20-Aug-2000','IP_PP_DATA',LU_IP)
+            OPEN(UNIT=LU_IP,FILE='IP_PP_DATA',FORM='UNFORMATTED',
 	1       ACCESS='DIRECT',STATUS='UNKNOWN',RECL=I,IOSTAT=IOS)
-	  FREQ_CNT=0
-          WRITE(56,REC=3)ACCESS_F,FREQ_CNT,NP
-          WRITE(56,REC=ACCESS_F)(MU(I),I=1,NP)
-	  WRITE_IP=.TRUE.
+	    FREQ_CNT=0
+            WRITE(LU_IP,REC=3)ACCESS_F,FREQ_CNT,NP
+            WRITE(LU_IP,REC=ACCESS_F)(MU(I),I=1,NP)
+	  END IF
 	END IF
         IF(WRITE_IP)THEN
 	  T1=0.0D0
-          IF(FREQ_CNT .NE. 0)READ(56,REC=ACCESS_F+FREQ_CNT)(IBOUND(LS),LS=1,NP),T1
+          IF(FREQ_CNT .NE. 0)READ(LU_IP,REC=ACCESS_F+FREQ_CNT)(IBOUND(LS),LS=1,NP),T1
 	  IF(T1 .NE. FREQ)FREQ_CNT=FREQ_CNT+1
-          WRITE(56,REC=3)ACCESS_F,FREQ_CNT,NP
-          WRITE(56,REC=ACCESS_F+FREQ_CNT)(CV_BOUND(LS),LS=1,NP),FREQ
+          WRITE(LU_IP,REC=3)ACCESS_F,FREQ_CNT,NP
+          WRITE(LU_IP,REC=ACCESS_F+FREQ_CNT)(CV_BOUND(LS),LS=1,NP),FREQ
         END IF
 	CALL TUNE(2,'FG_BIG_SEC')
 !

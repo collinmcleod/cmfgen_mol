@@ -28,6 +28,7 @@ FN7=$(LIB_DIR)lib$(LN7).a
 #
  
 OBJ1  =  cmf_flux_v5.o cmf_flux_sub_v5.o mod_cmf_obs.o\
+        cmf_flux_cntrl_var_mod.o rd_cmf_flux_controls.o check_cmf_flux_param_consis.o \
         rd_model_file.o  ins_line_v5.o obs_frame_sub_v6.o\
         mon_interp_fast.o ins_line_obs_v4.o rd_cont_j_obs.o 
  
@@ -59,10 +60,13 @@ $(EXE_DIR)obs_frame.exe :  $(OBJ2) $(FN1) $(FN2) $(FN3) $(FN4)
 USR = ../lib/libtools.a(usr_option.o)
 GEN = ../lib/libmod.a(mod_lev_dis_blk.o)
 
-cmf_flux_v5.o     : cmf_flux_v5.f      mod_cmf_obs.o   $(USR)
-cmf_flux_sub_v5.o : cmf_flux_sub_v5.f  mod_cmf_obs.o   $(GEN) \
+cmf_flux_v5.o     : cmf_flux_v5.f      mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(USR)
+cmf_flux_sub_v5.o : cmf_flux_sub_v5.f  mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(GEN) \
    COMP_JCONT_V4.INC  EVAL_LTE_INC_V4.INC\
    OPACITIES_V4.INC   XOPAC_V4.INC
+
+rd_cmf_flux_controls.o : cmf_flux_cntrl_var_mod.o
+check_cmf_flux_param_consis.o : cmf_flux_cntrl_var_mod.o
 
 $(GEN):
 	(cd ../subs; make )
