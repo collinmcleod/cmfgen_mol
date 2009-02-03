@@ -5,7 +5,7 @@ include ../Makefile_definitions
 LIB=$(LIB_DIR)libsubs.a
 LIB_MOD=$(LIB_DIR)libmod.a
 
-OPTION=$(FG)
+OPTION=$(FD)
 
 #
 # Entries for library
@@ -139,6 +139,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(omega_gen_v2.o)\
       $(LIB)(open_dir_acc_v1.o)\
       $(LIB)(par_fun_v2.o)\
+      $(LIB)(par_fun_v3.o)\
       $(LIB)(pertjfeau_ibc.o)\
       $(LIB)(phys_con.o)\
       $(LIB)(poptoion.o)\
@@ -158,6 +159,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(regrid_b_on_sph_tau.o)\
       $(LIB)(regrid_dchi.o)\
       $(LIB)(regrid_h.o)\
+      $(LIB)(regrid_tx_r.o)\
       $(LIB)(regrid_t_ed.o)\
       $(LIB)(regrid_t_ed_v2.o)\
       $(LIB)(regridwsc.o)\

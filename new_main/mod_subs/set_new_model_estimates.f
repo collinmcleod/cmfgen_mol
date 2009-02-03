@@ -176,7 +176,6 @@
 ! 
 	ELSE
 	  WRITE(LUER,*)'Using NON-GRID option for new model.'
-	  WRITE(LUER,*)'Departure coefficients assumed to be function of Ne.'
 	  IF(.NOT. DO_POP_SCALE)THEN
 	     DO_POP_SCALE=.TRUE.
 	     WRITE(LUER,*)'Warning - setting DO_POP_SCALE=.TRUE. in SET_NEW_MODEL_ESTIMATES'
@@ -233,6 +232,7 @@
 ! It may be better to regrid on the actual electron densities.
 !
 	  IF(DC_INTERP_METHOD .EQ. 'LTE')THEN
+	    WRITE(LUER,*)'LTE assume for departure coefficients.'
 	    T1=0.2D0
 	    CALL DET_LTE_ED(T1,ND,DO_LEV_DISSOLUTION)
 	    DO ID=1,NUM_IONS-1
@@ -242,6 +242,7 @@
 	      END IF
 	    END DO
 	  ELSE IF(DC_INTERP_METHOD .EQ. 'SPH_TAU')THEN
+	    WRITE(LUER,*)'Departure coefficients assumed to be function of Tau(spherical).'
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
@@ -250,6 +251,7 @@
 	      END IF
 	    END DO
 	  ELSE IF(DC_INTERP_METHOD .EQ. 'ED')THEN
+	    WRITE(LUER,*)'Departure coefficients assumed to be function of Ne.'
 	    TC(1:ND)=ED(1:ND)*CLUMP_FAC(1:ND)
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
@@ -263,6 +265,7 @@
 !
 ! We use TA for ED and TB for T since ED and T have already been set.
 !
+	    WRITE(LUER,*)'Departure coefficients assumed to be function of R.'
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
@@ -270,6 +273,20 @@
 	        CALL REGRIDWSC_V3( ATM(ID)%XzV_F,R,TA,TB, ATM(ID)%DXzV_F,
 	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
 	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,TMP_STRING)
+	      END IF
+	    END DO
+	  ELSE IF(DC_INTERP_METHOD .EQ. 'RTX')THEN
+!
+! NB: T must have been previoulsy computed.
+!
+	    WRITE(LUER,*)'Excitation temperatures assumed to be function of R.'
+	    DO ID=1,NUM_IONS-1
+	      IF(ATM(ID)%XzV_PRES)THEN
+	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
+	        ISPEC=SPECIES_LNK(ID)
+	        CALL REGRID_TX_R( ATM(ID)%XzV_F,ATM(ID)%DXzV_F,
+	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
+	1             POP_SPECIES(1,ISPEC),T,R,ATM(ID)%NXzV_F,ND,TMP_STRING)
 	      END IF
 	    END DO
 	  END IF
@@ -554,6 +571,7 @@
 !
 ! T3 and T2 are used to determine the current largest correction.
 !
+	    TC(1:ND)=T(1:ND)
 	    IF( MAIN_COUNTER .EQ. 1)THEN
 	      DO I=1,ND
 	        T_SAVE(I)=T(I)		!Save original T for use when
@@ -585,15 +603,21 @@
 ! NB: After calling PAR_FUN_V2, ATM(ID)%XzV_F will contain DCs -
 !       NOT populatons.
 !
+! TMP_STRING is used to indicate whether we interpolate in depature
+! coefficients (DC) or excitation temperatures (TX).
+!
+	    TMP_STRING='DC'
+	    IF(DC_INTERP_METHOD .EQ. 'RTX')TMP_STRING='TX'
 	    DO ID=1,NUM_IONS
 	      J=ID-1			!1 is added in PAR_FUN_V2
 	      ISPEC=SPECIES_LNK(ID)
-	      CALL PAR_FUN_V2(U_PAR_FN, PHI_PAR_FN, Z_PAR_FN,
+	      CALL PAR_FUN_V3(U_PAR_FN, PHI_PAR_FN, Z_PAR_FN,
 	1          GAM_SPECIES(1,ISPEC),
 	1          ATM(ID)%XzV_F,     ATM(ID)%XzVLTE_F,  ATM(ID)%W_XzV_F,
 	1          ATM(ID)%DXzV_F,    ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,
-	1          ATM(ID)%GIONXzV_F, ATM(ID)%ZXzV,T,    ATM(ID)%NXzV_F,
-	1          ND,J,NUM_IONS, ATM(ID)%XzV_PRES)
+	1          ATM(ID)%GIONXzV_F, ATM(ID)%ZXzV,T, TC, ED,
+	1          ATM(ID)%NXzV_F, ND,J,NUM_IONS, 
+	1          ATM(ID)%XzV_PRES,ION_ID(ID),TMP_STRING)
 	   END DO
 !
 ! The non-LTE partition functions are density independent, provided

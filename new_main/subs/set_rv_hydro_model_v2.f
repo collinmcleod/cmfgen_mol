@@ -6,6 +6,7 @@
 	1              RMAX_ON_RCORE,SN_AGE_DAYS,N_IB_INS,N_OB_INS,RDINR,ND,LU)
 	IMPLICIT NONE
 !
+! Altered 31-Jan-2008 : Minor bug fix.
 ! Altered 29-Dec-2008 : Based on SET_RV_HYDRO_MODEL_V2
 !                       Written to allow smaller outer radius.
 !                       Code now assumes R=Ro+V(r).t
@@ -65,6 +66,7 @@
 	INTEGER IOS
 	INTEGER NOLD,NDOLD
 	INTEGER I,J,J_SAV,L
+	INTEGER N_INS_TOT
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
 	INTEGER, PARAMETER :: IONE=1
@@ -310,11 +312,14 @@
 ! Define the new radius grid. The step size in R corresponds to the smaller of
 ! dLOGR and dLOG_TAU.
 !
+! N_INS_TOTS is a little larger than necessary.
+!
 	  J=1; I=1
 	  LOG_R(1)=LOG_OLD_R(1)
+	  N_INS_TOT=MAX(MIN(4,N_OB_INS),1)+MAX(MIN(3,N_IB_INS),1)+4
 	  DO WHILE(1 .EQ. 1)
 	    I=I+1
-	    IF(I .GT. 2*ND-4)THEN
+	    IF(I .GT. 2*ND-N_INS_TOT)THEN
 	      WRITE(LUER,*)'Error in SET_RV_HYDRO_MODEL_V2 --- LOG_R and TAU vectors too small'
 	      WRITE(LUER,*)'I=',I,'J=',J
 	      WRITE(LUER,*)'Log R(I)=',LOG_R(I)
@@ -432,7 +437,7 @@
 	IF(MAXVAL(ABS(SIGMA)) .LT. 1.0D-04)SIGMA(1:ND)=0.0D0
 !
 	LOG_R(1:ND)=LOG(R(1:ND))
-	LOG_R_HYDRO(1:ND)=LOG(R_HYDRO(1:ND))
+	LOG_R_HYDRO(1:NX)=LOG(R_HYDRO(1:NX))
 	CALL MON_INTERP(KAPPA,ND,IONE,LOG_R,ND,KAPPA_HYDRO,NX,LOG_R_HYDRO,NX)
 	TAU(1)=KAPPA(1)*R(1)
 	T1=LOG(KAPPA(2)/KAPPA(1))/LOG(R(1)/R(2))
@@ -452,7 +457,7 @@
 	  WRITE(LU,'(I5,ES16.8,3ES12.4)')ND,R(ND),V(ND),SIGMA(ND),TAU(ND)
 	CLOSE(LU)
 !
-	DEALLOCATE (R_HYDRO, V_HYDRO, SIGMA_HYDRO)
+	DEALLOCATE (R_HYDRO, LOG_R_HYDRO, V_HYDRO, SIGMA_HYDRO)
 	DEALLOCATE (DENSITY_HYDRO, KAPPA_HYDRO, TAU_HYDRO)
 	DEALLOCATE (OLD_R, LOG_OLD_R, OLD_TAU, COEF)
 !

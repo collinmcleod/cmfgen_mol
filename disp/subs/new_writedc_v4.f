@@ -34,7 +34,7 @@ C
 	CHARACTER*90 FMT
 !
 	REAL*8 RCORE
-	REAL*8 T1,T2,DELTA_T
+	REAL*8 T1,T2,T3,CONST,DELTA_T
 	REAL*8 TEXCITE(NHYD)
 	INTEGER I,J,COUNT,ND_CNT
 !
@@ -105,20 +105,28 @@ C
 	          T1=T1/T2
 	          WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I),I
 	          DO J=1,NHYD
-	            T1=LOG( HYD(J,I)*GION/GHYD(J)/WHYD(J,I)/
-	1                             2.07D-22/ED(I)/DHYD(1,I) )
 	            T2=HDKT*EDGEHYD(J)
-	            DELTA_T=10.0D0
+	            CONST=HYD(J,I)*(T2**1.5)*GION/GHYD(J)/WHYD(J,I)/2.07078D-22/ED(I)/DHYD(1,I)
+	            IF(CONST .LT. 2.8)THEN
+	               TEXCITE(J)=CONST**(0.67)
+	            ELSE
+	               TEXCITE(J)=LOG(CONST)
+	            END IF
 	            COUNT=0
-	            TEXCITE(J)=T(I)
-	            DO WHILE( ABS(DELTA_T) .GT. 1.0E-06 .AND. COUNT .LT. 100 )
+	            DELTA_T=1.0D+10
+	            DO WHILE( ABS(DELTA_T/TEXCITE(J)) .GT. 1.0E-08 .AND. COUNT .LT. 100 )
 	              COUNT=COUNT+1
-	              DELTA_T=( T1- T2/TEXCITE(J) + 1.5D0*LOG(TEXCITE(J)) )*
-	1                     TEXCITE(J)/(T2/TEXCITE(J)+1.5D0)
+	              T1=SQRT(TEXCITE(J))
+	              T3=EXP(TEXCITE(J))
+	              DELTA_T=(T1*TEXCITE(J)*T3 - CONST)/T3/T1/(1.5D0+TEXCITE(J))
 	              IF(DELTA_T .GT. 0.8*TEXCITE(J))DELTA_T=0.8*TEXCITE(J)
 	              IF(DELTA_T .LT. -0.8*TEXCITE(J))DELTA_T=-0.8*TEXCITE(J)
 	              TEXCITE(J)=TEXCITE(J)-DELTA_T
+	              IF(I .EQ. ND .AND. J .EQ. 1)THEN
+	                 WRITE(101,'(6ES14.4)')T2,CONST,TEXCITE(J),T1,T2,DELTA_T
+	              END IF
 	            END DO
+	            TEXCITE(J)=T2/TEXCITE(J)
 	            IF(COUNT .EQ. 100)THEN
 	              WRITE(6,*)'Error - TEXC didnt converge in 100 iterations'
 	              WRITE(6,*)'I,J=',I,J

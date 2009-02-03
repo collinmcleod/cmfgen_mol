@@ -79,11 +79,11 @@ C
 	      Y_LAB='M(t)'
 	      IF(LOG_Y)Y_LAB='Log M(t)'
 	    ELSE IF(DATA_TYPE .EQ. 'ETA')THEN
-	      Y_LAB='/ge(ergs\d \ucm\u-3 \ds\u-1 \dHz\u-1\d \gO\u-1\d)'
-	      IF(LOG_Y)Y_LAB='Log /ge(ergs\d \ucm\u-3 \ds\u-1 \dHz\u-1\d \gO\u-1\d)'
+	      Y_LAB='10\u10\d./ge(ergs\d \ucm\u-3 \ds\u-1 \dHz\u-1\d \gO\u-1\d)'
+	      IF(LOG_Y)Y_LAB='10 + Log /ge(ergs\d \ucm\u-3 \ds\u-1 \dHz\u-1\d \gO\u-1\d)'
 	    ELSE IF(DATA_TYPE .EQ. 'CHI')THEN
-	      Y_LAB='\gx(cm\u-1\d)'
-	      IF(LOG_Y)Y_LAB='Log \gx(cm\u-1\d)'
+	      Y_LAB='10\u10\d.\gx(cm\u-1\d)'
+	      IF(LOG_Y)Y_LAB='10 + Log \gx(cm\u-1\d)'
 	    ELSE 
 	      WRITE(6,*)'Unrecognized DATA_TYPE for FNU & NAT'
 	    END IF

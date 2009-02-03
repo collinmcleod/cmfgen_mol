@@ -2126,26 +2126,40 @@
 	  CALL USR_HIDDEN(ELEC,'FRAC','F','Fractional abundance')
 	  IF(ELEC)THEN
 	    DO ISPEC=1,NSPEC
-	      IF(XSPEC .EQ. SPECIES(ISPEC))THEN
+	      IF(XSPEC .EQ. SPECIES(ISPEC) .OR. (XSPEC .EQ. 'ALL' .AND.
+	1              POPDUM(ND,ISPEC) .GT. 0.0D0))THEN
 	        YV(1:ND)=LOG10(POPDUM(1:ND,ISPEC)/POP_ATOM(1:ND)+1.0D-100)
+	        CALL DP_CURVE(ND,XV,YV)
 	        FOUND=.TRUE.
-	        EXIT
+	        IF(XSPEC .NE. 'ALL')EXIT
 	      END IF
 	    END DO
+	    YAXIS='Fractional abundance (N\dX\u/N\dA/u)'
 	  ELSE
 	    DO ISPEC=1,NSPEC
-	      IF(XSPEC .EQ. SPECIES(ISPEC))THEN
+	      IF(XSPEC .EQ. SPECIES(ISPEC) .OR. (XSPEC .EQ. 'ALL' .AND.
+	1              POPDUM(ND,ISPEC) .GT. 0.0D0))THEN
 	        YV(1:ND)=LOG10(POPDUM(1:ND,ISPEC)+1.0D-100)
+	        CALL DP_CURVE(ND,XV,YV)
 	        FOUND=.TRUE.
-	        EXIT
+	        IF(XSPEC .NE. 'ALL')EXIT
 	      END IF
 	    END DO
+	    YAXIS='Species density (cm\u-3\d)'
 	  END IF
-	  IF(.NOT. FOUND)THEN
+	  IF(XSPEC .EQ. 'ALL')THEN
+	    J=0
+	    DO ISPEC=1,NSPEC
+	      IF(POPDUM(ND,ISPEC) .GT. 0.0D0)THEN
+	        J=J+1
+	        WRITE(6,'(A6,3X)',ADVANCE='NO')TRIM(SPECIES(ISPEC))
+	        IF(MOD(J,5) .EQ. 0)WRITE(6,'(A)')' '
+	        IF(MOD(J,5) .EQ. 0)J=0
+	      END IF
+	    END DO
+	    IF(J .NE. 0)WRITE(6,'(A)')' '
+	  ELSE IF(.NOT. FOUND)THEN
 	    WRITE(T_OUT,*)'Error --- unrecognized species'
-	  ELSE
-	    YAXIS='Fractional abundance'
-	    CALL DP_CURVE(ND,XV,YV)
 	  END IF
 	
 !
@@ -3525,13 +3539,12 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 ! ***********************************************************************
 !
 	ELSE IF(XOPT .EQ.'DC' .OR. XOPT .EQ. 'POP'
-	1                       .OR. XOPT .EQ. 'RAT') THEN
+	1             .OR. XOPT .EQ. 'RAT' .OR. XOPT .EQ. 'TX') THEN
 	  DO I=1,10
 	    LEV(I)=0
 	  END DO
-	  CALL USR_HIDDEN(LIN_DC,'LIN','F','Linear D.C. plots?')
-	  CALL USR_HIDDEN(SPEC_FRAC,'SPEC_FRAC','F',
-	1      'Species fraction?')
+	  IF(XOPT(1:2) .EQ. 'DC')CALL USR_HIDDEN(LIN_DC,'LIN','F','Linear D.C. plots?')
+	  CALL USR_HIDDEN(SPEC_FRAC,'SPEC_FRAC','F','Species fraction?')
 	  IF(XOPT .EQ. 'RAT')THEN
 	   HAM=.TRUE.
 	  ELSE
@@ -3553,11 +3566,13 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	      DO I=1,10
 	        IF(LEV(I) .EQ. 0 .OR. LEV(I) .GT. 20000)GOTO 1
 	          FLAG=.FALSE.
-	          CALL SETDC_OR_POP(YV,LEV(I),ATM(ID)%XzV_F,ATM(ID)%XzVLTE_F,
-	1            ATM(ID)%NXzV_F,ND,X,UC(ION_ID(ID)),FLAG)
-	          IF(.NOT. ATM(ID+1)%XzV_PRES)
-	1           CALL SETDC_OR_POP(YV,LEV(I),ATM(ID)%DXzV_F,ATM(ID)%DXzV_F,
-	1                        IONE,ND,X,'D'//TRIM(UC(ION_ID(ID))),FLAG)
+	          CALL SET_DC_OR_POP_OR_TX(YV,LEV(I),ATM(ID)%XzV_F,ATM(ID)%XzVLTE_F,
+	1            ATM(ID)%EDGEXzV_F,ATM(ID)%NXzV_F,ND,T,X,UC(ION_ID(ID)),FLAG)
+	          IF(.NOT. ATM(ID+1)%XzV_PRES)THEN
+	            T1=0.0D0
+	            CALL SET_DC_OR_POP_OR_TX(YV,LEV(I),ATM(ID)%DXzV_F,ATM(ID)%DXzV_F,
+	1                   T1,IONE,ND,T,X,'D'//TRIM(UC(ION_ID(ID))),FLAG)
+	          END IF
 !
 	        IF(XOPT .EQ. 'DC')THEN
 	          YAXIS='Log(b)'            
@@ -3567,6 +3582,8 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	             END DO
 	             YAXIS='Log(b)'
 	          END IF                 
+	        ELSE IF(XOPT .EQ. 'TX')THEN
+	          YAXIS='T\dX\u(10\u4\ \dK)'            
 	        ELSE IF(XOPT .EQ. 'RAT')THEN
 	          IF(SPEC_FRAC)THEN
 	          ELSE
@@ -4370,7 +4387,8 @@ c
 !
 ! To be read TAU_at_R and R_at_TAU respectively.
 !
-	ELSE IF(XOPT .EQ. 'RTAU' .OR. XOPT .EQ. 'TAUR' .OR. XOPT .EQ. 'WROPAC')THEN
+	ELSE IF(XOPT .EQ. 'RTAU' .OR. XOPT .EQ. 'TAUR' .OR. 
+	1       XOPT .EQ. 'CHIR' .OR. XOPT .EQ. 'WROPAC')THEN
 	  IF(XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are included'
 	  IF(.NOT. XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are NOT included'
 	  CALL USR_OPTION(LAM_ST,'LAMST',' ',FREQ_INPUT)
@@ -4445,7 +4463,7 @@ c
 	      WRITE(LU_OUT,'(6ES14.6)')CLUMP_FAC(1:ND)
 	      WRITE(LU_OUT,'(A)')' '
 	      WRITE(LU_OUT,'(A)')' Kappa Table (cm^2/gm)'
-	  ELSE IF(XOPT .EQ. 'TAUR')THEN
+	  ELSE IF(XOPT .EQ. 'TAUR' .OR. XOPT .EQ. 'CHIR')THEN
 	    CALL USR_OPTION(RVAL,'RAD',' ','Radius in R* (-ve for depth index)')
 	    IF(RVAL .GT. 0)THEN
 	      RVAL=RVAL*R(ND)
@@ -4466,6 +4484,7 @@ c
 	    WRITE(6,*)'RVAL/R* is',RVAL/R(ND)
 	    YAXIS='Log(\gt[R])'
 	    IF(LINY)YAXIS='\gt[R]'
+	    IF(XOPT .EQ. 'CHIR')YAXIS='\gx'
 	  ELSE
 	    CALL USR_OPTION(TAU_VAL,'TAU',' ',
 	1       'Tau value for which R is to be determined')
@@ -4504,6 +4523,9 @@ c
 	    IF(XOPT .EQ. 'WROPAC')THEN
 	      WRITE(LU_OUT,'(/,ES16.6)')ANG_TO_HZ/FL
 	      WRITE(LU_OUT,'(6ES14.4)')1.0D-10*CHI(1:ND)/CLUMP_FAC(1:ND)/MASS_DENSITY(1:ND)
+	    ELSE IF(XOPT .EQ. 'CHIR')THEN
+	      T2=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
+	      YV(ML)=T2*CHI(R_INDX+1) + (1.0-T2)*CHI(R_INDX)
 	    ELSE 
 	      CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,TYPE_ATM)
 	      IF(XOPT .EQ. 'TAUR')THEN

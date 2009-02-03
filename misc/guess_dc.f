@@ -398,7 +398,7 @@
 	  CALL GEN_IN(GION_LOW,'Statistical weight for lower ion level(i.e., 1 for CV)')
 !
 	  DO I=1,ND
-	    T1=DLOG(2.07D-22*ED(I)*DC(1,I))
+	    T1=DLOG(2.07078D-22*ED(I)*DC(1,I))
 	    T1=GION_LOW*EXP(T1+HDKT*FEDGE(1)/T(I))/(T(I)**1.5D0)/GION_UP
 	    ION_POP(I)=GS_ION_POP(I)/T1
 	  END DO

@@ -26,6 +26,7 @@ FN4=$(LIB_DIR)lib$(LN4).a
 OBJ1  =  rd_f_to_s_ids.o rd_f_to_s_ids_v2.o rd_energy.o write_osc_v2.o
  
 EXE   =  $(EXE_DIR)wr_f_to_s.exe\
+         $(EXE_DIR)ave_dc.exe\
          $(EXE_DIR)count_phot_data.exe\
          $(EXE_DIR)ed_vadat.exe\
          $(EXE_DIR)chk_phot.exe\
@@ -86,7 +87,7 @@ $(EXE_DIR)pack_osc.exe : pack_osc.o $(OANDF)
 #
 $(EXE_DIR)%.exe : %.o $(OANDF) 
 	$(F90) $*.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)$*.exe
 

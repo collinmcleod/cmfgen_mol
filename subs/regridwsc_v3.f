@@ -7,6 +7,8 @@
 	1                             POPATOM,N,ND,FILNAME)
 	IMPLICIT NONE
 !
+! Altered 26-Jan-2009 - Section involving TX fixeda
+!                         ADD1 variable removed (correction done on spot).
 ! Altered 23-Nov-2007 - Procedure for extending populations to larger radii changes.
 !                         We now fiddle departure coefficient to try to ensure
 !                         constant ionization (actual alteration date 14-Nov-2007). 
@@ -74,7 +76,7 @@
 ! Local Variables.
 !
 	INTEGER I,J,NOLD,NDOLD,COUNT,NX,NXST,NZ,IOS
-	REAL*8 RPOLD,TX,DELTA_T,T1,T2,ADD1,DC_MOD
+	REAL*8 RPOLD,TX,FX,DELTA_T,T1,T2
 	LOGICAL CHECK_DC
 	CHARACTER*80 STRING
 	CHARACTER*(*) FILNAME
@@ -134,8 +136,7 @@
 !
 ! Using the highest level read in, decide whether b, or b-1 have been read in.
 !
-	ADD1=0.0D0
-	IF( DABS( TA(NOLD) ) .LT. 0.2 .AND. CHECK_DC)ADD1=1.0D0
+	IF( DABS( TA(NOLD) ) .LT. 0.2 .AND. CHECK_DC)DPOP=DPOP+1.0D0
 !
 	IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN
 	  WRITE(LUER,*)'Warning - core radius not identical in REGRIDWSC_V3'
@@ -200,7 +201,6 @@
 ! logarithmically. Code assumes ED is proportional to POP_ATOM, and
 ! hence may break down for SN models (with variable composition).
 !
-	DPOP=DPOP+ADD1			!Insure never negative
 	DO J=1,NZ
 	  DO I=1,NDOLD
 	    OLDT(I)=LOG(DPOP(J,I))
@@ -216,38 +216,30 @@
 	  END DO
 	END DO
 !
-! Compute departure coefficients for N>NZ . New levels are set to have these
-! same excitation temperature as the highest level/
+! Compute departure coefficients for N>NZ. New levels are set to have these
+! same excitation temperature as the highest level.
 !
 	IF(N .GT. NZ)THEN
-	  DO I=1,ND
+	  TX=T(ND)
+	  DO I=ND,1,-1
 !
 ! We first compute the excitation temperature on level NZ.
 !
-	    TX=T(I)
-	    DELTA_T=10.0D0
+	    DELTA_T=100
 	    COUNT=0
-	    DC_MOD=LOG(DHEN(NZ,I)) + HDKT*EDGE(NZ)/T(I) - 1.5D0*LOG(T(I))
-	    DO WHILE( ABS(DELTA_T) .GT. 1.0E-06 .AND. COUNT .LT. 100 )
-	     T1=TX
-             IF(HDKT*EDGE(NZ)/TX .GT. 1.5D0)THEN
-               TX=HDKT*EDGE(NZ)/(DC_MOD+1.5D0*LOG(TX))
-             ELSE
-               TX= ( EXP(HDKT*EDGE(NZ)/TX-DC_MOD) )**(2.0D0/3.0D0)
-             END IF
-             COUNT=COUNT+1
-             DELTA_T=ABS(TX-T1)
+	    DO WHILE(ABS(DELTA_T) .GT. 1.0E-08 .AND. COUNT .LT. 100)
+	      FX=DHEN(NZ,I)*EXP(HDKT*EDGE(NZ)*(1.0D0/T(I)-1.0D0/TX))*
+	1           (TX/T(I))**1.5D0
+	      DELTA_T=(FX-1.0D0)*TX/FX/(1.5D0+HDKT*EDGE(NZ)/TX)
+	      IF(DELTA_T .GT.  0.8D0*TX)DELTA_T=0.8D0*TX
+	      IF(DELTA_T .LT. -0.8D0*TX)DELTA_T=-0.8D0*TX
+	      TX=TX-DELTA_T
+	      COUNT=COUNT+1
 	    END DO
 !
-!	    DO WHILE( ABS(DELTA_T) .GT. 1.0E-06 .AND. COUNT .LT. 100 )
-!	      T1=( (T(I)/TX)**(1.5) )*EXP(HDKT*EDGE(NZ)*(T(I)-TX)/T(I)/TX)
-!	      COUNT=COUNT+1
-!	      DELTA_T= (DHEN(NZ,I)-T1)*TX/T1/(1.0D0+HDKT*EDGE(NZ)/TX)
-!	      IF(ABS(DELTA_T) .GT. 0.8*TX)DELTA_T=0.5D0*DELTA_T
-!	      TX=TX-DELTA_T
-!	    END DO
+! We can now compute the Departure coefficients.
 !
-	    IF(COUNT .EQ. 100)THEN
+	    IF(COUNT .GE. 100)THEN
 	      WRITE(LUER,*)'Error in REGRIDWSC_V3 - TX didnt converge ',
 	1               'in 100 iterations'
 	      WRITE(LUER,*)'Depth=',I
@@ -256,8 +248,7 @@
 	      END DO
 	    ELSE
 	      DO J=NZ+1,N
-	         DHEN(J,I)=DHEN(NZ,I)*EXP( HDKT*(EDGE(NZ)-EDGE(J))*
-	1                   (TX-T(I))/TX/T(I) )
+	        DHEN(J,I)=EXP(HDKT*EDGE(J)*(1.0D0/TX-1.0D0/T(I)))*(T(I)/TX)**1.5D0
 	      END DO
 	    END IF
 	  END DO

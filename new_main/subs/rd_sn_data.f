@@ -9,10 +9,14 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 28-Jan-2009: If inner & outer radii differ from passed R values (via MOD_CMFGEN)
+!                        by less than 1 part in 10^8, they are made identical. This removes
+!                        a problem with older models where a slightly different technique
+!                        is used to compute the R grid.
 ! Altered  1-Jan-2009: Density scaling now valid for an arbitrary (but time independent
 !                        in Lagrangian frame) velocity law.
 ! Altered 12-Feb-2008: Fixed pop in calculation of POP_ATOM (only counts species present).
-!                      Now set species not present to have zero populaton.
+!                      Now set species not present to have zero population.
 !
 	INTEGER LU
 	INTEGER ND
@@ -128,7 +132,7 @@
 	1	      T_HYDRO(1) .EQ. 0.0D0 .OR.
 	1	      ATOM_DEN_HYDRO(1) .EQ. 0.0D0 .OR.
 	1	      ELEC_DEN_HYDRO(1) .EQ. 0.0D0)THEN
-	        WRITE(LUER,*)'Error reading SN datat'
+	        WRITE(LUER,*)'Error reading SN data'
 	        WRITE(LUER,*)'R, or T is zero'
 	        STOP
 	       ELSE
@@ -179,6 +183,8 @@
 	    ATOM_DEN_HYDRO(I)=ATOM_DEN_HYDRO(I)/VOL_EXP_FAC(I)
 	    ELEC_DEN_HYDRO(I)=ELEC_DEN_HYDRO(I)/VOL_EXP_FAC(I)
 	  END DO
+	  IF( ABS(R_HYDRO(1)/R(1)-1.0D0) .LE. 1.0D-08 )R_HYDRO(1)=R(1)
+	  IF( ABS(R_HYDRO(NX)/R(ND)-1.0D0) .LE. 1.0D-08 )R_HYDRO(NX)=R(ND)
 	END IF
 !
 ! We can now interpolate from the HYDRO grid to the CMFGEN grid.
@@ -203,8 +209,8 @@
 	CALL MON_INTERP(DENSITY,ND,IONE,LOG_R,ND,WRK_HYDRO,NX,LOG_R_HYDRO,NX)
 	DENSITY=EXP(DENSITY)
 !
-! Changed to LIN_INTERP as some models have humungus grid changes across
-! grid points which can cause -ve values due to roundoff errors.
+! Changed to LIN_INTERP as some models have humongous grid changes across
+! grid points which can cause -ve values due to round-off errors.
 ! 
 	POP_SPECIES=0.0D0
 	DO L=1,NSP

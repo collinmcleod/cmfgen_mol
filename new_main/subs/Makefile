@@ -16,6 +16,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(adjust_pops.o)\
       $(LIB)(ba_update_v6.o)\
       $(LIB)(ba_update_v7.o)\
+      $(LIB)(check_ions_present.o)\
       $(LIB)(cmf_blkband_v2.o)\
       $(LIB)(cmf_blkband_v3.o)\
       $(LIB)(create_iv_links_v2.o)\
@@ -102,6 +103,10 @@ $(LIB)(store_old_grid.o) : store_old_grid.f $(MOD)  $(LIB)(old_grid_module.o)
 $(LIB)(set_new_grid.o) : set_new_grid.f $(MOD)
 	$(F90) -c $(OPTION) set_new_grid.f
 	ar ruv $(LIB) set_new_grid.o
+
+$(LIB)(check_ions_present.o) : check_ions_present.f $(MOD)
+	$(F90) -c $(OPTION) check_ions_present.f
+	ar ruv $(LIB) check_ions_present.o
 
 $(LIB)(rd_sn_data.o) : rd_sn_data.f $(CONT)
 	$(F90) -c $(OPTION) rd_sn_data.f

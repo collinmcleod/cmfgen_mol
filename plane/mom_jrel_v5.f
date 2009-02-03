@@ -795,11 +795,11 @@
 	        dlnGRSQJdlnR(1:ND)=0.1D0*TB(1:ND)+0.9D0*dlnGRSQJdlnR(1:ND)
 	      END IF
 	    END IF
-	    IF(COUNT .EQ.  50)THEN
-	      WRITE(LUER,*)'Error in MOM_J_REL_V2: excessive iteration count.'
+	    IF(COUNT .EQ.  100)THEN
+	      WRITE(LUER,*)'Error in MOM_J_REL_V5: excessive iteration count.'
 	      WRITE(LUER,*)'FREQ=',FREQ
 	      WRITE(LUER,*)'Maximum error =',MAX_ER
-	      STOP
+	      ACCURATE=.TRUE.
 	    END IF
 	  END IF
 !

@@ -30,7 +30,7 @@
 	OPEN(UNIT=LUIN,FILE=FILENAME,STATUS='OLD',IOSTAT=IOS,
 	1       ACTION='READ')
 	  IF(IOS .NE. 0)THEN
-	    WRITE(LUER,*)'Error opening ',FILENAME,' in RD_F_TO_S_IDS'
+	    WRITE(LUER,*)'Error opening ',FILENAME,' in FDG_F_TO_S_NS_V1'
 	    STOP
 	  END IF
 !
@@ -41,7 +41,7 @@
 	  BACKSPACE(LUIN)
 	  READ(LUIN,*)I
 	  IF(I .LT. NF)THEN
-	    WRITE(LUER,*)'Error in RD_F_TO_S_IDS'
+	    WRITE(LUER,*)'Error in FDG_F_TO_S_NS_V1'
 	    WRITE(LUER,*)'Currently treating ',FILENAME
 	    WRITE(LUER,*)'Insufficient levels in file'
 	    STOP
@@ -54,7 +54,7 @@
 	  BACKSPACE(LUIN)
 	  READ(LUIN,*)ENTRY_NUM
 	  IF(ENTRY_NUM .LT. 2 .OR. ENTRY_NUM .GT. 20)THEN
-	    WRITE(LUER,*)'Error in RD_F_TO_S_IDS'
+	    WRITE(LUER,*)'Error in FDG_F_TO_S_NS_V1'
 	    WRITE(LUER,*)'Currently treating ',FILENAME
 	    WRITE(LUER,*)'Bad entry number for level link'
 	    STOP
@@ -88,7 +88,7 @@
 !
 	DO I=1,NF
 	  IF(F_TO_S(I) .LE. 0 .OR. F_TO_S(I) .GT. NS)THEN
-	    WRITE(LUER,*)'Error in RD_F_TO_S_IDS'
+	    WRITE(LUER,*)'Error in FDG_F_TO_S_NS_V1'
 	    WRITE(LUER,*)'Currently treating ',FILENAME
 	    WRITE(LUER,*)'Incorrect super level ID for level ',I
 	    STOP
@@ -106,7 +106,7 @@
 	END DO
 	DO I=1,NS
 	  IF(CNT(I) .EQ. 0)THEN
-	    WRITE(LUER,*)'Error in RD_F_TO_S_IDS'
+	    WRITE(LUER,*)'Error in FDG_F_TO_S_NS_V1'
 	    WRITE(LUER,*)'Currently treating ',FILENAME
 	    WRITE(LUER,*)'Super level ',I,' has no components'
 	    STOP

@@ -6,8 +6,10 @@
 !     GENSCOOL_SORT: Only the top rates are printed: Sorted using depths 1, 11, 21 etc. 
 !
 	PROGRAM MOD_COOL
+	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 29-Jan-2009: ND is now read in from MODEL (if it exists).
 ! Altered: 08-Feb-2008: Extra terms (such as V term) sheck and output.
 !
 	INTEGER, PARAMETER :: MAX_RECS=1000
@@ -27,11 +29,30 @@
 	INTEGER*4 I,J,K,ID
 	INTEGER N_INIT_RECS
 	INTEGER NRECS
+	INTEGER IOS
 	REAL*8 T1
+	LOGICAL FILE_OPEN
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
-	WRITE(6,'(A)',ADVANCE='NO')'INPUT ND: '
-	READ(5,*)ND
+	OPEN(UNIT=20,FILE='MODEL',STATUS='OLD',IOSTAT=IOS)
+	  IF(IOS .EQ. 0)THEN
+	    DO WHILE(1 .EQ. 1)
+	      READ(20,'(A)',IOSTAT=IOS)STRING
+	      IF(IOS .NE. 0)EXIT
+	      IF(INDEX(STRING,'!Number of depth points') .NE. 0)THEN
+	        READ(STRING,*)ND
+	        WRITE(6,'(A,I4)')' Number of depth points in the model is:',ND
+	        EXIT
+	      END IF
+	    END DO
+	  END IF
+	  INQUIRE(UNIT=20,OPENED=FILE_OPEN)
+	IF(FILE_OPEN)CLOSE(UNIT=20)
+!
+	IF(IOS .NE. 0)THEN
+	  WRITE(6,*)' Unable to open MODEL file to get # of depth points'
+	  CALL GEN_IN(ND,'Number of depth points')
+	END IF
 !
 	ALLOCATE (SUM(ND))
 	ALLOCATE (BOUND(ND))
@@ -136,15 +157,14 @@
 	CLOSE(UNIT=20)
 	CLOSE(UNIT=21)
 !
-	WRITE(6,'(A)')' '
-	WRITE(6,'(A)')'Cooling data has been written to GENCOOL_SUM'
-	WRITE(6,'(A)')'Will now sort data to display most important terms'
-	WRITE(6,'(A)')'12 records is a reasonable number to output '
+	WRITE(6,'(A)')' Cooling data has been written to GENCOOL_SUM'
+	WRITE(6,'(A)')' Will now sort data to display most important terms'
+	WRITE(6,'(A)')' 12 records is a reasonable number to output '
 !
 	OPEN(UNIT=20,FILE='GENCOOL_SUM',STATUS='UNKNOWN',ACTION='READ')
 	OPEN(UNIT=21,FILE='GENCOOL_SORT',STATUS='UNKNOWN',ACTION='WRITE')
-	WRITE(6,'(A)',ADVANCE='NO')'Input maximum number of records per depth to be output to sorted file: '
-	READ(5,*)NRECS
+	NRECS=12
+	CALL GEN_IN(NRECS,'Maximum number of records per depth to be output to sorted file')
 !
 	N_INIT_RECS=5
 	VALS=0.0D0
@@ -187,7 +207,7 @@
 	CLOSE(UNIT=21)
 !
 	WRITE(6,'(A)')' '
-	WRITE(6,'(A)')'Sorted cooling data has been written to GENCOOL_SORT'
+	WRITE(6,'(A)')' Sorted cooling data has been written to GENCOOL_SORT'
 	WRITE(6,'(A)')' '
 !
 	STOP

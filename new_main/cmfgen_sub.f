@@ -1080,6 +1080,9 @@
            IF(RD_COHERENT_ES)NUM_ITS_TO_DO=1
 	END IF
 !
+	CALL CHECK_IONS_PRESENT(ND,NUM_IONS)
+
+!
 ! Temporary check
 !
 !	CALL WRITE_SEQ_TIME_FILE_V1(SN_AGE_DAYS,ND,LUIN)
@@ -4143,6 +4146,8 @@
 !
 	  CALL TUNE(ITWO,'GIT')
 	  CALL TUNE(ITHREE,' ')
+!
+	  CALL CHECK_IONS_PRESENT(ND,NUM_IONS)
 !
 ! This file is a direct access file and contains the models
 ! output (i.e. T,density,population levels etc). No longer

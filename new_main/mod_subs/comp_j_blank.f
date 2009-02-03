@@ -464,7 +464,7 @@ C TRUE if FLUX_CAL_ONLY is true (single iteration with coherent,
 C last iteration if non-coherent).
 C
 	    IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
-	1         MAXCH .LT. 100.0D0) )THEN
+	1         MAXCH .LT. 100.0D0 .AND. .NOT. SN_MODEL) )THEN
 C
 C Quick and dirty method to ge an extended DENSITY vector. Will use TB in
 C the call to CMF_FORM_SOL.
@@ -739,7 +739,7 @@ C
 	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0D0
 	      END IF
 	    ELSE IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
-	1         MAXCH .LT.  100.0D0) )THEN
+	1         MAXCH .LT.  100.0D0 .AND. .NOT. SN_MODEL) )THEN
 	      IF(COHERENT_ES)THEN
      	        TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ(1:ND)
 	      ELSE

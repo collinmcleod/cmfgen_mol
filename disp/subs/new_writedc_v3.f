@@ -78,7 +78,7 @@ C
 	        WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I)
 	        DO J=1,NHYD
 	          T1=LOG( HYD(J,I)*GION/GHYD(J)/WHYD(J,I)/
-	1                             2.07D-22/ED(I)/DHYD(1,I) )
+	1                             2.07078D-22/ED(I)/DHYD(1,I) )
 	          T2=HDKT*EDGEHYD(J)
 	          DELTA_T=10.0D0
 		  COUNT=0
