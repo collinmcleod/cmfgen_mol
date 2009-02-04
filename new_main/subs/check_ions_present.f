@@ -211,6 +211,5 @@
 	  END IF
 	END DO
 !
-	STOP   
 	RETURN
 	END
