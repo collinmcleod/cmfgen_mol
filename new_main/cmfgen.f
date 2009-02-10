@@ -265,9 +265,15 @@
 	1        'Maximum # of frequencies that can be treated')
 	CALL RD_STORE_INT(NLF,'NLF',L_TRUE,
 	1        'Number of frequencies per Doppler profile in CMF mode (21)')
+	FL_OPTION=' '; I=20
+	CALL RD_STORE_NCHAR(FL_OPTION,'FL_OPT',I,L_FALSE,
+	1        'Option to automatically fudge number of FLs in all species')
 	SL_OPTION=' '; I=20
 	CALL RD_STORE_NCHAR(SL_OPTION,'SL_OPT',I,L_FALSE,
 	1        'Option to automatically fudge number of SLs in all species')
+	IL_OPTION=' '; I=20
+	CALL RD_STORE_NCHAR(IL_OPTION,'IL_OPT',I,L_FALSE,
+	1        'Option to automatically fudge number of ILs in all species')
 !
 ! We now get the number of atomic levels. Old MODEL_SPEC files, with NSF in the
 ! keyword can be read. ISF take's precident over NSF, and there is no check that 
@@ -291,7 +297,7 @@
 	    END IF
 	    IF(NS .NE. 0)THEN
 	      TEMP_KEY=TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(J))//'_F_TO_S'
-	      CALL FDG_F_TO_S_NS(NF,NS,NV,SL_OPTION,LU_IN,TEMP_KEY)
+	      CALL FDG_F_TO_S_NS_V1(NF,NS,NV,FL_OPTION,SL_OPTION,IL_OPTION,LU_IN,TEMP_KEY)
 	      ID=ID+1
 	      ION_ID(ID)=TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(J))
 	      ATM(ID)%XzV_PRES=.TRUE.

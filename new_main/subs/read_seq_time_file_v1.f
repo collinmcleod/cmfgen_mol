@@ -39,7 +39,8 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
-! Created 14-Mar-2007  Based on READ_TIME_MODEL_V2
+! Altered 08-Feb-2009: Format error for ZXzV fixed. FIRST variable added.
+! Created 14-Mar-2007: Based on READ_TIME_MODEL_V2
 !
 	INTEGER NT
 	INTEGER ND
@@ -79,6 +80,7 @@
 	LOGICAL DO_THIS_ID
 	CHARACTER(LEN=11) DATE
 	CHARACTER(LEN=10) SPECIES_NAME
+	LOGICAL, SAVE :: FIRST=.TRUE.
 !
 	LUER=ERROR_LU()
         HDKT=4.7994145D0					!1.0D+15*H/k/1.0D+04
@@ -141,7 +143,10 @@
 	          END IF
 	        ELSE
 	          READ(LU)I,NX,ZXzV
-	          WRITE(LUER,'(A,3(A,I5))')'read_seq_time_file_v1:','I=',I,'NX=',NX,'ZxZV=',ZXzV
+	          IF(FIRST)THEN
+	            WRITE(LUER,'(A,A,2(A,I5),A,F4.1)')'read_seq_time_file_v1: ',
+	1                   TRIM(SPECIES_NAME),': I=',I,'  NX=',NX,'  ZxZV=',ZXzV
+	          END IF
 	          ID=ID_BEG+NINT(ZXzV-ATM(ID_BEG)%ZXzV)
 	          IF(ZxZV .LT. ATM(ID_BEG)%ZXzV .OR. ZxZV .GT. ATM(ID_END-1)%ZXzV)THEN
 	            DO_THIS_ID=.FALSE.
@@ -210,6 +215,7 @@
 	    END IF
 	  END DO
 	END DO
+	FIRST=.FALSE.
 !
 	RETURN
 	END

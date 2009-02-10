@@ -202,7 +202,9 @@
 	LOGICAL, ALLOCATABLE :: IMP_VAR(:)
 !
 	CHARACTER(LEN=7), PARAMETER :: NAME_CONVENTION='K_FOR_I'
+	CHARACTER(LEN=20) FL_OPTION
 	CHARACTER(LEN=20) SL_OPTION
+	CHARACTER(LEN=20) IL_OPTION
 !
 ! For unknown reasons, the DEC OSF alpha compiler requires this declaration
 ! to be at the end of the data module in order not to get alignment problems.

@@ -2,7 +2,7 @@ C
 C Routine to read in the vector describing the matching of actual atomic levels
 C to that in the model atom with super levels.
 C
-	SUBROUTINE RD_F_TO_S_IDS_V2(F_TO_S,INT_SEQ,LEVNAME_F,N_F,N_S,N_V,
+	SUBROUTINE RD_F_TO_S_IDS_V2(F_TO_S,INT_SEQ,LEVNAME_F,N_F,N_S,
 	1                LUIN,FILENAME,SL_OPTION)
 	IMPLICIT NONE
 C
@@ -17,7 +17,7 @@ C Altered  2-Jan-1996 : INT_SEQ variable installed.
 C Altered 13-Oct-1995 : If N_F=N_S 1 to 1 mapping of levels is assumed.
 C Created 31-Mar-1995
 C
-	INTEGER N_S,N_F,N_V
+	INTEGER N_S,N_F
 	INTEGER LUIN
 	INTEGER F_TO_S(N_F),INT_SEQ(N_F)
 	CHARACTER(LEN=*) SL_OPTION
@@ -110,7 +110,7 @@ C
 	  READ(STRING(J:),*)F_TO_S(I),INT_SEQ(I)
 	END DO
 !
-	CALL DO_SL_ADJUSTEMENT(F_TO_S,INT_SEQ,N_F,N_S,N_V,SL_OPTION)
+	CALL DO_SL_ADJUSTEMENT(F_TO_S,INT_SEQ,N_F,N_S,SL_OPTION)
 !
 	IF(MAXVAL(F_TO_S) .NE. N_S)THEN
 	  WRITE(LUER,*)'Error in RD_F_TO_S_IDS_V2'

@@ -548,10 +548,9 @@
 	       WRITE(T_OUT,*)'New oscilator date:',ATM(ID)%NEW_XzV_OSCDATE
 	    END IF
 !
-	    J=0      !A dummy variable for IV
 	    FILENAME=TRIM(ION_ID(ID))//'_F_TO_S'
 	    CALL RD_F_TO_S_IDS_V2(ATM(ID)%F_TO_S_XzV,ATM(ID)%INT_SEQ_XzV,
-	1           ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,ATM(ID)%NXzV,J,
+	1           ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,ATM(ID)%NXzV,
 	1           LUIN,FILENAME,SL_OPTION)
 	    CALL RDPHOT_GEN_V2(ATM(ID)%EDGEXzV_F, ATM(ID)%XzVLEVNAME_F,
 	1            ATM(ID)%GIONXzV_F,      AT_NO(SPECIES_LNK(ID)),

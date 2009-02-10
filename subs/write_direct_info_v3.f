@@ -52,6 +52,10 @@
 ! Subroutine to read out information needed to reopen a DIRECT access file.
 ! The RECL is not stored with the file on UNIX systems.
 !
+! Modified 10-Sep-2008: Problem with integer divide when computing RECL.
+!                       Error occurred switching from PGF compiler (unit size=1)
+!                         to Intel compiler (unit size=4). 1/4 was giving 0
+!                         instead of 0.25
 ! Modified 28-Oct-2001: IOS returned in call 
 ! Modified 20-August-2000 so that a format date can be read.
 !
@@ -108,7 +112,8 @@
 	      IER=4; IF(INDEX(STRING,'File format date') .EQ. 0)GOTO 100
 	      FILE_DATE=STRING(1:INDEX(STRING,'  '))
 	      IER=5; READ(LU_EDD,*,ERR=100,IOSTAT=IOS)ND,RECL,OLD_WORD_SIZE,OLD_UNIT_SIZE
-	      RECL=RECL*(WORD_SIZE/OLD_WORD_SIZE)*(OLD_UNIT_SIZE/UNIT_SIZE)
+!	      RECL=RECL*(WORD_SIZE/OLD_WORD_SIZE)*(OLD_UNIT_SIZE/UNIT_SIZE)
+	      RECL=RECL*WORD_SIZE*OLD_UNIT_SIZE/OLD_WORD_SIZE/UNIT_SIZE
 	    ELSE IF(INDEX(STRING,'20-Aug-2000') .NE. 0)THEN
 	      IER=6; READ(LU_EDD,'(A)',ERR=100,IOSTAT=IOS)STRING
 	      IER=7; IF(INDEX(STRING,'File format date') .EQ. 0)GOTO 100

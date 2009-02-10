@@ -529,7 +529,7 @@
 	1           '   RSQE(rad)','        RSQW','      RSQJ  ','RSQ(W+E)/CHI','   RSQJ(old)',
 	1           '        RSQH','   RSQH(old)',
 	1           '        TMOD','        T(B)',
-	1           '           T','      T(old)'
+	1           '          TR','     TR(old)'
 	T1=1.0D-04*(3.14159265D0/5.67D-05)**0.25
 	DO I=1,ND
 	  T2=R(I)-1.0D-05*DELTA_TIME_SECS*VEL(I)
@@ -545,7 +545,7 @@
 	1           '   RSQE(rad)','        RSQW','      RSQJ  ','RSQ(W+E)/CHI','   RSQJ(old)',
 	1           '        RSQH','   RSQH(old)',
 	1           '        TMOD','        T(B)',
-	1           '           T','      T(old)'
+	1           '          TR','      TR(old)'
 !
         IF(DIFF_APPROX)THEN
 	  T1=1.0D0+RECIP_CDELTAT/CHI(ND)

@@ -4388,6 +4388,7 @@ c
 ! To be read TAU_at_R and R_at_TAU respectively.
 !
 	ELSE IF(XOPT .EQ. 'RTAU' .OR. XOPT .EQ. 'TAUR' .OR. 
+	1       XOPT .EQ. 'KAPR' .OR.
 	1       XOPT .EQ. 'CHIR' .OR. XOPT .EQ. 'WROPAC')THEN
 	  IF(XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are included'
 	  IF(.NOT. XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are NOT included'
@@ -4430,7 +4431,7 @@ c
 	    DO I=1,NFREQ
 	      ZV(I)=ANG_TO_HZ/ZV(I)
 	    END DO
-	    XAXIS='\gl(\gV)'
+	    XAXIS='\gl(\A)'
 	  ELSE
 	    XAXIS='\gn(10\u15\d Hz)'
 	  END IF
@@ -4463,7 +4464,7 @@ c
 	      WRITE(LU_OUT,'(6ES14.6)')CLUMP_FAC(1:ND)
 	      WRITE(LU_OUT,'(A)')' '
 	      WRITE(LU_OUT,'(A)')' Kappa Table (cm^2/gm)'
-	  ELSE IF(XOPT .EQ. 'TAUR' .OR. XOPT .EQ. 'CHIR')THEN
+	  ELSE IF(XOPT .EQ. 'TAUR' .OR. XOPT .EQ. 'CHIR' .OR. XOPT .EQ. 'KAPR')THEN
 	    CALL USR_OPTION(RVAL,'RAD',' ','Radius in R* (-ve for depth index)')
 	    IF(RVAL .GT. 0)THEN
 	      RVAL=RVAL*R(ND)
@@ -4484,7 +4485,8 @@ c
 	    WRITE(6,*)'RVAL/R* is',RVAL/R(ND)
 	    YAXIS='Log(\gt[R])'
 	    IF(LINY)YAXIS='\gt[R]'
-	    IF(XOPT .EQ. 'CHIR')YAXIS='\gx'
+	    IF(XOPT .EQ. 'CHIR')YAXIS='\gx (cm\u-1\d)'
+	    IF(XOPT .EQ. 'KAPR')YAXIS='\gx (cm\u2\d/g)'
 	  ELSE
 	    CALL USR_OPTION(TAU_VAL,'TAU',' ',
 	1       'Tau value for which R is to be determined')
@@ -4512,21 +4514,29 @@ c
 	      END DO
 	    END IF
 !
-! Adjust opacities for the effect of clumping.
-!
-	    DO I=1,ND
-	      CHI(I)=CHI(I)*CLUMP_FAC(I)
-	      ESEC(I)=ESEC(I)*CLUMP_FAC(I)
-	      ETA(I)=ETA(I)*CLUMP_FAC(I)
-	    END DO
-!
 	    IF(XOPT .EQ. 'WROPAC')THEN
 	      WRITE(LU_OUT,'(/,ES16.6)')ANG_TO_HZ/FL
-	      WRITE(LU_OUT,'(6ES14.4)')1.0D-10*CHI(1:ND)/CLUMP_FAC(1:ND)/MASS_DENSITY(1:ND)
+	      WRITE(LU_OUT,'(6ES14.4)')1.0D-10*CHI(1:ND)/MASS_DENSITY(1:ND)
 	    ELSE IF(XOPT .EQ. 'CHIR')THEN
-	      T2=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
-	      YV(ML)=T2*CHI(R_INDX+1) + (1.0-T2)*CHI(R_INDX)
+	      T1=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
+	      T2=CHI(R_INDX+1)*CLUMP_FAC(R_INDX+1)
+	      T3=CHI(R_INDX)*CLUMP_FAC(R_INDX)
+	      YV(ML)=1.0D-10*( T1*T2 + (1.0-T1)*T3 )
+	    ELSE IF(XOPT .EQ. 'KAPR')THEN
+	      T1=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
+	      T2=CHI(R_INDX+1)/MASS_DENSITY(R_INDX+1)
+	      T3=CHI(R_INDX)/MASS_DENSITY(R_INDX)
+	      YV(ML)=1.0D-10*( T1*T2 + (1.0-T1)*T3 )
 	    ELSE 
+!
+! Adjust opacities for the effect of clumping.
+!
+	      DO I=1,ND
+	        CHI(I)=CHI(I)*CLUMP_FAC(I)
+	        ESEC(I)=ESEC(I)*CLUMP_FAC(I)
+	        ETA(I)=ETA(I)*CLUMP_FAC(I)
+	      END DO
+!
 	      CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,TYPE_ATM)
 	      IF(XOPT .EQ. 'TAUR')THEN
 	        T2=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
