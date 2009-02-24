@@ -469,13 +469,13 @@
 !
 	ELSE IF(X(1:2) .EQ. 'IP' .OR. X(1:2) .EQ. 'FP' .OR.
 	1          X(1:3) .EQ. 'FAP')THEN
+	  IF(X(1:2) .EQ. 'IP')THEN
+	    WRITE(6,*)'Option to plot the intensity for a given impact parameter'
+	  END IF
 	  CALL USR_OPTION(I,'P',' ','Impact parameter index')
 	  IF(I .GT. NP)THEN
 	    WRITE(T_OUT,*)'Invalid depth; maximum value is',NP
 	    GOTO 1
-	  END IF
-	  IF(X(1:2) .EQ. 'IP')THEN
-	    WRITE(6,*)'Option to plot the intensity for a given impact parameter'
 	  END IF
 !
 ! If NP < ND, we must have a plane-parallel model.

@@ -58,7 +58,8 @@
 	    NF=I
 	  ELSE IF(FL_OPTION(1:7) .EQ. 'SET_TO_')THEN
 	    READ(FL_OPTION(8:),*)J
-	    NF=MIN(I,J)
+	    J=MAX(NF,J)			!Keep using existing level being used.
+	   NF=MIN(I,J)
 	  ELSE
 	    WRITE(6,*)'Error in FDG_F_O_S_NS_V1: FL_OPTION not recognized'
 	    WRITE(6,*)'FL_OPTION=',TRIM(FL_OPTION)

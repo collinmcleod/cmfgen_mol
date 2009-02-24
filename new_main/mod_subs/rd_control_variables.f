@@ -259,6 +259,16 @@ C
 	1          'Include all reltivistic terms in observer''s frame solution')
 	  CALL RD_STORE_LOG(DO_FULL_REL_CMF,'REL_CMF',L_FALSE,
 	1        'Include all reltivistic terms in CMF solution for observed intensity')
+!
+! These two options are installed only to retain consistency with earlier versions.
+!
+	  USE_OLD_MF_SCALING=.FALSE.
+	  USE_OLD_MF_OUTPUT=.FALSE.
+	  CALL RD_STORE_LOG(USE_OLD_MF_SCALING,'OLD_MFS',L_FALSE,
+	1        'Use old mass scaling when reading SN_HYDRO_DATA')
+	  CALL RD_STORE_LOG(USE_OLD_MF_OUTPUT,'OLD_MFO',L_FALSE,
+	1        'Use old mass scaling when reading SN_HYDRO_DATA')
+!
 C
 C Read in the un-normalized fractional abundances.
 C

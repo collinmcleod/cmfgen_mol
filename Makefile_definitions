@@ -13,7 +13,7 @@
 # Installation directory for CMFGEN
 # Site dependent.
 
-INSTALL_DIR=/export/home/jdh/cur_cmf/
+INSTALL_DIR=/Users/jdh/cur_cmf/
 
 #
 # These statements should not be altered.
@@ -99,12 +99,14 @@ EXE_DIR=$(INSTALL_DIR)exe/
 #G2CLIB=-L/usr/lib/gcc-lib/i386-glibc21-linux/egcs-2.91.66 -lg2c
 #X11LIB=-L/usr/X11R6/lib -lX11
 #
-BLAS=-g77libs -lpthread -L/usr/lib64 -lblas
-LAPACK=-L/usr/lib64 -llapack
+#BLAS=-g77libs -lpthread -L/usr/lib64 -lblas
 
 #For lyrebird
 
+BLAS= -lpthread -L/usr/lib64 -lblas
+LAPACK=-llapack
 LOCLIB=-L/usr/lib64
-PGLIB=-g77libs -L/usr/local/pgplot -lpgplot 
-X11LIB=-L/usr/X11R6/lib64 -lX11
-G2CLIB=-L/usr/lib/gcc-lib/x86_64-redhat-linux/3.4.3 -lg2c
+PGLIB= =pgf77libs -L/Users/jdh/pgplot/pgplot -lpgplot 
+#-lcpgplot 
+X11LIB=-L/usr/X11R6/lib -lX11
+#G2CLIB=-L/usr/lib/gcc-lib/x86_64-redhat-linux/3.4.3 -lg2c

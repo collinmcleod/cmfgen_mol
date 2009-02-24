@@ -2063,7 +2063,7 @@ C
 	  DO IP=1,NPLTS
 	    IF(IP .NE. VAR_PLT1 .AND. TYPE_CURVE(IP) .NE. 'I')THEN
 	      T1=0.0D0; T2=0.0D0
-	      DO J=1,NPTS(IP)
+	      DO J=2,NPTS(IP)-1
 	        T3=(CD(IP)%XVEC(J)-XT(1))*(XT(2)-CD(IP)%XVEC(J))
 	        IF(T3 .GT. 0)THEN
 	          T1=T1+CD(IP)%DATA(J)*ABS(CD(IP)%XVEC(J-1)-CD(IP)%XVEC(J+1))

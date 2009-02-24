@@ -9,6 +9,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 11-Feb-2009 : Use isotope data, when available, to atomic number fractions.
 ! Altered 28-Jan-2009: If inner & outer radii differ from passed R values (via MOD_CMFGEN)
 !                        by less than 1 part in 10^8, they are made identical. This removes
 !                        a problem with older models where a slightly different technique
@@ -182,8 +183,8 @@
 	  ATOM_DEN_HYDRO(I)=ATOM_DEN_HYDRO(I)/T2
 	  ELEC_DEN_HYDRO(I)=ELEC_DEN_HYDRO(I)/T2
 	END DO
-	IF( ABS(R_HYDRO(1)/R(1)-1.0D0) .LE. 1.0D-08 )R_HYDRO(1)=R(1)
-	IF( ABS(R_HYDRO(NX)/R(ND)-1.0D0) .LE. 1.0D-08 )R_HYDRO(NX)=R(ND)
+	IF( ABS(R_HYDRO(1)/R(1)-1.0D0) .LE. 1.0D-07 )R_HYDRO(1)=R(1)
+	IF( ABS(R_HYDRO(NX)/R(ND)-1.0D0) .LE. 1.0D-07 )R_HYDRO(NX)=R(ND)
 	DO I=1,ND
 	  VOL_EXP_FAC(I)=1.0D0/(1.0D0-T1*V(I)/R(I)*(SIGMA(I)+1.0D0))/
 	1                   (1.0D0-T1*V(I)/R(I))**2
@@ -276,27 +277,45 @@
 	  ISO(IS)%OLD_POP=ISO(IS)%OLD_POP*DENSITY/ISO(IS)%MASS/1.66D-24
 	END DO
 !
+! When isotopes are present, we need to use the individual mass-fractions to
+! compute the correct number of species atoms that are present. In such cases
+! the POP_PSECIES computed here overrides that computed above.
+!
+	IF(USE_OLD_MF_SCALING)THEN
+!
 ! Ensure isotope populations sum exactly to total species population
 ! Isotope populations of species not-present get set to zero.
+! Only necessary if using old scaling approach.
 !
-	DO IP=1,NUM_PARENTS
-	  WRK(1:ND)=0.0D0
-	  DO IS=1,NUM_ISOTOPES
-	    IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC)THEN
-	      WRK=WRK+ISO(IS)%OLD_POP
-	    END IF
-	  END DO
-	  DO IS=1,NUM_ISOTOPES
-	    IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC)THEN
-	      IF(SPECIES_PRES(ISO(IS)%ISPEC))THEN
-	        ISO(IS)%OLD_POP=ISO(IS)%OLD_POP*(POP_SPECIES(:,ISO(IS)%ISPEC)/WRK)
-	      ELSE
-	        ISO(IS)%OLD_POP=0.0D0
+	  DO IP=1,NUM_PARENTS
+	    WRK(1:ND)=0.0D0
+	    DO IS=1,NUM_ISOTOPES
+	      IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC)THEN
+	        WRK=WRK+ISO(IS)%OLD_POP
 	      END IF
-	    END IF
+	    END DO
+	    DO IS=1,NUM_ISOTOPES
+	      IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC)THEN
+	        IF(SPECIES_PRES(ISO(IS)%ISPEC))THEN
+	          ISO(IS)%OLD_POP=ISO(IS)%OLD_POP*(POP_SPECIES(:,ISO(IS)%ISPEC)/WRK)
+	        ELSE
+	          ISO(IS)%OLD_POP=0.0D0
+	        END IF
+	      END IF
+	    END DO
 	  END DO
-	END DO
-	WRITE(LUER,*)'Normalized isotope populations in RD_SN_DATA'
+	  WRITE(LUER,*)'Normalized isotope populations in RD_SN_DATA'
+	ELSE
+	  DO IP=1,NUM_PARENTS
+	    WRK(1:ND)=0.0D0
+	    DO IS=1,NUM_ISOTOPES
+	      IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC)THEN
+	        WRK=WRK+ISO(IS)%OLD_POP
+	      END IF
+	    END DO
+	    POP_SPECIES(:,PAR(IP)%ISPEC)=WRK
+	  END DO
+	END IF
 !
 ! If population is zero at some depths, but species is present, we will
 ! set to small value.
@@ -335,7 +354,7 @@
 	  END IF
 	END DO
 !
-	CALL OUT_SN_POPS_V2('SN_DATA_INPUT_CHK',SN_AGE_DAYS,ND,LU)
+	CALL OUT_SN_POPS_V3('SN_DATA_INPUT_CHK',SN_AGE_DAYS,USE_OLD_MF_OUTPUT,ND,LU)
 !
 	DEALLOCATE (R_HYDRO, LOG_R_HYDRO, V_HYDRO, SIGMA_HYDRO, T_HYDRO, DENSITY_HYDRO )
 	DEALLOCATE (WRK_HYDRO, SPEC_HYDRO, POP_HYDRO, ATOM_DEN_HYDRO, ELEC_DEN_HYDRO)

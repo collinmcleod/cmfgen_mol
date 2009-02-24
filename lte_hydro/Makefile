@@ -57,10 +57,10 @@ $(LIB)(%.o) : %.f
 # Give the dependencies of dispgen.exe and how it is created.
 #
 
-$(EXE_DIR)main_lte.exe : lte.o lte_sub.o set_lte_est.o det_ed.o lte_pop_sl.o \
+$(EXE_DIR)main_lte.exe : mod_cmfgen.o lte.o lte_sub.o set_lte_est.o det_ed.o lte_pop_sl.o \
                          ltepop_wld_v1.o genopaeta_v8.o set_line_opac.o writedc_v2.o \
                           $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
-	$(F90) lte.o lte_sub.o set_lte_est.o det_ed.o lte_pop_sl.o ltepop_wld_v1.o \
+	$(F90) mod_cmfgen.o lte.o lte_sub.o set_lte_est.o det_ed.o lte_pop_sl.o ltepop_wld_v1.o \
                      genopaeta_v8.o set_line_opac.o writedc_v2.o \
              -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN1) -l$(LN6) \
                $(LOCLIB) $(LAPACK) $(BLAS) \

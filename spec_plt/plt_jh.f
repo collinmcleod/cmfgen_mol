@@ -222,6 +222,7 @@
 	      EXIT
 	    END IF
 	  END DO
+	  ZM(ID)%NCF=ZM(ID)%NCF-1
 	CLOSE(LU_IN)
 	WRITE(T_OUT,*)'Successfully read in ',TRIM(ZM(ID)%FILENAME),' file as MODEL A (default)'
 	WRITE(T_OUT,*)'Number of depth points is',ZM(ID)%ND

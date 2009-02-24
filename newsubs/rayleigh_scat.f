@@ -67,7 +67,7 @@
 	    DELF=ABS(T2)
 	    IRES=I
 	  END IF
-	  T2=MAX(ABS(T2),0.0001)		!Prevent overflow
+	  T2=MAX(ABS(T2),0.0001D0)		!Prevent overflow
 	  IF(EDGE_FREQ .LT. FREQ)T2=-T2
 	  T1=T1+FOSC(I)/T2
 	END DO

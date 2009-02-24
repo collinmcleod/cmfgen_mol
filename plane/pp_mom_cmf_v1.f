@@ -451,6 +451,7 @@
 !
 	DO I=1,ND
 	  IF(G(I) .GT. 1.0D0)G(I)=1.0D0
+	  IF(G(I) .LT. -1.0D0)G(I)=-1.0D0
 	END DO
 !
 ! NB: We solve for J.

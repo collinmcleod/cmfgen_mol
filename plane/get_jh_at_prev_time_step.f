@@ -189,6 +189,12 @@
 ! R is in units of 10^10 cm, and V is in units of kms/s (i.e., 10^5 cm/s).
 !
 	DELTA_TIME_SECS=1.0D+05*(R(ND)-OLD_R(ND_OLD))/V(ND)
+	IF(DELTA_TIME_SECS .LE. 0.0D0)THEN
+	  WRITE(LU_ER,*)'Error in GET_JH_AT_PREV_TIME_STEP'
+	  WRITE(LU_ER,*)'Running a time dependent model with 0 ov -ve time step'
+	  WRITE(LU_ER,*)'R(ND),OLD_R(ND_OLD):',R(ND),OLD_R(ND_OLD)
+	  STOP
+	END IF
 !
 	IF(PRESENT(OPTION))THEN
 	  IF(OPTION .EQ. 'GREY')THEN
