@@ -170,6 +170,9 @@
 	    VJ_P(:,:,L)=T2*VJ(:,:,L)
 	    RJ_SUM(L)=T2*RJ(L)
 	  END DO
+!
+!$OMP PARALLEL PRIVATE(L,K)
+!$OMP DO
 	  DO L=DST,DEND
 	    DO K=1,NUM_BNDS
 	      IF(K .EQ. DIAG_INDX)THEN
@@ -180,11 +183,15 @@
 	      END IF
 	    END DO
 	  END DO
+!$OMP END DO
+!$OMP END PARALLEL
 	  CALL TUNE(2,'BA_UP_NFF')
 	  RETURN
 	ELSE IF(NEW_CONT)THEN		!and hence `single frequency' band
 	  CALL TUNE(1,'BA_UP_NC')
 	  T2=FQW/NU
+CC!$OMP PARALLEL PRIVATE(L,ID,T1)
+CC!$OMP DO
 	  DO L=DST,DEND
 	    T1=T2*EXP(-HDKT*NU/T(L))
 	    DO ID=1,NION
@@ -193,10 +200,14 @@
 	      END IF
 	    END DO
 	  END DO
+CC!$OMP END DO
+CC!$OMP END PARALLEL
 	  CALL TUNE(2,'BA_UP_NC')
 	ELSE
 	  CALL TUNE(1,'BA_UP_VJ')
 	  T2=FQW/NU
+!$OMP PARALLEL PRIVATE(L,I,K,T1)
+!$OMP DO
 	  DO L=DST,DEND
 	    T1=T2*EXP(-HDKT*NU/T(L))
 	    DO K=1,NUM_BNDS
@@ -207,9 +218,13 @@
 	    END DO
 	    RJ_SUM(L)=RJ_SUM(L)+T2*RJ(L)
 	  END DO
+!$OMP END DO
+!$OMP END PARALLEL
 	  CALL TUNE(2,'BA_UP_VJ')
 !
 	  CALL TUNE(1,'BA_UP_VT')
+!$OMP PARALLEL PRIVATE(L,I,K,T1,T2)
+!$OMP DO
 	  DO L=DST,DEND
 	    T1=CHI_CONT(L)-ESEC(L)
 	    T2=FQW*T1
@@ -227,6 +242,8 @@
 	      END IF
 	    END DO
 	  END DO
+!$OMP END DO
+!$OMP END PARALLEL
 	  CALL TUNE(2,'BA_UP_VT')
 	END IF
 !
@@ -236,6 +253,8 @@
 ! we loop over all L. This minimizes paging.
 !
 	  CALL TUNE(1,'BA_UP_BANF')
+!$OMP PARALLEL PRIVATE(L,J,K,QFV_T)
+!$OMP DO
 	  DO L=DST,DEND					!S.E. equation depth
 	    QFV_T=FQW*(CHI_CONT(L)-ESEC(L))
 	    DO K=1,NUM_BNDS
@@ -251,7 +270,11 @@
 	      END IF
  	    END DO
 	  END DO
-C
+!$OMP END DO
+!$OMP END PARALLEL
+!
+!$OMP PARALLEL PRIVATE(L,J,K,LS,BNDST,BNDEND)
+!$OMP DO
 	  DO L=DST,DEND
 	    BNDST=MAX( 1+DIAG_INDX-L, 1 )
 	    BNDEND=MIN( ND+DIAG_INDX-L, NUM_BNDS )
@@ -262,9 +285,13 @@ C
 	      END DO
 	    END DO
 	  END DO
+!$OMP END DO
+!$OMP END PARALLEL
 !
 	  DO ID=1,NION
 	    IF(SE(ID)%XzV_PRES)THEN
+!$OMP PARALLEL PRIVATE(L,I,J,K,JJ,BNDST,BNDEND)
+!$OMP DO
 	      DO L=DST,DEND
 	        BNDST=MAX( 1+DIAG_INDX-L, 1 )
 	        BNDEND=MIN( ND+DIAG_INDX-L, NUM_BNDS )
@@ -292,6 +319,8 @@ C
 	          END IF
 	        END DO		!Loop over band
 	      END DO		!Do DST to DEND
+!$OMP END DO
+!$OMP END PARALLEL
 	    END IF		!Is species present
 	  END DO		!Loop over species
 	  CALL TUNE(2,'BA_UP_BANF')
@@ -300,6 +329,9 @@ C Update BA matrices for several frequencies at once.
 C
 	ELSE IF(FINAL_FREQ)THEN
 	  CALL TUNE(1,'BA_FF')
+!
+!$OMP PARALLEL PRIVATE(L,J,K,BNDST,BNDEND)
+!$OMP DO
 	  DO L=DST,DEND					!S.E. equation depth
 	    BNDST=MAX( 1+DIAG_INDX-L, 1 )
 	    BNDEND=MIN( ND+DIAG_INDX-L, NUM_BNDS )
@@ -315,10 +347,14 @@ C
 	      END IF
 	    END DO
 	  END DO
+!$OMP END DO
+!$OMP END PARALLEL
 C
 C NB: We use VJ_P to compute COMP_VEC as this is defined a Int[ (VJ/v) dv].
 C            RJ_SUM is defined in the same way (i..e., Int[ (J/v) dv]
 C
+!$OMP PARALLEL PRIVATE(L,J,K,LS,BNDST,BNDEND)
+!$OMP DO
 	  DO L=DST,DEND
 	    BNDST=MAX( 1+DIAG_INDX-L, 1 )
 	    BNDEND=MIN( ND+DIAG_INDX-L, NUM_BNDS )
@@ -329,10 +365,14 @@ C
 	      END DO
 	    END DO
 	  END DO
+!$OMP END DO
+!$OMP END PARALLEL
 !
 	  DO ID=1,NION
 	    IF(SE(ID)%XzV_PRES)THEN
 !
+!$OMP PARALLEL PRIVATE(L,K,J,JJ,I)
+!$OMP DO
 	      DO L=DST,DEND
 	        K=DIAG_INDX
    	        DO JJ=1,SE(ID)%N_IV	  	  	  !Variable
@@ -345,7 +385,11 @@ C
 	          END IF
 	        END DO
 	      END DO
+!$OMP END DO
+!$OMP END PARALLEL
 !
+!$OMP PARALLEL PRIVATE(L,K,J,JJ,I,BNDST,BNDEND)
+!$OMP DO
 	      DO L=DST,DEND
 	        BNDST=MAX( 1+DIAG_INDX-L, 1 )
 	        BNDEND=MIN( ND+DIAG_INDX-L, NUM_BNDS )
@@ -363,6 +407,8 @@ C
 	          END IF
 	        END DO			!Loop over K (band index)
 	      END DO			!Loop over depth (DST to DEND)
+!$OMP END DO
+!$OMP END PARALLEL
 !
 	    END IF			!Is species present
 	  END DO			!Loop over ion

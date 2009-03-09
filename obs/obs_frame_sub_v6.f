@@ -586,12 +586,18 @@
 !     Thus at the beginning of each loop, we restore NRAY.
 !
 	  CALL TUNE(1,'ML')
+!
+!$OMP PARALLEL PRIVATE(ETA_VEC, CHI_VEC, TAU, DTAU, S, dS, EE, E0, E1, E2, E3,  
+!$OMP1   A0,A1,A2,A3,A4, PAR_FLUX, SM_NRAY, INDX, I, J, K, T1, T2, T3, T4)
+!$OMP DO
 	  DO 40000 ML=1+(OUT_ML-1)*NOS_INC,MIN(NOS,OUT_ML*NOS_INC)
 !
 	    ETA_VEC(1:NRAY)=0.0D0
 	    CHI_VEC(1:NRAY)=0.0D0
 !
-	    K=INDX(1)
+!	    K=INDX(1)
+	    K=1   !INDX(1)
+	    INDX(1)=1
 	    T1=OBS_FREQ(ML)*(1.0D0-VMU_RAY(1))*GAM_RAY(1)
 	    DO WHILE(T1 .LT. SM_FREQ_CMF(K))
 	      K=K+1
@@ -621,7 +627,7 @@
 !
 	    TAU(1)=CHI_VEC(1)*HALF_DZ(2)
 	    SM_NRAY=NRAY
-	    CALL TUNE(1,'FREQ INTERP')
+!	    CALL TUNE(1,'FREQ INTERP')
 	    DO I=2,NRAY
 	      J=I
 	      IF(I .GT. NR)J=2*NR-I
@@ -629,11 +635,14 @@
 ! Interpolate in frequency to transform ETA and CHI from the comoving frame to
 ! the observers frame for this ray and frequency.
 !
-	      K=INDX(I)
+	      K=INDX(I-1)      !INDX(I)
+!	      K=INDX(I)
 	      T1=OBS_FREQ(ML)*(1.0D0-VMU_RAY(I))*GAM_RAY(I)
-	      DO WHILE(T1 .LT. SM_FREQ_CMF(K))
-	        K=K+1
-	        IF(K .GT. SM_NCF)THEN
+!	      DO WHILE(T1 .LT. SM_FREQ_CMF(K))
+	      DO WHILE(T1 .GT. SM_FREQ_CMF(K-1))
+	        K=K-1
+!	        IF(K .GT. SM_NCF)THEN
+	        IF(K .LE. 1)THEN
 	          WRITE(LUER,*)'Error in OBS_FRAME_SUB_V5'
 	          WRITE(LUER,*)'Bad K indx: K=',K
 	          WRITE(LUER,*)T1,SM_FREQ_CMF(1),SM_FREQ_CMF(SM_NCF)
@@ -661,7 +670,7 @@
 	    END DO
 !
 2500	    CONTINUE
-	    CALL TUNE(2,'FREQ INTERP')
+!	    CALL TUNE(2,'FREQ INTERP')
 !
 ! Use the first derivatives in conjunction with the Euler-MaucLarin summation
 ! formula to increase the accuracy of the optical depth integration. No 
@@ -723,7 +732,7 @@
 !
 	    T1=MINVAL(CHI_VEC(1:SM_NRAY))
 	    IF(T1 .GT. 0 .AND. INT_METHOD .EQ. 'STAU')THEN
-	      CALL TUNE(1,'ST FLUX')
+!	      CALL TUNE(1,'ST FLUX')
 	      DO I=1,SM_NRAY
                 ETA_VEC(I)=ETA_VEC(I)/CHI_VEC(I)
 	      END DO
@@ -799,12 +808,12 @@
 	        PAR_FLUX=ETA_VEC(SM_NRAY)	!Ray is thick!
 	      ELSE IF(LS .GT. NC)THEN
 	        PAR_FLUX=0.0D0			!No incident radiation
-	      ELSE IF(LS .EQ. 1 .AND. ERR_COUNT .LE. 10)THEN
-	        WRITE(LUER,*)'Warning in OBS_FRAME_SUB'
-	        WRITE(LUER,*)'Some core rays have TAU_MAX < 20'
-	        WRITE(LUER,*)'Observers Frequency is',OBS_FREQ(ML)
-	        ERR_COUNT=ERR_COUNT+1
-	        PAR_FLUX=ETA_VEC(SM_NRAY)
+!	      ELSE IF(LS .EQ. 1 .AND. ERR_COUNT .LE. 10)THEN
+!	        WRITE(LUER,*)'Warning in OBS_FRAME_SUB'
+!	        WRITE(LUER,*)'Some core rays have TAU_MAX < 20'
+!	        WRITE(LUER,*)'Observers Frequency is',OBS_FREQ(ML)
+!	        ERR_COUNT=ERR_COUNT+1
+!	        PAR_FLUX=ETA_VEC(SM_NRAY)
 	      ELSE
 	        PAR_FLUX=ETA_VEC(SM_NRAY)
 	      END IF
@@ -815,7 +824,7 @@
 	1        -     dS(I+1)*A3(I)
 	1        -     dS(I)*A4(I) )
 	      END DO
-	      CALL TUNE(2,'ST FLUX')
+!	      CALL TUNE(2,'ST FLUX')
 	    ELSE
 !
 	      TAU(1)=CHI_VEC(1)*HALF_DZ(2)
@@ -825,7 +834,7 @@
 !
 ! Compute the integrand = ETA*EXP(-TAU)
 !
-	      CALL TUNE(1,'FLUX INTEG')
+!	      CALL TUNE(1,'FLUX INTEG')
 	      DO I=1,SM_NRAY
 	        ETA_VEC(I)=ETA_VEC(I)*DEXP(-TAU(I))
 	      END DO 
@@ -852,7 +861,7 @@
 	      IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
 	      PAR_FLUX=PAR_FLUX + (T3+T4)
 !
-	      CALL TUNE(2,'FLUX INTEG')
+!	      CALL TUNE(2,'FLUX INTEG')
 	    END IF
 !	    
 !
@@ -862,6 +871,9 @@
 	    IF(WRITE_IP)IP_OBS(LS,ML)=PAR_FLUX
 !
 40000	  CONTINUE
+!$OMP END DO
+!$OMP END PARALLEL
+!
 	  CALL TUNE(2,'ML')      
 45000	  CONTINUE
 !

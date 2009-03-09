@@ -788,7 +788,21 @@
 	      T1=0.5D0*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML))
 	      TA(ML)=TA(ML-1)+T1*(ZM(ID)%RJ(I,ML-1)+ZM(ID)%RJ(I,ML))
 	    END DO
-	    WRITE(T_OUT,*)'Luminosity is:',TA(NCF)*4.1274D+03
+	    IF( ZM(ID)%DATA_TYPE .EQ. 'H')THEN
+	      IF(ND .EQ. ND_ATM)THEN
+	        WRITE(T_OUT,'(/,A,ES11.4)')' Luminosity is:',R(I)*R(I)*TA(NCF)*4.1274D+03
+	      ElSE 
+	        WRITE(T_OUT,'(/,A,ES11.4)')' Luminosity/R(10^10cm)^2 is:',TA(NCF)*4.1274D+03
+	      END IF
+	    ELSE
+	      IF(ND .EQ. ND_ATM)THEN
+	        STRING=' 16 pi^2 r^2 '//TRIM(ZM(ID)%DATA_TYPE)//'/Lsun is:'
+	        WRITE(T_OUT,'(/,A,ES11.4)')TRIM(STRING),R(I)*R(I)*TA(NCF)*4.1274D+03
+	      ElSE 
+	        STRING=' 1.6E+21 pi^2 '//TRIM(ZM(ID)%DATA_TYPE)//'/Lsun is:'
+	        WRITE(T_OUT,'(/,A,ES11.4)')TRIM(STRING),TA(NCF)*4.1274D+03
+	      END IF
+	    END IF
 	    DO ML=1,NCF
 	      XV(ML)=ZM(ID)%NU(ML)
 	      YV(ML)=TA(ML)/TA(NCF)
@@ -796,7 +810,7 @@
 	    CALL DP_CNVRT_J_V2(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,'NAT',
 	1         ZM(ID)%DATA_TYPE,LAMC,XAXIS,YAXIS,L_FALSE)
 	    CALL DP_CURVE(NCF,XV,YV)
-	    YAXIS='L\g\dv\u/L'
+	    YAXIS='C\dL\u(\gv)/L'
 	  END DO
 !
 	ELSE IF(X(1:2) .EQ. 'CF')THEN

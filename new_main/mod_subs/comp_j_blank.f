@@ -910,6 +910,16 @@ C
 	    K_MOM(I)=K_MOM(I)*FEDD(I)
 	  END DO
 	END IF
-C
+!
+	IF(ABS(RJ(1)) .GT. 1.0D+30)THEN
+	  WRITE(LUER,*)' '
+	  WRITE(LUER,*)' '
+	  WRITE(LUER,*)'Error in comp_j_blank.f'
+	  WRITE(LUER,*)'Mean intensity blowing up, which is due to an instabilty'
+	  WRITE(LUER,*)'Try a finer grid at the outer boudary (preferred choice?)'
+	  WRITE(LUER,*)'Alternatively try a different N_TYPE option'
+	  STOP
+	END IF
+!
 	RETURN
 	END

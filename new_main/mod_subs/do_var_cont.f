@@ -674,7 +674,7 @@ C The matrix TX gives dJ ( J depth, X depth, X) where X represent some
 C fundamental parameter such as CHI_C, ETA_C, ESEC, ETAL_ etc
 C
 C We now convert TX  to a smaller matrix, taking into account only the 
-C variation of X at J's depth, and neighbouring depths.
+C variation of X at Js depth, and neighbouring depths.
 C
 C dJ_LOC( X , X depth [1=3:NUM_BNDS], J depth )
 C
@@ -699,6 +699,10 @@ C
 C NOPS= ND*NUM_BNDS*( 6NT + 2 + 7NUM_SIM )
 C
 	  CALL TUNE(1,'VC_VCHI')
+!
+!$OMP PARALLEL PRIVATE(I,J,K,L,NL)
+!$OMP DO SCHEDULE(STATIC, 1)
+!
 	  DO K=1,ND
 	    DO J=BNDST(K),BNDEND(K)
 	      L=BND_TO_FULL(J,K)
@@ -721,6 +725,10 @@ C
 	      END DO
 	    END DO	!Over Variable depth (1:NUM_BNDS)
 	  END DO		!Over J depth.
+!
+!$OMP END DO
+!$OMP END PARALLEL
+!
 	  CALL TUNE(2,'VC_VCHI')
 C
 C	  DO L=1,ND

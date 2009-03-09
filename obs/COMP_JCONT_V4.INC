@@ -914,3 +914,17 @@ C
 	  END DO
 	END IF
 !
+	IF(ABS(RJ(1)) .GT. 1.0D+30)THEN
+	  WRITE(LUER,*)' '
+	  WRITE(LUER,*)' '
+	  WRITE(LUER,*)('*',I=1,80)
+	  WRITE(LUER,*)'Error in COMP_JCONT_V4.INC'
+	  WRITE(LUER,*)'Mean intensity blowing up, which is due to an instabilty'
+	  WRITE(LUER,*)'Try a diferent N_TYPE option'
+	  WRITE(LUER,*)'Alternatively set INC_GRID=ALL_FREQ=T and NINS=1'
+	  WRITE(LUER,*)'Setting DELV_FG & DELV_MOM to 1 will also help'
+	  WRITE(LUER,*)('*',I=1,80)
+	  WRITE(LUER,*)' '
+	  WRITE(LUER,*)' '
+	  STOP
+	END IF

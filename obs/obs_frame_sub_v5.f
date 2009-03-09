@@ -549,6 +549,10 @@
 ! NB: In this loop we corrupt NRAY because we cease our integration at TAU_MAX.
 !     Thus at the beginning of each loop, we restore NRAY.
 !
+!OMP PARALLEL
+!OMP PRIVATE (ETA_VEC, CHI_VEC, TAU, DTAU, S, dS, EE, E0, E1, E2, E3)
+!OMP PRIVATE (A0,A1,A2,A3,A4, PAR_FLUX, SM_NRAY, INDX, I, K, T1, T2)
+!OMP DO 
 	  CALL TUNE(1,'ML')
 	  DO 40000 ML=1+(OUT_ML-1)*NOS_INC,MIN(NOS,OUT_ML*NOS_INC)
 !
@@ -763,12 +767,12 @@
 	        PAR_FLUX=ETA_VEC(SM_NRAY)	!Ray is thick!
 	      ELSE IF(LS .GT. NC)THEN
 	        PAR_FLUX=0.0D0			!No incident radiation
-	      ELSE IF(LS .EQ. 1 .AND. ERR_COUNT .LE. 10)THEN
-	        WRITE(LUER,*)'Warning in OBS_FRAME_SUB'
-	        WRITE(LUER,*)'Some core rays have TAU_MAX < 20'
-	        WRITE(LUER,*)'Observers Frequency is',OBS_FREQ(ML)
-	        ERR_COUNT=ERR_COUNT+1
-	        PAR_FLUX=ETA_VEC(SM_NRAY)
+!	      ELSE IF(LS .EQ. 1 .AND. ERR_COUNT .LE. 10)THEN
+!	        WRITE(LUER,*)'Warning in OBS_FRAME_SUB'
+!	        WRITE(LUER,*)'Some core rays have TAU_MAX < 20'
+!	        WRITE(LUER,*)'Observers Frequency is',OBS_FREQ(ML)
+!	        ERR_COUNT=ERR_COUNT+1
+!	        PAR_FLUX=ETA_VEC(SM_NRAY)
 	      ELSE
 	        PAR_FLUX=ETA_VEC(SM_NRAY)
 	      END IF
@@ -827,6 +831,9 @@
 !
 40000	  CONTINUE
 	  CALL TUNE(2,'ML')      
+!OMP END DO
+!OMP END PARALLEL
+!
 45000	  CONTINUE
 !
 	  WRITE(LUER,'(A,I3,A,I5)')

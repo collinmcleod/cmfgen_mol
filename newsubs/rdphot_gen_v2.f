@@ -587,8 +587,9 @@
 	          IF(XzV_ION_LEV_ID(PHOT_ID) .EQ. 0)THEN
 	            XzV_ION_LEV_ID(PHOT_ID)=F_TO_S_XzSIX(I)
 	          ELSE IF(XzV_ION_LEV_ID(PHOT_ID) .NE. F_TO_S_XzSIX(I))THEN
-	            WRITE(2,*)'Warning in RDPHOT_GEN_V1: ',DESC
+	            WRITE(LUER,*)'Warning in RDPHOT_GEN_V1: ',DESC
 	            WRITE(LUER,*)'Super levels of final states do not match'
+	            WRITE(LUER,*)'Final state is: ',FINAL_STATE(PHOT_ID,1)
 !
 ! Need to decide how to treat this better
 !	            STOP

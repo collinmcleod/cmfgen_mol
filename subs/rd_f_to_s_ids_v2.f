@@ -113,10 +113,12 @@ C
 	CALL DO_SL_ADJUSTEMENT(F_TO_S,INT_SEQ,N_F,N_S,SL_OPTION)
 !
 	IF(MAXVAL(F_TO_S) .NE. N_S)THEN
-	  WRITE(LUER,*)'Error in RD_F_TO_S_IDS_V2'
-	  WRITE(LUER,*)'Currently treating ',FILENAME
-	  WRITE(LUER,*)'Maximum NS in F_TO_S is',MAXVAL(F_TO_S)
-	  WRITE(LUER,*)'NS is',N_S
+	  WRITE(LUER,*)' '
+	  WRITE(LUER,'(1X,80A)')('*',I=1,80)
+	  WRITE(LUER,*)'Error in RD_F_TO_S_IDS_V2: Currently treating ',TRIM(FILENAME)
+	  WRITE(LUER,'(A,I4,3X,A,I4)')' NS=',N_S,'Maximum NS in F_TO_S is',MAXVAL(F_TO_S)
+	  WRITE(LUER,'(1X,80A)')('*',I=1,80)
+	  WRITE(LUER,*)' '
 	  STOP
 	END IF
 !

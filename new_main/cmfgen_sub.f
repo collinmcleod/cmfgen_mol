@@ -3707,9 +3707,11 @@
 ! Include the machanical luminosity imparted to the wind by the radiation 
 ! field in the total luminosity, and subtract out radioactive energy deposition..
 !
+! Altered: 28_Feb-2009: Chnaged J to  I in dE_RAD_DECAY.
+!
 	  T3=0.0D0
 	  DO I=ND-1,1,-1
-	    T3=T3+MECH_LUM(I)+DJDT_FLUX(I)+dE_WORK(I)-dE_RAD_DECAY(J)
+	    T3=T3+MECH_LUM(I)+DJDT_FLUX(I)+dE_WORK(I)-dE_RAD_DECAY(I)
 	    RLUMST(I)=RLUMST(I) + T3
 	  END DO
 	  CALL WRITV(RLUMST,ND,'Luminosity Check (not observed luminosity)',LU_FLUX)
@@ -3725,7 +3727,10 @@
 	  WRITE(LU_FLUX,'(A,T60,1PE12.4)')'Total Line luminosity:',T1
 	  WRITE(LU_FLUX,'(A,T60,1PE12.4)')
 	1   'Total Dielectronic and Implicit Recombination Luminosity:',T2
-	  WRITE(LU_FLUX,'(A,T60,1PE12.4)')'Total Mechanical Luminosity:',T3
+	  WRITE(LU_FLUX,'(A,T60,1PE12.4)')'Total Mechanical Luminosity:',SUM(MECH_LUM)
+	  WRITE(LU_FLUX,'(A,T60,1PE12.4)')'            Total DJDT_FLUX:',SUM(DJDT_FLUX)
+	  WRITE(LU_FLUX,'(A,T60,1PE12.4)')'         Total dE_RAD_DECAY:',SUM(dE_RAD_DECAY)
+	  WRITE(LU_FLUX,'(A,T60,1PE12.4)')'              Total dE_WORK:',SUM(dE_WORK)
 !
 ! The seocnd XRAY flux printed is the OBSERVED XRAY luminosity. Its should be very similar
 ! to the eralier value for optically thin winds.

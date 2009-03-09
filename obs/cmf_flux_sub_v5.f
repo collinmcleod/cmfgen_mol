@@ -1310,6 +1310,7 @@ C than an IF statement, to handle lines which begin at the same (upper)
 C frequency.
 C
 C
+	CALL TUNE(IONE,'ADD_LINE')
 	DO WHILE( LAST_LINE .LT. N_LINE_FREQ .AND.
 	1                ML .EQ. LINE_ST_INDX_IN_NU(LAST_LINE+1) )
 C
@@ -1438,6 +1439,7 @@ C
 	  END DO
 C	   
 	END DO	!Checking whether a  new line is being added.
+	CALL TUNE(ITWO,'ADD_LINE')
 C
 C 
 C
@@ -1460,6 +1462,7 @@ C
 !
 ! Compute profile: Doppler or Stark: T2 and T3 are presently garbage.
 !
+	  CALL TUNE(IONE,'SET_PROF')
 	  TA(1:ND)=0.0D0; TB(1:ND)=0.0D0
 	  DO SIM_INDX=1,MAX_SIM
 	    IF(RESONANCE_ZONE(SIM_INDX))THEN
@@ -1477,6 +1480,7 @@ C
 	      LINE_PROF_SIM(1:ND,SIM_INDX)=0.0D0
 	    END IF
 	  END DO                                    
+	  CALL TUNE(ITWO,'SET_PROF')
 C
 C 
 C
@@ -1506,6 +1510,7 @@ C
 	    ETA_CONT(I)=ETA(I)
 	  END DO
 C
+	  CALL TUNE(IONE,'OP_TOT')
 	  DO SIM_INDX=1,MAX_SIM
 	    IF(RESONANCE_ZONE(SIM_INDX))THEN
 	      DO I=1,ND
@@ -1514,6 +1519,7 @@ C
 	      END DO
 	    END IF
 	  END DO
+	  CALL TUNE(ITWO,'OP_TOT')
 C
 C CHECK for negative line opacities. We do not distinguish between lines.  
 C
@@ -1577,7 +1583,9 @@ C
 C
 C Compute continuum intensity.
 C
+	  CALL TUNE(IONE,'COMP_JCONT')
 	  INCLUDE 'COMP_JCONT_V4.INC'	
+	  CALL TUNE(ITWO,'COMP_JCONT')
 C
 C
 C Free up LINE storage locations. As we are only computing the line flux,

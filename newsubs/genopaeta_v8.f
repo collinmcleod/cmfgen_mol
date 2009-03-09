@@ -234,6 +234,8 @@ C
 C
 C Inner loop is over level.
 C
+CC!$OMP PARALLEL PRIVATE(TMP_ETA,TMP_CHI,T1,T2,I,K)
+CC!$OMP DO 
 	  DO K=K_ST,ND
 	    TMP_CHI(1:N)=0.0D0
 	    TMP_ETA(1:N)=0.0D0
@@ -254,6 +256,8 @@ C
 	    CHI(K)=CHI(K)+SUM(TMP_CHI)
 	    ETA(K)=ETA(K)+TETA1*SUM(TMP_ETA)
 	  END DO		!Depth
+CC!$OMP END DO
+CC!$OMP END PARALLEL
 	END IF			!Which inner loop.
 C
 	CALL TUNE(2,'GENOPA')

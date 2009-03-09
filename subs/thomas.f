@@ -92,20 +92,37 @@ C code as array is accessed in correct manner.
 C
 C Forward elimination.
 C
-	  DO J=1,N2
-	    D(1,J)=D(1,J)*B(1)
+	  IF(N2 .EQ. 1)THEN
+	    D(1,1)=D(1,1)*B(1)
 	    DO I=2,N1
-	      D(I,J)=(D(I,J)-A(I)*D(I-1,J))*B(I)
+	      D(I,1)=(D(I,1)-A(I)*D(I-1,1))*B(I)
 	    END DO
-	  END DO
+	  ELSE
+!$OMP PARALLEL DO
+	    DO J=1,N2
+	      D(1,J)=D(1,J)*B(1)
+	      DO I=2,N1
+	        D(I,J)=(D(I,J)-A(I)*D(I-1,J))*B(I)
+	      END DO
+	    END DO
+!$OMP END PARALLEL DO
+	  END IF
 C
 C Perform the back substitution. NB D(N1,J)=D(N1,J) is first step.
 C
-	  DO J=1,N2
+	  IF(N2 .EQ. 1)THEN
 	    DO I=N1-1,1,-1
-	       D(I,J)=D(I,J)+C(I)*D(I+1,J)
+	      D(I,1)=D(I,1)+C(I)*D(I+1,1)
 	    END DO
-	  END DO
+	  ELSE
+!$OMP PARALLEL DO
+	    DO J=1,N2
+	      DO I=N1-1,1,-1
+	         D(I,J)=D(I,J)+C(I)*D(I+1,J)
+	      END DO
+	    END DO
+!$OMP END PARALLEL DO
+	  END IF
 	END IF
 C
 	RETURN

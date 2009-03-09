@@ -1231,6 +1231,8 @@ C
 !
 ! Enter loop to perform integration along each ray.
 !
+!$OMP PARALLEL DO PRIVATE(SOURCE_PRIME,SOURCE_RAY,CHI_RAY,ETA_RAY,dCHIdR_RAY,Q,EE,E0,E1,E2,E3,S,dS,T1,T2,I_CORE,dZ,NI,I,K)
+!
 	  DO LS=1,NP
 !
 	    IF(NI_RAY(LS) .EQ. 1)THEN
@@ -1453,9 +1455,12 @@ C
 !
 !	    CALL TUNE(2,'FG_INT_INT')
 	  END DO			!LS
+!$OMP END PARALLEL DO
 !
 ! Compute the mean intensity like variable U at each grid point. Used to
 ! compute J.
+!
+!$OMP PARALLEL DO 
 !
 	  DO LS=1,NP
 	    DO I=1,NI_RAY(LS)
@@ -1463,14 +1468,18 @@ C
 	    END DO
 	  END DO
 !
+!$OMP END PARALLEL DO
+!
 ! We define CV on the gregular grid. We perform the interpolation onto
 ! the original R grid as we compute H.
 !
+!$OMP PARALLEL DO 
 	  DO LS=1,NP
 	    DO I=1,NI_RAY(LS)
 	      CV(I,LS)= 0.5D0*( I_P(I,LS)-I_M(I,LS) )
 	    END DO
 	  END DO
+!$OMP END PARALLEL DO
 !
 	  I_P_STORE(:,:)=I_P(:,:)
 	  I_M_STORE(:,:)=I_M(:,:)

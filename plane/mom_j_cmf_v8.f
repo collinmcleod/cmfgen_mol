@@ -17,9 +17,6 @@
 	REAL*8, ALLOCATABLE :: ESEC_COEF(:,:)
 	REAL*8, ALLOCATABLE :: CHI_COEF(:,:)
 	REAL*8, ALLOCATABLE :: ETA_COEF(:,:)
-	REAL*8, ALLOCATABLE :: F_COEF(:,:)
-	REAL*8, ALLOCATABLE :: G_COEF(:,:)
-	REAL*8, ALLOCATABLE :: NMID_ON_J_COEF(:,:)
 !
 ! All the following rays have dimension ND, where ND >= ND_SM.
 ! Some of the data in the arrays is need in subsequent calls.
@@ -205,9 +202,6 @@
 	  DEALLOCATE ( ETA_COEF )
 	  DEALLOCATE ( ESEC_COEF )
 	  DEALLOCATE ( CHI_COEF )
-	  DEALLOCATE ( F_COEF )
-	  DEALLOCATE ( G_COEF )
-	  DEALLOCATE ( NMID_ON_J_COEF )
 !
 	  DEALLOCATE ( V )
 	  DEALLOCATE ( SIGMA )

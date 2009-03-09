@@ -82,6 +82,9 @@
 !
 	REAL*8 T1
 	REAL*8 FREQ
+!
+	INTEGER LUER,ERROR_LU
+        EXTERNAL ERROR_LU
 	INTEGER I
 	INTEGER IFAIL
 ! 
@@ -420,6 +423,15 @@
 !
 	TA_SAV=TA; TB_SAV=TB; TC_SAV=TC; XM_SAV=XM
 	CALL THOMAS(TA,TB,TC,XM,ND,1)
+!
+	DO I=1,ND
+	  IF(XM(I) .GT. 1.0D+20)THEN
+	    LUER=ERROR_LU()
+	    WRITE(LUER,*)'Error in VAR_JREL_V2: RJ blowing up'
+	    WRITE(LUER,'(6ES12.4)')(XM(I),I=1,ND)
+	    STOP
+	  END IF
+	END DO
 !
 ! Check that no negative mean intensities have been computed.
 !
