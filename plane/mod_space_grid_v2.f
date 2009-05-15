@@ -45,7 +45,9 @@
 !
 	  INTEGER, ALLOCATABLE :: LNK(:)		!Indicates link to original grid
 !
+	  REAL*8, ALLOCATABLE :: I_IN_BND_STORE(:) 
 	  REAL*8 P_RAY				      	!P for ray
+	  REAL*8 FREQ_CONV_FAC				!Frequency conversion factor for hollow core.
 
 	  INTEGER  NZ	 	                    	!number of grid points along a p-ray
 !
@@ -77,7 +79,10 @@
 	REAL*8, ALLOCATABLE :: NQW_M(:,:)
 !
 	REAL*8, ALLOCATABLE :: R_EXT_SAV(:)
+	REAL*8, ALLOCATABLE :: FREQ_STORE(:)
 !
+	INTEGER CUR_LOC
+	INTEGER N_STORE
 	INTEGER ND_SAV
 	INTEGER ND_EXT_SAV
 	INTEGER NP_SAV
