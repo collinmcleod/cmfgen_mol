@@ -251,6 +251,7 @@
 	1         16,16.5,17.0/
 !
 	INTEGER LEV(10)
+	INTEGER IDEPTH(10)
 	LOGICAL FLAG,LINV,TRAPFORJ,JONS,JONLY,IN_R_SUN,SONLY
 	LOGICAL ELEC,DIF,SCALE,THICK,NORAD,ROSS,INC_RAY_SCAT
 	LOGICAL SPEC_FRAC,RADIAL
@@ -1338,7 +1339,7 @@
 	    IF(UC(N_TYPE(1:1)) .EQ. 'N')N_TYPE='N_ON_J'
 	    IF(UC(N_TYPE(1:1)) .EQ. 'G')N_TYPE='G_ONLY'
 !
-	    CALL USR_OPTION(LEV,10,1,'DEPTHS','0','Depths to be plotted ')
+	    CALL USR_OPTION(IDEPTH,10,1,'DEPTHS','0','Depths to be plotted [0 plots JBAR] ')
 	    CALL USR_OPTION(RED_EXT,'RED_EXT','14.0D0','Redward extension in Doppler widths' )
 	    CALL USR_OPTION(VDOP_FG_FRAC,'FG_FRAC','0','Doppler fraction for FG[V10] ')
 	    CALL USR_OPTION(VDOP_MOM_FRAC,'MOM_FRAC','0','Doppler fraction for MOM[V6] ')
@@ -1346,7 +1347,7 @@
 	    CALL USR_OPTION(FG_SOL_OPT,'SOL_METH','INT/INS','FG solution method: INT/INS or DIFF/INS')
 !
 	    PLT_J=.FALSE.; PLT_H=.FALSE.; PLT_LF=.FALSE.; PLT_LF=.FALSE.; PLT_FM=.FALSE.
-	    IF(LEV(1) .EQ. 0)THEN
+	    IF(DEPTHS(1) .EQ. 0)THEN
 	    ELSE
 	      CALL USR_OPTION(PLT_J,'PLT_J','F','Plot J')
 	      CALL USR_OPTION(PLT_H,'PLT_H','F','Plot H')
@@ -1379,7 +1380,7 @@
 	      IF(PLT_LF .AND. YAXIS .EQ. ' ')YAXIS='R\u2\d^LF'
 	      IF(PLT_LF .AND. YAXIS .EQ. ' ')YAXIS='MT'
 	   ELSE
-	    LEV(1)=0
+	    IDEPTH(1)=0
 	    CALL USR_OPTION(FULL_ES,'ALLES','T',
 	1        'Include line photons scatterd in resonace zone ?')
 	    CALL USR_HIDDEN(SKIPEW,'SKIPEW','F','Skip accurate EW computation ?')
@@ -1440,7 +1441,7 @@
 	  DO I=1,ND
 	    YV(I)=LOG10(JBAR(I))
 	  END DO
-	  IF(LEV(1) .EQ. 0)THEN
+	  IF(IDEPTH(1) .EQ. 0)THEN
 	    CALL DP_CURVE(ND,XV,YV)
 	    YAXIS='Log(Jbar)'
 	  END IF
