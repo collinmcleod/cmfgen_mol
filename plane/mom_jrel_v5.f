@@ -294,6 +294,7 @@
 	REAL*8 MAX_ER
 	REAL*8 DELTA_R
 	REAL*8 VDOP_MIN
+	REAL*8 TA_SAV,TB_SAV,XM_SAV
 !
 	INTEGER COUNT
 	INTEGER IFAIL
@@ -319,6 +320,7 @@
 	  DO I=1,ND_SM-1
 	    IT1=INT( (V_SM(I)-V_SM(I+1))/VDOP_MIN )
 	    IF( MOD(IT1,2) .NE. 0)IT1=IT1+1
+	    IF(I .EQ. ND_SM-1)IT1=20
 	    IF(IT1 .GT. 0)K=K+IT1
 	    K=K+1
 	  END DO
@@ -343,6 +345,7 @@
 	  DO I=1,ND_SM-1
             IT1=INT( (V_SM(I)-V_SM(I+1))/VDOP_MIN )
 	    IF( MOD(IT1,2) .NE. 0)IT1=IT1+1
+	    IF(I .EQ. ND_SM-1)IT1=20
             IF(IT1 .GT. 0)THEN
               DELTA_R=(R_SM(I+1)-R_SM(I))/(IT1+1)
                 DO J=1,IT1
@@ -682,6 +685,9 @@
 	    VC(I)=HS(I)
 	    XM(I)=DTAUONQ(I)*SOURCE(I)*R(I)*R(I)
 	  END DO
+!	  WRITE(168,'(6ES18.8)')FREQ,TA(5),TB(5),TC(5),XM(5),PSIPREV(5)
+!	  WRITE(168,'(6ES18.8)')FREQ,TA(15),TB(15),TC(15),XM(15),PSIPREV(15)
+!	  WRITE(168,'(6ES18.8)')FREQ,TA(ND-5),TB(ND-5),TC(ND-5),XM(ND-5),PSIPREV(ND-5)
 !
 ! Evaluate TA,TB,TC for boundary conditions
 !
@@ -705,8 +711,25 @@
 	    XM(ND)=GAM_REL(ND)*DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
 	  ELSE
 	    TA(ND)=-Q(ND-1)*(K_ON_J(ND-1)+VdHdR_TERM(ND-1))/DTAU_H(ND-1)
-	    TB(ND)=(K_ON_J(ND)+VdHdR_TERM(ND))/DTAU_H(ND-1)+IN_HBC*GAM_REL(ND)
-	    XM(ND)=GAM_REL(ND)*R(ND)*R(ND)*IC*(0.25D0+0.5D0*IN_HBC)
+	    TB(ND)=(K_ON_J(ND)+VdHdR_TERM(ND))/DTAU_H(ND-1)
+	    XM(ND)=GAM_REL(ND)*R(ND)*R(ND)*HNU_AT_IB
+!
+	    IF(.NOT. INIT)THEN
+	      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/DLOG_NU
+	      XM(ND)=XM(ND)-T1*K_ON_J_PREV(ND)*GAM_RSQJNU_PREV(ND)
+	      TB(ND)=TB(ND)-T1*K_ON_J(ND)
+	      T1=GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)-1.0D0
+	      XM(ND)=XM(ND)+GAM_REL(ND)*R(ND)*BETA(ND)*( (HNU_AT_IB-HNU_AT_IB_PREV) + T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/DLOG_NU
+	    END IF
+!	    XM(ND)=0.0D0   !GAM_REL(ND)*R(ND)*R(ND)*IN_HBC
+!	    TA(ND)=0.0D0; TC(ND)=0.0D0
+!	    TB(ND)=1.0D0
+!	    XM(ND)=IN_HBC*R(ND)*R(ND)*GAM_REL(ND)
+!	    TA(ND)=-Q(ND-1)*(K_ON_J(ND-1)+VdHdR_TERM(ND-1))/DTAU_H(ND-1)
+!	    TB(ND)=(K_ON_J(ND)+VdHdR_TERM(ND))/DTAU_H(ND-1)-IN_HBC
+!	    XM(ND)=0.0D0
+!	    TB(ND)=(K_ON_J(ND)+VdHdR_TERM(ND))/DTAU_H(ND-1)+IN_HBC*GAM_REL(ND)
+!	    XM(ND)=GAM_REL(ND)*R(ND)*R(ND)*IC*(0.25D0+0.5D0*IN_HBC)
 	  END IF
 	  TC(ND)=0.0D0
 	  VB(ND)=0.0D0
@@ -744,7 +767,10 @@
 !
 ! Solve for the radiation field along ray for this frequency.
 !
+	  TA_SAV=TA(ND);TB_SAV=TB(ND); XM_SAV=XM(ND)
 	  CALL THOMAS(TA,TB,TC,XM,ND,1)
+	  T1=GAM_REL(ND)*R(ND)*R(ND)
+	  WRITE(168,'(8ES18.8)')FREQ,TA_SAV,TB_SAV,XM_SAV,XM(ND-1),XM(ND),T1*JNU_STORE(ND),T1*IN_HBC
 !
 ! Check that no negative mean intensities have been computed.
 !
