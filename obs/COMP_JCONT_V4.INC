@@ -56,6 +56,10 @@ C
 	BNUE=TWOHCSQ*( FL**3 )*EMHNUKT(ND)/T2
 	DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
 	DDBBDT=DBB*(T1*(1.0D0+EMHNUKT(ND))/T2-2.0D0)/T(ND)
+	IF(SN_MODEL)THEN
+	  BNUE=0.0D0; DBB=0.0D0; DDBBDT=0.0D0
+	  IF(FIRST_FREQ)WRITE(LUER,*)'Setting flux to for hollow core in CMF_FLUX_SUB_V5'
+	END IF 
 C
 C Switch to using CHI_CLUMP, ETA_CLUMP, and ESEC_CLUMP in case the model 
 C has clumping.
@@ -622,7 +626,7 @@ C
 	1               FIRST_FREQ,NEW_FREQ,N_TYPE,NC,ND)
              ELSE IF(USE_FORMAL_REL)THEN
                IF(FIRST_FREQ)WRITE(LUER,*)'Calling CMF_FORMAL_REL in COMP_JCONT_V4.INC'
-               CALL CMF_FORMAL_REL_v2
+               CALL CMF_FORMAL_REL_V2
 	1                 (TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
 	1                  TC,FEDD,INBC,HBC_CMF(1),IPLUS,
 	1                  FL,dLOG_NU,DIF,BNUE,DBB,IC,THK_CONT,
