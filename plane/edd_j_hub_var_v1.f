@@ -16,6 +16,7 @@
 	1                  dRHSdCHI_DIF_BC,DIF,ND,NM)
 	IMPLICIT NONE
 !
+! Altered 25-Apr-2009 : Bug fig: dHS replaced by dHT in one expression.
 ! Altered 21-Feb-2007 : DBB replaced by dRHSdCHI_DIF_BC. Fixes small bug in EDD_J_HUB_VAR_V1.
 ! Created 19-July-2006
 !
@@ -166,7 +167,7 @@
 	1             - (dTAdCHI_I*JNU(J)+dTCdCHI_I*JNU(K)+dTBdCHI_I*JNU(I))
 	1             - (dUdCHI+dTBdCHI*JNU(I))
 	1             + (dHSDCHI(I)*RSQ_HNUM1(I)-dHSDCHI(J)*RSQ_HNUM1(J))
-	1             + (dHTDCHI(I)*RSQ_HNU_OLDT(I)-dHSDCHI(J)*RSQ_HNU_OLDT(J))
+	1             + (dHTDCHI(I)*RSQ_HNU_OLDT(I)-dHTDCHI(J)*RSQ_HNU_OLDT(J))
 	1             - T1*SOURCE(I)
 !
 	  VK(I,I,2)=T1
