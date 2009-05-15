@@ -83,14 +83,16 @@
 	DO WHILE(1 .EQ. 1)
 	  WRITE(6,*)' '
 	  WRITE(6,*)'Plot options are:'
-	  WRITE(6,*)' JF:  Plot J against frequency at outer boundary'
-	  WRITE(6,*)' JW:  Plot J against wavelength at outer boundary'
+	  WRITE(6,*)'  JF: Plot J against frequency at outer boundary'
+	  WRITE(6,*)'  JW: Plot J against wavelength at outer boundary'
 	  WRITE(6,*)' dJF: Plot J-J against frequency at outer boundary'
 	  WRITE(6,*)' dJW: Plot J-J against wavelength at outer boundary'
-	  WRITE(6,*)' DF:  Plot Error against frequency at outer boundary'
-	  WRITE(6,*)' DW:  Plot Error against wavelength at outer boundary'
-	  WRITE(6,*)' E(X):  Exit routine'
+	  WRITE(6,*)'  DF: Plot Error against frequency at outer boundary'
+	  WRITE(6,*)'  DW: Plot Error against wavelength at outer boundary'
+	  WRITE(6,*)' I??: Inner boundary options (as for outrer boundary)'
+	  WRITE(6,*)'E(X): Exit routine'
 	  CALL GEN_IN(PLT_OPT,'Plot option')
+!
 	  IF(UC(PLT_OPT) .EQ. 'JF')THEN
 	    CALL DP_CURVE(NCF,NU,JR_OUT)
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J',' ',' ')
@@ -110,6 +112,27 @@
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','% Difference',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'DW')THEN
 	    CALL DP_CURVE(NCF,LAM,DIFF_OUT)
+	    CALL GRAMON_PGPLOT('\gl(\A)','% Difference',' ',' ')
+!
+	  ELSE IF(UC(PLT_OPT) .EQ. 'IJF')THEN
+	    CALL DP_CURVE(NCF,NU,JR_IN)
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'IJW')THEN
+	    CALL DP_CURVE(NCF,LAM,JR_IN)
+	    CALL GRAMON_PGPLOT('\g(\A)','J',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'IDJW')THEN
+	    Y(1:NCF)=JR_IN(1:NCF)-JM_IN(1:NCF)
+	    CALL DP_CURVE(NCF,LAM,Y)
+	    CALL GRAMON_PGPLOT('\g(\A)','J(ray)-J(mom)',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'IDJF')THEN
+	    Y(1:NCF)=JR_IN(1:NCF)-JM_IN(1:NCF)
+	    CALL DP_CURVE(NCF,NU,Y)
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(ray)-J(mom)',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'IDF')THEN
+	    CALL DP_CURVE(NCF,NU,DIFF_IN)
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','% Difference',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'IDW')THEN
+	    CALL DP_CURVE(NCF,LAM,DIFF_IN)
 	    CALL GRAMON_PGPLOT('\gl(\A)','% Difference',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'EX' .OR. UC(PLT_OPT) .EQ. 'E')THEN
 	    STOP
