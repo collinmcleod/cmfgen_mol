@@ -1,6 +1,6 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
-      SUBROUTINE SOLVE_CMF_FORMAL_V2(CHI,ETA,IP,NU_DNU,
+      SUBROUTINE SOLVE_CMF_FORMAL_V2(CHI,ETA,IP,FREQ,NU_DNU,
      *                     BOUNDARY,B_NUE,dBDTAU,ND,NP,NC)
 !
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -37,22 +37,28 @@
 !
 ! Frequency variable
 !
+      real*8 :: freq
       real*8 :: nu_dnu
 !
 ! Boundary conditions
 !
       real*8 :: B_nue,dBdtau
 !
-      character*(*) :: boundary
+      character(len=*) :: boundary
 !
 ! Local variables
 !
       LOGICAL, PARAMETER :: L_TRUE=.TRUE.
       LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
+      real*8 ibound
       real*8 ee,e0,e1,e2,alpha,beta,gamma,t1
       real*8, dimension(nd) :: chi_tau
       real*8, dimension(nd) :: source_prime
+      real*8 new_freq
+!
+      integer ist,iend,imid
+      integer k
 !
       integer :: iz
       integer :: nzz
@@ -149,14 +155,64 @@
       ray(ip)%I_m(nzz)=ray(ip)%I_m(nzz-1)*ee+
      *     alpha*source_prime(nzz-1)+beta*source_prime(nzz)
 !
+! If we are using the holow boundary condition, we need to store the
+! intensity at the inner boundary. This flux will be used to compute
+! the incident intensity at another frequency. We can't directly use
+! the current flux, since the radiation will be redshifted by the 
+! expansion.
+!
+      if(ip .le. nc .and. boundary .eq. 'hollow')then
+	if(cur_loc .eq. -1)then
+	  cur_loc=0
+	  freq_store(cur_loc)=freq
+	else if(freq_store(cur_loc) .ne. freq)then
+          cur_loc=mod(cur_loc+1,n_store)
+	  freq_store(cur_loc)=freq
+	end if
+	ray(ip)%i_in_bnd_store(cur_loc)=ray(ip)%I_m(nzz)
+!
+! Now get flux incident at inner boudary from other side of envelope.
+!
+	ist=cur_loc+1
+        iend=cur_loc+n_store
+        if(freq_store(n_store-1) .EQ. 0.0D0)THEN
+          ist=0; iend=cur_loc
+        end if
+        k=mod(ist,n_store)
+        new_freq=freq*ray(ip)%freq_conv_fac
+	if(new_freq .ge. freq_store(k) .and. freq_store(n_store-1) .eq. 0.0D0)THEN
+          ibound=ray(ip)%i_in_bnd_store(0)
+	else if(new_freq .GT. freq_store(k))then
+          write(6,*)'Error in solve_cmf_formal_v2: invalid frequency range'
+	  write(6,*)freq_store(k),new_freq,freq
+	  write(6,*)k,ist,iend
+          stop
+        else
+          do while( iend-ist .gt. 1)
+            imid=(ist+iend)/2
+            k=mod(imid,n_store)
+            if(new_freq .gt. freq_store(k))then
+              iend=imid
+            else
+              ist=imid
+            end if
+          end do
+          iend=mod(iend,n_store); ist=mod(ist,n_store)
+          t1=(new_freq-freq_store(iend))/(freq_store(ist)-freq_store(iend))
+          ibound=t1*ray(ip)%i_in_bnd_store(ist)+(1.0d0-t1)*ray(ip)%i_in_bnd_store(iend)
+        end if
+      end if
+!
 !---------------------------------------------------------------
 !
 ! Calculate transfer in outward direction, I+ (mu=1)
 !
 ! At inner boundary use I+ = I- for core and non-core rays
 !
-      if((ip.gt.nc+1).or.(boundary.eq.'hollow'))then
+      if(ip .gt. nc+1)then
         ray(ip)%I_p(nzz)=ray(ip)%I_m(nzz)
+      else if(boundary.eq.'hollow')then
+        ray(ip)%I_p(nzz)=ibound
       elseif((boundary.eq.'gray').or.(boundary.eq.'diffusion'))then
         ray(ip)%I_p(nzz)=B_nue+ray(ip)%mu_p(nzz)*dBdtau
       else
@@ -230,6 +286,7 @@
       beta=e1/dtau(1)
       gamma=e0-e1/dtau(1)
       ray(ip)%I_p(1)=ray(ip)%I_p(2)*ee+beta*source_prime(1)+gamma*source_prime(2)
+!     if(ip .le. nc)write(166,*)freq,ray(ip)%I_p(nzz),ray(ip)%I_m(nzz)
 !
       return
       end
