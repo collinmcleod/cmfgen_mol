@@ -453,7 +453,7 @@ C
 C At the boundary, the interval close to the boundary is generally much
 C smaller than the subsequent interval. Thus at the boundary the slope will
 C generally be dominated by the boundary slope, and hence we will only
-C consider it in computing the derivatives. This means that that we don't
+C consider it in computing the derivatives. This means that that we do not
 C have to consider the effect (for example) of CHI(3) on dCHIdr(1) which
 C would necessitate an extra vector.
 C
@@ -477,7 +477,7 @@ C
 	        B(I)=T1/H(I-1)*SIGN(ONE,SLOPE(I-1))
 	      ELSE
 	        B(I)=-T1/H(I)*SIGN(ONE,SLOPE(I))
-	        C(I)=T1/H(I-1)*SIGN(ONE,SLOPE(I))
+	        C(I)=T1/H(I)*SIGN(ONE,SLOPE(I))
  	      END IF
 	    ELSE
 	      T1=T1*SIGN(0.5D0,ORIG_dCHIdR)/(H(I-1)+H(I))

@@ -132,7 +132,7 @@
 !
 	  ELSE
 !
-! Compute H/J at the mid points in the `new grird.
+! Compute H/J at the mid points in the `new grid.
 !
 	    I=NS+1
 	    TMP_VEC(1)=GRSQ(1)*HNU_AT_OB; TMP_VEC(NS+1)=GRSQ(NS)*HNU_AT_IB
@@ -185,18 +185,18 @@
 	 NMID_ON_J(1:NDM1)=0.0D0
 	  DO I=1,NDM1
 	    IF(RSQ_HNU_MID(I) .NE. 0)THEN
-	       NMID_ON_HMID(I)=RSQ_NNU_MID(I)/RSQ_HNU_MID(I)
-	       IF(NMID_ON_HMID(I) .GT. 1.0D0)THEN
-	         NMID_ON_HMID(I)=1.0D0
-	       ELSE IF( RSQ_NNU_MID(I) .LT. 0.01) THEN
-	         NMID_ON_HMID(I)=0.01D0
-	       END IF
+	      NMID_ON_HMID(I)=RSQ_NNU_MID(I)/RSQ_HNU_MID(I)
+	      IF(NMID_ON_HMID(I) .GT. 1.0D0)THEN
+	        NMID_ON_HMID(I)=1.0D0
+	      ELSE IF(NMID_ON_HMID(I) .LT. 0.01) THEN
+	        NMID_ON_HMID(I)=0.01D0
+	      END IF
 	    ELSE
 	      NMID_ON_HMID(I)=0.0D0              !Later replaced by average.
 	      LUER=ERROR_LU()
 	      WRITE(LUER,'(1X,A,1PE16.8)')'HNU zero for frequency:',FREQ
 	      WRITE(LUER,'(1X,A,I4)')'Error occurred at depth:',I
-	     END IF
+	    END IF
 	  END DO
 	END IF
 !

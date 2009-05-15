@@ -15,6 +15,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered 03-Apr-2009 : Inserted OUT_JH call in REL section.
 ! Altered 20-Jan-2008 : POPS & NT inserted into call. Changed to V2.
 !                       Now call JGREY_HUB_DDT_V2
 ! 
@@ -184,6 +185,17 @@
 	    NEW_FREQ=.FALSE.
 	    WRITE(LUER,*)'Current grey iteration accuracy is',T1
 	  END DO
+!
+! Output gray fluxes and boundary Eddington factors for next model in time sequence.
+!     T1  is used as a dummy argument for NU.
+!      I  is used as a dummy argument for NCF. Neither value is used when the
+!  'GREY' option is set. The logical variable L_TRUE is also not accessed.
+!
+	DO I=1,ND
+	  TA(I)=RJ(I)*R(I)*R(I)
+	END DO
+	T2=HFLUX*R(ND)*R(ND)      !R^2.H at inner boundary.
+	CALL OUT_JH(TA,RSQHNU,T2,HBC_CMF,T1,I,R,V,ND,L_TRUE,'GREY')
 !
 	ELSE IF(USE_DJDT_RTE)THEN
 !

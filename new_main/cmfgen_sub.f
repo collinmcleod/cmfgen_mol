@@ -1080,7 +1080,7 @@
 	END IF
 !
 	CALL CHECK_IONS_PRESENT(ND,NUM_IONS)
-
+	CALL CHECK_TMIN()
 !
 ! Temporary check
 !
@@ -2813,7 +2813,8 @@
 	  T2=T1*EMHNUKT(I)/(  ( (1.0D0-EMHNUKT(I))*T(I) )**2  )
 	  INT_dBdT(I)=INT_dBdT(I)+T2
 	  ROSS_MEAN(I)=ROSS_MEAN(I)+T2/CHI(I)
-	  PLANCK_MEAN(I)=PLANCK_MEAN(I)+T3*CHI_NOSCAT(I)*EMHNUKT(I)/(1.0D0-EMHNUKT(I))
+!	  PLANCK_MEAN(I)=PLANCK_MEAN(I)+T3*CHI_NOSCAT(I)*EMHNUKT(I)/(1.0D0-EMHNUKT(I))
+	  PLANCK_MEAN(I)=PLANCK_MEAN(I)+T3*(CHI(I)-CHI_SCAT(I))*EMHNUKT(I)/(1.0D0-EMHNUKT(I))
 	END DO
 	T1=SPEED_OF_LIGHT()*1.0D-05
 	DO J=1,N_FLUX_MEAN_BANDS
@@ -2874,7 +2875,7 @@
 	  END DO
 	END IF
 !
-	WRITE(199,*)ML,STEQ_T(1)
+!	WRITE(199,*)ML,STEQ_T(1)
 10000	CONTINUE
 	CALL TUNE(ITWO,'10000')
 !
@@ -2887,11 +2888,6 @@
 	CALL STEQ_BA_TWO_PHOT_RATE_V3(POPS,NT,ND,
 	1         DIAG_INDX,COMPUTE_BA,LUMOD,LST_ITERATION)
 	WRITE(199,*)ML,STEQ_T(1),'two'
-!
-! Store radiative equlibrium equation (radiative terms only) so
-! we can check influence on radiation field.
-!
-	DEP_RAD_EQ(1:ND)=STEQ_T(1:ND)
 !
 ! 
 !
@@ -2967,6 +2963,10 @@
 	IF(COMPUTE_BA .AND. WRBAMAT .AND. .NOT. FLUX_CAL_ONLY .AND. .NOT. LAMBDA_ITERATION)THEN
 	  CALL STORE_BA_DATA_V2(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,'BAMAT')
 	END IF
+!
+! Store radiative equlibrium equation so we can check influence on radiation field.
+!
+	DEP_RAD_EQ(1:ND)=STEQ_T(1:ND)
 !               
 !
 ! Write out recombination, photoionization and cooling terms for digestion.
@@ -3707,7 +3707,7 @@
 ! Include the machanical luminosity imparted to the wind by the radiation 
 ! field in the total luminosity, and subtract out radioactive energy deposition..
 !
-! Altered: 28_Feb-2009: Chnaged J to  I in dE_RAD_DECAY.
+! Altered: 28_Feb-2009: Changed J to  I in dE_RAD_DECAY.
 !
 	  T3=0.0D0
 	  DO I=ND-1,1,-1
@@ -4374,7 +4374,11 @@
 	       MAXCH=100			!To force run to continue
 	    ELSE
 	       CALL UPDATE_KEYWORD(L_FALSE,'[XSLOW]','VADAT',L_TRUE,L_TRUE,LUIN)
-	       IF(DO_LAMBDA_AUTO)RD_LAMBDA=.FALSE.
+	       IF(DO_LAMBDA_AUTO)THEN
+	         RD_LAMBDA=.FALSE.
+	         LAMBDA_ITERATION=.FALSE.
+	         CALL UPDATE_KEYWORD(L_FALSE,'[DO_LAM_IT]','IN_ITS',L_TRUE,L_TRUE,LUIN)
+	       END IF
 	    END IF
 	  END IF
 	  IF(INCL_ADVECTION .AND. ADVEC_RELAX_PARAM .LT. 1.0D0 .AND. MAXCH .LT. 100)THEN
@@ -4454,7 +4458,7 @@
 	      FIX_IMPURITY=.FALSE.
 	      FIXED_T=.TRUE.
 !
-! Don't wish to chnage ITERATION cycle values unless we have to.
+! Don't wish to change ITERATION cycle values unless we have to.
 !
 	    ELSE IF(OLD_RD_LAMBDA)THEN
 	      FIX_IMPURITY=RD_FIX_IMP

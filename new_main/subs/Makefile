@@ -17,6 +17,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(ba_update_v6.o)\
       $(LIB)(ba_update_v7.o)\
       $(LIB)(check_ions_present.o)\
+      $(LIB)(check_tmin.o)\
       $(LIB)(cmf_blkband_v2.o)\
       $(LIB)(cmf_blkband_v3.o)\
       $(LIB)(create_iv_links_v2.o)\

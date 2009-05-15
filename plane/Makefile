@@ -3,7 +3,7 @@
 
 include ../Makefile_definitions
 
-OPTION=$(FG)
+OPTION=$(FD)
 
 # Library where object files will/are stored
 
@@ -91,7 +91,7 @@ $(LIB)(define_grid_v2.o) : define_grid_v2.f $(LIB)(mod_space_grid_v2.o)
 	$(F90) -c $(OPTION) define_grid_v2.f
 	ar ruv $(LIB) define_grid_v2.o
 
-$(LIB)(drhsdchi_pp.o) : drhsdchi_pp.f $(LIB_MOD)(mod_trap_derivatives.o)
+$(LIB)(drhsdchi_pp.o) : drhsdchi_pp.f $(LIB)(mod_trap_derivatives.o)
 	$(F90) -c $(OPTION) drhsdchi_pp.f
 	ar ruv $(LIB) drhsdchi_pp.o
 
@@ -123,7 +123,7 @@ $(LIB)(var_mom_j_cmf_v9.o) : var_mom_j_cmf_v9.f $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) var_mom_j_cmf_v9.f
 	ar ruv $(LIB) var_mom_j_cmf_v9.o
 
-$(LIB)(var_jrel_v2.o) : var_jrel_v2.f $(LIB_MOD)(mod_var_jrel_v2.o) $(LIB_MOD)(mod_ray_mom_store.o) $(LIB_MOD)(mod_trap_derivatives.o) 
+$(LIB)(var_jrel_v2.o) : var_jrel_v2.f $(LIB_MOD)(mod_var_jrel_v2.o) $(LIB_MOD)(mod_ray_mom_store.o) $(LIB)(mod_trap_derivatives.o) 
 	$(F90) -c $(OPTION) var_jrel_v2.f
 	ar ruv $(LIB) var_jrel_v2.o
 
@@ -131,7 +131,7 @@ $(LIB)(var_mom_jext_cmf_v3.o) : var_mom_jext_cmf_v3.f $(LIB)(mod_ray_mom_store.o
 	$(F90) -c $(OPTION) var_mom_jext_cmf_v3.f
 	ar ruv $(LIB) var_mom_jext_cmf_v3.o
 
-$(LIB_MOD)(mod_trap_derivatives.o) :
+$(LIB)(mod_trap_derivatives.o) :
 	(cd ../subs ; make)
 
 clean :

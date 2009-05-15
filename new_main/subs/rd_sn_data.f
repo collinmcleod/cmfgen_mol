@@ -9,7 +9,8 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
-! Altered 11-Feb-2009 : Use isotope data, when available, to atomic number fractions.
+! Altered 02-Apr-2009: Now set fixed abundance specifiers, normally read in, to surface values.
+! Altered 11-Feb-2009: Use isotope data, when available, to atomic number fractions.
 ! Altered 28-Jan-2009: If inner & outer radii differ from passed R values (via MOD_CMFGEN)
 !                        by less than 1 part in 10^8, they are made identical. This removes
 !                        a problem with older models where a slightly different technique
@@ -56,6 +57,7 @@
 	CHARACTER(LEN=200) STRING
 	LOGICAL, SAVE :: FIRST=.TRUE.
 	LOGICAL DONE
+	LOGICAL PURE_HUBBLE
 !
 	LUER=ERROR_LU()
 	WRITE(LUER,*)'Entering RD_SN_DATA'
@@ -170,6 +172,17 @@
 !	    WRITE(LUER,'(I5,A,I5,2ES14.4)')L,TRIM(ISO_SPEC_HYDRO(L)),BARY_HYDRO(L),ISO_HYDRO(1,L),ISO_HYDRO(NX,L)
 	    STRING=' '
 	  END DO
+!
+	PURE_HUBBLE=.TRUE.
+	IF(PURE_HUBBLE)THEN
+	  T1=24.0D0*3600.0D0*1.0D+05*OLD_SN_AGE_DAYS/1.0D+10
+	  DO I=1,NX
+	    T2=V_HYDRO(I)
+	    V_HYDRO(I)=R_HYDRO(I)/T1
+	    WRITE(233,*)I,T2,V_HYDRO(I)
+	    SIGMA_HYDRO(I)=0.0D0
+	  END DO
+	END IF
 !
 ! Correct populations for SN expansion. We do not correct
 ! POP_HYDRO and ISO_HYDRO as these are mass-fractions.
@@ -353,6 +366,12 @@
 	    POP_ATOM(:)=POP_ATOM(:)+POP_SPECIES(:,L)
 	  END IF
 	END DO
+!
+! Set fixed abundance specifiers, normally read in, to surface values.
+!
+	DO L=1,NUM_SPECIES
+	  IF(SPECIES_PRES(L))AT_ABUND(L)=POP_SPECIES(1,L)/POP_ATOM(1)
+	END DO    
 !
 	CALL OUT_SN_POPS_V3('SN_DATA_INPUT_CHK',SN_AGE_DAYS,USE_OLD_MF_OUTPUT,ND,LU)
 !

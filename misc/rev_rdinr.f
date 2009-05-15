@@ -281,7 +281,10 @@
 	  DO I=IEND,ND
 	    NEW_XV(IST+NG+I+1-IEND)=I
 	  END DO
-	  NEW_XV(IST+NG+1)=0.5D0*(NEW_XV(IST+NG)+IEND+1)
+!
+! Not sure why had next statemnt
+!
+!	  NEW_XV(IST+NG+1)=0.5D0*(NEW_XV(IST+NG)+IEND+1)
 	  DO I=1,ND
 	    OLD_XV(I)=I
 	  END DO

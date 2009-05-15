@@ -6,15 +6,13 @@
 ! model, or whether it may be necesary to add additional high
 ! ionization stages.
 !
-	SUBROUTINE CHECK_IONS_PRESENT(ND,NUM_IONS)
+	SUBROUTINE CHECK_IONS_PRESENT(ND)
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
 ! Created: 28-Jan-2009.
 !
 	INTEGER ND
-	INTEGER NUM_IONS
-!
 	REAL*8 MAX_RATIO(NUM_IONS)
 !
 	REAL*8, PARAMETER ::  LOW_LIMIT=1.0D-10

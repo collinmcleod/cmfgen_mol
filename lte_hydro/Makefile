@@ -50,6 +50,7 @@ $(LIB) : $(OBJ)
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f 
+	ar -xo ../lib/libmod.a mod_cmfgen.o
 	$(F90) -c $(FG)  $<
 	ar ruv $(LIB) $*.o
 

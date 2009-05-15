@@ -41,6 +41,7 @@ all: $(EXE_DIR)cmf_flux.exe $(EXE_DIR)obs_frame.exe
 #
 
 $(EXE_DIR)cmf_flux.exe :  $(OBJ1) $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6) $(FN7)
+	ar -xo ../lib/libsubs.a griem_stark_mod.o
 	$(F90) $(OBJ1) griem_stark_mod.o \
               -L$(LIB_DIR) -l$(LN7) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN5) -l$(LN1) -l$(LN6) \
                $(LOCLIB) \

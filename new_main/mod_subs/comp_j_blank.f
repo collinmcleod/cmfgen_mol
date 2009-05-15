@@ -80,7 +80,7 @@
 !
 	INTEGER, SAVE :: FG_COUNT
 	INTEGER I
-	INTEGER L
+	INTEGER J_IT_COUNTER
 	LOGICAL NEW_FREQ
 !
 ! See COMP_J_CONT.INC to see earlier changes to this routine.
@@ -177,7 +177,7 @@ C
 C We will do this twice, so that F is of higher accuracy.
 C
 	  INACCURATE=.TRUE.
-	  L=0
+	  J_IT_COUNTER=0
 	  DO WHILE(INACCURATE)
 	    DO I=1,NDEXT
 	      SOURCEEXT(I)=ZETAEXT(I)+THETAEXT(I)*RJEXT(I)
@@ -193,12 +193,12 @@ C
 C
 C Update "inaccurate" iteration counter
 C
-	      L=L+1
+	      J_IT_COUNTER=J_IT_COUNTER+1
 C
 C Check if F has converged.
 C
 	      INACCURATE=.FALSE.
-	      IF(L .LT. 3 .OR. COMPUTE_EDDFAC)THEN	!Chnaged 8-Feb-95
+	      IF(J_IT_COUNTER .LT. 3 .OR. COMPUTE_EDDFAC)THEN	!Changed 8-Feb-95
 	        T1=0.0D0
 	        DO I=1,NDEXT
 	          T1=MAX(ABS(FOLD(I)-FEXT(I)),T1)
@@ -207,8 +207,7 @@ C
 	        IF(T1 .GT. ACC_EDD_FAC)INACCURATE=.TRUE.
 	      END IF
 C
-	      L=L+1
-	      IF(L .GT. 15)THEN
+	      IF(J_IT_COUNTER .GT. 15)THEN
 	         WRITE(LUER,*)'Possible error converging f - T1 is',T1
 	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION 
 	      	 INACCURATE=.FALSE.
@@ -317,7 +316,7 @@ C
 C We will do this twice, so that F is of higher accuracy.
 C
 	  INACCURATE=.TRUE.
-	  L=0
+	  J_IT_COUNTER=0
 	  DO WHILE(INACCURATE)
 C
 	     IF(COHERENT_ES)THEN
@@ -363,12 +362,12 @@ C
 C
 C Update "inaccurate" iteration counter
 C
-	      L=L+1
+	      J_IT_COUNTER=J_IT_COUNTER+1
 C
 C Check if F has converged.
 C
 	      INACCURATE=.FALSE.
-	      IF(L .LT. 20 .OR. COMPUTE_EDDFAC)THEN
+	      IF(J_IT_COUNTER .LT. 20 .OR. COMPUTE_EDDFAC)THEN
 	        T1=0.0D0
 	        DO I=1,NDEXT
 	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)        
@@ -377,7 +376,7 @@ C
 	        IF(T1 .GT. ACC_EDD_FAC)INACCURATE=.TRUE.
 	      END IF
 C
-	      IF(L .GT. 10)THEN
+	      IF(J_IT_COUNTER .GT. 10)THEN
 	         WRITE(LUER,*)'Possible error converging f - T1 is',T1
 	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION 
 	      	 INACCURATE=.FALSE.
@@ -578,7 +577,7 @@ C
 C We will do this twice, so that F is of higher accuracy.
 C
 	  INACCURATE=.TRUE.
-	  L=0
+	  J_IT_COUNTER=0
 	  DO WHILE(INACCURATE)
 C
 	     IF(COHERENT_ES)THEN
@@ -591,11 +590,12 @@ C NB Using TA for ETA, TC for JNU_VEC, and TB for HNU_VEC
 C
 	     CALL TUNE(IONE,'FG_J_CMF')
 	     IF(PLANE_PARALLEL_NO_V)THEN
-	        IF(FIRST_FREQ)WRITE(LUER,*)'Calling FCOMP_PP'
+	        IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling FCOMP_PP'
 	        SOURCE(1:ND)=TA(1:ND)/CHI_CLUMP(1:ND)
 	        CALL FCOMP_PP_V2(R,TC,FEDD,SOURCE,CHI_CLUMP,IPLUS,HBC_CMF,
 	1               NBC_CMF,INBC,DBB,IC,THK_CONT,DIF,ND,NC,METHOD)
 	     ELSE IF(PLANE_PARALLEL)THEN
+	        IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling PP_FORM_CMF_V2'
 	        CALL PP_FORM_CMF_V2(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
 	1               TC,TB,FEDD,GEDD,N_ON_J,INBC,
 	1               HBC_CMF(1),HBC_CMF(2),NBC_CMF(1),NBC_CMF(2),
@@ -604,7 +604,7 @@ C
 	1               FIRST_FREQ,NEW_FREQ,N_TYPE,NC,ND)
 !
 	     ELSE IF(USE_FORMAL_REL)THEN
-	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling CMF_FORMAL_REL in COMP_J_BLANK'
+	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling CMF_FORMAL_REL in COMP_J_BLANK'
 	       CALL CMF_FORMAL_REL_V2
 	1                 (TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
 	1                  TC,FEDD,INBC,HBC_CMF(1),IPLUS,
@@ -613,8 +613,7 @@ C
 	1                  METHOD,FIRST_FREQ,NEW_FREQ,NC,NP,ND)
 !
 	     ELSE 
-!
-	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling FG_J_CMF_V11 in COMP_J_BLANK'
+	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling FG_J_CMF_V11 in COMP_J_BLANK'
 	       CALL FG_J_CMF_V11(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
 	1                  TC,FEDD,AQW,HQW,KQW,NQW,HMIDQW,NMIDQW,
 	1                  INBC,HBC_CMF(1),IPLUS,FL,dLOG_NU,DIF,DBB,IC,
@@ -633,11 +632,13 @@ C
 	     END IF
 	     CALL TUNE(IONE,'MOM_J_CMF')
 	     IF(PLANE_PARALLEL_NO_V)THEN
+	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling MOM_J_PP_V1'
 	       CALL MOM_J_PP_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
 	1                  R,FEDD,RJ,RSQHNU,HBC_CMF,NBC_CMF,INBC,
 	1                  FL,DIF,DBB,IC,METHOD,COHERENT_ES,
 	1                  IZERO,FIRST_FREQ,NEW_FREQ,ND)
 	     ELSE IF(PLANE_PARALLEL)THEN
+	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling PP_MOM_CMF_V1'
 	       CALL PP_MOM_CMF_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
 	1                  FEDD,GEDD,N_ON_J,RJ,RSQHNU,
 	1                  VDOP_VEC,DELV_FRAC_MOM,
@@ -646,6 +647,7 @@ C
 	1                  N_TYPE,METHOD,COHERENT_ES,
 	1                  FIRST_FREQ,NEW_FREQ,ND)
 	     ELSE IF(USE_DJDT_RTE)THEN
+	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling MOM_J_DDT_V1'
 	       CALL MOM_J_DDT_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
 	1              V,R,FEDD,RJ,RSQHNU,DJDt_TERM,
 	1              VDOP_VEC,DELV_FRAC_MOM,
@@ -654,16 +656,26 @@ C
 	1              METHOD,COHERENT_ES,FIRST_FREQ,NEW_FREQ,
 	1              INCL_DJDT_TERMS,DJDT_RELAX_PARAM,NC,NP,ND,NCF)
 	     ELSE IF(USE_J_REL)THEN
+	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling MOM_JREL_V5'
 	       CALL MOM_JREL_V5(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
 	1             RJ,RSQHNU,VDOP_VEC,DELV_FRAC_MOM,
 	1             FL,dLOG_NU,DIF,DBB,IC,METHOD,COHERENT_ES,N_TYPE,
 	1             INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,FIRST_FREQ,ND)
+	       IF(LST_ITERATION)THEN
+	         DO I=1,ND
+	           TA(I)=RJ(I)*R(I)*R(I)
+	         END DO 
+	         T1=DBB*R(ND)*R(ND)/3.0D0/CHI_CLUMP(ND)
+	         CALL OUT_JH(TA,RSQHNU,T1,HBC_CMF(1),FL,NCF,R,V,ND,FIRST_FREQ,'NORMAL')
+	       END IF
 	     ELSE
+	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling MOM_J_CMF_V8'
 	       CALL MOM_J_CMF_V8(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
 	1              RJ,RSQHNU,VDOP_VEC,DELV_FRAC_MOM,
 	1              FL,dLOG_NU,DIF,DBB,IC,
 	1              N_TYPE,METHOD,COHERENT_ES,OUT_BC_TYPE,
 	1              FIRST_FREQ,NEW_FREQ,NC,NP,ND)
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Done Calling MOM_J_CMF_V8'
 	     END IF
 	     CALL TUNE(ITWO,'MOM_J_CMF')
 C
@@ -675,12 +687,12 @@ C
 C
 C Update "inaccurate" iteration counter
 C
-	      L=L+1
+	      J_IT_COUNTER=J_IT_COUNTER+1
 C
 C Check if F has converged.
 C
 	      INACCURATE=.FALSE.
-	      IF(L .LT. 20 .OR. COMPUTE_EDDFAC)THEN
+	      IF(J_IT_COUNTER .LT. 20 .OR. COMPUTE_EDDFAC)THEN
 	        T1=0.0D0
 	        DO I=1,ND
 	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)        
@@ -689,7 +701,7 @@ C
 	        IF(T1 .GT. ACC_EDD_FAC)INACCURATE=.TRUE.
 	      END IF
 C
-	      IF(L .GT. 20)THEN
+	      IF(J_IT_COUNTER .GT. 20)THEN
 	         WRITE(LUER,*)'Possible error converging f - T1 is',T1
 	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION 
 	      	 INACCURATE=.FALSE.
@@ -837,7 +849,7 @@ C
 C We will do this twice, so that F is of higher accuracy.
 C
 	  INACCURATE=.TRUE.
-	  L=0
+	  J_IT_COUNTER=0
 	  DO WHILE(INACCURATE)
 	    DO I=1,ND
 	      SOURCE(I)=ZETA(I)+THETA(I)*RJ(I)
@@ -852,12 +864,12 @@ C
 C
 C Update "inaccurate" iteration counter
 C
-	      L=L+1
+	      J_IT_COUNTER=J_IT_COUNTER+1
 C
 C Check if F has converged.
 C
 	      INACCURATE=.FALSE.
-	      IF(L .LT. 3 .OR. COMPUTE_EDDFAC)THEN
+	      IF(J_IT_COUNTER .LT. 3 .OR. COMPUTE_EDDFAC)THEN
 	        T1=0.0D0
 	        DO I=1,ND
 	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)
@@ -866,8 +878,7 @@ C
 	        IF(T1 .GT. ACC_EDD_FAC)INACCURATE=.TRUE.
 	      END IF       
 C
-	      L=L+1
-	      IF(L .GT. 15)THEN
+	      IF(J_IT_COUNTER .GT. 15)THEN
 	         WRITE(LUER,*)'Possible error converging f - T1 is',T1
 	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION 
 	      	 INACCURATE=.FALSE.

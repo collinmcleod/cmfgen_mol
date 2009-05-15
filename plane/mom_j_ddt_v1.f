@@ -616,6 +616,7 @@
 !
 	DO I=2,ND-1
 	  DTAUONQ(I)=0.5D0*(DTAU(I)+DTAU(I-1))/Q(I)
+!	  DTAUONQ(I)=0.5D0*(R(I-1)-R(I+1))*CHI(I)
 	  PSI(I)=DTAUONQ(I)*GAM(I)
 	  PSIPREV(I)=DTAUONQ(I)*GAM(I)
 	  DJDt(I)=DTAUONQ(I)*RECIP_CDELTAT/CHI(I)
@@ -735,12 +736,17 @@
 	  REWIND(172)
 	  REWIND(182)
 	END IF
-	IF(.NOT. INIT)THEN
+	IF(INIT)THEN
+	  WRITE(170,'(3(12X,A),4(18X,A))')' DJDT term',' dHdR term','Freq Deriv',
+	1                                     '-RHS','Chi ','Esec','Eta '
+	  WRITE(172,'(3(11X,A),4(18X,A))')'  DJDT term','dHdtau term',' Freq Deriv',
+	1                                     '-RHS','Chi ','Esec','Eta '
+	ELSE
 	  I=ND-4
 	  T1=ROLD_ON_R
 	  T2=R(I)*R(I)
 	  WRITE(170,'(8ES22.14)')FREQ,RECIP_CDELTAT*(XM(I)-T1*RSQJNU_OLDT(I))/T2,
-	1        2.0D0*(RSQHNU(I-1)-RSQHNU(I))/(R(I+1)-R(I-1))/T2,
+	1        2.0D0*(RSQHNU(I-1)-RSQHNU(I))/(R(I-1)-R(I+1))/T2,
 	1        V(I)*(XM(I)-RSQJNU_PREV(I))/R(I)/dLOG_NU/C_KMS/T2,
 	1        (CHI(I)-ESEC(I))*XM(I)/T2-ETA(I),
 	1        CHI(I),ESEC(I),ETA(I)

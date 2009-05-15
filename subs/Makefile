@@ -5,7 +5,7 @@ include ../Makefile_definitions
 LIB=$(LIB_DIR)libsubs.a
 LIB_MOD=$(LIB_DIR)libmod.a
 
-OPTION=$(FD)
+OPTION=$(FG)
 
 #
 # Entries for library
@@ -250,6 +250,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(write_direct_info.o)\
       $(LIB)(write_direct_info_v2.o)\
       $(LIB)(write_direct_info_v3.o)\
+      $(LIB)(write_vec.o)\
       $(LIB)(writv.o)\
       $(LIB)(writv_v2.o)\
       $(LIB)(wrrecomchk_v3.o)\

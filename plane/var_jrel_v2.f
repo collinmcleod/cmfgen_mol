@@ -85,7 +85,7 @@
 !
 	INTEGER LUER,ERROR_LU
         EXTERNAL ERROR_LU
-	INTEGER I
+	INTEGER I,J
 	INTEGER IFAIL
 ! 
 !
@@ -428,10 +428,12 @@
 	  IF(XM(I) .GT. 1.0D+20)THEN
 	    LUER=ERROR_LU()
 	    WRITE(LUER,*)'Error in VAR_JREL_V2: RJ blowing up'
-	    WRITE(LUER,'(6ES12.4)')(XM(I),I=1,ND)
+	    WRITE(LUER,'(6ES12.4)')(XM(J),J=1,ND)
 	    STOP
 	  END IF
 	END DO
+!
+!	WRITE(211,'(8ES14.4)')FREQ,GAM_RSQ(1:7)*XM(1:7)
 !
 ! Check that no negative mean intensities have been computed.
 !
@@ -449,22 +451,35 @@
 	1              (EPS_PREV_A(I)*JNU_PREV(I)  -EPS_A(I)*XM(I)) +
 	1              (EPS_PREV_B(I)*JNU_PREV(I+1)-EPS_B(I)*XM(I+1))
 	END DO
-	WRITE(157,'(7ES16.6)')FREQ,XM(1),XM(1)*GAM_RSQ(1),GAM_RSQHNU(1),
-	1                          XM(ND),XM(ND)*GAM_RSQ(ND),GAM_RSQHNU(ND-1)
+!	WRITE(157,'(7ES16.6)')FREQ,XM(1),XM(1)*GAM_RSQ(1),GAM_RSQHNU(1),
+!	1                          XM(ND),XM(ND)*GAM_RSQ(ND),GAM_RSQHNU(ND-1)
 !
 ! NB: A & C are d[dx/dr]/dx where x=gam.r^2.J
 !
 	IF(INCL_ADVEC_TERMS)THEN
-	  CALL DERIVCHI(TB,XM,R,ND,'LINMON')
-	  CALL d_DERIVCHI_dCHI(TB,XM,R,ND,'LINMON')
+	  TC(1:ND)=GAM_RSQ(1:ND)*XM(1:ND)
+	  CALL DERIVCHI(TB,TC,R,ND,'LINMON')
+	  CALL d_DERIVCHI_dCHI(TB,TC,R,ND,'LINMON')
+!	  DO I=1,ND
+!	   WRITE(216,'(I3,5ES18.8)')I,FREQ,GAM_RSQ(I)*XM(I),dlnGRSQJdlnR(I),R(I)*TB(I)/GAM_RSQ(I)/XM(I)
+!	  END DO
 	  TA=TA_SAV; TB=TB_SAV; TC=TC_SAV
+!	  WRITE(215,*)'New freq'
+!	  DO I=1,ND
+!	    WRITE(215,'(I3,5ES18.8)')I,FREQ,TA(I),TB(I),TC(I),(TA(I)+TB(I)+TC(I))/TB(I)
+!	  END DO
 	  DO I=2,ND-1
 	    TA(I)=TA(I)+GAM_RSQ_DTAUONQ(I)*BETA(I)*A(I)*GAM_RSQ(I-1)/GAM_RSQ(I)/CHI_J(I)
 	    TB(I)=TB(I)+GAM_RSQ_DTAUONQ(I)*BETA(I)*(B(I)-dlnGRSQJdlnR(I)/R(I))/CHI_J(I)
 	    TC(I)=TC(I)+GAM_RSQ_DTAUONQ(I)*BETA(I)*C(I)*GAM_RSQ(I+1)/GAM_RSQ(I)/CHI_J(I)
 	  END DO
+!	  DO I=1,ND
+!	    T1=R(I)*( A(I)*GAM_RSQ(I-1)*XM(I-1) + B(I)*GAM_RSQ(I)*XM(I) + C(I)*GAM_RSQ(I+1)*XM(I+1))/XM(I)/GAM_RSQ(I)
+!	    WRITE(215,'(I3,7ES18.8)')I,FREQ,TA(I),TB(I),TC(I),(TA(I)+TB(I)+TC(I))/TB(I),dlnGRSQJdlnR(I),T1
+!	  END DO
 	  CALL THOMAS(TA,TB,TC,XM_SAV,ND,1)
 	END IF
+!	WRITE(211,'(8ES14.4)')FREQ,GAM_RSQ(1:7)*XM_SAV(1:7)
 !
 ! 
 !

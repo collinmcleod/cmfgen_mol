@@ -785,6 +785,9 @@
 	    IF(MAX_ER .LT. 1.0D-08)ACCURATE=.TRUE.
 	    GAM_RSQJOLD(1:ND)=GAM_RSQJNU(1:ND)
 !
+! NB: DERIVCHI computes d(GAM.R^2J)/dR. We then mulitply that derivative by
+! R/[GAM.R^2.J] to get dln(GAM.R^2J)/dlnR).
+!
 	    DAMP_FAC=0.8D0
 	    IF(.NOT. ACCURATE .AND. INCL_ADVEC_TERMS)THEN
 	      CALL DERIVCHI(TB,XM,R,ND,'LINMON')
@@ -797,8 +800,7 @@
 	    END IF
 	    IF(COUNT .EQ.  100)THEN
 	      WRITE(LUER,*)'Error in MOM_J_REL_V5: excessive iteration count.'
-	      WRITE(LUER,*)'FREQ=',FREQ
-	      WRITE(LUER,*)'Maximum error =',MAX_ER
+	      WRITE(LUER,'(A,ES15.8,4X,A,ES9.2)')' FREQ= ',FREQ,'Error =',MAX_ER
 	      ACCURATE=.TRUE.
 	    END IF
 	  END IF

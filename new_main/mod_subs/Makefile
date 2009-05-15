@@ -54,8 +54,6 @@ OBJ = $(LIB)(adjust_r_grid_v2.o)\
 all : $(LIB)
 	cp -f $(INSTALL_DIR)perm_mod_file jnk.mod
 	mv -f *.mod $(MOD_DIR)
-	cp -f mod_cmfgen.o ../
-	cp -f mod_cmfgen.o ../../lte_hydro
 	rm -f *.o
 
 $(LIB) : $(MOD) $(OBJ)	

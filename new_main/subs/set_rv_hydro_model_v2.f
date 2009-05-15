@@ -1,11 +1,12 @@
 !
-! Subroutine to read a NYDRO model from SN_HYDRO_DATA and genrate
+! Subroutine to read a HYDRO model from SN_HYDRO_DATA and genrate
 ! the R grid, and the V and SIGMA vectors.
 !
 	SUBROUTINE SET_RV_HYDRO_MODEL_V2(R,V,SIGMA,RMAX,RCORE,
 	1              RMAX_ON_RCORE,SN_AGE_DAYS,N_IB_INS,N_OB_INS,RDINR,ND,LU)
 	IMPLICIT NONE
 !
+! Altered 10-Apr-2009 : RDINR now adopts R = Rold + V(r).dt
 ! Altered 31-Jan-2008 : Minor bug fix.
 ! Altered 29-Dec-2008 : Based on SET_RV_HYDRO_MODEL_V2
 !                       Written to allow smaller outer radius.
@@ -71,6 +72,7 @@
 	EXTERNAL ERROR_LU
 	INTEGER, PARAMETER :: IONE=1
 	CHARACTER(LEN=200) STRING
+	LOGICAL PURE_HUBBLE
 !
 	LUER=ERROR_LU()
 	OPEN(UNIT=LU,FILE='SN_HYDRO_DATA',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
@@ -162,6 +164,17 @@
 	WRITE(LUER,*)'Successfuly read SN data in SET_RV_HYDRO_V2'
 	CLOSE(LU)
 !
+!
+        PURE_HUBBLE=.TRUE.
+        IF(PURE_HUBBLE)THEN
+	  WRITE(6,*)'Setting Velocity so pure Hubble law in SET_RV_HYDRO_V2'
+          T1=24.0D0*3600.0D0*1.0D+05*OLD_SN_AGE_DAYS/1.0D+10
+          DO I=1,NX
+            V_HYDRO(I)=R_HYDRO(I)/T1
+            SIGMA_HYDRO(I)=0.0D0
+          END DO
+        END IF
+!
 ! Adjust R grid of SN for expansion.
 !	R_HYDRO=R_HYDRO*SN_EXP_FACTOR (Valid only if Hubble flow).
 !	DENSITY_HYDRO=DENSITY_HYDRO/(SN_EXP_FACTOR**3)
@@ -226,7 +239,7 @@
 ! TA is used for everything but R which is all we want.
 !
 	  DO I=1,ND
-	    READ(LU,*,IOSTAT=IOS)R(I),TA(I),TA(I),TA(I)
+	    READ(LU,*,IOSTAT=IOS)R(I),TA(I),TA(I),TA(I),TA(I),V(I)
 	    IF(IOS .EQ. 0)READ(LU,*,IOSTAT=IOS)(TA(J),J=1,NOLD)
 	    IF(IOS .NE. 0)THEN
 	      LUER=ERROR_LU()
@@ -242,9 +255,17 @@
 	    WRITE(LUER,*)'ABS(R(1)/R_HYDRO(1)-1.0D0)=',T1
 	    WRITE(LUER,*)'ABS(R(ND)/R_HYDRO(ND)-1.0D0)=',T2
 	  END IF
-	  DO I=1,ND               	!need to issue a warning here
-	    R(I)=R_HYDRO(NX)*(R(I)/R(ND))
+!
+! In the constant T1 we convert from days to seconds, and allow for the units of
+! V (km/s) and R (10^10 cm).
+!
+	  T1=24.0D0*3600.0D0*1.0D+05*(SN_AGE_DAYS-OLD_SN_AGE_DAYS)/1.0D+10
+	  DO I=1,ND
+	    R(I)=R(I)+T1*V(I)
 	  END DO
+!	  DO I=1,ND               	!need to issue a warning here
+!	    R(I)=R_HYDRO(NX)*(R(I)/R(ND))
+!	  END DO
 	  RMAX=R(1); RCORE=R(ND)
 	  RMAX=MIN(R(1),R_HYDRO(1))
 !

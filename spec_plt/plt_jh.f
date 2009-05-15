@@ -831,15 +831,17 @@
 	        TA(I)=TA(I)+T1*(ZM(ID)%RJ(I,ML)+ZM(ID)%RJ(I,ML+1))
 	      END DO
 	    END DO
+	    IF(ZM(ID)%DATA_TYPE .EQ. 'J')THEN
+	      TA(1:ND)=TA(1:ND)*R(1:ND)*R(1:ND)
+	    END IF
 !
 	   WRITE(T_OUT,*)'Boundary Luminosity is:',TA(1)*4.1274D+03
 	    DO I=1,ND
 	      XV(I)=I
 	      YV(I)=TA(I)/TA(1)
 	    END DO
-	    CALL DP_CNVRT_J_V2(XV,YV,ND,LOG_X,LOG_Y,' ',Y_PLT_OPT,
-	1         ZM(ID)%DATA_TYPE,LAMC,XAXIS,YAXIS,L_FALSE)
 	    CALL DP_CURVE(ND,XV,YV)
+	    XAXIS='I'
 	    YAXIS='L/L(d=1)'
 	  END DO
 !

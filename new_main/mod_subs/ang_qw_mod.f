@@ -31,8 +31,9 @@
 	REAL*8, ALLOCATABLE :: NMIDQWEXT(:,:)
 !
 ! Parameters, vectors, and arrays for computing the observed flux.
+! Was 2000 (changed 20-Apr-2009).
 !
-        INTEGER, PARAMETER :: NST_CMF=2000
+        INTEGER, PARAMETER :: NST_CMF=3000
         REAL*8  NU_STORE(NST_CMF)
 !
         INTEGER NP_OBS_MAX

@@ -20,6 +20,7 @@ FN4=$(LIB_DIR)lib$(LN4).a
 FN5=$(LIB_DIR)lib$(LN5).a
 #
 EXE  = $(EXE_DIR)plt_jh.exe\
+       $(EXE_DIR)plt_jh_cur.exe\
        $(EXE_DIR)plt_ip.exe\
        $(EXE_DIR)plt_phot_raw.exe\
        $(EXE_DIR)plt_rj.exe\
@@ -52,6 +53,12 @@ $(EXE_DIR)plt_jh.exe : plt_jh.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
              -L$(LIB_DIR) -lspec  -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
                $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)plt_jh.exe
+
+$(EXE_DIR)plt_jh_cur.exe : plt_jh_cur.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
+	$(F90) plt_jh_cur.o \
+             -L$(LIB_DIR) -lspec  -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
+               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
+              -o $(EXE_DIR)plt_jh_cur.exe
 
 $(EXE_DIR)plt_ip.exe : plt_ip.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
 	$(F90) plt_ip.o \

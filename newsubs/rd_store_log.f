@@ -31,6 +31,8 @@
 	USE RD_VAR_MOD
 	IMPLICIT NONE
 !
+! Altered: 10-Apr-2009: Now stop code if find inconsistency in presence of '[''s.
+!
 	INTEGER LU_IN,LU_OUT
 !
 	INTEGER I,J,IOS
@@ -70,7 +72,13 @@
 	    ELSE IF(KEY_ST(I) .NE. 0 .OR. KEY_END(I) .NE. 0)THEN
 	      WRITE(LUER,*)'Possible error in RD_OPTIONS_INTO_STORE'
 	      WRITE(LUER,*)'String with inconsistent [ brackets found'
-	      WRITE(LUER,*)STORE(I)	
+	      WRITE(LUER,*)STORE(I)
+	      STOP
+	    ELSE	
+	      WRITE(LUER,*)'Error in RD_OPTIONS_INTO_STORE'
+	      WRITE(LUER,*)'Comments (i.e., strings without [KEY]) must begin with !'
+	      WRITE(LUER,*)STORE(I)
+	      STOP
 	    END IF
 	  END IF
 	END DO
