@@ -91,6 +91,10 @@ $(LIB)(define_grid_v2.o) : define_grid_v2.f $(LIB)(mod_space_grid_v2.o)
 	$(F90) -c $(OPTION) define_grid_v2.f
 	ar ruv $(LIB) define_grid_v2.o
 
+$(LIB)(optdepth_v2.o) : optdepth_v2.f $(LIB)(mod_space_grid_v2.o)
+	$(F90) -c $(OPTION) optdepth_v2.f
+	ar ruv $(LIB) optdepth_v2.o
+
 $(LIB)(drhsdchi_pp.o) : drhsdchi_pp.f $(LIB)(mod_trap_derivatives.o)
 	$(F90) -c $(OPTION) drhsdchi_pp.f
 	ar ruv $(LIB) drhsdchi_pp.o
