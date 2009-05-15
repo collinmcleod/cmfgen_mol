@@ -139,6 +139,7 @@
 	INTEGER ND_ADD
 	INTEGER NP_MAX
 	INTEGER NRAY_MAX
+	INTEGER IDMIN,IDMAX
 !
 	CHARACTER*10 OLD_SOLUTION_OPTIONS
 	CHARACTER*10 SOLUTION_METHOD
@@ -207,6 +208,8 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Aleterd 11-May-2009: Altered value of IDMAX (for ETA and CHI interpolaton).
+!                        IDMAX & IDMIN now stored in FG_J_CMF_MOD_V11.
 ! Altered 19-Jan-2009: Changed IP_DATA to IP_FG_DATA which must exist for I(p)
 !                        to be output.
 ! Created 17-Dec-2008: Based on FG_J_CMF_V10
@@ -304,7 +307,6 @@
 !                
 	INTEGER NI_SMALL
 	INTEGER I,J,K,LS
-	INTEGER IDMIN,IDMAX
 	INTEGER NI
 !
 	REAL*8 DBC
@@ -555,6 +557,26 @@
 	    WRITE(J,*)'Using thick boundary condition in FG_J_CMF_V11'
 	    WRITE(J,'(2(A,ES16.8,3X))')' R(1)=',R(1),'RMAX=',RMAX
 	    WRITE(J,'(2(A,ES16.8,3X))')' V(1)=',V(1),'VMAX=',V_EXT(1)
+	  END IF
+!
+! Define zone used to extrapolate opacities and emissivities.
+!
+	  IF(ND_ADD .NE. 0)THEN
+	    IDMIN=1
+	    T1=R_EXT(1)/R(1)
+	    IF(T1 .LT. R(1)/R(ND/3))THEN
+	      T1=MIN(3.0D0,T1)
+	      DO I=1,ND
+	        IF(R(1)/R(I) .GT. T1)THEN
+	          IDMAX=MAX(4,I)
+	          EXIT
+	        END IF
+	      END DO
+	      IDMAX=MIN(IDMAX,ND/4)
+	    ELSE
+	      IDMAX=ND/6
+	    END IF
+	    WRITE(6,'(A,I4,A)')'Using depth 1 and',IDMAX,' to extrapolate opacities'
 	  END IF
 !
 ! Work out the maximim number of points per ray. This will allow us to allocate
@@ -940,7 +962,6 @@
 !
 	CALL TUNE(1,'FG_CHI_BEG')
 	IF(ND_ADD .NE. 0)THEN
-	  IDMIN=1; IDMAX=4
 	  IF(CHI(IDMIN) .LE. ESEC(IDMIN) .OR. CHI(IDMAX) .LE. ESEC(IDMAX))THEN
 	    ESEC_POW=LOG(ESEC(IDMAX)/ESEC(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
 	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
@@ -968,7 +989,7 @@
 ! We limit alpha to 3.5 to avoid excess envelope emission. If alpha were
 ! 3 we would get a logarithmic flux divergence as we increase the volume.
 !
-	  ALPHA=LOG(ETA(4)/ETA(1))/LOG(R(1)/R(4))
+	  ALPHA=LOG(ETA(IDMAX)/ETA(1))/LOG(R(1)/R(IDMAX))
 	  IF(ALPHA .LT. 3.5)ALPHA=3.5
 	  DO I=1,ND_ADD
 	    ETA_EXT(I)=ETA(1)*(R(1)/R_EXT(I))**ALPHA
