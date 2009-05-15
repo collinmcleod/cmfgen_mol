@@ -812,7 +812,7 @@
 !
 	CALL TUNE(1,'FG_CHI_BEG')
 	IF(ND_ADD .NE. 0)THEN
-	  IDMIN=1; IDMAX=4
+	  IDMIN=1; IDMAX=15
 	  IF(CHI(IDMIN) .LE. ESEC(IDMIN) .OR. CHI(IDMAX) .LE. ESEC(IDMAX))THEN
 	    ESEC_POW=LOG(ESEC(IDMAX)/ESEC(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
 	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
@@ -840,7 +840,7 @@
 ! We limit alpha to 3.5 to avoid excess envelope emission. If alpha were
 ! 3 we would get a logarithmic flux divergence as we increase the volume.
 !
-	  ALPHA=LOG(ETA(4)/ETA(1))/LOG(R(1)/R(4))
+	  ALPHA=LOG(ETA(IDMAX)/ETA(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
 	  IF(ALPHA .LT. 3.5)ALPHA=3.5
 	  DO I=1,ND_ADD
 	    ETA_EXT(I)=ETA(1)*(R(1)/R_EXT(I))**ALPHA
