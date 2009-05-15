@@ -144,7 +144,7 @@
 !
 	IF(INITIALIZE)THEN
 	  R_STORE(1:ND)=R(1:ND)
-	  GAM_REL_STORE(1:ND)=1.0D0/SQRT(1.0D0-(V(1:ND)/2.99792458D+10)**2)
+	  GAM_REL_STORE(1:ND)=1.0D0/SQRT(1.0D0-(V(1:ND)/2.99792458D+05)**2)
 	  DO I=1,ND-1
 	    RMID_STORE(I)=0.5D0*(R(I)+R(I+1))
 	    EXT_RMID_STORE(I+1)=0.5D0*(R(I)+R(I+1))
@@ -340,6 +340,41 @@
 	  ALLOCATE (CHI_RAY(J),ETA_RAY(J))
 	END IF
 !
+! For SN we can have a hollow core. In this case we need to store the
+! inward radiation field for use in calculating the outward radiation field.
+! Because of the expansion, the comoving frequencies do not match, hence
+! the need for storage of results at earlier frequencies.
+!
+	IF(DIF)THEN
+	  BOUNDARY='diffusion'
+	ELSE
+	  BOUNDARY='hollow'
+	  IF(.NOT. ALLOCATED(FREQ_STORE))THEN
+	    N_STORE=2.0D0*V(ND)/5.0D0
+	    WRITE(6,*)'N_STORE=',N_STORE
+	    ALLOCATE (FREQ_STORE(0:N_STORE-1))
+	    DO IP=1,NC
+	      ALLOCATE (RAY(IP)%I_IN_BND_STORE(0:N_STORE-1))
+	    END DO
+	    IF(FIRST_TIME .OR. NEW_R_GRID)THEN
+	      BETA=V(ND)/2.99792458D+05
+	      DO IP=1,NC
+	        T1=SQRT( (R(ND)-P(IP))*(R(ND)+P(IP)) )/R(ND)
+	        T2=1.0D0-BETA*(T1+BETA)/(1.0D0+BETA*T1)
+	        RAY(IP)%FREQ_CONV_FAC=1.0D0/GAM_REL_STORE(ND)/GAM_REL_STORE(ND)/T2/(1.0D0-BETA*T1)
+	        WRITE(6,'(5ES14.4)')RAY(IP)%FREQ_CONV_FAC,GAM_REL_STORE(ND),T1,T2,BETA
+	      END DO
+	    END IF
+	  END IF
+	  IF(INITIALIZE)THEN
+	    CUR_LOC=-1
+	    FREQ_STORE=0.0D0
+	    DO I=1,NC
+	      RAY(IP)%I_IN_BND_STORE=0.0D0
+	    END DO
+	  END IF
+	END IF 
+!
 	IF(RAY_POINTS_INSERTED)THEN
 	  LOG_CHI_EXT(1:ND_EXT)=LOG(CHI_EXT(1:ND_EXT))
 	  CALL MON_INT_FUNS_V2(CHI_COEF,LOG_CHI_EXT,LOG_R_EXT,ND_EXT)
@@ -352,6 +387,8 @@
 	    RAY(IP)%I_P=0.0D0; RAY(IP)%I_M=0.0D0
 	    RAY(IP)%I_P_PREV=0.0D0; RAY(IP)%I_M_PREV=0.0D0
 	    RAY(IP)%I_P_SAVE=0.0D0; RAY(IP)%I_M_SAVE=0.0D0
+	    HNU_AT_OB_PREV=0.0D0; NNU_AT_OB_PREV=0.0D0
+	    HNU_AT_IB_PREV=0.0D0; NNU_AT_IB_PREV=0.0D0
 	  END DO	
 	ELSE IF(NEW_FREQ)THEN
 	  DO IP=1,NP
@@ -359,6 +396,8 @@
 	    RAY(IP)%I_P_PREV=RAY(IP)%I_P_SAVE
 	    RAY(IP)%I_M_PREV=RAY(IP)%I_M_SAVE
 	  END DO	
+	  HNU_AT_OB_PREV=HNU_AT_OB; NNU_AT_OB_PREV=NNU_AT_OB
+	  HNU_AT_IB_PREV=HNU_AT_IB; NNU_AT_IB_PREV=NNU_AT_IB
 	END IF
 !
 ! If no points have been inserted on the rays, CHI and ETA are the same for 
@@ -377,13 +416,12 @@
 	NP_LIMIT=NP-1
 	IF(THICK_OB)NP_LIMIT=NP
 	T1=DBB/CHI(ND)			!dB/dTAU
-	BOUNDARY='diffusion'
-	IF(.NOT. DIF)THEN
-	  T1=0.0D0
-	  WRITE(LUER,*)'Error in CMF_FORM_REL_V2'
-	  WRITE(LUER,*)'Specifying intensity (i.e., Ic) at inner boundary not implemented'
-	  STOP
-	END IF
+!	IF(.NOT. DIF)THEN
+!	  T1=0.0D0
+!	  WRITE(LUER,*)'Error in CMF_FORM_REL_V2'
+!	  WRITE(LUER,*)'Specifying intensity (i.e., Ic) at inner boundary not implemented'
+!	  STOP
+!	END IF
 	IPLUS=0.0D0
 	DO IP=1,NP_LIMIT
 !
@@ -411,7 +449,7 @@
 ! Solve using Relativistic Formal Integral
 !
 	  T1=DBB/CHI(ND)
-          CALL SOLVE_CMF_FORMAL_V2(CHI_RAY,ETA_RAY,IP,NU_ON_dNU,BOUNDARY,b_planck,t1,NRAY,NP,NC)
+          CALL SOLVE_CMF_FORMAL_V2(CHI_RAY,ETA_RAY,IP,FREQ,NU_ON_dNU,BOUNDARY,b_planck,t1,NRAY,NP,NC)
 !
 	  DO ID=1,MIN(ND,NP-IP+1)
 	    I_P_GRID(ID)=RAY(IP)%I_P(RAY(IP)%LNK(ID))
@@ -419,7 +457,7 @@
 	    IF( I_P_GRID(ID) .LT. 0 .OR. I_M_GRID(ID) .LT. 0.0D0)THEN
 	      WRITE(LUER,*)'Error: invalid intensities in CMF_FORMAL_REL_V2'
 	      WRITE(LUER,*)'Check file CMF_FORMAL_REL_ERRORS'
-	      OPEN(UNIT=7,FILE='CMF_FORMAL_REL_ERRORS',STATUS='OLD')
+	      OPEN(UNIT=7,FILE='CMF_FORMAL_REL_ERRORS',STATUS='UNKNOWN')
 	        WRITE(7,*)IP,NRAY
 	        WRITE(7,'(6ES14.4)')FREQ,dLOG_NU,NU_ON_dNU,B_PLANCK,DBB,IC
 	        WRITE(7,'(A)')' '
@@ -468,11 +506,14 @@
         NBC=NNU_AT_OB/JNU_STORE(1)
 	IF(HBC .LT. 0.0D0)HBC=0.0D0
 	IF(NBC .LT. 0.0D0)NBC=0.0D0
-        IN_HBC=IN_HBC/(2.0D0*JNU_STORE(ND)-IC)
+        IN_HBC=HNU_STORE(ND)
+!        IN_HBC=JNU_STORE(ND)
+!        IN_HBC=HNU_STORE(ND)/JNU_STORE(ND)
+!	IN_HBC=IN_HBC/(2.0D0*JNU_STORE(ND)-IC)
 	RETURNED_OUT_HBC=HBC
 	RETURNED_IN_HBC=IN_HBC
 !
-!	WRITE(180,'(4ES14.4)')FREQ,HBC,NBC,IN_HBC
+	WRITE(180,'(4ES14.4)')FREQ,HBC,NBC,IN_HBC
 !	DO I=1,ND
 !	  WRITE(180,'(I4,7ES14.4)')I,JNU_STORE(I),HNU_STORE(I),KNU_STORE(I),NNU_STORE(I),
 !	1                          R(I),ETA(I),CHI(I)
