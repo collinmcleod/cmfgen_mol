@@ -201,7 +201,7 @@
 ! of SCL_LINE_HT_FAC of the tmean frequency for the super-level under 
 ! consideration. 0.5 is presently the prefered value.
 !
-	REAL*8 AVE_ENERGY(NT)		!Average energy of each super level
+!	REAL*8 AVE_ENERGY(NT)		!Average energy of each super level
 	REAL*8 STEQ_T_SCL(ND)
 	REAL*8 STEQ_T_NO_SCL(ND)
 ! 
@@ -500,7 +500,7 @@
 	END IF
 !
 	CALL SET_RADIATION_MOD(ND,NDMAX,NPMAX)
-	CALL SET_LINE_MOD(ND,MAX_SIM,NM)
+	CALL SET_LINE_MOD(ND,NT,MAX_SIM,NM)
         CALL SET_VAR_RAD_MOD_V2(ND,NDEXT,
 	1        NT,NUM_BNDS,NM,MAX_SIM,NM_KI,ACCURATE,L_FALSE)
 	CALL SET_CMF_SOB_MOD(ND,NUM_BNDS,NT,NM_KI,NLF,LUER)
