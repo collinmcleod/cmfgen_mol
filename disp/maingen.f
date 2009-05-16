@@ -1347,7 +1347,7 @@
 	    CALL USR_OPTION(FG_SOL_OPT,'SOL_METH','INT/INS','FG solution method: INT/INS or DIFF/INS')
 !
 	    PLT_J=.FALSE.; PLT_H=.FALSE.; PLT_LF=.FALSE.; PLT_LF=.FALSE.; PLT_FM=.FALSE.
-	    IF(DEPTHS(1) .EQ. 0)THEN
+	    IF(IDEPTH(1) .EQ. 0)THEN
 	    ELSE
 	      CALL USR_OPTION(PLT_J,'PLT_J','F','Plot J')
 	      CALL USR_OPTION(PLT_H,'PLT_H','F','Plot H')
