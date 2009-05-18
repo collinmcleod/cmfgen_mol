@@ -10,7 +10,11 @@
 	1             T,OLD_T,OLD_ED,N,ND,NSPEC,NSPEC_MAX,PRES,ION_ID,MODE)
 	IMPLICIT NONE
 !
-! Altered 07-MAr-2006 - 2.07D-22 pulled into exponential.
+! Altered 15-May-2009 - VERBOSE option installed.
+! Altered 03-Feb-2008 - Can now use excitation temperatures (MODE=TX), as well 
+!                         as departure coefficients (MODE=DC), to evaluate
+!                         partition functions.
+! Altered 07-Mar-2006 - 2.07D-22 pulled into exponential.
 ! Altered 25-May-1996 - ERROR_LU inserted.
 ! Altered 16-Jan-1995 - Occupation probabilities included in calculation of
 !                         partition function. CALL altered, but still V2.
@@ -52,9 +56,11 @@
 !
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
+	LOGICAL VERBOSE
 !
 	IF(.NOT. PRES)RETURN
 	LUER=ERROR_LU()
+	CALL GET_VERBOSE_INFO(VERBOSE)
 !
 	NSPEC=NSPEC+1		!Update species number.
 	IF(NSPEC+1 .GT. NSPEC_MAX)THEN
@@ -73,16 +79,19 @@
 	  END IF
 	END DO
 !
-	OPEN(UNIT=7,FILE=TRIM(ION_ID)//'_XXX',STATUS='UNKNOWN')
-	  WRITE(7,'(A)')' '
-	  WRITE(7,*)N,ND
-	  DO I=1,ND
+! Ouput departure coefficents.
+!
+	IF(VERBOSE)THEN
+	  OPEN(UNIT=7,FILE=TRIM(ION_ID)//'_ORIG_DC',STATUS='UNKNOWN')
 	    WRITE(7,'(A)')' '
-	    WRITE(7,'(4ES14.6)')DHE2(I),OLD_ED(I),T(I),OLD_T(I)
-	    WRITE(7,'(5ES14.6)')(HE2(J,I)/HE2LTE(J,I),J=1,N)
-	  END DO
-	CLOSE(UNIT=7)
-
+	    WRITE(7,*)N,ND
+	    DO I=1,ND
+	      WRITE(7,'(A)')' '
+	      WRITE(7,'(4ES14.6)')DHE2(I),OLD_ED(I),T(I),OLD_T(I)
+	      WRITE(7,'(5ES14.6)')(HE2(J,I)/HE2LTE(J,I),J=1,N)
+	    END DO
+	  CLOSE(UNIT=7)
+	END IF
 !
 ! Convert HE2 array to departure coefficients.
 !
@@ -129,7 +138,7 @@
 	    END DO
 	  END DO
 	ELSE
-	  WRITE(LUER,*)'Error in PAR_FN_V3: interplaton mode not recognized'
+	  WRITE(LUER,*)'Error in PAR_FN_V3: interplation mode not recognized'
 	  WRITE(LUER,*)'Passed mode is ',TRIM(MODE)
 	  STOP
 	END IF
@@ -152,15 +161,20 @@
 	  END DO
 	END DO
 !
-	OPEN(UNIT=7,FILE=TRIM(ION_ID)//'_RUB',STATUS='UNKNOWN')
-	  WRITE(7,'(A)')' '
-	  WRITE(7,*)N,ND
-	  DO I=1,ND
+! Ouput departure coefficents. If MODE=DC, these will be the same as in _ORID_DC files.
+! If MODE=TX, the files will contain the revised departure coefficients.
+!
+	IF(VERBOSE)THEN
+	  OPEN(UNIT=7,FILE=TRIM(ION_ID)//'_REV_DC',STATUS='UNKNOWN')
 	    WRITE(7,'(A)')' '
-	    WRITE(7,'(4ES14.6)')DHE2(I),OLD_ED(I),T(I),OLD_T(I)
-	    WRITE(7,'(5ES14.6)')(HE2(J,I),J=1,N)
-	  END DO
-	CLOSE(UNIT=7)
+	    WRITE(7,*)N,ND
+	    DO I=1,ND
+	      WRITE(7,'(A)')' '
+	      WRITE(7,'(4ES14.6)')DHE2(I),OLD_ED(I),T(I),OLD_T(I)
+	      WRITE(7,'(5ES14.6)')(HE2(J,I),J=1,N)
+	    END DO
+	  CLOSE(UNIT=7)
+	END IF
 !
 	RETURN
 	END
