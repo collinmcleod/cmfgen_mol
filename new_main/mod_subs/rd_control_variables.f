@@ -513,8 +513,16 @@ C
 	1           'Include advection terms in rate equations?')
 	  CALL RD_STORE_LOG(INCL_ADIABATIC,'INC_AD',L_TRUE,
 	1           'Include adiabatic cooling in energy equation')
+	  SCL_SL_LINE_OPAC=.FALSE.
+	  CALL RD_STORE_LOG(SCL_SL_LINE_OPAC,'SCL_SL_OPAC',L_FALSE,
+	1            'Scale SL line opacities/emissivties for heating/cooling consistency?')
 	  CALL RD_STORE_LOG(SCL_LINE_COOL_RATES,'SCL_LN',L_TRUE,
 	1            'Scale line cooling rate for Rad. Eq. equation?')
+	  IF(SCL_SL_LINE_OPAC .AND. SCL_LINE_COOL_RATES)THEN
+	    WRITE(LUER,*)'Inconsitent use of SCL_SL_OPAC and SCL_LN'
+	    WRITE(LUER,*)'Only one of the two options can be true'
+	    STOP
+	  END IF
 	  CALL RD_STORE_DBLE(SCL_LINE_HT_FAC,'SCL_LN_FAC',L_TRUE,
 	1            'Scale line cooling rate for Rad. Eq. equation?')
 	  SCL_LINE_DENSITY_LIMIT=1.0D+30
