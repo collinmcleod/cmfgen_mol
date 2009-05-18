@@ -368,6 +368,11 @@
 ! of SCL_LINE_HT_FAC of the tmean frequency for the super-level under 
 ! consideration. 0.5 is presently the prefered value.
 !
+! SCL_SL_LINE_OPAC effects the opacities to achieve consistency.
+! SCL_LINE_COOL_RATES only modifies the line cooling rates to achieve consistency.
+! Only one of these two options can be true at any one time.
+!
+	LOGICAL SCL_SL_LINE_OPAC
 	LOGICAL SCL_LINE_COOL_RATES
 	REAL*8 SCL_LINE_HT_FAC
 	REAL*8 SCL_LINE_DENSITY_LIMIT
