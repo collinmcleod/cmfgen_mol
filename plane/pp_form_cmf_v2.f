@@ -141,6 +141,7 @@
 	INTEGER NRAY_MAX
 	INTEGER NI_RAY
 	INTEGER NI
+	INTEGER IDMIN,IDMAX
 !
 	CHARACTER*10 OLD_SOLUTION_OPTIONS
 	CHARACTER*10 SOLUTION_METHOD
@@ -203,7 +204,8 @@
 	USE PP_FORM_CMF_MOD_V2
 	IMPLICIT NONE
 !
-!
+! Altered 14-May-2009: Altered value of IDMAX (for ETA and CHI interpolaton).
+!                        IDMAX & IDMIN now stored in FG_J_CMF_MOD_V11.
 ! Altered 19-Jan-2009: Changed IP_DATA to IP_PP_DATA which must exist for I(p)
 !                        to be output.
 ! Altered 08-Feb-2008 : Bug fix: NI_SMALL not set, and is no longer required as all rays have
@@ -294,7 +296,6 @@
 	LOGICAL, PARAMETER :: LTRUE=.TRUE.
 !                
 	INTEGER I,J,K,LS
-	INTEGER IDMIN,IDMAX
 !
 	REAL*8 DBC
 	REAL*8 I_CORE
@@ -512,6 +513,26 @@
 	      END DO
 	    END IF
 	  END IF
+!
+! Define zone used to extrapolate opacities and emissivities.
+!
+	IF(ND_ADD .NE. 0)THEN
+	  IDMIN=1
+	  T1=R_EXT(1)/R(1)
+	  IF(T1 .LT. R(1)/R(ND/3))THEN
+	    T1=MIN(3.0D0,T1)
+	    DO I=1,ND
+	      IF(R(1)/R(I) .GT. T1)THEN
+	        IDMAX=MAX(4,I)
+	        EXIT
+	      END IF
+	    END DO
+	    IDMAX=MIN(IDMAX,ND/6)
+	  ELSE
+	    IDMAX=ND/6
+	  END IF
+	  WRITE(6,'(A,I4,A)')' Using depth 1 and',IDMAX,' to extrapolate opacities'
+	END IF
 !
 ! Work out the maximim number of points per ray. This will allow us to allocate
 ! the required memory.
@@ -812,7 +833,6 @@
 !
 	CALL TUNE(1,'FG_CHI_BEG')
 	IF(ND_ADD .NE. 0)THEN
-	  IDMIN=1; IDMAX=15
 	  IF(CHI(IDMIN) .LE. ESEC(IDMIN) .OR. CHI(IDMAX) .LE. ESEC(IDMAX))THEN
 	    ESEC_POW=LOG(ESEC(IDMAX)/ESEC(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
 	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
@@ -843,7 +863,7 @@
 	  ALPHA=LOG(ETA(IDMAX)/ETA(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
 	  IF(ALPHA .LT. 3.5)ALPHA=3.5
 	  DO I=1,ND_ADD
-	    ETA_EXT(I)=ETA(1)*(R(1)/R_EXT(I))**ALPHA
+	    ETA_EXT(I)=ETA(IDMIN)*(R(IDMIN)/R_EXT(I))**ALPHA
 	    IF(ETA_EXT(I) .LE. 1.0D-280)ETA_EXT(I)=1.0D-280
 	  END DO
 	  DO I=ND_ADD+1,ND_EXT
