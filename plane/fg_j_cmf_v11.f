@@ -208,7 +208,7 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
-! Aleterd 11-May-2009: Altered value of IDMAX (for ETA and CHI interpolaton).
+! Altered 14-May-2009: Altered value of IDMAX (for ETA and CHI interpolaton).
 !                        IDMAX & IDMIN now stored in FG_J_CMF_MOD_V11.
 ! Altered 19-Jan-2009: Changed IP_DATA to IP_FG_DATA which must exist for I(p)
 !                        to be output.
@@ -572,11 +572,11 @@
 	          EXIT
 	        END IF
 	      END DO
-	      IDMAX=MIN(IDMAX,ND/4)
+	      IDMAX=MIN(IDMAX,ND/6)
 	    ELSE
 	      IDMAX=ND/6
 	    END IF
-	    WRITE(6,'(A,I4,A)')'Using depth 1 and',IDMAX,' to extrapolate opacities'
+	    WRITE(6,'(A,I4,A)')' Using depth 1 and',IDMAX,' to extrapolate opacities'
 	  END IF
 !
 ! Work out the maximim number of points per ray. This will allow us to allocate
@@ -989,10 +989,10 @@
 ! We limit alpha to 3.5 to avoid excess envelope emission. If alpha were
 ! 3 we would get a logarithmic flux divergence as we increase the volume.
 !
-	  ALPHA=LOG(ETA(IDMAX)/ETA(1))/LOG(R(1)/R(IDMAX))
+	  ALPHA=LOG(ETA(IDMAX)/ETA(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
 	  IF(ALPHA .LT. 3.5)ALPHA=3.5
 	  DO I=1,ND_ADD
-	    ETA_EXT(I)=ETA(1)*(R(1)/R_EXT(I))**ALPHA
+	    ETA_EXT(I)=ETA(IDMIN)*(R(IDMIN)/R_EXT(I))**ALPHA
 	    IF(ETA_EXT(I) .LE. 1.0D-280)ETA_EXT(I)=1.0D-280
 	  END DO
 	  DO I=ND_ADD+1,ND_EXT
