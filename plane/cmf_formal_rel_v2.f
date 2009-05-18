@@ -37,6 +37,8 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered 14-May-2009: Altered value of IDMAX (for ETA and CHI interpolaton).
+!                        IDMAX & IDMIN now stored in FG_J_CMF_MOD_V11.
         INTEGER NC
         INTEGER ND
         INTEGER NP
@@ -259,6 +261,26 @@
 	  END IF
 	  LOG_R_EXT(1:ND_EXT)=LOG(R_EXT(1:ND_EXT))
 !
+! Define zone used to extrapolate opacities and emissivities.
+!
+	  IF(ND_ADD .NE. 0)THEN
+	    IDMIN=1
+	    T1=R_EXT(1)/R(1)
+	    IF(T1 .LT. R(1)/R(ND/3))THEN
+	      T1=MIN(3.0D0,T1)
+	      DO I=1,ND
+	        IF(R(1)/R(I) .GT. T1)THEN
+	          IDMAX=MAX(4,I)
+	          EXIT
+	        END IF
+	      END DO
+	      IDMAX=MIN(IDMAX,ND/6)
+	    ELSE
+	      IDMAX=ND/6
+	    END IF
+	    WRITE(6,'(A,I4,A)')' Using depth 1 and',IDMAX,' to extrapolate opacities'
+	  END IF
+!
 	END IF
 !
 ! Compute CHI_EXT, and ETA_EXT. CHI_EXT could be saved, as it doesn't change
@@ -275,7 +297,6 @@
 ! extrapolate CHI below ESEC.
 !
 	IF(ND_ADD .NE. 0)THEN
-	  IDMIN=1; IDMAX=4
 	  IF(CHI(IDMIN) .LE. ESEC(IDMIN) .OR. CHI(IDMAX) .LE. ESEC(IDMAX))THEN
 	    ESEC_POW=LOG(ESEC(IDMAX)/ESEC(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
 	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
@@ -301,10 +322,10 @@
 ! We limit alpha to 3.5 to avoid excess envelope emission. If alpha were
 ! 3 we would get a logarithmic flux divergence as we increase the volume.
 !
-	  ALPHA=LOG(ETA(4)/ETA(1))/LOG(R(1)/R(4))
+	  ALPHA=LOG(ETA(IDMAX)/ETA(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
 	  IF(ALPHA .LT. 3.5)ALPHA=3.5
 	  DO I=1,ND_ADD
-	    ETA_EXT(I)=ETA(1)*(R(1)/R_EXT(I))**ALPHA
+	    ETA_EXT(I)=ETA(IDMIN)*(R(IDMIN)/R_EXT(I))**ALPHA
 	    IF(ETA_EXT(I) .LE. 1.0D-280)ETA_EXT(I)=1.0D-280
 	  END DO
 	  DO I=ND_ADD+1,ND_EXT
