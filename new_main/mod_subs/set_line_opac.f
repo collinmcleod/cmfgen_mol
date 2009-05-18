@@ -238,10 +238,34 @@
 	  END DO
 ! 
 !
+! If desired we can scale the line opacity/emissivities of transitions
+! among SL's. This allows us to obtain full consistency in the
+! upward/downwrd rates, and the cooling/heating rates. For the
+! cooling/heting rates, this is similar to SCL_LIN_COOL_RATES option.
+! However this option provides consistent with the radiative equilibrium
+! term appearing in the transfer equation. Implemented for SN which can
+! be totally dominated by scattering.
+!
+! This section should be consistent with corrections in CMFGEN_SUB
+! (in SCL_LINE_COO_RATES sections).
+!
+	  IF(SCL_SL_LINE_OPAC)THEN
+	    T3=(AVE_ENERGY(NL)-AVE_ENERGY(NUP))/FL_SIM(SIM_INDX)
+	    IF(ABS(T3-1.0D0) .GT. SCL_LINE_HT_FAC)T3=1.0D0
+	    DO I=D_ST,ND
+	      IF(POP_ATOM(I) .LE. SCL_LINE_DENSITY_LIMIT)THEN
+	        L_STAR_RATIO(I,SIM_INDX)=T3*L_STAR_RATIO(I,SIM_INDX)
+	        U_STAR_RATIO(I,SIM_INDX)=T3*U_STAR_RATIO(I,SIM_INDX)
+	      END IF
+	    END DO
+	  END IF
+!
 ! Compute line opacity and emissivity for this line.
 !
 	  T1=OSCIL(SIM_INDX)*OPLIN
 	  T2=FL_SIM(SIM_INDX)*EINA(SIM_INDX)*EMLIN
+	  LINE_OPAC_CON(SIM_INDX)=T1
+	  LINE_EMIS_CON(SIM_INDX)=T2
 	  NL=SIM_NL(SIM_INDX)
 	  NUP=SIM_NUP(SIM_INDX)
 	  DO I=D_ST,ND
@@ -256,20 +280,6 @@
 	      WRITE(LUER,'(1X,A)')TRANS_NAME_SIM(SIM_INDX)(1:J)
 	    END IF
 	  END DO
-!
-	  LINE_OPAC_CON(SIM_INDX)=T1
-	  LINE_EMIS_CON(SIM_INDX)=T2
-!
-          IF(SCL_LINE_COOL_RATES)THEN
-            T3=(AVE_ENERGY(NL)-AVE_ENERGY(NUP))/FL_SIM(SIM_INDX)
-            IF(ABS(T3-1.0D0) .GT. SCL_LINE_HT_FAC)T3=1.0D0
-	    LINE_OPAC_CON(SIM_INDX)=LINE_OPAC_CON(SIM_INDX)*T3
-	    LINE_EMIS_CON(SIM_INDX)=LINE_EMIS_CON(SIM_INDX)*T3
-	    DO I=D_ST,ND
-	      CHIL_MAT(I,SIM_INDX)=T3*CHIL_MAT(I,SIM_INDX)
-	      ETAL_MAT(I,SIM_INDX)=T3*ETAL_MAT(I,SIM_INDX)
-	    END DO
-          END IF
 !
 	END DO	!Checking whether a  new line is being added.
 !
