@@ -48,7 +48,7 @@ OBJ = $(LIB)(adjust_r_grid_v2.o)\
       $(LIB)(set_abund_clump.o)\
       $(LIB)(solve_for_pops.o)\
       $(LIB)(sub_cmf_line.o)\
-      $(LIB)(sub_sob_line_v2.o)\
+      $(LIB)(sub_sob_line_v3.o)\
       $(LIB)(sup_to_full_v4.o)
 
 all : $(LIB)

@@ -59,7 +59,7 @@
 	INTEGER NCF
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
-	CHARACTER(LEN=12), PARAMETER :: PRODATE='23-Nov-2007'		!Must be changed after alterations
+	CHARACTER(LEN=12), PARAMETER :: PRODATE='19-May-2009'		!Must be changed after alterations
 !
 ! 
 !
@@ -3568,7 +3568,7 @@
 ! Use the escape probability approximation for lines originating
 ! in all levels.
 !
-	  CALL SUB_SOB_LINE_V2(SECTION,POPS,AVE_ENERGY,CHIL,ETAL,NEG_OPACITY,
+	  CALL SUB_SOB_LINE_V3(SECTION,POPS,CHIL,ETAL,NEG_OPACITY,
 	1                    FL,CONT_FREQ,AMASS,
 	1                    EDDINGTON,IMPURITY_CODE,VAR_SOB_JC,LST_ITERATION,
 	1                    EW,CONT_INT,
