@@ -56,9 +56,9 @@ C
 	BNUE=TWOHCSQ*( FL**3 )*EMHNUKT(ND)/T2
 	DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
 	DDBBDT=DBB*(T1*(1.0D0+EMHNUKT(ND))/T2-2.0D0)/T(ND)
-	IF(SN_MODEL)THEN
+	IF(SN_MODEL .AND. .NOT. DIF)THEN
 	  BNUE=0.0D0; DBB=0.0D0; DDBBDT=0.0D0
-	  IF(FIRST_FREQ)WRITE(LUER,*)'Setting flux to for hollow core in CMF_FLUX_SUB_V5'
+	  IF(FIRST_FREQ)WRITE(LUER,*)'Setting flux for hollow core in CMF_FLUX_SUB_V5'
 	END IF 
 C
 C Switch to using CHI_CLUMP, ETA_CLUMP, and ESEC_CLUMP in case the model 
