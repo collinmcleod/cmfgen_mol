@@ -549,7 +549,7 @@
 	    WRITE(6,*)' '
 	    WRITE(6,*)'The following are evaluated for the inner boundary.'
 	    WRITE(6,*)' '
-	    WRITE(6,'(A,ES12.4,5X,,ES13.4)')'Integrated HFLUX is',1.0D+15*T1,
+	    WRITE(6,'(A,ES12.4,5X,ES13.4)')'Integrated HFLUX is',1.0D+15*T1,
 	1             '      Luminosity is',1.0D+15*T1*T2
 	    WRITE(6,'(A,ES12.4,5X,A,ES13.4)')'      Grey HFLUX is',ZM(ID)%HGREY(ND-1),
 	1             ' Grey luminosity is',ZM(ID)%HGREY(ND-1)*T2
