@@ -852,6 +852,19 @@
 	IF(NEWMOD)THEN
 	  WRITE(LUER,*)'Starting a new model.'
 	  WRITE(LUER,*)'*_IN files will be used to start model'
+	ELSE
+!
+! Generally RP and RMAX will be consistent with R(ND) and R(1). However they
+! will need to be reset if we have rewound a model (i.e., changed POINT1 to
+! use older iterations) when computing the hyrostatic structure.
+!
+	  IF(RP .NE. R(ND) .OR. R(1) .NE. RMAX)THEN
+	    WRITE(LUER,*)'Warning: updating RP and RMAX in CMFGEN to make them consistent'
+	    WRITE(LUER,*)'with values in SCRTEMP. This inconsistency should only have occured'
+            WRITE(LUER,*)'if you have rewound (changd POINT1) a model with DO_HYDRO=T'
+	    RP=R(ND)
+	    RMAX=R(1)
+	  END IF
 	END IF
 !
 ! Now does accurate flux calculation for a single iteration provided not a new model.

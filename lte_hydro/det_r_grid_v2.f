@@ -12,6 +12,10 @@
 	1           R,V,TAU,ND)
 	IMPLICIT NONE
 !
+! Altered 20-May-2009 : Fundamental change to inclusion of extra boundary points.
+!                         These are now directly included in the final tau grid,
+!                         rather than the initial grid. This should give more control
+!                         over the spacing.
 ! Altered 12-Feb-2007 : Modifications to allow more choice in the outer boundary 
 !                         condition. dLOG_TAU and V_SCL_FAC now passed in call.
 ! Created 12-Aug-2006
@@ -33,6 +37,9 @@
 	REAL*8 V(ND)
 	REAL*8 TAU(ND)
 !
+	INTEGER N_BND_PNTS		!Number of extra points used at boundaries
+	INTEGER NS			!NEW_ND - N_BND_PNTS (initally)
+!
 ! Local arrays.
 !
 	REAL*8 REV_R(ND_MAX)
@@ -53,19 +60,14 @@
 	INTEGER, PARAMETER :: IONE=1
 	EXTERNAL ERROR_LU
 !
-	LOG_TAU=LOG(TAU)
-	LOG_TAU_MAX=LOG(TAU_MAX)
-!
-	I=1
-	REV_R(1)=R(1)
-	REV_V(1)=V(1)
-	REV_TAU(1)=LOG_TAU(1)
-!
 ! Handle the grid near the oputer boundary, according to the option specified.
-! For each option, we irst check parameter validity.
+! For each option, we first check parameter validity. These options MUST BE
+! consistent with the same options at the end of the routine. In this section
+! we now onl determine how many points we are adding to the outer boundary.
 !
 	LUER=ERROR_LU()
 	WRITE(6,*)'OUT_BND_OPT=',OUT_BND_OPT
+	N_BND_PNTS=0
 	IF(OUT_BND_OPT .EQ. 'POW')THEN
 	  IF(NUM_OBND_PARAMS .NE. 2)THEN
 	    WRITE(LUER,*)'Error in DET_R_GRID_V2 for OUT_BND_OPT=POW'
@@ -80,14 +82,8 @@
 	    WRITE(LUER,*)'OBND_PARS(2) must be >1'
 	    STOP
 	  END IF
-	    WRITE(6,*)OBND_PARS(1)
-	    WRITE(6,*)OBND_PARS(2)
 	  J=NINT(OBND_PARS(1))
-	  DO K=2,J+1
-	    REV_TAU(K)=REV_TAU(1)+dLOG_TAU/(OBND_PARS(2)**(J+2-K))
-	  END DO
-	  REV_TAU(J+2)=REV_TAU(1)+dLOG_TAU
-	  K=J+2
+	  N_BND_PNTS=J
 	ELSE IF(OUT_BND_OPT .EQ. 'SPECIFY')THEN
 	  DO K=1,NUM_OBND_PARAMS-1
 	    IF(OBND_PARS(K) .LT. 1.0 .OR. OBND_PARS(K) .LE. OBND_PARS(K+1))THEN
@@ -96,31 +92,22 @@
 	      STOP
 	    END IF
 	  END DO
-	  DO K=1,NUM_OBND_PARAMS
-	    REV_TAU(K+1)=REV_TAU(1)+dLOG_TAU/OBND_PARS(K)
-	  END DO
-	  REV_TAU(NUM_OBND_PARAMS+2)=REV_TAU(1)+dLOG_TAU
-	  K=NUM_OBND_PARAMS+2
+	  N_BND_PNTS=NUM_OBND_PARAMS
 	ELSE IF(OUT_BND_OPT .EQ. 'DEFAULT')THEN
-	  REV_TAU(2)=REV_TAU(1)+dLOG_TAU/9.0D0
-	  REV_TAU(3)=REV_TAU(1)+dLOG_TAU/3.0D0
-	  REV_TAU(4)=REV_TAU(1)+dLOG_TAU
-	  K=4
+	  N_BND_PNTS=3
+	ELSE 
+	  WRITE(LUER,*)'Unrecognized option in DET_R_GRID_V3'
+	  STOP
 	END IF
 !
-!Estimate V: accuracy at outer boundary not important.	
+! Now define the uniform grid.
 !
-	IF(OUT_BND_OPT .NE. ' ' .AND. OUT_BND_OPT .NE. 'NONE')THEN
-	  J=2
-	  DO WHILE(REV_TAU(K) .GT. LOG_TAU(J))
-	    J=J+1
-	  END DO
-	  DO I=2,K
-	    T1=(REV_TAU(I)-LOG_TAU(1))/(LOG_TAU(J)-LOG_TAU(1))
-	    REV_V(I)=(1.0D0-T1)*V(1)+T1*V(J)
-	  END DO
-	  I=K
-	END IF
+	LOG_TAU=LOG(TAU)
+	LOG_TAU_MAX=LOG(TAU_MAX)
+	REV_R(1)=R(1)
+	REV_V(1)=V(1)
+	REV_TAU(1)=LOG_TAU(1)
+	I=1
 !
 	J=2
  	JST=J
@@ -133,7 +120,7 @@
 	    STOP
 	  END IF
 !
-! This step ensure TAU spacing criterin is satisfied.
+! This step ensure TAU spacing criterion is satisfied.
 !
 	  REV_TAU(I)=REV_TAU(I-1)+dLOG_TAU
 !
@@ -141,13 +128,16 @@
 ! to give more accuracy for our first orer boundary conditions. We ignore the 
 ! velocity check.
 !
-	  IF(REV_TAU(I)+dLOG_TAU .GE. LOG_TAU_MAX)THEN
+	  IF(REV_TAU(I) .GE. LOG_TAU_MAX-0.5*dLOG_TAU)THEN
 	    T1=LOG_TAU_MAX-REV_TAU(I-1)
-	    REV_TAU(I)=REV_TAU(I-1)+0.6*T1
-	    I=I+1
-	    REV_TAU(I)=REV_TAU(I-2)+0.9*T1
+	    REV_TAU(I)=REV_TAU(I-1)+T1/2
 	    I=I+1
 	    REV_TAU(I)=LOG_TAU_MAX
+	    N_BND_PNTS=N_BND_PNTS+2
+	  ELSE IF(REV_TAU(I)+dLOG_TAU .GE. LOG_TAU_MAX)THEN
+	    I=I+1
+	    REV_TAU(I)=LOG_TAU_MAX
+	    N_BND_PNTS=N_BND_PNTS+2
 	  ELSE
 !
 ! Check if V spacing criterion is satisifed. If not, shrink spacing. Linear
@@ -177,11 +167,13 @@
 !
 ! The next few line can be uncommented if debuging.
 !
-!	WRITE(80,'(/,A,/)')' Estimate R grid as determined by DET_R_GRID_V2'
-!	WRITE(80,'(A,2(13X,A))')'Index','R','V'
-!	DO I=1,ND_TMP
-!	  WRITE(80,'(I5,3ES14.4)')I,REV_V(I),REV_TAU(I)
-!	END DO
+	WRITE(80,'(/,A,/)')' Estimate R grid as determined by DET_R_GRID_V2'
+	WRITE(80,'(A,4(9X,A))')'Index','   V',' Tau','dTau'
+	T1=10.0D0; T1=LOG(10.0D0)
+	DO I=1,ND_TMP-1
+	  WRITE(80,'(I5,5ES14.4)')I,REV_V(I),REV_TAU(I)/T1,(REV_TAU(I+1)-REV_TAU(I))/T1
+	END DO
+	I=ND_TMP; WRITE(80,'(I5,4ES14.4)')I,REV_V(I),REV_TAU(I)/T1
 !
 ! We now create a grid with the requested number of grid points. To do so
 ! we use the array index as the independent variable. This approach should
@@ -194,7 +186,57 @@
 	DO I=1,NEW_ND
 	  REV_R(I)=1+((I-1.0D0)*(ND_TMP-1.0D0) )/(NEW_ND-1.0D0)
 	END DO
-	CALL MON_INTERP(REV_TAU,NEW_ND,IONE,REV_R,NEW_ND,OLD_TAU,ND_TMP,OLD_R,ND_TMP)
+	NS=NEW_ND-N_BND_PNTS
+	CALL MON_INTERP(REV_TAU,NS,IONE,REV_R,NS,OLD_TAU,ND_TMP,OLD_R,ND_TMP)
+!
+! Now need to handle bondaries:
+!
+	dLOG_TAU=REV_TAU(2)-REV_TAU(1)
+	IF(OUT_BND_OPT .EQ. 'POW')THEN
+	  J=NINT(OBND_PARS(1))
+	  REV_TAU(J+2:NS+J)=REV_TAU(2:NS)
+	  DO K=2,J+1
+	    REV_TAU(K)=REV_TAU(1)+dLOG_TAU/(OBND_PARS(2)**(J+2-K))
+	  END DO
+	  NS=NS+J
+	ELSE IF(OUT_BND_OPT .EQ. 'SPECIFY')THEN
+	  J=NUM_OBND_PARAMS
+	  REV_TAU(J+2:NS+J)=REV_TAU(2:NS)
+	  DO K=1,NUM_OBND_PARAMS
+	    REV_TAU(K+1)=REV_TAU(1)+dLOG_TAU/OBND_PARS(K)
+	  END DO
+	  NS=NS+J
+	ELSE IF(OUT_BND_OPT .EQ. 'DEFAULT')THEN
+	  J=3
+	  REV_TAU(J+2:NS+J)=REV_TAU(2:NS)
+	  REV_TAU(2)=REV_TAU(1)+dLOG_TAU/9.0D0
+	  REV_TAU(3)=REV_TAU(1)+dLOG_TAU/3.0D0
+	  REV_TAU(4)=REV_TAU(1)+dLOG_TAU
+	  NS=NS+J
+	END IF
+!
+! We now need to do the inner boundary.
+!
+	REV_TAU(NS+2)=REV_TAU(NS)
+	dLOG_TAU=REV_TAU(NS)-REV_TAU(NS-1)
+	REV_TAU(NS)=REV_TAU(NS-1)+0.6D0*dLOG_TAU
+	REV_TAU(NS+1)=REV_TAU(NS-1)+0.9D0*dLOG_TAU
+	NS=NS+2
+	IF(NS .NE. NEW_ND)THEN
+	  WRITE(6,*)'Error in DET_R_GRID_V2: Inconsistent NS and NEW_ND'
+	  WRITE(6,*)'        NS=',NS
+	  WRITE(6,*)'    NEW_ND=',NEW_ND
+	  WRITE(6,*)'N_BND_PNTS=',N_BND_PNTS
+	  STOP
+	END IF
+!
+	WRITE(80,'(/,/,X,A)')'Final Tau Grid'
+	WRITE(80,'(A,4(9X,A))')'Index',' Tau','dTau'
+	T1=10.0D0; T1=LOG(10.0D0)
+	DO I=1,ND_TMP-1
+	  WRITE(80,'(I5,5ES14.4)')I,REV_TAU(I)/T1,(REV_TAU(I+1)-REV_TAU(I))/T1
+	END DO
+	I=ND_TMP; WRITE(80,'(I5,4ES14.4)')I,REV_TAU(I)/T1
 !
 ! We finish by remembering that we have been working with LOG(TAU).
 !
