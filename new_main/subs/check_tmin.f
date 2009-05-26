@@ -10,6 +10,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered: 23-May-2009 : Bug fix
 ! Created: 14-Apr-2009
 !
 	REAL*8, PARAMETER :: HDKT=4.7994145D0
@@ -26,17 +27,17 @@
 ! Determine ionzation fractions.
 !
 	LUER=ERROR_LU()
-	TMIN=1.0D+10
+	TMIN=0.0D0
 	DO ISPEC=1,NUM_SPECIES
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	    T1=HDKT*ATM(ID)%EDGEXzV_F(1)
-	    T2=T1/LOG10(1.0D+300)
-	    TMIN=MIN(TMIN,T2)
+	    T2=T1/LOG(1.0D+300)
+	    TMIN=MAX(TMIN,T2)
 	  END DO
 	END DO
 	WRITE(6,*)' '
 	WRITE(6,'(A)')' If T is too small may get expoential overflow when computing LTE populations'
-	WRITE(6,'(A,F6.3)')' The recommended minimum value of T (T_MIN) is:',TMIN
+	WRITE(6,'(A,F6.3)')' The recommended minimum value of T (T_MIN) in units of 10^4 K is:',TMIN
 	WRITE(6,*)' '
 !
 	RETURN
