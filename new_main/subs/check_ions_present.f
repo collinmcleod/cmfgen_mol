@@ -109,11 +109,11 @@
 	DO ISPEC=1,NUM_SPECIES
 	  IF(SPECIES_PRES(ISPEC))THEN
 	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
-	      IF(MAX_RATIO(ID) .GT. LOW_LIMIT)THEN
+	      IF(MAX_RATIO(ID) .LT. LOW_LIMIT)THEN
 	        DO K=SPECIES_BEG_ID(ISPEC), ID-1
-	          WRITE(LUER,'(A,A,ES8.2,A,ES8.2)')TRIM(ION_ID(ID)),
+	          WRITE(LUER,'(1X,A,A,ES8.2,A,ES8.2)')TRIM(ION_ID(ID)),
 	1           ' may not need to be include in model. Its maximum fractional abundance of ',
-	1           MAX_RATIO(ID),' < ',LOW_LIMIT
+	1           MAX_RATIO(K),' < ',LOW_LIMIT
 	        END DO
 	        EXIT
 	      END IF
@@ -128,7 +128,7 @@
 	    DO ID=SPECIES_END_ID(ISPEC),SPECIES_BEG_ID(ISPEC),-1
 	      IF(MAX_RATIO(ID) .GT. HIGH_LIMIT)THEN
 	        DO K=ID+1,SPECIES_END_ID(ISPEC)
-	          WRITE(LUER,'(A,A,ES8.2,A,ES8.2)')TRIM(ION_ID(ID)),
+	          WRITE(LUER,'(1X,A,A,ES8.2,A,ES8.2)')TRIM(ION_ID(ID)),
 	1             ' may not need to be include in model. Its maximum fractional abundance of ',
 	1            MAX_RATIO(ID),' < ',HIGH_LIMIT
 	        END DO
