@@ -9,6 +9,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Revised: 29-May-2009 : Bug fixed -- didn't output correct record when IREC NE NITSF.
 ! Revised: 20-Jan-2006 : Updated so that R, V, & SIGMA writing option can be altered.
 ! Revised: 06-May-2004 : Updated reading of SCRTEMP to SCR_READ_V2
 ! Revised: 13-Feb-2002
@@ -24,6 +25,7 @@
 !
 	INTEGER NPLTS
 	INTEGER IREC
+	INTEGER IREC_RD
 	INTEGER IREC_WR
 	INTEGER NIT_WR
 	INTEGER NITSF
@@ -80,9 +82,9 @@
 	  IF(IOS .EQ. 0)READ(12,'(A)',IOSTAT=IOS)STRING
 	  IF(IOS .EQ. 0)THEN
 	    IF(INDEX(STRING,'!Format date') .EQ. 0)THEN
-	      READ(STRING,*,IOSTAT=IOS)K,NIT,WRITEN_N_TIMES
+	      READ(STRING,*,IOSTAT=IOS)IREC_RD,NIT,WRITEN_N_TIMES
 	    ELSE
-	      READ(12,*,IOSTAT=IOS)K,NIT
+	      READ(12,*,IOSTAT=IOS)IREC_RD,NIT
 	    END IF
 	  END IF
 	  IF(IOS .NE. 0)THEN
@@ -97,7 +99,7 @@
 	ALLOCATE (SIGMA(ND))
 !
 !
-! NIT_WR=2 means that we write out the LAST 2 iterayions only.
+! NIT_WR=2 means that we write out the LAST 2 iterations only.
 !
 	NIT_WR=2
 	CALL GEN_IN(NIT_WR,'Number of (FINAL) iterations to write')
@@ -108,7 +110,7 @@
 !
 	IREC_WR=0
 	DO I=1,NIT_WR
-	   IREC=NIT-(NIT_WR-I)
+	   IREC=IREC_RD-(NIT_WR-I)
 	   CALL SCR_READ_V2(R,V,SIGMA,POPS,IREC,NITSF,
 	1              WRITEN_N_TIMES,LST_NG,READ_WRITE_RVSIG,
 	1              NT,ND,LUSCR,NEWMOD)
