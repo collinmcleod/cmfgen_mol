@@ -1,5 +1,5 @@
 C
-C Program section to compute the continuum intnesity. Opacities must have
+C Program section to compute the continuum intensity. Opacities must have
 C previuosly been evaluated.
 C
 C Altered 31-Jul-2007 - Call to MOM_JREL_V3 etc installed.
@@ -365,6 +365,10 @@ C
 	1             RJEXT,RSQHNU,VDOP_VEC_EXT,DELV_FRAC_MOM,
 	1             FL,dLOG_NU,DIF,DBB,IC,METHOD,L_TRUE,N_TYPE,
 	1             INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,FIRST_FREQ,NDEXT)
+	     ELSE IF(USE_LAM_ES)THEN
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Using J from formal-solution for ray-by-ray solution'
+	       RJEXT(1:NDEXT)=TC(1:NDEXT); RSQHNU(1:NDEXT)=0.0D0
+	       CALL GET_RSQH_REL(RSQHNU, REXT, VEXT, FL, NDEXT)
 	     ELSE
 	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_CMF_V8 with accurate grid'
 	       CALL MOM_J_CMF_V8(TA,CHIEXT,TB,VEXT,SIGMAEXT,REXT,
@@ -633,7 +637,7 @@ C
 	1                  VDOP_VEC,DELV_FRAC_FG,
 	1                  METHOD,FIRST_FREQ,NEW_FREQ,NC,NP,ND)
 	     ELSE 
-	        IF(FIRST_FREQ)WRITE(LUER,*)'Calling FG_J_CMF_V10'
+	        IF(FIRST_FREQ)WRITE(LUER,*)'Calling FG_J_CMF_V11'
 	        CALL FG_J_CMF_V11(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
 	1                  TC,FEDD,AQW,HQW,KQW,NQW,HMIDQW,NMIDQW,
 	1                  INBC,HBC_CMF(1),IPLUS,FL,dLOG_NU,DIF,DBB,IC,
@@ -679,8 +683,12 @@ C
 	1             RJ,RSQHNU,VDOP_VEC,DELV_FRAC_MOM,
 	1             FL,dLOG_NU,DIF,DBB,IC,METHOD,L_TRUE,N_TYPE,
 	1             INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,FIRST_FREQ,ND)
+	     ELSE IF(USE_LAM_ES)THEN
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Using J from formal-solution for ray-by-ray solution'
+	       RJ(1:ND)=TC(1:ND); RSQHNU(1:ND)=0.0D0
+	       CALL GET_RSQH_REL(RSQHNU, R, V, FL, ND)
 	     ELSE
-	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_CMF_V6'
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_CMF_V8'
 	       CALL MOM_J_CMF_V8(TA,CHI_CLUMP,TB,V,SIGMA,R,
 	1  	       RJ,RSQHNU,VDOP_VEC,DELV_FRAC_MOM,
 	1              FL,dLOG_NU,DIF,DBB,IC,
