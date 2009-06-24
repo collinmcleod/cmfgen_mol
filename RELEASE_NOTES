@@ -3,19 +3,127 @@
 Please run a few test models and report any difficulties.
 
 Please report any compile difficulties. I cannot fix bugs/features
-if I don't know about them.
+if I don't know about them. The following summary of changes
+was hurriedly put together, and is thus incomplete. Documentation
+has not been updated to reflect the changes.
 
-If using PGF95 on the MAC_PRO please contact me. There are a couple
-of tricks you need to know about to get the code to run successfully.
-Hopefully the features/bugs will be fixed in the next version of the
-compiler.
+                    26-May-2009
 
-                    30-Jun-2008
+Note: Some transitions have inaccurate wavelengths. This can be
+      due to the adopted atomic models, or inaccurate data.
+      When computing observed spectra, you can place the
+      correct wavelengths in a file and soft-link it to
+      REVISED_LAMBDAS. An example file is in misc/REVISED_LAMBDAS_9apr08,
+      which show the correct format for the file. The case shown
+      is for Si IV, and arises because I have not split the 6z state into
+      6g and 6h. 
+
+(1) Significant changes and fixes to SN routines.
+
+(2) Modified computation of the Eddington factor, f, for
+      most routines. Mainly done to facilitate changes
+      to SN routines. Revised routines include MOM_JREL_V5 (instead of V3);
+      MOM_J_CMF_V8 (instead of V6),  FG_J_CMF_V11 (instead of v10)
+
+(3) Improvements to det_r_grid_v2.f used by DO_HYDRO option. Extra
+     grid points at outer boundary now inserted after new uniform grid
+     has been created. Should lead to better grid definition.
+
+(4) An alternative option has been installed to prevent SL's form
+      causing problem when solving for the temperature distribution.
+      Option is SCL_SL_OPAC in VADAT, and only one of SCL_SL_OPAC
+      and SCL_LN can be true. SCL_SL_OPAC scale emissivities/opacities
+      used in CMFGEN to yield consistency (rather than just the 
+      cooling rates). Now give consistency with RHS of zero-moment
+      transfer equation. Primarily installed for SN.
+
+(5) SL_OPTION, FL_OPTION, and IL_OPTION can be inserted into  MODEL_SPEC.
+      These options, if present, provide a method of splitting SL for
+      ALL species, with editing the batch.sh file. Primarily installed
+      for SN models.
+
+(6) A few routines have OMP instructions inserted. CMF_FLUX runs considerable
+    faster with multiple process -- e.g., over a factor of 3 gain for 4
+    processors. Only the observer's frame calculation is faster for SN model
+    that uses relativistic transfer.
+
+(7) DC_INTERP_METHOD can now be set to RTX. In this case interpolation
+      is done in Excitation Temperature space, rather than departure
+      coefficients.
+
+(8) All comments in VADAT must now start with a !. Banks lines
+      are still allowed. Strings with non-matching [ ] are
+      flagged.
+
+(9) Extrapolation of photoionization cross-sections to higher energy
+     improved. Only affected a single ionization stage where a resonance
+     occurred at the end of the tabulated cross-section.
+
+(10) Parameters for CMF_FLUX now placed in a module --- CMF_FLUX_CNTRL_VAR_MOD 
+      rather than in CMF_FLUX_SUB.
+
+(11) OBS_FRAME_SUB can now handle a hollow core. Done for late-time
+      SN models only when DIF (i.e., Diffusion approximation) is
+      set to zero.
+
+(12) As always there are minor bug fixes, changes, cleaning etc. None should
+     significantly affect modeling in most case. You can always use diff to 
+     find out what changes have been made to the code. If you execute 
+        com/full_diff.sh old_dist
+     in the current distribution, you will get a difference listing of
+     all Makefile, f files etc in Diff_sum
+
+**** Check consistency routines ****
+
+(1) A couple of routines have been inserted to check parameter
+     consistency. This is becoming useful as more options installed.
+
+(2) CMFGEN now outputs recommended value of T_MIN to OUTGEN. Setting
+     T_MIN prevents floating underflow/overflow when including very
+     ionization species such as CV.
+
+(3) CMFGEN now outputs to OUTGEN an indication of whether additional
+     ionization stages should be added (only for species included in
+     model)
+
+Additional routines:
+  These routines are included in the release. In some
+  cases they simply replace earlier versions. In other
+  cases they create new functions.
+
+disp: PAR_XOPAC.INC, set_dc_or_pop_or_tx.f, wr_crit.f
+
+misc: ave_dc.f, plt_alpha.f
+
+new_main/mod_subs: check_param_consistency.f, comp_grey_v3.f, sub_sob_line_v3.f
+                   check_ions_present.f, check_tmin.f, out_sn_pops_v3.f
+                   set_rv_hydro_model_v2.f
+
+obs:  check_cmf_flux_param_consis.f, cmf_flux_cntrl_var_mod.f
+      obs_frame_sub_v7.f, rd_cmf_flux_controls.f
+
+plane: characteristics_v2.f, cmf_formal_rel.f, cmf_formal_rel_v2.f
+       define_grid_v2.f, derivr.f, derivs.f, edd_jrel_var_v2.f
+       fg_j_cmf_v11.f, fine_chi_grid.f, fine_r_grid.f, get_moms_non_rel.f
+       get_moms_rel.f, h_weight.f, j_weight.f, jgrey_hub_ddt_v3.f
+       k_weight.f, mod_ray_mom_store.f, mod_space_grid_v2.f, mod_var_jrel_v2.f
+       mom_j_cmf_v8.f, mom_jrel_v5.f, n_weight.f, optdepth_v2.f
+       rel_variables.f, runge_kutta.f, solve_cmf_formal_v2.f, var_jrel_v2.f
+       var_mom_j_cmf_v9.f, var_mom_jext_cmf_v3.f, velocity_law.f
+
+spec_plt: plt_jh_cur.f
+
+subs: fdg_f_to_s_ns_v1.f, par_fun_v3.f, rd_f_to_s_ids_v2.f, regrid_t_ed_v2.f
+      regrid_tx_r.f, subs/write_vec.f
+
+******************************************************************************
+
+                30-Jun-2008
 
 (1) Bug fix to $cmfdist/new_main/subs/adjust_pops.f
      (could cause a crash on some machines).
 
-(2) Fixed a stack of write statements: replaced ,X, by ,1X, etc.
+(2) Fixed a stack of write statements
     A simple X cause troubles on some compilers.
     Also fixed a few other compiler sensitive statements.
 
@@ -62,7 +170,7 @@ convergence has been obtained. Starting a model with DO_LAMBDA=T
 (4) Improved convergence when there are extremely large corrections
 using LAMBDA iterations (e.g., when including X-rays).
 
-(5) Significant changes to allow SN models to be computed including:
+(5) Significant changes to allow SN models to be computed including
       (a) Time variations of statistical equilibrium equations, 
       (b) Inclusion of relativistic terms in transfer equation (moment
              equations only)

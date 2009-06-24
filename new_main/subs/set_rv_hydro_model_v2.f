@@ -165,7 +165,7 @@
 	CLOSE(LU)
 !
 !
-        PURE_HUBBLE=.TRUE.
+        PURE_HUBBLE=.FALSE.  !.TRUE.
         IF(PURE_HUBBLE)THEN
 	  WRITE(6,*)'Setting Velocity so pure Hubble law in SET_RV_HYDRO_V2'
           T1=24.0D0*3600.0D0*1.0D+05*OLD_SN_AGE_DAYS/1.0D+10
