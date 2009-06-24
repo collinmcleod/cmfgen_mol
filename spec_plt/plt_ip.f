@@ -6,7 +6,8 @@
 !
 	PROGRAM PLT_IP
 !
-! Aleterd 18-Aug-2003 : IOS added to DIRECT_INFO call
+! Altered 24-Jun-2009 : Use INU and INU2 instead of JNU,JNU2
+! Altered 18-Aug-2003 : IOS added to DIRECT_INFO call
 ! Altered 16-Jun-2000 : DIRECT_INFO call inserted.
 !
 ! Interface routines for IO routines.
@@ -684,7 +685,7 @@
 	  YAXIS='F(p)'
 	  CALL CURVE(NP-1,XV,ZV)
 !
-	ELSE IF(X(1:4) .EQ. 'JNU2')THEN
+	ELSE IF(X(1:4) .EQ. 'INU2')THEN
 	  CALL USR_OPTION(T1,'lam_st',' ','Start wavelength in Ang')
 	  T1=0.299794D+04/T1
           I=GET_INDX_DP(T1,NU,NCF)
@@ -786,7 +787,7 @@
 	  YAXIS='I(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
 	  CALL CURVE(NP,XV,YV)
 
-	ELSE IF(X(1:3) .EQ. 'JNU')THEN
+	ELSE IF(X(1:3) .EQ. 'INU')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
 	  T1=0.299794E+04/T1
           I=GET_INDX_DP(T1,NU,NCF)
@@ -1155,8 +1156,8 @@
 	    WRITE(6,*)' CF:   Plot cummulative spectrum as a function of impact parameter'
 	    WRITE(6,*)' IP:   Plot spectrum as a function of impact parameter'
 	    WRITE(6,*)' SP:   Plot spectrum inside and outside impact parameter p'
-	    WRITE(6,*)' JNU:  Plot I(p) for a given frequency'
-	    WRITE(6,*)' JNU2: Plot I(p) for a given frequency band'
+	    WRITE(6,*)' INU:  Plot I(p) for a given frequency'
+	    WRITE(6,*)' INU2: Plot I(p) for a given frequency band'
 	    WRITE(6,*)' IF2:  Plot normalize Flux originating inside p for a given frequency band'
 	    WRITE(6,*)' '
 	    WRITE(6,*)' '
