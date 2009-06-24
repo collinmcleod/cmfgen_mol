@@ -5,7 +5,33 @@ Please run a few test models and report any difficulties.
 Please report any compile difficulties. I cannot fix bugs/features
 if I don't know about them. The following summary of changes
 was hurriedly put together, and is thus incomplete. Documentation
-has not been updated to reflect the changes.
+has not yet been updated to reflect the changes.
+
+                    24-June-2009
+
+This release fixes a couple of bugs to  the 26-May-2009 release.
+There have also been some additional changes. The most notable
+fixes to the 26-May-2009 versions were:
+        (1) Correction to lte_hydro/det_r_grid_v2.f which fixed a grid
+               issue that caused Tau(RMAX) to be less than requested value.
+        (2) Correction to misc/rewrite_scr.f which fixed an issue when NITSF
+               and IREC were unequal in POINT1 files.
+
+Additional notes:
+
+        (1) Be carefull that FG and FD in the cur_cmf/Makefile_definitions
+               are correctly defined. I also added F90nomp which solves a bug/feature with
+               the PGF95 compilero on a Mac Pro. It general, it can be defined the same as
+                F90.
+        (2) In the web directory there is a file called CMFGENGuide.txt which was written
+                in conjunction with Phil Massey and Kathryn Neugent. You might find this useful
+                with O star modeling.
+        (3) A collection of O star models has been placed on my WEB page. These are models of
+                intermediate complexity, and can be used as basis for new models. The models
+                are based on those of Fabrice Martins, although some parameters have been rounded,
+                and the atomic models and atoms updated.
+
+   Please check the web site in a few weeks in case others notice some additional updates.
 
                     26-May-2009
 
