@@ -140,7 +140,11 @@
 ! We can determine the frequency grid. We always chose the smallest needed
 ! frequency spacing.
 !
-	DO WHILE( FREQ(INDX) .GT. NU_MIN/MAX_RW_EXTENT )
+! Changed from NU_MIN/MAX_RW_EXTENT to 1.1D0*NU_MIN becaus of SN models, which
+! can have an extremely large VINF (19-June-2009).
+!
+!	DO WHILE( FREQ(INDX) .GT. NU_MIN/MAX_RW_EXTENT )
+	DO WHILE( FREQ(INDX) .GT. 1.1D0*NU_MIN )
 !
 ! Continuum
 !
