@@ -72,6 +72,7 @@
 	INTEGER TIME_SEQ_NO             !Number of model in time sequence.
 	LOGICAL SN_MODEL
 	LOGICAL SN_HYDRO_MODEL		!Use HYDRO model for SN input
+	LOGICAL PURE_HUBBLE_FLOW        !Forces a pure Hubble flow
 	LOGICAL INCL_RADIOACTIVE_DECAY	!Allow for radioactive decay.
 	LOGICAL JGREY_WITH_V_TERMS 	!Include velocity terms when comuting T(grey).
 	LOGICAL INCL_DJDT_TERMS         !Include DJDt terms in radiative transfer equation
