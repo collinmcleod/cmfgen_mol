@@ -2331,6 +2331,17 @@
 	  DEFAULT=WR_STRING(LAM_EN)
 	  CALL USR_OPTION(LAM_EN,'LAMEN',DEFAULT,FREQ_INPUT)
 !
+! This makes sure LAM_ST,LAM_END are in A.
+!
+	  IF(KEV_INPUT)THEN
+	    LAM_ST=ANG_TO_HZ/(LAM_ST*KEV_TO_HZ)
+	    LAM_EN=ANG_TO_HZ/(LAM_EN*KEV_TO_HZ)
+	  ELSE IF(HZ_INPUT)THEN
+	    LAM_ST=ANG_TO_HZ/LAM_ST
+	    LAM_EN=ANG_TO_HZ/LAM_EN
+	  END IF
+	  T1=MIN(LAM_ST,LAM_EN); LAM_EN=MAX(LAM_ST,LAM_EN); LAM_ST=T1
+!
 ! TAU_CONSTANT is used to compute the optical depth. Two choices are
 ! availabe:
 !    (1) Radial optical depth. Valid in outer region.
@@ -2519,6 +2530,15 @@
 !
 	  IF(XOPT .EQ. 'DIST')THEN
 	    I=2*CNT
+	    IF(HZ_INPUT)THEN
+	      DO J=1,I
+	         ZV(J)=ANG_TO_HZ/ZV(J)
+	      END DO
+	    ELSE IF(KEV_INPUT)THEN
+	      DO J=1,I
+	         ZV(J)=ANG_TO_HZ/ZV(J)/KEV_TO_HZ
+	      END DO
+	    END IF
 	    CALL DP_CURVE(I,ZV,YV)
 	    CALL GRAMON_PGPLOT('\gl(\A)','Log \gt\dSob\u',' ',' ')
 	  ELSE IF(XOPT .EQ. 'NV')THEN
@@ -3182,8 +3202,8 @@
 	    NU_EN=ANG_TO_HZ/LAM_ST
 	    NU_ST=ANG_TO_HZ/LAM_EN
 	  ELSE
-	   NU_ST=LAM_ST
-	   NU_EN=LAM_EN
+	    NU_ST=LAM_ST
+	    NU_EN=LAM_EN
 	  END IF 
 	  DEL_NU=10.0D0**( LOG10(NU_EN/NU_ST)/(NLAM-1) )
 !
@@ -4270,6 +4290,8 @@ c
 !
 ! 
 !
+! Plots the Rayleigh scattering opacity as a function of depth.
+!
 	ELSE IF(XOPT .EQ. 'RAY')THEN
 	  CALL USR_OPTION(FREQ,'LAM','0.0',FREQ_INPUT)
 	  IF(FREQ .EQ. 0)THEN
@@ -4282,9 +4304,13 @@ c
 	    CHI_RAY(1:ND)=0.0D0
             CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
 	1             ATM(1)%NXzV_F,FREQ,ND)
-	    CHI_RAY(1:ND)=CHI_RAY(1:ND)*CLUMP_FAC(1:ND)
+	    CHI_RAY(1:ND)=1.0D-10*CHI_RAY(1:ND)*CLUMP_FAC(1:ND)
           END IF
 	  CALL DP_CURVE(ND,XV,CHI_RAY)
+	  YAXIS='\gx(cm\u-1\d)'
+!
+! Plots the Rayleigh scattering cross-section as a function of opacity.
+! In units of the Thompson-cross section.
 !
 	ELSE IF(XOPT .EQ. 'RAYL')THEN
 	  CALL USR_OPTION(LAM_ST,'LAM_ST','100.0',FREQ_INPUT)
@@ -4309,8 +4335,8 @@ c
 	  END DO
 	  YV(1:K)=YV(1:K)/ATM(1)%XzV_F(1,1)/6.65D-15
 	  CALL DP_CURVE(K,WV,YV)
-	  XAXIS='\gl(\V)'
-	  YAXIS='\gs/gs_dT\u'
+	  XAXIS='\gl(\A)'
+	  YAXIS='\gs/\gs\dT\u'
 !
 	ELSE IF(XOPT .EQ. 'ETA')THEN
 	  DO I=1,ND
@@ -4387,7 +4413,7 @@ c
 	      YV(I)=DLOG10(CHI(I))-10.0
 	    END DO
 	    CALL DP_CURVE(ND,XV,YV)
-	    YAXIS='Log(\gx(cm\u-1\d)'
+	    YAXIS='Log \gx(cm\u-1\d)'
 	  END IF
 !
 ! These options allow you to plot tau at a particular R (TAUR), or
@@ -4489,15 +4515,16 @@ c
 	    ELSE
 	      R_INDX=NINT(ABS(RVAL))
 	      R_INDX=MAX(1,R_INDX)
-	      R_INDX=MIN(R_INDX,ND-1)
+	      R_INDX=MIN(R_INDX,ND)
 	      RVAL=R(R_INDX)
+	      R_INDX=MIN(R_INDX,ND-1)
 	    END IF
 	    WRITE(6,*)'   RVAL is',RVAL
 	    WRITE(6,*)'RVAL/R* is',RVAL/R(ND)
 	    YAXIS='Log(\gt[R])'
 	    IF(LINY)YAXIS='\gt[R]'
 	    IF(XOPT .EQ. 'CHIR')YAXIS='\gx (cm\u-1\d)'
-	    IF(XOPT .EQ. 'KAPR')YAXIS='\gx (cm\u2\d/g)'
+	    IF(XOPT .EQ. 'KAPR')YAXIS='\gk (cm\u2\d/g)'
 	  ELSE
 	    CALL USR_OPTION(TAU_VAL,'TAU',' ',
 	1       'Tau value for which R is to be determined')
