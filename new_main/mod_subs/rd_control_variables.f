@@ -210,6 +210,7 @@ C
 !
 	  REVISE_R_GRID=.FALSE.
 	  JGREY_WITH_V_TERMS=.FALSE.
+	  PURE_HUBBLE_FLOW=.FALSE.
 	  N_RG_PAR=0
 	  TIME_SEQ_NO=0
 	  IF(SN_MODEL)THEN
@@ -232,6 +233,7 @@ C
 	      CALL RD_STORE_DBLE(RG_PAR(I),TEMP_CHAR(1:8),L_TRUE,'New R grid parameters:')
 	    END DO
 	    IF(N_RG_PAR .EQ. 0)N_RG_PAR=1
+!
 	    JGREY_WITH_V_TERMS=.TRUE.
 	    CALL RD_STORE_LOG(JGREY_WITH_V_TERMS,'JG_W_V',L_FALSE,
 	1            'Include V terms when computing Grey temperature?')
@@ -242,6 +244,8 @@ C
 	    CALL RD_STORE_INT(TIME_SEQ_NO,'TS_NO',DO_CO_MOV_DDT,
 	1            'Time sequence number: 1 for inital model')
 	    CALL RD_STORE_DBLE(SN_AGE_DAYS,'SN_AGE',DO_CO_MOV_DDT,'Age of SN in days')
+	    CALL RD_STORE_LOG(PURE_HUBBLE_FLOW,'PURE_HUB',L_TRUE,
+	1            'Force a pre hubble flow using age and radii of SN?')
 	    CALL RD_STORE_LOG(INCL_RADIOACTIVE_DECAY,'INC_RAD_DECAYS',L_TRUE,
 	1            'Allow for radiactive decays')
 	    CALL RD_STORE_NCHAR(SN_T_OPTION,'SN_T_OPT',ITEN,L_TRUE,
