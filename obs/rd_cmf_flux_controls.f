@@ -269,11 +269,13 @@
 	  USE_FORMAL_REL=.FALSE.
 	  INCL_REL_TERMS=.FALSE.
 	  INCL_ADVEC_TERMS_IN_TRANS_EQ=.FALSE.
+	  USE_LAM_ES=.FALSE.
 	  CALL RD_STORE_LOG(USE_J_REL,'USE_J_REL',L_FALSE,'Use relativistic moment solver?')
 	  CALL RD_STORE_LOG(INCL_REL_TERMS,'INCL_REL',L_FALSE,'Include relativistic terms?')
 	  CALL RD_STORE_LOG(INCL_ADVEC_TERMS_IN_TRANS_EQ,'INCL_ADV_TRANS',L_FALSE,
 	1    'Include advection terms in transfer equation?')
 	  CALL RD_STORE_LOG(USE_FORMAL_REL,'USE_FRM_REL',L_FALSE,'Use CMF_FORMAL_REL to compute F etc?')
+	  CALL RD_STORE_LOG(USE_LAM_ES,'USE_LAM_ES',L_FALSE,'Use formal solution for e.s. (done via Lambda iteration)')
 !
 	  WRITE(LUMOD,'()')
 	  CALL RD_STORE_LOG(ACCURATE,'INC_GRID',L_TRUE,'Increase grid size to improve accuracy? ')
@@ -313,6 +315,10 @@
 !
 	CLOSE(UNIT=LUMOD)
 	CALL CLEAN_RD_STORE
+!
+! Check consistency of parameters.
+!
+	CALL CHECK_CMF_FLUX_PARAM_CONSIS()
 !
 	RETURN
 	END
