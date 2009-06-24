@@ -5,6 +5,7 @@ include ../Makefile_definitions
 #
 # These names are for the fortran linker
 #
+
 LN1=tools
 LN2=disp
 LN3=subs
@@ -12,9 +13,11 @@ LN4=newsubs
 LN5=pgplt
 LN6=mod
 LN7=dev
+
 #
 # These names refer to the full file name
 #
+
 FN1=$(LIB_DIR)lib$(LN1).a
 FN2=$(LIB_DIR)lib$(LN2).a
 FN3=$(LIB_DIR)lib$(LN3).a
@@ -22,8 +25,9 @@ FN4=$(LIB_DIR)lib$(LN4).a
 FN5=$(LIB_DIR)lib$(LN5).a
 FN6=$(LIB_DIR)lib$(LN6).a
 FN7=$(LIB_DIR)lib$(LN7).a
+
 #
-# We only make dispgen.exe if there has been a change to the main *.f files,
+# We only make the executables if there has been a change to the main *.f files,
 # or if the libraries have changed since the last link.
 #
  
@@ -37,8 +41,8 @@ OBJ2  =  obs_frame.o obs_frame_sub_v2.o mon_interp_fast.o
 all: $(EXE_DIR)cmf_flux.exe $(EXE_DIR)obs_frame.exe
 
 #
-# Give the dependencies of dispgen.exe and how it is created.
-#
+# Give the dependencies of cmf_flux.exe and how it is created.
+# 
 
 $(EXE_DIR)cmf_flux.exe :  $(OBJ1) $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6) $(FN7)
 	ar -xo ../lib/libsubs.a griem_stark_mod.o
@@ -58,13 +62,20 @@ $(EXE_DIR)obs_frame.exe :  $(OBJ2) $(FN1) $(FN2) $(FN3) $(FN4)
 %.o : %.f
 	$(F90) -c $(FG)  $<
 
-USR = ../lib/libtools.a(usr_option.o)
-GEN = ../lib/libmod.a(mod_lev_dis_blk.o)
+#
+# I use F90noamp because of an issue with the PGF95 compiler on the Mac PRO.
+#
 
-cmf_flux_v5.o     : cmf_flux_v5.f      mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(USR)
+cmf_flux_v5.o : cmf_flux_v5.f      mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(USR)
+	$(F90nomp) -c $(FG) cmf_flux_v5.f 
+
 cmf_flux_sub_v5.o : cmf_flux_sub_v5.f  mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(GEN) \
    COMP_JCONT_V4.INC  EVAL_LTE_INC_V4.INC\
    OPACITIES_V4.INC   XOPAC_V4.INC
+	$(F90nomp) -c $(FG) cmf_flux_sub_v5.f 
+
+USR = ../lib/libtools.a(usr_option.o)
+GEN = ../lib/libmod.a(mod_lev_dis_blk.o)
 
 rd_cmf_flux_controls.o : cmf_flux_cntrl_var_mod.o
 check_cmf_flux_param_consis.o : cmf_flux_cntrl_var_mod.o
