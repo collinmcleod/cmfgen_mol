@@ -21,6 +21,7 @@ C
 	1              DEEP,ST_INDX,END_INDX)
 	IMPLICIT NONE
 C
+C Altered 12-Jun-2009 - Changed insertion at outer bundary to keep (R1-R2)/(R2-R3) small.
 C Altered 05-Jan-1998 - NEND replaced by ST_INDX, END_INDX
 C                         Changed to V2.
 C Altered 28-May-1996 - Call to DP_ZERO removed.
@@ -67,6 +68,21 @@ C
 	      REXT(J+K)=R(I)*EXP(DELR*K)
 	    END DO
 	  END DO
+!
+! Finalized: 12-June-2009
+! This technique preserves the ratio of the last two grid spacings.
+!
+	  IF(ST_INDX .EQ. 1)THEN
+	    T1=(R(1)-R(2))/(R(2)-R(3))
+	    IF(T1 .LT. 0.1D0)THEN
+	      REXT(2)=(REXT(1)+T1*REXT(3))/(1.0D0+T1)
+	    ELSE
+	      REXT(2)=REXT(1)-0.1D0*(REXT(1)-REXT(2))
+	    END IF
+	    WRITE(6,*)' Information about insertion of extra grid points at outer boundary (INC_GRID option)'
+	    WRITE(6,*)'   R ratio:',T1,(R(2)-R(3))/(R(3)-R(4))
+	    WRITE(6,*)'REXT ratio:',(REXT(1)-REXT(2))/(REXT(2)-REXT(3)),(REXT(2)-REXT(3))/(REXT(3)-REXT(4))
+	  END IF
 C
 	  DO I=END_INDX,ND
 	    J=I+(END_INDX-ST_INDX)*NPINS
