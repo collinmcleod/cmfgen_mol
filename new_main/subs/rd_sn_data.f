@@ -9,6 +9,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 24-Jun-2009: PURE_HUBBLE_FLOW now stored in CONTROL_VARIABLE_MOD
 ! Altered 02-Apr-2009: Now set fixed abundance specifiers, normally read in, to surface values.
 ! Altered 11-Feb-2009: Use isotope data, when available, to atomic number fractions.
 ! Altered 28-Jan-2009: If inner & outer radii differ from passed R values (via MOD_CMFGEN)
@@ -57,7 +58,6 @@
 	CHARACTER(LEN=200) STRING
 	LOGICAL, SAVE :: FIRST=.TRUE.
 	LOGICAL DONE
-	LOGICAL PURE_HUBBLE
 !
 	LUER=ERROR_LU()
 	WRITE(LUER,*)'Entering RD_SN_DATA'
@@ -173,8 +173,7 @@
 	    STRING=' '
 	  END DO
 !
-	PURE_HUBBLE=.TRUE.
-	IF(PURE_HUBBLE)THEN
+	IF(PURE_HUBBLE_FLOW)THEN
 	  T1=24.0D0*3600.0D0*1.0D+05*OLD_SN_AGE_DAYS/1.0D+10
 	  DO I=1,NX
 	    T2=V_HYDRO(I)
