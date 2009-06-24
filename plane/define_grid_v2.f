@@ -71,8 +71,8 @@
 !--------------------------------------------------------------------
 !
       IF(NEW_GRID .AND. ALLOCATED(TAU))THEN
+	DEALLOCATE (TAU, DTAU)
 	DO IP=1,NP
-	  DEALLOCATE (TAU, DTAU)
           DEALLOCATE (RAY(IP)%I_P, RAY(IP)%I_M, RAY(IP)%LNK)
           DEALLOCATE (RAY(IP)%I_P_PREV, RAY(IP)%I_M_PREV)
           DEALLOCATE (RAY(IP)%I_P_SAVE, RAY(IP)%I_M_SAVE)
