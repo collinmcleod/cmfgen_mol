@@ -862,6 +862,8 @@
 	    WRITE(LUER,*)'Warning: updating RP and RMAX in CMFGEN to make them consistent'
 	    WRITE(LUER,*)'with values in SCRTEMP. This inconsistency should only have occured'
             WRITE(LUER,*)'if you have rewound (changd POINT1) a model with DO_HYDRO=T'
+            WRITE(LUER,*)'  RP=',RP,  ' R(ND)=',R(ND)
+            WRITE(LUER,*)'RMAX=',RMAX,'  R(1)=',R(1)
 	    RP=R(ND)
 	    RMAX=R(1)
 	  END IF
@@ -933,8 +935,8 @@
          ELSE IF(VELTYPE .EQ. 10)THEN
 	    CALL RV_SN_MODEL_V2(R,V,SIGMA,RMAX,RP,VCORE,V_BETA1,RDINR,LUIN,ND)
 	 ELSE IF(VELTYPE .EQ. 11)THEN
-	   CALL SET_RV_HYDRO_MODEL_V2(R,V,SIGMA,RMAX,RP,RMAX_ON_RCORE,SN_AGE_DAYS,
-	1                      N_IB_INS,N_OB_INS,RDINR,ND,LUIN)
+	   CALL SET_RV_HYDRO_MODEL_V3(R,V,SIGMA,RMAX,RP,RMAX_ON_RCORE,SN_AGE_DAYS,
+	1                      PURE_HUBBLE_FLOW,N_IB_INS,N_OB_INS,RDINR,ND,LUIN)
            VINF=V(1)
 	 ELSE
 	   WRITE(LUER,*)'Invalid Velocity Law'
@@ -2649,6 +2651,8 @@
 	          END DO
 	        END IF
 	      END DO
+!	WRITE(198,'(5I10,4ES18.8)')ML,NL,NUP,MNL_F,MNUP_F,FL,STEQ_T(ND-9),
+!	1                           BA_T(NT-3,DIAG_INDX,ND-9),BA_T(NT,DIAG_INDX,ND-9)
 	      CALL TUNE(ITWO,'dBA_LINE')
 !
 ! Must now zero dZ since next time it is used it will be for a new line.
@@ -2909,7 +2913,18 @@
 	  END DO
 	END IF
 !
-!	WRITE(199,*)ML,STEQ_T(1)
+!	T1=FQW(ML)*(CHI_NOSCAT(ND-9)*RJ(ND-9) - ETA_NOSCAT(ND-9))
+!	IF(MOD(FREQ_INDX,N_PAR) .EQ. 0)THEN 
+!	  WRITE(199,'(I10,12ES18.8)')ML,FL,STEQ_T(ND-9),T1,FQW(ML)*ETA_NOSCAT(ND-9),
+!	1                           STEQ_T_SCL(ND-9),STEQ_T_NO_SCL(ND-9),
+!	1                           BA_T(NT-3,DIAG_INDX,ND-9),BA_T(NT,DIAG_INDX,ND-9)
+!	ELSE
+!	  WRITE(199,'(I10,12ES18.8)')ML,FL,STEQ_T(ND-9),T1,FQW(ML)*ETA_NOSCAT(ND-9),
+!	1                           STEQ_T_SCL(ND-9),STEQ_T_NO_SCL(ND-9),
+!	1                           BA_T(NT-3,DIAG_INDX,ND-9)+BA_T_PAR(NT-3,ND-9),
+!	1                           BA_T(NT,DIAG_INDX,ND-9)+BA_T_PAR(NT,ND-9)
+!	END IF
+!
 10000	CONTINUE
 	CALL TUNE(ITWO,'10000')
 !
@@ -2921,7 +2936,7 @@
 !
 	CALL STEQ_BA_TWO_PHOT_RATE_V3(POPS,NT,ND,
 	1         DIAG_INDX,COMPUTE_BA,LUMOD,LST_ITERATION)
-	WRITE(199,*)ML,STEQ_T(1),'two'
+	WRITE(199,*)ML,STEQ_T(ND-9),'two'
 !
 ! 
 !
@@ -2939,7 +2954,7 @@
 	END DO
 !
 	CALL STEQ_BA_CHG_EXCH_V3(POPS,T,NT,ND,DIAG_INDX,COMPUTE_BA)
-	WRITE(199,*)ML,STEQ_T(1),'chg'
+	WRITE(199,*)ML,STEQ_T(ND-9),'chg'
 !
 	DO ID=1,NUM_IONS-1
 	  CALL EVAL_CHG_RATES_V3(ATM(ID)%CHG_PRXzV, ATM(ID)%CHG_RRXzV,
@@ -2957,7 +2972,7 @@
           CALL STEQ_CO_MOV_DERIV_V2(ADVEC_RELAX_PARAM,LINEAR_ADV,
 	1             DO_CO_MOV_DDT,LAMBDA_ITERATION,COMPUTE_BA,
 	1             TIME_SEQ_NO,NUM_BNDS,ND,NT)
-	  WRITE(199,*)ML,STEQ_T(1),'SN_DDT'
+	  WRITE(199,*)ML,STEQ_T(ND-9),'SN_DDT'
 	ELSE
 	  CALL STEQ_ADVEC_V4(ADVEC_RELAX_PARAM,LINEAR_ADV,NUM_BNDS,ND,
 	1            INCL_ADVECTION,LAMBDA_ITERATION,COMPUTE_BA)
@@ -2970,7 +2985,7 @@
 	1                       POPS,AVE_ENERGY,HDKT,
 	1                       COMPUTE_BA,INCL_ADIABATIC,
 	1                       TIME_SEQ_NO,DIAG_INDX,NUM_BNDS,NT,ND)
-	  WRITE(199,*)ML,STEQ_T(1),'SN_ADD'
+	  WRITE(199,*)ML,STEQ_T(ND-9),'SN_ADD'
 	ELSE
 	  dE_WORK=0.0D0
 	  CALL EVAL_ADIABATIC_V3(AD_COOL_V,AD_COOL_DT,
@@ -2981,7 +2996,7 @@
 !
 	IF(SN_MODEL .AND. INCL_RADIOACTIVE_DECAY)THEN
 	  CALL EVAL_RAD_DECAY_V1(dE_RAD_DECAY,NT,ND)
-	  WRITE(199,*)ML,STEQ_T(1),'SN_RAD'
+	  WRITE(199,*)ML,STEQ_T(ND-9),'SN_RAD'
 	END IF
 !
 ! Prevent T from becoming too small by adding a extra heating term.
@@ -3641,7 +3656,9 @@
 	1          .AND. WRBAMAT
 	1          .AND. .NOT. FLUX_CAL_ONLY 
 	1          .AND. .NOT. LAMBDA_ITERATION)THEN
+	  CALL TUNE(1,'BAMAT_WR')
 	  CALL STORE_BA_DATA_V2(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,'BAMAT')
+	  CALL TUNE(2,'BAMAT_WR')
 	END IF
 !
 ! Ends check on GLOBAL_LINE.
@@ -4439,6 +4456,7 @@
 	       IF(DO_GREY_T_AUTO)THEN
 	         CALL GREY_T_ITERATE(POPS,Z_POP,NU,NU_EVAL_CONT,FQW,
 	1               LUER,LUIN,NC,ND,NP,NT,NCF,N_LINE_FREQ,MAX_SIM)
+                 MAIN_COUNTER=MAIN_COUNTER+1
 	         CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,RITE_N_TIMES,
 	1               LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
 	       END IF
