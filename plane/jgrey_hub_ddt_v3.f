@@ -319,7 +319,7 @@
 	    IF(WORK(I) .GT. 0)THEN
 	      T_FROM_J(I)=0.5D0*(OLD_T(I)*ROLD_ON_R+T_FROM_J(I))
 	    ELSE
-	      WRITE(6,*)'Error in JGREY_HUB_DDT_V2'
+	      WRITE(6,*)'Error in JGREY_HUB_DDT_V3'
 	      WRITE(6,*)'Error: WORK -ve yet -ve J or B'
 	      WRITE(6,*)'Check DJDT_GREY_ERROR file for more information'
 	      OPEN(UNIT=LU,FILE='DJDT_GREY_ERRROR',STATUS='UNKNOWN')
@@ -516,10 +516,10 @@
 	H_OUTBC=H_OUTBC/FS_RSQJ(1)
 !
 	T1=MAXVAL( ABS(F(1:ND)-FS_RSQK(1:ND)) )
-	WRITE(6,*)'Current accuracy in JGREY_HUB_DDT_V2 is', T1
+	WRITE(6,*)'Current accuracy in JGREY_HUB_DDT_V3 is', T1
 	F_LOOP_COUNTER=F_LOOP_COUNTER+1
-	IF(F_LOOP_COUNTER .GT. 50)THEN
-	   WRITE(6,*)'Exceeded 50 iterations or F inJGREY_HUB_DDT_V2'
+	IF(F_LOOP_COUNTER .GT. 200)THEN
+	   WRITE(6,*)'Exceeded 200 iterations or F in JGREY_HUB_DDT_V3'
 	   WRITE(6,*)'Check starting conditions'
 	   STOP
 	ELSE IF(T1 .GT. ACCURACY)THEN
