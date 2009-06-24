@@ -2,7 +2,10 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
-	INTEGER, PARAMETER :: NCF_MAX=400000
+! Altered 10-June-2009 : Inserted JMF, JMR options
+!                         Made J_COMP_full 2nd default filename
+!
+	INTEGER, PARAMETER :: NCF_MAX=600000
 !
 	REAL*8 INDX(NCF_MAX)
 	REAL*8 NU(NCF_MAX)
@@ -31,14 +34,25 @@
 !
 	INTEGER I,IBEG
 	INTEGER NCF
+	INTEGER IOS
 	INTEGER LUM_STAR 
 !
-1000	CONTINUE
  	FILENAME='J_COMP'
+1000	CONTINUE
 	CALL GEN_IN(FILENAME,'File with data to be plotted')
 	IF(FILENAME .EQ. ' ')GOTO 1000
+	FILENAME=ADJUSTL(FILENAME)
+	IF(UC(TRIM(FILENAME)) .EQ. 'EXIT')THEN
+	  WRITE(6,*)'Exiting code'
+	  STOP
+	END IF
 !
-	OPEN(UNIT=11,FILE=FILENAME,STATUS='OLD',ACTION='READ')
+	OPEN(UNIT=11,FILE=FILENAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(6,*)'Unable to open file: ',TRIM(FILENAME)
+ 	    FILENAME='J_COMP_full'
+	    GOTO 1000
+	  END IF
 !
 	  STRING=' '
 	  DO WHILE(INDEX(STRING,'HBC_CMF') .EQ. 0)
@@ -51,7 +65,8 @@
 	    IF(I .GT. NCF_MAX)THEN
 	      WRITE(6,*)'************************************************'
 	      WRITE(6,*)' '
-	      WRITE(6,*)'Error --- insufficent meory to read in all data'
+	      WRITE(6,*)'Error --- insufficent memory to read in all data'
+	      WRITE(6,*)'Edit NCF_MAX in plt_j_comp.f to get more memory'
 	      WRITE(6,*)' '
 	      WRITE(6,*)'************************************************'
 	      EXIT
@@ -75,34 +90,42 @@
 !
 !
 	WRITE(6,*)' '
-	WRITE(6,'(A,F6.2,A)')'Mean difference is:          ',SUM1,'%'
-	WRITE(6,'(A,F6.2,A)')'Mean absolute difference is: ',SUM3,'%'
-	WRITE(6,'(A,F6.2,A)')'Root mean square is:         ',SUM2,'%'
+	WRITE(6,'(A,F6.2,A)')' Mean difference is:          ',SUM1,'%'
+	WRITE(6,'(A,F6.2,A)')' Mean absolute difference is: ',SUM3,'%'
+	WRITE(6,'(A,F6.2,A)')' Root mean square is:         ',SUM2,'%'
 !
 	PLT_OPT='DW'
 	DO WHILE(1 .EQ. 1)
 	  WRITE(6,*)' '
 	  WRITE(6,*)'Plot options are:'
-	  WRITE(6,*)'  JF: Plot J against frequency at outer boundary'
-	  WRITE(6,*)'  JW: Plot J against wavelength at outer boundary'
-	  WRITE(6,*)' dJF: Plot J-J against frequency at outer boundary'
-	  WRITE(6,*)' dJW: Plot J-J against wavelength at outer boundary'
-	  WRITE(6,*)'  DF: Plot Error against frequency at outer boundary'
-	  WRITE(6,*)'  DW: Plot Error against wavelength at outer boundary'
+	  WRITE(6,*)'  JF: Plot J ray solution against frequency at outer boundary'
+	  WRITE(6,*)' JMF: Plot J mom solution against frequency at outer boundary'
+	  WRITE(6,*)'  JW: Plot J ray solution against wavelength at outer boundary'
+	  WRITE(6,*)' JMW: Plot J mom solution against wavelength at outer boundary'
+	  WRITE(6,*)' dJF: Plot J(ray)-J(mom) against frequency at outer boundary'
+	  WRITE(6,*)' dJW: Plot J(ray)-J(mom) against wavelength at outer boundary'
+	  WRITE(6,*)'  DF: Plot %error against frequency at outer boundary'
+	  WRITE(6,*)'  DW: Plot $error against wavelength at outer boundary'
 	  WRITE(6,*)' I??: Inner boundary options (as for outrer boundary)'
 	  WRITE(6,*)'E(X): Exit routine'
 	  CALL GEN_IN(PLT_OPT,'Plot option')
 !
 	  IF(UC(PLT_OPT) .EQ. 'JF')THEN
 	    CALL DP_CURVE(NCF,NU,JR_OUT)
-	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J',' ',' ')
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(ray)',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'JMF')THEN
+	    CALL DP_CURVE(NCF,NU,JM_OUT)
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(mom)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'JW')THEN
 	    CALL DP_CURVE(NCF,LAM,JR_OUT)
-	    CALL GRAMON_PGPLOT('\g(\A)','J',' ',' ')
+	    CALL GRAMON_PGPLOT('\gl(\A)','J(ray)',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'JMW')THEN
+	    CALL DP_CURVE(NCF,LAM,JM_OUT)
+	    CALL GRAMON_PGPLOT('\gl(\A)','J(mom)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'DJW')THEN
 	    Y(1:NCF)=JR_OUT(1:NCF)-JM_OUT(1:NCF)
 	    CALL DP_CURVE(NCF,LAM,Y)
-	    CALL GRAMON_PGPLOT('\g(\A)','J(ray)-J(mom)',' ',' ')
+	    CALL GRAMON_PGPLOT('\gl(\A)','J(ray)-J(mom)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'DJF')THEN
 	    Y(1:NCF)=JR_OUT(1:NCF)-JM_OUT(1:NCF)
 	    CALL DP_CURVE(NCF,NU,Y)
@@ -116,14 +139,20 @@
 !
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IJF')THEN
 	    CALL DP_CURVE(NCF,NU,JR_IN)
-	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J',' ',' ')
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(ray)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IJW')THEN
-	    CALL DP_CURVE(NCF,LAM,JR_IN)
-	    CALL GRAMON_PGPLOT('\g(\A)','J',' ',' ')
+	    CALL DP_CURVE(NCF,LAM,JM_IN)
+	    CALL GRAMON_PGPLOT('\gl(\A)','J(mom)',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'IJF')THEN
+	    CALL DP_CURVE(NCF,NU,JR_IN)
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(ray)',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'IJMW')THEN
+	    CALL DP_CURVE(NCF,LAM,JM_IN)
+	    CALL GRAMON_PGPLOT('\gl(\A)','J(mom)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IDJW')THEN
 	    Y(1:NCF)=JR_IN(1:NCF)-JM_IN(1:NCF)
 	    CALL DP_CURVE(NCF,LAM,Y)
-	    CALL GRAMON_PGPLOT('\g(\A)','J(ray)-J(mom)',' ',' ')
+	    CALL GRAMON_PGPLOT('\gl(\A)','J(ray)-J(mom)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IDJF')THEN
 	    Y(1:NCF)=JR_IN(1:NCF)-JM_IN(1:NCF)
 	    CALL DP_CURVE(NCF,NU,Y)
