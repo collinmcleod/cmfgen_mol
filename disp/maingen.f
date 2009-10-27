@@ -1211,6 +1211,19 @@
 	  XAXIS='m(gm cm\u-2\d)'
 	  XAXSAV=XAXIS
 !
+	ELSE IF(XOPT .EQ. 'XMASS')THEN
+!
+	  DO I=1,ND
+	    ZETA(I)=4.0D0*PI*1.0D+30*MASS_DENSITY(I)*R(I)*R(I)*CLUMP_FAC(I)
+	  END DO
+	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  WRITE(6,*)'Normalizing mass (in Msun) is',TA(ND)/1.989D+33
+	  DO I=1,ND
+	    XV(I)=DLOG10(TA(I)/TA(ND))
+	  END DO
+	  XAXIS='Mass Fraction'
+	  XAXSAV=XAXIS
+!
 	ELSE  IF(XOPT .EQ. 'XTAUC')THEN
 	  IF(.NOT. ELEC)THEN
 	    DO I=1,ND
@@ -3059,7 +3072,7 @@
 	  J=0
 	  FOUND=.FALSE.
 	  DO ID=1,NUM_IONS
-	    IF(ATM(ID)%XzV_PRES .AND. XSPEC .EQ. UC(ION_ID(ID)) )THEN
+	    IF(ATM(ID)%XzV_PRES .AND. (XSPEC .EQ. UC(ION_ID(ID)) .OR. XSPEC .EQ. 'ALL') )THEN
 	      DO NL=1,ATM(ID)%NXzV_F
 	        DO NUP=NL+1,ATM(ID)%NXzV_F
 	          IF(ATM(ID)%AXzV_F(NL,NUP) .NE. 0)THEN
@@ -4404,7 +4417,7 @@ c
 	  ELSE IF(XOPT .EQ. 'KAPPA')THEN
 	     YV(1:ND)=1.0D-10*CHI(1:ND)/MASS_DENSITY(1:ND)/CLUMP_FAC(1:ND)
 	     CALL DP_CURVE(ND,XV,YV)
-	     YAXIS='Log(\kx(cm\u3 \d/g)'
+	     YAXIS='\gk(cm\u3 \d/g)'
 	  ELSE
 !
 ! We subtract 10 to put CHI in units of cm-1

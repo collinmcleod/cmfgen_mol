@@ -57,7 +57,8 @@ EXE_DIR=$(INSTALL_DIR)exe/
 #********************************************************************
 #
 # F90 = pgf95 -Mconcur  
- F90 = pgf95 -mp 
+# F90 = pgf95 -mp
+ F90 = pgf95 -mp
  F90nomp = pgf95 
  FG  = -O2 -Mextend -Mbackslash -Ktrap=fp -I$(MOD_DIR)
  FD  = -Mextend -Mbackslash -g -Ktrap=fp -I$(MOD_DIR)

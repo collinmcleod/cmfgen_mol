@@ -154,6 +154,11 @@
 	1        'Output line-force multiplier as a function of ion & depth? ')
 	  CALL RD_STORE_LOG(WRITE_IP,'WR_IP',L_TRUE,
 	1        'Output I as a functio of p and frequency?')
+	  WRITE_RTAU=.FALSE.
+	  CALL RD_STORE_LOG(WRITE_RTAU,'WR_RTAU',L_FALSE,
+	1        'Output R(Tau=Tau_ref) as a functio of p and frequency?')
+	  CALL RD_STORE_DBLE(TAU_REF,'TAU_REF',WRITE_RTAU,
+	1        'Reference tau for WR_TAU')
 !
 	  WRITE(LUMOD,'()')
 	  CALL RD_STORE_NCHAR(GLOBAL_LINE_SWITCH,'GLOBAL_LINE',ISIX,L_TRUE,

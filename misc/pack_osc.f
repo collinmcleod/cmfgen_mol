@@ -165,9 +165,9 @@
 	REAL*8, ALLOCATABLE :: VEC_DP_WRK(:)
 	INTEGER, ALLOCATABLE :: VEC_INDX(:)
 !
-	INTEGER, PARAMETER :: NANG=11
+	INTEGER, PARAMETER :: NANG=12
 	CHARACTER*1 ANG_STR(NANG)
-	DATA ANG_STR/'S','P','D','F','G','H','I','K','L','M','N'/         !,'Z','W'/
+	DATA ANG_STR/'S','P','D','F','G','H','I','K','L','M','N','O'/         !,'Z','W'/
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN               
@@ -304,6 +304,9 @@
 	  ELSE
 	    K=K-1
 	    IF(NAME(I)(K:K) .GE. 'a' .AND. NAME(I)(K:K) .LE. 'z')K=K-1
+	    IF(NAME(I)(K:K) .EQ. '1' .OR. NAME(I)(K:K) .LE. '2')THEN
+	      K=K-1
+	    END IF
 	    IF(NAME(I)(K:K) .EQ. 'W' .OR. NAME(I)(K:K) .EQ. 'Z')THEN
 	      LEV_ANG(I)=NAME(I)(K:K)
 	    ELSE

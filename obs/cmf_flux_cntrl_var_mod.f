@@ -124,12 +124,14 @@
 ! Options to control optional output.
 !
 	LOGICAL WRITE_ETA_AND_CHI		!Write Eta and CHI out (EDDFACTOR file format)
+	LOGICAL WRITE_RTAU			!Write R(Tau=Tau_ref) (i.e., I as a function of impct parameter)
 	LOGICAL WRITE_IP			!Write I(p) (i.e., I as a function of impct parameter)
 	LOGICAL WRITE_FLUX			!Write flux file
 	LOGICAL WRITE_CMF_FORCE
 	LOGICAL WRITE_SOB_FORCE
 	LOGICAL WR_ION_LINE_FORCE
 	REAL*8 EW_CUT_OFF
+	REAL*8 TAU_REF
 !
 	LOGICAL DO_REL_IN_OBSFRAME
 	LOGICAL DO_CMF_REL_OBS

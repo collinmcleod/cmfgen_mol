@@ -18,6 +18,7 @@
 !     6 - Hummer fits to the opacity cross-sections for HeI
 !     7 - Modifed Seaton fit --- cross-section zero until offset edge.
 !     8 - Modifed Hydrogenic split l: cross-section zero until offset edge.
+!     9 - Ground-state photoioinization cross-sections from Werner et al.
 !    20 - Opacity Project: smoothed [number of data pairs]
 !    21 - Opacity Project: scaled, smoothed [number of data pairs]
 !    30 - Call XCROSS_V2 (For Lithium-like ions).
@@ -102,7 +103,7 @@
 	REAL*8 U			!Defined as FREQ/EDGE
 	REAL*8 RU			!Defined as EDGE/FREQ
 !
-	REAL*8 T1,T2
+	REAL*8 T1,T2,T3
 	REAL*8 DOP_NU
 	REAL*8 EDGE			!Ionization energy
 	REAL*8 A_VOIGT
@@ -111,6 +112,7 @@
 	REAL*8 RJ
 	REAL*8 SUM
 !
+	REAL*8, PARAMETER :: EV_TO_HZ=0.241798840766D0
 	REAL*8, PARAMETER :: EQUAL_COR_FAC=1.0D0+1.0D-14
 	INTEGER, PARAMETER :: IZERO=0
 	LOGICAL ALL_DONE
@@ -457,6 +459,14 @@ C
 	1              PD(ID)%CROSS_A(LMIN)*( PD(ID)%CROSS_A(LMIN+1) +
 	1               (1.0D0-PD(ID)%CROSS_A(LMIN+1))*RU )*( RU**PD(ID)%CROSS_A(LMIN+2) )
 	          END IF
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 9)THEN
+	          IF(FREQ_VEC(I) .GE. EDGE+PD(ID)%CROSS_A(LMIN))THEN
+                    U=FREQ_VEC(I)/PD(ID)%CROSS_A(LMIN+4)/EV_TO_HZ
+                    T1=(U-1.0D0)**2 + PD(ID)%CROSS_A(LMIN+8)**2
+                    T2=U**( 5.5D0+PD(ID)%CROSS_A(LMIN+2)-0.5D0*PD(ID)%CROSS_A(LMIN+7) )
+                    T3=( 1.0D0+SQRT(U/PD(ID)%CROSS_A(LMIN+6)) )**PD(ID)%CROSS_A(LMIN+7)
+                    PHOT(I)=PHOT(I)+1.0D-08*T1*PD(ID)%CROSS_A(LMIN+5)/T2/T3
+                  END IF
 !
 !                                   
 !

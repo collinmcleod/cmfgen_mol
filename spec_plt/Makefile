@@ -10,6 +10,7 @@ LN2=pgplt
 LN3=subs
 LN4=disp
 LN5=spec
+LN6=newsubs
 #
 # These names refer to the full file name
 #
@@ -18,6 +19,7 @@ FN2=$(LIB_DIR)lib$(LN2).a
 FN3=$(LIB_DIR)lib$(LN3).a
 FN4=$(LIB_DIR)lib$(LN4).a
 FN5=$(LIB_DIR)lib$(LN5).a
+FN6=$(LIB_DIR)lib$(LN6).a
 #
 EXE  = $(EXE_DIR)plt_jh.exe\
        $(EXE_DIR)plt_jh_cur.exe\
@@ -34,7 +36,7 @@ all : OBJ ALLEXE
 # Give the dependencies of dispgen.exe and how it is created.
 #
 
-OBJ       : $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
+OBJ       : $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)  $(FN6)
 ALLEXE    : $(EXE)
 
 #
@@ -66,11 +68,11 @@ $(EXE_DIR)plt_ip.exe : plt_ip.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
                $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)plt_ip.exe
 
-$(EXE_DIR)plt_phot_raw.exe : plt_phot_raw.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
+$(EXE_DIR)plt_phot_raw.exe : plt_phot_raw.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
 	$(F90) plt_phot_raw.o \
-             -L$(LIB_DIR) -l$(LN5)  -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
+             -L$(LIB_DIR) -l$(LN5)  -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN6) -l$(LN1) -l$(LN3) \
                $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
-              -o $(EXE_DIR)plt_phot_raw.exe
+              -g -o $(EXE_DIR)plt_phot_raw.exe
 
 $(EXE_DIR)new_plt_rj.exe : new_plt_rj.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
 	$(F90) new_plt_rj.o \

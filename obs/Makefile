@@ -2,6 +2,8 @@
 
 include ../Makefile_definitions
 
+OPTION=$(FG)
+
 #
 # These names are for the fortran linker
 #
@@ -33,7 +35,7 @@ FN7=$(LIB_DIR)lib$(LN7).a
  
 OBJ1  =  cmf_flux_v5.o cmf_flux_sub_v5.o mod_cmf_obs.o\
         cmf_flux_cntrl_var_mod.o rd_cmf_flux_controls.o check_cmf_flux_param_consis.o \
-        rd_model_file.o  ins_line_v5.o obs_frame_sub_v7.o\
+        rd_model_file.o  ins_line_v5.o obs_frame_sub_v8.o\
         mon_interp_fast.o ins_line_obs_v4.o rd_cont_j_obs.o 
  
 OBJ2  =  obs_frame.o obs_frame_sub_v2.o mon_interp_fast.o
@@ -49,7 +51,7 @@ $(EXE_DIR)cmf_flux.exe :  $(OBJ1) $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6) $(FN
 	$(F90) $(OBJ1) griem_stark_mod.o \
               -L$(LIB_DIR) -l$(LN7) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN5) -l$(LN1) -l$(LN6) \
                $(LOCLIB) \
-              -o $(EXE_DIR)cmf_flux.exe
+              -g -o $(EXE_DIR)cmf_flux.exe
 
 $(EXE_DIR)obs_frame.exe :  $(OBJ2) $(FN1) $(FN2) $(FN3) $(FN4)
 	$(F90) $(OBJ2) \
@@ -60,19 +62,19 @@ $(EXE_DIR)obs_frame.exe :  $(OBJ2) $(FN1) $(FN2) $(FN3) $(FN4)
 # General rule to compile a fortran ".f" file.
 
 %.o : %.f
-	$(F90) -c $(FG)  $<
+	$(F90) -c $(OPTION)  $<
 
 #
 # I use F90noamp because of an issue with the PGF95 compiler on the Mac PRO.
 #
 
 cmf_flux_v5.o : cmf_flux_v5.f      mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(USR)
-	$(F90nomp) -c $(FG) cmf_flux_v5.f 
+	$(F90nomp) -c $(OPTION) cmf_flux_v5.f 
 
 cmf_flux_sub_v5.o : cmf_flux_sub_v5.f  mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(GEN) \
    COMP_JCONT_V4.INC  EVAL_LTE_INC_V4.INC\
    OPACITIES_V4.INC   XOPAC_V4.INC
-	$(F90nomp) -c $(FG) cmf_flux_sub_v5.f 
+	$(F90nomp) -c $(OPTION) cmf_flux_sub_v5.f 
 
 USR = ../lib/libtools.a(usr_option.o)
 GEN = ../lib/libmod.a(mod_lev_dis_blk.o)

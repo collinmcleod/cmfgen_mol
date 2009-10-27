@@ -261,7 +261,7 @@
 	J=0; CALL RD_STORE_INT(J,'NOB_PARS',L_FALSE,'Number of outer boudary parameters')
 	DO I=1,J
 	  NUM_OBND_PARAMS=J
-	  WRITE(STRING,'(I)')I
+	  WRITE(STRING,'(I3)')I
 	  STRING='OB_P'//ADJUSTL(STRING)
 	  CALL RD_STORE_DBLE(OBND_PARS(I),TRIM(STRING),L_TRUE,'Paremeters for outer boundary condition')
 	END DO  

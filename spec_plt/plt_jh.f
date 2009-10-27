@@ -662,9 +662,11 @@
 	  YV(1:ND)=YV(1:ND)
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='r\u3\dJ'
-	ELSE IF(X(1:2) .EQ. 'JD')THEN
+	ELSE IF(X(1:2) .EQ. 'JD' .OR. X(1:5) .EQ. 'RSQJD')THEN
 !
 	  SCALE_FAC=1.0D0
+	  PLOT_RSQJ=.FALSE.
+	  IF(X(1:5) .EQ. 'RSQJD')PLOT_RSQJ=.TRUE.
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0','Scale factor to prevent overflow')
 	  CALL USR_OPTION(I,'Depth',' ','Depth index')
 	  ISAV=I
@@ -694,6 +696,7 @@
 !
 	    XV(1:NCF)=ZM(ID)%NU(1:NCF)
 	    YV(1:NCF)=ZM(ID)%RJ(I,1:NCF)*SCALE_FAC
+	    IF(PLOT_RSQJ)YV(1:NCF)=YV(1:NCF)*R(I)*R(I)
 	    CALL DP_CNVRT_J_V2(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         ZM(ID)%DATA_TYPE,LAMC,XAXIS,YAXIS,L_FALSE)
 	    CALL DP_CURVE(NCF,XV,YV)

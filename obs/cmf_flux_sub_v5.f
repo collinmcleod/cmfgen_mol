@@ -14,6 +14,7 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered: 20-Oct-2009 : Changed to call OBS_FRAME_SUB_V8 (WRITE_RTAU, TAU_REF added to call).
 ! Altered: 07-Jul-2008 : Substantial changes over a period of time to include
 !                          relativistic radiative transfer. Lots of changes to
 !                          COMP_JCONT.INC. NCEXT is now increased according to 
@@ -1998,12 +1999,13 @@ C
 	ELSE
 	   TA(1:ND)=V(1:ND)
 	END IF
-	CALL OBS_FRAME_SUB_V7(ETA_CMF_ST,CHI_CMF_ST,NU,
+	CALL OBS_FRAME_SUB_V8(ETA_CMF_ST,CHI_CMF_ST,NU,
 	1            R,TA,T,ED,ND,NCF,
 	1            P,MU_AT_RMAX,HQW_AT_RMAX,NC,NP_OBS,
 	1            OBS_FREQ,OBS_FLUX,N_OBS,
 	1            MAX_DEL_V_RES_ZONE,OBS_TAU_MAX,OBS_ES_DTAU,
 	1            N_INS_OBS,OBS_INT_METHOD,
+	1            TAU_REF,WRITE_RTAU,
 	1            WRITE_IP,DO_REL_IN_OBSFRAME,TMP_LOG)
 !
 	CALL GEN_ASCI_OPEN(LU_FLUX,'OBSFRAME','UNKNOWN',' ',' ',IZERO,IOS)

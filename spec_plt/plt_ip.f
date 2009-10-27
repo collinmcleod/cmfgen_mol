@@ -248,7 +248,7 @@
 !
 ! *************************************************************************
 !
-10	FILENAME='RVTJ'
+10	FILENAME='../RVTJ'
 	CALL GEN_IN(FILENAME,'File with R, V, T etc (RVTJ)')
 	OPEN(UNIT=LU_IN,FILE=FILENAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
@@ -810,7 +810,10 @@
 	    XV(1:NP-2)=LOG10(P(2:NP-1)/T2)
 	    XAXIS='Log P/R\d*\u'
 	  END IF
-	  YV(1:NP-2)=DLOG10(IP(2:NP-1,I))
+	  YV(1:NP-2)=IP(2:NP-1,I)
+	  DO I=1,NP-1
+	    WRITE(6,*)I,XV(I),YV(I)
+	  END DO
 	  YAXIS='I(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
 	  CALL CURVE(NP-2,XV,YV)
 

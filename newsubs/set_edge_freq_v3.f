@@ -74,6 +74,9 @@ C
 	    ELSE IF(T1 .LT. 0)THEN
 	       LUER=ERROR_LU()
 	       WRITE(LUER,*)'Error in SET_EDGE_FREQ - cross section negative'
+	       WRITE(LUER,*)'ID=',ID
+	       WRITE(LUER,*)'Level=',J
+	       WRITE(LUER,*)'iNumber of levels',NHI_F
 	       STOP
 	    END IF
 	  END DO

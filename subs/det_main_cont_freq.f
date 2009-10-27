@@ -128,6 +128,7 @@ C
 	       WRITE(17,'(X,I6,3X,2ES14.5,F10.2)')ML,NU(ML),0.01D0*C_KMS/NU(ML),C_KMS*(NU(ML)-T1)/NU(ML)
 	       T1=NU(ML)
 	     END IF
+	     WRITE(18,'(X,I6,3X,2ES14.5,F10.2)')ML,NU(ML),0.01D0*C_KMS/NU(ML),C_KMS*(NU(ML)-NU(ML-1))/NU(ML)
 	   END DO
 !
 	   WRITE(17,'(A)')' '

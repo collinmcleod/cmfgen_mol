@@ -181,6 +181,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(set_cont_freq_v4.o)\
       $(LIB)(set_dc_lte.o)\
       $(LIB)(set_edge_freq_v2.o)\
+      $(LIB)(set_gf_values_small.o)\
       $(LIB)(set_x_freq.o)\
       $(LIB)(set_gm_all.o)\
       $(LIB)(set_z_pop.o)\

@@ -200,6 +200,7 @@ C
 	I=2
 	DO WHILE (I .LT. NCF)
 	  IF( ABS(NU_CONT(I-1)/NU_CONT(I)-1.0D0) .LT. 1.0D-06)THEN
+!	  IF( ABS(NU_CONT(I-1)/NU_CONT(I)-1.0D0) .LT. 1.0D-04)THEN
 	    IF(NU_CONT(I)/MIN_FREQ_RAT .GT. MIN_FREQ_RAT*NU_CONT(I+1))THEN
 	      EDGE_FREQ(I-1)=.TRUE.
 	      EDGE_FREQ(I)=.TRUE.
@@ -229,24 +230,38 @@ C
 C If no lines to be included, set FREQ directly to continuum frequencies
 C and return.
 C
+        DO ML=2,NCF
+          WRITE(19,'(X,I6,3X,3ES15.6)')ML,NU_CONT(ML),0.01D0*C_KMS/NU_CONT(ML),
+	1              C_KMS*(NU_CONT(ML)-NU_CONT(ML-1))/NU_CONT(ML)
+	END DO
+!
 	IF(LN_INDX .GT. N_LINES)THEN
-!	  FREQ(1:NCF)=NU_CONT(1:NCF)
-!	  NFREQ=NCF
-	  FREQ(1:2)=NU_CONT(1:2)
-	  J=2
-	  I=3
-	  DO WHILE(I .LE. NCF)
-	    IF( (FREQ(J)-NU_CONT(I)) .GT. 2.5D0*(FREQ(J-1)-FREQ(J)))THEN
-	      FREQ(J+1)=FREQ(J)-2.0D0*(FREQ(J-1)-FREQ(J))
-	    ELSE
-	      FREQ(J+1)=NU_CONT(I)
-	      I=I+1
-	    END IF
-	    J=J+1
-	  END DO 
-	  NFREQ=J
-	  LU_ER=ERROR_LU()
-	  WRITE(LU_ER,*)'Warning --- no line inserted in INS_LINE_V5'
+	  FREQ(1:NCF)=NU_CONT(1:NCF)
+	  NFREQ=NCF
+!	  FREQ(1:2)=NU_CONT(1:2)
+!	  J=2
+!	  I=3
+!	  DO WHILE(I .LE. NCF)
+!	    IF( (FREQ(J)-NU_CONT(I)) .GT. 2.5D0*(FREQ(J-1)-FREQ(J)))THEN
+!	      FREQ(J+1)=FREQ(J)-2.0D0*(FREQ(J-1)-FREQ(J))
+!	    ELSE
+!	      FREQ(J+1)=NU_CONT(I)
+!	      I=I+1
+!	    END IF
+!	    J=J+1
+!          WRITE(17,'(X,2I6,3X,5ES15.6)')I,J,NU_CONT(I),FREQ(J), 
+!	1              (FREQ(J)-NU_CONT(I)),  2.5D0*(FREQ(J-1)-FREQ(J)), FREQ(J+1)
+!	  END DO 
+!	  NFREQ=J
+!	  LU_ER=ERROR_LU()
+!	  WRITE(LU_ER,*)'Warning --- no line inserted in INS_LINE_V5'
+!
+!         DO ML=2,NFREQ
+!            WRITE(18,'(X,I6,3X,3ES15.6)')ML,FREQ(ML),0.01D0*C_KMS/FREQ(ML),
+!	1                C_KMS*(FREQ(ML)-FREQ(ML-1))/FREQ(ML)
+!	  END DO
+!	  STOP
+!
 	  RETURN
 	END IF
 C 

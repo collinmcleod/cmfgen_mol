@@ -1,6 +1,7 @@
 	MODULE MOD_STRK_LIST
 	IMPLICIT NONE
 !
+! Altered 24-Aug-2009 : Bug fix: LUER not being initialized for one error message.
 ! Altered 11-may-2004 : Bug fix: LST_V_PROF_LIMIT was not being sorted.
 ! Altered 03-Jan-2001 : LST_TYPE length increased from 10 to 12.
 !
@@ -151,6 +152,7 @@
 	    READ(LU,'(A)',IOSTAT=IOS)STRING
 	    IF(IOS .NE. 0)EXIT
 	    IF(STRING .NE. ' ' .AND. STRING(1:1) .NE. '!')THEN
+	      LUER=ERROR_LU()
 	      WRITE(LUER,*)'Warning --- possible error in FULL_STRK_LIST'
 	      WRITE(LUER,*)'Extra records in file'
 	    END IF

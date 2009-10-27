@@ -50,6 +50,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)mass_sc.exe\
          $(EXE_DIR)plt_alpha.exe\
          $(EXE_DIR)plt_gf.exe\
+         $(EXE_DIR)plt_raw_xray.exe\
          $(EXE_DIR)plt_cool.exe\
          $(EXE_DIR)plt_ln_heat.exe\
          $(EXE_DIR)plt_j_comp.exe\

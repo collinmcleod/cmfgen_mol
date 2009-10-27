@@ -1,25 +1,27 @@
-C
+!
 	SUBROUTINE SCR_READ_V2(R,V,SIGMA,POPS,
 	1             IREC_RD,NITSF,NUM_TIMES,LST_NG,RVSIG_WRITTEN,
 	1             NT,ND,LU,NEWMOD)
 	IMPLICIT NONE
-C
-C Altered 02-May-2004 : Changed to V2.
-C                          RVSIG_WRITTEN inserted into call.
-C                          Only writes R, V & SIGMA when needed, but all
-C                          writes to file must be identical.
-C Altered 29-Feb-2004 - Adjusted to read new format file for SCRTEMP.
-C                          R, V, & SIGMA can be output for every iteration.
-C                          IREC_RD must be zero to read last iteration,
-C                          other wise iteration is IREC.
-C                          NUM_TIMES in no longer used.
-C Altered 05-Dec-1996 - INQUIRE statement used before closing files
-C                       ASCI files opened by GEN_ASCI_OPEN.
-C Altered 25-Jun-1996 - ACTION='READ' installed on OPEN statements.
-C Altered 12-Jan-1991 - By using call to DIR_ACC_PARS this version is now
-C                        compatible with both CRAY and VAX fortran.
-C Altered  3-Apr-1989 - LST_NG installed. LU now transmitted in call.
-C
+!
+! Altered 28-Sep-2009 : Changed to allow an increase in the number of depth points.
+!                          Previously the R,V, & SIGMA record was limiting ND.
+! Altered 02-May-2004 : Changed to V2.
+!                          RVSIG_WRITTEN inserted into call.
+!                          Only writes R, V & SIGMA when needed, but all
+!                          writes to file must be identical.
+! Altered 29-Feb-2004 - Adjusted to read new format file for SCRTEMP.
+!                          R, V, & SIGMA can be output for every iteration.
+!                          IREC_RD must be zero to read last iteration,
+!                          other wise iteration is IREC.
+!                          NUM_TIMES in no longer used.
+! Altered 05-Dec-1996 - INQUIRE statement used before closing files
+!                       ASCI files opened by GEN_ASCI_OPEN.
+! Altered 25-Jun-1996 - ACTION='READ' installed on OPEN statements.
+! Altered 12-Jan-1991 - By using call to DIR_ACC_PARS this version is now
+!                        compatible with both CRAY and VAX fortran.
+! Altered  3-Apr-1989 - LST_NG installed. LU now transmitted in call.
+!
 	LOGICAL NEWMOD
 !
 !                          On input,  IREC_RD is the iteration to be read.
@@ -29,24 +31,29 @@ C
 	INTEGER NITSF,NT,ND,NUM_TIMES,LST_NG,LU
 	REAL*8 R(ND),V(ND),SIGMA(ND),POPS(NT*ND)
 	LOGICAL RVSIG_WRITTEN
-C
-C Local variables.
-C
-C REC_SIZE     is the (maximum) record length in bytes.
-C REC_LEN      is the record length in computer units.
-C UNIT_SIZE    is the number of bytes per unit that is used to specify
-C                 the record length (thus RECL=REC_SIZ_LIM/UNIT_SIZE).
-C WORD_SIZE    is the number of bytes used to represent the number.
-C NUMRECS      is the # of records required to output POPS.
-C N_PER_REC    is the # of POPS numbers to be output per record.
-C
+!
+! Used to read R, V & SIGMA (allows for 3*ND to be > N_PER_REC.
+!
+	REAL*8 RVSIG_VEC(3*ND)
+!
+! Local variables.
+!
+! REC_SIZE     is the (maximum) record length in bytes.
+! REC_LEN      is the record length in computer units.
+! UNIT_SIZE    is the number of bytes per unit that is used to specify
+!                 the record length (thus RECL=REC_SIZ_LIM/UNIT_SIZE).
+! WORD_SIZE    is the number of bytes used to represent the number.
+! NUMRECS      is the # of records required to output POPS.
+! N_PER_REC    is the # of POPS numbers to be output per record.
+!
 	INTEGER UNIT_SIZE
 	INTEGER WORD_SIZE
 	INTEGER REC_SIZE,REC_LEN
-	INTEGER NUMRECS
-	INTEGER N_PER_REC
-	INTEGER ARRAYSIZE  	!Size of POPS array.
-C	
+	INTEGER NUMRECS			!Number of records needed to output POPS
+	INTEGER NUM_RV_RECS		!Number of records needed to output R,V & SIGMA.
+	INTEGER N_PER_REC		!Maximum number per record.
+	INTEGER ARRAYSIZE  		!Size of POPS array.
+!	
 	INTEGER LOC_NUMTIMES,ST_REC_M1,RECS_FOR_RV
 	INTEGER I,L,LUER,ERROR_LU
 	INTEGER IOS,IST,IEND
@@ -56,32 +63,25 @@ C
 	EXTERNAL ERROR_LU
 	CHARACTER*80 STRING
 	CHARACTER*11 FORMAT_DATE
-C
+!
 	NEWMOD=.FALSE.
 	LUER=ERROR_LU()
 	FORMAT_DATE=' '
-C
-C Determine the record size, and the number of records that
-C need to be written out to fully write out the population vector.
-C These are computer dependent, hence call to DIR_ACC_PARS. NB.
-C REC_SIZE is not the same as REC_LEN --- it is REC_LEN which is
-C passed to the OPEN statement.
+!
+! Determine the record size, and the number of records that
+! need to be written out to fully write out the population vector.
+! These are computer dependent, hence call to DIR_ACC_PARS. NB.
+! REC_SIZE is not the same as REC_LEN --- it is REC_LEN which is
+! passed to the OPEN statement.
  
 	CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
-	IF(N_PER_REC .LT. 3*ND)THEN
-	  WRITE(LUER,*)'Record length was too small fro R,V and'//
-	1              ' sigma in SCR_READ'
-	  WRITE(LUER,*)'3ND=',3*ND
-	  WRITE(LUER,*)'N_PER_REC=',N_PER_REC
-	  STOP
-	END IF
 	ARRAYSIZE=NT*ND
 	NUMRECS=INT( (ARRAYSIZE-1)/N_PER_REC )+1
 	REC_LEN=REC_SIZE/UNIT_SIZE
-C
-C Read in pointer to data file. If pointer file does not exist, or bad
-C data, initialize parameters for a NEW MODEL.
-C
+!
+! Read in pointer to data file. If pointer file does not exist, or bad
+! data, initialize parameters for a NEW MODEL.
+!
 	CALL GEN_ASCI_OPEN(LU,'POINT1','OLD',' ','READ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'Error opening POINT1 in SCR_READ'
@@ -128,9 +128,9 @@ C
 	END IF
 	INQUIRE(UNIT=LU,OPENED=FILE_OPEN)
 	IF(FILE_OPEN)CLOSE(UNIT=LU)
-C
-C		' OLD MODEL '
-C
+!
+!		' OLD MODEL '
+!
 	OPEN(UNIT=LU,FILE='SCRTEMP',FORM='UNFORMATTED',
 	1       ACCESS='DIRECT',STATUS='OLD',
 	1       RECL=REC_LEN,IOSTAT=IOS,ACTION='READ')
@@ -144,11 +144,25 @@ C
 	    LST_NG=-1000
 	    RETURN
 	  END IF
-C
-C Note that NITSF= # of successful iterations so far.
-C
-	  READ(LU,REC=1,IOSTAT=IOS)R,V,SIGMA
-	  IF(IOS .NE. 0)READ(LU,REC=2,IOSTAT=IOS)R,V,SIGMA
+!
+! Note that NITSF= # of successful iterations so far.
+!
+	  NUM_RV_RECS=INT( (3*ND-1)/N_PER_REC ) + 1
+	  IF(NUM_RV_RECS .EQ. 1)THEN
+	    READ(LU,REC=1,IOSTAT=IOS)R,V,SIGMA
+	    IF(IOS .NE. 0)READ(LU,REC=2,IOSTAT=IOS)R,V,SIGMA
+	    RECS_FOR_RV=2
+	  ELSE
+	    DO L=1,NUM_RV_RECS
+	      IST=(L-1)*N_PER_REC+1
+	      IEND=MIN(IST+N_PER_REC-1,3*ND)
+	      READ(LU,REC=ST_REC_M1+L,IOSTAT=IOS)(RVSIG_VEC(I),I=IST,IEND)
+	    END DO
+	    R(1:ND)=RVSIG_VEC(1:ND)
+	    V(1:ND)=RVSIG_VEC(ND+1:2*ND)
+	    SIGMA(1:ND)=RVSIG_VEC(2*ND+1:3*ND)
+	    RECS_FOR_RV=NUM_RV_RECS
+	  END IF
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'Error reading R,V, SIGMA vectors in READ_SCRTEMP'
 	    NEWMOD=.TRUE.
@@ -157,10 +171,9 @@ C
 	    IREC_RD=0
 	    RETURN
 	  END IF
-	  RECS_FOR_RV=2
-C
-C Read in the population data.
-C
+!
+! Read in the population data.
+!
 500	CONTINUE		!Try to read an earlier record.
 !
 ! IREC ignores the number of records that it takes to write each time.
@@ -173,9 +186,22 @@ C
 	  IREC_RD=IREC
 	END IF
 	IF(RVSIG_WRITTEN)THEN
-	  ST_REC_M1=(IREC-1)*(NUMRECS+1)+RECS_FOR_RV
-	  READ(LU,REC=ST_REC_M1+1,IOSTAT=IOS)R,V,SIGMA
-	  ST_REC_M1=ST_REC_M1+1
+	  IF(NUM_RV_RECS .EQ. 1)THEN
+	    ST_REC_M1=(IREC-1)*(NUMRECS+1)+RECS_FOR_RV
+	    READ(LU,REC=ST_REC_M1+1,IOSTAT=IOS)R,V,SIGMA
+	    ST_REC_M1=ST_REC_M1+1
+	  ELSE
+	    ST_REC_M1=(IREC-1)*(NUMRECS+NUM_RV_RECS)+RECS_FOR_RV
+	    DO L=1,NUM_RV_RECS
+	      IST=(L-1)*N_PER_REC+1
+	      IEND=MIN(IST+N_PER_REC-1,3*ND)
+	      READ(LU,REC=ST_REC_M1+L,IOSTAT=IOS)(RVSIG_VEC(I),I=IST,IEND)
+	    END DO
+	    R(1:ND)=RVSIG_VEC(1:ND)
+	    V(1:ND)=RVSIG_VEC(ND+1:2*ND)
+	    SIGMA(1:ND)=RVSIG_VEC(2*ND+1:3*ND)
+	    ST_REC_M1=ST_REC_M1+NUM_RV_RECS
+	  END IF
 	ELSE
 	  ST_REC_M1=(IREC-1)*NUMRECS+RECS_FOR_RV
 	END IF
@@ -200,55 +226,62 @@ C
 	  IF(FILE_OPEN)CLOSE(UNIT=LU)
 	  RETURN
 	END IF
-C
-C Successful Read !
-C
+!
+! Successful Read !
+!
 	CLOSE(UNIT=LU)
 	RETURN
 	END
-C
-C 
-C
-C Routine  to save population data. There is no limit on the
-C size of the POPS array.
-C
+!
+! 
+!
+! Routine  to save population data. There is no limit on the
+! size of the POPS array.
+!
 	SUBROUTINE SCR_RITE_V2(R,V,SIGMA,POPS,
 	1               IREC,NITSF,NUM_TIMES,LST_NG,WRITE_RVSIG,
 	1               NT,ND,LU,WRITFAIL)
 	IMPLICIT NONE
-C
-C Altered 02-May-2004 : Changed to V2.
-C                          RVSIG_WRITTEN inserted into call.
-C                          Only writes R, V & SIGMA when needed, but all
-C                          writes to file must be identical.
-C Altered 29-Feb-2004 - Adjusted to read new format file for SCRTEMP.
-C                          R, V, & SIGMA now output for every iteration.
-C                          NUM_TIMES in no longer used.
-C Altered 27-Feb-2004 : R,V, and SIGMA rewritten on every iteration.
-C Altered 25-Jun-1996 : GEN_ASCI_OPEN installed to OPEN POINT files.
-C
+!
+! Altered 28-Sep-2009 : Changed to allow an increase in the number of depth points.
+!                          Previously the R,V, & SIGMA record was limiting ND.
+! Altered 02-May-2004 : Changed to V2.
+!                          RVSIG_WRITTEN inserted into call.
+!                          Only writes R, V & SIGMA when needed, but all
+!                          writes to file must be identical.
+! Altered 29-Feb-2004 - Adjusted to read new format file for SCRTEMP.
+!                          R, V, & SIGMA now output for every iteration.
+!                          NUM_TIMES in no longer used.
+! Altered 27-Feb-2004 : R,V, and SIGMA rewritten on every iteration.
+! Altered 25-Jun-1996 : GEN_ASCI_OPEN installed to OPEN POINT files.
+!
 	LOGICAL WRITFAIL
 	LOGICAL WRITE_RVSIG
 	INTEGER IREC,NITSF,NT,ND,NUM_TIMES,LST_NG,LU
 	REAL*8 R(ND),V(ND),SIGMA(ND),POPS(NT*ND)
-C
-C Local variables.
-C
-C REC_SIZE     is the (maximum) record length in bytes.
-C REC_LEN      is the record length in computer units.
-C UNIT_SIZE    is the number of bytes per unit that is used to specify
-C                 the record length (thus RECL=REC_SIZ_LIM/UNIT_SIZE).
-C WORD_SIZE    is the number of bytes used to represent the number.
-C NUMRECS      is the # of records required to output POPS.
-C N_PER_REC    is the # of POPS numbers to be output per record.
-C
+!
+! Used to read R, V & SIGMA (allows for 3*ND to be > N_PER_REC.
+!
+	REAL*8 RVSIG_VEC(3*ND)
+!
+! Local variables.
+!
+! REC_SIZE     is the (maximum) record length in bytes.
+! REC_LEN      is the record length in computer units.
+! UNIT_SIZE    is the number of bytes per unit that is used to specify
+!                 the record length (thus RECL=REC_SIZ_LIM/UNIT_SIZE).
+! WORD_SIZE    is the number of bytes used to represent the number.
+! NUMRECS      is the # of records required to output POPS.
+! N_PER_REC    is the # of POPS numbers to be output per record.
+!
 	INTEGER UNIT_SIZE
 	INTEGER WORD_SIZE
 	INTEGER REC_SIZE,REC_LEN
-	INTEGER NUMRECS
-	INTEGER N_PER_REC
-	INTEGER ARRAYSIZE  	!Size of POPS array.
-C	
+	INTEGER NUMRECS			!Number of records needed to output POPS
+	INTEGER NUM_RV_RECS		!Number of records needed to output R,V & SIGMA.
+	INTEGER N_PER_REC		!Maximum number per record.
+	INTEGER ARRAYSIZE  		!Size of POPS array.
+!	
 	INTEGER ST_REC_M1,RECS_FOR_RV
 	INTEGER I,K,L,LUER,ERROR_LU
 	INTEGER IOS,IST,IEND
@@ -258,24 +291,17 @@ C
 	EXTERNAL ERROR_LU
 	CHARACTER(LEN=11) FORMAT_DATE
 	CHARACTER*80 STRING
-C
+!
 	LUER=ERROR_LU()
-C
-C Determine the record size, and the number of records that
-C need to be written out to fully write out the population vector.
-C These are computer dependent, hence call to DIR_ACC_PARS. NB.
-C REC_SIZE is not the same as REC_LEN --- it is REC_LEN which is
-C passed to the OPEN statement.
-C
+!
+! Determine the record size, and the number of records that
+! need to be written out to fully write out the population vector.
+! These are computer dependent, hence call to DIR_ACC_PARS. NB.
+! REC_SIZE is not the same as REC_LEN --- it is REC_LEN which is
+! passed to the OPEN statement.
+!
 	CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
-	IF(N_PER_REC .LT. 3*ND)THEN
-	  WRITE(LUER,*)'Record length is too small to output R,V and'//
-	1              ' sigma in SCR_RITE'
-	  WRITE(LUER,*)'3ND=',3*ND
-	  WRITE(LUER,*)'N_PER_REC=',N_PER_REC
-	  STOP
-	END IF
-	ARRAYSIZE=NT*ND			
+        ARRAYSIZE=NT*ND
 	NUMRECS=INT( (ARRAYSIZE-1)/N_PER_REC )+1
 	REC_LEN=REC_SIZE/UNIT_SIZE
 !
@@ -312,9 +338,9 @@ C
 !
 	  FORMAT_DATE='28-Feb-2004'
 	END IF
-C
-C*************************************************************************
-C
+!
+!*************************************************************************
+!
 	OPEN(UNIT=LU,FILE='SCRTEMP',FORM='UNFORMATTED'
 	1,  ACCESS='DIRECT',STATUS='UNKNOWN'
 	1,  RECL=REC_LEN,IOSTAT=IOS)
@@ -337,37 +363,61 @@ C
 	    END IF
 	  END IF
 !
-! We now write out R,V and SIGMA on very iteration. This is also 
-! done for SN model where R can change with iteration. R iread here will
-! only be correct for the last iteration. FIxewd with a later read.
+! We now write out R,V and SIGMA on every iteration. This is also 
+! done for SN models where R can change with iteration. R read here will
+! only be correct for the last iteration. Fixed with a later read.
 !
-	WRITE(LU,REC=1,IOSTAT=IOS)R,V,SIGMA
-	IF(IOS .EQ. 0)WRITE(LU,REC=2,IOSTAT=IOS)R,V,SIGMA
+! We keep two writes for R,V & SIGMA when a single record to preserve
+! compatibility woth older versions.
+!
+	  NUM_RV_RECS=INT( (3*ND-1)/N_PER_REC ) + 1
+	  IF(NUM_RV_RECS .EQ. 1)THEN
+	    WRITE(LU,REC=1,IOSTAT=IOS)R,V,SIGMA
+	    IF(IOS .EQ. 0)WRITE(LU,REC=2,IOSTAT=IOS)R,V,SIGMA
+	    RECS_FOR_RV=2
+	  ELSE
+            RVSIG_VEC(1:ND)=R(1:ND)
+            RVSIG_VEC(ND+1:2*ND)=V(1:ND)
+            RVSIG_VEC(2*ND+1:3*ND)=SIGMA(1:ND)
+            DO L=1,NUM_RV_RECS
+              IST=(L-1)*N_PER_REC+1
+              IEND=MIN(IST+N_PER_REC-1,3*ND)
+              WRITE(LU,REC=L,IOSTAT=IOS)(RVSIG_VEC(I),I=IST,IEND)
+            END DO
+            RECS_FOR_RV=NUM_RV_RECS
+	END IF
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error writing R,V etc vectors in SCR_RITE'
 	  WRITFAIL=.TRUE.
 	  RETURN
 	END IF
-	RECS_FOR_RV=2
-C
-C WRITE in the population data.
-C
+!
+! WRITE in the population data.
+!
 	IREC=IREC+1		!Next record output
-C
-C IREC ignores the number of records that it takes to write each time.
-C Hence in POINT it will correspond to the iteration number.
-C ST_REC_M1 + 1 is the first output record.
-C
-C NB: We cannot change the type of file that is being written. If we do
-C     SCRTEMP will be corrupted.
-C
+!
+! IREC ignores the number of records that it takes to write each time.
+! Hence in POINT it will correspond to the iteration number.
+! ST_REC_M1 + 1 is the first output record.
+!
+! NB: We cannot change the type of file that is being written. If we do
+!     SCRTEMP will be corrupted.
+!
 	IF(WRITE_RVSIG)THEN
-	  ST_REC_M1=(IREC-1)*(NUMRECS+1)+RECS_FOR_RV
-	  WRITE(LU,REC=ST_REC_M1+1,IOSTAT=IOS)R,V,SIGMA
-	  ST_REC_M1=ST_REC_M1+1
+	  ST_REC_M1=(IREC-1)*(NUMRECS+NUM_RV_RECS)+RECS_FOR_RV
+          RVSIG_VEC(1:ND)=R(1:ND)
+          RVSIG_VEC(ND+1:2*ND)=V(1:ND)
+          RVSIG_VEC(2*ND+1:3*ND)=SIGMA(1:ND)
+          DO L=1,NUM_RV_RECS
+            IST=(L-1)*N_PER_REC+1
+            IEND=MIN(IST+N_PER_REC-1,3*ND)
+            WRITE(LU,REC=ST_REC_M1+L,IOSTAT=IOS)(RVSIG_VEC(I),I=IST,IEND)
+          END DO
+	  ST_REC_M1=ST_REC_M1+NUM_RV_RECS
 	ELSE
 	  ST_REC_M1=(IREC-1)*NUMRECS+RECS_FOR_RV
 	END IF
+!
 	IF(IOS .EQ. 0)THEN
 	  DO L=1,NUMRECS
 	    IST=(L-1)*N_PER_REC+1
@@ -385,14 +435,14 @@ C
 	  IF(FILE_OPEN)CLOSE(UNIT=LU)
 	  RETURN
 	END IF
-C
-C Successful write.
-C
+!
+! Successful write.
+!
 	WRITFAIL=.FALSE.
 1000	CLOSE(UNIT=LU)
-C
-C Write pointer to data files.
-C
+!
+! Write pointer to data files.
+!
 	CALL GEN_ASCI_OPEN(LU,'POINT1','UNKNOWN',' ',' ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'Error opening in POINT1 in SCR_RITE'
@@ -403,7 +453,7 @@ C
 	  WRITE(LU,'(3X,A,5X,A,3X,A,4X,A,4X,A)')'IREC','NITSF','#_TIMES','LST_NG','WR_RVS'
 	  INQUIRE(UNIT=LU,OPENED=FILE_OPEN)
 	IF(FILE_OPEN)CLOSE(UNIT=LU)
-C
+!
 	CALL GEN_ASCI_OPEN(LU,'POINT2','UNKNOWN',' ',' ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'Error opening in POINT1 in SCR_RITE'
@@ -414,52 +464,59 @@ C
 	  WRITE(LU,'(3X,A,5X,A,3X,A,4X,A,4X,A)')'IREC','NITSF','#_TIMES','LST_NG','WR_RVS'
 	  INQUIRE(UNIT=LU,OPENED=FILE_OPEN)
 	IF(FILE_OPEN)CLOSE(UNIT=LU)
-C
+!
 	RETURN
 	END
-C
-C
-C Routine  to save population data. There is no limit on the
-C size of the POPS array. This useses the prefix NEW_ attached
-C to POINT and SCRTEMP. Otherwise it is identical to SCR_RITE_V2
-C
+!
+!
+! Routine  to save population data. There is no limit on the
+! size of the POPS array. This useses the prefix NEW_ attached
+! to POINT and SCRTEMP. Otherwise it is identical to SCR_RITE_V2
+!
 	SUBROUTINE SCR_RITE_NAM_V2(R,V,SIGMA,POPS,
 	1               IREC,NITSF,NUM_TIMES,LST_NG,WRITE_RVSIG,
 	1               NT,ND,LU,WRITFAIL)
 	IMPLICIT NONE
-C
-C Altered 02-May-2004 : Changed to V2.
-C                          RVSIG_WRITTEN inserted into call.
-C                          Only writes R, V & SIGMA when needed, but all
-C                          writes to file must be identical.
-C Altered 29-Feb-2004 - Adjusted to read new format file for NEW_SCRTEMP.
-C                          R, V, & SIGMA now output for every iteration.
-C                          NUM_TIMES in no longer used.
-C Altered 27-Feb-2004 : R,V, and SIGMA rewritten on every iteration.
-C Altered 25-Jun-1996 : GEN_ASCI_OPEN installed to OPEN NEW_POINT files.
-C
+!
+! Altered 28-Sep-2009 : Changed to allow an increase in the number of depth points.
+!                          Previously the R,V, & SIGMA record was limiting ND.
+! Altered 02-May-2004 : Changed to V2.
+!                          RVSIG_WRITTEN inserted into call.
+!                          Only writes R, V & SIGMA when needed, but all
+!                          writes to file must be identical.
+! Altered 29-Feb-2004 - Adjusted to read new format file for NEW_SCRTEMP.
+!                          R, V, & SIGMA now output for every iteration.
+!                          NUM_TIMES in no longer used.
+! Altered 27-Feb-2004 : R,V, and SIGMA rewritten on every iteration.
+! Altered 25-Jun-1996 : GEN_ASCI_OPEN installed to OPEN POINT files.
+!
 	LOGICAL WRITFAIL
 	LOGICAL WRITE_RVSIG
 	INTEGER IREC,NITSF,NT,ND,NUM_TIMES,LST_NG,LU
 	REAL*8 R(ND),V(ND),SIGMA(ND),POPS(NT*ND)
-C
-C Local variables.
-C
-C REC_SIZE     is the (maximum) record length in bytes.
-C REC_LEN      is the record length in computer units.
-C UNIT_SIZE    is the number of bytes per unit that is used to specify
-C                 the record length (thus RECL=REC_SIZ_LIM/UNIT_SIZE).
-C WORD_SIZE    is the number of bytes used to represent the number.
-C NUMRECS      is the # of records required to output POPS.
-C N_PER_REC    is the # of POPS numbers to be output per record.
-C
+!
+! Used to read R, V & SIGMA (allows for 3*ND to be > N_PER_REC.
+!
+	REAL*8 RVSIG_VEC(3*ND)
+!
+! Local variables.
+!
+! REC_SIZE     is the (maximum) record length in bytes.
+! REC_LEN      is the record length in computer units.
+! UNIT_SIZE    is the number of bytes per unit that is used to specify
+!                 the record length (thus RECL=REC_SIZ_LIM/UNIT_SIZE).
+! WORD_SIZE    is the number of bytes used to represent the number.
+! NUMRECS      is the # of records required to output POPS.
+! N_PER_REC    is the # of POPS numbers to be output per record.
+!
 	INTEGER UNIT_SIZE
 	INTEGER WORD_SIZE
 	INTEGER REC_SIZE,REC_LEN
-	INTEGER NUMRECS
-	INTEGER N_PER_REC
-	INTEGER ARRAYSIZE  	!Size of POPS array.
-C	
+	INTEGER NUMRECS			!Number of records needed to output POPS
+	INTEGER NUM_RV_RECS		!Number of records needed to output R,V & SIGMA.
+	INTEGER N_PER_REC		!Maximum number per record.
+	INTEGER ARRAYSIZE  		!Size of POPS array.
+!	
 	INTEGER ST_REC_M1,RECS_FOR_RV
 	INTEGER I,K,L,LUER,ERROR_LU
 	INTEGER IOS,IST,IEND
@@ -469,26 +526,20 @@ C
 	EXTERNAL ERROR_LU
 	CHARACTER(LEN=11) FORMAT_DATE
 	CHARACTER*80 STRING
-C
+!
 	LUER=ERROR_LU()
-C
-C Determine the record size, and the number of records that
-C need to be written out to fully write out the population vector.
-C These are computer dependent, hence call to DIR_ACC_PARS. NB.
-C REC_SIZE is not the same as REC_LEN --- it is REC_LEN which is
-C passed to the OPEN statement.
-C
+!
+! Determine the record size, and the number of records that
+! need to be written out to fully write out the population vector.
+! These are computer dependent, hence call to DIR_ACC_PARS. NB.
+! REC_SIZE is not the same as REC_LEN --- it is REC_LEN which is
+! passed to the OPEN statement.
+!
 	CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
-	IF(N_PER_REC .LT. 3*ND)THEN
-	  WRITE(LUER,*)'Record length is too small to output R,V and'//
-	1              ' sigma in SCR_RITE'
-	  WRITE(LUER,*)'3ND=',3*ND
-	  WRITE(LUER,*)'N_PER_REC=',N_PER_REC
-	  STOP
-	END IF
-	ARRAYSIZE=NT*ND			
+	ARRAYSIZE=NT*ND
 	NUMRECS=INT( (ARRAYSIZE-1)/N_PER_REC )+1
 	REC_LEN=REC_SIZE/UNIT_SIZE
+	WRITE(6,*)NUMRECS,ARRAYSIZE,N_PER_REC
 !
 ! We check FORMAT associated with SCRATCH file. This will allow us to
 ! preserve the same format for an existing file.
@@ -507,7 +558,7 @@ C
 	      STRING=ADJUSTL(STRING)
 	      FORMAT_DATE=STRING(1:11)
 	      READ(LU,*)I,I,I,I,LOC_WR_RVSIG
-	      IF(LOC_WR_RVSIG .NE. WRITE_RVSIG)THEN
+	      IF(LOC_WR_RVSIG .NEQV. WRITE_RVSIG)THEN
 	        WRITE(LUER,*)'Error in SCR_RITE_NAM_V2 -- inconsistent WR_RVSIG option'
 	        WRITE(LUER,*)'Restart a fresh model by deleting NEW_SCRTEMP etc.'
 	        STOP
@@ -523,14 +574,14 @@ C
 !
 	  FORMAT_DATE='28-Feb-2004'
 	END IF
-C
-C*************************************************************************
-C
+!
+!*************************************************************************
+!
 	OPEN(UNIT=LU,FILE='NEW_SCRTEMP',FORM='UNFORMATTED'
 	1,  ACCESS='DIRECT',STATUS='UNKNOWN'
 	1,  RECL=REC_LEN,IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
-	    WRITE(LUER,*)'Error opening NEW_SCRTEMP in WRITE_NEW_SCRTEMP'
+	    WRITE(LUER,*)'Error opening NEW_SCRTEMP in WRITE_SCRTEMP'
 	    WRITE(LUER,*)'Will try to open a new file'
 	    OPEN(UNIT=LU,FILE='NEW_SCRTEMP',FORM='UNFORMATTED',
 	1     ACCESS='DIRECT',STATUS='NEW',
@@ -548,37 +599,66 @@ C
 	    END IF
 	  END IF
 !
-! We now write out R,V and SIGMA on very iteration. This is also 
-! done for SN model where R can change with iteration. R iread here will
-! only be correct for the last iteration. FIxewd with a later read.
+! We now write out R,V and SIGMA on every iteration. This is also 
+! done for SN models where R can change with iteration. R read here will
+! only be correct for the last iteration. Fixed with a later read.
 !
-	WRITE(LU,REC=1,IOSTAT=IOS)R,V,SIGMA
-	IF(IOS .EQ. 0)WRITE(LU,REC=2,IOSTAT=IOS)R,V,SIGMA
+! We keep two writes for R,V & SIGMA when a single record to preserve
+! compatibility woth older versions.
+!
+	  NUM_RV_RECS=INT( (3*ND-1)/N_PER_REC ) + 1
+	  IF(NUM_RV_RECS .EQ. 1)THEN
+	    WRITE(LU,REC=1,IOSTAT=IOS)R,V,SIGMA
+	    IF(IOS .EQ. 0)WRITE(LU,REC=2,IOSTAT=IOS)R,V,SIGMA
+	    RECS_FOR_RV=2
+	  ELSE
+            RVSIG_VEC(1:ND)=R(1:ND)
+            RVSIG_VEC(ND+1:2*ND)=V(1:ND)
+            RVSIG_VEC(2*ND+1:3*ND)=SIGMA(1:ND)
+            DO L=1,NUM_RV_RECS
+              IST=(L-1)*N_PER_REC+1
+              IEND=MIN(IST+N_PER_REC-1,3*ND)
+              WRITE(LU,REC=L,IOSTAT=IOS)(RVSIG_VEC(I),I=IST,IEND)
+            END DO
+            RECS_FOR_RV=NUM_RV_RECS
+	END IF
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error writing R,V etc vectors in SCR_RITE'
 	  WRITFAIL=.TRUE.
 	  RETURN
 	END IF
-	RECS_FOR_RV=2
-C
-C WRITE in the population data.
-C
+	WRITE(6,*)'Read R, V & SIGMA'
+!
+! WRITE in the population data.
+!
 	IREC=IREC+1		!Next record output
-C
-C IREC ignores the number of records that it takes to write each time.
-C Hence in NEW_POINT it will correspond to the iteration number.
-C ST_REC_M1 + 1 is the first output record.
-C
-C NB: We cannot change the type of file that is being written. If we do
-C     NEW_SCRTEMP will be corrupted.
-C
+!
+! IREC ignores the number of records that it takes to write each time.
+! Hence in NEW_POINT it will correspond to the iteration number.
+! ST_REC_M1 + 1 is the first output record.
+!
+! NB: We cannot change the type of file that is being written. If we do
+!     NEW_SCRTEMP will be corrupted.
+!
 	IF(WRITE_RVSIG)THEN
-	  ST_REC_M1=(IREC-1)*(NUMRECS+1)+RECS_FOR_RV
-	  WRITE(LU,REC=ST_REC_M1+1,IOSTAT=IOS)R,V,SIGMA
-	  ST_REC_M1=ST_REC_M1+1
+	  ST_REC_M1=(IREC-1)*(NUMRECS+NUM_RV_RECS)+RECS_FOR_RV
+          RVSIG_VEC(1:ND)=R(1:ND)
+          RVSIG_VEC(ND+1:2*ND)=V(1:ND)
+          RVSIG_VEC(2*ND+1:3*ND)=SIGMA(1:ND)
+          DO L=1,NUM_RV_RECS
+            IST=(L-1)*N_PER_REC+1
+            IEND=MIN(IST+N_PER_REC-1,3*ND)
+            WRITE(LU,REC=ST_REC_M1+L,IOSTAT=IOS)(RVSIG_VEC(I),I=IST,IEND)
+          END DO
+	  ST_REC_M1=ST_REC_M1+NUM_RV_RECS
 	ELSE
 	  ST_REC_M1=(IREC-1)*NUMRECS+RECS_FOR_RV
 	END IF
+	WRITE(6,*)'Update record',IOS
+	WRITE(6,*)'RECS_FOR_RV: ',RECS_FOR_RV
+	WRITE(6,*)'NUM_RV_RECS: ',NUM_RV_RECS
+	WRITE(6,*)'NUMRECS: ',NUMRECS
+!
 	IF(IOS .EQ. 0)THEN
 	  DO L=1,NUMRECS
 	    IST=(L-1)*N_PER_REC+1
@@ -596,14 +676,14 @@ C
 	  IF(FILE_OPEN)CLOSE(UNIT=LU)
 	  RETURN
 	END IF
-C
-C Successful write.
-C
+!
+! Successful write.
+!
 	WRITFAIL=.FALSE.
 1000	CLOSE(UNIT=LU)
-C
-C Write pointer to data files.
-C
+!
+! Write pointer to data files.
+!
 	CALL GEN_ASCI_OPEN(LU,'NEW_POINT1','UNKNOWN',' ',' ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'Error opening in NEW_POINT1 in SCR_RITE'
@@ -614,7 +694,7 @@ C
 	  WRITE(LU,'(3X,A,5X,A,3X,A,4X,A,4X,A)')'IREC','NITSF','#_TIMES','LST_NG','WR_RVS'
 	  INQUIRE(UNIT=LU,OPENED=FILE_OPEN)
 	IF(FILE_OPEN)CLOSE(UNIT=LU)
-C
+!
 	CALL GEN_ASCI_OPEN(LU,'NEW_POINT2','UNKNOWN',' ',' ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'Error opening in NEW_POINT1 in SCR_RITE'
@@ -625,6 +705,6 @@ C
 	  WRITE(LU,'(3X,A,5X,A,3X,A,4X,A,4X,A)')'IREC','NITSF','#_TIMES','LST_NG','WR_RVS'
 	  INQUIRE(UNIT=LU,OPENED=FILE_OPEN)
 	IF(FILE_OPEN)CLOSE(UNIT=LU)
-C
+!
 	RETURN
 	END

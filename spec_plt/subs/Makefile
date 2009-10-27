@@ -27,6 +27,7 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(dp_cnvrt_j.o)\
          $(LIB)(dp_cnvrt_j_v2.o)\
          $(LIB)(poidev.o)\
+         $(LIB)(raw_subphot.o)\
          $(LIB)(ran2.o)\
          $(LIB)(rd_ew.o)\
          $(LIB)(rd_mod.o)\
@@ -43,7 +44,7 @@ $(LIB) : $(OBJ)
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f
-	$(F90) -c $(FG)  $<
+	$(F90) -c $(FD)  $<
 	ar ruv $(LIB) $*.o
 
 convolve.o : convolve.f parameters.inc constants.inc
