@@ -258,10 +258,17 @@
 ! In the constant T1 we convert from days to seconds, and allow for the units of
 ! V (km/s) and R (10^10 cm).
 !
-	  T1=24.0D0*3600.0D0*1.0D+05*(SN_AGE_DAYS-OLD_SN_AGE_DAYS)/1.0D+10
-	  DO I=1,ND
-	    R(I)=R(I)+T1*V(I)
-	  END DO
+	  IF(T2 .GT. 1.0D-06)THEN
+	    T1=24.0D0*3600.0D0*1.0D+05*(SN_AGE_DAYS-OLD_SN_AGE_DAYS)/1.0D+10
+	    DO I=1,ND
+	      R(I)=R(I)+T1*V(I)
+	    END DO
+	  ELSE
+	    WRITE(6,*)'As R(ND)=R_HYDRO no R scaling'
+	    DO I=1,ND               	!need to issue a warning here
+	      R(I)=R_HYDRO(NX)*(R(I)/R(ND))
+	    END DO
+	  END IF
 !	  DO I=1,ND               	!need to issue a warning here
 !	    R(I)=R_HYDRO(NX)*(R(I)/R(ND))
 !	  END DO

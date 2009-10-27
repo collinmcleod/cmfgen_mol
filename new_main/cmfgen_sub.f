@@ -2651,8 +2651,8 @@
 	          END DO
 	        END IF
 	      END DO
-!	WRITE(198,'(5I10,4ES18.8)')ML,NL,NUP,MNL_F,MNUP_F,FL,STEQ_T(ND-9),
-!	1                           BA_T(NT-3,DIAG_INDX,ND-9),BA_T(NT,DIAG_INDX,ND-9)
+	WRITE(198,'(5I10,4ES18.8)')ML,NL,NUP,MNL_F,MNUP_F,FL,STEQ_T(ND-9),
+	1                           BA_T(NT-3,DIAG_INDX,ND-9),BA_T(NT,DIAG_INDX,ND-9)
 	      CALL TUNE(ITWO,'dBA_LINE')
 !
 ! Must now zero dZ since next time it is used it will be for a new line.
@@ -2913,17 +2913,17 @@
 	  END DO
 	END IF
 !
-!	T1=FQW(ML)*(CHI_NOSCAT(ND-9)*RJ(ND-9) - ETA_NOSCAT(ND-9))
-!	IF(MOD(FREQ_INDX,N_PAR) .EQ. 0)THEN 
-!	  WRITE(199,'(I10,12ES18.8)')ML,FL,STEQ_T(ND-9),T1,FQW(ML)*ETA_NOSCAT(ND-9),
-!	1                           STEQ_T_SCL(ND-9),STEQ_T_NO_SCL(ND-9),
-!	1                           BA_T(NT-3,DIAG_INDX,ND-9),BA_T(NT,DIAG_INDX,ND-9)
-!	ELSE
-!	  WRITE(199,'(I10,12ES18.8)')ML,FL,STEQ_T(ND-9),T1,FQW(ML)*ETA_NOSCAT(ND-9),
-!	1                           STEQ_T_SCL(ND-9),STEQ_T_NO_SCL(ND-9),
-!	1                           BA_T(NT-3,DIAG_INDX,ND-9)+BA_T_PAR(NT-3,ND-9),
-!	1                           BA_T(NT,DIAG_INDX,ND-9)+BA_T_PAR(NT,ND-9)
-!	END IF
+	T1=FQW(ML)*(CHI_NOSCAT(ND-9)*RJ(ND-9) - ETA_NOSCAT(ND-9))
+	IF(MOD(FREQ_INDX,N_PAR) .EQ. 0)THEN 
+	  WRITE(199,'(I10,12ES18.8)')ML,FL,STEQ_T(ND-9),T1,FQW(ML)*ETA_NOSCAT(ND-9),
+	1                           STEQ_T_SCL(ND-9),STEQ_T_NO_SCL(ND-9),
+	1                           BA_T(NT-3,DIAG_INDX,ND-9),BA_T(NT,DIAG_INDX,ND-9)
+	ELSE
+	  WRITE(199,'(I10,12ES18.8)')ML,FL,STEQ_T(ND-9),T1,FQW(ML)*ETA_NOSCAT(ND-9),
+	1                           STEQ_T_SCL(ND-9),STEQ_T_NO_SCL(ND-9),
+	1                           BA_T(NT-3,DIAG_INDX,ND-9)+BA_T_PAR(NT-3,ND-9),
+	1                           BA_T(NT,DIAG_INDX,ND-9)+BA_T_PAR(NT,ND-9)
+	END IF
 !
 10000	CONTINUE
 	CALL TUNE(ITWO,'10000')
