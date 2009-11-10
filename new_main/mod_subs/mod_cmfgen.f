@@ -12,7 +12,7 @@
 !                            
 ! Number of atomic species (e.g. H, C, N is 3 species).
 !
-	INTEGER, PARAMETER :: NUM_SPECIES=23
+	INTEGER, PARAMETER :: NUM_SPECIES=26
 !
 ! Maximum number of ionization stages per species. For H, need at this number
 ! has to be 2 or higher (as I and II). A setting of 10 implies that we can treat

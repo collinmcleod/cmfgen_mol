@@ -4,7 +4,7 @@
 ! Altered 27-Nov-2000 : MASS changed to AT_MASS
 !                       Extra species installed. More consistent with CMFGEN.
 !
-	INTEGER, PARAMETER :: NSPEC=22
+	INTEGER, PARAMETER :: NSPEC=26
 	INTEGER, PARAMETER :: NION_MAX=20
 	INTEGER, PARAMETER :: NPHOT_MAX=4
 	INTEGER, PARAMETER :: MAX_ION=NSPEC*NION_MAX

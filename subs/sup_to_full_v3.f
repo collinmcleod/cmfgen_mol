@@ -31,6 +31,7 @@ C
 	1   CIII_PRES,T,ED,ND)
 	IMPLICIT NONE
 C
+C Altered 06-Nov-2009 : No longer gnerates error for truncated interp seq.
 C Altered 27-may-1996 : Dynamic arrays installed for GION,EDGE_S, SUM and CNT.
 C
 C Altered 02-Jan-1996. INT_SEQ_C2 inserted in call.
@@ -197,29 +198,34 @@ C
 	          M=M-1
 	        END DO
 	      END IF
+!
+! This might occur when we dont use the full atom.
+!
 	      IF(INT_SL .EQ. 0)THEN
-	        LU_ER=ERROR_LU()
-	        WRITE(LU_ER,*)'Error in SUP_TO_FULL_V3'
-	        WRITE(LU_ER,*)'No interpolating sequence found'
-	        WRITE(LU_ER,*)'N_S=',NC2_S
-	        WRITE(LU_ER,*)'N_F=',NC2_F
-	        WRITE(LU_ER,*)'Full level is:',I
-	        STOP
-	      END IF
-	      INT_SL=F_TO_S_MAP_C2(INT_SL)
+	        C2_F(I,K)=C2LTE_F(I,K)*(C2_S(L,K)/C2LTE_S(L,K))
+!	        LU_ER=ERROR_LU()
+!	        WRITE(LU_ER,*)'Error in SUP_TO_FULL_V3'
+!	        WRITE(LU_ER,*)'No interpolating sequence found'
+!	        WRITE(LU_ER,*)'N_S=',NC2_S
+!	        WRITE(LU_ER,*)'N_F=',NC2_F
+!	        WRITE(LU_ER,*)'Full level is:',I
+!	        STOP
+	      ELSE
+	         INT_SL=F_TO_S_MAP_C2(INT_SL)
 C
-	      T1=LOG(EDGE_S(L)/EDGEC2_F(I)) /
-	1                  LOG(EDGE_S(L)/EDGE_S(INT_SL))
-	      B1=C2_S(INT_SL,K)/C2LTE_S(INT_SL,K)
-	      B2=C2_S(L,K)/C2LTE_S(L,K)
-              B=T1*B1 + (1.0D0-T1)*B2
+	        T1=LOG(EDGE_S(L)/EDGEC2_F(I)) /
+	1                    LOG(EDGE_S(L)/EDGE_S(INT_SL))
+	        B1=C2_S(INT_SL,K)/C2LTE_S(INT_SL,K)
+	        B2=C2_S(L,K)/C2LTE_S(L,K)
+                B=T1*B1 + (1.0D0-T1)*B2
 C
 C Constrain the interpolation. Hopefully this is not necessary.
 C
-	      IF(B1 .LE. 1. .AND. B2 .LE. 1 .AND. B .GT. 1)B=1.0
-	      IF(B1 .GE. 1. .AND. B2 .GE. 1 .AND. B .LT. 1)B=1.0
-	      IF(B .LT. 0)B=B1
-	      C2_F(I,K)=C2LTE_F(I,K)*B
+	        IF(B1 .LE. 1. .AND. B2 .LE. 1 .AND. B .GT. 1)B=1.0
+	        IF(B1 .GE. 1. .AND. B2 .GE. 1 .AND. B .LT. 1)B=1.0
+	        IF(B .LT. 0)B=B1
+	        C2_F(I,K)=C2LTE_F(I,K)*B
+	      END IF
 	    END IF
 	  END DO
 C

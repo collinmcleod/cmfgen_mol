@@ -217,9 +217,11 @@ C
 	END DO
 C
  100    TOT_REC=REC(NPHOT)
-	DO I=IST,NPHOT
-	  REC(I)=REC(I)/TOT_REC
-	END DO
+	IF(TOT_REC .NE. 0.0D0)THEN
+	  DO I=IST,NPHOT
+	    REC(I)=REC(I)/TOT_REC
+	  END DO
+	END IF
 C
 C Correct TOT_REC for frequency independent temperature dependance.
 C
@@ -227,49 +229,3 @@ C
 C
 	RETURN
 	END
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

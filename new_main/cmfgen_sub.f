@@ -4518,6 +4518,10 @@
 	    END IF
 	    CLOSE(UNIT=LUSCR,STATUS='DELETE')
 	  END IF
+!
+!	  WRITE(6,*)'Inserted temporary fudge for FIXED_T'
+!	  FIXED_T=.TRUE.
+!	  IF(MAXCH .LT. 50.0D0 .AND. LAST_LAMBDA .NE. MAIN_COUNTER)FIXED_T=RD_FIX_T
 	  GOTO 20000				!Begin another iteration
 	END IF
 !

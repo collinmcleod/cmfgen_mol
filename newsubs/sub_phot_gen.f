@@ -127,6 +127,9 @@
 	IF(PHOT_ID .LT. 0)THEN
 	  IF(SET_TO_EDGE .AND. FREQ .EQ. 0)THEN
 	    PHOT(1:NLEVS)=GS_EDGE(1:NLEVS)+PD(ID)%EXC_FREQ(ABS(PHOT_ID))
+!	    DO I=1,NLEVS
+!	      IF(PHOT(I) .LT. 0.004D0)PHOT(I)=0.004D0
+!	    END DO
 	  ELSE
 	    WRITE(ERROR_LU(),*)'Invalid option list in SUB_PHOT_XzV[1]'
 	    STOP
@@ -155,6 +158,7 @@
 	DO I=1,NLEVS
 	  EDGE=GS_EDGE(I)+PD(ID)%EXC_FREQ(PHOT_ID)
 	  IF(FREQ .LT. EDGE .AND. SET_TO_EDGE)FREQ_VEC(I)=EDGE
+!	  IF(EDGE .LT. 0.004D0 .AND. SET_TO_EDGE)FREQ_VEC(I)=0.004D0
 	END DO
 !
 ! Check if cross-sections were just computed. If so, we use those value.

@@ -137,6 +137,7 @@ C
 	WRITE(T_OUT,*)'Y   :: Z(K)=Y(K)'
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'PD  :: Plot a variable as a function of depth.'
+	WRITE(T_OUT,*)'PD  :: Plot a variable as a function of velocity.'
 	WRITE(T_OUT,*)'PF  :: Plot 100.0D0*(Y(K+1)-Y(K))/Y(K+1) for all variables at a given depth.'
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'MED_R  :: Median corection as a function of depth'

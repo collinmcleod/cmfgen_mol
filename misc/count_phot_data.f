@@ -25,8 +25,11 @@
 	  IF(INDEX(STRING,'!Configuration name') .NE. 0)THEN
 	    K=INDEX(STRING,'  ')
 	    LEVEL_NAME=STRING(1:K)
-	  END IF
-	  IF(INDEX(STRING,'!Type of cross-section') .NE. 0)THEN
+	    READ(10,FMT='(A)',END=100)STRING
+	    IF(INDEX(STRING,'!Type of cross-section') .EQ. 0)THEN
+	      WRITE(6,*)'Error- tTYPE reconrd does not follow Config record'
+	      WRITE(6,*)LEVEL_NAME
+	    END IF
 	    READ(STRING,*)TYPE
 	  END IF
           IF(INDEX(STRING,'!Number of cross-section points') .NE. 0)THEN

@@ -76,7 +76,7 @@
 ! Used when reading file containing energy levels, oscillator strengths, etc
 ! (e.g. CV_F_OSCDAT)
 !
-	INTEGER, PARAMETER :: N_MAX=2000
+	INTEGER, PARAMETER :: N_MAX=5000
 	CHARACTER*30 NAME(N_MAX)
 	REAL*8 FEDGE(N_MAX)
 	REAL*8 ENERGY(N_MAX)
@@ -420,7 +420,7 @@
 	WRITE(T_OUT,*)
 	WRITE(T_OUT,*)' Check output file to ensure d.c''s ---> 1 at depth'
 	WRITE(T_OUT,*)
-2120	FORMAT(/,1X,F11.6,5X,1PE12.6,5X,0P,I4,5X,I4)
+2120	FORMAT(/,1X,ES14.8,5X,1PE12.6,5X,0P,I4,5X,I4)
 2122	FORMAT(/,1X,1P,E16.8,6E17.8)
 !
 ! Loop back to do additional species and ionization stages.

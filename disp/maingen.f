@@ -122,6 +122,7 @@
 	INTEGER GRID(NP_MAX),INDX(NP_MAX)
 	LOGICAL INACCURATE,REXT_COMPUTED,GREY_COMP
 	LOGICAL GREY_WITH_V_TERMS
+	LOGICAL GREY_REL
 	LOGICAL PLANE_PARALLEL_NOV
 !
 	REAL*8 XV(N_PLT_MAX),XNU(N_PLT_MAX)
@@ -260,6 +261,7 @@
 	LOGICAL VALID_VALUE
 	LOGICAL FOUND
 	LOGICAL NEW_FORMAT,NEW_FILE
+	LOGICAL NEW_FREQ
 	LOGICAL DO_TAU
 	LOGICAL DO_KAP
 	LOGICAL DONE_LINE
@@ -1709,6 +1711,11 @@
 ! distribution. One takes into account the velocity terms, and is needed for
 ! supernovae calculations.
 !
+	    IF(V(1) .GT. 5.0D+03)THEN
+	      CALL USR_OPTION(GREY_REL,'GREY_REL','T','Use for relativistic solution')
+	    ELSE
+	      CALL USR_OPTION(GREY_REL,'GREY_REL','F','Use for relativistic solution')
+	    END IF
 	    CALL USR_HIDDEN(GREY_WITH_V_TERMS,'VT','F','File appendage')
 	    CALL USR_HIDDEN(ELEC,'LOGT','F','Log of T?')
 	    IF(R(1)/R(ND) .LT. 2.0 .AND. V(1) .LT. 1.0D0)THEN
@@ -1722,7 +1729,59 @@
 ! Will use FA for F, GAM for NEWRJ, and GAMH for NEWRK
 !
 	    YAXIS='T(10\u4 \dK)'
-	    IF(GREY_WITH_V_TERMS)THEN
+	    IF(GREY_REL)THEN
+!
+	      TA(1:ND)=0.3D0              !FEDD: Initial guess
+	      TB(1:ND)=0.0D0              !H_ON_J: Initial guess
+	      TC(1:ND)=0.0D0              !dlnJdlnR=0.0D0
+	      GAMH(1:ND)=0.0D0            !Old FEDD
+	      XM(1:ND)=0.0D0              !As grey solution, not needed (ETA)
+	      NEW_FREQ=.TRUE.
+	      HBC=0.7D0; INBC=0.1D0
+	      WRITE(T_OUT,*)'Using MOM_JREL_GREY_V1 for grey solution'
+!
+! Note
+!   HFLUX=LUM*Lsun/16/(PI*PI)/10**2/R**2 (10**2 for 1/R**2).
+!   DBB = dBdR = 3.Chi.L/16(piR)**2 
+!   DBB is used for the lower boundary diffusion approximation. 
+!
+	      HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
+	      DBB=3.0D0*HFLUX*CHIROSS(ND)
+	      T1=1.0D0
+	      DO WHILE(T1 .GT. 1.0D-05)
+	        CALL MOM_JREL_GREY_V1(XM,CHIROSS,CHIROSS,V,SIGMA,R,
+	1              TB,TA,TC,RJ,HNU,HBC,INBC,
+	1              DIF,DBB,IC,METHOD,
+	1              L_TRUE,L_TRUE,NEW_FREQ,ND)
+!
+	        CALL FGREY_NOREL_V1(TA,TB,RJ,CHIROSS,R,V,SIGMA,
+	1              P,JQW,HMIDQW,KQW,LUM,IC,METHOD,
+	1              HBC,INBC,DIF,ND,NC,NP)
+	        T1=0.0D0
+	        DO I=1,ND
+	          T1=MAX(ABS(TA(I)-GAMH(I)),T1)
+	          GAMH(I)=TA(I)
+	        END DO
+	        NEW_FREQ=.FALSE.
+	        WRITE(T_OUT,*)'Current grey iteration accuracy is',T1
+	      END DO
+	      CALL TORSCL(TA,CHIROSS,R,TB,TC,ND,METHOD,TYPE_ATM)
+	      DO I=1,ND
+	        ZV(I)=DLOG10(TA(I))
+	        TGREY(I)=((3.14159265D0/5.67D-05*RJ(I))**0.25D0)*1.0D-04
+	        YV(I)=TGREY(I)
+	      END DO
+	      GREY_COMP=.TRUE.
+	      IF(ELEC)THEN
+	        YV(1:ND)=LOG10(YV(1:ND))
+	        YAXIS='Log T(10\u4 \dK)'
+	      END IF
+	      CALL DP_CURVE(ND,ZV,YV)
+	      XAXIS='Log(\gt\dRoss\u)'
+	      XAXSAV=XAXIS
+!
+
+	  ELSE IF(GREY_WITH_V_TERMS)THEN
 	      T2=1.0D-05          !Accuracy to converge f
               CALL JGREY_WITH_FVT(RJ,TB,CHIROSS,R,V,SIGMA,
 	1                  P,JQW,HMIDQW,KQW,NMIDQW,
@@ -2147,7 +2206,7 @@
 	ELSE IF(XOPT .EQ. 'YSPEC')THEN
 	  FOUND=.FALSE.
 	  ELEC=.FALSE.
-	  CALL USR_HIDDEN(ELEC,'FRAC','F','Fractional abundance')
+	  CALL USR_OPTION(ELEC,'FRAC','T','Fractional abundance')
 	  IF(ELEC)THEN
 	    DO ISPEC=1,NSPEC
 	      IF(XSPEC .EQ. SPECIES(ISPEC) .OR. (XSPEC .EQ. 'ALL' .AND.
@@ -2176,9 +2235,10 @@
 	    DO ISPEC=1,NSPEC
 	      IF(POPDUM(ND,ISPEC) .GT. 0.0D0)THEN
 	        J=J+1
-	        WRITE(6,'(A6,3X)',ADVANCE='NO')TRIM(SPECIES(ISPEC))
-	        IF(MOD(J,5) .EQ. 0)WRITE(6,'(A)')' '
-	        IF(MOD(J,5) .EQ. 0)J=0
+	        T1=POPDUM(ND,ISPEC)/POP_ATOM(ND)+1.0D-100
+	        WRITE(6,'(A6,2X,F9.6,3X,ES9.2,5X)',ADVANCE='NO')TRIM(SPECIES(ISPEC)),T1,LOG(T1)
+	        IF(MOD(J,3) .EQ. 0)WRITE(6,'(A)')' '
+	        IF(MOD(J,3) .EQ. 0)J=0
 	      END IF
 	    END DO
 	    IF(J .NE. 0)WRITE(6,'(A)')' '
@@ -3145,10 +3205,17 @@
 	    CHI_PAR(:,ID)=CHI_PAR(:,ID)/CHI(1:ND)
             YMAPV(ID)=ID
 	  END DO
-	  DO I=1,ND
-	    WRITE(6,*)'I=',I,ED(I)
-	    XMAPV(I)=LOG10(ED(I))
-	  END DO
+	  CALL USR_OPTION(ELEC,'Depth','T','Plot against depth index')
+	  IF(ELEC)THEN
+	    DO I=1,ND
+	      XMAPV(I)=I
+	    END DO
+	  ELSE
+	    DO I=1,ND
+	      WRITE(6,*)'I=',I,ED(I)
+	      XMAPV(I)=LOG10(ED(I))
+	    END DO
+	  END IF
 !
 ! Remove rows containing all zero's.
 !
@@ -3652,6 +3719,41 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 	    END IF
 	  END DO
 !
+	ELSE IF(XOPT .EQ.'TPOP' .OR. XOPT .EQ. 'LPOP' .OR. XOPT .EQ. 'LDC')THEN
+	  
+	  CALL USR_OPTION(K,'DEPTH','20','Depth for opacities')
+	  FOUND=.FALSE.
+	  XAXIS='Level'
+	  DO ID=1,NUM_IONS
+	    IF(XSPEC .EQ. UC(ION_ID(ID)) .AND. ATM(ID)%XzV_PRES)THEN
+	      L=ATM(ID)%NXzV_F
+	      IF(XOPT .EQ. 'LDC')THEN
+	        DO I=1,ATM(ID)%NXzV_F
+	          YV(I)=LOG10( ATM(ID)%XzV_F(I,K) / ATM(ID)%XzVLTE_F(I,K) )
+	          ZV(I)=I
+	        END DO
+	        YAXIS='log N'
+	      ELSE 
+	        DO I=1,ATM(ID)%NXzV_F
+	          YV(I)=LOG10(ATM(ID)%XzV_F(I,K))
+	          ZV(I)=I
+	        END DO
+	        YAXIS='log b'
+	      END IF
+	      FOUND=.TRUE.
+	    END IF
+	  END DO
+	  IF(XOPT .EQ. 'TPOP')THEN
+	    WRITE(6,*)'Wavelength set to 5000 Angstroms'
+	    FL=ANG_TO_HZ/5000.0D0
+	    T1=LOG10( 3.0D-10*OPLIN*R(K)/V(K)/(1.0D0+SIGMA(K))/FL )
+	    DO I=1,L
+	      YV(I)=YV(I)+T1
+	    END DO
+	    YAXIS='Tau/fv'
+	  END IF
+	  CALL DP_CURVE(L,ZV,YV)
+!
 ! 
 !
 ! Compute the ionization ratio for the total population of one ionization
@@ -3725,8 +3827,7 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 ! state to the total population of the next ionization state.
 !
 	ELSE IF(XOPT .EQ. 'IF') THEN
-	  CALL USR_HIDDEN(SPEC_FRAC,'SPEC_FRAC','F',
-	1      'Species fraction?')
+	  CALL USR_OPTION(SPEC_FRAC,'SPEC_FRAC','T','Species fraction?')
 	  DO ISPEC=1,NSPEC
 	    IF(XSPEC .EQ. SPECIES(ISPEC))THEN
 	      IF(SPEC_FRAC)THEN

@@ -24,7 +24,7 @@ C                       SL_WR option installed.
 C Altered 12-May-1997 : ELS option installed, and SP option cleaned.
 C Altered 08-May-1997 : NAME AND LS_NAME SET TO *30
 C
-	INTEGER, PARAMETER :: N_MAX=5000
+	INTEGER, PARAMETER :: N_MAX=8000
 C
 	CHARACTER*30 NAME(N_MAX)
 	CHARACTER*30 LS_NAME(N_MAX)

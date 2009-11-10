@@ -31,7 +31,7 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(ran2.o)\
          $(LIB)(rd_ew.o)\
          $(LIB)(rd_mod.o)\
-         $(LIB)(recom_opac.o)\
+         $(LIB)(recom_opac_v2.o)\
          $(LIB)(rd_obs_data_v2.o)
   
 all : $(LIB)

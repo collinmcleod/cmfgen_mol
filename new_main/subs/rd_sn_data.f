@@ -9,6 +9,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered  8-Nov-2009: Isotope/total population consistency check included.
 ! Altered 24-Jun-2009: PURE_HUBBLE_FLOW now stored in CONTROL_VARIABLE_MOD
 ! Altered 02-Apr-2009: Now set fixed abundance specifiers, normally read in, to surface values.
 ! Altered 11-Feb-2009: Use isotope data, when available, to atomic number fractions.
@@ -325,6 +326,15 @@
 	        WRK=WRK+ISO(IS)%OLD_POP
 	      END IF
 	    END DO
+	    T1=1.0D-100
+	    DO I=1,ND
+	       T2=(POP_SPECIES(I,PAR(IP)%ISPEC)+T1)/(WRK(I)+T1)-1.0D0
+	       IF(SPECIES_PRES(PAR(IP)%ISPEC) .AND. ABS(T2) .GT. 0.02D0)THEN
+	         WRITE(LUER,*)'Error in RD_SN_DATA: inconsistent total/isotope populations'
+	         WRITE(LUER,*)'Species:',SPECIES(PAR(IP)%ISPEC)
+	         STOP
+	       END IF
+	    END DO 
 	    POP_SPECIES(:,PAR(IP)%ISPEC)=WRK
 	  END DO
 	END IF
