@@ -6,6 +6,9 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 13-Nov-2009 : Changed INT_EN interpolaton section. No longer use 
+!                          OLD values when outside range, and we limit changes,
+!                          when extrapolating, to a factor of 2.
 ! Created 13-Dec-2005 : Based on EVAL_ADIABATIC_V3
 !
 	INTEGER NT
@@ -84,6 +87,7 @@
 	WRITE(LU,'(A)')' '
 	WRITE(LU,'(A)')'Beginning new DDT_WORK cycle'
 	WRITE(LU,'(A)')' '
+	WRITE(LU,'(A)')'Verbose Output= ',VERBOSE_OUTPUT
 !
 	IF(T_FROM_J(1) .EQ. 0.0D0)THEN
 	  TCUR(1:ND)=T(1:ND)
@@ -200,6 +204,8 @@
 	OLD_INT_EN=HDKT*OLD_INT_EN/OLD_POP_ATOM
 !
 ! If new INT_EN calculation, store for interpolation purposes.
+! T is the actual gas temperature, and will only vary when using the
+! grey temperature iteration.
 !
 	DO I=1,ND
 	  MATCH=.FALSE.
@@ -215,6 +221,16 @@
 	        T_STORE(I,J)=T(I)
 	        INT_EN_STORE(I,J)=INT_EN(I)
 	        EXIT
+	      ELSE IF(J .EQ. 20)THEN
+!
+! If array is full, and this is the largest T so far, we assume we
+! are unlikely to want the small T, and act accoridngly.
+!
+	             T_STORE(I,1:19)=T_STORE(I,1:19)
+	        INT_EN_STORE(I,1:19)=INT_EN_STORE(I,1:19)
+	        T_STORE(I,J)=T(I)
+	        INT_EN_STORE(I,J)=INT_EN(I)
+	        EXIT
 	      ELSE IF(T(I) .LT. T_STORE(I,J))THEN
 	             T_STORE(I,20:J+1:-1)=     T_STORE(I,19:J:-1)
 	        INT_EN_STORE(I,20:J+1:-1)=INT_EN_STORE(I,19:J:-1)
@@ -226,22 +242,40 @@
 	  END IF
 	END DO
 !
+! If we don't yet have a table, we use the current INT_EN. This will only
+! be an issue in temperature regons where the ionization is changing.
+!
+! When we have at last 2 table values, and T is outside tabulated zone, we
+! extrapolate. This could cause issues in regions of ionizaton changes, and
+! may need to be changed. When extrapolating, we limit changes to a factor
+! of 2.
+!
 	DO I=1,ND
 	  IF(T_STORE(I,2) .EQ. 0)THEN
-	    IF(ABS(OLD_T(I)/T(I)-1.0D0) > 0.02)THEN
-	      T1=(TCUR(I)-OLD_T(I))/(T(I)-OLD_T(I))
-	      INT_EN(I)=INT_EN(I)*T1+OLD_INT_EN(I)*(1.0D0-T1)
-	    END IF
 	  ELSE IF(TCUR(I) .LT. T_STORE(I,1))THEN
 	    T1=(TCUR(I)-T_STORE(I,1))/(T_STORE(I,2)-T_STORE(I,1))
 	    INT_EN(I)=INT_EN_STORE(I,2)*T1+INT_EN_STORE(I,1)*(1.0D0-T1)
+	    T2=2.0D0*MAX(INT_EN_STORE(I,2),INT_EN_STORE(I,1))
+	    IF(INT_EN(I) .GT.  T2)INT_EN(I)=T2
+	    T2=0.5D0*MIN(INT_EN_STORE(I,2),INT_EN_STORE(I,1))
+	    IF(INT_EN(I) .LT.  T2)INT_EN(I)=T2
 	  ELSE
 	    DO J=2,20
 	      IF(T_STORE(I,J) .EQ. 0.0D0)THEN
+!
+! Need to extrapolate.
+!
 	        T1=(TCUR(I)-T_STORE(I,J-2))/(T_STORE(I,J-1)-T_STORE(I,J-2))
 	        INT_EN(I)=INT_EN_STORE(I,J-1)*T1+INT_EN_STORE(I,J-2)*(1.0D0-T1)
+	        T2=2.0D0*MAX(INT_EN_STORE(I,J-1),INT_EN_STORE(I,J-2))
+	        IF(INT_EN(I) .GT.  T2)INT_EN(I)=T2
+	        T2=0.5D0*MIN(INT_EN_STORE(I,J-1),INT_EN_STORE(I,J-2))
+	        IF(INT_EN(I) .LT.  T2)INT_EN(I)=T2
 	        EXIT
 	      ELSE IF(TCUR(I) .LE. T_STORE(I,J))THEN
+!
+! Can use linear interpolaton.
+!
 	        T1=(TCUR(I)-T_STORE(I,J-1))/(T_STORE(I,J)-T_STORE(I,J-1))
 	        INT_EN(I)=INT_EN_STORE(I,J)*T1+INT_EN_STORE(I,J-1)*(1.0D0-T1)
                 EXIT
