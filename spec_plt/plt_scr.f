@@ -36,7 +36,6 @@ C
 	INTEGER LST_NG
 	INTEGER RITE_N_TIMES
 	INTEGER LUSCR
-	INTEGER NUM_TIMES
 	INTEGER K
 	INTEGER IOS
 C
@@ -51,7 +50,7 @@ C
 	REAL*8 T1,T2,T3
 C
 	LUSCR=26
-	NUM_TIMES=1
+	RITE_N_TIMES=1
 	NEWMOD=.TRUE.
 C
 	WRITE(T_OUT,*)' '
@@ -92,7 +91,6 @@ C
 	    END IF
 	  END IF
 	  IF(IOS .NE. 0)THEN
-	    RITE_N_TIMES=1
 	    WRITE(T_OUT,*)'Possible error reading POINT1'
 	    CALL GEN_IN(NIT,'Number of iterations')
 	  END IF
@@ -136,8 +134,8 @@ C
 	WRITE(T_OUT,*)'D   :: Z(K)=100.0D0*(Y(K)-Y(NIT))/Y(NIT)'
 	WRITE(T_OUT,*)'Y   :: Z(K)=Y(K)'
 	WRITE(T_OUT,*)' '
-	WRITE(T_OUT,*)'PD  :: Plot a variable as a function of depth.'
-	WRITE(T_OUT,*)'PD  :: Plot a variable as a function of velocity.'
+        WRITE(T_OUT,*)'PD  :: Plot a variable as a function of depth.'
+        WRITE(T_OUT,*)'PV  :: Plot a variable as a function of velocity.'
 	WRITE(T_OUT,*)'PF  :: Plot 100.0D0*(Y(K+1)-Y(K))/Y(K+1) for all variables at a given depth.'
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'MED_R  :: Median corection as a function of depth'
@@ -361,6 +359,22 @@ C
 	  Ylabel=''
 	  CALL GRAMON_PGPLOT('V(km/s)',Ylabel,' ',' ')
 	  GOTO 200
+	ELSE IF(PLT_OPT(1:3) .EQ. 'FDG')THEN
+	  IT=NIT; ID=ND; IVAR=NT
+	  CALL GEN_IN(IT,'Iteration # (zero to exit)')
+	  DO WHILE(1 .EQ. 1)
+	    CALL GEN_IN(IVAR,'Variable # (zero to exit)')
+	    IF(IVAR .EQ. 0)EXIT
+	    CALL GEN_IN(ID,'Depth of variable')
+	    T1=POPS(IVAR,ID,IT)
+	    CALL GEN_IN(T1,'New value of variable')
+	    POPS(IVAR,ID,IT)=T1
+	    IVAR=0
+	  END DO
+          NITSF=NITSF+1; IREC=IT
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IREC),IREC,NITSF,
+	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+	1              NT,ND,LUSCR,NEWMOD)
 	END IF
 C
 	ID=ND
