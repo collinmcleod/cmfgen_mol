@@ -23,12 +23,13 @@ FN4=$(LIB_DIR)lib$(LN4).a
 # or if the libraries have changed since the last link.
 #
  
-OBJ1  =  rd_f_to_s_ids.o rd_f_to_s_ids_v2.o rd_energy.o write_osc_v2.o
+OBJ1  =  rd_f_to_s_ids.o rd_ba_mat.o rd_f_to_s_ids_v2.o rd_energy.o write_osc_v2.o
  
 EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)ave_dc.exe\
          $(EXE_DIR)count_phot_data.exe\
          $(EXE_DIR)ed_vadat.exe\
+         $(EXE_DIR)chk_ba_est.exe\
          $(EXE_DIR)chk_phot.exe\
          $(EXE_DIR)pack_osc.exe\
          $(EXE_DIR)do_ng_v2.exe\
