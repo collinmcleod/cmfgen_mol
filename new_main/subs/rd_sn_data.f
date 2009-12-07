@@ -329,9 +329,10 @@
 	    T1=1.0D-100
 	    DO I=1,ND
 	       T2=(POP_SPECIES(I,PAR(IP)%ISPEC)+T1)/(WRK(I)+T1)-1.0D0
-	       IF(SPECIES_PRES(PAR(IP)%ISPEC) .AND. ABS(T2) .GT. 0.02D0)THEN
+	       IF(SPECIES_PRES(PAR(IP)%ISPEC) .AND. ABS(T2) .GT. 0.10D0)THEN
 	         WRITE(LUER,*)'Error in RD_SN_DATA: inconsistent total/isotope populations'
 	         WRITE(LUER,*)'Species:',SPECIES(PAR(IP)%ISPEC)
+	         WRITE(LUER,*)'Depth=',I,'  Fractional difference=',T2
 	         STOP
 	       END IF
 	    END DO 
