@@ -1984,7 +1984,7 @@
 	  CALL DP_CURVE(ND,XV,YV)
 !
 	ELSE IF(XOPT .EQ. 'YMASS')THEN
-	  T1=1.0D+30/MASS_SUN()
+	  T1=4.0D+30*PI/MASS_SUN()
 	  DO I=1,ND
 	    ZETA(I)=T1*MASS_DENSITY(I)*CLUMP_FAC(I)*R(I)*R(I)
 	  END DO
@@ -1992,6 +1992,19 @@
 	  YAXIS='M(\dsun\u)'
 	  WRITE(6,'(A,ES9.2,A)')'Mass of envlope is',TA(ND),' Msun'
 	  CALL DP_CURVE(ND,XV,TA)
+!
+	ELSE IF(XOPT .EQ. 'IMASS')THEN
+	  DO ISPEC=1,NSPEC
+	    IF(XSPEC .EQ. SPECIES(ISPEC) .AND.  POPDUM(ND,ISPEC) .GT. 0.0D0)THEN
+	      T1=4.0D+30*PI*AT_MASS(ISPEC)*ATOMIC_MASS_UNIT()/MASS_SUN()
+	      DO I=1,ND
+	        ZETA(I)=T1*POPDUM(I,ISPEC)*CLUMP_FAC(I)*R(I)*R(I)
+	      END DO
+	      CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	      CALL DP_CURVE(ND,XV,TA)
+	      WRITE(6,'(A,A,A,ES9.2,A)')'Mass of ',TRIM(SPECIES(ISPEC)),' is',TA(ND),' Msun'
+	    END IF
+	  END DO
 !
 	ELSE IF(XOPT .EQ. 'LOGT')THEN
 	  CALL DLOGVEC(T,YV,ND)
@@ -2070,6 +2083,21 @@
 	  YV(1:ND)=TC(1:ND)
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='dlnT/dlnP'
+!
+	ELSE IF(XOPT .EQ. 'DERAD')THEN
+	  CALL USR_OPTION(ELEC,'INTEG','F','Integrated luminosity')
+	  IF(ELEC)THEN
+	    YV(1:ND)=3.280D-03*dE_RAD_DECAY(1:ND)*R(1:ND)*R(1:ND)  !(4*PI*Dex(+30)/L(sun)
+	    CALL LUM_FROM_ETA(YV,R,ND)
+	    DO I=ND-1,1,-1
+	      YV(I)=YV(I+1)+YV(I)
+	    END DO
+	    YAXIS='E(rad)(L\dsun\u)'
+	  ELSE
+	    YV(1:ND)=DLOG(dE_RAD_DECAY(1:ND))
+	    YAXIS='\ge(ergs\u \dcm\u-2 \ds\u-1\d)'
+	  END IF
+	  CALL DP_CURVE(ND,XV,YV)
 !
 	ELSE IF(XOPT .EQ. 'PGONP')THEN
 	  TA(1:ND)=1.0D+04*BOLTZMANN_CONSTANT()*(ED(1:ND)+POP_ATOM(1:ND))*T(1:ND)
@@ -2236,7 +2264,7 @@
 	      IF(POPDUM(ND,ISPEC) .GT. 0.0D0)THEN
 	        J=J+1
 	        T1=POPDUM(ND,ISPEC)/POP_ATOM(ND)+1.0D-100
-	        WRITE(6,'(A6,2X,F9.6,3X,ES9.2,5X)',ADVANCE='NO')TRIM(SPECIES(ISPEC)),T1,LOG(T1)
+	        WRITE(6,'(A6,2X,F9.6,3X,ES9.2,5X)',ADVANCE='NO')TRIM(SPECIES(ISPEC)),T1,LOG10(T1)
 	        IF(MOD(J,3) .EQ. 0)WRITE(6,'(A)')' '
 	        IF(MOD(J,3) .EQ. 0)J=0
 	      END IF
