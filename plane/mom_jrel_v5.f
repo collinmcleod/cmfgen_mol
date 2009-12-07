@@ -231,6 +231,8 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered: 15-Nov-2009 : Bug fix: LOG(CHI_SM(1:ND))--> LOG(CHI_SM(1:ND_SM))
+!                          Also output warning when ND is different.
 ! Created: 31-Dec-2004 : Based on MOM_J_REL_V1
 !                        Removed all *PREV quantities from call and placed 
 !                          in module.
@@ -241,7 +243,7 @@
 	REAL*8 CHI_SM(ND_SM)
 	REAL*8 ESEC_SM(ND_SM)
 	REAL*8 V_SM(ND_SM)			!in km/s
-	REAL*8 SIGMA_SM(ND_SM)		!dlnV/dlnR
+	REAL*8 SIGMA_SM(ND_SM)			!dlnV/dlnR
 	REAL*8 R_SM(ND_SM)			!in units of 10^10 cm
 !
 ! These values are computed, and returned.
@@ -325,6 +327,11 @@
 	    K=K+1
 	  END DO
 	  ND=K
+	  IF(ND .NE. ND_SM)THEN
+	    WRITE(LUER,*)'Warning in MOM_JREL_V5: we have adjusted ND for more accuracy'
+	    WRITE(LUER,*)'ND(adjusted)=',ND,'ND(original)=',ND_SM
+	    WRITE(LUER,*)'This could effect convergence with CMFGEN models'
+	  END IF
 !
 	  IF(N_TYPE .NE. 'G_ONLY' .AND. N_TYPE .NE. 'N_ON_J' .AND. ND .NE. ND_SM)THEN
 	    LUER=ERROR_LU()
@@ -450,15 +457,15 @@
 !
 	IF(ND .GT. ND_SM)THEN
 !
-	  TA(1:ND)=LOG(ETA_SM(1:ND))
+	  TA(1:ND_SM)=LOG(ETA_SM(1:ND_SM))
 	  CALL MON_INTERP(ETA,ND,IONE,R,ND,TA,ND_SM,R_SM,ND_SM)
 	  ETA=EXP(ETA)
 !
-	  TA(1:ND)=LOG(CHI_SM(1:ND))
+	  TA(1:ND_SM)=LOG(CHI_SM(1:ND_SM))
 	  CALL MON_INTERP(CHI,ND,IONE,R,ND,TA,ND_SM,R_SM,ND_SM)
 	  CHI=EXP(CHI)
 !
-	  TA(1:ND)=LOG(ESEC_SM(1:ND))
+	  TA(1:ND_SM)=LOG(ESEC_SM(1:ND_SM))
 	  CALL MON_INTERP(ESEC,ND,IONE,R,ND,TA,ND_SM,R_SM,ND_SM)
 	  ESEC=EXP(ESEC)
 !
