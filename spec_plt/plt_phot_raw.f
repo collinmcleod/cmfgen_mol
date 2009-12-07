@@ -350,8 +350,8 @@
 	  TEMP_VEC(1)=0.5D0; TEMP_VEC(2)=1.0D0; TEMP_VEC(3)=2.0; TEMP_VEC(4)=5.0D0; TEMP_VEC(5)=10.0D0
 	  TOTAL_REC_VEC(:)=0.0D0
 	  CALL GEN_IN(TEMP_VEC,NT,NREC_MAX,'Temperature in 10^4K (5 values max)')
-	  WRITE(6,'(A,T30,5(5X,F6.2)')'Temperature (10^4 K)=',(TEMP_VEC(I),I=1,NT)
-	  WRITE(LUOUT,'(A,T30,5(5X,F6.2)')'Level / Temperature (10^4 K)',(TEMP_VEC(I),I=1,NT)
+	  WRITE(6,'(A,T30,5(5X,F6.2))')'Temperature (10^4 K)=',(TEMP_VEC(I),I=1,NT)
+	  WRITE(LUOUT,'(A,T30,5(5X,F6.2))')'Level / Temperature (10^4 K)',(TEMP_VEC(I),I=1,NT)
 	  DO INDX_1=1,NLEV_1
 	    EDGE=ENERGY_1(INDX_1)
 	    STAT_WEIGHT=STAT_WT_1(INDX_1)
@@ -464,18 +464,20 @@
 	  END DO
 	  EDGE=ENERGY_1(INDX_1)
 	  WRITE(6,'(/,8X,A,A)')     '          Level_1 name is: ',NAME_1(INDX_1)
-	  WRITE(6,'(8X,A,ES15.8,A,')'       Energy of level is: ',EDGE,' (10^15Hz)'
+	  WRITE(6,'(8X,A,ES15.8,A)')'       Energy of level is: ',EDGE,' (10^15Hz)'
 	  WRITE(6,'(8X,A,I2,/)')    ' Type of cross-section is: ',TYPE_1(INDX_1)
 !
 	  IF(TYPE_1(INDX_1) .EQ. 20 .OR. TYPE_1(INDX_1) .EQ. 21)THEN
 	    NV=NUM_VALS_1(INDX_1)
 	    XV(1:NV)=NU_1(LOC_1(INDX_1):LOC_1(INDX_1)+NV-1)
 	    YV(1:NV)=CROSS_1(LOC_1(INDX_1):LOC_1(INDX_1)+NV-1)
+	    FREQ_SCL_FAC=EDGE+EXC_EN_1
 	  ELSE
 	    NV=1000
 	    CALL RAW_SUBPHOT(YV,XV,CROSS_1(LOC_1(INDX_1)),TYPE_1(INDX_1),NUM_VALS_1(INDX_1),
 	1                    EDGE,EXC_EN_1,ZION_1,AMASS,NV)
-	    XV(1:NV)=XV(1:NV)/(EDGE+EXC_EN_1)
+	    FREQ_SCL_FAC=XV(1)
+	    XV(1:NV)=XV(1:NV)/FREQ_SCL_FAC
 	  END IF
 	  IF(DO_WAVE_PLT)THEN
 	    XV(1:NV)=ANG_TO_HZ/XV(1:NV)
@@ -499,7 +501,8 @@
 	    IF(TEMP .NE. 0)THEN
 	      WRITE(6,'(A,ES10.4,3X,A,F5.1,3X,A,F4.1,3X,A,I6,3X,A,F6.2)')
 	1        ' EDGE=',EDGE,'g=',STAT_WEIGHT,'gion=',GION,'NV=',NV,'T(10^K)=',TEMP
-	      CALL RECOM_OPAC(YV,XV,EDGE,STAT_WEIGHT,GION,NV,NV,TOTAL_REC,TEMP)
+	      T1=EDGE+EXC_EN_1
+	      CALL RECOM_OPAC_V2(YV,XV,T1,FREQ_SCL_FAC,STAT_WEIGHT,GION_1,NV,NV,TOTAL_REC,TEMP)
 	      WRITE(6,'(A,ES11.4)')' Total Rec=',TOTAL_REC
 	    END IF
 	  END IF
@@ -535,15 +538,18 @@
 	        NV=NUM_VALS_2(INDX_2)
 	        XV(1:NV)=NU_2(LOC_2(INDX_2):LOC_2(INDX_2)+NV-1)
 	        YV(1:NV)=CROSS_2(LOC_2(INDX_2):LOC_2(INDX_2)+NV-1)
+	        FREQ_SCL_FAC=EDGE+EXC_EN_1
 	      ELSE
 	        NV=1000
 	        CALL RAW_SUBPHOT(YV,XV,CROSS_2(LOC_2(INDX_2)),TYPE_2(INDX_2),NUM_VALS_2(INDX_2),
 	1                    EDGE,EXC_EN_2,ZION_2,AMASS,NV)
-	         XV(1:NV)=XV(1:NV)/(EDGE+EXC_EN_2)
+	        FREQ_SCL_FAC=XV(1)
+	        XV(1:NV)=XV(1:NV)/FREQ_SCL_FAC
 	      END IF
 	      IF(DO_RECOM .AND. OSCILLATOR_FILE_AVAIL)THEN
 	        IF(TEMP .NE. 0)THEN
-	          CALL RECOM_OPAC(YV,XV,EDGE,STAT_WEIGHT,GION,NV,NV,TOTAL_REC,TEMP)
+	          T1=EDGE+EXC_EN_1
+	          CALL RECOM_OPAC_V2(YV,XV,T1,FREQ_SCL_FAC,STAT_WEIGHT,GION,NV,NV,TOTAL_REC,TEMP)
 	          WRITE(6,*)'Total Rec=',TOTAL_REC
 	        END IF
 	      END IF
