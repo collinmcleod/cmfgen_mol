@@ -698,6 +698,16 @@
 	END IF
 	TC(ND)=0.0D0
 !
+	IF(INIT .AND. .NOT. FIRST_TIME)THEN
+	  REWIND(170)
+	END IF
+	IF(INIT)THEN
+	  WRITE(170,'(9(11X,A))')' Freq','  Gam','   dH','   TA','   TB','   TC',
+	1            '  PSI',' DJDt','DTONQ'
+	END IF
+	I=MIN(84,ND-10)
+	WRITE(170,'(9ES16.8)')FREQ,GAM(I),dH(I),TA(I),TB(I),TC(I),PSI(I),
+	1                       DJDt(I),DTAUONQ(I)*(1.0D0-COH_VEC(I))
 !
 ! Solve for the radiation field along ray for this frequency.
 !
@@ -752,16 +762,16 @@
 	END DO
 !
 	IF(INIT .AND. .NOT. FIRST_TIME)THEN
-	  REWIND(170)
-	  REWIND(172)
-	  REWIND(182)
+!	  REWIND(170)
+!	  REWIND(172)
+!	  REWIND(182)
 	END IF
 	IF(INIT)THEN
-	  WRITE(170,'(3(12X,A),4(18X,A))')' DJDT term',' dHdR term','Freq Deriv',
-	1                                     '-RHS','Chi ','Esec','Eta '
-	  WRITE(172,'(3(11X,A),4(18X,A))')'  DJDT term','dHdtau term',' Freq Deriv',
-	1                                     '-RHS','Chi ','Esec','Eta '
-	ELSE
+!	  WRITE(170,'(3(12X,A),4(18X,A))')' DJDT term',' dHdR term','Freq Deriv',
+!	1                                     '-RHS','Chi ','Esec','Eta '
+!	  WRITE(172,'(3(11X,A),4(18X,A))')'  DJDT term','dHdtau term',' Freq Deriv',
+!	1                                     '-RHS','Chi ','Esec','Eta '
+	ELSE IF(.FALSE.)THEN
 	  I=ND-4
 	  T1=ROLD_ON_R
 	  T2=R(I)*R(I)
