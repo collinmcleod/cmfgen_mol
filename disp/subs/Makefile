@@ -31,6 +31,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(rd_ion_pop_v3.o)\
       $(LIB)(rd_pop_dim.o)\
       $(LIB)(rd_rvtj.o)\
+      $(LIB)(rd_rvtj_v2.o)\
       $(LIB)(recom_chk_v2.o)\
       $(LIB)(set_dc_or_pop_or_tx.o)\
       $(LIB)(setdc_or_pop.o)\

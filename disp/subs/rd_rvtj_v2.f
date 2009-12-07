@@ -3,25 +3,23 @@ C Set of two routines to READ in desriptor populations.
 C The Hydrogen and Helium populations aren now READ in from their
 C own file.
 C
-	SUBROUTINE RD_RVTJ_PARAMS_V2(RMDOT,LUM,ABUNDH,TIME,NAME_CONV,
-	1                  ND,NC,NP,FILNAME,LUIN)
+	SUBROUTINE RD_RVTJ_PARAMS_V3(RMDOT,LUM,ABUNDH,TIME,NAME_CONV,
+	1                  ND,NC,NP,FORMAT_DATE,FILNAME,LUIN)
 	IMPLICIT NONE
 !
-! Altered 11-Nov-2009 : Instaled format date 10-Nov-2009. Changes will allow
-!                           this version to be used with existing routines without
-!                           updating to the new version (with TGREY etc).
 ! Altered 15-Jun-2000 : Naming convention inserted.
 !
 	INTEGER ND,NC,NP,LUIN
 	REAL*8 RMDOT,LUM,ABUNDH
-	CHARACTER*(*) TIME,FILNAME,NAME_CONV
+	CHARACTER(LEN=*) TIME,FILNAME,NAME_CONV
+	CHARACTER(LEN=*) FORMAT_DATE
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
 C Local Variables
 C
-	CHARACTER*11 LOC_FORMAT_DATE,FORMAT_DATE,PRODATE
+	CHARACTER*11 LOC_FORMAT_DATE,PRODATE
 	INTEGER NCF
 	LOGICAL RD_FIX_T
 C
@@ -30,11 +28,11 @@ C
 	LOC_FORMAT_DATE='08-JAN-1996'
 	READ(LUIN,'(T30,A11)')FORMAT_DATE
 	CALL SET_CASE_UP(FORMAT_DATE,0,0)
-	IF(FORMAT_DATE .NE. '15-JUN-2000' .AND. 
-	1   FORMAT_DATE .NE. '10-NOV-2009' .AND. 
-	1                      FORMAT_DATE .NE. LOC_FORMAT_DATE)THEN
+	IF(   TRIM(FORMAT_DATE) .NE. '15-JUN-2000' .AND.
+	1     TRIM(FORMAT_DATE) .NE. '10-NOV-2009' .AND.
+	1                      TRIM(FORMAT_DATE) .NE. LOC_FORMAT_DATE)THEN
 	  WRITE(ERROR_LU(),*)'Wrong format date : RVTJ read failure'
-	  WRITE(ERROR_LU(),*)'Subroutine called is RD_ASC_RVTJ_V2'
+	  WRITE(ERROR_LU(),*)'Subroutine called is RD_ASC_RVTJ_V3'
 	  WRITE(ERROR_LU(),*)'Subroutine date 1 is: ',LOC_FORMAT_DATE
 	  WRITE(ERROR_LU(),*)'Subroutine date 2 is: ','15-JUN-2000'
 	  WRITE(ERROR_LU(),*)'Subroutine date 3 is: ','10-NOV-2009'
@@ -65,18 +63,21 @@ C
 C
 C This routine reads in the vecors, and returns the number of HI levels.
 C
-	SUBROUTINE RD_RVTJ_VEC(R,V,SIGMA,ED,T,
-	1       ROSS_MEAN,FLUX_MEAN,
+	SUBROUTINE RD_RVTJ_VEC_V2(R,V,SIGMA,ED,T,
+	1       TGREY,dE_RAD_DECAY,ROSS_MEAN,FLUX_MEAN,
 	1       POP_ATOM,POP_ION,
-	1       MASS_DENSITY,CLUMP_FAC,ND,LUIN)
+	1       MASS_DENSITY,CLUMP_FAC,FORMAT_DATE,
+	1       ND,LUIN)
 	IMPLICIT NONE
 C
 	INTEGER ND
 	REAL*8 R(ND),V(ND),SIGMA(ND),ED(ND)
 	REAL*8 T(ND)
+	REAL*8 TGREY(ND),dE_RAD_DECAY(ND)
 	REAL*8 POP_ATOM(ND),POP_ION(ND)
 	REAL*8 MASS_DENSITY(ND),CLUMP_FAC(ND)
 	REAL*8 ROSS_MEAN(ND),FLUX_MEAN(ND)
+	CHARACTER(LEN=*) FORMAT_DATE
 C
 	INTEGER LUIN
 C
@@ -103,6 +104,16 @@ C
 C
 	CALL CHK_STRING(STRING,LUIN,'Temperature','RD_RVTJ')
 	READ(LUIN,*)(T(I),I=1,ND)
+!
+	IF(FORMAT_DATE .EQ. '10-NOV-2009')THEN
+	  CALL CHK_STRING(STRING,LUIN,'Grey temperature','RD_RVTJ')
+	  READ(LUIN,*)(TGREY(I),I=1,ND)
+	  CALL CHK_STRING(STRING,LUIN,'Heating: radioactive decay','RD_RVTJ')
+	  READ(LUIN,*)(dE_RAD_DECAY(I),I=1,ND)
+	ELSE
+	  TGREY(1:ND)=0.0D0
+	  dE_RAD_DECAY(1:ND)=0.0D0
+	END IF	
 C
 C In this routine, we skip over the continuum data.
 C
