@@ -325,7 +325,7 @@
 	      OPEN(UNIT=LU,FILE='DJDT_GREY_ERRROR',STATUS='UNKNOWN')
                 WRITE(LU,'(X,A,ES12.4,3X,A,ES12.4,6X,A,ES12.4)')
 	1               'WORK=',WORK(I),'T_FROM_J=',T_FROM_J(I),'OLD_T=',OLD_T(I)
-	        WRITE(LU,'(A,5A14)')'  J','T_FROM_J','    OLD_T','E(Decay)','    WORK',
+	        WRITE(LU,'(A,9A14)')'  J','T_FROM_J','    OLD_T','E(Decay)','    WORK',
 	1                        '     CHI','    CHIP','      RJ','    MOD_J'
 	        DO J=1,ND
 	          WRITE(LU,'(I3,8ES14.4)')J,T_FROM_J(J),OLD_T(J),E_RAD_DECAY(J),WORK(J),
@@ -334,13 +334,13 @@
 	      CLOSE(UNIT=LU)
 	      STOP
 	    END IF
-	    IF(BAD_J_COUNTER .GT. 100)THEN
-	      WRITE(6,*)'Exceeded 100 iterations for BAD_J_COUNTER'
+	    IF(BAD_J_COUNTER .GT. 300)THEN
+	      WRITE(6,*)'Exceeded 300 iterations for BAD_J_COUNTER'
 	      WRITE(6,*)'Check starting conditions'
 	      WRITE(6,*)'Check DJDT_GREY_ERROR file for more information'
 	      OPEN(UNIT=LU,FILE='DJDT_GREY_ERRROR',STATUS='UNKNOWN')
 	        WRITE(LU,*)'Reduction factor is',REDUCTION_FACTOR
-	        WRITE(LU,'(A,5A14)')'  J','T_FROM_J','    OLD_T','E(Decay)','    WORK',
+	        WRITE(LU,'(A,9A14)')'  J','T_FROM_J','    OLD_T','E(Decay)','    WORK',
 	1                        '     CHI','    CHIP','      RJ','    MOD_J'
 	        DO J=1,ND
 	          WRITE(LU,'(I3,8ES14.4)')J,T_FROM_J(J),OLD_T(J),E_RAD_DECAY(J),WORK(J),
