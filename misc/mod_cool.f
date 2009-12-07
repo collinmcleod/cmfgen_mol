@@ -9,6 +9,8 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 17-Nov-2009: Now read in charge exchange cooling.
+!                         Slight format change.
 ! Altered: 29-Jan-2009: ND is now read in from MODEL (if it exists).
 ! Altered: 08-Feb-2008: Extra terms (such as V term) sheck and output.
 !
@@ -68,8 +70,8 @@
 	   DO J=1,3
 	     READ(20,'(A)')TMP_STR
 	     READ(20,'(A)')STRING
-	     IF(J .EQ. 1)WRITE(21,'(A,T11,10I12)')'Depth',(K,K=ID,MIN(ID+9,ND))
-	     WRITE(21,'(A)')TMP_STR(4:9)//'   '//TRIM(STRING)
+	     IF(J .EQ. 1)WRITE(21,'(A,T12,10I12)')'Depth',(K,K=ID,MIN(ID+9,ND))
+	     WRITE(21,'(A)')TMP_STR(4:9)//'     '//TRIM(STRING)
 	     READ(20,'(A)')STRING
 	   END DO
 !
@@ -81,55 +83,56 @@
 	        TMP_STR=ADJUSTL(TMP_STR)
 	        K=INDEX(TMP_STR,' ')
 	        READ(20,'(A)')STRING
-	        WRITE(21,'(A,T10,A)')TMP_STR(1:K)//'COL ',TRIM(STRING)
+	        WRITE(21,'(A,T12,A)')TMP_STR(1:K)//'COL ',TRIM(STRING)
 	      ELSE IF( INDEX(STRING,'Free-Free') .NE. 0)THEN
 	        TMP_STR=STRING
 	        TMP_STR=ADJUSTL(TMP_STR)
 	        K=INDEX(TMP_STR,' ')
 	        READ(20,'(A)')STRING
-	        WRITE(21,'(A,T10,A)')TMP_STR(1:K)//'FF ',TRIM(STRING)
+	        WRITE(21,'(A,T12,A)')TMP_STR(1:K)//'FF ',TRIM(STRING)
 	      ELSE IF( INDEX(STRING,'K-shell') .NE. 0)THEN
 	        TMP_STR=STRING
 	        TMP_STR=ADJUSTL(TMP_STR)
 	        K=INDEX(TMP_STR,' ')
 	        READ(20,'(A)')STRING
-	        WRITE(21,'(A,T10,A)')TMP_STR(1:K)//'XKS ',TRIM(STRING)
+	        WRITE(21,'(A,T12,A)')TMP_STR(1:K)//'XKS ',TRIM(STRING)
 	      ELSE IF( INDEX(STRING,'V term') .NE. 0)THEN
 	        TMP_STR=STRING
 	        TMP_STR=ADJUSTL(TMP_STR)
 	        K=INDEX(TMP_STR,' ')
 	        READ(20,'(A)')STRING
-	        WRITE(21,'(A,T10,A)')'AC.R(V).',TRIM(STRING)
+	        WRITE(21,'(A)')' '
+	        WRITE(21,'(A,T12,A)')'AC.R(V).',TRIM(STRING)
 	      ELSE IF( INDEX(STRING,'dTdR term') .NE. 0)THEN
 	        TMP_STR=STRING
 	        TMP_STR=ADJUSTL(TMP_STR)
 	        K=INDEX(TMP_STR,' ')
 	        READ(20,'(A)')STRING
-	        WRITE(21,'(A,T10,A)')'AC.R(dT).',TRIM(STRING)
+	        WRITE(21,'(A,T12,A)')'AC.R(dT).',TRIM(STRING)
 	      ELSE IF( INDEX(STRING,'decay') .NE. 0)THEN
 	        TMP_STR=STRING
 	        TMP_STR=ADJUSTL(TMP_STR)
 	        K=INDEX(TMP_STR,' ')
 	        READ(20,'(A)')STRING
-	        WRITE(21,'(A,T10,A)')'R. decay',TRIM(STRING)
+	        WRITE(21,'(A,T12,A)')'|R. decay|',TRIM(STRING)
 	      ELSE IF( INDEX(STRING,'Artificial') .NE. 0)THEN
 	        TMP_STR=STRING
 	        TMP_STR=ADJUSTL(TMP_STR)
 	        K=INDEX(TMP_STR,' ')
 	        READ(20,'(A)')STRING
-	        WRITE(21,'(A,T10,A)')'Art. HT',TRIM(STRING)
+	        WRITE(21,'(A,T12,A)')'|Art. HT|',TRIM(STRING)
 	      ELSE IF( INDEX(STRING,'Rate') .NE. 0)THEN
 	        TMP_STR=STRING
 	        TMP_STR=ADJUSTL(TMP_STR)
 	        K=INDEX(TMP_STR,' ')
 	        READ(20,'(A)')STRING
-	        WRITE(21,'(A,T10,A)')'Net C.R.',TRIM(STRING)
+	        WRITE(21,'(A,T12,A)')'Net C.R.',TRIM(STRING)
 	     ELSE IF( INDEX(STRING,'Net') .NE. 0)THEN
 	        TMP_STR=STRING
 	        TMP_STR=ADJUSTL(TMP_STR)
 	        K=INDEX(TMP_STR,' ')
 	        READ(20,'(A)')STRING
-	        WRITE(21,'(A,T10,A)')'% C.R.',TRIM(STRING)
+	        WRITE(21,'(A,T12,A)')'% C.R.',TRIM(STRING)
 	        IF(I .NE. 1+(ND-1)/10)THEN
 	          READ(20,'(A)')STRING
 	          WRITE(21,'(A)')STRING
@@ -144,7 +147,22 @@
 	            TMP_STR=ADJUSTL(TMP_STR)
 	            K=INDEX(TMP_STR,' ')
 	            WRITE(21,'(A)')STRING
-                    WRITE(21,'(A,T11,10ES12.4)')TMP_STR(1:K)//'BF ',(SUM(K),K=ID,MIN(ID+9,ND))
+                    WRITE(21,'(A,T13,10ES12.4)')TMP_STR(1:K)//'BF ',(SUM(K),K=ID,MIN(ID+9,ND))
+	            EXIT
+	          ELSE
+	            READ(STRING,*)(BOUND(K),K=ID,MIN(ID+9,ND))
+	            SUM=SUM+BOUND
+	          END IF
+	        END DO
+	      ELSE IF( INDEX(STRING,'Charge exchange cooling rate') .NE. 0)THEN
+	        TMP_STR=STRING
+	        SUM=0.0D0
+	        DO WHILE(1 .EQ. 1)
+	          READ(20,'(A)')STRING
+	          IF(STRING .EQ. ' ')THEN
+	            TMP_STR=ADJUSTL(TMP_STR)
+	            K=INDEX(TMP_STR,' ')
+                    WRITE(21,'(A,T13,10ES12.4)')'Charge',(SUM(K),K=ID,MIN(ID+9,ND))
 	            EXIT
 	          ELSE
 	            READ(STRING,*)(BOUND(K),K=ID,MIN(ID+9,ND))
