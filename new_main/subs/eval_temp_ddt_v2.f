@@ -18,8 +18,10 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered 11-Nov-2009 : Fixed bug in BA calculation --- was skipping depth ND.
+!                          No longer calculate ION_EN. 
 ! Altered 12-Feb-2008 : VOL_EXP_FAC used. Now valid for all expansion laws.
-!                       Returned populations are corrected for decays and adiabatic expansion.
+!                          Returned populations are corrected for decays and adiabatic expansion.
 ! Altered 22-Mar-2007 : Call GET_POPS_AT_PREV_TIME_STEP_V4
 ! Altered 04-Feb-2007 : Bug fixed in d(STEQ_T)/dNe
 ! Altered 23-Jun-2006 : R, V removed from call to GET_POPS_AT_PREV_TIME_STEP_V2 since
@@ -62,7 +64,6 @@
 	REAL*8 OLD_POP_ATOM(ND)
 	REAL*8 OLD_INT_EN(ND)
 !
-	REAL*8 ION_EN(NT)
 	REAL*8 TOT_ENERGY(NT)
 !
 ! Local variables.
@@ -96,7 +97,6 @@
 ! Compute the total excitation energy of each level.
 !
 	TOT_ENERGY(1:NT)=0.0D0
-	ION_EN(1:NT)=0.0D0
 	DO ISPEC=1,NUM_SPECIES
 	  T1=0.0D0
 	  T2=0.0D0
@@ -105,7 +105,6 @@
 	    DO I=1,ATM(ID)%NXzV
 	      J=ATM(ID)%EQXzV+I-1
 	      TOT_ENERGY(J)=(AVE_ENERGY(ATM(ID)%EQXzV)-AVE_ENERGY(J))+T1
-	      ION_EN(J)=T2
 	    END DO
 	    J=ATM(ID)%EQXzV
 	    T1=T1+AVE_ENERGY(J)			!Adding on ionization energy
@@ -114,7 +113,6 @@
 	  IF(ID .GT. 0)THEN
 	    J=ATM(ID)%EQXzV
 	    TOT_ENERGY(J+ATM(ID)%NXzV)=T1
-	    ION_EN(J+ATM(ID)%NXzV)=T2
 	  END IF
 	END DO
 !
@@ -214,7 +212,7 @@
 ! Diagonal terms.
 !
 	IF(INCL_ADIABATIC .AND. COMPUTE_BA)THEN
-	  DO I=1,ND-1
+	  DO I=1,ND
 	    L=DIAG_INDX
 	    BA_T(NT,L,I)=BA_T(NT,L,I)-EK_VEC(I)*(1+GAMMA(I)) -
 	1                    P_VEC(I)*LOG(VOL_EXP_FAC(I))/T(I)
@@ -246,24 +244,30 @@
 	AD_CR_V=AD_CR_V*T1
 	AD_CR_DT=AD_CR_DT*T1
 !
-! Output diagnostic information.
+! Output diagnostic information. As OLD_POP_ATOM has already been corrected for
+! advection, we don't need to scale it by the change in volume.
 !
 	WRITE_CHK=.TRUE.
 	IF(WRITE_CHK)THEN
 	  OPEN(UNIT=7,FILE='ADIABAT_CHK',STATUS='UNKNOWN')
+	   WRITE(7,'(A)')'!'
+	   WRITE(7,'(A)')'! The terms (DEk/Dt, DEI/Dt, and DP/dt) listed below are included in the CMFGEN'
+	   WRITE(7,'(A)')'! radiative equilibrium equation. No additional scaling is needed. The d terms'
+	   WRITE(7,'(A)')'! represent the contribution to D... by current values'
+	   WRITE(7,'(A)')'!'
 	   WRITE(7,'(A,ES14.4)')'DELTA_T_SECS=',DELTA_T_SECS
 	   WRITE(7,'(A,ES14.4)')'SCALE_FAC=',SCALE
 	   WRITE(7,'(A,7(7X,A7),2X,A)')'Index','      V','      R','  OLD_R','      T','  OLD_T',
 	1               '    GAM','OLD_GAM','(Nn/No)(Rn/Ro)**3-1'
-	   WRITE(7,'(A,7(7X,A7))')'     ',' Ek(ev)',' Ei(ev)','     Ek','     EI',
-	1                    '   dEk','    dEI','     dP'
+	   WRITE(7,'(A,7(7X,A7))')'     ',' Ek(ev)',' Ei(ev)','    dEk','    dEI',
+	1                    ' DEk/Dt',' DEI/Dt','?DP/Dt'
 	   DO I=1,ND
 	    T1=EK_VEC(I)*(1.0D0+GAMMA(I))*T(I)
 	    T2=EI_VEC(I)*INT_EN(I)
 	    T3=EK_VEC(I)*( (1.0D0+GAMMA(I))*T(I)-(1.0D0+OLD_GAMMA(I))*OLD_T(I) )
 	    T4=EI_VEC(I)*(INT_EN(I)-OLD_INT_EN(I))
 	    WRITE(7,'(I5,8ES14.5)')I,V(I),R(I),OLD_R(I),T(I),OLD_T(I),GAMMA(I),OLD_GAMMA(I),
-	1                    (POP_ATOM(I)/OLD_POP_ATOM(I))*((R(I)/OLD_R(I))**3)-1.0D0
+	1                    (POP_ATOM(I)/OLD_POP_ATOM(I))-1.0D0
 	    WRITE(7,'(5X,7ES14.5)')1.5D0*T(I)*8.6174D-01,INT_EN(I)*8.6174D-01,T1,T2,T3,T4,
 	1                    P_VEC(I)*LOG(VOL_EXP_FAC(I))
 	   END DO
