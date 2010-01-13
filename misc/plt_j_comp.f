@@ -145,11 +145,11 @@
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(ray)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IJMF')THEN
 	    CALL DP_CURVE(NCF,NU,JM_IN)
-	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(ray)',' ',' ')
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(mom)',' ',' ')
 !
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IJW')THEN
 	    CALL DP_CURVE(NCF,LAM,JR_IN)
-	    CALL GRAMON_PGPLOT('\gl(\A)','J(mom)',' ',' ')
+	    CALL GRAMON_PGPLOT('\gl(\A)','J(raw)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IJMW')THEN
 	    CALL DP_CURVE(NCF,LAM,JM_IN)
 	    CALL GRAMON_PGPLOT('\gl(\A)','J(mom)',' ',' ')
@@ -162,6 +162,7 @@
 	    Y(1:NCF)=JR_IN(1:NCF)-JM_IN(1:NCF)
 	    CALL DP_CURVE(NCF,NU,Y)
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(ray)-J(mom)',' ',' ')
+!
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IDF')THEN
 	    CALL DP_CURVE(NCF,NU,DIFF_IN)
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','% Difference',' ',' ')
