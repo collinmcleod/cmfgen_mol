@@ -111,13 +111,13 @@
 	  READ(LU_IN,REC=IREC)OLD_R,OLD_V;    IREC=IREC+1
 !
 	  ALLOCATE (JST(ND_OLD,NSM))
-	  ALLOCATE (HST(ND_OLD,NSM))
-	  ALLOCATE (NUST(NSM));        NUST=0.0D0
+	  ALLOCATE (HST(ND_OLD,NSM));   HST=0.0D0
+	  ALLOCATE (NUST(NSM));         NUST=0.0D0
 	  ALLOCATE (H_INBC_ST(NSM))
 	  ALLOCATE (H_OUTBC_ST(NSM))
 !
 	  ALLOCATE (OLD_J(ND_OLD))
-	  ALLOCATE (OLD_H(ND_OLD-1))
+	  ALLOCATE (OLD_H(ND_OLD))
 !
 	  ALLOCATE (LOG_OLD_V(ND_OLD))
 	  ALLOCATE (LOG_OLD_MIDV(ND_OLD+1))
@@ -290,14 +290,16 @@
 	  END DO
 	  INDX=2
 !
-	  IF(COUNTER .EQ. NCF_OLD .AND. NU .LT. NUST(NSM))THEN
-	     WRITE(LU_ER,*)'Error in GET_JH_AT_PREV_TIME_STEP'
-	     WRITE(LU_ER,*)'Invalid minmum frequency --- outside range'
-	     WRITE(LU_ER,*)'NU=',NU
-	     WRITE(LU_ER,*)'NUST=',NUST(NSM)
-	     STOP
-	  END IF
 	END DO
+!
+! May need to change this to power law extrapolation.
+!
+	IF(COUNTER .EQ. NCF_OLD .AND. NU .LT. NUST(NSM))THEN
+	  WRITE(LU_ER,*)'Warning in GET_JH_AT_PREV_TIME_STEP'
+	  WRITE(LU_ER,*)'Possible invalid minmum frequency --- outside range'
+	  WRITE(LU_ER,*)'Will use simple extrapolation'
+	  WRITE(LU_ER,'(A,ES16.6,A,ES16.6)')'NU=',NU,'NUST=',NUST(NSM)
+	END IF
 !
 	IF(INIT .AND. NU .GT. NUST(1))THEN
 	  WRITE(LU_ER,*)'Warning in GET_JH_AT_PREV_TIME_STEP'
@@ -317,9 +319,12 @@
 !
 ! We initially use linear interpolation in frequency.
 !
-	  DO WHILE(NU .LT. NUST(INDX))
+	  DO WHILE(NU .LT. NUST(INDX) .AND. INDX .LT. NSM)
 	    INDX=INDX+1
 	  END DO
+	  IF(NU .LT. 0.005)THEN
+	    WRITE(6,'(I6,3ES14.6)')INDX,NU,NUST(INDX-1),NUST(INDX)
+	  END IF
 	  T1=(NU-NUST(INDX))/(NUST(INDX-1)-NUST(INDX))
 	  DO I=1,ND_OLD
 	    OLD_J(I)=(1.0D0-T1)*JST(I,INDX) + T1*JST(I,INDX-1)
