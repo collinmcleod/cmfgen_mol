@@ -10,6 +10,7 @@ C
 	USE MOD_USR_HIDDEN
 	IMPLICIT NONE
 C
+C Altered 13-Dec-2009 : LOWN option installed (comments added 13-Jan-2010). 
 C Altered 21-Apr-2008 : SEQ_WR installed; Improved handling of INT_SEQ.
 C Altered 23-Jun-2005 : FIX_DI option installed for WR_DC
 C Altered 25-Oct-2002 : CL option changed.
@@ -477,6 +478,22 @@ C
 	  WRITE(T_OUT,*)'Number of LS terms in full atom is  ',N_LS_TERMS
 	  WRITE(T_OUT,*)'Number of levels in SUPER atom is   ',ID
 !
+! This option allows the N lowest SL's to be automatically spit into 
+! individual levels. This option allows a direct comparision with a similar option
+! in CMFGEN specified in the MODEL_SPEC file. Usefule for identifying levels
+! with those in CMFGEN.
+!
+	ELSE IF(X(1:4) .EQ. 'LOWN')THEN
+	  CALL USR_OPTION(K,'N','10','How many SL''s to split')
+	  DO I=1,NLEV
+	    IF(F_TO_S(I) .LE. K)THEN
+	       F_TO_S(I)=I
+	    ELSE
+	      F_TO_S(I)=F_TO_S(I)+5000
+	    END IF
+	  END DO
+	  WRITE(6,*)'Now execute CLN command'
+!
 ! Option allows the user to improve the links in an existing link list.
 ! New SUPER levels will be created when the energy separation is
 ! greater than DEL_E_C, or when the departure coefficents of the levels
@@ -578,6 +595,8 @@ C also be C output.
 C
 	ELSE IF(X(1:5) .EQ. 'SL_WR')THEN
 	  CALL USR_OPTION(FILENAME,'File','SL_LNKS','Link check file')
+	  CALL USR_OPTION(CNT,'INITIAL','1','Initial SL number')
+	  CNT=CNT-1
 	  CALL USR_HIDDEN(WRITE_DC,'DC','F',' ')
 	  CALL GEN_ASCI_OPEN(LUOUT,FILENAME,'UNKNOWN',' ',
 	1                               'WRITE',IZERO,IOS)
@@ -594,11 +613,11 @@ C
 	        LAM_EDGE(I)=1.0D+08/(ION_EN-ENERGY(I))
 	        IF(WRITE_DC)THEN
 	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
-	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I,DC(I,1),
+	1                      LAM_EDGE(I),F_TO_S(I)+CNT,INT_SEQ(I),I,DC(I,1),
 	1                      DC(I,2),DC(I,3)
 	        ELSE
 	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
-	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I
+	1                      LAM_EDGE(I),F_TO_S(I)+CNT,INT_SEQ(I),I
 	        END IF
 	      END IF
 	    END DO
