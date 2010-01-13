@@ -27,6 +27,7 @@
 	REAL*8,  ALLOCATABLE :: BETA(:)                !ND : Sobolev escape probability
 	REAL*8,  ALLOCATABLE :: BETAC(:)               !ND : Dilution factor weighted "escape probaility"
 !
+	REAL*8,  ALLOCATABLE :: LINE_QW_SUM(:)         !MAX_SIM
 	REAL*8,  ALLOCATABLE :: BETAC_SIM(:,:)         !ND,MAX_SIM
 	REAL*8,  ALLOCATABLE :: ZNET_SIM(:,:)          !ND,MAX_SIM
 	REAL*8,  ALLOCATABLE :: JBAR_SIM(:,:)          !ND,MAX_SIM
@@ -140,6 +141,7 @@ C
 	IF(IOS .EQ. 0)ALLOCATE( BETAC_SIM(ND,MAX_SIM) ,STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE( ZNET_SIM(ND,MAX_SIM) ,STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE( JBAR_SIM(ND,MAX_SIM) ,STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE( LINE_QW_SUM(MAX_SIM) ,STAT=IOS)
 !
 	IF(IOS .EQ. 0)ALLOCATE( TRANS_NAME_SIM(MAX_SIM) ,STAT=IOS)
 !
