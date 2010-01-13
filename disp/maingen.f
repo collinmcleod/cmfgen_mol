@@ -3149,6 +3149,7 @@
 !
 ! Vdop=10 km/s and ignoring SQRT(PI)
 !
+	    WRITE(6,*)'Opacity at line center(for Vdop=10km/s) * SQRT(PI) normalized be e.s. opacity' 
 	    TAU_CONSTANT=1.0D-15*OPLIN*2.998D+04/(6.65D-15*ED(I))
 	  ELSE
 	    TAU_CONSTANT=OPLIN*R(I)*2.998E-10/V(I)
@@ -4567,8 +4568,8 @@ c
 ! To be read TAU_at_R and R_at_TAU respectively.
 !
 	ELSE IF(XOPT .EQ. 'RTAU' .OR. XOPT .EQ. 'TAUR' .OR. 
-	1       XOPT .EQ. 'KAPR' .OR.
-	1       XOPT .EQ. 'CHIR' .OR. XOPT .EQ. 'WROPAC')THEN
+	1       XOPT .EQ. 'KAPR' .OR. XOPT .EQ. 'CHIR' .OR.
+	1       XOPT .EQ. 'ETAR' .OR. XOPT .EQ. 'WROPAC')THEN
 	  IF(XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are included'
 	  IF(.NOT. XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are NOT included'
 	  CALL USR_OPTION(LAM_ST,'LAMST',' ',FREQ_INPUT)
@@ -4643,7 +4644,7 @@ c
 	      WRITE(LU_OUT,'(6ES14.6)')CLUMP_FAC(1:ND)
 	      WRITE(LU_OUT,'(A)')' '
 	      WRITE(LU_OUT,'(A)')' Kappa Table (cm^2/gm)'
-	  ELSE IF(XOPT .EQ. 'TAUR' .OR. XOPT .EQ. 'CHIR' .OR. XOPT .EQ. 'KAPR')THEN
+	  ELSE IF(XOPT .EQ. 'TAUR' .OR. XOPT .EQ. 'CHIR' .OR. XOPT .EQ. 'KAPR' .OR. XOPT .EQ. 'ETAR')THEN
 	    CALL USR_OPTION(RVAL,'RAD',' ','Radius in R* (-ve for depth index)')
 	    IF(RVAL .GT. 0)THEN
 	      RVAL=RVAL*R(ND)
@@ -4667,6 +4668,7 @@ c
 	    IF(LINY)YAXIS='\gt[R]'
 	    IF(XOPT .EQ. 'CHIR')YAXIS='\gx (cm\u-1\d)'
 	    IF(XOPT .EQ. 'KAPR')YAXIS='\gk (cm\u2\d/g)'
+	    IF(XOPT .EQ. 'ETAR')YAXIS='\ge (ergs cm\u3 \ds\u-1\d)'
 	  ELSE
 	    CALL USR_OPTION(TAU_VAL,'TAU',' ',
 	1       'Tau value for which R is to be determined')
@@ -4697,6 +4699,11 @@ c
 	    IF(XOPT .EQ. 'WROPAC')THEN
 	      WRITE(LU_OUT,'(/,ES16.6)')ANG_TO_HZ/FL
 	      WRITE(LU_OUT,'(6ES14.4)')1.0D-10*CHI(1:ND)/MASS_DENSITY(1:ND)
+	    ELSE IF(XOPT .EQ. 'ETAR')THEN
+	      T1=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
+	      T2=ETA(R_INDX+1)*CLUMP_FAC(R_INDX+1)
+	      T3=ETA(R_INDX)*CLUMP_FAC(R_INDX)
+	      YV(ML)=1.0D-10*( T1*T2 + (1.0-T1)*T3 )
 	    ELSE IF(XOPT .EQ. 'CHIR')THEN
 	      T1=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
 	      T2=CHI(R_INDX+1)*CLUMP_FAC(R_INDX+1)
