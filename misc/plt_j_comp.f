@@ -104,8 +104,8 @@
 	  WRITE(6,*)' JMW: Plot J mom solution against wavelength at outer boundary'
 	  WRITE(6,*)' dJF: Plot J(ray)-J(mom) against frequency at outer boundary'
 	  WRITE(6,*)' dJW: Plot J(ray)-J(mom) against wavelength at outer boundary'
-	  WRITE(6,*)'  DF: Plot %error against frequency at outer boundary'
-	  WRITE(6,*)'  DW: Plot $error against wavelength at outer boundary'
+	  WRITE(6,*)'  DF: Plot % error against frequency at outer boundary'
+	  WRITE(6,*)'  DW: Plot % error against wavelength at outer boundary'
 	  WRITE(6,*)' I??: Inner boundary options (as for outrer boundary)'
 	  WRITE(6,*)'E(X): Exit routine'
 	  CALL GEN_IN(PLT_OPT,'Plot option')
@@ -116,12 +116,14 @@
 	  ELSE IF(UC(PLT_OPT) .EQ. 'JMF')THEN
 	    CALL DP_CURVE(NCF,NU,JM_OUT)
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(mom)',' ',' ')
+!
 	  ELSE IF(UC(PLT_OPT) .EQ. 'JW')THEN
 	    CALL DP_CURVE(NCF,LAM,JR_OUT)
 	    CALL GRAMON_PGPLOT('\gl(\A)','J(ray)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'JMW')THEN
 	    CALL DP_CURVE(NCF,LAM,JM_OUT)
 	    CALL GRAMON_PGPLOT('\gl(\A)','J(mom)',' ',' ')
+!
 	  ELSE IF(UC(PLT_OPT) .EQ. 'DJW')THEN
 	    Y(1:NCF)=JR_OUT(1:NCF)-JM_OUT(1:NCF)
 	    CALL DP_CURVE(NCF,LAM,Y)
@@ -130,6 +132,7 @@
 	    Y(1:NCF)=JR_OUT(1:NCF)-JM_OUT(1:NCF)
 	    CALL DP_CURVE(NCF,NU,Y)
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(ray)-J(mom)',' ',' ')
+!
 	  ELSE IF(UC(PLT_OPT) .EQ. 'DF')THEN
 	    CALL DP_CURVE(NCF,NU,DIFF_OUT)
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','% Difference',' ',' ')
@@ -140,15 +143,17 @@
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IJF')THEN
 	    CALL DP_CURVE(NCF,NU,JR_IN)
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(ray)',' ',' ')
-	  ELSE IF(UC(PLT_OPT) .EQ. 'IJW')THEN
-	    CALL DP_CURVE(NCF,LAM,JM_IN)
-	    CALL GRAMON_PGPLOT('\gl(\A)','J(mom)',' ',' ')
-	  ELSE IF(UC(PLT_OPT) .EQ. 'IJF')THEN
-	    CALL DP_CURVE(NCF,NU,JR_IN)
+	  ELSE IF(UC(PLT_OPT) .EQ. 'IJMF')THEN
+	    CALL DP_CURVE(NCF,NU,JM_IN)
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','J(ray)',' ',' ')
+!
+	  ELSE IF(UC(PLT_OPT) .EQ. 'IJW')THEN
+	    CALL DP_CURVE(NCF,LAM,JR_IN)
+	    CALL GRAMON_PGPLOT('\gl(\A)','J(mom)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IJMW')THEN
 	    CALL DP_CURVE(NCF,LAM,JM_IN)
 	    CALL GRAMON_PGPLOT('\gl(\A)','J(mom)',' ',' ')
+!
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IDJW')THEN
 	    Y(1:NCF)=JR_IN(1:NCF)-JM_IN(1:NCF)
 	    CALL DP_CURVE(NCF,LAM,Y)
