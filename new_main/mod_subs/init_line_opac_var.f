@@ -41,6 +41,7 @@
 	    ZNET_SIM(I,SIM_INDX)=0.0D0
 	    JBAR_SIM(I,SIM_INDX)=0.0D0
 	  END DO
+	  LINE_QW_SUM(SIM_INDX)=0.0D0
 !
 ! Decide if line is weak, and hence whether we can iterate on the net rates
 ! rather than use a full linearization.
