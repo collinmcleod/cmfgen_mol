@@ -19,7 +19,7 @@
 ! Altered: 03-Mar-2000: Variable type ATM installed to simplify handling
 !	                   of multiple species.
 !
-! Created:  5-Jan-1998=9 (Progran began late Dec, 1998)
+! Created:  5-Jan-1998=9 (Program began late Dec, 1998)
 !
 	INTEGER ND		!Actual number of depth points in atmosphere
 	INTEGER NC		!Actual number of core rays 
@@ -332,6 +332,7 @@
 	        WRITE(LUER,*)'Check your MODEL_SPEC file for typo''s'
 	        STOP
 	      END IF
+	      WRITE(6,*)ID,ION_ID(ID)
 	    ELSE IF(AT_LEAST_ONE_ION_PRES)THEN
 	      FND_END_OF_IONS=.TRUE.
 	    END IF
@@ -524,7 +525,7 @@
 ! electron scattering opacity.
 ! levels can be used for 
 !
-	TX_OFFSET=5
+	TX_OFFSET=6
 !
 ! Total number of storage locations to be set aside. We multiply MAX_SIM by
 ! 2 to account for both the upper and lower levels.
