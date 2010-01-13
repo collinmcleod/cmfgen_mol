@@ -532,6 +532,10 @@ C
 	  SCL_LINE_DENSITY_LIMIT=1.0D+30
 	  CALL RD_STORE_DBLE(SCL_LINE_DENSITY_LIMIT,'SCL_DEN_LIM',L_FALSE,
 	1            'Density beyond which line cooling scaling is switched off')
+	  INCLUDE_dSLdT=.FALSE.
+	  CALL RD_STORE_LOG(INCLUDE_dSLdT,'INCL_dSLdT',L_FALSE,
+	1            'Include variation in distribution of level populations in a SL with T?')
+!
 	  LINEAR_ADV=.TRUE.
 	  CALL RD_STORE_LOG(LINEAR_ADV,'LIN_ADV',L_FALSE,
 	1           'Compute advection terms using derivatives in linear plane?')
