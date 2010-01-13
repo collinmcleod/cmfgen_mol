@@ -25,9 +25,12 @@ C
 C
 	INTEGER, PARAMETER :: T_OUT=6
 C
+	INTEGER, PARAMETER :: NLIM_MAX=10
+	INTEGER LIMITS(NLIM_MAX)
 	INTEGER NPLTS
 	INTEGER IREC
 	INTEGER IVAR
+	INTEGER I
 	INTEGER J
 	INTEGER ID
 	INTEGER IT
@@ -359,6 +362,28 @@ C
 	  Ylabel=''
 	  CALL GRAMON_PGPLOT('V(km/s)',Ylabel,' ',' ')
 	  GOTO 200
+	ELSE IF(PLT_OPT(1:4) .EQ. 'FDGV')THEN
+	  IT=NIT; ID=ND; IVAR=NT; LIMITS(:)=0; LIMITS(1)=1; LIMITS(NLIM_MAX)=ND
+	  CALL GEN_IN(IT,'Iteration # (zero to exit)')
+	  DO WHILE(1 .EQ. 1)
+	    CALL GEN_IN(IVAR,'Variable # (zero to exit)')
+	    IF(IVAR .EQ. 0)EXIT
+	    T1=0.0D0; T2=0.0D0
+	    CALL GEN_IN(T1,'% change in variable')
+	    IF(T1 .EQ. 0.0D0)CALL GEN_IN(T2,'Change in variable')
+	    CALL GEN_IN(LIMITS,J,NLIM_MAX,'Depths (L1:L2, L3:L4 etc)')
+	    DO I=1,J,2
+	      DO ID=LIMITS(I),LIMITS(I+1)
+	        T3=POPS(IVAR,ID,IT)
+	        POPS(IVAR,ID,IT)=T3*(1.0D0+T1/100.0D0)+T2
+	      END DO
+	    END DO
+	    IVAR=0
+	  END DO
+          NITSF=NITSF+1; IREC=IT
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IREC),IREC,NITSF,
+	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+	1              NT,ND,LUSCR,NEWMOD)
 	ELSE IF(PLT_OPT(1:3) .EQ. 'FDG')THEN
 	  IT=NIT; ID=ND; IVAR=NT
 	  CALL GEN_IN(IT,'Iteration # (zero to exit)')
