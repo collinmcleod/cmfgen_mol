@@ -56,13 +56,14 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(steq_co_mov_deriv_v2.o)\
       $(LIB)(store_old_grid.o)\
       $(LIB)(store_ba_data_v2.o)\
+      $(LIB)(tst_rd_seq.o)\
       $(LIB)(var_op_v8.o)\
       $(LIB)(var_x_opa_eta_v3.o)\
       $(LIB)(var_x_opa_eta_v4.o)\
       $(LIB)(vsebyj_multi_v6.o)\
       $(LIB)(vsebyj_x_v6.o)\
       $(LIB)(write_seq_time_file_v1.o)\
-      $(LIB)(tst_rd_seq.o)\
+      $(LIB)(update_ba_for_line.o)\
       $(LIB)(wr_asci_steq.o)
 
 all : $(LIB) XNUC XAUTO XCHG XTWO
