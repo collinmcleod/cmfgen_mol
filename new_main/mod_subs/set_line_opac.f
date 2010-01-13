@@ -35,8 +35,12 @@
 	REAL*8 POPS(NT,ND)
 	LOGICAL LST_DEPTH_ONLY
 !
-	COMMON/LINE/ OPLIN,EMLIN
-	REAL*8 OPLIN,EMLIN
+! Constants for opacity etc. These are set in CMFGEN.
+!
+        COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
+        COMMON/LINE/ OPLIN,EMLIN
+        REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+        REAL*8 OPLIN,EMLIN
 !
 	REAL*8 T1,T2,T3
 	REAL*8 NU_DOP
@@ -203,12 +207,12 @@
 ! MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
 ! MNL (MNUP) denotes the lower (upper) level in the super level model atom.
 !
-	MNL_F=VEC_MNL_F(LAST_LINE)
-	MNUP_F=VEC_MNUP_F(LAST_LINE)
-	DO K=D_ST,ND
-	  L_STAR_RATIO(K,SIM_INDX)=1.0D0
-	  U_STAR_RATIO(K,SIM_INDX)=1.0D0
-	END DO
+	  MNL_F=VEC_MNL_F(LAST_LINE)
+	  MNUP_F=VEC_MNUP_F(LAST_LINE)
+	  DO K=D_ST,ND
+	    L_STAR_RATIO(K,SIM_INDX)=1.0D0
+	    U_STAR_RATIO(K,SIM_INDX)=1.0D0
+	  END DO
 !
 ! T1 is used to represent b(level)/b(super level). If no interpolation of
 ! the b values in a super level has been performed, this ratio will be unity .
@@ -228,6 +232,10 @@
 	1             (ATM(ID)%XzV(MNUP,K)/ATM(ID)%XzVLTE(MNUP,K))
 	        U_STAR_RATIO(K,SIM_INDX)=T2*ATM(ID)%XzVLTE_F(MNUP_F,K)/
 	1              ATM(ID)%XzVLTE(MNUP,K)
+	        dL_RAT_dT(K,SIM_INDX)=L_STAR_RATIO(K,SIM_INDX)*
+	1         (-1.5D0-HDKT*ATM(ID)%EDGEXzV_F(MNL_F)/T(K)-ATM(ID)%dlnXzVLTE_dlnT(MNL,K))/T(K)
+	        dU_RAT_dT(K,SIM_INDX)=U_STAR_RATIO(K,SIM_INDX)*
+	1         (-1.5D0-HDKT*ATM(ID)%EDGEXzV_F(MNUP_F)/T(K)-ATM(ID)%dlnXzVLTE_dlnT(MNUP,K))/T(K)
 	      END DO
 	      GLDGU(SIM_INDX)=ATM(ID)%GXzV_F(MNL_F)/ATM(ID)%GXzV_F(MNUP_F)
 	      TRANS_NAME_SIM(SIM_INDX)=TRIM(TRANS_NAME_SIM(SIM_INDX))//
@@ -236,6 +244,13 @@
 	      EXIT
 	    END IF
 	  END DO
+!
+	  IF(.NOT. INCLUDE_dSLdT)THEN
+	    DO K=D_ST,ND
+	      dU_RAT_dT(K,SIM_INDX)=0.0D0
+	      dL_RAT_dT(K,SIM_INDX)=0.0D0
+	    END DO
+	  END IF
 ! 
 !
 ! If desired we can scale the line opacity/emissivities of transitions
@@ -249,23 +264,29 @@
 ! This section should be consistent with corrections in CMFGEN_SUB
 ! (in SCL_LINE_COO_RATES sections).
 !
-	  IF(SCL_SL_LINE_OPAC)THEN
-	    T3=(AVE_ENERGY(NL)-AVE_ENERGY(NUP))/FL_SIM(SIM_INDX)
-	    IF(ABS(T3-1.0D0) .GT. SCL_LINE_HT_FAC)T3=1.0D0
-	    DO I=D_ST,ND
-	      IF(POP_ATOM(I) .LE. SCL_LINE_DENSITY_LIMIT)THEN
-	        L_STAR_RATIO(I,SIM_INDX)=T3*L_STAR_RATIO(I,SIM_INDX)
-	        U_STAR_RATIO(I,SIM_INDX)=T3*U_STAR_RATIO(I,SIM_INDX)
-	      END IF
-	    END DO
-	  END IF
+!	  IF(SCL_SL_LINE_OPAC)THEN
+!	    T3=(AVE_ENERGY(NL)-AVE_ENERGY(NUP))/FL_SIM(SIM_INDX)
+!	    IF(ABS(T3-1.0D0) .GT. SCL_LINE_HT_FAC)T3=1.0D0
+!	    DO I=D_ST,ND
+!	      IF(POP_ATOM(I) .LE. SCL_LINE_DENSITY_LIMIT)THEN
+!	        L_STAR_RATIO(I,SIM_INDX)=T3*L_STAR_RATIO(I,SIM_INDX)
+!	        U_STAR_RATIO(I,SIM_INDX)=T3*U_STAR_RATIO(I,SIM_INDX)
+!	      END IF
+!	    END DO
+!	  END IF
 !
 ! Compute line opacity and emissivity for this line.
 !
-	  T1=OSCIL(SIM_INDX)*OPLIN
-	  T2=FL_SIM(SIM_INDX)*EINA(SIM_INDX)*EMLIN
+	  T3=1.0D0
+	  IF(SCL_SL_LINE_OPAC)THEN
+	    T3=(AVE_ENERGY(NL)-AVE_ENERGY(NUP))/FL_SIM(SIM_INDX)
+	    IF(ABS(T3-1.0D0) .GT. SCL_LINE_HT_FAC)T3=1.0D0
+	  END IF
+	  T1=OSCIL(SIM_INDX)*OPLIN*T3
+	  T2=FL_SIM(SIM_INDX)*EINA(SIM_INDX)*EMLIN*T3
 	  LINE_OPAC_CON(SIM_INDX)=T1
 	  LINE_EMIS_CON(SIM_INDX)=T2
+!
 	  NL=SIM_NL(SIM_INDX)
 	  NUP=SIM_NUP(SIM_INDX)
 	  DO I=D_ST,ND
