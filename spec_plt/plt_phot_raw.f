@@ -256,6 +256,7 @@
 	1        (IONIZATION_ENERGY-ENERGY_1(I)/STAT_WT_1(I))
 	  END DO
 	  OSCILLATOR_FILE_AVAIL=.TRUE.
+	  WRITE(6,*)'Number of levels in oscilator file is',NELEV
 	ELSE
 	  ENERGY_1(1:NLEV_1)=0.0D0; STAT_WT_1(1:NLEV_1)=0.0D0
 	  OSCILLATOR_FILE_AVAIL=.FALSE.
@@ -436,7 +437,7 @@
 	  LEVEL_NAME1='1'
 	  DO WHILE(INDX_1 .EQ. 0)
 	    WRITE(6,'(A)')' '
-	    CALL GEN_IN(LEVEL_NAME1,'Level name [or index] for File 1 (P to plot, E to exit)')
+100	    CALL GEN_IN(LEVEL_NAME1,'Level name [or index] for File 1 (P to plot, E to exit)')
 	    IF(UC(LEVEL_NAME1) .EQ. 'P')THEN
 	      CALL GRAMON_PGPLOT(XLAB,'\gs(Mb)',LEVEL_NAME1,' ')
 	      CALL GEN_IN(LEVEL_NAME1,'Level name [or index] for File (E to exit)')
@@ -451,14 +452,30 @@
 	    END DO
 	    IF(INDX_1 .EQ. 0)THEN
 	      READ(LEVEL_NAME1,*,IOSTAT=IOS)INDX_1
+	      IF(INDX_1 .EQ. 0)THEN
+	         WRITE(6,*)'Invalid index'
+	         GOTO 100
+	      END IF
 	      IF(IOS .NE. 0)THEN
 	        WRITE(6,*)'Error - level name not found'
 	        DO I=1,NLEV_1,5
 	          WRITE(6,'(5A14)')(TRIM(NAME_1(J)),J=I,MAX(I+4,NLEV_1))
 	        END DO
 	        INDX_1=0
+	      ELSE IF(OSCILLATOR_FILE_AVAIL)THEN
+	        IF(INDX_1 .GT. NELEV)THEN
+	          WRITE(6,*)'Invalid index; index should be < ',NELEV
+	          GOTO 100
+	        END IF
+	        LEVEL_NAME1=E_NAME(INDX_1)
+	        DO I=1,NLEV_1
+	          IF(LEVEL_NAME1 .EQ. NAME_1(I))THEN
+	            INDX_1=I
+	            EXIT
+	          END IF
+	        END DO
 	      ELSE
-	         LEVEL_NAME1=NAME_1(INDX_1)
+	        LEVEL_NAME1=NAME_1(INDX_1)
 	      END IF
 	    END IF
 	  END DO
