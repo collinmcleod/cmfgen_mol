@@ -72,7 +72,7 @@
 	INTEGER*4, PARAMETER :: N_TITLE=10
 	CHARACTER*80  XLABEL,YLABEL,TITLE(N_TITLE)
 	CHARACTER*(*) XLAB,YLAB,TITL,PASSED_OPT
-        CHARACTER*80 FILNAME
+        CHARACTER*200 FILNAME
         CHARACTER*80 ID_FILNAME
         CHARACTER*80, SAVE :: PLT_ST_FILENAME
 	CHARACTER*80 WK_STR,OPTION
@@ -265,6 +265,7 @@
 	N_INC_ID=0
 	DO_BORDER=.TRUE.
 	DRAW_GAUSS_HARD=.FALSE.
+	C_KMS=1.0D-05*SPEED_OF_LIGHT()
 !
 ! Define character strings for switching between VT and TEK modes.
 !
@@ -512,7 +513,7 @@
 	      IF(ASSOCIATED(CD(IP)%DATA))DEALLOCATE(CD(IP)%DATA)
 	      IF(ASSOCIATED(CD(IP)%EMAX))DEALLOCATE(CD(IP)%EMAX)
 	      IF(ASSOCIATED(CD(IP)%EMIN))DEALLOCATE(CD(IP)%EMIN)
-	      ERR(I)=.FALSE.
+	      ERR(IP)=.FALSE.
 	      NPTS(IP)=0
 	    END DO
 	    NPLTS=0
@@ -1737,24 +1738,31 @@ C
 !
 ! Use FILNAME as temporary STRING
 !
+	  CNT=0
 	  FILNAME='!'
-	  DO WHILE(FILNAME(1:1) .EQ. '!')
-	    READ(30,'(A)',IOSTAT=IOS)FILNAME
+	  DO WHILE(FILNAME(1:1) .EQ. '!' .OR. FILNAME .EQ. ' ')
+	    READ(30,'(A200)',IOSTAT=IOS)FILNAME
 	    WRITE(T_OUT,*)TRIM(FILNAME)
 	    IF(IOS .NE. 0)THEN
 	      WRITE(T_OUT,*)'Error reading file'
 	      CLOSE(UNIT=30)
 	      GOTO 1000
 	    END IF
+	    IF(INDEX(FILNAME,'Number of data points:') .NE. 0)THEN
+	      I=INDEX(FILNAME,'Number of data points:')
+	      READ(FILNAME(I+22:),*)CNT
+	      FILNAME='!'
+	    END IF
 	  END DO
 	  BACKSPACE(UNIT=30)
 !
+	  IP=NPLTS+1
+	  NPTS(IP)=CNT
+	  CALL NEW_GEN_IN(NPTS(IP),'Number of data points')
 	  COLUMN(1)=1; COLUMN(2)=2
 	  CALL NEW_GEN_IN(COLUMN,I,ITWO,'Data columns')
 	  K=MAX(COLUMN(1),COLUMN(2))
 !
-	  IP=NPLTS+1
-	  READ(30,*)NPTS(IP)
 	  ALLOCATE (CD(IP)%XVEC(NPTS(IP)),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (CD(IP)%DATA(NPTS(IP)),STAT=IOS)
 	  IF(IOS .NE. 0)THEN
@@ -1884,9 +1892,9 @@ C
 ! Peform simple X-axis arithmetic.
 !
 	ELSE IF (ANS .EQ. 'XAR')THEN
-	  CALL NEW_GEN_IN(XAR_OPERATION,'Operation: *,+,-,/,LG,ALG[=10^x]')
+	  CALL NEW_GEN_IN(XAR_OPERATION,'Operation: *,+,-,/,LG,ALG[=10^x],R[=1/x]')
 	  CALL SET_CASE_UP(XAR_OPERATION,IZERO,IZERO)
-	  IF(XAR_OPERATION .NE. 'LG' .AND. XAR_OPERATION .NE. 'ALG')THEN
+	  IF(XAR_OPERATION .NE. 'LG' .AND. XAR_OPERATION .NE. 'ALG' .AND. XAR_OPERATION .NE. 'R')THEN
 	    CALL NEW_GEN_IN(XAR_VAL,'Value')
 	  END IF
 	  CALL NEW_GEN_IN(XAR_PLT,'Which plot? (0=ALL,-ve exits)')
@@ -1922,6 +1930,22 @@ C
 	      END DO
 	      IF(XLABEL(1:3) .NE. 'Log')THEN
 	        XLABEL='Log '//XLABEL
+	      END IF
+	    ELSE IF(XAR_OPERATION .EQ. 'R')THEN
+	      T1=0.01D0*C_KMS
+	      T2=0.01D0*C_KMS
+	      CALL NEW_GEN_IN(T1,'Scale factor')
+	      DO J=1,NPTS(IP)
+	        IF(CD(IP)%XVEC(J) .GT. 0)THEN
+	          CD(IP)%XVEC(J)=T1/CD(IP)%XVEC(J)
+	        ELSE
+	          CD(IP)%XVEC(J)=-1000
+	  	END IF
+	      END DO
+	      IF(XLABEL .EQ. '\gn(10\u15 \dHz)' .AND. T1 .EQ. T2)THEN
+	        XLABEL='\gl(\A)'
+	      ELSE IF(XLABEL .EQ. '\gl(\A)' .AND. T1 .EQ. T2)THEN
+	        XLABEL='\gn(10\u15 \dHz)'
 	      END IF
 	    ELSE
 	      WRITE(T_OUT,*)'Invalid operation: try again'
