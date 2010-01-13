@@ -81,6 +81,7 @@
 	REAL*8 FL,AMASS,FL_OLD
 	REAL*8 FG_COUNT
 	REAL*8 SCL_FAC
+	REAL*8 SUM_BA
 !
 	LOGICAL LST_DEPTH_ONLY
 !
@@ -400,6 +401,7 @@
 	LOGICAL NEG_OPACITY(ND),FIRST_NEG
 	LOGICAL AT_LEAST_ONE_NEG_OPAC
 	LOGICAL FILE_OPEN
+	LOGICAL VERBOSE
 !
 ! Inidicates approximate frequencies for which TAU at outer boundary is written
 ! to OUTGEN on the last iteration.
@@ -452,9 +454,11 @@
 	CNT_FIX_BA=0
 	MAXCH_SUM=0.0D0
 	LST_ITERATION=.FALSE.
-	DPTH_INDX=84
-	VAR_INDX=755
+	DPTH_INDX=29
 	DPTH_INDX=MIN(DPTH_INDX,ND)		!Thus no problem if 84 > ND
+	VAR_INDX=226
+	VAR_INDX=MIN(VAR_INDX,NT)
+	CALL GET_VERBOSE_INFO(VERBOSE)
 !
 !
 ! When TRUE, FIXED_T indicated that T is to be heled fixed (at least at some
@@ -1342,11 +1346,12 @@
 ! This prevents a floating point exception.
 !
 	  RJ(1:ND)=0.0D0
-!
 	  CONT_FREQ=0.0D0
+	  FL=NU(1)
 	  DO ML=1,NCF
 	    FREQ_INDX=ML
 ! 
+	    FL_OLD=FL
 	    FL=NU(ML)
 	    IF(NU_EVAL_CONT(ML) .NE. CONT_FREQ)THEN
 	      COMPUTE_NEW_CROSS=.TRUE.
@@ -1904,6 +1909,8 @@
 !                                                                    
 ! Enter loop for each continuum frequency.
 !
+	SUM_BA=0.0D0
+	FL=NU(1)
 	CALL TUNE(IONE,'MLCF')
 	CALL TUNE(IONE,'10000')
 	DO 10000 ML=1,NCF
@@ -2225,12 +2232,11 @@
 	DO SIM_INDX=1,MAX_SIM
 	  IF(RESONANCE_ZONE(SIM_INDX))THEN
 	    DO I=1,ND
-	      ZNET_SIM(I,SIM_INDX)=ZNET_SIM(I,SIM_INDX) +
-	1          LINE_QW_SIM(SIM_INDX)*
+	      ZNET_SIM(I,SIM_INDX)=ZNET_SIM(I,SIM_INDX) + LINE_QW_SIM(SIM_INDX)*
 	1          (1.0D0-RJ(I)*CHIL_MAT(I,SIM_INDX)/ETAL_MAT(I,SIM_INDX))
-	      JBAR_SIM(I,SIM_INDX)=JBAR_SIM(I,SIM_INDX) +
-	1          LINE_QW_SIM(SIM_INDX)*RJ(I)
+	      JBAR_SIM(I,SIM_INDX)=JBAR_SIM(I,SIM_INDX) + LINE_QW_SIM(SIM_INDX)*RJ(I)
 	    END DO
+	    LINE_QW_SUM(SIM_INDX)=LINE_QW_SUM(SIM_INDX) + LINE_QW_SIM(SIM_INDX)
 	  END IF
 	END DO
 !
@@ -2240,6 +2246,7 @@
 ! NB: The line term in the RE equations is not needed since it is included 
 ! directly with continuum integration.
 !
+	WRITE(229,'(I6,3ES16.6)')ML,FL,SE(22)%STEQ(1,29),SE(22)%STEQ(2,29)
 	DO SIM_INDX=1,MAX_SIM
 	  IF( END_RES_ZONE(SIM_INDX) )THEN
             T1=FL_SIM(SIM_INDX)*EMLIN 
@@ -2265,6 +2272,7 @@
 	    END DO
 	  END IF    
 	END DO
+	WRITE(229,'(I6,3ES16.6)')ML,FL,SE(22)%STEQ(1,29),SE(22)%STEQ(2,29)
 !
 !                                                                    
 !
@@ -2289,6 +2297,20 @@
 !
 	  END IF
 !
+          IF(FL .GT. 1.070D0 .AND. FL .LT. 1.074)THEN
+            WRITE(231,'(I6,2ES16.8)')ML,FL,ETA_CONT(DPTH_INDX)
+             DO SIM_INDX=1,MAX_SIM
+               NL=SIM_NL(SIM_INDX)
+               NUP=SIM_NUP(SIM_INDX)
+               WRITE(231,'(2X,L,2X,2I5,5ES18.8)')RESONANCE_ZONE(SIM_INDX),NL,NUP,
+	1                   ETAL_MAT(DPTH_INDX,SIM_INDX),
+	1                   POPS(NL,DPTH_INDX)*L_STAR_RATIO(DPTH_INDX,SIM_INDX),
+	1                   POPS(NUP,DPTH_INDX)*U_STAR_RATIO(DPTH_INDX,SIM_INDX),
+	1                   POPS(NUP,DPTH_INDX)*dU_RAT_dT(DPTH_INDX,SIM_INDX),
+	1                   POPS(NUP,DPTH_INDX)*(U_STAR_RATIO(DPTH_INDX,SIM_INDX)-0.02*dU_RAT_dT(DPTH_INDX,SIM_INDX))
+             END DO
+          END IF
+!
 ! 
 !
 ! Modify the BA matrix for terms in the statistical equilibrium
@@ -2296,386 +2318,11 @@
 ! variation of RJ - rather the multiplying factors. This section
 ! must be done for a LAMBDA iteration.
 !
-! We use DST and DEND to avoid reading in the entire diagonal of the BA
-! array for each call to BA. Calling the routines ND times may take
-! too long --- therefore try alternative method.
-!
-! WE have replaced BA and BAION by BA_PAR and BAION_PAR in calls to
-! VSEBYJ. Since these are diagonal components, we have had to replace 
-! NUM_BANDS by IONE in the calls.
-!
-	IF(COMPUTE_BA)THEN
-	  CALL TUNE(IONE,'COMPUTE_BA')
-!
-!	  DO K=1,ND
-!	    DST=K
-!	    DEND=K
-	  DO K=1,1
-	    DST=1       
-	    DEND=ND
-!
-! NB: In this equation the matrices are NOT passed for WS, dWS and NU.
-!
-	    IF(FINAL_CONSTANT_CROSS)THEN
-	      DO ID=1,NUM_IONS-1
-	        ID_SAV=ID
-	        IF(ATM(ID)%XzV_PRES)THEN
-	          DO J=1,ATM(ID)%N_XzV_PHOT
-	            CALL VSEBYJ_MULTI_V6(ID_SAV,
-	1             ATM(ID)%WSXzV(1,1,J), ATM(ID)%dWSXzVdT(1,1,J),
-	1             ATM(ID)%XzV, ATM(ID)%XzVLTE, ATM(ID)%dlnXzVLTE_dlnT, 
-	1             ATM(ID)%NXzV,
-	1             ATM(ID+1)%XzV, ATM(ID+1)%XzVLTE,
-	1             ATM(ID+1)%dlnXzVLTE_dlnT, ATM(ID+1)%NXzV,
-	1             ATM(ID)%XzV_ION_LEV_ID(J),ED,T,
-	1             JREC,dJRECdt,JPHOT,NUM_BNDS,ND,DST,DEND)
-	          END DO
-	        END IF
-	      END DO
-	    END IF
-!
-! 
-! Note that ATM(ID+2)%EQXzV is the ion equation. Since Auger ionization,
-! 2 electrons are ejected.
-!
-	    IF(XRAYS .AND. FINAL_CONSTANT_CROSS)THEN
-	      DO ID=1,NUM_IONS-1
-	        IF(ATM(ID)%XzV_PRES .AND. ATM(ID+1)%XzV_PRES)THEN
-	          CALL VSEBYJ_X_V6(ID,ATM(ID)%WSE_X_XzV,
-	1             ATM(ID)%XzV, ATM(ID)%XzVLTE, ATM(ID)%dlnXzVLTE_dlnT, ATM(ID)%NXzV,
-	1             ATM(ID+1)%XzV_F, ATM(ID+1)%XzVLTE_F, ATM(ID+1)%EDGEXzV_F,
-	1             ATM(ID+1)%NXzV_F,ATM(ID+1)%DXzV,    ATM(ID+2)%EQXzV,
-	1             ED,T,JREC,dJRECdT,JPHOT,
-	1             ND,NION,DST,DEND)
-	        END IF
-	      END DO
-	    END IF		!End X-rays
-!
-! 
-!
-! Increment the large simultaneous perturbation matrix due to the
-! variation in J. We generally update the _PAR matrices. This is done to
-! ensure better cancelation of terms similar in size as occurs when
-! the optical depth is large.
-!
-! Every N_PAR frequencies we update the the full matrices, and zero the
-! ?_PAR arrays. Note that the non-diagonal part of BA and BAION
-! (i.e BA(I,J,K,L) with L .NE. DIAG_INDX) are presently updated for
-! every frequency.
-!
-! We now pass the continuum emissivity and opacity without any scattering 
-! contribution. We use TA as a zeroed vec for ESEC, which was subtracted
-! from CHI_CONT inside BA_UPDATE_V7.
-!
-	    IF( .NOT. LAMBDA_ITERATION)THEN
-	      TA(1:ND)=0.0D0
-              CALL BA_UPDATE_V7(VJ,VCHI_ALL,VETA_ALL,
-	1             ETA_NOSCAT,CHI_NOSCAT,TA,T,POPS,RJ,NU(ML),FQW(ML),
-	1             COMPUTE_NEW_CROSS,FINAL_CONSTANT_CROSS,DO_SRCE_VAR_ONLY,
-	1             BA_CHK_FAC,NION,NT,NUM_BNDS,ND,DST,DEND)
-	      T1=VCHI_ALL(VAR_INDX,DPTH_INDX)*RJ(DPTH_INDX)
-	      T2=(CHI(DPTH_INDX)-CHI_SCAT(DPTH_INDX))*VJ(VAR_INDX,DIAG_INDX,DPTH_INDX)
-	      T3=T1-VETA_ALL(VAR_INDX,DPTH_INDX)+T2
-	      IF(VERBOSE_OUTPUT)THEN
-	        WRITE(200,'(I10,12ES18.8)')ML,FL,RJ(DPTH_INDX),T1,VETA_ALL(VAR_INDX,DPTH_INDX),T2,T3,FQW(ML)*T3
-	      END IF
-	    END IF
-!
-	  END DO		!K=1,ND : DST,DEND
-	  CALL TUNE(ITWO,'COMPUTE_BA')
-!
-	  CALL TUNE(IONE,'ADD_PAR')
-	  IF( MOD(FREQ_INDX,N_PAR) .EQ. 0 .OR. FREQ_INDX .EQ. NCF )THEN
-            CALL ADD_PAR_TO_FULL_V2(NION,DIAG_INDX)
-  	  END IF
-	  CALL TUNE(ITWO,'ADD_PAR')
-!
-	END IF			!End compute_ba
-!
-! 
-!
-! We now allow for the variation of the LINE terms in the S.E. equations.
-! In this first section we perform a LAMBDA iteration for the LINE terms.
-! We do this if we are doing a FULL Lambda iteration, or if the line is
-! being treated as a WEAK_LINE.
-!
-	CALL TUNE(1,'BA_LAM')
-	DO SIM_INDX=1,MAX_SIM
-	  IF( COMPUTE_BA .AND. (LAMBDA_ITERATION .OR. WEAK_LINE(SIM_INDX)) )THEN
-	    IF (END_RES_ZONE(SIM_INDX) )THEN
-!
-! If we are doing a lambda iteration, we are assuming that JBAR is fixed.
-! Thus, dZ/dCHIL and dZ/dETAL is given by the following.
-!
-! NB: We do not set VB(I) to if NEG_OPACITY(I)=.TRUE. as we have not altered
-!     CHIL : We have only changed CHI which effects JBAR only.
-!
-! Altered 15-Feb-2005: No longer need VC. We now xplicitly cancel NU/ETAL depdence with
-! Nu.
-!
-	      DO I=1,ND
-	        VB(I)=-JBAR_SIM(I,SIM_INDX)/ETAL_MAT(I,SIM_INDX)
-!	        VC(I)=JBAR_SIM(I,SIM_INDX)*CHIL_MAT(I,SIM_INDX) /
-!	1                       ETAL_MAT(I,SIM_INDX)/ETAL_MAT(I,SIM_INDX)
-	      END DO
-!
-	      OPAC_FAC=LINE_OPAC_CON(SIM_INDX)
-	      STIM_FAC=-GLDGU(SIM_INDX)*OPAC_FAC
-	      EMIS_FAC=LINE_EMIS_CON(SIM_INDX)
-	      T1=EMIS_FAC/EINA(SIM_INDX)
-	      NUP=SIM_NUP(SIM_INDX)
- 	      NL=SIM_NL(SIM_INDX)
-!
-	      I=SIM_LINE_POINTER(SIM_INDX)
-	      ID=VEC_ID(I)
-	      MNL_F=VEC_MNL_F(I)
-	      MNUP_F=VEC_MNUP_F(I)
-	      MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
-	      MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
-!
-! Because we write the heating/cooling term interms of EINA, we need
-! to do the scaling when either SCL_LINE_COOL_RATES or SCL_SL_LINE_OPAC is true.
-!
-	      SCL_FAC=1.0D0
-	      IF(SCL_LINE_COOL_RATES .OR. SCL_SL_LINE_OPAC)THEN
-	        SCL_FAC=(AVE_ENERGY(NL)-AVE_ENERGY(NUP))/FL_SIM(SIM_INDX)
-	        IF(ABS(SCL_FAC-1.0D0) .GT. SCL_LINE_HT_FAC)SCL_FAC=1.0D0
-	      END IF
-	      DO K=1,ND
-	        T4=T1*SCL_FAC
-	        IF(POP_ATOM(K) .GE. SCL_LINE_DENSITY_LIMIT)T4=T1
-	        T2=ATM(ID)%XzV_F(MNUP_F,K)/POPS(NUP,K)
-	        dRATE_dUP=T2*EINA(SIM_INDX)*(1.0D0+U_STAR_RATIO(K,SIM_INDX)*POPS(NUP,K)*STIM_FAC*VB(K))
-	        dRATE_dLOW=T2*EINA(SIM_INDX)*L_STAR_RATIO(K,SIM_INDX)*OPAC_FAC*POPS(NUP,K)*VB(K)
-	        L=GET_DIAG(K)
-	        SE(ID)%BA(MNUP,MNUP,L,K)=SE(ID)%BA(MNUP,MNUP,L,K)-dRATE_dUP
-	        SE(ID)%BA(MNUP,MNL,L,K) =SE(ID)%BA(MNUP,MNL,L,K) -dRATE_dLOW
-	        SE(ID)%BA(MNL,MNUP,L,K) =SE(ID)%BA(MNL,MNUP,L,K) +dRATE_dUP
-	        SE(ID)%BA(MNL,MNL,L,K)  =SE(ID)%BA(MNL,MNL,L,K)  +dRATE_dLOW
-	        BA_T(NL,L,K) =BA_T(NL,L,K) -T4*dRATE_dLOW
-	        BA_T(NUP,L,K)=BA_T(NUP,L,K)-T4*dRATE_dUP
-	      END DO
-	    END IF	!Resonance zone
-	  END IF	!Lambda/Weak line
-	END DO		!Loop over SIM_INDX
-	CALL TUNE(2,'BA_LAM')
-!
-! 
-	CALL TUNE(IONE,'LINE_BA')
-	IF(COMPUTE_BA .AND. .NOT. LAMBDA_ITERATION)THEN
-	  IF(NUM_BNDS .EQ. ND)THEN
-	     WRITE(LUER,*)'Error --- NUM_BNDS .EQ. ND not implemented'
-	     STOP
-	  END IF
-!
-! Update the dZ matrix which gives the variation of the Net Rate
-! (=1-JBAR/SL) with respect to eta, chi, ED, ... etc.
-!
-! dZ( X, X depth [1:NUM_BNDS], Z depth, N_SIM)
-!
-! Scaling MAX_SIM*ND*NUM_BNDS*NM
-!
-! NB: J goes from 1 to NUM_BNDS (and not BNDST(K),BNDEND(K)) since we have no
-! reference to elements in a full matrix (such as FCHI).
-!
-! NB: OPAC_FAC and STIM_FAC are not multiplied by NEG_OPAC_FAC since we use
-!     the uncorrected line opacity in the source function and hence the
-!     expression for ZNET.
-!
-	  CALL TUNE(IONE,'dZ_LINE')
-	  DO SIM_INDX=1,MAX_SIM
-	    IF(RESONANCE_ZONE(SIM_INDX) .AND. .NOT. WEAK_LINE(SIM_INDX))THEN
-	      DO K=1,ND
-	        MUL_FAC=LINE_QW_SIM(SIM_INDX)*CHIL_MAT(K,SIM_INDX)/
-	1                   ETAL_MAT(K,SIM_INDX)
-	        OPAC_FAC=LINE_OPAC_CON(SIM_INDX)*L_STAR_RATIO(K,SIM_INDX)
-	        EMIS_FAC=LINE_EMIS_CON(SIM_INDX)*U_STAR_RATIO(K,SIM_INDX)
-	        STIM_FAC=LINE_OPAC_CON(SIM_INDX)*
-	1                        U_STAR_RATIO(K,SIM_INDX)*GLDGU(SIM_INDX)
-	        DO J=BNDST(K),BNDEND(K)
-	          IF(J .NE. DIAG_INDX)THEN
-	            DO L=3,NM
-	              IF(DO_THIS_TX_MATRIX(L))THEN
-	                dZ(L,J,K,SIM_INDX)=dZ(L,J,K,SIM_INDX) -
-	1                        MUL_FAC*dJ_LOC(L,J,K)
-	              END IF
-	            END DO
-	          ELSE 
-	            DO L=3,NM
-	              IF(DO_THIS_TX_MATRIX(L))THEN
-	                IF( L .EQ. LOW_POINTER(SIM_INDX) )THEN
-	                  dZ(L,J,K,SIM_INDX)=dZ(L,J,K,SIM_INDX) -
-	1                    MUL_FAC*( dJ_LOC(L,J,K) +
-	1                          RJ(K)*OPAC_FAC/CHIL_MAT(K,SIM_INDX) )
-	                ELSE IF( L .EQ. UP_POINTER(SIM_INDX) )THEN
-	                  dZ(L,J,K,SIM_INDX)=dZ(L,J,K,SIM_INDX) -
-	1                    MUL_FAC*( dJ_LOC(L,J,K)-
-	1                    RJ(K)*STIM_FAC/CHIL_MAT(K,SIM_INDX)-
-	1                    RJ(K)*EMIS_FAC/ETAL_MAT(K,SIM_INDX) )
-	                ELSE
-	                  dZ(L,J,K,SIM_INDX)=dZ(L,J,K,SIM_INDX) -
-	1                      MUL_FAC*dJ_LOC(L,J,K)
-	                END IF
-	              END IF
-	            END DO
-	          END IF
-	        END DO
-	      END DO
-	    END IF 
-	  END DO
-	  CALL TUNE(ITWO,'dZ_LINE')
-!
-! 
-!
-! Check whether any lines have been finalized. If so we can update the 
-! variation matrices.
-!
-! NB: Weak lines are handled in the LAMBDA ITERATION section.
-!
-! We use ZENT_VAR_LIMIT to reduce the number of operations. When ZNET
-! is approximatley unity, there is little point in linearizing ZNET.
-! NB: An ideal vale for ZNET_VAR_LIMIT is probably 0.01 or 0.001. If 
-! ZNET_VAR_LIMIT is zero, all depths will be included in the linearization, 
-! independent of ZNET. A very large value of ZNET (i.e. 10^4), will imply
-! an interation on the NET_RATES, with no linearization.
-!
-	  DO SIM_INDX=1,MAX_SIM
-!
-	    IF( END_RES_ZONE(SIM_INDX) .AND. .NOT. WEAK_LINE(SIM_INDX))THEN
-!
-	      I=SIM_LINE_POINTER(SIM_INDX)
-	      ID=VEC_ID(I)
-!
-! Can now update rate equation for variation in Z.
-!
-	      I=NT*NUM_BNDS*ND
-	      CALL DP_ZERO(dZ_POPS,I)
-!
-! Check which matrices get used to compute dZ_POPS. We include:
-!   (i) all transitions designated to be important.
-!  (ii) all transitions for levels in the same ionization stage.
-!
-	      DO I=TX_OFFSET+1,NM
-	        USE_THIS_VAR_MAT(I)=.FALSE.
-	        IF(VAR_IN_USE_CNT(I) .GT. 0 .AND. IMP_TRANS_VEC(I))THEN
-	          USE_THIS_VAR_MAT(I)=.TRUE.
-	        ELSE IF(VAR_IN_USE_CNT(I) .GT. 0)THEN
-	          NL=VAR_LEV_ID(I)
-	          IF(NL .GE. ATM(ID)%EQXzV .AND.
-	1                      NL .LE. ATM(ID)%EQXzV+ATM(ID)%NXzV)
-	1         USE_THIS_VAR_MAT(I)=.TRUE.
-	        END IF
-	      END DO
-!
-! NOPS= ND*NUM_BNDS*( 4NT + 2 + 7NUM_SIM )
-!
-!
-! Set up a temporary vector to handle Rayleigh scattering.
-!
-	      TA(1:ND)=0.0D0
-	      IF(SPECIES_PRES(1))THEN			!If H present!
-	        DO L=1,ND
-	          TA(L)=CHI_RAY(L)/ATM(1)%XzV_F(1,L)	          
-	        END DO
-	      END IF
-!
-	      DO K=1,ND
-		T4=ABS(ZNET_SIM(K,SIM_INDX)-1.0D0)
-	          IF(T4 .GT. ZNET_VAR_LIMIT)THEN
-	          DO J=BNDST(K),BNDEND(K)	  	  !Since refer to VCHI etc.
- 	            L=BND_TO_FULL(J,K)
-	            DO JJ=1,SE(ID)%N_IV			!Bad notation
-	              I=SE(ID)%LNK_TO_F(JJ)
-	              dZ_POPS(I,J,K)=dZ_POPS(I,J,K) +
-	1                ( VCHI(I,L)*dZ(3,J,K,SIM_INDX) + 
-	1                    VETA(I,L)*dZ(4,J,K,SIM_INDX) )
-	            END DO
-	            dZ_POPS(NT-1,J,K)=dZ_POPS(NT-1,J,K) +
-	1                            ESEC(L)*dZ(5,J,K,SIM_INDX)/ED(L)
-	            dZ_POPS(1,J,K)=dZ_POPS(1,J,K) +
-	1                            TA(L)*dZ(5,J,K,SIM_INDX)
-!
-! Now must do line terms.
-!
-	            DO I=TX_OFFSET+1,NM
-	              IF(USE_THIS_VAR_MAT(I))THEN
-	                NL=VAR_LEV_ID(I)
-	                dZ_POPS(NL,J,K)=dZ_POPS(NL,J,K) + dZ(I,J,K,SIM_INDX)
-	              END IF
-	            END DO
-	          END DO	        !Over Variable depth (1:NUM_BNDS)
-	        END IF		!ABS|ZNET-1| > 0.01
-	      END DO			!Over J depth.
-!
-! Update variation equations. NB. We do not need to update the Radiative
-! Equilibrium equation, since this is automatically updated with the
-! continuum.
-!
-! Note that there is no update of the NT equation since this is 
-! automatically included in the direct CHI*J-ETA term.
-!
-! NOPS = 6*ND*NT*NUM_BNDS
-!
-	      CALL TUNE(IONE,'dBA_LINE')
-	      NL=SIM_NL(SIM_INDX)
-	      NUP=SIM_NUP(SIM_INDX)
-	      I=SIM_LINE_POINTER(SIM_INDX)
-              MNL_F=VEC_MNL_F(I)
-	      MNUP_F=VEC_MNUP_F(I)
-	      MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
-	      MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
-!
-! NB: We compute T2 as U_STAR_RATIO may have been scaled, and this should
-! not effect the rate equations.
-! 
-	      IF(SCL_LINE_COOL_RATES)THEN
-	        SCL_FAC=(AVE_ENERGY(NL)-AVE_ENERGY(NUP))/FL_SIM(SIM_INDX)
-	        IF(ABS(SCL_FAC-1.0D0) .GT. SCL_LINE_HT_FAC)SCL_FAC=1.0D0
-	      ELSE
-	        SCL_FAC=1.0D0
-	      END IF
-	      DO L=1,ND					!Equation depth
-	        T3=SCL_FAC
-	        IF(POP_ATOM(L) .GE. SCL_LINE_DENSITY_LIMIT)T3=1.0D0
-	        T1=EINA(SIM_INDX)*ATM(ID)%XzV_F(MNUP_F,L)
-	        T2=ATM(ID)%XzV_F(MNUP_F,L)/POPS(NUP,L)
-	        K=GET_DIAG(L)
-	        SE(ID)%BA(MNL,MNUP,K,L)=SE(ID)%BA(MNL,MNUP,K,L) +
-	1           T2*EINA(SIM_INDX)*ZNET_SIM(L,SIM_INDX)
-	        SE(ID)%BA(MNUP,MNUP,K,L)=SE(ID)%BA(MNUP,MNUP,K,L) -
-	1           T2*EINA(SIM_INDX)*ZNET_SIM(L,SIM_INDX)
-	        BA_T(NUP,K,L)=BA_T(NUP,K,L) -
-	1           T3*ETAL_MAT(L,SIM_INDX)*ZNET_SIM(L,SIM_INDX)/POPS(NUP,L)
-		T4=ABS(ZNET_SIM(L,SIM_INDX)-1.0D0)
-	        IF(T4 .GT. ZNET_VAR_LIMIT)THEN
-	          DO K=1,NUM_BNDS			!Variable depth
-!
-! Because of our corrections earlier, unimportant variations are also
-! omitted from the radiative Equilibrium Equation.
-!
-	            DO J=1,SE(ID)%N_IV
-	              JJ=SE(ID)%LNK_TO_F(J)
-	              SE(ID)%BA(MNL,J,K,L) =SE(ID)%BA(MNL,J,K,L) +dZ_POPS(JJ,K,L)*T1
-	              SE(ID)%BA(MNUP,J,K,L)=SE(ID)%BA(MNUP,J,K,L)-dZ_POPS(JJ,K,L)*T1
-	              BA_T(JJ,K,L)=BA_T(JJ,K,L)-dZ_POPS(JJ,K,L)*
-	1                                        T3*ETAL_MAT(L,SIM_INDX)
-	            END DO
-	          END DO
-	        END IF
-	      END DO
-	WRITE(198,'(5I10,4ES18.8)')ML,NL,NUP,MNL_F,MNUP_F,FL,STEQ_T(DPTH_INDX),
-	1                           BA_T(NT-3,DIAG_INDX,DPTH_INDX),BA_T(NT,DIAG_INDX,DPTH_INDX)
-	      CALL TUNE(ITWO,'dBA_LINE')
-!
-! Must now zero dZ since next time it is used it will be for a new line.
-!
-	      I=NM*NUM_BNDS*ND
-	      CALL DP_ZERO(dZ(1,1,1,SIM_INDX),I)
-!
-	    END IF	!End_res_zone .and. .not. weak_line
-	  END DO	!SIM_INDX
-	END IF		!Compute_ba .and. .not. lambda_iteration
-	CALL TUNE(ITWO,'LINE_BA')
+	CALL UPDATE_BA_FOR_LINE(FL,FQW(ML),FREQ_INDX,
+	1              POPS,JREC,dJRECdT,JPHOT,
+	1              ND,NT,NUM_BNDS,NION,DIAG_INDX,
+	1              TX_OFFSET,MAX_SIM,NM,NCF,NLF,
+	1              LUER,FINAL_CONSTANT_CROSS,LST_ITERATION)
 !
 ! 
 !
@@ -2925,24 +2572,22 @@
 	  END DO
 	END IF
 !
-	IF(VERBOSE_OUTPUT)THEN
+	IF(LST_ITERATION .AND. VERBOSE_OUTPUT)THEN
 	  T1=FQW(ML)*(CHI_NOSCAT(DPTH_INDX)*RJ(DPTH_INDX) - ETA_NOSCAT(DPTH_INDX))
 	  IF(MOD(FREQ_INDX,N_PAR) .EQ. 0)THEN 
 	    WRITE(199,'(I10,12ES18.8)')ML,FL,STEQ_T(DPTH_INDX),T1,FQW(ML)*ETA_NOSCAT(DPTH_INDX),
-	1                             STEQ_T_SCL(DPTH_INDX),STEQ_T_NO_SCL(DPTH_INDX),
-	1                             BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),BA_T(NT,DIAG_INDX,DPTH_INDX)
+	1                           STEQ_T_SCL(DPTH_INDX),STEQ_T_NO_SCL(DPTH_INDX),
+	1                           BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),BA_T(NT,DIAG_INDX,DPTH_INDX)
 	  ELSE
 	    WRITE(199,'(I10,12ES18.8)')ML,FL,STEQ_T(DPTH_INDX),T1,FQW(ML)*ETA_NOSCAT(DPTH_INDX),
-	1                             STEQ_T_SCL(DPTH_INDX),STEQ_T_NO_SCL(DPTH_INDX),
-	1                             BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX)+BA_T_PAR(VAR_INDX,DPTH_INDX),
-	1                             BA_T(NT,DIAG_INDX,DPTH_INDX)+BA_T_PAR(NT,DPTH_INDX)
+	1                           STEQ_T_SCL(DPTH_INDX),STEQ_T_NO_SCL(DPTH_INDX),
+	1                           BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX)+BA_T_PAR(VAR_INDX,DPTH_INDX),
+	1                           BA_T(NT,DIAG_INDX,DPTH_INDX)+BA_T_PAR(NT,DPTH_INDX)
 	  END IF
 	END IF
 !
 10000	CONTINUE
-	IF(VERBOSE_OUTPUT)THEN
-	  WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'End cont loop'
-	END IF
+	WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'End cont loop'
 	CALL TUNE(ITWO,'10000')
 !
 	WRITE(LUER,*)' '
@@ -2953,9 +2598,7 @@
 !
 	CALL STEQ_BA_TWO_PHOT_RATE_V3(POPS,NT,ND,
 	1         DIAG_INDX,COMPUTE_BA,LUMOD,LST_ITERATION)
-	IF(VERBOSE_OUTPUT)THEN
-	  WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'two'
-	END IF
+	WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'two'
 !
 ! 
 !
@@ -2973,17 +2616,13 @@
 	END DO
 !
 	CALL STEQ_BA_CHG_EXCH_V3(POPS,T,NT,ND,DIAG_INDX,COMPUTE_BA)
-	IF(VERBOSE_OUTPUT)THEN
-	  WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'chg_1'
-	END IF
+	WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'chg_1'
 !
 	DO ID=1,NUM_IONS-1
 	  CALL EVAL_CHG_RATES_V3(ATM(ID)%CHG_PRXzV, ATM(ID)%CHG_RRXzV,
 	1           ION_ID(ID),POPS,T,ND,NT)
 	END DO
-	IF(VERBOSE_OUTPUT)THEN
-	  WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'chg_2'
-	END IF
+	WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'chg_2'
 ! 
 !
 ! Output errors that have occurred in MOM_J_CMF
@@ -2996,9 +2635,7 @@
           CALL STEQ_CO_MOV_DERIV_V2(ADVEC_RELAX_PARAM,LINEAR_ADV,
 	1             DO_CO_MOV_DDT,LAMBDA_ITERATION,COMPUTE_BA,
 	1             TIME_SEQ_NO,NUM_BNDS,ND,NT)
-	  IF(VERBOSE_OUTPUT)THEN
-	    WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'SN_DDT'
-	  END IF
+	  WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'SN_DDT'
 	ELSE
 	  CALL STEQ_ADVEC_V4(ADVEC_RELAX_PARAM,LINEAR_ADV,NUM_BNDS,ND,
 	1            INCL_ADVECTION,LAMBDA_ITERATION,COMPUTE_BA)
@@ -3011,9 +2648,7 @@
 	1                       POPS,AVE_ENERGY,HDKT,
 	1                       COMPUTE_BA,INCL_ADIABATIC,
 	1                       TIME_SEQ_NO,DIAG_INDX,NUM_BNDS,NT,ND)
-	  IF(VERBOSE_OUTPUT)THEN
-	    WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'SN_ADD'
-	  END IF
+	  WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'SN_ADD'
 	ELSE
 	  dE_WORK=0.0D0
 	  CALL EVAL_ADIABATIC_V3(AD_COOL_V,AD_COOL_DT,
@@ -3024,18 +2659,14 @@
 !
 	IF(SN_MODEL .AND. INCL_RADIOACTIVE_DECAY)THEN
 	  CALL EVAL_RAD_DECAY_V1(dE_RAD_DECAY,NT,ND)
-	  IF(VERBOSE_OUTPUT)THEN
-	    WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'SN_RAD'
-	  END IF
+	  WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'SN_RAD'
 	END IF
 !
 ! Prevent T from becoming too small by adding a extra heating term.
 !
 	CALL PREVENT_LOW_T(ARTIFICIAL_HEAT_TERM,T_MIN,COMPUTE_BA,LAMBDA_ITERATION,
 	1                       T_MIN_BA_EXTRAP,DIAG_INDX,NUM_BNDS,ND,NT)
-	IF(VERBOSE_OUTPUT)THEN
-	  WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'Artificial heat'
-	END IF
+	WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'Artificial heat'
 !
 ! Write pointer file and store BA, BA_ED and B_T matrices.
 !
