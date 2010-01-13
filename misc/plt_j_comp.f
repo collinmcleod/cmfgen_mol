@@ -149,7 +149,7 @@
 !
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IJW')THEN
 	    CALL DP_CURVE(NCF,LAM,JR_IN)
-	    CALL GRAMON_PGPLOT('\gl(\A)','J(raw)',' ',' ')
+	    CALL GRAMON_PGPLOT('\gl(\A)','J(ray)',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IJMW')THEN
 	    CALL DP_CURVE(NCF,LAM,JM_IN)
 	    CALL GRAMON_PGPLOT('\gl(\A)','J(mom)',' ',' ')
