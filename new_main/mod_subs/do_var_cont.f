@@ -595,12 +595,6 @@
 	            TX_EXT(K,J,LOW)=TX_EXT(K,J,LOW) + OPAC_FAC*TX_EXT(K,J,1)
 	            TX_EXT(K,J,UP)=TX_EXT(K,J,UP) + ( EMIS_FAC*TX_EXT(K,J,2) - STIM_FAC*TX_EXT(K,J,1) )
 	          END DO
-	          DO K=1,NDEXT
-	            OPAC_FAC=LINE_OPAC_CON(SIM_INDX)*LINE_PROF_SIM(SIM_INDX)*NEG_OPAC_FAC(J)*
-	1                (dL_RAT_dT(J,SIM_INDX)*POPS(NL,J)-GLDGU(SIM_INDX)*dU_RAT_dT(J,SIM_INDX)*POPS(NUP,J))
-	            EMIS_FAC=LINE_EMIS_CON(SIM_INDX)*LINE_PROF_SIM(SIM_INDX)*dU_RAT_dT(J,SIM_INDX)*POPS(NUP,J)
-	            TX_EXT(K,J,6)=TX_EXT(K,J,6) + (OPAC_FAC*TX_EXT(K,J,1)+EMIS_FAC*TX_EXT(K,J,2))
-	          END DO
 	        END DO
 	      END IF
 	    END DO
@@ -622,15 +616,29 @@
 	            TVX_EXT(K,J,LOW)=TVX_EXT(K,J,LOW) + OPAC_FAC*TVX_EXT(K,J,1)
 	            TVX_EXT(K,J,UP)=TVX_EXT(K,J,UP) + ( EMIS_FAC*TVX_EXT(K,J,2) - STIM_FAC*TVX_EXT(K,J,1) )
 	          END DO
-	          DO K=1,NDEXT-1
-	            OPAC_FAC=LINE_OPAC_CON(SIM_INDX)*LINE_PROF_SIM(SIM_INDX)*NEG_OPAC_FAC(J)*
-	1                (dL_RAT_dT(J,SIM_INDX)*POPS(NL,J)-GLDGU(SIM_INDX)*dU_RAT_dT(J,SIM_INDX)*POPS(NUP,J))
-	            EMIS_FAC=LINE_EMIS_CON(SIM_INDX)*LINE_PROF_SIM(SIM_INDX)*dU_RAT_dT(J,SIM_INDX)*POPS(NUP,J)
-	            TVX_EXT(K,J,6)=TVX_EXT(K,J,6) + (OPAC_FAC*TVX_EXT(K,J,1)+EMIS_FAC*TVX_EXT(K,J,2))
-	          END DO
 	        END DO
 	      END IF
 	    END DO
+!
+	    IF(INCLUDE_dSLdT)THEN
+	      DO SIM_INDX=1,MAX_SIM
+	        NL=SIM_NL(SIM_INDX)
+	        NUP=SIM_NUP(SIM_INDX)
+	        IF(.NOT. WEAK_LINE(SIM_INDX) .AND. RESONANCE_ZONE(SIM_INDX))THEN
+	          DO J=1,ND
+	            OPAC_FAC=LINE_OPAC_CON(SIM_INDX)*LINE_PROF_SIM(SIM_INDX)*NEG_OPAC_FAC(J)*
+	1               (dL_RAT_dT(J,SIM_INDX)*POPS(NL,J)-GLDGU(SIM_INDX)*dU_RAT_dT(J,SIM_INDX)*POPS(NUP,J))
+	            EMIS_FAC=LINE_EMIS_CON(SIM_INDX)*LINE_PROF_SIM(SIM_INDX)*dU_RAT_dT(J,SIM_INDX)*POPS(NUP,J)
+	            DO K=1,NDEXT
+	              TX_EXT(K,J,6)=TX_EXT(K,J,6) + (OPAC_FAC*TX_EXT(K,J,1)+EMIS_FAC*TX_EXT(K,J,2))
+	            END DO
+	            DO K=1,NDEXT-1
+	              TVX_EXT(K,J,6)=TVX_EXT(K,J,6) + (OPAC_FAC*TVX_EXT(K,J,1)+EMIS_FAC*TVX_EXT(K,J,2))
+	            END DO
+	          END DO
+	        END IF
+	      END DO
+	    END IF
 !
 ! Now zero dCHI and dETA storage locations. These refer to the TOTAL
 ! opacity and emissivity.

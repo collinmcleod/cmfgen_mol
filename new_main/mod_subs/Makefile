@@ -85,6 +85,11 @@ $(LIB)(comp_grey_v2.o) : comp_grey_v2.f $(LIB_MOD)(control_variable_mod.o) $(LIB
 	$(F90) -c $(FG) comp_grey_v2.f
 	ar ruv $(LIB) comp_grey_v2.o
 
+$(LIB)(comp_grey_v3.o) : comp_grey_v3.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
+                                  $(LIB_MOD)(ang_qw_mod.o)
+	$(F90) -c $(FG) comp_grey_v3.f
+	ar ruv $(LIB) comp_grey_v3.o
+
 $(LIB)(comp_opac.o) : comp_opac.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)
 	$(F90) -c $(FG) comp_opac.f
 	ar ruv $(LIB) comp_opac.o
@@ -146,17 +151,12 @@ $(LIB_MOD)(cmf_sob_mod.o) $(LIB_MOD)(steq_data_mod.o) $(LIB_MOD)(ang_qw_mod.o) $
 	$(F90) -c $(FG) sub_cmf_line.f
 	ar ruv $(LIB) sub_cmf_line.o
                                                                                                                       
-$(LIB)(sub_sob_line.o) : sub_sob_line.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
-$(LIB_MOD)(line_mod.o) $(LIB_MOD)(var_rad_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
-$(LIB_MOD)(cmf_sob_mod.o) $(LIB_MOD)(steq_data_mod.o) $(LIB_MOD)(ang_qw_mod.o) $(LIB_MOD)(line_vec_mod.o)
-	$(F90) -c $(FG) sub_sob_line.f
-	ar ruv $(LIB) sub_sob_line.o
                                                                                                                       
-$(LIB)(sub_sob_line_v2.o) : sub_sob_line_v2.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
+$(LIB)(sub_sob_line_v3.o) : sub_sob_line_v3.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
 $(LIB_MOD)(line_mod.o) $(LIB_MOD)(var_rad_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
 $(LIB_MOD)(cmf_sob_mod.o) $(LIB_MOD)(steq_data_mod.o) $(LIB_MOD)(ang_qw_mod.o) $(LIB_MOD)(line_vec_mod.o)
-	$(F90) -c $(FG) sub_sob_line_v2.f
-	ar ruv $(LIB) sub_sob_line_v2.o
+	$(F90) -c $(FG) sub_sob_line_v3.f
+	ar ruv $(LIB) sub_sob_line_v3.o
                                                                                                                       
 $(LIB)(do_var_cont.o) : do_var_cont.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
 $(LIB_MOD)(line_mod.o) $(LIB_MOD)(var_rad_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o)\

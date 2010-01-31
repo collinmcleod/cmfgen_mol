@@ -535,6 +535,10 @@ C
 	  INCLUDE_dSLdT=.FALSE.
 	  CALL RD_STORE_LOG(INCLUDE_dSLdT,'INCL_dSLdT',L_FALSE,
 	1            'Include variation in distribution of level populations in a SL with T?')
+	  NEW_LINE_BA=.FALSE.
+	  IF(SN_MODEL)NEW_LINE_BA=.TRUE.
+	  CALL RD_STORE_LOG(NEW_LINE_BA,'NEW_LINE_BA',L_FALSE,
+	1            'Use the new technique for comuting BA_T (i.e., dRE/dT)?')
 !
 	  LINEAR_ADV=.TRUE.
 	  CALL RD_STORE_LOG(LINEAR_ADV,'LIN_ADV',L_FALSE,

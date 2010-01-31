@@ -363,6 +363,7 @@
 !
 	REAL*8 BA_CHK_FAC
 	LOGICAL INCLUDE_dSLdT
+	LOGICAL NEW_LINE_BA
 !
 ! Variables for scaling the line cooling rates in oder that the radiative
 ! equilibrium equation is more consistent with the electron heating/cooling 

@@ -27,7 +27,6 @@
 	INTEGER LUER
 	LOGICAL FINAL_CONSTANT_CROSS
 	LOGICAL LST_ITERATION
-	LOGICAL NEW_APPROACH
 	LOGICAL UPDATE_dZ
 !
         REAL*8 FL
@@ -94,7 +93,6 @@
 !
 ! 
 !
-	NEW_APPROACH=.TRUE.
 	UPDATE_dZ=.FALSE.
 	DPTH_INDX=29
 	DPTH_INDX=MIN(DPTH_INDX,ND)             !Thus no problem if 84 > ND
@@ -181,7 +179,7 @@
 ! contribution. We use TA as a zeroed vec for ESEC, which was subtracted
 ! from CHI_CONT inside BA_UPDATE_V7.
 !
-	    IF(NEW_APPROACH .AND. .NOT. LAMBDA_ITERATION)THEN
+	    IF(NEW_LINE_BA .AND. .NOT. LAMBDA_ITERATION)THEN
               CALL BA_UPDATE_V7(VJ,VCHI_ALL,VETA_ALL,
 	1             ETA,CHI,CHI_SCAT,T,POPS,RJ,FL,FQW,
 	1             COMPUTE_NEW_CROSS,FINAL_CONSTANT_CROSS,DO_SRCE_VAR_ONLY,
@@ -527,7 +525,7 @@
 	        SCL_FAC=1.0D0
 	      END IF
 !
-	      IF(NEW_APPROACH)THEN
+	      IF(NEW_LINE_BA)THEN
 	        DO L=1,ND
 	          K=GET_DIAG(L)
 	          T3=SCL_FAC
