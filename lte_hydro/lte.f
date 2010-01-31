@@ -124,6 +124,11 @@
 	SOL_ABUND_HSCL(ID)=8.93D0
 !
 	ID=ID+1
+	AT_NO(ID)=9.0D0;            AT_MASS(ID)=19.00D0         !Fluorine
+	SPECIES(ID)='FLU';          SPECIES_ABR(ID)='F'
+	SOL_ABUND_HSCL(ID)=4.56D0
+!
+	ID=ID+1
 	AT_NO(ID)=10.0D0;	    AT_MASS(ID)=20.2D0		!Neon
 	SPECIES(ID)='NEON';	    SPECIES_ABR(ID)='Ne'
 	SOL_ABUND_HSCL(ID)=8.09D0
@@ -179,6 +184,11 @@
 	SOL_ABUND_HSCL(ID)=6.36D0
 !
 	ID=ID+1
+	AT_NO(ID)=21.0D0;           AT_MASS(ID)=44.96D0         !Scandium
+	SPECIES(ID)='SCAN';         SPECIES_ABR(ID)='Sc'
+	SOL_ABUND_HSCL(ID)=3.10D0
+!
+	ID=ID+1
 	AT_NO(ID)=22.0D0;	    AT_MASS(ID)=47.88D0		!Titanium
 	SPECIES(ID)='TIT';	    SPECIES_ABR(ID)='Tk'	!Actual symbol is Ti
 	SOL_ABUND_HSCL(ID)=4.99D0
@@ -212,8 +222,15 @@
 	AT_NO(ID)=28.0D0;	    AT_MASS(ID)=58.7D0		!Nickel
 	SPECIES(ID)='NICK';	    SPECIES_ABR(ID)='Nk'
 	SOL_ABUND_HSCL(ID)=6.25D0
+!
+	ID=ID+1
+	AT_NO(ID)=56.0D0;           AT_MASS(ID)=137.33D0        !Barium
+	SPECIES(ID)='BAR';          SPECIES_ABR(ID)='Ba'
+	SOL_ABUND_HSCL(ID)=2.13D0
+!
 	IF(ID .NE. NUM_SPECIES)THEN
 	  WRITE(LUER,*)'Error in CMFGEN: Invalid species setup'
+	  WRITE(LUER,*)'This likely means a new species has not been added to necesseary files'
 	  STOP
 	END IF
 !
