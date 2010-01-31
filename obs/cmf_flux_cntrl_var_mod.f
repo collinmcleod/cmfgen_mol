@@ -158,6 +158,8 @@
 	LOGICAL DIF
 	LOGICAL THK_CONT
 	LOGICAL THK_LINE
+	CHARACTER(LEN=10) OUTER_BND_METH
+	CHARACTER(LEN=10) INNER_BND_METH
 !
 ! Minimum velocity step size (Doppler widths) for FG_J_CMF and MOM_J_CMF.
 ! These are used to insert extra points alonga  ray, and provide additional

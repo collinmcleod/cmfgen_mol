@@ -12,7 +12,9 @@
 ! Created  20-Jun-1998
 !
 	INTEGER J
+	INTEGER COUNT
 !
+	COUNT=0
 	DO J=1,N_CHG
 !
 	  CHG_REACTION_AVAILABLE(J)=.TRUE.
@@ -21,8 +23,10 @@
 	1      (LEV_IN_POPS_CHG(J,3) .EQ. 0) .OR.
 	1      (LEV_IN_POPS_CHG(J,4) .EQ. 0) )THEN
 	    CHG_REACTION_AVAILABLE(J)=.FALSE.
-	    WRITE(LUER,*)'Warning from VERIFY_CHG_EXCH_V3'
-	    WRITE(LUER,*)'Charge exchange reaction unavailable. No. ',J
+	    IF(COUNT .EQ. 0)WRITE(LUER,*)' '
+	    IF(COUNT .EQ. 0)WRITE(LUER,*)'Warning from VERIFY_CHG_EXCH_V3'
+	    WRITE(LUER,*)'    Charge exchange reaction unavailabler:. No. ',J
+	    COUNT=COUNT+1
 	  ELSE
 	    IF(Z_CHG(J,1) .NE. Z_CHG(J,3)+1)THEN
 	      WRITE(LUER,*)'Error in VERIFY_CHG_EXCH_V3'

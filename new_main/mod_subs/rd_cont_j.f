@@ -4,7 +4,7 @@
 ! when we have poor population estimates for some ionization stages/species.
 ! For use with CMFGEN only.
 !
-! Aleterd 2-Apr-2008 : Now set HBC_CMF to small, non-zero, value.
+! Altered 2-Apr-2008 : Now set HBC_CMF to small, non-zero, value.
 ! Altered 8-Mar-2005 : Bux fix.
 !
 	SUBROUTINE RD_CONT_J(FL,FREQ_INDX,FIRST_FREQ,LST_ITERATION,

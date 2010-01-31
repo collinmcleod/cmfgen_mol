@@ -51,6 +51,24 @@
 !
 	  CALL RD_STORE_LOG(DIF,'DIF',L_TRUE,
 	1            'Use Diffusion approximation at inner boundary ?')
+	  IF(DIF)THEN
+	    INNER_BND_METH='DIFFUSION'
+	    CALL RD_STORE_CHAR(INNER_BND_METH,'IB_METH',L_FALSE,
+	1           'Inner boundary method (DIFFUSION, HOLLOW, or ZERO_FLUX)')
+	    IF(INNER_BND_METH .NE. 'DIFFUSION')THEN
+	      WRITE(LUER,*)'Error in RD_CONTROL_VARIABLES'
+	      WRITE(LUER,*)'Inconsistent inner boundary condition'
+	      WRITE(LUER,*)'DIF option and IB_METH are inconsistent'
+	      STOP
+	    END IF
+	  ELSE
+	    CALL RD_STORE_CHAR(INNER_BND_METH,'IB_METH',L_TRUE,
+	1           'Inner boundary method (DIFUSION, HOLLOW, or ZERO_FLUX)')
+	  END IF
+	  OUTER_BND_METH='HONJ'
+	  CALL RD_STORE_CHAR(OUTER_BND_METH,'OB_METH',L_FALSE,
+	1        'Outer boundary method (HONJ or HALF_MOM)')
+!
 	  CALL RD_STORE_INT(NUM_ES_ITERATIONS,'NUM_ES',L_TRUE,
 	1            'Number of electron scattering iterations?')
 	  CALL RD_STORE_LOG(RD_COHERENT_ES,'COH_ES',L_TRUE,

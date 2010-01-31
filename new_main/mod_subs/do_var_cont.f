@@ -37,7 +37,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
-! Altered   09-Jan-2010 : Included variation of line opacity & emissivity with T. This variation arises
+! Altered 31-Jan-2010 : Changed to VAR_MOM_J_DDT_V2 from VAR_MOM_J_DDT_V1.
+! Altered 09-Jan-2010 : Included variation of line opacity & emissivity with T. This variation arises
 !                           from the use of super-levels.
 ! Finalized 17-Dec-2004
 !
@@ -311,13 +312,14 @@
 	1                  INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,
 	1                  DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
 	   ELSE IF(USE_DJDT_RTE)THEN
-	     CALL VAR_MOM_J_DDT_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,ES_COH_VEC,V,R,
-	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR, 
-	1           dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR, 
-	1           KI,WM,RHS_dHdCHI,FEDD,HBC_CMF,INBC,FEDD_PREV,
-	1           INCL_DJDT_TERMS,DJDT_RELAX_PARAM,
-	1           FIRST_FREQ,FL,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
-	1           DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
+	     CALL VAR_MOM_J_DDT_V2(TA,CHI_CLUMP,CHI_SCAT_CLUMP,ES_COH_VEC,V,R,
+	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR,
+	1           dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR,
+	1           KI,WM,RHS_dHdCHI,FEDD,
+	1           INCL_DJDT_TERMS,DJDT_RELAX_PARAM,FIRST_FREQ,FL,dLOG_NU,
+	1           dTdR,DBB,dDBBdT,DO_THIS_TX_MATRIX,METHOD,
+	1           INNER_BND_METH,OUTER_BND_METH,
+	1           ND,NM,NM_KI)
 	   ELSE
 	    CALL VAR_MOM_J_CMF_V9(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
 	1           ES_COH_VEC,V,SIGMA,R,

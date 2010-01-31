@@ -1,7 +1,7 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
       SUBROUTINE SOLVE_CMF_FORMAL_V2(CHI,ETA,IP,FREQ,NU_DNU,
-     *                     BOUNDARY,B_NUE,dBDTAU,ND,NP,NC)
+     *                     INNER_BND_METH,B_NUE,dBDTAU,ND,NP,NC)
 !
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
@@ -14,13 +14,17 @@
 ! Altered 5/9/97  DLM installed MODULE for rpz and allocation
 !                     of many variables
 ! Altered 5/16/97 DLM installed three possible inner boundary conditions
-!                     'hollow'    - hollow core with I+=I-
-!                     'gray'      - diffusion approximation for gray atmosphere
-!                                   Mihalas (1980) 237 p 574
-!                     'diffusion' - diffusion approximation with I=B(nu,T)+mu*dBdtau(nu,T)
-!                                   Mihalas (1978) p 51
+!                     'HOLLOW'    - hollow core with I+=I-
+!                     'GRAY'      - DIFFUSION approximation for gray atmosphere: Mihalas (1980) 237 p 574
+!                     'DIFFUSION' - DIFFUSION approximation with I=B(nu,T)+mu*dBdtau(nu,T): Mihalas (1978) p 51
 ! Altered 6/12/97 DLM Name changed from solve_rel_formal.f
 ! Altered 31/12/04 DJH : Cleaned
+! Altered 22-Jan-2010: Changed call to V3 and altered boundary condition options:
+!                     'ZERO_FLUX' - hollow core with I+=I-
+!                     'HOLLOW'    - hollow core with I+=I- but with allowance for velocity shifts.
+!                     'GRAY'      - DIFFUSION approximation for gray atmosphere: Mihalas (1980) 237 p 574
+!                     'DIFFUSION' - DIFFUSION approximation with I=B(nu,T)+mu*dBdtau(nu,T): Mihalas (1978) p 51
+!
 !--------------------------------------------------------------------
 !
       USE MOD_SPACE_GRID_V2
@@ -44,7 +48,7 @@
 !
       real*8 :: B_nue,dBdtau
 !
-      character(len=*) :: boundary
+      character(len=*) :: INNER_BND_METH
 !
 ! Local variables
 !
@@ -161,7 +165,7 @@
 ! the current flux, since the radiation will be redshifted by the 
 ! expansion.
 !
-      if(ip .le. nc .and. boundary .eq. 'hollow')then
+      if(ip .le. nc .and. INNER_BND_METH .eq. 'HOLLOW')then
 	if(cur_loc .eq. -1)then
 	  cur_loc=0
 	  freq_store(cur_loc)=freq
@@ -209,16 +213,16 @@
 !
 ! At inner boundary use I+ = I- for core and non-core rays
 !
-      if(ip .gt. nc+1)then
+      if(ip .gt. nc+1 .or. INNER_BND_METH .eq. 'ZERO_FLUX')then
         ray(ip)%I_p(nzz)=ray(ip)%I_m(nzz)
-      else if(boundary.eq.'hollow')then
+      else if(INNER_BND_METH .eq. 'HOLLOW')then
         ray(ip)%I_p(nzz)=ibound
-      elseif((boundary.eq.'gray').or.(boundary.eq.'diffusion'))then
+      elseif((INNER_BND_METH .eq. 'GRAY') .or. (INNER_BND_METH .eq. 'DIFFUSION'))then
         ray(ip)%I_p(nzz)=B_nue+ray(ip)%mu_p(nzz)*dBdtau
       else
 	luer=error_lu()
-        write(luer,*)' Unknown inner boundary condition in SOLVE_CMF_FORMAL'
-        write(luer,*)'Passed boundary condition is ',trim(boundary)
+        write(luer,*)'Unknown inner boundary condition in SOLVE_CMF_FORMAL'
+        write(luer,*)'Passed boundary condition is ',trim(INNER_BND_METH)
         stop
       end if
 !

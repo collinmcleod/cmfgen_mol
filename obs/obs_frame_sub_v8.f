@@ -674,12 +674,15 @@
 ! Flux for lines which are optically thick at the outer boundary
 ! (eg CIII 976 in WCE stars, MGII 2780 in LBVs).
 !
+! Bug fux: 29-Jan-2010: When I > NR we now set J=NRAY+1-I (rather than 2NR-I)
+! to automatically handle a hollow core.
+!
 	    TAU(1)=CHI_VEC(1)*HALF_DZ(2)
 	    SM_NRAY=NRAY
 !	    CALL TUNE(1,'FREQ INTERP')
 	    DO I=2,NRAY
 	      J=I
-	      IF(I .GT. NR)J=2*NR-I
+	      IF(I .GT. NR)J=NRAY+1-I
 !
 ! Interpolate in frequency to transform ETA and CHI from the comoving frame to
 ! the observers frame for this ray and frequency.
@@ -698,6 +701,7 @@
 	          WRITE(LUER,*)'LS, OUT_ML, ML, I=',LS,OUT_ML,ML,I
 	        END IF
 	      END DO
+!
 	      INDX(I)=K
 	      T2=(T1-SM_FREQ_CMF(K))/(SM_FREQ_CMF(K-1)-SM_FREQ_CMF(K))
 	      ETA_VEC(I)=

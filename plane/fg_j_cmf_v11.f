@@ -208,6 +208,8 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered 14-Jan-2010: Added JPLUS_IB, JMIN_IB etc to improve computation of
+!                        boundary conditions.
 ! Altered 14-May-2009: Altered value of IDMAX (for ETA and CHI interpolaton).
 !                        IDMAX & IDMIN now stored in FG_J_CMF_MOD_V11.
 ! Altered 19-Jan-2009: Changed IP_DATA to IP_FG_DATA which must exist for I(p)
@@ -1009,6 +1011,11 @@
 	CALL MON_INT_FUNS_V2(ETA_COEF,LOG_ETA_EXT,LOG_R_EXT,ND_EXT)
 	CALL TUNE(2,'FG_CHI_BEG')
 !
+	JPLUS_IB=0.0D0; HPLUS_IB=0.0D0; KPLUS_IB=0.0D0; NPLUS_IB=0.0D0
+	JMIN_IB=0.0D0;  HMIN_IB=0.0D0; KMIN_IB=0.0D0;   NMIN_IB=0.0D0
+	JPLUS_OB=0.0D0;  HPLUS_OB=0.0D0; KPLUS_OB=0.0D0; NPLUS_OB=0.0D0
+	JMIN_OB=0.0D0;   HMIN_OB=0.0D0;  KMIN_OB=0.0D0;  NMIN_OB=0.0D0
+!
 ! 
 !***************************************************************************
 !***************************************************************************
@@ -1568,6 +1575,35 @@ C
 	    JNU_STORE(I)=JNU_STORE(I)+JQW(I,LS)*AV(K,LS)
 	    KNU_STORE(I)=KNU_STORE(I)+KQW(I,LS)*AV(K,LS)
 	  END DO
+	END DO
+!
+! This procedure works for the INTEGRAL or DIFFERENCE approach.
+!
+	DO LS=1,NP
+	  K=J_PNT(1,LS)
+	  T1=AV(K,LS)+CV_BOUND(LS)
+	  T2=0.0D0; T2=MAX(T2,AV(K,LS)-CV_BOUND(LS))
+	  JPLUS_OB=JPLUS_OB+JQW(1,LS)*T1
+	  HPLUS_OB=HPLUS_OB+HQW(1,LS)*T2
+	  KPLUS_OB=KPLUS_OB+KQW(1,LS)*T1
+	  NPLUS_OB=NPLUS_OB+NQW(1,LS)*T1
+	  JMIN_OB=JMIN_OB+JQW(1,LS)*T2
+	  HMIN_OB=HMIN_OB+HQW(1,LS)*T2
+	  KMIN_OB=KMIN_OB+KQW(1,LS)*T2
+	  NMIN_OB=NMIN_OB+NQW(1,LS)*T2
+	END DO
+	DO LS=1,NC+1
+	  K=J_PNT(ND,LS)
+	  T1=AV(K,LS)-0.5D0*I_M_IN_BND(LS)
+	  T2=I_M_IN_BND(LS)
+	  JPLUS_IB=JPLUS_IB+JQW(ND,LS)*T1
+	  HPLUS_IB=HPLUS_IB+HQW(ND,LS)*T2
+	  KPLUS_IB=KPLUS_IB+KQW(ND,LS)*T1
+	  NPLUS_IB=NPLUS_IB+NQW(ND,LS)*T1
+	  JMIN_IB=JMIN_IB+JQW(ND,LS)*T2
+	  HMIN_IB=HMIN_IB+HQW(ND,LS)*T2
+	  KMIN_IB=KMIN_IB+KQW(ND,LS)*T2
+	  NMIN_IB=NMIN_IB+NQW(ND,LS)*T2
 	END DO
 !
 ! Evaluate the H & N moments. These may be evaluated at the nodes,

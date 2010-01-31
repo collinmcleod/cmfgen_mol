@@ -6,6 +6,8 @@ C
 	1                NU_EVAL,DOPV,DELV_CONT,COMPUTE_ALL_CROSS)
 	IMPLICIT NONE
 C
+C Altered : 31-Jan-2010 : Fixed out-of-bounds array access.
+C
 C NCF represents the toal number of frequencies at which we solve the radiative
 C transfer equation. The frequencies are stored in the vector NU which
 C has been chosen to sample all lines and continuum edges adequately.
@@ -75,6 +77,7 @@ C
 	  DO WHILE( ABS( (NU_CONT(ML)-NU(L))/NU_CONT(ML)) .LE. DOP_RAT)
 	    NU_EVAL(L)=NU(L) 
 	    L=L+1
+	    IF(L .GT. NCF)EXIT
 	  END DO
 	END DO
 	NU_EVAL(1)=NU(1)

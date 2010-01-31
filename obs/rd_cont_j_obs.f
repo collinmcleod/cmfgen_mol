@@ -10,6 +10,7 @@
 	1           LST_ITERATION,LUER,LU_EDD,ACCESS_F,ND)
 	IMPLICIT NONE
 !
+! Altered 29-Jan-2010 : If frequency below minimum value, set J to J(last frequency).
 ! Created 28-Jan-2005
 !
 	INTEGER ND
@@ -34,6 +35,7 @@
 !
 	REAL*8 T1
 	INTEGER I
+	INTEGER IOS
 !
 ! Special treatment if first frequency. 
 !
@@ -54,7 +56,16 @@
 	DO WHILE(FL .LT. LOW_FREQ)
 	  HIGH_FREQ=LOW_FREQ
 	  RJ_HIGH(1:ND)=RJ_LOW(1:ND)
-	  READ(LU_EDD,REC=ACCESS_F)(RJ_LOW(I),I=1,ND),LOW_FREQ
+	  READ(LU_EDD,REC=ACCESS_F,IOSTAT=IOS)(RJ_LOW(I),I=1,ND),LOW_FREQ
+          IF(IOS. NE. 0)THEN
+            LOW_FREQ=HIGH_FREQ
+            RJ_LOW(1:ND)=RJ_HIGH(1:ND)
+            WRITE(LUER,*)'Error reading EDDFACTOR in RD_CONT_J'
+            WRITE(LUER,*)'LOW_FREQ=',LOW_FREQ
+            WRITE(LUER,*)'FL=',FL
+            WRITE(LUER,*)'ACCESS_F=',ACCESS_F
+            EXIT
+          END IF
           ACCESS_F=ACCESS_F+1
 	END DO
 !
@@ -63,7 +74,9 @@
 ! file value.
 !
         IF(FL .GE. HIGH_FREQ)THEN
-	   RJ(1:ND)=RJ_HIGH(1:ND)
+	  RJ(1:ND)=RJ_HIGH(1:ND)
+        ELSE IF(LOW_FREQ .EQ. HIGH_FREQ)THEN
+	  RJ(1:ND)=RJ_LOW(1:ND)
 	ELSE 
 	  T1=(FL-LOW_FREQ)/(HIGH_FREQ-LOW_FREQ)
 	  DO I=1,ND

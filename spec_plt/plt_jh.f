@@ -223,11 +223,10 @@
 	      EXIT
 	    END IF
 	  END DO
-	  ZM(ID)%NCF=ZM(ID)%NCF-1
 	CLOSE(LU_IN)
 	WRITE(T_OUT,*)'Successfully read in ',TRIM(ZM(ID)%FILENAME),' file as MODEL A (default)'
-	WRITE(T_OUT,*)'Number of depth points is',ZM(ID)%ND
-	WRITE(T_OUT,*)'Number of frequencies is ',ZM(ID)%NCF
+	WRITE(T_OUT,*)'    Number of depth points is',ZM(ID)%ND
+	WRITE(T_OUT,*)'Number of frequencies read is',ZM(ID)%NCF
 !
 ! Set default data types
 !
@@ -437,6 +436,13 @@
 !
 ! 
 !
+	ELSE IF(X(1:6) .EQ. 'FIXNCF')THEN
+	  ID=1
+	  OPEN(UNIT=LU_IN,FILE=ZM(ID)%FILENAME,STATUS='OLD',
+	1             RECL=REC_LENGTH,ACCESS='DIRECT',FORM='UNFORMATTED',IOSTAT=IOS)
+	    READ(LU_IN,REC=3)ST_REC,I,J
+	    WRITE(LU_IN,REC=3)ST_REC,ZM(ID)%NCF,ZM(ID)%ND
+	  CLOSE(LU_IN)
 	ELSE IF(X(1:4) .EQ. 'WRID')THEN
 	  DO ID=1,NUM_FILES
 	    WRITE(T_OUT,'(A,I2,A,A)')' ID=',ID,'          ',TRIM(ZM(ID)%FILENAME)
@@ -460,7 +466,12 @@
 	    ALLOCATE (ZM(ID)%RJ(ND,NCF))
 	    ALLOCATE (ZM(ID)%NU(NCF))
 	    DO ML=1,ZM(ID)%NCF
-	      READ(LU_IN,REC=ST_REC+ML-1)(ZM(ID)%RJ(I,ML),I=1,ZM(ID)%ND),ZM(ID)%NU(ML)
+	      READ(LU_IN,REC=ST_REC+ML-1,IOSTAT=IOS)(ZM(ID)%RJ(I,ML),I=1,ZM(ID)%ND),ZM(ID)%NU(ML)
+	      IF(IOS .NE. 0)THEN
+	        WRITE(T_OUT,*)'Error reading all frequencies'
+	        ZM(ID)%NCF=ML-1
+	        EXIT
+	      END IF
 	    END DO
 	  CLOSE(LU_IN)
 	  WRITE(T_OUT,*)'Successfully read in ',TRIM(ZM(ID)%FILENAME),' file'

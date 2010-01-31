@@ -87,31 +87,30 @@
 ! Determine ionzation fractions.
 !
 	DO ISPEC=1,NUM_SPECIES
-	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
-	    T1=0.0D0
-	    DO K=1,ND
-	      T2=SUM(ATM(ID)%XzV_F(:,K))
-	      T1=MAX(T1,T2/POP_SPECIES(K,ISPEC))
+	  IF(SPECIES_PRES(ISPEC))THEN
+	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	      T1=0.0D0
+	      DO K=1,ND
+	        T2=SUM(ATM(ID)%XzV_F(:,K))
+	        T1=MAX(T1,T2/POP_SPECIES(K,ISPEC))
+	      END DO
+	      MAX_RATIO(ID)=T1
 	    END DO
-	    MAX_RATIO(ID)=T1
-	    IF(ID .EQ. SPECIES_BEG_ID(ISPEC))THEN
-	      MAX_RATIO(ID+1)=MAXVAL(ATM(ID)%DXzV_F/POP_SPECIES(:,ISPEC))	   
-	    END IF
-	  END DO
+	    ID=SPECIES_END_ID(ISPEC)-1
+	    MAX_RATIO(ID+1)=MAXVAL(ATM(ID)%DXzV_F/POP_SPECIES(:,ISPEC))	   
+	  END IF
 	END DO
-!
-!	DO ID=1,NUM_IONS
-!	  WRITE(130,*)ID,MAX_RATIO(ID)
-!	END DO
 !
 ! Check whether the lowest ionization stages might be omitted.
 !
+	WRITE(LUER,'(A,A)')' Checking whether some low ionization stages ',
+	1                        'may be omitted from the model.'
 	DO ISPEC=1,NUM_SPECIES
 	  IF(SPECIES_PRES(ISPEC))THEN
 	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
-	      IF(MAX_RATIO(ID) .LT. LOW_LIMIT)THEN
+	      IF(MAX_RATIO(ID) .GT. LOW_LIMIT)THEN
 	        DO K=SPECIES_BEG_ID(ISPEC), ID-1
-	          WRITE(LUER,'(1X,A,A,ES8.2,A,ES8.2)')TRIM(ION_ID(ID)),
+	          WRITE(LUER,'(3X,A,T11,A,ES8.2,A,ES8.2)')TRIM(ION_ID(K)),
 	1           ' may not need to be include in model. Its maximum fractional abundance of ',
 	1           MAX_RATIO(K),' < ',LOW_LIMIT
 	        END DO
@@ -123,14 +122,21 @@
 !
 ! Check whether the highest ionization stages might be omitted.
 !
+	WRITE(LUER,'(A,A)')' Checking whether some high ionization stages ',
+	1                        'may be omitted from the model.'
 	DO ISPEC=1,NUM_SPECIES
 	  IF(SPECIES_PRES(ISPEC))THEN
 	    DO ID=SPECIES_END_ID(ISPEC),SPECIES_BEG_ID(ISPEC),-1
 	      IF(MAX_RATIO(ID) .GT. HIGH_LIMIT)THEN
 	        DO K=ID+1,SPECIES_END_ID(ISPEC)
-	          WRITE(LUER,'(1X,A,A,ES8.2,A,ES8.2)')TRIM(ION_ID(ID)),
-	1             ' may not need to be include in model. Its maximum fractional abundance of ',
-	1            MAX_RATIO(ID),' < ',HIGH_LIMIT
+	          IF(K .EQ. SPECIES_END_ID(ISPEC))THEN
+	            J=NINT(ATM(K-1)%ZXzV)+1
+	          ELSE
+	            J=NINT(ATM(K)%ZXzV)
+	          END IF
+	          WRITE(LUER,'(3X,A,T11,A,ES8.2,A,ES8.2)')TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(J)),
+	1             'may not need to be include in model. Its maximum fractional abundance is ',
+	1            MAX_RATIO(K),' < ',HIGH_LIMIT
 	        END DO
 	        EXIT
 	      END IF
@@ -142,8 +148,8 @@
 !
 	FIRST_TIME=.TRUE.
 	DO ISPEC=1,NUM_SPECIES
+	  ID=SPECIES_BEG_ID(ISPEC)
 	  IF(SPECIES_PRES(ISPEC) .AND. ATM(ID)%ZXzV .GT. 1.1D0)THEN
-	    ID=SPECIES_BEG_ID(ISPEC)
 	    IF(FIRST_TIME)THEN
 	      WRITE(LUER,'(A,A)')' Checking whether lower ionization stages ',
 	1                             'need to be included in model'
@@ -151,8 +157,9 @@
 	    END IF
 	    IF(MAX_RATIO(ID) .GT. 0.1D0)THEN
 	         K=NINT(ATM(ID)%ZXzV)-1
-	         WRITE(LUER,'(1X,A,T8,A,ES8.1,A)')TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(K)),
-	1              'may need to be included in the model (IF ~',ION_FRAC,')'
+	         WRITE(LUER,'(3X,A,T11,A,A,A,ES8.1,A)')TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(K)),
+	1              'may need to be included in the model (Maximum ',TRIM(ION_ID(ID)),
+	1              ' ionization fraction is',MAX_RATIO(ID),')'
 	    ELSE
 	         EXIT
 	    END IF
@@ -173,7 +180,7 @@
 	END DO
 !
 ! To check whether additional ionization stages need to be included,
-! we allow for the possibility that the previous ioization stage
+! we allow for the possibility that the previous ionization stage
 ! might not be dominant. Thus we multipy by ION_FRAC when its less
 ! than 1.
 ! 
@@ -200,7 +207,7 @@
 	1	          'Depth=',DPTH_INDX,'   T=',T_VAL,'   ED=',ED_VAL
 	           FIRST_TIME=.FALSE.
 	         END IF
-	         WRITE(LUER,'(1X,A,T9,A,ES8.1,A)')TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(ID)),
+	         WRITE(LUER,'(3X,A,T11,A,ES8.1,A)')TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(ID)),
 	1              'may need to be included in the model (IF ~',ION_FRAC,')'
 	       ELSE
 	         EXIT

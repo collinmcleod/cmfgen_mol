@@ -21,6 +21,7 @@ C
 	1              DEEP,ST_INDX,END_INDX)
 	IMPLICIT NONE
 C
+C Altered 31-Jan-2010 - Changed insertion at inner bundary to keep (R(ND-1)-R(ND))/(R(ND-2)-R(ND-1)) small.
 C Altered 12-Jun-2009 - Changed insertion at outer bundary to keep (R1-R2)/(R2-R3) small.
 C Altered 05-Jan-1998 - NEND replaced by ST_INDX, END_INDX
 C                         Changed to V2.
@@ -89,6 +90,19 @@ C
 	    REXT(J)=R(I)
 	    GRID(I)=J
 	  END DO
+C
+	  IF(END_INDX .EQ. ND)THEN
+	    T1=(R(ND-1)-R(ND))/(R(ND-2)-R(ND-1))
+	    T1=MIN(T1,0.1D0)
+	    REXT(NX-1)=(REXT(NX)+T1*REXT(NX-2))/(1.0D0+T1)
+!	    WRITE(6,*)' Information about insertion of extra grid points at inner boundary (INC_GRID option)'
+!	    WRITE(6,*)'   R ratio:',T1,(R(ND-1)-R(ND))/(R(ND-2)-R(ND-1))
+!	    WRITE(6,*)'REXT ratio:',(REXT(NX-1)-REXT(NX))/(REXT(NX-2)-REXT(NX-1)),
+!	1                           (REXT(NX-2)-REXT(NX-1))/(REXT(NX-3)-REXT(NX-2))
+!	    WRITE(6,*)REXT(NX-5:NX)
+!	    FLUSH(UNIT=6)
+	  END IF
+C
 	ELSE
 C
 C Check that REXT and GRID have been computed

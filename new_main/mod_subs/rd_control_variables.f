@@ -3,6 +3,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 31-Jan-2010 : INNER_BND_METH and OUTER_BND_METH options installed.
 ! Altered : 23-Nov-2007 : Optional LAM_SCALE_OPT variable included.
 ! Altered : 29-Jan-2006 : Control variables for relativistic transfer and time
 !                          dependent statistical equilibrium equations installed.
@@ -360,6 +361,23 @@ C
 C
 	  CALL RD_STORE_LOG(DIF,'DIF',L_TRUE,
 	1            'Use Diffusion approximation at inner boundary ?')
+	  IF(DIF)THEN
+	    INNER_BND_METH='DIFFUSION'
+	    CALL RD_STORE_CHAR(INNER_BND_METH,'IB_METH',L_FALSE,
+	1           'Inner boundary method (DIFFUSION, HOLLOW, or ZERO_FLUX)')
+	    IF(INNER_BND_METH .NE. 'DIFFUSION')THEN
+	      WRITE(LUER,*)'Error in RD_CONTROL_VARIABLES'
+	      WRITE(LUER,*)'Inconsistent inner boundary condition'
+	      WRITE(LUER,*)'DIF option and IB_METH are inconsistent'
+	      STOP
+	    END IF
+	  ELSE
+	    CALL RD_STORE_CHAR(INNER_BND_METH,'IB_METH',L_TRUE,
+	1           'Inner boundary method (DIFUSION, HOLLOW, or ZERO_FLUX)')
+	  END IF
+	  OUTER_BND_METH='HONJ'
+	  CALL RD_STORE_CHAR(OUTER_BND_METH,'OB_METH',L_FALSE,
+	1        'Outer boundary method (HONJ or HALF_MOM)')
 C
 	  CALL RD_STORE_LOG(RD_COHERENT_ES,'COH_ES',L_TRUE,
 	1            'Assume coherent electron scattering? ')

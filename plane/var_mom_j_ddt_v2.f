@@ -1,8 +1,9 @@
- 	MODULE MOD_VAR_HUB_J_V1
+ 	MODULE MOD_VAR_HUB_J_V2
 !
 	REAL*8, ALLOCATABLE :: JNU(:)
 	REAL*8, ALLOCATABLE :: JNUM1(:)
 	REAL*8, ALLOCATABLE :: JNU_OLDT(:)
+	REAL*8, ALLOCATABLE :: JNU_MOD(:)
 	REAL*8, ALLOCATABLE :: RSQ_HNU(:)
 	REAL*8, ALLOCATABLE :: RSQ_HNUM1(:)
 	REAL*8, ALLOCATABLE :: RSQ_HNU_OLDT(:)
@@ -41,8 +42,8 @@
 !
 	REAL*8 HONJ_OUTBC_PREV
 	REAL*8 HONJ_OUTBC_OLDT
-	REAL*8 HFLUX_AT_INB_OLDT
-	REAL*8 HFLUX_AT_INB_PREV
+	REAL*8 RSQH_AT_IB_OLDT
+	REAL*8 RSQH_AT_IB_PREV
 !
 	REAL*8 ROLD_ON_R
 	REAL*8 DELTA_TIME_SECS
@@ -50,7 +51,7 @@
 !
 	LOGICAL, SAVE :: FIRST_TIME=.TRUE.
 !
- 	END MODULE MOD_VAR_HUB_J_V1
+ 	END MODULE MOD_VAR_HUB_J_V2
 !
 ! This subroutine computes the variation of J as a function of the emissivity
 ! ETA and the opacity CHI.
@@ -81,18 +82,24 @@
 ! Note TA, TBC, TC, HU etc have been defined so that the program computes
 ! JNU and r^2 HNU.
 !
-	SUBROUTINE VAR_MOM_J_DDT_V1(ETA,CHI,ESEC,THETA,V,R,
+	SUBROUTINE VAR_MOM_J_DDT_V2(ETA,CHI,ESEC,THETA,V,R,
 	1                  TX,TVX,TX_DIF_d_T,TX_DIF_d_dTdR,
 	1                  TVX_DIF_d_T,TVX_DIF_d_dTdR,
-	1                  KI,WORKMAT,RHS_dHdCHI,
-	1                  F,HONJ_OUTBC,HFLUX_AT_INB,F_PREV,
+	1                  KI,WORKMAT,RHS_dHdCHI,F,
 	1                  DO_TIME_VAR,RELAX_PARAM,INIT,FREQ,dLOG_NU,
-	1                  DIF,dTdR,DBB,dDBBdT,IC,
-	1                  DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
- 	USE MOD_VAR_HUB_J_V1
+	1                  dTdR,DBB,dDBBdT,
+	1                  DO_THIS_TX_MATRIX,METHOD,
+	1                  INNER_BND_METH,OUTER_BND_METH,
+	1                  ND,NM,NM_KI)
+ 	USE MOD_VAR_HUB_J_V2
+	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
-! Created:   16-July-2006
+! Altered: 18-Jan-2010 - Changed to V2.
+!                        Installed INNER_BND_METH,OUTER_BND_METH and now use MOD_RAY_MOM_STORE.
+!                        Changes to allow "THIN" inner boundary condition, and more flexible
+!                          boundary conditions.
+! Created: 16-July-2006
 !
 	INTEGER ND
 	INTEGER NM
@@ -122,25 +129,32 @@
 ! "Eddington factors"
 !
 	REAL*8 F(ND)
-	REAL*8 F_PREV(ND)
 	REAL*8 HONJ_OUTBC
-	REAL*8 HFLUX_AT_INB
+	REAL*8 RSQH_AT_IB
+	REAL*8 RSQH_AT_OB
 !
 	REAL*8 dLOG_NU,dTdR,DBB,dDBBdT,IC
 	REAL*8 dNU_TERM_DIF_BC
-	REAL*8 dRHSdCHI_DIF_BC
+	REAL*8 dRHSdCHI_IB
+	REAL*8 dRHSdCHI_OB
 	REAL*8 FREQ
 	REAL*8 C_KMS
 	REAL*8 T1,T2,T3
+	REAL*8 MOD_DTAU
+	REAL*8 HPLUS,FPLUS
+	REAL*8 HMIN,FMIN
+	REAL*8 RSQ
 	REAL*8 RELAX_PARAM
-	CHARACTER*6 METHOD
+	CHARACTER(LEN=*) METHOD
+	CHARACTER(LEN=*) INNER_BND_METH
+	CHARACTER(LEN=*) OUTER_BND_METH
 !
 ! INIT is used to indicate that there is no coupling to the previous frequency.
 ! We are thus solving the normal continuum transfer equation (i.e. the absence
 ! of velocity fields)
 !
 	LOGICAL DO_TIME_VAR
-	LOGICAL DIF,INIT
+	LOGICAL INIT
 !
 	REAL*8 SPEED_OF_LIGHT
 	INTEGER ERROR_LU
@@ -157,6 +171,7 @@
 	  ALLOCATE ( JNU(ND) )
 	  ALLOCATE ( JNUM1(ND) )
 	  ALLOCATE ( JNU_OLDT(ND) )
+	  ALLOCATE ( JNU_MOD(ND) )
 	  ALLOCATE ( RSQ_HNU(ND) )
 	  ALLOCATE ( RSQ_HNUM1(ND) )
 	  ALLOCATE ( RSQ_HNU_OLDT(ND) )
@@ -209,13 +224,13 @@
 !
 	IF(DO_TIME_VAR)THEN
 	  CALL GET_JH_AT_PREV_TIME_STEP(JNU_OLDt,RSQ_HNU_OLDt,
-	1        HFLUX_AT_INB_OLDT,HONJ_OUTBC_OLDT,
+	1        RSQH_AT_IB_OLDT,HONJ_OUTBC_OLDT,
 	1        DELTA_TIME_SECS,FREQ,R,V,ND,INIT,'NORMAL')
 	  TA(1:ND)=R(1:ND)-1.0D-05*V(1:ND)*DELTA_TIME_SECS
 	  JNU_OLDT(1:ND)=JNU_OLDT(1:ND)/TA(1:ND)/TA(1:ND)
 	ELSE
 	  JNU_OLDT=0.0D0; RSQ_HNU_OLDt=0.0D0
-	  HFLUX_AT_INB_OLDT=0.0D0; HONJ_OUTBC_OLDT=0.0D0
+	  RSQH_AT_IB_OLDT=0.0D0; HONJ_OUTBC_OLDT=0.0D0
 	END IF
 !
 ! NB: The factor of 10^10 occurs because c. /\t is a length, and R in
@@ -344,44 +359,105 @@
 	END DO
 !
 ! Evaluate TA,TB,TC for boundary conditions
+! NB: GAM(1) is zero if inital frequency. Likewise, RECIP_CDELTAT is zero if not doing
+!            time variation.
 !
-	IF(.NOT. INIT)THEN
-	  PSI(1)=R(1)*R(1)*GAM(1)*HONJ_OUTBC
-	  PSIPREV(1)=R(1)*R(1)*GAM(1)*HONJ_OUTBC_PREV
-	END IF
-	T1=ROLD_ON_R**3
-	IF(DO_TIME_VAR)THEN
-	  DJDt(1)=R(1)*R(1)*dH(1)*HONJ_OUTBC
-	  DJDt_OLDT(1)=T1*R(1)*R(1)*dH(1)*HONJ_OUTBC_OLDT
-	END IF
-	TC(1)=-R(2)*R(2)*F(2)*Q(2)/DTAU(1)
-	TB(1)=R(1)*R(1)*( F(1)*Q(1)/DTAU(1) + HONJ_OUTBC ) + PSI(1) + DJDt(1)
-	XM(1)=PSIPREV(1)*JNUM1(1) + DJDT_OLDT(1)*JNU_OLDt(1)
+        HONJ_OUTBC=(HPLUS_OB-HMIN_OB)/(JPLUS_OB+JMIN_OB)
 	TA(1)=0.0D0
 	VB(1)=0.0D0
 	VC(1)=0.0D0
+        IF(OUTER_BND_METH .EQ. 'HONJ')THEN
+	  DJDt(1)=R(1)*R(1)*RECIP_CDELTAT*HONJ_OUTBC/CHI(1)
+	  DJDt_OLDT(1)=(ROLD_ON_R**3)*R(1)*R(1)*RECIP_CDELTAT*HONJ_OUTBC_OLDT/T1
+	  PSI(1)=R(1)*R(1)*GAM(1)*HONJ_OUTBC
+	  PSIPREV(1)=R(1)*R(1)*GAM(1)*HONJ_OUTBC_PREV
+	  TC(1)=-R(2)*R(2)*F(2)*Q(2)/DTAU(1)
+	  TB(1)=R(1)*R(1)*( F(1)*Q(1)/DTAU(1) + HONJ_OUTBC ) + PSI(1) + DJDt(1)
+	  XM(1)=PSIPREV(1)*JNUM1(1) + DJDT_OLDT(1)*JNU_OLDt(1)
+	  dRHSdCHI_OB=-XM(1)/CHI(1)
 !
-	HFLUX_AT_INB=DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
-	PSI(ND)=0.0D0
-	PSIPREV(ND)=0.0D0
-	IF(.NOT. INIT)THEN
-	  dNU_TERM_DIF_BC=0.0D0
-!	  dNU_TERM_DIF_BC=GAM(ND)*(HFLUX_AT_INB-HFLUX_AT_INB_PREV)
-	END IF
-	IF(DO_TIME_VAR)THEN
-	 DJDT(ND)=RECIP_CDELTAT/CHI(ND)
-	 DJDT_OLDT(ND)=DJDT(ND)*(HFLUX_AT_INB-HFLUX_AT_INB_OLDt*ROLD_ON_R)
-	END IF
-	TA(ND)=-R(ND-1)*R(ND-1)*F(ND-1)*Q(ND-1)/DTAU(ND-1)
-	IF(DIF)THEN
-	  TB(ND)=R(ND)*R(ND)*F(ND)/DTAU(ND-1)
-	  XM(ND)=HFLUX_AT_INB+DJDt_OLDT(ND)+dNU_TERM_DIF_BC
-	  dRHSdCHI_DIF_BC=-(HFLUX_AT_INB+DJDt_OLDT(ND)+
-	1         2.0D0*dNU_TERM_DIF_BC+DJDT(ND)*HFLUX_AT_INB)/CHI(ND)
+	ELSE IF(OUTER_BND_METH .EQ. 'HALF_MOM')THEN
+	  MOD_DTAU=0.5D0*(CHI(1)+CHI(2))*(R(1)-R(2))
+	  RSQ=R(1)*R(1)
+	  HPLUS=HPLUS_OB/JPLUS_OB
+	  FPLUS=KPLUS_OB/JPLUS_OB
+	  PSI(1)=RSQ*HPLUS*GAM(1)
+	  PSIPREV(1)=RSQ*HONJ_OUTBC_PREV*GAM(1)
+	  T1=R(1)*R(1)*RECIP_CDELTAT/CHI(1)
+	  DJDt(1)=HPLUS*T1
+	  DJDt_OLDt(1)=(ROLD_ON_R**3)*HONJ_OUTBC_OLDT*T1
+	  TC(1)=-R(2)*R(2)*F(2)/MOD_DTAU
+	  TB(1)=RSQ*( FPLUS/MOD_DTAU -  (1.0D0-FPLUS)/R(1)/CHI(1) + HPLUS ) + PSI(1) +DJDT(1)
+	  XM(1)=RSQ*( HMIN_OB - KMIN_OB/MOD_DTAU+(JMIN_OB-KMIN_OB)/R(1)/CHI(1)  +
+	1             GAM(1)*(HMIN_OB+HONJ_OUTBC_PREV*JNUM1(1)) ) +
+	1            (T1*HMIN_OB+DJDt_OLDt(1)*JNU_OLDt(1))
+	  dRHSdCHI_OB=RSQ*( (JMIN_OB-KMIN_OB)/R(1)/CHI(1)+GAM(1)*HMIN_OB ) + T1*HMIN_OB
+	  dRHSdCHI_OB=-dRHSdCHI_OB/CHI(1)
+	  XM(2)=XM(2)-JMIN_OB*TA(2)
 	ELSE
 	  I=ERROR_LU()
-	  WRITE(I,*)'Only diffusion approximation currently implemented'
-	  WRITE(I,*)'Routine is VAR_MOM_J_DDT_V1'
+	  WRITE(I,*)'Only HONJ & HALF_MD boundary conditions implemented at outer boundary'
+	  WRITE(I,*)'Routine is VAR_MOM_J_DDT_V2'
+	  STOP
+	END IF
+!
+	IF(INNER_BND_METH .EQ. 'DIFFUSION')THEN
+	  PSI(ND)=0.0D0
+	  PSIPREV(ND)=0.0D0
+	  DJDT(ND)=0.0D0
+	  DJDT_OLDt(ND)=0.0D0
+	  RSQH_AT_IB=DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
+!	  dNU_TERM_DIF_BC=GAM(ND)*(RSQH_AT_IB-RSQH_AT_IB_PREV)
+	  dNU_TERM_DIF_BC=0.0D0
+	  T1=RECIP_CDELTAT*(RSQH_AT_IB-RSQH_AT_IB_OLDt*ROLD_ON_R)/CHI(ND)
+	  TA(ND)=-R(ND-1)*R(ND-1)*F(ND-1)*Q(ND-1)/DTAU(ND-1)
+	  TB(ND)=R(ND)*R(ND)*F(ND)/DTAU(ND-1)
+	  XM(ND)=RSQH_AT_IB+T1+dNU_TERM_DIF_BC
+	  dRHSdCHI_IB=RSQH_AT_IB + T1 + dNU_TERM_DIF_BC + (RECIP_CDELTAT+GAM(ND)*RSQH_AT_IB)/CHI(ND)
+	  dRHSdCHI_IB=-RSQH_AT_IB/CHI(ND)
+!
+	ELSE IF(INNER_BND_METH .EQ. 'ZERO_FLUX')THEN
+!
+	  RSQH_AT_IB=0.0D0
+	  PSI(ND)=0.0D0
+	  PSIPREV(ND)=0.0D0
+	  TA(ND)=-R(ND-1)*R(ND-1)*F(ND-1)*Q(ND-1)/DTAU(ND-1)
+	  TB(ND)=R(ND)*R(ND)*F(ND)/DTAU(ND-1)
+	  XM(ND)=RSQH_AT_IB + DJDt(ND)*(RSQH_AT_IB-ROLD_ON_R*RSQH_AT_IB_OLDt)
+	  dRHSdCHI_IB=-DJDt(ND)*(RSQH_AT_IB-ROLD_ON_R*RSQH_AT_IB_OLDt)/CHI(ND)
+!
+	  TB(ND)=TB(ND)+0.1D0*R(ND)*R(ND)*F(ND)/DTAU(ND-1)
+	  XM(ND)=XM(ND)+0.1D0*R(ND)*R(ND)*F(ND)*(JPLUS_IB+JMIN_IB)/DTAU(ND-1)
+!
+! Since Q(ND)=1, we can still use DTAU(ND-1) at the inner boundary.
+! [Terms contain a /Q(ND)].
+!
+	ELSE IF(INNER_BND_METH(1:4) .EQ. 'HOLLOW')THEN
+	  RSQ=R(ND)*R(ND)
+	  HMIN=HMIN_IB/JMIN_IB
+	  FMIN=KMIN_IB/JMIN_IB
+	  TA(ND)=-R(ND-1)*R(ND-1)*F(ND-1)/DTAU(ND-1)
+	  TB(ND)=RSQ*( FMIN/DTAU(ND-1) + (1.0D0-FMIN)/R(ND)/CHI(ND) + HMIN*(1.0D0+GAM(ND)) )
+	  XM(ND)=RSQ*( HPLUS_IB-KPLUS_IB/DTAU(ND-1)-(JPLUS_IB-KPLUS_IB)/R(ND)/CHI(ND)
+	1              + GAM(ND)*(HPLUS_IB-RSQH_AT_IB_PREV/RSQ) )
+	  XM(ND-1)=XM(ND-1)-JPLUS_IB*TC(ND-1)
+	  dRHSdCHI_IB=RSQ*( (JPLUS_IB-KPLUS_IB)/R(ND)/CHI(ND)-GAM(ND)*HPLUS_IB )/CHI(ND)
+!
+	  TB(ND)=TB(ND)+0.1D0*RSQ*FMIN/DTAU(ND-1)
+	  XM(ND)=XM(ND)+0.1D0*RSQ*FMIN*(JPLUS_IB+JMIN_IB)/DTAU(ND-1)
+!
+! For consistency PSI is the term on the LHS, and PSIRPEV is the term on the RHS.
+!
+	  IF(.NOT. INIT)THEN
+	    PSI(ND)=RSQ*HMIN*GAM(ND) 
+	    PSIPREV(ND)=-GAM(ND)*RSQH_AT_IB_PREV/JNUM1(ND)
+	  END IF
+	  DJDt(ND)=0.0D0
+	  DJDt_OLDt(ND)=0.0D0
+	ELSE
+	  I=ERROR_LU()
+	  WRITE(I,*)'Only DIF (diffusion), ZERO_FLUX & HOLLOW boundary conditions currently implemented'
+	  WRITE(I,*)'Routine is VAR_MOM_J_DDT_V2'
 	  STOP
 	END IF
 	TC(ND)=0.0D0
@@ -392,34 +468,23 @@
 !
 	CALL THOMAS(TA,TB,TC,XM,ND,1)
 !
-	DO I=1,ND
-	  JNU(I)=XM(I)
-	END DO
+	JNU_MOD(1:ND)=XM(1:ND)
+        IF(INNER_BND_METH(1:4) .EQ. 'HOLLOW')THEN
+          RSQH_AT_IB=R(ND)*R(ND)*(HPLUS_IB-HMIN*XM(ND))
+          XM(ND)=XM(ND)+JPLUS_IB
+        END IF
+        IF(OUTER_BND_METH .EQ. 'HALF_MOM')THEN
+          RSQH_AT_OB=R(1)*R(1)*(HPLUS*XM(1)-HMIN_OB)
+          XM(1)=XM(1)+JMIN_OB
+        ELSE
+          RSQH_AT_OB=R(1)*R(1)*HONJ_OUTBC*XM(1)
+        END IF
+!
+	JNU(1:ND)=XM(1:ND)
 	DO I=1,ND-1
 	  RSQ_HNU(I)=(HU(I)*XM(I+1)-HL(I)*XM(I))+HS(I)*RSQ_HNUM1(I)+HT(I)*RSQ_HNU_OLDT(I)
 	END DO
 !
-	T1=ROLD_ON_R**3
-	I=ND-4
-	IF(.NOT. INIT)THEN
-	  WRITE(194,'(5ES22.8)')FREQ,T1,RECIP_CDELTAT,XM(I),JNU_OLDT(I)
-	  WRITE(195,'(8ES22.14)')FREQ,RECIP_CDELTAT*(XM(I)-T1*JNU_OLDT(I)),
-	1        2.0D0*(RSQ_HNU(I-1)-RSQ_HNU(I))/R(I)/R(I)/(R(I+1)-R(I-1)),
-	1        V(I)*(XM(I)-JNUM1(I))/R(I)/dLOG_NU/C_KMS,
-	1        (CHI(I)-ESEC(I))*XM(I)-ETA(I),
-	1        CHI(I),ESEC(I),ETA(I)
-	  WRITE(196,'(8ES22.14)')FREQ,RECIP_CDELTAT*(XM(I)-T1*JNU_OLDT(I))/CHI(I),
-	1        2.0D0*Q(I)*(RSQ_HNU(I-1)-RSQ_HNU(I))/R(I)/R(I)/(DTAU(I)+DTAU(I-1)),
-	1        V(I)*(XM(I)-JNUM1(I))/R(I)/dLOG_NU/C_KMS/CHI(I),
-	1        XM(I)*(1.0D0-THETA(I))-SOURCE(I),
-	1        CHI(I),ESEC(I),ETA(I)
-	  I=ND
-	  T1=(R(ND)*R(ND)*F(ND)*XM(ND)-R(ND-1)*R(ND-1)*F(ND-1)*Q(ND-1)*XM(ND-1))/DTAU(ND-1)
-	  T2=HFLUX_AT_INB+DJDt_OLDT(ND)+dNU_TERM_DIF_BC
-	  WRITE(182,'(18ES23.15)')FREQ,RECIP_CDELTAT*(HFLUX_AT_INB-ROLD_ON_R*HFLUX_AT_INB_PREV)/CHI(I),
-	1        T1,T2,T1-T2,HFLUX_AT_INB,HFLUX_AT_INB_PREV,DJDt_OLDT(I),dNU_TERM_DIF_BC,
-	1        XM(I-1),XM(I),F(I-1),F(I),Q(I-1),Q(I),CHI(I),ESEC(I),ETA(I)
-	END IF
 ! 
 !
 ! The J and H components of the radiation field have been found. We can thus
@@ -428,13 +493,17 @@
 ! Compute d{non-radiation field}/dchi matrix.
 !
 	CALL TUNE(1,'MOM_EDD')
-	CALL EDD_J_HUB_VAR_V1(KI,RHS_dHdCHI,WORKMAT,
+	CALL EDD_J_HUB_VAR_V2(KI,RHS_dHdCHI,WORKMAT,
 	1                SOURCE,CHI,ESEC,THETA,DTAU,R,
 	1                F,Q,HU,HL,HS,HT,RSQ_DTAUONQ,
 	1                W,WPREV,PSI,PSIPREV,DJDt,DJDT_OLDT,
-	1                JNU,JNUM1,JNU_OLDT,
+	1                JNU,JNUM1,JNU_OLDT,JNU_MOD,
 	1                RSQ_HNUM1,RSQ_HNU_OLDT,
-	1                dRHSdCHI_DIF_BC,DIF,ND,NM_KI)
+	1                dRHSdCHI_IB,dRHSdCHI_OB,
+	1                JMIN_IB,KMIN_IB,JPLUS_IB,KPLUS_IB,
+	1                JMIN_OB,KMIN_OB,JPLUS_OB,KPLUS_OB,
+	1                INNER_BND_METH,OUTER_BND_METH,
+	1                ND,NM_KI)
 	CALL TUNE(2,'MOM_EDD')
 !
 ! Evaluate the intensity variations.
@@ -463,7 +532,7 @@
 	  TX_OLD_d_T(I)=TX_DIF_d_T(I)
 	  TX_OLD_d_dTdR(I)=TX_DIF_d_dTDR(I)
 	END DO
-	IF(DIF)THEN
+	IF(INNER_BND_METH .EQ. 'DIFFUSION')THEN
 	  TX_DIF_d_T(1)=PSIPREV(1)*TX_DIF_d_T(1)
 	  TX_DIF_d_dTdR(1)=PSIPREV(1)*TX_DIF_d_dTdR(1)
 	  DO I=2,ND-1
@@ -506,7 +575,7 @@
 	dDBBdT_PREV=dDBBdT
 	CHI_AT_INB_PREV=CHI(ND)
 	HONJ_OUTBC_PREV=HONJ_OUTBC
-	HFLUX_AT_INB_PREV=HFLUX_AT_INB
+	RSQH_AT_IB_PREV=RSQH_AT_IB
 !
 	RETURN
 	END
