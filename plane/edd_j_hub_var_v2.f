@@ -225,16 +225,14 @@
 	1               ( PSI(ND)*JNU(ND)- PSIPREV(ND)*JNUM1(ND) )/CHI(ND) +
 	1               ( DJDT(ND)*JNU(ND)- DJDt_OLDt(ND)*JNU_OLDt(ND) )/CHI(ND)
 	ELSE IF(INNER_BND_METH .EQ. 'ZERO_FLUX')THEN
-	  IF(dRHSdCHI_IB .LE. 1.0D+200)THEN
-	    T1= ( R(ND)*R(ND)*EDDF(ND)*JNU(ND) - R(ND-1)*R(ND-1)*EDDF(ND-1)*Q(ND-1)*JNU(ND-1) )
+	  T1= ( R(ND)*R(ND)*EDDF(ND)*JNU(ND) - R(ND-1)*R(ND-1)*EDDF(ND-1)*Q(ND-1)*JNU(ND-1) )
 	1           /DTAU(ND-1)/DTAU(ND-1)
-	    DO L=ND-5,ND
-	      VK(ND,L,1)=VK(ND,L,1)+T1*dTAUdCHI(ND-1,L)
-	    END DO
-	    VK(ND,ND,1)=VK(ND,ND,1) + dRHSdCHI_IB +
+	  DO L=ND-5,ND
+	    VK(ND,L,1)=VK(ND,L,1)+T1*dTAUdCHI(ND-1,L)
+	  END DO
+	  VK(ND,ND,1)=VK(ND,ND,1) + dRHSdCHI_IB +
 	1               ( PSI(ND)*JNU(ND)- PSIPREV(ND)*JNUM1(ND) )/CHI(ND) +
 	1               ( DJDT(ND)*JNU(ND)- DJDt_OLDt(ND)*JNU_OLDt(ND) )/CHI(ND)
-	  END IF
 	ELSE IF(INNER_BND_METH .EQ. 'HOLLOW')THEN
 	  T1= ( R(ND)*R(ND)*(JNU_MOD(ND)*(KMIN_IB/JMIN_IB)+KPLUS_IB) -
 	1          R(ND-1)*R(ND-1)*EDDF(ND-1)*JNU(ND-1)  )
