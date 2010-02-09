@@ -6,6 +6,7 @@ C
 	1                LUIN,FILENAME,SL_OPTION)
 	IMPLICIT NONE
 C
+C Altered 04-Feb-2010 : Handles extra blank lines/comments mixed with levels.
 C Altered 30-Sep-2005 : Removed warning about mixed parity.
 C Altered 31-Jan-1997 : Only a warning is output if SUPER-LEVELS are defined
 C                          with mixed parity.
@@ -80,13 +81,14 @@ C
 C
 C NB: All entries must be separated by at LEAST 2 spaces.
 C
-	READ(LUIN,'(A)')STRING		!Blankline
+	READ(LUIN,'(A)')STRING				!Blankline
 	DO I=1,N_F
 	  F_TO_S(I)=0.
-	  READ(LUIN,'(A)')STRING
-	  DO WHILE(STRING(1:1) .EQ. ' ')	!Strip leading blanks.
-	    STRING(1:)=STRING(2:)
+	  STRING=' '
+	  DO WHILE (STRING .EQ . ' ' .OR. STRING(1:1) .EQ. '!')
+	    READ(LUIN,'(A)')STRING
 	  END DO
+	  STRING=ADJUSTL(STRING)			!Strip leading blanks.
 	  J=INDEX(STRING,'  ')
 	  IF(STRING(1:J) .NE. LEVNAME_F(I))THEN
 	    WRITE(LUER,*)'Error in RD_F_TO_S_IDS_V2'
@@ -110,7 +112,10 @@ C
 	  READ(STRING(J:),*)F_TO_S(I),INT_SEQ(I)
 	END DO
 !
-	CALL DO_SL_ADJUSTEMENT(F_TO_S,INT_SEQ,N_F,N_S,SL_OPTION)
+! The ' ' in the call prevents diagnostic information from being output.
+! Nominally it should be the F_TO_S FILENME.
+!
+	CALL DO_SL_ADJUSTEMENT(F_TO_S,INT_SEQ,N_F,N_S,SL_OPTION,' ')
 !
 	IF(MAXVAL(F_TO_S) .NE. N_S)THEN
 	  WRITE(LUER,*)' '
