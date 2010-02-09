@@ -172,7 +172,7 @@
 	    STOP
 	  END IF
 !
-	  T1=1.0D-14
+	  T1=1.0D-07
 	  IF(EQUAL(V(1),OLD_V(1),T1))THEN
 	     OLD_V(1)=V(1)
 	     LOG_OLD_V(1)=LOG_V(1)
