@@ -3,6 +3,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 01-Feb-2010 : GAMRAY_TRANS read inserted
 ! Altered : 31-Jan-2010 : INNER_BND_METH and OUTER_BND_METH options installed.
 ! Altered : 23-Nov-2007 : Optional LAM_SCALE_OPT variable included.
 ! Altered : 29-Jan-2006 : Control variables for relativistic transfer and time
@@ -251,6 +252,8 @@ C
 	1            'Allow for radiactive decays')
 	    CALL RD_STORE_NCHAR(SN_T_OPTION,'SN_T_OPT',ITEN,L_TRUE,
 	1           'Method to get T with non-GRID option (USE_T_IN or USE_HYDRO)')
+	    CALL RD_STORE_NCHAR(GAMRAY_TRANS,'GAMRAY_TRANS',ITEN,L_TRUE,
+	1           'NONLOCAL or LOCAL gamma-ray enegry transport')
 	    N_IB_INS=2
 	    N_OB_INS=3
 	    RMAX_ON_RCORE=-1.0D0		!Implies use default.
