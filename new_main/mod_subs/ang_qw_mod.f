@@ -41,7 +41,7 @@
         REAL*8 V_AT_RMAX                !Used if we extend the atmosphere.
         REAL*8 RMAX_OBS
         REAL*8 HFLUX_AT_OB		!In comoving frame
-	REAL*8 HFLUX_AT_IB
+        REAL*8 HFLUX_AT_IB
 !
 ! We allocate memory for the following vectors as we use them for the regular
 ! flux computation, and when extra depth points are inserted (ACCURATE=.TRUE.)
