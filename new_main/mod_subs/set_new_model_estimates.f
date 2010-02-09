@@ -117,6 +117,7 @@
 !
 	LOGICAL LST_DEPTH_ONLY
 	LOGICAL FIRST
+	LOGICAL COMPUTED
 !
 	CHARACTER*80 TMP_STRING
 	CHARACTER*20 SECTION
@@ -550,8 +551,13 @@
 ! ROSSMEAN already includes the effect of clumping.
 !
 	    CHI(1:ND)=ROSSMEAN(1:ND)
-	    WRITE(LUER,*)'Callng COMP_GREY_V3 in SET_NEW'
-	    CALL COMP_GREY_V3(POPS,TGREY,TA,ROSSMEAN,PLANCKMEAN,LUER,NC,ND,NP,NT)
+	    WRITE(LUER,*)'Callng COMP_GREY_V4 in SET_NEW'
+	    CALL COMP_GREY_V4(POPS,TGREY,TA,ROSSMEAN,PLANCKMEAN,COMPUTED,LUER,NC,ND,NP,NT)
+	    IF(.NOT. COMPUTED)THEN
+	      WRITE(LUER,*)'Unable to compute grey temperature structure'
+	      WRITE(LUER,*)'As this is needed to provide initial T estimate, stopping code'
+	      STOP
+	    END IF
 !
 ! SCALE_GREY modifies the computed grey temperature distribution according
 ! to that computed in a previous model.
