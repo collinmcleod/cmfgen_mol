@@ -18,6 +18,9 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 03-Feb-2010 : Simply set DC=1 if RR/PR is with 10% of unity. There
+!                         is potentially a problem with the simple iteration
+!                         for low iozaton stages with high temperatures.
 ! Altered 19-Sep-2007 : Species length increased from 5 to 6 (handle ArVIII).
 ! Altered 14-May-2006 : For a high ionization species, ground state population is 
 !                       read in from file. This allows estimate of ion population 
@@ -339,13 +342,17 @@
 	GS_DC(1:ND)=RECOM_SUM(1:ND)/PHOT_SUM(1:ND)
 	T1=5.0D0
 	DO I=1,ND
-	  DO J=1,10
-	    T1=LOG( GS_DC(I)*(T1/T(I))**1.5 )/HDKT/FEDGE(1)+1.0/T(I)
-	    T1=1.0/T1
-	  END DO
+	  IF(ABS(GS_DC(I)-1.0D0) .LT. 0.1D0)THEN
+	    T1=T(I)
+	  ELSE
+	    DO J=1,10
+	      T1=LOG( GS_DC(I)*(T1/T(I))**1.5 )/HDKT/FEDGE(1)+1.0/T(I)
+	      T1=1.0/T1
+	    END DO
+	  END IF
 	  T_EXC(I)=T1
 	  IF(I .EQ. 1 .OR. I .EQ. ND)THEN
-	    WRITE(T_OUT,'(I4,2X,A,F8.3,3X,A,F8.3)')I,'T=',T(I),'T_EXC=',T_EXC(I)
+	    WRITE(T_OUT,'(I4,2X,A,F8.3,3X,A,F8.3,3X,A,ES8.2)')I,'T=',T(I),'T_EXC=',T_EXC(I),'RR/PR=',GS_DC(I)
 	  END IF
 	END DO	
 	WRITE(T_OUT,*)GS_DC(1),FEDGE(1)
