@@ -96,6 +96,7 @@
 	LOGICAL REVISE_R_GRID
 	CHARACTER(LEN=10) NEW_RGRID_TYPE
 	CHARACTER(LEN=10) SN_T_OPTION
+	CHARACTER(LEN=10) GAMRAY_TRANS
 !
 ! Variables for including clumping under the assumption that the clumping
 ! occurs on scales much smaller than any of the transfer scales. Valid
