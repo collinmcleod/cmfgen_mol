@@ -31,7 +31,7 @@ OBJ = $(LIB)(adjust_r_grid_v2.o)\
       $(LIB)(check_param_consistency.o)\
       $(LIB)(comp_j_blank.o)\
       $(LIB)(comp_grey_v2.o)\
-      $(LIB)(comp_grey_v3.o)\
+      $(LIB)(comp_grey_v4.o)\
       $(LIB)(comp_opac.o)\
       $(LIB)(comp_var_opac.o)\
       $(LIB)(do_var_cont.o)\
