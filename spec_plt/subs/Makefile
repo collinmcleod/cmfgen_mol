@@ -44,7 +44,7 @@ $(LIB) : $(OBJ)
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f
-	$(F90) -c $(FD)  $<
+	$(F90) -c $(FG)  $<
 	ar ruv $(LIB) $*.o
 
 convolve.o : convolve.f parameters.inc constants.inc
