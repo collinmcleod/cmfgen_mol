@@ -490,7 +490,7 @@
 !
 ! 
 !
-	CALL GEN_ASCI_OPEN(LU_SE,'STEQ_VALS','UNKNOWN',' ',' ',IZERO,IOS)
+	CALL GEN_ASCI_OPEN(LU_SE,'STEQ_VALS','UNKNOWN','APPEND',' ',IZERO,IOS)
 !
 ! Open a scratch file to record model parameters. This file will eventually
 ! be renamed MODEL.
@@ -2424,7 +2424,7 @@
 ! TA is a work vector. TB initially used for extended SOB.
 !
 	   IF(ACCURATE)THEN
-	     CALL REGRID_H(TB,REXT,RSQHNU,HFLUX_AT_OB,HFLUX_AT_IN,NDEXT,TA)
+	     CALL REGRID_H(TB,REXT,RSQHNU,HFLUX_AT_OB,HFLUX_AT_IB,NDEXT,TA)
 	     DO I=1,ND
 	       SOB(I)=TB(POS_IN_NEW_GRID(I))
 	     END DO
@@ -2837,26 +2837,29 @@
 	IF(LST_ITERATION)THEN
 !
 ! Compute the grey temperature distribution and the Rosseland optical 
-! depth scale (returned in TA).
+! depth scale (returned in TA). When CHK is TRUE, the grey temperature
+! distribution has been successfully computed.
 !
 	  CHI(1:ND)=ROSS_MEAN(1:ND)*CLUMP_FAC(1:ND)
 	  TCHI(1:ND)=PLANCK_MEAN(1:ND)*CLUMP_FAC(1:ND)
-	  CALL COMP_GREY_V3(POPS,TGREY,TA,CHI,TCHI,LUER,NC,ND,NP,NT)
+	  CALL COMP_GREY_V4(POPS,TGREY,TA,CHI,TCHI,CHK,LUER,NC,ND,NP,NT)
 !
-	  OPEN(UNIT=LUIN,FILE='GREY_SCL_FACOUT',STATUS='UNKNOWN')
-	    WRITE(LUIN,'(A)')'!'
-	    WRITE(LUIN,'(A,8X,A,7X,A,7X,A,6X,A)')'!','Log(Tau)','T/T(grey)','T(10^4 K)','L'
-	    WRITE(LUIN,'(A)')'!'
-	    WRITE(LUIN,*)ND
-	    DO I=1,ND
-	      IF(TA(I) .GT. 0)THEN
-	        WRITE(LUIN,'(2X,3ES16.6,4X,I3)')LOG10(TA(I)),T(I)/TGREY(I),T(I),I
-	      ELSE
-	        WRITE(LUER,'(A)')' Bad Roseeland optical depth scale for T/TGREY output'
-	        WRITE(LUIN,'(A)')' Bad Roseeland optical depth scale for T/TGREY output'
-	        EXIT
-	      END IF
-            END DO
+	  IF(CHK)THEN
+	    OPEN(UNIT=LUIN,FILE='GREY_SCL_FACOUT',STATUS='UNKNOWN')
+	      WRITE(LUIN,'(A)')'!'
+	      WRITE(LUIN,'(A,8X,A,7X,A,7X,A,6X,A)')'!','Log(Tau)','T/T(grey)','T(10^4 K)','L'
+	      WRITE(LUIN,'(A)')'!'
+	      WRITE(LUIN,*)ND
+	      DO I=1,ND
+	        IF(TA(I) .GT. 0)THEN
+	          WRITE(LUIN,'(2X,3ES16.6,4X,I3)')LOG10(TA(I)),T(I)/TGREY(I),T(I),I
+	        ELSE
+	          WRITE(LUER,'(A)')' Bad Roseeland optical depth scale for T/TGREY output'
+	          WRITE(LUIN,'(A)')' Bad Roseeland optical depth scale for T/TGREY output'
+	          EXIT
+	        END IF
+              END DO
+	    END IF
 	  CLOSE(LUIN)
 	END IF
 !
