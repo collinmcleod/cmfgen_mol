@@ -1157,7 +1157,7 @@
 	    WRITE(6,*)' '
 	    WRITE(6,*)' TIT  LX  LY  XU '
 	    WRITE(6,*)' CF:   Plot cummulative spectrum as a function of impact parameter'
-	    WRITE(6,*)' IP:   Plot spectrum as a function of impact parameter'
+	    WRITE(6,*)' IP:   Plot spectrum at a given impact parameter'
 	    WRITE(6,*)' SP:   Plot spectrum inside and outside impact parameter p'
 	    WRITE(6,*)' INU:  Plot I(p) for a given frequency'
 	    WRITE(6,*)' INU2: Plot I(p) for a given frequency band'
