@@ -95,6 +95,7 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered:  2-Feb-2010 - Bug fix with DJDt_OLDT(1).
 ! Altered: 18-Jan-2010 - Changed to V2.
 !                        Installed INNER_BND_METH,OUTER_BND_METH and now use MOD_RAY_MOM_STORE.
 !                        Changes to allow "THIN" inner boundary condition, and more flexible
@@ -362,19 +363,22 @@
 ! NB: GAM(1) is zero if inital frequency. Likewise, RECIP_CDELTAT is zero if not doing
 !            time variation.
 !
-        HONJ_OUTBC=(HPLUS_OB-HMIN_OB)/(JPLUS_OB+JMIN_OB)
+! NB: dRHSdCHI_OB is only used for contributions directly related to CHI, but not
+! those related to PSI and DJDt.
+!
 	TA(1)=0.0D0
 	VB(1)=0.0D0
 	VC(1)=0.0D0
+        HONJ_OUTBC=(HPLUS_OB-HMIN_OB)/(JPLUS_OB+JMIN_OB)
         IF(OUTER_BND_METH .EQ. 'HONJ')THEN
 	  DJDt(1)=R(1)*R(1)*RECIP_CDELTAT*HONJ_OUTBC/CHI(1)
-	  DJDt_OLDT(1)=(ROLD_ON_R**3)*R(1)*R(1)*RECIP_CDELTAT*HONJ_OUTBC_OLDT/T1
+	  DJDt_OLDT(1)=(ROLD_ON_R**3)*R(1)*R(1)*RECIP_CDELTAT*HONJ_OUTBC_OLDT/CHI(1)
 	  PSI(1)=R(1)*R(1)*GAM(1)*HONJ_OUTBC
 	  PSIPREV(1)=R(1)*R(1)*GAM(1)*HONJ_OUTBC_PREV
 	  TC(1)=-R(2)*R(2)*F(2)*Q(2)/DTAU(1)
 	  TB(1)=R(1)*R(1)*( F(1)*Q(1)/DTAU(1) + HONJ_OUTBC ) + PSI(1) + DJDt(1)
 	  XM(1)=PSIPREV(1)*JNUM1(1) + DJDT_OLDT(1)*JNU_OLDt(1)
-	  dRHSdCHI_OB=-XM(1)/CHI(1)
+	  dRHSdCHI_OB=0.0D0
 !
 	ELSE IF(OUTER_BND_METH .EQ. 'HALF_MOM')THEN
 	  MOD_DTAU=0.5D0*(CHI(1)+CHI(2))*(R(1)-R(2))
@@ -421,10 +425,13 @@
 	  RSQH_AT_IB=0.0D0
 	  PSI(ND)=0.0D0
 	  PSIPREV(ND)=0.0D0
+	  DJDT(ND)=0.0D0
+	  DJDT_OLDt(ND)=0.0D0
 	  TA(ND)=-R(ND-1)*R(ND-1)*F(ND-1)*Q(ND-1)/DTAU(ND-1)
 	  TB(ND)=R(ND)*R(ND)*F(ND)/DTAU(ND-1)
-	  XM(ND)=RSQH_AT_IB + DJDt(ND)*(RSQH_AT_IB-ROLD_ON_R*RSQH_AT_IB_OLDt)
-	  dRHSdCHI_IB=-DJDt(ND)*(RSQH_AT_IB-ROLD_ON_R*RSQH_AT_IB_OLDt)/CHI(ND)
+	  T1=RECIP_CDELTAt*(RSQH_AT_IB-ROLD_ON_R*RSQH_AT_IB_OLDt)/CHI(ND)
+	  XM(ND)=RSQH_AT_IB + T1
+	  dRHSdCHI_IB=-T1/CHI(ND)
 !
 	  TB(ND)=TB(ND)+0.1D0*R(ND)*R(ND)*F(ND)/DTAU(ND-1)
 	  XM(ND)=XM(ND)+0.1D0*R(ND)*R(ND)*F(ND)*(JPLUS_IB+JMIN_IB)/DTAU(ND-1)
