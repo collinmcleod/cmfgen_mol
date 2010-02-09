@@ -332,7 +332,7 @@
 	        WRITE(LUER,*)'Check your MODEL_SPEC file for typo''s'
 	        STOP
 	      END IF
-	      WRITE(6,*)ID,ION_ID(ID)
+!	      WRITE(6,*)ID,ION_ID(ID)
 	    ELSE IF(AT_LEAST_ONE_ION_PRES)THEN
 	      FND_END_OF_IONS=.TRUE.
 	    END IF
