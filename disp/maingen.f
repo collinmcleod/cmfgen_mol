@@ -2245,7 +2245,7 @@
 	        IF(XSPEC .NE. 'ALL')EXIT
 	      END IF
 	    END DO
-	    YAXIS='Fractional abundance (N\dX\u/N\dA/u)'
+	    YAXIS='Fractional abundance (N\dX\u/N\dA\u)'
 	  ELSE
 	    DO ISPEC=1,NSPEC
 	      IF(XSPEC .EQ. SPECIES(ISPEC) .OR. (XSPEC .EQ. 'ALL' .AND.
