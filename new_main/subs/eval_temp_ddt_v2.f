@@ -277,19 +277,20 @@
 !
 	  OPEN(UNIT=7,FILE='ENERGY_COMP',STATUS='UNKNOWN')
 	    WRITE(7,'(A)')'!'
-	    WRITE(7,'(A)')'! Energy summery (ergs/cm^3)'
+	    WRITE(7,'(A)')'! Energy summary (ergs/cm^3)'
 	    WRITE(7,'(A,E10.4)')'! Delta t=',DELTA_T_SECS
 	    WRITE(7,'(A)')'!'
 	    WRITE(7,'(A)')'! NB: Radiative energy density assumes a BB at T(elec).'
 	    WRITE(7,'(A)')'!'
-	    WRITE(7,'(A,2(15X,A),5(8X,A))')'Depth','R','V','    Ek','    Ei',
-	1                                   '  Erad','Enuc/s','  Enuc'
+	    WRITE(7,'(A,3(14X,A),6(3X,A))')'Depth','R','V','T',
+	1                 ' Ek(ejecta)','Ek(thermal)','E(internal)',
+	1                 '       Erad','     Enuc/s','       Enuc'
 	    T1=4*ACOS(-1.0D0)*1.0D-10
 	    DO I=1,ND
 	      T2=T1*EK_VEC(I)*(1.0D0+GAMMA(I))*T(I)*DELTA_T_SECS
 	      T3=T1*EI_VEC(I)*INT_EN(I)*DELTA_T_SECS
 	      T4=4.0D+16*STEFAN_BOLTZ()*(T(I)**4)/SPEED_OF_LIGHT()
-	      WRITE(7,'(I5,2ES16.6,5ES14.5)')I,R(I),V(I),T2,T3,T4,
+	      WRITE(7,'(I5,3ES15.5,6ES14.5)')I,R(I),V(I),T(I),0.5D+10*DENSITY(I)*(V(I)**2),T2,T3,T4,
 	1		RADIOACTIVE_DECAY_ENERGY(I),RADIOACTIVE_DECAY_ENERGY(I)*DELTA_T_SECS      
 	    END DO
 	  CLOSE(UNIT=7)
