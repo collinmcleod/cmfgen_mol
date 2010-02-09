@@ -34,6 +34,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(fixpop_t.o)\
       $(LIB)(fixpop_in_ba_v3.o)\
       $(LIB)(generate_full_matrix_v3.o)\
+      $(LIB)(get_non_loc_gamma_energy.o)\
       $(LIB)(get_pops_at_prev_time_step_v2.o)\
       $(LIB)(get_pops_at_prev_time_step_v3.o)\
       $(LIB)(get_pops_at_prev_time_step_v4.o)\
@@ -78,6 +79,7 @@ CHG=$(LIB_MOD)(chg_exch_mod_v3.o)
 MOD=$(LIB_MOD)(mod_cmfgen.o)
 DIS=$(LIB_MOD)(mod_lev_dis_blk.o)
 CONT=$(LIB_MOD)(control_variable_mod.o)
+NUC=$(LIB_MOD)(nuc_iso_mod.o)
 
 HYD=$(LIB_MOD)(cmf_hydro_module.o)
 
@@ -109,9 +111,13 @@ $(LIB)(check_ions_present.o) : check_ions_present.f $(MOD)
 	$(F90) -c $(OPTION) check_ions_present.f
 	ar ruv $(LIB) check_ions_present.o
 
-$(LIB)(rd_sn_data.o) : rd_sn_data.f $(CONT)
+$(LIB)(rd_sn_data.o) : rd_sn_data.f $(MOD) $(CONT) $(NUC)
 	$(F90) -c $(OPTION) rd_sn_data.f
 	ar ruv $(LIB) rd_sn_data.o
+
+$(LIB)(get_non_loc_gamma_energy.o) : get_non_loc_gamma_energy.f $(CONT) $(NUC)
+	$(F90) -c $(OPTION) get_non_loc_gamma_energy.f
+	ar ruv $(LIB) get_non_loc_gamma_energy.o
 
 $(LIB)(read_seq_time_file_v1.o) : read_seq_time_file_v1.f $(MOD)
 	$(F90) -c $(OPTION) read_seq_time_file_v1.f
