@@ -42,6 +42,7 @@
         INTEGER MNL_F,MNUP_F
         INTEGER DPTH_INDX
         INTEGER VAR_INDX
+        INTEGER INDX_BA_METH
 !
 	REAL*8 VB(ND),VC(ND)
         REAL*8 T1,T2,T3,T4
@@ -179,9 +180,14 @@
 ! contribution. We use TA as a zeroed vec for ESEC, which was subtracted
 ! from CHI_CONT inside BA_UPDATE_V7.
 !
+	    INDX_BA_METH=ND+1
+	    IF(NEW_LINE_BA)INDX_BA_METH=41			!Set to 1 for NEW_LINE_BA
 	    IF(NEW_LINE_BA .AND. .NOT. LAMBDA_ITERATION)THEN
+	      TA(1:INDX_BA_METH-1)=ETA_NOSCAT(1:INDX_BA_METH-1); TA(INDX_BA_METH:ND)=ETA(INDX_BA_METH:ND)
+	      TB(1:INDX_BA_METH-1)=CHI_NOSCAT(1:INDX_BA_METH-1); TB(INDX_BA_METH:ND)=CHI(INDX_BA_METH:ND)
+	      TC(1:INDX_BA_METH-1)=0.0D0;                        TC(INDX_BA_METH:ND)=CHI_SCAT(INDX_BA_METH:ND)
               CALL BA_UPDATE_V7(VJ,VCHI_ALL,VETA_ALL,
-	1             ETA,CHI,CHI_SCAT,T,POPS,RJ,FL,FQW,
+	1             TA,TB,TC,T,POPS,RJ,FL,FQW,
 	1             COMPUTE_NEW_CROSS,FINAL_CONSTANT_CROSS,DO_SRCE_VAR_ONLY,
 	1             BA_CHK_FAC,NION,NT,NUM_BNDS,ND,DST,DEND)
 	    ELSE IF(.NOT. LAMBDA_ITERATION)THEN
@@ -525,8 +531,8 @@
 	        SCL_FAC=1.0D0
 	      END IF
 !
-	      IF(NEW_LINE_BA)THEN
-	        DO L=1,ND
+!	      IF(NEW_LINE_BA)THEN
+	        DO L=INDX_BA_METH,ND
 	          K=GET_DIAG(L)
 	          T3=SCL_FAC
 	          IF(POP_ATOM(L) .GE. SCL_LINE_DENSITY_LIMIT)T3=1.0D0
@@ -538,8 +544,8 @@
 	          T2=LINE_EMIS_CON(SIM_INDX)*dU_RAT_dT(L,SIM_INDX)*POPS(NUP,L)
 	          BA_T(NT,K,L)=BA_T(NT,K,L) + T3*(T1*JBAR_SIM(L,SIM_INDX) - T2*LINE_QW_SUM(SIM_INDX)) 
 	        END DO
-	      ELSE
-	        DO L=1,ND
+!	      ELSE
+	        DO L=1,INDX_BA_METH-1
 	          K=GET_DIAG(L)
 	          T3=SCL_FAC
 	          IF(POP_ATOM(L) .GE. SCL_LINE_DENSITY_LIMIT)T3=1.0D0
@@ -556,7 +562,7 @@
 	            END DO
 	          END IF
 	        END DO
-	      END IF
+!	      END IF
 	      CALL TUNE(ITWO,'dBA_LINE')
 !
 ! Must now zero dZ since next time it is used it will be for a new line.
