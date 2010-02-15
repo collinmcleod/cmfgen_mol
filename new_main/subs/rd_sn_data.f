@@ -386,7 +386,7 @@
 ! Get non-local energy deposition, if important.
 ! This replaces that computed by DO_SPECIES_DECAYS computed earlier.
 !
-	CALL GET_NON_LOCAL_GAMMA_ENERGY(V,SN_AGE_DAYS,ND,LU)
+	CALL GET_NON_LOCAL_GAMMA_ENERGY(V,ND,LU)
 !
 	CALL OUT_SN_POPS_V3('SN_DATA_INPUT_CHK',SN_AGE_DAYS,USE_OLD_MF_OUTPUT,ND,LU)
 !
