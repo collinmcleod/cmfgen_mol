@@ -367,12 +367,13 @@
 	      END DO
 	   END IF
 !
-	   T1=CHI(29)-CHI_SCAT(29)
-!	   WRITE(221,'(12ES16.8)')FL,ETA(29),CHI(29),T1,RJ(29),ETA(29)/T1,
-!	1             TX(29,29,1),TX(29,29,3),TX(29,29,2),TX(29,29,4),
-!	1             1.0D0+(TX(29,29,1)+TX(29,29,3))*T1/RJ(29), 
-!	1             (TX(29,29,2)+TX(29,29,4))*T1-1.0D0
-!	   WRITE(224,'(12ES16.8)')FL,ETA_CONT(29),CHI_CONT(29),T1,RJ(29),TX(29,29,1:6)
+!	   K=70
+!	   T1=CHI(K)-CHI_SCAT(K)
+!	   WRITE(221,'(12ES16.8)')FL,ETA(K),CHI(K),T1,RJ(K),ETA(K)/T1,
+!	1             TX(K,K,1),TX(K,K,3),TX(K,K,2),TX(K,K,4),
+!	1             1.0D0+(TX(K,K,1)+TX(K,K,3))*T1/RJ(K), 
+!	1             (TX(K,K,2)+TX(K,K,4))*T1-1.0D0
+!	   WRITE(224,'(12ES16.8)')FL,ETA_CONT(K),CHI_CONT(K),T1,RJ(K),TX(K,K,1:6)
 !
 ! We use TB as a temporary vector for J in the electron scattering emissivity.
 ! Its value depends on whether we have coherent or incoherent e.s.
@@ -396,6 +397,11 @@
 	        TVX(K,J,5)=TVX(K,J,5) + TVX(K,J,1) + TVX(K,J,2)*TB(J)
 	      END DO
 	    END DO
+!
+!	   K=70
+!	   T1=CHI(K)-CHI_SCAT(K)
+!	   WRITE(225,'(12ES16.8)')FL,ETA(K),CHI(K),T1,RJ(K),ETA(K)/T1,
+!	1             1.0D0+TX(K,K,3)*T1/RJ(K),TX(K,K,4)*T1-1.0D0,TX(K,K,5)*ESEC(K)/RJ(K)
 !
 ! Update line variation matrices. Note that the matrices now refer to the
 ! variation with respect to levels (e.g. the lower and upper level) and
