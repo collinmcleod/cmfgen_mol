@@ -454,9 +454,9 @@
 	CNT_FIX_BA=0
 	MAXCH_SUM=0.0D0
 	LST_ITERATION=.FALSE.
-	DPTH_INDX=29
+	DPTH_INDX=70
 	DPTH_INDX=MIN(DPTH_INDX,ND)		!Thus no problem if 84 > ND
-	VAR_INDX=226
+	VAR_INDX=NT
 	VAR_INDX=MIN(VAR_INDX,NT)
 	CALL GET_VERBOSE_INFO(VERBOSE)
 !
@@ -520,6 +520,9 @@
 	  DO_GREY_T_AUTO=.TRUE.
 	  CALL RD_STORE_LOG(DO_GREY_T_AUTO,'DO_GT_AUTO',L_FALSE,
 	1                         'Do a grey temperature iteration after revising USE_FIXED_J?')
+	  DO_T_AUTO=.FALSE.
+	  CALL RD_STORE_LOG(DO_T_AUTO,'DO_T_AUTO',L_FALSE,
+	1                         'Allow temperature to vary when sufficent convergence has been obtained?')
 	  CALL CLEAN_RD_STORE()
 	  CLOSE(UNIT=LUIN)
 	NUM_ITS_RD=NUM_ITS_TO_DO
@@ -4113,7 +4116,11 @@
 ! If we have reached desired convergence, we do one final loop
 ! so as to write out all relevant model data.  
 !
-	  IF( ( (RD_LAMBDA .AND. .NOT. DO_LAMBDA_AUTO) .OR. .NOT. LAMBDA_ITERATION) .AND.
+	  IF(DO_T_AUTO .AND. RD_FIX_T .AND. MAXCH .LT. 50.0D0 .AND. .NOT. LAMBDA_ITERATION)THEN
+	       RD_FIX_T=.FALSE.
+	       FIXED_T=RD_FIX_T
+	       CALL UPDATE_KEYWORD(L_FALSE,'[FIX_T]','VADAT',L_TRUE,L_TRUE,LUIN)
+	  ELSE IF( ( (RD_LAMBDA .AND. .NOT. DO_LAMBDA_AUTO) .OR. .NOT. LAMBDA_ITERATION) .AND.
 	1      MAXCH .LT. EPS .AND. NUM_ITS_TO_DO .NE. 0)THEN
 	      NUM_ITS_TO_DO=1
 	  ELSE
