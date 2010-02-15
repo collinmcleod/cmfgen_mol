@@ -4,7 +4,7 @@
 ! read in from:
 !                current_nonlocal_decay_energy.dat
 !
-	SUBROUTINE GET_NON_LOCAL_GAMMA_ENERGY(V,SN_AGE_DAYS,ND,LU)
+	SUBROUTINE GET_NON_LOCAL_GAMMA_ENERGY(V,ND,LU)
 	USE CONTROL_VARIABLE_MOD
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
@@ -12,7 +12,6 @@
 	INTEGER ND
 	INTEGER LU
 	REAL*8 V(ND)
-	REAL*8 SN_AGE_DAYS
 !
 ! Variables for reading in the non-local energy deposition from outside file
 !
@@ -32,7 +31,7 @@
 !
 	   READ(LU,*) NDTMP
 	   READ(LU,*) T1
-	   IF (T1.NE.SN_AGE_DAYS) THEN
+	   IF (T1 .NE. SN_AGE_DAYS) THEN
 	      WRITE(LUER,'(A80)') 'New time for Gamma-ray transport calculation is incompatible'
 	      WRITE(LUER,'(A50)') 'Monte Carlo new time [days]',T1
 	      WRITE(LUER,'(A50)') 'CMFGEN new time [days]',SN_AGE_DAYS
