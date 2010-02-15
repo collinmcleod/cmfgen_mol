@@ -146,6 +146,9 @@ C
 	WRITE(T_OUT,*)'IR     :: Z(ID)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
 	WRITE(T_OUT,*)'WRST   :: Writes fractional corections to file (same format as STEQ_VALS'
 	WRITE(T_OUT,*)' '
+	WRITE(T_OUT,*)'FDG    :: Fudge individual values at a single depth and output to SCRTEMP'
+	WRITE(T_OUT,*)'FDGV   :: Fudge values over a ranges of depths (% change) and output to SCRTEMP'
+	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'E   :: EXIT'
 	WRITE(T_OUT,*)' '
 	PLT_OPT='R'
@@ -371,7 +374,7 @@ C
 	    T1=0.0D0; T2=0.0D0
 	    CALL GEN_IN(T1,'% change in variable')
 	    IF(T1 .EQ. 0.0D0)CALL GEN_IN(T2,'Change in variable')
-	    CALL GEN_IN(LIMITS,J,NLIM_MAX,'Depths (L1:L2, L3:L4 etc)')
+	    CALL GEN_IN(LIMITS,J,NLIM_MAX,'Depths (L1 to L2, L3 to L4 etc)')
 	    DO I=1,J,2
 	      DO ID=LIMITS(I),LIMITS(I+1)
 	        T3=POPS(IVAR,ID,IT)
