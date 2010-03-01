@@ -10,6 +10,7 @@
 	1             T,OLD_T,OLD_ED,N,ND,NSPEC,NSPEC_MAX,PRES,ION_ID,MODE)
 	IMPLICIT NONE
 !
+! Altered 22-Feb-2010 - Altered computation of PHI to help problems with dynamic range.
 ! Altered 15-May-2009 - VERBOSE option installed.
 ! Altered 03-Feb-2008 - Can now use excitation temperatures (MODE=TX), as well 
 !                         as departure coefficients (MODE=DC), to evaluate
@@ -147,14 +148,14 @@
 !
 	ZPFN(NSPEC)=ZION-1
 	ZPFN(NSPEC+1)=ZION
-	LOG_RGU=2.07078D-22
-	LOG_RGU=LOG(LOG_RGU)
 	T1=HDKT*EDGE(1)
 	DO I=1,ND
 	  U(I,NSPEC)=GHE2(1)
 	  U(I,NSPEC+1)=GION
 	  PHI(I,NSPEC+1)=0.0D0
-	  PHI(I,NSPEC)=HE2(1,I)*EXP( LOG_RGU+T1/T(I) )/T(I)/SQRT(T(I))
+	  LOG_RGU=2.07078D-22*HE2(1,I)
+	  LOG_RGU=LOG(LOG_RGU)
+	  PHI(I,NSPEC)=EXP( LOG_RGU+T1/T(I) )/T(I)/SQRT(T(I))
 	  DO J=2,N
 	    T2=HDKT*(EDGE(J)-EDGE(1))
 	    U(I,NSPEC)=U(I,NSPEC) + GHE2(J)*EXP(T2/T(I))*W_HE2(J,I)*(HE2(J,I)/HE2(1,I))
