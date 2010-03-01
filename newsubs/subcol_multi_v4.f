@@ -138,10 +138,12 @@ C Rates are written using BRAT since BRAT is assumed to remain constant
 C during the linearization.
 C
 	      IF(L .NE. U)THEN
-	        BRAT=(HN_F(I,K)/HNST_F(I,K))/(HN_S(L,K)/HNST_S(L,K))
+	        BRAT=(HN_F(I,K)/HN_S(L,K))*(HNST_S(L,K)/HNST_F(I,K))
+!	        BRAT=(HN_F(I,K)/HNST_F(I,K))/(HN_S(L,K)/HNST_S(L,K))
 	        CIJ=CIJ*BRAT*HNST_F(I,K)/HNST_S(L,K)*(W_F(J,K)/W_F(I,K))
 C
-	        BRAT=(HN_F(J,K)/HNST_F(J,K))/(HN_S(U,K)/HNST_S(U,K))
+	        BRAT=(HN_F(J,K)/HN_S(U,K))*(HNST_S(U,K)/HNST_F(J,K))
+!	        BRAT=(HN_F(J,K)/HNST_F(J,K))/(HN_S(U,K)/HNST_S(U,K))
 	        CJI=CJI*BRAT*HNST_F(J,K)/HNST_S(U,K)
 C
 	        COL_S(L,U,K)=COL_S(L,U,K)+CIJ
@@ -169,7 +171,7 @@ C
 	    L=F_TO_S_MAPPING(I)    
 	    CII=8.63D-08*ED(K)*OMEGA_F(I,I)/GHYD_F(I)/SQRT(T(K))
 	    X=HDKT*EDGE_F(I)/T(K)
-	    CII=CII*EXP(-X)*HNST_F(I,K)/HNST_S(L,K)
+	    CII=CII*EXP(-X)*(HNST_F(I,K)/HNST_S(L,K))
 	    COL_S(L,L,K)=COL_S(L,L,K)+CII
 	    DCOL_S(L,L,K)=DCOL_S(L,L,K)+
 	1       CII*( dln_OMEGA_dlnT(I,I) - 2.0D0 - dlnHNST_S_dlnT(L,K) )/T(K)

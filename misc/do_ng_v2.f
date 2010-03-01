@@ -150,10 +150,15 @@
 	  IF(DO_REGARDLESS)THEN
 	    CALL GEN_IN(SCALE_INDIVIDUALLY,'Scale each population individually at each depth to limit change')
 	  END IF
-	ELSE IF(OPTION(1:2) .EQ.'AV')THEN
+	ELSE IF(OPTION(1:2) .EQ. 'AV')THEN
 	  N_ITS_TO_RD=2
 	  CALL GEN_IN(ND_ST,'Only do AVeraging if depth is .GE. ND_ST')
 	  CALL GEN_IN(ND_END,'Only do AVeraging if depth is .LE. ND_END')
+	ELSE IF(OPTION(1:2) .EQ. 'TG')THEN
+	  N_ITS_TO_RD=3
+	  CALL GEN_IN(ND_ST,'Only do NG acceleration for the depth in .GE. ND_ST')
+	  CALL GEN_IN(ND_END,'Only do NG acceleration for the depth in .LE. ND_END')
+	  CALL GEN_IN(IT_STEP,'Iteration step size for NG acceleration')
 	ELSE IF(OPTION(1:3) .EQ. 'NSR')THEN
 	  N_ITS_TO_RD=2
 	  SCALE_FAC=2.0D0
@@ -233,6 +238,21 @@
 	    DO I=1,NT+3
 	      BIG_POPS(I,J)=0.5D0*(RDPOPS(I,J,1)+RDPOPS(I,J,2))
 	    END DO
+	  END DO
+	  NG_DONE=.TRUE.
+	ELSE IF(OPTION(1:2) .EQ. 'TG')THEN
+	  BIG_POPS=RDPOPS(:,:,1)
+	  DO J=ND_ST,ND_END
+	    T1=(RDPOPS(NT,J,2)-RDPOPS(NT,J,3))/(RDPOPS(NT,J,1)-RDPOPS(NT,J,2))
+	    WRITE(6,*)'r1=',T1
+	    IF(T1 .GT. 0)THEN
+	      DO I=1,NT
+	        T2=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/(T1-1.0D0)
+	        IF(T2 .GT. RDPOPS(I,J,1))T2=RDPOPS(I,J,1)
+	        IF(T2 .LT. -0.5D0*RDPOPS(I,J,1))T2=-0.5D0*RDPOPS(I,J,1)
+	        BIG_POPS(I,J)=RDPOPS(I,J,1)+T2
+	      END DO
+	    END IF
 	  END DO
 	  NG_DONE=.TRUE.
 	ELSE IF(OPTION(1:3) .EQ. 'NSR')THEN

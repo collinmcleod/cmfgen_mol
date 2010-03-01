@@ -366,16 +366,17 @@ C
 	  CALL GRAMON_PGPLOT('V(km/s)',Ylabel,' ',' ')
 	  GOTO 200
 	ELSE IF(PLT_OPT(1:4) .EQ. 'FDGV')THEN
-	  IT=NIT; ID=ND; IVAR=NT; LIMITS(:)=0; LIMITS(1)=1; LIMITS(NLIM_MAX)=ND
+	  IT=NIT; ID=ND; IVAR=NT; LIMITS(:)=0; LIMITS(1)=1; LIMITS(2)=ND
 	  CALL GEN_IN(IT,'Iteration # (zero to exit)')
+	  T1=0.0D0; T2=0.0D0
 	  DO WHILE(1 .EQ. 1)
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)')
 	    IF(IVAR .EQ. 0)EXIT
-	    T1=0.0D0; T2=0.0D0
 	    CALL GEN_IN(T1,'% change in variable')
 	    IF(T1 .EQ. 0.0D0)CALL GEN_IN(T2,'Change in variable')
 	    CALL GEN_IN(LIMITS,J,NLIM_MAX,'Depths (L1 to L2, L3 to L4 etc)')
 	    DO I=1,J,2
+	      IF(LIMITS(I) .EQ. 0)EXIT
 	      DO ID=LIMITS(I),LIMITS(I+1)
 	        T3=POPS(IVAR,ID,IT)
 	        POPS(IVAR,ID,IT)=T3*(1.0D0+T1/100.0D0)+T2
