@@ -41,6 +41,9 @@ C
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 18-Feb-2010 : Changed order of times in (HNST_S(J,I)*CNM(J,J))*ED(I)/DI_S(I).
+!                         Using HNST*CNM instead of HNST/DI_S*CNM should prevent NANs
+!                           over a larger dynamic range of T
 ! Altered 30-Jan-2004 : Replaced by 0.0 by 0.0D0 everywhere.
 !                         Important in cool objects where collisions are more 
 !                         important than the radiation field.
@@ -192,7 +195,7 @@ C
 	        T2=T2+( HN_S(L,I)*DCNM(L,J)-HN_S(J,I)*DCNM(J,L) )
 	      END DO
 !
-	      SE(ID)%BA(J,VION,M,I)=SE(ID)%BA(J,VION,M,I) + HNST_S(J,I)*ED(I)/DI_S(I)*CNM(J,J)
+	      SE(ID)%BA(J,VION,M,I)=SE(ID)%BA(J,VION,M,I) + (HNST_S(J,I)*CNM(J,J))*ED(I)/DI_S(I)
 	      SE(ID)%BA(J,VED,M,I) =SE(ID)%BA(J,VED,M,I) + T1+CNM(J,J)*(2*HNST_S(J,I)-HN_S(J,I))
 	      SE(ID)%BA(J,VT,M,I)  =SE(ID)%BA(J,VT,M,I) +
 	1                              ED(I)*( T2+(HNST_S(J,I)-HN_S(J,I))*DCNM(J,J)+

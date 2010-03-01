@@ -80,7 +80,8 @@
 	L=(NUM_BNDS/2)+1
 !
 	DO K=DST,DEND			!Which depth point.
-	  B_RAT=(DI(ION_LEV,K)/DIST(ION_LEV,K))*(DIST(1,K)/DI(1,K))
+	  B_RAT=(DIST(1,K)/DIST(ION_LEV,K))*(DI(ION_LEV,K)/DI(1,K))
+!	  B_RAT=(DI(ION_LEV,K)/DIST(ION_LEV,K))*(DIST(1,K)/DI(1,K))
 	  DO J=1,NLEV			!Which equation (for S.E. only)
 	    IF(WSE(J,K) .NE. 0)THEN
 	      WSE_BY_RJ=WSE(J,K)*JPHOT(K)

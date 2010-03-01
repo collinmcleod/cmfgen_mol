@@ -144,7 +144,7 @@
 	        ELSE
 	          READ(LU)I,NX,ZXzV
 	          IF(FIRST)THEN
-	            WRITE(LUER,'(A,A,2(A,I5),A,F4.1)')'read_seq_time_file_v1: ',
+	            WRITE(LUER,'(A4,A,2(A,I5),A,F4.1)')'read_seq_time_file_v1: ',
 	1                   TRIM(SPECIES_NAME),': I=',I,'  NX=',NX,'  ZxZV=',ZXzV
 	          END IF
 	          ID=ID_BEG+NINT(ZXzV-ATM(ID_BEG)%ZXzV)
