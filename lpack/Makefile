@@ -1,7 +1,7 @@
 #
 include ../Makefile_definitions
 
-LIB = $(LIB_DIR)liblapack.a
+LIB = $(LIB_DIR)libmy_lapack.a
 
 OBJ =  dgeequ.o  dgetrf.o  dlamch.o  ieeeck.o  lsame.o\
        dgetf2.o  dgetrs.o  dlaswp.o  ilaenv.o

@@ -42,6 +42,8 @@
 	REAL*8, ALLOCATABLE :: R(:)			!ND
 	REAL*8, ALLOCATABLE :: V(:)			!ND
 	REAL*8, ALLOCATABLE :: SIGMA(:)			!ND
+	REAL*8 TA(2000)
+	REAL*8 TB(2000)
 !
 ! Local variables which are adjusted to match the particular model under
 ! consideration.
@@ -49,11 +51,13 @@
 	REAL*8 T1,T2,T3
 	REAL*8 SCALE_FAC
 	REAL*8 BIG_FAC
+	REAL*8 SF1,SF2
 !
 	INTEGER ND,NT
 	INTEGER NBAND
 	INTEGER ND_ST
 	INTEGER ND_END
+	INTEGER IT1,IT2
 !
 	INTEGER IOS
 	INTEGER IREC
@@ -63,6 +67,7 @@
 	INTEGER N_ITS_TO_RD
 	INTEGER IT_STEP
 	INTEGER I,J,K
+	INTEGER IVAR
 !
 	INTEGER, PARAMETER :: RITE_N_TIMES=1
 	INTEGER, PARAMETER :: T_OUT=6
@@ -152,8 +157,12 @@
 	  END IF
 	ELSE IF(OPTION(1:2) .EQ. 'AV')THEN
 	  N_ITS_TO_RD=2
+	  CALL GEN_IN(N_ITS_TO_RD,'Number of iterations to read')
 	  CALL GEN_IN(ND_ST,'Only do AVeraging if depth is .GE. ND_ST')
 	  CALL GEN_IN(ND_END,'Only do AVeraging if depth is .LE. ND_END')
+	ELSE IF(OPTION(1:3) .EQ. 'FID' .OR. OPTION(1:4) .EQ. 'FFID')THEN
+	  N_ITS_TO_RD=3
+	  CALL GEN_IN(N_ITS_TO_RD,'Number of iterations to read')
 	ELSE IF(OPTION(1:2) .EQ. 'TG')THEN
 	  N_ITS_TO_RD=3
 	  CALL GEN_IN(ND_ST,'Only do NG acceleration for the depth in .GE. ND_ST')
@@ -233,10 +242,12 @@
 !
 	  WRITE(6,*)'Finished NG accleration'
 	ELSE IF(OPTION(1:2) .EQ. 'AV')THEN
+	  IT1=1; CALL GEN_IN(IT1,'Iteration')
+	  IT2=2; CALL GEN_IN(IT2,'Iteration 2')
 	  BIG_POPS=RDPOPS(:,:,1)
 	  DO J=ND_ST,ND_END
 	    DO I=1,NT+3
-	      BIG_POPS(I,J)=0.5D0*(RDPOPS(I,J,1)+RDPOPS(I,J,2))
+	      BIG_POPS(I,J)=0.5D0*(RDPOPS(I,J,IT1)+RDPOPS(I,J,IT2))
 	    END DO
 	  END DO
 	  NG_DONE=.TRUE.
@@ -255,6 +266,48 @@
 	    END IF
 	  END DO
 	  NG_DONE=.TRUE.
+	ELSE IF(OPTION(1:3) .EQ. 'FID')THEN
+	  BIG_POPS=RDPOPS(:,:,1)
+	  CALL GEN_IN(ND_ST,'Depth to change')
+	  IT1=1; IT2=2
+	  DO WHILE(ND_ST .GT. 0 .AND. ND_ST .LE. ND)
+	    J=ND_ST
+	    CALL GEN_IN(IT1,'Highest iteration')
+	    CALL GEN_IN(IT2,'Lowest iteration')
+	    WRITE(6,*)RDPOPS(NT,J,IT1),RDPOPS(NT,J,IT2)
+	    CALL GEN_IN(SF1,'SE equation IT1') 
+	    CALL GEN_IN(SF2,'SE equation IT2') 
+	    IVAR=NT
+	    CALL GEN_IN(IVAR,'Variable?')
+	    T1=-SF2/(SF1-SF2); T2=SF1/(SF1-SF2)
+	    SF1=T1; SF2=T2
+	    WRITE(6,*)RDPOPS(IVAR,J,IT1),RDPOPS(IVAR,J,IT2),SF1*RDPOPS(IVAR,J,IT1)+SF2*RDPOPS(IVAR,J,IT2)
+	    DO I=1,NT
+	      BIG_POPS(I,J)=SF1*RDPOPS(I,J,IT1)+SF2*RDPOPS(I,J,IT2)
+	    END DO
+	    NG_DONE=.TRUE.
+	    CALL GEN_IN(ND_ST,'Depth to change')
+	  END DO
+	ELSE IF(OPTION(1:4) .EQ. 'FFID')THEN
+	  BIG_POPS=RDPOPS(:,:,1)
+	  OPEN(UNIT=22,STATUS='OLD',ACTION='READ',FILE='SE')
+	  DO WHILE(1 .EQ. 1)
+	    READ(22,*,END=200)ND_ST,ND_END
+	    READ(22,*,END=200)IT1,IT2
+	    READ(22,*)TB(ND_ST:ND_END)
+	    READ(22,*)TA(ND_ST:ND_END)
+	    DO J=ND_ST,ND_END
+	      T1=-TB(J)/(TA(J)-TB(J)); T2=TA(J)/(TA(J)-TB(J))
+	      TA(J)=T1; TB(J)=T2
+	      WRITE(6,*)RDPOPS(NT,J,IT1),RDPOPS(NT,J,IT2),TA(J)*RDPOPS(NT,J,IT1)+TB(J)*RDPOPS(NT,J,IT2)
+	      WRITE(21,*)RDPOPS(NT,J,IT1),RDPOPS(NT,J,IT2),TA(J)*RDPOPS(NT,J,IT1)+TB(J)*RDPOPS(NT,J,IT2)
+	      DO I=1,NT
+	        BIG_POPS(I,J)=TA(J)*RDPOPS(I,J,IT1)+TB(J)*RDPOPS(I,J,IT2)
+	      END DO
+	    END DO
+	    NG_DONE=.TRUE.
+	  END DO
+200	  CONTINUE
 	ELSE IF(OPTION(1:3) .EQ. 'NSR')THEN
 	  K=NINT(SCALE_FAC)
 	  DO J=ND_ST,ND_END

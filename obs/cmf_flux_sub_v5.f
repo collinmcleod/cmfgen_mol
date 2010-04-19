@@ -48,7 +48,7 @@
 !
 ! Maximum number of lines whose profile overlap at a given frequency.
 !
-	INTEGER, PARAMETER :: MAX_SIM=700
+	INTEGER, PARAMETER :: MAX_SIM=1000
 !
 ! Allow space to be set aside for the intrinsic line profiles. This saves 
 ! computational efort. An error message will be printed if these values

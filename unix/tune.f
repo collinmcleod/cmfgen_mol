@@ -24,6 +24,8 @@ C
         SUBROUTINE TUNE(LRUN,IDENT)
         IMPLICIT NONE
 !
+! Altered 08-Mar-2010 : Change variable for system clock to 8 bytes.
+!                          This prevents loss of elapsed time due to clock rollover.
 ! Altered 11-Nov-2000 : Call to F90 SYSTEM_CLOCK routine implemented.
 !                       Wall time now returened as in original VMS routine.
 !                       Counters now initialized if LRUN=0 is passed.
@@ -41,9 +43,9 @@ C
         CHARACTER*30 IDLIST(MAX_IDS)
         INTEGER I
 !
-	INTEGER IEND_WALL
-	INTEGER IC0,IR0,IM0,IT1
-	INTEGER IST_WALL(MAX_IDS)
+	INTEGER*8 IEND_WALL
+	INTEGER*8 IC0,IR0,IM0,IT1
+	INTEGER*8 IST_WALL(MAX_IDS)
 	REAL*8 CLK_PERIOD,RR0
 !
 	REAL*4 ETIME,TARRY(2)

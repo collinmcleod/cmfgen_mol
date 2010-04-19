@@ -294,12 +294,29 @@
 	  INCL_ADVEC_TERMS_IN_TRANS_EQ=.FALSE.
 	  USE_LAM_ES=.FALSE.
 	  CALL RD_STORE_LOG(USE_J_REL,'USE_J_REL',L_FALSE,'Use relativistic moment solver?')
+	  IF( USE_J_REL)THEN
+	    INCL_REL_TERMS=.TRUE.
+	    INCL_ADVEC_TERMS_IN_TRANS_EQ=.TRUE.
+	  END IF
 	  CALL RD_STORE_LOG(INCL_REL_TERMS,'INCL_REL',L_FALSE,'Include relativistic terms?')
 	  CALL RD_STORE_LOG(INCL_ADVEC_TERMS_IN_TRANS_EQ,'INCL_ADV_TRANS',L_FALSE,
 	1    'Include advection terms in transfer equation?')
+	  INCL_DJDT_TERMS=.FALSE.
+	  CALL RD_STORE_LOG(INCL_DJDT_TERMS,'INCL_DJDT',L_FALSE,'DJDt terms in transfer equaton for SN models?')
+	  IF(INCL_DJDT_TERMS)THEN
+	    USE_DJDT_RTE=.TRUE.
+	  ELSE
+	   USE_DJDT_RTE=.FALSE.
+	   CALL RD_STORE_LOG(USE_DJDT_RTE,'USE_DJDT_RTE',L_FALSE,
+	1    'Use solver which has DJDt terms in transfer equaton for SN models?')
+	  END IF
+	  DJDT_RELAX_PARAM=1.0D0
+	  CALL RD_STORE_DBLE(DJDT_RELAX_PARAM,'DJDT_RELAX',L_FALSE,
+	1          'Factor to scale DJDT terms to assist initial convergence')
+	  IF(USE_DJDT_RTE .OR. USE_J_REL)USE_FORMAL_REL=.TRUE.
 	  CALL RD_STORE_LOG(USE_FORMAL_REL,'USE_FRM_REL',L_FALSE,'Use CMF_FORMAL_REL to compute F etc?')
 	  CALL RD_STORE_LOG(USE_LAM_ES,'USE_LAM_ES',L_FALSE,'Use formal solution for e.s. (done via Lambda iteration)')
-!
+
 	  WRITE(LUMOD,'()')
 	  CALL RD_STORE_LOG(ACCURATE,'INC_GRID',L_TRUE,'Increase grid size to improve accuracy? ')
 	  CALL RD_STORE_LOG(ALL_FREQ,'ALL_FREQ',L_TRUE,'Increase accuracy for all frequencies?')

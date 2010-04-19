@@ -58,6 +58,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)plt_net.exe\
          $(EXE_DIR)solve_ba_mat.exe\
          $(EXE_DIR)tst_ba_mat_sol.exe\
+         $(EXE_DIR)tst_char_v2.exe\
          $(EXE_DIR)tlusty_vel.exe
  
 all: OBJ ALLEXE 

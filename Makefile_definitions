@@ -106,9 +106,9 @@ EXE_DIR=$(INSTALL_DIR)exe/
 
 #For lyrebird
 
-BLAS= -lpthread -L/usr/lib64 -lblas
+BLAS=-lblas
 LAPACK=-llapack
-LOCLIB=-L/usr/lib64
+LOCLIB=-L/opt/pgi/osx86-64/9.0-3/lib
 PGLIB= =pgf77libs -L/Users/jdh/pgplot/pgplot -lpgplot 
 #-lcpgplot 
 X11LIB=-L/usr/X11R6/lib -lX11

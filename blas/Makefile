@@ -1,7 +1,7 @@
 #
 include ../Makefile_definitions
 
-LIB = $(LIB_DIR)libblas.a
+LIB = $(LIB_DIR)libmy_blas.a
 
 OBJ =  chpr2.o   dcabs1.o  dsymm.o	izamax.o  sscal.o   xerbla.o  zhpmv.o \
 caxpy.o   crotg.o   dcopy.o   dsymv.o	lsame.o   sspmv.o   zaxpy.o   zhpr.o \

@@ -366,14 +366,32 @@
 	1                  FIRST_FREQ,NEW_FREQ,NDEXT)
 	       HFLUX_AT_OB=HBC_CMF(1)*RJ(1)-HBC_CMF(2)
 	       IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+	     ELSE IF(USE_DJDT_RTE)THEN
+	      IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_DDT_V2'
+	      CALL MOM_J_DDT_V2(TA,CHIEXT,TB,
+	1              VEXT,REXT,FEDD,RJEXT,RSQHNU,XM,                  !Use XM for DJDt_TERM,
+	1              HFLUX_AT_IB,HFLUX_AT_OB,
+	1              VDOP_VEC_EXT,DELV_FRAC_MOM,FL,dLOG_NU,DBB,
+	1              INNER_BND_METH,OUTER_BND_METH,
+	1              METHOD,COHERENT_ES,FIRST_FREQ,NEW_FREQ,
+	1              INCL_DJDT_TERMS,DJDT_RELAX_PARAM,NCEXT,NPEXT,NDEXT,NCF)
+
              ELSE IF(USE_J_REL)THEN
-	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_JREL_V5 with accurate grid'
+	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_JREL_V6 with accurate grid'
 	       CALL MOM_JREL_V6(TA,CHIEXT,TB,VEXT,SIGMAEXT,REXT,
 	1             RJEXT,RSQHNU,HFLUX_AT_IB,HFLUX_AT_OB,
 	1             VDOP_VEC_EXT,DELV_FRAC_MOM,FL,dLOG_NU,DBB,
 	1             INNER_BND_METH,OUTER_BND_METH,
 	1             METHOD,L_TRUE,N_TYPE,
 	1             INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,FIRST_FREQ,NDEXT)
+                 IF(LST_ITERATION)THEN
+                   DO I=1,NDEXT
+                     TA(I)=RJEXT(I)*REXT(I)*REXT(I)
+                   END DO
+                   T1=HFLUX_AT_IB*REXT(ND)*REXT(ND)
+                   T2=HFLUX_AT_OB/RJEXT(1)
+                   CALL OUT_JH(TA,RSQHNU,T1,T2,FL,NCF,REXT,VEXT,NDEXT,FIRST_FREQ,'NORMAL')
+	        END IF
 	     ELSE IF(USE_LAM_ES)THEN
 	       IF(FIRST_FREQ)WRITE(LUER,*)'Using J from formal-solution for ray-by-ray solution'
 	       RJEXT(1:NDEXT)=TC(1:NDEXT); RSQHNU(1:NDEXT)=0.0D0
@@ -695,6 +713,17 @@
 	1                  FIRST_FREQ,NEW_FREQ,ND)
                HFLUX_AT_OB=HBC_CMF(1)*RJ(1)-HBC_CMF(2)
                IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+!
+	    ELSE IF(USE_DJDT_RTE)THEN
+	      IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_J_DDT_V2'
+	      CALL MOM_J_DDT_V2(TA,CHI_CLUMP,TB,
+	1              V,R,FEDD,RJ,RSQHNU,XM,                    !Use TC for DJDt_TERM,
+	1              HFLUX_AT_IB,HFLUX_AT_OB,
+	1              VDOP_VEC,DELV_FRAC_MOM,FL,dLOG_NU,DBB,
+	1              INNER_BND_METH,OUTER_BND_METH,
+	1              METHOD,COHERENT_ES,FIRST_FREQ,NEW_FREQ,
+	1              INCL_DJDT_TERMS,DJDT_RELAX_PARAM,NC,NP,ND,NCF)
+
              ELSE IF(USE_J_REL)THEN
 	       IF(FIRST_FREQ)WRITE(LUER,*)'Calling MOM_JREL_V5'
 	       CALL MOM_JREL_V6(TA,CHI_CLUMP,TB,V,SIGMA,R,
@@ -703,6 +732,14 @@
 	1             INNER_BND_METH,OUTER_BND_METH,
 	1             METHOD,L_TRUE,N_TYPE,
 	1             INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,FIRST_FREQ,ND)
+               IF(LST_ITERATION)THEN
+                 DO I=1,ND
+                   TA(I)=RJ(I)*R(I)*R(I)
+                 END DO
+                 T1=HFLUX_AT_IB*R(ND)*R(ND)
+                 T2=HFLUX_AT_OB/RJ(1)
+                 CALL OUT_JH(TA,RSQHNU,T1,T2,FL,NCF,R,V,ND,FIRST_FREQ,'NORMAL')
+               END IF
 	     ELSE IF(USE_LAM_ES)THEN
 	       IF(FIRST_FREQ)WRITE(LUER,*)'Using J from formal-solution for ray-by-ray solution'
 	       RJ(1:ND)=TC(1:ND); RSQHNU(1:ND)=0.0D0

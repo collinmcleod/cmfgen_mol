@@ -4985,6 +4985,7 @@ c
 !
 	    T1=DLOG10(1.6914D-11/FREQ)
 	    DO I=1,ND
+	      WRITE(6,*)I,CHIL(I),TA(I)
 	      IF(TA(I) .GT. 0)THEN
 	        YV(I)=T1+DLOG10(TA(I))
 	      ELSE IF(TA(I) .LT. 0)THEN

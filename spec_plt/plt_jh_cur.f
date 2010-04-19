@@ -549,7 +549,7 @@
 	    WRITE(6,*)' '
 	    WRITE(6,*)'The following are evaluated for the inner boundary.'
 	    WRITE(6,*)' '
-	    WRITE(6,'(A,ES12.4,5X,ES13.4)')'Integrated HFLUX is',1.0D+15*T1,
+	    WRITE(6,'(A,ES12.4,5X,A,ES13.4)')'Integrated HFLUX is',1.0D+15*T1,
 	1             '      Luminosity is',1.0D+15*T1*T2
 	    WRITE(6,'(A,ES12.4,5X,A,ES13.4)')'      Grey HFLUX is',ZM(ID)%HGREY(ND-1),
 	1             ' Grey luminosity is',ZM(ID)%HGREY(ND-1)*T2
@@ -615,7 +615,7 @@
 	  T1=0.299794E+04/T1
 !
 	  SCALE_FAC=1.0D0
-	  CALL USR_HIDDEN(SCALE_FAC,'SCALE',' ','Scale factor to prevent overflow')
+	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0','Scale factor to prevent overflow')
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
 !
@@ -623,12 +623,22 @@
 	    WRITE(6,*)'Index=',I,'NCF=',NCF
 	    IF(ZM(ID)%NU(I)-T1 .GT. T1-ZM(ID)%NU(I+1))I=I+1
 	    WRITE(6,*)'Index=',I,'NCF=',NCF
+	    WRITE(6,*)'Freq=',ZM(ID)%NU(I)
 !
 	    CALL SET_X_AXIS(XV,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
 	    DO J=1,ND
-	      IF(X(1:3) .EQ. 'HNU')YV(J)=ZM(ID)%RJ(J,I)
-	      IF(X(1:3) .EQ. 'JNU')YV(J)=ZM(ID)%HFLUX(J,I)
+	      IF(X(1:3) .EQ. 'JNU')YV(J)=ZM(ID)%RJ(J,I)
+	      IF(X(1:3) .EQ. 'HNU')YV(J)=ZM(ID)%HFLUX(J,I)
 	    END DO
+	    IF(LOG_Y)THEN
+	      DO J=1,ND
+	       IF(YV(J) .GT. 0.0D0)THEN
+	         YV(J)=LOG10(YV(J))
+	       ELSE
+	         YV(J)=-200.0
+	       END IF
+	      END DO
+	    END IF
 	    CALL DP_CURVE(ND,XV,YV)
           END DO
 !
@@ -853,9 +863,10 @@
 	  XAXIS='Log V(km/s)'
 	ELSE IF(XAX_OPTION .EQ. 'XLINR')THEN
 	  DO I=1,ND
-	    XV(I)=R(I)
+	    XV(I)=R(I)/R(ND)
 	  END DO
-	  XAXIS='R(10\u10\d cm)'
+!	  XAXIS='R(10\u10\d cm)'
+	  XAXIS='R/R\d*\u'
 	ELSE IF(XAX_OPTION .EQ. 'XVEL')THEN
 	  DO I=1,ND
 	    XV(I)=V(I)
