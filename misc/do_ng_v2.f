@@ -131,7 +131,10 @@
 	OPTION='NG'
 	WRITE(T_OUT,*)'Options are:'
 	WRITE(T_OUT,*)'         NG: NG acceleration'
-	WRITE(T_OUT,*)'         AV: Average last 2 iterations'
+	WRITE(T_OUT,*)'         TG: NG acceleration based on temperature only'
+	WRITE(T_OUT,*)'         AV: Average 2 iterations (last iteration is 1, 2nd past is 2 etc)'
+	WRITE(T_OUT,*)'        FID: Linear average populations at a single depth based on SE equations'
+	WRITE(T_OUT,*)'       FFID: Linear average populations at multiple depthius based on SE values infile SE'
 	WRITE(T_OUT,*)'        SOR: Succesive over relaxation (scale last corrections)'
 	WRITE(T_OUT,*)'        NSR: Succesive over relaxation (power scale corrections)'
 	WRITE(T_OUT,*)'        REP: Repeat the last N corrections'
@@ -274,11 +277,11 @@
 	    J=ND_ST
 	    CALL GEN_IN(IT1,'Highest iteration')
 	    CALL GEN_IN(IT2,'Lowest iteration')
-	    WRITE(6,*)RDPOPS(NT,J,IT1),RDPOPS(NT,J,IT2)
 	    CALL GEN_IN(SF1,'SE equation IT1') 
 	    CALL GEN_IN(SF2,'SE equation IT2') 
 	    IVAR=NT
 	    CALL GEN_IN(IVAR,'Variable?')
+	    WRITE(6,*)RDPOPS(IVAR,J,IT1),RDPOPS(IVAR,J,IT2)
 	    T1=-SF2/(SF1-SF2); T2=SF1/(SF1-SF2)
 	    SF1=T1; SF2=T2
 	    WRITE(6,*)RDPOPS(IVAR,J,IT1),RDPOPS(IVAR,J,IT2),SF1*RDPOPS(IVAR,J,IT1)+SF2*RDPOPS(IVAR,J,IT2)
