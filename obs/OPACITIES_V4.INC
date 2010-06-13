@@ -43,6 +43,7 @@ C
 C
 C Free-free and bound-free opacities.
 C
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) REDUCTION(CHI,ETA) PRIVATE(ID,J)
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
@@ -55,6 +56,7 @@ C
 	      END DO
 	    END IF
 	  END DO
+!$OMP END PARALLEL DO
 C
 C 
 C
