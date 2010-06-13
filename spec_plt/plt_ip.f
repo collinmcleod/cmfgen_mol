@@ -699,7 +699,7 @@
 	  CALL USR_OPTION(USE_ARCSEC,'Arcsec','T','Use arcseconds?')
 	  CALL USR_OPTION(MULT_BY_PSQ,'PSQ','F','Multiply by P^2?')
 	  MULT_BY_P=.FALSE.
-	  IF(MULT_BY_PSQ .EQ. .FALSE.)THEN
+	  IF(.NOT. MULT_BY_PSQ)THEN
 	    CALL USR_OPTION(MULT_BY_P,'P','F','Multiply by P?')
 	  END IF
 	  IF(ALLOCATED(XV))DEALLOCATE(XV)
