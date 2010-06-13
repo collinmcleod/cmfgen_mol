@@ -16,7 +16,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(dlogvec.o)\
       $(LIB)(edgewr.o)\
       $(LIB)(fg_ham.o)\
-      $(LIB)(fqcomp.o)\
+      $(LIB)(fqcomp_v2.o)\
       $(LIB)(get_dtaulam.o)\
       $(LIB)(get_filename.o)\
       $(LIB)(hamtuvgh.o)\
