@@ -189,6 +189,8 @@
 !
 	  ELSE IF(CONT_VEL .AND. .NOT. ACCURATE)THEN
 	    IF(FIRST_FREQ)THEN
+	      WRITE(6,*)SHAPE(TX)
+	      WRITE(6,*)SHAPE(TVX)
 	      TX(:,:,:)=0.0D0
 	      TVX(:,:,:)=0.0D0
 	      FL_OLD=FL
@@ -212,6 +214,7 @@
 	          TB(L)=0.0D0
 	        END DO
 	      END IF
+!$OMP PARALLEL DO PRIVATE(T1)
 	      DO J=1,ND
 	        T1=ETA_CONT(J)*HDKT*(FL_OLD-FL)/T(J)/T(J)
 	        DO K=1,ND
@@ -220,6 +223,7 @@
 	          TX(K,J,6)=TX(K,J,6) + TX(K,J,4)*T1
 	        END DO
 	      END DO
+!$OMP PARALLEL DO PRIVATE(T1)
 	      DO J=1,ND
 	        T1=ETA_CONT(J)*HDKT*(FL_OLD-FL)/T(J)/T(J)
 	        DO K=1,ND-1
@@ -335,12 +339,14 @@
 ! Correcting for clumping this way does it for both the continuum and lines.
 !
 	    IF(DO_CLUMP_MODEL)THEN
+!$OMP PARALLEL DO
 	      DO J=1,ND
 	        DO K=1,ND
 	          TX(K,J,1)=TX(K,J,1)*CLUMP_FAC(J)
 	          TX(K,J,2)=TX(K,J,2)*CLUMP_FAC(J)
 	        END DO
 	      END DO
+!$OMP PARALLEL DO
 	      DO J=1,ND
 	        DO K=1,ND-1
 	          TVX(K,J,1)=TVX(K,J,1)*CLUMP_FAC(J)
@@ -383,6 +389,7 @@
 	    ELSE
 	      TB(1:ND)=RJ_ES(1:ND)
 	    END IF
+!$OMP PARALLEL DO
 	    DO J=1,ND
 	      DO K=1,ND
 	        TX(K,J,3)=TX(K,J,3) + TX(K,J,1)
@@ -390,6 +397,7 @@
 	        TX(K,J,5)=TX(K,J,5) + TX(K,J,1) + TX(K,J,2)*TB(J)
 	      END DO
 	    END DO
+!$OMP PARALLEL DO
 	    DO J=1,ND
 	      DO K=1,ND-1
 	        TVX(K,J,3)=TVX(K,J,3) + TVX(K,J,1)
@@ -411,10 +419,14 @@
 ! For simplicity we have ignored the T dependance of L_STAR_RATIO and
 ! U_STAR_RATIO.
 !
+! NB: We paralleize over the second loop, rather than SIM_INDX, as the
+!     variables LOW and UP may be the same for different SIM_INDX values.
+!
 	    CALL TUNE(1,'TX_TVX_VC')
 	    DO SIM_INDX=1,MAX_SIM
 	      LOW=LOW_POINTER(SIM_INDX);    UP=UP_POINTER(SIM_INDX)
 	      IF(.NOT. WEAK_LINE(SIM_INDX) .AND. RESONANCE_ZONE(SIM_INDX))THEN
+!$OMP PARALLEL DO PRIVATE(OPAC_FAC, EMIS_FAC, STIM_FAC)
 	        DO J=1,ND
 	          OPAC_FAC=lINE_OPAC_CON(SIM_INDX)*LINE_PROF_SIM(SIM_INDX)*
 	1                      NEG_OPAC_FAC(J)*L_STAR_RATIO(J,SIM_INDX)
@@ -436,6 +448,7 @@
 	    DO SIM_INDX=1,MAX_SIM
 	      LOW=LOW_POINTER(SIM_INDX);    UP=UP_POINTER(SIM_INDX)
 	      IF(.NOT. WEAK_LINE(SIM_INDX) .AND. RESONANCE_ZONE(SIM_INDX))THEN
+!$OMP PARALLEL DO PRIVATE(OPAC_FAC, EMIS_FAC, STIM_FAC)
 	        DO J=1,ND
 	          OPAC_FAC=LINE_OPAC_CON(SIM_INDX)*LINE_PROF_SIM(SIM_INDX)*
 	1                      NEG_OPAC_FAC(J)*L_STAR_RATIO(J,SIM_INDX)
@@ -457,6 +470,7 @@
 	        NL=SIM_NL(SIM_INDX)
 	        NUP=SIM_NUP(SIM_INDX)
 	        IF(.NOT. WEAK_LINE(SIM_INDX) .AND. RESONANCE_ZONE(SIM_INDX))THEN
+!$OMP PARALLEL DO PRIVATE(OPAC_FAC, EMIS_FAC)
 	          DO J=1,ND
 	            OPAC_FAC=LINE_OPAC_CON(SIM_INDX)*LINE_PROF_SIM(SIM_INDX)*NEG_OPAC_FAC(J)*
 	1              (dL_RAT_dT(J,SIM_INDX)*POPS(NL,J)-GLDGU(SIM_INDX)*dU_RAT_dT(J,SIM_INDX)*POPS(NUP,J))
@@ -497,12 +511,14 @@
 	          TB(L)=0.0D0
 	        END DO
 	      END IF
+!OMP PARALLEL DO
 	      DO J=1,ND
 	        DO K=1,NDEXT
 	          TX_EXT(K,J,3)=TX_EXT(K,J,3) * TA(J)
 	          TX_EXT(K,J,4)=TX_EXT(K,J,4) * TB(J)
 	        END DO
 	      END DO
+!OMP PARALLEL DO
 	      DO J=1,ND
 	        DO K=1,NDEXT-1
 	          TVX_EXT(K,J,3)=TVX_EXT(K,J,3) * TA(J)
@@ -541,12 +557,14 @@
 ! Correcting for clumping this way does it for both the continuum and lines.
 !
 	    IF(DO_CLUMP_MODEL)THEN
+!OMP PARALLEL DO
 	      DO J=1,ND
 	        DO K=1,NDEXT
 	          TX_EXT(K,J,1)=TX_EXT(K,J,1)*CLUMP_FAC(J)
 	          TX_EXT(K,J,2)=TX_EXT(K,J,2)*CLUMP_FAC(J)
 	        END DO
 	      END DO
+!OMP PARALLEL DO
 	      DO J=1,ND
 	        DO K=1,NDEXT-1
 	          TVX_EXT(K,J,1)=TVX_EXT(K,J,1)*CLUMP_FAC(J)
@@ -563,6 +581,7 @@
 	    ELSE
 	      TB(1:ND)=RJ_ES(1:ND)
 	    END IF
+!OMP PARALLEL DO
 	    DO J=1,ND
 	      DO K=1,NDEXT
 	        TX_EXT(K,J,3)=TX_EXT(K,J,3) + TX_EXT(K,J,1)
@@ -571,6 +590,7 @@
 	1                                         TX_EXT(K,J,2)*TB(J)
 	      END DO
 	    END DO
+!OMP PARALLEL DO
 	    DO J=1,ND
 	      DO K=1,NDEXT-1
 	        TVX_EXT(K,J,3)=TVX_EXT(K,J,3) + TVX_EXT(K,J,1)
@@ -592,6 +612,7 @@
 	      LOW=LOW_POINTER(SIM_INDX);    UP=UP_POINTER(SIM_INDX)
 	      NL=SIM_NL(SIM_INDX);          NUP=SIM_NUP(SIM_INDX)
 	      IF(.NOT. WEAK_LINE(SIM_INDX) .AND. RESONANCE_ZONE(SIM_INDX))THEN
+!$OMP PARALLEL DO PRIVATE(OPAC_FAC, EMIS_FAC, STIM_FAC)
 	        DO J=1,ND
 	          OPAC_FAC=lINE_OPAC_CON(SIM_INDX)*LINE_PROF_SIM(SIM_INDX)*
 	1                      NEG_OPAC_FAC(J)*L_STAR_RATIO(J,SIM_INDX)
@@ -613,6 +634,7 @@
 	      LOW=LOW_POINTER(SIM_INDX);    UP=UP_POINTER(SIM_INDX)
 	      NL=SIM_NL(SIM_INDX);          NUP=SIM_NUP(SIM_INDX)
 	      IF(.NOT. WEAK_LINE(SIM_INDX) .AND. RESONANCE_ZONE(SIM_INDX))THEN
+!$OMP PARALLEL DO PRIVATE(OPAC_FAC, EMIS_FAC, STIM_FAC)
 	        DO J=1,ND
 	          OPAC_FAC=LINE_OPAC_CON(SIM_INDX)*LINE_PROF_SIM(SIM_INDX)*
 	1                      NEG_OPAC_FAC(J)*L_STAR_RATIO(J,SIM_INDX)
@@ -633,6 +655,7 @@
 	        NL=SIM_NL(SIM_INDX)
 	        NUP=SIM_NUP(SIM_INDX)
 	        IF(.NOT. WEAK_LINE(SIM_INDX) .AND. RESONANCE_ZONE(SIM_INDX))THEN
+!$OMP PARALLEL DO PRIVATE(OPAC_FAC, EMIS_FAC)
 	          DO J=1,ND
 	            OPAC_FAC=LINE_OPAC_CON(SIM_INDX)*LINE_PROF_SIM(SIM_INDX)*NEG_OPAC_FAC(J)*
 	1               (dL_RAT_dT(J,SIM_INDX)*POPS(NL,J)-GLDGU(SIM_INDX)*dU_RAT_dT(J,SIM_INDX)*POPS(NUP,J))
@@ -745,8 +768,7 @@
 !
 	  CALL TUNE(1,'VC_VCHI')
 !
-!$OMP PARALLEL PRIVATE(I,L,NL)
-!$OMP DO SCHEDULE(STATIC, 1)
+!$OMP PARALLEL DO PRIVATE(I,L,NL)
 !
 	  DO K=1,ND
 	    DO J=BNDST(K),BNDEND(K)
@@ -771,8 +793,7 @@
 	    END DO	!Over Variable depth (1:NUM_BNDS)
 	  END DO		!Over J depth.
 !
-!$OMP END DO
-!$OMP END PARALLEL
+!$OMP END PARALLEL DO
 !
 	  DO K=1,ND
 	    DO J=BNDST(K),BNDEND(K)
