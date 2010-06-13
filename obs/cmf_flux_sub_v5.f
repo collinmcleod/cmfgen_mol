@@ -418,7 +418,7 @@ C
 C
 C Parameters, vectors, and arrays for computing the observed flux.
 C
-	INTEGER, PARAMETER :: NST_CMF=6000
+	INTEGER, PARAMETER :: NST_CMF=10000
 	INTEGER NP_OBS_MAX
 	INTEGER NP_OBS
 	REAL*8  NU_STORE(NST_CMF)
@@ -1466,6 +1466,7 @@ C
 !
 	  CALL TUNE(IONE,'SET_PROF')
 	  TA(1:ND)=0.0D0; TB(1:ND)=0.0D0
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE (TA,TB,I,J,T1,T3)
 	  DO SIM_INDX=1,MAX_SIM
 	    IF(RESONANCE_ZONE(SIM_INDX))THEN
               J=SIM_LINE_POINTER(SIM_INDX); I=ML
@@ -1481,7 +1482,8 @@ C
 	    ELSE              
 	      LINE_PROF_SIM(1:ND,SIM_INDX)=0.0D0
 	    END IF
-	  END DO                                    
+	  END DO
+!$OMP END PARALLEL DO                                    
 	  CALL TUNE(ITWO,'SET_PROF')
 C
 C 
@@ -2285,9 +2287,9 @@ C
 ! of the line emission. Not required in this code as used only
 ! for display purposes.
 !
-	CALL SOBEW_GRAD(SOURCE,CHI_CLUMP,CHI_SCAT_CLUMP,CHIL,ETAL,
-	1              V,SIGMA,R,P,FORCE_MULT,STARS_LUM,AQW,HQW,TA,EW,CONT_INT,
-	1              FL,DIF,DBB,IC,THK_CONT,L_FALSE,NC,NP,ND,METHOD)
+	CALL SOBEW_GRAD_V2(SOURCE,CHI_CLUMP,CHI_SCAT_CLUMP,CHIL,ETAL,
+	1            V,SIGMA,R,P,FORCE_MULT,STARS_LUM,AQW,HQW,TA,EW,CONT_INT,
+	1            FL,INNER_BND_METH,DBB,IC,THK_CONT,L_FALSE,NC,NP,ND,METHOD)
 !
 	IF(ABS(EW) .GE. EW_CUT_OFF)THEN
 	  T1=LAMVACAIR(FL_SIM(1)) 		!Wavelength(Angstroms)
