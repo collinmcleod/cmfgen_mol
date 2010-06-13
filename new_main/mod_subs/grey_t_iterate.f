@@ -13,6 +13,7 @@
 	USE LINE_MOD
 	IMPLICIT NONE
 !
+! Altered 23-May-2010 : Changed handling of T_MIN.
 ! Created 17-Dec-2004
 ! Altered 06-Jun-2005 : Call to SUP_TO FULL inserted to get better consistency.
 !                          Only done when GRID=.FALSE.
@@ -281,6 +282,8 @@
 !          GREY_PAR=INFINITY leaves T=T.
 !
 ! T3 and T2 are used to determine the current largest correction.
+! Changed so that minimum value of T set here is 0.95*T_MIN. This
+! helps with convergence?
 !
 	    IF( MAIN_COUNTER .EQ. 1)THEN
 	      DO I=1,ND
@@ -294,11 +297,15 @@
 	      ELSE
 	        T1=1.0D0-EXP(-TA(I)/GREY_PAR)
 	      END IF
-	      IF(T1 .LT. 0.1*GREY_PAR)T1=0.0
-	      T3=ABS( T1*(TGREY(I)-T(I)) )
-	      T(I)=T1*TGREY(I)+(1.0-T1)*T_SAVE(I)
-	      T(I)=MAX(T(I),T_MIN)
-	      T2=MAX(T3/T(I),T2)
+	      IF(T1 .LT. 0.1D0*GREY_PAR)THEN
+	        T(I)=MAX(T(I),0.95D0*T_MIN)
+	        T2=0.0D0
+	      ELSE
+	        T3=ABS( T1*(TGREY(I)-T(I)) )
+	        T(I)=T1*TGREY(I)+(1.0-T1)*T_SAVE(I)
+	        T(I)=MAX(T(I),0.95D0*T_MIN)
+	        T2=MAX(T3/T(I),T2)
+	      END IF
 	    END DO
 	    WRITE(LUER,'('' Largest correction to T in GREY initialization loop '//
 	1              'is '',1P,E9.2,'' %'')')100.0*T2
