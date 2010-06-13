@@ -99,7 +99,7 @@ C Now modify the matrices, operating on each matrix (labeled by K) separately.
 C We use OLD_TX to store TX( , ,K) at the previous frequency. Only necessary
 C when N is being (at least partially) specified in terms of J.
 C
-!
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(I,J,OLD_TX)
 	DO K=1,NM_TX
 	  IF(DO_THIS_TX_MATRIX(K))THEN
 	    IF(USE_EPS .AND. .NOT. INIT)THEN
@@ -119,7 +119,6 @@ C
 	        END DO
 	      END IF
 !
-!$OMP PARALLEL DO
 	      DO J=1,ND
 	        DO I=2,ND-1
  	          TX(I,J,K)=PSIPREV_MOD(I)*OLD_TX(I,J)
@@ -130,9 +129,7 @@ C
  	        TX(ND,J,K)= PSIPREV_MOD(ND)*OLD_TX(ND,J) +
 	1                       VB(ND)*TVX(ND-1,J,K)
 	      END DO
-!$OMP END PARALLEL DO
 	    ELSE IF(.NOT. INIT)THEN
-!$OMP PARALLEL DO
 	      DO J=1,ND
 	        TX(1,J,K)=PSIPREV_MOD(1)*TX(1,J,K) + VC(1)*TVX(1,J,K)
 	        DO I=2,ND-1
@@ -141,17 +138,14 @@ C
 	        END DO
  	        TX(ND,J,K)= PSIPREV_MOD(ND)*TX(ND,J,K) + VB(ND)*TVX(ND-1,J,K)
 	      END DO
-!$OMP END PARALLEL DO
 	    END IF
 C
 	    IF(K .EQ. 1 .OR. K .EQ. 2)THEN
-!$OMP PARALLEL DO
 	      DO J=1,ND
 	        DO I=1,ND
 	          TX(I,J,K)=TX(I,J,K)+KI(I,J,K)
 	        END DO
 	      END DO
-!$OMP END PARALLEL DO
 	    END IF
 C
 C Solve the simultaneous equations.
@@ -159,7 +153,6 @@ C
 	    CALL SIMPTH(TA,TB,TC,TX(1,1,K),ND,ND)
 C
 	    IF(USE_EPS)THEN
-!$OMP PARALLEL DO
 	      DO J=1,ND
 	        DO I=1,ND-1
 	           TVX(I,J,K)= HU(I)*TX(I+1,J,K) - HL(I)*TX(I,J,K)
@@ -168,30 +161,26 @@ C
 	1               (EPS_PREV_B(I)*OLD_TX(I+1,J)-EPS_B(I)*TX(I+1,J,K))
 	        END DO
 	      END DO
-!$OMP END PARALLEL DO
 	    ELSE
-!$OMP PARALLEL DO
 	      DO J=1,ND
 	        DO I=1,ND-1
 	           TVX(I,J,K)= HU(I)*TX(I+1,J,K) - HL(I)*TX(I,J,K)
 	1               + HS(I)*TVX(I,J,K)
 	        END DO
 	      END DO
-!$OMP END PARALLEL DO
 	    END IF
 C
 	    IF(K .EQ. 1)THEN
-!$OMP PARALLEL DO
 	      DO J=1,ND
 	        DO I=1,ND-1
 	          TVX(I,J,K)=TVX(I,J,K)+RHS_dHdCHI(I,J)
 	        END DO
 	      END DO
-!$OMP END PARALLEL DO
 	    END IF
 C
 	  END IF	!DO_THIS_MATRIX
 	END DO		!K
+!$OMP END PARALLEL DO
 !
 	RETURN
 	END
