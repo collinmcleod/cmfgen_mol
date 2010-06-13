@@ -20,22 +20,22 @@
 ! Testing parameters for SN model.
 !	
 	IF(SN_MODEL)THEN
-	  IF(DO_REL_IN_OBSFRAME .NE..TRUE.)THEN
+	  IF(.NOT. DO_REL_IN_OBSFRAME)THEN
 	    WRITE(LUER,*)TRIM(ER_LAB),' Problem with control parameters in CMF_FLUX_PARAM_INIT'
 	    WRITE(LUER,*)TRIM(ER_LAB),' DO_RELO should be true for SN MODEL'
 	    IF(STOP_IF_BAD_PARAM)STOP
 	  END IF
-	  IF(DO_CMF_REL_OBS .NE..TRUE.)THEN
+	  IF(.NOT. DO_CMF_REL_OBS)THEN
 	    WRITE(LUER,*)TRIM(ER_LAB),' Problem with control parameters in CMF_FLUX_PARAM_INIT'
 	    WRITE(LUER,*)TRIM(ER_LAB),' DO_CMF_RELO should be true for SN MODEL'
 	    IF(STOP_IF_BAD_PARAM)STOP
 	  END IF
-	  IF(USE_J_REL .AND. INCL_REL_TERMS .NE..TRUE.)THEN
+	  IF(USE_J_REL .AND. .NOT. INCL_REL_TERMS)THEN
 	    WRITE(LUER,*)TRIM(ER_LAB),' Problem with control parameters in CMF_FLUX_PARAM_INIT'
 	    WRITE(LUER,*)TRIM(ER_LAB),' INCL_REL should be true for SN MODEL'
 	    IF(STOP_IF_BAD_PARAM)STOP
 	  END IF
-	  IF(USE_J_REL .AND. INCL_ADVEC_TERMS_IN_TRANS_EQ .NE..TRUE.)THEN
+	  IF(USE_J_REL .AND. .NOT. INCL_ADVEC_TERMS_IN_TRANS_EQ)THEN
 	    WRITE(LUER,*)TRIM(ER_LAB),' Problem with control parameters in CMF_FLUX_PARAM_INIT'
 	    WRITE(LUER,*)TRIM(ER_LAB),' INCL_ADV_TRANS should be true for SN MODEL'
 	    IF(STOP_IF_BAD_PARAM)STOP
