@@ -166,7 +166,7 @@ C
 	CALL GRAMON_PGPLOT('V(km/s)','g/g\delec\u','(vdv/dr + \gr\u-1\d dP/dr + g )/g\delec\u \p2',' ')
 !
 	DO I=1,ND
-	  WRITE(40,'(I,3ES16.6)')I,P_REQ(I),P_GELEC(I),P_GRAD(I)
+	  WRITE(40,'(I5,3ES16.6)')I,P_REQ(I),P_GELEC(I),P_GRAD(I)
 	END DO
 	CLOSE(UNIT=40)
 	P_REQ(1:ND)=DLOG10(P_REQ(1:ND)*P_GELEC(1:ND))
