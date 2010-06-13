@@ -101,6 +101,7 @@
 	REAL*8 DBC
 	REAL*8 I_CORE
 	REAL*8 T1,T2
+	REAL*8 dBdTAU
 	REAL*8 ALPHA
 	REAL*8 ESEC_POW
 	REAL*8 BETA
@@ -443,40 +444,69 @@
 	JPLUS_OB=0.0D0;  HPLUS_OB=0.0D0; KPLUS_OB=0.0D0
 	JMIN_OB=0.0D0;   HMIN_OB=0.0D0;  KMIN_OB=0.0D0
 !
+! If using the HOLLOW core option, we need to determine location to
+! store inner boundary intensity. We do it here, since the storage 
+! location hase the same pointer for all rays.
+!
+	IF(INNER_BND_METH .eq. 'HOLLOW')THEN
+          IF(CUR_LOC .EQ. -1)THEN
+            CUR_LOC=0
+            FREQ_STORE(CUR_LOC)=FREQ
+          ELSE IF(FREQ_STORE(CUR_LOC) .NE. FREQ)THEN
+            CUR_LOC=MOD(CUR_LOC+1,N_STORE)
+            FREQ_STORE(CUR_LOC)=FREQ
+	  END IF
+	END IF
+!
 ! Determine radiative transfer along each p-ray
 !
 	NP_LIMIT=NP-1
 	IF(THICK_OB)NP_LIMIT=NP
-	T1=DBB/CHI(ND)			!dB/dTAU
+	dBdTAU=DBB/CHI(ND)			!dB/dTAU
 	IPLUS=0.0D0
-	DO IP=1,NP_LIMIT
 !
-	  NRAY=RAY(IP)%NZ
-	  IF(RAY_POINTS_INSERTED)THEN
-            K=1
-            DO I=1,RAY(IP)%NZ
-100	      CONTINUE
-              IF( RAY(IP)%R_RAY(I) .EQ. R_EXT(K))THEN
-                CHI_RAY(I)=CHI_EXT(K)
-                ETA_RAY(I)=ETA_EXT(K)
-	      ELSE IF(RAY(IP)%R_RAY(I) .GT. R_EXT(K+1))THEN
-                T1=LOG(RAY(IP)%R_RAY(I)/R_EXT(K))
-                T2=((CHI_COEF(K,1)*T1+CHI_COEF(K,2))*T1+CHI_COEF(K,3))*T1+CHI_COEF(K,4)
-                CHI_RAY(I)=EXP(T2)
-                T2=((ETA_COEF(K,1)*T1+ETA_COEF(K,2))*T1+ETA_COEF(K,3))*T1+ETA_COEF(K,4)
-                ETA_RAY(I)=EXP(T2)
-	      ELSE 
-	        K=K+1
-                GOTO 100
-	      END IF
-            END DO
-	  END IF
+	IF(RAY_POINTS_INSERTED)THEN
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(NRAY,I,K,T1,T2,CHI_RAY,ETA_RAY)
+	  DO IP=1,NP_LIMIT
+!
+	    NRAY=RAY(IP)%NZ
+	    IF(RAY_POINTS_INSERTED)THEN
+              K=1
+              DO I=1,RAY(IP)%NZ
+100	        CONTINUE
+                IF( RAY(IP)%R_RAY(I) .EQ. R_EXT(K))THEN
+                  CHI_RAY(I)=CHI_EXT(K)
+                  ETA_RAY(I)=ETA_EXT(K)
+	        ELSE IF(RAY(IP)%R_RAY(I) .GT. R_EXT(K+1))THEN
+                  T1=LOG(RAY(IP)%R_RAY(I)/R_EXT(K))
+                  T2=((CHI_COEF(K,1)*T1+CHI_COEF(K,2))*T1+CHI_COEF(K,3))*T1+CHI_COEF(K,4)
+                  CHI_RAY(I)=EXP(T2)
+                  T2=((ETA_COEF(K,1)*T1+ETA_COEF(K,2))*T1+ETA_COEF(K,3))*T1+ETA_COEF(K,4)
+                  ETA_RAY(I)=EXP(T2)
+	        ELSE 
+	          K=K+1
+                  GOTO 100
+	        END IF
+              END DO
+	    END IF
 !
 ! Solve using Relativistic Formal Integral
 !
-	  T1=DBB/CHI(ND)
-          CALL SOLVE_CMF_FORMAL_V2(CHI_RAY,ETA_RAY,IP,FREQ,NU_ON_dNU,INNER_BND_METH,b_planck,t1,NRAY,NP,NC)
+            CALL SOLVE_CMF_FORMAL_V2(CHI_RAY,ETA_RAY,IP,FREQ,NU_ON_dNU,INNER_BND_METH,b_planck,dBdTAU,NRAY,NP,NC)
+	  END DO
+!$OMP END PARALLEL DO
 !
+	ELSE 
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(NRAY)
+	  DO IP=1,NP_LIMIT
+	    NRAY=RAY(IP)%NZ
+            CALL SOLVE_CMF_FORMAL_V2(CHI_RAY,ETA_RAY,IP,FREQ,NU_ON_dNU,INNER_BND_METH,b_planck,dBdTAU,NRAY,NP,NC)
+	  END DO
+!$OMP END PARALLEL DO
+	END IF
+!
+	DO IP=1,NP_LIMIT
+	  NRAY=RAY(IP)%NZ
 	  DO ID=1,MIN(ND,NP-IP+1)
 	    I_P_GRID(ID)=RAY(IP)%I_P(RAY(IP)%LNK(ID))
 	    I_M_GRID(ID)=RAY(IP)%I_M(RAY(IP)%LNK(ID))
@@ -553,13 +583,13 @@
 	RET_HNU_AT_OB=HNU_AT_OB
 	RET_HNU_AT_IB=HNU_AT_IB
 !
-	T1=1.0D-200
-	WRITE(180,'(ES16.6,4(ES16.6,2F8.4))')FREQ,
-	1          JPLUS_IB, HPLUS_IB/MAX(JPLUS_IB,T1), KPLUS_IB/MAX(JPLUS_IB,T1),
-	1          JMIN_IB,  HMIN_IB/MAX(JMIN_IB,T1),   KMIN_IB/MAX(JMIN_IB,T1),
-	1          JPLUS_OB, HPLUS_OB/MAX(JPLUS_OB,T1), KPLUS_OB/MAX(JPLUS_OB,T1),
-	1          JMIN_OB,  HMIN_OB/MAX(JMIN_OB,T1),   KMIN_OB/MAX(JMIN_OB,T1)
-	FLUSH(UNIT=180)
+!	T1=1.0D-200
+!	WRITE(180,'(ES16.6,4(ES16.6,2F8.4))')FREQ,
+!	1          JPLUS_IB, HPLUS_IB/MAX(JPLUS_IB,T1), KPLUS_IB/MAX(JPLUS_IB,T1),
+!	1          JMIN_IB,  HMIN_IB/MAX(JMIN_IB,T1),   KMIN_IB/MAX(JMIN_IB,T1),
+!	1          JPLUS_OB, HPLUS_OB/MAX(JPLUS_OB,T1), KPLUS_OB/MAX(JPLUS_OB,T1),
+!	1          JMIN_OB,  HMIN_OB/MAX(JMIN_OB,T1),   KMIN_OB/MAX(JMIN_OB,T1)
+!	FLUSH(UNIT=180)
 !
 	FIRST_TIME=.FALSE.
 	RETURN
