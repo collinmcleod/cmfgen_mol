@@ -1,6 +1,7 @@
 !
 ! File to check the consistency of CMFGEN parameters
 !
+! Altered: 23-May-2010 - Fixed pontential compile problems with .NE. and logical operators.
 ! Created: 07-Jan-2008
 !
 	SUBROUTINE CHECK_PARAM_CONSISTENCY( )
@@ -18,12 +19,12 @@
 	LUER=ERROR_LU()
 !	
 	IF(SN_MODEL)THEN
-	  IF(DO_FULL_REL_OBS .NE..TRUE.)THEN
+	  IF(.NOT. DO_FULL_REL_OBS)THEN
 	    WRITE(LUER,*)TRIM(ER_LAB),' Problem with control parameters in VADAT'
 	    WRITE(LUER,*)TRIM(ER_LAB),' DO_FULL_RELL_OBS should be true for SN MODEL'
 	    IF(STOP_IF_BAD_PARAM)STOP
 	  END IF
-	  IF(DO_FULL_REL_CMF .NE..TRUE.)THEN
+	  IF(.NOT. DO_FULL_REL_CMF)THEN
 	    WRITE(LUER,*)TRIM(ER_LAB),' Problem with control parameters in VADAT'
 	    WRITE(LUER,*)TRIM(ER_LAB),' DO_FULL_REL_CMF should be true for SN MODEL'
 	    IF(STOP_IF_BAD_PARAM)STOP
@@ -33,12 +34,12 @@
 	    WRITE(LUER,*)TRIM(ER_LAB),' USE_JREL or USE_DJDT_RTE should be true for SN MODEL'
 	    IF(STOP_IF_BAD_PARAM)STOP
 	   END IF
-	  IF(USE_J_REL .AND. INCL_REL_TERMS .NE..TRUE.)THEN
+	  IF(USE_J_REL .AND. .NOT. INCL_REL_TERMS)THEN
 	    WRITE(LUER,*)TRIM(ER_LAB),' Problem with control parameters in VADAT'
 	    WRITE(LUER,*)TRIM(ER_LAB),' INCL_REL should be true for SN MODEL'
 	    IF(STOP_IF_BAD_PARAM)STOP
 	  END IF
-	  IF(USE_J_REL .AND. INCL_ADVEC_TERMS_IN_TRANS_EQ .NE..TRUE.)THEN
+	  IF(USE_J_REL .AND. .NOT. INCL_ADVEC_TERMS_IN_TRANS_EQ)THEN
 	    WRITE(LUER,*)TRIM(ER_LAB),' Problem with control parameters in VADAT'
 	    WRITE(LUER,*)TRIM(ER_LAB),' INCL_ADV_TRANS should be true for SN MODEL'
 	    IF(STOP_IF_BAD_PARAM)STOP
@@ -56,7 +57,7 @@
 	    WRITE(LUER,*)'DO_CO_MOV_DDT should also be set to TRUE.'
 	    STOP
 	  END IF
-	  IF(USE_DJDT_RTE .AND. TIME_SEQ_NO .EQ .1)THEN
+	  IF(USE_DJDT_RTE .AND. (TIME_SEQ_NO .EQ. 1) )THEN
 	    WRITE(LUER,*)'Error: inconsistency in control parameters in VADAT'
 	    WRITE(LUER,*)'SN model has TS_NO=1 implying initial model'
 	    WRITE(LUER,*)TRIM(ER_LAB),'USE_JREL=TRUE and USE_DJDT_RTE=FALSE for an initial model'
