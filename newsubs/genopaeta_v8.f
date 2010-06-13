@@ -12,6 +12,9 @@ C
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 C
+C Altered 13-Jun-2010 - Now include free-free contribution for all level. Particularly necessary
+C                          when you split low lying levels, and in SN where H/He do not
+C                          dominate.
 C Altered 27-May-2005 - Added check to get minimum frequency, in case levels
 C                         are out of order.
 C Altered 22-Feb-2000 - ID added to call.
@@ -96,7 +99,7 @@ C
 	REAL*8 ALPHA,TCHI1,TETA1,TETA2
 	REAL*8 T1,T2,ZION_CUBED,NEFF
 C
-	CALL TUNE(1,'GENOPA')
+C	CALL TUNE(1,'GENOPA')
 C
 C ND_LOC indicates the number of depth points we are going to compute the
 C opacity at. K_ST indicates the depth point to start, and is either 1, or ND.
@@ -109,11 +112,11 @@ C
 	  K_ST=1
 	END IF
 C
-C Add in free-free contribution. We assume that only ground state free-free
-C is important. We will generally include the first excited anyway,
-C when we compute opacities contributed by ionizations to excited levevels.
+C Add in free-free contribution. Because SN can be dominated by elements other
+C than H and He, we now sum over all levels. To make sure that we only do this
+C one, we only include the FREE-FREE contribution for the ion when PHOT_ID is one.
 C
-	IF(IONFF)THEN
+	IF(IONFF .AND. PHOT_ID .EQ. 1)THEN
 C
 C Compute free-free gaunt factors. Replaces call to GFF in following DO loop.
 C
@@ -128,11 +131,19 @@ C
 	      CALL FF_RES_GAUNT(GFF_VAL,NU,T,ID,GION,ZION,ND)
 	    END IF
 	  END IF
-C
+!
+! We use COR_FAC as a temporary vector containing the sum of all level populations in
+! the ion at each depth.
+!
+	  IF(LST_DEPTH_ONLY)THEN
+	    COR_FAC(ND)=SUM(DI(:,ND))
+	  ELSE
+	    COR_FAC=SUM(DI,1)
+	  END IF
 	  TCHI1=CHIFF*ZION*ZION/(NU*NU*NU)
 	  TETA1=CHIFF*ZION*ZION*TWOHCSQ
 	  DO K=K_ST,ND
-	    ALPHA=ED(K)*DI(ION_LEV,K)*GFF_VAL(K)/SQRT(T(K))
+	    ALPHA=ED(K)*COR_FAC(K)*GFF_VAL(K)/SQRT(T(K))
 	    CHI(K)=CHI(K)+TCHI1*ALPHA*(1.0D0-EMHNUKT(K))
 	    ETA(K)=ETA(K)+TETA1*ALPHA*EMHNUKT(K)
 	  END DO
@@ -260,6 +271,6 @@ CC!$OMP END DO
 CC!$OMP END PARALLEL
 	END IF			!Which inner loop.
 C
-	CALL TUNE(2,'GENOPA')
+C	CALL TUNE(2,'GENOPA')
 	RETURN
 	END
