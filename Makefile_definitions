@@ -108,7 +108,7 @@ EXE_DIR=$(INSTALL_DIR)exe/
 
 BLAS=-lblas
 LAPACK=-llapack
-LOCLIB=-L/opt/pgi/osx86-64/9.0-3/lib
+LOCLIB=-L/opt/pgi/osx86-64/10.5/lib
 PGLIB= =pgf77libs -L/Users/jdh/pgplot/pgplot -lpgplot 
 #-lcpgplot 
 X11LIB=-L/usr/X11R6/lib -lX11

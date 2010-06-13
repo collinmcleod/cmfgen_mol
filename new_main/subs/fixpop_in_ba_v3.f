@@ -8,6 +8,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 30-May-2010 : Fixed bug with output describing number of levels held fixed.
 ! Created 23-Apr-2001 : Based on FIXPOP
 !                       Designed to use MOD_SMGEN nd to operate on a single depth.
 !                       To be call by GENERATE_FULL_MATRIX.
@@ -178,8 +179,13 @@
 	  END IF
 !
 	  IF(LAST_MATRIX .AND. CNT(ATM(ID)%EQXZV) .NE. 0)THEN
-	    WRITE(LUER,100)FIX_N,ATM(ID)%NXzV,TRIM(ION_ID(ID)),CNT(ATM(ID)%EQXZV)
-100	    FORMAT(1X,I3,' levels of',I4,' fixed for ',A,' at',I4,' depths')
+	    IF( ATM(ID)%XzV_PRES)THEN 
+	      WRITE(LUER,100)FIX_N,ATM(ID)%NXzV,TRIM(ION_ID(ID)),CNT(ATM(ID)%EQXZV)
+100	      FORMAT(1X,I3,' levels of',I4,' fixed for ',A,' at',I4,' depths')
+	    ELSE
+	      WRITE(LUER,110)TRIM(SPECIES(SPECIES_LNK(ID))),CNT(ATM(ID)%EQXZV)
+110	      FORMAT(1X,'Last level of ',A,' held fixed at ',I4,' depths')
+	    END IF
 	  END IF
 C
 	END DO

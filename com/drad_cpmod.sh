@@ -72,4 +72,4 @@ out2in
 
 echo "Need to delte the GREY_SCL_FAC_IN file since grey scaling may not work."
 
-rm $2/GREY_SCL_FAC_IN
+rm -f GREY_SCL_FAC_IN
