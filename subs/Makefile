@@ -5,7 +5,7 @@ include ../Makefile_definitions
 LIB=$(LIB_DIR)libsubs.a
 LIB_MOD=$(LIB_DIR)libmod.a
 
-OPTION=$(FG)
+OPTION=$(FH)
 
 #
 # Entries for library
@@ -59,6 +59,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(fixpop.o)\
       $(LIB)(formsol.o)\
       $(LIB)(fqcomp_ibc.o)\
+      $(LIB)(fqcomp_ibc_v2.o)\
       $(LIB)(fqnew.o)\
       $(LIB)(full_to_sup.o)\
       $(LIB)(gamma.o)\
@@ -90,6 +91,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(integrate.o)\
       $(LIB)(interp_knowncoeef.o)\
       $(LIB)(jfeau_ibc.o)\
+      $(LIB)(jfeau_ibc_v2.o)\
       $(LIB)(jgrey.o)\
       $(LIB)(jgrey_with_fvt.o)\
       $(LIB)(jtrpwgt.o)\
@@ -187,6 +189,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(simq.o)\
       $(LIB)(sobew.o)\
       $(LIB)(sobew_grad.o)\
+      $(LIB)(sobew_grad_v2.o)\
       $(LIB)(sobjbar_sim.o)\
       $(LIB)(solveba_v3.o)\
       $(LIB)(starfin.o)\
