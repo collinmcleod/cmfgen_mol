@@ -19,6 +19,8 @@ c
 	1               INCLUDE_LINE_CENTERS)
 	IMPLICIT NONE
 C
+C Altered: 25-Apr-2010: Changed check of whether lines outside of continuum range.
+C                         Previously cut all lines for VINF --> C.
 C Altered: 18-Jul-2008: Changed terms of the form 1-a*Vinf/C_kms to 1/(1-a*Vinf/C_kms).
 C                         This is to prevent problems when Vinf is close to c. 
 C Altered: 13-Apr-2003: Bug fix: dNU replaced by dNU_NEXT in if statement (line 287)
@@ -133,6 +135,8 @@ C
 	END IF
 C
 	T1=1.0D0-(6.0D0*MAXVAL(VEC_MIN_VDOP)+3.0*VINF)/C_KMS
+	T1=1.0D0/(1.0D0+(6.0D0*MAXVAL(VEC_MIN_VDOP)+3.0D0*VINF)/C_KMS)
+	IF(T1 .LT. 0.5D0)T1=0.5D0
 	LOCAL_N_LINES=N_LINES
 	DO WHILE(NU_CONT(NCF) .GT. NU_LINE(LOCAL_N_LINES)*T1)
 	  LOCAL_N_LINES=LOCAL_N_LINES-1
