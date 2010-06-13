@@ -593,7 +593,7 @@
 	      IF(TA(I) .LT. 0.1*GREY_PAR)T1=0.0     !Changed T1 to TA(I) [14-Jan-2009]
 	      T3=ABS( T1*(TGREY(I)-T(I)) )
 	      T(I)=T1*TGREY(I)+(1.0-T1)*T_SAVE(I)
-	      T(I)=MAX(T(I),T_MIN)
+	      T(I)=MAX(T(I),0.95D0*T_MIN)
 	      T2=MAX(T3/T(I),T2)
 	    END DO
 	    WRITE(LUER,'('' Largest correction to T in GREY initialization loop '//
