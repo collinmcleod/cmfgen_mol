@@ -32,6 +32,7 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(rd_ew.o)\
          $(LIB)(rd_mod.o)\
          $(LIB)(recom_opac_v2.o)\
+         $(LIB)(rd_xy_data.o)\
          $(LIB)(rd_obs_data_v2.o)
   
 all : $(LIB)
@@ -50,6 +51,8 @@ $(LIB)(%.o) : %.f
 convolve.o : convolve.f parameters.inc constants.inc
 num_rec.o  : num_rec.f   parameters.inc constants.inc
 uvab.o     : uvabs.f     parameters.inc constants.inc
+
+rd_xy_data.o : ../../tools/new_gen_in.o
 
 clean :
 	rm -f *.o
