@@ -456,7 +456,7 @@
 	LST_ITERATION=.FALSE.
 	DPTH_INDX=22
 	DPTH_INDX=MIN(DPTH_INDX,ND)		!Thus no problem if 84 > ND
-	VAR_INDX=335
+	VAR_INDX=366
 	VAR_INDX=MIN(VAR_INDX,NT)
 	CALL GET_VERBOSE_INFO(VERBOSE)
 !
@@ -1944,6 +1944,8 @@
 ! TA is used as a work vector (dim ND)
 !
 	  CALL TUNE(IONE,'QUAD')
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(PHOT_ID)
+!
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES .AND. COMPUTE_NEW_CROSS)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
@@ -1957,11 +1959,13 @@
 	      END DO
 	    END IF  
 	  END DO
+!$OMP END PARALLEL DO
 	  CALL TUNE(ITWO,'QUAD')
 !
 ! 
 !
 	IF(XRAYS .AND. COMPUTE_NEW_CROSS)THEN
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(T1)
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES .AND. ATM(ID+1)%XzV_PRES)THEN
 	      T1=AT_NO(SPECIES_LNK(ID))+1-ATM(ID)%ZXzV		!Number of electrons
@@ -1973,6 +1977,7 @@
 	1           ATM(ID+1)%EDGEXzV_F, ATM(ID+1)%NXzV_F, ND)
 	    END IF
 	  END DO
+!$OMP END PARALLEL DO
 	END IF
 !
 ! 
@@ -2158,6 +2163,7 @@
 !
 	IF(FINAL_CONSTANT_CROSS)THEN
 	  CALL TUNE(IONE,'EVALSE')
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(ID_SAV)
 	  DO ID=1,NUM_IONS-1
 	    ID_SAV=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
@@ -2170,6 +2176,7 @@
 	      END DO
 	    END IF
 	  END DO
+!$OMP END PARALLEL DO
 	  CALL TUNE(ITWO,'EVALSE')
 	END IF
 !
@@ -2178,6 +2185,7 @@
 ! 2 electrons are ejected.
 !
 	IF(XRAYS .AND. FINAL_CONSTANT_CROSS)THEN
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(ID_SAV)
 	  DO ID=1,NUM_IONS-1
 	    ID_SAV=ID
 	    IF(ATM(ID)%XzV_PRES .AND. ATM(ID+1)%XzV_PRES)THEN
@@ -2187,6 +2195,7 @@
 	1          JREC,JPHOT,ND,NION)
 	    END IF
 	  END DO
+!$OMP END PARALLEL DO
 	END IF
 !
 ! 
@@ -2249,6 +2258,7 @@
 ! NB: The line term in the RE equations is not needed since it is included 
 ! directly with continuum integration.
 !
+	WRITE(229,'(I6,3ES16.6)')ML,FL,SE(22)%STEQ(1,29),SE(22)%STEQ(2,29)
 	DO SIM_INDX=1,MAX_SIM
 	  IF( END_RES_ZONE(SIM_INDX) )THEN
             T1=FL_SIM(SIM_INDX)*EMLIN 
@@ -2274,6 +2284,7 @@
 	    END DO
 	  END IF    
 	END DO
+	WRITE(229,'(I6,3ES16.6)')ML,FL,SE(22)%STEQ(1,29),SE(22)%STEQ(2,29)
 !
 !                                                                    
 !
