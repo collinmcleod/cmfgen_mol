@@ -96,6 +96,7 @@ C Now modify the matrices, operating on each matrix (labeled by K) separately.
 C We use OLD_TX to store TX( , ,K) at the previous frequency. Only necessary
 C when N is being (at least partially) specified in terms of J.
 C
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(I,J,OLD_TX)
 	DO K=1,NM_TX
 	  IF(DO_THIS_TX_MATRIX(K))THEN
 	    IF(USE_EPS .AND. .NOT. INIT)THEN
@@ -166,6 +167,7 @@ C
 C
 	  END IF	!DO_THIS_MATRIX
 	END DO		!K
+!$OMP END PARALLEL DO
  
 	RETURN
 	END
