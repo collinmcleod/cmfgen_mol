@@ -82,6 +82,7 @@
 !
 ! Free-free and bound-free opacities.
 !
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) REDUCTION(CHI,ETA) PRIVATE(ID,J,PHOT_ID)
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
@@ -95,6 +96,7 @@
 	      END DO
 	    END IF
 	  END DO
+!$OMP END PARALLEL DO
 !
 	  IF(ADD_ADDITIONAL_OPACITY)THEN
 	     DO I=1,ND
@@ -127,6 +129,7 @@
 ! This section was originaly XOPAC_V4.INC. See that file for erlier corrections.
 !
 	  IF(XRAYS)THEN
+!!$OMP PARALLEL DO SCHEDULE(DYNAMIC) REDUCTION(CHI,ETA) PRIVATE(ID,J,PHOT_ID)
 	    DO ID=1,NUM_IONS
 	      IF(ATM(ID)%XzV_PRES .AND. ATM(ID+1)%XzV_PRES)THEN
 	        T2=AT_NO(SPECIES_LNK(ID))+1-ATM(ID)%ZXzV
@@ -148,6 +151,7 @@
 	        END IF
 	      END IF
 	    END DO
+!!$OMP END PARALLEL DO
 	  END IF
 !
 	  CHI_NOSCAT(1:ND)=CHI(1:ND)
