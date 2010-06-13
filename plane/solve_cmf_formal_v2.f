@@ -24,6 +24,9 @@
 !                     'HOLLOW'    - hollow core with I+=I- but with allowance for velocity shifts.
 !                     'GRAY'      - DIFFUSION approximation for gray atmosphere: Mihalas (1980) 237 p 574
 !                     'DIFFUSION' - DIFFUSION approximation with I=B(nu,T)+mu*dBdtau(nu,T): Mihalas (1978) p 51
+! Altered 09-May-2010: Changed to call OPTDEPTH_V4.
+!                      CUR_LOC is noe set in calling routine. Since independent of ip, allows this routine to be
+!                        in parallel loop.
 !
 !--------------------------------------------------------------------
 !
@@ -59,6 +62,8 @@
       real*8 ee,e0,e1,e2,alpha,beta,gamma,t1
       real*8, dimension(nd) :: chi_tau
       real*8, dimension(nd) :: source_prime
+      real*8, dimension(nd) :: tau_loc
+      real*8, dimension(nd) :: dtau_loc
       real*8 new_freq
 !
       integer ist,iend,imid
@@ -96,7 +101,7 @@
 !
 ! Determine "optical depth" from outside to center (s_m,mu_m)
 !
-      CALL OPTDEPTH_V2(CHI_TAU,RAY(IP)%NZ,IP,L_FALSE)
+      CALL OPTDEPTH_V4(DTAU_LOC,CHI_TAU,RAY(IP)%NZ,IP,L_FALSE,'ZERO')
 !
 ! Calculate transfer in inward direction, I- (mu=-1)
 !
@@ -111,12 +116,12 @@
       nzz=ray(ip)%nz
       do iz=2,ray(ip)%nz-1
 !
-        t1=dtau(iz-1)
+        t1=dtau_loc(iz-1)
         if(t1 .gt. 0.01D0)then
-          ee=exp(-dtau(iz-1))
+          ee=exp(-dtau_loc(iz-1))
           e0=1.0d0-ee
-          e1=dtau(iz-1)-e0
-          e2=dtau(iz-1)*dtau(iz-1)-2.0d0*e1
+          e1=dtau_loc(iz-1)-e0
+          e2=dtau_loc(iz-1)*dtau_loc(iz-1)-2.0d0*e1
         else
           e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1-0.2D0*t1*(1.0D0-t1/6.0D0*
      1              (1.0D0-t1/7.0D0))))/3.0D0
@@ -125,12 +130,12 @@
           ee=1.0d0-e0
         end if
 !
-        alpha=e0+(e2-(dtau(iz)+2.0d0*dtau(iz-1))*e1)/(dtau(iz-1)*(dtau(iz)+dtau(iz-1)))
-        beta=((dtau(iz)+dtau(iz-1))*e1-e2)/(dtau(iz-1)*dtau(iz))
-        gamma=(e2-dtau(iz-1)*e1)/(dtau(iz)*(dtau(iz)+dtau(iz-1)))
+        alpha=e0+(e2-(dtau_loc(iz)+2.0d0*dtau_loc(iz-1))*e1)/(dtau_loc(iz-1)*(dtau_loc(iz)+dtau_loc(iz-1)))
+        beta=((dtau_loc(iz)+dtau_loc(iz-1))*e1-e2)/(dtau_loc(iz-1)*dtau_loc(iz))
+        gamma=(e2-dtau_loc(iz-1)*e1)/(dtau_loc(iz)*(dtau_loc(iz)+dtau_loc(iz-1)))
      	t1=alpha*source_prime(iz-1)+beta*source_prime(iz)+gamma*source_prime(iz+1)
         if(t1 .lt. 0)then
-	  t1=source_prime(iz)+dtau(iz)*(source_prime(iz)-source_prime(iz-1))/dtau(iz-1)
+	  t1=source_prime(iz)+dtau_loc(iz)*(source_prime(iz)-source_prime(iz-1))/dtau_loc(iz-1)
      	  t1=alpha*source_prime(iz-1)+beta*source_prime(iz)+gamma*t1
 	end if
 	ray(ip)%I_m(iz)=ray(ip)%I_m(iz-1)*ee+t1
@@ -140,12 +145,12 @@
 ! If only 2 points along the ray or at inner boundary, must use linear
 ! source function
 !
-      t1=dtau(nzz-1)
+      t1=dtau_loc(nzz-1)
       if(t1 .gt. 0.01d0)then
-        ee=exp(-dtau(nzz-1))
+        ee=exp(-dtau_loc(nzz-1))
         e0=1.0d0-ee
-        e1=dtau(nzz-1)-e0
-        e2=dtau(nzz-1)*dtau(nzz-1)-2.0d0*e1
+        e1=dtau_loc(nzz-1)-e0
+        e2=dtau_loc(nzz-1)*dtau_loc(nzz-1)-2.0d0*e1
       else
         e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1-0.2D0*t1*(1.0D0-t1/6.0D0*
      1              (1.0D0-t1/7.0D0))))/3.0D0
@@ -154,8 +159,8 @@
         ee=1.0d0-e0
       end if
 !
-      alpha=e0-e1/dtau(nzz-1)
-      beta=e1/dtau(nzz-1)
+      alpha=e0-e1/dtau_loc(nzz-1)
+      beta=e1/dtau_loc(nzz-1)
       ray(ip)%I_m(nzz)=ray(ip)%I_m(nzz-1)*ee+
      *     alpha*source_prime(nzz-1)+beta*source_prime(nzz)
 !
@@ -166,13 +171,6 @@
 ! expansion.
 !
       if(ip .le. nc .and. INNER_BND_METH .eq. 'HOLLOW')then
-	if(cur_loc .eq. -1)then
-	  cur_loc=0
-	  freq_store(cur_loc)=freq
-	else if(freq_store(cur_loc) .ne. freq)then
-          cur_loc=mod(cur_loc+1,n_store)
-	  freq_store(cur_loc)=freq
-	end if
 	ray(ip)%i_in_bnd_store(cur_loc)=ray(ip)%I_m(nzz)
 !
 ! Now get flux incident at inner boudary from other side of envelope.
@@ -233,7 +231,7 @@
 !
 ! Determine "optical depth" from outside to center (s_m,mu_m)
 !
-      CALL OPTDEPTH_V2(CHI_TAU,RAY(IP)%NZ,IP,L_TRUE)
+      CALL OPTDEPTH_V4(DTAU_LOC,CHI_TAU,RAY(IP)%NZ,IP,L_TRUE,'ZERO')
 !
 !---------------------------------------------------------------
 !
@@ -243,12 +241,12 @@
 !
       do iz=nzz-1,2,-1
 !
-        t1=dtau(iz)
+        t1=dtau_loc(iz)
         if(t1 .gt. 0.01d0)then
-          ee=exp(-dtau(iz))
+          ee=exp(-dtau_loc(iz))
           e0=1.0d0-ee
-          e1=dtau(iz)-e0
-          e2=dtau(iz)*dtau(iz)-2.0d0*e1
+          e1=dtau_loc(iz)-e0
+          e2=dtau_loc(iz)*dtau_loc(iz)-2.0d0*e1
         else
            e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1-0.2D0*t1*(1.0D0-t1/6.0D0*
      1              (1.0D0-t1/7.0D0))))/3.0D0
@@ -257,13 +255,13 @@
            ee=1.0d0-e0
          end if
 !
-        alpha=(e2-dtau(iz)*e1)/
-     *       (dtau(iz-1)*(dtau(iz)+dtau(iz-1)))
-        beta=((dtau(iz)+dtau(iz-1))*e1-e2)/(dtau(iz-1)*dtau(iz))
-        gamma=e0+(e2-(dtau(iz-1)+2.0d0*dtau(iz))*e1)/(dtau(iz)*(dtau(iz)+dtau(iz-1)))
+        alpha=(e2-dtau_loc(iz)*e1)/
+     *       (dtau_loc(iz-1)*(dtau_loc(iz)+dtau_loc(iz-1)))
+        beta=((dtau_loc(iz)+dtau_loc(iz-1))*e1-e2)/(dtau_loc(iz-1)*dtau_loc(iz))
+        gamma=e0+(e2-(dtau_loc(iz-1)+2.0d0*dtau_loc(iz))*e1)/(dtau_loc(iz)*(dtau_loc(iz)+dtau_loc(iz-1)))
         t1=alpha*source_prime(iz-1)+beta*source_prime(iz)+gamma*source_prime(iz+1)
         if(t1 .lt. 0)then
-	  t1=source_prime(iz)+dtau(iz-1)*(source_prime(iz)-source_prime(iz+1))/dtau(iz)
+	  t1=source_prime(iz)+dtau_loc(iz-1)*(source_prime(iz)-source_prime(iz+1))/dtau_loc(iz)
      	  t1=alpha*t1+beta*source_prime(iz)+gamma*source_prime(iz+1)
 	end if
         ray(ip)%I_p(iz)=ray(ip)%I_p(iz+1)*ee+t1
@@ -273,12 +271,12 @@
 ! If only 2 points along the ray or at outer boundary, must use linear
 ! source function
 !
-      t1=dtau(1)
+      t1=dtau_loc(1)
       if(t1 .gt. 0.01d0)then
-        ee=exp(-dtau(1))
+        ee=exp(-dtau_loc(1))
         e0=1.0d0-ee
-        e1=dtau(1)-e0
-        e2=dtau(1)*dtau(1)-2.0d0*e1
+        e1=dtau_loc(1)-e0
+        e2=dtau_loc(1)*dtau_loc(1)-2.0d0*e1
       else
         e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1-0.2D0*t1*(1.0D0-t1/6.0D0*
      1              (1.0D0-t1/7.0D0))))/3.0D0
@@ -287,8 +285,8 @@
         ee=1.0d0-e0
       end if
 !
-      beta=e1/dtau(1)
-      gamma=e0-e1/dtau(1)
+      beta=e1/dtau_loc(1)
+      gamma=e0-e1/dtau_loc(1)
       ray(ip)%I_p(1)=ray(ip)%I_p(2)*ee+beta*source_prime(1)+gamma*source_prime(2)
 !     if(ip .le. nc)write(166,*)freq,ray(ip)%I_p(nzz),ray(ip)%I_m(nzz)
 !
