@@ -288,12 +288,13 @@
 	  J=J-1
 	END DO
 !
-10	RVTJ_FILE_NAME=DIR_NAME(1:LEN_DIR)//'RVTJ'
-	CALL GEN_IN(RVTJ_FILE_NAME,'File with R, V, T etc (RVTJ)')
+	RVTJ_FILE_NAME=DIR_NAME(1:LEN_DIR)//'RVTJ'
+10	CALL GEN_IN(RVTJ_FILE_NAME,'File with R, V, T etc (RVTJ)')
 	IF(INDEX(RVTJ_FILE_NAME,'NULL') .EQ. 0)THEN
 	  OPEN(UNIT=LU_IN,FILE=RVTJ_FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	    IF(IOS .NE. 0)THEN
 	      WRITE(T_OUT,*)'Unable to open RVTJ: IOS=',IOS
+	      RVTJ_FILE_NAME='../RVTJ'
 	      GOTO 10
 	    END IF
 	  CLOSE(LU_IN)
@@ -580,7 +581,7 @@
 	ELSE IF(X(1:2) .EQ. 'JD' .OR. X(1:2) .EQ. 'HD')THEN
 !
 	  SCALE_FAC=1.0D0
-	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0','Scale factor to prevent overflow')
+	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0','Scale factor to prevent overflow')
 	  CALL USR_OPTION(I,'Depth',' ','Depth index')
 	  ISAV=I
 	  DO ID=1,NUM_FILES
@@ -632,11 +633,11 @@
 	    END DO
 	    IF(LOG_Y)THEN
 	      DO J=1,ND
-	       IF(YV(J) .GT. 0.0D0)THEN
-	         YV(J)=LOG10(YV(J))
-	       ELSE
-	         YV(J)=-200.0
-	       END IF
+	        IF(YV(J) .GT. 0.0D0)THEN
+	          YV(J)=LOG10(YV(J))
+	        ELSE
+	          YV(J)=-200.0
+	        END IF
 	      END DO
 	    END IF
 	    CALL DP_CURVE(ND,XV,YV)
@@ -663,6 +664,16 @@
 	        T1=0.5D0*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML))
 	        TA(ML)=TA(ML-1)+T1*(ZM(ID)%RJ(I,ML-1)+ZM(ID)%RJ(I,ML))
 	      END DO
+	      WRITE(T_OUT,'(/,A,ES11.4)')' J(Lsun) is:',TA(NCF)*4.1274D+03
+	      WRITE(T_OUT,'(A,ES11.4)')'      Beta is:',V(I)/2.99792458D+05
+	    END IF
+!
+! The transformiation from comoving-frame H to observing fram H is H(obs) = H + beta (J+K).
+! At the outer boudary, we will assume H=J+K (since we don't have K).
+!
+	    IF(I .EQ. 1 .AND. PLT_H)THEN
+	      T1=(1.0D0+2.0D0*V(1)/2.99792458D+05)*TA(NCF)
+	      WRITE(T_OUT,'(/,A,ES11.4)')'Observer''s frame luminosity(Lsun) is:',T1*4.1274D+03
 	    END IF
 !
 	    DO ML=1,NCF
@@ -863,10 +874,9 @@
 	  XAXIS='Log V(km/s)'
 	ELSE IF(XAX_OPTION .EQ. 'XLINR')THEN
 	  DO I=1,ND
-	    XV(I)=R(I)/R(ND)
+	    XV(I)=R(I)
 	  END DO
-!	  XAXIS='R(10\u10\d cm)'
-	  XAXIS='R/R\d*\u'
+	  XAXIS='R(10\u10\d cm)'
 	ELSE IF(XAX_OPTION .EQ. 'XVEL')THEN
 	  DO I=1,ND
 	    XV(I)=V(I)
