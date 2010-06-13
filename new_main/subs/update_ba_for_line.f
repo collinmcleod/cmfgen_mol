@@ -181,7 +181,7 @@
 ! from CHI_CONT inside BA_UPDATE_V7.
 !
 	    INDX_BA_METH=ND+1
-	    IF(NEW_LINE_BA)INDX_BA_METH=41			!Set to 1 for NEW_LINE_BA
+	    IF(NEW_LINE_BA)INDX_BA_METH=45			!Set to 1 for NEW_LINE_BA
 	    IF(NEW_LINE_BA .AND. .NOT. LAMBDA_ITERATION)THEN
 	      TA(1:INDX_BA_METH-1)=ETA_NOSCAT(1:INDX_BA_METH-1); TA(INDX_BA_METH:ND)=ETA(INDX_BA_METH:ND)
 	      TB(1:INDX_BA_METH-1)=CHI_NOSCAT(1:INDX_BA_METH-1); TB(INDX_BA_METH:ND)=CHI(INDX_BA_METH:ND)
@@ -313,24 +313,28 @@
 !     the uncorrected line opacity in the source function and hence the
 !     expression for ZNET.
 !
+	  IF(UPDATE_dZ)THEN
+	    DO L=1,ND
+	      TA(L)=CHI_NOSCAT_PREV(L)/CHI_NOSCAT(L)
+	      IF(ETA_CONT(L) .EQ. 0)THEN
+	        TB(L)=1.0D0
+	      ELSE
+	        TB(L)=ETA_PREV(L)/ETA_CONT(L)
+	      END IF
+	      IF(TA(L) .GT. 5.0)THEN
+	        TA(L)=0.0D0; TB(L)=0.0D0
+	      END IF
+	    END DO
+	  END IF
+!
 	  CALL TUNE(IONE,'dZ_LINE')
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(T1,MUL_FAC,OPAC_FAC,EMIS_FAC,STIM_FAC,J,K,L,NL,NUP)
 	  DO SIM_INDX=1,MAX_SIM
 	    IF(RESONANCE_ZONE(SIM_INDX) .AND. .NOT. WEAK_LINE(SIM_INDX))THEN
 !
 ! Adjust variation of line with continuum to current continuum frequency.
 !
 	      IF(UPDATE_dZ)THEN
-	        DO L=1,ND
-	          TA(L)=CHI_NOSCAT_PREV(L)/CHI_NOSCAT(L)
-	          IF(ETA_CONT(L) .EQ. 0)THEN
-	            TB(L)=1.0D0
-	          ELSE
-	            TB(L)=ETA_PREV(L)/ETA_CONT(L)
-	          END IF
-	          IF(TA(L) .GT. 5.0)THEN
-	            TA(L)=0.0D0; TB(L)=0.0D0
-	          END IF
-	        END DO
 	        DO K=1,ND
 	          DO J=BNDST(K),BNDEND(K)
  	            L=BND_TO_FULL(J,K)
@@ -391,6 +395,7 @@
 	      END DO
 	    END IF 
 	  END DO
+!$OMP END PARALLEL DO
 	  CALL TUNE(ITWO,'dZ_LINE')
 !
 ! 
@@ -447,6 +452,7 @@
 	        END DO
 	      END IF
 !
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(T4,I,J,JJ,L,NL)
 	      DO K=1,ND
 		T4=ABS(ZNET_SIM(K,SIM_INDX)-1.0D0)
 	          IF(T4 .GT. ZNET_VAR_LIMIT)THEN
@@ -475,6 +481,7 @@
 	          END DO	        !Over Variable depth (1:NUM_BNDS)
 	        END IF		!ABS|ZNET-1| > 0.01
 	      END DO			!Over J depth.
+!$OMP END PARALLEL DO
 !
 ! Update variation equations. NB. We do not need to update the Radiative
 ! Equilibrium equation, since this is automatically updated with the
@@ -500,6 +507,7 @@
 	      OPAC_FAC=LINE_OPAC_CON(SIM_INDX)
 	      STIM_FAC=LINE_OPAC_CON(SIM_INDX)*GLDGU(SIM_INDX)
 !
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(T1,T2,T4,J,K,JJ)
 	      DO L=1,ND					!Equation depth
 !
 	        K=DIAG_INDX
@@ -524,6 +532,7 @@
 	          END DO
 	        END IF
 	      END DO
+!$OMP END PARALLEL DO
 !
 	      IF(SCL_LINE_COOL_RATES)THEN
 	        SCL_FAC=(AVE_ENERGY(NL)-AVE_ENERGY(NUP))/FL_SIM(SIM_INDX)
@@ -546,6 +555,8 @@
 	          BA_T(NT,K,L)=BA_T(NT,K,L) + T3*(T1*JBAR_SIM(L,SIM_INDX) - T2*LINE_QW_SUM(SIM_INDX)) 
 	        END DO
 !	      ELSE
+!
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(T1,T3,T4,J,K,JJ)
 	        DO L=1,INDX_BA_METH-1
 	          K=GET_DIAG(L)
 	          T3=SCL_FAC
@@ -563,6 +574,8 @@
 	            END DO
 	          END IF
 	        END DO
+!$OMP END PARALLEL DO
+!
 !	      END IF
 	      CALL TUNE(ITWO,'dBA_LINE')
 !
