@@ -629,7 +629,7 @@
 	      WRITE(10,'(A,ES12.4)')'! New mass-loss rate in Msun/yr=',MDOT 
 	      WRITE(10,'(A,ES12.4)')'! Velocity at infinity in km/s =',VINF
 	      WRITE(10,'(A,ES12.4)')'! Beta for velocity law        =',BETA
-	      WRITE(10,'(A,I)'     )'! Velocity law (type)          =',VEL_TYPE
+	      WRITE(10,'(A,I2)'    )'! Velocity law (type)          =',VEL_TYPE
 	      WRITE(10,'(A,ES12.4)')'! Transition velocity is       =',V_TRANS
 	    END IF
 	    WRITE(10,'(A)')'!'
