@@ -273,12 +273,13 @@
 	  J=J-1
 	END DO
 !
-10	RVTJ_FILE_NAME=DIR_NAME(1:LEN_DIR)//'RVTJ'
-	CALL GEN_IN(RVTJ_FILE_NAME,'File with R, V, T etc (RVTJ)')
+	RVTJ_FILE_NAME=DIR_NAME(1:LEN_DIR)//'RVTJ'
+10	CALL GEN_IN(RVTJ_FILE_NAME,'File with R, V, T etc (RVTJ)')
 	IF(INDEX(RVTJ_FILE_NAME,'NULL') .EQ. 0)THEN
 	  OPEN(UNIT=LU_IN,FILE=RVTJ_FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	    IF(IOS .NE. 0)THEN
 	      WRITE(T_OUT,*)'Unable to open RVTJ: IOS=',IOS
+	      RVTJ_FILE_NAME='../RVTJ'
 	      GOTO 10
 	    END IF
 	  CLOSE(LU_IN)
@@ -685,7 +686,7 @@
 	    PLOT_RSQJ=.TRUE.
 	    CALL USR_OPTION(ZEROV,'ZEROV','T','Correct wavelntsh to zero V')
 	  END IF
-	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0','Scale factor to prevent overflow')
+	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0','Scale factor to prevent overflow')
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
 	    I=ISAV
@@ -729,7 +730,7 @@
 !
 	  SCALE_FAC=1.0D0
 	  PLOT_RSQJ=.FALSE.
-	  CALL USR_HIDDEN(SCALE_FAC,'SCALE',' ','Scale factor to prevent overflow')
+	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0','Scale factor to prevent overflow')
 	  CALL USR_HIDDEN(PLOT_RSQJ,'RSQJ','F','Plot r^2 Gamma J?')
 	  CALL USR_OPTION(USE_V,'USE_V','F','Use V for x-axis (otherwise R)')
 !
