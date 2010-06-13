@@ -11,6 +11,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered:   18-May-2010 : Change to allow BA to be held fixed after a LAMBDA iteration.
 ! Altered:   23-Feb-2007 : Call to SOLVEBA_V8 changed to SOLVEBA_V9; LAM_SCALE_OPT inserted
 !                            into SOLVEBA_V9 call.
 ! Finalized: 15-Feb-2006
@@ -41,9 +42,12 @@
 	REAL*8 ESEC(ND)
 	REAL*8 T1,T2
 	REAL*8, SAVE :: MAXCH_SUM=0.0D0
+	INTEGER, SAVE :: COUNT_FULL_LAM_BA=1
 !
 	INTEGER I,J
 !
+	LOGICAL FILE_OPEN
+	LOGICAL BA_SUCCESSFULLY_OUTPUT
 	LOGICAL SUCCESS
 	CHARACTER*20 TEMP_CHAR
 !
@@ -371,6 +375,26 @@
 	    WRITE(LUER,*)'Error flag=',I
 	  END IF
 	END IF
+!
+! Here we check whether we keep BA fixed. Previously we always computed the BA
+! matrix after a LAMBDA iteration. This will allow us to keep it fixed for
+! at least 1 iteration. Since the computation of the BA matrix takes considerable time,
+! this may reduce computational effort.
+!
+	IF(LAST_LAMBDA .EQ. MAIN_COUNTER .AND. .NOT. LAMBDA_ITERATION)THEN
+	   IF(COUNT_FULL_LAM_BA .NE. 0)THEN
+	      COUNT_FULL_LAM_BA=0
+	   ELSE
+	     OPEN(UNIT=7, FILE='BAMATPNT',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	     IF(IOS .EQ. 0)READ(7,*,IOSTAT=IOS)BA_SUCCESSFULLY_OUTPUT
+	     INQUIRE(UNIT=7,OPENED=FILE_OPEN)
+	     IF(FILE_OPEN)CLOSE(UNIT=7)
+	     IF(IOS .EQ. 0 .AND. BA_SUCCESSFULLY_OUTPUT)THEN
+!	       COMPUTE_BA=.FALSE.
+	       COUNT_FULL_LAM_BA=COUNT_FULL_LAM_BA+1
+	     END IF
+	  END IF
+	 END IF
 !
 	RETURN
 	END
