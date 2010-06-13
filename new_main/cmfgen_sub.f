@@ -2258,7 +2258,6 @@
 ! NB: The line term in the RE equations is not needed since it is included 
 ! directly with continuum integration.
 !
-	WRITE(229,'(I6,3ES16.6)')ML,FL,SE(22)%STEQ(1,29),SE(22)%STEQ(2,29)
 	DO SIM_INDX=1,MAX_SIM
 	  IF( END_RES_ZONE(SIM_INDX) )THEN
             T1=FL_SIM(SIM_INDX)*EMLIN 
@@ -2284,7 +2283,6 @@
 	    END DO
 	  END IF    
 	END DO
-	WRITE(229,'(I6,3ES16.6)')ML,FL,SE(22)%STEQ(1,29),SE(22)%STEQ(2,29)
 !
 !                                                                    
 !
