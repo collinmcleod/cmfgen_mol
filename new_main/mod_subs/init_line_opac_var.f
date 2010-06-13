@@ -86,8 +86,8 @@
 	1                     .NOT. WEAK_LINE(SIM_INDX))THEN
 	    THIS_TRANS_IMP=IMP_VAR(SIM_NL(SIM_INDX)) .AND. IMP_VAR(SIM_NUP(SIM_INDX))
 	    I=TX_OFFSET+1
-	    DO WHILE( VAR_LEV_ID(I) .NE. SIM_NL(SIM_INDX)  .OR.
-	1                                IMP_TRANS_VEC(I) .NE. THIS_TRANS_IMP )
+	    DO WHILE( (VAR_LEV_ID(I) .NE. SIM_NL(SIM_INDX))  .OR.
+	1                                (IMP_TRANS_VEC(I) .NEQV. THIS_TRANS_IMP) )
 	      I=I+1
 	      IF(I .GT. NM)THEN
 C
@@ -114,8 +114,8 @@ C
 C Now do the upper level.
 C
 	    I=TX_OFFSET+1
-	    DO WHILE( VAR_LEV_ID(I) .NE. SIM_NUP(SIM_INDX) .OR.
-	1                                IMP_TRANS_VEC(I) .NE. THIS_TRANS_IMP)
+	    DO WHILE( (VAR_LEV_ID(I) .NE. SIM_NUP(SIM_INDX)) .OR.
+	1                                (IMP_TRANS_VEC(I) .NEQV. THIS_TRANS_IMP) )
 	      I=I+1
 	      IF(I .GT. NM)THEN
 C
