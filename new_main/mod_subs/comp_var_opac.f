@@ -59,7 +59,10 @@ C
 	  DO L=1,ND
 	    EMHNUKT_CONT(L)=EXP(-HDKT*CONT_FREQ/T(L))
 	  END DO
-C
+!
+! Parallelizing over ID appears to be inefficient (using reduction) since
+! the whole arrays (VCHI, etc) must be added at the end of each call to VAR_op_V8.
+!
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
@@ -181,6 +184,7 @@ C
 ! NB: We also need to correct VETA for the variation in T in the factor T4.
 ! Over correction at present because impurity species included.
 !
+!$OMP PARALLEL DO PRIVATE(T4)
 	    DO L=1,ND
 	      T4=T1*EXP(-HDKT*(FL-CONT_FREQ)/T(L))
               DO K=1,NT
@@ -190,6 +194,7 @@ C
 	1                  ETA_C_EVAL(L)*T4*HDKT*(FL-CONT_FREQ)/T(L)/T(L)
 	    END DO
 !
+!$OMP PARALLEL DO PRIVATE(T4)
 	    DO L=1,ND
 	      T4=T1*EXP(-HDKT*(FL-CONT_FREQ)/T(L))
               DO K=1,NT
