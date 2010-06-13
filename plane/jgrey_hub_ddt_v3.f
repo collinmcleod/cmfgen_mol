@@ -18,6 +18,7 @@
 	1              ACCURACY,DO_TIME_VAR,TIME_SEQ_NO,ND,NC,NP,NT)
 	IMPLICIT NONE
 !
+! Altered 06-Jun-2010: Assume zero-flux option when not diffusion option.
 ! Altered 05-Aug-2008: Fixed bug with check SUM written to SN_GREY_CHK.
 !                          Replaced T1+T2+T3-E3 with T1+T2+T3-E3 (.ie., -T3 --> +T3)
 !                          NB: E3 refers to the work term, T3 to the radictive decay term.
@@ -248,15 +249,18 @@
 !
 ! NB: H_INBC is actually R^2 . H
 !
-	H_INBC=3.826D+13*LUMINOSITY/16.0D0/PI/PI
         IF(DIFF_APPROX)THEN
+	  H_INBC=3.826D+13*LUMINOSITY/16.0D0/PI/PI
 	  T1=1.0D0+RECIP_CDELTAT/CHI(ND)
           TA(ND)=-Q(ND-1)*F(ND-1)/DTAU(ND-1)
           TB(ND)=F(ND)/DTAU(ND-1)
           XM(ND)=H_INBC*T1 - ROLD_ON_R*ROLD_ON_R*RECIP_CDELTAT*H_INBC_OLDT/CHI(ND)
         ELSE
-	  WRITE(LUER,*)'Error --- only diffusion approximation defined in '
-	  STOP
+	  H_INBC=0.0D0
+	  T1=1.0D0+RECIP_CDELTAT/CHI(ND)
+          TA(ND)=-Q(ND-1)*F(ND-1)/DTAU(ND-1)
+          TB(ND)=F(ND)/DTAU(ND-1)
+          XM(ND)=0.0D0
         END IF
         TC(ND)=0.0D0
 !
