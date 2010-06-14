@@ -14,7 +14,13 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
-! Aleterd  15-Aug-2003 :  QF option installed. Allows ion column densities to be compared.
+! Altered  13-Jun-2010 :  Rayleigh scattering included in OPACITIES.INC.
+!                         ESEC replaced by CHI_SCAT in may locations.
+!                         Still some issues to be decided (i.e., Raleigh scattering to opacity file?)
+!  	                  Changed to SOBEW_GRAD_V2 -- changed call. Adapted to work for very low opacities.
+!                         Now include variable INNER_BND_METH.
+!
+! Altered  15-Aug-2003 :  QF option installed. Allows ion column densities to be compared.
 !                         Option added to PLTPHOT to allow photoioization cross-section
 !                           to be compted at a particular electron desnity. This allows the
 !                           effects of level dissolution to be seen.
@@ -51,7 +57,6 @@
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 	DOUBLE PRECISION CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
-!
 !
 ! 
 !
@@ -157,7 +162,9 @@
 	REAL*8 C_CMS
 	REAL*8 C_KMS
 !
-	CHARACTER*6 METHOD,TYPE_ATM
+	CHARACTER(LEN=6) METHOD
+	CHARACTER(LEN=6) TYPE_ATM
+	CHARACTER(LEN=10) INNER_BND_METH
 !
 	REAL*8, ALLOCATABLE :: CHI_PAR(:,:)
 	REAL*8, ALLOCATABLE :: ETA_PAR(:,:)
@@ -180,7 +187,8 @@
 	REAL*8 GB(ND),U(ND),VB(ND),VC(ND),CHIL(ND),ETAL(ND)
 	REAL*8 SOURCE(ND),TCHI(ND),ZETA(ND),THETA(ND)
 	REAL*8 ETA(ND),ETA_WITH_ES(ND)
-	REAL*8 ESEC(ND),EMHNUKT(ND),VT(ND),CHI_RAY(ND)
+	REAL*8 ESEC(ND),EMHNUKT(ND),VT(ND)
+	REAL*8 CHI_SCAT(ND),CHI_RAY(ND)
 	REAL*8 AV(ND),CV(ND)
 	REAL*8 FORCE_MULT(ND_MAX)
 	LOGICAL DO_DPTH(ND)
@@ -345,11 +353,21 @@
 !
 ! 
 !
-	DIF=.TRUE.
 	XAXIS=' '
 	XAXSAV=' '
 	YAXIS=' '
 	METHOD='LOGLOG'
+!
+! NB: ZERO_FLUX condition is equivalent to DIF=.TRUE. and DBB=0.
+!     Thus, for routine compatibility, we set DBB=0 when DIF is false.
+!
+	IF(V(1) .GT. 10000.0D0)THEN
+	  INNER_BND_METH='ZERO_FLUX'		!Default for SN model
+	  DIF=.FALSE.
+	ELSE
+	  INNER_BND_METH='DIFFUSION'		!Default for normal stars
+	  DIF=.TRUE.
+	END IF
 	TYPE_ATM=' '			!i.e def is not 'EXP'
 	TRAPFORJ=.TRUE.
 	TSTAR=T(ND)
@@ -823,20 +841,9 @@
 	    ELSE IF(ANG_INPUT)THEN
 	      FREQ=ANG_TO_HZ/FREQ
 	    END IF
-	    CALL USR_OPTION(ELEC,'ELEC','T',
-	1	 'Include electron scattering?')
+	    CALL USR_OPTION(ELEC,'ELEC','T','Include electron scattering?')
+	    CALL USR_OPTION(INC_RAY_SCAT,'RAY','F','Include Rayeigh scattering')
 	  END IF
-!
-! Compute  Rayleigh scattering contribution.
-!
-	  CALL USR_OPTION(INC_RAY_SCAT,'RAY','F','Include Rayeigh scattering')
-          IF(ATM(1)%XzV_PRES)THEN
-	    CHI_RAY(1:ND)=0.0D0
-            CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
-	1             ATM(1)%NXzV_F,FREQ,ND)
-	    CHI_RAY(1:ND)=CHI_RAY(1:ND)*CLUMP_FAC(1:ND)
-          END IF
-!
 	END IF
 !
 ! 
@@ -882,6 +889,7 @@
 	  T1=HDKT*FL/T(ND)
 	  T2=1.0D0-EMHNUKT(ND)
 	  DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
+	  IF(.NOT. DIF)DBB=0.0D0
 !
 ! Solve for the continuum radiation field at the line frequency.
 !
@@ -891,9 +899,11 @@
 ! Adjust the opacities and emissivities for the influence of clumping.
 !
 	  DO I=1,ND
+	    ETA(I)=ETA(I)*CLUMP_FAC(I)
 	    CHI(I)=CHI(I)*CLUMP_FAC(I)
 	    ESEC(I)=ESEC(I)*CLUMP_FAC(I)
-	    ETA(I)=ETA(I)*CLUMP_FAC(I)
+	    CHI_RAY(I)=CHI_RAY(I)*CLUMP_FAC(I)
+	    CHI_SCAT(I)=CHI_SCAT(I)*CLUMP_FAC(I)
 	  END DO
 !
 	END IF
@@ -1046,12 +1056,16 @@
 	      SOURCE(I)=ZETA(I)
 	    END DO
 	    INACCURATE=.TRUE.
+	    HBC=0.99D0
+	    THK_CONT=.FALSE.
 	    DO WHILE(INACCURATE)
-	      CALL FQCOMP(TA,TB,TC,XM,DTAU,R,Z,P,Q,FEXT,
+	      CALL FQCOMP_V2(TA,TB,TC,XM,DTAU,R,Z,P,Q,FEXT,
 	1            SOURCE,CHI,DCHIDR,JQW,KQW,DBB,HBC,
-	1            INBC,IC,S1,THK_CONT,DIF,NC,ND,NP,METHOD)
+	1            INBC,IC,S1,THK_CONT,INNER_BND_METH,NC,ND,NP,METHOD)
+	      T1=DBB
+	      IF(INNER_BND_METH .EQ. 'ZERO_FLUX' .OR. INNER_BND_METH .EQ. 'HOLLOW')T1=0.0D0
 	      CALL JFEAUNEW(TA,TB,TC,DTAU,R,RJ,Q,FEXT,
-	1            ZETA,THETA,CHI,DBB,IC,HBC,
+	1            ZETA,THETA,CHI,T1,IC,HBC,
 	1            INBC,THK_CONT,DIF,ND,METHOD)
 	      S1=ZETA(1)+THETA(1)*RJ(1)
 	      INACCURATE=.FALSE.
@@ -1063,6 +1077,10 @@
 	      END DO
 	      IF(T1 .GT. 1.0E-05)INACCURATE=.TRUE.
 	      WRITE(T_OUT,'('' Maximum fractional change is'',1PE11.4)')T1
+	    END DO
+	    WRITE(6,*)GAM(1),RJ(1)
+	    DO I=1,ND
+	      WRITE(26,'(ES18.8,6ES14.4)')R(I),ETA(I),CHI(I),THETA(I)*CHI(I),ZETA(I),THETA(I),RJ(I)
 	    END DO
 !
 	  ELSE
@@ -1080,8 +1098,7 @@
 ! contribute signifcantly to the emissivity.
 !
 	  DO I=1,ND
-!	    ETA_WITH_ES(I)=ETA(I)+RJ(I)*ED(I)*6.65E-15
-	    ETA_WITH_ES(I)=ETA(I)+RJ(I)*ESEC(I)
+	    ETA_WITH_ES(I)=ETA(I)+RJ(I)*CHI_SCAT(I)
 	  END DO
 !
 	END IF
@@ -1266,6 +1283,18 @@
 	    WRITE(T_OUT,*)'Setting METHOD=LOGLOG'
 	  ENDIF
 !
+	ELSE IF(XOPT .EQ. 'SET-IBC')THEN
+	  DEFAULT=INNER_BND_METH
+	  CALL USR_OPTION(INNER_BND_METH,'IBC',DEFAULT,
+	1      'Inner boundary condition: DIFFUSION, SCHUSTER, ZERO_FLUX, HOLLOW')
+	  IF(INNER_BND_METH .NE. 'DIFFUSION' .AND. INNER_BND_METH .NE. 'SCHUSTER' .AND.
+	1       INNER_BND_METH .NE. 'ZERO_FLUX' .AND. INNER_BND_METH .NE. 'HOLLOW')THEN
+	    INNER_BND_METH='DIFFSION'
+	    WRITE(T_OUT,*)'Did not recognize option'
+	    WRITE(T_OUT,*)'Setting INNER_BND_METH to DIFFUSION'
+	  ENDIF
+	  DIF=.TRUE.
+	  IF(INNER_BND_METH .NE. 'DIFFUSION')DIF=.FALSE.
 ! 
 ! **************************************************************************
 ! **************************************************************************
@@ -1375,7 +1404,7 @@
 !
 ! Note that CLUMP_FAC has already been included in ETA, CHI, ESEC, ETAL, and CHIL.
 !
-	    CALL COMP_JBAR(ETA,CHI,ESEC,ETAL,CHIL,
+	    CALL COMP_JBAR(ETA,CHI,CHI_SCAT,ETAL,CHIL,
 	1                T,V,SIGMA,R,P,
 	1                JQW,HMIDQW,KQW,NMIDQW,
 	1                JBAR,DIF,DTDR,IC,ELEC,
@@ -1412,7 +1441,7 @@
 ! which is not computed anyway.
 !
 	      IF(SOL_OPT(1:3) .EQ. 'HAM')THEN
-	        CALL HAM_FORMSOL(ETA_WITH_ES,CHI,ESEC,CHIL,ETAL,V,SIGMA,R,P,
+	        CALL HAM_FORMSOL(ETA_WITH_ES,CHI,CHI_SCAT,CHIL,ETAL,V,SIGMA,R,P,
 	1                  JBAR,ZNET,TA,TB,TC,.FALSE.,
 	1                  RJ,AV,CV,GAM,
 	1                  EW,CONT_INT,LINE_BL,FULL_ES,
@@ -1420,7 +1449,7 @@
 	1                  PF,LINE_PRO,LFQW,ERF,FL,DIF,DBB,IC,
 	1                  1.0D0,THK_LINE,THK_CONT,NLF,NC,NP,ND,METHOD)
 	      ELSE
-	        CALL FORMSOL(ETA_WITH_ES,CHI,ESEC,CHIL,ETAL,V,SIGMA,R,P,
+	        CALL FORMSOL(ETA_WITH_ES,CHI,CHI_SCAT,CHIL,ETAL,V,SIGMA,R,P,
 	1                  JBAR,ZNET,TA,TB,TC,.FALSE.,
 	1                  RJ,AV,CV,GAM,
 	1                  EW,CONT_INT,LINE_BL,FULL_ES,
@@ -1485,7 +1514,7 @@
 ! computed using Eddington Factors.
 !
 	    IF(HAM)THEN
-	      CALL FG_HAM(ETA_WITH_ES,CHI,ESEC,RJ,
+	      CALL FG_HAM(ETA_WITH_ES,CHI,CHI_SCAT,RJ,
 	1                  CHIL,ETAL,V,SIGMA,R,P,
 	1                  JNU,HNU,FEDD,GEDD,
 	1                  JQW,HMIDQW,KQW,NMIDQW,
@@ -1499,7 +1528,7 @@
 ! We use TA for RADEQ, and TB for the FLUX vectors returned by the
 ! EW computation.
 !
-	      CALL MOMHAM(ETA_WITH_ES,CHI,ESEC,THETA,RJ,CHIL,ETAL,
+	      CALL MOMHAM(ETA_WITH_ES,CHI,CHI_SCAT,THETA,RJ,CHIL,ETAL,
 	1                  V,SIGMA,R,JBAR,ZNET,
 	1                  JNU,HNU,FEDD,GEDD,
 	1                  HBC_VEC,INBC_VEC,NBC_VEC,TA,TB,
@@ -1508,7 +1537,7 @@
 	1                  NLF,NC,NP,ND)
 	      WRITE(T_OUT,180)MOMEW,MOMCONT_INT,LAMVACAIR(FL)
 	    ELSE
-	      CALL FG_COMP(ETA_WITH_ES,CHI,ESEC,RJ,
+	      CALL FG_COMP(ETA_WITH_ES,CHI,CHI_SCAT,RJ,
 	1                  CHIL,ETAL,V,SIGMA,R,P,
 	1                  JNU,HNU,FEDD,GEDD,
 	1                  JQW,HMIDQW,KQW,NMIDQW,
@@ -1522,7 +1551,7 @@
 ! We use TA for RADEQ, and TB for the FLUX vectors returned by the
 ! EW computation.
 !
-	      CALL MOMJBAR(ETA_WITH_ES,CHI,ESEC,THETA,RJ,CHIL,ETAL,
+	      CALL MOMJBAR(ETA_WITH_ES,CHI,CHI_SCAT,THETA,RJ,CHIL,ETAL,
 	1                  V,SIGMA,R,JBAR,ZNET,
 	1                  JNU,HNU,FEDD,GEDD,
 	1                  HBC_VEC,INBC_VEC,NBC_VEC,TA,TB,
@@ -1759,6 +1788,7 @@
 !
 	      HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
 	      DBB=3.0D0*HFLUX*CHIROSS(ND)
+	      IF(.NOT. DIF)DBB=0.0D0
 	      T1=1.0D0
 	      DO WHILE(T1 .GT. 1.0D-05)
 	        CALL MOM_JREL_GREY_V1(XM,CHIROSS,CHIROSS,V,SIGMA,R,
@@ -1825,7 +1855,8 @@
 !
               HFLUX=3.826D+13*LUM/16.0D0/PI**2/R(ND)/R(ND)
               DBB=3.0D0*CHIROSS(ND)*HFLUX
-              T1=1000.0D0
+              IF(.NOT. DIF)DBB=0.0D0
+	      T1=1000.0D0
 !
 ! Compute radial (vertical) optical depth increments.
 !
@@ -2318,7 +2349,7 @@
 	  DO I=1,ND
 	    ESEC(I)=6.65D-15*ED(I)
 	  END DO
-          CALL TORSCL_V2(TA,ESEC,R,TB,TC,ND,METHOD,TYPE_ATM,L_TRUE)
+          CALL TORSCL(TA,ESEC,R,TB,TC,ND,METHOD,TYPE_ATM)
 !
 	  DO I=1,ND
 	    J=I
@@ -2383,7 +2414,7 @@
 	1               ATM(ID)%GXzV_F(MNL_F)*ATM(ID)%XzV_F(MNUP_F,I)/ATM(ID)%GXzV_F(MNUP_F) )
 	            CHIL(I)=MAX(1.0D-15*CHIL(I)/(FL/2.998D+04)/SQRT(PI),1.0D-10)
 	          END DO
-                  CALL TORSCL_V2(TA,CHIL,R,TB,TC,DPTH_INDX,'ZERO',TYPE_ATM,L_FALSE)
+                  CALL TORSCL(TA,CHIL,R,TB,TC,DPTH_INDX,'ZERO',TYPE_ATM)
 	          TAU_SOB=TA(DPTH_INDX)
 	          IF(TAU_SOB .GT. TAU_LIM)THEN
 	            WRITE(73,'(A,3ES14.5,3X,F3.0,I6)')ION_ID(ID),ANG_TO_HZ/FL,
@@ -2805,9 +2836,9 @@
 	1               ZETA,THETA,CHI,VT,JQW,
 	1               THICK,DIF,DBB,IC,NC,ND,NP,METHOD)
 !
-	  S1=(ETA(1)+RJ(1)*ESEC(1))/CHI(1)
+	  S1=(ETA(1)+RJ(1)*CHI_SCAT(1))/CHI(1)
 	  DO I=1,ND
-	    SOURCE(I)=(ETA(I)+ESEC(I)*RJ(I))/CHI(I)
+	    SOURCE(I)=(ETA(I)+CHI_SCAT(I)*RJ(I))/CHI(I)
 	  END DO
 	  CALL NORDFLUX(TA,TB,TC,XM,DTAU,R,Z,P,SOURCE,CHI,dCHIdR,HQW,VT,
 	1               S1,THICK,DIF,DBB,IC,NC,ND,NP,METHOD)
@@ -2820,7 +2851,7 @@
           WRITE(LU_LOG,'('' Observed Flux is'',1Pe12.4,''Jy'')')T1
 !
 	  CALL EXTEND_OPAC(CHIEXT,ETAEXT,ESECEXT,RJEXT,COEF,INDX,NDX
-	1                     ,CHI,ETA,ESEC,RJ,ND)
+	1                     ,CHI,ETA,CHI_SCAT,RJ,ND)
 !
 	  DO I=1,NDX
 	    ZETAEXT(I)=ETAEXT(I)/CHIEXT(I)
@@ -2835,11 +2866,13 @@
 	  DO WHILE(INACCURATE)
 	    J=J+1
 	    WRITE(T_OUT,'('' Beginning '',I3,''th loop'')')J
-	    CALL FQCOMP(TA,TB,TC,XM,DTAU,REXT,Z,PEXT,Q,FEXT,
+	    CALL FQCOMP_V2(TA,TB,TC,XM,DTAU,REXT,Z,PEXT,Q,FEXT,
 	1          SOURCEEXT,CHIEXT,ETAEXT,JQWEXT,KQWEXT,DBB,HBC,
-	1          INBC,IC,S1,THICK,DIF,NCX,NDX,NPX,METHOD)
+	1          INBC,IC,S1,THICK,INNER_BND_METH,NCX,NDX,NPX,METHOD)
+	    T1=DBB
+	    IF(INNER_BND_METH .EQ. 'ZERO_FLUX' .OR. INNER_BND_METH .EQ. 'HOLLOW')T1=0.0D0
 	    CALL JFEAUNEW(TA,TB,TC,DTAU,REXT,RJEXT,Q,FEXT,
-	1          ZETAEXT,THETAEXT,CHIEXT,DBB,IC,HBC,
+	1          ZETAEXT,THETAEXT,CHIEXT,T1,IC,HBC,
 	1          INBC,THICK,DIF,NDX,METHOD)
 	    S1=ZETAEXT(1)+THETAEXT(1)*RJEXT(1)
 	    INACCURATE=.FALSE.
@@ -2859,9 +2892,9 @@
 !
 	    CALL UNGRID(AV,ND,RJEXT,NDX,GRID)
 !
-	    S1=(ETA(1)+AV(1)*ESEC(1))/CHI(1)
+	    S1=(ETA(1)+AV(1)*CHI_SCAT(1))/CHI(1)
 	    DO I=1,ND
-	      SOURCE(I)=(ETA(I)+ESEC(I)*AV(I))/CHI(I)
+	      SOURCE(I)=(ETA(I)+CHI_SCAT(I)*AV(I))/CHI(I)
 	    END DO
 	    CALL NORDFLUX(TA,TB,TC,XM,DTAU,R,Z,P,SOURCE,CHI,dCHIdR,HQW,VT,
 	1                 S1,THICK,DIF,DBB,IC,NC,ND,NP,METHOD)
@@ -2899,10 +2932,10 @@
 ! TA is used for the line flux. Integral of TA dlog(r) is
 ! the line EW.
 !
-	    CALL SOBEW_GRAD(SOURCE,CHI,ESEC,CHIL,ETAL,
+	    CALL SOBEW_GRAD_V2(SOURCE,CHI,CHI_SCAT,CHIL,ETAL,
 	1              FORCE_MULT,LUM,
 	1              V,SIGMA,R,P,JQW,HQW,TA,T1,S1,
-	1              FREQ,DIF,DBB,IC,THICK,.FALSE.,NC,NP,ND,METHOD)
+	1              FREQ,'HOLLOW',DBB,IC,THICK,.FALSE.,NC,NP,ND,METHOD)
 !
 	    CALL DP_CURVE(ND,XV,FORCE_MULT)
 	    YAXIS='Force Multiplier'
@@ -4535,11 +4568,6 @@ c
 	      CHI(I)=CHI(I)-ESEC(I)
 	    END DO
 	  END IF
-	  IF(INC_RAY_SCAT)THEN
-	    DO I=1,ND
-	      CHI(I)=CHI(I)+CHI_RAY(I)
-	    END DO
-	  END IF
 !
 	  IF(XOPT .EQ. 'TAUC')THEN
 	    CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,TYPE_ATM)
@@ -4731,9 +4759,11 @@ c
 ! Adjust opacities for the effect of clumping.
 !
 	      DO I=1,ND
+	        ETA(I)=ETA(I)*CLUMP_FAC(I)
 	        CHI(I)=CHI(I)*CLUMP_FAC(I)
 	        ESEC(I)=ESEC(I)*CLUMP_FAC(I)
-	        ETA(I)=ETA(I)*CLUMP_FAC(I)
+	        CHI_RAY(I)=CHI_RAY(I)*CLUMP_FAC(I)
+	        CHI_SCAT(I)=CHI_SCAT(I)*CLUMP_FAC(I)
 	      END DO
 !
 	      CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,TYPE_ATM)
@@ -4865,10 +4895,10 @@ c
 ! the line EW.
 !
 	  FORCE_MULT(1:ND)=0.0D0
-	  CALL SOBEW_GRAD(SOURCE,CHI,ESEC,CHIL,ETAL,
+	  CALL SOBEW_GRAD_V2(SOURCE,CHI,CHI_SCAT,CHIL,ETAL,
 	1             V,SIGMA,R,P,FORCE_MULT,LUM,
 	1             JQW,HQW,TA,T1,S1,
-	1             FREQ,DIF,DBB,IC,THICK,.FALSE.,NC,NP,ND,METHOD)
+	1             FREQ,'HOLLOW',DBB,IC,THICK,.FALSE.,NC,NP,ND,METHOD)
 !
           OPEN(UNIT=18,FILE='DSOB_FORCE_MULT',STATUS='UNKNOWN')
 	    WRITE(18,'(3X,A1,10X,A1,15X,A1,13X,A1)')'I','R','V','M'
@@ -4985,7 +5015,6 @@ c
 !
 	    T1=DLOG10(1.6914D-11/FREQ)
 	    DO I=1,ND
-	      WRITE(6,*)I,CHIL(I),TA(I)
 	      IF(TA(I) .GT. 0)THEN
 	        YV(I)=T1+DLOG10(TA(I))
 	      ELSE IF(TA(I) .LT. 0)THEN
