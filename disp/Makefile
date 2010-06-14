@@ -56,7 +56,7 @@ dispgen.o : dispgen.f mod_disp.o $(GEN)
 maingen.o : maingen.f mod_disp.o $(GEN) \
                EVAL_LTE_FULL.INC  OPACITIES.INC \
                PAR_OPACITIES.INC  XOPAC.INC PAR_XOPAC.INC
-	$(F90) -c  $(FG) maingen.f 
+	$(F90) -c  $(FD) maingen.f 
 
 $(GEN):
 	(cd ../tools; make )

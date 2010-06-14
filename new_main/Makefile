@@ -38,7 +38,7 @@ all : $(EXE_DIR)cmfgen_dev.exe
 $(EXE_DIR)cmfgen_dev.exe : cmfgen.o cmfgen_sub.o \
                                   $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
 	ar -xo ../lib/libmod.a mod_cmfgen.o
-	$(F90) -g mod_cmfgen.o cmfgen.o cmfgen_sub.o \
+	$(F90) mod_cmfgen.o cmfgen.o cmfgen_sub.o \
               -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN5) -l$(LN3) -l$(LN1) -l$(LN6) \
                $(LOCLIB) $(LAPACK) $(BLAS) \
               -o $(EXE_DIR)cmfgen_dev.exe

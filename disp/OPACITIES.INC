@@ -76,10 +76,17 @@ C
           END DO
 	END IF
 C
+        IF(ATM(1)%XzV_PRES .AND. INC_RAY_SCAT)THEN
+          CHI_RAY(1:ND)=0.0D0
+          CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
+	1             ATM(1)%NXzV_F,FL,ND)
+          CHI_RAY(1:ND)=CHI_RAY(1:ND)*CLUMP_FAC(1:ND)
+        END IF
 C
 	DO I=1,ND
+	  CHI(I)=CHI(I)+CHI_RAY(I)
 	  ZETA(I)=ETA(I)/CHI(I)
-	  THETA(I)=ESEC(I)/CHI(I)
+	  THETA(I)=(ESEC(I)+CHI_RAY(I))/CHI(I)
 	END DO
 C 
 C

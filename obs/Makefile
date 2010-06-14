@@ -2,7 +2,7 @@
 
 include ../Makefile_definitions
 
-OPTION=$(FG)
+OPTION=$(FD)
 
 #
 # These names are for the fortran linker
@@ -69,7 +69,7 @@ $(EXE_DIR)obs_frame.exe :  $(OBJ2) $(FN1) $(FN2) $(FN3) $(FN4)
 #
 
 cmf_flux_v5.o : cmf_flux_v5.f      mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(USR)
-	$(F90) -c $(OPTION) cmf_flux_v5.f 
+	$(F90nomp) -c $(OPTION) cmf_flux_v5.f 
 
 cmf_flux_sub_v5.o : cmf_flux_sub_v5.f  mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(GEN) \
    COMP_JCONT_V4.INC  EVAL_LTE_INC_V4.INC\
