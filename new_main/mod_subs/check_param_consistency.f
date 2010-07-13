@@ -55,7 +55,7 @@
 	    WRITE(LUER,*)'Error: inconsistency in control parameters in VADAT'
 	    WRITE(LUER,*)'SN model has USE_DJDT_RTE set to TRUE.'
 	    WRITE(LUER,*)'DO_CO_MOV_DDT should also be set to TRUE.'
-	    STOP
+	    IF(STOP_IF_BAD_PARAM)STOP
 	  END IF
 	  IF(USE_DJDT_RTE .AND. (TIME_SEQ_NO .EQ. 1) )THEN
 	    WRITE(LUER,*)'Error: inconsistency in control parameters in VADAT'
