@@ -37,6 +37,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)land_col_merge.exe\
          $(EXE_DIR)land_multi_merge.exe\
          $(EXE_DIR)mod_cool.exe\
+         $(EXE_DIR)mod_prrr.exe\
          $(EXE_DIR)n_col_merge.exe\
          $(EXE_DIR)n_multi_merge.exe\
          $(EXE_DIR)rewrite_scr.exe\

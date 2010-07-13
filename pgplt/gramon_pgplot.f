@@ -882,6 +882,7 @@ C
 	    MARK=.TRUE.
             WRITE(T_OUT,*)'Wil now mark data points'
 	    CALL NEW_GEN_IN(EXPMARK_SCALE,'Expand Symbol Size')
+	    IF(NPLTS .GT. 10)MARKER_STYLE(1:NPLTS)=-1
 	    CALL NEW_GEN_IN(MARKER_STYLE,I,NPLTS,
 	1                'Marker style {+/-}1,...,31)')
 	  END IF
@@ -2278,7 +2279,7 @@ C
 	    DO J=1,NPTS(IP)
 	      XT(1)=CD(IP)%XVEC(J)
 	      XT(2)=CD(IP)%XVEC(J)
-	      YT(1)=YMIN
+	      YT(1)=YPAR(1)
 	      YT(2)=CD(IP)%DATA(J)
 	      CALL PGLINE(2,XT,YT)
 	    END DO

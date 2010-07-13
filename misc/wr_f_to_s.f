@@ -86,6 +86,7 @@ C
 C
 	INTEGER I,J,K,L,IOS,ID
 	INTEGER CNT,NEW_CNT,N_LS_TERMS
+	INTEGER I1,K1
 	INTEGER MAX_NAME_LNGTH
 	REAL*8 T1,T2
 	REAL*8 DEL_E_CM
@@ -103,6 +104,7 @@ C
 	CHARACTER TIME*24
 	CHARACTER STRING*80
 	CHARACTER ANS*1			!Used for halting LI and HE options
+	CHARACTER(LEN=10) TMP_STR
 C
 	LOGICAL HEAD
 	LOGICAL L_TRUE,L_FALSE
@@ -629,6 +631,44 @@ C
 ! to be output together as a group. The level departure coefficients can 
 ! also be output.
 !
+	ELSE IF(X(1:7) .EQ. 'TERM_WR')THEN
+	  CALL USR_OPTION(FILENAME,'File','TERMS','Link check file')
+	  CALL USR_HIDDEN(WRITE_DC,'DC','F',' ')
+	  CALL GEN_ASCI_OPEN(LUOUT,FILENAME,'UNKNOWN',' ','WRITE',IZERO,IOS)
+C
+	  J=0
+	  DO I=1,NLEV
+	    TERM_NAME(I)=NAME(I)
+	    J=MAX(J,LEN_TRIM(NAME(I)))
+	    K=INDEX(NAME(I),'[')
+	    IF(K .NE. 0)TERM_NAME(I)=NAME(I)(1:K-1)
+	  END DO
+	  WRITE(6,*)'Defined terms'
+!
+	  WRITE(LUOUT,'(A)')'  '
+	  L=MAXVAL(F_TO_S(1:NLEV))
+	  DONE_LEV(1:NLEV)=.FALSE.
+	  DO K=1,NLEV
+	    K1=LEN_TRIM(TERM_NAME(K))
+	    IF(.NOT. DONE_LEV(K))WRITE(LUOUT,*)' '
+	    DO I=K,NLEV
+	      I1=LEN_TRIM(TERM_NAME(I))
+	      IF(TERM_NAME(K)(K1-4:K1) .EQ. TERM_NAME(I)(I1-4:I1) .AND. .NOT. DONE_LEV(I))THEN
+	        DONE_LEV(I)=.TRUE.
+	        LAM_EDGE(I)=1.0D+08/(ION_EN-ENERGY(I))
+	        IF(WRITE_DC)THEN
+	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
+	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I,DC(I,1),
+	1                      DC(I,2),DC(I,3)
+	        ELSE
+	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
+	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I
+	        END IF
+	      END IF
+	    END DO
+	  END DO
+	  CLOSE(LUOUT)
+C                           
 	ELSE IF(X(1:6) .EQ. 'SEQ_WR')THEN
 	  CALL USR_OPTION(FILENAME,'File','SEQ_LNKS','Link check file')
 	  CALL USR_HIDDEN(WRITE_DC,'DC','F',' ')

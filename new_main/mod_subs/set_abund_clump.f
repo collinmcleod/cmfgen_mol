@@ -16,6 +16,8 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 25-Jun-2010 : Correctly compute MEAN_ATOMIC_WEIGHT and ABUND_SUM for 
+!                         SN model. Abunances are surface abundances.
 ! Altered 08-Feb-2006 : New clumping law installed (used by PACO for P Cygni).
 ! Altered 05-Sep-2005 : VAR_MDOT section included.
 ! Created 19-Dec-2004
@@ -90,8 +92,13 @@
 !
 	IF(SN_HYDRO_MODEL)THEN
 	  CALL RD_SN_DATA(ND,NEWMOD,7)
-	  ABUND_SUM=1.0D0
-	  MEAN_ATOMIC_WEIGHT=1.0D0
+	  DO ISPEC=1,NUM_SPECIES
+	    IF(AT_ABUND(ISPEC) .GT. 0)THEN
+	      ABUND_SUM=ABUND_SUM+AT_ABUND(ISPEC)
+              MEAN_ATOMIC_WEIGHT=MEAN_ATOMIC_WEIGHT+AT_MASS(ISPEC)*AT_ABUND(ISPEC)
+	    END IF
+	  END DO
+	  MEAN_ATOMIC_WEIGHT=MEAN_ATOMIC_WEIGHT/ABUND_SUM
 	  RETURN
 	END IF
 ! 

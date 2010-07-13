@@ -113,6 +113,7 @@
 	REAL*8 RADIUS
 	REAL*8 T1,T2,T3
 	REAL*8 LAMC
+	REAL*8 EDGE_FREQ
 	REAL*8 T_ELEC
 	REAL*8, ALLOCATABLE :: NEW_R(:)
 	LOGICAL AIR_LAM
@@ -675,6 +676,29 @@
 	  YV(1:ND)=YV(1:ND)
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='r\u3\dJ'
+	ELSE IF(X(1:4) .EQ. 'PHOT')THEN
+	  IF(ALLOCATED(XV))DEALLOCATE(XV)
+	  IF(ALLOCATED(YV))DEALLOCATE(YV)
+	  ALLOCATE (XV(NCF))
+	  ALLOCATE (YV(NCF))
+	  CALL USR_OPTION(I,'Depth',' ','Depth index')
+	  CALL USR_OPTION(LAMC,'WAVE',' ','Ionization edge(Ang)')
+	  EDGE_FREQ=0.01D0*C_KMS/LAMC
+	  WRITE(6,*)'Edge freq is',EDGE_FREQ
+	  ND=ZM(1)%ND; NCF=ZM(1)%NCF
+	  XV(1)=0.0D0; YV(1)=0.0D0
+	  DO ML=2,NCF
+	    IF(ZM(1)%NU(ML) .LT. EDGE_FREQ)EXIT
+	    XV(ML)=0.01D0*C_KMS/ZM(1)%NU(ML)
+	    YV(ML)=YV(ML-1)+0.5D0*(ZM(1)%NU(ML-1)-ZM(1)%NU(ML+1))*ZM(1)%RJ(I,ML)*
+	1            (EDGE_FREQ/ZM(1)%NU(ML))**3
+	    J=ML
+	  END DO
+	  T1=YV(J)
+	  YV(1:J)=YV(1:J)/T1
+	  CALL DP_CURVE(J,XV,YV)
+	  YAXIS='Phot'
+!
 	ELSE IF(X(1:2) .EQ. 'JD' .OR. X(1:5) .EQ. 'RSQJD')THEN
 !
 	  CALL USR_OPTION(I,'Depth',' ','Depth index')

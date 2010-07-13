@@ -3209,6 +3209,7 @@
 	    IF(ATM(ID)%XzV_PRES .AND. (XSPEC .EQ. UC(ION_ID(ID)) .OR. XSPEC .EQ. 'ALL') )THEN
 	      DO NL=1,ATM(ID)%NXzV_F
 	        DO NUP=NL+1,ATM(ID)%NXzV_F
+	          WRITE(25,*)NL,NUP,ATM(ID)%AXzV_F(NL,NUP)
 	          IF(ATM(ID)%AXzV_F(NL,NUP) .NE. 0)THEN
 	            J=J+1
 	            T1=ATM(ID)%W_XzV_F(NUP,I)/ATM(ID)%W_XzV_F(NL,I)
@@ -3220,11 +3221,14 @@
                       XV(J)=ANG_TO_HZ/FREQ
 	            END IF
 	            T2=ATM(ID)%AXzV_F(NL,NUP)*(T1*ATM(ID)%XzV_F(NL,I)-GLDGU*ATM(ID)%XzV_F(NUP,I))
+	            WRITE(25,*)NL,NUP,T1,T2
+	            WRITE(25,*)J,XV(J),T2
 	            IF(T2 .NE. 0)THEN
 	              YV(J)=LOG10( ABS(T2)*TAU_CONSTANT/FREQ )
 	            ELSE
 	              J=J-1
 	            END IF
+	            WRITE(25,*)J,XV(J),T2
 	            FOUND=.TRUE.
 	          END IF
 	        END DO
@@ -3238,7 +3242,7 @@
 !
 	  XAXSAV=XAXIS
 	  IF(FLAG)THEN
-	    XAXIS='Log(\gl(\gV))'
+	    XAXIS='Log(\gl(\A))'
 	  ELSE
 	    XAXIS='\gl(\gV)'
 	  END IF
@@ -3790,6 +3794,24 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 !
 	        CALL DP_CURVE(ND,XV,YV)
 	      END DO
+	    END IF
+	  END DO
+!
+	ELSE IF(XOPT .EQ. 'DCS')THEN
+	  FOUND=.FALSE.
+	  DO ID=1,NUM_IONS
+	    IF( (XSPEC .EQ. UC(ION_ID(ID)) .OR. XSPEC .EQ. 'ALL') .AND. ATM(ID)%XzV_PRES)THEN
+	      K=0
+	      DO L=1,ND
+	        DO J=1,ATM(ID)%NXzV_F
+	          K=K+1
+	          ZV(K)=XV(L)
+	          YV(K)=LOG10(ATM(ID)%XzV_F(J,L)/ATM(ID)%XzVLTE_F(J,L))
+	        END DO
+	      END DO
+	      CALL DP_CURVE(K,ZV,YV)
+	      FOUND=.TRUE.
+	      YAXIS='Log b'
 	    END IF
 	  END DO
 !
