@@ -14,6 +14,7 @@
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 24-Jun-2010 : Check on whether SE_X is zero before computing RECIP_B_ION.
 ! Altered 12-Oct-2003 : If JREC is zero, the recombination term is not computed.
 !                         This is to avoid floating overflows at low temperatures.
 !                         In practice, the X-ray recombination term will be effectively zero
@@ -80,7 +81,7 @@
 	ION_V=SE(ID)%LNK_TO_IV(ION_EQ_IN_BA)
 !
 	DO I=DST,DEND			!Which depth point.
-	  IF(JREC(I) .NE. 0.0D0)THEN
+	  IF(JREC(I) .NE. 0.0D0 .AND. WSE_X(1,1) .NE. 0.0D0)THEN
 	    RECIP_B_ION=HNST_B(1,I)/HN_B(1,I)
 	    BSTIM=JREC(I)*RECIP_B_ION
 	  ELSE
