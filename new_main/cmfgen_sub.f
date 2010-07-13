@@ -2846,7 +2846,7 @@
 	1     'NB: Optical depth scale includes effect of clumping'
 	CLOSE(UNIT=LU_OPAC)
 !
-	IF(LST_ITERATION)THEN
+	IF(LST_ITERATION .AND. .NOT. RD_FIX_T)THEN
 !
 ! Compute the grey temperature distribution and the Rosseland optical 
 ! depth scale (returned in TA). When CHK is TRUE, the grey temperature
@@ -3624,6 +3624,11 @@
 	    FIX_IMPURITY=.FALSE.
 	    COMPUTE_BA=.TRUE.
 	    MAIN_COUNTER=MAIN_COUNTER+1
+	    IF(LST_ITERATION)THEN
+	      LST_ITERATION=.FALSE.
+	      CLOSE(LU_NET); CLOSE(LU_DR); CLOSE(LU_EW)
+	      CLOSE(LU_HT); CLOSE(LU_NEG)
+	    END IF
 	    IF(ACCURATE)THEN
 	      I=ND-DEEP
 	      CALL REXT_COEF_V2(REXT,COEF,INDX,NDEXT,R,POS_IN_NEW_GRID,
@@ -4132,7 +4137,7 @@
                COMPUTE_BA=.TRUE.
 	       CALL UPDATE_KEYWORD(L_FALSE,'[FIX_T]','VADAT',L_TRUE,L_TRUE,LUIN)
 	  ELSE IF( ( (RD_LAMBDA .AND. .NOT. DO_LAMBDA_AUTO) .OR. (LAST_LAMBDA .NE. MAIN_COUNTER)) .AND.
-	1      MAXCH .LT. EPS .AND. NUM_ITS_TO_DO .NE. 0)THEN
+	1      MAXCH .LT. EPS .AND. NUM_ITS_TO_DO .NE. 0 .AND. .NOT. DONE_HYDRO_REVISION)THEN
 	      NUM_ITS_TO_DO=1
 	  ELSE
 !
