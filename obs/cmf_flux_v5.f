@@ -83,11 +83,13 @@
 ! Open output file for all errors and comments.
 !
         LUER=ERROR_LU()
-!        CALL GEN_ASCI_OPEN(LUER,'OUT_FLUX','UNKNOWN','APPEND',' ',IZERO,IOS)
-!       IF(IOS .NE. 0)THEN
-!          WRITE(LUER,*)'Error opening OUTGEN in CMFGEN, IOS=',IOS
-!          STOP
-!        END IF
+        CALL GEN_ASCI_OPEN(LUER,'OUT_FLUX','UNKNOWN','APPEND',' ',IZERO,IOS)
+        IF(IOS .NE. 0)THEN
+          WRITE(LUER,*)'Error opening OUTGEN in CMFGEN, IOS=',IOS
+          STOP
+        END IF
+        CALL SET_LINE_BUFFERING(LUER)
+!
 !
 ! Set all atomic data. New species can be simple added by insertion.
 ! Try to add species in order of atomic number. Hydrogen should ALWAYS
