@@ -28,10 +28,10 @@
 ! have to worry about whether the l states are split.
 !
 	REAL*8, SAVE ::  FOSC(20)
-	DATA FOSC(2:20)/4.162E-01,7.910E-02,2.899E-02,1.394E-02,7.799E-03,
-	1         4.814E-03,3.183E-03,2.216E-03,1.605E-03,1.201E-03,
-	1         9.214E-04,7.227E-04,5.774E-04,4.686E-04,3.856E-04,
-	1         3.211E-04,2.702E-04,2.296E-04,1.967E-04/
+	DATA FOSC(2:20)/4.162D-01,7.910D-02,2.899D-02,1.394D-02,7.799D-03,
+	1         4.814D-03,3.183D-03,2.216D-03,1.605D-03,1.201D-03,
+	1         9.214D-04,7.227D-04,5.774D-04,4.686D-04,3.856D-04,
+	1         3.211D-04,2.702D-04,2.296D-04,1.967D-04/
 !
 	REAL*8 EDGE_FREQ
 	REAL*8 T1,T2
@@ -45,12 +45,12 @@
 !
 	IF(FREQ .GT. EDGE_HYD(1))THEN
 	  T1=FREQ/EDGE_HYD(1)
-	  RKI(1:ND)=RKI(1:ND)+6.65D-15*HYD(1,1:ND)*(1.0D0+1.66/SQRT(T1))
+	  RKI(1:ND)=RKI(1:ND)+6.65D-15*HYD(1,1:ND)*(1.0D0+1.66D0/SQRT(T1))
 	  RETURN
 	ELSE IF(FREQ .LT. 0.647D0*EDGE_HYD(1))THEN
 	  T1=(FREQ/EDGE_HYD(1))**2
 	  RKI(1:ND)=RKI(1:ND)+6.65D-15*HYD(1,1:ND)*
-	1               T1*T1*(1.26+5.068*T1+708.3*(T1**5))
+	1               T1*T1*(1.26D0+5.068D0*T1+708.3D0*(T1**5))
 	  RETURN
 	END IF
 !
@@ -75,7 +75,7 @@
 ! The 0.35 gives a match to fitting formula above, and prevents resonances
 ! from going to zero.
 !
-	T1=T1*T1+0.35
+	T1=T1*T1+0.35D0
 	IF(IRES .GT. 4)IRES=4
 	T1=MIN(1.0D4*FOSC(IRES)*FOSC(IRES),T1)
 	RKI(1:ND)=RKI(1:ND)+6.65D-15*T1*HYD(1,1:ND)
