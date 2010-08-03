@@ -3,6 +3,9 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered 15-Jul-2010 : Error check that NUM_ISOTOPES and NUM_DEACY_PATHS are compatible
+!                         with the maximum values set in NUC_ISO_MOD inserted.
+!
 	INTEGER ND
 	INTEGER LU
 !
@@ -40,9 +43,21 @@
 	    IF(INDEX(STRING,'Number of species') .NE. 0)THEN
 	    ELSE IF(INDEX(STRING,'Total number of isotopes') .NE. 0)THEN
 	      READ(STRING,*)NUM_ISOTOPES
+	      IF(NUM_ISOTOPES .GT. MAX_NUM_ISOTOPES)THEN
+	        WRITE(LUER,*)'Error in RD_NUCLEAR_DECAY_DATA - MAX_NUM_ISOTOPES in NUC_IS_MOD too small'
+	        WRITE(LUER,*)'Number of isotopes to be read is:',NUM_ISOTOPES
+	        WRITE(LUER,*)'Maximum number of isotopes set in NUC_ISO_MOD is:',MAX_NUM_ISOTOPES
+	        STOP
+	      END IF
 	    ELSE IF(INDEX(STRING,'Maximum number of isotopes/species') .NE. 0)THEN
 	    ELSE IF(INDEX(STRING,'Number of reactions') .NE. 0)THEN
 	      READ(STRING,*)NUM_DECAY_PATHS
+	      IF(NUM_DECAY_PATHS.GT. MAX_NUM_DECAY_PATHS)THEN
+	        WRITE(LUER,*)'Error in RD_NUCLEAR_DECAY_DATA - MAX_NUM_DECAY_PATHS in NUC_IS_MOD too small'
+	        WRITE(LUER,*)'Number of decay paths (reactions) to be read is:',NUM_DECAY_PATHS
+	        WRITE(LUER,*)'Maximum number of decay paths in NUC_ISO_MOD is:',MAX_NUM_DECAY_PATHS
+	        STOP
+	      END IF
 	    ELSE IF(STRING(1:1) .EQ. ' ' .OR. STRING(1:1) .EQ. '!')THEN
 	    ELSE
 	      WRITE(LUER,*)'Error in RD_NUCLEAR_DECAY_DATA'
