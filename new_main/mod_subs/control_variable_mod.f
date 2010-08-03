@@ -1,5 +1,6 @@
 	MODULE CONTROL_VARIABLE_MOD
 !
+! Altered : 16-Jul-2010 : Added FIX_ALL_SPECIES variable.
 ! Altered : 23-Nov-2007 : LAM_SCALE_OPT included.
 ! Altered : 20-Feb-2006 : ABOVE_EDGE changed to LOGICAL from REAL*8
 ! Altered : 29-Jan-2006 : Control variable fors relativistic transfer and time
@@ -419,6 +420,7 @@
 	LOGICAL FIXED_T,FIXED_NE,FIX_IMPURITY
 	LOGICAL VARFIXT
 	LOGICAL DO_SRCE_VAR_ONLY
+	LOGICAL FIX_ALL_SPECIES
 !
 	REAL*8 ADD_OPAC_SCL_FAC
  	LOGICAL ADD_ADDITIONAL_OPACITY
