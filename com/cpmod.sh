@@ -71,6 +71,48 @@ if(-e $1/ROSSELAND_LTE_TAB)then
   echo " Copyed ROSSELAND_LTE_TAB: needed for calculations of the hydro structure"
 endif
 
+if(-e $1/RDINR)then
+  cp $1/RDINR $2/
+  echo "    Copyed RDINR"
+endif
+
+if(-e $1/NUC_DECAY_DATA)then
+  cp $1/NUC_DECAY_DATA $2/
+  echo " Copying SN data"
+  echo "    Copyed NU_DECAY DATA"
+else
+  echo "    *** Unable to copy NU_DECAY DATA"
+endif
+
+if(-e $1/JH_AT_OLD_TIME)then
+  cp $1/JH_AT_OLD_TIME $2/
+  echo "    Copyed JH_AT_CURRENT_TIME"
+else
+  echo "    *** Unable to copy JH_AT_CURRENT_TIME"
+endif
+
+if(-e $1/JH_AT_OLD_TIME_INFO)then
+  cp $1/JH_AT_OLD_TIME_INFO $2/
+  echo "    Copyed JH_AT_CURRENT_TIME_INFO"
+else
+  echo "    *** Unable to copy JH_AT_CURRENT_TIME_INFO"
+endif
+
+if(-e $1/OLD_MODEL_DATA)then
+  cp $1/OLD_MODEL_DATA $2/
+  echo "    Copyed OLD_MODEL_DATA"
+else
+  echo "    *** Unable to copy OLD_MODEL_DATA"
+endif
+
+if(-e $1/SN_HYDRO_DATA)then
+  cp $1/SN_HYDRO_DATA $2/
+  echo "    Copyed SN_HYDRO_DATA"
+else
+  echo "    *** Unable to copy SN_HYDRO_DATA"
+endif
+
+
 #
 
 cd $2
