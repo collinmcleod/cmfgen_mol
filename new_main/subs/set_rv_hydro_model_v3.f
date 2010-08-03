@@ -6,7 +6,8 @@
 	1                  SN_AGE_DAYS,PURE_HUBBLE_FLOW,N_IB_INS,N_OB_INS,RDINR,ND,LU)
 	IMPLICIT NONE
 !
-! Altered 24-Jun-2009: Changed to V3: PURE_HUBBLE_FLOW passed in call.
+! Altered 15-Jul-2010 : Adjusted scalinf the R grid when read in from RDINR.
+! Altered 24-Jun-2009 : Changed to V3: PURE_HUBBLE_FLOW passed in call.
 ! Altered 10-Apr-2009 : RDINR now adopts R = Rold + V(r).dt
 ! Altered 31-Jan-2008 : Minor bug fix.
 ! Altered 29-Dec-2008 : Based on SET_RV_HYDRO_MODEL_V2
@@ -247,34 +248,50 @@
 	    END IF
           END DO
 !
-	  T1=ABS(R(1)/R_HYDRO(1)-1.0D0)
-	  T2=ABS(R(ND)/R_HYDRO(NX)-1.0D0)
-	  IF( T1 .GT. 1.0D-06 .OR. T2 .GT. 1.0D-06)THEN
-	    WRITE(LUER,*)'Warning: need to scale R in SET_RV_HYDRO_MODEL'
-	    WRITE(LUER,*)'ABS(R(1)/R_HYDRO(1)-1.0D0)=',T1
-	    WRITE(LUER,*)'ABS(R(ND)/R_HYDRO(ND)-1.0D0)=',T2
-	  END IF
+! Make sure the R grid that is read in is compatible with the R grid found in SN_HYDRO_DATA.
+! If R at the inner boundary differs signifcantly (currently 1 part in 10^6) from that in the
+! SN_HYDRO_DATA file, we assume that the supplied R grid was for the previous time step.
+!
+	  T2=1.0D0-R(ND)/R_HYDRO(NX)
+	  IF(T2 .GT. 1.0D-06)THEN
+	    WRITE(LUER,*)'In SET_RV_HYDRO_MODEL_V3 I am assuming that the supplied R grid is from'
+	    WRITE(LUER,*)'the previous time step.'
 !
 ! In the constant T1 we convert from days to seconds, and allow for the units of
 ! V (km/s) and R (10^10 cm).
 !
-	  IF(T2 .GT. 1.0D-06)THEN
 	    T1=24.0D0*3600.0D0*1.0D+05*(SN_AGE_DAYS-OLD_SN_AGE_DAYS)/1.0D+10
 	    DO I=1,ND
 	      R(I)=R(I)+T1*V(I)
 	    END DO
-	  ELSE
-	    WRITE(6,*)'As R(ND)=R_HYDRO no R scaling'
-	    DO I=1,ND               	!need to issue a warning here
-	      R(I)=R_HYDRO(NX)*(R(I)/R(ND))
-	    END DO
+	    T2=ABS(R(ND)/R_HYDRO(NX)-1.0D0)
+	    IF(T2 .GT. 1.0D-06)THEN
+	      WRITE(LUER,*)'Error in SET_RV_HYDRO_MODEL_V3'
+	      WRITE(LUER,*)'Supplied R grid does not match current or previous time step'
+	      STOP
+	    END IF
 	  END IF
-!	  DO I=1,ND               	!need to issue a warning here
-!	    R(I)=R_HYDRO(NX)*(R(I)/R(ND))
-!	  END DO
-	  RMAX=R(1); RCORE=R(ND)
-	  RMAX=MIN(R(1),R_HYDRO(1))
 !
+! Ensure we have an exact match between R_HYDRO and new R grid.
+! Currently we assume that the inner boundary of model is not changing.
+! The outer boundary can be moved inwards with time.
+!
+	  DO I=1,ND               	!need to issue a warning here
+	    R(I)=R_HYDRO(NX)*(R(I)/R(ND))
+	  END DO
+!
+! Check that RMAX is compatible.
+!
+	  IF(R(1) .GT. R_HYDRO(1))THEN
+	    R(1)=R_HYDRO(1)
+	    IF(R(1) .LT. R(2))THEN
+	      WRITE(LUER,*)'Error setting RMAX at outer boundary in SET_RV_HYDRO_MODEL_V3'
+	      WRITE(LUER,*)'We now have non-monotonic R grid'
+	      WRITE(LUER,*)'R(1:4)=',R(1:4)
+	      STOP
+	    END IF
+	  END IF
+	  RMAX=R(1); RCORE=R(ND)
 	  WRITE(LUER,*)'Read in R grid from RDINR in SET_RV_HYDRO_MODEL'
 !
 	ELSE

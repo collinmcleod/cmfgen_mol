@@ -90,6 +90,7 @@
 	    WRITE(LUER,*)'Error opening OUTGEN in CMFGEN, IOS=',IOS
 	    STOP
 	  END IF
+	  CALL SET_LINE_BUFFERING(LUER)
 	END IF
 !
 ! Set all atomic data. New species can be simple added by insertion.

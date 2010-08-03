@@ -20,19 +20,32 @@
 	COUNT_DATA=0
 !
 	OPEN(UNIT=10,FILE=FILENAME,STATUS='OLD',ACTION='READ')
-	DO WHILE (1 .EQ. 1)
+	STRING=' '
+	DO WHILE (INDEX(STRING,'!Configuration name') .EQ. 0)
 	  READ(10,FMT='(A)',END=100)STRING
-	  IF(INDEX(STRING,'!Configuration name') .NE. 0)THEN
-	    K=INDEX(STRING,'  ')
-	    LEVEL_NAME=STRING(1:K)
-	    READ(10,FMT='(A)',END=100)STRING
-	    IF(INDEX(STRING,'!Type of cross-section') .EQ. 0)THEN
-	      WRITE(6,*)'Error- tTYPE reconrd does not follow Config record'
-	      WRITE(6,*)LEVEL_NAME
-	    END IF
-	    READ(STRING,*)TYPE
+	  WRITE(6,*)TRIM(STRING)
+	END DO
+!
+	DO WHILE (1 .EQ. 1)
+!
+	  WRITE(6,*)TRIM(STRING)
+	  STRING=ADJUSTL(STRING)
+	  K=INDEX(STRING,'  ')
+	  LEVEL_NAME=STRING(1:K)
+	  READ(10,FMT='(A)',END=100)STRING
+	  IF(INDEX(STRING,'!Type of cross-section') .EQ. 0)THEN
+	    WRITE(6,*)'Error- TYPE record does not follow Config record'
+	    WRITE(6,*)LEVEL_NAME
+	    STOP
 	  END IF
-          IF(INDEX(STRING,'!Number of cross-section points') .NE. 0)THEN
+!
+	  READ(STRING,*)TYPE
+	  READ(10,FMT='(A)',END=100)STRING
+          IF(INDEX(STRING,'!Number of cross-section points') .EQ. 0)THEN
+	    WRITE(6,*)'Error- Number of cross-section points does not follow TYPE record'
+	    WRITE(6,*)LEVEL_NAME
+	    STOP
+	  ELSE
 	    COUNT_LEVS=COUNT_LEVS+1
 	    READ(STRING,*)NC
 	    COUNT_DATA=COUNT_DATA+NC
@@ -65,11 +78,24 @@
 	           WRITE(6,*)'    CROSS=',CROSS
 	        END IF
 	      END DO
+	    ELSE
+	      READ(10,*)(FREQ,I=1,NC)
 	    END IF
 	  END IF
-	END DO
-100	CONTINUE
 !
+	  STRING=' '
+	  DO WHILE(INDEX(STRING,'!Configuration name') .EQ. 0)
+	    IF(STRING .NE. ' ')THEN
+	      WRITE(6,*)'Invalid format: unexpected string'
+	      WRITE(6,*)TRIM(STRING)
+	      STOP
+	    END IF
+	    READ(10,FMT='(A)',END=100)STRING
+	  END DO
+	  WRITE(6,*)'2nd: ',TRIM(STRING)
+	END DO
+!
+100	CONTINUE
 	WRITE(6,*)'Numer of levels is ',COUNT_LEVS
 	WRITE(6,*)'Number of data values is',COUNT_DATA
 !

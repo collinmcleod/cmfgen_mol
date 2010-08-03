@@ -5,6 +5,7 @@
 !
 	PROGRAM PLT_PHOT_RAW
 	USE GEN_IN_INTERFACE
+	USE HYD_BF_PHOT_DATA
 	IMPLICIT NONE
 !
 ! Altered 16-Apr-2008 : Read in energy levels form oscilator file (if available).
@@ -113,6 +114,8 @@
 ! l=0 to n-1)
 !
         CALL RD_HYD_BF_DATA(LUIN,LUSCR,LUER)
+	WRITE(6,*)SHAPE(BF_L_INDX)
+	WRITE(6,*)SHAPE(BF_L_CROSS)
 !
 	WRITE(6,'(A)')' '
 	WRITE(6,'(A)')'Program designed to plot/compare opacity project data from photoionization files '
@@ -356,12 +359,17 @@
 	  DO INDX_1=1,NLEV_1
 	    EDGE=ENERGY_1(INDX_1)
 	    STAT_WEIGHT=STAT_WT_1(INDX_1)
+	    WRITE(6,*)NAME_1(INDX_1)
 	    IF(TYPE_1(INDX_1) .EQ. 20 .OR. TYPE_1(INDX_1) .EQ. 21)THEN
 	      NV=NUM_VALS_1(INDX_1)
 	      XV(1:NV)=NU_1(LOC_1(INDX_1):LOC_1(INDX_1)+NV-1)
 	      YV(1:NV)=CROSS_1(LOC_1(INDX_1):LOC_1(INDX_1)+NV-1)
 	      FREQ_SCL_FAC=EDGE+EXC_EN_1
+	      WRITE(6,*)SHAPE(BF_L_INDX)
+	      WRITE(6,*)SHAPE(BF_L_CROSS)
 	    ELSE
+	      WRITE(6,*)SHAPE(BF_L_INDX)
+	      WRITE(6,*)SHAPE(BF_L_CROSS)
 	      NV=1000
 	      CALL RAW_SUBPHOT(YV,XV,CROSS_1(LOC_1(INDX_1)),TYPE_1(INDX_1),NUM_VALS_1(INDX_1),
 	1                    EDGE,EXC_EN_1,ZION_1,AMASS,NV)
@@ -369,7 +377,6 @@
 	      XV(1:NV)=XV(1:NV)/FREQ_SCL_FAC
 	    END IF
 	    T1=EDGE+EXC_EN_1
-	    WRITE(6,*)NAME_1(INDX_1)
 	    DO I=1,NT
 	      CALL RECOM_OPAC_V2(YV,XV,T1,FREQ_SCL_FAC,STAT_WEIGHT,GION_1,NV,NV,LEVEL_REC_VEC(I),TEMP_VEC(I))
 	      TOTAL_REC_VEC(I)=TOTAL_REC_VEC(I)+LEVEL_REC_VEC(I)

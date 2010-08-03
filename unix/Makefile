@@ -15,6 +15,7 @@ OBJ= $(LIB)(dir_acc_pars_gen.o)\
      $(LIB)(date_time.o)\
      $(LIB)(verbose_info.o)\
      $(LIB)(wr_pwd.o)\
+     $(LIB)(set_line_buffering.o)\
      $(LIB)(tune.o)\
      $(LIB)(gen_asci_open.o)\
      $(LIB)(f01btf.o)\
