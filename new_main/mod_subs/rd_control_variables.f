@@ -3,6 +3,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 16-Jul-2010 : Added FIX_ALL_SPECIES variable, and assoicated options.
 ! Altered : 01-Feb-2010 : GAMRAY_TRANS read inserted
 ! Altered : 31-Jan-2010 : INNER_BND_METH and OUTER_BND_METH options installed.
 ! Altered : 23-Nov-2007 : Optional LAM_SCALE_OPT variable included.
@@ -656,21 +657,62 @@ C
 	1         TMP_KEY,ATM(ID)%XZV_PRES,TMP_STRING)
 	  END DO
 !
+! When adding new species / ioization stages it is sometime useful to hold
+! some levels fixed. This can be done in two ways. If we set FIX_ALL_SPEC true,
+! all levels will be held fixed UNLESS we do an UNFIX_XzV command. This will be the quickest,
+! and safest approach when adding a few ioization stages. We still need to set FIX_T and FIX_NE.
+!
+! Alternatively, we can set FIX_XzV for every ionization stage.
+!
+! NB: None of  the keywords need be present.
+!
+	  FIX_ALL_SPECIES=.FALSE.
+	  CALL RD_STORE_INT(FIX_ALL_SPECIES,'FIX_ALL_SPEC',L_FALSE,'Fix all species?')
+!
 ! Since we don't use FIX_XzV very much, these have been changed to a hidden variable.
 !
-	  DO ISPEC=1,NUM_SPECIES
-	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
-	      IF(ID .EQ. SPECIES_BEG_ID(ISPEC))WRITE(LUSCR,'()')
-	      TMP_KEY='FIX_'//TRIM(ION_ID(ID))
-	      TMP_STRING='Fix ? levels of '//TRIM(ION_ID(ID))
-	      ATM(ID)%FIX_NXzV=0
-	      CALL RD_STORE_INT(ATM(ID)%FIX_NXzV,TMP_KEY,L_FALSE,TMP_STRING)
+	  IF(FIX_ALL_SPECIES)THEN
+	    DO ISPEC=1,NUM_SPECIES
+	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
+	        ATM(ID)%FIX_NXzV=ATM(ID)%NXzV
+	      END DO
+	      FIX_SPECIES(ISPEC)=1
 	    END DO
-	    TMP_KEY='FIX_'//TRIM(SPECIES(ISPEC))
-	    TMP_STRING='Fix (?) highest ionization stage in '//TRIM(SPECIES(ISPEC))
-	    FIX_SPECIES(ISPEC)=0
-	    CALL RD_STORE_INT(FIX_SPECIES(ISPEC),TMP_KEY,L_FALSE,TMP_STRING)
-	  END DO
+!
+! We now allow the possibility of unfixing some levels.
+! The use of UFIX_XzV avoids confusion and abiguity with the FIX_XzV command.
+!
+	    DO ISPEC=1,NUM_SPECIES
+	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
+	        TMP_KEY='UNFIX_'//TRIM(ION_ID(ID))
+	        TMP_STRING='Fix ? levels of '//TRIM(ION_ID(ID))//' : set to 0 to unfix'
+	        I=-1; CALL RD_STORE_INT(I,TMP_KEY,L_FALSE,TMP_STRING)
+	        IF(I .NE. -1)ATM(ID)%FIX_NXzV=I
+	      END DO
+	      TMP_KEY='FIX_'//TRIM(SPECIES(ISPEC))
+	      TMP_STRING='Fix (?) highest ionization stage in '//TRIM(SPECIES(ISPEC))
+	      I=-1; CALL RD_STORE_INT(I,TMP_KEY,L_FALSE,TMP_STRING)
+	      IF(I .NE. -1)FIX_SPECIES(ISPEC)=I
+	    END DO
+!
+	  ELSE
+!
+! Using the fix command to fix levels.
+!
+	    DO ISPEC=1,NUM_SPECIES
+	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
+	        IF(ID .EQ. SPECIES_BEG_ID(ISPEC))WRITE(LUSCR,'()')
+	        TMP_KEY='FIX_'//TRIM(ION_ID(ID))
+	        TMP_STRING='Fix ? levels of '//TRIM(ION_ID(ID))
+	        ATM(ID)%FIX_NXzV=0
+	        CALL RD_STORE_INT(ATM(ID)%FIX_NXzV,TMP_KEY,L_FALSE,TMP_STRING)
+	      END DO
+	      TMP_KEY='FIX_'//TRIM(SPECIES(ISPEC))
+	      TMP_STRING='Fix (?) highest ionization stage in '//TRIM(SPECIES(ISPEC))
+	      FIX_SPECIES(ISPEC)=0
+	      CALL RD_STORE_INT(FIX_SPECIES(ISPEC),TMP_KEY,L_FALSE,TMP_STRING)
+	    END DO
+	  END IF
 C
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(FIXED_NE,'FIX_NE',L_TRUE,'Fix the electron density ?')
@@ -873,12 +915,13 @@ C
 	  CALL RD_STORE_INT(NUM_OSC_AV,'NOSC_AV',L_FALSE,'# of consecquitive oscillations')
 	  CALL RD_STORE_INT(ITS_PER_AV,'ITS/AV',L_FALSE,'# of iterations between averaging')
 !
+!
 	  UNDO_LAST_IT=.FALSE.
 	  CALL RD_STORE_LOG(UNDO_LAST_IT,'DO_UNDO',L_FALSE,'Undo corrections at last 5 depths')
 !
 	  STOP_IF_BAD_PARAM=.TRUE.
 	  CALL RD_STORE_LOG(STOP_IF_BAD_PARAM,'STOP_IF_BP',L_FALSE,'Undo corrections at last 5 depths')
-
+!
 	  CALL CLEAN_RD_STORE()
 !
 	CLOSE(UNIT=7)
