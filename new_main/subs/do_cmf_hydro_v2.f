@@ -15,6 +15,7 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 03-AUg-2010 : Match velocity at 0.75 x sound_speed (old vale was 0.5).
 ! Altered 18-May-2008 : Insert a limit as to the number of iterations (ITERATION_COUNT).
 ! Altered 11-May-2008 : Inserted MOD_RSTAR and changed to _V2.
 ! Created 15-Feb-2008 :
@@ -348,7 +349,7 @@
 	  DO I=1,MOD_ND
 	    ED_ON_NA_EST=OLD_ED(I)/OLD_POP_ATOM(I)
 	    SOUND_SPEED=SQRT(T1*(1.0D0+ED_ON_NA_EST)*OLD_T(I))
-	    IF(OLD_V(I) .LT. 0.5D0*SOUND_SPEED)THEN
+	    IF(OLD_V(I) .LT. 0.75D0*SOUND_SPEED)THEN
 	      CONNECTION_VEL=OLD_V(I)
 	      CONNECTION_RADIUS=OLD_R(I)
 	      CONNECTION_INDX=I
