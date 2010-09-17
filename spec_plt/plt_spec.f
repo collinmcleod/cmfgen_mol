@@ -1433,6 +1433,16 @@ C
 	    END IF
 	    CALL CURVE(NBB,XV,YV)
 	  END IF
+!
+	ELSE IF(X(1:5) .EQ. 'AV_EN')THEN
+	  T1=0.0D0
+	  T2=0.0D0
+	  DO I=1,NCF-1
+	    T1=T1+0.5D0*(NU(I)-NU(I+1))*(OBSF(I)+OBSF(I+1))
+	    T2=T2+0.5D0*(NU(I)-NU(I+1))*(OBSF(I)/NU(I)+OBSF(I+1)/NU(I+1))
+	  END DO
+	  WRITE(6,*)'Average photon frequency is (in 10^15 Hz)',T1/T2
+	  WRITE(6,*)'Effective photon energy is',6.626075D-12*T1/T2/2.7D0/1.380658D-16,'K'
 C 
 C
 C Plot section:

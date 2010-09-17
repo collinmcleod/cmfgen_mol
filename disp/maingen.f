@@ -2277,7 +2277,12 @@
 	ELSE IF(XOPT .EQ. 'YSPEC')THEN
 	  FOUND=.FALSE.
 	  ELEC=.FALSE.
+	  FLAG=.FALSE.
+!
+	  WRITE(6,*)'Option plots species density, fractinal abundance, or mass fraction'
+!
 	  CALL USR_OPTION(ELEC,'FRAC','T','Fractional abundance')
+	  IF(.NOT. ELEC)CALL USR_OPTION(FLAG,'MF','T','Mass fraction')
 	  IF(ELEC)THEN
 	    DO ISPEC=1,NSPEC
 	      IF(XSPEC .EQ. SPECIES(ISPEC) .OR. (XSPEC .EQ. 'ALL' .AND.
@@ -2289,6 +2294,20 @@
 	      END IF
 	    END DO
 	    YAXIS='Fractional abundance (N\dX\u/N\dA\u)'
+	  ELSE IF(FLAG)THEN
+	    DO ISPEC=1,NSPEC
+	      IF(XSPEC .EQ. SPECIES(ISPEC) .OR. (XSPEC .EQ. 'ALL' .AND.
+	1              POPDUM(ND,ISPEC) .GT. 0.0D0))THEN
+	        T1=AT_MASS(ISPEC)*ATOMIC_MASS_UNIT()
+	        DO I=1,ND
+	          YV(I)=T1*POPDUM(I,ISPEC)/MASS_DENSITY(I)
+	        END DO
+	        FOUND=.TRUE.
+	        CALL DP_CURVE(ND,XV,YV)
+	        IF(XSPEC .NE. 'ALL')EXIT
+	      END IF
+	    END DO
+	    YAXIS='Mass fraction'
 	  ELSE
 	    DO ISPEC=1,NSPEC
 	      IF(XSPEC .EQ. SPECIES(ISPEC) .OR. (XSPEC .EQ. 'ALL' .AND.
@@ -2301,6 +2320,7 @@
 	    END DO
 	    YAXIS='Species density (cm\u-3\d)'
 	  END IF
+!
 	  IF(XSPEC .EQ. 'ALL')THEN
 	    J=0
 	    DO ISPEC=1,NSPEC

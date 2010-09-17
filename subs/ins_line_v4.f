@@ -133,27 +133,27 @@
 !
 ! Check validity of some of the parameters.
 !
-	IF(R_CMF_WING_EXT .LT.2 .OR. R_CMF_WING_EXT .GT. 20)THEN
+	IF(R_CMF_WING_EXT .LT. 2.0D0 .OR. R_CMF_WING_EXT .GT. 20.0D0)THEN
 	  WRITE(LU_ER,*)'Invalid value for R_CMF_WING_EXT in INS_LINE'
 	  WRITE(LU_ER,*)'R_CMF_WING_EXT=',R_CMF_WING_EXT
 	  STOP
 	END IF
-	IF(ES_WING_EXT .LT. 0 .OR. ES_WING_EXT .GT. 20000)THEN
+	IF(ES_WING_EXT .LT. 0.0D0 .OR. ES_WING_EXT .GT. 20000.0D0)THEN
 	  WRITE(LU_ER,*)'Invalid value for ES_WING_EXT in INS_LINE'
 	  WRITE(LU_ER,*)'ES_WING_EXT=',ES_WING_EXT
 	  STOP
 	END IF
-	IF(MAX_DOP .LT.2 .OR. MAX_DOP .GT. 20)THEN
+	IF(MAX_DOP .LT. 2.0D0 .OR. MAX_DOP .GT. 20.0D0)THEN
 	  WRITE(LU_ER,*)'Invalid value for MAX_DOP in INS_LINE'
 	  WRITE(LU_ER,*)'MAX_DOP=',MAX_DOP
 	  STOP
 	END IF
-	IF(dV_CMF_PROF .LT. 1.0 .OR. dV_CMF_PROF .GT. 1.0E+05)THEN
+	IF(dV_CMF_PROF .LT. 1.0D0 .OR. dV_CMF_PROF .GT. 1.0D+05)THEN
 	  WRITE(LU_ER,*)'Invalid value for dV_CMF_PROF in INS_LINE'
 	  WRITE(LU_ER,*)'dV_CMF_PROF=',dV_CMF_PROF
 	  STOP
      	END IF
-	IF(dV_CMF_WING .LT. 1.0 .OR. dV_CMF_WING .GT. 1.0E+05)THEN
+	IF(dV_CMF_WING .LT. 1.0D0 .OR. dV_CMF_WING .GT. 1.0D+05)THEN
 	  WRITE(LU_ER,*)'Invalid value for dV_CMF_WING in INS_LINE'
 	  WRITE(LU_ER,*)'dV_CMF_WING=',dV_CMF_WING
 	  STOP
@@ -319,7 +319,7 @@
 ! zone.
 !
 !
-	    T1=FREQ(INDX)/(1.0D0+1.1*dV_CMF_WING/C_KMS) 
+	    T1=FREQ(INDX)/(1.0D0+1.1D0*dV_CMF_WING/C_KMS) 
 	    IF(T1 .GT. NU_LINE(LN_INDX)*RES_EXTENT)THEN
 	      DO WHILE(ML .LT. NCF .AND. NU_CONT(ML) .GT. T1)
 	        IF(EDGE_FREQ(ML) .AND. 
@@ -341,7 +341,7 @@
 ! Only add in extra points if resonance zone is 1.2dV_CMF_WING away.
 !
 	      I=INT( (FREQ(INDX)-NU_LINE(LN_INDX)*RES_EXTENT)/
-	1               FREQ(INDX)*C_KMS/dV_CMF_WING - 0.1)
+	1               FREQ(INDX)*C_KMS/dV_CMF_WING - 0.1D0)
 	      DELF=(FREQ(INDX)-NU_LINE(LN_INDX)*RES_EXTENT)/(I+1)
 	      DO J=1,I
 	        T1=FREQ(INDX)-DELF

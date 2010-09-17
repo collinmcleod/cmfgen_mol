@@ -93,7 +93,7 @@ $(EXE_DIR)plt_rj.exe : plt_rj.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
               -o $(EXE_DIR)plt_rj.exe
 
 %.o : %.f
-	$(F90) -c $(FD) $<
+	$(F90) -c $(FG) $<
 
 SUBS:
 	(cd subs; make)

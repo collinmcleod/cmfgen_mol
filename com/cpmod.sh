@@ -86,16 +86,16 @@ endif
 
 if(-e $1/JH_AT_OLD_TIME)then
   cp $1/JH_AT_OLD_TIME $2/
-  echo "    Copyed JH_AT_CURRENT_TIME"
+  echo "    Copyed JH_AT_OLD_TIME"
 else
-  echo "    *** Unable to copy JH_AT_CURRENT_TIME"
+  echo "    *** Unable to copy JH_AT_OLD_TIME"
 endif
 
 if(-e $1/JH_AT_OLD_TIME_INFO)then
   cp $1/JH_AT_OLD_TIME_INFO $2/
-  echo "    Copyed JH_AT_CURRENT_TIME_INFO"
+  echo "    Copyed JH_AT_OLD_TIME_INFO"
 else
-  echo "    *** Unable to copy JH_AT_CURRENT_TIME_INFO"
+  echo "    *** Unable to copy JH_AT_OLD_TIME_INFO"
 endif
 
 if(-e $1/OLD_MODEL_DATA)then

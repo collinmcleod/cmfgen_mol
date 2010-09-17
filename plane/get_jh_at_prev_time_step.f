@@ -92,7 +92,7 @@
 	  WRITE(6,*)'Logical unit for JH input is',LU_IN
           CALL READ_DIRECT_INFO_V3(I,REC_LENGTH,FILE_DATE,'JH_AT_OLD_TIME',LU_IN,IOS)
           IF(IOS .NE. 0)THEN
-            WRITE(LU_ER,*)'Error opening/reading JH_AT_OLD_T_INFO file: check format'
+            WRITE(LU_ER,*)'Error opening/reading JH_AT_OLD_TIME_INFO file: check format'
             STOP
 	  END IF
           OPEN(UNIT=LU_IN,FILE='JH_AT_OLD_TIME',STATUS='OLD',ACTION='READ',
@@ -291,14 +291,14 @@
 	  END DO
 	  INDX=2
 !
-	  IF(COUNTER .EQ. NCF_OLD .AND. NU .LT. NUST(NSM))THEN
-	     WRITE(LU_ER,*)'Error in GET_JH_AT_PREV_TIME_STEP'
-	     WRITE(LU_ER,*)'Invalid minmum frequency --- outside range'
-	     WRITE(LU_ER,*)'NU=',NU
-	     WRITE(LU_ER,*)'NUST=',NUST(NSM)
-	     STOP
-	  END IF
 	END DO
+!
+	IF(COUNTER .EQ. NCF_OLD .AND. NU .LT. NUST(NSM))THEN
+	  WRITE(LU_ER,*)'Warning in GET_JH_AT_PREV_TIME_STEP'
+	  WRITE(LU_ER,*)'Invalid minmum frequency --- outside range'
+	  WRITE(LU_ER,*)'NU=',NU
+	  WRITE(LU_ER,*)'NUST=',NUST(NSM)
+	END IF
 !
 	IF(INIT .AND. NU .GT. NUST(1))THEN
 	  WRITE(LU_ER,*)'Warning in GET_JH_AT_PREV_TIME_STEP'
@@ -316,6 +316,15 @@
 	  END DO
 	  H_INBC_OLDT=H_INBC_ST(1)
 	  H_OUTBC_OLDT=H_OUTBC_ST(1)
+	ELSE IF(NU .LT. NUST(NSM))THEN
+	  DO I=1,ND_OLD
+	    OLD_J(I)=JST(I,NSM)
+	  END DO
+	  DO I=1,ND_OLD-1
+	    OLD_H(I)=HST(I,NSM)
+	  END DO
+	  H_INBC_OLDT=H_INBC_ST(NSM)
+	  H_OUTBC_OLDT=H_OUTBC_ST(NSM)
 	ELSE
 !
 ! We initially use linear interpolation in frequency.

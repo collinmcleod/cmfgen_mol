@@ -658,7 +658,8 @@
 	    NI_RAY(LS)=K
 !
 	    PSQ=P(LS)*P(LS)
-	    DO I=1,NI_RAY(LS)
+	    R_RAY(1,LS)=R_EXT(1)
+	    DO I=2,NI_RAY(LS)
 	      R_RAY(I,LS)=SQRT(Z(I,LS)*Z(I,LS)+PSQ)
 	    END DO
 	    R_RAY(NI_RAY(LS),LS)=R_EXT(NI_SMALL)
@@ -692,6 +693,22 @@
 	          K=K+1
 	        END IF
 	      END DO
+	    END DO
+	  END DO
+!
+	  DO I=1,ND
+	    DO LS=1,NC+(ND-I+1)
+	      K=J_PNT(I,LS)
+	      IF(J_PNT(I,LS) .LT. 1 .OR. J_PNT(I,LS) .GT. NI_RAY(LS))THEN
+	        WRITE(LUER,*)'Error setting J_PNT in FG_J_CMF_V11 -- invalid values'
+	        WRITE(LUER,*)'Depth=',I,'Ray=',LS,'J_PNT value=',J_PNT(I,LS)
+	        STOP
+	      ELSE IF( ABS(R_RAY(K,LS)-R(I))/R(I) .GT. 1.0D-12)THEN
+	        WRITE(LUER,*)'Error setting J_PNT in FG_JCMF_V11 -- invalid values'
+	        WRITE(LUER,*)'Fractional difference is',ABS(R_RAY(K,LS)-R(I))/R(I)
+	        WRITE(LUER,*)'Depth=',I,'Ray=',LS,'J_PNT value=',J_PNT(I,LS)
+	        STOP
+	      END IF
 	    END DO
 	  END DO
 !

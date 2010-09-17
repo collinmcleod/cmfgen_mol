@@ -234,6 +234,8 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered: 25-Aug-2010 : Bug fix with IN_NBC_SAVE/ IN_HBC_SAVE. Both values
+!                          incorrectly set because of type'o.
 ! Altered: 17-Dec-2009 : Call changed: changed to V6
 !                        INNER_BND_METH and OUTER_BND_METH inserted.
 ! Altered: 15-Nov-2009 : Bug fix: LOG(CHI_SM(1:ND))--> LOG(CHI_SM(1:ND_SM))
@@ -781,8 +783,8 @@
 	      TB(ND)=TB(ND)+0.1D0*FMIN/DTAU
 	      XM(ND)=XM(ND)+0.1D0*FMIN*R(ND)*R(ND)*JMIN_IB/DTAU
 	    END IF
-	     IF(FREQ .EQ. FREQ_SAVE)BACKSPACE(UNIT=177)
-	    WRITE(177,'(ES15.7,9ES14.6)')FREQ,RSQ_JP,RSQ_HP,HMIN,FMIN,FPLUS,DTAU,TA(ND),TB(ND),XM(ND)
+!	    IF(FREQ .EQ. FREQ_SAVE)BACKSPACE(UNIT=177)
+!	    WRITE(177,'(ES15.7,9ES14.6)')FREQ,RSQ_JP,RSQ_HP,HMIN,FMIN,FPLUS,DTAU,TA(ND),TB(ND),XM(ND)
 !
 	  ELSE IF(INNER_BND_METH(1:3) .EQ. 'OLD')THEN
 	    TA(ND)=-Q(ND-1)*(K_ON_J(ND-1)+VdHdR_TERM(ND-1))/DTAU_H(ND-1)
@@ -807,8 +809,8 @@
 	  TA_SAV=TA(ND);TB_SAV=TB(ND); XM_SAV=XM(ND)
 	  CALL THOMAS(TA,TB,TC,XM,ND,1)
 !
-	  IF(FREQ .EQ. FREQ_SAVE)BACKSPACE(UNIT=178)
-	  WRITE(178,'(ES15.7,9ES14.6)')FREQ,RSQ_JP,RSQ_HP,XM(ND)+RSQ_JP,XM(ND-1),XM(ND-2),RSQ_HP-HMIN*XM(ND)
+!	  IF(FREQ .EQ. FREQ_SAVE)BACKSPACE(UNIT=178)
+!	  WRITE(178,'(ES15.7,9ES14.6)')FREQ,RSQ_JP,RSQ_HP,XM(ND)+RSQ_JP,XM(ND-1),XM(ND-2),RSQ_HP-HMIN*XM(ND)
 !
 ! We use IN_HBC_SAVE to save H at the previous freuqency.
 !
@@ -821,7 +823,7 @@
 	  IN_NBC_SAVE=0.0D0
 	ELSE IF(INNER_BND_METH .EQ. 'DIFFUSION')THEN
 	  IN_HBC_SAVE=DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
-	  IN_HBC_SAVE=DBB*R(ND)*R(ND)/5.0D0/CHI(ND)
+	  IN_NBC_SAVE=DBB*R(ND)*R(ND)/5.0D0/CHI(ND)
 	END IF
 !
 ! Check that no negative mean intensities have been computed.
@@ -848,13 +850,6 @@
 	1        ( EPS_PREV(I)*(GAM_RSQJNU_PREV(I)+GAM_RSQJNU_PREV(I+1)) -
 	1          EPS(I)*(XM(I)+XM(I+1)) )
 	  END DO
-	  I=ND-1
-	  WRITE(235,'(ES18.8,8ES14.4)')FREQ,HU(I),HL(I),HS(I),EPS_PREV(I),EPS(I)
-	  WRITE(236,'(ES18.8,8ES14.4)')FREQ,GAM_RSQHNU(I),HU(I)*XM(I+1),HL(I)*XM(I),
-	1                   HU(I)*XM(I+1)-HL(I)*XM(I),
-	1                   HS(I)*GAM_RSQHNU_PREV(I),
-	1                   EPS_PREV(I)*(GAM_RSQJNU_PREV(I)+GAM_RSQJNU_PREV(I+1)),
-	1                   EPS(I)*(XM(I)+XM(I+1))
 !
 	  IF(.NOT. INCL_ADVEC_TERMS)THEN
 	     ACCURATE=.TRUE.
@@ -890,12 +885,6 @@
 	  END IF
 !
 	END DO
-!
-	VB(1:ND)=0.0D0; VB(ND)=1.0D0
-	CALL SIMPTH(TA,TB,TC,VB,ND,1)
-	WRITE(231,'(ES18.8,8ES14.4)')FREQ,RSQ_JP,XM(ND),XM_SAV,VB(ND-4:ND)
-	WRITE(232,'(ES18.8,8ES14.4)')FREQ,RSQ_JP,XM(ND-1),TA_SAV,XM(ND-1)*VB(ND-4:ND)
-	WRITE(233,'(ES18.8,8ES14.4)')FREQ,RSQ_JP,XM(ND)-RSQ_JP,TB_SAV,(XM(ND)-RSQ_JP)*VB(ND-4:ND)
 !
 ! Save variables for next frequency
 !

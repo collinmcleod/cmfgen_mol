@@ -94,6 +94,7 @@
 	  IF(IOS .NE. 0)THEN
 	    WRITE(ERROR_LU(),'(A,A)')' Unable to open ',TRIM(NEW_FILENAME)
 	    WRITE(ERROR_LU(),*)'Error occurred in READ_DIRECT_INFO'
+	    WRITE(ERROR_LU(),*)'IOS=',IOS
 	    RETURN
 	  END IF
 	  STRING='!'

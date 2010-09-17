@@ -15,7 +15,8 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
-! Altered 03-AUg-2010 : Match velocity at 0.75 x sound_speed (old vale was 0.5).
+! Altered 31-Aug-2010 : TAU_REF can be a parameter (default is 2/3). For W-R stars.
+! Altered 03-Aug-2010 : Match velocity at 0.75 x sound_speed (old vale was 0.5).
 ! Altered 18-May-2008 : Insert a limit as to the number of iterations (ITERATION_COUNT).
 ! Altered 11-May-2008 : Inserted MOD_RSTAR and changed to _V2.
 ! Created 15-Feb-2008 :
@@ -117,6 +118,7 @@
 	REAL*8 OLD_TAU_MAX
 	REAL*8 T1,T2,T3
 	REAL*8 GAM_LIM_STORE
+	REAL*8 TAU_REF
 !
 ! Runge-Kutta estimates
 !
@@ -181,6 +183,7 @@
 	RMAX=MOD_RMAX/OLD_R(OLD_ND)
 	VTURB=MOD_VTURB
 !
+	TAU_REF=2.0D0/3.0D0
         dLOG_TAU=0.25D0
         V_SCL_FAC=0.75D00
         OBND_PARS(:)=0.0D0
@@ -236,6 +239,7 @@
 	CALL RD_STORE_LOG(RESET_REF_RADIUS,'RES_REF',L_FALSE,'Reset reference radius if using old velocity law')
 	CALL RD_STORE_DBLE(GAM_LIM,'GAM_LIM',L_FALSE,'Limiting Eddington factor')
 	CALL RD_STORE_LOG(UPDATE_GREY_SCL,'UP_GREY_SCL',L_FALSE,'Update GREY_SCL_FAC_IN')
+	CALL RD_STORE_DBLE(TAU_REF,'TAU_REF',L_FALSE,'Reference radius for g and Teff')
 !
 ! Therse are the parameters used to define the new R grid to be output to RVSIG_COL.
 ! 
@@ -307,13 +311,13 @@
 	IF(PLANE_PARALLEL_MOD)THEN
 	  OLD_REF_RADIUS=OLD_R(OLD_ND)
 	ELSE
-	  T1=2.0D0/3.0D0
+	  T1=TAU_REF
 	  I=GET_INDX_DP(T1,OLD_TAU,MOD_ND)
 	  T2=(LOG(T1)-LOG(OLD_TAU(I)))/(LOG(OLD_TAU(I+1))-LOG(OLD_TAU(I)))
 	  OLD_REF_RADIUS=(1.0D0-T1)*OLD_R(I)+T1*OLD_R(I+1)
 	  IF(VERBOSE_OUTPUT)THEN
 	    WRITE(LUV,*)'OLD_TAU(1)=',OLD_TAU(1)
-	    WRITE(LUV,*)'Reference radius (Tau=2/3) of of old model is',OLD_REF_RADIUS
+	    WRITE(LUV,*)'Reference radius (Tau=',TAU_REF,') of of old model is',OLD_REF_RADIUS
 	  END IF
 	END IF
 !
@@ -646,9 +650,9 @@
 	  END IF
 !
 ! Adjust the grid so that we get the correct reference radius,
-! defined as Tau(Ross)=2/3.
+! defined as Tau(Ross)=TAU_REF.
 !
-	  T1=2.0D0/3.0D0
+	  T1=TAU_REF
 	  I=GET_INDX_DP(T1,TAU,ND)
 	  T2=(LOG(T1)-LOG(TAU(I)))/(LOG(TAU(I+1))-LOG(TAU(I)))
 	  T2=(1.0D0-T2)*R(I)+T2*R(I+1)

@@ -341,7 +341,7 @@
 	DO ML=1,NCF                                          
 	  FQW(ML)=NU(ML)	!FQW has temporary storage of continuum freq.
 	END DO                    
-	V_DOP=12.85*SQRT( TDOP/AMASS_DOP + (VTURB/12.85)**2 )
+	V_DOP=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
 	CALL INS_LINE_V4(  NU,LINES_THIS_FREQ,I,NCF_MAX,
 	1		  VEC_FREQ,VEC_TRANS_TYPE,
 	1                 LINE_ST_INDX_IN_NU,LINE_END_INDX_IN_NU,

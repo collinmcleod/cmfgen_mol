@@ -55,6 +55,8 @@
 	CHARACTER(LEN=10) FILT_ID
 	CHARACTER(LEN=132) STRING
 !
+	WRITE(6,*)NU(1),NU(NCF)
+!
 ! Get filter and atmospheric extinction data. The zero points must also
 ! be in this file.
 !
@@ -122,11 +124,22 @@
 	  DO WHILE(NU(ML) .GT. FILT_FREQ(1))
 	    ML=ML+1
 	  END DO
-	  ML_BEG=ML
+	  ML_BEG=ML-1
 	  DO WHILE(NU(ML) .GT. FILT_FREQ(NF))
 	    ML=ML+1
 	  END DO
-	  ML_END=ML-1
+	  ML_END=ML
+!
+	  FILT_FREQ(2:NF+1)=FILT_FREQ(1:NF)
+	  FILT_RESP(2:NF+1)=FILT_RESP(1:NF)
+	  NF=NF+2
+	  FILT_RESP(1)=0.0D0; FILT_RESP(NF)=0.0D0
+	  FILT_FREQ(1)=NU(ML_BEG); FILT_FREQ(NF)=NU(ML_END)
+!
+	  DO I=1,NF
+	    WRITE(25,*)I,FILT_FREQ(I),FILT_RESP(I)
+	  END DO
+	  FLUSH(UNIT=25)
 !
 ! Check if stellar data is tabulted fine enough. This will mainly be
 ! a problem for continuum data, and possibly for the VEGA data
@@ -169,6 +182,11 @@
 	    REV_FLUX(1:NX)=FLUX(ML_BEG:ML_END)	    
 	  END IF
 !
+	  DO I=1,NX
+	    WRITE(21,*)I,REV_NU(I),REV_FLUX(I)
+	  END DO
+!
+	  WRITE(T_OUT,*)'Updating filter response function'
 	  RESP(1:NX)=0.0D0
 	  CALL MON_INTERP(RESP,NX,IONE,REV_NU,NX,FILT_RESP,NF,FILT_FREQ,NF)
 	  TRANS(1:NX)=1.0D0
