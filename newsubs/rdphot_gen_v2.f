@@ -656,6 +656,11 @@
 	      WRITE(LUER,*)'MAX_CROSS is too small'
 	      STOP
 	    END IF
+	    IF(PD(ID)%CROSS_TYPE(J,PHOT_ID) .EQ. 9 .AND. MOD(NPNTS,8) .NE. 0)THEN
+	      WRITE(6,*)'Error reading incross-section for ',TRIM(FILENAME)
+	      WRITE(6,*)'For TYPE=9, the number of points must be multiple of 8'
+	      STOP
+	    END IF
 !
 ! We can either read in a tabulated data set, or parameters for
 ! fitting a function. For a tabulated data set there must be the frequency

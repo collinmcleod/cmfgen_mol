@@ -25,6 +25,8 @@
 	USE HYD_BF_PHOT_DATA
 	IMPLICIT NONE
 !
+! Altered 17-Sep-2010 : Altered implementation of Verner ground-state fits
+!
 	INTEGER NCF
 	INTEGER NCROSS
 	REAL*8 FREQ(NCF)		!Cross-section
@@ -290,14 +292,14 @@
 	   WRITE(6,*)CROSS_A(1:9)
 	   K=1
 	   DO I=1,NCROSS/8
-	     IF(I .NE. 1)EDGE=EV_TO_HZ*CROSS_A(K+4)
+	     IF(I .NE. 1)EDGE=EV_TO_HZ*CROSS_A(K+2)
 	     DO ML=1,NCF
-	      IF(FREQ(ML) .GE. EDGE+CROSS_A(K))THEN
-	        U=FREQ(ML)/CROSS_A(K+4)/EV_TO_HZ
-	        T1=(U-1.0D0)**2 + CROSS_A(K+8)**2  
-	        T2=U**( 5.5D0+CROSS_A(K+2)-0.5D0*CROSS_A(K+7) )
-	        T3=( 1.0D0+SQRT(U/CROSS_A(K+6)) )**CROSS_A(K+7)
-	        PHOT(ML)=PHOT(ML)+1.0D-08*T1*CROSS_A(K+5)/T2/T3
+	      IF(FREQ(ML) .GE. EDGE)THEN
+	        U=FREQ(ML)/CROSS_A(K+3)/EV_TO_HZ
+	        T1=(U-1.0D0)**2 + CROSS_A(K+7)**2  
+	        T2=U**( 5.5D0+CROSS_A(K+1)-0.5D0*CROSS_A(K+6) )
+	        T3=( 1.0D0+SQRT(U/CROSS_A(K+5)) )**CROSS_A(K+6)
+	        PHOT(ML)=PHOT(ML)+1.0D-08*T1*CROSS_A(K+4)/T2/T3
 	      END IF
 	    END DO
 	    K=K+8

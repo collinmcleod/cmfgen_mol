@@ -464,13 +464,18 @@ C
 	1               (1.0D0-PD(ID)%CROSS_A(LMIN+1))*RU )*( RU**PD(ID)%CROSS_A(LMIN+2) )
 	          END IF
 	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 9)THEN
-	          IF(FREQ_VEC(I) .GE. EDGE+PD(ID)%CROSS_A(LMIN))THEN
-                    U=FREQ_VEC(I)/PD(ID)%CROSS_A(LMIN+4)/EV_TO_HZ
-                    T1=(U-1.0D0)**2 + PD(ID)%CROSS_A(LMIN+8)**2
-                    T2=U**( 5.5D0+PD(ID)%CROSS_A(LMIN+2)-0.5D0*PD(ID)%CROSS_A(LMIN+7) )
-                    T3=( 1.0D0+SQRT(U/PD(ID)%CROSS_A(LMIN+6)) )**PD(ID)%CROSS_A(LMIN+7)
-                    PHOT(I)=PHOT(I)+1.0D-08*T1*PD(ID)%CROSS_A(LMIN+5)/T2/T3
-                  END IF
+	          LMIN=LMIN-8
+	          DO J=1,(PD(ID)%END_LOC(TERM,K)-PD(ID)%ST_LOC(TERM,K)+1)/8
+	            LMIN=LMIN+8
+	            IF(J .NE. 1)EDGE=0.241798840766D0*PD(ID)%CROSS_A(LMIN+2)
+	            IF(FREQ_VEC(I) .GE. EDGE)THEN
+                      U=FREQ_VEC(I)/PD(ID)%CROSS_A(LMIN+3)/EV_TO_HZ
+                      T1=(U-1.0D0)**2 + PD(ID)%CROSS_A(LMIN+7)**2
+                      T2=U**( 5.5D0+PD(ID)%CROSS_A(LMIN+1)-0.5D0*PD(ID)%CROSS_A(LMIN+6) )
+                      T3=( 1.0D0+SQRT(U/PD(ID)%CROSS_A(LMIN+5)) )**PD(ID)%CROSS_A(LMIN+6)
+                      PHOT(I)=PHOT(I)+1.0D-08*T1*PD(ID)%CROSS_A(LMIN+4)/T2/T3
+                    END IF
+	          END DO
 !
 !                                   
 !

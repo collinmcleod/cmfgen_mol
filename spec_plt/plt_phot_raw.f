@@ -173,6 +173,10 @@
 	    READ(10,*)TYPE_1(J)
 	    READ(10,*)NUM_VALS_1(J)
 	    WRITE(16,*)TRIM(NAME_1(J)),TYPE_1(J),NUM_VALS_1(J)
+	    IF(TYPE_1(J) .EQ. 9 .AND. MOD(NUM_VALS_1(J),8) .NE. 0)THEN
+	      WRITE(6,*)'Invalid number of data points for cross-section 9'
+	      STOP
+	    END IF
 	    IF(TYPE_1(J) .EQ. 20 .OR. TYPE_1(J) .EQ. 21)THEN
 	      READ(10,*)(NU_1(I),CROSS_1(I), I=NXT_LOC,NXT_LOC+NUM_VALS_1(J)-1)
 	    ELSE
@@ -317,6 +321,10 @@
 	    NAME_2(J)=STRING(1:K-1)
 	    READ(10,*)TYPE_2(J)
 	    READ(10,*)NUM_VALS_2(J)
+	    IF(TYPE_2(J) .EQ. 9 .AND. MOD(NUM_VALS_2(J),8) .NE. 0)THEN
+	      WRITE(6,*)'Invalid number of data points for cross-section 9'
+	      STOP
+	    END IF
 	    IF(TYPE_2(J) .EQ. 20 .OR. TYPE_2(J) .EQ. 21)THEN
 	      READ(10,*)(NU_2(I),CROSS_2(I), I=NXT_LOC,NXT_LOC+NUM_VALS_2(J)-1)
 	    ELSE

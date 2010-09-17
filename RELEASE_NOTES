@@ -7,7 +7,71 @@ if I don't know about them. The following summary of changes
 was hurriedly put together, and is thus incomplete. Documentation
 has not yet been updated to reflect the changes.
 
+****************************************************************************
+****************************************************************************
+
+                    17-June-2010
+
+
+There have been many changes, especially with improvements of SN models.
+The SN stuff is still very much under development. Some of the changes,
+especially the non trivial, are listed below.
+
+The frequency selection 
+has changed slightly -- thus old EDDFACTOR files will not work with the
+new version of CMFGEN (unless using FIXED_J=T in VADAT/CMF_FLUX_PARAMA_INIT).
+
+Additional OMP instructions have been added to many routines. Sometimes these
+cause problems related to compiler bugs (or features!).
+If issues, compile without OMP. CMFGEN will run a factor of 2 to 2.5 times
+faster (pgf95 compiler) using 4 cpus. Additional CPUS don't increase the speed
+dramatically (yet). A much better gain is obtained with cmf_flux.
+
+/unix/set_line_buffering.f added for use with PGF95 compiler.
+   The subroutine forces unbuffered output (useful for OUTGEN).
+   For intel compilers, you may need to create a dummy routine.
+
+com/cpmod has been updated to copy a SN model so the same model can be
+  rerun in a  new directory.
+
+Flourine, Scandium, Vanadium, and Barium have can now be treated
+  (atomic data files not yet updated on web).
+
+Addition options addedi to DISPGEN. See maingen.f -- Documentation still to be updated.
+
+Additional options added to misc/do_ng_v2.f
+
+LOWN option added to wr_f_to_s
+Format of RVTJ has change. Should be transparent to CMFGEN users.
+
+Significant changes to cmfgen_sub.f, mostly related to SN work.
+A large section of code was transferred to a subroutine
+(update_ba_for_line.f).
+
+Updates to new_main/mod_subs/comp_j_blank.f. Mainly related to new SN calls.
+
+Additional variables in new_main/mod_subs/rd_control_variables.f. Mainly related to
+SN studies.
+
+new_main/subs/do_cmf_hydro_v2.f
+  Updated: Now join velocity at 0.75 x (sound speed) - was 0.5
+           TAU_REF can be a parameter in the file HYDRO_DEFAULTS
+           (default is 2/3 - same as old version).
+
+new_main/subs/solveba_v9.f replaces version new_main/subs/solveba_v8.f.
+  Designed to better converge models in which a few levels at a few
+    depths are limiting convergence. Tends to help, but still under development.
+    A vector (10 values) showing increases and decreases is nouw output to CMFGEN.
+
+Additonal options added to cmf_flux (changes in rd_cmf_flux_controls.f)
                     24-June-2009
+
+Minor bug fix in subs/det_main_cont_freq.f. Will cause slight (but insignificant)
+changes of models.
+
+
+****************************************************************************
+****************************************************************************
 
 This release fixes a couple of bugs to  the 26-May-2009 release.
 There have also been some additional changes. The most notable

@@ -7,7 +7,7 @@
 	IMPLICIT NONE
 !
 ! Altered : 26-Jul-2010 : Bug fix. Frequencies used for continuum evaluations
-!                           were not monotonic. Check noew inserted.
+!                           were not monotonic. Check now inserted.
 !                           Format of CONT_FREQ file changes.
 ! Altered : 31-Jan-2010 : Fixed out-of-bounds array access.
 !
