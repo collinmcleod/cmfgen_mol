@@ -251,6 +251,8 @@ C
 	1            'Force a pre hubble flow using age and radii of SN?')
 	    CALL RD_STORE_LOG(INCL_RADIOACTIVE_DECAY,'INC_RAD_DECAYS',L_TRUE,
 	1            'Allow for radiactive decays')
+	    CALL RD_STORE_LOG(TREAT_NON_THERMAL_ELECTRONS,'TRT_NON_TE',L_TRUE,
+	1            'Treat non-thermal electrons')
 	    CALL RD_STORE_NCHAR(SN_T_OPTION,'SN_T_OPT',ITEN,L_TRUE,
 	1           'Method to get T with non-GRID option (USE_T_IN or USE_HYDRO)')
 	    CALL RD_STORE_NCHAR(GAMRAY_TRANS,'GAMRAY_TRANS',ITEN,L_TRUE,
