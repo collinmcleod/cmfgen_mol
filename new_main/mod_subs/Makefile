@@ -71,10 +71,6 @@ $(LIB)(%.o) : %.f
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)
 
-$(LIB)(comp_j_blank.o) : comp_j_blank.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(ang_qw_mod.o)
-	$(F90) -c $(FG) comp_j_blank.f
-	ar ruv $(LIB) comp_j_blank.o
-
 $(LIB)(check_param_consistency.o) : check_param_consistency.f $(LIB_MOD)(control_variable_mod.o)\
                                   $(LIB_MOD)(ang_qw_mod.o)
 	$(F90) -c $(FG) check_param_consistency.f
@@ -85,10 +81,14 @@ $(LIB)(comp_grey_v2.o) : comp_grey_v2.f $(LIB_MOD)(control_variable_mod.o) $(LIB
 	$(F90) -c $(FG) comp_grey_v2.f
 	ar ruv $(LIB) comp_grey_v2.o
 
-$(LIB)(comp_grey_v3.o) : comp_grey_v3.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
+$(LIB)(comp_grey_v4.o) : comp_grey_v4.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
                                   $(LIB_MOD)(ang_qw_mod.o)
-	$(F90) -c $(FG) comp_grey_v3.f
-	ar ruv $(LIB) comp_grey_v3.o
+	$(F90) -c $(FG) comp_grey_v4.f
+	ar ruv $(LIB) comp_grey_v4.o
+
+$(LIB)(comp_j_blank.o) : comp_j_blank.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(ang_qw_mod.o)
+	$(F90) -c $(FG) comp_j_blank.f
+	ar ruv $(LIB) comp_j_blank.o
 
 $(LIB)(comp_opac.o) : comp_opac.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)
 	$(F90) -c $(FG) comp_opac.f
@@ -98,10 +98,21 @@ $(LIB)(comp_var_opac.o) : comp_var_opac.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_
 	$(F90) -c $(FG) comp_var_opac.f
 	ar ruv $(LIB) comp_var_opac.o
 
+$(LIB)(do_var_cont.o) : do_var_cont.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
+$(LIB_MOD)(line_mod.o) $(LIB_MOD)(var_rad_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
+$(LIB_MOD)(ang_qw_mod.o)
+	$(F90) -c $(FG) do_var_cont.f
+	ar ruv $(LIB) do_var_cont.o
+                                                                                                                      
 $(LIB)(grey_t_iterate.o) : grey_t_iterate.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
 $(LIB_MOD)(line_mod.o) $(LIB_MOD)(line_vec_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(ang_qw_mod.o)
 	$(F90) -c $(FG) grey_t_iterate.f
 	ar ruv $(LIB) grey_t_iterate.o
+                                                                                                                      
+$(LIB)(init_line_opac_var.o) : init_line_opac_var.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
+$(LIB_MOD)(line_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(var_rad_mod.o)
+	$(F90) -c $(FG) init_line_opac_var.f
+	ar ruv $(LIB) init_line_opac_var.o
                                                                                                                       
 $(LIB)(rd_cont_j.o) : rd_cont_j.f $(LIB)(opac_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
 $(LIB_MOD)(ang_qw_mod.o)
@@ -112,21 +123,6 @@ $(LIB)(rd_control_variables.o) : rd_control_variables.f $(LIB_MOD)(control_varia
 	$(F90) -c $(FG) rd_control_variables.f
 	ar ruv $(LIB) rd_control_variables.o
 
-$(LIB)(set_new_model_estimates.o) : set_new_model_estimates.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
-$(LIB_MOD)(line_mod.o) $(LIB_MOD)(line_vec_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(ang_qw_mod.o)
-	$(F90) -c $(FG) set_new_model_estimates.f
-	ar ruv $(LIB) set_new_model_estimates.o
-                                                                                                                      
-$(LIB)(set_line_opac.o) : set_line_opac.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
-$(LIB_MOD)(line_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(line_vec_mod.o)
-	$(F90) -c $(FG) set_line_opac.f
-	ar ruv $(LIB) set_line_opac.o
-                                                                                                                      
-$(LIB)(init_line_opac_var.o) : init_line_opac_var.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
-$(LIB_MOD)(line_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(var_rad_mod.o)
-	$(F90) -c $(FG) init_line_opac_var.f
-	ar ruv $(LIB) init_line_opac_var.o
-                                                                                                                      
 $(LIB)(set_abund_clump.o) : set_abund_clump.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)
 	$(F90) -c $(FG) set_abund_clump.f
 	ar ruv $(LIB) set_abund_clump.o
@@ -139,6 +135,16 @@ $(LIB)(set_frequency_grid.o) : set_frequency_grid.f $(LIB_MOD)(control_variable_
  $(LIB_MOD)(line_vec_mod.o) $(LIB_MOD)(mod_cmfgen.o) 
 	$(F90) -c $(FG) set_frequency_grid.f
 	ar ruv $(LIB) set_frequency_grid.o
+                                                                                                                      
+$(LIB)(set_line_opac.o) : set_line_opac.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
+$(LIB_MOD)(line_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(line_vec_mod.o)
+	$(F90) -c $(FG) set_line_opac.f
+	ar ruv $(LIB) set_line_opac.o
+                                                                                                                      
+$(LIB)(set_new_model_estimates.o) : set_new_model_estimates.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
+$(LIB_MOD)(line_mod.o) $(LIB_MOD)(line_vec_mod.o) $(LIB_MOD)(mod_cmfgen.o) $(LIB_MOD)(ang_qw_mod.o)
+	$(F90) -c $(FG) set_new_model_estimates.f
+	ar ruv $(LIB) set_new_model_estimates.o
                                                                                                                       
 $(LIB)(solve_for_pops.o) : solve_for_pops.f $(LIB_MOD)(control_variable_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
                                   $(LIB_MOD)(ang_qw_mod.o)
@@ -157,12 +163,6 @@ $(LIB_MOD)(line_mod.o) $(LIB_MOD)(var_rad_mod.o) $(LIB_MOD)(radiation_mod.o) $(L
 $(LIB_MOD)(cmf_sob_mod.o) $(LIB_MOD)(steq_data_mod.o) $(LIB_MOD)(ang_qw_mod.o) $(LIB_MOD)(line_vec_mod.o)
 	$(F90) -c $(FG) sub_sob_line_v3.f
 	ar ruv $(LIB) sub_sob_line_v3.o
-                                                                                                                      
-$(LIB)(do_var_cont.o) : do_var_cont.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\
-$(LIB_MOD)(line_mod.o) $(LIB_MOD)(var_rad_mod.o) $(LIB_MOD)(radiation_mod.o) $(LIB_MOD)(mod_cmfgen.o)\
-$(LIB_MOD)(ang_qw_mod.o)
-	$(F90) -c $(FG) do_var_cont.f
-	ar ruv $(LIB) do_var_cont.o
                                                                                                                       
 clean :
 	rm -f *.o 

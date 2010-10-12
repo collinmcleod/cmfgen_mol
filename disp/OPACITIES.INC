@@ -87,6 +87,7 @@ C
 	  CHI(I)=CHI(I)+CHI_RAY(I)
 	  ZETA(I)=ETA(I)/CHI(I)
 	  THETA(I)=(ESEC(I)+CHI_RAY(I))/CHI(I)
+	  CHI_SCAT(I)=CHI_RAY(I)+ESEC(I)
 	END DO
 C 
 C

@@ -179,7 +179,7 @@
 	1        'Reference tau for WR_TAU')
 !
 	  WRITE(LUMOD,'()')
-	  CALL RD_STORE_NCHAR(GLOBAL_LINE_SWITCH,'GLOBAL_LINE',ISIX,L_TRUE,
+	  CALL RD_STORE_NCHAR(GLOBAL_LINE_SWITCH,'GLOBAL_LINE',ITEN,L_TRUE,
 	1            'Global switch to indicate handeling of line')
 	  CALL SET_CASE_UP(GLOBAL_LINE_SWITCH,IZERO,IZERO)
 	  IF( GLOBAL_LINE_SWITCH(1:3) .NE. 'SOB' .AND.
@@ -218,14 +218,36 @@
 	  CALL RD_STORE_DBLE(T_SHOCK,'T_SHOCK',L_TRUE,'Shock T for X-ray emission')
 	  CALL RD_STORE_DBLE(V_SHOCK,'V_SHOCK',L_TRUE,'Cut off velocity for X-ray emission')
 !
-	  IF(GLOBAL_LINE_SWITCH .EQ. 'NONE')THEN
+! If we add _SPEC, SOB or BLANK is the default option. In this case we need only
+! specify the species we wish to change from the default.
+!
+	  IF(GLOBAL_LINE_SWITCH .EQ. 'SOB_SPEC')THEN
+	    DO ID=1,NUM_IONS
+	      IF(ATM(ID)%XzV_PRES)THEN
+                ATM(ID)%XzV_TRANS_TYPE='SOB'
+	        TEMP_CHAR='TRANS_'//ION_ID(ID)
+	        TMP_STRING='Method for treating '//TRIM(ION_ID(ID))//' lines?'
+	        CALL RD_STORE_NCHAR( ATM(ID)%XzV_TRANS_TYPE,TEMP_CHAR,ITEN,L_FALSE,TMP_STRING)
+	      END IF
+	    END DO
+	    GLOBAL_LINE_SWITCH='NONE'
+	  ELSE IF(GLOBAL_LINE_SWITCH .EQ. 'BLANK_SPEC')THEN
+	    DO ID=1,NUM_IONS
+	      IF(ATM(ID)%XzV_PRES)THEN
+	        ATM(ID)%XzV_TRANS_TYPE='BLANK'
+	        TEMP_CHAR='TRANS_'//ION_ID(ID)
+	        TMP_STRING='Method for treating '//TRIM(ION_ID(ID))//' lines?'
+	        CALL RD_STORE_NCHAR( ATM(ID)%XzV_TRANS_TYPE,TEMP_CHAR,ITEN,L_FALSE,TMP_STRING)
+	      END IF
+	    END DO
+	    GLOBAL_LINE_SWITCH='NONE'
+	  ELSE IF(GLOBAL_LINE_SWITCH .EQ. 'NONE')THEN
 	    WRITE(LUMOD,'()')
 	    DO ID=1,NUM_IONS
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        TEMP_CHAR='TRANS_'//ION_ID(ID)
 	        TMP_STRING='Method for treating '//TRIM(ION_ID(ID))//' lines?'
-	        CALL RD_STORE_NCHAR( ATM(ID)%XzV_TRANS_TYPE,TEMP_CHAR,
-	1                          ITEN,L_TRUE,TMP_STRING)
+	        CALL RD_STORE_NCHAR( ATM(ID)%XzV_TRANS_TYPE,TEMP_CHAR,ITEN,L_TRUE,TMP_STRING)
 	      END IF
 	    END DO
 	  END IF
