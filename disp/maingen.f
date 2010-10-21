@@ -3199,9 +3199,9 @@
 	  DO WHILE(.NOT. VALID_VALUE)
 	    CALL USR_OPTION(I,'DEPTH',DEFAULT,'Depth for plotting TAUL')
 	    IF(I .GE. 1 .AND. I .LE. ND)THEN
-	       WRITE(T_OUT,'(A,I4,A,ES12.4)')'     Radius at depth',I,'is',R(I)
-	       WRITE(T_OUT,'(A,I4,A,ES12.4)')'   Velocity at depth',I,'is',V(I)
-	       WRITE(T_OUT,'(A,I4,A,ES12.4)')'Temperature at depth',I,'is',T(I)
+	       WRITE(T_OUT,'(A,I4,A,ES12.4)')'     Radius at depth',I,' is',R(I)
+	       WRITE(T_OUT,'(A,I4,A,ES12.4)')'   Velocity at depth',I,' is',V(I)
+	       WRITE(T_OUT,'(A,I4,A,ES12.4)')'Temperature at depth',I,' is',T(I)
 	       VALID_VALUE=.TRUE.
 	    END IF
 	  END DO
@@ -3216,6 +3216,9 @@
 !
 	    WRITE(6,*)'Opacity at line center(for Vdop=10km/s) * SQRT(PI) normalized be e.s. opacity' 
 	    TAU_CONSTANT=1.0D-15*OPLIN*2.998D+04/(6.65D-15*ED(I))
+	  ELSE IF(V(I) .LE. 20.0D0)THEN
+	    WRITE(6,*)'Using modified static optical depth'
+	    TAU_CONSTANT=OPLIN*1.6914D-11		!Assumes Vdop=10 km/s
 	  ELSE
 	    TAU_CONSTANT=OPLIN*R(I)*2.998E-10/V(I)
 	    IF(RADIAL_TAU)TAU_CONSTANT=TAU_CONSTANT/(1.0D0+SIGMA(I))
@@ -3244,7 +3247,20 @@
 	            WRITE(25,*)NL,NUP,T1,T2
 	            WRITE(25,*)J,XV(J),T2
 	            IF(T2 .NE. 0)THEN
-	              YV(J)=LOG10( ABS(T2)*TAU_CONSTANT/FREQ )
+	              IF(V(I) .LE. 20.0D0 .AND. .NOT. LINE_STRENGTH)THEN
+	                YV(J)=0.0D0
+	                T3=T2
+	                DO K=I,2,-1
+	                  T2=T3
+	                  T1=ATM(ID)%W_XzV_F(NUP,K)/ATM(ID)%W_XzV_F(NL,K)
+	                  T3=T1*ATM(ID)%XzV_F(NL,K)-GLDGU*ATM(ID)%XzV_F(NUP,K)
+	                  YV(J)=YV(J)+(R(K-1)-R(K))*(T2+T3)
+	                  IF(V(K+1) .GT. 20.0D0)EXIT
+	                END DO
+	                YV(J)=LOG10( 0.5D0*ATM(ID)%AXzV_F(NL,NUP)*ABS(YV(J))*TAU_CONSTANT/FREQ)
+	              ELSE
+	                YV(J)=LOG10( ABS(T2)*TAU_CONSTANT/FREQ )
+	              END IF
 	            ELSE
 	              J=J-1
 	            END IF

@@ -6,6 +6,8 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 15-Oct-2010: Fixed bug with SIGMA computation for the extra
+!                        points added with the EXTR option.
 ! Altered 27-Aug-2007: Revised file read so as all ! (1st character) 
 ! comments are ignored.
 !
@@ -406,7 +408,7 @@
 !
 	  DO I=1,NN+NX_OUT
 	    V(I)=VINF*(1.0D0-RX/R(I))**BETA
-	    SIGMA(I)=BETA*V(I)*RX/R(I)/R(I)/(1.0D0-RX/R(I))-1.0D0
+	    SIGMA(I)=BETA*RX/R(I)/(1.0D0-RX/R(I))-1.0D0
 	  END DO
 !
 ! We remove the fine grid in the old model.

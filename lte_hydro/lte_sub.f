@@ -37,6 +37,12 @@
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
+! Altered 20-Oct-2010 : Commented out statements accessing DIFFW.
+!                         No longer call CALL SET_VAR_RAD_MOD_V2
+!                         This reduces memory requirements by not declaring 
+!                         CMFGEN variation arrays. DIFFW had to be commented out, as
+!                         declared in SET_VAR_RAD_MOD_V2.
+!
 ! Altered 16-Feb-2006 : Changed and modified over 2 month period. Section solving for
 !                         populations and performing NG acceleration etc removed to
 !                         subroutine (SOLVE_FOR_POPS). Routines added to allow time 
@@ -501,9 +507,10 @@
 !
 	CALL SET_RADIATION_MOD(ND,NDMAX,NPMAX)
 	CALL SET_LINE_MOD(ND,NT,MAX_SIM,NM)
-        CALL SET_VAR_RAD_MOD_V2(ND,NDEXT,
-	1        NT,NUM_BNDS,NM,MAX_SIM,NM_KI,ACCURATE,L_FALSE)
 	CALL SET_CMF_SOB_MOD(ND,NUM_BNDS,NT,NM_KI,NLF,LUER)
+!
+!       CALL SET_VAR_RAD_MOD_V2(ND,NDEXT,
+!	1        NT,NUM_BNDS,NM,MAX_SIM,NM_KI,ACCURATE,L_FALSE)
 !
 	T1=10.0/(NLF-1)
 	DO ML=1,NLF
@@ -911,9 +918,9 @@
 !
 ! Zero variation of DTDR vector
 !
-	DO I=1,NT
-	  DIFFW(I)=0.0D0
-	END DO
+!	DO I=1,NT
+!	  DIFFW(I)=0.0D0
+!	END DO
 !
 ! We ensure that LAST_LINE points to the first LINE that is going to
 ! be handled in the portion of the code that computes dTdR.

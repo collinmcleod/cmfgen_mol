@@ -78,6 +78,9 @@ cat Diff_output >> Diff_sum
 $cmfdist/com/main_diff.sh $X1/new_main/subs/two $X2/new_main/subs/two
 cat Diff_output >> Diff_sum
 
+$cmfdist/com/main_diff.sh $X1/new_main/subs/non_therm $X2/new_main/subs/non_therm
+cat Diff_output >> Diff_sum
+
 $cmfdist/com/main_diff.sh $X1/newsubs $X2/newsubs
 cat Diff_output >> Diff_sum
 
