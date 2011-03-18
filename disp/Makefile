@@ -32,8 +32,8 @@ all : $(EXE_DIR)dispgen.exe
 # Give the depeedencies of dispgen.exe and how it is created.
 #
 
-$(EXE_DIR)dispgen.exe : mod_disp.o dispgen.o maingen.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
-	$(F90) dispgen.o mod_disp.o maingen.o \
+$(EXE_DIR)dispgen.exe : mod_disp.o dispgen.o maingen.o pltphot_sub.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
+	$(F90) dispgen.o mod_disp.o maingen.o pltphot_sub.o \
              -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
                $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)/dispgen.exe
@@ -57,6 +57,9 @@ maingen.o : maingen.f mod_disp.o $(GEN) \
                EVAL_LTE_FULL.INC  OPACITIES.INC \
                PAR_OPACITIES.INC  XOPAC.INC PAR_XOPAC.INC
 	$(F90) -c  $(FD) maingen.f 
+
+pltphot_sub.o : pltphot_sub.f $(GEN)
+	$(F90) -c  $(FD) pltphot_sub.f 
 
 $(GEN):
 	(cd ../tools; make )
