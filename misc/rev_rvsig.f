@@ -535,7 +535,13 @@
 	  CALL GEN_IN(MDOT,'New mass-loss rate in Msun/yr')
 	  CALL GEN_IN(VINF,'Velocity at infinity in km/s')
 	  CALL GEN_IN(BETA,'Beta for velocity law')
+!
+	  WRITE(6,*)' '
+	  WRITE(6,*)' If increasing Mdot, simply enter a number slightly smaller than the sound speed.'
+	  WRITE(6,*)' If decreasing Mdot, you may need to enter a smaller number,'
+	  WRITE(6,*)' since as you decrease Mdot, the extent of the photosphere increase'
 	  CALL GEN_IN(V_TRANS,'Connection velocity in km/s')
+	  V_TRANS=V_TRANS*OLD_MDOT/MDOT
 !
 	  WRITE(6,'(A)')
 	  WRITE(6,'(A)')'Type 1: W(r).V(r) = 2V(t) + (Vinf-2V(t))*(1-r(t)/r))**BETA'
