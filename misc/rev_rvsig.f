@@ -6,6 +6,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 14-Mar-2011: Improved header output to RVSIG_COL.
 ! Altered 15-Oct-2010: Fixed bug with SIGMA computation for the extra
 !                        points added with the EXTR option.
 ! Altered 27-Aug-2007: Revised file read so as all ! (1st character) 
@@ -61,6 +62,7 @@
 !
 	INTEGER I,J,K
 	INTEGER I_ST,I_END
+	INTEGER N_HEAD
 !
         CHARACTER*30 UC
         EXTERNAL UC
@@ -69,14 +71,20 @@
 	CHARACTER(LEN=80) OLD_RVSIG_FILE
 	CHARACTER(LEN=80) NEW_RVSIG_FILE
 	CHARACTER(LEN=80) STRING
-
+	CHARACTER(LEN=80) OLD_HEADER(30)
+!
 	OLD_RVSIG_FILE='RVSIG_COL_OLD'
 	CALL GEN_IN(OLD_RVSIG_FILE,'File containing old R, V and sigma values')
 	OPEN(UNIT=10,FILE=OLD_RVSIG_FILE,STATUS='OLD',ACTION='READ')
 	  STRING=' '
+	  N_HEAD=0
 	  DO WHILE (INDEX(STRING,'!Number of depth points') .EQ. 0)
 	    READ(10,'(A)')STRING
+	    N_HEAD=N_HEAD+1
+	    N_HEAD=MIN(30,N_HEAD)
+	    OLD_HEADER(N_HEAD)=STRING
 	  END DO
+	  N_HEAD=N_HEAD-1
 	  READ(STRING,*)ND_OLD
 	  STRING=' '
 	  DO WHILE (STRING .EQ. ' ' .OR. STRING(1:1) .EQ. '!')
@@ -98,7 +106,7 @@
 	WRITE(6,'(A)')'         MDOT: change the mass-loss rate or velocity law'
 	WRITE(6,'(A)')'         NEWG: revise grid between two velocities'
 	WRITE(6,'(A)')'         SCLR: scale radius of star to new value'
-	WRITE(6,'(A)')'         SCLV: scale velociy law to new value'
+	WRITE(6,'(A)')'         SCLV: scale velocity law to new value'
 	WRITE(6,'(A)')'         PLOT: plot V and SIGMA from old RVSIG file'
 	WRITE(6,'(A)')
 
@@ -627,13 +635,28 @@
 	  OPEN(UNIT=10,FILE=NEW_RVSIG_FILE,STATUS='UNKNOWN',ACTION='WRITE')
 	    WRITE(10,'(A)')'!'
 	    IF(OPTION .EQ. 'MDOT')THEN
-	      WRITE(10,'(A,ES12.4)')'! Old mass-loss rate in Msun/yr=',OLD_MDOT
-	      WRITE(10,'(A,ES12.4)')'! New mass-loss rate in Msun/yr=',MDOT 
-	      WRITE(10,'(A,ES12.4)')'! Velocity at infinity in km/s =',VINF
-	      WRITE(10,'(A,ES12.4)')'! Beta for velocity law        =',BETA
-	      WRITE(10,'(A,I2)'    )'! Velocity law (type)          =',VEL_TYPE
-	      WRITE(10,'(A,ES12.4)')'! Transition velocity is       =',V_TRANS
+	      WRITE(10,'(A,ES14.6)')'! Old mass-loss rate in Msun/yr=',OLD_MDOT
+	      WRITE(10,'(A,ES14.6)')'! New mass-loss rate in Msun/yr=',MDOT 
+	      WRITE(10,'(A,ES14.6)')'! Velocity at infinity in km/s =',VINF
+	      WRITE(10,'(A,ES14.6)')'! Beta for velocity law        =',BETA
+	      WRITE(10,'(A,I3)'    )'! Velocity law (type)          =',VEL_TYPE
+	      WRITE(10,'(A,ES14.6)')'! Transition velocity is       =',V_TRANS
+	      WRITE(10,'(A,ES14.6)')'! R(1)/R(ND)                   =',R(1)/R(ND)
+	    ELSE IF(OPTION .EQ. 'SCLR')THEN
+	      WRITE(10,'(A,ES14.6)')'! Old stellar radius           =',OLD_R(ND_OLD)
+	      WRITE(10,'(A,ES14.6)')'! New stellar rdaius           =',R(ND_OLD)
+	      WRITE(10,'(A,ES14.6)')'! Velocity at infinity in km/s =',VINF
+	      WRITE(10,'(A,ES14.6)')'! Beta for velocity law        =',BETA
+	      WRITE(10,'(A,I3)'    )'! Velocity law (type)          =',VEL_TYPE
+	      WRITE(10,'(A,ES14.6)')'! Transition velocity is       =',V_TRANS
+	      WRITE(10,'(A,ES14.6)')'! R(1)/R(ND)                   =',R(1)/R(ND)
 	    END IF
+!
+! Use a !! to inidicate from old file.
+!
+	    DO I=1,N_HEAD
+	      WRITE(10,'(A,A)')'!',TRIM(OLD_HEADER(I))
+	    END DO
 	    WRITE(10,'(A)')'!'
 	    WRITE(10,'(A,7X,A,9X,10X,A,11X,A,3X,A)')'!','R','V(km/s)','Sigma','Depth'
 	    WRITE(10,'(A)')'!'
