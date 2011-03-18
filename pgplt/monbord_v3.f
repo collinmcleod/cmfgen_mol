@@ -39,6 +39,7 @@ C
 	REAL*4 XINC,YINC		!Spacing between axis coordinates
 	REAL*4 TICK_FAC
 	REAL*4 EXPCHAR
+	REAL*8 LST_X_VAL
 C
 	INTEGER*4 IXTICK,IYTICK		!Number of ticks between coordinates
 	INTEGER*4 IDX,IDY		!Number of digits after decimal point.
@@ -286,6 +287,7 @@ C
           X=(XPAR(1)+XPAR(2))/2.0
 	  Y=YPAR(2)+2.0*YTCK_SIZE+YCHAR_SIZE
 	  CALL PGPTXT(X,Y,RZERO,RHALF,TOPLABEL)
+	  LST_X_VAL=-2.0D0*XPAR(1)
 	  DO I=1,NXED
 	    X=XED(I)
 	    IF( (XPAR(1) .LE. X .AND. XPAR(2) .GE. X) .OR.
@@ -294,7 +296,10 @@ C
 	        Y=SCED(I)
 	        CALL PGMOVE(X,YPAR(2))
 	        CALL PGDRAW(X,YPAR(2)-YTCK_SIZE)
-	        CALL MON_NUM(X,YPAR(2)+YTCK_SIZE,Y,5,IDX)
+	        IF(ABS(X-LST_X_VAL) .GT. ABS(XPAR(2)-XPAR(1))/20.0D0)THEN
+	          CALL MON_NUM(X,YPAR(2)+YTCK_SIZE,Y,5,IZERO)               !IDX)
+	          LST_X_VAL=X
+	        END IF
               ELSE
 	        CALL PGMOVE(X,YPAR(2))
 	        CALL PGDRAW(X,YPAR(2)-0.67*YTCK_SIZE)
