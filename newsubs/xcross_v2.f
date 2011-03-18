@@ -138,15 +138,22 @@
 ! ionizations from the 3s and 3p states. The following code may need to be 
 ! changed when elements with z > 10 are included.
 !
-! We only include ionizations from the 2p shell if there is 3 or more
+! We only include ionizations from the n=2 shell if there is 2 or more
 ! electrons in the n=3 shell.
+!                        
+! We only include ionizations from the from the 3s2 and 3p6 shells if there is
+! at least 1 electron in the 3d shell.
+!
+! NB: Ne=11 corresponds to 1s2 2s2 2p6 3s
+! NB: Ne=19 corresponds to 1s2 2s2 2p6 3s2 3p6 [3d or 4s]
 !                        
 	  IF( NE .LE. 2 .OR. (.NOT. DO_LIT .AND. NE .EQ. 3) )RETURN
 !
 	  DO J=0,ANG_MAX_X
-	    LOOP_PQN_MAX=MIN(2,PQN_MAX_X)
+	    LOOP_PQN_MAX=MIN(3,PQN_MAX_X)
 	    IF(NE .LE. 19)LOOP_PQN_MAX=MIN(2,PQN_MAX_X)
 	    IF(NE .LE. 11)LOOP_PQN_MAX=1
+	    IF(LOOP_PQN_MAX .EQ. 3 .AND. J .EQ. 2)EXIT   	!Don't do valence electron
 	    DO I=1,LOOP_PQN_MAX
 	      IF( SIG_0_X(IZ,NE,I,J) .NE. 0 .AND. 
 	1         NU_EV .GE. E_THRESH_X(IZ,NE,I,J) )THEN
