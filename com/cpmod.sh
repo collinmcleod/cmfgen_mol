@@ -76,10 +76,26 @@ if(-e $1/RDINR)then
   echo "    Copyed RDINR"
 endif
 
+#If not a supernovae model, we exit.
+
+if(-e $1/JH_AT_OLD_TIME)then
+  echo " "
+  echo " SN data files available "
+  echo " "
+  echo "This routine is NOT to be used to run a new TIME step SN model."
+  echo "It can be used to copy SN output from a model so that the same"
+  echo "  time step can be run in another directory."
+  echo " "
+  echo "Use drad_cpmod to start a new SN model. "
+  echo " "
+else
+  goto  SKIPSN
+endif
+
 if(-e $1/NUC_DECAY_DATA)then
   cp $1/NUC_DECAY_DATA $2/
   echo " Copying SN data"
-  echo "    Copyed NU_DECAY DATA"
+  echo "    Copyed NU_DECAY_DATA"
 else
   echo "    *** Unable to copy NU_DECAY DATA"
 endif
@@ -106,14 +122,15 @@ else
 endif
 
 if(-e $1/SN_HYDRO_DATA)then
-  cp $1/SN_HYDRO_DATA $2/
+  cp $1/SN_HYDRO_DATA $2/SN_HYDRO_DATA
   echo "    Copyed SN_HYDRO_DATA"
 else
   echo "    *** Unable to copy SN_HYDRO_DATA"
 endif
 
-
 #
+
+SKIPSN:
 
 cd $2
 
