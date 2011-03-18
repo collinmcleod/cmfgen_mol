@@ -33,9 +33,11 @@
 	INTEGER, ALLOCATABLE :: CHG_ID(:,:)
 	REAL, ALLOCATABLE :: G_SUM(:,:)
 !
+	REAL*8 T1
 	INTEGER NOUT
 	INTEGER NIN
 	INTEGER J,K,L
+	INTEGER ICOUNT
 	INTEGER IPOS
 	INTEGER I_S,I_F
 	INTEGER LST
@@ -49,7 +51,6 @@
 !
 	IF(.NOT. DO_CHG_EXCH)RETURN
 !
-!	WRITE(LUER,*)'Entered SET_CHG_LEV_ID_V4'
 	ALLOCATE (LEV_CNT(N_CHG_RD,4),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (G_SUM(N_CHG_RD,4),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (ID_POINTER(N_CHG_RD,4),STAT=IOS)
@@ -75,7 +76,7 @@
 	        IF(SPEC_ID_CHG_RD(J,K) .EQ. ION_ID(ID))THEN
 	          ID_POINTER(J,K)=ID
 !
-! We first check if species 1 or 4 corresponds to the final ioization state.
+! We first check if species 1 or 4 corresponds to the final ionization state.
 !
 	          IF( (K .EQ. 2 .OR. K .EQ. 3) .AND. 
 	1           ATM(ID)%EQXzV+ATM(ID)%NXzV .EQ. EQ_SPECIES(SPECIES_LNK(ID)) )THEN
@@ -121,8 +122,29 @@
 	    END DO			!Over charge reaction
 	  END IF                        !Species present
 	END DO				!Over species
+!
+	CALL GEN_ASCI_OPEN(LUOUT,'CHG_EXCH_RD_CHK','UNKNOWN',' ','WRITE',IZERO,IOS)
+	WRITE(LUOUT,'(/,A)')' The LHS are charge exchange reactions that are included'
+	WRITE(LUOUT,  '(A)')' The RHS are charge exchange reactions that are excluded'
+	WRITE(LUOUT,  '(A)')' An ID of zero implies that the species (LHS) is the last ionization stage'
+	WRITE(LUOUT,'(/,2(3X,A),3X,A,T20,4X,A,2X,A,3X,A)')'J','K','Species','ID','NLev','nGsum'
+	DO J=1,N_CHG_RD
+	  L=LEV_CNT(J,1)*LEV_CNT(J,2)*LEV_CNT(J,3)*LEV_CNT(J,4)
+	  IF(L .NE. 0)THEN
+	    WRITE(LUOUT,'(A)')' '
+	    DO K=1,4
+	      WRITE(LUOUT,'(2I4,3X,A,T20,2I6,F7.1)')J,K,TRIM(SPEC_ID_CHG_RD(J,K)),
+	1         ID_POINTER(J,K),LEV_CNT(J,K),G_SUM(J,K)
+	    END DO
+	  ELSE
+	    DO K=1,4
+	      WRITE(LUOUT,'(40X,2I4,3X,A,T60,2I6,F7.1)')J,K,TRIM(SPEC_ID_CHG_RD(J,K)),
+	1         ID_POINTER(J,K),LEV_CNT(J,K),G_SUM(J,K)
+	    END DO
+	  END IF
+	END DO
 !
-! Now determine total number ocharge reactions.
+! Now determine total number of charge reactions.
 !
 	N_CHG=0
 	N_CHG_OMITTED=0
@@ -185,7 +207,7 @@
 !
 	L=0
 	DO J=1,N_CHG_RD
-	  WRITE(117,*)'Operating on charge exchange reaction J=',J
+	  WRITE(LUOUT,'(A,I3,4(2X,A))')'Operating on charge exchange reaction J=',J,SPEC_ID_CHG_RD(J,1:4)
 !
 ! NOUT and NIN are use to loop over ALL possible charge exchnage reactions.
 ! For LS coupling, we assume that the reaction rates are independent of
@@ -194,7 +216,7 @@
 !
 	  NOUT=1
 	  NIN=LEV_CNT(J,1)*LEV_CNT(J,2)*LEV_CNT(J,3)*LEV_CNT(J,4)
-	  WRITE(117,*)NIN,LEV_CNT(J,1),LEV_CNT(J,2),LEV_CNT(J,3),LEV_CNT(J,4)
+	  WRITE(LUOUT,*)NIN,LEV_CNT(J,1),LEV_CNT(J,2),LEV_CNT(J,3),LEV_CNT(J,4)
 	  IF(NIN .NE. 0)THEN
 	    LST=L
 	    DO K=1,4
@@ -208,7 +230,8 @@
 	      IF(K .EQ. 4)ID=ID_POINTER(J,2)
 	      I_S=(K-1)*(K-4)         
 	      IF( I_S .EQ. 0 .AND. ATM(ID)%EQXzV+ATM(ID)%NXzV .EQ. EQ_SPECIES(SPECIES_LNK(ID)) )THEN
-	        DO IP=1,NOUT
+	        NIN=LEV_CNT(J,1)*LEV_CNT(J,2)*LEV_CNT(J,3)*LEV_CNT(J,4)
+	        DO IP=1,NIN                  !NOUT
 	          L=L+1
 	          Z_CHG(L,K)=ATM(ID)%ZXzV
 	          ID_ION_CHG(L,K)=ID+1
@@ -216,7 +239,7 @@
 	          LEV_IN_ION_CHG(L,K)=1
 	          CHG_ID(L,K)=J
 	          G_CHG(L,K)=ATM(ID)%GIONXzV_F
-	          WRITE(117,*)J,K,L,Z_CHG(L,K),ID+1
+	          WRITE(LUOUT,'(2X,A,4I6,F7.1)')'A',J,K,L,ID+1,Z_CHG(L,K)
 	        END DO
 	      ELSE
 	        ID=ID_POINTER(J,K)
@@ -240,13 +263,13 @@
 	                  Z_CHG(L,K)=ATM(ID)%ZXzV-1.0D0
 	                  CHG_ID(L,K)=J
 	                  G_CHG(L,K)=ATM(ID)%GXzV_F(I_F)
-	                  WRITE(117,*)'B',J,K,L,Z_CHG(L,K),ID+1
+	                  WRITE(LUOUT,'(2X,A,4I6,F7.1)')'B',J,K,L,ID+1,Z_CHG(L,K)
 	                END DO
 	              ELSE
 	                DO II=1,NIN
 	                  G_CHG(L,K)=G_CHG(L,K)+ATM(ID)%GXzV_F(I_F)
 	                END DO
-	                WRITE(117,*)'C',J,K,L,Z_CHG(L,K),ID+1
+	                WRITE(LUOUT,'(2X,A,4I6,F7.1)')'C',J,K,L,ID+1,Z_CHG(L,K)
 	              END IF
 	            END IF
 	          END DO
@@ -269,14 +292,51 @@
           END IF                    !Is reaction available
 !	    
 	END DO                      !Loop over J (reactions read in)
+!
+	K=1
+	DO WHILE(K .LE. N_CHG)
+	  ICOUNT=1
+	  T1=COEF_CHG(K,1)*G_CHG(K,1)*G_CHG(K,2)
+	  DO L=K+1,N_CHG
+	    IF(CHG_ID(K,1) .EQ. CHG_ID(L,1))THEN
+	      T1=T1+COEF_CHG(L,1)*G_CHG(L,1)*G_CHG(L,2)
+	      ICOUNT=ICOUNT+1
+	    ELSE
+	      EXIT
+	    END IF
+	  END DO
+	  J=CHG_ID(K,1)
+	  T1=T1/COEF_CHG_RD(J,1)/G_SUM(J,1)/G_SUM(J,2)
+	  IF( ABS(T1-1.0D0) .GT. 1.0E-05)THEN
+	    WRITE(6,*)'Error in SETLEV_ID_V4 --- reaction rates do not agree'
+	    WRITE(6,'(A,I3)')'  Reaction is:',K
+	    WRITE(6,'(A,4A8)')'  Reactants are:',SPEC_ID_CHG(K,1:4)
+	    WRITE(6,'(A,ES14.4)')'  T1=',T1
+	    WRITE(6,*)G_SUM(J,1),G_SUM(J,2),G_SUM(J,3),G_SUM(J,4)
+	    DO L=K,N_CHG
+	      IF(CHG_ID(K,1) .EQ. CHG_ID(L,1))WRITE(6,'(3X,6ES14.4)')COEF_CHG_RD(J,1),COEF_CHG(L,1),G_CHG(L,1:4)
+	    END DO
+	    STOP
+	  END IF
+	  K=K+ICOUNT
+	END DO
 !
 ! Check that the SL's involved in a charge exchange reaction correspond to a
 ! single LS state.
 !
+	WRITE(LUOUT,'(A)')
+	WRITE(LUOUT,'(A)')
+	WRITE(LUOUT,'(A)')' Summary of charge exchange info'
+	DO J=1,N_CHG
+	  WRITE(LUOUT,'(/,4(A),7X,A,3X,A,8X,A,3X,A)')'   Type','     ID','  Level','   Lpop',
+	1                                             'z','Chg_ID','g','Species'
+	  WRITE(LUOUT,'(4(3X,I4),3X,F5.2,5X,I4,2X,F7.2,3X,A)')
+	1       (TYPE_CHG(J),ID_ION_CHG(J,K),LEV_IN_ION_CHG(J,K),LEV_IN_POPS_CHG(J,K),
+	1         Z_CHG(J,K),CHG_ID(J,K),G_CHG(J,K),TRIM(SPEC_ID_CHG(J,K)), K=1,4)
+	END DO
+	CLOSE(LUOUT)
+!
 	CALL GEN_ASCI_OPEN(LUOUT,'CHG_EXCH_CHK','UNKNOWN',' ','WRITE',IZERO,IOS)
-	WRITE(117,'(A)')
-	WRITE(117,'(A)')' Summary of charge exchange info'
-	WRITE(117,'(A)')
 	DO J=1,N_CHG
 	  STRING=' '
 	  DO K=1,4
@@ -319,10 +379,7 @@
 	      STRING(L+1:)=TRIM(SPEC_ID_CHG(J,K))//'{ion}'
 	    END IF
 	  END DO
-	  WRITE(LUOUT,'(1X,I3,3X,A,3X,ES12.4)')J,STRING(1:100),COEF_CHG(J,1)
-	  WRITE(117,'(4I5,F5.2,I4,F7.2,A)')
-	1       (TYPE_CHG(J),ID_ION_CHG(J,K),LEV_IN_ION_CHG(J,K),LEV_IN_POPS_CHG(J,K),Z_CHG(J,K),
-	1       CHG_ID(J,K),G_CHG(J,K),TRIM(SPEC_ID_CHG(J,K)), K=1,4)
+	  WRITE(LUOUT,'(1X,I3,3X,A,3X,2ES12.4)')J,STRING(1:100),COEF_CHG(J,1),COEF_CHG_RD(CHG_ID(J,1),1)
 	END DO
 !
 	IF(N_CHG_OMITTED .NE. 0)THEN
