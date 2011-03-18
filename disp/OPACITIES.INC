@@ -1,3 +1,7 @@
+!
+! Altered 6-Jan-2011 - CHI_RAY no longer scaled by CLUMP_FAC.
+!                      This scaling is done elsewhere.
+!
 C
 C Compute opacity and emissivity. This is a general include file
 C provided program uses exactly the same variables. Can be achieved
@@ -76,11 +80,10 @@ C
           END DO
 	END IF
 C
+        CHI_RAY(1:ND)=0.0D0
         IF(ATM(1)%XzV_PRES .AND. INC_RAY_SCAT)THEN
-          CHI_RAY(1:ND)=0.0D0
           CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
 	1             ATM(1)%NXzV_F,FL,ND)
-          CHI_RAY(1:ND)=CHI_RAY(1:ND)*CLUMP_FAC(1:ND)
         END IF
 C
 	DO I=1,ND
