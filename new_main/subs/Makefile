@@ -30,6 +30,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(evalse_qwvj_v6.o)\
       $(LIB)(evalse_x_qwvj_v4.o)\
       $(LIB)(eval_temp_ddt_v2.o)\
+      $(LIB)(fiddle_pop_corrections.o)\
       $(LIB)(fixpop_in_ba_v2.o)\
       $(LIB)(fixpop_t.o)\
       $(LIB)(fixpop_in_ba_v3.o)\
