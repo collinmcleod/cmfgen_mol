@@ -47,6 +47,7 @@
 !
 	IMPLICIT NONE
 !
+! Altered 09-Nov-2010 : Modified fit type 9.
 ! Altered 17-Apr-2008 : Installed fit Type 8:
 ! Altered 30-Apr-2004 : Modified Seaton fit (Type 7) installed.
 ! Altered 07-Dec-2001 : EQUAL_CORFAC installed for AMD processors and PGI compiler.
@@ -115,6 +116,9 @@
 	REAL*8, PARAMETER :: EV_TO_HZ=0.241798840766D0
 	REAL*8, PARAMETER :: EQUAL_COR_FAC=1.0D0+1.0D-14
 	INTEGER, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IONE=1
+	INTEGER, PARAMETER :: ITWO=2
+	INTEGER, PARAMETER :: ITHREE=3
 	LOGICAL ALL_DONE
 	LOGICAL DO_PURE_EDGE
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
@@ -463,6 +467,10 @@ C
 	1              PD(ID)%CROSS_A(LMIN)*( PD(ID)%CROSS_A(LMIN+1) +
 	1               (1.0D0-PD(ID)%CROSS_A(LMIN+1))*RU )*( RU**PD(ID)%CROSS_A(LMIN+2) )
 	          END IF
+!
+! We assume all ionizations are to the ground state. Previously we read in
+! an additional offset, but this has now been superceded.
+!
 	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 9)THEN
 	          LMIN=LMIN-8
 	          DO J=1,(PD(ID)%END_LOC(TERM,K)-PD(ID)%ST_LOC(TERM,K)+1)/8
@@ -484,6 +492,9 @@ C
 	          T1=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,
 	1                          IZERO,IZERO,L_FALSE,L_TRUE)
 	          IF(T1 .GT. 0)PHOT(1:NLEVS)=PHOT(1:NLEVS)+T1
+	          WRITE(6,*)'Error in SUB_PHOT_GEN -- calling CROSS TYPE 30 - 31'
+	          WRITE(6,*)'Loop   needs fixing'
+	          WRITE(6,*)GS_EDGE,NLEVS,PHOT_ID
 !
 	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 31)THEN
 	          T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION	!# of elec. in species.
@@ -491,6 +502,10 @@ C
 	1                        PD(ID)%CROSS_A(LMIN),PD(ID)%CROSS_A(LMIN),
 	1                        L_FALSE,L_FALSE)
 	          IF(T1 .GT. 0)PHOT(1:NLEVS)=PHOT(1:NLEVS)+T1
+	          WRITE(6,*)'Error in SUB_PHOT_GEN -- calling CROSS TYPE 30 - 31'
+	          WRITE(6,*)'Loop   needs fixing'
+	          WRITE(6,*)GS_EDGE,NLEVS,PHOT_ID
+	          STOP
 !
 ! More cross-section types can be added in here.
 !
@@ -524,9 +539,27 @@ C
 !
 	IF(PD(ID)%DO_KSHELL_W_GS .AND. PHOT_ID .EQ. 1 .AND. FREQ .GT. 0)THEN
 	  T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION			!Number of electrons in species.
-	  T1=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,IZERO,IZERO,L_FALSE,L_TRUE)
-	  IF(T1 .GT. 0)THEN
-	    PHOT(1:NLEVS)=PHOT(1:NLEVS)+T1
+	  T2=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,IZERO,IZERO,L_FALSE,L_TRUE)
+	  IF(T2 .GT. 0)THEN
+	    PHOT(1:NLEVS)=PHOT(1:NLEVS)+T2
+	  END IF
+	END IF
+!
+	T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION			!Number of electrons in species.
+	IF(T1 .EQ. 11 .AND. PHOT_ID .EQ. 1 .AND. FREQ .GT. 0)THEN
+	  T2=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,ITWO,IZERO,L_FALSE,L_TRUE)
+	  T2=T2+XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,ITWO,IONE,L_FALSE,L_TRUE)
+	  IF(T2 .GT. 0)THEN
+	    PHOT(1:NLEVS)=PHOT(1:NLEVS)+T2
+	  END IF
+	END IF
+!
+	T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION			!Number of electrons in species.
+	IF(T1 .EQ. 19 .AND. PHOT_ID .EQ. 1 .AND. FREQ .GT. 0)THEN
+	  T2=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,ITHREE,IZERO,L_FALSE,L_TRUE)
+	  T2=T2+XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,ITHREE,IONE,L_FALSE,L_TRUE)
+	  IF(T3 .GT. 0)THEN
+	    PHOT(1:NLEVS)=PHOT(1:NLEVS)+T2
 	  END IF
 	END IF
 !
