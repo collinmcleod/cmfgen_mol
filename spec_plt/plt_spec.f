@@ -18,6 +18,11 @@ C
 C
 	IMPLICIT NONE
 C
+C Altered 15-Mar-2011 : SMC reddening law added (done by Kathryn Neugent).
+C                       RED option installed -- crude method to get redenning.
+C                       Crude procedure to remove cosmic rays (or spikes) form observed
+C                         data implemented with rd_obs option.
+C                       Fixed comvolution option to make more transparent.
 C Altered 17-Jun-1996 : Bug fixed with Wavelength normalization for BB option.
 C Altered 16-mar-1997 : Cleaned: USR_OPTION installation finalized.
 C Altered 26-Nov-1996 : Norm option fixed so that entire MOD spectrum is 
@@ -33,7 +38,7 @@ c
 	INTEGER, PARAMETER :: NBB=2000
 C
 	INTEGER NCF		!Number of data points in default data
-	INTEGER NCF_MOD	!Used when plotting another model data set
+	INTEGER NCF_MOD		!Used when plotting another model data set
 c
 	REAL*8 NU(NCF_MAX)
 	REAL*8 OBSF(NCF_MAX)
@@ -43,6 +48,10 @@ C
 	INTEGER NCF_CONT
 	REAL*8 NU_CONT(NCF_MAX)
 	REAL*8 OBSF_CONT(NCF_MAX)
+!
+	INTEGER NOBS
+	REAL*8 NU_OBS(NCF_MAX)
+	REAL*8 OBSF_OBS(NCF_MAX)
 C
 C Indicates which columns the observatoinal data is in.
 C
@@ -82,6 +91,7 @@ C
 	LOGICAL NON_MONOTONIC
 	LOGICAL SMOOTH			!Smooth observational data?
 	LOGICAL CLEAN			!Remove IUE bad pixels?
+	LOGICAL CLN_CR			!Remove cosmic-ray spikes
 	LOGICAL TREAT_AS_MOD		
 	LOGICAL READ_OBS
 	LOGICAL AIR_LAM
@@ -119,6 +129,8 @@ C
 	INTEGER IOS			!Used for Input/Output errors.
 	INTEGER I,J,K,L,ML,MLST
 	INTEGER IST,IEND
+	INTEGER CNT
+	INTEGER NHAN
 	REAL*8 T1,T2,T3
 	REAL*8 SUM
 	REAL*8 TEMP
@@ -172,9 +184,11 @@ C
 	REAL*8 EBMV_GAL
 	REAL*8 EBMV_LMC
 	REAL*8 EBMV_CCM
+	REAL*8 EBMV_SMC         !KN - SMC law
 	REAL*8 RAX,RBX
 	REAL*8 FILTLAM(8),FILTZP(8),FLAM(24),ZERO_POINT
 	CHARACTER*1 FILT(8)
+	REAL*8 C1,C2,C3,C4,D,F  !KN For SMC
 !
 	REAL*8 RESPONSE1
 	REAL*8 RESPONSE2
@@ -222,6 +236,7 @@ C
 	Y_PLT_OPT='FNU'
 !
 	NCF=0
+	NOBS=0
 C
 C Conversion factor from Kev to units of 10^15 Hz.
 C Conversion factor from Angstroms to units of 10^15 Hz.
@@ -573,10 +588,13 @@ C
 C
 	  RAD_VEL=0.0D0
 	  CALL USR_HIDDEN(RAD_VEL,'RAD_VEL','0.0D0',
-	1             'Radial velcoity (+ve if away)')
+	1             'Radial velocity (+ve if away)')
 C
 	  CLEAN=.FALSE.
 	  CALL USR_HIDDEN(CLEAN,'CLEAN','F',' ')
+C
+	  CLN_CR=.FALSE.
+	  CALL USR_HIDDEN(CLN_CR,'CLN_CR','F','Remove cosmic ray spikes? ')
 C
 	  SMOOTH=.FALSE.
 	  CALL USR_HIDDEN(SMOOTH,'SMOOTH','F',' ')
@@ -589,9 +607,9 @@ C
 	  CALL USR_HIDDEN(TREAT_AS_MOD,'OVER','F',' ')
 C
 	  IF(SMOOTH)THEN
-	    K=5
+	    NHAN=5
 	    CALL USR_OPTION(K,'HAN','5','Number of points for HAN [ODD]')
-	    K=2*(K/2)+1	!Ensures odd. 
+	    NHAN=2*(NHAN/2)+1	!Ensures odd. 
 	  END IF
 C
 	  CALL USR_HIDDEN(OBS_COLS,2,2,'COLS','1,2','Columns with data')
@@ -620,6 +638,40 @@ C
 	      END IF
 	    END DO
 	  END IF
+!
+	  IF(CLN_CR)THEN
+	    ZV(1:J)=YV(1:J)
+	    DO L=3,J-10
+	      T1=MAXVAL(YV(L:L+9))
+	      DO I=L,MIN(J-2,L+9)
+	         IF(YV(I) .EQ. T1)THEN
+	           K=I
+	           EXIT
+	         END IF
+	      END DO 
+	      T1=0.0D0; T2=0.0D0; CNT=0
+	      DO I=MAX(1,K-10),MIN(K+10,J)
+	        IF(I .LT. K-1 .OR. I .GT. K+1)THEN
+	          T1=T1+YV(I)
+	          T2=T2+YV(I)*YV(I)
+	          CNT=CNT+1
+	        END IF
+	      END DO
+	      IF(CNT .GE. 4)THEN
+	        T1=T1/CNT; T2=SQRT((T2-T1*T1*CNT)/MAX(CNT-1,1))
+	      ELSE
+	        T1=YV(K)
+	        T2=1.0D+20
+	      END IF
+	      IF(YV(K) .GT. T1+4.0*T2)THEN
+	        YV(K)=YV(K-1)
+	        IF(YV(K-1) .GT. T1+4.0*T2)YV(K)=YV(K-2)
+		T3=YV(K+1) 
+	        IF(T3 .GT. T1+4.0*T2)T3=YV(K+2)
+	        YV(K)=0.5D0*(YV(K)+T3)
+	      END IF 
+	    END DO
+	  END IF
 C
 C We check whether the X axis is monotonic. If not, we smooth each section
 C separately. Designed for non-merged overlapping ECHELLE orders.
@@ -635,6 +687,7 @@ C
 	    END DO
 	  END IF
 C
+	  K=NHAN
 	  IF(SMOOTH .AND. NON_MONOTONIC)THEN
 	    ZV(1:J)=YV(1:J)
 	    DO I=1,K
@@ -691,8 +744,11 @@ C
 	      NU(I)=XV(I)
 	      OBSF(I)=YV(I)
 	    END DO
-	    WRITE(T_OUT,*)'Observational data replaces moel data'
+	    WRITE(T_OUT,*)'Observational data replaces model data'
 	  ELSE
+	    NOBS=J
+	    NU_OBS(1:NOBS)=XV(1:NOBS)
+	    OBSF_OBS(1:NOBS)=YV(1:NOBS)
 	    CALL CNVRT(XV,YV,J,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1                 LAMC,XAXIS,YAXIS,L_FALSE)
 	    CALL USR_HIDDEN(WR_PLT,'WR','F','Write data to file')
@@ -739,20 +795,33 @@ C
 !
 ! Instrumental profiles is assumed to be Gaussian.
 !
-	 CALL USR_OPTION(INST_RES,'INST_RES','3d0',
-	1                            'Instrumental Resolution [dLam] (FWHM)')
-!
-! Defaults are those of HUT.
-!
-	 CALL USR_OPTION(WAVE_MIN,'WAVE_MIN','900d0','Minimum Wavelength')
-	 CALL USR_OPTION(WAVE_MAX,'WAVE_MAX','1300d0','Maximum Wavelength')
+	 WRITE(T_OUT,*)' '
+	 WRITE(T_OUT,*)' Two choices are possible: '
+	 WRITE(T_OUT,*)'   (1) Fixed resolution (INST_RES) in angstroms'
+	 WRITE(T_OUT,*)'   (2) Fixed velocity resoluton (Lam/dLam) '
+	 WRITE(T_OUT,*)' The non-zero value is used'
+	 WRITE(T_OUT,*)' '
 !
 ! If the RESOLUTION is non zero, it gets used instead of INST_RES.
 ! Resolution allows a spectrum to be smoothed to a constant velocity
 ! resolution at all wavelengths.
 !
-	 CALL USR_HIDDEN(RESOLUTION,'RES','0d0',
-	1           'Resolution [Lam/dLam(FWHM)]')
+100	 CALL USR_OPTION(INST_RES,'INST_RES','0.0D0','Instrumental Resolution in Angstroms [dLam - FWHM]')
+	 CALL USR_OPTION(RESOLUTION,'RES','0.0D0','Resolution [Lam/dLam(FWHM)] (km/s if -ve)')
+	 IF(RESOLUTION .LT. 0.0D0)THEN
+	   RESOLUTION=1.0D-05*C_CMS/ABS(RESOLUTION)
+	 ELSE IF(RESOLUTION .EQ. 0.0D0 .AND. INST_RES .EQ. 0.0D0)THEN
+	   WRITE(T_OUT,*)'Only one INST_RES and RES can be zero'
+	   GOTO 100
+	 ELSE IF(RESOLUTION .NE. 0.0D0 .AND. INST_RES .NE. 0.0D0)THEN
+	   WRITE(T_OUT,*)'Only one INST_RES and RES can be non-zero'
+	   GOTO 100
+	 END IF
+! 
+! Defaults are those of HUT.
+!
+	 CALL USR_OPTION(WAVE_MIN,'WAVE_MIN','900d0','Minimum Wavelength')
+	 CALL USR_OPTION(WAVE_MAX,'WAVE_MAX','10000d0','Maximum Wavelength')
 	 CALL USR_HIDDEN(MIN_RES_KMS,'MIN_RES','1.0d0',
 	1           'Minimum Model Resolution (km/s)')
 	 CALL USR_HIDDEN(NUM_RES,'NUM_RES','5.0d0',
@@ -994,6 +1063,19 @@ C
 !
 !
 !
+! Option to do a least fit CCM redenning Law. The observational data
+! should have been read in using RD_OBS, and must be conatined in one file.
+!
+	ELSE IF(X(1:3) .EQ. 'RED')THEN
+	  IF(NOBS .EQ. 0)THEN
+	    WRITE(6,*)'Error -- observational data has not been read in'
+	  ELSE IF(NCF .EQ. 0)THEN
+	    WRITE(6,*)'Error -- model data has not been strored in the buffer'
+	  ELSE
+	    T1=2.5; T2=5.5
+	    CALL DETERM_REDDENING(OBSF_OBS,NU_OBS,NOBS,OBSF,NU,NCF,T1,T2)
+	  END IF
+! 
 	ELSE IF(X(1:4) .EQ. 'FLAM' .OR. 
 	1     X(1:4) .EQ. 'WRFL' .OR.  X(1:3) .EQ. 'FNU' .OR.
 	1                X(1:4) .EQ. 'EBMV') THEN
@@ -1009,6 +1091,8 @@ C
 	1             'Galactic E(B-V) to correct for I.S. extinction')
 	  CALL USR_OPTION(EBMV_LMC,'EBMV_LMC','0.0',
 	1             'LMC E(B-V) to correct for I.S. extinction')
+	  CALL USR_OPTION(EBMV_SMC,'EBMV_SMC','0.0',
+	1      'SMC E(B-V) to correct for I.S. extinction') !KN SMC
 !
 	  DIST=1.0D0
 	  CALL USR_OPTION(DIST,'DIST','1.0D0',' (in kpc) ')
@@ -1141,6 +1225,39 @@ C
 	    DO I=1,NCF
 	      YV(I)=YV(I)*( 10.0**(-0.4D0*EBMV_LMC*AL_D_EBmV(I)) )
 	    END DO
+	  END IF
+C
+C       KN: Set SMC interstellar extinction curve.
+C
+	  IF(EBMV_SMC .NE. 0)THEN
+	     R_EXT=2.74
+	     DO I=1,NCF
+	        T1=ANG_TO_HZ/NU(I)
+	        T1=(10000.0/T1) !1/Lambda(um)
+	        C1=-4.959
+	        C2=2.264*T1
+	        D=(T1**2)/(((T1**2-4.6**2)**2)+(T1**2))
+	        C3=0.389*D
+	        IF(T1 .LT. 5.9)THEN
+	           F=0
+	        ELSE
+	           F=0.5392*((T1-5.9)**2)+0.05644*((T1-5.9)**3)
+	        END IF
+	        C4=0.461*F
+                AL_D_EBmV(I)=C1+C2+C3+C4+R_EXT
+             END DO
+          END IF
+	  IF(X(1:4) .EQ. 'EBMV' .AND. EBMV_SMC .NE. 0)THEN
+	     DO I=1,NCF
+	        XV(I)=NU(I)
+	        YV(I)=EBMV_SMC*AL_D_EBmV(I)
+	     END DO
+	     XAXIS='\gl(\A)'
+	     YAXIS='A\d\gl\u'
+	  ELSE IF(X(1:4) .NE. 'EBMV' .AND. EBMV_SMC .NE. 0)THEN
+	     DO I=1,NCF
+	        YV(I)=YV(I)*( 10.0**(-0.4D0*EBMV_SMC*AL_D_EBmV(I)) )
+	     END DO
 	  END IF
 C
 	  IF(X(1:4) .NE. 'EBMV')THEN
