@@ -47,6 +47,8 @@
 !
 	IMPLICIT NONE
 !
+! Altered 11-MAr-2011 : 2s,2p opacity added for SiIV, PV
+!                       3s,3p opacity added for states with one 3d electron.
 ! Altered 09-Nov-2010 : Modified fit type 9.
 ! Altered 17-Apr-2008 : Installed fit Type 8:
 ! Altered 30-Apr-2004 : Modified Seaton fit (Type 7) installed.
@@ -545,6 +547,9 @@ C
 	  END IF
 	END IF
 !
+! Add in L-shell X-ray absorption for species such as SiIV, PV. We assume that only
+! one electron is ejected.
+!
 	T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION			!Number of electrons in species.
 	IF(T1 .EQ. 11 .AND. PHOT_ID .EQ. 1 .AND. FREQ .GT. 0)THEN
 	  T2=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,ITWO,IZERO,L_FALSE,L_TRUE)
@@ -553,6 +558,9 @@ C
 	    PHOT(1:NLEVS)=PHOT(1:NLEVS)+T2
 	  END IF
 	END IF
+!
+! Add in 3s, 3p X-ray absorption for species with one 3d (or 4s) electron. We assume that only
+! one electron is ejected.
 !
 	T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION			!Number of electrons in species.
 	IF(T1 .EQ. 19 .AND. PHOT_ID .EQ. 1 .AND. FREQ .GT. 0)THEN
