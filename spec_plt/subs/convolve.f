@@ -143,6 +143,7 @@
 ! below.
 !
 	kernal_sig = inst_res/2.35482
+	write(6,'(A,F7.2,A)')' Sigma of smoothing Gausian is',kernal_sig*c_kms,'km/s'
 	call tune(1,'cnvlv')
 	call convolve(tempwave,tempflux,Ntmp,kernal_sig,vsini,epsilon,fft)
 	call tune(2,'cnvlv')
