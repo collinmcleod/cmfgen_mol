@@ -1227,8 +1227,8 @@ C
 	ELSE IF(ANS .EQ. 'RID')THEN
 	  N_LINE_IDS=0
 	  J=0
-	  CALL NEW_GEN_IN(TAU_CUT,'Omit lines with central optical depth <')
 	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs')
+	  CALL NEW_GEN_IN(TAU_CUT,'Omit lines with central optical depth <')
 	  CALL NEW_GEN_IN(AIR_WAVELENGTHS,'Air wavelengths?')
 	  CALL SET_CASE_UP(ID_FILNAME,1,0)
           OPEN(UNIT=33,FILE=TRIM(ID_FILNAME),STATUS='OLD',IOSTAT=IOS)
@@ -2419,6 +2419,7 @@ C
 !
 	  DO I=1,N_LINE_IDS
 	    T1=ID_SCL*ID_Y_OFF(I)
+	    ID_VEC_BEG=0.9*(T1-1.0D0)+1.0D0
 	    TMP_STR=' '
 	    WRITE(TMP_STR,'(F12.2)')ID_WAVE(I)
 	    TMP_STR=TRIM(LINE_ID(I))//'-'//ADJUSTL(TMP_STR)
