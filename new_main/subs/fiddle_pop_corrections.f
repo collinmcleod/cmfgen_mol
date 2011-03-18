@@ -8,6 +8,7 @@
 	1              SCALE_OPT,LAMBDA_IT,LU_SUM,NT,ND)
 	IMPLICIT NONE
 !
+! Altered: 01-Feb-2011 -- Can use a : in list to specify a consecutive range.
 ! Created: 15-Nov-2010
 !
 	INTEGER NT
@@ -30,7 +31,7 @@
 	REAL*8 SCALE
 !
 	INTEGER IOS
-	INTEGER I,J
+	INTEGER I,J,L,IC
 	LOGICAL FILE_OPEN
 	CHARACTER(LEN=80)STRING
 !
@@ -55,10 +56,31 @@
 	    READ(LU_SUM,'(A)',IOSTAT=IOS)STRING
 	    IF(IOS .NE. 0)EXIT
 	    IF(STRING .NE. ' ' .AND. STRING(1:1) .NE. '!')THEN
-	      READ(STRING,*,IOSTAT=IOS)I,T1
-	      IF(IOS .NE. 0)EXIT
-	      IF(I .GE. 1 .AND. I .LE. ND .AND. T1 .GT. 0.0D0 .AND. T1 .LT. 2.0D0)THEN
-	         RELAX_PARAM(I)=T1
+	      IC=INDEX(STRING,':')
+	      IF(IC .EQ. 0)THEN
+	        READ(STRING,*,IOSTAT=IOS)I,T1
+	        IF(IOS .NE. 0)THEN
+	          WRITE(6,*)'Error reading ADJUST_CORRECTIONS in fiddle_pop_corrections'
+	          WRITE(6,*)'IOS=',IOS
+	          EXIT
+	        END IF
+	        IF(I .GE. 1 .AND. I .LE. ND .AND. T1 .GT. 0.0D0 .AND. T1 .LT. 2.0D0)THEN
+	           RELAX_PARAM(I)=T1
+	        END IF
+	      ELSE
+	        STRING(IC:IC)=' '
+	        READ(STRING,*,IOSTAT=IOS)I,J,T1
+	        IF(IOS .NE. 0)THEN
+	          WRITE(6,*)'Error reading ADJUST_CORRECTIONS in fiddle_pop_corrections'
+	          WRITE(6,*)'IOS=',IOS
+	          EXIT
+	        END IF
+	        L=I; I=MIN(I,J); J=MAX(J,L)
+	        IF(T1 .GT. 0.0D0 .AND. T1 .LT. 2.0D0)THEN
+	          DO L=MAX(1,I),MIN(J,ND)
+	             RELAX_PARAM(L)=T1
+	          END DO
+	        END IF
 	      END IF
 	    END IF
 	  END DO
