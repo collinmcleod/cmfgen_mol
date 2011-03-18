@@ -15,6 +15,10 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 03-Mar-2011 - Revised check on GAM_EDD to properly account for ionization state of gas.
+!                         Program value of GAM_EDD remains unchanged.
+!                         Extra parameter BETA2 can now be read in to fiddle with velocity law.
+!                         WIND_VEL_LAW_V2 is now called.
 ! Altered 31-Aug-2010 : TAU_REF can be a parameter (default is 2/3). For W-R stars.
 ! Altered 03-Aug-2010 : Match velocity at 0.75 x sound_speed (old vale was 0.5).
 ! Altered 18-May-2008 : Insert a limit as to the number of iterations (ITERATION_COUNT).
@@ -99,6 +103,7 @@
 !
 	REAL*8 VINF
 	REAL*8 BETA
+	REAL*8 BETA2
 	REAL*8 RMAX
 	REAL*8 CONNECTION_VEL
 	REAL*8 CONNECTION_RADIUS
@@ -119,6 +124,7 @@
 	REAL*8 T1,T2,T3
 	REAL*8 GAM_LIM_STORE
 	REAL*8 TAU_REF
+	REAL*8 MAX_ED_ON_NA
 !
 ! Runge-Kutta estimates
 !
@@ -226,7 +232,7 @@
 	CALL GEN_ASCI_OPEN(LUIN,'HYDRO_DEFAULTS','OLD',' ','READ',IZERO,IOS)
 	IF(IOS .NE. 0)THEN
 	  WRITE(LU_ERR,*)'Error opening HYDRO_DEFAULTS in WIND_HYD, IOS=',IOS
-	  STOP
+	  RETURN 
 	END IF
 	CALL RD_OPTIONS_INTO_STORE(LUIN,LUSCR)
 
@@ -240,6 +246,8 @@
 	CALL RD_STORE_DBLE(GAM_LIM,'GAM_LIM',L_FALSE,'Limiting Eddington factor')
 	CALL RD_STORE_LOG(UPDATE_GREY_SCL,'UP_GREY_SCL',L_FALSE,'Update GREY_SCL_FAC_IN')
 	CALL RD_STORE_DBLE(TAU_REF,'TAU_REF',L_FALSE,'Reference radius for g and Teff')
+	BETA2=BETA
+	CALL RD_STORE_DBLE(BETA2,'BETA2',L_FALSE,'Second exponent for velocity law')
 !
 ! Therse are the parameters used to define the new R grid to be output to RVSIG_COL.
 ! 
@@ -275,12 +283,12 @@
 	IF(VERBOSE_OUTPUT)THEN
 	  CALL GET_LU(LUV)
 	  OPEN(UNIT=LUV,FILE='HYDRO_ITERATION_INFO',STATUS='UNKNOWN')
+	  CALL SET_LINE_BUFFERING(LUV)
 	END IF
 	CALL GET_LU(LU)				!For files open/shut immediately
 !
 	REFERENCE_RADIUS=1.0D-18*SQRT(MOD_LUM*LUM_SUN()/TEFF**4/STEFAN_BC/4.0D0/PI)
 	WRITE(6,*)'Reference radius is',REFERENCE_RADIUS
-!
 !
 !
 !
@@ -370,31 +378,35 @@
 !
 !
 !
+! Compute Eddington ratio, GAM_EDD. This formulae is set for one electron per ion.
+! This formula holds at all radii, since g and Teff both scale as 1/r^2.
+!
+	MAX_ED_ON_NA=0.0D0
+	DO I=1,MOD_ND
+	  MAX_ED_ON_NA=MAX(MAX_ED_ON_NA,OLD_ED(I)/OLD_POP_ATOM(I))
+	END DO
+	GAM_EDD=1.0D+06*SIGMA_TH*STEFAN_BC*(TEFF**4)/MU_ATOM/C_CMS/(10**LOGG)/AMU
+	IF(GAM_EDD*MAX_ED_ON_NA .GT. 1.0D0)THEN
+	  WRITE(LU_ERR,*)'An invalid Eddington parameter has been computed in DO_CMF_HYDRO_V2'
+	  WRITE(LU_ERR,*)'Check the validity of Teff and Log G'
+	  WRITE(LU_ERR,*)'The computed (maximum) Eddington parameter is ',GAM_EDD*MAX_ED_ON_NA
+	  STOP
+	END IF
+!
+	IF(VERBOSE_OUTPUT)THEN
+	  WRITE(LUV,'(A,ES14.6)')'          Surface gravity is:',LOGG
+	  WRITE(LUV,'(A,ES14.6)')'             Mass of star is:',10**(LOGG)*(REFERENCE_RADIUS**2)/GRAV_CON
+	  WRITE(LUV,'(A,ES14.6)')'         Mean atomic mass is:',MU_ATOM
+	  WRITE(LUV,'(A,ES14.6)')'             Atom density is:',NI_ZERO
+	  WRITE(LUV,'(A,ES14.6)')'New effective temperature is:',TEFF
+	  WRITE(LUV,'(A,ES14.6)')'      Eddington parameter is:',GAM_EDD
+	END IF
+!
 	PREV_REF_RADIUS=-1.0
 	ITERATION_COUNTER=0
 	DO WHILE(ABS(REFERENCE_RADIUS/PREV_REF_RADIUS-1.0) .GT. 1.0D-05)
 	  ITERATION_COUNTER=ITERATION_COUNTER+1
 	  IF(VERBOSE_OUTPUT)WRITE(LUV,*)' Beginning new hydro loop'
-!
-! Compute Eddington ratio. This formulae is set for one electron per ion.
-! This formula holds at all radii, since g and Teff both scale as 1/r^2.
-!
-	  GAM_EDD=1.0D+06*SIGMA_TH*STEFAN_BC*(TEFF**4)/MU_ATOM/C_CMS/(10**LOGG)/AMU
-	  IF(GAM_EDD .GT. 1.0D0)THEN
-	    WRITE(LU_ERR,*)'An invalid Eddington parameter has been computed in DO_CMF_HYDRO_V2'
-	    WRITE(LU_ERR,*)'Check the validity of Teff and Log G'
-	    WRITE(LU_ERR,*)'The computed Eddington parameter is ',GAM_EDD
-	    STOP
-	  END IF
-!
-	  IF(VERBOSE_OUTPUT)THEN
-	    WRITE(LUV,'(A,ES14.6)')'          Surface gravity is:',LOGG
-	    WRITE(LUV,'(A,ES14.6)')'             Mass of star is:',10**(LOGG)*(REFERENCE_RADIUS**2)/GRAV_CON
-	    WRITE(LUV,'(A,ES14.6)')'         Mean atomic mass is:',MU_ATOM
-	    WRITE(LUV,'(A,ES14.6)')'             Atom density is:',NI_ZERO
-	    WRITE(LUV,'(A,ES14.6)')'New effective temperature is:',TEFF
-	    WRITE(LUV,'(A,ES14.6)')'      Eddington parameter is:',GAM_EDD
-	  END IF
 !
 ! The turbulent pressure is taken to be 0.5. roh . VTURB^2
 !
@@ -426,7 +438,7 @@
 	      T2=CONNECTION_VEL*(1.0D0/T1-2.0D0/CONNECTION_RADIUS)
 	      WRITE(LU_ERR,*)'      Scale height is',T1
 	      WRITE(LU_ERR,*)'      Connection dVdR',T2
-	      CALL WIND_VEL_LAW_V1(R,V,SIGMA,VINF,BETA,RMAX,
+	      CALL WIND_VEL_LAW_V2(R,V,SIGMA,VINF,BETA,BETA2,RMAX,
 	1          CONNECTION_RADIUS,CONNECTION_VEL,T2,ITWO,J,ND_MAX)
 	      DO I=1,J
 	        POP_ATOM(I)=MDOT/MU_ATOM/R(I)/R(I)/V(I)
