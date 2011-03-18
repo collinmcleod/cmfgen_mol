@@ -7,11 +7,14 @@
 !
 ! CMF_FLUX calling program is partially based on DISPGEN.
 !
-	PROGRAM CMFGEN
+	PROGRAM LTE
 	USE MOD_CMFGEN
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
+! Altered:  1-Nov-2010: ND and NP are now computed internally from the data
+!                         in the GRID_PARAMS file. This no longer any need to
+!                         alter MODEL_SPEC.
 ! Altered: 20-Mar-2005: FLUX_MEAN & ROSS_MEAN now zeroed. These vectors now
 !                         used in CMFGEN_SUB.
 ! Altered: 03-Mar-2000: Variable type ATM installed to simplify handling
@@ -262,18 +265,32 @@
 	  ATM(ID)%XzV_PRES=.FALSE.
 	END DO
 !
+! Get size of the electron and temperature grid. This will be used to set ND and
+! NP. We arbitrarily set NC to 10.
+!
+	OPEN(UNIT=LU_IN,FILE='GRID_PARAMS',STATUS='OLD',ACTION='READ')
+          READ(LU_IN,*)NC,ND
+        CLOSE(LU_IN)
+	ND=NC*ND
+	NC=10
+	NP=ND+NC
+	NUM_BNDS=1
+!
 ! Get data describing number of depth points, number of atomic levels
 ! etc.
 !
+! There is no need to read NC, ND, and NP, as these are ast from GRID_PARAMS.
+!
 	OPEN(UNIT=LU_IN,FILE='MODEL_SPEC',STATUS='OLD',ACTION='READ')
 	CALL RD_OPTIONS_INTO_STORE(LU_IN,LU_OUT)
-	CALL RD_STORE_INT(ND,'ND',L_TRUE,'Number of depth points')
-	CALL RD_STORE_INT(NC,'NC',L_TRUE,'Number of core rays')
-	CALL RD_STORE_INT(NP,'NP',L_TRUE,'Number of impact parameters')
-	CALL RD_STORE_INT(NUM_BNDS,'NUM_BNDS',L_TRUE,
-	1        'Number of bands in linearization matrix (BA)')
+!
+!	CALL RD_STORE_INT(ND,'ND',L_TRUE,'Number of depth points')
+!	CALL RD_STORE_INT(NC,'NC',L_TRUE,'Number of core rays')
+!	CALL RD_STORE_INT(NP,'NP',L_TRUE,'Number of impact parameters')
+!	CALL RD_STORE_INT(NUM_BNDS,'NUM_BNDS',L_TRUE,'Number of bands in linearization matrix (BA)')
+!
 	CALL RD_STORE_INT(MAX_SIM,'MAX_SIM',L_TRUE,
-	1        'Maximum # of lines that cab treated simultaneously')
+	1        'Maximum # of lines that can treated simultaneously')
 	CALL RD_STORE_INT(N_LINE_MAX,'NLINE_MAX',L_TRUE,
 	1        'Maximum # of lines that can be treated')
 	CALL RD_STORE_INT(NCF_MAX,'NCF_MAX',L_TRUE,
