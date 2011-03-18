@@ -464,16 +464,14 @@
 	    END DO
 	    IF(INDX_1 .EQ. 0)THEN
 	      READ(LEVEL_NAME1,*,IOSTAT=IOS)INDX_1
-	      IF(INDX_1 .EQ. 0)THEN
-	         WRITE(6,*)'Invalid index'
-	         GOTO 100
-	      END IF
-	      IF(IOS .NE. 0)THEN
+	      IF(INDX_1 .EQ. 0 .OR. IOS .NE. 0)THEN
+	        WRITE(6,*)'Invalid index/name'
 	        WRITE(6,*)'Error - level name not found'
 	        DO I=1,NLEV_1,5
-	          WRITE(6,'(5A14)')(TRIM(NAME_1(J)),J=I,MAX(I+4,NLEV_1))
+	          WRITE(6,'(5A14)')(TRIM(NAME_1(J)),J=I,MIN(I+4,NLEV_1))
 	        END DO
 	        INDX_1=0
+	        GOTO 100
 	      ELSE IF(OSCILLATOR_FILE_AVAIL)THEN
 	        IF(INDX_1 .GT. NELEV)THEN
 	          WRITE(6,*)'Invalid index; index should be < ',NELEV
@@ -552,7 +550,7 @@
 	        IF(IOS .NE. 0)THEN
 	          WRITE(6,*)'Error - level name not found'
 	          DO I=1,NLEV_2,5
-	            WRITE(6,'(5A14)')(TRIM(NAME_2(J)),J=I,MAX(I+4,NLEV_2))
+	            WRITE(6,'(5A14)')(TRIM(NAME_2(J)),J=I,MIN(I+4,NLEV_2))
 	          END DO
 	          INDX_2=0
 	        ELSE
