@@ -5,6 +5,11 @@
 # a SN model with a time-dependent radiation field.
 #
 
+echo " This procdure is used to copy the files needed to generate a NEW SN mode"
+echo " The routine will not copy time depndent SN files if the input and output directories"
+echo " are the same."
+echo " "
+
 # Test that we will not inadvertantly copy to the same directory
 # We also test that the second directory does not already contain batch.sh,
 #   possibly indicating model alredy exists in that directory.
