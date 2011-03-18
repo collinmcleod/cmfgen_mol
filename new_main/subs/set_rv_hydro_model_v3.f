@@ -268,6 +268,8 @@
 	    IF(T2 .GT. 1.0D-06)THEN
 	      WRITE(LUER,*)'Error in SET_RV_HYDRO_MODEL_V3'
 	      WRITE(LUER,*)'Supplied R grid does not match current or previous time step'
+	      WRITE(LUER,*)'      R(ND)=',R(ND)
+	      WRITE(LUER,*)'R_HYDRO(NX)=',R_HYDRO(NX)
 	      STOP
 	    END IF
 	  END IF
