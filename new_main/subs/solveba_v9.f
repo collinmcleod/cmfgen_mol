@@ -4,6 +4,8 @@
 	1              BA_COMPUTED,WR_BA_INV,WR_PRT_INV,LAMBDA_IT)
 	IMPLICIT NONE
 !
+! Altered 15-Nov-2010 : FIDDLE_POP_CORRECTIONS added to assist convergence. This allows
+!                         -ver relaxation to be used at some depths.
 ! Altered 23-Apr-2010 : DO_LEVEL_CHECK, MAX_INC_VEC, & MAX_DEC_VEC variables installed.
 !                         Return 10th maximum value, rather than biggest correction.
 !                         Done to help with a few non-converging levels.
@@ -255,14 +257,15 @@
 !
 !**********************************************************************************
 !**********************************************************************************
-!
+
 	IF(CHANGE_LIM .LE. 1.0D0)THEN
           WRITE(LUER,'(A,1PE12.4)')' Error in SOLVEBA_V9'
           WRITE(LUER,'(A,1PE12.4)')' Maximum change for normal iteration must be > 1.'
 	  STOP
 	END IF
 	BIG_LIM=(CHANGE_LIM-1.0D0)/CHANGE_LIM
-	LIT_LIM=-CHANGE_LIM
+!	LIT_LIM=-CHANGE_LIM
+	LIT_LIM=1.0D0-CHANGE_LIM
 	MINSCALE=1.0D0
 	IF(SCALE_OPT(1:5) .EQ. 'LOCAL')THEN
 	  DO I=1,ND
@@ -320,42 +323,45 @@
 !
 !
 	ELSE IF(SCALE_OPT(1:5) .EQ. 'MAJOR')THEN
-	  DO I=1,ND
-	    T1=BIG_LIM			!Prevents division by zero and insures
-	    T2=LIT_LIM 			!SCALE=1 if small changes.
-	    DO J=1,NT-1
-	      IF(POPS(J,I) .GT. 1.0E-10*POPS(NT-1,I))THEN
-	        T1=MAX(T1,STEQ(J,I))   		!Note + means decrease
-	        T2=MIN(T2,STEQ(J,I))            !Note - means increase
-	      END IF
-	    END DO
-	    IF(DO_LEVEL_CHK)THEN
-	      SCALE=1.0D0			!As majority of corrections < 10%
-	    ELSE
-	      SCALE=MIN( BIG_LIM/T1, LIT_LIM/T2 )
-	    END IF
+	  CALL FIDDLE_POP_CORRECTIONS(POPS,STEQ,T_MIN,CHANGE_LIM,SCALE_OPT,LAMBDA_IT,LU_SUM,NT,ND)
+!
+!	  DO I=1,ND
+!	    T1=BIG_LIM			!Prevents division by zero and insures
+!	    T2=LIT_LIM 			!SCALE=1 if small changes.
+!	    DO J=1,NT-1
+!	      IF(POPS(J,I) .GT. 1.0E-10*POPS(NT-1,I))THEN
+!	        T1=MAX(T1,STEQ(J,I))   		!Note + means decrease
+!	        T2=MIN(T2,STEQ(J,I))            !Note - means increase
+!	      END IF
+!	    END DO
+!	    IF(DO_LEVEL_CHK)THEN
+!	      SCALE=1.0D0			!As majority of corrections < 10%
+!	    ELSE
+!	      SCALE=MIN( BIG_LIM/T1, LIT_LIM/T2 )
+!	    END IF
 !
 ! Limit the change in T to a maximum of 20%, and ensure T > T_MIN.
 !
-	    T3=MAX( 0.2D0,ABS(STEQ(NT,I)) )
-	    SCALE=MIN( 0.2D0/T3,SCALE )
-	    MINSCALE=MIN(SCALE,MINSCALE)
-	    IF(STEQ(NT,I) .NE. 0 .AND. POPS(NT,I) .GT. T_MIN .AND.
-	1                      POPS(NT,I)*(1.0D0-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
-	        SCALE=(1.0D0-T_MIN/POPS(NT,I))/STEQ(NT,I)
-	    END IF
-	    IF(SCALE .GT. 1.0D0)SCALE=1.0D0		!i.e. will not force T to T_MIN
-!
-	    DO J=1,NT
-	      T1=STEQ(J,I)*SCALE
-	      IF(T1 .GT. BIG_LIM)T1=BIG_LIM
-	      IF(T1 .LT. LIT_LIM)T1=LIT_LIM
-	      IF(DO_LEVEL_CHK .AND. ABS(T1) .GT. 0.1D0)T1=0.3D0*T1
-	      POPS(J,I)=POPS(J,I)*(1.0D0-T1)
-	   END DO
-	  END DO
-	  WRITE(LUER,'(A,1PE12.4)')
-	1   ' The minimum value of scale for Major species is:',MINSCALE
+!	    T3=MAX( 0.2D0,ABS(STEQ(NT,I)) )
+!	    SCALE=MIN( 0.2D0/T3,SCALE )
+!	    MINSCALE=MIN(SCALE,MINSCALE)
+!	    IF(STEQ(NT,I) .NE. 0 .AND. POPS(NT,I) .GT. T_MIN .AND.
+!	1                      POPS(NT,I)*(1.0D0-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
+!	        SCALE=(1.0D0-T_MIN/POPS(NT,I))/STEQ(NT,I)
+!	    END IF
+!	    IF(SCALE .GT. 1.0D0)SCALE=1.0D0		!i.e. will not force T to T_MIN
+!!
+!	    DO J=1,NT
+!	      T1=STEQ(J,I)*SCALE
+!	      IF(T1 .GT. BIG_LIM)T1=BIG_LIM
+!	      IF(T1 .LT. LIT_LIM)T1=LIT_LIM
+!	      IF(DO_LEVEL_CHK .AND. ABS(T1) .GT. 0.1D0)T1=0.3D0*T1
+!!	      IF(I .EQ. 28 .OR. I .EQ. 29)T1=0.3D0*T1
+!	      POPS(J,I)=POPS(J,I)*(1.0D0-T1)
+!	   END DO
+!	  END DO
+!	  WRITE(LUER,'(A,1PE12.4)')
+!	1   ' The minimum value of scale for Major species is:',MINSCALE
 !
 !
 	ELSE			!Global Scaling !
