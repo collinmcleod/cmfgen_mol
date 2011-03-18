@@ -14,7 +14,7 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
-! Altered  15-Mar-2011 :  Setion for plotting photoioization cross-sections
+! Altered  15-Mar-2011 :  Section for plotting photoionization cross-sections
 !                           removed to subroutine. Can now plot all ground-state
 !                           cross section for a species.
 !                         TCMF option installed to use GREY T from CMFGEN calculation.
@@ -255,10 +255,11 @@
 !
 	CHARACTER*80 NAME,XAXIS,YAXIS,XAXSAV
 !
-	COMMON/TOPBORD/ SCED(31),XED(31),NXED,TOPLABEL
+	INTEGER, PARAMETER :: NSC=31
+	COMMON/TOPBORD/ SCED(NSC),XED(NSC),NXED,TOPLABEL
 	REAL*8 SCED,XED
 	INTEGER NXED
-	CHARACTER*30 TOPLABEL
+	CHARACTER(LEN=30) TOPLABEL
 	DATA SCED/2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,
 	1         10.5,11.0,11.5,12.0,12.5,13.0,13.5,14.0,14.5,15,15.5,
 	1         16,16.5,17.0/
@@ -3666,40 +3667,43 @@
 	ELSE IF(XOPT .EQ. 'GRED')THEN
 	  TA(1:ND)=XV(1:ND)
 !
-	  CALL USR_HIDDEN(FLAG,'DEC_ED','F','Decrease minimum Ne')
-	  IF(FLAG)THEN 
-	    DO WHILE(LOG10(ED(1)) .LT. SCED(1))
-	      SCED=SCED-0.5
-	    END DO
-	  END IF
-!
-! We extrapolate model to lower Ne assuming Log Ne is a linear function
-c of Xv. This will work best when XV is Log R or Log Tau.
-!
-	  IF(SCED(1) .LT. DLOG10(ED(1)))THEN
-	    DO I=ND,1,-1
-	      TA(I+1)=TA(I)
-	      TB(I+1)=DLOG10(ED(I))
-	    END DO
-	    TB(1)=SCED(1)
-	    T1=( DLOG10(ED(2))-SCED(1) )/( DLOG10(ED(2))-DLOG10(ED(1)) )
-	    TA(1)=T1*TA(2)+(1.0D0-T1)*TA(3)
-	  ELSE
-	    DO I=1,ND
+	  I=LOG10(ED(1));J=LOG10(ED(ND))
+	  IF(I .LT. ED(1))I=I+1
+	  NXED=(J-I)*2+1
+	  NXED=MIN(NXED,NSC)
+	  SCED(1)=I
+	  DO I=2,NXED
+	    SCED(I)=SCED(1)+(I-1)*0.5D0
+	  END DO
+	  DO I=1,ND
 	      TB(I)=DLOG10(ED(I))
-	    END DO
-	  END IF
-	  NXED=31
-	  DO WHILE( SCED(NXED) .GT. TB(ND) )
-	    NXED=NXED-1
 	  END DO
-	  CALL LININT(SCED,XED,NXED,TB,TA,ND)
-!
-	  CALL USR_HIDDEN(T1,'MAX_ED','14.0D0','Maximum Ne Along top axis ')
-	  DO WHILE(SCED(NXED) .GT. T1*1.00001)
-	     NXED=NXED-1
-	  END DO
+	  CALL MON_INTERP(SCED,NXED,IONE,XED,NXED,TB,ND,TA,ND)
 	  TOPLABEL='Log(N\de\u)'
+	  CALL GRAMON_PGPLOT(XAXIS,YAXIS,NAME,'TOPLAB')
+	  XAXIS=XAXSAV
+!
+	ELSE IF(XOPT .EQ. 'GRROSS')THEN
+	  DO I=1,ND
+	    CHIROSS(I)=CLUMP_FAC(I)*ROSS_MEAN(I)
+	  END DO
+	  CALL TORSCL(TAUROSS,CHIROSS,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  WRITE(T_OUT,*)'Rossland optical depth is : ',TAUROSS(ND)
+!
+	  TB(1:ND)=LOG10(TAUROSS(1:ND))
+	  TA(1:ND)=XV(1:ND)
+!
+	  I=TB(1); J=TB(ND)
+	  IF(I .LT. TB(1))I=I+1
+	  IF(J .GT. TB(ND))J=J-1
+	  SCED(1)=I
+	  NXED= (J-I)*2+1
+	  NXED=MIN(NXED,NSC)
+	  DO I=2,NXED
+	    SCED(I)=SCED(I-1)+0.5D0
+	  END DO
+	  CALL MON_INTERP(SCED,NXED,IONE,XED,NXED,TB,ND,TA,ND)
+	  TOPLABEL='Log(\gt\dRoss\u)'
 	  CALL GRAMON_PGPLOT(XAXIS,YAXIS,NAME,'TOPLAB')
 	  XAXIS=XAXSAV
 !
@@ -4537,7 +4541,7 @@ c
 ! To be read TAU_at_R and R_at_TAU respectively.
 !
 	ELSE IF(XOPT .EQ. 'RTAU' .OR. XOPT .EQ. 'TAUR' .OR. 
-	1       XOPT .EQ. 'KAPR' .OR. XOPT .EQ. 'CHIR' .OR.
+	1       XOPT .EQ. 'KAPR' .OR. XOPT .EQ. 'CHIR' .OR. XOPT .EQ. 'ALBEDO' .OR.
 	1       XOPT .EQ. 'ETAR' .OR. XOPT .EQ. 'WROPAC')THEN
 	  IF(XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are included'
 	  IF(.NOT. XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are NOT included'
@@ -4696,25 +4700,41 @@ c
 	      END DO
 !
 	      CALL TORSCL(TA,CHI,R,TB,TC,ND,METHOD,TYPE_ATM)
-	      IF(XOPT .EQ. 'TAUR')THEN
-	        T2=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
-	        YV(ML)=T2*TA(R_INDX+1) + (1.0-T2)*TA(R_INDX)
-	        IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
-	      ELSE
+	      IF(XOPT .EQ. 'ALBEDO')THEN
 	        I=1
 	        DO WHILE(TAU_VAL .GT. TA(I) .AND. I .LT. ND)
 	          I=I+1
 	        END DO
 	        IF(TAU_VAL .GT. TA(ND-1))THEN
-	          YV(ML)=1.0
+	          YV(ML)=ESEC(ND)/CHI(ND)
 	        ELSE IF(TAU_VAL .LE. TA(1))THEN
-	          YV(ML)=R(1)*TA(1)/TAU_VAL/R(ND)
+	          YV(ML)=ESEC(1)/CHI(1)
 	        ELSE
 	          T2=(TA(I)-TAU_VAL)/(TA(I)-TA(I-1))
-                  YV(ML)=( (1.0-T2)*R(I)+T2*R(I-1) )/R(ND)
+	          YV(ML)=( (1.0-T2)*ESEC(I)+T2*ESEC(I-1) )/( (1.0-T2)*CHI(I)+T2*CHI(I-1) )
 	        END IF
-	        IF(IN_R_SUN)YV(ML)=YV(ML)*R(ND)/6.96
-	        IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
+	        YAXIS='Albedo'
+	      ELSE
+	        IF(XOPT .EQ. 'TAUR')THEN
+	          T2=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
+	          YV(ML)=T2*TA(R_INDX+1) + (1.0-T2)*TA(R_INDX)
+	          IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
+	        ELSE
+	          I=1
+	         DO WHILE(TAU_VAL .GT. TA(I) .AND. I .LT. ND)
+	            I=I+1
+	          END DO
+	          IF(TAU_VAL .GT. TA(ND-1))THEN
+	            YV(ML)=1.0
+	          ELSE IF(TAU_VAL .LE. TA(1))THEN
+	            YV(ML)=R(1)*TA(1)/TAU_VAL/R(ND)
+	          ELSE
+	            T2=(TA(I)-TAU_VAL)/(TA(I)-TA(I-1))
+                    YV(ML)=( (1.0-T2)*R(I)+T2*R(I-1) )/R(ND)
+	          END IF
+	          IF(IN_R_SUN)YV(ML)=YV(ML)*R(ND)/6.96
+	          IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
+	        END IF
 	      END IF
 	    END IF
 	  END DO
