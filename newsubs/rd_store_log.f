@@ -64,7 +64,7 @@
 	  IF(STORE(I)(1:1) .NE. '!' .AND. STORE(I) .NE. ' ')THEN
 	    KEY_ST(I)=INDEX(STORE(I),'[')
 	    KEY_END(I)=INDEX(STORE(I),']')
-	    IF(KEY_ST(I) .NE. 0 .AND. KEY_END(I) .GT. KEY_ST(I)+1)THEN
+	  IF(KEY_ST(I) .NE. 0 .AND. KEY_END(I) .GT. KEY_ST(I)+1)THEN
 	      KEY_ST(I)=KEY_ST(I)+1
 	      KEY_END(I)=KEY_END(I)-1
 	      NST=I
@@ -130,6 +130,8 @@
 	USE RD_VAR_MOD
 	IMPLICIT NONE
 !
+! Altered 13-Feb-2011: Bug fixed for second return. Was using J insted of K
+!                          to specify string length.
 ! Altered 27-Apr-2007: STRING that is returned no longer has key and comment
 !                         included.
 !
@@ -152,7 +154,7 @@
 	    I_UP=I_UP+1
 	    RETURN
 	  ELSE IF(TRIM(KEY) .EQ. STORE(K)(KEY_ST(K):KEY_END(K)))THEN
-	    STRING=STORE(K)(1:KEY_ST(J)-2)
+	    STRING=STORE(K)(1:KEY_ST(K)-2)
 	    I_UP=I_DWN+1
 	    I_DWN=I_DWN-1
 	    RETURN
