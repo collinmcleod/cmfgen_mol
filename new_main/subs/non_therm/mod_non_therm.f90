@@ -38,9 +38,9 @@
 	  INTEGER :: LNK_TO_SPECIES
 	  LOGICAL :: PRES
 	  LOGICAL :: DO_THIS_ION_ROUTE
-	END TYPE NON_THEM_ION_DATA
+	END TYPE NON_THERM_ION_DATA
 !
-	INTEGER, NUM_THD
+	INTEGER NUM_THD
 	INTEGER, PARAMETER :: MAX_NUM_THD=500
 !
 ! These two switches are for testing purposes, and are thus hardwired into
