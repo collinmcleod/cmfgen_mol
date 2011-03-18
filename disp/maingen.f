@@ -14,6 +14,10 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered  15-Mar-2011 :  Setion for plotting photoioization cross-sections
+!                           removed to subroutine. Can now plot all ground-state
+!                           cross section for a species.
+!                         TCMF option installed to use GREY T from CMFGEN calculation.
 ! Altered  13-Jun-2010 :  Rayleigh scattering included in OPACITIES.INC.
 !                         ESEC replaced by CHI_SCAT in may locations.
 !                         Still some issues to be decided (i.e., Raleigh scattering to opacity file?)
@@ -2109,6 +2113,13 @@
 	    WRITE(T_OUT,*)'Error -Grey Temperature distribution not available'
 	    WRITE(T_OUT,*)'Call GREY option first --- '
 	  END IF
+!
+	ELSE IF(XOPT .EQ. 'TCMF')THEN
+	  DO I=1,ND
+	    YV(I)=CMFGEN_TGREY(I)
+	  END DO
+	  CALL DP_CURVE(ND,XV,YV)
+	  YAXIS='T(10\u4\dK)'
 !
 	ELSE IF(XOPT .EQ. 'T')THEN
 	  DO I=1,ND
@@ -4230,147 +4241,7 @@ c of Xv. This will work best when XV is Log R or Log Tau.
 ! 
 !  
 	ELSE IF(XOPT .EQ. 'PLTPHOT')THEN
-	  CALL USR_OPTION(I,'LEV','1','Level ID: Use WRID to check levs')
-	  CALL USR_OPTION(PHOT_ID,'PHOT_ID','1','Photoionization route')
-!
-! For taking into account level dissolution.
-!
-	  ED_VAL=0.0D0
-	  WRITE(T_OUT,'(A)')' '
-	  WRITE(T_OUT,'(A)')' Input non-zero Ne for level-dissolution.'
-	  WRITE(T_OUT,'(A)')' '
-	  IF(PHOT_ID .EQ. 1)CALL USR_OPTION(ED_VAL,'ED_VAL','0.0D0','Approximate Ne value')
-	  IF(ED_VAL .GT. 0)THEN
-	    IF(ED_VAL .LT. ED(1))THEN
-	      ED_VAL=ED(1)
-	      CNT=1
-	    ELSE IF(ED_VAL .GT. ED(ND))THEN
-	      ED_VAL=ED(ND)
-	      CNT=ND
-	    ELSE
-	      DO J=1,ND-1
-	       IF(ED_VAL .GT. ED(J) .AND. ED_VAL .LE. ED(J+1))THEN
-	         CNT=J
-	         IF( LOG(ED_VAL/ED(J)) .GT. LOG(ED(J+1)/ED_VAL))CNT=J+1
-	         EXIT
-	       END IF
-	      END DO
-	    END IF
-	    WRITE(T_OUT,'(A,ES10.2)')'Photoionization cross-section evaluated at Ne=',ED_VAL
-	  END IF
-	  FREQ_RES=MIN(3000.0D0,VSM_DIE_KMS)/2.0D0
-	  DEFAULT=WR_STRING(FREQ_RES)
-	  CALL USR_HIDDEN(FREQ_RES,'FREQ_RES',DEFAULT,'Frequency resolution in km/s')
-	  FREQ_RES=FREQ_RES/3.0D+05
-!
-	  DO ID=1,NUM_IONS
-	    IF(XSPEC .EQ. UC(ION_ID(ID)))THEN
-	      IF(I .GT. ATM(ID)%NXzV_F)THEN
-	        WRITE(T_OUT,*)'Invalid level ID for this species'
-	        GOTO 1
-	      ELSE
-	        WRITE(T_OUT,*)'                    Level is: ',ATM(ID)%XzVLEVNAME_F(I)
-	        WRITE(T_OUT,*)'Ionization energy to g.s. is: ',ATM(ID)%EDGEXzV_F(I)
-	      END IF
-	      FLAG=.FALSE.				!Don't return edge value.
-	      IF(ED_VAL .NE. 0.0D0)FLAG=.TRUE.
-	      TEMP=ATM(ID)%EDGEXzV_F(I)
-	      IF(FLAG)TEMP=0.7D0*ATM(ID)%EDGEXzV_F(I)
-	      J=0
-	      FREQ_MAX=20.0D0*ATM(ID)%EDGEXzV_F(I)
-	      DEFAULT=WR_STRING(FREQ_MAX)
-	      CALL USR_HIDDEN(FREQ_MAX,'FREQ_MAX',DEFAULT,'Maximum frequency in units of 10^15 Hz')
-	      DO WHILE(TEMP .LT. FREQ_MAX)
-	        CALL SUB_PHOT_GEN(ID,OMEGA_F,TEMP,ATM(ID)%EDGEXzV_F,
-	1             ATM(ID)%NXzV_F,PHOT_ID,FLAG)
-	        IF(FLAG .AND. TEMP .LT. FREQ_MAX)THEN
-	          T1=ATM(ID)%ZXzV**3
-	          T2=SQRT(3.289395*ATM(ID)%ZXzV*ATM(ID)%ZXzV/(ATM(ID)%EDGEXzV_F(I)-TEMP))
-	          IF(T2 .GT. 2*ATM(ID)%ZXzV)THEN
-	            T3=MIN(1.0D0,16.0D0*T1/(1.0D0+T2)/(1.0D0+T2)/3.0D0)
-	            DIS_CONST=( T3*ATM(ID)%ZXzV*T1/(T2**4) )**1.5D0
-	            K=CNT
-	            YDIS=1.091*(X_LEV_DIS(K)+4.0D0*(ATM(ID)%ZXzV-1)*A_LEV_DIS(K))*
-	1                           B_LEV_DIS(K)*B_LEV_DIS(K)
-	            XDIS=B_LEV_DIS(K)*X_LEV_DIS(K)
-	            T1=7.782+XDIS*DIS_CONST
-		    T2=T1/(T1+YDIS*DIS_CONST*DIS_CONST)
-	            OMEGA_F(I,1)=OMEGA_F(I,1)*T2
-	          ELSE
-	            OMEGA_F(I,1)=0.0D0
-	          END IF
-	        END IF
-!
-	        IF(XRAYS .AND. ATM(ID)%XzV_PRES .AND. ATM(ID+1)%XzV_PRES)THEN
-                  T2=AT_NO(SPECIES_LNK(ID))+1-ATM(ID)%ZXzV
-                  T1=XCROSS_V2(TEMP,AT_NO(SPECIES_LNK(ID)),T2,IZERO,IZERO,L_FALSE,L_FALSE)
-	          OMEGA_F(I,1)=OMEGA_F(I,1)+T1
-	        END IF
-!
-	        J=J+1
-	        ZV(J)=TEMP/ATM(ID)%EDGEXzV_F(I)
-	        YV(J)=1.0D+08*OMEGA_F(I,1)
-	        IF(J .EQ. N_PLT_MAX)EXIT  
-	        IF(TEMP .LT. ATM(ID)%EDGEXzV_F(I))THEN
-	           TEMP=TEMP*(1.0D0+10.0D0/3.0D+05)
-	         ELSE
-	           TEMP=TEMP*(1.0D0+FREQ_RES)
-	         END IF
-	      END DO
-	      EDGE_FREQ=ATM(ID)%EDGEXzV_F(I)
-	      EXIT
-	    END IF
-	  END DO
-!
-!
-	  CALL USR_OPTION(DIE_REG,'CUM','F','Plot recombination cummulative function?')
-	  IF(DIE_REG)THEN
-	    CALL USR_OPTION(TEMP,'T','1.0','Input T (in 10^4 K)')
-	    EXC_EN=0.0D0
-            IF(PHOT_ID .NE. 1)THEN
-	      CALL USR_OPTION(EXC_EN,'EXC_EN',' ','Excitaiton Energy (cm^-1) of final state')
-	    END IF
-	    EXC_EN=1.0D-15*C_CMS*EXC_EN
-	    CALL USR_OPTION(TMP_GION,'GION',' ','G for ION (No def)')
-!
-	    T1=HDKT*ATM(ID)%EDGEXzV_F(I)/TEMP
-	    WV(1:J)=0.0D0
-	    T3=YV(1)*ZV(1)*ZV(1)*EXP(-T1*(ZV(1)-1.0D0))
-	    DO K=2,J
-	      T2=T3
-	      T3=YV(K)*ZV(K)*ZV(K)*EXP(-T1*(ZV(K)-1.0D0))
-	      WV(K)=WV(K-1)+0.5D0*(T2+T3)*(ZV(K)-ZV(K-1))
-	    END DO
-!
-! Not that YV above is in Mbarns.
-!
-            T2=5.7885E-15*WV(J)*(ATM(ID)%EDGEXzV_F(I)**3)*ATM(ID)%GXzV_F(I)/TMP_GION
-            T2=T2*EXP(-HDKT*EXC_EN/T1)/(TEMP**1.5)
-            WRITE(6,*)'The recomination rate is:',T2
-	    DO K=1,J
-	      WV(K)=WV(K)/WV(J)
-	    END DO  
-	    XAXIS='\gn/\gn\do\u'
-	    YAXIS='F(\gv)'
-            YV(1:J)=WV(1:J)
-	  ELSE
-	    XAXIS='\gn/\gn\do\u'
-	    YAXIS='\gs(Mb)'
-	  END IF
-	  CALL USR_OPTION(FLAG,'LAM','F','Plot against wavelength?')
-	  IF(FLAG)THEN
-	    DO K=1,J
-	      ZV(K)=ANG_TO_HZ/(ZV(K)*ATM(ID)%EDGEXzV_F(I))
-	    END DO
-	    XAXIS='\gl(\A)'
-	  ELSE
-	    CALL USR_OPTION(FLAG,'NNF','F','Plot against non-normalized frequency?')
-	    IF(FLAG)THEN
-	      ZV(1:J)=ZV(1:J)*EDGE_FREQ
-	      XAXIS='\gn(10\u15 \dHz)'
-	    END IF
-	  END IF
-	  CALL DP_CURVE(J,ZV,YV)
+	  CALL PLTPHOT_SUB(XSPEC,XV,YV,WV,ZV,N_PLT_MAX,OMEGA_F,N_MAX,XAXIS,YAXIS,XRAYS,VSM_DIE_KMS,ND)
 !
 	ELSE IF(XOPT .EQ. 'RDDIE')THEN
 	  CALL USR_OPTION(DIE_REG,'REG','F','Include dielectronic lines')
@@ -5087,9 +4958,9 @@ c
 	      YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
 	      IF(RADIAL)YV(I)=YV(I)/(1.0D0+SIGMA(I))
 	      IF(YV(I) .GT. 0)THEN
-	        YV(I)=LOG10(YV(I))
+!	        YV(I)=LOG10(YV(I))
 	      ELSE
-	        YV(I)=-20.0
+!	        YV(I)=-20.0
 	      END IF
 	    END DO
 	    YAXIS='\gt\dSob\u'
