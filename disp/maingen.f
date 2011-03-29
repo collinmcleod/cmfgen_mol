@@ -2161,6 +2161,26 @@
 	  YV(1:ND)=TA(1:ND)/TB(1:ND)
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Pgas/P'
+!
+	ELSE IF(XOPT .EQ. 'DPDR')THEN
+	  TA(1:ND)=1.0D+04*BOLTZMANN_CONSTANT()*(ED(1:ND)+POP_ATOM(1:ND))*T(1:ND)
+	  DO I=2,ND-1
+	    YV(I)=1.0D-10*(TA(I+1)-TA(I-1))/(R(I-1)-R(I+1))/MASS_DENSITY(I)
+	    TC(I)=1.0D-10*TA(I)*LOG(TA(I+1)/TA(I-1))/LOG(R(I-1)/R(I+1))/R(I)/MASS_DENSITY(I)
+!	    TC(I)=LOG(V(I+1)/V(I-1))/LOG(R(I+1)/R(I-1))
+!	    TB(I)=1.0D-03*SQRT(BOLTZMANN_CONSTANT()*(POP_ATOM(I)+ED(I))*T(I)/MASS_DENSITY(I))
+!	    TC(I)=TB(I)*TB(I)*TC(I)/R(I)
+	  END DO
+	  YV(1)=YV(2); YV(ND)=YV(ND-1)
+	  TC(1)=TC(2); TC(ND)=TC(ND-1)
+	  DO I=1,ND
+	    TB(I)=1.0D-03*SQRT(BOLTZMANN_CONSTANT()*(POP_ATOM(I)+ED(I))*T(I)/MASS_DENSITY(I))
+	    TB(I)=TB(I)*TB(I)*(SIGMA(I)+1.0D0)/R(I)
+	  END DO
+	  CALL DP_CURVE(ND,XV,YV)
+	  CALL DP_CURVE(ND,XV,TB)
+	  CALL DP_CURVE(ND,XV,TC)
+	  YAXIS='\gr\u-1\d|dPdR|'
 !
 !
 	ELSE IF(XOPT .EQ. 'VEL')THEN
@@ -2229,7 +2249,12 @@
 	  DO I=1,ND
 	    YV(I)=DLOG10(SIGMA(I)+1.0)
 	  END DO
+	  DO I=2,ND-1
+	    TC(I)=DLOG10(LOG(V(I+1)/V(I-1))/LOG(R(I+1)/R(I-1)))
+	  END DO
+	  TC(1)=TC(2); TC(ND)=TC(ND-1)
 	  CALL DP_CURVE(ND,XV,YV)
+	  CALL DP_CURVE(ND,XV,TC)
 	  YAXIS='Log(\gs+1)'
 !
 	ELSE IF(XOPT .EQ. 'FONR')THEN
@@ -4677,16 +4702,19 @@ c
 	      T2=ETA(R_INDX+1)*CLUMP_FAC(R_INDX+1)
 	      T3=ETA(R_INDX)*CLUMP_FAC(R_INDX)
 	      YV(ML)=1.0D-10*( T1*T2 + (1.0-T1)*T3 )
+	      IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
 	    ELSE IF(XOPT .EQ. 'CHIR')THEN
 	      T1=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
 	      T2=CHI(R_INDX+1)*CLUMP_FAC(R_INDX+1)
 	      T3=CHI(R_INDX)*CLUMP_FAC(R_INDX)
 	      YV(ML)=1.0D-10*( T1*T2 + (1.0-T1)*T3 )
+	      IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
 	    ELSE IF(XOPT .EQ. 'KAPR')THEN
 	      T1=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
 	      T2=CHI(R_INDX+1)/MASS_DENSITY(R_INDX+1)
 	      T3=CHI(R_INDX)/MASS_DENSITY(R_INDX)
 	      YV(ML)=1.0D-10*( T1*T2 + (1.0-T1)*T3 )
+	      IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
 	    ELSE 
 !
 ! Adjust opacities for the effect of clumping.
