@@ -54,7 +54,7 @@
 	   DO I=1,ND
 	      WRITE(LU,'(3ES20.8)')V(I),RADIOACTIVE_DECAY_ENERGY(I),EDEPNEW(I)
 	   ENDDO
-	   WRITE(LU,'(\\,I5,A50)') NDTMP,' !Number of depth points in MC computation'
+	   WRITE(LU,'(/,/,I5,A50)') NDTMP,' !Number of depth points in MC computation'
 	   DO I=1,NDTMP
 	      WRITE(LU,'(3ES20.8)') VTMP(I),EDEPTMP(I)
 	   ENDDO

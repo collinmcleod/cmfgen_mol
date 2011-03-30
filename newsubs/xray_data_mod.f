@@ -29,6 +29,11 @@
 	REAL*8 y_w_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
 	REAL*8 P_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
 !
+! Gives the number of electrons ultimately ejected by the photoionization.
+! At present we assume this is 1, or 2.
+!
+	INTEGER  N_ED_EJ(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
+!
 	LOGICAL XRAY_PHOT_RD_IN
 !
 	END MODULE XRAY_DATA_MOD
@@ -47,7 +52,8 @@
 !
 	EXTERNAL ERROR_LU
 	INTEGER LU_ER,ERROR_LU
-	CHARACTER*80 STRING
+	LOGICAL NEW_FORMAT
+	CHARACTER(LEN=100) STRING
 !
 	LU_ER=ERROR_LU()
 	OPEN(UNIT=LU,FILE='XRAY_PHOT_FITS',STATUS='OLD',ACTION='READ',
@@ -58,17 +64,22 @@
 	    STOP
 	  END IF
 !
+	  NEW_FORMAT=.FALSE.
 	  STRING=' '
 	  DO WHILE(STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ')
 	    READ(LU,'(A)')STRING
+	    IF(INDEX(STRING,'Format date:') .NE. 0)NEW_FORMAT=.TRUE.
 	  END DO
 !
 	  SIG_0_X(:,:,:,:)=0.0D0
+	  N_ED_EJ(:,:,:,:)=0
+!
 	  DO WHILE(1 .EQ. 1)	
 	     READ(STRING,*,IOSTAT=IOS)IZ,INE,PQN,ANG
 	     IF(IOS .NE. 0)THEN
 	       WRITE(LU_ER,*)'Error reading IZ,INE... from XRAY_PHOT_FITS'
 	       WRITE(LU_ER,*)'IOSTAT=',IOS
+	       WRITE(LU_ER,'(A)')TRIM(STRING)
 	       STOP
 	     END IF
 	     IF(IZ .GT. ATNO_MAX_X)THEN
@@ -78,16 +89,35 @@
 	     IF(PQN .GT. PQN_MAX_X)GOTO 50
 	     IF(ANG .GT. ANG_MAX_X)GOTO 50
 !
-	     READ(STRING,*,IOSTAT=IOS)I,J,K,L,E_THRESH_X(IZ,INE,PQN,ANG),
+	     IF(NEW_FORMAT)THEN
+	       READ(STRING,*,IOSTAT=IOS)I,J,K,L,E_THRESH_X(IZ,INE,PQN,ANG),
 	1                          E_0_X(IZ,INE,PQN,ANG),
 	1                          SIG_0_X(IZ,INE,PQN,ANG),
 	1                          Y_A_X(IZ,INE,PQN,ANG),
 	1                          P_X(IZ,INE,PQN,ANG),
-	1                          Y_W_X(IZ,INE,PQN,ANG)
-	     IF(IOS .NE. 0)THEN
-	       WRITE(LU_ER,*)'Error reading IZ,INE... from XRAY_PHOT_FITS'
-	       WRITE(LU_ER,*)'IOSTAT=',IOS
-	       STOP
+	1                          Y_W_X(IZ,INE,PQN,ANG),
+	1                          N_ED_EJ(IZ,INE,PQN,ANG)
+	       IF(IOS .NE. 0)THEN
+	         WRITE(LU_ER,*)'Error reading photoionization data from XRAY_PHOT_FITS'
+	         WRITE(LU_ER,*)'IOSTAT=',IOS
+	         STOP
+	       END IF
+	     ELSE
+	       READ(STRING,*,IOSTAT=IOS)I,J,K,L,E_THRESH_X(IZ,INE,PQN,ANG),
+	1                          E_0_X(IZ,INE,PQN,ANG),
+	1                          SIG_0_X(IZ,INE,PQN,ANG),
+	1                          Y_A_X(IZ,INE,PQN,ANG),
+	1                          P_X(IZ,INE,PQN,ANG),
+	1                          Y_W_X(IZ,INE,PQN,ANG) 
+	       IF(IOS .NE. 0)THEN
+	         WRITE(LU_ER,*)'Error reading photoionization data from XRAY_PHOT_FITS'
+	         WRITE(LU_ER,*)'IOSTAT=',IOS
+	         STOP
+	       END IF
+	       N_ED_EJ(IZ,INE,PQN,ANG)=1
+	       IF(PQN .EQ. 1 .AND. INE .GT. 3)N_ED_EJ(IZ,INE,PQN,ANG)=2
+	       IF(PQN .EQ. 2 .AND. INE .GT. 11 .AND. ANG .EQ. 0)N_ED_EJ(IZ,INE,PQN,ANG)=2
+	       IF(PQN .EQ. 2 .AND. INE .GT. 12)N_ED_EJ(IZ,INE,PQN,ANG)=2
 	     END IF
 !
 50	    CONTINUE

@@ -64,7 +64,7 @@ $(LIB)(%.o) : %.f
 $(LIB)(ff_res_gaunt.o)    : ff_res_gaunt.f $(LIB)(phot_data_mod.o)
 $(LIB)(rd_phot_data_v1.o) : rd_phot_data_v1.f $(LIB)(phot_data_mod.o)
 $(LIB)(rdphot_gen_v1.o)   : rdphot_gen_v1.f   $(LIB)(phot_data_mod.o)
-$(LIB)(sub_phot_gen.o)    : sub_phot_gen.f    $(LIB)(phot_data_mod.o)
+$(LIB)(sub_phot_gen.o)    : sub_phot_gen.f    $(LIB)(phot_data_mod.o) $(LIB)(xray_data_mod.o)
 
 GEN = $(LIB_MOD)(mod_lev_dis_blk.o)
 

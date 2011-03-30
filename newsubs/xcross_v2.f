@@ -63,8 +63,8 @@
 !
 ! Define for ease of typing.
 !
-	IZ=ZCORE
-	NE=NUM_ELEC
+	IZ=NINT(ZCORE)
+	NE=NINT(NUM_ELEC)
 !
 	IF(.NOT. XRAY_PHOT_RD_IN)THEN
 	  LUER=ERROR_LU()
@@ -144,11 +144,12 @@
 	  IF( NE .LE. 2 .OR. (.NOT. DO_LIT .AND. NE .EQ. 3) )RETURN
 !
 	  DO J=0,ANG_MAX_X
-	    LOOP_PQN_MAX=MIN(2,PQN_MAX_X)
+	    LOOP_PQN_MAX=MIN(3,PQN_MAX_X)
 	    IF(NE .LE. 19)LOOP_PQN_MAX=MIN(2,PQN_MAX_X)
 	    IF(NE .LE. 11)LOOP_PQN_MAX=1
 	    DO I=1,LOOP_PQN_MAX
 	      IF( SIG_0_X(IZ,NE,I,J) .NE. 0 .AND. 
+	1         N_ED_EJ(IZ,NE,I,J) .GT. 1 .AND.
 	1         NU_EV .GE. E_THRESH_X(IZ,NE,I,J) )THEN
 	        Y=NU_EV/E_0_X(IZ,NE,I,J) 
 	        Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)

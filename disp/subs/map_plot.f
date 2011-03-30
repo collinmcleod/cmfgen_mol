@@ -1071,7 +1071,7 @@ c
 	    CALL MON_NUM(T1,T2-2*T3,MAP(I,J),1,IDY+4)
 	  END DO
 70	  CONTINUE
-
+!
 !
 ! Set Line vectors
 !
