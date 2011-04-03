@@ -78,7 +78,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(hydanggaunt.o)\
       $(LIB)(hydcrossl.o)\
       $(LIB)(hydro_terms.o)\
-      $(LIB)(hydro_terms_v3.o)\
+      $(LIB)(hydro_terms_v4.o)\
       $(LIB)(hyper.o)\
       $(LIB)(ichrlen.o)\
       $(LIB)(impar.o)\

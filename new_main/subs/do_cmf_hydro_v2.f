@@ -15,6 +15,7 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 31-Mar-2011 - Added variable NO_ITS_DONE and corresponding KEYWORD to file.
 ! Altered 03-Mar-2011 - Revised check on GAM_EDD to properly account for ionization state of gas.
 !                         Program value of GAM_EDD remains unchanged.
 !                         Extra parameter BETA2 can now be read in to fiddle with velocity law.
@@ -155,6 +156,7 @@
 	INTEGER  STRT_HYDRO_ITS
 	INTEGER  FREQ_HYDRO_ITS
 	INTEGER  NO_HYDRO_ITS
+	INTEGER  NO_ITS_DONE
 	INTEGER  ITERATION_COUNTER
 !
 	INTEGER  LU
@@ -237,6 +239,8 @@
 	CALL RD_OPTIONS_INTO_STORE(LUIN,LUSCR)
 
         CALL RD_STORE_INT(NO_HYDRO_ITS,'N_ITS',L_TRUE,'Number of hydro iterations remaining')
+	NO_ITS_DONE=-1
+        CALL RD_STORE_INT(NO_ITS_DONE,'ITS_DONE',L_FALSE,'Number of hydro iterations completed')
         CALL RD_STORE_INT(STRT_HYDRO_ITS,'STRT_ITS',L_FALSE,'Iteration to start first hydro iteration')
         CALL RD_STORE_INT(FREQ_HYDRO_ITS,'FREQ_ITS',L_FALSE,'Frequency for hydro iterations')
 	CALL RD_STORE_DBLE(NI_ZERO,'ATOM_DEN',L_FALSE,'Atom density at outer boundary (/cm^3)')
@@ -267,6 +271,15 @@
         CLOSE(UNIT=LUIN)
         CLOSE(UNIT=LUSCR)
 !
+! This is done for compatibility with earlier versions which may lack the keyword.
+!
+	IF(NO_ITS_DONE .EQ. -1)THEN
+	  NO_ITS_DONE=0
+	  OPEN(UNIT=LUIN,FILE='HYDRO_DEFAULTS',STATUS='OLD',POSITION='APPEND')
+	    WRITE(LUIN,'(A)')'0            [ITS_DONE]'
+	  CLOSE(LUIN)
+	END IF
+!
 ! Decide here whether we will do an iteration or not.
 !
 	DONE_HYDRO=.FALSE.
@@ -275,10 +288,6 @@
 	IF( MOD( (MAIN_COUNTER-STRT_HYDRO_ITS),FREQ_HYDRO_ITS ) .NE. 0)RETURN 
 !
 ! Begin Hydro computation.
-!
-	NO_HYDRO_ITS=NO_HYDRO_ITS-1
-	CALL UPDATE_KEYWORD(NO_HYDRO_ITS,'[N_ITS]','HYDRO_DEFAULTS',L_TRUE,L_TRUE,LUIN)
-	DONE_HYDRO=.TRUE.
 !
 	IF(VERBOSE_OUTPUT)THEN
 	  CALL GET_LU(LUV)
@@ -868,6 +877,13 @@
 	CALL SET_NEW_GRID(REV_R,REV_V,REV_SIGMA,REV_ED,REV_CHI_ROSS,NEW_ND)
 	CALL SET_ABUND_CLUMP(T1,T2,LU_ERR,NEW_ND)
 	CALL ADJUST_POPS(POPS,LU_ERR,NEW_ND,NT)
+!
+	NO_HYDRO_ITS=NO_HYDRO_ITS-1
+	NO_ITS_DONE=NO_ITS_DONE+1
+	CALL UPDATE_KEYWORD(NO_HYDRO_ITS,'[N_ITS]','HYDRO_DEFAULTS',L_TRUE,L_FALSE,LUIN)
+	CALL UPDATE_KEYWORD(NO_ITS_DONE,'[ITS_DONE]','HYDRO_DEFAULTS',L_FALSE,L_TRUE,LUIN)
+	DONE_HYDRO=.TRUE.
+!
 !
 ! Make sure VADAT is consitent with revised RGRID & parameters in HYDRO_PARAMS.
 ! We also return the correct RSTAR, RMAX and stellar mass.

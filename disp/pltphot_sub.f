@@ -91,7 +91,9 @@
 	  XAXIS='\gn(10\u15 \dHz)'
 	  FREQ_MAX=1000.0D0
 	  DEFAULT=WR_STRING(FREQ_MAX)
-	  CALL USR_HIDDEN(FREQ_MAX,'FREQ_MAX',DEFAULT,'Maximum frequency in units of 10^15 Hz')
+	  CALL USR_OPTION(FREQ_MAX,'FREQ_MAX',DEFAULT,'Maximum frequency in units of 10^15 Hz')
+	  DEFAULT='T'
+	  CALL USR_OPTION(DO_EV,'DO_EV',DEFAULT,'Plot X-axis in eV?')
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	    FREQ=ATM(SPECIES_BEG_ID(ISPEC))%EDGEXzV_F(ID)
 	    J=0
@@ -118,6 +120,7 @@
 	      XAXIS='\gn(eV)'
 	    END IF
 	    CALL DP_CURVE(J,ZV,YV)
+	    WRITE(6,'(A,I2,A,A)')' Curve ',ID-SPECIES_BEG_ID(ISPEC)+1,' is: ',TRIM(ION_ID(ID))
 	  END DO
 	  YAXIS='\gs(Mb)'
 	  RETURN

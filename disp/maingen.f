@@ -2360,6 +2360,8 @@
 !
 	  IF(XSPEC .EQ. 'ALL')THEN
 	    J=0
+	    WRITE(6,'(A)')' '
+	    WRITE(6,'(A)')'  Mass Fraction (MF) and Log(MF) at inner boundary'
 	    DO ISPEC=1,NSPEC
 	      IF(POPDUM(ND,ISPEC) .GT. 0.0D0)THEN
 	        J=J+1
@@ -4014,6 +4016,7 @@
 	        END DO
 	        YAXIS='Log '//TRIM(SPECIES_ABR(ISPEC))//'\un+\d/N(total)'
 	      END IF
+	      CNT=0
 	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
 	        IF(ATM(ID)%XzV_PRES)THEN
 	          DO I=1,ND
@@ -4025,9 +4028,14 @@
 	            ZV(I)=LOG10(ATM(ID)%DXzV_F(I)/TA(I))
 	          END DO
 	          CALL DP_CURVE(ND,XV,YV)
+	          CNT=CNT+1
+	          WRITE(6,'(A,I2,A,A)')' Curve ',CNT,' is due to: ',TRIM(ION_ID(ID))
 	        END IF
 	      END DO
 	      CALL DP_CURVE(ND,XV,ZV)
+	      CNT=CNT+1
+	      ID=SPECIES_END_ID(ISPEC)
+	      WRITE(6,'(A,I2,A,A)')' Curve ',CNT,' is due to: ',TRIM(ION_ID(ID))
 	    END IF
 	  END DO
 ! 
@@ -5006,9 +5014,9 @@ c
 	      YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
 	      IF(RADIAL)YV(I)=YV(I)/(1.0D0+SIGMA(I))
 	      IF(YV(I) .GT. 0)THEN
-!	        YV(I)=LOG10(YV(I))
+	        YV(I)=LOG10(YV(I))
 	      ELSE
-!	        YV(I)=-20.0
+	        YV(I)=-20.0
 	      END IF
 	    END DO
 	    YAXIS='\gt\dSob\u'
