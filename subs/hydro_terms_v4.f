@@ -94,6 +94,11 @@
 	  WRITE(I,*)'Error opening HYDRO in HYDRO_TERMS'
 	  WRITE(I,*)'IOS=',IOS
 	END IF
+!
+	ERROR_SUM=0.0D0
+	ERROR_SQ=0.0D0
+	ERROR_MAX=0.0D0
+	ERROR_CNT=0
 !                                              
 ! Output file header.
 !
@@ -141,7 +146,7 @@
 !
 	  IF(V(I) .LT. 5.0D0)THEN
 	    ERROR_SUM=ERROR_SUM+ERROR
-	    ERROR_SQ=ERROR_SQ+ERROR
+	    ERROR_SQ=ERROR_SQ+ERROR*ERROR
 	    ERROR_MAX=MAX(ERROR_MAX,ABS(ERROR))
 	    ERROR_CNT=ERROR_CNT+1
 	  END IF
@@ -211,9 +216,9 @@
 	    WRITE(I,*)' '
 	    WRITE(I,*)'*****************************************************************************************'
 	    WRITE(I,'(A)')' Possible error with hydrostatic structure --- large error in photosphere'
-	    WRITE(I,'(A,E10.2)')'              Mean error is',ERROR_SUM
-	    WRITE(I,'(A,E10.2)')' Root mean squared error is',ERROR_SQ
-	    WRITE(I,'(A,E10.2)')'           Maximum error is',ERROR_MAX
+	    WRITE(I,'(A,ES10.2)')'              Mean error is',ERROR_SUM
+	    WRITE(I,'(A,ES10.2)')' Root mean squared error is',ERROR_SQ
+	    WRITE(I,'(A,ES10.2)')'           Maximum error is',ERROR_MAX
 	    WRITE(I,*)'*****************************************************************************************'
 	    WRITE(I,*)' '
 	  END IF

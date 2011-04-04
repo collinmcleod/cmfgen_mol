@@ -20,7 +20,7 @@
             STOP
           END IF
 	  IOS=0
-          DO WHILE(1 .EQ. 1 .AND. IOS .EQ. 0)
+          DO WHILE(IOS .EQ. 0)
             READ(LUIN,'(A)',IOSTAT=IOS)STRING
             IF(INDEX(STRING,'[ITS_DONE]') .NE. 0)EXIT
           END DO
