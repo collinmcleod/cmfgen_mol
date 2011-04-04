@@ -16,6 +16,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(adjust_pops.o)\
       $(LIB)(ba_update_v6.o)\
       $(LIB)(ba_update_v7.o)\
+      $(LIB)(check_hydro_def.o)\
       $(LIB)(check_ions_present.o)\
       $(LIB)(check_tmin.o)\
       $(LIB)(cmf_blkband_v2.o)\

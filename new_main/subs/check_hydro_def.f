@@ -1,5 +1,13 @@
+!
+! Simple little routine to check whether the ITS_DONE keyword is included in
+! the HYDRO_DEFAULTS file. If not, the keyowrd is added. This is done
+! for compatability with earlier versions.
+!
 	SUBROUTINE CHECK_HYDRO_DEF(STRING,LUIN,LUER)
 	IMPLICIT NONE
+!
+! Created: 04-April-2011
+!
 	CHARACTER(LEN=*) STRING
 	INTEGER LUER
 	INTEGER LUIN

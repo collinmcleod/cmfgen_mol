@@ -239,8 +239,7 @@
 	CALL RD_OPTIONS_INTO_STORE(LUIN,LUSCR)
 
         CALL RD_STORE_INT(NO_HYDRO_ITS,'N_ITS',L_TRUE,'Number of hydro iterations remaining')
-	NO_ITS_DONE=-1
-        CALL RD_STORE_INT(NO_ITS_DONE,'ITS_DONE',L_FALSE,'Number of hydro iterations completed')
+        CALL RD_STORE_INT(NO_ITS_DONE,'ITS_DONE',L_TRUE,'Number of hydro iterations completed')
         CALL RD_STORE_INT(STRT_HYDRO_ITS,'STRT_ITS',L_FALSE,'Iteration to start first hydro iteration')
         CALL RD_STORE_INT(FREQ_HYDRO_ITS,'FREQ_ITS',L_FALSE,'Frequency for hydro iterations')
 	CALL RD_STORE_DBLE(NI_ZERO,'ATOM_DEN',L_FALSE,'Atom density at outer boundary (/cm^3)')
@@ -270,15 +269,6 @@
 !
         CLOSE(UNIT=LUIN)
         CLOSE(UNIT=LUSCR)
-!
-! This is done for compatibility with earlier versions which may lack the keyword.
-!
-	IF(NO_ITS_DONE .EQ. -1)THEN
-	  NO_ITS_DONE=0
-	  OPEN(UNIT=LUIN,FILE='HYDRO_DEFAULTS',STATUS='OLD',POSITION='APPEND')
-	    WRITE(LUIN,'(A)')'0            [ITS_DONE]'
-	  CLOSE(LUIN)
-	END IF
 !
 ! Decide here whether we will do an iteration or not.
 !

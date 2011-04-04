@@ -562,6 +562,12 @@
 	  FIX_IMPURITY=RD_FIX_IMP
 	END IF
 !
+! This ensures that the ITS_DONE keyword is in HYDRO_DEFAULTS.
+!
+	IF(DO_HYDRO .AND. .NOT. SN_MODEL)THEN
+	  CALL CHECK_HYDRO_DEF(STRING,LUIN,LUER)
+	END IF
+!
 ! 
 !
 	IF(ACCURATE)THEN
@@ -872,24 +878,9 @@
 	IF(NEWMOD)THEN
 	  WRITE(LUER,*)'Starting a new model.'
 	  WRITE(LUER,*)'*_IN files will be used to start model'
+	  WRITE(LUER,*)'Setting ITS_DONE keyword in HYDRO_DEFAULTS to 0'
 	  IF(DO_HYDRO .AND. .NOT. SN_MODEL)THEN
-	    OPEN(UNIT=LUIN,FILE='HYDRO_DEFAULTS',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
-	      IF(IOS .NE. 0)THEN
-	        WRITE(LUER,*)'ERROR -- DO_HYDRO is set but HYDRO_DEFAULTS cannot be opened'
-	        STOP
-	      END IF 
-	      DO WHILE(1 .EQ. 1)
-	        READ(LUIN,'(A)',IOSTAT=IOS)STRING
-	        IF(INDEX(STRING,'[ITS_DONE]') .NE. 0)EXIT
-	      END DO
-	    CLOSE(LUIN)
-	    IF(IOS .EQ. 0)THEN
-	      CALL UPDATE_KEYWORD(IZERO,'[ITS_DONE]','HYDRO_DEFAULTS',L_TRUE,L_TRUE,LUIN)
-	    ELSE
-	      OPEN(UNIT=LUIN,FILE='HYDRO_DEFAULTS',STATUS='OLD',POSITION='APPEND')
-                WRITE(LUIN,'(A)')'0             [ITS_DONE]'
-              CLOSE(LUIN)
-	    END IF
+            CALL UPDATE_KEYWORD(IZERO,'[ITS_DONE]','HYDRO_DEFAULTS',L_TRUE,L_TRUE,LUIN)
 	  END IF
 	ELSE
 !

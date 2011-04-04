@@ -926,7 +926,7 @@ C
 !
 	  CALL CLEAN_RD_STORE()
 !
-	CLOSE(UNIT=7)
+	CLOSE(UNIT=LUIN)
 !
 ! Check consistency of parameters.
 !
