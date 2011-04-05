@@ -376,7 +376,17 @@
 	TYPE_ATM=' '			!i.e def is not 'EXP'
 	TRAPFORJ=.TRUE.
 	TSTAR=T(ND)
+!
+! If the grey temperature is available in CMFGEN, we don't need to (although we can with the
+! GREY option) compute it.
+!
 	GREY_COMP=.FALSE.
+	IF(CMFGEN_TGREY(ND) .EQ. 0.0D0)THEN
+	  GREY_COMP=.FALSE.
+	ELSE
+	  GREY_COMP=.TRUE.
+	  TGREY(1:ND)=CMFGEN_TGREY(1:ND)
+	END IF
 	FIRST_RATE=.TRUE.
 !
 	XRAYS=.TRUE.                    !Changed def .FALSE.

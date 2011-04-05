@@ -59,6 +59,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(steq_co_mov_deriv_v2.o)\
       $(LIB)(store_old_grid.o)\
       $(LIB)(store_ba_data_v2.o)\
+      $(LIB)(sum_steq_sol.o)\
       $(LIB)(tst_rd_seq.o)\
       $(LIB)(var_op_v8.o)\
       $(LIB)(var_x_opa_eta_v3.o)\
