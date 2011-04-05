@@ -11,6 +11,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered:   05-Apr-2011 : Call to SUM_STEQ_SOL inserted to who link to levels with
+!                            largest corrections.
 ! Altered:   18-May-2010 : Change to allow BA to be held fixed after a LAMBDA iteration.
 ! Altered:   23-Feb-2007 : Call to SOLVEBA_V8 changed to SOLVEBA_V9; LAM_SCALE_OPT inserted
 !                            into SOLVEBA_V9 call.
@@ -217,6 +219,11 @@
 !	END IF
 !
         CALL WR2D_V2(SOL,NT,ND,'STEQ SOLUTION ARRAY','#',L_TRUE,LU_SE)
+!
+! NB: The call to SUM_STEQ_SOL corrupts SOL. I is used for output --
+!      the unit is closed on exit.
+!
+        I=7; CALL SUM_STEQ_SOL(SOL,NT,ND,I)
 !
 ! Determine whether convergence is sufficient to consider using
 ! NG acceleration. The first NG acceleration is done 4 iterations after
