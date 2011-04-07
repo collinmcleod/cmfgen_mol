@@ -10,6 +10,59 @@ has not yet been updated to reflect the changes.
 ****************************************************************************
 ****************************************************************************
 
+                 7_Apr-2011
+
+Several important bug fixes, and  improvements.
+
+(1) A bug with RD_STORE_LOG was fixed. This could potentially read in a
+    bad data value depending on the structure of the VADAT file.
+    If [] were aligned, there was no problem.
+
+(2) A bug with the X_ray cross-sections was found. L shell cross-sections
+      were not being included for Si IV, PV and similar species (arose
+      because for these species only 1 electron is ejected from the inner shell.
+      Code was also updated to include M shell (p and s states) for Iron.
+      Limited tests did not find huge changes.
+
+      A new file xray_phot_fits.dat relaces an older version in the $atomic/misc
+      directory of the same name. It is the same data, but has an extra column.
+      To read this file, with an older version of the code, you will
+      need to change the length of STRING in $cmfdist/newsubs/xray_data_mod.f to 100
+      (or point to the older version of the file).
+
+(3) The HYDRO_DEFAULTS file now has another keyword indicating how many iterations
+      have been done -- change is transparent to user. An ERROR is ouput to OUTGEN
+      on the final iteration if the hydrostatic structure is poor -- check HYDRO
+      
+     In the HYDRO file amke sure MAX_R is set. I also recommend that you use the IOB_OPT to
+     ensure a fine grid at  the outer boudary. The crucial number os DTAU(2)/DTAU(1) --
+     the following sets the ratio to 25.
+
+          SPECIFY        [OB_OPT]
+          2              [NOB_PARS]
+          50.0D0         [OB_P1]
+          2.0D0          [OB_P2]
+          100            [MAX_R]
+
+(4) It is now possible to put a file ADJUST_CORRECTIONS in the model directory.
+    If you put
+           10:20 0.3
+            15   0.4
+    it will scale the corrections (full iterations only) at depths 10 through 20
+    by a factor of 0.3, and depth 15 by 0.5. This is -ve relaxation, and can facilitate
+    convergence when level pops are oscillating. Particularly useful for O stars with
+    low mass-loss rates. FOr O stars with low Mdots, and high Vinf, 80 or more depth points
+    are recommended.
+
+(4) In $atomic there are three new X-ray files: gal_xray_hr.dat, smc_xray_hr.dat,
+    lmc_xray_hr.dat. These were computed with the plasma emission code APEC for
+    solar, and scaled solar abundances. They should be use instead of the old rs data.
+
+John
+
+****************************************************************************
+****************************************************************************
+
                     17-June-2010
 
 
