@@ -17,6 +17,7 @@
 !
 	INTEGER ND,LUOUT
 !
+! Altered  05-Apr-2011 : Bug fixed when multiplet structure split (G_CHG incorrect).
 ! Altered  11-Apr-2002 : Changed to allow automatic splitting of charge exchange rates
 !                          among a single LS state.
 ! Altered  09-Oct-1999 : Error reporting inproved.
@@ -207,7 +208,9 @@
 !
 	L=0
 	DO J=1,N_CHG_RD
-	  WRITE(LUOUT,'(A,I3,4(2X,A))')'Operating on charge exchange reaction J=',J,SPEC_ID_CHG_RD(J,1:4)
+	  WRITE(LUOUT,'(/,A,I3,4(2X,A))')' Operating on charge exchange reaction J=',J,SPEC_ID_CHG_RD(J,1:4)
+	  WRITE(LUOUT,'(A,3X,4I5)')' Super levels associated with each each species:',
+	1                 LEV_CNT(J,1),LEV_CNT(J,2),LEV_CNT(J,3),LEV_CNT(J,4)
 !
 ! NOUT and NIN are use to loop over ALL possible charge exchnage reactions.
 ! For LS coupling, we assume that the reaction rates are independent of
@@ -216,7 +219,6 @@
 !
 	  NOUT=1
 	  NIN=LEV_CNT(J,1)*LEV_CNT(J,2)*LEV_CNT(J,3)*LEV_CNT(J,4)
-	  WRITE(LUOUT,*)NIN,LEV_CNT(J,1),LEV_CNT(J,2),LEV_CNT(J,3),LEV_CNT(J,4)
 	  IF(NIN .NE. 0)THEN
 	    LST=L
 	    DO K=1,4
@@ -239,7 +241,7 @@
 	          LEV_IN_ION_CHG(L,K)=1
 	          CHG_ID(L,K)=J
 	          G_CHG(L,K)=ATM(ID)%GIONXzV_F
-	          WRITE(LUOUT,'(2X,A,4I6,F7.1)')'A',J,K,L,ID+1,Z_CHG(L,K)
+	          WRITE(LUOUT,'(2X,A,T20,4I6,2F7.1)')'B',J,K,L,ID+1,G_CHG(L,L),Z_CHG(L,K)
 	        END DO
 	      ELSE
 	        ID=ID_POINTER(J,K)
@@ -263,13 +265,15 @@
 	                  Z_CHG(L,K)=ATM(ID)%ZXzV-1.0D0
 	                  CHG_ID(L,K)=J
 	                  G_CHG(L,K)=ATM(ID)%GXzV_F(I_F)
-	                  WRITE(LUOUT,'(2X,A,4I6,F7.1)')'B',J,K,L,ID+1,Z_CHG(L,K)
+	                  WRITE(LUOUT,'(2X,A,2X,A,T20,4I6,2F7.1)')'B',TRIM(LOC_NAME),J,K,L,ID+1,G_CHG(L,L),Z_CHG(L,K)
 	                END DO
 	              ELSE
+	                L=LST
 	                DO II=1,NIN
+	                  L=L+1
 	                  G_CHG(L,K)=G_CHG(L,K)+ATM(ID)%GXzV_F(I_F)
 	                END DO
-	                WRITE(LUOUT,'(2X,A,4I6,F7.1)')'C',J,K,L,ID+1,Z_CHG(L,K)
+	                WRITE(LUOUT,'(2X,A,2X,A,T20,4I6,2F7.1)')'C',TRIM(LOC_NAME),J,K,L,ID+1,G_CHG(L,L),Z_CHG(L,K)
 	              END IF
 	            END IF
 	          END DO
