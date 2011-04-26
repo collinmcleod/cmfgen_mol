@@ -608,7 +608,7 @@ C
 C
 	  IF(SMOOTH)THEN
 	    NHAN=5
-	    CALL USR_OPTION(K,'HAN','5','Number of points for HAN [ODD]')
+	    CALL USR_OPTION(NHAN,'HAN','5','Number of points for HAN [ODD]')
 	    NHAN=2*(NHAN/2)+1	!Ensures odd. 
 	  END IF
 C

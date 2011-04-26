@@ -76,6 +76,39 @@ EXE_DIR=$(INSTALL_DIR)exe/
  PGLIB= =pgf77libs -L/Users/jdh/pgplot/pgplot -lpgplot 
  X11LIB=-L/usr/X11R6/lib -lX11
 
+#
+# Options I use on a 32 bit intel computer running linux.
+#
+# F90 = gfortran44
+# F90nomp = gfortran44 
+# FG  = -O2 -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
+# FH  = -O2 -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
+# FD  = -g  -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
+# FFREE  = -fno-backslash -I$(MOD_DIR) -J$(MOD_DIR)
+# FFRED  = -fno-backslash -g -I$(MOD_DIR) -J$(MOD_DIR)
+#
+# BLAS=-lblas
+# LAPACK=-llapack
+# LOCLIB=-L/usr/lib
+# PGLIB=  -L/home/bruno1/users/jdh/pgplot/pgplot -lpgplot 
+# X11LIB=-L/usr/X11R6/lib -lX11
+
+#
+# Options used with pgf compiler on a 64 bit opteron system.
+#
+# F90 = pgf95 -mp 
+# F90nomp = pgf95  
+# FG  = -O2 -Mconcur -Mlarge_arrays -Mextend -Mbackslash  -Ktrap=fp -I$(MOD_DIR)
+# FH  = -O2 -Mconcur -Mlarge_arrays -Mextend -Mbackslash  -Ktrap=fp -I$(MOD_DIR)
+# FD  = -g -Mconcur -Mlarge_arrays -Mextend -Mbackslash  -Ktrap=fp -I$(MOD_DIR)
+# FFREE  = -Mbackslash -Ktrap=fp -I$(MOD_DIR)
+# FFRED  = -Mbackslash -g -Ktrap=fp -I$(MOD_DIR)
+# BLAS= 
+# LAPACK=-lacml -lacml_mv
+# LOCLIB=
+# PGLIB= -g77libs -L/usr/pgplot -lpgplot 
+# X11LIB=-L/usr/lib64 -lX11
+
 #********************************************************************
 # Locations of system dependent libraries. 
 # Use system routines for BLAS and LPACK when avialble. Fortran 

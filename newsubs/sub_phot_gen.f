@@ -48,7 +48,8 @@
 !
 	IMPLICIT NONE
 !
-! Altered 11-MAr-2011 : 2s,2p opacity added for SiIV, PV
+! Altered 21-Apr-2011 : Bug fix for Types 30, 31 (inadvertantly applying to all levels)
+! Altered 11-Mar-2011 : 2s,2p opacity added for SiIV, PV
 !                       3s,3p opacity added for states with one 3d electron.
 ! Altered 09-Nov-2010 : Modified fit type 9.
 ! Altered 17-Apr-2008 : Installed fit Type 8:
@@ -493,19 +494,17 @@ C
 !
 	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 30)THEN
 	          T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION	!# of elec. in species.
-	          T1=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,
-	1                          IZERO,IZERO,L_FALSE,L_TRUE)
-	          IF(T1 .GT. 0)PHOT(1:NLEVS)=PHOT(1:NLEVS)+T1
+	          T1=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,IZERO,IZERO,L_FALSE,L_TRUE)
+	          IF(T1 .GT. 0)PHOT(I)=PHOT(I)+T1
 	          WRITE(6,*)'Error in SUB_PHOT_GEN -- calling CROSS TYPE 30 - 31'
 	          WRITE(6,*)'Loop   needs fixing'
 	          WRITE(6,*)GS_EDGE,NLEVS,PHOT_ID
 !
 	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 31)THEN
 	          T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION	!# of elec. in species.
-	          T1=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,
-	1                        PD(ID)%CROSS_A(LMIN),PD(ID)%CROSS_A(LMIN),
+	          T1=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,PD(ID)%CROSS_A(LMIN),PD(ID)%CROSS_A(LMIN),
 	1                        L_FALSE,L_FALSE)
-	          IF(T1 .GT. 0)PHOT(1:NLEVS)=PHOT(1:NLEVS)+T1
+	          IF(T1 .GT. 0)PHOT(I)=PHOT(I)+T1
 	          WRITE(6,*)'Error in SUB_PHOT_GEN -- calling CROSS TYPE 30 - 31'
 	          WRITE(6,*)'Loop   needs fixing'
 	          WRITE(6,*)GS_EDGE,NLEVS,PHOT_ID

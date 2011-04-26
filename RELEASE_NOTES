@@ -4,8 +4,9 @@ Please run a few test models and report any difficulties.
 
 Please report any compile difficulties. I cannot fix bugs/features
 if I don't know about them. The following summary of changes
-was hurriedly put together, and is thus incomplete. Documentation
-has not yet been updated to reflect the changes.
+was hurriedly put together, and is thus incomplete. This list does not
+include trivial changes, and updates to DISPGEN/PLT_SPEC. Documentation
+has not yet been updated to reflect the changes, but is coming!
 
 ****************************************************************************
 ****************************************************************************
@@ -34,8 +35,8 @@ Several important bug fixes, and  improvements.
       have been done -- change is transparent to user. An ERROR is ouput to OUTGEN
       on the final iteration if the hydrostatic structure is poor -- check HYDRO
       
-     In the HYDRO file amke sure MAX_R is set. I also recommend that you use the IOB_OPT to
-     ensure a fine grid at  the outer boudary. The crucial number os DTAU(2)/DTAU(1) --
+     In the HYDRO file make sure MAX_R is set. I also recommend that you use the OB_OPT to
+     ensure a fine grid at  the outer boudary. The crucial number is DTAU(2)/DTAU(1) --
      the following sets the ratio to 25.
 
           SPECIFY        [OB_OPT]
@@ -47,16 +48,48 @@ Several important bug fixes, and  improvements.
 (4) It is now possible to put a file ADJUST_CORRECTIONS in the model directory.
     If you put
            10:20 0.3
-            15   0.4
+            15   0.5
     it will scale the corrections (full iterations only) at depths 10 through 20
     by a factor of 0.3, and depth 15 by 0.5. This is -ve relaxation, and can facilitate
     convergence when level pops are oscillating. Particularly useful for O stars with
-    low mass-loss rates. FOr O stars with low Mdots, and high Vinf, 80 or more depth points
+    low mass-loss rates. For O stars with low Mdots, and high Vinf, 80 or more depth points
     are recommended.
 
 (4) In $atomic there are three new X-ray files: gal_xray_hr.dat, smc_xray_hr.dat,
     lmc_xray_hr.dat. These were computed with the plasma emission code APEC for
-    solar, and scaled solar abundances. They should be use instead of the old rs data.
+    solar, and scaled solar abundances bu Janos Zsargo. They should be use instead
+    of the old rs data.
+
+(5) CMFGEN and CMF_FLUX work successfully with PGF95 and OMP. Using 4 proceses 
+       does imprive computation time. Presently I am using /opt/pgi/osx86-64/10.8/bin/pgf95
+       on a MAC, and /usr/local/pgi105/linux86-64/10.5/bin/pgf95 on a LINUX system.
+
+(6) On a 32-bit lunux system I succussfully compiled CMFGEN using GFROTRAN44 -- version
+    41 had issues.I did not try parallel processing.
+
+(7) CMFGEN runs under INTEL but I have had issues (as yet unresolved) when OMP options were
+    switched on. There is also may be the usual character issue in one or two routines --
+    explictly specifying the string length solves these.
+
+(8) $cmfdist/newsubs/subs/non_therm contains dummy routines only. This routines are still 
+       under development.
+
+(9) When running ltebat.sh to compute the ROSSELAND mean opacity table, it
+      is no longer necessary to change MODEL_SPEC. In fact, ltebat.sh could
+      point to the files (MODEL_SPEC and VADAT) in the parent directory.
+
+(10) A file CORRECTION_LINK has been added which can be used with CORRECTION_SUM. The file
+      prints the largest corections at 5 to 10 depths, and indicates the levels associated
+      with these corrections.
+
+(11) Improvements have been made to the cpmod command.`
+
+(12) The INTEL compiler has an and off problem with some declarations. Seems to be version and operating
+         dependent. If the newly compiled crashes quickly do the following: 
+         Edit $cmfdist/newsubs/rdphot_gen_v2.f and replace 
+               CHARACTER*(*) OSCDATE  by  CHARACTER(LEN=*) OSCDATE
+         Edit $cmfdist/newsubs/genosc_v8.f and replace
+               CHARACTER*(*) FILNAME  by  CHARACTER(LEN=20) FILNAME(N)
 
 John
 

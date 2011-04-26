@@ -208,6 +208,7 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered 21-Apr-2011: Bug fix for HNU_AT_OB when using DIFF option (not generally sed anyway).
 ! Altered 14-Jan-2010: Added JPLUS_IB, JMIN_IB etc to improve computation of
 !                        boundary conditions.
 ! Altered 14-May-2009: Altered value of IDMAX (for ETA and CHI interpolaton).
@@ -1642,8 +1643,8 @@ C
 	    HNU_AT_OB=0.0D0; NNU_AT_OB=0.0D0
 	    DO LS=1,NP
 	      K=H_PNT(1,LS)
-	      HNU_AT_OB=HNU_AT_OB+HQW(I,LS)*CV(K,LS)
-	      NNU_AT_OB=NNU_AT_OB+NQW(I,LS)*CV(K,LS)
+	      HNU_AT_OB=HNU_AT_OB+HQW(1,LS)*CV(K,LS)
+	      NNU_AT_OB=NNU_AT_OB+NQW(1,LS)*CV(K,LS)
 	    END DO
 	    HN_DEF_ON_NODES=.FALSE.
 	  ELSE    

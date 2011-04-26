@@ -132,7 +132,7 @@
 !
 	IF(NUM_TRANS .EQ. 0)THEN
 	  CLOSE(LUIN)
-	  RETURN			!i.e use approximate formulae only.
+	  STOP			!i.e use approximate formulae only.
 	END IF
 !
 	STRING=' '

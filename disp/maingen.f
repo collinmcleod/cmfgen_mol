@@ -1992,23 +1992,32 @@
 !
 	ELSE IF(XOPT .EQ. 'ROSS')THEN
 	  WRITE(T_OUT,*)'Volume filling factor not allowed for.'
-	  CALL USR_OPTION(ELEC,'ON_NE','T','Normalize by the electron scattering opacity?')
+	  CALL USR_OPTION(ELEC,'KAPPA','T','Mass absorption coefficient?')
 	  IF(ROSS_MEAN(1) .NE. 0.0D0)THEN
 	    IF(ELEC)THEN
 	      DO I=1,ND
-	        YV(I)=ROSS_MEAN(I)/(6.65D-15*ED(I))
+	        YV(I)=1.0D-10*ROSS_MEAN(I)/MASS_DENSITY(I)
 	      END DO
-	      YAXIS='Rosseland Mean Opacity/ \gsNe'           ! (cm\u-1\d)'
+	      YAXIS='Rosseland Mean Opacity (cm\u2\d/g)'           ! (cm\u-1\d)'
 	    ELSE
-	      DO I=1,ND
-	        YV(I)=DLOG10(ROSS_MEAN(I))-10
-	      END DO
-	      YAXIS='Rosseland Mean Opacity (cm\u-1\d)'
+	      CALL USR_OPTION(ELEC,'ON_NE','T','Normalize by the electron scattering opacity?')
+	      IF(ELEC)THEN
+	        DO I=1,ND
+	          YV(I)=ROSS_MEAN(I)/(6.65D-15*ED(I))
+	        END DO
+	      YAXIS='Rosseland Mean Opacity/ \gsNe'           ! (cm\u-1\d)'
+	      ELSE
+	        DO I=1,ND
+	          YV(I)=DLOG10(ROSS_MEAN(I))-10
+	        END DO
+	        YAXIS='Rosseland Mean Opacity (cm\u-1\d)'
+	      END IF
 	    END IF
 	    CALL DP_CURVE(ND,XV,YV)
 	  ELSE
 	    WRITE(T_OUT,*)'Rosseland opacity not available.'
-	  END IF!
+	  END IF
+!
 	ELSE IF(XOPT .EQ. 'YLOGR')THEN
 	  DO I=1,ND
 	    YV(I)=DLOG10(R(I)/R(ND))
@@ -2078,6 +2087,16 @@
 	    WRITE(T_OUT,*)'Call GREY option first --- ',
 	1                'has higher spatial resolution.'
 	  END IF
+!
+	ELSE IF(XOPT .EQ. 'ROP')THEN
+	  DO I=1,ND
+	    YV(I)=LOG10(1.0D-10*ROSS_MEAN(I)/MASS_DENSITY(I))
+	    ZV(I)=LOG10(1.0D+06*MASS_DENSITY(I)/T(I)**3)
+	    WRITE(6,*)I,ZV(I),YV(I)
+	  END DO
+	  CALL DP_CURVE(ND,ZV,YV)
+	  XAXIS='\gr/T\u3\d\d6\u'
+	  YAXIS='\gk(ross)'
 !
 	ELSE IF(XOPT .EQ. 'THOP')THEN
 	  DO I=1,ND

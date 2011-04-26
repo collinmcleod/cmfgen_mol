@@ -12,14 +12,36 @@
 	INTEGER ID
 	INTEGER NT,N
 	INTEGER ILOW,IUP
+	INTEGER IOS
+	LOGICAL FILE_OPEN
+	CHARACTER(LEN=80) STRING
 !
-	NT=0
-	CALL GEN_IN(NT,'Number of elements (==NT in MODEL)')
+	OPEN(UNIT=20,FILE='MODEL',STATUS='OLD',IOSTAT=IOS)
+	  IF(IOS .EQ. 0)THEN
+	    DO WHILE(1 .EQ. 1)
+	      READ(20,'(A)',IOSTAT=IOS)STRING
+	      IF(IOS .NE. 0)EXIT
+	      IF(INDEX(STRING,'!Total number of variables') .NE. 0)THEN
+	        READ(STRING,*)NT
+	        WRITE(6,'(A,I4)')' Number of variables in the model is:',NT
+	        EXIT
+	      END IF
+	    END DO
+	  END IF
+	  INQUIRE(UNIT=20,OPENED=FILE_OPEN)
+	IF(FILE_OPEN)CLOSE(UNIT=20)
+!
+	IF(IOS .NE. 0)THEN
+	  NT=0
+	  WRITE(6,*)' Unable to open/read MODEL file to get # of variables'
+	  CALL GEN_IN(NT,'Number of elements (==NT in MODEL)')
+	END IF
 	IF(NT .EQ. 0)THEN
 	  WRITE(6,*)'Invalid number of elements'
 	  WRITE(6,*)'Check NT in file MODEL'
 	  STOP
 	END IF
+!
 	ID=1
 	CALL GEN_IN(ID,'Depth indicator: i.e., X in BA_ASCI_N_DX:')
 !
@@ -41,6 +63,7 @@
 	INTEGER N,NT
 	INTEGER ILOW,IUP
 	INTEGER ID
+	INTEGER IEQ
 !
 	REAL*8 POPS_RD(NT)
 	REAL*8 STEQ_RD(NT)
@@ -233,11 +256,18 @@
 	END DO
 !
 	T1=0.0D0
-	DO J=1,N
-	  WRITE(125,'(I5,3ES30.16)')J,STEQ(J),SAV_CMAT(N,J)/SAV_STEQ(N),SAV_CMAT(N,J)*STEQ(J)/SAV_STEQ(N)
-	 T1=T1+SAV_CMAT(N,J)*STEQ(J)/SAV_STEQ(N)
+	DO IEQ=335,391
+	DO J=335,394     !1,N
+	  IF(SAV_STEQ(IEQ) .NE. 0)THEN
+	     WRITE(125,'(I5,3ES30.16)')J,STEQ(J),SAV_CMAT(IEQ,J),SAV_CMAT(IEQ,J)*STEQ(J)/SAV_STEQ(IEQ)
+!	     WRITE(125,'(I5,3ES30.16)')J,STEQ(J),SAV_CMAT(IEQ,J)/SAV_STEQ(IEQ),SAV_CMAT(IEQ,J)*STEQ(J)/SAV_STEQ(IEQ)
+	     T1=T1+SAV_CMAT(IEQ,J)*STEQ(J)/SAV_STEQ(IEQ)
+	   ELSE
+	     WRITE(125,'(I5,3ES30.16)')J,STEQ(J)
+	  END IF
 	END DO
-	WRITE(6,*)'N Sum is',T1
+	WRITE(125,*)'Sum is for equation',IEQ,'is',T1
+	END DO
 !
 	DO I=1,N
 	  WRITE(15,'(I5,3ES16.8)')I,STEQ(I),SAV_CMAT(1,I),STEQ(I)*SAV_CMAT(1,I)
