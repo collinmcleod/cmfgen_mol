@@ -91,6 +91,8 @@ Several important bug fixes, and  improvements.
          Edit $cmfdist/newsubs/genosc_v8.f and replace
                CHARACTER*(*) FILNAME  by  CHARACTER(LEN=20) FILNAME(N)
 
+(13)  A big with photoionizaton type 30/31 was fixed, but these aren't currently used
+
 John
 
 ****************************************************************************
