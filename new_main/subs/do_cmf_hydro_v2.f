@@ -15,6 +15,8 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 17-Jun-2011 - Added check to make sure dVdR is not negative at the connection point.
+!                         When -ve, we lower GAM_LIM.
 ! Altered 31-Mar-2011 - Added variable NO_ITS_DONE and corresponding KEYWORD to file.
 ! Altered 03-Mar-2011 - Revised check on GAM_EDD to properly account for ionization state of gas.
 !                         Program value of GAM_EDD remains unchanged.
@@ -432,11 +434,22 @@
 	      I=CONNECTION_INDX
 	      ED_ON_NA_EST=OLD_ED(I)/OLD_POP_ATOM(I)
 	      ROSS_ON_ES=OLD_ROSS_MEAN(I)/OLD_ESEC(I)
-	      GAM_FULL=MIN( GAM_LIM,GAM_EDD*ED_ON_NA_EST*(OLD_FLUX_MEAN(I)/OLD_ESEC(I)) )
-	      T1=1.0D-10*(BC*TEFF*(1+ED_ON_NA_EST)+PTURB_ON_NA)/( (10.0**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU )
-	      T2=CONNECTION_VEL*(1.0D0/T1-2.0D0/CONNECTION_RADIUS)
-	      WRITE(LU_ERR,*)'      Scale height is',T1
-	      WRITE(LU_ERR,*)'      Connection dVdR',T2
+	      T2=-1.0D0
+	      DO WHILE(T2 .LT. 0.0D0)
+	        GAM_FULL=MIN( GAM_LIM,GAM_EDD*ED_ON_NA_EST*(OLD_FLUX_MEAN(I)/OLD_ESEC(I)) )
+	        T1=1.0D-10*(BC*TEFF*(1+ED_ON_NA_EST)+PTURB_ON_NA)/( (10.0**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU )
+	        T2=CONNECTION_VEL*(1.0D0/T1-2.0D0/CONNECTION_RADIUS)
+	        WRITE(LU_ERR,*)'      Scale height is',T1
+	        WRITE(LU_ERR,*)'      Connection dVdR',T2
+                IF(T2 .LE. 0.0D0)THEN
+	          WRITE(LU_ERR,*)'    Connection radius',CONNECTION_RADIUS
+                  WRITE(LU_ERR,*)'Resetting GAM_LIM due to -ve velocity gradient'
+                  WRITE(LU_ERR,*)'         GAM_FULL was',GAM_FULL
+                  WRITE(LU_ERR,*)'          GAM_LIM was',GAM_LIM
+	          GAM_LIM=GAM_LIM-0.01
+                  WRITE(LU_ERR,*)'       New GAM_LIM is',GAM_LIM
+	        END IF
+	      END DO
 	      CALL WIND_VEL_LAW_V2(R,V,SIGMA,VINF,BETA,BETA2,RMAX,
 	1          CONNECTION_RADIUS,CONNECTION_VEL,T2,ITWO,J,ND_MAX)
 	      DO I=1,J

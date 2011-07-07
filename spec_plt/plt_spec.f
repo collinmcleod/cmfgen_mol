@@ -658,7 +658,14 @@ C
 	        END IF
 	      END DO
 	      IF(CNT .GE. 4)THEN
-	        T1=T1/CNT; T2=SQRT((T2-T1*T1*CNT)/MAX(CNT-1,1))
+	        T1=T1/CNT
+	        T2=T2-T1*T1*CNT
+	        IF(T2 .GT. 0.0D0)THEN
+	          T2=SQRT(T2/(CNT-1.0D0))
+	        ELSE
+	          T1=YV(K)
+	          T2=1.0D+20
+	        END IF
 	      ELSE
 	        T1=YV(K)
 	        T2=1.0D+20

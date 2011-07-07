@@ -41,6 +41,7 @@ C
 	1                         FILENAME,COLS,IOS)
 	IMPLICIT NONE
 C
+C Altered 07-Jul-2011 : Improved error message when reading bad data.
 C Altered 11-May-2008 : Altered to handle blank lines/comments at end of file.
 C Altered 18-Nov-1999 : Altered to allow for multiple data sets in the same
 C                        file.
@@ -273,7 +274,11 @@ C
 	    IF(INDEX(STRING(1),'********************') .NE. 0)GOTO 2000
 	    IF(INDEX(STRING(1)(1:1),'!').NE. 0)GOTO 10
 	    IF(STRING(1) .EQ. ' ')GOTO 10
-	    READ(STRING(1),*)LAM(I),FLUX(I)
+	    READ(STRING(1),*,IOSTAT=IOS)LAM(I),FLUX(I)
+	    IF(IOS .NE. 0)THEN
+	      WRITE(6,*)'Error reading data. I index=',I
+	      EXIT
+	    END IF
 	    NPTS=I
 	  END DO
 	ELSE

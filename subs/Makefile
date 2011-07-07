@@ -11,7 +11,7 @@ OPTION=$(FH)
 # Entries for library
 #
 OBJ = $(LIB)(add_par_to_full.o)\
-      $(LIB)(adjust_line_freq.o)\
+      $(LIB)(adjust_line_freq_v2.o)\
       $(LIB)(ave_flips.o)\
       $(LIB)(undo_it.o)\
       $(LIB)(ba_replace.o)\

@@ -19,6 +19,7 @@ c
 	1               INCLUDE_LINE_CENTERS)
 	IMPLICIT NONE
 C
+C Altered: 07-Jul-2011: Enhanced error checking and messages.
 C Altered: 25-Apr-2010: Changed check of whether lines outside of continuum range.
 C                         Previously cut all lines for VINF --> C.
 C Altered: 18-Jul-2008: Changed terms of the form 1-a*Vinf/C_kms to 1/(1-a*Vinf/C_kms).
@@ -164,6 +165,16 @@ C
 	  IF(NU_STRT_LINE(I) .LT. NU_STRT_LINE(I+1))THEN
 	    WRITE(LU_ER,*)'Error in INS_LINE:'
 	    WRITE(LU_ER,*)'Start line frequencies not monotonically decreasing'
+	    STOP
+	  END IF
+	END DO
+	DO I=1,N_LINES
+	  IF(NU_STRT_LINE(I) .LE. NU_LINE(I) .AND. TRANS_TYPE(I) .EQ. 'BLANK')THEN
+	    WRITE(LU_ER,*)'Error in INS_LINE:'
+	    WRITE(LU_ER,*)'Inconsistent line and start line frequencies'
+	    WRITE(LU_ER,*)I-1,NU_LINE(I-1),NU_STRT_LINE(I-1)
+	    WRITE(LU_ER,*)I,NU_LINE(I),NU_STRT_LINE(I)
+	    WRITE(LU_ER,*)I+1,NU_LINE(I+1),NU_STRT_LINE(I+1)
 	    STOP
 	  END IF
 	END DO
@@ -441,7 +452,7 @@ C
 	WRITE(LU_ER,'(1X,A,1PE9.2,A)')
 	1          'Minimum frequency spacing is:',T1,'km/s'
 C
-C Test that all lines treated in blanketing mode hane LINE_ST_INDX and
+C Test that all lines treated in blanketing mode have LINE_ST_INDX and
 C LINE_END_INDX defined.
 C
 	DO I=1,LOCAL_N_LINES
@@ -450,10 +461,17 @@ C
 	1        LINE_END_INDX(I) .LE. LINE_ST_INDX(I) .OR.
 	1        LINE_ST_INDX(MAX(I-1,1)) .GT. LINE_ST_INDX(I))THEN
 	      WRITE(LU_ER,*)' Invalid LINE_ST_INDX or LINE_END_INDX in INS_LINE_V5'
-	      WRITE(LU_ER,*)'INDX=',I
+	      WRITE(LU_ER,*)'             INDX=',I
+	      WRITE(LU_ER,*)'    LOCAL_N_LINES=',LOCAL_N_LINES
+	      WRITE(LU_ER,*)'          N_LINES=',N_LINES
+	      WRITE(LU_ER,*)'            NFREQ=',NFREQ
+	      WRITE(LU_ER,*)'        NFREQ_MAX=',NFREQ_MAX
+	      WRITE(LU_ER,*)'      FREQ(ML_ST)=',FREQ(LINE_ST_INDX(I))
+	      WRITE(LU_ER,*)'          NU_LINE=',NU_LINE(I)
+	      WRITE(LU_ER,*)'     NU_STRT_LINE=',NU_STRT_LINE(I)
 	      WRITE(LU_ER,*)'LINE_ST_INDX(I-1)=',LINE_ST_INDX(MAX(I-1,1))
-	      WRITE(LU_ER,*)'LINE_ST_INDX(I)=',LINE_ST_INDX(I)
-	      WRITE(LU_ER,*)'LINE_END_INDX(I)=',LINE_END_INDX(I)
+	      WRITE(LU_ER,*)'  LINE_ST_INDX(I)=',LINE_ST_INDX(I)
+	      WRITE(LU_ER,*)' LINE_END_INDX(I)=',LINE_END_INDX(I)
 	      STOP
 	    END IF
 	  END IF

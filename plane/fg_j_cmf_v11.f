@@ -208,6 +208,8 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered 07-Jul-2011: Changed extrapolation region I to max-value of 10 (rathee than ND/6).
+!                         This was done for shell model. Mayu need further changes.
 ! Altered 21-Apr-2011: Bug fix for HNU_AT_OB when using DIFF option (not generally sed anyway).
 ! Altered 14-Jan-2010: Added JPLUS_IB, JMIN_IB etc to improve computation of
 !                        boundary conditions.
@@ -577,7 +579,8 @@
 	      END DO
 	      IDMAX=MIN(IDMAX,ND/6)
 	    ELSE
-	      IDMAX=ND/6
+!	      IDMAX=ND/6
+	      IDMAX=MIN(10,ND/6)
 	    END IF
 	    WRITE(6,'(A,I4,A)')' Using depth 1 and',IDMAX,' to extrapolate opacities'
 	  END IF

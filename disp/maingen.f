@@ -14,6 +14,7 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered  07-Jul-2011 : Included commands to look at f, and Mdot in "shell" models.
 ! Altered  15-Mar-2011 :  Section for plotting photoionization cross-sections
 !                           removed to subroutine. Can now plot all ground-state
 !                           cross section for a species.
@@ -2048,6 +2049,91 @@
 	    YV(I)=DLOG10(TA(I))
 	  END DO
 	  YAXIS='m(gm cm\u-2\d)'
+	  CALL DP_CURVE(ND,XV,YV)
+!
+! Used to verify that model has a constant mass-loss rate. It can also be used to
+! see Mdot variation in time depndent model.
+!
+	ELSE IF(XOPT .EQ. 'YMDOT')THEN
+	  T1=4.0D+25*PI*365.25D0*24.0D0*3600.0D0/MASS_SUN()
+	  DO I=1,ND
+	    YV(I)=LOG10( T1*MASS_DENSITY(I)*CLUMP_FAC(I)*R(I)*R(I)*V(I) )
+	  END DO
+	  YAXIS='Mass Loss rate(Msun/yr)'
+	  CALL DP_CURVE(ND,XV,YV)
+!
+! Designed to look at Mdot in shell models. Since these models are not smooth, we avearge
+! (sum) data over the smoothing step size.
+!
+	ELSE IF(XOPT .EQ. 'YAVMDOT')THEN
+	  CALL USR_OPTION(T4,'dLOGR','0.1','Smoothing step in log R space')
+	  T1=4.0D+30*PI/MASS_SUN()
+	  DO I=1,ND
+	    ZETA(I)=T1*MASS_DENSITY(I)*CLUMP_FAC(I)*R(I)*R(I)
+	  END DO
+	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  WRITE(6,*)'Done mass determination'
+	  DO I=1,ND
+	    ZETA(I)=1.0D+05/V(I)
+	  END DO
+	  CALL TORSCL(ZV,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  WRITE(6,*)'Done time determination'
+	  DO I=1,ND-1
+	    T1=365.25D0*24.0D0*3600.0D0
+	    J=MIN(I+1,ND)
+	    DO K=I+1,ND
+	      IF( LOG10(R(I)/R(J)) .GT. T4)EXIT
+	      J=K
+	    END DO
+	    YV(I)=LOG10( T1*(TA(J)-TA(I))/(ZV(J)-ZV(I)) )
+	  END DO
+	  T1=4.0D+25*PI*365.25D0*24.0D0*3600.0D0/MASS_SUN()
+	  I=ND
+	  YV(I)=LOG10( T1*MASS_DENSITY(I)*CLUMP_FAC(I)*R(I)*R(I)*V(I) )
+!
+	  YAXIS='Mass Loss rate(Msun/yr)'
+	  CALL DP_CURVE(ND,XV,YV)
+!
+	ELSE IF(XOPT .EQ. 'YF')THEN
+	  YAXIS='Clumping factor'
+	  CALL DP_CURVE(ND,XV,CLUMP_FAC)
+!
+! Designed to look at f, the clumping factor, in shell models. Since these models are not 
+! smooth, we avearge (sum) data over the smoothing step size.
+!
+	ELSE IF(XOPT .EQ. 'YAVF')THEN
+	  CALL USR_OPTION(T4,'dLOGR','0.1','Smoothing step in log R space')
+!
+	  T1=4.0D+30*PI
+	  DO I=1,ND
+	    ZETA(I)=T1*MASS_DENSITY(I)*R(I)*R(I)*CLUMP_FAC(I)
+	  END DO
+	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+!
+	  DO I=1,ND
+	    ZETA(I)=ZETA(I)*MASS_DENSITY(I)
+	  END DO
+	  CALL TORSCL(ZV,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+!
+! Compute dV
+!
+	  T1=4.0D+30*PI
+	  DO I=1,ND
+	    ZETA(I)=T1*R(I)*R(I)
+	  END DO
+	  CALL TORSCL(XM,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+!
+	  DO I=1,ND-1
+	    J=MIN(I+1,ND)
+	    DO K=I+1,ND
+	      IF(LOG10(R(I)/R(J)) .GT. T4)EXIT
+	      J=K
+	    END DO
+	    YV(I)=(TA(J)-TA(I))*(TA(J)-TA(I))/(ZV(J)-ZV(I))/(XM(J)-XM(I))
+	  END DO
+	  YV(ND)=1.0D0
+!
+	  YAXIS='Clumping factor'
 	  CALL DP_CURVE(ND,XV,YV)
 !
 	ELSE IF(XOPT .EQ. 'YMASS')THEN
