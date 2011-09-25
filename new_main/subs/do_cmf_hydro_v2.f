@@ -15,6 +15,7 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 30-Jul-2011 - Added VC_ON_SS as parameter
 ! Altered 17-Jun-2011 - Added check to make sure dVdR is not negative at the connection point.
 !                         When -ve, we lower GAM_LIM.
 ! Altered 31-Mar-2011 - Added variable NO_ITS_DONE and corresponding KEYWORD to file.
@@ -126,6 +127,7 @@
 	REAL*8 OLD_TAU_MAX
 	REAL*8 T1,T2,T3
 	REAL*8 GAM_LIM_STORE
+	REAL*8 VC_ON_SS
 	REAL*8 TAU_REF
 	REAL*8 MAX_ED_ON_NA
 !
@@ -193,6 +195,7 @@
 	RMAX=MOD_RMAX/OLD_R(OLD_ND)
 	VTURB=MOD_VTURB
 !
+	VC_ON_SS=0.75D0
 	TAU_REF=2.0D0/3.0D0
         dLOG_TAU=0.25D0
         V_SCL_FAC=0.75D00
@@ -249,6 +252,7 @@
 	CALL RD_STORE_DBLE(RMAX,'MAX_R',L_FALSE,'Maximum radius in terms of Connection radius')
 	CALL RD_STORE_LOG(RESET_REF_RADIUS,'RES_REF',L_FALSE,'Reset reference radius if using old velocity law')
 	CALL RD_STORE_DBLE(GAM_LIM,'GAM_LIM',L_FALSE,'Limiting Eddington factor')
+	CALL RD_STORE_DBLE(VC_ON_SS,'VC_ON_SS',L_FALSE,'Connection velocity on sound speed')
 	CALL RD_STORE_LOG(UPDATE_GREY_SCL,'UP_GREY_SCL',L_FALSE,'Update GREY_SCL_FAC_IN')
 	CALL RD_STORE_DBLE(TAU_REF,'TAU_REF',L_FALSE,'Reference radius for g and Teff')
 	BETA2=BETA
@@ -362,7 +366,7 @@
 	  DO I=1,MOD_ND
 	    ED_ON_NA_EST=OLD_ED(I)/OLD_POP_ATOM(I)
 	    SOUND_SPEED=SQRT(T1*(1.0D0+ED_ON_NA_EST)*OLD_T(I))
-	    IF(OLD_V(I) .LT. 0.75D0*SOUND_SPEED)THEN
+	    IF(OLD_V(I) .LT. VC_ON_SS*SOUND_SPEED)THEN
 	      CONNECTION_VEL=OLD_V(I)
 	      CONNECTION_RADIUS=OLD_R(I)
 	      CONNECTION_INDX=I

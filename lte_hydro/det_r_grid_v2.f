@@ -144,13 +144,16 @@
 ! interpolation if fine since we are only constructing the grid, not actual values
 ! on the grid.
 !
+! We test agaianst V(I-1) [rather than V(I)] because in some case step size can be 
+!    very big. Changed Jul 31, 2011.
+!
 	    DO WHILE (REV_TAU(I) .GT. LOG_TAU(J))
 	      IF(J .EQ. ND)EXIT
 	      J=J+1
 	    END DO
 	    T1=(REV_TAU(I)-LOG_TAU(J-1))/(LOG_TAU(J)-LOG_TAU(J-1))
 	    REV_V(I)=(1.0D0-T1)*V(J-1)+T1*V(J)
-	    IF(REV_V(I) .GT. 0.1D0 .AND. REV_V(I) .LT. V_SCL_FAC*REV_V(I-1))THEN
+	    IF(REV_V(I-1) .GT. 0.1D0 .AND. REV_V(I) .LT. V_SCL_FAC*REV_V(I-1))THEN
 	      J=JST
 	      DO WHILE (V_SCL_FAC*REV_V(I-1) .LT. V(J))
 	        IF(J .EQ. ND)EXIT

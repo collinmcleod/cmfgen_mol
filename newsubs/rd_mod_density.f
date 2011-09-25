@@ -60,7 +60,7 @@
 	    IF( ABS(T1-R(I))/R(I) .GT. 1.0D-06)THEN
 	      WRITE(LUER,*)'Error in RD_MOD_DENSITY'
 	      WRITE(LUER,*)'R scales don''t agree'
-	      WRITE(LUER,*)R(I),T1
+	      WRITE(LUER,*)I,R(I),T1
 	      STOP
 	    END IF
 	  END DO

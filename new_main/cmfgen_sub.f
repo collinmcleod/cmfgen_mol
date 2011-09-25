@@ -500,6 +500,7 @@
 	  WRITE(LUER,*)'Error opening MODEL_SCR in CMFGEN, IOS=',IOS
 	  STOP
 	END IF
+	CALL SET_LINE_BUFFERING(LUSCR)
 	WRITE(LUSCR,'()')
 !
 ! Read in parameters which can change during a single model run. These

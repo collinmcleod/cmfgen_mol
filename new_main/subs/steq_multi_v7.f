@@ -41,6 +41,7 @@ C
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 22-Jun-2011 : Parallelization statements inserted.
 ! Altered 18-Feb-2010 : Changed order of times in (HNST_S(J,I)*CNM(J,J))*ED(I)/DI_S(I).
 !                         Using HNST*CNM instead of HNST/DI_S*CNM should prevent NANs
 !                           over a larger dynamic range of T
@@ -164,6 +165,7 @@ C
 	1         F_TO_S_MAPPING,TMP_VEC_COOL,T(I),TMP_VEC_ED,IONE)
 !
 ! 
+!$OMP PARALLEL DO PRIVATE(T1,T2,J,L)
 	  DO J=1,N_S			!Which S.E. equation
 	    T1=0.0D0
 	    T2=0.0D0
@@ -173,8 +175,10 @@ C
 	    END DO
 	    SE(ID)%STEQ(J,I)=SE(ID)%STEQ(J,I)+(T1+(HNST_S(J,I)-HN_S(J,I))*CNM(J,J))*ED(I)
 	  END DO
+!$OMP END PARALLEL DO
 !
 	  IF(COMPUTE_BA)THEN
+!$OMP PARALLEL DO PRIVATE(T1,T2,J,K,L)
 	    DO J=1,N_S			!Which S.E. equation
 	      DO K=1,N_S			!Which variable
 	        IF(K.EQ.J)THEN
@@ -201,6 +205,8 @@ C
 	1                              ED(I)*( T2+(HNST_S(J,I)-HN_S(J,I))*DCNM(J,J)+
 	1                              CNM(J,J)*HNST_S(J,I)*dlnHNST_S_dlnT(J,I)/T(I) )
 	    END DO
+!$OMP END PARALLEL DO
+! 
 	  END IF
 C
 C EQION is the ion equation 

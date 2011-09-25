@@ -5,6 +5,8 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered 24-Sep-2011 : No longer multiply  RADIOACTIVE_DECAY_ENERGY by FRAC_ELEC_HEATING.
+!                          This bug fixed much earlier in Luc's and CHendong's modeling.
 ! Created 16-Sep-2010
 !
         INTEGER NT
@@ -61,7 +63,7 @@
 !
         PI=ACOS(-1.0D0)
         SCALE=1.0D+10/4.0D0/PI
-        STEQ_T=STEQ_T+SCALE*RADIOACTIVE_DECAY_ENERGY*FRAC_ELEC_HEATING
+        STEQ_T=STEQ_T+SCALE*RADIOACTIVE_DECAY_ENERGY                                      !*FRAC_ELEC_HEATING
         dE_RAD_DECAY=RADIOACTIVE_DECAY_ENERGY
 	RADIOACTIVE_DECAY_ENERGY_eV=SCALE_FACTOR*RADIOACTIVE_DECAY_ENERGY/ELECTRON_VOLT()
 !

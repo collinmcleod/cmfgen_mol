@@ -8,6 +8,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 15-Sep-2011 : Fixed bug: IS was not being set [ID=SPECIES_END_ID(ISPEC)] for last ionization stage.
 ! Altered 30-May-2010 : Fixed bug with output describing number of levels held fixed.
 ! Created 23-Apr-2001 : Based on FIXPOP
 !                       Designed to use MOD_SMGEN nd to operate on a single depth.

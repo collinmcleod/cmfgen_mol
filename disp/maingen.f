@@ -2052,7 +2052,7 @@
 	  CALL DP_CURVE(ND,XV,YV)
 !
 ! Used to verify that model has a constant mass-loss rate. It can also be used to
-! see Mdot variation in time depndent model.
+! see Mdot variation in time dependent model.
 !
 	ELSE IF(XOPT .EQ. 'YMDOT')THEN
 	  T1=4.0D+25*PI*365.25D0*24.0D0*3600.0D0/MASS_SUN()

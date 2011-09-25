@@ -1,6 +1,6 @@
 	SUBROUTINE READ_ARNAUD_ION_DATA(ND)
-	USE MOD_NON_THERM
 	USE MOD_CMFGEN
+	USE MOD_NON_THERM
 	IMPLICIT NONE
 	INTEGER ND
 !
@@ -102,9 +102,9 @@
 	               END IF
 	             END DO
 	             IF(THD(IT)%N_STATES .EQ. 0)THEN
-	               WRITE(6,*)'Error in READ_ARNAUD_ION_DATA'
-	               WRITE(6,*)'Lower level not found'
-	               WRITE(6,*)TRIM(STRING)
+	               WRITE(LU_ER,*)'Error in READ_ARNAUD_ION_DATA'
+	               WRITE(LU_ER,*)'Lower level not found'
+	               WRITE(LU_ER,*)TRIM(STRING)
 	               STOP
 	             END IF
 !
