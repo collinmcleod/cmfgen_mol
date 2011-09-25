@@ -21,7 +21,7 @@
 	INTEGER, ALLOCATABLE :: TYPE_1(:)
 	INTEGER, ALLOCATABLE ::  NUM_VALS_1(:)
 	INTEGER, ALLOCATABLE ::  LOC_1(:)
-	CHARACTER(LEN=30), ALLOCATABLE :: NAME_1(:)
+	CHARACTER(LEN=40), ALLOCATABLE :: NAME_1(:)
 	REAL*8, ALLOCATABLE :: NU_1(:)
 	REAL*8, ALLOCATABLE :: CROSS_1(:)
 	REAL*8, ALLOCATABLE :: ENERGY_1(:)
@@ -36,7 +36,7 @@
 	INTEGER, ALLOCATABLE :: TYPE_2(:)
 	INTEGER, ALLOCATABLE ::  NUM_VALS_2(:)
 	INTEGER, ALLOCATABLE ::  LOC_2(:)
-	CHARACTER(LEN=30), ALLOCATABLE :: NAME_2(:)
+	CHARACTER(LEN=40), ALLOCATABLE :: NAME_2(:)
 	REAL*8, ALLOCATABLE :: NU_2(:)
 	REAL*8, ALLOCATABLE :: CROSS_2(:)
 	REAL*8 ZION_2
@@ -51,8 +51,8 @@
 	REAL*8 IONIZATION_ENERGY
 	CHARACTER(LEN=30), ALLOCATABLE :: E_NAME(:)
 !
-	CHARACTER*30 LEVEL_NAME1
-	CHARACTER*30 LEVEL_NAME2
+	CHARACTER*40 LEVEL_NAME1
+	CHARACTER*40 LEVEL_NAME2
 !
 	REAL*8 T1
 	REAL*8 FREQ_SCL_FAC
@@ -84,6 +84,7 @@
 	LOGICAL DO_ALL_RECOM
 	LOGICAL DO_SEQ_PLTS
 	LOGICAL OSCILLATOR_FILE_AVAIL
+	LOGICAL SPLIT_J
 	EXTERNAL SPEED_OF_LIGHT
 !
 	CHARACTER(LEN=30) UC; EXTERNAL UC
@@ -108,6 +109,7 @@
         EMLIN=5.27296D-03
 	ANG_TO_HZ=1.0D-07*SPEED_OF_LIGHT()
 	AMASS=40.0D0
+	SPLIT_J=.FALSE.
 !
 ! Read in bound-free gaunt factors for individual n states of hydrogen,
 ! and hydrogenic cross-sections for individual l states (n =0 to 30,
@@ -142,6 +144,8 @@
 	      READ(STRING,*)ZION_1
 	    ELSE IF( INDEX(STRING,'Statistical weight of ion') .NE. 0)THEN
 	      READ(STRING,*)GION_1
+	    ELSE IF( INDEX(STRING,'!Split J levels') .NE. 0)THEN
+	      READ(STRING,*)SPLIT_J
 	    ELSE IF( INDEX(STRING,'!Excitation energy of final state') .NE. 0)THEN
 	      READ(STRING,*)EXC_EN_1
 	    ELSE IF( INDEX(STRING,'!Number of energy levels') .NE. 0)THEN
@@ -177,6 +181,7 @@
 	      WRITE(6,*)'Invalid number of data points for cross-section 9'
 	      STOP
 	    END IF
+	    IF(TYPE_1(J) .EQ. 23)TYPE_1(J)=20
 	    IF(TYPE_1(J) .EQ. 20 .OR. TYPE_1(J) .EQ. 21)THEN
 	      READ(10,*)(NU_1(I),CROSS_1(I), I=NXT_LOC,NXT_LOC+NUM_VALS_1(J)-1)
 	    ELSE
@@ -194,6 +199,7 @@
 	ELSE
 	  FILENAME=' '
 	END IF
+	WRITE(6,*)'SPLIT_J=',SPLIT_J
 !
 ! Read in energy levels from oscilator file, if it is available.
 ! May need to change if oscilator file format changes.
@@ -241,7 +247,7 @@
 	    K=INDEX(STRING,'  ')
 	    E_NAME(I)=STRING(1:K-1)
 	    READ(STRING(K:),*)G(I),ENERGY(I)
-	    IF(E_NAME(I)(K-1:K-1) .EQ.  ']')THEN
+	    IF(E_NAME(I)(K-1:K-1) .EQ.  ']' .AND. .NOT. SPLIT_J)THEN
 	      K=INDEX(E_NAME(I),'[')
 	      E_NAME(I)(K:)=' '
 	    END IF
@@ -343,11 +349,11 @@
 	CALL GEN_IN(CREATE_SUMMARY,'Create a summary of photo-ionization cross sections (1st file only)?')
 	IF(CREATE_SUMMARY)THEN
 	  OPEN(UNIT=11,FILE='Phot_summary',STATUS='UNKNOWN',ACTION='WRITE')
-	    WRITE(11,'(A,T20,A,6X,A,3(10X,A))')'Level','Type',' Np','X1','X2','X2'
+	    WRITE(11,'(A,T40,A,6X,A,3(10X,A))')'Level','Type',' Np','X1','X2','X2'
 	    DO K=1,40
 	      DO J=1,NLEV_1
 	        IF(TYPE_1(J) .EQ. K)THEN
-	          WRITE(11,'(A,T20,I4,2X,I6,5ES13.4)')TRIM(NAME_1(J)),TYPE_1(J),NUM_VALS_1(J),
+	          WRITE(11,'(A,T40,I4,2X,I6,5ES13.4)')TRIM(NAME_1(J)),TYPE_1(J),NUM_VALS_1(J),
 	1            CROSS_1(LOC_1(J):LOC_1(J)+MIN(4,NUM_VALS_1(J)-1))
 	        END IF
 	      END DO

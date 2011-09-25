@@ -85,7 +85,7 @@
 	REAL*8 T1,T2,T3,SPEED_LIGHT
 	INTEGER I,J,K,NW,L1,L2,IOS,LEV_ID
 	INTEGER MAXLEN,LUER,CUT_CNT
-	CHARACTER*132 STRING
+	CHARACTER(LEN=200) STRING
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 !
@@ -170,6 +170,9 @@
 	  END DO
 	  STRING=ADJUSTL(STRING)
 	  OSCDATE(1:11)=STRING(1:11)
+	  IF(TRIM(FORMAT_DATE) .EQ. 'OLD')THEN
+	    WRITE(LUER,*)'Possible error -- FORMAT Date not found in oscilator file'
+	  END IF
 !
 	  READ(LUIN,'(A)')STRING
 	  J=ICHRLEN(STRING)
@@ -300,9 +303,9 @@
 !
 	  DO I=2,N
 	   IF(FEDGE(I) .GT. FEDGE(I-1))THEN
+	      WRITE(LUER,*)' '
 	      WRITE(LUER,*)'Warning/error reading in Level Names from '//FILNAME
-	      WRITE(LUER,*)'Energy levels are out of order'
-	      WRITE(LUER,*)'Levels are:',I-1,I
+	      WRITE(LUER,*)'Energy levels are out of order: levels are:',I-1,I
 	    END IF
 	  END DO
 !

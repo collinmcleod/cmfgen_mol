@@ -316,9 +316,7 @@ Modeling the extended atmospheres of WN stars
 {\color{red} Acknowledgements}
 
 \blankhalf
-The author gratefully acknowledges support for CMFGEN from 
-
-I would also like to thank Paco Najarro and Doug Miller for their direct contributions to CMFGEN, and Jean-Claude Bouret, Paul Crowther, Luc Dessart, Ivan Hubeny, Thierry Lanz, Fabrice  Martins, Stan Owocki and many others for discussions on  radiative transfer, massive stars and their winds, and supernovae.
+The author gratefully acknowledges support for CMFGEN from acknowledges support from STScI theory grant HST-AR-11756.01.A and NASA theory grant NNX10AC80G. I would also like to thank Paco Najarro and Doug Miller for their direct contributions to CMFGEN, and Jean-Claude Bouret, Paul Crowther, Luc Dessart, Leo Gerogiev, Ivan Hubeny, Thierry Lanz, Kathryn Neugent, Fabrice  Martins, Phil Massy, Stan Owocki and many others for discussions on  radiative transfer, massive stars and their winds, and supernovae.
 
 The author also would like to acknowledge the numerous workers who have made atomic data calculations, and
 who have made that data publicly available. I would especially like to thank Keith Butler, Robert~Kurucz, Sultana Nahar, Anil Pradhan, 
@@ -927,12 +925,13 @@ Routines with known system dependencies are placed in \$cmfdist/unix, and may ne
 of ASCII files with pgf. No buffering is the default with Intel systems.
 
 \item
-[CHANGE]?
-The Intel Compiler 70 IFC F90 generally works much better than the earlier versions. As yet, I have not tested the latest modified release (version 8) on Pentium systems. The Makefiles, as supplied with the distribution, work with Redhat Linux 7.3. The appropriate compilation flags for the IFC compiler are given in Makefile\_definitions. For the compilation two additional steps need to be done.
+The Intel Compiler can have issues, and these change from release to release. I used \\
 
-a.  Copy \$cmfdist/unix/tune\_intel.f \$cmfdist/unix/tune.f \\
-b. Copy \$cmfdist/new\_main/mod\_subs/mod\_cmfgen\_intel.f  \\
-      \hbox{}  \hspace{1in}             \$cmfdist/new\_main/mod\_subs/mod\_cmfgen.f  (see 2 above)
+\indent
+\verb+ FG = -cm -extend_source -w95 -w90 -nbs -O3 -axTW -I$(MOD_DIR)+
+
+when compiling. In the latest release (at least on a Mac Pro) you may need to change the Makefiles to force some modules to be linked. The latest INTEL compiler would not link pure modules that were in Libraries. It did not run successfully with OMP.
+
 \end{enumerate}
 
 \vskip 20pt

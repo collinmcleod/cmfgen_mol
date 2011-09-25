@@ -147,6 +147,7 @@
 	      SUM=SUM+(2*L+1)*(10.0D0**T2)
 	      J=RJ+1 		!Restore as corrupted	
 	    END DO
+	    WRITE(6,*)'NEF,N,ZION',NEF,N,ZION
 	    SUM=SUM*( NEF/(N*ZION) )**2
 	    PHOT(ML)=SUM/( (LEND-LST+1)*(LEND+LST+1) )
 	  END DO
