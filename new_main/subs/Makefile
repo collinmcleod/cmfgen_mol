@@ -29,6 +29,8 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(do_ng_accel_band_v2.o)\
       $(LIB)(eval_adiabatic_v3.o)\
       $(LIB)(evalse_qwvj_v6.o)\
+      $(LIB)(evalse_qwvj_v7.o)\
+      $(LIB)(evalse_lowt_v1.o)\
       $(LIB)(evalse_x_qwvj_v4.o)\
       $(LIB)(eval_temp_ddt_v2.o)\
       $(LIB)(fiddle_pop_corrections.o)\
@@ -54,6 +56,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(solveba_v7.o)\
       $(LIB)(solveba_v9.o)\
       $(LIB)(steq_multi_v7.o)\
+      $(LIB)(steq_multi_v8.o)\
       $(LIB)(steqne_v4.o)\
       $(LIB)(steq_advec_v4.o)\
       $(LIB)(steq_co_mov_deriv_v2.o)\
@@ -62,10 +65,13 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(sum_steq_sol.o)\
       $(LIB)(tst_rd_seq.o)\
       $(LIB)(var_op_v8.o)\
+      $(LIB)(var_op_v10.o)\
       $(LIB)(var_x_opa_eta_v3.o)\
       $(LIB)(var_x_opa_eta_v4.o)\
       $(LIB)(vsebyj_multi_v6.o)\
+      $(LIB)(vsebyj_multi_v7.o)\
       $(LIB)(vsebyj_x_v6.o)\
+      $(LIB)(write_cmat.o)\
       $(LIB)(write_seq_time_file_v1.o)\
       $(LIB)(update_ba_for_line.o)\
       $(LIB)(wr_asci_steq.o)

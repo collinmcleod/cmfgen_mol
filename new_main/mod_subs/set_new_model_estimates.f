@@ -33,6 +33,10 @@
 	USE LINE_MOD
 	IMPLICIT NONE
 !
+! Altered 05-Apr-2011 : Many changes done in order to facilitate the USE of LTE populations
+!                         over a wider dynamic range (18-Dec-2010).
+!                         Single routine (REGRID_LOG_DC_V1) now used to read all departure coefficient files.
+!                         CNVT_FR_DC_V2 and PAR_FUN_V4 now called.
 ! Altered 15-Jan-2009 : Changed REGRID_T_ED to V2
 !                          'R' option in with non 'GRID' option no longer effects T & ED.
 ! Created 17-Dec-2004
@@ -142,9 +146,9 @@
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      TMP_STRING=TRIM(ION_ID(ID))//'_IN'
 	      ISPEC=SPECIES_LNK(ID)
-	      CALL REGRIDWSC_V3( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,
+	      CALL REGRID_LOG_DC_V1( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,CLUMP_FAC,
 	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
-	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,TMP_STRING)
+	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,'R',TMP_STRING)
 	    END IF
 	  END DO
 !
@@ -247,8 +251,10 @@
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
-	        CALL REGRID_B_ON_SPH_TAU(ATM(ID)%XzV_F,ATM(ID)%DXzV_F,ED,CLUMP_FAC,
-	1            R,ATM(ID)%NXzV_F,ND,LUIN,TMP_STRING)
+	        ISPEC=SPECIES_LNK(ID)
+	        CALL REGRID_LOG_DC_V1( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,CLUMP_FAC,
+	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
+	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,'SPH_TAU',TMP_STRING)
 	      END IF
 	    END DO
 	  ELSE IF(DC_INTERP_METHOD .EQ. 'ED')THEN
@@ -257,9 +263,10 @@
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
-	        CALL REGRID_B_ON_NE(ATM(ID)%XzV_F,TC,ATM(ID)%DXzV_F,TA,
-	1            ATM(ID)%NXzV_F, IONE,
-	1            ATM(ID)%NXzV_F,ND,LUIN,TMP_STRING)
+	        ISPEC=SPECIES_LNK(ID)
+	        CALL REGRID_LOG_DC_V1( ATM(ID)%XzV_F,R,TC,T, ATM(ID)%DXzV_F,CLUMP_FAC,
+	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
+	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,'ED',TMP_STRING)
 	      END IF
 	    END DO
 	  ELSE IF(DC_INTERP_METHOD .EQ. 'R')THEN
@@ -271,9 +278,9 @@
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
 	        ISPEC=SPECIES_LNK(ID)
-	        CALL REGRIDWSC_V3( ATM(ID)%XzV_F,R,TA,TB, ATM(ID)%DXzV_F,
+	        CALL REGRID_LOG_DC_V1( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,CLUMP_FAC,
 	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
-	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,TMP_STRING)
+	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,'R',TMP_STRING)
 	      END IF
 	    END DO
 	  ELSE IF(DC_INTERP_METHOD .EQ. 'RTX')THEN
@@ -285,9 +292,9 @@
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
 	        ISPEC=SPECIES_LNK(ID)
-	        CALL REGRID_TX_R( ATM(ID)%XzV_F,ATM(ID)%DXzV_F,
+	        CALL REGRID_LOG_DC_V1( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,CLUMP_FAC,
 	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
-	1             POP_SPECIES(1,ISPEC),T,R,ATM(ID)%NXzV_F,ND,TMP_STRING)
+	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,'RTX',TMP_STRING)
 	      END IF
 	    END DO
 	  END IF
@@ -324,11 +331,11 @@
 	  FIRST=.TRUE.
 	  DO ID=SPECIES_END_ID(ISPEC),SPECIES_BEG_ID(ISPEC),-1
 	    IF(ATM(ID)%XzV_PRES)THEN
-	      CALL LTEPOP_WLD_V1(ATM(ID)%XzVLTE_F, ATM(ID)%W_XzV_F,
+	      CALL LTEPOP_WLD_V2(ATM(ID)%XzVLTE_F, ATM(ID)%LOG_XzVLTE_F, ATM(ID)%W_XzV_F,
 	1              ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,
 	1              ATM(ID)%ZXzV,      ATM(ID)%GIONXzV_F,
 	1              ATM(ID)%NXzV_F,    ATM(ID)%DXzV_F,     ED,T,ND)
-	      CALL CNVT_FR_DC(ATM(ID)%XzV_F, ATM(ID)%XzVLTE_F,
+	      CALL CNVT_FR_DC_V2(ATM(ID)%XzV_F, ATM(ID)%LOG_XzVLTE_F,
 	1              ATM(ID)%DXzV_F,    ATM(ID)%NXzV_F,
 	1              TB,                TA,ND,
 	1              FIRST,             ATM(ID+1)%XzV_PRES)
@@ -607,7 +614,7 @@
 ! highest ionization stage. Must be done in forward direction.
 !
 ! NB: After calling PAR_FUN_V2, ATM(ID)%XzV_F will contain DCs -
-!       NOT populatons.
+!       NOT populations.
 !
 ! TMP_STRING is used to indicate whether we interpolate in depature
 ! coefficients (DC) or excitation temperatures (TX).
@@ -617,9 +624,9 @@
 	    DO ID=1,NUM_IONS
 	      J=ID-1			!1 is added in PAR_FUN_V2
 	      ISPEC=SPECIES_LNK(ID)
-	      CALL PAR_FUN_V3(U_PAR_FN, PHI_PAR_FN, Z_PAR_FN,
+	      CALL PAR_FUN_V4(U_PAR_FN, PHI_PAR_FN, Z_PAR_FN,
 	1          GAM_SPECIES(1,ISPEC),
-	1          ATM(ID)%XzV_F,     ATM(ID)%XzVLTE_F,  ATM(ID)%W_XzV_F,
+	1          ATM(ID)%XzV_F,     ATM(ID)%LOG_XzVLTE_F,  ATM(ID)%W_XzV_F,
 	1          ATM(ID)%DXzV_F,    ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,
 	1          ATM(ID)%GIONXzV_F, ATM(ID)%ZXzV,T, TC, ED,
 	1          ATM(ID)%NXzV_F, ND,J,NUM_IONS, 
@@ -687,11 +694,11 @@
 	      FIRST=.TRUE.   
 	      DO ID=SPECIES_END_ID(ISPEC),SPECIES_BEG_ID(ISPEC),-1
 	        IF(ATM(ID)%XzV_PRES)THEN
-	          CALL LTEPOP_WLD_V1(ATM(ID)%XzVLTE_F, ATM(ID)%W_XzV_F,
+	          CALL LTEPOP_WLD_V2(ATM(ID)%XzVLTE_F, ATM(ID)%LOG_XzVLTE_F,  ATM(ID)%W_XzV_F,
 	1               ATM(ID)%EDGEXzV_F,  ATM(ID)%GXzV_F,  ATM(ID)%ZXzV,
 	1               ATM(ID)%GIONXzV_F,  ATM(ID)%NXzV_F,  ATM(ID)%DXzV_F,
 	1               ED,T,ND)
-	          CALL CNVT_FR_DC(ATM(ID)%XzV_F, ATM(ID)%XzVLTE_F,
+	          CALL CNVT_FR_DC_V2(ATM(ID)%XzV_F, ATM(ID)%LOG_XzVLTE_F,
 	1               ATM(ID)%DXzV_F,   ATM(ID)%NXzV_F,
 	1               TB,               TA,ND,FIRST,      ATM(ID+1)%XzV_PRES)
 	          IF(ID .NE. SPECIES_BEG_ID(ISPEC))ATM(ID-1)%DXzV_F(1:ND)=TB(1:ND)

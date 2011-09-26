@@ -6,6 +6,8 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 19-Sep-2011 : Bug fix in DDT_WORK_CHK output: ER (cur and old) were a
+!                          factor of 4 too large.
 ! Altered 13-Nov-2009 : Changed INT_EN interpolaton section. No longer use 
 !                          OLD values when outside range, and we limit changes,
 !                          when extrapolating, to a factor of 2.
@@ -87,7 +89,7 @@
 	WRITE(LU,'(A)')' '
 	WRITE(LU,'(A)')'Beginning new DDT_WORK cycle'
 	WRITE(LU,'(A)')' '
-	WRITE(LU,'(A)')'Verbose Output= ',VERBOSE_OUTPUT
+	WRITE(LU,'(A,L1)')'Verbose Output= ',VERBOSE_OUTPUT
 !
 	IF(T_FROM_J(1) .EQ. 0.0D0)THEN
 	  TCUR(1:ND)=T(1:ND)
@@ -313,6 +315,8 @@
 	END DO
 	OLD_T_RET(1:ND)=OLD_T(1:ND)
 !
+! NB: E(rad field)=4. pi J /c = 4 sigma T^4 /c (as  J=B= sigma T^4 / pi)
+!
 	WRITE(LU,'(A)')' '
 	WRITE(LU,'(A,F9.6))')'OLD_R/R=',OLD_R(ND)/R(ND)
 	WRITE(LU,'(A)')'Term comparisons'
@@ -320,7 +324,7 @@
 	WRITE(LU,'(A,14(4X,A))')'   I','  Cur. T','   Old T',' ER(cur)',' ER(old)',
 	1                   ' Ek(cur)',' Ek(old)',' IE(cur)',' IE(old)',
 	1                   'Rek(cur)','Rek(old)','RIE(cur)','RIE(old)','   Pterm','    Work'
-	T1=16.0D0*1.0D+16*5.67D-05/2.998D+10
+	T1=4.0D0*1.0D+16*5.67D-05/2.998D+10
 	DO I=1,ND
 	    T2=1.0D+04*BOLTZMANN_CONSTANT()*POP_ATOM(I)
 	    WRITE(LU,'(I4,14ES12.4)')I,TCUR(I),OLD_T(I),

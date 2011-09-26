@@ -1310,12 +1310,12 @@
 !
 	DO ID=1,NUM_IONS-1
 	  ID_SAV=ID
-	  CALL SET_TWO_PHOT_V2(ION_ID(ID), ID_SAV,
-	1       ATM(ID)%XzVLTE,     ATM(ID)%NXzV,
-	1       ATM(ID)%XzVLTE_F,   ATM(ID)%XzVLEVNAME_F,
-	1       ATM(ID)%EDGEXzV_F,  ATM(ID)%GXzV_F,
-	1       ATM(ID)%F_TO_S_XzV, ATM(ID)%NXzV_F, ND,
-	1       ATM(ID)%ZXzV,       ATM(ID)%EQXzV,  ATM(ID)%XzV_PRES)
+	  CALL SET_TWO_PHOT_V3(ION_ID(ID), ID_SAV,
+	1       ATM(ID)%XzVLTE,          ATM(ID)%NXzV,
+	1       ATM(ID)%XzVLTE_F_ON_S,   ATM(ID)%XzVLEVNAME_F,
+	1       ATM(ID)%EDGEXzV_F,       ATM(ID)%GXzV_F,
+	1       ATM(ID)%F_TO_S_XzV,      ATM(ID)%NXzV_F,  ND,
+	1       ATM(ID)%ZXzV,            ATM(ID)%EQXzV,   ATM(ID)%XzV_PRES)
 	END DO
 !
 ! 
@@ -1526,12 +1526,12 @@
             LOC_ID=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      TMP_STRING=TRIM(ION_ID(ID))//'_COL_DATA'
-              CALL STEQ_MULTI_V7(CNM,DCNM,ED,T,
-	1         ATM(ID)%XzV,       ATM(ID)%XzVLTE,   ATM(ID)%dlnXzVLTE_dlnT,
-	1         ATM(ID)%NXzV,      ATM(ID)%DXzV,     ATM(ID)%XzV_F, 
-	1         ATM(ID)%XzVLTE_F,  ATM(ID)%W_XzV_F,  ATM(ID)%AXzV_F,
-	1         ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,   ATM(ID)%XzVLEVNAME_F,
-	1         ATM(ID)%NXzV_F,    ATM(ID)%F_TO_S_XzV,
+              CALL STEQ_MULTI_V8(CNM,DCNM,ED,T,
+	1         ATM(ID)%XzV,            ATM(ID)%XzVLTE,         ATM(ID)%dlnXzVLTE_dlnT,
+	1         ATM(ID)%NXzV,           ATM(ID)%DXzV,           ATM(ID)%XzV_F, 
+	1         ATM(ID)%XzVLTE_F_ON_S,  ATM(ID)%W_XzV_F,        ATM(ID)%AXzV_F,
+	1         ATM(ID)%EDGEXzV_F,      ATM(ID)%GXzV_F,         ATM(ID)%XzVLEVNAME_F,
+	1         ATM(ID)%NXzV_F,         ATM(ID)%F_TO_S_XzV,
 	1         POP_SPECIES(1,SPECIES_LNK(ID)), ATM(ID+1)%XzV_PRES, ATM(ID)%ZXzV,
 	1         LOC_ID,TMP_STRING,OMEGA_GEN_V3,
 	1         ATM(ID)%EQXzV,NUM_BNDS,ND,NION,COMPUTE_BA,DST,DEND)
@@ -1557,7 +1557,7 @@
 	END DO		!K=1,ND  - DST,DEND
 !
 	IF(TREAT_NON_THERMAL_ELECTRONS)THEN
-	  WRITE(6,*)'Beginning calculation non therm electron spectrum: ED next'
+	  WRITE(6,*)'Beginning calculation of non-thermal electron spectrum: ED next'
 	  CALL TUNE(1,'NON_THERM')
 	    CALL ELECTRON_NON_THERM_SPEC(ND)
 	  CALL TUNE(2,'NON_THERM')
@@ -1575,10 +1575,10 @@
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      TMP_STRING=TRIM(ION_ID(ID))//'_COL_DATA'
-	      CALL COLCOOL_SL_V4(
+	      CALL COLCOOL_SL_V5(
 	1        ATM(ID)%CPRXzV, ATM(ID)%CRRXzV,  ATM(ID)%COOLXzV,CNM,DCNM,
 	1        ATM(ID)%XzV,    ATM(ID)%XzVLTE,  ATM(ID)%dlnXzVLTE_dlnT, 
-	1        ATM(ID)%NXzV,   ATM(ID)%XzV_F,   ATM(ID)%XzVLTE_F, 
+	1        ATM(ID)%NXzV,   ATM(ID)%XzV_F,   ATM(ID)%XzVLTE_F_ON_S,
 	1        ATM(ID)%AXzV_F, ATM(ID)%W_XzV_F, ATM(ID)%EDGEXzV_F,
 	1        ATM(ID)%GXzV_F, ATM(ID)%XzVLEVNAME_F,
 	1        ATM(ID)%F_TO_S_XzV, ATM(ID)%NXzV_F, ATM(ID)%ZXzV,
@@ -1978,11 +1978,11 @@
 	    IF(ATM(ID)%XzV_PRES .AND. COMPUTE_NEW_CROSS)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
 	       PHOT_ID=J
-	       CALL QUAD_MULTI_V7(ATM(ID)%WSXzV(1,1,J), ATM(ID)%dWSXzVdT(1,1,J),
+	       CALL QUAD_MULTI_V8(ATM(ID)%WSXzV(1,1,J), ATM(ID)%dWSXzVdT(1,1,J),
 	1             ATM(ID)%WCRXzV(1,1,J),
 	1             ATM(ID)%XzVLTE, ATM(ID)%dlnXzVLTE_dlnT, ATM(ID)%NXzV,
-	1             ATM(ID)%XzVLTE_F, ATM(ID)%EDGEXzV_F, ATM(ID)%NXzV_F,
-	1             ATM(ID)%F_TO_S_XzV,CONT_FREQ,T,ND,
+	1             ATM(ID)%XzVLTE_F_ON_S, ATM(ID)%EDGEXzV_F, ATM(ID)%NXzV_F,
+	1             ATM(ID)%F_TO_S_XzV, CONT_FREQ,T,ND,
 	1             ION_ID(ID), ATM(ID)%ZXzV, PHOT_ID, ID)
 	      END DO
 	    END IF  
@@ -1997,12 +1997,12 @@
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES .AND. ATM(ID+1)%XzV_PRES)THEN
 	      T1=AT_NO(SPECIES_LNK(ID))+1-ATM(ID)%ZXzV		!Number of electrons
-	      CALL QUAD_X_GEN_V4(AT_NO(SPECIES_LNK(ID)),T1,
-	1           ATM(ID)%WSE_X_XzV,   ATM(ID)%WCR_X_XzV, CONT_FREQ,
-	1           ATM(ID)%XzVLTE,      ATM(ID)%NXzV,
-	1           ATM(ID)%XzVLTE_F,    ATM(ID)%EDGEXzV_F,
-	1           ATM(ID)%F_TO_S_XzV,  ATM(ID)%NXzV_F,
-	1           ATM(ID+1)%EDGEXzV_F, ATM(ID+1)%NXzV_F, ND)
+	      CALL QUAD_X_GEN_V5(AT_NO(SPECIES_LNK(ID)),T1,
+	1           ATM(ID)%WSE_X_XzV,      ATM(ID)%WCR_X_XzV, CONT_FREQ,
+	1           ATM(ID)%XzVLTE,         ATM(ID)%NXzV,
+	1           ATM(ID)%XzVLTE_F_ON_S,  ATM(ID)%EDGEXzV_F,
+	1           ATM(ID)%F_TO_S_XzV,     ATM(ID)%NXzV_F,
+	1           ATM(ID+1)%EDGEXzV_F,    ATM(ID+1)%NXzV_F, ND)
 	    END IF
 	  END DO
 !$OMP END PARALLEL DO
@@ -2196,10 +2196,10 @@
 	    ID_SAV=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
-	        CALL EVALSE_QWVJ_V6(ID_SAV,
+	        CALL EVALSE_QWVJ_V7(ID_SAV,
 	1         ATM(ID)%WSXzV(1,1,J), ATM(ID)%XzV, ATM(ID)%XzVLTE,
 	1         ATM(ID)%NXzV, ATM(ID)%XzV_ION_LEV_ID(J),
-	1         ATM(ID+1)%XzV, ATM(ID+1)%XzVLTE, ATM(ID+1)%NXzV, 
+	1         ATM(ID+1)%XzV, ATM(ID+1)%LOG_XzVLTE, ATM(ID+1)%NXzV, 
 	1         JREC,JPHOT,NT,ND)
 	      END DO
 	    END IF
@@ -2207,6 +2207,8 @@
 !$OMP END PARALLEL DO
 	  CALL TUNE(ITWO,'EVALSE')
 	END IF
+!
+	CALL EVALSE_LOWT_V1(RJ,NU(ML),FQW(ML),COMPUTE_BA,NT,ND)
 !
 ! 
 ! Note that ATM(ID+2)%EQXzV is the ion equation. Since Auger ionization,
@@ -2236,13 +2238,13 @@
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
-	        CALL PRRR_SL_V5(
+	        CALL PRRR_SL_V6(
 	1          ATM(ID)%APRXzV,        ATM(ID)%ARRXzV, 
 	1          ATM(ID)%BFCRXzV,      ATM(ID)%FFXzV,
 	1          ATM(ID)%WSXzV(1,1,J), ATM(ID)%WCRXzV(1,1,J),
 	1          ATM(ID)%XzV,          ATM(ID)%XzVLTE, 
 	1          ATM(ID)%NXzV,         ATM(ID)%ZXzV,
-	1          ATM(ID+1)%XzV,        ATM(ID+1)%XzVLTE, 
+	1          ATM(ID+1)%XzV,        ATM(ID+1)%LOG_XzVLTE, 
 	1          ATM(ID+1)%NXzV, J,    ATM(ID)%XzV_ION_LEV_ID(J),
 	1          ED,T,JREC,JPHOT,JREC_CR,JPHOT_CR,BPHOT_CR,
 	1          FL,CONT_FREQ,ZERO_REC_COOL_ARRAYS,ND)
@@ -2250,11 +2252,11 @@
 	    END IF
 !
 	    IF(ATM(ID)%XzV_PRES .AND. ATM(ID+1)%XzV_PRES .AND. XRAYS)THEN
-	      CALL X_RRR_COOL_V5(X_RECOM(1,ATM(ID)%INDX_XzV),
+	      CALL X_RRR_COOL_V6(X_RECOM(1,ATM(ID)%INDX_XzV),
 	1            X_COOL(1,ATM(ID)%INDX_XzV), ATM(ID)%WSE_X_XzV,
 	1            ATM(ID)%WCR_X_XzV,
-	1            ATM(ID)%XzV,        ATM(ID)%XzVLTE,     ATM(ID)%NXzV,
-	1            ATM(ID+1)%XzV_F,    ATM(ID+1)%XzVLTE_F, ATM(ID+1)%NXzV_F,
+	1            ATM(ID)%XzV,        ATM(ID)%LOG_XzVLTE,     ATM(ID)%NXzV,
+	1            ATM(ID+1)%XzV_F,    ATM(ID+1)%LOG_XzVLTE_F, ATM(ID+1)%NXzV_F,
 	1            JREC,JPHOT,JREC_CR,JPHOT_CR,
 	1            ZERO_REC_COOL_ARRAYS,ND,L_TRUE)
 	    END IF
@@ -2263,6 +2265,10 @@
 !
 	CALL TUNE(ITWO,'PRRRCOOL')
 	END IF 			!Only evaluate if last iteration.
+!
+	IF(LST_ITERATION)THEN
+	  CALL PRRR_LOWT_V1(RJ,NU(ML),FQW(ML),ND)
+	END IF
 !
 ! 
 !
@@ -3586,7 +3592,7 @@
 ! If we have changed the R grid, we need to recomput the angular quadrature weitghts,
 ! and put the atom density ect on the new radius grid.
 !
-	IF(REVISE_R_GRID)THEN
+	IF(REVISE_R_GRID .AND. R_GRID_REVISED)THEN
 	  CALL SET_ANG_QW(R,NC,ND,NP,REXT,NCEXT,NDEXT,NPEXT,TRAPFORJ,ACCURATE)
 !
 ! Compute CLUM_FAC(1:ND) which allow for the possibility that the wind is
@@ -4076,7 +4082,7 @@
 	1          ATM(ID)%NXzV_F,ND,
 	1          ATM(ID+1)%XzV_PRES,FIRST)
 	      TMP_STRING=TRIM(ION_ID(ID))//'OUT'
-	      CALL WRITEDC_V2( ATM(ID)%XzV_F, ATM(ID)%XzVLTE_F,
+	      CALL WRITEDC_V3( ATM(ID)%XzV_F, ATM(ID)%LOG_XzVLTE_F,
 	1          ATM(ID)%NXzV_F, ATM(ID)%DXzV_F,IONE,
 	1          R,T,ED,V,CLUMP_FAC,LUM,ND,
 	1          TRIM(TMP_STRING),'DC',IONE)

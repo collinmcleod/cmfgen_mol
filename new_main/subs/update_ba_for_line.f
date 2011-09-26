@@ -13,6 +13,8 @@
 	USE RADIATION_MOD
 	IMPLICIT NONE
 !
+! Altered: 06-Feb-2010 : Now call VSEBYJ_MULTI_V7.
+!
         INTEGER ND
         INTEGER NT
         INTEGER NUM_BNDS
@@ -95,7 +97,7 @@
 ! 
 !
 	UPDATE_dZ=.FALSE.
-	DPTH_INDX=70
+	DPTH_INDX=6
 	DPTH_INDX=MIN(DPTH_INDX,ND)             !Thus no problem if 84 > ND
 	VAR_INDX=NT
 	VAR_INDX=MIN(VAR_INDX,NT)
@@ -134,11 +136,11 @@
 	        ID_SAV=ID
 	        IF(ATM(ID)%XzV_PRES)THEN
 	          DO J=1,ATM(ID)%N_XzV_PHOT
-	            CALL VSEBYJ_MULTI_V6(ID_SAV,
+	            CALL VSEBYJ_MULTI_V7(ID_SAV,
 	1             ATM(ID)%WSXzV(1,1,J), ATM(ID)%dWSXzVdT(1,1,J),
 	1             ATM(ID)%XzV, ATM(ID)%XzVLTE, ATM(ID)%dlnXzVLTE_dlnT, 
 	1             ATM(ID)%NXzV,
-	1             ATM(ID+1)%XzV, ATM(ID+1)%XzVLTE,
+	1             ATM(ID+1)%XzV, ATM(ID+1)%LOG_XzVLTE,
 	1             ATM(ID+1)%dlnXzVLTE_dlnT, ATM(ID+1)%NXzV,
 	1             ATM(ID)%XzV_ION_LEV_ID(J),ED,T,
 	1             JREC,dJRECdt,JPHOT,NUM_BNDS,ND,DST,DEND)

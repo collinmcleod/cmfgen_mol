@@ -9,6 +9,7 @@
 	USE OPAC_MOD
 	IMPLICIT NONE
 !
+! Altered 05-Apr-2011 : Now call VAR_OP_V10 (6-Feb-2011)
 ! Created 26-Feb-2004 : Based on VAROPAC_V4
 !
 	INTEGER ND
@@ -67,10 +68,10 @@ C
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
 	        PHOT_ID=J
-	        CALL VAR_OP_V8(VCHI,VETA,VCHI_ALL,VETA_ALL,
-	1         ATM(ID)%XzV, ATM(ID)%XzVLTE, ATM(ID)%dlnXzVLTE_dlnT, ATM(ID)%NXzV,
-	1         ATM(ID)%XzVLTE_F, ATM(ID)%EDGEXzV_F, ATM(ID)%NXzV_F, ATM(ID)%F_TO_S_XzV,
-	1         ATM(ID+1)%XzV,    ATM(ID+1)%XzVLTE,  ATM(ID+1)%dlnXzVLTE_dlnT,
+	        CALL VAR_OP_V10(VCHI,VETA,VCHI_ALL,VETA_ALL,
+	1         ATM(ID)%XzV, ATM(ID)%XzVLTE, ATM(ID)%LOG_XzVLTE,  ATM(ID)%dlnXzVLTE_dlnT, ATM(ID)%NXzV,
+	1         ATM(ID)%XzVLTE_F_ON_S, ATM(ID)%EDGEXzV_F, ATM(ID)%NXzV_F, ATM(ID)%F_TO_S_XzV,
+	1         ATM(ID+1)%XzV,    ATM(ID+1)%LOG_XzVLTE,  ATM(ID+1)%dlnXzVLTE_dlnT,
 	1         ATM(ID+1)%NXzV,   PHOT_ID,           ATM(ID)%XzV_ION_LEV_ID(J),
 	1         ED,T,EMHNUKT_CONT,IMP_VAR,
 	1         CONT_FREQ,ATM(ID)%ZXzV,ID,L_TRUE,

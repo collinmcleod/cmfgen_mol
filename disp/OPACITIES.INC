@@ -1,5 +1,6 @@
 !
-! Altered 6-Jan-2011 - CHI_RAY no longer scaled by CLUMP_FAC.
+! Altered 25-Sep-2011 - Now call GENOPAETA_V10 (changed from V8).
+! Altered  6-Jan-2011 - CHI_RAY no longer scaled by CLUMP_FAC.
 !                      This scaling is done elsewhere.
 !
 C
@@ -48,10 +49,10 @@ C
 	DO ID=1,NUM_IONS
 	  IF(ATM(ID)%XzV_PRES)THEN
 	    DO J=1,ATM(ID)%N_XzV_PHOT
-	      CALL GENOPAETA_V8(ID,CHI,ETA,FL,
-	1         ATM(ID)%XzV_F,ATM(ID)%XzVLTE_F,ATM(ID)%EDGEXzV_F,
+	      CALL GENOPAETA_V10(ID,CHI,ETA,FL,
+	1         ATM(ID)%XzV_F,ATM(ID)%XzVLTE_F,ATM(ID)%LOG_XzVLTE_F,ATM(ID)%EDGEXzV_F,
 	1         ATM(ID)%GIONXzV_F,ATM(ID)%ZXzV,ATM(ID)%NXzV_F,
-	1         ATM(ID+1)%XzV_F,ATM(ID+1)%XzVLTE_F,
+	1         ATM(ID+1)%XzV_F,ATM(ID+1)%LOG_XzVLTE_F,
 	1         ATM(ID+1)%NXzV_F,
 	1         J,ATM(ID)%XzV_ION_LEV_ID(J),ED,T,EMHNUKT,
 	1         L_TRUE,ND,LST_DEPTH_ONLY)

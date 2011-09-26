@@ -728,8 +728,10 @@
 	1          .OR. XOPT .EQ. 'WRL'
 	1          .OR. XOPT .EQ. 'BETA')THEN
 !
-	  CALL USR_OPTION(LEV,ITWO,ITWO,'Levels',' ','NL and NUP')
-	  NL=LEV(1); NUP=LEV(2)
+	   CALL GET_LINE_INDICES(VEC_FREQ,VEC_MNL_F,VEC_MNUP_F,VEC_SPEC,VEC_TRANS_NAME,
+	1                           N_LINE_FREQ,XSPEC,NL,NUP,FLAG)
+	   LEV(1)=NL; LEV(2)=NUP
+	   IF(.NOT. FLAG)GOTO 1
 !
 ! Compute line opacity and emissivity.
 !
@@ -1692,7 +1694,7 @@
 	    DO ID=1,NUM_IONS
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        FILENAME=TRIM(ION_ID(ID))//TRIM(STRING)
-	        CALL NEW_WRITEDC_V4(ATM(ID)%XzVLTE_F,ATM(ID)%XzVLTE_F,ATM(ID)%W_XzV_F,
+	        CALL NEW_WRITEDC_V5(ATM(ID)%XzVLTE_F,ATM(ID)%LOG_XzVLTE_F,ATM(ID)%W_XzV_F,
 	1             ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%NXzV_F,
 	1             ATM(ID)%DXzV_F,ATM(ID)%GIONXzV_F,IONE,R,T,ED,V,CLUMP_FAC,
 	1             DO_DPTH,LUM,ND,FILENAME,TYPE,IONE)
@@ -1702,7 +1704,7 @@
 	    DO ID=1,NUM_IONS
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        FILENAME=TRIM(ION_ID(ID))//TRIM(STRING)
-	        CALL NEW_WRITEDC_V4(ATM(ID)%XzV_F,ATM(ID)%XzVLTE_F,ATM(ID)%W_XzV_F,
+	        CALL NEW_WRITEDC_V5(ATM(ID)%XzV_F,ATM(ID)%LOG_XzVLTE_F,ATM(ID)%W_XzV_F,
 	1             ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%NXzV_F,
 	1             ATM(ID)%DXzV_F,ATM(ID)%GIONXzV_F,IONE,R,T,ED,V,CLUMP_FAC,
 	1             DO_DPTH,LUM,ND,FILENAME,TYPE,IONE)
@@ -1716,7 +1718,7 @@
 ! This page computes the Rosseland mean opacity from the temperature
 ! distribution and the population levels. An option allows the electron
 ! scattering opacity to be excluded from the calculations. The Rossland
-! optical depth scale is giben in TAUROSS, and TA is a working vector. The
+! optical depth scale is given in TAUROSS, and TA is a working vector. The
 ! Rossland opacity is given in CHIROSS. Not written as a subroutine to allow
 ! easy inclusion of additional opacity sources.
 !
@@ -3948,7 +3950,7 @@
 	      DO I=1,10
 	        IF(LEV(I) .EQ. 0 .OR. LEV(I) .GT. 20000)GOTO 1
 	          FLAG=.FALSE.
-	          CALL SET_DC_OR_POP_OR_TX(YV,LEV(I),ATM(ID)%XzV_F,ATM(ID)%XzVLTE_F,
+	          CALL SET_DC_OR_POP_OR_TX_V2(YV,LEV(I),ATM(ID)%XzV_F,ATM(ID)%LOG_XzVLTE_F,
 	1            ATM(ID)%EDGEXzV_F,ATM(ID)%NXzV_F,ND,T,X,UC(ION_ID(ID)),FLAG)
 	          IF(.NOT. ATM(ID+1)%XzV_PRES)THEN
 	            T1=0.0D0

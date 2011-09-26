@@ -64,7 +64,7 @@
 	  L=LMAX
 	  WRITE(LUOUT,'(A)')' '
 	  WRITE(LUOUT,'(A,I4)')' 5 largest reductions at depth:',L
-	  WRITE(LUOUT,'(8X,A,3X,A,4X,A,7X,A)')'SOL(J,L)','Species','SL','J'
+	  WRITE(LUOUT,'(8X,A,3X,A,6X,A,5X,A)')'SOL(J,L)','Species','SL','I(STEQ)'
 	  DO WHILE(1 .EQ. 1)
 	    WRITE(LUOUT,'(A)')' '
 	    WRITE(LUOUT,'(A,I4)')' 5 largest reductions at depth:',L
@@ -72,7 +72,7 @@
 	    CALL INDEXX(NT,SOL(1,L),INDX,L_TRUE)
 	    DO I=NT,NT-4,-1
 	      J=INDX(I)
-	      WRITE(LUOUT,'(2X,ES14.4,A10,I6,3X,I5)')SOL(J,L),TRIM(VEC_DESC(J)),VEC_SL(J),J
+	      WRITE(LUOUT,'(2X,ES14.4,A10,I8,6X,I5)')SOL(J,L),TRIM(VEC_DESC(J)),VEC_SL(J),J
 	    END DO
 !
 	    WRITE(LUOUT,'(A)')' '
@@ -80,7 +80,7 @@
 	    WRITE(LUOUT,'(A)')' '
 	    DO I=1,5
 	      J=INDX(I)
-	      WRITE(LUOUT,'(2X,ES14.4,A10,I6,3X,I5)')SOL(J,L),TRIM(VEC_DESC(J)),VEC_SL(J),J
+	      WRITE(LUOUT,'(2X,ES14.4,A10,I8,6X,I5)')SOL(J,L),TRIM(VEC_DESC(J)),VEC_SL(J),J
 	    END DO
 	    IF(L .EQ. LMIN)EXIT
 	    L=LMIN 

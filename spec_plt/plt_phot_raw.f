@@ -49,7 +49,7 @@
 	REAL*8, ALLOCATABLE :: ENERGY(:)
 	REAL*8, ALLOCATABLE :: G(:)
 	REAL*8 IONIZATION_ENERGY
-	CHARACTER(LEN=30), ALLOCATABLE :: E_NAME(:)
+	CHARACTER(LEN=40), ALLOCATABLE :: E_NAME(:)
 !
 	CHARACTER*40 LEVEL_NAME1
 	CHARACTER*40 LEVEL_NAME2
@@ -67,7 +67,7 @@
 	LOGICAL CREATE_SUMMARY
 	CHARACTER*132 STRING,FILENAME
 !
-	INTEGER, PARAMETER :: NCF_MAX=10000
+	REAL*8, PARAMETER :: NCF_MAX=10000
 	REAL*8 XV(NCF_MAX),YV(NCF_MAX)
 !
 	INTEGER, PARAMETER :: NREC_MAX=5
@@ -84,7 +84,6 @@
 	LOGICAL DO_ALL_RECOM
 	LOGICAL DO_SEQ_PLTS
 	LOGICAL OSCILLATOR_FILE_AVAIL
-	LOGICAL SPLIT_J
 	EXTERNAL SPEED_OF_LIGHT
 !
 	CHARACTER(LEN=30) UC; EXTERNAL UC
@@ -109,7 +108,6 @@
         EMLIN=5.27296D-03
 	ANG_TO_HZ=1.0D-07*SPEED_OF_LIGHT()
 	AMASS=40.0D0
-	SPLIT_J=.FALSE.
 !
 ! Read in bound-free gaunt factors for individual n states of hydrogen,
 ! and hydrogenic cross-sections for individual l states (n =0 to 30,
@@ -144,8 +142,6 @@
 	      READ(STRING,*)ZION_1
 	    ELSE IF( INDEX(STRING,'Statistical weight of ion') .NE. 0)THEN
 	      READ(STRING,*)GION_1
-	    ELSE IF( INDEX(STRING,'!Split J levels') .NE. 0)THEN
-	      READ(STRING,*)SPLIT_J
 	    ELSE IF( INDEX(STRING,'!Excitation energy of final state') .NE. 0)THEN
 	      READ(STRING,*)EXC_EN_1
 	    ELSE IF( INDEX(STRING,'!Number of energy levels') .NE. 0)THEN
@@ -181,8 +177,7 @@
 	      WRITE(6,*)'Invalid number of data points for cross-section 9'
 	      STOP
 	    END IF
-	    IF(TYPE_1(J) .EQ. 23)TYPE_1(J)=20
-	    IF(TYPE_1(J) .EQ. 20 .OR. TYPE_1(J) .EQ. 21)THEN
+	    IF(TYPE_1(J) .GE. 20 .AND. TYPE_1(J) .LE. 24)THEN
 	      READ(10,*)(NU_1(I),CROSS_1(I), I=NXT_LOC,NXT_LOC+NUM_VALS_1(J)-1)
 	    ELSE
 	      READ(10,*)(CROSS_1(I), I=NXT_LOC,NXT_LOC+NUM_VALS_1(J)-1)
@@ -199,7 +194,6 @@
 	ELSE
 	  FILENAME=' '
 	END IF
-	WRITE(6,*)'SPLIT_J=',SPLIT_J
 !
 ! Read in energy levels from oscilator file, if it is available.
 ! May need to change if oscilator file format changes.
@@ -247,7 +241,7 @@
 	    K=INDEX(STRING,'  ')
 	    E_NAME(I)=STRING(1:K-1)
 	    READ(STRING(K:),*)G(I),ENERGY(I)
-	    IF(E_NAME(I)(K-1:K-1) .EQ.  ']' .AND. .NOT. SPLIT_J)THEN
+	    IF(E_NAME(I)(K-1:K-1) .EQ.  ']')THEN
 	      K=INDEX(E_NAME(I),'[')
 	      E_NAME(I)(K:)=' '
 	    END IF
@@ -263,10 +257,13 @@
 	      IF(E_NAME(J) .EQ. NAME_1(I))THEN
 	        ENERGY_1(I)=ENERGY_1(I)+G(J)*ENERGY(J)
 	        STAT_WT_1(I)=STAT_WT_1(I)+G(J)
+	        WRITE(126,*)J,ENERGY(J),STAT_WT_1(J),E_NAME(J)
 	      END IF
 	    END DO
+	    WRITE(126,*)I,ENERGY_1(I),NAME_1(I)
 	    IF(STAT_WT_1(I) .NE. 0.0D0)ENERGY_1(I)=1.0D-15*SPEED_OF_LIGHT()*
 	1        (IONIZATION_ENERGY-ENERGY_1(I)/STAT_WT_1(I))
+	    WRITE(126,*)I,ENERGY_1(I),NAME_1(I)
 	  END DO
 	  OSCILLATOR_FILE_AVAIL=.TRUE.
 	  WRITE(6,*)'Number of levels in oscilator file is',NELEV
@@ -331,7 +328,7 @@
 	      WRITE(6,*)'Invalid number of data points for cross-section 9'
 	      STOP
 	    END IF
-	    IF(TYPE_2(J) .EQ. 20 .OR. TYPE_2(J) .EQ. 21)THEN
+	    IF(TYPE_2(J) .GE. 20 .AND. TYPE_2(J) .LE. 24)THEN
 	      READ(10,*)(NU_2(I),CROSS_2(I), I=NXT_LOC,NXT_LOC+NUM_VALS_2(J)-1)
 	    ELSE
 	      READ(10,*)(CROSS_2(I), I=NXT_LOC,NXT_LOC+NUM_VALS_2(J)-1)
@@ -349,11 +346,11 @@
 	CALL GEN_IN(CREATE_SUMMARY,'Create a summary of photo-ionization cross sections (1st file only)?')
 	IF(CREATE_SUMMARY)THEN
 	  OPEN(UNIT=11,FILE='Phot_summary',STATUS='UNKNOWN',ACTION='WRITE')
-	    WRITE(11,'(A,T40,A,6X,A,3(10X,A))')'Level','Type',' Np','X1','X2','X2'
+	    WRITE(11,'(A,T20,A,6X,A,3(10X,A))')'Level','Type',' Np','X1','X2','X2'
 	    DO K=1,40
 	      DO J=1,NLEV_1
 	        IF(TYPE_1(J) .EQ. K)THEN
-	          WRITE(11,'(A,T40,I4,2X,I6,5ES13.4)')TRIM(NAME_1(J)),TYPE_1(J),NUM_VALS_1(J),
+	          WRITE(11,'(A,T20,I4,2X,I6,5ES13.4)')TRIM(NAME_1(J)),TYPE_1(J),NUM_VALS_1(J),
 	1            CROSS_1(LOC_1(J):LOC_1(J)+MIN(4,NUM_VALS_1(J)-1))
 	        END IF
 	      END DO
@@ -373,11 +370,16 @@
 	  DO INDX_1=1,NLEV_1
 	    EDGE=ENERGY_1(INDX_1)
 	    STAT_WEIGHT=STAT_WT_1(INDX_1)
-	    IF(TYPE_1(INDX_1) .EQ. 20 .OR. TYPE_1(INDX_1) .EQ. 21)THEN
+	    IF(TYPE_1(INDX_1) .GE. 20 .AND. TYPE_1(INDX_1) .LE. 23)THEN
 	      NV=NUM_VALS_1(INDX_1)
 	      XV(1:NV)=NU_1(LOC_1(INDX_1):LOC_1(INDX_1)+NV-1)
 	      YV(1:NV)=CROSS_1(LOC_1(INDX_1):LOC_1(INDX_1)+NV-1)
 	      FREQ_SCL_FAC=EDGE+EXC_EN_1
+	    ELSE IF(TYPE_1(INDX_1) .EQ. 24)THEN
+	      NV=NUM_VALS_1(INDX_1)-1
+	      XV(1:NV)=NU_1(LOC_1(INDX_1+1):LOC_1(INDX_1)+NV)
+	      YV(1:NV)=CROSS_1(LOC_1(INDX_1+1):LOC_1(INDX_1)+NV)
+	      FREQ_SCL_FAC=1.0D0
 	    ELSE
 	      NV=1000
 	      CALL RAW_SUBPHOT(YV,XV,CROSS_1(LOC_1(INDX_1)),TYPE_1(INDX_1),NUM_VALS_1(INDX_1),
@@ -420,10 +422,14 @@
 	        INDX_1=J
 	        EDGE=ENERGY_1(INDX_1)
 	        WRITE(6,'(4X,A,A,T40,ES10.4)')'Level name/energy is: ',TRIM(NAME_1(INDX_1)),EDGE
-	        IF(TYPE_1(INDX_1) .EQ. 20 .OR. TYPE_1(INDX_1) .EQ. 21)THEN
+	        IF(TYPE_1(INDX_1) .GE. 20 .AND. TYPE_1(INDX_1) .LE. 23)THEN
 	          NV=NUM_VALS_1(INDX_1)
 	          XV(1:NV)=NU_1(LOC_1(INDX_1):LOC_1(INDX_1)+NV-1)
 	          YV(1:NV)=CROSS_1(LOC_1(INDX_1):LOC_1(INDX_1)+NV-1)
+	        ELSE IF(TYPE_1(INDX_1) .EQ. 24)THEN
+	          NV=NUM_VALS_1(INDX_1)-1
+	          XV(1:NV)=NU_1(LOC_1(INDX_1)+1:LOC_1(INDX_1)+NV)
+	          YV(1:NV)=CROSS_1(LOC_1(INDX_1)+1:LOC_1(INDX_1)+NV)
 	        ELSE
 	          NV=1000
 	          CALL RAW_SUBPHOT(YV,XV,CROSS_1(LOC_1(INDX_1)),TYPE_1(INDX_1),NUM_VALS_1(INDX_1),
@@ -470,14 +476,16 @@
 	    END DO
 	    IF(INDX_1 .EQ. 0)THEN
 	      READ(LEVEL_NAME1,*,IOSTAT=IOS)INDX_1
-	      IF(INDX_1 .EQ. 0 .OR. IOS .NE. 0)THEN
-	        WRITE(6,*)'Invalid index/name'
+	      IF(INDX_1 .EQ. 0)THEN
+	         WRITE(6,*)'Invalid index'
+	         GOTO 100
+	      END IF
+	      IF(IOS .NE. 0)THEN
 	        WRITE(6,*)'Error - level name not found'
 	        DO I=1,NLEV_1,5
-	          WRITE(6,'(5A14)')(TRIM(NAME_1(J)),J=I,MIN(I+4,NLEV_1))
+	          WRITE(6,'(5A14)')(TRIM(NAME_1(J)),J=I,MAX(I+4,NLEV_1))
 	        END DO
 	        INDX_1=0
-	        GOTO 100
 	      ELSE IF(OSCILLATOR_FILE_AVAIL)THEN
 	        IF(INDX_1 .GT. NELEV)THEN
 	          WRITE(6,*)'Invalid index; index should be < ',NELEV
@@ -500,11 +508,16 @@
 	  WRITE(6,'(8X,A,ES15.8,A)')'       Energy of level is: ',EDGE,' (10^15Hz)'
 	  WRITE(6,'(8X,A,I2,/)')    ' Type of cross-section is: ',TYPE_1(INDX_1)
 !
-	  IF(TYPE_1(INDX_1) .EQ. 20 .OR. TYPE_1(INDX_1) .EQ. 21)THEN
+	  IF(TYPE_1(INDX_1) .GE. 20 .AND. TYPE_1(INDX_1) .LE. 23)THEN
 	    NV=NUM_VALS_1(INDX_1)
 	    XV(1:NV)=NU_1(LOC_1(INDX_1):LOC_1(INDX_1)+NV-1)
 	    YV(1:NV)=CROSS_1(LOC_1(INDX_1):LOC_1(INDX_1)+NV-1)
 	    FREQ_SCL_FAC=EDGE+EXC_EN_1
+	  ELSE IF(TYPE_1(INDX_1) .EQ. 24)THEN
+	    NV=NUM_VALS_1(INDX_1)-1
+	    XV(1:NV)=NU_1(LOC_1(INDX_1)+1:LOC_1(INDX_1)+NV)
+	    YV(1:NV)=CROSS_1(LOC_1(INDX_1)+1:LOC_1(INDX_1)+NV)
+	    FREQ_SCL_FAC=1.0D0
 	  ELSE
 	    NV=1000
 	    CALL RAW_SUBPHOT(YV,XV,CROSS_1(LOC_1(INDX_1)),TYPE_1(INDX_1),NUM_VALS_1(INDX_1),
@@ -556,7 +569,7 @@
 	        IF(IOS .NE. 0)THEN
 	          WRITE(6,*)'Error - level name not found'
 	          DO I=1,NLEV_2,5
-	            WRITE(6,'(5A14)')(TRIM(NAME_2(J)),J=I,MIN(I+4,NLEV_2))
+	            WRITE(6,'(5A14)')(TRIM(NAME_2(J)),J=I,MAX(I+4,NLEV_2))
 	          END DO
 	          INDX_2=0
 	        ELSE

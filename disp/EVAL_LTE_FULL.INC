@@ -14,9 +14,11 @@ C opacities and photoinization terms.
 C
 	DO ID=1,NUM_IONS
 	  IF(ATM(ID)%XzV_PRES)THEN
-	    CALL LTEPOP_WLD_V1(ATM(ID)%XzVLTE_F,ATM(ID)%W_XzV_F,
-	1          ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%ZXzV,
-	1          ATM(ID)%GIONXzV_F,ATM(ID)%NXzV_F,ATM(ID)%DXzV_F,ED,T,ND)
+	    CALL LTEPOP_WLD_V2(
+	1          ATM(ID)%XzVLTE_F,    ATM(ID)%LOG_XZVLTE_F,     ATM(ID)%W_XzV_F,
+	1          ATM(ID)%EDGEXzV_F,   ATM(ID)%GXzV_F,           ATM(ID)%ZXzV,
+	1          ATM(ID)%GIONXzV_F,   ATM(ID)%NXzV_F,           ATM(ID)%DXzV_F,
+	1          ED,T,ND)
 	    IF(.NOT. ATM(ID+1)%XzV_PRES)THEN
 	      DO I=1,ND
 	        ATM(ID+1)%XzV_F(1,I)=ATM(ID)%DXzV_F(I)

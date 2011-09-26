@@ -11,8 +11,6 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
-! Altered:   05-Apr-2011 : Call to SUM_STEQ_SOL inserted to who link to levels with
-!                            largest corrections.
 ! Altered:   18-May-2010 : Change to allow BA to be held fixed after a LAMBDA iteration.
 ! Altered:   23-Feb-2007 : Call to SOLVEBA_V8 changed to SOLVEBA_V9; LAM_SCALE_OPT inserted
 !                            into SOLVEBA_V9 call.
@@ -223,7 +221,7 @@
 ! NB: The call to SUM_STEQ_SOL corrupts SOL. I is used for output --
 !      the unit is closed on exit.
 !
-        I=7; CALL SUM_STEQ_SOL(SOL,NT,ND,I)
+	I=7; CALL SUM_STEQ_SOL(SOL,NT,ND,I)
 !
 ! Determine whether convergence is sufficient to consider using
 ! NG acceleration. The first NG acceleration is done 4 iterations after
@@ -293,18 +291,29 @@
 ! fronts. By doing it before the output to SCRTEMP, we ensure that
 ! a continuuing model starts with the revised R grid.
 !
-	IF(REVISE_R_GRID)THEN
-	  R_OLD(1:ND)=R(1:ND)
-	  CALL ESOPAC(ESEC,ED,ND)               !Electron scattering emission factor.
-	  CALL ADJUST_R_GRID_V2(POPS,P,FLUX_MEAN,ESEC,
-	1     NEW_RGRID_TYPE,RG_PAR,N_RG_PAR,ND,NT,NC,NP)
-	END IF
-!
 ! Write pointer file and output data necessary to begin a new
 ! iteration.
 !
 	CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,RITE_N_TIMES,
 	1                LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
+!
+! Program to create a NEW_R_GRID which is equally spaced in LOG(Tau) where
+! TAU is based on the FLUX mean opacity.
+!
+! In VADAT REVISE_R_GRID should be set to TRUE.
+!
+	IF(REVISE_R_GRID)THEN
+	  R_OLD(1:ND)=R(1:ND)
+	  CALL ESOPAC(ESEC,ED,ND)               !Electron scattering emission factor.
+          CALL ADJUST_R_GRID_V3(POPS,ESEC,MAIN_COUNTER,R_GRID_REVISED,ND,NT)
+	  IF(R_GRID_REVISED)THEN
+	     MAIN_COUNTER=MAIN_COUNTER+1
+	     CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,RITE_N_TIMES,
+	1                LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
+	  END IF
+	ELSE
+	  R_GRID_REVISED=.FALSE.
+	END IF
 ! 
 !
 ! Perform the acceleration. T1 and T2 return the percentage changes
@@ -388,7 +397,11 @@
 ! at least 1 iteration. Since the computation of the BA matrix takes considerable time,
 ! this may reduce computational effort.
 !
-	IF(LAST_LAMBDA .EQ. MAIN_COUNTER .AND. .NOT. LAMBDA_ITERATION)THEN
+	IF(R_GRID_REVISED)THEN
+	   LAMBDA_ITERATION=.TRUE.
+	   COMPUTE_BA=.TRUE.
+	   COUNT_FULL_LAM_BA=1000
+	ELSE IF(LAST_LAMBDA .EQ. MAIN_COUNTER .AND. .NOT. LAMBDA_ITERATION)THEN
 	   IF(COUNT_FULL_LAM_BA .NE. 0)THEN
 	      COUNT_FULL_LAM_BA=0
 	   ELSE

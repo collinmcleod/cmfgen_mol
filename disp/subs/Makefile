@@ -19,13 +19,14 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(fqcomp_v2.o)\
       $(LIB)(get_dtaulam.o)\
       $(LIB)(get_filename.o)\
+      $(LIB)(get_line_indices.o)\
       $(LIB)(hamtuvgh.o)\
       $(LIB)(ham_formsol.o)\
       $(LIB)(ham_varlam.o)\
       $(LIB)(jfeaunew.o)\
       $(LIB)(map_plot.o)\
       $(LIB)(momham.o)\
-      $(LIB)(new_writedc_v4.o)\
+      $(LIB)(new_writedc_v5.o)\
       $(LIB)(op_spec_file_v2.o)\
       $(LIB)(pallet.o)\
       $(LIB)(rd_ion_pop_v3.o)\
@@ -34,6 +35,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(rd_rvtj_v2.o)\
       $(LIB)(recom_chk_v2.o)\
       $(LIB)(set_dc_or_pop_or_tx.o)\
+      $(LIB)(set_dc_or_pop_or_tx_v2.o)\
       $(LIB)(setdc_or_pop.o)\
       $(LIB)(setforng.o)\
       $(LIB)(setrec.o)\

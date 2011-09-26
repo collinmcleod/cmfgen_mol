@@ -12,6 +12,8 @@
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
+! Altered: 25-Sep-2011: ION_ID now set for last ioization stage (LAST_ION).
+!                          LOG_XzVLTE, LOG_XzVLTE_F and XzVLTE_F_ON_S allocated.
 ! Altered: 19-Jan-2008: SL_OPTION installed. Allows number of SL's to be
 !                         automatically changed.
 ! Altered: 20-Mar-2005: FLUX_MEAN & ROSS_MEAN now zeroed. These vectors now
@@ -461,10 +463,13 @@
 	  NS=ATM(ID)%NXzV
 	                ALLOCATE (ATM(ID)%XzV(NS,ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%XzVLTE(NS,ND),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%LOG_XzVLTE(NS,ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%dlnXzVLTE_dlnT(NS,ND),STAT=IOS)
 !
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%XzV_F(NF,ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%XzVLTE_F(NF,ND),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%LOG_XzVLTE_F(NF,ND),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%XzVLTE_F_ON_S(NF,ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%W_XzV_F(NF,ND),STAT=IOS)
 !
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%AXzV_F(NF,NF),STAT=IOS)

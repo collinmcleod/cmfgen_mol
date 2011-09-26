@@ -9,6 +9,7 @@
 	USE OPAC_MOD
 	IMPLICIT NONE
 !
+! Altered 05-Apr-2011 : Now call GENOPAETA_V10 (6-Feb-2011)
 ! Altered 11-Jun-2006: Installed CHI_NOSCAT and ETA_NOSCAT. Scattering
 !                        opacity now computed after bound-free, free-free,
 !                        two photon, and X-ray opacity have been computed.
@@ -87,10 +88,10 @@
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
 	        PHOT_ID=J
-	        CALL GENOPAETA_V8(ID,CHI,ETA,CONT_FREQ,
-	1           ATM(ID)%XzV_F,      ATM(ID)%XzVLTE_F, ATM(ID)%EDGEXzV_F,
-	1           ATM(ID)%GIONXzV_F, ATM(ID)%ZXzV,   ATM(ID)%NXzV_F,
-	1           ATM(ID+1)%XzV,      ATM(ID+1)%XzVLTE, ATM(ID+1)%NXzV, 
+	        CALL GENOPAETA_V10(ID,CHI,ETA,CONT_FREQ,
+	1           ATM(ID)%XzV_F,      ATM(ID)%XzVLTE_F,     ATM(ID)%LOG_XzVLTE_F,  ATM(ID)%EDGEXzV_F,
+	1           ATM(ID)%GIONXzV_F,  ATM(ID)%ZXzV,         ATM(ID)%NXzV_F,
+	1           ATM(ID+1)%XzV,      ATM(ID+1)%LOG_XzVLTE, ATM(ID+1)%NXzV, 
 	1           PHOT_ID,            ATM(ID)%XzV_ION_LEV_ID(J),
 	1           ED,T,EMHNUKT_CONT,L_TRUE,ND,LST_DEPTH_ONLY)
 	      END DO
@@ -140,7 +141,7 @@
 	          DO I=J,ND
 	            T2=0.0D0			!Temporary CHI
 	            T3=0.0D0			!Temporary ETA
-	            T4=ATM(ID+1)%XzVLTE_F(1,I)/ATM(ID+1)%XzV_F(1,I)*EMHNUKT_CONT(I)
+	            T4=(ATM(ID+1)%XzVLTE_F(1,I)*EMHNUKT_CONT(I))/ATM(ID+1)%XzV_F(1,I)
 	            DO J=1,ATM(ID)%NXzV_F
 		      T2=T2+ATM(ID)%XzV_F(J,I)
 	              T3=T3+ATM(ID)%XzVLTE_F(J,I)

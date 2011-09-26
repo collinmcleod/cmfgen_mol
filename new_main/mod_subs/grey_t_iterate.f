@@ -13,6 +13,8 @@
 	USE LINE_MOD
 	IMPLICIT NONE
 !
+! Altered 05-Apr-2011 : Now call PAR_FUN_V2 (instead of V2), LTEPOP_WLD_V2 and LTE_POP_SL_V2 (28-Nov-2010).
+!                         Changes donw to give a wider dynamic rangs in LTE populations. 
 ! Altered 23-May-2010 : Changed handling of T_MIN.
 ! Created 17-Dec-2004
 ! Altered 06-Jun-2005 : Call to SUP_TO FULL inserted to get better consistency.
@@ -320,12 +322,13 @@
 	    DO ID=1,NUM_IONS
 	      J=ID-1			!1 is added in PAR_FUN_V2
 	      ISPEC=SPECIES_LNK(ID)
-	      CALL PAR_FUN_V2(U_PAR_FN, PHI_PAR_FN, Z_PAR_FN,
+	      CALL PAR_FUN_V4(U_PAR_FN, PHI_PAR_FN, Z_PAR_FN,
 	1          GAM_SPECIES(1,ISPEC),
-	1          ATM(ID)%XzV_F,     ATM(ID)%XzVLTE_F,  ATM(ID)%W_XzV_F,
-	1          ATM(ID)%DXzV_F,    ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,
-	1          ATM(ID)%GIONXzV_F, ATM(ID)%ZXzV,T,    ATM(ID)%NXzV_F,
-	1          ND,J,NUM_IONS, ATM(ID)%XzV_PRES)
+	1          ATM(ID)%XzV_F,     ATM(ID)%LOG_XzVLTE_F,  ATM(ID)%W_XzV_F,
+	1          ATM(ID)%DXzV_F,    ATM(ID)%EDGEXzV_F,     ATM(ID)%GXzV_F,
+	1          ATM(ID)%GIONXzV_F, ATM(ID)%ZXzV,          T, TA, ED,
+	1          ATM(ID)%NXzV_F,    ND,J,NUM_IONS,         ATM(ID)%XzV_PRES,
+	1          ION_ID(ID),        'DC' )
 	   END DO
 !
 ! The non-LTE partition functions are density independent, provided
@@ -389,13 +392,14 @@
 	      FIRST=.TRUE.   
 	      DO ID=SPECIES_END_ID(ISPEC),SPECIES_BEG_ID(ISPEC),-1
 	        IF(ATM(ID)%XzV_PRES)THEN
-	          CALL LTEPOP_WLD_V1(ATM(ID)%XzVLTE_F, ATM(ID)%W_XzV_F,
-	1               ATM(ID)%EDGEXzV_F,  ATM(ID)%GXzV_F,  ATM(ID)%ZXzV,
-	1               ATM(ID)%GIONXzV_F,  ATM(ID)%NXzV_F,  ATM(ID)%DXzV_F,
+	          CALL LTEPOP_WLD_V2(
+	1               ATM(ID)%XzVLTE_F,   ATM(ID)%LOG_XzVLTE_F,  ATM(ID)%W_XzV_F,
+	1               ATM(ID)%EDGEXzV_F,  ATM(ID)%GXzV_F,        ATM(ID)%ZXzV,
+	1               ATM(ID)%GIONXzV_F,  ATM(ID)%NXzV_F,        ATM(ID)%DXzV_F,
 	1               ED,T,ND)
-	          CALL CNVT_FR_DC(ATM(ID)%XzV_F, ATM(ID)%XzVLTE_F,
-	1               ATM(ID)%DXzV_F,   ATM(ID)%NXzV_F,
-	1               TB,               TA,ND,FIRST,      ATM(ID+1)%XzV_PRES)
+	          CALL CNVT_FR_DC_V2(ATM(ID)%XzV_F,    ATM(ID)%LOG_XzVLTE_F,
+	1                            ATM(ID)%DXzV_F,   ATM(ID)%NXzV_F,
+	1                            TB,               TA,ND,FIRST,      ATM(ID+1)%XzV_PRES)
 	          IF(ID .NE. SPECIES_BEG_ID(ISPEC))ATM(ID-1)%DXzV_F(1:ND)=TB(1:ND)
 	        END IF
 	      END DO

@@ -19,6 +19,8 @@
 	USE LINE_MOD
         IMPLICIT NONE
 !
+! Altered 05-Apr-2011 : L_STAR_RATIO and U_STAR_RATIO now computed using XzVLTE_F_ON_S (29-Nov-2010).
+!                         Done to facilitate use of lower temperaturs.
 ! Altered 20-Feb-2006 : Minor bug fix --- incorrect acces VAR_IN_USE_CNT when BA not being computed
 ! Created 21-Dec-2004
 !
@@ -223,11 +225,10 @@
 	      MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
 	      MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
 	      DO K=D_ST,ND
-	        T1=(ATM(ID)%XzV_F(MNL_F,K)/ATM(ID)%XzV(MNL,K))*(ATM(ID)%XzVLTE(MNL,K)/ATM(ID)%XzVLTE_F(MNL_F,K))
-	        L_STAR_RATIO(K,SIM_INDX)=T1*(ATM(ID)%W_XzV_F(MNUP_F,K)/ATM(ID)%W_XzV_F(MNL_F,K))*
-	1                                  (ATM(ID)%XzVLTE_F(MNL_F,K)/ATM(ID)%XzVLTE(MNL,K))
-	        T2=(ATM(ID)%XzV_F(MNUP_F,K)/ATM(ID)%XzV(MNUP,K))*(ATM(ID)%XzVLTE(MNUP,K)/ATM(ID)%XzVLTE_F(MNUP_F,K))
-	        U_STAR_RATIO(K,SIM_INDX)=T2*(ATM(ID)%XzVLTE_F(MNUP_F,K)/ATM(ID)%XzVLTE(MNUP,K))
+	        T1=(ATM(ID)%XzV_F(MNL_F,K)/ATM(ID)%XzV(MNL,K))/ATM(ID)%XzVLTE_F_ON_S(MNL_F,K)
+	        L_STAR_RATIO(K,SIM_INDX)=T1*(ATM(ID)%W_XzV_F(MNUP_F,K)/ATM(ID)%W_XzV_F(MNL_F,K))*ATM(ID)%XzVLTE_F_ON_S(MNL_F,K)
+	        T2=(ATM(ID)%XzV_F(MNUP_F,K)/ATM(ID)%XzV(MNUP,K))/ATM(ID)%XzVLTE_F_ON_S(MNUP_F,K)
+	        U_STAR_RATIO(K,SIM_INDX)=T2*ATM(ID)%XzVLTE_F_ON_S(MNUP_F,K)
 	        dL_RAT_dT(K,SIM_INDX)=L_STAR_RATIO(K,SIM_INDX)*
 	1         (-1.5D0-HDKT*ATM(ID)%EDGEXzV_F(MNL_F)/T(K)-ATM(ID)%dlnXzVLTE_dlnT(MNL,K))/T(K)
 	        dU_RAT_dT(K,SIM_INDX)=U_STAR_RATIO(K,SIM_INDX)*

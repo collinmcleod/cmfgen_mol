@@ -118,6 +118,7 @@
 	LOGICAL FILE_PRES
 	LOGICAL TMP_LOG
 	LOGICAL PLT_H
+	LOGICAL NORM
 !
 	INTEGER LEN_DIR
 	CHARACTER(LEN=80) DIR_NAME
@@ -562,19 +563,33 @@
 ! Options to plot J and H computed by grey optiom.
 !
 	ELSE IF(X(1:2) .EQ. 'JG')THEN
+	  NORM=.FALSE.
+	  CALL GEN_IN(NORM,'Normalize J(Grey) by outer boundary value?')
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND
 	    CALL SET_X_AXIS(XV,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
 	    WRITE(6,*)'R^2.J at outer boundary is',1.0D+20*ZM(ID)%JGREY(1),'ergs/s'
-	    YV(1:ND)=ZM(ID)%JGREY(1:ND)/ZM(ID)%JGREY(1)
+	    IF(NORM)THEN
+	      YV(1:ND)=ZM(ID)%JGREY(1:ND)/ZM(ID)%JGREY(1)
+	    ELSE
+	      YV(1:ND)=ZM(ID)%JGREY(1:ND)
+	    END IF
 	    CALL DP_CURVE(ND,XV,YV)
 	  END DO
+	  YAXIS='J(grey)'
+	  IF(NORM)YAXIS='JG/JG(1)'
 	ELSE IF(X(1:2) .EQ. 'HG')THEN
+	  NORM=.FALSE.
+	  CALL GEN_IN(NORM,'Normalize H(Grey) by outer boundary value?')
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND
 	    CALL SET_X_AXIS(XV,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
 	    WRITE(6,*)'R^2.H at outer boundary is',1.0D+20*ZM(ID)%HGREY(1),'ergs/s'
-	    YV(1:ND)=ZM(ID)%HGREY(1:ND)/ZM(ID)%HGREY(1)
+	    IF(NORM)THEN
+	      YV(1:ND)=ZM(ID)%HGREY(1:ND)/ZM(ID)%HGREY(1)
+	    ELSE
+	      YV(1:ND)=ZM(ID)%HGREY(1:ND)
+	    END IF
 	    CALL DP_CURVE(ND,XV,YV)
 	  END DO
 !
@@ -773,12 +788,13 @@
 	        ZV(I)=ZV(I)+T1*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML+1))
               END DO
             END DO
+	    CALL SET_X_AXIS(XV,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
             YV=0.5D+15*YV; ZV=0.5D+15*ZV
             CALL DP_CURVE(ND,XV,YV)
             CALL DP_CURVE(ND,XV,ZV)
           END DO
 	  XAXIS='R/R\d*\u'
-	  YAXIS='Int J dv; Int dJ/dlnv dv'
+	  YAXIS='r\u2\d Int J dv; r\u2\d Int dJ/dlnv dv'
 !
 ! 
 ! Plot section:

@@ -3,6 +3,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 05-Apr-2011 : Change to the way REVISE_R_GRID handled. Variable controlling
+!                           R grid revision now read in by routine do the R-grid revision.
 ! Altered : 16-Jul-2010 : Added FIX_ALL_SPECIES variable, and assoicated options.
 ! Altered : 01-Feb-2010 : GAMRAY_TRANS read inserted
 ! Altered : 31-Jan-2010 : INNER_BND_METH and OUTER_BND_METH options installed.
@@ -217,25 +219,7 @@ C
 	  N_RG_PAR=0
 	  TIME_SEQ_NO=0
 	  IF(SN_MODEL)THEN
-	    CALL RD_STORE_LOG(REVISE_R_GRID,'REV_RGRID',L_TRUE,
-	1            'Automatically revise R grid?')
-	    CALL RD_STORE_NCHAR(NEW_RGRID_TYPE,'RG_TYPE',ISIX,REVISE_R_GRID,
-	1           'Type of new R grid (UNIFORM or FIX_NX)?')
-	    CALL SET_CASE_UP(NEW_RGRID_TYPE,IZERO,IZERO)
-	    CALL RD_STORE_INT(N_RG_PAR,'N_RG_PAR',L_FALSE,
-	1          'Number of parameters used to determinie new R grid')
-	    IF(N_RG_PAR .GT. N_RG_PAR_MAX)THEN
-	      WRITE(LUER,*)'Error in CMFGEN'
-	      WRITE(LUER,*)'N_RG_PAR too large: N_RG_PAR=',N_RG_PAR
-	      STOP
-	    END IF
-	    RG_PAR(:)=0.0D0
-	    DO I=1,N_RG_PAR			!Should be less than 10
-	      TEMP_CHAR='RG_PAR_'
-	      WRITE(TEMP_CHAR(8:8),'(I1)')I
-	      CALL RD_STORE_DBLE(RG_PAR(I),TEMP_CHAR(1:8),L_TRUE,'New R grid parameters:')
-	    END DO
-	    IF(N_RG_PAR .EQ. 0)N_RG_PAR=1
+	    CALL RD_STORE_LOG(REVISE_R_GRID,'REV_RGRID',L_TRUE,'Automatically revise R grid?')
 !
 	    JGREY_WITH_V_TERMS=.TRUE.
 	    CALL RD_STORE_LOG(JGREY_WITH_V_TERMS,'JG_W_V',L_FALSE,
@@ -926,7 +910,7 @@ C
 !
 	  CALL CLEAN_RD_STORE()
 !
-	CLOSE(UNIT=LUIN)
+	CLOSE(UNIT=7)
 !
 ! Check consistency of parameters.
 !

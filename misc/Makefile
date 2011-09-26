@@ -52,6 +52,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)rev_hydro_turb.exe\
          $(EXE_DIR)mass_sc.exe\
          $(EXE_DIR)plt_alpha.exe\
+         $(EXE_DIR)plt_ddt_work.exe\
          $(EXE_DIR)plt_gf.exe\
          $(EXE_DIR)plt_raw_xray.exe\
          $(EXE_DIR)plt_cool.exe\
@@ -60,6 +61,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)plt_net.exe\
          $(EXE_DIR)solve_ba_mat.exe\
          $(EXE_DIR)tst_ba_mat_sol.exe\
+         $(EXE_DIR)comp_ba_mat_sol.exe\
          $(EXE_DIR)tst_char_v2.exe\
          $(EXE_DIR)tlusty_vel.exe
  

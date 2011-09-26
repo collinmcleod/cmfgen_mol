@@ -22,6 +22,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(cmf_form_sol.o)\
       $(LIB)(cmf_form_sol_v2.o)\
       $(LIB)(cnvt_fr_dc.o)\
+      $(LIB)(cnvt_fr_dc_v2.o)\
       $(LIB)(colcool_sl_v3.o)\
       $(LIB)(comp_j_conv.o)\
       $(LIB)(comp_j_conv_v2.o)\
@@ -106,8 +107,10 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(lin_interp.o)\
       $(LIB)(locsolut.o)\
       $(LIB)(lte_pop_sl.o)\
+      $(LIB)(lte_pop_sl_v2.o)\
       $(LIB)(ltepop.o)\
       $(LIB)(ltepop_wld_v1.o)\
+      $(LIB)(ltepop_wld_v2.o)\
       $(LIB)(lum_from_eta.o)\
       $(LIB)(marupv.o)\
       $(LIB)(mat5pen.o)\
@@ -142,13 +145,17 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(open_dir_acc_v1.o)\
       $(LIB)(par_fun_v2.o)\
       $(LIB)(par_fun_v3.o)\
+      $(LIB)(par_fun_v4.o)\
       $(LIB)(pertjfeau_ibc.o)\
       $(LIB)(phys_con.o)\
       $(LIB)(poptoion.o)\
       $(LIB)(prrr_sl_v5.o)\
+      $(LIB)(prrr_sl_v6.o)\
+      $(LIB)(prrr_lowt_v1.o)\
       $(LIB)(qfromf.o)\
       $(LIB)(qkim.o)\
       $(LIB)(quad_x_gen_v4.o)\
+      $(LIB)(quad_x_gen_v5.o)\
       $(LIB)(quad_x_lit_v3.o)\
       $(LIB)(rd_f_to_s_ids.o)\
       $(LIB)(rd_f_to_s_ids_v2.o)\
@@ -167,6 +174,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(regridwsc.o)\
       $(LIB)(regridwsc_v2.o)\
       $(LIB)(regridwsc_v3.o)\
+      $(LIB)(regrid_log_dc_v1.o)\
       $(LIB)(rext_coef_v2.o)\
       $(LIB)(rite_asc.o)\
       $(LIB)(rite_atmdes_v2.o)\
@@ -204,6 +212,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(storeba.o)\
       $(LIB)(subcol_multi_v3.o)\
       $(LIB)(sup_to_full_v3.o)\
+      $(LIB)(sup_to_full_v3b.o)\
       $(LIB)(tau.o)\
       $(LIB)(tcompd.o)\
       $(LIB)(term_io.o)\
@@ -251,6 +260,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(write_j_cmf_err.o)\
       $(LIB)(writedc.o)\
       $(LIB)(writedc_v2.o)\
+      $(LIB)(writedc_v3.o)\
       $(LIB)(write_direct_info.o)\
       $(LIB)(write_direct_info_v2.o)\
       $(LIB)(write_direct_info_v3.o)\
@@ -260,6 +270,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(wrrecomchk_v3.o)\
       $(LIB)(x02ajf.o)\
       $(LIB)(x_rrr_cool_v5.o)\
+      $(LIB)(x_rrr_cool_v6.o)\
       $(LIB)(xcross.o)\
       $(LIB)(xvecd.o)\
       $(LIB)(zalongp.o)\

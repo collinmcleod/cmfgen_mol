@@ -9,6 +9,9 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 05-Apr-2011 : Now call LTEPOP_WLD_V2 (instead of V1) and
+!                                LTE_POP_SL_V2 (instead of V1) (28-Nov-2010).
+!                         Changes done to give a wider dynamic rangs in LTE populations. 
 ! Created 19-Dec-2004
 !
 	INTEGER ND
@@ -31,20 +34,21 @@
 !
 	DO ID=1,NUM_IONS
 	  IF(ATM(ID)%XzV_PRES)THEN
-	    CALL LTEPOP_WLD_V1(
-	1          ATM(ID)%XzVLTE_F,  ATM(ID)%W_XzV_F,
+	    CALL LTEPOP_WLD_V2(
+	1          ATM(ID)%XzVLTE_F,  ATM(ID)%LOG_XzVLTE_F, ATM(ID)%W_XzV_F,
 	1          ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,  ATM(ID)%ZXzV,
 	1          ATM(ID)%GIONXzV_F, ATM(ID)%NXzV_F,
 	1          ATM(ID)%DXzV_F,    ED,T,ND)
-	    CALL LTE_POP_SL(
-	1          ATM(ID)%XzVLTE,    ATM(ID)%dlnXzVLTE_dlnT,
-	1          ATM(ID)%NXzV,      ATM(ID)%XzVLTE_F,
-	1          ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV,
-	1          ATM(ID)%NXzV_F,    ATM(ID)%XzV_PRES, T,ND)
+	    CALL LTE_POP_SL_V2(
+	1          ATM(ID)%XzVLTE,         ATM(ID)%LOG_XzVLTE,    ATM(ID)%dlnXzVLTE_dlnT,
+	1          ATM(ID)%NXzV,           ATM(ID)%XzVLTE_F,      ATM(ID)%LOG_XzVLTE_F,
+	1          ATM(ID)%XzVLTE_F_ON_S,  ATM(ID)%EDGEXzV_F,     ATM(ID)%F_TO_S_XzV,
+	1          ATM(ID)%NXzV_F,         ATM(ID)%XzV_PRES, T,ND)
 	    IF(.NOT. ATM(ID+1)%XzV_PRES)THEN
 	      DO I=1,ND
-	        ATM(ID+1)%XzV(1,I)=ATM(ID)%DXzV_F(I)		!True if not present.
-	        ATM(ID+1)%XzVLTE(1,I)=ATM(ID)%DXzV_F(I)		!True if not present.
+	        ATM(ID+1)%XzV(1,I)=ATM(ID)%DXzV_F(I)			!True if not present.
+	        ATM(ID+1)%XzVLTE(1,I)=ATM(ID)%DXzV_F(I)			!True if not present.
+	        ATM(ID+1)%LOG_XzVLTE(1,I)=LOG(ATM(ID)%DXzV_F(I))	!True if not present.
 	        ATM(ID+1)%dlnXzVLTE_dlnT(1,I)=0.0D0
 	      END DO
 	    END IF

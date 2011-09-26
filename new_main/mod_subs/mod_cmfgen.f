@@ -6,6 +6,8 @@
 !
 	MODULE MOD_CMFGEN
 !
+! Altered 25-Sep-2011 : LOG_XzVLTE_F, XzVLTE_F_ON_S, LOG_XzVLTE arrays added (26-Nov-2010/5-Apr-2011).
+!                         Length of level name changed to 40.
 ! Altered 19-Jan-2009 : SL_OPTION inserted
 ! Altered 06-Aug-2008 : PLANCK_MEAN inserted.
 ! Altered 31-Jan-2002 : FIXEDT etc inserted.
@@ -85,24 +87,27 @@
 	TYPE MODEL_ATOM_DATA
 !
 	  REAL*8, ALLOCATABLE :: XzV_F(:,:)		!Level populations in FULL atom
-	  REAL*8, ALLOCATABLE :: XzVLTE_F(:,:)	!LTE level populations in FULL atom
-	  REAL*8, ALLOCATABLE :: W_XzV_F(:,:)	!Level dissolution factors
+	  REAL*8, ALLOCATABLE :: XzVLTE_F(:,:)		!LTE level populations in FULL atom
+          REAL*8, ALLOCATABLE :: LOG_XzVLTE_F(:,:)  	!Log(LTE level populations in FULL atom)
+          REAL*8, ALLOCATABLE :: XzVLTE_F_ON_S(:,:) 	!Log(LTE level populations in FULL atom)
+	  REAL*8, ALLOCATABLE :: W_XzV_F(:,:)		!Level dissolution factors
 	  REAL*8, ALLOCATABLE :: DXzV_F(:)		!Ion population for full atom
-	  REAL*8, ALLOCATABLE :: AXzV_F(:,:)	!Oscillator strength (A(I,j), i<j)
-	  REAL*8, ALLOCATABLE :: EDGEXzV_F(:)	!Ionization energy to g.s. (10^15 Hz)
+	  REAL*8, ALLOCATABLE :: AXzV_F(:,:)		!Oscillator strength (A(I,j), i<j)
+	  REAL*8, ALLOCATABLE :: EDGEXzV_F(:)		!Ionization energy to g.s. (10^15 Hz)
 	  REAL*8, ALLOCATABLE :: GXzV_F(:)		!Level statistical weights in full atom
-	  INTEGER, ALLOCATABLE :: F_TO_S_XzV(:)	!Link of full levels to super levels
+	  INTEGER, ALLOCATABLE :: F_TO_S_XzV(:)		!Link of full levels to super levels
 	  INTEGER, ALLOCATABLE :: INT_SEQ_XzV(:)
-	  CHARACTER*30, ALLOCATABLE :: XzVLEVNAME_F(:)	!Level name
+	  CHARACTER(LEN=40), ALLOCATABLE :: XzVLEVNAME_F(:)	!Level name
 !
 	  REAL*8, ALLOCATABLE :: DXzV(:)		!Ion population for super level
 	  REAL*8, ALLOCATABLE :: XzV(:,:)		!Level population in SL atom
-	  REAL*8, ALLOCATABLE :: XzVLTE(:,:)	!LTE populations in SL atom
+	  REAL*8, ALLOCATABLE :: XzVLTE(:,:)		!LTE populations in SL atom
+          REAL*8, ALLOCATABLE :: LOG_XzVLTE(:,:)    	!LOG(LTE populations in SL atom)
 	  REAL*8, ALLOCATABLE :: dlnXzVLTE_dlnT(:,:)
 !
 	  REAL*8, ALLOCATABLE :: WSXzV(:,:,:)		!Weights assoc. with s.e. eval.
 	  REAL*8, ALLOCATABLE :: WCRXzV(:,:,:)		!Weights assoc. with cooling.
-	  REAL*8, ALLOCATABLE :: dWSXzVdT(:,:,:)		!Weights assoc. with d(S.E. Eqn)/dT
+	  REAL*8, ALLOCATABLE :: dWSXzVdT(:,:,:)	!Weights assoc. with d(S.E. Eqn)/dT
 	  REAL*8, ALLOCATABLE :: WSE_X_XzV(:,:)		!X-ray photoionization weights.
 	  REAL*8, ALLOCATABLE :: WCR_X_XzV(:,:)		!
 !

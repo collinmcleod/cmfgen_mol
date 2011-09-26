@@ -74,21 +74,21 @@
 !
 	TYPE MODEL_ATOM_DATA
 !
-	  REAL*8, POINTER :: XzV_F(:,:)		!Level populations in FULL atom
-	  REAL*8, POINTER :: XzVLTE_F(:,:)	!LTE level populations in FULL atom
-	  REAL*8, POINTER :: W_XzV_F(:,:)	!Level dissolution factors
-	  REAL*8, POINTER :: DXzV_F(:)		!Ion population for full atom
-	  REAL*8, POINTER :: AXzV_F(:,:)	!Oscillator strength (A(I,j), i<j)
-	  REAL*8, POINTER :: EDGEXzV_F(:)	!Ionization energy to g.s. (10^15 Hz)
-	  REAL*8, POINTER :: GXzV_F(:)		!Level statistical weights in full atom
-	  REAL*8, POINTER :: ARAD(:)		!Inverse radiative lifetime of level
-	  REAL*8, POINTER :: GAM2(:)		!Collisional profile parameter.
-	  REAL*8, POINTER :: GAM4(:)		!Collisional profile parameter.
+	  REAL*8, ALLOCATABLE :: XzV_F(:,:)		!Level populations in FULL atom
+	  REAL*8, ALLOCATABLE :: XzVLTE_F(:,:)	!LTE level populations in FULL atom
+	  REAL*8, ALLOCATABLE :: W_XzV_F(:,:)	!Level dissolution factors
+	  REAL*8, ALLOCATABLE :: DXzV_F(:)		!Ion population for full atom
+	  REAL*8, ALLOCATABLE :: AXzV_F(:,:)	!Oscillator strength (A(I,j), i<j)
+	  REAL*8, ALLOCATABLE :: EDGEXzV_F(:)	!Ionization energy to g.s. (10^15 Hz)
+	  REAL*8, ALLOCATABLE :: GXzV_F(:)		!Level statistical weights in full atom
+	  REAL*8, ALLOCATABLE :: ARAD(:)		!Inverse radiative lifetime of level
+	  REAL*8, ALLOCATABLE :: GAM2(:)		!Collisional profile parameter.
+	  REAL*8, ALLOCATABLE :: GAM4(:)		!Collisional profile parameter.
 !
-	  REAL*8, POINTER :: DXzV(:)		!Ion population for super level
-	  REAL*8, POINTER :: XzV(:,:)		!Level population in SL atom
-	  REAL*8, POINTER :: XzVLTE(:,:)	!LTE populations in SL atom
-	  REAL*8, POINTER :: dlnXzVLTE_dlnT(:,:)
+	  REAL*8, ALLOCATABLE :: DXzV(:)		!Ion population for super level
+	  REAL*8, ALLOCATABLE :: XzV(:,:)		!Level population in SL atom
+	  REAL*8, ALLOCATABLE :: XzVLTE(:,:)	!LTE populations in SL atom
+	  REAL*8, ALLOCATABLE :: dlnXzVLTE_dlnT(:,:)
 !
 	  REAL*8 ZXzV			!Charge on ion (=1 for HI)
 	  REAL*8 GIONXzV_F		!Statistical weight of ion
@@ -96,15 +96,15 @@
 ! Identifications corresponding to each photoionization route.
 !
 	  INTEGER XzV_ION_LEV_ID(NPHOT_MAX)
-	  INTEGER, POINTER :: F_TO_S_XzV(:)	!Link of full levels to super levels
-	  INTEGER, POINTER :: INT_SEQ_XzV(:)
+	  INTEGER, ALLOCATABLE :: F_TO_S_XzV(:)	!Link of full levels to super levels
+	  INTEGER, ALLOCATABLE :: INT_SEQ_XzV(:)
 !
 	  INTEGER NXzV_F		!Number of levels in full atom
 	  INTEGER NXzV		!Number of levels in SL atom
 	  INTEGER EQXzV		!Equation in BA matrix for g.s. of atom
 	  INTEGER N_XzV_PHOT		!Number of states species can ionize to.
 !
-	  LOGICAL, POINTER :: OBSERVED_LEVEL(:)	!Link of full levels to super levels
+	  LOGICAL, ALLOCATABLE :: OBSERVED_LEVEL(:)	!Link of full levels to super levels
 	  
 ! Indicates whether a species is present. The final ionization state is regarded
 ! as not present (e.g. HII_PRES is ALWAYS false, even though we treat H+ when
@@ -117,12 +117,11 @@
 	  LOGICAL DIE_AUTO_XzV
 	  LOGICAL DIE_WI_XzV
 !
-	  CHARACTER*30, POINTER :: XzVLEVNAME_F(:)	!Level name
-!
-	  CHARACTER*6  XzV_TRANS_TYPE	!Transition type (e.g. Blank, Sobolev etc)
-	  CHARACTER*10 XzV_PROF_TYPE	!Type of profile (e.g. Doppler, Stark)
-	  CHARACTER*11 XzV_OSCDATE
-	  CHARACTER*11 NEW_XzV_OSCDATE
+	  CHARACTER(LEN=40), ALLOCATABLE :: XzVLEVNAME_F(:)	!Level name
+	  CHARACTER(LEN=6)  XzV_TRANS_TYPE	!Transition type (e.g. Blank, Sobolev etc)
+	  CHARACTER(LEN=10) XzV_PROF_TYPE	!Type of profile (e.g. Doppler, Stark)
+	  CHARACTER(LEN=11) XzV_OSCDATE
+	  CHARACTER(LEN=11) NEW_XzV_OSCDATE
 !
 	END TYPE MODEL_ATOM_DATA
 !
