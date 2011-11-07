@@ -72,14 +72,14 @@ C We backspace so that the record with the numer of levels is available for
 C the next call to RD_POP_DIM.
 C
 	  BACKSPACE(LUIN)
-	  WRITE(LUER,*)'  ',DESC//' data unavaialable'
+!	  WRITE(LUER,*)'  ',DESC//' data unavaialable'
 	  CIII_PRES=.FALSE.
 	  NCIII=1		!So NCIII can be used as dimension limit.
 	END IF
 C
 1000	CONTINUE
 	IF(NCIII .EQ. 0)THEN
-	  WRITE(LUER,*)'  ',DESC//' data unavaialable'
+!	  WRITE(LUER,*)'  ',DESC//' data unavaialable'
 	  CIII_PRES=.FALSE.
 	  NCIII=1		!So NCIII can be used as dimension limit.
 	END IF

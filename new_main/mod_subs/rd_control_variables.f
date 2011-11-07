@@ -3,7 +3,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
-! Altered : 05-Apr-2011 : Change to the way REVISE_R_GRID handled. Variable controlling
+! Altered : 02/07-Nov-2011 : Changed location of COMP_GREY_LST_IT so that set for all model.
+! Altered : 05-Apr-2011 : Changed the way REVISE_R_GRID is handled. Variable controlling
 !                           R grid revision now read in by routine do the R-grid revision.
 ! Altered : 16-Jul-2010 : Added FIX_ALL_SPECIES variable, and assoicated options.
 ! Altered : 01-Feb-2010 : GAMRAY_TRANS read inserted
@@ -216,6 +217,7 @@ C
 	  REVISE_R_GRID=.FALSE.
 	  JGREY_WITH_V_TERMS=.FALSE.
 	  PURE_HUBBLE_FLOW=.FALSE.
+	  COMP_GREY_LST_IT=.TRUE.
 	  N_RG_PAR=0
 	  TIME_SEQ_NO=0
 	  IF(SN_MODEL)THEN
@@ -255,7 +257,6 @@ C
 	1            'Initial Scale factor for adding decay energy')
             END IF
 !
-	    COMP_GREY_LST_IT=.TRUE.
 	    CALL RD_STORE_LOG(COMP_GREY_LST_IT,'COMP_GREY_LST_IT',L_FALSE,'Compute grey solution on last iteration?')
 !
 	    CALL RD_STORE_NCHAR(SN_T_OPTION,'SN_T_OPT',ITEN,L_TRUE,

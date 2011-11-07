@@ -38,6 +38,9 @@
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
+! Altered 07-Nov-2011 : Now output MNL_F, MNUP_F to NETRATE and TOTRATE.
+! Altered       -2011 : Extensive alterations to handle low temperatures.
+!                       Extensive alterations to include non-thermal ionizations
 ! Altered 19-Jan-2009 : SL otion inserted; rd_f_to_s_ids_v2.f now used.
 ! Altered 16-Feb-2006 : Changed and modified over 2 month period. Section solving for
 !                         populations and performing NG acceleration etc removed to
@@ -59,7 +62,7 @@
 	INTEGER NCF
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
-	CHARACTER(LEN=12), PARAMETER :: PRODATE='19-May-2009'		!Must be changed after alterations
+	CHARACTER(LEN=12), PARAMETER :: PRODATE='07-Nov-2011'		!Must be changed after alterations
 !
 ! 
 !
@@ -2574,12 +2577,12 @@
 	  DO SIM_INDX=1,MAX_SIM
 	    IF(END_RES_ZONE(SIM_INDX))THEN
 	      LS=SIM_LINE_POINTER(SIM_INDX)
-	      WRITE(LU_NET,'(/,1X,I6,2X,A,2X,F10.6,2X,I6,2X,I6)')
+	      WRITE(LU_NET,'(/,1X,I6,2X,A,2X,F10.6,4(2X,I6))')
 	1         LS,TRANS_NAME_SIM(SIM_INDX),VEC_FREQ(LS),
-	1            VEC_NL(LS),VEC_NUP(LS)
-	      WRITE(LU_DR,'(/,1X,I6,2X,A,2X,F10.6,2X,I6,2X,I6)')
+	1            VEC_NL(LS),VEC_NUP(LS),VEC_MNL_F(LS),VEC_MNUP_F(LS)
+	      WRITE(LU_DR,'(/,1X,I6,2X,A,2X,F10.6,4(2X,I6))')
 	1         LS,TRANS_NAME_SIM(SIM_INDX),VEC_FREQ(LS),
-	1            VEC_NL(LS),VEC_NUP(LS)
+	1            VEC_NL(LS),VEC_NUP(LS),VEC_MNL_F(LS),VEC_MNUP_F(LS)
 	      T3=(AVE_ENERGY(SIM_NL(SIM_INDX))-
 	1            AVE_ENERGY(SIM_NUP(SIM_INDX)))/VEC_FREQ(LS)
 	      WRITE(LU_HT,'(/,1X,I6,2X,A,2X,F10.6,2X,I6,2X,I6,ES14.4)')

@@ -1,0 +1,201 @@
+!
+! Subroutine to plot the Luminosity and auxiliary quanties from the file OBSFLUX.
+! Routine is primarily designed to assist in diagnosing SN models.
+!
+! The final plot shows the "Corrected Luminosity" (not OBSERVED) which should be 
+! constant as a function of depth. Also shown is the difference between this curve,
+! and the original "observed" luminosity (CMF). 
+!
+! Unlike OBSFLUX, we intgerate inwards rather than outwards. This allows a more
+! realistic examination of the errors relative to the observed flux.
+!
+! Program requires the following CMFGEN files:
+!                                              OBSFLUX
+!                                              RVTJ
+!                                              MODEL
+!
+	PROGRAM PLT_CMF_LUM
+	USE GEN_IN_INTERFACE
+	IMPLICIT NONE
+!
+! Cleaned: 06-Nov-2011
+!
+	REAL*8, ALLOCATABLE :: R(:)
+	REAL*8, ALLOCATABLE :: V(:)
+	REAL*8, ALLOCATABLE :: XAXIS(:)
+!
+	REAL*8, ALLOCATABLE :: LUM(:)
+	REAL*8, ALLOCATABLE :: MECH(:)
+	REAL*8, ALLOCATABLE :: ADI(:)
+	REAL*8, ALLOCATABLE :: DJDT(:)
+	REAL*8, ALLOCATABLE :: RAD_DECAY(:)
+	REAL*8, ALLOCATABLE :: TOTAL(:)
+	REAL*8, ALLOCATABLE :: CHANGE(:)
+!
+	REAL*8, SPEED_OF_LIGHT
+	REAL*8 T1
+!
+	EXTERNAL SPEED_OF_LIGHT
+	CHARACTER(LEN=132) STRING
+	CHARACTER(LEN=20)  XLABEL
+!
+	INTEGER ND
+	INTEGER IOS
+	INTEGER I
+	LOGICAL FILE_OPEN
+!
+        OPEN(UNIT=20,FILE='MODEL',STATUS='OLD',IOSTAT=IOS)
+          IF(IOS .EQ. 0)THEN
+            DO WHILE(1 .EQ. 1)
+              READ(20,'(A)',IOSTAT=IOS)STRING
+              IF(IOS .NE. 0)EXIT
+              IF(INDEX(STRING,'!Number of depth points') .NE. 0)THEN
+                READ(STRING,*)ND
+                WRITE(6,'(A,I4)')' Number of depth points in the model is:',ND
+                EXIT
+              END IF
+            END DO
+          END IF
+          INQUIRE(UNIT=20,OPENED=FILE_OPEN)
+        IF(FILE_OPEN)CLOSE(UNIT=20)
+!
+        IF(IOS .NE. 0)THEN
+          WRITE(6,*)' Unable to open MODEL file to get # of depth points'
+          CALL GEN_IN(ND,'Number of depth points')
+        END IF
+!
+	IOS=0
+	ALLOCATE (R(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (V(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (XAXIS(ND),STAT=IOS)
+!
+	IF(IOS .EQ. 0)ALLOCATE (LUM(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (MECH(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (DJDT(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (ADI(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (RAD_DECAY(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (TOTAL(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (CHANGE(ND),STAT=IOS)
+	IF(IOS .NE. 0)THEN
+	  WRITE(6,*)'Error -- unable to allocate vectors in PLT_CMF_LUM'
+	  WRITE(6,*)'Error is ',IOS
+	  STOP
+	END IF
+!
+	LUM=0; MECH=0.0D0; DJDT=0.0D0; ADI=0.0D0
+	RAD_DECAY=0.0D0; TOTAL=0.0D0; CHANGE=0.0D0
+!
+	OPEN(UNIT=20,FILE='RVTJ',STATUS='OLD',ACTION='READ')
+	  STRING=' '
+	  DO WHILE(INDEX(STRING,'Radius') .EQ. 0)
+	    READ(20,'(A)')STRING
+	  END DO
+	  READ(20,*)(R(I),I=1,ND)
+	  READ(20,'(A)')STRING
+	  READ(20,*)(V(I),I=1,ND)
+	CLOSE(UNIT=20)
+
+	DO I=1,ND
+	  R(I)=R(I)/R(ND)
+	END DO
+	XAXIS=V(1:ND)
+	XLABEL='V(km/s)'
+!
+	OPEN(UNIT=20,FILE='OBSFLUX',STATUS='OLD',ACTION='READ')
+	  STRING=' '
+	  DO WHILE(INDEX(STRING,'Luminosity') .EQ. 0)
+	    READ(20,'(A)')STRING
+	  END DO
+	  READ(20,*)(LUM(I),I=1,ND)
+!
+	  DO WHILE(1 .EQ. 1)
+	    STRING=' '
+	    DO WHILE(STRING .EQ. ' ')
+	      READ(20,'(A)')STRING
+	    END DO
+	    IF(INDEX(STRING,'Mechanical Luminosity') .NE. 0)THEN
+	      READ(20,*)(MECH(I),I=1,ND)
+	    ELSE IF(INDEX(STRING,'Internal') .NE. 0)THEN
+	      READ(20,*)(ADI(I),I=1,ND)
+	    ELSE IF(INDEX(STRING,'Flux arrising') .NE. 0)THEN
+	      READ(20,*)(DJDt(I),I=1,ND)
+	    ELSE IF (INDEX(STRING,'Energy deposited') .NE. 0)THEN
+	      READ(20,*)(RAD_DECAY(I),I=1,ND)
+	    ELSE IF (INDEX(STRING,'Total Radiative') .NE. 0)THEN
+	      EXIT
+	    END IF
+	    READ(20,'(A)')STRING
+	  END DO
+	  CLOSE(UNIT=20)
+!
+	WRITE(6,*)' '
+	CALL WR_COL_STR('|1              The luminosity is plotted in red')
+	CALL WR_COL_STR('|4 The "conserved" luminosity is plotted in blue')
+	WRITE(6,*)' '
+	T1=0.0D0
+	TOTAL(1)=LUM(1)
+	DO I=1,ND-1
+	  T1=T1+MECH(I)+ADI(I)+DJDT(I)-RAD_DECAY(I)
+	  TOTAL(I+1)=LUM(I+1)-T1
+	END DO
+	CALL DP_CURVE(ND,XAXIS,LUM)
+	CALL DP_CURVE(ND,XAXIS,TOTAL)
+	CALL GRAMON_PGPLOT(XLABEL,'Luminosity (L\d'//char(09)//'\u)',' ',' ')
+!
+	WRITE(6,*)' '
+	CALL WR_COL_STR(' |1*** |0Plotting the corrections at each depth |1***')
+	WRITE(6,*)' '
+	CALL WR_COL_STR('|1 The "mechanical" luminosity contribution at each depth is plotted in red')
+	CALL WR_COL_STR('|4 The "adiabatic" luminosity contribution at each depth is plotted in blue')
+	CALL WR_COL_STR('|2    The "DJDTt" luminosity contribution at each depth is plotted in green')
+	CALL WR_COL_STR('|0       The "radioactove"  contribution at each depth is plotted in purple')
+	WRITE(6,*)' '
+	CALL DP_CURVE(ND,XAXIS,MECH)
+	CALL DP_CURVE(ND,XAXIS,ADI)
+	CALL DP_CURVE(ND,XAXIS,DJDT)
+	CALL DP_CURVE(ND,XAXIS,RAD_DECAY)
+	CALL GRAMON_PGPLOT(XLABEL,'\gDL(L\d'//char(09)//'\u)',' ',' ')
+!
+	DO I=2,ND
+	  MECH(I)=MECH(I)+MECH(I-1)
+	  DJDT(I)=DJDT(I)+DJDT(I-1)
+	  ADI(I)=ADI(I)+ADI(I-1)
+	  RAD_DECAY(I)=RAD_DECAY(I)+RAD_DECAY(I-1)
+	END DO
+	RAD_DECAY=-RAD_DECAY
+!
+	WRITE(6,*)' '
+	CALL WR_COL_STR(' |1*** |0Plotting cummalative contributions (intgerated inwards). |1***')
+	WRITE(6,*)' '
+	CALL WR_COL_STR('|1       The work on the gas term (MECH) is in red')
+	CALL WR_COL_STR('|4    Adiabatic cooling/internal energy is in blue')
+	CALL WR_COL_STR('|2                       The DJDT term is in green')
+	CALL WR_COL_STR('|0  The term due to radioactive decay is in purple')
+	CALL WR_COL_STR('|5        The "corrected luminosity" is in in pink')
+	CALL WR_COL_STR('|3 The total of the corrections terms in in yellow')
+	WRITE(6,*)' '
+!
+	CALL DP_CURVE(ND,XAXIS,MECH)
+	CALL DP_CURVE(ND,XAXIS,ADI)
+	CALL DP_CURVE(ND,XAXIS,DJDT)
+	CALL DP_CURVE(ND,XAXIS,RAD_DECAY)
+	CALL DP_CURVE(ND,XAXIS,TOTAL)
+	CHANGE=MECH+ADI+DJDT+RAD_DECAY
+	CALL DP_CURVE(ND,XAXIS,CHANGE)
+	CALL GRAMON_PGPLOT(XLABEL,'Luminosity (L\d'//char(09)//'\u)',' ',' ')
+!
+	WRITE(6,*)' '
+	CALL WR_COL_STR('|1 Here we plot the total energy balance (normalized by the value at d=2).')
+	CALL WR_COL_STR('|1 I recommend subtracting 1 from plot 1, and multiply by 10 or 100.')
+	CALL WR_COL_STR('|4 We also plot the normalized correction.')
+	WRITE(6,*)' '
+!
+	T1=TOTAL(2)
+	TOTAL=TOTAL/T1
+	CALL DP_CURVE(ND,XAXIS,TOTAL)
+	CHANGE=CHANGE/T1
+	CALL DP_CURVE(ND,XAXIS,CHANGE)
+	CALL GRAMON_PGPLOT(XLABEL,'Luminosity (L\d'//char(09)//'\u)',' ',' ')
+!
+	STOP
+	END

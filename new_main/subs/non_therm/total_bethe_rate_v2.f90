@@ -1,6 +1,13 @@
+!
+! The rates in this routine must be kept consistent with BETHE_APPROX. 
+!
 	SUBROUTINE TOTAL_BETHE_RATE_V2(RATE,NL,NUP,YE,XKT,dXKT,NKT,ID,DPTH_INDX,ND)
 	USE MOD_CMFGEN
 	IMPLICIT NONE
+!
+! Altered: 06-Nov-2011 : Inserted ATM(ID)%CROSEC_NTFAC into cross-section.
+!                        Some cleaning done.
+!			 GBAR changed from vector to scaler.
 !
 	INTEGER ID
 	INTEGER DPTH_INDX
@@ -21,7 +28,7 @@
 	REAL*8, PARAMETER :: COEF2=-0.00647558d0
 	REAL*8, PARAMETER :: CONNECT_POINT=1.2212243D0
 !
-	REAL*8 GBAR(NKT)
+	REAL*8 GBAR
 	REAL*8 X
 	REAL*8 T1,T2
 	REAL*8 dE
@@ -30,39 +37,27 @@
 	INTEGER IKT
 !
 	RATE=0.0D0
-	gbar(:)=0.0d0
+	GBAR=0.0d0
 !
 	IF(ATM(ID)%AXzV_F(NL,NUP) .EQ. 0.0D0)RETURN
 	dE=ATM(ID)%EDGEXzV_F(NL)-ATM(ID)%EDGEXzV_F(NUP)
 	IF(dE .LE. 0)RETURN
 !
 	dE_eV=Hz_to_eV*dE
-!	T2=3.28978D0/dE
-!	IF(FAST_BETHE_METHOD)THEN
-!	  GBAR=0.2
-!	  T1=3.28978D0*COL_CONST*GBAR*ATM(ID)%AXzV_F(NL,NUP)/dE
-!	  DO IKT=1,NKT
-!	    IF(XKT(IKT) .GE. dE_eV)THEN
-!	      RATE=RATE+T1*YE(IKT,DPTH_INDX)*dXKT(IKT)/XKT(IKT)
-!	    END IF
-!	  END DO
-!	ELSE
-!	  GBAR=0.2
-	  T1=3.28978D0*COL_CONST*ATM(ID)%AXzV_F(NL,NUP)/dE
-	  DO IKT=1,NKT
-	    IF(XKT(IKT) .GE. dE_eV)THEN
-	      X = sqrt(xkt(ikt)/dE_eV-1.0d0)
-	      IF((ATM(ID)%ZXzV .NE. 1).AND.(X .LE. CONNECT_POINT))THEN
-	        GBAR(IKT) = 0.2D0
-	      ELSE
-	        GBAR(IKT) = COEF0 + COEF1*X + COEF2*X*X
-	      END IF
-	      if(gbar(ikt) .gt. 0.0d0)then
-	        RATE=RATE+T1*GBAR(ikt)*YE(IKT,DPTH_INDX)*dXKT(IKT)/XKT(IKT)
-	      end if
+	T1=3.28978D0*COL_CONST*ATM(ID)%AXzV_F(NL,NUP)*ATM(ID)%CROSEC_NTFAC/dE
+	DO IKT=1,NKT
+	  IF(XKT(IKT) .GE. dE_eV)THEN
+	    X = SQRT(XKT(IKT)/dE_eV-1.0d0)
+	    IF((ATM(ID)%ZXzV .NE. 1).AND.(X .LE. CONNECT_POINT))THEN
+	      GBAR = 0.2D0
+	    ELSE
+	      GBAR = COEF0 + COEF1*X + COEF2*X*X
 	    END IF
-	  END DO
-!	END IF
+	    IF(GBAR .GT. 0.0D0)THEN
+	      RATE=RATE+T1*GBAR*YE(IKT,DPTH_INDX)*dXKT(IKT)/XKT(IKT)
+	    end if
+	  END IF
+	END DO
 !
 	RETURN
-	END      
+	END

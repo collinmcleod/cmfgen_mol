@@ -15,6 +15,7 @@
 	1                     NU,NU_CONT,INIT_ARRAYS,ND)
 	IMPLICIT NONE
 !
+! Altered 20-Oct-2011 - Now sum up all in ion levels for FF. Only do this when PHOT_ID=1
 ! Altered 05-Apr-2011 - Changed to V6.
 !                       LOG_DIST (rather than dwHNST_F) is passed in call.
 !                         Modifications done to allow lower temperaturs.
@@ -67,7 +68,7 @@
 	LOGICAL INIT_ARRAYS	        !Used to signify initialization
 !
 	INTEGER I,J
-	REAL*8 T2,A1,TMP_HNST
+	REAL*8 POP_SUM,T2,A1,TMP_HNST
 	REAL*8 JB_RAT, JC_RAT
 	REAL*8 H,ZHYD,CHIBF,CHIFF,HDKT,TWOHCSQ
 !
@@ -134,12 +135,15 @@
 !
 ! The constant in T2 is 4PI x 1.0E-10.
 !
-	T2=1.256637061D-09*ZHYD*ZHYD*CHIFF/(NU_CONT**3)
-	DO J=1,ND
-	  A1=EXP(-HDKT*NU/T(J))
-	  FF(J) =FF(J)+T2*ED(J)*DI(ION_LEV,J)/SQRT(T(J))*(1.0D0-A1)
-	1       *GFF_VAL(J)*( BPHOT_CR(J)-JPHOT_CR(J) )
-	END DO
+	IF(ION_LEV .EQ. 1)THEN
+	  T2=1.256637061D-09*ZHYD*ZHYD*CHIFF/(NU_CONT**3)
+	  DO J=1,ND
+	    POP_SUM=SUM(DI(:,J))
+	    A1=EXP(-HDKT*NU/T(J))
+	    FF(J) =FF(J)+T2*ED(J)*POP_SUM/SQRT(T(J))*(1.0D0-A1)
+	1           *GFF_VAL(J)*( BPHOT_CR(J)-JPHOT_CR(J) )
+	  END DO
+	END IF
 !
 	RETURN
 	END

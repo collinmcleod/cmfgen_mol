@@ -22,6 +22,7 @@ OBJ = $(LIB)(usr_option.o)\
       $(LIB)(update_keyword.o)\
       $(LIB)(upper_case.o)\
       $(LIB)(usr_hidden.o)\
+      $(LIB)(wr_col_str.o)\
       $(LIB)(wr_fmt_string.o)\
       $(LIB)(wr_string.o)
 

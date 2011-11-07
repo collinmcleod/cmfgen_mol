@@ -49,6 +49,7 @@
 	LOGICAL NET_RECOM_PER_LEVEL
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
+        CHARACTER(LEN=2), PARAMETER :: FORMFEED=' '//CHAR(12)
 	CHARACTER(LEN=6) COLOR(8)
 	DATA COLOR/'RED','BLUE','GREEN','MAUVE','PINK','YELLOW','ORANGE','F_Gree'/
 !
@@ -186,14 +187,14 @@
 	       READ(20,*)(RECOM(I),I=IST,IEND)
 	       RECOM_SUM(IST:IEND)=RECOM_SUM(IST:IEND)+RECOM(IST:IEND)
 	     END DO
-	     WRITE(21,'(A,I4,A,I4,A)')'   Total reombination rate (d=',(I-1)*10+1,' to',MIN(I*10,ND),'):'
+	     WRITE(21,'(A,I4,A,I4,A)')'   Total recombination rate (d=',IST,' to',IEND,'):'
 	     WRITE(21,'(X,10ES12.4)')(RECOM_SUM(I),I=IST,IEND)
-	     WRITE(21,'(A)')
+!	     WRITE(21,'(A)')
 	   END IF
 !
 	   DO WHILE(INDEX(STRING,'Net Recombination Rate') .EQ. 0)
 	     READ(20,'(A)')STRING
-	     IF(INDEX(STRING,'Net Recombination Rate') .NE. 0)THEN
+	     IF(INDEX(STRING,'Net Recombination Rate') .EQ. 0)THEN
 	       WRITE(21,'(A)')TRIM(STRING)
 	     END IF
 	     IF(INDEX(STRING,'Colisional Recombination Rate') .NE. 0)THEN
@@ -219,8 +220,11 @@
 	   FLUSH(21)
 	   DO WHILE(1 .EQ. 1)
 	     READ(20,'(A)',END=200)STRING
+	     IF(STRING(1:1) .EQ. '1' .OR. STRING(1:1) .EQ. FORMFEED)THEN
+	       EXIT
+	       WRITE(21,'(A)')FORMFEED
+	     END IF
 	     WRITE(21,'(A)')TRIM(STRING)
-	     IF(STRING(1:1) .EQ. '1')EXIT
 	   END DO
 	   FLUSH(21)
 	END DO

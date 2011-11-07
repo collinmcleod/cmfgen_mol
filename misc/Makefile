@@ -52,6 +52,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)rev_hydro_turb.exe\
          $(EXE_DIR)mass_sc.exe\
          $(EXE_DIR)plt_alpha.exe\
+         $(EXE_DIR)plt_cmf_lum.exe\
          $(EXE_DIR)plt_ddt_work.exe\
          $(EXE_DIR)plt_gf.exe\
          $(EXE_DIR)plt_raw_xray.exe\
