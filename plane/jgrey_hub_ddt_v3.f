@@ -170,9 +170,13 @@
 	T_FROM_J(1:ND)=0.0D0
 	OLD_T(1:ND)=0.0D0
 	TSTORE(1:ND)=0.0D0
-	REDUCTION_FACTOR=1000.0D0
+	REDUCTION_FACTOR=100.0D0
         BAD_J_COUNTER=0
         F_LOOP_COUNTER=0
+!
+	F(1:ND)=0.0D0
+	RJ(1:ND)=RSQ_J_OLDt(1:ND)/R(1:ND)/R(1:ND)
+	GOTO 5000
 !
 1000	CONTINUE
 !
@@ -318,13 +322,18 @@
 	BAD_J=.FALSE.
 	DO I=1,ND
 	  IF(TA(I) .LE. 0.0D0 .OR. RJ(I) .LE. 0.0D0)THEN
+	    IF(RJ(I+1) .LE. 0.0D0)THEN
+	      RJ(I)=R(I-1)*R(I-1)*RJ(I-1)
+	    ELSE
+	      RJ(I)=SQRT(R(I+1)*RJ(I-1))
+	    END IF 
             BAD_J_COUNTER=BAD_J_COUNTER+1
 	    BAD_J=.TRUE.
 	    IF(WORK(I) .GT. 0)THEN
 	      T_FROM_J(I)=0.5D0*(OLD_T(I)*ROLD_ON_R+T_FROM_J(I))
 	    ELSE
-	      WRITE(6,*)'Error in JGREY_HUB_DDT_V3'
-	      WRITE(6,*)'Error: WORK -ve yet -ve J or B'
+	      WRITE(6,*)'Possible error in JGREY_HUB_DDT_V3'
+	      WRITE(6,*)'Possible error: WORK -ve yet -ve J or B'
 	      WRITE(6,*)'Check DJDT_GREY_ERROR file for more information'
 	      OPEN(UNIT=LU,FILE='DJDT_GREY_ERRROR',STATUS='UNKNOWN')
                 WRITE(LU,'(X,A,ES12.4,3X,A,ES12.4,6X,A,ES12.4)')
@@ -336,6 +345,12 @@
 	1                              CHI(J),CHI_PLANCK(J),RJ(J),TA(J)
 	        END DO
 	      CLOSE(UNIT=LU)
+	      T_FROM_J(I)=0.5D0*(OLD_T(I)*ROLD_ON_R+T_FROM_J(I))
+	      IF(RJ(I+1) .LE. 0.0D0)THEN
+	        RJ(I)=R(I-1)*R(I-1)*RJ(I-1)
+	      ELSE
+	        RJ(I)=SQRT(R(I+1)*RJ(I-1))
+	      END IF 
 	      STOP
 	    END IF
 	    IF(BAD_J_COUNTER .GT. 300)THEN
@@ -367,7 +382,8 @@
 	TSTORE(1:ND)=T_FROM_J(1:ND)
 	IF(BAD_J)GOTO 1000
 	IF(REDUCTION_FACTOR .GT. 1.0D0)THEN
-	  REDUCTION_FACTOR=MAX(1.0D0,REDUCTION_FACTOR-1.0D0)
+!	  REDUCTION_FACTOR=MAX(1.0D0,REDUCTION_FACTOR-1.0D0)
+	  REDUCTION_FACTOR=MAX(1.0D0,REDUCTION_FACTOR/1.2D0)
 	  GOTO 1000
 	END IF	
 	BAD_J_COUNTER=0
@@ -381,6 +397,8 @@
 	CALL OUT_JH(XM,RSQ_HFLUX,H_INBC,H_OUTBC,T1,I,R,VEL,ND,L_TRUE,'GREY')
 !
 ! 
+!
+5000	CONTINUE
 !
 ! Solve for the Eddington factors using a ray by ray solution. The D/Dt terms
 ! are presently ignored.

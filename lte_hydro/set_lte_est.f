@@ -113,7 +113,7 @@
 !
 ! Evaluates LTE populations for both the FULL atom, and super levels.
 !
-	CALL EVAL_LTE_V4(DO_LEV_DISSOLUTION,ND)
+	CALL EVAL_LTE_V5(DO_LEV_DISSOLUTION,ND)
 !
 	RETURN
 	END

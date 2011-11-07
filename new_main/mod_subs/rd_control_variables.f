@@ -235,8 +235,29 @@ C
 	1            'Force a pre hubble flow using age and radii of SN?')
 	    CALL RD_STORE_LOG(INCL_RADIOACTIVE_DECAY,'INC_RAD_DECAYS',L_TRUE,
 	1            'Allow for radiactive decays')
+!
 	    CALL RD_STORE_LOG(TREAT_NON_THERMAL_ELECTRONS,'TRT_NON_TE',L_TRUE,
 	1            'Treat non-thermal electrons')
+	    SCL_NT_CROSEC=.FALSE.
+	    SCL_NT_ION_CROSEC=.FALSE.
+	    IF(TREAT_NON_THERMAL_ELECTRONS)THEN
+	      CALL RD_STORE_LOG(SCL_NT_CROSEC,'SCL_NT_CROSEC',L_FALSE,
+	1                       'Scale the nonthermal excitation cross sections?')
+	      CALL RD_STORE_LOG(SCL_NT_ION_CROSEC,'SCL_NT_ION_CROSEC',L_FALSE,
+	1                       'Scale the nonthermal ionization cross sections?')
+	    ENDIF
+!
+	    ADD_DEC_NRG_SLOWLY=.FALSE.
+	    CALL RD_STORE_LOG(ADD_DEC_NRG_SLOWLY,'GAMMA_SLOW',L_FALSE,
+	1            'Add radioactivity decay energy slowly?')
+	    IF(ADD_DEC_NRG_SLOWLY)THEN
+	       CALL RD_STORE_DBLE(DEC_NRG_SCL_FAC_BEG,'DECNRG_SCLFAC_BEG',ADD_DEC_NRG_SLOWLY,
+	1            'Initial Scale factor for adding decay energy')
+            END IF
+!
+	    COMP_GREY_LST_IT=.TRUE.
+	    CALL RD_STORE_LOG(COMP_GREY_LST_IT,'COMP_GREY_LST_IT',L_FALSE,'Compute grey solution on last iteration?')
+!
 	    CALL RD_STORE_NCHAR(SN_T_OPTION,'SN_T_OPT',ITEN,L_TRUE,
 	1           'Method to get T with non-GRID option (USE_T_IN or USE_HYDRO)')
 	    CALL RD_STORE_NCHAR(GAMRAY_TRANS,'GAMRAY_TRANS',ITEN,L_TRUE,

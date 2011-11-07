@@ -96,7 +96,7 @@ $(EXE_DIR)%.exe : %.o $(OANDF)
 	$(F90) $*.o \
               $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \
-              -o $(EXE_DIR)$*.exe
+              -g -o $(EXE_DIR)$*.exe
 
 
 $(EXE_DIR)tlusty_vel.exe : tlusty_vel.o $(OANDF) 
@@ -118,7 +118,7 @@ $(EXE_DIR)solve_ba_mat.exe : solve_ba_mat.o
 # General rule to compile a fortran ".f" file.
 
 %.o : %.f
-	$(F90) -c $(FG)  $<
+	$(F90)  -c $(FD)  $<
 
 USR = $(LIB_DIR)libtools.a(usr_option.o)
 GEN = $(LIB_DIR)libtools.a(gen_in.o)

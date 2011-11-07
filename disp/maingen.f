@@ -3443,6 +3443,72 @@
 	  IF(J .NE. 0)WRITE(T_OUT,*)J,' lines plotted'
 	  IF(J  .NE. 0)CALL DP_CURVE(J,XV,YV)
 !
+!`
+	ELSE IF(XOPT .EQ. 'VLTAU')THEN
+!
+	  DEFAULT=WR_STRING(LAM_ST)
+	  CALL USR_OPTION(LAM_ST,'LAMST',DEFAULT,FREQ_INPUT)
+	  DEFAULT=WR_STRING(LAM_EN)
+	  CALL USR_OPTION(LAM_EN,'LAMEN',DEFAULT,FREQ_INPUT)
+	  NU_ST=ANG_TO_HZ/LAM_ST
+	  NU_EN=ANG_TO_HZ/LAM_EN
+	  T1=NU_ST
+	  NU_ST=MIN(NU_ST,NU_EN)
+	  NU_EN=MAX(T1,NU_EN)
+!
+	  DO I=1,ND
+	    TA(I)=OPLIN*R(I)*2.998D-10/V(I)
+	  END DO
+!
+	  J=0
+	  FOUND=.FALSE.
+	  DO ID=1,NUM_IONS
+	    IF(ATM(ID)%XzV_PRES)THEN
+	      DO NL=1,ATM(ID)%NXzV_F
+	        DO NUP=NL+1,ATM(ID)%NXzV_F
+	          FREQ=ATM(ID)%EDGEXzV_F(NL)-ATM(ID)%EDGEXzV_F(NUP)
+	          GLDGU=ATM(ID)%GXzV_F(NL)/ATM(ID)%GXzV_F(NUP)
+	          IF(ATM(ID)%AXzV_F(NL,NUP) .NE. 0 .AND. FREQ .GT. NU_ST .AND. FREQ .LT. NU_EN)THEN
+	            J=J+1
+	            IF(FLAG)THEN
+                      XV(J)=LOG10( ANG_TO_HZ/FREQ )
+	            ELSE
+                      XV(J)=ANG_TO_HZ/FREQ
+	            END IF
+	            ELEC=.FALSE.
+	            DO I=1,ND
+	              T1=ATM(ID)%W_XzV_F(NUP,I)/ATM(ID)%W_XzV_F(NL,I)
+	              T2=ATM(ID)%AXzV_F(NL,NUP)*(T1*ATM(ID)%XzV_F(NL,I)-GLDGU*ATM(ID)%XzV_F(NUP,I))
+	              T2=T2*TA(I)/FREQ
+	              IF(ELEC .AND. T2 .LT. 1.0D0)THEN
+	                ZV(J)=(YV(J)-V(I))/2
+	                YV(J)=(YV(J)+V(I))/2
+	                EXIT
+	              ELSE IF(T2 .GT. 1.0D0 .AND. .NOT. ELEC)THEN
+	                ELEC=.TRUE.
+	                YV(J)=V(I)
+	              ELSE IF(ELEC .AND. I .EQ. ND)THEN
+	                ZV(J)=(YV(J)-V(I))/2
+	                YV(J)=(YV(J)+V(I))/2
+	              ELSE IF(I .EQ. ND)THEN
+	                J=J-1
+	              END IF
+	            END DO
+	          END IF
+	        END DO
+	      END DO
+	    END IF
+	  END DO
+!
+	  XAXSAV=XAXIS
+	  IF(FLAG)THEN
+	    XAXIS='Log(\gl(\A))'
+	  ELSE
+	    XAXIS='\gl(\gV)'
+	  END IF
+	  YAXIS='V(km/s)'
+	  IF(J .NE. 0)WRITE(T_OUT,*)J,' lines plotted'
+	  IF(J  .NE. 0)CALL DP_CURVE_AND_ER(J,XV,YV,ZV,' ')
 !
 !
 ! This section creates an image of the partial opacities (i.e., the opacities due
@@ -4690,7 +4756,7 @@ c
 !
 ! To be read TAU_at_R and R_at_TAU respectively.
 !
-	ELSE IF(XOPT .EQ. 'RTAU' .OR. XOPT .EQ. 'TAUR' .OR. 
+	ELSE IF(XOPT .EQ. 'RTAU' .OR. XOPT .EQ. 'VTAU' .OR. XOPT .EQ. 'TAUR' .OR. 
 	1       XOPT .EQ. 'KAPR' .OR. XOPT .EQ. 'CHIR' .OR. XOPT .EQ. 'ALBEDO' .OR.
 	1       XOPT .EQ. 'ETAR' .OR. XOPT .EQ. 'WROPAC')THEN
 	  IF(XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are included'
@@ -4792,9 +4858,12 @@ c
 	    IF(XOPT .EQ. 'CHIR')YAXIS='\gx (cm\u-1\d)'
 	    IF(XOPT .EQ. 'KAPR')YAXIS='\gk (cm\u2\d/g)'
 	    IF(XOPT .EQ. 'ETAR')YAXIS='\ge (ergs cm\u3 \ds\u-1\d)'
+	  ELSE IF(XOPT .EQ. 'VTAU')THEN
+	    CALL USR_OPTION(TAU_VAL,'TAU',' ','Tau value for which V is to be determined')
+	    YAXIS='V(km/s)'
+	    IF(LINY)YAXIS='R[\gt]/R\d*\u'
 	  ELSE
-	    CALL USR_OPTION(TAU_VAL,'TAU',' ',
-	1       'Tau value for which R is to be determined')
+	    CALL USR_OPTION(TAU_VAL,'TAU',' ','Tau value for which R is to be determined')
 	    YAXIS='Log(R[\gt]/R\d*\u)'
 	    IF(LINY)YAXIS='R[\gt]/R\d*\u'
 	  END IF
@@ -4872,9 +4941,22 @@ c
 	          T2=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
 	          YV(ML)=T2*TA(R_INDX+1) + (1.0-T2)*TA(R_INDX)
 	          IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
+	        ELSE IF(XOPT .EQ. 'VTAU')THEN
+	          I=1
+	          DO WHILE(TAU_VAL .GT. TA(I) .AND. I .LT. ND)
+	            I=I+1
+	          END DO
+	          IF(TAU_VAL .GT. TA(ND-1))THEN
+	            YV(ML)=V(ND)
+	          ELSE IF(TAU_VAL .LE. TA(1))THEN
+	            YV(ML)=V(1)*TA(1)/TAU_VAL
+	          ELSE
+	            T2=(TA(I)-TAU_VAL)/(TA(I)-TA(I-1))
+                    YV(ML)=( (1.0-T2)*V(I)+T2*V(I-1) )
+	          END IF
 	        ELSE
 	          I=1
-	         DO WHILE(TAU_VAL .GT. TA(I) .AND. I .LT. ND)
+	          DO WHILE(TAU_VAL .GT. TA(I) .AND. I .LT. ND)
 	            I=I+1
 	          END DO
 	          IF(TAU_VAL .GT. TA(ND-1))THEN

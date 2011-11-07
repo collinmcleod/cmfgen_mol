@@ -18,6 +18,8 @@
 	INTEGER N_LINES
 	INTEGER COUNT
 	INTEGER I,K,ML,IBEG
+	INTEGER IOS
+	LOGICAL FILE_OPEN
 !
 	CHARACTER*80 FILENAME
 	CHARACTER*80 STRING
@@ -37,8 +39,26 @@
 	CALL GEN_IN(FILENAME,'File with data to be plotted')
 	IF(FILENAME .EQ. ' ')GOTO 100
 !
-	ND=104; N_LINES=102066
-	CALL GEN_IN(ND,'Number of data points (must be exact)')
+	OPEN(UNIT=20,FILE='MODEL',STATUS='OLD',IOSTAT=IOS)
+	  IF(IOS .EQ. 0)THEN
+	    DO WHILE(1 .EQ. 1)
+	      READ(20,'(A)',IOSTAT=IOS)STRING
+	      IF(IOS .NE. 0)EXIT
+	      IF(INDEX(STRING,'!Number of depth points') .NE. 0)THEN
+	         READ(STRING,*)ND
+	         WRITE(6,'(A,I4)')' Number of depth points in the model is:',ND
+	         EXIT
+	      END IF
+	    END DO
+	  END IF
+	INQUIRE(UNIT=20,OPENED=FILE_OPEN)
+	IF(FILE_OPEN)CLOSE(UNIT=20)
+!
+	IF(IOS .NE. 0)THEN
+	  WRITE(6,*)' Unable to open MODEL file to get # of depth points'
+	  CALL GEN_IN(ND,'Number of data points (must be exact)')
+	END IF
+	N_LINES=NMAX
 	CALL GEN_IN(N_LINES,'Maximum number of lines to be read')
 !
 	ALLOCATE (LH(ND,N_LINES))

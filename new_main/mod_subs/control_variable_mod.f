@@ -82,7 +82,16 @@
 	LOGICAL DO_CO_MOV_DDT		!Include comoving drivative in SE equations.
 	LOGICAL DO_FULL_REL_OBS         !Include all relativistic terms in obs. frame computation.
 	LOGICAL DO_FULL_REL_CMF         !Include all relativistic terms in CMF obs. frame computation.
-	LOGICAL TREAT_NON_THERMAL_ELECTRONS	!
+!
+! Non thermal parameters
+!
+	LOGICAL TREAT_NON_THERMAL_ELECTRONS     !
+	LOGICAL ADD_DEC_NRG_SLOWLY
+	REAL*8 DEC_NRG_SCL_FAC_BEG
+	REAL*8 DEC_NRG_SCL_FAC
+	LOGICAL COMP_GREY_LST_IT        !Comput J(GREY) on last iteration [DEFAULT is TRUE].
+	LOGICAL SCL_NT_CROSEC
+	LOGICAL SCL_NT_ION_CROSEC
 !
 	LOGICAL USE_J_REL
 	LOGICAL USE_FORMAL_REL

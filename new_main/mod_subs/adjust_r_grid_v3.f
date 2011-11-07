@@ -93,9 +93,9 @@
 	  STOP
 	END IF
 	CALL RD_OPTIONS_INTO_STORE(LUIN,LUSCR)
-	CALL RD_STORE_INT(NO_R_REV,'N_ITS',L_TRUE,'Number of hydro iterations remaining')
-	CALL RD_STORE_INT(STRT_R_REV,'STRT_ITS',L_FALSE,'Iteration to start first hydro iteration')
-	CALL RD_STORE_INT(FREQ_R_REV,'FREQ_ITS',L_FALSE,'Frequency for hydro iterations')
+	CALL RD_STORE_INT(NO_R_REV,'N_ITS',L_TRUE,'Number of iterations remaining')
+	CALL RD_STORE_INT(STRT_R_REV,'STRT_ITS',L_FALSE,'Iteration to start first R-grid revision')
+	CALL RD_STORE_INT(FREQ_R_REV,'FREQ_ITS',L_FALSE,'Frequency for R-grid revisions')
 	I=10; CALL RD_STORE_NCHAR(GRID_TYPE,'GRID_TYPE',I,L_TRUE,'Regridding method: MODUN, UNIFORM, FIX_NX')
 	IF(GRID_TYPE .EQ. 'MODUN')THEN
 	  STRETCH_POW=1.5D0

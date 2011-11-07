@@ -7,6 +7,7 @@
 !
 	PROGRAM PLT_JH_CUR
 !
+! Altered 8-Oct-2011   : Improved plot labeling, pass RSQ? to DP_CNVRT routine.
 ! Created 5-April-2009 : Based on PLT_JH (plots EDDFACTOR).
 ! Interface routines for IO routines.
 !
@@ -106,6 +107,7 @@
 	INTEGER REC_LENGTH
 	INTEGER NEW_ND
 	REAL*8 SCALE_FAC
+	REAL*8 RVAL
 	REAL*8 TEMP
 	REAL*8 DTDR
 	REAL*8 RADIUS
@@ -253,9 +255,9 @@
 	STRING=ZM(ID)%FILENAME
 	CALL SET_CASE_UP(STRING,IZERO,IZERO)
 	IF(INDEX(STRING,'JH_AT') .NE. 0)THEN
-	   ZM(ID)%DATA_TYPE='J'
+	   ZM(ID)%DATA_TYPE='RSQJ'
 	ELSE IF(INDEX(STRING,'FLUX') .NE. 0)THEN
-	   ZM(ID)%DATA_TYPE='H'
+	   ZM(ID)%DATA_TYPE='RSQH'
 	ELSE
 	   ZM(ID)%DATA_TYPE='UNKNOWN'
 	END IF
@@ -516,7 +518,7 @@
 	  STRING=ZM(ID)%FILENAME
 	  CALL SET_CASE_UP(STRING,IZERO,IZERO)
 	  IF(INDEX(STRING,'JH_AT') .NE. 0)THEN
-	    ZM(ID)%DATA_TYPE='J'
+	    ZM(ID)%DATA_TYPE='RSQJ'
 	  ELSE
 	    ZM(ID)%DATA_TYPE='UNKNOWN'
 	  END IF
@@ -576,8 +578,8 @@
 	    END IF
 	    CALL DP_CURVE(ND,XV,YV)
 	  END DO
-	  YAXIS='J(grey)'
-	  IF(NORM)YAXIS='JG/JG(1)'
+	  YAXIS='r^2 J(grey)/10\u20\d'
+	  IF(NORM)YAXIS='r\u2\dJG/r(1)\u2\dJG(1)'
 	ELSE IF(X(1:2) .EQ. 'HG')THEN
 	  NORM=.FALSE.
 	  CALL GEN_IN(NORM,'Normalize H(Grey) by outer boundary value?')
@@ -592,6 +594,8 @@
 	    END IF
 	    CALL DP_CURVE(ND,XV,YV)
 	  END DO
+	  YAXIS='r^2 H(grey)/10\u20\d'
+	  IF(NORM)YAXIS='r\u2\dHG/r(1)\u2\dHG(1)'
 !
 	ELSE IF(X(1:2) .EQ. 'JD' .OR. X(1:2) .EQ. 'HD')THEN
 !
@@ -757,19 +761,23 @@
 !
 	ELSE IF(X(1:2) .EQ. 'BB') THEN
 !
+	  I=1
+	  CALL USR_OPTION(I,'Depth',' ','Depth index: for default R, T')
+	  DEFAULT=WR_STRING(T(I))
+	  RVAL=ZM(1)%R(I)
 	  NCF=ZM(1)%NCF
-          CALL USR_OPTION(TEMP,'TEMP','3.0',' ')
+          CALL USR_OPTION(TEMP,'TEMP',DEFAULT,' ')
           DO I=1,ZM(1)%NCF
             T3=HDKT*ZM(1)%NU(I)/TEMP
             IF(T3 .GT. 1.0D0)THEN
-              YV(I)=TWOHCSQ*(ZM(1)%NU(I)**3)*DEXP(-T3)/(1.0D0-DEXP(-T3))
+              YV(I)=RVAL*RVAL*TWOHCSQ*(ZM(1)%NU(I)**3)*DEXP(-T3)/(1.0D0-DEXP(-T3))
             ELSE
-              YV(I)=TWOHCSQ*(ZM(1)%NU(I)**3)/(DEXP(T3)-1.0D0)
+              YV(I)=RVAL*RVAL*TWOHCSQ*(ZM(1)%NU(I)**3)/(DEXP(T3)-1.0D0)
             END IF
             XV(I)=ZM(1)%NU(I)
          END DO
 	 CALL DP_CNVRT_J_V2(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
-	1         'J',LAMC,XAXIS,YAXIS,L_FALSE)
+	1         'RSQJ',LAMC,XAXIS,YAXIS,L_FALSE)
 	 CALL DP_CURVE(NCF,XV,YV)
 !
 	ELSE IF(X(1:3) .EQ. 'INT') THEN

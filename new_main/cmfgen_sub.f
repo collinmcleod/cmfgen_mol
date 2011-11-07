@@ -639,6 +639,16 @@
 	   FILL_FAC_XRAYS_2=FILL_FAC_X2_BEG
 	END IF
 !
+	IF(TREAT_NON_THERMAL_ELECTRONS .AND. (SCL_NT_CROSEC .OR. SCL_NT_ION_CROSEC))THEN
+	  CALL RD_NT_CROSEC_SCLFAC_V2(LUIN,LUER)
+	END IF
+!
+	IF(TREAT_NON_THERMAL_ELECTRONS .AND. ADD_DEC_NRG_SLOWLY .AND. RD_LAMBDA)THEN
+	  DEC_NRG_SCL_FAC=DEC_NRG_SCL_FAC_BEG
+	ELSE
+	  DEC_NRG_SCL_FAC=1.0D0
+	END IF
+!
 	CALL RD_NUC_DECAY_DATA(INCL_RADIOACTIVE_DECAY,ND,LUIN)
 !
 ! 
@@ -1302,7 +1312,7 @@
 ! This routine not only evaluates the LTE populations of both model atoms, but
 ! it also evaluates the dln(LTE Super level Pop)/dT.
 !
-	CALL EVAL_LTE_V4(DO_LEV_DISSOLUTION,ND)
+	CALL EVAL_LTE_V5(DO_LEV_DISSOLUTION,ND)
 !
 ! 
 !
@@ -1562,7 +1572,7 @@
 	    CALL ELECTRON_NON_THERM_SPEC(ND)
 	  CALL TUNE(2,'NON_THERM')
 	  CALL TUNE(1,'SE_NON_THERM')
-	    CALL SE_BA_NON_THERM(dE_RAD_DECAY,COMPUTE_BA,NT,ND)
+	    CALL SE_BA_NON_THERM_V2(dE_RAD_DECAY,COMPUTE_BA,NT,ND,DEC_NRG_SCL_FAC)
 	  CALL TUNE(2,'SE_NON_THERM')
 	END IF
 !
@@ -2747,11 +2757,11 @@
 	      J=0
 	      IF(ID .NE. 1)J=ATM(ID-1)%INDX_XzV
 	      TMP_STRING=TRIM(ION_ID(ID))//'PRRR'
-	      CALL WRRECOMCHK_V3(ATM(ID)%APRXzV, ATM(ID)%ARRXzV,
+	      CALL WRRECOMCHK_V4(ATM(ID)%APRXzV, ATM(ID)%ARRXzV,
 	1          ATM(ID)%CPRXzV, ATM(ID)%CRRXzV,
 	1          ATM(ID)%CHG_PRXzV, ATM(ID)%CHG_RRXzV, SE(ID)%STEQ_ADV,
 	1          DIERECOM(1,ATM(ID)%INDX_XzV),ADDRECOM(1,ATM(ID)%INDX_XzV),
-	1          X_RECOM(1,J),X_RECOM(1,ATM(ID)%INDX_XzV),
+	1          X_RECOM(1,J),X_RECOM(1,ATM(ID)%INDX_XzV),ATM(ID)%NTIXzV,
 	1          R,T,ED,ATM(ID)%DXzV,TA,TB, ATM(ID)%NXzV,
 	1          ND,LU_REC_CHK,TMP_STRING,ION_ID(ID))
 	    END IF
@@ -2767,8 +2777,8 @@
 	    CALL FSTCOOL(R,T,ED,TA,TB,ML,ND,LU_REC_CHK)
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
-	        CALL WRCOOLGEN(ATM(ID)%BFCRXzV, ATM(ID)%FFXzV, ATM(ID)%COOLXzV,
-	1           DIECOOL(1,ATM(ID)%INDX_XzV), X_COOL(1,ATM(ID)%INDX_XzV),
+	        CALL WRCOOLGEN_V2(ATM(ID)%BFCRXzV, ATM(ID)%FFXzV, ATM(ID)%COOLXzV,
+	1           DIECOOL(1,ATM(ID)%INDX_XzV), X_COOL(1,ATM(ID)%INDX_XzV), ATM(ID)%NTCXzV,
 	1           ATM(ID)%XzV_PRES, ATM(ID)%NXzV, ION_ID(ID),
 	1           TA,TB,LS,ND,LU_REC_CHK)
 	      END IF
@@ -2893,9 +2903,11 @@
 !
 	  CHI(1:ND)=ROSS_MEAN(1:ND)*CLUMP_FAC(1:ND)
 	  TCHI(1:ND)=PLANCK_MEAN(1:ND)*CLUMP_FAC(1:ND)
-	  CALL COMP_GREY_V4(POPS,TGREY,TA,CHI,TCHI,CHK,LUER,NC,ND,NP,NT)
+	  IF(COMP_GREY_LST_IT)THEN
+	    CALL COMP_GREY_V4(POPS,TGREY,TA,CHI,TCHI,CHK,LUER,NC,ND,NP,NT)
+	  END IF
 !
-	  IF(CHK)THEN
+	  IF(CHK .AND. COMP_GREY_LST_IT)THEN
 	    OPEN(UNIT=LUIN,FILE='GREY_SCL_FACOUT',STATUS='UNKNOWN')
 	      WRITE(LUIN,'(A)')'!'
 	      WRITE(LUIN,'(A,8X,A,7X,A,7X,A,6X,A)')'!','Log(Tau)','T/T(grey)','T(10^4 K)','L'
@@ -4037,6 +4049,23 @@
 !
 	  CLOSE(UNIT=LU_POP)
 !
+	  IF(TREAT_NON_THERMAL_ELECTRONS)THEN
+	    CALL GEN_ASCI_OPEN(LU_POP,'NON_THERM_COOL','UNKNOWN',' ',' ',IZERO,IOS)
+	    WRITE(LU_POP,'(1X,A,T30,I5)')'ND:',ND
+	    WRITE(LU_POP,*)''
+	    DO ID=1,NUM_IONS
+	      IF(ATM(ID)%XzV_PRES)THEN
+	        WRITE(LU_POP,'(A)')TRIM(ION_ID(ID))//' ionization cooling (eV)'
+	        WRITE(LU_POP,'(1X,1P8E16.7)')ATM(ID)%NT_ION_CXzV
+	        WRITE(LU_POP,*)''
+	        WRITE(LU_POP,'(A)')TRIM(ION_ID(ID))//' excitation cooling (eV)'
+	        WRITE(LU_POP,'(1X,1P8E16.7)')ATM(ID)%NT_EXC_CXzV
+	        WRITE(LU_POP,*)''
+	      END IF
+	    END DO
+	  CLOSE(UNIT=LU_POP)
+	  END IF
+!
 	  IF(SN_HYDRO_MODEL)THEN
 	    CALL OUT_SN_POPS_V3('SN_HYDRO_FOR_NEXT_MODEL',SN_AGE_DAYS,USE_OLD_MF_OUTPUT,ND,LUMOD)
 	  END IF
@@ -4067,7 +4096,7 @@
 !      1 refers to format for output.
 !      1,NHY - For use with HeI.
 !
-	CALL EVAL_LTE_V4(DO_LEV_DISSOLUTION,ND)
+	CALL EVAL_LTE_V5(DO_LEV_DISSOLUTION,ND)
 !      
 ! GAM_SPECIES refers to the number of electrons arising from each species (eg
 ! carbon).
@@ -4164,6 +4193,21 @@
 	    ADVEC_RELAX_PARAM=MIN(1.0D0,ADVEC_RELAX_PARAM*2.0D0)
 	    WRITE(LUER,*)'Have adjuseted advection relaxation parameter to:',ADVEC_RELAX_PARAM
 	    MAXCH=100
+	  END IF
+!
+! Adjust non-thermal decay energy scale factor. This is option is useful when adding non-thermal ioizations
+! to a thermal model.
+!
+	  IF(TREAT_NON_THERMAL_ELECTRONS .AND. ADD_DEC_NRG_SLOWLY .AND. RD_LAMBDA .AND. MAXCH .LT. 100)THEN
+	    IF(DEC_NRG_SCL_FAC .NE. 1.0D0)THEN
+	      DEC_NRG_SCL_FAC=MIN(DEC_NRG_SCL_FAC*10.0D0,1.0D0)
+	      WRITE(LUER,*)'Have adjusted radioactivity decay energy scale factor'
+	      WRITE(LUER,*)'New scale factor is',DEC_NRG_SCL_FAC
+	      CALL UPDATE_KEYWORD(DEC_NRG_SCL_FAC,'[DECNRG_SCLFAC_BEG]','VADAT',L_TRUE,L_TRUE,LUIN)
+	      MAXCH=100
+	    ELSE
+	      CALL UPDATE_KEYWORD(L_FALSE,'[GAMMA_SLOW]','VADAT',L_TRUE,L_TRUE,LUIN)
+	    END IF
 	  END IF
 !
 ! If we have reached desired convergence, we do one final loop

@@ -122,6 +122,11 @@
 	  REAL*8, ALLOCATABLE :: CPRXzV(:)
 	  REAL*8, ALLOCATABLE :: COOLXzV(:)
 !
+	  REAL*8, ALLOCATABLE :: NTCXzV(:)                   !Non-thermal cooling rate for species XzV
+	  REAL*8, ALLOCATABLE :: NTIXzV(:)                   !Non-thermal ionization rate
+	  REAL*8, ALLOCATABLE :: NT_ION_CXzV(:)              !Non thermal cooling rate (ionization)
+	  REAL*8, ALLOCATABLE :: NT_EXC_CXzV(:)              !Non thermal cooling rate (excitation)
+!
 ! Data vectors to check charge recombination rates.
 !
 	  REAL*8, ALLOCATABLE :: CHG_RRXzV(:)
@@ -129,6 +134,9 @@
 !
 	  REAL*8 ZXzV			!Charge on ion (=1 for HI)
 	  REAL*8 GIONXzV_F		!Statistical weight of ion
+!
+	  REAL*8 CROSEC_NTFAC           !Factor to scale the non-thermal exictation cross-sections
+	  REAL*8 ION_CROSEC_NTFAC       !Factor to scale non-thermal ioinzation cross-sections
 !
 	  INTEGER NXzV_F		!Number of levels in full atom
 	  INTEGER NXzV			!Number of levels in SL atom

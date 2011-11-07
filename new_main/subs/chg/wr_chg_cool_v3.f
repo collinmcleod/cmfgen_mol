@@ -4,7 +4,8 @@
 	SUBROUTINE WR_CHG_COOL_V3(NETCR,TOTCR,COUNTER,ND,LU)
 	USE CHG_EXCH_MOD_V3
 	IMPLICIT NONE
-!                                            
+!
+! Altered 03-Oct-2011 : Checks on non-zero N_CHG before writing header.
 ! Created 26-Aug-1998 : based on WR_AD_COOL
 !
 	INTEGER COUNTER
@@ -20,6 +21,7 @@
 	IF(MF .GT. ND)MF=ND
 !
 	IF(.NOT. DO_CHG_EXCH)RETURN
+	IF(N_CHG .EQ. 0)RETURN
 !
 	WRITE(LU,'(/3X,A)')'Charge exchange cooling rate [ergs/cm**3/sec]'
 	DO J=1,N_CHG

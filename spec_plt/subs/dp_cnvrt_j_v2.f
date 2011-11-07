@@ -8,6 +8,7 @@
 	1                    DATA_TYPE,LAMC,X_LAB,Y_LAB,X_ONLY)
 	IMPLICIT NONE
 !
+! Altered 08-Oct-2011: Inserted RSQ? DATA_TYPE into call.
 ! Altered 26-Mar-2002: Data_TYPE inserted into call.
 !                      Changed to version V2
 !
@@ -35,6 +36,8 @@ C Conversion factor from Angstroms to units of 10^15 Hz.
 C
 	KEV_TO_HZ=0.241838E+03
 	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07  	!10^8/10^15
+	X_LAB=' '
+	Y_LAB=' '
 C
 	IF(.NOT. X_ONLY)THEN
 	  IF(Y_PLT_OPT .EQ. 'NU_FNU')THEN
@@ -44,13 +47,16 @@ C
 	    END DO
 	    IF(DATA_TYPE .EQ. 'J')THEN
 	      Y_LAB='\gnJ\d\gn\u(ergs\d cm\u-2 \ds\u-1\d)' 
-	      IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(ergs\d \ucm\u-2 \ds\u-1\d)' 
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
 	      Y_LAB='\gnH\d\gn\u(ergs\d cm\u-2 \ds\u-1\d)' 
-	      IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(ergs\d \ucm\u-2 \ds\u-1\d)' 
+	    ELSE IF(DATA_TYPE .EQ. 'RSQJ')THEN
+	      Y_LAB='r\u2\d\gnJ\d\gn\u(ergs\d \us\u-1\d)/10\u20\d' 
+	    ELSE IF(DATA_TYPE .EQ. 'RSQH')THEN
+	      Y_LAB='r\u2\d\gnH\d\gn\u(ergs\d \us\u-1\d)/10\u20\d' 
 	    ELSE 
 	      WRITE(6,*)'Unrecognized DATA_TYPE for NU_FNU'
 	    END IF
+	    IF(LOG_Y)Y_LAB='Log '//Y_LAB
 	  ELSE IF(Y_PLT_OPT .EQ. 'FLAM')THEN
 	    T1=1.0E+22/C_CMS	  	!1.0E+30*1.0E-08
 	    DO I=1,NBB
@@ -58,13 +64,16 @@ C
 	    END DO
 	    IF(DATA_TYPE .EQ. 'J')THEN
 	      Y_LAB='J\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)' 
-	      IF(LOG_Y)Y_LAB='Log J\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)' 
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
 	      Y_LAB='H\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)' 
-	      IF(LOG_Y)Y_LAB='Log H\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)' 
+	    ELSE IF(DATA_TYPE .EQ. 'RSQJ')THEN
+	      Y_LAB='r\u2\dJ\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)\10\u20\d' 
+	    ELSE IF(DATA_TYPE .EQ. 'RSQH')THEN
+	      Y_LAB='r\u2\dH\d\gl\u(ergs\d \ucm\u-2 \d\A)/10\u20\d' 
 	    ELSE 
 	      WRITE(6,*)'Unrecognized DATA_TYPE for FLAM'
 	    END IF
+	    IF(LOG_Y)Y_LAB='Log '//Y_LAB
 	  ELSE IF(Y_PLT_OPT .EQ. 'FNU' .OR. Y_PLT_OPT(1:3) .EQ. 'NAT')THEN
 !
 ! Plots the data units as read in.
@@ -74,7 +83,13 @@ C
 	      IF(LOG_Y)Y_LAB='Log J\d\gn\u(ergs\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
 	      Y_LAB='H\d\gn\u(ergs\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)' 
-	      IF(LOG_Y)Y_LAB='Log H\d\gn\u(ergs\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
+	      IF(LOG_Y)Y_LAB='Log '//Y_LAB
+	    ELSE IF(DATA_TYPE .EQ. 'RSQJ')THEN
+	      Y_LAB='r\u2\dJ\d\gn\u(ergs\d \us\u-1 \dHz\u-1\d)/10\u20\d' 
+	      IF(LOG_Y)Y_LAB='Log '//Y_LAB
+	    ELSE IF(DATA_TYPE .EQ. 'RSQH')THEN
+	      Y_LAB='r\u2\dH\d\gn\u(ergs\d \us\u-1 \dHz\u-1\d)/10\u20\d' 
+	      IF(LOG_Y)Y_LAB='Log '//Y_LAB
 	    ELSE IF(DATA_TYPE .EQ. 'M(t)')THEN
 	      Y_LAB='M(t)'
 	      IF(LOG_Y)Y_LAB='Log M(t)'

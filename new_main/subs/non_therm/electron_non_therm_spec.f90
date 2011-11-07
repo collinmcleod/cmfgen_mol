@@ -3,6 +3,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+!	INTEGER NUM_IONS
 	INTEGER ND
 !
 	REAL*8, SAVE, ALLOCATABLE :: LELEC(:)
@@ -15,6 +16,8 @@
 !
 	INTEGER, SAVE, ALLOCATABLE :: INDX(:)
 	LOGICAL, SAVE, ALLOCATABLE :: DO_THIS_ION(:)
+	logical, save, allocatable :: do_and_1st_time(:)
+	integer, save, allocatable :: nlow_maxs(:)
 !
 	REAL*8 EKT
 	REAL*8 EKTP
@@ -56,6 +59,7 @@
 !
 	INTEGER, PARAMETER :: LU_ER=6
 	INTEGER, PARAMETER :: LU_TH=8
+	integer, parameter :: lu_bethe = 100
 	LOGICAL, SAVE :: FIRST_TIME=.TRUE.
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
@@ -74,7 +78,7 @@
 	WRITE(LU_ER,*)' '
 	WRITE(LU_ER,*)'Entering ELECTRON_NON_THERM_SPEC'
 	OPEN(UNIT=LU_TH,FILE='NON_THERM_SPEC_INFO',STATUS='UNKNOWN')
-	CALL SET_LINE_BUFFERING(LU_TH)
+!	CALL SET_LINE_BUFFERING(LU_TH)
 !
 ! Allocate arrays that will be used for each depth:.
 !
@@ -112,6 +116,8 @@
 	  IF(IOS .EQ. 0)ALLOCATE (POP_VEC(NUM_THD))
 	  IF(IOS .EQ. 0)ALLOCATE (INDX(NUM_THD))
 	  IF(IOS .EQ. 0)ALLOCATE (DO_THIS_ION(NUM_IONS))
+	  if(ios .eq. 0)allocate (do_and_1st_time(num_ions))
+	  if(ios .eq. 0)allocate (nlow_maxs(num_ions))
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LU_ER,*) 'Error allocating LELEC, SOURCE, etc in ELECTRON_NON_TERMAL_SPEC',IOS
 	    STOP
@@ -137,7 +143,7 @@
 	    END IF
 	  END DO
 	  WRITE(LU_TH,*)'Computing cross-sections'
-	  CALL ARNAUD_CROSS()
+	  CALL ARNAUD_CROSS_V3()
 !
 	  I=0
 	  DO IT=1,NUM_THD
@@ -188,9 +194,11 @@
 	  E_INIT = T2
 	END IF
 !
+!	open(unit=lu_bethe,file='bethe_cross_chk',status='unknown')
+	do_and_1st_time(:)=l_false
 	DO DPTH_INDX=1,ND
 !
-	  WRITE(LU_TH,'(/,X,A,I3)')'Starting depth index',DPTH_INDX
+	  WRITE(LU_TH,'(/,X,A,I3)')'Starting depth index: ',DPTH_INDX
 !
 ! Decide on which species we will handle when computing the electron distribution.
 ! For each route, we sum up over all levels of that term. This approach will
@@ -221,16 +229,17 @@
 	    ID=THD(INDX(IT))%LNK_TO_ION
 	    THD(INDX(IT))%DO_THIS_ION_ROUTE=.TRUE.
 	    DO_THIS_ION(ID)=.TRUE.
+	    do_and_1st_time(id)=.true.
 	    WRITE(LU_TH,'(I4,2X,I4,4X,A6,ES12.3)')IT,ID,TRIM(ION_ID(ID)),POP_VEC(INDX(IT))
 	  END DO
 !
 ! Building the upper-diagonal matrix mat(1:nkt,1:nkt)
 !
-	  WRITE(6,*)'Constructing MAT'
+	  WRITE(LU_TH,*)'Constructing MAT'
 !
 ! Get the energy losses through Coulomb interaction
 !
-	  WRITE(6,*)'Electron density=',ED(DPTH_INDX)  !ED(DPTH_INDX)
+	  WRITE(LU_TH,*)'Electron density=',ED(DPTH_INDX)  !ED(DPTH_INDX)
 	  CALL GET_LELEC(LELEC,XKT,NKT,ED(DPTH_INDX))  !,ED(DPTH_INDX))
 	  IF(VERBOSE_OUTPUT)THEN
 	    DO IKT=1,NKT
@@ -255,7 +264,7 @@
 	      IF(THD(IT)%PRES .AND. THD(IT)%DO_THIS_ION_ROUTE)THEN
 	        NATOM=THD(IT)%N_ATOM
                 XION_POT = THD(IT)%ION_POT
-	        WRITE(6,'(A,I3,A,F7.2,A)')'Ionization potential for IT=',IT,' is ',XION_POT,' eV'
+	        WRITE(LU_TH,'(A,I3,A,F7.2,A)')'Ionization potential for IT=',IT,' is ',XION_POT,' eV'
 !
 	        IF(XION_POT .LT. XKT(1))THEN
 	           IST=1
@@ -299,7 +308,8 @@
 !
 	CALL TUNE(1,'MAT_EXCITE')
 	IF (INCLUDE_EXCITATION)THEN
-	  WRITE(6,*)'Beginning excitation section'
+	  WRITE(LU_TH,*)'Beginning excitation section'
+!	  open(unit=lu_bethe,file='bethe_cross_chk',status='unknown',action='write')
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES .AND. DO_THIS_ION(ID))THEN
 !
@@ -311,11 +321,15 @@
 	        IF(ATM(ID)%XzV_F(I,DPTH_INDX)/T1 .GT. 1.0D-04)EXIT
 	        MAX_LOW_LEV=I
 	      END DO
-! 
+	      nlow_maxs(id)=max(nlow_maxs(id),max_low_lev)
+!
 	      DO J=2,ATM(ID)%NXzV_F
 	        DO I=1,MIN(J-1,MAX_LOW_LEV)
 	          NL=I; NUP=J
-	          CALL BETHE_APPROX(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX,FAST_BETHE_METHOD)
+!	          write(lu_bethe,'(x,I5,2X,I4,4X,A6,ES16.8)')dpth_indx,ID,TRIM(ION_ID(ID)), &
+!	                                                atm(id)%xzv_f(nl,dpth_indx)
+!	          CALL BETHE_APPROX(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX,FAST_BETHE_METHOD)
+	          CALL BETHE_APPROX_V3(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
 !
 !
 !$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(IKT,IKT0,IKTP,IKTPN,EKT,EMAX)
@@ -346,6 +360,7 @@
 	      END DO		!Loop over upper level
 	    END IF		!Ionization stage present
 	  END DO		!Loop over ionization stage
+!	  close(lu_bethe)
 	END IF			!Include excitations?
 	CALL TUNE(2,'MAT_EXCITE')
 !
@@ -389,8 +404,8 @@
 	    FRAC_ELEC_HEATING(DPTH_INDX)=FRAC_ELEC_HEATING(DPTH_INDX) + YE(IKT,DPTH_INDX)*LELEC(IKT)*dXKT(IKT)
 	  END DO
 	  FRAC_ELEC_HEATING(DPTH_INDX)=FRAC_ELEC_HEATING(DPTH_INDX)/E_INIT
-	  WRITE(6,*)'Fraction into electron heating is',FRAC_ELEC_HEATING(DPTH_INDX)
-	  WRITE(6,*)'Fraction into electron heating is',XKT(1)*LELEC(1)*YE(1,DPTH_INDX)/E_INIT
+	  WRITE(LU_TH,*)'Fraction into electron heating is',FRAC_ELEC_HEATING(DPTH_INDX)
+	  WRITE(LU_TH,*)'Fraction into electron heating is',XKT(1)*LELEC(1)*YE(1,DPTH_INDX)/E_INIT
 	  FRAC_ELEC_HEATING(DPTH_INDX)=FRAC_ELEC_HEATING(DPTH_INDX) + XKT(1)*LELEC(1)*YE(1,DPTH_INDX)/E_INIT
 !
 ! Compute the ionization and heating contributions
@@ -436,11 +451,15 @@
 	      DO J=2,ATM(ID)%NXzV_F
 	        DO I=1,MIN(J-1,MAX_LOW_LEV)
 	          NL=I; NUP=J
-	          CALL BETHE_APPROX(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX,L_TRUE)
+!	          CALL BETHE_APPROX(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX,L_TRUE)
+	          CALL BETHE_APPROX_V3(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
 	          dE=Hz_TO_eV*(ATM(ID)%EDGEXZV_F(I)-ATM(ID)%EDGEXZV_F(J))
 	          DO IKT=1,NKT
 	            FRAC_EXCITE_HEATING(DPTH_INDX)=FRAC_EXCITE_HEATING(DPTH_INDX)+dE*Qnn(IKT)*YE(IKT,DPTH_INDX)
 	          END DO
+!	          write(lu_bethe,*)''
+!	          write(lu_bethe,'(x,i3,x,i4,x,i5,x,i5)')id,dpth_indx,nl,nup
+!	          write(lu_bethe,'(1X,1P8E16.7)')(Qnn(ikt)/atm(id)%xzv_f(nl,dpth_indx),ikt=1,nkt)
 	        END DO
 	      END DO
 	    END IF
@@ -448,9 +467,9 @@
 	END IF			!Include excitations?
 	CALL TUNE(2,'CHK_EXCITE')
 	FRAC_EXCITE_HEATING(DPTH_INDX)=FRAC_EXCITE_HEATING(DPTH_INDX)/E_INIT
-	WRITE(LU_ER,*)'Fraction into excitation heating is',FRAC_EXCITE_HEATING(DPTH_INDX)
+	WRITE(LU_TH,*)'Fraction into excitation heating is',FRAC_EXCITE_HEATING(DPTH_INDX)
 !
-	WRITE(LU_ER,*)'Total heating is ', FRAC_ELEC_HEATING(DPTH_INDX) + &
+	WRITE(LU_TH,*)'Total heating is ', FRAC_ELEC_HEATING(DPTH_INDX) + &
 	                               FRAC_ION_HEATING(DPTH_INDX)+ &
 	                               FRAC_EXCITE_HEATING(DPTH_INDX)
 !
@@ -458,6 +477,25 @@
 !	  CALL GRAMON_PGPLOT('E(keV)','Y(E)',' ',' ')
 !
 	END DO 		!loop over depth
+!	open(unit=lu_bethe,file='bethe_cross_chk',status='unknown')
+!	  if(include_excitation)then
+!	    do id=1,num_ions
+!	      if(atm(id)%xzv_pres .and. do_and_1st_time(id))then
+!	        do_and_1st_time(id) = .false.
+!	        do j=2,atm(id)%nxzv_f
+!	          do i=1,min(j-1,nlow_maxs(id))
+!	            nl=i; nup=j
+!	            CALL bethe_cross(Qnn,NL,NUP,XKT,dXKT,NKT,ID)
+!	            write(lu_bethe,*)''
+!	            write(lu_bethe,'(x,a6,x,i3,x,i5,x,i5)')trim(ion_id(id)),id,nl,nup
+!	            write(lu_bethe,'(1X,1P8E16.7)')(Qnn(ikt),ikt=1,nkt)
+!	          end do
+!	        end do
+!	      end if
+!	    end do
+!	  end if
+!	close(unit=lu_bethe)
+!
 !
 	WRITE(LU_TH,'(/,X,A,/)')'Summary of energy channels'
 	WRITE(LU_TH,'(4(5X,A))'),' dE(ELEC)/E','  dE(ION)/E','  dE(EXC)/E','dE(TOTAL)/E'
@@ -484,10 +522,33 @@
 ! Close diagnostic file, forcing all output.
 !
 	CLOSE(UNIT=LU_TH)
+	WRITE(LU_ER,*)'Exiting ELECTRON_NON_THERM_SPEC'
 !
 ! Before leaving the routine we normalize YE by the E_INIT. We can later scale by the actual energy input.
 !
 	YE=YE/E_INIT
+!
+! Output the degradation spectrum
+!
+	open(unit=lu_bethe,file='NON_THERM_DEGRADATION_SPEC',status='unknown')
+	write(lu_bethe,'(1x,A,I5)')'Number of energy grid: ',NKT
+	write(lu_bethe,'(1x,A,I5)')'Number of depth: ',ND
+	write(lu_bethe,*)''
+	write(lu_bethe,'(A)')'Energy grids (eV)'
+	write(lu_bethe,'(1x,1p8e16.7)')(XKT(IKT),IKT=1,NKT)
+	write(lu_bethe,*)''
+	write(lu_bethe,'(A)')'Source'
+	write(lu_bethe,'(1x,1p8e16.7)')(SOURCE(IKT),IKT=1,NKT)
+	write(lu_bethe,*)''
+	write(lu_bethe,'(A)')'Lelec'
+	write(lu_bethe,'(1x,1p8e16.7)')(LELEC(IKT),IKT=1,NKT)
+	write(lu_bethe,*)''
+	do dpth_indx=1,nd
+	  write(lu_bethe,'(A,I5)')'Depth: ',dpth_indx
+	  write(lu_bethe,'(1x,1p8e16.7)')(YE(IKT,DPTH_INDX),IKT=1,NKT)
+	  write(lu_bethe,*)''
+	end do
+	close(unit=lu_bethe)
 !
 	RETURN
 	END

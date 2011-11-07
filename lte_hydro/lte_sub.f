@@ -891,7 +891,7 @@
 ! This routine not only evaluates the LTE populations of both model atoms, but
 ! it also evaluates the dln(LTE Super level Pop)/dT.
 !
-	CALL EVAL_LTE_V4(DO_LEV_DISSOLUTION,ND)
+	CALL EVAL_LTE_V5(DO_LEV_DISSOLUTION,ND)
 !
 ! 
 !
@@ -1433,7 +1433,7 @@
 !      1 refers to format for output.
 !      1,NHY - For use with HeI.
 !
-	CALL EVAL_LTE_V4(DO_LEV_DISSOLUTION,ND)
+	CALL EVAL_LTE_V5(DO_LEV_DISSOLUTION,ND)
 !      
 ! GAM_SPECIES refers to the number of electrons arising from each species (eg
 ! carbon).

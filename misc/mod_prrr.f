@@ -14,28 +14,53 @@
 ! Altered: 29-Jan-2009: ND is now read in from MODEL (if it exists).
 ! Altered: 08-Feb-2008: Extra terms (such as V term) sheck and output.
 !
-	INTEGER, PARAMETER :: MAX_RECS=1000
 !
-	CHARACTER*132 TMP_STR
-	CHARACTER*132 STRING
-	CHARACTER*132 STR_VEC(MAX_RECS)
-	REAL*8 VALS(MAX_RECS,10)
-	REAL*8 TA(MAX_RECS)
-	INTEGER INDX(MAX_RECS)
+	INTEGER, PARAMETER :: ND_MAX=200
+	REAL*8 PHOT(ND_MAX,2000)
+	REAL*8 RECOM(ND_MAX)
+	REAL*8 RECOM_SUM(ND_MAX)
+	REAL*8 PHOT_SUM(ND_MAX)
+	REAL*8 COL_IR(ND_MAX)
+	REAL*8 CHG_IR(ND_MAX)
+	REAL*8 NT_IR(ND_MAX)
+	REAL*8 COL_RR(ND_MAX)
+	REAL*8 CHG_RR(ND_MAX)
+	REAL*8 ADVEC_RR(ND_MAX)
 !
-	REAL*8 PHOT(10,2000)
-	REAL*8 RECOM(10)
+	REAL*8 R(ND_MAX)
+	REAL*8 V(ND_MAX)
+	REAL*8 TEMP(ND_MAX)
+	REAL*8 ED(ND_MAX)
+	REAL*8 DI(ND_MAX)
+!
+	REAL*8 XVEC(ND_MAX)
+	REAL*8 YSUM(ND_MAX)
 !
 	INTEGER*4 ND
 	INTEGER*4 NV
-	INTEGER*4 I,J,K
+	INTEGER*4 I,J,K,L
 	INTEGER N_INIT_RECS
 	INTEGER NRECS
 	INTEGER IOS
 	INTEGER IST,IEND,NLEV
 	REAL*8 T1
+	REAL*8 MIN_VAL
 	LOGICAL FILE_OPEN
+	LOGICAL NET_RECOM_PER_LEVEL
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
+!
+	CHARACTER(LEN=6) COLOR(8)
+	DATA COLOR/'RED','BLUE','GREEN','MAUVE','PINK','YELLOW','ORANGE','F_Gree'/
+!
+	CHARACTER(LEN=132) TMP_STR
+	CHARACTER(LEN=132) STRING
+	CHARACTER(LEN=132) FILE_NAME
+	CHARACTER(LEN=10) SPECIES
+	CHARACTER(LEN=2) XAX_OPT
+	CHARACTER(LEN=30) XLABEL
+	CHARACTER(LEN=30) YLABEL
+        CHARACTER(LEN=30) UC
+        EXTERNAL UC
 !
 	OPEN(UNIT=20,FILE='MODEL',STATUS='OLD',IOSTAT=IOS)
 	  IF(IOS .EQ. 0)THEN
@@ -57,46 +82,141 @@
 	  CALL GEN_IN(ND,'Number of depth points')
 	END IF
 !
-	OPEN(UNIT=20,FILE='FeIPRRR',STATUS='OLD',ACTION='READ')
-	OPEN(UNIT=21,FILE='FeIPRRR_SUM',STATUS='UNKNOWN',ACTION='WRITE')
+	IOS=0
+	OPEN(UNIT=20,FILE='RVTJ',STATUS='OLD',IOSTAT=IOS)
+	  DO WHILE(INDEX(STRING,'Velocity (km/s)') .EQ. 0)
+            READ(20,'(A)',IOSTAT=IOS)STRING
+	  END DO
+	  READ(20,*,IOSTAT=IOS)(V(I),I=1,ND)
+	CLOSE(UNIT=20)
+	IF(IOS .NE. 0)THEN
+	  WRITE(6,*)'Unable to get V(km/s) from RVTJ'
+	  V(1:ND)=1.0
+	END IF
 !
-	DO I=1,1+(ND-1)/10
-	   IST=1; IEND=MIN(10,ND-(I-1)*10)
+	CHG_IR(1:ND)=0.0D0
+	COL_IR(1:ND)=0.0D0
+	NT_IR(1:ND)=0.0D0
+	CHG_RR(1:ND)=0.0D0
+	COL_RR(1:ND)=0.0D0
+	ADVEC_RR(1:ND)=0.0D0
+	RECOM_SUM(1:ND)=0.0D0
+	PHOT_SUM(1:ND)=0.0D0
 !
-	   DO J=1,13
-	     READ(20,'(A)')TMP_STR
-	     WRITE(21,'(A)')TRIM(TMP_STR)
+	NET_RECOM_PER_LEVEL=.FALSE.
+	CALL GEN_IN(NET_RECOM_PER_LEVEL,'Ouput net recombination rate to each level?')
+!
+	SPECIES='FeI'
+	CALL GEN_IN(SPECIES,'File is assumed to be SPECIES//PRRR')
+	FILE_NAME=TRIM(SPECIES)//'PRRR'
+	OPEN(UNIT=20,FILE=FILE_NAME,STATUS='OLD',ACTION='READ')
+	FILE_NAME=TRIM(FILE_NAME)//'_SUM'
+	OPEN(UNIT=21,FILE=FILE_NAME,STATUS='UNKNOWN',ACTION='WRITE')
+!
+	STRING=' '
+	DO L=1,ND,10
+	   IST=L; IEND=MIN(ND,IST+9)
+	   WRITE(6,*)IST,IEND
+!
+	   DO WHILE(INDEX(STRING,'Photoionization Rate') .EQ. 0)
+	     READ(20,'(A)')STRING
+	     IF(INDEX(STRING,'Photoionization Rate') .EQ. 0)THEN
+	       WRITE(21,'(A)')TRIM(STRING)
+	     END IF
+	     IF(INDEX(STRING,'Radius') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       WRITE(21,'(A)')TRIM(STRING)
+	       READ(STRING,*)(R(I),I=IST,IEND)
+	     ELSE IF(INDEX(STRING,'Temperature') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       WRITE(21,'(A)')TRIM(STRING)
+	       READ(STRING,*)(TEMP(I),I=IST,IEND)
+	     ELSE IF(INDEX(STRING,'Electron Density') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       WRITE(21,'(A)')TRIM(STRING)
+	       READ(STRING,*)(ED(I),I=IST,IEND)
+	     ELSE IF(INDEX(STRING,'Ion Density') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       WRITE(21,'(A)')TRIM(STRING)
+	       READ(STRING,*)(DI(I),I=IST,IEND)
+	     END IF
 	   END DO
-	   READ(20,'(A)')TMP_STR	!Photoionization header.
 !
 	   NLEV=0
 	   DO WHILE(1 .EQ. 1)
 	     READ(20,'(A)')STRING
 	     IF(STRING .NE. ' ')THEN
 	       NLEV=NLEV+1
-	       WRITE(6,*)STRING(1:10)
-	       READ(STRING,*)(PHOT(K,NLEV),K=IST,IEND)
+	       READ(STRING,*)(PHOT(I,NLEV),I=IST,IEND)
+	       PHOT_SUM(IST:IEND)=PHOT_SUM(IST:IEND)+PHOT(IST:IEND,NLEV)
 	     ELSE
 	       EXIT
 	     END IF
 	   END DO
 !
-	   DO J=1,3
-	     READ(20,'(A)')STRING
-	     WRITE(21,'(A)')TRIM(STRING)
-	   END DO
-	   WRITE(21,'(A,I4,A,I4,A)')'   Total photoionization rate (d=',(I-1)*10+1,' to',MIN(I*10,ND),'):'
-	   WRITE(21,'(X,10ES12.4)')(SUM(PHOT(K,:)),K=IST,IEND)
+	   WRITE(21,'(A,I4,A,I4,A)')'   Total photoionization rate (d=',IST,' to',IEND,'):'
+	   WRITE(21,'(X,10ES12.4)')(PHOT_SUM(I),I=IST,IEND)
 	   WRITE(21,'(A)')
 !
-	   READ(20,'(A)')STRING
-	   WRITE(21,'(A,A)')'   Net ',TRIM(STRING(4:))
-!
-	   DO J=1,NLEV
-	     READ(20,*)(RECOM(K),K=IST,IEND)
-	     WRITE(21,'(X,10ES12.4)')(RECOM(K)-PHOT(K,J),K=IST,IEND)
+	   DO WHILE(INDEX(STRING,'Recombination Rates') .EQ. 0)
+	     READ(20,'(A)')STRING
+	     IF(INDEX(STRING,'Recombination Rates') .EQ. 0)THEN
+	       WRITE(21,'(A)')TRIM(STRING)
+	     END IF
+	     IF(INDEX(STRING,'Colisional Ionization Rate') .NE. 0)THEN
+	        READ(20,'(A)')STRING
+	        WRITE(21,'(A)')TRIM(STRING)
+	        READ(STRING,*)(COL_IR(I),I=IST,IEND)
+	     ELSE IF(INDEX(STRING,'Charge Transfer Ionization Rate') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       WRITE(21,'(A)')TRIM(STRING)
+	       READ(STRING,*)(CHG_IR(I),I=IST,IEND)
+	     END IF
 	   END DO
 !
+	   IF(NET_RECOM_PER_LEVEL)THEN
+	     WRITE(21,'(A,A)')'   Net ',TRIM(STRING(4:))
+	     DO J=1,NLEV
+	       READ(20,*)(RECOM(I),I=IST,IEND)
+	       RECOM_SUM(IST:IEND)=RECOM_SUM(IST:IEND)+RECOM(IST:IEND)
+	       WRITE(21,'(X,10ES12.4)')(RECOM(I)-PHOT(I,J),I=IST,IEND)
+	     END DO
+	   ELSE
+	     DO J=1,NLEV
+	       READ(20,*)(RECOM(I),I=IST,IEND)
+	       RECOM_SUM(IST:IEND)=RECOM_SUM(IST:IEND)+RECOM(IST:IEND)
+	     END DO
+	     WRITE(21,'(A,I4,A,I4,A)')'   Total reombination rate (d=',(I-1)*10+1,' to',MIN(I*10,ND),'):'
+	     WRITE(21,'(X,10ES12.4)')(RECOM_SUM(I),I=IST,IEND)
+	     WRITE(21,'(A)')
+	   END IF
+!
+	   DO WHILE(INDEX(STRING,'Net Recombination Rate') .EQ. 0)
+	     READ(20,'(A)')STRING
+	     IF(INDEX(STRING,'Net Recombination Rate') .NE. 0)THEN
+	       WRITE(21,'(A)')TRIM(STRING)
+	     END IF
+	     IF(INDEX(STRING,'Colisional Recombination Rate') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       WRITE(21,'(A)')TRIM(STRING)
+	       READ(STRING,*)(COL_RR(I),I=IST,IEND)
+	     ELSE IF(INDEX(STRING,'Charge Transfer Recombination Rate') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       WRITE(21,'(A)')TRIM(STRING)
+	       READ(STRING,*)(CHG_RR(I),I=IST,IEND)
+	     ELSE IF(INDEX(STRING,'Effective Advection Recombination Rate') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       WRITE(21,'(A)')TRIM(STRING)
+	       READ(STRING,*)(ADVEC_RR(I),I=IST,IEND)
+	     ELSE IF(INDEX(STRING,'Non-Thermal Ionization Rate') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       WRITE(21,'(A)')TRIM(STRING)
+	       READ(STRING,*)(NT_IR(I),I=IST,IEND)
+	     END IF
+	   END DO
+!
+	   WRITE(21,'(A)')TRIM(STRING)
+	   FLUSH(21)
 	   DO WHILE(1 .EQ. 1)
 	     READ(20,'(A)',END=200)STRING
 	     WRITE(21,'(A)')TRIM(STRING)
@@ -106,5 +226,100 @@
 	END DO
 200	CONTINUE
 !
-	STOP
+	WRITE(6,'(8ES14.4)')PHOT_SUM(1),RECOM_SUM(1),
+	1             COL_IR(1),CHG_IR(1),COL_RR(1),CHG_RR(1),
+	1             ADVEC_RR(1),NT_IR(1)
+	WRITE(6,'(8ES14.4)')PHOT_SUM(ND),RECOM_SUM(ND),
+	1             COL_IR(ND),CHG_IR(ND),COL_RR(ND),CHG_RR(ND),
+	1             ADVEC_RR(ND),NT_IR(ND)
+	WRITE(6,'(8ES14.4)')R(1),V(1),TEMP(1),R(ND),V(ND),TEMP(ND)
+!
+	DO I=1,ND
+	   YSUM(I)=( PHOT_SUM(I)+RECOM_SUM(I) +
+	1             COL_IR(I)+CHG_IR(I) +
+	1             COL_RR(I)+CHG_RR(I) +
+	1             ABS(NT_IR(I)) +
+	1             ABS(ADVEC_RR(I)) )/2.0D0
+	   PHOT_SUM(I)=PHOT_SUM(I)/YSUM(I)
+	   COL_IR(I)=COL_IR(I)/YSUM(I)
+	   CHG_IR(I)=CHG_IR(I)/YSUM(I)
+	   NT_IR(I)=NT_IR(I)/YSUM(I)
+!
+	   RECOM_SUM(I)=-RECOM_SUM(I)/YSUM(I)
+	   COL_RR(I)=-COL_RR(I)/YSUM(I)
+	   CHG_RR(I)=-CHG_RR(I)/YSUM(I)
+	   ADVEC_RR(I)=-ADVEC_RR(I)/YSUM(I)
+	END DO
+	YLABEL='Normalized rate'
+!
+2000	CONTINUE
+	XAX_OPT='I'
+	CALL GEN_IN(XAX_OPT,'X axis option: I, R, V, T, ED, S(stop)')
+	XAX_OPT=UC(XAX_OPT)
+	IF(XAX_OPT(1:1) .EQ. 'I')THEN
+	  DO I=1,ND
+	    XVEC(I)=I
+	  END DO
+	  XLABEL='Depth index'
+	ELSE IF(XAX_OPT(1:1) .EQ. 'R')THEN
+	  XVEC(1:ND)=R(1:ND)
+	  XLABEL='Radius(10\u10\d cm)'
+	ELSE IF(XAX_OPT(1:1) .EQ. 'V')THEN
+	  XVEC(1:ND)=V(1:ND)
+	  XLABEL='V(km/s)'
+	ELSE IF(XAX_OPT(1:1) .EQ. 'T')THEN
+	  XVEC(1:ND)=TEMP(1:ND)
+	  XLABEL='T(10\u4\dK)'
+	ELSE IF(XAX_OPT(1:2) .EQ. 'ED')THEN
+	  XVEC(1:ND)=ED(1:ND)
+	  XLABEL='Ne(cm\u-3\d)'
+	ELSE IF(XAX_OPT(1:1) .EQ. 'S')THEN
+	  STOP
+	END IF
+!
+	MIN_VAL=0.001D0
+	WRITE(6,*)' '
+	WRITE(6,*)'Calling DP_CURVE'
+	WRITE(6,*)'                : +ve means ionizing'
+	WRITE(6,*)'                : -ve means recombination'
+	WRITE(6,'(A,I2,3A)')'   Curve ',1,': Photoionization rate (',TRIM(COLOR(1)),')'
+	CALL DP_CURVE(ND,XVEC,PHOT_SUM)
+	WRITE(6,'(A,I2,3A)')'   Curve ',2,': Collsional ionization rate (',TRIM(COLOR(2)),')'
+	CALL DP_CURVE(ND,XVEC,COL_IR)
+	I=2
+	IF(MAXVAL(CHG_IR(1:ND)) .GE. MIN_VAL)THEN
+	  CALL DP_CURVE(ND,XVEC,CHG_IR)
+	  I=I+1
+	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Charge exch. ionization rate (',TRIM(COLOR(I)),')'
+	END IF
+	IF(MAXVAL(NT_IR(1:ND)) .GE. MIN_VAL)THEN
+	  CALL DP_CURVE(ND,XVEC,NT_IR)
+	  I=I+1
+	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Non-thermal ionization rate (',TRIM(COLOR(I)),')'
+	END IF
+!
+	IF(MINVAL(RECOM_SUM(1:ND)) .LE. -MIN_VAL)THEN
+	  CALL DP_CURVE(ND,XVEC,RECOM_SUM)
+	  I=I+1
+	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Radiative recombination rate (',TRIM(COLOR(I)),')'
+	END IF
+	IF(MINVAL(COL_RR(1:ND)) .LE. -MIN_VAL)THEN
+	  CALL DP_CURVE(ND,XVEC,COL_RR)
+	  I=I+1
+	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Collisional recombination rate (',TRIM(COLOR(I)),')'
+	END IF
+	IF(MINVAL(CHG_RR(1:ND)) .LE. -MIN_VAL)THEN
+	  CALL DP_CURVE(ND,XVEC,CHG_RR)
+	  I=I+1
+	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Charge exch. recombination rate (',TRIM(COLOR(I)),')'
+	END IF
+	IF(MAXVAL(ABS(CHG_RR(1:ND))) .GE. MIN_VAL)THEN
+	  CALL DP_CURVE(ND,XVEC,ADVEC_RR)
+	  I=I+1
+	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Advection recombination rate (',TRIM(COLOR(I)),')'
+	END IF
+	WRITE(6,*)' '
+	CALL GRAMON_PGPLOT(XLABEL,YLABEL,' ',' ')
+	GOTO 2000
+!
 	END

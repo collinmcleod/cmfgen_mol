@@ -256,7 +256,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(wr_art_heat.o)\
       $(LIB)(wr_cooling_term.o)\
       $(LIB)(wr_x_info.o)\
-      $(LIB)(wrcoolgen.o)\
+      $(LIB)(wrcoolgen_v2.o)\
       $(LIB)(write_j_cmf_err.o)\
       $(LIB)(writedc.o)\
       $(LIB)(writedc_v2.o)\
@@ -267,7 +267,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(write_vec.o)\
       $(LIB)(writv.o)\
       $(LIB)(writv_v2.o)\
-      $(LIB)(wrrecomchk_v3.o)\
+      $(LIB)(wrrecomchk_v4.o)\
       $(LIB)(x02ajf.o)\
       $(LIB)(x_rrr_cool_v5.o)\
       $(LIB)(x_rrr_cool_v6.o)\
