@@ -28,7 +28,7 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(dp_cnvrt_j.o)\
          $(LIB)(dp_cnvrt_j_v2.o)\
          $(LIB)(poidev.o)\
-         $(LIB)(raw_subphot.o)\
+         $(LIB)(raw_subphot_v2.o)\
          $(LIB)(ran2.o)\
          $(LIB)(rd_ew.o)\
          $(LIB)(rd_mod.o)\

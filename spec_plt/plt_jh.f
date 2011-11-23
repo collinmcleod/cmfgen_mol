@@ -699,6 +699,32 @@
 	  CALL DP_CURVE(J,XV,YV)
 	  YAXIS='Phot'
 !
+	ELSE IF(X(1:2) .EQ. 'EJ')THEN
+	  IF(ALLOCATED(XV))DEALLOCATE(XV)
+	  IF(ALLOCATED(YV))DEALLOCATE(YV)
+	  ALLOCATE (XV(ND))
+	  ALLOCATE (YV(ND))
+	  DO ID=1,NUM_FILES
+	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
+	    DO ML=1,NCF-1
+	      IF(MOD(ML,1000) .EQ. 0)WRITE(6,*)ML
+	      DO J=1,ND
+	        YV(J)=YV(J)+(ZM(ID)%NU(ML)-ZM(ID)%NU(ML+1))*(ZM(ID)%RJ(J,ML)+ZM(ID)%RJ(J,ML+1))
+	      END DO
+	    END DO
+	    T1=1.6D+16*ATAN(1.0D0)*1/SPEED_OF_LIGHT()      !4*PI*1.0D+15
+	    YV(1:ND)=0.5D0*T1*YV(1:ND)
+	    YV(1:ND)=3.280D-03*YV(1:ND)*R(1:ND)*R(1:ND)  !(4*PI*Dex(+30)/L(sun)
+	    CALL LUM_FROM_ETA(YV,R,ND)
+	    DO I=ND-1,1,-1
+	      YV(I)=YV(I+1)+YV(I)
+	    END DO
+	    T2=R(ND)
+	    XV(1:ND)=DLOG10(R(1:ND)/T2)
+	    CALL DP_CURVE(ND,XV,YV)
+	    YAXIS='E(rad)(s.L\dsun\u)'
+	  END DO
+!
 	ELSE IF(X(1:2) .EQ. 'JD' .OR. X(1:5) .EQ. 'RSQJD')THEN
 !
 	  CALL USR_OPTION(I,'Depth',' ','Depth index')

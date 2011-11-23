@@ -1636,7 +1636,14 @@
 ! the Temperature and hence the population levels to assist in obtaining
 ! a converged model.
 !
-	ELSE IF(XOPT .EQ. 'LTE')THEN
+	ELSE IF(XOPT .EQ. 'HMIN')THEN
+	  DO I=1,ND
+	    YV(I)=2.07D-22*ED(I)*ATM(1)%XzV_F(1,I)*EXP(HDKT*0.754D0/4.135667D0/T(I))
+	    YV(I)=LOG(YV(I)/2.0D0/(T(I)**1.5D0))
+	  END DO
+	  CALL DP_CURVE(ND,XV,YV)
+!
+	ELSE IF(XOPT .EQ. 'E')THEN
 	  INCLUDE 'EVAL_LTE_FULL.INC'
 !
 ! 
@@ -2266,8 +2273,56 @@
 	    END DO
 	    YAXIS='E(rad)(L\dsun\u)'
 	  ELSE
-	    YV(1:ND)=DLOG(dE_RAD_DECAY(1:ND))
-	    YAXIS='\ge(ergs\u \dcm\u-2 \ds\u-1\d)'
+	    YV(1:ND)=DLOG10(dE_RAD_DECAY(1:ND))
+	    YAXIS='Log \ge(ergs\u \dcm\u-3 \ds\u-1\d)'
+	  END IF
+	  CALL DP_CURVE(ND,XV,YV)
+!
+	ELSE IF(XOPT .EQ. 'EK')THEN
+	  CALL USR_OPTION(ELEC,'INTEG','T','Integrate kinetic energy?')
+	  YV(1:ND)=1.5D+04*(ED(1:ND)+POP_ATOM(1:ND))*T(1:ND)*BOLTZMANN_CONSTANT()
+	  IF(ELEC)THEN
+	    YV(1:ND)=3.280D-03*YV(1:ND)*R(1:ND)*R(1:ND)  !(4*PI*Dex(+30)/L(sun)
+	    CALL LUM_FROM_ETA(YV,R,ND)
+	    DO I=ND-1,1,-1
+	      YV(I)=YV(I+1)+YV(I)
+	    END DO
+	    YAXIS='E(kinetic)(s.L\dsun\u)'
+	  ELSE
+	    YV(1:ND)=DLOG10(YV(1:ND))
+	    YAXIS='Log EK(ergs\u \dcm\u-3)'
+	  END IF
+	  CALL DP_CURVE(ND,XV,YV)
+!
+	ELSE IF(XOPT .EQ. 'EI')THEN
+	  CALL USR_OPTION(ELEC,'INTEG','T','Integrate intenal energy?')
+          YV(1:ND)=0.0D0
+!
+	  DO ISPEC=1,NSPEC
+	    T1=0.0D0			!Total energy of state
+	    T2=0.0D0                    !Running ioization energy
+!
+	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	      DO I=1,ATM(ID)%NXzV_F
+	        T1=T2+(ATM(ID)%EDGEXzV_F(1)-ATM(ID)%EDGEXzV_F(I))
+	        DO J=1,ND
+	          YV(J)=YV(J)+T1*ATM(ID)%XzV_F(I,J)
+	        END DO
+	      END DO
+	      T2=T2+ATM(ID)%EDGEXzV_F(1)
+	    END DO
+	  END DO
+	  YV(1:ND)=1.0D+04*HDKT*YV(1:ND)*BOLTZMANN_CONSTANT()
+	  IF(ELEC)THEN
+	    YV(1:ND)=3.280D-03*YV(1:ND)*R(1:ND)*R(1:ND)  !(4*PI*Dex(+30)/L(sun)
+	    CALL LUM_FROM_ETA(YV,R,ND)
+	    DO I=ND-1,1,-1
+	      YV(I)=YV(I+1)+YV(I)
+	    END DO
+	    YAXIS='E(kinetic)(s.L\dsun\u)'
+	  ELSE
+	    YV(1:ND)=DLOG10(YV(1:ND))
+	    YAXIS='Log EI(ergs\u \dcm\u-3)'
 	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
 !

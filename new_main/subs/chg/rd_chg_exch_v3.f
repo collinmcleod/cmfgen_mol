@@ -213,7 +213,7 @@
 	      IF(SPEC_ID_CHG_RD(I,L) .EQ. SPEC_ID_CHG_RD(I,K))THEN
 	        WRITE(LUER,*)'Error in RD_CHG_EXCH'
 	        WRITE(LUER,*)'Duplication of species ID, reaction:',I
-	        STOP
+!	        STOP
 	      END IF
 	    END DO
 	  END DO

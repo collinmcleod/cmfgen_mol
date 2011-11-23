@@ -322,10 +322,19 @@
 	BAD_J=.FALSE.
 	DO I=1,ND
 	  IF(TA(I) .LE. 0.0D0 .OR. RJ(I) .LE. 0.0D0)THEN
-	    IF(RJ(I+1) .LE. 0.0D0)THEN
-	      RJ(I)=R(I-1)*R(I-1)*RJ(I-1)
+	    IF(RJ(I+1) .LE. 0.0D0 .AND. I .NE. 1)THEN
+	      T1=R(I-1)/R(I)
+	      RJ(I)=T1*T1*RJ(I-1)
+	    ELSE IF(RJ(I+1) .LE. 0.0D0)THEN
+	      DO J=I+2,ND
+	        IF(RJ(J) .GT. 0)THEN
+	          T1=R(J)/R(I)
+	          RJ(I)=T1*T1*RJ(J)
+	          EXIT
+	        END IF
+	      END DO
 	    ELSE
-	      RJ(I)=SQRT(R(I+1)*RJ(I-1))
+	      RJ(I)=SQRT(RJ(I+1)*RJ(I-1))
 	    END IF 
             BAD_J_COUNTER=BAD_J_COUNTER+1
 	    BAD_J=.TRUE.

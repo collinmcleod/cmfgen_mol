@@ -17,6 +17,7 @@
 !
 	INTEGER ND,LUOUT
 !
+! Altered  21-Nov-2011 : Bug fixed to handle when both species involve multiple levels.
 ! Altered  05-Apr-2011 : Bug fixed when multiplet structure split (G_CHG incorrect).
 ! Altered  11-Apr-2002 : Changed to allow automatic splitting of charge exchange rates
 !                          among a single LS state.
@@ -34,10 +35,18 @@
 	INTEGER, ALLOCATABLE :: CHG_ID(:,:)
 	REAL, ALLOCATABLE :: G_SUM(:,:)
 !
+	INTEGER, ALLOCATABLE :: TMP_ID_ION(:,:)
+	INTEGER, ALLOCATABLE :: TMP_LEV_IN_POPS(:,:)
+	INTEGER, ALLOCATABLE :: TMP_LEV_IN_ION(:,:)
+	REAL*8,  ALLOCATABLE :: TMP_G(:,:)
+	REAL*8,  ALLOCATABLE :: TMP_Z(:,:)
+!
 	REAL*8 T1
 	INTEGER NOUT
 	INTEGER NIN
-	INTEGER J,K,L
+	INTEGER I,J,K,L
+	INTEGER L1,L2,L3,L4,ML
+	INTEGER ICNT
 	INTEGER ICOUNT
 	INTEGER IPOS
 	INTEGER I_S,I_F
@@ -125,6 +134,7 @@
 	END DO				!Over species
 !
 	CALL GEN_ASCI_OPEN(LUOUT,'CHG_EXCH_RD_CHK','UNKNOWN',' ','WRITE',IZERO,IOS)
+	CALL SET_LINE_BUFFERING(LUOUT)
 	WRITE(LUOUT,'(/,A)')' The LHS are charge exchange reactions that are included'
 	WRITE(LUOUT,  '(A)')' The RHS are charge exchange reactions that are excluded'
 	WRITE(LUOUT,  '(A)')' An ID of zero implies that the species (LHS) is the last ionization stage'
@@ -202,87 +212,109 @@
         COOL_CHG(:,:)=0.0D0
 	INITIALIZE_ARRAYS=.TRUE.
 !
+!
+	IOS=0
+	I=MAXVAL(LEV_CNT)
+	WRITE(LUER,*)'Maximum level count is',I
+	IF(IOS .EQ. 0)ALLOCATE (TMP_ID_ION(I,4),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (TMP_LEV_IN_POPS(I,4),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (TMP_LEV_IN_ION(I,4),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (TMP_G(I,4),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (TMP_Z(I,4),STAT=IOS)
+	IF(IOS .NE. 0)THEN
+	  WRITE(LUER,*)'Error allocating temporary arrays in SET_LEV_ID_V4: IOS=',IOS
+	  STOP
+	END IF
+!
 ! Determine ionization stage and levels for species involved in charge 
 ! exchange reactions. Now determine whether the present species is in 
 ! the CHARGE exchange reaction list.
 !
-	L=0
+	LST=0
 	DO J=1,N_CHG_RD
 	  WRITE(LUOUT,'(/,A,I3,4(2X,A))')' Operating on charge exchange reaction J=',J,SPEC_ID_CHG_RD(J,1:4)
 	  WRITE(LUOUT,'(A,3X,4I5)')' Super levels associated with each each species:',
 	1                 LEV_CNT(J,1),LEV_CNT(J,2),LEV_CNT(J,3),LEV_CNT(J,4)
+!
+	IF(LEV_CNT(J,1)*LEV_CNT(J,2)*LEV_CNT(J,3)*LEV_CNT(J,4) .NE. 0)THEN
 !
 ! NOUT and NIN are use to loop over ALL possible charge exchnage reactions.
 ! For LS coupling, we assume that the reaction rates are independent of
 ! the initial states, and proportional to the statistical weight of the final
 ! state.
 !
-	  NOUT=1
-	  NIN=LEV_CNT(J,1)*LEV_CNT(J,2)*LEV_CNT(J,3)*LEV_CNT(J,4)
-	  IF(NIN .NE. 0)THEN
-	    LST=L
-	    DO K=1,4
-	      L=LST
-	      NIN=NIN/LEV_CNT(J,K)
-!
-! Level 1 or 4 may be the final ionization stage, which we first check.
-!
-	      ID=1
+	  TMP_G=0.0D0
+	  DO K=1,4
+	    IF(K .EQ. 1 .OR. K .EQ. 4)THEN
 	      IF(K .EQ. 1)ID=ID_POINTER(J,3)
 	      IF(K .EQ. 4)ID=ID_POINTER(J,2)
-	      I_S=(K-1)*(K-4)         
-	      IF( I_S .EQ. 0 .AND. ATM(ID)%EQXzV+ATM(ID)%NXzV .EQ. EQ_SPECIES(SPECIES_LNK(ID)) )THEN
-	        NIN=LEV_CNT(J,1)*LEV_CNT(J,2)*LEV_CNT(J,3)*LEV_CNT(J,4)
-	        DO IP=1,NIN                  !NOUT
-	          L=L+1
-	          Z_CHG(L,K)=ATM(ID)%ZXzV
-	          ID_ION_CHG(L,K)=ID+1
-	          LEV_IN_POPS_CHG(L,K)=ATM(ID)%EQXzV+ATM(ID)%NXzV
-	          LEV_IN_ION_CHG(L,K)=1
-	          CHG_ID(L,K)=J
-	          G_CHG(L,K)=ATM(ID)%GIONXzV_F
-	          WRITE(LUOUT,'(2X,A,T20,4I6,2F7.1)')'B',J,K,L,ID+1,G_CHG(L,L),Z_CHG(L,K)
+	      IF(ATM(ID)%EQXzV+ATM(ID)%NXzV .EQ. EQ_SPECIES(SPECIES_LNK(ID)) )THEN
+	        TMP_Z(1,K)=ATM(ID)%ZXzV
+	        TMP_ID_ION(1,K)=ID+1
+	        TMP_LEV_IN_POPS(1,K)=ATM(ID)%EQXzV+ATM(ID)%NXzV
+	        TMP_LEV_IN_ION(1,K)=1
+	        TMP_G(1,K)=ATM(ID)%GIONXzV_F
+	        GOTO 100
+	      END IF
+	    END IF
+!
+	    ID=ID_POINTER(J,K)
+	    ICNT=0
+	    DO I_F=1,ATM(ID)%NXzV_F
+	      LOC_NAME=ATM(ID)%XzVLEVNAME_F(I_F)
+	      IF(INDEX(LEV_NAME_CHG_RD(J,K),'[') .EQ. 0)THEN
+	        IPOS=INDEX(LOC_NAME,'[')
+	        IF(IPOS .NE. 0)LOC_NAME=LOC_NAME(1:IPOS-1)
+	      END IF
+	      IF(LOC_NAME .EQ. LEV_NAME_CHG_RD(J,K) .OR.
+	1        LOC_NAME .EQ. ALT_LEV_NAME_CHG_RD(J,K))THEN
+	        I_S=ATM(ID)%F_TO_S_XzV(I_F)
+	        ML=0
+	        DO I=1,ICNT
+	          IF(I_S .EQ. TMP_LEV_IN_ION(I,K))THEN
+	            ML=I
+	            EXIT
+	          END IF
 	        END DO
-	      ELSE
-	        ID=ID_POINTER(J,K)
-	        DO IP=1,NOUT
-	          I_S=0
-	          DO I_F=1,ATM(ID)%NXzV_F
-	            LOC_NAME=ATM(ID)%XzVLEVNAME_F(I_F)
-	            IF(INDEX(LEV_NAME_CHG_RD(J,K),'[') .EQ. 0)THEN
-	              IPOS=INDEX(LOC_NAME,'[')
-	              IF(IPOS .NE. 0)LOC_NAME=LOC_NAME(1:IPOS-1)
-	            END IF
-	            IF(LOC_NAME .EQ. LEV_NAME_CHG_RD(J,K) .OR.
-	1               LOC_NAME .EQ. ALT_LEV_NAME_CHG_RD(J,K))THEN
-	              IF(I_S .EQ. 0 .OR. I_S .NE. ATM(ID)%F_TO_S_XzV(I_F))THEN
-	                DO II=1,NIN
-	                  L=L+1
-	                  ID_ION_CHG(L,K)=ID     
-	                  I_S=ATM(ID)%F_TO_S_XzV(I_F)
-	                  LEV_IN_ION_CHG(L,K)=I_S
-	                  LEV_IN_POPS_CHG(L,K)=ATM(ID)%EQXzV+I_S-1
-	                  Z_CHG(L,K)=ATM(ID)%ZXzV-1.0D0
-	                  CHG_ID(L,K)=J
-	                  G_CHG(L,K)=ATM(ID)%GXzV_F(I_F)
-	                  WRITE(LUOUT,'(2X,A,2X,A,T20,4I6,2F7.1)')'B',TRIM(LOC_NAME),J,K,L,ID+1,G_CHG(L,L),Z_CHG(L,K)
-	                END DO
-	              ELSE
-	                L=LST
-	                DO II=1,NIN
-	                  L=L+1
-	                  G_CHG(L,K)=G_CHG(L,K)+ATM(ID)%GXzV_F(I_F)
-	                END DO
-	                WRITE(LUOUT,'(2X,A,2X,A,T20,4I6,2F7.1)')'C',TRIM(LOC_NAME),J,K,L,ID+1,G_CHG(L,L),Z_CHG(L,K)
-	              END IF
-	            END IF
+	        IF(ML .EQ. 0)THEN
+	          ICNT=ICNT+1
+	          ML=ICNT
+	        END IF
+!
+	        TMP_ID_ION(ML,K)=ID     
+	        TMP_LEV_IN_ION(ML,K)=I_S
+	        TMP_LEV_IN_POPS(ML,K)=ATM(ID)%EQXzV+I_S-1
+	        TMP_Z(ML,K)=ATM(ID)%ZXzV-1.0D0
+	        TMP_G(ML,K)=TMP_G(ML,K)+ATM(ID)%GXzV_F(I_F)
+	      END IF
+	    END DO
+100	    CONTINUE
+	  END DO		!End loop over K=1,4
+!
+	  L=LST
+	  DO L4=1,LEV_CNT(J,4)
+	    DO L3=1,LEV_CNT(J,3)
+	      DO L2=1,LEV_CNT(J,2)
+	        DO L1=1,LEV_CNT(J,1)
+	          L=L+1
+	          DO K=1,4
+	            WRITE(6,'(8I5)')J,L,L1,L2,L3,L4,ML,K
+	            IF(K .EQ. 1)ML=L1
+	            IF(K .EQ. 2)ML=L2
+	            IF(K .EQ. 3)ML=L3
+	            IF(K .EQ. 4)ML=L4
+	            ID_ION_CHG(L,K)=TMP_ID_ION(ML,K)
+	            LEV_IN_ION_CHG(L,K)=TMP_LEV_IN_ION(ML,K)
+	            LEV_IN_POPS_CHG(L,K)=TMP_LEV_IN_POPS(ML,K)
+	            Z_CHG(L,K)=TMP_Z(ML,K)
+	            CHG_ID(L,K)=J
+	            G_CHG(L,K)=TMP_G(ML,K)
 	          END DO
 	        END DO
-	      END IF
-	      NOUT=NOUT*LEV_CNT(J,K)
-!
-	    END DO                   !Loop over K
-!
+	      END DO
+	    END DO
+	  END DO
+!	         
 ! Save the reaction rates for each of the new reactions.
 !
 	    DO K=LST+1,L
@@ -293,12 +325,14 @@
 	      COEF_CHG(K,1:N_COEF_MAX)=COEF_CHG_RD(J,1:N_COEF_MAX)
 	      COEF_CHG(K,1)=COEF_CHG(K,1)*G_CHG(K,3)*G_CHG(K,4)/G_SUM(J,3)/G_SUM(J,4)
 	    END DO
-          END IF                    !Is reaction available
+	    LST=L
 !	    
-	END DO                      !Loop over J (reactions read in)
+        END IF                    !Is reaction available
+	END DO                    !Loop over J (reactions read in)
 !
 	K=1
 	DO WHILE(K .LE. N_CHG)
+	  WRITE(6,*)'K=',K
 	  ICOUNT=1
 	  T1=COEF_CHG(K,1)*G_CHG(K,1)*G_CHG(K,2)
 	  DO L=K+1,N_CHG
@@ -347,7 +381,7 @@
 	    ID=ID_ION_CHG(J,K)
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      I_S=LEV_IN_ION_CHG(J,K)
-	      NAME1=' '
+	      NAME1=' ';  NAME2=' '
 	      DO I_F=1,ATM(ID)%NXzV_F
 	        IF(ATM(ID)%F_TO_S_XzV(I_F) .EQ. I_S)THEN
                   IF(NAME1 .EQ. ' ')THEN
@@ -369,6 +403,10 @@
 	               WRITE(LUER,*)'NAME2=',NAME2
 	               STOP
 	            END IF
+!
+! Done to write out LS level name if SL. L must not be corrupted from previous write.
+!
+	            STRING(L+1:)=TRIM(SPEC_ID_CHG(J,K))//'{'//TRIM(NAME2)//'}'
 	          END IF
 	        END IF
 	      END DO
@@ -408,6 +446,7 @@
 	DEALLOCATE (CHG_ID)
 	DEALLOCATE (G_SUM)
 	DEALLOCATE (ID_POINTER)
+	DEALLOCATE (TMP_ID_ION,TMP_LEV_IN_POPS,TMP_LEV_IN_ION,TMP_G,TMP_Z)
 !
 	RETURN
 	END

@@ -46,6 +46,8 @@
 	DO K=1,5
 	  MAX_CHANGE=0.0D0
 	  MIN_CHANGE=0.0D0
+	  LMAX=K
+	  LMIN=5+K
 !
 	  DO L=1,ND
 	    DO I=1,NT

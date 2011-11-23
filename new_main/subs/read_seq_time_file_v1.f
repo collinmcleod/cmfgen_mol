@@ -39,6 +39,9 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 09-Nov-2011 : Changed to improve population of omitted state. We allow for the
+!                           ground state of an ion being a combination of several levels.
+!                           The oscilator file of the omitted ion must be available for reading.
 ! Altered 08-Feb-2009: Format error for ZXzV fixed. FIRST variable added.
 ! Created 14-Mar-2007: Based on READ_TIME_MODEL_V2
 !
@@ -75,11 +78,15 @@
 	INTEGER I
 	INTEGER J
 	INTEGER L
+	INTEGER IOS
+	INTEGER LU_OSC
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
 	LOGICAL DO_THIS_ID
+	LOGICAL DID_LAST_ID
 	CHARACTER(LEN=11) DATE
 	CHARACTER(LEN=10) SPECIES_NAME
+	CHARACTER(LEN=80) STRING
 	LOGICAL, SAVE :: FIRST=.TRUE.
 !
 	LUER=ERROR_LU()
@@ -130,6 +137,7 @@
 ! We use OLD_XzV for the old populations, with the number of levels adjusted for 
 !                                         the new model.
 !
+	      DID_LAST_ID=.FALSE.
 	      DO LOOP_ID=ID_BEG_RD,ID_END_RD				!Ionization stages
 	        DO_THIS_ID=.TRUE.
 	        IF(DATE .EQ. '17-Mar-2007')THEN
@@ -190,6 +198,46 @@
 	          END IF
 !
 	          DEALLOCATE(OLD_XzV)
+	          DID_LAST_ID=.TRUE.
+!
+! In this section we correct for the possibility that the ground term has
+! structure, and thus we need to sum its populations over several levels.
+! We simply do this by scaling by the ratio of statistical weights. 
+!
+	        ELSE IF(DID_LAST_ID)THEN
+!
+! Get statistical weight of ground state.
+!
+	          STRING=TRIM(ION_ID(ID))//'_F_OSCDAT'
+	          CALL GET_LU(LU_OSC,'in READ_SEQ_TIME_FILE_V1')
+	          OPEN(FILE=TRIM(STRING),UNIT=LU_OSC,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	          IF(IOS .NE. 0)THEN
+	            WRITE(LUER,'(A)')'Error opening'//TRIM(STRING)//' in READ_SEQ_TIME_FILE_V1'
+	            STOP
+	          END IF
+	          STRING=' '
+	          DO WHILE(INDEX(STRING,'!Number of transitions') .EQ. 0)
+	            READ(LU_OSC,'(A)')STRING
+	          END DO
+	          READ(LU_OSC,'(A)')STRING
+	          READ(LU_OSC,'(A)')STRING
+	          IF(INDEX(STRING,' 0.0000') .EQ. 0)THEN
+	            WRITE(LUER,'(A)')'Error reading '//TRIM(ION_ID(ID))//'_F_OSCDAT'//' in READ_SEQ_TIME_FILE_V1'
+	            STOP
+	          END IF
+	          I=INDEX(STRING,'  ')
+	          READ(STRING(I:),*)T1				!G lowest levels
+	          IF(FIRST)THEN
+	            WRITE(LUER,'(A)')'Warning -- ionization stage '//TRIM(ION_ID(ID))//'is no longer included in the model'
+	            WRITE(LUER,'(A,F5.1)')'The statistical weight of the ground term is: ',T1
+	            WRITE(LUER,'(A,F5.1)')'The statistical weight of the ion term is:    ',ATM(ID-1)%GIONXzV_F
+	          END IF
+	          J=ATM(ID-1)%EQXzV+ATM(ID-1)%NXzV		!Small NXzV
+	          POPS(J,:)=TMP_XzV(1,:)*(ATM(ID-1)%GIONXzV_F/T1)
+	          CLOSE(LU_OSC)
+	          DID_LAST_ID=.FALSE.
+	        ELSE
+	          DID_LAST_ID=.FALSE.
 	        END IF			!Model has this ionization stage.
 	        DEALLOCATE(TMP_XzV)
 !

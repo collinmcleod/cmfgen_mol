@@ -95,6 +95,11 @@
 	  V(1:ND)=1.0
 	END IF
 !
+	NET_RECOM_PER_LEVEL=.FALSE.
+	CALL GEN_IN(NET_RECOM_PER_LEVEL,'Ouput net recombination rate to each level?')
+!
+1000	CONTINUE
+!
 	CHG_IR(1:ND)=0.0D0
 	COL_IR(1:ND)=0.0D0
 	NT_IR(1:ND)=0.0D0
@@ -104,11 +109,9 @@
 	RECOM_SUM(1:ND)=0.0D0
 	PHOT_SUM(1:ND)=0.0D0
 !
-	NET_RECOM_PER_LEVEL=.FALSE.
-	CALL GEN_IN(NET_RECOM_PER_LEVEL,'Ouput net recombination rate to each level?')
-!
 	SPECIES='FeI'
-	CALL GEN_IN(SPECIES,'File is assumed to be SPECIES//PRRR')
+	CALL GEN_IN(SPECIES,'File is assumed to be SPECIES//PRRR- EX to exit')
+	IF(UC(SPECIES) .EQ. 'EX')STOP
 	FILE_NAME=TRIM(SPECIES)//'PRRR'
 	OPEN(UNIT=20,FILE=FILE_NAME,STATUS='OLD',ACTION='READ')
 	FILE_NAME=TRIM(FILE_NAME)//'_SUM'
@@ -209,7 +212,7 @@
 	       READ(20,'(A)')STRING
 	       WRITE(21,'(A)')TRIM(STRING)
 	       READ(STRING,*)(ADVEC_RR(I),I=IST,IEND)
-	     ELSE IF(INDEX(STRING,'Non-Thermal Ionization Rate') .NE. 0)THEN
+	     ELSE IF(INDEX(STRING,'Non-Thermal Ionization') .NE. 0)THEN
 	       READ(20,'(A)')STRING
 	       WRITE(21,'(A)')TRIM(STRING)
 	       READ(STRING,*)(NT_IR(I),I=IST,IEND)
@@ -257,14 +260,16 @@
 	YLABEL='Normalized rate'
 !
 2000	CONTINUE
-	XAX_OPT='I'
-	CALL GEN_IN(XAX_OPT,'X axis option: I, R, V, T, ED, S(stop)')
+	XAX_OPT='XN'
+	CALL GEN_IN(XAX_OPT,'X axis option: XN, R, V, T, ED, EX(stop), NS (new species)')
 	XAX_OPT=UC(XAX_OPT)
-	IF(XAX_OPT(1:1) .EQ. 'I')THEN
+	IF(XAX_OPT(1:2) .EQ. 'XN')THEN
 	  DO I=1,ND
 	    XVEC(I)=I
 	  END DO
 	  XLABEL='Depth index'
+	ELSE IF(XAX_OPT(1:2) .EQ. 'NS')THEN
+	  GOTO 1000
 	ELSE IF(XAX_OPT(1:1) .EQ. 'R')THEN
 	  XVEC(1:ND)=R(1:ND)
 	  XLABEL='Radius(10\u10\d cm)'
@@ -277,7 +282,7 @@
 	ELSE IF(XAX_OPT(1:2) .EQ. 'ED')THEN
 	  XVEC(1:ND)=ED(1:ND)
 	  XLABEL='Ne(cm\u-3\d)'
-	ELSE IF(XAX_OPT(1:1) .EQ. 'S')THEN
+	ELSE IF(XAX_OPT(1:2) .EQ. 'EX')THEN
 	  STOP
 	END IF
 !
@@ -317,7 +322,7 @@
 	  I=I+1
 	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Charge exch. recombination rate (',TRIM(COLOR(I)),')'
 	END IF
-	IF(MAXVAL(ABS(CHG_RR(1:ND))) .GE. MIN_VAL)THEN
+	IF(MAXVAL(ABS(ADVEC_RR(1:ND))) .GE. MIN_VAL)THEN
 	  CALL DP_CURVE(ND,XVEC,ADVEC_RR)
 	  I=I+1
 	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Advection recombination rate (',TRIM(COLOR(I)),')'

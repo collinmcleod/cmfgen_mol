@@ -313,7 +313,7 @@
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES .AND. DO_THIS_ION(ID))THEN
 !
-! Determine levels form which excitation will occur.
+! Determine levels from which excitation will occur.
 !
 	      T1=SUM(ATM(ID)%XzV_F(:,DPTH_INDX))
 	      MAX_LOW_LEV=ATM(ID)%NXzV_F
