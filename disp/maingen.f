@@ -2488,7 +2488,7 @@
 	  ELEC=.FALSE.
 	  FLAG=.FALSE.
 !
-	  WRITE(6,*)'Option plots species density, fractinal abundance, or mass fraction'
+	  WRITE(6,*)'Option plots fractional abundance (N/Na), mass fraction, or species density.'
 !
 	  CALL USR_OPTION(ELEC,'FRAC','T','Fractional abundance')
 	  IF(.NOT. ELEC)CALL USR_OPTION(FLAG,'MF','T','Mass fraction')
@@ -2531,23 +2531,10 @@
 	  END IF
 !
 	  IF(XSPEC .EQ. 'ALL')THEN
-	    J=0
-	    WRITE(6,'(A)')' '
-	    WRITE(6,'(A)')'  Mass Fraction (MF) and Log(MF) at inner boundary'
-	    DO ISPEC=1,NSPEC
-	      IF(POPDUM(ND,ISPEC) .GT. 0.0D0)THEN
-	        J=J+1
-	        T1=POPDUM(ND,ISPEC)/POP_ATOM(ND)+1.0D-100
-	        WRITE(6,'(A6,2X,F9.6,3X,ES9.2,5X)',ADVANCE='NO')TRIM(SPECIES(ISPEC)),T1,LOG10(T1)
-	        IF(MOD(J,3) .EQ. 0)WRITE(6,'(A)')' '
-	        IF(MOD(J,3) .EQ. 0)J=0
-	      END IF
-	    END DO
-	    IF(J .NE. 0)WRITE(6,'(A)')' '
+	    CALL WR_SPEC_SUM(ELEC,FLAG,ND)
 	  ELSE IF(.NOT. FOUND)THEN
 	    WRITE(T_OUT,*)'Error --- unrecognized species'
 	  END IF
-	
 !
 	ELSE IF(XOPT .EQ. 'YION')THEN
 	  DO I=1,ND

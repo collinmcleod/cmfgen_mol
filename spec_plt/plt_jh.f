@@ -699,6 +699,8 @@
 	  CALL DP_CURVE(J,XV,YV)
 	  YAXIS='Phot'
 !
+! Plot energy density in the radiaton field.
+!
 	ELSE IF(X(1:2) .EQ. 'EJ')THEN
 	  IF(ALLOCATED(XV))DEALLOCATE(XV)
 	  IF(ALLOCATED(YV))DEALLOCATE(YV)

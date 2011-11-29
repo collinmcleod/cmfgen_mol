@@ -1,7 +1,15 @@
 	SUBROUTINE ELECTRON_NON_THERM_SPEC(ND)
 	USE MOD_NON_THERM
 	USE MOD_CMFGEN
+	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
+!
+! Altered 7-Nov-2011 : Altered selection of levels used for evaluating non-thermal spectrum.
+!                      We now use the atom density, rather than ion density at tthe depth of interest.
+!                      NT_OMIT_SCALE added 23-Nov-2011
+!                      CONTROL_VARIABL_MOD included.
+!                      Set SOURCE to 0 before setting its value: important for CONSTANT and BELL_SHAPE
+!                      Installed NT_SOURCE_TYPE variable.
 !
 !	INTEGER NUM_IONS
 	INTEGER ND
@@ -12,12 +20,16 @@
 	REAL*8, SAVE, ALLOCATABLE :: DETAI_DE(:)
 	REAL*8, SAVE, ALLOCATABLE :: MAT(:,:)
 	REAL*8, SAVE, ALLOCATABLE :: Qnn(:)
+	REAL*8, SAVE, ALLOCATABLE :: Qnn_TMP(:)
 	REAL*8, SAVE, ALLOCATABLE :: POP_VEC(:)
 !
 	INTEGER, SAVE, ALLOCATABLE :: INDX(:)
 	LOGICAL, SAVE, ALLOCATABLE :: DO_THIS_ION(:)
 	logical, save, allocatable :: do_and_1st_time(:)
 	integer, save, allocatable :: nlow_maxs(:)
+!
+	REAL*8, ION_SUM(NUM_IONS)
+	LOGICAL, DO_THIS_ION_EXC(NUM_IONS)
 !
 	REAL*8 EKT
 	REAL*8 EKTP
@@ -40,7 +52,6 @@
 	REAL*8, PARAMETER :: XKT_MAX=1.0D+03
 	REAL*8, PARAMETER :: DELTA_ENR_SOURCE=30.0D0
 	REAL*8, PARAMETER :: Hz_to_eV=13.60D0/3.2897D0
-	LOGICAL, PARAMETER :: VERBOSE_OUTPUT=.FALSE.
 !
 	INTEGER ISPEC
 	INTEGER ID
@@ -50,7 +61,6 @@
 	INTEGER IKTP
 	INTEGER IKTPN
 	INTEGER DPTH_INDX
-	INTEGER IOS
 	INTEGER I, J, K
 	INTEGER IST
 	INTEGER NL,NUP
@@ -59,10 +69,8 @@
 !
 	INTEGER, PARAMETER :: LU_ER=6
 	INTEGER, PARAMETER :: LU_TH=8
-	integer, parameter :: lu_bethe = 100
+	integer, parameter :: LU_BETHE = 100
 	LOGICAL, SAVE :: FIRST_TIME=.TRUE.
-	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
-	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
 	LOGICAL INJECT_DIRAC_AT_EMAX
 	LOGICAL INCLUDE_EXCITATION
@@ -70,10 +78,17 @@
 	CHARACTER(LEN=10) SOURCE_TYPE
 	CHARACTER(LEN=40) TMP_NAME
 !
-	SOURCE_TYPE='CONSTANT'       !or 'BELL SHAPE'
-	INJECT_DIRAC_AT_EMAX=.TRUE.
 	INCLUDE_IONIZATION=.TRUE.    !.TRUE.
 	INCLUDE_EXCITATION=.TRUE.    !.TRUE.
+!
+	INJECT_DIRAC_AT_EMAX=.FALSE.
+	IF(NT_SOURCE_TYPE(1:12) .EQ. 'INJECT_DIRAC')THEN
+	  INJECT_DIRAC_AT_EMAX=.TRUE.
+	ELSE IF (NT_SOURCE_TYPE .EQ. 'CONSTANT')THEN
+	  SOURCE_TYPE='CONSTANT'
+	ELSE IF (NT_SOURCE_TYPE .EQ. 'BELL_SHAPE')THEN
+	  SOURCE_TYPE='BELL_SHAPE'
+	END IF
 !
 	WRITE(LU_ER,*)' '
 	WRITE(LU_ER,*)'Entering ELECTRON_NON_THERM_SPEC'
@@ -111,6 +126,7 @@
 	  IF(IOS .EQ. 0)ALLOCATE (SOURCE(NKT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (RHS(NKT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (Qnn(NKT),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (Qnn_TMP(NKT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (dETAI_dE(NKT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (MAT(NKT,NKT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (POP_VEC(NUM_THD))
@@ -163,6 +179,7 @@
 ! E_INIT will be a normalisation constant to yield fractions for ionization etc.
 !
 	WRITE(LU_TH,*)'Constructing SOURCE'
+	SOURCE=0.0D0
 	IF (INJECT_DIRAC_AT_EMAX) THEN ! zero otherwise
 	  E_INIT = XKT_MAX
 	ELSE
@@ -225,7 +242,8 @@
 	  CALL INDEXX(NUM_THD,POP_VEC,INDX,L_FALSE)
 	  DO_THIS_ION(:)=L_FALSE
 	  THD(:)%DO_THIS_ION_ROUTE=L_FALSE
-	  DO IT=1,10
+	  DO IT=1,NUM_THD
+	    IF(POP_VEC(INDX(IT)) .LT. 0.01D0*POP_VEC(INDX(1)) .AND. IT .GT. 10)EXIT
 	    ID=THD(INDX(IT))%LNK_TO_ION
 	    THD(INDX(IT))%DO_THIS_ION_ROUTE=.TRUE.
 	    DO_THIS_ION(ID)=.TRUE.
@@ -309,53 +327,86 @@
 	CALL TUNE(1,'MAT_EXCITE')
 	IF (INCLUDE_EXCITATION)THEN
 	  WRITE(LU_TH,*)'Beginning excitation section'
-!	  open(unit=lu_bethe,file='bethe_cross_chk',status='unknown',action='write')
+!
+! We only do excitations for ions with a fractional population > 0.01.
+! We exclude the final ion when computing the fractional population.
+! We do at least one ionization stage for each species.
+!
+	  ION_SUM(:)=0.0D0
+	  DO_THIS_ION_EXC(:)=.FALSE.
+	  DO ISPEC=1,NUM_SPECIES
+	    T1=0.0D0
+	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	     IF(ATM(ID)%XzV_PRES)ION_SUM(ID)=SUM(ATM(ID)%XzV_F(:,DPTH_INDX))
+	     T1=T1+ION_SUM(ID)
+	    END DO
+	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	     IF(ION_SUM(ID)/T1 .GT. 1.0D-03)DO_THIS_ION_EXC(ID)=.TRUE.
+	    END DO
+	  END DO
+!
 	  DO ID=1,NUM_IONS
-	    IF(ATM(ID)%XzV_PRES .AND. DO_THIS_ION(ID))THEN
+	    IF(ATM(ID)%XzV_PRES .AND. DO_THIS_ION_EXC(ID))THEN
 !
 ! Determine levels from which excitation will occur.
 !
-	      T1=SUM(ATM(ID)%XzV_F(:,DPTH_INDX))
-	      MAX_LOW_LEV=ATM(ID)%NXzV_F
+	      T1=ION_SUM(ID)
+	      MAX_LOW_LEV=0
 	      DO I=ATM(ID)%NXzV_F,1,-1
-	        IF(ATM(ID)%XzV_F(I,DPTH_INDX)/T1 .GT. 1.0D-04)EXIT
+	        IF(ATM(ID)%XzV_F(I,DPTH_INDX)/T1 .GT. NT_OMIT_SCALE)EXIT
 	        MAX_LOW_LEV=I
 	      END DO
-	      nlow_maxs(id)=max(nlow_maxs(id),max_low_lev)
+	      NLOW_MAXS(ID)=MAX(NLOW_MAXS(ID),MAX_LOW_LEV)
 !
-	      DO J=2,ATM(ID)%NXzV_F
-	        DO I=1,MIN(J-1,MAX_LOW_LEV)
-	          NL=I; NUP=J
-!	          write(lu_bethe,'(x,I5,2X,I4,4X,A6,ES16.8)')dpth_indx,ID,TRIM(ION_ID(ID)), &
+	      DO I=1,MAX_LOW_LEV
+	        NL=I
+	        DO WHILE(J .LE. ATM(ID)%NXzV_F)
+	          K=J
+	          IF(ATM(ID)%AXzV_F(I,J) .GT. 0.0D0)THEN
+	            dE=Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(J))
+	            Qnn=0.0D0
+	            DO WHILE(K .LE. ATM(ID)%NXzV_F)
+	              IF(Hz_TO_eV*(ATM(ID)%EDGEXZV_F(K)-ATM(ID)%EDGEXZV_F(J)) .GE. 1.0)EXIT
+	              J=K
+	              NUP=K
+	              IF(ATM(ID)%AXzV_F(I,J) .GT. 0.0D0)THEN
+	                CALL BETHE_APPROX_V3(Qnn_TMP,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
+	                Qnn=Qnn+Qnn_TMP 
+	              END IF
+	              K=K+1
+	            END DO
+!
+!	            write(lu_bethe,'(x,I5,2X,I4,4X,A6,ES16.8)')dpth_indx,ID,TRIM(ION_ID(ID)), &
 !	                                                atm(id)%xzv_f(nl,dpth_indx)
-!	          CALL BETHE_APPROX(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX,FAST_BETHE_METHOD)
-	          CALL BETHE_APPROX_V3(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
+!	            CALL BETHE_APPROX(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX,FAST_BETHE_METHOD)
 !
 !
 !$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(IKT,IKT0,IKTP,IKTPN,EKT,EMAX)
-	          DO IKT=1,NKT
-	            EKT = XKT(IKT)
-	            IKT0 = IKT
+	            DO IKT=1,NKT
+	              EKT = XKT(IKT)
+	              IKT0 = IKT
 !
 ! Need to find the upper bound iktpn for which ektp = ekt + Excitation_Energy
 !
-	            EMAX = EKT+Hz_TO_eV*(ATM(ID)%EDGEXZV_F(I)-ATM(ID)%EDGEXZV_F(J))
-	            IKTPN=IKT0 
-	            IF (EMAX .GT. XKT(NKT-1)) then
-	              IKTPN = NKT
-	            ELSE
-	              DO WHILE (XKT(IKTPN) .LT. EMAX)
-	                IKTPN = IKTPN + 1
+	              EMAX = EKT+dE
+	              IKTPN=IKT0 
+	              IF (EMAX .GT. XKT(NKT-1)) then
+	                IKTPN = NKT
+	              ELSE
+	                DO WHILE (XKT(IKTPN) .LT. EMAX)
+	                  IKTPN = IKTPN + 1
+	                END DO
+	              END IF
+!
+	              DO IKTP=IKT0,IKTPN
+	                MAT(IKT0,IKTP) = MAT(IKT0,IKTP) + Qnn(IKTP)
 	              END DO
-	            END IF
 !
-	            DO IKTP=IKT0,IKTPN
-	               MAT(IKT0,IKTP) = MAT(IKT0,IKTP) + Qnn(IKTP)
-	            END DO
-!
-	          END DO	!Loop over energy
+	            END DO	!Loop over energy
 !OMP END PARALLEL DO
 !
+	          END IF        !Check if f(i,j)=0
+	          J=J+1
 	        END DO		!Loop over lower level
 	      END DO		!Loop over upper level
 	    END IF		!Ionization stage present
@@ -447,19 +498,15 @@
 	CALL TUNE(1,'CHK_EXCITE')
 	IF(INCLUDE_EXCITATION)THEN
 	  DO ID=1,NUM_IONS
-	    IF(ATM(ID)%XzV_PRES .AND. DO_THIS_ION(ID))THEN
-	      DO J=2,ATM(ID)%NXzV_F
-	        DO I=1,MIN(J-1,MAX_LOW_LEV)
+	    IF(ATM(ID)%XzV_PRES .AND. DO_THIS_ION_EXC(ID))THEN
+	      DO I=1,MAX_LOW_LEV
+	      DO J=I+1,ATM(ID)%NXzV_F
 	          NL=I; NUP=J
-!	          CALL BETHE_APPROX(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX,L_TRUE)
 	          CALL BETHE_APPROX_V3(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
 	          dE=Hz_TO_eV*(ATM(ID)%EDGEXZV_F(I)-ATM(ID)%EDGEXZV_F(J))
 	          DO IKT=1,NKT
 	            FRAC_EXCITE_HEATING(DPTH_INDX)=FRAC_EXCITE_HEATING(DPTH_INDX)+dE*Qnn(IKT)*YE(IKT,DPTH_INDX)
 	          END DO
-!	          write(lu_bethe,*)''
-!	          write(lu_bethe,'(x,i3,x,i4,x,i5,x,i5)')id,dpth_indx,nl,nup
-!	          write(lu_bethe,'(1X,1P8E16.7)')(Qnn(ikt)/atm(id)%xzv_f(nl,dpth_indx),ikt=1,nkt)
 	        END DO
 	      END DO
 	    END IF

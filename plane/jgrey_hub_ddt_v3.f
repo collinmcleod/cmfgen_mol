@@ -18,6 +18,8 @@
 	1              ACCURACY,DO_TIME_VAR,TIME_SEQ_NO,ND,NC,NP,NT)
 	IMPLICIT NONE
 !
+! Altered 13-Nov-2011: Better handling of error conditions - RJ adjusted before T udated.
+!                          Comments added 23-Nov-2011.
 ! Altered 06-Jun-2010: Assume zero-flux option when not diffusion option.
 ! Altered 05-Aug-2008: Fixed bug with check SUM written to SN_GREY_CHK.
 !                          Replaced T1+T2+T3-E3 with T1+T2+T3-E3 (.ie., -T3 --> +T3)
@@ -311,17 +313,9 @@
 	  WRITE(LU,'(A)')' '
 	CLOSE(LU)
 !
-	DO I=1,ND
-	  TA(I)=RJ(I)+(E_RAD_DECAY(I)-WORK(I))/MAX(0.1D0*CHI(I),CHI_PLANCK(I))
-	END DO
-!
-! Compute the temperature distribution, and the Rosseland optical depth scale.
-! NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert T from units of 
-! K to units of 10^4 K. 
-!
 	BAD_J=.FALSE.
 	DO I=1,ND
-	  IF(TA(I) .LE. 0.0D0 .OR. RJ(I) .LE. 0.0D0)THEN
+	  IF(RJ(I) .LE. 0.0D0)THEN
 	    IF(RJ(I+1) .LE. 0.0D0 .AND. I .NE. 1)THEN
 	      T1=R(I-1)/R(I)
 	      RJ(I)=T1*T1*RJ(I-1)
@@ -336,48 +330,40 @@
 	    ELSE
 	      RJ(I)=SQRT(RJ(I+1)*RJ(I-1))
 	    END IF 
-            BAD_J_COUNTER=BAD_J_COUNTER+1
 	    BAD_J=.TRUE.
+            BAD_J_COUNTER=BAD_J_COUNTER+1
+	  END IF
+	  TA(I)=RJ(I)+(E_RAD_DECAY(I)-WORK(I))/MAX(0.1D0*CHI(I),CHI_PLANCK(I))
+	END DO
+!
+	IF(BAD_J_COUNTER .GT. 300)THEN
+	  WRITE(6,*)'Exceeded 300 iterations for BAD_J_COUNTER'
+	  WRITE(6,*)'Check starting conditions'
+	  WRITE(6,*)'Check DJDT_GREY_ERROR file for more information'
+	  OPEN(UNIT=LU,FILE='DJDT_GREY_ERRROR',STATUS='UNKNOWN')
+	    WRITE(LU,*)'Reduction factor is',REDUCTION_FACTOR
+	    WRITE(LU,'(A,9A14)')'  J','T_FROM_J','    OLD_T','E(Decay)','    WORK',
+	1                        '     CHI','    CHIP','      RJ','    MOD_J'
+	    DO J=1,ND
+	      WRITE(LU,'(I3,8ES14.4)')J,T_FROM_J(J),OLD_T(J),E_RAD_DECAY(J),WORK(J),
+	1                                CHI(J),CHI_PLANCK(J),RJ(J),TA(J)
+	    END DO
+	  CLOSE(UNIT=LU)
+	  STOP
+	END IF
+!
+! Compute the temperature distribution, and the Rosseland optical depth scale.
+! NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert T from units of 
+! K to units of 10^4 K. 
+!
+	DO I=1,ND
+	  IF(TA(I) .LE. 0.0D0)THEN
 	    IF(WORK(I) .GT. 0)THEN
 	      T_FROM_J(I)=0.5D0*(OLD_T(I)*ROLD_ON_R+T_FROM_J(I))
 	    ELSE
-	      WRITE(6,*)'Possible error in JGREY_HUB_DDT_V3'
-	      WRITE(6,*)'Possible error: WORK -ve yet -ve J or B'
-	      WRITE(6,*)'Check DJDT_GREY_ERROR file for more information'
-	      OPEN(UNIT=LU,FILE='DJDT_GREY_ERRROR',STATUS='UNKNOWN')
-                WRITE(LU,'(X,A,ES12.4,3X,A,ES12.4,6X,A,ES12.4)')
-	1               'WORK=',WORK(I),'T_FROM_J=',T_FROM_J(I),'OLD_T=',OLD_T(I)
-	        WRITE(LU,'(A,9A14)')'  J','T_FROM_J','    OLD_T','E(Decay)','    WORK',
-	1                        '     CHI','    CHIP','      RJ','    MOD_J'
-	        DO J=1,ND
-	          WRITE(LU,'(I3,8ES14.4)')J,T_FROM_J(J),OLD_T(J),E_RAD_DECAY(J),WORK(J),
-	1                              CHI(J),CHI_PLANCK(J),RJ(J),TA(J)
-	        END DO
-	      CLOSE(UNIT=LU)
 	      T_FROM_J(I)=0.5D0*(OLD_T(I)*ROLD_ON_R+T_FROM_J(I))
-	      IF(RJ(I+1) .LE. 0.0D0)THEN
-	        RJ(I)=R(I-1)*R(I-1)*RJ(I-1)
-	      ELSE
-	        RJ(I)=SQRT(R(I+1)*RJ(I-1))
-	      END IF 
-	      STOP
 	    END IF
-	    IF(BAD_J_COUNTER .GT. 300)THEN
-	      WRITE(6,*)'Exceeded 300 iterations for BAD_J_COUNTER'
-	      WRITE(6,*)'Check starting conditions'
-	      WRITE(6,*)'Check DJDT_GREY_ERROR file for more information'
-	      OPEN(UNIT=LU,FILE='DJDT_GREY_ERRROR',STATUS='UNKNOWN')
-	        WRITE(LU,*)'Reduction factor is',REDUCTION_FACTOR
-	        WRITE(LU,'(A,9A14)')'  J','T_FROM_J','    OLD_T','E(Decay)','    WORK',
-	1                        '     CHI','    CHIP','      RJ','    MOD_J'
-	        DO J=1,ND
-	          WRITE(LU,'(I3,8ES14.4)')J,T_FROM_J(J),OLD_T(J),E_RAD_DECAY(J),WORK(J),
-	1                                CHI(J),CHI_PLANCK(J),RJ(J),TA(J)
-	        END DO
-	      CLOSE(UNIT=LU)
-	      STOP
-	    END IF
-	 ELSE
+	  ELSE
             T_FROM_J(I)=0.9D0*T_FROM_J(I)+0.1D0*((PI/5.67D-05*TA(I))**0.25D0)*1.0D-04
 	  END IF
         END DO

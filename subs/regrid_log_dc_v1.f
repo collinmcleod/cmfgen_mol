@@ -7,6 +7,8 @@
 	1               POPATOM,N,ND,LU_IN,INTERP_OPTION,FILE_NAME)
 	IMPLICIT NONE
 !
+! Altered: 18-Nov-2011: Big fix. Not all DPOP was being set and this could cause a crash
+!                        when taking LOGS (levels unused).
 ! Created: 18-Dec-2010: This routine replace REGRIDWSC_V3, REGRIDB_ON_NE, REGRID_TX_R.
 !                       Interplation options are 'R', 'ED', 'SPH_TAU', and 'RTX'.
 !                       Routine handled INPUT files with departure coefficients, or
@@ -137,7 +139,7 @@
 	    READ(LU_IN,*)OLD_R(I),OLD_DI(I),OLD_ED(I),OLD_T(I)
 	  END IF
 	  READ(LU_IN,*)(TA(J),J=1,NOLD)
-	  DO J=1,NZ
+	  DO J=1,NOLD                         !We use NOLD for when we take Logs.
 	    DPOP(J,I)=TA(J)
 	  END DO
 	END DO

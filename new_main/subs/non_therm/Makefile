@@ -32,10 +32,11 @@ $(LIB) : $(OBJ2) $(OBJ)
 NT =  $(LIB_DIR)libmod.a(mod_non_therm.o)
 ST =  $(LIB_DIR)libmod.a(steq_data_mod.o)
 CMF = $(LIB_DIR)libmod.a(mod_cmfgen.o)
+CNT = $(LIB_DIR)libmod.a(control_variable_mod.o)
 
 # General rules to make obects in a library and object files
 
-$(LIB)(%.o) : %.f90 $(NT) $(ST) $(CMF)
+$(LIB)(%.o) : %.f90 $(NT) $(ST) $(CMF) $(CNT)
 	$(F90) -c $(FFREE) -I..  $<
 	ar ruv $(LIB) $*.o
 

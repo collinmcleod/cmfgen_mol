@@ -4,6 +4,7 @@
 	1              BA_COMPUTED,WR_BA_INV,WR_PRT_INV,LAMBDA_IT)
 	IMPLICIT NONE
 !
+! Altered 08-Nov-2011 : Updated maximum correction output with info on whether BA was computed.
 ! Altered 15-Nov-2010 : FIDDLE_POP_CORRECTIONS added to assist convergence. This allows
 !                         -ver relaxation to be used at some depths.
 ! Altered 23-Apr-2010 : DO_LEVEL_CHECK, MAX_INC_VEC, & MAX_DEC_VEC variables installed.
@@ -160,9 +161,12 @@
 	IF(LAMBDA_IT)THEN
  	  WRITE(LUER,9000)IINC,ABS(INCREASE),'  (LAMBDA)'
 	  WRITE(LUER,9200)IDEC,DECREASE,'  (LAMBDA)'
+	ELSE IF(BA_COMPUTED)THEN
+ 	  WRITE(LUER,9000)IINC,ABS(INCREASE),'  (BA computed)'
+	  WRITE(LUER,9200)IDEC,DECREASE,'  (BA computed)'
 	ELSE
- 	  WRITE(LUER,9000)IINC,ABS(INCREASE)
-	  WRITE(LUER,9200)IDEC,DECREASE
+ 	  WRITE(LUER,9000)IINC,ABS(INCREASE),'  (BA not computed)'
+	  WRITE(LUER,9200)IDEC,DECREASE,'  (BA not computed)'
 	END IF
 9000	FORMAT(' Maximum % increase at depth ',I3,' is',1PE10.2: A)
 9200	FORMAT(' Maximum % decrease at depth ',I3,' is',1PE10.2: A)

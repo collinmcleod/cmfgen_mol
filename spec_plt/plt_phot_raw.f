@@ -347,11 +347,11 @@
 	CALL GEN_IN(CREATE_SUMMARY,'Create a summary of photo-ionization cross sections (1st file only)?')
 	IF(CREATE_SUMMARY)THEN
 	  OPEN(UNIT=11,FILE='Phot_summary',STATUS='UNKNOWN',ACTION='WRITE')
-	    WRITE(11,'(A,T20,A,6X,A,3(10X,A))')'Level','Type',' Np','X1','X2','X2'
+	    WRITE(11,'(A,T42,A,6X,A,3(10X,A))')'Level','Type',' Np','X1','X2','X2'
 	    DO K=1,40
 	      DO J=1,NLEV_1
 	        IF(TYPE_1(J) .EQ. K)THEN
-	          WRITE(11,'(A,T20,I4,2X,I6,5ES13.4)')TRIM(NAME_1(J)),TYPE_1(J),NUM_VALS_1(J),
+	          WRITE(11,'(A,T42,I4,2X,I6,5ES13.4)')TRIM(NAME_1(J)),TYPE_1(J),NUM_VALS_1(J),
 	1            CROSS_1(LOC_1(J):LOC_1(J)+MIN(4,NUM_VALS_1(J)-1))
 	        END IF
 	      END DO

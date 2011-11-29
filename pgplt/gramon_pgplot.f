@@ -6,6 +6,9 @@
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
+! Altered:  26-Nov-2011 : Curves cycle over pen-colors 2 to 13.
+!                         Dashed curve for plots > 13
+!                         Marker style ignored when MARK is off (use I for invisible curve).
 ! Altered:  08-Apr-2006 : In NM option, normalization now correctly handles unequeally 
 !                            spaced data.
 ! Altered:  23-Aug-2005 : Grey pen option installed.
@@ -337,19 +340,23 @@
 !
 ! Define default line representations (initially not dashed)
 !
-	LINE_STYLE(:)=1
 	LINE_WGT(:)=1
 	DO I=1,MAX_PLTS
+	  LINE_STYLE(I)=1
 	  MARKER_STYLE(I)=MOD(I,5)
+	END DO
+	DO I=14,MAX_PLTS
+	  LINE_STYLE(I)=2
 	END DO
 	DASH=.FALSE.
 !
 ! Assign a color index to each pen. Keep previus assignments if they have been
-! made.
+! made. We avoid the white pen as it won't show on a hardcopy.
 !
 	IF (FSTOPEN) THEN
-	  DO I=0,MAXPEN
-	    PEN_COL(I)=MIN(I,15)
+	  PEN_COL(0)=0
+	  DO I=1,MAXPEN
+	    PEN_COL(I)=MOD(I-1,14)+1
 	  END DO
 	END IF
 !
@@ -882,9 +889,7 @@ C
 	    MARK=.TRUE.
             WRITE(T_OUT,*)'Wil now mark data points'
 	    CALL NEW_GEN_IN(EXPMARK_SCALE,'Expand Symbol Size')
-	    IF(NPLTS .GT. 10)MARKER_STYLE(1:NPLTS)=-1
-	    CALL NEW_GEN_IN(MARKER_STYLE,I,NPLTS,
-	1                'Marker style {+/-}1,...,31)')
+	    CALL NEW_GEN_IN(MARKER_STYLE,I,NPLTS,'Marker style {+/-}1,...,31)')
 	  END IF
 	  GOTO 1000
 !
@@ -2241,9 +2246,9 @@ C
 	    CALL PGSWIN(XPAR(1),XPAR(2),YPAR_R_AX(1),YPAR_R_AX(2))
 	  END IF
 !
-	  IF(TYPE_CURVE(IP) .EQ. 'L' .AND. MARKER_STYLE(IP) .GE. 0)THEN
+	  IF(TYPE_CURVE(IP) .EQ. 'L' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    CALL PGLINE(NPTS(IP),CD(IP)%XVEC,CD(IP)%DATA)
-	  ELSE IF(TYPE_CURVE(IP) .EQ. 'E' .AND. MARKER_STYLE(IP) .GE. 0)THEN
+	  ELSE IF(TYPE_CURVE(IP) .EQ. 'E' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    IST=1
 	    IEND=2
 	    T1=CD(IP)%XVEC(NPTS(IP))-CD(IP)%XVEC(1)
@@ -2262,20 +2267,20 @@ C
 	      IEND=IST+1
 	    END DO
 !
-	  ELSE IF(TYPE_CURVE(IP) .EQ. 'H' .AND. MARKER_STYLE(IP) .GE. 0)THEN
+	  ELSE IF(TYPE_CURVE(IP) .EQ. 'H' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    CALL PGBIN(NPTS(IP),CD(IP)%XVEC,CD(IP)%DATA,.TRUE.)
 !
 ! This routine does a histogram plot, but the X axis is assumed
 ! to represent the vertices of each bin, rather than the central
 ! position.
 !
-	  ELSE IF(TYPE_CURVE(IP) .EQ. 'A' .AND. MARKER_STYLE(IP) .GE. 0)THEN
+	  ELSE IF(TYPE_CURVE(IP) .EQ. 'A' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    CALL HIST_ADJ(CD(IP)%XVEC,CD(IP)%DATA,NPTS(IP))
 !
 ! This routine does a series of verticle lines extending from YMIN to YV(I)
 ! at each X value.
 !
-	  ELSE IF(TYPE_CURVE(IP) .EQ. 'V' .AND. MARKER_STYLE(IP) .GE. 0)THEN
+	  ELSE IF(TYPE_CURVE(IP) .EQ. 'F' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    DO J=1,NPTS(IP)
 	      XT(1)=CD(IP)%XVEC(J)
 	      XT(2)=CD(IP)%XVEC(J)
@@ -2287,7 +2292,7 @@ C
 ! This routine does a broken plot. NPTS should be even. Lines are drawn
 ! from I to I+1 point for I odd only.
 !
-	  ELSE IF(TYPE_CURVE(IP) .EQ. 'B' .AND. MARKER_STYLE(IP) .GE. 0)THEN
+	  ELSE IF(TYPE_CURVE(IP) .EQ. 'B' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    CALL PGSLS(LINE_STYLE(IP))
 	    Q=PEN_COL(IP+1)
 	    CALL PGSCI(Q)     ! START WITH COLOR INDEX 2

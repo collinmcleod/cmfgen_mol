@@ -26,6 +26,8 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered 11-Nov-2011 - Only include FF variation when PHOT_ID=1. When this is true,
+!                         we now do it for ALL levels.
 ! Altered 05-Apr-2011 - Changed to V5.
 !                         HNST_F_ON_S (rather than HNST_F) is passed in call.
 !                         LOG_HNSR_S passed in call.
@@ -115,6 +117,7 @@ C
 	REAL*8 LOG_DI_RAT(ND)		!Used as work vector
 	REAL*8 DT_TERM(ND)		!Used as work vector
 	REAL*8 HDKT_ON_T(ND)		!Used as work vector
+	REAL*8 POP_SUM(ND)
 C
 	REAL*8 YDIS(ND)			!Constant for computing level dissolution/
 	REAL*8 XDIS(ND)			!Constant for computing level dissolution/
@@ -168,33 +171,43 @@ C
 C
 C Free-free processes
 C
-	IF( IONFF )THEN
+	IF( IONFF .AND. PHOT_ID .EQ. 1)THEN
 C
 C Compute free-free gaunt factors. Replaces call to GFF in following DO loop.
 C
 	  IF(LST_DEPTH_ONLY)THEN
 	    CALL GFF_VEC(GFF_VAL(ND),NU,T(ND),Z,ND_LOC)
+	    POP_SUM(ND)=SUM(DI_S(:,ND))
 	  ELSE
 	    CALL GFF_VEC(GFF_VAL,NU,T,Z,ND_LOC)
+	    POP_SUM=SUM(DI_S,1)
 	  END IF
 C
 	  TCHI1=CHIFF*Z*Z/( NU**3 )
 	  TETA1=CHIFF*Z*Z*TWOHCSQ
+!
+!$OMP PARALLEL DO PRIVATE(ALPHA,TCHI2,TETA2,I,K,L)
 	  DO K=K_ST,ND
 	    ALPHA=GFF_VAL(K)/SQRT(T(K))
 C
 	    TCHI2=TCHI1*ALPHA
-	    PCHI(EQION,K)=PCHI(EQION,K)+ED(K)*TCHI2*(1.0D0-EMHNUKT(K))
-	    PCHI(NT-1,K)=PCHI(NT-1,K)+DI_S(ION_LEV,K)*TCHI2*(1.0D0-EMHNUKT(K))
-	    PCHI(NT,K)=PCHI(NT,K)+ED(K)*DI_S(ION_LEV,K)*TCHI2/T(K)*
-	1        ( -0.5D0+(0.5D0-HNUONK/T(K))*EMHNUKT(K) )
+	    PCHI(NT-1,K)=PCHI(NT-1,K)+POP_SUM(K)*TCHI2*(1.0D0-EMHNUKT(K))
+	    PCHI(NT,K)=PCHI(NT,K)+ED(K)*POP_SUM(K)*TCHI2/T(K)*( -0.5D0+(0.5D0-HNUONK/T(K))*EMHNUKT(K) )
 C
 	    TETA2=TETA1*ALPHA*EMHNUKT(K)
-	    PETA(EQION,K)=PETA(EQION,K)+TETA2*ED(K)
-	    PETA(NT-1,K)=PETA(NT-1,K)+TETA2*DI_S(ION_LEV,K)
-	    PETA(NT,K)=PETA(NT,K)-TETA2*ED(K)*DI_S(ION_LEV,K)*
-	1        ( 0.5D0-HNUONK/T(K) )/T(K)
+	    PETA(NT-1,K)=PETA(NT-1,K)+TETA2*POP_SUM(K)
+	    PETA(NT,K)  =PETA(NT,K)  +TETA2*POP_SUM(K)*ED(K)*(HNUONK/T(K)-0.5D0)/T(K)
+!
+	    TCHI2=TCHI2*ED(K)*(1.0D0-EMHNUKT(K))
+	    TETA2=TETA2*ED(K)
+	    DO I=1,N_DI
+	      L=EQION+I-1
+	      PCHI(L,K)=PCHI(L,K)+TCHI2
+	      PETA(L,K)=PETA(L,K)+TETA2
+	    END DO
 	  END DO
+!$OMP END PARALLEL DO
+!
 	END IF
 C 
 C

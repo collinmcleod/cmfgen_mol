@@ -242,11 +242,16 @@ C
 	1            'Treat non-thermal electrons')
 	    SCL_NT_CROSEC=.FALSE.
 	    SCL_NT_ION_CROSEC=.FALSE.
+	    NT_OMIT_SCALE=1.0D-08
+	    NT_SOURCE_TYPE='INJECT_DIRAC'
 	    IF(TREAT_NON_THERMAL_ELECTRONS)THEN
 	      CALL RD_STORE_LOG(SCL_NT_CROSEC,'SCL_NT_CROSEC',L_FALSE,
-	1                       'Scale the nonthermal excitation cross sections?')
+	1               'Scale the nonthermal excitation cross sections?')
 	      CALL RD_STORE_LOG(SCL_NT_ION_CROSEC,'SCL_NT_ION_CROSEC',L_FALSE,
-	1                       'Scale the nonthermal ionization cross sections?')
+	1               'Scale the nonthermal ionization cross sections?')
+	      CALL RD_STORE_DBLE(NT_OMIT_SCALE,'NT_OMIT_SCALE',L_FALSE,
+	1               'Fractional populations below this level are excluded when computing the non-thermal electron spectrum')
+	      CALL RD_STORE_CHAR(NT_SOURCE_TYPE,'NT_SOURCE',L_FALSE,'Non-thermal source type - INJECT_DIRAC, CONSTANT or BELL_SHAPE')
 	    ENDIF
 !
 	    ADD_DEC_NRG_SLOWLY=.FALSE.
