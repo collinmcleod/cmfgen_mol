@@ -41,7 +41,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(get_non_loc_gamma_energy.o)\
       $(LIB)(get_pops_at_prev_time_step_v2.o)\
       $(LIB)(get_pops_at_prev_time_step_v3.o)\
-      $(LIB)(get_pops_at_prev_time_step_v4.o)\
+      $(LIB)(get_pops_at_prev_time_step_v5.o)\
       $(LIB)(old_grid_module.o)\
       $(LIB)(prevent_low_t.o)\
       $(LIB)(read_ba_data_v2.o)\
@@ -59,7 +59,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(steq_multi_v8.o)\
       $(LIB)(steqne_v4.o)\
       $(LIB)(steq_advec_v4.o)\
-      $(LIB)(steq_co_mov_deriv_v2.o)\
+      $(LIB)(steq_co_mov_deriv_v3.o)\
       $(LIB)(store_old_grid.o)\
       $(LIB)(store_ba_data_v2.o)\
       $(LIB)(sum_steq_sol.o)\

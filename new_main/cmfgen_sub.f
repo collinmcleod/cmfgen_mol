@@ -38,6 +38,8 @@
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
+! Altered 29-Nov-2011 : Call to STEQ_CO_MOV_DERIV changed to _V3. Done to facilitae
+!                         hadling of additional levels with time dependence.
 ! Altered 07-Nov-2011 : Now output MNL_F, MNUP_F to NETRATE and TOTRATE.
 ! Altered       -2011 : Extensive alterations to handle low temperatures.
 !                       Extensive alterations to include non-thermal ionizations
@@ -2685,7 +2687,7 @@
 ! Allow for advection terms.
 !
 	IF(SN_MODEL .AND. DO_CO_MOV_DDT)THEN
-          CALL STEQ_CO_MOV_DERIV_V2(ADVEC_RELAX_PARAM,LINEAR_ADV,
+          CALL STEQ_CO_MOV_DERIV_V3(POPS,ADVEC_RELAX_PARAM,LINEAR_ADV,
 	1             DO_CO_MOV_DDT,LAMBDA_ITERATION,COMPUTE_BA,
 	1             TIME_SEQ_NO,NUM_BNDS,ND,NT)
 	  WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'SN_DDT'

@@ -18,6 +18,11 @@
 	1              ACCURACY,DO_TIME_VAR,TIME_SEQ_NO,ND,NC,NP,NT)
 	IMPLICIT NONE
 !
+! Altered 28-Nov-2011: REDUCTION_FATOR reduced to 10, and BAD_J_COUNTER now only updated
+!                          per iteration, not per bad depth. WORK is now set to zero
+!                          before jumping to compute "f" on the first iteraton step. The
+!                          advanced computation of "f" was added, since a initial estimate for 
+!                          "f" was causing some of the ocnvergnce difficuties.
 ! Altered 13-Nov-2011: Better handling of error conditions - RJ adjusted before T udated.
 !                          Comments added 23-Nov-2011.
 ! Altered 06-Jun-2010: Assume zero-flux option when not diffusion option.
@@ -172,13 +177,27 @@
 	T_FROM_J(1:ND)=0.0D0
 	OLD_T(1:ND)=0.0D0
 	TSTORE(1:ND)=0.0D0
-	REDUCTION_FACTOR=100.0D0
+	REDUCTION_FACTOR=10.0D0
         BAD_J_COUNTER=0
         F_LOOP_COUNTER=0
 !
 	F(1:ND)=0.0D0
 	RJ(1:ND)=RSQ_J_OLDt(1:ND)/R(1:ND)/R(1:ND)
+!
+! Loop to evaluate the Eddington factor f. A poor initial estimate was causing 
+! convergence issues in some models.
+!
 	GOTO 5000
+!
+! We ned work to evaluate f.
+!
+	IF(DO_TIME_VAR)THEN
+	  CALL DDT_WORK(WORK,POPS,T_FROM_J,OLD_T,TIME_SEQ_NO,ND,NT)
+	ELSE
+	  OLD_T=0.0D0
+	  T_FROM_J=0.0D0
+	  WORK=0.0D0
+	END IF
 !
 1000	CONTINUE
 !
@@ -275,7 +294,7 @@
 	  WRITE(121,'(2ES16.6)')H_INBC,H_INBC_OLDT
 	  WRITE(121,'(3ES16.6)')H_OUTBC,H_OUTBC_OLDT,RSQ_J_OLDt(1)
 	  DO I=1,ND
-	    WRITE(121,'(I4,6ES16.6)')I,TA(I),TB(I),TC(I),JFAC(I),JT(I),XM(I)
+	    WRITE(121,'(I4,7ES16.6)')I,TA(I),TB(I),TC(I),JFAC(I),JT(I),XM(I),F(I)
 	  END DO
 	END IF
 	CALL THOMAS(TA,TB,TC,XM,ND,1)
@@ -331,10 +350,10 @@
 	      RJ(I)=SQRT(RJ(I+1)*RJ(I-1))
 	    END IF 
 	    BAD_J=.TRUE.
-            BAD_J_COUNTER=BAD_J_COUNTER+1
 	  END IF
 	  TA(I)=RJ(I)+(E_RAD_DECAY(I)-WORK(I))/MAX(0.1D0*CHI(I),CHI_PLANCK(I))
 	END DO
+        IF(BAD_J)BAD_J_COUNTER=BAD_J_COUNTER+1
 !
 	IF(BAD_J_COUNTER .GT. 300)THEN
 	  WRITE(6,*)'Exceeded 300 iterations for BAD_J_COUNTER'

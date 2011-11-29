@@ -6,6 +6,7 @@
 !
 	MODULE MOD_CMFGEN
 !
+! Altered 29-Nov-2011 : OLD_LEV_POP_AVAIL added as vector.
 ! Altered 25-Sep-2011 : LOG_XzVLTE_F, XzVLTE_F_ON_S, LOG_XzVLTE arrays added (26-Nov-2010/5-Apr-2011).
 !                         Length of level name changed to 40.
 ! Altered 19-Jan-2009 : SL_OPTION inserted
@@ -79,6 +80,11 @@
 ! Indicates whether a species (e.g. Carbon) is included.
 !
 	LOGICAL SPECIES_PRES(NUM_SPECIES)
+!
+! Used to indicate whether a level population is available at a previous time step.
+! Used for SN calculations (1:NT).
+!
+	LOGICAL, ALLOCATABLE :: OLD_LEV_POP_AVAIL(:)
 !
 ! 
 ! Data arrays for full atom. The names in this array should not be changed,

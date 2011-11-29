@@ -6,6 +6,8 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 22-Nov-2011 : Changed call to GET_POPS_AT_PREV_TIME_STEP from V4 to V5
+!                          (POPS was added to call).
 ! Altered 19-Sep-2011 : Bug fix in DDT_WORK_CHK output: ER (cur and old) were a
 !                          factor of 4 too large.
 ! Altered 13-Nov-2009 : Changed INT_EN interpolaton section. No longer use 
@@ -150,7 +152,7 @@
 ! for advection, radioactive decays, and are not normalized.
 !
 	LUIN=7
-	CALL GET_POPS_AT_PREV_TIME_STEP_V4(OLD_POPS,OLD_R,
+	CALL GET_POPS_AT_PREV_TIME_STEP_V5(POPS,OLD_POPS,OLD_R,
 	1      L_FALSE,L_FALSE,L_FALSE,TIME_SEQ_NO,ND,NT,LUIN)
 	OLD_ED(:)=OLD_POPS(NT-1,:)
 	OLD_T(:)=OLD_POPS(NT,:)

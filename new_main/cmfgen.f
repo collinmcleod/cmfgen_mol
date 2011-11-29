@@ -12,6 +12,7 @@
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
+! Altered: 29-Nov-2011: Memory allocation for OLD_LEV_POP_AVAIL added.
 ! Altered: 25-Sep-2011: ION_ID now set for last ioization stage (LAST_ION).
 !                          LOG_XzVLTE, LOG_XzVLTE_F and XzVLTE_F_ON_S allocated.
 ! Altered: 19-Jan-2008: SL_OPTION installed. Allows number of SL's to be
@@ -544,6 +545,11 @@
 	1                        ATM(ID)%EQXzV,NT,ATM(ID)%XzV_PRES)
 	  END IF
 	END DO
+!
+! Allocated logical vector to idicate whether a level was in available
+! in the earlier model of a time sequence.
+!
+	ALLOCATE (OLD_LEV_POP_AVAIL(NT))
 !
 ! Used when computing dCHI and dETA for CMF mode. Required dimension is 4.
 !

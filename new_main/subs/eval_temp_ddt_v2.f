@@ -18,6 +18,8 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered 22-Nov-2011 : Changed call to GET_POPS_AT_PREV_TIME_STEP from V4 to V5
+!                          (POPS was added to call).
 ! Altered 11-Nov-2009 : Fixed bug in BA calculation --- was skipping depth ND.
 !                          No longer calculate ION_EN. 
 ! Altered 12-Feb-2008 : VOL_EXP_FAC used. Now valid for all expansion laws.
@@ -121,7 +123,7 @@
 ! advection, radioactive decays, and are normalized.
 !
 	LU=7
-	CALL GET_POPS_AT_PREV_TIME_STEP_V4(OLD_POPS,OLD_R,
+	CALL GET_POPS_AT_PREV_TIME_STEP_V5(POPS,OLD_POPS,OLD_R,
 	1      L_TRUE,L_TRUE,L_TRUE,TIME_SEQ_NO,ND,NT,LU)
 	OLD_ED(:)=OLD_POPS(NT-1,:)
 	OLD_T(:)=OLD_POPS(NT,:)

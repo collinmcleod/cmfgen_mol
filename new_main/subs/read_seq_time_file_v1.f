@@ -39,6 +39,10 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 29-Nov-2011 : Changed to allow better treatment of omitted levels. We now set
+!                           a flag to indicate a level is unavailable. This allows us
+!                           to set the D/Dt terms to zero when level is unavailable at
+!                           the earlier time step.
 ! Altered 09-Nov-2011 : Changed to improve population of omitted state. We allow for the
 !                           ground state of an ion being a combination of several levels.
 !                           The oscilator file of the omitted ion must be available for reading.
@@ -77,6 +81,7 @@
 	INTEGER NX
 	INTEGER I
 	INTEGER J
+	INTEGER K
 	INTEGER L
 	INTEGER IOS
 	INTEGER LU_OSC
@@ -93,6 +98,7 @@
         HDKT=4.7994145D0					!1.0D+15*H/k/1.0D+04
 	POPS=0.0D0
 	OLD_ION_STAGE_PRES(1:NUM_IONS)=.FALSE.
+	OLD_LEV_POP_AVAIL(1:NT)=.TRUE.
 !
 	OPEN(UNIT=LU,FILE='OLD_MODEL_DATA',FORM='UNFORMATTED',STATUS='UNKNOWN',ACTION='READ')
 !
@@ -181,6 +187,8 @@
 	            DO I=J+1,ATM(ID)%NXzV_F
 		      T1=HDKT*(ATM(ID)%EDGEXZV_F(J)-ATM(ID)%EDGEXZV_F(I))/T(L)
 	              OLD_XzV(I,L)=OLD_XzV(J,L)*ATM(ID)%GXZV_F(I)/ATM(ID)%GXZV_F(J)*EXP(T1)
+	              K=ATM(ID)%EQXzV-1+ATM(ID)%F_TO_S_XzV(I)
+	              OLD_LEV_POP_AVAIL(I)=.FALSE.
 	            END DO
 	          END DO
 !
@@ -255,11 +263,14 @@
 	DO ISPEC=1,NUM_SPECIES
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	    IF(.NOT. OLD_ION_STAGE_PRES(ID))THEN
-	      WRITE(LUER,*)'Error in READ_SEQ_TIME_FILE_V1: ID not available'
+	      WRITE(LUER,*)'Warning in READ_SEQ_TIME_FILE_V1: ID not available'
 	      WRITE(LUER,*)'      Species is=',SPECIES(ISPEC)
 	      WRITE(LUER,*)'   ID in program=',ID
 	      WRITE(LUER,*)'          Ion ID=',ION_ID(ID)
-              STOP
+	      DO I=1,ATM(ID)%NXzV_F
+	        J=ATM(ID)%EQXzV-1+ATM(ID)%F_TO_S_XzV(I)
+	        OLD_LEV_POP_AVAIL(J)=.FALSE.
+	      END DO
 	    END IF
 	  END DO
 	END DO
