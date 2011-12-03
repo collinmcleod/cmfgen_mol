@@ -210,8 +210,13 @@
 	            '  Fe_nuc(eV)','    Felec','Felec(SE)','     Fion',' Fion(SE)','     Fexc',' Fexc(SE)', &
 	            '  E_ion  ','  E_exc  ','  E_cool '
 	DO I=1,ND
-	  T2=Hz_TO_eV*LOCAL_ION_HEATING(I)/RADIOACTIVE_DECAY_ENERGY_eV(I)
-	  T3=Hz_TO_eV*LOCAL_EXC_HEATING(I)/RADIOACTIVE_DECAY_ENERGY_eV(I)
+	  IF(RADIOACTIVE_DECAY_ENERGY_eV(I) .NE. 0.0D0)THEN
+	    T2=Hz_TO_eV*LOCAL_ION_HEATING(I)/RADIOACTIVE_DECAY_ENERGY_eV(I)
+	    T3=Hz_TO_eV*LOCAL_EXC_HEATING(I)/RADIOACTIVE_DECAY_ENERGY_eV(I)
+	  ELSE
+	    T2=0.0D0
+	    T3=0.0D0
+	  END IF
 	  T1=(1.0D0-T2-T3)
 	  WRITE(LU_TH,'(ES12.4,9(ES12.4))')RADIOACTIVE_DECAY_ENERGY_eV(I),        &
 	               FRAC_ELEC_HEATING(I),T1,         &

@@ -2280,7 +2280,7 @@ C
 ! This routine does a series of verticle lines extending from YMIN to YV(I)
 ! at each X value.
 !
-	  ELSE IF(TYPE_CURVE(IP) .EQ. 'F' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
+	  ELSE IF(TYPE_CURVE(IP) .EQ. 'V' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    DO J=1,NPTS(IP)
 	      XT(1)=CD(IP)%XVEC(J)
 	      XT(2)=CD(IP)%XVEC(J)

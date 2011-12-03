@@ -89,7 +89,9 @@
 	LOGICAL ADD_DEC_NRG_SLOWLY
 	REAL*8 DEC_NRG_SCL_FAC_BEG
 	REAL*8 DEC_NRG_SCL_FAC
-	REAL*8 NT_OMIT_SCALE            !Fractional pops omitted if < NT_OMIT_SCL
+	REAL*8 NT_OMIT_ION_SCALE        !Ion omitted if < NT_OMIT_ION_SCL*(largest ion pop.).
+	REAL*8 NT_OMIT_LEV_SCALE        !Fractional pops omitted if < NT_OMIT_SCL
+	INTEGER NON_THERMAL_IT_CNTRL    !Controls how often we update the nonthermal electron distribution.
 	LOGICAL COMP_GREY_LST_IT        !Comput J(GREY) on last iteration [DEFAULT is TRUE].
 	LOGICAL SCL_NT_CROSEC
 	LOGICAL SCL_NT_ION_CROSEC
