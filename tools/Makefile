@@ -15,6 +15,7 @@ OBJ = $(LIB)(usr_option.o)\
       $(LIB)(form_sp_num.o)\
       $(LIB)(gen_in.o)\
       $(LIB)(get_lu.o)\
+      $(LIB)(mod_color_pen_def.o)\
       $(LIB)(new_gen_in.o)\
       $(LIB)(get_indx.o)\
       $(LIB)(set_case_fn.o)\

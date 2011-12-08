@@ -102,7 +102,7 @@
 	    ION_IVAR=IVAR+ATM(ID)%NXzV
 	    DO K=1,ND
 	      DO I=1,ATM(ID)%NXzV                                !Which S.E. equation
-	        J=ATM(ID)%EQXzV-1+ATM(ID)%F_TO_S_XzV(I)
+	        J=ATM(ID)%EQXzV-1+I
 	        IF(OLD_LEV_POP_AVAIL(J))THEN
 	          T1=DERIV_CONST*(ATM(ID)%XzV(I,K)-OLD_POPS(IVAR+I-1,K))
 	          SE(ID)%STEQ(I,K)=SE(ID)%STEQ(I,K) - T1
@@ -160,7 +160,7 @@
 	        END DO
 	      END DO
 	      T2=T2+ATM(ID_END-1)%DXzV(K)
-	      IF(T1 .GT. T2)THEN
+	      IF(T1 .GT. T2 .AND. OLD_LEV_POP_AVAIL(ATM(ID)%EQXzV))THEN
 	        DO I=ID+1,ID_END
 		  SE(ID)%STEQ_ADV(K)=SE(ID)%STEQ_ADV(K)+SUM(I,K)
 	        END DO

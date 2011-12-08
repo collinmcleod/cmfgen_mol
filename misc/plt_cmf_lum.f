@@ -16,6 +16,7 @@
 !
 	PROGRAM PLT_CMF_LUM
 	USE GEN_IN_INTERFACE
+	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
 ! Cleaned: 06-Nov-2011
@@ -129,8 +130,8 @@
 	  CLOSE(UNIT=20)
 !
 	WRITE(6,*)' '
-	CALL WR_COL_STR('|1              The luminosity is plotted in red')
-	CALL WR_COL_STR('|4 The "conserved" luminosity is plotted in blue')
+	WRITE(6,'(3A)')PG_PEN(2),'              The luminosity is plotted in red',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(3),' The "conserved" luminosity is plotted in blue',DEF_PEN
 	WRITE(6,*)' '
 	T1=0.0D0
 	TOTAL(1)=LUM(1)
@@ -143,12 +144,12 @@
 	CALL GRAMON_PGPLOT(XLABEL,'Luminosity (L\d'//char(09)//'\u)',' ',' ')
 !
 	WRITE(6,*)' '
-	CALL WR_COL_STR(' |1*** |0Plotting the corrections at each depth |1***')
+	WRITE(6,*)' Plotting the corrections at each depth'
 	WRITE(6,*)' '
-	CALL WR_COL_STR('|1 The "mechanical" luminosity contribution at each depth is plotted in red')
-	CALL WR_COL_STR('|4 The "adiabatic" luminosity contribution at each depth is plotted in blue')
-	CALL WR_COL_STR('|2    The "DJDTt" luminosity contribution at each depth is plotted in green')
-	CALL WR_COL_STR('|0       The "radioactove"  contribution at each depth is plotted in purple')
+	WRITE(6,'(3A)')PG_PEN(2)//' The "mechanical" luminosity contribution at each depth is plotted in red',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(2)//' The "adiabatic" luminosity contribution at each depth is plotted in blue',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(4)//' The "DJDTt" luminosity contribution at each depth is plotted in green',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(5)//' The "radioactove"  contribution at each depth is plotted in purple',DEF_PEN
 	WRITE(6,*)' '
 	CALL DP_CURVE(ND,XAXIS,MECH)
 	CALL DP_CURVE(ND,XAXIS,ADI)
@@ -167,12 +168,12 @@
 	WRITE(6,*)' '
 	CALL WR_COL_STR(' |1*** |0Plotting cummalative contributions (intgerated inwards). |1***')
 	WRITE(6,*)' '
-	CALL WR_COL_STR('|1       The work on the gas term (MECH) is in red')
-	CALL WR_COL_STR('|4    Adiabatic cooling/internal energy is in blue')
-	CALL WR_COL_STR('|2                       The DJDT term is in green')
-	CALL WR_COL_STR('|0  The term due to radioactive decay is in purple')
-	CALL WR_COL_STR('|5        The "corrected luminosity" is in in pink')
-	CALL WR_COL_STR('|3 The total of the corrections terms in in yellow')
+	WRITE(6,'(3A)')PG_PEN(2)//'       The work on the gas term (MECH) is in red',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(3)//'    Adiabatic cooling/internal energy is in blue',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(4)//'                       The DJDT term is in green',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(5)//'  The term due to radioactive decay is in purple',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(6)//'        The "corrected luminosity" is in in pink',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(7)//' The total of the corrections terms in in yellow',DEF_PEN
 	WRITE(6,*)' '
 !
 	CALL DP_CURVE(ND,XAXIS,MECH)
@@ -185,9 +186,9 @@
 	CALL GRAMON_PGPLOT(XLABEL,'Luminosity (L\d'//char(09)//'\u)',' ',' ')
 !
 	WRITE(6,*)' '
-	CALL WR_COL_STR('|1 Here we plot the total energy balance (normalized by the value at d=2).')
-	CALL WR_COL_STR('|1 I recommend subtracting 1 from plot 1, and multiply by 10 or 100.')
-	CALL WR_COL_STR('|4 We also plot the normalized correction.')
+	WRITE(6,'(3A)')PG_PEN(2)//'Here we plot the total energy balance (normalized by the value at d=2).'
+	WRITE(6,'(3A)')PG_PEN(2)//'I recommend subtracting 1 from plot 1, and multiply by 10 or 100.',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(3)//'We also plot the normalized correction.',DEF_PEN
 	WRITE(6,*)' '
 !
 	T1=TOTAL(2)

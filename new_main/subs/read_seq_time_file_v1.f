@@ -188,7 +188,7 @@
 		      T1=HDKT*(ATM(ID)%EDGEXZV_F(J)-ATM(ID)%EDGEXZV_F(I))/T(L)
 	              OLD_XzV(I,L)=OLD_XzV(J,L)*ATM(ID)%GXZV_F(I)/ATM(ID)%GXZV_F(J)*EXP(T1)
 	              K=ATM(ID)%EQXzV-1+ATM(ID)%F_TO_S_XzV(I)
-	              OLD_LEV_POP_AVAIL(I)=.FALSE.
+	              OLD_LEV_POP_AVAIL(K)=.FALSE.
 	            END DO
 	          END DO
 !
@@ -267,8 +267,8 @@
 	      WRITE(LUER,*)'      Species is=',SPECIES(ISPEC)
 	      WRITE(LUER,*)'   ID in program=',ID
 	      WRITE(LUER,*)'          Ion ID=',ION_ID(ID)
-	      DO I=1,ATM(ID)%NXzV_F
-	        J=ATM(ID)%EQXzV-1+ATM(ID)%F_TO_S_XzV(I)
+	      DO I=1,ATM(ID)%NXzV
+	        J=ATM(ID)%EQXzV-1+I
 	        OLD_LEV_POP_AVAIL(J)=.FALSE.
 	      END DO
 	    END IF

@@ -6,6 +6,7 @@
 !     GENSCOOL_SORT: Only the top rates are printed: Sorted using depths 1, 11, 21 etc. 
 !
 	PROGRAM MOD_PRRR
+	USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -50,8 +51,6 @@
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
         CHARACTER(LEN=2), PARAMETER :: FORMFEED=' '//CHAR(12)
-	CHARACTER(LEN=6) COLOR(8)
-	DATA COLOR/'RED','BLUE','GREEN','MAUVE','PINK','YELLOW','ORANGE','F_Gree'/
 !
 	CHARACTER(LEN=132) TMP_STR
 	CHARACTER(LEN=132) STRING
@@ -97,6 +96,7 @@
 !
 	NET_RECOM_PER_LEVEL=.FALSE.
 	CALL GEN_IN(NET_RECOM_PER_LEVEL,'Ouput net recombination rate to each level?')
+	SPECIES='FeI'
 !
 1000	CONTINUE
 !
@@ -109,11 +109,17 @@
 	RECOM_SUM(1:ND)=0.0D0
 	PHOT_SUM(1:ND)=0.0D0
 !
-	SPECIES='FeI'
-	CALL GEN_IN(SPECIES,'File is assumed to be SPECIES//PRRR- EX to exit')
-	IF(UC(SPECIES) .EQ. 'EX')STOP
-	FILE_NAME=TRIM(SPECIES)//'PRRR'
-	OPEN(UNIT=20,FILE=FILE_NAME,STATUS='OLD',ACTION='READ')
+	IOS=1
+	DO WHILE(IOS .NE. 0)
+	  CALL GEN_IN(SPECIES,'File is assumed to be SPECIES//PRRR- EX to exit')
+	  IF(UC(SPECIES) .EQ. 'EX')STOP
+	  FILE_NAME=TRIM(SPECIES)//'PRRR'
+	  OPEN(UNIT=20,FILE=FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(6,'(2A,I5,A)')' Error -- unable to open file: '//TRIM(FILE_NAME),' (IOS=',IOS,')'
+	    WRITE(6,'(A)')' Check capatilzation of ION name'
+	  END IF
+	END DO
 	FILE_NAME=TRIM(FILE_NAME)//'_SUM'
 	OPEN(UNIT=21,FILE=FILE_NAME,STATUS='UNKNOWN',ACTION='WRITE')
 !
@@ -286,47 +292,55 @@
 	  STOP
 	END IF
 !
-	MIN_VAL=0.001D0
+	MIN_VAL=0.01D0
 	WRITE(6,*)' '
 	WRITE(6,*)'Calling DP_CURVE'
 	WRITE(6,*)'                : +ve means ionizing'
 	WRITE(6,*)'                : -ve means recombination'
-	WRITE(6,'(A,I2,3A)')'   Curve ',1,': Photoionization rate (',TRIM(COLOR(1)),')'
-	CALL DP_CURVE(ND,XVEC,PHOT_SUM)
-	WRITE(6,'(A,I2,3A)')'   Curve ',2,': Collsional ionization rate (',TRIM(COLOR(2)),')'
-	CALL DP_CURVE(ND,XVEC,COL_IR)
-	I=2
-	IF(MAXVAL(CHG_IR(1:ND)) .GE. MIN_VAL)THEN
-	  CALL DP_CURVE(ND,XVEC,CHG_IR)
-	  I=I+1
-	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Charge exch. ionization rate (',TRIM(COLOR(I)),')'
-	END IF
-	IF(MAXVAL(NT_IR(1:ND)) .GE. MIN_VAL)THEN
-	  CALL DP_CURVE(ND,XVEC,NT_IR)
-	  I=I+1
-	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Non-thermal ionization rate (',TRIM(COLOR(I)),')'
-	END IF
+	WRITE(6,*)' '
 !
+	WRITE(6,'(A,I2,2A)')PG_PEN(2)//'   Curve ',1,': Photoionization rate',DEF_PEN
+	CALL DP_CURVE(ND,XVEC,PHOT_SUM)
+	I=2
 	IF(MINVAL(RECOM_SUM(1:ND)) .LE. -MIN_VAL)THEN
 	  CALL DP_CURVE(ND,XVEC,RECOM_SUM)
 	  I=I+1
-	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Radiative recombination rate (',TRIM(COLOR(I)),')'
+	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Radiative recombination rate',DEF_PEN
 	END IF
-	IF(MINVAL(COL_RR(1:ND)) .LE. -MIN_VAL)THEN
-	  CALL DP_CURVE(ND,XVEC,COL_RR)
+!
+	IF(MAXVAL(NT_IR(1:ND)) .GE. MIN_VAL)THEN
+	  CALL DP_CURVE(ND,XVEC,NT_IR)
 	  I=I+1
-	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Collisional recombination rate (',TRIM(COLOR(I)),')'
-	END IF
-	IF(MINVAL(CHG_RR(1:ND)) .LE. -MIN_VAL)THEN
-	  CALL DP_CURVE(ND,XVEC,CHG_RR)
-	  I=I+1
-	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Charge exch. recombination rate (',TRIM(COLOR(I)),')'
+	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Non-thermal ionization rate',DEF_PEN
 	END IF
 	IF(MAXVAL(ABS(ADVEC_RR(1:ND))) .GE. MIN_VAL)THEN
 	  CALL DP_CURVE(ND,XVEC,ADVEC_RR)
 	  I=I+1
-	  WRITE(6,'(A,I2,3A)')'   Curve ',I,': Advection recombination rate (',TRIM(COLOR(I)),')'
+	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Advection rate',DEF_PEN
 	END IF
+!
+	IF(MAXVAL(CHG_IR(1:ND)) .GE. MIN_VAL)THEN
+	  CALL DP_CURVE(ND,XVEC,CHG_IR)
+	  I=I+1
+	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Charge exch. ionization rate',DEF_PEN
+	END IF
+	IF(MINVAL(CHG_RR(1:ND)) .LE. -MIN_VAL)THEN
+	  CALL DP_CURVE(ND,XVEC,CHG_RR)
+	  I=I+1
+	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Charge exch. recombination rate',DEF_PEN
+	END IF
+!
+	IF(MAXVAL(COL_IR(1:ND)) .GE. MIN_VAL)THEN
+	  CALL DP_CURVE(ND,XVEC,COL_IR)
+	  I=I+1
+	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Collsional ionization rate',DEF_PEN
+	END IF
+	IF(MINVAL(COL_RR(1:ND)) .LE. -MIN_VAL)THEN
+	  CALL DP_CURVE(ND,XVEC,COL_RR)
+	  I=I+1
+	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Collisional recombination rate',DEF_PEN
+	END IF
+!
 	WRITE(6,*)' '
 	CALL GRAMON_PGPLOT(XLABEL,YLABEL,' ',' ')
 	GOTO 2000
