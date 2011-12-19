@@ -132,6 +132,7 @@
 	  REAL*8, ALLOCATABLE :: NTIXzV(:)                   !Non-thermal ionization rate
 	  REAL*8, ALLOCATABLE :: NT_ION_CXzV(:)              !Non thermal cooling rate (ionization)
 	  REAL*8, ALLOCATABLE :: NT_EXC_CXzV(:)              !Non thermal cooling rate (excitation)
+	  REAL*8, ALLOCATABLE :: NT_OMEGA(:,:)               !Non thermal collision strength
 !
 ! Data vectors to check charge recombination rates.
 !

@@ -6,6 +6,8 @@
 !
 	MODULE MOD_CMF_OBS
 !
+! Altered 17-Dec-2011:  Added LOG_XzVLTE_F, LOG_XzVLTE, and XzVLTE_F_ON_S to MODEL_ATOM_DATA
+!
 ! Number of atomic species (e.g. H, C, N is 3 species).
 !
 	INTEGER, PARAMETER :: NUM_SPECIES=26
@@ -75,11 +77,13 @@
 	TYPE MODEL_ATOM_DATA
 !
 	  REAL*8, ALLOCATABLE :: XzV_F(:,:)		!Level populations in FULL atom
-	  REAL*8, ALLOCATABLE :: XzVLTE_F(:,:)	!LTE level populations in FULL atom
-	  REAL*8, ALLOCATABLE :: W_XzV_F(:,:)	!Level dissolution factors
+	  REAL*8, ALLOCATABLE :: XzVLTE_F(:,:)		!LTE level populations in FULL atom
+	  REAL*8, ALLOCATABLE :: LOG_XzVLTE_F(:,:)      !Log(LTE level populations in FULL atom)
+	  REAL*8, ALLOCATABLE :: XzVLTE_F_ON_S(:,:)     !Log(LTE level populations in FULL atom
+	  REAL*8, ALLOCATABLE :: W_XzV_F(:,:)		!Level dissolution factors
 	  REAL*8, ALLOCATABLE :: DXzV_F(:)		!Ion population for full atom
-	  REAL*8, ALLOCATABLE :: AXzV_F(:,:)	!Oscillator strength (A(I,j), i<j)
-	  REAL*8, ALLOCATABLE :: EDGEXzV_F(:)	!Ionization energy to g.s. (10^15 Hz)
+	  REAL*8, ALLOCATABLE :: AXzV_F(:,:)		!Oscillator strength (A(I,j), i<j)
+	  REAL*8, ALLOCATABLE :: EDGEXzV_F(:)		!Ionization energy to g.s. (10^15 Hz)
 	  REAL*8, ALLOCATABLE :: GXzV_F(:)		!Level statistical weights in full atom
 	  REAL*8, ALLOCATABLE :: ARAD(:)		!Inverse radiative lifetime of level
 	  REAL*8, ALLOCATABLE :: GAM2(:)		!Collisional profile parameter.
@@ -87,7 +91,8 @@
 !
 	  REAL*8, ALLOCATABLE :: DXzV(:)		!Ion population for super level
 	  REAL*8, ALLOCATABLE :: XzV(:,:)		!Level population in SL atom
-	  REAL*8, ALLOCATABLE :: XzVLTE(:,:)	!LTE populations in SL atom
+	  REAL*8, ALLOCATABLE :: XzVLTE(:,:)		!LTE populations in SL atom
+	  REAL*8, ALLOCATABLE :: LOG_XzVLTE(:,:)        !LOG(LTE populations in SL at
 	  REAL*8, ALLOCATABLE :: dlnXzVLTE_dlnT(:,:)
 !
 	  REAL*8 ZXzV			!Charge on ion (=1 for HI)

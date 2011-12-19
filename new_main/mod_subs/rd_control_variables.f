@@ -549,11 +549,12 @@ C
 	  CALL RD_STORE_DBLE(OVER_FREQ_DIF,'OL_DIF',L_TRUE,
 	1           'Max. difference (in km/s) for overlap')
 	  OVER_FREQ_DIF=OVER_FREQ_DIF/2.998E+05
-C
-	  CALL RD_STORE_LOG(INCL_CHG_EXCH,'INC_CHG',L_TRUE,
-	1           'Include charge exchange reactions?')
-	  CALL RD_STORE_LOG(INCL_TWO_PHOT,'INC_TWO',L_TRUE,
-	1           'Include two photon transitions?')
+!
+	  CALL RD_STORE_LOG(INCL_CHG_EXCH,'INC_CHG',L_TRUE,'Include charge exchange reactions?')
+	  CALL RD_STORE_LOG(INCL_TWO_PHOT,'INC_TWO',L_TRUE,'Include two photon transitions?')
+	  INCL_PENNING_ION=.FALSE.
+	  CALL RD_STORE_LOG(INCL_PENNING_ION,'INC_PEN',SN_MODEL,'Include Penning ionization?')
+!
 	  CALL RD_STORE_LOG(INCL_RAY_SCAT,'INC_RAY',L_TRUE,
 	1           'Include opacity due to Rayleigh scattering?')
 	  CALL RD_STORE_LOG(INCL_ADVECTION,'INC_ADV',L_TRUE,

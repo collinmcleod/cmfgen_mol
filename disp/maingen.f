@@ -4131,13 +4131,13 @@
 	          YV(I)=LOG10( ATM(ID)%XzV_F(I,K) / ATM(ID)%XzVLTE_F(I,K) )
 	          ZV(I)=I
 	        END DO
-	        YAXIS='log N'
+	        YAXIS='log b'
 	      ELSE 
 	        DO I=1,ATM(ID)%NXzV_F
 	          YV(I)=LOG10(ATM(ID)%XzV_F(I,K))
 	          ZV(I)=I
 	        END DO
-	        YAXIS='log b'
+	        YAXIS='log N'
 	      END IF
 	      FOUND=.TRUE.
 	    END IF
@@ -4467,24 +4467,6 @@
 	         END IF
 	    END IF
 	  END DO
-!
-	ELSE IF(XOPT(1:4) .EQ. 'ICOL')THEN
-	  CALL USR_OPTION(AV,5,5,'ARN',' ','Arnaud collisional ionization fits')
-	  WRITE(6,*)(AV(I),I=1,5)
-	  ZV(1)=AV(1)+0.000001D0
-	  DO I=1,1000
-	    ZV(I)=AV(1)+(I-1)
-	    S1=ZV(I)/AV(1)
-	    T1=1.0D0-1.0D0/S1
-	    T2=DLOG(S1)
-            YV(I) = 1.0D-14*(AV(2)*T1 + AV(3)*T1*T1 + AV(4)*T2 + AV(5)*T2/S1)/S1/AV(1)**2
-	    YV(I) = YV(I)/1.0D-18
-	  END DO
-	  J=1000
-	  CALL DP_CURVE(J,ZV,YV)   
-	  XAXSAV=XAXIS
-	  XAXIS='eV'
-	  YAXIS='Sigma(MB)'
 !
 ! 
 !

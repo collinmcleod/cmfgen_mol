@@ -13,13 +13,14 @@ LIB_MOD=$(LIB_DIR)libmod.a
 #
 OBJ = $(LIB)(read_arnaud_ion_data.o)\
       $(LIB)(arnaud_cross_v3.o)\
-      $(LIB)(bethe_approx_v3.o)\
+      $(LIB)(bethe_approx_v4.o)\
       $(LIB)(intsigc.o)\
       $(LIB)(rd_nt_crosec_sclfac_v2.o)\
       $(LIB)(se_ba_non_therm_v2.o)\
       $(LIB)(set_xkt_array.o)\
       $(LIB)(get_lelec.o)\
-      $(LIB)(total_bethe_rate_v2.o)\
+      $(LIB)(read_nt_omega_data.o)\
+      $(LIB)(total_bethe_rate_v3.o)\
       $(LIB)(electron_non_therm_spec.o)
 
 OBJ2 = $(LIB_MOD)(mod_non_therm.o)

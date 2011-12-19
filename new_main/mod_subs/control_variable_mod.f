@@ -452,6 +452,7 @@
 	LOGICAL INCL_CHG_EXCH		!Include charge exchange reactions.
 	LOGICAL INCL_TWO_PHOT		!Include two-photon transitions
 	LOGICAL INCL_RAY_SCAT           !Include Rayleigh scattering.
+	LOGICAL INCL_PENNING_ION        !Include H/He Pening ionization
 	LOGICAL LINEAR_ADV              !Comput derivatives using linear approximation.
 !
 	LOGICAL INCL_ADVECTION          !Include advection terms in rate equations.

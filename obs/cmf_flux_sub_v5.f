@@ -14,6 +14,9 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered: 17-Dec-2011 : Now call OPACITIES_V5.INC and EVAL_LTE_INC_V5.INC 
+!                          L_STAR_RATIO and U_STAR_RATIO now computed using XzVLTE_F_ON_S 
+!                          Done to allow lower wind temperatures.
 ! Altered: 20-Oct-2009 : Changed to call OBS_FRAME_SUB_V8 (WRITE_RTAU, TAU_REF added to call).
 ! Altered: 07-Jul-2008 : Substantial changes over a period of time to include
 !                          relativistic radiative transfer. Lots of changes to
@@ -610,7 +613,7 @@ C
 C This routine not only evaluates the LTE populations of both model atoms, but
 C it also evaluates the dln(LTE Super level Pop)/dT.
 C
-	INCLUDE 'EVAL_LTE_INC_V4.INC'
+	INCLUDE 'EVAL_LTE_INC_V5.INC'
 C
 C Compute the turbulent velocity and MINIMUM Doppler velocity as a function of depth.
 C For the later, the iron mas of 55.8amu is assumed.
@@ -1394,15 +1397,10 @@ C
 	    MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
 	    MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
 	    DO K=1,ND
-	      T1=(ATM(ID)%XzV_F(MNL_F,K)/ATM(ID)%XzVLTE_F(MNL_F,K)) /
-	1             (ATM(ID)%XzV(MNL,K)/ATM(ID)%XzVLTE(MNL,K))
-	      L_STAR_RATIO(K,SIM_INDX)=T1*ATM(ID)%W_XzV_F(MNUP_F,K)*
-	1        ATM(ID)%XzVLTE_F(MNL_F,K)/ATM(ID)%XzVLTE(MNL,K)/
-	1        ATM(ID)%W_XzV_F(MNL_F,K)
-	      T2=(ATM(ID)%XzV_F(MNUP_F,K)/ATM(ID)%XzVLTE_F(MNUP_F,K)) /
-	1             (ATM(ID)%XzV(MNUP,K)/ATM(ID)%XzVLTE(MNUP,K))
-	      U_STAR_RATIO(K,SIM_INDX)=T2*ATM(ID)%XzVLTE_F(MNUP_F,K)/
-	1              ATM(ID)%XzVLTE(MNUP,K)
+              T1=(ATM(ID)%XzV_F(MNL_F,K)/ATM(ID)%XzV(MNL,K))/ATM(ID)%XzVLTE_F_ON_S(MNL_F,K)
+              L_STAR_RATIO(K,SIM_INDX)=T1*(ATM(ID)%W_XzV_F(MNUP_F,K)/ATM(ID)%W_XzV_F(MNL_F,K))*ATM(ID)%XzVLTE_F_ON_S(MNL_F,K)
+              T2=(ATM(ID)%XzV_F(MNUP_F,K)/ATM(ID)%XzV(MNUP,K))/ATM(ID)%XzVLTE_F_ON_S(MNUP_F,K)
+	      U_STAR_RATIO(K,SIM_INDX)=T2*ATM(ID)%XzVLTE_F_ON_S(MNUP_F,K)
 	    END DO
 	    GLDGU(SIM_INDX)=ATM(ID)%GXzV_F(MNL_F)/ATM(ID)%GXzV_F(MNUP_F)
 	    TRANS_NAME_SIM(SIM_INDX)=TRIM(TRANS_NAME_SIM(SIM_INDX))//
@@ -1501,7 +1499,7 @@ C
 C Compute opacity and emissivity.
 C
 	  CALL TUNE(IONE,'C_OPAC')
-	  INCLUDE 'OPACITIES_V4.INC'
+	  INCLUDE 'OPACITIES_V5.INC'
 	  CALL TUNE(ITWO,'C_OPAC')
 C
 C Since resonance zones included, we must add the line opacity and 
@@ -2150,16 +2148,11 @@ C
 ! This ratio is NOT treated in the linearization.
 !
 	      DO K=1,ND
-	        T1=(ATM(ID)%XzV_F(MNL_F,K)/ATM(ID)%XzVLTE_F(MNL_F,K)) /
-	1               (ATM(ID)%XzV(MNL,K)/ATM(ID)%XzVLTE(MNL,K))
-	        L_STAR_RATIO(K,SIM_INDX)=T1*ATM(ID)%W_XzV_F(MNUP_F,K)*
-	1               ATM(ID)%XzVLTE_F(MNL_F,K)/ATM(ID)%XzVLTE(MNL,K)/
-	1               ATM(ID)%W_XzV_F(MNL_F,K)
-	        T2=(ATM(ID)%XzV_F(MNUP_F,K)/ATM(ID)%XzVLTE_F(MNUP_F,K)) /
-	1               (ATM(ID)%XzV(MNUP,K)/ATM(ID)%XzVLTE(MNUP,K))
-	        U_STAR_RATIO(K,SIM_INDX)=T2*ATM(ID)%XzVLTE_F(MNUP_F,K)/
-	1               ATM(ID)%XzVLTE(MNUP,K)
-	      END DO
+	        T1=(ATM(ID)%XzV_F(MNL_F,K)/ATM(ID)%XzV(MNL,K))/ATM(ID)%XzVLTE_F_ON_S(MNL_F,K)
+	        L_STAR_RATIO(K,SIM_INDX)=T1*(ATM(ID)%W_XzV_F(MNUP_F,K)/ATM(ID)%W_XzV_F(MNL_F,K))*ATM(ID)%XzVLTE_F_ON_S(MNL_F,K)
+	        T2=(ATM(ID)%XzV_F(MNUP_F,K)/ATM(ID)%XzV(MNUP,K))/ATM(ID)%XzVLTE_F_ON_S(MNUP_F,K)
+	        U_STAR_RATIO(K,SIM_INDX)=T2*ATM(ID)%XzVLTE_F_ON_S(MNUP_F,K)
+    	      END DO
 	      GLDGU(SIM_INDX)=ATM(ID)%GXzV_F(MNL_F)/ATM(ID)%GXzV_F(MNUP_F)
 	      TRANS_NAME_SIM(SIM_INDX)=TRIM(TRANS_NAME_SIM(SIM_INDX))//
 	1             '('//TRIM(ATM(ID)%XzVLEVNAME_F(MNUP_F))//'-'//

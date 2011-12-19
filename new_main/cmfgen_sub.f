@@ -731,6 +731,7 @@
 	IF(TREAT_NON_THERMAL_ELECTRONS)THEN
           WRITE(97,*)'Before CALL READ_ARNAUD'; FLUSH(UNIT=97)
 	  CALL READ_ARNAUD_ION_DATA(ND)
+	  CALL READ_NT_OMEGA_DATA()
 	END IF
 !
 ! 
@@ -1952,7 +1953,7 @@
 !
 	NUM_OF_WEAK_LINES=0.0D0
 	CONT_FREQ=0.0D0
-!                                                                    
+!
 ! Enter loop for each continuum frequency.
 !
 	SUM_BA=0.0D0
@@ -2678,6 +2679,15 @@
 	1           ION_ID(ID),POPS,T,ND,NT)
 	END DO
 	WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'chg_2'
+!
+! Penning
+!
+!    HeI(1s_2s_3Se) + H(1s_2Se)  --->  HeI(1s2_1Se) +  H+
+!                                                                    
+	IF(INCL_PENNING_ION)THEN
+	  CALL DO_PENNING_ION(HDKT,COMPUTE_BA,DIAG_INDX,ND)
+	END IF
+! 
 ! 
 !
 ! Output errors that have occurred in MOM_J_CMF

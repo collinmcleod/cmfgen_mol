@@ -15,8 +15,8 @@
 !                                              MODEL
 !
 	PROGRAM PLT_CMF_LUM
+        USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
-	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
 ! Cleaned: 06-Nov-2011
@@ -99,8 +99,9 @@
 	DO I=1,ND
 	  R(I)=R(I)/R(ND)
 	END DO
-	XAXIS=V(1:ND)
-	XLABEL='V(km/s)'
+	V(1:ND)=0.001D0*V(1:ND)
+	XAXIS(1:ND)=V(1:ND)
+	XLABEL='V(Mm\u \ds\u-1\d)'
 !
 	OPEN(UNIT=20,FILE='OBSFLUX',STATUS='OLD',ACTION='READ')
 	  STRING=' '
@@ -136,8 +137,8 @@
 	T1=0.0D0
 	TOTAL(1)=LUM(1)
 	DO I=1,ND-1
-	  T1=T1+MECH(I)+ADI(I)+DJDT(I)-RAD_DECAY(I)
-	  TOTAL(I+1)=LUM(I+1)-T1
+	  T1=T1+RAD_DECAY(I)-MECH(I)-ADI(I)-DJDT(I)
+	  TOTAL(I+1)=LUM(I+1)+T1
 	END DO
 	CALL DP_CURVE(ND,XAXIS,LUM)
 	CALL DP_CURVE(ND,XAXIS,TOTAL)
@@ -163,24 +164,27 @@
 	  ADI(I)=ADI(I)+ADI(I-1)
 	  RAD_DECAY(I)=RAD_DECAY(I)+RAD_DECAY(I-1)
 	END DO
-	RAD_DECAY=-RAD_DECAY
+	MECH=-MECH
+	DJDT=-DJDT
+	ADI=-ADI
 !
 	WRITE(6,*)' '
 	CALL WR_COL_STR(' |1*** |0Plotting cummalative contributions (intgerated inwards). |1***')
+	CALL WR_COL_STR(' |1*** |0These represent the contributions to the "conserved luminosity)". |1***')
 	WRITE(6,*)' '
-	WRITE(6,'(3A)')PG_PEN(2)//'       The work on the gas term (MECH) is in red',DEF_PEN
-	WRITE(6,'(3A)')PG_PEN(3)//'    Adiabatic cooling/internal energy is in blue',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(2)//'            The "corrected luminosity" is in red',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(3)//'    The term due to radioactive decay is in blue',DEF_PEN
 	WRITE(6,'(3A)')PG_PEN(4)//'                       The DJDT term is in green',DEF_PEN
-	WRITE(6,'(3A)')PG_PEN(5)//'  The term due to radioactive decay is in purple',DEF_PEN
-	WRITE(6,'(3A)')PG_PEN(6)//'        The "corrected luminosity" is in in pink',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(5)//'  Adiabatic cooling/internal energy is in purple',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(6)//'      The work on the gas term (MECH) is in pink',DEF_PEN
 	WRITE(6,'(3A)')PG_PEN(7)//' The total of the corrections terms in in yellow',DEF_PEN
 	WRITE(6,*)' '
 !
+	CALL DP_CURVE(ND,XAXIS,TOTAL)
+	CALL DP_CURVE(ND,XAXIS,RAD_DECAY)
+	CALL DP_CURVE(ND,XAXIS,DJDT)
 	CALL DP_CURVE(ND,XAXIS,MECH)
 	CALL DP_CURVE(ND,XAXIS,ADI)
-	CALL DP_CURVE(ND,XAXIS,DJDT)
-	CALL DP_CURVE(ND,XAXIS,RAD_DECAY)
-	CALL DP_CURVE(ND,XAXIS,TOTAL)
 	CHANGE=MECH+ADI+DJDT+RAD_DECAY
 	CALL DP_CURVE(ND,XAXIS,CHANGE)
 	CALL GRAMON_PGPLOT(XLABEL,'Luminosity (L\d'//char(09)//'\u)',' ',' ')

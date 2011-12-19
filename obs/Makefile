@@ -72,8 +72,8 @@ cmf_flux_v5.o : cmf_flux_v5.f      mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(USR
 	$(F90nomp) -c $(OPTION) cmf_flux_v5.f 
 
 cmf_flux_sub_v5.o : cmf_flux_sub_v5.f  mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(GEN) \
-   COMP_JCONT_V4.INC  EVAL_LTE_INC_V4.INC\
-   OPACITIES_V4.INC   XOPAC_V4.INC
+   COMP_JCONT_V4.INC  EVAL_LTE_INC_V5.INC\
+   OPACITIES_V5.INC   XOPAC_V4.INC
 	$(F90nomp) -c $(OPTION) cmf_flux_sub_v5.f 
 
 USR = ../lib/libtools.a(usr_option.o)

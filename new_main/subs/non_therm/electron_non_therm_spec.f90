@@ -44,11 +44,14 @@
 	REAL*8 dE
 !
 	REAL*8 T1,T2
+	REAL*8 RATE
 	REAL*8 SIG1,SIG2
 	REAL*8 XCROSS
 	REAL*8 XION_POT
 	REAL*8 NATOM
 	REAL*8 ASUM
+	REAL*8 SCALER_SPEC_SUM
+	REAL*8 SCALER_ION_SUM
 !
 	INTEGER GET_INDX_DP
 	REAL*8 INTSIGC
@@ -82,6 +85,7 @@
 	integer, parameter :: LU_BETHE = 100
 	LOGICAL, SAVE :: FIRST_TIME=.TRUE.
 	INTEGER, SAVE :: NT_ITERATION_COUNTER
+	LOGICAL DO_LOC_CHK
 !
 	LOGICAL INJECT_DIRAC_AT_EMAX
 	CHARACTER(LEN=10) SOURCE_TYPE
@@ -106,7 +110,7 @@
 	  NT_ITERATION_COUNTER=NT_ITERATION_COUNTER+1
 	  IF(MOD(NT_ITERATION_COUNTER-1,NON_THERMAL_IT_CNTRL) .NE. 0)RETURN
 	END IF
-	  
+	DO_LOC_CHK=.TRUE.
 !
 	WRITE(LU_ER,*)' '
 	WRITE(LU_ER,*)'Entering ELECTRON_NON_THERM_SPEC'
@@ -192,8 +196,8 @@
 	FRAC_EXCITE_HEATING=0.0D0
 	YE=0.0D0
 !
-! Set how the lectrons are ejected at high enegry. This will be the smae for all
-! depths. We can either iject at EMAX, or use a Bell-shaped curve near EMAX.
+! Set how the lectrons are ejected at high enegry. This will be the same for all
+! depths. We can either inject at EMAX, or use a Bell-shaped curve near EMAX.
 ! E_INIT will be a normalisation constant to yield fractions for ionization etc.
 !
 	WRITE(LU_TH,*)'Constructing SOURCE'
@@ -228,6 +232,27 @@
 	  END DO
 	  E_INIT = T2
 	END IF
+!
+! Write a summary of IONS, ionization potentials, and thrshold cross-sections.
+!
+	WRITE(LU_TH,'(X,A,T12,3X,A,2X,A,4X,A,2X,A,4X,A)')'Ion ID','IT','IST','SIG(IST)','SIG(IST+1)','Ion Pot.'
+	DO IT=1,NUM_THD
+	  IF(THD(IT)%PRES)THEN
+            XION_POT = THD(IT)%ION_POT
+	    IF(XION_POT .LT. XKT(1))THEN
+	      IST=1
+	      SIG1=THD(IT)%CROSS_SEC(1); SIG2=0.0D0
+	    ELSE IF(XION_POT .GT. XKT(NKT))THEN
+	      IST=NKT+1
+	      SIG1=0.0D0; SIG2=0.0D0
+	    ELSE
+	      IST=GET_INDX_DP(XION_POT,XKT,NKT)
+	      SIG1=THD(IT)%CROSS_SEC(IST); SIG2=THD(IT)%CROSS_SEC(IST+1)
+	    END IF
+	    ID=THD(IT)%LNK_TO_ION
+	    WRITE(LU_TH,'(X,A,T12,2I5,2ES12.2,F12.2)')ION_ID(ID),IT,IST,SIG1,SIG2,XION_POT
+	  END IF
+	END DO
 !
 !
 !	open(unit=lu_bethe,file='bethe_cross_chk',status='unknown')
@@ -383,9 +408,9 @@
 	        NL=I
 	        J=I+1
 	        DO WHILE(J .LE. ATM(ID)%NXzV_F)
-	          IF(ATM(ID)%AXzV_F(I,J) .GT. 0.0D0)THEN
-	            NUP=J
-	            CALL BETHE_APPROX_V3(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
+	          NUP=J
+	          CALL BETHE_APPROX_V4(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
+	          IF(SUM(Qnn) .GT. 0.0D0)THEN
 	            dE=ATM(ID)%AXzV_F(NL,NUP)*Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(J))
 	            ASUM=ATM(ID)%AXzV_F(NL,NUP)
 	            K=J
@@ -393,8 +418,8 @@
 	              IF(Hz_TO_eV*(ATM(ID)%EDGEXZV_F(K+1)-ATM(ID)%EDGEXZV_F(J)) .GE. 1.0)EXIT
 	              K=K+1
 	              NUP=K
-	              IF(ATM(ID)%AXzV_F(NL,NUP) .GT. 0.0D0)THEN
-	                CALL BETHE_APPROX_V3(Qnn_TMP,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
+	              CALL BETHE_APPROX_V4(Qnn_TMP,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
+	              IF(SUM(Qnn) .GT. 0.0D0)THEN
 	                Qnn=Qnn+Qnn_TMP 
 	                dE=dE+ATM(ID)%AXzV_F(NL,NUP)*Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(K))
 	                ASUM=ASUM+ATM(ID)%AXzV_F(NL,NUP)
@@ -473,115 +498,104 @@
 !
 ! Compute electron heating
 !
-	  DO IKT=1,NKT
-	    FRAC_ELEC_HEATING(DPTH_INDX)=FRAC_ELEC_HEATING(DPTH_INDX) + YE(IKT,DPTH_INDX)*LELEC(IKT)*dXKT(IKT)
-	  END DO
-	  FRAC_ELEC_HEATING(DPTH_INDX)=FRAC_ELEC_HEATING(DPTH_INDX)/E_INIT
-	  WRITE(LU_TH,*)'Fraction into electron heating is',FRAC_ELEC_HEATING(DPTH_INDX)
-	  WRITE(LU_TH,*)'Fraction into electron heating is',XKT(1)*LELEC(1)*YE(1,DPTH_INDX)/E_INIT
-	  FRAC_ELEC_HEATING(DPTH_INDX)=FRAC_ELEC_HEATING(DPTH_INDX) + XKT(1)*LELEC(1)*YE(1,DPTH_INDX)/E_INIT
+	    DO IKT=1,NKT
+	      FRAC_ELEC_HEATING(DPTH_INDX)=FRAC_ELEC_HEATING(DPTH_INDX) + YE(IKT,DPTH_INDX)*LELEC(IKT)*dXKT(IKT)
+	    END DO
+	    T1=XKT(1)*LELEC(1)*YE(1,DPTH_INDX)/E_INIT
+	    FRAC_ELEC_HEATING(DPTH_INDX)=FRAC_ELEC_HEATING(DPTH_INDX)/E_INIT
+	    FRAC_ELEC_HEATING(DPTH_INDX)=FRAC_ELEC_HEATING(DPTH_INDX)+T1
+	    WRITE(LU_TH,'(A,2ES12.4)')'(Fraction into electron heating and correction are',FRAC_ELEC_HEATING(DPTH_INDX),T1
+!
+!	  END DO		!Depth index
 !
 ! Compute the ionization and heating contributions
 !
-	  CALL TUNE(1,'CHK_ION')
-	  WRITE(LU_TH,*)'Checking ionization energy'
-	  WRITE(LU_TH,'(3X,A,2X,A,4X,A,2X,A,3X,A)')'IT','IST','SIG(IST)','SIG(IST+1)','dE(ION)/E'
-	  IF (INCLUDE_IONIZATION) THEN
-	    DO IT=1,NUM_THD
-	      IF(THD(IT)%PRES .AND. THD(IT)%DO_THIS_ION_ROUTE)THEN
-	        NATOM=THD(IT)%N_ATOM
-                XION_POT = THD(IT)%ION_POT
+	    IF(INCLUDE_IONIZATION .AND. DO_LOC_CHK)THEN
+	      CALL TUNE(1,'CHK_ION')
+	      WRITE(LU_TH,*)'Checking ionization energy'
+	      WRITE(LU_TH,'(4X,A,2X,A,4X,A,2X,A,3X,A)')'IT','IST','SIG(IST)','SIG(IST+1)','dE(ION)/E'
+	      DO IT=1,NUM_THD
+	        IF(THD(IT)%PRES .AND. THD(IT)%DO_THIS_ION_ROUTE)THEN
+	          NATOM=THD(IT)%N_ATOM
+                  XION_POT = THD(IT)%ION_POT
 !
-	        IF(XION_POT .LT. XKT(1))THEN
-	           IST=1
-	           SIG1=THD(IT)%CROSS_SEC(1); SIG2=0.0D0
-	        ELSE IF(XION_POT .GT. XKT(NKT))THEN
-	           IST=NKT+1
-	           SIG1=0.0D0; SIG2=0.0D0
-	        ELSE
-	           IST=GET_INDX_DP(XION_POT,XKT,NKT)
-	           SIG1=THD(IT)%CROSS_SEC(IST); SIG2=THD(IT)%CROSS_SEC(IST+1)
-	        END IF
-	        T1 = 0.0D0
-	        DO IKTP=IST,NKT
-	          XCROSS = THD(IT)%CROSS_SEC(IKTP)
-	          DETAI_DE(IKTP) = DETAI_DE(IKTP) + &
-	                NATOM * XION_POT / E_INIT * YE(IKTP,DPTH_INDX)*XCROSS
-	          T1 = T1 + YE(IKTP,DPTH_INDX)*dXKT(IKTP)*XCROSS
-	        END DO
-	        WRITE(LU_TH,'(2I5,3E12.2)')IT,IST,SIG1,SIG2,NATOM * XION_POT * T1 / E_INIT
-	        FRAC_ION_HEATING(DPTH_INDX) = FRAC_ION_HEATING(DPTH_INDX) + NATOM * XION_POT * T1 / E_INIT
-	      END IF
-	    END DO
-	    WRITE(LU_TH,*)'Fraction into ionization heating is',FRAC_ION_HEATING(DPTH_INDX)
-	  END IF
-	  CALL TUNE(2,'CHK_ION')
-!
-	CALL TUNE(1,'CHK_EXCITE')
-	IF(INCLUDE_EXCITATION)THEN
-	  DO ID=1,NUM_IONS
-	    IF(ATM(ID)%XzV_PRES .AND. DO_THIS_ION_EXC(ID))THEN
-!
-	      T1=ION_SUM(ID)
-	      MAX_LOW_LEV=ATM(ID)%NXzV_F
-	      DO I=ATM(ID)%NXzV_F,1,-1
-	        IF(ATM(ID)%XzV_F(I,DPTH_INDX)/SPEC_SUM(ID) .GT. NT_OMIT_LEV_SCALE)EXIT
-	        MAX_LOW_LEV=I
-	      END DO
-!
-	      DO I=1,MAX_LOW_LEV
-	        DO J=I+1,ATM(ID)%NXzV_F
-	          NL=I; NUP=J
-	          IF(ATM(ID)%AXzV_F(NL,NUP) .GT. 0.0D0)THEN
-	            CALL BETHE_APPROX_V3(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
-	            dE=Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(NUP))
-	            DO IKT=1,NKT
-	              FRAC_EXCITE_HEATING(DPTH_INDX)=FRAC_EXCITE_HEATING(DPTH_INDX)+dE*Qnn(IKT)*YE(IKT,DPTH_INDX)
-	            END DO
+	          IF(XION_POT .LT. XKT(1))THEN
+	             IST=1
+	             SIG1=THD(IT)%CROSS_SEC(1); SIG2=0.0D0
+	          ELSE IF(XION_POT .GT. XKT(NKT))THEN
+	             IST=NKT+1
+	             SIG1=0.0D0; SIG2=0.0D0
+	          ELSE
+	             IST=GET_INDX_DP(XION_POT,XKT,NKT)
+	             SIG1=THD(IT)%CROSS_SEC(IST); SIG2=THD(IT)%CROSS_SEC(IST+1)
 	          END IF
-	        END DO
+	          T1 = 0.0D0
+	          DO IKTP=IST,NKT
+	            XCROSS = THD(IT)%CROSS_SEC(IKTP)
+	            DETAI_DE(IKTP) = DETAI_DE(IKTP) + &
+	                NATOM * XION_POT / E_INIT * YE(IKTP,DPTH_INDX)*XCROSS
+	            T1 = T1 + YE(IKTP,DPTH_INDX)*dXKT(IKTP)*XCROSS
+	          END DO
+	          WRITE(LU_TH,'(X,2I5,3ES12.2)')IT,IST,SIG1,SIG2,NATOM * XION_POT * T1 / E_INIT
+	          FRAC_ION_HEATING(DPTH_INDX) = FRAC_ION_HEATING(DPTH_INDX) + NATOM * XION_POT * T1 / E_INIT
+	        END IF
+	      END DO		!Ionization route
+	    CALL TUNE(2,'CHK_ION')
+	   END IF
+	END DO		!Depth indx
+!
+	IF(INCLUDE_EXCITATION .AND. DO_LOC_CHK)THEN
+	  CALL TUNE(1,'CHK_EXCITE')
+!
+!$OMP PARALLEL PRIVATE( RATE,dE,T1,SCALER_SPEC_SUM,SCALER_ION_SUM,ISPEC,ID,I,J,NL,NUP,IKT,DPTH_INDX,MAX_LOW_LEV )
+!$OMP DO SCHEDULE(DYNAMIC)
+!
+	  DO DPTH_INDX=1,ND
+	    DO ISPEC=1,NUM_SPECIES
+	      SCALER_SPEC_SUM=0.0D0
+	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	        T1=SUM(ATM(ID)%XzV_F(:,DPTH_INDX))
+	        SCALER_SPEC_SUM=SCALER_SPEC_SUM+T1
 	      END DO
-	    END IF
-	  END DO		!Loop over ionization stage
-	END IF			!Include excitations?
-	CALL TUNE(2,'CHK_EXCITE')
-	FRAC_EXCITE_HEATING(DPTH_INDX)=FRAC_EXCITE_HEATING(DPTH_INDX)/E_INIT
-	WRITE(LU_TH,*)'Fraction into excitation heating is',FRAC_EXCITE_HEATING(DPTH_INDX)
+	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	        SCALER_ION_SUM=SUM(ATM(ID)%XzV_F(:,DPTH_INDX))/SCALER_SPEC_SUM
+	        IF(SCALER_ION_SUM .GT. NT_OMIT_ION_SCALE)THEN
 !
-	WRITE(LU_TH,*)'Total heating is ', FRAC_ELEC_HEATING(DPTH_INDX) + &
-	                               FRAC_ION_HEATING(DPTH_INDX)+ &
-	                               FRAC_EXCITE_HEATING(DPTH_INDX)
+	          T1=SCALER_ION_SUM
+	          MAX_LOW_LEV=ATM(ID)%NXzV_F
+	          DO I=ATM(ID)%NXzV_F,1,-1
+	            IF(ATM(ID)%XzV_F(I,DPTH_INDX)/SCALER_SPEC_SUM .GT. NT_OMIT_LEV_SCALE)EXIT
+	            MAX_LOW_LEV=I
+	          END DO
 !
-!	  CALL DP_CURVE(NKT,XKT,YE(1,DPTH_INDX))
-!	  CALL GRAMON_PGPLOT('E(keV)','Y(E)',' ',' ')
+	          DO I=1,MAX_LOW_LEV
+	            DO J=I+1,ATM(ID)%NXzV_F
+	              NL=I; NUP=J
+	              CALL TOTAL_BETHE_RATE_V3(RATE,NL,NUP,YE,XKT,dXKT,NKT,ID,DPTH_INDX,ND)
+	              dE=Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(NUP))
+	              FRAC_EXCITE_HEATING(DPTH_INDX)=FRAC_EXCITE_HEATING(DPTH_INDX)+dE*RATE*ATM(ID)%XzV_F(NL,DPTH_INDX)
+	            END DO
+	          END DO
+	        END IF		!Do this ion
+	      END DO		!Loop over ionization stage
+	    END DO              !Loop over species
+	    FRAC_EXCITE_HEATING(DPTH_INDX)=FRAC_EXCITE_HEATING(DPTH_INDX)/E_INIT
+	  END DO		!Loop over depth
+!$OMP END DO
+!$OMP END PARALLEL
+	    CALL TUNE(2,'CHK_EXCITE')
+	END IF		!Include excitation and DO_LOC_CHK?
 !
-	END DO 		!loop over depth
-!	open(unit=lu_bethe,file='bethe_cross_chk',status='unknown')
-!	  if(include_excitation)then
-!	    do id=1,num_ions
-!	      if(atm(id)%xzv_pres .and. do_and_1st_time(id))then
-!	        do_and_1st_time(id) = .false.
-!	        do j=2,atm(id)%nxzv_f
-!	          do i=1,min(j-1,nlow_maxs(id))
-!	            nl=i; nup=j
-!	            CALL bethe_cross(Qnn,NL,NUP,XKT,dXKT,NKT,ID)
-!	            write(lu_bethe,*)''
-!	            write(lu_bethe,'(x,a6,x,i3,x,i5,x,i5)')trim(ion_id(id)),id,nl,nup
-!	            write(lu_bethe,'(1X,1P8E16.7)')(Qnn(ikt),ikt=1,nkt)
-!	          end do
-!	        end do
-!	      end if
-!	    end do
-!	  end if
-!	close(unit=lu_bethe)
+! Provide a depth dependent summary
 !
-!
-	WRITE(LU_TH,'(/,X,A,/)')'Summary of energy channels'
-	WRITE(LU_TH,'(4(5X,A))'),' dE(ELEC)/E','  dE(ION)/E','  dE(EXC)/E','dE(TOTAL)/E'
-	DO I=1,ND
-	  WRITE(LU_TH,'(4ES16.6)')FRAC_ELEC_HEATING(I),FRAC_ION_HEATING(I),FRAC_EXCITE_HEATING(I), &
-	  FRAC_ELEC_HEATING(I)+FRAC_ION_HEATING(I)+FRAC_EXCITE_HEATING(I)
-	END DO
+	IF(DO_LOC_CHK)THEN
+	  WRITE(LU_TH,'(/,X,A,/)')'Summary of energy channels'
+	  WRITE(LU_TH,'(4(5X,A))'),' dE(ELEC)/E','  dE(ION)/E','  dE(EXC)/E','dE(TOTAL)/E'
+	  DO I=1,ND
+	    WRITE(LU_TH,'(4ES16.6)')FRAC_ELEC_HEATING(I),FRAC_ION_HEATING(I),FRAC_EXCITE_HEATING(I), &
+	    FRAC_ELEC_HEATING(I)+FRAC_ION_HEATING(I)+FRAC_EXCITE_HEATING(I)
+	  END DO
+	END IF
 !
 ! Below we compute the number of non thermal electrons arising from the input of non-thermal energy.
 ! This is the number on electrons per 1eV of energy input.
@@ -601,7 +615,6 @@
 ! Close diagnostic file, forcing all output.
 !
 	CLOSE(UNIT=LU_TH)
-	WRITE(LU_ER,*)'Exiting ELECTRON_NON_THERM_SPEC'
 !
 ! Before leaving the routine we normalize YE by the E_INIT. We can later scale by the actual energy input.
 !
@@ -628,6 +641,8 @@
 	  write(lu_bethe,*)''
 	end do
 	close(unit=lu_bethe)
+!
+	WRITE(LU_ER,*)'Exiting ELECTRON_NON_THERM_SPEC'
 !
 	RETURN
 	END

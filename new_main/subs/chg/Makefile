@@ -12,6 +12,7 @@ LIB_MOD=$(LIB_DIR)libmod.a
 # Entries in a library
 #
 OBJ = $(LIB)(rd_chg_exch_v3.o)\
+      $(LIB)(do_penning_ion.o)\
       $(LIB)(eval_chg_rates_v3.o)\
       $(LIB)(set_chg_exch_v4.o)\
       $(LIB)(set_chg_lev_id_v4.o)\

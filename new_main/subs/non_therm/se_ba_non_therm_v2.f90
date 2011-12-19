@@ -76,7 +76,7 @@
 	  ATM(I)%NT_EXC_CXzV(:)=0.0D0
 	END DO
 	write(lu_th,*)''
-	write(lu_th,'(A5,6(A12))')'Depth','Ne(NT)','Ne','Ne(NT)/Ne','Ek(NT)','Ek','Ek(NT)/Ek'
+	write(lu_th,'(X,A5,6(A12))')'Depth','Ne(NT)','Ne','Ne(NT)/Ne','Ek(NT)','Ek','Ek(NT)/Ek'
 	DO DPTH_INDX=1,ND
 !
 ! Estimate number of non-thermal electrons.
@@ -89,7 +89,7 @@
 	  END DO
 	  T1=T1*SQRT(0.5D0*9.109389D-28/1.602177D-12)*RADIOACTIVE_DECAY_ENERGY_eV(DPTH_INDX)
 	  T2=T2*SQRT(0.5D0*9.109389D-28/1.602177D-12)*RADIOACTIVE_DECAY_ENERGY_eV(DPTH_INDX)
-	  write(lu_th,'(i5,6es12.4)')dpth_indx,T1,ED(DPTH_INDX),T1/ED(DPTH_INDX),             &
+	  write(lu_th,'(x,i5,6es12.4)')dpth_indx,T1,ED(DPTH_INDX),T1/ED(DPTH_INDX),             &
 	                             T2,1.5D0*8.617343D-5*ED(DPTH_INDX)*T(DPTH_INDX)*1.0d4,   &
 	                             T2/(1.5D0*8.617343D-5*ED(DPTH_INDX)*T(DPTH_INDX)*1.0d4)   
 !	  WRITE(LU_TH,'(A,I3,A,2ES12.4)')' Non-thermal and thermal electron densities at depth',  &
@@ -176,7 +176,7 @@
 	          DO I=1,MIN(10,J-1)
 	            NL_F=I; NUP_F=J
 !	            CALL TOTAL_BETHE_RATE(RATE,NL_F,NUP_F,YE,XKT,dXKT,NKT,FAST_BETHE_METHOD,ID,DPTH_INDX,ND)
-	            CALL TOTAL_BETHE_RATE_V2(RATE,NL_F,NUP_F,YE,XKT,dXKT,NKT,ID,DPTH_INDX,ND)
+	            CALL TOTAL_BETHE_RATE_V3(RATE,NL_F,NUP_F,YE,XKT,dXKT,NKT,ID,DPTH_INDX,ND)
 	            NUP=ATM(ID)%F_TO_S_XzV(NUP_F)
 !
 ! NB:  XzV_F= XzV  (XzVLTE_F/XzVLTE)
