@@ -64,6 +64,7 @@
 	INTEGER LUER
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
+	CHARACTER(LEN=12), PARAMETER :: PRODATE='19-Dec-2011' 
 !
 	DATA BLANK/' '/
 !
@@ -278,8 +279,9 @@
 	SCRAT=.FALSE.
 	SCRATREC=1
 	IOS=2			!Filename has to exits, blank not allowed.
-	WRITE(T_OUT,*)'Append (ask) to so that subsequent FILE names '//
-	1         'are not defaulted'
+	WRITE(T_OUT,*)'Program date is: ',PRODATE
+	WRITE(T_OUT,*)' '
+	WRITE(T_OUT,*)'Append (ask) to so that subsequent FILE names are not defaulted'
 	WRITE(T_OUT,*)'Append (scrat) to get scratch output.'
 	WRITE(T_OUT,*)' '
 	I=80
