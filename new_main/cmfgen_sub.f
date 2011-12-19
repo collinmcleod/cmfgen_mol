@@ -3506,16 +3506,19 @@
 ! Altered: 28_Feb-2009: Changed J to  I in dE_RAD_DECAY.
 !
 	  T3=0.0D0
-	  DO I=ND-1,1,-1
-	    T3=T3+MECH_LUM(I)+DJDT_FLUX(I)+dE_WORK(I)-RAD_DECAY_LUM(I)
-	    RLUMST(I)=RLUMST(I) + T3
+	  DO I=1,ND-1
+	    T3=T3+RAD_DECAY_LUM(I)-MECH_LUM(I)-DJDT_FLUX(I)-dE_WORK(I)
+	    RLUMST(I+1)=RLUMST(I+1) + T3
 	  END DO
 	  CALL WRITV(RLUMST,ND,'Luminosity Check (not observed luminosity)',LU_FLUX)
 !
+	  TA(1:ND)=RLUMST(1:ND)/RLUMST(2)
+	  CALL WRITV(TA,ND,'Normalized luminosity check',LU_FLUX)
+!
 	  T3=0.0D0
-	  DO I=ND-1,1,-1
-	    T3=T3+DEP_RAD_EQ(I)
-	    RLUMST(I)=RLUMST(I) + T3
+	  DO I=1,ND-1
+	    T3=T3-DEP_RAD_EQ(I)
+	    RLUMST(I+1)=RLUMST(I+1) + T3
 	  END DO
 	  CALL WRITV(RLUMST,ND,'Consistency check (include dep. from rad. equil.)',LU_FLUX)
 !
