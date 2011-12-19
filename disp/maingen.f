@@ -12,6 +12,7 @@
 	USE MOD_USR_HIDDEN
 	USE MOD_WR_STRING
 	USE MOD_LEV_DIS_BLK
+	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
 ! Altered  07-Jul-2011 : Included commands to look at f, and Mdot in "shell" models.
@@ -4100,7 +4101,13 @@
 	    END IF
 	  END DO
 !
+! Plots departure coeeficient for each level at each depth. 
+!
 	ELSE IF(XOPT .EQ. 'DCS')THEN
+!
+	  WRITE(6,*)' '
+	  WRITE(6,*)PG_PEN(2)//'Use B option in PLT_SPEC for plotting'
+	  WRITE(6,*)' '
 	  FOUND=.FALSE.
 	  DO ID=1,NUM_IONS
 	    IF( (XSPEC .EQ. UC(ION_ID(ID)) .OR. XSPEC .EQ. 'ALL') .AND. ATM(ID)%XzV_PRES)THEN
@@ -4120,7 +4127,7 @@
 !
 	ELSE IF(XOPT .EQ.'TPOP' .OR. XOPT .EQ. 'LPOP' .OR. XOPT .EQ. 'LDC')THEN
 	  
-	  CALL USR_OPTION(K,'DEPTH','20','Depth for opacities')
+	  CALL USR_OPTION(K,'DEPTH','20','Depth at which quantities are to be plotted.')
 	  FOUND=.FALSE.
 	  XAXIS='Level'
 	  DO ID=1,NUM_IONS
@@ -4142,16 +4149,20 @@
 	      FOUND=.TRUE.
 	    END IF
 	  END DO
-	  IF(XOPT .EQ. 'TPOP')THEN
+	  IF(XOPT .EQ. 'TPOP' .AND. FOUND)THEN
 	    WRITE(6,*)'Wavelength set to 5000 Angstroms'
 	    FL=ANG_TO_HZ/5000.0D0
 	    T1=LOG10( 3.0D-10*OPLIN*R(K)/V(K)/(1.0D0+SIGMA(K))/FL )
 	    DO I=1,L
 	      YV(I)=YV(I)+T1
 	    END DO
-	    YAXIS='Tau/fv'
+	    YAXIS='Tau/f'
 	  END IF
-	  CALL DP_CURVE(L,ZV,YV)
+	  IF(FOUND)THEN
+	    CALL DP_CURVE(L,ZV,YV)
+	  ELSE
+	    WRITE(6,*)'Species not found'
+	  END IF
 !
 ! 
 !

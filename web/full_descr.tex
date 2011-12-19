@@ -222,9 +222,13 @@
 \ind{DO\_NG\_V2}{do_ng_v2} \\
 \ind{GUESS\_DC}{guess_dc} \\
 \ind{REWRITE\_DC}{rewrite_dc} \\
+\ind{MOD\_COOL}{mod_cool}\\
+\ind{MOD\_PRRR}{mod_prrr} \\
+\ind{PLT\_CMF\_LUM}{plt_cmf} \\
 \ind{PLT\_SCR}{plt_scr} \\
 \ind{PLT\_RJ}{plot_rj} \\
 \ind{PLT\_JH}{plot_jh} \\
+\ind{PLT\_JH\_CUR}{plot_jh_cur}\\
 \ind{PLT\_IP}{plt_ip} \\
 \ind{LAND\_COL\_MERGE}{land_col_merge} \\
 \ind{N\_COL\_MERGE}{n_col_merge} \\
@@ -2440,7 +2444,13 @@ Generally new models start by reading in a table of $T$/\Psub{T}{grey}\ for anot
 \shd{Options for assisting convergence}{assist_conv}
 
 \begin{mylist}{longest label}
-\item[FIX\_XzV]    Fix the first [FIX\_XzV] levels for species XzV. Option is mainly for debugging purposes. If a particular level is causing convergence difficulties, it can be fixed while the other populations are solved for. Usually set to 0.
+\item[FIX\_ALL\_SPEC]    When true all species are held fix. This option can be used with [UNFIX\_XzV] to a single, or multiple ionization stage, to be updated by the CMFGEN calculaton. XzV. Mainly used when adding new species and/or ionization stages. Default is FALSE.
+
+\item[UNFIX\_XzV]    Allow a single ionization stage to be removed from the influence of the [FIX\_ALL\_SPC] option.
+Set to 0 to UNFIX the ionization stage
+
+\item[FIX\_XzV]    Fix the first [FIX\_XzV] levels for species XzV. Option is mainly for debugging purposes. If a particular level is causing convergence difficulties, it can be fixed while the other populations are solved for. Usually set to 0, and need not be
+present in VADAT.
 
 \item[FIX\_DUM]    To fix the highest available ionization state of species DUM, set to unity. For example, when DUM=HE, He$^{++}$ is held fixed when all ionization stages of helium are included. Usually set to 0.
 
@@ -3061,8 +3071,29 @@ Allows new input files to be created with estimates of the departure coefficient
 \blankline
 \shd{REWRITE\_DC}{rewrite_dc}
  Modify departure coefficient file to allow for level splitting. Primarily used to split individual LS levels into J states. Requires 2 oscillator files for use.
+  
+blankline
+\shd{MOD\_COOL}{mod_cool}
+Program to rewrite the GENCOOL file into a more convenient format. Two files are written:\\
+\indent
+GENCOOL\_SUM:   Same format as GENCOOL except that we have summed up over all bound-free rates. \\
+\indent
+GENSCOOL\_SORT: Only the top rates are printed: Sorted using depths 1, 11, 21 etc. Thus, at depth 20, for example,
+rates will not be in order.
 
 \blankline
+\shd{MOD\_PRRR}{mod_prrr}
+ Program to rewrite the XzVPRRR file, for a given species, in a more convenient summary format (output file is
+ XzVPRRR\_SUM). Routine also allows the rates, as a function of depth, to be plotted. This allow an
+ easy way to check which processes are directly important for controlling the ionization structure.
+  
+\blankline
+\shd{PLT\_CMF\_LUM}{plt_cmf}
+ Plot comoving-frame luminosity and auxiliary vectors from OBSFLUX. Program is designed to check how well the
+ ``conserved luminosity" is conserved. Program plots $Dr^3/Dt$, mechanical term, radioactive energy deposition, 
+ and the gas term.  Note: For a homologous flow, $Dr^4/Dt$=$Dr^3/Dt$ + mechanical term.
+ 
+ \blankline
 \shd{PLT\_SCR}{plt_scr}
  Plot data in SCRTEMP file, which contains the populations as a function of iteration. A variety of options are available to illustrate convergence.
 
@@ -3073,6 +3104,9 @@ Allows new input files to be created with estimates of the departure coefficient
 \blankline
 \shd{PLT\_JH}{plot_jh}  Plot data from a variety of scratch files created with CMFGEN and CMF\_FLUX. Multiple files can be read in, using the RD\_MOD option. Data files that can be read include EDDFACTOR, ES\_J\_CONV, CHI\_DATA, ETA\_DATA, FLUX\_DATA, CMF\_FORCE\_DATA, SOB\_FORCE\_DATA. Be careful with the Y-axis label, which is not always correct.
 
+\blankline
+\shd{PLT\_JH\_CUR}{plot_jh_cur}  Plot J and H moments contained in the supernovae data file JH\_AT\_CURRENT\_TIME (or JH\_AT\_OLD\_TIME).  Multiple files can be read in, using the RD\_MOD option. Options are similar to PLT\_JH.
+ 
 \blankline
 \shd{PLT\_IP}{plt_ip} Plot data in IP\_DATA file. The IP\_DATA file contains the intensity data as a function of impact parameter and frequency. It can be created using CMF\_FLUX. 
 
