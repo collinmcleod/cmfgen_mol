@@ -85,8 +85,9 @@
 	1           'N_ON_J, MIXED, or G_ONLY')
 	  CALL RD_STORE_NCHAR(FG_SOL_OPTIONS,'FG_OPT',ITEN,L_TRUE,
 	1           'Solution options for FG_J_CMF: DIFF/INS and INT/INS')
-	  CALL RD_STORE_LOG(RDTHK_CONT,'THK_CONT',L_TRUE,
-	1           'Use thick boundary condition for continuum ? ')
+	  CALL RD_STORE_LOG(RDTHK_CONT,'THK_CONT',L_TRUE,'Use thick boundary condition for continuum ? ')
+	  REXT_FAC=0.0D0
+	  CALL RD_STORE_DBLE(REXT_FAC,'REXT_FAC',L_FALSE,'Factor to extend R by for thick continuum solution')
 	  CALL RD_STORE_LOG(TRAPFORJ,'TRAP_J',L_TRUE,
 	1           'Use trapazoidal weights to compute J? ')
 !

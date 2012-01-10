@@ -427,15 +427,17 @@ C
 	1         'Maximum velocity spacing (Doppler units) in FG_J_CMF_V10')
 	  CALL RD_STORE_DBLE(DELV_FRAC_MOM,'VFRAC_MOM',L_TRUE,
 	1         'Maximum velocity spacing (Doppler units) in MOM_J_CMF_V10')
-											
-	  CALL RD_STORE_LOG(RDTHK_CONT,'THK_CONT',L_TRUE,
-	1           'Use thick boundary condition for continuum ? ')
+!
+	  CALL RD_STORE_LOG(RDTHK_CONT,'THK_CONT',L_TRUE,'Use thick boundary condition for continuum ? ')
 	  RD_OUT_BC_TYPE=1
 	  OUT_BC_TYPE=1 
 	  OUT_BC_PARAM_ONE=0.299794D0
 	  CALL RD_STORE_INT(RD_OUT_BC_TYPE,'OBC_TYPE',L_FALSE,
 	1           'Outer boundary condition type: 1=def=old')
 	  CALL RD_STORE_INT(OUT_BC_PARAM_ONE,'BC_PAR1',L_FALSE,'Frequency to switch to new BC')
+	  REXT_FAC=0.0D0
+	  CALL RD_STORE_DBLE(REXT_FAC,'REXT_FAC',L_FALSE,'Factor ot extend R grid by for thick continuum')
+!
 	  INCL_INCID_RAD=.FALSE.
 	  CALL RD_STORE_LOG(INCL_INCID_RAD,'INCID_RAD',L_FALSE,
 	1           'Include incident radiation for plane-parellel mod with V?')

@@ -2001,6 +2001,27 @@
 ! ****************************************************************************
 ! ****************************************************************************
 !
+	ELSE IF(XOPT .EQ. 'YFLUX)')THEN
+	  DO I=1,ND
+	    TA(I)=CLUMP_FAC(I)*FLUX_MEAN(I)
+	  END DO
+	  IF(MINVAL(TA(1:ND)) .LE. 0)THEN
+	    CALL TORSCL(TB,TA,R,TB,TC,ND,'ZERO',TYPE_ATM)
+	  ELSE
+	    CALL TORSCL(TB,TA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  END IF
+	  WRITE(T_OUT,*)'Flux optical depth is : ',TB(ND)
+!
+	  DO I=1,ND
+	    IF(TB(I) .GT. 0)THEN
+	      YV(I)=LOG10(TB(I))
+	    ELSE
+	      YV(I)=0.0D0
+	    END IF
+	  END DO
+	  CALL DP_CURVE(ND,XV,YV)
+	  YAXIS='\gt(Flux)'
+!
 	ELSE IF(XOPT .EQ. 'ROSS')THEN
 	  WRITE(T_OUT,*)'Volume filling factor not allowed for.'
 	  CALL USR_OPTION(ELEC,'KAPPA','T','Mass absorption coefficient?')
@@ -2436,7 +2457,7 @@
 	      YV(I)=FLUX_MEAN(I)/ROSS_MEAN(I)
 	    END DO
 	    CALL DP_CURVE(ND,XV,YV)
-	    YAXIS='\gx(Flux)/gx(Ross)'
+	    YAXIS='\gx(Flux)/\gx(Ross)'
 	  ELSE
 	    WRITE(6,*)'Error --- Rosseland mean opacity not defined'
 	  END IF
@@ -4101,7 +4122,7 @@
 	    END IF
 	  END DO
 !
-! Plots departure coeeficient for each level at each depth. 
+! Plots departure coeeficient for each level at each depth.
 !
 	ELSE IF(XOPT .EQ. 'DCS')THEN
 !
@@ -4126,7 +4147,7 @@
 	  END DO
 !
 	ELSE IF(XOPT .EQ.'TPOP' .OR. XOPT .EQ. 'LPOP' .OR. XOPT .EQ. 'LDC')THEN
-	  
+!
 	  CALL USR_OPTION(K,'DEPTH','20','Depth at which quantities are to be plotted.')
 	  FOUND=.FALSE.
 	  XAXIS='Level'

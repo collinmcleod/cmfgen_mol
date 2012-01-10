@@ -25,6 +25,8 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(determine_nse.o)\
       $(LIB)(det_lte_ed.o)\
       $(LIB)(ddt_work.o)\
+      $(LIB)(do_vel_regrid.o)\
+      $(LIB)(do_tau_regrid.o)\
       $(LIB)(do_cmf_hydro_v2.o)\
       $(LIB)(do_ng_accel_band_v2.o)\
       $(LIB)(eval_adiabatic_v3.o)\

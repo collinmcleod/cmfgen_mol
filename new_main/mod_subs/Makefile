@@ -26,7 +26,7 @@ MOD = $(LIB_MOD)(mod_cmfgen.o)\
       $(LIB_MOD)(var_rad_mod.o)
 
 OBJ = $(LIB)(adjust_r_grid_v2.o)\
-      $(LIB)(adjust_r_grid_v3.o)\
+      $(LIB)(adjust_r_grid_v4.o)\
       $(LIB)(adjust_den_vecs.o)\
       $(LIB)(check_param_consistency.o)\
       $(LIB)(comp_j_blank.o)\

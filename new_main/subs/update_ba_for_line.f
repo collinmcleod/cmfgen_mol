@@ -242,14 +242,6 @@
 ! NB: We do not set VB(I) to if NEG_OPACITY(I)=.TRUE. as we have not altered
 !     CHIL : We have only changed CHI which effects JBAR only.
 !
-! Altered 15-Feb-2005: No longer need VC. We now xplicitly cancel NU/ETAL depdence with Nu.
-! Alteredi 9-Dec-2009: Changed sign of VB.
-!
-	      DO I=1,ND
-	        VB(I)=JBAR_SIM(I,SIM_INDX)/ETAL_MAT(I,SIM_INDX)
-	        VC(I)=CHIL_MAT(I,SIM_INDX)*VB(I)
-	      END DO
-!
 	      OPAC_FAC=LINE_OPAC_CON(SIM_INDX)
 	      STIM_FAC=GLDGU(SIM_INDX)*OPAC_FAC
 	      EMIS_FAC=LINE_EMIS_CON(SIM_INDX)
@@ -263,6 +255,14 @@
 	      MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
 	      MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
 !
+! Altered 15-Feb-2005: No longer need VC. We now xplicitly cancel NU/ETAL depdence with Nu.
+! Altered 9-Dec-2009: Changed sign of VB.
+!
+	      DO I=1,ND
+	        VC(I)=JBAR_SIM(I,SIM_INDX)*(CHIL_MAT(I,SIM_INDX)/ETAL_MAT(I,SIM_INDX))
+	        VB(I)=JBAR_SIM(I,SIM_INDX)*(ATM(ID)%XzV_F(MNUP_F,I)/ETAL_MAT(I,SIM_INDX))
+	      END DO
+!
 ! Because we write the heating/cooling term interms of EINA, we need
 ! to do the scaling when either SCL_LINE_COOL_RATES or SCL_SL_LINE_OPAC is true.
 !
@@ -274,8 +274,8 @@
 	      DO K=1,ND
 	        L=GET_DIAG(K)
 	        dRATE_dUP=EINA(SIM_INDX)*U_STAR_RATIO(K,SIM_INDX)*
-	1                   (ZNET_SIM(K,SIM_INDX)+VC(K)+ATM(ID)%XzV_F(MNUP_F,K)*STIM_FAC*VB(K))
-	        dRATE_dLOW=-EINA(SIM_INDX)*ATM(ID)%XzV_F(MNUP_F,K)*OPAC_FAC*L_STAR_RATIO(K,SIM_INDX)*VB(K)
+	1                   (ZNET_SIM(K,SIM_INDX)+VC(K)+STIM_FAC*VB(K))
+	        dRATE_dLOW=-EINA(SIM_INDX)*OPAC_FAC*L_STAR_RATIO(K,SIM_INDX)*VB(K)
 	        SE(ID)%BA(MNUP,MNUP,L,K)=SE(ID)%BA(MNUP,MNUP,L,K)-dRATE_dUP
 	        SE(ID)%BA(MNUP,MNL,L,K) =SE(ID)%BA(MNUP,MNL,L,K) -dRATE_dLOW
 	        SE(ID)%BA(MNL,MNUP,L,K) =SE(ID)%BA(MNL,MNUP,L,K) +dRATE_dUP

@@ -2,12 +2,14 @@
 ! Routine to evaluate the Penning contribution to the de-excitation rate of
 ! the highly meta-stable state, 2s_3Se of HeI.
 !
-!    HeI(1s_2s_3Se) + H(1s_2Se)  --->  HeI(1s2_1Se) +  H+
+!    HeI(1s_2s_3Se) + H(1s_2Se)  --->  HeI(1s2_1Se) +  H+ + e-
 !
 	SUBROUTINE DO_PENNING_ION(HDKT,COMPUTE_BA,DIAG_INDX,ND)
 	USE MOD_CMFGEN
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
+!
+! Altered: 09-Jan-2012: Bug fixed with linearization.
 !
 	INTEGER ND
 	INTEGER DIAG_INDX
@@ -70,13 +72,14 @@
 	            REV_RATE=REV_RATE_COEF*ED(L)*ATM(ID1)%DXzV(L)*ATM(ID2)%XzV_F(1,L)
 	            dREV_RATEdT=-REV_RATE*T1/T(L)
 !
-	            IV=SE(ID1)%LNK_TO_IV(ATM(ID2)%EQXzV)
-	            SE(ID1)%BA(1,1,II,L)   =SE(ID1)%BA(1,1,II,L)   -ALPHA*ATM(ID2)%XzV_F(2,L)
-	            SE(ID1)%BA(1,IV+1,II,L)=SE(ID1)%BA(1,IV+1,II,L)-ALPHA*ATM(ID1)%XzV_F(1,L)
+	            IV=SE(ID1)%LNK_TO_IV(ATM(ID2)%EQXzV+1)
+	            SE(ID1)%BA(1,1,II,L) =SE(ID1)%BA(1,1,II,L) -ALPHA*ATM(ID2)%XzV_F(2,L)
+	            SE(ID1)%BA(1,IV,II,L)=SE(ID1)%BA(1,IV,II,L)-ALPHA*ATM(ID1)%XzV_F(1,L)
 !
 	            IQ=ION_EQ_H
 	            IED=IV_ED_HI
 	            IT=IV_T_HI
+	            IV=SE(ID1)%LNK_TO_IV(ATM(ID2)%EQXzV)
 	            SE(ID1)%BA(1,IV,II,L) =SE(ID1)%BA(1,IV,II,L) +REV_RATE_COEF*ED(L)*ATM(ID1)%DXzV(L)
 	            SE(ID1)%BA(1,IQ,II,L) =SE(ID1)%BA(1,IQ,II,L) +REV_RATE_COEF*ED(L)*ATM(ID2)%XzV_F(1,L)
 	            SE(ID1)%BA(1,IED,II,L)=SE(ID1)%BA(1,IED,II,L)+REV_RATE_COEF*ATM(ID1)%DXzV(L)*ATM(ID2)%XzV_F(1,L)
@@ -90,24 +93,26 @@
 	            SE(ID1)%BA(IQ,IED,II,L)=SE(ID1)%BA(IQ,IED,II,L)-REV_RATE_COEF*ATM(ID1)%DXzV(L)*ATM(ID2)%XzV_F(1,L)
 	            SE(ID1)%BA(IQ,IT,II,L) =SE(ID1)%BA(IQ,IT,II,L) -dREV_RATEdT
 !
+! Now do HeI equations.
+!
 	            IV=SE(ID2)%LNK_TO_IV(ATM(ID1)%EQXzV)
-	            SE(ID2)%BA(2,2,II,L) =SE(ID1)%BA(2,2,II,L) -ALPHA*ATM(ID1)%XzV_F(1,L)
-	            SE(ID2)%BA(2,IV,II,L)=SE(ID1)%BA(2,IV,II,L)-ALPHA*ATM(ID2)%XzV_F(2,L)
-	            SE(ID2)%BA(1,2,II,L) =SE(ID1)%BA(1,2,II,L) +ALPHA*ATM(ID1)%XzV_F(1,L)
-	            SE(ID2)%BA(1,IV,II,L)=SE(ID1)%BA(1,IV,II,L)+ALPHA*ATM(ID2)%XzV_F(2,L)
+	            SE(ID2)%BA(2,2,II,L) =SE(ID2)%BA(2,2,II,L) -ALPHA*ATM(ID1)%XzV_F(1,L)
+	            SE(ID2)%BA(2,IV,II,L)=SE(ID2)%BA(2,IV,II,L)-ALPHA*ATM(ID2)%XzV_F(2,L)
+	            SE(ID2)%BA(1,2,II,L) =SE(ID2)%BA(1,2,II,L) +ALPHA*ATM(ID1)%XzV_F(1,L)
+	            SE(ID2)%BA(1,IV,II,L)=SE(ID2)%BA(1,IV,II,L)+ALPHA*ATM(ID2)%XzV_F(2,L)
 !
 	            IV=SE(ID2)%LNK_TO_IV(ATM(ID1)%EQXzV+ATM(ID1)%NXzV-1)
 	            IED=IV_ED_HeI
 	            IT=IV_T_HeI
-	            SE(ID2)%BA(2,1,II,L)  =SE(ID1)%BA(2,1,II,L)  +REV_RATE_COEF*ED(L)*ATM(ID1)%DXzV(L)
-	            SE(ID2)%BA(2,IV,II,L) =SE(ID1)%BA(2,IV,II,L) +REV_RATE_COEF*ED(L)*ATM(ID2)%XzV_F(1,L)
-	            SE(ID2)%BA(2,IED,II,L)=SE(ID1)%BA(2,IED,II,L)+REV_RATE_COEF*ATM(ID1)%DXzV(L)*ATM(ID2)%XzV_F(1,L)
-	            SE(ID2)%BA(2,IT,II,L) =SE(ID1)%BA(1,IT,II,L) +dREV_RATEdT
+	            SE(ID2)%BA(2,1,II,L)  =SE(ID2)%BA(2,1,II,L)  +REV_RATE_COEF*ED(L)*ATM(ID1)%DXzV(L)
+	            SE(ID2)%BA(2,IV,II,L) =SE(ID2)%BA(2,IV,II,L) +REV_RATE_COEF*ED(L)*ATM(ID2)%XzV_F(1,L)
+	            SE(ID2)%BA(2,IED,II,L)=SE(ID2)%BA(2,IED,II,L)+REV_RATE_COEF*ATM(ID1)%DXzV(L)*ATM(ID2)%XzV_F(1,L)
+	            SE(ID2)%BA(2,IT,II,L) =SE(ID2)%BA(1,IT,II,L) +dREV_RATEdT
 !
-	            SE(ID2)%BA(1,1,II,L)  =SE(ID1)%BA(1,1,II,L)  -REV_RATE_COEF*ED(L)*ATM(ID1)%DXzV(L)
-	            SE(ID2)%BA(1,IV,II,L) =SE(ID1)%BA(1,IV,II,L) -REV_RATE_COEF*ED(L)*ATM(ID2)%XzV_F(1,L)
+	            SE(ID2)%BA(1,1,II,L)  =SE(ID2)%BA(1,1,II,L)  -REV_RATE_COEF*ED(L)*ATM(ID1)%DXzV(L)
+	            SE(ID2)%BA(1,IV,II,L) =SE(ID2)%BA(1,IV,II,L) -REV_RATE_COEF*ED(L)*ATM(ID2)%XzV_F(1,L)
 	            SE(ID2)%BA(1,IED,II,L)=SE(ID2)%BA(1,IED,II,L)-REV_RATE_COEF*ATM(ID1)%DXzV(L)*ATM(ID2)%XzV_F(1,L)
-	            SE(ID2)%BA(1,IT,II,L) =SE(ID1)%BA(1,IT,II,L) -dREV_RATEdT
+	            SE(ID2)%BA(1,IT,II,L) =SE(ID2)%BA(1,IT,II,L) -dREV_RATEdT
 !
 	          END DO
 	        END IF

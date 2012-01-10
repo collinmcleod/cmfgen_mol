@@ -19,7 +19,7 @@ MOD=  $(LIB)(mod_ray_mom_store.o)\
 
 OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(characteristics_v2.o)\
-      $(LIB)(cmf_formal_rel_v3.o)\
+      $(LIB)(cmf_formal_rel_v4.o)\
       $(LIB)(derivr.o)\
       $(LIB)(derivs.o)\
       $(LIB)(drhsdchi_pp.o)\
@@ -29,7 +29,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(edd_jrel_var_v2.o)\
       $(LIB)(fcomp_pp_v2.o)\
       $(LIB)(fgrey_norel_v1.o)\
-      $(LIB)(fg_j_cmf_v11.o)\
+      $(LIB)(fg_j_cmf_v12.o)\
       $(LIB)(gauleg.o)\
       $(LIB)(get_ibound.o)\
       $(LIB)(get_jh_at_prev_time_step.o)\

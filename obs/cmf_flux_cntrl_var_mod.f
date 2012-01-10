@@ -157,6 +157,7 @@
 !
 ! General boundary condition options.
 !
+	REAL*8 REXT_FAC
 	LOGICAL RDTHK_CONT
 	LOGICAL DIF
 	LOGICAL THK_CONT

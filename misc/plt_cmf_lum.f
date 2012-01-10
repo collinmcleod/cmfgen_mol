@@ -23,6 +23,8 @@
 !
 	REAL*8, ALLOCATABLE :: R(:)
 	REAL*8, ALLOCATABLE :: V(:)
+	REAL*8, ALLOCATABLE :: SIGMA(:)
+	REAL*8, ALLOCATABLE :: POPS(:,:)
 	REAL*8, ALLOCATABLE :: XAXIS(:)
 !
 	REAL*8, ALLOCATABLE :: LUM(:)
@@ -40,29 +42,40 @@
 	CHARACTER(LEN=132) STRING
 	CHARACTER(LEN=20)  XLABEL
 !
+	INTEGER, PARAMETER :: LU_RD=20
+        INTEGER IREC,NITSF,RITE_N_TIMES,LAST_NG
+	LOGICAL WRITE_RVSIG,NEWMOD
+!
 	INTEGER ND
+	INTEGER NT
 	INTEGER IOS
 	INTEGER I
 	LOGICAL FILE_OPEN
 !
-        OPEN(UNIT=20,FILE='MODEL',STATUS='OLD',IOSTAT=IOS)
+	WRITE(6,'(A)')' '
+        OPEN(UNIT=LU_RD,FILE='MODEL',STATUS='OLD',IOSTAT=IOS)
           IF(IOS .EQ. 0)THEN
             DO WHILE(1 .EQ. 1)
-              READ(20,'(A)',IOSTAT=IOS)STRING
+              READ(LU_RD,'(A)',IOSTAT=IOS)STRING
               IF(IOS .NE. 0)EXIT
               IF(INDEX(STRING,'!Number of depth points') .NE. 0)THEN
                 READ(STRING,*)ND
                 WRITE(6,'(A,I4)')' Number of depth points in the model is:',ND
+              END IF
+              IF(INDEX(STRING,'!Total number of variables') .NE. 0)THEN
+                READ(STRING,*)NT
+                WRITE(6,'(A,I4)')'    Number of variables in the model is:',NT
                 EXIT
               END IF
             END DO
           END IF
-          INQUIRE(UNIT=20,OPENED=FILE_OPEN)
-        IF(FILE_OPEN)CLOSE(UNIT=20)
+          INQUIRE(UNIT=LU_RD,OPENED=FILE_OPEN)
+        IF(FILE_OPEN)CLOSE(UNIT=LU_RD)
 !
         IF(IOS .NE. 0)THEN
           WRITE(6,*)' Unable to open MODEL file to get # of depth points'
           CALL GEN_IN(ND,'Number of depth points')
+          CALL GEN_IN(NT,'Number of variables (NT)')
         END IF
 !
 	IOS=0
@@ -86,16 +99,29 @@
 	LUM=0; MECH=0.0D0; DJDT=0.0D0; ADI=0.0D0
 	RAD_DECAY=0.0D0; TOTAL=0.0D0; CHANGE=0.0D0
 !
-	OPEN(UNIT=20,FILE='RVTJ',STATUS='OLD',ACTION='READ')
-	  STRING=' '
-	  DO WHILE(INDEX(STRING,'Radius') .EQ. 0)
-	    READ(20,'(A)')STRING
-	  END DO
-	  READ(20,*)(R(I),I=1,ND)
-	  READ(20,'(A)')STRING
-	  READ(20,*)(V(I),I=1,ND)
-	CLOSE(UNIT=20)
-
+	OPEN(UNIT=LU_RD,FILE='RVTJ',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	  IF(IOS .EQ. 0)THEN
+	    STRING=' '
+	    DO WHILE(INDEX(STRING,'Radius') .EQ. 0)
+	      READ(LU_RD,'(A)')STRING
+	    END DO
+	    READ(LU_RD,*)(R(I),I=1,ND)
+	    READ(LU_RD,'(A)')STRING
+	    READ(LU_RD,*)(V(I),I=1,ND)
+	  END IF
+	CLOSE(UNIT=LU_RD)
+	IF(IOS .NE. 0)THEN
+          ALLOCATE (POPS(NT,ND))
+	  ALLOCATE (SIGMA(ND))
+	  IREC=0                  ! Get last iteration
+          CALL SCR_READ_V2(R,V,SIGMA,POPS,IREC,NITSF,RITE_N_TIMES,LAST_NG,
+	1                 WRITE_RVSIG,NT,ND,LU_RD,NEWMOD)
+	  IF(NEWMOD)THEN
+	    WRITE(6,*)'Unable to read R, V, etc from SCRTEMP'
+	    STOP
+	  END IF
+	END IF
+!
 	DO I=1,ND
 	  R(I)=R(I)/R(ND)
 	END DO
@@ -148,7 +174,7 @@
 	WRITE(6,*)' Plotting the corrections at each depth'
 	WRITE(6,*)' '
 	WRITE(6,'(3A)')PG_PEN(2)//' The "mechanical" luminosity contribution at each depth is plotted in red',DEF_PEN
-	WRITE(6,'(3A)')PG_PEN(2)//' The "adiabatic" luminosity contribution at each depth is plotted in blue',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(3)//' The "adiabatic" luminosity contribution at each depth is plotted in blue',DEF_PEN
 	WRITE(6,'(3A)')PG_PEN(4)//' The "DJDTt" luminosity contribution at each depth is plotted in green',DEF_PEN
 	WRITE(6,'(3A)')PG_PEN(5)//' The "radioactove"  contribution at each depth is plotted in purple',DEF_PEN
 	WRITE(6,*)' '
@@ -200,7 +226,7 @@
 	CALL DP_CURVE(ND,XAXIS,TOTAL)
 	CHANGE=CHANGE/T1
 	CALL DP_CURVE(ND,XAXIS,CHANGE)
-	CALL GRAMON_PGPLOT(XLABEL,'Luminosity (L\d'//char(09)//'\u)',' ',' ')
+	CALL GRAMON_PGPLOT(XLABEL,' ',' ',' ')
 !
 	STOP
 	END

@@ -10,6 +10,7 @@
 C
 	REAL*8, ALLOCATABLE :: POPS(:,:,:)		!NT,ND,NIT
 	REAL*8, ALLOCATABLE :: R_MAT(:,:)		!ND,NIT
+	REAL*8, ALLOCATABLE :: V_MAT(:,:)		!ND,NIT
 	REAL*8, ALLOCATABLE :: RAT(:,:)			!NT,ND
 !
 	REAL*8, ALLOCATABLE :: R(:)			!ND
@@ -101,6 +102,7 @@ C
 C
 	ALLOCATE (POPS(NT,ND,NIT))
 	ALLOCATE (R_MAT(ND,NIT))
+	ALLOCATE (V_MAT(ND,NIT))
 	ALLOCATE (RAT(NT,ND))
 !
 	ALLOCATE (R(ND))
@@ -124,6 +126,7 @@ C
 	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
 	1              NT,ND,LUSCR,NEWMOD)
 	  R_MAT(:,IREC)=R(:) 
+	  V_MAT(:,IREC)=V(:) 
 	END DO
 C
 200	CONTINUE
@@ -356,14 +359,37 @@ C
 	    IVAR=NT
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)')
 	    IF(IVAR .EQ. 0)EXIT
+	    T1=1.0D0
+	    IF(V(1) .GT. 10000.0D0)T1=1.0D-03
 	    DO ID=1,ND
 	      Y(ID)=POPS(IVAR,ID,IT)
-	      X(ID)=V(ID)
+	      X(ID)=T1*V_MAT(ID,IT)
 	    END DO
 	    CALL DP_CURVE(ND,X,Y)
 	  END DO
 	  Ylabel=''
-	  CALL GRAMON_PGPLOT('V(km/s)',Ylabel,' ',' ')
+	  IF(V(1) .GT. 10000.0D0)THEN
+	    CALL GRAMON_PGPLOT('V(Mm/s)',Ylabel,' ',' ')
+	  ELSE
+	    CALL GRAMON_PGPLOT('V(km/s)',Ylabel,' ',' ')
+	  END IF
+	  GOTO 200
+	ELSE IF(PLT_OPT(1:2) .EQ. 'PR')THEN
+	  IT=NIT; ID=ND
+	  DO WHILE(1 .EQ. 1)
+	    CALL GEN_IN(IT,'Iteration # (zero to exit)')
+	    IF(IT .EQ. 0)EXIT
+	    IVAR=NT
+	    CALL GEN_IN(IVAR,'Variable # (zero to exit)')
+	    IF(IVAR .EQ. 0)EXIT
+	    DO ID=1,ND
+	      Y(ID)=POPS(IVAR,ID,IT)
+	      X(ID)=1.0D-04*R_MAT(ID,IT)
+	    END DO
+	    CALL DP_CURVE(ND,X,Y)
+	  END DO
+	  Ylabel=''
+	  CALL GRAMON_PGPLOT('R(10\u14 \dcm)',Ylabel,' ',' ')
 	  GOTO 200
 	ELSE IF(PLT_OPT(1:4) .EQ. 'FDGV')THEN
 	  IT=NIT; ID=ND; IVAR=NT; LIMITS(:)=0; LIMITS(1)=1; LIMITS(2)=ND
