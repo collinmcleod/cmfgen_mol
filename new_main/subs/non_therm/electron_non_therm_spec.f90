@@ -57,11 +57,14 @@
 	REAL*8 INTSIGC
 	EXTERNAL INTSIGC,GET_INDX_DP
 !
+! We now set these values by values passed from CMFGEN.
+!
+	REAL*8 XKT_MIN
+	REAL*8 XKT_MAX
+!
 ! These parameters (except Hz_TO_eV) probably only need to be changed if performing tests.
 !
 	REAL*8, PARAMETER :: Hz_to_eV=13.60569253D0/3.289841960D0
-	REAL*8, PARAMETER :: XKT_MIN=1.0D0
-	REAL*8, PARAMETER :: XKT_MAX=1.0D+03
 	REAL*8, PARAMETER :: DELTA_ENR_SOURCE=30.0D0
 	LOGICAL, PARAMETER :: INCLUDE_EXCITATION=.TRUE.
 	LOGICAL, PARAMETER :: INCLUDE_IONIZATION=.TRUE.
@@ -92,6 +95,8 @@
 	CHARACTER(LEN=40) TMP_NAME
 !
 !
+	XKT_MIN=NT_EMIN	
+	XKT_MAX=NT_EMAX
 	INJECT_DIRAC_AT_EMAX=.FALSE.
 	IF(NT_SOURCE_TYPE(1:12) .EQ. 'INJECT_DIRAC')THEN
 	  INJECT_DIRAC_AT_EMAX=.TRUE.
@@ -123,6 +128,7 @@
 ! The following vectors/arrays are stored in MOD_NON_THERM
 !
 	IF(.NOT. ALLOCATED(XKT))THEN
+	  NKT=NT_NKT
 	  WRITE(LU_TH,*)'Allocating memory to describe non-thermal electron distribution'
 	  ALLOCATE (XKT(NKT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (dXKT(NKT),STAT=IOS)
@@ -331,7 +337,7 @@
 	      IF(THD(IT)%PRES .AND. THD(IT)%DO_THIS_ION_ROUTE)THEN
 	        NATOM=THD(IT)%N_ATOM
                 XION_POT = THD(IT)%ION_POT
-	        WRITE(LU_TH,'(A,I3,A,F7.2,A)')'Ionization potential for IT=',IT,' is ',XION_POT,' eV'
+	        WRITE(LU_TH,'(A,I3,A,F7.2,A)')' Ionization potential for IT=',IT,' is ',XION_POT,' eV'
 !
 	        IF(XION_POT .LT. XKT(1))THEN
 	           IST=1

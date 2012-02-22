@@ -126,7 +126,7 @@
 	ND_END=ND
 	NBAND=1
 	IT_STEP=1
-	N_ITS_TO_RD=4
+	N_ITS_TO_RD=8	!Was 4
 !
 	OPTION='NG'
 	WRITE(T_OUT,*)'Options are:'
@@ -161,13 +161,15 @@
 	ELSE IF(OPTION(1:2) .EQ. 'AV')THEN
 	  N_ITS_TO_RD=2
 	  CALL GEN_IN(N_ITS_TO_RD,'Number of iterations to read')
-	  CALL GEN_IN(ND_ST,'Only do AVeraging if depth is .GE. ND_ST')
-	  CALL GEN_IN(ND_END,'Only do AVeraging if depth is .LE. ND_END')
+	  CALL GEN_IN(ND_ST,'Only do Averaging if depth is .GE. ND_ST')
+	  CALL GEN_IN(ND_END,'Only do Averaging if depth is .LE. ND_END')
 	ELSE IF(OPTION(1:3) .EQ. 'FID' .OR. OPTION(1:4) .EQ. 'FFID')THEN
 	  N_ITS_TO_RD=3
 	  CALL GEN_IN(N_ITS_TO_RD,'Number of iterations to read')
 	ELSE IF(OPTION(1:2) .EQ. 'TG')THEN
 	  N_ITS_TO_RD=3
+	  SCALE_FAC=2.0D0
+	  CALL GEN_IN(SCALE_FAC,'Exponent (N) to power scale (i.e., (1+T1)**N last correction if r<1')
 	  CALL GEN_IN(ND_ST,'Only do NG acceleration for the depth in .GE. ND_ST')
 	  CALL GEN_IN(ND_END,'Only do NG acceleration for the depth in .LE. ND_END')
 	  CALL GEN_IN(IT_STEP,'Iteration step size for NG acceleration')
@@ -268,6 +270,10 @@
 	        IF(T2 .LT. -0.5D0*RDPOPS(I,J,1))T2=-0.5D0*RDPOPS(I,J,1)
 	        BIG_POPS(I,J)=RDPOPS(I,J,1)+T2
 	      END DO
+	    ELSE
+	      K=NINT(SCALE_FAC)
+	      T1=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/RDPOPS(I,J,2)
+	      BIG_POPS(I,J)=RDPOPS(I,J,1)*(1.0D0+T1)**K
 	    END IF
 	  END DO
 	  NG_DONE=.TRUE.
@@ -407,9 +413,9 @@
 	INTEGER ND
 	INTEGER NS
 	REAL*8 NEWPOP(NS)
-	REAL*8 RDPOPS(NT,ND,4)
+	REAL*8 RDPOPS(NT,ND,8)
 !
-	REAL*8 TEMP(4,NS)
+	REAL*8 TEMP(8,NS)
 	INTEGER I,J,K,L
 	LOGICAL WEIGHT
 !
@@ -422,7 +428,7 @@
 !
 ! Rewrite the relevant poulations in a form suitable for NGACCEL.
 !
-	DO J=1,4
+	DO J=1,8
 	  DO L=LST,LEND
 	    DO I=1,NT
 	      K=I+NT*(L-LST)
@@ -433,7 +439,9 @@
 	WEIGHT=.TRUE.
 !
 	WRITE(6,*)'Calling NGACCEL'
-	CALL NGACCEL(NEWPOP,TEMP,NS,WEIGHT)
+!	CALL NGACCEL(NEWPOP,TEMP,NS,WEIGHT)
+	I=6
+	CALL NGACCEL_ARB_ORD(NEWPOP,TEMP,NS,I,WEIGHT)
 !
 	RETURN
 	END
@@ -455,7 +463,7 @@
 	INTEGER ND_END
 	INTEGER LUER
 	REAL*8 POPS(NT,ND)
-	REAL*8 RDPOPS(NT,ND,4)
+	REAL*8 RDPOPS(NT,ND,8)
 	LOGICAL DO_REGARDLESS
 	LOGICAL SCALE_INDIVIDUALLY
 	LOGICAL NG_DONE

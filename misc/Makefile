@@ -59,6 +59,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)plt_cool.exe\
          $(EXE_DIR)plt_ln_heat.exe\
          $(EXE_DIR)plt_j_comp.exe\
+         $(EXE_DIR)plt_q_col.exe\
          $(EXE_DIR)plt_net.exe\
          $(EXE_DIR)plt_non_therm.exe\
          $(EXE_DIR)solve_ba_mat.exe\
@@ -120,7 +121,7 @@ $(EXE_DIR)solve_ba_mat.exe : solve_ba_mat.o
 # General rule to compile a fortran ".f" file.
 
 %.o : %.f
-	$(F90)  -c $(FD)  $<
+	$(F90)  -c $(FG)  $<
 
 USR = $(LIB_DIR)libtools.a(usr_option.o)
 GEN = $(LIB_DIR)libtools.a(gen_in.o)

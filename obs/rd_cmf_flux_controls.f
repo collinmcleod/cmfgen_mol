@@ -175,7 +175,10 @@
 	1        'Output I as a functio of p and frequency?')
 	  WRITE_RTAU=.FALSE.
 	  CALL RD_STORE_LOG(WRITE_RTAU,'WR_RTAU',L_FALSE,
-	1        'Output R(Tau=Tau_ref) as a functio of p and frequency?')
+	1        'Output R(Tau=Tau_ref) as a function of p and frequency?')
+	  WRITE_dFR=.FALSE.
+	  CALL RD_STORE_LOG(WRITE_dFR,'WR_dFR',L_FALSE,
+	1        'Output dFR as a functioin of R and frequency?')
 	  CALL RD_STORE_DBLE(TAU_REF,'TAU_REF',WRITE_RTAU,
 	1        'Reference tau for WR_TAU')
 !

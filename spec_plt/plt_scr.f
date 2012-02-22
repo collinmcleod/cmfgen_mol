@@ -140,7 +140,8 @@ C
 	WRITE(T_OUT,*)'D   :: Z(K)=100.0D0*(Y(K)-Y(NIT))/Y(NIT)'
 	WRITE(T_OUT,*)'Y   :: Z(K)=Y(K)'
 	WRITE(T_OUT,*)' '
-        WRITE(T_OUT,*)'PD  :: Plot a variable as a function of depth.'
+        WRITE(T_OUT,*)'PD  :: Plot 100.0D0*(Y(K)-Y(K-1))/Y(K) as a function of depth index.'
+        WRITE(T_OUT,*)'PN  :: Plot a variable as a function of depth index.'
         WRITE(T_OUT,*)'PV  :: Plot a variable as a function of velocity.'
 	WRITE(T_OUT,*)'PF  :: Plot 100.0D0*(Y(K+1)-Y(K))/Y(K+1) for all variables at a given depth.'
 	WRITE(T_OUT,*)' '
@@ -335,6 +336,23 @@ C
 	  CALL GRAMON_PGPLOT('Depth',Ylabel,' ',' ')
 	  GOTO 200
 	ELSE IF(PLT_OPT(1:2) .EQ. 'PD')THEN
+	  IT=NIT; ID=ND
+	  DO WHILE(1 .EQ. 1)
+	    CALL GEN_IN(IT,'Iteration # (zero to exit)')
+	    IF(IT .EQ. 0)EXIT
+	    IVAR=NT
+	    CALL GEN_IN(IVAR,'Variable # (zero to exit)')
+	    IF(IVAR .EQ. 0)EXIT
+	    DO ID=1,ND
+	      Y(ID)=100.0D0*(POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1))/POPS(IVAR,ID,IT)
+	      X(ID)=ID
+	    END DO
+	    CALL DP_CURVE(ND,X,Y)
+	  END DO
+	  Ylabel='1 - Y(I-1)/Y(I)'
+	  CALL GRAMON_PGPLOT('Depth',Ylabel,' ',' ')
+	  GOTO 200
+	ELSE IF(PLT_OPT(1:2) .EQ. 'PN')THEN
 	  IT=NIT; ID=ND
 	  DO WHILE(1 .EQ. 1)
 	    CALL GEN_IN(IT,'Iteration # (zero to exit)')

@@ -28,7 +28,7 @@ OBJ2 = $(LIB_MOD)(mod_non_therm.o)
 all : $(LIB)
 	rm -f *.o
 
-$(LIB) : $(OBJ2) $(OBJ)
+$(LIB) : $(OBJ)
 
 NT =  $(LIB_DIR)libmod.a(mod_non_therm.o)
 ST =  $(LIB_DIR)libmod.a(steq_data_mod.o)
@@ -41,7 +41,7 @@ $(LIB)(%.o) : %.f90 $(NT) $(ST) $(CMF) $(CNT)
 	$(F90) -c $(FFREE) -I..  $<
 	ar ruv $(LIB) $*.o
 
-$(LIB)(mod_non_therm.o) : mod_non_therm.f90
+$(LIB_MOD)(mod_non_therm.o) : mod_non_therm.f90
 	$(F90) -c $(FFREE) -I..  mod_non_therm.f90
 	ar ruv $(LIB_MOD) mod_non_therm.o
 

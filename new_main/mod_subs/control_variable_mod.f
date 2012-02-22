@@ -91,6 +91,9 @@
 	REAL*8 DEC_NRG_SCL_FAC
 	REAL*8 NT_OMIT_ION_SCALE        !Ion omitted if < NT_OMIT_ION_SCL*(largest ion pop.).
 	REAL*8 NT_OMIT_LEV_SCALE        !Fractional pops omitted if < NT_OMIT_SCL
+        REAL*8 NT_EMAX			!Maximum energy of non-thermal electrons
+        REAL*8 NT_EMIN			!Minimum energy of non-thermal electrons
+	INTEGER NT_NKT
 	INTEGER NON_THERMAL_IT_CNTRL    !Controls how often we update the nonthermal electron distribution.
 	LOGICAL COMP_GREY_LST_IT        !Comput J(GREY) on last iteration [DEFAULT is TRUE].
 	LOGICAL SCL_NT_CROSEC

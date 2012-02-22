@@ -135,7 +135,7 @@
 !
 	T1=0.0D0
 	DO I=2,ND-1
-	  T1=MAX( T1,(R(I)-R_OLD(I))/(R(I-1)-R(I+1)) ) 
+	  T1=MAX( T1,ABS(R(I)-R_OLD(I))/(R(I-1)-R(I+1)) ) 
 	END DO
 	T1=T1*2.0D0
 	IF(T1 .LT. 1.0D-03)THEN

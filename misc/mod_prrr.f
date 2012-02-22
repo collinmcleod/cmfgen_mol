@@ -290,6 +290,9 @@
 	  XLABEL='Ne(cm\u-3\d)'
 	ELSE IF(XAX_OPT(1:2) .EQ. 'EX')THEN
 	  STOP
+	ELSE
+	  WRITE(6,*)'Unrecognized X-axis option'
+	  GOTO 2000
 	END IF
 !
 	MIN_VAL=0.01D0

@@ -2,6 +2,9 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 10-Feb-2012: Improved computation of gbar. Expression now works for
+!                        very low energies, andhigh energies.
+!
 	INTEGER ID
 	INTEGER DPTH_INDX
 	INTEGER NKT
@@ -43,11 +46,15 @@
 	  DO IKT=1,NKT
 	    IF(XKT(IKT) .GE. dE_eV)THEN
 	      X = sqrt(xkt(ikt)/dE_eV-1.0d0)
-	      IF((ATM(ID)%ZXzV .NE. 1).AND.(X .LE. CONNECT_POINT))THEN
-	        GBAR(IKT) = 0.2D0
-	      ELSE
-	        GBAR(IKT) = COEF0 + COEF1*X + COEF2*X*X
-	      END IF
+              IF((ATM(ID)%ZXzV .NE. 1).AND.(X .LE. CONNECT_POINT))THEN
+                GBAR(IKT) = 0.2D0
+              ELSE IF(X .LE. 0.80D0)THEN
+                GBAR(IKT) = 0.074*X*(1.0D0+X)
+              ELSE IF(X .LE. 6)THEN
+                GBAR(IKT) = COEF0 + COEF1*X + COEF2*X*X
+              ELSE
+                GBAR(IKT) = +0.105D0+LOG(X)/1.8138D0
+              END IF
 	      if(gbar(ikt) .gt. 0.0d0)then
 	        RATE=RATE+T1*GBAR(ikt)*YE(IKT,DPTH_INDX)*dXKT(IKT)/XKT(IKT)
 	      end if

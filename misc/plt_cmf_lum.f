@@ -198,22 +198,29 @@
 	CALL WR_COL_STR(' |1*** |0Plotting cummalative contributions (intgerated inwards). |1***')
 	CALL WR_COL_STR(' |1*** |0These represent the contributions to the "conserved luminosity)". |1***')
 	WRITE(6,*)' '
+!
 	WRITE(6,'(3A)')PG_PEN(2)//'            The "corrected luminosity" is in red',DEF_PEN
+	CALL DP_CURVE(ND,XAXIS,TOTAL)
+!
 	WRITE(6,'(3A)')PG_PEN(3)//'    The term due to radioactive decay is in blue',DEF_PEN
+	CALL DP_CURVE(ND,XAXIS,RAD_DECAY)
+!
 	WRITE(6,'(3A)')PG_PEN(4)//'                       The DJDT term is in green',DEF_PEN
-	WRITE(6,'(3A)')PG_PEN(5)//'  Adiabatic cooling/internal energy is in purple',DEF_PEN
-	WRITE(6,'(3A)')PG_PEN(6)//'      The work on the gas term (MECH) is in pink',DEF_PEN
+	CALL DP_CURVE(ND,XAXIS,DJDT)
+!
+	WRITE(6,'(3A)')PG_PEN(5)//'      The work on the gas term (MECH) is in purple',DEF_PEN
+	CALL DP_CURVE(ND,XAXIS,MECH)
+!
+	WRITE(6,'(3A)')PG_PEN(6)//'  Adiabatic cooling/internal energy is in pink',DEF_PEN
+	CALL DP_CURVE(ND,XAXIS,ADI)
+!
 	WRITE(6,'(3A)')PG_PEN(7)//' The total of the corrections terms in in yellow',DEF_PEN
+	CHANGE=MECH+ADI+DJDT+RAD_DECAY
+!
 	WRITE(6,*)' '
 !
-	CALL DP_CURVE(ND,XAXIS,TOTAL)
-	CALL DP_CURVE(ND,XAXIS,RAD_DECAY)
-	CALL DP_CURVE(ND,XAXIS,DJDT)
-	CALL DP_CURVE(ND,XAXIS,MECH)
-	CALL DP_CURVE(ND,XAXIS,ADI)
-	CHANGE=MECH+ADI+DJDT+RAD_DECAY
 	CALL DP_CURVE(ND,XAXIS,CHANGE)
-	CALL GRAMON_PGPLOT(XLABEL,'Luminosity (L\d'//char(09)//'\u)',' ',' ')
+	CALL GRAMON_PGPLOT(XLABEL,'Luminosity (L\d\m9\u)',' ',' ')
 !
 	WRITE(6,*)' '
 	WRITE(6,'(3A)')PG_PEN(2)//'Here we plot the total energy balance (normalized by the value at d=2).'

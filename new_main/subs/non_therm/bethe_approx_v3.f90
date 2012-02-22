@@ -5,8 +5,11 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
-! Altered 06-Nov-2011 - Cleaned.
-!                       GBAR changed from vector to scaler
+!
+! Altered 10-Feb-2012: Improved computation of gbar. Expression now works for
+!                        very low energies, andhigh energies.
+! Altered 06-Nov-2011: Cleaned.
+!                        GBAR changed from vector to scaler
 !
 	INTEGER ID
 	INTEGER DPTH_INDX

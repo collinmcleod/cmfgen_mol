@@ -5,6 +5,7 @@
 !                                              MODEL
 !
 	PROGRAM PLT_NON_THERM
+	USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -158,15 +159,14 @@
 	CLOSE(UNIT=20)
 !
 	WRITE(6,*)' '
-	CALL WR_COL_STR('|1              The luminosity is plotted in red')
-	CALL WR_COL_STR('|4 The "conserved" luminosity is plotted in blue')
-	WRITE(6,*)' '
+	WRITE(6,'(3A)')PG_PEN(2),' Plotting the non-thermal degradation spectrum in red',DEF_PEN
 !
 	DPTH_INDX=ND/2
 10	CONTINUE
-	CALL GEN_IN(DPTH_INDX,'Depth index for plotting')
+	CALL GEN_IN(DPTH_INDX,'Depth index for plotting electron degradation spectrum')
 	IF(DPTH_INDX .LE. 0)GOTO 20
 	CALL DP_CURVE(NKT,XKT,YE(1,DPTH_INDX))
+	CALL DP_CURVE(NKT,XKT,LELEC)
 	CALL GRAMON_PGPLOT('kT(ev)','YE',' ',' ')
 	GOTO 10
 20	CONTINUE
@@ -185,7 +185,7 @@
 !
 	DPTH_INDX=ND/2
 30	CONTINUE
-	CALL GEN_IN(DPTH_INDX,'Depth index for plotting')
+	CALL GEN_IN(DPTH_INDX,'Depth index for plotting electron and non-thermal electron distributions')
 	IF(DPTH_INDX .LE. 0)STOP
 !
 	T1=0.86173324D0*T(DPTH_INDX)
@@ -204,8 +204,8 @@
 	END DO
 	NON_THERMAL_ED=NON_THERMAL_ED*0.5D0*(RAD_ENERGY(DPTH_INDX)*6.24150974D+11)
 	WRITE(6,*)' '
-	CALL WR_COL_STR('|1 The non-thermal electron distribution is plotted in red')
-	CALL WR_COL_STR('|4    The thermal electron distribution is plotted in blue')
+	WRITE(6,'(3A)')PG_PEN(2),' The non-thermal electron distribution is plotted in red',DEF_PEN
+	WRITE(6,'(3A)')PG_PEN(3),' The thermal electron distribution is plotted in blue',DEF_PEN
 	WRITE(6,*)'The temperature (10^4K) is ',T(DPTH_INDX)
 	WRITE(6,*)ED(DPTH_INDX),THERMAL_ED,NON_THERMAL_ED
 	WRITE(6,*)' '

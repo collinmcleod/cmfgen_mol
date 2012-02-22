@@ -6,6 +6,7 @@
 	1                  SN_AGE_DAYS,PURE_HUBBLE_FLOW,N_IB_INS,N_OB_INS,RDINR,ND,LU)
 	IMPLICIT NONE
 !
+! Altered 28-Jan-2012 : Initialize dLOGR and dTAU=0.0D when using R grdid from RDINR as used for diagnostic output.
 ! Altered 15-Jul-2010 : Adjusted scalinf the R grid when read in from RDINR.
 ! Altered 24-Jun-2009 : Changed to V3: PURE_HUBBLE_FLOW passed in call.
 ! Altered 10-Apr-2009 : RDINR now adopts R = Rold + V(r).dt
@@ -294,6 +295,7 @@
 	    END IF
 	  END IF
 	  RMAX=R(1); RCORE=R(ND)
+	  dLOGR=0.0D0; dTAU=0.0D0		!Set for diagnostic output file.
 	  WRITE(LUER,*)'Read in R grid from RDINR in SET_RV_HYDRO_MODEL'
 !
 	ELSE

@@ -45,8 +45,12 @@
 	      X = sqrt(xkt(ikt)/dE_eV-1.0d0)
 	      IF((ATM(ID)%ZXzV .NE. 1).AND.(X .LE. CONNECT_POINT))THEN
 	        GBAR(IKT) = 0.2D0
-	      ELSE
+	      ELSE IF(X .LE. 0.80D0)THEN
+	        GBAR(IKT) = 0.074*X*(1.0D0+X)
+	      ELSE IF(X .LE. 6)THEN
 	        GBAR(IKT) = COEF0 + COEF1*X + COEF2*X*X
+	      ELSE
+	        GBAR(IKT) = +0.105D0+LOG(X)/1.8138D0
 	      END IF
 	      if(gbar(ikt) .ge. 0.0d0)then
 	        Q(IKT)=T1*GBAR(ikt)*dXKT(IKT)/XKT(IKT)

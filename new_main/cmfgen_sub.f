@@ -1066,7 +1066,6 @@
 ! Useful for assisting convergence when the model is experiencing
 ! difficulty converging.
 !
-	CALL TUNE(IONE,'GIT')
 	IF(NUM_ITS_TO_DO .EQ. 0)THEN
 	  IF(RDINSOL)THEN
 !
@@ -1175,7 +1174,9 @@
 	LAST_LAMBDA=NITSF
 	LAST_AV=NITSF
 	NEXT_AV=0
+!
 20000	CONTINUE
+	CALL TUNE(IONE,'GIT')
 	NUM_ITS_TO_DO=NUM_ITS_TO_DO-1
 	IF(NUM_ITS_TO_DO .EQ. 0)LST_ITERATION=.TRUE.
 	MAIN_COUNTER=MAIN_COUNTER+1
@@ -3616,8 +3617,10 @@
 !
 	CALL WRITV(STEQ_T,ND,'Radiative Equlibrium Equation',LU_SE)
 !
+	CALL TUNE(1,'SOLVE_FOR_POPS')
 	CALL SOLVE_FOR_POPS(POPS,NT,NION,ND,NC,NP,NUM_BNDS,DIAG_INDX,
 	1      MAXCH,MAIN_COUNTER,IREC,LU_SE,LUSCR,LST_ITERATION)
+	CALL TUNE(2,'SOLVE_FOR_POPS')
 !
 ! If we have changed the R grid, we need to recomput the angular quadrature weitghts,
 ! and put the atom density ect on the new radius grid.
@@ -4286,17 +4289,25 @@
 ! will be undertaken.
 !
 	    CALL GEN_ASCI_OPEN(LUSCR,'MODEL_SCR','UNKNOWN',' ',' ',IZERO,IOS)
-	    IF(IOS .EQ. 0)CALL GEN_ASCI_OPEN(LUIN,'IN_ITS','OLD',' ','READ',IZERO,IOS)
-	    IF(IOS .NE. 0)THEN  
-	       WRITE(LUER,*)'Error opening IN_ITS or MODEL_SCR in CMFGEN, IOS=',IOS
-	       WRITE(LUER,*)'Error occurs at the end of CMFGEN_SUB.'
-	       WRITE(LUER,*)'Error will be ignored.'
-	       GOTO 20000
-	    END IF
-	    OLD_RD_LAMBDA=RD_LAMBDA
-	    I=NUM_ITS_RD
-	    CALL RD_INT(NUM_ITS_RD,'NUM_ITS',LUIN,LUSCR,'Number of iterations to perform')
-	    CALL RD_LOG(RD_LAMBDA,'DO_LAM_IT',LUIN,LUSCR,'Do LAMBDA iterations ?')
+	      IF(IOS .EQ. 0)CALL GEN_ASCI_OPEN(LUIN,'IN_ITS','OLD',' ','READ',IZERO,IOS)
+	      IF(IOS .NE. 0)THEN  
+	         WRITE(LUER,*)'Error opening IN_ITS or MODEL_SCR in CMFGEN, IOS=',IOS
+	         WRITE(LUER,*)'Error occurs at the end of CMFGEN_SUB.'
+	         WRITE(LUER,*)'Error will be ignored.'
+	         GOTO 20000
+	      END IF
+	      CALL RD_OPTIONS_INTO_STORE(LUIN,LUSCR)
+	      OLD_RD_LAMBDA=RD_LAMBDA
+	      I=NUM_ITS_RD
+	      CALL RD_STORE_INT(NUM_ITS_RD,'NUM_ITS',L_TRUE,'Number of iterations to perform')
+	      CALL RD_STORE_LOG(RD_LAMBDA,'DO_LAM_IT',L_TRUE,'Do LAMBDA iterations ?')
+	      CALL RD_STORE_LOG(DO_LAMBDA_AUTO,'DO_LAM_AUTO',L_FALSE,
+	1                  'Start non-lambda iterations automatically?')
+	      CALL RD_STORE_LOG(DO_GREY_T_AUTO,'DO_GT_AUTO',L_FALSE,
+	1                  'Do a grey temperature iteration after revising USE_FIXED_J?')
+	      CALL RD_STORE_LOG(DO_T_AUTO,'DO_T_AUTO',L_FALSE,
+	1                  'Allow temperature to vary when sufficent convergence has been obtained?')
+	      CALL CLEAN_RD_STORE()
 	    CLOSE(UNIT=LUIN)
 	    NUM_ITS_TO_DO=NUM_ITS_TO_DO+(NUM_ITS_RD-I)
 	    IF(NUM_ITS_TO_DO .LE. 0)NUM_ITS_TO_DO=1
@@ -4313,6 +4324,7 @@
 	    END IF
 	    CLOSE(UNIT=LUSCR,STATUS='DELETE')
 	  END IF
+	  CALL TUNE(ITWO,'GIT')
 !
 !	  WRITE(6,*)'Inserted temporary fudge for FIXED_T'
 !	  FIXED_T=.TRUE.

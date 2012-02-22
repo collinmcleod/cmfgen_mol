@@ -203,7 +203,7 @@
 	      DO K=1,ND
 	        DO I=1,ATM(ID)%NXzV
 	          T1=DERIV_CONST
-	          J=ATM(ID)%EQXzV-1+ATM(ID)%F_TO_S_XzV(I)
+	          J=ATM(ID)%EQXzV-1+I                        !ATM(ID)%F_TO_S_XzV(I)
 	          IF(.NOT. OLD_LEV_POP_AVAIL(J))T1=0.0D0
 	          SE(ID)%BA(I,I,M,K)=SE(ID)%BA(I,I,M,K)-T1
 	        END DO		!loop over S.E. equation

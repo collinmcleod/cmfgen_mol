@@ -1,6 +1,6 @@
 	MODULE MOD_NON_THERM
 !
-        INTEGER, PARAMETER :: NKT=1000
+        INTEGER NKT
 !
 ! XKT contains the electroin energy in eV.
 ! dXKT is the quadrature weight for integrating over energy.

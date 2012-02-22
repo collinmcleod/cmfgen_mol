@@ -234,6 +234,7 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered: 28-Jan-2012 : Minor bug fix. dLOG_NU was being used with HOLLOW option when INIT was true.
 ! Altered: 25-Aug-2010 : Bug fix with IN_NBC_SAVE/ IN_HBC_SAVE. Both values
 !                          incorrectly set because of type'o.
 ! Altered: 17-Dec-2009 : Call changed: changed to V6
@@ -756,7 +757,6 @@
 	    FPLUS=KPLUS_IB/JPLUS_IB
 	    FMIN=KMIN_IB/JMIN_IB
 	    DTAU=0.5D0*(R(ND-1)-R(ND))*(CHI(ND)+CHI(ND-1))
-	    T1=CON_DELTA(ND)/dLOG_NU/CHI(ND)
 	    IF(INIT)THEN
 	      TA(ND)=-K_ON_J(ND-1)/DTAU
 	      TB(ND)=FMIN/DTAU + (1.0D0-FMIN)/R(ND)/CHI(ND) + HMIN
@@ -772,6 +772,7 @@
 !	      XM(ND)=XM(ND)+T1*T2*(RSQ_NP-IN_NBC_PREV)
 !	      XM(ND-1)=XM(ND-1)-RSQ_JP*TC(ND-1)
 !
+	      T1=CON_DELTA(ND)/dLOG_NU/CHI(ND)
 	      TA(ND)=-K_ON_J(ND-1)/DTAU
 	      TB(ND)=FMIN/DTAU + (1.0D0-FMIN)/R(ND)/CHI(ND) + HMIN*(1.0D0+T1)
 	      XM(ND)=RSQ_HP-FPLUS*RSQ_JP/DTAU- (1.0D0-FPLUS)*RSQ_JP/R(ND)/CHI(ND)

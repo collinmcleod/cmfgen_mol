@@ -90,7 +90,7 @@
 	  IF(K .NE. 0)THEN
 	    STORE(I)(1:K-1)=' '
 	    STORE(I)(1:1)='F'
-	    IF(VALUE)STORE(I)(1:)='T'
+	    IF(VALUE)STORE(I)(1:1)='T'
 	    EXIT
 	  END IF
 	END DO

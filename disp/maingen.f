@@ -1752,6 +1752,10 @@
 !
 	ELSE IF(XOPT .EQ. 'XROSS' .OR. XOPT .EQ. 'YROSS' .OR.
 	1                                 XOPT .EQ. 'GREY')THEN
+	  IF(ROSS_MEAN(1) .EQ. 0.0D0)THEN
+	    WRITE(T_OUT,*)'Rosseland mean opacity unavailabe'
+	    GOTO 1
+	  END IF
 	  DO I=1,ND
 	    CHIROSS(I)=CLUMP_FAC(I)*ROSS_MEAN(I)
 	  END DO
@@ -4501,6 +4505,22 @@
 	  END DO
 !
 ! 
+!
+	ELSE IF(XOPT .EQ. 'RNT')THEN
+	  DEFAULT='NON_THERM_SPEC_INFO'
+	  CALL USR_OPTION(FILENAME,'FILE',DEFAULT,'File name with fractional energies')
+	  CALL RD_NON_THERM_SPEC(YV,ZV,WV,ND,FILENAME,LU_IN,IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(T_OUT,*)'Error unable to open file. IOS=',IOS
+	    GOTO 1
+	  END IF
+!
+	  WRITE(T_OUT,'(A)')' '
+	  WRITE(T_OUT,'(A)')'Curve ordering is Felec, Fion, Fexec '
+	  CALL DP_CURVE(ND,XV,YV)
+	  CALL DP_CURVE(ND,XV,ZV)
+	  CALL DP_CURVE(ND,XV,WV)
+	  YAXIS='Channel fraction'
 !
 	ELSE IF(XOPT .EQ. 'PHOT')THEN
 	  CALL USR_OPTION(TEMP,'Nu','0.0','Input frequency (10^15)Hz')

@@ -246,9 +246,15 @@ C
 	    SCL_NT_ION_CROSEC=.FALSE.
 	    NT_OMIT_ION_SCALE=1.0D-03
 	    NT_OMIT_LEV_SCALE=1.0D-04
+	    NT_NKT=1000                 !Number of energy bins
+	    NT_EMAX=1000.0D0            !eV
+	    NT_EMIN=1.0D0               !ev
 	    NON_THERMAL_IT_CNTRL=1
 	    NT_SOURCE_TYPE='BELL_SHAPE'
 	    IF(TREAT_NON_THERMAL_ELECTRONS)THEN
+	      CALL RD_STORE_INT(NT_NKT,'NT_NKT',L_FALSE,'Number of energy bins')
+	      CALL RD_STORE_DBLE(NT_EMIN,'NT_EMIN',L_FALSE,'Minimum energy of non-thermal electrons in eV')
+	      CALL RD_STORE_DBLE(NT_EMAX,'NT_EMAX',L_FALSE,'Maximum energy of non-thermal electrons in eV')
 	      CALL RD_STORE_LOG(SCL_NT_CROSEC,'SCL_NT_CROSEC',L_FALSE,
 	1               'Scale the nonthermal excitation cross sections?')
 	      CALL RD_STORE_LOG(SCL_NT_ION_CROSEC,'SCL_NT_ION_CROSEC',L_FALSE,

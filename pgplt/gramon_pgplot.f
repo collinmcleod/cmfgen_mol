@@ -2057,6 +2057,31 @@ C
 	  IF(OP .GT. NPLTS)NPLTS=OP
 	  GOTO 1000
 !
+	ELSE IF (ANS .EQ. 'SUM')THEN
+	  CALL NEW_GEN_IN(IP,'Input plot 1?')
+	  OP=NPLTS+1
+	  CALL NEW_GEN_IN(OP,'Output plot?')
+	  TYPE_CURVE(OP)='L'
+	  IF(OP .NE. IP .AND. ASSOCIATED(CD(OP)%XVEC))THEN
+            DEALLOCATE (CD(OP)%XVEC)
+            DEALLOCATE (CD(OP)%DATA)
+          END IF
+          IF(.NOT. ASSOCIATED(CD(OP)%XVEC))THEN
+	    ALLOCATE (CD(OP)%XVEC(NPTS(IP)),STAT=IOS)
+            IF(IOS .EQ. 0)ALLOCATE (CD(OP)%DATA(NPTS(IP)),STAT=IOS)
+	  END IF
+          CD(OP)%DATA(1)=CD(IP)%DATA(1)
+          DO I=2,NPTS(IP)
+	    T2=CD(IP)%DATA(I)
+	    CD(OP)%DATA(I)=CD(OP)%DATA(I-1)+CD(IP)%DATA(I)
+	    T1=T2
+	  END DO
+	  IF(IP .NE. OP)CD(OP)%XVEC=CD(IP)%XVEC
+	  NPTS(OP)=NPTS(IP)
+	  ERR(OP)=.FALSE.
+	  IF(OP .GT. NPLTS)NPLTS=OP
+	  GOTO 1000
+!
 	ELSE IF(ANS .EQ. 'NM')THEN
 	  VAR_PLT1=1
 	  CALL NEW_GEN_IN(VAR_PLT1,'Reference plot for normalization (0 to norm to 1.0')

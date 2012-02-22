@@ -5,9 +5,9 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered 12-Feb-2-12 : Changed ordering of loops, split ionizations from excitations, and paralleized over depth.
 ! Created 16-Sep-2010
 !
-!        INTEGER NUM_IONS
         INTEGER NT
         INTEGER ND
 !
@@ -46,13 +46,9 @@
 !
 	INTEGER, PARAMETER :: LU_TH=8
 	INTEGER, PARAMETER :: LU_ER=6
-!	REAL*8, SAVE :: SCALE_FACTOR=1.0D0
 	REAL*8 DEC_NRG_SCL_FAC
 	REAL*8, PARAMETER :: Hz_to_eV=13.60D0/3.2897D0
 	REAL*8, PARAMETER :: Hz_to_erg=6.6261965D-12
-!
-        OPEN(UNIT=LU_TH,FILE='NON_THERM_SPEC_INFO',STATUS='UNKNOWN',POSITION='APPEND')
-!        CALL SET_LINE_BUFFERING(LU_TH)
 !
 	LOCAL_ION_HEATING=0.0D0
 	LOCAL_EXC_HEATING=0.0D0
@@ -66,7 +62,6 @@
         SCALE=1.0D+10/4.0D0/PI
         STEQ_T=STEQ_T+SCALE*RADIOACTIVE_DECAY_ENERGY   !*FRAC_ELEC_HEATING
         dE_RAD_DECAY=RADIOACTIVE_DECAY_ENERGY
-!	RADIOACTIVE_DECAY_ENERGY_eV=SCALE_FACTOR*RADIOACTIVE_DECAY_ENERGY/ELECTRON_VOLT()
 	RADIOACTIVE_DECAY_ENERGY_eV=DEC_NRG_SCL_FAC*RADIOACTIVE_DECAY_ENERGY/ELECTRON_VOLT()
 !
 	DO I=1,NUM_IONS
@@ -75,41 +70,23 @@
 	  ATM(I)%NT_ION_CXzV(:)=0.0D0
 	  ATM(I)%NT_EXC_CXzV(:)=0.0D0
 	END DO
-	write(lu_th,*)''
-	write(lu_th,'(X,A5,6(A12))')'Depth','Ne(NT)','Ne','Ne(NT)/Ne','Ek(NT)','Ek','Ek(NT)/Ek'
-	DO DPTH_INDX=1,ND
-!
-! Estimate number of non-thermal electrons.
-!
-	  T1=0.0D0
-	  T2=0.0D0
-	  DO IKT=1,NKT
-	    T1=T1+YE(IKT,DPTH_INDX)*dXKT(IKT)/SQRT(XKT(IKT))
-	    T2=T2+XKT(IKT)*YE(IKT,DPTH_INDX)*dXKT(IKT)/SQRT(XKT(IKT))
-	  END DO
-	  T1=T1*SQRT(0.5D0*9.109389D-28/1.602177D-12)*RADIOACTIVE_DECAY_ENERGY_eV(DPTH_INDX)
-	  T2=T2*SQRT(0.5D0*9.109389D-28/1.602177D-12)*RADIOACTIVE_DECAY_ENERGY_eV(DPTH_INDX)
-	  write(lu_th,'(x,i5,6es12.4)')dpth_indx,T1,ED(DPTH_INDX),T1/ED(DPTH_INDX),             &
-	                             T2,1.5D0*8.617343D-5*ED(DPTH_INDX)*T(DPTH_INDX)*1.0d4,   &
-	                             T2/(1.5D0*8.617343D-5*ED(DPTH_INDX)*T(DPTH_INDX)*1.0d4)   
-!	  WRITE(LU_TH,'(A,I3,A,2ES12.4)')' Non-thermal and thermal electron densities at depth',  &
-!	          DPTH_INDX,' are:',T1,ED(DPTH_INDX)
-!	  WRITE(LU_TH,'(A,I3,A,2ES12.4)')' Non-thermal and thermal electron energies(eV) at depth ', &
-!	          DPTH_INDX,' are: ',T2,1.5D0*8.617343D-5*ED(DPTH_INDX)*T(DPTH_INDX)
 !
 ! Compute the ionization contribution
 !
-	  IF (INCLUDE_NON_THERM_IONIZATION) THEN
+	IF (INCLUDE_NON_THERM_IONIZATION) THEN
 !
 ! Loop over different ionization routes.
 !
-	    DO IT=1,NUM_THD
+	  DO IT=1,NUM_THD
+	    ID=THD(IT)%LNK_TO_ION
+	    ISPEC=THD(IT)%LNK_TO_SPECIES
+	    IKT_ST=GET_INDX_DP(THD(IT)%ION_POT,XKT,NKT)
+!
+!$OMP PARALLEL DO PRIVATE(DPTH_INDX,IKT,RATE,SE_ION_LEV,GUPPER,ION_EXC_EN,NL_F,NUP_F,NL,NUP,T1,I,J)
+	    DO DPTH_INDX=1,ND
 !
 ! Get the total excitation route. We ignore slight differences in IP.
 !
-	      ID=THD(IT)%LNK_TO_ION
-	      ISPEC=THD(IT)%LNK_TO_SPECIES
-	      IKT_ST=GET_INDX_DP(THD(IT)%ION_POT,XKT,NKT)
 	      RATE = 0.0D0
 	      DO IKT=IKT_ST,NKT
 	        RATE = RATE + YE(IKT,DPTH_INDX)*dXKT(IKT)*THD(IT)%CROSS_SEC(IKT)
@@ -117,30 +94,29 @@
 	      RATE=RATE*RADIOACTIVE_DECAY_ENERGY_eV(DPTH_INDX)
 !
 	      DO J=1,THD(IT)%N_ION_ROUTES
-	         IF(ID .EQ. SPECIES_END_ID(ISPEC)-1)THEN
-                   SE_ION_LEV=ATM(ID)%NXzV+1
-	           GUPPER=THD(IT)%SUM_GION
-	           ION_EXC_EN=0.0D0
-	         ELSE
-	           NUP_F=THD(IT)%ION_LEV(J); NUP=ATM(ID+1)%F_TO_S_XzV(NUP_F)
-                   SE_ION_LEV=SE(ID)%ION_LEV_TO_EQ_PNT(NUP)
-	           GUPPER=ATM(ID+1)%GXzV_F(NUP_F)
-                   SE_ION_LEV=ATM(ID)%NXzV+1               !NUP -- assume all to ground state at  present.
-	           ION_EXC_EN=0.0D0                        !=ATM(ID+1)%EDGEXzV_F(1)-ATM(ID+1)%EDGEXzV_F(NUP_F)
-	         END IF
-	         DO I=1,THD(IT)%N_STATES
-	           NL_F=THD(IT)%ATOM_STATES(I); NL=ATM(ID)%F_TO_S_XzV(NL_F)
-	           T1=RATE*ATM(ID)%XzV_F(NL_F,DPTH_INDX)*GUPPER/THD(IT)%SUM_GION
-	           ATM(ID)%NTIXzV(DPTH_INDX)=ATM(ID)%NTIXzV(DPTH_INDX)+T1             ! non-thermal rates?
-!	           ATM(ID+1)%NTIXzV(DPTH_INDX)=ATM(ID+1)%NTIXzV(DPTH_INDX)-T1         ! non-thermal rates?
-	           ATM(ID)%NTCXzV(DPTH_INDX)=ATM(ID)%NTCXzV(DPTH_INDX)  &
+	        IF(ID .EQ. SPECIES_END_ID(ISPEC)-1)THEN
+                  SE_ION_LEV=ATM(ID)%NXzV+1
+	          GUPPER=THD(IT)%SUM_GION
+	          ION_EXC_EN=0.0D0
+	        ELSE
+	          NUP_F=THD(IT)%ION_LEV(J); NUP=ATM(ID+1)%F_TO_S_XzV(NUP_F)
+                  SE_ION_LEV=SE(ID)%ION_LEV_TO_EQ_PNT(NUP)
+	          GUPPER=ATM(ID+1)%GXzV_F(NUP_F)
+                  SE_ION_LEV=ATM(ID)%NXzV+1               !NUP -- assume all to ground state at  present.
+	          ION_EXC_EN=0.0D0                        !=ATM(ID+1)%EDGEXzV_F(1)-ATM(ID+1)%EDGEXzV_F(NUP_F)
+	        END IF
+	        DO I=1,THD(IT)%N_STATES
+	          NL_F=THD(IT)%ATOM_STATES(I); NL=ATM(ID)%F_TO_S_XzV(NL_F)
+	          T1=RATE*ATM(ID)%XzV_F(NL_F,DPTH_INDX)*GUPPER/THD(IT)%SUM_GION
+	          ATM(ID)%NTIXzV(DPTH_INDX)=ATM(ID)%NTIXzV(DPTH_INDX)+T1             ! non-thermal rates?
+	          ATM(ID)%NTCXzV(DPTH_INDX)=ATM(ID)%NTCXzV(DPTH_INDX)  &
 	                          +Hz_to_erg*T1*(ATM(ID)%EDGEXzV_F(NL_F)+ION_EXC_EN)  ! non-thermal cooling?
-	           SE(ID)%STEQ(NL,DPTH_INDX)=SE(ID)%STEQ(NL,DPTH_INDX)-T1
-	           SE(ID)%STEQ(SE_ION_LEV,DPTH_INDX)=SE(ID)%STEQ(SE_ION_LEV,DPTH_INDX)+T1
-	           LOCAL_ION_HEATING(DPTH_INDX)=LOCAL_ION_HEATING(DPTH_INDX)+ T1*(ATM(ID)%EDGEXzV_F(NL_F)+ION_EXC_EN)
-	           ATM(ID)%NT_ION_CXzV(DPTH_INDX)=ATM(ID)%NT_ION_CXzV(DPTH_INDX) &
+	          SE(ID)%STEQ(NL,DPTH_INDX)=SE(ID)%STEQ(NL,DPTH_INDX)-T1
+	          SE(ID)%STEQ(SE_ION_LEV,DPTH_INDX)=SE(ID)%STEQ(SE_ION_LEV,DPTH_INDX)+T1
+	          LOCAL_ION_HEATING(DPTH_INDX)=LOCAL_ION_HEATING(DPTH_INDX)+ T1*(ATM(ID)%EDGEXzV_F(NL_F)+ION_EXC_EN)
+	          ATM(ID)%NT_ION_CXzV(DPTH_INDX)=ATM(ID)%NT_ION_CXzV(DPTH_INDX) &
 	                          +Hz_to_eV*T1*(ATM(ID)%EDGEXzV_F(NL_F)+ION_EXC_EN)
-	         END DO
+	        END DO
 	      END DO
 !
 ! NB:  XzV_F= XzV  (XzVLTE_F/XzVLTE)
@@ -166,16 +142,21 @@
 	        END DO
 	      END IF
 !
-	    END DO			!Ionization species/route
-	  END IF			!Include ioizations?
+	    END DO   		!Loop over depth
+!$OMP END PARALLEL DO
+	  END DO		!Ionization species/route
+	END IF			!Include ionizations?
 !
-	  IF(INCLUDE_NON_THERM_EXCITATION)THEN
-	    DO ID=1,NUM_IONS
-	      IF(ATM(ID)%XzV_PRES)THEN
+!
+!
+	IF(INCLUDE_NON_THERM_EXCITATION)THEN
+	  DO ID=1,NUM_IONS
+	    IF(ATM(ID)%XzV_PRES)THEN
+!$OMP PARALLEL DO PRIVATE (DPTH_INDX,I,J,NL_F,NUP_F,NL,NUP,RATE,T1,T2)
+	      DO DPTH_INDX=1,ND
 	        DO J=2,ATM(ID)%NXzV_F
 	          DO I=1,MIN(10,J-1)
 	            NL_F=I; NUP_F=J
-!	            CALL TOTAL_BETHE_RATE(RATE,NL_F,NUP_F,YE,XKT,dXKT,NKT,FAST_BETHE_METHOD,ID,DPTH_INDX,ND)
 	            CALL TOTAL_BETHE_RATE_V3(RATE,NL_F,NUP_F,YE,XKT,dXKT,NKT,ID,DPTH_INDX,ND)
 	            NUP=ATM(ID)%F_TO_S_XzV(NUP_F)
 !
@@ -199,11 +180,33 @@
 	                  +Hz_to_eV*T1*(ATM(ID)%EDGEXzV_F(NL_F)-ATM(ID)%EDGEXzV_F(NUP_F))
 	          END DO
 	        END DO
-	      END IF
-	    END DO			!Loop over ionization stage
-	  END IF			!Include excitations?
+	      END DO 		!Loop over depth
+!$OMP END PARALLEL DO
+	    END IF
+	  END DO		!Loop over ionization stage
+	END IF			!Include excitations?
 !
-	END DO 		!loop over depth
+
+        OPEN(UNIT=LU_TH,FILE='NON_THERM_SPEC_INFO',STATUS='UNKNOWN',POSITION='APPEND')
+        CALL SET_LINE_BUFFERING(LU_TH)
+!
+! Estimate number of non-thermal electrons.
+!
+	WRITE(LU_TH,*)''
+	WRITE(LU_TH,'(X,A5,6(A12))')'Depth','Ne(NT)','Ne','Ne(NT)/Ne','Ek(NT)','Ek','Ek(NT)/Ek'
+	DO DPTH_INDX=1,ND
+	  T1=0.0D0
+	  T2=0.0D0
+	  DO IKT=1,NKT
+	    T1=T1+YE(IKT,DPTH_INDX)*dXKT(IKT)/SQRT(XKT(IKT))
+	    T2=T2+XKT(IKT)*YE(IKT,DPTH_INDX)*dXKT(IKT)/SQRT(XKT(IKT))
+	  END DO
+	  T1=T1*SQRT(0.5D0*9.109389D-28/1.602177D-12)*RADIOACTIVE_DECAY_ENERGY_eV(DPTH_INDX)
+	  T2=T2*SQRT(0.5D0*9.109389D-28/1.602177D-12)*RADIOACTIVE_DECAY_ENERGY_eV(DPTH_INDX)
+	  WRITE(LU_TH,'(X,I5,6ES12.4)')DPTH_INDX,T1,ED(DPTH_INDX),T1/ED(DPTH_INDX),             &
+	                             T2,1.5D0*8.617343D-5*ED(DPTH_INDX)*T(DPTH_INDX)*1.0D4,   &
+	                             T2/(1.5D0*8.617343D-5*ED(DPTH_INDX)*T(DPTH_INDX)*1.0D4)   
+	END DO
 !
 	WRITE(LU_TH,'(//,A)')'Comparison of heating fractions (SE as evaluated in SE_BA_NON_THERM)'
 	WRITE(LU_TH,'(//,A,9(3X,A))')       &
@@ -226,8 +229,6 @@
 	               Hz_TO_eV*LOCAL_ION_HEATING(I)+Hz_TO_eV*LOCAL_EXC_HEATING(I)
 	END DO
 	CLOSE(LU_TH)
-!
-!	SCALE_FACTOR=MIN(SCALE_FACTOR*10.0D0, 1.0D0)
 	WRITE(6,*)'Scale factor is ',DEC_NRG_SCL_FAC
 !
 	RETURN

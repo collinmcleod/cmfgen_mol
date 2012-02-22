@@ -24,6 +24,7 @@ FN6=$(LIB_DIR)lib$(LN6).a
 EXE  = $(EXE_DIR)plt_jh.exe\
        $(EXE_DIR)plt_jh_cur.exe\
        $(EXE_DIR)plt_ip.exe\
+       $(EXE_DIR)plt_dfr.exe\
        $(EXE_DIR)plt_phot_raw.exe\
        $(EXE_DIR)plt_rj.exe\
        $(EXE_DIR)plt_scr.exe\
@@ -67,6 +68,12 @@ $(EXE_DIR)plt_ip.exe : plt_ip.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
              -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
                $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)plt_ip.exe
+
+$(EXE_DIR)plt_dfr.exe : plt_dfr.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
+	$(F90) plt_dfr.o \
+             -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
+               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
+              -o $(EXE_DIR)plt_dfr.exe
 
 $(EXE_DIR)plt_phot_raw.exe : plt_phot_raw.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
 	$(F90) plt_phot_raw.o \

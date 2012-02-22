@@ -135,6 +135,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(newvkimd.o)\
       $(LIB)(newwmat.o)\
       $(LIB)(ngaccel.o)\
+      $(LIB)(ngaccel_arb_ord.o)\
       $(LIB)(nordangqw.o)\
       $(LIB)(nordflux.o)\
       $(LIB)(nordtau.o)\
