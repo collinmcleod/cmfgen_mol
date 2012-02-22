@@ -92,6 +92,7 @@
 	CHARACTER(LEN=40) TMP_NAME
 !
 !
+	INJECT_DIRAC_AT_EMAX=.FALSE.
 	IF(NT_SOURCE_TYPE(1:12) .EQ. 'INJECT_DIRAC')THEN
 	  INJECT_DIRAC_AT_EMAX=.TRUE.
 	ELSE IF (NT_SOURCE_TYPE .EQ. 'CONSTANT')THEN
@@ -204,6 +205,7 @@
 	SOURCE=0.0D0
 	IF (INJECT_DIRAC_AT_EMAX) THEN ! zero otherwise
 	  E_INIT = XKT_MAX
+	  WRITE(LU_TH,*)'Using Dirac delta function injection'
 	ELSE
 	  T1 = 0.0D0
 	  T2 = DELTA_ENR_SOURCE
@@ -214,6 +216,7 @@
 	        T1 = T1 + SOURCE(IKT)*dXKT(IKT)
               END IF
 	    END DO
+	    WRITE(LU_TH,*)'Using constant for electron injection'
 	  ELSE IF(SOURCE_TYPE .EQ. 'BELL_SHAPE')THEN
 	    DO IKT=1,NKT
 	      IF (XKT(IKT) .GE. (XKT_MAX-T2)) THEN
@@ -221,6 +224,7 @@
 	        T1 = T1 + SOURCE(IKT)*dXKT(IKT)
               END IF
 	    END DO
+	    WRITE(LU_TH,*)'Using BELL_SHAPE for electron injection'
           END IF
 	  SOURCE(:) = SOURCE(:) / T1
 !
