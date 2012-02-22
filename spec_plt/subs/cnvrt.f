@@ -45,8 +45,8 @@ C
 	    DO I=1,NBB
 	      YV(I)=T1*YV(I)*XV(I)*XV(I)
 	    END DO
-	    Y_LAB='F\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)' 
-	    IF(LOG_Y)Y_LAB='Log F\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)' 
+	    Y_LAB='F\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A\u-1\d)' 
+	    IF(LOG_Y)Y_LAB='Log F\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A\u-1\d)'
 	  ELSE IF(Y_PLT_OPT .EQ. 'FNU')THEN
 	    Y_LAB='F\d\gn\u(Jy)'
 	    IF(LOG_Y)Y_LAB='Log F\d\gn\u(Jy)'
