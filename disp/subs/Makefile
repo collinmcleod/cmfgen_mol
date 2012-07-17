@@ -51,7 +51,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(writscrat.o)\
       $(LIB)(wr_col.o)\
       $(LIB)(wr_col_rates.o)\
-      $(LIB)(wr_spec_sum.o)\
+      $(LIB)(wr_spec_sum_v2.o)\
       $(LIB)(wr_crit.o)\
       $(LIB)(xvecfeau.o)
 
@@ -65,9 +65,9 @@ $(LIB)(%.o) : %.f
 	$(F90) -c $(FG)  $<
 	ar ruv $(LIB) $*.o
 
-$(LIB)(wr_spec_sum.o) : wr_spec_sum.f ../mod_disp.o 
-	$(F90) -c  $(FG) -I../ wr_spec_sum.f
-	ar ruv $(LIB) wr_spec_sum.o
+$(LIB)(wr_spec_sum_v2.o) : wr_spec_sum_v2.f ../mod_disp.o 
+	$(F90) -c  $(FG) -I../ wr_spec_sum_v2.f
+	ar ruv $(LIB) wr_spec_sum_v2.o
 
 # 
 # Specific dependency of source files which uses external 

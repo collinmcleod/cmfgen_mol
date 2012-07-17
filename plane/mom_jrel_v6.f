@@ -620,6 +620,10 @@
 ! Compute optical depth scales.
 !
 	TA(1:ND)=CHI_H(1:ND)*Q(1:ND)
+	DO I=1,ND
+	  IF(TA(I) .LT. 0.0D0)TA(I)=0.1D0*ABS(TA(I))
+	  IF(TA(I) .EQ. 0.0D0)TA(I)=0.1D0*ABS(TA(I-1))
+	END DO
 	CALL DERIVCHI(TB,TA,R,ND,METHOD)
 	CALL NORDTAU(DTAU_H,TA,R,R,TB,ND)
 !

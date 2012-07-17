@@ -1262,6 +1262,17 @@
 	  XAXIS='Mass Fraction'
 	  XAXSAV=XAXIS
 !
+	ELSE IF(XOPT .EQ. 'XFLUX')THEN
+	    DO I=1,ND
+	      TA(I)=ABS(CLUMP_FAC(I)*FLUX_MEAN(I))
+	    END DO
+	    CALL TORSCL(TB,TA,R,XM,TC,ND,METHOD,TYPE_ATM)
+	    WRITE(T_OUT,*)'Flux mean opacity set positive'
+	    WRITE(T_OUT,*)'Flux optical depth is : ',TB(ND)
+	    XV(1:ND)=LOG10(TB(1:ND))
+	    XAXIS='Log(\gt\dFlux\u)'
+	    XAXSAV=XAXIS
+!
 	ELSE  IF(XOPT .EQ. 'XTAUC')THEN
 	  IF(.NOT. ELEC)THEN
 	    DO I=1,ND
@@ -1284,9 +1295,15 @@
 	  XAXIS='Log(t)'
 !
 	ELSE IF(XOPT .EQ. 'SET-ATM')THEN
-	  CALL USR_OPTION(TYPE_ATM,'ATM',' ','Type of atmosphere: EXP or WIND')
+	  CALL USR_OPTION(TYPE_ATM,'ATM',' ','Type of atmosphere: EXP, WIND or POW')
 	  TYPE_ATM=UC(TYPE_ATM)
-	  IF(TYPE_ATM .NE. 'EXP')THEN
+	  IF(TYPE_ATM .EQ. 'EXP')THEN
+	  ELSE IF(TYPE_ATM .EQ. 'POW')THEN
+	    TYPE_ATM='P'
+	    T1=LOG(MASS_DENSITY(5)/MASS_DENSITY(1))/LOG(R(1)/R(5))
+	    WRITE(TYPE_ATM(2:6),'(F5.2)')T1
+	    WRITE(6,'(A,F5.2)')'Density exponent for atmospheres is ',T1
+	  ELSE
 	    TYPE_ATM=' '
 	    WRITE(T_OUT,*)'Atmosphere is assumed to have a wind'
 	  ENDIF
@@ -1764,7 +1781,7 @@
 	  WRITE(T_OUT,*)'Rossland optical depth is : ',TAUROSS(ND)
 !
 ! 
-	  IF(X .EQ. 'XROSS')THEN
+	  IF(XOPT .EQ. 'XROSS')THEN
 	    DO I=1,ND
 	      XV(I)=LOG10(TAUROSS(I))
 	    END DO
@@ -2005,15 +2022,11 @@
 ! ****************************************************************************
 ! ****************************************************************************
 !
-	ELSE IF(XOPT .EQ. 'YFLUX)')THEN
+	ELSE IF(XOPT .EQ. 'YFLUX')THEN
 	  DO I=1,ND
-	    TA(I)=CLUMP_FAC(I)*FLUX_MEAN(I)
+	    TA(I)=ABS(CLUMP_FAC(I)*FLUX_MEAN(I))
 	  END DO
-	  IF(MINVAL(TA(1:ND)) .LE. 0)THEN
-	    CALL TORSCL(TB,TA,R,TB,TC,ND,'ZERO',TYPE_ATM)
-	  ELSE
-	    CALL TORSCL(TB,TA,R,TB,TC,ND,METHOD,TYPE_ATM)
-	  END IF
+	  CALL TORSCL(TB,TA,R,XM,TC,ND,METHOD,TYPE_ATM)
 	  WRITE(T_OUT,*)'Flux optical depth is : ',TB(ND)
 !
 	  DO I=1,ND
@@ -2024,7 +2037,7 @@
 	    END IF
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
-	  YAXIS='\gt(Flux)'
+	  YAXIS='Log \gt(Flux)'
 !
 	ELSE IF(XOPT .EQ. 'ROSS')THEN
 	  WRITE(T_OUT,*)'Volume filling factor not allowed for.'
@@ -2557,7 +2570,7 @@
 	  END IF
 !
 	  IF(XSPEC .EQ. 'ALL')THEN
-	    CALL WR_SPEC_SUM(ELEC,FLAG,ND)
+	    CALL WR_SPEC_SUM_V2(ELEC,FLAG,XV,ND)
 	  ELSE IF(.NOT. FOUND)THEN
 	    WRITE(T_OUT,*)'Error --- unrecognized species'
 	  END IF
@@ -3026,7 +3039,7 @@
 	    DO I=1,ND
 	      YV(I)=DLOG10(ETA_WITH_ES(I)/CHI(I))
 	    END DO
-	    YAXIS='J\dc\u/S'
+	    YAXIS='S'
 	  ELSE
 	    DO I=1,ND
 	      YV(I)=DLOG10( RJ(I)*
@@ -3192,13 +3205,17 @@
             CLOSE(UNIT=18)
 !
 ! S1 is the continuum flux in Jy for an object at 1kpc.
-! EW is the line equivalent width in Angstroms.
+! T1 is the line equivalent width in Angstroms.
+! T3 is the line flux in ergs/cm^2/s
 !
 	    T2=LAMVACAIR(FREQ)		!Wavelength(Angstroms)
-	    WRITE(T_OUT,40008)T1,S1,T2
-	    WRITE(LU_NET,40008)T1,S1,T2
-40008	    FORMAT(1X,'EW =',1PE10.3,' Ang',5X,'I =',E10.3,' Jy',5X,
-	1             'Lambda =',E11.4,' Ang')
+	    T3=T1*S1*1.0D-23*FREQ*1.0D+15/T1
+	    WRITE(LU_NET,40008)T1,S1,T2,T3
+	    WRITE(T_OUT,'(A)')RED_PEN
+	    WRITE(T_OUT,40008)T1,S1,T2,T3
+40008	    FORMAT(1X,'EW =',ES10.3,' Ang',5X,'I =',ES10.3,' Jy',5X,
+	1             'Lambda =',ES11.4,' Ang',5X,'Line flux=',ES10.3,' ergs/cm^2/s')
+	    WRITE(T_OUT,'(A)')DEF_PEN
 	  END IF
 !
 ! 
@@ -3243,15 +3260,28 @@
 !
 ! Assumes line opacity and emissivity have been computed in the set up.
 !
-	  DO I=1,ND
-	    IF(CHIL(I).LT. 1.0D-30)THEN
-	      YV(I)=-30
-	    ELSE
-	      YV(I)=DLOG10( ETAL(I)/CHIL(I) )
-	    END IF
-	  END DO
-	  CALL DP_CURVE(ND,XV,YV)
-	  YAXIS='S'
+	  CALL USR_OPTION(ELEC,'LIN','T','Plot S instead of Log S')
+	  IF(ELEC)THEN
+	    DO I=1,ND
+	      IF( ABS(CHIL(I)) .LT. 1.0D-50)THEN
+	         YV(I)=-30
+	      ELSE
+	        YV(I)=ETAL(I)/CHIL(I)
+	      END IF
+	    END DO
+	    CALL DP_CURVE(ND,XV,YV)
+	    YAXIS='S'
+	  ELSE
+	    DO I=1,ND
+	      IF(CHIL(I).LT. 1.0D-30)THEN
+	         YV(I)=-30
+	      ELSE
+	        YV(I)=DLOG10( ETAL(I)/CHIL(I) )
+	      END IF
+	    END DO
+	    CALL DP_CURVE(ND,XV,YV)
+	    YAXIS='Log S'
+	  END IF
 ! 
 !
 
@@ -3531,7 +3561,7 @@
 	  J=0
 	  FOUND=.FALSE.
 	  DO ID=1,NUM_IONS
-	    IF(ATM(ID)%XzV_PRES)THEN
+	    IF(ATM(ID)%XzV_PRES .AND. (XSPEC .EQ. UC(ION_ID(ID)) .OR. XSPEC .EQ. 'ALL') )THEN
 	      DO NL=1,ATM(ID)%NXzV_F
 	        DO NUP=NL+1,ATM(ID)%NXzV_F
 	          FREQ=ATM(ID)%EDGEXzV_F(NL)-ATM(ID)%EDGEXzV_F(NUP)
@@ -4835,6 +4865,7 @@ c
 !
 ! We subtract 10 to put CHI in units of cm-1
 !
+	    WRITE(6,*)'Warning: The plotted CHI has units of cm^-1 - not program units'
 	    DO I=1,ND
 	      YV(I)=DLOG10(CHI(I))-10.0
 	    END DO
@@ -5187,10 +5218,14 @@ c
 !
 ! S1 is the continuum flux in Jy for an object at 1kpc.
 ! T1 is the line equivalent width in Angstroms.
+! T3 is the line flux in ergs/cm^2/s
 !
 	  T2=LAMVACAIR(FREQ)		!Wavelength(Angstroms)
-	  WRITE(T_OUT,40008)T1,S1,T2
-	  WRITE(LU_NET,40008)T1,S1,T2
+	  T3=T1*S1*1.0D-23*FREQ*1.0D+15/T1
+	  WRITE(LU_NET,40008)T1,S1,T2,T3
+	  WRITE(T_OUT,'(A)')RED_PEN
+	  WRITE(T_OUT,40008)T1,S1,T2,T3
+	  WRITE(T_OUT,'(A)')DEF_PEN
 !
 	  CALL USR_OPTION(ELEC,'PLOT','F','PLot Line Origin?')
 !
@@ -5322,19 +5357,36 @@ c
 !
 ! Assumes V_D=10kms.
 !
+	  CALL USR_OPTION(ELEC,'KAPPA','T','Plot kappa insted of chi?')
 	  WRITE(6,*)'A Doppler velocity of 10 km/s is assumed'
-	  T1=DLOG10(1.6914D-11/FREQ)
-	  DO I=1,ND
-	    IF(CHIL(I) .GT. 0)THEN
-	      YV(I)=T1+DLOG10(CHIL(I))
-	    ELSE IF(CHIL(I) .LT. 0)THEN
-	      YV(I)=T1+DLOG10(-CHIL(I))-20.0D0
-	    ELSE
-	      YV(I)=-30.0
+	  WRITE(6,*)'Warning: CHIL now has units of cm^-1 - not program units'
+	  IF(ELEC)THEN
+	    T1=1.6914D-21/FREQ
+	    YV(1:ND)=T1*CHIL(1:ND)/MASS_DENSITY(1:ND)/CLUMP_FAC(1:ND)
+	    YAXIS='\gk(cm\u3 \d/g)'
+	    CALL DP_CURVE(ND,XV,YV)
+	  ELSE
+	    VALID_VALUE=.TRUE.
+	    ZV(1:ND)=0.0D0; YV(1:ND)=0.0D0
+	    T1=DLOG10(1.6914D-11/FREQ)-10.0D0
+	    DO I=1,ND
+	      IF(CHIL(I) .GT. 0)THEN
+	        YV(I)=T1+DLOG10(CHIL(I))
+	      ELSE IF(CHIL(I) .LT. 0)THEN
+	        ZV(I)=T1+DLOG10(-CHIL(I))
+	        VALID_VALUE=.FALSE.
+	      ELSE
+	        YV(I)=-30.0
+	      END IF
+	    END DO
+	    YAXIS='Log \gx\dL\u(cm\u-1\d)'
+	    CALL DP_CURVE(ND,XV,YV)
+	    IF(.NOT. VALID_VALUE)THEN
+	      WRITE(6,*)'Warning -- negative line opacities'
+	      WRITE(6,*)'Sending to data plots to DURVE - use MARK to illustrate'
+	      CALL DP_CURVE(ND,XV,ZV)
 	    END IF
-	  END DO
-	  YAXIS='\gx\dL\u'
-	  CALL DP_CURVE(ND,XV,YV)
+	  END IF
 ! 
 !
 ! Write out line/continuum opacities and emissivities for use with

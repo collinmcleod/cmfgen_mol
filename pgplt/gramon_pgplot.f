@@ -247,6 +247,7 @@
 	SAVE FSTOPEN,PEN_COL,DASH,PRINTER
 	SAVE MARGINX,MARGINY
 	SAVE PLT_LINE_WGT
+	SAVE LINE_WGT 
 	DATA FSTOPEN,DASH,PRINTER/.TRUE.,.FALSE.,'FIRST'/
 	DATA PLT_LINE_WGT/1/
 	DATA HARD_FMT_STR/'_1'/
@@ -293,6 +294,7 @@
 	  TICK_FAC_SCALE=1.5D0
 	  PLT_LINE_WGT=1
           PLT_ST_FILENAME=' '
+	  LINE_WGT(:)=1
 	END IF
 	TITLE(1:N_TITLE)=' '
 !
@@ -340,7 +342,6 @@
 !
 ! Define default line representations (initially not dashed)
 !
-	LINE_WGT(:)=1
 	DO I=1,MAX_PLTS
 	  LINE_STYLE(I)=1
 	  MARKER_STYLE(I)=MOD(I,5)
@@ -724,6 +725,7 @@ C left hand axis. As this is primary for pretty plots, the options are less
 C powerful than for the left axis.
 C
 	  NORMAL_R_Y_AXIS=.TRUE.
+	  WRITE(T_OUT,'(A)')' Set Y_AX to R to use with right axis'
 	  DO IP=1,NPLTS
 	    WRITE(T_OUT,'(I3,'' : '',$)')IP
 	    CALL NEW_GEN_IN(WHICH_Y_AX(IP),'Y_AX=')
@@ -2251,7 +2253,8 @@ C
 !
 	CALL PGSCH(RONE)
 	CALL PGQCS(IFOUR,XCHAR_SIZE,YCHAR_SIZE)
-	T1=ABS(YPAR(2)-YPAR(1))/YCHAR_SIZE/35.0
+!	T1=ABS(YPAR(2)-YPAR(1))/YCHAR_SIZE/35.0
+	T1=(YPAR(2)-YPAR(1))/YCHAR_SIZE/35.0
 	EXPCHAR=EXPCHAR_SCALE*T1
 	EXPMARK=EXPMARK_SCALE*T1
 	TICK_FAC=TICK_FAC_SCALE*T1

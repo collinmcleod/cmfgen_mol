@@ -262,8 +262,9 @@
 	  CALL GEN_IN(IVAR,'Variable?')
 	  DO J=ND_ST,ND_END
 	    T1=(RDPOPS(IVAR,J,2)-RDPOPS(IVAR,J,3))/(RDPOPS(IVAR,J,1)-RDPOPS(IVAR,J,2))
-	    WRITE(6,*)'r1=',T1
-	    IF(T1 .GT. 0)THEN
+	    WRITE(6,*)'r1=',T1,'Depth=',J
+	    IF(T1 .GT. 1.0)THEN
+	      IF(T1 .LT. 1.05D0)T1=1.05
 	      DO I=1,NT
 	        T2=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/(T1-1.0D0)
 	        IF(T2 .GT. RDPOPS(I,J,1))T2=RDPOPS(I,J,1)

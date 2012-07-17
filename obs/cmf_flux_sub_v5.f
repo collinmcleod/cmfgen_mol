@@ -57,8 +57,8 @@
 ! computational efort. An error message will be printed if these values
 ! are too small.
 !
-	INTEGER, PARAMETER :: NLINES_PROF_STORE=60
-        INTEGER, PARAMETER :: NFREQ_PROF_STORE=7000
+	INTEGER, PARAMETER :: NLINES_PROF_STORE=500
+        INTEGER, PARAMETER :: NFREQ_PROF_STORE=20000
 C
 	INTEGER NCF
 	INTEGER ND,NC,NP

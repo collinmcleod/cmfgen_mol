@@ -124,6 +124,7 @@
 !
 	INTEGER LEN_DIR
 	CHARACTER(LEN=80) DIR_NAME
+	CHARACTER(LEN=100) HELP_FILE
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
@@ -246,6 +247,15 @@
 	ELSE
 	   ZM(ID)%DATA_TYPE='UNKNOWN'
 	END IF
+100	CALL GEN_IN(ZM(ID)%DATA_TYPE,'Default data type is')
+	IF( ZM(ID)%DATA_TYPE .NE. 'J' .AND.
+	1   ZM(ID)%DATA_TYPE .NE. 'H' .AND.
+	1   ZM(ID)%DATA_TYPE .NE. 'M(t)' .AND.
+	1   ZM(ID)%DATA_TYPE .NE. 'ETA' .AND.
+	1   ZM(ID)%DATA_TYPE .NE. 'CHI')THEN
+	   WRITE(6,*)'Invalid data type: Valid types are J, H, M(t), ETA and CHI'
+	   GOTO 100
+	END IF
 !
 !
 !
@@ -323,6 +333,16 @@
 	   CALL TORSCL(TAU_ES,TA,R,TB,TC,ND_ATM,METHOD,TYPE_ATM)
 	 ELSE
 
+	 END IF
+	 IF(ZM(1)%DATA_TYPE .EQ. 'H' .AND.  ND .EQ. ZM(1)%ND)THEN
+	   DO ML=1,NCF
+	     DO I=1,ND
+	       ZM(ID)%RJ(I,ML)=ZM(ID)%RJ(I,ML)/R(I)/R(I)
+	     END DO
+	   END DO
+	 ELSE IF(ZM(1)%DATA_TYPE .EQ. 'H')THEN
+	   WRITE(6,*)'Unable to comput H from R^2.H since R non-matching R grid'
+	   WRITE(6,*)'Be warned -- quantities may contain an extra factor of R^2'
 	 END IF
 !
 ! 
@@ -497,6 +517,25 @@
 	  ELSE
 	    ZM(ID)%DATA_TYPE='UNKNOWN'
 	  END IF
+200	  CALL GEN_IN(ZM(ID)%DATA_TYPE,'Default data type is')
+	  IF( ZM(ID)%DATA_TYPE .NE. 'J' .AND.
+	1     ZM(ID)%DATA_TYPE .NE. 'H' .AND.
+	1     ZM(ID)%DATA_TYPE .NE. 'M(t)' .AND.
+	1     ZM(ID)%DATA_TYPE .NE. 'ETA' .AND.
+	1     ZM(ID)%DATA_TYPE .NE. 'CHI')THEN
+	      WRITE(6,*)'Invalid data type: Valid types are J, H, M(t), ETA and CHI'
+	     GOTO 200
+	  END IF
+	  IF(ZM(ID)%DATA_TYPE .EQ. 'H' .AND.  ND .EQ. ZM(ID)%ND)THEN
+	    DO ML=1,NCF
+	      DO I=1,ND
+	       ZM(ID)%RJ(I,ML)=ZM(ID)%RJ(I,ML)/R(I)/R(I)
+	      END DO
+	    END DO
+	  ELSE IF(ZM(ID)%DATA_TYPE .EQ. 'H')THEN
+	    WRITE(6,*)'Unable to comput H from R^2.H since R non-matching R grid'
+	    WRITE(6,*)'Be warned -- quantities may contain an extra factor of R^2'
+	  END IF
 !
 	ELSE IF(X(1:4) .EQ. 'EXTJ')THEN
 !
@@ -653,6 +692,10 @@
 !
 	ELSE IF(X(1:3) .EQ. 'R3J')THEN
 	  ID=1; ND=ZM(ID)%ND
+	  IF(ND .NE. ND_ATM)THEN
+	    WRITE(6,*)'Unable to plot r^3.J since ND is not equal to ND_ATM'
+	    GOTO 1
+	  END IF
 	  IF(ALLOCATED(XV))DEALLOCATE(XV)
 	  IF(ALLOCATED(YV))DEALLOCATE(YV)
 	  ALLOCATE (XV(ND))
@@ -735,8 +778,12 @@
 	  PLOT_RSQJ=.FALSE.
 	  ZEROV=.FALSE.
 	  IF(X(1:5) .EQ. 'RSQJD')THEN
+	    IF(ND .NE. ND_ATM)THEN
+	      WRITE(6,*)'Unable to plot r^2.J since ND is not equal to ND_ATM'
+	      GOTO 1
+	    END IF
 	    PLOT_RSQJ=.TRUE.
-	    CALL USR_OPTION(ZEROV,'ZEROV','T','Correct wavelntsh to zero V')
+	    CALL USR_OPTION(ZEROV,'ZEROV','T','Correct wavelenghts to zero V')
 	  END IF
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0','Scale factor to prevent overflow')
 	  DO ID=1,NUM_FILES
@@ -777,8 +824,12 @@
 	  END DO
 !
 	ELSE IF(X(1:3) .EQ. 'JNU')THEN
-	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
-	  T1=0.299794E+04/T1
+	  CALL USR_OPTION(T1,'Lambda',' ','Vacuum wavelength in Ang (-ve for Hz)')
+	  IF(T1 .LE. 0)THEN
+	    T1=ABS(T1)
+	  ELSE
+	    T1=0.299794E+04/T1
+	  END IF
 !
 	  SCALE_FAC=1.0D0
 	  PLOT_RSQJ=.FALSE.
@@ -790,25 +841,37 @@
 	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
 !
             I=GET_INDX_DP(T1,ZM(ID)%NU,NCF)
-	    WRITE(6,*)'Index=',I,'NCF=',NCF
 	    IF(ZM(ID)%NU(I)-T1 .GT. T1-ZM(ID)%NU(I+1))I=I+1
-	    WRITE(6,*)'Index=',I,'NCF=',NCF
 	    IF(ALLOCATED(XV))DEALLOCATE(XV)
 	    IF(ALLOCATED(YV))DEALLOCATE(YV)
 	    ALLOCATE (XV(ND))
 	    ALLOCATE (YV(ND))
 !
-	    IF(USE_V)THEN
-	      XV(1:ND)=V(1:ND)
+	    IF(ND .EQ. ND_ATM)THEN
+	      IF(USE_V)THEN
+	        XV(1:ND)=V(1:ND)
+	        XAXIS='V(km\u \ds\u-1\d)'
+	      ELSE
+	        WRITE(6,*)'R(1)=',R(1)
+	        WRITE(6,*)'R(ND)=',R(ND)
+	        T2=R(ND)
+	        XV(1:ND)=DLOG10(R(1:ND)/T2)
+	        XAXIS='R/R(ND)'
+	      END IF
 	    ELSE
-	      WRITE(6,*)'R(1)=',R(1)
-	      WRITE(6,*)'R(ND)=',R(ND)
-	      T2=R(ND)
-	      XV(1:ND)=DLOG10(R(1:ND)/T2)
+	     WRITE(6,*)'Plotting against depth index since ND is not equal to ND_ATM'
+	      DO I=1,ND
+	        XV(I)=I
+	      END DO
+	      XAXIS='Depth index'
 	    END IF
-!
+	    YAXIS=ZM(ID)%DATA_TYPE
+	    IF(PLOT_RSQJ)THEN
+	      YAXIS='Log r\u2\d'//YAXIS
+	    ELSE
+	      YAXIS='Log '//YAXIS
+	    END IF
 	    DO J=1,ND
-	      WRITE(6,*)J,ZM(ID)%RJ(J,I)
 	      IF(ZM(ID)%RJ(J,I) .GT. 0)THEN
 	        IF(PLOT_RSQJ)THEN
 	          YV(J)=DLOG10(ZM(ID)%RJ(J,I)*R(J)*R(J)/SQRT(1.0D0-V(J)*V(J)/C_KMS/C_KMS))
@@ -893,6 +956,7 @@
 	ELSE IF(X(1:2) .EQ. 'CF')THEN
 !
 	  DO ID=1,NUM_FILES
+	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
 	    IF(ALLOCATED(XV))DEALLOCATE(XV)
 	    IF(ALLOCATED(YV))DEALLOCATE(YV)
 	    IF(ALLOCATED(TA))DEALLOCATE(TA)
@@ -900,7 +964,6 @@
 	    ALLOCATE (YV(ND))
 	    ALLOCATE (TA(ND))
 !
-	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
 	    TA(1:ND)=0.0D0
 	    DO ML=1,NCF-1
 	      T1=0.5D0*(ZM(ID)%NU(ML)-ZM(ID)%NU(ML+1))
@@ -908,18 +971,24 @@
 	        TA(I)=TA(I)+T1*(ZM(ID)%RJ(I,ML)+ZM(ID)%RJ(I,ML+1))
 	      END DO
 	    END DO
-	    IF(ZM(ID)%DATA_TYPE .EQ. 'J')THEN
-	      TA(1:ND)=TA(1:ND)*R(1:ND)*R(1:ND)
+	    IF(ND .EQ. ND_ATM)THEN
+	      IF(ZM(ID)%DATA_TYPE .EQ. 'J' .OR. ZM(ID)%DATA_TYPE .EQ. 'H')THEN
+	        TA(1:ND)=TA(1:ND)*R(1:ND)*R(1:ND)
+	        YAXIS='L/L(d=1)'
+	        IF(ZM(ID)%DATA_TYPE .EQ. 'J')YAXIS='R\u2\d/J/R\u2\dJ(d=1)'
+	      END IF
+	      WRITE(T_OUT,*)'Boundary Luminosity is:',TA(1)*4.1274D+03
+	    ELSE
+	      YAXIS='H/H(d=1)'
+	      IF(ZM(ID)%DATA_TYPE .EQ. 'J')YAXIS='J/J(d=1)'
 	    END IF
 !
-	   WRITE(T_OUT,*)'Boundary Luminosity is:',TA(1)*4.1274D+03
 	    DO I=1,ND
 	      XV(I)=I
 	      YV(I)=TA(I)/TA(1)
 	    END DO
 	    CALL DP_CURVE(ND,XV,YV)
 	    XAXIS='I'
-	    YAXIS='L/L(d=1)'
 	  END DO
 !
 ! 
@@ -969,12 +1038,15 @@
 !
 	ELSE IF(X(1:2) .EQ. 'BB') THEN
 !
-	  NCF=ZM(1)%NCF
-	  IF(ALLOCATED(XV))DEALLOCATE(XV)
-	  IF(ALLOCATED(YV))DEALLOCATE(YV)
-	  ALLOCATE (XV(NCF))
-	  ALLOCATE (YV(NCF))
-          CALL USR_OPTION(TEMP,'TEMP','3.0',' ')
+	NCF=ZM(1)%NCF
+	IF(ALLOCATED(XV))DEALLOCATE(XV)
+	IF(ALLOCATED(YV))DEALLOCATE(YV)
+	ALLOCATE (XV(NCF))
+	ALLOCATE (YV(NCF))
+	I=1
+	CALL USR_OPTION(I,'Depth',' ','Depth index: for default R, T')
+	DEFAULT=WR_STRING(T(I))
+	CALL USR_OPTION(TEMP,'TEMP',DEFAULT,' ')
           DO I=1,ZM(1)%NCF
             T3=HDKT*ZM(1)%NU(I)/TEMP
             IF(T3 .GT. 1.0D0)THEN
@@ -1086,12 +1158,13 @@
 	ELSE IF(X(1:2) .EQ. 'LI' .OR. X(1:4) .EQ. 'LIST' .OR. 
 	1                             X(1:2) .EQ. 'HE' 
 	1          .OR. X(1:4) .EQ. 'HELP')THEN
+	  CALL GET_ENVIRONMENT_VARIABLE(NAME="CMFDIST",VALUE=HELP_FILE,STATUS=IOS)
 	  IF(X(1:2) .EQ. 'LI')THEN
-	    CALL GEN_ASCI_OPEN(LU_IN,'PLT_JH_OPT_DESC','OLD',' ','READ',
-	1                  IZERO,IOS)
+	    HELP_FILE=TRIM(HELP_FILE)//'/txt_files/plt_jh_opt_desc.txt'
+	    CALL GEN_ASCI_OPEN(LU_IN,HELP_FILE,'OLD',' ','READ',IZERO,IOS)
 	  ELSE 
-	    CALL GEN_ASCI_OPEN(LU_IN,'PLT_JH_OPTIONS','OLD',' ','READ',
-	1                  IZERO,IOS)
+	    HELP_FILE=TRIM(HELP_FILE)//'/txt_files/plt_jh_options.txt'
+	    CALL GEN_ASCI_OPEN(LU_IN,HELP_FILE,'OLD',' ','READ',IZERO,IOS)
 	  END IF
 	  IF(IOS .NE. 0)THEN
 	    WRITE(T_OUT,*)'Error opening HELP or DESCRIPTOR file for PLT_JH'

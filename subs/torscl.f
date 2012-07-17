@@ -5,6 +5,8 @@
 	SUBROUTINE TORSCL(TOR,CHI,R,DTAU,dCHI_dR,ND,METHOD,TYPE_ATM)
 	IMPLICIT NONE
 !
+! Altered 24-Mar-2011 : Addoption Pnnnnn where nnnn is a poistive exponent indicating
+!                         the power law density exponent.
 ! Altered 21-Dec-2004 : Bug fix. For TYPE_ATM .NE. 'EXP', the routine was always
 !                         returning TAU(1) = CHI(1)*R(1). Routine now computes
 !                         optical depth over depth indices 1 to 5, and limits the
@@ -44,14 +46,9 @@
 	    TOR(1)=0.00001
 	    WRITE(LUER,*)'Warning - optical depth at boundary set to 10^{-5} in TORSCL'
 	  END IF
-	ELSE IF (CHI(1) .GT. 0 .AND. CHI(INDX) .GT. CHI(1))THEN
-	  T1=DLOG(CHI(1)/CHI(INDX))/DLOG(R(INDX)/R(1))
-	  IF(T1 .GT. 1.5D0)THEN
-	   TOR(1)=CHI(1)*R(1)/(T1-1.0D0)
-	  ELSE
-	    TOR(1)=CHI(1)*R(1)
-	    WRITE(LUER,*)'Warning - opacity assumed to be r**(-2) in TORSCL'
-	  END IF
+	ELSE IF(TYPE_ATM(1:1) .EQ. 'P')THEN
+	  READ(TYPE_ATM(2:6),*)T1
+	  TOR(1)=CHI(1)*R(1)/(T1-1.0D0)
 	ELSE
 	  TOR(1)=CHI(1)*R(1)
 	  WRITE(LUER,*)'Warning - opacity assumed to be r**(-2) in TORSCL'

@@ -206,6 +206,9 @@
 	  IF(LOC_INDX .EQ. 0)THEN
 	    WRITE(LUER,*)'Error in SET_PROF --- insufficient storage'
 	    WRITE(LUER,*)'Maximum number of storage locations is:',NSTORE_MAX
+	    DO ML=1,NSTORE_MAX
+	       WRITE(LUER,'(I4,ES14.5,2I8)')ML,NU_ZERO_STORE(ML),NL_STORE(ML),NUP_STORE(ML)
+	    END DO
 	    STOP
 	  END IF
 	  STORE_AVAIL(LOC_INDX)=.FALSE.

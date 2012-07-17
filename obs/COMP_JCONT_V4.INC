@@ -2,6 +2,9 @@
 ! Program section to compute the continuum intensity. Opacities must have
 ! previuosly been evaluated.
 !
+! Altered 10-Apr-2011 - Bug fix: HFLUX_AT_OB and HFLUX_AT_IB were not
+!                         being correctly set for normal wind calculation. Only
+!                         effects  output to FLUX_FILE.
 ! Altered 24-Jan-2009 - Changes to call MOM_JREL_V6
 !                       Call to CMF_FORMAL_REL_V3
 !                       Variable HFLUX_AT_OB, HFLUX_AT_IB introduced.
@@ -59,6 +62,7 @@
 	BNUE=TWOHCSQ*( FL**3 )*EMHNUKT(ND)/T2
 	DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
 	DDBBDT=DBB*(T1*(1.0D0+EMHNUKT(ND))/T2-2.0D0)/T(ND)
+        HFLUX_AT_IB=DBB/CHI(ND)/3.0D0
 	IF(SN_MODEL .AND. .NOT. DIF)THEN
 	  BNUE=0.0D0; DBB=0.0D0; DDBBDT=0.0D0
 	  IF(FIRST_FREQ)WRITE(LUER,*)'Setting flux for hollow core in CMF_FLUX_SUB_V5'
@@ -406,8 +410,8 @@
 	1              N_TYPE,METHOD,L_TRUE,IONE,           !IONE => old outer bc
 	1              FIRST_FREQ,NEW_FREQ,
 	1              NCEXT,NPEXT,NDEXT)
-	       IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
-	       HFLUX_AT_IB=HBC_CMF(1)*RJ(1)
+	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+	       HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
 	     END IF
 	     CALL TUNE(ITWO,'MOM_J_CMF_ACC')
 !

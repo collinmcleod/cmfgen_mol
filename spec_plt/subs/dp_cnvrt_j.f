@@ -106,7 +106,7 @@ C
 	IF(LOG_Y)THEN
 	  DO I=1,NBB
 	    IF(YV(I) .LE. 0)THEN
-	      YV(I)=-50
+	      YV(I)=-200
 	    ELSE
 	      YV(I)=LOG10(YV(I))
 	    END IF

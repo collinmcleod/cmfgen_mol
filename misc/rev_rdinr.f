@@ -88,16 +88,16 @@
 	  WRITE(10,'(1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)')RMIN,LUM,1,NEW_ND
 	  WRITE(10,'(A)')' '
 	  I=1
-	  WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I
+	  WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')R(I),DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I
 	  WRITE(10,'(F7.1)')1.0D0
 !
 	  DO I=2,ND 
 	    WRITE(10,'(A)')' '
-	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')SQRT(R(I-1)*R(I)),
+	    WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')SQRT(R(I-1)*R(I)),
 	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I
 	    WRITE(10,'(F7.1)')1.0D0
 	    WRITE(10,'(A)')' '
-	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),
+	    WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')R(I),
 	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I
 	    WRITE(10,'(F7.1)')1.0D0
 	  END DO
@@ -117,7 +117,7 @@
 	  WRITE(10,'(1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)')RMIN,LUM,1,ND
 	  DO I=1,ND 
 	    WRITE(10,'(A)')' '
-	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),
+	    WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')R(I),
 	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I
 	    WRITE(10,'(F7.1)')1.0D0
 	  END DO
@@ -139,7 +139,7 @@
 	  WRITE(10,'(1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)')RMIN,LUM,1,ND+NG
 	  DO I=1,FST
 	    WRITE(10,'(A)')' '
-	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),
+	    WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')R(I),
 	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I
 	    WRITE(10,'(F7.1)')1.0D0
 	  END DO
@@ -155,8 +155,9 @@
 	    DO J=1,NG
 	      ICOUNT=ICOUNT+1
 	      T1=R(I)-J*(R(I)-R(I+1))/(NG+1)
+	      READ(5,*)T1
 	      WRITE(10,'(A)')' '
-	      WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')T1,
+	      WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')T1,
 	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),ICOUNT
 	      WRITE(10,'(F7.1)')1.0D0
 	    END DO
@@ -164,7 +165,7 @@
 	    J=I+1
 	    ICOUNT=ICOUNT+1
 	    WRITE(10,'(A)')' '
-	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(J),
+	    WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')R(J),
 	1                DI(J),ED(J),T(J),IRAT(J),VEL(J),CLUMP_FAC(J),ICOUNT
 	    WRITE(10,'(F7.1)')1.0D0
 	  END DO
@@ -174,7 +175,7 @@
 	  DO I=LST+1,ND 
 	    ICOUNT=ICOUNT+1
 	    WRITE(10,'(A)')' '
-	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),
+	    WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')R(I),
 	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),ICOUNT
 	    WRITE(10,'(F7.1)')1.0D0
 	  END DO
@@ -252,13 +253,13 @@
           DO I=1,NEW_ND-(ND+1-IST)
             T1=(RTMP(1)/R(I))**2
 	    WRITE(10,'(A)')' '
-            WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),
+            WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')R(I),
 	1                T1*DI(1),T1*ED(1),T(1),IRAT(1),VEL(1),CLUMP_FAC(1),I
             WRITE(10,'(F7.1)')1.0D0
 	  END DO
 	  DO I=IST,ND
             WRITE(10,'(A)')' '
-            WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')RTMP(I),
+            WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')RTMP(I),
 	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I+(NEW_ND-ND)
             WRITE(10,'(F7.1)')1.0D0
           END DO
@@ -328,14 +329,14 @@
 	      T2=1.0D0-T1
 	      WRITE(6,*)I,T1,T2,NEW_XV(I),OLD_XV(IEND),OLD_XV(IST)
 	      WRITE(6,*)VEL(J),VEL(J+1),T2*VEL(J)+T1*VEL(J+1)
-	      WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')RTMP(I),
+	      WRITE(10,'(1X,1P,E18.10,4E15.5,E17.7,E15.5,2X,I4,A1)')RTMP(I),
 	1                T2*DI(J)+T1*DI(J+1),T2*ED(J)+T1*ED(J+1),
 	1                T2*T(J)+T1*T(J+1),  T2*IRAT(J)+T1*IRAT(J+1),
 	1                T2*VEL(J)+T1*VEL(J+1),
 	1                T2*CLUMP_FAC(J)+T1*CLUMP_FAC(J+1),I
 	    ELSE
 	      J=I; IF(I .GT. IST)J=I-IST-NG+IEND-1
-	      WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')RTMP(I),
+	      WRITE(10,'(1X,1P,E18.10,4E15.5,E17.7,E15.5,2X,I4,A1)')RTMP(I),
 	1                DI(J),ED(J),T(J),IRAT(J),VEL(J),CLUMP_FAC(J),I
 	    END IF
 	    WRITE(10,'(F7.1)')1.0D0
@@ -365,7 +366,7 @@
 	  DO I=1,ND+NG
 	    J=MIN(I,ND)
 	    WRITE(10,'(A)')' '
-	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')RTMP(I),
+	    WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')RTMP(I),
 	1                DI(J),ED(J),T(J),IRAT(J),VEL(J),CLUMP_FAC(J),I
 	    WRITE(10,'(F7.1)')1.0D0
 	  END DO
@@ -393,7 +394,7 @@
 	  WRITE(10,'(1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)')RMIN,LUM,1,ND+NG
 	  I=1
 	  WRITE(10,'(A)')' '
-	  WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),
+	  WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')R(I),
 	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I
 	  WRITE(10,'(F7.1)')1.0D0
 !
@@ -411,7 +412,7 @@
 	  END DO
 	  DO I=1,NI+NG
 	    WRITE(10,'(A)')' '
-	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')RTMP(I),
+	    WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')RTMP(I),
 	1                DI(2),ED(2),T(2),IRAT(2),VEL(2),CLUMP_FAC(2),I+1
 	    WRITE(10,'(F7.1)')1.0D0
 	  END DO
@@ -420,7 +421,7 @@
 !
 	  DO I=NI+2,ND 
 	    WRITE(10,'(A)')' '
-	    WRITE(10,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),
+	    WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')R(I),
 	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I+NG
 	    WRITE(10,'(F7.1)')1.0D0
 	  END DO

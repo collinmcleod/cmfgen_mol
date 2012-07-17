@@ -95,7 +95,8 @@
 	INTEGER REC_LENGTH
 	REAL*8 PI
 	REAL*8 FREQ
-	REAL*8 T1,T2
+	REAL*8 T1,T2,T3
+	REAL*8 FRAC
 	REAL*8 LAMC
 	LOGICAL AIR_LAM
 !
@@ -240,7 +241,8 @@
 	 ALLOCATE (TAU_ROSS(ND))
 	 ALLOCATE (TAU_ES(ND))
 	 IF(ROSS_MEAN(ND) .NE. 0)THEN
-	   CALL TORSCL(TAU_ROSS,ROSS_MEAN,R,TB,TC,ND,METHOD,TYPETM)
+	   TA(1:ND)=ROSS_MEAN(1:ND)*CLUMP_FAC(1:ND)
+	   CALL TORSCL(TAU_ROSS,TA,R,TB,TC,ND,METHOD,TYPETM)
 	 END IF
 	 TA(1:ND)=6.65D-15*ED(1:ND)
 	 CALL TORSCL(TAU_ES,TA,R,TB,TC,ND,METHOD,TYPETM)
@@ -306,16 +308,24 @@
 !                    
 ! Set X-Ais plotting options.
 !
-	ELSE IF(X(1:4) .EQ. 'LOGR')THEN
+	ELSE IF(X(1:2) .EQ. 'XN')THEN
+	  DO I=1,ND
+	    XV_SAV(I)=I
+	  END DO
+	  XAXIS_SAV='Depth index'
+	ELSE IF(X(1:5) .EQ. 'XLOGR')THEN
 	  XV_SAV(1:ND)=LOG10(R/R(ND))
-	  XAXIS='Log R/R\d*\u)'
-	ELSE IF(X(1:4) .EQ. 'LINR')THEN
+	  XAXIS_SAV='Log R/R\d*\u)'
+	ELSE IF(X(1:5) .EQ. 'XLINR')THEN
 	  XV_SAV(1:ND)=R/R(ND)
-	  XAXIS='R/R\d*\u)'
-	ELSE IF(X(1:4) .EQ. 'LOGV')THEN
+	  XAXIS_SAV='R/R\d*\u)'
+	ELSE IF(X(1:5) .EQ. 'XLOGV')THEN
 	  XV_SAV(1:ND)=LOG10(V)
 	  XAXIS_SAV='Log V(km\u \ds\u-1\d)'
-	ELSE IF(X(1:1) .EQ. 'V')THEN
+	ELSE IF(X(1:5) .EQ. 'XED')THEN
+	  XV_SAV(1:ND)=LOG10(ED)
+	  XAXIS_SAV='Log Ne(cm\u-3\d)'
+	ELSE IF(X(1:2) .EQ. 'XV')THEN
 	  IF(V(1) .GT. 10000.0D0)THEN
 	    XV_SAV(1:ND)=1.0D-03*V
 	    XAXIS_SAV='V(Mm\u \ds\u-1\d)'
@@ -326,7 +336,7 @@
 	ELSE IF(X(1:5) .EQ. 'XROSS')THEN
 	  IF(TAU_ROSS(10) .NE. 0.0D0)THEN
 	    XV_SAV(1:ND)=LOG10(TAU_ROSS)
-	    XAXIS_SAV='\gt(Ross)'
+	    XAXIS_SAV='Log \gt(Ross)'
 	  ELSE
 	    WRITE(6,*)'Tau(Ross) is not available'
 	  END IF
@@ -385,6 +395,53 @@
 	  YAXIS(J:J)='I'
 	  CALL CURVE(NCF,XV,YV)
 !
+	ELSE IF(X(1:2) .EQ. 'OR' .OR. X(1:2) .EQ. 'OV' .OR. X(1:2) .EQ. 'OD')THEN
+	  WRITE(6,*)'Option to plot the radius for a given fractional contribution'
+	  CALL USR_OPTION(FRAC,'FRAC',' ','Fractional value')
+	  IF(FRAC .LE. 0 .OR. FRAC .GT. 1.0)THEN
+	    WRITE(T_OUT,*)'Invalid fractional value'
+	    GOTO 1
+	  END IF
+!
+	  DO ML=1,NCF
+	    ZV(ML)=SUM(dFR(:,ML))
+	  END DO
+!
+	  XV(1:NCF)=NU(1:NCF)
+	  DO ML=1,NCF
+	    TA(1)=0
+	    IF(ZV(ML) .GT. 0.0D0)THEN
+	      DO I=2,ND
+	        TA(I)=TA(I-1)+dFR(I,ML)
+	        IF(TA(I) .GT. FRAC*ZV(ML))THEN
+	           T1=TA(I-1)/ZV(ML)
+	           T2=TA(I)/ZV(ML)
+	           T3=(FRAC-T1)/(T2-T1)
+	           IF(X(1:2) .EQ. 'OR')THEN
+	             YV(ML)=(T1*R(I)+(1.0D0-T1)*R(I-1))/R(ND)
+	           ELSE IF(X(1:2) .EQ. 'OD')THEN
+	             YV(ML)=(T1*I+(1.0D0-T1)*(I-1))
+	           ELSE
+	             YV(ML)=1.0D-03*(T1*V(I)+(1.0D0-T1)*V(I-1))
+	           END IF
+	           EXIT
+	         END IF
+	       END DO
+	     ELSE
+	       YV(ML)=0.0D0
+	     END IF
+	   END DO
+	   IF(X(1:2) .EQ. 'OR')THEN
+	     YAXIS='R/R(ND)'
+	   ELSE IF(X(1:2) .EQ. 'OD')THEN
+	     YAXIS='Depth index'
+	   ELSE
+	     YAXIS='V(Mm/s)'
+	   END IF
+	  CALL CNVRT(XV,ZV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	1         LAMC,XAXIS,YAXIS,L_TRUE)
+	  CALL CURVE(NCF,XV,YV)
+!
 	ELSE IF(X .EQ. 'DF2' .OR. X .EQ. 'DDF2')THEN
 	  CALL USR_OPTION(T1,'lam_st',' ','Start wavelength in Ang')
 	  T1=0.299794D+04/T1
@@ -431,8 +488,12 @@
 	    WRITE(6,*)'Use CUM option in PGPLOT to get intgegrated flux'
 	    CALL CURVE(ND-1,XV,YV)
 	  ELSE
+	    YAXIS='\gd'//TRIM(YAXIS)
+	    DO I=1,ND-1
+	      XV(I)=0.5D0*(XV(I+1)+XV(I))
+	    END DO
 	    WRITE(6,*)'Use SUM option in PGPLOT to get intgegrated flux'
-	    CALL CURVE(ND,XV,YV)
+	    CALL CURVE(ND-1,XV,YV)
 	  END IF
 !
 	ELSE IF(X .EQ. 'DF' .OR. X .EQ. 'DDF')THEN
@@ -465,8 +526,13 @@
 	    WRITE(6,*)'Use CUM option in PGPLOT to get intgegrated flux'
 	    CALL CURVE(ND-1,XV,YV)
 	  ELSE
+	    YAXIS='\gd'//TRIM(YAXIS)
+	    DO I=1,ND-1
+	      XV(I)=0.5D0*(XV(I+1)+XV(I))
+	    END DO
 	    WRITE(6,*)'Use SUM option in PGPLOT to get intgegrated flux'
-	    CALL CURVE(ND,XV,YV)
+	    WRITE(6,*)'Use H curve to plot'
+	    CALL CURVE(ND-1,XV,YV)
 	  END IF
 !
 	ELSE IF(X(1:6) .EQ. 'RD_OBS')THEN
@@ -606,15 +672,22 @@
 	1          .OR. X(1:4) .EQ. 'HELP')THEN
 	  WRITE(6,*)' '
 	  WRITE(6,*)' TIT  LX  LY  '
+	  WRITE(6,*)' XN:      Set X axis to depth indexV'
 	  WRITE(6,*)' XV:      Set X axis to V'
-	  WRITE(6,*)' XLOGV:   Set X axis to Log V'
-	  WRITE(6,*)' XLOGR:   Set X axis to Log R/R8'
+	  WRITE(6,*)' XED:     Set X axis to Log(Ne)'
+	  WRITE(6,*)' XROSS:   Set X axis to Log Tau(Ross)'
 	  WRITE(6,*)' XLINR:   Set X axis to R/R*'
+	  WRITE(6,*)' XLOGV:   Set X axis to Log V'
+	  WRITE(6,*)' XLOGR:   Set X axis to Log R/R*'
 	  WRITE(6,*)' SP:      Plot spectrum - sums dF(R) over all radii'
 	  WRITE(6,*)' DF:      Plot dF(R) for a given frequency'
 	  WRITE(6,*)' DF2:     Plot dF(R) averaged over a given frequency band'
 	  WRITE(6,*)' DDF:     Plots dF/dX (X=default axis) for a given frequency band'
 	  WRITE(6,*)' DDF2:    Plots dF/dX (X=default axis) averaged over a given frequency band'
+	  WRITE(6,*)' IR:      Plot the contribution, as a funtion of lambda, at a given radius'
+	  WRITE(6,*)' OR:      Plot the radius, as a funtion of lambda, for a given fractional contribution'
+	  WRITE(6,*)' OV:      Plot the velocity, as a funtion of lambda, for a given fractional contribution'
+	  WRITE(6,*)' ON:      Plot the depth index, as a funtion of lambda, for a given fractional contribution'
 	  WRITE(6,*)' '
 	  WRITE(6,*)' '
 	  GOTO 1

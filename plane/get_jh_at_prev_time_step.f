@@ -286,8 +286,8 @@
 	    READ(LU_IN,REC=IREC)(JST(I,ML),I=1,ND_OLD),(HST(I,ML),I=1,ND_OLD-1),
 	1                          H_INBC_ST(ML),H_OUTBC_ST(ML),NUST(ML)
 	    IREC=IREC+1
-	    WRITE(250,'(7ES14.5)')NUST(ML),JST(1,ML),HST(1,ML),JST(ND_OLD,ML),HST(ND_OLD-1,ML),
-	1                          H_INBC_ST(ML),H_OUTBC_ST(ML)
+!	    WRITE(250,'(7ES14.5)')NUST(ML),JST(1,ML),HST(1,ML),JST(ND_OLD,ML),HST(ND_OLD-1,ML),
+!	1                          H_INBC_ST(ML),H_OUTBC_ST(ML)
 	  END DO
 	  INDX=2
 !
@@ -353,7 +353,8 @@
         CALL MON_INTERP(WRK_NEW_H,ND_P1,IONE,LOG_MIDV,ND_P1,WRK_OLD_H,ND_OLD_P1,LOG_OLD_MIDV,ND_OLD_P1)
 	NEW_H(1:ND-1)=WRK_NEW_H(2:ND)
 	T1=1.0D-12; IF(.NOT. EQUAL(V(1),OLD_V(1),T1) )H_OUTBC_OLDT=WRK_NEW_H(1)/NEW_J(1)
-	WRITE(251,'(7ES14.5)')NU,NEW_J(1),NEW_H(1),NEW_J(ND),NEW_H(ND-1),H_INBC_OLDT,H_OUTBC_OLDT
+!
+!	WRITE(251,'(7ES14.5)')NU,NEW_J(1),NEW_H(1),NEW_J(ND),NEW_H(ND-1),H_INBC_OLDT,H_OUTBC_OLDT
 !
 ! As we enter this routine for the same frequency (iteration and variation) several
 ! times, save interpolated values.

@@ -407,8 +407,7 @@ C
 	1           'Inner boundary method (DIFUSION, HOLLOW, or ZERO_FLUX)')
 	  END IF
 	  OUTER_BND_METH='HONJ'
-	  CALL RD_STORE_CHAR(OUTER_BND_METH,'OB_METH',L_FALSE,
-	1        'Outer boundary method (HONJ or HALF_MOM)')
+	  CALL RD_STORE_CHAR(OUTER_BND_METH,'OB_METH',L_FALSE,'Outer boundary method (HONJ or HALF_MOM)')
 C
 	  CALL RD_STORE_LOG(RD_COHERENT_ES,'COH_ES',L_TRUE,
 	1            'Assume coherent electron scattering? ')
@@ -438,8 +437,7 @@ C
 	  RD_OUT_BC_TYPE=1
 	  OUT_BC_TYPE=1 
 	  OUT_BC_PARAM_ONE=0.299794D0
-	  CALL RD_STORE_INT(RD_OUT_BC_TYPE,'OBC_TYPE',L_FALSE,
-	1           'Outer boundary condition type: 1=def=old')
+	  CALL RD_STORE_INT(RD_OUT_BC_TYPE,'OBC_TYPE',L_FALSE,'Outer boundary condition type: 1=def=old')
 	  CALL RD_STORE_INT(OUT_BC_PARAM_ONE,'BC_PAR1',L_FALSE,'Frequency to switch to new BC')
 	  REXT_FAC=0.0D0
 	  CALL RD_STORE_DBLE(REXT_FAC,'REXT_FAC',L_FALSE,'Factor ot extend R grid by for thick continuum')

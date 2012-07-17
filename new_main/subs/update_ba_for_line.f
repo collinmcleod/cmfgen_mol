@@ -105,6 +105,7 @@
 	  FL_OLD=FL
 	  SUM_BA=0.0D0
 	END IF
+!
 !
 ! Modify the BA matrix for terms in the statistical equilibrium
 ! equations which are multiplied by RJ. NB. This is not for the

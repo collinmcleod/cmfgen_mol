@@ -5,7 +5,7 @@
 !
 !      For N=2: EXPAND_CHAR=1.3; EXPAND_TICK=1.3; ASR=0.6; Plot Size=20 cm
 !      For N=3: EXPAND_CHAR=2.0; EXPAND_TICK=2.0; ASR=0.4; Plot Size=20 cm
-!      For N=4: EXPAND_CHAR=1.7; EXPAND_TICK=1.7; ASR=0.3; Plot Size=20 cm
+!      For N=4: EXPAND_CHAR=1.8; EXPAND_TICK=1.8; ASR=0.3; Plot Size=20 cm
 !      For N=5: EXPAND_CHAR=1.7; EXPAND_TICK=1.7; ASR=0.25; Plot Size=20 cm
 !
 	PROGRAM N_COL_MERGE
@@ -65,7 +65,7 @@ C
 	  ELSE IF(N_PLTS .EQ. 3)THEN
 	    WRITE(LU_OUT,'(A)')'  500 8500 translate'
 	  ELSE IF(N_PLTS .EQ. 4)THEN
-	    WRITE(LU_OUT,'(A)')'  500 9700 translate'
+	    WRITE(LU_OUT,'(A)')'  500 9400 translate'      !9700
 	  ELSE
 	    WRITE(LU_OUT,'(A)')'  500 10100 translate'
 	  END IF
@@ -83,7 +83,7 @@ C
 	  IF( N_PLTS .EQ. 3)THEN
 	    WRITE(LU_OUT,'(A)')' 0 -4000 translate'
 	  ELSE IF( N_PLTS .EQ. 4)THEN
-	    WRITE(LU_OUT,'(A)')' 0 -3000 translate'
+	    WRITE(LU_OUT,'(A)')' 0 -3100 translate'		!1000
 	  ELSE
 	    I=-(4000*3)/N_PLTS
 	    WRITE(LU_OUT,'(A,I5,A)')' 0 ',I,' translate'

@@ -2,6 +2,9 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 10-Feb-2012: Improved computation of gbar. Expression now works for
+!                        very low energies, andhigh energies.
+!
 	INTEGER ID
 	INTEGER DPTH_INDX
 	INTEGER NKT
@@ -21,7 +24,7 @@
 	REAL*8, PARAMETER :: COEF2=-0.00647558d0
 	REAL*8, PARAMETER :: CONNECT_POINT=1.2212243D0
 !
-	REAL*8 GBAR(NKT)
+	REAL*8 GBAR
 	REAL*8 X
 	REAL*8 T1,T2
 	REAL*8 dE
@@ -30,8 +33,6 @@
 	INTEGER IKT
 !
 	Q(:)=0.0D0
-	gbar(:)=0.0d0
-!
 	dE=ATM(ID)%EDGEXzV_F(NL)-ATM(ID)%EDGEXzV_F(NUP)
 	IF(dE .LE. 0)RETURN
 	dE_eV=Hz_to_eV*dE
@@ -41,23 +42,23 @@
 	IF(ATM(ID)%AXzV_F(NUP,NL) .GT. 1.0D+03 .OR. ATM(ID)%NT_OMEGA(NL,NUP) .EQ. 0.0D0)THEN
 	  T1=3.28978D0*COL_CONST*ATM(ID)%AXzV_F(NL,NUP)*ATM(ID)%XzV_F(NL,DPTH_INDX)/dE*ATM(ID)%CROSEC_NTFAC
 	  DO IKT=1,NKT
+	    GBAR=0.0D0
 	    IF(XKT(IKT) .GE. dE_eV)THEN
 	      X = sqrt(xkt(ikt)/dE_eV-1.0d0)
 	      IF((ATM(ID)%ZXzV .NE. 1).AND.(X .LE. CONNECT_POINT))THEN
-	        GBAR(IKT) = 0.2D0
+	        GBAR = 0.2D0
 	      ELSE IF(X .LE. 0.80D0)THEN
-	        GBAR(IKT) = 0.074*X*(1.0D0+X)
+	        GBAR = 0.074*X*(1.0D0+X)
 	      ELSE IF(X .LE. 6)THEN
-	        GBAR(IKT) = COEF0 + COEF1*X + COEF2*X*X
+	        GBAR = COEF0 + COEF1*X + COEF2*X*X
 	      ELSE
-	        GBAR(IKT) = +0.105D0+LOG(X)/1.8138D0
+	        GBAR = +0.105D0+LOG(X)/1.8138D0
 	      END IF
-	      if(gbar(ikt) .ge. 0.0d0)then
-	        Q(IKT)=T1*GBAR(ikt)*dXKT(IKT)/XKT(IKT)
-	      endif
+	      IF(GBAR .GE. 0.0d0)THEN
+	        Q(IKT)=T1*GBAR*dXKT(IKT)/XKT(IKT)
+	      ENDIF
 	    END IF
 	  END DO
-!	  write(148,'(3A,3ES14.4)')ATM(ID)%XzVLEVNAME_F(NL),'-->',ATM(ID)%XzVLEVNAME_F(NUP),0.0D0,SUM(Q)
 	ELSE IF(ATM(ID)%NT_OMEGA(NL,NUP) .NE. 0.0D0)THEN
 	  T1=PI*A0*A0*13.6d0
 	  T1=T1*ATM(ID)%NT_OMEGA(NL,NUP)/ATM(ID)%GXzV_F(NL)*ATM(ID)%XzV_F(NL,DPTH_INDX)
@@ -66,9 +67,6 @@
 	      Q(IKT)=T1*dXKT(IKT)/XKT(IKT)
 	    END IF
 	  END DO
-!	  Q=0.0D0
-!	  write(148,'(3A,3ES14.4)')ATM(ID)%XzVLEVNAME_F(NL),'-->',ATM(ID)%XzVLEVNAME_F(NUP),ATM(ID)%NT_OMEGA(NL,NUP),SUM(Q)
-!	  flush(148)
 	ELSE
 !
 	END IF

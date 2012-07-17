@@ -30,6 +30,7 @@
 	REAL*8 GION_1 
 	REAL*8 EXC_EN_1
 	REAL*8 AMASS
+	LOGICAL SPLITJ_1
 !
 	INTEGER NPAIRS_2
 	INTEGER NLEV_2
@@ -42,6 +43,7 @@
 	REAL*8 ZION_2
 	REAL*8 GION_2 
 	REAL*8 EXC_EN_2
+	LOGICAL SPLITJ_2
 !
 ! These are used to read the Oscilator file.
 !
@@ -142,6 +144,8 @@
 	      READ(STRING,*)ZION_1
 	    ELSE IF( INDEX(STRING,'Statistical weight of ion') .NE. 0)THEN
 	      READ(STRING,*)GION_1
+	    ELSE IF( INDEX(STRING,'!Split J levels') .NE. 0)THEN
+	      READ(STRING,*)SPLITJ_1
 	    ELSE IF( INDEX(STRING,'!Excitation energy of final state') .NE. 0)THEN
 	      READ(STRING,*)EXC_EN_1
 	    ELSE IF( INDEX(STRING,'!Number of energy levels') .NE. 0)THEN
@@ -241,9 +245,11 @@
 	    K=INDEX(STRING,'  ')
 	    E_NAME(I)=STRING(1:K-1)
 	    READ(STRING(K:),*)G(I),ENERGY(I)
-	    IF(E_NAME(I)(K-1:K-1) .EQ.  ']')THEN
-	      K=INDEX(E_NAME(I),'[')
-	      E_NAME(I)(K:)=' '
+	    IF(.NOT. SPLITJ_1)THEN
+	      IF(E_NAME(I)(K-1:K-1) .EQ.  ']')THEN
+	        K=INDEX(E_NAME(I),'[')
+	        E_NAME(I)(K:)=' '
+	      END IF
 	    END IF
 	  END DO
 	  CLOSE(UNIT=10)
@@ -252,6 +258,7 @@
 ! have [].
 !
 	  ENERGY_1(1:NLEV_1)=0.0D0; STAT_WT_1(1:NLEV_1)=0.0D0
+	  WRITE(6,*)'Entering name comparison loop'
 	  DO I=1,NLEV_1
 	    DO J=1,NELEV
 	      IF(E_NAME(J) .EQ. NAME_1(I))THEN
@@ -298,6 +305,8 @@
 	      READ(STRING,*)GION_2
 	    ELSE IF( INDEX(STRING,'!Excitation energy of final state') .NE. 0)THEN
 	      READ(STRING,*)EXC_EN_2
+	    ELSE IF( INDEX(STRING,'!Split J levels') .NE. 0)THEN
+	      READ(STRING,*)SPLITJ_2
 	    ELSE IF( INDEX(STRING,'!Number of energy levels') .NE. 0)THEN
 	      READ(STRING,*)NLEV_2
 	      ALLOCATE (TYPE_2(NLEV_2),NUM_VALS_2(NLEV_2),LOC_2(NLEV_2), NAME_2(NLEV_2),STAT=IOS)

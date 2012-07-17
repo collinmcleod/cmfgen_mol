@@ -2,9 +2,6 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
-! Altered 10-Feb-2012: Improved computation of gbar. Expression now works for
-!                        very low energies, andhigh energies.
-!
 	INTEGER ID
 	INTEGER DPTH_INDX
 	INTEGER NKT
@@ -24,7 +21,7 @@
 	REAL*8, PARAMETER :: COEF2=-0.00647558d0
 	REAL*8, PARAMETER :: CONNECT_POINT=1.2212243D0
 !
-	REAL*8 GBAR(NKT)
+	REAL*8 GBAR
 	REAL*8 X
 	REAL*8 T1,T2
 	REAL*8 dE
@@ -33,12 +30,9 @@
 	INTEGER IKT
 !
 	RATE=0.0D0
-	gbar(:)=0.0d0
-!
-!	IF(ATM(ID)%AXzV_F(NL,NUP) .EQ. 0.0D0)RETURN
+	GBAR=0.0D0
 	dE=ATM(ID)%EDGEXzV_F(NL)-ATM(ID)%EDGEXzV_F(NUP)
 	IF(dE .LE. 0)RETURN
-!
 	dE_eV=Hz_to_eV*dE
 !
 	IF(ATM(ID)%AXzV_F(NUP,NL) .GT. 1.0D+03 .OR. ATM(ID)%NT_OMEGA(NL,NUP) .EQ. 0.0D0)THEN
@@ -47,17 +41,17 @@
 	    IF(XKT(IKT) .GE. dE_eV)THEN
 	      X = sqrt(xkt(ikt)/dE_eV-1.0d0)
               IF((ATM(ID)%ZXzV .NE. 1).AND.(X .LE. CONNECT_POINT))THEN
-                GBAR(IKT) = 0.2D0
+                GBAR = 0.2D0
               ELSE IF(X .LE. 0.80D0)THEN
-                GBAR(IKT) = 0.074*X*(1.0D0+X)
+                GBAR = 0.074*X*(1.0D0+X)
               ELSE IF(X .LE. 6)THEN
-                GBAR(IKT) = COEF0 + COEF1*X + COEF2*X*X
+                GBAR = COEF0 + COEF1*X + COEF2*X*X
               ELSE
-                GBAR(IKT) = +0.105D0+LOG(X)/1.8138D0
+                GBAR = +0.105D0+LOG(X)/1.8138D0
               END IF
-	      if(gbar(ikt) .gt. 0.0d0)then
-	        RATE=RATE+T1*GBAR(ikt)*YE(IKT,DPTH_INDX)*dXKT(IKT)/XKT(IKT)
-	      end if
+	      IF(GBAR .GT. 0.0D0)THEN
+	        RATE=RATE+T1*GBAR*YE(IKT,DPTH_INDX)*dXKT(IKT)/XKT(IKT)
+	      END IF
 	    END IF
 	  END DO
 	ELSE IF(ATM(ID)%NT_OMEGA(NL,NUP) .NE. 0.0D0)THEN

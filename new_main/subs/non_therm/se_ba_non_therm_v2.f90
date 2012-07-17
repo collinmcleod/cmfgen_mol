@@ -155,7 +155,7 @@
 !$OMP PARALLEL DO PRIVATE (DPTH_INDX,I,J,NL_F,NUP_F,NL,NUP,RATE,T1,T2)
 	      DO DPTH_INDX=1,ND
 	        DO J=2,ATM(ID)%NXzV_F
-	          DO I=1,MIN(10,J-1)
+	          DO I=1,MIN(20,J-1)
 	            NL_F=I; NUP_F=J
 	            CALL TOTAL_BETHE_RATE_V3(RATE,NL_F,NUP_F,YE,XKT,dXKT,NKT,ID,DPTH_INDX,ND)
 	            NUP=ATM(ID)%F_TO_S_XzV(NUP_F)

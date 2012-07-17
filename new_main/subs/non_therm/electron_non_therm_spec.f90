@@ -4,16 +4,17 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
-! Altered 1-Dec-2011 : Included NON_THERM_IT_CNTRL and NT_OMIT_ION_SCALE.
-!                      NT_LEV_SCALE changed to NT_OMIT_LEV_SCALE
-!                      Altered method for excluding levels.
-!                      Fixed bugs with excitaton sction.
-! Altered 7-Nov-2011 : Altered selection of levels used for evaluating non-thermal spectrum.
-!                      We now use the atom density, rather than ion density at tthe depth of interest.
-!                      NT_OMIT_LEV_SCALE added 23-Nov-2011
-!                      CONTROL_VARIABL_MOD included.
-!                      Set SOURCE to 0 before setting its value: important for CONSTANT and BELL_SHAPE
-!                      Installed NT_SOURCE_TYPE variable.
+! Altered 16-Feb-2021 : Cleaned (many prior changes to this date also).
+! Altered  1-Dec-2011 : Included NON_THERM_IT_CNTRL and NT_OMIT_ION_SCALE.
+!                       NT_LEV_SCALE changed to NT_OMIT_LEV_SCALE
+!                       Altered method for excluding levels.
+!                       Fixed bugs with excitaton sction.
+! Altered  7-Nov-2011 : Altered selection of levels used for evaluating non-thermal spectrum.
+!                       We now use the atom density, rather than ion density at tthe depth of interest.
+!                       NT_OMIT_LEV_SCALE added 23-Nov-2011
+!                       CONTROL_VARIABL_MOD included.
+!                       Set SOURCE to 0 before setting its value: important for CONSTANT and BELL_SHAPE
+!                       Installed NT_SOURCE_TYPE variable.
 !
 !	INTEGER NUM_IONS
 	INTEGER ND
@@ -47,11 +48,13 @@
 	REAL*8 RATE
 	REAL*8 SIG1,SIG2
 	REAL*8 XCROSS
+	REAL*8 NA_dX_CROSS
 	REAL*8 XION_POT
 	REAL*8 NATOM
 	REAL*8 ASUM
 	REAL*8 SCALER_SPEC_SUM
 	REAL*8 SCALER_ION_SUM
+	REAL*8 dXKT_MIN
 !
 	INTEGER GET_INDX_DP
 	REAL*8 INTSIGC
@@ -68,6 +71,7 @@
 	REAL*8, PARAMETER :: DELTA_ENR_SOURCE=30.0D0
 	LOGICAL, PARAMETER :: INCLUDE_EXCITATION=.TRUE.
 	LOGICAL, PARAMETER :: INCLUDE_IONIZATION=.TRUE.
+	CHARACTER(LEN=3), PARAMETER :: XKT_METHOD='lin'
 !
 	INTEGER ISPEC
 	INTEGER ID
@@ -122,6 +126,11 @@
 	WRITE(LU_ER,*)'Entering ELECTRON_NON_THERM_SPEC'
 	OPEN(UNIT=LU_TH,FILE='NON_THERM_SPEC_INFO',STATUS='UNKNOWN')
 	CALL SET_LINE_BUFFERING(LU_TH)
+	WRITE(LU_TH,'(A)')' '
+	WRITE(LU_TH,'(A,I5)')  ' Number of enrgy bins is ',NKT
+	WRITE(LU_TH,'(A,F8.2)')' Emin in eV is',XKT_MIN
+	WRITE(LU_TH,'(A,F8.2)')' Emax in eV is',XKT_MAX
+	WRITE(LU_TH,'(A)')' '
 !
 ! Allocate arrays that will be used for each depth:.
 !
@@ -175,7 +184,7 @@
 	IF(FIRST_TIME)THEN
 !
 	  WRITE(LU_TH,*)'Setting XKT array'
-	  CALL SET_XKT_ARRAY(XKT_MIN,XKT_MAX,NKT,XKT,dXKT,'lin')
+	  CALL SET_XKT_ARRAY(XKT_MIN,XKT_MAX,NKT,XKT,dXKT,XKT_METHOD)
 !
 ! If needed, allocate memory for collisional ioinzation cross-sections.
 !
@@ -202,6 +211,8 @@
 	FRAC_ION_HEATING=0.0D0
 	FRAC_EXCITE_HEATING=0.0D0
 	YE=0.0D0
+	dXKT_MIN=(XKT_MAX-XKT_MIN)/(NKT-1)
+	IF(METHOD .EQ. 'log')dXKT_MIN=XKT(2)-XKT(1)
 !
 ! Set how the lectrons are ejected at high enegry. This will be the same for all
 ! depths. We can either inject at EMAX, or use a Bell-shaped curve near EMAX.
@@ -347,28 +358,27 @@
 	           IST=GET_INDX_DP(XION_POT,XKT,NKT)
 	        END IF
 ! 
-!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(IKT,IKTP,EKT,EKTP,EMIN,EMAX,XCROSS)
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(IKT,IKTP,EKT,EKTP,EMIN,EMAX,XCROSS,NA_dX_CROSS)
 	        DO IKTP=IST,NKT
-	          EkTP = XKT(IKTP)
                   XCROSS = THD(IT)%CROSS_SEC(IKTP)
+	          IF(XCROSS .GT. 0.0D0)THEN
+	            EKTP = XKT(IKTP)
+                    EMAX = MIN(0.5d0*(EKTP+XION_POT),XKT(NKT))
+	            NA_dX_CROSS=NATOM*dXKT(IKTP)*XCROSS
 !
-	          DO IKT=1,IKTP
-	            IF(XCROSS .EQ. 0.0D0)EXIT
-	            EKT = XKT(IKT)
-	            EMIN = MAX(EKTP-EKT,XION_POT)
-	            EMAX = MIN(0.5D0*(EKTP+XION_POT),XKT(NKT))
-	            IF(EMAX .GT. EMIN)THEN
-	              MAT(IKT,IKTP) = MAT(IKT,IKTP) + &
-                            NATOM*dXKT(IKTP)*XCROSS*INTSIGC(EKTP,XION_POT,EMIN,EMAX)
-	            END IF
+	            DO IKT=1,IKTP
+	              EKT = XKT(IKT)
+	              EMIN = MAX(EKTP-EKT,XION_POT)
+	              IF(EMAX .GT. EMIN)THEN
+	                MAT(IKT,IKTP) = MAT(IKT,IKTP) + NA_dX_CROSS*INTSIGC(EKTP,XION_POT,EMIN,EMAX)
+	              END IF
 !
-                    IF (EKTP .GT. (2.0D0*EKT+XION_POT)) THEN
-                      EMIN = EKT+XION_POT
-                      EMAX = MIN(0.5d0*(EKTP+XION_POT),XKT(NKT))
-                      MAT(IKT,IKTP) = MAT(IKT,IKTP) &
-                       - NATOM*dXKT(IKTP)*XCROSS*INTSIGC(EKTP,XION_POT,EMIN,EMAX)
-                    END IF
-	          END DO
+                      IF (EKTP .GT. (2.0D0*EKT+XION_POT)) THEN
+                        EMIN = EKT+XION_POT
+                        MAT(IKT,IKTP) = MAT(IKT,IKTP) - NA_dX_CROSS*INTSIGC(EKTP,XION_POT,EMIN,EMAX)
+                      END IF
+	            END DO
+	          END IF
 !
 	        END DO
 !$OMP END PARALLEL DO
@@ -420,7 +430,7 @@
 	        DO WHILE(J .LE. ATM(ID)%NXzV_F)
 	          NUP=J
 	          CALL BETHE_APPROX_V4(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
-	          IF(SUM(Qnn) .GT. 0.0D0)THEN
+	          IF(Qnn(NKT) .GT. 0.0D0)THEN
 	            dE=ATM(ID)%AXzV_F(NL,NUP)*Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(J))
 	            ASUM=ATM(ID)%AXzV_F(NL,NUP)
 	            K=J
@@ -429,7 +439,7 @@
 	              K=K+1
 	              NUP=K
 	              CALL BETHE_APPROX_V4(Qnn_TMP,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
-	              IF(SUM(Qnn) .GT. 0.0D0)THEN
+	              IF(Qnn_TMP(NKT) .GT. 0.0D0)THEN
 	                Qnn=Qnn+Qnn_TMP 
 	                dE=dE+ATM(ID)%AXzV_F(NL,NUP)*Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(K))
 	                ASUM=ASUM+ATM(ID)%AXzV_F(NL,NUP)
@@ -450,9 +460,13 @@
 	              IF (EMAX .GT. XKT(NKT-1)) then
 	                IKTPN = NKT
 	              ELSE
-	                DO WHILE (XKT(IKTPN) .LT. EMAX)
-	                  IKTPN = IKTPN + 1
-	                END DO
+	                IF(XKT_METHOD .EQ. 'lin')THEN
+	                  IKTPN=NINT( (EMAX-EKT)/dXKT_MIN+IKT0 )
+	                ELSE
+	                  DO WHILE (XKT(IKTPN) .LT. EMAX)
+	                    IKTPN = IKTPN + 1
+	                  END DO
+	                END IF
 	              END IF
 !
 	              DO IKTP=IKT0,IKTPN
