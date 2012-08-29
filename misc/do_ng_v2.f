@@ -65,6 +65,7 @@
 	INTEGER LST_NG
 	INTEGER IFLAG
 	INTEGER N_ITS_TO_RD
+	INTEGER N_ITS_TO_AV
 	INTEGER IT_STEP
 	INTEGER I,J,K
 	INTEGER IVAR
@@ -169,10 +170,15 @@
 	ELSE IF(OPTION(1:2) .EQ. 'TG')THEN
 	  N_ITS_TO_RD=3
 	  SCALE_FAC=2.0D0
+	  IT_STEP=1
+	  N_ITS_TO_AV=1
+	  CALL GEN_IN(N_ITS_TO_RD,'Number of iterations to read')
 	  CALL GEN_IN(SCALE_FAC,'Exponent (N) to power scale (i.e., (1+T1)**N last correction if r<1')
 	  CALL GEN_IN(ND_ST,'Only do NG acceleration for the depth in .GE. ND_ST')
 	  CALL GEN_IN(ND_END,'Only do NG acceleration for the depth in .LE. ND_END')
-	  CALL GEN_IN(IT_STEP,'Iteration step size for NG acceleration')
+	  CALL GEN_IN(N_ITS_TO_AV,'Number of iterations to avergae')
+	  IF(N_ITS_TO_AV .EQ. 1)CALL GEN_IN(IT_STEP,'Iteration step size for NG acceleration')
+	  N_ITS_TO_RD=3*N_ITS_TO_AV
 	ELSE IF(OPTION(1:3) .EQ. 'NSR')THEN
 	  N_ITS_TO_RD=2
 	  SCALE_FAC=2.0D0
@@ -261,6 +267,11 @@
 	  IVAR=NT
 	  CALL GEN_IN(IVAR,'Variable?')
 	  DO J=ND_ST,ND_END
+	    IF(N_ITS_TO_AV .NE. 1)THEN
+	      DO K=1,N_ITS_TO_RD/N_ITS_TO_AV
+	        RDPOPS(:,J,K)=0.5D0*(RDPOPS(:,J,2*K-1)+RDPOPS(:,J,2*K))
+	      END DO
+	    END IF
 	    T1=(RDPOPS(IVAR,J,2)-RDPOPS(IVAR,J,3))/(RDPOPS(IVAR,J,1)-RDPOPS(IVAR,J,2))
 	    WRITE(6,*)'r1=',T1,'Depth=',J
 	    IF(T1 .GT. 1.0)THEN

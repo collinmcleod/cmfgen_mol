@@ -506,7 +506,9 @@ C
 	  CALL RD_STORE_LOG(VERBOSE_OUTPUT,'VERBOSE_OUT',L_FALSE,
 	1        'Switch on enhanced diagnostic output')
 	  CALL SET_VERBOSE_INFO(VERBOSE_OUTPUT)
-C
+	  WRITE_RATES=.FALSE.
+	  CALL RD_STORE_LOG(WRITE_RATES,'WRITE_RATES',L_FALSE,'Write out NETRATE, TOTRATE, etc')
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_NCHAR(GLOBAL_LINE_SWITCH,'GLOBAL_LINE',ISIX,L_TRUE,
 	1            'Global switch to indicate handeling of line')
@@ -587,8 +589,10 @@ C
 	1            'Include variation in distribution of level populations in a SL with T?')
 	  NEW_LINE_BA=.FALSE.
 	  IF(SN_MODEL)NEW_LINE_BA=.TRUE.
+	  INDX_BA_METH_RD=45
 	  CALL RD_STORE_LOG(NEW_LINE_BA,'NEW_LINE_BA',L_FALSE,
 	1            'Use the new technique for comuting BA_T (i.e., dRE/dT)?')
+	  CALL RD_STORE_INT(INDX_BA_METH_RD,'INDX_BA_METH',L_FALSE,'Depth location to begin NEW_LINE_BA technique')
 !
 	  LINEAR_ADV=.TRUE.
 	  CALL RD_STORE_LOG(LINEAR_ADV,'LIN_ADV',L_FALSE,

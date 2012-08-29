@@ -137,6 +137,11 @@
 	  CALL RD_STORE_INT(N_INS_OBS,'N_INS_OBS',L_TRUE,
 	1          'Mininum number of points to be inserted in '//
 	1          ' observers frame grid (>= 0)')
+!
+	  REVISE_P_GRID=.FALSE.
+	  CALL RD_STORE_LOG(REVISE_P_GRID,'REVISE_P',L_FALSE,
+	1          'Revise p frid for observer''s calculation')
+!
 	  CALL RD_STORE_LOG(DO_REL_IN_OBSFRAME,'DO_RELO',L_FALSE,
 	1        'Use all relativistic terms in Observer''s frame calculation.')
 	  CALL RD_STORE_LOG(DO_CMF_REL_OBS,'DO_CMF_RELO',L_FALSE,

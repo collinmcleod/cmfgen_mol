@@ -14,6 +14,7 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered:  3-Aug-2012 : Changed to allow the computation of a revised grid for shell models.
 ! Altered: 17-Dec-2011 : Now call OPACITIES_V5.INC and EVAL_LTE_INC_V5.INC 
 !                          L_STAR_RATIO and U_STAR_RATIO now computed using XzVLTE_F_ON_S 
 !                          Done to allow lower wind temperatures.
@@ -424,6 +425,7 @@ C
 	INTEGER, PARAMETER :: NST_CMF=10000
 	INTEGER NP_OBS_MAX
 	INTEGER NP_OBS
+	INTEGER NC_OBS
 	REAL*8  NU_STORE(NST_CMF)
 	REAL*8 V_AT_RMAX		!Used if we extend the atmosphere.
 	REAL*8 RMAX_OBS
@@ -1972,12 +1974,31 @@ C
 	  HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*R(ND)*R(ND)/R(1)/R(1)
 	  P(1:NC)=R(ND)*SQRT( (1.0D0-MU_AT_RMAX(1:NC))*(1.0D0+MU_AT_RMAX(1:NC)) )
 	  NP_OBS=NC
+	  P_OBS(1:NP_OBS)=P(1:NP_OBS)
+	ELSE IF(REVISE_P_GRID)THEN
+	  DEALLOCATE (P_OBS)
+	  I=NP*10; ALLOCATE (P_OBS(I))
+	  CALL REVISE_OBS_P(P_OBS,NP_OBS,I,NC_OBS,NC,R,ND,LUIN,LUMOD)
+!
+	  DEALLOCATE (MU_AT_RMAX,HQW_AT_RMAX)
+	  ALLOCATE (MU_AT_RMAX(NP_OBS),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (HQW_AT_RMAX(NP_OBS),STAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(LUER,*)'Error allocate MU_AT_RMAX in refine p grid section'
+	    STOP
+	  END IF
+	  DO LS=1,NP_OBS
+	    MU_AT_RMAX(LS)=SQRT((R(1)-P_OBS(LS))*(R(1)+P_OBS(LS)))/R(1)
+	  END DO
+	  CALL HWEIGHT(MU_AT_RMAX,HQW_AT_RMAX,NP_OBS)
+!
 	ELSE
 	  DO LS=1,NP
 	    MU_AT_RMAX(LS)=SQRT((R(1)-P(LS))*(R(1)+P(LS)))/R(1)
 	  END DO
 	  CALL HWEIGHT(MU_AT_RMAX,HQW_AT_RMAX,NP)
 	  NP_OBS=NP
+	  P_OBS(1:NP_OBS)=P(1:NP_OBS)
 	END IF
 !
 ! ***************************************************************************
@@ -1998,7 +2019,7 @@ C
 	END IF
 	CALL OBS_FRAME_SUB_V9(ETA_CMF_ST,CHI_CMF_ST,NU,
 	1            R,TA,T,ED,ND,NCF,
-	1            P,MU_AT_RMAX,HQW_AT_RMAX,NC,NP_OBS,
+	1            P_OBS,MU_AT_RMAX,HQW_AT_RMAX,NC_OBS,NP_OBS,
 	1            OBS_FREQ,OBS_FLUX,N_OBS,
 	1            MAX_DEL_V_RES_ZONE,OBS_TAU_MAX,OBS_ES_DTAU,
 	1            N_INS_OBS,OBS_INT_METHOD,

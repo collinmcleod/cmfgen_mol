@@ -178,6 +178,7 @@
 	REAL*8 OBS_TAU_MAX			!Cut integration off when TAU > OBS_TAU_MAX
 	REAL*8 OBS_ES_DTAU			!Maximum grid spacing, in e.s. optical depth, along ray.
 	INTEGER N_INS_OBS               	!# of additional points inserted/per zone for observer's frame calculation.
+	LOGICAL REVISE_P_GRID			!Revise p grid for observer's fram calculation?
 	CHARACTER(LEN=10) OBS_INT_METHOD	!STAU (integrate over S) or ETAZ (integrate over eta)
 !
 ! Used in the CMF frame formal solution.

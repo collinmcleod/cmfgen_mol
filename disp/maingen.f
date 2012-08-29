@@ -1066,8 +1066,7 @@
 	    EDDC=.TRUE.
 	    DEFAULT='T'
 	  ENDIF
-	  CALL USR_OPTION(EDDC,'EDDC',DEFAULT,
-	1             'Use Eddington factors to compute Jc ?')
+	  CALL USR_OPTION(EDDC,'EDDC',DEFAULT,'Use Eddington factors to compute Jc ?')
 !
 	  IF(EDDC)THEN
 	    S1=ZETA(1)
@@ -1373,6 +1372,39 @@
 	  IF(.NOT. FLAG)THEN
 	    WRITE(T_OUT,*)'Error --- invalid species identification'
 	  END IF
+!
+	ELSE IF(XOPT .EQ. 'WRLST')THEN
+	  OPEN(UNIT=LU_OUT,FILE='LST_LEVL_INFO',STATUS='UNKNOWN')
+	  DO ID=1,NUM_IONS
+	    IF(ATM(ID)%XzV_PRES)THEN
+	      K=0
+	      DO J=2,ATM(ID)%NXzV_F-1
+	        DO L=1,J-1
+	          IF(ATM(ID)%AXzV_F(J,L) .GE. 1.0D-20)K=K+1
+	        END DO
+	      END DO
+	      I=ATM(ID)%NXzV_F
+	      WRITE(LU_OUT,'(A7,3X,I4,I8,3X,A30)')ION_ID(ID),ATM(ID)%NXzV_F,K,ATM(ID)%XzVLEVNAME_F(I)
+	    END IF
+	  END DO
+	  CLOSE(LU_OUT)
+!
+	ELSE IF(XOPT .EQ. 'CHKA')THEN
+!
+	  WRITE(6,*)' '
+          WRITE(6,*)BLUE_PEN//'Writing out levels with no decay routes'//DEF_PEN
+	  WRITE(6,*)' '
+	  DO ID=1,NUM_IONS
+	    IF(ATM(ID)%XzV_PRES)THEN
+	      DO J=2,ATM(ID)%NXZV_F
+	        T1=SUM(ATM(ID)%AXzV_F(J,1:J-1))
+	        IF(T1 .EQ. 0.0D0)THEN
+	          WRITE(6,'(A6,3X,I4,4X,A)')ION_ID(ID),J,TRIM(ATM(ID)%XzVLEVNAME_F(J))
+	          WRITE(30,'(A6,3X,I4,4X,A)')ION_ID(ID),J,TRIM(ATM(ID)%XzVLEVNAME_F(J))
+	        END IF
+	      END DO
+	    END IF
+	  END DO
 !
 ! 
 !
@@ -2335,7 +2367,7 @@
 !
 	ELSE IF(XOPT .EQ. 'ERAD')THEN
 	  CALL USR_OPTION(ELEC,'INTEG','T','Integrate radiative energy?')
-	  T1=4.0D0*BOLTZMANN_CONSTANT()/SPEED_OF_LIGHT()
+	  T1=4.0D+16*STEFAN_BOLTZ()/SPEED_OF_LIGHT()
 	  YV(1:ND)=T1*(T(1:ND)**4)
 	  IF(ELEC)THEN
 	    YV(1:ND)=3.280D-03*YV(1:ND)*R(1:ND)*R(1:ND)  !(4*PI*Dex(+30)/L(sun)
@@ -4178,7 +4210,7 @@
 	ELSE IF(XOPT .EQ. 'DCS')THEN
 !
 	  WRITE(6,*)' '
-	  WRITE(6,*)PG_PEN(2)//'Use B option in PLT_SPEC for plotting'
+	  WRITE(6,*)BLUE_PEN//'Use B option in PLT_SPEC for plotting'//DEF_PEN
 	  WRITE(6,*)' '
 	  FOUND=.FALSE.
 	  DO ID=1,NUM_IONS
@@ -5246,17 +5278,29 @@ c
 !
 	  CALL USR_OPTION(ELEC,'PLOT','F','PLot Line Origin?')
 !
-! Factor of 2.302585 is to convert from LN to LOG10
+! We can now use the current X-axis for the X-axis. Zeta(x)
+! is defined similarly to before: Zeta(x) dx gives the
+! emission about x in an interval dx.
+!
+! We use JNU for COEF which must be dimensioned JNU(ND,*) [with * > 3]
+! NB: T1 contains the line EW.
 !
 	  IF(ELEC)THEN
-	    T1=2.302585/T1
+	    WRITE(T_OUT,*)' '
+	    WRITE(T_OUT,*)BLUE_PEN//'Area under curve is normalized to unity'//DEF_PEN
+	    WRITE(T_OUT,*)' '
+	    DO I=1,ND-2
+	      IF( (XV(I+1)-XV(I))*(XV(I+2)-XV(I+1)) .LE. 0.0D0)THEN
+	        WRITE(T_OUT,*)RED_PEN//'Error -- can only plot line origin against a mononotonix X-axis'//DEF_PEN
+	        GOTO 1
+	      END IF
+	    END DO 
+	    CALL MON_INT_FUNS_V2(JNU,XV,R,ND)
 	    DO I=1,ND
-	      YV(I)=TA(I)*T1
-	      ZV(I)=DLOG10(R(I)/R(ND))
+	      YV(I)=TA(I)/R(I)/JNU(I,3)/T1
 	    END DO
-	    CALL DP_CURVE(ND,ZV,YV)
-	    YAXIS='\gx'
-	    XAXIS='Log(r/R\d*\u)'
+	    CALL DP_CURVE(ND,XV,YV)
+	    YAXIS='\gz'
 	  ELSE
 	    CALL DP_CURVE(ND,XV,FORCE_MULT)
 	    YAXIS='Force Multiplier'

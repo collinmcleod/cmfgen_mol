@@ -385,6 +385,7 @@
 	REAL*8 BA_CHK_FAC
 	LOGICAL INCLUDE_dSLdT
 	LOGICAL NEW_LINE_BA
+	INTEGER INDX_BA_METH_RD
 !
 ! Variables for scaling the line cooling rates in oder that the radiative
 ! equilibrium equation is more consistent with the electron heating/cooling 
@@ -521,5 +522,6 @@
 	LOGICAL CHECK_LINE_OPAC
         LOGICAL SOBOLEV
         LOGICAL VERBOSE_OUTPUT
+	LOGICAL WRITE_RATES
 !
 	END MODULE CONTROL_VARIABLE_MOD

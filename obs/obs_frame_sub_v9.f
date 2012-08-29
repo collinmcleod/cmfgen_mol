@@ -355,22 +355,22 @@
 	IF(PLANE_PARALLEL)NP_TMP=NC
 	DO 50000 LS=1,NP_TMP
 !
-	  IF(LS .GT. NC)THEN
-	    NI=ND-(LS-NC-1)
-	  ELSE
-	    NI=ND
-	  END IF
-!
 	  IF(PLANE_PARALLEL)THEN
+	    NI=ND
 	    DO I=1,NI
 	      Z(I)=R(I)/MU_AT_RMAX(LS)
 	      VMU(I)=V(I)*R(I)/Z(I)
 	    END DO
 	  ELSE
+	    NI=ND
+	    DO WHILE(P(LS) .GT. R(NI))
+	     NI=NI-1
+	    END DO
 	    DO I=1,NI
 	      Z(I)=SQRT( (R(I)+P(LS))*(R(I)-P(LS)) )
 	      VMU(I)=V(I)*Z(I)/R(I)
 	    END DO
+	    IF(LS .GT. NC .AND. P(LS) .NE. R(NI))NI=NI+1
 	    IF(LS .GT. NC)THEN
 	      Z(NI)=0.0D0
 	      VMU(NI)=0.0D0
@@ -497,14 +497,16 @@
 	    DO I=1,NR
 	      R_RAY(I)=Z_RAY(I)*MU_AT_RMAX(LS)
 	    END DO
+	    R_RAY(1)=R(1)
+	    R_RAY(NR)=R(NI)
 	  ELSE
 	    PSQ=P(LS)*P(LS)
-	    DO I=2,NR-1
+	    DO I=2,NR
 	      R_RAY(I)=SQRT(PSQ+Z_RAY(I)*Z_RAY(I))
 	    END DO
+	    R_RAY(1)=R(1)
+	    R_RAY(NR)=MAX(P(LS),R(ND))		!Avoid rounding errors.
 	  END IF
-	  R_RAY(1)=R(1)
-	  R_RAY(NR)=R(NI)
 !
 	  CALL MON_INTERP_FAST(V_RAY,NRAY,IONE,R_RAY,NR,V,ND,R,ND)
 	  IF(PLANE_PARALLEL)THEN
@@ -605,7 +607,8 @@
 	      J=J-1
 	    END DO
 	    END_INDX_CMF(OUT_ML)=MIN(NCF,J+10)
-	    WRITE(301,'(5(A,I7))')'LS=',LS,'OUT_ML=',OUT_ML,
+	    WRITE(301,'(A,I7,2X,A,ES16.6,5(2X,A,I7))')
+	1           'LS=',LS,'P(LS)=',P(LS),'OUT_ML=',OUT_ML,
 	1           'IST=',STRT_INDX_CMF(OUT_ML),'IND=',END_INDX_CMF(OUT_ML),
 	1           'SM_NCF=',END_INDX_CMF(OUT_ML)-STRT_INDX_CMF(OUT_ML)
 	    SM_NCF=MAX(SM_NCF,END_INDX_CMF(OUT_ML)-STRT_INDX_CMF(OUT_ML)+1)

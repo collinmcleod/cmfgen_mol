@@ -6,6 +6,8 @@
 	1                  SN_AGE_DAYS,PURE_HUBBLE_FLOW,N_IB_INS,N_OB_INS,RDINR,ND,LU)
 	IMPLICIT NONE
 !
+! Altered 28-Aug-2012 : Incorrect dimension (ND instead of J) was being passed to
+!                         MON_INTERP. Caused bou access issue/crash rather than wrong result.
 ! Altered 10-Jul-2012 : Modified computation of R grid, especially the grid near the boundaries.
 ! Altered 28-Jan-2012 : Initialize dLOGR and dTAU=0.0D when using R grdid from RDINR as used for diagnostic output.
 ! Altered 15-Jul-2010 : Adjusted scalinf the R grid when read in from RDINR.
@@ -438,7 +440,7 @@
 	  DO I=1,J
 	    XN(I)=1.0D0+(I-1.0D0)*(ND_TMP-1.0D0)/(J-1.0D0)
 	  END DO
-	  CALL MON_INTERP(R,J,IONE,XN,ND,LOG_R,ND_TMP,TAU,ND_TMP)
+	  CALL MON_INTERP(R,J,IONE,XN,J,LOG_R,ND_TMP,TAU,ND_TMP)
 	  LOG_R=R
 	  ND_TMP=J
 !

@@ -5,6 +5,8 @@
 	SUBROUTINE GET_ND_SEQ_MODEL_FILE(ND,LU)
 	IMPLICIT NONE
 !
+! Altered 29-Aug-2012 :  Old LEV_POP_AVAIL was not being set for the ion when a new
+!                           higher ioiztion stage was being added.
 ! Altered 22-Jul-2008 :  Changed to facilitate addition/deletion of ionization stages
 !                           from time dependent models. NUM_SPECIES and ZXzV for each
 !                           ion is now output. At present iozation stages can only be
@@ -271,6 +273,8 @@
 	        J=ATM(ID)%EQXzV-1+I
 	        OLD_LEV_POP_AVAIL(J)=.FALSE.
 	      END DO
+	      J=ATM(ID)%EQXzV+ATM(ID)%NXzV
+	      IF(ID .EQ. SPECIES_END_ID(ISPEC)-1)OLD_LEV_POP_AVAIL(J)=.FALSE.
 	    END IF
 	  END DO
 	END DO
