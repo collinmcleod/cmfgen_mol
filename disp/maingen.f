@@ -2333,6 +2333,23 @@
 	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
 !
+	ELSE IF(XOPT .EQ. 'ERAD')THEN
+	  CALL USR_OPTION(ELEC,'INTEG','T','Integrate radiative energy?')
+	  T1=4.0D0*BOLTZMANN_CONSTANT()/SPEED_OF_LIGHT()
+	  YV(1:ND)=T1*(T(1:ND)**4)
+	  IF(ELEC)THEN
+	    YV(1:ND)=3.280D-03*YV(1:ND)*R(1:ND)*R(1:ND)  !(4*PI*Dex(+30)/L(sun)
+	    CALL LUM_FROM_ETA(YV,R,ND)
+	    DO I=ND-1,1,-1
+	      YV(I)=YV(I+1)+YV(I)
+	    END DO
+	    YAXIS='E(rad)(s.L\dsun\u)'
+	  ELSE
+	    YV(1:ND)=DLOG10(YV(1:ND))
+	    YAXIS='Log E\drad\u(ergs\u \dcm\u-3)'
+	  END IF
+	  CALL DP_CURVE(ND,XV,YV)
+!
 	ELSE IF(XOPT .EQ. 'EI')THEN
 	  CALL USR_OPTION(ELEC,'INTEG','T','Integrate intenal energy?')
           YV(1:ND)=0.0D0
