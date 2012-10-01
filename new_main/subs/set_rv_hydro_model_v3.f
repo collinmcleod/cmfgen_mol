@@ -7,7 +7,7 @@
 	IMPLICIT NONE
 !
 ! Altered 28-Aug-2012 : Incorrect dimension (ND instead of J) was being passed to
-!                         MON_INTERP. Caused bou access issue/crash rather than wrong result.
+!                         MON_INTERP. Causes access issue/crash rather than wrong result.
 ! Altered 10-Jul-2012 : Modified computation of R grid, especially the grid near the boundaries.
 ! Altered 28-Jan-2012 : Initialize dLOGR and dTAU=0.0D when using R grdid from RDINR as used for diagnostic output.
 ! Altered 15-Jul-2010 : Adjusted scalinf the R grid when read in from RDINR.

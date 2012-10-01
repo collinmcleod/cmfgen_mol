@@ -71,6 +71,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(genangqw.o)\
       $(LIB)(genosc_v5.o)\
       $(LIB)(genosc_v6.o)\
+      $(LIB)(get_col_ref.o)\
       $(LIB)(getelec_v2.o)\
       $(LIB)(gff.o)\
       $(LIB)(gnthydl.o)\

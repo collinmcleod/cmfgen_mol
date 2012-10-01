@@ -63,8 +63,8 @@ EXE_DIR=$(INSTALL_DIR)exe/
 
 # F90 = pgf95 
 
- F90 = pgf95 -mp -Mlarge_arrays -Ktrap=fp
- F90nomp = pgf95  -Mlarge_arrays -Ktrap=fp
+ F90 = pgf95 -mp -Mlarge_arrays -Ktrap=fp -Mipa
+ F90nomp = pgf95  -Mlarge_arrays -Ktrap=fp -Mipa
 
 # FG  = -O2  -Mlarge_arrays -Mextend -Mbackslash  -Ktrap=fp -I$(MOD_DIR)
 # FH  = -O2  -Mlarge_arrays -Mextend -Mbackslash  -Ktrap=fp -I$(MOD_DIR)

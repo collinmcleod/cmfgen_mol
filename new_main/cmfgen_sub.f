@@ -722,7 +722,12 @@
 	1             VSM_DIE_KMS, ATM(ID)%DIE_AUTO_XzV, ATM(ID)%DIE_WI_XzV,
 	1             ION_ID(ID),LUIN,LUSCR,TMP_STRING)
 	      END IF
-	    END IF
+!
+! This is simply to get any data references that are in the collisional data file.
+!
+	      TMP_STRING=TRIM(ION_ID(ID))//'_COL_DATA'
+	      CALL GET_COL_REF(TMP_STRING,LUIN,LUSCR)
+	   END IF
 	  END DO
 	END DO
 !

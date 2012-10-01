@@ -14,6 +14,8 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered:  1-Oct-2012 : Fixed bug: NC_OBS was not being set for the normal P-grid which caused
+!                           a problem with the observer's frame calculation.
 ! Altered:  3-Aug-2012 : Changed to allow the computation of a revised grid for shell models.
 ! Altered: 17-Dec-2011 : Now call OPACITIES_V5.INC and EVAL_LTE_INC_V5.INC 
 !                          L_STAR_RATIO and U_STAR_RATIO now computed using XzVLTE_F_ON_S 
@@ -1997,7 +1999,7 @@ C
 	    MU_AT_RMAX(LS)=SQRT((R(1)-P(LS))*(R(1)+P(LS)))/R(1)
 	  END DO
 	  CALL HWEIGHT(MU_AT_RMAX,HQW_AT_RMAX,NP)
-	  NP_OBS=NP
+	  NC_OBS=NC; NP_OBS=NP
 	  P_OBS(1:NP_OBS)=P(1:NP_OBS)
 	END IF
 !

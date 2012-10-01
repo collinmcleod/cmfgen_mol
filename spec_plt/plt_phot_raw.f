@@ -6,8 +6,11 @@
 	PROGRAM PLT_PHOT_RAW
 	USE GEN_IN_INTERFACE
 	USE HYD_BF_PHOT_DATA
+	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered 20-Sep-2012 : Bug fix with incorrect link test for 2nd photoionization data set.
+!                         Cleaned.
 ! Altered 16-Apr-2008 : Read in energy levels form oscilator file (if available).
 !                       Deleted log plot section (since can be done in pgplot)
 !                       Can now eneter level index for name. If unrecognized level,
@@ -21,16 +24,19 @@
 	INTEGER, ALLOCATABLE :: TYPE_1(:)
 	INTEGER, ALLOCATABLE ::  NUM_VALS_1(:)
 	INTEGER, ALLOCATABLE ::  LOC_1(:)
-	CHARACTER(LEN=40), ALLOCATABLE :: NAME_1(:)
 	REAL*8, ALLOCATABLE :: NU_1(:)
 	REAL*8, ALLOCATABLE :: CROSS_1(:)
 	REAL*8, ALLOCATABLE :: ENERGY_1(:)
 	REAL*8, ALLOCATABLE :: STAT_WT_1(:)
+!
+	CHARACTER(LEN=40), ALLOCATABLE :: NAME_1(:)
 	REAL*8 ZION_1
 	REAL*8 GION_1 
 	REAL*8 EXC_EN_1
 	REAL*8 AMASS
 	LOGICAL SPLITJ_1
+!
+! Storage for 2nd photoionization data set.
 !
 	INTEGER NPAIRS_2
 	INTEGER NLEV_2
@@ -45,7 +51,7 @@
 	REAL*8 EXC_EN_2
 	LOGICAL SPLITJ_2
 !
-! These are used to read the Oscilator file.
+! These are used to read the Oscillator file.
 !
 	INTEGER NELEV
 	REAL*8, ALLOCATABLE :: ENERGY(:)
@@ -56,7 +62,7 @@
 	CHARACTER*40 LEVEL_NAME1
 	CHARACTER*40 LEVEL_NAME2
 !
-	REAL*8 T1
+	REAL*8 T1,T2
 	REAL*8 FREQ_SCL_FAC
 !
 	INTEGER I,J,K
@@ -82,6 +88,7 @@
 	REAL*8 ANG_TO_HZ,SPEED_OF_LIGHT
 	REAL*8, PARAMETER :: RONE=1.0D0
 	LOGICAL DO_WAVE_PLT
+        LOGICAL PLOT_REL_TO_GS_EDGE
 	LOGICAL DO_RECOM
 	LOGICAL DO_ALL_RECOM
 	LOGICAL DO_SEQ_PLTS
@@ -116,28 +123,29 @@
 ! l=0 to n-1)
 !
         CALL RD_HYD_BF_DATA(LUIN,LUSCR,LUER)
-	WRITE(6,*)SHAPE(BF_L_INDX)
-	WRITE(6,*)SHAPE(BF_L_CROSS)
 !
-	WRITE(6,'(A)')' '
-	WRITE(6,'(A)')'Program designed to plot/compare opacity project data from photoionization files '
-	WRITE(6,'(A)')'Use DISPGEN to plot tabulated cross-sections '
-	WRITE(6,'(A)')' '
+	WRITE(6,'(A)')BLUE_PEN
+	WRITE(6,'(A)')' Program designed to plot/compare opacity project data from photoionization files'
+	WRITE(6,'(A)')DEF_PEN
 !
 10	FILENAME='PHOT1'
-	CALL GEN_IN(FILENAME,'First photoionization file1:')
+	CALL GEN_IN(FILENAME,RED_PEN//'FIRST'//DEF_PEN//' photoionization file:')
 	NPAIRS_1=0
 	OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME,ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
+	    WRITE(6,'(A)')RED_PEN
 	    WRITE(6,*)'Unable to open file: ',TRIM(FILENAME)
 	    WRITE(6,*)'IOSTAT=',IOS
+	    WRITE(6,'(A)')DEF_PEN
 	    GOTO 10
 	  END IF
 	  DO WHILE(NPAIRS_1 .EQ. 0)
 	    READ(10,'(A)',IOSTAT=IOS)STRING
 	    IF(IOS .NE. 0)THEN
+	      WRITE(6,'(A)')RED_PEN
 	      WRITE(6,*)'Error reading file: ',TRIM(FILENAME)
 	      WRITE(6,*)'IOSTAT=',IOS
+	      WRITE(6,'(A)')DEF_PEN
 	      STOP
 	    END IF
 	    IF( INDEX(STRING,'!Screened nuclear charge') .NE. 0)THEN
@@ -153,9 +161,11 @@
 	      ALLOCATE (TYPE_1(NLEV_1),NUM_VALS_1(NLEV_1),LOC_1(NLEV_1),
 	1               NAME_1(NLEV_1),ENERGY_1(NLEV_1),STAT_WT_1(NLEV_1),STAT=IOS)
 	      IF(IOS .NE. 0)THEN
+	        WRITE(6,'(A)')RED_PEN
 	        WRITE(6,*)'Error in PLT_PHOT_RAW -- unable to allocate storage (1)'
 	        WRITE(6,*)'STAT=',IOS
 	        WRITE(6,*)'NLEV_1=',NLEV_1
+	        WRITE(6,'(A)')DEF_PEN
 	        STOP
 	      END IF
 	    END IF
@@ -202,29 +212,23 @@
 ! Read in energy levels from oscilator file, if it is available.
 ! May need to change if oscilator file format changes.
 !
-14	CONTINUE
-!
-	WRITE(6,'(A)')' '
+	WRITE(6,'(A)')BLUE_PEN
 	WRITE(6,'(A)')' Not all options available if no oscillator file '
 	WRITE(6,'(A)')' Can only treat opacity data when no oscillator file'
-	WRITE(6,'(A)')' '
+	WRITE(6,'(A)')DEF_PEN
 !
+14	CONTINUE
 	CALL GEN_IN(FILENAME,'File with oscillator data: "" for no file')
 	IF(FILENAME .NE. " ")THEN
 	  OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME,ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
-	    WRITE(6,*)'Unable to open file: ',TRIM(FILENAME)
+	    WRITE(6,*)RED_PEN
+	    WRITE(6,*)'Unable to open oscillator file: ',TRIM(FILENAME)
 	    WRITE(6,*)'IOSTAT=',IOS
+	    WRITE(6,*)DEF_PEN
 	    GOTO 14
 	  END IF
 	  STRING=' '
-!	  DO WHILE(INDEX(STRING,'!Format date') .EQ. 0)
-!	    READ(10,'(A)')STRING
-!	  END DO
-!	  IF(INDEX(STRING,'17-Oct-2000') .EQ. 0)THEN
-!	    WRITE(6,*)'Oscilator format date is not recognized by this routine'
-!	    GOTO 14
-!	  END IF
 	  DO WHILE(INDEX(STRING,'!Number of energy levels') .EQ. 0)
 	    READ(10,'(A)')STRING
 	  END DO
@@ -254,10 +258,11 @@
 	  END DO
 	  CLOSE(UNIT=10)
 !
-! Now need to match names. We assume photoionzation files do not
+! Now need to match names. We assume photoionization files do not
 ! have [].
 !
 	  ENERGY_1(1:NLEV_1)=0.0D0; STAT_WT_1(1:NLEV_1)=0.0D0
+	  WRITE(6,*)BLUE_PEN
 	  WRITE(6,*)'Entering name comparison loop'
 	  DO I=1,NLEV_1
 	    DO J=1,NELEV
@@ -267,6 +272,10 @@
 	        WRITE(126,'(I5,ES15.6,F7.1,4X,A)')J,ENERGY(J),G(J),E_NAME(J)
 	      END IF
 	    END DO
+	    IF(STAT_WT_1(I) .EQ. 0)THEN
+	      WRITE(6,*)RED_PEN,'Error - no match for level',NAME_1(I),I
+	      STOP
+	    END IF
 	    ENERGY_1(I)=ENERGY_1(I)/STAT_WT_1(I)
 	    WRITE(126,'(I5,ES15.6,4X,A)')I,ENERGY_1(I),TRIM(NAME_1(I))
 	    IF(STAT_WT_1(I) .NE. 0.0D0)ENERGY_1(I)=1.0D-15*SPEED_OF_LIGHT()*
@@ -274,7 +283,8 @@
 	    WRITE(126,'(I5,ES15.6,4X,A)')I,ENERGY_1(I),TRIM(NAME_1(I))
 	  END DO
 	  OSCILLATOR_FILE_AVAIL=.TRUE.
-	  WRITE(6,*)'Number of levels in oscilator file is',NELEV
+	  WRITE(6,*)'Number of levels in oscillator file is',NELEV
+	  WRITE(6,*)DEF_PEN
 	ELSE
 	  ENERGY_1(1:NLEV_1)=0.0D0; STAT_WT_1(1:NLEV_1)=0.0D0
 	  OSCILLATOR_FILE_AVAIL=.FALSE.
@@ -284,10 +294,12 @@
 !
 20	NPAIRS_2=0
 	FILENAME='PHOT2'
-	CALL GEN_IN(FILENAME,'Second photoionization file1 ("" for null):')
+	WRITE(6,*)RED_PEN
+	CALL GEN_IN(FILENAME,'SECOND'//DEF_PEN//'photoionization file ("" for null):')
 	IF(FILENAME .EQ. ' ')GOTO 1000
 	OPEN(UNIT=10,STATUS='OLD',FILE=FILENAME,ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
+	    WRITE(6,*)RED_PEN
 	    WRITE(6,*)'Unable to open file: ',TRIM(FILENAME)
 	    WRITE(6,*)'IOSTAT=',IOS
 	    GOTO 20
@@ -295,8 +307,10 @@
 	  DO WHILE(NPAIRS_2 .EQ. 0)
 	    READ(10,'(A)',IOSTAT=IOS)STRING
 	    IF(IOS .NE. 0)THEN
+	      WRITE(6,*)RED_PEN
 	      WRITE(6,*)'Error reading file: ',TRIM(FILENAME)
 	      WRITE(6,*)'IOSTAT=',IOS
+	      WRITE(6,*)DEF_PEN
 	      STOP
 	    END IF
 	    IF( INDEX(STRING,'!Screened nuclear charge') .NE. 0)THEN
@@ -311,9 +325,11 @@
 	      READ(STRING,*)NLEV_2
 	      ALLOCATE (TYPE_2(NLEV_2),NUM_VALS_2(NLEV_2),LOC_2(NLEV_2), NAME_2(NLEV_2),STAT=IOS)
 	      IF(IOS .NE. 0)THEN
+	        WRITE(6,*)RED_PEN
 	        WRITE(6,*)'Error in PLT_PHOT_RAW -- unable to allocate storage (2)'
 	        WRITE(6,*)'STAT=',IOS
 	        WRITE(6,*)'NLEV_2=',NLEV_2
+	        WRITE(6,*)DEF_PEN
 	        STOP
 	      END IF
 	    END IF
@@ -335,7 +351,9 @@
 	    READ(10,*)TYPE_2(J)
 	    READ(10,*)NUM_VALS_2(J)
 	    IF(TYPE_2(J) .EQ. 9 .AND. MOD(NUM_VALS_2(J),8) .NE. 0)THEN
+	      WRITE(6,*)RED_PEN
 	      WRITE(6,*)'Invalid number of data points for cross-section 9'
+	      WRITE(6,*)DEF_PEN
 	      STOP
 	    END IF
 	    IF(TYPE_2(J) .GE. 20 .AND. TYPE_2(J) .LE. 24)THEN
@@ -353,7 +371,8 @@
 ! 
 !
 	CREATE_SUMMARY=.FALSE.
-	CALL GEN_IN(CREATE_SUMMARY,'Create a summary of photo-ionization cross sections (1st file only)?')
+	WRITE(6,'(A)')' '
+	CALL GEN_IN(CREATE_SUMMARY,'Create a summary of photoionization cross sections (1st file only)?')
 	IF(CREATE_SUMMARY)THEN
 	  OPEN(UNIT=11,FILE='Phot_summary',STATUS='UNKNOWN',ACTION='WRITE')
 	    WRITE(11,'(A,T42,A,6X,A,3(10X,A))')'Level','Type',' Np','X1','X2','X2'
@@ -369,14 +388,17 @@
 	END IF
 !
 	DO_ALL_RECOM=.FALSE.
-	IF(OSCILLATOR_FILE_AVAIL)CALL GEN_IN(DO_ALL_RECOM,'Compute recombination rates for all species?')
+	IF(OSCILLATOR_FILE_AVAIL)CALL GEN_IN(DO_ALL_RECOM,'Compute recombination rates for all levels?')
 	IF(DO_ALL_RECOM)THEN
+	  WRITE(6,*)BLUE_PEN
+	  WRITE(6,*)'Data will be written to RECOM_SUM'
 	  OPEN(UNIT=LUOUT,FILE='RECOM_SUM',STATUS='UNKNOWN',ACTION='WRITE')
 	  TEMP_VEC(1)=0.5D0; TEMP_VEC(2)=1.0D0; TEMP_VEC(3)=2.0; TEMP_VEC(4)=5.0D0; TEMP_VEC(5)=10.0D0
 	  TOTAL_REC_VEC(:)=0.0D0
 	  CALL GEN_IN(TEMP_VEC,NT,NREC_MAX,'Temperature in 10^4K (5 values max)')
-	  WRITE(6,'(A,T30,5(5X,F6.2))')'Temperature (10^4 K)=',(TEMP_VEC(I),I=1,NT)
-	  WRITE(LUOUT,'(A,T30,5(5X,F6.2))')'Level / Temperature (10^4 K)',(TEMP_VEC(I),I=1,NT)
+	  WRITE(6,*)GREEN_PEN
+	  WRITE(6,'(A,T30,5(5X,F6.2))')' Temperature (10^4 K)=',(TEMP_VEC(I),I=1,NT)
+	  WRITE(LUOUT,'(A,T30,5(5X,F6.2))')' Level / Temperature (10^4 K)',(TEMP_VEC(I),I=1,NT)
 	  DO INDX_1=1,NLEV_1
 	    EDGE=ENERGY_1(INDX_1)
 	    STAT_WEIGHT=STAT_WT_1(INDX_1)
@@ -402,21 +424,45 @@
 	      CALL RECOM_OPAC_V2(YV,XV,T1,FREQ_SCL_FAC,STAT_WEIGHT,GION_1,NV,NV,LEVEL_REC_VEC(I),TEMP_VEC(I))
 	      TOTAL_REC_VEC(I)=TOTAL_REC_VEC(I)+LEVEL_REC_VEC(I)
 	    END DO
-	    WRITE(6,'(A,T30,5ES11.3)')TRIM(NAME_1(INDX_1)),(LEVEL_REC_VEC(I),I=1,NT)
-	    WRITE(LUOUT,'(A,T30,5ES11.3)')TRIM(NAME_1(INDX_1)),(LEVEL_REC_VEC(I),I=1,NT)
+!	    WRITE(6,'(A,T30,5ES11.3)')TRIM(NAME_1(INDX_1)),(LEVEL_REC_VEC(I),I=1,NT)
+	    WRITE(LUOUT,'(X,A,T30,5ES11.3)')TRIM(NAME_1(INDX_1)),(LEVEL_REC_VEC(I),I=1,NT)
 	    FLUSH(LUOUT)
 	  END DO
-	  WRITE(6,'(A,T30,5ES11.3)')'Total Recom. Rate=',(TOTAL_REC_VEC(I),I=1,NT)
-	  WRITE(LUOUT,'(A,T30,5ES11.3)')'Total Recom. Rate=',(TOTAL_REC_VEC(I),I=1,NT)
+	  WRITE(6,'(A,T30,5ES11.3)')' Total Recom. Rate/ion=',(TOTAL_REC_VEC(I),I=1,NT)
+	  WRITE(LUOUT,'(A,T30,5ES11.3)')' Total Recom. Rate/ion=',(TOTAL_REC_VEC(I),I=1,NT)
+!
+	  IF(EXC_EN_1 .NE. 0.0D0)THEN
+	    WRITE(6,*)' '
+	    WRITE(6,*)'These give the total recombination rate / ground state ion'
+	    WRITE(6,*)' '
+	    WRITE(LUOUT,*)' '
+	    WRITE(LUOUT,*)'These give the total recombination rate / ground state ion'
+	    WRITE(LUOUT,*)' '
+	    T1=1.0D0
+	    CALL GEN_IN(T1,'Statistical weight for ion ground level')
+	    T1=GION_1/T1
+	    T2=-HDKT*EXC_EN_1
+	    WRITE(6,'(A,T30,5ES11.3)')' Recom. Rate/g.s. ion=',(T1*TOTAL_REC_VEC(I)*EXP(T2/TEMP_VEC(I)),I=1,NT)
+	    WRITE(LUOUT,'(A,T30,5ES11.3)')' Recom. Rate/g.s. ion=',(T1*TOTAL_REC_VEC(I)*EXP(T2/TEMP_VEC(I)),I=1,NT)
+	  END IF
+	  WRITE(6,*)DEF_PEN
 	  CLOSE(LUOUT)
 	END IF
 !
-	DO_WAVE_PLT=.FALSE.
-	CALL GEN_IN(DO_WAVE_PLT,'Plot versus wavelength?')
-	DO_RECOM=.FALSE.
-	CALL GEN_IN(DO_RECOM,'Compute recombination rate?')
-	LEVEL_NAME1=' '
+	WRITE(6,*)BLUE_PEN
+	WRITE(6,*)'These reamining options refer to individual cross-sections'
+	WRITE(6,*)DEF_PEN
+	DO_WAVE_PLT=.FALSE.;  CALL GEN_IN(DO_WAVE_PLT,'Plot versus wavelength?')
+	DO_RECOM=.FALSE.;     CALL GEN_IN(DO_RECOM,'Compute recombination rate?')
 !
+	WRITE(6,*)BLUE_PEN
+	WRITE(6,*)'Plotting relative to the ground state photoianiozatiom limit only makes sense'
+	WRITE(6,*)'for levels below the ionization limit.'
+	WRITE(6,*)DEF_PEN
+        PLOT_REL_TO_GS_EDGE=.FALSE.
+	CALL GEN_IN(PLOT_REL_TO_GS_EDGE,'Use frequency in units of iomization energy to the ground state?')
+!
+	LEVEL_NAME1=' '
 	DO_SEQ_PLTS=.FALSE.
 	CALL GEN_IN(DO_SEQ_PLTS,'Plot photoionization cross-section for a sequence: eg., 6d (T or F)')
 	IF(DO_SEQ_PLTS)THEN
@@ -452,7 +498,7 @@
 	        CALL DP_CURVE(NV,XV,YV)
 	      END IF
 	      IF(ICOUNT .EQ. 50)THEN
-	        WRITE(6,*)'Maximum number of plots exceeded'
+	        WRITE(6,*)RED_PEN//'Maximum number of plots exceeded'//DEF_PEN
 	        EXIT
 	      END IF
 	    END DO
@@ -537,6 +583,8 @@
 	  END IF
 	  IF(DO_WAVE_PLT)THEN
 	    XV(1:NV)=ANG_TO_HZ/FREQ_SCL_FAC/XV(1:NV)
+	  ELSE IF(PLOT_REL_TO_GS_EDGE)THEN
+	    XV(1:NV)=XV(1:NV)*FREQ_SCL_FAC/EDGE
 	  END IF
 	  CALL DP_CURVE(NV,XV,YV)
 !
@@ -556,7 +604,7 @@
 	    CALL GEN_IN(TEMP,'Temperature in 10^4K')
 	    IF(TEMP .NE. 0)THEN
 	      WRITE(6,'(A,ES10.4,3X,A,F5.1,3X,A,F4.1,3X,A,I6,3X,A,F6.2)')
-	1        ' EDGE=',EDGE,'g=',STAT_WEIGHT,'gion=',GION,'NV=',NV,'T(10^K)=',TEMP
+	1        ' EDGE=',EDGE,'g=',STAT_WEIGHT,'gion=',GION_1,'NV=',NV,'T(10^K)=',TEMP
 	      T1=EDGE+EXC_EN_1
 	      CALL RECOM_OPAC_V2(YV,XV,T1,FREQ_SCL_FAC,STAT_WEIGHT,GION_1,NV,NV,TOTAL_REC,TEMP)
 	      WRITE(6,'(A,ES11.4)')' Total Rec=',TOTAL_REC
@@ -590,11 +638,11 @@
 !
 	    EDGE=ENERGY_1(INDX_1)
 	    IF(INDX_2 .GT. 0)THEN
-	      IF(TYPE_2(INDX_1) .EQ. 20 .OR. TYPE_2(INDX_1) .EQ. 21)THEN
+	      IF(TYPE_2(INDX_2) .EQ. 20 .OR. TYPE_2(INDX_2) .EQ. 21)THEN
 	        NV=NUM_VALS_2(INDX_2)
 	        XV(1:NV)=NU_2(LOC_2(INDX_2):LOC_2(INDX_2)+NV-1)
 	        YV(1:NV)=CROSS_2(LOC_2(INDX_2):LOC_2(INDX_2)+NV-1)
-	        FREQ_SCL_FAC=EDGE+EXC_EN_1
+	        FREQ_SCL_FAC=EDGE+EXC_EN_2
 	      ELSE
 	        NV=1000
 	        CALL RAW_SUBPHOT_V2(YV,XV,CROSS_2(LOC_2(INDX_2)),TYPE_2(INDX_2),NUM_VALS_2(INDX_2),
@@ -604,7 +652,7 @@
 	      END IF
 	      IF(DO_RECOM .AND. OSCILLATOR_FILE_AVAIL)THEN
 	        IF(TEMP .NE. 0)THEN
-	          T1=EDGE+EXC_EN_1
+	          T1=EDGE+EXC_EN_2
 	          CALL RECOM_OPAC_V2(YV,XV,T1,FREQ_SCL_FAC,STAT_WEIGHT,GION,NV,NV,TOTAL_REC,TEMP)
 	          WRITE(6,*)'Total Rec=',TOTAL_REC
 	        END IF
@@ -612,6 +660,8 @@
 	    END IF
 	    IF(DO_WAVE_PLT)THEN
 	      XV(1:NV)=ANG_TO_HZ/FREQ_SCL_FAC/XV(1:NV)
+	    ELSE IF(PLOT_REL_TO_GS_EDGE)THEN
+	      XV(1:NV)=XV(1:NV)*FREQ_SCL_FAC/EDGE
 	    END IF
 	    CALL DP_CURVE(NV,XV,YV)
 	  END IF

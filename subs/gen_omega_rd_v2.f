@@ -17,6 +17,9 @@
 	1                      MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE)
 	IMPLICIT NONE
 !
+! Altered 02-Sep-2012 : Outputs error messgae when matching transition not found.
+!                         Checks ordering of levels (necessary for overlapping LS states).
+!                         Fixed bug when data levels split, and program levels unsplit.
 ! Altered 20-Dec-2006 : Minor bug fix. Incorrect ray access after reading in
 !                         collisonal ioization term. LST_NUP was being set to 0.
 ! Altered 20-Dec-2004 : Eror message now output if error occurs reading
@@ -58,6 +61,10 @@
 !
 ! Local variables.
 !
+	INTEGER, PARAMETER :: MAX_NUM_NO_MATCH=20
+	INTEGER NUM_NO_MATCH
+	CHARACTER(LEN=40) NO_MATCH_NAME(MAX_NUM_NO_MATCH)
+
 	REAL*8 COL_VEC(MAX_TVALS)
 	REAL*8 GL_SUM,GU_SUM,NORM_FAC
 	INTEGER NL_VEC(10)
@@ -87,6 +94,8 @@
 	CHARACTER*60 LOCNAME(NLEV)
 !
 	LUER=ERROR_LU()
+	NUM_NO_MATCH=0
+	NO_MATCH_NAME=' '
 !
 	DO NL=1,NLEV
 	  LOCNAME(NL)=STRIP_LD_BLANK(LEVNAME(NL))
@@ -331,8 +340,8 @@
 	    DO LOOP=1,NLEV
 	      NUP=MOD(LOOP+LST_NUP-2,NLEV)+1
 	      IF(LST_NUP .LT. 1)THEN
-	        WRITE(6,*)LST_NUP,FILE_NAME
-	        WRITE(6,*)LOW_LEV,UP_LEV
+	        WRITE(LUER,*)LST_NUP,FILE_NAME
+	        WRITE(LUER,*)LOW_LEV,UP_LEV
 	      END IF
 	      K=INDEX(LOCNAME(NUP),'[')
 	      IF(K .EQ. 0)THEN
@@ -369,11 +378,11 @@
 ! The multiplet collision strengths are converted to individual collision 
 ! strengths using:
 !
-! Omega(i,J)= g(i)g(j) OMEGA(MULITPLET) / G(L)/G(U)
+! Omega(i,j)= g(i)g(j) OMEGA(MULITPLET) / G(L)/G(U)
 !
 ! This formula automatically recovers the correct result that
 !
-! OMEGA = SUM(i) SUM(J)  Omega(i,j)
+! OMEGA = SUM(i) SUM(j)  Omega(i,j)
 !
 	  READ(STRING,*,IOSTAT=IOS)(COL_VEC(I),I=1,NUM_TVALS)
 	  IF(IOS .NE. 0)THEN
@@ -396,26 +405,63 @@
 	      TAB_INDX=TAB_INDX+NUM_TVALS
 	    END DO
 	  ELSE
+!
+! If the first IF statement is true, collisional data is split but not the level in model atom.
+! Unlikely to happen. Since the J states of individual states may overlap, we need to check
+! the ordering.
+!
 	    DO NL=1,NL_CNT
 	      DO NUP=1,NUP_CNT
-	        IF(LOC_INDX(NL,NUP) .EQ. 0)THEN
-	          TRANS_INDX=TRANS_INDX+1
-	          ID_LOW(TRANS_INDX)=NL_VEC(NL)
-	          ID_UP(TRANS_INDX)=NUP_VEC(NUP)
-	          ID_INDX(TRANS_INDX)=TAB_INDX
-	          I=TAB_INDX
-	          TAB_INDX=TAB_INDX+NUM_TVALS
-	        ELSE
-	          I=LOC_INDX(NL,NUP)
-	        END IF
-	        OMEGA_TABLE(I:I+NUM_TVALS-1)=OMEGA_TABLE(I:I+NUM_TVALS-1)+
+	        IF(NL_VEC(NL) .EQ. NUP_VEC(NUP))THEN
+	        ELSE 
+	          IF(LOC_INDX(NL_VEC(NL),NUP_VEC(NUP)) .EQ. 0)THEN
+	            TRANS_INDX=TRANS_INDX+1
+	            IF(NL_VEC(NL) .LT. NUP_VEC(NUP))THEN
+	              ID_LOW(TRANS_INDX)=NL_VEC(NL)
+	              ID_UP(TRANS_INDX)=NUP_VEC(NUP)
+	            ELSE
+	              ID_LOW(TRANS_INDX)=NUP_VEC(NL)
+	              ID_UP(TRANS_INDX)=NL_VEC(NUP)
+	            END IF
+	            ID_INDX(TRANS_INDX)=TAB_INDX
+	            I=TAB_INDX
+	            TAB_INDX=TAB_INDX+NUM_TVALS
+	            LOC_INDX(NL_VEC(NL),NUP_VEC(NUP))=I
+	          ELSE
+	            I=LOC_INDX(NL_VEC(NL),NUP_VEC(NUP))
+	          END IF
+	          OMEGA_TABLE(I:I+NUM_TVALS-1)=OMEGA_TABLE(I:I+NUM_TVALS-1)+
 	1            COL_VEC(1:NUM_TVALS)*STAT_WT(NUP_VEC(NUP))*
 	1                              STAT_WT(NL_VEC(NL))
+	        END IF
 	      END DO
 	    END DO
 	  END IF
 !
 500	  CONTINUE
+!
+	  IF(NL_CNT .EQ. 0)THEN
+	    K=0
+	    DO I=1,NUM_NO_MATCH
+	      IF(TRIM(LOW_LEV) .EQ. TRIM(NO_MATCH_NAME(I)))K=I
+	    END DO
+	    IF(K .EQ. 0)THEN
+	      NUM_NO_MATCH=MIN(NUM_NO_MATCH+1,MAX_NUM_NO_MATCH)
+	      K=NUM_NO_MATCH
+	      NO_MATCH_NAME(K)=TRIM(LOW_LEV)
+	    END IF
+	  END IF
+	  IF(NUP_CNT .EQ. 0)THEN
+	    K=0
+	    DO I=1,NUM_NO_MATCH
+	      IF(TRIM(UP_LEV) .EQ. TRIM(NO_MATCH_NAME(I)))K=I
+	    END DO
+	    IF(K .EQ. 0)THEN
+	      NUM_NO_MATCH=MIN(NUM_NO_MATCH+1,MAX_NUM_NO_MATCH)
+	      K=NUM_NO_MATCH
+	      NO_MATCH_NAME(K)=TRIM(UP_LEV)
+	    END IF
+	  END IF
 !
 ! Read in the next collisional data set. If the record is blank, we
 ! read in the NEXT record, as BLANK records are not included in the NUM_TRANS
@@ -426,6 +472,11 @@
 	    READ(LUIN,'(A)')STRING
 	  END DO
 !
+	END DO
+!
+	DO I=1,NUM_NO_MATCH
+	  WRITE(LUER,'(A,A,A,A)')' Warning(',TRIM(FILE_NAME),
+	1                   '): No match found for level ',TRIM(NO_MATCH_NAME(I))
 	END DO
 !
 ! NUM_TRANS is now set equal to the actual number of transitions read.
