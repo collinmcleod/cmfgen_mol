@@ -21,6 +21,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 01-Nov-2012 : Bug fix with TG option. Values when r < 1 were not being updated.
 ! Altered 05-May-2007 : Fixed bug when do NG accleration with band size < ND
 ! Altered 07-Mar-2006 : Acceleratiion can now start at ND_ST.
 ! Altered 19-May-2004 : Bug fix: NG_DONE set to true, even when no NG done.
@@ -284,8 +285,10 @@
 	      END DO
 	    ELSE
 	      K=NINT(SCALE_FAC)
-	      T1=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/RDPOPS(I,J,2)
-	      BIG_POPS(I,J)=RDPOPS(I,J,1)*(1.0D0+T1)**K
+	      DO I=1,NT
+	        T1=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/RDPOPS(I,J,2)
+	        BIG_POPS(I,J)=RDPOPS(I,J,1)*(1.0D0+T1)**K
+	      END DO
 	    END IF
 	  END DO
 	  NG_DONE=.TRUE.

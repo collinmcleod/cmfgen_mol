@@ -276,7 +276,8 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(xcross.o)\
       $(LIB)(xvecd.o)\
       $(LIB)(zalongp.o)\
-      $(LIB)(zero.o)
+      $(LIB)(zero.o)\
+      $(LIB)(zero_2d_mat.o)
 
 all : $(LIB) UNIX
 	cp -f $(INSTALL_DIR)perm_mod_file jnk.mod

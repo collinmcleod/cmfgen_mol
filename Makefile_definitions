@@ -63,8 +63,8 @@ EXE_DIR=$(INSTALL_DIR)exe/
 
 # F90 = pgf95 
 
- F90 = pgf95 -mp -Mlarge_arrays -Ktrap=fp -Mipa
- F90nomp = pgf95  -Mlarge_arrays -Ktrap=fp -Mipa
+ F90 = pgf95 -mp -Mlarge_arrays -Ktrap=fp 
+ F90nomp = pgf95  -Mlarge_arrays -Ktrap=fp
 
 # FG  = -O2  -Mlarge_arrays -Mextend -Mbackslash  -Ktrap=fp -I$(MOD_DIR)
 # FH  = -O2  -Mlarge_arrays -Mextend -Mbackslash  -Ktrap=fp -I$(MOD_DIR)
@@ -79,7 +79,7 @@ EXE_DIR=$(INSTALL_DIR)exe/
 
  BLAS=-lblas
  LAPACK=-llapack
- LOCLIB=-L/opt/pgi/osx86-64/11.8/lib
+ LOCLIB=-L/opt/pgi/osx86-64/12.9/lib
  PGLIB= =pgf77libs -L/Users/jdh/pgplot/pgplot -lpgplot 
  X11LIB=-L/usr/X11R6/lib -lX11
 

@@ -376,7 +376,10 @@ C
 	    WRITE(LUER,*)'Error in CMFGEN --- invalid range for EXT_LINE_VAR'
 	    STOP
 	  END IF
-!
+	  NEW_VAR_STORAGE_METHOD=.TRUE.
+	  CALL RD_STORE_LOG(NEW_VAR_STORAGE_METHOD,'NEW_VST_METH',L_FALSE,
+	1         'Use new storage method for lines (different storage for each line)?')
+	!
 ! NB: An ideal vale for ZNET_VAR_LIMIT is probably 0.01 or 0.001. If 
 ! ZNET_VAR_LIMIT is zero, all depths will be included in the linearization, 
 ! independent of ZNET. A very large value of ZNET (i.e. 10^4), will imply

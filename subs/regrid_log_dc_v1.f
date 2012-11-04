@@ -7,6 +7,7 @@
 	1               POPATOM,N,ND,LU_IN,INTERP_OPTION,FILE_NAME)
 	IMPLICIT NONE
 !
+! Altered 16-Oct-2012 - Added BA_TX_CONV and NO_TX_CONV
 ! Altered: 18-Nov-2011: Big fix. Not all DPOP was being set and this could cause a crash
 !                        when taking LOGS (levels unused).
 ! Created: 18-Dec-2010: This routine replace REGRIDWSC_V3, REGRIDB_ON_NE, REGRID_TX_R.
@@ -62,6 +63,8 @@
 	INTEGER NZ,NOLD,NDOLD
 	INTEGER NX,NX_ST,NX_END
 	INTEGER COUNT,IOS
+	LOGICAL BAD_TX_CONV
+	LOGICAL NO_TX_CONV(ND)
 	LOGICAL TAKE_LOGS
 	LOGICAL CHECK_DC
 	LOGICAL CLUMP_PRES
@@ -74,7 +77,7 @@
 !
 	OPEN(UNIT=LU_IN,STATUS='OLD',FILE=FILE_NAME,IOSTAT=IOS)
 	IF(IOS .NE. 0)THEN
-	  WRITE(LUER,*)'Error opening ',TRIM(FILE_NAME),' in REGRIDWSC_V3'
+	  WRITE(LUER,*)'Error opening ',TRIM(FILE_NAME),' in REGRID_LOG_DC_V1'
 	  WRITE(LUER,*)'IOS=',IOS
 	  STOP
 	END IF
@@ -158,7 +161,7 @@
 	NX_END=ND
 	IF(INTERP_OPTION .EQ. 'R')THEN
 	  IF(DABS(OLD_R(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN
-	    WRITE(LUER,*)'Warning - core radius not identical in REGRIDWSC_V3'
+	    WRITE(LUER,*)'Warning - core radius not identical in REGRID_LOG_DC_V1'
 	    WRITE(LUER,*)'Rescaling to make Rcore identical'
 	    DO I=1,NDOLD
 	      OLD_R(I)=R(ND)*( OLD_R(I)/OLD_R(NDOLD) )
@@ -198,7 +201,7 @@
           END DO
 	  IF(K .EQ. 1 .OR. K .EQ. ND)THEN
 	    LUER=ERROR_LU()
-            WRITE(LUER,*)'Error computing RTAU1 in REGRID_B_ON_SPH_TAU'
+            WRITE(LUER,*)'Error computing RTAU1 in REGRID_LOG_DC_V1'
           END IF
 	  T1=(1.0D0-TAU(K))/(TAU(K+1)-TAU(K))
           RTAU1=T1*R(K+1)+(1.0D0-T1)*R(K)
@@ -225,7 +228,7 @@
           END DO
 	  IF(K .EQ. 1 .OR. K .EQ. ND)THEN
 	    LUER=ERROR_LU()
-            WRITE(LUER,*)'Error computing RTAU1_OLD in REGRID_B_ON_SPH_TAU'
+            WRITE(LUER,*)'Error computing RTAU1_OLD in REGRID_LOG_DC_V1'
           END IF
           T1=(1.0D0-OLD_TAU(K))/(OLD_TAU(K+1)-OLD_TAU(K))
           RTAU1_OLD=T1*OLD_R(K+1)+(1.0D0-T1)*OLD_R(K)
@@ -349,6 +352,8 @@
 ! Compute departure coefficients for N>NZ. These levels are set to have these
 ! same excitation temperature as the highest level.
 !
+	NO_TX_CONV=.FALSE.
+	BAD_TX_CONV=.FALSE.
 	IF(N .GT. NZ)THEN
 	  T_EXCITE=T(ND)
 	  DO I=ND,1,-1
@@ -370,9 +375,8 @@
 ! We can now compute the Departure coefficients.
 !
 	    IF(COUNT .GE. 100)THEN
-	      WRITE(LUER,*)'Error in REGRIDWSC_V3 - TX didnt converge ',
-	1               'in 100 iterations'
-	      WRITE(LUER,*)'Depth=',I
+	      NO_TX_CONV(I)=.TRUE.
+	      BAD_TX_CONV=.TRUE.
 	      DO J=NZ+1,N
 	        DHEN(J,I)=DHEN(NZ,I)
 	      END DO
@@ -382,6 +386,15 @@
 	      END DO
 	    END IF
 	  END DO
+	  IF(BAD_TX_CONV)THEN
+	    WRITE(LUER,*)'Error in REGRID_LOG_DC_V1 - TX did not converge in 100 iterations'
+	    WRITE(LUER,*)'File is ',TRIM(FILE_NAME)
+	    WRITE(LUER,*)'It occurred at the following depths:'
+	    DO I=1,ND
+	      IF(NO_TX_CONV(I))WRITE(LUER,'(I5)',ADVANCE='NO')I
+	      IF(MOD(I,10) .EQ. 0)WRITE(LUER,'(A)')' '
+	    END DO
+          END IF
 	END IF
 !
 	CLOSE(UNIT=8)

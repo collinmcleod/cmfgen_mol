@@ -39,7 +39,7 @@ OBJ = $(LIB)(adjust_r_grid_v2.o)\
       $(LIB)(eval_lte_v5.o)\
       $(LIB)(grey_t_iterate.o)\
       $(LIB)(init_opac_mod.o)\
-      $(LIB)(init_line_opac_var.o)\
+      $(LIB)(init_line_opac_var_v2.o)\
       $(LIB)(rd_control_variables.o)\
       $(LIB)(rd_cont_j.o)\
       $(LIB)(set_line_opac.o)\

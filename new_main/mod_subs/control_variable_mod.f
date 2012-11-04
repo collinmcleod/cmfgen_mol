@@ -263,7 +263,8 @@
         REAL*8 WEAK_LINE_LIMIT
         LOGICAL OVERLAP
 	LOGICAL WEAK_WITH_NET
-	INTEGER NUM_OF_WEAK_LINES    !COunter in CMFGEN_SUB only
+	LOGICAL NEW_VAR_STORAGE_METHOD
+	INTEGER NUM_OF_WEAK_LINES    	!Counter in CMFGEN_SUB only
 !
 ! Indicates whether how ALL lines are to be treated.
 !

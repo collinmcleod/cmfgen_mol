@@ -7,6 +7,7 @@
 	1                             POPATOM,N,ND,FILNAME)
 	IMPLICIT NONE
 !
+! Altered 16-Oct-2012 - Added BA_TX_CONV and NO_TX_CONV
 ! Altered 26-Jan-2009 - Section involving TX fixeda
 !                         ADD1 variable removed (correction done on spot).
 ! Altered 23-Nov-2007 - Procedure for extending populations to larger radii changes.
@@ -77,6 +78,8 @@
 !
 	INTEGER I,J,NOLD,NDOLD,COUNT,NX,NXST,NZ,IOS
 	REAL*8 RPOLD,TX,FX,DELTA_T,T1,T2
+	LOGICAL BAD_TX_CONV
+	LOGICAL NO_TX_CONV(ND)
 	LOGICAL CHECK_DC
 	CHARACTER*80 STRING
 	CHARACTER*(*) FILNAME
@@ -219,6 +222,8 @@
 ! Compute departure coefficients for N>NZ. New levels are set to have these
 ! same excitation temperature as the highest level.
 !
+	NO_TX_CONV=.FALSE.
+	BAD_TX_CONV=.FALSE.
 	IF(N .GT. NZ)THEN
 	  TX=T(ND)
 	  DO I=ND,1,-1
@@ -240,9 +245,8 @@
 ! We can now compute the Departure coefficients.
 !
 	    IF(COUNT .GE. 100)THEN
-	      WRITE(LUER,*)'Error in REGRIDWSC_V3 - TX didnt converge ',
-	1               'in 100 iterations'
-	      WRITE(LUER,*)'Depth=',I
+	      NO_TX_CONV(I)=.TRUE.
+	      BAD_TX_CONV=.TRUE.
 	      DO J=NZ+1,N
 	        DHEN(J,I)=DHEN(NZ,I)
 	      END DO
@@ -252,6 +256,16 @@
 	      END DO
 	    END IF
 	  END DO
+!
+	  IF(BAD_TX_CONV)THEN
+	    WRITE(LUER,*)'Error in REGRIDWSC_V3 - TX did not converge in 100 iterations'
+	    WRITE(LUER,*)'File is ',TRIM(FILNAME)
+	    WRITE(LUER,*)'It occurred at the following depths:'
+	    DO I=1,ND
+	      IF(NO_TX_CONV(I))WRITE(LUER,'(I5)',ADVANCE='NO')I
+	      IF(MOD(I,10) .EQ. 0)WRITE(LUER,'(A)')' '
+	    END DO
+	  END IF
 	END IF
 !
 	CLOSE(UNIT=8)
