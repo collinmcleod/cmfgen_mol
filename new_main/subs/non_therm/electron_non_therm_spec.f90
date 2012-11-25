@@ -4,7 +4,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
-! Altered 16-Feb-2021 : Cleaned (many prior changes to this date also).
+! Altered 23-Feb-2102 : ASUM was changed to QSUM, since A can be zero for some transition.
+! Altered 16-Feb-2012 : Cleaned (many prior changes to this date also).
 ! Altered  1-Dec-2011 : Included NON_THERM_IT_CNTRL and NT_OMIT_ION_SCALE.
 !                       NT_LEV_SCALE changed to NT_OMIT_LEV_SCALE
 !                       Altered method for excluding levels.
@@ -51,7 +52,7 @@
 	REAL*8 NA_dX_CROSS
 	REAL*8 XION_POT
 	REAL*8 NATOM
-	REAL*8 ASUM
+	REAL*8 QSUM
 	REAL*8 SCALER_SPEC_SUM
 	REAL*8 SCALER_ION_SUM
 	REAL*8 dXKT_MIN
@@ -432,10 +433,13 @@
 	        DO WHILE(J .LE. ATM(ID)%NXzV_F)
 	          NUP=J
 !
+! Now weight dE by Qnn rather than by AXzV_F(NL,NUP). Avoids division by zero when
+! oscilator strength is zero.
+!
 	          CALL BETHE_APPROX_V5(Qnn,NL,NUP,XKT,dXKT_ON_XKT,NKT,ID,DPTH_INDX)
 	          IF(Qnn(NKT) .GT. 0.0D0)THEN
-	            dE=ATM(ID)%AXzV_F(NL,NUP)*Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(J))
-	            ASUM=ATM(ID)%AXzV_F(NL,NUP)
+	            dE=Qnn(NKT)*Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(J))
+	            QSUM=Qnn(NKT)
 	            K=J
 	            DO WHILE(K+1 .LE. ATM(ID)%NXzV_F)
 	              IF(Hz_TO_eV*(ATM(ID)%EDGEXZV_F(K+1)-ATM(ID)%EDGEXZV_F(J)) .GE. 1.0)EXIT
@@ -444,11 +448,11 @@
 	              CALL BETHE_APPROX_V5(Qnn_TMP,NL,NUP,XKT,dXKT_ON_XKT,NKT,ID,DPTH_INDX)
 	              IF(Qnn_TMP(NKT) .GT. 0.0D0)THEN
 	                CALL PAR_VEC_SUM(QNN,Qnn_TMP,NKT) 
-	                dE=dE+ATM(ID)%AXzV_F(NL,NUP)*Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(K))
-	                ASUM=ASUM+ATM(ID)%AXzV_F(NL,NUP)
+	                dE=dE+Qnn_TMP(NKT)*Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(K))
+	                QSUM=QSUM+Qnn_TMP(NKT)
 	              END IF
 	            END DO
-	            dE=dE/ASUM			!Weighted average energy of transition array.
+	            dE=dE/QSUM			!Weighted average energy of transition array.
 	            J=K
 !
 !$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(IKT,IKT0,IKTP,IKTPN,EKT,EMAX)
