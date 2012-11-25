@@ -18,6 +18,7 @@
 	1              ACCURACY,DO_TIME_VAR,TIME_SEQ_NO,ND,NC,NP,NT)
 	IMPLICIT NONE
 !
+! Altered 04-Nov-2012; WORK was not being set before evaluating f.
 ! Altered 28-Nov-2011: REDUCTION_FATOR reduced to 10, and BAD_J_COUNTER now only updated
 !                          per iteration, not per bad depth. WORK is now set to zero
 !                          before jumping to compute "f" on the first iteraton step. The
@@ -184,12 +185,7 @@
 	F(1:ND)=0.0D0
 	RJ(1:ND)=RSQ_J_OLDt(1:ND)/R(1:ND)/R(1:ND)
 !
-! Loop to evaluate the Eddington factor f. A poor initial estimate was causing 
-! convergence issues in some models.
-!
-	GOTO 5000
-!
-! We ned work to evaluate f.
+! We need WORK to evaluate f.
 !
 	IF(DO_TIME_VAR)THEN
 	  CALL DDT_WORK(WORK,POPS,T_FROM_J,OLD_T,TIME_SEQ_NO,ND,NT)
@@ -198,6 +194,11 @@
 	  T_FROM_J=0.0D0
 	  WORK=0.0D0
 	END IF
+!
+! Loop to evaluate the Eddington factor f. A poor initial estimate was causing 
+! convergence issues in some models.
+!
+	GOTO 5000
 !
 1000	CONTINUE
 !

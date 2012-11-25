@@ -1895,7 +1895,7 @@ C
 	    END IF
 	    WRITE(LU_OPAC,FMT)R(I),I,T1,TA(I),TC(1),
 	1      ROSSMEAN(I),INT_dBdT(I),FLUXMEAN(I),ESEC(I),
-	1      T2,T3,TC(1),TC(2)
+	1      T2,T3,TC(2),TC(3)
 	  END DO
 	CLOSE(UNIT=LU_OPAC)
 !

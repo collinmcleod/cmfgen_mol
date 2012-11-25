@@ -48,14 +48,19 @@
 	END DO
 !
 	DO ID=1,NION
-          SE(ID)%BA_PAR=0.0D0
+!$OMP PARALLEL DO 
+	  DO K=1,ND
+	    DO IV=1,SE(ID)%N_IV
+	      DO IS=1,SE(ID)%N_SE
+	         SE(ID)%BA_PAR(IS,IV,K)=0.0D0
+	      END DO
+	    END DO
+	  END DO
+!$OMP END PARALLEL DO
 	END DO
 !
 	BA_T(:,DIAG_INDX,:)=BA_T(:,DIAG_INDX,:)+BA_T_PAR
 	BA_T_PAR=0.0D0
-!
-!        I=SE(4)%LNK_TO_IV(1101)
-!	WRITE(99,*)SE(4)%BA(1,I,DIAG_INDX,1),SE(4)%BA(2,I,DIAG_INDX,1)
 !
 	RETURN
 	END

@@ -142,7 +142,8 @@
 	READ(STRING,*)NUM_TRANS
 	IF(NUM_TRANS .GT. MAX_TRANS)THEN
 	  WRITE(LUER,*)'Error reading collisonal data from '//FILE_NAME
-	  WRITE(LUER,*)'MAX_TRANS too small'
+	  WRITE(LUER,*)'MAX_TRANS is too small:',MAX_TRANS
+	  WRITE(LUER,*)'NUM_TRANS =',NUM_TRANS
 	  STOP
 	END IF
 	STRING=' '

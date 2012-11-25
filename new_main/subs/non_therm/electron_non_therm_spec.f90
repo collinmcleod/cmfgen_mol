@@ -141,6 +141,7 @@
 	  WRITE(LU_TH,*)'Allocating memory to describe non-thermal electron distribution'
 	  ALLOCATE (XKT(NKT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (dXKT(NKT),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (dXKT_ON_XKT(NKT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (YE(NKT,ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (FRAC_ELEC_HEATING(ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (FRAC_ION_HEATING(ND),STAT=IOS)
@@ -185,6 +186,7 @@
 !
 	  WRITE(LU_TH,*)'Setting XKT array'
 	  CALL SET_XKT_ARRAY(XKT_MIN,XKT_MAX,NKT,XKT,dXKT,XKT_METHOD)
+	  dXKT_ON_XKT(1:NKT)=dXKT(1:NKT)/XKT(1:NKT)
 !
 ! If needed, allocate memory for collisional ioinzation cross-sections.
 !
@@ -429,7 +431,8 @@
 	        J=I+1
 	        DO WHILE(J .LE. ATM(ID)%NXzV_F)
 	          NUP=J
-	          CALL BETHE_APPROX_V4(Qnn,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
+!
+	          CALL BETHE_APPROX_V5(Qnn,NL,NUP,XKT,dXKT_ON_XKT,NKT,ID,DPTH_INDX)
 	          IF(Qnn(NKT) .GT. 0.0D0)THEN
 	            dE=ATM(ID)%AXzV_F(NL,NUP)*Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(J))
 	            ASUM=ATM(ID)%AXzV_F(NL,NUP)
@@ -438,9 +441,9 @@
 	              IF(Hz_TO_eV*(ATM(ID)%EDGEXZV_F(K+1)-ATM(ID)%EDGEXZV_F(J)) .GE. 1.0)EXIT
 	              K=K+1
 	              NUP=K
-	              CALL BETHE_APPROX_V4(Qnn_TMP,NL,NUP,XKT,dXKT,NKT,ID,DPTH_INDX)
+	              CALL BETHE_APPROX_V5(Qnn_TMP,NL,NUP,XKT,dXKT_ON_XKT,NKT,ID,DPTH_INDX)
 	              IF(Qnn_TMP(NKT) .GT. 0.0D0)THEN
-	                Qnn=Qnn+Qnn_TMP 
+	                CALL PAR_VEC_SUM(QNN,Qnn_TMP,NKT) 
 	                dE=dE+ATM(ID)%AXzV_F(NL,NUP)*Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(K))
 	                ASUM=ASUM+ATM(ID)%AXzV_F(NL,NUP)
 	              END IF
@@ -474,7 +477,7 @@
 	              END DO
 !
 	            END DO	!Loop over energy
-!OMP END PARALLEL DO
+!$OMP END PARALLEL DO
 !
 	          END IF        !Check if f(i,j)=0
 	          J=J+1

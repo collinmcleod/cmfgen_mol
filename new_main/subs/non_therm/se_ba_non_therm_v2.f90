@@ -19,6 +19,7 @@
 	REAL*8 LOCAL_EXC_HEATING(ND)
 	LOGICAL COMPUTE_BA
 !
+	REAL*8 MOD_YE(NKT,ND)
 	REAL*8 PI
 	REAL*8 ELECTRON_VOLT
 	INTEGER GET_INDX_DP
@@ -148,6 +149,12 @@
 	END IF			!Include ionizations?
 !
 !
+!$OMP PARALLEL DO PRIVATE (DPTH_INDX,I)
+	DO DPTH_INDX=1,ND
+	  DO I=1,NKT
+	    MOD_YE(I,DPTH_INDX)=YE(I,DPTH_INDX)*dXKT(I)/XKT(I)
+	  END DO
+	END DO
 !
 	IF(INCLUDE_NON_THERM_EXCITATION)THEN
 	  DO ID=1,NUM_IONS
@@ -157,7 +164,7 @@
 	        DO J=2,ATM(ID)%NXzV_F
 	          DO I=1,MIN(20,J-1)
 	            NL_F=I; NUP_F=J
-	            CALL TOTAL_BETHE_RATE_V3(RATE,NL_F,NUP_F,YE,XKT,dXKT,NKT,ID,DPTH_INDX,ND)
+	            CALL TOTAL_BETHE_RATE_V4(RATE,NL_F,NUP_F,MOD_YE,XKT,NKT,ID,DPTH_INDX,ND)
 	            NUP=ATM(ID)%F_TO_S_XzV(NUP_F)
 !
 ! NB:  XzV_F= XzV  (XzVLTE_F/XzVLTE)
@@ -170,14 +177,13 @@
 	              SE(ID)%BA_PAR(NUP,NL,DPTH_INDX)=SE(ID)%BA_PAR(NUP,NL,DPTH_INDX)+T2
 	            END IF
 	            T1=T1*ATM(ID)%XzV_F(NL_F,DPTH_INDX)
-	            SE(ID)%STEQ(NL,DPTH_INDX)=SE(ID)%STEQ(NL,DPTH_INDX)-T1
-	            SE(ID)%STEQ(NUP,DPTH_INDX)=SE(ID)%STEQ(NUP,DPTH_INDX)+T1
-	            LOCAL_EXC_HEATING(DPTH_INDX)=LOCAL_EXC_HEATING(DPTH_INDX)+T1* &
-	                                (ATM(ID)%EDGEXzV_F(NL_F)-ATM(ID)%EDGEXzV_F(NUP_F))
-	            ATM(ID)%NTCXzV(DPTH_INDX)=ATM(ID)%NTCXzV(DPTH_INDX)  &
-	                  +Hz_to_erg*T1*(ATM(ID)%EDGEXzV_F(NL_F)-ATM(ID)%EDGEXzV_F(NUP_F)) ! non-thermal cooling?
-	            ATM(ID)%NT_EXC_CXzV(DPTH_INDX)=ATM(ID)%NT_EXC_CXzV(DPTH_INDX)  &
-	                  +Hz_to_eV*T1*(ATM(ID)%EDGEXzV_F(NL_F)-ATM(ID)%EDGEXzV_F(NUP_F))
+	            SE(ID)%STEQ(NL,DPTH_INDX)=SE(ID)%STEQ(NL,DPTH_INDX) - T1
+	            SE(ID)%STEQ(NUP,DPTH_INDX)=SE(ID)%STEQ(NUP,DPTH_INDX) + T1
+	            T1=T1*(ATM(ID)%EDGEXzV_F(NL_F)-ATM(ID)%EDGEXzV_F(NUP_F))
+	            LOCAL_EXC_HEATING(DPTH_INDX)=LOCAL_EXC_HEATING(DPTH_INDX) + T1
+	            T1=T1*Hz_to_erg
+	            ATM(ID)%NTCXzV(DPTH_INDX)=ATM(ID)%NTCXzV(DPTH_INDX) + T1 			 ! non-thermal cooling?
+	            ATM(ID)%NT_EXC_CXzV(DPTH_INDX)=ATM(ID)%NT_EXC_CXzV(DPTH_INDX)  + T1
 	          END DO
 	        END DO
 	      END DO 		!Loop over depth

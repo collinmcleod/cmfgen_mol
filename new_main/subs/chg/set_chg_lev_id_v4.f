@@ -298,7 +298,6 @@
 	        DO L1=1,LEV_CNT(J,1)
 	          L=L+1
 	          DO K=1,4
-	            WRITE(6,'(8I5)')J,L,L1,L2,L3,L4,ML,K
 	            IF(K .EQ. 1)ML=L1
 	            IF(K .EQ. 2)ML=L2
 	            IF(K .EQ. 3)ML=L3
@@ -332,7 +331,6 @@
 !
 	K=1
 	DO WHILE(K .LE. N_CHG)
-	  WRITE(6,*)'K=',K
 	  ICOUNT=1
 	  T1=COEF_CHG(K,1)*G_CHG(K,1)*G_CHG(K,2)
 	  DO L=K+1,N_CHG

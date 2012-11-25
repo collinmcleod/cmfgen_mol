@@ -100,7 +100,7 @@
 	      STORAGE_LOC_FOUND=.FALSE.
 	      IF(.NOT. NEW_VAR_STORAGE_METHOD)THEN
                 DO I=TX_OFFSET+1,NM
-                  IF(VAR_LEV_ID(I) .EQ. SIM_NL(SIM_INDX) .AND. IMP_TRANS_VEC(I) .EQV. THIS_TRANS_IMP)THEN
+                  IF( (VAR_LEV_ID(I) .EQ. SIM_NL(SIM_INDX)) .AND. (IMP_TRANS_VEC(I) .EQV. THIS_TRANS_IMP) )THEN
                     LOW_POINTER(SIM_INDX)=I
                     VAR_IN_USE_CNT(I)=VAR_IN_USE_CNT(I)+1
                     STORAGE_LOC_FOUND=.TRUE.
@@ -122,7 +122,7 @@
 	        VAR_LEV_ID(I)=SIM_NL(SIM_INDX)
 	        IMP_TRANS_VEC(I)=THIS_TRANS_IMP
 	        LOW_POINTER(SIM_INDX)=I
-	        VAR_IN_USE_CNT(I)=VAR_IN_USE_CNT(I)+1
+	        VAR_IN_USE_CNT(I)=1
 	      END IF
 !
 ! Now do the upper level. We first search to see if there is an existing storage location for level NUP.
@@ -130,7 +130,7 @@
 	      STORAGE_LOC_FOUND=.FALSE.
 	      IF(.NOT. NEW_VAR_STORAGE_METHOD)THEN
                 DO I=TX_OFFSET+1,NM
-                  IF(VAR_LEV_ID(I) .EQ. SIM_NUP(SIM_INDX) .AND. IMP_TRANS_VEC(I) .EQV. THIS_TRANS_IMP)THEN
+                  IF( (VAR_LEV_ID(I) .EQ. SIM_NUP(SIM_INDX)) .AND. (IMP_TRANS_VEC(I) .EQV. THIS_TRANS_IMP) )THEN
                     UP_POINTER(SIM_INDX)=I
                     VAR_IN_USE_CNT(I)=VAR_IN_USE_CNT(I)+1
                     STORAGE_LOC_FOUND=.TRUE.
@@ -139,12 +139,8 @@
                 END DO
 	      END IF
 !
-! We can use the next I value, since we started the search for the lower level at the beginning.
-! (and provided we are using the new storage method).
-!
 	      IF(.NOT. STORAGE_LOC_FOUND)THEN
-	        I=I+1
-	        IF(.NOT. NEW_VAR_STORAGE_METHOD)I=TX_OFFSET+1
+	        I=TX_OFFSET+1
 	        DO WHILE(VAR_LEV_ID(I) .NE. 0 )
 	          I=I+1
 	          IF(I .GT. NM)THEN
@@ -156,7 +152,7 @@
 	        VAR_LEV_ID(I)=SIM_NUP(SIM_INDX)
 	        IMP_TRANS_VEC(I)=THIS_TRANS_IMP
 	        UP_POINTER(SIM_INDX)=I
-	        VAR_IN_USE_CNT(I)=VAR_IN_USE_CNT(I)+1
+	        VAR_IN_USE_CNT(I)=1
 	      END IF
 !
 ! 

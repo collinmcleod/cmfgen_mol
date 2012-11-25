@@ -9,6 +9,7 @@
 !
         REAL*8, ALLOCATABLE :: XKT(:)
         REAL*8, ALLOCATABLE :: dXKT(:)
+        REAL*8, ALLOCATABLE :: dXKT_ON_XKT(:)
         REAL*8, ALLOCATABLE :: YE(:,:)
 !
 ! These quantities provide the fraction of the total energy going into the

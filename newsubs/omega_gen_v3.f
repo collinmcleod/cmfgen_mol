@@ -13,6 +13,7 @@
 	1                       ID,FILE_NAME)
 	IMPLICIT NONE
 !
+! Altered 12-Oct-2012 : MAX_TRANS increased to 50,000
 ! Altered 23-Nov-2007 : MAX_TVALS adjusted upwards from 21 to 40 (20-Nov-2007).
 ! Altered 23-Feb-1999 : Access of collison table increased to improve speed
 !                         for Fe2. Old method very inefficient. Now loop
@@ -53,7 +54,7 @@
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE
-	PARAMETER (MAX_TRANS=30000)
+	PARAMETER (MAX_TRANS=50000)
 	PARAMETER (MAX_TVALS=40)
 	PARAMETER (MAX_TAB_SIZE=MAX_TVALS*MAX_TRANS)
 	INTEGER, SAVE :: ID_LOW(MAX_TRANS)
@@ -96,11 +97,6 @@
 	1                      MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE)
 	  LAST_RD_FILE=FILE_NAME
 	END IF
-!
-!	WRITE(6,*)'Num of trans is',NUM_TRANS
-!	DO I=1,NUM_TRANS
-!	  WRITE(100,'(2I7,10ES12.3)')ID_LOW(I),ID_UP(I),OMEGA_TABLE(ID_INDX(I):ID_INDX(I)+MIN(10,NUM_TVALS)-1)
-!	END DO
 !
 ! 
 !

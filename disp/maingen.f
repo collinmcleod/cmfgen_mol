@@ -4909,7 +4909,7 @@ c
 	  ELSE IF(XOPT .EQ. 'KAPPA')THEN
 	     YV(1:ND)=1.0D-10*CHI(1:ND)/MASS_DENSITY(1:ND)/CLUMP_FAC(1:ND)
 	     CALL DP_CURVE(ND,XV,YV)
-	     YAXIS='\gk(cm\u3 \d/g)'
+	     YAXIS='\gk(cm\u2 \d/g)'
 	  ELSE
 !
 ! We subtract 10 to put CHI in units of cm-1

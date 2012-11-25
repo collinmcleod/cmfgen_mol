@@ -416,18 +416,22 @@
 	END IF
 !
 	IF(INITIALIZE)THEN
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) 
 	  DO IP=1,NP
 	    RAY(IP)%I_P=0.0D0; RAY(IP)%I_M=0.0D0
 	    RAY(IP)%I_P_PREV=0.0D0; RAY(IP)%I_M_PREV=0.0D0
 	    RAY(IP)%I_P_SAVE=0.0D0; RAY(IP)%I_M_SAVE=0.0D0
-	    HNU_AT_OB_PREV=0.0D0; NNU_AT_OB_PREV=0.0D0
-	    HNU_AT_IB_PREV=0.0D0; NNU_AT_IB_PREV=0.0D0
 	  END DO	
+	  HNU_AT_OB_PREV=0.0D0; NNU_AT_OB_PREV=0.0D0
+	  HNU_AT_IB_PREV=0.0D0; NNU_AT_IB_PREV=0.0D0
 	ELSE IF(NEW_FREQ)THEN
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(ID,IP)
 	  DO IP=1,NP
-	    RAY(IP)%I_P=0.0D0; RAY(IP)%I_M=0.0D0
-	    RAY(IP)%I_P_PREV=RAY(IP)%I_P_SAVE
-	    RAY(IP)%I_M_PREV=RAY(IP)%I_M_SAVE
+	    DO ID=1,RAY(IP)%NZ
+	      RAY(IP)%I_P(ID)=0.0D0; RAY(IP)%I_M(ID)=0.0D0
+	      RAY(IP)%I_P_PREV(ID)=RAY(IP)%I_P_SAVE(ID)
+	      RAY(IP)%I_M_PREV(ID)=RAY(IP)%I_M_SAVE(ID)
+	    END DO	
 	  END DO	
 	  HNU_AT_OB_PREV=HNU_AT_OB; NNU_AT_OB_PREV=NNU_AT_OB
 	  HNU_AT_IB_PREV=HNU_AT_IB; NNU_AT_IB_PREV=NNU_AT_IB
@@ -501,77 +505,89 @@
 !$OMP END PARALLEL DO
 !
 	ELSE 
+	  CALL TUNE(1,'FG_SOLVE')
 !$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(NRAY)
 	  DO IP=1,NP_LIMIT
 	    NRAY=RAY(IP)%NZ
             CALL SOLVE_CMF_FORMAL_V2(CHI_RAY,ETA_RAY,IP,FREQ,NU_ON_dNU,INNER_BND_METH,b_planck,dBdTAU,NRAY,NP,NC)
 	  END DO
 !$OMP END PARALLEL DO
+	  CALL TUNE(2,'FG_SOLVE')
 	END IF
+!	    IF( I_P_GRID(ID) .LT. 0 .OR. I_M_GRID(ID) .LT. 0.0D0)THEN
+!	      WRITE(LUER,*)'Error: invalid intensities in CMF_FORMAL_REL_V4'
+!	      WRITE(LUER,*)'Check file CMF_FORMAL_REL_ERRORS'
+!	      OPEN(UNIT=7,FILE='CMF_FORMAL_REL_ERRORS',STATUS='UNKNOWN')
+!	        WRITE(7,*)IP,NRAY
+!	        WRITE(7,'(6ES14.4)')FREQ,dLOG_NU,NU_ON_dNU,B_PLANCK,DBB
+!	        WRITE(7,'(A)')' '
+!	        DO I=1,NRAY
+!	          WRITE(7,'(8ES14.4)')CHI_RAY(I),ETA_RAY(I),
+!	1                     RAY(IP)%S_P(I),RAY(IP)%B_P(I),RAY(IP)%I_P(I),
+!	1                     RAY(IP)%S_M(I),RAY(IP)%B_M(I),RAY(IP)%I_M(I)
+!	        END DO
+!	      CLOSE(UNIT=7)
+!	      STOP
+!	    END IF
 !
+! Integrate over p to get J and K. 
+!
+	CALL TUNE(1,'JVAL')
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) REDUCTION(+:JNU_STORE,HNU_STORE,KNU_STORE,NNU_STORE) PRIVATE(T1,T2,ID,IP)
 	DO IP=1,NP_LIMIT
-	  NRAY=RAY(IP)%NZ
 	  DO ID=1,MIN(ND,NP-IP+1)
-	    I_P_GRID(ID)=RAY(IP)%I_P(RAY(IP)%LNK(ID))
-	    I_M_GRID(ID)=RAY(IP)%I_M(RAY(IP)%LNK(ID))
-	    IF( I_P_GRID(ID) .LT. 0 .OR. I_M_GRID(ID) .LT. 0.0D0)THEN
-	      WRITE(LUER,*)'Error: invalid intensities in CMF_FORMAL_REL_V4'
-	      WRITE(LUER,*)'Check file CMF_FORMAL_REL_ERRORS'
-	      OPEN(UNIT=7,FILE='CMF_FORMAL_REL_ERRORS',STATUS='UNKNOWN')
-	        WRITE(7,*)IP,NRAY
-	        WRITE(7,'(6ES14.4)')FREQ,dLOG_NU,NU_ON_dNU,B_PLANCK,DBB
-	        WRITE(7,'(A)')' '
-	        DO I=1,NRAY
-	          WRITE(7,'(8ES14.4)')CHI_RAY(I),ETA_RAY(I),
-	1                     RAY(IP)%S_P(I),RAY(IP)%B_P(I),RAY(IP)%I_P(I),
-	1                     RAY(IP)%S_M(I),RAY(IP)%B_M(I),RAY(IP)%I_M(I)
-	        END DO
-	      CLOSE(UNIT=7)
-	      STOP
-	    END IF
+	    T1=RAY(IP)%I_P(RAY(IP)%LNK(ID))
+	    T2=RAY(IP)%I_M(RAY(IP)%LNK(ID))
+            Jnu_store(ID)=Jnu_store(ID)+T1*Jqw_p(ID,ip)+T2*Jqw_m(ID,ip)
+            Hnu_store(ID)=Hnu_store(ID)+T1*Hqw_p(ID,ip)+T2*Hqw_m(ID,ip)
+            Knu_store(ID)=Knu_store(ID)+T1*Kqw_p(ID,ip)+T2*Kqw_m(ID,ip)
+            Nnu_store(ID)=Nnu_store(ID)+T1*Nqw_p(ID,ip)+T2*Nqw_m(ID,ip)
 	  END DO
+	END DO
+	CALL TUNE(2,'JVAL')
 !
-! Integrate over p to get J and K. NB: nz(ip) is the number of
-! data points along each segment associated with the 2 directions.
+	ID=ND
+	DO IP=1,NC+1
+	  T1=RAY(IP)%I_P(RAY(IP)%LNK(ID))
+	  T2=RAY(IP)%I_M(RAY(IP)%LNK(ID))
+	  JPLUS_IB=JPLUS_IB+T1*Jqw_p(ND,ip)
+	  HPLUS_IB=HPLUS_IB+T1*Hqw_p(ND,ip)
+	  KPLUS_IB=KPLUS_IB+T1*Kqw_p(ND,ip)
+	  NPLUS_IB=NPLUS_IB+T1*Nqw_p(ND,ip)
+	  JMIN_IB =JMIN_IB +T2*Jqw_m(ND,ip)
+	  HMIN_IB =HMIN_IB -T2*Hqw_m(ND,ip)    !- to make +ve
+	  KMIN_IB =KMIN_IB +T2*Kqw_m(ND,ip)
+	  NMIN_IB =NMIN_IB -T2*Nqw_m(ND,ip)
+	END DO
 !
-           DO ID=1,MIN(ND,NP-IP+1)
-             Jnu_store(ID)=Jnu_store(ID)+I_p_grid(ID)*Jqw_p(ID,ip)+I_m_grid(ID)*Jqw_m(ID,ip)
-             Hnu_store(ID)=Hnu_store(ID)+I_p_grid(ID)*Hqw_p(ID,ip)+I_m_grid(ID)*Hqw_m(ID,ip)
-             Knu_store(ID)=Knu_store(ID)+I_p_grid(ID)*Kqw_p(ID,ip)+I_m_grid(ID)*Kqw_m(ID,ip)
-             Nnu_store(ID)=Nnu_store(ID)+I_p_grid(ID)*Nqw_p(ID,ip)+I_m_grid(ID)*Nqw_m(ID,ip)
-	  END DO
+! Evaluate half moments at outer boundary, and store intensity at the outer boundary.
 !
-          IF(IP .LE. NC+1)THEN
-	    JPLUS_IB=JPLUS_IB+I_p_grid(ND)*Jqw_p(ND,ip)
-	    HPLUS_IB=HPLUS_IB+I_p_grid(ND)*Hqw_p(ND,ip)
-	    KPLUS_IB=KPLUS_IB+I_p_grid(ND)*Kqw_p(ND,ip)
-	    NPLUS_IB=NPLUS_IB+I_p_grid(ND)*Nqw_p(ND,ip)
-	    JMIN_IB =JMIN_IB +I_m_grid(ND)*Jqw_m(ND,ip)
-	    HMIN_IB =HMIN_IB -I_m_grid(ND)*Hqw_m(ND,ip)    !- to make +ve
-	    KMIN_IB =KMIN_IB +I_m_grid(ND)*Kqw_m(ND,ip)
-	    NMIN_IB =NMIN_IB -I_m_grid(ND)*Nqw_m(ND,ip)
-	  END IF
-	  JPLUS_OB=JPLUS_OB+I_p_grid(1)*Jqw_p(1,ip)
-	  HPLUS_OB=HPLUS_OB+I_p_grid(1)*Hqw_p(1,ip)
-	  KPLUS_OB=KPLUS_OB+I_p_grid(1)*Kqw_p(1,ip)
-	  NPLUS_OB=NPLUS_OB+I_p_grid(1)*Nqw_p(1,ip)
-	  JMIN_OB =JMIN_OB +I_m_grid(1)*Jqw_m(1,ip)
-	  HMIN_OB =HMIN_OB -I_m_grid(1)*Hqw_m(1,ip)    !- to make +ve
-	  KMIN_OB =KMIN_OB +I_m_grid(1)*Kqw_m(1,ip)
-	  NMIN_OB =NMIN_OB -I_m_grid(1)*Nqw_m(1,ip)
-!
-! Store intensity at the outer boundary.
-!
-	  IPLUS(IP)=I_P_GRID(1)-I_M_GRID(1)
-!
+	ID=1
+	DO IP=1,NP
+	  T1=RAY(IP)%I_P(RAY(IP)%LNK(ID))
+	  T2=RAY(IP)%I_M(RAY(IP)%LNK(ID))
+	  JPLUS_OB=JPLUS_OB+T1*Jqw_p(1,ip)
+	  HPLUS_OB=HPLUS_OB+T1*Hqw_p(1,ip)
+	  KPLUS_OB=KPLUS_OB+T1*Kqw_p(1,ip)
+	  NPLUS_OB=NPLUS_OB+T1*Nqw_p(1,ip)
+	  JMIN_OB =JMIN_OB +T2*Jqw_m(1,ip)
+	  HMIN_OB =HMIN_OB -T2*Hqw_m(1,ip)    !- to make +ve
+	  KMIN_OB =KMIN_OB +T2*Kqw_m(1,ip)
+	  NMIN_OB =NMIN_OB -T2*Nqw_m(1,ip)
+	  IPLUS(IP)=T1-T2
 	END DO
 !
 ! Save intensity for integration at next frequency.
 !
+	CALL TUNE(1,'FGP_SAVE')
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(ID,IP)
 	DO IP=1,NP
-	  RAY(IP)%I_P_SAVE=RAY(IP)%I_P
-	  RAY(IP)%I_M_SAVE=RAY(IP)%I_M
+	  DO ID=1,RAY(IP)%NZ
+	    RAY(IP)%I_P_SAVE(ID)=RAY(IP)%I_P(ID)
+	    RAY(IP)%I_M_SAVE(ID)=RAY(IP)%I_M(ID)
+	  END DO
 	END DO
+	CALL TUNE(2,'FGP_SAVE')
 !
 	JNU=JNU_STORE
 	FEDD=KNU_STORE/JNU_STORE

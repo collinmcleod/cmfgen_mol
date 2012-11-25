@@ -13,6 +13,7 @@
 	1                       PHOT_SUB,FILE_NAME)
 	IMPLICIT NONE
 !
+! Altered 12-Oct-2012 : MAX_TRANS increased to 50,000
 ! Altered 08-Sep-2000 : MAX_TRANS increased to 30,000
 ! Altered 23-Feb-1999 : Access of collison table increased to improve speed
 !                         for Fe2. Old method very inefficient. Now loop
@@ -52,7 +53,7 @@
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE
-	PARAMETER (MAX_TRANS=30000)
+	PARAMETER (MAX_TRANS=50000)
 	PARAMETER (MAX_TVALS=20)
 	PARAMETER (MAX_TAB_SIZE=MAX_TVALS*MAX_TRANS)
 	INTEGER, SAVE :: ID_LOW(MAX_TRANS)
