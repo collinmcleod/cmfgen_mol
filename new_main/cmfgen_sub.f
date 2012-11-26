@@ -1415,11 +1415,12 @@
 !
 ! Compute variation of opacity/emissivity. Store in VCHI and VETA.
 !
-	    CALL TUNE(1,'DTDR_VOPAC')
-!	    INCLUDE 'VAROPAC_V4.INC'
-	    CALL COMP_VAR_OPAC(POPS,RJ,FL,CONT_FREQ,FREQ_INDX,
-	1                SECTION,ND,NT,LST_DEPTH_ONLY)
-	    CALL TUNE(2,'DTDR_VOPAC')
+	    IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN
+	      CALL TUNE(1,'DTDR_VOPAC')
+	      CALL COMP_VAR_OPAC(POPS,RJ,FL,CONT_FREQ,FREQ_INDX,
+	1                  SECTION,ND,NT,LST_DEPTH_ONLY)
+	      CALL TUNE(2,'DTDR_VOPAC')
+	    END IF
 ! 
 !
 ! Compute contribution to CHI and VCHI by lines.
@@ -1490,6 +1491,9 @@
 	  DO I=1,NT
 	    DIFFW(I)=DIFFW(I)*T1
 	  END DO
+	END IF
+	IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN
+	  DIFFW(1:NT)=0.0D0
 	END IF
 	CALL TUNE(2,'DTDR')
 	CALL TUNE(3,'  ')
@@ -2435,20 +2439,24 @@
 	      NL=LOW_POINTER(SIM_INDX)
 	      VAR_IN_USE_CNT(NL)=VAR_IN_USE_CNT(NL)-1
 	      IF(VAR_IN_USE_CNT(NL) .EQ. 0)THEN
+!$OMP PARALLEL WORKSHARE
 	        TX(:,:,NL)=0.0D0	!ND,ND,NM
 	        TVX(:,:,NL)=0.0D0	!ND-1,ND,NM
 	        dZ(NL,:,:,:)=0.0D0	!NM,NUM_BNDS,ND,MAX_SIM
 	        VAR_LEV_ID(NL)=0
+!$OMP END PARALLEL WORKSHARE
 	      END IF
 	      LOW_POINTER(SIM_INDX)=0
 !
 	      NUP=UP_POINTER(SIM_INDX)
 	      VAR_IN_USE_CNT(NUP)=VAR_IN_USE_CNT(NUP)-1
 	      IF(VAR_IN_USE_CNT(NUP) .EQ. 0)THEN
+!$OMP PARALLEL WORKSHARE
 	        TX(:,:,NUP)=0.0D0	!ND,ND,NM
 	        TVX(:,:,NUP)=0.0D0	!ND-1,ND,NM
 	        dZ(NUP,:,:,:)=0.0D0	!NM,NUM_BNDS,ND,MAX_SIM
 	        VAR_LEV_ID(NUP)=0
+!$OMP END PARALLEL WORKSHARE
 	      END IF
 	      UP_POINTER(SIM_INDX)=0
 	    END IF			!Outside region of influence by line?
