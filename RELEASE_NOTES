@@ -11,6 +11,72 @@ has not yet been updated to reflect the changes, but is coming!
 ****************************************************************************
 ****************************************************************************
 
+                 25-Nov-2012
+
+(1) LTE populations are now also installed in LOG format in CMFGEN and DISPGEN.
+       This is a MAJOR change and required a change in many routines. Since some
+       subroutines had different passed arguments, file version names were updated.
+       This was done to faciltate SN models with large changes in temperature that 
+       have high ionization in the inner region, but much lower temperature and 
+       ionization in the outer regions.
+
+(2) Atomic data files now contain links to the atomic data.
+     This can be obtained from the MODEL file by doing
+ 
+        grep "\[Reference\]" MODEL
+
+(3) Routines for non-thermal ionization in SN are now included in the distribution.
+
+(4) There were some issues with incorrect names in atomic data files. An error
+    is now output to OUTGEN when this ocurrs (the atomic data files have been fixed).
+    Unfortunately this error will also occur when using small atoms in which
+       the appropriate levels ahs not been included.
+
+(5) Penning ionization has been included. Only relevant to SN. Set [INC_PEN]=F in
+      VADAT file.
+
+(6) Some programs now write messages to the terminal in color.
+
+(7) More options included in MAINGEN. Mainly for SN work. Documentation not yet updated.
+       New options can be found by differencing $cmfdist/disp/maingen.f with older version.
+
+(8) MOD_PRRR was updated and is now more sophisticated. This allows a more compact form
+       of the PRRR files to be output, and plotting.
+
+(9) The noramlized check for the FLUX (output at the end of OBSFLUX) is now
+       obtained by integrating inwards (rather than outwards). Mainly
+       relevant to SN models.
+
+(10) More options added to VADAT file. These are read in by
+         $cmfdist/new_main/mod_subs/rd_control_variables.f
+     Most of these are related to non thermal ioizations.
+
+(11) A new key word ( [NEW_VST_METH] ) has been added to VADAT. At present
+       its defaults is TRUE. This potentially could slow the code, and
+       might cause convergence difficulties (its been tested but I can't
+       test all regimes). It helps the convergence of Ia models. The
+       current default is TRUE -- to get the current (i.e., old) behaviour,
+       set to FALSE.
+
+(12) Program no longer write NETRATE, TOTRATE, and LINEHEAT on last iteration. To
+       get these set [WRITE_RATES]=T in VADAT.
+
+(13) A bug related to CHG exchange retcions was fixed.
+       See $cmfdist/new_main/subs/chg/set_chg_lev_id_v4.f
+
+(14) A bug was fixed relating to ADJUST_LINE_FREQ ins CMF_FLUX calculations.
+
+(15) Modications to $cmfdist/plane/jgrey_hub_ddt_v3.f. Modified to converge
+       better and fixed bug (only important if did not converge).
+
+(16) Additional plotting options added to $cmfdist/spec_plt/plt_scr.f. This routine
+       allows, for example, variables to be plotted for different iteartions of a 
+       currently running model.
+
+ 
+****************************************************************************
+****************************************************************************
+
                  7_Apr-2011
 
 Several important bug fixes, and  improvements.
