@@ -127,5 +127,5 @@
 	CALL DP_CURVE(NKT,XKT,Q)
 	CALL GRAMON_PGPLOT('E(ev)','Q(MB)',' ',' ')
 !
-	RETURN
+	STOP
 	END      

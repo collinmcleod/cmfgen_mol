@@ -276,7 +276,7 @@
 	    T1=(RDPOPS(IVAR,J,2)-RDPOPS(IVAR,J,3))/(RDPOPS(IVAR,J,1)-RDPOPS(IVAR,J,2))
 	    WRITE(6,*)'r1=',T1,'Depth=',J
 	    IF(T1 .GT. 1.0)THEN
-	      IF(T1 .LT. 1.05D0)T1=1.05
+	      IF(T1 .LT. 1.010D0)T1=1.010D0
 	      DO I=1,NT
 	        T2=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/(T1-1.0D0)
 	        IF(T2 .GT. RDPOPS(I,J,1))T2=RDPOPS(I,J,1)
@@ -577,7 +577,8 @@
 	    ELSE
 	      T1=1.0D0
 	      DO K=1,NT
-                IF(NEWPOP(K,L) .LT. 0.1D0*POPS(K,L))THEN
+                IF(POPS(K,L) .EQ. NEWPOP(K,L))THEN
+                ELSE IF(NEWPOP(K,L) .LT. 0.1D0*POPS(K,L))THEN
                   T1=MIN( T1, 0.9D0*POPS(K,L)/(POPS(K,L)-NEWPOP(K,L)) )
                 ELSE IF(NEWPOP(K,L) .GT. 10.0D0*POPS(K,L))THEN
                   T1=MIN( T1, 9.0D0*POPS(K,L)/(NEWPOP(K,L)-POPS(K,L)) )

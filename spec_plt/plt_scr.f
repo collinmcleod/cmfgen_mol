@@ -144,6 +144,7 @@ C
         WRITE(T_OUT,*)'PN  :: Plot a variable as a function of depth index.'
         WRITE(T_OUT,*)'PV  :: Plot a variable as a function of velocity.'
 	WRITE(T_OUT,*)'PF  :: Plot 100.0D0*(Y(K+1)-Y(K))/Y(K+1) for all variables at a given depth.'
+        WRITE(T_OUT,*)'VR  :: Plot velocity as a function of radius.'
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'MED_R  :: Median corection as a function of depth'
 	WRITE(T_OUT,*)'MR     :: Z(K)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
@@ -400,15 +401,48 @@ C
 	    IVAR=NT
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)')
 	    IF(IVAR .EQ. 0)EXIT
+	    T1=1.0D0
+	    IF(R(1) .GT. 1.0D+04)T1=1.0D-04
 	    DO ID=1,ND
 	      Y(ID)=POPS(IVAR,ID,IT)
 	      X(ID)=1.0D-04*R_MAT(ID,IT)
 	    END DO
 	    CALL DP_CURVE(ND,X,Y)
 	  END DO
+	  IF(R(1) .GT. 1.0D+04)THEN
+	    CALL GRAMON_PGPLOT('R(10\u14 \dcm)',Ylabel,' ',' ')
+	  ELSE
+	    CALL GRAMON_PGPLOT('R(10\u10 \dcm)',Ylabel,' ',' ')
+	  END IF
 	  Ylabel=''
-	  CALL GRAMON_PGPLOT('R(10\u14 \dcm)',Ylabel,' ',' ')
 	  GOTO 200
+!
+	ELSE IF(PLT_OPT(1:2) .EQ. 'VR')THEN
+	  IT=NIT; ID=ND
+	  DO WHILE(1 .EQ. 1)
+	    CALL GEN_IN(IT,'Iteration # (zero to exit)')
+	    IF(IT .EQ. 0)EXIT
+	    IVAR=NT
+	    CALL GEN_IN(IVAR,'Variable # (zero to exit)')
+	    IF(IVAR .EQ. 0)EXIT
+	    T1=1.0D0; T2=1.0D0
+	    IF(R(1) .GT. 1.0D+04)T1=1.0D-04
+	    IF(V(1) .GT. 1.0D+04)T2=1.0D-04
+	    DO ID=1,ND
+	      X(ID)=T1*R_MAT(ID,IT)
+	      Y(ID)=T2*V_MAT(ID,IT)
+	    END DO
+	    CALL DP_CURVE(ND,X,Y)
+	  END DO
+	  Ylabel='V(km/s)'
+	  IF(V(1) .GT. 1.0D+04)Ylabel='V(Mm/s)'
+	  IF(R(1) .GT. 1.0D+04)THEN
+	    CALL GRAMON_PGPLOT('R(10\u14 \dcm)',Ylabel,' ',' ')
+	  ELSE
+	    CALL GRAMON_PGPLOT('R(10\u10 \dcm)',Ylabel,' ',' ')
+	  END IF
+	  GOTO 200
+!
 	ELSE IF(PLT_OPT(1:4) .EQ. 'FDGV')THEN
 	  IT=NIT; ID=ND; IVAR=NT; LIMITS(:)=0; LIMITS(1)=1; LIMITS(2)=ND
 	  CALL GEN_IN(IT,'Iteration # (zero to exit)')

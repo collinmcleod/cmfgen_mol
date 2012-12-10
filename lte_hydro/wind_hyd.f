@@ -75,6 +75,7 @@
 	USE HYDRO_PARAM_MODULE
 	IMPLICIT NONE
 !
+! Altered 29-Nov-2012 : Put in error check to make sure connection velocity < sound speed.
 ! Altered Mar2007: Minor bug fixes.
 !
 	INTEGER NP,NC
@@ -591,8 +592,15 @@ C
 	  IF(WIND_PRESENT)THEN
 	    SOUND_SPEED=1.0D+04*(1.0D0+ED_ON_NA(I))*BOLTZMANN_CONSTANT()*T(I)/MU_ATOM/ATOMIC_MASS_UNIT()
 	    SOUND_SPEED=1.0D-05*SQRT(SOUND_SPEED)
-!	    SOUND_SPEED=1.0D+10
-	    WRITE(6,'(A,3ES14.4)')'SOUND_SPEED',SOUND_SPEED
+	    WRITE(6,'(A)')' '
+	    WRITE(6,'(A,3ES14.4)')' The sound speed at the iwind connection point in km/s is:',SOUND_SPEED
+	    IF(SOUND_SPEED .LT. CONNECTION_VEL)THEN
+	      WRITE(6,'(A)')' '
+	      WRITE(6,*)'ERROR --- your connection velocity is larger than the sound speed'
+	      WRITE(6,*)'The recommened connection velocity is 0.5 to 0.75 times the SOUND_SPEED'
+	      WRITE(6,'(A)')' '
+	      STOP
+	    END IF
 	  END IF
 !
 !
@@ -605,6 +613,9 @@ C
 	  OPEN(UNIT=76,STATUS='UNKNOWN',ACTION='WRITE',FILE='DIAGNOSTIC_EST_2')
 	  WRITE(76,'(4X,8(4X,A))')'   R_EST','  KR_OLD',' KES_OLD','   OLD_T',
 	1                         ' OLD_TAU','     KES','       T','      KR'
+!
+	  CALL SET_LINE_BUFFERING(75)
+	  CALL SET_LINE_BUFFERING(76)
 !
 ! The boudary condition for the integration of the hydrostatic equation
 ! has been set, either at the outer boundary, or at the wind connection point.

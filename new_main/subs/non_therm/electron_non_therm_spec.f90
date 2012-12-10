@@ -34,9 +34,9 @@
 	logical, save, allocatable :: do_and_1st_time(:)
 	integer, save, allocatable :: nlow_maxs(:)
 !
-	REAL*8, ION_SUM(NUM_IONS)
-	REAL*8, SPEC_SUM(NUM_IONS)
-	LOGICAL, DO_THIS_ION_EXC(NUM_IONS)
+	REAL*8 ION_SUM(NUM_IONS)
+	REAL*8 SPEC_SUM(NUM_IONS)
+	LOGICAL DO_THIS_ION_EXC(NUM_IONS)
 !
 	REAL*8 EKT
 	REAL*8 EKTP

@@ -159,7 +159,50 @@
 	  V(1:ND)=T1*OLD_V(1:ND)
 	  R(1:ND)=OLD_R(1:ND)
 	  SIGMA(1:ND)=OLD_SIGMA(1:ND)
- 
+!
+	ELSE IF(OPTION .EQ. 'FG')THEN
+          I_ST=1; I_END=ND
+          CALL GEN_IN(I_ST,'Start index for fine grid')
+          CALL GEN_IN(I_END,'End index for fine grid')
+          WRITE(6,*)'Number of points in requeted interval is',I_END-I_ST-1
+          NX=I_END-I_ST
+          CALL GEN_IN(NX,'New number of grid points for this interval')
+          ND=I_ST+NX+(ND_OLD-I_END)+1
+!
+            DO I=1,I_ST
+              X2(I)=I
+            END DO
+            T1=(I_END-I_ST)/(NX+1.0D0)
+            DO I=1,NX
+              X2(I_ST+I)=I_ST+I*T1
+            END DO
+            DO I=I_END,ND_OLD
+              X2(I_ST+NX+I+1-I_END)=I
+            END DO
+           DO I=1,ND
+             X1(I)=I
+           END DO
+           CALL MON_INTERP(R,ND,IONE,X2,ND,OLD_R,ND_OLD,X1,ND_OLD)
+!
+! Now compute the revised V and SIGMA.
+!
+	  ALLOCATE (COEF(ND_OLD,4))
+	  CALL MON_INT_FUNS_V2(COEF,OLD_V,OLD_R,ND_OLD)
+	  J=1
+	  I=1
+	  DO WHILE (I .LE. ND)
+	    IF(R(I) .GE. OLD_R(J+1))THEN
+	      T1=R(I)-OLD_R(J)
+	      V(I)=COEF(J,4)+T1*(COEF(J,3)+T1*(COEF(J,2)+T1*COEF(J,1)))
+	      SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0*T1*COEF(J,1))
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	      I=I+1
+	    ELSE
+	      J=J+1
+	    END IF
+	  END DO
+	  DEALLOCATE (COEF)
+!
 	ELSE IF(OPTION .EQ. 'ADDR')THEN
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')'This option allows extra grid points to be added'

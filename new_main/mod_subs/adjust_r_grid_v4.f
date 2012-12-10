@@ -7,6 +7,10 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 02-Dec-2012 : Changed calls to DO_TAU_REGRID and DO_VEL_REGRID.
+!                       Now open R_REGRIDDING_LOG in this routine.
+!                       Use monotonic interpolaton for V and SIGMA.
+!                  
 ! Altered 09-Feb-2011 : Major rewrite of ADJUST_R_GRID_V3 which was  a version
 !                       still under development. This routine is controlled by
 !	                parameters read in from the file ADJUST_R_DEFAULTS. This
@@ -31,6 +35,9 @@
 ! Local variables.
 !
 	REAL*8 R_OLD(ND)
+	REAL*8 V_OLD(ND)
+	REAL*8 SIGMA_OLD(ND)
+!
 	REAL*8 LOG_R_OLD(ND)
 	REAL*8 LOG_R(ND)
 	REAL*8 dTAU_OLD(ND)
@@ -39,6 +46,7 @@
 !
 	REAL*8 TA(ND)			!Work vectors
 	REAL*8 TB(ND)
+	REAL*8 COEF(ND,4)
 !
 ! The fine grid (FG) is chosen to cover the ionization front. The default values are
 ! -2.0 to 1.0D0 in log(TAU) space.
@@ -68,6 +76,7 @@
 	INTEGER NX
 	INTEGER I,I1,I2,J
 	INTEGER IOS
+	INTEGER LU
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: T_OUT=6
@@ -77,7 +86,7 @@
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	CHARACTER(LEN=80) STRING
 !
-	WRITE(T_OUT,*)'Entering ADJUST_R_GRID_V3'
+	WRITE(T_OUT,*)'Entering ADJUST_R_GRID_V4'
 !
 ! Set default parameters
 !
@@ -90,7 +99,7 @@
 !
 	CALL GEN_ASCI_OPEN(LUIN,'ADJUST_R_DEFAULTS','OLD',' ','READ',IZERO,IOS)
 	IF(IOS .NE. 0)THEN
-	  WRITE(T_OUT,*)'Error opening ADJUST_R_DEFAULTS in ADJUST_R_GRID_V3, IOS=',IOS
+	  WRITE(T_OUT,*)'Error opening ADJUST_R_DEFAULTS in ADJUST_R_GRID_V4, IOS=',IOS
 	  STOP
 	END IF
 	CALL RD_OPTIONS_INTO_STORE(LUIN,LUSCR)
@@ -115,14 +124,17 @@
 	  RETURN
 	END IF
 !
+        CALL GET_LU(LU)
+	OPEN(UNIT=LU,FILE='R_REGRIDDING_LOG',STATUS='UNKNOWN',ACTION='WRITE')
+!
 ! Save existing grid, which will be used for the interplations.
 !
 	R_OLD(1:ND)=R(1:ND)
 !
 	IF(REGRIDDING_METHOD .EQ. 'TAU_SPACE')THEN
-	  CALL DO_TAU_REGRID(POPS,ESEC,R_OLD,DONE_R_REV,ND,NT)
+	  CALL DO_TAU_REGRID_V2(POPS,ESEC,DONE_R_REV,ND,NT,LU)
 	ELSE IF(REGRIDDING_METHOD.EQ. 'VEL_SPACE')THEN
-	  CALL DO_VEL_REGRID(POPS,R,V,POP_ATOM,DONE_R_REV,ND,NT)
+	  CALL DO_VEL_REGRID_V2(POPS,R,V,POP_ATOM,DONE_R_REV,ND,NT,LU)
 	ELSE
 	  WRITE(T_OUT,'(A)')'Error- REGRIDDING_METHOD (GRID_METH option) not recognized in ADJUST_R_GRID_V4 '
 	  WRITE(T_OUT,'(A)')'REGRIDDING_METHOD =',TRIM(REGRIDDING_METHOD)
@@ -152,13 +164,34 @@
 ! We do not need to interpolate T, and ED directly, since these are part
 ! of POPS.
 !
+	  V_OLD(1:ND)=V(1:ND)
+	  SIGMA_OLD(1:ND)=SIGMA(1:ND)
 	  LOG_R=LOG(R)
 	  LOG_R_OLD=LOG(R_OLD)
 	  TA(1:ND)=LOG(V(1:ND))
-	  CALL MON_INTERP(V,ND,IONE,LOG_R,ND,TA,ND,LOG_R_OLD,ND)
-	  V(1:ND)=EXP(V(1:ND))
-	  TA(1:ND)=SIGMA(1:ND)
-	  CALL MON_INTERP(SIGMA,ND,IONE,LOG_R,ND,TA,ND,LOG_R_OLD,ND)
+!
+	  CALL MON_INT_FUNS_V2(COEF,TA,LOG_R_OLD,ND)
+	  J=1
+	  DO I=2,ND-1
+	    DO WHILE(R(I) .LT. R_OLD(J+1))
+	      J=J+1
+	    END DO
+	    T1=LOG_R(I)-LOG_R_OLD(J)
+	    V(I)=EXP( COEF(J,4)+T1*(COEF(J,3)+T1*(COEF(J,2)+T1*COEF(J,1))) )
+	    SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0*T1*COEF(J,1))
+	    SIGMA(I)=SIGMA(I)-1.0D0
+	  END DO
+!
+	  WRITE(LU,'(A,8(7X,A))')'!Index','        R','     Rold','   Log(R)','Log(Rold)','        V',
+	1                               '     Vold','    Sigma','Sigma_old'
+	  WRITE(LU,'(A)')'!'
+	  DO I=1,ND
+	    WRITE(LU,'(I6,8ES16.5)')I,R(I),R_OLD(I),LOG_R(I),LOG_R_OLD(I),V(I),V_OLD(I),SIGMA(I),SIGMA_OLD(I)
+	  END DO
+	  CLOSE(LU)
+!
+! Now interpolate all populations, temperature etc.
+!
 	  DO I=1,NT
 	    TA(1:ND)=LOG(POPS(I,1:ND))
 	    CALL MON_INTERP(TB,ND,IONE,LOG_R,ND,TA,ND,LOG_R_OLD,ND)
@@ -169,7 +202,7 @@
 	DONE_R_REV=.TRUE.
 	NO_R_REV=NO_R_REV-1
         CALL UPDATE_KEYWORD(NO_R_REV,'[N_ITS]','ADJUST_R_DEFAULTS',L_TRUE,L_TRUE,LUIN)
-	WRITE(T_OUT,*)'Adjusted R grid in ADJUST_R_GRID_V3'
+	WRITE(T_OUT,*)'Adjusted R grid in ADJUST_R_GRID_V4'
 !
 	RETURN
 	END

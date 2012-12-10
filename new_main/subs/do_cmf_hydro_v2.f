@@ -571,6 +571,7 @@
 ! Set estimates at current location. Then integrate hydrostatic
 ! equation using 4th order Runge-Kutta.
 !
+	    IF(VERBOSE_OUTPUT)WRITE(LUV,'(5X,A,5X)')'  dPdR','dTAUdR','  T_EST','   dPn',' dTAUn'
 100	    P_EST=P(I-1)
 	    TAU_EST=TAU(I-1)
 	    T_EST=T(I-1)
@@ -580,7 +581,7 @@
 	    CALL CMF_HYDRO_DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
 	    dP1=H*dPdR
 	    dTAU1=H*dTAUdR
-	    IF(VERBOSE_OUTPUT)WRITE(LUV,*)dPdR,dTAUdR,T_EST,dP1,dTAU1
+	    IF(VERBOSE_OUTPUT)WRITE(LUV,'(5ES16.8)')dPdR,dTAUdR,T_EST,dP1,dTAU1
 !
 	    P_EST=P(I-1)+dP1/2
 	    TAU_EST=TAU(I-1)+dTAU1/2
@@ -589,7 +590,7 @@
 	    CALL CMF_HYDRO_DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
 	    dP2=H*dPdR
 	    dTAU2=H*dTAUdR
-	    IF(VERBOSE_OUTPUT)WRITE(LUV,*)dPdR,dTAUdR,T_EST,dP2,dTAU2
+	    IF(VERBOSE_OUTPUT)WRITE(LUV,'(5ES16.8)')dPdR,dTAUdR,T_EST,dP2,dTAU2
 !
 	    P_EST=P(I-1)+dP2/2
 	    TAU_EST=TAU(I-1)+dTAU2/2
@@ -598,7 +599,7 @@
 	    CALL CMF_HYDRO_DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
 	    dP3=H*dPdR
 	    dTAU3=H*dTAUdR
-	    IF(VERBOSE_OUTPUT)WRITE(LUV,*)dPdR,dTAUdR,T_EST,dP3,dTAU3
+	    IF(VERBOSE_OUTPUT)WRITE(LUV,'(5ES16.8)')dPdR,dTAUdR,T_EST,dP3,dTAU3
 !
 	    P_EST=P(I-1)+dP3
 	    TAU_EST=TAU(I-1)+dTAU2
@@ -607,7 +608,7 @@
 	    CALL CMF_HYDRO_DERIVS(P_EST,TAU_EST,T_EST,ED_ON_NA_EST,ATOM_EST)
 	    dP4=H*dPdR
 	    dTAU4=H*dTAUdR
-	    IF(VERBOSE_OUTPUT)WRITE(LUV,*)dPdR,dTAUdR,T_EST,dP4,dTAU4
+	    IF(VERBOSE_OUTPUT)WRITE(LUV,'(5ES16.8)')dPdR,dTAUdR,T_EST,dP4,dTAU4
 !
 ! Update values at next grid point.
 !
@@ -623,13 +624,13 @@
 	    CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*ROSS_ON_ES
 	    GAMMA_FULL(I)=GAM_FULL
 	    V(I)=MDOT/MU_ATOM/POP_ATOM(I)/R(I)/R(I)
-	    IF(.NOT. PLANE_PARALLEL_NO_V)THEN
-	      IF(V(I) .GE. V(I-1))THEN
-	        GAM_LIM=GAM_LIM-0.01
-	        IF(VERBOSE_OUTPUT)WRITE(LUV,*)'Resetting GAM_LIM due to -ve velocity gradient'
-	        GOTO 100
-	      END IF 
-	    END IF
+!	    IF(.NOT. PLANE_PARALLEL_NO_V)THEN
+!	      IF(V(I) .GE. V(I-1))THEN
+!	        GAM_LIM=GAM_LIM-0.01
+!	        IF(VERBOSE_OUTPUT)WRITE(LUV,*)'Resetting GAM_LIM due to -ve velocity gradient'
+!	        GOTO 100
+!	      END IF 
+!	    END IF
 	    GAM_LIM=GAM_LIM_STORE
 	    ND=I
 !

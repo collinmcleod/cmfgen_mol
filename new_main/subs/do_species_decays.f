@@ -7,13 +7,15 @@
 ! Upon exit ISO%OLD_POP_DECAY is set.
 !           PAR_ISO           is set.
 !
-! This routine currently only works for 2-step decay processes.
+! This routine currently only works for 1 and 2-step decay processes.
 !
 ! e.g., Ni56 --> Co56 -- Fe56
 !
 	SUBROUTINE DO_SPECIES_DECAYS(DELTA_T,ND) 
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
+!
+! Altered: 23-Nov-2012 : Added 1 step decay process
 !
 	INTEGER ND
 	REAL*8 VEC1(ND)
@@ -41,11 +43,27 @@
 !
 	WRITE(6,*)'In DO_SPECIES_DECAYS, Delta T=',DELTA_T
 	DO IN=1,NUM_DECAY_PATHS
-	  IF(NUC(IN)%SEQUENCE ==  'F')THEN
+!
+! Do decay chains with a single decay route.
+!
+	  IF(NUC(IN)%SEQUENCE ==  'E')THEN
+	    IS=NUC(IN)%LNK_TO_ISO
+	    JS=NUC(IN)%DAUGHTER_LNK_TO_ISO
+	    VEC1=EXP(-NUC(IN)%DECAY_CONST*DELTA_T)
+	    WRITE(6,*)'Found one step nuclear reaction chain:',IN
+	    ISO(IS)%OLD_POP_DECAY=ISO(IS)%OLD_POP*VEC1
+	    ISO(JS)%OLD_POP_DECAY=ISO(JS)%OLD_POP + ISO(IS)%OLD_POP*(1.0D0-VEC1)
+	    RADIOACTIVE_DECAY_ENERGY=RADIOACTIVE_DECAY_ENERGY +  
+	1            ISO(IS)%OLD_POP*(1.0D0-VEC1)*NUC(IN)%ENERGY_PER_DECAY
+!
+! Do two step sequences.
+!
+	  ELSE IF(NUC(IN)%SEQUENCE ==  'F')THEN
 	    IS=NUC(IN)%LNK_TO_ISO
 	    VEC1=EXP(-NUC(IN)%DECAY_CONST*DELTA_T)
 	    DO JN=1,NUM_DECAY_PATHS
-	      IF(NUC(JN)%SEQUENCE ==  'S' .AND. NUC(JN)%BARYON_NUMBER .EQ.  NUC(IN)%BARYON_NUMBER)THEN
+	      IF(NUC(JN)%SEQUENCE ==  'S' .AND. NUC(JN)%BARYON_NUMBER .EQ.  NUC(IN)%BARYON_NUMBER .AND.
+	1        NUC(JN)%SPECIES .EQ. NUC(IN)%DAUGHTER)THEN
 	        WRITE(6,*)'Found nuclear reaction chain:',IN,JN
 	        JS=NUC(JN)%LNK_TO_ISO
 	        VEC2=EXP(-NUC(JN)%DECAY_CONST*DELTA_T)

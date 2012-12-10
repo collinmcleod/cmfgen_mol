@@ -210,18 +210,19 @@ C
 	1             'Clumping parameters:')
 	  END DO
 !
+	  REVISE_R_GRID=.FALSE.
+	  CALL RD_STORE_LOG(REVISE_R_GRID,'REV_RGRID',L_FALSE,'Automatically revise R grid?')
+!
 ! These calls read in parameters which automatically control the
 ! revision of the R grid automatically in SN models that have sharp
 ! ionization fronts.
 !
-	  REVISE_R_GRID=.FALSE.
 	  JGREY_WITH_V_TERMS=.FALSE.
 	  PURE_HUBBLE_FLOW=.FALSE.
 	  COMP_GREY_LST_IT=.TRUE.
 	  N_RG_PAR=0
 	  TIME_SEQ_NO=0
 	  IF(SN_MODEL)THEN
-	    CALL RD_STORE_LOG(REVISE_R_GRID,'REV_RGRID',L_TRUE,'Automatically revise R grid?')
 !
 	    JGREY_WITH_V_TERMS=.TRUE.
 	    CALL RD_STORE_LOG(JGREY_WITH_V_TERMS,'JG_W_V',L_FALSE,
