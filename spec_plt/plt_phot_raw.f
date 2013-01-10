@@ -487,7 +487,7 @@
 	          XV(1:NV)=NU_1(LOC_1(INDX_1)+1:LOC_1(INDX_1)+NV)
 	          YV(1:NV)=CROSS_1(LOC_1(INDX_1)+1:LOC_1(INDX_1)+NV)
 	        ELSE
-	          NV=1000
+	          NV=2000
 	          CALL RAW_SUBPHOT_V2(YV,XV,CROSS_1(LOC_1(INDX_1)),TYPE_1(INDX_1),NUM_VALS_1(INDX_1),
 	1                    EDGE,EXC_EN_1,ZION_1,AMASS,NAME_1(INDX_1),NV)
 	          XV(1:NV)=XV(1:NV)/(EDGE+EXC_EN_1)
@@ -638,7 +638,7 @@
 !
 	    EDGE=ENERGY_1(INDX_1)
 	    IF(INDX_2 .GT. 0)THEN
-	      IF(TYPE_2(INDX_2) .EQ. 20 .OR. TYPE_2(INDX_2) .EQ. 21)THEN
+	      IF(TYPE_2(INDX_2) .EQ. 20 .OR. TYPE_2(INDX_2) .LE. 23)THEN
 	        NV=NUM_VALS_2(INDX_2)
 	        XV(1:NV)=NU_2(LOC_2(INDX_2):LOC_2(INDX_2)+NV-1)
 	        YV(1:NV)=CROSS_2(LOC_2(INDX_2):LOC_2(INDX_2)+NV-1)
