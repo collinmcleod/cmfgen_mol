@@ -79,7 +79,7 @@
 	    STEQ_T(K)=STEQ_T(K) + HEAT(K)
 	  END DO
 !
-	  HEAT=HEAT*1.25663706E-09		!For electron cooling equiation.
+	  HEAT=HEAT*1.25663706D-09		!For electron cooling equiation.
 !
         END IF
 !

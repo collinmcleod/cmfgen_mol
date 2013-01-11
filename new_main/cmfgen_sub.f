@@ -552,7 +552,7 @@
 !
 ! RMDOT is the density at R=10dex10 cm and V=1km/s (atomic mass units)
 !
-	RMDOT=RMDOT*3.02286E+23
+	RMDOT=RMDOT*3.02286D+23
 !
 ! LAMBDA_ITERATION controls whether a LAMBDA iteration is performed.
 ! A Lambda iteration is forced if RD_LAMDA is true. FIXED_T is set true
@@ -1236,7 +1236,7 @@
 	1       ACCESS='DIRECT',STATUS='OLD',RECL=I,IOSTAT=IOS)
 	      IF(IOS .EQ. 0)THEN
 	        READ(LU_EDD,REC=5,IOSTAT=IOS)T1
-	        IF(T1 .EQ. 0 .OR. IOS .NE. 0)THEN
+	        IF(T1 .EQ. 0.0D0 .OR. IOS .NE. 0)THEN
 	          WRITE(LUER,*)'Error --- All Eddfactors not'//
 	1                      ' computed - will compute new F'
 	          COMPUTE_EDDFAC=.TRUE.
@@ -1482,8 +1482,8 @@
 !
 	  END DO
 !
-! The luminosity of the Sun is 3.826E+33 ergs/sec. For convenience
-! DTDR will have the units  (E+04K)/(E+10cm) .
+! The luminosity of the Sun is 3.826D+33 ergs/sec. For convenience
+! DTDR will have the units  (D+04K)/(D+10cm) .
 !
 	  T1=LUM*7.2685D+11/R(ND)/R(ND)
 	  DTDR=T1/DTDR
@@ -2368,7 +2368,7 @@
 !
 	  END IF
 !
-          IF(FL .GT. 1.070D0 .AND. FL .LT. 1.074)THEN
+          IF(FL .GT. 1.070D0 .AND. FL .LT. 1.074D0)THEN
             WRITE(231,'(I6,2ES16.8)')ML,FL,ETA_CONT(DPTH_INDX)
              DO SIM_INDX=1,MAX_SIM
                NL=SIM_NL(SIM_INDX)
@@ -2378,7 +2378,7 @@
 	1                   POPS(NL,DPTH_INDX)*L_STAR_RATIO(DPTH_INDX,SIM_INDX),
 	1                   POPS(NUP,DPTH_INDX)*U_STAR_RATIO(DPTH_INDX,SIM_INDX),
 	1                   POPS(NUP,DPTH_INDX)*dU_RAT_dT(DPTH_INDX,SIM_INDX),
-	1                   POPS(NUP,DPTH_INDX)*(U_STAR_RATIO(DPTH_INDX,SIM_INDX)-0.02*dU_RAT_dT(DPTH_INDX,SIM_INDX))
+	1                   POPS(NUP,DPTH_INDX)*(U_STAR_RATIO(DPTH_INDX,SIM_INDX)-0.02D0*dU_RAT_dT(DPTH_INDX,SIM_INDX))
              END DO
           END IF
 !
@@ -2416,7 +2416,7 @@
 !      is lower that the last frequency of the resonance zone.
 !
 	CALL TUNE(1,'CHK_L_FIN')
-	T1=1.0D0-EXT_LINE_VAR*V(1)/2.998E+05         
+	T1=1.0D0-EXT_LINE_VAR*V(1)/2.998D+05         
 	DO SIM_INDX=1,MAX_SIM
 	  IF(LINE_STORAGE_USED(SIM_INDX))THEN
 !
@@ -2833,7 +2833,7 @@
 ! 
 !
 	WRITE(LUER,*)'Luminosity of star is :',RLUMST(1),RLUMST(ND)
-	IF(RLUMST(1) .LE. 0.0D0)RLUMST(1)=1.0E-20
+	IF(RLUMST(1) .LE. 0.0D0)RLUMST(1)=1.0D-20
 	DO I=1,ND
 	  IF(RLUMST(I) .GE. 0.0D0 .AND. RLUMST(I) .LT.  1.0D-05)RLUMST(I)=1.0D-05
 	  IF(RLUMST(I) .LE. 0.0D0 .AND. RLUMST(I) .GT. -1.0D-05)RLUMST(I)=-1.0D-05
@@ -2853,7 +2853,7 @@
 ! scale. The optical depth scale INCLDUES the effects of clumping. TCHI is used
 ! as a temporary work vector.
 !
-! T1=4 * [STEFAN BOLTZMAN CONS] * 1.0E+16 / pi
+! T1=4 * [STEFAN BOLTZMAN CONS] * 1.0D+16 / pi
 !
 	T1=7.218771D+11
 	DO I=1,ND
@@ -2899,13 +2899,13 @@
 	  DO I=1,ND
 	    IF(I .EQ. 1)THEN
 	      T1=LOG(ROSS_MEAN(1)*CLUMP_FAC(1)/ROSS_MEAN(4)/CLUMP_FAC(4))/LOG(R(4)/R(1))
-	      IF(T1 .LT. 2.0)T1=2.0D0
+	      IF(T1 .LT. 2.0D0)T1=2.0D0
 	      T1=ROSS_MEAN(1)*CLUMP_FAC(1)*R(1)/(T1-1.0D0)		!Rosseland optical depth scale
 	      T2=LOG(ABS(FLUX_MEAN(1)*CLUMP_FAC(1)/FLUX_MEAN(4)/CLUMP_FAC(4)))/LOG(R(4)/R(1))
-	      IF(T2 .LT. 2.0)T2=2.0D0
+	      IF(T2 .LT. 2.0D0)T2=2.0D0
 	      T2=FLUX_MEAN(1)*CLUMP_FAC(1)*R(1)/(T2-1.0D0)		!Flux optical depth scale
 	      T3=LOG(ESEC(1)*CLUMP_FAC(1)/ESEC(4)/CLUMP_FAC(4))/LOG(R(4)/R(1))
-	      IF(T3 .LT. 2.0)T3=2.0D0
+	      IF(T3 .LT. 2.0D0)T3=2.0D0
 	      T3=ESEC(1)*CLUMP_FAC(1)*R(1)/(T3-1.0D0)			!Electon scattering optical depth scale
 	      TC(1:3)=0.0D0
 	    ELSE
@@ -4009,9 +4009,9 @@
 	1                                        NAME_CONVENTION
 !
 	    WRITE(LU_POP,'(A)')' Radius (10^10 cm)'
-	    WRITE(LU_POP,'(1X,1P8E16.7)')R
+	    WRITE(LU_POP,'(1X,1P8E18.9)')R
 	    WRITE(LU_POP,'(A)')' Velocity (km/s)'
-	    WRITE(LU_POP,'(1X,1P8E16.7)')V
+	    WRITE(LU_POP,'(1X,1P8E18.9)')V
 	    WRITE(LU_POP,'(A)')' dlnV/dlnr-1'
 	    WRITE(LU_POP,'(1X,1P8E16.7)')SIGMA
 	    WRITE(LU_POP,'(A)')' Electron density'

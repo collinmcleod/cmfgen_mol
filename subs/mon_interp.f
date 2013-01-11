@@ -65,12 +65,12 @@ C
                 DYI=SI +(SI-SIP1)*HI/(HI+HIP1)
                 DYIP1=(SI*HIP1+SIP1*HI)/(HI+HIP1)
 	        DYI=( SIGN(ONE,SI)+SIGN(ONE,DYI) )*
-	1            MIN(ABS(SI),0.5*ABS(DYI))
+	1            MIN(ABS(SI),0.5D0*ABS(DYI))
 	        DYIP1=( SIGN(ONE,SI)+SIGN(ONE,SIP1) )*
-	1            MIN(ABS(SI),ABS(SIP1),0.5*ABS(DYIP1))
+	1            MIN(ABS(SI),ABS(SIP1),0.5D0*ABS(DYIP1))
 	        T1=(QZR(M)-R(I))
-                A=(DYI+DYIP1-2.0*SI)/HI/HI
-	        B=(3.0*SI-2.0*DYI-DYIP1)/HI
+                A=(DYI+DYIP1-2.0D0*SI)/HI/HI
+	        B=(3.0D0*SI-2.0D0*DYI-DYIP1)/HI
 	        C=DYI
 	        D=VARRAY(I,J)
                 QZ(M,J)=((A*T1+B)*T1+C)*T1+D
@@ -84,12 +84,12 @@ C
                 DYI=(SIM1*HI+SI*HIM1)/(HIM1+HI)
                 DYIP1=SI+(SI-SIM1)*HI/(HIM1+HI)
 	        DYI=( SIGN(ONE,SIM1)+SIGN(ONE,SI) )*
-	1            MIN(ABS(SIM1),ABS(SI),0.5*ABS(DYI))
+	1            MIN(ABS(SIM1),ABS(SI),0.5D0*ABS(DYI))
 	        DYIP1=( SIGN(ONE,SI)+SIGN(ONE,DYIP1) )*
-	1            MIN(ABS(SI),0.5*ABS(DYIP1))
+	1            MIN(ABS(SI),0.5D0*ABS(DYIP1))
 	        T1=(QZR(M)-R(I))
-                A=(DYI+DYIP1-2.0*SI)/HI/HI
-	        B=(3.0*SI-2.0*DYI-DYIP1)/HI
+                A=(DYI+DYIP1-2.0D0*SI)/HI/HI
+	        B=(3.0D0*SI-2.0D0*DYI-DYIP1)/HI
 	        C=DYI
 	        D=VARRAY(I,J)
                 QZ(M,J)=((A*T1+B)*T1+C)*T1+D
@@ -105,12 +105,12 @@ C
                 DYI=(SIM1*HI+SI*HIM1)/(HIM1+HI)
                 DYIP1=(SI*HIP1+SIP1*HI)/(HI+HIP1)
 	        DYI=( SIGN(ONE,SIM1)+SIGN(ONE,SI) )*
-	1            MIN(ABS(SIM1),ABS(SI),0.5*ABS(DYI))
+	1            MIN(ABS(SIM1),ABS(SI),0.5D0*ABS(DYI))
 	        DYIP1=( SIGN(ONE,SI)+SIGN(ONE,SIP1) )*
-	1            MIN(ABS(SI),ABS(SIP1),0.5*ABS(DYIP1))
+	1            MIN(ABS(SI),ABS(SIP1),0.5D0*ABS(DYIP1))
 	        T1=(QZR(M)-R(I))
-                A=(DYI+DYIP1-2.0*SI)/HI/HI
-	        B=(3.0*SI-2.0*DYI-DYIP1)/HI
+                A=(DYI+DYIP1-2.0D0*SI)/HI/HI
+	        B=(3.0D0*SI-2.0D0*DYI-DYIP1)/HI
 	        C=DYI
 	        D=VARRAY(I,J)
                 QZ(M,J)=((A*T1+B)*T1+C)*T1+D

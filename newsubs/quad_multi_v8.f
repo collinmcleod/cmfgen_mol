@@ -121,7 +121,7 @@
 	  ZION_CUBED=ZION*ZION*ZION
 	  DO I_F=1,N_F
 	    IF(NU_CONT .LT. EDGE_F(I_F) .AND. ALPHA_VEC(I_F) .NE. 0)THEN
-	      NEFF=SQRT(3.289395*ZION*ZION/(EDGE_F(I_F)-NU_CONT))
+	      NEFF=SQRT(3.289395D0*ZION*ZION/(EDGE_F(I_F)-NU_CONT))
 	      IF(NEFF .GT. 2*ZION)THEN
 	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
 	         DIS_CONST(I_F)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
@@ -134,7 +134,7 @@
 !
 	IF(MOD_DO_LEV_DIS)THEN
 	  DO J=1,ND
-	    YDIS(J)=1.091*(X_LEV_DIS(J)+4.0D0*(ZION-1)*A_LEV_DIS(J))*
+	    YDIS(J)=1.091D0*(X_LEV_DIS(J)+4.0D0*(ZION-1)*A_LEV_DIS(J))*
 	1               B_LEV_DIS(J)*B_LEV_DIS(J)
 	    XDIS(J)=B_LEV_DIS(J)*X_LEV_DIS(J)
 	  END DO
@@ -157,10 +157,10 @@
 ! We only allow for level dissolutions when the ionizations are occurring to
 ! the ground state.
 !
-	  ELSE IF(DIS_CONST(I_F) .GE. 0)THEN
+	  ELSE IF(DIS_CONST(I_F) .GE. 0.0D0)THEN
 	    T1=FOUR_PI_D_H*ALPHA_VEC(I_F)
 	    DO J=1,ND
-	      T2=7.782+XDIS(J)*DIS_CONST(I_F)
+	      T2=7.782D0+XDIS(J)*DIS_CONST(I_F)
 	      T3=T1*T2/(T2+YDIS(J)*DIS_CONST(I_F)*DIS_CONST(I_F))
 	      WSE_S(I_S,J)=WSE_S(I_S,J) + T3*HNST_F_ON_S(I_F,J)
 	      WSE_CR_S(I_S,J)=WSE_CR_S(I_S,J) - EDGE_F(I_F)*T3*HNST_F_ON_S(I_F,J)

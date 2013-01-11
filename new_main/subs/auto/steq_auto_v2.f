@@ -84,7 +84,7 @@
 !
 	IBEG_AUTO=0
 	DO I=1,N_F
-	  IF(FEDGE_F(I) .LT. 0)THEN
+	  IF(FEDGE_F(I) .LT. 0.0D0)THEN
 	    IBEG_AUTO=I
 	    EXIT
 	  END IF

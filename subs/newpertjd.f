@@ -74,8 +74,8 @@ C
 	  END IF
 C
 	  IF(THK)THEN
-	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
+	    IF(P(LS) .GT. 0.0D0)THEN
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796D0-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF
@@ -87,7 +87,7 @@ C
 	    IBOUND=SOURCE(1)*(1.0D0-EXP(-TOR))
 	  ELSE
 	    IBOUND=SOURCE(1)*TOR*
-	1             (1.D0-TOR/2.0*(1.0D0-TOR/3.0*(1.0-TOR/4.0)))
+	1             (1.0D0-TOR/2.0D0*(1.0D0-TOR/3.0D0*(1.0D0-TOR/4.0D0)))
 	  END IF
 C
 	  IF(NI .GT. 2)THEN
@@ -137,7 +137,7 @@ C Compute &W vector if diffusion approximation.
 C
 	    IF(LS .LE. NC .AND. DIFF)THEN
 	      DO I=1,ND
-	        XM(I)=0.0
+	        XM(I)=0.0D0
 	      END DO
 	      XM(ND)=SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI(ND)
 	      CALL SIMPTH(TA,TB,TC,XM,NI,1)

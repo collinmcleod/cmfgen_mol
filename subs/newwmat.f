@@ -16,11 +16,11 @@ C
 C Note the general non thick case, TOR is 0, hence W(1,1)=0 . The thick
 C case ocurrs when TOR is non zero.
 C
-	 IF(TOR .GT. 0.01)THEN
+	 IF(TOR .GT. 0.01D0)THEN
 	  W(1,1)=THETA(1)*(1.0D0-EXP(-TOR))
 	ELSE
 	  W(1,1)=THETA(1)*
-	1   (1.D0-TOR/2.0D0*(1.0D0-TOR/3.0D0*(1.0-TOR/4.0D0)))*TOR
+	1   (1.0D0-TOR/2.0D0*(1.0D0-TOR/3.0D0*(1.0D0-TOR/4.0D0)))*TOR
 	END IF
 C
 	DO 20 I=2,NI-1

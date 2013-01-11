@@ -198,12 +198,12 @@
 	      RAT_TOO_BIG=.FALSE.
 	      DO L=1,ND
 	        TA(L)=CHI_NOSCAT_PREV(L)/CHI_NOSCAT(L)
-	        IF(ETA_CONT(L) .EQ. 0)THEN
+	        IF(ETA_CONT(L) .EQ. 0.0D0)THEN
                   TB(L)=1.0D0
 	        ELSE
 	          TB(L)=ETA_PREV(L)/ETA_CONT(L)
 	        END IF
-	        IF(TA(L) .GT. 5.0)THEN
+	        IF(TA(L) .GT. 5.0D0)THEN
 	          TA(L)=0.0D0; TB(L)=0.0D0
 	        END IF
 !	        IF(TA(L) .GT. 1.5)RAT_TOO_BIG=.TRUE.
@@ -263,12 +263,12 @@
 !	      IF(MIXED_ES_VAR)THEN
 !	        DO I=ND,1,-1
 !	          IF( ABS(RJ(I)-RJ_ES(I))/(RJ(I)+RJ_ES(I)) .GT.
-!	1                          0.5*ES_VAR_FAC)EXIT
+!	1                          0.5D0*ES_VAR_FAC)EXIT
 !	          ES_COH_VEC(I)=ESEC_CLUMP(I)/CHI_CLUMP(I)
 !	        END DO
 !	      END IF
 !	      DO I=1,ND
-!	        IF(ES_COH_VEC(I) .EQ. 0)THEN
+!	        IF(ES_COH_VEC(I) .EQ. 0.0D0)THEN
 !	          TA(I)=ETA_CLUMP(I)+ESEC_CLUMP(I)*RJ_ES(I)
 !	        ELSE
 !	          TA(I)=ETA_CLUMP(I)+ESEC_CLUMP(I)*(RJ_ES(I)-RJ(I))

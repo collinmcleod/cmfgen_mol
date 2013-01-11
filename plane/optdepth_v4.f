@@ -63,7 +63,7 @@
           DO IZ=1,NZ-1
             DTAU_LOC(IZ)=0.5D0*(RAY(IP)%S_P(IZ)-RAY(IP)%S_P(IZ+1))*(CHI(IZ)+CHI(IZ+1))
 	    T1=( (RAY(IP)%S_P(IZ)-RAY(IP)%S_P(IZ+1))**2 )*(DCHIDZ(IZ+1)-DCHIDZ(IZ))/12.0D0
-            IF(T1 .LT. 0)THEN
+            IF(T1 .LT. 0.0D0)THEN
 	      DTAU_LOC(IZ)=MAX(0.5D0*DTAU_LOC(IZ),DTAU_LOC(IZ)+T1)
 	    ELSE
 	      DTAU_LOC(IZ)=MIN(1.5D0*DTAU_LOC(IZ),DTAU_LOC(IZ)+T1)

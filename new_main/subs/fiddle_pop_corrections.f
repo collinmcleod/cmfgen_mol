@@ -141,7 +141,7 @@
 	    T1=BIG_LIM                  !Prevents division by zero and insures
 	    T2=LIT_LIM                  !SCALE=1 if small changes.
 	    DO J=1,NT-1
-	      IF(POPS(J,I) .GT. 1.0E-10*POPS(NT-1,I))THEN
+	      IF(POPS(J,I) .GT. 1.0D-10*POPS(NT-1,I))THEN
 	        T1=MAX(T1,STEQ(J,I))            !Note + means decrease
 	        T2=MIN(T2,STEQ(J,I))            !Note - means increase
 	      END IF

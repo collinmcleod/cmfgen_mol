@@ -220,7 +220,7 @@
 	    END DO
 !
 ! Compute CHI, and then optical depth scale.
-! Stefan-Boltzman constant *1E-15*1E+16/PI (T**4/PI). NB --- T1 is a factor
+! Stefan-Boltzman constant *1D-15*1D+16/PI (T**4/PI). NB --- T1 is a factor
 ! of 10^15 larger than in MAINGEN as FQW has already been multiplied by
 ! 10^15 for dv integrations.
 !
@@ -342,7 +342,7 @@
 !
 	    T1=1.0
 	    J=0
-	    DO WHILE (T1 .GT. 1.0E-04)
+	    DO WHILE (T1 .GT. 1.0D-04)
 	      FIRST=.TRUE.
 !
 ! Recall GAM_SPECIES is set to be the population of the highest ionization

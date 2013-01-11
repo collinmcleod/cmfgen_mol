@@ -159,14 +159,14 @@
 ! 
 ! Set constants.
 !
-	CHIBF=2.815E-06
-	CHIFF=3.69E-29
-	HDKT=4.7994145
-	TWOHCSQ=0.0147452575
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
+	CHIBF=2.815D-06
+	CHIFF=3.69D-29
+	HDKT=4.7994145D0
+	TWOHCSQ=0.0147452575D0
+	OPLIN=2.6540081D+08
+	EMLIN=5.27296D-03
+	OPLIN=2.6540081D+08
+	EMLIN=5.27296D-03
 !
 	C_CMS=SPEED_OF_LIGHT()
 	C_KMS=1.0D-05*C_CMS
@@ -190,7 +190,7 @@
 ! Conversion factor from Kev to units of 10^15 Hz.
 ! Conversion factor from Angstroms to units of 10^15 Hz.
 !
-	KEV_TO_HZ=0.241838E+03
+	KEV_TO_HZ=0.241838D+03
 	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07  	!10^8/10^15
 	RADIUS=1.0D0; DTDR=1.0D0; TEMP=5.0D0 	!Non zero defaults
 !
@@ -828,7 +828,7 @@
 	  IF(T1 .LE. 0)THEN
 	    T1=ABS(T1)
 	  ELSE
-	    T1=0.299794E+04/T1
+	    T1=0.299794D+04/T1
 	  END IF
 !
 	  SCALE_FAC=1.0D0
@@ -939,7 +939,7 @@
 	        STRING=' 16 pi^2 r^2 '//TRIM(ZM(ID)%DATA_TYPE)//'/Lsun is:'
 	        WRITE(T_OUT,'(/,A,ES11.4)')TRIM(STRING),R(I)*R(I)*TA(NCF)*4.1274D+03
 	      ElSE 
-	        STRING=' 1.6E+21 pi^2 '//TRIM(ZM(ID)%DATA_TYPE)//'/Lsun is:'
+	        STRING=' 1.6D+21 pi^2 '//TRIM(ZM(ID)%DATA_TYPE)//'/Lsun is:'
 	        WRITE(T_OUT,'(/,A,ES11.4)')TRIM(STRING),TA(NCF)*4.1274D+03
 	      END IF
 	    END IF

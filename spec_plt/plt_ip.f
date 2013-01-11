@@ -163,14 +163,14 @@
 ! 
 ! Set constants.
 !
-	CHIBF=2.815E-06
-	CHIFF=3.69E-29
-	HDKT=4.7994145
-	TWOHCSQ=0.0147452575
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
+	CHIBF=2.815D-06
+	CHIFF=3.69D-29
+	HDKT=4.7994145D0
+	TWOHCSQ=0.0147452575D0
+	OPLIN=2.6540081D+08
+	EMLIN=5.27296D-03
+	OPLIN=2.6540081D+08
+	EMLIN=5.27296D-03
 !
 	C_CMS=SPEED_OF_LIGHT()
 	C_KMS=1.0D-05*C_CMS
@@ -190,14 +190,14 @@
 	X_UNIT='ANG'
 	Y_PLT_OPT='FNU'
 !
-	DISTANCE=1.0		!kpc
-	SLIT_WIDTH=0.1          !arcseconds
-	PIXEL_LENGTH=0.0254     !arcseconds
+	DISTANCE=1.0D0		  !kpc
+	SLIT_WIDTH=0.1D0          !arcseconds
+	PIXEL_LENGTH=0.0254D0     !arcseconds
 !
 ! Conversion factor from Kev to units of 10^15 Hz.
 ! Conversion factor from Angstroms to units of 10^15 Hz.
 !
-	KEV_TO_HZ=0.241838E+03
+	KEV_TO_HZ=0.241838D+03
 	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07  	!10^8/10^15
 !
 !  Read in model.
@@ -379,12 +379,12 @@
 ! we use in plotting at all wavelngths.
 !
 	   IF(X_UNIT .EQ. 'MM/S' .OR. X_UNIT .EQ. 'KM/S')THEN
-	     CALL USR_OPTION(LAMC,'LAMC','0.0',
+	     CALL USR_OPTION(LAMC,'LAMC','0.0D0',
 	1             'Central Lambda(Ang) [-ve for frequency (10^15 Hz)]')
 	     IF(LAMC .LT. 0)THEN
 	       LAMC=1.0D-07*C_CMS/ABS(LAMC)
 	     ELSE
-	       IF(LAMC .GT. 2000)THEN
+	       IF(LAMC .GT. 2000.0D0)THEN
                  CALL USR_OPTION(AIR_LAM,'AIR','T',
 	1                'Air wavelength [only for Lam > 2000A]?')
 	       ELSE
@@ -438,7 +438,7 @@
 	  DO J=1,I-1
 	    YV(1:NCF)=YV(1:NCF)+0.5D0*(IP(J,1:NCF)*P(J)+IP(J+1,1:NCF)*P(J+1))*(P(J+1)-P(J))
 	  END DO
-          T1=DISTANCE*1.0E+03*PARSEC()
+          T1=DISTANCE*1.0D+03*PARSEC()
 	  T1=2.0D0*PI*1.0D+23*(1.0E+10/T1)**2
 	  YV(1:NCF)=YV(1:NCF)*T1
 !
@@ -454,7 +454,7 @@
 	  DO J=I,NP-1
 	    YV(1:NCF)=YV(1:NCF)+0.5D0*(IP(J,1:NCF)*P(J)+IP(J+1,1:NCF)*P(J+1))*(P(J+1)-P(J))
 	  END DO
-          T1=DISTANCE*1.0E+03*PARSEC()
+          T1=DISTANCE*1.0D+03*PARSEC()
 	  T1=2.0D0*PI*1.0D+23*(1.0E+10/T1)**2
 	  YV(1:NCF)=YV(1:NCF)*T1
 !

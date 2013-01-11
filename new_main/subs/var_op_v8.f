@@ -223,8 +223,8 @@ C
 	IF(MOD_DO_LEV_DIS .AND. PHOT_ID .EQ. 1)THEN
 	  ZION_CUBED=Z*Z*Z
 	  DO I=1,N_F
-	    IF(NU .LT. EDGE_F(I) .AND. ALPHA_VEC(I) .NE. 0)THEN
-	      NEFF=SQRT(3.289395*Z*Z/(EDGE_F(I)-NU))
+	    IF(NU .LT. EDGE_F(I) .AND. ALPHA_VEC(I) .NE. 0.0D0)THEN
+	      NEFF=SQRT(3.289395D0*Z*Z/(EDGE_F(I)-NU))
 	      IF(NEFF .GT. 2*Z)THEN
 	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
 	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
@@ -239,7 +239,7 @@ C Compute dissolution vectors that are independent of level.
 C
 	IF(MOD_DO_LEV_DIS)THEN
 	  DO K=K_ST,ND
-	    YDIS(K)=1.091*(X_LEV_DIS(K)+4.0D0*(Z-1)*A_LEV_DIS(K))*
+	    YDIS(K)=1.091D0*(X_LEV_DIS(K)+4.0D0*(Z-1)*A_LEV_DIS(K))*
 	1                 B_LEV_DIS(K)*B_LEV_DIS(K)
 	    XDIS(K)=B_LEV_DIS(K)*X_LEV_DIS(K)
 	  END DO
@@ -282,8 +282,8 @@ C     d(LTE_F)/dDI = LTE_F/Di_F *(DI_F/DI)=LTE_F/DI
 C
 	      DO K=K_ST,ND
 	        ALPHA=ALPHA_VEC(I)*(HNST_F(I,K)/HNST_S(L,K))
-	        IF(DIS_CONST(I) .GE. 0)THEN
-	          T1=7.782+XDIS(K)*DIS_CONST(I)
+	        IF(DIS_CONST(I) .GE. 0.0D0)THEN
+	          T1=7.782D0+XDIS(K)*DIS_CONST(I)
 	          T2=T1/(T1+YDIS(K)*DIS_CONST(I)*DIS_CONST(I))
 	          ALPHA=ALPHA*T2
 	        END IF
@@ -319,10 +319,10 @@ C
 	    SUM_ION_NOT_IMP=0.0D0; SUM_T1_NOT_IMP=0.0D0;   SUM_T2_NOT_IMP=0.0D0
 	    DO I=1,N_F
 	      L=F_TO_S_MAPPING(I)
-	      IF(ALPHA_VEC(I) .GT. 0)THEN
+	      IF(ALPHA_VEC(I) .GT. 0.0D0)THEN
 	        ALPHA=ALPHA_VEC(I)*(HNST_F(I,K)/HNST_S(L,K))
-	        IF(DIS_CONST(I) .GE. 0)THEN
-	          T1=7.782+XDIS(K)*DIS_CONST(I)
+	        IF(DIS_CONST(I) .GE. 0.0D0)THEN
+	          T1=7.782D0+XDIS(K)*DIS_CONST(I)
 	          T2=T1/(T1+YDIS(K)*DIS_CONST(I)*DIS_CONST(I))
 	          ALPHA=ALPHA*T2
 	        END IF

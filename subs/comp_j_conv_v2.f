@@ -17,7 +17,7 @@ C
 	1             LU_OUT,FILE_OUT)
 	IMPLICIT NONE
 C
-C Altered 20-Oct-2003 : No scaling peformed when PLANCK_FN has zero's.
+C Altered 20-Oct-2003 : No scaling peformed when PLANCK_FN has zero''s.
 C Altered 18-Aug-2003 : FILE_DATE inserted into INFO call.
 C Altered 17-Oct-2002 : Computation of BB changed to avoid floating overflow.
 C Altered 16-Jun-2000 : Record length can no be obtained form INFO files.
@@ -244,12 +244,12 @@ C
 C Compute those parts of the TRIDIAGONAL vectors which are independent of
 C depth, and the fitting parameters.
 C
-	A_STORE(1)=0
+	A_STORE(1)=0.0D0
 	C_STORE(1)=-2.0D0/( LOG(NU(1)/NU(2)) )**2
 	DO ML=2,NCF-1
 	  D1=LOG(NU(ML-1)/NU(ML))
 	  D2=LOG(NU(ML)/NU(ML+1))
-	  DH=0.5*(D1+D2)
+	  DH=0.5D0*(D1+D2)
 	  A_STORE(ML)=-1.0D0/D1/DH
 	  C_STORE(ML)=-1.0D0/D2/DH
 	END DO
@@ -265,7 +265,7 @@ C
 !
 	DO K=1,ND
 C
-	  BETA=1.84E-03*SQRT(TEMP(K))
+	  BETA=1.84D-03*SQRT(TEMP(K))
 	  T3=0.5D0*HDKT*NU(1)/TEMP(K)
 	  IF(T3 .LT. 1)T3=0.0D0
 	  IF(T3 .GT. 700.0D0)T3=700.0D0

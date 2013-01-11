@@ -68,8 +68,8 @@
 	  END IF
 !
 	  IF(THK)THEN
-	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
+	    IF(P(LS) .GT. 0.0D0)THEN
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796D0-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF
@@ -87,7 +87,7 @@
 	      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
 	    END DO
 	    DO I=1,NI-1
-	      DTAU(I)=0.5*(Z(I)-Z(I+1))*(CHI(I)+CHI(I+1)+(Z(I)-Z(I+1))
+	      DTAU(I)=0.5D0*(Z(I)-Z(I+1))*(CHI(I)+CHI(I+1)+(Z(I)-Z(I+1))
 	1     *(dCHIdR(I+1)*Z(I+1)/R(I+1)-dCHIdR(I)*Z(I)/R(I))/6.0D0)
 	    END DO
 	  END IF
@@ -113,8 +113,8 @@
 !
 	    IF(LS .GT. NC)THEN
 	      TA(NI)=-TC(NI-1)
-	      TB(NI)=-DTAU(NI-1)/2.
-	      XM(NI)=0.5*DTAU(NI-1)*SOURCE(NI)
+	      TB(NI)=-DTAU(NI-1)/2.0D0
+	      XM(NI)=0.5D0*DTAU(NI-1)*SOURCE(NI)
 	    ELSE IF(INNER_BND_METH .EQ. 'DIFFUSION')THEN
 	      TA(NI)=-TC(NI-1)
 	      TB(NI)=0.0D0
@@ -129,10 +129,10 @@
 ! for clarity.
 !
 	      TA(NI)=-TC(NI-1)
-	      TB(NI)=-DTAU(NI-1)/2.
-	      XM(NI)=0.5*DTAU(NI-1)*SOURCE(NI)
+	      TB(NI)=-DTAU(NI-1)/2.0D0
+	      XM(NI)=0.5D0*DTAU(NI-1)*SOURCE(NI)
 	    END IF
-	    TC(NI)=0.0
+	    TC(NI)=0.0D0
 !
 ! Solve the tridiagonal system of equations.
 !
@@ -145,12 +145,12 @@
 	    E2=1.0D0-(1.0D0-E1)/DTAU(1)
 	    E3=(1.0D0-E1)/DTAU(1)-E1
 	    IF(DTAU(1) .LT. 1.0D-03)THEN
-	      E2=DTAU(1)*0.5+DTAU(1)*DTAU(1)/6.0D0
-	      E3=DTAU(1)*0.5-DTAU(1)*DTAU(1)/3.0D0
+	      E2=DTAU(1)*0.5D0+DTAU(1)*DTAU(1)/6.0D0
+	      E3=DTAU(1)*0.5D0-DTAU(1)*DTAU(1)/3.0D0
 	    END IF
 !
 	    XM(2)=IBOUND*E1+SOURCE(2)*E2+SOURCE(1)*E3
-            XM(1)=0.5*(IBOUND+XM(2)*E1+SOURCE(1)*E2+SOURCE(2)*E3)
+            XM(1)=0.5D0*(IBOUND+XM(2)*E1+SOURCE(1)*E2+SOURCE(2)*E3)
 	  END IF
 !
 ! Update the FA and FB matrices (see notes).

@@ -425,7 +425,7 @@
 !
 ! Check whether close enough to Outer Bondary.
 !
-	    IF(LOG_R(I)-1.5*(LOG_R(I-1)-LOG_R(I)) .LT. LOG_OLD_R(NS))EXIT
+	    IF(LOG_R(I)-1.5D0*(LOG_R(I-1)-LOG_R(I)) .LT. LOG_OLD_R(NS))EXIT
 	  END DO
 	  T1=LOG_R(I-1)-LOG_OLD_R(NS)
 	  LOG_R(I)=LOG_R(I-1)-0.5D0*T1

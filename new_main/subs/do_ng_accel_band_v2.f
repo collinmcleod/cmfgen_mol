@@ -201,11 +201,11 @@
 ! Now check whether the NG acceleation has been reasonable.
 ! If it has, store the new estimates in POPS.
 !
-	MAXINC=-1000.0
-	MAXDEC=1000.0
+	MAXINC=-1000.0D0
+	MAXDEC=1000.0D0
 	DO L=1,ND 
-	  LOCINC=-1000.0
-	  LOCDEC=1000.0
+	  LOCINC=-1000.0D0
+	  LOCDEC=1000.0D0
 	  DO K=1,NT
 	    T1=NEWPOP(K,L)/POPS(K,L)
 	    LOCINC=MAX(LOCINC,T1)

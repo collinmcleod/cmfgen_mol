@@ -139,7 +139,7 @@
 !
 ! dJ_CHK_FAC 
 !
-	IF(dJ_CHK_FAC .LT. 1.0D-10 .OR. dJ_CHK_FAC .GT. 0.1)THEN
+	IF(dJ_CHK_FAC .LT. 1.0D-10 .OR. dJ_CHK_FAC .GT. 0.1D0)THEN
 	  I=ERROR_LU()
 	  WRITE(I,*)'Error in BA_UPDATE_V7'
 	  WRITE(I,*)'Invalid value for dJ_CHK_FAC: dJ_CHK_FAC=',dJ_CHK_FAC

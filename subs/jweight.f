@@ -26,18 +26,18 @@ C
 	H=X(1)-X(2)
 	HN=X(2)-X(3)
 	RF=X(1)-X(3)
-	W(1)=0.5*H-H*H/12.0/RF-HN*H/RF/12.0D0
-	W(2)=0.5*H+H*H/RF/6.0*(1.0+0.5*H/HN)+HN*H/RF/12.0
+	W(1)=0.5D0*H-H*H/12.0D0/RF-HN*H/RF/12.0D0
+	W(2)=0.5D0*H+H*H/RF/6.0D0*(1.0D0+0.5D0*H/HN)+HN*H/RF/12.0D0
 	W(3)=H*H/RF/12.0*(-1.0-H/HN)
 C
 	DO I=3,N-2
 	  H=X(I-1)-X(I)
 	  RF=X(I-2)-X(I)
 	  RE=X(I-1)-X(I+1)
-	  W(I-2)=W(I-2)-H*H/12.0/RF	
-	  W(I-1)=W(I-1)+0.5*H+H*H/12.0/RE
-	  W(I)=W(I)+0.5*H+H*H/12.0/RF	
-	  W(I+1)=W(I+1)-H*H/12.0/RE
+	  W(I-2)=W(I-2)-H*H/12.0D0/RF	
+	  W(I-1)=W(I-1)+0.5D0*H+H*H/12.0D0/RE
+	  W(I)=W(I)+0.5D0*H+H*H/12.0D0/RF	
+	  W(I+1)=W(I+1)-H*H/12.0D0/RE
 	END DO
 C
 	IF(X(N) .EQ. 0)THEN
@@ -48,9 +48,9 @@ C
 	  H=X(N-2)-X(N-1)
 	  HN=X(N-1)-X(N)
 	  W(N-3)=W(N-3)-H*H/RF/12.0D0
-	  W(N-2)=W(N-2)+0.5*H
-	  W(N-1)=W(N-1)+0.5*(H+2.0*HN/3.0)+H*H/HN/6.0+H*H/12.0/RF
-	  W(N)=W(N)+2.0*HN/3.0-H*H/HN/6.0
+	  W(N-2)=W(N-2)+0.5D0*H
+	  W(N-1)=W(N-1)+0.5D0*(H+2.0D0*HN/3.0D0)+H*H/HN/6.0D0+H*H/12.0D0/RF
+	  W(N)=W(N)+2.0D0*HN/3.0D0-H*H/HN/6.0D0
 	ELSE
 C
 C For outer boundary. Extrapolate to zero assuming a quadratic
@@ -67,10 +67,10 @@ C
 	  H=X(N-2)-X(N-1)
 	  RF=X(N-3)-X(N-1)
 	  RE=X(N-2)-X(N)
-	  W(N-3)=W(N-3)-H*H/12.0/RF	
-	  W(N-2)=W(N-2)+0.5*H+H*H/12.0/RE
-	  W(N-1)=W(N-1)+0.5*H+H*H/12.0/RF	
-	  W(N)=W(N)-H*H/12.0/RE
+	  W(N-3)=W(N-3)-H*H/12.0D0/RF	
+	  W(N-2)=W(N-2)+0.5D0*H+H*H/12.0D0/RE
+	  W(N-1)=W(N-1)+0.5D0*H+H*H/12.0D0/RF	
+	  W(N)=W(N)-H*H/12.0D0/RE
 C
 C Integral from X(N-1) to zero.
 C

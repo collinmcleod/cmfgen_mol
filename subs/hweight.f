@@ -35,22 +35,22 @@ C
 	H=X(1)-X(2)
 	HN=X(2)-X(3)
 	RF=X(1)-X(3)
-	W(1)=0.5*H*(X(1)-H/6.0D0)
-	1       -H*H/RF/12.0*((2.0D0+HN/H)*X(1)-X(2))
-	W(2)=0.5*H*(X(2)+H/6.0D0)
-	1       +H*H/RF/12.0D0*(2.0+H/HN+HN/H)*X(1)
-	W(3)=-H*H/RF/12.0*(X(2)+H/HN*X(1))
+	W(1)=0.5D0*H*(X(1)-H/6.0D0)
+	1       -H*H/RF/12.0D0*((2.0D0+HN/H)*X(1)-X(2))
+	W(2)=0.5D0*H*(X(2)+H/6.0D0)
+	1       +H*H/RF/12.0D0*(2.0D0+H/HN+HN/H)*X(1)
+	W(3)=-H*H/RF/12.0D0*(X(2)+H/HN*X(1))
 C
 	DO I=3,N-1
 	  H=X(I-1)-X(I)
 	  RF=X(I-2)-X(I)
 	  RE=X(I-1)-X(I+1)
-	  W(I-2)=W(I-2)-X(I-1)*H*H/12.0/RF
-	  W(I-1)=W(I-1)+0.5*H*(X(I-1)-H/6.0D0)
-	1              +X(I)*H*H/12.0/RE
+	  W(I-2)=W(I-2)-X(I-1)*H*H/12.0D0/RF
+	  W(I-1)=W(I-1)+0.5D0*H*(X(I-1)-H/6.0D0)
+	1              +X(I)*H*H/12.0D0/RE
 	  W(I)=W(I)+0.5*H*(X(I)+H/6.0D0)
-	1              +X(I-1)*H*H/12.0/RF
-	  W(I+1)=W(I+1)-X(I)*H*H/12.0/RE
+	1              +X(I-1)*H*H/12.0D0/RF
+	  W(I+1)=W(I+1)-X(I)*H*H/12.0D0/RE
 	END DO
 C
 C Assumes that V(mu=0)=0 and mu.V'(mu)=0 at mu=0. 
@@ -68,11 +68,11 @@ C
 	  H=X(N-1)-X(N)
 	  RF=X(N-2)-X(N)
 	  RE=X(N-1)				!As X(N+1)=0
-	  W(N-2)=W(N-2)-X(N-1)*H*H/12.0/RF
-	  W(N-1)=W(N-1)+0.5*H*(X(N-1)-H/6.0D0)
-	1              +X(N)*H*H/12.0/RE
-	  W(N)=W(N)+0.5*H*(X(N)+H/6.0D0)
-	1              +X(I-1)*H*H/12.0/RF
+	  W(N-2)=W(N-2)-X(N-1)*H*H/12.0D0/RF
+	  W(N-1)=W(N-1)+0.5D0*H*(X(N-1)-H/6.0D0)
+	1              +X(N)*H*H/12.0D0/RE
+	  W(N)=W(N)+0.5D0*H*(X(N)+H/6.0D0)
+	1              +X(I-1)*H*H/12.0D0/RF
 C
 C Integral from X(N) to X(N+1)
 C

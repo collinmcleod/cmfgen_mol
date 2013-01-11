@@ -441,7 +441,7 @@
 	      T2=-1.0D0
 	      DO WHILE(T2 .LT. 0.0D0)
 	        GAM_FULL=MIN( GAM_LIM,GAM_EDD*ED_ON_NA_EST*(OLD_FLUX_MEAN(I)/OLD_ESEC(I)) )
-	        T1=1.0D-10*(BC*TEFF*(1+ED_ON_NA_EST)+PTURB_ON_NA)/( (10.0**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU )
+	        T1=1.0D-10*(BC*TEFF*(1+ED_ON_NA_EST)+PTURB_ON_NA)/( (10.0D0**LOGG)*(1.0D0-GAM_FULL)*MU_ATOM*AMU )
 	        T2=CONNECTION_VEL*(1.0D0/T1-2.0D0/CONNECTION_RADIUS)
 	        WRITE(LU_ERR,*)'      Scale height is',T1
 	        WRITE(LU_ERR,*)'      Connection dVdR',T2
@@ -450,7 +450,7 @@
                   WRITE(LU_ERR,*)'Resetting GAM_LIM due to -ve velocity gradient'
                   WRITE(LU_ERR,*)'         GAM_FULL was',GAM_FULL
                   WRITE(LU_ERR,*)'          GAM_LIM was',GAM_LIM
-	          GAM_LIM=GAM_LIM-0.01
+	          GAM_LIM=GAM_LIM-0.01D0
                   WRITE(LU_ERR,*)'       New GAM_LIM is',GAM_LIM
 	        END IF
 	      END DO
@@ -544,7 +544,7 @@
 ! GAM_EDD (i.e., GAMMA computed the electron scattering opacity only) rather
 ! than GAM_FULL.
 !
-	    SCL_HT=(10**LOGG)*(1.0D0-GAM_EDD)*MU_ATOM*AMU/
+	    SCL_HT=(10.0D0**LOGG)*(1.0D0-GAM_EDD)*MU_ATOM*AMU/
 	1            (BC*(1.0D0+ED_ON_NA(I-1))*T(I-1)+PTURB_ON_NA)
 	    SCL_HT=1.0D-10/SCL_HT
 !
@@ -841,8 +841,8 @@
 	  WRITE(LU,'(A,ES16.6)')'!      Log surface gravity (cgs) is:',LOGG
 	  WRITE(LU,'(A,ES16.6)')'!         Core radius (10^10 cm) is:',REV_R(NEW_ND)
 	  WRITE(LU,'(A,ES16.6)')'!    Reference radius (10^10 cm) is:',REFERENCE_RADIUS
-	  WRITE(LU,'(A,ES16.6)')'!              Luminosity (Lsun) is:',( (TEFF/0.5770D0)**4 )*( (REFERENCE_RADIUS/6.9599)**2 )
-	  WRITE(LU,'(A,ES16.6)')'!            Mass (Msun) of star is:',10**(LOGG)*REFERENCE_RADIUS*REFERENCE_RADIUS/GRAV_CON
+	  WRITE(LU,'(A,ES16.6)')'!              Luminosity (Lsun) is:',( (TEFF/0.5770D0)**4 )*( (REFERENCE_RADIUS/6.9599D0)**2 )
+	  WRITE(LU,'(A,ES16.6)')'!            Mass (Msun) of star is:',10.0D0**(LOGG)*REFERENCE_RADIUS*REFERENCE_RADIUS/GRAV_CON
 	  WRITE(LU,'(A,ES16.6)')'!       Mass loss rate (Msun/yr) is:',MDOT/MASS_LOSS_SCALE_FACTOR
 	  WRITE(LU,'(A,ES16.6)')'!         Mean atomic mass (amu) is:',MU_ATOM
 	  WRITE(LU,'(A,ES16.6)')'!            Eddington parameter is:',GAM_EDD
@@ -898,7 +898,7 @@
 !
 	MOD_RSTAR=REV_R(NEW_ND)
 	MOD_RMAX=REV_R(1)
-	MOD_MASS=10**(LOGG)*(REFERENCE_RADIUS**2)/GRAV_CON
+	MOD_MASS=10.0D0**(LOGG)*(REFERENCE_RADIUS**2)/GRAV_CON
 	CALL UPDATE_KEYWORD(REV_R(NEW_ND),'[RSTAR]','VADAT',L_TRUE,L_FALSE,LUIN)
 	T1=MOD_RMAX/REV_R(NEW_ND)
 	CALL UPDATE_KEYWORD(T1,'[RMAX]','VADAT',L_FALSE,L_FALSE,LUIN)
@@ -928,9 +928,9 @@
 	CALL CMF_HYDRO_NEW_EST(TAU,TEMP)
 !
 	IF(PLANE_PARALLEL_MOD)THEN
-	  T1=(10.0**LOGG)*(1.0D0-GAM_FULL)
+	  T1=(10.0D0**LOGG)*(1.0D0-GAM_FULL)
 	ELSE
-	  T1=(10.0**LOGG)*(1.0D0-GAM_FULL)*(REFERENCE_RADIUS/R_EST)**2
+	  T1=(10.0D0**LOGG)*(1.0D0-GAM_FULL)*(REFERENCE_RADIUS/R_EST)**2
 	END IF
 	T2=(MDOT/MU_ATOM/POP_ATOM/R_EST/R_EST)**2/(SOUND_SPEED**2+0.5D0*VTURB**2)
 !	T2=(MDOT/MU_ATOM/POP_ATOM/R_EST/R_EST)**2/(SOUND_SPEED**2)                       !+0.5D0*VTURB**2)

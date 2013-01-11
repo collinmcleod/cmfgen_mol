@@ -33,7 +33,7 @@
 	INTEGER, ALLOCATABLE :: ID_POINTER(:,:)
 	INTEGER, ALLOCATABLE :: LEV_CNT(:,:)
 	INTEGER, ALLOCATABLE :: CHG_ID(:,:)
-	REAL, ALLOCATABLE :: G_SUM(:,:)
+	REAL*8, ALLOCATABLE :: G_SUM(:,:)
 !
 	INTEGER, ALLOCATABLE :: TMP_ID_ION(:,:)
 	INTEGER, ALLOCATABLE :: TMP_LEV_IN_POPS(:,:)
@@ -74,7 +74,7 @@
 ! Perform iniilizations.
 !
         LEV_CNT(:,:)=0
-        G_SUM(:,:)=0
+        G_SUM(:,:)=0.0D0
 	ID_POINTER(:,:)=0
 !
 ! Count actual number of reactions. This is to allow for split J levels.

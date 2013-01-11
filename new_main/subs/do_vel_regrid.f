@@ -179,7 +179,7 @@
 	IF(JST .EQ. 1)NI=NI-NOB
 	IF(JEND .EQ. ND)NI=NI-NIB
 	dV=EXP(2.0D0*LOG(V(JST)/V(JEND))/(NI-1))
-	dV=1.04
+	dV=1.04D0
 !
 	WRITE(LUER,'(A)')' '
 	WRITE(LUER,'(2(A,I4,14X))')    '    JST=',   JST,'   JEND=',JEND
@@ -205,7 +205,7 @@
 	    WRITE(LUER,*)'Error in DO_VEL_REGRID -- NMAX not sufficently large'
 	    WRITE(LUER,*)'Adjusting dV and starting again'
 	    WRITE(LUER,*)'L=',L
-	    dV=dV*1.02
+	    dV=dV*1.02D0
 	    GOTO 100
 	  END IF
 !

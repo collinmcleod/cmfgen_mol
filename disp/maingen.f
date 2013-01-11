@@ -2055,21 +2055,34 @@
 ! ****************************************************************************
 !
 	ELSE IF(XOPT .EQ. 'YFLUX')THEN
+	  CALL USR_OPTION(ELEC,'dFLUX','F','Plot dTAU (flux mean opacity)')
 	  DO I=1,ND
 	    TA(I)=ABS(CLUMP_FAC(I)*FLUX_MEAN(I))
 	  END DO
 	  CALL TORSCL(TB,TA,R,XM,TC,ND,METHOD,TYPE_ATM)
 	  WRITE(T_OUT,*)'Flux optical depth is : ',TB(ND)
 !
-	  DO I=1,ND
-	    IF(TB(I) .GT. 0)THEN
-	      YV(I)=LOG10(TB(I))
-	    ELSE
-	      YV(I)=0.0D0
-	    END IF
-	  END DO
-	  CALL DP_CURVE(ND,XV,YV)
-	  YAXIS='Log \gt(Flux)'
+	  IF(ELEC)THEN
+	    DO I=1,ND-1
+	      IF(TB(I) .GT. 0)THEN
+	        YV(I)=LOG10(TB(I+1)/TB(I))
+	      ELSE
+	        YV(I)=10.0D0
+	      END IF
+	    END DO
+	    CALL DP_CURVE(ND-1,XV,YV)
+	    YAXIS='Log d\gt(Flux)'
+	  ELSE
+	    DO I=1,ND
+	      IF(TB(I) .GT. 0)THEN
+	        YV(I)=LOG10(TB(I))
+	      ELSE
+	        YV(I)=0.0D0
+	      END IF
+	    END DO
+	    YAXIS='Log \gt(Flux)'
+	    CALL DP_CURVE(ND,XV,YV)
+	  END IF
 !
 	ELSE IF(XOPT .EQ. 'ROSS')THEN
 	  WRITE(T_OUT,*)'Volume filling factor not allowed for.'
@@ -2443,6 +2456,14 @@
 	  YAXIS='\gr\u-1\d|dPdR|'
 !
 !
+	ELSE IF(XOPT .EQ. 'RONV')THEN
+	  T1=1.0D+10/1.0D+05/24.0D0/3600.0D0
+	  DO I=1,ND
+	    YV(I)=V(I)/R(I)
+	  END DO
+	  CALL DP_CURVE(ND,XV,YV)
+	  YAXIS='t(days)'
+!
 	ELSE IF(XOPT .EQ. 'VEL')THEN
 	  DO I=1,ND
 	    YV(I)=V(I)
@@ -2454,6 +2475,27 @@
 	  CALL DLOGVEC(V,YV,ND)
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log V(kms\u-1\d) '
+!
+	ELSE IF(XOPT .EQ. 'VOL') THEN
+	  CALL USR_OPTION(T1,'SN_AGE','1.0','SN age in days')
+	  CALL USR_OPTION(T2,'dAGE','0.1','Fractional change in SN age')
+	  T2=1.0D-05*T1*24.0D0*3600.0D0*T2
+	  DO I=1,ND
+	    TA(I)=(1.0D0+V(I)*T2/R(I))**2
+	    TA(I)=TA(I)*(1.0D0+V(I)*T2/R(I)*(SIGMA(I)+1.0D0))
+	    TA(I)=TA(I)**(1.0D0/3.0D0)
+	  END DO
+	  CALL DP_CURVE(ND,XV,TA)
+	  YAXIS='Vf/Vi**0.33'
+!
+	ELSE IF(XOPT .EQ. 'RZERO') THEN
+	  CALL USR_OPTION(T1,'SN_AGE','1.0','SN age in days')
+	  T2=1.0D-05*T1*24.0D0*3600.0D0
+	  DO I=1,ND
+	    TA(I)=R(I)-V(I)*T2
+	  END DO
+	  CALL DP_CURVE(ND,XV,TA)
+	  YAXIS='Rzero'
 !
 ! Allows various velocity parameters to be varied to test their
 ! effect on the velocity law.
@@ -3446,6 +3488,7 @@
 	      T(I)=T1*TGREY(I)+(1.0-T1)*T(I)
 	    END DO
 !
+
 	    DO ID=1,NUM_IONS
 	      CALL UPDATE_POPS(ATM(ID)%XzV_F,ATM(ID)%XzVLTE_F,
 	1                    ATM(ID)%NXzV_F,ND,T,TA)
@@ -3454,6 +3497,11 @@
 	      T(I)=TA(I)
 	    END DO
 	  END IF
+!
+! Compute LTE populations
+!
+!            INCLUDE 'EVAL_LTE_FULL.INC'
+!
 	  ROSS=.FALSE.
 	  GREY_COMP=.FALSE.
 !
@@ -4909,7 +4957,7 @@ c
 	  ELSE IF(XOPT .EQ. 'KAPPA')THEN
 	     YV(1:ND)=1.0D-10*CHI(1:ND)/MASS_DENSITY(1:ND)/CLUMP_FAC(1:ND)
 	     CALL DP_CURVE(ND,XV,YV)
-	     YAXIS='\gk(cm\u2 \d/g)'
+	     YAXIS='\gk(cm\u3 \d/g)'
 	  ELSE
 !
 ! We subtract 10 to put CHI in units of cm-1
@@ -4921,6 +4969,15 @@ c
 	    CALL DP_CURVE(ND,XV,YV)
 	    YAXIS='Log \gx(cm\u-1\d)'
 	  END IF
+!
+	ELSE IF(XOPT .EQ. 'TAUGAM')THEN
+	  XM(1:ND)=0.03*MASS_DENSITY(1:ND)*1.0D+10
+	  CALL TORSCL(TA,XM,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  DO I=1,ND
+	    YV(I)=DLOG10(TA(I))
+	  END DO
+	  CALL DP_CURVE(ND,XV,YV)
+	  YAXIS='Log(\gt\d\g\u)'
 !
 ! These options allow you to plot tau at a particular R (TAUR), or
 ! alternatively, R at a given value of Tau (RTAU).

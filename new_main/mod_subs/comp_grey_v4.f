@@ -237,7 +237,7 @@
 	END IF
 !
 ! Compute the temperature distribution, and the Rosseland optical depth scale.
-! NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert T from units of 
+! NB sigma=5.67D-05 and the factor of 1.0D-04 is to convert T from units of 
 ! K to units of 10^4 K. The ' ' in TORSCL indicates TYPE of atmosphere,
 ! and here is set to ' ' so as TORSCL assumes a 1/r^2 density dependence
 ! at boundary.

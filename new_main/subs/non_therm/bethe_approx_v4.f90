@@ -45,7 +45,7 @@
 	    GBAR=0.0D0
 	    IF(XKT(IKT) .GE. dE_eV)THEN
 	      X = sqrt(xkt(ikt)/dE_eV-1.0d0)
-	      IF((ATM(ID)%ZXzV .NE. 1).AND.(X .LE. CONNECT_POINT))THEN
+	      IF(( NINT(ATM(ID)%ZXzV) .NE. 1) .AND. (X .LE. CONNECT_POINT))THEN
 	        GBAR = 0.2D0
 	      ELSE IF(X .LE. 0.80D0)THEN
 	        GBAR = 0.074*X*(1.0D0+X)

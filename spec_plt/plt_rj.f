@@ -174,7 +174,7 @@ C
 C Convolve RJ with electron-scattering redistribution function.
 C
 	CALL GEN_IN(T_elec,'Electron temperature (in units 10^4 K)')
-	BETA=1.84E-03*SQRT(T_elec)
+	BETA=1.84D-03*SQRT(T_elec)
 	T1=0.5D0*BETA*BETA
 	C(1)=0.0D0
 	A(1)=0.0D0
@@ -244,25 +244,25 @@ C
 !
 ! Covolve Planck function and plot
 !
-	BETA=1.84E-03*SQRT(T_elec)
+	BETA=1.84D-03*SQRT(T_elec)
 	T1=0.5D0*BETA*BETA
 	C(1)=0.0D0
 	A(1)=0.0D0
 	B(1)=-1.0D0
-	D(1)=NU(1)**3/(EXP(4.7994*NU(1)/T_ELEC)-1)
+	D(1)=NU(1)**3/(EXP(4.7994D0*NU(1)/T_ELEC)-1)
 	DO ML=2,NCF-1
 	  D1=LOG(NU(ML-1)/NU(ML))
 	  D2=LOG(NU(ML)/NU(ML+1))
-	  DH=0.5*(D1+D2)
+	  DH=0.5D0*(D1+D2)
 	  A(ML)=-T1/D1/DH
 	  B(ML)=-1.0D0
 	  C(ML)=-T1/D2/DH
-	  D(ML)=NU(ML)**3/(EXP(4.7994*NU(ML)/T_ELEC)-1)
+	  D(ML)=NU(ML)**3/(EXP(4.7994D0*NU(ML)/T_ELEC)-1)
 	END DO
 	A(NCF)=0.0
 	C(NCF)=0.0
 	B(NCF)=-1.0D0
-	D(NCF)=NU(NCF)**3/(EXP(4.7994*NU(NCF)/T_ELEC)-1)
+	D(NCF)=NU(NCF)**3/(EXP(4.7994D0*NU(NCF)/T_ELEC)-1)
 	PLANCK_FN(1:NCF)=D(1:NCF)
 C
 	CALL THOMAS_RH(A,B,C,D,NCF,IONE)

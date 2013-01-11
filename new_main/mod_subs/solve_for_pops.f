@@ -147,7 +147,7 @@
 	  ELSE 
 	    IF(WRBAMAT_RDIN)COMPUTE_BA=L_FALSE
 	  END IF
-	  IF(CNT_FIX_BA .GT. N_ITS_TO_FIX_BA .AND. MAXCH_SUM .GT. 3.0*VAL_FIX_BA)THEN
+	  IF(CNT_FIX_BA .GT. N_ITS_TO_FIX_BA .AND. MAXCH_SUM .GT. 3.0D0*VAL_FIX_BA)THEN
 	    MAXCH_SUM=0.0D0
 	    COMPUTE_BA=L_TRUE
 	    WRBAMAT=WRBAMAT_RDIN
@@ -156,7 +156,7 @@
 ! This will force BA to be recomuted again, after N_ITS_TO_FIX_BA, because T was variable
 ! at some depths.
 !
-	  IF(CON_SCL_T .NE. 0)THEN
+	  IF(CON_SCL_T .NE. 0.0D0)THEN
 	    MAXCH_SUM=1000.0D0*VAL_FIX_BA
 	  END IF
 	ELSE
@@ -175,7 +175,7 @@
 	1          .AND. CON_SCL_T .EQ. 0.0D0)THEN
 	    COMPUTE_BA=COMPUTE_BARDIN
 	  END IF
-	  IF(WRBAMAT_RDIN .AND. MAXCH .LT. 2.0*VAL_FIX_BA 
+	  IF(WRBAMAT_RDIN .AND. MAXCH .LT. 2.0D0*VAL_FIX_BA 
 	1         .AND. .NOT. LAMBDA_ITERATION
 	1          .AND. CON_SCL_T .EQ. 0.0D0)THEN
 	    WRBAMAT=.TRUE.
@@ -199,12 +199,12 @@
 	  DO I=1,ND
 	    DO J=1,NT
 	      IF( (SOL(J,I) .GT. 0.8D0 .OR.
-	1          SOL(J,I) .LT. -5.0D0) .AND. TA(I) .LT. 1.0)THEN
+	1          SOL(J,I) .LT. -5.0D0) .AND. TA(I) .LT. 1.0D0)THEN
 	            TAU_SCL_T=TA(I)
 	            CON_SCL_T=1000.0D0
 	      END IF
 	      IF( (SOL(J,I) .GT. 10.0D0 .OR.
-	1          SOL(J,I) .LT. -20.0D0) .AND. TA(I) .GE. 1.0)THEN
+	1          SOL(J,I) .LT. -20.0D0) .AND. TA(I) .GE. 1.0D0)THEN
 	            TAU_SCL_T=TA(I)
 	            CON_SCL_T=1000.0D0
 	      END IF
@@ -377,7 +377,7 @@
 	    NEXT_NG=MAIN_COUNTER+ITS_PER_NG
 	    CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,
 	1             RITE_N_TIMES,LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
-	    IF(T1 .GT. 50.0 .AND. T2 .GT. 50.0)THEN
+	    IF(T1 .GT. 50.0D0 .AND. T2 .GT. 50.0D0)THEN
 	      LAMBDA_ITERATION=.TRUE.
 	      CNT_LAM=0
 	      FIXED_T=.TRUE.

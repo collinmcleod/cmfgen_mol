@@ -542,8 +542,8 @@
 	    DEL_R_FAC=EXP( LOG(RMAX/ALPHA)/(ND_ADD-3) )
 	    R_EXT(1)=RMAX
 	    R_EXT(4)=RMAX/DEL_R_FAC
-	    R_EXT(2)=R_EXT(1)-0.1*(R_EXT(1)-R_EXT(4))
-	    R_EXT(3)=R_EXT(1)-0.4*(R_EXT(1)-R_EXT(4))
+	    R_EXT(2)=R_EXT(1)-0.1D0*(R_EXT(1)-R_EXT(4))
+	    R_EXT(3)=R_EXT(1)-0.4D0*(R_EXT(1)-R_EXT(4))
 	    DO I=5,ND_ADD-1
 	      R_EXT(I)=R_EXT(I-1)/DEL_R_FAC
 	    END DO
@@ -991,7 +991,7 @@
 	IF(ND_ADD .NE. 0)THEN
 	  IF(CHI(IDMIN) .LE. ESEC(IDMIN) .OR. CHI(IDMAX) .LE. ESEC(IDMAX))THEN
 	    ESEC_POW=LOG(ESEC(IDMAX)/ESEC(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
-	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
+	    IF(ESEC_POW .LT. 2.0D0)ESEC_POW=2.0D0
 	    DO I=1,ND_ADD
 	      CHI_EXT(I)=CHI(IDMIN)*(R(IDMIN)/R_EXT(I))**ESEC_POW
 	      dCHIdR(I)= -ESEC_POW*CHI_EXT(I)/R_EXT(I)
@@ -999,9 +999,9 @@
 	  ELSE
 	    ALPHA=LOG( (CHI(IDMAX)-ESEC(IDMAX)) / (CHI(IDMIN)-ESEC(IDMIN)) )
 	1          /LOG(R(IDMIN)/R(IDMAX))
-	    IF(ALPHA .LT. 2.)ALPHA=2.0
+	    IF(ALPHA .LT. 2.0D0)ALPHA=2.0D0
 	    ESEC_POW=LOG(ESEC(IDMAX)/ESEC(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
-	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
+	    IF(ESEC_POW .LT. 2.0D0)ESEC_POW=2.0D0
    	    DO I=1,ND_ADD
 	      T1=(CHI(IDMIN)-ESEC(IDMIN))*(R(IDMIN)/R_EXT(I))**ALPHA
 	      T2=ESEC(IDMIN)*(R(IDMIN)/R_EXT(I))**ESEC_POW
@@ -1017,7 +1017,7 @@
 ! 3 we would get a logarithmic flux divergence as we increase the volume.
 !
 	  ALPHA=LOG(ETA(IDMAX)/ETA(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
-	  IF(ALPHA .LT. 3.5)ALPHA=3.5
+	  IF(ALPHA .LT. 3.5D0)ALPHA=3.5D0
 	  DO I=1,ND_ADD
 	    ETA_EXT(I)=ETA(IDMIN)*(R(IDMIN)/R_EXT(I))**ALPHA
 	    IF(ETA_EXT(I) .LE. 1.0D-280)ETA_EXT(I)=1.0D-280
@@ -1163,8 +1163,8 @@
 	      END DO
 	      PAR_AV(NI,LS)=U(NI)*AV_PREV(NI,LS)-VB(NI)*CV_PREV(NI-1,LS)
 !
-	      TC(NI,LS)=0				!As used.
-	      DIV(1)=1.0/(TC(1,LS)+TB(1,LS))
+	      TC(NI,LS)=0.0D0				!As used.
+	      DIV(1)=1.0D0/(TC(1,LS)+TB(1,LS))
 	      TC(1,LS)=TC(1,LS)*DIV(1)
 	      TB(1,LS)=TB(1,LS)*DIV(1)
 	      DO I=2,NI
@@ -1181,7 +1181,7 @@
 	      END DO
 !
 	      IF(LS .GT. NC)THEN
-	        XM(NI)=0.5*DTAU(NI-1,LS)*SOURCE_RAY(NI)
+	        XM(NI)=0.5D0*DTAU(NI-1,LS)*SOURCE_RAY(NI)
 	      ELSE IF(DIF)THEN
 	        XM(NI)=DBC
 	      ELSE
@@ -1405,12 +1405,12 @@ C
 	        T1=DTAU(I,LS)
 	        EE(I)=0.0D0
 	        IF(T1 .LT. 700.0D0)EE(I)=EXP(-T1)
-	        IF(T1 .GT. 0.5)THEN
+	        IF(T1 .GT. 0.5D0)THEN
 	          E0(I)=1.0D0-EE(I)
 	          E1(I)=1.0D0-E0(I)/T1
 	          E2(I)=1.0D0-2.0D0*E1(I)/T1
 	          E3(I)=1.0D0-3.0D0*E2(I)/T1
-	        ELSE IF(T1 .GT. 0.1)THEN
+	        ELSE IF(T1 .GT. 0.1D0)THEN
 	          E3(I)=0.25D0*T1*( 1.0D0-0.20*T1*
 	1               (1.0D0-T1/6.0D0*(1.0D0-T1/7.0D0*
 	1               (1.0D0-T1/8.0D0*(1.0D0-T1/9.0D0*
@@ -1464,13 +1464,13 @@ C
 ! Adjust first derivatives so that function is monotonic  in each interval.
 !
 	    dS(1)=( SIGN(ONE,S(1))+SIGN(ONE,dS(1)) )*
-	1                      MIN(ABS(S(1)),0.5*ABS(dS(1)))
+	1                      MIN(ABS(S(1)),0.5D0*ABS(dS(1)))
 	    DO I=2,NI-1
 	      dS(I)=( SIGN(ONE,S(I-1))+SIGN(ONE,S(I)) )*
-	1               MIN(ABS(S(I-1)),ABS(S(I)),0.5*ABS(dS(I)))
+	1               MIN(ABS(S(I-1)),ABS(S(I)),0.5D0*ABS(dS(I)))
 	    END DO
 	    dS(NI)=( SIGN(ONE,S(NI-1))+SIGN(ONE,dS(NI)) )*
-	1               MIN(ABS(S(NI-1)),0.5*ABS(dS(NI)))
+	1               MIN(ABS(S(NI-1)),0.5D0*ABS(dS(NI)))
 !
             I_M(1,LS)=0.0D0
 	    DO I=1,NI-1
@@ -1678,7 +1678,7 @@ C
 	    DO I=1,MIN(ND,ND-(LS-NC-1))-1
 	      K=H_PNT(I,LS)
 	      T2=0.5D0*(R(I)+R(I+1))
-	      T1=( 2.0*T2-(R_RAY(K,LS)+R_RAY(K+1,LS)) )/(R_RAY(K+2,LS)-R_RAY(K,LS))
+	      T1=( 2.0D0*T2-(R_RAY(K,LS)+R_RAY(K+1,LS)) )/(R_RAY(K+2,LS)-R_RAY(K,LS))
 	      HNU_STORE(I)=HNU_STORE(I)+HMIDQW(I,LS)*((1.0D0-T1)*CV(K,LS)+T1*CV(K+1,LS))
 	      NNU_STORE(I)=NNU_STORE(I)+NMIDQW(I,LS)*((1.0D0-T1)*CV(K,LS)+T1*CV(K+1,LS))
 	    END DO

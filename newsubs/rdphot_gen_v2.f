@@ -696,11 +696,11 @@
 ! To get the Rydberg constant we assume that the atomic mass in AMU is just
 ! twice the atomic number. Only exeption is H.
 !
-	  NU_INF=1.0D-15*109737.31*SPEED_OF_LIGHT()
+	  NU_INF=1.0D-15*109737.31D0*SPEED_OF_LIGHT()
 	  IF(PD(ID)%AT_NO .EQ. 1)THEN
 	    NU_INF=NU_INF/(1+5.48597D-04)
 	  ELSE
-	    NU_INF=NU_INF/(1+5.48597D-04/(2*PD(ID)%AT_NO))
+	    NU_INF=NU_INF/(1.0D0+5.48597D-04/(2*PD(ID)%AT_NO))
 	  END IF
 	  DO I=1,NXzV
 	    IF(SPLIT_J)THEN
@@ -788,8 +788,8 @@
 ! Initialize storage locations for use by PHOT_XzV. These are used to store
 ! photoionization cross-sections to speed up computation.
 !
-	PD(ID)%LST_CROSS(:,:)=0.D0
-	PD(ID)%LST_FREQ(:,:)=0.D0
+	PD(ID)%LST_CROSS(:,:)=0.0D0
+	PD(ID)%LST_FREQ(:,:)=0.0D0
 	DO J=1,PD(ID)%NUM_PHOT_ROUTES		!
 	  DO I=1,NXzV			!Loop over levels
 	    K=PD(ID)%A_ID(I,J)			!Get pointer to cross-section

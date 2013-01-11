@@ -401,7 +401,7 @@
 	XM(ND)=XM(ND)
 !
 !	IF(INIT)THEN
-	IF(ABS(FREQ-49.8654D0) .LT. 0.001)THEN
+	IF(ABS(FREQ-49.8654D0) .LT. 0.001D0)THEN
 	  WRITE(172,*)'TA'
 	  WRITE(172,*)TA
 	  WRITE(172,*)'TB'
@@ -438,7 +438,7 @@
 ! Check that no negative mean intensities have been computed.
 !
 	DO I=1,ND
-	  IF(XM(I) .LT. 0)THEN
+	  IF(XM(I) .LT. 0.0D0)THEN
 	    XM(I)=ABS(XM(I))/10.0D0
 	  END IF
 	END DO

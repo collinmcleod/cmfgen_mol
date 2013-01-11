@@ -13,7 +13,15 @@
 # Installation directory for CMFGEN
 # Site dependent.
 
+HOST :=$(shell hostname)
+
+ifeq ($(HOST),ibis.phyast.pitt.edu)
 INSTALL_DIR=/Users/jdh/cur_cmf/
+endif
+
+ifeq ($(HOST),lorikeet.phyast.pitt.edu)
+INSTALL_DIR=/export/home/jdh/cur_cmf/
+endif
 
 #
 # These statements should not be altered.
@@ -23,46 +31,8 @@ LIB_DIR=$(INSTALL_DIR)lib/
 MOD_DIR=$(INSTALL_DIR)mod/
 EXE_DIR=$(INSTALL_DIR)exe/
  
-# Options for FORTRAN compile:
-#        FG are the FORTRAN comiler options
-#        Site dependent.
 
-
-#********************************************************************
-# Fujitsu Fortran 90/95 compiler 
-#********************************************************************
-#
-# F90     = f95
-# FG  = -w -Fixed -X 9 -AmE -I$(MOD_DIR) 
-
-#********************************************************************
-# Intel compiler
-#********************************************************************
-#
-# F90 = ifc
-# FG = -cm -extend_source -w95 -w90 -tpp7 -nbs -I$(MOD_DIR)  
-# FFREE =  -I$(MOD_DIR)
-
-#********************************************************************
-# DEC OSF FORTRAN for ALpha
-#********************************************************************
-
-# F90 = fort
-# FG  = -extend_source -I$(MOD_DIR)
-# FG  = -extend_source -g -ladebug -I$(MOD_DIR)
-# FFREE  = -I$(MOD_DIR)
-
-#********************************************************************
-# PGF90 compiler
-#********************************************************************
-#
-# The -fastsse option causes issues with some routines.
-#
-# FG  = -O2 -Mconcur -fastsse -Mlarge_arrays -Mextend -Mbackslash  -Ktrap=fp -I$(MOD_DIR)
-#
-
-# F90 = pgf95 
-
+ifeq ($(HOST),ibis.phyast.pitt.edu)
  F90 = pgf95 -mp -Mlarge_arrays -Ktrap=fp 
  F90nomp = pgf95  -Mlarge_arrays -Ktrap=fp
 
@@ -83,75 +53,25 @@ EXE_DIR=$(INSTALL_DIR)exe/
  PGLIB= =pgf77libs -L/Users/jdh/pgplot/pgplot -lpgplot 
  X11LIB=-L/usr/X11R6/lib -lX11
 
-#
-# Options I use on a 32 bit intel computer running linux.
-#
-# F90 = gfortran44
-# F90nomp = gfortran44 
-# FG  = -O2 -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
-# FH  = -O2 -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
-# FD  = -g  -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
-# FFREE  = -fno-backslash -I$(MOD_DIR) -J$(MOD_DIR)
-# FFRED  = -fno-backslash -g -I$(MOD_DIR) -J$(MOD_DIR)
-#
-# BLAS=-lblas
-# LAPACK=-llapack
-# LOCLIB=-L/usr/lib
-# PGLIB=  -L/home/bruno1/users/jdh/pgplot/pgplot -lpgplot 
-# X11LIB=-L/usr/X11R6/lib -lX11
+endif
 
-#
-# Options used with pgf compiler on a 64 bit opteron system.
-#
-# F90 = pgf95 -mp 
-# F90nomp = pgf95  
-# FG  = -O2 -Mconcur -Mlarge_arrays -Mextend -Mbackslash  -Ktrap=fp -I$(MOD_DIR)
-# FH  = -O2 -Mconcur -Mlarge_arrays -Mextend -Mbackslash  -Ktrap=fp -I$(MOD_DIR)
-# FD  = -g -Mconcur -Mlarge_arrays -Mextend -Mbackslash  -Ktrap=fp -I$(MOD_DIR)
-# FFREE  = -Mbackslash -Ktrap=fp -I$(MOD_DIR)
-# FFRED  = -Mbackslash -g -Ktrap=fp -I$(MOD_DIR)
-# BLAS= 
-# LAPACK=-lacml -lacml_mv
-# LOCLIB=
-# PGLIB= -g77libs -L/usr/pgplot -lpgplot 
-# X11LIB=-L/usr/lib64 -lX11
+ifeq ($(HOST),lorikeet.phyast.pitt.edu)
 
-#********************************************************************
-# Locations of system dependent libraries. 
-# Use system routines for BLAS and LPACK when avialble. Fortran 
-# versions are packed with the cMFGEN distribution.
-#********************************************************************
-#
-# For Rosella
-#
-#LOCLIB=-L/usr/lib
-#PGLIB=-L/usr/local/lib -lpgplot 
-#G2CLIB=-L/usr/lib/gcc-lib/alpha-redhat-linux/egcs-2.91.66 -lg2c
-#X11LIB=-L/usr/X11R6/lib -lX11
+ F90 = pgf95 -mp -fPIC -Mlarge_arrays 
+ F90nomp = pgf95 -Mlarge_arrays 
 
-#BLAS=-lcxml
-#LAPACK=-lcxml
+ FG  = -O2 -Mconcur  -Mextend -Mbackslash   -I$(MOD_DIR)
+ FH  = -O2 -Mconcur  -Mextend -Mbackslash   -I$(MOD_DIR)
+ FD  = -g  -Mconcur  -Mextend -Mbackslash   -I$(MOD_DIR)
+ FFREE  = -Mbackslash  -I$(MOD_DIR)
+ FFRED  = -Mbackslash -g -Ktrap=fp -I$(MOD_DIR)
 
-#
-# For Kookaburra
-#
-#LOCLIB = -L/usr/lib
-#PGLIB = -L/usr/local/pgplot -lpgplot -lcpgplot
-#G2CLIB = -L/usr/lib/gcc-lib/i386-glibc21-linux/egcs-2.91.66 -lg2c
-#X11LIB = -L/usr/X11R6/lib -lX11
-#
-#BLAS = /usr/intel/mkl/lib/32/libmkl_p4.a -lguide -lpthread
-#LAPACK = /usr/intel/mkl/lib/32/libmkl_lapack.a
+ BLAS=
+ LAPACK=-lacml -lacml_mv
+ LOCLIB= 
 
-#
-# For Correla
-#
-#LOCLIB=-L/usr/lib
-#PGLIB=-g77libs -L/usr/local/build/pgplot -lpgplot 
-#G2CLIB=-L/usr/lib/gcc-lib/i386-glibc21-linux/egcs-2.91.66 -lg2c
-#X11LIB=-L/usr/X11R6/lib -lX11
-#
-#BLAS=-g77libs -lpthread -L/usr/lib64 -lblas
+ PGLIB= -pgf77libs -L/usr/lib64 -lpgplot 
+ X11LIB=-L/usr/lib64/ghostscript/8.15 -lX11
 
-#For lyrebird
+endif
 

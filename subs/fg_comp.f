@@ -461,7 +461,7 @@ C defined midway between R(1) and R(2).
 C
 	  T1=( (PF(1)-PF(NLF))+DNU )*FL*1.0D+15
 	  EW=2.99794D-12*( HBLANK-HNU(1,1)*T1 )/HNU(1,1)/FL/FL
-	  CONT_INT=13.19868*HNU(1,1)*( (R(1)+R(2))**2 )/4.0D0
+	  CONT_INT=13.19868D0*HNU(1,1)*( (R(1)+R(2))**2 )/4.0D0
 	ELSE
 	  EW=0.0D0
 	  CONT_INT=0.0D0

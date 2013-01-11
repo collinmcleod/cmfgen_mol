@@ -230,7 +230,7 @@
                   DO I=1,ATM(ID)%NXzV
                     T1=EDGE_SUM(I)/G_SUM(I)
 	            EQ=SE(ID)%EQ_IN_BA(I)
-	            SUM=SUM+5.27296E-03*T1*STEQ_VEC(EQ)
+	            SUM=SUM+5.27296D-03*T1*STEQ_VEC(EQ)
 	          END DO
 	          STEQ_VEC(NT)=STEQ_VEC(NT)+SUM
 	          IF(DEPTH_INDX .EQ. 1)WRITE(114,*)ATM(ID)%NXzV_F,ATM(ID)%NXzV,STEQ_VEC(NT),SUM
@@ -241,7 +241,7 @@
                   DO I=1,ATM(ID)%NXzV
                     T1=EDGE_SUM(I)/G_SUM(I)
 	            EQ=SE(ID)%EQ_IN_BA(I)
-	            SUM=SUM+5.27296E-03*T1*C_MAT(EQ,J)
+	            SUM=SUM+5.27296D-03*T1*C_MAT(EQ,J)
 	          END DO
 	          C_MAT(NT,J)=C_MAT(NT,J)+SUM
 	        END DO

@@ -513,7 +513,7 @@ C
 	      END DO
 	      NY=NIT-1
 	      T1=MAXVAL(ABS(Z(1:NY)))
-	      IF(T1 .LT. 1.0E-02)THEN
+	      IF(T1 .LT. 1.0D-02)THEN
 	        Z(1:NY)=Z(1:NY)*1.0D+03
 	        YLABEL='\gDY/Y(%)\d \ux10\u3\d'
 	        WRITE(T_OUT,*)'Correction scaled by factor of 10^3'
@@ -541,7 +541,7 @@ C
 	      END DO
 	      NY=NIT-1
 	      T1=MAXVAL(ABS(Z(1:NY)))
-	      IF(T1 .LT. 1.0E-02)THEN
+	      IF(T1 .LT. 1.0D-02)THEN
 	        Z(1:NY)=Z(1:NY)*1.0D+03
 	        YLABEL='[Y(K)-Y(NIT)]/Y(NIT) [%]\d \ux10\u3\d'
 	        WRITE(T_OUT,*)'Correction scaled by factor of 10^3'

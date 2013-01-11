@@ -311,7 +311,7 @@
 !
 ! If GF_CUT is large, we assume we just want the ENERGY levels.
 !
-	IF(GF_CUT .GT. 1000.0 .OR. NTRET .EQ. 0)THEN
+	IF(GF_CUT .GT. 1000.0D0 .OR. NTRET .EQ. 0)THEN
 	  CLOSE(LUIN)
 	  NTRET=0
 	  RETURN

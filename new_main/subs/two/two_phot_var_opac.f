@@ -54,8 +54,8 @@
 	      Y=FREQ/FREQ_TWO(J)
 	      U=Y*(1.0D0-Y)
 	      FU=4.0D0*U
-	      AY=24.56D0*COEF_TWO(J,1)*( U*(1-FU**0.8) +
-	1                 0.88D0*(U**1.53)*(FU**0.8) )
+	      AY=24.56D0*COEF_TWO(J,1)*( U*(1.0D0-FU**0.8D0) +
+	1                 0.88D0*(U**1.53D0)*(FU**0.8D0) )
 	    END IF
 !
 	    ETA_CONST=CONST*FREQ/FREQ_TWO(J)

@@ -459,7 +459,7 @@
 !
 ! Find match with lower-level name:
 !
-	    LOW_PNT=0.0D0
+	    LOW_PNT=0
 	    DO I=1,NUM_LEVELS
 	      IF(LOW_NAME .EQ. DIE_LEV_NAME(I))THEN
 	         LOW_PNT=I
@@ -475,7 +475,7 @@
 !
 ! Find match with upper-level name:
 !
-	    UP_PNT=0.0D0
+	    UP_PNT=0
 	    DO I=1,NUM_LEVELS
 	      IF(UP_NAME .EQ. DIE_LEV_NAME(I))THEN
 	         UP_PNT=I
@@ -598,8 +598,8 @@
 !
 	    T1=HDKT*EDGEDIE
 	    A10=2.07D-10*GUPDIE*EINA/GION_GS
-	    A20=A10*EXP(0.5D0*T1)/(2.0D0**1.5)
-	    A30=A10*EXP(T1/3.0D0)/(3.0D0**1.5)
+	    A20=A10*EXP(0.5D0*T1)/(2.0D0**1.5D0)
+	    A30=A10*EXP(T1/3.0D0)/(3.0D0**1.5D0)
 	    A10=A10*EXP(T1)
 !
 ! Is this lower level in model atom ?
@@ -727,9 +727,9 @@
 	1                  'included (LS : WI) ',/,
 	1 '[Units 10^-12] ( ) denotes percentage of LTDR NOT included')
 	  IF( (A1+M1) .NE. 0)THEN
-	    M1=100.0*M1/(A1+M1)
-	    M2=100.0*M2/(A2+M2)
-	    M3=100.0*M3/(A3+M3)
+	    M1=100.0D0*M1/(A1+M1)
+	    M2=100.0D0*M2/(A2+M2)
+	    M3=100.0D0*M3/(A3+M3)
 	    WRITE(LUOUT,1000)INC,(INC+MIS),A1,M1,A2,M2,A3,M3
 1000	    FORMAT( X,I4,'(',I4,')',3( 2X,1PE10.3,'(',0PF6.2,')' )  )
 	  END IF

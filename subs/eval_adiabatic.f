@@ -61,7 +61,7 @@ C
 	  SCALE=1.0D+09*BOLTZMANN_CONSTANT()/4.0D0/PI
 	  DO I=1,ND
  	    WORK(I)=(POPION(I)+ED(I))*SCALE*VEL(I)*
-	1                (1.5*AD_CR_DT(I)+SIGMA(I)+3.0D0)/R(I)
+	1                (1.5D0*AD_CR_DT(I)+SIGMA(I)+3.0D0)/R(I)
  	  END DO
 	  DO I=1,ND
 	    STEQ(NT,I)=STEQ(NT,I)-WORK(I)*T(I)
@@ -111,7 +111,7 @@ C
 C We split the adiabatic terms into 2 parts: The velocity term, and the
 C dTdR term. This split is useful for diagnostic purposes.
 C
-	SCALE=0.1*BOLTZMANN_CONSTANT()
+	SCALE=0.1D0*BOLTZMANN_CONSTANT()
 	DO I=1,ND
 	  AD_CR_V(I)= SCALE*(POPION(I)+ED(I))*
 	1                VEL(I)*T(I)/R(I)*(3.0D0+SIGMA(I))

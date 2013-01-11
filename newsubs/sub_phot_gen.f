@@ -134,7 +134,7 @@
 ! photoionization cross-sections are computed. For use with SET_TO_EDGE.
 !
 	IF(PHOT_ID .LT. 0)THEN
-	  IF(SET_TO_EDGE .AND. FREQ .EQ. 0)THEN
+	  IF(SET_TO_EDGE .AND. FREQ .EQ. 0.0D0)THEN
 	    PHOT(1:NLEVS)=GS_EDGE(1:NLEVS)+PD(ID)%EXC_FREQ(ABS(PHOT_ID))
 !	    DO I=1,NLEVS
 !	      IF(PHOT(I) .LT. 0.004D0)PHOT(I)=0.004D0
@@ -421,7 +421,7 @@ C
 	          T1=CONV_FAC*(  PD(ID)%CROSS_A(LMIN)+RU*( PD(ID)%CROSS_A(LMIN+1) +
 	1                   RU*(PD(ID)%CROSS_A(LMIN+2) + RU*(PD(ID)%CROSS_A(LMIN+3)+
 	1                   RU*(PD(ID)%CROSS_A(LMIN+4)+RU*PD(ID)%CROSS_A(LMIN+5)))) )  )
-	          IF(T1 .GT. 0.0)PHOT(I)=PHOT(I)+T1
+	          IF(T1 .GT. 0.0D0)PHOT(I)=PHOT(I)+T1
 !
 !
 	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 5)THEN
@@ -452,7 +452,7 @@ C
 ! U+SPACING(U) is the smallest number different from U (and lager).
 !
 	          X=LOG10(U+3.0D0*SPACING(U))
-	          IF(X .GE. 0)THEN
+	          IF(X .GE. 0.0D0)THEN
                     IF(X .LT. PD(ID)%CROSS_A(LMIN+4))THEN
 	              T1=((PD(ID)%CROSS_A(LMIN+3)*X+PD(ID)%CROSS_A(LMIN+2))*X +
 	1                  PD(ID)%CROSS_A(LMIN+1))*X+PD(ID)%CROSS_A(LMIN)

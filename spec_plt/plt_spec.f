@@ -1325,7 +1325,7 @@ C
 	  DO I=1,NCF
 	    TOT_LUM=TOT_LUM+OBSF(I)*FQW(I)
 	  END DO
-	  TOT_LUM=TOT_LUM*312.7			!4pi*(1kpc)**2*(1E+15)*(1E-23)/Lsun
+	  TOT_LUM=TOT_LUM*312.7			!4pi*(1kpc)**2*(1E+15)*(1D-23)/Lsun
 	  WRITE(T_OUT,*)' '
 	  WRITE(T_OUT,*)'Total luminosity is:               ',TOT_LUM
 C
@@ -1343,8 +1343,8 @@ C
               N_PHOT=N_PHOT+FQW(I)*OBSF(I)/NU(I)
 	      LUM=LUM+FQW(I)*OBSF(I)
 	    END DO
-	    LUM=LUM*312.7			!4pi*(1kpc)**2*(1E+15)*(1E-23)/Lsun
-	    N_PHOT=47.2566+DLOG10(N_PHOT) !DLOG10(4pi*(1kpc)**2*(1E-23)/h)
+	    LUM=LUM*312.7			!4pi*(1kpc)**2*(1E+15)*(1D-23)/Lsun
+	    N_PHOT=47.2566+DLOG10(N_PHOT) !DLOG10(4pi*(1kpc)**2*(1D-23)/h)
 	    T1=ANG_TO_HZ/TMP_FREQ
 	    WRITE(T_OUT,*)' '
 	    WRITE(T_OUT,'(1X,A,F4.0,A,1PE11.4)')
@@ -1367,8 +1367,8 @@ C
 	1              (OBSF(ML-1)/NU(ML-1)+OBSF(ML)/NU(ML))
 	  END DO
 	  DO ML=2,NCF
-	    IF(YV(ML) .LT. 1.0E-30)YV(ML)=1.0E-30
-	    YV(ML)=47.2566+LOG10(YV(ML)) !DLOG10(4pi*(1kpc)**2*(1E-23)/h)
+	    IF(YV(ML) .LT. 1.0D-30)YV(ML)=1.0D-30
+	    YV(ML)=47.2566D0+LOG10(YV(ML)) 		!DLOG10(4pi*(1kpc)**2*(1E-23)/h)
 	  END DO
 C
 	  I=NCF-1
@@ -1380,15 +1380,15 @@ C
 	ELSE IF(X(1:3) .EQ.'CUM')THEN
 	  NORM_LUM=0.0D0
 	  CALL USR_OPTION(NORM_LUM,'NORM_LUM',' ',' (in Lsun) ')
-	  YV(1)=0.0
+	  YV(1)=0.0D0
 	  DO I=2,NCF
 	    YV(I)=YV(I-1)+(OBSF(I)+OBSF(I-1))*(NU(I-1)-NU(I))*0.5D0
 	  END DO
-	  T2=YV(NCF)*312.7		!4pi*(1kpc)**2*(1E+15)*(1E-23)/Lsun
-	  IF(NORM_LUM .EQ. 0)THEN
+	  T2=YV(NCF)*312.7D0		!4pi*(1kpc)**2*(1D+15)*(1D-23)/Lsun
+	  IF(NORM_LUM .EQ. 0.0D0)THEN
 	    NORM_LUM=YV(NCF)
 	  ELSE
-	    NORM_LUM=NORM_LUM/312.7
+	    NORM_LUM=NORM_LUM/312.7D0
 	  END IF
 	  DO I=1,NCF
 	    XV(I)=NU(I)
@@ -1505,7 +1505,7 @@ C
 !
 	  IF(NCF .EQ. 0)THEN
 	     T2=EXP(LOG(1.0D+4)/(NBB-1))
-	     T1=3.289*912.0D0/10.0D0
+	     T1=3.289D0*912.0D0/10.0D0
 	     CALL USR_HIDDEN(LIN_INT,'NORM','T','Normalize peak to unity?')
 	     DO I=1,NBB
 	       NU(I)=T1/(T2**I)
@@ -1530,7 +1530,7 @@ C NU_MAX to NU_MIN but with a larger spacing.
 C
 	    DNU=DLOG10(NU(NCF)/NU(1))/(NBB-1)
 	    DO I=1,NBB
-	      T1=NU(1)*10.0**(DNU*(I-1))
+	      T1=NU(1)*10.0D0**(DNU*(I-1))
 	       T3=HDKT*T1/TEMP
 	       IF(T3 .GT. 1.0D0)THEN
 	         YV(I)=TWOHCSQ*(T1**3)*DEXP(-T3)/(1.0D0-DEXP(-T3))
@@ -1539,20 +1539,20 @@ C
 	       END IF
 	      XV(I)=T1
 	    END DO         
-	    IF(NORM_WAVE .GT. 200)THEN
-	      NORM_FREQ=2.998E+03/NORM_WAVE
+	    IF(NORM_WAVE .GT. 200.0D0)THEN
+	      NORM_FREQ=2.998D+03/NORM_WAVE
 	      DO I=2,NCF
 	        IF(NORM_FREQ .LE. NU(I-1) .AND. NORM_FREQ .GT. NU(I))K=I
 	      END DO
 	      T1=LOG(NU(K-1)/NORM_FREQ)/LOG(NU(K-1)/NU(K))
-	      NORM_FLUX=EXP( (1.0-T1)*LOG(OBSF(K-1))+T1*LOG(OBSF(K)) )
+	      NORM_FLUX=EXP( (1.0D0-T1)*LOG(OBSF(K-1))+T1*LOG(OBSF(K)) )
 	      BB_FLUX=TWOHCSQ*(NORM_FREQ**3)/(DEXP(HDKT*NORM_FREQ/TEMP)-1.0D0)
 	      SCALE_FAC=NORM_FLUX/BB_FLUX
 	      DO I=1,NBB
 	        YV(I)=YV(I)*SCALE_FAC
 	      END DO
 	    ELSE
-	      SCALE_FAC=NORM_WAVE*NORM_WAVE*159.8413 !1E+23*pi*(Rsun/1kpc)**2
+	      SCALE_FAC=NORM_WAVE*NORM_WAVE*159.8413D0     	 !1E+23*pi*(Rsun/1kpc)**2
 	      DO I=1,NBB
 	        YV(I)=YV(I)*SCALE_FAC
 	      END DO

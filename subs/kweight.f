@@ -29,25 +29,25 @@ C
 	HN=X(2)-X(3)
 	RF=X(1)-X(3)
 C
-	W(1)=0.5*H*X(1)*(X(1)-H/3.0D0)
-	1        -H*H/RF/12.0*((2.0D0+HN/H)*(1.0D0-H*H/10.0)
+	W(1)=0.5D0*H*X(1)*(X(1)-H/3.0D0)
+	1        -H*H/RF/12.0D0*((2.0D0+HN/H)*(1.0D0-H*H/10.0D0)
 	1        -X(2)*X(2)+H*H/10.0D0)
-	W(2)=0.5*H*X(2)*(X(2)+H/3.0D0)
+	W(2)=0.5D0*H*X(2)*(X(2)+H/3.0D0)
 	1        +H*H/RF/12.0D0
-	1        *(2.0+H/HN+HN/H)*(1.0D0-H*H/10.0)
-	W(3)=H*H/RF/12.0*(H*H/10.0D0-X(2)*X(2)
-	1        -H/HN*(1.0D0-H*H/10.0))
+	1        *(2.0D0+H/HN+HN/H)*(1.0D0-H*H/10.0D0)
+	W(3)=H*H/RF/12.0D0*(H*H/10.0D0-X(2)*X(2)
+	1        -H/HN*(1.0D0-H*H/10.0D0))
 C
 	DO I=3,N-1
 	  H=X(I-1)-X(I)
 	  RF=X(I-2)-X(I)
 	  RE=X(I-1)-X(I+1)
-	  W(I-2)=W(I-2)-(X(I-1)*X(I-1)-H*H/10.0D0)*H*H/12.0/RF
-	  W(I-1)=W(I-1)+0.5*H*X(I-1)*(X(I-1)-H/3.0D0)
-	1          +(X(I)*X(I)-H*H/10.0D0)*H*H/12.0/RE	
-	  W(I)=W(I)+0.5*H*X(I)*(X(I)+H/3.0D0)
-	1          +(X(I-1)*X(I-1)-H*H/10.0D0)*H*H/12.0/RF	
-	  W(I+1)=W(I+1)-(X(I)*X(I)-H*H/10.0D0)*H*H/12.0/RE
+	  W(I-2)=W(I-2)-(X(I-1)*X(I-1)-H*H/10.0D0)*H*H/12.0D0/RF
+	  W(I-1)=W(I-1)+0.5D0*H*X(I-1)*(X(I-1)-H/3.0D0)
+	1          +(X(I)*X(I)-H*H/10.0D0)*H*H/12.0D0/RE	
+	  W(I)=W(I)+0.5D0*H*X(I)*(X(I)+H/3.0D0)
+	1          +(X(I-1)*X(I-1)-H*H/10.0D0)*H*H/12.0D0/RF	
+	  W(I+1)=W(I+1)-(X(I)*X(I)-H*H/10.0D0)*H*H/12.0D0/RE
 	END DO
 C
 C Assume that dU/dmu=0 at mu=0, and that U depend on MU*MU. Could
@@ -55,13 +55,13 @@ C also have this assumption in previous equation as well.
 C
 	IF(X(N) .EQ. 0)THEN
 	  H=X(N-1)-X(N)
-	  W(N-1)=W(N-1)+0.5*H*(X(N-1)*X(N-1)-X(N-1)*H/3.0D0)
+	  W(N-1)=W(N-1)+0.5D0*H*(X(N-1)*X(N-1)-X(N-1)*H/3.0D0)
 	1        -H/6.0D0*(X(N-1)*X(N-1)-H*H/10.0D0)
 	  W(N)=W(N)+H/6.0D0*(X(N-1)*X(N-1)-H*H/10.0D0)
 	ELSE
-	  H=15.0*(X(N-1)-X(N))*(X(N-1)+X(N))
-	  W(N-1)=W(N-1)+2.0*(X(N-1)**5)/H
-	  W(N)=W(N)+(X(N-1)**3)*(3.0*X(N-1)*X(N-1)-5.0*X(N)*X(N))/H
+	  H=15.0D0*(X(N-1)-X(N))*(X(N-1)+X(N))
+	  W(N-1)=W(N-1)+2.0D0*(X(N-1)**5)/H
+	  W(N)=W(N)+(X(N-1)**3)*(3.0D0*X(N-1)*X(N-1)-5.0D0*X(N)*X(N))/H
 	  LUER=ERROR_LU()
 	  WRITE(LUER,*)'Warning - Extrapolation to zero required in KWEIGHT'
 	END IF

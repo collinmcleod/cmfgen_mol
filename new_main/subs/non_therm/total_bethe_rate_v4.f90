@@ -32,7 +32,7 @@
 	RATE=0.0D0
 	GBAR=0.0D0
 	dE=ATM(ID)%EDGEXzV_F(NL)-ATM(ID)%EDGEXzV_F(NUP)
-	IF(dE .LE. 0)RETURN
+	IF(dE .LE. 0.0D0)RETURN
 	dE_eV=Hz_to_eV*dE
 !
 	IF(ATM(ID)%AXzV_F(NUP,NL) .GT. 1.0D+03 .OR. ATM(ID)%NT_OMEGA(NL,NUP) .EQ. 0.0D0)THEN
@@ -40,12 +40,12 @@
 	  DO IKT=1,NKT
 	    IF(XKT(IKT) .GE. dE_eV)THEN
 	      XSQ = XKT(IKT)/dE_eV-1.0D0
-              IF((ATM(ID)%ZXzV .NE. 1) .AND. (XSQ .LE. CONNECT_POINT_SQ) )THEN
+              IF(( NINT(ATM(ID)%ZXzV) .NE. 1) .AND. (XSQ .LE. CONNECT_POINT_SQ) )THEN
                 GBAR = 0.2D0
               ELSE IF(XSQ .LE. 0.64D0)THEN			!X .LE. 0.8D0
                 X=SQRT(XSQ)
-	        GBAR = 0.074*X*(1.0D0+X)
-              ELSE IF(XSQ.LE. 36)THEN				!X .LE. 6.0D0
+	        GBAR = 0.074D0*X*(1.0D0+X)
+              ELSE IF(XSQ .LE. 36.0D0)THEN				!X .LE. 6.0D0
                 X=SQRT(XSQ)
                 GBAR = COEF0 + X*(COEF1 + COEF2*X)
               ELSE
@@ -58,7 +58,7 @@
 	  END DO
 	  RATE=RATE*T1
 	ELSE IF(ATM(ID)%NT_OMEGA(NL,NUP) .NE. 0.0D0)THEN
-	  T1=13.6d0*PI*A0*A0
+	  T1=13.6D0*PI*A0*A0
 	  T1=T1*ATM(ID)%NT_OMEGA(NL,NUP)/ATM(ID)%GXzV_F(NL)
 	  DO IKT=1,NKT
 	    IF(XKT(IKT) .GE. dE_eV)THEN

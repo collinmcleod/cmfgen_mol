@@ -150,7 +150,7 @@
 !
 	DO I=1,NLEV
 	  DO J=I+1,NLEV
-	    IF(OMEGA(I,J) .EQ. 0 .AND. EIN_A(I,J) .NE. 0)THEN
+	    IF(OMEGA(I,J) .EQ. 0.0D0 .AND. EIN_A(I,J) .NE. 0.0D0)THEN
 	      FL=EDGE(I)-EDGE(J)
 	      X=HDKT*FL/TEMP
 	      IFAIL=0
@@ -167,23 +167,23 @@
 	          dln_GBAR_dlnT=(1.0D0/EX_E1X-X)
 	        ELSE
 	          GBAR=0.066D0*(1.0D0+1.5D0/X)/SQRT(X)
-	          dln_GBAR_dlnT=-0.5D0+0.099/X/GBAR
+	          dln_GBAR_dlnT=-0.5D0+0.099D0/X/GBAR
 	        END IF
 	      ELSE
-	        G1=0.2
-	        IF( SAME_N(LEVELNAME(I),LEVELNAME(J)) )G1=0.7
+	        G1=0.2D0
+	        IF( SAME_N(LEVELNAME(I),LEVELNAME(J)) )G1=0.7D0
 	        G2=0.276D0*EX_E1X
 	        IF(G1 .GT. G2)THEN
 	          GBAR=G1
-	          dln_GBAR_dlnT=0
+	          dln_GBAR_dlnT=0.0D0
 	        ELSE
 	          GBAR=G2
 	          dln_GBAR_dlnT=(1.0D0/EX_E1X-X)
 	        END IF
 	      END IF
-	      OMEGA(I,J)=47.972*OMEGA_SCALE*GBAR*EIN_A(I,J)*STAT_WT(I)/FL
+	      OMEGA(I,J)=47.972D0*OMEGA_SCALE*GBAR*EIN_A(I,J)*STAT_WT(I)/FL
 	      dln_OMEGA_dlnT(I,J)=dln_GBAR_dlnT
-	    ELSE IF(OMEGA(I,J) .EQ. 0)THEN
+	    ELSE IF(OMEGA(I,J) .EQ. 0.0D0)THEN
 	      OMEGA(I,J)=OMEGA_SET
 	      dln_OMEGA_dlnT(I,J)=0.0D0
 	    END IF

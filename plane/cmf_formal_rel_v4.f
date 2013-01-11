@@ -335,7 +335,7 @@
 ! 3 we would get a logarithmic flux divergence as we increase the volume.
 !
 	  ALPHA=LOG(ETA(IDMAX)/ETA(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
-	  IF(ALPHA .LT. 3.5)ALPHA=3.5
+	  IF(ALPHA .LT. 3.5D0)ALPHA=3.5D0
 	  DO I=1,ND_ADD
 	    ETA_EXT(I)=ETA(IDMIN)*(R(IDMIN)/R_EXT(I))**ALPHA
 	    IF(ETA_EXT(I) .LE. 1.0D-280)ETA_EXT(I)=1.0D-280

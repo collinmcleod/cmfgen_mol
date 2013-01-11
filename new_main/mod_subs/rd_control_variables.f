@@ -560,7 +560,7 @@ C
 	1           'Allow for overlap of close lines (SOB only) ?')
 	  CALL RD_STORE_DBLE(OVER_FREQ_DIF,'OL_DIF',L_TRUE,
 	1           'Max. difference (in km/s) for overlap')
-	  OVER_FREQ_DIF=OVER_FREQ_DIF/2.998E+05
+	  OVER_FREQ_DIF=OVER_FREQ_DIF/2.998D+05
 !
 	  CALL RD_STORE_LOG(INCL_CHG_EXCH,'INC_CHG',L_TRUE,'Include charge exchange reactions?')
 	  CALL RD_STORE_LOG(INCL_TWO_PHOT,'INC_TWO',L_TRUE,'Include two photon transitions?')

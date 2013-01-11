@@ -374,8 +374,8 @@ C
 	    C(I)=T1*H(I-1)/H(I)/CHI(I+1)
 	    B(I)=T1*(H(I)/H(I-1)-H(I-1)/H(I))/CHI(I)
 	  END DO
-	  B(ND)=1.0/H(ND-1)/CHI(ND)
-	  A(ND)=-1.0/H(ND-1)/CHI(ND-1)
+	  B(ND)=1.0D0/H(ND-1)/CHI(ND)
+	  A(ND)=-1.0D0/H(ND-1)/CHI(ND-1)
 !
 ! Convert for LOG-LOG to LINEAR-LINEAR plane (i.e. We multiply dCHIdR[i]
 ! by CHI[i]/R[i] )
@@ -401,12 +401,12 @@ C
             ORIG_dCHIdR=
 	1       (SLOPE(I-1)*H(I)+SLOPE(I)*H(I-1))/(H(I-1)+H(I))
 	1      * CHI(I)/R(I)
-	    IF(dCHIdR(I) .EQ. 0)THEN
+	    IF(dCHIdR(I) .EQ. 0.0D0)THEN
 	      A(I)=0.0D0
 	      B(I)=0.0D0
 	      C(I)=0.0D0
 	    ELSE IF( MIN(ABS(LIN_SLOPE(I-1)),ABS(LIN_ SLOPE(I)))
-	1                             .LT. 0.5*ABS(ORIG_dCHIdR) )THEN
+	1                             .LT. 0.5D0*ABS(ORIG_dCHIdR) )THEN
 	      IF( ABS(LIN_SLOPE(I-1)) .LT. ABS(LIN_SLOPE(I)) )THEN
 	        A(I)=-2.0D0/LIN_H(I-1)
 	        B(I)=2.0D0/LIN_H(I-1)
@@ -421,7 +421,7 @@ C
 !
 	  ORIG_dCHIdR=SLOPE(ND-1) +
 	1              (SLOPE(ND-1)-SLOPE(ND-2))*H(ND-1)/(H(ND-2)+H(ND-1))
-	  IF(dCHIdR(ND) .EQ. 0)THEN
+	  IF(dCHIdR(ND) .EQ. 0.0D0)THEN
 	    A(ND)=0.0D0
 	    B(ND)=0.0D0
 	  ELSE IF(ABS(SLOPE(ND-1)) .LT. 0.5D0*ABS(ORIG_dCHIdR))THEN
@@ -470,8 +470,8 @@ C
 	  DO I=2,ND-1
             ORIG_dCHIdR=(SLOPE(I-1)*H(I)+SLOPE(I)*H(I-1))/(H(I-1)+H(I))
 	    T1=SIGN(ONE,SLOPE(I-1))+SIGN(ONE,SLOPE(I))
-	    IF( ABS(SLOPE(I-1)) .LT. 0.5*ABS(ORIG_dCHIdR) .OR.
-	1	ABS(SLOPE(I)) .LT. 0.5*ABS(ORIG_dCHIdR) )THEN
+	    IF( ABS(SLOPE(I-1)) .LT. 0.5D0*ABS(ORIG_dCHIdR) .OR.
+	1	ABS(SLOPE(I)) .LT. 0.5D0*ABS(ORIG_dCHIdR) )THEN
 	      IF( ABS(SLOPE(I-1)) .LT. ABS(SLOPE(I)) )THEN
 	        A(I)=-T1/H(I-1)*SIGN(ONE,SLOPE(I-1))
 	        B(I)=T1/H(I-1)*SIGN(ONE,SLOPE(I-1))
@@ -494,7 +494,7 @@ C
 	    B(ND)=2.0D0/H(ND-1)
 	    A(ND)=-B(ND)
 	  ELSE IF( T1 .NE. 0)THEN
-	    B(ND)=1.0/H(ND-1)
+	    B(ND)=1.0D0/H(ND-1)
 	    A(ND)=-B(ND)     
 	  END IF
 C

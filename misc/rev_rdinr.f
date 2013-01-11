@@ -32,7 +32,7 @@
 	REAL*8 NEW_XV(MAX_ND)
 !
 	INTEGER, PARAMETER :: IZERO=0
-	INTEGER I,J
+	INTEGER I,J,K
 	INTEGER FST,LST
 	INTEGER IST,IEND
 	INTEGER NI,NG
@@ -263,18 +263,42 @@
 	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I+(NEW_ND-ND)
             WRITE(10,'(F7.1)')1.0D0
           END DO
-
 !
-	ELSE IF(OPTION .EQ. 'FG' .OR. OPTION .EQ. 'FR' .OR. OPTION .EQ. 'LOG_FR')THEN
+	ELSE IF(OPTION .EQ. 'IV' .OR. OPTION .EQ. 'FG' .OR. 
+	1       OPTION .EQ. 'ID' .OR. 
+	1       OPTION .EQ. 'FR' .OR. OPTION .EQ. 'LOG_FR')THEN
 	  IST=1; IEND=ND
-	  CALL GEN_IN(IST,'Start index for fine grid')
-	  CALL GEN_IN(IEND,'End index for fine grid')
-	  WRITE(6,*)'Number of points in requeted interval is',IEND-IST-1
-	  NG=IEND-IST
-	  CALL GEN_IN(NG,'New number of grid points for this interval')
+	  CALL GEN_IN(IST,'Start index for fine grid (unaltered)')
+	  CALL GEN_IN(IEND,'End index for fine gridi (unaltered)')
+	  WRITE(6,*)'Number of points in the interval is',IEND-IST-1
+	  IF(OPTION .NE. 'IV' .AND. OPTION .NE. 'ID')THEN
+	     NG=IEND-IST
+	     CALL GEN_IN(NG,'New number of grid points for this interval')
+	     NEW_ND=IST+NG+(ND-IEND)+1
+	  END IF
 !
-	  NEW_ND=IST+NG+(ND-IEND)+1
-	  IF(OPTION .EQ. 'FG')THEN
+	  IF(OPTION .EQ. 'IV')THEN
+	    DO I=1,IST
+	      NEW_XV(I)=VEL(I)
+	    END DO
+	    I=IST
+	    DO WHILE(1 .EQ. 1)
+	      NEW_XV(I+1)=0.0D0
+	      CALL GEN_IN(NEW_XV(I+1),'Next velocity value')
+	      IF(NEW_XV(I+1) .EQ. 0.0D0)EXIT
+	      I=I+1
+	    END DO
+	    NEW_ND=I+ND-IEND+1
+	    NG=I-IST
+	    DO J=IEND,ND
+	      I=I+1
+	      NEW_XV(I)=VEL(J)
+	    END DO
+	    CALL MON_INTERP(RTMP,NEW_ND,IONE,NEW_XV,NEW_ND,R,ND,VEL,ND)
+	    OLD_XV(1:ND)=VEL(1:ND)
+	    WRITE(6,'(7ES12.4)')(NEW_XV(I),I=1,NEW_ND)
+!
+	  ELSE IF(OPTION .EQ. 'FG')THEN
 	    DO I=1,IST
 	      NEW_XV(I)=I
 	    END DO
@@ -289,6 +313,34 @@
 	     OLD_XV(I)=I
 	   END DO
 	   CALL MON_INTERP(RTMP,NEW_ND,IONE,NEW_XV,NEW_ND,R,ND,OLD_XV,ND)
+!
+	  ELSE IF(OPTION .EQ. 'ID')THEN
+	    DO I=1,IST
+	      NEW_XV(I)=I
+	    END DO
+	    NEW_XV(IST+1)=IST+0.66D0
+	    NEW_XV(IST+2)=IST+1.33D0
+	    NEW_XV(IST+3)=IST+2.0D0
+	    K=IEND-IST-5
+!
+	    DO I=1,2*K+1
+	      NEW_XV(IST+3+I)=IST+2+0.5D0*I
+	    END DO
+	    I=IST+ 4 + 2*K+1
+	    NEW_XV(I)=IEND-2
+	    NEW_XV(I+1)=IEND-1.33D0
+	    NEW_XV(I+2)=IEND-0.66D0
+!
+	    K=I+3    
+	    DO I=IEND,ND
+	      NEW_XV(K+I-IEND)=I
+	    END DO
+	    NEW_ND=K+ND-IEND
+	    DO I=1,ND
+	      OLD_XV(I)=I
+	    END DO
+	    CALL MON_INTERP(RTMP,NEW_ND,IONE,NEW_XV,NEW_ND,R,ND,OLD_XV,ND)
+!
 	 ELSE  IF(OPTION .EQ. 'LOG_FR')THEN
 	    DO I=1,IST
 	      NEW_XV(I)=R(I)

@@ -166,14 +166,14 @@
 ! 
 ! Set constants.
 !
-	CHIBF=2.815E-06
-	CHIFF=3.69E-29
-	HDKT=4.7994145
-	TWOHCSQ=0.0147452575
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
+	CHIBF=2.815D-06
+	CHIFF=3.69D-29
+	HDKT=4.7994145D0
+	TWOHCSQ=0.0147452575D0
+	OPLIN=2.6540081D+08
+	EMLIN=5.27296D-03
+	OPLIN=2.6540081D+08
+	EMLIN=5.27296D-03
 !
 	C_CMS=SPEED_OF_LIGHT()
 	C_KMS=1.0D-05*C_CMS
@@ -193,14 +193,14 @@
 	X_UNIT='ANG'
 	Y_PLT_OPT='FNU'
 !
-	DISTANCE=1.0		!kpc
-	SLIT_WIDTH=0.1          !arcseconds
-	PIXEL_LENGTH=0.0254     !arcseconds
+	DISTANCE=1.0D0		  !kpc
+	SLIT_WIDTH=0.1D0          !arcseconds
+	PIXEL_LENGTH=0.0254D0     !arcseconds
 !
 ! Conversion factor from Kev to units of 10^15 Hz.
 ! Conversion factor from Angstroms to units of 10^15 Hz.
 !
-	KEV_TO_HZ=0.241838E+03
+	KEV_TO_HZ=0.241838D+03
 	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07  	!10^8/10^15
 !
 !  Read in model.
@@ -470,8 +470,8 @@
 	  DO J=1,I-1
 	    YV(1:NCF)=YV(1:NCF)+HQW(J)*IP(J,1:NCF)
 	  END DO
-          T1=DISTANCE*1.0E+03*PARSEC()
-	  T1=R(1)*R(1)*1.0D+23*(1.0E+10/T1)**2
+          T1=DISTANCE*1.0D+03*PARSEC()
+	  T1=R(1)*R(1)*1.0D+23*(1.0D+10/T1)**2
 	  YV(1:NCF)=YV(1:NCF)*T1
 !
 ! NB: J and I have the same units, apart from per steradian.
@@ -636,8 +636,8 @@
 	  DO I=2,NP
 	    ZV(I-1)=ZV(I)/T1
 	  END DO
-          T2=DISTANCE*1.0E+03*PARSEC()
-	  T2=2.0D0*PI*1.0D+23*(1.0E+10/T2)**2
+          T2=DISTANCE*1.0D+03*PARSEC()
+	  T2=2.0D0*PI*1.0D+23*(1.0D+10/T2)**2
 	  WRITE(6,'(A,ES12.3,A)')'The average flux in band is',T1*T2,'Jy'
 !
 	  YAXIS='F(p)'
@@ -669,7 +669,7 @@
 !
 	  IF(MULT_BY_P)THEN
 	    IF(USE_ARCSEC)THEN
-	      T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	      T1=1.0D+10*206265.0D0/(DISTANCE*1.0D+03*PARSEC())
 	      XV(1:NP)=P(1:NP)*T1 
 	      XAXIS='P(")'
 	    ELSE
@@ -698,7 +698,7 @@
 !
 	  ELSE
 	    IF(USE_ARCSEC)THEN
-	      T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	      T1=1.0D+10*206265.0D0/(DISTANCE*1.0D+03*PARSEC())
 	      DO K=1,NP-2
 	        XV(K)=LOG10(P(K+1)*T1)
 	      END DO
@@ -731,7 +731,7 @@
 !
 	ELSE IF(X(1:3) .EQ. 'IMU')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
-	  T1=0.299794E+04/T1
+	  T1=0.299794D+04/T1
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
@@ -747,7 +747,7 @@
 
 	ELSE IF(X(1:3) .EQ. 'INU')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
-	  T1=0.299794E+04/T1
+	  T1=0.299794D+04/T1
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
@@ -777,7 +777,7 @@
 	  LAMBDA=NINT(T1-1.0D0)
 	  DO WHILE(LAMBDA .LE. T2)
 	    LAMBDA=LAMBDA+1
-	    T1=0.299794E+04/LAMBDA
+	    T1=0.299794D+04/LAMBDA
             I=GET_INDX_DP(T1,NU,NCF)
 	    IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 	    YV(1:NP-2)=IP(2:NP-1,I)

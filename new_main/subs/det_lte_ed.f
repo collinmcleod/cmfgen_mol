@@ -66,7 +66,7 @@
 !
 	DO L=1,ND
           XKBT = BOLTZMANN_CONSTANT() * TEMP(L) * 1.0D4 
-          T1 = (2.0D0*PI*ELECTRON_MASS()*XKBT/HSQR)**1.5
+          T1 = (2.0D0*PI*ELECTRON_MASS()*XKBT/HSQR)**1.5D0
           T2 = HDKT/TEMP(L)
           DO ID=1,NUM_IONS
             IF (ATM(ID)%XzV_PRES) THEN
@@ -103,7 +103,7 @@
 	      CONVERGED=.FALSE.
 !
               XKBT = BOLTZMANN_CONSTANT() * TEMP(L) * 1.0D4 
-              T1 = (2.0D0*PI*ELECTRON_MASS()*XKBT/HSQR)**1.5
+              T1 = (2.0D0*PI*ELECTRON_MASS()*XKBT/HSQR)**1.5D0
               T2 = HDKT/TEMP(L)
               DO ID=1,NUM_IONS
                 IF (ATM(ID)%XzV_PRES) THEN

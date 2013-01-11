@@ -855,7 +855,7 @@ C
 	    T1=LAMVACAIR(VEC_FREQ(ML))
 	    T2=C_KMS*(VEC_FREQ(ML-1)-VEC_FREQ(ML))/VEC_FREQ(ML)
 	    IF(T2 .GT. C_KMS)T2=C_KMS
-	    IF(T1 .LT. 1.0E+04)THEN
+	    IF(T1 .LT. 1.0D+04)THEN
 	      WRITE(LUIN,
 	1      '(1X,I6,2(1X,I6),2X,F10.6,2X,F10.3,2X,F10.2,4X,A)')
 	1         ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
@@ -1425,8 +1425,8 @@ C
 	    CHIL_MAT(I,SIM_INDX)=T1*(L_STAR_RATIO(I,SIM_INDX)*POPS(NL,I)-
 	1            GLDGU(SIM_INDX)*U_STAR_RATIO(I,SIM_INDX)*POPS(NUP,I))
 	    ETAL_MAT(I,SIM_INDX)=T2*POPS(NUP,I)*U_STAR_RATIO(I,SIM_INDX)
-	    IF(CHIL_MAT(I,SIM_INDX) .EQ. 0)THEN
-	      CHIL_MAT(I,SIM_INDX)=0.01*T1*POPS(NL,I)*L_STAR_RATIO(I,SIM_INDX)
+	    IF(CHIL_MAT(I,SIM_INDX) .EQ. 0.0D0)THEN
+	      CHIL_MAT(I,SIM_INDX)=0.01D0*T1*POPS(NL,I)*L_STAR_RATIO(I,SIM_INDX)
 	      WRITE(LUER,*)'Zero line opacity in CMFGEN_SUB'
 	      WRITE(LUER,*)'This needs to be fixed'
 	      J=ICHRLEN(TRANS_NAME_SIM(SIM_INDX))
@@ -1831,7 +1831,7 @@ C
 ! optical depth scales; TA for the FLUX mean optical depth scale, 
 ! and TB for the ROSSELAND mean optical depth scale.
 !
-! T1=4 * [STEFAN BOLTZMAN CONS] * 1.0E+16 / pi
+! T1=4 * [STEFAN BOLTZMAN CONS] * 1.0D+16 / pi
 !
 	T1=7.218771D+11
 	DO I=1,ND

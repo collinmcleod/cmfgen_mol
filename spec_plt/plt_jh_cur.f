@@ -158,14 +158,14 @@
 ! 
 ! Set constants.
 !
-	CHIBF=2.815E-06
-	CHIFF=3.69E-29
-	HDKT=4.7994145
-	TWOHCSQ=0.0147452575
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
+	CHIBF=2.815D-06
+	CHIFF=3.69D-29
+	HDKT=4.7994145D0
+	TWOHCSQ=0.0147452575D0
+	OPLIN=2.6540081D+08
+	EMLIN=5.27296D-03
+	OPLIN=2.6540081D+08
+	EMLIN=5.27296D-03
 	PI=ACOS(-1.0D0)
 !
 	C_CMS=SPEED_OF_LIGHT()
@@ -191,7 +191,7 @@
 ! Conversion factor from Kev to units of 10^15 Hz.
 ! Conversion factor from Angstroms to units of 10^15 Hz.
 !
-	KEV_TO_HZ=0.241838E+03
+	KEV_TO_HZ=0.241838D+03
 	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07  	!10^8/10^15
 	RADIUS=1.0D0; DTDR=1.0D0; TEMP=5.0D0 	!Non zero defaults
 !
@@ -417,12 +417,12 @@
 ! we use in plotting at all wavelengths.
 !
 	   IF(X_UNIT .EQ. 'MM/S' .OR. X_UNIT .EQ. 'KM/S')THEN
-	     CALL USR_OPTION(LAMC,'LAMC','0.0',
+	     CALL USR_OPTION(LAMC,'LAMC','0.0D0',
 	1             'Central Lambda(Ang) [-ve for frequency (10^15 Hz)]')
 	     IF(LAMC .LT. 0)THEN
 	       LAMC=1.0D-07*C_CMS/ABS(LAMC)
 	     ELSE
-	       IF(LAMC .GT. 2000)THEN
+	       IF(LAMC .GT. 2000.0D0)THEN
                  CALL USR_OPTION(AIR_LAM,'AIR','T',
 	1                'Air wavelength [only for Lam > 2000A]?')
 	       ELSE
@@ -632,7 +632,7 @@
 !
 	ELSE IF(X(1:3) .EQ. 'JNU' .OR. X(1:3) .EQ. 'HNU')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
-	  T1=0.299794E+04/T1
+	  T1=0.299794D+04/T1
 !
 	  SCALE_FAC=1.0D0
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0','Scale factor to prevent overflow')
