@@ -31,10 +31,10 @@ C
 	END IF
 C
 	DO I=1,ND
-	  DION(I)=0.0
-	  dDIONdNe(I)=0.0
-	  LOC_CH(I)=0.0
-	  dLOC_CH_dNe(I)=0.0
+	  DION(I)=0.0D0
+	  dDIONdNe(I)=0.0D0
+	  LOC_CH(I)=0.0D0
+	  dLOC_CH_dNe(I)=0.0D0
 	END DO
 !
 	DO I=1,ND

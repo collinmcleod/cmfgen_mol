@@ -70,7 +70,7 @@ C RSQN_ON_RSQJ. NO need to check _B, since differ by constant (factor) only.
 C
 	USE_EPS=.FALSE.			!G Eddington factor only
 	DO I=1,NDEXT
-	  IF(EPS_A(I) .NE. 0 .OR. EPS_PREV_A(I) .NE. 0)USE_EPS=.TRUE.
+	  IF(EPS_A(I) .NE. 0.0D0 .OR. EPS_PREV_A(I) .NE. 0.0D0)USE_EPS=.TRUE.
 	END DO
 C
 	IF(NM_TX .LT. 2 .OR. NM_KI .LT. 2)THEN

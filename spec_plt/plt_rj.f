@@ -183,7 +183,7 @@ C
 	DO ML=2,NCF-1
 	  D1=LOG(NU(ML-1)/NU(ML))
 	  D2=LOG(NU(ML)/NU(ML+1))
-	  DH=0.5*(D1+D2)
+	  DH=0.5D0*(D1+D2)
 	  A(ML)=-T1/D1/DH
 	  B(ML)=-1.0D0
 	  C(ML)=-T1/D2/DH

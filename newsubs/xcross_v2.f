@@ -106,7 +106,7 @@
 	    Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)
 	    XCROSS_V2=XCROSS_V2+
 	1   SIG_0_X(IZ,NE,I,J) *
-	1       ((Y-1)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
+	1       ((Y-1.0D0)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
 	1       (1.0D0+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
 	  END IF
 !
@@ -122,7 +122,7 @@
 	        Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)
 	        XCROSS_V2=XCROSS_V2+
 	1       SIG_0_X(IZ,NE,I,J) *
-	1          ((Y-1)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
+	1          ((Y-1.0D0)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
 	1          (1.0D0+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
 	      END IF
 	    END DO
@@ -155,7 +155,7 @@
 	        Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)
 	        XCROSS_V2=XCROSS_V2+
 	1       SIG_0_X(IZ,NE,I,J) *
-	1          ((Y-1)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
+	1          ((Y-1.0D0)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
 	1          (1.0D0+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
 	      END IF
 	    END DO

@@ -123,7 +123,7 @@
           e1=dtau_loc(iz-1)-e0
           e2=dtau_loc(iz-1)*dtau_loc(iz-1)-2.0d0*e1
         else
-          e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1-0.2D0*t1*(1.0D0-t1/6.0D0*
+          e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1.0d0-0.2D0*t1*(1.0D0-t1/6.0D0*
      1              (1.0D0-t1/7.0D0))))/3.0D0
           e1=0.5d0*(t1*t1-e2)
           e0=t1-e1
@@ -134,7 +134,7 @@
         beta=((dtau_loc(iz)+dtau_loc(iz-1))*e1-e2)/(dtau_loc(iz-1)*dtau_loc(iz))
         gamma=(e2-dtau_loc(iz-1)*e1)/(dtau_loc(iz)*(dtau_loc(iz)+dtau_loc(iz-1)))
      	t1=alpha*source_prime(iz-1)+beta*source_prime(iz)+gamma*source_prime(iz+1)
-        if(t1 .lt. 0)then
+        if(t1 .lt. 0.0d0)then
 	  t1=source_prime(iz)+dtau_loc(iz)*(source_prime(iz)-source_prime(iz-1))/dtau_loc(iz-1)
      	  t1=alpha*source_prime(iz-1)+beta*source_prime(iz)+gamma*t1
 	end if
@@ -152,7 +152,7 @@
         e1=dtau_loc(nzz-1)-e0
         e2=dtau_loc(nzz-1)*dtau_loc(nzz-1)-2.0d0*e1
       else
-        e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1-0.2D0*t1*(1.0D0-t1/6.0D0*
+        e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1.0D0-0.2D0*t1*(1.0D0-t1/6.0D0*
      1              (1.0D0-t1/7.0D0))))/3.0D0
         e1=0.5d0*(t1*t1-e2)
         e0=t1-e1
@@ -248,7 +248,7 @@
           e1=dtau_loc(iz)-e0
           e2=dtau_loc(iz)*dtau_loc(iz)-2.0d0*e1
         else
-           e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1-0.2D0*t1*(1.0D0-t1/6.0D0*
+           e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1.0D0-0.2D0*t1*(1.0D0-t1/6.0D0*
      1              (1.0D0-t1/7.0D0))))/3.0D0
            e1=0.5d0*(t1*t1-e2)
            e0=t1-e1
@@ -260,7 +260,7 @@
         beta=((dtau_loc(iz)+dtau_loc(iz-1))*e1-e2)/(dtau_loc(iz-1)*dtau_loc(iz))
         gamma=e0+(e2-(dtau_loc(iz-1)+2.0d0*dtau_loc(iz))*e1)/(dtau_loc(iz)*(dtau_loc(iz)+dtau_loc(iz-1)))
         t1=alpha*source_prime(iz-1)+beta*source_prime(iz)+gamma*source_prime(iz+1)
-        if(t1 .lt. 0)then
+        if(t1 .lt. 0.0d0)then
 	  t1=source_prime(iz)+dtau_loc(iz-1)*(source_prime(iz)-source_prime(iz+1))/dtau_loc(iz)
      	  t1=alpha*t1+beta*source_prime(iz)+gamma*source_prime(iz+1)
 	end if
@@ -278,7 +278,7 @@
         e1=dtau_loc(1)-e0
         e2=dtau_loc(1)*dtau_loc(1)-2.0d0*e1
       else
-        e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1-0.2D0*t1*(1.0D0-t1/6.0D0*
+        e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1.0d0-0.2D0*t1*(1.0D0-t1/6.0D0*
      1              (1.0D0-t1/7.0D0))))/3.0D0
         e1=0.5d0*(t1*t1-e2)
         e0=t1-e1

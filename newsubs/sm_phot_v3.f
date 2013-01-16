@@ -232,8 +232,7 @@
 	DO WHILE(FLAG)
 	  IF(NSM+1 .GT. NSM_MAX)THEN
 	    WRITE(6,10)NSM,NSM_MAX
- 10         FORMAT(' Error NSM_MAX TOO small : NSM =',I6,
-     *           ': NSM_MAX =',I6)
+ 10         FORMAT(' Error NSM_MAX TOO small : NSM =',I6,': NSM_MAX =',I6)
 	    WRITE(6,*)'DNU=',DNU
 	    STOP
 	  END IF
@@ -254,10 +253,10 @@ C
 	IEND=2
 	DO ML=1,NSM
 	  SIG_NEW=SIG_GAU*NU_SM(ML)
-	  DO WHILE (NU_FINE(IST) .LT. NU_SM(ML)-5.0*SIG_NEW)
+	  DO WHILE (NU_FINE(IST) .LT. NU_SM(ML)-5.0D0*SIG_NEW)
 	    IST=IST+1
 	  END DO
-	  DO WHILE ( (NU_FINE(IEND)-NU_SM(ML)) .LT. 5.0*SIG_NEW)
+	  DO WHILE ( (NU_FINE(IEND)-NU_SM(ML)) .LT. 5.0D0*SIG_NEW)
 	    IF(IEND .EQ. NFINE)GOTO 100
 	    IEND=IEND+1
 	  END DO
@@ -284,7 +283,7 @@ C
 	1         (CROSS_FINE(I)*Z(J)+CROSS_FINE(I+1)*Z(J+1))
 	    SUM=SUM + (NU_FINE(I+1)-NU_FINE(I))*(Z(J)+Z(J+1))
 	  END DO
-	  IF(SUM .NE. 0)THEN
+	  IF(SUM .NE. 0.0D0)THEN
 	    CROSS_SM(ML)=CROSS_SM(ML)/SUM
 	  ELSE
 	    WRITE(6,*)'Zero SUM in SM_PHOT_V3'
@@ -303,8 +302,7 @@ C
 ! Omit pints that are uneessary to maintain an accuracy of CUT_ACCURACY in the
 ! cross-section assuming linear interpolation.
 !
-        CALL CUT_POINTS_V3(NU,CROSS,NCROSS,
-	1                NU_SM,CROSS_SM,NSM,CUT_ACCURACY)
+        CALL CUT_POINTS_V3(NU,CROSS,NCROSS,NU_SM,CROSS_SM,NSM,CUT_ACCURACY)
 !
 	RETURN
 !

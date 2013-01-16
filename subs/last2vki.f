@@ -14,7 +14,7 @@ C
 C
 C The incident intensity is assumed to be SOURCE(1)*(1.0-EXP(-TOR)).
 C
-	IF(TOR .GT. 0.01)THEN
+	IF(TOR .GT. 0.01D0)THEN
 	  T1=(1.0D0-EXP(-TOR))
 	ELSE
 	  T1=(1.D0-TOR/2.0D0*(1.0D0-TOR/3.0D0*(1.0-TOR/4.0D0)))*TOR
@@ -29,7 +29,7 @@ C
 	  E1=EXP(-DTAU(1))
 	  DE1=-E1*(Z(1)-Z(2))*0.5D0
 	  IF(DTAU(1) .LT. 1.0D-03)THEN
-	    E2=DTAU(1)*0.5+DTAU(1)*DTAU(1)/6.0D0
+	    E2=DTAU(1)*0.5D0+DTAU(1)*DTAU(1)/6.0D0
 	    DE2=(0.5+DTAU(1)/3.0D0)*(Z(1)-Z(2))*0.5D0
 	    E3=DTAU(1)*0.5D0-DTAU(1)*DTAU(1)/3.0D0
 	    DE3=(0.5-2.0*DTAU(1)/3.0D0)*(Z(1)-Z(2))*0.5D0

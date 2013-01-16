@@ -453,6 +453,8 @@
 	COMPUTE_EW=.TRUE.
 	FULL_ES=.TRUE.
 	SN_MODEL=.FALSE.
+        TREAT_NON_THERMAL_ELECTRONS=.FALSE.
+	INCL_RADIOACTIVE_DECAY=.FALSE.
 	ZERO_REC_COOL_ARRAYS=.TRUE.
 	I=12
 	FORMFEED=' '//CHAR(I)
@@ -537,7 +539,7 @@
 ! are no longer required by program when using the BAND solution. They
 ! are still passed, however, to SOLVEBA.
 !
-	REPA=1.2
+	REPA=1.2D0
 	MATELIM=1
 
 !
@@ -609,7 +611,7 @@
 	1        NT,NUM_BNDS,NM,MAX_SIM,NM_KI,ACCURATE,L_TRUE)
 	CALL SET_CMF_SOB_MOD(ND,NUM_BNDS,NT,NM_KI,NLF,LUER)
 !
-	T1=10.0/(NLF-1)
+	T1=10.0D0/(NLF-1)
 	DO ML=1,NLF
 	  PF(ML)=5.0D0-T1*(ML-1)
 	END DO
@@ -844,7 +846,7 @@
 ! The incident Sobolev intensity is S[ 1.0-exp(tau(sob)*ERF) ]
 ! NB -from the definition, -1<erf<0 .
 !
-	T1=4.286299D-05*SQRT( TDOP/AMASS_DOP + (VTURB/12.85)**2 )
+	T1=4.286299D-05*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
 	J=0
 	DO I=1,NLF
 	  ERF(I)=-0.5D0*S15ADF(PF(I),J)
@@ -950,12 +952,13 @@
 !
 ! Compute the ion population at each depth.                          
 ! These are required when evaluation the occupation probabilities, and hence
-! the LTE populations.
+! the LTE populations. Not that Z_POP is effectivy integer, thus we
+! use 0.01 as check.
 !
 	  DO J=1,ND
 	    POPION(J)=0.0D0
 	    DO I=1,NT
-	      IF(Z_POP(I) .GT. 0)POPION(J)=POPION(J)+POPS(I,J)
+	      IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
 	    END DO
 	  END DO
 !
@@ -1268,7 +1271,7 @@
 ! have successfully been computed. (Consistent with old Eddfactor
 ! format a EDD_FAC can never be zero : Reason write a real number).
 !
-	      T1=0.0
+	      T1=0.0D0
 	      WRITE(LU_EDD,REC=5)T1
 	    END IF
 	  END IF
@@ -1316,7 +1319,7 @@
 	 DO J=1,ND
 	    POPION(J)=0.0D0
 	    DO I=1,NT
-	      IF(Z_POP(I) .GT. 0)POPION(J)=POPION(J)+POPS(I,J)
+	      IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
 	    END DO
 	 END DO
 !
@@ -1492,7 +1495,7 @@
 	    DIFFW(I)=DIFFW(I)*T1
 	  END DO
 	END IF
-	IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN
+	IF(LAMBDA_ITERATION .OR. .NOT. COMPUTE_BA)THEN
 	  DIFFW(1:NT)=0.0D0
 	END IF
 	CALL TUNE(2,'DTDR')
@@ -3126,7 +3129,7 @@
 ! 
 	IF(.NOT. SOBOLEV)THEN
 	  CALL TRAPUNEQ(PF,LFQW,NLF)
-	  T1=0.0
+	  T1=0.0D0
 	  DO ML=1,NLF
 	    LFQW(ML)=LFQW(ML)*FL*1.0D+15
 	    PROF(ML)=DOP_PRO(PF(ML),FL,TDOP,VTURB,AMASS)
@@ -3593,7 +3596,7 @@
 ! computed. If COMPUTE_EDDFAC is true we can safely write to record 5
 ! as file must have new format.
 !
-	T1=1.0
+	T1=1.0D0
 	IF(COMPUTE_EDDFAC)WRITE(LU_EDD,REC=5)T1
 	CLOSE(UNIT=LU_EDD)
 	IF(.NOT. COHERENT_ES)CLOSE(UNIT=LU_ES)
@@ -3688,7 +3691,7 @@
 	DO J=1,ND
 	  POPION(J)=0.0D0
 	  DO I=1,NT
-	    IF(Z_POP(I) .GT. 0)POPION(J)=POPION(J)+POPS(I,J)
+	    IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
 	  END DO
 	END DO
 !
@@ -3837,7 +3840,7 @@
 	  NEXT_LOC=1  ;   STRING=' '
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TA(ND))
 	  T1=1.0D+10*RP/RAD_SUN() ; CALL WR_VAL_INFO(STRING,NEXT_LOC,'R*/Rsun',T1)
-	  T1=TEFF_SUN()*(ABS(LUM)/T1**2)**0.25					!ABS for SN
+	  T1=TEFF_SUN()*(ABS(LUM)/T1**2)**0.25D0					!ABS for SN
 	  IF(PLANE_PARALLEL_NO_V .OR. PLANE_PARALLEL)THEN
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff(K)',T1)
 	  ELSE
@@ -3855,7 +3858,7 @@
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(3))		!20.0D0
 	    T1=1.0D+10*TC(3)/RAD_SUN()
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'R /Rsun',T1)
-	    T1=TEFF_SUN()*(ABS(LUM)/T1**2)**0.25
+	    T1=TEFF_SUN()*(ABS(LUM)/T1**2)**0.25D0
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff(K)',T1)
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(3))
 	    IF(DO_HYDRO)THEN
@@ -3870,7 +3873,7 @@
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(2))		!10.0D0
 	    T1=1.0D+10*TC(2)/RAD_SUN()
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'R /Rsun',T1)
-	    T1=TEFF_SUN()*(ABS(LUM)/T1**2)**0.25
+	    T1=TEFF_SUN()*(ABS(LUM)/T1**2)**0.25D0
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff(K)',T1)
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(2))
 	    IF(DO_HYDRO)THEN
@@ -3885,7 +3888,7 @@
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(1))		!0.67D0
 	    T1=1.0D+10*TC(1)/RAD_SUN()
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'R /Rsun',T1)
-	    T1=TEFF_SUN()*(ABS(LUM)/T1**2)**0.25
+	    T1=TEFF_SUN()*(ABS(LUM)/T1**2)**0.25D0
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff(K)',T1)
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(1))
 	    IF(DO_HYDRO)THEN
@@ -4042,7 +4045,7 @@
 	    DO J=1,ND
 	      POPION(J)=0.0D0
 	      DO I=1,NT
-	        IF(Z_POP(I) .GT. 0)POPION(J)=POPION(J)+POPS(I,J)
+	        IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
 	      END DO
 	    END DO
 	    WRITE(LU_POP,'(A)')' Atom Density'
@@ -4285,7 +4288,7 @@
 	       OPEN(UNIT=LU_EDD,FILE='EDDFACTOR',FORM='UNFORMATTED',ACCESS='DIRECT',STATUS='REPLACE',RECL=I)
 	       WRITE(LU_EDD,REC=1)0; WRITE(LU_EDD,REC=2)0
 	       WRITE(LU_EDD,REC=3)0; WRITE(LU_EDD,REC=4)0
-	       T1=0.0
+	       T1=0.0D0
 	       WRITE(LU_EDD,REC=5)T1
 	       COHERENT_ES=.TRUE.
 !

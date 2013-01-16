@@ -35,9 +35,9 @@ C
 	T1=( (X(1)**3)-0.3D0*X(1)*H*H ) * (H**3)/R/(R+H)/12.0D0
 	RE=H*H*( (X(2)**3)-0.3D0*H*H*X(2) )/(X(1)-X(3))/12.0D0
 C
-	W(1)=W(1)+0.5*H*(  (X(1)**3) -0.5D0*H*(X(1)**2)
+	W(1)=W(1)+0.5D0*H*(  (X(1)**3) -0.5D0*H*(X(1)**2)
 	1         +(H**3)/60.0D0  )+RE-RF
-	W(2)=W(2)+0.5*H*(  (X(2)**3) +0.5D0*H*(X(2)**2)
+	W(2)=W(2)+0.5D0*H*(  (X(2)**3) +0.5D0*H*(X(2)**2)
 	1         -(H**3)/60.0D0  )+RF+T1
 	W(3)=W(3)-RE-T1
 C
@@ -46,9 +46,9 @@ C
 	  RF=H*H*(X(I-1)**3-0.3D0*H*H*X(I-1))/(X(I-2)-X(I))/12.0D0
 	  RE=H*H*(X(I)**3-0.3D0*H*H*X(I))/(X(I-1)-X(I+1))/12.0D0
 	  W(I-2)=W(I-2)-RF
-	  W(I-1)=W(I-1)+0.5*H*(  (X(I-1)**3) -0.5D0*H*(X(I-1)**2)
+	  W(I-1)=W(I-1)+0.5D0*H*(  (X(I-1)**3) -0.5D0*H*(X(I-1)**2)
 	1         +(H**3)/60.0D0  )+RE
-	  W(I)=W(I)+0.5*H*(  (X(I)**3) +0.5D0*H*(X(I)**2)
+	  W(I)=W(I)+0.5D0*H*(  (X(I)**3) +0.5D0*H*(X(I)**2)
 	1         -(H**3)/60.0D0  )+RF
 	  W(I+1)=W(I+1)-RE
 	END DO
@@ -57,21 +57,21 @@ C Assume that V(mu)=0 at mu=0, and that it depends linearly on mu.
 C When X(N) .ne. 0 we assume that v'(n)=v(n)/mu*
 C
 	IF(X(N) .EQ. 0)THEN
-	  W(N-1)=W(N-1)+0.2*(X(N-1)**4)
+	  W(N-1)=W(N-1)+0.2D0*(X(N-1)**4)
 	ELSE
 	  H=X(N-1)-X(N)
 	  RF=H*H*(X(N-1)**3-0.3D0*H*H*X(N-1))/(X(N-2)-X(N))/12.0D0
 	  RE=H*H*(X(N)**3-0.3D0*H*H*X(N))/X(N)/12.0D0
 	  W(N-2)=W(N-2)-RF
-	  W(N-1)=W(N-1)+0.5*H*(  (X(N-1)**3) -0.5D0*H*(X(N-1)**2)
+	  W(N-1)=W(N-1)+0.5D0*H*(  (X(N-1)**3) -0.5D0*H*(X(N-1)**2)
 	1         +(H**3)/60.0D0  )
-	  W(N)=W(N)+0.5*H*(  (X(N)**3) +0.5D0*H*(X(N)**2)
+	  W(N)=W(N)+0.5D0*H*(  (X(N)**3) +0.5D0*H*(X(N)**2)
 	1         -(H**3)/60.0D0  )+RF+RE
 C
 C The above was for the integral from n-1 to n. Now need to extend the
 C integral to MU=0.
 C
-	  W(N)=W(N)+0.2*(X(N)**4)
+	  W(N)=W(N)+0.2D0*(X(N)**4)
 	END IF
 C
 C Ensure that the weights have the correct normalization (shouldnt be 

@@ -160,7 +160,7 @@
 ! Read in number of energy levels.
 !
 	  IOS=0
-          L1=0.0
+          L1=0
 	  DO WHILE(L1 .EQ. 0 .AND. IOS .EQ. 0)
 	    READ(LUIN,'(A)',IOSTAT=IOS)STRING
 	    L1=INDEX(STRING,'!Number of energy levels')
@@ -698,7 +698,7 @@
 !
 	  NU_INF=1.0D-15*109737.31D0*SPEED_OF_LIGHT()
 	  IF(PD(ID)%AT_NO .EQ. 1)THEN
-	    NU_INF=NU_INF/(1+5.48597D-04)
+	    NU_INF=NU_INF/(1.0D0+5.48597D-04)
 	  ELSE
 	    NU_INF=NU_INF/(1.0D0+5.48597D-04/(2*PD(ID)%AT_NO))
 	  END IF
@@ -731,7 +731,7 @@
 	    END IF
 	    T1=NU_INF/(EDGE(I)+PD(ID)%EXC_FREQ(PHOT_ID))
 	    PD(ID)%NEF(I,PHOT_ID)=0.0D0
-	    IF(T1 .GT. 0)PD(ID)%NEF(I,PHOT_ID)=ZXzV*DSQRT(T1)
+	    IF(T1 .GT. 0.0D0)PD(ID)%NEF(I,PHOT_ID)=ZXzV*DSQRT(T1)
 	  END DO
 !
 	  CLOSE(UNIT=LUIN)

@@ -194,7 +194,7 @@
 	BLUE_WING_EXT=ES_WING_EXT+(NDOP+2)*V_DOP*FRAC_DOP	!In km/s
 	RED_WING_EXT=ES_WING_EXT+R_CMF_WING_EXT*VINF
 !                                                  
-	APP_RES_EXT=RES_EXTENT*(1+0.5D0*dNU_on_NU)	!No units
+	APP_RES_EXT=RES_EXTENT*(1.0D0+0.5D0*dNU_on_NU)	!No units
 	APP_ESBW_EXT=1.0D0+(BLUE_WING_EXT+0.2D0*dV_CMF_WING)/C_KMS
 !
 ! Determine continuum frequencies bracketing bound-free edges. We keep
@@ -224,10 +224,6 @@
 	  ELSE
 	    I=I+1
 	  END IF
-	END DO
-!
-	DO I=1,NCF
-	   WRITE(161,*)I,NU_CONT(I),EDGE_FREQ(I)
 	END DO
 !
 ! Find the first line that is to be included as a blanketed line.
@@ -454,12 +450,12 @@
 ! SWITCH_FREQ) we use until dV_VMF_WING, which is the spacing in the e.s. wings.
 !
 	    MIN_FREQ=NU_LINE(LST_LN_INDX)/RES_EXTENT/
-	1              (1.+RED_WING_EXT/C_KMS)
+	1              (1.0D0+RED_WING_EXT/C_KMS)
 !
 ! The V_CMF_PROF is added to allow for some bleeding.
 !
 	    SWITCH_FREQ=NU_LINE(LST_LN_INDX)/RES_EXTENT/
-	1              (1.+(2.0D0*VINF+dV_CMF_PROF)/C_KMS)
+	1              (1.0D0+(2.0D0*VINF+dV_CMF_PROF)/C_KMS)
 !
 ! We check that the minimum frequency does not extend beyond the
 ! resonance zone of the next line. As we will put a frequency at

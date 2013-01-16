@@ -288,7 +288,7 @@
         ID=1
         DO I=1,NRAY_SM-1
           dV=Z(I)*V_GRID(I)/R_GRID(I)-Z(I+1)*V_GRID(I+1)/R_GRID(I+1)
-          IF(dV .GT. 1.25*VDOP_FRAC*VDOP_VEC(I))THEN
+          IF(dV .GT. 1.25D0*VDOP_FRAC*VDOP_VEC(I))THEN
             RAY_POINTS_INSERTED=.TRUE.
             NINS=dV/(VDOP_FRAC*VDOP_VEC(I))
             dZ=(Z(I)-Z(I+1))/(NINS+1)

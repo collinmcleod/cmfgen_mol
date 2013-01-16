@@ -824,13 +824,13 @@
 ! Adjust the first derivatives so that function is monotonic in each interval.
 !
 	      dS(IST)=( SIGN(ONE,S(IST))+SIGN(ONE,dS(IST)) )*
-	1                      MIN(ABS(S(IST)),0.5*ABS(dS(IST)))
+	1                      MIN(ABS(S(IST)),0.5D0*ABS(dS(IST)))
 	      DO I=IST+1,IEND-1
 	        dS(I)=( SIGN(ONE,S(I-1))+SIGN(ONE,S(I)) )*
-	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5*ABS(dS(I)))
+	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5D0*ABS(dS(I)))
 	      END DO
 	      dS(IEND)=( SIGN(ONE,S(IEND-1))+SIGN(ONE,dS(IEND)) )*
-	1            MIN(ABS(S(IEND-1)),0.5*ABS(dS(IEND)))
+	1            MIN(ABS(S(IEND-1)),0.5D0*ABS(dS(IEND)))
 !
 ! Compute the revised optical depth scale.
 !
@@ -908,13 +908,13 @@
 ! Adjust the first derivatives so that function is monotonic in each interval.
 !
 	      dS(IST)=( SIGN(ONE,S(IST))+SIGN(ONE,dS(IST)) )*
-	1                      MIN(ABS(S(IST)),0.5*ABS(dS(IST)))
+	1                      MIN(ABS(S(IST)),0.5D0*ABS(dS(IST)))
 	      DO I=IST+1,IEND-1
 	        dS(I)=( SIGN(ONE,S(I-1))+SIGN(ONE,S(I)) )*
-	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5*ABS(dS(I)))
+	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5D0*ABS(dS(I)))
 	      END DO
 	      dS(IEND)=( SIGN(ONE,S(IEND-1))+SIGN(ONE,dS(IEND)) )*
-	1            MIN(ABS(S(IEND-1)),0.5*ABS(dS(IEND)))
+	1            MIN(ABS(S(IEND-1)),0.5D0*ABS(dS(IEND)))
 !
 	      IF(LS .GT. NC .OR. BACK_SIDE)THEN
 	        PAR_FLUX=0.0D0			!No incident radiation
@@ -1100,7 +1100,7 @@
 !
 ! NB: HQW_AT_RMAX is MU dMU and that PdP is R^2 MU dMU.
 !
-	OBS_FLUX=OBS_FLUX*6.59934*R(1)*R(1)          !Jansky's (1kpc)
+	OBS_FLUX=OBS_FLUX*6.59934D0*R(1)*R(1)          !Jansky's (1kpc)
 !
 ! Output IP_OBS, if saved.
 !

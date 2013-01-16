@@ -20,7 +20,7 @@ C
 	TB(1)=-R(1)*R(1)*(F(1)*Q(1)/DTAU(1)+HBC)
 C
 	DO I=2,ND-1
-	  T1=0.5*(DTAU(I-1)+DTAU(I))
+	  T1=0.5D0*(DTAU(I-1)+DTAU(I))
 	  TA(I)=-F(I-1)*Q(I-1)*R(I-1)*R(I-1)/DTAU(I-1)/T1
 	  TC(I)=-F(I+1)*Q(I+1)*R(I+1)*R(I+1)/DTAU(I)/T1
 	  TB(I)=R(I)*R(I)*((1.0D0-THETA(I))/Q(I)

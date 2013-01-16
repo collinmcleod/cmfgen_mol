@@ -437,7 +437,7 @@ C
 	  T1=( (PF(1)-PF(NLF))+DNU )*FL*1.0D+15
 	  EW=2.99794D-12*( HBLANK(1)-RSQHNU(1,1)*T1 )/
 	1                 RSQHNU(1,1)/FL/FL
-	  CONT_INT=13.19868*RSQHNU(1,1)
+	  CONT_INT=13.19868D0*RSQHNU(1,1)
 C
 C Change HBLANK and JBLANK to be the int{across line -Jc} (i.e
 C integral of J or H above the continuum). Thus, for a weak line,

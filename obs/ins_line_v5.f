@@ -385,7 +385,7 @@ C
 	      DO K=LN_INDX,LN_INDX+NUM_RES_LINES-1
 	         IF(TRANS_TYPE(K)(1:3) .EQ. 'BLA')THEN
 	           dNU=FREQ(INDX)-NU_LINE(K)
-	           IF(dNU .GT. FRAC_DOP*VEC_MIN_VDOP(K)*FREQ(INDX)*0.1)THEN
+	           IF(dNU .GT. FRAC_DOP*VEC_MIN_VDOP(K)*FREQ(INDX)*0.1D0)THEN
 	             dNU_NEXT=MIN(dNU_NEXT,dNU)
 	           END IF
 	         END IF

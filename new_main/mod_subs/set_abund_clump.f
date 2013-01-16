@@ -126,7 +126,7 @@
 	    T4=T4+ABS(AT_ABUND(ISPEC))/AT_MASS(ISPEC)
 	  END IF
 	END DO
-	IF(T1 .NE. 0 .AND. T3 .GT. 1.0D0)THEN
+	IF(T1 .NE. 0.0D0 .AND. T3 .GT. 1.0D0)THEN
 	  WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
 	  WRITE(LUER,*)'Sum of mass fractions should be less than unity'
 	  WRITE(LUER,*)'Mass fraction=',T3
@@ -142,7 +142,7 @@
 !NB: 1-T3 is the mass fraction of species whose abundances were specified in
 !          terms of fractional number densities.
 !
-	IF(T2 .NE. 0)T2=(1.0D0-T3)*T1/T2		!f#/mu#
+	IF(T2 .NE. 0.0D0)T2=(1.0D0-T3)*T1/T2		!f#/mu#
 	MEAN_ATOMIC_WEIGHT=1.0D0/(T2+T4)
 !
 ! Convert any mass fractions to number fractions. If no number fractions
@@ -150,10 +150,10 @@
 ! to have an abundance of unity.
 !
 	ABUND_SUM=0.0D0
-	IF(T1 .EQ. 0)T1=1.0D0
+	IF(T1 .EQ. 0.0D0)T1=1.0D0
 	DO ISPEC=1,NUM_SPECIES
-	  IF(T2 .EQ. 0)T2=ABS(AT_ABUND(ISPEC))/AT_MASS(ISPEC)
-	  IF(AT_ABUND(ISPEC) .LT. 0)AT_ABUND(ISPEC)=
+	  IF(T2 .EQ. 0.0D0)T2=ABS(AT_ABUND(ISPEC))/AT_MASS(ISPEC)
+	  IF(AT_ABUND(ISPEC) .LT. 0.0D0)AT_ABUND(ISPEC)=
 	1         T1*ABS(AT_ABUND(ISPEC))/T2/AT_MASS(ISPEC)
 	  ABUND_SUM=ABUND_SUM+AT_ABUND(ISPEC)
 	END DO

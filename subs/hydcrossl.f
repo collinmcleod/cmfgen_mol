@@ -41,7 +41,7 @@ C
 C
 C Compute scaled energy of ejected electron in rydbergs.
 C
-	U=(NU-NUION)/3.2882/Z/Z
+	U=(NU-NUION)/3.2882D0/Z/Z
 C
 C Check whether cross-sections need to be computed. Limit on
 C on equality of U and USAV is not very stringent, but cross-section

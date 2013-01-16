@@ -133,7 +133,7 @@
 	  ERROR=200.0D0*(VdVdR+dPdR_ON_ROH-g_TOT)/
 	1        ( ABS(VdVdR)+ ABS(dPdR_ON_ROH)+ ABS(g_TOT) )
 !                  
-	  IF(R(I) .GT. 9.99E+04)THEN
+	  IF(R(I) .GT. 9.99D+04)THEN
 	    FMT='(1X,ES12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7)'
 	  ELSE
 	    FMT='(1X,F12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7)'

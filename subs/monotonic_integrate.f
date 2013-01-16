@@ -55,13 +55,13 @@
 !
 ! Adjust first derivatives so that function is monotonic  in each interval.
 !
-	D(1)=( SIGN(ONE,S(1))+SIGN(ONE,D(1)) )*MIN(ABS(S(1)),0.5*ABS(D(1)))
+	D(1)=( SIGN(ONE,S(1))+SIGN(ONE,D(1)) )*MIN(ABS(S(1)),0.5D0*ABS(D(1)))
 	DO I=2,ND-1
 	  D(I)=( SIGN(ONE,S(I-1))+SIGN(ONE,S(I)) )*
-	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5*ABS(D(I)))
+	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5D0*ABS(D(I)))
 	END DO
 	D(ND)=( SIGN(ONE,S(ND-1))+SIGN(ONE,D(ND)) )*
-	1        MIN(ABS(S(ND-1)),0.5*ABS(D(ND)))
+	1        MIN(ABS(S(ND-1)),0.5D0*ABS(D(ND)))
 !
 ! Now do the integration.
 !

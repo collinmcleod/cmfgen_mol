@@ -170,7 +170,7 @@ C reduce the correction, so that we keep the old temperature scale at small
 C optical depths.
 C
 	K=2
-        LDL=(LUM*RTAU1_OLD*RTAU1_OLD/LUMOLD/RTAU1/RTAU1)**0.25
+        LDL=(LUM*RTAU1_OLD*RTAU1_OLD/LUMOLD/RTAU1/RTAU1)**0.25D0
 	DO I=1,ND
 	  IF(TAU(I) .LT. TAU_SWITCH)THEN
 	    MLDL=1+(LDL-1)*TAU(I)/TAU_SWITCH
@@ -188,7 +188,7 @@ C
 	      GOTO 10
 	    END IF
 	  ELSE
-	    T(I)=MLDL*TOLD(NDOLD)*(TAU(I)/TAUOLD(NDOLD))**0.25
+	    T(I)=MLDL*TOLD(NDOLD)*(TAU(I)/TAUOLD(NDOLD))**0.25D0
 	  END IF
 	END DO
 C

@@ -140,16 +140,16 @@ C
 C
           dCHIdR(1)=SLOPE(1) +(SLOPE(1)-SLOPE(2))*H(1)/(H(1)+H(2))
 	  dCHIdR(1)=( SIGN(ONE,SLOPE(1))+SIGN(ONE,dCHIdR(1)) )*
-	1            MIN(ABS(SLOPE(1)),0.5*ABS(dCHIdR(1)))
+	1            MIN(ABS(SLOPE(1)),0.5D0*ABS(dCHIdR(1)))
 	  DO I=2,ND-1
             dCHIdR(I)=(SLOPE(I-1)*H(I)+SLOPE(I)*H(I-1))/(H(I-1)+H(I))
 	    dCHIdR(I)=( SIGN(ONE,SLOPE(I-1))+SIGN(ONE,SLOPE(I)) )*
-	1            MIN(ABS(SLOPE(I-1)),ABS(SLOPE(I)),0.5*ABS(dCHIdR(I)))
+	1            MIN(ABS(SLOPE(I-1)),ABS(SLOPE(I)),0.5D0*ABS(dCHIdR(I)))
 	  END DO
 	  dCHIdR(ND)=SLOPE(ND-1) +
 	1             (SLOPE(ND-1)-SLOPE(ND-2))*H(ND-1)/(H(ND-2)+H(ND-1))
 	  dCHIdR(ND)=( SIGN(ONE,SLOPE(ND-1))+SIGN(ONE,dCHIdR(ND)) )*
-	1            MIN(ABS(SLOPE(ND-1)),0.5*ABS(dCHIdR(ND)))
+	1            MIN(ABS(SLOPE(ND-1)),0.5D0*ABS(dCHIdR(ND)))
 !
 !
 	ELSE IF(METHOD .EQ. 'LOGMON')THEN
@@ -196,13 +196,13 @@ C
 ! Now adjust the derivatives so that curve is monotonic in each interval.
 !
 	  dCHIdR(1)=( SIGN(ONE,SLOPE(1))+SIGN(ONE,dCHIdR(1)) )*
-	1            MIN(ABS(SLOPE(1)),0.5*ABS(dCHIdR(1)))
+	1            MIN(ABS(SLOPE(1)),0.5D0*ABS(dCHIdR(1)))
 	  DO I=2,ND-1
 	    dCHIdR(I)=( SIGN(ONE,SLOPE(I-1))+SIGN(ONE,SLOPE(I)) )*
-	1            MIN(ABS(SLOPE(I-1)),ABS(SLOPE(I)),0.5*ABS(dCHIdR(I)))
+	1            MIN(ABS(SLOPE(I-1)),ABS(SLOPE(I)),0.5D0*ABS(dCHIdR(I)))
 	  END DO
 	  dCHIdR(ND)=( SIGN(ONE,SLOPE(ND-1))+SIGN(ONE,dCHIdR(ND)) )*
-	1            MIN(ABS(SLOPE(ND-1)),0.5*ABS(dCHIdR(ND)))
+	1            MIN(ABS(SLOPE(ND-1)),0.5D0*ABS(dCHIdR(ND)))
 C	
 	ELSE IF(METHOD(1:4) .EQ. 'ZERO')THEN
 	  DO I=1,ND
@@ -389,7 +389,7 @@ C
 ! Now modify the A,B and C if we have modified dCHIdR to ensure monotocity.
 !
           ORIG_dCHIdR=SLOPE(1) +(SLOPE(1)-SLOPE(2))*H(1)/(H(1)+H(2))
-	  IF(dCHIdR(1) .EQ. 0)THEN
+	  IF(dCHIdR(1) .EQ. 0.0D0)THEN
 	    B(1)=0.0D0
 	    C(1)=0.0D0
 	  ELSE IF(ABS(SLOPE(1)) .LT. 0.5D0*ABS(ORIG_dCHIdR))THEN
@@ -462,7 +462,7 @@ C
 	  IF( ABS(SLOPE(1)) .LT. 0.5D0*ABS(ORIG_dCHIdR) )THEN
 	    C(1)=2.0D0/H(1)
 	    B(1)=-C(1)
-	  ELSE IF(T1 .NE. 0)THEN
+	  ELSE IF(T1 .NE. 0.0D0)THEN
 	    C(1)=ONE/H(1)
 	    B(1)=-C(1)
 	  END IF

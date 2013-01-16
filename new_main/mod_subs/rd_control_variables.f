@@ -363,7 +363,7 @@ C
 	  FRAC_SIG_GAU=0.25D0
 	  CALL RD_STORE_DBLE(FRAC_SIG_GAU,'FRAC_SIG',L_FALSE,
 	1        'Fractional spacing a across smoothing Gauusian (use 0.25)')
-	  CUT_ACCURACY=0.02
+	  CUT_ACCURACY=0.02D0
 	  CALL RD_STORE_DBLE(CUT_ACCURACY,'CUT_ACC',L_FALSE,
 	1        'Accuracy to retain data when omitting data points to save space (use 0.02)')
 	  ABOVE_EDGE=.TRUE.

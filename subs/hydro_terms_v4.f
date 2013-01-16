@@ -151,7 +151,7 @@
 	    ERROR_CNT=ERROR_CNT+1
 	  END IF
 !                  
-	  IF(R(I) .GT. 9.99E+04)THEN
+	  IF(R(I) .GT. 9.99D+04)THEN
 	    FMT='(1X,ES12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7)'
 	  ELSE
 	    FMT='(1X,F12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7)'

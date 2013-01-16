@@ -823,6 +823,29 @@
 	    CALL DP_CURVE(NCF,XV,YV)
 	  END DO
 !
+	ELSE IF(X(1:4) .EQ. 'DJNU')THEN
+	  CALL USR_OPTION(L,'Depth',' ','Depth index')
+	  IF(NUM_FILES .EQ. 1)THEN
+	    WRITE(6,*)'Error -- this option only works on two (identical) models'
+	  ELSE
+	    IF(ALLOCATED(XV))DEALLOCATE(XV)
+	    IF(ALLOCATED(YV))DEALLOCATE(YV)
+	    ALLOCATE (XV(NCF))
+	    ALLOCATE (YV(NCF))
+	    XV(1:NCF)=ZM(1)%NU(1:NCF)
+	    DO ML=1,NCF
+	      T1=ZM(1)%RJ(L,ML)+ZM(2)%RJ(L,ML)
+	      IF(T1 .NE. 0)THEN
+	        YV(ML)=200.0D0*(ZM(1)%RJ(L,ML)-ZM(2)%RJ(L,ML))/T1
+	      ELSE
+	        YV(ML)=200.0D0
+	      END IF
+	    END DO
+	    YAXIS='Percentage difference'
+	    XAXIS='Frequency (10^15 Hz)'
+	    CALL DP_CURVE(NCF,XV,YV)
+	  END IF
+!
 	ELSE IF(X(1:3) .EQ. 'JNU')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Vacuum wavelength in Ang (-ve for Hz)')
 	  IF(T1 .LE. 0)THEN

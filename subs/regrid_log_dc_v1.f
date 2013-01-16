@@ -150,7 +150,7 @@
 !
 ! Decide if DPOP refers to b, b-1 or log b. Convert all to log b (base e).
 !
-	IF( DABS( TA(NOLD) ) .LT. 0.2 .AND. CHECK_DC)DPOP=DPOP+1.0D0
+	IF( DABS( TA(NOLD) ) .LT. 0.2D0 .AND. CHECK_DC)DPOP=DPOP+1.0D0
 	IF(TAKE_LOGS)THEN
 	  DPOP=DLOG(DPOP)
 	ELSE IF(LOG_TEN .NE. 1.0D0)THEN
@@ -160,7 +160,7 @@
 	NX_ST=1
 	NX_END=ND
 	IF(INTERP_OPTION .EQ. 'R')THEN
-	  IF(DABS(OLD_R(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN
+	  IF(DABS(OLD_R(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
 	    WRITE(LUER,*)'Warning - core radius not identical in REGRID_LOG_DC_V1'
 	    WRITE(LUER,*)'Rescaling to make Rcore identical'
 	    DO I=1,NDOLD
@@ -288,7 +288,7 @@
 	    T_EXCITE=OLD_T(NDOLD)
 	    DO J=NDOLD,1,-1
 	      DELTA_T=100
-	      DO WHILE(ABS(DELTA_T/T_EXCITE) .GT. 1.0E-08)
+	      DO WHILE(ABS(DELTA_T/T_EXCITE) .GT. 1.0D-08)
 	        FX=DPOP(I,J)*EXP(HDKT*EDGE(I)*(1.0D0/OLD_T(J)-1.0D0/T_EXCITE))*
 	1          (T_EXCITE/OLD_T(J))**1.5D0
 	        DELTA_T=(FX-1.0D0)*T_EXCITE/FX/(1.5D0+HDKT*EDGE(I)/T_EXCITE)
@@ -360,10 +360,10 @@
 !
 ! We first compute the excitation temperature on level NZ.
 !
-	    DELTA_T=100
+	    DELTA_T=100.0D0
 	    COUNT=0
 	    COUNT=1000
-	    DO WHILE(ABS(DELTA_T) .GT. 1.0E-08 .AND. COUNT .LT. 100)
+	    DO WHILE(ABS(DELTA_T) .GT. 1.0D-08 .AND. COUNT .LT. 100)
 	      FX=EXP(DHEN(NZ,I)+HDKT*EDGE(NZ)*(1.0D0/T(I)-1.0D0/T_EXCITE))*(T_EXCITE/T(I))**1.5D0
 	      DELTA_T=(FX-1.0D0)*T_EXCITE/FX/(1.5D0+HDKT*EDGE(NZ)/T_EXCITE)
 	      IF(DELTA_T .GT.  0.8D0*T_EXCITE)DELTA_T=0.8D0*T_EXCITE

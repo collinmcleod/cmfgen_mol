@@ -175,8 +175,8 @@ C
 C Determine boundary condition for continuum intensity.
 C
 	  IF(THK_CONT)THEN
-	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
+	    IF(P(LS) .GT. 0.0D0)THEN
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796D0-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF
@@ -423,7 +423,7 @@ C
 	1                 (ETAL(1)/CHIL(1)-IBOUND)*(1.0D0-WERF_EXP)
 	    VSRCE(1)=0.0D0
 	    TA(1)=0.0D0
-	    TC(1)=1./DTAU(1)
+	    TC(1)=1.0/DTAU(1)
 	    TB(1)=-1.0D0-TC(1)
 	    DO I=2,NI-1
 	      TA(I)=TC(I-1)
@@ -450,7 +450,7 @@ C
 	      XM(NI)=IC*DNU+Q(NI)
 	      VSRCE(NI)=0.0D0
 	    END IF
-	    TC(NI)=0.0
+	    TC(NI)=0.0D0
 C
 C Update dJINT/dS. Since dU/dS=1/TB we must do this before we call THOMAS.
 C
@@ -537,7 +537,7 @@ C defined midway between R(1) and R(2).
 C
 	  T1=( (PF(1)-PF(NLF))+DNU )*FL*1.0D+15
 	  EW=2.99794D-12*( HBLANK(1)-HCONT(1)*T1 )/HCONT(1)/FL/FL
-	  CONT_INT=13.19868*HCONT(1)*( (R(1)+R(2))**2 )/4.0D0
+	  CONT_INT=13.19868D0*HCONT(1)*( (R(1)+R(2))**2 )/4.0D0
 C
 C Change HBLANK and JBLANK to be the int{across line -Jc} (i.e
 C integral of J or H above the continuum). Thus, for a weak line,

@@ -29,7 +29,7 @@
 	IF(NEW_METHOD)THEN
 	  DO I=1,NR
 	    X=HDKT/T(I)
-	    RGU=2.07078D-22*ED(I)*DI(I)*( T(I)**(-1.5) )/GU
+	    RGU=2.07078D-22*ED(I)*DI(I)*( T(I)**(-1.5D0) )/GU
 	    RGU=LOG(RGU)
 	    DO J=1,N
 	      HNST(J,I)=G(J)*EXP(NUION(J)*X+RGU)
@@ -40,7 +40,7 @@
 	  RGU=LOG(RGU)
 	  DO I=1,NR
 	    X=HDKT/T(I)
-	    Y=ED(I)*DI(I)*( T(I)**(-1.5) )
+	    Y=ED(I)*DI(I)*( T(I)**(-1.5D0) )
 	    DO J=1,N
 	      HNST(J,I)=G(J)*Y*EXP(NUION(J)*X+RGU)
 	    END DO

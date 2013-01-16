@@ -1,4 +1,4 @@
-
+C
 C Subroutine to compute the quadrature weights for a modified cubic rule.
 C Reference - A Nordlund (Methods in Radiative Transfer, W Kallofen).
 C The routine makes specific assumptions concerning the behaviour of the
@@ -31,7 +31,7 @@ C
 C
 	W(:)=0.0D0
 	DO I=1,N-1
-	  T1=0.5*(X(I)+X(I+1))
+	  T1=0.5D0*(X(I)+X(I+1))
 	  T2=(X(I)*X(I)+X(I)*X(I+1)+X(I+1)*X(I+1))/3.0D0
 	  W(I)=W(I)+T2-X(I+1)*T1
 	  W(I+1)=W(I+1)-T2+T1*X(I)
@@ -39,7 +39,7 @@ C
 C
 C Assumes that V(mu=0)=0 and mu.V'(mu)=0 at mu=0. 
 C
-	IF(X(N) .NE. 0)THEN
+	IF(X(N) .NE. 0.0D0)THEN
 C
 C Since V(mu=0) is zero, we dont actually need a ray with mu=0 since the weight
 C is automatically zero.

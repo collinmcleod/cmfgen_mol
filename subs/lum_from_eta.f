@@ -32,8 +32,8 @@ C
 	DERIV(ND)=(LINE_LUM(ND-1)-LINE_LUM(ND))/(R(ND-1)-R(ND))
 C
 	DO I=1,ND-1
-	  LINE_LUM(I)=0.5*(R(I)-R(I+1))*( LINE_LUM(I)+LINE_LUM(I+1) 
-	1            +(R(I)-R(I+1))*(DERIV(I+1)-DERIV(I))/6.0 )
+	  LINE_LUM(I)=0.5D0*(R(I)-R(I+1))*( LINE_LUM(I)+LINE_LUM(I+1) 
+	1            +(R(I)-R(I+1))*(DERIV(I+1)-DERIV(I))/6.0D0 )
 	END DO
 	LINE_LUM(ND)=0.0D0
 C

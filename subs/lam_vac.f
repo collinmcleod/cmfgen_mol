@@ -16,7 +16,7 @@ C
 	REAL*8 T1
 	INTEGER I
 C
-	IF(LAM_AIR .LT. 1999.352)THEN
+	IF(LAM_AIR .LT. 1999.352D0)THEN
 	  WRITE(6,*)' ERROR --- in LAM_VAC'
 	  WRITE(6,*)' Formulae for conversion of air to vacuum wavelenths',
 	1                ' invalid below 2000Ang'

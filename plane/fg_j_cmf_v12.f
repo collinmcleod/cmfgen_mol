@@ -592,7 +592,7 @@
 ! Work out the maximim number of points per ray. This will allow us to allocate
 ! the require memory.
 !
-	  NRAY_MAX=0.0
+	  NRAY_MAX=0
 	  DO LS=1,NP
 	    NI_SMALL=ND_EXT-(LS-NC-1)
 	    IF(LS .LE. NC+1)NI_SMALL=ND_EXT
@@ -610,7 +610,7 @@
 	    DO I=1,NI_SMALL-1
 	      T1=(Z_EXT(I)*V_EXT(I)/R_EXT(I)-Z_EXT(I+1)*V_EXT(I+1)/R_EXT(I+1))/T2
 	      IF(.NOT. THK .AND. NI_SMALL .EQ. 2)T1=MAX(2.01D0,T1)
-	      IF(T1 .GT. 1)K=K+INT(T1)
+	      IF(T1 .GT. 1.0D0)K=K+INT(T1)
 	      K=K+1
 	    END DO
             NRAY_MAX=MAX(NRAY_MAX,K)
@@ -651,7 +651,7 @@
 	    DO I=1,NI_SMALL-1
 	      T1=(Z_EXT(I)*V_EXT(I)/R_EXT(I)-Z_EXT(I+1)*V_EXT(I+1)/R_EXT(I+1))/T2
 	      IF(.NOT. THK .AND. NI_SMALL .EQ. 2)T1=MAX(2.01D0,T1)
-	      IF(T1 .GT. 1)THEN
+	      IF(T1 .GT. 1.0D0)THEN
 	        DELTA_Z=(Z_EXT(I+1)-Z_EXT(I))/(INT(T1)+1)
 	        DO J=1,INT(T1)
 	          K=K+1
@@ -934,7 +934,7 @@
 	1                   (SIGMA_RAY(I)+SIGMA_RAY(I+1))  )/
 	1                   (R_RAY(I,LS)+R_RAY(I+1,LS))
 	     END DO
-	     GAMH(NI,LS)=0.0
+	     GAMH(NI,LS)=0.0D0
 	    END IF
 !
 	  END DO		!LS Loop
@@ -1411,7 +1411,7 @@ C
 	          E2(I)=1.0D0-2.0D0*E1(I)/T1
 	          E3(I)=1.0D0-3.0D0*E2(I)/T1
 	        ELSE IF(T1 .GT. 0.1D0)THEN
-	          E3(I)=0.25D0*T1*( 1.0D0-0.20*T1*
+	          E3(I)=0.25D0*T1*( 1.0D0-0.20D0*T1*
 	1               (1.0D0-T1/6.0D0*(1.0D0-T1/7.0D0*
 	1               (1.0D0-T1/8.0D0*(1.0D0-T1/9.0D0*
 	1               (1.0D0-T1/10.0D0*(1.0D0-T1/11.0D0*
@@ -1420,7 +1420,7 @@ C
 	          E1(I)=T1*( 1.0D0-E2(I) )/2.0D0
 	          E0(I)=T1*( 1.0D0-E1(I) )
 	        ELSE
-	          E3(I)=0.25D0*T1*( 1.0D0-0.20*T1*
+	          E3(I)=0.25D0*T1*( 1.0D0-0.20D0*T1*
 	1               (1.0D0-T1/6.0D0*(1.0D0-T1/7.0D0*
 	1               (1.0D0-T1/8.0D0*(1.0D0-T1/9.0D0) ))))
 	          E2(I)=T1*( 1.0D0-E3(I) )/3.0D0
@@ -1504,13 +1504,13 @@ C
 ! Adjust the first derivatives so that function is monotonic in each interval.
 !
 	    dS(1)=( SIGN(ONE,S(1))+SIGN(ONE,dS(1)) )*
-	1                      MIN(ABS(S(1)),0.5*ABS(dS(1)))
+	1                      MIN(ABS(S(1)),0.5D0*ABS(dS(1)))
 	    DO I=2,NI-1
 	      dS(I)=( SIGN(ONE,S(I-1))+SIGN(ONE,S(I)) )*
-	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5*ABS(dS(I)))
+	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5D0*ABS(dS(I)))
 	    END DO
 	    dS(NI)=( SIGN(ONE,S(NI-1))+SIGN(ONE,dS(NI)) )*
-	1            MIN(ABS(S(NI-1)),0.5*ABS(dS(NI)))
+	1            MIN(ABS(S(NI-1)),0.5D0*ABS(dS(NI)))
 !
 	    IF(LS .LE. NC)THEN
 	      I_P(NI,LS)=I_CORE
@@ -1621,14 +1621,14 @@ C
 	  K=J_PNT(ND,LS)
 	  T1=AV(K,LS)-0.5D0*I_M_IN_BND(LS)
 	  T2=I_M_IN_BND(LS)
-	  JPLUS_IB=JPLUS_IB+JQW(ND,LS)*T1
-	  HPLUS_IB=HPLUS_IB+HQW(ND,LS)*T2
-	  KPLUS_IB=KPLUS_IB+KQW(ND,LS)*T1
-	  NPLUS_IB=NPLUS_IB+NQW(ND,LS)*T1
-	  JMIN_IB=JMIN_IB+JQW(ND,LS)*T2
-	  HMIN_IB=HMIN_IB+HQW(ND,LS)*T2
-	  KMIN_IB=KMIN_IB+KQW(ND,LS)*T2
-	  NMIN_IB=NMIN_IB+NQW(ND,LS)*T2
+	  JPLUS_IB = JPLUS_IB+JQW(ND,LS)*T1
+	  HPLUS_IB = HPLUS_IB+HQW(ND,LS)*T2
+	  KPLUS_IB = KPLUS_IB+KQW(ND,LS)*T1
+	  NPLUS_IB = NPLUS_IB+NQW(ND,LS)*T1
+	   JMIN_IB = JMIN_IB +JQW(ND,LS)*T2
+	   HMIN_IB = HMIN_IB +HQW(ND,LS)*T2
+	   KMIN_IB = KMIN_IB +KQW(ND,LS)*T2
+	   NMIN_IB = NMIN_IB +NQW(ND,LS)*T2
 	END DO
 !
 ! Evaluate the H & N moments. These may be evaluated at the nodes,

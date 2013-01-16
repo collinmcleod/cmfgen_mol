@@ -54,7 +54,7 @@ C
 C                            
 C Compute collisional cross-sections (and their T derivatives)
 C
-	  COOL(I)=0.0
+	  COOL(I)=0.0D0
 	  CALL SUBCOL_MULTI_V3(OMEGA_F,dln_OMEGA_F_dlNT,
 	1          CNM,DCNM,
 	1          HN_S(1,I),HNST_S(1,I),dlnHNST_S_dlnT(1,I),N_S,
@@ -63,8 +63,8 @@ C
 	1          ZION,SUB_PHOT,COL_FILE,OMEGA_COL,
 	1          F_TO_S_MAP,COOL(I),T(I),TMP_ED,IONE)
 C
-	  CPR(I)=0.0
-	  CRR(I)=0.0
+	  CPR(I)=0.0D0
+	  CRR(I)=0.0D0
 	  COOL(I)=COOL(I)*ED(I)*H
 C
 	  DO J=1,N_S				!Level

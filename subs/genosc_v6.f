@@ -233,7 +233,7 @@ C
 !
 ! If GF_CUT is large, we assume we just want the ENERGY levels.
 !
-	IF(GF_CUT .GT. 1000.0 .OR. NTRET .EQ. 0)THEN
+	IF(GF_CUT .GT. 1000.0D0 .OR. NTRET .EQ. 0)THEN
 	  CLOSE(LUIN)
 	  NTRET=0
 	  RETURN
@@ -320,7 +320,7 @@ C
 ! Delete very weak transitions from the line list. We first ensure that all
 ! parameters are reasonable.
 !
-	IF(GF_CUT .GT. 0 .AND. MAX(MIN_NUM_TRANS,LEV_CUT) .LT. N)THEN
+	IF(GF_CUT .GT. 0.0D0 .AND. MAX(MIN_NUM_TRANS,LEV_CUT) .LT. N)THEN
 !
 	  IF(GF_ACTION .NE. 'SET_NEG' .AND. GF_ACTION .NE. 'SET_ZERO')THEN
 	    WRITE(LUER,'(1X,A)')'Error in GENOSC_V6'
@@ -350,7 +350,7 @@ C
 	    END DO
 	  END DO
 !
-	  IF(CUT_CNT .NE. 0)THEN
+	  IF(CUT_CNT .NE. 0.0D0)THEN
 	    WRITE(LUER,'(1X,A,I5,A,A)')'***Warning**** --- ',CUT_CNT,
 	1     ' weak transitions cut in GENOSC_V6 --- ',TRIM(FILNAME)
  	  END IF

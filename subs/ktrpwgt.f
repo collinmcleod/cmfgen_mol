@@ -25,7 +25,7 @@ C
 C
 C Assumes that du/dmu=0 at mu=0.
 C
-	IF(X(N) .NE. 0)THEN
+	IF(X(N) .NE. 0.0D0)THEN
 C
 C Integral from X(N) to 0
 C

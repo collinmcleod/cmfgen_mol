@@ -85,7 +85,7 @@ C Save the line intensity in the large frequency band so that it can be
 C used when we correct for electron scattering. If JNU has not been determined
 C by a call to MOMJBAR, we set it equal to the continuum intensity.
 C
-	IF( JNU(1,NLF+1) .EQ. 0 .AND. JNU(ND,NLF+1) .EQ. 0 )THEN
+	IF( JNU(1,NLF+1) .EQ. 0.0D0 .AND. JNU(ND,NLF+1) .EQ. 0.0D0 )THEN
 	  DO I=1,ND
 	    JPREV(I)=JCONT(I)*DNU
 	  END DO
@@ -133,8 +133,8 @@ C
 C Determine boundary condition for continuum intensity.
 C
 	  IF(THK_CONT)THEN
-	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
+	    IF(P(LS) .GT. 0.0D0)THEN
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796D0-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF
@@ -343,13 +343,13 @@ C
 C For the line, it is very difficult to estimate the incident
 C line intensity once where outside the core. We thus assume that
 C it is given by the continuum intensity = IBOUND. NB - The term
-C added for the case of a thick line is GAM'*(I(blue) - Icont).
+C added for the case of a thick line is GAM''*(I(blue) - Icont).
 C
 	    XM(1)=-Q(1)-IBOUND*DNU
 	    IF(THK_LINE)XM(1)=XM(1)+GAM(1)*
 	1            (ETAL(1)/CHIL(1)-IBOUND)*(1.0D0-WERF_EXP)/CHI(1)
 	    TA(1)=0.0D0
-	    TC(1)=1./DTAU(1)
+	    TC(1)=1.0D0/DTAU(1)
 	    TB(1)=-1.0D0-TC(1)
 	    DO I=2,NI-1
 	      TA(I)=TC(I-1)
@@ -369,10 +369,10 @@ C
 	      XM(NI)=0.5D0*DTAU(NI-1)*(SOURCE(NI)+Q(NI))-QH(NI-1)
 	    ELSE
 	      TA(NI)=-TC(NI-1)
-	      TB(NI)=1-TA(NI)
+	      TB(NI)=1.0D0-TA(NI)
 	      XM(NI)=IC*DNU+Q(NI)
 	    END IF
-	    TC(NI)=0.0
+	    TC(NI)=0.0D0
 C
 C Solve the tridiagonal system of equations.
 C

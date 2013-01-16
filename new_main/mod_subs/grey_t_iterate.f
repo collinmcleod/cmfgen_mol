@@ -340,7 +340,7 @@
 ! We use H for ED(est)
 ! We use QH for dED(est)/dT.
 !
-	    T1=1.0
+	    T1=1.0D0
 	    J=0
 	    DO WHILE (T1 .GT. 1.0D-04)
 	      FIRST=.TRUE.
@@ -358,12 +358,12 @@
 	        END IF
 	      END DO
 !
-	      T1=0.0
+	      T1=0.0D0
 	      DO I=1,ND
 	        TA(I)=-(H(I)-ED(I))/(QH(I)-1.0D0)/ED(I)
 	        T1=MAX(T1,ABS(TA(I)))
-	        IF(TA(I) .LT. -0.9)TA(I)=-0.9
-	        IF(TA(I) .GT. 9.0)TA(I)=9.0
+	        IF(TA(I) .LT. -0.9D0)TA(I)=-0.9D0
+	        IF(TA(I) .GT. 9.0D0)TA(I)=9.0D0
 	        ED(I)=ED(I)*(1.0D0+TA(I))
 	      END DO
 	      J=J+1
@@ -445,7 +445,7 @@
 	    DO J=1,ND
 	      POPION(J)=0.0D0
 	      DO I=1,NT        
-	        IF(Z_POP(I) .GT. 0)POPION(J)=POPION(J)+POPS(I,J)
+	        IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
 	      END DO
 	    END DO
 !

@@ -332,7 +332,7 @@
 !	    ELSE IF(MAX_ER_LST_IT .LT. MAX_ER)THEN          ! .AND. MAX_ER .GT. 0.05)THEN
 !	      DAMP_FAC=MAX(0.1D0,DAMP_FAC-0.1D0)
 !	    END IF
-	    DAMP_FAC=0.2
+	    DAMP_FAC=0.2D0
 	    dlnJdlnR(1:ND)=(1.0D0-DAMP_FAC)*dlnJdlnR(1:ND)+DAMP_FAC*TB(1:ND)
 	    MAX_ER_LST_IT=MAX_ER
 	  END IF

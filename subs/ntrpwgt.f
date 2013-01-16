@@ -26,7 +26,7 @@ C
 	W(:)=0.0D0
 C
 	DO I=1,N-1
-	  T1=0.25*(X(I)+X(I+1)) * (X(I)*X(I)+X(I+1)*X(I+1))
+	  T1=0.25D0*(X(I)+X(I+1)) * (X(I)*X(I)+X(I+1)*X(I+1))
 	  T2=( (X(I)**4) + (X(I)**3)*X(I+1) + (X(I)*X(I+1))**2
 	1      + (X(I+1)**3)*X(I) + (X(I+1)**4) )/5.0D0
 	  W(I)=W(I)+T2-X(I+1)*T1
@@ -35,7 +35,7 @@ C
 C
 C Assumes that V(mu=0)=0.
 C
-	IF(X(N) .NE. 0)THEN
+	IF(X(N) .NE. 0.0D0)THEN
 C
 C Since V(mu=0) is zero, we dont actually need a ray with mu=0 since the weight
 C is automatically zero.
@@ -65,7 +65,7 @@ C
 	DO I=1,N
 	  SUM=SUM+W(I)
 	END DO
-	IF(X(N) .EQ. 0)THEN
+	IF(X(N) .EQ. 0.0D0)THEN
 	  T1=0.25D0
 	ELSE
 	  T1=0.25D0*( 1.0D0-(X(N)**4) )+0.2D0*(X(N)**4)

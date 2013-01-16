@@ -48,7 +48,7 @@ C
 C Compute the solution vector. Note that the units need to be
 C eventually included. Note T1=Lsun/16/(PI*PI)/10**2 (10**2 for 1/R**2).
 C
-	T1=3.826D+13*LUM/16.0D0/(3.141592654)**2.0
+	T1=3.826D+13*LUM/16.0D0/(3.141592654D0)**2.0
 	T2=F(1)*Q(1)/HBC
 	RJ(1)=T1/HBC/R(1)/R(1)
 	DO I=2,ND
@@ -97,7 +97,7 @@ C
 	    CALL THOMAS(TA,TB,TC,XM,NI,IONE)
 C
 	ELSE IF(NI .EQ. 1)THEN
-	  XM(1)=0.0
+	  XM(1)=0.0D0
 	ELSE IF(NI .EQ. 2)THEN
 	  Z(1)=SQRT( (R(1)-P(LS))*(R(1)+P(LS)) )
 	  DTAU(1)=0.5D0*Z(1)*(CHI(1)+CHI(2))		!Z(2)=0.0
@@ -105,12 +105,12 @@ C
 	  E2=1.0D0-(1.0D0-E1)/DTAU(1)
 	  E3=(1.0D0-E1)/DTAU(1)-E1
 	  IF(DTAU(1) .LT. 1.0D-03)THEN
-	    E2=DTAU(1)*0.5+DTAU(1)*DTAU(1)/6.0D0
-	    E3=DTAU(1)*0.5-DTAU(1)*DTAU(1)/3.0D0
+	    E2=DTAU(1)*0.5D0+DTAU(1)*DTAU(1)/6.0D0
+	    E3=DTAU(1)*0.5D0-DTAU(1)*DTAU(1)/3.0D0
 	  END IF
 C
 	  XM(2)=TA(2)*E2+TA(1)*E3
-          XM(1)=0.5*(XM(2)*E1+TA(1)*E2+TA(2)*E3)
+          XM(1)=0.5D0*(XM(2)*E1+TA(1)*E2+TA(2)*E3)
 	END IF
 C
 C Update the ANGLE integrations.

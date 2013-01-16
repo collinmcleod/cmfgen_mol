@@ -95,7 +95,7 @@
 	  CALL RD_INT(N_TEMP,'N_TEMP',LU_IN,LU_ER,'# freq bins')
 	  CALL RD_DBLE(LOG_T_MIN,'LOG_T_MIN',LU_IN,LU_ER,' ')
 	  CALL RD_DBLE(DEL_LOG_T,'DEL_LOG_T',LU_IN,LU_ER,' ')
-	  LOG_T_MIN=LOG_T_MIN-4.0		!Convert from K to units of 10^4 K
+	  LOG_T_MIN=LOG_T_MIN-4.0D0		!Convert from K to units of 10^4 K
 ! 
 ! Temperature tabulated in equal increments of Log Ne.
 !

@@ -89,7 +89,7 @@ C
 C
 C Check if desired accuracy has been obtained or whether solution
  
-	    IF(ABS(WXX(J)-FQ(J,I)) .GT. ABS(FQ(J,I)/1000.0)
+	    IF(ABS(WXX(J)-FQ(J,I)) .GT. ABS(FQ(J,I)/1000.0D0)
 	1)    TEST=.FALSE.
 	    IF(ABS(FQ(J,I)) .GT. 1.0D+10)THEN
 	      MSOL=.FALSE.

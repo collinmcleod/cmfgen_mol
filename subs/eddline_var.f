@@ -84,8 +84,8 @@ C
 	    K=I+1
 	    dTAdCHI_J=-dHLdTAU(J)
 	    dTCdCHI_I=-dHUdTAU(I)
-	    dTBdCHI_I=dHLdTAU(I)+0.5/Q(I)
-	    dTBdCHI_J=dHUdTAU(J)+0.5/Q(I)
+	    dTBdCHI_I=dHLdTAU(I)+0.5D0/Q(I)
+	    dTBdCHI_J=dHUdTAU(J)+0.5D0/Q(I)
 	    T1=0.5D0*R(I)*R(I)/Q(I)
 C
 	    dRHSdJ= T1*SOURCE(I) - dTAdCHI_J*AV(J) - dTBdCHI_J*AV(I)
@@ -150,8 +150,8 @@ C
 	 K=I+1
 	 dTAdCHI_J=-dHLdTAU(J)
 	 dTCdCHI_I=-dHUdTAU(I)
-	 dTBdCHI_I=dHLdTAU(I)+PSI(I)/(DTAU(J)+DTAU(I))+0.5/Q(I)
-	 dTBdCHI_J=dHUdTAU(J)+PSI(I)/(DTAU(J)+DTAU(I))+0.5/Q(I)
+	 dTBdCHI_I=dHLdTAU(I)+PSI(I)/(DTAU(J)+DTAU(I))+0.5D0/Q(I)
+	 dTBdCHI_J=dHUdTAU(J)+PSI(I)/(DTAU(J)+DTAU(I))+0.5D0/Q(I)
 	 T1=0.5D0*R(I)*R(I)/Q(I)
 C
 C dDELUB is use as correction because UB(I)=-TB(I)-PSI(I)-PSIPREV(I)

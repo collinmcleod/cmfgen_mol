@@ -55,9 +55,9 @@
 ! Some cross sections start above threshold so smoothed cross section will have
 ! cross_sm=0.  Must find first cross_sm.ne.0 and start calculation there
 !
-      IF(CROSS_SM(2).EQ.0.0D0)THEN
+      IF(CROSS_SM(2) .EQ. 0.0D0)THEN
         DO I=3,NUM_SM
-          IF(CROSS_SM(I).NE.0.0D0)GOTO 400
+          IF(CROSS_SM(I) .NE. 0.0D0)GOTO 400
         ENDDO
         STOP ' ALL CROSS SECTIONS = 0'
  400    LOW=I-1
@@ -78,14 +78,14 @@
 ! Find next maximum or minimum point (dy/dx=0).
 ! Inflection points (d2y/d2x=0) are now omitted.
 !
- 330  IF(LOW.EQ.1)THEN
-        IF((DERIV(1)*DERIV(2)).LT.0.0D0)GOTO 300
+ 330  IF(LOW .EQ. 1)THEN
+        IF((DERIV(1)*DERIV(2)) .LT. 0.0D0)GOTO 300
         DO I=LOW+2,NUM_SM-1
-          IF((DERIV(I-1)*DERIV(I)).LE.0.0D0)GOTO 300
+          IF((DERIV(I-1)*DERIV(I)) .LE. 0.0D0)GOTO 300
         END DO
       ELSE
         DO I=LOW+1,NUM_SM-1
-          IF((DERIV(I-1)*DERIV(I)).LE.0.0D0)GOTO 300
+          IF((DERIV(I-1)*DERIV(I)) .LE. 0.0D0)GOTO 300
         END DO
       ENDIF
       HIGH=NUM_SM
@@ -103,8 +103,7 @@
 ! Determine the distance from each exact point (i=low,high)
 ! to the straight line interpolation between LOW and HIGH.
 ! 
-        M=(CROSS_SM(HIGH)-CROSS_SM(LOW))/
-     *       (NU_SM(HIGH)-NU_SM(LOW))
+        M=(CROSS_SM(HIGH)-CROSS_SM(LOW))/(NU_SM(HIGH)-NU_SM(LOW))
         DO I=LOW+1,HIGH-1
 	  Y=CROSS_SM(LOW)+M*(NU_SM(I)-NU_SM(LOW))
           DIST(I)=ABS(Y-CROSS_SM(I))
@@ -122,7 +121,7 @@
 ! The use of comp_val avoids problems when the cross-sections are zero,
 !
         COMP_VAL=MIN(CROSS_SM(LOW),CROSS_SM(HIGH))
-	IF(COMP_VAL .EQ. 0)COMP_VAL=1.0d-06
+	IF(COMP_VAL .EQ. 0.0D0)COMP_VAL=1.0d-06
 !
 ! We ensure that there is at least 20 points per decade of frequency space,
 ! when the cross-section (which is Mbarns) is less than 1.0D-06.
@@ -130,7 +129,7 @@
         IF( (DIST(MID)/COMP_VAL) .GT. CUT_ACCURACY)THEN
           HIGH=MID
           GOTO 320		!RESTART TESTING PROCEDURE
-        ELSE IF( NU_SM(HIGH)/NU_SM(LOW) .GT. 1.1 
+        ELSE IF( NU_SM(HIGH)/NU_SM(LOW) .GT. 1.1D0 
      *                         .AND. COMP_VAL .EQ. 1.0d-06)THEN
           HIGH=MID
           GOTO 320		!RESTART TESTING PROCEDURE
@@ -145,7 +144,6 @@
       ENDIF
 !
  340  CONTINUE
-!     WRITE(*,'(2I7)')NUM_SM,NUM_CUT
 !
       RETURN
       END

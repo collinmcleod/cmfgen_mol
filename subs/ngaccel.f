@@ -33,7 +33,7 @@ C
 C
 C X02AJF returns the machine precision.
 C
-	PRECIS=100.0*X02AJF()
+	PRECIS=100.0D0*X02AJF()
 C
 	A1=0.0D0
 	B1=0.0D0
@@ -70,16 +70,16 @@ C
 	DIV2=B1*B1
 	IF( EQUAL(DIV1,DIV2,PRECIS) )THEN
 	  WRITE(LUER,*)'Warning - Singular determinant in NGACCEL'
-	  IF(A1 .NE. 0)THEN
+	  IF(A1 .NE. 0.0D0)THEN
 	    A=C1/A1
 	    B=0.0D0
-	  ELSE IF(B2 .NE. 0)THEN
+	  ELSE IF(B2 .NE. 0.0D0)THEN
 	    A=0.0D0
 	    B=C2/B2
 	  ELSE
 	    WRITE(LUER,*)'Error - no solution for C1 and C2 in NGACCEL'
-	    A=0
-	    B=0
+	    A=0.0D0
+	    B=0.0D0
 	  END IF
 	ELSE
 	  DIVISOR=DIV1-DIV2

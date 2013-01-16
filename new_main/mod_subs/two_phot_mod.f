@@ -128,7 +128,7 @@
 ! which begin with a ! or a blank, are ignored.
 !
 	  IOS=0
-          L=0.0
+          L=0
 	  DO WHILE(L .EQ. 0 .AND. IOS .EQ. 0)
 	    READ(LUIN,'(A)',IOSTAT=IOS)STRING
 	    L=INDEX(STRING,'!Number of 2-photon transitions')

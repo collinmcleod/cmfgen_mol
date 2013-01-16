@@ -42,7 +42,7 @@ C
 C
 C Find maximum coefficient in column I
 C
-	    BIG=0.0
+	    BIG=0.0D0
 	    JM=I
 	    DO J=I,N					!Equation
 	      IF(ABS(BIG).LT.ABS(BA(J,I,K,K)))THEN

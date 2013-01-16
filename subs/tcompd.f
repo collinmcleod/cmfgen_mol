@@ -18,8 +18,8 @@ C
 C
 	INTEGER I
 C
-	TA(1)=0.0
-	TC(1)=1./DTAU(1)
+	TA(1)=0.0D0
+	TC(1)=1.0D0/DTAU(1)
 	TB(1)=-1.0D0-TC(1)
 C
 	DO I=2,NI-1
@@ -38,9 +38,9 @@ C
 		TB(NI)=-TA(NI)+DTAU(NI-1)/2.0D0
 	ELSE
 		TA(NI)=-TC(NI-1)
-		TB(NI)=1-TA(NI)
+		TB(NI)=1.0D0-TA(NI)
 	END IF
-	TC(NI)=0.0
+	TC(NI)=0.0D0
 C
 	RETURN
 	END

@@ -51,8 +51,8 @@
 ! Compute optical depth at line center.
 !
 	    T1=1.0D-15/1.77245385095516D0		!1.0D-15/SQRT(PI)
-	    NU_DOP=FL_SIM(SIM_INDX)*12.85*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
-	1                        (VTURB/12.85)**2 )/2.998D+05
+	    NU_DOP=FL_SIM(SIM_INDX)*12.85D0*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
+	1                        (VTURB/12.85D0)**2 )/2.998D+05
 	    T2=T1/NU_DOP
 	    WEAK_LINE(SIM_INDX)=.TRUE.
 	    DO I=1,ND

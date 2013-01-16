@@ -129,7 +129,7 @@
 !
 	DO K=1,ND
 	  X=HDKT/T(K)
-	  RGU=2.07078D-22*ED(K)*DIC2_S(K)*( T(K)**(-1.5) )/GION(K)
+	  RGU=2.07078D-22*ED(K)*DIC2_S(K)*( T(K)**(-1.5D0) )/GION(K)
 	  RGU=LOG(RGU)
 	  DO I=1,NC2_F
 	    C2LTE_F(I,K)=W_C2_F(I,K)*GC2_F(I)*EXP(EDGEC2_F(I)*X+RGU)

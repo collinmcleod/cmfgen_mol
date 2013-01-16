@@ -152,12 +152,12 @@ C
 C Compute those parts of the TRIDIAGONAL vectors which are independent of
 C depth, and the fitting parameters.
 C
-	A_STORE(1)=0
+	A_STORE(1)=0.0D0
 	C_STORE(1)=-2.0D0/( LOG(NU(1)/NU(2)) )**2
 	DO ML=2,NCF-1
 	  D1=LOG(NU(ML-1)/NU(ML))
 	  D2=LOG(NU(ML)/NU(ML+1))
-	  DH=0.5*(D1+D2)
+	  DH=0.5D0*(D1+D2)
 	  A_STORE(ML)=-1.0D0/D1/DH
 	  C_STORE(ML)=-1.0D0/D2/DH
 	END DO

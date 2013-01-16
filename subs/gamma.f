@@ -28,7 +28,7 @@ C
 	  GAMH(I)=(V(I+1)+V(I))*3.33564D-06*(  1.0D0+0.5D0
 	1    *(MU**2)*(SIGMA(I)+SIGMA(I+1))  )/(R(I)+R(I+1))
 10	CONTINUE
-	GAMH(NI)=0.0
+	GAMH(NI)=0.0D0
 	MU=Z(NI)/R(NI)
 	GAM(NI)=3.33564D-06*V(NI)*( 1.0D0+SIGMA(NI)*(MU**2) )/R(NI)
 C

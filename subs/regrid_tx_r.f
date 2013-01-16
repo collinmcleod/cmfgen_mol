@@ -103,9 +103,9 @@
 !
 ! Using the highest level read in, decide whether b, or b-1 have been read in.
 !
-	IF( DABS( TA(NOLD) ) .LT. 0.2 .AND. CHECK_DC)DPOP=DPOP+1.0D0
+	IF( DABS( TA(NOLD) ) .LT. 0.2D0 .AND. CHECK_DC)DPOP=DPOP+1.0D0
 !
-	IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN
+	IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
 	  WRITE(LUER,*)'Warning - core radius not identical in REGRIDWSC_V3'
 	  WRITE(LUER,*)'Rescaling to make Rcore identical'
 	  DO I=1,NDOLD

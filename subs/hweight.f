@@ -48,14 +48,14 @@ C
 	  W(I-2)=W(I-2)-X(I-1)*H*H/12.0D0/RF
 	  W(I-1)=W(I-1)+0.5D0*H*(X(I-1)-H/6.0D0)
 	1              +X(I)*H*H/12.0D0/RE
-	  W(I)=W(I)+0.5*H*(X(I)+H/6.0D0)
+	  W(I)=W(I)+0.5D0*H*(X(I)+H/6.0D0)
 	1              +X(I-1)*H*H/12.0D0/RF
 	  W(I+1)=W(I+1)-X(I)*H*H/12.0D0/RE
 	END DO
 C
-C Assumes that V(mu=0)=0 and mu.V'(mu)=0 at mu=0. 
+C Assumes that V(mu=0)=0 and mu.dV(mu)=0 at mu=0. 
 C
-	IF(X(N) .EQ. 0)THEN
+	IF(X(N) .EQ. 0.0D0)THEN
 	  H=X(N-1)
 	  W(N-1)=W(N-1)+H*H/3.0D0
 	ELSE

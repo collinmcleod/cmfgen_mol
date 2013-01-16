@@ -59,7 +59,7 @@ C
 C
 	IF(THK)THEN
 	  IF(P(LS) .GT. 0)THEN
-	    TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
+	    TOR=CHI(1)*R(1)*R(1)*(1.570796D0-ACOS(P(LS)/R(1)))/P(LS)
 	  ELSE
 	    TOR=CHI(1)*R(1)
 	  END IF
