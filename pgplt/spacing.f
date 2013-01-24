@@ -15,7 +15,7 @@ C
 ! 
 !
 !
-	INTEGER*4 FUNCTION NDEC(XINC)
+	INTEGER FUNCTION NDEC(XINC)
 	IMPLICIT NONE
 !
 ! Function to estimate the numer of digits to be used when labeling
@@ -24,7 +24,7 @@ C
 ! Altered 31-May-2000 : Method changed to overcome rounding problems.
 !
 	REAL*4 XINC
-	INTEGER*4 ITMP
+	INTEGER ITMP
 	CHARACTER*10 STRING
 C
 	IF(XINC .EQ. 0)THEN

@@ -28,11 +28,11 @@ C      PARAMETER(NMAX=131072)
         IF (ISIGN.EQ.1) THEN
           ANS(I)=FFT(I)*ANS(I)/dble(NO2)
         ELSE IF (ISIGN.EQ.-1) THEN
-          IF (CDABS(ANS(I)).EQ.zero) PAUSE 'DECONVOLVING AT A RESPONSE ZER
-     *O'
+          IF (CDABS(ANS(I)) .EQ. zero) PAUSE 'DECONVOLVING AT A RESPONSE ZERO'
           ANS(I)=FFT(I)/ANS(I)/dble(NO2)
         ELSE
-          PAUSE 'NO MEANING FOR ISIGN'
+          WRITE(6,*)'NO MEANING FOR ISIGN in CNVLV'
+	  STOP
         ENDIF
 13    CONTINUE
       ANS(1)=CMPLX(REAL(ANS(1)),REAL(ANS(NO2+1)),kind(0d0))

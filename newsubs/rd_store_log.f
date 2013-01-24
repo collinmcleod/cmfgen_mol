@@ -1,11 +1,11 @@
-!
-! Altered: 11-Mar-2008   For output changed T35 to T40
-! 3-Mar-2000: Created - Based on routines in RD_LOG.
-!	      All calls now RD_STORE_...
-!             Data is first read in from a file and stored.  
-!             Options are then read from store in ANY order.
-!             Only those options requested are checked.
-!             KEYS are checked for uniqueness (7-Jun-2000)
+! Altered: 23-Mar-2012:  Improved error reporting.
+! Altered: 11-Mar-2008:  For output changed T35 to T40
+!           3-Mar-2000:  Created - Based on routines in RD_LOG.
+!	                 All calls now RD_STORE_...
+!                        Data is first read in from a file and stored.  
+!                        Options are then read from store in ANY order.
+!                        Only those options requested are checked.
+!                        KEYS are checked for uniqueness (7-Jun-2000)
 !             
 !             Option access should begin with:
 !	          CALL RD_OPTIONS_INTO_STORE(LU_IN,LU_OUT)
@@ -16,7 +16,7 @@
 	IMPLICIT NONE
 !
 	INTEGER, PARAMETER :: NST_MAX=700
-	CHARACTER*80, ALLOCATABLE :: STORE(:)
+	CHARACTER(LEN=80), ALLOCATABLE :: STORE(:)
 	INTEGER, ALLOCATABLE ::  KEY_ST(:)
 	INTEGER, ALLOCATABLE :: KEY_END(:)
 !
@@ -24,6 +24,7 @@
 	INTEGER I_UP,I_DWN
 	INTEGER LUER
 	INTEGER LUO
+	INTEGER IOS
 !
 	END MODULE RD_VAR_MOD
 !
@@ -35,7 +36,7 @@
 !
 	INTEGER LU_IN,LU_OUT
 !
-	INTEGER I,J,IOS
+	INTEGER I,J
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 !
@@ -111,7 +112,6 @@
 	SUBROUTINE CLEAN_RD_STORE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
-	INTEGER IOS
 !
 	DEALLOCATE (STORE,STAT=IOS)
 	IF(IOS .EQ. 0)DEALLOCATE (KEY_ST,STAT=IOS)
@@ -135,7 +135,7 @@
 ! Altered 27-Apr-2007: STRING that is returned no longer has key and comment
 !                         included.
 !
-	CHARACTER*(*) KEY,STRING
+	CHARACTER(LEN=*) KEY,STRING
 	LOGICAL MUST_BE_PRES
 	LOGICAL KEY_FOUND
 !
@@ -180,12 +180,26 @@
 	LOGICAL VALUE
 	LOGICAL MUST_BE_PRES
 	LOGICAL KEY_FOUND
-	CHARACTER*(*) KEY,A
-	CHARACTER*80 STRING
+	CHARACTER(LEN=*) KEY,A
+	CHARACTER(LEN=80) STRING
 !
 	CALL GET_KEY_STRING(STRING,KEY,MUST_BE_PRES,KEY_FOUND)
 	IF(.NOT. KEY_FOUND)RETURN
-	READ(STRING,*)VALUE
+	READ(STRING,*,IOSTAT=IOS)VALUE
+	IF(IOS .NE. 0)THEN
+	  WRITE(LUER,*)'Error reading logical value with RD_STORE_LOG'
+	  WRITE(LUER,*)'String with error follows:'
+	  WRITE(LUER,*)TRIM(STRING)
+	  STOP
+	END IF
+	STRING=ADJUSTL(STRING)
+	IF(STRING(1:1) .NE. 'T' .AND. STRING(1:1) .NE. 'F')THEN
+	  WRITE(LUER,*)'Error reading logical value with RD_STORE_LOG'
+	  WRITE(LUER,*)'Use F [or FALSE] and T [or TRUE] for logical variables'
+	  WRITE(LUER,*)'String with error follows'
+	  WRITE(LUER,*)TRIM(STRING)
+	  STOP
+	END IF
 	WRITE(LUO,10)VALUE,TRIM(KEY),TRIM(A)
 10	FORMAT(12X,L1,5X,'[',A,']',T40,A)
 !
@@ -199,8 +213,8 @@
 	LOGICAL VALUE1,VALUE2
 	LOGICAL MUST_BE_PRES
 	LOGICAL KEY_FOUND
-	CHARACTER*(*) KEY,A
-	CHARACTER*80 STRING
+	CHARACTER(LEN=*) KEY,A
+	CHARACTER(LEN=80) STRING
 !
 	CALL GET_KEY_STRING(STRING,KEY,MUST_BE_PRES,KEY_FOUND)
 	IF(.NOT. KEY_FOUND)RETURN
@@ -218,12 +232,18 @@
 	INTEGER VALUE
 	LOGICAL MUST_BE_PRES
 	LOGICAL KEY_FOUND
-	CHARACTER*(*) KEY,A
-	CHARACTER*80 STRING
+	CHARACTER(LEN=*) KEY,A
+	CHARACTER(LEN=80) STRING
 !
 	CALL GET_KEY_STRING(STRING,KEY,MUST_BE_PRES,KEY_FOUND)
 	IF(.NOT. KEY_FOUND)RETURN
-	READ(STRING,*)VALUE
+	READ(STRING,*,IOSTAT=IOS)VALUE
+	IF(IOS .NE. 0)THEN
+	  WRITE(LUER,*)'Error reading integer value with RD_STORE_INT'
+	  WRITE(LUER,*)'String with error follows:'
+	  WRITE(LUER,*)TRIM(STRING)
+	  STOP
+	END IF
 	WRITE(LUO,10)VALUE,TRIM(KEY),TRIM(A)
 10	FORMAT(5X,I8,5X,'[',A,']',T40,A)
 !
@@ -239,12 +259,18 @@
 	LOGICAL MUST_BE_PRES
 	LOGICAL KEY_FOUND
 	INTEGER I
-	CHARACTER*(*) KEY,A
-	CHARACTER*80 STRING
+	CHARACTER(LEN=*) KEY,A
+	CHARACTER(LEN=80) STRING
 !
 	CALL GET_KEY_STRING(STRING,KEY,MUST_BE_PRES,KEY_FOUND)
 	IF(.NOT. KEY_FOUND)RETURN
-	READ(STRING,*)VALUE1,VALUE2
+	READ(STRING,*,IOSTAT=IOS)VALUE1,VALUE2
+	IF(IOS .NE. 0)THEN
+	  WRITE(LUER,*)'Error reading integer values with RD_STORE_2INT'
+	  WRITE(LUER,*)'String with error follows:'
+	  WRITE(LUER,*)TRIM(STRING)
+	  STOP
+	END IF
 	WRITE(STRING,'(I8,A,I8)')VALUE1,',',VALUE2
 	I=1
 	DO WHILE(I.LE. LEN_TRIM(STRING))
@@ -267,12 +293,18 @@
 	REAL*8 VALUE
 	LOGICAL MUST_BE_PRES
 	LOGICAL KEY_FOUND
-	CHARACTER*(*) KEY,A
-	CHARACTER*80 STRING
+	CHARACTER(LEN=*) KEY,A
+	CHARACTER(LEN=80) STRING
 !
 	CALL GET_KEY_STRING(STRING,KEY,MUST_BE_PRES,KEY_FOUND)
 	IF(.NOT. KEY_FOUND)RETURN
-	READ(STRING,*)VALUE
+	READ(STRING,*,IOSTAT=IOS)VALUE
+	IF(IOS .NE. 0)THEN
+	  WRITE(LUER,*)'Error reading double precision value with RD_STORE_DBLE'
+	  WRITE(LUER,*)'String with error follows:'
+	  WRITE(LUER,*)TRIM(STRING)
+	  STOP
+	END IF
 	WRITE(LUO,10)VALUE,TRIM(KEY),TRIM(A)
 10	FORMAT(1X,1PE12.5,5X,'[',A,']',T40,A)
 !
@@ -288,7 +320,7 @@
 !                       (Alteration done much earlier on ROSELLA).
 !
 	IMPLICIT NONE
-	CHARACTER*(*) KEY,A
+	CHARACTER(LEN=*) KEY,A
 	CHARACTER(LEN=*) VALUE
 	CHARACTER(LEN=80) STRING
 	CHARACTER(LEN=13) TMP_STR	!Must be 13 for output format
@@ -337,8 +369,8 @@
 	IMPLICIT NONE
 	INTEGER NCHAR
 	INTEGER I
-	CHARACTER*(*) KEY,A,VALUE
-	CHARACTER*80 STRING
+	CHARACTER(LEN=*) KEY,A,VALUE
+	CHARACTER(LEN=80) STRING
 	LOGICAL MUST_BE_PRES
 	LOGICAL KEY_FOUND
 !
@@ -374,7 +406,7 @@
 ! Created 07-Jun-2000
 !
 	INTEGER CNT
-	CHARACTER*(*) SUB_KEY
+	CHARACTER(LEN=*) SUB_KEY
 !
 	INTEGER I,BEG_CNT,END_CNT
 !
@@ -419,12 +451,18 @@
 	LOGICAL MUST_BE_PRES
 	LOGICAL KEY_FOUND
 	INTEGER I
-	CHARACTER*(*) KEY,A
-	CHARACTER*80 STRING
+	CHARACTER(LEN=*) KEY,A
+	CHARACTER(LEN=80) STRING
 !
 	CALL GET_KEY_STRING(STRING,KEY,MUST_BE_PRES,KEY_FOUND)
 	IF(.NOT. KEY_FOUND)RETURN
 	READ(STRING,*)VALUE1,VALUE2,VALUE3
+	IF(IOS .NE. 0)THEN
+	  WRITE(LUER,*)'Error reading 3 integer values with RD_STORE_3INT'
+	  WRITE(LUER,*)'String with error follows:'
+	  WRITE(LUER,*)TRIM(STRING)
+	  STOP
+	END IF
 	WRITE(STRING,'(I8,A,I8,A,I8)')VALUE1,',',VALUE2,',',VALUE3
 	I=1
 	DO WHILE(I.LE. LEN_TRIM(STRING))

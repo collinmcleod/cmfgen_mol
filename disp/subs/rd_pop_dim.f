@@ -45,21 +45,22 @@ C
 	NCIII=0
 	DO WHILE(INDX .EQ. 0)
 	  READ(LUIN,'(A)',IOSTAT=IOS,END=1000)STRING
+C
+	  IF(IOS .NE. 0)THEN
+	    WRITE(LUER,*)'***************************************************'
+	    WRITE(LUER,*)'***************************************************'
+	    WRITE(LUER,*)'Warning : Unable to get Number of levels record'
+	    WRITE(LUER,*)'Species is: ', DESC
+	    WRITE(LUER,*)'Warning ocurred in RD_POP_DIM'
+	    WRITE(LUER,*)'***************************************************'
+	    WRITE(LUER,*)'***************************************************'
+	    CIII_PRES=.FALSE.
+	    NCIII=1		!So NCIII can be used as dimension limit.
+	    RETURN
+	  END IF
+!
 	  INDX=INDEX(STRING,'Number of ')
 	END DO
-C
-	IF(IOS .NE. 0)THEN
-	  WRITE(LUER,*)'***************************************************'
-	  WRITE(LUER,*)'***************************************************'
-	  WRITE(LUER,*)'Warning : Unable to get Number of levels record'
-	  WRITE(LUER,*)'Species is: ', DESC
-	  WRITE(LUER,*)'Warning ocurred in RD_POP_DIM'
-	  WRITE(LUER,*)'***************************************************'
-	  WRITE(LUER,*)'***************************************************'
-	  CIII_PRES=.FALSE.
-	  NCIII=1		!So NCIII can be used as dimension limit.
-	  RETURN
-	END IF
 C
 	IF( INDEX(STRING,'Number of '//DESC//' levels:') .NE. 0 .OR.
 	1       INDEX(STRING,'Number of '//TRIM(UC(DESC))//' levels:')

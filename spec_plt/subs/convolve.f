@@ -47,22 +47,22 @@
 	real*8, allocatable :: tempwave(:)
 	real*8, allocatable :: tempflux(:)
 !
-	integer*4 Nmod
-	integer*4 Ntmp
+	integer Nmod
+	integer Ntmp
 	real*8 cwave_max,cwave_min
 	real*8 model_res    ! the model resolution
 	real*8 min_dlam     ! the model resolution
 	real*8 kernal_sig   ! the corresponding sigma (fwhm = 2.354sig)
 	real*8 extend       ! wavelength extension to consider
                             ! in convolution
-	integer*4 alter_min ! min and max indices of original array to be
-	integer*4 alter_max ! changed.
-	integer*4 con_min   ! the min and max indices of original
-        integer*4 con_max   ! to be *considered*
-	integer*4 larger_index
-	integer*4 smaller_index
-	integer*4 i_min,i_max
-	integer*4 ios
+	integer alter_min ! min and max indices of original array to be
+	integer alter_max ! changed.
+	integer con_min   ! the min and max indices of original
+        integer con_max   ! to be *considered*
+	integer larger_index
+	integer smaller_index
+	integer i_min,i_max
+	integer ios
 	logical fft         ! 1=fft method, 0=straight convolution
 	                    ! need to make the following parameters
 !
@@ -171,7 +171,7 @@ C
 	subroutine convolve(wave,flux,Nmod,sigma,vsini,epsilon,fft)
 	implicit none
 !
-	integer*4 Nmod
+	integer Nmod
 	real*8 wave(Nmod)
 	real*8 flux(Nmod)
 	real*8 sigma
@@ -195,8 +195,9 @@ C
 
 	subroutine nonfftconvolve(wave,flux,Nmod,sigma,vsini,epsilon)
 	implicit none
+	include 'constants.inc'
 
-	integer*4 Nmod
+	integer Nmod
 	real*8 wave(Nmod)
 	real*8 flux(Nmod)
 	real*8 sigma
@@ -205,17 +206,16 @@ C
 !
 	real*8 answer(Nmod)
 	real*8 response(Nmod)
-	integer*4 Nresponse,nron2
-	integer*4 i       ! index for convolution array
-	integer*4 j       ! index for response array
-	integer*4 k       ! index for model array
-	integer*4 l       ! temporay index for model array in concolution
+	integer Nresponse,nron2
+	integer i       ! index for convolution array
+	integer j       ! index for response array
+	integer k       ! index for model array
+	integer l       ! temporay index for model array in concolution
 !
 	if(vsini .eq. 0)then
-	  call fillresponse(wave,response,Nmod,Nresponse,sigma,0)
+	  call fillresponse(wave,response,Nmod,Nresponse,sigma,izero)
 	else
-	  call fill_rot_response(wave,response,Nmod,Nresponse,
-	1                              vsini,epsilon,0)
+	  call fill_rot_response(wave,response,Nmod,Nresponse,vsini,epsilon,izero)
 	end if
 	nron2=Nresponse/2
 !
@@ -281,15 +281,15 @@ C
 	real*8 flux(NMAX)
 	real*8 response(NMAX)
 	real*8 ans(NMAX)
-	integer*4 Nmod
+	integer Nmod
 	real*8 sigma
 
 	real*8 dlam
-	integer*4 length,i
-	integer*4 isign,Nresponse
+	integer length,i
+	integer isign,Nresponse
 !
 	external log2
-	integer*4 log2
+	integer log2
 
 C       The numerical recipies routines demand that the  length of the 
 C       data array to be some power of 2 
@@ -307,7 +307,7 @@ C       Fill out data the rest of the data array with zeros.
 	   wave(i) = dlam + wave(i-1)
 	end do
 
-	call fillresponse(wave,response,length,Nresponse,sigma,1)
+	call fillresponse(wave,response,length,Nresponse,sigma,ione)
 
 C	call dp_curve(Nresponse,wave,response)
 
@@ -332,15 +332,15 @@ C
 	implicit none
 	include 'constants.inc'
 
-	integer*4 Nmod           ! size of data array
+	integer Nmod           ! size of data array
 	real*8 wave(Nmod)        ! wavelength array
 	real*8 response(Nmod)    ! response array
 	real*8 sigma             ! sigma of gaussian 
-	integer*4 Nresponse      ! size of response array
-	integer*1 wrap           ! fill in wrap-around order?
+	integer Nresponse      ! size of response array
+	integer wrap           ! fill in wrap-around order?
 !
 	integer, parameter :: num_sigmas=5
-	integer*4 i
+	integer i
 	real*8 lambda,dlam,cutoff,mu
 	real*8 gauss
 	real*8 response_area
@@ -406,15 +406,15 @@ C
 	implicit none
 	include 'constants.inc'
 !
-	integer*4 Nmod           ! size of data array
+	integer Nmod           ! size of data array
 	real*8 wave(Nmod)     	! wavelength array
 	real*8 response(Nmod) 	! response array
 	real*8 vsini
 	real*8 epsilon
-	integer*4 Nresponse      ! size of response array
-	integer*1 wrap           ! fill in wrap-around order?
+	integer Nresponse      ! size of response array
+	integer wrap           ! fill in wrap-around order?
 
-	integer*4 i
+	integer i
 	real*8 lambda,dlam,cutoff,mu
 	real*8 response_area
 	real*8 t1,dlam_rot,a1,a2
@@ -512,7 +512,7 @@ C
 	function log2(n)
 
 	implicit none
-	integer*4 n,log2,junk
+	integer n,log2,junk
 
 	log2 = 0
 	junk = n/2
@@ -533,15 +533,15 @@ C
 	subroutine linearize_v2(wave,flux,n,nmax,dlam)
 	implicit none
 !
-	integer*4 n
-	integer*4 nmax
+	integer n
+	integer nmax
 	real*8 wave(NMAX),flux(NMAX)
 	real*8 dlam 				! even spacing in wavelength
 !
 	real*8 tempwave(N),tempflux(N)
-	integer*4 nnew
-	integer*4 i
 	real*8 dlamover2
+	integer nnew
+	integer i
 !
 	dlamover2 = 0.5d0*dlam
 	nnew = (wave(n)-wave(1))/dlam  ! this will shorten wavelength 

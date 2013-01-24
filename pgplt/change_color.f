@@ -9,14 +9,14 @@ C Created September 1996 by Gregson Vaux
 C
       IMPLICIT NONE
 C
-      INTEGER*4 I,NC,JUST,AXIS,IRET
+      INTEGER I,NC,JUST,AXIS,IRET
       REAL*4 RED(0:15),BLUE(0:15),GREEN(0:15)
       REAL*4 XBEG,XEND,YBEG,YEND,HEIGHT
       REAL*4 COL(3)
-      INTEGER*4 ROUT,BOUT,GOUT
+      INTEGER ROUT,BOUT,GOUT
       CHARACTER*8 ICH(1:15),RCH(0:15),BCH(0:15),GCH(0:15)
 C
-      INTEGER*4, PARAMETER :: ITHREE=3
+      INTEGER, PARAMETER :: ITHREE=3
 C
 C Clear screen and ouput sample of pens to plot device
 C

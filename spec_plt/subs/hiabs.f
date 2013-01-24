@@ -61,6 +61,7 @@ C
 	REAL*8 FUN_PI
 	REAL*8 VOIGT
 	EXTERNAL SPEED_OF_LIGHT,FUN_PI,VOIGT
+	CHARACTER(LEN=1) TMP_STR
 C
 C First read in the atomic data, kindly provided by Chuck Bowers (CWB).
 C
@@ -75,8 +76,8 @@ C
 	OPEN(UNIT=10,FILE='HI_IS_LINE_LIST',ACTION='READ',STATUS='OLD',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(6,*)'HI_IS_LINE_LIST file not found'
-	    WRITE(6,*)'Use astxt to assign file, then hit return/enter'
-	    PAUSE
+	    WRITE(6,*)'Use astxt to assign file, then hit any character and return/enter'
+	    READ(6,'(A)')TMP_STR 
 	    GOTO 100
 	  END IF
 	  DO I=1,NHYD

@@ -18,8 +18,10 @@
 	INTEGER SETVBUF
 	INTEGER IOS
 !
+! Comment out SETVBUF line for non PGI systems
+!	
+	IOS=0
 	IOS=SETVBUF(LU,IONE,LEN_BUF,MY_BUFFER)
-!
 	IF(IOS .NE. 0)THEN
 	  WRITE(LU,*)'Error setting bufer in SET_LINE_BUFFERING'
 	  WRITE(LU,*)'IOS=',IOS

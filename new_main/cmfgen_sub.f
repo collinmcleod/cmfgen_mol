@@ -64,7 +64,7 @@
 	INTEGER NCF
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
-	CHARACTER(LEN=12), PARAMETER :: PRODATE='10-Jan-2012'		!Must be changed after alterations
+	CHARACTER(LEN=12), PARAMETER :: PRODATE='16-Jan-2013'		!Must be changed after alterations
 !
 ! 
 !

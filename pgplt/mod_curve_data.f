@@ -1,21 +1,24 @@
 	MODULE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
-! Altered 28-MAr-2003: LU_ER changed from 5 to 6.
+! Altered 24-Jan-2013: Vectors in CURVE_DATA in no longer a pointer.
+!                      This required ASSOICATED test to be replaced by ALLOCATED
+!                         test in several routines. 
+! Altered 28-Mar-2003: LU_ER changed from 5 to 6.
 !
-	INTEGER*4, PARAMETER :: MAX_PLTS=50
-	INTEGER*4, PARAMETER :: LU_ER=6
-	INTEGER*4 IOS
+	INTEGER, PARAMETER :: MAX_PLTS=50
+	INTEGER, PARAMETER :: LU_ER=6
+	INTEGER IOS
 !
-	INTEGER*4 NPLTS
-	INTEGER*4 NPTS(MAX_PLTS)
+	INTEGER NPLTS
+	INTEGER NPTS(MAX_PLTS)
 	LOGICAL   ERR(MAX_PLTS)
 !
 	TYPE CURVE_DATA
-	  REAL*4, POINTER :: XVEC(:)
-	  REAL*4, POINTER :: DATA(:)
-	  REAL*4, POINTER :: EMIN(:)
-	  REAL*4, POINTER :: EMAX(:)
+	  REAL*4, ALLOCATABLE :: XVEC(:)
+	  REAL*4, ALLOCATABLE :: DATA(:)
+	  REAL*4, ALLOCATABLE :: EMIN(:)
+	  REAL*4, ALLOCATABLE :: EMAX(:)
 	END TYPE CURVE_DATA
 !
 	DATA NPTS/MAX_PLTS*0/

@@ -14,12 +14,10 @@ LIB_MOD=$(LIB_DIR)libmod.a
 #
 OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(adjust_pops.o)\
-      $(LIB)(ba_update_v6.o)\
       $(LIB)(ba_update_v7.o)\
       $(LIB)(check_hydro_def.o)\
       $(LIB)(check_ions_present.o)\
       $(LIB)(check_tmin.o)\
-      $(LIB)(cmf_blkband_v2.o)\
       $(LIB)(cmf_blkband_v3.o)\
       $(LIB)(create_iv_links_v2.o)\
       $(LIB)(determine_nse.o)\
@@ -30,7 +28,6 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(do_cmf_hydro_v2.o)\
       $(LIB)(do_ng_accel_band_v2.o)\
       $(LIB)(eval_adiabatic_v3.o)\
-      $(LIB)(evalse_qwvj_v6.o)\
       $(LIB)(evalse_qwvj_v7.o)\
       $(LIB)(evalse_lowt_v1.o)\
       $(LIB)(evalse_x_qwvj_v4.o)\
@@ -41,8 +38,6 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(fixpop_in_ba_v3.o)\
       $(LIB)(generate_full_matrix_v3.o)\
       $(LIB)(get_non_loc_gamma_energy.o)\
-      $(LIB)(get_pops_at_prev_time_step_v2.o)\
-      $(LIB)(get_pops_at_prev_time_step_v3.o)\
       $(LIB)(get_pops_at_prev_time_step_v5.o)\
       $(LIB)(old_grid_module.o)\
       $(LIB)(prevent_low_t.o)\
@@ -54,10 +49,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(set_rv_hydro_model_v3.o)\
       $(LIB)(set_imp_vec.o)\
       $(LIB)(set_new_grid.o)\
-      $(LIB)(solveba_v6.o)\
-      $(LIB)(solveba_v7.o)\
       $(LIB)(solveba_v9.o)\
-      $(LIB)(steq_multi_v7.o)\
       $(LIB)(steq_multi_v8.o)\
       $(LIB)(steqne_v4.o)\
       $(LIB)(steq_advec_v4.o)\
@@ -66,11 +58,8 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(store_ba_data_v2.o)\
       $(LIB)(sum_steq_sol.o)\
       $(LIB)(tst_rd_seq.o)\
-      $(LIB)(var_op_v8.o)\
       $(LIB)(var_op_v10.o)\
-      $(LIB)(var_x_opa_eta_v3.o)\
       $(LIB)(var_x_opa_eta_v4.o)\
-      $(LIB)(vsebyj_multi_v6.o)\
       $(LIB)(vsebyj_multi_v7.o)\
       $(LIB)(vsebyj_x_v6.o)\
       $(LIB)(write_cmat.o)\
@@ -100,7 +89,6 @@ UP_MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
        $(LIB_DIR)libmod.a(opac_mod.o)\
        $(LIB_DIR)libmod.a(radiation_mod.o)\
        $(LIB_DIR)libmod.a(steq_data_mod.o)\
-       $(LIB_DIR)libmod.a(radiation_mod.o)\
        $(LIB_DIR)libmod.a(var_rad_mod.o)
 
 $(LIB)(%.o) : %.f  $(STEQ)
@@ -171,6 +159,11 @@ $(LIB)(set_new_grid.o) : set_new_grid.f $(MOD)
 	$(F90) -c $(OPTION) set_new_grid.f
 	ar ruv $(LIB) set_new_grid.o
 
+$(LIB)(steq_advec_v4.o) : steq_advec_v4.f $(MOD) $(STEQ)
+	$(F90) -c $(OPTION) steq_advec_v4.f
+	ar ruv $(LIB) steq_advec_v4.o
+
+
 $(LIB)(store_old_grid.o) : store_old_grid.f $(MOD)  $(LIB)(old_grid_module.o)
 	$(F90) -c $(OPTION) store_old_grid.f
 	ar ruv $(LIB) store_old_grid.o
@@ -187,17 +180,17 @@ $(LIB)(set_ba_storage.o) : set_ba_storage.f $(STEQ) $(MOD)
 	$(F90) -c $(OPTION)  set_ba_storage.f
 	ar ruv $(LIB) set_ba_storage.o
 
-$(LIB)(steq_co_mov_deriv_v2.o) : steq_co_mov_deriv_v2.f $(STEQ) $(MOD)
-	$(F90) -c $(OPTION)  steq_co_mov_deriv_v2.f
-	ar ruv $(LIB) steq_co_mov_deriv_v2.o
+$(LIB)(steq_co_mov_deriv_v3.o) : steq_co_mov_deriv_v3.f $(STEQ) $(MOD)
+	$(F90) -c $(OPTION)  steq_co_mov_deriv_v3.f
+	ar ruv $(LIB) steq_co_mov_deriv_v3.o
 
 $(LIB)(update_ba_for_line.o) : update_ba_for_line.f $(UP_MODS)
 	$(F90) -c $(OPTION)  update_ba_for_line.f
 	ar ruv $(LIB) update_ba_for_line.o
 
-$(LIB)(var_op_v8.o) : var_op_v8.f $(DIS)
-	$(F90) -c $(OPTION)  var_op_v8.f
-	ar ruv $(LIB) var_op_v8.o
+$(LIB)(var_op_v10.o) : var_op_v10.f $(DIS)
+	$(F90) -c $(OPTION)  var_op_v10.f
+	ar ruv $(LIB) var_op_v10.o
 
 $(STEQ):
 	(cd ../mod_subs ; make)

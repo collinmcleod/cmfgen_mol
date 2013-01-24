@@ -320,7 +320,7 @@
 ! NB: E(rad field)=4. pi J /c = 4 sigma T^4 /c (as  J=B= sigma T^4 / pi)
 !
 	WRITE(LU,'(A)')' '
-	WRITE(LU,'(A,F9.6))')'OLD_R/R=',OLD_R(ND)/R(ND)
+	WRITE(LU,'(A,F9.6)')'OLD_R/R=',OLD_R(ND)/R(ND)
 	WRITE(LU,'(A)')'Term comparisons'
 	WRITE(LU,'(A)')' '
 	WRITE(LU,'(A,14(4X,A))')'   I','  Cur. T','   Old T',' ER(cur)',' ER(old)',
