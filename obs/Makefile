@@ -33,7 +33,7 @@ FN7=$(LIB_DIR)lib$(LN7).a
 # or if the libraries have changed since the last link.
 #
  
-OBJ1  =  cmf_flux_v5.o cmf_flux_sub_v5.o mod_cmf_obs.o\
+OBJ1  =  cmf_flux_v5.o cmf_flux_sub_v5.o mod_cmf_obs.o mod_freq_obs.o \
         cmf_flux_cntrl_var_mod.o rd_cmf_flux_controls.o check_cmf_flux_param_consis.o \
         rd_model_file.o revise_obs_p.o  ins_line_v5.o obs_frame_sub_v9.o\
         mon_interp_fast.o ins_line_obs_v4.o rd_cont_j_obs.o 
@@ -57,7 +57,7 @@ $(EXE_DIR)obs_frame.exe :  $(OBJ2) $(FN1) $(FN2) $(FN3) $(FN4)
 	$(F90) $(OBJ2) \
               -L$(LIB_DIR) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) \
                $(LOCLIB) \
-              -o $(EXE_DIR)obs_frame.exe
+              -o  $(EXE_DIR)obs_frame.exe
 
 # General rule to compile a fortran ".f" file.
 
@@ -68,13 +68,22 @@ $(EXE_DIR)obs_frame.exe :  $(OBJ2) $(FN1) $(FN2) $(FN3) $(FN4)
 # I use F90noamp because of an issue with the PGF95 compiler on the Mac PRO.
 #
 
-cmf_flux_v5.o : cmf_flux_v5.f      mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(USR)
-	$(F90nomp) -c $(OPTION) cmf_flux_v5.f 
+cmf_flux_v5.o : cmf_flux_v5.f  mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(USR)
+	$(F90) -c $(OPTION) cmf_flux_v5.f 
 
-cmf_flux_sub_v5.o : cmf_flux_sub_v5.f  mod_cmf_obs.o  cmf_flux_cntrl_var_mod.o $(GEN) \
+#	$(F90nomp) -c $(OPTION) cmf_flux_v5.f 
+
+
+
+cmf_flux_sub_v5.o : cmf_flux_sub_v5.f  mod_cmf_obs.o  mod_freq_obs.o cmf_flux_cntrl_var_mod.o $(GEN) \
    COMP_JCONT_V4.INC  EVAL_LTE_INC_V5.INC\
    OPACITIES_V5.INC   XOPAC_V4.INC
-	$(F90nomp) -c $(OPTION) cmf_flux_sub_v5.f 
+	$(F90) -c $(OPTION) cmf_flux_sub_v5.f 
+
+#	$(F90) -c $(OPTION) cmf_flux_sub_v5.f 
+
+
+
 
 USR = ../lib/libtools.a(usr_option.o)
 GEN = ../lib/libmod.a(mod_lev_dis_blk.o)

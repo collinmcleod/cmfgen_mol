@@ -10,9 +10,16 @@
 !
 	SUBROUTINE CMF_FLUX_SUB_V5(ND,NC,NP,NDMAX,NPMAX,NT,NLINE_MAX)
 	USE MOD_CMF_OBS
+	USE MOD_FREQ_OBS
 	USE CMF_FLUX_CNTRL_VAR_MOD
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
+!
+! Altered: 21-Jan-2013 : Change to vectors passed to SET_PRO_V3. Error probably affects IR HeI lines.
+!                           No change top UV/optical spectrum was seen.
+!                        Placed large vectors (dimension with NCF_MAX and NLINE_MAX) in module MOD_FREQ_OBS.
+!                           These were being placed on the stack, and limiting the available stacks size.
+!                           Error in STACK found using -g debug option with -Mchkstk.
 !
 ! Altered:  1-Oct-2012 : Fixed bug: NC_OBS was not being set for the normal P-grid which caused
 !                           a problem with the observer's frame calculation.
@@ -46,12 +53,6 @@
 ! Altered: 04-Jan-2000 : We now check that arrays can be allocated.
 ! Finalized: 5-Jan-1999
 !
-! NCF_MAX is the maximum number of continuum points (which will include line
-! frequencies in blanketing mode) which can be treated. For small DOPPLER widths
-! and large frequency ranges this might need to be increased.
-!
-	INTEGER, PARAMETER :: NCF_MAX=1500000
-!
 ! Maximum number of lines whose profile overlap at a given frequency.
 !
 	INTEGER, PARAMETER :: MAX_SIM=3000
@@ -62,21 +63,21 @@
 !
 	INTEGER, PARAMETER :: NLINES_PROF_STORE=500
         INTEGER, PARAMETER :: NFREQ_PROF_STORE=20000
-C
+!
 	INTEGER NCF
 	INTEGER ND,NC,NP
 	INTEGER NDMAX,NPMAX
 	INTEGER NT,NLINE_MAX
-C
+!
 	REAL*8 POPS(NT,ND)
-C
-C Constants for opacity etc.
-C
+!
+! Constants for opacity etc.
+!
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-C
-C Internally used variables
-C
+!
+! Internally used variables
+!
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
 	REAL*8 OPLIN,EMLIN
 	REAL*8 DTDR,BNUE,DBB,DDBBDT
@@ -86,50 +87,50 @@ C
 	REAL*8 T1,T2,T3,T4
 	REAL*8 FL,FL_OLD
 	REAL*8 FG_COUNT
-C
-C
-C REC_SIZE     is the (maximum) record length in bytes.
-C UNIT_SIZE    is the number of bytes per unit that is used to specify
-C                 the record length (thus RECL=REC_SIZ_LIM/UNIT_SIZE).
-C WORD_SIZE    is the number of bytes used to represent the number.
-C N_PER_REC    is the # of POPS numbers to be output per record.
-C
+!
+!
+! REC_SIZE     is the (maximum) record length in bytes.
+! UNIT_SIZE    is the number of bytes per unit that is used to specify
+!                 the record length (thus RECL=REC_SIZ_LIM/UNIT_SIZE).
+! WORD_SIZE    is the number of bytes used to represent the number.
+! N_PER_REC    is the # of POPS numbers to be output per record.
+!
  	INTEGER REC_SIZE
 	INTEGER UNIT_SIZE
 	INTEGER WORD_SIZE
 	INTEGER N_PER_REC
-C
-C 
-C Logical Unit assignments. Those indicated with a # after the ! are open in
-C  large sections of the code. Other units generally used temprarily.
-C
+!
+! 
+! Logical Unit assignments. Those indicated with a # after the ! are open in
+!  large sections of the code. Other units generally used temprarily.
+!
 	INTEGER               LUER        !Output/Error file.
 	INTEGER, PARAMETER :: LUIN=7      !General input unit (closed after accesses).
 	INTEGER, PARAMETER :: LUMOD=8     !Model Description file.
-C
+!
 	INTEGER, PARAMETER :: LU_FLUX=10   	!Flux/Luminosity Data (OBSFLUX)
 	INTEGER, PARAMETER :: LU_OPAC=18   	!Rosseland mean opacity etc.
 	INTEGER, PARAMETER :: LU_EW=20     	!# EW data.
-C
+!
 	INTEGER, PARAMETER :: LU_EDD=35       !Continuum Eddington factors.
 	INTEGER, PARAMETER :: LU_JCOMP=37     !J_COMP
 	INTEGER, PARAMETER :: LU_ES=38        !ES_J_CONV
-C
-C For listing of transitions with TOTAL negative opacity values at some depths.
-C
+!
+! For listing of transitions with TOTAL negative opacity values at some depths.
+!
 	INTEGER, PARAMETER :: LU_NEG=75
-C
-C 
-C
+!
+! 
+!
 	INTEGER NL,NUP
 	INTEGER MNL,MNUP
 	INTEGER MNL_F,MNUP_F
 	INTEGER I,J,K,L,ML,LS,LINE_INDX
 	INTEGER ID,ID_SAV,ISPEC
 	INTEGER ES_COUNTER
-C
-C Functions called
-C
+!
+! Functions called
+!
 	INTEGER ICHRLEN,ERROR_LU
 	REAL*8 LAMVACAIR
 	REAL*8 ATOMIC_MASS_UNIT
@@ -138,46 +139,21 @@ C
 	EXTERNAL JTRPWGT,HTRPWGT,KTRPWGT,NTRPWGT
 	EXTERNAL ICHRLEN,ERROR_LU,SPEED_OF_LIGHT
 	EXTERNAL LAMVACAIR,ATOMIC_MASS_UNIT
-C
-C 
+!
+! 
 	CHARACTER FMT*120
 	CHARACTER SECTION*20
 	CHARACTER TMP_KEY*20
 	CHARACTER STRING*132
 	CHARACTER EW_STRING*132
 	CHARACTER TEMP_CHAR*132
-C
-C Global vectors:
-C
-	REAL*8 AMASS_ALL(NT)
-C
-C Arrays for performing LINE frequencies in numerical order
-C
-	REAL*8 VEC_FREQ(NLINE_MAX)
-	REAL*8 VEC_STRT_FREQ(NLINE_MAX)
-	REAL*8 VEC_OSCIL(NLINE_MAX)
-	REAL*8 VEC_EINA(NLINE_MAX)
-	REAL*8 VEC_ARAD(NLINE_MAX)
-	REAL*8 VEC_DP_WRK(NLINE_MAX)
-	REAL*8 VEC_VDOP_MIN(NLINE_MAX)
-C
-	INTEGER VEC_INDX(NLINE_MAX)
-	INTEGER VEC_NL(NLINE_MAX)
-	INTEGER VEC_NUP(NLINE_MAX)
-	INTEGER VEC_MNL_F(NLINE_MAX)
-	INTEGER VEC_MNUP_F(NLINE_MAX)
-	INTEGER VEC_INT_WRK(NLINE_MAX)
-	INTEGER PROF_LIST_LOCATION(NLINE_MAX)
-	CHARACTER*6 VEC_SPEC(NLINE_MAX)
-	CHARACTER*6 VEC_TRANS_TYPE(NLINE_MAX)
-	CHARACTER*12 PROF_TYPE(NLINE_MAX)
-	CHARACTER*12 VEC_CHAR_WRK(NLINE_MAX)
-	CHARACTER*80, ALLOCATABLE :: VEC_TRANS_NAME(:)
-	INTEGER N_LINE_FREQ
 !
-C
-C Arrays and variables for treating lines simultaneously.
-C
+! Global vectors:
+!
+	REAL*8 AMASS_ALL(NT)
+!
+! Arrays and variables for treating lines simultaneously.
+!
 	REAL*8 EINA(MAX_SIM)
 	REAL*8 OSCIL(MAX_SIM)
 	REAL*8 GLDGU(MAX_SIM)
@@ -185,7 +161,7 @@ C
 	REAL*8 FL_SIM(MAX_SIM)
 	INTEGER SIM_NL(MAX_SIM)
 	INTEGER SIM_NUP(MAX_SIM)
-C
+!
 	REAL*8 CHIL_MAT(ND,MAX_SIM)
 	REAL*8 ETAL_MAT(ND,MAX_SIM)
 	REAL*8 BB_COR(ND,MAX_SIM)
@@ -198,44 +174,40 @@ C
 	REAL*8 CONT_INT
 	LOGICAL OVERLAP
 	LOGICAL SOBOLEV
-C
-C L refers to the lower level, U to the upper level.
-C
+!
+! L refers to the lower level, U to the upper level.
+!
 	REAL*8 L_STAR_RATIO(ND,MAX_SIM)
 	REAL*8 U_STAR_RATIO(ND,MAX_SIM)
-C
+!
 	REAL*8, ALLOCATABLE :: ETA_CMF_ST(:,:)
 	REAL*8, ALLOCATABLE :: CHI_CMF_ST(:,:)
 	REAL*8, ALLOCATABLE :: RJ_CMF_ST(:,:)
 	REAL*8, ALLOCATABLE :: ION_LINE_FORCE(:,:)
-C
-C Vectors for treating lines simultaneously with the continuum.
-C
-	INTEGER LINES_THIS_FREQ(NCF_MAX)
-	INTEGER LINE_ST_INDX_IN_NU(NLINE_MAX)
-	INTEGER LINE_END_INDX_IN_NU(NLINE_MAX)
+!
+! Vectors for treating lines simultaneously with the continuum.
+!
 	REAL*8 LINE_PROF_SIM(ND,MAX_SIM)
-C
+!
 	REAL*8 NU_MAX_OBS
 	REAL*8 NU_MIN_OBS
-C
+!
 	REAL*8 CONT_FREQ
-C
+!
 	CHARACTER*50 TRANS_NAME_SIM(MAX_SIM)
-C
+!
 	LOGICAL RESONANCE_ZONE(MAX_SIM)
 	LOGICAL END_RES_ZONE(MAX_SIM)
 	LOGICAL LINE_STORAGE_USED(MAX_SIM)
-C
+!
 	INTEGER FREQ_INDX
 	INTEGER FIRST_LINE
 	INTEGER LAST_LINE
-	INTEGER LINE_LOC(NLINE_MAX)
 	INTEGER SIM_LINE_POINTER(MAX_SIM)
-C
-C 
-C
-C Opacity/emissivity
+!
+! 
+!
+! Opacity/emissivity
 	REAL*8 CHI(ND)			!Continuum opacity (all sources)
 	REAL*8 CHI_RAY(ND)
 	REAL*8 CHI_SCAT(ND)
@@ -247,35 +219,35 @@ C Opacity/emissivity
 	REAL*8 THETA(ND)		!Elec. scat. source coef.
 	REAL*8 SOURCE(ND)		!Complete source function.
 	REAL*8 DTAU(NDMAX)		!Optical depth (used in error calcs)
-C		DTAU(I)=0.5*(CHI(I)+CHI(I+1))*(Z(I)-Z(I+1))
+!		DTAU(I)=0.5*(CHI(I)+CHI(I+1))*(Z(I)-Z(I+1))
 	REAL*8 dCHIdR(NDMAX) 		!Derivative of opacity.
-C
+!
 	REAL*8 P(NP)
-C
+!
 	REAL*8 CHI_CONT(ND)
 	REAL*8 ETA_CONT(ND)
-C
-C These parameters are used when computing J and the variation of J.
-C
+!
+! These parameters are used when computing J and the variation of J.
+!
 	REAL*8 CHI_SCAT_CLUMP(ND)
 	REAL*8 CHI_RAY_CLUMP(ND)
 	REAL*8 CHI_CLUMP(ND)		!==CHI(I)*CLUMP_FAC(I)
 	REAL*8 ETA_CLUMP(ND)		!==ETA(I)*CLUMP_FAC(I)
 	REAL*8 ESEC_CLUMP(ND)		!==ESEC(I)*CLUMP_FAC(I)
-C
-C Variables to limit the computation of the continuum opacities and 
-C emissivities. 
-C
+!
+! Variables to limit the computation of the continuum opacities and 
+! emissivities. 
+!
 	REAL*8 EMHNUKT_CONT(ND)
 	REAL*8 ETA_C_EVAL(ND)
 	REAL*8 CHI_C_EVAL(ND)
-C
-C 
-C
+!
+! 
+!
 	REAL*8 Z_POP(NT)		!Ionic charge for each species
-C
-C Variables etc for computation of continuum in comoving frame.
-C
+!
+! Variables etc for computation of continuum in comoving frame.
+!
 	LOGICAL FIRST_FREQ
 	LOGICAL NEW_FREQ
 	REAL*8 dLOG_NU			!Step in frequency in Log plane
@@ -296,9 +268,8 @@ C
 	REAL*8 HBC_CMF(3),HBC_PREV(3)
 	REAL*8 NBC_CMF(3),NBC_PREV(3),INBC_PREV
 	REAL*8 HFLUX_AT_IB,HFLUX_AT_OB
-C
-C Quadrature weights.
-	REAL*8 FQW(NCF_MAX)		!Frequency weights
+!
+! Quadrature weights.
 	REAL*8 AQW(ND,NP)		!Angular quad. weights. (indep. of v)
 	REAL*8 HQW(ND,NP)		!Angular quad. weights. (indep. of v) for flux integration.
 	REAL*8 KQW(ND,NP)		!Angular quad. weights for K integration.
@@ -309,26 +280,26 @@ C Quadrature weights.
 	REAL*8 NMIDQW(ND,NP)		!Angular quad. weights. (indep. of v)
                                         !for N integration. Defined at the
                                         !mid points of the radius mesh.
-C
-C Continuum matrices
+!
+! Continuum matrices
 	REAL*8 WM(ND,ND)		!Coef. matrix of J & %J vector
 	REAL*8 FB(ND,ND)		!Coef. of J & %J vects in angular equ.
-C
-C Transfer equation vectors
+!
+! Transfer equation vectors
 	REAL*8 TA(NDMAX)
 	REAL*8 TB(NDMAX)
 	REAL*8 TC(NDMAX)
 	REAL*8 XM(NDMAX)		!R.H.S. (SOURCE VECTOR)
-C
-C 
-C
-C Arrays and variables for computation of the continuum intensity
-C using Eddington factors. This is separate to the "inclusion of
-C additional points".
-C
+!
+! 
+!
+! Arrays and variables for computation of the continuum intensity
+! using Eddington factors. This is separate to the "inclusion of
+! additional points".
+!
 	REAL*8 FEDD(NDMAX)
 	REAL*8 QEDD(NDMAX)
-C
+!
 	LOGICAL MID
 	LOGICAL FIRST
 	LOGICAL NEG_OPACITY(ND)
@@ -336,31 +307,31 @@ C
 	LOGICAL LAMBDA_ITERATION
 	LOGICAL LST_ITERATION
 	LOGICAL LST_DEPTH_ONLY
-C 
-C
-C
-C X-ray variables.
-C
+! 
+!
+!
+! X-ray variables.
+!
 	REAL*8 FILL_VEC_SQ(ND)
 	REAL*8 XRAY_LUM(ND)
 	REAL*8 GFF,XCROSS_V2
 	EXTERNAL GFF,XCROSS_V2
-C
-C
-C
-C ACESS_F is the current record we are writing in EDDFACTOR.
-C EDD_CONT_REC is the record in EDDFACTOR which points to the first
-C record containing the continuum values.
-C
+!
+!
+!
+! ACESS_F is the current record we are writing in EDDFACTOR.
+! EDD_CONT_REC is the record in EDDFACTOR which points to the first
+! record containing the continuum values.
+!
 	INTEGER ACCESS_F
 	INTEGER, PARAMETER :: EDD_CONT_REC=3
 	CHARACTER(LEN=20) DA_FILE_DATE
-C
+!
 	INTEGER NDEXT,NCEXT,NPEXT
 	INTEGER INDX(NDMAX),POS_IN_NEW_GRID(ND)
 	REAL*8 COEF(0:3,NDMAX)
 	REAL*8 INBC,HBC_J,HBC_S			!Bound. Cond. for JFEAU
-C
+!
 	REAL*8 REXT(NDMAX),PEXT(NPMAX),VEXT(NDMAX)
 	REAL*8 TEXT(NDMAX),SIGMAEXT(NDMAX)
 	REAL*8 CHIEXT(NDMAX),ESECEXT(NDMAX),ETAEXT(NDMAX)
@@ -369,34 +340,34 @@ C
 	REAL*8 RJEXT(NDMAX),RJEXT_ES(NDMAX)
 	REAL*8 FOLD(NDMAX),FEXT(NDMAX),QEXT(NDMAX),SOURCEEXT(NDMAX)
 	REAL*8 VDOP_VEC_EXT(NDMAX)
-C
-C
+!
+!
 	REAL*8 F2DAEXT(NDMAX,NDMAX)     !These arrays don't need to be
-C
-C If required, these arrays shoukd have size NDEXT*NPEXT
-C
+!
+! If required, these arrays shoukd have size NDEXT*NPEXT
+!
 	REAL*8, ALLOCATABLE :: AQWEXT(:,:)	!Angular quad. weights. (indep. of v)
 	REAL*8, ALLOCATABLE :: HQWEXT(:,:)	!Angular quad. weights for flux integration.
 	REAL*8, ALLOCATABLE :: KQWEXT(:,:)	!Angular quad. weights for K integration.
 	REAL*8, ALLOCATABLE :: NQWEXT(:,:)	!Angular quad. weights for N integration.
 	REAL*8, ALLOCATABLE :: HMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
 	REAL*8, ALLOCATABLE :: NMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
-C
-C Arrays for calculating mean opacities.
-C
+!
+! Arrays for calculating mean opacities.
+!
 	REAL*8 FLUXMEAN(ND) 		!Flux mean opacity
 	REAL*8 LINE_FLUXMEAN(ND) 	!Flux mean opacity due to lines.
 	REAL*8 ROSSMEAN(ND)  		!Rosseland mean opacity
 	REAL*8 INT_dBdT(ND)  		!Integral of dB/dT over nu 
-C                                            (to calculate ROSSMEAN)
+!                                            (to calculate ROSSMEAN)
 	REAL*8 FORCE_MULT(ND)
 	REAL*8 NU_FORCE
 	REAL*8 NU_FORCE_FAC
 	INTEGER N_FORCE
 	INTEGER ML_FORCE
 	LOGICAL TMP_LOG
-C
-C Other arrays
+!
+! Other arrays
 	REAL*8 Z(NDMAX)			!Z displacement along a given array
 	REAL*8 EMHNUKT(ND)		!EXP(-hv/kT)
 	REAL*8 RLUMST(ND)		!Luminosity as a function of depth
@@ -406,24 +377,18 @@ C Other arrays
 	REAL*8 SOB(ND)   	    	!Used in computing continuum flux
 	REAL*8 RJ(ND)			!Mean intensity
 	REAL*8 RJ_ES(ND)		!Convolution of RJ with e.s. R(v'v')
-C
-C Line variables.
-C
+!
+! Line variables.
+!
 	REAL*8 VAL_DO_NG
 	REAL*8 RP
 	REAL*8 VINF
 	REAL*8 VTURB_VEC(ND)
 	REAL*8 VDOP_VEC(ND)
 	REAL*8 MAX_DEL_V_RES_ZONE(ND)
-C
-C Continuum frequency variables and arrays.
-C
-	REAL*8 NU(NCF_MAX)		!Continuum and line frequencies
-	REAL*8 NU_EVAL_CONT(NCF_MAX)	!Frequencies to evaluate continuum
-	REAL*8 OBS(NCF_MAX)		!Observers spectrum
-C
-C Parameters, vectors, and arrays for computing the observed flux.
-C
+!
+! Parameters, vectors, and arrays for computing the observed flux.
+!
 	INTEGER, PARAMETER :: NST_CMF=10000
 	INTEGER NP_OBS_MAX
 	INTEGER NP_OBS
@@ -432,43 +397,41 @@ C
 	REAL*8 V_AT_RMAX		!Used if we extend the atmosphere.
 	REAL*8 RMAX_OBS
 	REAL*8 H_OUT,H_IN
-C
-C We allocate memory for the following vectors as we use them for the regular
-C flux computation, and when extra depth points are inserted (ACCURATE=.TRUE.)
-C
+!
+! We allocate memory for the following vectors as we use them for the regular
+! flux computation, and when extra depth points are inserted (ACCURATE=.TRUE.)
+!
 	REAL*8, ALLOCATABLE :: IPLUS_STORE(:,:)
 	REAL*8, ALLOCATABLE :: P_OBS(:)
 	REAL*8, ALLOCATABLE :: IPLUS(:)
 	REAL*8, ALLOCATABLE :: MU_AT_RMAX(:)
 	REAL*8, ALLOCATABLE :: HQW_AT_RMAX(:)
-C
-C Supercedes OBS
-C
+!
+! Supercedes OBS
+!
 	INTEGER N_OBS
-	REAL*8 OBS_FREQ(NCF_MAX)		!Since N_OBS < NCF =< NCF_MAX
-	REAL*8 OBS_FLUX(NCF_MAX)
 	LOGICAL FIRST_OBS_COMP
-C
-C Indicates approximate frequencies for which TAU at outer boundary is written
-C to OUTGEN on the last iteration.
-C
-C They are the He2 ege, NIII/CIII egde, HeI, HI, HI(N=2).
-C
+!
+! Indicates approximate frequencies for which TAU at outer boundary is written
+! to OUTGEN on the last iteration.
+!
+! They are the He2 ege, NIII/CIII egde, HeI, HI, HI(N=2).
+!
 	INTEGER, PARAMETER :: N_TAU_EDGE=5
 	REAL*8 TAU_EDGE(N_TAU_EDGE)
 	DATA TAU_EDGE/13.16D0,11.60D0,5.95D0,3.29D0,0.83D0/
-C
-C
-C Check whether EQUATION LABELLING is consistent. ' I ' is used as the
-C number of the current equation. We also set the variable SPEC_PRES which 
-C indicates whether at least one ioization stage of a species is present.
-C It is used to determine, foe example,  whether a number conservation 
-C equation is required.
-C
-	I=1
+!
+!
+! Check whether EQUATION LABELLING is consistent. ' I ' is used as the
+! number of the current equation. We also set the variable SPEC_PRES which 
+! indicates whether at least one ioization stage of a species is present.
+! It is used to determine, foe example,  whether a number conservation 
+! equation is required.
+!
 !
 !???????????????????????
 !
+	I=1
 	DO ISPEC=1,NUM_SPECIES
 	  IF(SPECIES_PRES(ISPEC))THEN
 	    SPECIES_PRES(ISPEC)=.FALSE.
@@ -491,8 +454,10 @@ C
 	  WRITE(LUER,*)'Error - NT has wrong value in CMFGEN'
 	  STOP
 	END IF
-C 
-C
+!
+	CALL INIT_MOD_FREQ_OBS(NLINE_MAX)
+! 
+!
 !	LAMBDA_ITERATION=.FALSE.
 	LAMBDA_ITERATION=.TRUE.
 	LST_ITERATION=.FALSE.
@@ -505,29 +470,29 @@ C
 	C_KMS=SPEED_OF_LIGHT()/1.0D+05
 	DO_REL_IN_OBSFRAME=.FALSE.
 	DA_FILE_DATE='20-Aug-2003' 
-C
+!
 	CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
-C
-C MAXCH and VAL_DO_NG are set so that they defined for the TEST in
-C COMP_JCONT_V?.INC whether to do an accurate flux calculation. An 
-C accurate flux calculation can be avoided by doing a LAMBDA iteration.
-C
+!
+! MAXCH and VAL_DO_NG are set so that they defined for the TEST in
+! COMP_JCONT_V?.INC whether to do an accurate flux calculation. An 
+! accurate flux calculation can be avoided by doing a LAMBDA iteration.
+!
 	MAXCH=0.0D0
 	VAL_DO_NG=5.0D0
-C
-C Set the vector Z_POP to contain the ionic charge for each species.
-C
+!
+! Set the vector Z_POP to contain the ionic charge for each species.
+!
 	Z_POP(1:NT)=0.0D0
-C
+!
 	DO ID=1,NUM_IONS
 	  CALL SET_Z_POP(Z_POP, ATM(ID)%ZXzV, ATM(ID)%EQXzV,
 	1                       ATM(ID)%NXzV, NT, ATM(ID)%XzV_PRES)
 	END DO
-C
-C Store atomic masses in vector of LENGTH NT for later use by line 
-C calculations. G_ALL and LEVEL_ID  are no longer used due to the use
-C of super levels.
-C
+!
+! Store atomic masses in vector of LENGTH NT for later use by line 
+! calculations. G_ALL and LEVEL_ID  are no longer used due to the use
+! of super levels.
+!
 	AMASS_ALL(1:NT)=0.0D0
 !
 ! We also set the mass of the ion corresponding to XzV to AT_MASS for each
@@ -545,7 +510,7 @@ C
 !
 	  CALL RD_CMF_FLUX_CONTROLS(ND,LUMOD,LUER)
 !
-C 
+! 
 !
 ! Scale abunances of species if desired. This should only be done for exploratory
 ! spectral calculations, and only for IMPURITY species (i.e. not H or He).
@@ -606,22 +571,22 @@ C
 	1        ATM(ID)%F_TO_S_XzV, ATM(ID)%NXzV_F, ATM(ID)%DXzV_F,
 	1        ATM(ID+1)%XzV,      ATM(ID+1)%NXzV, ATM(ID+1)%XzV_PRES, ND)
 	  END DO
-C
-C Store all quantities in POPS array. 
-C
+!
+! Store all quantities in POPS array. 
+!
 	  DO ID=1,NUM_IONS
 	    CALL IONTOPOP(POPS, ATM(ID)%XzV,        ATM(ID)%DXzV,  ED,T,
 	1        ATM(ID)%EQXzV, ATM(ID)%NXzV,NT,ND, ATM(ID)%XzV_PRES)
 	  END DO
-C
-C This routine not only evaluates the LTE populations of both model atoms, but
-C it also evaluates the dln(LTE Super level Pop)/dT.
-C
+!
+! This routine not only evaluates the LTE populations of both model atoms, but
+! it also evaluates the dln(LTE Super level Pop)/dT.
+!
 	INCLUDE 'EVAL_LTE_INC_V5.INC'
-C
-C Compute the turbulent velocity and MINIMUM Doppler velocity as a function of depth.
-C For the later, the iron mas of 55.8amu is assumed.
-C
+!
+! Compute the turbulent velocity and MINIMUM Doppler velocity as a function of depth.
+! For the later, the iron mas of 55.8amu is assumed.
+!
 	IF(TURB_LAW .EQ. 'LAW_V1')THEN
 	  VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*V(1:ND)/V(1)
 	ELSE IF(TURB_LAW .EQ. 'LAW_TAU1')THEN
@@ -637,17 +602,17 @@ C
 	  STOP
 	END IF
 	VDOP_VEC(1:ND)=SQRT( VTURB_VEC(1:ND)**2 + 2.96*T(1:ND) )
-C
+!
 	TA(1:ND)=ABS( CLUMP_FAC(1:ND)-1.0D0 )
 	T1=MAXVAL(TA)
 	DO_CLUMP_MODEL=.FALSE.
 	IF(T1 .GT. 1.0D-05)DO_CLUMP_MODEL=.TRUE.
-C
-C
-C Compute profile frequencies such that for the adopted doppler
-C velocity the profile ranges from 5 to -5 doppler widths.
-C This section needs to be rewritten if we want the profile to
-C vary with depth.
+!
+!
+! Compute profile frequencies such that for the adopted doppler
+! velocity the profile ranges from 5 to -5 doppler widths.
+! This section needs to be rewritten if we want the profile to
+! vary with depth.
 	  FIRST=.TRUE.		!Check cross section at edge is non-zero.
 	  NCF=0 		!Initialize number of continuum frequencies.
 !
@@ -664,16 +629,16 @@ C vary with depth.
 	1           ATM(ID)%ZXzV, ATM(ID)%XzV_PRES, ATM(ID+1)%XzV_PRES)
 	    END DO
 	  END IF
-C
-C Now insert addition points into frequency array. WSCI is used as a
-C work array - okay since of length NCF_MAX, and zeroed in QUADSE.
-C OBSF contains the bound-free edges - its contents are zero on
-C subroutine exit. J is used as temporary variable for the number of
-C frequencies transmitted to SET_CONT_FREQ. NCF is returned as the number 
-C of frequency points. FQW is used a an integer array for the sorting ---
-C we know it has the correct length since it is the same size as NU.
-C LUIN --- Used as temporary LU (opened and closed).
-C
+!
+! Now insert addition points into frequency array. WSCI is used as a
+! work array - okay since of length NCF_MAX, and zeroed in QUADSE.
+! OBSF contains the bound-free edges - its contents are zero on
+! subroutine exit. J is used as temporary variable for the number of
+! frequencies transmitted to SET_CONT_FREQ. NCF is returned as the number 
+! of frequency points. FQW is used a an integer array for the sorting ---
+! we know it has the correct length since it is the same size as NU.
+! LUIN --- Used as temporary LU (opened and closed).
+!
 	  J=NCF
 !	  CALL SET_CONT_FREQ(NU,OBS,FQW,
 !	1                        SMALL_FREQ_RAT,BIG_FREQ_AMP,dFREQ_BF_MAX,
@@ -687,18 +652,18 @@ C
 	1                        dV_LEV_DIS,AMP_DIS,MIN_FREQ_LEV_DIS,
 	1                        DELV_CONT,DELV_CONT,T1,
 	1                        J,NCF,NCF_MAX,LUIN)
-C                                             
-C                         
-C 
-C Set up lines that will be treated with the continuum calculation.
-C This section of code is also used by the code treating purely lines
-C (either single transition Sobolev or CMF, or overlapping Sobolev).
-C
-C To define the line transitions we need to operate on the FULL atom models.
-C We thus perform separate loops for each species. VEV_TRANS_NAME is
-C allocated temporaruly so that we can output the full transitions name
-C to TRANS_INFO.
-C
+!                                             
+!                         
+! 
+! Set up lines that will be treated with the continuum calculation.
+! This section of code is also used by the code treating purely lines
+! (either single transition Sobolev or CMF, or overlapping Sobolev).
+!
+! To define the line transitions we need to operate on the FULL atom models.
+! We thus perform separate loops for each species. VEV_TRANS_NAME is
+! allocated temporaruly so that we can output the full transitions name
+! to TRANS_INFO.
+!
 	ML=0			!Initialize line counter.
 	ALLOCATE (VEC_TRANS_NAME(NLINE_MAX),STAT=IOS)
 	IF(IOS .NE. 0)THEN
@@ -707,7 +672,7 @@ C
 	  WRITE(LUER,*)'STATUS=',IOS
 	  STOP
 	END IF
-C
+!
 	ESEC(1:ND)=6.65D-15*ED(1:ND)
 !
 ! The onlye species not present is the ion corresponding
@@ -759,12 +724,12 @@ C
 	END DO
 	N_LINE_FREQ=ML
 	CALL ADJUST_LINE_FREQ_V2(VEC_FREQ,VEC_STRT_FREQ,VEC_TRANS_NAME,N_LINE_FREQ,LUIN)
-C
-C 
-C
-C GLOBAL_LINE_SWITCH provides an option to handle all LINE by the same method.
-C The local species setting only takes precedence when it is set to NONE.
-C
+!
+! 
+!
+! GLOBAL_LINE_SWITCH provides an option to handle all LINE by the same method.
+! The local species setting only takes precedence when it is set to NONE.
+!
 	IF(GLOBAL_LINE_SWITCH(1:4) .NE. 'NONE')THEN
 	  DO I=1,N_LINE_FREQ
 	    VEC_TRANS_TYPE(I)=GLOBAL_LINE_SWITCH
@@ -776,21 +741,21 @@ C
 	END IF
 !
 	CALL INIT_PROF_MODULE(ND,NLINES_PROF_STORE,NFREQ_PROF_STORE)
-C
-C If desired, we can set transitions with:
-C      wavelengths > FLUX_CAL_LAM_END (in A) to the SOBOLEV option.
-C      wavelengths < FLUX_CAL_LAM_BEG (in A) to the SOBOLEV option.
-C
-C The region defined by FLUX_CAL_LAM_BEG < LAM < FLUX_CAL_LAM_END will be computed using
-C transition types determined by the earlier species and global options.
-C
-C Option has 2 uses:
-C
-C 1. Allows use of SOBOLEV approximation in IR where details of radiative
-C    transfer is unimportant. In this case FLUX_CAL_LAM_BEG should be set to zero.
-C 2. Allows a full flux calculation to be done in a limited wavelength region
-C    as defined by FLUX_CAL_LAM_END and FLUX_CAL_LAM_BEG. 
-C
+!
+! If desired, we can set transitions with:
+!      wavelengths > FLUX_CAL_LAM_END (in A) to the SOBOLEV option.
+!      wavelengths < FLUX_CAL_LAM_BEG (in A) to the SOBOLEV option.
+!
+! The region defined by FLUX_CAL_LAM_BEG < LAM < FLUX_CAL_LAM_END will be computed using
+! transition types determined by the earlier species and global options.
+!
+! Option has 2 uses:
+!
+! 1. Allows use of SOBOLEV approximation in IR where details of radiative
+!    transfer is unimportant. In this case FLUX_CAL_LAM_BEG should be set to zero.
+! 2. Allows a full flux calculation to be done in a limited wavelength region
+!    as defined by FLUX_CAL_LAM_END and FLUX_CAL_LAM_BEG. 
+!
 	IF(SET_TRANS_TYPE_BY_LAM)THEN
 	  IF(FLUX_CAL_LAM_END .LT. FLUX_CAL_LAM_BEG)THEN
 	    WRITE(LUER,*)'Error in CMFGEN'
@@ -814,15 +779,15 @@ C
 	    END IF
 	  END DO
 	END IF
-C
+!
 	DO ML=1,N_LINE_FREQ
 	  IF(VEC_TRANS_TYPE(ML) .NE. 'BLANK')VEC_STRT_FREQ(ML)=VEC_FREQ(ML)
 	END DO
-C
-C Sort lines into numerically decreaing frequency. This is used for
-C outputing TRANS_INFO file. Need to sort all the VECTORS, as they
-C are linked.
-C
+!
+! Sort lines into numerically decreaing frequency. This is used for
+! outputing TRANS_INFO file. Need to sort all the VECTORS, as they
+! are linked.
+!
 	CALL INDEXX(N_LINE_FREQ,VEC_FREQ,VEC_INDX,L_FALSE)
 	CALL SORTDP(N_LINE_FREQ,VEC_STRT_FREQ,VEC_INDX,VEC_DP_WRK)
 	CALL SORTDP(N_LINE_FREQ,VEC_FREQ,VEC_INDX,VEC_DP_WRK)
@@ -830,7 +795,7 @@ C
 	CALL SORTDP(N_LINE_FREQ,VEC_ARAD,VEC_INDX,VEC_DP_WRK)
 	CALL SORTDP(N_LINE_FREQ,VEC_EINA,VEC_INDX,VEC_DP_WRK)
 	CALL SORTDP(N_LINE_FREQ,VEC_VDOP_MIN,VEC_INDX,VEC_DP_WRK)
-C
+!
 	CALL SORTINT(N_LINE_FREQ,VEC_NL,VEC_INDX,VEC_INT_WRK)
 	CALL SORTINT(N_LINE_FREQ,VEC_NUP,VEC_INDX,VEC_INT_WRK)
 	CALL SORTINT(N_LINE_FREQ,VEC_MNL_F,VEC_INDX,VEC_INT_WRK)
@@ -840,7 +805,7 @@ C
 	CALL SORTCHAR(N_LINE_FREQ,VEC_SPEC,VEC_INDX,VEC_CHAR_WRK)
 	CALL SORTCHAR(N_LINE_FREQ,VEC_TRANS_TYPE,VEC_INDX,VEC_CHAR_WRK)
 	CALL SORTCHAR(N_LINE_FREQ,PROF_TYPE,VEC_INDX,VEC_CHAR_WRK)
-C
+!
 	I=160	!Record length - allow for long names
 	CALL GEN_ASCI_OPEN(LUIN,'TRANS_INFO','UNKNOWN',' ','WRITE',I,IOS)
 	  WRITE(LUIN,*)
@@ -869,12 +834,12 @@ C
 	  END DO
 	CLOSE(UNIT=LUIN)
 	DEALLOCATE (VEC_TRANS_NAME)
-C
-C Get lines and arrange in numerically decreasing frequency according to
-C the START frequency of the line. This will allow us to consider line overlap,
-C and to include lines with continuum frequencies so that the can be handled 
-C automatically.
-C
+!
+! Get lines and arrange in numerically decreasing frequency according to
+! the START frequency of the line. This will allow us to consider line overlap,
+! and to include lines with continuum frequencies so that the can be handled 
+! automatically.
+!
 	CALL INDEXX(N_LINE_FREQ,VEC_STRT_FREQ,VEC_INDX,L_FALSE)
 	CALL SORTDP(N_LINE_FREQ,VEC_STRT_FREQ,VEC_INDX,VEC_DP_WRK)
 	CALL SORTDP(N_LINE_FREQ,VEC_FREQ,VEC_INDX,VEC_DP_WRK)
@@ -882,7 +847,7 @@ C
 	CALL SORTDP(N_LINE_FREQ,VEC_ARAD,VEC_INDX,VEC_DP_WRK)
 	CALL SORTDP(N_LINE_FREQ,VEC_EINA,VEC_INDX,VEC_DP_WRK)
 	CALL SORTDP(N_LINE_FREQ,VEC_VDOP_MIN,VEC_INDX,VEC_DP_WRK)
-C
+!
 	CALL SORTINT(N_LINE_FREQ,VEC_NL,VEC_INDX,VEC_INT_WRK)
 	CALL SORTINT(N_LINE_FREQ,VEC_NUP,VEC_INDX,VEC_INT_WRK)
 	CALL SORTINT(N_LINE_FREQ,VEC_MNL_F,VEC_INDX,VEC_INT_WRK)
@@ -892,13 +857,13 @@ C
 	CALL SORTCHAR(N_LINE_FREQ,VEC_SPEC,VEC_INDX,VEC_CHAR_WRK)
 	CALL SORTCHAR(N_LINE_FREQ,VEC_TRANS_TYPE,VEC_INDX,VEC_CHAR_WRK)
 	CALL SORTCHAR(N_LINE_FREQ,PROF_TYPE,VEC_INDX,VEC_CHAR_WRK)
-C
-C
-C
-C We have found all lines. If we are doing a blanketing calculation for this
-C line we insert them into the continuum frequency set, otherwise the
-C line is not included.
-C
+!
+!
+!
+! We have found all lines. If we are doing a blanketing calculation for this
+! line we insert them into the continuum frequency set, otherwise the
+! line is not included.
+!
 	DO ML=1,NCF                                          
 	  FQW(ML)=NU(ML)	!FQW has temporary storage of continuum freq.
 	END DO                    
@@ -908,10 +873,10 @@ C
 	1                 LINE_ST_INDX_IN_NU,LINE_END_INDX_IN_NU,N_LINE_FREQ,
 	1                 FQW,NCF,FRAC_DOP,VINF,dV_CMF_PROF,dV_CMF_WING,
 	1                 ES_WING_EXT,R_CMF_WING_EXT,L_FALSE )
-C
+!
 	K=NCF		!# of continuum frequencies: Need for DET_MAIN...
 	NCF=I		!Revised
-C
+!
 	WRITE(LUER,*)' '
 	WRITE(LUER,'(A,1X,I7)')' Number of line frequencies is:',N_LINE_FREQ
 	WRITE(LUER,'(A,6X,I7)')' Number of continuum frequencies is:',NCF
@@ -923,23 +888,23 @@ C
 	V_DOP=FRAC_DOP*MINVAL(VEC_VDOP_MIN)
 	CALL DET_MAIN_CONT_FREQ(NU,NCF,FQW,K,NU_EVAL_CONT,
 	1             V_DOP,DELV_CONT,COMPUTE_ALL_CROSS)
-C
-C Redefine frequency quadrature weights.
-C
+!
+! Redefine frequency quadrature weights.
+!
 	CALL SMPTRP(NU,FQW,NCF)
 	DO ML=1,NCF                                           
 	  FQW(ML)=FQW(ML)*1.0D+15
 	END DO
-C
-C Set observers frequencies. The slight fiddling in setting NU_MAX and NU_MIN 
-C is done so that the CMF frequencies encompass all observers frame 
-C frequencies. This allows computation of all observers fluxes allowing for 
-C velocity effects.
-C
-C We always insert lines into the observers frame frequencies. This allows
-C a blanketed model spectrum to be divided by an unblanketed model
-C spectrum.
-C
+!
+! Set observers frequencies. The slight fiddling in setting NU_MAX and NU_MIN 
+! is done so that the CMF frequencies encompass all observers frame 
+! frequencies. This allows computation of all observers fluxes allowing for 
+! velocity effects.
+!
+! We always insert lines into the observers frame frequencies. This allows
+! a blanketed model spectrum to be divided by an unblanketed model
+! spectrum.
+!
 	T1=NU(1)/(1.0D0+2.0D0*VINF/C_KMS)
 	NU_MAX_OBS=MIN(T1,NU(3))
 	T1=NU(NCF)*(1.0D0+2.0D0*VINF/C_KMS)
@@ -951,19 +916,19 @@ C
 	1               FRAC_DOP_OBS,dV_OBS_PROF,dV_OBS_WING,dV_OBS_BIG,
 	1               OBS_PRO_EXT_RAT,ES_WING_EXT,VTURB_MAX)
 
-C
-C 
-C Need to calculate impact parameters, and angular quadrature weights here
-C as these may be required when setting up the initial temperature
-C distribution of the atmosphere (i.e. required by JGREY).
-C
-C
-C Compute impact parameter values P
-C
+!
+! 
+! Need to calculate impact parameters, and angular quadrature weights here
+! as these may be required when setting up the initial temperature
+! distribution of the atmosphere (i.e. required by JGREY).
+!
+!
+! Compute impact parameter values P
+!
 	CALL IMPAR(P,R,RP,NC,ND,NP)
-C
-C Compute the angular quadrature weights
-C
+!
+! Compute the angular quadrature weights
+!
 	IF(TRAPFORJ)THEN
 	  CALL NORDANGQW(AQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,JTRPWGT)
 	  CALL NORDANGQW(HQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,HTRPWGT)
@@ -985,7 +950,7 @@ C
 	  CALL GENANGQW(NMIDQW,R,P,WM(1,1),WM(1,3),WM(1,5),
 	1               NC,ND,NP,NWEIGHT,MID)
 	END IF
-C
+!
 	IF(ACCURATE)THEN
 !
 ! We first verify that the interpolation range is valid.
@@ -999,10 +964,10 @@ C
 	    STOP
 	  END IF
 	  NCEXT=NC*(NPINS+1)
-C
-C NB: The following expression guarentees that NPEXT has the same relationship
-C to NDEXT and NCEXT as does NP to ND and NC.
-C
+!
+! NB: The following expression guarentees that NPEXT has the same relationship
+! to NDEXT and NCEXT as does NP to ND and NC.
+!
 	  NPEXT=NDEXT+NCEXT+(NP-ND-NC)
 	  IF(NPEXT .GT. NPMAX)THEN
 	    WRITE(LUER,*)' Error - NPEXT larger than NPMAX in CMFGEN'
@@ -1015,7 +980,7 @@ C
 	  CALL EXTEND_VTSIGMA(VEXT,TEXT,SIGMAEXT,COEF,INDX,NDEXT,
 	1         V,T,SIGMA,ND)
 	  CALL IMPAR(PEXT,REXT,RP,NCEXT,NDEXT,NPEXT)
-C
+!
 	  ALLOCATE (AQWEXT(NDEXT,NPEXT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (HQWEXT(NDEXT,NPEXT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (KQWEXT(NDEXT,NPEXT),STAT=IOS)
@@ -1034,10 +999,10 @@ C
 !
 	  TA(1:NDEXT)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*VEXT(1:NDEXT)/VEXT(1)
 	  VDOP_VEC_EXT(1:NDEXT)=SQRT( TA(1:NDEXT)**2 + 2.96*TEXT(1:NDEXT) )
-C
-C Note that the F2DAEXT vectors (here used as dummy variables) must be at least
-C NPEXT long.
-C
+!
+! Note that the F2DAEXT vectors (here used as dummy variables) must be at least
+! NPEXT long.
+!
 	  IF(TRAPFORJ)THEN
 	    CALL NORDANGQW(AQWEXT,REXT,PEXT,F2DAEXT(1,1),F2DAEXT(1,4),
 	1               F2DAEXT(1,7),NCEXT,NDEXT,NPEXT,JTRPWGT)
@@ -1071,9 +1036,9 @@ C
 	  NDEXT=ND ; NCEXT=NC; NPEXT=NP
 	  TEXT(1:ND)=T(1:ND)
 	END IF
-C
-C Allocate arrays and vectors for computing observed fluxes.
-C
+!
+! Allocate arrays and vectors for computing observed fluxes.
+!
 	IF(ACCURATE)THEN
 	  NP_OBS_MAX=NPEXT+12
 	ELSE
@@ -1090,10 +1055,10 @@ C
 	  WRITE(LUER,*)'STATUS=',IOS
 	  STOP
 	END IF
-C
-C Used when computing the observed fluxes. These will get overwritten
-C if we do an accurate comoving frame soluton using CMF_FORM_SOL.
-C
+!
+! Used when computing the observed fluxes. These will get overwritten
+! if we do an accurate comoving frame soluton using CMF_FORM_SOL.
+!
 	IF(ACCURATE)THEN
 	  DO LS=1,NPEXT
 	    MU_AT_RMAX(LS)=SQRT( 1.0D0 -(PEXT(LS)/REXT(1))**2 )
@@ -1107,7 +1072,7 @@ C
 	  END DO
 	  IF(P(NP) .EQ. R(1))MU_AT_RMAX(NP)=0.0D0
 	END IF
-C
+!
 	ALLOCATE (ETA_CMF_ST(ND,NCF),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (CHI_CMF_ST(ND,NCF),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (RJ_CMF_ST(ND,NCF),STAT=IOS)
@@ -1117,10 +1082,10 @@ C
 	  WRITE(LUER,*)'STATUS=',IOS
 	  STOP
 	END IF
-C 
-C
-C Set 2-photon data with current atomic models and populations.
-C
+! 
+!
+! Set 2-photon data with current atomic models and populations.
+!
 	DO ID=1,NUM_IONS
 	  ID_SAV=ID
 	  CALL SET_TWO_PHOT_V2(TRIM(ION_ID(ID)),ID_SAV,
@@ -1129,14 +1094,14 @@ C
 	1       ATM(ID)%GXzV_F,   ATM(ID)%F_TO_S_XzV,   ATM(ID)%NXzV_F, ND,
 	1       ATM(ID)%ZXzV,     ATM(ID)%EQXzV,        ATM(ID)%XzV_PRES)
 	END DO
-C
+!
 	DTDR=(T(ND)-T(ND-1))/(R(ND-1)-R(ND))
-C 
-C 
-C
-C Electron scattering iteration loop. We perform this loop to
-C take into account incoherent electron scattering.
-C
+! 
+! 
+!
+! Electron scattering iteration loop. We perform this loop to
+! take into account incoherent electron scattering.
+!
 	IF(RD_COHERENT_ES)NUM_ES_ITERATIONS=1
 	DO ES_COUNTER=1,NUM_ES_ITERATIONS
 !
@@ -1173,12 +1138,12 @@ C
 	    WRITE(LU_EDD,REC=2)0
 	    WRITE(LU_EDD,REC=3)0
 	    WRITE(LU_EDD,REC=4)0
-C
-C We set record 5 to zero, to signify that the eddington factors are
-C currently being computed. A non zero value signifies that all values
-C have successfully been computed. (Consistent with old Eddfactor
-C format a EDD_FAC can never be zero : Reason write a real number).
-C
+!
+! We set record 5 to zero, to signify that the eddington factors are
+! currently being computed. A non zero value signifies that all values
+! have successfully been computed. (Consistent with old Eddfactor
+! format a EDD_FAC can never be zero : Reason write a real number).
+!
 	    T1=0.0
 	    WRITE(LU_EDD,REC=5)T1
 	  END IF
@@ -1223,14 +1188,14 @@ C
 	    END IF
 	END IF
 !
-C***************************************************************************
-C***************************************************************************
-C
-C                         CONTINUUM LOOP
-C
-C***************************************************************************
-C***************************************************************************
-C
+!***************************************************************************
+!***************************************************************************
+!
+!                         CONTINUUM LOOP
+!
+!***************************************************************************
+!***************************************************************************
+!
 	EDDINGTON=EDD_CONT
 	IF(ACCURATE .OR. EDDINGTON)THEN
 	  IF(COMPUTE_EDDFAC)THEN
@@ -1253,7 +1218,7 @@ C
 	DO SIM_INDX=1,MAX_SIM
 	  LINE_STORAGE_USED(SIM_INDX)=.FALSE.
 	END DO
-C
+!
 	CONT_FREQ=0.0D0
 !
 ! Define parameters to allow the Cummulative force multipler to be output at
@@ -1263,9 +1228,9 @@ C
 	NU_FORCE=NU(1)
 	NU_FORCE_FAC=(1.0D0-500.0D0/C_KMS)
 	ML_FORCE=1
-C                                                                    
-C Enter loop for each continuum frequency.
-C
+!                                                                    
+! Enter loop for each continuum frequency.
+!
 	CALL TUNE(IONE,'MLCF')
 	DO 10000 ML=1,NCF
 	  FREQ_INDX=ML
@@ -1276,55 +1241,55 @@ C
 	    FIRST_FREQ=.FALSE.
 	  END IF
 	  SECTION='CONTINUUM'
-C
+!
 	  IF(NU_EVAL_CONT(ML) .NE. CONT_FREQ)THEN
 	    COMPUTE_NEW_CROSS=.TRUE.
 	    CONT_FREQ=NU_EVAL_CONT(ML)
 	  ELSE
 	    COMPUTE_NEW_CROSS=.FALSE.
 	  END IF
-C
-C 
-C
-C Section to include lines automatically with the continuum.
-C
-C
-C  LINES_THIS_FREQ --- Logical vector [NCF] indicating whether this frequency
-C                        is part of the resonance zone (i.e. Doppler profile) of 
-C                        one (or more) lines.
-C
-C LINE_ST_INDX_IN_NU --- Integer vector [N_LINES] which specifies the starting
-C                          frequency index for this lines resonance zone.
-C
-C LINE_END_INDX_IN_NU --- Integer vector [N_LINES] which specifies the final
-C                          frequency index for this lines resonance zone.
-C
-C FIRST_LINE   ---- Integer specifying the index of the highest frequency
-C                         line which we are taking into account in the
-C                         transfer.
-C
-C LAST_LINE  ---- Integer specifying the index of the lowest frequency
-C                         line which we are taking into account in the
-C                         transfer.
-C                                        
-C LINE_LOC   ---- Integer array. Used to locate location of a particular line
-C                         in the SIM vectors/arrays.
-C
-C SIM_LINE_POINTER --- Integer array --- locates the line corresponding to
-C                         the indicated storage location in the SIM vectors/
-C                         arrays.
-C
-C Check whether we have to treat another line. We use a DO WHILE, rather
-C than an IF statement, to handle lines which begin at the same (upper)
-C frequency.
-C
-C
+!
+! 
+!
+! Section to include lines automatically with the continuum.
+!
+!
+!  LINES_THIS_FREQ --- Logical vector [NCF] indicating whether this frequency
+!                        is part of the resonance zone (i.e. Doppler profile) of 
+!                        one (or more) lines.
+!
+! LINE_ST_INDX_IN_NU --- Integer vector [N_LINES] which specifies the starting
+!                          frequency index for this lines resonance zone.
+!
+! LINE_END_INDX_IN_NU --- Integer vector [N_LINES] which specifies the final
+!                          frequency index for this lines resonance zone.
+!
+! FIRST_LINE   ---- Integer specifying the index of the highest frequency
+!                         line which we are taking into account in the
+!                         transfer.
+!
+! LAST_LINE  ---- Integer specifying the index of the lowest frequency
+!                         line which we are taking into account in the
+!                         transfer.
+!                                        
+! LINE_LOC   ---- Integer array. Used to locate location of a particular line
+!                         in the SIM vectors/arrays.
+!
+! SIM_LINE_POINTER --- Integer array --- locates the line corresponding to
+!                         the indicated storage location in the SIM vectors/
+!                         arrays.
+!
+! Check whether we have to treat another line. We use a DO WHILE, rather
+! than an IF statement, to handle lines which begin at the same (upper)
+! frequency.
+!
+!
 	CALL TUNE(IONE,'ADD_LINE')
 	DO WHILE( LAST_LINE .LT. N_LINE_FREQ .AND.
 	1                ML .EQ. LINE_ST_INDX_IN_NU(LAST_LINE+1) )
-C
-C Have another line --- need to find its storage location.
-C
+!
+! Have another line --- need to find its storage location.
+!
 	  I=1
 	  DO WHILE(LINE_STORAGE_USED(I))
 	    I=I+1
@@ -1334,9 +1299,9 @@ C
 	        FIRST_LINE=MIN(FIRST_LINE,SIM_LINE_POINTER(SIM_INDX)) 
 	      END DO
 	      IF( ML .GT. LINE_END_INDX_IN_NU(FIRST_LINE))THEN
-C
-C Free up storage location for line.
-C
+!
+! Free up storage location for line.
+!
 	        I=LINE_LOC(FIRST_LINE)
 	        LINE_STORAGE_USED(I)=.FALSE.
 	        SIM_LINE_POINTER(I)=0
@@ -1348,54 +1313,54 @@ C
 	      END IF
 	    END IF
 	  END DO
-C
+!
 	  SIM_INDX=I
 	  LAST_LINE=LAST_LINE+1
 	  LINE_STORAGE_USED(SIM_INDX)=.TRUE.
 	  LINE_LOC(LAST_LINE)=SIM_INDX
 	  SIM_LINE_POINTER(SIM_INDX)=LAST_LINE
-C
-C Have located a storage location. Now must compute all relevant quantities
-C necessary to include this line in the transfer calculations.
-C
+!
+! Have located a storage location. Now must compute all relevant quantities
+! necessary to include this line in the transfer calculations.
+!
 	  SIM_NL(SIM_INDX)=VEC_NL(LAST_LINE)
 	  SIM_NUP(SIM_INDX)=VEC_NUP(LAST_LINE)
 	  NL=SIM_NL(SIM_INDX)
 	  NUP=SIM_NUP(SIM_INDX)
-C
+!
 	  EINA(SIM_INDX)=VEC_EINA(LAST_LINE)
 	  OSCIL(SIM_INDX)=VEC_OSCIL(LAST_LINE)
 	  FL_SIM(SIM_INDX)=VEC_FREQ(LAST_LINE)
-C
+!
 	  TRANS_NAME_SIM(SIM_INDX)=TRIM(VEC_SPEC(LAST_LINE))
 	  AMASS_SIM(SIM_INDX)=AMASS_ALL(NL)
-C
-C 
-C
-C Compute U_STAR_RATIO and L_STAR_RATIO which are used to switch from
-C the opacity/emissivity computed with a FULL_ATOM to an equivalent form
-C but written in terms of the SUPER-LEVELS. 
-C
-C L refers to the lower level of the transition.
-C U refers to the upper level of the transition.
-C
-C At present we must treat each species separately (for those with both FULL
-C and SUPER_LEVEL model atoms).
-C
-C MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
-C MNL (MNUP) denotes the lower (upper) level in the super level model atom.
-C
+!
+! 
+!
+! Compute U_STAR_RATIO and L_STAR_RATIO which are used to switch from
+! the opacity/emissivity computed with a FULL_ATOM to an equivalent form
+! but written in terms of the SUPER-LEVELS. 
+!
+! L refers to the lower level of the transition.
+! U refers to the upper level of the transition.
+!
+! At present we must treat each species separately (for those with both FULL
+! and SUPER_LEVEL model atoms).
+!
+! MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
+! MNL (MNUP) denotes the lower (upper) level in the super level model atom.
+!
 	MNL_F=VEC_MNL_F(LAST_LINE)
 	MNUP_F=VEC_MNUP_F(LAST_LINE)
 	DO K=1,ND
 	  L_STAR_RATIO(K,SIM_INDX)=1.0D0
 	  U_STAR_RATIO(K,SIM_INDX)=1.0D0
 	END DO
-C
-C T1 is used to represent b(level)/b(super level). If no interpolation of
-C the b values in a super level has been performed, this ratio will be unity .
-C This ratio is NOT treated in the linearization.
-C
+!
+! T1 is used to represent b(level)/b(super level). If no interpolation of
+! the b values in a super level has been performed, this ratio will be unity .
+! This ratio is NOT treated in the linearization.
+!
 	DO ID=1,NUM_IONS
 	  IF(VEC_SPEC(LAST_LINE) .EQ. ION_ID(ID))THEN
 	    MNL=ATM(ID)%F_TO_S_XzV(MNL_F)
@@ -1413,10 +1378,10 @@ C
 	    EXIT
 	  END IF
 	END DO
-C 
-C
-C Compute line opacity and emissivity for this line.
-C
+! 
+!
+! Compute line opacity and emissivity for this line.
+!
 	  T1=OSCIL(SIM_INDX)*OPLIN
 	  T2=FL_SIM(SIM_INDX)*EINA(SIM_INDX)*EMLIN
 	  NL=SIM_NL(SIM_INDX)
@@ -1433,22 +1398,22 @@ C
 	      WRITE(LUER,'(1X,A)')TRANS_NAME_SIM(SIM_INDX)(1:J)
 	    END IF
 	  END DO
-C
-C Ensure that LAST_LINE points to the next LINE that is going to be handled 
-C in the BLANKETING portion of the code.
-C
+!
+! Ensure that LAST_LINE points to the next LINE that is going to be handled 
+! in the BLANKETING portion of the code.
+!
 	  DO WHILE(LAST_LINE .LT. N_LINE_FREQ.AND.
 	1            VEC_TRANS_TYPE(LAST_LINE+1)(1:4) .NE. 'BLAN')
 	       LAST_LINE=LAST_LINE+1
 	  END DO
-C	   
+!	   
 	END DO	!Checking whether a  new line is being added.
 	CALL TUNE(ITWO,'ADD_LINE')
-C
-C 
-C
-C Check whether current frequency is a resonance frequency for each line.
-C
+!
+! 
+!
+! Check whether current frequency is a resonance frequency for each line.
+!
 	DO SIM_INDX=1,MAX_SIM
 	  RESONANCE_ZONE(SIM_INDX)=.FALSE.
 	  END_RES_ZONE(SIM_INDX)=.FALSE.
@@ -1465,17 +1430,28 @@ C
 	END DO
 !
 ! Compute profile: Doppler or Stark: T2 and T3 are presently garbage.
+! TB is the proton density.
+! TC is the He+ density.
 !
 	  CALL TUNE(IONE,'SET_PROF')
-	  TA(1:ND)=0.0D0; TB(1:ND)=0.0D0
-!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE (TA,TB,I,J,T1,T3)
+	  TB(1:ND)=0.0D0; TC(1:ND)=0.0D0
+	  DO ID=1,NUM_IONS
+	    IF(ATM(ID)%XzV_PRES .AND. ION_ID(ID) .EQ. 'HI')THEN
+	      TB(1:ND)=ATM(ID)%DxzV(1:ND)
+	    ELSE IF(ATM(ID)%XzV_PRES .AND. ION_ID(ID) .EQ. 'HeI')THEN
+	      TC(1:ND)=ATM(ID)%DxzV(1:ND)
+	    END IF
+	  END DO
+!
+! Paralleizing this loop seems to cost CPU time.
+!!$OMP PARALLEL DO SCHEDULE(DYNAMIC,20) PRIVATE (TA,I,J,T1,T3)
 	  DO SIM_INDX=1,MAX_SIM
 	    IF(RESONANCE_ZONE(SIM_INDX))THEN
               J=SIM_LINE_POINTER(SIM_INDX); I=ML
 	      T1=Z_POP(VEC_NL(J))+1.0D0; T3=0.0D0
               CALL SET_PROF_V3(TA,NU,I,
 	1               LINE_ST_INDX_IN_NU(J),LINE_END_INDX_IN_NU(J),
-	1               ED,TA,TB,T,VTURB_VEC,ND,
+	1               ED,TB,TC,T,VTURB_VEC,ND,
 	1               PROF_TYPE(J),PROF_LIST_LOCATION(J),
 	1               VEC_FREQ(J),VEC_MNL_F(J),VEC_MNUP_F(J),
 	1               AMASS_SIM(SIM_INDX),T1,VEC_ARAD(J),T3,VTURB_FIX,
@@ -1485,13 +1461,13 @@ C
 	      LINE_PROF_SIM(1:ND,SIM_INDX)=0.0D0
 	    END IF
 	  END DO
-!$OMP END PARALLEL DO                                    
+!!$OMP END PARALLEL DO                                    
 	  CALL TUNE(ITWO,'SET_PROF')
-C
-C 
-C
-C Determine which method will be used to compute continuum intensity.
-C
+!
+! 
+!
+! Determine which method will be used to compute continuum intensity.
+!
 	  IF(ACCURATE .AND. ALL_FREQ)THEN       
 	    THIS_FREQ_EXT=.TRUE.
 	  ELSE IF( ACCURATE .AND. FL .GT. ACC_FREQ_END )THEN
@@ -1499,23 +1475,23 @@ C
 	  ELSE        
 	    THIS_FREQ_EXT=.FALSE.
 	  END IF
-C
-C Compute opacity and emissivity.
-C
+!
+! Compute opacity and emissivity.
+!
 	  CALL TUNE(IONE,'C_OPAC')
 	  INCLUDE 'OPACITIES_V5.INC'
 	  CALL TUNE(ITWO,'C_OPAC')
-C
-C Since resonance zones included, we must add the line opacity and 
-C emissivity to the raw continuum values. We first save the pure continuum 
-C opacity and emissivity. These are used in carrying the variation of J from 
-C one frequency to the next.
-C
+!
+! Since resonance zones included, we must add the line opacity and 
+! emissivity to the raw continuum values. We first save the pure continuum 
+! opacity and emissivity. These are used in carrying the variation of J from 
+! one frequency to the next.
+!
 	  DO I=1,ND
 	    CHI_CONT(I)=CHI(I)
 	    ETA_CONT(I)=ETA(I)
 	  END DO
-C
+!
 	  CALL TUNE(IONE,'OP_TOT')
 	  DO SIM_INDX=1,MAX_SIM
 	    IF(RESONANCE_ZONE(SIM_INDX))THEN
@@ -1526,9 +1502,9 @@ C
 	    END IF
 	  END DO
 	  CALL TUNE(ITWO,'OP_TOT')
-C
-C CHECK for negative line opacities. We do not distinguish between lines.  
-C
+!
+! CHECK for negative line opacities. We do not distinguish between lines.  
+!
 	  AT_LEAST_ONE_NEG_OPAC=.FALSE.
 	  NEG_OPACITY(1:ND)=.FALSE.
 	  IF(NEG_OPAC_OPTION .EQ. 'SRCE_CHK')THEN
@@ -1571,12 +1547,12 @@ C
 	    WRITE(LU_NEG,'(A,2X,I3,5X,A,2XI3)')
 	1        ' 1st depth',K,'Last depth',J
 	  END IF
-C
+!
 	  DO I=1,ND
 	    ZETA(I)=ETA(I)/CHI(I)
 	    THETA(I)=CHI_SCAT(I)/CHI(I)
 	  END DO
-C
+!
 	  IF(LST_ITERATION .AND. ML .NE. NCF)THEN
 	    DO I=1,N_TAU_EDGE
 	      IF(NU(ML) .GE. TAU_EDGE(I) .AND. 
@@ -1586,18 +1562,18 @@ C
 	      END IF
 	    END DO
 	  END IF
-C
-C Compute continuum intensity.
-C
+!
+! Compute continuum intensity.
+!
 	  CALL TUNE(IONE,'COMP_JCONT')
 	  INCLUDE 'COMP_JCONT_V4.INC'	
 	  CALL TUNE(ITWO,'COMP_JCONT')
-C
-C
-C Free up LINE storage locations. As we are only computing the line flux,
-C and not its variation, we can free up the memory space as soon as we
-C exit the resonance zone. This procedure is much simpler than in CMFGEN,
-C
+!
+!
+! Free up LINE storage locations. As we are only computing the line flux,
+! and not its variation, we can free up the memory space as soon as we
+! exit the resonance zone. This procedure is much simpler than in CMFGEN,
+!
 	DO SIM_INDX=1,MAX_SIM
 	  IF(END_RES_ZONE(SIM_INDX))THEN
 	    LINE_LOC( SIM_LINE_POINTER(SIM_INDX) )=0
@@ -1605,18 +1581,18 @@ C
 	    SIM_LINE_POINTER(SIM_INDX)=0
 	  END IF
 	END DO
-C
-C
-C Compute flux distribution and luminosity (in L(sun)) of star. NB: For
-C NORDFLUX we always assume coherent scattering.
-C
-C
+!
+!
+! Compute flux distribution and luminosity (in L(sun)) of star. NB: For
+! NORDFLUX we always assume coherent scattering.
+!
+!
 	CALL TUNE(IONE,'FLUX_DIST')
 	IF(THIS_FREQ_EXT .AND. .NOT. CONT_VEL)THEN
-C
-C Since ETAEXT is not required any more, it will be used
-C flux.
-C
+!
+! Since ETAEXT is not required any more, it will be used
+! flux.
+!
 	  S1=(ETA(1)+RJ(1)*CHI_SCAT(1))/CHI(1)
 	  CALL MULTVEC(SOURCEEXT,ZETAEXT,THETAEXT,RJEXT,NDEXT)
 	  CALL NORDFLUX(TA,TB,TC,XM,DTAU,REXT,Z,PEXT,
@@ -1624,15 +1600,15 @@ C
 	1               S1,THK_CONT,DIF,DBB,IC,NCEXT,NDEXT,NPEXT,METHOD)
 	  CALL UNGRID(SOB,ND,ETAEXT,NDEXT,POS_IN_NEW_GRID)
 	  SOB(2)=ETAEXT(2)				!Special case
-C
-C Compute observed flux in Janskys for an object at 1 kpc .
-C	(const=dex(23)*2*pi*dex(20)/(3.0856dex(21))**2 )
-C
+!
+! Compute observed flux in Janskys for an object at 1 kpc .
+!	(const=dex(23)*2*pi*dex(20)/(3.0856dex(21))**2 )
+!
 	  OBS_FLUX(ML)=6.599341D0*SOB(1)*2.0D0		!2 DUE TO 0.5U
 	ELSE IF(CONT_VEL)THEN
-C
-C TA is a work vector. TB initially used for extended SOB.
-C
+!
+! TA is a work vector. TB initially used for extended SOB.
+!
 	   IF(ACCURATE)THEN
 	     CALL REGRID_H(TB,REXT,RSQHNU,HFLUX_AT_OB,HFLUX_AT_IB,NDEXT,TA)
 	     DO I=1,ND
@@ -1667,16 +1643,16 @@ C
 	1           MU_AT_RMAX,HQW_AT_RMAX,OBS_FREQ,OBS_FLUX,N_OBS,
 	1           V_AT_RMAX,RMAX_OBS,'IPLUS','LIN_INT',DO_CMF_REL_OBS,
 	1           FIRST_OBS_COMP,NP_OBS)
-C
+!
 	ELSE                          
 	  S1=(ETA(1)+RJ(1)*CHI_SCAT(1))/CHI(1)
 	  CALL MULTVEC(SOURCE,ZETA,THETA,RJ,ND)
 	  CALL NORDFLUX(TA,TB,TC,XM,DTAU,R,Z,P,SOURCE,CHI,THETA,HQW,SOB,
 	1               S1,THK_CONT,DIF,DBB,IC,NC,ND,NP,METHOD)
-C
-C Compute observed flux in Janskys for an object at 1 kpc .
-C	(const=dex(23)*2*pi*dex(20)/(3.0856dex(21))**2 )
-C
+!
+! Compute observed flux in Janskys for an object at 1 kpc .
+!	(const=dex(23)*2*pi*dex(20)/(3.0856dex(21))**2 )
+!
 	  OBS_FLUX(ML)=6.599341D0*SOB(1)*2.0D0		!2 DUE TO 0.5U
 	END IF
 !
@@ -1694,10 +1670,10 @@ C
 	  ML_FORCE=ML_FORCE+1
 	  NU_FORCE=NU_FORCE*NU_FORCE_FAC
 	END IF
-C
-C Compute the luminosity, the FLUX mean opacity, and the ROSSELAND
-C mean opacities.
-C
+!
+! Compute the luminosity, the FLUX mean opacity, and the ROSSELAND
+! mean opacities.
+!
 	IF(ML .EQ. 1)THEN		!Need to move to main loop imit.
 	  DO I=1,ND
 	    RLUMST(I)=0.0D0
@@ -1762,10 +1738,10 @@ C
 	    CLOSE(LUIN)
 	  END IF
 	END IF
-C
-C The current opacities and emissivities are stored for the variation of the
-C radiation field at the next frequency.
-C                                                  
+!
+! The current opacities and emissivities are stored for the variation of the
+! radiation field at the next frequency.
+!                                                  
 	DO I=1,ND
 	  CHI_PREV(I)=CHI_CONT(I)
 	  ETA_PREV(I)=ETA_CONT(I)
@@ -1926,35 +1902,35 @@ C
 	  CLOSE(UNIT=82)
 	  CLOSE(UNIT=83)
 	END IF
-C
-C If requested, convolve J with the electron-scattering redistribution
-C funtion. K is used for LUIN, and LUOUIT but is not accessed.
-C
+!
+! If requested, convolve J with the electron-scattering redistribution
+! funtion. K is used for LUIN, and LUOUIT but is not accessed.
+!
 	IF(.NOT. COHERENT_ES)THEN
 	  I=ND*NCF
 	  CALL COMP_J_CONV_V2(RJ_CMF_ST,I,NU,T,ND,NCF,
 	1         K,'J PASSED VIA CALL',EDD_CONT_REC,L_FALSE,L_FALSE,
 	1         K,'RETURN J VIA CALL')
 	END IF
-C
+!
 	ESEC(1:ND)=6.65D-15*ED(1:ND)
 	DO ML=1,NCF
 	  ETA_CMF_ST(1:ND,ML)=ETA_CMF_ST(1:ND,ML) +
 	1                        RJ_CMF_ST(1:ND,ML)*ESEC(1:ND)
 	END DO
 	DEALLOCATE (RJ_CMF_ST)
-C
-C 
-C ***************************************************************************
-C ***************************************************************************
-C
-C Determine the number of points inserted along each ray via 
-C MAX_DEL_V_RES_ZONE.
-C
+!
+! 
+! ***************************************************************************
+! ***************************************************************************
+!
+! Determine the number of points inserted along each ray via 
+! MAX_DEL_V_RES_ZONE.
+!
 	DO I=1,ND
 	  MAX_DEL_V_RES_ZONE(I)=VTURB_VEC(I)*FRAC_DOP*0.5D0
 	END DO
-C
+!
 	IF(DO_CLUMP_MODEL)THEN
 	  DO ML=1,NCF
 	    ETA_CMF_ST(:,ML)=ETA_CMF_ST(:,ML)*CLUMP_FAC(:)
@@ -1975,7 +1951,7 @@ C
 	  HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*MU_AT_RMAX(1:NC)
 	  HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*R(ND)*R(ND)/R(1)/R(1)
 	  P(1:NC)=R(ND)*SQRT( (1.0D0-MU_AT_RMAX(1:NC))*(1.0D0+MU_AT_RMAX(1:NC)) )
-	  NP_OBS=NC
+	  NC_OBS=NC; NP_OBS=NP
 	  P_OBS(1:NP_OBS)=P(1:NP_OBS)
 	ELSE IF(REVISE_P_GRID)THEN
 	  DEALLOCATE (P_OBS)
