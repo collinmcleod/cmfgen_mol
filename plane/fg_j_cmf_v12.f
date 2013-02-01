@@ -705,7 +705,7 @@
 	  END DO
 !
 	  DO I=1,ND
-	    DO LS=1,NC+(ND-I+1)
+	    DO LS=1,NP-I+1
 	      K=J_PNT(I,LS)
 	      IF(J_PNT(I,LS) .LT. 1 .OR. J_PNT(I,LS) .GT. NI_RAY(LS))THEN
 	        WRITE(LUER,*)'Error setting J_PNT in FG_J_CMF_V12 -- invalid values'

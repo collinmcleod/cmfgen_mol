@@ -36,7 +36,6 @@ MOD_DIR=$(INSTALL_DIR)mod/
 EXE_DIR=$(INSTALL_DIR)exe/
   
 
-
 ifeq ($(HOST),ibis.phyast.pitt.edu)
  F90 = pgf95 -mp -Mlarge_arrays -Ktrap=fp 
  F90nomp = pgf95  -Mlarge_arrays -Ktrap=fp
@@ -60,6 +59,25 @@ ifeq ($(HOST),ibis.phyast.pitt.edu)
  X11LIB=-L/usr/X11R6/lib -lX11
 
 endif
+
+#
+# Linkging and compilig instructions for gfortran.
+!
+ifeq ($(HOST),gfortran.phyast.pitt.edu)
+ F90 = gfortran -fopenmp
+ F90nomp = gfortran
+ FG  =  -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
+ FH  =  -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
+ FD  = -g  -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
+ FFREE  = -fno-backslash -I$(MOD_DIR) -J$(MOD_DIR)
+ FFRED  = -fno-backslash -g -I$(MOD_DIR) -J$(MOD_DIR)
+
+ BLAS=-lblas
+ LAPACK=-llapack
+ LOCLIB=-L/usr/lib -L/opt/pgi/osx86-64/12.9/lib
+ X11LIB=-L/usr/X11R6/lib -lX11
+endif
+
 
 ifeq ($(HOST),lorikeet.phyast.pitt.edu)
 
