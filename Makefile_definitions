@@ -61,8 +61,9 @@ ifeq ($(HOST),ibis.phyast.pitt.edu)
 endif
 
 #
-# Linkging and compilig instructions for gfortran.
-!
+# Linking and compilig instructions for gfortran.
+#
+
 ifeq ($(HOST),gfortran.phyast.pitt.edu)
  F90 = gfortran -fopenmp
  F90nomp = gfortran

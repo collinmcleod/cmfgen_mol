@@ -3300,7 +3300,7 @@
 ! T3 is the line flux in ergs/cm^2/s
 !
 	    T2=LAMVACAIR(FREQ)		!Wavelength(Angstroms)
-	    T3=T1*S1*1.0D-23*FREQ*1.0D+15/T1
+	    T3=T1*S1*1.0D-23*FREQ*1.0D+15/T2
 	    WRITE(LU_NET,40008)T1,S1,T2,T3
 	    WRITE(T_OUT,'(A)')RED_PEN
 	    WRITE(T_OUT,40008)T1,S1,T2,T3
@@ -5327,7 +5327,7 @@ c
 ! T3 is the line flux in ergs/cm^2/s
 !
 	  T2=LAMVACAIR(FREQ)		!Wavelength(Angstroms)
-	  T3=T1*S1*1.0D-23*FREQ*1.0D+15/T1
+	  T3=T1*S1*1.0D-23*FREQ*1.0D+15/T2
 	  WRITE(LU_NET,40008)T1,S1,T2,T3
 	  WRITE(T_OUT,'(A)')RED_PEN
 	  WRITE(T_OUT,40008)T1,S1,T2,T3

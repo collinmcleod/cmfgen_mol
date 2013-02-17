@@ -65,12 +65,11 @@
 !
 	  L=LMAX
 	  WRITE(LUOUT,'(A)')' '
-	  WRITE(LUOUT,'(A,I4)')' 5 largest reductions at depth:',L
-	  WRITE(LUOUT,'(8X,A,3X,A,6X,A,5X,A)')'SOL(J,L)','Species','SL','I(STEQ)'
 	  DO WHILE(1 .EQ. 1)
 	    WRITE(LUOUT,'(A)')' '
 	    WRITE(LUOUT,'(A,I4)')' 5 largest reductions at depth:',L
 	    WRITE(LUOUT,'(A)')' '
+	    WRITE(LUOUT,'(8X,A,3X,A,6X,A,5X,A)')'SOL(J,L)','Species','SL','I(STEQ)'
 	    CALL INDEXX(NT,SOL(1,L),INDX,L_TRUE)
 	    DO I=NT,NT-4,-1
 	      J=INDX(I)

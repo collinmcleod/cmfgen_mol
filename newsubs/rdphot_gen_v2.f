@@ -580,7 +580,13 @@
 	            STRING=FINAL_STATE(PHOT_ID,1)		!Switch names for later output
 	            FINAL_STATE(PHOT_ID,1)=FINAL_STATE(PHOT_ID,L1)
 	            FINAL_STATE(PHOT_ID,L1)=STRING
-	            EXIT
+	            IF(I .EQ. 1)THEN
+	              WRITE(LUER,*)'Error in RDPHOT_GEN_V2: ',DESC
+	              WRITE(LUER,*)'Secondary ionization route is to the ground state'
+	              WRITE(LUER,*)'Check ln -sf statements in batch.sh'
+	              STOP
+	              EXIT
+	            END IF
 	          END IF
 	        END DO
 	        IF(FOUND_FINAL_STATE)THEN
@@ -762,10 +768,9 @@
 ! Output summary of photoionization routes.
 !
 	WRITE(LUOUT,*)'Summary of Photoionization routes for ',TRIM(DESC)
-	WRITE(LUOUT,'(1X,A,T40,(2X,I2))')
-	1            'Final State/Phot ID',(I,I=1,N_PHOT)
+	WRITE(LUOUT,'(1X,A,T40,20I5)')'Final State/Phot ID',(I,I=1,N_PHOT)
 	DO PHOT_ID=1,N_PHOT
-	  WRITE(LUOUT,'(1X,A,T40,(3X,L1))')
+	  WRITE(LUOUT,'(1X,A,T40,20L5)')
 	1    FINAL_STATE(PHOT_ID,1),(PD(ID)%DO_PHOT(PHOT_ID,I),I=1,N_PHOT)
 	END DO
 !
