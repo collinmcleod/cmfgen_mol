@@ -202,9 +202,9 @@
 !
 	      CALL ZERO_2D_MAT(dZ(1,1,1,SIM_INDX),NM,NUM_BNDS*ND)
 !	      dZ(:,:,:,SIM_INDX)=0.0D0	!NM,NUM_BNDS,ND,MAX_SIM	
-	      CALL TUNE(ITWO,'VLSETUP')
 !
 	    END IF			!BA computed and weak line check
+	    CALL TUNE(ITWO,'VLSETUP')
 	  END IF                        !New line storage requires
 	END DO
 !

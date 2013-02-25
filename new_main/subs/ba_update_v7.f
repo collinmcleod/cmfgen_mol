@@ -39,6 +39,7 @@
 	USE STEQ_DATA_MOD 
 	IMPLICIT NONE
 !
+! Altered 19-Feb-2013 :: Added TUNE statement so that BA_UP section is always enclosed.
 ! Altered 11-Feb-2005 :: Rewrite setion in BA_FF.
 !                        Done to try an improve memory access when using very
 !                           large arrays.
@@ -162,7 +163,7 @@
 ! is treated as a special case.
 !
 	IF(NEW_CONT .AND. .NOT. FINAL_FREQ)THEN
-	  CALL TUNE(1,'BA_UP_NFF')
+	  CALL TUNE(IONE,'BA_UP_NFF')
 	  T2=FQW/NU
 !$OMP PARALLEL DO PRIVATE(T1)
 	  DO L=DST,DEND
@@ -187,10 +188,11 @@
 	  END DO
 !$OMP END DO
 !$OMP END PARALLEL
-	  CALL TUNE(2,'BA_UP_NFF')
+	  CALL TUNE(ITWO,'BA_UP_NFF')
+	  CALL TUNE(ITWO,'BA_UP')	!Call needed to close TUNE, since next statement is a RETURN.
 	  RETURN
 	ELSE IF(NEW_CONT)THEN		!and hence `single frequency' band
-	  CALL TUNE(1,'BA_UP_NC')
+	  CALL TUNE(IONE,'BA_UP_NC')
 	  T2=FQW/NU
 CC!$OMP PARALLEL PRIVATE(L,ID,T1)
 CC!$OMP DO
@@ -204,9 +206,9 @@ CC!$OMP DO
 	  END DO
 CC!$OMP END DO
 CC!$OMP END PARALLEL
-	  CALL TUNE(2,'BA_UP_NC')
+	  CALL TUNE(ITWO,'BA_UP_NC')
 	ELSE
-	  CALL TUNE(1,'BA_UP_VJ')
+	  CALL TUNE(IONE,'BA_UP_VJ')
 	  T2=FQW/NU
 !$OMP PARALLEL PRIVATE(L,I,K,T1)
 !$OMP DO
@@ -222,9 +224,9 @@ CC!$OMP END PARALLEL
 	  END DO
 !$OMP END DO
 !$OMP END PARALLEL
-	  CALL TUNE(2,'BA_UP_VJ')
+	  CALL TUNE(ITWO,'BA_UP_VJ')
 !
-	  CALL TUNE(1,'BA_UP_VT')
+	  CALL TUNE(IONE,'BA_UP_VT')
 !$OMP PARALLEL PRIVATE(L,I,K,T1,T2)
 !$OMP DO
 	  DO L=DST,DEND
@@ -246,7 +248,7 @@ CC!$OMP END PARALLEL
 	  END DO
 !$OMP END DO
 !$OMP END PARALLEL
-	  CALL TUNE(2,'BA_UP_VT')
+	  CALL TUNE(ITWO,'BA_UP_VT')
 	END IF
 !
 	IF(NEW_CONT .AND. FINAL_FREQ)THEN
@@ -254,7 +256,7 @@ CC!$OMP END PARALLEL
 ! Done in this way to ensure better cancellation of large terms. Note that
 ! we loop over all L. This minimizes paging.
 !
-	  CALL TUNE(1,'BA_UP_BANF')
+	  CALL TUNE(IONE,'BA_UP_BANF')
 !$OMP PARALLEL PRIVATE(L,J,K,QFV_T)
 !$OMP DO
 	  DO L=DST,DEND					!S.E. equation depth
@@ -325,12 +327,12 @@ CC!$OMP END PARALLEL
 !$OMP END PARALLEL
 	    END IF		!Is species present
 	  END DO		!Loop over species
-	  CALL TUNE(2,'BA_UP_BANF')
+	  CALL TUNE(ITWO,'BA_UP_BANF')
 C
 C Update BA matrices for several frequencies at once.
 C
 	ELSE IF(FINAL_FREQ)THEN
-	  CALL TUNE(1,'BA_FF')
+	  CALL TUNE(IONE,'BA_FF')
 !
 !$OMP PARALLEL PRIVATE(L,J,K,BNDST,BNDEND)
 !$OMP DO
@@ -414,7 +416,7 @@ C
 !
 	    END IF			!Is species present
 	  END DO			!Loop over ion
-	  CALL TUNE(2,'BA_FF')
+	  CALL TUNE(ITWO,'BA_FF')
 	END IF
 	CALL TUNE(ITWO,'BA_UP')
 C

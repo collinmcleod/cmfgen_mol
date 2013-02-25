@@ -150,9 +150,17 @@
 !
 	REAL*8 GREY_PAR
 	REAL*8 T_INIT_TAU
-	REAL*8 T_MIN
 	LOGICAL ITERATE_INIT_T
 	LOGICAL T_MIN_BA_EXTRAP
+!
+! Used to limit the temperature while iterating on T.
+!
+	REAL*8 T_MIN
+!
+! When you use the LTE option to set the departure coefficients, T_EXCITE_MIN
+! is used in the outer region to set the escitation coefficient. 
+
+	REAL*8 T_EXCITE_MIN
 !
 ! Indicates that the R grid for the NEWMODEL should be rad in from a file --
 ! ist is not computed.

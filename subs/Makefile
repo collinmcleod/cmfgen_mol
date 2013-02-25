@@ -173,7 +173,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(set_cont_freq.o)\
       $(LIB)(set_cont_freq_v3.o)\
       $(LIB)(set_cont_freq_v4.o)\
-      $(LIB)(set_dc_lte.o)\
+      $(LIB)(set_dc_lte_v2.o)\
       $(LIB)(set_edge_freq_v2.o)\
       $(LIB)(set_x_freq.o)\
       $(LIB)(set_gm_all.o)\

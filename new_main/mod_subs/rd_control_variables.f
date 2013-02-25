@@ -663,7 +663,11 @@ C
 	  IF(INTERP_DC_SPH_TAU)DC_INTERP_METHOD='SPH_TAU'
 	  CALL RD_STORE_LOG(SET_LTE_AS_INIT_ESTIMATES,'LTE_EST',L_FALSE,
 	1        'Use LTE for the initial estimates')
+!
 	  IF(SET_LTE_AS_INIT_ESTIMATES)DC_INTERP_METHOD='LTE'
+	  IF(DC_INTERP_METHOD .EQ. 'LTE')THEN
+	    CALL RD_STORE_DBLE(T_EXCITE_MIN,'T_EXC',L_TRUE,'Minimum temp. when using LTE option')
+	  END IF
 	  CALL RD_STORE_LOG(DO_POP_SCALE,'POP_SCALE',L_TRUE,
 	1        'Scale populations so that cons. Eq. satisfied ?')
 	  CALL RD_STORE_DBLE(T_INIT_TAU,'T_INIT_TAU',L_TRUE,

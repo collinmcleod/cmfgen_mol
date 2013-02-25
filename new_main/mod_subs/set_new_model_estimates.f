@@ -236,16 +236,19 @@
 ! electron density for clumping (i.e. ED(I)*CLUMP_FAC(I)), which we store in TC.
 ! It may be better to regrid on the actual electron densities.
 !
+! NB: ATM(ID)$XzV_F is to LOG(dep. coef.)
+!
 	  IF(DC_INTERP_METHOD .EQ. 'LTE')THEN
-	    WRITE(LUER,*)'LTE assume for departure coefficients.'
-	    T1=0.2D0
+	    WRITE(LUER,*)'LTE assumed for departure coefficients.'
+	    T1=T_EXCITE_MIN
 	    CALL DET_LTE_ED(T1,ND,DO_LEV_DISSOLUTION)
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
-	        CALL SET_DC_LTE(ATM(ID)%XzV_F,ATM(ID)%DXzV_F,ATM(ID)%EDGEXzV_F,ATM(ID)%NXzV_F,T,T1,ND)
+	        CALL SET_DC_LTE_V2(ATM(ID)%XzV_F,ATM(ID)%DXzV_F,ATM(ID)%EDGEXzV_F,ATM(ID)%NXzV_F,T,T1,ND)
 	        ATM(ID)%DXzV_F=1.0D-200
 	      END IF
 	    END DO
+!
 	  ELSE IF(DC_INTERP_METHOD .EQ. 'SPH_TAU')THEN
 	    WRITE(LUER,*)'Departure coefficients assumed to be function of Tau(spherical).'
 	    DO ID=1,NUM_IONS-1
@@ -257,6 +260,7 @@
 	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,'SPH_TAU',TMP_STRING)
 	      END IF
 	    END DO
+!
 	  ELSE IF(DC_INTERP_METHOD .EQ. 'ED')THEN
 	    WRITE(LUER,*)'Departure coefficients assumed to be function of Ne.'
 	    TC(1:ND)=ED(1:ND)*CLUMP_FAC(1:ND)
@@ -269,6 +273,7 @@
 	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,'ED',TMP_STRING)
 	      END IF
 	    END DO
+!
 	  ELSE IF(DC_INTERP_METHOD .EQ. 'R')THEN
 !
 ! We use TA for ED and TB for T since ED and T have already been set.
@@ -283,6 +288,7 @@
 	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,'R',TMP_STRING)
 	      END IF
 	    END DO
+!
 	  ELSE IF(DC_INTERP_METHOD .EQ. 'RTX')THEN
 !
 ! NB: T must have been previoulsy computed.

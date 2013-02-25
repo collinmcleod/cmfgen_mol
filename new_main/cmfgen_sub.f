@@ -1100,6 +1100,7 @@
 	1                  LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
 	  END IF
 	  LST_ITERATION=.TRUE.
+	  CALL TUNE(1,'GIT')
 	  GOTO 9999			!End (write out POPS.)
 	END IF
 ! 
@@ -3411,7 +3412,6 @@
 50000	CONTINUE
 	LINE_INDX=LINE_INDX+NUM_SIM_LINES
 	END DO 			!END NL LOOP
-	CALL TUNE(ITWO,'LINE LOOP')
 !
 ! Write pointer file and then store BA and STEQ matrices.
 !
@@ -3429,6 +3429,7 @@
 ! Ends check on GLOBAL_LINE.
 !
 			END IF
+	CALL TUNE(ITWO,'LINE LOOP')
 !
 !
 ! Compute the the total line luminosity, and the total dielectronic line 
