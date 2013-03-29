@@ -524,13 +524,16 @@
 	  CALL RD_STORE_LOG(RD_LAMBDA,'DO_LAM_IT',L_TRUE,'Do LAMBDA iterations ?')
 	  DO_LAMBDA_AUTO=.TRUE.
 	  CALL RD_STORE_LOG(DO_LAMBDA_AUTO,'DO_LAM_AUTO',L_FALSE,
-	1                         'Start non-lambda iterations automatically?')
+	1                      'Start non-lambda iterations automatically?')
 	  DO_GREY_T_AUTO=.TRUE.
 	  CALL RD_STORE_LOG(DO_GREY_T_AUTO,'DO_GT_AUTO',L_FALSE,
-	1                         'Do a grey temperature iteration after revising USE_FIXED_J?')
+	1                      'Do a grey temperature iteration after revising USE_FIXED_J?')
 	  DO_T_AUTO=.FALSE.
 	  CALL RD_STORE_LOG(DO_T_AUTO,'DO_T_AUTO',L_FALSE,
-	1                         'Allow temperature to vary when sufficent convergence has been obtained?')
+	1                      'Allow temperature to vary when sufficent convergence has been obtained?')
+	  SET_POPS_D2_EQ_D1=.FALSE.
+	  CALL RD_STORE_LOG(SET_POPS_D2_EQ_D1,'D2_EQ_D1',L_FALSE,
+	1                      'Replace pops at depth 2 with those at depth 1 for non-LAMBDA it?')
 	  CALL CLEAN_RD_STORE()
 	  CLOSE(UNIT=LUIN)
 	NUM_ITS_RD=NUM_ITS_TO_DO
@@ -4333,6 +4336,8 @@
 	1                  'Do a grey temperature iteration after revising USE_FIXED_J?')
 	      CALL RD_STORE_LOG(DO_T_AUTO,'DO_T_AUTO',L_FALSE,
 	1                  'Allow temperature to vary when sufficent convergence has been obtained?')
+	      CALL RD_STORE_LOG(SET_POPS_D2_EQ_D1,'D2_EQ_D1',L_FALSE,
+	1                  'Replace pops at depth 2 with those at depth 1 for non-LAMBDA it?')
 	      CALL CLEAN_RD_STORE()
 	    CLOSE(UNIT=LUIN)
 	    NUM_ITS_TO_DO=NUM_ITS_TO_DO+(NUM_ITS_RD-I)

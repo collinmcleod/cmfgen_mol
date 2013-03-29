@@ -1965,9 +1965,10 @@ C
 ! Perform simple Y-axis arithmetic.
 !
 	ELSE IF (ANS .EQ. 'YAR')THEN
-	  CALL NEW_GEN_IN(YAR_OPERATION,'Operation: *,+,-,/,LG,R[=1/Y],ALG[=10^y]')
+	  CALL NEW_GEN_IN(YAR_OPERATION,'Operation: *,+,-,/,LG,R[=1/Y],ALG[=10^y],ABS')
 	  CALL SET_CASE_UP(YAR_OPERATION,IZERO,IZERO)
 	  IF( YAR_OPERATION .NE. 'LG' .AND. 
+	1          YAR_OPERATION .NE. 'ABS' .AND. 
 	1          YAR_OPERATION .NE. 'ALG' .AND. 
 	1          YAR_OPERATION(1:1) .NE. 'R')THEN
 	    CALL NEW_GEN_IN(YAR_VAL,'Value')
@@ -1989,6 +1990,8 @@ C
 	      CD(IP)%DATA=CD(IP)%DATA*YAR_VAL
 	    ELSE IF(YAR_OPERATION .EQ. '/')THEN
 	      CD(IP)%DATA=CD(IP)%DATA/YAR_VAL
+	    ELSE IF(YAR_OPERATION .EQ. 'ABS')THEN
+	      CD(IP)%DATA=ABS(CD(IP)%DATA)
 	    ELSE IF(YAR_OPERATION .EQ. 'ALG')THEN
 	      CD(IP)%DATA=10.0D0**(CD(IP)%DATA)
 	      IF(YLABEL(1:3) .EQ. 'Log')THEN

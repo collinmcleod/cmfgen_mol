@@ -49,7 +49,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(set_rv_hydro_model_v3.o)\
       $(LIB)(set_imp_vec.o)\
       $(LIB)(set_new_grid.o)\
-      $(LIB)(solveba_v9.o)\
+      $(LIB)(solveba_v11.o)\
       $(LIB)(steq_multi_v8.o)\
       $(LIB)(steqne_v4.o)\
       $(LIB)(steq_advec_v4.o)\

@@ -170,6 +170,12 @@
 	  ELSE
 	    OLD_R(NDOLD)=R(ND)
 	  END IF
+	  IF( 1.0D0-OLD_R(1)/R(1) .LE. 1.0D-10 )OLD_R(1)=R(1)
+	  IF(OLD_R(2) .GE. OLD_R(1))THEN
+	    WRITE(LUER,*)'Reset OLD_R(1) in REGRID_T_ED but now OLD_R(2) .GE. OLD_R(1))'
+	    STOP
+	  END IF
+!
 	  OLD_X=LOG(OLD_R)
 	  NEW_X=LOG(R)
 	  DO WHILE(R(NX_ST) .GT. OLD_R(1))

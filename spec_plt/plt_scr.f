@@ -350,7 +350,7 @@ C
 	    END DO
 	    CALL DP_CURVE(ND,X,Y)
 	  END DO
-	  Ylabel='1 - Y(I-1)/Y(I)'
+	  YLABEL='[Y(I-1)-Y(I)]/Y(I) [%]'
 	  CALL GRAMON_PGPLOT('Depth',Ylabel,' ',' ')
 	  GOTO 200
 	ELSE IF(PLT_OPT(1:2) .EQ. 'PN')THEN

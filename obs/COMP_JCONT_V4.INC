@@ -2,6 +2,8 @@
 ! Program section to compute the continuum intensity. Opacities must have
 ! previuosly been evaluated.
 !
+! Altered 14-mar-2013 - When useing EDDINGTON we now call jfeau_ibc_v2.f and fqcomp_ibc_v2.f.
+!                          These handle a hollow core/zero flux inner bundary condition.
 ! Altered 10-Apr-2011 - Bug fix: HFLUX_AT_OB and HFLUX_AT_IB were not
 !                         being correctly set for normal wind calculation. Only
 !                         effects  output to FLUX_FILE.
@@ -923,12 +925,14 @@
 	      SOURCE(I)=ZETA(I)+THETA(I)*RJ(I)
 	    END DO
 	    S1=SOURCE(1)
-	    CALL FQCOMP_IBC(TA,TB,TC,XM,DTAU,R,Z,P,QEDD,FEDD,
-	1            SOURCE,CHI_CLUMP,dCHIdR,AQW,KQW,DBB,HBC_J,HBC_S,
-	1            INBC,IC,THK_CONT,DIF,NC,ND,NP,METHOD)
-	    CALL JFEAU_IBC(TA,TB,TC,DTAU,R,RJ,QEDD,FEDD,
+!
+	    CALL FQCOMP_IBC_V2(TA,TB,TC,XM,DTAU,R,Z,P,QEDD,FEDD,
+	1            SOURCE,CHI_CLUMP,dCHIdR,AQW,KQW,
+	1            DBB,HBC_J,HBC_S,INBC,IC,
+	1            THK_CONT,INNER_BND_METH,NC,ND,NP,METHOD)
+	    CALL JFEAU_IBC_V2(TA,TB,TC,DTAU,R,RJ,QEDD,FEDD,
 	1          ZETA,THETA,CHI_CLUMP,DBB,IC,HBC_J,HBC_S,
-	1          INBC,THK_CONT,DIF,ND,METHOD)
+	1          INBC,THK_CONT,INNER_BND_METH,ND,METHOD)
 !
 ! Update "inaccurate" iteration counter
 !

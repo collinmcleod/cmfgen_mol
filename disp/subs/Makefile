@@ -10,6 +10,7 @@ LIB=$(LIB_DIR)/libdisp.a
 # Entries for library
 #
 OBJ = $(LIB)(betanew.o)\
+      $(LIB)(branch_rat.o)\
       $(LIB)(chk_string.o)\
       $(LIB)(comp_jbar.o)\
       $(LIB)(compion.o)\
@@ -68,6 +69,10 @@ $(LIB)(%.o) : %.f
 $(LIB)(wr_spec_sum_v2.o) : wr_spec_sum_v2.f ../mod_disp.o 
 	$(F90) -c  $(FG) -I../ wr_spec_sum_v2.f
 	ar ruv $(LIB) wr_spec_sum_v2.o
+
+$(LIB)(branch_rat.o) : branch_rat.f ../mod_disp.o 
+	$(F90) -c  $(FG) -I../ branch_rat.f
+	ar ruv $(LIB) branch_rat.o
 
 # 
 # Specific dependency of source files which uses external 

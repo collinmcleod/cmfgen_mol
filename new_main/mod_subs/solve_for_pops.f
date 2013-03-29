@@ -11,6 +11,9 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered:   26-Mar-2012 : Changed to CALL SOLVEBA_V11. Pas POP_ATOM.
+! Altered:   12-Mar-2012 : Changed to CALL SOLVEBA_V10. Allows populations at depth 2 to be
+!                            equated to those at depth 1.
 ! Altered:   18-May-2010 : Change to allow BA to be held fixed after a LAMBDA iteration.
 ! Altered:   23-Feb-2007 : Call to SOLVEBA_V8 changed to SOLVEBA_V9; LAM_SCALE_OPT inserted
 !                            into SOLVEBA_V9 call.
@@ -117,10 +120,9 @@
 	  T1=MAX_LIN_COR
 	  TEMP_CHAR=METH_SOL
 	END IF
-	CALL SOLVEBA_V9(SOL,POPS,
-	1       DIAG_INDX,NT,NION,NUM_BNDS,ND,
+	CALL SOLVEBA_V11(SOL,POPS,POP_ATOM,DIAG_INDX,NT,NION,NUM_BNDS,ND,
 	1       MAXCH,TEMP_CHAR,SUCCESS,SCALE_OPT,LAM_SCALE_OPT,T1,T_MIN,
-	1       COMPUTE_BA,WR_BA_INV,WR_PART_OF_INV,LAMBDA_ITERATION)
+	1       COMPUTE_BA,WR_BA_INV,WR_PART_OF_INV,LAMBDA_ITERATION,SET_POPS_D2_EQ_D1)
 !
 ! Complicated algorithim to decide when to switch off BA computation.
 ! We only switch off BA computation in WRBAMAT_RDIN is TRUE.

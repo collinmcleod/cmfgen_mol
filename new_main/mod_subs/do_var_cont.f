@@ -511,14 +511,14 @@
 	          TB(L)=0.0D0
 	        END DO
 	      END IF
-!OMP PARALLEL DO
+!$OMP PARALLEL DO
 	      DO J=1,ND
 	        DO K=1,NDEXT
 	          TX_EXT(K,J,3)=TX_EXT(K,J,3) * TA(J)
 	          TX_EXT(K,J,4)=TX_EXT(K,J,4) * TB(J)
 	        END DO
 	      END DO
-!OMP PARALLEL DO
+!$OMP PARALLEL DO
 	      DO J=1,ND
 	        DO K=1,NDEXT-1
 	          TVX_EXT(K,J,3)=TVX_EXT(K,J,3) * TA(J)
@@ -557,14 +557,14 @@
 ! Correcting for clumping this way does it for both the continuum and lines.
 !
 	    IF(DO_CLUMP_MODEL)THEN
-!OMP PARALLEL DO
+!$OMP PARALLEL DO
 	      DO J=1,ND
 	        DO K=1,NDEXT
 	          TX_EXT(K,J,1)=TX_EXT(K,J,1)*CLUMP_FAC(J)
 	          TX_EXT(K,J,2)=TX_EXT(K,J,2)*CLUMP_FAC(J)
 	        END DO
 	      END DO
-!OMP PARALLEL DO
+!$OMP PARALLEL DO
 	      DO J=1,ND
 	        DO K=1,NDEXT-1
 	          TVX_EXT(K,J,1)=TVX_EXT(K,J,1)*CLUMP_FAC(J)
@@ -581,7 +581,7 @@
 	    ELSE
 	      TB(1:ND)=RJ_ES(1:ND)
 	    END IF
-!OMP PARALLEL DO
+!$OMP PARALLEL DO
 	    DO J=1,ND
 	      DO K=1,NDEXT
 	        TX_EXT(K,J,3)=TX_EXT(K,J,3) + TX_EXT(K,J,1)
@@ -590,7 +590,7 @@
 	1                                         TX_EXT(K,J,2)*TB(J)
 	      END DO
 	    END DO
-!OMP PARALLEL DO
+!$OMP PARALLEL DO
 	    DO J=1,ND
 	      DO K=1,NDEXT-1
 	        TVX_EXT(K,J,3)=TVX_EXT(K,J,3) + TVX_EXT(K,J,1)
@@ -822,6 +822,7 @@
 	1                       dJ_DIF_d_T(K)+dJ_DIF_d_dTdR(K)*DIFFW(NT)
 	    END DO
 	  END IF
+!
 	ELSE
 !
 ! Section to increment the variation matrices.

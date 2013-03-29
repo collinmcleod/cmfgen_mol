@@ -54,8 +54,9 @@ ifeq ($(HOST),ibis.phyast.pitt.edu)
 
  BLAS=-lblas
  LAPACK=-llapack
- LOCLIB=-L/opt/pgi/osx86-64/12.9/lib
- PGLIB= =pgf77libs -L/Users/jdh/pgplot/pgplot -lpgplot 
+# LOCLIB=-L/opt/pgi/osx86-64/12.9/lib
+ LOCLIB=-L/opt/pgi/osx86-64/11.8/lib
+ PGLIB= -pgf77libs -L/Users/jdh/pgplot/pgplot -lpgplot 
  X11LIB=-L/usr/X11R6/lib -lX11
 
 endif
@@ -115,7 +116,7 @@ ifeq ($(HOST),gannet.phyast.pitt.edu)
  LAPACK=-lacml -lacml_mv
  LOCLIB= 
 
- PGLIB= -pgf77libs -L/usr/pgplot -lpgplot 
+ PGLIB= -g77libs -L/usr/pgplot -lpgplot
  X11LIB=-L/usr/lib64/lib -lX11
 
 endif

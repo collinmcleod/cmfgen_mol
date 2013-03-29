@@ -389,11 +389,14 @@ C
 	  CALL RD_STORE_DBLE(ZNET_VAR_LIMIT,'ZNET_VAR_LIM',L_TRUE,
 	1            'Include lines in full varaition when '//
 	1            ' ABS(ZNET-1) > ZNET_VAR_LIM')
-	  CALL RD_STORE_LOG(WEAK_WITH_NET,'WNET',L_TRUE,
-	1            'Use Lambda iteration for weak lines?')
-	  CALL RD_STORE_DBLE(WEAK_LINE_LIMIT,'WK_LIM',L_TRUE,
-	1            'Maximum opacity ratio for weak lines (0.01)?')
-C
+	  CALL RD_STORE_LOG(WEAK_WITH_NET,'WNET',L_TRUE,'Use Lambda iteration for weak lines?')
+	  CALL RD_STORE_DBLE(WEAK_LINE_LIMIT,'WK_LIM',L_TRUE,'Maximum opacity ratio for weak lines (0.01)?')
+!
+	  USE_WEAK_TAU_LIM=.FALSE.; WEAK_TAU_LINE_LIMIT=0.01D0
+	  CALL RD_STORE_LOG(USE_WEAK_TAU_LIM,'WK_TAU',L_FALSE,'Use TAU(SOB) to decide weak lines?')
+	  CALL RD_STORE_DBLE(WEAK_TAU_LINE_LIMIT,'WK_TAU_LIM',USE_WEAK_TAU_LIM,
+	1                      'Maximum TAU for weak lines (0.01)?')
+!
 	  CALL RD_STORE_LOG(DIF,'DIF',L_TRUE,
 	1            'Use Diffusion approximation at inner boundary ?')
 	  IF(DIF)THEN

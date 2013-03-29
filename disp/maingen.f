@@ -3537,6 +3537,12 @@
 	1    'that of main code to avoid inconsisteancies.'
 !
 ! 
+! Computes the optical depth of lines of a given ionization stage and species at a 
+! given depth in the atmosphere. Either the radial or tangential Sobolev optical
+! depth is used.
+!
+	ELSE IF(XOPT .EQ. 'ARAT')THEN
+          CALL BRANCH_RAT(OMEGA_F,XV,YV,XSPEC,N_MAX,N_PLT_MAX,ND)
 !
 ! Computes the optical depth of lines of a given ionization stage and species at a 
 ! given depth in the atmosphere. Either the radial or tangential Sobolev optical

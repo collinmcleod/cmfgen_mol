@@ -37,26 +37,26 @@
 	INTEGER ID
 	INTEGER PHOT_ID
 !
-C Compute the opacity AND emissivity variation as a function of the changes
-C in population levels. As the variation is linear, they can be added
-C independently. Note that the VCHI and VETA are not zeroed when the
-C variation routines are called.
-C
+! Compute the opacity AND emissivity variation as a function of the changes
+! in population levels. As the variation is linear, they can be added
+! independently. Note that the VCHI and VETA are not zeroed when the
+! variation routines are called.
+!
 	IF(COMPUTE_NEW_CROSS)THEN
-C
-C Zero VCHI and VETA, then allow for the variation of the electron
-C scattering opacity and emissivity with ED.
-C
-C TA is used as a work vector.
-C
+!
+! Zero VCHI and VETA, then allow for the variation of the electron
+! scattering opacity and emissivity with ED.
+!
+! TA is used as a work vector.
+!
 	  CALL DP_ZERO(VCHI,NT*ND)
 	  CALL DP_ZERO(VETA,NT*ND)
 	  CALL DP_ZERO(VCHI_ALL,NT*ND)
 	  CALL DP_ZERO(VETA_ALL,NT*ND)
-C
-C We use EMHNUKT_CONT since we are evaluating the variation in the opacities
-C and emissivities at CONT_FREQ, not FL
-C
+!
+! We use EMHNUKT_CONT since we are evaluating the variation in the opacities
+! and emissivities at CONT_FREQ, not FL
+!
 	  DO L=1,ND
 	    EMHNUKT_CONT(L)=EXP(-HDKT*CONT_FREQ/T(L))
 	  END DO
@@ -89,11 +89,11 @@ C
 	  END DO
 	END IF
 !
-C
-C 
-C
-C Add in 2-photon opacities and emissivities.
-C
+!
+! 
+!
+! Add in 2-photon opacities and emissivities.
+!
 	  CALL TWO_PHOT_VAR_OPAC(VETA,VCHI,POPS,T,CONT_FREQ,ND,NT)
 !
 ! Altered 04-Mar-2004: Call inserted directly into subroutine. No longer done
@@ -119,37 +119,55 @@ C
 ! _ALL will contain the variation of ETA/CHI for ALL species.
 !
 	  IF(LST_DEPTH_ONLY)THEN
+!
+!$OMP PARALLEL WORKSHARE
+!
 	    VCHI_ALL(:,ND)=VCHI_ALL(:,ND)+VCHI(:,ND)
 	    VETA_ALL(:,ND)=VETA_ALL(:,ND)+VETA(:,ND)
 	    VCHI_SAV(:,ND)=VCHI(:,ND)
 	    VETA_SAV(:,ND)=VETA(:,ND)
 	    VCHI_ALL_SAV(:,ND)=VCHI_ALL(:,ND)
 	    VETA_ALL_SAV(:,ND)=VETA_ALL(:,ND)
+!
+!$OMP END PARALLEL WORKSHARE
+!
 	  ELSE
+!
+!$OMP PARALLEL WORKSHARE
+!
 	    VCHI_ALL=VCHI_ALL+VCHI
 	    VETA_ALL=VETA_ALL+VETA
 	    VCHI_SAV=VCHI
 	    VETA_SAV=VETA
 	    VCHI_ALL_SAV=VCHI_ALL
 	    VETA_ALL_SAV=VETA_ALL
+!
+!$OMP END PARALLEL WORKSHARE
+!
 	  END IF
 	ELSE IF(CONT_FREQ .EQ. FL)THEN
+!
+!$OMP PARALLEL WORKSHARE
+!
 	    VCHI=VCHI_SAV
 	    VETA=VETA_SAV
 	    VCHI_ALL=VCHI_ALL_SAV
 	    VETA_ALL=VETA_ALL_SAV
+!
+!$OMP END PARALLEL WORKSHARE
+!
 	END IF
-C
-C 
-C
-C This section of code can be utilized by both the DTDR and CONTINUUM code
-C sections.
-C
+!
+! 
+!
+! This section of code can be utilized by both the DTDR and CONTINUUM code
+! sections.
+!
   	IF(CONT_FREQ .NE. FL)THEN
-C
-C Scale dCHI and dETA to allow for the slight variation in frequency.
-C Correction should generally be small.
-C
+!
+! Scale dCHI and dETA to allow for the slight variation in frequency.
+! Correction should generally be small.
+!
 ! NB: Previously T4 was defined by T4= EMHNUKT(L)/EMHNUKT_CONT(L). In the
 ! presence of X-rays, and with NU=1000 or larger, EMHNUKT_CONT could be
 ! zero, thus causing a divide by zero.
@@ -165,17 +183,17 @@ C
                VETA(K,L)=VETA_SAV(K,L)*T4
                VETA_ALL(K,L)=VETA_ALL_SAV(K,L)*T4
             END DO
-C
-C Need to correct VETA for the variation in T in the factor T4.
-C Over correction at present because impurity species included.
-C
+!
+! Need to correct VETA for the variation in T in the factor T4.
+! Over correction at present because impurity species included.
+!
 	    VETA(NT,L)=VETA(NT,L) + 
 	1                ETA_C_EVAL(L)*T4*HDKT*(FL-CONT_FREQ)/T(L)/T(L)
 	    VETA_ALL(NT,L)=VETA_ALL(NT,L) + 
 	1                ETA_C_EVAL(L)*T4*HDKT*(FL-CONT_FREQ)/T(L)/T(L)
-C
-C Can now correct the opacity.
-C
+!
+! Can now correct the opacity.
+!
 	     DO K=1,NT
                VCHI(K,L)=VCHI_SAV(K,L)+(VETA_SAV(K,L)/T2-VETA(K,L)/T3)
                VCHI_ALL(K,L)=VCHI_ALL_SAV(K,L)+(VETA_ALL_SAV(K,L)/T2-VETA_ALL(K,L)/T3)
@@ -204,25 +222,30 @@ C
 	      VETA_ALL(NT,L)=VETA_ALL(NT,L) + 
 	1                  ETA_C_EVAL(L)*T4*HDKT*(FL-CONT_FREQ)/T(L)/T(L)
 	    END DO
-C
-C Can now correct the opacity.
-C
+!
+! Can now correct the opacity.
+!
+!$OMP  PARALLEL WORKSHARE
+!
             VCHI=VCHI_SAV+(VETA_SAV/T2-VETA/T3)
             VCHI_ALL=VCHI_ALL_SAV+(VETA_ALL_SAV/T2-VETA_ALL/T3)
+!
+!$OMP END PARALLEL WORKSHARE
+!
 	  END IF  
-C
+!
 	END IF			!Correct cross-section?
-C
-C 
-C
-C
-C In the CONTINUUM code section (with blanketing) the variation of the opacity 
-C and emissivity due to the electron scattering term is handled separately.
-C It is required in the DTDR section, DIELECTRONIC and LINE sections.
-C In DTDR the cross-sections can also be held fixed. In order that our
-C correction process implemented above works, we must keep the electron
-C scattering cross-section separate (primarily in the emissivity).
-C
+!
+! 
+!
+!
+! In the CONTINUUM code section (with blanketing) the variation of the opacity 
+! and emissivity due to the electron scattering term is handled separately.
+! It is required in the DTDR section, DIELECTRONIC and LINE sections.
+! In DTDR the cross-sections can also be held fixed. In order that our
+! correction process implemented above works, we must keep the electron
+! scattering cross-section separate (primarily in the emissivity).
+!
 	IF(SECTION .NE. 'CONTINUUM')THEN
 	  IF(ATM(1)%XzV_PRES)THEN
 	    DO K=1,ND

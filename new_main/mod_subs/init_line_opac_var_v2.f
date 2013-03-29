@@ -57,18 +57,30 @@
 ! rather than use a full linearization.
 !
 	    IF(WEAK_WITH_NET)THEN
+	      IF(USE_WEAK_TAU_LIM)THEN
 !
-! Compute optical depth at line center.
+! Compute Sobolev optical depth. Note: 2.998D+10 = C(km/s) / 1.0D+15
 !
-	      T1=1.0D-15/1.77245385095516D0		!1.0D-15/SQRT(PI)
-	      NU_DOP=FL_SIM(SIM_INDX)*12.85D0*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
+	        WEAK_LINE(SIM_INDX)=.TRUE.
+	        T1=2.998D-10/FL_SIM(SIM_INDX)
+	        DO I=1,ND
+	          T2=ABS(CHIL_MAT(I,SIM_INDX))*T1*R(I)/V(I)
+	          IF(T2 .GT. WEAK_TAU_LINE_LIMIT)WEAK_LINE(SIM_INDX)=.FALSE.
+	        END DO
+	      ELSE
+!
+! Compute opacity at line center.
+!
+	        T1=1.0D-15/1.77245385095516D0		!1.0D-15/SQRT(PI)
+	        NU_DOP=FL_SIM(SIM_INDX)*12.85D0*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
 	1                        (VTURB/12.85D0)**2 )/2.998D+05
-	      T2=T1/NU_DOP
-	      WEAK_LINE(SIM_INDX)=.TRUE.
-	      DO I=1,ND
-	        IF( ABS(CHIL_MAT(I,SIM_INDX))*T2/ESEC(I) .GT. WEAK_LINE_LIMIT)
-	1                            WEAK_LINE(SIM_INDX)=.FALSE.
-	      END DO
+	        T2=T1/NU_DOP
+	        WEAK_LINE(SIM_INDX)=.TRUE.
+	        DO I=1,ND
+	          IF( ABS(CHIL_MAT(I,SIM_INDX))*T2/ESEC(I) .GT. WEAK_LINE_LIMIT)
+	1                              WEAK_LINE(SIM_INDX)=.FALSE.
+	        END DO
+	      END IF
 	      IF(WEAK_LINE(SIM_INDX))NUM_OF_WEAK_LINES=NUM_OF_WEAK_LINES+1
 	    ELSE
 	      WEAK_LINE(SIM_INDX)=.FALSE.
