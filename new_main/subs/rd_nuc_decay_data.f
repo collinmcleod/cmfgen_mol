@@ -10,6 +10,7 @@
 	INTEGER LU
 !
 	INTEGER IN		!Index for NUC
+	INTEGER IN_LOOP
 	INTEGER IS		!Index for ISO
 	INTEGER IP		!Index for PAR
 	INTEGER J
@@ -19,6 +20,7 @@
 	REAL*8 ELECTRON_VOLT
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU,ELECTRON_VOLT
+	LOGICAL UNRECOGNIZED_ISO
 	LOGICAL VERBOSE
 	LOGICAL INCL_RAD_DECAYS
 !
@@ -61,7 +63,8 @@
 	    ELSE IF(STRING(1:1) .EQ. ' ' .OR. STRING(1:1) .EQ. '!')THEN
 	    ELSE
 	      WRITE(LUER,*)'Error in RD_NUCLEAR_DECAY_DATA'
-	      WRITE(LUER,*)'Unrecognized statment'
+	      WRITE(LUER,*)'Unrecognized statment -- statement is:'
+	      WRITE(LUER,*)TRIM(STRING)
 	      STOP
 	    END IF
 	  END DO
@@ -102,8 +105,34 @@
 	  END IF
 	END DO
 	WRITE(LUER,*)'Successfully read in isotope data from NUC_DATA_FILE'
-! 
-	DO IN=1,NUM_DECAY_PATHS
+!
+! Determine the link between ISOTOPE and SPECIES (as specified in MOD_CMFGEN).
+!
+	UNRECOGNIZED_ISO=.FALSE.
+	DO IS=1,NUM_ISOTOPES
+	  DO J=1,NUM_SPECIES
+	    IF(ISO(IS)%SPECIES .EQ. SPECIES(J))THEN
+	      ISO(IS)%ISPEC=J
+	      EXIT
+	    END IF
+	  END DO
+	  IF(ISO(IS)%ISPEC .EQ. 0)UNRECOGNIZED_ISO=.TRUE.
+	END DO
+!
+	IF(UNRECOGNIZED_ISO)THEN
+	  WRITE(LUER,*)' '
+	  WRITE(LUER,*)'Error in RD_NUCLEAR_DECAY_DATA: unrecognized isotopes'
+	  WRITE(LUER,*)'Add the ISOTOPE to the SN_HYDRO_FILE (preferred)'
+	  WRITE(LUER,*)'or delete ISOTOPE (and reactions?) from NUC_DECAY_DATA'
+	  DO IS=1,NUM_ISOTOPES
+	    IF(ISO(IS)%ISPEC .EQ. 0)WRITE(LUER,*)ISO(IS)%SPECIES
+	  END DO
+	  STOP
+	END IF
+!
+	IN=0
+	DO IN_LOOP=1,NUM_DECAY_PATHS
+	  IN=IN+1
 	  STRING=' '
 	  DO WHILE(STRING .EQ. ' ' .OR. STRING(1:1) .EQ. '!')
 	    READ(LU,'(A)')STRING
@@ -146,30 +175,10 @@
 	    WRITE(LUER,*)'STRING is: ',TRIM(STRING)
 	    STOP
 	  END IF
-	END DO
-	CLOSE(LU)
-	WRITE(6,*)'Successfully read in NUCLEAR data'
-!
-! Determine the link between ISOTOPE and SPECIES (as specified in MOD_CMFGEN).
-!
-	DO IS=1,NUM_ISOTOPES
-	   DO J=1,NUM_SPECIES
-	     IF(ISO(IS)%SPECIES .EQ. SPECIES(J))THEN
-	        ISO(IS)%ISPEC=J
-	        EXIT
-	     END IF
-	   END DO
-	   IF(ISO(IS)%ISPEC .EQ. 0)THEN
-	     WRITE(LUER,*)'Error in RD_NUCLEAR_DECAY_DATA'
-	     WRITE(LUER,*)ISO(IS)%SPECIES,' not recognized'
-	     STOP
-	   END IF
-	END DO
 !
 ! Determine links between NUCLEAR reactant and the corresponding ISOTOPE.
 ! We need to do both the parent and the isotope.
 !
-	DO IN=1,NUM_DECAY_PATHS
 	  DO IS=1,NUM_ISOTOPES
 	    IF(NUC(IN)%SPECIES .EQ. ISO(IS)%SPECIES)THEN
 	       NUC(IN)%ISPEC=ISO(IS)%ISPEC
@@ -186,10 +195,29 @@
 	       IF(NUC(IN)%DAUGHTER_BARYON_NUMBER .EQ. ISO(IS)%BARYON_NUMBER)THEN
 	         NUC(IN)%DAUGHTER_LNK_TO_ISO=IS
 	         EXIT
-	       END IF
+	      END IF
 	    END IF
 	  END DO
+!
+	  IF(NUC(IN)%LNK_TO_ISO .EQ. 0 .OR. NUC(IN)%DAUGHTER_LNK_TO_ISO .EQ. 0)THEN
+	    NUC(IN)%LNK_TO_ISO=0
+	    NUC(IN)%DAUGHTER_LNK_TO_ISO=0
+	    WRITE(6,*)'Warning: No match was found for the following nuclear reaction'
+	    WRITE(6,'(2(A5,I6))')NUC(IN)%SPECIES,NUC(IN)%BARYON_NUMBER,NUC(IN)%DAUGHTER,NUC(IN)%DAUGHTER_BARYON_NUMBER
+	    IN=IN-1
+	  END IF
+!
 	END DO
+	CLOSE(LU)
+	NUM_DECAY_PATHS=IN
+	WRITE(6,*)'Successfully read in NUCLEAR data'
+!
+	IF(VERBOSE)THEN
+	  DO IN=1,NUM_DECAY_PATHS
+	    WRITE(6,'(I5,2A10,3I8)')IN,TRIM(NUC(IN)%SPECIES),TRIM(NUC(IN)%DAUGHTER),NUC(IN)%BARYON_NUMBER,
+	1                  NUC(IN)%LNK_TO_ISO,NUC(IN)%DAUGHTER_LNK_TO_ISO
+	  END DO
+	END IF
 !
 ! Determine link bewteen ISOTOPES (in ISO) and the PARENT group (in PAR)
 ! This determines the storage order in PAR.

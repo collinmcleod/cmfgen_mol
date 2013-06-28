@@ -8,6 +8,7 @@
       USE STEQ_DATA_MOD
       IMPLICIT NONE
 !
+! Altered 04-Apr-2013 : MEMORY made REAL to avoid integer overflow.
 ! Altered 01-Apr-2004 : BA matrices allocated after all STEQ matrices.
 ! Created 05-Apr-2001
 !
@@ -23,7 +24,7 @@
       INTEGER LU_ER,ERROR_LU
       EXTERNAL ERROR_LU
 !
-      INTEGER MEMORY
+      REAL*8 MEMORY
       INTEGER I,NX,NY
 !
       LU_ER=ERROR_LU()
@@ -42,7 +43,7 @@
 !
 ! Will need to add an extra equation for X-rays.
 !
-      MEMORY=0
+      MEMORY=0.0D0
       DO ID=1,NION
 	IF(SE(ID)%XzV_PRES)THEN
 	  NX=SE(ID)%N_SE
@@ -121,9 +122,9 @@
 !
       MEMORY=MEMORY+2*NT*ND*NUM_BNDS+NT*ND
       WRITE(LU_ER,*)' '
-      WRITE(LU_ER,*)'Amount of memory allocated for BA is:  ',MEMORY,' words'
-      MEMORY=NT*NT*(NUM_BNDS+1)*ND
-      WRITE(LU_ER,*)'Memory needed with full dependence is: ',MEMORY,' words'
+      WRITE(LU_ER,'(A,ES17.10,A)')' Amount of memory allocated for BA is:  ',MEMORY,' words'
+      MEMORY=DFLOAT(NT)*NT*(NUM_BNDS+1)*ND
+      WRITE(LU_ER,'(A,ES17.10,A)')' Memory needed with full dependence is: ',MEMORY,' words'
 !
       RETURN
       END

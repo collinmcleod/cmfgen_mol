@@ -133,6 +133,7 @@
 ! NB: In this equation the matrices are NOT passed for WS, dWS and NU.
 !
 	    IF(FINAL_CONSTANT_CROSS)THEN
+	      CALL TUNE(1,'BA_CONT_UP')
 	      DO ID=1,NUM_IONS-1
 	        ID_SAV=ID
 	        IF(ATM(ID)%XzV_PRES)THEN
@@ -148,6 +149,7 @@
 	          END DO
 	        END IF
 	      END DO
+	      CALL TUNE(2,'BA_CONT_UP')
 	    END IF
 !
 ! 
@@ -155,6 +157,7 @@
 ! 2 electrons are ejected.
 !
 	    IF(XRAYS .AND. FINAL_CONSTANT_CROSS)THEN
+	      CALL TUNE(1,'BA_XRAY_UP')
 	      DO ID=1,NUM_IONS-1
 	        IF(ATM(ID)%XzV_PRES .AND. ATM(ID+1)%XzV_PRES)THEN
 	          CALL VSEBYJ_X_V6(ID,ATM(ID)%WSE_X_XzV,
@@ -165,6 +168,7 @@
 	1             ND,NION,DST,DEND)
 	        END IF
 	      END DO
+	      CALL TUNE(2,'BA_XRAY_UP')
 	    END IF		!End X-rays
 !
 ! 

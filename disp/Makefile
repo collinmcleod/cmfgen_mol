@@ -11,6 +11,7 @@ LN3=subs
 LN4=pgplt
 LN5=newsubs
 LN6=disp
+LN7=dev
 #
 # These names refer to the full file name
 #
@@ -20,6 +21,7 @@ FN3=$(LIB_DIR)lib$(LN3).a
 FN4=$(LIB_DIR)lib$(LN4).a
 FN5=$(LIB_DIR)lib$(LN5).a
 FN6=$(LIB_DIR)lib$(LN6).a
+FN7=$(LIB_DIR)lib$(LN7).a
 
 #
 # We only make dispgen.exe if there has been a changen to the main *.f files,
@@ -32,9 +34,9 @@ all : $(EXE_DIR)dispgen.exe
 # Give the depeedencies of dispgen.exe and how it is created.
 #
 
-$(EXE_DIR)dispgen.exe : mod_disp.o dispgen.o maingen.o pltphot_sub.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
+$(EXE_DIR)dispgen.exe : mod_disp.o dispgen.o maingen.o pltphot_sub.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6) $(FN7)
 	$(F90) dispgen.o mod_disp.o maingen.o pltphot_sub.o \
-             -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
+             -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) -l$(LN7) \
                $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)/dispgen.exe
 

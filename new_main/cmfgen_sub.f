@@ -3571,7 +3571,7 @@
 	1                                     SUM(XRAY_LUM_1KEV),OBS_XRAY_LUM_1KEV
 	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emitted & observed X-ray Luminosity (> 0.1 keV, Lstar) :',
 	1                                     SUM(XRAY_LUM_0P1)/LUM,OBS_XRAY_LUM_0P1/LUM
-	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emiited & observed X-ray Luminosity (> 1 keV, Lstar):',
+	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emitted & observed X-ray Luminosity (> 1 keV, Lstar):',
 	1                                     SUM(XRAY_LUM_1KEV)/LUM,OBS_XRAY_LUM_1KEV/LUM
 	CLOSE(UNIT=LU_FLUX)
 !

@@ -9,6 +9,7 @@
 	1            INBCNEW,IC,THK,INNER_BND_METH,NC,ND,NP,METHOD)
 	IMPLICIT NONE
 !
+! Altered 28-May-2013: J is now returned in XM.
 ! Altered 07-Jun-2010: Changed to THOMAS_RH to handle later stages of SN.
 !                        Replaced DIF variable by INNER_BND_METH.
 ! Altered 26-May-2005 --- R*R-P*P replaved by (R-P)*(R+P)
@@ -189,6 +190,7 @@
 !        routines.
 !   (ii) Q is now completely consistent with the updated f value.
 !
+	XM=NEWRJ
 	CALL QFROMF(NEWRK,NEWRJ,R,TA,TB,ND)	!TA work vector
 !
 	RETURN

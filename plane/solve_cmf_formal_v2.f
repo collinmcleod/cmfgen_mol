@@ -27,6 +27,9 @@
 ! Altered 09-May-2010: Changed to call OPTDEPTH_V4.
 !                      CUR_LOC is noe set in calling routine. Since independent of ip, allows this routine to be
 !                        in parallel loop.
+! Altered 07-Apr-2103: Source function is now interpolated using linear interpolation for last two intervals for
+!                        outgoing rays. Problems were arising because of rapidly varying source functon and very 
+!                        unequal step sizes.
 !
 !--------------------------------------------------------------------
 !
@@ -239,7 +242,7 @@
 !
 !---------------------------------------------------------------
 !
-      do iz=nzz-1,2,-1
+      do iz=nzz-1,3,-1
 !
         t1=dtau_loc(iz)
         if(t1 .gt. 0.01d0)then
@@ -271,23 +274,25 @@
 ! If only 2 points along the ray or at outer boundary, must use linear
 ! source function
 !
-      t1=dtau_loc(1)
-      if(t1 .gt. 0.01d0)then
-        ee=exp(-dtau_loc(1))
-        e0=1.0d0-ee
-        e1=dtau_loc(1)-e0
-        e2=dtau_loc(1)*dtau_loc(1)-2.0d0*e1
-      else
-        e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1.0d0-0.2D0*t1*(1.0D0-t1/6.0D0*
-     1              (1.0D0-t1/7.0D0))))/3.0D0
-        e1=0.5d0*(t1*t1-e2)
-        e0=t1-e1
-        ee=1.0d0-e0
-      end if
+      do iz=min(nzz-1,2),1,-1
+        t1=dtau_loc(iz)
+        if(t1 .gt. 0.01d0)then
+          ee=exp(-dtau_loc(iz))
+          e0=1.0d0-ee
+          e1=dtau_loc(iz)-e0
+          e2=dtau_loc(iz)*dtau_loc(iz)-2.0d0*e1
+        else
+          e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1.0d0-0.2D0*t1*(1.0D0-t1/6.0D0*
+     1                (1.0D0-t1/7.0D0))))/3.0D0
+          e1=0.5d0*(t1*t1-e2)
+          e0=t1-e1
+          ee=1.0d0-e0
+        end if
 !
-      beta=e1/dtau_loc(1)
-      gamma=e0-e1/dtau_loc(1)
-      ray(ip)%I_p(1)=ray(ip)%I_p(2)*ee+beta*source_prime(1)+gamma*source_prime(2)
+        beta=e1/dtau_loc(iz)
+        gamma=e0-e1/dtau_loc(iz)
+        ray(ip)%I_p(iz)=ray(ip)%I_p(iz+1)*ee+beta*source_prime(iz)+gamma*source_prime(iz+1)
+       end do
 !     if(ip .le. nc)write(166,*)freq,ray(ip)%I_p(nzz),ray(ip)%I_m(nzz)
 !
       return

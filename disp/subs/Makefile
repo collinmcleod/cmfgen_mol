@@ -10,6 +10,7 @@ LIB=$(LIB_DIR)/libdisp.a
 # Entries for library
 #
 OBJ = $(LIB)(betanew.o)\
+      $(LIB)(arnaud_cross_v3_disp.o)\
       $(LIB)(branch_rat.o)\
       $(LIB)(chk_string.o)\
       $(LIB)(comp_jbar.o)\
@@ -18,6 +19,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(edgewr.o)\
       $(LIB)(fg_ham.o)\
       $(LIB)(fqcomp_v2.o)\
+      $(LIB)(gam_abs.o)\
       $(LIB)(get_dtaulam.o)\
       $(LIB)(get_filename.o)\
       $(LIB)(get_line_indices.o)\
@@ -30,11 +32,13 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(new_writedc_v5.o)\
       $(LIB)(op_spec_file_v2.o)\
       $(LIB)(pallet.o)\
+      $(LIB)(plt_arn.o)\
       $(LIB)(rd_ion_pop_v3.o)\
       $(LIB)(rd_non_therm_spec.o)\
       $(LIB)(rd_pop_dim.o)\
       $(LIB)(rd_rvtj.o)\
       $(LIB)(rd_rvtj_v2.o)\
+      $(LIB)(read_arnaud_ion_data_disp.o)\
       $(LIB)(recom_chk_v2.o)\
       $(LIB)(set_dc_or_pop_or_tx.o)\
       $(LIB)(set_dc_or_pop_or_tx_v2.o)\
@@ -51,6 +55,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(write_line.o)\
       $(LIB)(writscrat.o)\
       $(LIB)(wr_col.o)\
+      $(LIB)(wr_col_lines.o)\
       $(LIB)(wr_col_rates.o)\
       $(LIB)(wr_spec_sum_v2.o)\
       $(LIB)(wr_crit.o)\
@@ -58,12 +63,18 @@ OBJ = $(LIB)(betanew.o)\
 
 all : $(LIB)
 	rm -f *.o
-$(LIB) : $(OBJ)	
+$(LIB) : $(OBJ)	$(NT)
+
+NT =  $(LIB_DIR)libmod.a(mod_non_therm.o)
 
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f 
 	$(F90) -c $(FG)  $<
+	ar ruv $(LIB) $*.o
+
+$(LIB)(%.o) : %.f90 ../mod_disp.o $(NT)
+	$(F90) -c $(FFREE)  -I../ -I../../new_main/subs/non_therm $<
 	ar ruv $(LIB) $*.o
 
 $(LIB)(wr_spec_sum_v2.o) : wr_spec_sum_v2.f ../mod_disp.o 
@@ -79,6 +90,7 @@ $(LIB)(branch_rat.o) : branch_rat.f ../mod_disp.o
 # fortran moudles. (The order of compilation matters.)
 #
 
+
 GEN = ../../lib/libsubs.a(mod_trap_derivatives.o)
 
 $(LIB)(get_dtaulam.o)  : get_dtaulam.f  $(GEN)
@@ -86,8 +98,12 @@ $(LIB)(get_dtaulam.o)  : get_dtaulam.f  $(GEN)
 $(GEN):
 	(cd ../../subs; make )
 
+$(NT):
+	(cd ../../new_main/subs/non_therm; make )
+
 clean :
 	rm -f *.o
+	rm -f $(LIB_DIR)/libdisp.a
 
 clean_lib :
 	rm -f $(LIB)

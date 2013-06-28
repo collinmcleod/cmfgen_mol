@@ -12,6 +12,7 @@ LIB=$(LIB_DIR)libtools.a
 OBJ = $(LIB)(usr_option.o)\
       $(LIB)(constants_mod.o)\
       $(LIB)(condit_string.o)\
+      $(LIB)(count_occur.o)\
       $(LIB)(form_sp_num.o)\
       $(LIB)(gen_in.o)\
       $(LIB)(get_lu.o)\

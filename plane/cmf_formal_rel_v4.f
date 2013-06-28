@@ -38,6 +38,7 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered 04-Apr-2013: Fixed bug. NP_LIMIT(not NP) is limit when THICK_OB=FALSE.
 ! Altered 08-Jan-2012: Changed to V4 -- added REXT_FAC to call.
 ! Altered 14-May-2009: Altered value of IDMAX (for ETA and CHI interpolaton).
 !                        IDMAX & IDMIN now stored in FG_J_CMF_MOD_V11.
@@ -563,7 +564,7 @@
 ! Evaluate half moments at outer boundary, and store intensity at the outer boundary.
 !
 	ID=1
-	DO IP=1,NP
+	DO IP=1,NP_LIMIT
 	  T1=RAY(IP)%I_P(RAY(IP)%LNK(ID))
 	  T2=RAY(IP)%I_M(RAY(IP)%LNK(ID))
 	  JPLUS_OB=JPLUS_OB+T1*Jqw_p(1,ip)
@@ -581,7 +582,7 @@
 !
 	CALL TUNE(1,'FGP_SAVE')
 !$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(ID,IP)
-	DO IP=1,NP
+	DO IP=1,NP_LIMIT
 	  DO ID=1,RAY(IP)%NZ
 	    RAY(IP)%I_P_SAVE(ID)=RAY(IP)%I_P(ID)
 	    RAY(IP)%I_M_SAVE(ID)=RAY(IP)%I_M(ID)

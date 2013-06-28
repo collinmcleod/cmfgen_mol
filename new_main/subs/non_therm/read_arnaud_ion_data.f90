@@ -21,8 +21,11 @@
 	REAL*8, PARAMETER :: Hz_TO_eV=4.1356691D0
 	REAL*8 T1,T2
 !
+	INTEGER COUNT_OCCUR
+	EXTERNAL COUNT_OCCUR
+!
 	OPEN(UNIT=LU_OUT,FILE='NON_THERM_ION_SUM',STATUS='UNKNOWN')
-	CALL SET_LINE_BUFFERING(LU_OUT)
+!	CALL SET_LINE_BUFFERING(LU_OUT)
 !
 ! File containing the parameters for the ionization potential
 ! and direct-ionization cross section used in Arnaud & Rothenflug 1985
@@ -74,8 +77,23 @@
 	             END IF
 	             THD(IT)%LNK_TO_SPECIES=ISPEC
 	             THD(IT)%LNK_TO_ION=ID
-	             READ(STRING,*) THD(IT)%ZION,THD(IT)%N_ION_EL,THD(IT)%PQN,THD(IT)%ANG,THD(IT)%ION_POT, &
-	                 THD(IT)%A_COL,THD(IT)%B_COL,THD(IT)%C_COL,THD(IT)%D_COL
+	             THD(IT)%NTAB=0
+	             IF(COUNT_OCCUR(STRING,'.') .GT. 1)THEN
+	               READ(STRING,*) THD(IT)%ZION,THD(IT)%N_ION_EL,THD(IT)%PQN,THD(IT)%ANG,THD(IT)%ION_POT, &
+	                   THD(IT)%A_COL,THD(IT)%B_COL,THD(IT)%C_COL,THD(IT)%D_COL
+	             ELSE
+	               WRITE(6,*)'Reading tabulated value'
+	               READ(STRING,*) THD(IT)%ZION,THD(IT)%N_ION_EL,THD(IT)%PQN,THD(IT)%ANG,THD(IT)%ION_POT, THD(IT)%NTAB
+	               ALLOCATE(THD(IT)%XTAB(THD(IT)%NTAB),STAT=IOS)
+	               IF(IOS .EQ. 0)ALLOCATE(THD(IT)%YTAB(THD(IT)%NTAB),STAT=IOS)
+	               IF(IOS .NE. 0)THEN
+	                 WRITE(6,*)'Unable to allocate XTAB and YTAB in READ_ARNAUD'
+	                 STOP
+	               END IF
+	               READ(LU_IN,*)THD(IT)%XTAB
+	               READ(LU_IN,*)THD(IT)%YTAB
+	               THD(IT)%XTAB=THD(IT)%XTAB*THD(IT)%ION_POT
+	             END IF
 	             THD(IT)%PRES=.TRUE.
 !
 ! Find level in atom. We assume ground term, unless the lower term (indicated by a *) is specified.
@@ -93,7 +111,7 @@
 	                 TMP_NAME=TRIM(ATM(ID)%XZVLEVNAME_F(1))
 	               END IF
 	             END IF
-	             DO I=1,MIN(10,ATM(ID)%NXzV_F)
+	             DO I=1,MIN(30,ATM(ID)%NXzV_F)
 	               K=INDEX(ATM(ID)%XzVLEVNAME_F(I),'[')-1
 	               IF(K .LT. 0)K=LEN_TRIM(ATM(ID)%XzVLEVNAME_F(I))
 	                IF(INDEX(TMP_NAME,ATM(ID)%XZVLEVNAME_F(I)(1:K)) .NE. 0)THEN
@@ -129,7 +147,10 @@
 	                 END IF
 	               END DO
 	               IF(INDEX(TMP_NAME,'&') .NE. 0)THEN
-	                 IT=IT-1
+	                 THD(IT)%SUM_GION=ATM(ID)%GIONXzV_F
+	                 THD(IT)%N_ION_ROUTES=1
+	                 THD(IT)%ION_LEV(1)=1
+!	                 IT=IT-1
 	               ELSE IF(THD(IT)%N_ION_ROUTES .EQ. 0)THEN
 	                 WRITE(6,*)'Error in RD_ARNAUD_ION_DATA -- unmatched ion level name'
 	                 WRITE(6,*)TRIM(STRING)
@@ -140,6 +161,7 @@
 	                 WRITE(6,*)THD(IT)%ION_POT,Hz_TO_eV*T1,Hz_TO_eV*T2
 	                 IF(THD(IT)%ION_POT .GT. Hz_TO_eV*T1 .AND. THD(IT)%ION_POT .LT. Hz_TO_eV*T2)THEN
 	                   WRITE(6,*)'Continuing execution as level not included' 
+	                   THD(IT)%NTAB=0
 	                   IT=IT-1
 	                 ELSE
 	                   STOP

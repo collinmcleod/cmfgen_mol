@@ -18,6 +18,7 @@
 !                    SCRTEMP(.DAT)
 !
 	PROGRAM DO_NG_V2
+	USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -53,6 +54,7 @@
 	REAL*8 SCALE_FAC
 	REAL*8 BIG_FAC
 	REAL*8 SF1,SF2
+	REAL*8 REAL_LIMIT
 !
 	INTEGER ND,NT
 	INTEGER NBAND
@@ -68,7 +70,8 @@
 	INTEGER N_ITS_TO_RD
 	INTEGER N_ITS_TO_AV
 	INTEGER IT_STEP
-	INTEGER I,J,K
+	INTEGER I,J,K,L
+	INTEGER LOCATION(1)
 	INTEGER IVAR
 !
 	INTEGER, PARAMETER :: RITE_N_TIMES=1
@@ -80,6 +83,7 @@
 	LOGICAL DO_REGARDLESS
 	LOGICAL WRITE_RVSIG
 	LOGICAL SCALE_INDIVIDUALLY
+	LOGICAL REPLACE_VAL
 	CHARACTER*4 OPTION
 	CHARACTER*132 STRING
 !
@@ -165,6 +169,9 @@
 	  CALL GEN_IN(N_ITS_TO_RD,'Number of iterations to read')
 	  CALL GEN_IN(ND_ST,'Only do Averaging if depth is .GE. ND_ST')
 	  CALL GEN_IN(ND_END,'Only do Averaging if depth is .LE. ND_END')
+	ELSE IF(OPTION(1:2) .EQ. 'SM')THEN
+	  N_ITS_TO_RD=2
+	  CALL GEN_IN(N_ITS_TO_RD,'Number of iterations to read')
 	ELSE IF(OPTION(1:3) .EQ. 'FID' .OR. OPTION(1:4) .EQ. 'FFID')THEN
 	  N_ITS_TO_RD=3
 	  CALL GEN_IN(N_ITS_TO_RD,'Number of iterations to read')
@@ -263,6 +270,35 @@
 	    END DO
 	  END DO
 	  NG_DONE=.TRUE.
+!
+	ELSE IF(OPTION(1:2) .EQ. 'SM')THEN
+	  BIG_POPS=RDPOPS(:,:,1)
+	  REAL_LIMIT=1.0D-08
+	  CALL GEN_IN(REAL_LIMIT,'Replace value when ratio is larger than this value.')
+	  DO I=1,NT
+	    TA(1:ND)=BIG_POPS(I,1:ND)
+	    DO J=2,ND-1
+	      TB(J)=BIG_POPS(I,J)/SQRT(BIG_POPS(I,J-1)*BIG_POPS(I,J+1))
+	    END DO
+	    TB(1)=TA(1)/TA(2); TB(ND)=TA(ND)/TA(ND-1)
+	    LOCATION=MINLOC(TB(1:ND)); K=LOCATION(1)
+	    IF(TB(K) .LT. REAL_LIMIT)THEN
+	      WRITE(6,'(2I4,3ES14.4)',ADVANCE='NO')I,K,TB(K),TA(MAX(1,K-2):MAX(1,K-1))
+	      WRITE(6,'(A,ES14.4,A,2ES14.4)')RED_PEN,TA(K:K),DEF_PEN,TA(MIN(ND,K+1):MIN(ND,K+2))
+	      CALL GEN_IN(REPLACE_VAL,'Replace value with harmonic average?')
+	      J=K-1; IF(K .EQ. 1)J=2
+	      L=K+1; IF(K .EQ. ND)L=ND-1
+	      IF(REPLACE_VAL)THEN
+	        BIG_POPS(I,K)=SQRT(TA(J)*TA(L))
+	      ELSE
+	        T1=BIG_POPS(I,K)
+	        CALL GEN_IN(T1,'New value (default is old value)')
+	        BIG_POPS(I,K)=T1
+	      END IF
+	    END IF
+	  END DO
+	  NG_DONE=.TRUE.
+!
 	ELSE IF(OPTION(1:2) .EQ. 'TG')THEN
 	  BIG_POPS=RDPOPS(:,:,1)
 	  IVAR=NT
@@ -464,6 +500,7 @@
 !
 	SUBROUTINE NG_MIT_OPTS(POPS,RDPOPS,ND,NT,NBAND,ND_ST,ND_END,DO_REGARDLESS,
 	1                           SCALE_INDIVIDUALLY,NG_DONE,LUER)
+	USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -490,6 +527,8 @@
 !
 	REAL*8 RINDX(NT)
 	REAL*8 RAT(NT)
+	REAL*8 TA(MAX(NT,ND))
+	REAL*8 TB(MAX(NT,ND))
 !
 	REAL*8 T1
 	REAL*8 LOCINC,LOCDEC
@@ -519,6 +558,25 @@
 	  IF(ND_ST .GT. 1)NEWPOP(:,1:ND_ST-1)=POPS(:,1:ND_ST-1)
 	  IF(ND_END .LT. ND)NEWPOP(:,ND_END+1:ND)=POPS(:,ND_END+1:ND)
 	END IF
+!
+	WRITE(6,*)' '//RED_PEN
+	WRITE(6,'(1X,70A)')('*',I=1,70)
+	WRITE(6,*)' '
+	WRITE(6,*)'Plotting T correction due to acceleration, and the last T correction'
+	WRITE(6,*)'If the two corrections are not of the same sign, the acceleration i'
+	WRITE(6,*)'should be CANCELLED.'
+	WRITE(6,*)' '
+	WRITE(6,'(1X,70A)')('*',I=1,70)
+	WRITE(6,*)' '//DEF_PEN
+!
+	DO I=1,ND
+	  INT_ARRAY(I)=I
+	  TA(I)=100.0D0*(1.0D0-RDPOPS(NT,I,2)/NEWPOP(NT,I))
+	  TB(I)=100.0D0*(1.0D0-RDPOPS(NT,I,3)/RDPOPS(NT,I,2))
+	END DO
+	CALL DP_CURVE(ND,INT_ARRAY,TA)
+	CALL DP_CURVE(ND,INT_ARRAY,TB)
+	CALL GRAMON_PGPLOT('Depth Index','100[T(new)-T(old)]/T(new)',' ',' ')
 !
 	WRITE(6,*)' '
 	WRITE(6,'(1X,70A)')('*',I=1,70)
@@ -650,9 +708,6 @@
 	WRITE(6,*)' '
 	WRITE(6,'(1X,70A)')('*',I=1,70)
 	WRITE(6,*)' '
-	DO I=1,ND
-	  INT_ARRAY(I)=I
-	END DO
 	CALL DP_CURVE(ND,INT_ARRAY,VEC_DEC)
 	CALL DP_CURVE(ND,INT_ARRAY,VEC_INC)
 	CALL GRAMON_PGPLOT('Depth Index','100(N/O-1)',' ',' ')

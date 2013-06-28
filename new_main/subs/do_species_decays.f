@@ -46,26 +46,27 @@
 !
 ! Do decay chains with a single decay route.
 !
-	  IF(NUC(IN)%SEQUENCE ==  'E')THEN
-	    IS=NUC(IN)%LNK_TO_ISO
-	    JS=NUC(IN)%DAUGHTER_LNK_TO_ISO
+	  IS=NUC(IN)%LNK_TO_ISO
+	  JS=NUC(IN)%DAUGHTER_LNK_TO_ISO
+	  IF(NUC(IN)%SEQUENCE ==  'E' .AND. IS*JS .NE. 0)THEN
 	    VEC1=EXP(-NUC(IN)%DECAY_CONST*DELTA_T)
-	    WRITE(6,*)'Found one step nuclear reaction chain:',IN
+!	    WRITE(6,*)'Found one step nuclear reaction chain:',IN
 	    ISO(IS)%OLD_POP_DECAY=ISO(IS)%OLD_POP*VEC1
 	    ISO(JS)%OLD_POP_DECAY=ISO(JS)%OLD_POP + ISO(IS)%OLD_POP*(1.0D0-VEC1)
 	    RADIOACTIVE_DECAY_ENERGY=RADIOACTIVE_DECAY_ENERGY +  
 	1            ISO(IS)%OLD_POP*(1.0D0-VEC1)*NUC(IN)%ENERGY_PER_DECAY
+!	    WRITE(6,*)RADIOACTIVE_DECAY_ENERGY
 !
 ! Do two step sequences.
 !
-	  ELSE IF(NUC(IN)%SEQUENCE ==  'F')THEN
-	    IS=NUC(IN)%LNK_TO_ISO
+	  ELSE IF(NUC(IN)%SEQUENCE ==  'F' .AND. IS .NE. 0)THEN
 	    VEC1=EXP(-NUC(IN)%DECAY_CONST*DELTA_T)
 	    DO JN=1,NUM_DECAY_PATHS
 	      IF(NUC(JN)%SEQUENCE ==  'S' .AND. NUC(JN)%BARYON_NUMBER .EQ.  NUC(IN)%BARYON_NUMBER .AND.
 	1        NUC(JN)%SPECIES .EQ. NUC(IN)%DAUGHTER)THEN
-	        WRITE(6,*)'Found nuclear reaction chain:',IN,JN
+!	        WRITE(6,*)'Found nuclear reaction chain:',IN,JN
 	        JS=NUC(JN)%LNK_TO_ISO
+	        IF(JS .EQ. 0)EXIT
 	        VEC2=EXP(-NUC(JN)%DECAY_CONST*DELTA_T)
 	        VEC3=NUC(IN)%DECAY_CONST*( EXP(-NUC(JN)%DECAY_CONST*DELTA_T) -
 	1                   EXP(-NUC(IN)%DECAY_CONST*DELTA_T) )/(NUC(IN)%DECAY_CONST-NUC(JN)%DECAY_CONST)
@@ -79,6 +80,7 @@
 	1            ISO(IS)%OLD_POP*(1.0D0-VEC1)*NUC(IN)%ENERGY_PER_DECAY +
 	1            ISO(JS)%OLD_POP*(1.0D0-VEC2)*NUC(JN)%ENERGY_PER_DECAY +
 	1            ISO(IS)%OLD_POP*(1.0D0-VEC1-VEC3)*(NUC(IN)%ENERGY_PER_DECAY+NUC(JN)%ENERGY_PER_DECAY)
+!	        WRITE(6,*)RADIOACTIVE_DECAY_ENERGY
 	        EXIT
 	      END IF
 	    END DO

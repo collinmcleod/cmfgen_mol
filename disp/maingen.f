@@ -314,12 +314,16 @@
 	CHARACTER X*20
 	CHARACTER XOPT*10
 	CHARACTER XSPEC*10
+!
 	CHARACTER TYPE*10
-	CHARACTER STRING*80
-	CHARACTER FILENAME*80
+	CHARACTER(LEN=80) STRING
+	CHARACTER(LEN=10) COL_OPT
+	CHARACTER(LEN=80) FILENAME
+!
 	CHARACTER FMT*80
 	CHARACTER*120 DEFAULT
 	CHARACTER*120 DESCRIPTION
+	CHARACTER(LEN=1) FIRST_COLR
 !
 ! External functions
 !
@@ -364,6 +368,9 @@
 	XAXSAV=' '
 	YAXIS=' '
 	METHOD='LOGLOG'
+	FIRST_COLR='T'
+	DPTH_INDX=ND/2
+	COL_OPT='CL'
 !
 ! NB: ZERO_FLUX condition is equivalent to DIF=.TRUE. and DBB=0.
 !     Thus, for routine compatibility, we set DBB=0 when DIF is false.
@@ -2071,7 +2078,7 @@
 	      END IF
 	    END DO
 	    CALL DP_CURVE(ND-1,XV,YV)
-	    YAXIS='Log d\gt(Flux)'
+	    YAXIS='dLog \gt(Flux)'
 	  ELSE
 	    DO I=1,ND
 	      IF(TB(I) .GT. 0)THEN
@@ -2236,7 +2243,7 @@
 	  END DO
 	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
 	  YAXIS='M(\dsun\u)'
-	  WRITE(6,'(A,ES9.2,A)')'Mass of envlope is',TA(ND),' Msun'
+	  WRITE(6,'(A,ES9.2,A)')'Mass of envelope (ejecta) is',TA(ND),' Msun'
 	  CALL DP_CURVE(ND,XV,TA)
 !
 	ELSE IF(XOPT .EQ. 'IMASS')THEN
@@ -3542,7 +3549,13 @@
 ! depth is used.
 !
 	ELSE IF(XOPT .EQ. 'ARAT')THEN
-          CALL BRANCH_RAT(OMEGA_F,XV,YV,XSPEC,N_MAX,N_PLT_MAX,ND)
+	  WRITE(6,'(A)')RED_PEN
+	  WRITE(6,'(A)')'Plotting line optical depth versus wavelength'
+	  WRITE(6,'(A)')'Lines with different A/SUM ranges ar eplotted in different colors'
+	  WRITE(6,'(A)')BLACK_PEN
+!
+	  XAXSAV=XAXIS
+          CALL BRANCH_RAT(OMEGA_F,XV,YV,XAXIS,YAXIS,XSPEC,N_MAX,N_PLT_MAX,ND)
 !
 ! Computes the optical depth of lines of a given ionization stage and species at a 
 ! given depth in the atmosphere. Either the radial or tangential Sobolev optical
@@ -4584,17 +4597,27 @@
 	  END IF
 !
 	ELSE IF(XOPT .EQ. 'COLR')THEN
-	  CALL USR_OPTION(I,'Depth','1','Input depth to check col. rates')
+	  IF(DPTH_INDX .LT. 1 .OR. DPTH_INDX .GT. ND)DPTH_INDX=ND/2
+	  DEFAULT=WR_STRING(DPTH_INDX)
+	  CALL USR_OPTION(DPTH_INDX,'Depth',DEFAULT,'Input depth to check collision quantities')
 	  STRING=' '
-	  CALL USR_OPTION(STRING,'TYPE','NR',
-	1       'Output net rates (NR), Downward rate (DR), CR')
-	  IF(UC(STRING(1:2)) .EQ. 'NR')THEN
+	  WRITE(6,*)' '
+	  WRITE(6,*)'Options are:'
+	  WRITE(6,*)'   NR: Output net rates;       DR: Downward rates'
+	  WRITE(6,*)'   CR: Output cooling terms;   CL: Cooling lines'
+	  WRITE(6,*)' '
+	  DEFAULT=COL_OPT
+	  CALL USR_OPTION(COL_OPT,'TYPE',DEFAULT,'NR, DR, CR, CL')
+	  IF(UC(COL_OPT(1:2)) .EQ. 'NR')THEN
 	    STRING='NET_RATES'
-	  ELSE IF(UC(STRING(1:2)) .EQ. 'CR')THEN
+	  ELSE IF(UC(COL_OPT(1:2)) .EQ. 'CR')THEN
 	    STRING='COOL_RATES'
+	  ELSE IF(UC(COL_OPT(1:2)) .EQ. 'CL')THEN
+	    STRING='COOL_LINES'
 	  ELSE
 	    STRING=' '
 	  END IF
+	  I=DPTH_INDX
 	  TMP_ED=ED(I)
 	  T1=T(I)
 	  DO ID=1,NUM_IONS
@@ -4608,9 +4631,19 @@
 	1         ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,ATM(ID)%ZXzV,
 	1         ID,TRIM(ION_ID(ID))//'_COL_DATA',OMEGA_GEN_V3,
 	1         ATM(ID)%F_TO_S_XzV,TEMP,T1,TMP_ED,IONE)
-	      CALL WR_COL_RATES(OMEGA_S,ATM(ID)%XzV_F(1,I),ATM(ID)%XzVLTE_F(1,I),
-	1             ATM(ID)%EDGEXzV_F,ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,
-	1             TRIM(XSPEC)//'R',LU_COL,STRING)
+	      IF(STRING .EQ. 'COOL_LINES')THEN
+	  	CALL USR_OPTION(FLAG,'NEW_FILE',FIRST_COLR,'New file?')
+	        FIRST_COLR='F'
+	        J=10
+	        CALL WR_COL_LINES(OMEGA_S,ATM(ID)%AXzV_F,ATM(ID)%XzV_F(1,I),ATM(ID)%XzVLTE_F(1,I),
+	1               ATM(ID)%W_XzV_F(1,I),ATM(ID)%GXzV_F,
+	1               ATM(ID)%EDGEXzV_F,ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,
+	1               TRIM(ION_ID(ID)),R(I),V(I),SIGMA(I),I,J,LU_COL,FLAG)
+	      ELSE
+	        CALL WR_COL_RATES(OMEGA_S,ATM(ID)%XzV_F(1,I),ATM(ID)%XzVLTE_F(1,I),
+	1               ATM(ID)%EDGEXzV_F,ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,
+	1               TRIM(XSPEC)//'R',LU_COL,STRING)
+	      END IF
 	    END IF
 	  END DO
 !
@@ -4689,6 +4722,10 @@
 !  
 	ELSE IF(XOPT .EQ. 'PLTPHOT')THEN
 	  CALL PLTPHOT_SUB(XSPEC,XV,YV,WV,ZV,N_PLT_MAX,OMEGA_F,N_MAX,XAXIS,YAXIS,XRAYS,VSM_DIE_KMS,ND)
+!
+	ELSE IF(XOPT .EQ. 'PLTARN')THEN
+	  CALL PLT_ARN(XSPEC,ND,XV,YV,N_PLT_MAX)
+	  XAXIS='eV'; YAXIS='\gs(cm\u-2\d)'	
 !
 	ELSE IF(XOPT .EQ. 'RDDIE')THEN
 	  CALL USR_OPTION(DIE_REG,'REG','F','Include dielectronic lines')
@@ -4976,14 +5013,39 @@ c
 	    YAXIS='Log \gx(cm\u-1\d)'
 	  END IF
 !
-	ELSE IF(XOPT .EQ. 'TAUGAM')THEN
-	  XM(1:ND)=0.03*MASS_DENSITY(1:ND)*1.0D+10
-	  CALL TORSCL(TA,XM,R,TB,TC,ND,METHOD,TYPE_ATM)
-	  DO I=1,ND
-	    YV(I)=DLOG10(TA(I))
+! Estimate the effective absorbative optical depth scale for Gamma-rays.
+!
+	ELSE IF(XOPT .EQ. 'TAUGAM' .OR. XOPT .EQ. 'GAMABS')THEN
+	  TA(1:ND)=0.5D0			!Number of electrons per baryon
+	  DO ISPEC=1,NSPEC
+	    IF('HYD' .EQ. SPECIES(ISPEC))THEN
+	      TA(1:ND)=0.5D0*(1.0D0+POPDUM(1:ND,ISPEC)/POP_ATOM(1:ND))
+	    END IF
 	  END DO
-	  CALL DP_CURVE(ND,XV,YV)
-	  YAXIS='Log(\gt\d\g\u)'
+	  XM(1:ND)=0.06D0*TA(1:ND)*MASS_DENSITY(1:ND)*1.0D+10
+	  WRITE(6,*)XM(ND)*R(ND),XM(ND)*(R(ND-1)-R(ND))
+!
+	  IF(XOPT .EQ. 'GAMABS')THEN
+	    CALL GAM_ABS(R,V,XM,ND)
+	    YAXIS='Rad. Dec. Energy (ergs/cm\u2\d/sec)'
+!
+	  ELSE
+	    CALL TORSCL(TA,XM,R,TB,TC,ND,METHOD,TYPE_ATM)
+	    CALL USR_OPTION(ELEC,'dTAU','F','Plot dTAU)')
+	    IF(ELEC)THEN
+	      DO I=1,ND-1
+	        YV(I)=LOG10(TA(I+1)/TA(I))
+	      END DO
+	      CALL DP_CURVE(ND-1,XV,YV)
+	      YAXIS='dLog \gt\d\g\u'
+	    ELSE
+	      DO I=1,ND
+	        YV(I)=DLOG10(TA(I))
+	      END DO
+	      CALL DP_CURVE(ND,XV,YV)
+	      YAXIS='Log(\gt\d\g\u)'
+	    END IF
+	  END IF
 !
 ! These options allow you to plot tau at a particular R (TAUR), or
 ! alternatively, R at a given value of Tau (RTAU).

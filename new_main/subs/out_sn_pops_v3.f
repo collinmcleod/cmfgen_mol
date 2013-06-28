@@ -7,6 +7,7 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered 08-May-2013 : Now write isotope data, when zero, in brief format.
 ! Altered 11-Feb-2009 : Use isotope data, when available, to compute mass fractions.
 !                       Added USE_OLD_MF_OUTPUT to allow consistency checks with older
 !                         models.
@@ -75,8 +76,13 @@
 	DO I=1,NUM_ISOTOPES
 	  WRITE(TMP_STR(1:3),'(I3)')ISO(I)%BARYON_NUMBER
 	  TMP_STR=TRIM(ISO(I)%SPECIES)//TMP_STR(1:3)//' mass fraction'
-	  TMP_VEC=1.66D-24*ISO(I)%POP*ISO(I)%MASS/DENSITY
-	  CALL OUT_SN_VEC(TMP_VEC,ND,TMP_STR,LU)
+	  IF(SUM(ISO(I)%POP) .NE. 0.0D0)THEN
+	    TMP_VEC=1.66D-24*ISO(I)%POP*ISO(I)%MASS/DENSITY
+	    CALL OUT_SN_VEC(TMP_VEC,ND,TMP_STR,LU)
+	  ELSE
+	    WRITE(LU,'(/,A)')TRIM(TMP_STR)
+	    WRITE(LU,'(2X,I5,A)')ND,'*0.00000D0'
+	  END IF
 	END DO
 !
 	CLOSE(LU)

@@ -14,6 +14,7 @@
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 04-Jun-2013 : Loop over depth index was paralleized.
 ! Altered 24-Jun-2010 : Check on whether SE_X is zero before computing RECIP_B_ION.
 ! Altered 12-Oct-2003 : If JREC is zero, the recombination term is not computed.
 !                         This is to avoid floating overflows at low temperatures.
@@ -79,6 +80,8 @@
 	NIV=SE(ID)%N_IV
 	ION_EQ=SE(ID)%XRAY_EQ
 	ION_V=SE(ID)%LNK_TO_IV(ION_EQ_IN_BA)
+!
+!$OMP PARALLEL DO PRIVATE(I,J,RECIP_B_ION,BSTIM,WSE_BY_RJ,T3,T4,DI_FAC,ED_FAC,T_FAC)
 !
 	DO I=DST,DEND			!Which depth point.
 	  IF(JREC(I) .NE. 0.0D0 .AND. WSE_X(1,1) .NE. 0.0D0)THEN

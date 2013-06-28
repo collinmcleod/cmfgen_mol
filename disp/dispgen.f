@@ -247,14 +247,13 @@ C
 	ASK=.FALSE.
 	SCRAT=.FALSE.
 !
-10	FILENAME=' '
-	DIR_NAME=' '
+	FILENAME='RVTJ'
+10	DIR_NAME=' '
 	IOS=2			!Filename has to exits, blank not allowed.
 	WRITE(T_OUT,*)'Append (ask) to so that subsequent FILE names '//
 	1         'are not defaulted'
 	WRITE(T_OUT,*)'Append (scrat) to get scratch output.'
 	WRITE(T_OUT,*)' '
-	FILENAME='RVTJ'
 	CALL GEN_IN(FILENAME,'Structure file')
 	STRING=FILENAME
 	CALL SET_CASE_UP(STRING,0,0)
@@ -263,7 +262,10 @@ C
 	I= INDEX(STRING,'(')
 	IF(I .NE. 0)FILENAME=FILENAME(1:I-1)//' '
 	INQUIRE(FILE=FILENAME,EXIST=FILE_PRES)
-	IF(.NOT. FILE_PRES)GOTO 10
+	IF(.NOT. FILE_PRES)THEN
+	  FILENAME='../RVTJ'
+	  GOTO 10
+	END IF
 C
 C Get default directory.
 C

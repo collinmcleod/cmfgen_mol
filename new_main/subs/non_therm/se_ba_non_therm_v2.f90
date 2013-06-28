@@ -5,7 +5,8 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
-! Altered 12-Feb-2-12 : Changed ordering of loops, split ionizations from excitations, and paralleized over depth.
+! Altered 06-Jun-2012 : Now use ATM(ID)%XzVLTE_F_ON_S to avoid floating point errors. 
+! Altered 12-Feb-2012 : Changed ordering of loops, split ionizations from excitations, and paralleized over depth.
 ! Created 16-Sep-2010
 !
         INTEGER NT
@@ -135,8 +136,8 @@
                   SE_ION_LEV=ATM(ID)%NXzV+1               !NUP -- assume all to ground state at  present.
 	          DO I=1,THD(IT)%N_STATES
 	            NL_F=THD(IT)%ATOM_STATES(I); NL=ATM(ID)%F_TO_S_XzV(NL_F)
-	            T1=RATE*GUPPER/THD(IT)%SUM_GION * &
-	                         (ATM(ID)%XzVLTE_F(NL_F,DPTH_INDX)/ATM(ID)%XzVLTE(NL,DPTH_INDX))
+	            T1=RATE*GUPPER/THD(IT)%SUM_GION * ATM(ID)%XzVLTE_F_ON_S(NL_F,DPTH_INDX)
+!&	                         (ATM(ID)%XzVLTE_F(NL_F,DPTH_INDX)/ATM(ID)%XzVLTE(NL,DPTH_INDX))
 	            SE(ID)%BA_PAR(NL,NL,DPTH_INDX)=SE(ID)%BA_PAR(NL,NL,DPTH_INDX)-T1
 	            SE(ID)%BA_PAR(SE_ION_LEV,NL,DPTH_INDX)=SE(ID)%BA_PAR(SE_ION_LEV,NL,DPTH_INDX)+T1
 	          END DO
@@ -172,7 +173,8 @@
 	            NL=ATM(ID)%F_TO_S_XzV(NL_F)
 	            T1=RATE*RADIOACTIVE_DECAY_ENERGY_eV(DPTH_INDX)
 	            IF(COMPUTE_BA)THEN
-	              T2=T1*(ATM(ID)%XzVLTE_F(NL_F,DPTH_INDX)/ATM(ID)%XzVLTE(NL,DPTH_INDX))
+	              T2=T1*ATM(ID)%XzVLTE_F_ON_S(NL_F,DPTH_INDX)
+!	              T2=T1*(ATM(ID)%XzVLTE_F(NL_F,DPTH_INDX)/ATM(ID)%XzVLTE(NL,DPTH_INDX))
 	              SE(ID)%BA_PAR(NL,NL,DPTH_INDX)=SE(ID)%BA_PAR(NL,NL,DPTH_INDX)-T2
 	              SE(ID)%BA_PAR(NUP,NL,DPTH_INDX)=SE(ID)%BA_PAR(NUP,NL,DPTH_INDX)+T2
 	            END IF

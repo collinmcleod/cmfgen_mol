@@ -242,6 +242,7 @@
 	    READ(10,'(A)')STRING
 	  END DO
 	  READ(10,'(A)')STRING		!Get blank line
+!	  CALL GEN_IN(NELEV,'Number of energy levels')
 	  ALLOCATE(G(NELEV),E_NAME(NELEV),ENERGY(NELEV))
 !
 	  G(:)=0.0D0;ENERGY(:)=0.0D0
@@ -275,13 +276,13 @@
 	    END DO
 	    IF(STAT_WT_1(I) .EQ. 0)THEN
 	      WRITE(6,*)RED_PEN,'Error - no match for level',NAME_1(I),I
-	      STOP
-	    END IF
-	    ENERGY_1(I)=ENERGY_1(I)/STAT_WT_1(I)
-	    WRITE(126,'(I5,ES15.6,4X,A)')I,ENERGY_1(I),TRIM(NAME_1(I))
-	    IF(STAT_WT_1(I) .NE. 0.0D0)ENERGY_1(I)=1.0D-15*SPEED_OF_LIGHT()*
+	    ELSE
+	      ENERGY_1(I)=ENERGY_1(I)/STAT_WT_1(I)
+	      WRITE(126,'(I5,ES15.6,4X,A)')I,ENERGY_1(I),TRIM(NAME_1(I))
+	      IF(STAT_WT_1(I) .NE. 0.0D0)ENERGY_1(I)=1.0D-15*SPEED_OF_LIGHT()*
 	1        (IONIZATION_ENERGY-ENERGY_1(I))
-	    WRITE(126,'(I5,ES15.6,4X,A)')I,ENERGY_1(I),TRIM(NAME_1(I))
+	      WRITE(126,'(I5,ES15.6,4X,A)')I,ENERGY_1(I),TRIM(NAME_1(I))
+	    END IF
 	  END DO
 	  OSCILLATOR_FILE_AVAIL=.TRUE.
 	  WRITE(6,*)'Number of levels in oscillator file is',NELEV

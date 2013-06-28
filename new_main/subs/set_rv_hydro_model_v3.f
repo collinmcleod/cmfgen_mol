@@ -71,7 +71,7 @@
 ! They are currently hardwird, but could be passed as parameters.
 !
 	REAL*8, PARAMETER :: IB_FAC=2.5D0
-	REAL*8, PARAMETER :: OB_FAC=2.0D0
+	REAL*8, PARAMETER :: OB_FAC=1.5D0
 !
 	INTEGER ND_TMP
 	INTEGER NX
@@ -376,158 +376,8 @@
 !
 ! Estimate spacing to get required grid spacing.
 !
-	  OLD_TAU=LOG(OLD_TAU)
-	  J=ND-1-N_OB_INS-N_IB_INS
-	  dTAU=(OLD_TAU(NS)-OLD_TAU(1))/J
-	  LOG_OLD_R=LOG(OLD_R)
-	  dLOGR=(LOG_OLD_R(1)-LOG_OLD_R(NS))/J  		!(ND-7)
-!
-! Define the new radius grid. The step size in R corresponds to the smaller of
-! dLOGR and dLOG_TAU. We create a "uniform" grid. The finer grid at the inner and
-! uter boudaries is now only set when we set the FINAL grid.
-!
-! N_INS_TOTS is a little larger than necessary.
-!
-	  J=1; I=1
-	  LOG_R(1)=LOG_OLD_R(1)
-	  DO WHILE(1 .EQ. 1)
-	    I=I+1
-	    IF(I .GT. 2*ND)THEN
-	      WRITE(LUER,*)'Error in SET_RV_HYDRO_MODEL_V3 --- LOG_R and TAU vectors too small'
-	      WRITE(LUER,*)'I=',I,'J=',J
-	      WRITE(LUER,*)'Log R(I)=',LOG_R(I)
-	      WRITE(LUER,*)'Log old R(I)=',LOG_OLD_R(I)
-	      WRITE(LUER,*)'Error in SET_RV_HYDRO_MODEL_V3 --- LOG_R and TAU vectors too small'
-	      STOP
-	    END IF
-!
-	    DO WHILE(LOG_OLD_R(J+1) .GT. LOG_R(I-1))
-	      J=J+1
-	    END DO
-	    T1=(LOG_R(I-1)-LOG_OLD_R(J+1))/(LOG_OLD_R(J)-LOG_OLD_R(J+1))
-	    TAU_BEG=T1*OLD_TAU(J)+(1.0D0-T1)*OLD_TAU(J+1)
-!
-! Compute dTAU step, and check to see if we need to use that.
-!
-	    J_SAV=J
-	    NEXT_R=LOG_R(I-1)-dLOGR
-	    DO WHILE(LOG_OLD_R(J+1) .GT. NEXT_R)
-	      J=J+1
-	    END DO
-	    T1=(NEXT_R-LOG_OLD_R(J+1))/(LOG_OLD_R(J)-LOG_OLD_R(J+1))
-	    TAU_END=T1*OLD_TAU(J)+(1.0D0-T1)*OLD_TAU(J+1)
-!
-	    IF(TAU_END-TAU_BEG .GT. dTAU)THEN
-	      NEXT_R=LOG_R(I-1)-dLOGR*dTAU/(TAU_END-TAU_BEG)
-	    END IF
-	    J=J_SAV
-	    LOG_R(I)=NEXT_R
-!
-! Check whether close enough to Outer Bondary.
-!
-	    IF(LOG_R(I)-1.5D0*(LOG_R(I-1)-LOG_R(I)) .LT. LOG_OLD_R(NS))EXIT
-	  END DO
-	  T1=LOG_R(I-1)-LOG_OLD_R(NS)
-	  LOG_R(I)=LOG_R(I-1)-0.5D0*T1
-	  I=I+1
-	  LOG_R(I)=LOG_OLD_R(NS)
-	  ND_TMP=I
-!
-! We now rescale the grid to have the correct number of grid points.
-!
-	  J=ND-N_IB_INS-N_OB_INS
-	  DO I=1,ND_TMP; TAU(I)=I; END DO
-	  DO I=1,J
-	    XN(I)=1.0D0+(I-1.0D0)*(ND_TMP-1.0D0)/(J-1.0D0)
-	  END DO
-	  CALL MON_INTERP(R,J,IONE,XN,J,LOG_R,ND_TMP,TAU,ND_TMP)
-	  LOG_R=R
-	  ND_TMP=J
-!
-! Add extra points at inner boundary.
-!
-	  I=ND_TMP
-	  T1=LOG_R(ND_TMP-1)-LOG_R(ND_TMP)
-	  IF(N_IB_INS .EQ. 1)THEN
-	    LOG_R(I)=LOG_OLD_R(NS)+0.2D0*T1
-	    ND_TMP=I+1
-	  ELSE IF(N_IB_INS .EQ. 2)THEN
-	    LOG_R(I+1)=LOG_OLD_R(NS)+0.1D0*T1     !0.1D0
-	    LOG_R(I)=LOG_OLD_R(NS)+0.4D0*T1      !0.4D0
-	    ND_TMP=I+2
-	  ELSE IF(N_IB_INS .EQ. 3)THEN
-	    LOG_R(I+2)=LOG_OLD_R(NS)+0.06D0*T1
-	    LOG_R(I+1)=LOG_OLD_R(NS)+0.16D0*T1
-	    LOG_R(I)=LOG_OLD_R(NS)+0.4D0*T1
-	    ND_TMP=I+3
-	  ELSE
-	    T2=1.0
-	    DO J=1,N_IB_INS
-	      T2=IB_FAC*T2+1.0D0
-	    END DO
-	    T1=T1/T2
-	    DO J=N_IB_INS,1,-1
-	      LOG_R(I+J-1)=LOG_OLD_R(NS)+T1
-	      T1=T1*IB_FAC
-	    END DO
-	    ND_TMP=I+N_IB_INS
-	  END IF
-	  LOG_R(ND_TMP)=LOG_OLD_R(NS)
-!
-! Add finer grid at outer boundary.
-!
-! Shift grid to allow for insertion of extra ponts
-!
-	  DO I=ND_TMP,2,-1
-	     LOG_R(I+N_OB_INS)=LOG_R(I)
-	  END DO
-!
-	  T1=LOG_R(1)-LOG_R(2)
-	  IF(N_OB_INS .GE. 5)THEN
-!
-! The ration of successive step size is assumed to be FAC. The last step size is
-! taken to be ~1/20 of the second last step size.
-!
-	    T2=1.0D0
-	    DO I=1,N_OB_INS-1
-	      T2=T2*OB_FAC+1.0D0
-	    END DO
-	    T1=T1/T2
-	    LOG_R(2)=LOG_R(1)-0.05D0*T1
-	    LOG_R(3)=LOG_R(1)-T1
-	    DO I=3,N_OB_INS
-	      T1=T1*OB_FAC
-	      LOG_R(1+I)=LOG_R(I)-T1
-	    END DO
-	    ND_TMP=ND_TMP+N_OB_INS
-!
-	  ELSE IF(N_OB_INS .EQ. 4)THEN
-	    LOG_R(2)=LOG_OLD_R(1)-0.003D0*T1
-	    LOG_R(3)=LOG_OLD_R(1)-0.03D0*T1
-	    LOG_R(4)=LOG_OLD_R(1)-0.1D0*T1
-	    LOG_R(5)=LOG_OLD_R(1)-0.4D0*T1
-	    ND_TMP=ND_TMP+4
-!
-	  ELSE IF(N_OB_INS .EQ. 3)THEN
-	    LOG_R(2)=LOG_OLD_R(1)-0.01D0*T1
-	    LOG_R(3)=LOG_OLD_R(1)-0.1D0*T1
-	    LOG_R(4)=LOG_OLD_R(1)-0.3D0*T1
-	    ND_TMP=ND_TMP+3
-!
-	  ELSE IF(N_OB_INS .EQ. 2)THEN
-	    LOG_R(2)=LOG_OLD_R(1)-0.01D0*T1
-	    LOG_R(3)=LOG_OLD_R(1)-0.3D0*T1
-	    ND_TMP=ND_TMP+2
-!
-	  ELSE IF(N_OB_INS .EQ. 1)THEN
-	    LOG_R(2)=LOG_OLD_R(1)-0.03D0*T1
-	    ND_TMP=ND_TMP+1
-	  END IF
-!
-	  R=EXP(LOG_R)
-	  R(1)=OLD_R(1)
-	  R(ND)=R_HYDRO(NX)
-	  WRITE(LUER,*)R(1:ND)
+          CALL SET_SN_R_GRID(R,OLD_R,OLD_TAU,IB_FAC,OB_FAC,N_IB_INS,N_OB_INS,ND,NS)
+
 	  WRITE(LUER,*)'Computed R grid in SET_RV_HYDRO_MODEL_V3'
 !
 	END IF

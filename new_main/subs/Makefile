@@ -25,6 +25,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(ddt_work.o)\
       $(LIB)(do_vel_regrid_v2.o)\
       $(LIB)(do_tau_regrid_v2.o)\
+      $(LIB)(do_gam_abs_approx.o)\
       $(LIB)(do_cmf_hydro_v2.o)\
       $(LIB)(do_ng_accel_band_v2.o)\
       $(LIB)(eval_adiabatic_v3.o)\
@@ -48,6 +49,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(set_ba_storage.o)\
       $(LIB)(set_rv_hydro_model_v3.o)\
       $(LIB)(set_imp_vec.o)\
+      $(LIB)(set_sn_r_grid.o)\
       $(LIB)(set_new_grid.o)\
       $(LIB)(solveba_v11.o)\
       $(LIB)(steq_multi_v8.o)\

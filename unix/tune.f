@@ -141,7 +141,7 @@ C
 	    WRITE(LU,*)'A printout of the STACK follows'
 	    WRITE(LU,*)' '
 	    DO I=1,NUM_STACK
-              WRITE(LU,'(II7,T20,A)')I,STACK(I),TRIM(IDLIST(STACK(I)))
+              WRITE(LU,'(I7,I7,T20,A)')I,STACK(I),TRIM(IDLIST(STACK(I)))
 	    END DO
 	    STOP
 	    CURRENT_ID=0
