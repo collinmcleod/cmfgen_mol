@@ -11,6 +11,16 @@ has not yet been updated to reflect the changes, but is coming!
 ****************************************************************************
 ****************************************************************************
 
+                 01-Jul-2013
+
+This is a slightly extended release of the 25-Noc-2012 which never made it to
+my web site. Thus users should read the 25-Nov-2012 release notes. Most of the
+changes aere relatively minor -- new options, paraellization updates, and a
+few code changes to facillitate compilations.
+
+****************************************************************************
+****************************************************************************
+
                  25-Nov-2012
 
 (1) LTE populations are now also installed in LOG format in CMFGEN and DISPGEN.
@@ -30,7 +40,7 @@ has not yet been updated to reflect the changes, but is coming!
 (4) There were some issues with incorrect names in atomic data files. An error
     is now output to OUTGEN when this ocurrs (the atomic data files have been fixed).
     Unfortunately this error will also occur when using small atoms in which
-       the appropriate levels ahs not been included.
+       the appropriate levels has not been included.
 
 (5) Penning ionization has been included. Only relevant to SN. Set [INC_PEN]=F in
       VADAT file.

@@ -6,6 +6,7 @@
 	1                  SN_AGE_DAYS,PURE_HUBBLE_FLOW,N_IB_INS,N_OB_INS,RDINR,ND,LU)
 	IMPLICIT NONE
 !
+! Altered 09-Jul-2013 : Now use to depths 1 and 8 (rather than 1 & 2) to estimate boundary optical depth.
 ! Altered 28-Aug-2012 : Incorrect dimension (ND instead of J) was being passed to
 !                         MON_INTERP. Causes access issue/crash rather than wrong result.
 ! Altered 10-Jul-2012 : Modified computation of R grid, especially the grid near the boundaries.
@@ -348,7 +349,7 @@
 !
 	  KAPPA_HYDRO=1.0D+10*KAPPA_HYDRO*DENSITY_HYDRO
 	  TAU_HYDRO(1)=KAPPA_HYDRO(1)*R_HYDRO(1)
-	  T1=LOG(KAPPA_HYDRO(2)/KAPPA_HYDRO(1))/LOG(R_HYDRO(1)/R_HYDRO(2))
+	  T1=LOG(KAPPA_HYDRO(8)/KAPPA_HYDRO(1))/LOG(R_HYDRO(1)/R_HYDRO(8))
 	  IF(T1 .GT. 1.5D0)TAU_HYDRO(1)=TAU_HYDRO(1)/(T1-1)
 	  DO I=2,NX
 	    TAU_HYDRO(I)=TAU_HYDRO(I-1)+0.5D0*(KAPPA_HYDRO(I-1)+KAPPA_HYDRO(I))*

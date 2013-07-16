@@ -26,6 +26,7 @@ EXE  = $(EXE_DIR)plt_jh.exe\
        $(EXE_DIR)plt_ip.exe\
        $(EXE_DIR)plt_delta.exe\
        $(EXE_DIR)plt_dfr.exe\
+       $(EXE_DIR)plt_many_sn_spec.exe\
        $(EXE_DIR)plt_phot_raw.exe\
        $(EXE_DIR)plt_rj.exe\
        $(EXE_DIR)plt_scr.exe\
@@ -38,7 +39,7 @@ all : OBJ ALLEXE
 # Give the dependencies of dispgen.exe and how it is created.
 #
 
-OBJ       : $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)  $(FN6)
+OBJ       : $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
 ALLEXE    : $(EXE)
 
 #
@@ -46,65 +47,17 @@ ALLEXE    : $(EXE)
 # UNIX systems, hence we take the easy but tediuos method.
 #
 
-$(EXE_DIR)plt_spec.exe : plt_spec.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
-	$(F90) plt_spec.o \
-             -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
-               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
-              -o $(EXE_DIR)plt_spec.exe
-
-$(EXE_DIR)plt_jh.exe : plt_jh.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
-	$(F90) plt_jh.o \
-             -L$(LIB_DIR) -lspec  -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
-               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
-              -o $(EXE_DIR)plt_jh.exe
-
-$(EXE_DIR)plt_jh_cur.exe : plt_jh_cur.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
-	$(F90) plt_jh_cur.o \
-             -L$(LIB_DIR) -lspec  -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
-               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
-              -o $(EXE_DIR)plt_jh_cur.exe
-
-$(EXE_DIR)plt_ip.exe : plt_ip.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
-	$(F90) plt_ip.o \
-             -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
-               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
-              -o $(EXE_DIR)plt_ip.exe
-
-$(EXE_DIR)plt_delta.exe : plt_delta.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
-	$(F90) plt_delta.o \
-             -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
-               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
-              -o $(EXE_DIR)plt_delta.exe
-
-$(EXE_DIR)plt_dfr.exe : plt_dfr.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
-	$(F90) plt_dfr.o \
-             -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
-               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
-              -o $(EXE_DIR)plt_dfr.exe
+$(EXE_DIR)%.exe : %.o $(OiBJ)
+	$(F90) $*.o \
+		$(OBJ1) -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
+		$(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \
+		-o $(EXE_DIR)$*.exe
 
 $(EXE_DIR)plt_phot_raw.exe : plt_phot_raw.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
 	$(F90) plt_phot_raw.o \
              -L$(LIB_DIR) -l$(LN5)  -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN6) -l$(LN1) -l$(LN3) \
                $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -g -o $(EXE_DIR)plt_phot_raw.exe
-
-$(EXE_DIR)new_plt_rj.exe : new_plt_rj.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
-	$(F90) new_plt_rj.o \
-             -L$(LIB_DIR) -l$(LN5)  -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
-               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
-              -o $(EXE_DIR)new_plt_rj.exe
-
-$(EXE_DIR)plt_scr.exe : plt_scr.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
-	$(F90) plt_scr.o \
-             -L$(LIB_DIR) -l$(LN5)  -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
-               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
-              -o $(EXE_DIR)plt_scr.exe
-
-$(EXE_DIR)plt_rj.exe : plt_rj.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
-	$(F90) plt_rj.o \
-             -L$(LIB_DIR) -l$(LN5)  -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
-               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
-              -o $(EXE_DIR)plt_rj.exe
 
 %.o : %.f
 	$(F90) -c $(FD) $<

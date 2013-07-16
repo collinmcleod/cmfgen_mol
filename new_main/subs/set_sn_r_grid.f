@@ -1,6 +1,9 @@
 	SUBROUTINE SET_SN_R_GRID(R,OLD_R,OLD_TAU,IB_RAT,OB_RAT,N_IB_INS,N_OB_INS,ND,NS)
 	IMPLICIT NONE
 !
+! Altered 9-Jul-2013 : OB_RAT_LOC was introduced (earlier). Some fixes and a check that step size not too large
+!                        at outer boundary transition introduced.
+!  
 	INTEGER NS
 	INTEGER ND
 !
@@ -40,7 +43,7 @@
 	LOG_OLD_R=LOG(OLD_R)
 !
 	dTAU=(LOG_OLD_TAU(NS)-LOG_OLD_TAU(1))/(ND-1)
-	OB_RAT_LOC=MIN(OB_RAT,EXP(dTAU))
+	OB_RAT_LOC=MAX(OB_RAT,EXP(dTAU))
 !
 	J=ND-1-N_OB_INS-N_IB_INS
 	dTAU=(LOG_OLD_TAU(NS)-LOG_OLD_TAU(1)-N_OB_INS*LOG(OB_RAT_LOC))/J
@@ -168,6 +171,13 @@
 	END DO
 	LOG_R(1)=LOG_OLD_R(1)
 	LOG_R(2)=LOG_R(1)-0.05D0*T1
+!
+	T1=LOG_R(N_OB_INS+1)-LOG_R(N_OB_INS+2)
+	T2=LOG_R(N_OB_INS+2)-LOG_R(N_OB_INS+3)
+	IF(T2 .GT. 2.0*T1)THEN
+	  T1=(T2-2.0D0*T1)/3.0D0
+	  LOG_R(N_OB_INS+2)=LOG_R(N_OB_INS+2)-T2
+	END IF
 !
 	R=EXP(LOG_R)
 	R(1)=OLD_R(1)

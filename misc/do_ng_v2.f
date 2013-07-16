@@ -22,6 +22,9 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 10-Jul-2013 : After NG acceleration program plots the accelerated T correction, and the
+!                         previous T correction. This will allow a prompt check as to whether the
+!                         NG acceleration should be used.
 ! Altered 01-Nov-2012 : Bug fix with TG option. Values when r < 1 were not being updated.
 ! Altered 05-May-2007 : Fixed bug when do NG accleration with band size < ND
 ! Altered 07-Mar-2006 : Acceleratiion can now start at ND_ST.
@@ -73,6 +76,7 @@
 	INTEGER I,J,K,L
 	INTEGER LOCATION(1)
 	INTEGER IVAR
+	INTEGER T_INDEX
 !
 	INTEGER, PARAMETER :: RITE_N_TIMES=1
 	INTEGER, PARAMETER :: T_OUT=6
@@ -256,8 +260,9 @@
 ! Perform the NG acceleration.
 !
 	  J=NT+3
-	  CALL NG_MIT_OPTS(BIG_POPS,RDPOPS,ND,J,NBAND,ND_ST,ND_END,DO_REGARDLESS,
-	1                     SCALE_INDIVIDUALLY,NG_DONE,T_OUT)
+	  T_INDEX=NT
+	  CALL NG_MIT_OPTS_V2(BIG_POPS,RDPOPS,ND,J,NBAND,ND_ST,ND_END,T_INDEX,
+	1                     DO_REGARDLESS,SCALE_INDIVIDUALLY,NG_DONE,T_OUT)
 !
 	  WRITE(6,*)'Finished NG accleration'
 	ELSE IF(OPTION(1:2) .EQ. 'AV')THEN
@@ -498,8 +503,8 @@
 	END
 !
 !
-	SUBROUTINE NG_MIT_OPTS(POPS,RDPOPS,ND,NT,NBAND,ND_ST,ND_END,DO_REGARDLESS,
-	1                           SCALE_INDIVIDUALLY,NG_DONE,LUER)
+	SUBROUTINE NG_MIT_OPTS_V2(POPS,RDPOPS,ND,NT,NBAND,ND_ST,ND_END,T_INDEX,
+	1                           DO_REGARDLESS,SCALE_INDIVIDUALLY,NG_DONE,LUER)
 	USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
@@ -513,6 +518,7 @@
 	INTEGER NBAND
 	INTEGER ND_ST
 	INTEGER ND_END
+	INTEGER T_INDEX
 	INTEGER LUER
 	REAL*8 POPS(NT,ND)
 	REAL*8 RDPOPS(NT,ND,8)
@@ -560,19 +566,20 @@
 	END IF
 !
 	WRITE(6,*)' '//RED_PEN
-	WRITE(6,'(1X,70A)')('*',I=1,70)
-	WRITE(6,*)' '
-	WRITE(6,*)'Plotting T correction due to acceleration, and the last T correction'
-	WRITE(6,*)'If the two corrections are not of the same sign, the acceleration i'
+	WRITE(6,'(1X,90A)')('*',I=1,90)
+	WRITE(6,*)' '//DEF_PEN
+	WRITE(6,*)'Plotting '//RED_PEN//'T correction due to acceleration (red),'//
+	1            DEF_PEN//'and '//BLUE_PEN//'the last iterative correction (blue).'//DEF_PEN
+	WRITE(6,*)'If the two corrections are not (generally) of the same sign, the acceleration'
 	WRITE(6,*)'should be CANCELLED.'
-	WRITE(6,*)' '
-	WRITE(6,'(1X,70A)')('*',I=1,70)
+	WRITE(6,*)' '//RED_PEN
+	WRITE(6,'(1X,90A)')('*',I=1,90)
 	WRITE(6,*)' '//DEF_PEN
 !
-	DO I=1,ND
-	  INT_ARRAY(I)=I
-	  TA(I)=100.0D0*(1.0D0-RDPOPS(NT,I,2)/NEWPOP(NT,I))
-	  TB(I)=100.0D0*(1.0D0-RDPOPS(NT,I,3)/RDPOPS(NT,I,2))
+	DO L=1,ND
+	  INT_ARRAY(L)=L
+	  TA(L)=100.0D0*(1.0D0-RDPOPS(T_INDEX,L,2)/NEWPOP(T_INDEX,L))
+	  TB(L)=100.0D0*(1.0D0-RDPOPS(T_INDEX,L,3)/RDPOPS(T_INDEX,L,2))
 	END DO
 	CALL DP_CURVE(ND,INT_ARRAY,TA)
 	CALL DP_CURVE(ND,INT_ARRAY,TB)

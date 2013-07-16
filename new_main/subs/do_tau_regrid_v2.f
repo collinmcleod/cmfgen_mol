@@ -6,6 +6,9 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 12-Jul-2013 : Modified so that grid size changes more uniformly near FG_MAX
+!                          when using the refine option. Also updated output to LOG file.
+!                          (most changes done 09-Jul or earlier). 
 ! Altered 02-Dec-2012 : Changed to V2 (added LU to call and removed R_OLD).
 !                       Added REFINE option.
 !                       LOG file (attached yto unit LU) must be open on call.
@@ -43,7 +46,7 @@
 	REAL*8 FG_MAX			!Max Tau for FG
 	REAL*8 FG_RANGE
 !
-	REAL*8 T1
+	REAL*8 T1,T2
 	REAL*8 DLOG_TAU
 	REAL*8 STRETCH_POW		!Power law exponent to stretch tau scale about 1
 !
@@ -324,8 +327,8 @@
 	  FG_MIN=TAU_OLD(IST)
 	  FG_MAX=TAU_OLD(IEND)
 	  FG_RANGE=FG_MAX-FG_MIN
-	  WRITE(LU,'(A,ES12.4,A,I4)')'!  Minimum optical depth is',FG_MIN,'at depth index',IST
-	  WRITE(LU,'(A,ES12.4,A,I4)')'!  Maximum optical depth is',FG_MAX,'at depth index',IEND
+	  WRITE(LU,'(A,ES12.4,A,I4)')'! Minimum optical depth is',FG_MIN,' at depth index',IST
+	  WRITE(LU,'(A,ES12.4,A,I4)')'! Maximum optical depth is',FG_MAX,' at depth index',IEND
 	  WRITE(LU,'(A,ES12.4)')'! Range of optical depth is',FG_RANGE
 !
 ! Compute the new grid. 
@@ -341,6 +344,19 @@
 !
 	  TAU(IST)=0.5D0*(TAU(IST-1)+TAU(IST+1))
 	  TAU(IEND)=0.5D0*(TAU(IEND-1)+TAU(IEND+1))
+!
+	  IF(IEND .LT. ND-5 .AND. IEND .GT. 10)THEN
+	    T1=(EXP(TAU(IEND)-TAU(IEND-1))-1.0D0)/(1.0D0-EXP(TAU(IEND-2)-TAU(IEND-1)))
+	    T2=(EXP(TAU(IEND+1)-TAU(IEND))-1.0D0)/(1.0D0-EXP(TAU(IEND-1)-TAU(IEND)))
+	    T2=(TAU(IEND+1)-TAU(IEND))/(TAU(IEND)-TAU(IEND-1))
+	    IF(T2 .LT. 1.0D0)T2=1.0D0/T2
+	    IF(T2 .GT. 1.4D0 .AND. T2 .GT. T1)THEN
+	      T1=(LOG(TAU(IEND+1)/TAU(IEND-4)))/5
+	      DO I=IEND-3,IEND
+	        TAU(I)=EXP(DLOG(TAU(IEND-4))+(I+4-IEND)*T1)
+	      END DO
+	    END IF
+	  END IF
 !
 	ELSE
 	  WRITE(T_OUT,*)'Invalid GRID_TYPE in ADJUST_R_GRID'
@@ -397,11 +413,15 @@
 	WRITE(LU,'(A)')'!'
 	WRITE(LU,'(A)')'! All Logs are base 10.'
 	WRITE(LU,'(A)')'!'
-	WRITE(LU,'(A,6(7X,A))')'!Index','      TAU','     dTAU',' TAU(old)',
-	1                               'dTAU(old)','Log(Rold)','   V(old)'
+	WRITE(LU,'(A,7(2X,A))')'!Index','      Log(TAU)','     dLOG(TAU)',
+	1                               '         Ratio',' Log[TAU(old)]',
+	1                               'dLOG[TAU(old)]','     Log(Rold)',
+	1                               '        V(old)'
 	WRITE(LU,'(A)')'!'
 	DO I=1,ND
-	  WRITE(LU,'(I6,6ES16.5)')I,TAU(I),TAU(MIN(I+1,ND))-TAU(I),
+	  T1=0.0D0
+	  IF(I .NE. 1 .AND. I .NE. ND)T1=(EXP(TAU(I+1)-TAU(I))-1.0D0)/(1.0D0-EXP(TAU(I-1)-TAU(I)))
+	  WRITE(LU,'(I6,7ES16.5)')I,TAU(I),TAU(MIN(I+1,ND))-TAU(I),T1,
 	1               TAU_OLD(I),TAU_OLD(MIN(I+1,ND))-TAU_OLD(I),LOG_R_OLD(I),V(I)
 	END DO
 !

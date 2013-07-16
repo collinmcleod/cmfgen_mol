@@ -10,6 +10,8 @@ C
 	SUBROUTINE RD_POP_DIM(NCIII,CIII_PRES,DESC,FORMAT_DATE,LUIN)
 	IMPLICIT NONE
 C
+C Altered 23-Jan-2013 : Changed location of "Number of levels" warning to overcome
+C                         an issue with GFORTRAN which ignored the "END=" statement.
 C Altered 04-Jun-1998 : Routine checks for occurrence of DESC and upper case
 C                         version of DESC. To handle change from HE2 to He2
 C                         and HEI to HeI.

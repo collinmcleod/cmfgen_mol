@@ -118,10 +118,10 @@ C
 	    CALL RD_STORE_INT(N_OB_INS,'NBND_INS',L_FALSE,
 	1           'Number of additional points to insert in radius grid at boundary')
 	    CALL RD_STORE_DBLE(CONS_FOR_R_GRID,'C_R_GRID',L_FALSE,
-	1           'Constant to allow imprved shoice of R grid')
+	1           'Constant to allow improved choice of R grid')
 	    IF(CONS_FOR_R_GRID .GT. 0)THEN
 	      CALL RD_STORE_DBLE(EXP_FOR_R_GRID,'E_R_GRID',L_TRUE,
-	1           'Constant to allow imprved shoice of R grid')
+	1           'Constant to allow improved choice of R grid')
 	    ELSE
 	      CONS_FOR_R_GRID=1.0D0
 	      EXP_FOR_R_GRID=0.0D0

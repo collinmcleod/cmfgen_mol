@@ -67,6 +67,23 @@ else
   cp $1/CUR_MODEL_DATA                 $2/OLD_MODEL_DATA
 endif
 
+#
+# Copie files that do not necessarily exist for all models.
+# 
+
+if(-e $1/ADJUST_R_DEFAULTS)then
+  cp $1/ADJUST_R_DEFAULTS              $2/
+  echo " "
+  echo " Copyed ADJUST_R_DEFAULTS: This file wll need to be edited if you wish the R grid"
+  echo " to be revised during the run."
+endif
+
+if(-e $1/arnaud_rothenflug.dat)then
+  cp $1/arnaud_rothenflug.dat         $2/
+  echo " "
+  echo " Copyed arnaud_rothenflug.dat"
+endif
+
 # Change to the new model directory.
 
 cd $2
