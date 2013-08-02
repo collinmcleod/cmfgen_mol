@@ -441,7 +441,7 @@
 ! Since Q(ND)=1, we can still use DTAU(ND-1) at the inner boundary.
 ! [Terms contain a /Q(ND)].
 !
-	ELSE IF(INNER_BND_METH(1:4) .EQ. 'HOLLOW')THEN
+	ELSE IF(INNER_BND_METH(1:6) .EQ. 'HOLLOW')THEN
 	  RSQ=R(ND)*R(ND)
 	  HMIN=HMIN_IB/JMIN_IB
 	  FMIN=KMIN_IB/JMIN_IB

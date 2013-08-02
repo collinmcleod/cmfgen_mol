@@ -260,7 +260,7 @@
 !
 ! Therse are the parameters used to define the new R grid to be output to RVSIG_COL.
 ! 
-	CALL RD_STORE_DBLE(dLOG_TAU,'dLOG_TAU',L_FALSE,'Lograritihmic spacing in Tau for new R grid')
+	CALL RD_STORE_DBLE(dLOG_TAU,'dLOG_TAU',L_FALSE,'Logarithmic spacing in Tau for new R grid')
 	CALL RD_STORE_DBLE(V_SCL_FAC,'VSCL_FAC',L_FALSE,'Maximum V(I-1)/V(I) for new R grid (<1)')
 	I=10
 	CALL RD_STORE_NCHAR(OUT_BND_OPT,'OB_OPT',I,L_FALSE,'Outer boundary option: POW, SPECIFY, DEFAULT, NONE')

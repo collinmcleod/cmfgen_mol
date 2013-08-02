@@ -47,7 +47,7 @@ ALLEXE    : $(EXE)
 # UNIX systems, hence we take the easy but tediuos method.
 #
 
-$(EXE_DIR)%.exe : %.o $(OiBJ)
+$(EXE_DIR)%.exe : %.o $(OBJ)
 	$(F90) $*.o \
 		$(OBJ1) -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
 		$(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \

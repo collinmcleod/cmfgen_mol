@@ -1,11 +1,12 @@
 !
 ! File to check the consistency of parameters for CMF_FLUX.
 !
-! Created: 16-Jun-2009
-!
 	SUBROUTINE CHECK_CMF_FLUX_PARAM_CONSIS()
 	USE CMF_FLUX_CNTRL_VAR_MOD
 	IMPLICIT NONE
+!
+! Altered: 25-Jul-2013 _ Added DJDT consistency check.
+! Created: 16-Jun-2009
 !
 	INTEGER LUER
 	INTEGER ERROR_LU
@@ -42,7 +43,19 @@
 	  END IF
 	  IF(USE_J_REL .AND. .NOT. USE_FORMAL_REL)THEN
 	    WRITE(LUER,*)TRIM(ER_LAB),' Problem with control parameters in CMF_FLUX_PARAM_INIT'
-	    WRITE(LUER,*)TRIM(ER_LAB),' UE_FRM_REL should be true for SN MODEL'
+	    WRITE(LUER,*)TRIM(ER_LAB),' USE_FRM_REL should be true for SN MODEL'
+	    IF(STOP_IF_BAD_PARAM)STOP
+	  END IF
+!
+	  IF(USE_J_REL .AND. (INCL_DJDT_TERMS .OR. USE_DJDT_RTE))THEN
+	    WRITE(LUER,*)TRIM(ER_LAB),' Problem with control parameters in CMF_FLUX_PARAM_INIT'
+	    WRITE(LUER,*)TRIM(ER_LAB),' USE_J_REL and (INCL_DJDT_TERMS or USE_DJTD_RTE) should not both be true'
+	    IF(STOP_IF_BAD_PARAM)STOP
+	  END IF
+!
+	  IF( (INCL_DJDT_TERMS .OR. USE_DJDT_RTE) .AND. (INCL_DJDT_TERMS .NEQV. USE_DJDT_RTE) )THEN
+	    WRITE(LUER,*)TRIM(ER_LAB),' Problem with control parameters in CMF_FLUX_PARAM_INIT'
+	    WRITE(LUER,*)TRIM(ER_LAB),' INCL_DJDT_TERMS and USE_DJTD_RTE should be the same except in testing mode'
 	    IF(STOP_IF_BAD_PARAM)STOP
 	  END IF
 !
