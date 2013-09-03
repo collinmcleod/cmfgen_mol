@@ -15,6 +15,8 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered: 02-Sep-2013 : Minor bug fix -- added excess energy (for those Ni
+!                            that decay all the way to 56Fe in a single time step).
 ! Altered: 23-Nov-2012 : Added 1 step decay process
 !
 	INTEGER ND
@@ -80,8 +82,6 @@
 	1            ISO(IS)%OLD_POP*(1.0D0-VEC1)*NUC(IN)%ENERGY_PER_DECAY +
 	1            ISO(JS)%OLD_POP*(1.0D0-VEC2)*NUC(JN)%ENERGY_PER_DECAY +
 	1            ISO(IS)%OLD_POP*(1.0D0-VEC1-VEC3)*NUC(JN)%ENERGY_PER_DECAY
-!	1            ISO(IS)%OLD_POP*(1.0D0-VEC1-VEC3)*(NUC(IN)%ENERGY_PER_DECAY+NUC(JN)%ENERGY_PER_DECAY)
-!	        WRITE(6,*)RADIOACTIVE_DECAY_ENERGY
 	        EXIT
 	      END IF
 	    END DO

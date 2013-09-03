@@ -5,6 +5,7 @@ include ../Makefile_definitions
 # Library where object files will/are stored
 
 LIB=$(LIB_DIR)libpgplt.a
+LIB_MOD=$(LIB_DIR)libmod.a
 
 #
 # Entries in a library
@@ -24,9 +25,11 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(gaus_romb.o)\
       $(LIB)(gaus_fit_er.o)\
       $(LIB)(get_gramon_min_max.o)\
+      $(LIB)(get_pgi_file_info.o)\
       $(LIB)(gramon_pgplot.o)\
       $(LIB)(hist_adj.o)\
       $(LIB)(justify_convert_v2.o)\
+      $(LIB)(modify_pgi_ps.o)\
       $(LIB)(mon_num.o)\
       $(LIB)(monbord_v3.o)\
       $(LIB)(moninside.o)\
@@ -56,11 +59,12 @@ $(LIB)(%.o) : %.f
 #     depend on ../tools/gen_in
 
 GEN = ../lib/libtools.a(gen_in.o)
+COL=  ../lib/libmod.a(mod_color_pen_def.o)
 
 $(LIB)(change_color.o)    : change_color.f  $(GEN)
 $(LIB)(change_pen.o)      : change_pen.f    $(GEN)
 
-$(LIB)(gramon_pgplot.o)   : gramon_pgplot.f $(LIB)(mod_curve_data.o) $(GEN) 
+$(LIB)(gramon_pgplot.o)   : gramon_pgplot.f $(LIB)(mod_curve_data.o) $(GEN) $(COL) 
 $(LIB)(curve.o)           : curve.f         $(LIB)(mod_curve_data.o) $(GEN)
 $(LIB)(vectorpen.o)       : vectorpen.f     $(LIB)(mod_curve_data.o) $(GEN)
 
@@ -74,6 +78,9 @@ $(LIB)(ed_gaus_fit.o)     : ed_gaus_fit.f   $(LIB)(gaus_fit_data.o)
 $(LIB)(find_lines.o)      : find_lines.f    $(LIB)(gaus_fit_data.o)
 
 $(GEN):
+	(cd ../tools; make )
+
+$(COL):
 	(cd ../tools; make )
 
 clean :

@@ -4,8 +4,10 @@
 	SUBROUTINE GRAMON_PGPLOT(XLAB,YLAB,TITL,PASSED_OPT)
 	USE NEW_GEN_IN_INTERFACE
 	USE MOD_CURVE_DATA
+	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered:  31-Sep-2013 : Added long-plot option.
 ! Altered:  26-Nov-2011 : Curves cycle over pen-colors 2 to 13.
 !                         Dashed curve for plots > 13
 !                         Marker style ignored when MARK is off (use I for invisible curve).
@@ -222,20 +224,22 @@
 !
 ! Printer variables.
 !
-	CHARACTER*80 PRINTER
-	CHARACTER*80 HARD_FILE
-	CHARACTER*20 HARD_TYPE
-	CHARACTER*20 HARD_FMT_STR
-	INTEGER HARD_CNT
-	SAVE HARD_CNT
-	SAVE HARD_FMT_STR
-	SAVE HARD_TYPE
+	CHARACTER(LEN=80), SAVE :: PRINTER='pgplot_1.ps/cps'
+	CHARACTER(LEN=80), SAVE :: HARD_FILE
+	CHARACTER(LEN=20), SAVE :: HARD_TYPE
+	CHARACTER(LEN=80) CUR_HARD_FILE
+	INTEGER, SAVE :: HARD_CNT
+	LOGICAL, SAVE :: FIRST_HARD=.TRUE.
 !
 	INTEGER PGOPEN,PLT_LINE_WGT
 	INTEGER ID
 	SAVE ID
 	REAL*4 TOTXMM,TOTYMM,SCALEFACY,SCALEFAC
 	REAL*4 PRINTX1,PRINTX2,PRINTY1,PRINTY2
+!
+	LOGICAL LONG_PLOT
+	REAL*4 LENGTH_OF_HC_PLOT
+	REAL*4 LP_ASR
 !
 ! Variables for options 'WP' (i.e. write plot) and 'RP' (i.e. read plot).
 !
@@ -248,9 +252,8 @@
 	SAVE MARGINX,MARGINY
 	SAVE PLT_LINE_WGT
 	SAVE LINE_WGT 
-	DATA FSTOPEN,DASH,PRINTER/.TRUE.,.FALSE.,'FIRST'/
+	DATA FSTOPEN,DASH/.TRUE.,.FALSE./
 	DATA PLT_LINE_WGT/1/
-	DATA HARD_FMT_STR/'_1'/
 	DATA HARD_CNT/1/
 	N_REC_SIZE=1000
 !
@@ -270,6 +273,8 @@
 	DO_BORDER=.TRUE.
 	DRAW_GAUSS_HARD=.FALSE.
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	LONG_PLOT=.FALSE.
+	LENGTH_OF_HC_PLOT=200.0D0       !cm
 !
 ! Define character strings for switching between VT and TEK modes.
 !
@@ -842,6 +847,9 @@ C
             CALL PGQCR(I,RED(I),GREEN(I),BLUE(I))
           END DO
 	  GOTO 1000
+	ELSE IF(ANS .EQ. 'SC')THEN
+	  T1=100; T2=0.2
+	  CALL PGSCRL(T1,T2)
 !
 !Option to adjust the shape of the box, and the tick marks tec.
 !
@@ -855,6 +863,11 @@ C
 	  WRITE(T_OUT,*)'Y/X > 0, 0(Device default) , X/Y < 0'
 	  CALL NEW_GEN_IN(ASR,'Aspect Ratio')
 !
+	  IF(LONG_PLOT)THEN
+	    WRITE(T_OUT,*)RED_PEN
+	    WRITE(T_OUT,*)' As a long plot, 0.05 and 0.95 may be better for left/right margin'
+	    WRITE(T_OUT,*)DEF_PEN
+	  END IF
 700	  CALL NEW_GEN_IN(MARGINX,I,ITWO,'Left and Right Margins (0:1)')
 	  IF((MARGINX(1) .GT. 1) .OR. (MARGINX(1) .LT. 0)) THEN
 	    WRITE(T_OUT,*)'Left-Margin is incorrect, try again.'
@@ -1541,14 +1554,31 @@ C
 	    END DO		!Multiple plots
 	    GOTO 1000
 	  END IF
+	ELSE IF(ANS .EQ. 'LP')THEN
+	  IF(LONG_PLOT)THEN
+	    WRITE(6,*)'Resuming normal hard copy mode'
+	    LONG_PLOT=.FALSE.
+	  ELSE
+	    WRITE(6,*)'Setting hard-copy to produce long plots'
+	    WRITE(6,*)'This option only work CPS as the device'
+	    LONG_PLOT=.TRUE.
+	    CALL NEW_GEN_IN(LENGTH_OF_HC_PLOT,'Length of plot surface in cm''s')
+	    LP_ASR=2.54D0*8.0D0/LENGTH_OF_HC_PLOT
+	    WRITE(6,*)'Default aspect ratio of pot surface is',LP_ASR
+	  END IF
 !
 !
 !
 	ELSE IF(ANS .EQ. 'Z' .OR. ANS .EQ. 'ZN')THEN
-	  IF (PRINTER .EQ. 'FIRST' .OR. ANS .EQ. 'ZN') THEN
-	    WRITE(T_OUT,*)'Choose a post-script device and file',
-	1              ' for printing [file/dev] '
-	    BEG=PGOPEN('?')
+	  IF (FIRST_HARD .OR. ANS .EQ. 'ZN') THEN
+	    WRITE(T_OUT,*)RED_PEN,' '
+	    WRITE(T_OUT,*)'Choose a post-script device and file for printing [file/dev] '
+	    WRITE(T_OUT,*)'A sensible name format is xxx_1.ps/cps'
+	    WRITE(T_OUT,*)'Use a . only for the file extension'
+	    WRITE(T_OUT,*)DEF_PEN,' '
+	    CALL NEW_GEN_IN(PRINTER,'File and printer: enter ? for list')
+	    BEG=PGOPEN(PRINTER)
+	    FIRST_HARD=.FALSE.
 	  ELSE
 	    CALL NEW_GEN_IN(HARD_FILE,'Plot file')
 	    PRINTER=TRIM(HARD_FILE)//'/'//HARD_TYPE
@@ -1559,41 +1589,8 @@ C
 !
 	  CALL PGQINF('TYPE',HARD_TYPE,LENGTH)
 	  CALL PGQINF('FILE',HARD_FILE,LENGTH)
-!
-! Want last occurrence of HARD_FMT_STR in filename to avoid possible
-! occurences of HARD_FMT_STR in directory names.
-!
-	  K=-10
-	  J=0
-	  DO WHILE(J .NE. K)
-	   K=J
-	   J=J+INDEX(HARD_FILE(J+1:),TRIM(HARD_FMT_STR))
-	  END DO
-	  IF(J .NE. 0)HARD_FILE=HARD_FILE(1:J-1)
-	  J=INDEX(HARD_FILE,'.PS')
-	  IF(J .EQ. 0)J=INDEX(HARD_FILE,'.ps')
-	  IF(J .NE. 0)HARD_FILE=HARD_FILE(1:J-1)
-!
-	  J=LEN_TRIM(HARD_FILE)
-	  K=J
-	  DO WHILE(HARD_FILE(K:K) .GE. '0' .AND. HARD_FILE(K:K) .LE. '9')
-	    K=K-1
-	    IF(K .EQ. 0)EXIT
-	  END DO
-	  IF(K .NE. J .AND. K .NE. 0)THEN
-	    IF(HARD_FILE(K:K) .EQ. '_')THEN
-	       READ(HARD_FILE(K+1:J),*)HARD_CNT
-	       HARD_FILE=HARD_FILE(1:K-1)
-	    END IF
-	  END IF 
-!
-	  HARD_CNT=HARD_CNT+1
-	  WRITE(HARD_FMT_STR,'(I10)')HARD_CNT
-	  DO WHILE(HARD_FMT_STR(1:1) .EQ. ' ')
-	    HARD_FMT_STR(1:)=HARD_FMT_STR(2:)
-	  END DO
-	  HARD_FMT_STR='_'//TRIM(HARD_FMT_STR)
-	  HARD_FILE=TRIM(HARD_FILE)//TRIM(HARD_FMT_STR)//'.ps'
+	  CALL GET_PGI_FILE_NUMBER(HARD_CNT,HARD_FILE)
+	  CALL UPDATE_PGI_FILE_NAME(HARD_CNT,HARD_FILE)
 	  PRINTER=TRIM(HARD_FILE)//'/'//HARD_TYPE
 !
 	  HARD=.TRUE.
@@ -2183,6 +2180,10 @@ C
 ! Open the appropriate plotting device
 !
  6000	IF (HARD) CALL PGBBUF
+	IF (HARD .AND. LONG_PLOT)THEN
+	  T1=LENGTH_OF_HC_PLOT/2.54D0           !in inches
+	  CALL PGPAP(T1,LP_ASR)
+	END IF
 !
 ! Initialize plotting parameters to the correct values
 !
@@ -2213,7 +2214,7 @@ C
 !
 	TOTXMM=(DXEND-DXST)
 	TOTYMM=(DYEND-DYST)
- 350	IF(HARD) CALL NEW_GEN_IN(XCM,'Plot size')
+ 350	IF(HARD) CALL NEW_GEN_IN(XCM,'Plot size (in cm)')
 !
 ! Commented out to test the box squareing routine
 ! Gregson Vaux December 1996
@@ -2506,10 +2507,12 @@ C
 !
 	CALL PGMOVE((XPAR(2)-XPAR(1))/2.0,(YPAR(2)-YPAR(1))/2.0)
 	IF(HARD) THEN
+	  CALL PGQINF('FILE',CUR_HARD_FILE,LENGTH)
 	  CALL PGEBUF		!send plot to printer file
 	  CALL PGCLOS
 	  CALL PGSLCT(ID)
 	  HARD=.FALSE.
+	  IF(LONG_PLOT)CALL MODIFY_PGI_PS(CUR_HARD_FILE,LENGTH_OF_HC_PLOT,LP_ASR)
 	END IF
 	CALL PGSCR(0,RTEMP,GTEMP,BTEMP)
 !
