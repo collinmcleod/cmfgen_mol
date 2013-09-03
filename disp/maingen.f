@@ -4940,11 +4940,21 @@ c
 	  YAXIS='\gs/\gs\dT\u'
 !
 	ELSE IF(XOPT .EQ. 'ETA')THEN
-	  DO I=1,ND
-	    YV(I)=DLOG10(ETA(I)+1.0D-250)-10.0D0
-	  END DO
-	  CALL DP_CURVE(ND,XV,YV)
-	  YAXIS='Log(\ge(ergs/cm\u3\d/s/Hz)'
+	  ELEC=.FALSE.
+	  CALL USR_OPTION(ELEC,'RCUBE','F','Multiply ETA by R^3?')
+	  IF(ELEC)THEN
+	    DO I=1,ND
+	      YV(I)=DLOG10(R(I)*R(I)*R(I)*ETA(I)+1.0D-250)+20.0D0
+	    END DO
+	    CALL DP_CURVE(ND,XV,YV)
+	    YAXIS='Log(r\u3\d\ge(ergs/s/Hz)'
+	  ELSE
+	    DO I=1,ND
+	      YV(I)=DLOG10(ETA(I)+1.0D-250)-10.0D0
+	    END DO
+	    CALL DP_CURVE(ND,XV,YV)
+	    YAXIS='Log(\ge(ergs/cm\u3\d/s/Hz)'
+	  END IF
 !
 	ELSE IF(XOPT .EQ. 'DIFFT')THEN
 	  ELEC=.FALSE.

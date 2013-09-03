@@ -737,6 +737,9 @@
 ! With a hollow core, we need to make sure we don't include
 ! opacity due to the hollow core (located between NR and NR+1).
 !
+! NB: This TAU is only used to limit the length of the ray. It is recomputed when
+! doing the integration.
+!
 	      DTAU(I-1)=HALF_DZ(I-1)*(CHI_VEC(I-1)+CHI_VEC(I))
 	      IF(I .EQ. NR+1 .AND. LS .LE. NC)THEN
 	        TAU(I)=TAU(I-1)
@@ -791,6 +794,7 @@
 	    IST=1; IEND=SM_NRAY
 	    BACK_SIDE=.FALSE.
 	    IF(LS .LE. NC .AND. HOLLOW_CORE)BACK_SIDE=.TRUE.
+	    IF(WRITE_dFR)dI_RAY=0.0D0
 35000	    CONTINUE
 !
 ! Check whether we need to do the BACK_SIDE loop.
@@ -938,10 +942,10 @@
 	    ELSE
 !
 ! If IST.NE. 1 we are on the backside. In this case the optical depth of
-! the hollow core is zero. The optical depth of the near side has not yer
+! the hollow core is zero. The optical depth of the near side has not yet
 ! been computed, and will be taken into account later.
 !
-	      TAU(IST)=0.0D0
+	      IF(IST .NE. 1)TAU(IST)=CHI_VEC(IST)*0.5D0*dZ(IST)
 	      IF(IST .EQ. 1)TAU(1)=CHI_VEC(1)*HALF_DZ(2)
 	      DO I=IST,IEND-1
 	        TAU(I+1)=TAU(I)+DTAU(I)
@@ -985,7 +989,7 @@
 !
 ! Integrate this solution on to line profile. If we have a hollow core,
 ! we update the observed profile for the NEAR-SIDE integration --- this
-! will also contain the back-ide contribution corrected for optical depth
+! will also contain the back-side contribution corrected for optical depth
 ! effects in the near side envelope.
 !
 	    IF(BACK_SIDE)THEN
@@ -996,53 +1000,68 @@
 	      IF(WRITE_IP)IP_OBS(LS,ML)=PAR_FLUX
 	    END IF
 !
-! Section to output where R=TAU_REF as a function of impact parameter
-! and frequency.
+	    IF(WRITE_dFR .AND. INT_METHOD .EQ. 'ETAZ')THEN
 !
-! If 'ETAZ; method is in use, TAU has already been computea accurately, although we
+	      T2=(ETA_VEC(1)-ETA_VEC(2))/dZ(1)
+	      DO I=1,IEND-1
+	        T1=T2
+	        T2=(ETA_VEC(I-1)-ETA_VEC(I+1))*RECIP_DEL_Z(I)
+	        T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
+	        T4=DZSQ_ON_12(I-1)*(T2-T1)
+	        IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
+	        dI_RAY(I)=T3 + T4
+	      END DO
+	      I=IEND
+	      T1=T2
+	      T2=(ETA_VEC(I-1)-ETA_VEC(I))/dZ(I-1)
+	      T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
+	      T4=DZSQ_ON_12(I-1)*(T2-T1)
+	      IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
+	      dI_RAY(I)=T3 + T4
+!
+! Check to see if core was hollow.
+!
+	      IF(SM_NRAY .GT. NR .AND. LS .LE. NC)THEN
+	        dI_RAY(NR+1)=0.0D0
+	        T2=(ETA_VEC(NR+1)-ETA_VEC(NR+2))/dZ(NR+1)
+	        DO I=NR+2,SM_NRAY-1
+	          T1=T2
+	          T2=(ETA_VEC(I-1)-ETA_VEC(I+1))*RECIP_DEL_Z(I)
+	          T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
+	          T4=DZSQ_ON_12(I-1)*(T2-T1)
+	          IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
+	          dI_RAY(I)=T3 + T4
+	        END DO
+	        I=SM_NRAY
+	        T1=T2
+	        T2=(ETA_VEC(I-1)-ETA_VEC(I))/dZ(I-1)
+	        T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
+	        T4=DZSQ_ON_12(I-1)*(T2-T1)
+	        IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
+	        dI_RAY(I)=T3 + T4
+	     END IF
+!
+! Now need to interpolate dI_RAY onto our regular R grid. Since the RAY grid is finer than the
+! regular R grid, the J index can only change by at most 1 as I varies by 1.
+!
+	      J=2
+	      DO I=1,SM_NRAY
+	        IF(Z_RAY(I) .GE. 0.0D0)THEN
+	          IF(R_RAY(I) .LT. R(J))J=J+1
+	        ELSE
+	          IF(HOLLOW_CORE .AND. LS .LE. NC .AND. TAU(IEND) .GT. 0)dI_RAY(I)=dI_RAY(I)*EXP(-TAU(IEND))
+	          IF(R_RAY(I) .GT. R(J))J=J-1
+	        END IF
+	        dI_R(J,ML)=dI_R(J,ML)+dI_RAY(I)*HQW_AT_RMAX(LS)
+	      END DO
+	    END IF
+!
+! Section to output where R=TAU_REF as a function of impact parameter and frequency.
+!
+! If 'ETAZ; method is in use, TAU has already been computed accurately, although we
 ! need to correct Tau(backside) for Tau(front envelope).
 !
 ! Is 'STAU' method in use, we recompute the TAU scale.
-!
-	IF(WRITE_dFR .AND. INT_METHOD .EQ. 'ETAZ')THEN
-	  T2=(ETA_VEC(IST)-ETA_VEC(IST+1))/dZ(IST)
-	  DO I=IST+1,IEND-1
-	    T1=T2
-	    T2=(ETA_VEC(I-1)-ETA_VEC(I+1))*RECIP_DEL_Z(I)
-	    T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
-	    T4=DZSQ_ON_12(I-1)*(T2-T1)
-	    IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
-	    dI_RAY(I)=T3 + T4
-	  END DO
-	  I=IEND
-	  T1=T2
-	  T2=(ETA_VEC(I-1)-ETA_VEC(I))/dZ(I-1)
-	  T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
-	  T4=DZSQ_ON_12(I-1)*(T2-T1)
-	  IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
-	  dI_RAY(I)=T3 + T4
-!
-! Now need to interpolate dI_RAY onto our regular R grid.
-!
-	  J=2
-	  DO I=IST+1,IEND
-	    IF(Z_RAY(I) .GE. 0.0D0)THEN
-	      IF(R_RAY(I) .GE. R(J))THEN
-	       dI_R(J,ML)=dI_R(J,ML)+dI_RAY(I)*HQW_AT_RMAX(LS)
-	      ELSE
-	        J=J+1
-	        dI_R(J,ML)=dI_R(J,ML)+dI_RAY(I)*HQW_AT_RMAX(LS)
-	      END IF
-	    ELSE
-	      IF(R_RAY(I) .LE. R(J))THEN
-	        dI_R(J,ML)=dI_R(J,ML)+dI_RAY(I)*HQW_AT_RMAX(LS)
-	      ELSE
-	        J=J-1
-	        dI_R(J,ML)=dI_R(J,ML)+dI_RAY(I)*HQW_AT_RMAX(LS)
-	      END IF
-	    END IF
-	  END DO
-	END IF
 !
 	IF(WRITE_RTAU)THEN
 	  IF(HOLLOW_CORE .AND. INT_METHOD .EQ. 'ETAZ')THEN
