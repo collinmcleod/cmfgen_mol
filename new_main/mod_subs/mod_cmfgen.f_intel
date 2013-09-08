@@ -6,6 +6,9 @@
 !
 	MODULE MOD_CMFGEN
 !
+! Altered 29-Nov-2011 : OLD_LEV_POP_AVAIL added as vector.
+! Altered 25-Sep-2011 : LOG_XzVLTE_F, XzVLTE_F_ON_S, LOG_XzVLTE arrays added (26-Nov-2010/5-Apr-2011).
+!                         Length of level name changed to 40.
 ! Altered 19-Jan-2009 : SL_OPTION inserted
 ! Altered 06-Aug-2008 : PLANCK_MEAN inserted.
 ! Altered 31-Jan-2002 : FIXEDT etc inserted.
@@ -78,6 +81,11 @@
 !
 	LOGICAL SPECIES_PRES(NUM_SPECIES)
 !
+! Used to indicate whether a level population is available at a previous time step.
+! Used for SN calculations (1:NT).
+!
+	LOGICAL, ALLOCATABLE :: OLD_LEV_POP_AVAIL(:)
+!
 ! 
 ! Data arrays for full atom. The names in this array should not be changed,
 ! although new variables can be added.
@@ -85,24 +93,27 @@
 	TYPE MODEL_ATOM_DATA
 !
 	  REAL*8, POINTER :: XzV_F(:,:)		!Level populations in FULL atom
-	  REAL*8, POINTER :: XzVLTE_F(:,:)	!LTE level populations in FULL atom
-	  REAL*8, POINTER :: W_XzV_F(:,:)	!Level dissolution factors
+	  REAL*8, POINTER :: XzVLTE_F(:,:)		!LTE level populations in FULL atom
+          REAL*8, POINTER :: LOG_XzVLTE_F(:,:)  	!Log(LTE level populations in FULL atom)
+          REAL*8, POINTER :: XzVLTE_F_ON_S(:,:) 	!Log(LTE level populations in FULL atom)
+	  REAL*8, POINTER :: W_XzV_F(:,:)		!Level dissolution factors
 	  REAL*8, POINTER :: DXzV_F(:)		!Ion population for full atom
-	  REAL*8, POINTER :: AXzV_F(:,:)	!Oscillator strength (A(I,j), i<j)
-	  REAL*8, POINTER :: EDGEXzV_F(:)	!Ionization energy to g.s. (10^15 Hz)
+	  REAL*8, POINTER :: AXzV_F(:,:)		!Oscillator strength (A(I,j), i<j)
+	  REAL*8, POINTER :: EDGEXzV_F(:)		!Ionization energy to g.s. (10^15 Hz)
 	  REAL*8, POINTER :: GXzV_F(:)		!Level statistical weights in full atom
-	  INTEGER, POINTER :: F_TO_S_XzV(:)	!Link of full levels to super levels
+	  INTEGER, POINTER :: F_TO_S_XzV(:)		!Link of full levels to super levels
 	  INTEGER, POINTER :: INT_SEQ_XzV(:)
-	  CHARACTER*30, POINTER :: XzVLEVNAME_F(:)	!Level name
+	  CHARACTER(LEN=40), POINTER :: XzVLEVNAME_F(:)	!Level name
 !
 	  REAL*8, POINTER :: DXzV(:)		!Ion population for super level
 	  REAL*8, POINTER :: XzV(:,:)		!Level population in SL atom
-	  REAL*8, POINTER :: XzVLTE(:,:)	!LTE populations in SL atom
+	  REAL*8, POINTER :: XzVLTE(:,:)		!LTE populations in SL atom
+          REAL*8, POINTER :: LOG_XzVLTE(:,:)    	!LOG(LTE populations in SL atom)
 	  REAL*8, POINTER :: dlnXzVLTE_dlnT(:,:)
 !
 	  REAL*8, POINTER :: WSXzV(:,:,:)		!Weights assoc. with s.e. eval.
 	  REAL*8, POINTER :: WCRXzV(:,:,:)		!Weights assoc. with cooling.
-	  REAL*8, POINTER :: dWSXzVdT(:,:,:)		!Weights assoc. with d(S.E. Eqn)/dT
+	  REAL*8, POINTER :: dWSXzVdT(:,:,:)	!Weights assoc. with d(S.E. Eqn)/dT
 	  REAL*8, POINTER :: WSE_X_XzV(:,:)		!X-ray photoionization weights.
 	  REAL*8, POINTER :: WCR_X_XzV(:,:)		!
 !
@@ -117,6 +128,12 @@
 	  REAL*8, POINTER :: CPRXzV(:)
 	  REAL*8, POINTER :: COOLXzV(:)
 !
+	  REAL*8, POINTER :: NTCXzV(:)                   !Non-thermal cooling rate for species XzV
+	  REAL*8, POINTER :: NTIXzV(:)                   !Non-thermal ionization rate
+	  REAL*8, POINTER :: NT_ION_CXzV(:)              !Non thermal cooling rate (ionization)
+	  REAL*8, POINTER :: NT_EXC_CXzV(:)              !Non thermal cooling rate (excitation)
+	  REAL*8, POINTER :: NT_OMEGA(:,:)               !Non thermal collision strength
+!
 ! Data vectors to check charge recombination rates.
 !
 	  REAL*8, POINTER :: CHG_RRXzV(:)
@@ -124,6 +141,9 @@
 !
 	  REAL*8 ZXzV			!Charge on ion (=1 for HI)
 	  REAL*8 GIONXzV_F		!Statistical weight of ion
+!
+	  REAL*8 CROSEC_NTFAC           !Factor to scale the non-thermal exictation cross-sections
+	  REAL*8 ION_CROSEC_NTFAC       !Factor to scale non-thermal ioinzation cross-sections
 !
 	  INTEGER NXzV_F		!Number of levels in full atom
 	  INTEGER NXzV			!Number of levels in SL atom

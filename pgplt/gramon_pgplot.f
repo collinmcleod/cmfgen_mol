@@ -7,7 +7,8 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
-! Altered:  31-Sep-2013 : Added long-plot option.
+! Altered:  04-Sep-2013 : Increased MAXPEN (=MAX_PLOTS). Minor cleaning.
+! Altered:  31-Aug-2013 : Added long-plot option.
 ! Altered:  26-Nov-2011 : Curves cycle over pen-colors 2 to 13.
 !                         Dashed curve for plots > 13
 !                         Marker style ignored when MARK is off (use I for invisible curve).
@@ -42,10 +43,9 @@
 ! Finalized 07-Mar-1997 : PGPLOT version.
 !                            Based on GRAMON (Mongo)
 !
-	INTEGER MAXSTR,MAXVEC,MAXPEN
-        PARAMETER (MAXSTR=500)
-	PARAMETER (MAXVEC=500)
-	PARAMETER (MAXPEN=30)
+        INTEGER, PARAMETER :: MAXSTR=500
+	INTEGER, PARAMETER :: MAXVEC=500
+	INTEGER, PARAMETER :: MAXPEN=50            !Should be the same as MAX_PLTS
 !
 	INTEGER NDEC,GET_INDX_SP
 	EXTERNAL SPACING,GET_INDX_SP
@@ -276,6 +276,12 @@
 	LONG_PLOT=.FALSE.
 	LENGTH_OF_HC_PLOT=200.0D0       !cm
 !
+	IF(NPLTS .GT. MAXPEN)THEN
+	  WRITE(T_OUT,*)'Error n GRAMON_PLOT -- not enough pen loctions'
+	  WRITE(T_OUT,*)'MAXPEN should be set to the same value as MAX_PLTS'
+	  RETURN
+	END IF
+!
 ! Define character strings for switching between VT and TEK modes.
 !
 	TO_TEK(1:1)=CHAR(27)
@@ -453,66 +459,82 @@
 	L=LEN_TRIM(ANS)
 	CALL SET_CASE_UP(ANS,IONE,IZERO)
         IF(ANS .EQ. 'H')THEN
-	  WRITE(T_OUT,*)'P=Plot - default'
-          WRITE(T_OUT,*)'E=EXIT from PLOT package'
-	  WRITE(T_OUT,*)'Z=Hardcopy (ZN=Asks for new hard device)'
-          WRITE(T_OUT,*)'A=Define Axis Parameters'
-          WRITE(T_OUT,*)'2A=Define labeling of right-hand axis'
-          WRITE(T_OUT,*)'F=Change default axis parameters'
-	  WRITE(T_OUT,*)'L=Modify Axis Labels and Titles'
- 	  WRITE(T_OUT,*)'D=Switch dashed lines on/off'
- 	  WRITE(T_OUT,*)'DE=Edit dashed lines one by one'
-	  WRITE(T_OUT,*)'W=Change thickness of curves'
- 	  WRITE(T_OUT,*)'WE=Edit line weights one by one'
-	  WRITE(T_OUT,*)'M=Switch marking data points on/off'
-	  WRITE(T_OUT,*)'C=Indicate how curves are to be connected (L,H,A,E,I,V,B)'
-	  WRITE(T_OUT,*)'B=Switch error bars on/off'
-	  WRITE(T_OUT,*)'CC=Change Color setting'
-	  WRITE(T_OUT,*)'CP=Change Pen (Color Index)'
-          WRITE(T_OUT,*)'N=Define IDX,HT etc'
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'P   - Plot - default'
+          WRITE(T_OUT,*)'E   - EXIT from PLOT package'
+	  WRITE(T_OUT,*)'Z   - Hardcopy (ZN=Asks for new hard device)'
+          WRITE(T_OUT,*)'LP  - Allow a long hard copy postscript plot to be created (with CPS)'
+	  WRITE(T_OUT,*)' '
+          WRITE(T_OUT,*)'A   - Define Axis Parameters'
+          WRITE(T_OUT,*)'2A  - Define labeling of right-hand axis'
+          WRITE(T_OUT,*)'F   - Change default axis parameters'
+          WRITE(T_OUT,*)'N   - Define aspect ratio, plot margins, character height etc'
+	  WRITE(T_OUT,*)'L   - Modify Axis Labels and Titles'
+	  WRITE(T_OUT,*)' '
+ 	  WRITE(T_OUT,*)'D   - Switch dashed lines on/off'
+ 	  WRITE(T_OUT,*)'DE  - Edit dashed lines one by one'
+	  WRITE(T_OUT,*)'W   - Change thickness (weights) of curves'
+ 	  WRITE(T_OUT,*)'WE  - Edit line weights one by one'
+	  WRITE(T_OUT,*)'M   - Switch marking data points on/off'
+	  WRITE(T_OUT,*)'C   - Indicate how curves are to be connected (L,H,A,E,I,V,B)'
+	  WRITE(T_OUT,*)'B   - Switch error bars on/off'
+	  WRITE(T_OUT,*)'CC  - Change Color setting'
+	  WRITE(T_OUT,*)'CP  - Change Pen (Color Index)'
+	  WRITE(T_OUT,*)'BRD - Switch border potting on (def) or off'
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
 !
-	  WRITE(T_OUT,*)'DC=Define a straight line continuum for EW'
-	  WRITE(T_OUT,*)'EW=Measure the EW of a single line'
-	  WRITE(T_OUT,*)'LY=Switch between LINEAR/LOG Y axis'
-	  WRITE(T_OUT,*)'LXY=Switch between LINEAR/LOG for X and Y axes'
-	  WRITE(T_OUT,*)'VC=Define line vectors using cursor'
-	  WRITE(T_OUT,*)'VF=Define line vectors using file input'
-	  WRITE(T_OUT,*)'VF=Online edit of vectors'
-          WRITE(T_OUT,*)'SC=Define strings using cursor'
-          WRITE(T_OUT,*)'SF=Define strings using file input'
-          WRITE(T_OUT,*)'SE=Online edit of strings'
-          WRITE(T_OUT,*)'RID=REad line ID''s'
-          WRITE(T_OUT,*)'SID=Change defaults for writing line ID''s'
-	  WRITE(T_OUT,*)'CL=Clear Graphics Screen'
+	  WRITE(T_OUT,*)'LX  - Switch between LINEAR/LOG labeling of X axis'
+	  WRITE(T_OUT,*)'LY  - Switch between LINEAR/LOG labeling of Y axis'
+	  WRITE(T_OUT,*)'LXY - Switch between LINEAR/LOG baleling of X and Y axes'
+          WRITE(T_OUT,*)'RID - Read line ID''s'
+          WRITE(T_OUT,*)'SID - Change defaults for writing line ID''s'
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'VC  - Define line vectors using cursor'
+	  WRITE(T_OUT,*)'VF  - Define line vectors using file input'
+	  WRITE(T_OUT,*)'VE  - Online edit of vectors'
+          WRITE(T_OUT,*)'SC  - Define strings using cursor'
+          WRITE(T_OUT,*)'SF  - Define strings using file input'
+          WRITE(T_OUT,*)'SE  - Online edit of strings'
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
 !
-	  WRITE(T_OUT,*)'VEL=Convert X axis to km/s space'
-	  WRITE(T_OUT,*)'XAR=Simple X axis arithmetic'
-	  WRITE(T_OUT,*)'YAR=Simple Y axis arithmetic'
-	  WRITE(T_OUT,*)'VAR=Simple arithmetic on two plots'
-	  WRITE(T_OUT,*)'SIG=Compute mean and standard deviation'
-	  WRITE(T_OUT,*)'NM=Scale average to 1 or to another plot'
+	  WRITE(T_OUT,*)'VEL - Convert X axis to km/s space'
+	  WRITE(T_OUT,*)'XAR - Simple X axis arithmetic'
+	  WRITE(T_OUT,*)'YAR - Simple Y axis arithmetic'
+	  WRITE(T_OUT,*)'VAR - Simple arithmetic on two plots'
+	  WRITE(T_OUT,*)'NM  - Scale average to 1 or to another plot'
 !
-	  WRITE(T_OUT,*)'RXY=Read plot from asci file'
-	  WRITE(T_OUT,*)'WXY=Write plot to asci file'
-	  WRITE(T_OUT,*)'SXY=Write section of data to terminal'
-	  WRITE(T_OUT,*)'RP=Read labeled plots from firct accecs file'
-	  WRITE(T_OUT,*)'RPF=Similar to RP but asks for filename'
-	  WRITE(T_OUT,*)'WP=Write labeled plots to direct access file'
-	  WRITE(T_OUT,*)'WPF=Similar to WP but asks for filename'
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'LOC - Use a cursor to read of (X,Y) coordinates on a plot'
+	  WRITE(T_OUT,*)'DC  - Define a straight line continuum for EW'
+	  WRITE(T_OUT,*)'EW  - Measure the EW of a single line'
+	  WRITE(T_OUT,*)'GF  - Fit a (modfied) gaussian to an absorption or emission line'  
+	  WRITE(T_OUT,*)'MGF - Fit multiple gaussian to an absorption or emission complex'  
+	  WRITE(T_OUT,*)'EGF - Edit gauss-fit arameters'
+	  WRITE(T_OUT,*)'DG  - Draw gauss-fit.'
+	  WRITE(T_OUT,*)'WGF - Write gauss-fit parameters to a file'
+!
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'RXY - Read plot from asci file'
+	  WRITE(T_OUT,*)'WXY - Write plot to asci file'
+	  WRITE(T_OUT,*)'SXY - Write section of data to terminal'
+	  WRITE(T_OUT,*)'RP  - Read labeled plots from direct accecs file'
+	  WRITE(T_OUT,*)'RPF - Similar to RP but asks for filename'
+	  WRITE(T_OUT,*)'WP  - Write labeled plots to direct access file'
+	  WRITE(T_OUT,*)'WPF - Similar to WP but asks for filename'
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
 !
-	  WRITE(T_OUT,*)'OLF=Open LOG file'
-	  WRITE(T_OUT,*)'OIF=Open input file'
-	  WRITE(T_OUT,*)'CLF=Close LOG file'
-	  WRITE(T_OUT,*)'CIF=Close inpit file'
+	  WRITE(T_OUT,*)'OLF - Open LOG file'
+	  WRITE(T_OUT,*)'OIF - Open input file'
+	  WRITE(T_OUT,*)'CLF - Close LOG file'
+	  WRITE(T_OUT,*)'CIF - Close inpit file'
+	  WRITE(T_OUT,*)'CL  - Clear Graphics Screen'
 !
-	  WRITE(T_OUT,*)'NOI=Leave data intact on exit (switch)'
-	  WRITE(T_OUT,*)'H=Help'
+	  WRITE(T_OUT,*)'NOI - Leave data intact on exit (switch)'
+	  WRITE(T_OUT,*)'H   - Help'
+	  WRITE(T_OUT,*)' '
           GOTO 1000
 !
 ! Exit from Ploting package, saving STRING and VECTOR information.
@@ -1282,12 +1304,12 @@ C
 	      IF(LINE_ID(J)(3:5) .EQ. 'SEV')LINE_ID(J)(3:)='VII'//LINE_ID(J)(6:)
 	    END DO
 	  ELSE
-	    WRITE(6,*)'Unable top open file'
+	    WRITE(T_OUT,*)'Unable top open file'
 	    GOTO 1000
 	  END IF
 1500	  CONTINUE
 	  CLOSE(UNIT=33)
-	  WRITE(6,*)'Number of lines read in is',N_LINE_IDS
+	  WRITE(T_OUT,*)'Number of lines read in is',N_LINE_IDS
 	  CALL NEW_GEN_IN(ID_SCL,'Factor to scale line location')
 	  CALL NEW_GEN_IN(ID_EXPCHAR,'Factor to scale size of ID')
 	  GOTO 1000
@@ -1556,15 +1578,15 @@ C
 	  END IF
 	ELSE IF(ANS .EQ. 'LP')THEN
 	  IF(LONG_PLOT)THEN
-	    WRITE(6,*)'Resuming normal hard copy mode'
+	    WRITE(T_OUT,*)'Resuming normal hard copy mode'
 	    LONG_PLOT=.FALSE.
 	  ELSE
-	    WRITE(6,*)'Setting hard-copy to produce long plots'
-	    WRITE(6,*)'This option only work CPS as the device'
+	    WRITE(T_OUT,*)'Setting hard-copy to produce long plots'
+	    WRITE(T_OUT,*)'This option only work CPS as the device'
 	    LONG_PLOT=.TRUE.
 	    CALL NEW_GEN_IN(LENGTH_OF_HC_PLOT,'Length of plot surface in cm''s')
 	    LP_ASR=2.54D0*8.0D0/LENGTH_OF_HC_PLOT
-	    WRITE(6,*)'Default aspect ratio of pot surface is',LP_ASR
+	    WRITE(T_OUT,*)'Default aspect ratio of pot surface is',LP_ASR
 	  END IF
 !
 !
@@ -1828,7 +1850,7 @@ C
 	      END DO
 	      WRITE(30,'(A)')' '
 	    END DO
-	    WRITE(6,*)NPLTS,' plots written to ',TRIM(FILNAME)
+	    WRITE(T_OUT,*)NPLTS,' plots written to ',TRIM(FILNAME)
 	  ELSE
 	    WRITE(30,*)NPLTS
 	    WRITE(30,*)NPTS(L)
@@ -1836,7 +1858,7 @@ C
 	    DO J=1,NPTS(IP)
 	      WRITE(30,*)CD(IP)%XVEC(J),CD(IP)%DATA(J)
 	    END DO
-	    WRITE(6,*)'One plot written to ',TRIM(FILNAME)
+	    WRITE(T_OUT,*)'One plot written to ',TRIM(FILNAME)
 	  END IF
 	  CLOSE(UNIT=30)
 !
@@ -1846,7 +1868,7 @@ C
 	  DO IP=1,NPLTS
 	    DO J=1,NPTS(IP)
 	      IF(CD(IP)%XVEC(J) .GE. XPAR(1) .AND. CD(IP)%XVEC(J) .LE. XPAR(2))THEN
-	        WRITE(6,*)IP,J,CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	        WRITE(T_OUT,*)IP,J,CD(IP)%XVEC(J),CD(IP)%DATA(J)
 	      END IF
 	    END DO
 	  END DO
@@ -2088,10 +2110,10 @@ C
 	  VAR_PLT1=1
 	  CALL NEW_GEN_IN(VAR_PLT1,'Reference plot for normalization (0 to norm to 1.0')
 	  IF(VAR_PLT1 .LT. 0 .OR. VAR_PLT1 .GT. NPLTS)THEN
-	    WRITE(6,*)'Bad plot number'
+	    WRITE(T_OUT,*)'Bad plot number'
 	    GOTO 1000
 	  END IF
-	  IF(VAR_PLT1 .EQ. 0)WRITE(6,*)'Normalizing plots to 1.0'
+	  IF(VAR_PLT1 .EQ. 0)WRITE(T_OUT,*)'Normalizing plots to 1.0'
 	  XT(1)=XPAR(1); CALL NEW_GEN_IN(XT(1),'Beginning of normalization range')
 	  XT(2)=XPAR(2)
 	  CALL NEW_GEN_IN(XT(2),'End of normalization range')
@@ -2108,8 +2130,8 @@ C
 	    END DO
 	    MEAN=0.5D0*MEAN; T2=0.5D0*T2
 	    IF(MEAN .EQ. 0 .OR. T2 .EQ. 0)THEN
-	      WRITE(6,*)'No normalization will be done'
-	      WRITE(6,*)'Bad range of data'
+	      WRITE(T_OUT,*)'No normalization will be done'
+	      WRITE(T_OUT,*)'Bad range of data'
 	      GOTO 1000
 	    ELSE
 	      MEAN=MEAN/T2
@@ -2129,11 +2151,11 @@ C
 	      END DO
 	      T1=0.5D0*T1; T2=0.5D0*T2
 	      IF(T2 .EQ. 0 .OR. T1 .EQ. 0)THEN
-	        WRITE(6,*)IP,' not normalized'
+	        WRITE(T_OUT,*)IP,' not normalized'
 	      ELSE
 	        T1=T1/T2
 	        T3=MEAN/T1
-	        WRITE(6,*)'Normalization parameter for plot',IP,' is',T3
+	        WRITE(T_OUT,*)'Normalization parameter for plot',IP,' is',T3
 	        DO J=1,NPTS(IP)
 	          CD(IP)%DATA(J)=CD(IP)%DATA(J)*T3
 	        END DO
@@ -2442,7 +2464,7 @@ C
 !
 	  ID_WAVE_OFF(1:N_LINE_IDS)=ID_WAVE(1:N_LINE_IDS)
 	  CALL PGQCS(IFOUR,XCHAR_SIZE,YCHAR_SIZE)
-	  WRITE(6,*)'XCHAR_SIZE=',XCHAR_SIZE
+	  WRITE(T_OUT,*)'XCHAR_SIZE=',XCHAR_SIZE
 	  DO L=1,5
 	    DO I=1,N_LINE_IDS
 	      T1=(ID_WAVE(I)-XPAR(1))*(XPAR(2)-ID_WAVE(2))
