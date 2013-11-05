@@ -49,7 +49,7 @@ ALLEXE    : $(EXE)
 
 $(EXE_DIR)%.exe : %.o $(OBJ) $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
 	$(F90) $*.o \
-		$(OBJ1) -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
+		$(OBJ1) -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
 		$(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \
 		-o $(EXE_DIR)$*.exe
 
