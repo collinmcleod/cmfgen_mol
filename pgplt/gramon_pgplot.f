@@ -7,6 +7,8 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered:  22-Nov-2013 : Added LG option for curve type. This plots the log of the absolute 
+!                           value of the data but indicates where the data is -ve.
 ! Altered:  04-Sep-2013 : Increased MAXPEN (=MAX_PLOTS). Minor cleaning.
 ! Altered:  31-Aug-2013 : Added long-plot option.
 ! Altered:  26-Nov-2011 : Curves cycle over pen-colors 2 to 13.
@@ -51,7 +53,7 @@
 	EXTERNAL SPACING,GET_INDX_SP
 	REAL*4 SPACING
 !
-	CHARACTER*1 TYPE_CURVE(MAX_PLTS)
+	CHARACTER(LEN=2) TYPE_CURVE(MAX_PLTS)
 !
 	LOGICAL DO_ERROR
 	CHARACTER*5 LOG_AXIS
@@ -201,6 +203,7 @@
 	REAL*4 T1,T2,T3,T4
  	REAL*4 XVAL,YVAL
 	REAL*4 XVAL_SAV,YVAL_SAV
+	REAL*4 TA(500)
 !
 	INTEGER BEG
 	INTEGER Q	!Used for pen color
@@ -934,14 +937,15 @@ C
 	  DO IP=1,NPLTS
 850	    WRITE(T_OUT,'(I3,'' : '',$)')IP
 	    CALL NEW_GEN_IN(TYPE_CURVE(IP),'TC=')
-	    CALL SET_CASE_UP(TYPE_CURVE(IP),1,1)
+	    CALL SET_CASE_UP(TYPE_CURVE(IP),IONE,IZERO)
 	    IF( TYPE_CURVE(IP) .NE. 'L' .AND.              !Normal line
 	1       TYPE_CURVE(IP) .NE. 'E' .AND.              !non-monotonic
 	1       TYPE_CURVE(IP) .NE. 'B' .AND.              !Broken
 	1       TYPE_CURVE(IP) .NE. 'I' .AND.              !Invisible
 	1       TYPE_CURVE(IP) .NE. 'V' .AND.              !Verticle lines
 	1       TYPE_CURVE(IP) .NE. 'A' .AND.              !Hist - X vert
-	1       TYPE_CURVE(IP) .NE. 'H' )THEN              !Histogram
+	1       TYPE_CURVE(IP) .NE. 'H' .AND.              !Histogram
+	1       TYPE_CURVE(IP) .NE. 'LG' )THEN             !Log(ABS)
 !
 	        WRITE(T_OUT,*)'Invalid connection specifier. Specifiers are:'
 	        WRITE(T_OUT,*)'L --- Normal line'
@@ -2321,6 +2325,36 @@ C
 	      IEND=IST+1
 	    END DO
 !
+	  ELSE IF(TYPE_CURVE(IP) .EQ. 'LG')THEN
+	    IST=1
+	    IEND=2
+	    L=ABS(MARKER_STYLE(IP))
+	    CALL PGSCH(EXPMARK)
+	    TA(1:NPTS(IP))=0.0D0
+	    DO I=1,NPTS(IP)
+	      IF(CD(IP)%DATA(I) .NE. 0)TA(I)=LOG10(ABS(CD(IP)%DATA(I)))
+	    END DO
+	    WRITE(6,'(A,I3,A,2ES12.2)')'Minimuam/Maximum values for plot',IP,'are ',
+	1                MINVAL(TA(1:NPTS(IP))),MAXVAL(TA(1:NPTS(IP)))
+	    DO WHILE(IEND .LT. NPTS(IP))
+	      DO WHILE(IEND .LT. NPTS(IP))
+	         IF( CD(IP)%DATA(IEND)*CD(IP)%DATA(IEND-1) .GT. 0)THEN
+	           IEND=IEND+1
+	         ELSE
+	           EXIT
+	         END IF
+	      END DO
+	      J=IEND-IST
+	      IF(J .NE. 1)CALL PGLINE(J,CD(IP)%XVEC(IST),TA(IST))
+	      DO J=IST,IEND-1
+	        IF(MARK)CALL PGPT(1,CD(IP)%XVEC(J),TA(J),L)
+	        IF(CD(IP)%DATA(J) .LT. 0)CALL PGPT(1,CD(IP)%XVEC(J),TA(J),24)
+	      END DO
+	      IST=IEND
+	      IEND=IST+1
+	    END DO
+	    CALL PGSCH(EXPCHAR)		!Reset character size
+!
 	  ELSE IF(TYPE_CURVE(IP) .EQ. 'H' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    CALL PGBIN(NPTS(IP),CD(IP)%XVEC,CD(IP)%DATA,.TRUE.)
 !
@@ -2399,7 +2433,8 @@ C
 !
 ! Don't draw if invisible curve.
 !
-	    IF(L .NE. 0 .AND. TYPE_CURVE(IP) .NE. 'I')THEN
+	    IF(L .NE. 0 .AND. TYPE_CURVE(IP) .NE. 'I' .AND. 
+	1                     TYPE_CURVE(IP) .NE. 'LG')THEN
 !	      CALL PGSLS(LINE_STYLE(IP))
 	      Q=PEN_COL(IP+1)
 	      CALL PGSCI(Q)     ! START WITH COLOR INDEX 2

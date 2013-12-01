@@ -57,12 +57,11 @@
 !
 	INTEGER, PARAMETER :: MAX_SIM=3000
 !
-! Allow space to be set aside for the intrinsic line profiles. This saves 
-! computational efort. An error message will be printed if these values
-! are too small.
+! Define vinteger variables to set aside for storage for the intrinsic line profiles.
+! These are now computed by a subroutine (as of Nov-2013).
 !
-	INTEGER, PARAMETER :: NLINES_PROF_STORE=500
-        INTEGER, PARAMETER :: NFREQ_PROF_STORE=20000
+	INTEGER NLINES_PROF_STORE
+	INTEGER NFREQ_PROF_STORE
 !
 	INTEGER NCF
 	INTEGER ND,NC,NP
@@ -740,8 +739,6 @@
 	  END DO
 	END IF
 !
-	CALL INIT_PROF_MODULE(ND,NLINES_PROF_STORE,NFREQ_PROF_STORE)
-!
 ! If desired, we can set transitions with:
 !      wavelengths > FLUX_CAL_LAM_END (in A) to the SOBOLEV option.
 !      wavelengths < FLUX_CAL_LAM_BEG (in A) to the SOBOLEV option.
@@ -915,7 +912,10 @@
 	1		NU_MAX_OBS,NU_MIN_OBS,VINF,
 	1               FRAC_DOP_OBS,dV_OBS_PROF,dV_OBS_WING,dV_OBS_BIG,
 	1               OBS_PRO_EXT_RAT,ES_WING_EXT,VTURB_MAX)
-
+!
+	CALL GET_PROFILE_STORAGE_LIMITS(NLINES_PROF_STORE,NFREQ_PROF_STORE,
+	1         LINE_ST_INDX_IN_NU,LINE_END_INDX_IN_NU,PROF_TYPE,N_LINE_FREQ,NCF)
+	CALL INIT_PROF_MODULE(ND,NLINES_PROF_STORE,NFREQ_PROF_STORE)
 !
 ! 
 ! Need to calculate impact parameters, and angular quadrature weights here

@@ -22,9 +22,6 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
-! Altered 10-Jul-2013 : After NG acceleration program plots the accelerated T correction, and the
-!                         previous T correction. This will allow a prompt check as to whether the
-!                         NG acceleration should be used.
 ! Altered 01-Nov-2012 : Bug fix with TG option. Values when r < 1 were not being updated.
 ! Altered 05-May-2007 : Fixed bug when do NG accleration with band size < ND
 ! Altered 07-Mar-2006 : Acceleratiion can now start at ND_ST.
@@ -576,14 +573,27 @@
 	WRITE(6,'(1X,90A)')('*',I=1,90)
 	WRITE(6,*)' '//DEF_PEN
 !
+	T1=0.0D0
 	DO L=1,ND
 	  INT_ARRAY(L)=L
-	  TA(L)=100.0D0*(1.0D0-RDPOPS(T_INDEX,L,2)/NEWPOP(T_INDEX,L))
+	  TA(L)=100.0D0*(1.0D0-RDPOPS(T_INDEX,L,1)/NEWPOP(T_INDEX,L))
 	  TB(L)=100.0D0*(1.0D0-RDPOPS(T_INDEX,L,3)/RDPOPS(T_INDEX,L,2))
+	  T1=MAX(ABS(TA(L)),T1);  T1=MAX(ABS(TB(L)),T1)
 	END DO
-	CALL DP_CURVE(ND,INT_ARRAY,TA)
-	CALL DP_CURVE(ND,INT_ARRAY,TB)
-	CALL GRAMON_PGPLOT('Depth Index','100[T(new)-T(old)]/T(new)',' ',' ')
+	IF(T1 .EQ. 0.0D0)THEN
+	  CALL GEN_IN(K,'Input new variable to be plotted as T correction is zero')
+	  DO L=1,ND
+	    TA(L)=100.0D0*(1.0D0-RDPOPS(K,L,1)/NEWPOP(K,L))
+	    TB(L)=100.0D0*(1.0D0-RDPOPS(K,L,3)/RDPOPS(K,L,2))
+	  END DO
+	  CALL DP_CURVE(ND,INT_ARRAY,TA)
+	  CALL DP_CURVE(ND,INT_ARRAY,TB)
+	  CALL GRAMON_PGPLOT('Depth Index','100[X(new)-X(old)]/X(new)',' ',' ')
+	ELSE
+	  CALL DP_CURVE(ND,INT_ARRAY,TA)
+	  CALL DP_CURVE(ND,INT_ARRAY,TB)
+	  CALL GRAMON_PGPLOT('Depth Index','100[T(new)-T(old)]/T(new)',' ',' ')
+	END IF
 !
 	WRITE(6,*)' '
 	WRITE(6,'(1X,70A)')('*',I=1,70)

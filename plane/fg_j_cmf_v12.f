@@ -710,6 +710,7 @@
 	      IF(J_PNT(I,LS) .LT. 1 .OR. J_PNT(I,LS) .GT. NI_RAY(LS))THEN
 	        WRITE(LUER,*)'Error setting J_PNT in FG_J_CMF_V12 -- invalid values'
 	        WRITE(LUER,*)'Depth=',I,'Ray=',LS,'J_PNT value=',J_PNT(I,LS)
+	        WRITE(LUER,*)R_EXT(1),R_RAY(1,LS),NI_RAY(LS)
 	        STOP
 	      ELSE IF( ABS(R_RAY(K,LS)-R(I))/R(I) .GT. 1.0D-12)THEN
 	        WRITE(LUER,*)'Error setting J_PNT in FG_JCMF_V12 -- invalid values'
