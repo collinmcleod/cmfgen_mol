@@ -2414,17 +2414,19 @@
 !      lower than the last frequency in the lines resonance zone it can safely
 !      be removed.
 !
-! 2. Line is removed when the current frequency is lower by EXT_LINE_VAR 
+! 2. Line is removed when the current frequency is lower by EXT_LINE_VAR*VINF 
 !      (converted to frequency units) than the last frequency in the resonance
 !       zone. This is a control parameter, and may be used to speed up the code.
-!       NB: EXT_LINE_VAR >= 0.
+!       NB: EXT_LINE_VAR >= 0. Due to strong line overlap, it was found that
+!       this method of line removal can cause issues when Vinf ~ 0 (e.g., in a 
+!       plane-parallel model). We thus put in a restriction of 300 km/s.
 !
 ! 3. To make way for another line. This is only done when necessary, and is
 !      done elsewhere. Only requirement is that the current frequency
 !      is lower that the last frequency of the resonance zone.
 !
 	CALL TUNE(1,'CHK_L_FIN')
-	T1=1.0D0-EXT_LINE_VAR*V(1)/2.998D+05         
+	T1=1.0D0-EXT_LINE_VAR*MAX(V(1),300.0D0)/2.998E+05
 	DO SIM_INDX=1,MAX_SIM
 	  IF(LINE_STORAGE_USED(SIM_INDX))THEN
 !

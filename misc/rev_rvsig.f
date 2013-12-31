@@ -315,7 +315,7 @@
 	      EXIT
 	    END IF
 	  END DO
-	  IF(V_MIN-OLD_V(I+1) .LT. OLD_V(I)-V_MIN)I_END=I+1
+	  IF(V_MIN-OLD_V(I_END+1) .LT. OLD_V(I_END)-V_MIN)I_END=I_END+1
 	  WRITE(6,*)' I_ST=',I_ST,OLD_V(I_ST)
 	  WRITE(6,*)'I_END=',I_END,OLD_V(I_END)
 	  WRITE(6,*)'Current number of points in interval is',I_END-I_ST-1
