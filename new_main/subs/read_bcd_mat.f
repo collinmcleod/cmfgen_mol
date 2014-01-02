@@ -4,6 +4,7 @@
 !
 ! Altered 16-Dec-2013:  Changed depth index on scratch file from I3.3 to I4.4.
 !                         This was done to allow for clumped models with ND 999.
+!                         Filename incread to LEN=14 (2-Jan-2013)
 !
 	INTEGER N,NION,DEPTH_INDX
 	REAL*8 B(N,N)
@@ -21,7 +22,7 @@
 	INTEGER  LUER,ERROR_LU,IOS,I
 	EXTERNAL ERROR_LU
 	LOGICAL LU_USED
-	CHARACTER*12 FILENAME
+	CHARACTER(LEN=14) FILENAME
 !
 ! Get an unused UNIT number.
 !
@@ -87,7 +88,7 @@
 	INTEGER  LUER,ERROR_LU,IOS,I
 	EXTERNAL ERROR_LU
 	LOGICAL LU_USED
-	CHARACTER*12 FILENAME
+	CHARACTER(LEN=14) FILENAME
 !
 ! Get an unused UNIT number.
 !

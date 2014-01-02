@@ -61,13 +61,14 @@
 !
 	BIG_LIM=(CHANGE_LIM-1.0D0)/CHANGE_LIM
         LIT_LIM=1.0D0-CHANGE_LIM
+	MIN_SCALE=1.0D+20
 !
 ! Set default parameters.
 !
 	L_ST=1; L_END=ND
 	RELAX_VARIABLE=1.0D0
 	T_LIM_VARIABLE=0.2D0
-	POP_LIM_VARIABLE=100*CHANGE_LIM		!=>implies no effect
+	POP_LIM_VARIABLE=100.0D0*CHANGE_LIM		!=>implies no effect
 	DO I=1,ND
 	  RELAX_PARAM(I)=RELAX_VARIABLE
 	  T_LIM(I)=T_LIM_VARIABLE
@@ -78,11 +79,11 @@
 	CONSISTENCY_CNT=0
 !
 ! Valid ranges:
-!              Relaxations      0 < T1 < 2
-!              T LIMIT          0 < T1 < 0.2 
-!              POP LIMIT        0 < T1 < 0.8 (really only valid if T1 < 0.3)
+!              0 < RELAX_PARAM < 2
+!              0 < T_LIM < 0.2 
+!              POP_LIM > 1
 !
-! The file need not be present.
+! The file, ADJUST_CORRECTIONS, need not be present.
 !
 ! NB: The relaxation parameter and the T LIMIT effect all corrections (if used) at the
 !     specified depth. POP LIMIT only effects corrections bigger than POP LIMIT.
@@ -102,9 +103,9 @@
 	  IF(L_ST .LT. 1 .OR. L_END .GT. ND)THEN
 	    WRITE(6,*)'Error in depth indices in ADJUST_CORRECTIONS -- invalid range'
 	    WRITE(6,*)'Depth indices=',L_ST,L_END
-	    L_ST=1; L_END=0.0D0
+	    L_ST=1; L_END=ND
 	    RELAX_VARIABLE=1.0D0; T_LIM_VARIABLE=0.2D0
-	    POP_LIM_VARIABLE=100*CHANGE_LIM
+	    POP_LIM_VARIABLE=100.0D0*CHANGE_LIM		!=>implies no effect
 	  END IF
 !
 	  IF(T_LIM_VARIABLE .LT. 0.0D0 .OR. T_LIM_VARIABLE .GT. 0.20D0)THEN
@@ -121,7 +122,7 @@
 	    WRITE(6,*)'Error for POP LIMIT in ADJUST_CORRECTIONS -- invalid value'
 	    WRITE(6,*)'Valid range is > 1.0'
 	    WRITE(6,*)'POP LIMIT parameter read in',POP_LIM_VARIABLE
-	    POP_LIM_VARIABLE=100*CHANGE_LIM
+	    POP_LIM_VARIABLE=100.0D0*CHANGE_LIM		!=>implies no effect
 	  END IF
 	  DO L=L_ST,L_END
 	    POP_LIM(L)=POP_LIM_VARIABLE
@@ -141,7 +142,7 @@
 	INQUIRE(UNIT=LU_SUM,OPENED=FILE_OPEN)
 	IF(FILE_OPEN)CLOSE(LU_SUM)
 	IF(LAMBDA_IT)RELAX_PARAM(1:ND)=1.0D0
-	IF(LAMBDA_IT)POP_LIM(1:ND)=1.0D+10
+	IF(LAMBDA_IT)POP_LIM(1:ND)=100.0D0*CHANGE_LIM
 !
 	IF(SCALE_OPT(1:5) .EQ. 'MAJOR')THEN
 	  DO I=1,ND
@@ -167,17 +168,19 @@
 	    END IF
 	    IF(SCALE .GT. 1.0D0)SCALE=1.0D0             !i.e., will not force T to T_MIN
 !
-! RELAX_PARAM allows for the use of successive over-relaxation.
+! RELAX_PARAM allows for the use of successive over or under relaxation.
+! When RELAX_PARAM > 1, BIG_LIM and LIT_LIM ensure that we don't get
+! negatve populations.
 !
-	    IF(RELAX_PARAM(I) .LT. SCALE)SCALE=RELAX_PARAM(I)
+	    IF(SCALE .EQ. 1.0D0)SCALE=RELAX_PARAM(I)
 !
-! Ensure population change don't change population by too large an amount.
+! Ensure population change doesn't change population by too large an amount.
 ! POP_LIM allows us to force smaller corrections at some depths even while
 ! CMFGEN is running.
 !
 	    T2=(POP_LIM(I)-1.0D0)/POP_LIM(I)
 	    DPTH_BIG_LIM=MIN(BIG_LIM,T2)
-	    DPTH_LIT_LIM=MAX(LIT_LIM,-POP_LIM(I))
+	    DPTH_LIT_LIM=MAX(LIT_LIM,1.0D0-POP_LIM(I))
 	    DO J=1,NT
 	      T1=STEQ(J,I)*SCALE
 	      IF(T1 .GT. DPTH_BIG_LIM)T1=DPTH_BIG_LIM
