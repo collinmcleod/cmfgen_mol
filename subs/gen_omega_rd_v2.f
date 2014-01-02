@@ -17,6 +17,7 @@
 	1                      MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE)
 	IMPLICIT NONE
 !
+! Altered 15-Dec-2013 : Code now only outputs error message on first call for each species.
 ! Altered 02-Sep-2012 : Outputs error messgae when matching transition not found.
 !                         Checks ordering of levels (necessary for overlapping LS states).
 !                         Fixed bug when data levels split, and program levels unsplit.
@@ -93,6 +94,15 @@
 	CHARACTER*500 STRING
 	CHARACTER*60 LOCNAME(NLEV)
 !
+	LOGICAL, SAVE :: DO_WARNING_OUTPUT
+	CHARACTER(LEN=80), SAVE :: FIRST_FILE=' '
+!
+	IF(FIRST_FILE .EQ. ' ')THEN
+	  FIRST_FILE=FILE_NAME
+	  DO_WARNING_OUTPUT=.TRUE.
+	ELSE IF(FIRST_FILE .EQ. FILE_NAME)THEN
+	  DO_WARNING_OUTPUT=.FALSE.
+	END IF
 	LUER=ERROR_LU()
 	NUM_NO_MATCH=0
 	NO_MATCH_NAME=' '
@@ -475,10 +485,12 @@
 !
 	END DO
 !
-	DO I=1,NUM_NO_MATCH
-	  WRITE(LUER,'(A,A,A,A)')' Warning(',TRIM(FILE_NAME),
+	IF(DO_WARNING_OUTPUT)THEN
+	  DO I=1,NUM_NO_MATCH
+	    WRITE(LUER,'(A,A,A,A)')' Warning(',TRIM(FILE_NAME),
 	1                   '): No match found for level ',TRIM(NO_MATCH_NAME(I))
-	END DO
+	  END DO
+	END IF
 !
 ! NUM_TRANS is now set equal to the actual number of transitions read.
 !

@@ -38,6 +38,8 @@
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
+! Altered  6-Dec-2013 : When removing lines from the variation set we assume a minimum terminal
+!                          velocity of 300 km/s. Important for plane-parallel models with Vinf=0.
 ! Altered 29-Nov-2011 : Call to STEQ_CO_MOV_DERIV changed to _V3. Done to facilitae
 !                         hadling of additional levels with time dependence.
 ! Altered 07-Nov-2011 : Now output MNL_F, MNUP_F to NETRATE and TOTRATE.
@@ -1193,8 +1195,7 @@
 	IF(NUM_ITS_TO_DO .EQ. 0)LST_ITERATION=.TRUE.
 	MAIN_COUNTER=MAIN_COUNTER+1
 !
-	CALL MESS(LUER,'Current great iteration count is')
-	WRITE(LUER,*)MAIN_COUNTER
+	 WRITE(LUER,'(A,I4)')'Current great iteration count is',MAIN_COUNTER
 !
 ! Used as a initializing switch for COMP_OBS.
 !
@@ -4212,6 +4213,7 @@
 	  IF(FILE_OPEN)THEN
 	    CLOSE(UNIT=LUER)
 	    CALL GEN_ASCI_OPEN(LUER,'OUTGEN','OLD','APPEND',' ',IZERO,IOS)
+	    CALL SET_LINE_BUFFERING(LUER)
 	  END IF
 	  CLOSE(UNIT=LU_SE)
 	  CALL GEN_ASCI_OPEN(LU_SE,'STEQ_VALS','OLD','APPEND',' ',IZERO,IOS)

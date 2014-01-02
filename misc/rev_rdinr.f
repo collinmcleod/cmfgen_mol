@@ -9,7 +9,9 @@
 !                 FG_IB:       Finer grid near inner boundary.
 !                 FG_OB:       Finer grid near outer boundary.
 !                 IR           Insert additional points betwen I=FST and I=LST
-!                 SCAL_R:      Scale radius grid
+!                 SCALE_R:     Scale radius grid.
+!                 TAU          Insert extra depth points in Log(TAU).
+!                 RTAU         Insert extra depth points in Log(Tau) with constrints on dR.
 !
 	PROGRAM REV_RDINR
 	USE GEN_IN_INTERFACE
@@ -18,8 +20,12 @@
 ! Created : 23-Jan-2006
 ! Altered : 24-Sep-2006 --- FG option added.
 ! Altered : 26-Nov-2007 --- EXTR option installed.
+! Altered : 24-Dec-2014 --- TAU and RTAU options inserted -- they are primarily for SN models.
 !
+	INTEGER, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: MAX_ND=500
+!
 	REAL*8 R(MAX_ND)
 	REAL*8 DI(MAX_ND)
 	REAL*8 ED(MAX_ND)
@@ -27,28 +33,38 @@
 	REAL*8 IRAT(MAX_ND)
 	REAL*8 VEL(MAX_ND)
 	REAL*8 CLUMP_FAC(MAX_ND)
+!
 	REAL*8 RTMP(MAX_ND)
 	REAL*8 OLD_XV(MAX_ND)
 	REAL*8 NEW_XV(MAX_ND)
+	REAL*8 NEW_TAU(MAX_ND)
+	REAL*8 OLD_TAU(MAX_ND)
+	REAL*8 TAU(MAX_ND)
+	REAL*8 NEW_VEL(MAX_ND)
 !
-	INTEGER, PARAMETER :: IZERO=0
-	INTEGER I,J,K
-	INTEGER FST,LST
-	INTEGER IST,IEND
-	INTEGER NI,NG
-	INTEGER ICOUNT
-	INTEGER N,ND,NEW_ND
-	INTEGER, PARAMETER :: IONE=1
+!
 	REAL*8 RMIN,RMAX,LUM
 	REAL*8 GRID_FACTOR,GRID_RATIO
 	REAL*8 T1,T2,SCALE_FACTOR,DELR
-	CHARACTER*132 STRING
-	CHARACTER*132 FILE_IN
-	CHARACTER*132 FILE_OUT
+	REAL*8 TAU_MIN,TAU_MAX
+	REAL*8 TAU_RAT
+	REAL*8 R_SCALE_FAC
 !
-	CHARACTER*20 OPTION
+	INTEGER I,J,K
+	INTEGER FST,LST
+	INTEGER IST,IEND
+	INTEGER IOS
+	INTEGER NI,NG
+	INTEGER NIB,NOB
+	INTEGER ICOUNT
+	INTEGER N,ND,NEW_ND,TAU_ND
 !
-	FILE_IN='HIOUT'; FILE_OUT='RDINR'
+	CHARACTER(LEN=132) STRING
+	CHARACTER(LEN=132) FILE_IN
+	CHARACTER(LEN=132) FILE_OUT
+	CHARACTER(LEN=20)  OPTION
+!
+	FILE_IN='RDINR_OLD'; FILE_OUT='RDINR'
 	CALL GEN_IN(FILE_IN,'Input file: DC file format')
 	CALL GEN_IN(FILE_OUT,'Output file: DC file format')
 !
@@ -60,9 +76,13 @@
         WRITE(6,'(A)')'   FG_OB:       Finer grid near outer boundary'
 	WRITE(6,'(A)')'   IR           Insert additional points betwen I=FST and I=LST'
 	WRITE(6,'(A)')'   SCALE_R:     Scale radius grid'
+	WRITE(6,'(A)')'   TAU:         Insert points (multiple ranges) in TAU space'
+	WRITE(6,'(A)')'   RTAU:        Refine whole grid - dTAU and dR space'
 	OPTION='FG_OB'
 	CALL GEN_IN(OPTION,'Action to be taken:')
-	
+!
+! The old R-grid file is assumed to have the same format as the DC files.
+!
 	OPEN(UNIT=9,FILE=FILE_IN,STATUS='OLD',ACTION='READ')
 	OPEN(UNIT=10,FILE=FILE_OUT,STATUS='UNKNOWN',ACTION='WRITE')
 	DO I=1,3
@@ -83,7 +103,143 @@
 100	CONTINUE
 !
 	CALL SET_CASE_UP(OPTION,IZERO,IZERO)
-	IF(OPTION .EQ. 'DOUB')THEN
+!
+	IF(OPTION .EQ. 'RTAU')THEN
+	  OPEN(UNIT=20,FILE='MEANOPAC',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	    IF(IOS .NE. 0)THEN
+	      WRITE(6,*)' '
+	      WRITE(6,*)'Error -- unable to open MEANOPAC which is required by the RTAU option'
+	      STOP
+	    END IF
+	    READ(20,'(A)')STRING
+	    DO I=1,ND
+	      READ(20,*)RTMP(I),J,OLD_TAU(I)
+	    END DO
+	  CLOSE(UNIT=20)
+!
+	  NIB=2; NOB=1
+	  NEW_ND=100
+	  R_SCALE_FAC=1.4
+	  CALL GEN_IN(NEW_ND,'Input new number of depth points')
+	  CALL GEN_IN(R_SCALE_FAC,'Factor (>1) to enhance maximum dLog(R) spacing')
+	  CALL GEN_IN(NIB,'Number of depth points to insert at inner boundary')
+	  CALL GEN_IN(NOB,'Number of depth points to insert at outer boundary')
+	  CALL ADJUST_SN_R_GRID(RTMP,R,OLD_TAU,R_SCALE_FAC,T1,T1,NIB,NOB,NEW_ND,ND)
+!
+	 CALL MON_INTERP(NEW_VEL,NEW_ND,IONE,RTMP,NEW_ND,VEL,ND,R,ND)
+!
+! Create new file containing the R-grid. Only R, V, and I are on the new grid.
+!
+	  WRITE(10,'(1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)')R(ND),LUM,1,NEW_ND
+	  DO I=1,NEW_ND
+	    J=MIN(I,ND)
+	    WRITE(10,'(A)')' '
+	    WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')RTMP(I),
+	1                DI(J),ED(J),T(J),IRAT(J),NEW_VEL(I),CLUMP_FAC(J),I
+	    WRITE(10,'(F7.1)')1.0D0
+	  END DO
+!
+! Option to insert extra points equally space in LOG(TAU). Multiple regions may
+! be edited at the same time.
+!
+	ELSE IF(OPTION .EQ. 'TAU')THEN
+	  OPEN(UNIT=20,FILE='MEANOPAC',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	    IF(IOS .NE. 0)THEN
+	      WRITE(6,*)' '
+	      WRITE(6,*)'Error -- unable to open MEANOPAC which is required by the TAU option'
+	      STOP
+	    END IF
+	    READ(20,'(A)')STRING
+	    READ(20,'(A)')STRING
+	    DO I=1,ND
+	      READ(20,*)RTMP(I),J,OLD_TAU(I)
+	    END DO
+	  CLOSE(UNIT=20)
+!
+	  WRITE(6,*)' '
+	  WRITE(6,'(A,ES9.3,5X,A,E9.3,/)')' TAU(Min)=',OLD_TAU(1),'TAU(Max)=',OLD_TAU(ND)
+	  WRITE(6,*)' '
+	  WRITE(6,*)'You may do multiple intervals -- one at a time'
+	  WRITE(6,*)'To exit, put TAU_MIN -ve (or zero)'
+	  WRITE(6,*)' '
+!
+	  CALL GEN_IN(TAU_MIN,'Minimum of TAU range for revision')
+	  NEW_ND=ND
+	  NEW_TAU(1:ND)=OLD_TAU(1:ND)
+	  DO WHILE(TAU_MIN .GT. 0.0D0)
+	    CALL GEN_IN(TAU_MAX,'Maximum of Tau range for revision')
+	    TAU_ND=NEW_ND
+	    TAU(1:TAU_ND)=NEW_TAU(1:TAU_ND)
+	    IST=1
+	    DO I=1,TAU_ND-1
+	      IF(TAU_MIN .LT. TAU(I+1))THEN
+	        IST=I
+	        IF( (TAU_MIN-TAU(I)) .GT. (TAU(I+1)-TAU_MIN))IST=IST+1
+	        TAU_MIN=TAU(IST)
+	        EXIT
+	      END IF
+	    END DO
+	    DO I=1,TAU_ND-1
+	      IF(TAU_MAX .LT. TAU(I+1))THEN
+	        IEND=I
+	        IF( (TAU_MAX-TAU(I)) .GT. (TAU(I+1)-TAU_MAX))IEND=IEND+1
+	        TAU_MAX=TAU(IEND)
+	        EXIT
+	      END IF
+	    END DO
+!
+	    WRITE(6,'(A)')' '
+	    WRITE(6,*)'Number of points in the interval is',IEND-IST-1
+	    WRITE(6,'(A)')' '
+	    WRITE(6,'(2(3X,A,7X,A,4X,A,4X))'),'I','dTAU(I)','TAU(I/I-1)','E','dTAU(E)','TAU(E+1/E)'
+	    WRITE(6,'(2(I4,2ES14.3,4X))')IST,TAU(IST)-TAU(IST-1),TAU(IST)/TAU(IST-1),
+	1                             IEND,TAU(IEND+1)-TAU(IEND),TAU(IEND+1)/TAU(IEND)
+	    WRITE(6,'(A)')' '
+	    IST=MAX(IST,2); IEND=MIN(TAU_ND-1,IEND)
+!
+	    WRITE(6,'(2X,A,10X,A,10X,A,3X,A,10X,A,3X,A)')'NG','TAU_RAT','dTAU','dTAU[I/I-1]','dTAU','dTAU[E+1/E]'
+	    NG=IEND-IST-1 
+	    DO K=NG,NG+40,4
+	      TAU_RAT=EXP( LOG(TAU_MAX/TAU_MIN) / (K+1) )
+	      WRITE(6,'(I4,3X,7ES14.3)')K,TAU_RAT,
+	1           (TAU_RAT-1)*TAU(IST),(TAU_RAT-1)*TAU(IST)/(TAU(IST)-TAU(IST-1)),
+	1     TAU(IEND)*(1.0D0-1.0D0/TAU_RAT),
+	1           (TAU(IEND+1)-TAU(IEND))/TAU(IEND)/(1.0D0-1.0D0/TAU_RAT)
+	    END DO
+	    WRITE(6,'(A)')' '
+	    NG=LOG(TAU_MAX/TAU_MIN)/LOG(1.3D0)+1
+	    CALL GEN_IN(NG,'New number of grid points for this interval')
+	    TAU_RAT=EXP( LOG(TAU_MAX/TAU_MIN) / (NG+1) )
+!
+	    NEW_ND=IST+NG+(TAU_ND-IEND)+1
+	    DO I=1,IST
+	      NEW_TAU(I)=TAU(I)
+	    END DO
+	    DO I=IST+1,IST+NG
+	      NEW_TAU(I)=NEW_TAU(I-1)*TAU_RAT
+	    END DO
+	    DO I=IST+NG+1,NEW_ND
+	      NEW_TAU(I)=TAU(IEND+(I-IST-NG-1))
+	    END DO
+	    TAU_MIN=0.0D0
+	    CALL GEN_IN(TAU_MIN,'Minimum of TAU range for revision (=<0) to exit.')
+	  END DO
+!
+! Now create the NEW R grid.
+!
+	  CALL MON_INTERP(RTMP,NEW_ND,IONE,NEW_TAU,NEW_ND,R,ND,OLD_TAU,ND)
+	  CALL MON_INTERP(NEW_VEL,NEW_ND,IONE,RTMP,NEW_ND,VEL,ND,R,ND)
+	  RTMP(1)=R(1); RTMP(NEW_ND)=R(ND)
+	  WRITE(10,'(1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)')R(ND),LUM,1,NEW_ND
+	  DO I=1,NEW_ND
+	    J=MIN(I,ND)
+	    WRITE(10,'(A)')' '
+	    WRITE(10,'(1X,1P,E18.10,6E15.5,2X,I4,A1)')RTMP(I),
+	1              DI(J),ED(J),T(J),IRAT(J),NEW_VEL(I),CLUMP_FAC(J),I
+	    WRITE(10,'(F7.1)')1.0D0
+	  END DO
+!
+	ELSE IF(OPTION .EQ. 'DOUB')THEN
 	  NEW_ND=2*ND-1
 	  WRITE(10,'(1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4)')RMIN,LUM,1,NEW_ND
 	  WRITE(10,'(A)')' '
@@ -101,6 +257,7 @@
 	1                DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I),I
 	    WRITE(10,'(F7.1)')1.0D0
 	  END DO
+!
 	ELSE IF(OPTION .EQ. 'SCALE_R')THEN
 	  T1=0.0D0
 	  CALL GEN_IN(T1,'New RMIN')

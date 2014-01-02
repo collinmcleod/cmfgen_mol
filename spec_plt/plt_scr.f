@@ -7,7 +7,10 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 	INTEGER ND,NT,NIT
-C
+!
+! Altered 12-Dec-2013: Installed LY option so that we can plot very small populations on
+!                        a logarithmic scale.
+!
 	REAL*8, ALLOCATABLE :: POPS(:,:,:)		!NT,ND,NIT
 	REAL*8, ALLOCATABLE :: R_MAT(:,:)		!ND,NIT
 	REAL*8, ALLOCATABLE :: V_MAT(:,:)		!ND,NIT
@@ -43,6 +46,7 @@ C
 	INTEGER K
 	INTEGER IOS
 C
+	LOGICAL LOG_Y_AXIS
 	LOGICAL NEWMOD
 	LOGICAL WRITE_RVSIG
 	LOGICAL DO_ABS
@@ -154,6 +158,8 @@ C
 	WRITE(T_OUT,*)'FDG    :: Fudge individual values at a single depth and output to SCRTEMP'
 	WRITE(T_OUT,*)'FDGV   :: Fudge values over a ranges of depths (% change) and output to SCRTEMP'
 	WRITE(T_OUT,*)' '
+	WRITE(T_OUT,*)'LY  :: Switch to/from Log(Y) for options where appropriate (not full implemented)'
+	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'E   :: EXIT'
 	WRITE(T_OUT,*)' '
 	PLT_OPT='R'
@@ -161,7 +167,12 @@ C
 	CALL SET_CASE_UP(PLT_OPT,0,0)
 !
 	IF(PLT_OPT(1:2) .EQ. 'E ' .OR. PLT_OPT(1:2) .EQ. 'EX')STOP
-	IF(PLT_OPT(1:5) .EQ. 'CHK_R')THEN
+	IF(PLT_OPT(1:2) .EQ. 'LY')THEN
+	   IF(LOG_Y_AXIS)WRITE(6,*)'Switching to linear Y axis'
+	   IF(.NOT. LOG_Y_AXIS)WRITE(6,*)'Switching to logarithmic Y axis'
+	   LOG_Y_AXIS=.NOT. LOG_Y_AXIS
+	   GOTO 200
+	ELSE IF(PLT_OPT(1:5) .EQ. 'CHK_R')THEN
 	  DO IT=1,NIT
 	    WRITE(6,'(2ES16.6)')R_MAT(1,IT),R_MAT(ND,IT)
 	  END DO
@@ -363,11 +374,17 @@ C
 	    IF(IVAR .EQ. 0)EXIT
 	    DO ID=1,ND
 	      Y(ID)=POPS(IVAR,ID,IT)
+	      Z(ID)=LOG10(POPS(IVAR,ID,IT))
 	      X(ID)=ID
 	    END DO
-	    CALL DP_CURVE(ND,X,Y)
+	    IF(LOG_Y_AXIS)THEN
+	      CALL DP_CURVE(ND,X,Z)
+	      Ylabel='Log'
+	    ELSE
+	      CALL DP_CURVE(ND,X,Y)
+	      Ylabel=''
+	    END IF
 	  END DO
-	  Ylabel=''
 	  CALL GRAMON_PGPLOT('Depth',Ylabel,' ',' ')
 	  GOTO 200
 	ELSE IF(PLT_OPT(1:2) .EQ. 'PV')THEN
@@ -382,11 +399,17 @@ C
 	    IF(V(1) .GT. 10000.0D0)T1=1.0D-03
 	    DO ID=1,ND
 	      Y(ID)=POPS(IVAR,ID,IT)
+	      Z(ID)=LOG10(POPS(IVAR,ID,IT))
 	      X(ID)=T1*V_MAT(ID,IT)
 	    END DO
-	    CALL DP_CURVE(ND,X,Y)
+	    IF(LOG_Y_AXIS)THEN
+	      CALL DP_CURVE(ND,X,Z)
+	      Ylabel='Log'
+	    ELSE
+	      CALL DP_CURVE(ND,X,Y)
+	      Ylabel=''
+	    END IF
 	  END DO
-	  Ylabel=''
 	  IF(V(1) .GT. 10000.0D0)THEN
 	    CALL GRAMON_PGPLOT('V(Mm/s)',Ylabel,' ',' ')
 	  ELSE
@@ -405,16 +428,22 @@ C
 	    IF(R(1) .GT. 1.0D+04)T1=1.0D-04
 	    DO ID=1,ND
 	      Y(ID)=POPS(IVAR,ID,IT)
+	      Z(ID)=LOG10(POPS(IVAR,ID,IT))
 	      X(ID)=1.0D-04*R_MAT(ID,IT)
 	    END DO
-	    CALL DP_CURVE(ND,X,Y)
+	    IF(LOG_Y_AXIS)THEN
+	      CALL DP_CURVE(ND,X,Z)
+	      Ylabel='Log'
+	    ELSE
+	      CALL DP_CURVE(ND,X,Y)
+	      Ylabel=''
+	    END IF
 	  END DO
 	  IF(R(1) .GT. 1.0D+04)THEN
 	    CALL GRAMON_PGPLOT('R(10\u14 \dcm)',Ylabel,' ',' ')
 	  ELSE
 	    CALL GRAMON_PGPLOT('R(10\u10 \dcm)',Ylabel,' ',' ')
 	  END IF
-	  Ylabel=''
 	  GOTO 200
 !
 	ELSE IF(PLT_OPT(1:2) .EQ. 'VR')THEN
@@ -551,10 +580,12 @@ C
 	    ELSE IF(PLT_OPT(1:1) .EQ. 'Y')THEN
 	      DO K=1,NIT
 	        Z(K)=Y(K)
+	        IF(LOG_Y_AXIS)Z(K)=LOG10(Z(K))
 	        X(K)=FLOAT(K)
 	      END DO
 	      NY=NIT
 	      YLABEL='Y(K)'
+	      IF(LOG_Y_AXIS)YLABEL='Log Y(K)'
 	    ELSE
 	      WRITE(T_OUT,*)' Option not recognized: try again'
 	      GOTO 1000

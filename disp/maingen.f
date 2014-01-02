@@ -382,9 +382,16 @@
 	  INNER_BND_METH='DIFFUSION'		!Default for normal stars
 	  DIF=.TRUE.
 	END IF
-	TYPE_ATM=' '			!i.e def is not 'EXP'
 	TRAPFORJ=.TRUE.
 	TSTAR=T(ND)
+!
+	TYPE_ATM='P'
+	T1=LOG(MASS_DENSITY(5)/MASS_DENSITY(1))/LOG(R(1)/R(5))
+	WRITE(TYPE_ATM(2:6),'(F5.2)')T1
+	WRITE(6,'(A)')RED_PEN
+	WRITE(6,'(A)')' For optical depth calculations we will assume a power density distribution'
+	WRITE(6,'(A,F5.2)')' at the outer boundary. Density exponent for atmosphere is ',T1
+	WRITE(6,'(A)')DEF_PEN
 !
 ! If the grey temperature is available in CMFGEN, we don't need to (although we can with the
 ! GREY option) compute it.
@@ -2257,6 +2264,8 @@
 	  CALL DP_CURVE(ND,XV,TA)
 !
 	ELSE IF(XOPT .EQ. 'IMASS')THEN
+	  K=0
+	  WRITE(6,'(A)')' '
 	  DO ISPEC=1,NSPEC
 	    IF( (XSPEC .EQ. SPECIES(ISPEC) .OR. XSPEC .EQ. 'ALL') .AND.  POPDUM(ND,ISPEC) .GT. 0.0D0)THEN
 	      T1=4.0D+30*PI*AT_MASS(ISPEC)*ATOMIC_MASS_UNIT()/MASS_SUN()
@@ -2265,8 +2274,12 @@
 	      END DO
 	      CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
 	      CALL DP_CURVE(ND,XV,TA)
-	      WRITE(6,'(A,A,A,ES9.2,A)')'Mass of ',TRIM(SPECIES(ISPEC)),' is',TA(ND),' Msun'
+	      K=K+1
+	      WRITE(6,'( A,A4,A,ES9.2,A)',ADVANCE='NO')' Mass of ',TRIM(SPECIES(ISPEC)),' is',TA(ND),' Msun'
+	      IF(MOD(K,2) .NE. 0)WRITE(6,'(10X)',ADVANCE='NO')
+	      IF(MOD(K,2) .EQ. 0)WRITE(6,'(A)')' '
 	    END IF
+	    IF(MOD(K,2) .NE. 0)WRITE(6,'(A)')' '
 	  END DO
 !
 	ELSE IF(XOPT .EQ. 'LOGT')THEN

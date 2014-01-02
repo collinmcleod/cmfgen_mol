@@ -47,6 +47,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(read_time_model_v1.o)\
       $(LIB)(read_seq_time_file_v1.o)\
       $(LIB)(set_ba_storage.o)\
+      $(LIB)(set_depth_consistency.o)\
       $(LIB)(set_rv_hydro_model_v3.o)\
       $(LIB)(set_imp_vec.o)\
       $(LIB)(set_sn_r_grid.o)\

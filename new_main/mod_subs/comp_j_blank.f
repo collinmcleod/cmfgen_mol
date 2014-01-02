@@ -35,7 +35,9 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
-! Aletered : 16-Feb-2006 " CMF_FORM_SOL_V2 used for last iteration when MAXCH<100, and
+! Altered : 16-Dec-2013 : CMF_FORM_SOL_V2 (non EXT option) no longer called when ND > 199.
+!                             CMF_FORM_SOL_V2 is not parallelized and slows down large clumped models.
+! Altered : 16-Feb-2006 : CMF_FORM_SOL_V2 used for last iteration when MAXCH<100, and
 !                            not LAMBDA iteration. Sometimes it might be useful to
 !                            change so that CMF_FORM_SOL_V2 is also called when LMABDA 
 !                            iteration used. FG_COUNt was not being initialized.
@@ -765,7 +767,7 @@ C
 	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0D0
 	      END IF
 	    ELSE IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
-	1         MAXCH .LT.  100.0D0 .AND. .NOT. SN_MODEL) )THEN
+	1         MAXCH .LT.  100.0D0 .AND. .NOT. SN_MODEL .AND. ND .LT. 200) )THEN
 	      IF(COHERENT_ES)THEN
      	        TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ(1:ND)
 	      ELSE

@@ -1,4 +1,4 @@
-#Include file with system dependent definitions
+#        Include file with system dependent definitions
 
 include ../Makefile_definitions
 
@@ -108,6 +108,12 @@ $(EXE_DIR)tlusty_vel.exe : tlusty_vel.o $(OANDF)
               $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) -ldisp \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)tlusty_vel.exe
+
+$(EXE_DIR)rev_rdinr.exe : rev_rdinr.o adjust_sn_r_grid.o
+	$(F90) rev_rdinr.o adjust_sn_r_grid.o \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) -ldisp \
+              $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
+              -o $(EXE_DIR)rev_rdinr.exe
 
 $(EXE_DIR)guess_dc.exe : guess_dc.o $(OANDF) 
 	$(F90) guess_dc.o \

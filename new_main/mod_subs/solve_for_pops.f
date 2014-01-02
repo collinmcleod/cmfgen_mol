@@ -11,6 +11,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Aleterd:   31-Dec-2013 : No longer set COMPUTE_BA=T when T_MIN_BA_EXTRAP is true. We may need to
+!                            change this.
 ! Altered:   26-Mar-2012 : Changed to CALL SOLVEBA_V11. Pas POP_ATOM.
 ! Altered:   12-Mar-2012 : Changed to CALL SOLVEBA_V10. Allows populations at depth 2 to be
 !                            equated to those at depth 1.
@@ -183,7 +185,8 @@
 	    WRBAMAT=.TRUE.
 	  END IF
 	END IF
-	IF(T_MIN_BA_EXTRAP)COMPUTE_BA=.TRUE.
+!
+!	IF(T_MIN_BA_EXTRAP)COMPUTE_BA=.TRUE.
 !
 ! The STEQ array contains the percentage changes in the populations.
 ! Shall now determine whether the population changes are too large.
