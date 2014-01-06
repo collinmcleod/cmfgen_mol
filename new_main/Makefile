@@ -90,6 +90,7 @@ lib2:
 	(cd ../pgplt; make )
 lib3:
 	(cd ../subs; make )
+	(cd ../stark; make )
 lib4:
 	(cd ../newsubs; make )
 lib5:

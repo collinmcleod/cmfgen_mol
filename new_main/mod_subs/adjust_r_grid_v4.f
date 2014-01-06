@@ -126,6 +126,7 @@
 !
         CALL GET_LU(LU)
 	OPEN(UNIT=LU,FILE='R_REGRIDDING_LOG',STATUS='UNKNOWN',ACTION='WRITE')
+	CALL SET_LINE_BUFFERING(LU)		!Switches off line buffering
 !
 ! Save existing grid, which will be used for the interplations.
 !

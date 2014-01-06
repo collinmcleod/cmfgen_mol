@@ -68,7 +68,7 @@ else
 endif
 
 #
-# Copie files that do not necessarily exist for all models.
+# Copy files that do not necessarily exist for all models.
 # 
 
 if(-e $1/ADJUST_R_DEFAULTS)then

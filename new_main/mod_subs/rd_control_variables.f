@@ -118,10 +118,10 @@ C
 	    CALL RD_STORE_INT(N_OB_INS,'NBND_INS',L_FALSE,
 	1           'Number of additional points to insert in radius grid at boundary')
 	    CALL RD_STORE_DBLE(CONS_FOR_R_GRID,'C_R_GRID',L_FALSE,
-	1           'Constant to allow improved choice of R grid')
+	1           'Constant to allow improved shoice of R grid')
 	    IF(CONS_FOR_R_GRID .GT. 0)THEN
 	      CALL RD_STORE_DBLE(EXP_FOR_R_GRID,'E_R_GRID',L_TRUE,
-	1           'Constant to allow improved choice of R grid')
+	1           'Constant to allow improved shoice of R grid')
 	    ELSE
 	      CONS_FOR_R_GRID=1.0D0
 	      EXP_FOR_R_GRID=0.0D0
@@ -454,15 +454,54 @@ C
 	1           'Include incident radiation for plane-parellel mod with V?')
 	  CALL RD_STORE_LOG(TRAPFORJ,'TRAP_J',L_TRUE,
 	1           'Use trapazoidal weights to compute J? ')
-C
+!
+! This section of the code should work with old VADAT  files when using a Doppler profile of
+! fixed width (the default).
+!
 	  WRITE(LUSCR,'()')
+	  FIX_DOP=.TRUE.
+	  AMASS_DOP=1.0D0
+	  CALL RD_STORE_LOG(FIX_DOP,'FIX_DOP',L_FALSE,
+	1      'Use the same turbulent velocity for all species?')
 	  CALL RD_STORE_DBLE(TDOP,'TDOP',L_TRUE,
 	1      'Temperature to be used in Doppler profile (10^4K)')
-	  CALL RD_STORE_DBLE(AMASS_DOP,'AMASS_DOP',L_TRUE,
+	  IF(FIX_DOP)THEN
+	    CALL RD_STORE_DBLE(AMASS_DOP,'AMASS_DOP',L_TRUE,
 	1      'Atomic mass to be used in Doppler profile (amu''s)')
-	  CALL RD_STORE_DBLE(VTURB,'VTURB',L_TRUE,
+	    CALL RD_STORE_DBLE(VTURB,'VTURB',L_TRUE,
 	1      'Turbulent velocity to be used in Doppler profile (km/s)')
-C
+	    VTURB_MIN=VTURB; VTURB_MAX=VTURB
+	    GLOBAL_LINE_PROF='DOP_FIX'
+	  ELSE
+	    CALL RD_STORE_DBLE(VTURB_MIN,'VTURB_MIN',L_TRUE,
+	1      'Minimum turbulent velocity for Doppler profile (km/s)')
+	    CALL RD_STORE_DBLE(VTURB_MAX,'VTURB_MAX',L_TRUE,
+	1      'Maximum turbulent velocity for Doppler profile (km/s)')
+	    VTURB=VTURB_MIN
+!
+	    WRITE(LUSCR,'()')
+	    CALL RD_STORE_NCHAR(GLOBAL_LINE_PROF,'GLOBAL_PROF',ITEN,L_TRUE,
+	1        'Global switch for intrinsic line absorption profile')
+	    CALL SET_CASE_UP(GLOBAL_LINE_PROF,IZERO,IZERO)
+	    IF( GLOBAL_LINE_PROF .NE. 'NONE' .AND.
+	1       GLOBAL_LINE_PROF .NE. 'DOP_FIX' .AND.
+	1       GLOBAL_LINE_PROF .NE. 'DOP_SPEC' .AND.
+	1       GLOBAL_LINE_PROF .NE. 'DOPPLER' .AND.
+	1       GLOBAL_LINE_PROF .NE. 'LIST' .AND.
+	1       GLOBAL_LINE_PROF .NE. 'LIST_VGT' .AND.
+	1       GLOBAL_LINE_PROF .NE. 'VOIGT' .AND.
+	1       GLOBAL_LINE_PROF .NE. 'HZ_STARK')THEN
+	      WRITE(LUER,*)'Invalid GLOBAL_LINE_PROF parameter'
+	      STOP
+	    END IF
+	    CALL RD_STORE_LOG(SET_PROF_LIMS_BY_OPACITY,'OPAC_LIMS',L_TRUE,
+	1           'Set prof limits by line to cont. ratio?')
+	    CALL RD_STORE_DBLE(DOP_PROF_LIMIT,'DOP_LIM',L_TRUE,
+	1           'Edge limits for Doppler line profile')
+	    CALL RD_STORE_DBLE(VOIGT_PROF_LIMIT,'VOIGT_LIM',L_TRUE,
+	1           'Edge limits for Voigt line profile')
+	  END IF
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_DBLE(MAX_DOP,'MAX_DOP',L_TRUE,
 	1      'Maximum half-width of resonance zone (in Doppler widths)')

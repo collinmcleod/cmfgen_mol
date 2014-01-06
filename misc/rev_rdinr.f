@@ -14,13 +14,15 @@
 !                 RTAU         Insert extra depth points in Log(Tau) with constrints on dR.
 !
 	PROGRAM REV_RDINR
+	USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
 ! Created : 23-Jan-2006
 ! Altered : 24-Sep-2006 --- FG option added.
 ! Altered : 26-Nov-2007 --- EXTR option installed.
-! Altered : 24-Dec-2014 --- TAU and RTAU options inserted -- they are primarily for SN models.
+! Altered : 24-Dec-2013 --- TAU and RTAU options inserted.
+! Altered : 05-Jan-2014 --- NG=0 allows insertion to be skipped for TAU option.
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
@@ -149,8 +151,10 @@
 	      WRITE(6,*)'Error -- unable to open MEANOPAC which is required by the TAU option'
 	      STOP
 	    END IF
-	    READ(20,'(A)')STRING
-	    READ(20,'(A)')STRING
+	    STRING=' '
+	    DO WHILE(INDEX(STRING,'Tau(Ross)') .EQ. 0 .AND. INDEX(STRING,'Rat(Ross)') .EQ. 0)
+	      READ(20,'(A)')STRING
+	    END DO
 	    DO I=1,ND
 	      READ(20,*)RTMP(I),J,OLD_TAU(I)
 	    END DO
@@ -208,19 +212,27 @@
 	    END DO
 	    WRITE(6,'(A)')' '
 	    NG=LOG(TAU_MAX/TAU_MIN)/LOG(1.3D0)+1
-	    CALL GEN_IN(NG,'New number of grid points for this interval')
-	    TAU_RAT=EXP( LOG(TAU_MAX/TAU_MIN) / (NG+1) )
 !
-	    NEW_ND=IST+NG+(TAU_ND-IEND)+1
-	    DO I=1,IST
-	      NEW_TAU(I)=TAU(I)
-	    END DO
-	    DO I=IST+1,IST+NG
-	      NEW_TAU(I)=NEW_TAU(I-1)*TAU_RAT
-	    END DO
-	    DO I=IST+NG+1,NEW_ND
-	      NEW_TAU(I)=TAU(IEND+(I-IST-NG-1))
-	    END DO
+	    WRITE(6,'(A)')RED_PEN
+	    WRITE(6,'(A)')' Need to choose NG to give a good step size at either end.'
+	    WRITE(6,'(A)')' Enter 0 points if insertion interval is unsatsfactory.'
+	    WRITE(6,'(A)')DEF_PEN
+	    CALL GEN_IN(NG,'New number of grid points for this interval')
+	    IF(NG .EQ. 0)THEN
+	    ELSE
+	      TAU_RAT=EXP( LOG(TAU_MAX/TAU_MIN) / (NG+1) )
+!
+	      NEW_ND=IST+NG+(TAU_ND-IEND)+1
+	      DO I=1,IST
+	        NEW_TAU(I)=TAU(I)
+	      END DO
+	      DO I=IST+1,IST+NG
+	        NEW_TAU(I)=NEW_TAU(I-1)*TAU_RAT
+	      END DO
+	      DO I=IST+NG+1,NEW_ND
+	        NEW_TAU(I)=TAU(IEND+(I-IST-NG-1))
+	      END DO
+	    END IF
 	    TAU_MIN=0.0D0
 	    CALL GEN_IN(TAU_MIN,'Minimum of TAU range for revision (=<0) to exit.')
 	  END DO

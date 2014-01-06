@@ -488,9 +488,9 @@
 	        IF(RESONANCE_ZONE(SIM_INDX))THEN
 	          DO I=1,ND
 	            CHI(I)=CHI(I) +
-	1             CHIL_MAT(I,SIM_INDX)*LINE_PROF_SIM(SIM_INDX)
+	1             CHIL_MAT(I,SIM_INDX)*LINE_PROF_SIM(I,SIM_INDX)
 	            ETA(I)=ETA(I) +
-	1             ETAL_MAT(I,SIM_INDX)*LINE_PROF_SIM(SIM_INDX)
+	1             ETAL_MAT(I,SIM_INDX)*LINE_PROF_SIM(I,SIM_INDX)
 	          END DO
 	        END IF
 	      END DO

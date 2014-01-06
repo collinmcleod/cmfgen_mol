@@ -1,5 +1,6 @@
 	MODULE CONTROL_VARIABLE_MOD
 !
+! Incorporated: 02-Jan-2014: Changed to allow depth dependent profiles.
 ! Altered : 05-Apr-2011 : Added vriable R_GRD_REVISED (10-Feb-2011).
 ! Altered : 16-Jul-2010 : Added FIX_ALL_SPECIES variable.
 ! Altered : 23-Nov-2007 : LAM_SCALE_OPT included.
@@ -199,8 +200,18 @@
 ! to be constant at all depths.
 !
 	REAL*8 TDOP
+	REAL*8 VDOP_FIX
 	REAL*8 VTURB
 	REAL*8 AMASS_DOP
+	REAL*8 VTURB_MIN
+	REAL*8 VTURB_MAX
+	LOGICAL FIX_DOP
+!
+	REAL*8 DOP_PROF_LIMIT
+	REAL*8 VOIGT_PROF_LIMIT
+	LOGICAL SET_PROF_LIMS_BY_OPACITY
+	LOGICAL RD_STARK_FILE
+	CHARACTER(LEN=10) GLOBAL_LINE_PROF
 !
 ! Variables used to define what transitions are neglected. Cut is
 ! presently by the gf value, and the lower level of the transition.

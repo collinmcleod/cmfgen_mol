@@ -696,10 +696,11 @@
 	        T2=GF_CUT
 	      END IF
 	      TMP_STRING=TRIM(ION_ID(ID))//'_F_OSCDAT'
-	      CALL GENOSC_V6( ATM(ID)%AXzV_F, ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,
-	1                 ATM(ID)%XzVLEVNAME_F, T1, ATM(ID)%ZXzV,
+	      CALL GENOSC_V8( ATM(ID)%AXzV_F, ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,ATM(ID)%XzVLEVNAME_F, 
+	1                 ATM(ID)%ARAD,ATM(ID)%GAM2,ATM(ID)%GAM4,ATM(ID)%OBSERVED_LEVEL,
+	1                 T1, ATM(ID)%ZXzV,
 	1                 ATM(ID)%XzV_OSCDATE, ATM(ID)%NXzV_F,I,
-	1                 'SET_ZERO',T2,GF_LEV_CUT,MIN_NUM_TRANS,
+	1                 'SET_ZERO',T2,GF_LEV_CUT,MIN_NUM_TRANS,L_FALSE,
 	1                 LUIN,LUSCR,TMP_STRING)
 	      TMP_STRING=TRIM(ION_ID(ID))//'_F_TO_S'
 	      CALL RD_F_TO_S_IDS_V2( ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
@@ -837,36 +838,6 @@
 !
 ! 
 !
-! Compute profile frequencies such that for the adopted doppler
-! velocity the profile ranges from 5 to -5 doppler widths.
-! This section needs to be rewritten if we want the profile to
-! vary with depth.
-!
-! ERF is used in computing the Sobolev incident intensity at the
-! outer boundary. ERF = int from "x" to "inf" of -e(-x^2)/sqrt(pi).
-! Note that ERF is not the error function. ERF is related to the
-! complementary error function by ERF =-0.5D0 . erfc(X).
-! S15ADF is a NAG routine which returns erfc(x).
-!
-! The incident Sobolev intensity is S[ 1.0-exp(tau(sob)*ERF) ]
-! NB -from the definition, -1<erf<0 .
-!
-	T1=4.286299D-05*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
-	J=0
-	DO I=1,NLF
-	  ERF(I)=-0.5D0*S15ADF(PF(I),J)
-	  PF(I)=PF(I)*T1
-	END DO
-        VDOP_VEC(1:ND)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
-!
-! Compute the frequency grid for CMFGEN. Routine also allocates the vectors 
-! needed for the line data, sets the line data, and puts the line data into 
-! numerical order.
-!
-	CALL SET_FREQUENCY_GRID(NU,FQW,LINES_THIS_FREQ,NU_EVAL_CONT,
-	1               NCF,NCF_MAX,N_LINE_FREQ,
-	1               OBS_FREQ,OBS,N_OBS,LUIN,IMPURITY_CODE)
-!
 ! Define the average energy of each super level. At present this is
 ! depth independent, which should be adequate for most models.
 ! This average energy is used to scale the line cooling rates in
@@ -1003,6 +974,44 @@
 	    STOP
 	  END IF
 	END IF
+!
+! Compute profile frequencies such that for the adopted doppler
+! velocity the profile ranges from 5 to -5 doppler widths.
+! This section needs to be rewritten if we want the profile to
+! vary with depth.
+!
+! ERF is used in computing the Sobolev incident intensity at the
+! outer boundary. ERF = int from "x" to "inf" of -e(-x^2)/sqrt(pi).
+! Note that ERF is not the error function. ERF is related to the
+! complementary error function by ERF =-0.5D0 . erfc(X).
+! S15ADF is a NAG routine which returns erfc(x).
+!
+! The incident Sobolev intensity is S[ 1.0-exp(tau(sob)*ERF) ]
+! NB -from the definition, -1<erf<0 .
+!
+	T1=4.286299D-05*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
+	J=0
+	DO I=1,NLF
+	  ERF(I)=-0.5D0*S15ADF(PF(I),J)
+	  PF(I)=PF(I)*T1
+	END DO
+        VDOP_VEC(1:ND)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
+	WRITE(6,*)VTURB_MIN,VTURB_MAX
+	VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*V(1:ND)/V(1)
+	WRITE(6,*)VTURB_VEC(1),VTURB_VEC(ND)
+!
+	IF(GLOBAL_LINE_PROF(1:4) .EQ. 'LIST')THEN
+	  CALL RD_STRK_LIST(LUIN)
+	END IF
+!
+! Compute the frequency grid for CMFGEN. Routine also allocates the vectors 
+! needed for the line data, sets the line data, and puts the line data into 
+! numerical order.
+!
+	CALL SET_FREQUENCY_GRID_V2(NU,FQW,LINES_THIS_FREQ,NU_EVAL_CONT,
+	1               NCF,NCF_MAX,N_LINE_FREQ,ND,
+	1               OBS_FREQ,OBS,N_OBS,LUIN,IMPURITY_CODE)
+!
 !
 ! 
 !
@@ -1195,7 +1204,7 @@
 	IF(NUM_ITS_TO_DO .EQ. 0)LST_ITERATION=.TRUE.
 	MAIN_COUNTER=MAIN_COUNTER+1
 !
-	 WRITE(LUER,'(A,I4)')'Current great iteration count is',MAIN_COUNTER
+	WRITE(LUER,'(A,I4)')'Current great iteration count is',MAIN_COUNTER
 !
 ! Used as a initializing switch for COMP_OBS.
 !
@@ -1448,7 +1457,7 @@
 !
 	  DO SIM_INDX=1,MAX_SIM
 	    IF(RESONANCE_ZONE(SIM_INDX))THEN
-	       CHI(ND)=CHI(ND)+CHIL_MAT(ND,SIM_INDX)*LINE_PROF_SIM(SIM_INDX)
+	       CHI(ND)=CHI(ND)+CHIL_MAT(ND,SIM_INDX)*LINE_PROF_SIM(ND,SIM_INDX)
 	    END IF
 	  END DO
 !
@@ -1459,9 +1468,9 @@
 	    IF(RESONANCE_ZONE(SIM_INDX))THEN
 	      NL=SIM_NL(SIM_INDX)
 	      NUP=SIM_NUP(SIM_INDX)
-	      VCHI(NL,ND)=VCHI(NL,ND)+LINE_PROF_SIM(SIM_INDX)*
+	      VCHI(NL,ND)=VCHI(NL,ND)+LINE_PROF_SIM(ND,SIM_INDX)*
 	1        LINE_OPAC_CON(SIM_INDX)*L_STAR_RATIO(ND,SIM_INDX)
-	      VCHI(NUP,ND)=VCHI(NUP,ND)-LINE_PROF_SIM(SIM_INDX)*
+	      VCHI(NUP,ND)=VCHI(NUP,ND)-LINE_PROF_SIM(ND,SIM_INDX)*
 	1        LINE_OPAC_CON(SIM_INDX)*U_STAR_RATIO(ND,SIM_INDX)*
 	1        GLDGU(SIM_INDX)
 	    END IF
@@ -2087,8 +2096,8 @@
 	    DO SIM_INDX=1,MAX_SIM
 	      IF(RESONANCE_ZONE(SIM_INDX))THEN
 	        DO I=1,ND
-	          CHI(I)=CHI(I)+CHIL_MAT(I,SIM_INDX)*LINE_PROF_SIM(SIM_INDX)
-	          ETA(I)=ETA(I)+ETAL_MAT(I,SIM_INDX)*LINE_PROF_SIM(SIM_INDX)
+	          CHI(I)=CHI(I)+CHIL_MAT(I,SIM_INDX)*LINE_PROF_SIM(I,SIM_INDX)
+	          ETA(I)=ETA(I)+ETAL_MAT(I,SIM_INDX)*LINE_PROF_SIM(I,SIM_INDX)
 	        END DO
 	      END IF
 	    END DO
@@ -2314,11 +2323,11 @@
 	DO SIM_INDX=1,MAX_SIM
 	  IF(RESONANCE_ZONE(SIM_INDX))THEN
 	    DO I=1,ND
-	      ZNET_SIM(I,SIM_INDX)=ZNET_SIM(I,SIM_INDX) + LINE_QW_SIM(SIM_INDX)*
+	      ZNET_SIM(I,SIM_INDX)=ZNET_SIM(I,SIM_INDX) + LINE_QW_SIM(I,SIM_INDX)*
 	1          (1.0D0-RJ(I)*CHIL_MAT(I,SIM_INDX)/ETAL_MAT(I,SIM_INDX))
-	      JBAR_SIM(I,SIM_INDX)=JBAR_SIM(I,SIM_INDX) + LINE_QW_SIM(SIM_INDX)*RJ(I)
+	      JBAR_SIM(I,SIM_INDX)=JBAR_SIM(I,SIM_INDX) + LINE_QW_SIM(I,SIM_INDX)*RJ(I)
+	      LINE_QW_SUM(I,SIM_INDX)=LINE_QW_SUM(I,SIM_INDX) + LINE_QW_SIM(I,SIM_INDX)
 	    END DO
-	    LINE_QW_SUM(SIM_INDX)=LINE_QW_SUM(SIM_INDX) + LINE_QW_SIM(SIM_INDX)
 	  END IF
 	END DO
 !
@@ -2427,7 +2436,7 @@
 !      is lower that the last frequency of the resonance zone.
 !
 	CALL TUNE(1,'CHK_L_FIN')
-	T1=1.0D0-EXT_LINE_VAR*MAX(V(1),300.0D0)/2.998E+05
+        T1=1.0D0-EXT_LINE_VAR*MAX(V(1),600.0D0)/2.998E+05
 	DO SIM_INDX=1,MAX_SIM
 	  IF(LINE_STORAGE_USED(SIM_INDX))THEN
 !

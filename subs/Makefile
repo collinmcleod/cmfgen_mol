@@ -79,7 +79,8 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(init_temp_v2.o)\
       $(LIB)(ins_line_obs_v2.o)\
       $(LIB)(ins_line_obs_v3.o)\
-      $(LIB)(ins_line_v4.o)\
+      $(LIB)(ins_line_obs_v5.o)\
+      $(LIB)(ins_line_v6.o)\
       $(LIB)(integrate.o)\
       $(LIB)(interp_knowncoeef.o)\
       $(LIB)(jfeau_ibc.o)\
@@ -115,6 +116,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(mon_int_funs_v2.o)\
       $(LIB)(mon_int_ins_v1.o)\
       $(LIB)(mon_interp.o)\
+      $(LIB)(mon_interp_fast.o)\
       $(LIB)(monotonic_integrate.o)\
       $(LIB)(mult2d.o)\
       $(LIB)(multvec.o)\
@@ -149,6 +151,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(rd_f_to_s_ids_v2.o)\
       $(LIB)(rd_free_val.o)\
       $(LIB)(rd_log.o)\
+      $(LIB)(rd_t_ed.o)\
       $(LIB)(rdgendie_v4.o)\
       $(LIB)(readba.o)\
       $(LIB)(regrid_b_on_ne.o)\
