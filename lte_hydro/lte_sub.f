@@ -734,6 +734,11 @@
 	  PF(I)=PF(I)*T1
 	END DO
         VDOP_VEC(1:ND)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
+        VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*V(1:ND)/V(1)
+!
+        IF(GLOBAL_LINE_PROF(1:4) .EQ. 'LIST')THEN
+          CALL RD_STRK_LIST(LUIN)
+        END IF
 !
 ! Compute the frequency grid for CMFGEN. Routine also allocates the vectors 
 ! needed for the line data, sets the line data, and puts the line data into 

@@ -71,7 +71,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(hydanggaunt.o)\
       $(LIB)(hydcrossl.o)\
       $(LIB)(hydro_terms.o)\
-      $(LIB)(hydro_terms_v4.o)\
+      $(LIB)(hydro_terms_v5.o)\
       $(LIB)(hyper.o)\
       $(LIB)(ichrlen.o)\
       $(LIB)(impar.o)\
@@ -178,6 +178,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(set_cont_freq_v4.o)\
       $(LIB)(set_dc_lte_v2.o)\
       $(LIB)(set_edge_freq_v2.o)\
+      $(LIB)(set_t_ed_grid.o)\
       $(LIB)(set_x_freq.o)\
       $(LIB)(set_gm_all.o)\
       $(LIB)(set_z_pop.o)\

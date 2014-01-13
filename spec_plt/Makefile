@@ -30,6 +30,7 @@ EXE  = $(EXE_DIR)plt_jh.exe\
        $(EXE_DIR)plt_phot_raw.exe\
        $(EXE_DIR)plt_rj.exe\
        $(EXE_DIR)plt_scr.exe\
+       $(EXE_DIR)plt_steq.exe\
        $(EXE_DIR)new_plt_rj.exe\
        $(EXE_DIR)plt_spec.exe
 

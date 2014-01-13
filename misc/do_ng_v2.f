@@ -542,8 +542,10 @@
 	INTEGER DEC_LOC,INC_LOC
 	INTEGER I,K,L
 	INTEGER LST,LEND
+	INTEGER IOS
 	INTEGER, PARAMETER :: IONE=1
 	LOGICAL DO_PLTS
+	CHARACTER(LEN=80) STRING
 !
 	NUM_BAD_NG=0
 	VEC_INC(1:ND)=0.0D0
@@ -581,7 +583,16 @@
 	  T1=MAX(ABS(TA(L)),T1);  T1=MAX(ABS(TB(L)),T1)
 	END DO
 	IF(T1 .EQ. 0.0D0)THEN
-	  CALL GEN_IN(K,'Input new variable to be plotted as T correction is zero')
+	  OPEN(UNIT=12,FILE='CORRECTION_LINK',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	  K=1
+	  IF(IOS .NE. 0)THEN
+	    DO I=1,27
+	      READ(10,'(A)')STRING
+	      IF(STRING .NE. ' ')WRITE(6,'(A)')TRIM(STRING)
+	    END DO 
+	    CLOSE(UNIT=12)
+	  END IF
+	  CALL GEN_IN(K,'Input variable to be plotted as T correction is zero')
 	  DO L=1,ND
 	    TA(L)=100.0D0*(1.0D0-RDPOPS(K,L,1)/NEWPOP(K,L))
 	    TB(L)=100.0D0*(1.0D0-RDPOPS(K,L,3)/RDPOPS(K,L,2))

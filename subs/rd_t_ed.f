@@ -56,8 +56,5 @@
 	END DO
 	CLOSE(LU_IN)
 !
-	WRITE(6,*)T(1:ND)
-	WRITE(6,*)ED(1:ND)
-!
 	RETURN
 	END

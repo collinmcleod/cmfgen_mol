@@ -84,11 +84,11 @@
 ! Open output file for all errors and comments. Change DO_TERM_OUT to
 ! have the output go to the terminal/batch log file.
 !
-	DO_TERM_OUT=.TRUE.
+	DO_TERM_OUT=.FALSE.
 	IF(.NOT. DO_TERM_OUT)THEN
-	  CALL GEN_ASCI_OPEN(LUER,'OUTGEN','UNKNOWN','APPEND',' ',IZERO,IOS)
+	  CALL GEN_ASCI_OPEN(LUER,'OUTLTE','UNKNOWN','APPEND',' ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN
-	    WRITE(LUER,*)'Error opening OUTGEN in CMFGEN, IOS=',IOS
+	    WRITE(LUER,*)'Error opening OUTLTE in LTE, IOS=',IOS
 	    STOP
 	  END IF
 	END IF
