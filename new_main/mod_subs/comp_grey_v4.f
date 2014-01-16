@@ -204,11 +204,12 @@
 !
 ! TA is a temporary vector with the change in enthalpy.
 !
-	   WRITE(6,*)'Calling JGREY_HUB_DDT_V3'
+	   WRITE(6,*)'Calling JGREY_HUB_DDT_V4'
 	   T2=1.0D-06		!Accuracy to converge f
-	   CALL JGREY_HUB_DDT_V3(RJ,SOB,CHI,PLANCKMEAN,R,V,SIGMA,POPS,
+	   CALL JGREY_HUB_DDT_V4(RJ,SOB,CHI,PLANCKMEAN,R,V,SIGMA,POPS,
 	1              P,AQW,HMIDQW,KQW,LUM,METHOD,DIF,IC,
-	1              T2,INCL_DJDT_TERMS,TIME_SEQ_NO,ND,NC,NP,NT)
+	1              T2,INCL_DJDT_TERMS,TIME_SEQ_NO,COMPUTED,ND,NC,NP,NT)
+	   IF(.NOT. COMPUTED)RETURN
 !
 	ELSE
 !

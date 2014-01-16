@@ -1259,7 +1259,7 @@
 	  DO I=1,ND
 	    XV(I)=DLOG10(TA(I))
 	  END DO
-	  XAXIS='m(gm cm\u-2\d)'
+	  XAXIS='Log m(gm cm\u-2\d)'
 	  XAXSAV=XAXIS
 !
 	ELSE IF(XOPT .EQ. 'XMASS')THEN
@@ -1268,11 +1268,12 @@
 	    ZETA(I)=4.0D0*PI*1.0D+30*MASS_DENSITY(I)*R(I)*R(I)*CLUMP_FAC(I)
 	  END DO
 	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  WRITE(6,*)'Mass in integrated from outer boudary.'
 	  WRITE(6,*)'Normalizing mass (in Msun) is',TA(ND)/1.989D+33
 	  DO I=1,ND
 	    XV(I)=DLOG10(TA(I)/TA(ND))
 	  END DO
-	  XAXIS='Mass Fraction'
+	  XAXIS='Log Mass Fraction'
 	  XAXSAV=XAXIS
 !
 	ELSE IF(XOPT .EQ. 'XFLUX')THEN
@@ -2281,6 +2282,7 @@
 	    END IF
 	    IF(MOD(K,2) .NE. 0)WRITE(6,'(A)')' '
 	  END DO
+	  YAXIS='Mass(M\d\(9)\u)'
 !
 	ELSE IF(XOPT .EQ. 'LOGT')THEN
 	  CALL DLOGVEC(T,YV,ND)
@@ -2648,7 +2650,7 @@
 	  ELEC=.FALSE.
 	  FLAG=.FALSE.
 !
-	  WRITE(6,*)'Option plots fractional abundance (N/Na), mass fraction, or species density.'
+	  WRITE(6,*)'Option plots fractional abundance (N/N[atom]), mass fraction, or species density.'
 !
 	  CALL USR_OPTION(ELEC,'FRAC','T','Fractional abundance')
 	  IF(.NOT. ELEC)CALL USR_OPTION(FLAG,'MF','T','Mass fraction')
@@ -2662,7 +2664,7 @@
 	        IF(XSPEC .NE. 'ALL')EXIT
 	      END IF
 	    END DO
-	    YAXIS='Fractional abundance (N\dX\u/N\dA\u)'
+	    YAXIS='Log Fractional abundance (N\dX\u/N\dA\u)'
 	  ELSE IF(FLAG)THEN
 	    DO ISPEC=1,NSPEC
 	      IF(XSPEC .EQ. SPECIES(ISPEC) .OR. (XSPEC .EQ. 'ALL' .AND.
@@ -2687,7 +2689,7 @@
 	        IF(XSPEC .NE. 'ALL')EXIT
 	      END IF
 	    END DO
-	    YAXIS='Species density (cm\u-3\d)'
+	    YAXIS='Log Species density (cm\u-3\d)'
 	  END IF
 !
 	  IF(XSPEC .EQ. 'ALL')THEN

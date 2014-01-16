@@ -279,6 +279,10 @@
 	CALL RD_STORE_INT(NP,'NP',L_TRUE,'Number of impact parameters')
 	CALL RD_STORE_INT(NUM_BNDS,'NUM_BNDS',L_TRUE,
 	1        'Number of bands in linearization matrix (BA)')
+	IF(NUM_BNDS .NE. 1 .OR. NUM_BNDS .NE. 3)THEN
+	  WRITE(LUER,*)'Error: NUM_BNDS in MODEL_SPEC must be 1 or 3. Value is',NUM_BNDS
+	  STOP
+	END IF
 	CALL RD_STORE_INT(MAX_SIM,'MAX_SIM',L_TRUE,
 	1        'Maximum # of lines that cab treated simultaneously')
 	CALL RD_STORE_INT(N_LINE_MAX,'NLINE_MAX',L_TRUE,
