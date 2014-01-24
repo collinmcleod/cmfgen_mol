@@ -7,9 +7,10 @@
 	1               POPATOM,N,ND,LU_IN,INTERP_OPTION,FILE_NAME)
 	IMPLICIT NONE
 !
-! Altered 16-Oct-2012 - Added BA_TX_CONV and NO_TX_CONV
+! Altered 18-Jan-2014 - Fixed minor bug -- needed ABS when checkikng equality of R(1) and OLD_R(1).
+! Altered 16-Oct-2012 - Added BA_TX_CONV and NO_TX_CONV.
 ! Altered: 18-Nov-2011: Big fix. Not all DPOP was being set and this could cause a crash
-!                        when taking LOGS (levels unused).
+!                            when taking LOGS (levels unused).
 ! Created: 18-Dec-2010: This routine replace REGRIDWSC_V3, REGRIDB_ON_NE, REGRID_TX_R.
 !                       Interplation options are 'R', 'ED', 'SPH_TAU', and 'RTX'.
 !                       Routine handled INPUT files with departure coefficients, or
@@ -170,7 +171,7 @@
 	  ELSE
 	    OLD_R(NDOLD)=R(ND)
 	  END IF
-	  IF( 1.0D0-OLD_R(1)/R(1) .LE. 1.0D-10 )OLD_R(1)=R(1)
+	  IF( ABS(1.0D0-OLD_R(1)/R(1)) .LE. 1.0D-10 )OLD_R(1)=R(1)
 	  IF(OLD_R(2) .GE. OLD_R(1))THEN
 	    WRITE(LUER,*)'Reset OLD_R(1) in REGRID_T_ED but now OLD_R(2) .GE. OLD_R(1))'
 	    STOP

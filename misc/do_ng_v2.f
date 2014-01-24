@@ -22,6 +22,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 17-Jan-2014 : Changed I3 to I4 to allow for ND > 999.
 ! Altered 01-Nov-2012 : Bug fix with TG option. Values when r < 1 were not being updated.
 ! Altered 05-May-2007 : Fixed bug when do NG accleration with band size < ND
 ! Altered 07-Mar-2006 : Acceleratiion can now start at ND_ST.
@@ -674,7 +675,7 @@
                 POPS(K,L)=POPS(K,L)+T1*(NEWPOP(K,L)-POPS(K,L))
               END DO
 	      IF(T1 .NE. 1.0D0)WRITE(LUER,8000)L,LOCINC,LOCDEC
-8000	      FORMAT(1X,'Scaling performed at depth ',I3,':',
+8000	      FORMAT(1X,'Scaling performed at depth ',I4,':',
 	1          1X,'Biggest increase/decrease was ',2ES12.2)
 	    END IF
 !
@@ -694,7 +695,7 @@
 	    NUM_BAD_NG=NUM_BAD_NG+1
 	    WRITE(LUER,*)'NUM_BAD_NG=',NUM_BAD_NG
 	    WRITE(LUER,9000)L,LOCINC,LOCDEC
-9000	    FORMAT(1X,'No NG acceleration performed at depth ',I3,/,
+9000	    FORMAT(1X,'No NG acceleration performed at depth ',I4,/,
 	1          1X,'Biggest increase was ',1PE10.2,/,
 	1          1X,'Biggest decrease was ',E10.2)
 	
@@ -747,9 +748,9 @@
 	MAXINC=100.0D0*(MAXINC-1.0D0)
 	MAXDEC=100.0D0*(1.0D0/MAXDEC-1.0D0)
 	WRITE(LUER,9800)INC_LOC,MAXINC
-9800	FORMAT(1X,'Max NG % increase at depth ',I3,' is',1PE10.2)
+9800	FORMAT(1X,'Max NG % increase at depth ',I4,' is',1PE10.2)
 	WRITE(LUER,9900)DEC_LOC,MAXDEC
-9900	FORMAT(1X,'Max NG % decrease at depth ',I3,' is',1PE10.2)
+9900	FORMAT(1X,'Max NG % decrease at depth ',I4,' is',1PE10.2)
 C
 	NG_DONE=.TRUE.  		!Successful acceleration
 C
