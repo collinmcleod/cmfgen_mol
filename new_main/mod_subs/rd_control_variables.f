@@ -430,6 +430,10 @@ C
 	  CALL RD_STORE_NCHAR(METHOD,'METHOD',ISIX,L_TRUE,
 	1         'Which method for continuum tau'//
 	1         ' loglog, loglin, linear or zero ?')
+	  LUM_FROM_ETA_METHOD='LINMON'
+	  CALL RD_STORE_NCHAR(LUM_FROM_ETA_METHOD,'LUM_METH',ISIX,L_FALSE,
+	1         'Which method for computing L from ETA '//
+	1         ' loglog, loglin, linear or zero ?')
 	  CALL RD_STORE_NCHAR(N_TYPE,'N_TYPE',ISIX,L_TRUE,
 	1         'Method for to handle N for MOM_J_CMF -- '//
 	1         'N_ON_J, MIXED, or G_ONLY')

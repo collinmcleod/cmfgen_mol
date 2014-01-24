@@ -609,7 +609,8 @@ C
 	1               FIRST_FREQ,NEW_FREQ,N_TYPE,NC,ND)
 !
 	     ELSE IF(USE_FORMAL_REL)THEN
-	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling CMF_FORMAL_REL_V4 in COMP_J_BLANK'
+	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)
+	1            WRITE(LUER,*)'Calling CMF_FORMAL_REL_V4 in COMP_J_BLANK'
 	       CALL CMF_FORMAL_REL_V4
 	1                 (TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
 	1                  TC,FEDD,HFLUX_AT_IB,HFLUX_AT_OB,IPLUS,
@@ -823,15 +824,15 @@ C
 	    T1=ABS(RJ(1))+ABS(TC(1))
 	    IF(T1 .NE. 0)T1=ABS(200.0D0*(RJ(1)-TC(1))/T1)
 	    IF(T1 .GT. 100.0D0)THEN
-	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 1000% for last frequency'
+	      WRITE(LUER,'(/,A)')' Error --- J(mom) and J(ray) differ by more than 1000% for last frequency'
 	      WRITE(LUER,'(A)')' It is STRONGLY suggested that you use a finer grid at the outer boundary'
 	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error and/or use plt_jh'
 	    ELSE IF(T1 .GT. 50.0D0)THEN
-	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 50% for last frequency'
+	      WRITE(LUER,'(/,A)')' Error --- J(mom) and J(ray) differ by more than 50% for last frequency'
 	      WRITE(LUER,'(A)')' It is strongly suggested that you use a finer grid at the outer boundary'
 	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error'
 	    ELSE IF(T1 .GT. 20.0D0)THEN
-	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 20% for last frequency'
+	      WRITE(LUER,'(/,A)')' Error --- J(mom) and J(ray) differ by more than 20% for last frequency'
 	      WRITE(LUER,'(A)')' Although this is ulikely to effect the colution, it is suggested that'
 	      WRITE(LUER,'(A)')' you use a finer grid at the outer boundary'
 	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error'
@@ -855,7 +856,7 @@ C
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJ(I),I=1,ND),T1
 	    IF(T1 .NE. FL)THEN        
-	      WRITE(LUER,*)'Error - incorrect reading of Mean Intensity' 
+	      WRITE(LUER,'(/,A)')' Error - incorrect reading of Mean Intensity' 
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
 	      STOP

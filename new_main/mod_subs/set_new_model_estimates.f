@@ -140,7 +140,7 @@
 ! The first call to REGRIDWS is effectively used to compute DHeI only.
 !
 	IF(GRID) THEN
-	  WRITE(LUER,*)'Using direct interpolation option (i.e. GRID) for new model.'
+	  WRITE(LUER,'(/,A,/)')' Using direct interpolation option (i.e. GRID) for new model.'
 !
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN

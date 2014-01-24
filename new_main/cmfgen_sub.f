@@ -108,9 +108,10 @@
 ! Logical Unit assignments. Those indicated with a # after the ! are open in
 !  large sections of the code. Other units generally used temprarily.
 !
-	INTEGER               LUER        !Output/Error file.
-	INTEGER, PARAMETER :: LUIN=7      !General input unit (closed after accesses).
-	INTEGER, PARAMETER :: LUMOD=8     !Model Description file.
+	INTEGER               LUER      	!Output/Error file.
+	INTEGER               LUWARN	        !
+	INTEGER, PARAMETER :: LUIN=7            !General input unit (closed after accesses).
+	INTEGER, PARAMETER :: LUMOD=8           !Model Description file.
 !
 	INTEGER, PARAMETER :: LU_DC=9      	!Departure coefficient Output.
 	INTEGER, PARAMETER :: LU_FLUX=10   	!Flux/Luminosity Data (OBSFLUX)
@@ -172,7 +173,7 @@
 !
 ! Functions called
 !
-	INTEGER ICHRLEN,ERROR_LU
+	INTEGER ICHRLEN,ERROR_LU,WARNING_LU
 	REAL*8 DOP_PRO
 	REAL*8 S15ADF
 	REAL*8 LAMVACAIR
@@ -183,7 +184,7 @@
 	REAL*8 TEFF_SUN
 	REAL*8 MASS_SUN
 	LOGICAL EQUAL
-	EXTERNAL ICHRLEN,ERROR_LU,SPEED_OF_LIGHT,GRAVITATIONAL_CONSTANT
+	EXTERNAL ICHRLEN,ERROR_LU,WARNING_LU,SPEED_OF_LIGHT,GRAVITATIONAL_CONSTANT
 	EXTERNAL MASS_SUN,RAD_SUN,TEFF_SUN
 !
 	INTEGER GET_DIAG
@@ -450,11 +451,13 @@
 ! Initialization section
 !
 	LUER=ERROR_LU()
+	LUWARN=WARNING_LU()
 	ACCESS_F=5
 	COMPUTE_LAM=.FALSE.
 	COMPUTE_EW=.TRUE.
 	FULL_ES=.TRUE.
 	SN_MODEL=.FALSE.
+	VINF=0.0D0				!Will be reset later
         TREAT_NON_THERMAL_ELECTRONS=.FALSE.
 	INCL_RADIOACTIVE_DECAY=.FALSE.
 	ZERO_REC_COOL_ARRAYS=.TRUE.
@@ -687,6 +690,7 @@
 ! NB: The passed GF_CUT is set to zero if the Atomic NO. of the species
 !      under consideration is less than AT_NO_GF_CUT.
 !
+	WRITE(LUWARN,'(/,A,/)')' Reading in atomic data'
 	DO ISPEC=1,NUM_SPECIES
 	  DO ID=SPECIES_END_ID(ISPEC),SPECIES_BEG_ID(ISPEC),-1
 	    IF( ATM(ID)%XzV_PRES)THEN
@@ -757,7 +761,7 @@
 	  WRITE(LUER,*)'Error opening MODEL in CMFGEN, IOS=',IOS
 	  STOP
 	END IF
-	WRITE(6,*)'Opened MODEL'
+	WRITE(6,'(/,A)')' Successfully opened file MODEL'
 !
 ! Output description of model. This is done after the reading of most data
 ! since some of the model information is read in.
@@ -974,6 +978,7 @@
 	    STOP
 	  END IF
 	END IF
+	IF(VINF .EQ. 0.0D0)VINF=V(1)
 !
 ! Compute profile frequencies such that for the adopted doppler
 ! velocity the profile ranges from 5 to -5 doppler widths.
@@ -996,9 +1001,7 @@
 	  PF(I)=PF(I)*T1
 	END DO
         VDOP_VEC(1:ND)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
-	WRITE(6,*)VTURB_MIN,VTURB_MAX
 	VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*V(1:ND)/V(1)
-	WRITE(6,*)VTURB_VEC(1),VTURB_VEC(ND)
 !
 	IF(GLOBAL_LINE_PROF(1:4) .EQ. 'LIST')THEN
 	  CALL RD_STRK_LIST(LUIN)
@@ -1164,8 +1167,10 @@
            IF(RD_COHERENT_ES)NUM_ITS_TO_DO=1
 	END IF
 !
+! Removed TMIN consistency check since I now use LOG(LTE pops).
+!
 	CALL CHECK_IONS_PRESENT(ND,NUM_IONS)
-	CALL CHECK_TMIN()
+!	CALL CHECK_TMIN()
 !
 ! Temporary check
 !
@@ -1204,7 +1209,12 @@
 	IF(NUM_ITS_TO_DO .EQ. 0)LST_ITERATION=.TRUE.
 	MAIN_COUNTER=MAIN_COUNTER+1
 !
-	WRITE(LUER,'(A,I4)')'Current great iteration count is',MAIN_COUNTER
+	WRITE(LUER,'(A)')' '
+	WRITE(LUER,'(X,80A)')('*',I=1,80)
+	WRITE(LUER,'(X,80A)')('*',I=1,80)
+	WRITE(LUER,'(A)')' '
+	WRITE(LUER,'(A,I4)')' Current great iteration count is',MAIN_COUNTER
+	WRITE(LUER,'(A)')' '
 !
 ! Used as a initializing switch for COMP_OBS.
 !
@@ -1238,8 +1248,7 @@
 	    I=WORD_SIZE*(NDEXT+1)/UNIT_SIZE
 	    CALL READ_DIRECT_INFO_V3(K,J,STRING,'EDDFACTOR',LU_EDD,IOS)
 	    IF(IOS .NE. 0)THEN
-	      WRITE(LUER,*)'Error --- unable to open EDDFACTOR_INFO'
-	      WRITE(LUER,*)'Will compute new f'
+	      WRITE(LUER,*)'Error --- unable to open EDDFACTOR_INFO -- will compute new f'
 	      COMPUTE_EDDFAC=.TRUE.
 	      IOS=0
 	    ELSE IF(.NOT. COMPUTE_EDDFAC .AND. K .NE. ND)THEN
@@ -1255,7 +1264,7 @@
 	      IF(IOS .EQ. 0)THEN
 	        READ(LU_EDD,REC=5,IOSTAT=IOS)T1
 	        IF(T1 .EQ. 0.0D0 .OR. IOS .NE. 0)THEN
-	          WRITE(LUER,*)'Error --- All Eddfactors not'//
+	          WRITE(LUER,'(/,A)')' Warning --- All Eddfactors not'//
 	1                      ' computed - will compute new F'
 	          COMPUTE_EDDFAC=.TRUE.
 	        END IF
@@ -1518,6 +1527,7 @@
 !
 	LST_DEPTH_ONLY=.FALSE.
 	WRITE(LUER,*)'The value of DTDR is :',DTDR
+	WRITE(LUER,'(A)')' '
 ! 
 !
 ! Zero STEQ and BA arrays.
@@ -2178,8 +2188,10 @@
 	        IF(NU(ML) .GE. TAU_EDGE(I) .AND. 
 	1                       NU(ML+1) .LT. TAU_EDGE(I))THEN
 	          T1=LOG(CHI_CONT(5)/CHI_CONT(1))/LOG(R(1)/R(5))
+	          IF(I .EQ. 1)WRITE(LUER,'(A)')' '
 	          WRITE(LUER,'(A,1P,E11.4,A,E10.3)')' Tau(Nu=',NU(ML),
 	1            ') at outer boundary is:',CHI_CONT(1)*R(1)/MAX(T1-1.0D0,1.0D0)
+	          IF(I .EQ. N_TAU_EDGE)WRITE(LUER,'(A)')' '
 	        END IF
 	      END DO
 	    END IF
@@ -2852,7 +2864,7 @@
 	END IF		!Only output if last iteration.
 ! 
 !
-	WRITE(LUER,*)'Luminosity of star is :',RLUMST(1),RLUMST(ND)
+	WRITE(LUER,'(A,2ES18.8,/)')' Luminosity of star (d=1,ND) is :',RLUMST(1),RLUMST(ND)
 	IF(RLUMST(1) .LE. 0.0D0)RLUMST(1)=1.0D-20
 	DO I=1,ND
 	  IF(RLUMST(I) .GE. 0.0D0 .AND. RLUMST(I) .LT.  1.0D-05)RLUMST(I)=1.0D-05
@@ -2955,7 +2967,11 @@
 	  TCHI(1:ND)=PLANCK_MEAN(1:ND)*CLUMP_FAC(1:ND)
 	  IF(COMP_GREY_LST_IT)THEN
 	    CALL COMP_GREY_V4(POPS,TGREY,TA,CHI,TCHI,CHK,LUER,NC,ND,NP,NT)
-	    IF(CHK)WRITE(LUER,*)'Grey solution was not successfully computed'
+	    IF(CHK)THEN
+	      WRITE(LUER,'(/,X,A,/)')'Grey solution was successfully computed'
+	    ELSE 
+	      WRITE(LUER,'(/,X,A,/)')'Grey solution was NOT successfully computed'
+	    END IF
 	  END IF
 !
 	  IF(CHK .AND. COMP_GREY_LST_IT)THEN
@@ -3478,14 +3494,14 @@
 	  RAD_DECAY_LUM(I)=dE_RAD_DECAY(I)*R(I)*R(I)*T2		!As ergs/cm^3
 	END DO
 !
-	CALL LUM_FROM_ETA(LLUMST,R,ND)
-	CALL LUM_FROM_ETA(DIELUM,R,ND)
-	CALL LUM_FROM_ETA(DEP_RAD_EQ,R,ND)
-	CALL LUM_FROM_ETA(dE_WORK,R,ND)
-	CALL LUM_FROM_ETA(RAD_DECAY_LUM,R,ND)
-	CALL LUM_FROM_ETA(XRAY_LUM_TOT,R,ND)
-	CALL LUM_FROM_ETA(XRAY_LUM_0P1,R,ND)
-	CALL LUM_FROM_ETA(XRAY_LUM_1KeV,R,ND)
+	CALL LUM_FROM_ETA_V2(LLUMST,R,LUM_FROM_ETA_METHOD,ND)
+	CALL LUM_FROM_ETA_V2(DIELUM,R,LUM_FROM_ETA_METHOD,ND)
+	CALL LUM_FROM_ETA_V2(DEP_RAD_EQ,R,LUM_FROM_ETA_METHOD,ND)
+	CALL LUM_FROM_ETA_V2(dE_WORK,R,LUM_FROM_ETA_METHOD,ND)
+	CALL LUM_FROM_ETA_V2(RAD_DECAY_LUM,R,LUM_FROM_ETA_METHOD,ND)
+	CALL LUM_FROM_ETA_V2(XRAY_LUM_TOT,R,LUM_FROM_ETA_METHOD,ND)
+	CALL LUM_FROM_ETA_V2(XRAY_LUM_0P1,R,LUM_FROM_ETA_METHOD,ND)
+	CALL LUM_FROM_ETA_V2(XRAY_LUM_1KeV,R,LUM_FROM_ETA_METHOD,ND)
 !
 	IF(PLANE_PARALLEL_NO_V)THEN
 	  MECH_LUM(1:ND)=0.0D0

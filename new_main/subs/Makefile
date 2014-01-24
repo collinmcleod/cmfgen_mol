@@ -13,6 +13,7 @@ LIB_MOD=$(LIB_DIR)libmod.a
 # Entries for library
 #
 OBJ = $(LIB)(add_par_to_full_v2.o)\
+      $(LIB)(adjust_sn_r_grid.o)\
       $(LIB)(adjust_pops.o)\
       $(LIB)(ba_update_v7.o)\
       $(LIB)(check_hydro_def.o)\
@@ -23,6 +24,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(determine_nse.o)\
       $(LIB)(det_lte_ed.o)\
       $(LIB)(ddt_work.o)\
+      $(LIB)(do_full_r_grid_v1.o)\
       $(LIB)(do_vel_regrid_v2.o)\
       $(LIB)(do_tau_regrid_v2.o)\
       $(LIB)(do_gam_abs_approx.o)\
@@ -52,7 +54,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(set_imp_vec.o)\
       $(LIB)(set_sn_r_grid.o)\
       $(LIB)(set_new_grid.o)\
-      $(LIB)(solveba_v11.o)\
+      $(LIB)(solveba_v12.o)\
       $(LIB)(steq_multi_v8.o)\
       $(LIB)(steqne_v4.o)\
       $(LIB)(steq_advec_v4.o)\

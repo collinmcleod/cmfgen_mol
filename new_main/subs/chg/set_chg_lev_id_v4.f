@@ -169,8 +169,8 @@
 	  END IF
 	END DO
 	WRITE(LUER,*)'Number of charge transitions read in is',N_CHG_RD
-	WRITE(LUER,*)'Number of charge transitions omitted is ',N_CHG_OMITTED
-	WRITE(LUER,*)'Number of revixsed charge transitions, including split state, is',N_CHG
+	WRITE(LUER,*)'Number of charge transitions omitted is',N_CHG_OMITTED
+	WRITE(LUER,*)'Number of revised charge transitions, including split state, is',N_CHG
 !
 	ALLOCATE (TYPE_CHG(N_CHG),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (TLO_CHG(N_CHG),STAT=IOS)

@@ -67,9 +67,9 @@
 	INTEGER ISPEC
 	INTEGER NUM_IONS_RD
 !
-	INTEGER LUER
-	INTEGER ERROR_LU
-	EXTERNAL ERROR_LU
+	INTEGER LUER,LUWARN
+	INTEGER ERROR_LU,WARNING_LU
+	EXTERNAL ERROR_LU,WARNING_LU
 !
 	LOGICAL AT_LEAST_ONE_ION_PRES
 	LOGICAL FND_END_OF_IONS
@@ -84,9 +84,11 @@
 	OPLIN=2.6540081D+08
 	EMLIN=5.27296D-03
 	LUER=ERROR_LU()
+	LUWARN=WARNING_LU()
 !
 ! Open output file for all errors and comments. Change DO_TERM_OUT to
-! have the output go to the terminal/batch log file.
+! have the output go to the terminal/batch log file. NB: The WARNINGS
+! file is overwritten.
 !
 	DO_TERM_OUT=.FALSE.                                   !TRUE.
 	IF(.NOT. DO_TERM_OUT)THEN
@@ -97,6 +99,12 @@
 	  END IF
 	  CALL SET_LINE_BUFFERING(LUER)
 	END IF
+	CALL GEN_ASCI_OPEN(LUWARN,'WARNINGS','UNKNOWN',' ',' ',IZERO,IOS)
+	IF(IOS .NE. 0)THEN
+	  WRITE(LUWARN,*)'Error opening WARNINGS in CMFGEN, IOS=',IOS
+	  STOP
+	END IF
+	CALL SET_LINE_BUFFERING(LUWARN)
 !
 ! Set all atomic data. New species can be simple added by insertion.
 ! Try to add species in order of atomic number. Hydrogen should ALWAYS

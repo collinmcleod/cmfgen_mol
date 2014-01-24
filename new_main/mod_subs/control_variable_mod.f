@@ -277,6 +277,7 @@
 ! Specifies method used to compute optical depth.
 !
 	CHARACTER(LEN=6)  METHOD
+	CHARACTER(LEN=6)  LUM_FROM_ETA_METHOD
 !
         REAL*8 OVER_FREQ_DIF
         REAL*8 WEAK_LINE_LIMIT

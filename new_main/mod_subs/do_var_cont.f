@@ -191,8 +191,6 @@
 !
 	  ELSE IF(CONT_VEL .AND. .NOT. ACCURATE)THEN
 	    IF(FIRST_FREQ)THEN
-	      WRITE(6,*)SHAPE(TX)
-	      WRITE(6,*)SHAPE(TVX)
 	      TX(:,:,:)=0.0D0
 	      TVX(:,:,:)=0.0D0
 	      FL_OLD=FL

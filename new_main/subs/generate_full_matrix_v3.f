@@ -82,12 +82,14 @@
 	INTEGER ID
 	INTEGER ISPEC
 !
-	INTEGER ERROR_LU,LUER
-	EXTERNAL ERROR_LU
+	INTEGER ERROR_LU,WARNING_LU
+	INTEGER LUER,LUWARN
+	EXTERNAL ERROR_LU,WARNING_LU
 !
 ! To save typing.
 !
 	LUER=ERROR_LU()
+	LUWARN=WARNING_LU()
         K=DEPTH_INDX
 	DIAG_BAND=.FALSE.
 	IF(DIAG_INDX .EQ. BAND_INDX)DIAG_BAND=.TRUE.
@@ -325,13 +327,15 @@
 	END DO
 !
 	IF(DIAG_BAND .AND. DEPTH_INDX .EQ. ND)THEN
+	  WRITE(LUWARN,'(/,/,X,A,/)')' Equation selection in generate_full_matrix_v3.f' 
 	  DO ID=1,NION
 	    IF(REP_CNT(ID) .GT. 0)THEN
-              WRITE(LUER,'(1X,A,T9,A,I3,A)')
+              WRITE(LUWARN,'(1X,A,T9,A,I3,A)')
 	1         TRIM(ION_ID(ID)),' g.s. eq. replaced by ionization eq. at ',
 	1         REP_CNT(ID),' depths.'
 	      END IF
 	  END DO
+	  WRITE(LUWARN,'(A)')' '
 	END IF
 !
 !	IF(K .EQ. 1 .AND. DIAG_BAND)THEN

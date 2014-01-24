@@ -16,6 +16,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(undo_it.o)\
       $(LIB)(blkband.o)\
       $(LIB)(chk_eq_num.o)\
+      $(LIB)(chk_col_name.o)\
       $(LIB)(cmf_form_sol.o)\
       $(LIB)(cmf_form_sol_v2.o)\
       $(LIB)(cnvt_fr_dc.o)\
@@ -104,6 +105,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(ltepop_wld_v1.o)\
       $(LIB)(ltepop_wld_v2.o)\
       $(LIB)(lum_from_eta.o)\
+      $(LIB)(lum_from_eta_v2.o)\
       $(LIB)(marupv.o)\
       $(LIB)(mat5pen.o)\
       $(LIB)(mess.o)\

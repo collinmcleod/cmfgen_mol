@@ -477,7 +477,7 @@
 	END DO
 	I=I-N_LINE_FREQ
 	IF(I .NE. 0)THEN
-	  WRITE(LUER,*)' Warning from SET_FREQUENCY_GRID'
+	  WRITE(LUER,*)'Warning from SET_FREQUENCY_GRID'
 	  WRITE(LUER,'(1X,I5,A,A)')I,' weak lines in ',
 	1        'extreme IR will be ignored as outside continuum range.'
 	  WRITE(LUER,*)'Min(Nu_CONT)=',NU(NCF)

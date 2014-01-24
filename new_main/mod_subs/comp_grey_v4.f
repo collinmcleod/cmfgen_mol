@@ -68,6 +68,8 @@
 	REAL*8 HFLUX
 !
 	INTEGER I,J,K,L
+	INTEGER LUWARN,WARNING_LU
+	EXTERNAL WARNING_LU
 !
 	LOGICAL LST_DEPTH_ONLY
 	LOGICAL FIRST_FREQ
@@ -79,7 +81,9 @@
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	COMPUTED=.TRUE.
-	WRITE(6,*)'BEGIN COMP_GREY_V4',ND,NC,NP
+	LUWARN=WARNING_LU()
+	WRITE(LUWARN,'(/,A,3I6)')' Begin COMP_GREY_V4',ND,NC,NP
+	WRITE(LUER,'(/,A,3I6)')' Begin COMP_GREY_V4',ND,NC,NP
 	PI=4.0D0*ATAN(1.0D0)
 	CHI(1:ND)=ROSSMEAN(1:ND)
 !
@@ -204,7 +208,8 @@
 !
 ! TA is a temporary vector with the change in enthalpy.
 !
-	   WRITE(6,*)'Calling JGREY_HUB_DDT_V4'
+	   WRITE(LUER,*)'Calling JGREY_HUB_DDT_V4'
+	   WRITE(LUWARN,*)'Calling JGREY_HUB_DDT_V4'
 	   T2=1.0D-06		!Accuracy to converge f
 	   CALL JGREY_HUB_DDT_V4(RJ,SOB,CHI,PLANCKMEAN,R,V,SIGMA,POPS,
 	1              P,AQW,HMIDQW,KQW,LUM,METHOD,DIF,IC,
@@ -236,6 +241,7 @@
 !	      WRITE(LUER,'('' Maximum change in Grey F is '',1P,E11.4)')T1
 	    END DO
 	END IF
+	WRITE(LUWARN,'(A)')' '
 !
 ! Compute the temperature distribution, and the Rosseland optical depth scale.
 ! NB sigma=5.67D-05 and the factor of 1.0D-04 is to convert T from units of 

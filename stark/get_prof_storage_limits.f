@@ -50,9 +50,10 @@
 	  IF(LN_INDX .EQ. NLINES .AND. ML .LE. LINE_END_INDX_IN_NU(NL) )EXIT
 	END DO
 !
-	WRITE(6,*)'Maximum number of profiles to be stored is',NPROF_MAX
-	WRITE(6,*)'Maximum number of frequncies per profile is',NFREQ_MAX
+	IF(NPROF_MAX .NE. 0 .OR. NFREQ_MAX .NE. 0)THEN
+	  WRITE(6,*)'Maximum number of profiles to be stored is ',NPROF_MAX
+	  WRITE(6,*)'Maximum number of frequncies per profile is',NFREQ_MAX
+	END IF
 !
 	RETURN
 	END
-

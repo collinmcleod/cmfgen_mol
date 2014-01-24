@@ -16,13 +16,14 @@
 	REAL*8 ZCORE,ZION
 	LOGICAL NI_PRES,N2_PRES 
 !
-	INTEGER ERROR_LU,LUER
-	EXTERNAL ERROR_LU
+	INTEGER ERROR_LU,LUER,WARNING_LU,LUWARN
+	EXTERNAL ERROR_LU,WARNING_LU
 !
 	REAL*8 CONV_FAC
-	INTEGER I,J,LOOP_PQN_MAX
+	INTEGER I,J,K,LOOP_PQN_MAX
 	INTEGER IZ,NE
 	LOGICAL, SAVE :: FIRST=.TRUE.
+	LOGICAL, SAVE :: FIRST_PQN=.TRUE.
 !
 	IF( .NOT. NI_PRES)RETURN
 	IF( .NOT. N2_PRES)RETURN
@@ -58,25 +59,41 @@
 	      END IF
 	      NCF=NCF+1
 	      FREQ(NCF)=E_THRESH_X(IZ,NE,I,J)*CONV_FAC
-              IF(FREQ(NCF) .GT. MAX_CONT_FREQ)THEN
-	        LUER=ERROR_LU()
 !
-	        IF(FIRST)THEN
-	          FIRST=.FALSE.
-	          WRITE(LUER,*)' '
-	          WRITE(LUER,*)'*************** Warning -- Warning -- Warning ****************'
-	          WRITE(LUER,*)'Max. cont. freq may be too small in in SET_X_FREQ_V2'
-	          WRITE(LUER,*)'Max. cont. should generally be set to 1000 when X-rays present'
-	          WRITE(LUER,*)'Need to allow for ionization from inner shells. Generally can'
-	          WRITE(LUER,*)'ignore ionization from n=1 (=PQN) state of iron group elements'
-	          WRITE(LUER,*)'since these can also ionize from n=2 sate. A list of effected'
-	          WRITE(LUER,*)'ionization routes follows:'
-	          WRITE(LUER,*)
+! If IZ > 20, we only output error to OUTGEN when PQN > 1. For most of
+! CMFGEN's applications, don't need to consider X-ray iozation from
+! n=1 when IZ > 20.
+!
+              IF(FREQ(NCF) .GT. MAX_CONT_FREQ)THEN
+	        K=0
+	        IF(IZ .GT. 20 .AND. I .EQ. 1)THEN
+	          IF(FIRST_PQN)THEN 
+	            LUWARN=WARNING_LU(); K=LUWARN
+	            FIRST_PQN=.FALSE.
+	          END IF
+	        ELSE IF(FIRST)THEN
+	          LUER=ERROR_LU(); K=LUER
 	          FIRST=.FALSE.
 	        END IF
-	        WRITE(LUER,'(1X,4(A4,I2,3X),3X,A,ES10.2)')' IZ=',IZ,' NE=',NE,'PQN=',I,
-	1                   'ANG=',J,'Edge Freq(10^15 Hz)=',FREQ(NCF)
-                NCF=NCF-1
+	        IF(K .NE. 0)THEN
+	          WRITE(K,*)' '
+	          WRITE(K,*)'*************** Warning -- Warning -- Warning ****************'
+	          WRITE(K,*)'Max. cont. freq may be too small in in SET_X_FREQ_V2'
+	          WRITE(K,*)'Max. cont. should generally be set to 1000 when X-rays present'
+	          WRITE(K,*)'Need to allow for ionization from inner shells. Generally can'
+	          WRITE(K,*)'ignore ionization from n=1 (=PQN) state of iron group elements'
+	          WRITE(K,*)'since these can also ionize from n=2 sate. A list of effected'
+	          WRITE(K,*)'ionization routes follows:'
+	          WRITE(K,*)
+	        END IF
+	        IF(IZ .GT. 20 .AND. I .EQ. 1)THEN
+	          WRITE(LUWARN,'(1X,4(A4,I2,3X),3X,A,ES10.2)')' IZ=',IZ,' NE=',NE,'PQN=',I,
+	1                     'ANG=',J,'Edge Freq(10^15 Hz)=',FREQ(NCF)
+                ELSE
+	          WRITE(LUER,'(1X,4(A4,I2,3X),3X,A,ES10.2)')' IZ=',IZ,' NE=',NE,'PQN=',I,
+	1                     'ANG=',J,'Edge Freq(10^15 Hz)=',FREQ(NCF)
+	        END IF
+	        NCF=NCF-1
 	      END IF
 	    END IF
 	  END DO

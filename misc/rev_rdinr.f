@@ -168,7 +168,7 @@
 	  IB_RAT=2.0D0; OB_RAT=1.5D0
 	  SCL_FAC=0.0D0
 	  DTAU2_ON_DTAU1=100.0D0
-	  dLOGT_MAX=0.0D0
+	  dLOGT_MAX=0.05D0
 !
 	  WRITE(6,'(A)')' '
 	  CALL GEN_IN(NEW_ND,'Input new number of depth points')
