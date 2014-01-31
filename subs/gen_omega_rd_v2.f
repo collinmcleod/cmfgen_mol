@@ -17,8 +17,9 @@
 	1                      MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE)
 	IMPLICIT NONE
 !
-! Altered 20-Dec-2014 : Code check non-matching level corresponds to a higher level not 
-!                          included in the model atom.
+! Altered 25-Jan-2015 : Minor bug fix - could print out a wrong matching name.
+! Altered 20-Dec-2014 : Code checks if non-matching level corresponds to a higher level not 
+!                          included in the model atom (call CHL_COL_NAME).
 ! Altered 15-Dec-2013 : Code now only outputs error message on first call for each species.
 ! Altered 02-Sep-2012 : Outputs error messgae when matching transition not found.
 !                         Checks ordering of levels (necessary for overlapping LS states).
@@ -464,7 +465,10 @@
 	      NO_MATCH_NAME(K)=TRIM(LOW_LEV)
 	    END IF
 	  END IF
-	  IF(NUP_CNT .EQ. 0 .AND. TRIM(UP_LEV) .NE. 'I')THEN
+!
+! We only bother with the upper level if we successfully found a match for the lower level.
+!
+	  IF(NL_CNT .NE. 0 .AND. NUP_CNT .EQ. 0 .AND. TRIM(UP_LEV) .NE. 'I')THEN
 	    K=0
 	    DO I=1,NUM_NO_MATCH
 	      IF(TRIM(UP_LEV) .EQ. TRIM(NO_MATCH_NAME(I)))K=I

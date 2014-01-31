@@ -14,6 +14,7 @@ LIB_MOD=$(LIB_DIR)libmod.a
 #
 
 MOD=  $(LIB)(mod_ray_mom_store.o)\
+      $(LIB)(mod_var_mom_j_cmf.o)\
       $(LIB)(mod_var_jrel_v2.o)\
       $(LIB)(mod_space_grid_v2.o)
 
@@ -139,7 +140,7 @@ $(LIB)(solve_cmf_formal_v2.o) : solve_cmf_formal_v2.f $(LIB)(mod_space_grid_v2.o
 	$(F90) -c $(OPTION) solve_cmf_formal_v2.f
 	ar ruv $(LIB) solve_cmf_formal_v2.o
 
-$(LIB)(var_mom_j_cmf_v9.o) : var_mom_j_cmf_v9.f $(LIB)(mod_ray_mom_store.o)
+$(LIB)(var_mom_j_cmf_v9.o) : var_mom_j_cmf_v9.f $(LIB)(mod_ray_mom_store.o) $(LIB)(mod_var_mom_j_cmf.o)
 	$(F90) -c $(OPTION) var_mom_j_cmf_v9.f
 	ar ruv $(LIB) var_mom_j_cmf_v9.o
 

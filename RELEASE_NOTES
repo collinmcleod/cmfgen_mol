@@ -11,6 +11,38 @@ has not yet been updated to reflect the changes, but is coming!
 ****************************************************************************
 ****************************************************************************
 
+                 30-Jan-2014
+
+1. CMFGEN can now handle variable width Doppler profiles, and STARK profiles.
+   This ability has to specifically requested by new VADAT options -- the
+   default is to use fixed width Doppler profiles. For most situations, this
+   is adequate. Because of this change, a new frequency grid is created.
+
+2. A file WARNINGS has been intoduced. This contains many of the routine
+    diagnostic message and warnings that typically come with a CMFGEN
+    calculation. As consequence OUTGEN is a lot cleaner.
+
+3. Convergence of plane-parallell models with VINF has been fixed (issues
+     arose when using NEW_VST_METH=T). Setting this FALSE for stars will
+     give equivalent convergence to older verions, and probably requires
+     less memory. 
+
+4. A program (set_new_sn_mod) is availabale to update the VADAT file from
+     time step 1 to time step 2 (when many radiative transfer options
+     must be changd). It can also be used to update the time and sequence
+     number when moving to model time-step 3, etc.    
+
+5. Memory for line profiles in cmf_flux_v5.f and cmfgen.f is now dynamically
+     allocated.
+
+6. New options have been introduced to help convergence of SN models on the
+     first time step. There also have been signicant improvements to rev_rdinr.exe
+     so that improve r-grids can be created (with spacing determined by both
+     the step size in log(tau) and R.
+
+****************************************************************************
+****************************************************************************
+
                  01-Jul-2013
 
 This is a slightly extended release of the 25-Noc-2012 which never made it to

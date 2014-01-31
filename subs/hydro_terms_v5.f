@@ -10,6 +10,7 @@
 	1              LST_ITERATION,BAND_FLUX,N_FLUXMEAN_BANDS,LU_OUT,ND)
 	IMPLICIT NONE
 !
+! Altered 26-Jan-2014 : Changed ouput to TYPE_ATM and increased its length.
 ! Altered 06-Jan-2014 : Changed to V5 (inserted LOGG, ROSS_MEAN_OPAC and CLUMP_FAC in call).
 ! Altered 31-Mar-2010 : Changed from V3 to V4: Inserted LST_ITERATION in call.
 ! Altered 11-Mar-2008 : Changed from V2 to V3
@@ -92,7 +93,7 @@
 	REAL*8 ERROR_SUM
 	REAL*8 ERROR_SQ
 !
-	CHARACTER(LEN=6) TYPE_ATM
+	CHARACTER(LEN=12) TYPE_ATM
 	CHARACTER(LEN=80) FMT
 	INTEGER I,J,IOS,ERROR_LU
 	INTEGER ERROR_CNT
@@ -126,12 +127,11 @@
 !
 	TYPE_ATM='P'
         T1=LOG(POP_ATOM(5)/POP_ATOM(1))/LOG(R(1)/R(5))
-        WRITE(TYPE_ATM(2:6),'(F5.2)')T1
+        WRITE(TYPE_ATM(2:),'(ES10.3)')T1
 !
 	DO I=1,ND
 	  OPAC(I)=MAX(ROSS_MEAN_OPAC(I),ELEC_MEAN_OPAC(I))*CLUMP_FAC(I)
 	END DO
-	WRITE(6,*)'TYPE_ATM=',TYPE_ATM
 	CALL TORSCL(TAU,OPAC,R,TB,TC,ND,'LOGMON',TYPE_ATM)
 	T1=0.6667D0
 	CALL MON_INTERP(RPHOT,IONE,IONE,T1,IONE,R,ND,TAU,ND)
@@ -215,6 +215,8 @@
 	1          '   Specified surface gravity is: ',10**LOGG,' (',LOGG,')'
 	WRITE(LU_OUT,'(1X,A,F8.2,A)')
 	1          '                  Stars mass is: ',STARS_MASS,' Msun'
+	WRITE(LU_OUT,'(A,A)')' Power law exponent at outer boundary (TYPE_ATM)=',TRIM(TYPE_ATM(2:))
+
 !
 	RLUMST(:)=BAND_FLUX(:,N_FLUXMEAN_BANDS)
         DO J=N_FLUXMEAN_BANDS,2,-1

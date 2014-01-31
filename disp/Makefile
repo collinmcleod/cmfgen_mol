@@ -36,7 +36,7 @@ all : $(EXE_DIR)dispgen.exe
 
 $(EXE_DIR)dispgen.exe : mod_disp.o dispgen.o maingen.o pltphot_sub.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6) $(FN7)
 	$(F90) dispgen.o mod_disp.o maingen.o pltphot_sub.o \
-             -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) -l$(LN7) \
+             -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) -l$(LN7) -l$(LN5) \
                $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)/dispgen.exe
 
@@ -58,7 +58,7 @@ dispgen.o : dispgen.f mod_disp.o $(GEN)
 maingen.o : maingen.f mod_disp.o $(GEN) \
                EVAL_LTE_FULL.INC  OPACITIES.INC \
                PAR_OPACITIES.INC  XOPAC.INC PAR_XOPAC.INC
-	$(F90) -c  $(FD) maingen.f 
+	$(F90) -c  $(FD) -O1 maingen.f 
 
 pltphot_sub.o : pltphot_sub.f $(GEN)
 	$(F90) -c  $(FD) pltphot_sub.f 

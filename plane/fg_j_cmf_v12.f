@@ -316,6 +316,7 @@
 	INTEGER NI_SMALL
 	INTEGER I,J,K,LS
 	INTEGER NI
+	INTEGER NP_TMP
 !
 	REAL*8 DBC
 	REAL*8 I_CORE
@@ -687,7 +688,10 @@
 	    STOP	
           END IF
 !
-	  DO LS=1,NP
+! LS=NP with only 1 depth point must be treated separately.
+!
+	  NP_TMP=NP; IF(NI_RAY(NP) .EQ. 1)NP_TMP=NP-1
+	  DO LS=1,NP_TMP
 	    NI_SMALL=ND-(LS-NC-1);   IF(LS .LE. NC+1)NI_SMALL=ND
 	    K=1
 	    DO I=1,NI_SMALL
@@ -704,6 +708,7 @@
 	      END DO
 	    END DO
 	  END DO
+	  IF(NI_RAY(NP) .EQ. 1)J_PNT(1,NP)=1
 !
 	  DO I=1,ND
 	    DO LS=1,NP-I+1
@@ -711,6 +716,8 @@
 	      IF(J_PNT(I,LS) .LT. 1 .OR. J_PNT(I,LS) .GT. NI_RAY(LS))THEN
 	        WRITE(LUER,*)'Error setting J_PNT in FG_J_CMF_V12 -- invalid values'
 	        WRITE(LUER,*)'Depth=',I,'Ray=',LS,'J_PNT value=',J_PNT(I,LS)
+	        WRITE(LUER,*)'NP=',NP,'R(1)=',R(1),'R_RAY(1,LS)=',R_RAY(1,LS)
+	        WRITE(LUER,*)'NI_SMALL=',NI_SMALL
 	        STOP
 	      ELSE IF( ABS(R_RAY(K,LS)-R(I))/R(I) .GT. 1.0D-12)THEN
 	        WRITE(LUER,*)'Error setting J_PNT in FG_JCMF_V12 -- invalid values'

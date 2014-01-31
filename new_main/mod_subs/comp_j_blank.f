@@ -692,7 +692,6 @@ C
 	1              FIRST_FREQ,NEW_FREQ,NC,NP,ND)
 	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
                HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
-	       IF(FIRST_FREQ)WRITE(LUER,*)'Done Calling MOM_J_CMF_V8'
 	     END IF
 	     CALL TUNE(ITWO,'MOM_J_CMF')
 C

@@ -5,8 +5,7 @@
 ! or INCOHERENT electron scattering can be assumed. This data is then passed
 ! to OBS_FRAME_SUB for computation of the OBSERVER's flux.
 !
-! This routine is a heavily stripped down and modified version of
-! CMFGEN.
+! This routine is a heavily stripped down and modified version of CMFGEN.
 !
 	SUBROUTINE CMF_FLUX_SUB_V5(ND,NC,NP,NDMAX,NPMAX,NT,NLINE_MAX)
 	USE MOD_CMF_OBS
@@ -446,11 +445,11 @@
 !
 	LUER=ERROR_LU()
 	IF(EQNE .NE. I)THEN
-	  WRITE(LUER,*)'Error - EQNE has wrong value in CMFGEN'
+	  WRITE(LUER,*)'Error - EQNE has wrong value in CMF_FLUX_SUB_V5'
 	  STOP
 	END IF
 	IF(NT .NE. I+1)THEN
-	  WRITE(LUER,*)'Error - NT has wrong value in CMFGEN'
+	  WRITE(LUER,*)'Error - NT has wrong value in CMF_FLUX_SUB_V5'
 	  STOP
 	END IF
 !
@@ -686,7 +685,7 @@
 	        IF(ATM(ID)%AXzV_F(MNL,MNUP) .NE. 0)THEN
 	          ML=ML+1
 	          IF(ML .GT. NLINE_MAX)THEN
-	            WRITE(LUER,*)'NLINE_MAX is too small in CMFGEN'
+	            WRITE(LUER,*)'NLINE_MAX is too small in CMF_FLUX_SUB_V5'
 	            STOP
 	          END IF
 	          VEC_FREQ(ML)=ATM(ID)%EDGEXzV_F(MNL)-ATM(ID)%EDGEXzV_F(MNUP)
@@ -755,15 +754,9 @@
 !
 	IF(SET_TRANS_TYPE_BY_LAM)THEN
 	  IF(FLUX_CAL_LAM_END .LT. FLUX_CAL_LAM_BEG)THEN
-	    WRITE(LUER,*)'Error in CMFGEN'
+	    WRITE(LUER,*)'Error in CMF_FLUX_SUB_V5'
 	    WRITE(LUER,*)'FLUX_CAL_LAM_END must be > FLUX_CAL_LAM_BEG'
 	    STOP
-	  END IF
-	  IF( (.NOT. FLUX_CAL_ONLY) .AND. FLUX_CAL_LAM_BEG .NE. 0)THEN
-	    WRITE(LUER,*)'WARNING in CMFGEN'
-	    WRITE(LUER,*)'WARNING in CMFGEN'
-	    WRITE(LUER,*)'FLUX_CAL_LAM_BEG is normally zero for non-FLUX'
-	    WRITE(LUER,*)'calculations:'
 	  END IF
 	  GLOBAL_LINE_SWITCH='NONE'
 	  T1=SPEED_OF_LIGHT()*1.0D-07
@@ -877,7 +870,6 @@
 	WRITE(LUER,*)' '
 	WRITE(LUER,'(A,1X,I7)')' Number of line frequencies is:',N_LINE_FREQ
 	WRITE(LUER,'(A,6X,I7)')' Number of continuum frequencies is:',NCF
-	WRITE(LUER,*)' '
 !
 ! Used inthis context, every edge must be with V_DOP km/s of a frequency in the NU
 ! array.
@@ -1126,8 +1118,7 @@
 	        COMPUTE_EDDFAC=.TRUE.
 	      END IF
 	    ELSE
-	      WRITE(LUER,*)'Error opening EDDFACTOR'//
-	1                    ' - will compute new F'
+	      WRITE(LUER,'(/,X,A)')'Error opening EDDFACTOR - will compute new F'
 	        COMPUTE_EDDFAC=.TRUE.
 	    END IF
 	  END IF
@@ -1554,11 +1545,12 @@
 	  END DO
 !
 	  IF(LST_ITERATION .AND. ML .NE. NCF)THEN
+	    T1=MAX( LOG(DENSITY(5)/DENSITY(1))/LOG(R(1)/R(5))-1.0D0,1.0D0 )
 	    DO I=1,N_TAU_EDGE
-	      IF(NU(ML) .GE. TAU_EDGE(I) .AND. 
-	1                     NU(ML+1) .LT. TAU_EDGE(I))THEN
+	      IF(NU(ML) .GE. TAU_EDGE(I) .AND. NU(ML+1) .LT. TAU_EDGE(I))THEN
+	        IF(I .EQ. 1)WRITE(LUER,'(A)')' '
 	        WRITE(LUER,'(A,1P,E10.4,A,E10.3)')' Tau(Nu=',NU(ML),
-	1          ') at outer boundary is:',CHI_CONT(1)*R(1)
+	1          ') at outer boundary is:',CHI_CONT(1)*R(1)/T1
 	      END IF
 	    END DO
 	  END IF
