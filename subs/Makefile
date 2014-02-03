@@ -208,6 +208,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(thomas_rh.o)\
       $(LIB)(torscl.o)\
       $(LIB)(torscl_v2.o)\
+      $(LIB)(torscl_v3.o)\
       $(LIB)(transposeba.o)\
       $(LIB)(tuvghd.o)\
       $(LIB)(tuvghd_rh.o)\

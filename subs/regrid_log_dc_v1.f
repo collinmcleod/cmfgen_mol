@@ -51,8 +51,8 @@
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
-	INTEGER ERROR_LU,LUER
-	EXTERNAL ERROR_LU
+	INTEGER ERROR_LU,LUER,LUWARN,WARNING_LU
+	EXTERNAL ERROR_LU,WARNING_LU
 !
 ! Local Variables.
 !
@@ -64,6 +64,7 @@
 	INTEGER NZ,NOLD,NDOLD
 	INTEGER NX,NX_ST,NX_END
 	INTEGER COUNT,IOS
+	INTEGER, SAVE :: FIRST=.TRUE.
 	LOGICAL BAD_TX_CONV
 	LOGICAL NO_TX_CONV(ND)
 	LOGICAL TAKE_LOGS
@@ -73,6 +74,7 @@
 	CHARACTER(LEN=*) FILE_NAME
 !
 	LUER=ERROR_LU()
+	LUWARN=WARNING_LU()
 !
 ! Read in values from previous model.
 !
@@ -162,8 +164,15 @@
 	NX_END=ND
 	IF(INTERP_OPTION .EQ. 'R')THEN
 	  IF(DABS(OLD_R(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
-	    WRITE(LUER,*)'Warning - core radius not identical in REGRID_LOG_DC_V1'
-	    WRITE(LUER,*)'Rescaling to make Rcore identical'
+	    IF(FIRST)THEN
+	      WRITE(LUWARN,*)'Warning - core radius not identical in REGRID_LOG_DC_V1'
+	      WRITE(LUER,*)'Warning - core radius not identical in REGRID_LOG_DC_V1'
+	      WRITE(LUER,*)'Rescaling to make Rcore identical --- ',TRIM(FILE_NAME)
+	      WRITE(LUER,*)'Additional warnings will be output to WARNINGS'
+	      FIRST=.FALSE.
+	    ELSE
+	      WRITE(LUWARN,*)'Rescaling to make Rcore identical --- ',TRIM(FILE_NAME)
+	    END IF
 	    DO I=1,NDOLD
 	      OLD_R(I)=R(ND)*( OLD_R(I)/OLD_R(NDOLD) )
 	    END DO
