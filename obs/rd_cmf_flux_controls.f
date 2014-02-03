@@ -275,12 +275,28 @@
 	    WRITE(LUER,*)'Invalid GLOBAL_LINE_PROF parameter'
 	    STOP
 	  END IF
+	  IF(GLOBAL_LINE_PROF .EQ. 'DOP_FIX')THEN
+            CALL RD_STORE_DBLE(TDOP,'TDOP',L_TRUE,'Temperature to be used in Doppler profile (10^4K)')
+            CALL RD_STORE_DBLE(AMASS_DOP,'AMASS_DOP',L_TRUE,'Atomic mass to be used in Doppler profile (amu''s)')
+	  ELSE
+	    TDOP=2.0D0; AMASS_DOP=1.0D+06
+	  END IF
 	  CALL RD_STORE_LOG(SET_PROF_LIMS_BY_OPACITY,'OPAC_LIMS',L_TRUE,
 	1           'Set prof limits by line to cont. ratio?')
 	  CALL RD_STORE_DBLE(DOP_PROF_LIMIT,'DOP_LIM',L_TRUE,
 	1           'Edge limits for Doppler line profile')
 	  CALL RD_STORE_DBLE(VOIGT_PROF_LIMIT,'VOIGT_LIM',L_TRUE,
 	1           'Edge limits for Voigt line profile')
+!
+	  MAX_PROF_ED=1.0D+16
+	  NORM_PROFILE=.FALSE.
+	  V_PROF_LIMIT=5000.0D0
+	  CALL RD_STORE_DBLE(MAX_PROF_ED,'MAX_PROF_ED',L_FALSE,
+	1           'Maximum electron density for Stark profile computation')
+	  CALL RD_STORE_DBLE(V_PROF_LIMIT,'V_PROF_LIM',L_FALSE,
+	1           'One-sided profile limit for Stark profiles (km/s)')
+	  CALL RD_STORE_LOG(NORM_PROFILE,'NORM_PROF',L_FALSE,
+	1           'When true, profiles are normalized to have unit area.')
 !
 ! Verify validity of profile option. We also check whether we need to leed
 ! in the file which links certain types of profiles to individual lines.

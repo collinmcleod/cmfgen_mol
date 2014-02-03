@@ -5090,9 +5090,10 @@ c
 !
 ! To be read TAU_at_R and R_at_TAU respectively.
 !
-	ELSE IF(XOPT .EQ. 'RTAU' .OR. XOPT .EQ. 'VTAU' .OR. XOPT .EQ. 'TAUR' .OR. 
-	1       XOPT .EQ. 'KAPR' .OR. XOPT .EQ. 'CHIR' .OR. XOPT .EQ. 'ALBEDO' .OR.
-	1       XOPT .EQ. 'ETAR' .OR. XOPT .EQ. 'WROPAC')THEN
+	ELSE IF(XOPT .EQ. 'RTAU'  .OR. XOPT .EQ. 'VTAU' .OR. XOPT .EQ. 'TAUR' .OR. 
+	1       XOPT .EQ. 'EDTAU' .OR. 
+	1       XOPT .EQ. 'KAPR'  .OR. XOPT .EQ. 'CHIR' .OR. XOPT .EQ. 'ALBEDO' .OR.
+	1       XOPT .EQ. 'ETAR'  .OR. XOPT .EQ. 'WROPAC')THEN
 	  IF(XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are included'
 	  IF(.NOT. XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are NOT included'
 	  CALL USR_OPTION(LAM_ST,'LAMST',' ',FREQ_INPUT)
@@ -5195,7 +5196,9 @@ c
 	  ELSE IF(XOPT .EQ. 'VTAU')THEN
 	    CALL USR_OPTION(TAU_VAL,'TAU',' ','Tau value for which V is to be determined')
 	    YAXIS='V(km/s)'
-	    IF(LINY)YAXIS='R[\gt]/R\d*\u'
+	  ELSE IF(XOPT .EQ. 'EDTAU')THEN
+	    CALL USR_OPTION(TAU_VAL,'TAU',' ','Tau value for which Ne is to be determined')
+	    YAXIS='Ne(/cm\u3\d)'
 	  ELSE
 	    CALL USR_OPTION(TAU_VAL,'TAU',' ','Tau value for which R is to be determined')
 	    YAXIS='Log(R[\gt]/R\d*\u)'
@@ -5275,18 +5278,20 @@ c
 	          T2=(R(R_INDX)-RVAL)/(R(R_INDX)-R(R_INDX+1))
 	          YV(ML)=T2*TA(R_INDX+1) + (1.0-T2)*TA(R_INDX)
 	          IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
-	        ELSE IF(XOPT .EQ. 'VTAU')THEN
+	        ELSE IF(XOPT .EQ. 'VTAU' .OR. XOPT .EQ. 'EDTAU')THEN
+	          TB(1:ND)=V(1:ND)
+	          IF(XOPT .EQ. 'EDTAU')TB(1:ND)=ED(1:ND)
 	          I=1
 	          DO WHILE(TAU_VAL .GT. TA(I) .AND. I .LT. ND)
 	            I=I+1
 	          END DO
 	          IF(TAU_VAL .GT. TA(ND-1))THEN
-	            YV(ML)=V(ND)
+	            YV(ML)=TB(ND)
 	          ELSE IF(TAU_VAL .LE. TA(1))THEN
-	            YV(ML)=V(1)*TA(1)/TAU_VAL
+	            YV(ML)=TB(1)*TA(1)/TAU_VAL
 	          ELSE
 	            T2=(TA(I)-TAU_VAL)/(TA(I)-TA(I-1))
-                    YV(ML)=( (1.0-T2)*V(I)+T2*V(I-1) )
+                    YV(ML)=( (1.0-T2)*TB(I)+T2*TB(I-1) )
 	          END IF
 	        ELSE
 	          I=1

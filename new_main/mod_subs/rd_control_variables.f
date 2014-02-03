@@ -506,6 +506,18 @@ C
 	1           'Edge limits for Voigt line profile')
 	  END IF
 !
+! The following options do not apply to a Doppler profile.
+!
+	  V_PROF_LIMIT=3000.0D0
+	  MAX_PROF_ED=1.0D+16
+	  NORM_PROFILE=.TRUE.
+	  CALL RD_STORE_DBLE(MAX_PROF_ED,'MAX_PROF_ED',L_FALSE,
+	1           'Maximum electron density for Stark profile computation')
+	  CALL RD_STORE_DBLE(V_PROF_LIMIT,'V_PROF_LIM',L_FALSE,
+	1           'One-sided profile limit for Stark profiles (km/s)')
+	  CALL RD_STORE_LOG(NORM_PROFILE,'NORM_PROF',L_FALSE,
+	1           'When true, profiles are normalized to have unit area.')
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_DBLE(MAX_DOP,'MAX_DOP',L_TRUE,
 	1      'Maximum half-width of resonance zone (in Doppler widths)')
@@ -845,6 +857,7 @@ C
 	    WRITE(LUER,*)'******WARNING in CMFGEN*****************'
 	    WRITE(LUER,*)'Solution method inconsistent with NUM_BNDS'
 	    WRITE(LUER,*)'METH_SOL=',METH_SOL,'NUM_BNDS=',NUM_BNDS
+	    WRITE(LUER,'(X,A,/)')'Using diagnoal solution'
 	    METH_SOL='DIAG'
 	  END IF
 	  CALL RD_STORE_NCHAR(SCALE_OPT,'SCALE_OPT',ISIX,L_TRUE,

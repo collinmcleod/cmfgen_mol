@@ -5,8 +5,8 @@ Please run a few test models and report any difficulties.
 Please report any compile difficulties. I cannot fix bugs/features
 if I don't know about them. The following summary of changes
 was hurriedly put together, and is thus incomplete. This list does not
-include trivial changes, and updates to DISPGEN/PLT_SPEC. Documentation
-has not yet been updated to reflect the changes, but is coming!
+include trivial changes, and updates to DISPGEN/PLT_SPEC. Som documentation
+has not yet been updated to reflect the changes.
 
 ****************************************************************************
 ****************************************************************************
@@ -14,31 +14,49 @@ has not yet been updated to reflect the changes, but is coming!
                  30-Jan-2014
 
 1. CMFGEN can now handle variable width Doppler profiles, and STARK profiles.
-   This ability has to specifically requested by new VADAT options -- the
-   default is to use fixed width Doppler profiles. For most situations, this
-   is adequate. Because of this change, a new frequency grid is created.
+     This ability has to specifically requested by new VADAT options -- the
+     default is to use fixed width Doppler profiles. For most situations, this
+     is adequate, and is recommended. Because of this change, a new frequency
+     grid is used.
 
-2. A file WARNINGS has been intoduced. This contains many of the routine
-    diagnostic message and warnings that typically come with a CMFGEN
-    calculation. As consequence OUTGEN is a lot cleaner.
+2. Extra hidden parameters have been added to both VADAT and CMFGEN. These
+     effect the computation primarily of Stark profiles: They are: V_PROF_LIM
+     (inidcates one sided extent of profile -- default is 5000 km/s for
+     cmf_flux_v5.f and 3000 km/s for CMFGEN), MAX_PROF_ED (indicates the 
+     maximum electron density used in Stark profile computations - def=10^16 
+     -- maximum of some tabulated data is 10^17.) & NORM_PROFILE which
+     means that the stark profiles are normalized to have unit area before they
+     are used -- essential for CMFGEN. See documentation for known issues. 
 
-3. Convergence of plane-parallell models with VINF has been fixed (issues
+3. A file WARNINGS has been intoduced. This contains many of the routine
+     diagnostic message and warnings that typically come with a CMFGEN
+     calculation. As consequence OUTGEN is a lot cleaner.
+
+4. Convergence of plane-parallell models with VINF has been fixed (issues
      arose when using NEW_VST_METH=T). Setting this FALSE for stars will
      give equivalent convergence to older verions, and probably requires
      less memory. 
 
-4. A program (set_new_sn_mod) is availabale to update the VADAT file from
+5. A program (set_new_sn_mod) is availabale to update the VADAT file from
      time step 1 to time step 2 (when many radiative transfer options
      must be changd). It can also be used to update the time and sequence
      number when moving to model time-step 3, etc.    
 
-5. Memory for line profiles in cmf_flux_v5.f and cmfgen.f is now dynamically
+6. Memory for line profiles in cmf_flux_v5.f and cmfgen.f is now dynamically
      allocated.
 
-6. New options have been introduced to help convergence of SN models on the
+7. New options have been introduced to help convergence of SN models on the
      first time step. There also have been signicant improvements to rev_rdinr.exe
      so that improve r-grids can be created (with spacing determined by both
      the step size in log(tau) and R.
+
+8. Errors related to level names for collisional data are now ONLY output to
+     CMFGEN when there is no matching name in the oscilator file.
+
+9. Some collisional files have been udated -- mainly corrections to levels 
+     names. New files were not created, so save original atomic model
+     directory structure if you want to repeat a calcualtion exactly. Not
+     much effect on most stellar models. 
 
 ****************************************************************************
 ****************************************************************************

@@ -892,7 +892,7 @@
 ! will need to be reset if we have rewound a model (i.e., changed POINT1 to
 ! use older iterations) when computing the hyrostatic structure.
 !
-	  IF(RP .NE. R(ND) .OR. R(1) .NE. RMAX)THEN
+	  IF(.NOT. SN_HYDRO_MODEL .AND. (RP .NE. R(ND) .OR. R(1) .NE. RMAX))THEN
 	    WRITE(LUER,*)'Warning: updating RP and RMAX in CMFGEN to make them consistent'
 	    WRITE(LUER,*)'with values in SCRTEMP. This inconsistency should only have occured'
             WRITE(LUER,*)'if you have rewound (changd POINT1) a model with DO_HYDRO=T'
@@ -977,7 +977,15 @@
 	   WRITE(LUER,*)'Invalid Velocity Law'
 	    STOP
 	  END IF
+!
+	  IF(SN_HYDRO_MODEL)THEN
+	    T1=RMAX/RP
+	    CALL UPDATE_KEYWORD(RP,'[RSTAR]','VADAT',L_TRUE,L_FALSE,LUIN)
+	    CALL UPDATE_KEYWORD(T1,'[RMAX]','VADAT',L_FALSE,L_TRUE,LUIN)
+	    WRITE(LUER,*)'Updated RP and RMAX in VADAT as new SN hydro model'
+	  END IF
 	END IF
+!
 	IF(VINF .EQ. 0.0D0)VINF=V(1)
 !
 ! Compute profile frequencies such that for the adopted doppler
