@@ -1125,7 +1125,7 @@
 	1                  LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
 	  END IF
 	  LST_ITERATION=.TRUE.
-	  CALL TUNE(1,'GIT')
+	  CALL TUNE(IONE,'GIT')
 	  GOTO 9999			!End (write out POPS.)
 	END IF
 ! 
@@ -1403,7 +1403,7 @@
 	  LINE_STORAGE_USED(SIM_INDX)=.FALSE.
 	END DO
 !
-	CALL TUNE(1,'DTDR')
+	CALL TUNE(IONE,'DTDR')
 	DTDR=0.0D0
 	SECTION='DTDR'
 	IF(IMPURITY_CODE .OR. USE_FIXED_J .OR. FLUX_CAL_ONLY .OR. (RD_LAMBDA .AND. NEWMOD .AND. .NOT. SN_MODEL))THEN
@@ -1439,22 +1439,22 @@
 	      COMPUTE_NEW_CROSS=.FALSE.
 	    END IF
 !
-	    CALL TUNE(1,'DTDR_OPAC')
+	    CALL TUNE(IONE,'DTDR_OPAC')
 	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONLY)
 !	    INCLUDE 'OPACITIES_V4.INC'
-	    CALL TUNE(2,'DTDR_OPAC')
+	    CALL TUNE(ITWO,'DTDR_OPAC')
 !
 ! 
 !
 ! Compute variation of opacity/emissivity. Store in VCHI and VETA.
 !
 	    IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN
-	      CALL TUNE(1,'DTDR_VOPAC')
+	      CALL TUNE(IONE,'DTDR_VOPAC')
 	      CALL COMP_VAR_OPAC(POPS,RJ,FL,CONT_FREQ,FREQ_INDX,
 	1                  SECTION,ND,NT,LST_DEPTH_ONLY)
-	      CALL TUNE(2,'DTDR_VOPAC')
+	      CALL TUNE(ITWO,'DTDR_VOPAC')
 	    END IF
 ! 
 !
@@ -1497,7 +1497,7 @@
 !
 ! Set TA = to the variation vector at the inner boundary.
 !
-	    CALL TUNE(1,'DTDR_VEC')
+	    CALL TUNE(IONE,'DTDR_VEC')
 	    DO I=1,NT
 	      TA(I)=VCHI(I,ND)
 	    END DO
@@ -1513,7 +1513,7 @@
 	    END DO
 	    DIFFW(NT)=DIFFW(NT)+T3*(TA(NT)/CHI(ND)-(T1*(1.0D0+EMHNUKT(ND))
 	1           /(1.0D0-EMHNUKT(ND))-2.0D0)/T(ND))
-	    CALL TUNE(2,'DTDR_VEC')
+	    CALL TUNE(ITWO,'DTDR_VEC')
 !
 	  END DO
 !
@@ -1530,8 +1530,7 @@
 	IF(LAMBDA_ITERATION .OR. .NOT. COMPUTE_BA)THEN
 	  DIFFW(1:NT)=0.0D0
 	END IF
-	CALL TUNE(2,'DTDR')
-	CALL TUNE(3,'  ')
+	CALL TUNE(ITWO,'DTDR')
 !
 	LST_DEPTH_ONLY=.FALSE.
 	WRITE(LUER,*)'The value of DTDR is :',DTDR
@@ -1584,7 +1583,7 @@
 !	  DST=K
 !	  DEND=K
 !
-	  CALL TUNE(1,'STEQ')
+	  CALL TUNE(IONE,'STEQ')
           DO ID=1,NUM_IONS-1
             LOC_ID=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
@@ -1611,7 +1610,7 @@
 	1         TMP_STRING,         NUM_BNDS,ND,COMPUTE_BA,DST,DEND)
 	    END IF
 	  END DO
-	  CALL TUNE(2,'STEQ')
+	  CALL TUNE(ITWO,'STEQ')
 !        
 ! Update charge equation. No longer done in STEQHEII
 !
@@ -1621,12 +1620,12 @@
 !
 	IF(TREAT_NON_THERMAL_ELECTRONS)THEN
 	  WRITE(6,*)'Beginning calculation of non-thermal electron spectrum: ED next'
-	  CALL TUNE(1,'NON_THERM')
+	  CALL TUNE(IONE,'NON_THERM')
 	    CALL ELECTRON_NON_THERM_SPEC(ND)
-	  CALL TUNE(2,'NON_THERM')
-	  CALL TUNE(1,'SE_NON_THERM')
+	  CALL TUNE(ITWO,'NON_THERM')
+	  CALL TUNE(IONE,'SE_NON_THERM')
 	    CALL SE_BA_NON_THERM_V2(dE_RAD_DECAY,COMPUTE_BA,NT,ND,DEC_NRG_SCL_FAC)
-	  CALL TUNE(2,'SE_NON_THERM')
+	  CALL TUNE(ITWO,'SE_NON_THERM')
 	END IF
 !
 	IF(LST_ITERATION)
@@ -2455,7 +2454,7 @@
 !      done elsewhere. Only requirement is that the current frequency
 !      is lower that the last frequency of the resonance zone.
 !
-	CALL TUNE(1,'CHK_L_FIN')
+	CALL TUNE(IONE,'CHK_L_FIN')
         T1=1.0D0-EXT_LINE_VAR*MAX(V(1),600.0D0)/2.998E+05
 	DO SIM_INDX=1,MAX_SIM
 	  IF(LINE_STORAGE_USED(SIM_INDX))THEN
@@ -2502,7 +2501,7 @@
 	    END IF			!Outside region of influence by line?
 	  END IF			!Line is in use.
 	END DO				!Loop over line
-	CALL TUNE(2,'CHK_L_FIN')
+	CALL TUNE(ITWO,'CHK_L_FIN')
 !
 ! 
 !
@@ -2799,9 +2798,9 @@
 !	BA_T(NT,DIAG_INDX,ND)=1.0D0
 !	IF(DIAG_INDX .NE. 1)BA_T(NT,DIAG_INDX-1,ND)=-1.0D0
 	IF(COMPUTE_BA .AND. WRBAMAT .AND. .NOT. FLUX_CAL_ONLY .AND. .NOT. LAMBDA_ITERATION)THEN
-	  CALL TUNE(1,'STORE_BA')
+	  CALL TUNE(IONE,'STORE_BA')
 	    CALL STORE_BA_DATA_V2(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,'BAMAT')
-	  CALL TUNE(2,'STORE_BA')
+	  CALL TUNE(ITWO,'STORE_BA')
 	END IF
 !
 ! Store radiative equlibrium equation so we can check influence on radiation field.
@@ -3017,7 +3016,6 @@
 	IF(LST_ITERATION)
 	1     CALL WR_ASCI_STEQ(NION,ND,'STEQ ARRAY- Continuum Terms',19)
 !                                   
-		CALL TUNE(ITHREE,' ')
 ! 
 	CALL TUNE(IONE,'LINE LOOP')
 !
@@ -3461,9 +3459,9 @@
 	1          .AND. WRBAMAT
 	1          .AND. .NOT. FLUX_CAL_ONLY 
 	1          .AND. .NOT. LAMBDA_ITERATION)THEN
-	  CALL TUNE(1,'BAMAT_WR')
+	  CALL TUNE(IONE,'BAMAT_WR')
 	  CALL STORE_BA_DATA_V2(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,'BAMAT')
-	  CALL TUNE(2,'BAMAT_WR')
+	  CALL TUNE(ITWO,'BAMAT_WR')
 	END IF
 !
 ! Ends check on GLOBAL_LINE.
@@ -3683,10 +3681,10 @@
 !
 	CALL WRITV(STEQ_T,ND,'Radiative Equlibrium Equation',LU_SE)
 !
-	CALL TUNE(1,'SOLVE_FOR_POPS')
+	CALL TUNE(IONE,'SOLVE_FOR_POPS')
 	CALL SOLVE_FOR_POPS(POPS,NT,NION,ND,NC,NP,NUM_BNDS,DIAG_INDX,
 	1      MAXCH,MAIN_COUNTER,IREC,LU_SE,LUSCR,LST_ITERATION)
-	CALL TUNE(2,'SOLVE_FOR_POPS')
+	CALL TUNE(ITWO,'SOLVE_FOR_POPS')
 !
 ! If we have changed the R grid, we need to recomput the angular quadrature weitghts,
 ! and put the atom density ect on the new radius grid.
@@ -4394,6 +4392,7 @@
 	    CLOSE(UNIT=LUSCR,STATUS='DELETE')
 	  END IF
 	  CALL TUNE(ITWO,'GIT')
+	  CALL TUNE(ITHREE,' ')
 !
 !	  WRITE(6,*)'Inserted temporary fudge for FIXED_T'
 !	  FIXED_T=.TRUE.

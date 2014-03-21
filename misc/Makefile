@@ -85,8 +85,8 @@ $(EXE_DIR)wr_f_to_s.exe : wr_f_to_s.o $(OANDF)
               -o $(EXE_DIR)wr_f_to_s.exe
 #
 $(EXE_DIR)chk_phot.exe : chk_phot.o recom_chk_v2.o get_exc_freq.o $(OANDF)
-	$(F90) chk_phot.o recom_chk_v2.o get_exc_freq.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
+	$(F90) -Wl,-t   -v chk_phot.o recom_chk_v2.o get_exc_freq.o \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) -lnewsubs \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)chk_phot.exe
 #

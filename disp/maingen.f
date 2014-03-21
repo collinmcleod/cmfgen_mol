@@ -2280,7 +2280,7 @@
 	      IF(MOD(K,2) .NE. 0)WRITE(6,'(10X)',ADVANCE='NO')
 	      IF(MOD(K,2) .EQ. 0)WRITE(6,'(A)')' '
 	    END IF
-	    IF(MOD(K,2) .NE. 0)WRITE(6,'(A)')' '
+	    IF(MOD(K,2) .NE. 0. .AND. XSPEC .EQ. 'ALL')WRITE(6,'(A)')' '
 	  END DO
 	  YAXIS='Mass(M\d\(9)\u)'
 !

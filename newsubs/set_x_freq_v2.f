@@ -7,6 +7,9 @@
 	USE XRAY_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 20-Mar-2014: Bug fix -- WARN_LU and ERROR_LU were not necessarily defined
+!                         after the first entry.
+! Altered 24-Jan-2014: WARNING_LU installed
 ! Altered 22-Dec-2004: Error message improved.
 ! Created 23-Oct-2000: Bsed on SET_X_FRQ
 !
@@ -66,13 +69,15 @@
 !
               IF(FREQ(NCF) .GT. MAX_CONT_FREQ)THEN
 	        K=0
+	        LUWARN=WARNING_LU()
+	        LUER=ERROR_LU()
 	        IF(IZ .GT. 20 .AND. I .EQ. 1)THEN
 	          IF(FIRST_PQN)THEN 
-	            LUWARN=WARNING_LU(); K=LUWARN
+	            K=LUWARN
 	            FIRST_PQN=.FALSE.
 	          END IF
 	        ELSE IF(FIRST)THEN
-	          LUER=ERROR_LU(); K=LUER
+	          K=LUER
 	          FIRST=.FALSE.
 	        END IF
 	        IF(K .NE. 0)THEN

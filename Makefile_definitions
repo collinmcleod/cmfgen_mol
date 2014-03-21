@@ -64,8 +64,9 @@ ifeq ($(HOST),ibis.phyast.pitt.edu)
 
  BLAS=-lblas
  LAPACK=-llapack
+ LOCLIB=-L/opt/pgi/osx86-64/11.8/lib
 # LOCLIB=-L/opt/pgi/osx86-64/12.9/lib
- LOCLIB=-L/opt/pgi/osx86-64/14.1/libso
+# LOCLIB=-L/opt/pgi/osx86-64/14.3/lib
  PGLIB= -pgf77libs -L/Users/jdh/pgplot/pgplot -lpgplot 
  X11LIB=-L/usr/X11R6/lib -lX11
 

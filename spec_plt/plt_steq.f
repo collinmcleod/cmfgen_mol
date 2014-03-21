@@ -193,8 +193,8 @@ C
 	ELSE IF(PLT_OPT(1:5) .EQ. 'RDV_I')THEN
 	  CALL GEN_IN(ID,'Depth')
 	  CALL GEN_IN(IV,'Variable')
-	  YV(1:NIT)=SIGN(ABS(ST(1:NIT)%STEQ(IV,ID))**0.25,ST(1:NIT)%STEQ(IV,ID))
 	  DO I=1,NIT
+	    YV(I)=SIGN(ABS(ST(I)%STEQ(IV,ID))**0.25,ST(I)%STEQ(IV,ID))
 	    XV(I)=I
 	  END DO
 	  XLABEL='Iteration'
