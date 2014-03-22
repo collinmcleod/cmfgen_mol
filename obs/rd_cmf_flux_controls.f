@@ -65,6 +65,9 @@
 	    CALL RD_STORE_CHAR(INNER_BND_METH,'IB_METH',L_TRUE,
 	1           'Inner boundary method (DIFUSION, HOLLOW, or ZERO_FLUX)')
 	  END IF
+	  IB_STAB_FACTOR=0.1D0
+	  IF(INNER_BND_METH .EQ. 'DIFFUSION')IB_STAB_FACTOR=0.0D0
+	  CALL RD_STORE_DBLE(IB_STAB_FACTOR,'IB_STAB',L_FALSE,'Inner boundary stabilization factor')
 	  OUTER_BND_METH='HONJ'
 	  CALL RD_STORE_CHAR(OUTER_BND_METH,'OB_METH',L_FALSE,
 	1        'Outer boundary method (HONJ or HALF_MOM)')

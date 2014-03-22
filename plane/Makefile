@@ -27,7 +27,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(define_grid_v2.o)\
       $(LIB)(expn.o)\
       $(LIB)(edd_j_hub_var_v2.o)\
-      $(LIB)(edd_jrel_var_v2.o)\
+      $(LIB)(edd_jrel_var_v3.o)\
       $(LIB)(fcomp_pp_v2.o)\
       $(LIB)(fgrey_norel_v1.o)\
       $(LIB)(fg_j_cmf_v12.o)\
@@ -36,7 +36,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(get_jh_at_prev_time_step.o)\
       $(LIB)(get_moms_non_rel.o)\
       $(LIB)(get_moms_rel.o)\
-      $(LIB)(mom_jrel_v6.o)\
+      $(LIB)(mom_jrel_v7.o)\
       $(LIB)(get_rsqh_rel.o)\
       $(LIB)(jgrey_hub_ddt_v2.o)\
       $(LIB)(jgrey_hub_ddt_v4.o)\
@@ -60,7 +60,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(rel_variables.o)\
       $(LIB)(runge_kutta.o)\
       $(LIB)(solve_cmf_formal_v2.o)\
-      $(LIB)(var_jrel_v2.o)\
+      $(LIB)(var_jrel_v3.o)\
       $(LIB)(var_mom_j_ddt_v2.o)\
       $(LIB)(var_mom_pp_v1.o)\
       $(LIB)(var_mom_j_cmf_v9.o)\

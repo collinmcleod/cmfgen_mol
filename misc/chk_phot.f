@@ -7,7 +7,6 @@
 ! packed into LS states is output.
 !
 	PROGRAM CHK_PHOT
-	USE PHOT_DATA_MOD
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !

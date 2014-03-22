@@ -184,6 +184,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(set_x_freq.o)\
       $(LIB)(set_gm_all.o)\
       $(LIB)(set_z_pop.o)\
+      $(LIB)(specfy_it_cycle.o)\
       $(LIB)(simq.o)\
       $(LIB)(sobew.o)\
       $(LIB)(sobew_grad.o)\

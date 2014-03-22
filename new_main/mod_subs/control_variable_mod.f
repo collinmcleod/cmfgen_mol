@@ -103,6 +103,7 @@
 !
 	LOGICAL USE_J_REL
 	LOGICAL USE_FORMAL_REL
+	LOGICAL USE_LAM_ES
 	LOGICAL INCL_REL_TERMS
 	LOGICAL INCL_ADVEC_TERMS_IN_TRANS_EQ
 	LOGICAL USE_OLD_MF_SCALING
@@ -389,6 +390,7 @@
 	INTEGER N_PAR
 	REAL*8 MAX_LAM_COR	!Maximum fractional change for Lambda iteration.
 	REAL*8 MAX_LIN_COR	!Maximum fractional change for linearization.
+	REAL*8 MAX_dT_COR       !Maximum allowed change in the temperature.
 	REAL*8 MAX_CHNG_LIM
 !
 ! Indicates how to scale the corections to the populations, so that
@@ -535,7 +537,8 @@
 	CHARACTER(LEN=10) OUTER_BND_METH
 	CHARACTER(LEN=10) INNER_BND_METH
 !
-	REAL*8  OUT_BC_PARAM_ONE
+	REAL*8 IB_STAB_FACTOR
+	REAL*8 OUT_BC_PARAM_ONE
 	REAL*8 REXT_FAC
 	INTEGER RD_OUT_BC_TYPE
 	INTEGER OUT_BC_TYPE

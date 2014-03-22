@@ -164,6 +164,7 @@
 ! General boundary condition options.
 !
 	REAL*8 REXT_FAC
+	REAL*8 IB_STAB_FACTOR
 	LOGICAL RDTHK_CONT
 	LOGICAL DIF
 	LOGICAL THK_CONT

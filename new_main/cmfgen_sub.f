@@ -66,7 +66,7 @@
 	INTEGER NCF
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
-	CHARACTER(LEN=12), PARAMETER :: PRODATE='27-Jan-2014'		!Must be changed after alterations
+	CHARACTER(LEN=12), PARAMETER :: PRODATE='22-Mar-2014'		!Must be changed after alterations
 !
 ! 
 !
@@ -2871,7 +2871,9 @@
 	END IF		!Only output if last iteration.
 ! 
 !
-	WRITE(LUER,'(A,2ES18.8,/)')' Luminosity of star (d=1,ND) is :',RLUMST(1),RLUMST(ND)
+	WRITE(STRING,'(I5)')MAIN_COUNTER; STRING=ADJUSTL(STRING)
+	STRING=' Luminosity of star (d=1,ND)(iteration '//TRIM(STRING)//') is:'
+	WRITE(LUER,'(A,2ES18.8,/)')TRIM(STRING),RLUMST(1),RLUMST(ND)
 	IF(RLUMST(1) .LE. 0.0D0)RLUMST(1)=1.0D-20
 	DO I=1,ND
 	  IF(RLUMST(I) .GE. 0.0D0 .AND. RLUMST(I) .LT.  1.0D-05)RLUMST(I)=1.0D-05
@@ -2879,7 +2881,10 @@
 	END DO
 !
 	CALL GEN_ASCI_OPEN(LU_FLUX,'OBSFLUX','UNKNOWN',' ',' ',IZERO,IOS)
-	  CALL WRITV(OBS_FREQ,N_OBS,'Continuum Frequencies',LU_FLUX)
+	  WRITE(STRING,'(I10)')N_OBS
+	  STRING=ADJUSTL(STRING)
+          STRING='Continuum Frequencies ( '//TRIM(STRING)//' )'
+	  CALL WRITV(OBS_FREQ,N_OBS,TRIM(STRING),LU_FLUX)
 	  CALL WRITV(OBS_FLUX,N_OBS,'Observed intensity (Janskys)',LU_FLUX)
 	  CALL WRITV(RLUMST,ND,'Luminosity',LU_FLUX)
 	CLOSE(UNIT=LU_FLUX)
@@ -2925,14 +2930,14 @@
 !
 	CALL GEN_ASCI_OPEN(LU_OPAC,'MEANOPAC','UNKNOWN',' ',' ',IZERO,IOS)
 	  WRITE(LU_OPAC,
-	1  '( ''     R        I   Tau(Ross)   /\Tau   Rat(Ross)'//
+	1  '( ''       R        I   Tau(Ross)   /\Tau   Rat(Ross)'//
 	1  '  Chi(Ross)  Chi(ross)  Chi(Flux)   Chi(es) '//
 	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)     Kappa   V(km/s)'' )' )
 	  IF(R(1) .GE. 1.0D+05)THEN
-	    FMT='( 1X,1P,E10.4,2X,I3,1X,1P,E9.3,2(2X,E8.2),1X,'//
+	    FMT='( 1X,1P,E12.6,2X,I3,1X,1P,E9.3,2(2X,E8.2),1X,'//
 	1        '4(2X,E9.3),2(2X,E8.2),4(2X,E8.2) )'
 	  ELSE
-	    FMT='( 1X,F10.4,2X,I3,1X,1P,E9.3,2(2X,E8.2),1X,'//
+	    FMT='( 1X,F12.6,2X,I3,1X,1P,E9.3,2(2X,E8.2),1X,'//
 	1        '4(2X,E9.3),2(2X,E8.2),4(2X,E8.2) )'
 	  END IF
 	  DO I=1,ND
@@ -3782,6 +3787,28 @@
 	  END IF
 	END IF
 !
+	IF(DO_CLUMP_MODEL .AND. MAXCH .LT. 50.0D0 .AND. .NOT. FIXED_T .AND. 
+	1         LAST_LAMBDA .NE. MAIN_COUNTER)THEN
+	  CALL AUTO_CLUMP_REV(POPS,CLUMP_LAW,CLUMP_PAR,N_CLUMP_PAR,CHK,ND,NT,LUIN)
+	  IF(CHK)THEN
+	    CALL SET_ABUND_CLUMP(MEAN_ATOMIC_WEIGHT,ABUND_SUM,LUER,ND)
+	    CALL SCR_RITE_V2(R,V,SIGMA,POPS,IREC,MAIN_COUNTER,RITE_N_TIMES,
+	1                LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
+	    LAMBDA_ITERATION=.TRUE.
+            FIXED_T=.TRUE.
+	    RD_FIX_T=.TRUE.
+	    FIX_IMPURITY=.FALSE.
+	    COMPUTE_BA=.TRUE.
+	    MAIN_COUNTER=MAIN_COUNTER+1
+	    MAXCH=200
+	    IF(LST_ITERATION .AND. WRITE_RATES)THEN
+	      LST_ITERATION=.FALSE.
+	      CLOSE(LU_NET); CLOSE(LU_DR); CLOSE(LU_EW)
+	      CLOSE(LU_HT); CLOSE(LU_NEG)
+	    END IF
+	  END IF
+	END IF
+!
 ! Initialize pointer file for storage of BA matrix.
 !
 	I=-1000
@@ -3818,8 +3845,7 @@
 	  WRITE(LUMOD,'(/,''Model Started on:'',15X,(A))')TIME
 	  CALL DATE_TIME(TIME)
 	  WRITE(LUMOD,'(''Model Finalized on:'',13X,(A))')TIME
-	  WRITE(LUMOD,
-	1       '(''Main program last changed on:'',3X,(A))')PRODATE
+	  WRITE(LUMOD,'(''Main program last changed on:'',3X,(A))')PRODATE
 	  WRITE(LUMOD,'()')
 !
 	  STRING=' '
@@ -4347,6 +4373,7 @@
 	       LAMBDA_ITERATION=.FALSE.
 	       FIXED_T=RD_FIX_T
 	    END IF
+	    CALL SPECIFY_IT_CYCLE(COMPUTE_BA,LAMBDA_ITERATION,FIXED_T)
 !
 ! Check to see if the user has changed IN_ITS to modify the number of iterations being
 ! undertaken. If the file has not been modified, no action will be taken. The use may

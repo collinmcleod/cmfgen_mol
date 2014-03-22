@@ -31,6 +31,7 @@
 !
 	LOGICAL LOG_Y_AXIS
 	LOGICAL DO_ABS
+	LOGICAL NORMALIZE
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	CHARACTER*10 PLT_OPT
 	CHARACTER*80 XLABEL
@@ -95,7 +96,7 @@ C
 	      DO I=1,NT
 	        READ(12,'(A)',ERR=5000,END=5000)STRING
 	        K=INDEX(STRING,'*')+1
-	        READ(STRING(K:),*)(ST(IT)%STEQ(I,J),J=L,MIN(L+9,ND))
+	        READ(STRING(K:),*,END=5000)(ST(IT)%STEQ(I,J),J=L,MIN(L+9,ND))
 	      END DO
 	      READ(12,'(A)',ERR=5000,END=5000)STRING
 	    END DO
@@ -111,7 +112,7 @@ C
 	      DO I=1,NT
 	        READ(12,'(A)',ERR=5000,END=5000)STRING
 	        K=INDEX(STRING,'#')+1
-	        READ(STRING(K:),*)(ST(IT)%SOL(I,J),J=L,MIN(L+9,ND))
+	        READ(STRING(K:),*,END=5000)(ST(IT)%SOL(I,J),J=L,MIN(L+9,ND))
 	      END DO
 	      READ(12,'(A)',ERR=5000,END=5000)STRING
 	    END DO
@@ -191,14 +192,32 @@ C
 	  GOTO 200
 !
 	ELSE IF(PLT_OPT(1:5) .EQ. 'RDV_I')THEN
+	  ID=5; IV=NT; NORMALIZE=.TRUE.
 	  CALL GEN_IN(ID,'Depth')
 	  CALL GEN_IN(IV,'Variable')
+	  CALL GEN_IN(NORMALIZE,'Normalize plot by maximum value')
+	  IF(NORMALIZE)THEN
+	   T1=0
+	   IF(IV .EQ. NT)THEN
+	      DO I=1,NIT; T1=MAX(T1,ABS(ST(I)%RE(ID))); END DO
+	      YV(1:NIT)=ST(1:NIT)%RE(ID)/T1
+	    ELSE
+	      DO I=1,NIT; T1=MAX(T1,ABS(ST(I)%STEQ(IV,ID))); END DO
+	      YV(1:NIT)=ST(1:NIT)%STEQ(IV,ID)/T1
+	    END IF
+	    YLABEL='(dN/dt)/Max(|dN/dt|)'
+	  ELSE
+	   IF(IV .EQ. NT)THEN
+	      YV(1:NIT)=SIGN(ABS(ST(1:NIT)%RE(ID))**0.25,ST(1:NIT)%RE(ID))
+	    ELSE
+	      YV(1:NIT)=SIGN(ABS(ST(1:NIT)%STEQ(IV,ID))**0.25,ST(1:NIT)%STEQ(IV,ID))
+	    END IF
+	    YLABEL='dN/dt\u1/4\d'
+	  END IF
 	  DO I=1,NIT
-	    YV(I)=SIGN(ABS(ST(I)%STEQ(IV,ID))**0.25,ST(I)%STEQ(IV,ID))
 	    XV(I)=I
 	  END DO
 	  XLABEL='Iteration'
-	  YLABEL='dN/dt\u1/4\d'
 	  CALL DP_CURVE(NIT,XV,YV) 
 	  GOTO 200
 !

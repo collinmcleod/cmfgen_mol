@@ -33,6 +33,7 @@
 ! Altered : 05-Jan-2014 --- NG=0 allows insertion to be skipped for TAU option.
 ! Altered : 08-Jan-2014 --- Improvements to RTAU option and call to ADJUST_SN_R_GRID made.
 ! Altered : 15-Jan-2014 --- Changed ID option, cleaned, and generally use OUT__RGRD to create RDINR file.
+! Altered : 19-Mar-2014 --- Tried to improve handling of boundaries with TAU option.
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
@@ -46,6 +47,7 @@
 	REAL*8 VEL(MAX_ND)
 	REAL*8 CLUMP_FAC(MAX_ND)
 	REAL*8 OLD_TAU(MAX_ND)
+	REAL*8 TAU_SAV(MAX_ND)
 !
 	REAL*8 RTMP(MAX_ND)
 	REAL*8 OLD_XV(MAX_ND)
@@ -74,8 +76,10 @@
 	INTEGER NIB,NOB
 	INTEGER ICOUNT
 	INTEGER N,ND,NEW_ND,TAU_ND
+	INTEGER ND_SAV
 !
 	LOGICAL RD_MEANOPAC
+	LOGICAL GRID_SAT
 !
 	CHARACTER(LEN=132) STRING
 	CHARACTER(LEN=132) FILE_IN
@@ -133,7 +137,10 @@
 	    READ(20,'(A)')STRING
 	    DO I=1,ND
 	      READ(20,*)RTMP(I),J,OLD_TAU(I)
-	      IF( ABS(RTMP(I)-R(I))/R(I) .GT. 1.0D-06 )THEN
+	      J=MAX(I,2)
+	      T1=R(J-1)-R(J)
+	      IF( ABS(RTMP(I)-R(I))/T1 .GT. 2.0D-03 )THEN
+	        WRITE(6,*)ABS(RTMP(I)-R(I))/T1
 	        WRITE(6,*)'Possible eror with MEANOPAC -- inconsistent R grid'
 	        WRITE(6,*)'R(I)=',R(I)
 	        WRITE(6,*)'RTMP(I)=',RTMP(I)
@@ -173,7 +180,7 @@
 	  WRITE(6,'(A)')' '
 	  CALL GEN_IN(NEW_ND,'Input new number of depth points')
 	  CALL GEN_IN(R_SCALE_FAC,'Factor (>1) to enhance maximum dLog(R) spacing')
-	  CALL GEN_IN(dLOGT_MAX,'Maximum fractional change in the temperatur')
+	  CALL GEN_IN(dLOGT_MAX,'Maximum fractional change in the temperature')
 !
 	  WRITE(6,'(A)')BLUE_PEN
 	  CALL GEN_IN(NIB,'Number of depth points to insert at INNER boundary')
@@ -187,6 +194,7 @@
 	  WRITE(6,'(A)')DEF_PEN
 !
 	  T1=OLD_TAU(1)
+	  WRITE(6,*)T1
 	  DO I=1,ND
 	    OLD_TAU(I)=OLD_TAU(I)-SCL_FAC*T1
 	  END DO
@@ -212,11 +220,26 @@
 	  WRITE(6,*)'To exit, put TAU_MIN -ve (or zero)'
 	  WRITE(6,*)' '
 !
-	  CALL GEN_IN(TAU_MIN,'Minimum of TAU range for revision')
+	  TAU_MIN=OLD_TAU(1); TAU_MAX=OLD_TAU(ND)
+1000	  CALL GEN_IN(TAU_MIN,'Minimum of TAU range for revision')
+	  IF(TAU_MIN .LT. OLD_TAU(1) .OR. TAU_MIN .GT. OLD_TAU(ND))THEN
+	    WRITE(6,'(A)')RED_PEN
+	    WRITE(6,*)'Error -- requested TAU_MIN is outside valid range'
+	    WRITE(6,'(A,ES9.3,5X,A,E9.3,/)')' TAU(Min)=',OLD_TAU(1),'TAU(Max)=',OLD_TAU(ND)
+	    WRITE(6,'(A)')DEF_PEN
+	    GOTO 1000
+	  END IF
 	  NEW_ND=ND
 	  NEW_TAU(1:ND)=OLD_TAU(1:ND)
 	  DO WHILE(TAU_MIN .GT. 0.0D0)
-	    CALL GEN_IN(TAU_MAX,'Maximum of Tau range for revision')
+2000	    CALL GEN_IN(TAU_MAX,'Maximum of Tau range for revision')
+	    IF(TAU_MAX .LT. OLD_TAU(1) .OR. TAU_MAX .GT. OLD_TAU(ND))THEN
+	      WRITE(6,'(A)')RED_PEN
+	      WRITE(6,*)'Error -- requested TAU_MIN is outside valid range'
+	      WRITE(6,'(A,ES9.3,5X,A,E9.3,/)')' TAU(Min)=',OLD_TAU(1),'TAU(Max)=',OLD_TAU(ND)
+	      WRITE(6,'(A)')DEF_PEN
+	      GOTO 2000
+	    END IF
 	    TAU_ND=NEW_ND
 	    TAU(1:TAU_ND)=NEW_TAU(1:TAU_ND)
 	    IST=1
@@ -224,7 +247,6 @@
 	      IF(TAU_MIN .LT. TAU(I+1))THEN
 	        IST=I
 	        IF( (TAU_MIN-TAU(I)) .GT. (TAU(I+1)-TAU_MIN))IST=IST+1
-	        TAU_MIN=TAU(IST)
 	        EXIT
 	      END IF
 	    END DO
@@ -232,52 +254,73 @@
 	      IF(TAU_MAX .LT. TAU(I+1))THEN
 	        IEND=I
 	        IF( (TAU_MAX-TAU(I)) .GT. (TAU(I+1)-TAU_MAX))IEND=IEND+1
-	        TAU_MAX=TAU(IEND)
 	        EXIT
 	      END IF
 	    END DO
-!
-	    WRITE(6,'(A)')' '
-	    WRITE(6,*)'Number of points in the interval is',IEND-IST-1
-	    WRITE(6,'(A)')' '
-	    WRITE(6,'(2(3X,A,7X,A,4X,A,4X))'),'I','dTAU(I)','TAU(I/I-1)','E','dTAU(E)','TAU(E+1/E)'
-	    WRITE(6,'(2(I4,2ES14.3,4X))')IST,TAU(IST)-TAU(IST-1),TAU(IST)/TAU(IST-1),
-	1                             IEND,TAU(IEND+1)-TAU(IEND),TAU(IEND+1)/TAU(IEND)
-	    WRITE(6,'(A)')' '
 	    IST=MAX(IST,2); IEND=MIN(TAU_ND-1,IEND)
+	    IF(IEND .EQ. IST)IEND=MIN(TAU_ND-1,IEND+1)
+	    IF(IEND .EQ. IST)IST=MAX(2,IST-1)
+	    TAU_MIN=TAU(IST); TAU_MAX=TAU(IEND)
+	    NG=IEND-IST-1
 !
-	    WRITE(6,'(2X,A,10X,A,10X,A,3X,A,10X,A,3X,A)')'NG','TAU_RAT','dTAU','dTAU[I/I-1]','dTAU','dTAU[E+1/E]'
-	    NG=IEND-IST-1 
-	    DO K=NG,NG+40,4
-	      TAU_RAT=EXP( LOG(TAU_MAX/TAU_MIN) / (K+1) )
-	      WRITE(6,'(I4,3X,7ES14.3)')K,TAU_RAT,
-	1           (TAU_RAT-1)*TAU(IST),(TAU_RAT-1)*TAU(IST)/(TAU(IST)-TAU(IST-1)),
-	1     TAU(IEND)*(1.0D0-1.0D0/TAU_RAT),
-	1           (TAU(IEND+1)-TAU(IEND))/TAU(IEND)/(1.0D0-1.0D0/TAU_RAT)
-	    END DO
 	    WRITE(6,'(A)')' '
-	    NG=LOG(TAU_MAX/TAU_MIN)/LOG(1.3D0)+1
+	    WRITE(6,*)IST,TAU(IST)
+	    WRITE(6,*)IEND,TAU(IEND)
+	    WRITE(6,*)'Number of points in the interval is ',NG
+	    WRITE(6,'(A)')' '
+	    CALL GEN_IN(NG,'Enter new number of grid points for the interval')
 !
-	    WRITE(6,'(A)')RED_PEN
-	    WRITE(6,'(A)')' Need to choose NG to give a good step size at either end.'
-	    WRITE(6,'(A)')' Enter 0 points if insertion interval is unsatsfactory.'
-	    WRITE(6,'(A)')DEF_PEN
-	    CALL GEN_IN(NG,'New number of grid points for this interval')
-	    IF(NG .EQ. 0)THEN
-	    ELSE
-	      TAU_RAT=EXP( LOG(TAU_MAX/TAU_MIN) / (NG+1) )
+	    TAU_SAV=TAU(1:NEW_ND)
+	    ND_SAV=NEW_ND
+	    TAU_RAT=EXP( LOG(TAU_MAX/TAU_MIN) / (NG+1) )
+	    NEW_ND=IST+NG+(TAU_ND-IEND)+1
 !
-	      NEW_ND=IST+NG+(TAU_ND-IEND)+1
-	      DO I=1,IST
-	        NEW_TAU(I)=TAU(I)
-	      END DO
-	      DO I=IST+1,IST+NG
-	        NEW_TAU(I)=NEW_TAU(I-1)*TAU_RAT
-	      END DO
-	      DO I=IST+NG+1,NEW_ND
-	        NEW_TAU(I)=TAU(IEND+(I-IST-NG-1))
+	    DO I=1,IST
+	      NEW_TAU(I)=TAU(I)
+	    END DO
+	    DO I=IST+1,IST+NG
+	      NEW_TAU(I)=NEW_TAU(I-1)*TAU_RAT
+	    END DO
+	    DO I=IST+NG+1,NEW_ND
+	      NEW_TAU(I)=TAU(IEND+(I-IST-NG-1))
+	    END DO
+!
+            IF(IST .GT. 2)THEN
+              J=MAX(4,IST)
+              TAU_RAT=EXP( LOG(NEW_TAU(J+2)/NEW_TAU(J-2))/4 )
+              DO I=J-2,J+2
+                NEW_TAU(I)=NEW_TAU(I-1)*TAU_RAT
 	      END DO
 	    END IF
+!
+            IEND=IST+NG
+            IF(IEND .LT. NEW_ND-3)THEN
+              J=MIN(IEND-1,ND-4)
+              TAU_RAT=EXP( LOG(NEW_TAU(J+3)/NEW_TAU(J-2))/5 )
+              DO I=J-2,J+2
+                NEW_TAU(I)=NEW_TAU(I-1)*TAU_RAT
+	      END DO
+	    END IF
+!
+	    WRITE(6,'(4X,A1,9X,A,8X,A,3X,A)')'I','Tau','dTAU','dLog(Tau)'
+	    DO I=MAX(IST-3,2),MIN(IST+4,ND-1)
+	      WRITE(6,'(I5,4ES12.3)')I,NEW_TAU(I),NEW_TAU(I+1)-NEW_TAU(I),
+	1            LOG(NEW_TAU(I+1)/NEW_TAU(I))
+	    END DO
+	    WRITE(6,'(A)')' '
+	    DO I=MAX(IEND-6,2),MIN(IEND+3,ND-1)
+	      WRITE(6,'(I5,4ES12.3)')I,NEW_TAU(I),NEW_TAU(I+1)-NEW_TAU(I),
+	1            LOG(NEW_TAU(I+1)/NEW_TAU(I))
+	    END DO
+	    CALL GEN_IN(GRID_SAT,'Is grid satisfactory?')
+	    IF(GRID_SAT)THEN
+	    ELSE
+	      NEW_ND=ND_SAV
+	      NEW_TAU(1:NEW_ND)=TAU_SAV(1:NEW_ND)
+	    END IF
+!
+! We can do anther region if desired.
+!
 	    TAU_MIN=0.0D0
 	    CALL GEN_IN(TAU_MIN,'Minimum of TAU range for revision (=<0) to exit.')
 	  END DO

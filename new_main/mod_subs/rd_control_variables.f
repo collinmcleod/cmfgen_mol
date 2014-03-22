@@ -413,6 +413,9 @@ C
 	    CALL RD_STORE_CHAR(INNER_BND_METH,'IB_METH',L_TRUE,
 	1           'Inner boundary method (DIFUSION, HOLLOW, or ZERO_FLUX)')
 	  END IF
+	  IB_STAB_FACTOR=0.1D0
+	  IF(INNER_BND_METH .EQ. 'DIFFUSION')IB_STAB_FACTOR=0.0D0
+	  CALL RD_STORE_DBLE(IB_STAB_FACTOR,'IB_STAB',L_FALSE,'Inner boundary stabilization factor')
 	  OUTER_BND_METH='HONJ'
 	  CALL RD_STORE_CHAR(OUTER_BND_METH,'OB_METH',L_FALSE,'Outer boundary method (HONJ or HALF_MOM)')
 C
@@ -871,6 +874,14 @@ C
 	1      'Maximum fractional change for linearization ')
 	  CALL RD_STORE_DBLE(MAX_LAM_COR,'MAX_LAM',L_TRUE,
 	1      'Maximum fractional change for lambda iteration ')
+	  MAX_dT_COR=0.2D0
+	  CALL RD_STORE_DBLE(MAX_dT_COR,'MAX_dT',L_FALSE,
+	1      'Maximum fractional change in the temperature')
+	  IF(MAX_dT_COR .LE. 0.0D0 .OR. MAX_dT_COR .GT. 0.201D0)THEN
+	    WRITE(LUER,*)' Error: MAX_dT in VADAT has an invalid value of',MAX_dT_COR
+	    WRITE(LUER,*)' Require 0 < MAX_dT_COR < 0.2'
+	    STOP
+	  END IF
 	  CALL RD_STORE_DBLE(MAX_CHNG_LIM,'MAX_CHNG',L_TRUE,
 	1      'If maximum % fractional change > MAX_CHNG terminate model ')
 !
@@ -929,10 +940,12 @@ C
 	  CALL RD_STORE_DBLE(DJDT_RELAX_PARAM,'DJDT_RELAX',L_FALSE,
 	1          'Factor to scale DJDT terms to assist initial convergence')
 !
+	  USE_LAM_ES=.FALSE.
 	  USE_J_REL=.FALSE.
 	  INCL_REL_TERMS=.FALSE.
 	  INCL_ADVEC_TERMS_IN_TRANS_EQ=.FALSE.
 	  USE_FORMAL_REL=.FALSE.
+	  CALL RD_STORE_LOG(USE_LAM_ES,'USE_LAM_ES',L_FALSE,'Use lambda iteration with ray solutions?')
 	  CALL RD_STORE_LOG(USE_J_REL,'USE_J_REL',L_FALSE,'Use MOM_J_REL_VN to solve the moment equations?')
 	  IF(USE_DJDT_RTE .OR. USE_J_REL)USE_FORMAL_REL=.TRUE.
 	  CALL RD_STORE_LOG(USE_FORMAL_REL,'USE_FRM_REL',L_FALSE,'Use CMF_FORMAL_REL to compute F etc?')

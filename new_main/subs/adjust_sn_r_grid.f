@@ -6,6 +6,7 @@
 	1           IB_RAT,OB_RAT,DTAU2_ON_DTAU1,N_IB_INS,N_OB_INS,ND,NS)
 	IMPLICIT NONE
 !
+! Altered: 21-Mar-2014 -- Bug fix -- LOG_OLD_T was being computed over ND instead of NS. 
 ! Altered: 07-Jan-2014 -- Changes to call, and extensive improvements made.
 ! Altered: 16-Jul-2013
 !
@@ -67,7 +68,7 @@
 	LOG_OLD_R=LOG(OLD_R)
 	IF(dLOGT_MAX .GT. 0 .AND. dLOGT_MAX .LT. 1.D0)THEN
 	  CHECK_T=.TRUE.
-	  LOG_OLD_T(1:ND)=LOG(OLD_T(1:ND))
+	  LOG_OLD_T(1:NS)=LOG(OLD_T(1:NS))
 	ELSE
 	  CHECK_T=.FALSE.
 	END IF
