@@ -22,7 +22,7 @@
 	REAL*8 LOG_OLD_T(NS)
 	REAL*8 LOG_OLD_TAU(NS)
 !
-	INTEGER, PARAMETER :: IND=2
+	INTEGER, PARAMETER :: IND=3
 	REAL*8 XN(ND)                   !Used as integer grid
 	REAL*8 ZN(IND*ND)		!Used as integer grid.
 	REAL*8 LOG_R(IND*ND)
@@ -135,7 +135,7 @@
 	      WRITE(LUER,*)' Log TAU(I)=',LOG_TAU(I)
 	      WRITE(LUER,*)' Log R(I)=',LOG_R(I)
 	      WRITE(LUER,*)' Log old R(I)=',LOG_OLD_R(I)
-	      WRITE(LUER,*)' Error in SET_RV_HYDRO_MODEL_V3 --- LOG_R and TAU vectors too small'
+	      WRITE(LUER,*)' Error in ADJUST_SN_R_GRID `--- LOG_R and TAU vectors too small'
 	      STOP
 	    END IF
 !

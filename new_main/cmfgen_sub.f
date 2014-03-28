@@ -38,6 +38,11 @@
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
+! Altered 27-Mar-2013 : dE_WORK and RAD_DECAY_LUM updated for clumping.
+!                       LUWARN inserted (done earlier)
+!                       LIN_PROF_SIM is now depth dependent -- code cannow handle depth dependent 
+!                          line profiles.
+!                       Calls to AUTO_CLUMP_REV and SPECIFY_IT_CYCLE added.       
 ! Altered  6-Dec-2013 : When removing lines from the variation set we assume a minimum terminal
 !                          velocity of 300 km/s. Important for plane-parallel models with Vinf=0.
 ! Altered 29-Nov-2011 : Call to STEQ_CO_MOV_DERIV changed to _V3. Done to facilitae
@@ -66,7 +71,7 @@
 	INTEGER NCF
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
-	CHARACTER(LEN=12), PARAMETER :: PRODATE='22-Mar-2014'		!Must be changed after alterations
+	CHARACTER(LEN=12), PARAMETER :: PRODATE='27-Mar-2014'		!Must be changed after alterations
 !
 ! 
 !
@@ -3501,8 +3506,8 @@
 	  XRAY_LUM_TOT(I)=XRAY_LUM_TOT(I)*R(I)*R(I)*T1
 	  XRAY_LUM_0P1(I)=XRAY_LUM_0P1(I)*R(I)*R(I)*T1
 	  XRAY_LUM_1KEV(I)=XRAY_LUM_1KEV(I)*R(I)*R(I)*T1
-	  dE_WORK(I)=dE_WORK(I)*R(I)*R(I)*T1
-	  RAD_DECAY_LUM(I)=dE_RAD_DECAY(I)*R(I)*R(I)*T2		!As ergs/cm^3
+	  dE_WORK(I)=dE_WORK(I)*R(I)*R(I)*T1*CLUMP_FAC(I)
+	  RAD_DECAY_LUM(I)=dE_RAD_DECAY(I)*R(I)*R(I)*T2*CLUMP_FAC(I)		!As ergs/cm^3
 	END DO
 !
 	CALL LUM_FROM_ETA_V2(LLUMST,R,LUM_FROM_ETA_METHOD,ND)

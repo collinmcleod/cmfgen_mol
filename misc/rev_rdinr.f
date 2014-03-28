@@ -34,6 +34,7 @@
 ! Altered : 08-Jan-2014 --- Improvements to RTAU option and call to ADJUST_SN_R_GRID made.
 ! Altered : 15-Jan-2014 --- Changed ID option, cleaned, and generally use OUT__RGRD to create RDINR file.
 ! Altered : 19-Mar-2014 --- Tried to improve handling of boundaries with TAU option.
+! Altered : 27-Mar-2014 --- Fixed bug with DOUB option (introduced when cleaning),
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
@@ -374,8 +375,9 @@
 	    J=2*I-1
 	    RTMP(J)=R(I)
 	    J=2*I
-	    RTMP(I)=SQRT(R(I)*R(I+1))
+	    RTMP(J)=SQRT(R(I)*R(I+1))
 	  END DO
+	  NEW_ND=2*ND-1
 	  RTMP(NEW_ND)=R(ND)
 	  CALL OUT_RGRID(RTMP,NEW_ND,R,DI,ED,T,IRAT,VEL,CLUMP_FAC,OLD_TAU,ND,RMIN,LUM,RD_MEANOPAC)
 !
@@ -767,12 +769,14 @@
 !
 ! This routine:
 !        (1) Checks that R is monotonic
-!        (2) COmpted V, T, etc on the new grid
+!        (2) Computes V, T, etc on the new grid
 !        (3) Outputs the revised R files.
 !        (4) Ouputs R_GRID_CHK so that DTAU etc spacings can be examined.
 !
 	SUBROUTINE OUT_RGRID(RTMP,NEW_ND,R,DI,ED,T,IRAT,VEL,CLUMP_FAC,OLD_TAU,ND,RMIN,LUM,RD_MEANOPAC)
 	IMPLICIT NONE
+!
+! Altered 22-Mar-2014 : T now output to R_GRID_CHK file.
 !
 	INTEGER ND
 	INTEGER NEW_ND
@@ -842,13 +846,14 @@
 	  WRITE(LU,'(A)')' '
 	  WRITE(LU,'(A)')' Final grid computed with SET_SN_R_GRID '
           WRITE(LU,'(A)')' '
-          WRITE(LU,'(A,17X,A,9X,A,8X,A,11X,A,10X,A,7X,A,6X,A,3X,A)')
-	1           ' Depth','R','Ln(R)','dLn(R)','Tau','dTau','Ln(Tau)','dLn(Tau)','dTAU[I/I-1]'
+          WRITE(LU,'(A,17X,A,9X,A,8X,A,11X,A,10X,A,7X,A,6X,A,3X,A,13X,A,3X,A)')
+	1           ' Depth','R','Ln(R)','dLn(R)','Tau','dTau','Ln(Tau)','dLn(Tau)','dTAU[I/I-1]','T','dT/T(I)'
 	  T1=0.0D0
 	  DO I=1,NEW_ND-1
 	    IF(I .NE. 1)T1=(NEW_TAU(I+1)-NEW_TAU(I))/(NEW_TAU(I)-NEW_TAU(I-1))
-	    WRITE(LU,'(I6,ES18.8,7ES14.4)')I,RTMP(I),LOG(RTMP(I)),LOG(RTMP(I+1)/RTMP(I)),
-	1      NEW_TAU(I),NEW_TAU(I+1)-NEW_TAU(I),LOG(NEW_TAU(I)),LOG(NEW_TAU(I+1)/NEW_TAU(I)),T1
+	    WRITE(LU,'(I6,ES18.8,9ES14.4)')I,RTMP(I),LOG(RTMP(I)),LOG(RTMP(I+1)/RTMP(I)),
+	1      NEW_TAU(I),NEW_TAU(I+1)-NEW_TAU(I),LOG(NEW_TAU(I)),LOG(NEW_TAU(I+1)/NEW_TAU(I)),
+	1      T1,NEW_T(I),NEW_T(I+1)/NEW_T(I)-1.0D0
 	  END DO
 	  I=NEW_ND
 	  WRITE(LU,'(I6,ES18.8,7ES14.4)')I,RTMP(I),LOG(RTMP(I)),0.0D0,NEW_TAU(I),0.0D0,LOG(NEW_TAU(I)),0.0D0
