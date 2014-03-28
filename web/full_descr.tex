@@ -1742,6 +1742,41 @@ be 30.
 
 \end{indented_list} 
 
+\vfill
+\eject
+\item[SPECIFY\_IT\_CYCLE]  When this control file is present it can be used to force a particular iteration sequence of iteration types. The cycle is repeated unless the NORM option is found. Specify only one option, per line. The number of consecutive iterations of the same type is specified by a number following the option -- if no number is present 1 is assumed. Do not place [] around the iteration options. There is no check on the validity of
+the option ordering. Thus users should not allow T to vary with a fixed BA  if the previous computation geld T fixed. It is all right to follow a LAMBDA-iteration with a full iteration PROVIDED the BA matrix was computed on an earlier iteration (a LAMBDA iteration does not overwrite the BAMAT file). SPECIFY\_IT\_CYCLE  may be changed while the program is running. Unrecognized options are deleted from the file and the default iteration option is used.
+The file is read in \$cmfdist/subs/specfy\_it\_cycle.f.
+
+\begin{plt_list}{FULL(FIXT,FIXBA) N}
+
+\item[LAM  N]  Do N lambda iterations.
+\item[FULL  N] Do N full iterations -- the BA matrix is computed and the temperature is allowed to vary.
+\item[FULL(FIXT)  N] Do N full iterations -- the BA matrix is computed but the temperature is held fixed.
+\item[FULL(FIXBA) N] Do N full iterations -- the BA matrix is not computed. Behavior of T variation depends on the previous iteration. 
+\item[FULL(FIXT,FIXBA) N] Do N full iterations -- the BA matrix is not computed and the temperature is held fixed.
+\item[NORM] Return to a normal iteration cycle. When this record is reached (it is cycled to the top) lower statements are ignore.
+
+\end{plt_list} 
+
+\vspace{-10pt}
+\item[ADJUST\_CORRECTIONS]  Optional control file containing parameters that can be used to scale corrections in order to facilitate convergence. This control file may be changed while the program is running. This file is used by \$cmfdist/subs/iddle\_pop\_corrections\_v2.f.
+
+\begin{indented_list}{ATOM\_DENNNN}
+
+\item[RELAX]  A value of Z (say 0.5) indicates that all corrections should be scaled by a factor of 0.5. $Z <1$ is equivalent to under-relaxation, and can help difficult models (especially those oscillating) converge. $Z>1$ corresponds to over-relaxation and might help a model converge faster (or it might cause it to diverge, so
+be warned!).
+
+\item[T\_LIM] Maximum fractional change allowed to the temperature.
+
+\item[LST] Beginning depth. If not present, 1 is assumed.
+
+\item[LEND] End depth. If not present, ND is assumed.
+
+\item[CONSIT\_CNT] Checks every CONSIST\_CNT iterations whether adjacent populations are consistent. No consistency check is performed when the parameter is not present, or if it is $\le$ 0. This option may help
+models struggling to converge early on but users should note it is still under development.
+
+\end{indented_list}
 
 \vfill
 \eject
