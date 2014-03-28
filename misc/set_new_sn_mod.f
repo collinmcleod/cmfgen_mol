@@ -146,7 +146,7 @@
 ! The following options generally do need not change. Current values are
 ! used as defaults.
 !
-	ANSWER='F'
+	ANSWER=.FALSE.
 	CALL GEN_IN(ANSWER,'Change other parameters:')
 	IF(ANSWER)THEN
 	  DO L=1,NREC
@@ -195,7 +195,7 @@
 	  END DO
 	END IF
 !
-	ANSWER='F'
+	ANSWER=.FALSE.
 	CALL GEN_IN(ANSWER,'Set NG parameter to default values?')
 	IF(ANSWER)THEN
 	  DO L=1,NREC
@@ -229,7 +229,7 @@
 	CLOSE(UNIT=10)
         WRITE(6,'(/,A,I4,A,/)')' Written ',NREC,' records  to VADAT'
 !
-	ANSWER='T'
+	ANSWER=.TRUE.
 	CALL GEN_IN(ANSWER,'Generate default IN_ITS file')
 	IF(ANSWER)THEN
           OPEN(UNIT=10,FILE='IN_ITS',STATUS='UNKNOWN')

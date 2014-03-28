@@ -196,7 +196,7 @@
 	    IF(LOG_R(I)-1.5D0*(LOG_R(I-1)-LOG_R(I)) .LT. LOG_OLD_R(NS))EXIT
 	    IF(LOG_TAU(I)+1.5D0*(LOG_TAU(I-1)-LOG_TAU(I)) .GT. LOG_OLD_TAU(NS))EXIT
 	  END DO
-	  WRITE(6,'(A,I4,4Z,A,I4)')'Grid it=',ICNT,'ND=',I+1
+	  WRITE(6,'(A,I4,4X,A,I4)')'Grid it=',ICNT,'ND=',I+1
 	  ND_TMP=I+1
 !
 	  IF(ND_TMP .EQ. ND-N_IB_INS-N_OB_INS)EXIT

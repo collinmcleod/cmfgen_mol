@@ -200,17 +200,21 @@ C
 	   T1=0
 	   IF(IV .EQ. NT)THEN
 	      DO I=1,NIT; T1=MAX(T1,ABS(ST(I)%RE(ID))); END DO
-	      YV(1:NIT)=ST(1:NIT)%RE(ID)/T1
+	      DO I=1,NIT; YV(I)=ST(I)%RE(ID)/T1;        END DO
 	    ELSE
 	      DO I=1,NIT; T1=MAX(T1,ABS(ST(I)%STEQ(IV,ID))); END DO
-	      YV(1:NIT)=ST(1:NIT)%STEQ(IV,ID)/T1
+	      DO I=1,NIT; YV(I)=ST(I)%STEQ(IV,ID)/T1;        END DO
 	    END IF
 	    YLABEL='(dN/dt)/Max(|dN/dt|)'
 	  ELSE
 	   IF(IV .EQ. NT)THEN
-	      YV(1:NIT)=SIGN(ABS(ST(1:NIT)%RE(ID))**0.25,ST(1:NIT)%RE(ID))
+	      DO I=1,NIT
+	        YV(I)=SIGN(ABS(ST(I)%RE(ID))**0.25,ST(I)%RE(ID))
+	      END DO
 	    ELSE
-	      YV(1:NIT)=SIGN(ABS(ST(1:NIT)%STEQ(IV,ID))**0.25,ST(1:NIT)%STEQ(IV,ID))
+	      DO I=1,NIT
+	        YV(I)=SIGN(ABS(ST(I)%STEQ(IV,ID))**0.25,ST(I)%STEQ(IV,ID))
+	      END DO
 	    END IF
 	    YLABEL='dN/dt\u1/4\d'
 	  END IF
