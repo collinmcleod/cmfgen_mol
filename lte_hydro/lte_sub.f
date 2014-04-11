@@ -37,6 +37,8 @@
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
+! Altered 04-Apr-2014 : Bug fix -- needed to move computation of V(r) before the
+!                         computation of VTURB_VEC.
 ! Incorporated 02-Jan-2013: Chagend to allow depth dependent line profiles.
 ! Altered 20-Oct-2010 : Commented out statements accessing DIFFW.
 !                         No longer call CALL SET_VAR_RAD_MOD_V2
@@ -711,6 +713,15 @@
 	1         AT_MASS(SPECIES_LNK(ID))
 	END DO
 !
+! These don't effect the LTE opacities but are needed in some places
+! (for consitenct with CMFGEN).
+!
+	DO I=1,ND
+	  R(ND-I+1)=1.0D0+(I-1)*0.01D0
+	  V(I)=1.0D0
+	  SIGMA(I)=0.0D0
+	END DO
+!
 ! 
 !
 ! Compute profile frequencies such that for the adopted doppler
@@ -771,11 +782,6 @@
 ! clumped. At the sime time, we compute the vectors which give the density,
 ! the atom density, and the species density at each depth.
 !
-	DO I=1,ND
-	  R(ND-I+1)=1.0D0+(I-1)*0.01D0
-	  V(I)=1.0D0
-	  SIGMA(I)=0.0D0
-	END DO
 	CALL SET_ABUND_CLUMP(MEAN_ATOMIC_WEIGHT,ABUND_SUM,LUER,ND)
 !
 ! 

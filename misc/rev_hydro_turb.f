@@ -88,7 +88,8 @@
 !
 	READ(STRING(ND+1),*)RND
 	DO I=1,NSTR
-	  IF(INDEX(STRING(I),'Surface gravity is:') .NE. 0)THEN
+	  IF(INDEX(STRING(I),'Surface gravity is:') .NE. 0 .OR.
+	1    INDEX(STRING(I),'Specified surface gravity is:') .NE. 0)THEN
 	    J=INDEX(STRING(I),':')
 	    READ(STRING(I)(J+1:),*)GSUR_OLD
 	    MASS_OLD=GSUR_OLD/GRAV_CON*RND*RND

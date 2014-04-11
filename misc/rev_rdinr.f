@@ -81,6 +81,7 @@
 !
 	LOGICAL RD_MEANOPAC
 	LOGICAL GRID_SAT
+	LOGICAL ROUND_ERROR
 !
 	CHARACTER(LEN=132) STRING
 	CHARACTER(LEN=132) FILE_IN
@@ -145,6 +146,12 @@
 	        WRITE(6,*)'Possible eror with MEANOPAC -- inconsistent R grid'
 	        WRITE(6,*)'R(I)=',R(I)
 	        WRITE(6,*)'RTMP(I)=',RTMP(I)
+	        ROUND_ERROR=.TRUE.
+	        CALL GEN_IN(ROUND_ERROR,'Contunue as only rounding error?')
+	        IF(ROUND_ERROR)THEN
+	            RTMP(1:ND)=R(1:ND)
+	            EXIT
+	        END IF 
 	        STOP
 	      END IF
 	    END DO
