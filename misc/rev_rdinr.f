@@ -134,6 +134,7 @@
 ! Read in optical depth scale. Needed for RTAU and TAU options. Also used
 ! for checking purposes (if available) for some other options.
 !
+	ROUND_ERROR=.FALSE.
 	OPEN(UNIT=20,FILE='MEANOPAC',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .EQ. 0)THEN
 	    READ(20,'(A)')STRING
@@ -141,24 +142,23 @@
 	      READ(20,*)RTMP(I),J,OLD_TAU(I)
 	      J=MAX(I,2)
 	      T1=R(J-1)-R(J)
-	      IF( ABS(RTMP(I)-R(I))/T1 .GT. 2.0D-03 )THEN
+	      IF( ABS(RTMP(I)-R(I))/T1 .GT. 2.0D-03 .AND. .NOT. ROUND_ERROR)THEN
 	        WRITE(6,*)ABS(RTMP(I)-R(I))/T1
 	        WRITE(6,*)'Possible eror with MEANOPAC -- inconsistent R grid'
 	        WRITE(6,*)'R(I)=',R(I)
 	        WRITE(6,*)'RTMP(I)=',RTMP(I)
 	        ROUND_ERROR=.TRUE.
-	        CALL GEN_IN(ROUND_ERROR,'Contunue as only rounding error?')
-	        IF(ROUND_ERROR)THEN
-	            RTMP(1:ND)=R(1:ND)
-	            EXIT
-	        END IF 
-	        STOP
+	        CALL GEN_IN(ROUND_ERROR,'Continue as only rounding error?')
+	        IF(.NOT. ROUND_ERROR)STOP
 	      END IF
 	    END DO
 	    RD_MEANOPAC=.TRUE.
 	  ELSE
 	    RD_MEANOPAC=.FALSE.
 	  END IF
+	  IF(ROUND_ERROR .AND. RD_MEANOPAC)THEN
+	    RTMP(1:ND)=R(1:ND)
+	  END IF 
 	CLOSE(UNIT=20)
 !
 	CALL SET_CASE_UP(OPTION,IZERO,IZERO)

@@ -3,6 +3,7 @@
 ! in a CMFGEN input files. An example is an update of
 ! XFI1_BEG etc which change as the iteration procedes.
 !
+! Altered 09-May-2014: LUER was not set before being used in several locations.
 ! Created 23-Nov-2007
 !
 	MODULE UPDATE_KEYWORD_INTERFACE
@@ -61,6 +62,7 @@
 	  END IF
 	END DO
 	IF(K .EQ. 0)THEN
+	  LUER=ERROR_LU()
 	  WRITE(LUER,*)'Error in UPDATE_KEYWORD'
 	  WRITE(LUER,*)TRIM(KEY_WORD),' not found in file ',TRIM(DATA_FILE)
 	  STOP
@@ -96,6 +98,7 @@
 	END DO
 !
 	IF(K .EQ. 0)THEN
+	  LUER=ERROR_LU()
 	  WRITE(LUER,*)'Error in UPDATE_KEYWORD'
 	  WRITE(LUER,*)TRIM(KEY_WORD),' not found in file ',TRIM(DATA_FILE)
 	  STOP
@@ -137,6 +140,7 @@
 	END DO
 !
 	IF(K .EQ. 0)THEN
+	  LUER=ERROR_LU()
 	  WRITE(LUER,*)'Error in UPDATE_KEYWORD'
 	  WRITE(LUER,*)TRIM(KEY_WORD),' not found in file ',TRIM(DATA_FILE)
 	  STOP
@@ -176,6 +180,7 @@
 	END DO
 !
 	IF(K .EQ. 0)THEN
+	  LUER=ERROR_LU()
 	  WRITE(LUER,*)'Error in UPDATE_KEYWORD'
 	  WRITE(LUER,*)TRIM(KEY_WORD),' not found in file ',TRIM(DATA_FILE)
 	  STOP
@@ -224,6 +229,7 @@
 	       NUM_RECS=I
 	    END DO
 	    READ(LU,'(A)',END=100)TMP_STR
+	    LUER=ERROR_LU()
 	    WRITE(LUER,*)'Insufficient storage in UPDATE_KEYWORD'
 	    WRITE(LUER,*)'Keyword data file is:',TRIM(DATA_FILE)
 	    STOP
