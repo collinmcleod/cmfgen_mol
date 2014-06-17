@@ -2985,9 +2985,9 @@
 	  IF(COMP_GREY_LST_IT)THEN
 	    CALL COMP_GREY_V4(POPS,TGREY,TA,CHI,TCHI,CHK,LUER,NC,ND,NP,NT)
 	    IF(CHK)THEN
-	      WRITE(LUER,'(/,X,A,/)')'Grey solution was successfully computed'
+	      WRITE(LUER,'(/,1X,A,/)')'Grey solution was successfully computed'
 	    ELSE 
-	      WRITE(LUER,'(/,X,A,/)')'Grey solution was NOT successfully computed'
+	      WRITE(LUER,'(/,1X,A,/)')'Grey solution was NOT successfully computed'
 	    END IF
 	  END IF
 !

@@ -55,6 +55,10 @@
 	1             LIMIT_SET_BY_OPACITY)
 	USE MOD_STRK_LIST
 !
+! Altered 20-MAy-2015 : Bug fix: When WAVE was outside valid range, GET_INDX_DP was returning an error 
+!                          to fort.2 (not OUTGEN) but was also returning a valid index. As a result, some
+!                          lines (in this case belonging to HeI) would use the wrong profile.
+! Altered 14-May-2015 : Limit Ne to MAX_PROF_ED.
 ! Altered 31-Jan-2014 : Added V_PROF_LIMIT & MAX_PROF_ED to call. Changed to V4.
 ! Altered  6-Jan-2014 : V3 was added to repositry 6_jan-2014.
 !                           (taken from cur_cm_25jun13 development version).
@@ -102,6 +106,7 @@
 !
 	INTEGER I,J
 	REAL*8 ESEC(ND)
+	REAL*8 ED_MOD(ND)
 	REAL*8 TMP_VEC(ND)
 	REAL*8 NU_DOP(ND)
 	REAL*8 LINE_TO_CONT_RATIO(ND)
@@ -121,6 +126,7 @@
 	LOC_GAM_COL=GAM_COL
 	PROF_LIST_LOCATION=0
 	LOCAL_V_PROF_LIMIT=V_PROF_LIMIT
+	WAVE=0.01D0*C_KMS/NU_ZERO
 !
 ! The option assumes fixed width Doppler profiles, and recovers exactly the
 ! same option as was installed in CMFGEN prior to the installations of variable 
@@ -142,7 +148,13 @@
 !
 	IF(PROF_TYPE(1:4) .EQ. 'LIST')THEN
 	  WAVE=0.01D0*C_KMS/NU_ZERO
-	  I=GET_INDX_DP(WAVE,LST_WAVE,N_LST)
+	  IF(WAVE .LT. LST_WAVE(1))THEN
+	    I=1
+	  ELSE IF(WAVE .GT. LST_WAVE(N_LST))THEN
+	    I=N_LST
+	  ELSE
+	    I=GET_INDX_DP(WAVE,LST_WAVE,N_LST)
+	  END IF
 	  DO J=MAX(1,I-2),MIN(I+2,N_LST)
 	    IF( TRIM(SPECIES_IN) .EQ. TRIM(LST_SPECIES(J)) .AND.
 	1          ABS((WAVE-LST_WAVE(J))/WAVE) .LT. 1.0D-05)THEN
@@ -163,6 +175,10 @@
 !                    
         TMP_VEC(1:ND)=( VTURB_IN(1:ND)/12.85D0  )**2
 	ESEC(1:ND)=6.65D-15*ED_IN(1:ND)
+	ED_MOD=ED_IN
+	DO I=1,ND
+	  ED_MOD(I)=MIN(ED_IN(I),MAX_PROF_ED)
+	END DO
 !                       
         T1=1.0D-15/1.77245385095516D0         !1.0D-15/SQRT(PI)
 	VEC_VDOP_MIN=1.0D+50			!Very large number 
@@ -214,7 +230,7 @@
 	IF(PROF_TYPE .EQ. 'VOIGT')THEN
 	  IF(LIMIT_SET_BY_OPACITY)THEN
 	    DO I=1,ND            
-	      T2=LOC_GAM_RAD+LOC_GAM_COL*ED_IN(I)
+	      T2=LOC_GAM_RAD+LOC_GAM_COL*ED_MOD(I)
               T1=6.7005D-09*SQRT(T2*NU_DOP(I)*LINE_TO_CONT_RATIO(I)/VOIGT_LIMIT)
 	      dNU=MAX(T1,dNU)
 	    END DO
@@ -226,7 +242,7 @@
 ! center.
 !
 	    DO I=1,ND
-	      T2=LOC_GAM_RAD+LOC_GAM_COL*ED_IN(I)
+	      T2=LOC_GAM_RAD+LOC_GAM_COL*ED_MOD(I)
               T1=6.7005D-09*SQRT(1.0D+06*T2*NU_DOP(I))
 	      dNU=MAX(T1,dNU)
 	    END DO

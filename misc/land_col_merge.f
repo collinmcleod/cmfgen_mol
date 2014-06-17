@@ -139,6 +139,7 @@ C
 1000	  CONTINUE
 	  WRITE(LU_OUT,'(A)')STRING
 	  WRITE(LU_OUT,'(A)')'%%EOF'
+	  CLOSE(LU_OUT)
 !
 ! Update file name in a systematic way to save typing.
 !

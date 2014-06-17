@@ -17,7 +17,7 @@
 	1                      MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE)
 	IMPLICIT NONE
 !
-! Altered 24-Apr-2015 : Code now checks "validity" of T values and collison stregths.
+! Altered 24-Apr-2015 : Code now checks "validity" of T values and collision strengths.
 ! Altered 25-Jan-2015 : Minor bug fix - could print out a wrong matching name.
 ! Altered 20-Dec-2014 : Code checks if non-matching level corresponds to a higher level not 
 !                          included in the model atom (call CHL_COL_NAME).

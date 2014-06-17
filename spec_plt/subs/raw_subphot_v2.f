@@ -25,6 +25,7 @@
 	USE HYD_BF_PHOT_DATA
 	IMPLICIT NONE
 !
+! Altered 17-Jun-2014 : Bug fixed with cross-section TYPE=5 -- LMIN was being used when not set.
 ! Altered 17-Sep-2010 : Altered implementation of Verner ground-state fits
 !
 	INTEGER NCF
@@ -209,7 +210,7 @@
 	    X=DLOG10(X)
 	    T1=10**(  CROSS_A(1)+X*( CROSS_A(2) + X*(CROSS_A(3) +
 	1               X*CROSS_A(4)) ) + LG10_CONV_FAC  )
-	    IF(U .GT. CROSS_A(5))T1=T1*(CROSS_A(LMIN+5)/U)**2
+	    IF(U .GT. CROSS_A(5))T1=T1*(CROSS_A(5)/U)**2
 	    PHOT(ML)=T1
 	  END DO
 !

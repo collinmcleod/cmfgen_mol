@@ -35,6 +35,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 14-Dec-2014 : RSQHNU etc now set to one when not computing J. This avoids issues with
+!                             possible NaNs.
 ! Altered : 16-Dec-2013 : CMF_FORM_SOL_V2 (non EXT option) no longer called when ND > 199.
 !                             CMF_FORM_SOL_V2 is not parallelized and slows down large clumped models.
 ! Altered : 16-Feb-2006 : CMF_FORM_SOL_V2 used for last iteration when MAXCH<100, and
@@ -145,6 +147,7 @@
 	IF(CONT_VEL .AND. USE_FIXED_J)THEN
 	  CALL RD_CONT_J(FL,FREQ_INDX,FIRST_FREQ,LST_ITERATION,
 	1          ACCURATE,LUER,LU_EDD,ACCESS_F,ND,NP)
+	  RSQHNU=1.0D0; HFLUX_AT_OB=0.001D0; HFLUX_AT_IB=0.0D0
 !
 	ELSE IF(.NOT. CONT_VEL .AND. THIS_FREQ_EXT)THEN
 C

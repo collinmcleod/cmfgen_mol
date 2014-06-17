@@ -1082,8 +1082,8 @@ C
 	1        -    dS(I)*A4(I) )
 	      END DO
 !
-	      I_P_PREV(:,LS)=I_P(1:NI)
-	      I_M_PREV(:,LS)=I_M(1:NI)
+	      I_P_PREV(1:NI,LS)=I_P(1:NI)
+	      I_M_PREV(1:NI,LS)=I_M(1:NI)
 !
 	      IPLUS_P(LS)=I_P(1)
 	   END IF			!End Integral method

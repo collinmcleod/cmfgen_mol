@@ -35,6 +35,7 @@
 ! Read in VADAT file for editing.
 !
 	OPEN(UNIT=9,FILE='OLD_VADAT',STATUS='OLD',ACTION='READ')
+	  NUM_STR=0
 	  DO I=1,1000
 	    READ(9,'(A)',END=100)STRING(I)
 	    NUM_STR=I
@@ -46,6 +47,7 @@
 !
 ! Modify RSTAR
 !
+	J=0
 	DO I=1,NUM_STR
 	  J=INDEX(STRING(I),'[RSTAR]')
 	  IF(J .NE. 0)THEN

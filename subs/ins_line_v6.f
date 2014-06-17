@@ -483,10 +483,12 @@
 	LU_ER=ERROR_LU()
 	WRITE(LU_ER,*)'Error --- insufficient frequencies to store'//
 	1               ' both line and continuum frequencies'
-	WRITE(LU_ER,*)'ML= ',ML
-	WRITE(LU_ER,*)'LN_INDX= ',LN_INDX
-	WRITE(LU_ER,*)'INDX= ',INDX
-	WRITE(LU_ER,*)'NFREQ_MAX= ',NFREQ_MAX
+	WRITE(LU_ER,*)'ML(cont. index)= ',ML
+	WRITE(LU_ER,*)'   NCF(# cont.)= ',NCF
+	WRITE(LU_ER,*)'        LN_INDX= ',LN_INDX
+	WRITE(LU_ER,*)'          NLINE= ',N_LINES
+	WRITE(LU_ER,*)'           INDX= ',INDX
+	WRITE(LU_ER,*)'       NFREQ_MAX= ',NFREQ_MAX
 !
 	STOP
 	END

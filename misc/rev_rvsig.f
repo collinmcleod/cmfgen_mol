@@ -501,12 +501,18 @@
 !
 ! Find conection velocity and index.
 !
+	  TRANS_I=0
 	  DO I=1,ND_OLD
 	    IF(V_TRANS .LE. OLD_V(I) .AND. V_TRANS .GE. OLD_V(I+1))THEN
 	      TRANS_I=I
 	      EXIT
 	    END IF
 	  END DO
+	  IF(TRANS_I .EQ. 0)THEN
+	    WRITE(6,'(/,1X,A)')'Error V_TRANS is outside range'
+	    WRITE(6,'(1X,3(A,ES15.8,3X))')'V_TRANS=',V_TRANS,'OLD_V(1)=',OLD_V(1),'V(ND_OLD)=',OLD_V(ND_OLD)
+	  END IF
+
 	  IF( OLD_V(TRANS_I)-V_TRANS .GT. V_TRANS-OLD_V(TRANS_I+1))TRANS_I=TRANS_I+1
 	  V_TRANS=OLD_V(TRANS_I)
 	  R(1:ND)=OLD_R(1:ND_OLD)+(NEW_RSTAR-OLD_R(ND_OLD))

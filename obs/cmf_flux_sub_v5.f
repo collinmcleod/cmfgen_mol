@@ -1119,7 +1119,7 @@
 	        COMPUTE_EDDFAC=.TRUE.
 	      END IF
 	    ELSE
-	      WRITE(LUER,'(/,X,A)')'Error opening EDDFACTOR - will compute new F'
+	      WRITE(LUER,'(/,1X,A)')'Error opening EDDFACTOR - will compute new F'
 	        COMPUTE_EDDFAC=.TRUE.
 	    END IF
 	  END IF

@@ -1326,6 +1326,7 @@ C
 	    IF(NI_RAY(LS) .EQ. 1)THEN
 	      I_P(1,LS)=0.0D0
 	      I_M(1,LS)=0.0D0
+	      NI=1
 	      GOTO 1000
 	    END IF
 !

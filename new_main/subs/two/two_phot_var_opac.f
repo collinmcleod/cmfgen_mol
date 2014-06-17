@@ -56,6 +56,9 @@
 	      FU=4.0D0*U
 	      AY=24.56D0*COEF_TWO(J,1)*( U*(1.0D0-FU**0.8D0) +
 	1                 0.88D0*(U**1.53D0)*(FU**0.8D0) )
+	    ELSE
+	      WRITE(6,'(/,1X,A)')'Error in TWO_PHOT_VAR_OPAC -- unrecognized type for TWO_PHOTON transition'
+	      STOP
 	    END IF
 !
 	    ETA_CONST=CONST*FREQ/FREQ_TWO(J)

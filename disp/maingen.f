@@ -169,7 +169,7 @@
 	REAL*8 C_KMS
 !
 	CHARACTER(LEN=6) METHOD
-	CHARACTER(LEN=6) TYPE_ATM
+	CHARACTER(LEN=10) TYPE_ATM
 	CHARACTER(LEN=10) INNER_BND_METH
 !
 	REAL*8, ALLOCATABLE :: CHI_PAR(:,:)
@@ -387,10 +387,16 @@
 !
 	TYPE_ATM='P'
 	T1=LOG(MASS_DENSITY(5)/MASS_DENSITY(1))/LOG(R(1)/R(5))
-	WRITE(TYPE_ATM(2:6),'(F5.2)')T1
 	WRITE(6,'(A)')RED_PEN
-	WRITE(6,'(A)')' For optical depth calculations we will assume a power density distribution'
-	WRITE(6,'(A,F5.2)')' at the outer boundary. Density exponent for atmosphere is ',T1
+	IF(T1 .LT. 100)THEN
+	  WRITE(TYPE_ATM(2:6),'(F5.2)')T1
+	  WRITE(6,'(A)')' For optical depth calculations we will assume a power density distribution'
+	  WRITE(6,'(A,F5.2)')' at the outer boundary. Density exponent for atmosphere is ',T1
+	ELSE
+	  WRITE(TYPE_ATM(2:9),'(ES8.2)')T1
+	  WRITE(6,'(A)')' For optical depth calculations we will assume a power density distribution'
+	  WRITE(6,'(A,ES8.2)')' at the outer boundary. Density exponent for atmosphere is ',T1
+	END IF
 	WRITE(6,'(A)')DEF_PEN
 !
 ! If the grey temperature is available in CMFGEN, we don't need to (although we can with the
@@ -1315,8 +1321,13 @@
 	  ELSE IF(TYPE_ATM .EQ. 'POW')THEN
 	    TYPE_ATM='P'
 	    T1=LOG(MASS_DENSITY(5)/MASS_DENSITY(1))/LOG(R(1)/R(5))
-	    WRITE(TYPE_ATM(2:6),'(F5.2)')T1
-	    WRITE(6,'(A,F5.2)')'Density exponent for atmospheres is ',T1
+	    IF(T1 .LT. 100)THEN
+	      WRITE(TYPE_ATM(2:6),'(F5.2)')T1
+	      WRITE(6,'(A,F5.2)')'Density exponent for atmospheres is ',T1
+	    ELSE
+	      WRITE(TYPE_ATM(2:9),'(ES8.2)')T1
+	      WRITE(6,'(A,ES8.2)')'Density exponent for atmospheres is ',T1
+	    END IF
 	  ELSE
 	    TYPE_ATM=' '
 	    WRITE(T_OUT,*)'Atmosphere is assumed to have a wind'

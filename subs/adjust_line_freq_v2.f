@@ -28,7 +28,7 @@
 	OPEN(UNIT=LUIN,FILE='REVISED_LAMBDAS',STATUS='OLD',IOSTAT=IOS,ACTION='READ')
 	IF(IOS .NE. 0)THEN
 	  LUER=ERROR_LU()
-	  WRITE(LUER,'(/,X,A)')'WARNING: file with accurate wavelengths not found'
+	  WRITE(LUER,'(/,1X,A)')'WARNING: file with accurate wavelengths not found'
 	  RETURN
 	END IF
 !
@@ -49,6 +49,7 @@
 	  L=INDEX(STRING,'(')-1
 	  SPECIES=STRING(1:L)
 !
+	  JST=0
 	  IF(SPECIES .EQ. OLD_SPECIES)THEN
 	  ELSE
 	    DO J=1,N_LINE_FREQ
@@ -58,6 +59,10 @@
 	        EXIT
 	      END IF
 	    END DO
+	  END IF
+	  IF(JST .EQ. 0)THEN
+	    WRITE(6,*)'Warning -- unrecognized species in REVISED_LAMBDAS'
+	    WRITE(6,*)'SPECIES=',SPECIES
 	  END IF
 !
 ! Now find the line. These are not ordered.
