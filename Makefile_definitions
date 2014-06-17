@@ -72,13 +72,16 @@ ifeq ($(HOST),ibis.phyast.pitt.edu)
 
 endif
 
-#
+
 # Linking and compilig instructions for gfortran.
 #
+# -ffpe-trap=invalid,overflow  -finit-real=nan -fcheck=all
+#
+# O<=>O1 -- I did not try O2 and -finit-real=nan caused issues with a LPACK routine.
 
 ifeq ($(HOST),gfortran.phyast.pitt.edu)
- F90 = gfortran -fopenmp
- F90nomp = gfortran
+ F90 = gfortran -fopenmpa -O
+ F90nomp = gfortran -O
  FG  =  -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
  FH  =  -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
  FD  = -g  -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
