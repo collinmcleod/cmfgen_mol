@@ -188,9 +188,16 @@
 	  IF(LST_WAVE(J) .GT. 1.3D+04 .AND. LST_TYPE(J) .EQ. 'LEMKE_HI' .AND. LST_NL(J) .EQ. 4)THEN
 	    LUER=ERROR_LU()
 	    WRITE(LUER,*)' '
-	    WRITE(LUER,*)'Error --- you should not use Lemke stark profiles for IR Bracket lines as they contain an error'
+	    WRITE(LUER,'(1X,80A)')('*',L=1,70)
+	    WRITE(LUER,'(1X,80A)')('*',L=1,70)
 	    WRITE(LUER,*)' '
-	    STOP
+	    WRITE(LUER,*)'Warning--- you should not use Lemke stark profiles for IR Bracket lines as they contain an error'
+	    WRITE(LUER,*)'See: Repolust et al 2005, A&A 440, 261 (page 4)'
+	    WRITE(LUER,*)' '
+	    WRITE(LUER,'(1X,80A)')('*',L=1,70)
+	    WRITE(LUER,'(1X,80A)')('*',L=1,70)
+	    WRITE(LUER,*)' '
+	    EXIT
 	  END IF
 	END DO
 !

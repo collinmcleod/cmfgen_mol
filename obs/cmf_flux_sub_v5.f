@@ -1278,7 +1278,7 @@
 !
 	CALL TUNE(IONE,'ADD_LINE')
 	DO WHILE( LAST_LINE .LT. N_LINE_FREQ .AND.
-	1                ML .EQ. LINE_ST_INDX_IN_NU(LAST_LINE+1) )
+	1                ML .EQ. LINE_ST_INDX_IN_NU(MIN(LAST_LINE+1,N_LINE_FREQ)) )
 !
 ! Have another line --- need to find its storage location.
 !
@@ -1395,7 +1395,7 @@
 ! in the BLANKETING portion of the code.
 !
 	  DO WHILE(LAST_LINE .LT. N_LINE_FREQ.AND.
-	1            VEC_TRANS_TYPE(LAST_LINE+1)(1:4) .NE. 'BLAN')
+	1            VEC_TRANS_TYPE(MIN(LAST_LINE+1,N_LINE_FREQ))(1:4) .NE. 'BLAN')
 	       LAST_LINE=LAST_LINE+1
 	  END DO
 !	   

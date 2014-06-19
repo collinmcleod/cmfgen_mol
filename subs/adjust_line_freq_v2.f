@@ -49,7 +49,6 @@
 	  L=INDEX(STRING,'(')-1
 	  SPECIES=STRING(1:L)
 !
-	  JST=0
 	  IF(SPECIES .EQ. OLD_SPECIES)THEN
 	  ELSE
 	    DO J=1,N_LINE_FREQ
@@ -60,21 +59,21 @@
 	      END IF
 	    END DO
 	  END IF
-	  IF(JST .EQ. 0)THEN
-	    WRITE(6,*)'Warning -- unrecognized species in REVISED_LAMBDAS'
-	    WRITE(6,*)'SPECIES=',SPECIES
-	  END IF
 !
 ! Now find the line. These are not ordered.
 !
-	  DO J=JST,N_LINE_FREQ
-	    IF(NAME(1:K) .EQ. VEC_TRANS_NAME(J))THEN
-	      T1=LINE_STRT_FREQ(J)/LINE_FREQ(J)
-	      LINE_FREQ(J)=FREQ
-	      LINE_STRT_FREQ(J)=T1*FREQ
-	      EXIT
-	    END IF
-	  END DO
+	  IF(SPECIES .EQ. OLD_SPECIES)THEN
+	    DO J=JST,N_LINE_FREQ
+	      IF(NAME(1:K) .EQ. VEC_TRANS_NAME(J))THEN
+	        T1=LINE_STRT_FREQ(J)/LINE_FREQ(J)
+	        LINE_FREQ(J)=FREQ
+	        LINE_STRT_FREQ(J)=T1*FREQ
+	        EXIT
+	      END IF
+	    END DO
+	  ELSE
+	    WRITE(6,*)'Warning -- unrecognized species in REVISED_LAMBDAS: SPECIES=',SPECIES
+	  END IF
 !
 	END DO
 !

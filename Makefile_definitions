@@ -80,7 +80,7 @@ endif
 # O<=>O1 -- I did not try O2 and -finit-real=nan caused issues with a LPACK routine.
 
 ifeq ($(HOST),gfortran.phyast.pitt.edu)
- F90 = gfortran -fopenmpa -O
+ F90 = gfortran -fopenmp -O
  F90nomp = gfortran -O
  FG  =  -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
  FH  =  -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -I$(MOD_DIR) -J$(MOD_DIR)
