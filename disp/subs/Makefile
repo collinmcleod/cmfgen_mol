@@ -67,40 +67,51 @@ $(LIB) : $(OBJ)	$(NT)
 
 NT =  $(LIB_DIR)libmod.a(mod_non_therm.o)
 
+GEN =  $(LIB_DIR)libtools.a(gen_in.o)\
+	$(LIB_DIR)libtools.a(usr_option.o)\
+	$(LIB_DIR)libtools.a(usr_hidden.o)\
+	$(LIB_DIR)libtools.a(mod_color_pen_def.o)\
+	$(LIB_DIR)libmod.a(mod_lev_dis_blk.o)\
+	$(LIB_DIR)libtools.a(wr_string.o)
+
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f 
 	$(F90) -c $(FG)  $<
 	ar ruv $(LIB) $*.o
 
-$(LIB)(map_plot.o) : map_plot.f  
-	$(F90) -c  $(FD) -O1 map_plot.f
-	ar ruv $(LIB) map_plot.o
-
 $(LIB)(%.o) : %.f90 ../mod_disp.o $(NT)
 	$(F90) -c $(FFREE)  -I../ -I../../new_main/subs/non_therm $<
 	ar ruv $(LIB) $*.o
 
-$(LIB)(wr_spec_sum_v2.o) : wr_spec_sum_v2.f ../mod_disp.o 
-	$(F90) -c  $(FG) -I../ wr_spec_sum_v2.f
-	ar ruv $(LIB) wr_spec_sum_v2.o
-
-$(LIB)(branch_rat.o) : branch_rat.f ../mod_disp.o 
+$(LIB)(branch_rat.o) : branch_rat.f ../mod_disp.o  $(GEN)
 	$(F90) -c  $(FG) -I../ branch_rat.f
 	ar ruv $(LIB) branch_rat.o
 
-# 
+$(LIB)(comp_jbar.o) : comp_jbar.f ../mod_disp.o  $(GEN)
+	$(F90) -c  $(FG) -I../ comp_jbar.f
+	ar ruv $(LIB) comp_jbar.o
+
+$(LIB)(map_plot.o) : map_plot.f $(GEN)
+	$(F90) -c  $(FD) -O1 map_plot.f 
+	ar ruv $(LIB) map_plot.o
+
+$(LIB)(wr_spec_sum_v2.o) : wr_spec_sum_v2.f ../mod_disp.o $(GEN)
+	$(F90) -c  $(FG) -I../ wr_spec_sum_v2.f
+	ar ruv $(LIB) wr_spec_sum_v2.o
+
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)
-#
 
+TRAP = ../../lib/libsubs.a(mod_trap_derivatives.o)
 
-GEN = ../../lib/libsubs.a(mod_trap_derivatives.o)
+$(LIB)(get_dtaulam.o)  : get_dtaulam.f  $(TRAP)
 
-$(LIB)(get_dtaulam.o)  : get_dtaulam.f  $(GEN)
+$(TRAP):
+	(cd ../../subs; make )
 
 $(GEN):
-	(cd ../../subs; make )
+	(cd ../../tools; make )
 
 $(NT):
 	(cd ../../new_main/subs/non_therm; make )

@@ -329,7 +329,6 @@
 !
 ! We can do anther region if desired.
 !
-	    TAU_MIN=0.0D0
 	    CALL GEN_IN(TAU_MIN,'Minimum of TAU range for revision (=<0) to exit.')
 	  END DO
 !

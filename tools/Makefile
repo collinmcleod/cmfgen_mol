@@ -60,8 +60,6 @@ $(LIB)(usr_hidden.o) : usr_hidden.f $(LIB)(wr_string.o) $(LIB)(sve_file.o)
 #             libplot.a(pixplot_module.o) 
 
 
-
-
 clean :
 	rm -f *.o 
 

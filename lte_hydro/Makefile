@@ -76,7 +76,8 @@ $(EXE_DIR)wind_hyd.exe : wind_hyd.o $(OBJ_FILES) \
                $(LOCLIB) $(LAPACK) $(BLAS) $(PGLIB) $(G2CLIB) $(X11LIB) \
                -o $(EXE_DIR)wind_hyd.exe
 
-USR=$(LIB_DIR)libtools.a(usr_option.o)
+USR=$(LIB_DIR)libtools.a(usr_option.o)\
+    $(LIB_DIR)libtools.a(gen_in.o)
 
 MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
       $(LIB_DIR)libmod.a(cmf_sob_mod.o)\
@@ -96,6 +97,21 @@ lte.o : lte.f $(MODS) $(USR)
 
 lte_sub.o : lte_sub.f $(MODS)
 	$(F90) -c $(FG) lte_sub.f 
+
+wind_hyd.o : wind_hyd.f $(USR)
+	$(F90) -c $(FG) wind_hyd.f 
+
+det_ed.o : det_ed.f $(MODS)
+	$(F90) -c $(FG) det_ed.f 
+
+genopaeta_v8.o : genopaeta_v8.f $(MODS)
+	$(F90) -c $(FG) genopaeta_v8.f 
+
+set_line_opac.o : set_line_opac.f $(MODS)
+	$(F90) -c $(FG) set_line_opac.f 
+
+set_lte_est.o : set_lte_est.f $(MODS)
+	$(F90) -c $(FG) set_lte_est.f 
 
 %.o : %.f 
 	$(F90) -c $(FG) $< 
