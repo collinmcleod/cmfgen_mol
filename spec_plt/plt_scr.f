@@ -9,6 +9,7 @@
 	IMPLICIT NONE
 	INTEGER ND,NT,NIT
 !
+! Altered 30-Mar-2014: Altered FDG option so as to print out adjacent values.
 ! Altered 11-Mar-2014: Installed INT option.
 ! Altered 25-Feb-2014: Modified WRST option.
 ! Altered 12-Dec-2013: Installed LY option so that we can plot very small populations on
@@ -526,6 +527,8 @@ C
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)')
 	    IF(IVAR .EQ. 0)EXIT
 	    CALL GEN_IN(ID,'Depth of variable')
+	    WRITE(6,'(5(9X,I5))')(I,I=MAX(ID-2,1),MIN(ID+2,ND))
+	    WRITE(6,'(5ES14.4)')(POPS(IVAR,I,IT),I=MAX(ID-2,1),MIN(ID+2,ND))
 	    T1=POPS(IVAR,ID,IT)
 	    CALL GEN_IN(T1,'New value of variable')
 	    POPS(IVAR,ID,IT)=T1

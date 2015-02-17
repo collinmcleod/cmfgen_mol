@@ -2731,33 +2731,41 @@
 !
 !
 !
-
 	ELSE IF(XOPT .EQ. 'LNID')THEN
 !
 	  WRITE(T_OUT,'(A)')' '
 	  WRITE(T_OUT,'(A)')'Create line ID file for stars with weak winds.'
+	  WRITE(T_OUT,'(A)')'The list is created based on the line optical depth at a give Tau(e.s.)'
+	  WRITE(T_OUT,'(A)')'Use XTAUC and TAUC option to find Tau(e.s) at Tau(cont)=2/3'
 	  WRITE(T_OUT,'(A)')' '
 	  DO I=1,ND
 	    ESEC(I)=6.65D-15*ED(I)
 	  END DO
           CALL TORSCL(TA,ESEC,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  CALL USR_OPTION(TAU_VAL,'TAUES','0.67D0',
+	1          'Electron scattering optical depth at whch line optical depth is evaluated')
+	  CALL USR_OPTION(VTURB,'VTURB','10.0','Turbulent velcity for line profile (units km/s)?')
 !
 	  DO I=1,ND
 	    J=I
-	    IF(TA(I) .GT. 0.67)THEN
+	    IF(TA(I) .GT. TAU_VAL)THEN
 	      EXIT
 	    END IF
 	  END DO
-	  DPTH_INDX=I-1
+	  DPTH_INDX=J
 !
 	  DEFAULT='0.01'
-	  CALL USR_OPTION(TAU_LIM,'TAU',DEFAULT,'Line optical deth at tau_c=2/3')
+	  CALL USR_OPTION(TAU_LIM,'TAU',DEFAULT,'We only output lines with Tau > ?')
+	  CALL USR_OPTION(FLAG,'ADD','F','Add transition name to output file?')
 !
-          WRITE(T_OUT,'(1X,A,1P,E14.6)')'    R(I)/R*=',R(DPTH_INDX)/R(ND)
-          WRITE(T_OUT,'(1X,A,1P,E14.6)')'       V(I)=',V(DPTH_INDX)
-          WRITE(T_OUT,'(1X,A,1P,E14.6)')'       T(I)=',T(DPTH_INDX)
-          WRITE(T_OUT,'(1X,A,1P,E14.6)')'      ED(I)=',ED(DPTH_INDX)
+	  WRITE(T_OUT,'(/,A,/)')' Values at depth just exceeeding requested TAU(e.s)'
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'     R(I)/R*=',R(DPTH_INDX)/R(ND)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'        V(I)=',V(DPTH_INDX)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'        T(I)=',T(DPTH_INDX)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'       ED(I)=',ED(DPTH_INDX)
+          WRITE(T_OUT,'(1X,A,1P,E14.6)')'TAU(e.s.)(I)=',TA(DPTH_INDX)
 !
+	  WRITE(T_OUT,'(A)')' '
 	  DEFAULT=WR_STRING(LAM_ST)
 	  CALL USR_OPTION(LAM_ST,'LAMST',DEFAULT,FREQ_INPUT)
 	  DEFAULT=WR_STRING(LAM_EN)
@@ -2788,11 +2796,13 @@
 	    NUP=N_LINE_FREQ
 	  END IF
 !
+! We use T4 for the interpolation to the requested optical depth.
+!
+	  T4=(TAU_VAL-TA(DPTH_INDX-1))/(TA(DPTH_INDX)-TA(DPTH_INDX-1))
 	  DO LINE_INDX=NL,NUP
 	    MNL_F=VEC_MNL_F(LINE_INDX)
 	    MNUP_F=VEC_MNUP_F(LINE_INDX)
 	    FL=VEC_FREQ(LINE_INDX)
-	    I=DPTH_INDX
 !
 	    IF(ANG_TO_HZ/FL .GT. LAM_ST .AND. ANG_TO_HZ/FL .LT. LAM_EN)THEN
 	      DO ID=1,NUM_IONS
@@ -2803,13 +2813,15 @@
 	            T1=ATM(ID)%W_XzV_F(MNUP_F,I)/ATM(ID)%W_XzV_F(MNL_F,I)
 	            CHIL(I)=OPLIN*VEC_OSCIL(LINE_INDX)*( T1*ATM(ID)%XzV_F(MNL_F,I)-
 	1               ATM(ID)%GXzV_F(MNL_F)*ATM(ID)%XzV_F(MNUP_F,I)/ATM(ID)%GXzV_F(MNUP_F) )
-	            CHIL(I)=MAX(1.0D-15*CHIL(I)/(FL/2.998D+04)/SQRT(PI),1.0D-10)
+	            T2=12.86D0*SQRT( T(I)/AT_MASS(SPECIES_LNK(ID))+(VTURB/12.86D0)**2 )/C_KMS
+	            CHIL(I)=MAX(1.0D-15*CHIL(I)/FL/T2/SQRT(PI),1.0D-10)
 	          END DO
                   CALL TORSCL_V2(TA,CHIL,R,TB,TC,DPTH_INDX,'ZERO',TYPE_ATM,L_FALSE)
-	          TAU_SOB=TA(DPTH_INDX)
+	          TAU_SOB=T4*TA(DPTH_INDX)+(1.0D0-T4)*TA(DPTH_INDX-1)
+	          STRING=' ';  IF(FLAG)STRING=VEC_TRANS_NAME(LINE_INDX)
 	          IF(TAU_SOB .GT. TAU_LIM)THEN
-	            WRITE(73,'(A,3ES14.5,3X,F3.0,I6)')ION_ID(ID),ANG_TO_HZ/FL,
-	1                                                TAU_SOB,ANG_TO_HZ/FL,1.0,2
+	            WRITE(73,'(A,3ES14.5,3X,F3.0,I6,5X,A)')ION_ID(ID),ANG_TO_HZ/FL,
+	1                                TAU_SOB,ANG_TO_HZ/FL,1.0,2,TRIM(STRING)
 	          END IF
 	        END IF
 	      END DO
@@ -3549,6 +3561,22 @@
 	  GREY_COMP=.FALSE.
 !
 ! 
+	ELSE IF(XOPT .EQ. 'XCOOL')THEN
+!
+	   WRITE(6,*)' '
+	   WRITE(6,*)' Compares X-ray cooling time and flow times assuming smooth flow'
+	   WRITE(6,*)' '
+!
+! The factor 0.375 = 1.5/4 (3/2 kT and 4 for the shock compression).
+!
+	   T2=BOLTZMANN_CONSTANT()
+	    DO I=1,ND
+	      TA(I)=0.375D0*T2*(ED(I)+POP_ATOM(I))*1.0D+28/ED(I)/POP_ATOM(I)/CLUMP_FAC(I)
+	      TB(I)=1.0D+05*R(I)/V(I)
+	    END DO
+	    CALL DP_CURVE(ND,XV,TA)
+	    CALL DP_CURVE(ND,XV,TB)
+	    YAXIS='t\dX\u(T/10\u6\d)(\gL/10\u22\d) s; t(flow)'
 	ELSE IF(XOPT .EQ.'XRAY')THEN
 	  XRAYS=.NOT. XRAYS
 	  IF(XRAYS)THEN
@@ -5573,7 +5601,7 @@ c
 	        YV(I)=-30.0
 	      END IF
 	    END DO
-	    YAXIS='\gt\dstat\u'
+	    YAXIS='Log(\gt\dstat\u)'
 	  ELSE
 	    DO I=1,ND
 	      YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
@@ -5584,7 +5612,7 @@ c
 	        YV(I)=-20.0
 	      END IF
 	    END DO
-	    YAXIS='\gt\dSob\u'
+	    YAXIS='Log(\gt\dSob\u)'
 	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
 !

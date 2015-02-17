@@ -86,7 +86,7 @@ $(LIB)(characteristics_v2.o) : characteristics_v2.f $(LIB)(mod_space_grid_v2.o)
 	$(F90) -c $(OPTION) characteristics_v2.f
 	ar ruv $(LIB) characteristics_v2.o
 
-$(LIB)(cmf_formal_rel_v2.o) : cmf_formal_rel_v2.f $(LIB)(mod_space_grid_v2.o) $(LIB_MOD)(mod_ray_mom_store.o)
+$(LIB)(cmf_formal_rel_v2.o) : cmf_formal_rel_v2.f $(LIB)(mod_space_grid_v2.o) $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) cmf_formal_rel_v2.f
 	ar ruv $(LIB) cmf_formal_rel_v2.o
 
@@ -118,7 +118,7 @@ $(LIB)(mom_j_cmf_v8.o) : mom_j_cmf_v8.f $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) mom_j_cmf_v8.f
 	ar ruv $(LIB) mom_j_cmf_v8.o
 
-$(LIB)(mom_j_ddt_v2.o) : mom_j_ddt_v2.f $(LIB_MOD)(mod_ray_mom_store.o)
+$(LIB)(mom_j_ddt_v2.o) : mom_j_ddt_v2.f $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) mom_j_ddt_v2.f
 	ar ruv $(LIB) mom_j_ddt_v2.o
 
@@ -142,7 +142,7 @@ $(LIB)(var_mom_j_ddt_v2.o) : var_mom_j_ddt_v2.f $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) var_mom_j_ddt_v2.f
 	ar ruv $(LIB) var_mom_j_ddt_v2.o
 
-$(LIB)(var_jrel_v3.o) : var_jrel_v3.f $(LIB_MOD)(mod_var_jrel_v2.o) $(LIB_MOD)(mod_ray_mom_store.o) $(LIB)(mod_trap_derivatives.o) 
+$(LIB)(var_jrel_v3.o) : var_jrel_v3.f $(LIB)(mod_var_jrel_v2.o) $(LIB)(mod_ray_mom_store.o) $(LIB)(mod_trap_derivatives.o) 
 	$(F90) -c $(OPTION) var_jrel_v3.f
 	ar ruv $(LIB) var_jrel_v3.o
 

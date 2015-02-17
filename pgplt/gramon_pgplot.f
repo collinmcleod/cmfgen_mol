@@ -7,6 +7,8 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered:  22-Jan-2015 : Bug fix. SC option for scrolling changed to SCR.
+!                         SC is reserved for entering strings by cursor
 ! Altered:  14-Jan-2014 : Revised LG option
 ! Altered:  22-Nov-2013 : Added LG option for curve type. This plots the log of the absolute 
 !                           value of the data but indicates where the data is -ve.
@@ -884,7 +886,10 @@ C
             CALL PGQCR(I,RED(I),GREEN(I),BLUE(I))
           END DO
 	  GOTO 1000
-	ELSE IF(ANS .EQ. 'SC')THEN
+!
+! Supposed to allow scrolling.
+!
+	ELSE IF(ANS .EQ. 'SCR')THEN
 	  T1=100; T2=0.2
 	  CALL PGSCRL(T1,T2)
 !

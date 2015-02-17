@@ -19,6 +19,7 @@ OBJ = $(LIB)(usr_option.o)\
       $(LIB)(mod_color_pen_def.o)\
       $(LIB)(new_gen_in.o)\
       $(LIB)(get_indx.o)\
+      $(LIB)(read_keyword.o)\
       $(LIB)(set_case_fn.o)\
       $(LIB)(sve_file.o)\
       $(LIB)(update_keyword.o)\

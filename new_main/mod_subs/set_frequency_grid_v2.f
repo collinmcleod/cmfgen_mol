@@ -456,8 +456,8 @@
 !	1                  VEC_FREQ(ML),VEC_STRT_FREQ(ML),NU(LINE_END_INDX_IN_NU(ML))
 !	END DO
 !
-	WRITE(LUER,'(A,T40,I6)')' Number of line frequencies is:',N_LINE_FREQ
-	WRITE(LUER,'(A,T40,I6)')' Number of frequencies is:',NCF
+	WRITE(LUER,'(A,T40,I7)')' Number of line frequencies is:',N_LINE_FREQ
+	WRITE(LUER,'(A,T40,I7)')' Number of frequencies is:',NCF
 	WRITE(LUER,*)' '
 !
 ! Redefine frequency quadrature weights.

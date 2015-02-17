@@ -141,8 +141,8 @@
 	INTEGER NRAY_MAX
 	INTEGER IDMIN,IDMAX
 !
-	CHARACTER*10 OLD_SOLUTION_OPTIONS
-	CHARACTER*10 SOLUTION_METHOD
+	CHARACTER(LEN=10) OLD_SOLUTION_OPTIONS
+	CHARACTER(LEN=10) SOLUTION_METHOD
 	LOGICAL INSERT
 	LOGICAL FIRST_TIME
 	LOGICAL NEW_R_GRID
@@ -152,6 +152,7 @@
 	DATA FIRST_TIME/.TRUE./
 	DATA PREVIOUS_FREQ/0.0D0/
 !
+	SAVE
 	END MODULE FG_J_CMF_MOD_V12
 !
 ! 
@@ -790,6 +791,10 @@
 	  IF(IOS .EQ. 0)ALLOCATE ( CV(NRAY_MAX,NP),STAT=IOS )
 	  IF(IOS .EQ. 0)ALLOCATE ( DTAU(NRAY_MAX,NP),STAT=IOS )
 	  IF(IOS .EQ. 0)ALLOCATE ( GAM(NRAY_MAX,NP),STAT=IOS )
+	  IF(IOS .NE. 0)THEN
+	    WRITE(LUER,*)'Error allocating V_RAY etc in FG_J_CMF_V12: Status=',IOS
+	    STOP	
+          END IF
 !
 !***************************************************************************
 !***************************************************************************
@@ -1447,6 +1452,7 @@ C
 	        A4(I,LS)=DTAU(I,LS)*(E3(I)-E2(I))
 	      END DO
 	    END IF
+!
 !	    CALL TUNE(2,'FG_NEW_F')
 !
 ! ******************* INWARD DIRECTED RAYS *********************************

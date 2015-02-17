@@ -93,6 +93,7 @@
 	      MOD_FIX_T_D_END=I
 	    END IF
 	  END DO
+	  IF(MOD_FIX_T_D_END .LT. 5)MOD_FIX_T_D_END=5  	!avoid inconsistency at outer boundary.
 	END IF
 ! 
 !

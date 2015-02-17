@@ -153,7 +153,7 @@
 	    IF(L1 .NE. 0)THEN
 	      STRING=ADJUSTL(STRING)
 	      FORMAT_DATE(1:11)=STRING(1:11)
-	      IF(FORMAT_DATE .NE. '17-Oct-2000')THEN
+	      IF(FORMAT_DATE .NE. '17-Oct-2000' .AND. FORMAT_DATE .NE. '17-Jun-2014')THEN
 	        WRITE(LUER,*)'Error in GENOSC_V8: reading ',TRIM(FILNAME)
 	        WRITE(LUER,*)'Invalid format date: ',TRIM(FORMAT_DATE)
 	        STOP

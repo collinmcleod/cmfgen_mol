@@ -164,6 +164,7 @@
 	INTEGER  NO_HYDRO_ITS
 	INTEGER  NO_ITS_DONE
 	INTEGER  ITERATION_COUNTER
+	INTEGER  VEL_LAW
 !
 	INTEGER  LU
 	INTEGER  LUV
@@ -197,6 +198,7 @@
 	MDOT=MOD_MDOT
 	RMAX=MOD_RMAX/OLD_R(OLD_ND)
 	VTURB=MOD_VTURB
+	VEL_LAW=ITWO
 !
 	VC_ON_SS=0.75D0
 	TAU_REF=2.0D0/3.0D0
@@ -258,6 +260,7 @@
 	CALL RD_STORE_DBLE(VC_ON_SS,'VC_ON_SS',L_FALSE,'Connection velocity on sound speed')
 	CALL RD_STORE_LOG(UPDATE_GREY_SCL,'UP_GREY_SCL',L_FALSE,'Update GREY_SCL_FAC_IN')
 	CALL RD_STORE_DBLE(TAU_REF,'TAU_REF',L_FALSE,'Reference radius for g and Teff')
+	CALL RD_STORE_INT(VEL_LAW,'VEL_LAW',L_FALSE,'Velocity law for wind region (2 or 3)')
 	BETA2=BETA
 	CALL RD_STORE_DBLE(BETA2,'BETA2',L_FALSE,'Second exponent for velocity law')
 !
@@ -512,7 +515,7 @@
 	        END IF
 	      END DO
 	      CALL WIND_VEL_LAW_V2(R,V,SIGMA,VINF,BETA,BETA2,RMAX,
-	1          CONNECTION_RADIUS,CONNECTION_VEL,T2,ITWO,J,ND_MAX)
+	1          CONNECTION_RADIUS,CONNECTION_VEL,T2,VEL_LAW,J,ND_MAX)
 	      DO I=1,J
 	        POP_ATOM(I)=MDOT/MU_ATOM/R(I)/R(I)/V(I)
 	      END DO
@@ -628,7 +631,7 @@
 ! Set estimates at current location. Then integrate hydrostatic
 ! equation using 4th order Runge-Kutta.
 !
-	    IF(VERBOSE_OUTPUT)WRITE(LUV,'(5X,A,5X)')'  dPdR','dTAUdR','  T_EST','   dPn',' dTAUn'
+	    IF(VERBOSE_OUTPUT)WRITE(LUV,'(5(5X,A,5X))')'  dPdR','dTAUdR','  T_EST','   dPn',' dTAUn'
 100	    P_EST=P(I-1)
 	    TAU_EST=TAU(I-1)
 	    T_EST=T(I-1)
