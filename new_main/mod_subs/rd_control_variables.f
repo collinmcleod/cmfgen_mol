@@ -3,6 +3,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 15-Feb-2015 : Added INSTANTANEOUS_ENERGY_DEPOSITION option (12-Jan-2015 on OSPREY[cur_cmf_gam])
 ! Altered : 02/07-Nov-2011 : Changed location of COMP_GREY_LST_IT so that set for all model.
 ! Altered : 05-Apr-2011 : Changed the way REVISE_R_GRID is handled. Variable controlling
 !                           R grid revision now read in by routine do the R-grid revision.
@@ -283,6 +284,9 @@ C
 	1           'Method to get T with non-GRID option (USE_T_IN or USE_HYDRO)')
 	    CALL RD_STORE_NCHAR(GAMRAY_TRANS,'GAMRAY_TRANS',ITEN,L_TRUE,
 	1           'NONLOCAL or LOCAL gamma-ray enegry transport')
+	    INSTANTANEOUS_ENERGY_DEPOSITION=.FALSE.
+	    CALL RD_STORE_LOG(INSTANTANEOUS_ENERGY_DEPOSITION,'INS_DEP',L_FALSE,'Instantaneous gamma-ray energy deposition?')
+!
 	    N_IB_INS=2
 	    N_OB_INS=3
 	    RMAX_ON_RCORE=-1.0D0		!Implies use default.

@@ -70,7 +70,7 @@
 	IOS=0
 	NX=0
 	DO I=1,NX_RD
-	  READ(LU,'(A)',END=500,IOSTAT=IOS)STRING
+100	  READ(LU,'(A)',END=500,IOSTAT=IOS)STRING
 	  IF(IOS .EQ. 0 .AND. STRING(1:1) .NE. '!' .AND. STRING .NE. ' ')THEN
 	    READ(STRING,*,IOSTAT=IOS)(TEMP_VAR(L),L=1,K)
 	    IF(IOS .EQ. 0)THEN
@@ -80,14 +80,15 @@
 	    END IF
 	  END IF
 	  IF(IOS .NE. 0)THEN
-	    WRITE(T_OUT,*)'Error in reading plot from file:',TRIM(FILNAME)
+	    WRITE(T_OUT,*)'Error in reading record from file:',TRIM(FILNAME)
 	    WRITE(T_OUT,*)'Data point number is:',I
 	    WRITE(T_OUT,*)'Erronous record follows'
 	    WRITE(T_OUT,'(A)')TRIM(STRING)
 	    IF(NX .LT. 2)THEN
 	      IOS=1
-	      WRITE(T_OUT,*)'No data passed to plotting package'
-	    ELSE
+	      WRITE(T_OUT,*)'Skipping to next record'
+	      GOTO 100
+	  ELSE
 	      WRITE(T_OUT,*)NX,' data points passed to plotting package'
 	    END IF
 	    RETURN

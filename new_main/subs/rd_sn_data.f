@@ -9,6 +9,8 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 30-Jan-2015: Mass of each isotope is now output to SPECIES_MASSES
+!                        Now call GET_NON_LOCAL_GAMMA_ENERGY_V2
 ! Altered  8-Nov-2009: Isotope/total population consistency check included.
 ! Altered 24-Jun-2009: PURE_HUBBLE_FLOW now stored in CONTROL_VARIABLE_MOD
 ! Altered 02-Apr-2009: Now set fixed abundance specifiers, normally read in, to surface values.
@@ -43,6 +45,7 @@
 	CHARACTER(LEN=10), ALLOCATABLE :: SPEC_HYDRO(:)
 	CHARACTER(LEN=10), ALLOCATABLE :: ISO_SPEC_HYDRO(:)
 !
+	REAL*8 MASS_SPECIES(100)
 	REAL*8 WRK(ND)
 	REAL*8 LOG_R(ND)
 	REAL*8 DELTA_T_SECS
@@ -173,6 +176,7 @@
 !	    WRITE(LUER,'(I5,A,I5,2ES14.4)')L,TRIM(ISO_SPEC_HYDRO(L)),BARY_HYDRO(L),ISO_HYDRO(1,L),ISO_HYDRO(NX,L)
 	    STRING=' '
 	  END DO
+	CLOSE(UNIT=LU)
 !
 	IF(PURE_HUBBLE_FLOW)THEN
 	  T1=24.0D0*3600.0D0*1.0D+05*OLD_SN_AGE_DAYS/1.0D+10
@@ -281,6 +285,19 @@
 	WRITE(6,*)'   Maximum normalization factor was',MAXVAL(WRK)
 	WRITE(6,*)'   Minimum normalization factor was',MINVAL(WRK)
 !
+! Compute the mass of each species present in the ejecta.
+!
+	MASS_SPECIES=0.0D0
+	DO L=1,NUM_SPECIES
+	  IF(SPECIES_PRES(L))THEN
+	    DO K=1,ND
+	      WRK(K)=POP_SPECIES(K,L)*DENSITY(K)*R(K)*R(K)
+	    END DO
+	    CALL LUM_FROM_ETA(WRK,R,ND)
+	    MASS_SPECIES(L)=4.0D0*3.1416D0*SUM(WRK(1:ND))/1.989D+03
+	  END IF
+	END DO
+!
 ! Now compute the atomic population of each species.
 !
 	DO L=1,NUM_SPECIES
@@ -360,13 +377,47 @@
 	  STOP
 	END IF
 	DELTA_T_SECS=24.0D0*3600.0D0*(SN_AGE_DAYS-OLD_SN_AGE_DAYS)
-	CALL DO_SPECIES_DECAYS(DELTA_T_SECS,ND)
+	CALL DO_SPECIES_DECAYS_V2(INSTANTANEOUS_ENERGY_DEPOSITION,DELTA_T_SECS,ND)
+	IF(ABS(DELTA_T_SECS/SN_AGE_DAYS) .LT. 1.0D-05 .AND. 
+	1     (INCL_DJDT_TERMS .OR. DO_CO_MOV_DDT) )THEN
+	  WRITE(LUER,'(/,/,1X,A80)')('*',I=1,79)
+	  WRITE(LUER,*)'Error in RD_SN_DATA'
+	  WRITE(LUER,*)'You have requested time depndent calculations but have a very small time step'
+	  WRITE(LUER,*)'DELTA_T_SECS=',DELTA_T_SECS
+	  WRITE(LUER,*)'SN_AGE_DAYS=',SN_AGE_DAYS
+	  WRITE(LUER,*)'OLD_SN_AGE_DAYS=',OLD_SN_AGE_DAYS
+	  STOP
+	END IF
         DO IS=1,NUM_ISOTOPES
           ISO(IS)%POP=ISO(IS)%OLD_POP_DECAY
         END DO
 	DO IP=1,NUM_PARENTS
 	  POP_SPECIES(1:ND,PAR(IP)%ISPEC)=PAR(IP)%OLD_POP_DECAY
 	END DO
+!
+! Compute the mass for each isotope.
+!
+	OPEN(UNIT=LU,FILE='SPECIES_MASSES',STATUS='UNKNOWN')
+	DO L=1,NUM_SPECIES
+	  IF(SPECIES_PRES(L))THEN
+	    T2=0.0D0
+	    DO IS=1,NUM_ISOTOPES
+	      IF(ISO(IS)%SPECIES .EQ. SPECIES(L))THEN
+	        DO K=1,ND
+	          WRK(K)=ISO(IS)%POP(K)*R(K)*R(K)
+	        END DO
+	        CALL LUM_FROM_ETA(WRK,R,ND)
+	        T1=4.0D0*3.1416D0*1.66D-24*SUM(WRK(1:ND))*ISO(IS)%MASS/1.989D+03
+	        IF(T1 .NE. 0)WRITE(LU,'(A,T8,ES11.3,4X,I3)')TRIM(SPECIES(L)),T1,ISO(IS)%BARYON_NUMBER
+	        T2=T2+T1
+	      END IF
+	    END DO
+	    IF(T2 .NE. 0.0D0)MASS_SPECIES(L)=T2
+	    WRITE(LU,'(A,T8,ES11.3)')TRIM(SPECIES(L)),MASS_SPECIES(L)
+	  END IF
+	END DO
+	WRITE(LU,*)'Total ejecta mass of model is ',SUM(MASS_SPECIES)
+	CLOSE(UNIT=LU)
 !
 ! Compute total ATOM population.
 !
@@ -386,7 +437,7 @@
 ! Get non-local energy deposition, if important.
 ! This replaces that computed by DO_SPECIES_DECAYS computed earlier.
 !
-	CALL GET_NON_LOCAL_GAMMA_ENERGY(V,ND,LU)
+	CALL GET_NON_LOCAL_GAMMA_ENERGY_V2(R,V,ND,LU)
 !
 	CALL OUT_SN_POPS_V3('SN_DATA_INPUT_CHK',SN_AGE_DAYS,USE_OLD_MF_OUTPUT,ND,LU)
 !

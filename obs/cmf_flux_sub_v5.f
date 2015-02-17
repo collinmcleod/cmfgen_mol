@@ -1797,6 +1797,10 @@
 	  CLOSE(UNIT=82)
 	END IF
 !
+! Output errors that have occurred in MOM_J_CMF
+!
+        I=1; CALL WRITE_J_CMF_ERR(I)
+!
 ! Compute ROSSELAND and FLUX mean opacities. Compute the respective
 ! optical depth scales; TA for the FLUX mean optical depth scale, 
 ! and TB for the ROSSELAND mean optical depth scale.

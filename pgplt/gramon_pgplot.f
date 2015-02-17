@@ -7,6 +7,7 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered:  17-Feb-2015 : Can now have multi-colored titles.
 ! Altered:  22-Jan-2015 : Bug fix. SC option for scrolling changed to SCR.
 !                         SC is reserved for entering strings by cursor
 ! Altered:  14-Jan-2014 : Revised LG option
@@ -208,6 +209,7 @@
 	REAL*4 XVAL_SAV,YVAL_SAV
 	REAL*4, ALLOCATABLE :: TA(:)
 !
+	INTEGER, SAVE :: PEN_OFFSET
 	INTEGER BEG
 	INTEGER Q	!Used for pen color
 !
@@ -312,6 +314,7 @@
 	  PLT_LINE_WGT=1
           PLT_ST_FILENAME=' '
 	  LINE_WGT(:)=1
+	  PEN_OFFSET=1
 	END IF
 	TITLE(1:N_TITLE)=' '
 !
@@ -573,7 +576,7 @@
                     IF(FLAGSTR(I))THEN
                       WRITE(33,17)LOC(I),XSTR(I),YSTR(I),ORIENTATION(I),
 	1                   STR_EXP(I),STR_COL(I),TRIM(STRING(I))
-17	              FORMAT(1X,I1,', ',4(F9.4,','),I3,',',1X,1H',A,1H')
+17	              FORMAT(1X,I1,', ',4(ES12.4,','),I3,',',1X,1H',A,1H')
 	           END IF
 	         END DO
                 CLOSE(UNIT=33)
@@ -857,6 +860,9 @@ C
 	  CALL CHANGE_PEN(PEN_COL,MAXPEN,NPLTS)
 	  GOTO 1000
 !
+	ELSE IF(ANS .EQ. 'SFP')THEN
+	  CALL NEW_GEN_IN(PEN_OFFSET,'First colored pen: 0 [black], 1 [red]')
+!
 ! Reset default pen color. Useful after GP option.
 !
 	ELSE IF(ANS .EQ. 'RCP')THEN
@@ -886,9 +892,6 @@ C
             CALL PGQCR(I,RED(I),GREEN(I),BLUE(I))
           END DO
 	  GOTO 1000
-!
-! Supposed to allow scrolling.
-!
 	ELSE IF(ANS .EQ. 'SCR')THEN
 	  T1=100; T2=0.2
 	  CALL PGSCRL(T1,T2)
@@ -932,8 +935,8 @@ C
 	  GOTO 1000
 !
 	ELSE IF( ANS .EQ. 'W')THEN
-	    CALL NEW_GEN_IN(LINE_WGT,I,NPLTS,
-	1                'Line Weight:: 1,2 etc')
+	    CALL NEW_GEN_IN(LINE_WGT,I,NPLTS,'Line Weight:: 1,2 etc')
+	    IF(LINE_WGT(1) .LT. 0)LINE_WGT(1:NPLTS)=ABS(LINE_WGT(1))
 	ELSE IF( ANS .EQ. 'WE')THEN
 	  DO IP=1,NPLTS			!Edit individually
 	    CALL NEW_GEN_IN(LINE_WGT(IP),'Line weights (1,...,5)')
@@ -1135,8 +1138,8 @@ C
 	      CALL NEW_GEN_IN(STRING(ISTR),'STRING')
 	    END IF
 	  END DO
-	  STR=.TRUE.
 	  GOTO 1000
+	  STR=.TRUE.
 !
 	ELSE IF (ANS .EQ. 'SC')THEN
 	  INIT=.FALSE.          !Strings automatically initialized first time.
@@ -2328,8 +2331,8 @@ C
 	DO IP=1,NPLTS
 	  CALL PGSLW(LINE_WGT(IP))
 	  CALL PGSLS(LINE_STYLE(IP))
-	  Q=PEN_COL(IP+1)
-	  CALL PGSCI(Q)     ! START WITH COLOR INDEX 2
+	  Q=PEN_COL(IP+PEN_OFFSET)
+	  CALL PGSCI(Q)     ! START WITH COLOR INDEX 2 when PEN_OFFSET is 1 (default)
 !
 ! Checks whether we are installing a right axis.
 !
@@ -2520,6 +2523,7 @@ C
 ! LOC_PG negative.
 !
 	IF(STR)THEN
+	  WRITE(6,*)'Calling Justify'
 	  CALL JUSTIFY_CONVERT_V2(XSTR,YSTR,LOC,LOC_PG,ORIENTATION,FLAGSTR,
      *    XSTRPOS,YSTRPOS,STRING,MAXSTR)
 	  T1=(XSTRPOS(I)-XPAR(1))*(XPAR(2)-XSTRPOS(I))
@@ -2529,8 +2533,9 @@ C
 	    IF(FLAGSTR(I) .AND. T1 .GT. 0 .AND. T2 .GT. 0)THEN
 	      CALL PGSCI(STR_COL(I))
 	      CALL PGSCH(EXPCHAR*STR_EXP(I))
-	      CALL PGPTXT(XSTRPOS(I),YSTRPOS(I),ORIENTATION(I),
-	1                            LOC_PG(I),STRING(I))
+	      WRITE(6,*)'Calling PUT_TEXT'
+!	        CALL PGPTXT(XSTRPOS(I),YSTRPOS(I),ORIENTATION(I),LOC_PG(I),STRING(I))
+	      CALL PUT_TEXT(XSTRPOS(I),YSTRPOS(I),ORIENTATION(I),LOC_PG(I),STRING(I))
 	    END IF
 	  END DO
 	END IF

@@ -235,7 +235,10 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
-! Alteerd: 15-Feb-2014 : Changed to V7. Added IB_STAB_FACTOR to call.
+! Altered: 17-Feb-2015 : Check that |r^2.H| < r^2.J
+!                          Modified error output to MOM_J_ERRORS
+!                          [OSPREY/cur_cmf_gam: 24-Jan-2015]
+! Altered: 15-Feb-2014 : Changed to V7. Added IB_STAB_FACTOR to call.
 ! Altered: 28-Jan-2012 : Minor bug fix. dLOG_NU was being used with HOLLOW option when INIT was true.
 ! Altered: 25-Aug-2010 : Bug fix with IN_NBC_SAVE/ IN_HBC_SAVE. Both values
 !                          incorrectly set because of type'o.
@@ -327,6 +330,7 @@
 	INTEGER, PARAMETER :: IONE=1
 !
 	LOGICAL ACCURATE
+	LOGICAL FILE_OPEN
 !
 ! 
 !
@@ -508,7 +512,14 @@
 	  KMID_ON_J(1:ND)=0.0D0
           NMID_ON_J(1:ND)=0.0D0
 	  dlnGRSQJdlnR(1:ND)=0.0D0
+          INQUIRE(UNIT=47,OPENED=FILE_OPEN)
+	  IF(FILE_OPEN)THEN
+            REWIND(47)
+          ELSE
+            OPEN(UNIT=47,FILE='MOM_J_ERRORS',STATUS='UNKNOWN')
+          END IF
 	END IF
+!
 	DO I=1,ND
 	  IF(NMID_ON_HMID(I) .GT. 1.0D0)NMID_ON_HMID(I)=1.0D0
 	END DO
@@ -832,6 +843,7 @@
 !
 	  DO I=1,ND
 	    IF(XM(I) .LT. 0)THEN
+	      WRITE(47,'(I5,ES16.8,10ES13.4)')I,FREQ,XM(I),ETA(I),CHI(I),ESEC(I),K_ON_J(I),XM(MAX(1,I-2):MIN(I+2,ND))
 	      XM(I)=ABS(XM(I))/10.0D0
 	      RECORDED_ERROR=.FALSE.
 	      J=1
@@ -839,9 +851,9 @@
 	        IF(MOM_ERR_ON_FREQ(J) .EQ. FREQ)RECORDED_ERROR=.TRUE.
 	        J=J+1
 	      END DO
-	      IF(.NOT. RECORDED_ERROR .AND. MOM_ERR_CNT .LT. N_ERR_MAX)THEN
+	      IF(.NOT. RECORDED_ERROR)THEN
 	        MOM_ERR_CNT=MOM_ERR_CNT+1
-	        MOM_ERR_ON_FREQ(MOM_ERR_CNT)=FREQ
+	        IF(MOM_ERR_CNT .LT. N_ERR_MAX)MOM_ERR_ON_FREQ(MOM_ERR_CNT)=FREQ
 	      END IF	
 	    END IF
 	  END DO
@@ -851,6 +863,17 @@
 	    GAM_RSQHNU(I)=HU(I)*XM(I+1)-HL(I)*XM(I)+HS(I)*GAM_RSQHNU_PREV(I) +
 	1        ( EPS_PREV(I)*(GAM_RSQJNU_PREV(I)+GAM_RSQJNU_PREV(I+1)) -
 	1          EPS(I)*(XM(I)+XM(I+1)) )
+	  END DO
+!
+! Make sure H satisfies the basic requirement that it is less than J.
+!
+	  DO I=1,ND-1
+	    T1=(XM(I)+XM(I+1))/2.0D0
+	    IF(GAM_RSQHNU(I) .GT. T1)THEN
+	       GAM_RSQHNU(I)=0.99D0*T1
+	    ELSE IF(GAM_RSQHNU(I) .LT. -T1)THEN
+	       GAM_RSQHNU(I)=-0.99D0*T1
+	    END IF
 	  END DO
 !
 	  IF(.NOT. INCL_ADVEC_TERMS)THEN
@@ -919,7 +942,7 @@
           RSQHNU_SM(I)=T1*GAM_RSQHNU(K)
         END DO
 !
-	HFLUX_AT_OB=IN_HBC_SAVE/R_SM(ND_SM)/R_SM(ND_SM)
+	HFLUX_AT_OB=IN_HBC_SAVE/R_SM(ND)/R_SM(ND)
 	IF(OUTER_BND_METH .EQ. 'HONJ')THEN
 	  HFLUX_AT_OB=HBC*JNU_SM(1)
 	END IF

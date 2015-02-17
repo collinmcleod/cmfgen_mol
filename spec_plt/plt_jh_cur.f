@@ -7,8 +7,10 @@
 !
 	PROGRAM PLT_JH_CUR
 !
-! Altered 8-Oct-2011   : Improved plot labeling, pass RSQ? to DP_CNVRT routine.
-! Created 5-April-2009 : Based on PLT_JH (plots EDDFACTOR).
+! Altered 17-Feb-2015   : Code plots r^2H at midpoint of R (as defined).
+!                         [OSPREY cur/cmf: 17-Jan-2015] 
+! Altered  8-Oct-2011   : Improved plot labeling, pass RSQ? to DP_CNVRT routine.
+! Created  5-April-2009 : Based on PLT_JH (plots EDDFACTOR).
 ! Interface routines for IO routines.
 !
 	USE MOD_USR_OPTION
@@ -66,6 +68,7 @@
 ! Vectors for passing data to plot package via calls to CURVE.
 !
 	REAL*8, ALLOCATABLE :: XV(:)
+	REAL*8, ALLOCATABLE :: XV_MID(:)
 	REAL*8, ALLOCATABLE :: YV(:)
 	REAL*8, ALLOCATABLE :: ZV(:)
 !
@@ -111,6 +114,7 @@
 	REAL*8 TEMP
 	REAL*8 DTDR
 	REAL*8 RADIUS
+	REAL*8 LAMBDA
 	REAL*8 T1,T2,T3
 	REAL*8 PI
 	REAL*8 LAMC
@@ -171,6 +175,7 @@
 	C_CMS=SPEED_OF_LIGHT()
 	C_KMS=1.0D-05*C_CMS
 	XAX_OPTION='XLOGR'
+	LAMBDA=5000.0D0
 !
         CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
 !
@@ -247,7 +252,7 @@
 	WRITE(T_OUT,*)'Number of frequencies is ',ZM(ID)%NCF
 !
 	I=MAX(ZM(ID)%ND,ZM(ID)%NCF)
-	ALLOCATE (XV(I),YV(I),ZV(I))
+	ALLOCATE (XV(I),XV_MID(I),YV(I),ZV(I))
 	XV_LENGTH=I
 !
 ! Set default data types
@@ -569,7 +574,7 @@
 	  CALL GEN_IN(NORM,'Normalize J(Grey) by outer boundary value?')
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND
-	    CALL SET_X_AXIS(XV,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
+	    CALL SET_X_AXIS_V2(XV,XV_MID,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
 	    WRITE(6,*)'R^2.J at outer boundary is',1.0D+20*ZM(ID)%JGREY(1),'ergs/s'
 	    IF(NORM)THEN
 	      YV(1:ND)=ZM(ID)%JGREY(1:ND)/ZM(ID)%JGREY(1)
@@ -585,7 +590,7 @@
 	  CALL GEN_IN(NORM,'Normalize H(Grey) by outer boundary value?')
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND
-	    CALL SET_X_AXIS(XV,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
+	    CALL SET_X_AXIS_V2(XV,XV_MID,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
 	    WRITE(6,*)'R^2.H at outer boundary is',1.0D+20*ZM(ID)%HGREY(1),'ergs/s'
 	    IF(NORM)THEN
 	      YV(1:ND)=ZM(ID)%HGREY(1:ND)/ZM(ID)%HGREY(1)
@@ -607,7 +612,8 @@
 	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
 	    I=ISAV
 	    IF(ID .NE. 1 .AND. ND .NE. ZM(1)%ND)CALL USR_OPTION(I,'Depth',' ','Depth index')
-	    IF(I .GT. ND)THEN
+	    IF(I .GT. ND .OR. I .LT. 1)THEN
+	      WRITE(T_OUT,*)'Invalid depth; minimum value is',1
 	      WRITE(T_OUT,*)'Invalid depth; maximum value is',ND
 	      GOTO 1
 	    END IF
@@ -630,9 +636,54 @@
 	    CALL DP_CURVE(NCF,ZV,YV)
 	  END DO
 !
+	ELSE IF(X(1:2) .EQ. 'DJ' .OR. X(1:2) .EQ. 'DH')THEN
+!
+	  SCALE_FAC=1.0D0
+	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0','Scale factor to prevent overflow')
+	  CALL USR_OPTION(I,'Depth',' ','Depth index')
+	  ISAV=I
+	  DO ID=1,NUM_FILES
+	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
+	    I=ISAV
+	    IF(ID .NE. 1 .AND. ND .NE. ZM(1)%ND)CALL USR_OPTION(I,'Depth',' ','Depth index')
+	    IF(I .GT. ND .OR. I .LT. 1)THEN
+	      WRITE(T_OUT,*)'Invalid depth; minimum value is',1
+	      WRITE(T_OUT,*)'Invalid depth; maximum value is',ND
+	      GOTO 1
+	    END IF
+	    IF(ID .EQ. 1 .AND. ND .EQ. ND_ATM)THEN
+	      CALL DERIVCHI(TB,T,R,ND,'LOGLOG')
+	      TEMP=T(I); DTDR=TB(I); RADIUS=R(I)
+	      WRITE(T_OUT,'(X,A,1P,E14.6)')'    R(I)/R*=',R(I)/R(ND)
+	      WRITE(T_OUT,'(X,A,1P,E14.6)')'       V(I)=',V(I)
+	      WRITE(T_OUT,'(X,A,1P,E14.6)')'       T(I)=',T(I)
+	      WRITE(T_OUT,'(X,A,1P,E14.6)')'      ED(I)=',ED(I)
+	      WRITE(T_OUT,'(X,A,1P,E14.6)')'TAU_ROSS(I)=',TAU_ROSS(I)
+	      WRITE(T_OUT,'(X,A,1P,E14.6)')'  TAU_ES(I)=',TAU_ES(I)
+	    END IF
+!
+	    YV(1)=0.0D0
+	    ZV(1:NCF)=ZM(ID)%NU(1:NCF)
+	    DO J=2,NCF
+	      IF(X(1:2) .EQ.  'DJ')YV(J)=ABS(ZM(ID)%RJ(I,J+1)-ZM(ID)%RJ(I,J))/MIN(ZM(ID)%RJ(I,J+1),ZM(ID)%RJ(I,J))
+	    END DO
+	    CALL DP_CNVRT_J_V2(ZV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	1         ZM(ID)%DATA_TYPE,LAMC,XAXIS,YAXIS,L_TRUE)
+	    CALL DP_CURVE(NCF,ZV,YV)
+!
+	  END DO
+!
 	ELSE IF(X(1:3) .EQ. 'JNU' .OR. X(1:3) .EQ. 'HNU')THEN
-	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  DEFAULT=WR_STRING(LAMBDA)
+	  CALL USR_OPTION(LAMBDA,'Lambda',DEFAULT,'Wavelength in Ang (-ve for 10^15 Hz)')
+	  IF(LAMBDA .EQ. 0.0D0)THEN
+	    WRITE(6,*)'Invalid wavelength -- cannot be zero'
+	    GOTO 3						!return to get new option
+	  ELSE IF(LAMBDA .LT. 0.0D0)THEN
+	    T1=ABS(LAMBDA)
+	  ELSE
+	     T1=0.299794D+04/LAMBDA
+	  END IF
 !
 	  SCALE_FAC=1.0D0
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0','Scale factor to prevent overflow')
@@ -645,7 +696,7 @@
 	    WRITE(6,*)'Index=',I,'NCF=',NCF
 	    WRITE(6,*)'Freq=',ZM(ID)%NU(I)
 !
-	    CALL SET_X_AXIS(XV,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
+	    CALL SET_X_AXIS_V2(XV,XV_MID,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
 	    DO J=1,ND
 	      IF(X(1:3) .EQ. 'JNU')YV(J)=ZM(ID)%RJ(J,I)
 	      IF(X(1:3) .EQ. 'HNU')YV(J)=ZM(ID)%HFLUX(J,I)
@@ -659,7 +710,11 @@
 	        END IF
 	      END DO
 	    END IF
-	    CALL DP_CURVE(ND,XV,YV)
+	    IF(X(1:3) .EQ. 'JNU')THEN
+	      CALL DP_CURVE(ND,XV,YV)
+	    ELSE
+	      CALL DP_CURVE(ND-1,XV_MID,YV)
+	    END IF
           END DO
 !
 	ELSE IF(X(1:3) .EQ. 'CFD')THEN
@@ -744,7 +799,7 @@
 	      IF(TMP_LOG)YAXIS='J/B'
 	    END IF
 !
-	    CALL SET_X_AXIS(XV,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
+	    CALL SET_X_AXIS_V2(XV,XV_MID,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
 	    IF(TMP_LOG)THEN
 	      DO I=1,ND
 	        YV(I)=0.1D0*PI*TA(I)/R(I)/R(I)/5.670400D-05/(T(I)**4)
@@ -796,7 +851,7 @@
 	        ZV(I)=ZV(I)+T1*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML+1))
               END DO
             END DO
-	    CALL SET_X_AXIS(XV,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
+	    CALL SET_X_AXIS_V2(XV,XV_MID,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
             YV=0.5D+15*YV; ZV=0.5D+15*ZV
             CALL DP_CURVE(ND,XV,YV)
             CALL DP_CURVE(ND,XV,ZV)
@@ -876,39 +931,49 @@
 	RETURN
    	END
 !
-	SUBROUTINE SET_X_AXIS(XV,XAXIS,R,V,XAX_OPTION,ND)
+	SUBROUTINE SET_X_AXIS_V2(XV,XV_MID,XAXIS,R,V,XAX_OPTION,ND)
 	IMPLICIT NONE
 !
 	INTEGER ND
 	REAL*8 XV(ND)
+	REAL*8 XV_MID(ND)
 	REAL*8 R(ND)
 	REAL*8 V(ND)
 	CHARACTER(LEN=*) XAXIS,XAX_OPTION
 	INTEGER I
 !
 	IF(XAX_OPTION .EQ. 'XLOGR')THEN
-	  DO I=1,ND
+	  DO I=1,ND-1
 	    XV(I)=LOG10(R(I))
+	    XV_MID(I)=LOG10(0.5D0*(R(I)+R(I+1)))
 	  END DO
+	  XV(ND)=LOG10(R(ND))
 	  XAXIS='Log R(10\u10\d cm)'
 	ELSE IF(XAX_OPTION .EQ. 'XLOGV')THEN
-	  DO I=1,ND
+	  DO I=1,ND-1
 	    XV(I)=LOG10(V(I))
+	    XV_MID(I)=LOG10(0.5D0*(V(I)+V(I+1)))
 	  END DO
+	  XV(ND)=LOG10(V(ND))
 	  XAXIS='Log V(km/s)'
 	ELSE IF(XAX_OPTION .EQ. 'XLINR')THEN
-	  DO I=1,ND
+	  DO I=1,ND-1
 	    XV(I)=R(I)
+	    XV_MID(I)=0.5D0*(R(I)+R(I+1))
 	  END DO
+	  XV(ND)=R(ND)
 	  XAXIS='R(10\u10\d cm)'
 	ELSE IF(XAX_OPTION .EQ. 'XVEL')THEN
-	  DO I=1,ND
+	  DO I=1,ND-1
 	    XV(I)=V(I)
+	    XV_MID(I)=0.5D0*(V(I)+V(I+1))
 	  END DO
 	ELSE IF(XAX_OPTION .EQ. 'XN')THEN
-	  DO I=1,ND
+	  DO I=1,ND-1
 	    XV(I)=I
+	    XV_MID(I)=I+0.5D0
 	  END DO
+	  XV(ND)=ND
 	  XAXIS='I'
 	END IF
 !

@@ -134,24 +134,32 @@
 ! Read in optical depth scale. Needed for RTAU and TAU options. Also used
 ! for checking purposes (if available) for some other options.
 !
+! We use TAU_SAV for dTAU, and is used to increase the precision of the TAU
+! scale (as insufficient digits may be print out).
+!
 	ROUND_ERROR=.FALSE.
 	OPEN(UNIT=20,FILE='MEANOPAC',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .EQ. 0)THEN
 	    READ(20,'(A)')STRING
 	    DO I=1,ND
-	      READ(20,*)RTMP(I),J,OLD_TAU(I)
+	      READ(20,*)RTMP(I),J,OLD_TAU(I),TAU_SAV(I)
 	      J=MAX(I,2)
 	      T1=R(J-1)-R(J)
 	      IF( ABS(RTMP(I)-R(I))/T1 .GT. 2.0D-03 .AND. .NOT. ROUND_ERROR)THEN
-	        WRITE(6,*)ABS(RTMP(I)-R(I))/T1
+	        WRITE(6,*)' '
 	        WRITE(6,*)'Possible eror with MEANOPAC -- inconsistent R grid'
-	        WRITE(6,*)'R(I)=',R(I)
-	        WRITE(6,*)'RTMP(I)=',RTMP(I)
+	        WRITE(6,*)'Error could simply be a lack of sig. digits in MEANOPAC'
+	        WRITE(6,*)' RMO(I)=',RTMP(I)
+	        WRITE(6,*)'   R(I)=',R(I)
+	        WRITE(6,*)' R(I+1)=',R(I+1)
 	        ROUND_ERROR=.TRUE.
 	        CALL GEN_IN(ROUND_ERROR,'Continue as only rounding error?')
 	        IF(.NOT. ROUND_ERROR)STOP
 	      END IF
 	    END DO
+	    DO I=8,1,-1
+              OLD_TAU(I)=OLD_TAU(I+1)-TAU_SAV(I)
+            END DO
 	    RD_MEANOPAC=.TRUE.
 	  ELSE
 	    RD_MEANOPAC=.FALSE.
@@ -185,24 +193,34 @@
 	  DTAU2_ON_DTAU1=100.0D0
 	  dLOGT_MAX=0.05D0
 !
+	  WRITE(6,'(A)')BLUE_PEN
 	  WRITE(6,'(A)')' '
 	  CALL GEN_IN(NEW_ND,'Input new number of depth points')
+	  WRITE(6,'(A)')RED_PEN
+	  WRITE(6,'(A)')' The following factor is used to adjust the importance of the dR to the change in dTAU '
+	  WRITE(6,'(A)')BLUE_PEN
 	  CALL GEN_IN(R_SCALE_FAC,'Factor (>1) to enhance maximum dLog(R) spacing')
-	  CALL GEN_IN(dLOGT_MAX,'Maximum fractional change in the temperature')
+	  CALL GEN_IN(dLOGT_MAX,'Maximum fractional change in the temperature: set to > 1.0 to switch T check off')
 !
 	  WRITE(6,'(A)')BLUE_PEN
 	  CALL GEN_IN(NIB,'Number of depth points to insert at INNER boundary')
 	  CALL GEN_IN(IB_RAT,'Ratio in optical depth increments at INNER boundry (>1)')
 !
-	  WRITE(6,'(A)')RED_PEN
 	  CALL GEN_IN(NOB,'Number of depth points to insert at OUTER boundary')
-	  CALL GEN_IN(OB_RAT,'Ratio in optical depth increments at OUTER boundry (>1)')
+	  IF(NOB .NE. 1)CALL GEN_IN(OB_RAT,'Ratio in optical depth increments at OUTER boundry (>1)')
+	  WRITE(6,'(A)')RED_PEN
+	  WRITE(6,'(A)')' The following factor stretches the optical depth scale so that more points'
+	  WRITE(6,'(A)')' are placed near the outer boundary (>=0 & < 1):'
+	  WRITE(6,'(A)')BLUE_PEN
 	  CALL GEN_IN(SCL_FAC,'Factor to scale optical depth at OUTER boundary: TAU=TAU-SF*TAU(1)')
+	  IF(SCL_FAC .LT. 0.0D0 .OR. SCL_FAC .GE. 1.0D0)THEN
+	    WRITE(6,*)'Invalid scale factor: should be >=0 and < 1.0'
+	    STOP
+	  END IF
 	  CALL GEN_IN(DTAU2_ON_DTAU1,'~DTAU(2)/DTAU(1) at outer boudary')
 	  WRITE(6,'(A)')DEF_PEN
 !
 	  T1=OLD_TAU(1)
-	  WRITE(6,*)T1
 	  DO I=1,ND
 	    OLD_TAU(I)=OLD_TAU(I)-SCL_FAC*T1
 	  END DO
@@ -329,6 +347,7 @@
 !
 ! We can do anther region if desired.
 !
+	    TAU_MIN=0.0D0
 	    CALL GEN_IN(TAU_MIN,'Minimum of TAU range for revision (=<0) to exit.')
 	  END DO
 !

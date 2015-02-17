@@ -6,6 +6,8 @@
 	1                  SN_AGE_DAYS,PURE_HUBBLE_FLOW,N_IB_INS,N_OB_INS,RDINR,ND,LU)
 	IMPLICIT NONE
 !
+! Altered 25-Jan-2015 : Bug fix. Error assoicated with RDINR when NLEV> ND.
+!                         Now read in to T1, since we don't requird the level populations.
 ! Altered 09-Jul-2013 : Now use to depths 1 and 8 (rather than 1 & 2) to estimate boundary optical depth.
 ! Altered 28-Aug-2012 : Incorrect dimension (ND instead of J) was being passed to
 !                         MON_INTERP. Causes access issue/crash rather than wrong result.
@@ -266,7 +268,7 @@
 !
 	  DO I=1,ND
 	    READ(LU,*,IOSTAT=IOS)R(I),TA(I),TA(I),TA(I),TA(I),V(I)
-	    IF(IOS .EQ. 0)READ(LU,*,IOSTAT=IOS)(TA(J),J=1,NOLD)
+	    IF(IOS .EQ. 0)READ(LU,*,IOSTAT=IOS)(T1,J=1,NOLD)
 	    IF(IOS .NE. 0)THEN
 	      LUER=ERROR_LU()
 	      WRITE(LUER,*)'Error in SET_RV_HYDRO_MODEL_V3 --- unable to R grid in file with R grid'

@@ -20,6 +20,7 @@ OBJ = $(LIB)(usr_option.o)\
       $(LIB)(new_gen_in.o)\
       $(LIB)(get_indx.o)\
       $(LIB)(read_keyword.o)\
+      $(LIB)(rd_sing_vec_rvtj.o)\
       $(LIB)(set_case_fn.o)\
       $(LIB)(sve_file.o)\
       $(LIB)(update_keyword.o)\

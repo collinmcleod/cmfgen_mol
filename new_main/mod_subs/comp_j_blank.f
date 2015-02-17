@@ -35,6 +35,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 17-Feb-2015 : r^2.J and r^2.H now ouput on last iteration when using USE_LAM_ES option.
 ! Altered : 14-Dec-2014 : RSQHNU etc now set to one when not computing J. This avoids issues with
 !                             possible NaNs.
 ! Altered : 16-Dec-2013 : CMF_FORM_SOL_V2 (non EXT option) no longer called when ND > 199.
@@ -691,6 +692,14 @@ C
 	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
                HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
 	       CALL GET_RSQH_REL(RSQHNU,R,V,FL,ND)
+	       IF(LST_ITERATION)THEN
+	         DO I=1,ND
+	           TA(I)=RJ(I)*R(I)*R(I)
+	         END DO 
+	         T1=HFLUX_AT_IB*R(ND)*R(ND)
+	         T2=HFLUX_AT_OB/RJ(1)
+	         CALL OUT_JH(TA,RSQHNU,T1,T2,FL,NCF,R,V,ND,FIRST_FREQ,'NORMAL')
+	       END IF
 	     ELSE
 	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling MOM_J_CMF_V8'
 	       CALL MOM_J_CMF_V8(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,

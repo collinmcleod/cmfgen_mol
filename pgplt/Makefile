@@ -33,7 +33,9 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(mon_num.o)\
       $(LIB)(monbord_v3.o)\
       $(LIB)(moninside.o)\
+      $(LIB)(put_text.o)\
       $(LIB)(simp_ew.o)\
+      $(LIB)(strip_slash_p.o)\
       $(LIB)(spacing.o)\
       $(LIB)(vectorpen.o)\
       $(LIB)(gaus_fit_data.o)\

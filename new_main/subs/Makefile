@@ -24,10 +24,11 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(determine_nse.o)\
       $(LIB)(det_lte_ed.o)\
       $(LIB)(ddt_work.o)\
+      $(LIB)(do_species_decays_v2.o)\
       $(LIB)(do_full_r_grid_v1.o)\
       $(LIB)(do_vel_regrid_v2.o)\
       $(LIB)(do_tau_regrid_v2.o)\
-      $(LIB)(do_gam_abs_approx.o)\
+      $(LIB)(do_gam_abs_approx_v2.o)\
       $(LIB)(do_cmf_hydro_v2.o)\
       $(LIB)(do_ng_accel_band_v2.o)\
       $(LIB)(eval_adiabatic_v3.o)\
@@ -40,7 +41,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(fixpop_t.o)\
       $(LIB)(fixpop_in_ba_v3.o)\
       $(LIB)(generate_full_matrix_v3.o)\
-      $(LIB)(get_non_loc_gamma_energy.o)\
+      $(LIB)(get_non_loc_gamma_energy_v2.o)\
       $(LIB)(get_pops_at_prev_time_step_v5.o)\
       $(LIB)(old_grid_module.o)\
       $(LIB)(prevent_low_t.o)\
