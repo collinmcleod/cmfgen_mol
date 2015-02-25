@@ -1338,12 +1338,18 @@ C
 	  CALL NEW_GEN_IN(ID_SCL,'Factor to scale line location')
 	  CALL NEW_GEN_IN(ID_EXPCHAR,'Factor to scale size of ID')
 	  GOTO 1000
+!
 	ELSE IF(ANS .EQ. 'SID')THEN
 	  CALL NEW_GEN_IN(ID_SCL,'Factor to scale line location')
 	  CALL NEW_GEN_IN(ID_VEC_BEG,'Location to start ID line')
 	  CALL NEW_GEN_IN(ID_VEC_END,'Location to end ID line')
 	  CALL NEW_GEN_IN(ID_EXPCHAR,'Factor to scale size of ID')
 	  N_OMIT_ID=0
+!
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)RED_PEN,'Species name are case sensitive and have no spaces'
+	  WRITE(T_OUT,*)'Use SiIII etc',DEF_PEN
+	  WRITE(T_OUT,*)' '
 	  DO I=1,10
 	    OMIT_ID(I)='ZZ'
 	    CALL NEW_GEN_IN(OMIT_ID(I),'Species ID to OMIT from labels')
@@ -2549,14 +2555,14 @@ C
 	  DO I=1,N_LINE_IDS
 	    WR_ID(I)=.TRUE.
 	    DO J=1,N_OMIT_ID
-	      IF( INDEX(LINE_ID(I),TRIM(OMIT_ID(J))) .NE. 0 )THEN
+	      IF( INDEX(LINE_ID(I),TRIM(OMIT_ID(J))//' ') .NE. 0)THEN
 	        WR_ID(I)=.FALSE.
 	        EXIT
 	      END IF
 	    END DO
 	    DO J=1,N_INC_ID
 	      IF(J .EQ. 1)WR_ID(I)=.FALSE.
-	      IF( INDEX(LINE_ID(I),TRIM(INC_ID(J))) .NE. 0 )THEN
+	      IF( INDEX(LINE_ID(I),TRIM(INC_ID(J))//' ') .NE. 0 )THEN
 	        WR_ID(I)=.TRUE.
 	        EXIT
 	      END IF

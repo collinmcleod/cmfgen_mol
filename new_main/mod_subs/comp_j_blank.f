@@ -173,7 +173,7 @@ C
 	    END DO
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJEXT(I),I=1,NDEXT),T1
-	    IF(T1 .NE. FL)THEN
+	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
 	      WRITE(LUER,*)'Error - incorrect reading of mean intensity'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
@@ -298,9 +298,8 @@ C
 	    END IF
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJEXT(I),I=1,NDEXT),T1
-	    IF(T1 .NE. FL)THEN
-	      WRITE(LUER,*)'Error - incorrect reading of'//
-	1                  ' the mean intensity'
+	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
+	      WRITE(LUER,*)'Error - incorrect reading of the mean intensity'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
 	      STOP
@@ -311,7 +310,7 @@ C If we are using incoherent electron scattering, RJEXT_ES must be available.
 C
 	  IF(.NOT. COHERENT_ES)THEN
 	    READ(LU_ES,REC=ACCESS_F)(RJEXT_ES(I),I=1,NDEXT),T1
-	    IF(T1 .NE. FL)THEN
+	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
 	      WRITE(LUER,*)'Error - incorrect reading of'//
 	1                ' the mean intensity'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
@@ -354,10 +353,10 @@ C
 	1            ESECEXT(1:NDEXT)*RJEXT_ES(1:NDEXT)
 	     END IF
 	     CALL TUNE(IONE,'MOM_J_CMF_ACC')
-	     CALL MOM_J_CMF_V8(TA,CHIEXT,ESECEXT,VEXT,SIGMAEXT,REXT,
+	     CALL MOM_J_CMF_V9(TA,CHIEXT,ESECEXT,VEXT,SIGMAEXT,REXT,
 	1  	       RJEXT,RSQHNU,VDOP_VEC_EXT,DELV_FRAC_MOM,
 	1              FL,dLOG_NU,DIF,DBB,IC,
-	1              N_TYPE,METHOD,COHERENT_ES,OUT_BC_TYPE,
+	1              N_TYPE,CHECK_H_ON_J,METHOD,COHERENT_ES,OUT_BC_TYPE,
 	1              FIRST_FREQ,NEW_FREQ,NCEXT,NPEXT,NDEXT)
 	     CALL TUNE(ITWO,'MOM_J_CMF_ACC')
              IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJEXT(NDEXT)
@@ -561,9 +560,8 @@ C
 	    END IF
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJ(I),I=1,ND),T1
-	    IF(T1 .NE. FL)THEN
-	      WRITE(LUER,*)'Error - incorrect reading of'//
-	1                  ' the mean intensity'
+	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
+	      WRITE(LUER,*)'Error - incorrect reading of the mean intensity'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
 	      STOP
@@ -702,13 +700,21 @@ C
 	       END IF
 	     ELSE
 	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling MOM_J_CMF_V8'
-	       CALL MOM_J_CMF_V8(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
+	       CALL MOM_J_CMF_V9(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
 	1              RJ,RSQHNU,VDOP_VEC,DELV_FRAC_MOM,
 	1              FL,dLOG_NU,DIF,DBB,IC,
-	1              N_TYPE,METHOD,COHERENT_ES,OUT_BC_TYPE,
+	1              N_TYPE,CHECK_H_ON_J,METHOD,COHERENT_ES,OUT_BC_TYPE,
 	1              FIRST_FREQ,NEW_FREQ,NC,NP,ND)
 	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
                HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
+	       IF(LST_ITERATION .AND. WRITE_JH)THEN
+	         DO I=1,ND
+	           TA(I)=RJ(I)*R(I)*R(I)
+	         END DO
+	         T1=HFLUX_AT_IB*R(ND)*R(ND)
+	         T2=HFLUX_AT_OB/RJ(1)
+	         CALL OUT_JH(TA,RSQHNU,T1,T2,FL,NCF,R,V,ND,FIRST_FREQ,'NORMAL')
+	       END IF
 	     END IF
 	     CALL TUNE(ITWO,'MOM_J_CMF')
 C

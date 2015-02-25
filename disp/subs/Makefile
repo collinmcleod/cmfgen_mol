@@ -22,6 +22,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(gam_abs.o)\
       $(LIB)(get_dtaulam.o)\
       $(LIB)(get_filename.o)\
+      $(LIB)(get_flux_deficit.o)\
       $(LIB)(get_line_indices.o)\
       $(LIB)(hamtuvgh.o)\
       $(LIB)(ham_formsol.o)\
@@ -77,7 +78,7 @@ GEN =  $(LIB_DIR)libtools.a(gen_in.o)\
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f 
-	$(F90) -c $(FG)  $<
+	$(F90) -c $(FD)  $<
 	ar ruv $(LIB) $*.o
 
 $(LIB)(%.o) : %.f90 ../mod_disp.o $(NT)

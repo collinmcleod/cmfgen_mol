@@ -44,6 +44,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(k_weight.o)\
       $(LIB)(n_weight.o)\
       $(LIB)(mom_j_cmf_v8.o)\
+      $(LIB)(mom_j_cmf_v9.o)\
       $(LIB)(mom_j_ddt_v2.o)\
       $(LIB)(mom_j_pp_v1.o)\
       $(LIB)(mom_jrel_v7.o)\
@@ -62,6 +63,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(var_mom_j_ddt_v2.o)\
       $(LIB)(var_mom_pp_v1.o)\
       $(LIB)(var_mom_j_cmf_v9.o)\
+      $(LIB)(var_mom_j_cmf_v10.o)\
       $(LIB)(var_mom_jext_cmf_v3.o)\
       $(LIB)(velocity_law.o)
 

@@ -235,6 +235,7 @@
 	REAL*8 T1,T2,T3,T4
 	REAL*8 TMP_ED
 	REAL*8 TAU_LIM
+	REAL*8 DEPTH_LIM
 	REAL*8 TEMP,TSTAR,NEW_RSTAR,NEW_VSTAR
 	REAL*8 VSM_DIE_KMS
 	REAL*8 DIST_KPC
@@ -583,6 +584,7 @@
 	    END DO
 	  END IF
 	END DO
+	WRITE(6,*)'Total number of line transition is',ML
 !
 !
 ! 
@@ -2734,9 +2736,9 @@
 	ELSE IF(XOPT .EQ. 'LNID')THEN
 !
 	  WRITE(T_OUT,'(A)')' '
-	  WRITE(T_OUT,'(A)')'Create line ID file for stars with weak winds.'
-	  WRITE(T_OUT,'(A)')'The list is created based on the line optical depth at a give Tau(e.s.)'
-	  WRITE(T_OUT,'(A)')'Use XTAUC and TAUC option to find Tau(e.s) at Tau(cont)=2/3'
+	  WRITE(T_OUT,'(A)')' Create line ID file for stars with weak winds.'
+	  WRITE(T_OUT,'(A)')' The list is created based on the line optical depth at a give Tau(e.s.)'
+	  WRITE(T_OUT,'(A)')' Use XTAUC and TAUC option to find Tau(e.s) at Tau(cont)=2/3'
 	  WRITE(T_OUT,'(A)')' '
 	  DO I=1,ND
 	    ESEC(I)=6.65D-15*ED(I)
@@ -2830,6 +2832,104 @@
 	  CLOSE(UNIT=73)
 ! 
 !
+! Designed for use with plane-parallel models. We compute the central intesnity of
+! each line to deduce line-identifcations.
+!
+	ELSE IF(XOPT .EQ. 'PLNID')THEN
+!
+	  WRITE(T_OUT,'(A)')' '
+	  WRITE(T_OUT,'(A)')' Create line ID file for plane-paraell models'
+	  WRITE(T_OUT,'(A)')' The list is created based on the central line intensity'
+	  WRITE(T_OUT,'(A)')' '
+	  CALL USR_OPTION(VTURB,'VTURB','10.0','Turbulent velcity for line profile (units km/s)?')
+!
+	  DEFAULT='0.01'
+	  CALL USR_OPTION(DEPTH_LIM,'DEPTH',DEFAULT,
+	1        'Output lines whose central depth from the continuum is > LIMIT')
+	  CALL USR_OPTION(FLAG,'ADD','F','Add transition name to output file?')
+!
+	  WRITE(T_OUT,'(A)')' '
+	  DEFAULT=WR_STRING(LAM_ST)
+	  CALL USR_OPTION(LAM_ST,'LAMST',DEFAULT,FREQ_INPUT)
+	  DEFAULT=WR_STRING(LAM_EN)
+	  CALL USR_OPTION(LAM_EN,'LAMEN',DEFAULT,FREQ_INPUT)
+	  DEFAULT='LINE_ID'
+	  CALL USR_OPTION(FILENAME,'FILE',DEFAULT,'Output file for line IDs')
+	  CALL GEN_ASCI_OPEN(73,FILENAME,'UNKNOWN',' ',' ',IZERO,IOS)
+!
+! MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
+!
+! Determine index range encompassing desired wavelength range.
+!
+	  NU_ST=ANG_TO_HZ/LAM_ST
+	  IF(NU_ST .LT. VEC_FREQ(1))THEN
+	    NL=GET_INDX_DP(NU_ST,VEC_FREQ,N_LINE_FREQ)
+	    IF(VEC_FREQ(NL) .GT. NU_ST)NL=NL+1
+	  ELSE
+	    NL=1
+	  END IF
+!
+	  NU_EN=ANG_TO_HZ/LAM_EN
+	  IF(NU_EN .GT. VEC_FREQ(N_LINE_FREQ))THEN
+	    NUP=GET_INDX_DP(NU_EN,VEC_FREQ,N_LINE_FREQ)
+	    IF(VEC_FREQ(NUP) .LT. NU_EN)NUP=NUP-1
+	  ELSE
+	    NUP=N_LINE_FREQ
+	  END IF
+	  WRITE(6,*)' '
+	  WRITE(6,*)'Number of line transitions in the interval is',NUP-NL+1
+!
+	  DO LINE_INDX=NL,NUP
+	    MNL_F=VEC_MNL_F(LINE_INDX)
+	    MNUP_F=VEC_MNUP_F(LINE_INDX)
+	    FL=VEC_FREQ(LINE_INDX)
+!
+	    INCLUDE 'OPACITIES.INC'
+!
+! Compute DBB and DDBBDT for diffusion approximation. DBB=dB/dR
+! and DDBBDT= dB/dTR .
+!
+	    T1=HDKT*FL/T(ND)
+	    T2=1.0D0-EMHNUKT(ND)
+	    DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
+	    IF(.NOT. DIF)DBB=0.0D0
+!
+! Adjust the opacities and emissivities for the influence of clumping.
+!
+	    DO I=1,ND
+	      ETA(I)=ETA(I)*CLUMP_FAC(I)
+	      CHI(I)=CHI(I)*CLUMP_FAC(I)
+	      ESEC(I)=ESEC(I)*CLUMP_FAC(I)
+	      CHI_RAY(I)=CHI_RAY(I)*CLUMP_FAC(I)
+	      CHI_SCAT(I)=CHI_SCAT(I)*CLUMP_FAC(I)
+	    END DO
+!
+! ID must be set here as it modified by OPACITIES.INC
+!
+	    ID=VEC_ION_INDX(LINE_INDX)
+	    GLDGU=ATM(ID)%GXzV_F(MNL_F)/ATM(ID)%GXzV_F(MNUP_F)
+	    DO I=1,ND
+	      T1=ATM(ID)%W_XzV_F(MNUP_F,I)/ATM(ID)%W_XzV_F(MNL_F,I)
+	      CHIL(I)=OPLIN*ATM(ID)%AXzV_F(MNL_F,MNUP_F)*(T1*ATM(ID)%XzV_F(MNL_F,I)-GLDGU*ATM(ID)%XzV_F(MNUP_F,I) )
+	      ETAL(I)=EMLIN*FREQ*ATM(ID)%AXzV_F(MNUP_F,MNL_F)*ATM(ID)%XzV_F(MNUP_F,I)
+	      T2=12.86D0*SQRT( T(I)/AT_MASS(SPECIES_LNK(ID))+(VTURB/12.86D0)**2 )/C_KMS
+	      T2=1.0D-15/FL/T2/SQRT(PI)
+	      CHIL(I)=MAX(T2*CHIL(I)*CLUMP_FAC(I),1.0D-10)
+	      ETAL(I)=ETAL(I)*T2*CLUMP_FAC(I)
+	    END DO
+	    CALL GET_FLUX_DEFICIT(T2,R,ETA,CHI,CHI_RAY,CHI_SCAT,ESEC,ETAL,CHIL,FL,DBB,ND)
+!
+	    IF(ABS(T2).GT. DEPTH_LIM)THEN
+	      STRING=' ';  IF(FLAG)STRING=VEC_TRANS_NAME(LINE_INDX)
+	      WRITE(73,'(A,3ES14.5,3X,F3.0,I6,5X,A)')ION_ID(ID),ANG_TO_HZ/FL,
+	1                               T2,ANG_TO_HZ/FL,1.0,2,TRIM(STRING)
+	    END IF
+	    IF(MOD(LINE_INDX-NL,MAX(10,(NUP-NL)/10)) .EQ. 0)THEN
+	      WRITE(6,'(A,I7,A,I7,A)')' Done',LINE_INDX-NL+1,' of ',NUP-NL+1,' lines'
+	    END IF
+	  END DO
+	  CLOSE(UNIT=73)
+!
 ! Section to allow various line optical deph and wavelength distributions to be examined.
 !
 ! 1. POW: Plots the # of lines in Log(Tau) or Log(Line strength) space. Each uniform logarithmic bin

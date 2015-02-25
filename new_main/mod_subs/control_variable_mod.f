@@ -18,6 +18,7 @@
 	INTEGER, PARAMETER :: IFOUR=4
 	INTEGER, PARAMETER :: IFIVE=5
 	INTEGER, PARAMETER :: ISIX=6
+	INTEGER, PARAMETER :: ISEV=7
 	INTEGER, PARAMETER :: ITEN=10
 !
 	REAL*8, PARAMETER :: RZERO=0.0D0
@@ -261,6 +262,7 @@
 ! Method to handle N moment  (N_ON_J, MIXED, or G_ONLY)
 !
 	CHARACTER(LEN=6)  N_TYPE
+	LOGICAL CHECK_H_ON_J
 !
 ! These insert extra points into the grid when solving for the radition field.
 ! These insertions are done internally, and do not directly effect the returned
@@ -556,5 +558,6 @@
         LOGICAL SOBOLEV
         LOGICAL VERBOSE_OUTPUT
 	LOGICAL WRITE_RATES
+	LOGICAL WRITE_JH
 !
 	END MODULE CONTROL_VARIABLE_MOD

@@ -1780,9 +1780,8 @@
 	       STRING(1:)=STRING(2:)
 	  END DO
 	  STRING='Continuum Frequencies ( '//TRIM(STRING)//' )'
-	  CALL WRITV_V2(OBS_FREQ,N_OBS,ISIX,TRIM(STRING),LU_FLUX)
-	  CALL WRITV_V2(OBS_FLUX,N_OBS,IFOUR,
-	1                    'Observed intensity (Janskys)',LU_FLUX)
+	  CALL WRITV_V2(OBS_FREQ,N_OBS,ISEV,TRIM(STRING),LU_FLUX)
+	  CALL WRITV_V2(OBS_FLUX,N_OBS,IFOUR,'Observed intensity (Janskys)',LU_FLUX)
 	  CALL WRITV(RLUMST,ND,'Luminosity',LU_FLUX)
 	CLOSE(UNIT=LU_FLUX)
 !
@@ -1843,15 +1842,15 @@
 	TA(ND)=0.0D0; TB(ND)=0.0D0; TC(ND)=0.0D0; DTAU(ND)=0.0D0
 	CALL GEN_ASCI_OPEN(LU_OPAC,'MEANOPAC','UNKNOWN',' ',' ',IZERO,IOS)
 	  WRITE(LU_OPAC,
-	1  '( ''     R        I   Tau(Ross)   /\Tau   Rat(Ross)'//
+	1  '( ''     R        I    Tau(Ross)   /\Tau   Rat(Ross)'//
 	1  '  Chi(Ross)  Chi(ross)  Chi(Flux)   Chi(es) '//
-	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)'' )' )
+	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)     Kappa   V(km/s)'' )' )
 	  IF(R(1) .GE. 1.0D+05)THEN
-	    FMT='( 1X,1P,E10.4,2X,I3,1X,0P,F9.3,1P,2(2X,E8.2),1X,'//
-	1        '4(2X,E9.3),0P,2(2X,F8.2),1P,2(2X,E8.2) )'
+	    FMT='( 1X,ES12.6,2X,I3,1X,ES9.3,2(2X,ES8.2),1X,'//
+	1        '4(2X,ES9.3),6(2X,ES8.2) )'
 	  ELSE
-	    FMT='( 1X,F10.4,2X,I3,1X,F9.3,1P,2(2X,E8.2),1X,'//
-	1        '4(2X,E9.3),0P,2(2X,F8.2),1P,2(2X,E8.2) )'
+	    FMT='( 1X,F12.6,2X,I3,1X,ES9.3,2(2X,ES8.2),1X,'//
+	1        '4(2X,ES9.3),6(2X,ES8.2) )'
 	  END IF
 	  DO I=1,ND
 	    IF(I .EQ. 1)THEN
@@ -1869,7 +1868,7 @@
 	    END IF
 	    WRITE(LU_OPAC,FMT)R(I),I,T1,TA(I),TC(1),
 	1      ROSSMEAN(I),INT_dBdT(I),FLUXMEAN(I),ESEC(I),
-	1      T2,T3,TC(2),TC(3)
+	1      T2,T3,TC(2),TC(3),1.0D-10*ROSS_MEAN(I)/DENSITY(I),V(I)
 	  END DO
 	CLOSE(UNIT=LU_OPAC)
 !
@@ -2008,9 +2007,8 @@
 	       STRING(1:)=STRING(2:)
 	  END DO
 	  STRING='Continuum Frequencies ( '//TRIM(STRING)//' )'
-	  CALL WRITV_V2(OBS_FREQ,N_OBS,ISIX,TRIM(STRING),LU_FLUX)
-	  CALL WRITV_V2(OBS_FLUX,N_OBS,IFOUR,
-	1                     'Observed intensity (Janskys)',LU_FLUX)
+	  CALL WRITV_V2(OBS_FREQ,N_OBS,ISEV,TRIM(STRING),LU_FLUX)
+	  CALL WRITV_V2(OBS_FLUX,N_OBS,IFOUR,'Observed intensity (Janskys)',LU_FLUX)
 	CLOSE(UNIT=LU_FLUX)
 !
 ! At present the line EW's are automatically computed when the

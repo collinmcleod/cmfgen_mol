@@ -60,7 +60,7 @@
 	IF(OPTIONS(1) .EQ. 'RVSIG_COL')THEN
 	  CALL GEN_ASCI_OPEN(LUIN,'RVSIG_COL','OLD',' ','READ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN
-	    WRITE(LUER,*)'Error in RD_RV_FILE: IOSTAT=',IOS
+	    WRITE(LUER,*)'Error in RD_RV_FILE_V2: IOSTAT=',IOS
 	    WRITE(LUER,*)'Unable to open RVSIG_COL'
 	    STOP
 	  END IF
@@ -70,7 +70,7 @@
 	  END DO
 	  READ(STRING,*)ND_LOC
 	  IF(ND_LOC .NE. ND)THEN
-	    WRITE(LUER,*)'Error in RD_RV_FILE'
+	    WRITE(LUER,*)'Error in RD_RV_FILE_V2'
 	    WRITE(LUER,*)'Routine can''t yet handle a differnet number of depth points'
 	    STOP
 	  END IF
@@ -84,7 +84,12 @@
 	  BACKSPACE(LUIN)
 !
 	  DO I=1,ND
-	    READ(LUIN,*)R(I),V(I),SIGMA(I)
+	    READ(LUIN,*,IOSTAT=IOS)R(I),V(I),SIGMA(I)
+	    IF(IOS .NE. 0)THEN
+	      WRITE(LUER,*)'Error in RD_RV_FILE_V2: IOSTAT=',IOS
+	      WRITE(LUER,*)'Error reading R, V & SIGMA -- check correct # of data values'
+	      STOP
+	    END IF
 	  END DO
 	  CLOSE(LUIN)
 !
@@ -94,7 +99,7 @@
 	  T1=R(ND)
 	  R(1:ND)=R(1:ND)*(RP/T1)
 	  IF(ABS(R(1)-RMAX) .GT. 0.1D0*(R(1)-R(2)))THEN
-	    WRITE(LUER,*)'Error in RD_RV_FILE'
+	    WRITE(LUER,*)'Error in RD_RV_FILE_V2'
 	    WRITE(LUER,*)'R(1)/R(ND) must match RMAX/RP'
 	    WRITE(LUER,*)'R(1)/R(ND)=',R(1)/R(ND)
 	    STOP
@@ -107,7 +112,7 @@ C Read data from Alex Dekoter''s program.
 C
 	  CALL GEN_ASCI_OPEN(LUIN,'deKOTER','OLD',' ','READ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN
-	    WRITE(LUER,*)'Error in RD_RV_FILE: IOSTAT=',IOS
+	    WRITE(LUER,*)'Error in RD_RV_FILE_V2: IOSTAT=',IOS
 	    WRITE(LUER,*)'Unable to open RVSIG_COL'
 	    STOP
 	  END IF
@@ -122,7 +127,7 @@ C
 	  READ(LUIN,*)ND_LOC
 !
 	  IF(ND_LOC .NE. ND-1)THEN
-	    WRITE(LUER,*)'Error in RD_RV_FILE'
+	    WRITE(LUER,*)'Error in RD_RV_FILE_V2'
 	    WRITE(LUER,*)'Routine can''t yet handle a differnet number of depth points'
 	    WRITE(LUER,*)'ND in file should be 1 less than in CMFGEN'
 	    STOP

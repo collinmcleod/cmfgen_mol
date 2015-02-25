@@ -2,7 +2,7 @@
 ! Data module for MOM_J_CMF_V8. Data placed in this module is automatically
 ! saved between subroutine calls..
 !
-	MODULE MOD_MOM_J_V8
+	MODULE MOD_MOM_J_V9
 	IMPLICIT NONE
 !
 ! To be dimenensioned ND_SM where ND_SM is the size of the R grid
@@ -80,7 +80,7 @@
 	DATA FIRST_TIME/.TRUE./
 	DATA VDOP_FRAC_SAVE/-10001.1D0/    !Absurd value
 !
-	END MODULE MOD_MOM_J_V8
+	END MODULE MOD_MOM_J_V9
 !
 !
 !
@@ -109,17 +109,18 @@
 !     IF N_TYPE='MIXED' (in FG_J_CMF_V4) one of G or NMID_ON_J is
 !       non-zero, and is the value to be used in MOM_J_CMF
 !
-	SUBROUTINE MOM_J_CMF_V8(ETA_SM,CHI_SM,ESEC_SM,
+	SUBROUTINE MOM_J_CMF_V9(ETA_SM,CHI_SM,ESEC_SM,
 	1                  V_SM,SIGMA_SM,R_SM,
 	1                  JNU,RSQHNU_SM,
 	1                  VDOP_VEC,VDOP_FRAC,
 	1                  FREQ,dLOG_NU,DIF,DBB,IC,
-	1                  N_TYPE,METHOD,COHERENT,OUT_BC_TYPE,
+	1                  N_TYPE,CHECK_H_ON_J,METHOD,COHERENT,OUT_BC_TYPE,
 	1                  INIT,NEW_FREQ,NC,NP,ND_SM)
 	USE MOD_MOM_J_V8
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered: 24-Feb-2015: Added CHECK_H_ON_J to call.
 ! Created: 17-Dec-2008: Based on MOM_J_CMF_V7
 !
 !
@@ -141,6 +142,7 @@
 !
 ! Boundary conditions.
 !
+	LOGICAL CHECK_H_ON_J
 	INTEGER OUT_BC_TYPE
 	REAL*8 DBB,IC,FREQ,dLOG_NU
 	CHARACTER*6 METHOD
@@ -671,9 +673,9 @@
 	      IF(MOM_ERR_ON_FREQ(J) .EQ. FREQ)RECORDED_ERROR=.TRUE.
 	      J=J+1
 	    END DO
-	    IF(.NOT. RECORDED_ERROR .AND. MOM_ERR_CNT .LT. N_ERR_MAX)THEN
+	    IF(.NOT. RECORDED_ERROR)THEN
 	      MOM_ERR_CNT=MOM_ERR_CNT+1
-	      MOM_ERR_ON_FREQ(MOM_ERR_CNT)=FREQ
+	      IF(MOM_ERR_CNT .LE. N_ERR_MAX)MOM_ERR_ON_FREQ(MOM_ERR_CNT)=FREQ
 	    END IF	
 	  END IF
 	END DO
@@ -696,15 +698,17 @@
 !
 ! Make sure H satisfies the basic requirement that it is less than J.
 !
-!	DO I=1,ND-1
-!	  T1=(RSQJNU(I)+RSQJNU(I+1))/2.0D0
-!	  T1=MAX(RSQJNU(I),RSQJNU(I+1))
-!	  IF(RSQHNU(I) .GT. T1)THEN
-!	    RSQHNU(I)=0.99D0*T1
-!	  ELSE IF(RSQHNU(I) .LT. -T1)THEN
-!	    RSQHNU(I)=-0.99D0*T1
-!	  END IF
-!	END DO
+	IF(CHECK_H_ON_J)THEN
+	  DO I=1,ND-1
+	    T1=(RSQJNU(I)+RSQJNU(I+1))/2.0D0
+	    T1=MAX(RSQJNU(I),RSQJNU(I+1))
+	    IF(RSQHNU(I) .GT. T1)THEN
+	      RSQHNU(I)=0.99999D0*T1
+	    ELSE IF(RSQHNU(I) .LT. -T1)THEN
+	      RSQHNU(I)=-0.99999D0*T1
+	    END IF
+	  END DO
+	END IF
 !
 ! Regrid derived J and RSQH values onto small grid. We devide RSQJ by R^2 so that
 ! we return J.
