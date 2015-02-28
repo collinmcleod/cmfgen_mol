@@ -78,7 +78,7 @@ GEN =  $(LIB_DIR)libtools.a(gen_in.o)\
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f 
-	$(F90) -c $(FD)  $<
+	$(F90) -c $(FG)  $<
 	ar ruv $(LIB) $*.o
 
 $(LIB)(%.o) : %.f90 ../mod_disp.o $(NT)
