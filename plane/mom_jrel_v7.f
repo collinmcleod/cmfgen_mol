@@ -841,19 +841,19 @@
 !
 ! Check that no negative mean intensities have been computed.
 !
+	  RECORDED_ERROR=.FALSE.
 	  DO I=1,ND
 	    IF(XM(I) .LT. 0)THEN
 	      WRITE(47,'(I5,ES16.8,10ES13.4)')I,FREQ,XM(I),ETA(I),CHI(I),ESEC(I),K_ON_J(I),XM(MAX(1,I-2):MIN(I+2,ND))
 	      XM(I)=ABS(XM(I))/10.0D0
-	      RECORDED_ERROR=.FALSE.
-	      J=1
-	      DO WHILE (J .LE. MOM_ERR_CNT .AND. .NOT. RECORDED_ERROR)
-	        IF(MOM_ERR_ON_FREQ(J) .EQ. FREQ)RECORDED_ERROR=.TRUE.
-	        J=J+1
-	      END DO
 	      IF(.NOT. RECORDED_ERROR)THEN
-	        MOM_ERR_CNT=MOM_ERR_CNT+1
-	        IF(MOM_ERR_CNT .LT. N_ERR_MAX)MOM_ERR_ON_FREQ(MOM_ERR_CNT)=FREQ
+	        IF(MOM_ERR_CNT .GT. N_ERR_MAX)THEN
+	          MOM_ERR_CNT=MOM_ERR_CNT+1
+	        ELSE IF(MOM_ERR_ON_FREQ(MOM_ERR_CNT) .NE. FREQ)THEN
+	          MOM_ERR_CNT=MOM_ERR_CNT+1
+	          IF(MOM_ERR_CNT .LT. N_ERR_MAX)MOM_ERR_ON_FREQ(MOM_ERR_CNT)=FREQ
+	        END IF
+	        RECORDED_ERROR=.TRUE.
 	      END IF	
 	    END IF
 	  END DO

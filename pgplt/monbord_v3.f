@@ -342,20 +342,22 @@ C
 	  X=XPAR(1)-XTCK_SIZE
 	  DO I=1,NY
 	    Y=YNUMST+(I-1)*YINC-0.4*YCHAR_SIZE
-	    WRITE(STR,'(I4)')NINT(Y)
-	    YNUM='10\u'
-	    YNUM_LEN=4
-	    DO J=1,4
-	      IF(STR(J:J) .NE. ' ')THEN
-                YNUM=YNUM(1:YNUM_LEN)//STR(J:J)
-	        YNUM_LEN=YNUM_LEN+1
-	      END IF
-	    END DO
-            YNUM=YNUM(1:YNUM_LEN)//'\d'
-	    YNUM_LEN=YNUM_LEN+2
-	    CALL PGMOVE(X,Y)
-	    ANGLE=0.0
-	    CALL PGPTXT(X,Y,ANGLE,RONE,YNUM(1:YNUM_LEN))
+	    IF( (Y-YPAR(1))*(YPAR(2)-Y) .GT. 1.0D-04*ABS(YPAR(2)-YPAR(1)))THEN
+	      WRITE(STR,'(I4)')NINT(Y)
+	      YNUM='10\u'
+	      YNUM_LEN=4
+	      DO J=1,4
+	        IF(STR(J:J) .NE. ' ')THEN
+                  YNUM=YNUM(1:YNUM_LEN)//STR(J:J)
+	          YNUM_LEN=YNUM_LEN+1
+	        END IF
+	      END DO
+              YNUM=YNUM(1:YNUM_LEN)//'\d'
+	      YNUM_LEN=YNUM_LEN+2
+	      CALL PGMOVE(X,Y)
+	      ANGLE=0.0
+	      CALL PGPTXT(X,Y,ANGLE,RONE,YNUM(1:YNUM_LEN))
+	    END IF
 	  END DO
 	ELSE
 	  DO I=0,NY

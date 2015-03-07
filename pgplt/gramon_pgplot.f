@@ -184,7 +184,9 @@
 	REAL*8 CENTRAL_LAM
 	REAL*8 OLD_CENTRAL_LAM
 	REAL*8 C_KMS
+	REAL*8 C_VAL
 	LOGICAL AIR_LAM
+	CHARACTER(LEN=5), SAVE :: VEL_UNIT='km/s'
 !
 ! For XAR and YAR arithmetic options.
 !
@@ -1904,18 +1906,44 @@ C
 	    END DO
 	  END DO
 ! 
+!
+	ELSE IF(ANS .EQ. 'LAM')THEN
+	  WRITE(6,*)RED_PEN
+	  WRITE(6,'(A,/)')' All wavelengths are vacuum'//BLUE_PEN
+	  WRITE(6,*)'H I:     4341.692   4862.691   6564.60'
+	  WRITE(6,*)'He I:    4472.76    4923.30    5017.08    5049.15   5877.29'
+	  WRITE(6,*)'He I:    6679.99    7067.20    7283.36   10833.1  20586.9'
+	  WRITE(6,*)'He II:   4201.02    4542.86    4687.01    5413.02 '
+          WRITE(6,*)'C IV:    1548.187   1550.177   5802.92    5813.58'
+	  WRITE(6,*)'Ca II:   3707.078   3737.964   8500.35    8544.44    8664.52'
+          WRITE(6,*)'Si II:   6348.85    6373.12'
+	  WRITE(6,*)DEF_PEN
+	  GOTO 1000
+!
+	ELSE IF (ANS .EQ. 'KMS')THEN          !Recall ANS in always upper case
+	  VEL_UNIT='km/s'
+	  WRITE(6,*)'Using km/s for velocity unit'
+	  GOTO 1000
+!
+	ELSE IF (ANS .EQ. 'MMS')THEN
+	  VEL_UNIT='Mm/s'
+	  WRITE(6,*)'Using Mm/s for velocity unit'
+	  GOTO 1000
+!
 ! Convert from Ang to velocity space. Data must have been originally
 ! in Ang. This option can be done many times, as old Ang scale is
 ! restored on each call.
 !
 	ELSE IF (ANS .EQ. 'VEL')THEN
 	  C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	  C_VAL=C_KMS
+	  IF(VEL_UNIT .EQ. 'Mm/s')C_VAL=1.0D-03*C_KMS
 	  CALL NEW_GEN_IN(CENTRAL_LAM,'/\(Ang) [-ve: 10^15 Hz]')
 	  IF(CENTRAL_LAM .LT. 0)THEN
-	    CENTRAL_LAM=1.0D-02*C_KMS/ABS(CENTRAL_LAM)
+	    CENTRAL_LAM=1.0D-02*C_VAL/ABS(CENTRAL_LAM)
 	  ELSE IF(CENTRAL_LAM .GT. 2000)THEN
-	    AIR_LAM=.TRUE.
-            CALL NEW_GEN_IN(AIR_LAM,'Air /\ [only for /\ > 2000A]')
+	    AIR_LAM=.FALSE.
+            CALL NEW_GEN_IN(AIR_LAM,'Wavelength in air?')
 	    IF(AIR_LAM)CENTRAL_LAM=LAM_VAC(CENTRAL_LAM)
 	  END IF
 !
@@ -1925,7 +1953,7 @@ C
 	    DO IP=1,NPLTS
 	      DO J=1,NPTS(IP)
 	        CD(IP)%XVEC(J)=OLD_CENTRAL_LAM*
-	1                         (1.0+CD(IP)%XVEC(J)/C_KMS)
+	1                         (1.0+CD(IP)%XVEC(J)/C_VAL)
 	      END DO
 	    END DO
 	  END IF
@@ -1933,13 +1961,14 @@ C
 ! Puts X-axis in km/s
 !
 	  IF(CENTRAL_LAM .NE. 0)THEN
-	    T1=SPEED_OF_LIGHT()*1.0D-05/CENTRAL_LAM
+	    T1=C_VAL/CENTRAL_LAM
 	    DO IP=1,NPLTS
 	      DO J=1,NPTS(IP)
 	        CD(IP)%XVEC(J)=T1*(CD(IP)%XVEC(J)-CENTRAL_LAM)
 	      END DO
 	    END DO
 	    XLABEL='V(km\d \us\u-1\d)'
+	    IF(VEL_UNIT .EQ. 'Mm/s')XLABEL='V(Mm\d \us\u-1\d)'
 	  ELSE
 	    XLABEL=XLAB
 	  END IF
@@ -2011,6 +2040,20 @@ C
 	    END IF
 	  END DO
 	  GOTO 1000
+!
+	ELSE IF (ANS .EQ. 'OFF')THEN
+	  CALL NEW_GEN_IN(YAR_PLT,'Which plot? (0=ALL,-ve exits)')
+	  IP=YAR_PLT
+	  IP_ST=IP; IF(IP .EQ. 0)IP_ST=1
+	  IP_END=IP; IF(IP .EQ. 0)IP_END=NPLTS
+	  IF(IP .LT. 0 .OR. IP .GT. NPLTS)THEN
+	    WRITE(T_OUT,*)'Invalid plot number'
+	    GOTO 1000
+	  END IF
+	  CALL NEW_GEN_IN(YAR_VAL,'Offset')
+	  DO IP=IP_ST,IP_END
+	    CD(IP)%DATA=CD(IP)%DATA+YAR_VAL*(IP-IP_ST)
+	  END DO
 !
 ! Perform simple Y-axis arithmetic.
 !
