@@ -16,6 +16,9 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(change_color.o)\
       $(LIB)(change_pen.o)\
       $(LIB)(curve.o)\
+      $(LIB)(cut_points_from_plot.o)\
+      $(LIB)(define_more_pens.o)\
+      $(LIB)(do_fill.o)\
       $(LIB)(do_vec_op.o)\
       $(LIB)(do_mult_gf.o)\
       $(LIB)(draw_right_y_axis.o)\
@@ -26,6 +29,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(gaus_fit_er.o)\
       $(LIB)(get_gramon_min_max.o)\
       $(LIB)(get_pgi_file_info.o)\
+      $(LIB)(get_titles.o)\
       $(LIB)(gramon_pgplot.o)\
       $(LIB)(hist_adj.o)\
       $(LIB)(justify_convert_v2.o)\
@@ -36,6 +40,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(put_text.o)\
       $(LIB)(simp_ew.o)\
       $(LIB)(strip_slash_p.o)\
+      $(LIB)(shrink_vectors.o)\
       $(LIB)(spacing.o)\
       $(LIB)(vectorpen.o)\
       $(LIB)(gaus_fit_data.o)\

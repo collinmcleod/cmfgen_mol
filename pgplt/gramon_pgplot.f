@@ -7,6 +7,8 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered:  22-Apr-2015 : Added FILL option to fill the space between two curves that create a polygon.
+!                           ANS changed to length 4 (from 3)
 ! Altered:  17-Feb-2015 : Can now have multi-colored titles.
 ! Altered:  22-Jan-2015 : Bug fix. SC option for scrolling changed to SCR.
 !                         SC is reserved for entering strings by cursor
@@ -80,6 +82,12 @@
 	CHARACTER*1 WHICH_Y_AX(MAX_PLTS)
 	CHARACTER*80 YLABEL_R_AX
 !
+	INTEGER IFILL_PLT1(10)
+	INTEGER IFILL_PLT2(10)
+	INTEGER IFILL_CLR(10)
+	INTEGER NFILL
+	LOGICAL FILL
+!
 	INTEGER, PARAMETER :: N_TITLE=10
 	CHARACTER*80  XLABEL,YLABEL,TITLE(N_TITLE)
 	CHARACTER*(*) XLAB,YLAB,TITL,PASSED_OPT
@@ -112,6 +120,7 @@
 	REAL*4 ID_VEC_BEG
 	REAL*4 ID_VEC_END
 	REAL*4 ID_EXPCHAR
+	REAL*4 CUT_ACCURACY
 	INTEGER ID_LOC
 	INTEGER ID_LOC_PG
 	CHARACTER*10 OMIT_ID(10)
@@ -149,6 +158,7 @@
 	INTEGER MARKER_STYLE(MAX_PLTS)
 	LOGICAL HARD,TITONRHS,FIRST,FSTOPEN,DASH,MARK
 	LOGICAL INITIALIZE_ON_EXIT
+	LOGICAL, SAVE :: REVERSE_PLOTTING_ORDER=.FALSE.
 !
 ! E, cursor, and continuum parameters.
 !
@@ -197,7 +207,7 @@
 !
 ! Miscellaneous
 !
-	CHARACTER*3 ANS
+	CHARACTER*4 ANS
 	INTEGER LENGTH
 	INTEGER LAST_DP
 	REAL*4 V1,IT
@@ -220,7 +230,7 @@
 !
 ! Loop variables
 	INTEGER I,J,K,L,CNT,IP,OP
-	INTEGER IP_ST,IP_END
+	INTEGER IP_ST,IP_END,IP_INC
 !
 ! Color variables
 	REAL*4 RED(0:15),BLUE(0:15),GREEN(0:15)
@@ -317,6 +327,7 @@
           PLT_ST_FILENAME=' '
 	  LINE_WGT(:)=1
 	  PEN_OFFSET=1
+	  IFILL_PLT1=0; IFILL_PLT2=0
 	END IF
 	TITLE(1:N_TITLE)=' '
 !
@@ -416,8 +427,7 @@
 	YMAX_SAV=YMAX; YMIN_SAV=YMIN
 !
 ! Open user set workstation (default is set into the system).
-! We only ask
-! for work-station name if first call to GRAMON.
+! We only ask for work-station name if first call to GRAMON.
 !
 	WRITE(T_OUT,4) XMIN,XMAX
 4	FORMAT(' Abisca limits  :',1P2E14.4)
@@ -457,6 +467,12 @@
           DO I=0,15                  !Get these + def color representations.
             CALL PGQCR(I,RED(I),GREEN(I),BLUE(I))
           END DO
+!
+	  CALL DEFINE_MORE_PENS(MAXPEN)
+	  DO I=26,30
+	    IFILL_CLR(I-25)=I
+	  END DO
+!
 	END IF
 	FSTOPEN=.FALSE.
 	HARD=.FALSE.
@@ -842,6 +858,12 @@ C
 	  CALL NEW_GEN_IN(TITONRHS,'TITONRHS')
 	  GOTO 1000
 !
+	ELSE IF(ANS .EQ. 'GL')THEN
+	  CALL NEW_GEN_IN(FILNAME,'FILE')
+	  CALL GET_TITLES(FILNAME,TITLE,N_TITLE)
+	  CALL NEW_GEN_IN(TITONRHS,'TITONRHS')
+	  GOTO 1000
+!
 ! Switch to prevent inialization of data curves on exit from routine.
 ! By default, the plot count is set to zero on exit, and the data is lost on
 ! a new entry to the plotting package.
@@ -982,7 +1004,14 @@ C
 	    END IF
 	  END DO
 	  GOTO 1000
-!	    
+!
+	ELSE IF( ANS .EQ. 'RPO')THEN
+	  REVERSE_PLOTTING_ORDER= .NOT. REVERSE_PLOTTING_ORDER
+	  IF(REVERSE_PLOTTING_ORDER)THEN
+	    WRITE(6,*)'Order of ploting will be reversed'
+	  ELSE
+	    WRITE(6,*)'Normal order of ploting will be resumed'
+	  END IF	    
  	ELSE IF( ANS .EQ. 'D')THEN
 	  IF(DASH)THEN
             WRITE(T_OUT,*)'Now all solid line plots '
@@ -1634,10 +1663,12 @@ C
 	    CALL NEW_GEN_IN(PRINTER,'File and printer: enter ? for list')
 	    BEG=PGOPEN(PRINTER)
 	    FIRST_HARD=.FALSE.
+	    CALL DEFINE_MORE_PENS(MAXPEN)
 	  ELSE
 	    CALL NEW_GEN_IN(HARD_FILE,'Plot file')
 	    PRINTER=TRIM(HARD_FILE)//'/'//HARD_TYPE
 	    BEG=PGOPEN(PRINTER)
+	    CALL DEFINE_MORE_PENS(MAXPEN)		!Pen definitions are not saved.
 	  END IF
 !
 ! Save hard device and set default file name for net plot.
@@ -1911,13 +1942,34 @@ C
 	  WRITE(6,*)RED_PEN
 	  WRITE(6,'(A,/)')' All wavelengths are vacuum'//BLUE_PEN
 	  WRITE(6,*)'H I:     4341.692   4862.691   6564.60'
-	  WRITE(6,*)'He I:    4472.76    4923.30    5017.08    5049.15   5877.29'
-	  WRITE(6,*)'He I:    6679.99    7067.20    7283.36   10833.1  20586.9'
-	  WRITE(6,*)'He II:   4201.02    4542.86    4687.01    5413.02 '
+	  WRITE(6,*)'He I:    4472.76    4923.30    5017.08    5049.15    5877.29'
+	  WRITE(6,*)'He I:    6679.99    7067.20    7283.36   10833.1    20586.9'
+	  WRITE(6,*)'He II:   1640.42    4201.02    4542.86    4687.01    5413.02   10125.36'
           WRITE(6,*)'C IV:    1548.187   1550.177   5802.92    5813.58'
-	  WRITE(6,*)'Ca II:   3707.078   3737.964   8500.35    8544.44    8664.52'
-          WRITE(6,*)'Si II:   6348.85    6373.12'
+          WRITE(6,*)'Na I:    5889.951   5895.924'
+          WRITE(6,*)'Si II:   1190.416   1193.290  1194.500    1197.394'
+          WRITE(6,*)'Si II:   1230.749   1231.658' 
+	  WRITE(6,*)'Si II:   1260.42    1260.738  1265.002    1304.360   1309.276' 
+          WRITE(6,*)'Si II:   1526.72    1533.45    6348.85    6373.12'
+          WRITE(6,*)'Si IV:   1393.755   1402.770   4090.016   4117.264'
+	  WRITE(6,*)'Ca II:   3934.777   3969.592   7293.48    7325.91    8500.35    8544.44    8664.52'
+	
 	  WRITE(6,*)DEF_PEN
+	  GOTO 1000
+!
+	ELSE IF (ANS .EQ. 'CUT')THEN          !Recall ANS in always upper case
+	  WRITE(6,'(A)')BLUE_PEN
+	  WRITE(6,'(A)')' This option reduces the number of data points in each curve.'
+	  WRITE(6,'(A)')' It is useful for creating smaller publication quality plots.'//RED_PEN
+	  WRITE(6,'(A)')' This option cannot be undone.'//BLUE_PEN
+	  WRITE(6,'(A)')' A negative cut accuracy does nothing'
+	  WRITE(6,'(A)')' To compare with original data:'
+	  WRITE(6,'(A)')'    Store original data using WP & read after cut with RP, OR'
+	  WRITE(6,'(A)')'    do CUT, NOI, and redo plots'
+	  WRITE(6,'(A)')DEF_PEN
+	  CUT_ACCURACY=0.001D0
+	  CALL NEW_GEN_IN(CUT_ACCURACY,'Fractional accuracy to retain in plots')
+	  IF(CUT_ACCURACY .GT. 0.0)CALL SHRINK_VECTORS(CUT_ACCURACY)
 	  GOTO 1000
 !
 	ELSE IF (ANS .EQ. 'KMS')THEN          !Recall ANS in always upper case
@@ -2141,6 +2193,22 @@ C
 	  CALL NEW_GEN_IN(VAR_PLT3,'Output plot?')
 	  TYPE_CURVE(VAR_PLT3)='L'
 	  CALL DO_VEC_OP(VAR_PLT1,VAR_PLT2,VAR_PLT3,.TRUE.,VAR_OPERATION)
+	  GOTO 1000
+!
+	ELSE IF (ANS .EQ. 'FILL')THEN
+	  CALL NEW_GEN_IN(FILL,'Fill enclosed areas?')
+	  IF(FILL)THEN
+	    I=NFILL+1
+	    CALL NEW_GEN_IN(I,'Fill identifier - default is next number')
+	    IF(IFILL_PLT1(I) .EQ. 0)IFILL_PLT1(I)=1
+	    IF(IFILL_PLT2(I) .EQ. 0)IFILL_PLT2(I)=2
+	    CALL NEW_GEN_IN(IFILL_PLT1(I),'Input 1st plot')
+	    CALL NEW_GEN_IN(IFILL_PLT2(I),'Input 2nd plot')
+	    CALL NEW_GEN_IN(IFILL_CLR(I),'Color for fill region')
+	    IF(I .EQ. NFILL+1)NFILL=NFILL+1
+	  ELSE
+	    NFILL=0
+	  END IF
 	  GOTO 1000
 !
 	ELSE IF (ANS .EQ. 'CUM')THEN
@@ -2377,7 +2445,21 @@ C
 !
 ! Draw Graphs
 !
-	DO IP=1,NPLTS
+	IP_ST=1; IP_END=NPLTS; IP_INC=1
+	IF(REVERSE_PLOTTING_ORDER)THEN
+	  IP_ST=NPLTS; IP_END=1; IP_INC=-1
+	END IF
+!
+! We do the FILL option first so that the curves are drawn on TOP.
+!
+	IF(FILL)THEN
+	  DO I=1,NFILL
+	    CALL PGSCI(IFILL_CLR(I))
+	    CALL DO_FILL(XPAR,YPAR,IFILL_PLT1(I),IFILL_PLT2(I),.TRUE.)
+	  END DO
+	END IF
+!
+	DO IP=IP_ST,IP_END,IP_INC
 	  CALL PGSLW(LINE_WGT(IP))
 	  CALL PGSLS(LINE_STYLE(IP))
 	  Q=PEN_COL(IP+PEN_OFFSET)

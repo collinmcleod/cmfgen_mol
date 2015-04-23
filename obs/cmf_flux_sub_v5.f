@@ -14,6 +14,7 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered: 04-Apr-2015 : Changed SET_TWO_PHOT_V2 to _V3.
 ! Altered: 21-Jan-2013 : Change to vectors passed to SET_PRO_V3. Error probably affects IR HeI lines.
 !                           No change top UV/optical spectrum was seen.
 !                        Placed large vectors (dimension with NCF_MAX and NLINE_MAX) in module MOD_FREQ_OBS.
@@ -1081,11 +1082,12 @@
 !
 	DO ID=1,NUM_IONS
 	  ID_SAV=ID
-	  CALL SET_TWO_PHOT_V2(TRIM(ION_ID(ID)),ID_SAV,
-	1       ATM(ID)%XzVLTE,   ATM(ID)%NXzV,
-	1       ATM(ID)%XzVLTE_F, ATM(ID)%XzVLEVNAME_F, ATM(ID)%EDGEXzV_F,
-	1       ATM(ID)%GXzV_F,   ATM(ID)%F_TO_S_XzV,   ATM(ID)%NXzV_F, ND,
-	1       ATM(ID)%ZXzV,     ATM(ID)%EQXzV,        ATM(ID)%XzV_PRES)
+	  CALL SET_TWO_PHOT_V3(TRIM(ION_ID(ID)),ID_SAV,
+	1       ATM(ID)%XzVLTE,         ATM(ID)%NXzV,
+	1       ATM(ID)%XzVLTE_F_ON_S,  ATM(ID)%XzVLEVNAME_F, 
+	1       ATM(ID)%EDGEXzV_F,      ATM(ID)%GXzV_F,
+	1       ATM(ID)%F_TO_S_XzV,     ATM(ID)%NXzV_F,     ND,
+	1       ATM(ID)%ZXzV,           ATM(ID)%EQXzV,      ATM(ID)%XzV_PRES)
 	END DO
 !
 	DTDR=(T(ND)-T(ND-1))/(R(ND-1)-R(ND))
@@ -1559,9 +1561,11 @@
 !
 ! Compute continuum intensity.
 !
-	  CALL TUNE(IONE,'COMP_JCONT')
-	  INCLUDE 'COMP_JCONT_V4.INC'	
-	  CALL TUNE(ITWO,'COMP_JCONT')
+	  IF(COMPUTE_J)THEN
+	    CALL TUNE(IONE,'COMP_JCONT')
+	    INCLUDE 'COMP_JCONT_V4.INC'	
+	    CALL TUNE(ITWO,'COMP_JCONT')
+	  END IF
 !
 !
 ! Free up LINE storage locations. As we are only computing the line flux,
@@ -1582,7 +1586,8 @@
 !
 !
 	CALL TUNE(IONE,'FLUX_DIST')
-	IF(THIS_FREQ_EXT .AND. .NOT. CONT_VEL)THEN
+	IF(.NOT. COMPUTE_J)THEN
+	ELSE IF(THIS_FREQ_EXT .AND. .NOT. CONT_VEL)THEN
 !
 ! Since ETAEXT is not required any more, it will be used
 ! flux.
@@ -1679,18 +1684,20 @@
 	    INT_dBdT(I)=0.0d0
 	  END DO
 	END IF
-	T1=TWOHCSQ*HDKT*FQW(ML)*(NU(ML)**4)
-	DO I=1,ND		              !(4*PI)**2*Dex(+20)/L(sun)
-	  T2=SOB(I)*FQW(ML)*4.1274D-12
-	  RLUMST(I)=RLUMST(I)+T2
-	  J_INT(I)=J_INT(I)+RJ(I)*FQW(ML)*4.1274D-12
-	  K_INT(I)=K_INT(I)+K_MOM(I)*FQW(ML)*4.1274D-12
-	  FLUXMEAN(I)=FLUXMEAN(I)+T2*CHI(I)
-	  LINE_FLUXMEAN(I)=LINE_FLUXMEAN(I)+T2*(CHI(I)-CHI_CONT(I))
-	  T2=T1*EMHNUKT(I)/(  ( (1.0D0-EMHNUKT(I))*T(I) )**2  )
-	  INT_dBdT(I)=INT_dBdT(I)+T2
-	  ROSSMEAN(I)=ROSSMEAN(I)+T2/CHI(I)
-	END DO
+	IF(COMPUTE_J)THEN
+	  T1=TWOHCSQ*HDKT*FQW(ML)*(NU(ML)**4)
+	  DO I=1,ND		              !(4*PI)**2*Dex(+20)/L(sun)
+	    T2=SOB(I)*FQW(ML)*4.1274D-12
+	    RLUMST(I)=RLUMST(I)+T2
+	    J_INT(I)=J_INT(I)+RJ(I)*FQW(ML)*4.1274D-12
+	    K_INT(I)=K_INT(I)+K_MOM(I)*FQW(ML)*4.1274D-12
+	    FLUXMEAN(I)=FLUXMEAN(I)+T2*CHI(I)
+	    LINE_FLUXMEAN(I)=LINE_FLUXMEAN(I)+T2*(CHI(I)-CHI_CONT(I))
+	    T2=T1*EMHNUKT(I)/(  ( (1.0D0-EMHNUKT(I))*T(I) )**2  )
+	    INT_dBdT(I)=INT_dBdT(I)+T2
+	    ROSSMEAN(I)=ROSSMEAN(I)+T2/CHI(I)
+	  END DO
+	END IF
 	CALL TUNE(ITWO,'FLUX_DIST')
 !
 ! Compute and output line force contributed by each species.
@@ -1754,6 +1761,25 @@
 !
 10000	CONTINUE
 	CALL TUNE(ITWO,'MLCF')
+!
+! NB: We use K here, rather than ACCESS_F, so that we don't corrupt EDDFACTOR if
+!      evaluate EW is set to TRUE.
+! 
+	IF(WRITE_ETA_AND_CHI)THEN
+	  K=5						!Use for ACCESS_F
+	  I=WORD_SIZE*(ND+1)/UNIT_SIZE
+	  J=82; CALL OPEN_DIR_ACC_V1(ND,I,DA_FILE_DATE,'ETA_DATA',J)
+	  J=83; CALL OPEN_DIR_ACC_V1(ND,I,DA_FILE_DATE,'CHI_DATA',J)
+	  WRITE(82,REC=EDD_CONT_REC)K,NCF,ND
+	  WRITE(83,REC=EDD_CONT_REC)K,NCF,ND
+	  DO ML=1,NCF
+	    WRITE(82,REC=K-1+ML)(ETA_CMF_ST(I,ML),I=1,ND),NU(ML)
+	    WRITE(83,REC=K-1+ML)(CHI_CMF_ST(I,ML),I=1,ND),NU(ML)
+	  END DO
+	  CLOSE(UNIT=82)
+	  CLOSE(UNIT=83)
+	END IF
+	IF(.NOT. COMPUTE_J)STOP
 !
 	COMPUTE_EDDFAC=.FALSE.
 !
@@ -1881,25 +1907,6 @@
 	1		  FLUXMEAN,ESEC,I,ND)
 !
 ! 
-!
-! NB: We use K here, rather than ACCESS_F, so that we don't corrupt EDDFACTOR if
-!      evaluate EW is set to TRUE.
-! 
-	IF(WRITE_ETA_AND_CHI)THEN
-	  K=5						!Use for ACCESS_F
-	  I=WORD_SIZE*(ND+1)/UNIT_SIZE
-	  J=82; CALL OPEN_DIR_ACC_V1(ND,I,DA_FILE_DATE,'ETA_DATA',J)
-	  J=83; CALL OPEN_DIR_ACC_V1(ND,I,DA_FILE_DATE,'CHI_DATA',J)
-	  WRITE(82,REC=EDD_CONT_REC)K,NCF,ND
-	  WRITE(83,REC=EDD_CONT_REC)K,NCF,ND
-	  DO ML=1,NCF
-	    WRITE(82,REC=K-1+ML)(ETA_CMF_ST(I,ML),I=1,ND),NU(ML)
-	    WRITE(83,REC=K-1+ML)(CHI_CMF_ST(I,ML),I=1,ND),NU(ML)
-	  END DO
-	  CLOSE(UNIT=82)
-	  CLOSE(UNIT=83)
-	END IF
-!
 ! If requested, convolve J with the electron-scattering redistribution
 ! funtion. K is used for LUIN, and LUOUIT but is not accessed.
 !

@@ -88,7 +88,12 @@ C
 	    STRING=ADJUSTL(STRING)
 	    STRING=STRING(INDEX(STRING,' ')+1:)
 	    I=I+1
-	    READ(STRING,*)LAM_ZERO(I),GL(I),GUP(I),OSC(I),NCOL(I),VDOP(I),VRAD(I)
+	    READ(STRING,*,IOSTAT=IOS)LAM_ZERO(I),GL(I),GUP(I),OSC(I),NCOL(I),VDOP(I),VRAD(I)
+	    IF(IOS .NE. 0)THEN
+	      WRITE(6,*)'Error reading interstellar line data - erronous record follows'
+	      WRITE(6,*)TRIM(STRING)
+	      GOTO 10
+	    END IF
 	    NCOL(I)=10.0**NCOL(I)
 	    NLINES=I
         END DO
@@ -97,6 +102,8 @@ C
 	IF(NLINES .EQ. 0)THEN
 	  WRITE(6,*)'Unable to read LINE DATA from IS_LINE_LIST in IS_LINE_ABS'
 	  RETURN
+	ELSE
+	  WRITE(6,*)'Number of lines read in is',NLINES
 	END IF
 C
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()
@@ -116,7 +123,7 @@ C
 	  FREQ=0.01*C_KMS/WAVE(J)
 	  DO I=1,NlINES
 	      v=(FREQ-NU_ZERO(I))/NU_DOP(I)
-	      IF(ABS(V) .LE. 10.0)THEN
+	      IF(ABS(V) .LE. 100.0)THEN                  !Was 10
 	        a=1.0D-15*GAM(I)/4/PI/NU_DOP(I)
 	        PHI=VOIGT(a,v)    
 	        TAU=TAU+CHIL(I)*PHI

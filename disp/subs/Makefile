@@ -7,6 +7,8 @@ include ../../Makefile_definitions
 LIB=$(LIB_DIR)/libdisp.a
 
 #
+# $(LIB)(disp_bethe_approx_v5.o)\
+#
 # Entries for library
 #
 OBJ = $(LIB)(betanew.o)\
@@ -92,6 +94,10 @@ $(LIB)(branch_rat.o) : branch_rat.f ../mod_disp.o  $(GEN)
 $(LIB)(comp_jbar.o) : comp_jbar.f ../mod_disp.o  $(GEN)
 	$(F90) -c  $(FG) -I../ comp_jbar.f
 	ar ruv $(LIB) comp_jbar.o
+
+$(LIB)(disp_bethe_approx_v5.o) : disp_bethe_approx_v5.f ../mod_disp.o  $(GEN)
+	$(F90) -c  $(FG) -I../ disp_bethe_approx_v5.f
+	ar ruv $(LIB) disp_bethe_approx_v5.o
 
 $(LIB)(map_plot.o) : map_plot.f $(GEN)
 	$(F90) -c  $(FD) -O1 map_plot.f 

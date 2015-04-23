@@ -129,6 +129,7 @@
 !
 ! Options to control optional output.
 !
+	LOGICAL COMPUTE_J                       !Compute J (default is TRUE)
 	LOGICAL WRITE_ETA_AND_CHI		!Write Eta and CHI out (EDDFACTOR file format)
 	LOGICAL WRITE_dFR			!Write dF as a function of R and frequency.
 	LOGICAL WRITE_RTAU			!Write R(Tau=Tau_ref) (i.e., I as a function of impct parameter)

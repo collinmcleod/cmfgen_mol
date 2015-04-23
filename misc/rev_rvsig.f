@@ -24,6 +24,10 @@
 	REAL*8 V(NMAX)
 	REAL*8 SIGMA(NMAX)
 !
+	REAL*8 RTMP(NMAX)
+	REAL*8 OLD_TAU(NMAX)
+	REAL*8 TAU_SAV(NMAX)
+!
 	REAL*8 TMP_R(NMAX)
 	REAL*8 X1(NMAX)
 	REAL*8 X2(NMAX)	
@@ -66,6 +70,10 @@
 	INTEGER I,J,K
 	INTEGER I_ST,I_END
 	INTEGER N_HEAD
+	INTEGER IOS
+!
+	LOGICAL ROUND_ERROR
+	LOGICAL RD_MEANOPAC
 !
         CHARACTER*30 UC
         EXTERNAL UC
@@ -115,6 +123,56 @@
 
 	CALL GEN_IN(OPTION,'Enter option for revised RVSIG file')
 	OPTION=UC(TRIM(OPTION))
+!
+! Read in optical depth scale. Needed for RTAU and TAU options. Also used
+! for checking purposes (if available) for some other options.
+!
+! We use TAU_SAV for dTAU, and is used to increase the precision of the TAU
+! scale (as insufficient digits may be print out).
+!
+	IF(OPTION .EQ. 'SPP')THEN
+	  ROUND_ERROR=.FALSE.
+	  OPEN(UNIT=20,FILE='MEANOPAC',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	    IF(IOS .EQ. 0)THEN
+	      READ(20,'(A)')STRING
+	      DO I=1,ND
+	        READ(20,*)RTMP(I),J,OLD_TAU(I),TAU_SAV(I)
+	        J=MAX(I,2)
+	        T1=R(J-1)-R(J)
+	        IF( ABS(RTMP(I)-R(I))/T1 .GT. 2.0D-03 .AND. .NOT. ROUND_ERROR)THEN
+	          WRITE(6,*)' '
+	          WRITE(6,*)'Possible eror with MEANOPAC -- inconsistent R grid'
+	          WRITE(6,*)'Error could simply be a lack of sig. digits in MEANOPAC'
+	          WRITE(6,*)' RMO(I)=',RTMP(I)
+	          WRITE(6,*)'   R(I)=',R(I)
+	          WRITE(6,*)' R(I+1)=',R(I+1)
+	          ROUND_ERROR=.TRUE.
+	          CALL GEN_IN(ROUND_ERROR,'Continue as only rounding error?')
+	          IF(.NOT. ROUND_ERROR)STOP
+	        END IF
+	      END DO
+	      DO I=8,1,-1
+                OLD_TAU(I)=OLD_TAU(I+1)-TAU_SAV(I)
+              END DO
+	      RD_MEANOPAC=.TRUE.
+	    ELSE
+	      RD_MEANOPAC=.FALSE.
+	    END IF
+	    IF(ROUND_ERROR .AND. RD_MEANOPAC)THEN
+	      RTMP(1:ND)=R(1:ND)
+	    END IF 
+	  CLOSE(UNIT=20)
+	END IF
+!
+	IF(OPTION .EQ. 'SPP')THEN
+	  WRITE(6,'(A)')' '
+	  WRITE(6,'(A)')'This option takes a plane-parallel model and oututs a spherical model'
+	  WRITE(6,'(A)')'The MEANOPAC from the plane-parallel model is required'
+	  WRITE(6,'(A)')'The VADAT file is also required'
+	END IF
+!
+	  
+!
 	IF(OPTION .EQ. 'NEW_ND')THEN
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')'This option allows a new R grid to be output'

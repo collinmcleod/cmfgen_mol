@@ -16,9 +16,9 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(hiabs.o)\
          $(LIB)(h2abs.o)\
          $(LIB)(int_rec_ap.o)\
-         $(LIB)(is_line_abs.o)\
+         $(LIB)(is_line_abs_v2.o)\
          $(LIB)(num_rec.o)\
-         $(LIB)(uvabs.o)\
+         $(LIB)(uvabs_v2.o)\
          $(LIB)(adjust_jes_v2.o)\
          $(LIB)(filt_pass_band.o)\
          $(LIB)(cnvlv_es_one_par_v2.o)\

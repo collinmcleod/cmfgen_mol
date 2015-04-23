@@ -102,6 +102,7 @@ C
 	LOGICAL UNEQUAL
 	LOGICAL LOG_X,LOG_Y
 	CHARACTER*10 Y_PLT_OPT,X_UNIT
+	CHARACTER*80 IS_FILE
 	CHARACTER*80 FILENAME
 	CHARACTER*80 DIRECTORY 
 	CHARACTER*80 XKEY,YKEY
@@ -441,6 +442,7 @@ C
 	    NCF=NCF_CONT
 	    NU(1:NCF)=NU_CONT(1:NCF)
 	    OBSF(1:NCF)=OBSF_CONT(1:NCF)
+	    WRITE(6,*)'As read in to PLT_SPEC buffer, X will assumed to be NU'
 	  ELSE IF(IOS .EQ. 0)THEN
 	    T1=MAXVAL(OBSF_CONT(1:NCF_CONT))
 	    IF(T1 .GT. 1.0D+38)THEN
@@ -611,8 +613,7 @@ C
 	  CALL USR_HIDDEN(ADD_FAC,'ADD','0.0D0',' ')
 C
 	  RAD_VEL=0.0D0
-	  CALL USR_HIDDEN(RAD_VEL,'RAD_VEL','0.0D0',
-	1             'Radial velocity (+ve if away)')
+	  CALL USR_HIDDEN(RAD_VEL,'RAD_VEL','0.0D0','Radial velocity of star (+ve if away)')
 C
 	  CLEAN=.FALSE.
 	  CALL USR_HIDDEN(CLEAN,'CLEAN','F',' ')
@@ -639,6 +640,9 @@ C
 	  CALL USR_HIDDEN(OBS_COLS,2,2,'COLS','1,2','Columns with data')
 	  CALL RD_OBS_DATA_V2(XV,YV,NCF_MAX,J,FILENAME,OBS_COLS,IOS)
 	  IF(IOS .NE. 0)GOTO 1		!Get another option
+!
+! Convert from Ang (Vacuum) to Hz.
+!
 	  DO I=1,J
 	    XV(I)=ANG_TO_HZ/XV(I)
 	    YV(I)=YV(I)*SCALE_FAC+ADD_FAC
@@ -646,7 +650,7 @@ C
 C
 	  IF(RAD_VEL .NE. 0)THEN
 	    DO I=1,J
-	     XV(I)=XV(I)*(1.0D0-1.0D+05*RAD_VEL/C_CMS)
+	     XV(I)=XV(I)*(1.0D0+1.0D+05*RAD_VEL/C_CMS)
 	    END DO
 	  END IF
 C
@@ -802,16 +806,16 @@ C
 !
 	  CALL USR_HIDDEN(HI_ABS,'HI_ABS','T','Correct for HI absorption')
 	  CALL USR_HIDDEN(H2_ABS,'H2_ABS','T','Correct for HII absorption')
-	  CALL USR_HIDDEN(V_R,'V_R','0.0d0','Radial Velocity (km/s)')
+	  CALL USR_HIDDEN(V_R,'V_R','0.0D0','Radial Velocity (km/s)')
 	  CALL USR_HIDDEN(WAVE_MIN,'WAVE_MIN','900d0','Minimum Wavelength')
-	  CALL USR_HIDDEN(WAVE_MAX,'WAVE_MAX','1300d0','Maximum Wavelength')
-	  CALL USR_HIDDEN(MIN_RES_KMS,'MIN_RES','2.0D0',
-	1                       'Minimum Model Resolution')
+	  CALL USR_HIDDEN(WAVE_MAX,'WAVE_MAX','3000d0','Maximum Wavelength')
+	  CALL USR_HIDDEN(MIN_RES_KMS,'MIN_RES','2.0D0','Minimum Model Resolution')
+	  CALL USR_HIDDEN(IS_FILE,'IS_FILE','IS_LINE_LIST','File wth list and strengths of IS lines')
 !
-	  CALL UVABS(NU,OBSF,NCF,NCF_MAX,
+	  CALL UVABS_V2(NU,OBSF,NCF,NCF_MAX,
      1              T_IN_K,V_TURB,LOG_NTOT,
      1	            LOG_H2_NTOT,V_R,MIN_RES_KMS,WAVE_MAX,WAVE_MIN,
-     1	            HI_ABS,H2_ABS)
+     1	            HI_ABS,H2_ABS,IS_FILE)
 !
 !
 !
@@ -990,8 +994,9 @@ C
 	  CALL USR_HIDDEN(V_R,'V_R','0.0d0','Radial Velocity (km/s)')
 	  CALL USR_HIDDEN(WAVE_MIN,'WAVE_MINI','900d0','Minimum Wavelength')
 	  CALL USR_HIDDEN(WAVE_MAX,'WAVE_MAXI','1300d0','Maximum Wavelength')
+	  CALL USR_HIDDEN(IS_FILE,'IS_FILE','IS_LINE_LIST','File wth list and strengths of IS lines')
 !
-	  CALL UVABS(NU,OBSF,NCF,NCF_MAX,
+	  CALL UVABS_V2(NU,OBSF,NCF,NCF_MAX,
      1              T_IN_K,V_TURB,LOG_NTOT,
      1	            LOG_H2_NTOT,V_R,MIN_RES_KMS,WAVE_MAX,WAVE_MIN,
      1	            HI_ABS,H2_ABS)

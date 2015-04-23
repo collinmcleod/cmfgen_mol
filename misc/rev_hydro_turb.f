@@ -191,7 +191,7 @@ C
 	  CALL GRAMON_PGPLOT(XLAB,YLAB,' ',' ')
 	  YLAB=' '
 !
-	ELSE IF(XOPT .EQ. 'H' .OR. XOPT(1:2) .EQ. 'HE')THEN
+	ELSE IF(XOPT .EQ. 'H' .OR. XOPT(1:2) .EQ. 'HE' .OR. XOPT .EQ. '?')THEN
 	   WRITE(6,*)RED_PEN
 	   WRITE(6,*)'XVEL    -- set X axis to V(km/s)'
 	   WRITE(6,*)'XR      -- set X axis to R/R(ND)'
@@ -207,7 +207,6 @@ C
 	   WRITE(6,*)'NGRAD   -- plot g_r/g_e'
 !
 	   WRITE(6,*)DEF_PEN
-	
 !
 	ELSE IF(XOPT .EQ. 'XVEL')THEN
 	  XVEC(1:ND)=P_VEL(1:ND)

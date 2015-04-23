@@ -36,6 +36,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(equal.o)\
       $(LIB)(esopac.o)\
       $(LIB)(estau.o)\
+      $(LIB)(estau_v2.o)\
       $(LIB)(eval_adiabatic.o)\
       $(LIB)(eval_ed.o)\
       $(LIB)(ew_format.o)\

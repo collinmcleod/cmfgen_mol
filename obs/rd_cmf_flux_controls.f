@@ -170,6 +170,8 @@
 	1        ' Allow for SOB & CMF lines in defining observers'//
 	1        ' frequencies?')
 !
+	  COMPUTE_J=.TRUE.
+	  CALL RD_STORE_LOG(COMPUTE_J,'COMP_J',L_FALSE,'Compute the radiation field')
 	  CALL RD_STORE_LOG(WRITE_ETA_AND_CHI,'WR_ETA',L_TRUE,'Output ETA and CHI? ')
 	  CALL RD_STORE_LOG(WRITE_FLUX,'WR_FLUX',L_TRUE, 'Output Flux as a function of depth? ')
 	  CALL RD_STORE_LOG(WRITE_CMF_FORCE,'WR_CMF_FORCE',L_TRUE,

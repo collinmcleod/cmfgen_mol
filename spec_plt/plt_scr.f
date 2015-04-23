@@ -577,6 +577,17 @@ C
 	  WRITE(6,*)'Populations can be compared with older iterations.'
 	  GOTO 200
 !
+	ELSE IF(PLT_OPT(1:3) .EQ. 'FIX_OSC')THEN
+	  CALL FIX_POP_OSCILLATIONS(POPS(1,1,NIT),R,V,SIGMA,LUSCR,ND,NT)
+          NITSF=NITSF+1; IREC=NIT
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IREC),IREC,NITSF,
+	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+	1              NT,ND,LUSCR,NEWMOD)
+	  WRITE(6,*)'Corrections written to SCRTEMP as new iteration.'
+	  WRITE(6,*)'Restart program if you wish to compare to with pops from last iteration.'
+	  WRITE(6,*)'Populations can be compared with older iterations.'
+	  GOTO 200
+!
 	ELSE IF(PLT_OPT .EQ. 'R' .OR.
 	1       PLT_OPT .EQ. 'F' .OR.
 	1       PLT_OPT .EQ. 'D' .OR.

@@ -10,6 +10,7 @@ LN3=subs
 LN4=disp
 LN5=spec
 LN6=newsubs
+LN7=dev
 
 # These names refer to the full file name
 
@@ -19,6 +20,7 @@ FN3=$(LIB_DIR)lib$(LN3).a
 FN4=$(LIB_DIR)lib$(LN4).a
 FN5=$(LIB_DIR)lib$(LN5).a
 FN6=$(LIB_DIR)lib$(LN6).a
+FN7=$(LIB_DIR)lib$(LN7).a
 
 EXE  = $(EXE_DIR)plt_jh.exe\
        $(EXE_DIR)plt_jh_cur.exe\
@@ -56,7 +58,7 @@ ALLEXE    : $(EXE)
 
 $(EXE_DIR)%.exe : %.o $(OBJ) $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
 	$(F90) $*.o \
-		$(OBJ1) -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
+		$(OBJ1) -L$(LIB_DIR) -l$(LN7) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
 		$(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \
 		-o $(EXE_DIR)$*.exe
 
