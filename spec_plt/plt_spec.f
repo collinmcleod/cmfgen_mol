@@ -81,6 +81,7 @@ C
 	REAL*8 DNU
 	REAL*8 BB_FLUX
 	REAL*8 SCALE_FAC
+	REAL*8 XFAC
 	REAL*8 ADD_FAC
 	REAL*8 LAMC
 	REAL*8 RAD_VEL			!Radial velcity in km/s
@@ -357,10 +358,11 @@ C
 	  IF(.NOT. LOG_Y)WRITE(T_OUT,*)'Now using Linear Y axis'
 	ELSE IF(X(1:2) .EQ.'YU' .OR. X(1:6) .EQ. 'YUNITS')THEN
 	  CALL USR_OPTION(Y_PLT_OPT,'Y_UNIT',' ',
-	1          'FNU, NU_FNU, FLAM')
+	1          'FNU, NU_FNU, FLAM, LAM_FLAM')
 	  CALL SET_CASE_UP(Y_PLT_OPT,IZERO,IZERO)
 	  IF(Y_PLT_OPT .NE. 'FNU' .AND.
 	1        Y_PLT_OPT .NE. 'NU_FNU' .AND.
+	1        Y_PLT_OPT .NE. 'LAM_FLAM' .AND.
 	1        Y_PLT_OPT .NE. 'FLAM')THEN
 	     WRITE(T_OUT,*)'Invalid Y Plot option: Try again'
 	  END IF
@@ -372,6 +374,7 @@ C
 	  CALL USR_OPTION(FILENAME,'File',' ','Model file')
 	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
+	  CALL USR_HIDDEN(XFAC,'XFAC','1.0D0',' ')
 	  IF(OVER)THEN
 C
 C This option allows all normal model options to be done on the data
@@ -383,13 +386,17 @@ C
 	       GOTO 1		!Get another option
 	    END IF
 	    OVER=.FALSE.
-	    IF(SCALE_FAC .NE. 1)THEN
-	       CALL GEN_IN(OVER,'Do you really want to scale the data')
+!
+	    IF(SCALE_FAC .NE. 1.0D0 .OR. XFAC .NE. 1.0D0)THEN
+	      OBSF(1:NCF)=OBSF(1:NCF)*SCALE_FAC
+	      NU(1:NCF)=NU(1:NCF)*XFAC
+	      WRITE(T_OUT,*)'Model has been scaled!'
+	    ELSE
+	      WRITE(T_OUT,*)'No scaling done with new model data'
 	    END IF
-	    IF(OVER)OBSF(1:NCF)=OBSF(1:NCF)*SCALE_FAC
+! 
 	    WRITE(T_OUT,*)'New model data replaces old data'
 	    WRITE(T_OUT,*)'No plots done with new model data'
-	    WRITE(T_OUT,*)'No scaling done with new model data'
 	  ELSE
 C
 C This option is now similar to RD_CONT
@@ -400,7 +407,7 @@ C
 	       GOTO 1		!Get another option
 	    END IF
 	    DO I=1,NCF_MOD
-	      XV(I)=NU_CONT(I)
+	      XV(I)=NU_CONT(I)*XFAC
 	      YV(I)=OBSF_CONT(I)*SCALE_FAC
 	    END DO
 	    CALL CNVRT(XV,YV,NCF_MOD,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,

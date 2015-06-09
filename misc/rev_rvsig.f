@@ -544,6 +544,9 @@
 	  V_TRANS=4.0D0
 	  CALL GEN_IN(NEW_RSTAR,'New radius')
 	  CALL GEN_IN(V_TRANS,'Connection velocity in km/s')
+	  CALL GEN_IN(OLD_MDOT,'Old mass-loss rate in Msun/yr')
+	  MDOT=OLD_MDOT
+	  CALL GEN_IN(MDOT,'New mass-loss rate in Msun/yr')
 !
 	  WRITE(6,'(A)')
 	  WRITE(6,'(A)')'Type 1: W(r).V(r) = 2V(t) + (Vinf-2V(t))*(1-r(t)/r))**BETA'
@@ -582,7 +585,7 @@
 !
 	  T1=R(ND)/OLD_R(ND_OLD)
 	  DO I=TRANS_I,ND
-	    V(I)=OLD_V(I)/T1/T1
+	    V(I)=MDOT*OLD_V(I)/T1/T1/OLD_MDOT
 	    SIGMA(I)=(OLD_SIGMA(I)+1.0D0)*R(I)/OLD_R(I)-1.0D0
 	  END DO
 	  V_TRANS=V(TRANS_I)
@@ -638,6 +641,7 @@
               SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
 	    END DO
 	  END IF
+!
 	ELSE IF(OPTION .EQ. 'MDOT')THEN
 !
 	  ND=ND_OLD

@@ -60,6 +60,7 @@
 	REAL*4 SPACING
 !
 	CHARACTER(LEN=2) TYPE_CURVE(MAX_PLTS)
+	REAL*8 VB_BASE(MAX_PLTS)
 !
 	LOGICAL DO_ERROR
 	CHARACTER*5 LOG_AXIS
@@ -109,6 +110,7 @@
 	INTEGER VECPEN(MAXVEC)
 !
 	INTEGER N_LINE_IDS
+	LOGICAL OBSERVED_WAVE(5000)
 	CHARACTER*10 LINE_ID(5000)
 	REAL*4 ID_WAVE(5000)
 	REAL*4 ID_WAVE_OFF(5000)
@@ -295,6 +297,7 @@
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()
 	LONG_PLOT=.FALSE.
 	LENGTH_OF_HC_PLOT=200.0D0       !cm
+	VB_BASE=-1000
 !
 	IF(NPLTS .GT. MAXPEN)THEN
 	  WRITE(T_OUT,*)'Error n GRAMON_PLOT -- not enough pen loctions'
@@ -507,15 +510,22 @@
 	  WRITE(T_OUT,*)'B   - Switch error bars on/off'
 	  WRITE(T_OUT,*)'CC  - Change Color setting'
 	  WRITE(T_OUT,*)'CP  - Change Pen (Color Index)'
-	  WRITE(T_OUT,*)'BRD - Switch border potting on (def) or off'
+	  WRITE(T_OUT,*)'RCP - Reset default color pens'
+	  WRITE(T_OUT,*)'GP  - Set default for grey pens'
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
+!
+	  WRITE(T_OUT,*)'BRD  - Switch border potting on (def) or off'
+	  WRITE(T_OUT,*)'FILL - Color in region between 2 curves'
+	  WRITE(T_OUT,*)'OFF  - Set offsets when plotting multiple plots'
+          WRITE(T_OUT,*)'RPO  - Plot curves in reverse order (switch): does not affect color'
+          WRITE(T_OUT,*)'RID  - Read line ID''s'
+          WRITE(T_OUT,*)'SID  - Change defaults for writing line ID''s'
+	  WRITE(T_OUT,*)' '
 !
 	  WRITE(T_OUT,*)'LX  - Switch between LINEAR/LOG labeling of X axis'
 	  WRITE(T_OUT,*)'LY  - Switch between LINEAR/LOG labeling of Y axis'
 	  WRITE(T_OUT,*)'LXY - Switch between LINEAR/LOG baleling of X and Y axes'
-          WRITE(T_OUT,*)'RID - Read line ID''s'
-          WRITE(T_OUT,*)'SID - Change defaults for writing line ID''s'
 	  WRITE(T_OUT,*)' '
 	  WRITE(T_OUT,*)'VC  - Define line vectors using cursor'
 	  WRITE(T_OUT,*)'VF  - Define line vectors using file input'
@@ -526,6 +536,7 @@
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
 !
+	  WRITE(T_OUT,*)'LAM - List wavelengths of common lines'
 	  WRITE(T_OUT,*)'VEL - Convert X axis to km/s space'
 	  WRITE(T_OUT,*)'XAR - Simple X axis arithmetic'
 	  WRITE(T_OUT,*)'YAR - Simple Y axis arithmetic'
@@ -987,6 +998,7 @@ C
 	1       TYPE_CURVE(IP) .NE. 'B' .AND.              !Broken
 	1       TYPE_CURVE(IP) .NE. 'I' .AND.              !Invisible
 	1       TYPE_CURVE(IP) .NE. 'V' .AND.              !Verticle lines
+	1       TYPE_CURVE(IP) .NE. 'VB' .AND.             !Verticle lines
 	1       TYPE_CURVE(IP) .NE. 'A' .AND.              !Hist - X vert
 	1       TYPE_CURVE(IP) .NE. 'H' .AND.              !Histogram
 	1       TYPE_CURVE(IP) .NE. 'LG' )THEN             !Log(ABS)
@@ -1338,7 +1350,13 @@ C
 	    BACKSPACE(33)
 	    DO WHILE(J+1 .LE. 5000)
 	      READ(33,*,END=1500)LINE_ID(J+1),ID_WAVE(J+1),TAU(J+1),ID_WAVE_OFF(J+1),ID_Y_OFF(J+1)
-	      IF(AIR_WAVELENGTHS)THEN
+	      IF(ID_WAVE(J+1) .LT. 0.0D0)THEN
+	         ID_WAVE(J+1)=ABS(ID_WAVE(J+1))
+	         OBSERVED_WAVE(J+1)=.FALSE.
+	      ELSE
+	         OBSERVED_WAVE(J+1)=.TRUE.
+	      END IF
+	     IF(AIR_WAVELENGTHS)THEN
 	         DP_T1=ID_WAVE(J+1)
 	         ID_WAVE(J+1)=LAM_AIR(DP_T1)
 	      END IF
@@ -2555,6 +2573,16 @@ C
 	      CALL PGLINE(2,XT,YT)
 	    END DO
 !
+	  ELSE IF(TYPE_CURVE(IP) .EQ. 'VB' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
+	    CALL NEW_GEN_IN(VB_BASE(IP),'Base level')
+	    DO J=1,NPTS(IP)
+	      XT(1)=CD(IP)%XVEC(J)
+	      XT(2)=CD(IP)%XVEC(J)
+	      YT(1)=VB_BASE(IP)
+	      YT(2)=CD(IP)%DATA(J)
+	      CALL PGLINE(2,XT,YT)
+	    END DO
+!
 ! This routine does a broken plot. NPTS should be even. Lines are drawn
 ! from I to I+1 point for I odd only.
 !
@@ -2720,6 +2748,7 @@ C
 	    TMP_STR=' '
 	    WRITE(TMP_STR,'(F12.2)')ID_WAVE(I)
 	    TMP_STR=TRIM(LINE_ID(I))//'-'//ADJUSTL(TMP_STR)
+	    IF(.NOT. OBSERVED_WAVE(I))TMP_STR='*'//TMP_STR
 	    CALL JUSTIFY_CONVERT_V2(ID_WAVE_OFF(I),T1,ID_LOC,ID_LOC_PG,ID_ORIENT,.TRUE.,
 	1                  XSTRPOS(1),YSTRPOS(1),TMP_STR,IONE)
 	    T1=(XSTRPOS(1)-XPAR(1))*(XPAR(2)-XSTRPOS(1))

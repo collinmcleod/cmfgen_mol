@@ -1,5 +1,6 @@
 	MODULE MOD_DISP
 !
+! Altered 13-May-2015 : Inserted ARAD, GAM2, GAM4 and OBSERVED_LEVEL in MODEL_ATOM_DATA.
 ! Altered 28-Mar-2003 : NUM_IONS variable installed.
 ! Altered 27-Nov-2000 : MASS changed to AT_MASS
 !                       Extra species installed. More consistent with CMFGEN.
@@ -34,6 +35,10 @@
 	  REAL*8, ALLOCATABLE :: AXzV_F(:,:)
 	  REAL*8, ALLOCATABLE :: EDGEXzV_F(:)
 	  REAL*8, ALLOCATABLE :: GXzV_F(:)
+	  REAL*8, ALLOCATABLE :: ARAD(:)                !Inverse radiative lifetime of level
+	  REAL*8, ALLOCATABLE :: GAM2(:)                !Collisional profile parameter.
+	  REAL*8, ALLOCATABLE :: GAM4(:)                !Collisional profile parameter.
+	  LOGICAL, ALLOCATABLE :: OBSERVED_LEVEL(:)     !Does level have a know energy.
 !
 	  REAL*8 ZXzV
 	  REAL*8 GIONXzV_F

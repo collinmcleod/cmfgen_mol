@@ -2385,7 +2385,15 @@
 ! Compute dlnT/dlnP for comparison with adiabatic temperature gradient.
 !
 	ELSE IF(XOPT .EQ. 'DTDP')THEN
-	  TA(1:ND)=DLOG( (ED(1:ND)+POP_ATOM(1:ND))*T(1:ND) )
+	  T1=1.0D+04*BOLTZMANN_CONSTANT()
+	  TA(1:ND)=T1*(ED(1:ND)+POP_ATOM(1:ND))*T(1:ND)
+	  ELEC=.TRUE.
+	  CALL USR_OPTION(ELEC,'RP','T','Include radiation pressure')
+	  IF(ELEC)THEN
+	    T1=1.0D+16*STEFAN_BOLTZ()/SPEED_OF_LIGHT()
+	    TA(1:ND)=TA(1:ND)+T1*(T(1:ND)**4)
+	  END IF
+	  TA(1:ND)=DLOG( TA(1:ND) )
 	  TB(1:ND)=DLOG( T(1:ND) )
 	  CALL DERIVCHI(TC,TB,TA,ND,'LINMON')
 	  YV(1:ND)=TC(1:ND)
@@ -2921,7 +2929,9 @@
 !
 	    IF(ABS(T2).GT. DEPTH_LIM)THEN
 	      STRING=' ';  IF(FLAG)STRING=VEC_TRANS_NAME(LINE_INDX)
-	      WRITE(73,'(A,3ES14.5,3X,F3.0,I6,5X,A)')ION_ID(ID),ANG_TO_HZ/FL,
+	      T1=ANG_TO_HZ/FL
+	      IF(.NOT. ATM(ID)%OBSERVED_LEVEL(MNL_F) .OR. .NOT. ATM(ID)%OBSERVED_LEVEL(MNUP_F))T1=-T1
+	      WRITE(73,'(A,3ES14.5,3X,F3.0,I6,5X,A)')ION_ID(ID),T1,
 	1                               T2,ANG_TO_HZ/FL,1.0,2,TRIM(STRING)
 	    END IF
 	    IF(MOD(LINE_INDX-NL,MAX(10,(NUP-NL)/10)) .EQ. 0)THEN
