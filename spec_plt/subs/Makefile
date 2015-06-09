@@ -12,6 +12,7 @@ LIB=$(LIB_DIR)libspec.a
 OBJ    = $(LIB)(convolve.o)\
          $(LIB)(do_int_rec_ap.o)\
          $(LIB)(determ_reddening.o)\
+         $(LIB)(fix_pop_oscillations.o)\
          $(LIB)(get_mag.o)\
          $(LIB)(hiabs.o)\
          $(LIB)(h2abs.o)\

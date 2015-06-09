@@ -33,6 +33,7 @@
 	USE LINE_MOD
 	IMPLICIT NONE
 !
+! Altered 07-Apr-2015 : Changed to SET_TWO_PHOT_V3.
 ! Altered 05-Apr-2011 : Many changes done in order to facilitate the USE of LTE populations
 !                         over a wider dynamic range (18-Dec-2010).
 !                         Single routine (REGRID_LOG_DC_V1) now used to read all departure coefficient files.
@@ -434,11 +435,12 @@
 !
 	    DO ID=1,NUM_IONS-1
 	       ID_SAV=ID
-	       CALL SET_TWO_PHOT_V2(ION_ID(ID), ID_SAV, ATM(ID)%XzVLTE, ATM(ID)%NXzV,
-	1          ATM(ID)%XzVLTE_F,   ATM(ID)%XzVLEVNAME_F,
-	1          ATM(ID)%EDGEXzV_F,  ATM(ID)%GXzV_F,
-	1          ATM(ID)%F_TO_S_XzV, ATM(ID)%NXzV_F, ND,
-	1          ATM(ID)%ZXzV,       ATM(ID)%EQXzV,  ATM(ID)%XzV_PRES)
+	       CALL SET_TWO_PHOT_V3(ION_ID(ID), ID_SAV, 
+	1          ATM(ID)%XzVLTE,          ATM(ID)%NXzV,
+	1          ATM(ID)%XzVLTE_F_ON_S,   ATM(ID)%XzVLEVNAME_F,
+	1          ATM(ID)%EDGEXzV_F,       ATM(ID)%GXzV_F,
+	1          ATM(ID)%F_TO_S_XzV,      ATM(ID)%NXzV_F, ND,
+	1          ATM(ID)%ZXzV,            ATM(ID)%EQXzV,  ATM(ID)%XzV_PRES)
 	    END DO
 !
 ! 

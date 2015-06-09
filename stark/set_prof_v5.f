@@ -34,10 +34,11 @@
 	1             TEMP_IN,VTURB_IN,ND,
 	1             PROF_TYPE,PROF_LIST_LOCATION,
 	1             NU_ZERO,NL,NUP,AMASS_IN,Z_IN,
-	1             GAM_RAD,GAM_COL,
+	1             GAM_RAD,C4_INTER,
 	1             TDOP,AMASS_DOP,VTURB,MAX_PROF_ED,
 	1             END_RES_ZONE,NORM_PROFILE,LU_STK)
 !
+! Altered 18-May-2015: LOC_GAM_COL is set to C4 unless specifically set in STRK_LIST.
 ! Altered 20-May-2014: VERBOSE option introduced, and sone diagnostic output was modified.
 ! Altered 14-May-2014: MAX_PROF_ED now applies to all profiles
 ! Altered 31-Jan-2014: Added MAX_PROF_ED to call (changed to V5).
@@ -70,7 +71,7 @@
 	REAL*8 Z_IN
 	REAL*8 NU_ZERO
 	REAL*8 GAM_RAD
-	REAL*8 GAM_COL
+	REAL*8 C4_INTER
 	REAL*8 VTURB		!Turbulent velocity (km/s): same at all depths
 	REAL*8 TDOP
 	REAL*8 AMASS_DOP
@@ -142,7 +143,7 @@
           TMP_VEC(1:ND)=( VTURB_IN(1:ND)/12.85D0  )**2
           T2=NU_ZERO*12.85D0/C_KMS
 	  LOC_GAM_RAD=GAM_RAD
-	  LOC_GAM_COL=GAM_COL
+	  LOC_GAM_COL=1.55D+04*(ABS(C4_INTER)**0.667D0)
 	  ID=PROF_LIST_LOCATION
 	  IF(ID .NE. 0)THEN
 	    LOC_GAM_RAD=LST_GAM_RAD(ID)

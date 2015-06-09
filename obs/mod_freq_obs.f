@@ -5,6 +5,7 @@
 !
 	MODULE MOD_FREQ_OBS
 !
+! Altered: 18-May-2015 : Added VEC_C4.
 ! Created: 22-Jan-2013
 !
 ! NCF_MAX is the maximum number of continuum points (which will include line
@@ -39,6 +40,7 @@
         REAL*8, ALLOCATABLE :: VEC_OSCIL(:)
         REAL*8, ALLOCATABLE :: VEC_EINA(:)
         REAL*8, ALLOCATABLE :: VEC_ARAD(:)
+        REAL*8, ALLOCATABLE :: VEC_C4(:)
         REAL*8, ALLOCATABLE :: VEC_DP_WRK(:)
         REAL*8, ALLOCATABLE :: VEC_VDOP_MIN(:)
 !
@@ -68,6 +70,7 @@
         IF(IOS .EQ. 0)ALLOCATE(VEC_OSCIL(NLINE_MAX),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE(VEC_EINA(NLINE_MAX),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE(VEC_ARAD(NLINE_MAX),STAT=IOS)
+        IF(IOS .EQ. 0)ALLOCATE(VEC_C4(NLINE_MAX),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE(VEC_DP_WRK(NLINE_MAX),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE(VEC_VDOP_MIN(NLINE_MAX),STAT=IOS)
 !

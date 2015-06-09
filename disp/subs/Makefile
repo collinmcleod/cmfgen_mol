@@ -6,11 +6,9 @@ include ../../Makefile_definitions
 
 LIB=$(LIB_DIR)/libdisp.a
 
-#
-# $(LIB)(disp_bethe_approx_v5.o)\
-#
+
 # Entries for library
-#
+
 OBJ = $(LIB)(betanew.o)\
       $(LIB)(arnaud_cross_v3_disp.o)\
       $(LIB)(branch_rat.o)\
@@ -36,6 +34,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(op_spec_file_v2.o)\
       $(LIB)(pallet.o)\
       $(LIB)(plt_arn.o)\
+      $(LIB)(plt_profs.o)\
       $(LIB)(rd_ion_pop_v3.o)\
       $(LIB)(rd_non_therm_spec.o)\
       $(LIB)(rd_pop_dim.o)\
@@ -102,6 +101,10 @@ $(LIB)(disp_bethe_approx_v5.o) : disp_bethe_approx_v5.f ../mod_disp.o  $(GEN)
 $(LIB)(map_plot.o) : map_plot.f $(GEN)
 	$(F90) -c  $(FD) -O1 map_plot.f 
 	ar ruv $(LIB) map_plot.o
+
+$(LIB)(plt_profs.o) : plt_profs.f ../mod_disp.o $(GEN)
+	$(F90) -c  $(FG) -I../ -I../../mood  plt_profs.f 
+	ar ruv $(LIB) plt_profs.o
 
 $(LIB)(wr_spec_sum_v2.o) : wr_spec_sum_v2.f ../mod_disp.o $(GEN)
 	$(F90) -c  $(FG) -I../ wr_spec_sum_v2.f

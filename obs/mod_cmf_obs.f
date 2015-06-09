@@ -6,6 +6,8 @@
 !
 	MODULE MOD_CMF_OBS
 !
+! Altered: 18-May-2015 : Changed GAM2, GAM4 to C4 and C6 (quadratic and Van der Waals 
+!                           interacton constants).
 ! Altered 17-Dec-2011:  Added LOG_XzVLTE_F, LOG_XzVLTE, and XzVLTE_F_ON_S to MODEL_ATOM_DATA
 !
 ! Number of atomic species (e.g. H, C, N is 3 species).
@@ -86,8 +88,8 @@
 	  REAL*8, ALLOCATABLE :: EDGEXzV_F(:)		!Ionization energy to g.s. (10^15 Hz)
 	  REAL*8, ALLOCATABLE :: GXzV_F(:)		!Level statistical weights in full atom
 	  REAL*8, ALLOCATABLE :: ARAD(:)		!Inverse radiative lifetime of level
-	  REAL*8, ALLOCATABLE :: GAM2(:)		!Collisional profile parameter.
-	  REAL*8, ALLOCATABLE :: GAM4(:)		!Collisional profile parameter.
+	  REAL*8, ALLOCATABLE :: C4(:)  		!Collisional profile parameter.
+	  REAL*8, ALLOCATABLE :: C6(:)	 		!Collisional profile parameter.
 !
 	  REAL*8, ALLOCATABLE :: DXzV(:)		!Ion population for super level
 	  REAL*8, ALLOCATABLE :: XzV(:,:)		!Level population in SL atom

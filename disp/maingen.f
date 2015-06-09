@@ -15,6 +15,8 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered  09-Jun-2015 : Added PLT_PRFS to call.
+!                          Altered DTDP option.
 ! Altered  07-Jul-2011 : Included commands to look at f, and Mdot in "shell" models.
 ! Altered  15-Mar-2011 :  Section for plotting photoionization cross-sections
 !                           removed to subroutine. Can now plot all ground-state
@@ -2738,6 +2740,8 @@
 	    YAXIS='Filling Factor'
 	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
+	ELSE IF(XOPT .EQ. 'PROF')THEN
+	  CALL PLT_PROFS()
 !
 !
 !

@@ -103,6 +103,7 @@
 	WRITE(6,'(A)')'   ID           Half grid spacing betwen I=FST and I=LST with modifcation to adjacent points'
 	WRITE(6,'(A)')'   IR           Insert additional points betwen I=FST and I=LST'
 	WRITE(6,'(A)')'   SCALE_R:     Scale radius grid'
+	WRITE(6,'(A)')'   ADDR:        Add extra R points in R space'
 	WRITE(6,'(A)')'   TAU:         Refine grid and add points (multiple ranges) in TAU space'
 	WRITE(6,'(A)')'   RTAU:        Refine whole grid - dTAU and dR space'
 	WRITE(6,'(A)')' '
@@ -354,6 +355,39 @@
 ! Now create the NEW R grid.
 !
 	  CALL MON_INTERP(RTMP,NEW_ND,IONE,NEW_TAU,NEW_ND,R,ND,OLD_TAU,ND)
+!
+	  CALL OUT_RGRID(RTMP,NEW_ND,R,DI,ED,T,IRAT,VEL,CLUMP_FAC,OLD_TAU,ND,RMIN,LUM,RD_MEANOPAC)
+!
+! Option to insert extra points equally space in LOG(TAU). Multiple regions may
+! be edited at the same time.
+!
+	ELSE IF(OPTION .EQ. 'ADDR')THEN
+!
+	  WRITE(6,*)' '
+	  WRITE(6,*)' '
+	  CALL GEN_IN(IST,'Initial depth index bounding revison region')
+	  CALL GEN_IN(IEND,'Last depth index bounding revison region')
+	  IST=MAX(IST,2); IEND=MIN(IEND,ND)
+	  NG=IEND-IST-1
+!
+	  IF(IEND .NE. ND)NG=(R(IST)-R(IEND))/(R(IEND)-R(IEND+1))-1
+	  WRITE(6,'(A)')' '
+	  WRITE(6,*)'Number of points in the interval is ',NG
+	  CALL GEN_IN(NG,'Enter new number of grid points for the interval')
+	  NEW_ND=IST+NG+(ND-IEND)+1
+!
+	  DO I=1,IST
+	    RTMP(I)=R(I)
+	  END DO
+	  T1=(R(IST)-R(IEND))/(NG+1)
+	  DO I=IST+1,IST+NG
+	     RTMP(I)=RTMP(I-1)-T1
+	  END DO
+	  DO I=IST+NG+1,NEW_ND
+	    RTMP(I)=R(IEND+(I-IST-NG-1))
+	  END DO
+!
+! Now create the NEW R grid.
 !
 	  CALL OUT_RGRID(RTMP,NEW_ND,R,DI,ED,T,IRAT,VEL,CLUMP_FAC,OLD_TAU,ND,RMIN,LUM,RD_MEANOPAC)
 !

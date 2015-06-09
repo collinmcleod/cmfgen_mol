@@ -13,6 +13,8 @@
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
+! Altered: 18-May-2015 : Changed GAM2, GAM4 to C4 and C6 (quadratic and Van der Waals 
+!                          interacton constants)(09-Jun-2105).
 ! Altered: 17-Mar-2003: SCRAT & SCRATREC are now initialized.
 ! Altered: 03-Mar-2000: Variable type ATM installed to simplify handling
 !	                   of multiple species.
@@ -489,8 +491,8 @@
 	        IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%DXzV(ND),STAT=IOS)         ; ATM(ID)%DXzV(:)=0.0D0
 	        IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%GXzV_F(NF),STAT=IOS)
 	        IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%ARAD(NF),STAT=IOS)
-	        IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%GAM2(NF),STAT=IOS)
-	        IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%GAM4(NF),STAT=IOS)
+	        IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%C4(NF),STAT=IOS)
+	        IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%C6(NF),STAT=IOS)
 	        IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%OBSERVED_LEVEL(NF),STAT=IOS)
 	        IF(IOS .NE. 0)THEN
 	          WRITE(LUER,*)'Error in CMF_FLUX'
@@ -571,7 +573,7 @@
 	    FILENAME=TRIM(ION_ID(ID))//'_F_OSCDAT'
 	    CALL GENOSC_V8(ATM(ID)%AXzV_F,  ATM(ID)%EDGEXzV_F,
 	1          ATM(ID)%GXzV_F, ATM(ID)%XzVLEVNAME_F, 
-	1          ATM(ID)%ARAD,ATM(ID)%GAM2,ATM(ID)%GAM4,
+	1          ATM(ID)%ARAD,ATM(ID)%C4,ATM(ID)%C6,
 	1          ATM(ID)%OBSERVED_LEVEL,T1,ATM(ID)%ZXzV,
 	1          ATM(ID)%NEW_XzV_OSCDATE, ATM(ID)%NXzV_F, I,
 	1          GF_ACTION,GF_CUT,GF_LEV_CUT,MIN_NUM_TRANS,ONLY_OBS_LINES,

@@ -15,6 +15,9 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 05-Jun-2015 - Fixed bug; GAM_LIM_STORE was not being set to GAM_LIM when it was read
+!                           in from the HDYRO_DEFAULTS file.
+!                       Now save old RVSIG_COL file as RVSIG_COL_IT_#.
 ! Altered 30-Jul-2011 - Added VC_ON_SS as parameter
 ! Altered 17-Jun-2011 - Added check to make sure dVdR is not negative at the connection point.
 !                         When -ve, we lower GAM_LIM.
@@ -143,6 +146,7 @@
 	LOGICAL USE_OLD_VEL
 	LOGICAL L_TEMP
 	LOGICAL FILE_OPEN
+	LOGICAL FILE_PRES
 	LOGICAL VERBOSE_OUTPUT
 	LOGICAL UPDATE_GREY_SCL
 !
@@ -257,6 +261,7 @@
 	CALL RD_STORE_DBLE(RMAX,'MAX_R',L_FALSE,'Maximum radius in terms of Connection radius')
 	CALL RD_STORE_LOG(RESET_REF_RADIUS,'RES_REF',L_FALSE,'Reset reference radius if using old velocity law')
 	CALL RD_STORE_DBLE(GAM_LIM,'GAM_LIM',L_FALSE,'Limiting Eddington factor')
+	GAM_LIM_STORE=GAM_LIM
 	CALL RD_STORE_DBLE(VC_ON_SS,'VC_ON_SS',L_FALSE,'Connection velocity on sound speed')
 	CALL RD_STORE_LOG(UPDATE_GREY_SCL,'UP_GREY_SCL',L_FALSE,'Update GREY_SCL_FAC_IN')
 	CALL RD_STORE_DBLE(TAU_REF,'TAU_REF',L_FALSE,'Reference radius for g and Teff')
@@ -888,6 +893,27 @@
 	END DO
 !
 !
+!
+! Saves the current RVSIG_FILE for recovery puposes. Except for the first
+! iteration, this could be recovered from RVSIG_COL. For portability, we
+! use only regular fortran commands.
+!
+	INQUIRE(FILE='RVSIG_COL',EXIST=FILE_PRES)
+	IF(FILE_PRES)THEN
+	  STRING=' '
+	  WRITE(STRING,'(I4.4)')MAIN_COUNTER
+	  STRING='RVSIG_COL_IT_'//TRIM(STRING)
+   	  OPEN(UNIT=LUIN,FILE='RVSIG_COL',STATUS='OLD',ACTION='READ')
+	  OPEN(UNIT=LU,FILE=TRIM(STRING),STATUS='UNKNOWN',ACTION='WRITE')
+	  DO WHILE(1 .EQ. 1)
+	    READ(LUIN,'(A)',IOSTAT=IOS)STRING
+	    WRITE(LU,'(A)')TRIM(STRING)
+	    IF(IOS .NE. 0)EXIT
+	  END DO
+	  CLOSE(LUIN)
+	  CLOSE(LU)
+	END IF
+!
 ! Output revised hydrostatic structure. This can be used to restart the current
 ! model from scratch.
 !

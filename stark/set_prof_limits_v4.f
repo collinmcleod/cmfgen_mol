@@ -55,9 +55,11 @@
 	1             LIMIT_SET_BY_OPACITY)
 	USE MOD_STRK_LIST
 !
-! Altered 20-MAy-2015 : Bug fix: When WAVE was outside valid range, GET_INDX_DP was returning an error 
+! Altered 18-May-2015 : Bug fix: When WAVE was outside valid range, GET_INDX_DP was returning an error 
 !                          to fort.2 (not OUTGEN) but was also returning a valid index. As a result, some
 !                          lines (in this case belonging to HeI) would use the wrong profile.
+!                          LOC_GAM_COL is no longer set to zer0. Uses passed value (GAM_COL).
+!                          Removed limit on whenVOIGT profiles used -- may need to be updated.  
 ! Altered 14-May-2015 : Limit Ne to MAX_PROF_ED.
 ! Altered 31-Jan-2014 : Added V_PROF_LIMIT & MAX_PROF_ED to call. Changed to V4.
 ! Altered  6-Jan-2014 : V3 was added to repositry 6_jan-2014.
@@ -189,9 +191,10 @@
           PROF_LINE_CENTER=T1/NU_DOP(I)
 	   LINE_TO_CONT_RATIO(I)=ABS(CHIL(I))*PROF_LINE_CENTER/ESEC(I)
 	   IF(LINE_TO_CONT_RATIO(I) .EQ. 0)LINE_TO_CONT_RATIO(I)=1.0D-50
-	   IF(LINE_TO_CONT_RATIO(I) .GT. 1.0E+04 .AND. PROF_TYPE .EQ. 'LIST_VGT')THEN
+!	   IF(LINE_TO_CONT_RATIO(I) .GT. 1.0E+04 .AND. PROF_TYPE .EQ. 'LIST_VGT')THEN
+	   IF(PROF_TYPE .EQ. 'LIST_VGT')THEN
 	     LOC_GAM_RAD=GAM_RAD
-	     LOC_GAM_COL=0.0D0		!GAM_COL
+	     LOC_GAM_COL=1.55D+04*(ABS(GAM_COL)**0.667D0)		!GAM_COL
 	     PROF_TYPE='VOIGT'
 	   END IF 
 	END DO

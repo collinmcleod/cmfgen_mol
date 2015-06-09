@@ -5,7 +5,7 @@ C
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
-! Altered 13-May-2015 : CHanged to GENOSC_V8 (from _V5). Updated MOD_DISP.
+! Altered 13-May-2015 : Changed to GENOSC_V8 (from _V5). Updated MOD_DISP.
 ! Altered 07-Sep-2005 : XRAYS option set to TRUE. Lithium cross-sections will be set.
 ! Altered 20-Apr-2004 : Use RDHOTGEN_V2 will allows for dynamic smoothing of 
 !                         photoioization cross-sections.
