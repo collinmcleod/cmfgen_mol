@@ -525,6 +525,10 @@
 	REAL*8 XRAY_EMISS_1,XRAY_EMISS_2
 	REAL*8 VSMOOTH_XRAYS
 !
+	REAL*8 ALLOWED_XRAY_FLUX_ERROR       !Fractional error allowed before X-ray emissivties are scaled 
+        REAL*8 DESIRED_XRAY_LUM              !Desired X-ray luminosity (> 0.1 keV)
+	LOGICAL SCALE_XRAY_LUM               !Indicates whether the X-ray emissivities will be scaled automatically.
+!
 	REAL*8 NU_XRAY_END
 	REAL*8 DELV_XRAY
 !

@@ -3606,8 +3606,8 @@
 	  WRITE(LU_FLUX,'(A,T60,1PE12.4)')'Total Rad. decay luminosity:',SUM(RAD_DECAY_LUM)
 	  WRITE(LU_FLUX,'(A,T60,1PE12.4)')'              Total dE_WORK:',SUM(dE_WORK)
 !
-! The seocnd XRAY flux printed is the OBSERVED XRAY luminosity. Its should be very similar
-! to the eralier value for optically thin winds.
+! The second XRAY flux printed is the OBSERVED XRAY luminosity. It should be very similar
+! to the earlier value for optically thin winds.
 !
 	  WRITE(LU_FLUX,'(A,T60,ES12.4)')'Total Shock Luminosity (Lsun):',SUM(XRAY_LUM_TOT)
 	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emitted & observed X-ray Luminosity (> 0.1 keV, Lsun) :',
@@ -4304,6 +4304,21 @@
 	         LAMBDA_ITERATION=.FALSE.
 	         CALL UPDATE_KEYWORD(L_FALSE,'[DO_LAM_IT]','IN_ITS',L_TRUE,L_TRUE,LUIN)
 	       END IF
+	    END IF
+	  ELSE IF(XRAYS)THEN
+!
+! We do not do the scaling if there is intrinsic X-ray emssion from the star.
+! DESIRED_XRAY_LUM should be in units of LSTAR.
+!
+	    IF(OBS_XRAY_LUM_0P1 .LT. SUM(XRAY_LUM_0P1) .AND. SCALE_XRAY_LUM)THEN
+	      IF( (LUM*DESIRED_XRAY_LUM/OBS_XRAY_LUM_0P1-1.0D0) .GT. ALLOWED_XRAY_FLUX_ERROR)THEN
+	        T1=SQRT(LUM*DESIRED_XRAY_LUM/OBS_XRAY_LUM_0P1)
+	        FILL_FAC_XRAYS_1=T1*FILL_FAC_XRAYS_1
+	        FILL_FAC_XRAYS_2=T1*FILL_FAC_XRAYS_2
+	        CALL UPDATE_KEYWORD(FILL_FAC_XRAYS_1,'[XFI1_BEG]','VADAT',L_TRUE,L_FALSE,LUIN)
+	        CALL UPDATE_KEYWORD(FILL_FAC_XRAYS_2,'[XFI2_BEG]','VADAT',L_FALSE,L_TRUE,LUIN)
+	        WRITE(6,*)'Adjusted filling factors to match desired X-ray luminosity'
+	      END IF
 	    END IF
 	  END IF
 	  IF(INCL_ADVECTION .AND. ADVEC_RELAX_PARAM .LT. 1.0D0 .AND. MAXCH .LT. 100)THEN

@@ -137,7 +137,7 @@ $(LIB)(set_ang_qw.o) : set_ang_qw.f $(LIB_MOD)(ang_qw_mod.o)
 	$(F90) -c $(FG) set_ang_qw.f
 	ar ruv $(LIB) set_ang_qw.o
 
-$(LIB)(set_frequency_grid_v2.o) : set_frequency_grid.f $(LIB_MOD)(control_variable_mod.o)\
+$(LIB)(set_frequency_grid_v2.o) : set_frequency_grid_v2.f $(LIB_MOD)(control_variable_mod.o)\
               $(LIB_MOD)(line_vec_mod.o) $(LIB_MOD)(mod_cmfgen.o) 
 	$(F90) -c $(FG) set_frequency_grid_v2.f
 	ar ruv $(LIB) set_frequency_grid_v2.o

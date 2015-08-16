@@ -180,13 +180,27 @@ C
 	    CALL RD_STORE_DBLE(RMDOT,'MDOT',L_TRUE,'Mass Loss rate (Msun/yr) ')
 	  END IF
 	  CALL RD_STORE_DBLE(LUM,'LSTAR',L_TRUE,'Stellar luminosity (Lsun)')
+!
+! TEFF and LOGG only need to be present if DO_HYDRO is TRUE. Values will still be read
+! in when available if DO_HYDRO is FALSE. 
+!
+	  TEFF=0.0D0; LOGG=0.0D0
 	  IF(DO_HYDRO)THEN
-	    CALL RD_STORE_DBLE(TEFF,'TEFF',L_TRUE,'Effective temperature (10^4 K)')
-	    CALL RD_STORE_DBLE(LOGG,'LOGG',L_TRUE,'Log surface gravity (cgs units)')
-	    CALL RD_STORE_DBLE(V_BETA1,'BETA',L_TRUE,'Beta exponent for velocity law')
+	    CALL RD_STORE_DBLE(TEFF,'TEFF',DO_HYDRO,'Effective temperature (10^4 K)')
+	    CALL RD_STORE_DBLE(LOGG,'LOGG',DO_HYDRO,'Log surface gravity (cgs units)')
+	    CALL RD_STORE_DBLE(V_BETA1,'BETA',DO_HYDRO,'Beta exponent for velocity law')
 	    PRESSURE_VTURB=0.0D0
-	    CALL RD_STORE_DBLE(PRESSURE_VTURB,'P_VTURB',L_FALSE,'Beta exponent for velocity law')
+	    CALL RD_STORE_DBLE(PRESSURE_VTURB,'P_VTURB',L_FALSE,'Ipressure trubulent velocity')
 	  END IF
+	  IF(TEFF .NE. 0.0D0 .AND. .NOT. DO_HYDRO)THEN
+	    WRITE(LUER,'(A)')' Possible Error in VADAT file.'
+	    WRITE(LUER,'(A)')' You have set TEFF in VADAT but DO_HYDRO is false.'
+            WRITE(LUER,'(A)')' TEFF will not be VALID unless hydro-iterations are performed.'
+            WRITE(LUER,'(A)')' Remove TEFF if you are not going to do a hdyro iteration'
+            WRITE(LUER,'(A)')' In this case TEFF is set by L, R and Mdot'
+	    STOP
+	  END IF
+
 	  CALL RD_STORE_DBLE(STARS_MASS,'MASS',L_TRUE,'Stellar mass (Msun)')
 C
 C All clumping parameters are read in, even when CLUMPING is switched off.
@@ -707,6 +721,15 @@ C
 	1           'Initial filling factor for X-ray emission [2]')
 	  CALL RD_STORE_DBLE(SLOW_XRAY_SCL_FAC,'XSCL_FAC',ADD_XRAYS_SLOWLY,
 	1           'Rate to increase X-ray filling factor')
+!
+	  SCALE_XRAY_LUM=.FALSE.
+	  ALLOWED_XRAY_FLUX_ERROR=0.1D0 
+	  CALL RD_STORE_LOG(SCALE_XRAY_LUM,'SCL_XLUM',L_FALSE,
+	1           'Scale X-ray emissivities to get a specified X-ray luminosiity')
+	  CALL RD_STORE_DBLE(DESIRED_XRAY_LUM,'XRAY_LUM',SCALE_XRAY_LUM,
+	1           'X-ray luminosity in units of LSTAR')
+	  CALL RD_STORE_DBLE(ALLOWED_XRAY_FLUX_ERROR,'XRAY_ERR',L_FALSE,
+	1           'Fractional error allowed in observed X-ray luminosity')
 !
 	  DELV_XRAY=0.5D0*VSMOOTH_XRAYS
 	  CALL RD_STORE_DBLE(DELV_XRAY,'V_XRAY',L_FALSE,

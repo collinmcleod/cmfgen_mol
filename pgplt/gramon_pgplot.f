@@ -7,6 +7,7 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered:  29-Jun-2015 : Changed RID o check ABS(TAU) which for pp model can -ve.
 ! Altered:  22-Apr-2015 : Added FILL option to fill the space between two curves that create a polygon.
 !                           ANS changed to length 4 (from 3)
 ! Altered:  17-Feb-2015 : Can now have multi-colored titles.
@@ -995,6 +996,7 @@ C
 	    CALL SET_CASE_UP(TYPE_CURVE(IP),IONE,IZERO)
 	    IF( TYPE_CURVE(IP) .NE. 'L' .AND.              !Normal line
 	1       TYPE_CURVE(IP) .NE. 'E' .AND.              !non-monotonic
+	1       TYPE_CURVE(IP) .NE. 'EC' .AND.              !non-monotonic
 	1       TYPE_CURVE(IP) .NE. 'B' .AND.              !Broken
 	1       TYPE_CURVE(IP) .NE. 'I' .AND.              !Invisible
 	1       TYPE_CURVE(IP) .NE. 'V' .AND.              !Verticle lines
@@ -1361,7 +1363,7 @@ C
 	         ID_WAVE(J+1)=LAM_AIR(DP_T1)
 	      END IF
 	      IF( (ID_WAVE(J+1)-XPAR(1))*(XPAR(2)-ID_WAVE(J+1)) .GT. 0 .AND.
-	1                   TAU(J+1) .GT. TAU_CUT)THEN
+	1                   ABS(TAU(J+1)) .GT. TAU_CUT)THEN
 	         J=J+1
 	         N_LINE_IDS=J
 	      END IF
@@ -2491,23 +2493,30 @@ C
 !
 	  IF(TYPE_CURVE(IP) .EQ. 'L' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    CALL PGLINE(NPTS(IP),CD(IP)%XVEC,CD(IP)%DATA)
-	  ELSE IF(TYPE_CURVE(IP) .EQ. 'E' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
+	  ELSE IF( (TYPE_CURVE(IP) .EQ. 'E' .OR. TYPE_CURVE(IP) .EQ. 'EC') 
+	1              .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    IST=1
 	    IEND=2
-	    T1=CD(IP)%XVEC(NPTS(IP))-CD(IP)%XVEC(1)
+	    T1=CD(IP)%XVEC(NPTS(IEND))-CD(IP)%XVEC(IST)
+	    Q=PEN_COL(IP+PEN_OFFSET)-1
 	    DO WHILE(IEND .LT. NPTS(IP))
 	      DO WHILE(IEND .LT. NPTS(IP))
-	         IF( (CD(IP)%XVEC(IEND)-CD(IP)%XVEC(IEND-1))/T1 
+	         IF( (CD(IP)%XVEC(IEND+1)-CD(IP)%XVEC(IEND))/T1 
 	1                                                   .GE. 0)THEN
 	           IEND=IEND+1
 	         ELSE
 	           EXIT
 	         END IF
 	      END DO
-	      J=IEND-IST
+	      IF(TYPE_CURVE(IP) .EQ. 'EC')THEN
+	        Q=Q+1;
+	        CALL PGSCI(Q)
+	      END IF
+	      J=IEND-IST+1
 	      CALL PGLINE(J,CD(IP)%XVEC(IST),CD(IP)%DATA(IST))
 	      IST=IEND+1
 	      IEND=IST+1
+	      T1=CD(IP)%XVEC(NPTS(IEND))-CD(IP)%XVEC(IST)
 	    END DO
 !
 	  ELSE IF(TYPE_CURVE(IP) .EQ. 'LG')THEN

@@ -556,6 +556,10 @@
 !
 	CALL RD_XRAY_FITS(LUIN)
 !
+	IF(XRAYS .AND. .NOT. FF_XRAYS)THEN
+	  CALL RD_XRAY_SPEC(T_SHOCK_1,T_SHOCK_2,LUIN)
+	END IF
+!
 ! We now need to compute the populations for the model atom with Super-levels.
 ! We do this in reverse order (i.e. highest ionization stage first) in order
 ! that we the ion density for the lower ionization stage is available for
@@ -1768,7 +1772,7 @@
 ! NB: We use K here, rather than ACCESS_F, so that we don't corrupt EDDFACTOR if
 !      evaluate EW is set to TRUE.
 ! 
-	IF(WRITE_ETA_AND_CHI)THEN
+	IF(WRITE_ETA_AND_CHI .AND. (ES_COUNTER .EQ. NUM_ES_ITERATIONS .OR. .NOT. COMPUTE_J))THEN
 	  K=5						!Use for ACCESS_F
 	  I=WORD_SIZE*(ND+1)/UNIT_SIZE
 	  J=82; CALL OPEN_DIR_ACC_V1(ND,I,DA_FILE_DATE,'ETA_DATA',J)
@@ -2187,7 +2191,7 @@
 !
 ! Compute continuum opacity and emissivity at the line frequency.
 !
-	INCLUDE 'OPACITIES_V4.INC'
+	INCLUDE 'OPACITIES_V5.INC'
 !
 ! Compute continuum intensity.
 !

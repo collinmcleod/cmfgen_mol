@@ -34,7 +34,7 @@
 !
 	OPEN(UNIT=LU,FILE=FILNAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	IF(IOS .NE. 0)THEN
-	  WRITE(T_OUT,*)'Error opening file'
+	  WRITE(T_OUT,*)'Error opening file: IOS=',IOS
 	  RETURN
 	END IF
 !
@@ -85,12 +85,13 @@
 	    WRITE(T_OUT,*)'Erronous record follows'
 	    WRITE(T_OUT,'(A)')TRIM(STRING)
 	    IF(NX .LT. 2)THEN
-	      IOS=1
 	      WRITE(T_OUT,*)'Skipping to next record'
 	      GOTO 100
-	  ELSE
+	    ELSE
 	      WRITE(T_OUT,*)NX,' data points passed to plotting package'
+	      IOS=0
 	    END IF
+	    CLOSE(UNIT=LU)
 	    RETURN
 	  END IF
 	END DO

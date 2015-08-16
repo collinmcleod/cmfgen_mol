@@ -160,6 +160,8 @@
 ! HYD_N_DATA contains the Bound-free gaunt factor.
 !
 	  N=CROSS_A(2)
+	  WRITE(30,'(A,T30,A,F8.3,2X,I3,2X,F3.0,3ES12.5)')TRIM(LEVEL_NAME),'NEF,N,ZION',NEF,N,ZION,EDGE,GS_EDGE,EXC_FREQ
+	  FLUSH(UNIT=30)
 	  DO ML=1,NCF
 	    U=FREQ(ML)/EDGE
 	    X=LOG10(U)

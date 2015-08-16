@@ -172,6 +172,13 @@
 	  END DO
 	END IF
 !
+! For high HI and HeII line profiles we automatically chooses the HZ_STARK option
+! if the pofile type has not already been set.
+!
+	IF(PROF_TYPE(1:4) .EQ. 'LIST')THEN
+	  IF(SPECIES_IN .EQ. 'HI' .OR. SPECIES_IN .EQ. 'He2')PROF_TYPE='HZ_STARK'
+	END IF
+!
 ! We assume all lines are dominated by the Doppler profile at line center.
 ! We ensure LINE_TO_CONT ratio is not zero, to prevent division by zero.
 !                    
@@ -199,13 +206,10 @@
 	   END IF 
 	END DO
 !
-! If the line is not in the list, chooses an alternative profile.
+! If the line profile has not been set, we choose DOPPLER as the default.
 !
 	IF(PROF_TYPE(1:4) .EQ. 'LIST')THEN
 	  PROF_TYPE='DOPPLER'
-	  IF(SPECIES_IN .EQ. 'HI' .OR. SPECIES_IN .EQ. 'He2')THEN
-	    PROF_TYPE='HZ_STARK'
-	  END IF
 	END IF
 !
 	VEC_STRT_FREQ=0.0D0

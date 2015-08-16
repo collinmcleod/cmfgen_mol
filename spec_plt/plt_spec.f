@@ -1107,7 +1107,7 @@ C
 !
 !
 ! Option to do a least fit CCM redenning Law. The observational data
-! should have been read in using RD_OBS, and must be conatined in one file.
+! should have been read in using RD_OBS, and must be contained in one file.
 !
 	ELSE IF(X(1:3) .EQ. 'RED')THEN
 	  IF(NOBS .EQ. 0)THEN

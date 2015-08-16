@@ -580,6 +580,16 @@
 	      K=I
 	    END IF
 	  END DO
+	  IF(K .EQ. 1)THEN
+	    IF(ABS(NEW_R(1)-R(1))/(R(1)-R(2)) .LT. 0.01D0)THEN
+	      K=0
+	      NEW_R(1)=R(1)
+	    END IF
+	  END IF
+!
+	  IF(ABS(NEW_R(NEW_ND)-R(ND))/(R(ND-1)-R(ND)) .LT. 0.01D0)THEN
+	    NEW_R(NEW_ND)=R(ND)
+	  END IF
 !
 	  ACCESS_F=5
 	  I=WORD_SIZE*(NEW_ND+1)/UNIT_SIZE; J=83

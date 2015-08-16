@@ -2276,7 +2276,7 @@
 	  END DO
 	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
 	  YAXIS='M(\dsun\u)'
-	  WRITE(6,'(A,ES9.2,A)')'Mass of envelope (ejecta) is',TA(ND),' Msun'
+	  WRITE(6,'(A,ES10.3,A)')'Mass of envelope (ejecta) is',TA(ND),' Msun'
 	  CALL DP_CURVE(ND,XV,TA)
 !
 	ELSE IF(XOPT .EQ. 'IMASS')THEN

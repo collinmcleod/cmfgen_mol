@@ -227,10 +227,28 @@
 !
 	  CALL RD_STORE_LOG(INCL_TWO_PHOT,'INC_TWO',L_TRUE,'Include two photon transitions?')
 	  CALL RD_STORE_LOG(INCL_RAY_SCAT,'INC_RAY',L_TRUE,'Include Rayeligh scattering?')
+!
 	  CALL RD_STORE_LOG(XRAYS,'INC_XRAYS',L_TRUE,'Include X-ray emission')
-	  CALL RD_STORE_DBLE(FILL_FAC_XRAYS,'FIL_FAC',L_TRUE,'Filling factor for X-ray emission')
-	  CALL RD_STORE_DBLE(T_SHOCK,'T_SHOCK',L_TRUE,'Shock T for X-ray emission')
-	  CALL RD_STORE_DBLE(V_SHOCK,'V_SHOCK',L_TRUE,'Cut off velocity for X-ray emission')
+	  CALL RD_STORE_LOG(FF_XRAYS,'FF_XRAYS',XRAYS,'Use free-free processes to compute X-ray emission')
+	  CALL RD_STORE_LOG(XRAY_SMOOTH_WIND,'X_SM_WIND',XRAYS,'Ignore clumping when computing X-ray emission')
+!
+	  VSMOOTH_XRAYS=3000.0D0
+	  CALL RD_STORE_DBLE(VSMOOTH_XRAYS,'VS_XRAYS',XRAYS,'X-ray smoothing width for SOB/CMF options')
+!
+	  FILL_FAC_XRAYS_1=0.D0
+	  FILL_FAC_XRAYS_2=0.D0
+	  CALL RD_STORE_DBLE(FILL_FAC_XRAYS_1,'FIL_FAC_1',XRAYS,
+	1           'Filling factor for X-ray emission [1]')
+	  CALL RD_STORE_DBLE(T_SHOCK_1,'T_SHOCK_1',XRAYS,
+	1           'Shock T for X-ray emission [1]')
+	  CALL RD_STORE_DBLE(V_SHOCK_1,'V_SHOCK_1',XRAYS,
+	1           'Cut off velocity for X-ray emission [1]')
+	  CALL RD_STORE_DBLE(FILL_FAC_XRAYS_2,'FIL_FAC_2',XRAYS,
+	1           'Filling factor for X-ray emission [2]')
+	  CALL RD_STORE_DBLE(T_SHOCK_2,'T_SHOCK_2',XRAYS,
+	1           'Shock T for X-ray emission [2]')
+	  CALL RD_STORE_DBLE(V_SHOCK_2,'V_SHOCK_2',XRAYS,
+	1           'Cut off velocity for X-ray emission [2]')
 !
 ! If we add _SPEC, SOB or BLANK is the default option. In this case we need only
 ! specify the species we wish to change from the default.
