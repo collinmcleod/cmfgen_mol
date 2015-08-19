@@ -21,7 +21,7 @@
       REAL*8 EM
       REAL*8 ALXM
 !
-      REAL*8, RAN2_DP
+      REAL*8 RAN2_DP
       REAL*8, SAVE :: G,SQ,AXLM
       REAL*8, SAVE :: OLDM=-1
       REAL*8, PARAMETER :: PI=3.141592654D0

@@ -46,6 +46,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(gaus_fit_data.o)\
       $(LIB)(do_gaus_fit.o)\
       $(LIB)(wr_gaus_fit.o)\
+      $(LIB)(write_line_lambdas.o)\
       $(LIB)(gaus_fit_func.o)
 
 all : $(LIB)
