@@ -235,6 +235,7 @@
 	REAL*8 NU_ST,NU_EN
 	REAL*8 FREQ_RES,FREQ_MAX
 	REAL*8 T1,T2,T3,T4
+	REAL*8 EK_EJECTA
 	REAL*8 TMP_ED
 	REAL*8 TAU_LIM
 	REAL*8 DEPTH_LIM
@@ -2418,7 +2419,7 @@
 	  CALL DP_CURVE(ND,XV,YV)
 !
 	ELSE IF(XOPT .EQ. 'EK')THEN
-	  CALL USR_OPTION(ELEC,'INTEG','T','Integrate kinetic energy?')
+	  CALL USR_OPTION(ELEC,'INTEG','T','Integrate thermal kinetic energy?')
 	  YV(1:ND)=1.5D+04*(ED(1:ND)+POP_ATOM(1:ND))*T(1:ND)*BOLTZMANN_CONSTANT()
 	  IF(ELEC)THEN
 	    YV(1:ND)=3.280D-03*YV(1:ND)*R(1:ND)*R(1:ND)  !(4*PI*Dex(+30)/L(sun)
@@ -2438,17 +2439,19 @@
 	  T1=4.0D+16*STEFAN_BOLTZ()/SPEED_OF_LIGHT()
 	  YV(1:ND)=T1*(T(1:ND)**4)
 	  IF(ELEC)THEN
-	    YV(1:ND)=3.280D-03*YV(1:ND)*R(1:ND)*R(1:ND)  !(4*PI*Dex(+30)/L(sun)
+	    YV(1:ND)=4.0D+30*PI*YV(1:ND)*R(1:ND)*R(1:ND)  !(*PI*Dex(+30) !/L(sun)
 	    CALL LUM_FROM_ETA(YV,R,ND)
 	    DO I=ND-1,1,-1
 	      YV(I)=YV(I+1)+YV(I)
 	    END DO
-	    YAXIS='E(rad)(s.L\dsun\u)'
+	    YAXIS='Log E(rad)'          !(s.L\dsun\u)'
+	    YV(1:ND-1)=DLOG10(YV(1:ND-1))
+	    CALL DP_CURVE(ND-1,XV,YV)
 	  ELSE
-	    YV(1:ND)=DLOG10(YV(1:ND))
 	    YAXIS='Log E\drad\u(ergs\u \dcm\u-3)'
+	    YV(1:ND)=DLOG10(YV(1:ND))
+	    CALL DP_CURVE(ND,XV,YV)
 	  END IF
-	  CALL DP_CURVE(ND,XV,YV)
 !
 	ELSE IF(XOPT .EQ. 'EI')THEN
 	  CALL USR_OPTION(ELEC,'INTEG','T','Integrate intenal energy?')
@@ -2509,6 +2512,30 @@
 	  CALL DP_CURVE(ND,XV,TB)
 	  CALL DP_CURVE(ND,XV,TC)
 	  YAXIS='\gr\u-1\d|dPdR|'
+!
+	ELSE IF(XOPT .EQ. 'BEK')THEN
+	  YV(1:ND)=0.5D+10*MASS_DENSITY(1:ND)*V(1:ND)*V(1:ND)
+	  YV(1:ND)=4*PI*1.0D+30*YV(1:ND)*R(1:ND)*R(1:ND)
+	  CALL LUM_FROM_ETA(YV,R,ND)
+	  DO I=ND-1,1,-1
+	    YV(I)=YV(I+1)+YV(I)
+	  END DO	
+	  EK_EJECTA=YV(1)
+	  WRITE(6,*)RED_PEN
+	  WRITE(6,'(A,ES10.3,A)')' Kinetic energy of ejecta is ',EK_EJECTA,' ergs'
+	  YAXIS='Log EK(ergs\u \dcm\u-3)'
+	  YV(1:ND-1)=DLOG10(YV(1:ND-1))
+	  CALL DP_CURVE(ND-1,XV,YV)
+!
+	  T1=4.0D+30*PI/MASS_SUN()
+	  DO I=1,ND
+	    ZETA(I)=T1*MASS_DENSITY(I)*CLUMP_FAC(I)*R(I)*R(I)
+	  END DO
+	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  WRITE(6,'(A,F9.4,A)')' Mass of envelope (ejecta) is',TA(ND),' Msun'
+	  T1=SQRT(2.0D0*EK_EJECTA/TA(ND)/MASS_SUN())/1.0D+05
+	  WRITE(6,'(A,F10.2,A)')' Mean square velocity is ',T1,' km/s',DEF_PEN
+!
 !
 !
 	ELSE IF(XOPT .EQ. 'RONV')THEN

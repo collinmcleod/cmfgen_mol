@@ -1221,7 +1221,6 @@ C
 	  WRITE(T_OUT,*)'Maximum number of strings is',MAXSTR
 	  GOTO 1000
 !
-!
 	ELSE IF(ANS .EQ. 'LOC')THEN
 	  CALL PGQCS(4,T1,T3)			!T3=Character Height
 	  T3=T3*1.5
@@ -1245,6 +1244,26 @@ C
 	    CALL MON_NUM(T1,T2-T3,YVAL,1,IDY+2)
 	  END DO
 70	  CONTINUE
+!
+	ELSE IF(ANS .EQ. 'SLP')THEN
+	  CALL PGQCS(4,T1,T3)			!T3=Character Height
+	  T3=T3*1.5
+	  T1=XPAR(1)-(XPAR(2)-XPAR(1))/15.0
+	  T2=YPAR(2)+(YPAR(2)-YPAR(1))/15.0
+!
+	  DO WHILE(1 .EQ. 1)
+	    CURSERR = PGCURS(XVAL,YVAL,CURSVAL)
+	    IF(END_CURS(CURSVAL))EXIT
+	    CURSERR = PGCURS(XVAL_SAV,YVAL_SAV,CURSVAL)
+	    IF(END_CURS(CURSVAL))EXIT
+	    Q=VECPEN(1)
+	    CALL PGSCI(IONE)
+	    T3=(YVAL_SAV-YVAL)/(XVAL_SAV-XVAL)
+	    CALL PGMOVE(XVAL,YVAL)
+	    CALL PGDRAW(XVAL_SAV,YVAL_SAV)
+	    WRITE(6,*)'Slope of line is:',T3
+	  END DO
+!
 !
 !
 ! Set Line vectors

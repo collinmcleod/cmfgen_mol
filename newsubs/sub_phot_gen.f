@@ -137,6 +137,15 @@
 	  IF(SET_TO_EDGE .AND. FREQ .EQ. 0.0D0)THEN
 	    PHOT(1:NLEVS)=GS_EDGE(1:NLEVS)+PD(ID)%EXC_FREQ(ABS(PHOT_ID))
 !	    DO I=1,NLEVS
+!	      IF(PHOT(I) .LE. 0.0D0)THEN
+!	        WRITE(6,*)'Error -- bound-free edge at less than zero freq'
+!	        DO J=1,NLEVS
+!	          WRITE(6,*)PHOT(J)
+!	        END DO
+!	        STOP
+!	      END IF
+!	    END DO	        
+!	    DO I=1,NLEVS
 !	      IF(PHOT(I) .LT. 0.004D0)PHOT(I)=0.004D0
 !	    END DO
 	  ELSE

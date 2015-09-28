@@ -14,6 +14,7 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered: 09-Sep-2015 : Changed to C4(line)= ABS(C4[upper]) + ABS(C4[lower) [I was just summing values]
 ! Altered: 18-May-2015 : Changed GAM2, GAM4 to C4 and C6 (quadratic and Van der Waals interacton constants).
 !                           C4 is now utilized (read into VEC_C4). C6 is still not used (09-Jun-2015).
 ! Altered: 04-Apr-2015 : Changed SET_TWO_PHOT_V2 to _V3.
@@ -704,7 +705,7 @@
 	          VEC_OSCIL(ML)=ATM(ID)%AXzV_F(MNL,MNUP)
 	          VEC_EINA(ML)=ATM(ID)%AXzV_F(MNUP,MNL)
 	          VEC_ARAD(ML)= ATM(ID)%ARAD(MNL)+ATM(ID)%ARAD(MNUP)
-	          VEC_C4(ML)= ATM(ID)%C4(MNL)+ATM(ID)%C4(MNUP)
+	          VEC_C4(ML)= ABS(ATM(ID)%C4(MNL)) + ABS(ATM(ID)%C4(MNUP))
 	          VEC_TRANS_TYPE(ML)=ATM(ID)%XzV_TRANS_TYPE
 	          VEC_TRANS_NAME(ML)=TRIM(VEC_SPEC(ML))//
 	1             '('//TRIM(ATM(ID)%XzVLEVNAME_F(MNUP))//'-'//

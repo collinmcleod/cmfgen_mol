@@ -7,6 +7,7 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 19-Aug-2015 : Check on makig sure SIGMA > -1 (cur_hmi, 23-Jun-2105)
 ! Altered 02-Dec-2012 : Changed calls to DO_TAU_REGRID and DO_VEL_REGRID.
 !                       Now open R_REGRIDDING_LOG in this routine.
 !                       Use monotonic interpolaton for V and SIGMA.
@@ -82,6 +83,7 @@
 	INTEGER, PARAMETER :: T_OUT=6
 	INTEGER, PARAMETER :: LUIN=7
 	INTEGER, PARAMETER :: LUSCR=8
+	LOGICAL ERROR
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	CHARACTER(LEN=80) STRING
@@ -176,6 +178,7 @@
 !
 	  CALL MON_INT_FUNS_V2(COEF,TA,LOG_R_OLD,ND)
 	  J=1
+	  ERROR=.FALSE.
 	  DO I=2,ND-1
 	    DO WHILE(R(I) .LT. R_OLD(J+1))
 	      J=J+1
@@ -184,7 +187,21 @@
 	    V(I)=EXP( COEF(J,4)+T1*(COEF(J,3)+T1*(COEF(J,2)+T1*COEF(J,1))) )
 	    SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0D0*T1*COEF(J,1))
 	    SIGMA(I)=SIGMA(I)-1.0D0
+	    IF(SIGMA(I) .LT. -1.0D0 .AND. V(I) .LT. 0.2D00)THEN
+	      SIGMA(I)=-0.999D0
+	    ELSE IF(SIGMA(I) .LT. -1.0D0)THEN
+	      ERROR=.TRUE.
+	    END IF
 	  END DO
+!
+	  IF(ERROR)THEN
+	    WRITE(6,*)'Error in ADJUST_R_GRID_V4 - SIGMA is not monotonic'
+	    WRITE(6,*)'J, V(J) and SIGMA(J) follows'
+	    DO J=1,I
+	      WRITE(6,*)J,V(J),SIGMA(J)
+	    END DO
+	    STOP
+	  END IF
 !
 	  WRITE(LU,'(A,8(7X,A))')'!Index','        R','     Rold','   Log(R)','Log(Rold)','        V',
 	1                               '     Vold','    Sigma','Sigma_old'

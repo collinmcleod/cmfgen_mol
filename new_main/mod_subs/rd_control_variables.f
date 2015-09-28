@@ -587,6 +587,7 @@ C
 	  CALL RD_STORE_LOG(SOB_FREQ_IN_OBS,'SOB_FREQ_IN_OBS',L_TRUE,
 	1        ' Allow for SOB & CMF lines in defining observers'//
 	1        ' frequencies?')
+!
 	  VERBOSE_OUTPUT=.FALSE.
 	  CALL RD_STORE_LOG(VERBOSE_OUTPUT,'VERBOSE_OUT',L_FALSE,
 	1        'Switch on enhanced diagnostic output')
@@ -648,6 +649,8 @@ C
 !
 	  CALL RD_STORE_LOG(INCL_CHG_EXCH,'INC_CHG',L_TRUE,'Include charge exchange reactions?')
 	  CALL RD_STORE_LOG(INCL_TWO_PHOT,'INC_TWO',L_TRUE,'Include two photon transitions?')
+	  TWO_PHOTON_METHOD='USE_RAD'
+	  CALL RD_STORE_CHAR(TWO_PHOTON_METHOD,'TWO_METH',L_FALSE,'USE_RAD, W or ?')
 	  INCL_PENNING_ION=.FALSE.
 	  CALL RD_STORE_LOG(INCL_PENNING_ION,'INC_PEN',SN_MODEL,'Include Penning ionization?')
 !

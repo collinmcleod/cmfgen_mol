@@ -5,6 +5,7 @@ C
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 19-AUg-2015 : Changed to GENOSC_V9 (from _V8).
 ! Altered 13-May-2015 : Changed to GENOSC_V8 (from _V5). Updated MOD_DISP.
 ! Altered 07-Sep-2005 : XRAYS option set to TRUE. Lithium cross-sections will be set.
 ! Altered 20-Apr-2004 : Use RDHOTGEN_V2 will allows for dynamic smoothing of 
@@ -473,11 +474,11 @@ C
 	DO ID=NUM_IONS,1,-1
 	  IF(ATM(ID)%XzV_PRES)THEN
 	    TMP_STRING=TRIM(ION_ID(ID))//'_F_OSCDAT'
-	    CALL GENOSC_V8(ATM(ID)%AXzV_F,ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%XzVLEVNAME_F,
+	    CALL GENOSC_V9(ATM(ID)%AXzV_F,ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%XzVLEVNAME_F,
 	1          ATM(ID)%ARAD,ATM(ID)%GAM2,ATM(ID)%GAM4,
 	1          ATM(ID)%OBSERVED_LEVEL,T1,ATM(ID)%ZXzV,
 	1          ATM(ID)%NEW_XzV_OSCDATE,ATM(ID)%NXzV_F,I,
-	1          GF_ACTION,GF_CUT,GF_LEV_CUT,MIN_NUM_TRANS,L_FALSE,
+	1          GF_ACTION,GF_CUT,GF_LEV_CUT,MIN_NUM_TRANS,L_FALSE,L_FALSE,
 	1          LUIN,LU_TMP,TRIM(TMP_STRING))
 	    IF(ATM(ID)%XzV_OSCDATE .NE. ATM(ID)%NEW_XzV_OSCDATE)THEN
 	       WRITE(T_OUT,*)'Warning --- invalid date for ',ION_ID(ID)

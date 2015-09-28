@@ -160,20 +160,9 @@ C
 	      LUER=ERROR_LU()
               WRITE(LUER,*)'Error in STARPCYG_V3 --- unable to R grid in file with R grid'
 	      STOP
-	    END IF
+	     END IF
 	  END DO
 	  R(1)=RMAX
-!
-	  DO I=1,ND-1
-	    IF( R(I+1) .GE. R(I))THEN
-	      LUER=ERROR_LU()
-              WRITE(LUER,*)'Error in STARPCYG_V3 --- non-monotonic R grid.'
-              WRITE(LUER,*)'R should be monontonically decreasing'
-	      WRITE(LUER,*)(J,R(J), J=MAX(I-4,1),MIN(I+4,ND))
-	      STOP
-	    END IF
-	  END DO
-!
 C
 C Compute Velocity and SIGMA
 C

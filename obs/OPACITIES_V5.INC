@@ -65,7 +65,11 @@
 !
 ! Add in 2-photon emissivity and opacity.
 !
-	  CALL TWO_PHOT_OPAC(ETA,CHI,POPS,T,CONT_FREQ,ND,NT)
+	IF(COMPUTE_EDDFAC)THEN
+	  CALL TWO_PHOT_OPAC_V2(ETA,CHI,POPS,T,NU,CONT_FREQ,' ',NCF,ND,NT,35,6)
+	ELSE
+	  CALL TWO_PHOT_OPAC_V2(ETA,CHI,POPS,T,NU,CONT_FREQ,TWO_PHOTON_METHOD,NCF,ND,NT,35,6)
+	END IF
 !
 ! Compute X-ray opacities and emissivities (at local electron temp).
 !

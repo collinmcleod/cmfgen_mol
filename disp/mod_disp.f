@@ -1,12 +1,13 @@
 	MODULE MOD_DISP
 !
+! Altered 12-Jun-2015 : NION_MAX increased to 21. Added MI (cur_hmi,19-Aug-2015)
 ! Altered 13-May-2015 : Inserted ARAD, GAM2, GAM4 and OBSERVED_LEVEL in MODEL_ATOM_DATA.
 ! Altered 28-Mar-2003 : NUM_IONS variable installed.
 ! Altered 27-Nov-2000 : MASS changed to AT_MASS
 !                       Extra species installed. More consistent with CMFGEN.
 !
 	INTEGER, PARAMETER :: NSPEC=26
-	INTEGER, PARAMETER :: NION_MAX=20
+	INTEGER, PARAMETER :: NION_MAX=21
 	INTEGER, PARAMETER :: NPHOT_MAX=4
 	INTEGER, PARAMETER :: MAX_ION=NSPEC*NION_MAX
 	INTEGER  NUM_IONS			!Total number of ions present
@@ -80,7 +81,7 @@ C
 !	DATA GEN_ION_ID /'I','II','III','IV','V',
 !	1                'VI','VII','VIII','IX','X','XI','XII'/
 !
-	DATA GEN_ION_ID /'I','2','III','IV','V',
+	DATA GEN_ION_ID /'MI','I','2','III','IV','V',
 	1                'SIX','SEV','VIII','IX','X','XI','XII',
 	1                'XIII','XIV','XV','XSIX','XSEV','X8','X9','XX'/
 !

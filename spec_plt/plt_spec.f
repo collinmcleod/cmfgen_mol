@@ -670,6 +670,8 @@ C
 	    DO I=2,J-1
 	      IF(YV(I) .EQ. 0)THEN
 	        YV(I)=0.5D0*(ZV(I-1)+ZV(I+1))
+	      ELSE IF(YV(I) .LT. -1.0D+10)THEN
+	        YV(I)=0.0D0
 	      END IF
 	    END DO
 	  END IF

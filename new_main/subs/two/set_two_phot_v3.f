@@ -12,10 +12,11 @@
 	USE TWO_PHOT_MOD
 	IMPLICIT NONE
 !
+! Altered 19-Aug-2015: Added options to improve two photon absorption (cur_hmi,14-Jul-2015)
 ! Altered 05-Apr-2011 - Changed to V3.
 !                       HNST_F_ON_S (rather than HNST_F) is passed in call.
-!                       HNST_F/HNST_S replaced by HNST_F_ON_S - done to faciliate
-!                         modifications allowing lower temperaturs.
+!                       HNST_F/HNST_S replaced by HNST_F_ON_S - done to facilitate
+!                         modifications allowing lower temperatures.
 ! Created 26-Jun-1998
 !
 	INTEGER N_S
@@ -35,7 +36,6 @@
 	CHARACTER*(*) SPECIES
 	CHARACTER*(*) LEVEL_NAME(N_F)
 !
-	REAL*8 T(ND)
 	REAL*8 GION
 	REAL*8 ZION
 !
@@ -64,11 +64,14 @@
 	  ALLOCATE (ION_LOW_LEV_TWO(N_TWO))
 	  ALLOCATE (ION_UP_LEV_TWO(N_TWO))
 	  ALLOCATE (ION_ID_TWO(N_TWO))
+	  ALLOCATE (LST_FREQ_INDX_TWO(N_TWO))
 C
 	  ALLOCATE (FS_RAT_LOW(ND,N_TWO))
 	  ALLOCATE (FS_RAT_UP(ND,N_TWO))
 	  ALLOCATE (UP_RATE_TWO(ND,N_TWO))
 	  ALLOCATE (DOWN_RATE_TWO(ND,N_TWO))
+	  ALLOCATE (RJ_TWO(ND,N_TWO))
+	  ALLOCATE (W_TWO(ND))
 C
 	  INITIALIZE_TWO=.TRUE.
 	END IF
@@ -88,6 +91,7 @@ C
 	  FS_RAT_UP(:,:)=0.0D0
 	  DOWN_RATE_TWO(:,:)=0.0D0
 	  UP_RATE_TWO(:,:)=0.0D0
+	  LST_FREQ_INDX_TWO=0
 	  TWO_PHOT_AVAILABLE(:)=.FALSE.
 	END IF
 !

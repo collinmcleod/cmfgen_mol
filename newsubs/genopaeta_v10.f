@@ -12,6 +12,7 @@ C
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 C
+C Altered 19-Aug-2015: Added call to DO_HMI_FF (cur_hmi, 21-Jun-2015)
 C Altered 03-Feb-2011 - Call changed: Include LOG_HNST and DIST replaced vy LOG_DIST.
 C                          Updated to V10.
 C Altered 13-Jun-2010 - Now include free-free contribution for all level. Particularly necessary
@@ -122,7 +123,17 @@ C Add in free-free contribution. Because SN can be dominated by elements other
 C than H and He, we now sum over all levels. To make sure that we only do this
 C one, we only include the FREE-FREE contribution for the ion when PHOT_ID is one.
 C
-	IF(IONFF .AND. PHOT_ID .EQ. 1)THEN
+	IF(ZION .EQ. 0.0D0)THEN
+	  I=7
+	  IF(LST_DEPTH_ONLY)THEN
+	    K=ND_LOC
+	    COR_FAC(K)=DI(1,K)
+	    CALL DO_HMI_FF(ETA(K),CHI(K),COR_FAC(K),ED(K),T(K),EMHNUKT(K),NU,I,K)
+	  ELSE
+	    COR_FAC=DI(1,1:ND)
+	    CALL DO_HMI_FF(ETA,CHI,COR_FAC,ED,T,EMHNUKT,NU,I,ND)
+	  END IF
+	ELSE IF(IONFF .AND. PHOT_ID .EQ. 1)THEN
 C
 C Compute free-free gaunt factors. Replaces call to GFF in following DO loop.
 C

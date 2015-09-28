@@ -38,6 +38,7 @@
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
+! Altered 24-Jul-2105 : Added HMI, Changed to COMP_OPAC_V2 (cur_hmi, 19-Aug-2015)
 ! Altered 27-Mar-2013 : dE_WORK and RAD_DECAY_LUM updated for clumping.
 !                       LUWARN inserted (done earlier)
 !                       LIN_PROF_SIM is now depth dependent -- code cannow handle depth dependent 
@@ -71,7 +72,7 @@
 	INTEGER NCF
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
-	CHARACTER(LEN=12), PARAMETER :: PRODATE='27-Mar-2014'		!Must be changed after alterations
+	CHARACTER(LEN=12), PARAMETER :: PRODATE='20-Aug-2015'		!Must be changed after alterations
 !
 ! 
 !
@@ -471,7 +472,8 @@
 	CNT_FIX_BA=0
 	MAXCH_SUM=0.0D0
 	LST_ITERATION=.FALSE.
-	DPTH_INDX=22
+!
+	DPTH_INDX=1
 	DPTH_INDX=MIN(DPTH_INDX,ND)		!Thus no problem if 84 > ND
 	VAR_INDX=366
 	VAR_INDX=MIN(VAR_INDX,NT)
@@ -705,11 +707,11 @@
 	        T2=GF_CUT
 	      END IF
 	      TMP_STRING=TRIM(ION_ID(ID))//'_F_OSCDAT'
-	      CALL GENOSC_V8( ATM(ID)%AXzV_F, ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,ATM(ID)%XzVLEVNAME_F, 
+	      CALL GENOSC_V9( ATM(ID)%AXzV_F, ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,ATM(ID)%XzVLEVNAME_F, 
 	1                 ATM(ID)%ARAD,ATM(ID)%GAM2,ATM(ID)%GAM4,ATM(ID)%OBSERVED_LEVEL,
 	1                 T1, ATM(ID)%ZXzV,
 	1                 ATM(ID)%XzV_OSCDATE, ATM(ID)%NXzV_F,I,
-	1                 'SET_ZERO',T2,GF_LEV_CUT,MIN_NUM_TRANS,L_FALSE,
+	1                 'SET_ZERO',T2,GF_LEV_CUT,MIN_NUM_TRANS,L_FALSE,L_FALSE,
 	1                 LUIN,LUSCR,TMP_STRING)
 	      TMP_STRING=TRIM(ION_ID(ID))//'_F_TO_S'
 	      CALL RD_F_TO_S_IDS_V2( ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
@@ -1445,7 +1447,7 @@
 	    END IF
 !
 	    CALL TUNE(IONE,'DTDR_OPAC')
-	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
+	      CALL COMP_OPAC_V2(POPS,NU,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONLY)
 !	    INCLUDE 'OPACITIES_V4.INC'
@@ -1754,7 +1756,7 @@
 !
 ! Compute continuum opacity and emissivity at the line frequency.
 !
-	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
+	      CALL COMP_OPAC_V2(POPS,NU,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONLY)
 !	    INCLUDE 'OPACITIES_V4.INC'
@@ -2104,7 +2106,7 @@
 ! Compute opacity and emissivity.
 !
 	    CALL TUNE(IONE,'C_OPAC')
-	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
+	      CALL COMP_OPAC_V2(POPS,NU,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONlY)
 !	    INCLUDE 'OPACITIES_V4.INC'
@@ -3275,7 +3277,7 @@
 ! Compute continuum opacity and emissivity at the line frequency.
 !
 !	    INCLUDE 'OPACITIES_V4.INC'
-	    CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
+	    CALL COMP_OPAC_V2(POPS,NU,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONLY)
 
@@ -3606,8 +3608,8 @@
 	  WRITE(LU_FLUX,'(A,T60,1PE12.4)')'Total Rad. decay luminosity:',SUM(RAD_DECAY_LUM)
 	  WRITE(LU_FLUX,'(A,T60,1PE12.4)')'              Total dE_WORK:',SUM(dE_WORK)
 !
-! The second XRAY flux printed is the OBSERVED XRAY luminosity. It should be very similar
-! to the earlier value for optically thin winds.
+! The seocnd XRAY flux printed is the OBSERVED XRAY luminosity. Its should be very similar
+! to the eralier value for optically thin winds.
 !
 	  WRITE(LU_FLUX,'(A,T60,ES12.4)')'Total Shock Luminosity (Lsun):',SUM(XRAY_LUM_TOT)
 	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emitted & observed X-ray Luminosity (> 0.1 keV, Lsun) :',
@@ -4383,7 +4385,8 @@
 ! If DONE_HYDRO_REVISION is TRUE, we do a LAMBDA iteration immediately afterwoods.
 ! LAMBDA_ITERATION has already been set.
 !
-	    ELSE IF(DONE_HYDRO_REVISION)THEN
+	    ELSE IF(DONE_HYDRO_REVISION .OR. R_GRID_REVISED)THEN
+	       LAMBDA_ITERATION=.TRUE.
 !
 ! If RD_LABDA is TRUE., switch to full iteration when convergence has been achieved.
 ! We switch when the convergence is 20%.
@@ -4394,7 +4397,7 @@
 	       LAMBDA_ITERATION=.FALSE.
 	       FIXED_T=RD_FIX_T
 	    END IF
-	    CALL SPECIFY_IT_CYCLE(COMPUTE_BA,LAMBDA_ITERATION,FIXED_T)
+	    CALL SPECIFY_IT_CYCLE_V2(MAIN_COUNTER,COMPUTE_BA,LAMBDA_ITERATION,FIXED_T)
 !
 ! Check to see if the user has changed IN_ITS to modify the number of iterations being
 ! undertaken. If the file has not been modified, no action will be taken. The use may

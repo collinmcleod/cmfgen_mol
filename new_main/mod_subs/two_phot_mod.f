@@ -4,8 +4,9 @@
 ! equations) and BA matrices can be updated.
 !
 	MODULE TWO_PHOT_MOD
-	  INTEGER N_TWO
+	INTEGER N_TWO
 !
+! Altered 19-Aug-2015: Extra variables added to improve two photon opacity calculation (cur_hmi, 8-Jul-2015).
 ! Created 26-Jun-1998
 !
 ! Reaction data
@@ -60,12 +61,15 @@
 !
 	  REAL*8, ALLOCATABLE :: DOWN_RATE_TWO(:,:)
 	  REAL*8, ALLOCATABLE :: UP_RATE_TWO(:,:)
+	  REAL*8, ALLOCATABLE :: RJ_TWO(:,:)
+	  REAL*8, ALLOCATABLE :: W_TWO(:)
 !
           INTEGER, ALLOCATABLE :: ION_ID_TWO(:)
           INTEGER, ALLOCATABLE :: ION_LOW_LEV_TWO(:)
           INTEGER, ALLOCATABLE :: ION_UP_LEV_TWO(:)
           INTEGER, ALLOCATABLE :: LOW_LEV_TWO(:)
           INTEGER, ALLOCATABLE :: UP_LEV_TWO(:)
+          INTEGER, ALLOCATABLE :: LST_FREQ_INDX_TWO(:)
 !	  
 	  LOGICAL, ALLOCATABLE :: TWO_PHOT_AVAILABLE(:)
 !
@@ -74,6 +78,8 @@
 !
 	  LOGICAL INITIALIZE_TWO
 	  LOGICAL DO_TWO_PHOT
+!
+	  CHARACTER(LEN=10) TWO_METHOD
 !
 	END MODULE TWO_PHOT_MOD
 !

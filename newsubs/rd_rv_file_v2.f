@@ -9,6 +9,7 @@
 !
 	SUBROUTINE RD_RV_FILE_V2(R,V,SIGMA,RMAX,RP,VINF,LUIN,ND,OPTIONS,N_OPT)
 !
+! Altered  19-Aug-2015: Added check that SIMGMA < -1.0D0 (cur_hmi,21-Jun-2015).
 ! Altered  31-Mar-2008: Check on VINF is now set to 10% accuracy. Done as V(1) is normally
 !                         < Vinf as radius grid does not extend to infinity.
 ! Altered  16-Jan-2007: VINF only checked of > 0.1 km/s (not important for pp models)
@@ -92,6 +93,18 @@
 	    END IF
 	  END DO
 	  CLOSE(LUIN)
+!
+	  DO I=1,ND-1
+	    IF(V(I) .LE. V(I+1) .AND. V(I) .LT. 0.1D0)THEN
+	      SIGMA(I)=-0.999D0
+	      WRITE(6,*)'Warning from RD_RV_FILE_V2'
+	      WRITE(6,*)'Adjusting SIGMA in hydrostatic zone to be monotonic'
+	    ELSE IF(V(I) .LE. V(I+1))THEN
+	      WRITE(LUER,*)'Error in RD_RV_FILE_V2'
+	      WRITE(6,*)'CMFGEN cannot handle a monotonic velocity law'
+	      STOP
+	    END IF
+	  END DO
 !
 ! Now scale to match radius. V is assumed to be fixed on a r/R(ND) scale.
 ! SIGMA does not change with a simple scaling in r.
