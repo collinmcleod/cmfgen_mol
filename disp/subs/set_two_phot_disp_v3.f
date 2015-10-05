@@ -5,7 +5,11 @@
 ! This routine must be executed for each iteration as the arrays
 ! FS_RAT_LOW and FS_RAT_UP need to be updated.
 !
-	SUBROUTINE SET_TWO_PHOT_V3(SPECIES,ID,
+! This routine should be identical to SET_TWO_PHOT_V3 except we do not
+! access HNST_F_ON_S (we assume it unity) and EQSPC. We also set 
+! UP_LEV_TWO and LOW_LEV_TWO to the level in the FULL atom -- not in POPS.
+!
+	SUBROUTINE SET_TWO_PHOT_DISP_V3(SPECIES,ID,
 	1            HNST_S,N_S,
 	1            HNST_F_ON_S,LEVEL_NAME,EDGE_F,G_F,F_TO_S,N_F,
 	1            ND,ZION,EQSPEC,SPECIES_PRESENT)
@@ -107,12 +111,12 @@ C
 	       IF( LEVEL_NAME(I) .EQ. LOW_NAME_TWO(J) .OR. 
 	1              LEVEL_NAME(I) .EQ. A_LOW_NAME_TWO(J) )THEN
 	          I_F=I
-	          I_S=F_TO_S(I)
+	          I_S=I                          !F_TO_S(I)
 	          ION_LOW_LEV_TWO(J)=I_S
-	          LOW_LEV_TWO(J)=EQSPEC+I_S-1
+	          LOW_LEV_TWO(J)=I_S             !EQSPEC+I_S-1
 	          FREQ_TWO(J)=EDGE_F(I_F)
 	          G_LOW_TWO(J)=G_F(I_F)
-	          FS_RAT_LOW(1:ND,J)=HNST_F_ON_S(I_F,1:ND)
+	          FS_RAT_LOW(1:ND,J)=1.0D0             !HNST_F_ON_S(I_F,1:ND)
 	       END IF
 	    END DO
 !
@@ -122,20 +126,20 @@ C
 	       IF( LEVEL_NAME(I) .EQ. UP_NAME_TWO(J) .OR. 
 	1                 LEVEL_NAME(I) .EQ. A_UP_NAME_TWO(J))THEN
 	          I_F=I
-	          I_S=F_TO_S(I)
+	          I_S=I                                 !F_TO_S(I)
 	          ION_UP_LEV_TWO(J)=I_S
-	          UP_LEV_TWO(J)=EQSPEC+I_S-1
+	          UP_LEV_TWO(J)=I_S                     ! EQSPEC+I_S-1
 	          G_UP_TWO(J)=G_F(I_F)
 	          FREQ_TWO(J)=FREQ_TWO(J)-EDGE_F(I_F)
-	          FS_RAT_UP(1:ND,J)=HNST_F_ON_S(I_F,1:ND)
+	          FS_RAT_UP(1:ND,J)=1.0D0               !HNST_F_ON_S(I_F,1:ND)
 !
 ! The following treats the case when the 2s and 2p state are treated as a single level.
 !
 	          IF(LEVEL_NAME(I) .EQ. '2___' .AND. TWO_PHOT_FORMAT_DATE .EQ. ' ')THEN
 	            COEF_TWO(2,J)=2
 	            LUER=ERROR_LU()
-	            WRITE(LUER,'(1X,A,1X,A,2X,A)')'Warning in SET_TWO_PHOT -- adjusting A'//
-	1               ' as working with full n=2 level',TRIM(SPECIES),TRIM(LEVEL_NAME(I))
+	            WRITE(LUER,*)'Warning in SET_TWO_PHOT -- adjusting A as working with n=2 level'
+	            WRITE(LUER,'(1X,A,2X,A)')TRIM(SPECIES),TRIM(LEVEL_NAME(I))
 	          END IF
 	          COEF_TWO(1,J)=COEF_TWO(1,J)*COEF_TWO(2,J)/G_UP_TWO(J)
 	       END IF
@@ -147,6 +151,7 @@ C
 	      LUER=ERROR_LU()
 	      WRITE(LUER,*)'Error in SET_TWO_PHOT --- invalid level ordering'
 	      WRITE(LUER,*)SPEC_ID_TWO(J)
+	      WRITE(LUER,*)LOW_LEV_TWO(J),UP_LEV_TWO(J)
 	      STOP
 	    END IF
 	    TWO_PHOT_AVAILABLE(J)=.TRUE.

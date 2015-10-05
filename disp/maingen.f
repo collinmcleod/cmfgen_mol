@@ -290,6 +290,7 @@
 	REAL*8 RED_EXT
 	REAL*8 VDOP_FG_FRAC
 	REAL*8 VDOP_MOM_FRAC
+	CHARACTER*30 TWO_PHOT_OPTION
 	CHARACTER*30 FREQ_INPUT
 	CHARACTER*10 SOL_OPT
 	CHARACTER*10 FG_SOL_OPT
@@ -544,6 +545,19 @@
 ! the RVTJ file.
 !
 	CALL COMP_LEV_DIS_BLK(ED,POPION,T,LEVEL_DISSOLUTION,ND)
+!
+! Set 2-photon data with current atomic models and populations.
+!
+        DO ID=1,NUM_IONS-1
+          I=ID
+          CALL SET_TWO_PHOT_DISP_V3(ION_ID(ID), ID,
+	1       ATM(ID)%XzVLTE_F,        ATM(ID)%NXzV_F,
+	1       RONE,                    ATM(ID)%XzVLEVNAME_F,
+	1       ATM(ID)%EDGEXzV_F,       ATM(ID)%GXzV_F,
+	1       RONE,                    ATM(ID)%NXzV_F,  ND,
+	1       ATM(ID)%ZXzV,            IONE,   ATM(ID)%XzV_PRES)
+        END DO
+!
 !
 ! Compute LTE populations
 !
@@ -5234,6 +5248,79 @@ c
 	    CALL DP_CURVE(ND,XV,YV)
 	    YAXIS='Log \gx(cm\u-1\d)'
 	  END IF
+!
+	ELSE IF(XOPT .EQ. 'TWOOP')THEN
+	  CALL USR_OPTION(LAM_ST,'LAMST','911.0D0',FREQ_INPUT)
+	  CALL USR_OPTION(LAM_EN,'LAMEN','9000.0D0',FREQ_INPUT)
+	  IF(KEV_INPUT)THEN
+	    LAM_ST=LAM_ST*KEV_TO_HZ
+	    LAM_EN=LAM_EN*KEV_TO_HZ
+	  ELSE IF(ANG_INPUT)THEN
+	    LAM_ST=ANG_TO_HZ/LAM_ST
+	    LAM_EN=ANG_TO_HZ/LAM_EN
+	  END IF
+	  CALL USR_OPTION(NFREQ,'NPTS','-100','+ve lin. spacing, -ve log')
+!
+	  IF(NFREQ .LT. 0)THEN
+	    LINX=.FALSE.
+	    NFREQ=-NFREQ
+	    T1=LOG(LAM_EN/LAM_ST)/(NFREQ-1)
+	    DO I=1,NFREQ
+	      XNU(I)=EXP( LOG(LAM_ST)+(I-1)*T1 )
+	    END DO
+	  ELSE
+	    LINX=.TRUE.
+	    T1=(LAM_EN-LAM_ST)/(NFREQ-1)
+	    DO I=1,NFREQ
+	      XNU(I)=LAM_ST+(I-1)*T1
+	    END DO
+	  END IF
+!
+	  DO I=1,NUM_IONS
+	    IF(XSPEC .EQ. UC(ION_ID(I)))THEN
+	      ID=I
+	      EXIT
+	    END IF
+	  END DO
+	  DEFAULT='LTE'
+	  CALL USR_OPTION(TWO_PHOT_OPTION,'OPT','LTE','Two photon option: LTE, NOSTIM, RAD, and OLD_DEF')
+!
+	  XAXSAV=XAXIS
+	  CALL USR_OPTION(ELEC,'OPAC','F','Plot opacity instead of emissivity?')
+	  DO ML=1,NFREQ
+	    ETA(1:ND)=0.0D0; CHI(1:ND)=0.0D0
+	    CALL TWO_PHOT_OPAC_DISP_V3(ETA,CHI,ATM(ID)%XzV_F,T,XNU(ML),TWO_PHOT_OPTION,ID,ND,ATM(ID)%NXzV_F)
+	    IF(ELEC)THEN
+	      YV(ML)=CHI(1)
+	      WV(ML)=CHI(ND/2)
+	      ZV(ML)=CHI(ND)
+	    ELSE
+	      YV(ML)=ETA(1)
+	      WV(ML)=ETA(ND/2)
+	      ZV(ML)=ETA(ND)
+	    END IF
+	  END DO
+	  IF(ELEC)THEN
+	    YAXIS='Opacity'
+	  ELSE
+	    YAXIS='Emissivity'
+	  END IF
+!
+	  CALL USR_OPTION(ELEC,'PHOT','F','Plot photon emission rate instead of emissivity?')
+	  IF(ELEC)THEN
+	    DO ML=1,NFREQ
+	      T1=4.0D0*PI/6.626D-27/1.0D+15/XNU(ML)/1.0D+10
+	      YV(ML)=YV(ML)*T1/ATM(ID)%XzV_F(2,1)
+	      WV(ML)=WV(ML)*T1/ATM(ID)%XzV_F(2,ND/2)
+	      ZV(ML)=ZV(ML)*T1/ATM(ID)%XzV_F(2,ND)
+	    END DO
+	    YAXIS='# of photons/s/Hz'
+	  END IF
+!
+	  XAXIS='\gv(10\u15\d Hz)'
+	  CALL DP_CURVE(NFREQ,XNU,YV)
+	  CALL DP_CURVE(NFREQ,XNU,WV)
+	  CALL DP_CURVE(NFREQ,XNU,ZV)
 !
 ! Estimate the effective absorbative optical depth scale for Gamma-rays.
 !

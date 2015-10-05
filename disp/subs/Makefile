@@ -44,6 +44,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(recom_chk_v2.o)\
       $(LIB)(set_dc_or_pop_or_tx.o)\
       $(LIB)(set_dc_or_pop_or_tx_v2.o)\
+      $(LIB)(set_two_phot_disp_v3.o)\
       $(LIB)(setdc_or_pop.o)\
       $(LIB)(setforng.o)\
       $(LIB)(setrec.o)\
@@ -52,6 +53,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(sobjbar.o)\
       $(LIB)(starpcyg_tst.o)\
       $(LIB)(terminal_lu.o)\
+      $(LIB)(two_phot_opac_disp_v3.o)\
       $(LIB)(update_pops.o)\
       $(LIB)(wrbeta.o)\
       $(LIB)(write_line.o)\

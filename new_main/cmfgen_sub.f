@@ -38,6 +38,7 @@
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
+! Altered 29-Sep-2105 : Changed back to COMP_OPAC (Different TWO_PHOT in routine)
 ! Altered 24-Jul-2105 : Added HMI, Changed to COMP_OPAC_V2 (cur_hmi, 19-Aug-2015)
 ! Altered 27-Mar-2013 : dE_WORK and RAD_DECAY_LUM updated for clumping.
 !                       LUWARN inserted (done earlier)
@@ -95,6 +96,7 @@
 	REAL*8 FG_COUNT
 	REAL*8 SCL_FAC
 	REAL*8 SUM_BA
+	REAL*8 RLUMST_BND
 !
 	LOGICAL LST_DEPTH_ONLY
 !
@@ -1055,8 +1057,11 @@
 	1        V,TA,SIGMA,ND)
 !
           VDOP_VEC_EXT(1:NDEXT)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
-!
+	  CALL SET_POP_FOR_TWOJ(POS_IN_NEW_GRID,EDD_CONT_REC,LU_EDD,NDEXT)
+	ELSE
+	  CALL SET_POP_FOR_TWOJ(POS_IN_NEW_GRID,EDD_CONT_REC,LU_EDD,ND)
 	END IF
+	
 !
 ! Need to calculate impact parameters, and angular quadrature weights here
 ! as these may be required when setting up the initial temperature
@@ -1447,7 +1452,7 @@
 	    END IF
 !
 	    CALL TUNE(IONE,'DTDR_OPAC')
-	      CALL COMP_OPAC_V2(POPS,NU,NU_EVAL_CONT,FQW,
+	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONLY)
 !	    INCLUDE 'OPACITIES_V4.INC'
@@ -1756,7 +1761,7 @@
 !
 ! Compute continuum opacity and emissivity at the line frequency.
 !
-	      CALL COMP_OPAC_V2(POPS,NU,NU_EVAL_CONT,FQW,
+	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONLY)
 !	    INCLUDE 'OPACITIES_V4.INC'
@@ -2106,7 +2111,7 @@
 ! Compute opacity and emissivity.
 !
 	    CALL TUNE(IONE,'C_OPAC')
-	      CALL COMP_OPAC_V2(POPS,NU,NU_EVAL_CONT,FQW,
+	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONlY)
 !	    INCLUDE 'OPACITIES_V4.INC'
@@ -2886,6 +2891,7 @@
 	  IF(RLUMST(I) .GE. 0.0D0 .AND. RLUMST(I) .LT.  1.0D-05)RLUMST(I)=1.0D-05
 	  IF(RLUMST(I) .LE. 0.0D0 .AND. RLUMST(I) .GT. -1.0D-05)RLUMST(I)=-1.0D-05
 	END DO
+	RLUMST_BND=RLUMST(1)
 !
 	CALL GEN_ASCI_OPEN(LU_FLUX,'OBSFLUX','UNKNOWN',' ',' ',IZERO,IOS)
 	  WRITE(STRING,'(I10)')N_OBS
@@ -3277,7 +3283,7 @@
 ! Compute continuum opacity and emissivity at the line frequency.
 !
 !	    INCLUDE 'OPACITIES_V4.INC'
-	    CALL COMP_OPAC_V2(POPS,NU,NU_EVAL_CONT,FQW,
+	    CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONLY)
 
@@ -3611,15 +3617,17 @@
 ! The seocnd XRAY flux printed is the OBSERVED XRAY luminosity. Its should be very similar
 ! to the eralier value for optically thin winds.
 !
+	  T1=LUM
+	  IF(SN_MODEL .AND. .NOT. USE_FIXED_J)T1=RLUMST_BND
 	  WRITE(LU_FLUX,'(A,T60,ES12.4)')'Total Shock Luminosity (Lsun):',SUM(XRAY_LUM_TOT)
 	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emitted & observed X-ray Luminosity (> 0.1 keV, Lsun) :',
 	1                                     SUM(XRAY_LUM_0P1),OBS_XRAY_LUM_0P1
 	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emitted & observed X-ray Luminosity (> 1 keV, Lsun):',
 	1                                     SUM(XRAY_LUM_1KEV),OBS_XRAY_LUM_1KEV
 	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emitted & observed X-ray Luminosity (> 0.1 keV, Lstar) :',
-	1                                     SUM(XRAY_LUM_0P1)/LUM,OBS_XRAY_LUM_0P1/LUM
+	1                                     SUM(XRAY_LUM_0P1)/LUM,OBS_XRAY_LUM_0P1/T1
 	  WRITE(LU_FLUX,'(A,T60,2ES12.4)')'Emitted & observed X-ray Luminosity (> 1 keV, Lstar):',
-	1                                     SUM(XRAY_LUM_1KEV)/LUM,OBS_XRAY_LUM_1KEV/LUM
+	1                                     SUM(XRAY_LUM_1KEV)/LUM,OBS_XRAY_LUM_1KEV/T1
 	CLOSE(UNIT=LU_FLUX)
 !
 ! Quick and dirty way of ensuring people don't take notic of OBSFLUX when USE_FIXED_J is TRUE.

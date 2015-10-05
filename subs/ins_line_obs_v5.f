@@ -152,7 +152,7 @@
 ! Continuum
 !
 	  dNU=FREQ(INDX)*BIG_SPACING
-	  WRITE(139,'(2ES12.4,A)')dNU,C_KMS*dNU/FREQ(INDX),'      A'
+!	  WRITE(139,'(2ES12.4,A)')dNU,C_KMS*dNU/FREQ(INDX),'      A'
 !
 ! Electron scattering wings. Since dV_OBS_KMS is the same for all lines,
 ! we can exit once e.s. wing region is found.
@@ -172,7 +172,7 @@
 	    END IF
 	    K=K+1
 	  END DO
-  	  WRITE(139,'(2ES12.4,A)')dNU,C_KMS*dNU/FREQ(INDX),'      B'
+!  	  WRITE(139,'(2ES12.4,A)')dNU,C_KMS*dNU/FREQ(INDX),'      B'
 !
 ! Profile. As NU_STRT_LINE monotonically decreases, we can stop looking at
 !          line K when the next frequency is > NU_STRT_LINE(K). Since
@@ -192,7 +192,7 @@
 	    END IF
 	    K=K+1
 	  END DO
-  	  WRITE(139,'(2ES12.4,A)')dNU,C_KMS*dNU/FREQ(INDX),'      C'
+!  	  WRITE(139,'(2ES12.4,A)')dNU,C_KMS*dNU/FREQ(INDX),'      C'
 !
 ! Doppler core. If FRAC_DOP_OBS is large, this section will be effectively
 !               ignored. This sections is primarily needed when we see
@@ -215,8 +215,8 @@
 	    K=K+1
 	    IF(K .GT. N_LINES)EXIT
 	  END DO
-  	  WRITE(139,'(2ES12.4,A)')dNU,C_KMS*dNU/FREQ(INDX),'      D'
-  	  WRITE(149,'(2ES12.4,A)')FREQ(INDX),C_KMS*dNU/FREQ(INDX),'      D'
+!  	  WRITE(139,'(2ES12.4,A)')dNU,C_KMS*dNU/FREQ(INDX),'      D'
+!  	  WRITE(149,'(2ES12.4,A)')FREQ(INDX),C_KMS*dNU/FREQ(INDX),'      D'
 !
 	  FREQ(INDX+1)=FREQ(INDX)-dNU
 	  INDX=INDX+1

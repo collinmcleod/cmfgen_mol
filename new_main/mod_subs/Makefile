@@ -32,7 +32,6 @@ OBJ = $(LIB)(adjust_r_grid_v4.o)\
       $(LIB)(comp_grey_v2.o)\
       $(LIB)(comp_grey_v4.o)\
       $(LIB)(comp_opac.o)\
-      $(LIB)(comp_opac_v2.o)\
       $(LIB)(comp_var_opac.o)\
       $(LIB)(do_var_cont.o)\
       $(LIB)(eval_lte_v5.o)\

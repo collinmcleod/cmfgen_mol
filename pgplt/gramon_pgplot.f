@@ -2087,8 +2087,9 @@ C
 	        XLABEL=ADJUSTL(XLABEL)
 	      END IF
 	    ELSE IF(XAR_OPERATION .EQ. 'LG')THEN
+	      T1=TINY(CD(IP)%XVEC(1))
 	      DO J=1,NPTS(IP)
-	        IF(CD(IP)%XVEC(J) .GT. 0)THEN
+	        IF(CD(IP)%XVEC(J) .GT. T1)THEN
 	          CD(IP)%XVEC(J)=LOG10(CD(IP)%XVEC(J))
 	        ELSE
 	          CD(IP)%XVEC(J)=-1000.0
@@ -2174,8 +2175,9 @@ C
 	        YLABEL=ADJUSTL(YLABEL)
 	      END IF
 	    ELSE IF(YAR_OPERATION .EQ. 'LG')THEN
+	      T1=TINY(CD(IP)%DATA(1))
 	      DO J=1,NPTS(IP)
-	        IF(CD(IP)%DATA(J) .GT. 0)THEN
+	        IF(CD(IP)%DATA(J) .GT. T1)THEN
 	          CD(IP)%DATA(J)=LOG10(CD(IP)%DATA(J))
 	        ELSE
 	          CD(IP)%DATA(J)=-1000.0

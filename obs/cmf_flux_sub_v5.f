@@ -1038,6 +1038,7 @@
 	  NDEXT=ND ; NCEXT=NC; NPEXT=NP
 	  TEXT(1:ND)=T(1:ND)
 	END IF
+        CALL SET_POP_FOR_TWOJ(POS_IN_NEW_GRID,EDD_CONT_REC,LU_EDD,NDEXT)
 !
 ! Allocate arrays and vectors for computing observed fluxes.
 !

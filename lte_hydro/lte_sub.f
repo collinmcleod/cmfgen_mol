@@ -474,6 +474,7 @@
 ! point to the input data record (Note : Single Record)
 !
 	CALL RD_CONTROL_VARIABLES(LUIN,LUSCR,LUER,NUM_BNDS)
+	TWO_PHOTON_METHOD='LTE'
 !
 ! RMDOT is the density at R=10dex10 cm and V=1km/s (atomic mass units)
 !

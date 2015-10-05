@@ -235,6 +235,10 @@ C
 !
 	CALL RD_HYD_BF_DATA(LUIN,LUMOD,T_OUT)
 !
+! Read in atomic data for 2-photon transitions.
+!
+        CALL RD_TWO_PHOT(LUIN,L_TRUE)
+!
 ! Read in X-ray photoionization cross-sections.
 !
         CALL RD_XRAY_FITS(LUIN)
