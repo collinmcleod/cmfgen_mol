@@ -177,7 +177,7 @@
 	  STRING=ADJUSTL(STRING)
 	  OSCDATE(1:11)=STRING(1:11)
 	  IF(TRIM(FORMAT_DATE) .EQ. 'OLD')THEN
-	    WRITE(LUWARN,*)'Possible error -- FORMAT Date not found in oscilator file'
+	    WRITE(LUWARN,*)'Warning -- FORMAT Date not found in oscilator file:',TRIM(FILNAME)
 	  END IF
 !
 	  READ(LUIN,'(A)')STRING

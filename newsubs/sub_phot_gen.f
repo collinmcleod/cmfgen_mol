@@ -48,6 +48,9 @@
 !
 	IMPLICIT NONE
 !
+! Altered 07-Oct-2015 : Bug fix for Type 7 (modified Seaton formula).
+!                         Offset was beeing added to the current frequency instead
+!                            of the ionization edge.
 ! Altered 21-Apr-2011 : Bug fix for Types 30, 31 (inadvertantly applying to all levels)
 ! Altered 11-Mar-2011 : 2s,2p opacity added for SiIV, PV
 !                       3s,3p opacity added for states with one 3d electron.
@@ -475,7 +478,8 @@ C
 !
 	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 7 .AND.
 	1                             PD(ID)%CROSS_A(LMIN) .NE. 0)THEN
-	          RU=EDGE/(FREQ_VEC(I)+PD(ID)%CROSS_A(LMIN+3))
+!	          RU=EDGE/(FREQ_VEC(I)+PD(ID)%CROSS_A(LMIN+3))
+	          RU=(EDGE+PD(ID)%CROSS_A(LMIN+3))/FREQ_VEC(I)
 	          IF(RU .LE. 1.0D0)THEN
 	            PHOT(I)=PHOT(I) + CONV_FAC*
 	1              PD(ID)%CROSS_A(LMIN)*( PD(ID)%CROSS_A(LMIN+1) +

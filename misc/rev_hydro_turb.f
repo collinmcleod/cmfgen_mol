@@ -12,7 +12,7 @@
 !
 	IMPLICIT NONE
 !
-	INTEGER I,J,IOS
+	INTEGER I,J,K,IOS
 	INTEGER NSTR
 	INTEGER ND
 	INTEGER, PARAMETER :: LU_OUT=11
@@ -35,6 +35,7 @@
 	REAL*8 GSUR_NEW
 	REAL*8 GSUR_OLD
 	REAL*8 GRAV_CON
+	REAL*8 RPHOT
 !
 	REAL*8 dTPdR
         REAL*8 VTURB
@@ -100,19 +101,30 @@
 	1                   '    g_RAD',
 	1                    '   g_ELEC','Gamma','M(t)'
 !
+	MASS_OLD=0.0D0
 	READ(STRING(ND+1),*)RND
 	DO I=1,NSTR
 	  IF(INDEX(STRING(I),'urface gravity is:') .NE. 0)THEN
 	    J=INDEX(STRING(I),':')
 	    READ(STRING(I)(J+1:),*)GSUR_OLD
-	    MASS_OLD=GSUR_OLD/GRAV_CON*RND*RND
-	    WRITE(T_OUT,'(1X,A,F8.2)')'Old mass is ',MASS_OLD
-	    MASS_NEW=MASS_OLD
-	    CALL GEN_IN(MASS_NEW,'New mass in solar units')
-	    GSUR_NEW=GSUR_OLD*MASS_NEW/MASS_OLD
-	    EXIT
+	  ELSE IF(INDEX(STRING(I),'Photospheric radius is') .NE. 0)THEN
+	    J=INDEX(STRING(I),':')
+	    K=INDEX(STRING(I),'(')
+	    IF(K .NE. 0)READ(STRING(I)(J+1:K-1),*)RPHOT
+	    IF(K .EQ. 0)READ(STRING(I)(J+1:),*)RPHOT
+	  ELSE IF(INDEX(STRING(I),'Stars mass is') .NE. 0)THEN
+	    J=INDEX(STRING(I),':')
+	    READ(STRING(I)(J+1:),*)MASS_OLD
 	  END IF
 	END DO
+	IF(MASS_OLD .EQ. 0)THEN
+	  WRITE(6,*)'Assuming surface gravity is defined at inner boundary'
+	  MASS_OLD=GSUR_OLD/GRAV_CON*RND*RND
+	  WRITE(T_OUT,'(1X,A,F8.2)')'Old mass is ',MASS_OLD
+	END IF
+	MASS_NEW=MASS_OLD
+	CALL GEN_IN(MASS_NEW,'New mass in solar units')
+	GSUR_NEW=GSUR_OLD*MASS_NEW/MASS_OLD
 !
         VTURB=0.0D0; CALL GEN_IN(VTURB,'Turbulent velcity in km/s)')
         LOW_LIM=1; CALL GEN_IN(LOW_LIM,'Depth to begin revised mass estimate')
@@ -122,8 +134,9 @@
         SUM_R=0
 	DO I=1,ND
 	  READ(STRING(I+1),*)R,V,E,VdVdR,dPdR,g_TOT,g_RAD,g_ELEC,Gamma
-	  g_TOT=g_RAD-GSUR_NEW*(RND/R)**2
-	  Gamma=g_RAD/GSUR_NEW*(R/RND)**2
+	  P_GRAV(I)=MASS_NEW*GRAV_CON/R/R
+	  g_TOT=g_RAD-P_GRAV(I)      !GSUR_NEW*(RND/R)**2
+	  Gamma=g_RAD/P_GRAV(I)      !GSUR_NEW*(R/RND)**2
 	  IF(VTURB .EQ. 0)THEN
 	    dTPdR=0.0D0
 	  ELSE
@@ -141,11 +154,10 @@
 	  P_VEL(I)=V
 	  P_dPdR(I)=dPdR
 	  P_dVdR(I)=VdVdR/V
-	  P_REQ(I)=VdVdR+dPdR+dTPdR+GSUR_NEW*(RND/R)**2
+	  P_REQ(I)=VdVdR+dPdR+dTPdR+P_GRAV(I)              !GSUR_NEW*(RND/R)**2
 	  P_GRAD(I)=g_RAD
 	  P_GELEC(I)=g_ELEC
 	  P_GTOT(I)=g_TOT
-	  P_GRAV(I)=g_RAD-g_TOT
 !
 	  IF(R .GT. 9.99E+04)THEN
 	    FMT='(1X,ES12.6,ES13.4,F9.2,6(ES14.4),2F11.2)'
@@ -200,6 +212,7 @@ C
 	   WRITE(6,*)'GELEC   -- plot g(elec)'
 	   WRITE(6,*)'GRAV    -- plot g'
 	   WRITE(6,*)'dPdR    -- plot (1/roh).dP/dr'
+	   WRITE(6,*)'dVdR    -- plot dV/dR'
 !
 	   WRITE(6,*)'REQ     -- plot VdVdR+dPdR+dTPdR+g'
 	   WRITE(6,*)'NGL     -- plot g_l/(g-g_e)'
@@ -248,6 +261,9 @@ C
 	  CALL DP_CURVE(I,XVEC,ZVEC)
 	  XLAB='Log R'
 !
+	ELSE IF(XOPT .EQ. 'DVDR')THEN
+	  CALL DP_CURVE(ND,P_VEL,P_dVdR)
+	  YLAB=TRIM(YLAB)//';dV\dg\u/dr'
 	ELSE IF(XOPT .EQ. 'DPDR')THEN
 	  CALL DP_CURVE(ND,P_VEL,P_dPdR)
 	  YLAB=TRIM(YLAB)//'; \gr\u-1\d dP\dg\u/dr'

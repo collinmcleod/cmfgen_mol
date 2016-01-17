@@ -65,7 +65,12 @@
 !
 	LUER=ERROR_LU()
 	WRITE(LUER,'(/,A)')' Entering RD_SN_DATA'
-	OPEN(UNIT=LU,FILE='SN_HYDRO_DATA',STATUS='OLD')
+	OPEN(UNIT=LU,FILE='SN_HYDRO_DATA',STATUS='OLD',IOSTAT=IOS)
+	IF(IOS .NE. 0)THEN
+	  WRITE(LUER,*)'Error opening SN_HYDRO_DATA ins rd_sn_data.f'
+	  WRITE(LUER,*)'IOSTAT=',IOS
+	  STOP
+	END IF
 !
 ! Get the number of data points in the HYDRO model, and the number 
 ! of species.

@@ -76,6 +76,7 @@ $(EXE_DIR)wind_hyd.exe : wind_hyd.o $(OBJ_FILES) \
                $(LOCLIB) $(LAPACK) $(BLAS) $(PGLIB) $(G2CLIB) $(X11LIB) \
                -o $(EXE_DIR)wind_hyd.exe
 
+
 USR=$(LIB_DIR)libtools.a(usr_option.o)\
     $(LIB_DIR)libtools.a(gen_in.o)
 
@@ -134,6 +135,7 @@ $(FN3): lib3
 $(FN4): lib4
 $(FN5): lib5
 $(FN6): lib6
+$(FN7): lib7
 
 lib1:
 	(cd ../tools; make )
@@ -148,6 +150,8 @@ lib5:
 	(cd ../new_main/subs; make )
 lib6:
 	(cd ../new_main/mod_subs; make )
+lib7:
+	(cd ../disp; make )
 
 
 clean :

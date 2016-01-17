@@ -271,7 +271,7 @@
 	    IF(IOS .EQ. 0)READ(LU,*,IOSTAT=IOS)(T1,J=1,NOLD)
 	    IF(IOS .NE. 0)THEN
 	      LUER=ERROR_LU()
-	      WRITE(LUER,*)'Error in SET_RV_HYDRO_MODEL_V3 --- unable to R grid in file with R grid'
+	      WRITE(LUER,*)'Error in SET_RV_HYDRO_MODEL_V3 --- unable to read R grid in file with R grid'
 	      STOP
 	    END IF
           END DO

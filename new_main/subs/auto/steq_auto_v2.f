@@ -105,6 +105,8 @@
           WRITE(LUER,'(A,A)')' AUTO_FILE is ',TRIM(AUTO_FILE)
           WRITE(LUER,*)' '
           RETURN
+	ELSE
+	  RETURN
         END IF
 !
         EQION=N_S+1			!Ion equation

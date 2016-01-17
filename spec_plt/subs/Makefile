@@ -15,6 +15,7 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(determ_reddening.o)\
          $(LIB)(fix_pop_oscillations.o)\
          $(LIB)(get_mag.o)\
+         $(LIB)(get_nd_nt_nit.o)\
          $(LIB)(hiabs.o)\
          $(LIB)(h2abs.o)\
          $(LIB)(int_rec_ap.o)\

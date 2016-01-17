@@ -15,6 +15,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(chk_string.o)\
       $(LIB)(comp_jbar.o)\
       $(LIB)(compion.o)\
+      $(LIB)(determ_clump_pos.o)\
       $(LIB)(dlogvec.o)\
       $(LIB)(edgewr.o)\
       $(LIB)(fg_ham.o)\

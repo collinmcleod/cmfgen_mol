@@ -18,6 +18,8 @@ C
 C
 	IMPLICIT NONE
 C
+C Altered 04-Nov-2015 : Fixed SMC redenning law in optical. Previous formula only
+C                         valid for UV. Joined UV smoothly (at 2950A) to CCM law with R=2.74.
 C Altered 15-Mar-2011 : SMC reddening law added (done by Kathryn Neugent).
 C                       RED option installed -- crude method to get redenning.
 C                       Crude procedure to remove cosmic rays (or spikes) form observed
@@ -1125,6 +1127,19 @@ C
 	1     X(1:4) .EQ. 'WRFL' .OR.  X(1:3) .EQ. 'FNU' .OR.
 	1                X(1:4) .EQ. 'EBMV') THEN
 !
+! If NCF is defined, we use that freuqency grid when computing the extinction curve.
+! Otherwise, we define the grid.
+!
+	  IF(X(1:4) .EQ. 'EBMV' .AND. NCF .EQ. 0)THEN
+	    T1=ANG_TO_HZ/900.0D0; T2=ANG_TO_HZ/5.0E+04
+	    NCF=1000
+	    T2=EXP(LOG(T1/T2)/(NCF-1))
+	    NU(1)=T1
+	    DO I=2,NCF
+	      NU(I)=NU(I-1)/T2
+	    END DO
+	  END IF
+!
 	  CALL USR_OPTION(EBMV_CCM,'EBMV_CCM','0.0D0',
 	1             'CCM E(B-V) to correct for I.S. extinction')
 	  IF(EBMV_CCM .NE. 0)THEN
@@ -1279,18 +1294,31 @@ C
 	     DO I=1,NCF
 	        T1=ANG_TO_HZ/NU(I)
 	        T1=(10000.0/T1) !1/Lambda(um)
-	        C1=-4.959
-	        C2=2.264*T1
-	        D=(T1**2)/(((T1**2-4.6**2)**2)+(T1**2))
-	        C3=0.389*D
-	        IF(T1 .LT. 5.9)THEN
-	           F=0
-	        ELSE
-	           F=0.5392*((T1-5.9)**2)+0.05644*((T1-5.9)**3)
-	        END IF
-	        C4=0.461*F
-                AL_D_EBmV(I)=C1+C2+C3+C4+R_EXT
-             END DO
+	        IF(T1 .LT. 1.1)THEN
+	          RAX=0.574*(T1**1.61)
+	          RBX=-0.527*(T1**1.61)
+	          AL_D_EBmV(I)=R_EXT*(RAX+RBX/R_EXT)
+	        ELSE IF(T1. LT. 3.39)THEN
+	          T2=T1-1.82
+	          RAX=1+T2*(0.17699-T2*(0.50447+T2*(0.02427-T2*(0.72085
+	1                +T2*(0.01979-T2*(0.77530-0.32999*T2))))))
+	          RBX=T2*(1.41338+T2*(2.28305+T2*(1.07233-T2*(5.38434
+	1                 +T2*(0.62251-T2*(5.30260-2.09002*T2))))))
+	          AL_D_EBmV(I)=R_EXT*(RAX+RBX/R_EXT)
+	        ELSE 
+	          C1=-4.959
+	          C2=2.264*T1
+	          D=(T1**2)/(((T1**2-4.6**2)**2)+(T1**2))
+	          C3=0.389*D
+	          IF(T1 .LT. 5.9)THEN
+	             F=0
+	          ELSE
+	             F=0.5392*((T1-5.9)**2)+0.05644*((T1-5.9)**3)
+	          END IF
+	          C4=0.461*F
+                  AL_D_EBmV(I)=C1+C2+C3+C4+R_EXT
+               END IF
+	     END DO
           END IF
 	  IF(X(1:4) .EQ. 'EBMV' .AND. EBMV_SMC .NE. 0)THEN
 	     DO I=1,NCF

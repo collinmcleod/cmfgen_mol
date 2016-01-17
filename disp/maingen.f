@@ -214,6 +214,7 @@
 	LOGICAL RADIAL_TAU
 !
 	INTEGER I,J,K,L
+	INTEGER IMIN,IMAX
 	INTEGER ISPEC,ID
 	INTEGER NLF,ML
 	INTEGER IOS,NFREQ,R_INDX
@@ -2204,9 +2205,13 @@
 !
 	ELSE IF(XOPT .EQ. 'YMDOT')THEN
 	  T1=4.0D+25*PI*365.25D0*24.0D0*3600.0D0/MASS_SUN()
+	  WRITE(6,*)T1
+	  WRITE(6,*)MASS_DENSITY(1),CLUMP_FAC(1),R(1),V(1)
 	  DO I=1,ND
+	    WRITE(26,*)T1*MASS_DENSITY(I)*CLUMP_FAC(I)*R(I)*R(I)*V(I)
 	    YV(I)=LOG10( T1*MASS_DENSITY(I)*CLUMP_FAC(I)*R(I)*R(I)*V(I) )
 	  END DO
+	  WRITE(6,*)YV(1)
 	  YAXIS='Mass Loss rate(Msun/yr)'
 	  CALL DP_CURVE(ND,XV,YV)
 !
@@ -2271,15 +2276,37 @@
 	  END DO
 	  CALL TORSCL(XM,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
 !
-	  DO I=1,ND-1
-	    J=MIN(I+1,ND)
-	    DO K=I+1,ND
-	      IF(LOG10(R(I)/R(J)) .GT. T4)EXIT
-	      J=K
-	    END DO
-	    YV(I)=(TA(J)-TA(I))*(TA(J)-TA(I))/(ZV(J)-ZV(I))/(XM(J)-XM(I))
+	  CALL DETERM_CLUM_POS(MASS_DENSITY,R,ND,TC,K)
+	  J=1
+	  IF(K .GT. 2)THEN
+	    L=(TC(2)-TC(1))/2
+	  ELSE
+	    L=1
+	    WRITE(6,*)'L=',L
+	  END IF
+	  DO I=1,ND-5
+	    IMIN=MAX(1,I-L)
+	    IMAX=MIN(ND,I+L)
+	    YV(I)=(TA(IMAX)-TA(IMIN))*(TA(IMAX)-TA(IMIN))/(ZV(IMAX)-ZV(IMIN))/(XM(IMAX)-XM(IMIN))
+	    IF(I .GT. TC(K)+L/2)THEN
+	      DO J=I,ND-1
+	        IMAX=J+1; IMIN=J
+	        YV(J)=(TA(IMAX)-TA(IMIN))*(TA(IMAX)-TA(IMIN))/(ZV(IMAX)-ZV(IMIN))/(XM(IMAX)-XM(IMIN))
+	      END DO
+	      YV(ND)=1.0D0
+	      EXIT
+	    END IF
 	  END DO
-	  YV(ND)=1.0D0
+!
+!	  DO I=1,ND-1
+!	    J=MIN(I+1,ND)
+!	    DO K=I+1,ND
+!	      IF(LOG10(R(I)/R(J)) .GT. T4)EXIT
+!	      J=K
+!	    END DO
+!	    YV(I)=(TA(J)-TA(I))*(TA(J)-TA(I))/(ZV(J)-ZV(I))/(XM(J)-XM(I))
+!	  END DO
+!	  YV(ND)=1.0D0
 !
 	  YAXIS='Clumping factor'
 	  CALL DP_CURVE(ND,XV,YV)
