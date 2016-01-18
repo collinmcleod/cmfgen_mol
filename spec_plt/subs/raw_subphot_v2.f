@@ -25,6 +25,7 @@
 	USE HYD_BF_PHOT_DATA
 	IMPLICIT NONE
 !
+! Altered 07-Oct-2015 : Bug fixed with cross-section TYPE=7.
 ! Altered 17-Jun-2014 : Bug fixed with cross-section TYPE=5 -- LMIN was being used when not set.
 ! Altered 17-Sep-2010 : Altered implementation of Verner ground-state fits
 !

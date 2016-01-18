@@ -15,11 +15,13 @@
 	INTEGER I,J,K,IOS
 	INTEGER NSTR
 	INTEGER ND
+	INTEGER, PARAMETER :: LU_IN=7
 	INTEGER, PARAMETER :: LU_OUT=11
 	INTEGER, PARAMETER :: T_OUT=6
 	INTEGER, PARAMETER :: IZERO=0
 !
 	REAL*8 R
+	REAL*8 RSQ
 	REAL*8 V
 	REAL*8 E
 	REAL*8 VdVdR
@@ -52,8 +54,9 @@
 	EXTERNAL GRAVITATIONAL_CONSTANT, MASS_SUN
 !
 	CHARACTER*132 STRING(500)
+	CHARACTER*132 TMP_STRING
 	CHARACTER*132 FMT
-	CHARACTER*132 FILENAME
+	CHARACTER*132 FILENAME,RVTJ_FILE_NAME
 	CHARACTER(LEN=80) XLAB,YLAB,TIT
 	CHARACTER(LEN=10) XOPT
 !
@@ -66,10 +69,14 @@
 	REAL*8 P_GELEC(200)
 	REAL*8 P_GTOT(200)
 	REAL*8 P_GRAV(200)
+	REAL*8 ED(200)
 	REAL*8 TA(200)
 	REAL*8 XVEC(200)
 	REAL*8 YVEC(200)
 	REAL*8 ZVEC(200)
+!
+	LOGICAL OLD_FORMAT
+	LOGICAL PLANE_PARALLEL
 !
 	GRAV_CON=1.0D-20*GRAVITATIONAL_CONSTANT()*MASS_SUN()
 !
@@ -118,10 +125,10 @@
 	  END IF
 	END DO
 	IF(MASS_OLD .EQ. 0)THEN
-	  WRITE(6,*)'Assuming surface gravity is defined at inner boundary'
-	  MASS_OLD=GSUR_OLD/GRAV_CON*RND*RND
-	  WRITE(T_OUT,'(1X,A,F8.2)')'Old mass is ',MASS_OLD
+	  WRITE(6,*)'Old mass not available'
+	  CALL GEN_IN(MASS_OLD,'New mass in solar units')
 	END IF
+	WRITE(T_OUT,'(1X,A,F8.2)')'Old mass is ',MASS_OLD
 	MASS_NEW=MASS_OLD
 	CALL GEN_IN(MASS_NEW,'New mass in solar units')
 	GSUR_NEW=GSUR_OLD*MASS_NEW/MASS_OLD
@@ -130,16 +137,28 @@
         LOW_LIM=1; CALL GEN_IN(LOW_LIM,'Depth to begin revised mass estimate')
         HIGH_LIM=ND; CALL GEN_IN(HIGH_LIM,'Depth to end revised mass estimate')
 !
+	READ(STRING(2),*)T1
+	PLANE_PARALLEL=.FALSE.
+	IF(T1/RND .LT. 1.5D0)PLANE_PARALLEL=.TRUE.
+	CALL GEN_IN(PLANE_PARALLEL,'Plane paraellel model?')
+!
         SUM_ERROR=0
         SUM_R=0
+	OLD_FORMAT=.TRUE.
+	IF(INDEX(STRING(1),'dTPdR/ROH') .NE. 0)OLD_FORMAT=.FALSE.
 	DO I=1,ND
-	  READ(STRING(I+1),*)R,V,E,VdVdR,dPdR,g_TOT,g_RAD,g_ELEC,Gamma
-	  P_GRAV(I)=MASS_NEW*GRAV_CON/R/R
-	  g_TOT=g_RAD-P_GRAV(I)      !GSUR_NEW*(RND/R)**2
-	  Gamma=g_RAD/P_GRAV(I)      !GSUR_NEW*(R/RND)**2
-	  IF(VTURB .EQ. 0)THEN
+	  IF(OLD_FORMAT)THEN
 	    dTPdR=0.0D0
+	    READ(STRING(I+1),*)R,V,E,VdVdR,dPdR,g_TOT,g_RAD,g_ELEC,Gamma
 	  ELSE
+	    READ(STRING(I+1),*)R,V,E,VdVdR,dPdR,dTPdR,g_TOT,g_RAD,g_ELEC,Gamma
+	  END IF
+	  RSQ=R*R
+	  IF(PLANE_PARALLEL)RSQ=RND*RND
+	  P_GRAV(I)=MASS_NEW*GRAV_CON/RSQ
+	  g_TOT=g_RAD-P_GRAV(I)
+	  Gamma=g_RAD/P_GRAV(I)
+	  IF(VTURB .NE. 0.0D0)THEN
 	    dTPdR=-0.5D0*VTURB*VTURB*(2.0D0/R+VdVdR/V/V)
 	  END IF
           DENOM=(ABS(VdVdR)+ ABS(dPdR)+ ABS(dTPdR)+ABS(g_TOT))
@@ -153,7 +172,7 @@
 	  P_R(I)=R
 	  P_VEL(I)=V
 	  P_dPdR(I)=dPdR
-	  P_dVdR(I)=VdVdR/V
+	  P_dVdR(I)=1.0D-05*VdVdR/V
 	  P_REQ(I)=VdVdR+dPdR+dTPdR+P_GRAV(I)              !GSUR_NEW*(RND/R)**2
 	  P_GRAD(I)=g_RAD
 	  P_GELEC(I)=g_ELEC
@@ -205,6 +224,7 @@ C
 !
 	ELSE IF(XOPT .EQ. 'H' .OR. XOPT(1:2) .EQ. 'HE' .OR. XOPT .EQ. '?')THEN
 	   WRITE(6,*)RED_PEN
+	   WRITE(6,*)'XdVdR   -- set X axis to dVdR'
 	   WRITE(6,*)'XVEL    -- set X axis to V(km/s)'
 	   WRITE(6,*)'XR      -- set X axis to R/R(ND)'
 !
@@ -224,10 +244,38 @@ C
 	ELSE IF(XOPT .EQ. 'XVEL')THEN
 	  XVEC(1:ND)=P_VEL(1:ND)
 	  XLAB='V(km/s)'
+!
+	ELSE IF(XOPT .EQ. 'XDVDR')THEN
+	  XVEC(1:ND)=1000.0D0*P_dVdR(1:ND)
+	  XLAB='dVdR(ks\u-1\d)'
+!
+	ELSE IF(XOPT .EQ. 'XT')THEN
+	  IOS=1
+	  RVTJ_FILE_NAME='RVTJ'
+	  DO WHILE(IOS .NE. 0)
+            CALL GEN_IN(RVTJ_FILE_NAME,'File with R, V, T etc (RVTJ)')
+            OPEN(UNIT=LU_IN,FILE=RVTJ_FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+            IF(IOS .NE. 0)WRITE(T_OUT,*)'Unable to open RVTJ: IOS=',IOS
+	    RVTJ_FILE_NAME='../RVTJ'
+          END DO
+	  TMP_STRING=' '
+	  DO WHILE(INDEX(TMP_STRING,'Electron density') .EQ. 0)
+	    READ(LU_IN,'(A)')TMP_STRING
+	  END DO
+	  READ(LU_IN,*)(ED(I),I=1,ND)
+          CLOSE(LU_IN)
+	  XVEC(1:ND)=ED(1:ND)*6.65D-25*10.0D+05/P_dVdR(1:ND)
+	  XLAB='t'
+!
 	ELSE IF(XOPT .EQ. 'XR')THEN
 	  XVEC(1:ND)=P_R(1:ND)/P_R(ND)
 	  WRITE(6,*)'R(ND)=',P_R(ND)
 	  XLAB='R/R(ND)'
+!
+	ELSE IF(XOPT .EQ. 'VEL')THEN
+	  YVEC(1:ND)=P_VEL(1:ND)
+	  CALL DP_CURVE(ND,XVEC,YVEC)
+	  YLAB='V(km/s)'
 !
 	ELSE IF(XOPT .EQ. 'INT')THEN
 	  I=0

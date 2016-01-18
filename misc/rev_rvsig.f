@@ -4,6 +4,7 @@
 !
 	PROGRAM REVISE_RVSIG
 	USE GEN_IN_INTERFACE
+	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
 ! Altered 24-Oct-2013: Added VEL_TYPE=3 so that can do a velocity law with 2 components.
@@ -47,6 +48,7 @@
 	REAL*8 V_MAX
 	REAL*8 V_MIN 
 !
+	REAL*4 XVAL,YVAL
 	REAL*8 R_TRANS
 	REAL*8 V_TRANS
 	REAL*8 dVdR_TRANS
@@ -71,13 +73,17 @@
 	INTEGER I_ST,I_END
 	INTEGER N_HEAD
 	INTEGER IOS
+	INTEGER PGCURS
 !
 	LOGICAL ROUND_ERROR
 	LOGICAL RD_MEANOPAC
+	LOGICAL CURSERR
+	LOGICAL REPLOT
 !
         CHARACTER*30 UC
         EXTERNAL UC
 !
+	CHARACTER(LEN=1) CURSVAL
 	CHARACTER(LEN=10) OPTION
 	CHARACTER(LEN=80) OLD_RVSIG_FILE
 	CHARACTER(LEN=80) NEW_RVSIG_FILE
@@ -767,6 +773,79 @@
 	    END DO
 	  END IF
 !
+	ELSE IF(OPTION .EQ. 'CUR')THEN
+!
+	  WRITE(6,'(A)')BLUE_PEN
+	  WRITE(6,*)'Use ''r'' to replace a data point'
+	  WRITE(6,*)'Use ''a'' to add a data point'
+	  WRITE(6,*)'Use ''d'' to delete a data point'
+	  WRITE(6,*)'Use ''e'' to exit'
+	  WRITE(6,'(A)')DEF_PEN
+!
+	  CALL DP_CURVE(ND_OLD,OLD_R,OLD_V)
+ 	  CALL GRAMON_PGPLOT('R/R\d*\u','V(km/s)',' ',' ')
+	  WRITE(6,'(A)')'Cursor now available to modify data points'
+	  ND=ND_OLD
+	  R(1:ND)=OLD_R(1:ND); V(1:ND)=OLD_V(1:ND)
+!
+	  DO WHILE(1 .EQ. 1)
+	    DO WHILE(1 .EQ. 1)
+	      CURSERR = PGCURS(XVAL,YVAL,CURSVAL)
+	      WRITE(6,*)XVAL,YVAL
+	      IF(CURSVAL .EQ. 'e' .OR. CURSVAL .EQ. 'E')EXIT
+	      IF(CURSVAL .EQ. 'r' .OR. CURSVAL .EQ. 'R')THEN
+	        T1=XVAL
+	        TMP_R(1:ND)=ABS(R(1:ND)-XVAL)
+	        I=MINLOC(TMP_R(1:ND),IONE)
+	        V(I)=YVAL
+	        WRITE(6,*)'Replaced V for R=',R(I)
+	      ELSE IF(CURSVAL .EQ. 'd' .OR. CURSVAL .EQ. 'D')THEN
+	        T1=XVAL
+	        TMP_R(1:ND)=ABS(R(1:ND)-T1)
+	        I=MINLOC(TMP_R(1:ND),IONE)
+	        R(I:ND-1)=R(I+1:ND)
+	        V(I:ND-1)=V(I+1:ND)
+	        ND=ND-1
+	        WRITE(6,*)'Deleted R=',R(I),' from grid'
+	      ELSE IF(CURSVAL .EQ. 'a' .OR. CURSVAL .EQ. 'A')THEN
+	        DO I=1,ND-1
+	          IF( (R(I)-XVAL)*(R(I+1)-XVAL) .LT. 0 )THEN
+	            DO J=ND,I+1,-1
+                      R(J+1)=R(J)
+                      V(J+1)=V(J)
+	            END DO
+	            R(I+1)=XVAL; V(I+1)=YVAL
+	            ND=ND+1
+	            WRITE(6,*)'Add R=',R(I),' to grid'
+	            EXIT
+	          END IF
+	        END DO
+	      ELSE
+	        WRITE(6,*)RED_PEN
+	        WRITE(6,*)'Error - use r(eplace), a(dd), d(elete), e'
+	        WRITE(6,*)DEF_PEN
+	      END IF
+	    END DO
+	    CALL GEN_IN(REPLOT,'Replot to see revision to V')
+	    IF(REPLOT)THEN
+	      CALL DP_CURVE(ND_OLD,OLD_R,OLD_V)
+	      CALL DP_CURVE(ND,R,V)
+ 	      CALL GRAMON_PGPLOT('R/R\d*\u','V(km/s)',' ',' ')
+	    ELSE
+	      EXIT
+	    END IF
+	  END DO
+!
+! Compute SIGMA
+!
+	  ALLOCATE (COEF(ND,4))
+	  CALL MON_INT_FUNS_V2(COEF,V,R,ND)
+	  DO I=1,ND
+	    SIGMA(I)=COEF(I,3)
+	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	  END DO
+	  DEALLOCATE (COEF)
+!
 	ELSE IF(OPTION .EQ. 'PLOT')THEN
 	  ND=ND_OLD 
 	  DO I=1,ND
@@ -822,9 +901,11 @@
 	T1=R(ND)
 	R(1:ND)=R(1:ND)/T1
 	WRITE(6,*)'Plotting V versus R/R*'
+	CALL DP_CURVE(ND_OLD,OLD_R,OLD_V)
 	CALL DP_CURVE(ND,R,V)
 	CALL GRAMON_PGPLOT('R/R\d*\u','V(km/s)',' ',' ')
 	WRITE(6,*)'Plotting Sigma versus R/R*'
+	CALL DP_CURVE(ND_OLD,OLD_R,OLD_SIGMA)
 	CALL DP_CURVE(ND,R,SIGMA)
 	CALL GRAMON_PGPLOT('R/R\d*\u','SIGMA',' ',' ')
 !

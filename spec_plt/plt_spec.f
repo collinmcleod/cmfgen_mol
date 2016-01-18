@@ -18,6 +18,7 @@ C
 C
 	IMPLICIT NONE
 C
+C Altered 18-Jan-2015 : Added REM_BP (automatic removal of bad pixel).
 C Altered 04-Nov-2015 : Fixed SMC redenning law in optical. Previous formula only
 C                         valid for UV. Joined UV smoothly (at 2950A) to CCM law with R=2.74.
 C Altered 15-Mar-2011 : SMC reddening law added (done by Kathryn Neugent).
@@ -94,6 +95,7 @@ C
 	LOGICAL NON_MONOTONIC
 	LOGICAL SMOOTH			!Smooth observational data?
 	LOGICAL CLEAN			!Remove IUE bad pixels?
+	LOGICAL REMOVE_BAD_PIX
 	LOGICAL CLN_CR			!Remove cosmic-ray spikes
 	LOGICAL TREAT_AS_MOD		
 	LOGICAL READ_OBS
@@ -627,6 +629,9 @@ C
 	  CLEAN=.FALSE.
 	  CALL USR_HIDDEN(CLEAN,'CLEAN','F',' ')
 C
+	  REMOVE_BAD_PIX=.FALSE.
+	  CALL USR_HIDDEN(REMOVE_BAD_PIX,'REM_BP','F','Remove bad pixels? ')
+C
 	  CLN_CR=.FALSE.
 	  CALL USR_HIDDEN(CLN_CR,'CLN_CR','F','Remove cosmic ray spikes? ')
 C
@@ -675,6 +680,26 @@ C
 	      ELSE IF(YV(I) .LT. -1.0D+10)THEN
 	        YV(I)=0.0D0
 	      END IF
+	    END DO
+	  END IF
+!
+	  IF(REMOVE_BAD_PIX)THEN
+	    DO L=3,J-50,90
+	      T1=0.0D0; T2=0.0D0; T3=0.0D0
+	      DO K=L,MIN(L+99,J)
+	        T1=T1+YV(K)
+	        T2=T2+YV(K)*YV(K)
+	        T3=T3+1
+	      END DO
+	      T1=T1/T3
+	      T2=SQRT( (T2-T3*T1*T1)/(T3-1) )
+	      DO K=L+1,MIN(L+98,J-1)
+	        IF( ABS(YV(K)-T1) .GT. 5.0*T2 .AND.
+	1           ABS(YV(K-1)-T1) .LT. 3.0*T2 .AND.
+	1           ABS(YV(K+1)-T1) .LT. 3.0*T2)THEN
+	           YV(K)=0.5D0*(YV(K-1)+YV(K+1))
+	        END IF
+	      END DO
 	    END DO
 	  END IF
 !
