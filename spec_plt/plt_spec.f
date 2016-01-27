@@ -34,7 +34,7 @@ C
 C
 C Determines largest single plot that can read in.
 C
-	INTEGER, PARAMETER :: NCF_MAX=2000000
+	INTEGER, PARAMETER :: NCF_MAX=3000000
 C
 C Used to indicate number of data points in BB spectrum
 c
