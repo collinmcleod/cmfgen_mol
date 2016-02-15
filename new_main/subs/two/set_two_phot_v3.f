@@ -65,6 +65,7 @@
 	  ALLOCATE (ION_UP_LEV_TWO(N_TWO))
 	  ALLOCATE (ION_ID_TWO(N_TWO))
 	  ALLOCATE (LST_FREQ_INDX_TWO(N_TWO))
+	  ALLOCATE (TWO_PHOT_COEF_FIXED(N_TWO))
 C
 	  ALLOCATE (FS_RAT_LOW(ND,N_TWO))
 	  ALLOCATE (FS_RAT_UP(ND,N_TWO))
@@ -86,6 +87,7 @@ C
 	  ION_UP_LEV_TWO(:)=0.0D0
 	  ION_ID_TWO(:)=0.0D0
 	  Z_TWO(:)=0.0D0
+	  TWO_PHOT_COEF_FIXED(:)=.FALSE.
 	  FS_RAT_LOW(:,:)=0.0D0
 	  FS_RAT_UP(:,:)=0.0D0
 	  DOWN_RATE_TWO(:,:)=0.0D0
@@ -132,12 +134,14 @@ C
 ! The following treats the case when the 2s and 2p state are treated as a single level.
 !
 	          IF(LEVEL_NAME(I) .EQ. '2___' .AND. TWO_PHOT_FORMAT_DATE .EQ. ' ')THEN
-	            COEF_TWO(2,J)=2
-	            LUER=ERROR_LU()
-	            WRITE(LUER,'(1X,A,1X,A,2X,A)')'Warning in SET_TWO_PHOT -- adjusting A'//
+	            IF(.NOT. TWO_PHOT_COEF_FIXED(J))THEN
+	              COEF_TWO(1,J)=COEF_TWO(1,J)/4.0D0
+	              LUER=ERROR_LU()
+	              WRITE(LUER,'(1X,A,1X,A,2X,A)')'Warning in SET_TWO_PHOT -- adjusting A'//
 	1               ' as working with full n=2 level',TRIM(SPECIES),TRIM(LEVEL_NAME(I))
-	          END IF
-	          COEF_TWO(1,J)=COEF_TWO(1,J)*COEF_TWO(2,J)/G_UP_TWO(J)
+	              TWO_PHOT_COEF_FIXED(J)=.TRUE.
+	            END IF
+	         END IF
 	       END IF
 	    END DO
 !

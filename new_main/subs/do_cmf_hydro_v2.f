@@ -463,6 +463,9 @@
 	  WRITE(LU_ERR,*)'An invalid Eddington parameter has been computed in DO_CMF_HYDRO_V2'
 	  WRITE(LU_ERR,*)'Check the validity of Teff and Log G'
 	  WRITE(LU_ERR,*)'The computed (maximum) Eddington parameter is ',GAM_EDD*MAX_ED_ON_NA
+	  WRITE(LU_ERR,*)'                            Teff(K)/1.0+04 is',TEFF
+	  WRITE(LU_ERR,*)'                         LOG_G (cgs units) is',LOGG
+	  WRITE(LU_ERR,*)'                                MAX(Ne/Na) is',MAX_ED_ON_NA
 	  STOP
 	END IF
 !
