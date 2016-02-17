@@ -913,12 +913,12 @@
 !
 	DO ID=1,NUM_IONS-1
 	  ID_SAV=ID
-	  CALL SET_TWO_PHOT_V2(ION_ID(ID), ID_SAV,
-	1       ATM(ID)%XzVLTE,     ATM(ID)%NXzV,
-	1       ATM(ID)%XzVLTE_F,   ATM(ID)%XzVLEVNAME_F,
-	1       ATM(ID)%EDGEXzV_F,  ATM(ID)%GXzV_F,
-	1       ATM(ID)%F_TO_S_XzV, ATM(ID)%NXzV_F, ND,
-	1       ATM(ID)%ZXzV,       ATM(ID)%EQXzV,  ATM(ID)%XzV_PRES)
+	  CALL SET_TWO_PHOT_V3(ION_ID(ID), ID_SAV,
+	1       ATM(ID)%XzVLTE,          ATM(ID)%NXzV,
+	1       ATM(ID)%XzVLTE_F_ON_S,   ATM(ID)%XzVLEVNAME_F,
+	1       ATM(ID)%EDGEXzV_F,       ATM(ID)%GXzV_F,
+	1       ATM(ID)%F_TO_S_XzV,      ATM(ID)%NXzV_F, ND,
+	1       ATM(ID)%ZXzV,            ATM(ID)%EQXzV,  ATM(ID)%XzV_PRES)
 	END DO
 !
 ! 

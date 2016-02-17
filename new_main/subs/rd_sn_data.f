@@ -9,6 +9,8 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 15-Feb-2016: ISOTOPE_COUNTER added so that the same NUC_DECAY_DATA file can be used
+!                         for all species.
 ! Altered 30-Jan-2015: Mass of each isotope is now output to SPECIES_MASSES
 !                        Now call GET_NON_LOCAL_GAMMA_ENERGY_V2
 ! Altered  8-Nov-2009: Isotope/total population consistency check included.
@@ -58,6 +60,7 @@
 	INTEGER I,L,K
 	INTEGER IS,IP
 	INTEGER LUER,ERROR_LU
+	INTEGER ISOTOPE_COUNTER
 	EXTERNAL ERROR_LU
 	CHARACTER(LEN=200) STRING
 	LOGICAL, SAVE :: FIRST=.TRUE.
@@ -343,22 +346,31 @@
 	ELSE
 	  DO IP=1,NUM_PARENTS
 	    WRK(1:ND)=0.0D0
+	    ISOTOPE_COUNTER=0
 	    DO IS=1,NUM_ISOTOPES
 	      IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC)THEN
 	        WRK=WRK+ISO(IS)%OLD_POP
+	        ISOTOPE_COUNTER=ISOTOPE_COUNTER+1
 	      END IF
 	    END DO
-	    T1=1.0D-100
-	    DO I=1,ND
-	       T2=(POP_SPECIES(I,PAR(IP)%ISPEC)+T1)/(WRK(I)+T1)-1.0D0
-	       IF(SPECIES_PRES(PAR(IP)%ISPEC) .AND. ABS(T2) .GT. 0.20D0)THEN
-	         WRITE(LUER,*)'Error in RD_SN_DATA: inconsistent total/isotope populations'
-	         WRITE(LUER,*)'Species:',SPECIES(PAR(IP)%ISPEC)
-	         WRITE(LUER,*)'Depth=',I,'  Fractional difference=',T2
-	         STOP
-	       END IF
-	    END DO 
-	    POP_SPECIES(:,PAR(IP)%ISPEC)=WRK
+	    IF(ISOTOPE_COUNTER .NE. 0)THEN
+	      T1=1.0D-100
+	      DO I=1,ND
+	         T2=(POP_SPECIES(I,PAR(IP)%ISPEC)+T1)/(WRK(I)+T1)-1.0D0
+	         IF(SPECIES_PRES(PAR(IP)%ISPEC) .AND. ABS(T2) .GT. 0.20D0)THEN
+	           WRITE(LUER,*)'Error in RD_SN_DATA: inconsistent total/isotope populations'
+	           WRITE(LUER,*)'Species:',SPECIES(PAR(IP)%ISPEC)
+	           WRITE(LUER,*)'Depth=',I,'  Fractional difference=',T2
+	           STOP
+	         END IF
+	      END DO 
+	      POP_SPECIES(:,PAR(IP)%ISPEC)=WRK
+	    ELSE
+	      WRITE(LUER,*)' '
+	      WRITE(LUER,*)'Warning: decay data present in NUC_DECAY_DATA for PAR(I)%ISPEC'
+	      WRITE(LUER,*)'However the is no isotopic data present in SN_HYDRO_DATA'
+	      WRITE(LUER,*)' '
+	    END IF
 	  END DO
 	END IF
 !

@@ -71,6 +71,7 @@
           INTEGER, ALLOCATABLE :: LST_FREQ_INDX_TWO(:)
 !	  
 	  LOGICAL, ALLOCATABLE :: TWO_PHOT_AVAILABLE(:)
+	  LOGICAL, ALLOCATABLE :: TWO_PHOT_COEF_FIXED(:)
 !
 ! Use to indicate thate data arrays need to be initialized. This is
 ! reset to FALSE in STEQ_BA_TWO_PHOT.

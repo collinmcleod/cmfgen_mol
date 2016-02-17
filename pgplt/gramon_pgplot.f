@@ -1677,6 +1677,9 @@ C
 	    END DO		!Multiple plots
 	    GOTO 1000
 	  END IF
+	ELSE IF(ANS .EQ. 'EWG')THEN
+	  CALL DO_MANY_EW(TYPE_CURVE,NPLTS,MAX_PLTS)
+!
 	ELSE IF(ANS .EQ. 'LP')THEN
 	  IF(LONG_PLOT)THEN
 	    WRITE(T_OUT,*)'Resuming normal hard copy mode'

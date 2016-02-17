@@ -33,6 +33,7 @@
 	USE LINE_MOD
 	IMPLICIT NONE
 !
+! Altered 31-Jan-2016 : Added SAVED_TWO_PHOT_METHOD.
 ! Altered 07-Apr-2015 : Changed to SET_TWO_PHOT_V3.
 ! Altered 05-Apr-2011 : Many changes done in order to facilitate the USE of LTE populations
 !                         over a wider dynamic range (18-Dec-2010).
@@ -126,6 +127,7 @@
 !
 	CHARACTER*80 TMP_STRING
 	CHARACTER*20 SECTION
+	CHARACTER(LEN=12) SAVED_TWO_PHOTON_METHOD
 !
 ! Constants for opacity etc.
 !
@@ -135,6 +137,8 @@
 	LST_DEPTH_ONLY=.FALSE.
 	SECTION='CONTINUUM'
 	GREY_IOS=0
+	SAVED_TWO_PHOTON_METHOD=TWO_PHOTON_METHOD
+	TWO_PHOTON_METHOD='LTE'
 !
 ! Compute temperature distribution and populations. The call ' 'WSC are
 ! too allow NDOLD in the input files to be larger than ND.
@@ -776,6 +780,10 @@
 	  DEALLOCATE (PHI_PAR_FN,STAT=IOS)
 	  DEALLOCATE (Z_PAR_FN,STAT=IOS)
 	END IF 
+!
+! Restore two photon method option.
+!
+	TWO_PHOTON_METHOD=SAVED_TWO_PHOTON_METHOD
 !
 	RETURN
 	END

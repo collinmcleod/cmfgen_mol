@@ -19,10 +19,12 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(cut_points_from_plot.o)\
       $(LIB)(define_more_pens.o)\
       $(LIB)(do_fill.o)\
-      $(LIB)(do_vec_op.o)\
+      $(LIB)(do_many_ew.o)\
       $(LIB)(do_mult_gf.o)\
+      $(LIB)(do_vec_op.o)\
       $(LIB)(draw_right_y_axis.o)\
       $(LIB)(ed_gaus_fit.o)\
+      $(LIB)(ew_group.o)\
       $(LIB)(find_lines.o)\
       $(LIB)(fntick.o)\
       $(LIB)(gaus_romb.o)\
