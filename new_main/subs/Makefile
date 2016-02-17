@@ -12,6 +12,7 @@ LIB_MOD=$(LIB_DIR)libmod.a
 # Entries for library
 
 OBJ = $(LIB)(add_par_to_full_v2.o)\
+      $(LIB)(adjust_cmat_to_lte.o)\
       $(LIB)(adjust_sn_r_grid.o)\
       $(LIB)(adjust_pops.o)\
       $(LIB)(auto_clump_rev.o)\
@@ -53,6 +54,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(set_depth_consistency.o)\
       $(LIB)(set_rv_hydro_model_v3.o)\
       $(LIB)(set_imp_vec.o)\
+      $(LIB)(set_pops_to_pure_lte.o)\
       $(LIB)(set_sn_r_grid.o)\
       $(LIB)(set_new_grid.o)\
       $(LIB)(solveba_v13.o)\
@@ -101,7 +103,7 @@ UP_MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
 # Note: Not all files depend on mod_cmfgen and steq_data_mod, but assuming this dependency
 # reduces signicantly the number of specific specifications.
 
-$(LIB)(%.o) : %.f  $(STEQ) $(MOD)
+$(LIB)(%.o) : %.f  $(STEQ) $(MOD) $(CONT)
 	$(F90) -c $(OPTION) $<
 	ar ruv $(LIB) $*.o
 

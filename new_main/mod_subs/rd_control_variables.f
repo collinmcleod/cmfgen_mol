@@ -447,7 +447,11 @@ C
 	  CALL RD_STORE_DBLE(ES_VAR_FAC,'ES_FAC',L_TRUE,
 	1            'Fractional proximity of RJ and RJ_ES for coherent'//
 	1            ' variation')
-C
+!
+	  LTE_MODEL=.FALSE.
+	  CALL RD_STORE_LOG(LTE_MODEL,'LTE_MOD',L_FALSE,
+	1            'Force populations to LTE and iterate T only?')
+!
 	  CALL RD_STORE_NCHAR(METHOD,'METHOD',ISIX,L_TRUE,
 	1         'Which method for continuum tau'//
 	1         ' loglog, loglin, linear or zero ?')

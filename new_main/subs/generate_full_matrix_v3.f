@@ -10,6 +10,7 @@
 	1                FIRST_MATRIX,LAST_MATRIX,USE_PASSED_REP)
 	USE MOD_CMFGEN
 	USE STEQ_DATA_MOD
+	USE CONTROL_VARIABLE_MOD, ONLY : LTE_MODEL
 	IMPLICIT NONE
 !
 ! Altered 13-Mar-2014 : Issues with crude electron-energy balance equation when
@@ -365,6 +366,8 @@
 	1       NT,ND,NION,DIAG_BAND,K,
 	1       FIRST_MATRIX,LAST_MATRIX)
 	END IF
+!
+	CALL ADJUST_CMAT_TO_LTE(C_MAT,STEQ_VEC,DIAG_BAND,DEPTH_INDX,NT)
 !
 ! Scale the BA matrix so that we solve for the fractional corrections to
 ! the populations. This seems to yield better solutions for large matrices,
