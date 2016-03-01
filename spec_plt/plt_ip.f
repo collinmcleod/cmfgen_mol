@@ -687,7 +687,7 @@
 	  YAXIS='F(p)'
 	  CALL CURVE(NP-1,XV,ZV)
 !
-	ELSE IF(X(1:4) .EQ. 'INU2')THEN
+	ELSE IF(X(1:4) .EQ. 'INU2' .OR. X(1:5) .EQ. 'WINU2')THEN
 	  CALL USR_OPTION(T1,'lam_st',' ','Start wavelength in Ang')
 	  T1=0.299794D+04/T1
           I=GET_INDX_DP(T1,NU,NCF)
@@ -755,22 +755,33 @@
 	    YV(:)=0.0D0
 	    K=MIN(I,J); J=MAX(I,J); I=K
 	    IF(J .EQ. I)J=I+1
-	    DO K=I,J-1
-	      YV(1:NP-2)=YV(1:NP-2)+0.5D0*(IP(2:NP-1,K)+IP(2:NP-1,K+1))*
-	1                                 (NU(K)-NU(K+1))
-	    END DO
-	    T1=ABS(NU(I)-NU(J))
-	    YV(1:NP-2)=LOG10(YV(1:NP-2)/T1)
-	    IF(MULT_BY_PSQ)THEN
-	      DO I=1,NP-2
-	        YV(I)=YV(I)+2.0D0*LOG10(P(I+1))+20.0D0
+	    WRITE(6,*)X
+	    IF(X(1:5) .EQ. 'WINU2')THEN
+	      WRITE(30,*)NP-1,J-I+2
+	      WRITE(30,'(1000ES14.6)')P(2:NP)
+	      WRITE(30,'(1000ES15.7)')XV(1:NP-1)
+	      WRITE(30,'(1000ES15.7)')ANG_TO_HZ/NU(I:J+1)
+	      DO K=I,J+1
+	        WRITE(30,'(500ES12.4)')IP(2:NP,K)
 	      END DO
-	      YAXIS='Log p\u2\dI\gn\u(ergs s\u-1\d Hz\u-1\d steradian\u-1\d)' 
 	    ELSE
-	      YAXIS='Log I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	      DO K=I,J-1
+	        YV(1:NP-2)=YV(1:NP-2)+0.5D0*(IP(2:NP-1,K)+IP(2:NP-1,K+1))*
+	1                                 (NU(K)-NU(K+1))
+	      END DO
+	      T1=ABS(NU(I)-NU(J))
+	      YV(1:NP-2)=LOG10(YV(1:NP-2)/T1)
+	      IF(MULT_BY_PSQ)THEN
+	        DO I=1,NP-2
+	          YV(I)=YV(I)+2.0D0*LOG10(P(I+1))+20.0D0
+	        END DO
+	        YAXIS='Log p\u2\dI\gn\u(ergs s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	      ELSE
+	        YAXIS='Log I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	      END IF
+	      XAXIS='\gm'
+	      CALL CURVE(NP-2,XV,YV)
 	    END IF
-	    XAXIS='\gm'
-	    CALL CURVE(NP-2,XV,YV)
 	  END IF
 !
 	ELSE IF(X(1:3) .EQ. 'IMU')THEN

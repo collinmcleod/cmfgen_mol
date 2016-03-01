@@ -367,7 +367,9 @@
 	1       FIRST_MATRIX,LAST_MATRIX)
 	END IF
 !
-	CALL ADJUST_CMAT_TO_LTE(C_MAT,STEQ_VEC,DIAG_BAND,DEPTH_INDX,NT)
+	IF(LTE_MODEL)THEN
+	  CALL ADJUST_CMAT_TO_LTE(C_MAT,STEQ_VEC,DIAG_BAND,DEPTH_INDX,NT)
+	END IF
 !
 ! Scale the BA matrix so that we solve for the fractional corrections to
 ! the populations. This seems to yield better solutions for large matrices,

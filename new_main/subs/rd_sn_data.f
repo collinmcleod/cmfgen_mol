@@ -60,11 +60,11 @@
 	INTEGER I,L,K
 	INTEGER IS,IP
 	INTEGER LUER,ERROR_LU
-	INTEGER ISOTOPE_COUNTER
 	EXTERNAL ERROR_LU
 	CHARACTER(LEN=200) STRING
 	LOGICAL, SAVE :: FIRST=.TRUE.
 	LOGICAL DONE
+	LOGICAL FIRST_WARN
 !
 	LUER=ERROR_LU()
 	WRITE(LUER,'(/,A)')' Entering RD_SN_DATA'
@@ -262,6 +262,7 @@
 !	       CALL MON_INTERP(ISO(K)%OLD_POP,ND,IONE,LOG_R,ND,ISO_HYDRO(1:NX,L),NX,LOG_R_HYDRO,NX)
 	       CALL LIN_INTERP(LOG_R,ISO(K)%OLD_POP,ND,LOG_R_HYDRO,ISO_HYDRO(1:NX,L),NX)
 	       DONE=.TRUE.
+	       ISO(K)%READ_ISO_POPS=.TRUE.
 	       EXIT
 	    END IF
 	  END DO
@@ -344,16 +345,17 @@
 	  END DO
 	  WRITE(LUER,*)'   Normalized isotope populations in RD_SN_DATA'
 	ELSE
+	  FIRST_WARN=.TRUE.
 	  DO IP=1,NUM_PARENTS
 	    WRK(1:ND)=0.0D0
-	    ISOTOPE_COUNTER=0
+	    PAR(IP)%DECAY_CHAIN_AVAILABLE=.FALSE.
 	    DO IS=1,NUM_ISOTOPES
-	      IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC)THEN
+	      IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC .AND. ISO(IS)%READ_ISO_POPS)THEN
 	        WRK=WRK+ISO(IS)%OLD_POP
-	        ISOTOPE_COUNTER=ISOTOPE_COUNTER+1
+	        PAR(IP)%DECAY_CHAIN_AVAILABLE=.TRUE.
 	      END IF
 	    END DO
-	    IF(ISOTOPE_COUNTER .NE. 0)THEN
+	    IF(PAR(IP)%DECAY_CHAIN_AVAILABLE .NE. 0)THEN
 	      T1=1.0D-100
 	      DO I=1,ND
 	         T2=(POP_SPECIES(I,PAR(IP)%ISPEC)+T1)/(WRK(I)+T1)-1.0D0
@@ -366,10 +368,16 @@
 	      END DO 
 	      POP_SPECIES(:,PAR(IP)%ISPEC)=WRK
 	    ELSE
-	      WRITE(LUER,*)' '
-	      WRITE(LUER,*)'Warning: decay data present in NUC_DECAY_DATA for PAR(I)%ISPEC'
-	      WRITE(LUER,*)'However the is no isotopic data present in SN_HYDRO_DATA'
-	      WRITE(LUER,*)' '
+	      IF(FIRST_WARN)THEN
+	        WRITE(LUER,*)' '
+	        WRITE(LUER,*)'Warning: Possible error in reading SN_HYDRO_DATA with RD_SN_DATA'
+	        WRITE(LUER,*)'The following species have decay data present in NUC_DECAY_DATA'//
+	1                          'but are absent in SN_HYDRO_DATA'
+	        WRITE(LUER,*)'Isotope: ',PAR(IP)%ISPEC
+	        FIRST_WARN=.FALSE.
+	       ELSE
+	        WRITE(LUER,*)'Isotope: ',PAR(IP)%ISPEC
+	      END IF
 	    END IF
 	  END DO
 	END IF
@@ -409,7 +417,9 @@
           ISO(IS)%POP=ISO(IS)%OLD_POP_DECAY
         END DO
 	DO IP=1,NUM_PARENTS
-	  POP_SPECIES(1:ND,PAR(IP)%ISPEC)=PAR(IP)%OLD_POP_DECAY
+	  IF(PAR(IP)%DECAY_CHAIN_AVAILABLE)THEN
+	    POP_SPECIES(1:ND,PAR(IP)%ISPEC)=PAR(IP)%OLD_POP_DECAY
+	  END IF
 	END DO
 !
 ! Compute the mass for each isotope.

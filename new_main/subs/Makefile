@@ -155,6 +155,9 @@ $(STEQ):
 $(MOD):
 	(cd ../mod_subs ; make)
 
+$(NUC):
+	(cd ../mod_subs ; make)
+
 $(UP_MOD):
 	(cd ../mod_subs ; make)
 
