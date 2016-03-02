@@ -7,6 +7,8 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered:  01-Mar-2016 : Added XN option to XAR option. This allows Y to be plotted against
+!                          the index I. By default, a new plot is created [24-Feb-2016].
 ! Altered:  29-Jun-2015 : Changed RID o check ABS(TAU) which for pp model can -ve.
 ! Altered:  22-Apr-2015 : Added FILL option to fill the space between two curves that create a polygon.
 !                           ANS changed to length 4 (from 3)
@@ -2063,7 +2065,8 @@ C
 	ELSE IF (ANS .EQ. 'XAR')THEN
 	  CALL NEW_GEN_IN(XAR_OPERATION,'Operation: *,+,-,/,LG,ALG[=10^x],R[=1/x]')
 	  CALL SET_CASE_UP(XAR_OPERATION,IZERO,IZERO)
-	  IF(XAR_OPERATION .NE. 'LG' .AND. XAR_OPERATION .NE. 'ALG' .AND. XAR_OPERATION .NE. 'R')THEN
+	  IF(XAR_OPERATION .NE. 'LG' .AND. XAR_OPERATION .NE. 'ALG' .AND. 
+	1           XAR_OPERATION .NE. 'XN' .AND. XAR_OPERATION .NE. 'R')THEN
 	    CALL NEW_GEN_IN(XAR_VAL,'Value')
 	  END IF
 	  CALL NEW_GEN_IN(XAR_PLT,'Which plot? (0=ALL,-ve exits)')
@@ -2117,6 +2120,20 @@ C
 	      ELSE IF(XLABEL .EQ. '\gl(\A)' .AND. T1 .EQ. T2)THEN
 	        XLABEL='\gn(10\u15 \dHz)'
 	      END IF
+	    ELSE IF(XAR_OPERATION .EQ. 'XN')THEN
+	      WRITE(6,*)'Curent plot is',IP
+	      K=0
+	      CALL NEW_GEN_IN(K,'Output plot: 0 adds new plot?')
+	      IF(K .EQ. IP)THEN
+	        K=IP
+	      ELSE IF(K .EQ. 0)THEN
+	        CALL CURVE(NPTS(IP),CD(IP)%XVEC,CD(IP)%DATA)
+	        K=NPLTS
+	      END IF
+	      DO I=1,NPTS(K)
+	        CD(K)%XVEC(I)=I
+	      END DO
+	      TYPE_CURVE(K)=TYPE_CURVE(IP)
 	    ELSE
 	      WRITE(T_OUT,*)'Invalid operation: try again'
 	      GOTO 1000

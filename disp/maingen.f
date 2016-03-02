@@ -15,6 +15,8 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered  01-MAr-2016 : Adjusted PLNID -- only compute continuum opacity every 1009 km/s.
+!                          (Results in considerable speed up [1-Feb-2016]).
 ! Altered  09-Jun-2015 : Added PLT_PRFS to call.
 !                          Altered DTDP option.
 ! Altered  07-Jul-2011 : Included commands to look at f, and Mdot in "shell" models.
@@ -246,7 +248,7 @@
 !
 	INTEGER NPINS,NCX,NDX,NPX
 	INTEGER ND_TMP
-	REAL*8 FREQ,FL
+	REAL*8 FREQ,FL,FL_SAVE
 	REAL*8 TAU_SOB
 	REAL*8  TMP_GION
 	EQUIVALENCE (FREQ,FL)
@@ -2959,30 +2961,38 @@
 	  WRITE(6,*)' '
 	  WRITE(6,*)'Number of line transitions in the interval is',NUP-NL+1
 !
+	  FL_SAVE=0.0D0
 	  DO LINE_INDX=NL,NUP
 	    MNL_F=VEC_MNL_F(LINE_INDX)
 	    MNUP_F=VEC_MNUP_F(LINE_INDX)
 	    FL=VEC_FREQ(LINE_INDX)
 !
-	    INCLUDE 'OPACITIES.INC'
+! Since the opacities are sequentially computed, we dont need to compute them 
+! at all frequencies. At present we simply compute them every 1000 km/s.
+! This saves considerable computing time.
+!
+	    IF( 2.998D+05*ABS(FL_SAVE-FL)/FL .GT. 1000.0D0)THEN
+	      FL_SAVE=FL
+	      INCLUDE 'OPACITIES.INC'
 !
 ! Compute DBB and DDBBDT for diffusion approximation. DBB=dB/dR
 ! and DDBBDT= dB/dTR .
 !
-	    T1=HDKT*FL/T(ND)
-	    T2=1.0D0-EMHNUKT(ND)
-	    DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
-	    IF(.NOT. DIF)DBB=0.0D0
+	      T1=HDKT*FL/T(ND)
+	      T2=1.0D0-EMHNUKT(ND)
+	      DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
+	      IF(.NOT. DIF)DBB=0.0D0
 !
 ! Adjust the opacities and emissivities for the influence of clumping.
 !
-	    DO I=1,ND
-	      ETA(I)=ETA(I)*CLUMP_FAC(I)
-	      CHI(I)=CHI(I)*CLUMP_FAC(I)
-	      ESEC(I)=ESEC(I)*CLUMP_FAC(I)
-	      CHI_RAY(I)=CHI_RAY(I)*CLUMP_FAC(I)
-	      CHI_SCAT(I)=CHI_SCAT(I)*CLUMP_FAC(I)
-	    END DO
+	      DO I=1,ND
+	        ETA(I)=ETA(I)*CLUMP_FAC(I)
+	        CHI(I)=CHI(I)*CLUMP_FAC(I)
+	        ESEC(I)=ESEC(I)*CLUMP_FAC(I)
+	        CHI_RAY(I)=CHI_RAY(I)*CLUMP_FAC(I)
+	        CHI_SCAT(I)=CHI_SCAT(I)*CLUMP_FAC(I)
+	      END DO
+	    END IF
 !
 ! ID must be set here as it modified by OPACITIES.INC
 !

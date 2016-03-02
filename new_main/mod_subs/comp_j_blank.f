@@ -689,8 +689,10 @@ C
 	       END IF
 	     ELSE IF(USE_LAM_ES)THEN
 	       RJ(1:ND)=TC(1:ND)
-	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
-               HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
+	       IF(.NOT. USE_FORMAL_REL)THEN
+	         IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+                 HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
+	       END IF
 	       CALL GET_RSQH_REL(RSQHNU,R,V,FL,ND)
 	       IF(LST_ITERATION)THEN
 	         DO I=1,ND

@@ -9,6 +9,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 01-Mar-2016  Option to omit advection terms when not included in the model [25-Feb-2016].
 ! Altered: 17-Feb-2015  Improved estimate of cooling time by including ATOM_DENSITY.
 ! Altered:              Estimate of cooling time outout to GENCOOL_SORT
 ! Altered: 12-Mar-2014: Added read/ouput of non-thermal cooling.
@@ -42,6 +43,7 @@
 	INTEGER IOS
 	REAL*8 T1
 	LOGICAL FILE_OPEN
+	LOGICAL ONLY_INCLUDED_TERMS
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
 	OPEN(UNIT=20,FILE='MODEL',STATUS='OLD',IOSTAT=IOS)
@@ -58,6 +60,9 @@
 	  END IF
 	  INQUIRE(UNIT=20,OPENED=FILE_OPEN)
 	IF(FILE_OPEN)CLOSE(UNIT=20)
+!
+	ONLY_INCLUDED_TERMS=.TRUE.
+	CALL GEN_IN(ONLY_INCLUDED_TERMS,'Only output terms that are included?')
 !
 	IF(IOS .NE. 0)THEN
 	  WRITE(6,*)' Unable to open MODEL file to get # of depth points'
@@ -122,20 +127,28 @@
 	        CALL SUM_RATES(TOTAL_RATE,STRING,ID,ND)
 	        WRITE(21,'(A,T12,A)')TMP_STR(1:K)//'XKS ',TRIM(STRING)
 	      ELSE IF( INDEX(STRING,'V term') .NE. 0)THEN
-	        TMP_STR=STRING
-	        TMP_STR=ADJUSTL(TMP_STR)
-	        K=INDEX(TMP_STR,' ')
-	        READ(20,'(A)')STRING
-	        CALL SUM_RATES(TOTAL_RATE,STRING,ID,ND)
-	        WRITE(21,'(A)')' '
-	        WRITE(21,'(A,T12,A)')'AC.R(V).',TRIM(STRING)
+	        IF(ONLY_INCLUDED_TERMS .AND. INDEX(STRING,'Not Incl') .NE. 0)THEN
+	          READ(20,'(A)')STRING
+	        ELSE
+	          TMP_STR=STRING
+	          TMP_STR=ADJUSTL(TMP_STR)
+	          K=INDEX(TMP_STR,' ')
+	          READ(20,'(A)')STRING
+	          CALL SUM_RATES(TOTAL_RATE,STRING,ID,ND)
+	          WRITE(21,'(A)')' '
+	          WRITE(21,'(A,T12,A)')'AC.R(V).',TRIM(STRING)
+	        END IF
 	      ELSE IF( INDEX(STRING,'dTdR term') .NE. 0)THEN
-	        TMP_STR=STRING
-	        TMP_STR=ADJUSTL(TMP_STR)
-	        K=INDEX(TMP_STR,' ')
-	        READ(20,'(A)')STRING
-	        CALL SUM_RATES(TOTAL_RATE,STRING,ID,ND)
-	        WRITE(21,'(A,T12,A)')'AC.R(dT).',TRIM(STRING)
+	        IF(ONLY_INCLUDED_TERMS .AND. INDEX(STRING,'Not Incl') .NE. 0)THEN
+	          READ(20,'(A)')STRING
+	        ELSE
+	          TMP_STR=STRING
+	          TMP_STR=ADJUSTL(TMP_STR)
+	          K=INDEX(TMP_STR,' ')
+	          READ(20,'(A)')STRING
+	          CALL SUM_RATES(TOTAL_RATE,STRING,ID,ND)
+	          WRITE(21,'(A,T12,A)')'AC.R(dT).',TRIM(STRING)
+	        END IF
 	      ELSE IF( INDEX(STRING,'decay') .NE. 0)THEN
 	        TMP_STR=STRING
 	        TMP_STR=ADJUSTL(TMP_STR)

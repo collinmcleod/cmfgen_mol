@@ -9,6 +9,12 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered: 01-Mar-2016 : Changed to allow handling of a standard NUC_DECAY_DATA file.
+!                         Code checks availability of decay route. This is important
+!                         when a species but not isotopes are included [17-Feb-2016].
+!                         Still may need to alter NUC_DECAY_DATA file is switch in middle of
+!                         a model sequence (since a species with a short life may suddenly
+!                         start to decay). A warning is ouput in such cases.
 ! Altered 15-Feb-2016: ISOTOPE_COUNTER added so that the same NUC_DECAY_DATA file can be used
 !                         for all species.
 ! Altered 30-Jan-2015: Mass of each isotope is now output to SPECIES_MASSES
@@ -370,17 +376,18 @@
 	    ELSE
 	      IF(FIRST_WARN)THEN
 	        WRITE(LUER,*)' '
-	        WRITE(LUER,*)'Warning: Possible error in reading SN_HYDRO_DATA with RD_SN_DATA'
-	        WRITE(LUER,*)'The following species have decay data present in NUC_DECAY_DATA'//
-	1                          'but are absent in SN_HYDRO_DATA'
-	        WRITE(LUER,*)'Isotope: ',PAR(IP)%ISPEC
+	        WRITE(LUER,*)'Warning: Possible error in reading SN_HYDRO_DATA with RD_SN_DATA.'
+	        WRITE(LUER,*)'The following species have decay data present in NUC_DECAY_DATA',
+	1                          '     but have no isotope data in SN_HYDRO_DATA.'
+	        WRITE(LUER,*)SPECIES(PAR(IP)%ISPEC)
 	        FIRST_WARN=.FALSE.
 	       ELSE
-	        WRITE(LUER,*)'Isotope: ',PAR(IP)%ISPEC
+	        WRITE(LUER,*)SPECIES(PAR(IP)%ISPEC)
 	      END IF
 	    END IF
 	  END DO
 	END IF
+	IF(.NOT. FIRST_WARN)WRITE(6,*)' '
 !
 ! If population is zero at some depths, but species is present, we will
 ! set to small value.
@@ -391,6 +398,14 @@
 	      POP_SPECIES(K,L)=MAX(1.0D-20,POP_SPECIES(K,L))
 	    END DO
 	  END IF
+	END DO
+!
+! Set for species with decay chain data, but which may not have isotopic
+! data present.
+!
+	DO IP=1,NUM_PARENTS
+	  PAR(IP)%OLD_POP=POP_SPECIES(:,PAR(IP)%ISPEC)
+	  PAR(IP)%OLD_POP_DECAY= PAR(IP)%OLD_POP
 	END DO
 !
 ! Correct populations for radioactive decays.
@@ -421,6 +436,35 @@
 	    POP_SPECIES(1:ND,PAR(IP)%ISPEC)=PAR(IP)%OLD_POP_DECAY
 	  END IF
 	END DO
+!
+	FIRST_WARN=.TRUE.
+	DO IS=1,NUM_ISOTOPES
+	  IF(ISO(IS)%READ_ISO_POPS)THEN
+	    T1=SUM(ISO(IS)%OLD_POP)
+	    IF(T1 .NE. 0.0D0)THEN
+	      T1=0.0D0
+	      DO I=1,ND
+	        T2=ABS(1.0D0-ISO(IS)%OLD_POP_DECAY(I)/ISO(IS)%OLD_POP(I))
+	        IF( (T2 .GT. 3.0D0 .OR. T2 .LT. 0.30D0) .AND. ISO(IS)%OLD_POP(I) .GT. 1.0D-10)THEN
+	          IF(FIRST_WARN)THEN
+	            FIRST_WARN=.FALSE.
+	            WRITE(6,*)' '
+	            WRITE(6,*)'WARNING from RD_SN_DATA '
+	            WRITE(6,*)'The following isotopes have changed their abundance by over a factor of 3.'
+	            WRITE(6,*)'This may have occurred because you are using a revised NUCELAR decay data file.'
+	            WRITE(6,*)'Do diff SN_HYDRO_DATA SN_HYDRO_FOR_NEXT_MODEL to see changes.'
+	            WRITE(6,*)'This may affect the heating unless using instantaneous energy deposition.'
+	            WRITE(6,'(3X,A,T12,I3)')TRIM(ISO(IS)%SPECIES),ISO(IS)%BARYON_NUMBER
+	          ELSE
+	            WRITE(6,'(3X,A,T12,I3)')TRIM(ISO(IS)%SPECIES),ISO(IS)%BARYON_NUMBER
+	          END IF
+	          EXIT
+	        END IF
+	      END DO
+	    END IF
+	  END IF
+	END DO
+	IF(.NOT. FIRST_WARN)WRITE(6,*)' '
 !
 ! Compute the mass for each isotope.
 !

@@ -133,10 +133,6 @@ $(LIB)(get_non_loc_gamma_energy.o) : get_non_loc_gamma_energy.f $(CONT) $(NUC)
 	$(F90) -c $(OPTION) get_non_loc_gamma_energy.f
 	ar ruv $(LIB) get_non_loc_gamma_energy.o
 
-$(LIB)(rd_sn_data.o) : rd_sn_data.f $(MOD) $(CONT) $(NUC)
-	$(F90) -c $(OPTION) rd_sn_data.f
-	ar ruv $(LIB) rd_sn_data.o
-
 $(LIB)(store_old_grid.o) : store_old_grid.f $(MOD)  $(LIB)(old_grid_module.o)
 	$(F90) -c $(OPTION) store_old_grid.f
 	ar ruv $(LIB) store_old_grid.o

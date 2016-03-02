@@ -167,6 +167,7 @@
 	    ALLOCATE (A_UP_NAME_TWO(N_TWO))
 	    ALLOCATE (N_COEF_TWO(N_TWO))
 	    ALLOCATE (COEF_TWO(N_TWO,MAX_COEF))
+	    ALLOCATE (TWO_PHOT_COEF_FIXED(N_TWO))
 	    INITIALIZE_TWO=.TRUE.
 	  END IF
 !
@@ -175,6 +176,7 @@
 	    A_UP_NAME_TWO(:)=' '
 	    COEF_TWO(:,:)=0.0D0
 	  END IF
+	  TWO_PHOT_COEF_FIXED(:)=.FALSE.
 !
 ! Read in 2-photon transition data.
 !

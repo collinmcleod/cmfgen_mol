@@ -15,6 +15,9 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered: 01-Mar-2016 : Changed to allow handling of a standard NUC_DECAY_DATA file.
+!                         Code checks availability of decay route. This is important
+!                         when a species but not isotopes are included [17-Feb-2016].
 ! Altered: 02-Sep-2013 : Minor bug fix -- added excess energy (for those Ni
 !                            that decay all the way to 56Fe in a single time step).
 ! Altered: 23-Nov-2012 : Added 1 step decay process
@@ -37,6 +40,7 @@
 	INTEGER K,L,M
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
+	CHARACTER(LEN=20) TMP_STR
 !
 	LUER=ERROR_LU()
 	DO IS=1,NUM_ISOTOPES
@@ -45,7 +49,10 @@
 	RADIOACTIVE_DECAY_ENERGY=0.0D0
 	KINETIC_DECAY_ENERGY=0.0D0
 !
-	WRITE(6,*)'   In DO_SPECIES_DECAYS, Delta T=',DELTA_T
+	WRITE(TMP_STR,'(F12.2)')DELTA_T; TMP_STR=ADJUSTL(TMP_STR) 
+	WRITE(6,'(A,F6.2,A)')' In DO_SPECIES_DECAYS, Delta t = '//TRIM(TMP_STR)//
+	1                   ' s (',DELTA_T/3600.0D0/24.0D0,' days)'
+!
 	DO IN=1,NUM_DECAY_PATHS
 !
 ! Do decay chains with a single decay route.
@@ -118,13 +125,17 @@
 	END IF
 !
 	DO IP=1,NUM_PARENTS
-	  PAR(IP)%OLD_POP=0.0D0 
-	  PAR(IP)%OLD_POP_DECAY=0.0D0 
+	  IF(PAR(IP)%DECAY_CHAIN_AVAILABLE)THEN
+	    PAR(IP)%OLD_POP=0.0D0 
+	    PAR(IP)%OLD_POP_DECAY=0.0D0 
+	  END IF
 	END DO
 	DO IS=1,NUM_ISOTOPES
 	  IP=ISO(IS)%LNK_TO_PAR
-	  PAR(IP)%OLD_POP=PAR(IP)%OLD_POP+ISO(IS)%OLD_POP
-	  PAR(IP)%OLD_POP_DECAY=PAR(IP)%OLD_POP_DECAY+ISO(IS)%OLD_POP_DECAY
+	  IF(PAR(IP)%DECAY_CHAIN_AVAILABLE)THEN
+	    PAR(IP)%OLD_POP=PAR(IP)%OLD_POP+ISO(IS)%OLD_POP
+	    PAR(IP)%OLD_POP_DECAY=PAR(IP)%OLD_POP_DECAY+ISO(IS)%OLD_POP_DECAY
+	  END IF
 	END DO
 !
 	RETURN

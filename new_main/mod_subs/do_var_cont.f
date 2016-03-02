@@ -193,6 +193,10 @@
 	    IF(FIRST_FREQ)THEN
 	      TX(:,:,:)=0.0D0
 	      TVX(:,:,:)=0.0D0
+	      dJ_DIF_d_T(:)=0.0D0
+	      dJ_DIF_d_dTdR(K)=0.0D0
+	      dRSQH_DIF_d_T=0.0D0
+	      dRSQH_DIF_d_dTdR=0.0D0
 	      FL_OLD=FL
 	    ELSE
 	      RAT_TOO_BIG=.FALSE.
@@ -317,6 +321,7 @@
 	1                  dTdR,DBB,dDBBdT,IC,
 	1                  INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,
 	1                  DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
+	   ELSE IF (USE_LAM_ES)THEN
 	   ELSE IF(USE_DJDT_RTE)THEN
 	     CALL VAR_MOM_J_DDT_V2(TA,CHI_CLUMP,CHI_SCAT_CLUMP,ES_COH_VEC,V,R,
 	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR,
