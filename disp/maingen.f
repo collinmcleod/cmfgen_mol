@@ -139,6 +139,7 @@
 	LOGICAL GREY_WITH_V_TERMS
 	LOGICAL GREY_REL
 	LOGICAL PLANE_PARALLEL_NOV
+	LOGICAL FLUSH_FILE
 !
 	REAL*8 XV(N_PLT_MAX),XNU(N_PLT_MAX)
 	REAL*8 YV(N_PLT_MAX),ZV(N_PLT_MAX),WV(N_PLT_MAX)
@@ -2821,6 +2822,8 @@
 	  WRITE(T_OUT,'(A)')' Create line ID file for stars with weak winds.'
 	  WRITE(T_OUT,'(A)')' The list is created based on the line optical depth at a give Tau(e.s.)'
 	  WRITE(T_OUT,'(A)')' Use XTAUC and TAUC option to find Tau(e.s) at Tau(cont)=2/3'
+	  WRITE(T_OUT,'(A)')' Use PLNID for plane-parallel models'
+	  WRITE(T_OUT,'(A)')' PLNID may also work better for O stars with weak winds'
 	  WRITE(T_OUT,'(A)')' '
 	  DO I=1,ND
 	    ESEC(I)=6.65D-15*ED(I)
@@ -2920,8 +2923,9 @@
 	ELSE IF(XOPT .EQ. 'PLNID')THEN
 !
 	  WRITE(T_OUT,'(A)')' '
-	  WRITE(T_OUT,'(A)')' Create line ID file for plane-paraell models'
-	  WRITE(T_OUT,'(A)')' The list is created based on the central line intensity'
+	  WRITE(T_OUT,'(A)')' Create line ID file for plane-paralell models'
+	  WRITE(T_OUT,'(A)')' The list is created based on an estimate of the central line intensity'
+	  WRITE(T_OUT,'(A)')' The procdure may also work for most O stars -- especially those with weak winds'
 	  WRITE(T_OUT,'(A)')' '
 	  CALL USR_OPTION(VTURB,'VTURB','10.0','Turbulent velcity for line profile (units km/s)?')
 !
@@ -2938,6 +2942,7 @@
 	  DEFAULT='LINE_ID'
 	  CALL USR_OPTION(FILENAME,'FILE',DEFAULT,'Output file for line IDs')
 	  CALL GEN_ASCI_OPEN(73,FILENAME,'UNKNOWN',' ',' ',IZERO,IOS)
+	  CALL USR_HIDDEN(FLUSH_FILE,'FLUSH','F','Flush outout immediately?')
 !
 ! MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
 !
@@ -3015,6 +3020,7 @@
 	      IF(.NOT. ATM(ID)%OBSERVED_LEVEL(MNL_F) .OR. .NOT. ATM(ID)%OBSERVED_LEVEL(MNUP_F))T1=-T1
 	      WRITE(73,'(A,3ES14.5,3X,F3.0,I6,5X,A)')ION_ID(ID),T1,
 	1                               T2,ANG_TO_HZ/FL,1.0,2,TRIM(STRING)
+	      IF(FLUSH_FILE)FLUSH(UNIT=73)
 	    END IF
 	    IF(MOD(LINE_INDX-NL,MAX(10,(NUP-NL)/10)) .EQ. 0)THEN
 	      WRITE(6,'(A,I7,A,I7,A)')' Done',LINE_INDX-NL+1,' of ',NUP-NL+1,' lines'

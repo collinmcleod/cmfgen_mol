@@ -8,6 +8,7 @@
 	IMPLICIT NONE
 	INTEGER ND
 !
+! Altered 07-Mar-2016: Bug fix -- F was not being initialized.
 ! Created 24-Feb-2015
 !
 	REAL*8 R(ND)
@@ -63,6 +64,7 @@
 	  HBC_S=0.50D0
 	  HBC_J=0.99D0
 	  FOLD=0.33D0
+	  F=0.33D0
 	  FIRST_TIME=.FALSE.
 	  INIT=.TRUE.
 	END IF

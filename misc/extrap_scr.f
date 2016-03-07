@@ -73,9 +73,9 @@
 	INQUIRE(FILE='POINT2', EXIST=FILE_2_EXISTS)
 	INQUIRE(FILE='SCRTEMP',EXIST=FILE_3_EXISTS)
 	IF(FILE_1_EXISTS .OR. FILE_2_EXISTS .OR. FILE_3_EXISTS)THEN
-	  WRITE(6,*)' '
+	  WRITE(6,*)RED_PEN
 	  WRITE(6,*)'Error: POINT1, POINT2 and SCRTEMP cannot exist in this woking directory'
-	  WRITE(6,*)' '
+	  WRITE(6,*)DEF_PEN
 	  STOP
 	END IF
 !
@@ -94,7 +94,15 @@
 	  IF(DIRECTORY(J:J) .NE. '/')DIRECTORY(J+1:J+1)='/'
 !
 	  FILENAME=TRIM(DIRECTORY)//'MODEL'
-	  OPEN(UNIT=12,FILE=FILENAME,STATUS='OLD',ACTION='READ')
+	  OPEN(UNIT=12,FILE=FILENAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(6,*)RED_PEN
+	    WRITE(6,*)'Error unable to open '//TRIM(FILENAME)
+	    WRITE(6,*)'Stopping execution'
+	    WRITE(6,*)DEF_PEN
+	    WRITE(6,*)' '
+	    STOP
+	  END IF
 	  STRING=' '
 	  DO WHILE(INDEX(STRING,'!Number of depth') .EQ. 0)
 	    READ(12,'(A)',IOSTAT=IOS)STRING
@@ -179,7 +187,8 @@
 !
 	WRITE(T_OUT,*)' '
 	SCR(3)%SN_AGE=SCR(2)%SN_AGE*(SCR(2)%SN_AGE/SCR(1)%SN_AGE)
-	CALL GEN_IN(SCR(3)%SN_AGE,'Age of new SN model in days')
+	STRING='Age of new SN model in days '//RED_PEN//'[Must be exact]'//DEF_PEN
+	CALL GEN_IN(SCR(3)%SN_AGE,STRING)
 	WRITE(T_OUT,*)' '
 !
 ! 1.0D-05 since V is in km/s, and R in units of 10^10 cm.
@@ -265,6 +274,12 @@
 	CALL SCR_RITE_V2(SCR(IS)%R,SCR(IS)%V,SCR(IS)%SIGMA,SCR(IS)%POPS,IREC,NITSF,
 	1              RITE_N_TIMES,LST_NG,L_TRUE,
 	1              SCR(IS)%NT,SCR(IS)%ND,LUSCR,NEWMOD)
+!
+	WRITE(6,'(A)')BLUE_PEN
+	WRITE(6,'(A)')'You should now do: '//RED_PEN
+	WRITE(6,'(A)')'        $cmfdist/com/mvscr.sh'//BLUE_PEN
+	WRITE(6,'(A)')'to rename NEW_SCRTEMP to SCRTEMP etc'//DEF_PEN
+	WRITE(6,'(A)')
 !
 	STOP
 	END
