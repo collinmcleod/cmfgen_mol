@@ -379,6 +379,13 @@ C
 	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
 	  CALL USR_HIDDEN(XFAC,'XFAC','1.0D0',' ')
+	  CALL USR_HIDDEN(RAD_VEL,'RAD_VEL','0.0D0','Radial velocity(km/s) of star')
+	  IF(XFAC .NE. 1.0D0 .AND. RAD_VEL .NE. 0.0D0)THEN
+	    WRITE(6,*)'Only one of XFAC and RAD_VEL can be changed from their default values of 1 and 0'
+	    GOTO 1
+	  ELSE IF(RAD_VEL .NE. 0.0D0)THEN
+	    XFAC=(1.0D0+1.0D+05*RAD_VEL/C_CMS)
+	  END IF
 	  IF(OVER)THEN
 C
 C This option allows all normal model options to be done on the data

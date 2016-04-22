@@ -9,6 +9,7 @@
 	USE READ_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 10-Feb-2016: Bug fix (for non identucal velocity grids).
 ! Altered 26-Feb-2016: Bug fix (for case of identical velocity grids).
 ! Created 19-Feb-2016: Based intially on PLT_SCR.
 !
@@ -247,8 +248,8 @@
 	  WRITE(6,*)'Starting to interpolate Model 1 onto Model 2 grid'
 	  DO I=1,SCR(3)%NT
 	    Y1=DLOG(SCR(1)%POPS(I,:))
-	    CALL MON_INTERP(Y2,SCR(2)%ND,IONE,X2,SCR(1)%ND,Y1,SCR(1)%ND,X2,SCR(1)%ND)
-	    SCR(1)%WRK_POPS(I,:)=EXP(Y1)
+	    CALL MON_INTERP(Y2,SCR(2)%ND,IONE,X2,SCR(2)%ND,Y1,SCR(1)%ND,X1,SCR(1)%ND)
+	    SCR(1)%WRK_POPS(I,:)=EXP(Y2)
 	  END DO 
 	  WRITE(6,*)'Interpolated Model 2 onto Model 1 grid'
 !

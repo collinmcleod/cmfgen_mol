@@ -63,6 +63,11 @@
 	OUTF=' '
 	CALL GEN_IN(OUTF,'Output file')
 	CALL GEN_ASCI_OPEN(LU_OUT,OUTF,'NEW',' ',' ',IREC,IOS)
+	IF(IOS .NE. 0)THEN
+	  WRITE(6,*)'Unable to open ',TRIM(OUTF)
+	  WRITE(6,*)'Fille cannot exist already'
+	  STOP
+	END IF
 !
 	TEST=.FALSE.
 	FILE1='pgplot_1.ps'

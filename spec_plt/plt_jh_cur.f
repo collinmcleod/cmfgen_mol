@@ -17,6 +17,8 @@
 	USE MOD_USR_HIDDEN
 	USE MOD_WR_STRING
 	USE GEN_IN_INTERFACE
+	USE MOD_COLOR_PEN_DEF
+	USE READ_KEYWORD_INTERFACE
 !
 	IMPLICIT NONE
 !
@@ -81,6 +83,7 @@
 	REAL*8 KEV_TO_HZ
 	REAL*8 C_CMS
 	REAL*8 C_KMS
+	REAL*8 SN_AGE
 !
 	LOGICAL LOG_X,LOG_Y
 	CHARACTER*10 Y_PLT_OPT,X_UNIT
@@ -125,9 +128,11 @@
 	LOGICAL TMP_LOG
 	LOGICAL PLT_H
 	LOGICAL NORM
+	LOGICAL VADAT_EXISTS
 !
 	INTEGER LEN_DIR
 	CHARACTER(LEN=80) DIR_NAME
+	CHARACTER(LEN=80) VADAT_FILE
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
@@ -835,6 +840,53 @@
 	1         'RSQJ',LAMC,XAXIS,YAXIS,L_FALSE)
 	 CALL DP_CURVE(NCF,XV,YV)
 !
+! Plot energy density in the radiaton field.
+!
+	ELSE IF(X(1:2) .EQ. 'EJ')THEN
+	  IF(ALLOCATED(XV))DEALLOCATE(XV)
+	  IF(ALLOCATED(YV))DEALLOCATE(YV)
+	  ALLOCATE (XV(ND)); XV=0.0D0
+	  ALLOCATE (YV(ND)); YV=0.0D0
+	  DO ID=1,NUM_FILES
+	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
+	    DO ML=1,NCF-1
+	      DO J=1,ND
+	        T1=(ZM(ID)%HFLUX(J,ML)+ZM(ID)%HFLUX(J,ML+1))*2.0D0*ZM(ID)%V(J)/C_KMS
+	        YV(J)=YV(J)+(ZM(ID)%NU(ML)-ZM(ID)%NU(ML+1))*(ZM(ID)%RJ(J,ML)+ZM(ID)%RJ(J,ML+1)+T1)
+	      END DO
+	    END DO
+	    T1=1.6D+16*ATAN(1.0D0)*1/SPEED_OF_LIGHT()      !4*PI*1.0D+15
+	    YV(1:ND)=0.5D0*T1*YV(1:ND)
+	    YV(1:ND)=3.280D-03*YV(1:ND)                    !(4*PI*Dex(+30)/L(sun)
+	    CALL LUM_FROM_ETA(YV,R,ND)
+	    DO I=ND-1,1,-1
+	      YV(I)=YV(I+1)+YV(I)
+	    END DO
+	    T2=R(ND)
+	    XV(1:ND)=DLOG10(R(1:ND)/T2)
+	    CALL DP_CURVE(ND,XV,YV)
+!
+	    VADAT_FILE='VADAT'
+	    INQUIRE(FILE=VADAT_FILE,EXIST=VADAT_EXISTS)
+	    IF(.NOT. VADAT_EXISTS)THEN
+	      VADAT_FILE='../VADAT'
+	      INQUIRE(FILE=VADAT_FILE,EXIST=VADAT_EXISTS)
+	    END IF
+	    SN_AGE=0.0D0
+	    IF(VADAT_EXISTS)THEN
+	     CALL READ_KEYWORD(SN_AGE,'[SN_AGE]',L_FALSE,VADAT_FILE,L_TRUE,L_TRUE,7)
+	    END IF
+	    YAXIS='E(rad)(s.L\dsun\u)'
+	    WRITE(6,'(A)')RED_PEN
+	    WRITE(6,'(A,ES12.4,A)')'   Integerated energy is',YV(1),' s.Lsun'
+	    WRITE(6,'(A,ES12.4,A)')'   Integerated energy is',YV(1)*3.826D+33,' ergs'
+	    IF(SN_AGE .NE. 0.0D0)THEN
+	      T1=YV(1)*SN_AGE*24.0D0*3600.0D0*3.826D+33
+	      WRITE(6,'(A,ES12.4,A,F10.4,A)')' t.Integerated energy is',T1,
+	1                     ' s ergs [SN age =',SN_AGE,' d]'
+	    END IF
+	    WRITE(6,'(A)')DEF_PEN
+	  END DO
 	ELSE IF(X(1:3) .EQ. 'INT') THEN
 !
 ! For diagnostic purposes. Designed specifically to computes

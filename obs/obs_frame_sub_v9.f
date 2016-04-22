@@ -183,6 +183,8 @@
 !
 	REAL*8 MAX_VMU
 	REAL*8 T1,T2,T3,T4
+	REAL*8 RPHOT
+	REAL*8 VPHOT
 	REAL*8 PSQ
 	REAL*8 C_KMS
 	REAL*8 PAR_FLUX
@@ -1186,6 +1188,29 @@
 	   DO ML=1,NOS
 	     WRITE(82,REC=ACCESS_F+ML)(dI_R(I,ML),I=1,ND),OBS_FREQ(ML)
 	   END DO
+	   CLOSE(UNIT=82)
+	   OPEN(UNIT=82,FILE='PHOTOSPHERIC_RADIUS',STATUS='UNKNOWN',ACTION='WRITE')
+	     WRITE(82,*)'!'
+	     WRITE(82,'(3A)')'!   Freq(10^15 Hz)','          Flux(Jy)',
+	1                    '   RPHOT(10^10 cm)','           V(km/s)'
+	     WRITE(82,*)'!'
+	     DO ML=1,NOS
+	       T1=SUM(dI_R(:,ML))
+	       IF(T1 .NE. 0.0D0)THEN
+	         T2=0.0D0
+	         DO J=1,ND
+	           T2=T2+dI_R(J,ML)/T1
+	           IF(T2 .GE. 0.5D0)EXIT
+	           T3=T2
+	         END DO
+	         RPHOT=R(J-1)+(R(J)-R(J-1))*(0.5D0-T3)/(T2-T3) 
+	         VPHOT=V(J-1)+(V(J)-V(J-1))*(0.5D0-T3)/(T2-T3) 
+	       ELSE
+	         RPHOT=0.0D0
+	         VPHOT=0.0D0
+	       END IF
+	       WRITE(82,'(4ES19.8)')OBS_FREQ(ML),T1,RPHOT,VPHOT
+	     END DO
 	   CLOSE(UNIT=82)
 	 END IF
 !

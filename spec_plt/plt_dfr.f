@@ -30,6 +30,7 @@
 	REAL*8, ALLOCATABLE :: TA(:)
 	REAL*8, ALLOCATABLE :: TB(:)
 	REAL*8, ALLOCATABLE :: TC(:)
+	REAL*8, ALLOCATABLE :: TAU_FLUX(:)
 	REAL*8, ALLOCATABLE :: TAU_ROSS(:)
 	REAL*8, ALLOCATABLE :: TAU_ES(:)
 !
@@ -99,6 +100,7 @@
 	REAL*8 PI
 	REAL*8 FREQ
 	REAL*8 T1,T2,T3
+	REAL*8 RPHOT,VPHOT
 	REAL*8 FRAC
 	REAL*8 LAMC
 	LOGICAL AIR_LAM
@@ -251,11 +253,16 @@
 	 ALLOCATE (TA(ND))
 	 ALLOCATE (TB(ND))
 	 ALLOCATE (TC(ND))
-	 ALLOCATE (TAU_ROSS(ND))
-	 ALLOCATE (TAU_ES(ND))
+	 ALLOCATE (TAU_ROSS(ND)); TAU_ROSS=0.0D0
+	 ALLOCATE (TAU_FLUX(ND)); TAU_FLUX=0.0D0
+	 ALLOCATE (TAU_ES(ND));   TAU_ES=0.0D0
 	 IF(ROSS_MEAN(ND) .NE. 0)THEN
 	   TA(1:ND)=ROSS_MEAN(1:ND)*CLUMP_FAC(1:ND)
 	   CALL TORSCL(TAU_ROSS,TA,R,TB,TC,ND,METHOD,TYPETM)
+	 END IF
+	 IF(FLUX_MEAN(ND) .NE. 0)THEN
+	   TA(1:ND)=FLUX_MEAN(1:ND)*CLUMP_FAC(1:ND)
+	   CALL TORSCL(TAU_FLUX,TA,R,TB,TC,ND,METHOD,TYPETM)
 	 END IF
 	 TA(1:ND)=6.65D-15*ED(1:ND)
 	 CALL TORSCL(TAU_ES,TA,R,TB,TC,ND,METHOD,TYPETM)
@@ -426,30 +433,70 @@
 	      DO I=2,ND
 	        TA(I)=TA(I-1)+dFR(I,ML)
 	        IF(TA(I) .GT. FRAC*ZV(ML))THEN
-	           T1=TA(I-1)/ZV(ML)
-	           T2=TA(I)/ZV(ML)
-	           T3=(FRAC-T1)/(T2-T1)
-	           IF(X(1:2) .EQ. 'OR')THEN
-	             YV(ML)=(T1*R(I)+(1.0D0-T1)*R(I-1))/R(ND)
-	           ELSE IF(X(1:2) .EQ. 'OD')THEN
-	             YV(ML)=(T1*I+(1.0D0-T1)*(I-1))
-	           ELSE
-	             YV(ML)=1.0D-03*(T1*V(I)+(1.0D0-T1)*V(I-1))
-	           END IF
-	           EXIT
-	         END IF
-	       END DO
-	     ELSE
-	       YV(ML)=0.0D0
-	     END IF
-	   END DO
-	   IF(X(1:2) .EQ. 'OR')THEN
-	     YAXIS='R/R(ND)'
-	   ELSE IF(X(1:2) .EQ. 'OD')THEN
-	     YAXIS='Depth index'
-	   ELSE
-	     YAXIS='V(Mm/s)'
-	   END IF
+	          T1=TA(I-1)/ZV(ML)
+	          T2=TA(I)/ZV(ML)
+	          T3=(FRAC-T1)/(T2-T1)
+	          IF(X(1:2) .EQ. 'OR')THEN
+	            YV(ML)=(T3*R(I)+(1.0D0-T3)*R(I-1))/R(ND)
+	          ELSE IF(X(1:2) .EQ. 'OD')THEN
+	            YV(ML)=(T3*I+(1.0D0-T3)*(I-1))
+	          ELSE
+	            YV(ML)=1.0D-03*(T3*V(I)+(1.0D0-T3)*V(I-1))
+	          END IF
+	          EXIT
+	        END IF
+	      END DO
+	    ELSE
+	      YV(ML)=0.0D0
+	    END IF
+	  END DO
+!
+	  IF(X(1:2) .EQ. 'OR')THEN
+	    YAXIS='R/R(ND)'
+	  ELSE IF(X(1:2) .EQ. 'OD')THEN
+	    YAXIS='Depth index'
+	  ELSE
+	    YAXIS='V(Mm/s)'
+	  END IF
+!
+	  T1=0.0D0; T2=0.0D0
+	  DO ML=2,NCF
+	    T1=T1+(ZV(ML+1)+ZV(ML))*(XV(ML)-XV(ML+1))
+	    T2=T2+(YV(ML+1)*ZV(ML+1)+YV(ML)*ZV(ML))*(XV(ML)-XV(ML+1))
+	  END DO
+!
+	  IF(X(1:2) .EQ. 'OR')THEN
+	    RPHOT=R(ND)*T2/T1
+	    DO I=2,ND
+	      IF(RPHOT .GE. R(I))EXIT
+	    END DO
+	    T3=(RPHOT-R(I-1))/(R(I)-R(I-1))
+	    VPHOT=V(I-1)+T3*(V(I)-V(I-1))
+	    WRITE(6,'(A,ES14.4,2A)')' The flux weighted photospheric  velocity is',VPHOT,' Mm/s'
+	    WRITE(6,'(A,ES14.4,2A)')' The flux weighted photospheric   radius  is',RPHOT,' 10^10 cm'
+	    T1=TAU_FLUX(I-1)+T3*(TAU_FLUX(I)-TAU_FLUX(I-1))
+	    WRITE(6,'(A,ES14.4,2A)')' The flux weighted photospheric tau(flux) is',T1
+	    T1=TAU_ROSS(I-1)+T3*(TAU_ROSS(I)-TAU_ROSS(I-1))
+	    WRITE(6,'(A,ES14.4,2A)')' The flux weighted photospheric tau(Ross) is',T1
+	    T1=TAU_ES(I-1)+T3*(TAU_ES(I)-TAU_ES(I-1))
+	    WRITE(6,'(A,ES14.4,2A)')' The flux weighted photospheric   tau(es) is',T1
+	  ELSE IF(X(1:2) .EQ. 'OV')THEN
+	    VPHOT=T2/T1
+	    DO I=2,ND
+	      IF(VPHOT .GE. 0.001D0*V(I))EXIT
+	    END DO
+	    T3=(1000.0D0*VPHOT-V(I-1))/(V(I)-V(I-1))
+	    RPHOT=R(I-1)+T3*(R(I)-R(I-1))
+	    WRITE(6,'(A,ES14.4,2A)')' The flux weighted photospheric  velocity is',VPHOT,' Mm/s'
+	    WRITE(6,'(A,ES14.4,2A)')' The flux weighted photospheric   radius  is',RPHOT,' 10^10 cm'
+	    T1=TAU_FLUX(I-1)+T3*(TAU_FLUX(I)-TAU_FLUX(I-1))
+	    WRITE(6,'(A,ES14.4,2A)')' The flux weighted photospheric tau(flux) is',T1
+	    T1=TAU_ROSS(I-1)+T3*(TAU_ROSS(I)-TAU_ROSS(I-1))
+	    WRITE(6,'(A,ES14.4,2A)')' The flux weighted photospheric tau(Ross) is',T1
+	    T1=TAU_ES(I-1)+T3*(TAU_ES(I)-TAU_ES(I-1))
+	    WRITE(6,'(A,ES14.4,2A)')' The flux weighted photospheric   tau(es) is',T1
+	  END IF
+!
 	  CALL CNVRT(XV,ZV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         LAMC,XAXIS,YAXIS,L_TRUE)
 	  CALL CURVE(NCF,XV,YV)
