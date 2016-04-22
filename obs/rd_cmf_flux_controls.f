@@ -377,10 +377,13 @@
 	  CALL RD_STORE_LOG(INCL_DJDT_TERMS,'INCL_DJDT',L_FALSE,'DJDt terms in transfer equaton for SN models?')
 	  IF(INCL_DJDT_TERMS)THEN
 	    USE_DJDT_RTE=.TRUE.
+	    USE_Dr4JDT=.TRUE.
+	    CALL RD_STORE_LOG(USE_Dr4JDT,'USE_DR4JDT',L_FALSE,'Difference Dr4JDt')
 	  ELSE
-	   USE_DJDT_RTE=.FALSE.
-	   CALL RD_STORE_LOG(USE_DJDT_RTE,'USE_DJDT_RTE',L_FALSE,
-	1    'Use solver which has DJDt terms in transfer equaton for SN models?')
+	    USE_DJDT_RTE=.FALSE.
+	    USE_Dr4JDT=.FALSE.
+	    CALL RD_STORE_LOG(USE_DJDT_RTE,'USE_DJDT_RTE',L_FALSE,
+	1     'Use solver which has DJDt terms in transfer equaton for SN models?')
 	  END IF
 	  DJDT_RELAX_PARAM=1.0D0
 	  CALL RD_STORE_DBLE(DJDT_RELAX_PARAM,'DJDT_RELAX',L_FALSE,

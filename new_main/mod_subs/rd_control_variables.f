@@ -969,9 +969,12 @@ C
 	  CALL RD_STORE_LOG(INCL_DJDT_TERMS,'INCL_DJDT',L_FALSE,'DJDt terms in transfer equaton for SN models?')
 	  IF(INCL_DJDT_TERMS)THEN
 	    USE_DJDT_RTE=.TRUE.
+	    USE_Dr4JDT=.TRUE.
+	    CALL RD_STORE_LOG(USE_Dr4JDT,'USE_DR4JDT',L_FALSE,'Difference Dr4JDt')
 	  ELSE
 	    JGREY_WITH_V_TERMS=.FALSE.
 	    USE_DJDT_RTE=.FALSE.
+	    USE_Dr4JDT=.FALSE.
 	    CALL RD_STORE_LOG(USE_DJDT_RTE,'USE_DJDT_RTE',L_FALSE,
 	1    'Use solver which has DJDt terms in transfer equaton for SN models?')
 	  END IF

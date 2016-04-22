@@ -82,6 +82,7 @@
 	LOGICAL JGREY_WITH_V_TERMS 	!Include velocity terms when comuting T(grey).
 	LOGICAL INCL_DJDT_TERMS         !Include DJDt terms in radiative transfer equation
 	LOGICAL USE_DJDT_RTE            !Use the radiative transfer equation solver which includes DJDt terms
+	LOGICAL USE_DR4JDT              !Explicitly difference Dr4JDt (rather than Dr3JDt)
 	LOGICAL DO_CO_MOV_DDT		!Include comoving drivative in SE equations.
 	LOGICAL DO_FULL_REL_OBS         !Include all relativistic terms in obs. frame computation.
 	LOGICAL DO_FULL_REL_CMF         !Include all relativistic terms in CMF obs. frame computation.
