@@ -2447,7 +2447,7 @@
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='dlnT/dlnP'
 !
-	ELSE IF(XOPT .EQ. 'DADAD')THEN
+	ELSE IF(XOPT .EQ. 'DERAD')THEN
 	  CALL USR_OPTION(ELEC,'INTEG','F','Integrated luminosity')
 	  IF(ELEC)THEN
 	    YV(1:ND)=3.280D-03*dE_RAD_DECAY(1:ND)*R(1:ND)*R(1:ND)  !(4*PI*Dex(+30)/L(sun)

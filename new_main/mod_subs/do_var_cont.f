@@ -194,7 +194,7 @@
 	      TX(:,:,:)=0.0D0
 	      TVX(:,:,:)=0.0D0
 	      dJ_DIF_d_T(:)=0.0D0
-	      dJ_DIF_d_dTdR(K)=0.0D0
+	      dJ_DIF_d_dTdR(:)=0.0D0
 	      dRSQH_DIF_d_T=0.0D0
 	      dRSQH_DIF_d_dTdR=0.0D0
 	      FL_OLD=FL
