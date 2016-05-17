@@ -21,6 +21,7 @@
 	INTEGER, PARAMETER :: LUOUT=40
 !
 	REAL*8, ALLOCATABLE :: R(:)
+	REAL*8, ALLOCATABLE :: R_RVTJ(:)
 	REAL*8, ALLOCATABLE :: RJ(:,:)
 	REAL*8, ALLOCATABLE :: HFLUX(:,:)
 	REAL*8, ALLOCATABLE :: NU(:)
@@ -71,8 +72,8 @@
 	LOGICAL DONL_DR4J_LUM
 	LOGICAL DONL_INTERN_LUM
 !
-	CHARACTER(LEN=80) DIR_NAME(NMAX)
-	CHARACTER(LEN=80) FILE_NAME
+	CHARACTER(LEN=140) DIR_NAME(NMAX)
+	CHARACTER(LEN=140) FILE_NAME
 	CHARACTER(LEN=80) FILE_DATE
 	CHARACTER(LEN=200) STRING
 !
@@ -112,16 +113,33 @@
 	DO I=1,NMOD
 !
           FILE_NAME=TRIM(DIR_NAME(I))//'RVTJ'
-          OPEN(UNIT=LUIN,FILE=FILE_NAME,STATUS='OLD',ACTION='READ')
-            DO WHILE(ND .EQ. 0)
-              READ(LUIN,'(A)')STRING
-              IF(INDEX(STRING,'ND:') .NE. 0)THEN
-                K=INDEX(STRING,':')+1
-                READ(STRING(K:),*)ND
-              END IF
-            END DO
-	  CLOSE(UNIT=10)
-!	
+          ND=0
+	  OPEN(UNIT=LUIN,FILE=FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	    IF(IOS .EQ. 0)THEN
+              DO WHILE(ND .EQ. 0)
+                READ(LUIN,'(A)')STRING
+                IF(INDEX(STRING,'ND:') .NE. 0)THEN
+                  K=INDEX(STRING,':')+1
+                  READ(STRING(K:),*)ND
+                END IF
+              END DO
+	      IF(ALLOCATED(R_RVTJ))DEALLOCATE(R_RVTJ)
+	      ALLOCATE (R_RVTJ(ND))
+	      STRING=' '
+	      DO WHILE(INDEX(STRING,'Radius (10^10 cm)') .EQ. 0)
+	        READ(10,'(A)')STRING
+	      END DO
+	      READ(10,*)R_RVTJ	
+	      CLOSE(UNIT=10)
+	    ELSE
+	      WRITE(6,*)' '
+	      WRITE(6,*)'Unable to open ',TRIM(FILE_NAME)
+	      WRITE(6,*)'Assuming this, and subsequent models, are unavailable'
+	      NMOD=I-1
+	      EXIT
+	      WRITE(6,*)' '
+	    END IF
+!
 	  DONL_CMF_LUM=.FALSE.
 	  DONL_MECH_LUM=.FALSE.
 	  DONL_DECAY_LUM=.FALSE.
@@ -189,12 +207,25 @@
 	   ALLOCATE(HFLUX(ND,NCF))
 	   ALLOCATE(NU(NCF))
 	   ALLOCATE(R(ND))
-	   READ(LUIN,REC=ST_REC-2,IOSTAT=IOS)(R(1:ND))
+!	   READ(LUIN,REC=ST_REC-2,IOSTAT=IOS)(R(1:ND))
+	   READ(LUIN,REC=ST_REC-2)(R(1:ND))
 	   DO ML=1,NCF
 	     READ(LUIN,REC=ST_REC+ML-1)RJ(1:ND,ML),HFLUX(1:ND-1,ML),T1,T2,NU(ML)
 	   END DO
 	   NCF=NCF-1
 	   CLOSE(UNIT=10)
+!
+! Compare R in RVTJ with that in the JH file.
+!
+	  DO J=1,ND
+	    IF( ABS(1.0D0-R_RVTJ(J)/R(J)) .GT. 1.0D-07)THEN
+	      WRITE(6,*)'Error R grid does not match'
+	      WRITE(6,*)R(J)
+	      WRITE(6,*)R_RVTJ(J)
+	      WRITE(6,*)'Directory name is ',DIR_NAME(I)
+	      STOP
+	    END IF
+	  END DO
 !
 	  YV=0.0D0
           DO ML=1,NCF-1
@@ -210,7 +241,8 @@
 	  CALL LUM_FROM_ETA(YV,R,ND)
 	  E_RAD(I)=2.0D0*PI*4.0D+37*PI*SUM(YV(1:ND))/C_MMS
 !
-	  WRITE(LUOUT,'(F10.4,7ES14.4)')SN_AGE(I),L_CMF(I),L_MECH(I),L_DR4J(I),L_INTERN(I),L_DECAY(I),E_RAD(I)
+	  WRITE(LUOUT,'(F10.4,6ES14.4,4X,A)')SN_AGE(I),L_CMF(I),L_MECH(I),L_DR4J(I),
+	1               L_INTERN(I),L_DECAY(I),E_RAD(I),DIR_NAME(I)(MAX(1,K-10):K)
 	  FLUSH(UNIT=LUOUT)
 	END DO
 !

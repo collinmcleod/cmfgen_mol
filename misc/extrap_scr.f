@@ -9,6 +9,7 @@
 	USE READ_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 25-Apr-2016: LST_NG rest to -100o as for new model.
 ! Altered 10-Feb-2016: Bug fix (for non identucal velocity grids).
 ! Altered 26-Feb-2016: Bug fix (for case of identical velocity grids).
 ! Created 19-Feb-2016: Based intially on PLT_SCR.
@@ -271,7 +272,7 @@
 	STRING='ln -sf NEW_SCRTEMP    SCRTEMP'
 	CALL SYSTEM(STRING)
 !
-	NITSF=1; IREC=0; IS=3
+	NITSF=1; IREC=0; IS=3; LST_NG=-1000
 	CALL SCR_RITE_V2(SCR(IS)%R,SCR(IS)%V,SCR(IS)%SIGMA,SCR(IS)%POPS,IREC,NITSF,
 	1              RITE_N_TIMES,LST_NG,L_TRUE,
 	1              SCR(IS)%NT,SCR(IS)%ND,LUSCR,NEWMOD)

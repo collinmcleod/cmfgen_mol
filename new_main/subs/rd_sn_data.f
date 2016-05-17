@@ -9,6 +9,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered: 15-May-2016 : Fixed minor bug when checking size of isotope abundance changes.
 ! Altered: 01-Mar-2016 : Changed to allow handling of a standard NUC_DECAY_DATA file.
 !                         Code checks availability of decay route. This is important
 !                         when a species but not isotopes are included [17-Feb-2016].
@@ -84,6 +85,7 @@
 ! Get the number of data points in the HYDRO model, and the number 
 ! of species.
 !
+	  NX=0; NSP=0; NISO=0; OLD_SN_AGE_DAYS=0.0D0
 	  DO WHILE (1 .EQ. 1)
 	    STRING=' '
 	    DO WHILE (STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ')
@@ -257,9 +259,7 @@
 	END DO
 	WRITE(LUER,*)'   Read SN populations in RD_SN_DATA'
 !
-	DO IS=1,NUM_ISOTOPES
-	  ISO(IS)%OLD_POP_DECAY=ISO(IS)%OLD_POP
-	END DO
+	ISO(:)%READ_ISO_POPS=.FALSE.
 	DO L=1,NISO
 	  DONE=.FALSE.
 	  DO K=1,NUM_ISOTOPES
@@ -296,9 +296,9 @@
 	DO L=1,NUM_SPECIES
 	  POP_SPECIES(:,L)=POP_SPECIES(:,L)/WRK(:)
 	END DO
-	WRITE(6,*)'   Normalized mass fractions in RD_SN_DATA'
-	WRITE(6,*)'   Maximum normalization factor was',MAXVAL(WRK)
-	WRITE(6,*)'   Minimum normalization factor was',MINVAL(WRK)
+	WRITE(LUER,*)'   Normalized mass fractions in RD_SN_DATA'
+	WRITE(LUER,*)'   Maximum normalization factor was',MAXVAL(WRK)
+	WRITE(LUER,*)'   Minimum normalization factor was',MINVAL(WRK)
 !
 ! Compute the mass of each species present in the ejecta.
 !
@@ -379,6 +379,7 @@
 	        WRITE(LUER,*)'Warning: Possible error in reading SN_HYDRO_DATA with RD_SN_DATA.'
 	        WRITE(LUER,*)'The following species have decay data present in NUC_DECAY_DATA',
 	1                          '     but have no isotope data in SN_HYDRO_DATA.'
+	        WRITE(LUER,*)'Please add the appropriate isotopic data'
 	        WRITE(LUER,*)SPECIES(PAR(IP)%ISPEC)
 	        FIRST_WARN=.FALSE.
 	       ELSE
@@ -387,7 +388,11 @@
 	    END IF
 	  END DO
 	END IF
-	IF(.NOT. FIRST_WARN)WRITE(6,*)' '
+	IF(.NOT. FIRST_WARN)THEN
+	  WRITE(LUER,*)'Add more isotope data or delete the appropriate reactions'
+	  STOP
+	END IF
+	WRITE(LUER,*)' '
 !
 ! If population is zero at some depths, but species is present, we will
 ! set to small value.
@@ -444,19 +449,20 @@
 	    IF(T1 .NE. 0.0D0)THEN
 	      T1=0.0D0
 	      DO I=1,ND
-	        T2=ABS(1.0D0-ISO(IS)%OLD_POP_DECAY(I)/ISO(IS)%OLD_POP(I))
-	        IF( (T2 .GT. 3.0D0 .OR. T2 .LT. 0.30D0) .AND. ISO(IS)%OLD_POP(I) .GT. 1.0D-10)THEN
+	        T2=1.0D0-ISO(IS)%OLD_POP_DECAY(I)/ISO(IS)%OLD_POP(I)
+	        IF( (T2 .LE. -2.0D0 .OR. T2 .GT. 0.67D0) .AND. ISO(IS)%OLD_POP(I) .GT. 1.0D-10)THEN
 	          IF(FIRST_WARN)THEN
 	            FIRST_WARN=.FALSE.
-	            WRITE(6,*)' '
-	            WRITE(6,*)'WARNING from RD_SN_DATA '
-	            WRITE(6,*)'The following isotopes have changed their abundance by over a factor of 3.'
-	            WRITE(6,*)'This may have occurred because you are using a revised NUCELAR decay data file.'
-	            WRITE(6,*)'Do diff SN_HYDRO_DATA SN_HYDRO_FOR_NEXT_MODEL to see changes.'
-	            WRITE(6,*)'This may affect the heating unless using instantaneous energy deposition.'
-	            WRITE(6,'(3X,A,T12,I3)')TRIM(ISO(IS)%SPECIES),ISO(IS)%BARYON_NUMBER
+	            WRITE(LUER,*)' '
+	            WRITE(LUER,*)'WARNING from RD_SN_DATA '
+	            WRITE(LUER,*)'The following isotopes have changed their abundance by over a factor of 3.'
+	            WRITE(LUER,*)'This may have occurred because you are using a revised NUCLEAR decay data file.'
+	            WRITE(LUER,*)'Do diff SN_HYDRO_DATA SN_HYDRO_FOR_NEXT_MODEL to see changes.'
+	            WRITE(LUER,*)'This may affect the heating, partyicularly when using energy'//
+	1                        ' deposition averaged over time.'
+	            WRITE(LUER,'(3X,A,T12,I3)')TRIM(ISO(IS)%SPECIES),ISO(IS)%BARYON_NUMBER
 	          ELSE
-	            WRITE(6,'(3X,A,T12,I3)')TRIM(ISO(IS)%SPECIES),ISO(IS)%BARYON_NUMBER
+	            WRITE(LUER,'(3X,A,T12,I3)')TRIM(ISO(IS)%SPECIES),ISO(IS)%BARYON_NUMBER
 	          END IF
 	          EXIT
 	        END IF
@@ -464,7 +470,7 @@
 	    END IF
 	  END IF
 	END DO
-	IF(.NOT. FIRST_WARN)WRITE(6,*)' '
+	IF(.NOT. FIRST_WARN)WRITE(LUER,*)' '
 !
 ! Compute the mass for each isotope.
 !
@@ -479,8 +485,15 @@
 	        END DO
 	        CALL LUM_FROM_ETA(WRK,R,ND)
 	        T1=4.0D0*3.1416D0*1.66D-24*SUM(WRK(1:ND))*ISO(IS)%MASS/1.989D+03
-	        IF(T1 .NE. 0)WRITE(LU,'(A,T8,ES11.3,4X,I3)')TRIM(SPECIES(L)),T1,ISO(IS)%BARYON_NUMBER
-	        T2=T2+T1
+	        IF(T1 .NE. 0 .AND. ISO(IS)%STABLE)THEN
+	          WRITE(LU,'(A,T8,ES11.3,4X,I3,5X,A)')TRIM(SPECIES(L)),
+	1            T1,ISO(IS)%BARYON_NUMBER,'Stable'
+	          T2=T2+T1
+	        ELSE IF(T1 .NE. 0)THEN
+	          WRITE(LU,'(A,T8,ES11.3,4X,I3,5X,A)')TRIM(SPECIES(L)),
+	1            T1,ISO(IS)%BARYON_NUMBER,'Unstable'
+	          T2=T2+T1
+	        END IF
 	      END IF
 	    END DO
 	    IF(T2 .NE. 0.0D0)MASS_SPECIES(L)=T2
@@ -513,7 +526,8 @@
 	CALL OUT_SN_POPS_V3('SN_DATA_INPUT_CHK',SN_AGE_DAYS,USE_OLD_MF_OUTPUT,ND,LU)
 !
 	DEALLOCATE (R_HYDRO, LOG_R_HYDRO, V_HYDRO, SIGMA_HYDRO, T_HYDRO, DENSITY_HYDRO )
-	DEALLOCATE (WRK_HYDRO, SPEC_HYDRO, POP_HYDRO, ATOM_DEN_HYDRO, ELEC_DEN_HYDRO)
+	DEALLOCATE (ATOM_DEN_HYDRO, ELEC_DEN_HYDRO, POP_HYDRO, ISO_HYDRO, WRK_HYDRO)
+	DEALLOCATE (BARY_HYDRO, SPEC_HYDRO, ISO_SPEC_HYDRO)
 	WRITE(LUER,'(A,/)')' Exiting RD_SN_DATA'
 !
 	RETURN
