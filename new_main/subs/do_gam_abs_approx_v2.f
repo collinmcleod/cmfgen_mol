@@ -8,6 +8,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered: 27-May-2016 -- CHI is now multiplied by CLUMP_FAC so that clumping is correctly accounted for.
 ! Altered: 29-Jan-2015 -- LOCAL_ABS_ENEGRY added to call. Fixed bug in luminosity calculation.
 ! Altered: 06-Jan-2015 -- KINETIC_DECAY_ENERGY included in the call.
 !                         Changed to V2. Kinetic energy is assumed to be
@@ -42,7 +43,7 @@
 !
 ! Compute the absorbative opacity.
 !
-	CHI(1:ND)=0.06D0*TA(1:ND)*DENSITY(1:ND)*1.0D+10
+	CHI(1:ND)=0.06D0*TA(1:ND)*DENSITY(1:ND)*CLUMP_FAC(1:ND)*1.0D+10
 !
 ! Calculate a larger R grid. We attempt to keep the outer grid spacing small.
 !

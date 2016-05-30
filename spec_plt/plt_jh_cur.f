@@ -520,7 +520,7 @@
 	IF(I .GT. XV_LENGTH)THEN
 	  DEALLOCATE (XV,YV,ZV)
 	  ALLOCATE (XV(I),YV(I),ZV(I))
-	  I=XV_LENGTH
+	  XV_LENGTH=I
 	END IF
 !
 ! Set default data types
@@ -843,10 +843,6 @@
 ! Plot energy density in the radiaton field.
 !
 	ELSE IF(X(1:2) .EQ. 'EJ')THEN
-	  IF(ALLOCATED(XV))DEALLOCATE(XV)
-	  IF(ALLOCATED(YV))DEALLOCATE(YV)
-	  ALLOCATE (XV(ND)); XV=0.0D0
-	  ALLOCATE (YV(ND)); YV=0.0D0
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
 	    DO ML=1,NCF-1

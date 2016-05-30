@@ -73,7 +73,7 @@
 	INTEGER NCF
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
-	CHARACTER(LEN=12), PARAMETER :: PRODATE='04-Oct-2015'		!Must be changed after alterations
+	CHARACTER(LEN=12), PARAMETER :: PRODATE='30-May-2016'		!Must be changed after alterations
 !
 ! 
 !
@@ -480,7 +480,6 @@
 	VAR_INDX=366
 	VAR_INDX=MIN(VAR_INDX,NT)
 	CALL GET_VERBOSE_INFO(VERBOSE)
-!
 !
 ! When TRUE, FIXED_T indicated that T is to be heled fixed (at least at some
 ! depths) in the linearization. This variable is set automatically by the 

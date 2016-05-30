@@ -61,10 +61,13 @@
 	REAL*8 OLD_SN_AGE_DAYS
 	REAL*8 DEN_SCL_FAC
 	REAL*8 T1,T2
+	REAL*8 MF_IB,MF_OB
+	REAL*8 ISO_MF_IB,ISO_MF_OB
+!
 	INTEGER NX
 	INTEGER NSP
 	INTEGER NISO
-	INTEGER I,L,K
+	INTEGER I,L,K,CNT
 	INTEGER IS,IP
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
@@ -189,9 +192,19 @@
 	    ISO_SPEC_HYDRO(L)=STRING(1:I-1)
 	    READ(STRING(I:),*)BARY_HYDRO(L)
 	    READ(LU,*)(ISO_HYDRO(I,L), I=1,NX)
-!	    WRITE(LUER,'(I5,A,I5,2ES14.4)')L,TRIM(ISO_SPEC_HYDRO(L)),BARY_HYDRO(L),ISO_HYDRO(1,L),ISO_HYDRO(NX,L)
 	    STRING=' '
 	  END DO
+!
+! Check no more isotopes
+!
+	  STRING=' '
+	  DO WHILE( INDEX(STRING,'mass fraction') .EQ. 0)
+	     READ(LU,'(A)',END=1000)STRING 
+	  END DO
+	  WRITE(LUER,*)'Error in RD_SN_DATA -- more isotopic mass fractions in SN_HYDRO_DATA' 
+	  WRITE(LUER,*)TRIM(STRING)
+	  STOP
+1000	  CONTINUE
 	CLOSE(UNIT=LU)
 !
 	IF(PURE_HUBBLE_FLOW)THEN
@@ -472,35 +485,52 @@
 	END DO
 	IF(.NOT. FIRST_WARN)WRITE(LUER,*)' '
 !
-! Compute the mass for each isotope.
+! Compute the mass for each isotope. We also output the mass fractions at the boundaries.
 !
 	OPEN(UNIT=LU,FILE='SPECIES_MASSES',STATUS='UNKNOWN')
+	WRITE(LU,'(A,3X,A,5X,A,13X,8X,A,8X,A)')'Species ','M(Msun)','BN','MF(OB)','MF(IB)'
 	DO L=1,NUM_SPECIES
 	  IF(SPECIES_PRES(L))THEN
 	    T2=0.0D0
+	    CNT=0
+!
+! We use these MF's if no isotopes.
+!
+	    MF_OB=1.66D-24*AT_MASS(L)*POP_SPECIES(1,L)/DENSITY(1)
+	    MF_IB=1.66D-24*AT_MASS(L)*POP_SPECIES(ND,L)/DENSITY(ND)
 	    DO IS=1,NUM_ISOTOPES
 	      IF(ISO(IS)%SPECIES .EQ. SPECIES(L))THEN
+	        CNT=CNT+1
+	        IF(CNT .EQ. 1)THEN
+	          WRITE(LU,'(A)')' '
+	          MF_OB=0.0D0; MF_IB=0.0D0
+	        END IF
 	        DO K=1,ND
 	          WRK(K)=ISO(IS)%POP(K)*R(K)*R(K)
 	        END DO
 	        CALL LUM_FROM_ETA(WRK,R,ND)
 	        T1=4.0D0*3.1416D0*1.66D-24*SUM(WRK(1:ND))*ISO(IS)%MASS/1.989D+03
+	        ISO_MF_OB=ISO(IS)%POP(1)*1.66D-24*ISO(IS)%MASS/DENSITY(1)
+	        ISO_MF_IB=ISO(IS)%POP(ND)*1.66D-24*ISO(IS)%MASS/DENSITY(ND)
+	        MF_OB=MF_OB+ISO_MF_OB
+	        MF_IB=MF_IB+ISO_MF_IB
 	        IF(T1 .NE. 0 .AND. ISO(IS)%STABLE)THEN
-	          WRITE(LU,'(A,T8,ES11.3,4X,I3,5X,A)')TRIM(SPECIES(L)),
-	1            T1,ISO(IS)%BARYON_NUMBER,'Stable'
+	          WRITE(LU,'(A,T8,ES11.3,4X,I3,5X,A,2ES14.3)')TRIM(SPECIES(L)),
+	1            T1,ISO(IS)%BARYON_NUMBER,'  Stable',ISO_MF_OB,ISO_MF_IB
 	          T2=T2+T1
 	        ELSE IF(T1 .NE. 0)THEN
-	          WRITE(LU,'(A,T8,ES11.3,4X,I3,5X,A)')TRIM(SPECIES(L)),
-	1            T1,ISO(IS)%BARYON_NUMBER,'Unstable'
+	          WRITE(LU,'(A,T8,ES11.3,4X,I3,5X,A,2ES14.3)')TRIM(SPECIES(L)),
+	1            T1,ISO(IS)%BARYON_NUMBER,'Unstable',ISO_MF_OB,ISO_MF_IB
 	          T2=T2+T1
 	        END IF
 	      END IF
 	    END DO
 	    IF(T2 .NE. 0.0D0)MASS_SPECIES(L)=T2
-	    WRITE(LU,'(A,T8,ES11.3)')TRIM(SPECIES(L)),MASS_SPECIES(L)
+	    WRITE(LU,'(A,T8,ES11.3,20X,2ES14.3)')TRIM(SPECIES(L)),MASS_SPECIES(L),
+	1             MF_OB,MF_IB
 	  END IF
 	END DO
-	WRITE(LU,*)'Total ejecta mass of model is ',SUM(MASS_SPECIES)
+	WRITE(LU,'(/,A,ES12.4)')'Total ejecta mass of model is ',SUM(MASS_SPECIES)
 	CLOSE(UNIT=LU)
 !
 ! Compute total ATOM population.

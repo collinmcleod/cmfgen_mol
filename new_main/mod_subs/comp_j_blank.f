@@ -174,9 +174,10 @@ C
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJEXT(I),I=1,NDEXT),T1
 	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
-	      WRITE(LUER,*)'Error - incorrect reading of mean intensity'
+	      WRITE(LUER,*)'Error - incorrect reading of EDDFACTOR in COMP_J_BLANK'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
+	      WRITE(LUER,*)'You may need to delete EDDFACTOR'
 	      STOP                
 	    END IF
 	  END IF
@@ -299,9 +300,10 @@ C
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJEXT(I),I=1,NDEXT),T1
 	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
-	      WRITE(LUER,*)'Error - incorrect reading of the mean intensity'
+	      WRITE(LUER,*)'Error - incorrect reading of EDDFACTOR in COMP_J_BLANK'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
+	      WRITE(LUER,*)'You may need to delete EDDFACTOR'
 	      STOP
 	    END IF
 	  END IF
@@ -311,10 +313,10 @@ C
 	  IF(.NOT. COHERENT_ES)THEN
 	    READ(LU_ES,REC=ACCESS_F)(RJEXT_ES(I),I=1,NDEXT),T1
 	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
-	      WRITE(LUER,*)'Error - incorrect reading of'//
-	1                ' the mean intensity'
+	      WRITE(LUER,*)'Error - incorrect reading of ES_J_CONV in COMO_J_BLANK'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
+	      WRITE(LUER,*)'You may need to delete ES_J_CONV'
 	      STOP
 	    END IF
 	  END IF
@@ -562,9 +564,10 @@ C
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJ(I),I=1,ND),T1
 	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
-	      WRITE(LUER,*)'Error - incorrect reading of the mean intensity'
+	      WRITE(LUER,*)'Error - incorrect reading of EDDFACTOR in COMP_J_BLANK'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
+	      WRITE(LUER,*)'You may need to delete EDDFACTOR'
 	      STOP
 	    END IF
 	  END IF
@@ -574,10 +577,10 @@ C
 	  IF(.NOT. COHERENT_ES)THEN
 	    READ(LU_ES,REC=ACCESS_F)(RJ_ES(I),I=1,ND),T1
 	    IF(T1 .NE. FL)THEN
-	      WRITE(LUER,*)'Error - incorrect reading of'//
-	1                ' the mean intensity'
+	      WRITE(LUER,*)'Error - incorrect reading of ES_J_CONV in COMP_J_BLANK'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
+	      WRITE(LUER,*)'You may need to delete ES_J_CONV'
 	      STOP
 	    END IF
 	  END IF
@@ -882,9 +885,10 @@ C
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJ(I),I=1,ND),T1
 	    IF(T1 .NE. FL)THEN        
-	      WRITE(LUER,'(/,A)')' Error - incorrect reading of Mean Intensity' 
+	      WRITE(LUER,'(/,A)')' Error - incorrect reading of EDDFACTOR in COMP_J_BLANK'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
+	      WRITE(LUER,*)'You may need to delete EDDFACTOR'
 	      STOP
 	    END IF
 	  END IF
