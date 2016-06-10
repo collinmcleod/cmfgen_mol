@@ -228,11 +228,20 @@
 	1                POP_SPECIES(1,ISPEC),AT_NO(ISPEC),SPECIES_PRES(ISPEC),ND)
 	      END DO
 	      CALL GETELEC_V2(SPEC_DEN,AT_NO_VEC,I,ED,ND,LUIN,'GAMMAS_IN')
+!
+	      IF(INTERP_T_ON_R_GRID)THEN
+!
+! We do a simple linera interpolation on R, and assume that the Grey iteration procdure
+! will correct T in the inner region. Usefull when large changes in T.
+!
+	        CALL REGRID_T_ED(R,TA,T,POP_ATOM,ND,'T_IN')
+	      ELSE
 !                         
 ! The INIT_TEMP routine assumes that the T can interpolated using 
 ! a Spherical TAU scale computed using the electron scattering opacity.
 !
-	      CALL INIT_TEMP_V2(R,ED,CLUMP_FAC,T,LUM,T_INIT_TAU,ND,LUIN,'T_IN')
+	        CALL INIT_TEMP_V2(R,ED,CLUMP_FAC,T,LUM,T_INIT_TAU,ND,LUIN,'T_IN')
+	      END IF
 	    END IF
 	  END IF
 !

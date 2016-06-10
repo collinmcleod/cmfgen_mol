@@ -1604,7 +1604,7 @@ C
 	     END IF
 	  ELSE
 	    CALL USR_OPTION(NORM_WAVE,'NW',' ',
-	1       'Norm Wave (Angstroms) or Radius (<200Rsun)')
+	1       'Norm Wave (Angstroms) or Radius (<0 [in Rsun])')
 C
 C Rather than choose the full NCF points we adopt a set that extends from
 C NU_MAX to NU_MIN but with a larger spacing.
@@ -1620,7 +1620,7 @@ C
 	       END IF
 	      XV(I)=T1
 	    END DO         
-	    IF(NORM_WAVE .GT. 200.0D0)THEN
+	    IF(NORM_WAVE .GT. 0.0D0)THEN
 	      NORM_FREQ=2.998D+03/NORM_WAVE
 	      DO I=2,NCF
 	        IF(NORM_FREQ .LE. NU(I-1) .AND. NORM_FREQ .GT. NU(I))K=I

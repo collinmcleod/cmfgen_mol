@@ -158,6 +158,7 @@
 	REAL*8 T_INIT_TAU
 	LOGICAL ITERATE_INIT_T
 	LOGICAL T_MIN_BA_EXTRAP
+	LOGICAL INTERP_T_ON_R_GRID
 !
 ! Used to limit the temperature while iterating on T.
 !

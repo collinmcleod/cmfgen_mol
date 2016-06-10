@@ -774,6 +774,8 @@ C
 	1        'Tau above which T is set exactly to T(spherical)')
 	  CALL RD_STORE_LOG(ITERATE_INIT_T,'IT_ON_T',L_TRUE,
 	1        'Improve initial T estimate by iteration ?')
+	  CALL RD_STORE_LOG(INTERP_T_ON_R_GRID,'T_ON_R',L_FALSE,
+	1       'Interpolate T on R grid - default is SPH tau grid')
 	  CALL RD_STORE_DBLE(GREY_PAR,'GREY_TAU',L_TRUE,
 	1        'SpecifysTau above which T is set to TGREY in iterative process')
 !

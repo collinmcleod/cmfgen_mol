@@ -725,6 +725,12 @@
 	1             VEC_ARAD(ML),VEC_C4(ML),TDOP,AMASS_DOP,VTURB_FIX,                !2: Garbage at present
 	1             DOP_PROF_LIMIT,VOIGT_PROF_LIMIT,V_PROF_LIMIT,MAX_PROF_ED,
 	1             SET_PROF_LIMS_BY_OPACITY)
+	          IF(ID .EQ. 1)THEN
+	            IF(ATM(ID)%XzVLEVNAME_F(2) .NE. '2___' .AND. INDEX(PROF_TYPE(ML),'DOP') .EQ. 0)THEN
+	              WRITE(LUER,*)'Error in CMF_FLUX -- only Doppler profiles are implemented for split H levels'
+	              STOP
+	            END IF
+	          END IF
 	        END IF
 	      END DO
 	    END DO
