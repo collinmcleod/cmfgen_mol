@@ -293,6 +293,14 @@
 	END DO
 	WRITE(LUER,*)'   Read SN isotope populations in RD_SN_DATA'
 !
+	DO IS=1,NUM_ISOTOPES
+	  IF(ISO(IS)%READ_ISO_POPS)THEN
+	    DO I=1,ND
+	     ISO(IS)%OLD_POP(I)=MAX(ISO(IS)%OLD_POP(I),1.0D-20)
+	    END DO
+	  END IF
+	END DO
+!
 ! Ensure mass-fractions sum to unity. Two options: scale either
 ! the mass-fractions or the density. Here we scale the mass-fractions.
 ! To avoid possible confusion, we only allow for species explicitly

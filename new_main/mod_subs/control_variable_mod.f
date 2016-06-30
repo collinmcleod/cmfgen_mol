@@ -1,5 +1,6 @@
 	MODULE CONTROL_VARIABLE_MOD
 !
+! Altered : 15-Jun-2016 : NT_ITERATION_COUNTER added to this routine so that it is accessible by CMFGEN_SUB.
 ! Altered : 15-Feb-2015 : Added INSTANTANEOUS_ENERGY_DEPOSITION option (12-Jan-2015 on OSPREY[cur_cmf_gam])
 ! Incorporated: 02-Jan-2014: Changed to allow depth dependent profiles.
 ! Altered : 05-Apr-2011 : Added vriable R_GRD_REVISED (10-Feb-2011).
@@ -99,6 +100,7 @@
         REAL*8 NT_EMIN			!Minimum energy of non-thermal electrons
 	INTEGER NT_NKT
 	INTEGER NON_THERMAL_IT_CNTRL    !Controls how often we update the nonthermal electron distribution.
+	INTEGER NT_ITERATION_COUNTER
 	LOGICAL COMP_GREY_LST_IT        !Comput J(GREY) on last iteration [DEFAULT is TRUE].
 	LOGICAL SCL_NT_CROSEC
 	LOGICAL SCL_NT_ION_CROSEC

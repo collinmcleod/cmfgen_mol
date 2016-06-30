@@ -158,9 +158,12 @@
 	        IF(.NOT. ROUND_ERROR)STOP
 	      END IF
 	    END DO
-	    DO I=8,1,-1
-              OLD_TAU(I)=OLD_TAU(I+1)-TAU_SAV(I)
-            END DO
+!	    DO I=8,1,-1
+!             OLD_TAU(I)=OLD_TAU(I+1)-TAU_SAV(I)
+!            END DO
+ 	     DO I=2,ND
+              OLD_TAU(I)=OLD_TAU(I-1)+TAU_SAV(I-1)
+             END DO
 	    RD_MEANOPAC=.TRUE.
 	  ELSE
 	    RD_MEANOPAC=.FALSE.

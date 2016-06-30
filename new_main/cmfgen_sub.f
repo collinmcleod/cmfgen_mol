@@ -3712,7 +3712,7 @@
 	IF(LAST_NG .EQ. MAIN_COUNTER)NUM_ITS_TO_DO=MAX(2,NUM_ITS_TO_DO)
 	CALL TUNE(ITWO,'SOLVE_FOR_POPS')
 !
-! If we have changed the R grid, we need to recomput the angular quadrature weitghts,
+! If we have changed the R grid, we need to recompute the angular quadrature weitghts,
 ! and put the atom density ect on the new radius grid.
 !
 	IF(REVISE_R_GRID .AND. R_GRID_REVISED)THEN
@@ -3725,6 +3725,10 @@
 !				  CALL ADJUST_DEN_VECS(R_OLD,ND)
 !
 	  CALL SET_ABUND_CLUMP(MEAN_ATOMIC_WEIGHT,ABUND_SUM,LUER,ND)
+!
+! Need to update the electron non-thermal spectrum on the new grid.
+!
+	  IF(TREAT_NON_THERMAL_ELECTRONS)NT_ITERATION_COUNTER=0
 	END IF
 
 ! 
@@ -4376,7 +4380,7 @@
 	       CALL UPDATE_KEYWORD(L_FALSE,'[FIX_T]','VADAT',L_TRUE,L_TRUE,LUIN)
 	  ELSE IF( ( (RD_LAMBDA .AND. .NOT. DO_LAMBDA_AUTO) .OR. (LAST_LAMBDA .NE. MAIN_COUNTER)) .AND.
 	1      MAXCH .LT. EPS .AND. NUM_ITS_TO_DO .NE. 0 .AND. .NOT. DONE_HYDRO_REVISION)THEN
-	      NUM_ITS_TO_DO=1
+	      IF(MAIN_COUNTER .NE. LAST_NG)NUM_ITS_TO_DO=1
 	  ELSE
 !
 ! If we are USING a fixed J, autmatically switched to variable J when convergence achieved.

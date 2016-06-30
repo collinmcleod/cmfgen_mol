@@ -1293,16 +1293,26 @@
 !
 	ELSE IF(XOPT .EQ. 'XMASS')THEN
 !
+	  CALL USR_OPTION(FLAG,'MDIR','T','Integrate inwards from outer boundary')
 	  DO I=1,ND
 	    ZETA(I)=4.0D0*PI*1.0D+30*MASS_DENSITY(I)*R(I)*R(I)*CLUMP_FAC(I)
 	  END DO
 	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
-	  WRITE(6,*)'Mass in integrated from outer boudary.'
-	  WRITE(6,*)'Normalizing mass (in Msun) is',TA(ND)/1.989D+33
-	  DO I=1,ND
-	    XV(I)=DLOG10(TA(I)/TA(ND))
-	  END DO
-	  XAXIS='Log Mass Fraction'
+	  IF(FLAG)THEN
+	    WRITE(6,*)'Mass in integrated from outer boudary.'
+	    WRITE(6,*)'Normalizing mass (in Msun) is',TA(ND)/1.989D+33
+	    DO I=1,ND
+	      XV(I)=DLOG10(TA(I)/TA(ND))
+	    END DO
+	    XAXIS='Log Mass Fraction'
+	  ELSE
+	    WRITE(6,*)'Mass in integrated from inner boudary.'
+	    WRITE(6,*)'Total mass (in Msun) is',TA(ND)/1.989D+33
+	    DO I=1,ND
+	      XV(I)=(TA(ND)-TA(I))/1.989D+33
+	    END DO
+	    XAXIS='Mass (Msun)'
+	  END IF
 	  XAXSAV=XAXIS
 !
 	ELSE IF(XOPT .EQ. 'XFLUX')THEN

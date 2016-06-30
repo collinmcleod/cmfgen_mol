@@ -6,6 +6,7 @@
 	1           IB_RAT,OB_RAT,DTAU2_ON_DTAU1,N_IB_INS,N_OB_INS,ND,NS)
 	IMPLICIT NONE
 !
+! Altered: 12-Jun-2017 -- Introduce dTAU_COMP so as to check change in dTAU.
 ! Altered: 27-Jan-2015 -- Do initial loop up to 3 times. Also improved diagnostic output.
 ! Altered: 21-Mar-2014 -- Bug fix -- LOG_OLD_T was being computed over ND instead of NS. 
 ! Altered: 07-Jan-2014 -- Changes to call, and extensive improvements made.
@@ -41,7 +42,7 @@
 	INTEGER N_OB_INS
 !
 	REAL*8 dTAU			!d(LOG(TAU))
-	REAL*8 dTAU_OLD
+	REAL*8 dTAU_COMP
 	REAL*8 dLOGR
 	REAL*8 dLOGT
 	REAL*8 LOG_TAU_MIN
@@ -148,8 +149,12 @@
 !    (2) The change in dTAU from the prvious step is too large.
 ! We compute both a new R and TAU grid, although the TAU grid is primarily used for output.
 !
+! We now check that the step in dTAU is not much larger than the previous step size in dTAU.
+!
 	    NEXT_R=LOG_R(I-1)-dLOGR
-	    TAU_END=LOG_TAU(I-1)+dTAU
+	    dTAU_COMP=dTAU
+	    IF(I .GT. 4)dTAU_COMP=MIN( dTAU,1.3D0*(LOG_TAU(I-1)-lOG_TAU(I-2)))
+	    TAU_END=LOG_TAU(I-1)+dTAU_COMP
 	    J=1
 	    DO WHILE(LOG_OLD_R(J+1) .GT. NEXT_R)
 	      J=J+1
@@ -157,7 +162,7 @@
 	    T1=(NEXT_R-LOG_OLD_R(J))/(LOG_OLD_R(J+1)-LOG_OLD_R(J))
 	    T2=T1*LOG_OLD_TAU(J+1)+(1.0D0-T1)*LOG_OLD_TAU(J)
 	    T2=T2-LOG_TAU(I-1)
-	    IF(T2 .GT. dTAU)THEN
+	    IF(T2 .GT. dTAU_COMP)THEN
 	        J=1
 	      DO WHILE(LOG_OLD_TAU(J+1) .LT. TAU_END)
 	        J=J+1
@@ -190,6 +195,9 @@
 	        LOG_TAU(I)=T1*LOG_OLD_TAU(J+1)+(1.0D0-T1)*LOG_OLD_TAU(J)
 	        LOG_T(I)=T1*LOG_OLD_T(J+1)+(1.0D0-T1)*LOG_OLD_T(J)
 	      END DO
+	    ELSE
+	      T1=(LOG_R(I)-LOG_OLD_R(J))/(LOG_OLD_R(J+1)-LOG_OLD_R(J))
+	      LOG_T(I)=T1*LOG_OLD_T(J+1)+(1.0D0-T1)*LOG_OLD_T(J)
 	    END IF
 !
 ! Check whether close enough to inner bondary.
@@ -206,21 +214,24 @@
 	  LOG_R(ND_TMP)=LOG_OLD_R(NS)
 	  LOG_TAU(ND_TMP)=LOG_OLD_TAU(NS)
 !
-	  WRITE(LU,'(A)')' '
-	  WRITE(LU,'(A)')' First pass at creating new grid. As this grid will generally have too many '
-	  WRITE(LU,'(A)')' grid points, we will use interpolaiton to create a smaller grid.'
-	  WRITE(LU,'(A)')' Note: All logs are natural.'
+	  IF(ICNT .EQ. 1)THEN
+	    WRITE(LU,'(A)')' '
+	    WRITE(LU,'(A)')' First pass at creating new grid. As this grid will generally have too many '
+	    WRITE(LU,'(A)')' grid points, we will use interpolaiton to create a smaller grid.'
+	    WRITE(LU,'(A)')' Note: All logs are natural.'
+	  END IF
+!
 	  WRITE(LU,'(A)')' '
 	  WRITE(LU,'(A,17X,A,9X,A,8X,A,11X,A,10X,A,7X,A,6X,A,3X,A)')
 	1           ' Depth','R','Ln(R)','dLn(R)','Tau','dTAU','Ln(Tau)','dLn(Tau)','dTAU[I/I-1]'
 	  TAU(1:ND_TMP)=EXP(LOG_TAU(1:ND_TMP))
 	  DO I=1,ND_TMP-1
-	    IF(I .NE. 1)T1=(TAU(I+1)-TAU(I))/(TAU(I)-TAU(I-1))
-	    WRITE(LU,'(I6,ES18.8,7ES14.4)')I,EXP(LOG_R(I)),LOG_R(I),LOG_R(I+1)-LOG_R(I),
-	1              TAU(I),TAU(I+1)-TAU(I),LOG_TAU(I),LOG_TAU(I+1)-LOG_TAU(I),T1
+	    IF(I .NE. 1)T1=(TAU(I+1)-TAU(I))/MAX(TAU(I)-TAU(I-1),1.0D-10)
+	    WRITE(LU,'(I6,ES18.8,9ES14.4)')I,EXP(LOG_R(I)),LOG_R(I),LOG_R(I+1)-LOG_R(I),
+	1              TAU(I),TAU(I+1)-TAU(I),LOG_TAU(I),LOG_TAU(I+1)-LOG_TAU(I),T1,EXP(LOG_T(I+1)-LOG_T(I))
 	  END DO
 	  I=ND_TMP
-	  WRITE(LU,'(I6,ES18.8,7ES14.4)')I,EXP(LOG_R(I)),LOG_R(I),0.0D0,TAU(I),0.0D0,LOG_TAU(I),0.0D0
+	  WRITE(LU,'(I6,ES18.8,8ES14.4)')I,EXP(LOG_R(I)),LOG_R(I),0.0D0,TAU(I),0.0D0,LOG_TAU(I),0.0D0
 !
 	  IF(ND_TMP .EQ. ND-N_IB_INS-N_OB_INS)EXIT
 	END DO
@@ -343,7 +354,7 @@
 	1           ' Depth','R','Ln(R)','dLn(R)','Tau','dTau','Ln(Tau)','dLn(Tau)','dTAU[I/I-1]'
 	T1=0.0D0
 	DO I=1,ND-1
-	  IF(I .NE. 1)T1=(TAU(I+1)-TAU(I))/(TAU(I)-TAU(I-1))
+	  IF(I .NE. 1)T1=(TAU(I+1)-TAU(I))/MAX(TAU(I)-TAU(I-1),1.0D-10)
 	  WRITE(LU,'(I6,ES18.8,7ES14.4)')I,R(I),LOG_R(I),LOG_R(I+1)-LOG_R(I),
 	1              TAU(I),TAU(I+1)-TAU(I),LOG_TAU(I),LOG_TAU(I+1)-LOG_TAU(I),T1
 	END DO
