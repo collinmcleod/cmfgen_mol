@@ -501,6 +501,29 @@
 	1         LAMC,XAXIS,YAXIS,L_TRUE)
 	  CALL CURVE(NCF,XV,YV)
 !
+	ELSE IF(X .EQ. 'WF2')THEN
+	  CALL USR_OPTION(T1,'lam_st',' ','Start wavelength in Ang')
+	  T1=0.299794D+04/T1
+          I=GET_INDX_DP(T1,NU,NCF)
+	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
+!
+	  CALL USR_OPTION(T1,'lam_end',' ','End wavelength in Ang')
+	  T1=0.299794D+04/T1
+          J=GET_INDX_DP(T1,NU,NCF)
+	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
+!
+	  WRITE(30,*)ND,J-I+2
+	  WRITE(30,'(1000ES14.6)')(R(L),L=1,ND)
+	  WRITE(30,'(1000ES15.7)')ANG_TO_HZ/NU(I:J+1)
+	  DO K=I,J+1
+	    TA(1:ND)=0.0D0
+	    DO ML=K-4,K+3
+	      TA(1:ND-1)=TA(1:ND-1)+(dFR(1:ND-1,ML)+dFR(1:ND-1,ML+1))*(NU(ML)-NU(ML+1))
+	    END DO
+	    TA(1:ND-1)=0.5D0*TA(1:ND-1)/(NU(K-4)-NU(K+4))
+	    WRITE(30,'(500ES12.4)')(TA(L),L=1,ND-1)
+	  END DO
+!
 	ELSE IF(X .EQ. 'DF2' .OR. X .EQ. 'DDF2')THEN
 	  CALL USR_OPTION(T1,'lam_st',' ','Start wavelength in Ang')
 	  T1=0.299794D+04/T1

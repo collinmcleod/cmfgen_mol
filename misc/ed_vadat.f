@@ -1,6 +1,8 @@
 	PROGRAM ED_VADAT
 	IMPLICIT NONE
 !
+! Altered 01-Sep-2015: TIME_SEQ_NO changed from integer to real.
+!
 ! Total number of models 
 !
 	INTEGER NUM_ITS
@@ -12,7 +14,7 @@
 	REAL*8 LSTAR
 !
 	INTEGER I,J
-	INTEGER TIME_SEQ_NO
+	REAL*8 TIME_SEQ_NO
 	INTEGER NUM_STR
 	REAL*8 R_SCALE_FACTOR
 	REAL*8 L_SCALE_FACTOR
@@ -94,8 +96,17 @@
 	  IF(J .NE. 0)THEN
 	    READ(STRING(I),*)TIME_SEQ_NO
 	    TIME_SEQ_NO=TIME_SEQ_NO+1
-	    TMP_STR=' '; WRITE(TMP_STR,'(I3)')TIME_SEQ_NO
+	    TMP_STR=' '; WRITE(TMP_STR,'(8.3)')TIME_SEQ_NO
 	    TMP_STR=ADJUSTL(TMP_STR)
+	    I=LEN_TRIM(TMP_STR)
+	    DO WHILE(I .GT. 1)
+	      IF(TMP_STR(I:I) .EQ. '0')THEN
+	        TMP_STR(I:I)=' '
+	        I=I=1
+	      ELSE
+	        EXIT
+	      END IF
+	    END DO
 	    STRING(I)=TMP_STR(1:16)//STRING(I)(J:)
 	    EXIT
 	  END IF

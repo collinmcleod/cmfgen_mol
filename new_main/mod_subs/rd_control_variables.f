@@ -3,6 +3,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 01-Sep-2016 : Added variabe MINIMUM_ISO_POP (not required)
+!                            TIME_SEQ_NO changed from integer to real.
 ! Altered : 15-Feb-2015 : Added INSTANTANEOUS_ENERGY_DEPOSITION option (12-Jan-2015 on OSPREY[cur_cmf_gam])
 ! Altered : 02/07-Nov-2011 : Changed location of COMP_GREY_LST_IT so that set for all model.
 ! Altered : 05-Apr-2011 : Changed the way REVISE_R_GRID is handled. Variable controlling
@@ -161,6 +163,9 @@ C
 	    CALL RD_STORE_DBLE(VINF1,'VINF',L_TRUE,'Terminal velocity (km/s)')
 	    SN_MODEL=.TRUE.
 	    SN_HYDRO_MODEL=.TRUE.
+	  ELSE IF(VELTYPE .EQ. 12)THEN
+	    CALL RD_STORE_DBLE(VCORE,'VCORE',L_TRUE,'Initial velocity (km/s)')
+	    CALL RD_STORE_DBLE(V_BETA1,'BETA1',L_TRUE,'Power of velocity Law')
 	  ELSE
 	    WRITE(LUER,*)'Velocity law ',VELTYPE, ' not implemented',
 	1                ' in this version of CMFGEN'
@@ -236,7 +241,7 @@ C
 	  PURE_HUBBLE_FLOW=.FALSE.
 	  COMP_GREY_LST_IT=.TRUE.
 	  N_RG_PAR=0
-	  TIME_SEQ_NO=0
+	  TIME_SEQ_NO=0.0D0
 	  IF(SN_MODEL)THEN
 !
 	    JGREY_WITH_V_TERMS=.TRUE.
@@ -245,8 +250,7 @@ C
 	    DO_CO_MOV_DDT=.FALSE.
 	    CALL RD_STORE_LOG(DO_CO_MOV_DDT,'DO_DDT',L_FALSE,
 	1            'Include comoving derivative in SE equations?')
-	    TIME_SEQ_NO=1
-	    CALL RD_STORE_INT(TIME_SEQ_NO,'TS_NO',DO_CO_MOV_DDT,
+	    CALL RD_STORE_DBLE(TIME_SEQ_NO,'TS_NO',DO_CO_MOV_DDT,
 	1            'Time sequence number: 1 for inital model')
 	    CALL RD_STORE_DBLE(SN_AGE_DAYS,'SN_AGE',DO_CO_MOV_DDT,'Age of SN in days')
 	    CALL RD_STORE_LOG(PURE_HUBBLE_FLOW,'PURE_HUB',L_TRUE,
@@ -291,6 +295,8 @@ C
 	       CALL RD_STORE_DBLE(DEC_NRG_SCL_FAC_BEG,'DECNRG_SCLFAC_BEG',ADD_DEC_NRG_SLOWLY,
 	1            'Initial Scale factor for adding decay energy')
             END IF
+	    MINIMUM_ISO_POP=1.0D-20
+	    CALL RD_STORE_DBLE(MINIMUM_ISO_POP,'MIN_ISO_POP',L_FALSE,'Minimum population for ant ISOTOPE')
 !
 	    CALL RD_STORE_LOG(COMP_GREY_LST_IT,'COMP_GREY_LST_IT',L_FALSE,'Compute grey solution on last iteration?')
 !

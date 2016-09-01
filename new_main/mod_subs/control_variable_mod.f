@@ -1,5 +1,6 @@
 	MODULE CONTROL_VARIABLE_MOD
 !
+! Altered : 01-Sep-2016 : TIME_SEQ_NO changed from integer to real.
 ! Altered : 15-Jun-2016 : NT_ITERATION_COUNTER added to this routine so that it is accessible by CMFGEN_SUB.
 ! Altered : 15-Feb-2015 : Added INSTANTANEOUS_ENERGY_DEPOSITION option (12-Jan-2015 on OSPREY[cur_cmf_gam])
 ! Incorporated: 02-Jan-2014: Changed to allow depth dependent profiles.
@@ -74,8 +75,8 @@
 	REAL*8 DJDT_RELAX_PARAM         !Factor to assist inclusion of DJDT terms.
 	REAL*8 SN_AGE_DAYS              !Age of SN in days.
 	REAL*8 RMAX_ON_RCORE
+	REAL*8 TIME_SEQ_NO              !Number of model in time sequence (need not be an integer).
 !
-	INTEGER TIME_SEQ_NO             !Number of model in time sequence.
 	LOGICAL SN_MODEL
 	LOGICAL SN_HYDRO_MODEL		!Use HYDRO model for SN input
 	LOGICAL PURE_HUBBLE_FLOW        !Forces a pure Hubble flow
@@ -105,6 +106,8 @@
 	LOGICAL SCL_NT_CROSEC
 	LOGICAL SCL_NT_ION_CROSEC
 	CHARACTER(LEN=12) NT_SOURCE_TYPE
+!
+	REAL*8 MINIMUM_ISO_POP          !Minimum isotop population for included isotope.
 !
 	LOGICAL USE_J_REL
 	LOGICAL USE_FORMAL_REL

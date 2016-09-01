@@ -451,10 +451,10 @@ C
 ! This option simply reads in data in XY format. No conversion is done to the data.
 ! Comments (bginning with !) and blank lines are ignored in the data file.
 !
-	ELSE IF(X(1:7) .EQ. 'RXY')THEN
+	ELSE IF(X(1:3) .EQ. 'RXY')THEN
 	  FILENAME=' '
 	  CALL USR_OPTION(FILENAME,'File',' ','Model file')
-	  CALL RD_XY_DATA(NU_CONT,OBSF_CONT,NCF_CONT,NCF_MAX,FILENAME,LU_IN,IOS)
+	  CALL RD_XY_DATA_USR(NU_CONT,OBSF_CONT,NCF_CONT,NCF_MAX,FILENAME,LU_IN,IOS)
 	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
 	  IF(OVER .AND. IOS .EQ. 0)THEN
 	    NCF=NCF_CONT
@@ -466,7 +466,8 @@ C
 	    IF(T1 .GT. 1.0D+38)THEN
 	      WRITE(6,*)'Data exceeds single precision range: Maximum=',T1 
 	      WRITE(6,*)'Necessary to scale data for plotting'
-	      CALL GEN_IN(T1,'Factor to divide data by')
+	      T1=1.0D0
+	      CALL USR_OPTION(T1,'SCL_FAC','1.0D+40','Factor to divide data by')
 	      OBSF_CONT(1:NCF_CONT)=OBSF_CONT(1:NCF_CONT)/T1
 	    END IF
 	    CALL DP_CURVE(NCF_CONT,NU_CONT,OBSF_CONT)

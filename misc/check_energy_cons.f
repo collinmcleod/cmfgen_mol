@@ -14,6 +14,9 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 28-AUg-2016: Output obsereved luminosity
+!                       Output better error diagnostics
+!
 	INTEGER, PARAMETER :: NMAX=200			!Maximum number of models in time sequence
 	INTEGER, PARAMETER :: ND_MAX=200		!Maximum number of depth points (in any model)
 	INTEGER, PARAMETER :: NCF_MAX=500000		!Maximum nnumber of frequncies (in any model)
@@ -25,6 +28,8 @@
 	REAL*8, ALLOCATABLE :: RJ(:,:)
 	REAL*8, ALLOCATABLE :: HFLUX(:,:)
 	REAL*8, ALLOCATABLE :: NU(:)
+	REAL*8, ALLOCATABLE :: OBS_FREQ(:)
+	REAL*8, ALLOCATABLE :: OBS_FLUX(:)
 !
 	REAL*8 SN_AGE(NMAX)
 	REAL*8 VINF(NMAX)
@@ -37,6 +42,7 @@
 	REAL*8 INTERN_LUM(ND_MAX)
 !
 	REAL*8 E_RAD(NMAX)
+	REAL*8 L_OBS(NMAX)
 	REAL*8 L_CMF(NMAX)
 	REAL*8 L_MECH(NMAX)
 	REAL*8 L_DECAY(NMAX)
@@ -45,7 +51,7 @@
 	REAL*8 E_CONS(NMAX)
 !
 	REAL*8 LAMC
-	REAL*8 T1,T2,T3
+	REAL*8 T1,T2,T3,T4,T5
 	REAL*8 PI
 	REAL*8 LUM_CONV_FACTOR
 	REAL*8 C_Mms
@@ -108,7 +114,7 @@
 	WRITE(LUOUT,'(A)')' L_DR4J refers Dr^4/dT term when L_MECH is zero.'
 	WRITE(LUOUT,'(A,/)')' L_DR4J refers Dr^3/dT term when L_MECH is non zero.'
 !
-	WRITE(LUOUT,'(4X,A,6(6X,A))')'AGE(d)','   L_CMF','  L_MECH','  L_DR4J',
+	WRITE(LUOUT,'(4X,A,7(6X,A))')'AGE(d)','   L_OBS','   L_CMF','  L_MECH','  L_DR4J',
 	1                         'L_INTERN',' L_DECAY','   E_RAD'
 	DO I=1,NMOD
 !
@@ -145,11 +151,39 @@
 	  DONL_DECAY_LUM=.FALSE.
 	  DONL_DR4J_LUM=.FALSE.
 	  DONL_INTERN_LUM=.FALSE.
+          LUM_CONV_FACTOR=16*ATAN(1.0D0)*1.0D+15*1.0D-23*((3.0856D+21)**2)/3.826D+33
 !
 	  FILE_NAME=TRIM(DIR_NAME(I))//'OBSFLUX'
 	  OPEN(UNIT=LUIN,FILE=FILE_NAME,STATUS='OLD',ACTION='READ')
 	  DO WHILE(1 .EQ. 1)
 	    READ(LUIN,'(A)',END=200)STRING
+	    IF(INDEX(STRING,'Continuum Frequencies') .NE. 0)THEN
+	      K=INDEX(STRING,'(')+1
+	      IF(K .EQ. 1)THEN
+	        WRITE(6,*)'Assuming maximum number of frequenices is ',NCF_MAX
+	        ALLOCATE(OBS_FREQ(NCF_MAX)); OBS_FREQ=0.0D0
+	        READ(LUIN,*,ERR=50)(OBS_FREQ(J),J=1,NCF_MAX)
+50	        NCF=NCF_MAX
+	        DO WHILE(OBS_FREQ(NCF) .EQ. 0.0D0)
+	          NCF=NCF-1
+	        END DO
+	        BACKSPACE(LUIN)		!as may have read in obs. intensity record. 
+	      ELSE
+	        READ(STRING(K:),*)NCF
+	        ALLOCATE(OBS_FREQ(NCF))
+	        READ(LUIN,*)OBS_FREQ(1:NCF)
+	      END IF
+	      ALLOCATE(OBS_FLUX(NCF))
+	    END IF
+	    IF(INDEX(STRING,'Observed intensity') .NE. 0 .AND. .NOT. DONL_CMF_LUM)THEN
+	      READ(LUIN,*)OBS_FLUX(1:NCF)
+              L_OBS(I)=0.0D0
+              DO K=2,NCF
+                 L_OBS(I)=L_OBS(I)+(OBS_FREQ(K-1)-OBS_FREQ(K))*(OBS_FLUX(K)+OBS_FLUX(K+1))
+              END DO
+              L_OBS(I)=LUM_CONV_FACTOR*L_OBS(I)*0.5D0
+	      DEALLOCATE(OBS_FREQ,OBS_FLUX)
+	    END IF
 	    IF(INDEX(STRING,'Luminosity') .NE. 0 .AND. .NOT. DONL_CMF_LUM)THEN
 	      READ(LUIN,*)CMF_LUM(1:ND)
 	      L_CMF(I)=CMF_LUM(1)
@@ -241,7 +275,7 @@
 	  CALL LUM_FROM_ETA(YV,R,ND)
 	  E_RAD(I)=2.0D0*PI*4.0D+37*PI*SUM(YV(1:ND))/C_MMS
 !
-	  WRITE(LUOUT,'(F10.4,6ES14.4,4X,A)')SN_AGE(I),L_CMF(I),L_MECH(I),L_DR4J(I),
+	  WRITE(LUOUT,'(F10.4,7ES14.4,4X,A)')SN_AGE(I),L_OBS(I),L_CMF(I),L_MECH(I),L_DR4J(I),
 	1               L_INTERN(I),L_DECAY(I),E_RAD(I),DIR_NAME(I)(MAX(1,K-10):K)
 	  FLUSH(UNIT=LUOUT)
 	END DO
@@ -256,19 +290,26 @@
 	WRITE(LUOUT,*)' '
 	WRITE(LUOUT,*)' The 6th and 7th (i.e., second last) columns should be identical'
 	WRITE(LUOUT,*)' The % Change is the increase in Int(L-Q+I)t+t.E over a single time step.'
+	WRITE(LUOUT,*)' The % Error  is the increase in Int(L-Q+I)t+t.E over from the first time step.'
+	WRITE(LUOUT,*)' The % E2     is 200*dE/ABS(all terms) -  gives depature from energy conservation irrespective of dominant E'
 	WRITE(LUOUT,*)' '
-	WRITE(LUOUT,'(4X,A,4(4X,A),X,A,5X,A,6X,A)')'AGE(d)','Int(tL.dt)','Int(tQ.dt)','Int(tI.dt)','  t.E(rad)',
-	1              'Int(L-Q+I)t+t.E','t(1).E(1)','% Change'
+	WRITE(LUOUT,'(4X,A,4(4X,A),X,A,5X,A,3(4X,A))')'AGE(d)','Int(tL.dt)','Int(tQ.dt)','Int(tI.dt)','  t.E(rad)',
+	1              'Int(L-Q+I)t+t.E','t(1).E(1)','% Change', ' % Error',' % E'
 	E_CONS(1)=SN_AGE(1)*E_RAD(1)
 	DO I=2,NMOD
 	   T1=T1+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_CMF(I)+SN_AGE(I-1)*L_CMF(I-1))*0.5D0*3.826D+33
 	   T2=T2+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_DECAY(I)+SN_AGE(I-1)*L_DECAY(I-1))*0.5D0*3.826D+33
 	   T3=T3+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_INTERN(I)+SN_AGE(I-1)*L_INTERN(I-1))*0.5D0*3.826D+33
 	   E_CONS(I)=T1-T2+T3+SN_AGE(I)*E_RAD(I)
-	   WRITE(LUOUT,'(F10.4,4ES14.4,ES16.4,2ES14.4)')SN_AGE(I)/24.0D0/3600.0D0,
+	   T5=100.0D0*(E_CONS(I)-SN_AGE(1)*E_RAD(1))
+	   T4=T5/SN_AGE(1)/E_RAD(1)
+	   T5=2.0D0*T5/(ABS(T1)+ABS(T2)+ABS(T3)+SN_AGE(I)*E_RAD(I)+SN_AGE(1)*E_RAD(1))
+	   K=LEN_TRIM(DIR_NAME(I)); J=MAX(1,K-15)
+	   WRITE(LUOUT,'(F10.4,4ES14.4,ES16.4,ES14.4,3ES12.2,3X,A)')SN_AGE(I)/24.0D0/3600.0D0,
 	1              T1,T2,T3,SN_AGE(I)*E_RAD(I),
 	1              E_CONS(I),SN_AGE(1)*E_RAD(1),
-	1              100.0D0*(E_CONS(I)-E_CONS(I-1))/SN_AGE(1)/E_RAD(1)
+	1              100.0D0*(E_CONS(I)-E_CONS(I-1))/SN_AGE(1)/E_RAD(1),
+	1              T4,T5,DIR_NAME(I)(MAX(1,K-10):K)
 	END DO
 !
 ! Same quantities as above, but a different grouping.

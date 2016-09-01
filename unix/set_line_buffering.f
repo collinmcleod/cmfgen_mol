@@ -60,8 +60,8 @@
 	IOS=0
 	IOS=SETVBUF(LU,IONE,LEN_BUF,MY_BUFFER(IBUF))
 	IF(IOS .NE. 0)THEN
-	  WRITE(LU,*)'Error setting bufer in SET_LINE_BUFFERING'
-	  WRITE(LU,*)'IOS=',IOS
+	  WRITE(6,*)'Error setting bufer in SET_LINE_BUFFERING'
+	  WRITE(6,*)'IOS=',IOS
 	  STOP
 	END IF
 !

@@ -235,6 +235,9 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered: 30-Aug-2016 : Shifted H_ON_J_PREV later in the code so that it is allocated.
+!                          For some reason, the PG and INTEL compilers did not give
+!                          an error when the non-allocated array was zeroed.
 ! Altered: 17-Feb-2015 : Check that |r^2.H| < r^2.J
 !                          Modified error output to MOM_J_ERRORS
 !                          [OSPREY/cur_cmf_gam: 24-Jan-2015]
@@ -442,13 +445,6 @@
 	  EPS(:)=0.0D0
 	  EPS_PREV(:)=0.0D0
 !
-	  H_ON_J_PREV(:)=0.0D0
-	  K_ON_J_PREV(:)=0.0D0
-	  N_ON_J_PREV(:)=0.0D0
-	  NMID_ON_HMID_PREV(:)=0.0D0
-	  NMID_ON_J_PREV(:)=0.0D0
-	  KMID_ON_J_PREV(:)=0.0D0
-!
 ! Assume (1)	SIGMAd+1/2 = 0.5*( SIGMAd+1+SIGMAd )
 ! 	 (2)	Vd+1/2=0.5*( Vd + Vd+1 )
 ! Note that V is in km/s and SIGMA=(dlnV/dlnR-1.0)
@@ -512,6 +508,14 @@
 	  KMID_ON_J(1:ND)=0.0D0
           NMID_ON_J(1:ND)=0.0D0
 	  dlnGRSQJdlnR(1:ND)=0.0D0
+!
+	  H_ON_J_PREV(:)=0.0D0
+	  K_ON_J_PREV(:)=0.0D0
+	  N_ON_J_PREV(:)=0.0D0
+	  NMID_ON_HMID_PREV(:)=0.0D0
+	  NMID_ON_J_PREV(:)=0.0D0
+	  KMID_ON_J_PREV(:)=0.0D0
+!
           INQUIRE(UNIT=47,OPENED=FILE_OPEN)
 	  IF(FILE_OPEN)THEN
             REWIND(47)

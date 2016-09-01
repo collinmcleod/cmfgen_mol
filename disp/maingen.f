@@ -397,6 +397,17 @@
 	TYPE_ATM='P'
 	T1=LOG(MASS_DENSITY(5)/MASS_DENSITY(1))/LOG(R(1)/R(5))
 	WRITE(6,'(A)')RED_PEN
+	IF(T1 .LT. 2)THEN
+	  WRITE(6,'(A)')' Power for density law variation at outer boudary is shallower than r^{-n} where n=2'
+	  WRITE(6,'(A)')' Shown below is the power based on depths 1 and I'
+	  WRITE(6,*)' '
+	  DO I=2,MIN(15,ND)
+	    WRITE(6,'(X,I4,ES12.3)')I,LOG(MASS_DENSITY(I)/MASS_DENSITY(1))/LOG(R(1)/R(I))
+	  END DO
+	  CALL USR_OPTION(T1,'POW','2','Power for rhj propto r^{-n}')
+	  WRITE(6,*)' '
+	END IF
+!
 	IF(T1 .LT. 100)THEN
 	  WRITE(TYPE_ATM(2:6),'(F5.2)')T1
 	  WRITE(6,'(A)')' For optical depth calculations we will assume a power density distribution'

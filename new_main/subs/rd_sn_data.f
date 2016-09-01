@@ -9,6 +9,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered: 31-Aug-2016 : Better error reporting -- we check taht all chain isotopes are present.
 ! Altered: 15-May-2016 : Fixed minor bug when checking size of isotope abundance changes.
 ! Altered: 01-Mar-2016 : Changed to allow handling of a standard NUC_DECAY_DATA file.
 !                         Code checks availability of decay route. This is important
@@ -68,7 +69,7 @@
 	INTEGER NSP
 	INTEGER NISO
 	INTEGER I,L,K,CNT
-	INTEGER IS,IP
+	INTEGER IS,IP,ID,IN
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
 	CHARACTER(LEN=200) STRING
@@ -296,7 +297,7 @@
 	DO IS=1,NUM_ISOTOPES
 	  IF(ISO(IS)%READ_ISO_POPS)THEN
 	    DO I=1,ND
-	     ISO(IS)%OLD_POP(I)=MAX(ISO(IS)%OLD_POP(I),1.0D-20)
+	     ISO(IS)%OLD_POP(I)=MAX(ISO(IS)%OLD_POP(I),MINIMUM_ISO_POP)
 	    END DO
 	  END IF
 	END DO
@@ -356,8 +357,9 @@
 	  DO IP=1,NUM_PARENTS
 	    WRK(1:ND)=0.0D0
 	    DO IS=1,NUM_ISOTOPES
-	      IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC)THEN
+	      IF(ISO(IS)%ISPEC .EQ. PAR(IP)%ISPEC .AND. ISO(IS)%READ_ISO_POPS)THEN
 	        WRK=WRK+ISO(IS)%OLD_POP
+	        PAR(IP)%DECAY_CHAIN_AVAILABLE=.TRUE.
 	      END IF
 	    END DO
 	    DO IS=1,NUM_ISOTOPES
@@ -372,7 +374,6 @@
 	  END DO
 	  WRITE(LUER,*)'   Normalized isotope populations in RD_SN_DATA'
 	ELSE
-	  FIRST_WARN=.TRUE.
 	  DO IP=1,NUM_PARENTS
 	    WRK(1:ND)=0.0D0
 	    PAR(IP)%DECAY_CHAIN_AVAILABLE=.FALSE.
@@ -390,29 +391,32 @@
 	           WRITE(LUER,*)'Error in RD_SN_DATA: inconsistent total/isotope populations'
 	           WRITE(LUER,*)'Species:',SPECIES(PAR(IP)%ISPEC)
 	           WRITE(LUER,*)'Depth=',I,'  Fractional difference=',T2
+	           WRITE(LUER,*)WRK(I),POP_SPECIES(I,PAR(IP)%ISPEC)
 	           STOP
 	         END IF
 	      END DO 
 	      POP_SPECIES(:,PAR(IP)%ISPEC)=WRK
-	    ELSE
-	      IF(FIRST_WARN)THEN
-	        WRITE(LUER,*)' '
-	        WRITE(LUER,*)'Warning: Possible error in reading SN_HYDRO_DATA with RD_SN_DATA.'
-	        WRITE(LUER,*)'The following species have decay data present in NUC_DECAY_DATA',
-	1                          '     but have no isotope data in SN_HYDRO_DATA.'
-	        WRITE(LUER,*)'Please add the appropriate isotopic data'
-	        WRITE(LUER,*)SPECIES(PAR(IP)%ISPEC)
-	        FIRST_WARN=.FALSE.
-	       ELSE
-	        WRITE(LUER,*)SPECIES(PAR(IP)%ISPEC)
-	      END IF
 	    END IF
 	  END DO
 	END IF
-	IF(.NOT. FIRST_WARN)THEN
-	  WRITE(LUER,*)'Add more isotope data or delete the appropriate reactions'
-	  STOP
-	END IF
+!
+	FIRST_WARN=.TRUE.
+	DO IP=1,NUM_PARENTS
+	  IF(PAR(IP)%DECAY_CHAIN_AVAILABLE)THEN
+	  ELSE
+	    IF(FIRST_WARN)THEN
+	      WRITE(LUER,*)' '
+	      WRITE(LUER,*)'Warning: Possible error in reading SN_HYDRO_DATA with RD_SN_DATA.'
+	      WRITE(LUER,*)'The following species have ISOTOPE data present in NUC_DECAY_DATA',
+	1                        '     but have no isotope data in SN_HYDRO_DATA.'
+	      WRITE(LUER,*)'You many need to add the appropriate isotopic data'
+	      WRITE(LUER,*)SPECIES(PAR(IP)%ISPEC)
+	      FIRST_WARN=.FALSE.
+	    ELSE
+	      WRITE(LUER,*)SPECIES(PAR(IP)%ISPEC)
+	    END IF
+	  END IF
+	END DO
 	WRITE(LUER,*)' '
 !
 ! If population is zero at some depths, but species is present, we will
@@ -454,6 +458,22 @@
 	  WRITE(LUER,*)'OLD_SN_AGE_DAYS=',OLD_SN_AGE_DAYS
 	  STOP
 	END IF
+!
+! This checks that ISOTOPES for each ACTIVE chain is avaliable. An actve chain
+! is one that has at least one isotope present.
+!
+	DO IN=1,NUM_DECAY_PATHS
+	  IS=NUC(IN)%LNK_TO_ISO
+	  ID=NUC(IN)%DAUGHTER_LNK_TO_ISO
+	  IF(ISO(IS)%READ_ISO_POPS .NEQV. ISO(ID)%READ_ISO_POPS)THEN
+	    WRITE(LUER,*)' '
+	    WRITE(LUER,*)' Error -- you have read in one isotope in a decay chain but not both'
+	    WRITE(LUER,'(1X,A5,I4,3X,A,:L1)') NUC(IN)%SPECIES,NUC(IN)%BARYON_NUMBER,'Read=',ISO(IS)%READ_ISO_POPS
+	    WRITE(LUER,'(1X,A5,I4,3X,A,:L1)') NUC(IN)%DAUGHTER,NUC(IN)%DAUGHTER_BARYON_NUMBER,'Read=',ISO(ID)%READ_ISO_POPS
+	    STOP
+	  END IF
+	END DO
+!
         DO IS=1,NUM_ISOTOPES
           ISO(IS)%POP=ISO(IS)%OLD_POP_DECAY
         END DO

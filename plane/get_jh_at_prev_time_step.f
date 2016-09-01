@@ -171,6 +171,8 @@
 	    WRITE(LU_ER,*)'Velocities at inner boundary are not identical'
 	    WRITE(LU_ER,*)'Old velocity at depth is',OLD_V(ND_OLD)
 	    WRITE(LU_ER,*)'New velocity at depth is',V(ND)
+	    WRITE(LU_ER,*)'Make sure you also updated JH_AT_OLD_TIME_INFO when you stated the model'
+	    WRITE(LU_ER,*)'This will cause an error if ND has changed between successive models'
 	    STOP
 	  END IF
 !

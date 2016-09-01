@@ -164,7 +164,7 @@
 	    IF(ITS_PER_NG .NE. 4 .AND. ITS_PER_NG .NE. 8)WRITE(T_OUT,*)'Error: ITS_PER_NG must be 4 or 8'
 	  END DO
           N_ITS_TO_RD=ITS_PER_NG
-	  DO_REGARDLESS=.FALSE.
+	  DO_REGARDLESS=.TRUE.
 	  WRITE(T_OUT,'(/,A)')' The next parameter indicates the number of depths treated simultaneously'
 	  WRITE(T_OUT,'(A)')' The acceleration starts in blocks from the inner boundary'
 	  CALL GEN_IN(NBAND,'Band width for NG acceleration')

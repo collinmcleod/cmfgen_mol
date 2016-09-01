@@ -247,9 +247,10 @@
 	NEW_R_GRID=.FALSE.
 	IF(ND_SM .NE. ND_SM_SAV)THEN
 	  NEW_R_GRID=.TRUE.
-	  IF(.NOT. FIRST_TIME)WRITE(LUER,*)
-	1             'Updating R grid in MOM_J_DDT_V2 as ND_SM has changed'
-	ELSE IF(ALLOCATED(R))THEN
+	  IF(.NOT. FIRST_TIME)THEN
+	    WRITE(LUER,*)'Updating R grid in MOM_J_DDT_V2 as ND_SM has changed'
+	  END IF
+	  ELSE IF(ALLOCATED(R))THEN
 !
 ! We only use R_SM_SAV here. We do the comparison with R_SM_SAV, rather than
 ! LOG_R_SM, because it avoids precision problems.
@@ -276,6 +277,7 @@
 !
 	IF(FIRST_TIME)THEN
           OPEN(UNIT=47,FILE='MOM_J_ERRORS',STATUS='UNKNOWN')
+	  WRITE(LUER,*)'The value of USE_DR4JDT is',USE_DR4JDT
 	ELSE IF(INIT)THEN
 	  REWIND(47)
 	END IF
