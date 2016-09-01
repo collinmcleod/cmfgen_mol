@@ -102,7 +102,7 @@
 	    DO WHILE(I .GT. 1)
 	      IF(TMP_STR(I:I) .EQ. '0')THEN
 	        TMP_STR(I:I)=' '
-	        I=I=1
+	        I=I-1
 	      ELSE
 	        EXIT
 	      END IF
