@@ -13,7 +13,7 @@
 	REAL*8 RSTAR
 	REAL*8 LSTAR
 !
-	INTEGER I,J
+	INTEGER I,J,K
 	REAL*8 TIME_SEQ_NO
 	INTEGER NUM_STR
 	REAL*8 R_SCALE_FACTOR
@@ -98,11 +98,11 @@
 	    TIME_SEQ_NO=TIME_SEQ_NO+1
 	    TMP_STR=' '; WRITE(TMP_STR,'(8.3)')TIME_SEQ_NO
 	    TMP_STR=ADJUSTL(TMP_STR)
-	    I=LEN_TRIM(TMP_STR)
-	    DO WHILE(I .GT. 1)
-	      IF(TMP_STR(I:I) .EQ. '0')THEN
-	        TMP_STR(I:I)=' '
-	        I=I-1
+	    K=LEN_TRIM(TMP_STR)
+	    DO WHILE(K .GT. 1)
+	      IF(TMP_STR(K:K) .EQ. '0')THEN
+	        TMP_STR(K:K)=' '
+	        K=K-1
 	      ELSE
 	        EXIT
 	      END IF
