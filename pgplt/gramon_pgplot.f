@@ -303,6 +303,7 @@
 	LONG_PLOT=.FALSE.
 	LENGTH_OF_HC_PLOT=200.0D0       !cm
 	VB_BASE=-1000
+	FILL=.FALSE.
 !
 	IF(NPLTS .GT. MAXPEN)THEN
 	  WRITE(T_OUT,*)'Error n GRAMON_PLOT -- not enough pen loctions'

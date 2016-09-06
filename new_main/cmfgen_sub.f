@@ -38,8 +38,9 @@
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
-! Altered 29-Sep-2105 : Changed back to COMP_OPAC (Different TWO_PHOT in routine)
-! Altered 24-Jul-2105 : Added HMI, Changed to COMP_OPAC_V2 (cur_hmi, 19-Aug-2015)
+! Aleterd 06-Sep-2016 : Output more R digits to MEANOPAC.
+! Altered 29-Sep-2015 : Changed back to COMP_OPAC (Different TWO_PHOT in routine)
+! Altered 24-Jul-2015 : Added HMI, Changed to COMP_OPAC_V2 (cur_hmi, 19-Aug-2015)
 ! Altered 27-Mar-2013 : dE_WORK and RAD_DECAY_LUM updated for clumping.
 !                       LUWARN inserted (done earlier)
 !                       LIN_PROF_SIM is now depth dependent -- code cannow handle depth dependent 
@@ -2946,15 +2947,15 @@
 !
 	CALL GEN_ASCI_OPEN(LU_OPAC,'MEANOPAC','UNKNOWN',' ',' ',IZERO,IOS)
 	  WRITE(LU_OPAC,
-	1  '( ''       R        I   Tau(Ross)   /\Tau   Rat(Ross)'//
+	1  '( ''         R          I   Tau(Ross)   /\Tau   Rat(Ross)'//
 	1  '  Chi(Ross)  Chi(ross)  Chi(Flux)   Chi(es) '//
 	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)     Kappa   V(km/s)'' )' )
 	  IF(R(1) .GE. 1.0D+05)THEN
-	    FMT='( 1X,1P,E12.6,2X,I3,1X,1P,E9.3,2(2X,E8.2),1X,'//
+	    FMT='( 1X,ES16.10,2X,I3,1X,,ES9.3,2(2X,ES8.2),1X,'//
 	1        '4(2X,E9.3),2(2X,E8.2),4(2X,E8.2) )'
 	  ELSE
-	    FMT='( 1X,F12.6,2X,I3,1X,1P,E9.3,2(2X,E8.2),1X,'//
-	1        '4(2X,E9.3),2(2X,E8.2),4(2X,E8.2) )'
+	    FMT='( 1X,F16.10,2X,I3,1X,ES9.3,2(2X,ES8.2),1X,'//
+	1        '4(2X,ES9.3),2(2X,ES8.2),4(2X,ES8.2) )'
 	  END IF
 	  DO I=1,ND
 	    IF(I .EQ. 1)THEN
@@ -3347,7 +3348,7 @@
 	          FIRST_NEG=.FALSE.
 	        END IF
 	        WRITE(LU_NEG,2290)I,T2,ED(I)
-2290	        FORMAT(1X,'I= ',I3,'  : TAU(Sob)= ',1P,E10.2,'  : Ne=',E9.2)
+2290	        FORMAT(1X,'I= ',I3,'  : TAU(Sob)= ',ES10.2,'  : Ne=',ES9.2)
 	        WRITE(LU_NEG,*)CHIL(I),POPS(NL,I),R(I),V(I),T1
 	      END IF
 	      CHIL(I)=1.0D0	!Reset after we output its value.
@@ -4110,9 +4111,9 @@
 	1                                        NAME_CONVENTION
 !
 	    WRITE(LU_POP,'(A)')' Radius (10^10 cm)'
-	    WRITE(LU_POP,'(1X,1P8E18.9)')R
+	    WRITE(LU_POP,'(1X,8ES18.10)')R
 	    WRITE(LU_POP,'(A)')' Velocity (km/s)'
-	    WRITE(LU_POP,'(1X,1P8E18.9)')V
+	    WRITE(LU_POP,'(1X,8ES18.10)')V
 	    WRITE(LU_POP,'(A)')' dlnV/dlnr-1'
 	    WRITE(LU_POP,'(1X,1P8E16.7)')SIGMA
 	    WRITE(LU_POP,'(A)')' Electron density'

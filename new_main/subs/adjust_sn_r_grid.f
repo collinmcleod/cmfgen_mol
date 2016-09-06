@@ -202,6 +202,7 @@
 !
 ! Check whether close enough to inner bondary.
 !
+	    IF(LOG_R(I)-dLOGR .LE. LOG_OLD_R(NS))EXIT
 	    IF(LOG_R(I)-1.5D0*(LOG_R(I-1)-LOG_R(I)) .LT. LOG_OLD_R(NS))EXIT
 	    IF(LOG_TAU(I)+1.5D0*(LOG_TAU(I-1)-LOG_TAU(I)) .GT. LOG_OLD_TAU(NS))EXIT
 	  END DO

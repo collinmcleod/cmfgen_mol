@@ -7,6 +7,7 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered: 06-Sep-2016 : Increased output precision in R and V to 10 digits.
 ! Altered: 01-Mar-2016 : Changed to allow handling of a standard NUC_DECAY_DATA file.
 !                         Code checks availability of decay route. This is important
 !                         when a species but not isotopes are included [17-Feb-2016].
@@ -116,7 +117,11 @@
 	INTEGER I
 !
 	WRITE(LU,'(/,A)')TRIM(HEADER)
-	WRITE(LU,'(1X,1P8E16.7)')(X(I),I=1,ND)
-!
+	IF(INDEX(HEADER,'Radius') .NE. 0 .OR. INDEX(HEADER,'Velocity') .NE. 0)THEN
+	  WRITE(LU,'(8ES18.10)')(X(I),I=1,ND)
+	ELSE
+	  WRITE(LU,'(1X,8ES16.7)')(X(I),I=1,ND)
+	END IF
+	!
 	RETURN
 	END
