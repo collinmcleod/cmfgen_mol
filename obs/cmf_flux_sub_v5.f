@@ -14,6 +14,9 @@
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 !
+! Altered: 21-Sep-2016 : Error corrected -- I was writing out KAPPA from RVTJ rather than the from the CMF_FLUX
+!                           calculaton. Note that the ROSSELAND mean is only correct (at depth) if we compute
+!                           the spectrum over the full frequency range.
 ! Altered: 09-Sep-2015 : Changed to C4(line)= ABS(C4[upper]) + ABS(C4[lower) [I was just summing values]
 ! Altered: 18-May-2015 : Changed GAM2, GAM4 to C4 and C6 (quadratic and Van der Waals interacton constants).
 !                           C4 is now utilized (read into VEC_C4). C6 is still not used (09-Jun-2015).
@@ -391,7 +394,7 @@
 !
 ! Parameters, vectors, and arrays for computing the observed flux.
 !
-	INTEGER, PARAMETER :: NST_CMF=10000
+	INTEGER, PARAMETER :: NST_CMF=20000
 	INTEGER NP_OBS_MAX
 	INTEGER NP_OBS
 	INTEGER NC_OBS
@@ -1872,8 +1875,8 @@
 	  CALL DERIVCHI(dCHIdR,FLUXMEAN,R,ND,METHOD)
         ELSE
 	  dCHIDR(1:ND)=0.0D0
-	  WRITE(LUER,*)'Error in CMF_FLUX_SUB: Check MEANOPAC'
-	  WRITE(LUER,*)'Flux mean opacity has negative values'
+	  WRITE(LUER,*)'Warning from CMF_FLUX_SUB: Check MEANOPAC'
+	  WRITE(LUER,*)'Flux mean opacity has zero or negative values'
 	END IF
         CALL NORDTAU(TB,FLUXMEAN,R,R,dCHIdR,ND)
 !
@@ -1886,13 +1889,11 @@
 	1  '( ''     R        I    Tau(Ross)   /\Tau   Rat(Ross)'//
 	1  '  Chi(Ross)  Chi(ross)  Chi(Flux)   Chi(es) '//
 	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)     Kappa   V(km/s)'' )' )
-	  IF(R(1) .GE. 1.0D+05)THEN
-	    FMT='( 1X,ES12.6,2X,I3,1X,ES9.3,2(2X,ES8.2),1X,'//
-	1        '4(2X,ES9.3),6(2X,ES8.2) )'
-	  ELSE
-	    FMT='( 1X,F12.6,2X,I3,1X,ES9.3,2(2X,ES8.2),1X,'//
-	1        '4(2X,ES9.3),6(2X,ES8.2) )'
-	  END IF
+	IF(R(1) .GE. 1.0D+05)THEN
+	  FMT='(ES17.10,I4,2ES10.3,ES10.2,4ES11.3,4ES10.2,2ES11.3)'
+	ELSE
+	  FMT='( F17.10,I4,2ES10.3,ES10.2,4ES11.3,4ES10.2,2ES11.3)'
+	END IF
 	  DO I=1,ND
 	    IF(I .EQ. 1)THEN
 	      T1=0.0D0		!Rosseland optical depth scale
@@ -1909,7 +1910,7 @@
 	    END IF
 	    WRITE(LU_OPAC,FMT)R(I),I,T1,TA(I),TC(1),
 	1      ROSSMEAN(I),INT_dBdT(I),FLUXMEAN(I),ESEC(I),
-	1      T2,T3,TC(2),TC(3),1.0D-10*ROSS_MEAN(I)/DENSITY(I),V(I)
+	1      T2,T3,TC(2),TC(3),1.0D-10*ROSSMEAN(I)/DENSITY(I),V(I)
 	  END DO
 	CLOSE(UNIT=LU_OPAC)
 !

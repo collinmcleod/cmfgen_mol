@@ -2951,11 +2951,9 @@
 	1  '  Chi(Ross)  Chi(ross)  Chi(Flux)   Chi(es) '//
 	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)     Kappa   V(km/s)'' )' )
 	  IF(R(1) .GE. 1.0D+05)THEN
-	    FMT='( 1X,ES16.10,2X,I3,1X,,ES9.3,2(2X,ES8.2),1X,'//
-	1        '4(2X,E9.3),2(2X,E8.2),4(2X,E8.2) )'
+	    FMT='(ES17.10,I4,2ES10.3,ES10.2,4ES11.3,4ES10.2,2ES11.3)'
 	  ELSE
-	    FMT='( 1X,F16.10,2X,I3,1X,ES9.3,2(2X,ES8.2),1X,'//
-	1        '4(2X,ES9.3),2(2X,ES8.2),4(2X,ES8.2) )'
+	    FMT='( F17.10,I4,2ES10.3,ES10.2,4ES11.3,4ES10.2,2ES11.3)'
 	  END IF
 	  DO I=1,ND
 	    IF(I .EQ. 1)THEN
@@ -4277,7 +4275,7 @@
 ! the current TIME_SEQ_NO.
 !
 	  IF(SN_MODEL)THEN
-	    CALL RITE_TIME_MODEL(R,V,SIGMA,POPS,IREC,L_FALSE,L_TRUE,NT,ND,LUSCR,CHK)
+!	    CALL RITE_TIME_MODEL(R,V,SIGMA,POPS,IREC,L_FALSE,L_TRUE,NT,ND,LUSCR,CHK)
 	    CALL WRITE_SEQ_TIME_FILE_V1(SN_AGE_DAYS,ND,LUSCR)
 	  END IF
 !
@@ -4369,6 +4367,10 @@
 	    ELSE
 	      CALL UPDATE_KEYWORD(L_FALSE,'[GAMMA_SLOW]','VADAT',L_TRUE,L_TRUE,LUIN)
 	    END IF
+	  END IF
+!
+	  IF(SN_MODEL)THEN
+	    CALL WRITE_SEQ_TIME_FILE_V1(SN_AGE_DAYS,ND,LUSCR)
 	  END IF
 !
 ! If we have reached desired convergence, we do one final loop

@@ -155,6 +155,7 @@ C
 	      LUER=ERROR_LU()
 	      WRITE(LUER,*)'Error in SET_TWO_PHOT --- invalid level ordering'
 	      WRITE(LUER,*)SPEC_ID_TWO(J)
+	      WRITE(LUER,*)TRIM(UP_NAME_TWO(J)),'   ',TRIM(A_UP_NAME_TWO(J))
 	      STOP
 	    END IF
 	    TWO_PHOT_AVAILABLE(J)=.TRUE.

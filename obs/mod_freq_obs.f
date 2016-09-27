@@ -12,7 +12,7 @@
 ! frequencies in blanketing mode) which can be treated. For small DOPPLER widths
 ! and large frequency ranges this might need to be increased.
 !
-	INTEGER, PARAMETER :: NCF_MAX=2000000
+	INTEGER, PARAMETER :: NCF_MAX=3000000
 !
 ! Vectors for treating lines simultaneously with the continuum.
 !
