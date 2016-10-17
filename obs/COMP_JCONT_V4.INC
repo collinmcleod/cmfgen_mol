@@ -762,7 +762,7 @@
 	1              N_TYPE,METHOD,L_TRUE,IONE,
 	1              FIRST_FREQ,NEW_FREQ,NC,NP,ND)
                IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
-               HFLUX_AT_IB=HBC_CMF(1)*RJ(1)
+               HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
 	     END IF
 	     CALL TUNE(ITWO,'MOM_J_CMF')
 !

@@ -49,7 +49,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(mom_j_cmf_v10.o)\
       $(LIB)(mom_j_ddt_v3.o)\
       $(LIB)(mom_j_pp_v1.o)\
-      $(LIB)(mom_jrel_v7.o)\
+      $(LIB)(mom_jrel_v8.o)\
       $(LIB)(mom_jrel_grey_v1.o)\
       $(LIB)(mom_jrel_grey_v2.o)\
       $(LIB)(optdepth_v4.o)\

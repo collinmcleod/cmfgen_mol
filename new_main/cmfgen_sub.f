@@ -1166,9 +1166,9 @@
 !
 	CHK=.FALSE.
 	IF(.NOT. NEWMOD)THEN
-          CALL READ_BA_DATA_V2(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,CHK,'BAMAT')
+          CALL READ_BA_DATA_V3(LU_BA,NION,NUM_BNDS,ND,CHK,FIXED_T,SUCCESS,'BAMAT')
 	END IF
-	IF(.NOT. CHK .OR. LAMBDA_ITERATION)THEN
+	IF(.NOT. SUCCESS .OR. LAMBDA_ITERATION)THEN
 	  NLBEGIN=0
           COMPUTE_BA=.TRUE.
 	  WRBAMAT=.FALSE.
@@ -1483,8 +1483,10 @@
 ! NB: Care must taken to ensure that this section remains consistent
 !      with that in continuum calculation section.
 !
+	  CALL TUNE(1,'SET_LINE_OPAC')
 	    CALL SET_LINE_OPAC(POPS,NU,FREQ_INDX,LAST_LINE,N_LINE_FREQ,
 	1          LST_DEPTH_ONLY,LUER,ND,NT,NCF,MAX_SIM)
+	  CALL TUNE(2,'SET_LINE_OPAC')
 !
 ! Add in line opacity.
 !
@@ -1604,7 +1606,7 @@
             LOC_ID=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      TMP_STRING=TRIM(ION_ID(ID))//'_COL_DATA'
-              CALL STEQ_MULTI_V8(CNM,DCNM,ED,T,
+              CALL STEQ_MULTI_V9(CNM,DCNM,ED,T,
 	1         ATM(ID)%XzV,            ATM(ID)%XzVLTE,         ATM(ID)%dlnXzVLTE_dlnT,
 	1         ATM(ID)%NXzV,           ATM(ID)%DXzV,           ATM(ID)%XzV_F, 
 	1         ATM(ID)%XzVLTE_F_ON_S,  ATM(ID)%W_XzV_F,        ATM(ID)%AXzV_F,
@@ -1612,7 +1614,8 @@
 	1         ATM(ID)%NXzV_F,         ATM(ID)%F_TO_S_XzV,
 	1         POP_SPECIES(1,SPECIES_LNK(ID)), ATM(ID+1)%XzV_PRES, ATM(ID)%ZXzV,
 	1         LOC_ID,TMP_STRING,OMEGA_GEN_V3,
-	1         ATM(ID)%EQXzV,NUM_BNDS,ND,NION,COMPUTE_BA,DST,DEND)
+	1         ATM(ID)%EQXzV,NUM_BNDS,ND,NION,
+	1         COMPUTE_BA,FIXED_T,LST_ITERATION,DST,DEND)
 !
 ! Handle states which can partially autoionize.
 !
@@ -1671,8 +1674,8 @@
 ! is necessary to save a rewrite of the STEQ*** routines.
 !
 	IF(.NOT. COMPUTE_BA .AND. .NOT. FLUX_CAL_ONLY)THEN
-	  CALL READ_BA_DATA_V2(LU_BA,NION,NUM_BNDS,ND,IOS,CHK,'BAMAT')
-	  IF(.NOT. CHK)THEN
+	  CALL READ_BA_DATA_V3(LU_BA,NION,NUM_BNDS,ND,CHK,FIXED_T,SUCCESS,'BAMAT')
+	  IF(.NOT. SUCCESS)THEN
 	    WRITE(LUER,*)'Major Error - cant read BA File'
 	    WRITE(LUER,*)'Previously read successfully - '//
 	1             'before continuum loop'
@@ -2056,11 +2059,12 @@
 	    IF(ATM(ID)%XzV_PRES .AND. COMPUTE_NEW_CROSS)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
 	       PHOT_ID=J
-	       CALL QUAD_MULTI_V8(ATM(ID)%WSXzV(1,1,J), ATM(ID)%dWSXzVdT(1,1,J),
+	       CALL QUAD_MULTI_V9(ATM(ID)%WSXzV(1,1,J), ATM(ID)%dWSXzVdT(1,1,J),
 	1             ATM(ID)%WCRXzV(1,1,J),
 	1             ATM(ID)%XzVLTE, ATM(ID)%dlnXzVLTE_dlnT, ATM(ID)%NXzV,
 	1             ATM(ID)%XzVLTE_F_ON_S, ATM(ID)%EDGEXzV_F, ATM(ID)%NXzV_F,
 	1             ATM(ID)%F_TO_S_XzV, CONT_FREQ,T,ND,
+	1             COMPUTE_BA,FIXED_T,LST_ITERATION,
 	1             ION_ID(ID), ATM(ID)%ZXzV, PHOT_ID, ID)
 	      END DO
 	    END IF  
@@ -2090,8 +2094,10 @@
 !
 ! Include lines 
 !
+	CALL TUNE(1,'SET_LINE_OPAC')
         CALL SET_LINE_OPAC(POPS,NU,ML,LAST_LINE,N_LINE_FREQ,
 	1         LST_DEPTH_ONLY,LUER,ND,NT,NCF,MAX_SIM)
+	CALL TUNE(2,'SET_LINE_OPAC')
 !
 	CALL INIT_LINE_OPAC_VAR_V2(LAST_LINE,LUER,ND,TX_OFFSET,MAX_SIM,NM)
 !
@@ -2126,6 +2132,7 @@
 ! opacity and emissivity. These are used in carrying the variation of J from 
 ! one frequency to the next.
 !
+	    CALL TUNE(1,'RS_ZONE')
 	    DO SIM_INDX=1,MAX_SIM
 	      IF(RESONANCE_ZONE(SIM_INDX))THEN
 	        DO I=1,ND
@@ -2134,6 +2141,7 @@
 	        END DO
 	      END IF
 	    END DO
+	    CALL TUNE(2,'RS_ZONE')
 !
 !	    DO I=1,ND
 !	      IF(CHI(I)*R(I) .LT. 1.0D-04)THEN
@@ -2354,7 +2362,8 @@
 !
 ! Update line net rates, and the S.E. Eq. IFF we have finished a line 
 ! transition.
-!                      
+!
+	CALL TUNE(1,'JBAR_SIM')                      
 	DO SIM_INDX=1,MAX_SIM
 	  IF(RESONANCE_ZONE(SIM_INDX))THEN
 	    DO I=1,ND
@@ -2365,6 +2374,7 @@
 	    END DO
 	  END IF
 	END DO
+	CALL TUNE(2,'JBAR_SIM')                      
 !
 ! Update the S.E. Eq. IFF we have finished a line transition (i.e. are at
 ! the final point of the resonance zone.) 
@@ -2815,7 +2825,7 @@
 !	IF(DIAG_INDX .NE. 1)BA_T(NT,DIAG_INDX-1,ND)=-1.0D0
 	IF(COMPUTE_BA .AND. WRBAMAT .AND. .NOT. FLUX_CAL_ONLY .AND. .NOT. LAMBDA_ITERATION)THEN
 	  CALL TUNE(IONE,'STORE_BA')
-	    CALL STORE_BA_DATA_V2(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,'BAMAT')
+	    CALL STORE_BA_DATA_V3(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,FIXED_T,'BAMAT')
 	  CALL TUNE(ITWO,'STORE_BA')
 	END IF
 !
@@ -3480,7 +3490,7 @@
 	1          .AND. .NOT. FLUX_CAL_ONLY 
 	1          .AND. .NOT. LAMBDA_ITERATION)THEN
 	  CALL TUNE(IONE,'BAMAT_WR')
-	  CALL STORE_BA_DATA_V2(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,'BAMAT')
+	  CALL STORE_BA_DATA_V3(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,FIXED_T,'BAMAT')
 	  CALL TUNE(ITWO,'BAMAT_WR')
 	END IF
 !
@@ -3839,7 +3849,7 @@
 ! Initialize pointer file for storage of BA matrix.
 !
 	I=-1000
-	CALL INIT_BA_DATA_PNT_V2(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,'BAMAT')
+	CALL INIT_BA_DATA_PNT_V3(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,FIXED_T,'BAMAT')
 	CLOSE(UNIT=LU_EDD)
 !
 !

@@ -47,7 +47,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(get_pops_at_prev_time_step_v5.o)\
       $(LIB)(old_grid_module.o)\
       $(LIB)(prevent_low_t.o)\
-      $(LIB)(read_ba_data_v2.o)\
+      $(LIB)(read_ba_data_v3.o)\
       $(LIB)(read_bcd_mat.o)\
       $(LIB)(read_time_model_v1.o)\
       $(LIB)(read_seq_time_file_v1.o)\
@@ -60,18 +60,18 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(set_sn_r_grid.o)\
       $(LIB)(set_new_grid.o)\
       $(LIB)(solveba_v13.o)\
-      $(LIB)(steq_multi_v8.o)\
+      $(LIB)(steq_multi_v9.o)\
       $(LIB)(steqne_v4.o)\
       $(LIB)(steq_advec_v4.o)\
       $(LIB)(steq_co_mov_deriv_v3.o)\
       $(LIB)(store_old_grid.o)\
-      $(LIB)(store_ba_data_v2.o)\
+      $(LIB)(store_ba_data_v3.o)\
       $(LIB)(sum_steq_sol.o)\
       $(LIB)(tst_rd_seq.o)\
       $(LIB)(var_op_v10.o)\
       $(LIB)(var_x_opa_eta_v4.o)\
-      $(LIB)(vsebyj_multi_v7.o)\
-      $(LIB)(vsebyj_x_v6.o)\
+      $(LIB)(vsebyj_multi_v8.o)\
+      $(LIB)(vsebyj_x_v7.o)\
       $(LIB)(write_cmat.o)\
       $(LIB)(write_seq_time_file_v1.o)\
       $(LIB)(update_ba_for_line.o)\

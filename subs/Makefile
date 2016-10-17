@@ -217,6 +217,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(tuvghd_rh.o)\
       $(LIB)(ungrid.o)\
       $(LIB)(up_tx_tvx.o)\
+      $(LIB)(up_tx_tvx_noeps.o)\
       $(LIB)(up_tx_tvx_v2.o)\
       $(LIB)(up_tx_tvx_ext_v1.o)\
       $(LIB)(update_gam.o)\

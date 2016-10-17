@@ -97,6 +97,7 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered: 02-Oct-2016 - Changed from UP_TX_TVX to UP_TX_TVX_NOEPS.
 ! Altered: 10-Feb-2010 - Minor correction to dRHSdCHI_IB for DIFFUSION approximation.
 ! Altered:  2-Feb-2010 - Bug fix with DJDt_OLDT(1).
 ! Altered: 18-Jan-2010 - Changed to V2.
@@ -540,10 +541,8 @@
 ! not vary in the linearization.
 !
 	CALL TUNE(1,'UP_TX')
-	DUMMY_VEC=0.0D0
-	CALL UP_TX_TVX(TX,TVX,KI,TA,TB,TC,PSIPREV,
+	CALL UP_TX_TVX_NOEPS(TX,TVX,KI,TA,TB,TC,PSIPREV,
 	1                       VB,VC,HU,HL,HS,RHS_dHdCHI,
-	1                       DUMMY_VEC,DUMMY_VEC,DUMMY_VEC,DUMMY_VEC,
 	1                       WORKMAT,ND,NM,NM_KI,
 	1                       INIT,DO_THIS_TX_MATRIX)
 	CALL TUNE(2,'UP_TX')

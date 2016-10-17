@@ -24,7 +24,7 @@ OBJ= $(LIB)(ave_level_energy.o)\
      $(LIB)(newpertjd.o)\
      $(LIB)(omega_gen_v3.o)\
      $(LIB)(phot_data_mod.o)\
-     $(LIB)(quad_multi_v8.o)\
+     $(LIB)(quad_multi_v9.o)\
      $(LIB)(rayleigh_scat.o)\
      $(LIB)(rdphot_gen_v2.o)\
      $(LIB)(rd_hyd_bf_data.o)\
@@ -38,7 +38,7 @@ OBJ= $(LIB)(ave_level_energy.o)\
      $(LIB)(set_x_freq_v2.o)\
      $(LIB)(sm_phot_v3.o)\
      $(LIB)(subcol_multi_v4.o)\
-     $(LIB)(subcol_multi_v5.o)\
+     $(LIB)(subcol_multi_v6.o)\
      $(LIB)(sub_phot_gen.o)\
      $(LIB)(xcross_v2.o)\
      $(LIB)(xray_data_mod.o)\
