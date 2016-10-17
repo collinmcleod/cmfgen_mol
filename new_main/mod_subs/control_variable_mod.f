@@ -1,5 +1,6 @@
 	MODULE CONTROL_VARIABLE_MOD
 !
+! Altered : 17-Oct-2016 : H_CHK_OPTION replaces CHECK_H_ON_J.
 ! Altered : 01-Sep-2016 : TIME_SEQ_NO changed from integer to real.
 ! Altered : 15-Jun-2016 : NT_ITERATION_COUNTER added to this routine so that it is accessible by CMFGEN_SUB.
 ! Altered : 15-Feb-2015 : Added INSTANTANEOUS_ENERGY_DEPOSITION option (12-Jan-2015 on OSPREY[cur_cmf_gam])
@@ -269,7 +270,7 @@
 ! Method to handle N moment  (N_ON_J, MIXED, or G_ONLY)
 !
 	CHARACTER(LEN=6)  N_TYPE
-	LOGICAL CHECK_H_ON_J
+	CHARACTER(LEN=10) H_CHK_OPTION
 !
 ! These insert extra points into the grid when solving for the radition field.
 ! These insertions are done internally, and do not directly effect the returned
