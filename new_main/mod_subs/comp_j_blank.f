@@ -36,7 +36,7 @@
 	IMPLICIT NONE
 !
 ! Altered : 17-Oct-2016 : H_CHK_OPTION added to moment routines.
-!                            Moment routines are: MOM_J_CMF_V11.F, VAR_MOM_J_DDT_V4.F, and MOM_JREL_V8.F.
+!                            Moment routines are: MOM_J_CMF_V11.F, MOM_J_DDT_V4.F, and MOM_JREL_V8.F.
 ! Altered : 17-Feb-2015 : r^2.J and r^2.H now ouput on last iteration when using USE_LAM_ES option.
 ! Altered : 14-Dec-2014 : RSQHNU etc now set to one when not computing J. This avoids issues with
 !                             possible NaNs.
@@ -672,7 +672,7 @@ C
 	1              V,R,FEDD,RJ,RSQHNU,DJDt_TERM,
 	1              HFLUX_AT_IB,HFLUX_AT_OB,
 	1              VDOP_VEC,DELV_FRAC_MOM,FL,dLOG_NU,DBB,
-	1              INNER_BND_METH,OUTER_BND_METH,
+	1              H_CHK_OPTION,INNER_BND_METH,OUTER_BND_METH,
 	1              METHOD,COHERENT_ES,FIRST_FREQ,NEW_FREQ,
 	1              INCL_DJDT_TERMS,USE_DR4JDT,DJDT_RELAX_PARAM,NC,NP,ND,NCF)
 	     ELSE IF(USE_J_REL)THEN
