@@ -9,6 +9,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 18-Oct-2017  Fixed estimate of cooling time.
 ! Altered: 01-Mar-2016  Option to omit advection terms when not included in the model [25-Feb-2016].
 ! Altered: 17-Feb-2015  Improved estimate of cooling time by including ATOM_DENSITY.
 ! Altered:              Estimate of cooling time outout to GENCOOL_SORT
@@ -306,7 +307,7 @@
 !
 	READ(STRING,*)(TEMP_VEC(I),I=ID,MIN(ID+9,ND))
 	DO I=ID,MIN(ID+9,ND)
-	  TOTAL_RATE(I)=TOTAL_RATE(I)+TEMP_VEC(I)
+	  TOTAL_RATE(I)=TOTAL_RATE(I)+ABS(TEMP_VEC(I))
 	END DO
 !
 	RETURN

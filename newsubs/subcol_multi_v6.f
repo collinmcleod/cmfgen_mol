@@ -144,7 +144,7 @@
 !$OMP PARALLEL DO SCHEDULE(DYNAMIC) REDUCTION(+:K_COOL) 
 !$OMP1 PRIVATE(I,J,I_COOL,CII,CIJ,CJI,X,L,U,BRAT)
 	  DO I=1,N_F-1
-	    I_COOL=0
+	    I_COOL=0.0D0
 	    DO J=I+1,N_F                           
 !
 	      CIJ=8.63D-08*ED(K)*OMEGA_F(I,J)/SQRT(T(K))
@@ -156,7 +156,7 @@
 !                        
 	      L=F_TO_S_MAPPING(I)    
 	      CII=CIJ*HNST_F_ON_S(I,K)*(1.0D0-W_F(J,K)/W_F(I,K))
-	      COL_F(I,I)=CII
+	      COL_F(I,I)=COL_F(I,I)+CII
 	      IF(DO_dCOLdT)THEN
 	        DCOL_F(I,I)=CII*( dln_OMEGA_dlnT(I,J) +
 	1        X -2.0D0 - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
