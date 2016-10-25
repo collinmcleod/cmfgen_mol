@@ -21,6 +21,10 @@
 	1                 COMPUTE_BA,FIXED_T,LAST_ITERATION)
 	IMPLICIT NONE
 !
+! Altered 23-Oct-2016 - Bug fix with level dissolution.
+!                          Fixed bug introduced in creating V6.
+! Altered 17-Oct-2016 - Changed to V6. Updated to improve speed - based on "fast"
+!                          version created earlier on OSPREY.
 ! Altered 05-Apr-2011 - Changed to V5.
 !                       HNST_F_ON_S (rather than HNST_F) is passed in call.
 !                       HNST_F/HNST_S replaced by HNST_F_ON_S - done to faciliate
