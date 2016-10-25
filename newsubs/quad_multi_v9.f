@@ -28,6 +28,8 @@
 	IMPLICIT NONE
 	EXTERNAL SUB_PHOT_GEN
 !
+! Altered 23-Oct-2016 - Bug fix (collision ionization with dissolution) and introduced
+!                          PHOT_DIS_PARAMETER.
 ! Altered 04-Oct-2016 - Changed to V9
 !                       Only compute WSE_CR_S(I_S,J) and dWSE_SdT on LAST iteration, or
 !                          when T is variable.
@@ -173,11 +175,14 @@
 	      T1=FOUR_PI_D_H*ALPHA_VEC(I_F)
 	      DO J=1,ND
 	        T2=7.782D0+XDIS(J)*DIS_CONST(I_F)
-	        T3=T1*T2/(T2+YDIS(J)*DIS_CONST(I_F)*DIS_CONST(I_F))
-	        WSE_S(I_S,J)=WSE_S(I_S,J) + T3*HNST_F_ON_S(I_F,J)
-	        WSE_CR_S(I_S,J)=WSE_CR_S(I_S,J) - EDGE_F(I_F)*T3*HNST_F_ON_S(I_F,J)
-	        dWSE_SdT(I_S,J)=dWSE_SdT(I_S,J) - T3*HNST_F_ON_S(I_F,J)*
-	1          (dlnHNST_S_dlnT(I_S,J)+1.5D0+HDKT*EDGE_F(I_F)/T(J))/T(J)
+	        T3=T2/(T2+YDIS(J)*DIS_CONST(I_F)*DIS_CONST(I_F))
+	        IF(T2 .GT. PHOT_DIS_PARAMETER)THEN
+	          T3=T1*T3
+	          WSE_S(I_S,J)=WSE_S(I_S,J) + T3*HNST_F_ON_S(I_F,J)
+	          WSE_CR_S(I_S,J)=WSE_CR_S(I_S,J) - EDGE_F(I_F)*T3*HNST_F_ON_S(I_F,J)
+	          dWSE_SdT(I_S,J)=dWSE_SdT(I_S,J) - T3*HNST_F_ON_S(I_F,J)*
+	1            (dlnHNST_S_dlnT(I_S,J)+1.5D0+HDKT*EDGE_F(I_F)/T(J))/T(J)
+	        END IF
 	      END DO
 	    END IF
 	  END DO
@@ -197,8 +202,11 @@
 	      T1=FOUR_PI_D_H*ALPHA_VEC(I_F)
 	      DO J=1,ND
 	        T2=7.782D0+XDIS(J)*DIS_CONST(I_F)
-	        T3=T1*T2/(T2+YDIS(J)*DIS_CONST(I_F)*DIS_CONST(I_F))
-	        WSE_S(I_S,J)=WSE_S(I_S,J) + T3*HNST_F_ON_S(I_F,J)
+	        T3=T2/(T2+YDIS(J)*DIS_CONST(I_F)*DIS_CONST(I_F))
+	        IF(T2 .GT. PHOT_DIS_PARAMETER)THEN
+	          T3=T1*T3
+	          WSE_S(I_S,J)=WSE_S(I_S,J) + T3*HNST_F_ON_S(I_F,J)
+	        END IF
 	      END DO
 	    END IF
 	  END DO
