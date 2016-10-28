@@ -56,8 +56,8 @@
 	  YMAX=1.0
 	  WRITE(T_OUT,*)'Y limits are zero - setting default values'
 	ELSE IF(ABS(YMAX-YMIN)/MAX(ABS(YMAX),ABS(YMIN)) .LT. 1.0D-08)THEN
-	  YMIN=0.0
-	  YMAX=1.0
+	  YMIN=0.9*YMIN
+	  YMAX=1.1*YMAX
 	  WRITE(T_OUT,*)'Invalid Y limits - setting default values'
 	END IF
 	IF(XMAX .EQ. 0 .AND. XMIN .EQ. 0)THEN
@@ -65,8 +65,8 @@
 	  XMAX=1.0
 	  WRITE(T_OUT,*)'X limits are zero - setting default values'
 	ELSE IF(ABS(XMAX-XMIN)/MAX(ABS(XMAX),ABS(XMIN)) .LT. 1.0D-08)THEN
-	  XMIN=0.0
-	  XMAX=1.0
+	  XMIN=0.9*XMIN
+	  XMAX=1.1*XMAX
 	  WRITE(T_OUT,*)'Invalid X limits - setting default values'
 	END IF
 !

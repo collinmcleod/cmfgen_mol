@@ -2229,13 +2229,14 @@
 !
 	ELSE IF(XOPT .EQ. 'YMDOT')THEN
 	  T1=4.0D+25*PI*365.25D0*24.0D0*3600.0D0/MASS_SUN()
-	  WRITE(6,*)T1
-	  WRITE(6,*)MASS_DENSITY(1),CLUMP_FAC(1),R(1),V(1)
+!	  WRITE(6,*)T1
+!	  WRITE(6,*)MASS_DENSITY(1),CLUMP_FAC(1),R(1),V(1)
 	  DO I=1,ND
 	    WRITE(26,*)T1*MASS_DENSITY(I)*CLUMP_FAC(I)*R(I)*R(I)*V(I)
 	    YV(I)=LOG10( T1*MASS_DENSITY(I)*CLUMP_FAC(I)*R(I)*R(I)*V(I) )
 	  END DO
-	  WRITE(6,*)YV(1)
+	  WRITE(6,'(A,ES14.4,A)')'Mass loss rate is ',10**(YV(1)),' Msun/yr'
+	  WRITE(6,'(A,ES14.4,A)')'     Log(Mdot) is ',YV(1)
 	  YAXIS='Mass Loss rate(Msun/yr)'
 	  CALL DP_CURVE(ND,XV,YV)
 !
@@ -2600,7 +2601,7 @@
 	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
 	  WRITE(6,'(A,F9.4,A)')' Mass of envelope (ejecta) is',TA(ND),' Msun'
 	  T1=SQRT(2.0D0*EK_EJECTA/TA(ND)/MASS_SUN())/1.0D+05
-	  WRITE(6,'(A,F10.2,A)')' Mean square velocity is ',T1,' km/s',DEF_PEN
+	  WRITE(6,'(A,F10.2,A)')' SQRT(Mean square velocity) is ',T1,' km/s',DEF_PEN
 !
 !
 !
@@ -2945,9 +2946,9 @@
 	ELSE IF(XOPT .EQ. 'PLNID')THEN
 !
 	  WRITE(T_OUT,'(A)')' '
-	  WRITE(T_OUT,'(A)')' Create line ID file for plane-paralell models'
+	  WRITE(T_OUT,'(A)')' Create line ID file for plane-paraillel models'
 	  WRITE(T_OUT,'(A)')' The list is created based on an estimate of the central line intensity'
-	  WRITE(T_OUT,'(A)')' The procdure may also work for most O stars -- especially those with weak winds'
+	  WRITE(T_OUT,'(A)')' The procedure may also work for most O stars -- especially those with weak winds'
 	  WRITE(T_OUT,'(A)')' '
 	  CALL USR_OPTION(VTURB,'VTURB','10.0','Turbulent velcity for line profile (units km/s)?')
 !

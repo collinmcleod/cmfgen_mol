@@ -1,8 +1,8 @@
 !
 ! Subroutine designed to plot intrinsinc line profiles for a range of
-! tempertaures and densities.
+! temperatures and densities.
 !
-! FULL_STRK_LIST and strak files must be linked for the routine to work.
+! FULL_STRK_LIST and Stark files must be linked for the routine to work.
 !
 	SUBROUTINE PLT_PROFS
 	USE MOD_DISP

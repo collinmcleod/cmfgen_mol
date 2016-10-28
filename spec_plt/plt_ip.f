@@ -309,7 +309,7 @@
 	  ALLOCATE (HQW_AT_RMAX(NP))
 	  CALL GAULEG(RZERO,RONE,TMP_MU,HQW_AT_RMAX,NP)
 	  PLANE_PARALLEL_MOD=.TRUE.
-	  WRITE(6,*)'Model assumed to be plae-paraellel'
+	  WRITE(6,*)'Model assumed to be plae-parallel'
 	ELSE
 	  ALLOCATE (HQW_AT_RMAX(NP))
 	  CALL HWEIGHT(MU,HQW_AT_RMAX,NP)
@@ -1258,11 +1258,14 @@
 	    WRITE(6,*)' TIT  LX  LY  XU '
 	    WRITE(6,*)' CF:   Plot cummulative spectrum as a function of impact parameter'
 	    WRITE(6,*)' IP:   Plot spectrum at a given impact parameter'
+	    WRITE(6,*)' IMU:  Plot intensity as a function of MU for a given frequency'
 	    WRITE(6,*)' SP:   Plot spectrum inside and outside impact parameter p'
 	    WRITE(6,*)' INU:  Plot I(p) for a given frequency'
 	    WRITE(6,*)' INU2: Plot I(p) for a given frequency band'
 	    WRITE(6,*)' IF2:  Plot normalize Flux originating inside p for a given frequency band'
 	    WRITE(6,*)' '
+	    WRITE(6,*)' GR:   Enter polot packgae to plot passed data'
+	    WRITE(6,*)' GRL:  As for GR but no labels passed'
 	    WRITE(6,*)' '
 	    GOTO 1
 	  END IF
