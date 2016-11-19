@@ -175,6 +175,7 @@
         INTEGER  L1,L2,U1,U2
 	INTEGER IT,MNT,NIV
 	INTEGER ISPEC
+	INTEGER GAMMA_ADD_SLOWLY_COUNTER
 !
 ! Main iteration loop variables.
 !
@@ -471,6 +472,7 @@
         TREAT_NON_THERMAL_ELECTRONS=.FALSE.
 	INCL_RADIOACTIVE_DECAY=.FALSE.
 	ZERO_REC_COOL_ARRAYS=.TRUE.
+	GAMMA_ADD_SLOWLY_COUNTER=-1
 	I=12
 	FORMFEED=' '//CHAR(I)
 	CNT_FIX_BA=0
@@ -4365,11 +4367,15 @@
 	  END IF
 !
 ! Adjust non-thermal decay energy scale factor. This is option is useful when adding non-thermal ioizations
-! to a thermal model.
+! to a thermal model. During the convergence process we typically increase DEC_NRG_SCL_FAC by a factor of 10.
+! If only 2 iterations were done, befores changing, we increase it by a factor of 100.
 !
 	  IF(TREAT_NON_THERMAL_ELECTRONS .AND. ADD_DEC_NRG_SLOWLY .AND. RD_LAMBDA .AND. MAXCH .LT. 100)THEN
 	    IF(DEC_NRG_SCL_FAC .NE. 1.0D0)THEN
 	      DEC_NRG_SCL_FAC=MIN(DEC_NRG_SCL_FAC*10.0D0,1.0D0)
+	      IF(GAMMA_ADD_SLOWLY_COUNTER .EQ. 2)THEN
+	        DEC_NRG_SCL_FAC=MIN(DEC_NRG_SCL_FAC*10.0D0,1.0D0)
+	      END IF
 	      WRITE(LUER,*)'Have adjusted radioactivity decay energy scale factor'
 	      WRITE(LUER,*)'New scale factor is',DEC_NRG_SCL_FAC
 	      CALL UPDATE_KEYWORD(DEC_NRG_SCL_FAC,'[DECNRG_SCLFAC_BEG]','VADAT',L_TRUE,L_TRUE,LUIN)
@@ -4377,6 +4383,9 @@
 	    ELSE
 	      CALL UPDATE_KEYWORD(L_FALSE,'[GAMMA_SLOW]','VADAT',L_TRUE,L_TRUE,LUIN)
 	    END IF
+	    GAMMA_ADD_SLOWLY_COUNTER=1
+	  ELSE IF(DEC_NRG_SCL_FAC .NE. 1.0D0)THEN
+	    GAMMA_ADD_SLOWLY_COUNTER=GAMMA_ADD_SLOWLY_COUNTER+1
 	  END IF
 !
 	  IF(SN_MODEL)THEN
@@ -4436,7 +4445,7 @@
 	       LAMBDA_ITERATION=.FALSE.
 	       FIXED_T=RD_FIX_T
 	    END IF
-	    CALL SPECIFY_IT_CYCLE_V2(MAIN_COUNTER,COMPUTE_BA,LAMBDA_ITERATION,FIXED_T)
+	    CALL SPECIFY_IT_CYCLE_V3(MAIN_COUNTER,COMPUTE_BA,LAMBDA_ITERATION,FIXED_T,NEXT_NG,NEXT_AV)
 !
 ! Check to see if the user has changed IN_ITS to modify the number of iterations being
 ! undertaken. If the file has not been modified, no action will be taken. The use may

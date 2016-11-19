@@ -1188,10 +1188,10 @@ C
 	      CALL NEW_GEN_IN(STR_EXP(ISTR),'EXP')
 	      CALL NEW_GEN_IN(STR_COL(ISTR),'COL')
 	      CALL NEW_GEN_IN(STRING(ISTR),'STRING')
+	      STR=.TRUE.
 	    END IF
 	  END DO
 	  GOTO 1000
-	  STR=.TRUE.
 !
 	ELSE IF (ANS .EQ. 'SC')THEN
 	  INIT=.FALSE.          !Strings automatically initialized first time.
@@ -1956,9 +1956,9 @@ C
 	    DO J=1,MAXVAL(NPTS)
 	      DO IP=1,NPLTS
 	        IF(J .LE. NPTS(IP))THEN
-	          WRITE(30,'(2X,2ES14.6)',ADVANCE='NO')CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	          WRITE(30,'(2X,ES14.7,E14.6)',ADVANCE='NO')CD(IP)%XVEC(J),CD(IP)%DATA(J)
 	        ELSE
-	          WRITE(30,'(2X,2ES14.6)',ADVANCE='NO')0.0D0,0.0D0
+	          WRITE(30,'(2X,ES14.7,E14.6)',ADVANCE='NO')0.0D0,0.0D0
 	        END IF
 	      END DO
 	      WRITE(30,'(A)')' '
@@ -1969,7 +1969,7 @@ C
 	    WRITE(30,*)NPTS(L)
 	    IP=L
 	    DO J=1,NPTS(IP)
-	      WRITE(30,*)CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	      WRITE(30,'(2X,ES14.7,ES14.6)')CD(IP)%XVEC(J),CD(IP)%DATA(J)
 	    END DO
 	    WRITE(T_OUT,*)'One plot written to ',TRIM(FILNAME)
 	  END IF

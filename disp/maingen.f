@@ -5892,17 +5892,27 @@ c
 !
 ! Assumes V_D=10kms.
 !
-	    T1=DLOG10(1.6914D-11/FREQ)
-	    DO I=1,ND
-	      IF(TA(I) .GT. 0)THEN
-	        YV(I)=T1+DLOG10(TA(I))
-	      ELSE IF(TA(I) .LT. 0)THEN
-	        YV(I)=T1+DLOG10(-TA(I))-20.0D0
-	      ELSE
-	        YV(I)=-30.0
-	      END IF
-	    END DO
-	    YAXIS='Log(\gt\dstat\u)'
+	    IF(MINVAL(YV(1:ND)) .LE. 0.0D0)THEN
+	      WRITE(6,*)'Negative optical depth encountered using linear plot'
+	      T1=1.6914D-11/FREQ
+	      DO I=1,ND
+	         YV(I)=T1*TA(I)
+		 WRITE(6,*)I,TA(I)
+	      END DO
+	      YAXIS='Log(\gt\dstat\u)'
+	    ELSE
+	      T1=DLOG10(1.6914D-11/FREQ)
+	      DO I=1,ND
+	        IF(TA(I) .GT. 0)THEN
+	          YV(I)=T1+DLOG10(TA(I))
+	        ELSE IF(TA(I) .LT. 0)THEN
+	          YV(I)=T1+DLOG10(-TA(I))-20.0D0
+	        ELSE
+	          YV(I)=-30.0
+	        END IF
+	      END DO
+	      YAXIS='Log(\gt\dstat\u)'
+	    END IF
 	  ELSE
 	    DO I=1,ND
 	      YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
