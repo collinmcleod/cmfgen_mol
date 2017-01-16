@@ -108,6 +108,7 @@
 !
 	INTEGER IOS			!Used for Input/Output errors.
 	INTEGER I,J,K,L,ML,ISAV
+	INTEGER NU_INDX
 	INTEGER ST_REC
 	INTEGER REC_LENGTH
 	INTEGER NEW_ND
@@ -920,6 +921,10 @@
 !
             I=GET_INDX_DP(T1,ZM(ID)%NU,NCF)
 	    IF(ZM(ID)%NU(I)-T1 .GT. T1-ZM(ID)%NU(I+1))I=I+1
+	    NU_INDX=I
+	    WRITE(6,'(A,F12.6,A)')' Frequency being plotted is',ZM(ID)%NU(I),' x 10^15 Hz'
+	    T1=0.299794D+04/T1
+	    WRITE(6,'(A,F12.4,A)')'Wavelength being plotted is',T1,' Angstroms'
 	    IF(ALLOCATED(XV))DEALLOCATE(XV)
 	    IF(ALLOCATED(YV))DEALLOCATE(YV)
 	    ALLOCATE (XV(ND))
@@ -950,11 +955,11 @@
 	      YAXIS='Log '//YAXIS
 	    END IF
 	    DO J=1,ND
-	      IF(ZM(ID)%RJ(J,I) .GT. 0)THEN
+	      IF(ZM(ID)%RJ(J,NU_INDX) .GT. 0)THEN
 	        IF(PLOT_RSQJ)THEN
-	          YV(J)=DLOG10(ZM(ID)%RJ(J,I)*R(J)*R(J)/SQRT(1.0D0-V(J)*V(J)/C_KMS/C_KMS))
+	          YV(J)=DLOG10(ZM(ID)%RJ(J,NU_INDX)*R(J)*R(J)/SQRT(1.0D0-V(J)*V(J)/C_KMS/C_KMS))
 	        ELSE
-	          YV(J)=DLOG10(ZM(ID)%RJ(J,I))
+	          YV(J)=DLOG10(ZM(ID)%RJ(J,NU_INDX))
 	        END IF
 	      ELSE
 	        YV(J)=-100.0

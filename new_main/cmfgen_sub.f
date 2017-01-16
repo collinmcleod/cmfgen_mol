@@ -478,6 +478,7 @@
 	CNT_FIX_BA=0
 	MAXCH_SUM=0.0D0
 	LST_ITERATION=.FALSE.
+	dE_RAD_DECAY=0.0D0 			!For non-SN models.
 !
 	DPTH_INDX=1
 	DPTH_INDX=MIN(DPTH_INDX,ND)		!Thus no problem if 84 > ND

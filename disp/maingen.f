@@ -1200,10 +1200,23 @@
 	  XAXSAV=XAXIS
 !
 	ELSE IF(XOPT .EQ. 'XLINR')THEN
-	  DO I=1,ND
-	    XV(I)=R(I)/R(ND)
-	  END DO
-	  XAXIS='r/R\d*\u'
+	  CALL USR_HIDDEN(FLAG,'NORM','T','Normalized X axis (def=T)')
+	  IF(FLAG)THEN
+	    DO I=1,ND
+	      XV(I)=R(I)/R(ND)
+	    END DO
+	    XAXIS='r/R\d*\u'
+	  ELSE
+	    T1=1.0D0
+	    XAXIS='r(10\u10 \dcm)'
+	    IF(R(ND) .GT. 1.0D+04)THEN
+	      T1=1.0D+04
+	      XAXIS='r(10\u14 \dcm)'
+	    END IF
+	    DO I=1,ND
+	      XV(I)=R(I)/T1
+	    END DO
+	  END IF
 	  XAXSAV=XAXIS
 !
 	ELSE IF(XOPT .EQ. 'XAU')THEN

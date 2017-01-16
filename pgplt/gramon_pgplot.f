@@ -165,6 +165,7 @@
 	LOGICAL FILE_IS_OPEN
 	LOGICAL INITIALIZE_ON_EXIT
 	LOGICAL, SAVE :: REVERSE_PLOTTING_ORDER=.FALSE.
+	LOGICAL REVERSE
 !
 ! E, cursor, and continuum parameters.
 !
@@ -1956,9 +1957,9 @@ C
 	    DO J=1,MAXVAL(NPTS)
 	      DO IP=1,NPLTS
 	        IF(J .LE. NPTS(IP))THEN
-	          WRITE(30,'(2X,ES14.7,E14.6)',ADVANCE='NO')CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	          WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE='NO')CD(IP)%XVEC(J),CD(IP)%DATA(J)
 	        ELSE
-	          WRITE(30,'(2X,ES14.7,E14.6)',ADVANCE='NO')0.0D0,0.0D0
+	          WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE='NO')0.0D0,0.0D0
 	        END IF
 	      END DO
 	      WRITE(30,'(A)')' '
@@ -2163,7 +2164,7 @@ C
 ! Perform simple Y-axis arithmetic.
 !
 	ELSE IF (ANS .EQ. 'YAR')THEN
-	  CALL NEW_GEN_IN(YAR_OPERATION,'Operation: *,+,-,/,LG,R[=1/Y],ALG[=10^y],ABS')
+	  CALL NEW_GEN_IN(YAR_OPERATION,'Operation: *,+,-,/,LG,R[=1/Y],ALG[=10^y],ABS,MX,DX')
 	  CALL SET_CASE_UP(YAR_OPERATION,IZERO,IZERO)
 	  IF(YAR_OPERATION .EQ. 'MX' .OR. YAR_OPERATION .EQ. 'DX')THEN
 	    YAR_VAL=0.5D0*(XPAR(1)+XPAR(2))
@@ -2289,10 +2290,13 @@ C
 	  GOTO 1000
 !
 	ELSE IF (ANS .EQ. 'CUM')THEN
+	  IP=1
 	  CALL NEW_GEN_IN(IP,'Input plot 1?')
 	  OP=NPLTS+1
 	  CALL NEW_GEN_IN(OP,'Output plot?')
 	  TYPE_CURVE(OP)='L'
+	  REVERSE=.FALSE.
+	  CALL NEW_GEN_IN(REVERSE,'Reverse integration direction?')
 	  IF(OP .NE. IP .AND. ALLOCATED(CD(OP)%XVEC))THEN
             DEALLOCATE (CD(OP)%XVEC)
             DEALLOCATE (CD(OP)%DATA)
@@ -2301,14 +2305,25 @@ C
 	    ALLOCATE (CD(OP)%XVEC(NPTS(IP)),STAT=IOS)
             IF(IOS .EQ. 0)ALLOCATE (CD(OP)%DATA(NPTS(IP)),STAT=IOS)
 	  END IF
-	  T1=CD(IP)%DATA(1)
-          CD(OP)%DATA(1)=0
-          DO I=2,NPTS(IP)
-	    T2=CD(IP)%DATA(I)
-	    CD(OP)%DATA(I)=CD(OP)%DATA(I-1)+0.5D0*(T1+T2)*
+	  IF(REVERSE)THEN
+	    T1=CD(IP)%DATA(NPTS(IP))
+            CD(OP)%DATA(NPTS(IP))=0
+            DO I=NPTS(IP)-1,1,-1
+	      T2=CD(IP)%DATA(I)
+	      CD(OP)%DATA(I)=CD(OP)%DATA(I+1)+0.5D0*(T1+T2)*
+	1              ABS(CD(IP)%XVEC(I)-CD(IP)%XVEC(I+1))
+	      T1=T2
+	    END DO
+	  ELSE
+	    T1=CD(IP)%DATA(1)
+            CD(OP)%DATA(1)=0
+            DO I=2,NPTS(IP)
+	      T2=CD(IP)%DATA(I)
+	      CD(OP)%DATA(I)=CD(OP)%DATA(I-1)+0.5D0*(T1+T2)*
 	1              ABS(CD(IP)%XVEC(I)-CD(IP)%XVEC(I-1))
-	    T1=T2
-	  END DO
+	      T1=T2
+	    END DO
+	  END IF
 	  IF(IP .NE. OP)CD(OP)%XVEC=CD(IP)%XVEC
 	  NPTS(OP)=NPTS(IP)
 	  ERR(OP)=.FALSE.
