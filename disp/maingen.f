@@ -1367,6 +1367,7 @@
 	  CALL USR_HIDDEN(T1,'VTH','10.0','Thermal doppler velocity (km/s)')
 	  DO I=1,ND
 	    T2=(SIGMA(I)+1.0D0)*V(I)/R(I)
+!	    XV(I)=DLOG10(6.65D-15*T1/T2)
 	    XV(I)=DLOG10(6.65D-15*ED(I)*CLUMP_FAC(I)*T1/T2)
 	  END DO
 	  XAXIS='Log(t)'
@@ -2736,7 +2737,7 @@
 	  CALL USR_HIDDEN(T1,'VTH','10.0','Thermal doppler velocity (km/s)')
 	  DO I=1,ND
 	    T2=(SIGMA(I)+1.0D0)*V(I)/R(I)
-	    YV(I)=DLOG10(6.65D-15*ED(I)*T1/T2)
+	    YV(I)=DLOG10(6.65D-15*ED(I)*CLUMP_FAC(I)*T1/T2)
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='Log(t)'
