@@ -62,6 +62,8 @@
 	REAL*8 dVdR
 	REAL*8 MDOT
 	REAL*8 OLD_MDOT
+	REAL*8 LSTAR
+	REAL*8 OLD_LSTAR
 	REAL*8 TOP,BOT 
 	REAL*8 dTOPdR,dBOTdR 
 	REAL*8 ALPHA
@@ -656,7 +658,18 @@
 	  CALL GEN_IN(V_TRANS,'Connection velocity in km/s')
 	  CALL GEN_IN(OLD_MDOT,'Old mass-loss rate in Msun/yr')
 	  MDOT=OLD_MDOT
+!
+	  WRITE(6,*)RED_PEN
+	  WRITE(6,*)'The defaut mass assume Mdot/R^1.5 is to be preserved'
+	  WRITE(6,*)DEF_PEN
+	  MDOT=OLD_MDOT*(NEW_RSTAR/OLD_R(ND_OLD))**1.5D0
 	  CALL GEN_IN(MDOT,'New mass-loss rate in Msun/yr')
+!
+	  CALL GEN_IN(OLD_LSTAR,'Old stellar luminosity in Lsun')
+	  T1=OLD_LSTAR*(NEW_RSTAR/OLD_R(ND_OLD))**2
+	  WRITE(6,*)RED_PEN
+	  WRITE(6,'(A,ES14.4)')'New luminosity if Teff is to be preserved',T1
+	  WRITE(6,*)DEF_PEN
 !
 	  WRITE(6,'(A)')
 	  WRITE(6,'(A)')'Type 1: W(r).V(r) = Vinf*(1-rx/r)**BETA'
@@ -731,24 +744,35 @@
               SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
 	    END DO
 	  ELSE
-	    BETA2=BETA
-	    CALL GEN_IN(BETA2,'Beta2 for velocity law')
 	    SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
 	    WRITE(6,*)'  Transition radius is',R_TRANS
 	    WRITE(6,*)'Transition velocity is',V_TRANS
 	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
+!
+	    SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
+	    WRITE(6,*)'  Transition radius is',R_TRANS
+	    WRITE(6,*)'Transition velocity is',V_TRANS
+	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
+	    ALPHA=2.0D0
+!	    IF(VEL_TYPE .EQ. 4)ALPHA=3.0D0
+	    BETA2=BETA
+	    CALL GEN_IN(BETA2,'Beta2 for velocity law')
 	    DO I=1,TRANS_I-1
 	      T1=R_TRANS/R(I)
 	      T2=1.0D0-T1
-	      TOP = 2.0D0*V_TRANS + (VINF-2.0D0*V_TRANS) * T2**BETA
-	      BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
-	      V(I) = TOP/BOT
-                                                                                
+	      T3=BETA+(BETA2-BETA)*T2
+	      TOP = (VINF-ALPHA*V_TRANS) * T2**T3
+	      BOT = 1.0D0 + (ALPHA-1.0D0)*exp( (R_TRANS-R(I))/SCALE_HEIGHT )
+
 !NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
-                                                                                
-	      dTOPdR = (VINF - 2.0D0*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
-	      dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
+
+	      dTOPdR = (VINF - ALPHA*V_TRANS) * BETA * T1 / R(I) * T2**(T3-1.0D0) +
+	1                  T1*TOP*(BETA2-BETA)*(1.0D0+LOG(T2))/R(I)
+	      dBOTdR=  (ALPHA-1.0D0)*exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
+!
+	      TOP = ALPHA*V_TRANS + TOP
 	      dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
+	      V(I) = TOP/BOT
               SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
 	    END DO
 	  END IF

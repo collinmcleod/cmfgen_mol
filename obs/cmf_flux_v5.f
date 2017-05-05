@@ -88,7 +88,7 @@
         LUER=ERROR_LU()
         CALL GEN_ASCI_OPEN(LUER,'OUT_FLUX','UNKNOWN','APPEND',' ',IZERO,IOS)
         IF(IOS .NE. 0)THEN
-          WRITE(LUER,*)'Error opening OUTGEN in CMFGEN, IOS=',IOS
+          WRITE(LUER,*)'Error opening OUT_FLUX in CMF_FLUX_V5, IOS=',IOS
           STOP
         END IF
         CALL SET_LINE_BUFFERING(LUER)

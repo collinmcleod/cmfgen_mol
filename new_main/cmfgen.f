@@ -74,6 +74,7 @@
 	LOGICAL AT_LEAST_ONE_ION_PRES
 	LOGICAL FND_END_OF_IONS
 	LOGICAL DO_TERM_OUT
+	CHARACTER(LEN=20) TIME
 !
 ! Set constants.
 !
@@ -105,6 +106,8 @@
 	  STOP
 	END IF
 	CALL SET_LINE_BUFFERING(LUWARN)
+        CALL DATE_TIME(TIME)
+        WRITE(LUER,'(//,'' Model started on:'',15X,(A))')TIME
 !
 ! Set all atomic data. New species can be simple added by insertion.
 ! Try to add species in order of atomic number. Hydrogen should ALWAYS

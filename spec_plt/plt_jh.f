@@ -117,6 +117,7 @@
 !
 	INTEGER IOS			!Used for Input/Output errors.
 	INTEGER I,J,K,L,ML,ISAV
+	INTEGER NINS
 	INTEGER NU_INDX
 	INTEGER ST_REC
 	INTEGER REC_LENGTH
@@ -127,6 +128,7 @@
 	REAL*8 RADIUS
 	REAL*8 T1,T2,T3
 	REAL*8 RVAL
+	REAL*8 DELR
 	REAL*8 LAMC
 	REAL*8 FREQ_VAL
 	REAL*8 EDGE_FREQ
@@ -261,6 +263,7 @@
 	  WRITE(6,*)'RECORD for reading R, V and SIGMA is',ST_REC
 	  IF(ST_REC .EQ. 0)THEN
 	    ZM(ID)%RV_PRES=.FALSE.
+	    ZM(ID)%R=0.0D0; ZM(ID)%V=0.0; ZM(ID)%LANG_COORD=0.0D0
 	  ELSE
 	    ZM(ID)%RV_PRES=.TRUE.
 	    READ(LU_IN,REC=ST_REC)ZM(ID)%R
@@ -382,11 +385,31 @@
 	END IF
 	CLOSE(LU_IN)
 !
-	 IF(ND_ATM .NE. ZM(1)%ND)THEN
-	   WRITE(6,*)' ' 
-	   WRITE(6,*)' WARNING -- ND in RVTJ differs from that assoicated with main input file ' 
-	   WRITE(6,*)' ' 
-	 END IF
+	IF(ND_ATM .EQ. ZM(1)%ND)THEN
+          IF(ZM(1)%R(1) .EQ. 0.0D0)THEN
+	    WRITE(6,*)' Setting R and V to values in RVTJ'
+	    ZM(1)%R=R; ZM(1)%V=V
+	  END IF
+	ELSE IF( MOD(ZM(ID)%ND+1,ND_ATM) .EQ. 0)THEN
+	  NINS=(ZM(ID)%ND+1)/ND_ATM-1
+	  ZM(ID)%R(1)=R(1); ZM(ID)%V(1)=V(1)
+	  J=1
+	  DO I=1,ND_ATM-1
+	    DELR=LOG(R(I+1)/R(I))/K
+	    DO L=1,NINS
+	      J=J+1
+	      ZM(ID)%R(J)=ZM(ID)%R(J-1)*EXP(DELR)
+	    END DO
+	    J=J+1
+	    ZM(ID)%R(J)=R(I+1); ZM(ID)%V(J)=V(I+1)
+	  END DO
+	  WRITE(6,*)'Warning -- set R grin to RVTJ file wiyh interpolation'
+	  WRITE(6,*)'Use interp option to set other values.'
+	ELSE
+	  WRITE(6,*)' ' 
+	  WRITE(6,*)' WARNING -- ND in RVTJ differs from that assoicated with main input file ' 
+	  WRITE(6,*)' ' 
+	END IF
 !
 ! Now compute the important optical depth scales.
 !
@@ -577,7 +600,7 @@
 	  DEALLOCATE (TA)
 	  ALLOCATE (TA(MAX(ND_ATM,ND_MAX)))
 	  DO ID=1,NUM_FILES
-	    IF(ZM(ID)%R(1) .NE. 0.0D0)THEN
+	    IF(ZM(ID)%R(1) .NE. 0.0D0 .AND. ZM(ID)%ED(1) .EQ. 0.0D0)THEN
 	      ND=ZM(ID)%ND-2
 !
               ZM(ID)%ED(1)=ED(1); ZM(ID)%ED(ND+2)=ED(ND_ATM)
@@ -652,6 +675,7 @@
 	  DO ID=1,NUM_FILES
 	    WRITE(T_OUT,'(A,I2,A,A)')' ID=',ID,'          ',TRIM(ZM(ID)%FILENAME)
 	  END DO
+!
 	ELSE IF(X(1:6) .EQ. 'RD_MOD')THEN
 	  NUM_FILES=NUM_FILES+1
 	  ID=NUM_FILES
@@ -686,9 +710,32 @@
 	      END IF
 	    END DO
 	    READ(LU_IN,REC=RV_REC)ST_REC
-	    READ(LU_IN,REC=ST_REC)ZM(ID)%R
-	    READ(LU_IN,REC=ST_REC+1)ZM(ID)%V
-	    READ(LU_IN,REC=ST_REC+2)ZM(ID)%LANG_COORD
+	    IF(ST_REC  .NE. 0)THEN
+	      READ(LU_IN,REC=ST_REC)ZM(ID)%R
+	      READ(LU_IN,REC=ST_REC+1)ZM(ID)%V
+	      READ(LU_IN,REC=ST_REC+2)ZM(ID)%LANG_COORD
+	    ELSE IF(ND_ATM .EQ. ZM(ID)%ND)THEN
+	      ZM(ID)%R=R; ZM(ID)%V=V; ZM(ID)%ED=ED
+	      ZM(ID)%T=T; ZM(ID)%TAU_ES=TAU_ES
+	      WRITE(6,*)'Setting R and V for model to values from RVTJ file'
+	    ELSE IF(MOD(ZM(ID)%ND+1,ND_ATM) .EQ. 0)THEN
+	      NINS=(ZM(ID)%ND+1)/ND_ATM-1
+	      ZM(ID)%R(1)=R(1)
+	      J=1
+	      DO I=1,ND_ATM-1
+	        DELR=LOG(R(I+1)/R(I))/K
+	        DO L=1,NINS
+	          J=J+1
+	          ZM(ID)%R(J)=ZM(ID)%R(J-1)*EXP(DELR)
+	        END DO
+	        J=J+1
+	        ZM(ID)%R(J)=R(I+1)
+	      END DO
+	      WRITE(6,*)'Warning -- set R grin to RVTJ file wiyh interpolation'
+	      WRITE(6,*)'Use interp option to set other values.'
+	    ELSE
+	      WRITE(6,*)'Warning -- no R grid available some options may cause code to crash'
+	    END IF
 	  CLOSE(LU_IN)
 	  WRITE(T_OUT,*)'Successfully read in ',TRIM(ZM(ID)%FILENAME),' file'
 	  WRITE(T_OUT,*)'Number of depth points is',ZM(ID)%ND

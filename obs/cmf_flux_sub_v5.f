@@ -911,20 +911,29 @@
 ! a blanketed model spectrum to be divided by an unblanketed model
 ! spectrum.
 !
-	T1=NU(1)/(1.0D0+2.0D0*VINF/C_KMS)
-	NU_MAX_OBS=MIN(T1,NU(3))
-	T1=NU(NCF)*(1.0D0+2.0D0*VINF/C_KMS)
-	NU_MIN_OBS=MAX(NU(NCF-3),T1)
-	CALL INS_LINE_OBS_V4(OBS_FREQ,N_OBS,NCF_MAX,
+	CALL TUNE(1,'INS_LINE_OBS')
+	  WRITE(LUER,*)'Calling INS_LINE_OBS_V4'
+	  T1=NU(1)/(1.0D0+2.0D0*VINF/C_KMS)
+	  NU_MAX_OBS=MIN(T1,NU(3))
+	  T1=NU(NCF)*(1.0D0+2.0D0*VINF/C_KMS)
+	  NU_MIN_OBS=MAX(NU(NCF-3),T1)
+	  CALL INS_LINE_OBS_V4(OBS_FREQ,N_OBS,NCF_MAX,
 	1               VEC_FREQ,VEC_STRT_FREQ,VEC_VDOP_MIN,VEC_TRANS_TYPE,
 	1               N_LINE_FREQ,SOB_FREQ_IN_OBS,
 	1		NU_MAX_OBS,NU_MIN_OBS,VINF,
 	1               FRAC_DOP_OBS,dV_OBS_PROF,dV_OBS_WING,dV_OBS_BIG,
 	1               OBS_PRO_EXT_RAT,ES_WING_EXT,VTURB_MAX)
+	  WRITE(LUER,*)'Finished calling INS_LINE_OBS_V4'
+	CALL TUNE(2,'INS_LINE_OBS')
 !
+	CALL TUNE(1,'SET_PROF_STORE')
+	WRITE(LUER,*)'Setting pofile storage'
 	CALL GET_PROFILE_STORAGE_LIMITS(NLINES_PROF_STORE,NFREQ_PROF_STORE,
 	1         LINE_ST_INDX_IN_NU,LINE_END_INDX_IN_NU,PROF_TYPE,N_LINE_FREQ,NCF)
 	CALL INIT_PROF_MODULE(ND,NLINES_PROF_STORE,NFREQ_PROF_STORE)
+	WRITE(LUER,*)'Finished set profile storage'
+	CALL TUNE(2,'SET_PROF_STORE')
+	CALL TUNE(3,' ')
 !
 ! 
 ! Need to calculate impact parameters, and angular quadrature weights here
@@ -1499,6 +1508,13 @@
 	        CHI(I)=0.1D0*ETA(I)*(CHI_CONT(I)-ESEC(I))/ETA_CONT(I)
 	        NEG_OPACITY(I)=.TRUE.
 	        AT_LEAST_ONE_NEG_OPAC=.TRUE.
+	        IF(CHI(I) .LE. 0.0D0)THEN
+	          WRITE(6,*)'Possible error -- CHI still negative after correction'
+	          WRITE(6,'(A,I4,5X,A,ES16.10)')'Depth=',I,'Freq=',FL
+	          WRITE(6,'(5(8X,A))')'   ETA','ETA_CONT','    CHI','CHI_CONT','   ESEC'
+	          WRITE(6,'(5ES16.10)')ETA(I),ETA_CONT(I),CHI(I),CHI_CONT(I),ESEC(I)
+	          CHI(I)=0.1D0*ESEC(I)
+	         END IF
 	      ELSE IF(CHI(I) .LT. 0.1D0*ESEC(I))THEN
 	        CHI(I)=0.1D0*ESEC(I)
 	        NEG_OPACITY(I)=.TRUE.
@@ -1780,7 +1796,10 @@
 	  CLOSE(UNIT=J)
 !
 	END IF
-	IF(.NOT. COMPUTE_J)STOP
+	IF(.NOT. COMPUTE_J)THEN
+	  I=3; CALL TUNE(I,' ')
+	  STOP
+	END IF
 !
 	COMPUTE_EDDFAC=.FALSE.
 !

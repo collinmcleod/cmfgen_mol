@@ -75,7 +75,7 @@
 	INTEGER NCF
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
-	CHARACTER(LEN=12), PARAMETER :: PRODATE='17-Oct-2016'		!Must be changed after alterations
+	CHARACTER(LEN=12), PARAMETER :: PRODATE='05-May-2017'		!Must be changed after alterations
 !
 ! 
 !
@@ -2245,7 +2245,9 @@
 	  CALL TUNE(ITWO,'EVALSE')
 	END IF
 !
-	CALL EVALSE_LOWT_V1(RJ,NU(ML),FQW(ML),COMPUTE_BA,NT,ND)
+	CALL TUNE(IONE,'LOWT')
+	CALL EVALSE_LOWT_V2(RJ,NU(ML),FQW(ML),COMPUTE_BA,NT,ND,FIRST_FREQ)
+	CALL TUNE(ITWO,'LOWT')
 !
 ! 
 ! Note that ATM(ID+2)%EQXzV is the ion equation. Since Auger ionization,
@@ -2304,7 +2306,7 @@
 	END IF 			!Only evaluate if last iteration.
 !
 	IF(LST_ITERATION)THEN
-	  CALL PRRR_LOWT_V1(RJ,NU(ML),FQW(ML),ND)
+	  CALL PRRR_LOWT_V2(RJ,NU(ML),FQW(ML),ND,FIRST_FREQ)
 	END IF
 !
 ! 
