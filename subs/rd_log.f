@@ -170,6 +170,7 @@ C
 	SUBROUTINE RD_NCHAR(VALUE,KEY,NCHAR,LUI,LUO,A)
 	IMPLICIT NONE!
 !
+! Altered 03-Aug-2017: Fixed bug with long string write.
 ! Altered 21-Nov-2000: Changed to allow long strings to be read.
 !
 	INTEGER LUI,LUO,NCHAR,KEY_LOC,K
@@ -194,12 +195,12 @@ C
 C Now set value
 C
 	VALUE=' '
-	VALUE=STRING(1:KEY_LOC-1)
+	VALUE=ADJUSTL(STRING(1:KEY_LOC-1))
 	K=LEN_TRIM(VALUE)
-	IF(NCHAR .LE. K)THEN
-	  STRING=' '
-	  STRING(13-K:12)=VALUE
-	END IF
+!	IF(NCHAR .LE. K)THEN
+!	  STRING=' '
+!	  STRING(13-K:12)=VALUE
+!	END IF
 	WRITE(LUO,10)STRING(1:MAX(12,K)),KEY,A
 10	FORMAT(1X,A,5X,'[',A,']',T35,A)
 C

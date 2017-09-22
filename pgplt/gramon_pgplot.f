@@ -103,7 +103,7 @@
 	CHARACTER*6 TO_TEK
 	CHARACTER*2 TO_VT
 	CHARACTER(LEN=10) LAM_OPTION
-	CHARACTER*50 PLT_ID,RD_PLT_ID,PLT_ID_SAV
+	CHARACTER(LEN=50) PLT_ID,RD_PLT_ID,PLT_ID_SAV
 !
 ! Vector arrays
 !
@@ -266,6 +266,8 @@
 	REAL*4 TOTXMM,TOTYMM,SCALEFACY,SCALEFAC
 	REAL*4 PRINTX1,PRINTX2,PRINTY1,PRINTY2
 !
+	LOGICAL SMOOTH_PLOT(MAX_PLTS)
+	LOGICAL BOX_FILTER
 	LOGICAL LONG_PLOT
 	REAL*4 LENGTH_OF_HC_PLOT
 	REAL*4 LP_ASR
@@ -1219,10 +1221,10 @@ C
 	      IF(END_CURS(CURSVAL))GOTO 1000
 830	      WRITE(T_OUT,810,ADVANCE='NO')
 810	      FORMAT(1X,'Desc(LOC,ORI,''STRING''): ')
-	      READ(T_IN,'(A)',ERR=830)WK_STR
+	      READ(T_IN,'(A)',ERR=830,END=1000)WK_STR
 	      READ(WK_STR,*,ERR=830)LOC(ISTR)
 	      IF(LOC(ISTR) .EQ. 0)GOTO 1000
-	      READ(WK_STR,*,ERR=830)LOC(ISTR),ORIENTATION(ISTR),STRING(ISTR)
+	      READ(WK_STR,*,ERR=830,END=1000)LOC(ISTR),ORIENTATION(ISTR),STRING(ISTR)
 	      FLAGSTR(ISTR)=.TRUE.
 	    END IF
 	    ISTR=ISTR+1
@@ -1444,6 +1446,24 @@ C
 	  END DO
 !
 ! 
+	ELSE IF (ANS .EQ. 'REP')THEN
+	  IF(NPLTS .EQ. 1)THEN
+	    PLOT_ID=1
+	  ELSE
+	    CALL NEW_GEN_IN(PLOT_ID,'Plot for simple data replacement:')
+	  END IF
+	  DO J=1,10
+	    CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
+	    IF(END_CURS(CURSVAL))EXIT
+	    CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
+	    IF(END_CURS(CURSVAL))EXIT
+	    SLOPE=(YCUR(2)-YCUR(1))/(XCUR(2)-XCUR(1))
+	    DO I=1,NPTS(PLOT_ID)
+	      IF( (CD(PLOT_ID)%XVEC(I)-XCUR(1))*(CD(PLOT_ID)%XVEC(I)-XCUR(2)) .LT. 0.0D0)THEN
+                CD(PLOT_ID)%DATA(I)=YCUR(1)+SLOPE*(CD(PLOT_ID)%XVEC(I)-XCUR(1))
+	      END IF
+	    END DO
+	  END DO
 !
 ! Define a crude straight line continuum about a line, so the EW can be
 ! computed.
@@ -1485,6 +1505,72 @@ C
             CD(IP)%DATA(1:I)=CONT(1:I)
             NPTS(IP)=I
             ERR(IP)=.FALSE.
+            IF(IP .GT. NPLTS)NPLTS=IP
+	  END IF
+	  GOTO 1000
+!
+	ELSE IF (ANS .EQ. 'CONT')THEN
+	  IF(NPLTS .EQ. 1)THEN
+	    PLOT_ID=1
+	  ELSE
+	    IOS=-1
+	    DO WHILE(IOS .NE. 0)
+	      IOS=0
+	      CALL NEW_GEN_IN(PLOT_ID,'Plot to determine EW for:')
+	      IF(PLOT_ID .LT. 0 .OR. PLOT_ID .GT. NPLTS)THEN
+	        IOS=-1
+	        WRITE(6,*)'Error - invalid plot number - try again'
+	      END IF
+	    END DO
+	  END IF
+	  IF(ALLOCATED(CONT))DEALLOCATE(CONT)
+	  ALLOCATE(CONT(NPTS(PLOT_ID)))
+	  CONT=CD(PLOT_ID)%DATA
+!
+	  CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
+	  DO J=1,30
+	    XCUR(1)=XCUR(2); YCUR(1)=YCUR(2)
+	    CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
+	    IF(END_CURS(CURSVAL))EXIT
+	    SLOPE=(YCUR(2)-YCUR(1))/(XCUR(2)-XCUR(1))
+	    DO I=1,NPTS(PLOT_ID)
+	      IF( (CD(PLOT_ID)%XVEC(I)-XCUR(1))*(CD(PLOT_ID)%XVEC(I)-XCUR(2)) .LT. 0)THEN
+                CONT(I)=YCUR(1)+SLOPE*(CD(PLOT_ID)%XVEC(I)-XCUR(1))
+	      END IF
+	    END DO
+	  END DO
+!
+	  CALL PGLINE(NPTS(PLOT_ID),CD(PLOT_ID)%XVEC,CONT)
+	  CONTINUUM_DEFINED=.TRUE.
+	  IP=NPLTS+1;    IOS=-1
+	  DO WHILE(IOS .NE. 0)
+	    IOS=0
+	    CALL NEW_GEN_IN(IP,'Output plot?')
+	    IF(IP .LT. 0 .OR. IP .GT. NPLTS+1)THEN
+	      IOS=-1
+	      WRITE(6,*)'Error - invalid plot number - try again'
+	    END IF
+	  END DO
+          ERR(IP)=.FALSE.
+	  TYPE_CURVE(IP)='L'
+	  IF(IP .EQ. PLOT_ID)THEN
+            CD(IP)%DATA=CONT
+	  ELSE
+	    IF(ALLOCATED(CD(IP)%XVEC))THEN
+	      DEALLOCATE (CD(IP)%XVEC)
+	      DEALLOCATE (CD(IP)%DATA)
+	    END IF
+	    I=NPTS(PLOT_ID)
+	    ALLOCATE (CD(IP)%XVEC(I),STAT=IOS)
+	    IF(IOS .EQ. 0)ALLOCATE (CD(IP)%DATA(I),STAT=IOS)
+	    IF(IOS .NE. 0)THEN
+	      WRITE(T_OUT,*)'Error: unable to allocate new data vectors'
+	      WRITE(T_OUT,*)'IOS=',IOS
+	      STOP
+	    END IF
+            CD(IP)%XVEC=CD(PLOT_ID)%XVEC
+	    CD(IP)%DATA=CONT
+            NPTS(IP)=I
             IF(IP .GT. NPLTS)NPLTS=IP
 	  END IF
 	  GOTO 1000
@@ -1550,7 +1636,7 @@ C
 	1               (CD(IP)%DATA(I+1)-CONT(I+1))/CONT(I+1) )*
 	1               (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
 	      CENTROID=CENTROID+T1*( CD(IP)%XVEC(I)*(CD(IP)%DATA(I)-CONT(I))/CONT(I)
-	1               + CD(IP)%XVEC(I)*(CD(IP)%DATA(I+1)-CONT(I+1))/CONT(I+1) )*
+	1               + CD(IP)%XVEC(I+1)*(CD(IP)%DATA(I+1)-CONT(I+1))/CONT(I+1) )*
 	1                 (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
 	    END DO
 	    IF(EW .NE. 0.0)THEN
@@ -1628,7 +1714,7 @@ C
 	            EW=EW+T1*( CD(IP)%DATA(I) + CD(IP)%DATA(I+1) )*
 	1                 (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
 	            CENTROID=CENTROID+T1*( CD(IP)%XVEC(I)*CD(IP)%DATA(I)
-	1               + CD(IP)%XVEC(I)*CD(IP)%DATA(I+1) )*
+	1               + CD(IP)%XVEC(I+1)*CD(IP)%DATA(I+1) )*
 	1                 (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
 	          END DO
 	          IF(EW .NE. 0.0)THEN
@@ -1794,8 +1880,7 @@ C
 	  ELSE IF(ANS .EQ. 'RPF')THEN
 	    CALL NEW_GEN_IN(PLT_ST_FILENAME,'Name of file with stored plots')
 	  END IF
-	  OPEN(UNIT=30,FORM='UNFORMATTED',FILE=PLT_ST_FILENAME,STATUS='OLD',
-	1          IOSTAT=IOS)
+	  OPEN(UNIT=30,FORM='UNFORMATTED',FILE=PLT_ST_FILENAME,STATUS='OLD',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(T_OUT,*)'Error opening file'
 	    GOTO 1000
@@ -1804,10 +1889,17 @@ C
 	  PLT_ID_SAV=' '
 !
 	  DO WHILE(1 .EQ. 1)
+!
+	    WRITE(6,*)' '
+	    WRITE(6,*)'The identifier must be unique, but need not be complete.'
+	    WRITE(6,*)' '
 	    CALL NEW_GEN_IN(PLT_ID,'PLT_ID=')
 	    IF(PLT_ID .EQ. ' ' .OR. PLT_ID .EQ. PLT_ID_SAV)EXIT
 	    RD_PLT_ID=' '
-	    DO WHILE(RD_PLT_ID .NE. 'PLT_ID='//PLT_ID)
+!
+	    PLT_ID='PLT_ID='//ADJUSTL(PLT_ID)
+	    I=LEN_TRIM(PLT_ID)
+	    DO WHILE(RD_PLT_ID(1:I) .NE. PLT_ID(1:I))
 	      READ(30,IOSTAT=IOS)RD_PLT_ID
 	      IF(IOS .EQ. -1)THEN
 	        WRITE(T_OUT,*)'Unable to identify plot --- IOS',IOS
@@ -1824,6 +1916,7 @@ C
 	        CLOSE(UNIT=30)
 	        GOTO 1000
 	      END IF
+	      I=LEN_TRIM(PLT_ID)
 	    END DO
 	    IP=NPLTS+1
 	    IF(IP .GT. MAX_PLTS)THEN
@@ -2292,6 +2385,26 @@ C
 	  CALL DO_VEC_OP(VAR_PLT1,VAR_PLT2,VAR_PLT3,.TRUE.,VAR_OPERATION)
 	  GOTO 1000
 !
+	ELSE IF (ANS .EQ. 'SM' .OR. ANS .EQ. 'BXSM')THEN
+	  IF(ANS .EQ. 'BXSM')THEN
+	    BOX_FILTER=.TRUE.
+	    I=3; CALL NEW_GEN_IN(I,'NPTS > 2 (should be odd)')
+	  ELSE
+	    BOX_FILTER=.FALSE.
+	    I=5; CALL NEW_GEN_IN(I,'NHAN > 2 (should be odd)')
+	  END IF
+	  IF(I .EQ. 2*(I/2))THEN
+	    WRITE(6,*)'Increasing number of points by one to make odd'
+	    I=I+1
+	  END IF
+	  SMOOTH_PLOT=.TRUE.
+	  DO IP=1,NPLTS
+	    WRITE(TMP_STR,'(I2)')IP
+	    TMP_STR='Smooth plot ('//TMP_STR(1:2)//')'
+	    CALL NEW_GEN_IN(SMOOTH_PLOT(IP),TRIM(TMP_STR))
+	  END DO
+	  CALL SMOOTH_PLT(SMOOTH_PLOT,BOX_FILTER,I)
+!
 	ELSE IF (ANS .EQ. 'FILL')THEN
 	  CALL NEW_GEN_IN(FILL,'Fill enclosed areas?')
 	  IF(FILL)THEN
@@ -2590,7 +2703,7 @@ C
 	1              .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    IST=1
 	    IEND=2
-	    T1=CD(IP)%XVEC(NPTS(IEND))-CD(IP)%XVEC(IST)
+	    T1=CD(IP)%XVEC(IEND)-CD(IP)%XVEC(IST)
 	    Q=PEN_COL(IP+PEN_OFFSET)-1
 	    DO WHILE(IEND .LT. NPTS(IP))
 	      DO WHILE(IEND .LT. NPTS(IP))
@@ -2609,7 +2722,12 @@ C
 	      CALL PGLINE(J,CD(IP)%XVEC(IST),CD(IP)%DATA(IST))
 	      IST=IEND+1
 	      IEND=IST+1
-	      T1=CD(IP)%XVEC(NPTS(IEND))-CD(IP)%XVEC(IST)
+	      T1=CD(IP)%XVEC(IEND)-CD(IP)%XVEC(IST)
+	      IF(T1 .EQ. 0.0D0)THEN
+	        WRITE(6,*)'Zero spacing in GRAMON-PGPLOT ', IST,IEND,IP
+	        IEND=IEND+1
+	        T1=CD(IP)%XVEC(NPTS(IEND))-CD(IP)%XVEC(IST)
+	      END IF  
 	    END DO
 !
 	  ELSE IF(TYPE_CURVE(IP) .EQ. 'LG')THEN

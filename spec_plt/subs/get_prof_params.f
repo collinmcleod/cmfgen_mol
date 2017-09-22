@@ -26,7 +26,7 @@
 !
 	MAXIMUM=-1000.0D0; MINIMUM=10000.0D0
 	DO J=1,NCF
-	  IF(XV(J) .GT. 0.95D0*LINE_WAVE .AND. XV(J) .LT. LINE_WAVE)THEN
+	  IF(XV(J) .GT. 0.96D0*LINE_WAVE .AND. XV(J) .LT. 0.997D0*LINE_WAVE)THEN
 	    IF(YV(J) .LT. MINIMUM)THEN
 	      MINIMUM=YV(J)
 	      IMIN=J
@@ -42,7 +42,7 @@
 	  END IF
 	END DO
 !
-! Find centroid, integreating between the limits set by Y=0
+! Find centroid, integrating between the limits set by Y=0
 !
 	DATA=YV-1.0D0
 	IF(MINIMUM .GT. 1.0D0 .AND. SN_AGE .GT. 30.0)DATA=DATA-MINIMUM

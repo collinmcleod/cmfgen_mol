@@ -43,7 +43,10 @@
 	EXTERNAL SPEED_OF_LIGHT,GET_INDX_DP,UC
 !
 	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07      !10^8/10^1
-	
+!
+	WRITE(6,*)' '	
+	WRITE(6,*)'Use default so line wavelenth requested'
+	WRITE(6,*)' '	
 	CALL USR_OPTION(LEV,ITWO,ITWO,'Levels','-1,-1','NL and NUP')
 	NL=LEV(1); NUP=LEV(2)
 	IF(NL .GE. 0 .AND. NUP .GE. 0)THEN
@@ -51,6 +54,10 @@
 	  RETURN
 	END IF
 !
+	WRITE(6,*)' '	
+	WRITE(6,*)' Writing more common line wavelengths'
+	WRITE(6,*)' '	
+	CALL WRITE_LINE_LAMBDAS(XSPEC)
 	CALL USR_OPTION(LAMBDA,'LAMBDA',' ','Wavelength of transition in Angstroms')
 	FREQ=ANG_TO_HZ/LAMBDA
 	K=GET_INDX_DP(FREQ,VEC_FREQ,NLINE_FREQ)

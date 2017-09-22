@@ -108,9 +108,9 @@ C
 	LOGICAL LOG_X,LOG_Y
 	CHARACTER*10 Y_PLT_OPT,X_UNIT
 	CHARACTER*80 IS_FILE
-	CHARACTER*80 FILENAME
 	CHARACTER*80 DIRECTORY 
 	CHARACTER*80 XKEY,YKEY
+	CHARACTER*200 FILENAME
 !
 ! Variable for applying interstellar absorption to model spectrum.
 !
@@ -1530,7 +1530,7 @@ C
 	    XV(I)=NU(I)
 	    YV(I)=YV(I)/NORM_LUM
 	  END DO
-	  WRITE(T_OUT,*)'Total Luminosoty is',T2
+	  WRITE(T_OUT,*)'Total Luminosity is',T2
 	  CALL CNVRT(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1                 LAMC,XAXIS,YAXIS,L_TRUE)
 	  CALL CURVE(NCF,XV,YV)

@@ -332,6 +332,19 @@
 	      CALL RD_STORE_2INT(NS,NF,TEMP_KEY,L_FALSE,' ')
 	      NV=NS
 	    END IF
+	    IF(NV .GT. NS)THEN
+	      NV=NS
+	      WRITE(LUER,*)'Warning NV should be less than, or equal to, NS -- resetting NV'
+	      WRITE(LUER,'(1X,A,I5,4X,A,I5)')'NV=',NV,'NS=',NS
+	      WRITE(LUER,*)'Species is ',TRIM(TEMP_KEY)
+	    END IF
+	    IF(NS .GT. NF)THEN
+	      WRITE(LUER,*)'Error NS should be less than, or equal to, NF'
+	      WRITE(LUER,'(1X,A,I5,4X,A,I5)')'NS=',NS,'NF=',NF
+	      WRITE(LUER,*)'Species is ',TRIM(TEMP_KEY)
+	      STOP
+	    END IF
+!
 	    IF(NS .NE. 0)THEN
 	      TEMP_KEY=TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(J))//'_F_TO_S'
 	      CALL FDG_F_TO_S_NS_V1(NF,NS,NV,FL_OPTION,SL_OPTION,IL_OPTION,LU_IN,TEMP_KEY)

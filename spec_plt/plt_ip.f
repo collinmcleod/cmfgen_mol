@@ -17,6 +17,7 @@
 	USE MOD_USR_HIDDEN
 	USE MOD_WR_STRING
 	USE GEN_IN_INTERFACE
+	USE MOD_COLOR_PEN_DEF
 !
 	IMPLICIT NONE
 !
@@ -432,8 +433,7 @@
 !
 ! 
 !
-! Simple option to compute inetgrated spectrum inside impact index I,
-! and outside index I.
+! Simple option to compute full spectrum. Can be directly compared with obs_fin.
 !
 	ELSE IF(X(1:2) .EQ. 'SP')THEN
 !
@@ -442,14 +442,17 @@
 	  ALLOCATE (XV(NCF))
 	  ALLOCATE (YV(NCF))
 !
-	  WRITE(6,*) HQW_AT_RMAX,R(ND)
 	  XV(1:NCF)=NU(1:NCF)
 	  YV(1:NCF)=0.0D0
 	  DO J=1,NP
 	    YV(1:NCF)=YV(1:NCF)+HQW_AT_RMAX(J)*IP(J,1:NCF)
 	  END DO
           T1=DISTANCE*1.0D+03*PARSEC()
-	  T1=2.0D0*R(ND)*R(ND)*PI*1.0D+23*(1.0E+10/T1)**2
+	  IF(PLANE_PARALLEL_MOD)THEN
+	    T1=2.0D0*R(ND)*R(ND)*PI*1.0D+23*(1.0E+10/T1)**2
+	  ELSE
+	    T1=2.0D0*R(1)*R(1)*PI*1.0D+23*(1.0E+10/T1)**2
+	  END IF
 	  YV(1:NCF)=YV(1:NCF)*T1
 !
 ! NB: J and I have the same units, apart from per steradian.
@@ -457,6 +460,9 @@
 	  CALL CNVRT_J(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         LAMC,XAXIS,YAXIS,L_FALSE)
 	  CALL CURVE(NCF,XV,YV)
+	  YAXIS='F\gn(Jy)'
+!
+! Option to compute spetrum inside, and outside, a particular impact parameter.
 !
 	ELSE IF(X(1:3) .EQ. 'ISP')THEN
 	  CALL USR_OPTION(I,'P',' ','Impact parameter index cuttoff')
@@ -468,7 +474,14 @@
 	  T1=P(I)*1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
 	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',P(I)*1.0E+10,' cm'
 	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',T1,' arcsec'
+	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',P(I)/6.96D0,' Rsun'
 	  WRITE(T_OUT,'(1X,A,1P,E14.6)')'    P(I)/R*=',P(I)/R(ND)
+	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'          d=',DISTANCE,' kpc'
+!
+	  WRITE(6,*)' '
+	  WRITE(6,*)RED_PEN,' Spectrum for p .LE. P(I)'
+	  WRITE(6,*)BLUE_PEN,' Spectrum for p .GE. P(I)'
+	  WRITE(6,*)DEF_PEN
 !
 	  IF(ALLOCATED(XV))DEALLOCATE(XV)
 	  IF(ALLOCATED(YV))DEALLOCATE(YV)
@@ -506,11 +519,7 @@
 	  CALL CNVRT_J(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         LAMC,XAXIS,YAXIS,L_FALSE)
 	  CALL CURVE(NCF,XV,YV)
-	  WRITE(6,*)XV(1),YV(1)
-!
-	  YAXIS(J:J)='I'
-	  J=INDEX(YAXIS,')')
-	  YAXIS(J:)=' Jy'
+	  YAXIS='F\gn(Jy)'
 !
 	ELSE IF(X(1:2) .EQ. 'IP' .OR. X(1:2) .EQ. 'FP' .OR.
 	1          X(1:3) .EQ. 'FAP')THEN
@@ -1259,7 +1268,8 @@
 	    WRITE(6,*)' CF:   Plot cummulative spectrum as a function of impact parameter'
 	    WRITE(6,*)' IP:   Plot spectrum at a given impact parameter'
 	    WRITE(6,*)' IMU:  Plot intensity as a function of MU for a given frequency'
-	    WRITE(6,*)' SP:   Plot spectrum inside and outside impact parameter p'
+	    WRITE(6,*)' SP:   Plot full spectrum'
+	    WRITE(6,*)' ISP:  Plot spectrum inside and outside impact parameter p'
 	    WRITE(6,*)' INU:  Plot I(p) for a given frequency'
 	    WRITE(6,*)' INU2: Plot I(p) for a given frequency band'
 	    WRITE(6,*)' IF2:  Plot normalize Flux originating inside p for a given frequency band'

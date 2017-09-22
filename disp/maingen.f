@@ -328,6 +328,7 @@
 	CHARACTER(LEN=80) STRING
 	CHARACTER(LEN=10) COL_OPT
 	CHARACTER(LEN=80) FILENAME
+	CHARACTER(LEN=200) PWD
 !
 	CHARACTER FMT*80
 	CHARACTER*120 DEFAULT
@@ -1787,7 +1788,7 @@
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 !
-	ELSE IF(XOPT .EQ. 'E')THEN
+	ELSE IF(XOPT .EQ. 'LTE')THEN
 	  INCLUDE 'EVAL_LTE_FULL.INC'
 !
 ! 
@@ -3198,9 +3199,11 @@
 !
 	    IF(ANG_TO_HZ/FL .GT. LAM_ST .AND. ANG_TO_HZ/FL .LT. LAM_EN)THEN
 	      DONE_LINE=.FALSE.
+	      IF(XSPEC .EQ. 'ALL')XSPEC=' '
 	      DO ID=1,NUM_IONS
 	        IF(VEC_SPEC(LINE_INDX) .EQ. ION_ID(ID) .AND.
-	1           (XSPEC .EQ. ' ' .OR. XSPEC .EQ. UC(ION_ID(ID))) )THEN
+	1           ( XSPEC .EQ. ' ' .OR. XSPEC .EQ. UC(ION_ID(ID)) .OR. 
+	1             XSPEC .EQ. SPECIES(SPECIES_LNK(ID)) ))THEN
 	          T1=ATM(ID)%W_XzV_F(MNUP_F,I)/ATM(ID)%W_XzV_F(MNL_F,I)
 	          CHIL(I)=OPLIN*VEC_OSCIL(LINE_INDX)*(
 	1            T1*ATM(ID)%XzV_F(MNL_F,I)-
@@ -6026,6 +6029,10 @@ c
 	      IF(IOS .NE. 0)THEN
 	         WRITE(T_OUT,*)'Error - unable to open old LINEDATA file'
 	      END IF
+	      CALL GETCWD(PWD)
+	      WRITE(25,'(A)')'!'
+	      WRITE(25,'(A,A)')'! Model directory is ',TRIM(PWD)
+	      WRITE(25,'(A)')'!'
 	    END IF
 	    WRITE(25,*)' '
 	    WRITE(25,'(1X,A,A,I3,A,I3,A,T25,A,T40,A)')
@@ -6050,8 +6057,11 @@ c
 	1                  'File name (existing file will be overwrittem')
 	      OPEN(UNIT=25,FILE=FILENAME,STATUS='UNKNOWN')
 	    END IF
-   	    WRITE(25,'(1X,A,T25,A,T40,A)')'09-Mar-1994',
-	1            '[Date]','Revised format date'
+	    CALL GETCWD(PWD)
+	    WRITE(25,'(A)')'!'
+	    WRITE(25,'(A,A)')'! Model directory is ',TRIM(PWD)
+	    WRITE(25,'(A)')'!'
+   	    WRITE(25,'(1X,A,T25,A,T40,A)')'16-Sep-2017','[Date]','Revised format date'
    	    WRITE(25,'(1X,A,T25,A,T40,A)')TRIM(NAME),
 	1            '[MOD_ID]','Model'
 	    IF(XOPT .EQ. 'WRL')THEN

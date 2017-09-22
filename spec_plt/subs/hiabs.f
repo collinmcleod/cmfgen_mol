@@ -18,6 +18,7 @@ C EZ CMa spectrum to revel the ``true'' spectrum.  This modification started
 C on 4-30-92 by SRM.
 C
 	SUBROUTINE HIABS(WAVE,FLUX,NLAM,V_TURB,LOG_NTOT,T_IN_K)
+	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 C
 C Altered 16-Apr-2008: PAUSE used if cannot find file with line list.
@@ -54,6 +55,8 @@ C
 	REAL*8 T1
 C
 	INTEGER I,J,IOS
+	LOGICAL DO_SYS
+	CHARACTER(LEN=100) STRING
 C
 C Functions
 C
@@ -76,8 +79,18 @@ C
 	OPEN(UNIT=10,FILE='HI_IS_LINE_LIST',ACTION='READ',STATUS='OLD',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(6,*)'HI_IS_LINE_LIST file not found'
-	    WRITE(6,*)'Use astxt to assign file, then hit any character and return/enter'
-	    READ(6,'(A)')TMP_STR 
+	    CALL GET_ENVIRONMENT_VARIABLE('CMFDIST',STRING)
+            STRING=TRIM(STRING)//'/com/assign_txt_files_tcsh.sh'
+	    WRITE(6,*)'I can assign the file with the following command'
+	    WRITE(6,*)'    ',TRIM(STRING)
+	    DO_SYS=.TRUE.
+	    CALL GEN_IN(DO_SYS,'Do you want me to issue the CMFGEN assignment command')
+	    IOS=0
+	    IF(DO_SYS)CALL SYSTEM(STRING)
+	    IF(.NOT. DO_SYS .OR. IOS .NE. 0)THEN
+	      WRITE(6,*)'Use astxt to assign file, then hit any character and return/enter'
+	      READ(5,'(A)')TMP_STR 
+	    END IF
 	    GOTO 100
 	  END IF
 	  DO I=1,NHYD

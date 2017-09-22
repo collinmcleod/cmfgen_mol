@@ -5,6 +5,8 @@ C
 C  (a) The full atoms.
 C  (B) The Super-Level model atom.
 C
+C Altered 28-Jun-2017 - LOG_XzVLTE_F is now defined for the last ionization stage of each species.
+C                         Only caused a problem if a depth value was set to NAN. 
 C Altered 26-Oct-1995
 C Created 1-Oct-1990 (Section taken from CMFGEN)>
 C
@@ -23,6 +25,7 @@ C
 	      DO I=1,ND
 	        ATM(ID+1)%XzV_F(1,I)=ATM(ID)%DXzV_F(I)
 	        ATM(ID+1)%XzVLTE_F(1,I)=ATM(ID)%DXzV_F(I)
+                ATM(ID+1)%LOG_XzVLTE_F(1,I)=LOG(ATM(ID)%DXzV_F(I))
 	      END DO
 	    END IF
 	  END IF

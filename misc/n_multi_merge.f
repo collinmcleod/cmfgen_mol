@@ -34,6 +34,8 @@
 !
 	WRITE(LU_TERM,*)' '
 	WRITE(LU_TERM,*)'Program to merge N plots in C columns'
+	WRITE(LU_TERM,*)'1x3 plots (cr): ',
+	1    'EXPAND_CHAR=2.5; EXPAND_TICK=2.5; ASR=0.45; Plot Size=17.0 cm'
 	WRITE(LU_TERM,*)'2x3 plots (cr): ',
 	1    'EXPAND_CHAR=1.2; EXPAND_TICK=1.2; ASR=0.89; Plot Size=9.5 cm'
 	WRITE(LU_TERM,*)'2x5 plots (cr): ',
@@ -50,7 +52,10 @@
 	WRITE(HOR_OFFSET,'(I4)')I
 	I=7900-1300*NROWS
 	WRITE(VER_OFFSET,'(I4)')I
-	IF(NCOLS .EQ. 3 .AND. NROWS .EQ. 5)THEN
+	IF(NCOLS .EQ. 1 .AND. NROWS .EQ. 1)THEN
+	  HOR_OFFSET='0'
+	  VER_OFFSET='4100'
+	ELSE IF(NCOLS .EQ. 3 .AND. NROWS .EQ. 5)THEN
 	  HOR_OFFSET='3200'
 	  VER_OFFSET='2300'
 	ELSE IF(NCOLS .EQ. 2 .AND. NROWS .EQ. 5)THEN

@@ -1021,7 +1021,8 @@
 	ELSE IF(X(1:2) .EQ. 'JD' .OR. X(1:5) .EQ. 'RSQJD')THEN
 !
 	  CALL USR_OPTION(I,'Depth',' ','Depth index in model 1')
-	  ISAV=I
+	  ISAV=MIN(I,ZM(1)%ND)
+	  ISAV=MAX(ISAV,1)
 	  RVAL=ZM(1)%R(ISAV)
 !
 	  SCALE_FAC=1.0D0

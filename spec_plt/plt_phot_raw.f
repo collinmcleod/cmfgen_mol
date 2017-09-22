@@ -158,6 +158,7 @@
 	      READ(STRING,*)SPLITJ_1
 	    ELSE IF( INDEX(STRING,'!Excitation energy of final state') .NE. 0)THEN
 	      READ(STRING,*)EXC_EN_1
+	      EXC_EN_1=1.0D-15*EXC_EN_1*SPEED_OF_LIGHT()
 	    ELSE IF( INDEX(STRING,'!Number of energy levels') .NE. 0)THEN
 	      READ(STRING,*)NLEV_1
 	      ALLOCATE (TYPE_1(NLEV_1),NUM_VALS_1(NLEV_1),LOC_1(NLEV_1),
@@ -322,6 +323,7 @@
 	      READ(STRING,*)GION_2
 	    ELSE IF( INDEX(STRING,'!Excitation energy of final state') .NE. 0)THEN
 	      READ(STRING,*)EXC_EN_2
+	      EXC_EN_2=1.0D-15*EXC_EN_2*SPEED_OF_LIGHT()
 	    ELSE IF( INDEX(STRING,'!Split J levels') .NE. 0)THEN
 	      READ(STRING,*)SPLITJ_2
 	    ELSE IF( INDEX(STRING,'!Number of energy levels') .NE. 0)THEN

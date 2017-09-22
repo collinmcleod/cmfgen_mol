@@ -43,6 +43,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(simp_ew.o)\
       $(LIB)(strip_slash_p.o)\
       $(LIB)(shrink_vectors.o)\
+      $(LIB)(smooth_plt.o)\
       $(LIB)(spacing.o)\
       $(LIB)(vectorpen.o)\
       $(LIB)(gaus_fit_data.o)\

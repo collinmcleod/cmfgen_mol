@@ -24,7 +24,7 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(uvabs_v2.o)\
          $(LIB)(adjust_jes_v2.o)\
          $(LIB)(filt_pass_band.o)\
-         $(LIB)(get_prof_params.o)\
+         $(LIB)(get_prof_params_v2.o)\
          $(LIB)(cnvlv_es_one_par_v2.o)\
          $(LIB)(cnvlv_es_two_par_v2.o)\
          $(LIB)(cnvrt.o)\

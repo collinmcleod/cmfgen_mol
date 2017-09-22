@@ -81,10 +81,10 @@
 	INTEGER N_HEAD
 	INTEGER IOS
 	INTEGER PGCURS
+	INTEGER CURSERR
 !
 	LOGICAL ROUND_ERROR
 	LOGICAL RD_MEANOPAC
-	LOGICAL CURSERR
 	LOGICAL REPLOT
 !
         CHARACTER*30 UC
@@ -137,46 +137,49 @@
 	CALL GEN_IN(OPTION,'Enter option for revised RVSIG file')
 	OPTION=UC(TRIM(OPTION))
 !
-! Read in optical depth scale. Needed for RTAU and TAU options. Also used
+! Read in optical depth scale. Needed for SPP and TAU options. Also used
 ! for checking purposes (if available) for some other options.
 !
 ! We use TAU_SAV for dTAU, and is used to increase the precision of the TAU
 ! scale (as insufficient digits may be print out).
 !
-	IF(OPTION .EQ. 'SPP' .OR. OPTION .EQ. 'TAU')THEN
-	  ROUND_ERROR=.FALSE.
-	  OPEN(UNIT=20,FILE='MEANOPAC',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
-	    IF(IOS .EQ. 0)THEN
-	      READ(20,'(A)')STRING
-	      DO I=1,ND_OLD
-	        READ(20,*)RTMP(I),J,OLD_TAU(I),TAU_SAV(I),T1,CHI_ROSS(I)
-	        J=MAX(I,2)
-	        T1=OLD_R(J-1)-OLD_R(J)
-	        IF( ABS(RTMP(I)-R(I))/T1 .GT. 2.0D-03 .AND. .NOT. ROUND_ERROR)THEN
-	          WRITE(6,*)' '
-	          WRITE(6,*)'Possible eror with MEANOPAC -- inconsistent R grid'
-	          WRITE(6,*)'Error could simply be a lack of sig. digits in MEANOPAC'
-	          WRITE(6,*)' RMO(I)=',RTMP(I)
-	          WRITE(6,*)'   R(I)=',OLD_R(I)
-	          WRITE(6,*)' R(I+1)=',OLD_R(I+1)
-	          ROUND_ERROR=.TRUE.
-	          CALL GEN_IN(ROUND_ERROR,'Continue as only rounding error?')
-	          IF(.NOT. ROUND_ERROR)STOP
-	        END IF
-	      END DO
-	      DO I=8,1,-1
-                OLD_TAU(I)=OLD_TAU(I+1)-TAU_SAV(I)
-              END DO
-	      RD_MEANOPAC=.TRUE.
-	      WRITE(6,*)'Successfully read MEANOPAC'
-	    ELSE
-	      RD_MEANOPAC=.FALSE.
+	ROUND_ERROR=.FALSE.
+	OPEN(UNIT=20,FILE='MEANOPAC',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	  IF(IOS .EQ. 0)THEN
+	    READ(20,'(A)')STRING
+	    DO I=1,ND_OLD
+	      READ(20,*)RTMP(I),J,OLD_TAU(I),TAU_SAV(I),T1,CHI_ROSS(I)
+	      J=MAX(I,2)
+	      T1=OLD_R(J-1)-OLD_R(J)
+	      IF( ABS(RTMP(I)-R(I))/T1 .GT. 2.0D-03 .AND. .NOT. ROUND_ERROR)THEN
+	        WRITE(6,*)' '
+	        WRITE(6,*)'Possible eror with MEANOPAC -- inconsistent R grid'
+	        WRITE(6,*)'Error could simply be a lack of sig. digits in MEANOPAC'
+	        WRITE(6,*)' RMO(I)=',RTMP(I)
+	        WRITE(6,*)'   R(I)=',OLD_R(I)
+	        WRITE(6,*)' R(I+1)=',OLD_R(I+1)
+	        ROUND_ERROR=.TRUE.
+	        CALL GEN_IN(ROUND_ERROR,'Continue as only rounding error?')
+	        IF(.NOT. ROUND_ERROR)STOP
+	      END IF
+	    END DO
+	    DO I=8,1,-1
+              OLD_TAU(I)=OLD_TAU(I+1)-TAU_SAV(I)
+            END DO
+	    RD_MEANOPAC=.TRUE.
+	    WRITE(6,*)'Successfully read MEANOPAC'
+	  ELSE
+	    RD_MEANOPAC=.FALSE.
+	    WRITE(6,*)'MEANOPAC has not been read'
+	    IF(OPTION .EQ. 'SPP' .OR. OPTION .EQ. 'TAU')THEN
+	      WRITE(6,*)'MENAOPAC  is equired for the TAU option'
+	      STOP
 	    END IF
-	    IF(ROUND_ERROR .AND. RD_MEANOPAC)THEN
-	      RTMP(1:ND_OLD)=OLD_R(1:ND_OLD)
-	    END IF 
-	  CLOSE(UNIT=20)
-	END IF
+	    CLOSE(UNIT=20)
+	  END IF
+	  IF(ROUND_ERROR .AND. RD_MEANOPAC)THEN
+	     RTMP(1:ND_OLD)=OLD_R(1:ND_OLD)
+	  END IF 
 !
 	IF(OPTION .EQ. 'SPP')THEN
 	  WRITE(6,'(A)')' '

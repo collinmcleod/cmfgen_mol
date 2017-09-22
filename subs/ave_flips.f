@@ -6,6 +6,8 @@
 	SUBROUTINE AVE_FLIPS(NEW_POPS,POPS,NT,ND,CUR_IT_NO,NUM_OSC,SIMPLE,AV_DONE)
 	IMPLICIT NONE
 !
+! Aletered 06-Jul-2017: Routine returns AV_DONE=.FALSE is ICOUNT (number of flips) is zero.
+! 
 	INTEGER NT
 	INTEGER ND
 	REAL*8 NEW_POPS(NT*ND)
@@ -86,7 +88,7 @@
 	  ICOUNT=ICOUNT+1
 100	  CONTINUE
 	END DO
-	AV_DONE=.TRUE.
+	IF(ICOUNT .GT. 0)AV_DONE=.TRUE.
 	WRITE(LUER,*)'Number of averages performed in AVE_FLIPS is',ICOUNT
 	WRITE(LUER,*)'      Maximum number of possible averages is',NT*ND
 !

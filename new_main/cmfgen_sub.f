@@ -1236,6 +1236,7 @@
 	WRITE(LUER,'(A)')' '
 	WRITE(LUER,'(A,I4)')' Current great iteration count is',MAIN_COUNTER
 	WRITE(LUER,'(A)')' '
+	FLUSH(LUER)
 !
 ! Used as a initializing switch for COMP_OBS.
 !
@@ -1972,6 +1973,7 @@
 !
 	SUM_BA=0.0D0
 	FL=NU(1)
+	FLUSH(LUER)
 	CALL TUNE(IONE,'MLCF')
 	CALL TUNE(IONE,'10000')
 	DO 10000 ML=1,NCF
