@@ -64,6 +64,9 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(wr_col_rates.o)\
       $(LIB)(wr_spec_sum_v2.o)\
       $(LIB)(wr_crit.o)\
+      $(LIB)(write_line_12may98.o)\
+      $(LIB)(write_line_old.o)\
+      $(LIB)(write_line_multi.o)\
       $(LIB)(xvecfeau.o)
 
 all : $(LIB)

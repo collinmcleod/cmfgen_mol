@@ -258,6 +258,12 @@
 	REAL*8 SCLHT,VCORE,VPHOT,VINF1,V_BETA1,V_EPS1
 	REAL*8 VINF2,V_BETA2,V_EPS2
 !
+	CHARACTER(LEN=20), FILE_FORMAT
+	CHARACTER(LEN=20), MOD_NAME
+	CHARACTER(LEN=30), TRANS_NAME
+	CHARACTER(LEN=100), SAVE :: FILE_FOR_WRL=' '
+	LOGICAL FILE_PRES
+!
 ! Storage for constants used for evaluating the level disolution.
 ! Required by SUP_TO_FULL and LTE_POP_WLD.
 !
@@ -381,6 +387,7 @@
 	FIRST_COLR='T'
 	DPTH_INDX=ND/2
 	COL_OPT='CL'
+	FILE_FORMAT='OLD'
 !
 ! NB: ZERO_FLUX condition is equivalent to DIF=.TRUE. and DBB=0.
 !     Thus, for routine compatibility, we set DBB=0 when DIF is false.
@@ -5987,124 +5994,74 @@ c
 !
 	ELSE IF(XOPT .EQ. 'WRC' .OR. XOPT .EQ. 'WRL')THEN
 	  CONT_INT=TWOHCSQ*(FREQ**3)/( EXP(HDKT*FREQ/T(ND))-1.0D0 )
-	  CALL USR_OPTION(NEW_FORMAT,'NEW_FORM','F',
-	1        'Output multiple lines in new format file?')
-	  IF(NEW_FORMAT)THEN
+	  CALL USR_OPTION(FILE_FORMAT,'FORMAT',FILE_FORMAT,'Format: OLD, NEW, MULTI')
+!
+	  NEW_FILE=.TRUE.
+	  IF(FILE_FORMAT .NE. 'OLD')THEN
 	    CALL USR_OPTION(NEW_FILE,'NEW_FILE','F','Open new file?')
 	  END IF
 !
-	  IF(NEW_FORMAT .AND. NEW_FILE)THEN
-	    OPEN(UNIT=25,FILE='LINEDATA',STATUS='NEW')
-   	    WRITE(25,'(1X,A,T25,A,T40,A)')'12-May-1998',
-	1            '[Date]','Revised format date'
-   	    WRITE(25,'(1X,A,T25,A,T40,A)')TRIM(NAME),
-	1             '[MOD_ID]','Model'
- 	    WRITE(25,'(1X,A,T25,A,T40,A)')'TRUE',
-	1            '[DIF]','Diffusion approximation'
-	    WRITE(25,'(1X,1PE15.8,T25,A,T40,A)')CONT_INT,
-	1            '[IC]','Schuster intensity'
-	    WRITE(25,*)' '
-!
-	    WRITE(25,'(1X,A,T25,A,T40,A)')'Continuum:',
-	1               '[TR_ID]','Transition identification'
-	    WRITE(25,'(1X,1PE15.8,T25,A,T40,A)')FREQ,
-	1            '[FREQ]','Frequency (10^15 Hz)'
-	    WRITE(25,'(1X,1PE12.5,T25,A,T40,A)')LAMVACAIR(FREQ),
-	1            '[LAM]','Wavelength (Ang)'
-!
-	    WRITE(25,*)' '
-	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'R',(R(I),I=1,ND)
-	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'T',(T(I),I=1,ND)
-	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'SIGMA',(SIGMA(I),I=1,ND)
-	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'V',(V(I),I=1,ND)
-	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'ETA',(ETA(I),I=1,ND)
-	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'CHI_TH',
-	1                              ( (CHI(I)-ESEC(I)) ,I=1,ND)
-	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'ESEC',(ESEC(I),I=1,ND)
-	  END IF
-!
-	  IF(NEW_FORMAT .AND. XOPT .EQ. 'WRL')THEN
-	    IF(.NOT. NEW_FILE)THEN
-	      OPEN(UNIT=25,FILE='LINEDATA',STATUS='OLD',IOSTAT=IOS)
-	      IF(IOS .NE. 0)THEN
-	         WRITE(T_OUT,*)'Error - unable to open old LINEDATA file'
+	  IF(NEW_FILE)THEN
+	    FILE_FOR_WRL='LINEDATA'
+	    FILE_PRES=.TRUE.
+	    DO WHILE(FILE_PRES)
+	      CALL USR_OPTION(FILE_FOR_WRL,'FILE',FILE_FOR_WRL,'Output file')
+	      INQUIRE(FILE=FILE_FOR_WRL,EXIST=FILE_PRES) 
+	      IF(FILE_PRES)THEN
+	        WRITE(6,*)'Error - file exists - enter alternate name'
 	      END IF
-	      CALL GETCWD(PWD)
-	      WRITE(25,'(A)')'!'
-	      WRITE(25,'(A,A)')'! Model directory is ',TRIM(PWD)
-	      WRITE(25,'(A)')'!'
+	    END DO
+	    OPEN(UNIT=LU_OUT,FILE=FILE_FOR_WRL,STATUS='NEW')
+	  ELSE
+	    INQUIRE(FILE=FILE_FOR_WRL,EXIST=FILE_PRES) 
+	    IF(.NOT. FILE_PRES)THEN
+	      WRITE(6,*)'Error - file does not exist'
+	      CALL USR_OPTION(FILE_FOR_WRL,'FILE',FILE_FOR_WRL,'Output file')
 	    END IF
-	    WRITE(25,*)' '
-	    WRITE(25,'(1X,A,A,I3,A,I3,A,T25,A,T40,A)')
-	1            TRIM(XSPEC),'(',LEV(2),'-',LEV(1),')',
-	1            '[TR_ID]','Transition identification'
-	    WRITE(25,'(1X,1PE15.8,T25,A,T40,A)')FREQ,
-	1            '[FREQ]','Frequency (10^15 Hz)'
-	    WRITE(25,'(1X,1PE12.5,T25,A,T40,A)')LAMVACAIR(FREQ),
-	1            '[LAM]','Wavelength (Ang)'
-	    WRITE(25,'(1X,F6.2,T25,A,T40,A)')AMASS,'[AMASS]','Atomic mass'
-	    WRITE(25,*)' '
-	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'ETAL',(ETAL(I),I=1,ND)
-	    WRITE(25,'(1X,A,/,(1P,1X,9E14.6))')'CHIL',(CHIL(I),I=1,ND)
+	    OPEN(UNIT=LU_OUT,FILE=FILE_FOR_WRL,STATUS='OLD',POSITION='APPEND')
 	  END IF
-
-	  IF(.NOT. NEW_FORMAT)THEN
-	    OPEN(UNIT=25,FILE='LINEDATA',STATUS='NEW',IOSTAT=IOS)
-	    IF(IOS .NE. 0)THEN
-	      WRITE(T_OUT,*)'Error opening LINEDATA file: probably because file exists'
-	      DEFAULT='LINEDATA_1'
-	      CALL USR_OPTION(FILENAME,'FILE',DEFAULT,
-	1                  'File name (existing file will be overwrittem')
-	      OPEN(UNIT=25,FILE=FILENAME,STATUS='UNKNOWN')
-	    END IF
+!
+	  IF(XOPT .EQ. 'WRL')THEN
+	    WRITE(TRANS_NAME,'(1X,A,A,I3,A,I3,A,T25,A,T40,A)')
+	1            TRIM(XSPEC),'(',LEV(2),'-',LEV(1),')'
+	  ELSE
+	    TRANS_NAME='Continuum'
+	  END IF
+!
+	  IF(NEW_FILE)THEN
 	    CALL GETCWD(PWD)
-	    WRITE(25,'(A)')'!'
-	    WRITE(25,'(A,A)')'! Model directory is ',TRIM(PWD)
-	    WRITE(25,'(A)')'!'
-   	    WRITE(25,'(1X,A,T25,A,T40,A)')'16-Sep-2017','[Date]','Revised format date'
-   	    WRITE(25,'(1X,A,T25,A,T40,A)')TRIM(NAME),
-	1            '[MOD_ID]','Model'
-	    IF(XOPT .EQ. 'WRL')THEN
-	        WRITE(25,'(1X,A,A,I3,A,I3,A,T25,A,T40,A)')
-	1            TRIM(XSPEC),'(',LEV(2),'-',LEV(1),')',
-	1            '[TR_ID]','Transition identification'
-	      ELSE
-	        WRITE(25,'(1X,A,T25,A,T40,A)')'Continuum:',
-	1               '[TR_ID]','Transition identification'
-	      END IF
- 	      WRITE(25,'(1X,A,T25,A,T40,A)')'TRUE',
-	1            '[DIF]','Diffusion approximation'
-	      WRITE(25,'(1X,1PE15.8,T25,A,T40,A)')FREQ,
-	1            '[FREQ]','Frequency (10^15 Hz)'
-	      WRITE(25,'(1X,1PE12.5,T25,A,T40,A)')LAMVACAIR(FREQ),
-	1            '[LAM]','Wavelength (Ang)'
-	      WRITE(25,'(1X,F6.2,T25,A,T40,A)')AMASS,
-	1            '[AMASS]','Atomic mass'
-	      WRITE(25,'(1X,1PE15.8,T25,A,T40,A)')CONT_INT,
-	1            '[IC]','Schuster intensity'
-	      WRITE(25,'(1X,I3,T25,A,T40,A)')ND,
-	1            '[ND]','Number of depth points'
-	      WRITE(25,*)' '
-	      WRITE(25,
-	1       '(1X,T9,A,T23,A,T35,A,T51,A,T64,A,T76,A,T91,A,T105,A,T119,A)')
-	1            'R','T','SIGMA','V','ETA','CHI_TH','ESEC',
-	1            'ETAL','CHIL'
-	      IF(XOPT .EQ. 'WRC')THEN
-	        DO I=1,ND
-	          CHIL(I)=1.0D-10
-	          ETAL(I)=1.0D-10
-	        END DO
-	      END IF
-	      DO I=1,ND
- 	        WRITE(25,555)R(I),T(I),SIGMA(I),V(I),
- 	1                 ETA(I),(CHI(I)-ESEC(I)),
-	1                 ESEC(I),ETAL(I),CHIL(I)
+	    WRITE(LU_OUT,'(A)')'!'
+	    WRITE(LU_OUT,'(A,A)')'! Model directory is ',TRIM(PWD)
+	    WRITE(LU_OUT,'(A)')'!'
+	    MOD_NAME=PWD
+	    IF(LEN_TRIM(PWD) .GT. 20)THEN
+	      I=LEN_TRIM(PWD)
+	      DO J=I-1,1,-1
+	        IF(PWD(J:J) .EQ. '/')THEN
+	          MOD_NAME=PWD(MAX(I-19,J+1):I)
+	          EXIT
+	        END IF
 	      END DO
-	    CLOSE(UNIT=25)
-555	    FORMAT(1X,1P9E14.6)
+	    END IF
 	  END IF
 !
-! Option to output nformation concerning bound-bound transitions.
+	  IF(FILE_FORMAT .EQ. 'NEW')THEN
+	    CALL WRITE_LINE_12MAY98(TRANS_NAME,MOD_NAME,
+	1          DIF,IC,FREQ,AMASS,R,V,SIGMA,T,
+	1          ETA,CHI,ESEC,CHIL,ETAL,ND,LU_OUT)
+	  ELSE IF(FILE_FORMAT .EQ. 'MULTI')THEN
+	    CALL WRITE_LINE_MULTI(TRANS_NAME,MOD_NAME,NEW_FILE,
+	1          DIF,IC,FREQ,AMASS,R,V,SIGMA,T,
+	1          MASS_DENSITY,CLUMP_FAC,
+	1          ETA,CHI,ESEC,CHIL,ETAL,ND,LU_OUT)
+	  ELSE
+	    CALL WRITE_LINE_OLD(TRANS_NAME,MOD_NAME,
+	1          DIF,IC,FREQ,AMASS,R,V,SIGMA,T,
+	1          MASS_DENSITY,CLUMP_FAC,
+	1          ETA,CHI,ESEC,CHIL,ETAL,ND,LU_OUT)
+	  END IF
+!
+! Option to output information concerning bound-bound transitions.
 ! Output file has same format as that generated by CMFGEN. Only a section
 ! of wavelength space needs to be output.
 !
