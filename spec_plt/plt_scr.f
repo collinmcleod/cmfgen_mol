@@ -9,6 +9,9 @@
 	IMPLICIT NONE
 	INTEGER ND,NT,NIT
 !
+! Altered 06-Dec-2017: Made compatible with osiris version
+!                        For multiple fudges, only one new record is now written.
+!                        REP and RAT options inserted                  
 ! Altered 26-Feb-2015: Fixed error with FDG ouput if called multiple times.
 ! Altered 30-Mar-2014: Altered FDG option so as to print out adjacent values.
 ! Altered 11-Mar-2014: Installed INT option.
@@ -40,6 +43,7 @@ C
 	INTEGER LIMITS(NLIM_MAX)
 	INTEGER NPLTS
 	INTEGER IREC
+	INTEGER LST_IREC
 	INTEGER IVAR
 	INTEGER I
 	INTEGER J
@@ -63,6 +67,8 @@ C
 	CHARACTER*80 YLABEL
 	CHARACTER*132 STRING
 C
+	INTEGER IMAX,IMIN
+	REAL*8 RMAX,RMIN
 	REAL*8 T1,T2,T3
 C
 	LUSCR=26
@@ -163,11 +169,14 @@ C
 	WRITE(T_OUT,*)'IR     :: Z(ID)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
 	WRITE(T_OUT,*)'WRST   :: Writes fractional corections to file (FRAC_COR -- same format as STEQ_VALS'
 	WRITE(T_OUT,*)' '
-	WRITE(T_OUT,*)'FDG    :: Fudge individual values at a single depth and output to SCRTEMP'
-	WRITE(T_OUT,*)'FDGV   :: Fudge values over a ranges of depths (% change) and output to SCRTEMP'
-	WRITE(T_OUT,*)'INT    :: Interpolate values whose corrections are above a certain % limit'
-	WRITE(T_OUT,*)'UNDO   :: Undo corrections over a range of depths'
-	WRITE(T_OUT,*)' '
+	WRITE(T_OUT,*)'FDG      :: Fudge individual values at a single depth and output to SCRTEMP'
+	WRITE(T_OUT,*)'FDGV     :: Fudge values over a ranges of depths (% change) and output to SCRTEMP'
+	WRITE(T_OUT,*)'INT      :: Interpolate values whose corrections are above a certain % limit'
+	WRITE(T_OUT,*)'RAT      :: Compare populations at adjacent depths'
+	WRITE(T_OUT,*)'REP      :: Replace populations on one iteration with those of another'
+	WRITE(T_OUT,*)'FDG_OSC  ::'
+	WRITE(T_OUT,*)'UNDO     :: Undo corrections over a range of depths'
+	WRITE(T_OUT,*)' ' 
 	WRITE(T_OUT,*)'LY  :: Switch to/from Log(Y) for options where appropriate (not full implemented)'
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'E   :: EXIT'
@@ -510,12 +519,13 @@ C
 	    END DO
 	    IVAR=0
 	  END DO
-          NITSF=NITSF+1; IREC=NIT+FDG_COUNTER
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
 	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
 	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
 	1              NT,ND,LUSCR,NEWMOD)
 	  WRITE(6,*)'Corrections written to SCRTEMP as new (and last) iteration.'
-	  WRITE(6,*)'A new record is writted every time FDG or FDGV is called'
+	  WRITE(6,*)'The same record is writted every time FDG or FDGV is called'
 	  WRITE(6,*)'Restart program if you wish to compare to with pops from last iteration.'
 	  WRITE(6,*)'Populations can be compared with older iterations.'
 	  GOTO 200
@@ -542,12 +552,13 @@ C
 	    END DO
 	    IVAR=0
 	  END DO
-          NITSF=NITSF+1; IREC=NIT+FDG_COUNTER
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
 	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
 	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
 	1              NT,ND,LUSCR,NEWMOD)
 	  WRITE(6,*)'Corrections written to SCRTEMP as new (and last) iteration.'
-	  WRITE(6,*)'A new record is writted every time FDG or FDGV is called'
+	  WRITE(6,*)'The same record is written every time FDG or FDGV is called'
 	  WRITE(6,*)'Restart program if you wish to compare to with pops from last iteration.'
 	  WRITE(6,*)'Populations can be compared with older iterations.'
 	  GOTO 200
@@ -562,13 +573,15 @@ C
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
 	    IF(IVAR .EQ. 0)EXIT
 	    CALL GEN_IN(ID,'Depth of variable')
+	    IF(ID.EQ. 0)EXIT
 	    WRITE(6,'(7(9X,I5))')(I,I=MAX(ID-3,1),MIN(ID+3,ND))
 	    WRITE(6,'(7ES14.4)')(POPS(IVAR,I,IT),I=MAX(ID-3,1),MIN(ID+3,ND))
 	    T1=POPS(IVAR,ID,IT)
 	    CALL GEN_IN(T1,'New value of variable')
 	    POPS(IVAR,ID,IT)=T1
 	  END DO
-          NITSF=NITSF+1; IREC=NIT+FDG_COUNTER
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
 	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
 	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
 	1              NT,ND,LUSCR,NEWMOD)
@@ -579,6 +592,7 @@ C
 	  GOTO 200
 !
 	ELSE IF(PLT_OPT(1:3) .EQ. 'INT')THEN
+          FDG_COUNTER=FDG_COUNTER+1
 	  IT=NIT; ID=ND; T2=100.0D0
 	  CALL GEN_IN(IT,'Iteration # (zero to exit)')
 	  CALL GEN_IN(ID,'Depth of variable')
@@ -598,7 +612,8 @@ C
 	      END IF
 	    END IF
 	  END DO
-          NITSF=NITSF+1; IREC=IT
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
 	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IREC),IREC,NITSF,
 	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
 	1              NT,ND,LUSCR,NEWMOD)
@@ -608,14 +623,57 @@ C
 	  GOTO 200
 !
 	ELSE IF(PLT_OPT(1:3) .EQ. 'FIX_OSC')THEN
+          FDG_COUNTER=FDG_COUNTER+1
 	  CALL FIX_POP_OSCILLATIONS(POPS(1,1,NIT),R,V,SIGMA,LUSCR,ND,NT)
-          NITSF=NITSF+1; IREC=NIT
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
 	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IREC),IREC,NITSF,
 	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
 	1              NT,ND,LUSCR,NEWMOD)
 	  WRITE(6,*)'Corrections written to SCRTEMP as new iteration.'
 	  WRITE(6,*)'Restart program if you wish to compare to with pops from last iteration.'
 	  WRITE(6,*)'Populations can be compared with older iterations.'
+	  GOTO 200
+!
+	ELSE IF(PLT_OPT(1:3) .EQ. 'RAT')THEN
+	  WRITE(6,*)' '
+	  IT=NIT; ID=ND; T2=100.0D0
+	  CALL GEN_IN(IT,'Iteration # (zero to exit)')
+	  CALL GEN_IN(K,'Maximum depth to consider')
+!	  CALL GEN_IN(T2,'Interpolate values with correction > >%')
+	  DO ID=2,K
+	    RMAX=0.0D0; RMIN=100.0D0
+	    DO IVAR=1,NT-1
+	      T3=POPS(IVAR,ID-1,IT)/POPS(IVAR,ID+1,IT)
+	      IF(T3 .GT. RMAX)THEN
+	        RMAX=T3; IMAX=IVAR
+	      END IF
+	      IF(T3 .LT. RMIN)THEN
+	        RMIN=T3; IMIN=IVAR
+	      END IF
+	    END DO
+	    WRITE(6,'(1X,A,I4,2(3X,A,I5,ES11.2E3),A)')'At depth',ID,RED_PEN,IMAX,RMAX,
+	1                 BLUE_PEN,IMIN,RMIN,DEF_PEN
+	  END DO
+	  GOTO 200
+!
+	ELSE IF(PLT_OPT(1:3) .EQ. 'REP')THEN
+	  WRITE(6,*)' '
+          FDG_COUNTER=FDG_COUNTER+1
+	  IT=NIT; ID=ND; IVAR=NT; J=1; K=ND; IVAR=NT
+	  CALL GEN_IN(IT,'Iteration to be replaced')
+	  CALL GEN_IN(IT2,'Iteration with estimates')
+	  CALL GEN_IN(J,'Minimum depth to consider')
+	  CALL GEN_IN(K,'Maximum depth to consider')
+	  CALL GEN_IN(IVAR,'Variable to replace')
+	  DO ID=J,K
+	   POPS(IVAR,ID,IT)=POPS(IVAR,ID,IT2)
+	  END DO
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
+	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+	1              NT,ND,LUSCR,NEWMOD)
 	  GOTO 200
 !
 	ELSE IF(PLT_OPT .EQ. 'R' .OR.

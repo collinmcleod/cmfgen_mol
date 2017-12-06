@@ -7,6 +7,8 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered 06-Nov-2017: Made compatible with version of osiris.
+!                        TAU option cleaned, options added.
 ! Altered 24-Oct-2013: Added VEL_TYPE=3 so that can do a velocity law with 2 components.
 ! Altered 14-Mar-2011: Improved header output to RVSIG_COL.
 ! Altered 15-Oct-2010: Fixed bug with SIGMA computation for the extra
@@ -70,6 +72,9 @@
 	INTEGER TRANS_I
 	INTEGER VEL_TYPE
 !
+	REAL*8 V_CON,V_RAT_MAX,IB_RAT,OB_RAT,DTAU2_ON_DTAU1
+	INTEGER N_IB_INS,N_OB_INS
+!
 	INTEGER NN
 	INTEGER NX
 	INTEGER N_ADD
@@ -129,15 +134,19 @@
 	WRITE(6,'(A)')'         FGOB: insert N points at outer boundary (to make finer grid)'
 	WRITE(6,'(A)')'         MDOT: change the mass-loss rate or velocity law'
 	WRITE(6,'(A)')'         NEWG: revise grid between two velocities or depth indicies'
+	WRITE(6,'(A)')'          RDR: read in new R grid (DC format)'
 	WRITE(6,'(A)')'         SCLR: scale radius of star to new value'
 	WRITE(6,'(A)')'         SCLV: scale velocity law to new value'
+	WRITE(6,'(A)')'          TAU: Create entrie grid equally spaced in log[TAU] with constraints on dV'
 	WRITE(6,'(A)')'         PLOT: plot V and SIGMA from old RVSIG file'
+	WRITE(6,'(A)')
+	WRITE(6,'(A)')'R_GRID_CHK (if MEANOPAC readd) will contain dTAU and dV information.'
 	WRITE(6,'(A)')
 
 	CALL GEN_IN(OPTION,'Enter option for revised RVSIG file')
 	OPTION=UC(TRIM(OPTION))
 !
-! Read in optical depth scale. Needed for SPP and TAU options. Also used
+! Read in optical depth scale. Needed for RTAU and TAU options. Also used
 ! for checking purposes (if available) for some other options.
 !
 ! We use TAU_SAV for dTAU, and is used to increase the precision of the TAU
@@ -148,7 +157,7 @@
 	  IF(IOS .EQ. 0)THEN
 	    READ(20,'(A)')STRING
 	    DO I=1,ND_OLD
-	      READ(20,*)RTMP(I),J,OLD_TAU(I),TAU_SAV(I),T1,CHI_ROSS(I)
+	     READ(20,*)RTMP(I),J,OLD_TAU(I),TAU_SAV(I),T1,CHI_ROSS(I)
 	      J=MAX(I,2)
 	      T1=OLD_R(J-1)-OLD_R(J)
 	      IF( ABS(RTMP(I)-R(I))/T1 .GT. 2.0D-03 .AND. .NOT. ROUND_ERROR)THEN
@@ -166,7 +175,9 @@
 	    DO I=8,1,-1
               OLD_TAU(I)=OLD_TAU(I+1)-TAU_SAV(I)
             END DO
+	    CLOSE(UNIT=20)
 	    RD_MEANOPAC=.TRUE.
+	    IF(ROUND_ERROR)RTMP(1:ND_OLD)=OLD_R(1:ND_OLD)
 	    WRITE(6,*)'Successfully read MEANOPAC'
 	  ELSE
 	    RD_MEANOPAC=.FALSE.
@@ -175,11 +186,7 @@
 	      WRITE(6,*)'MENAOPAC  is equired for the TAU option'
 	      STOP
 	    END IF
-	    CLOSE(UNIT=20)
 	  END IF
-	  IF(ROUND_ERROR .AND. RD_MEANOPAC)THEN
-	     RTMP(1:ND_OLD)=OLD_R(1:ND_OLD)
-	  END IF 
 !
 	IF(OPTION .EQ. 'SPP')THEN
 	  WRITE(6,'(A)')' '
@@ -189,49 +196,23 @@
 	END IF
 !
 	IF(OPTION .EQ. 'TAU')THEN
-	  WRITE(6,*)'Option still under development'
-	  I=7
-          CALL RD_SING_VEC_RVTJ(CLUMP_FAC,ND_OLD,'Clumping Factor','RVTJ',I,IOS)
+!
 	  ND=ND_OLD
+	  V_TRANS=30.0D0; V_RAT_MAX=1.5
+	  IB_RAT=2.0; OB_RAT=4.0D0; DTAU2_ON_DTAU1=100.0D0
+	  N_IB_INS=2; N_OB_INS=1
+!
 	  CALL GEN_IN(ND,'Number of depth points')
-	  T1=MAXVAL(OLD_SIGMA(1:ND_OLD))
-	  WRITE(6,*)'Maximum value of SIGMA is',T1
-	  DO I=1,ND_OLD
-!	    X2(I)=CLUMP_FAC(I)*CHI_ROSS(I)*(0.5D0+OLD_SIGMA(I)/10.0D0)   !/(1.0D0+SQRT(OLD_V(I))) !*(1.0D0+OLD_SIGMA(I)/T1)
-	    X2(I)=CLUMP_FAC(I)*CHI_ROSS(I)*(1.0D0+(1.0D0+OLD_SIGMA(I)))
-!	    X2(I)=CLUMP_FAC(I)*CHI_ROSS(I)
-	  END DO
-	  X1(1)=X2(1)*OLD_R(1)
-	  DO I=2,ND_OLD
-	    X1(I)=X1(I-1)+ 0.5D0*(OLD_R(I-1)-OLD_R(I))*(X2(I-1)+X2(I))
-	  END DO
+	  CALL GEN_IN(V_CON,'Connection velocity in km/s')
+	  CALL GEN_IN(IB_RAT,'Ratio of spacing at the inner boundary')
+	  CALL GEN_IN(OB_RAT,'Ratio of spacing at the outer boundary')
+	  CALL GEN_IN(N_IB_INS,'Number of extra points to insert at the inner boudary')
+	  CALL GEN_IN(N_OB_INS,'Number of extra points to insert at the outer boudary')
+	  CALL GEN_IN(DTAU2_ON_DTAU1,'DTAU(2)/DTAU(1)')
 !
-!	  DO I=1,ND_OLD
-!	    T1=MIN(OLD_V(I),300.0D0)/0.1D0
-!	    X1(I)=X1(I)/MAX(1.0D0,SQRT(T1))
-!	  END DO
-!
-	  T1=EXP(LOG(X1(ND_OLD)/X1(1))/(ND-4))
-	  WRITE(6,*)'TAU step size ratio is',T1
-	  X2(1)=X1(1)
-	  X2(2)=X1(1)+0.02*X1(1)*(T1-1.0D0)
-	  X2(3)=X1(1)*T1
-	  DO I=4,ND-3
-	    X2(I)=X2(I-1)*T1
-	  END DO
-	  X2(ND-2)=X2(ND-3)*SQRT(T1)
-	  X2(ND-1)=X2(ND-2)*(T1**0.25D0)
-	  X2(ND)=X1(ND_OLD)
-	  WRITE(6,*)'Defined X2 grid'
-! 
-	  DO I=1,ND_OLD
-	    WRITE(6,*)I,OLD_R(I),X2(I)
-	  END DO
-	  CALL MON_INTERP(R,ND,IONE,X2,ND,OLD_R,ND_OLD,X1,ND_OLD)
-	  WRITE(6,*)'Defined new R grid by interpolation'
-	  DO I=1,ND
-	    WRITE(6,*)I,R(I),X2(I)
-	  END DO
+	  CALL ADJUST_ATM_R_GRID(R,OLD_R,OLD_V,OLD_TAU,
+	1         V_CON,V_RAT_MAX,IB_RAT,OB_RAT,
+	1         DTAU2_ON_DTAU1,N_IB_INS,N_OB_INS,ND,ND_OLD)
 !
 ! Now compute the revised SIGMA. V has already been computed.
 !
@@ -252,24 +233,46 @@
 	  END DO
 	  DEALLOCATE (COEF)
 	  WRITE(6,*)'Determined R and V on the new grid'
-	  CALL MON_INTERP(TAU,ND,IONE,R,ND,OLD_TAU,ND_OLD,OLD_R,ND_OLD)
-	  WRITE(6,*)'Determined TAU on the new grid'
-	  I=1
-	  WRITE(30,'(3X,A,6X,A,T28,A,T40,A,T53,A,T66,A,T78,A,T93,A,T101,A)')
-	1           'I','R','V','SIGMA','TAU','dTAU','dTRAT','X2','V(I)/V(I+1)'
-	  WRITE(30,'(1X,I3,F16.9,7ES13.4)')I,R(I),V(I),SIGMA(I),TAU(I),TAU(I+1)-TAU(I),T2,X2(I),V(I)/V(I+1)
-	  FLUSH(UNIT=30)
-	  T2=0.00
-	  DO I=2,ND-1
-	    T1=TAU(I+1)-TAU(I)
-	    T2=T1/(TAU(I)-TAU(I-1))
-	    WRITE(30,'(1X,I3,F16.9,7ES13.4)')I,R(I),V(I),SIGMA(I),TAU(I),T1,T2,X2(I),V(I)/V(I+1)
-	    FLUSH(UNIT=30)
-	  END DO
-	  I=ND
-	  WRITE(30,'(1X,I3,F16.9,6ES13.4)')I,R(I),V(I),SIGMA(I),TAU(I),0.0D0,0.0D0,X2(I)
-	  FLUSH(UNIT=30)
 !
+	ELSE IF(OPTION .EQ. 'RDR')THEN
+	  OLD_RVSIG_FILE='RDINR'
+	  CALL GEN_IN(OLD_RVSIG_FILE,'File with new R values -- DC format')
+	  OPEN(UNIT=9,FILE=OLD_RVSIG_FILE,STATUS='OLD',ACTION='READ')
+	  DO I=1,3
+	    READ(9,'(A)')STRING
+	  END DO
+	  READ(9,'(A)')STRING
+	  READ(STRING,*)T1,T1,J,ND
+	  READ(9,'(A)')STRING                 !Final blank line
+!
+	  DO I=1,ND
+	    READ(9,'(A)')STRING
+	    READ(STRING,*)R(I)         !DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I)
+	    DO WHILE(STRING .NE. ' ')
+	      READ(9,'(A)',END=100)STRING
+	    END DO
+	  END DO
+100	  CONTINUE
+	  CLOSE(UNIT=9)
+!
+	  ALLOCATE (COEF(ND_OLD,4))
+	  CALL MON_INT_FUNS_V2(COEF,OLD_V,OLD_R,ND_OLD)
+!
+	  J=1
+	  I=1
+	  DO WHILE (I .LE. ND)
+	    IF(R(I) .GE. OLD_R(J+1))THEN
+	      T1=R(I)-OLD_R(J)
+	      V(I)=COEF(J,4)+T1*(COEF(J,3)+T1*(COEF(J,2)+T1*COEF(J,1)))
+	      SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0*T1*COEF(J,1))
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	      I=I+1
+	    ELSE
+	      J=J+1
+	    END IF
+	  END DO
+	  DEALLOCATE (COEF)
+ 
 	ELSE IF(OPTION .EQ. 'NEW_ND')THEN
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')'This option allows a new R grid to be output'
@@ -278,7 +281,7 @@
 	  ND=70
 	  CALL GEN_IN(ND,'Number of depth points')
 	  DO I=1,ND_OLD
-	    X1(I)=I
+	      X1(I)=I
 	  END DO
 	  T1=DFLOAT(ND_OLD-1)/DFLOAT(ND-1)
 	  DO I=1,ND
@@ -746,19 +749,35 @@
               dVdR = dTOPdR / BOT  + V(I)*dBOTdR/BOT
               SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
 	    END DO
-	  ELSE
+	  ELSE IF(VEL_TYPE .EQ. 2)THEN
 	    SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
 	    WRITE(6,*)'  Transition radius is',R_TRANS
 	    WRITE(6,*)'Transition velocity is',V_TRANS
 	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
+	    DO I=1,TRANS_I-1
+	      T1=R_TRANS/R(I)
+	      T2=1.0D0-T1
+	      TOP = 2.0D0*V_TRANS + (VINF-2.0D0*V_TRANS) * T2**BETA
+	      BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
+	      V(I) = TOP/BOT
+                                                                                
+!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
+                                                                                
+	      dTOPdR = (VINF - 2.0D0*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
+	      dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
+	      dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
+              SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
+	    END DO
+	  ELSE IF(VEL_TYPE .EQ. 3 .OR. VEL_TYPE .EQ. 4)THEN
+	    BETA2=BETA
+	    CALL GEN_IN(BETA2,'Beta2 for velocity law')
 !
 	    SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
 	    WRITE(6,*)'  Transition radius is',R_TRANS
 	    WRITE(6,*)'Transition velocity is',V_TRANS
 	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
 	    ALPHA=2.0D0
-!	    IF(VEL_TYPE .EQ. 4)ALPHA=3.0D0
-	    BETA2=BETA
+	    IF(VEL_TYPE .EQ. 4)ALPHA=3.0D0
 	    CALL GEN_IN(BETA2,'Beta2 for velocity law')
 	    DO I=1,TRANS_I-1
 	      T1=R_TRANS/R(I)
@@ -1087,6 +1106,27 @@
 	      WRITE(10,'(F18.8,ES17.7,F17.7,4X,I4)')R(I),V(I),SIGMA(I),I
 	    END DO
 	  CLOSE(UNIT=10)
+!
+	  IF(RD_MEANOPAC)THEN
+	    OPEN(UNIT=30,FILE='R_GRID_CHK',STATUS='UNKNOWN',ACTION='WRITE')
+	    CALL MON_INTERP(TAU,ND,IONE,R,ND,OLD_TAU,ND_OLD,OLD_R,ND_OLD)
+	    WRITE(6,*)'Determined TAU on the new grid'
+	    I=1
+	    WRITE(30,'(3X,A,6X,A,T28,A,T40,A,T53,A,T66,A,T78,A,T93,A,T101,A)')
+	1           'I','R','V','SIGMA','TAU','dTAU','dTRAT','dV(I)','V(I)/V(I+1)'
+	    FLUSH(UNIT=30)
+	    T2=0.00
+	    WRITE(30,'(1X,I3,F16.9,7ES13.4)')I,R(I),V(I),SIGMA(I),TAU(I),TAU(I+1)-TAU(I),T2,V(I)-V(I+1),V(I)/V(I+1)
+	    DO I=2,ND-1
+	      T1=TAU(I+1)-TAU(I)
+	      T2=T1/(TAU(I)-TAU(I-1))
+	      WRITE(30,'(1X,I3,F16.9,7ES13.4)')I,R(I),V(I),SIGMA(I),TAU(I),T1,T2,V(I)-V(I+1),V(I)/V(I+1)
+	      FLUSH(UNIT=30)
+	    END DO
+	    I=ND
+	    WRITE(30,'(1X,I3,F16.9,6ES13.4)')I,R(I),V(I),SIGMA(I),TAU(I)
+	    CLOSE(UNIT=30)
+	  END IF
 	END IF
 !
 	T1=R(ND)

@@ -3,6 +3,7 @@
 ! in a CMFGEN input files. An example is an update of
 ! XFI1_BEG etc which change as the iteration procedes.
 !
+! Altered 13-Nov-2017: Fixed minor bug with update_keyowrd_dp
 ! Altered 10-Jun-2015: PRIVATE made default for UPDATE_KEYWORD_INTERFACE
 ! Altered 10-Jun-2015: Subroutine cause gracefull stop if KEYWORD file cannot be opened.
 ! Altered 09-May-2014: LUER was not set before being used in several locations.
@@ -33,7 +34,7 @@
 	LOGICAL WR_FILE
 	INTEGER LU,LUER,ERROR_LU
 	EXTERNAL ERROR_LU
-	INTEGER I,J,K
+	INTEGER I,J,K,ID
 !
 	CALL RD_KEY_WRD_FILE(DATA_FILE,RD_FILE,LU)
 !
@@ -42,16 +43,20 @@
 	  IF(K .NE. 0)THEN
 	    IF(ABS(VALUE) .GT. 0.01 .AND. ABS(VALUE) .LT. 1.0D+05)THEN
 	      WRITE(TMP_STR,'(F20.8)')VALUE
+	      TMP_STR=ADJUSTL(TMP_STR)
+	      J=LEN_TRIM(TMP_STR)
 	    ELSE
 	      WRITE(TMP_STR,'(ES20.8)')VALUE
-	    END IF
-	    TMP_STR=ADJUSTL(TMP_STR)
-	    J=INDEX(TMP_STR,'E')
-	    TMP_STR(J:J)='D'
-	    DO WHILE(J .GT. 2)
+	      TMP_STR=ADJUSTL(TMP_STR)
+	      J=INDEX(TMP_STR,'E')
+	      TMP_STR(J:J)='D'
 	      J=J-1
+	    END IF
+	    ID=INDEX(TMP_STR,'.')+1
+	    DO WHILE(J .GT. ID)
 	      IF(TMP_STR(J:J) .NE. '0')EXIT
 	      TMP_STR(J:)=TMP_STR(J+1:)
+	      J=J-1
 	    END DO
 	    J=LEN_TRIM(TMP_STR)
 	    IF(J .LT. K-2)THEN

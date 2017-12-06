@@ -259,11 +259,11 @@
 	    L=F_TO_S_MAP_C2(I)
 	    SUM(L)=SUM(L)+C2_F(I,K)
 	  END DO
-	 WRITE(6,*)NC2_F, NCIII_F
+!	 WRITE(6,*)NC2_F, NCIII_F
 	  DO I=1,NC2_F
 	    L=F_TO_S_MAP_C2(I)
-	    WRITE(6,*)L,SUM(L),EDGEC2_F(1)
-	    FLUSH(UNIT=6)
+!	    WRITE(6,*)L,SUM(L),EDGEC2_F(1)
+!	    FLUSH(UNIT=6)
 	    C2_F(I,K)=C2_F(I,K)*(C2_S(L,K)/SUM(L))
 	  END DO
 !

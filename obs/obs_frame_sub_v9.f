@@ -11,6 +11,7 @@
 	1            DO_REL_CORRECTIONS,PLANE_PARALLEL)
 	IMPLICIT NONE
 !
+! Altered 02-Nov-2017 : Fixed a bug when comput dS when IEND-IST=1 .
 ! Altered 19-Jan-2016 : Fixed bug for I=1 when computing dFR (bounds issue).
 ! Altered 16-Jan-2016 : Updated output for IP_DATA, RTAU_DATA and ZTAU_DATA. Now output correct
 !                         number of angles.
@@ -823,14 +824,17 @@
 !
 ! Now compute the derivatives of CHI at node I.
 !
-	      dS(IST)=S(IST) +(S(IST)-S(IST+1))*DZ(IST)/(DZ(IST)+DZ(IST+1))
-	      DO I=IST+1,IEND-1
-	        dS(I)=(S(I-1)*DZ(I)+S(I)*DZ(I-1))/
-	1                  (DZ(I-1)+DZ(I))
-	      END DO
-	      dS(IEND)=S(IEND-1)+
-	1                  (S(IEND-1)-S(IEND-2))*DZ(IEND-1)/
-	1                  (DZ(IEND-2)+DZ(IEND-1))
+	      IF(IEND-IST .GT. 1)THEN
+	        dS(IST)=S(IST) +(S(IST)-S(IST+1))*DZ(IST)/(DZ(IST)+DZ(IST+1))
+	        DO I=IST+1,IEND-1
+	          dS(I)=(S(I-1)*DZ(I)+S(I)*DZ(I-1))/(DZ(I-1)+DZ(I))
+	        END DO
+	        dS(IEND)=S(IEND-1)+
+	1                  (S(IEND-1)-S(IEND-2))*DZ(IEND-1)/(DZ(IEND-2)+DZ(IEND-1))
+	      ELSE
+	        dS(1)=S(1)
+	        dS(2)=S(1)
+	      END IF
 !
 ! Adjust the first derivatives so that function is monotonic in each interval.
 !

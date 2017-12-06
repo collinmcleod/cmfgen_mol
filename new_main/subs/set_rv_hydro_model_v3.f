@@ -6,6 +6,7 @@
 	1                  SN_AGE_DAYS,PURE_HUBBLE_FLOW,N_IB_INS,N_OB_INS,RDINR,ND,LU)
 	IMPLICIT NONE
 !
+! Altered 02-Nov-2017 : Bug fix when RMAX < R_HYDRO(1): OLD_T not being correctly set.
 ! Altered 25-Jan-2015 : Bug fix. Error assoicated with RDINR when NLEV> ND.
 !                         Now read in to T1, since we don't requird the level populations.
 ! Altered 09-Jul-2013 : Now use to depths 1 and 8 (rather than 1 & 2) to estimate boundary optical depth.
@@ -393,6 +394,7 @@
 	    OLD_R(2:NS)=R_HYDRO(J:NX)
 	    OLD_R(1)=RMAX
 	    OLD_TAU(2:NS)=TAU_HYDRO(J:NX)
+	    OLD_T(2:NS)=T_HYDRO(J:NX)
 	    T1=(RMAX-R_HYDRO(J))/(R_HYDRO(J-1)-R_HYDRO(J))
 	    OLD_TAU(1)=T1*TAU_HYDRO(J-1)+(1.0D0-T1)*TAU_HYDRO(J)
 	    OLD_T(1)=T1*T_HYDRO(J-1)+(1.0D0-T1)*T_HYDRO(J)

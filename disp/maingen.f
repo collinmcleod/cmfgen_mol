@@ -284,6 +284,7 @@
 	INTEGER IDEPTH(10)
 	LOGICAL FLAG,LINV,TRAPFORJ,JONS,JONLY,IN_R_SUN,SONLY
 	LOGICAL ELEC,DIF,SCALE,THICK,NORAD,ROSS,INC_RAY_SCAT
+	LOGICAL CHECK_FOR_NAN,TMP_LOGICAL,DOWN_RATE
 	LOGICAL SPEC_FRAC,RADIAL
 	LOGICAL LST_DEPTH_ONLY
 	LOGICAL DIE_REG,DIE_WI
@@ -1358,6 +1359,21 @@
 	    XAXIS='Log(\gt\dFlux\u)'
 	    XAXSAV=XAXIS
 !
+	ELSE IF(XOPT .EQ. 'XRAD')THEN
+	    WRITE(6,*)'Option to compute the radiation presure'
+	    T1=LUM*3.826D+13/4.0D0/PI/SPEED_OF_LIGHT()
+	    DO I=1,ND
+	      TA(I)=T1*ABS(CLUMP_FAC(I)*FLUX_MEAN(I))/R(I)/R(I)
+	    END DO
+	    CALL TORSCL(XV,TA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	    WRITE(6,'(1X,A,T60,ES14.6)')'Radiation pressure at inner boundary is',XV(ND)
+	    T1=4.0D+16*STEFAN_BOLTZ()*(T(ND)**4)/3.0D0/SPEED_OF_LIGHT()
+	    WRITE(6,'(1X,A,T60,ES14.6)')'Radiation pressure at inner boudary from (1/3)aT^4 is',T1
+	    WRITE(6,'(1X,A,T60,ES14.6)')'Percentage difference is ',100.0D0*(1.0D0-XV(ND)/T1)
+	    WRITE(6,*)' '
+	    XAXIS='Log(Prad)'
+	    XAXSAV=XAXIS
+!
 	ELSE  IF(XOPT .EQ. 'XTAUC')THEN
 	  IF(.NOT. ELEC)THEN
 	    DO I=1,ND
@@ -1753,6 +1769,7 @@
 	ELSE IF( XOPT .EQ. 'SOBR' )THEN
 !
 	  CALL USR_HIDDEN(NORAD,'NORAD','F','Ignore radiation filed ?')
+	  CALL USR_HIDDEN(DOWN_RATE,'DWNR','F','Compute new downward rate: Nu Aul Zul')
 !
 	  DO I=1,ND
 	    SOURCE(I)=ETA_WITH_ES(I)/CHI(I)
@@ -1776,6 +1793,10 @@
 	1           'Sobolev Approx but radiation field not included'
 	    WRITE(LU_NET,40002)LEV(1),LEV(2)
 	    WRITE(LU_NET,40003)(U(I),I=1,ND)
+	  ELSE IF(DOWN_RATE)THEN
+	    WRITE(LU_NET,40001)'Ne Aul Zul'
+	    WRITE(LU_NET,40002)LEV(1),LEV(2)
+	    WRITE(LU_NET,40003)(ETAL(I)*ZNET(I)/EMLIN/FL,I=1,ND)
 	  ELSE
 	    WRITE(LU_NET,40001)'Sobolev Approximation'
 	    WRITE(LU_NET,40002)LEV(1),LEV(2)
@@ -2573,6 +2594,11 @@
 	    YAXIS='Log EI(ergs\u \dcm\u-3)'
 	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
+!
+	ELSE IF(XOPT .EQ. 'PGAS')THEN
+	  TA(1:ND)=LOG10(1.0D+04*BOLTZMANN_CONSTANT()*(ED(1:ND)+POP_ATOM(1:ND))*T(1:ND))
+	  CALL DP_CURVE(ND,XV,TA)
+	  YAXIS='Pgas'
 !
 	ELSE IF(XOPT .EQ. 'PGONP')THEN
 	  TA(1:ND)=1.0D+04*BOLTZMANN_CONSTANT()*(ED(1:ND)+POP_ATOM(1:ND))*T(1:ND)

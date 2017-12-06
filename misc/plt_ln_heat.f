@@ -2,28 +2,43 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
-	INTEGER, PARAMETER :: NMAX=400000
+! Altered:  6-Dec-2017 - Made copatible with version from osiris.
+! Altered: 14-Jun-2017 - Added option to read LINEHEAT created by SOBOLEV approximation.
+!
+	INTEGER, PARAMETER :: NMAX=600000
+	INTEGER, PARAMETER :: NS_MAX=400
 !
 	REAL*8 NU(NMAX)
 	REAL*8 LAM(NMAX)
+	REAL*8 SCALE_FAC(NMAX)
 	REAL*8 XV(NMAX)
 	REAL*8 Y(NMAX)
-	CHARACTER*40 NAME(NMAX)
+	INTEGER INDX(NMAX)
+	CHARACTER*60 NAME(NMAX)
+!
+! These are used to determine which species contribute most to the
+! difference between SE_SCL and SE_NOSCL.
+!
+	REAL*8 SUMD(NS_MAX)
+	CHARACTER*10 SPEC(NS_MAX)
 !
 	REAL*8, ALLOCATABLE :: LH(:,:)
 	REAL*8, ALLOCATABLE :: SE_SCL(:,:)
 	REAL*8, ALLOCATABLE :: SE_NOSCL(:,:)
 !
+	REAL*8 T1
 	INTEGER ND
 	INTEGER N_LINES
 	INTEGER COUNT
-	INTEGER I,K,ML,IBEG
+	INTEGER I,J,K,L,ML,IBEG
+	INTEGER NL,NUP
 	INTEGER IOS
 	LOGICAL FILE_OPEN
+	LOGICAL DO_SORT
 	LOGICAL SOB_MODEL
 !
 	CHARACTER*80 FILENAME
-	CHARACTER*80 STRING
+	CHARACTER*200 STRING
         CHARACTER*30 UC
         EXTERNAL UC
 	CHARACTER*20 PLT_OPT
@@ -35,7 +50,8 @@
 	WRITE(6,'(A)')' Can be used to identify SL assignments that might be changed.'
 	WRITE(6,'(A)')' '
 !
-	SOB_MODEL=.TRUE.
+        SOB_MODEL=.FALSE.
+        CALL GEN_IN(SOB_MODEL,'Was LINEHEAT created using the SONBOLEV approximation?')
 100	CONTINUE
  	FILENAME='LINEHEAT'
 	CALL GEN_IN(FILENAME,'File with data to be plotted')
@@ -76,11 +92,11 @@
 	    READ(11,'(A)',END=5000)STRING
 	  END DO
 	  IF(INDEX(STRING,'error in L due to') .NE. 0)GOTO 5000
-	  IF(SOB_MODEL)THEN
+	    IF(SOB_MODEL)THEN
 	    READ(STRING,*,ERR=200)LAM(ML)
 	    READ(11,*)LH(1:ND,ML)
 	    COUNT=COUNT+1
-	  ELSE 
+	  ELSE
 	    STRING=ADJUSTL(STRING)
 	    K=INDEX(STRING,' ')
 	    STRING=ADJUSTL(STRING(K:))
@@ -93,7 +109,7 @@
 	    END DO
 	    K=INDEX(STRING,'  ')
 	    STRING(1:)=STRING(K:)
-	    READ(STRING,*,ERR=200)NU(ML)
+	    READ(STRING,*,ERR=200)NU(ML),NL,NUP,SCALE_FAC(ML)
 	    READ(11,*)LH(1:ND,ML)
 	    READ(11,'(A)')STRING
 	    IF(STRING .NE. ' ')THEN
@@ -111,11 +127,11 @@
 	END DO
 5000	CONTINUE
 	N_LINES=COUNT
-	WRITE(6,*)'Number of lines read is',N_LINES
+	WRITE(6,*)'Number of lines read is',N_LINES 
 !
-	IF(SOB_MODEL)THEN
-	  NU(1:N_LINES)=2.99702458D+03/LAM(1:N_LINES)
-	ELSE
+        IF(SOB_MODEL)THEN
+          NU(1:N_LINES)=2.99702458D+03/LAM(1:N_LINES)
+        ELSE 
 	  LAM(1:N_LINES)=2.99702458D+03/NU(1:N_LINES)
 	END IF
 !
@@ -134,8 +150,6 @@
 	    K=ND
 	    CALL GEN_IN(K,'Depth for plotting')
 	    Y(1:N_LINES)=LH(K,1:N_LINES)
-	    WRITE(6,*)NU(1),NU(N_LINES)
-	    WRITE(6,*)Y(1),Y(ND)
 	    CALL DP_CURVE(N_LINES,NU,Y)
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','LH',' ',' ')
 	  ELSE IF(UC(PLT_OPT) .EQ. 'SS')THEN
@@ -151,6 +165,59 @@
 	    Y(1:N_LINES)=SE_NOSCL(K,1:N_LINES)
 	    CALL DP_CURVE(N_LINES,NU,Y)
 	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','STEQ(scaled)',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'DIFF')THEN
+	    K=ND
+	    CALL GEN_IN(K,'Depth for plotting')
+	    DO L=1,N_LINES-1
+	      Y(L)=(SE_NOSCL(K,L+1)-SE_NOSCL(K,L))-(SE_SCL(K,L+1)-SE_SCL(K,L))
+	    END DO
+	    Y(N_LINES)=0
+	    CALL DP_CURVE(N_LINES,NU,Y)
+	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','Diff',' ',' ')
+	  ELSE IF(UC(PLT_OPT) .EQ. 'MAIN')THEN
+!
+! Get the influence due to scaling of a given line on the radiative equilibrium
+! equation.
+!
+	    K=ND
+	    CALL GEN_IN(K,'Depth for plotting')
+	    SUMD=0.0D0; SPEC=' '
+!
+	    DO ML=1,N_LINES
+	      Y(ML)=LH(K,ML)*(1.0D0-SCALE_FAC(ML))
+	      I=INDEX(NAME(ML),'(')
+	      DO J=1,200
+	        IF(SPEC(J) .EQ. ' ')SPEC(J)=NAME(ML)(1:I-1)
+	        IF(NAME(ML)(1:I-1) .EQ. SPEC(J))THEN
+	          SUMD(J)=SUMD(J)+Y(ML)
+	          EXIT
+	        END IF
+	      END DO
+	    END DO
+!
+	    DO J=1,200
+	      IF(SPEC(J) .EQ. ' ')EXIT
+	      WRITE(27,'(A10,ES14.4)')TRIM(SPEC(J)),SUMD(J)
+	    END DO
+!
+	    DO_SORT=.FALSE.
+	    CALL GEN_IN(DO_SORT,'Create a list of the 20 line having the largest influence')
+	    IF(DO_SORT)THEN
+	      T1=SUM(SUMD)
+	      Y(1:N_LINES)=Y(1:N_LINES)/T1
+	      CALL INDEXX(N_LINES,Y,INDX,.TRUE.)
+!
+	      DO I=N_LINES,N_LINES-19,-1
+	        J=INDX(I)
+	        WRITE(28,'(A60,ES16.6,ES12.2)')NAME(J),LAM(J),Y(J)
+	      END DO
+	      WRITE(28,'(A)')' '
+	      DO I=1,20
+	        J=INDX(I)
+	        WRITE(28,'(A60,ES16.6,ES12.2)')NAME(J),LAM(J),Y(J)
+	      END DO
+	    END IF
+!
 	  ELSE IF(UC(PLT_OPT) .EQ. 'FV')THEN
 	    DO I=1,ND
 	      XV(I)=I

@@ -12,6 +12,8 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 06-Sep-2017: Made compatible with osiris version.
+!                         Osiris version had been cleaned and had additional options.
 ! Altered: 12-Sep-2016: Extensively modified. Routine is now option driven (as for PLTSPEC and DISPGEN).
 !
 	REAL*8, ALLOCATABLE :: R(:)
@@ -19,6 +21,9 @@
 	REAL*8, ALLOCATABLE :: T(:)
 	REAL*8, ALLOCATABLE :: ED(:)
 	REAL*8, ALLOCATABLE :: DI(:)
+!
+	REAL*8, ALLOCATABLE :: PHOT_RATE(:,:)
+	REAL*8, ALLOCATABLE :: REC_RATE(:,:)
 !
 	REAL*8, ALLOCATABLE :: TOT_PHOT_RATE(:)
 	REAL*8, ALLOCATABLE :: TOT_REC_RATE(:)
@@ -50,16 +55,29 @@
 	EXTERNAL UC
 !
 	REAL*8 SUM_VAL
-	INTEGER I,J,IBEG
+	INTEGER I,J,L,LEV,IBEG
 	INTEGER IOS
 	INTEGER ND
+	INTEGER NLEV
 	INTEGER LEN_DIR
+	INTEGER, PARAMETER :: IZERO=0
 	LOGICAL RADIUS_DONE
 	LOGICAL FILE_OPEN
+	LOGICAL NORM_RATE
+	CHARACTER(LEN=10) ION_STAGE
+!
+	LEV=1
+	NORM_RATE=.TRUE.
+	YLABEL='1.0E+12 Rate /Ne/Di'
+!	
+ 	ION_STAGE=' '
+	CALL GEN_IN(ION_STAGE,'Ionization stage (e.g., OSIX)')
+	ION_STAGE=ADJUSTL(ION_STAGE)
+	CALL SET_CASE_UP(ION_STAGE,IZERO,IZERO)
 !
 ! We get the file, and open it here in case we need a directory name.
 !
- 	FILENAME=' '
+ 	FILENAME=TRIM(ION_STAGE)//'PRRR'
 	CALL GEN_IN(FILENAME,'File with data to be plotted')
 	OPEN(UNIT=11,FILE=FILENAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	IF(IOS .NE. 0)THEN
@@ -97,7 +115,19 @@
 	      IF(IOS .NE. 0)EXIT
 	      IF(INDEX(STRING,'!Number of depth points') .NE. 0)THEN
 	        READ(STRING,*)ND
+	        WRITE(6,'(A)')' '
 	        WRITE(6,'(A,I4)')' Number of depth points in the model is:',ND
+	        EXIT
+	      END IF
+	    END DO
+	    DO WHILE(1 .EQ. 1)
+	      READ(20,'(A)',IOSTAT=IOS)STRING
+	      IF(IOS .NE. 0)EXIT
+	      IF(INDEX(STRING,ION_STAGE) .NE. 0)THEN
+	        STRING=ADJUSTL(STRING); I=INDEX(STRING,'  '); STRING=STRING(I:)
+	        READ(STRING,*)I,NLEV
+	        WRITE(6,'(A,I4)')' Number of super levels is:',NLEV
+	        WRITE(6,'(A)')' '
 	        EXIT
 	      END IF
 	    END DO
@@ -113,6 +143,9 @@
 	ALLOCATE(T(ND));     T=0.0D0
 	ALLOCATE(ED(ND));    ED=0.0D0
 	ALLOCATE(DI(ND));    DI=0.0D0
+!
+	ALLOCATE(PHOT_RATE(NLEV,ND));      PHOT_RATE=0.0D0 
+	ALLOCATE(REC_RATE(NLEV,ND));       REC_RATE=0.0D0
 !
 	ALLOCATE(TOT_PHOT_RATE(ND));      TOT_PHOT_RATE=0.0D0 
 	ALLOCATE(TOT_REC_RATE(ND));       TOT_REC_RATE=0.0D0
@@ -149,12 +182,10 @@
 !
 ! The following assumes there is a blanke line after the photoioization rates.
 !
-	      DO WHILE(1 .EQ. 1)
-	        READ(11,'(A)')STRING
-	        IF(STRING .EQ. ' ')EXIT
-	        READ(STRING,*)(YV(I),I=IBEG,MIN(IBEG+9,ND))
+	      DO L=1,NLEV
+	        READ(11,*)(PHOT_RATE(L,I),I=IBEG,MIN(IBEG+9,ND))
 	        DO I=IBEG,MIN(IBEG+9,ND)
-	          TOT_PHOT_RATE(I)=TOT_PHOT_RATE(I)+YV(I)
+	          TOT_PHOT_RATE(I)=TOT_PHOT_RATE(I)+PHOT_RATE(L,I)
 	        END DO
 	      END DO
 	    ELSE IF(INDEX(STRING,'Colisional Ionization Rate') .NE. 0)THEN
@@ -163,12 +194,10 @@
 !
 ! The following assumes there is a blanke line after the recombination rates.
 !
-	      DO WHILE(1 .EQ. 1)
-	        READ(11,'(A)')STRING
-	        IF(STRING .EQ. ' ')EXIT
-	        READ(STRING,*)(YV(I),I=IBEG,MIN(IBEG+9,ND))
+	      DO L=1,NLEV
+	        READ(11,*)(REC_RATE(L,I),I=IBEG,MIN(IBEG+9,ND))
 	        DO I=IBEG,MIN(IBEG+9,ND)
-	          TOT_REC_RATE(I)=TOT_REC_RATE(I)+YV(I)
+	          TOT_REC_RATE(I)=TOT_REC_RATE(I)+REC_RATE(L,I)
 	        END DO
 	      END DO
 	    ELSE IF(INDEX(STRING,'Colisional Recombination Rate') .NE. 0)THEN
@@ -301,43 +330,72 @@
           END DO
           XLABEL='Index'
         ELSE IF(XOPT .EQ. 'XR')THEN
+          XV=R/R(ND)
+          XLABEL='R/R(ND)'
+        ELSE IF(XOPT .EQ. 'XR')THEN
           XV=R
           XLABEL='R'
         ELSE IF(XOPT .EQ. 'XLOGR')THEN
           XV=LOG10(R)
           XLABEL='Log(R[10\u10\d cm])'
+        ELSE IF(XOPT .EQ. 'XNLOGR')THEN
+          XV=LOG10(R/R(ND))
+          XLABEL='Log(R/R(ND))'
 !
+	ELSE IF(XOPT .EQ. 'NORM')THEN
+	  NORM_RATE=.NOT. NORM_RATE
+	  IF(NORM_RATE)THEN
+	    WRITE(6,*)'Rate will be normalized'
+	    YLABEL='1.0E+12 Rate /Ne/Di'
+	  ELSE
+	    WRITE(6,*)'Rate will NOT be normalized'
+	    YLABEL='Rate'
+	  END IF
 	ELSE IF(XOPT .EQ. 'NT')THEN
 	  YV=NT_ION_RATE
+	  IF(NORM_RATE)YV=1.0D+12*YV/ED/DI
 	  IF(SUM _VAL .NE. 0.0D0)CALL DP_CURVE(ND,XV,YV)
 	ELSE IF(XOPT .EQ. 'COL_ION')THEN
 	  YV=COL_ION_RATE
+	  IF(NORM_RATE)YV=1.0D+12*YV/ED/DI
 	  SUM_VAL=SUM(YV)
 	  IF(SUM _VAL .NE. 0.0D0)CALL DP_CURVE(ND,XV,YV)
 	ELSE IF(XOPT .EQ. 'COL_REC')THEN
 	  YV=COL_REC_RATE
+	  IF(NORM_RATE)YV=1.0D+12*YV/ED/DI
 	  SUM_VAL=SUM(YV)
 	  IF(SUM _VAL .NE. 0.0D0)CALL DP_CURVE(ND,XV,YV)
 	ELSE IF(XOPT .EQ. 'REC_RATE')THEN
 	  YV=TOT_REC_RATE
+	  IF(NORM_RATE)YV=1.0D+12*YV/ED/DI
 	  SUM_VAL=SUM(YV)
 	  IF(SUM _VAL .NE. 0.0D0)CALL DP_CURVE(ND,XV,YV)
+	ELSE IF(XOPT .EQ. 'IREC')THEN
+	  IF(LEV .LT. 0 .OR. LEV .GT. NLEV)LEV=1
+	  CALL GEN_IN(LEV,'Level to plot recombination rate')
+	  YV=REC_RATE(LEV,1:ND)
+	  IF(NORM_RATE)YV=1.0D+12*YV/ED/DI
+	  CALL DP_CURVE(ND,XV,YV)
 !
-	ELSE IF(XOPT .EQ. 'ADV_RATE')THEN
-	  YV=ADV_REC_RATE
-	  SUM_VAL=SUM(YV)
-	  IF(SUM _VAL .NE. 0.0D0)CALL DP_CURVE(ND,XV,YV)
-!
+	ELSE IF(XOPT .EQ. 'IPHOT')THEN
+	  IF(LEV .LT. 0 .OR. LEV .GT. NLEV)LEV=1
+	  CALL GEN_IN(LEV,'Level to plot photoioization rate')
+	  YV=PHOT_RATE(LEV,1:ND)
+	  IF(NORM_RATE)YV=1.0D+12*YV/ED/DI
+	  CALL DP_CURVE(ND,XV,YV)
 	ELSE IF(XOPT .EQ. 'PHOT_RATE')THEN
 	  YV=TOT_PHOT_RATE
+	  IF(NORM_RATE)YV=1.0D+12*YV/ED/DI
 	  SUM_VAL=SUM(YV)
 	  IF(SUM _VAL .NE. 0.0D0)CALL DP_CURVE(ND,XV,YV)
 	ELSE IF(XOPT .EQ. 'REC_COEF')THEN
 	  YV=REC_COEF
+	  IF(NORM_RATE)YV=1.0D+12*YV/ED/DI
 	  SUM_VAL=SUM(YV)
 	  IF(SUM _VAL .NE. 0.0D0)CALL DP_CURVE(ND,XV,YV)
 	ELSE IF(XOPT .EQ. 'NET')THEN
 	  YV=NET
+	  IF(NORM_RATE)YV=1.0D+12*YV/ED/DI
 	  SUM_VAL=SUM(YV)
 	  IF(SUM _VAL .NE. 0.0D0)CALL DP_CURVE(ND,XV,YV)
 !
@@ -345,20 +403,19 @@
           CALL GRAMON_PGPLOT(XLABEL,YLABEL,' ',' ')
         ELSE IF(XOPT .EQ. 'HE' .OR. XOPT .EQ. 'HELP')THEN
 	  WRITE(6,'(A)')' '
-	  WRITE(6,'(1X,3A,T30,A)')RED_PEN,'XR',BLUE_PEN,'Set X axis to R'
-	  WRITE(6,'(1X,3A,T30,A)')RED_PEN,'XLOGR',BLUE_PEN,'Set X axis to Log(R)'
-	  WRITE(6,'(1X,3A,T30,A)')RED_PEN,'XV',BLUE_PEN,'Set X axis to velocity'
-	  WRITE(6,'(1X,3A,T30,A)')RED_PEN,'XLOGV',BLUE_PEN,'Set X axis to Log(velocity)'
-	  WRITE(6,'(1X,3A,T30,A)')RED_PEN,'XN',BLUE_PEN,'Set X axis to depth index'
-	  WRITE(6,'(A)')' '
-	  WRITE(6,'(1X,3A,T30,A)')RED_PEN,'COL_ION',BLUE_PEN,'Plot the collisional ionization rate'
-	  WRITE(6,'(1X,3A,T30,A)')RED_PEN,'COL_ION',BLUE_PEN,'Plot the collisional recombination rate'
-	  WRITE(6,'(1X,3A,T30,A)')RED_PEN,'PHOT_RATE',BLUE_PEN,'Plot the photoionization rate'
-	  WRITE(6,'(1X,3A,T30,A)')RED_PEN,'REC_RATE',BLUE_PEN,'Plot the recombination rate'
-	  WRITE(6,'(1X,3A,T30,A)')RED_PEN,'ADV_RATE',BLUE_PEN,'Plot the advection recombination rate'
-	  WRITE(6,'(1X,3A,T30,A)')RED_PEN,'NT',BLUE_PEN,'Plot the non-thermal ionization rate'
-	  WRITE(6,'(A)')' '
-	  WRITE(6,'(1X,3A,T30,A)')RED_PEN,'EX',BLUE_PEN,'Exit from program'
+	  WRITE(6,'(1X,A,A,A1,T20,A)')RED_PEN,'XR',BLUE_PEN,'Set X axis to R'
+	  WRITE(6,'(1X,A,A,A1,T20,A)')RED_PEN,'XLOGR',BLUE_PEN,'Set X axis to Log(R)'
+	  WRITE(6,'(1X,A,A,A1,T20,A)')RED_PEN,'XVEL',BLUE_PEN,'Set X axis to velocity'
+	  WRITE(6,'(1X,A,A,A1,T20,A)')RED_PEN,'XLOGV',BLUE_PEN,'Set X axis to Log(velocity)'
+	  WRITE(6,'(1X,A,A,A1,T20,A)')RED_PEN,'XN',BLUE_PEN,'Set X axis to depth index'
+	  WRITE(6,'(A1)')' '
+	  WRITE(6,'(1X,A,A,A1,T20,A)')RED_PEN,'COL_ION',BLUE_PEN,'Plot the collisional ionization rate'
+	  WRITE(6,'(1X,A,A,A1,T20,A)')RED_PEN,'COL_ION',BLUE_PEN,'Plot the collisional recombination rate'
+	  WRITE(6,'(1X,A,A,A1,T20,A)')RED_PEN,'PHOT_RATE',BLUE_PEN,'Plot the photoionization rate'
+	  WRITE(6,'(1X,A,A,A1,T20,A)')RED_PEN,'REC_RATE',BLUE_PEN,'Plot the recombination rate'
+	  WRITE(6,'(1X,A,A,A1,T20,A)')RED_PEN,'NT',BLUE_PEN,'Plot the non-thermal ionization rate'
+	  WRITE(6,'(A1)')' '
+	  WRITE(6,'(1X,A,A,A1,T20,A)')RED_PEN,'EX',BLUE_PEN,'Exit from porgram'
 	  WRITE(6,'(A)')DEF_PEN
         ELSE IF(XOPT .EQ. 'EX')THEN
           STOP
@@ -366,7 +423,7 @@
           WRITE(6,*)'Option not recognized'
         END IF
 	IF(SUM_VAL .EQ. 0.0D0)THEN
-	   WRITE(6,*)'No call to CURVE as data values for requested option are zero'
+	   WRITE(6,*)'No call to CURVE as data values for requested option are zer'
 	END IF
         GOTO 3
 !

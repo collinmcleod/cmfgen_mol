@@ -136,7 +136,7 @@
 	LN_INDX=1
 	IF(.NOT. INCL_ALL_LINES)THEN
 	  DO WHILE(LN_INDX .LE. N_LINES .AND. 
-	1                       TRANS_TYPE(LN_INDX)(1:3) .NE. 'BLA')
+	1                 TRANS_TYPE(MIN(N_LINES,LN_INDX))(1:3) .NE. 'BLA')
 	    LN_INDX=LN_INDX+1
 	  END DO
 	END IF

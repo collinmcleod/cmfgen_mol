@@ -1205,7 +1205,7 @@
 !
 	LAST_LINE=0			!Updated as each line is done
 	DO WHILE(LAST_LINE .LT. N_LINE_FREQ .AND.
-	1             VEC_TRANS_TYPE(LAST_LINE+1)(1:4) .NE. 'BLAN')
+	1             VEC_TRANS_TYPE(MIN(LAST_LINE+1,N_LINE_FREQ))(1:4) .NE. 'BLAN')
 	        LAST_LINE=LAST_LINE+1
 	END DO
 	DO SIM_INDX=1,MAX_SIM
