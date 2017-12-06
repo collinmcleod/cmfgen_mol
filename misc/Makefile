@@ -25,7 +25,7 @@ FN5=$(LIB_DIR)lib$(LN5).a
 # or if the libraries have changed since the last link.
 #
  
-OBJ1  =  update_pg_filename.o rd_f_to_s_ids.o rd_ba_mat.o rd_f_to_s_ids_v2.o rd_energy.o write_osc_v2.o
+OBJ1  =  update_pg_filename.o adjust_atm_r_grid.o rd_f_to_s_ids.o rd_ba_mat.o rd_f_to_s_ids_v2.o rd_energy.o write_osc_v2.o
  
 EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)ave_dc.exe\
@@ -46,7 +46,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)n_col_merge.exe\
          $(EXE_DIR)n_multi_merge.exe\
          $(EXE_DIR)rewrite_scr.exe\
-         $(EXE_DIR)rewrite_dc.exe\
+         $(EXE_DIR)rewrite_dc_v2.exe\
          $(EXE_DIR)rev_rdinr.exe\
          $(EXE_DIR)rev_rvsig.exe\
          $(EXE_DIR)recomz.exe\
