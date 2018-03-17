@@ -92,8 +92,9 @@
 	LOGICAL RD_MEANOPAC
 	LOGICAL REPLOT
 !
+	INTEGER GET_INDX_DP
         CHARACTER*30 UC
-        EXTERNAL UC
+        EXTERNAL UC,GET_INDX_DP
 !
 	CHARACTER(LEN=1) CURSVAL
 	CHARACTER(LEN=10) OPTION
@@ -137,6 +138,7 @@
 	WRITE(6,'(A)')'          RDR: read in new R grid (DC format)'
 	WRITE(6,'(A)')'         SCLR: scale radius of star to new value'
 	WRITE(6,'(A)')'         SCLV: scale velocity law to new value'
+	WRITE(6,'(A)')'         STOP: convert spherical model to a plane-paralell model'
 	WRITE(6,'(A)')'          TAU: Create entrie grid equally spaced in log[TAU] with constraints on dV'
 	WRITE(6,'(A)')'         PLOT: plot V and SIGMA from old RVSIG file'
 	WRITE(6,'(A)')
@@ -193,6 +195,8 @@
 	  WRITE(6,'(A)')'This option takes a plane-parallel model and oututs a spherical model'
 	  WRITE(6,'(A)')'The MEANOPAC from the plane-parallel model is required'
 	  WRITE(6,'(A)')'The VADAT file is also required'
+	  WRITE(6,'(A)')'Option not yet implemented'
+	  STOP
 	END IF
 !
 	IF(OPTION .EQ. 'TAU')THEN
@@ -975,6 +979,54 @@
 	    END DO
 	  END IF
 !
+	ELSE IF(OPTION .EQ. 'STOP')THEN
+!
+	  WRITE(6,*)' '
+	  WRITE(6,*)' Create a new RVSIG_COL file for a plane-parallel model from a spherical modl'
+	  WRITE(6,*)' '
+!
+	  ND=ND_OLD
+	  CALL GEN_IN(ND,'Increase number depth points (larger?)')
+	  CALL GEN_IN(V_TRANS,'Velocity at which to extend plane-parallel atmosphere (km/s)')
+	  IF(ND .EQ. ND_OLD)THEN
+	    R=OLD_R; V=OLD_V
+	  ELSE IF(ND .LT. ND_OLD)THEN
+	    J=ND_OLD-ND
+	    R(1:ND)=OLD_R(J+1:ND)
+	    V(1:ND)=OLD_V(J+1:ND)
+	  ELSE 
+	    J=ND-ND_OLD
+	    R(J+1:ND)=OLD_R(1:ND)
+	    V(J+1:ND)=OLD_V(1:ND)
+	    DO I=J,1,-1
+	      V(I)=V(I+1)*1.01D0		!Value irrelevant
+	    END DO
+	  END IF 
+	  TRANS_I=GET_INDX_DP(V_TRANS,V,ND)
+	  SCALE_HEIGHT=(R(TRANS_I)-R(TRANS_I+1))/LOG(V(TRANS_I)/V(TRANS_I+1))
+!
+	  WRITE(6,*)'     TRANS_I=',TRANS_I
+	  WRITE(6,*)'  R(TRANS_I)=',R(TRANS_I)
+	  WRITE(6,*)'  V(TRANS_I)=',V(TRANS_I)
+	  WRITE(6,*)'SCALE_HEIGHT=',SCALE_HEIGHT
+!
+	  T1=3.0D0; CALL GEN_IN(T1,'Number of depth points per scale height')
+	  IF(T1 .GT. 1)T1=1.0D0/T1
+	  DO I=TRANS_I-1,1,-1
+	    R(I)=R(I+1)+T1*SCALE_HEIGHT
+	    V(I)=V(TRANS_I)*EXP( (R(I)-R(TRANS_I))/SCALE_HEIGHT)
+	  END DO
+	  V(1:ND)=1.0D-15*V(1:ND)
+	  WRITE(6,*)'Decrease the mass-loss rate in the VADAT file by 10^15'
+!
+	  ALLOCATE (COEF(ND,4))
+	  CALL MON_INT_FUNS_V2(COEF,V,R,ND)
+	  DO I=1,ND
+	    SIGMA(I)=COEF(I,3)
+	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	  END DO
+	  DEALLOCATE (COEF)
+!
 	ELSE IF(OPTION .EQ. 'CUR')THEN
 !
 	  WRITE(6,'(A)')BLUE_PEN
@@ -1080,7 +1132,6 @@
 	      WRITE(10,'(A,ES14.6)')'! Beta in inner wind           =',BETA2
 	        WRITE(10,'(A,ES14.6)')'! ALPHA                        =',ALPHA
 	        END IF
-	      WRITE(10,'(A,ES14.6)')'! R(1)/R(ND)                   =',R(1)/R(ND)
 	    ELSE IF(OPTION .EQ. 'SCLR')THEN
 	      WRITE(10,'(A,ES14.6)')'! Old stellar radius           =',OLD_R(ND_OLD)
 	      WRITE(10,'(A,ES14.6)')'! New stellar rdaius           =',R(ND_OLD)
@@ -1088,8 +1139,8 @@
 	      WRITE(10,'(A,ES14.6)')'! Beta for velocity law        =',BETA
 	      WRITE(10,'(A,I3)'    )'! Velocity law (type)          =',VEL_TYPE
 	      WRITE(10,'(A,ES14.6)')'! Transition velocity is       =',V_TRANS
-	      WRITE(10,'(A,ES14.6)')'! R(1)/R(ND)                   =',R(1)/R(ND)
 	    END IF
+	    WRITE(10,'(A,ES14.6)')'! R(1)/R(ND)                   =',R(1)/R(ND)
 !
 ! Use a !! to inidicate from old file.
 !

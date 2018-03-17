@@ -2380,17 +2380,28 @@
 	  CALL DP_CURVE(ND,XV,YV)
 !
 	ELSE IF(XOPT .EQ. 'YMASS')THEN
+	  CALL USR_OPTION(TMP_LOGICAL,'OUTW','F','Intgerate mass outwards?')
 	  T1=4.0D+30*PI/MASS_SUN()
 	  DO I=1,ND
 	    ZETA(I)=T1*MASS_DENSITY(I)*CLUMP_FAC(I)*R(I)*R(I)
 	  END DO
+!
+! Note that TB[i] contains dM[i] (R[i] to R[i+1]).
+!
 	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  IF(TMP_LOGIAL)THEN
+	    TA(ND)=0.0D0
+	    DO I=ND-1,1,-1
+	      TA(I)=TA(I+1)+TB(I)
+	    END DO
+	  END IF
 	  YAXIS='M(\dsun\u)'
 	  WRITE(6,'(A,ES10.3,A)')'Mass of envelope (ejecta) is',TA(ND),' Msun'
 	  CALL DP_CURVE(ND,XV,TA)
 !
 	ELSE IF(XOPT .EQ. 'IMASS')THEN
 	  K=0
+	  CALL USR_OPTION(TMP_LOGICAL,'OUTW','F','Intgerate mass outwards?')
 	  WRITE(6,'(A)')' '
 	  DO ISPEC=1,NSPEC
 	    IF( (XSPEC .EQ. SPECIES(ISPEC) .OR. XSPEC .EQ. 'ALL') .AND.  POPDUM(ND,ISPEC) .GT. 0.0D0)THEN
@@ -2399,6 +2410,12 @@
 	        ZETA(I)=T1*POPDUM(I,ISPEC)*CLUMP_FAC(I)*R(I)*R(I)
 	      END DO
 	      CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	      IF(TMP_LOGIAL)THEN
+	        TA(ND)=0.0D0
+	        DO I=ND-1,1,-1
+	          TA(I)=TA(I+1)+TB(I)
+	        END DO
+	      END IF
 	      CALL DP_CURVE(ND,XV,TA)
 	      K=K+1
 	      WRITE(6,'( A,A4,A,ES9.2,A)',ADVANCE='NO')' Mass of ',TRIM(SPECIES(ISPEC)),' is',TA(ND),' Msun'
@@ -5178,7 +5195,7 @@ c
 	ELSE IF(XOPT .EQ. 'RR')THEN
 	   FOUND=.FALSE.
 	   DO ID=1,NUM_IONS
-	     IF(XSPEC .EQ. ION_ID(ID))THEN
+	     IF(XSPEC .EQ. UC(ION_ID(ID)))THEN
 	       CALL SETREC(TA,ATM(ID)%DXzV,ATM(ID+1)%XzV_F,ATM(ID+1)%NXzV_F,ND)
 	       FOUND=.TRUE.
 	     END IF

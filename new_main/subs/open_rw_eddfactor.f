@@ -83,8 +83,9 @@
 	    READ(LU_EDD,REC=FINISH_REC,IOSTAT=IOS)T1
 	    IF(FILENAME .EQ. FILENAME .OR. FILENAME .EQ. 'ES_J_CONV')THEN
 	      IF(T1 .EQ. 0.0D0 .OR. IOS .NE. 0)THEN
-	        WRITE(LUER,'(/,A)')' Warning --- All EDDFACTOR values not'//
+	        WRITE(LUER,'(/,A)')' Warning --- All values not'//
 	1                      ' computed - will compute new F'
+	        WRITE(LUER,'(A)')'Currently trying to read ',TRIM(FILENAME)
 	        COMPUTE_EDDFAC=.TRUE.
 	      END IF
 	    END IF
@@ -99,8 +100,9 @@
 	IF(COMPUTE_EDDFAC)THEN
 	  IF(USE_FIXED_J)THEN
 	    WRITE(LUER,*)'Error in CMFGEN_SUB'
-	    WRITE(LUER,*)'Program will compute EDDFACTOR but this is'//
+	    WRITE(LUER,*)'Program will compute new values but this is'//
 	1                      ' incompatable with US_FIXED_J=T'
+	    WRITE(LUER,'(A)')'Currently trying to read ',TRIM(FILENAME)
 	    STOP
 	  END IF
 !

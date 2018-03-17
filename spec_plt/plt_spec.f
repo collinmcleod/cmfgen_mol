@@ -1675,7 +1675,12 @@ C
 	       END IF
 	      XV(I)=T1
 	    END DO         
-	    IF(NORM_WAVE .GT. 0.0D0)THEN
+	    IF(NORM_WAVE .EQ. 0.0D0)THEN
+	      T1=4.0D0*ATAN(1.0D0)    !PI
+	      DO I=1,NBB
+	        YV(I)=YV(I)*T1
+	      END DO
+	    ELSE IF(NORM_WAVE .GT. 0.0D0)THEN
 	      NORM_FREQ=2.998D+03/NORM_WAVE
 	      DO I=2,NCF
 	        IF(NORM_FREQ .LE. NU(I-1) .AND. NORM_FREQ .GT. NU(I))K=I

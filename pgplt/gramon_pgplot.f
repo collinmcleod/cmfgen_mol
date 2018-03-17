@@ -2168,7 +2168,7 @@ C
 ! Peform simple X-axis arithmetic.
 !
 	ELSE IF (ANS .EQ. 'XAR')THEN
-	  CALL NEW_GEN_IN(XAR_OPERATION,'Operation: *,+,-,/,LG,ALG[=10^x],R[=1/x]')
+	  CALL NEW_GEN_IN(XAR_OPERATION,'Operation: *,+,-,/,LG,ALG[=10^x],R[=1/x],XN')
 	  CALL SET_CASE_UP(XAR_OPERATION,IZERO,IZERO)
 	  IF(XAR_OPERATION .NE. 'LG' .AND. XAR_OPERATION .NE. 'ALG' .AND. 
 	1           XAR_OPERATION .NE. 'XN' .AND. XAR_OPERATION .NE. 'R')THEN

@@ -115,8 +115,6 @@
 	REAL*8 RMAX
 	REAL*8 CONNECTION_VEL
 	REAL*8 CONNECTION_RADIUS
-	REAL*8 RP2_ON_CON_RAD
-	REAL*8 VEXT
 	INTEGER CONNECTION_INDX
 !
 	INTEGER ND			!Number of points in RUnge-Kutta integration
@@ -205,9 +203,6 @@
 	RMAX=MOD_RMAX/OLD_R(OLD_ND)
 	VTURB=MOD_VTURB
 	VEL_LAW=ITWO
-	BETA2=0.0D0
-	VEXT=-1.0D0
-	RP2_ON_CON_RAD=-1.0D0
 !
 	VC_ON_SS=0.75D0
 	TAU_REF=2.0D0/3.0D0
@@ -273,22 +268,6 @@
 	CALL RD_STORE_INT(VEL_LAW,'VEL_LAW',L_FALSE,'Velocity law for wind region (2 or 3)')
 	BETA2=BETA
 	CALL RD_STORE_DBLE(BETA2,'BETA2',L_FALSE,'Second exponent for velocity law')
-	CALL RD_STORE_DBLE(VEXT,'VEXT',L_FALSE,'Extension (km/s) to VINFr. Note: VINF1=VINF-VEXT')
-	CALL RD_STORE_DBLE(RP2_ON_CON_RAD,'RP2_ON_RT',L_FALSE,'Ration of RP2 to transition radius')
-	IF(VEL_LAW .EQ. 5)THEN
-	  IF(BETA2 .EQ. 0.0D0)THEN
-	    WRITE(LU_ERR,*)'Error in DO_CMF_HYDRO_V2 -- BETA2 cannot be zero for VEL_LAW 5'
-	    STOP
-	  END IF
-	  IF(VEXT .LT. 0.0D0)THEN
-	    WRITE(LU_ERR,*)'Error in DO_CMF_HYDRO_V2 -- VEXT cannot be less than zero for VEL_LAW 5'
-	    STOP
-	  END IF
-	  IF(RP2_ON_CON_RAD .LT. 0.0D0)THEN
-	    WRITE(LU_ERR,*)'Error in DO_CMF_HYDRO_V2 -- RP2_ON_CON_RAD cannot be less than zero for VEL_LAW 5'
-	    STOP
-	  END IF
-	END IF
 !
 ! Therse are the parameters used to define the new R grid to be output to RVSIG_COL.
 ! 
@@ -546,17 +525,11 @@
                   WRITE(LU_ERR,*)'       New GAM_LIM is',GAM_LIM
 	        END IF
 	      END DO
-!
-	      IF(USE_OLD_VEL)THEN
-	        CALL WIND_VEL_LAW_V3(R,V,SIGMA,VINF,BETA,BETA2,
-	1            VEXT,RP2_ON_CON_RAD,RMAX,
-	1            CONNECTION_RADIUS,CONNECTION_VEL,T2,VEL_LAW,J,ND_MAX)
-	        DO I=1,J
-	          POP_ATOM(I)=MDOT/MU_ATOM/R(I)/R(I)/V(I)
-	        END DO
-	      ELSE
-	        J=CONNECTION_INDX
-	      END IF
+	      CALL WIND_VEL_LAW_V2(R,V,SIGMA,VINF,BETA,BETA2,RMAX,
+	1          CONNECTION_RADIUS,CONNECTION_VEL,T2,VEL_LAW,J,ND_MAX)
+	      DO I=1,J
+	        POP_ATOM(I)=MDOT/MU_ATOM/R(I)/R(I)/V(I)
+	      END DO
 !
 ! To get other quantities we interpolate as a function of density.
 ! The atom density should be monotonic. At the outer boundary,
