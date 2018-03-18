@@ -117,11 +117,7 @@
 !
 	NLBEGIN=0	!Initialize for next iteration
 	CONTINUE
-	WRITE(6,*)'Calling STEQ in '
-	FLUSH(UNIT=6)
 	CALL WR_ASCI_STEQ(NION,ND,'STEQ ARRAY',LU_SE)
-	WRITE(6,*)'Done xalling STEQ in '
-	FLUSH(UNIT=6)
 !
 ! If we are currently doing a LAMBDA iteration we allow for bigger
 ! changes - up to a factor of 100. Otherwise changes are limited to

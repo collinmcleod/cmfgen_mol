@@ -7,6 +7,8 @@
 !
 	PROGRAM PLT_JH
 !
+! Altered 18-Mar-2018 :  Updated from OSIRIS.
+!                          BNU option installed in OSIRIS version, 12-Dec-2017        
 ! Altered 02-Nov-2013 :  Modified EXTJ J option -- now uses MON_INTERP.
 ! Altered 09-Jan-2009 :  No longer require RVTJ file.
 ! Altered 23-Nov-2007 :  New option inserted to allow J (in EDDFACTOR File) to be extended to

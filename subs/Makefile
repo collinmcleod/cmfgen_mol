@@ -40,6 +40,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(eval_adiabatic.o)\
       $(LIB)(eval_ed.o)\
       $(LIB)(ew_format.o)\
+      $(LIB)(ew_format_v2.o)\
       $(LIB)(ex_e1x_fun.o)\
       $(LIB)(exponx.o)\
       $(LIB)(extend3opac.o)\

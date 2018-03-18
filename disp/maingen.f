@@ -15,6 +15,9 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered  17-Mar-2018 : Adjusted to be compatible with OSIRIS version.
+!                          On 14-MAr-2018 option to reverse M integration was added.
+!                          WR_LINE keyword added to LTAU option.
 ! Altered  01-MAr-2016 : Adjusted PLNID -- only compute continuum opacity every 1009 km/s.
 !                          (Results in considerable speed up [1-Feb-2016]).
 ! Altered  09-Jun-2015 : Added PLT_PRFS to call.
@@ -236,6 +239,7 @@
 	REAL*8 RVAL,TAU_VAL,ED_VAL
 	REAL*8 XDIS,YDIS,DIS_CONST
 	REAL*8 LAM_ST,LAM_EN,DEL_NU
+	REAL*8 FREQ_ST,FREQ_EN
 	REAL*8 NU_ST,NU_EN
 	REAL*8 FREQ_RES,FREQ_MAX
 	REAL*8 T1,T2,T3,T4
@@ -310,6 +314,7 @@
 	LOGICAL LINE_BL,FULL_ES,EDDC,HAM,SKIPEW
 	LOGICAL THK_CONT,THK_LINE,LIN_DC,LINX,LINY
 	LOGICAL FIRST_RATE
+	LOGICAL WR_LINE
 	LOGICAL L_TRUE,L_FALSE
 	DATA L_TRUE/.TRUE./
 	DATA L_FALSE/.FALSE./
@@ -2389,7 +2394,7 @@
 ! Note that TB[i] contains dM[i] (R[i] to R[i+1]).
 !
 	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
-	  IF(TMP_LOGIAL)THEN
+	  IF(TMP_LOGICAL)THEN
 	    TA(ND)=0.0D0
 	    DO I=ND-1,1,-1
 	      TA(I)=TA(I+1)+TB(I)
@@ -2410,7 +2415,7 @@
 	        ZETA(I)=T1*POPDUM(I,ISPEC)*CLUMP_FAC(I)*R(I)*R(I)
 	      END DO
 	      CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
-	      IF(TMP_LOGIAL)THEN
+	      IF(TMP_LOGICAL)THEN
 	        TA(ND)=0.0D0
 	        DO I=ND-1,1,-1
 	          TA(I)=TA(I+1)+TB(I)
@@ -3932,6 +3937,24 @@
 	1      'Use radial (alt. is TANGENTIAL) direction to evaluate the Sobolev optical depth')
 	  CALL USR_OPTION(LINE_STRENGTH,'LS','F','Plot line strength')
 !
+	  DEFAULT=WR_STRING(LAM_ST)
+	  CALL USR_OPTION(LAM_ST,'LAMST',DEFAULT,FREQ_INPUT)
+	  DEFAULT=WR_STRING(LAM_EN)
+	  CALL USR_OPTION(LAM_EN,'LAMEN',DEFAULT,FREQ_INPUT)
+	  CALL USR_OPTION(WR_LINE,'WR_LINE','F','Write line?')
+!
+! This makes sure LAM_ST,LAM_END are in A.
+!
+	  IF(KEV_INPUT)THEN
+	    LAM_ST=ANG_TO_HZ/(LAM_ST*KEV_TO_HZ)
+	    LAM_EN=ANG_TO_HZ/(LAM_EN*KEV_TO_HZ)
+	  ELSE IF(HZ_INPUT)THEN
+	    LAM_ST=ANG_TO_HZ/LAM_ST
+	    LAM_EN=ANG_TO_HZ/LAM_EN
+	  END IF
+	  T1=MIN(LAM_ST,LAM_EN); LAM_EN=MAX(LAM_ST,LAM_EN); LAM_ST=T1
+	  FREQ_ST=ANG_TO_HZ/LAM_ST; FREQ_EN=ANG_TO_HZ/LAM_EN
+!
 	  IF(LINE_STRENGTH)THEN
 !
 ! Vdop=10 km/s and ignoring SQRT(PI)
@@ -3968,7 +3991,7 @@
 	            T2=ATM(ID)%AXzV_F(NL,NUP)*(T1*ATM(ID)%XzV_F(NL,I)-GLDGU*ATM(ID)%XzV_F(NUP,I))
 	            WRITE(25,*)NL,NUP,T1,T2
 	            WRITE(25,*)J,XV(J),T2
-	            IF(T2 .NE. 0)THEN
+	            IF(T2 .NE. 0 .AND. FREQ .LE. FREQ_ST .AND. FREQ .GE.  FREQ_EN)THEN
 	              IF(V(I) .LE. 20.0D0 .AND. .NOT. LINE_STRENGTH)THEN
 	                YV(J)=0.0D0
 	                T3=T2
@@ -3982,6 +4005,9 @@
 	                YV(J)=LOG10( 0.5D0*ATM(ID)%AXzV_F(NL,NUP)*ABS(YV(J))*TAU_CONSTANT/FREQ)
 	              ELSE
 	                YV(J)=LOG10( ABS(T2)*TAU_CONSTANT/FREQ )
+	              END IF
+	              IF(WR_LINE)THEN
+	                WRITE(40,'(F12.4,ES12.4,2X,A10,2I6)')XV(J),YV(J),ION_ID(ID), NL, NUP
 	              END IF
 	            ELSE
 	              J=J-1

@@ -151,7 +151,7 @@
 	CHARACTER SECTION*20
 	CHARACTER TMP_KEY*20
 	CHARACTER STRING*132
-	CHARACTER EW_STRING*132
+	CHARACTER EW_STRING*160
 	CHARACTER TEMP_CHAR*132
 !
 ! Global vectors:
@@ -1783,6 +1783,7 @@
 	  DO ML=1,NCF
 	    WRITE(J,REC=K-1+ML)(ETA_CMF_ST(I,ML),I=1,ND),NU(ML)
 	  END DO
+	  T1=1.0D0; WRITE(J,REC=FINISH_REC)T1
 	  CLOSE(UNIT=J)
 !
 	  CALL OPEN_RW_EDDFACTOR(R,V,LANG_COORD,ND,
@@ -1793,6 +1794,7 @@
 	  DO ML=1,NCF
 	    WRITE(J,REC=K-1+ML)(CHI_CMF_ST(I,ML),I=1,ND),NU(ML)
 	  END DO
+	  T1=1.0D0; WRITE(J,REC=FINISH_REC)T1
 	  CLOSE(UNIT=J)
 !
 	END IF
@@ -2079,8 +2081,8 @@
 ! Open file to store EW data
 !
 	CALL GEN_ASCI_OPEN(LU_EW,'EWDATA','UNKNOWN',' ',' ',IZERO,IOS)
-	WRITE(LU_EW,'(4X,A,3X,A,6X,A,2X,A,3X,A)')'Lam(Ang)','C. Flux',
-	1                  'EW(Ang)','Sob','Trans. Name'
+	WRITE(LU_EW,'(3X,A,2X,A,3X,A,5X,A,3(2X,A),4X,A)')'Lam(Ang)','C.Flux(Jy)',
+	1                  'EW(Ang)','L.Flux','Sob','  NL',' NUP','Trans. Name'
 !
 ! Zero the vector that will be used to store the force-multiplier computed
 ! for all lines using the SOBOLEV approximation.
@@ -2321,9 +2323,11 @@
 	IF(ABS(EW) .GE. EW_CUT_OFF)THEN
 	  T1=LAMVACAIR(FL_SIM(1)) 		!Wavelength(Angstroms)
 	  DO SIM_INDX=1,NUM_SIM_LINES
-	    NUP=SIM_NUP(SIM_INDX)
-	    CALL EW_FORMAT(EW_STRING,TRANS_NAME_SIM(SIM_INDX),T1,
-	1                     CONT_INT,EW,SOBOLEV)
+	    J=SIM_LINE_POINTER(SIM_INDX)
+	    MNL=VEC_MNL_F(J)
+	    MNUP=VEC_MNUP_F(J)
+	    CALL EW_FORMAT_V2(EW_STRING,TRANS_NAME_SIM(SIM_INDX),T1,
+	1                     CONT_INT,EW,SOBOLEV,MNL,MNUP)
 	    IF(SIM_INDX .NE. 1)THEN
 	      I=INDEX(EW_STRING,'  ')
 	      EW_STRING(3:I+1)=EW_STRING(1:I-1)

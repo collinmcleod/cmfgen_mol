@@ -5,6 +5,7 @@ C
 	INTEGER FUNCTION GET_INDX_DP(RVAL,R,NW)
 	IMPLICIT NONE
 C
+C Altered 17-JAn-2018 - Error reporting improved (added to IBIS 17-Mar-2018)
 C Altered 19-May-2014 - Changed error unit form 2 to 6 (25-May-2014).                              
 C Altered 02-May-1990 - Bug fix: If on two consecutive calls, RVAL was the
 C                       same but the R array different, the returned index

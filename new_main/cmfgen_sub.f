@@ -1597,12 +1597,8 @@
 	  CALL TUNE(ITWO,'SE_NON_THERM')
 	END IF
 !
-	WRITE(6,*)'Beginning STEQ write'
-	FLUSH(UNIT=6)
 	IF(LST_ITERATION)
 	1     CALL WR_ASCI_STEQ(NION,ND,'STEQ ARRAY- Collisional Terms',19)
-	WRITE(6,*)'Done STEQ write'
-	FLUSH(UNIT=6)
 ! 
 !
 ! Compute the collisional cooling terms for digestion.
