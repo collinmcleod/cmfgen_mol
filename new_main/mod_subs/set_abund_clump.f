@@ -16,6 +16,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 21-Mar-2018 : Added SNCL clumping option.
 ! Altered 25-Jun-2010 : Correctly compute MEAN_ATOMIC_WEIGHT and ABUND_SUM for 
 !                         SN model. Abunances are surface abundances.
 ! Altered 08-Feb-2006 : New clumping law installed (used by PACO for P Cygni).
@@ -85,11 +86,27 @@
 	1          EXP(-V(K)/CLUMP_PAR(2))+
 	1	   (1.0D0-CLUMP_PAR(1))*EXP( (V(K)-V(1))/CLUMP_PAR(3))
 	    END DO
-	  ELSE
+	 ELSE IF(CLUMP_LAW(1:4) .EQ. 'SNCL')THEN
+	    IF (CLUMP_PAR(3) .EQ. 0.0D0) THEN
+	       DO K=1,ND
+		  T1 = (V(K) - V(ND)) / CLUMP_PAR(2)
+		  CLUMP_FAC(K)=1.0D0 + (CLUMP_PAR(1)-1.0d0)*EXP(-T1*T1)
+	       END DO
+	    ELSE
+	       DO K=1,ND
+		  IF (V(K).LE.CLUMP_PAR(3)) THEN
+		     CLUMP_FAC(K) = CLUMP_PAR(1)
+		  ELSE
+		     T1 = (V(K) - CLUMP_PAR(3)) / CLUMP_PAR(2)
+		     CLUMP_FAC(K)=1.0D0 + (CLUMP_PAR(1)-1.0d0)*EXP(-T1*T1)
+		  ENDIF
+	       END DO
+	    ENDIF
+	 ELSE
 	    WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
 	    WRITE(LUER,*)'Invalid law for computing clumping factor'
 	    STOP
-	  END IF
+	 END IF
 	ELSE
 	  DO K=1,ND
 	    CLUMP_FAC(K)=1.0D0

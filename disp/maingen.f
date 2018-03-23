@@ -15,6 +15,7 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered  21-Mar-2018 : DERAD is now corrected for clumping.
 ! Altered  17-Mar-2018 : Adjusted to be compatible with OSIRIS version.
 !                          On 14-MAr-2018 option to reverse M integration was added.
 !                          WR_LINE keyword added to LTAU option.
@@ -2537,7 +2538,7 @@
 	ELSE IF(XOPT .EQ. 'DERAD')THEN
 	  CALL USR_OPTION(ELEC,'INTEG','F','Integrated luminosity')
 	  IF(ELEC)THEN
-	    YV(1:ND)=3.280D-03*dE_RAD_DECAY(1:ND)*R(1:ND)*R(1:ND)  !(4*PI*Dex(+30)/L(sun)
+	    YV(1:ND)=3.280D-03*dE_RAD_DECAY(1:ND)*CLUMP_FAC(1:ND)*R(1:ND)*R(1:ND)  !(4*PI*Dex(+30)/L(sun)
 	    CALL LUM_FROM_ETA(YV,R,ND)
 	    DO I=ND-1,1,-1
 	      YV(I)=YV(I+1)+YV(I)

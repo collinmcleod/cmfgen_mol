@@ -39,7 +39,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(get_moms_rel.o)\
       $(LIB)(get_rsqh_rel.o)\
       $(LIB)(jgrey_hub_ddt_v2.o)\
-      $(LIB)(jgrey_hub_ddt_v4.o)\
+      $(LIB)(jgrey_hub_ddt_v5.o)\
       $(LIB)(j_weight.o)\
       $(LIB)(h_weight.o)\
       $(LIB)(k_weight.o)\

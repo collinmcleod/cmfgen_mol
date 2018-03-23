@@ -7,6 +7,7 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered: 21-Mar-2018 : Now output CLUMP_FAC to SN_HYDRO_FOR_NEXT_MODEL. 
 ! Altered: 06-Sep-2016 : Increased output precision in R and V to 10 digits.
 ! Altered: 01-Mar-2016 : Changed to allow handling of a standard NUC_DECAY_DATA file.
 !                         Code checks availability of decay route. This is important
@@ -59,6 +60,7 @@
 	CALL OUT_SN_VEC(DENSITY,ND,'Density (gm/cm^3)',LU)
 	CALL OUT_SN_VEC(POP_ATOM,ND,'Atom density (/cm^3)',LU)
 	CALL OUT_SN_VEC(ED,ND,'Electron density (/cm^3)',LU)
+	CALL OUT_SN_VEC(CLUMP_FAC,ND,'Clumping factor',LU)
 	CALL OUT_SN_VEC(ROSS_MEAN,ND,'Rosseland mean opacty (10^{-10} cm^{-1})',LU)
 	TMP_VEC=1.0D-10*ROSS_MEAN/DENSITY
 	CALL OUT_SN_VEC(TMP_VEC,ND,'Kappa (cm^2/gm)',LU)
