@@ -37,10 +37,9 @@
 !
 	IF(IZ .GT. 30)THEN
 	  LUER=ERROR_LU()
-	  WRITE(LUER,*)'Error in XCROSS_V2'
-	  WRITE(LUER,*)'No X-ray data available for species'//
-	1                     ' with Atomic No.  > 30'
-	  STOP
+	  WRITE(LUER,*)'Warning in SET_X_FREQ_V2'
+	  WRITE(LUER,*)'No X-ray data available for species with Atomic No. > ATNO_MAX'
+!	  STOP
 	END IF
 !
 ! We only wish to return photoionization edges for the core

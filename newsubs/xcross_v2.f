@@ -56,6 +56,7 @@
 	REAL*8 NU_EV
 	REAL*8 Y
 	REAL*8 Q
+	LOGICAL, SAVE :: FIRST=.TRUE.
 !
 	XCROSS_V2=0.0D0
 	CON_FAC=1.0D0/0.24191D0			!10^15 Hz to ev
@@ -75,11 +76,16 @@
 	END IF
 !
 	IF(IZ .GT. ATNO_MAX_X)THEN
-	  LUER=ERROR_LU()
-	  WRITE(LUER,*)'Error in XCROSS_V2'
-	  WRITE(LUER,*)'No X-ray data available for species'//
-	1                     ' with Z > ',ATNO_MAX_X
-	  STOP
+	  IF(FIRST)THEN
+	    LUER=ERROR_LU()
+	    WRITE(LUER,*)'Warning in XCROSS_V2'
+	    WRITE(LUER,*)'No X-ray data available for species'//
+	1                       ' with Z > ',ATNO_MAX_X
+	    FIRST=.FALSE.
+	  END IF
+	  SIG_0_X(IZ,NE,:,:)=0.0D0
+	  XCROSS_V2=0.0D0
+	  RETURN
 	END IF
 !
 ! This section allows the photoionization cross-ection for a particular
