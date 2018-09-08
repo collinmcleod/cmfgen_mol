@@ -1,20 +1,26 @@
 	PROGRAM PLT_LN_HEAT
 	USE GEN_IN_INTERFACE
+	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered: 30-Aug-2018 - All important arrays now allocatable.
+!                          Cleaned up output from option MAIN.
+!                          Added option IDI, and options to set X-axis.
+!                          Options now done in same way as maingen.
+!                          Changes done over a week (23 ? on).
 ! Altered:  6-Dec-2017 - Made copatible with version from osiris.
 ! Altered: 14-Jun-2017 - Added option to read LINEHEAT created by SOBOLEV approximation.
 !
 	INTEGER, PARAMETER :: NMAX=600000
 	INTEGER, PARAMETER :: NS_MAX=400
 !
-	REAL*8 NU(NMAX)
-	REAL*8 LAM(NMAX)
-	REAL*8 SCALE_FAC(NMAX)
-	REAL*8 XV(NMAX)
-	REAL*8 Y(NMAX)
-	INTEGER INDX(NMAX)
-	CHARACTER*60 NAME(NMAX)
+	REAL*8, ALLOCATABLE :: NU(:)
+	REAL*8, ALLOCATABLE :: LAM(:)
+	REAL*8, ALLOCATABLE :: SCALE_FAC(:)
+	REAL*8, ALLOCATABLE :: XV(:)
+	REAL*8, ALLOCATABLE :: Y(:)
+	INTEGER, ALLOCATABLE:: INDX(:)
+	CHARACTER(LEN=60), ALLOCATABLE :: NAME(:)
 !
 ! These are used to determine which species contribute most to the
 ! difference between SE_SCL and SE_NOSCL.
@@ -25,23 +31,27 @@
 	REAL*8, ALLOCATABLE :: LH(:,:)
 	REAL*8, ALLOCATABLE :: SE_SCL(:,:)
 	REAL*8, ALLOCATABLE :: SE_NOSCL(:,:)
+	CHARACTER(LEN=120), ALLOCATABLE ::  TRANS_INFO(:)
 !
 	REAL*8 T1
 	INTEGER ND
 	INTEGER N_LINES
 	INTEGER COUNT
-	INTEGER I,J,K,L,ML,IBEG
+	INTEGER I,J,K,L,ML,IBEG,IDEPTH
 	INTEGER NL,NUP
 	INTEGER IOS
+	INTEGER NSPEC
 	LOGICAL FILE_OPEN
 	LOGICAL DO_SORT
 	LOGICAL SOB_MODEL
 !
-	CHARACTER*80 FILENAME
-	CHARACTER*200 STRING
-        CHARACTER*30 UC
+	CHARACTER(LEN=80) FILENAME
+	CHARACTER(LEN=200) STRING
+        CHARACTER(LEN=30) UC
+	CHARACTER(LEN=20) PLT_OPT
+	CHARACTER(LEN=20) XLABEL
+	CHARACTER(LEN=20) YLABEL
         EXTERNAL UC
-	CHARACTER*20 PLT_OPT
 !
 	WRITE(6,'(A)')' '
 	WRITE(6,'(A)')' Program to plot the radiative equilibrium equation.'
@@ -51,7 +61,7 @@
 	WRITE(6,'(A)')' '
 !
         SOB_MODEL=.FALSE.
-        CALL GEN_IN(SOB_MODEL,'Was LINEHEAT created using the SONBOLEV approximation?')
+        CALL GEN_IN(SOB_MODEL,'Was LINEHEAT created using the SOBOLEV approximation?')
 100	CONTINUE
  	FILENAME='LINEHEAT'
 	CALL GEN_IN(FILENAME,'File with data to be plotted')
@@ -82,9 +92,21 @@
 	ALLOCATE (LH(ND,N_LINES))
 	ALLOCATE (SE_SCL(ND,N_LINES))
 	ALLOCATE (SE_NOSCL(ND,N_LINES))
+	ALLOCATE (TRANS_INFO(N_LINES))
+!
+	ALLOCATE (NU(N_LINES))
+	ALLOCATE (LAM(N_LINES))
+	ALLOCATE (SCALE_FAC(N_LINES))
+	ALLOCATE (XV(N_LINES))
+	ALLOCATE (Y(N_LINES))
+	ALLOCATE (INDX(N_LINES))
+	ALLOCATE (NAME(N_LINES))
 !
 	OPEN(UNIT=11,FILE=FILENAME,STATUS='OLD',ACTION='READ')
 !
+	WRITE(6,'(A)')RED_PEN
+	WRITE(6,'(A)')' Reading data -- this may take a while'
+	WRITE(6,'(A)')DEF_PEN
 	COUNT=0
 	DO ML=1,N_LINES
 	  STRING=' '
@@ -98,6 +120,7 @@
 	    COUNT=COUNT+1
 	  ELSE
 	    STRING=ADJUSTL(STRING)
+	    TRANS_INFO(ML)=STRING
 	    K=INDEX(STRING,' ')
 	    STRING=ADJUSTL(STRING(K:))
 	    K=INDEX(STRING,' ')
@@ -127,44 +150,64 @@
 	END DO
 5000	CONTINUE
 	N_LINES=COUNT
+	WRITE(6,'(A)')BLUE_PEN
 	WRITE(6,*)'Number of lines read is',N_LINES 
+	WRITE(6,'(A)')DEF_PEN
 !
         IF(SOB_MODEL)THEN
-          NU(1:N_LINES)=2.99702458D+03/LAM(1:N_LINES)
+          NU(1:N_LINES)=2.99792458D+03/LAM(1:N_LINES)
         ELSE 
-	  LAM(1:N_LINES)=2.99702458D+03/NU(1:N_LINES)
+          LAM(1:N_LINES)=2.99792458D+03/NU(1:N_LINES)
 	END IF
 !
-	PLT_OPT='SS'
+! Set def axis.
+!
+	XV(1:N_LINES)=NU(1:N_LINES)
+	XLABEL='\gn(10\u15 \dHz)'
+!
 	DO WHILE(1 .EQ. 1)
 	  WRITE(6,*)' '
-	  WRITE(6,*)'Plot options are:'
-	  WRITE(6,*)' LH:    Plot LH  at given depth'
-	  WRITE(6,*)' SS:    Plot STEQ (scaling) at given depth'
-	  WRITE(6,*)' SN:    Plot STEQ (no scaling) at a given depth'
-	  WRITE(6,*)' FV:    Plot final values (SCL, NO SCL) as a function of depth'
-	  WRITE(6,*)' WR:    Write SS & SN data at a single depth to file'
-	  WRITE(6,*)' E(X):  Exit routine'
+	  PLT_OPT='P'
 	  CALL GEN_IN(PLT_OPT,'Plot option')
-	  IF(UC(PLT_OPT) .EQ. 'LH')THEN
+!
+	  IF(UC(PLT_OPT) .EQ. 'XLAM')THEN
+	    DO I=1,N_LINES
+	      XV(I)=LAM(I)
+	    END DO
+	    XLABEL='\gl(\AA)'
+	  ELSE IF(UC(PLT_OPT) .EQ. 'XNU')THEN
+	    DO I=1,N_LINES
+	      XV(I)=NU(I)
+	    END DO
+	    XLABEL='\gn(10\u15 \dHz)'
+	  ELSE IF(UC(PLT_OPT) .EQ. 'XN')THEN
+	    DO I=1,N_LINES
+	      XV(I)=I
+	    END DO
+	    XLABEL='I'
+! 
+	  ELSE IF(UC(PLT_OPT) .EQ. 'LH')THEN
 	    K=ND
 	    CALL GEN_IN(K,'Depth for plotting')
 	    Y(1:N_LINES)=LH(K,1:N_LINES)
-	    CALL DP_CURVE(N_LINES,NU,Y)
-	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','LH',' ',' ')
+	    CALL DP_CURVE(N_LINES,XV,Y)
+	    YLABEL='LH'
+!
 	  ELSE IF(UC(PLT_OPT) .EQ. 'SS')THEN
 	    K=ND
 	    CALL GEN_IN(K,'Depth for plotting')
 	    Y(1:N_LINES)=SE_SCL(K,1:N_LINES)
 	    WRITE(6,*)Y(N_LINES)
-	    CALL DP_CURVE(N_LINES,NU,Y)
-	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','STEQ(scaled)',' ',' ')
+	    CALL DP_CURVE(N_LINES,XV,Y)
+	    YLABEL='STEQ(scaled)'
+!
 	  ELSE IF(UC(PLT_OPT) .EQ. 'SN')THEN
 	    K=ND
 	    CALL GEN_IN(K,'Depth for plotting')
 	    Y(1:N_LINES)=SE_NOSCL(K,1:N_LINES)
-	    CALL DP_CURVE(N_LINES,NU,Y)
-	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','STEQ(scaled)',' ',' ')
+	    CALL DP_CURVE(N_LINES,XV,Y)
+	    YLABEL='STEQ(not scaled)'
+!
 	  ELSE IF(UC(PLT_OPT) .EQ. 'DIFF')THEN
 	    K=ND
 	    CALL GEN_IN(K,'Depth for plotting')
@@ -172,52 +215,73 @@
 	      Y(L)=(SE_NOSCL(K,L+1)-SE_NOSCL(K,L))-(SE_SCL(K,L+1)-SE_SCL(K,L))
 	    END DO
 	    Y(N_LINES)=0
-	    CALL DP_CURVE(N_LINES,NU,Y)
-	    CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','Diff',' ',' ')
+	    CALL DP_CURVE(N_LINES,XV,Y)
+	    YLABEL='Diff'
+!
 	  ELSE IF(UC(PLT_OPT) .EQ. 'MAIN')THEN
 !
 ! Get the influence due to scaling of a given line on the radiative equilibrium
 ! equation.
 !
-	    K=ND
-	    CALL GEN_IN(K,'Depth for plotting')
+	    IDEPTH=ND
+	    CALL GEN_IN(IDEPTH,'Depth for plotting')
 	    SUMD=0.0D0; SPEC=' '
 !
 	    DO ML=1,N_LINES
-	      Y(ML)=LH(K,ML)*(1.0D0-SCALE_FAC(ML))
+	      Y(ML)=LH(IDEPTH,ML)*(1.0D0-SCALE_FAC(ML))
 	      I=INDEX(NAME(ML),'(')
 	      DO J=1,200
-	        IF(SPEC(J) .EQ. ' ')SPEC(J)=NAME(ML)(1:I-1)
+	        IF(SPEC(J) .EQ. ' ')THEN
+	          SPEC(J)=NAME(ML)(1:I-1)
+	          NSPEC=NSPEC+1
+	        END IF
 	        IF(NAME(ML)(1:I-1) .EQ. SPEC(J))THEN
 	          SUMD(J)=SUMD(J)+Y(ML)
 	          EXIT
 	        END IF
 	      END DO
 	    END DO
+	    CALL INDEXX(NSPEC,SUMD,INDX,.TRUE.)
 !
-	    DO J=1,200
-	      IF(SPEC(J) .EQ. ' ')EXIT
-	      WRITE(27,'(A10,ES14.4)')TRIM(SPEC(J)),SUMD(J)
-	    END DO
-!
-	    DO_SORT=.FALSE.
-	    CALL GEN_IN(DO_SORT,'Create a list of the 20 line having the largest influence')
-	    IF(DO_SORT)THEN
-	      T1=SUM(SUMD)
-	      Y(1:N_LINES)=Y(1:N_LINES)/T1
-	      CALL INDEXX(N_LINES,Y,INDX,.TRUE.)
-!
-	      DO I=N_LINES,N_LINES-19,-1
+	    WRITE(6,'(A)')RED_PEN
+	    WRITE(6,'(A)')' Output is being written to the file: HEAT_CONTRIBUTIONS'
+	    WRITE(6,'(A)')DEF_PEN
+	    OPEN(UNIT=27,FILE='HEAT_CONTRIBUTIONS',STATUS='UNKNOWN',ACTION='WRITE',POSITION='APPEND')
+	      WRITE(27,'(A)')' '
+	      WRITE(27,'(A,2X,I4)')' Contributions to Rad. Equil. Equ at depth',IDEPTH
+	      WRITE(27,'(A)')' '
+	      WRITE(27,'(X,A,ES14.4,5X,A,ES14.4)')'Scaled sum=',SE_SCL(IDEPTH,N_LINES),'Unscsaled sum',SE_NOSCL(IDEPTH,N_LINES)
+	      WRITE(27,'(A)')' '
+	      DO I=1,NSPEC
 	        J=INDX(I)
-	        WRITE(28,'(A60,ES16.6,ES12.2)')NAME(J),LAM(J),Y(J)
+	        IF(SPEC(J) .EQ. ' ')EXIT
+	        WRITE(27,'(A10,ES14.4)')TRIM(SPEC(J)),SUMD(J)
 	      END DO
-	      WRITE(28,'(A)')' '
-	      DO I=1,20
-	        J=INDX(I)
-	        WRITE(28,'(A60,ES16.6,ES12.2)')NAME(J),LAM(J),Y(J)
-	      END DO
-	    END IF
 !
+	      DO_SORT=.TRUE.
+	      CALL GEN_IN(DO_SORT,'Create a list of the 30 lines having the largest influence')
+	      IF(DO_SORT)THEN
+	        T1=SUM(SUMD)
+	        Y(1:N_LINES)=ABS(Y(1:N_LINES))/T1
+	        CALL INDEXX(N_LINES,Y,INDX,.TRUE.)
+!
+	        WRITE(27,'(A)')' '
+	        WRITE(27,'(A,2X,I4)')' Lines with cooling (+ve) / heating (-ve) contributions'
+	        WRITE(27,'(A)')' '
+	        WRITE(27,'(1X,A,T71,A,2X,A,4X,A)')'Transition','Lam(A)','Frac. Contr.','Scale Fac.'
+	        WRITE(27,'(A)')' '
+	        T1=SUM(SUMD)
+	        DO I=1,29
+	          J=INDX(I)
+	          WRITE(27,'(1X,A60,ES16.6,ES14.3,ES14.5)')NAME(J),LAM(J),LH(IDEPTH,J)*(1.0D0-SCALE_FAC(J))/T1,SCALE_FAC(J)
+	        END DO
+	      END IF
+	    CLOSE(UNIT=27)
+!
+	  ELSE IF(UC(PLT_OPT) .EQ. 'IDI')THEN
+	    CALL GEN_IN(I,'Line index on plot')
+	    WRITE(6,'(A)')TRANS_INFO(I)
+!	   
 	  ELSE IF(UC(PLT_OPT) .EQ. 'FV')THEN
 	    DO I=1,ND
 	      XV(I)=I
@@ -227,6 +291,7 @@
 	    Y(1:ND)=SE_NOSCL(1:ND,N_LINES)
 	    CALL DP_CURVE(ND,XV,Y)
 	    CALL GRAMON_PGPLOT('Depth Index','STEQ(sc,scl)',' ',' ')
+!
 	  ELSE IF(UC(PLT_OPT) .EQ. 'WR')THEN
 	    K=ND
 	    CALL GEN_IN(K,'Depth for plotting')
@@ -234,6 +299,29 @@
 	      WRITE(100,'(I7,4ES14.4,3X,A)')I,NU(I),SE_NOSCL(K,I)-SE_SCL(K,I),
 	1                SE_NOSCL(K,I),SE_SCL(K,I),TRIM(NAME(I))
 	    END DO
+!
+	  ELSE IF(UC(PLT_OPT(1:1)) .EQ. 'H')THEN
+!
+	    WRITE(6,*)' '
+	    WRITE(6,*)' XN:    Set X-axis to line index'
+	    WRITE(6,*)' XNU:   Set X-axis to frequency'
+	    WRITE(6,*)' XLAM:  Set X-axis to wavelength'
+	    WRITE(6,*)' '
+	    WRITE(6,*)' IDI:   Get transition information for line I'
+	    WRITE(6,*)' MAIN:  List most important lines contributing to heatinge error at given depth'
+	    WRITE(6,*)'           Also lists contributions by ioization stage'
+	    WRITE(6,*)' '
+	    WRITE(6,*)' LH:    Plot LH  at given depth'
+	    WRITE(6,*)' SS:    Plot STEQ (scaling) at given depth'
+	    WRITE(6,*)' SN:    Plot STEQ (no scaling) at a given depth'
+	    WRITE(6,*)' DIFF   Plit contibution by individual lines to the difference betwenn SCL and NO_SCL'
+	    WRITE(6,*)' FV:    Plot final values (SCL, NO SCL) as a function of depth'
+	    WRITE(6,*)' WR:    Write SS & SN data at a single depth to file'
+	    WRITE(6,*)' E(X):  Exit routine'
+!
+	  ELSE IF(UC(PLT_OPT) .EQ. 'P')THEN
+	    CALL GRAMON_PGPLOT(XLABEL,YLABEL,' ',' ')
+!
 	  ELSE IF(UC(PLT_OPT) .EQ. 'EX' .OR. UC(PLT_OPT) .EQ. 'E')THEN
 	    STOP
 	  END IF

@@ -164,6 +164,9 @@
 	1           'Solution options for CMF_FORM_SOL')
 	  CALL RD_STORE_LOG(DO_SOBOLEV_LINES,'DO_SOB_LINES',L_TRUE,
 	1        'Compute Sobolev EWs?')
+	  DO_ALL_SOB_LINES=.FALSE.
+	  CALL RD_STORE_LOG(DO_ALL_SOB_LINES,'DO_ALL_SOB',L_FALSE,
+	1        'Compute ALL Sobolev lines EWs?')
 	  CALL RD_STORE_DBLE(EW_CUT_OFF,'EW_CUT',L_TRUE,
 	1        'Output EW info only if ABS(EW) > EW_CUT')
 	  CALL RD_STORE_LOG(SOB_FREQ_IN_OBS,'SOB_FREQ_IN_OBS',L_TRUE,

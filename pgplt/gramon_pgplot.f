@@ -32,7 +32,7 @@
 ! Altered:  04-Apr-2001 : Include option for differen PLT_ST filename.
 !                         Code now ouputs name of stored plots when bad plot id entered.
 ! Altered:  15-Jul-2000 : MOD_CURVE_DATA installed.
-!                         Dynamically allocated DAta arrays to allow arbitrary
+!                         Dynamically allocated data arrays to allow arbitrary
 !                         size plots.
 ! Altered:  31-May-2000 : Now can handel smaller X and Y ranges, because
 !                          exponential format has been included in MON_NUM.
@@ -93,6 +93,8 @@
 	LOGICAL FILL
 !
 	INTEGER, PARAMETER :: N_TITLE=10
+	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
+	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 	CHARACTER*80  XLABEL,YLABEL,TITLE(N_TITLE)
 	CHARACTER*(*) XLAB,YLAB,TITL,PASSED_OPT
         CHARACTER*200 FILNAME
@@ -187,6 +189,14 @@
 	INTEGER PGBEG, PGCURS
 	REAL*8 SPEED_OF_LIGHT
 	REAL*8 LAM_VAC
+	REAL*8 LAM_ST,LAM_END
+!
+	REAL*8 DP_CUT_ACC
+	REAL*8 SIG_GAU_KMS
+	REAL*8 FRAC_SIG_GAU
+	REAL*8, ALLOCATABLE :: WRK1(:)
+	REAL*8, ALLOCATABLE :: WRK2(:)
+	
 !
 	REAL*4,    PARAMETER :: RONE=1.0
 	INTEGER, PARAMETER :: IZERO=0
@@ -308,6 +318,9 @@
 	LENGTH_OF_HC_PLOT=200.0D0       !cm
 	VB_BASE=-1000
 	FILL=.FALSE.
+	SIG_GAU_KMS=10.0D0
+	FRAC_SIG_GAU=0.25D0
+	DP_CUT_ACC=0.01D0
 !
 	IF(NPLTS .GT. MAXPEN)THEN
 	  WRITE(T_OUT,*)'Error n GRAMON_PLOT -- not enough pen loctions'
@@ -2043,6 +2056,9 @@ C
 	    WRITE(T_OUT,*)'Error opening file'
 	    GOTO 1000
 	  END IF
+	  LAM_ST=0.0D0; LAM_END=0.0D0
+	  CALL NEW_GEN_IN(LAM_ST,'Start wavelength for output (def=ALL)')
+	  CALL NEW_GEN_IN(LAM_END,'End waveliength for output (def=ALL)')
 !
 	  L=-1
 	  CALL NEW_GEN_IN(L,'Plot to output (def=-1=ALL)')
@@ -2051,13 +2067,27 @@ C
 	    WRITE(30,*)NPLTS
 	    WRITE(30,*)(NPTS(I),I=1,NPLTS)
 	    DO J=1,MAXVAL(NPTS)
-	      DO IP=1,NPLTS
-	        IF(J .LE. NPTS(IP))THEN
-	          WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE='NO')CD(IP)%XVEC(J),CD(IP)%DATA(J)
-	        ELSE
-	          WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE='NO')0.0D0,0.0D0
-	        END IF
-	      END DO
+	      IF(LAM_ST .EQ. LAM_END)THEN
+	        DO IP=1,NPLTS
+	          IF(J .LE. NPTS(IP))THEN
+	            WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE='NO')CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	          ELSE
+	            WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE='NO')0.0D0,0.0D0
+	          END IF
+	        END DO
+	        WRITE(30,'(A)')' '
+	      ELSE
+	        CNT=0
+	        DO IP=1,NPLTS
+	          IF(J .LE. NPTS(IP) .AND. (LAM_ST-CD(IP)%XVEC(J))*(CD(IP)%XVEC(J)-LAM_END) .GE. 0)THEN
+	            WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE='NO')CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	            CNT=CNT+1
+	          ELSE
+	            WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE='NO')0.0D0,0.0D0
+	          END IF
+	        END DO
+	        IF(CNT .NE. 0)WRITE(30,'(A)')' '
+	      END IF
 	      WRITE(30,'(A)')' '
 	    END DO
 	    WRITE(T_OUT,*)NPLTS,' plots written to ',TRIM(FILNAME)
@@ -2065,9 +2095,17 @@ C
 	    WRITE(30,*)NPLTS
 	    WRITE(30,*)NPTS(L)
 	    IP=L
-	    DO J=1,NPTS(IP)
-	      WRITE(30,'(2X,ES14.7,ES14.6)')CD(IP)%XVEC(J),CD(IP)%DATA(J)
-	    END DO
+	    IF(LAM_ST .EQ. LAM_END)THEN
+	      DO J=1,NPTS(IP)
+	        WRITE(30,'(2X,ES14.7,ES14.6)')CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	      END DO
+	    ELSE
+	      DO J=1,NPTS(IP)
+	        IF( (LAM_ST-CD(IP)%XVEC(J))*(CD(IP)%XVEC(J)-LAM_END) .GE. 0)THEN
+	           WRITE(30,'(2X,ES14.7,ES14.6)')CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	        END IF
+	      END DO
+	    END IF 
 	    WRITE(T_OUT,*)'One plot written to ',TRIM(FILNAME)
 	  END IF
 	  CLOSE(UNIT=30)
@@ -2388,6 +2426,11 @@ C
 	  GOTO 1000
 !
 	ELSE IF (ANS .EQ. 'SM' .OR. ANS .EQ. 'BXSM')THEN
+!
+	  WRITE(6,*)BLUE_PEN
+	  WRITE(6,*)'Note: This option asumes equally spaced data'
+	  WRITE(6,*)'Use the GSM option for unequal data for Gaussian smoothing with fixed resolution (in km/s)'
+	  WRITE(6,*)DEF_PEN
 	  IF(ANS .EQ. 'BXSM')THEN
 	    BOX_FILTER=.TRUE.
 	    I=3; CALL NEW_GEN_IN(I,'NPTS > 2 (should be odd)')
@@ -2406,6 +2449,39 @@ C
 	    CALL NEW_GEN_IN(SMOOTH_PLOT(IP),TRIM(TMP_STR))
 	  END DO
 	  CALL SMOOTH_PLT(SMOOTH_PLOT,BOX_FILTER,I)
+!
+	ELSE IF (ANS .EQ. 'GSM')THEN
+	  IP=1; CALL NEW_GEN_IN(IP,'Plot to smooth')
+	  OP=NPLTS+1; CALL NEW_GEN_IN(OP,'Output plot')
+	  CALL NEW_GEN_IN(SIG_GAU_KMS,'Sigma of Gaussian in km/s')
+	  CALL NEW_GEN_IN(FRAC_SIG_GAU,'Number of points per Gaussian')
+	  CALL NEW_GEN_IN(DP_CUT_ACC,'Fractional accuracy to cut points')
+!
+! Estimate size of vectors so smoothing can occur.
+!
+	  J=ABS(LOG10(CD(IP)%DATA(1)/CD(IP)%DATA(NPTS(IP)))/LOG(1.0D0+SIG_GAU_KMS*FRAC_SIG_GAU/3.0D+05))
+	  J=2*MAX(NPTS(IP),J)
+	  WRITE(6,*)NPTS(IP),J
+	  IF(ALLOCATED(WRK1))DEALLOCATE(WRK1)
+	  IF(ALLOCATED(WRK2))DEALLOCATE(WRK2)
+	  ALLOCATE(WRK1(J),WRK2(J))
+	  WRK1(1:NPTS(IP))=CD(IP)%XVEC
+	  WRK2(1:NPTS(IP))=CD(IP)%DATA
+	  K=NPTS(IP)
+	  WRITE(6,*)'Calling smoothing function'
+	  CALL SM_PHOT_V3(WRK1,WRK2,K,J,SIG_GAU_KMS,FRAC_SIG_GAU,DP_CUT_ACC,L_TRUE)
+	  WRITE(6,*)'Number of data points in unsmoothed data set is',NPTS(IP)
+	  WRITE(6,*)'Number of data points in   smoothed data set is',K
+	  IF(ALLOCATED(CD(OP)%XVEC))THEN
+	    DEALLOCATE(CD(OP)%XVEC,CD(OP)%DATA)
+	  END IF
+	  ALLOCATE(CD(OP)%XVEC(K),CD(OP)%DATA(K))
+	  CD(OP)%XVEC=WRK1(1:K)
+	  CD(OP)%DATA=WRK2(1:K)
+	  NPTS(OP)=K
+	  IF(OP .GT. NPLTS)NPLTS=OP
+	  ERR(OP)=.FALSE.
+	  TYPE_CURVE(OP)=TYPE_CURVE(IP)
 !
 	ELSE IF (ANS .EQ. 'FILL')THEN
 	  CALL NEW_GEN_IN(FILL,'Fill enclosed areas?')

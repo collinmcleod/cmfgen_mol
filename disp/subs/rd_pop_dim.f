@@ -48,10 +48,11 @@ C
 	DO WHILE(INDX .EQ. 0)
 	  READ(LUIN,'(A)',IOSTAT=IOS,END=1000)STRING
 C
-C The test against 5001 is to overcome an issue with GFROTRAN which does not detect the
+C The test against 5008 is to overcome an issue with GFROTRAN which does not detect the
 C end of the file. This should cause no issues with othr compilers.
+C Changed from 5001.
 C
-	  IF(IS_IOSTAT_END(IOS) .OR. IOS .EQ. 5001)THEN
+	  IF(IS_IOSTAT_END(IOS) .OR. IOS .EQ. 5008)THEN
 	    GOTO 1000
 	  ELSE IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'***************************************************'

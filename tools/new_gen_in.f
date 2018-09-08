@@ -90,6 +90,8 @@ C
 	      WRITE(GT_OUT,*)'Error reading options from log file'
 	    ELSE
 	      WRITE(GT_OUT,*)'Inconsistency reading options from log file'
+	      WRITE(GT_OUT,*)TRIM(KEY_GSTRING(3:))
+	      WRITE(GT_OUT,*)TRIM(GSTRING)
 	    END IF
 	    WRITE(GT_OUT,*)'Returning to keyboard input'
 	    CLOSE(LF_IN)

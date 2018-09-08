@@ -420,6 +420,7 @@ C
 	  END DO
 	  CALL GRAMON_PGPLOT('Depth',Ylabel,' ',' ')
 	  GOTO 200
+!
 	ELSE IF(PLT_OPT(1:2) .EQ. 'PV')THEN
 	  IT=NIT; ID=ND
 	  DO WHILE(1 .EQ. 1)
@@ -449,6 +450,31 @@ C
 	    CALL GRAMON_PGPLOT('V(km/s)',Ylabel,' ',' ')
 	  END IF
 	  GOTO 200
+!
+	ELSE IF(PLT_OPT(1:2) .EQ. 'PT')THEN
+	  IT=NIT; ID=ND
+	  DO WHILE(1 .EQ. 1)
+	    CALL GEN_IN(IT,'Iteration # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NIT)
+	    IF(IT .EQ. 0)EXIT
+	    IVAR=NT
+	    CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
+	    IF(IVAR .EQ. 0)EXIT
+	    DO ID=1,ND
+	      Y(ID)=POPS(IVAR,ID,IT)
+	      Z(ID)=LOG10(POPS(IVAR,ID,IT))
+	      X(ID)=POPS(NT,ID,IT)
+	    END DO
+	    IF(LOG_Y_AXIS)THEN
+	      CALL DP_CURVE(ND,X,Z)
+	      Ylabel='Log'
+	    ELSE
+	      CALL DP_CURVE(ND,X,Y)
+	      Ylabel=''
+	    END IF
+	  END DO
+	  CALL GRAMON_PGPLOT('T(10\u4\ dK))',Ylabel,' ',' ')
+	  GOTO 200
+!
 	ELSE IF(PLT_OPT(1:2) .EQ. 'PR')THEN
 	  IT=NIT; ID=ND
 	  DO WHILE(1 .EQ. 1)

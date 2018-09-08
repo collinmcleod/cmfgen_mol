@@ -15,6 +15,7 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered  01-Jul-2018 : Added species/ion options to TAUSOB.
 ! Altered  21-Mar-2018 : DERAD is now corrected for clumping.
 ! Altered  17-Mar-2018 : Adjusted to be compatible with OSIRIS version.
 !                          On 14-MAr-2018 option to reverse M integration was added.
@@ -36,7 +37,7 @@
 !
 ! Altered  15-Aug-2003 :  QF option installed. Allows ion column densities to be compared.
 !                         Option added to PLTPHOT to allow photoioization cross-section
-!                           to be compted at a particular electron desnity. This allows the
+!                           to be compted at a particular electron density. This allows the
 !                           effects of level dissolution to be seen.
 ! Altered  28-Mar-2003 :  MAX_ION replaced bu NUM_IONS everywhere.
 ! Altered  01-Jub-1998 :  MOD_LEV_DIS_BLK replaces  include file.
@@ -345,6 +346,7 @@
 !
 	CHARACTER FMT*80
 	CHARACTER*120 DEFAULT
+	CHARACTER*120 TAUSOB_DEF
 	CHARACTER*120 DESCRIPTION
 	CHARACTER(LEN=1) FIRST_COLR
 !
@@ -462,6 +464,7 @@
 !
 	LAM_ST=0.0D0
 	LAM_EN=1.0D+06
+	TAUSOB_DEF='1000'
 !
 	ZERO_VEC(:)=0.0D0
 	UNIT_VEC(:)=1.0D0
@@ -1479,7 +1482,15 @@
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES .AND. XSPEC .EQ. UC(ION_ID(ID)))THEN
 	      IF(LEV(2) .EQ. 0)LEV(2)=ATM(ID)%NXzV_F
-	      WRITE(T_OUT,'(5(2X,A16,1X,I3))')(TRIM(ATM(ID)%XzVLEVNAME_F(I)),I,I=LEV(1),LEV(2))
+	      K=0
+	      DO I=LEV(1),LEV(2)
+	        K=MAX(K,LEN_TRIM(ATM(ID)%XzVLEVNAME_F(I)))
+	      END DO
+	      IF(K .LE. 16)THEN
+	        WRITE(T_OUT,'(5(2X,A16,1X,I3))')(TRIM(ATM(ID)%XzVLEVNAME_F(I)),I,I=LEV(1),LEV(2))
+	      ELSE
+	        WRITE(T_OUT,'(3(2X,A30,1X,I3))')(TRIM(ATM(ID)%XzVLEVNAME_F(I)),I,I=LEV(1),LEV(2))
+	      END IF
 	      FLAG=.TRUE.
 	    END IF
 	  END DO
@@ -2448,10 +2459,11 @@
 	  END IF
 !
 	ELSE IF(XOPT .EQ. 'ROP')THEN
+	  WRITE(6,'(2X,A,2X,(A,3X))')'Depth','Log(T(K))',' LogR','Log K'
 	  DO I=1,ND
 	    YV(I)=LOG10(1.0D-10*ROSS_MEAN(I)/MASS_DENSITY(I))
 	    ZV(I)=LOG10(1.0D+06*MASS_DENSITY(I)/T(I)**3)
-	    WRITE(6,*)I,ZV(I),YV(I)
+	    WRITE(6,'(2X,I5,3X,3F8.3)')I,LOG10(T(I))+4.0D0,ZV(I),YV(I)
 	  END DO
 	  CALL DP_CURVE(ND,ZV,YV)
 	  XAXIS='\gr/T\u3\d\d6\u'
@@ -2816,16 +2828,52 @@
 ! levelp population.
 !
 	ELSE IF(XOPT .EQ. 'TAUSOB')THEN
-	  CALL USR_OPTION(FL,'LAM','1000','Wavelength in Ang')
+	  CALL USR_OPTION(FL,'LAM',TAUSOB_DEF,'Wavelength in Ang')
+	  TAUSOB_DEF=WR_STRING(FL)
 	  FL=ANG_TO_HZ/FL
-	  DO I=1,ND
-	    T1=3.0D-10*OPLIN*POP_ATOM(I)*R(I)/V(I)/FL
-	    YV(I)=LOG10(T1)
-	    ZV(I)=LOG10(T1/(1.0D0+SIGMA(I)))
-	  END DO
-	  CALL DP_CURVE(ND,XV,YV)
-	  CALL DP_CURVE(ND,XV,ZV)
-	  YAXIS='Log(\gt\dSob\u/fX)'
+	  TMP_LOGICAL=.FALSE.
+	  IF(XSPEC .EQ. ' ')THEN
+	    TA(1:ND)=POP_ATOM(1:ND)
+	    TMP_LOGICAL=.TRUE.
+	  ELSE
+	    DO ISPEC=1,NSPEC
+	      IF(XSPEC .EQ. SPECIES(ISPEC))THEN
+	        TA(1:ND)=POPDUM(1:ND,ISPEC)
+	        TMP_LOGICAL=.TRUE.
+	        EXIT
+	      END IF
+	    END DO
+	    IF(.NOT. TMP_LOGICAL)THEN
+	      DO ID=1,NUM_IONS
+	        IF(ATM(ID)%XzV_PRES .AND. XSPEC .EQ. UC(ION_ID(ID)))THEN
+	          TA(1:ND)=ATM(ID)%XzV_F(1,1:ND)
+	          K=INDEX(ATM(ID)%XzVLEVNAME_F(1),'[')
+	          IF(K .EQ. 0)THEN
+	            J=1
+	          ELSE
+	            DO L=1,ATM(ID)%NXzV_F
+	              IF(INDEX(ATM(ID)%XzVLEVNAME_F(L),ATM(ID)%XzVLEVNAME_F(1)(1:K)) .EQ. 0)EXIT
+	              J=L
+	            END DO
+	          END IF
+	          WRITE(6,'(X,A,10F6.1)')'Stat. weights for lower term are:',(ATM(ID)%GXzV_F(L),L=1,J)
+	          TMP_LOGICAL=.TRUE.
+	          EXIT
+	        END IF
+	      END DO
+	    END IF
+	  END IF
+	  IF(TMP_LOGICAL)THEN
+	    DO I=1,ND
+	      T1=3.0D-10*OPLIN*TA(I)*R(I)/V(I)/FL
+	      YV(I)=LOG10(T1)
+	      ZV(I)=LOG10(T1/(1.0D0+SIGMA(I)))
+	    END DO
+	    CALL DP_CURVE(ND,XV,ZV)
+	    YAXIS='Log(\gt\dSob\u/fX)'
+	  ELSE
+	    WRITE(6,*)'Unrecognized species or ion: XSPEC=',TRIM(XSPEC)
+	  END IF
 !
 	ELSE IF(XOPT .EQ. 'YATOM')THEN
 	  DO I=1,ND
@@ -3975,7 +4023,9 @@
 	  J=0
 	  FOUND=.FALSE.
 	  DO ID=1,NUM_IONS
-	    IF(ATM(ID)%XzV_PRES .AND. (XSPEC .EQ. UC(ION_ID(ID)) .OR. XSPEC .EQ. 'ALL') )THEN
+	    IF(ATM(ID)%XzV_PRES .AND. (XSPEC .EQ. UC(ION_ID(ID)) .OR.
+	1                       XSPEC .EQ. SPECIES(SPECIES_LNK(ID)) .OR.
+	1                       XSPEC .EQ. 'ALL') )THEN
 	      DO NL=1,ATM(ID)%NXzV_F
 	        DO NUP=NL+1,ATM(ID)%NXzV_F
 	          WRITE(25,*)NL,NUP,ATM(ID)%AXzV_F(NL,NUP)
@@ -6194,8 +6244,10 @@ c
 
 	ELSE IF(XOPT .EQ. 'WRRTK')THEN
 	  DO I=1,ND
-	    WRITE(25,'(I3,ES15.5,3ES14.4)')I,R(I)*1.0D+10,T(I)*1.0D+04,
-	1          MASS_DENSITY(I),1.0D-10*ROSS_MEAN(I)/MASS_DENSITY(I)
+	    T1=1.0D-10*ROSS_MEAN(I)/MASS_DENSITY(I)
+	    WRITE(25,'(I3,ES15.5,6ES14.4)')I,R(I)*1.0D+10,T(I)*1.0D+04,
+	1          MASS_DENSITY(I),T1,
+	1          LOG10(T1),LOG10(T(I))+4.0D0,LOG10(MASS_DENSITY(I)/T(I)**3)+6.0D0
 	  END DO
 	ELSE IF(XOPT .EQ. 'WRRVSIG')THEN
 	  CALL USR_OPTION(ELEC,'DCF','F','Include the density and clumping factor in file?')

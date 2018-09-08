@@ -54,10 +54,11 @@ ALLEXE    : $(EXE)
 
 # A MACRO deinition could probably be used here, but it is difficult to get it to work on all
 # UNIX systems, hence we take the easy but tediuos method.
+#	$(F90) $*.o /Users/jdh/pgplot/pgplotsrc/grsy00.o  \
 
 $(EXE_DIR)%.exe : %.o $(OBJ) $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
-	$(F90) $*.o /Users/jdh/pgplot/pgplotsrc/grsy00.o  \
-		$(OBJ1) -L$(LIB_DIR) -l$(LN7) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN3) \
+	$(F90) $*.o \
+		$(OBJ1) -L$(LIB_DIR) -l$(LN7) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN6) -l$(LN3) -l$(LN1) -l$(LN3) \
 		$(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \
 		-o $(EXE_DIR)$*.exe
 

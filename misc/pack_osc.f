@@ -9,6 +9,11 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 02-Sep-2018 : Fixed bug handling levels whose ienergy ordering was incorrect.
+!                       Cleaned.
+!                       Option to chose whether to inlude energy depndence of f on S (dipole transitions).
+!                       Now check validity of statistical weight of packed states.
+! 
 	INTEGER NLEV
 	INTEGER IOS
 	INTEGER, PARAMETER :: T_OUT=6
@@ -29,9 +34,10 @@
 	WRITE(T_OUT,'(A)')' The name of the oscillator file is prompted.'
 	WRITE(T_OUT,'()')
 	WRITE(T_OUT,'(A)')' The following diagnostic file are output:'
-	WRITE(T_OUT,'(A)')'                  XzV_PACK,'
-	WRITE(T_OUT,'(A)')'          SLP_CHK_FOR_XzV,'
-	WRITE(T_OUT,'(A)')'         ERROR_CHK_FOR_XzV,'
+	WRITE(T_OUT,'(A)')'                  XzV_PACK'
+	WRITE(T_OUT,'(A)')'           SLP_CHK_FOR_XzV'
+	WRITE(T_OUT,'(A)')'         ERROR_CHK_FOR_XzV'
+	WRITE(T_OUT,'(A)')'                 GROUP_XZV - shows assignment of levels to packed state'
 	WRITE(T_OUT,'()')
 	WRITE(T_OUT,'(70A)')('*',I=1,70)
 	WRITE(T_OUT,'()')
@@ -44,7 +50,7 @@
 	IOS=1
 	DO WHILE(IOS .NE. 0)
 	  OSC_FILE=' '
-	  CALL GEN_IN(OSC_FILE,'File with oscilator strengths')
+	  CALL GEN_IN(OSC_FILE,'File with oscillator strengths')
 	  CALL GEN_ASCI_OPEN(LUIN,OSC_FILE,'OLD',' ','READ',IZERO,IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(T_OUT,*)'Error occurred reading Oscillator file: try again'
@@ -57,7 +63,7 @@
 	CLOSE(LUIN)
 	READ(STRING,*)NLEV
 	CLOSE(LUIN)
-	WRITE(T_OUT,*)'Number of atomic levels is',NLEV
+	WRITE(T_OUT,'(/,1X,A,I4,/)')'Number of atomic levels is ',NLEV
 !
 	CALL PACK_OSC_SUB(OSC_FILE,ION_ID,NLEV)
 !
@@ -154,6 +160,7 @@
 	LOGICAL, ALLOCATABLE :: SECND(:,:)
 	INTEGER, ALLOCATABLE :: TRANS(:,:)
 	INTEGER, ALLOCATABLE :: CROSS_TYPE_PACK(:)
+	CHARACTER(LEN=1), ALLOCATABLE :: PACK_SPIN(:)	!Multiplicity
 !
 	REAL*8, ALLOCATABLE :: FLOW_SUM(:)
 	REAL*8, ALLOCATABLE :: FHIGH_SUM(:)
@@ -165,10 +172,6 @@
 	REAL*8, ALLOCATABLE :: VEC_DP_WRK(:)
 	INTEGER, ALLOCATABLE :: VEC_INDX(:)
 !
-	INTEGER, PARAMETER :: NANG=12
-	CHARACTER*1 ANG_STR(NANG)
-	DATA ANG_STR/'S','P','D','F','G','H','I','K','L','M','N','O'/         !,'Z','W'/
-!
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN               
 	DOUBLE PRECISION CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
@@ -179,12 +182,13 @@
 	INTEGER IZERO
 	PARAMETER (IZERO=0)
 !
+	REAL*8 T1,T2
 	INTEGER I,J,K,L,IS,JS,IOS
 	INTEGER ID,PHOT_ID
 	INTEGER CNT
 	INTEGER N_LS_TERMS
 	INTEGER MAX_NAME_LNGTH
-	REAL*8 T1,T2
+	LOGICAL INCLUDE_F_DEP_ON_E
 !
 	CHARACTER(LEN=30) TMP_STR
 	CHARACTER(LEN=24) TIME
@@ -292,47 +296,7 @@
 !
 ! Check that states have correct statistical weight.
 !
-	WRITE(LUER,*)' '
-	DO I=1,NLEV
-	 LEV_ANG(I)=' '
-	  K=LEN_TRIM(NAME(I))
-	  J=INDEX(NAME(I),'[')
-	  IF(J .NE. 0)K=J-1
-	  IF(NAME(I)(K-2:K) .EQ. 'SNG')THEN
-	  ELSE IF(NAME(I)(K-2:K) .EQ. 'TRP')THEN
-	  ELSE IF(NAME(I)(K-2:K) .EQ. '___')THEN
-	  ELSE
-	    K=K-1
-	    IF(NAME(I)(K:K) .GE. 'a' .AND. NAME(I)(K:K) .LE. 'z')K=K-1
-	    IF(NAME(I)(K:K) .EQ. '1' .OR. NAME(I)(K:K) .LE. '2')THEN
-	      K=K-1
-	    END IF
-	    IF(NAME(I)(K:K) .EQ. 'W' .OR. NAME(I)(K:K) .EQ. 'Z')THEN
-	      LEV_ANG(I)=NAME(I)(K:K)
-	    ELSE
-	      T1=0.0D0
-	      DO J=1,NANG
-	        IF(NAME(I)(K:K) .EQ. ANG_STR(J))THEN
-	          LEV_ANG(I)=ANG_STR(J)
-	          IF(INDEX(NAME(I),'[') .EQ. 0)THEN
-	            READ(LEV_SPIN(I),*)T1
-	            T1=T1*(2*J-1)
-	            IF(NINT(T1) .NE. NINT(G(I)))THEN
-	              WRITE(LUER,*)' '
-	              WRITE(LUER,*)'Invalid statistical weight for state',NAME(I)
-	              WRITE(T_OUT,*)'Invalid statistical weight for state',NAME(I)
-	            END IF
-	          END IF
-	          EXIT
-	        END IF
-	      END DO
-	      IF(LEV_ANG(I) .EQ. ' ')THEN
-	         WRITE(LUER,*)'Unable to get L for ',TRIM(NAME(I))
-	         WRITE(T_OUT,*)'Unable to get L for ',TRIM(NAME(I))
-	      END IF
-	    END IF
-	  END IF
-	END DO
+	CALL CHECK_STAT_WT(NAME,G,LEV_ANG,LEV_SPIN,NLEV,T_OUT,LUER)
 !
 ! Create a summary file with f and A values summed over transitions to individual leveles
 !
@@ -340,29 +304,29 @@
 	CALL GEN_IN(AF_CHK,'Create check file with A & F summed over levels?')
 	IF(AF_CHK)THEN
 	  FILENAME='AF_CHK_FOR_'//TRIM(ION_ID)
-	  OPEN(UNIT=30,STATUS='UNKNOWN',FILE=FILENAME)
-	  WRITE(30,'()')
-	  WRITE(30,'()')
-	  WRITE(30,'(A)')' Summary file with information on oscillator strength'//
+	  OPEN(UNIT=LUOUT,STATUS='UNKNOWN',FILE=FILENAME)
+	  WRITE(LUOUT,'()')
+	  WRITE(LUOUT,'()')
+	  WRITE(LUOUT,'(A)')' Summary file with information on oscillator strength'//
 	1                     ' and Einstein A values.'
-	  WRITE(30,'(A)')'   FL_SUM is the sum of f from lower state to the given state.'
-	  WRITE(30,'(A)')'   AL_SUM is the sum of the decay rates from the given state.'
-	  WRITE(30,'(A)')'   FH_SUM is the sum of f from higher states to the given state.'
-	  WRITE(30,'(A)')'   AH_SUM is the sum of A from higher states to the given state.'
-	  WRITE(30,'(A)')' These sums may be weighted by the statistical weights.'
+	  WRITE(LUOUT,'(A)')'   FL_SUM is the sum of f from lower state to the given state.'
+	  WRITE(LUOUT,'(A)')'   AL_SUM is the sum of the decay rates from the given state.'
+	  WRITE(LUOUT,'(A)')'   FH_SUM is the sum of f from higher states to the given state.'
+	  WRITE(LUOUT,'(A)')'   AH_SUM is the sum of A from higher states to the given state.'
+	  WRITE(LUOUT,'(A)')' These sums may be weighted by the statistical weights.'
 	  USE_G_WEIGHTING=.FALSE.
 	  CALL GEN_IN(USE_G_WEIGHTING,'Weight f,A sums by g?')
-	  WRITE(30,'()')
+	  WRITE(LUOUT,'()')
 	  STRING='Name'
 	  
 	  IF(USE_G_WEIGHTING)THEN
-	    WRITE(30,'(A,3X,3(1X,A),8X,A,3X,4(3X,A,4X))')STRING(1:MAX_NAME_LNGTH),
+	    WRITE(LUOUT,'(A,3X,3(1X,A),8X,A,3X,4(3X,A,4X))')STRING(1:MAX_NAME_LNGTH),
 	1           'S','L','P','G','GFL_SUM','GFH_SUM','GAL_SUM','GAH_SUM'
 	  ELSE
-	     WRITE(30,'(A,3X,3(1X,A),8X,A,3X,4(4X,A,4X))')STRING(1:MAX_NAME_LNGTH),
+	     WRITE(LUOUT,'(A,3X,3(1X,A),8X,A,3X,4(4X,A,4X))')STRING(1:MAX_NAME_LNGTH),
 	1           'S','L','P','G','FL_SUM','FH_SUM','AL_SUM','AH_SUM'
 	  END IF
-	  WRITE(30,'()')
+	  WRITE(LUOUT,'()')
 !
 	  ALLOCATE (FLOW_SUM(NLEV))
 	  ALLOCATE (ALOW_SUM(NLEV))
@@ -383,19 +347,21 @@
 	      FHIGH_SUM(I)=SUM(FOSC(I,I+1:NLEV))
 	      AHIGH_SUM(I)=SUM(FOSC(I+1:NLEV,I))
 	    END IF
-	    WRITE(30,'(A,3X,3(A,2X),3X,F5.0,4ES14.4)')NAME(I)(1:MAX_NAME_LNGTH),
+	    WRITE(LUOUT,'(A,3X,3(A,2X),3X,F5.0,4ES14.4)')NAME(I)(1:MAX_NAME_LNGTH),
 	1                  LEV_SPIN(I),LEV_ANG(I),LEV_PARITY(I),
 	1                  G(I),FLOW_SUM(I),FHIGH_SUM(I),ALOW_SUM(I),AHIGH_SUM(I)
 	  END DO
-	  CLOSE(UNIT=30)
+	  CLOSE(UNIT=LUOUT)
 	END IF
 !
 	PACK=.TRUE.
 	PACK_LJ_STATES=.TRUE.
 	EMIN_PACK=-1.0D0			!i.e. pack all states
+	INCLUDE_F_DEP_ON_E=.TRUE.
 	CALL GEN_IN(PACK,'Pack states?')
 	CALL GEN_IN(EMIN_PACK,'Pack when states above this energy (in cm^{-1})')
 	CALL GEN_IN(PACK_LJ_STATES,'Pack states in intermediate coupling?')
+	CALL GEN_IN(INCLUDE_F_DEP_ON_E,'Include the enegry dependence when relating E to S (only valid for dipole)')
 !
 	ALLOCATE (LEVEL_DONE(NLEV))
 	LEVEL_DONE=.FALSE.
@@ -405,21 +371,23 @@
 !
 	IF(PACK)THEN
 	  FILENAME='SLP_CHK_FOR_'//TRIM(ION_ID)
-	  OPEN(UNIT=30,STATUS='UNKNOWN',FILE=FILENAME)
-	  WRITE(30,'()')
+	  OPEN(UNIT=LUOUT,STATUS='UNKNOWN',FILE=FILENAME)
+	  WRITE(LUOUT,'()')
 	  STRING='Level'
-	  WRITE(30,'(A,3X,3(2X,A))')STRING(1:MAX_NAME_LNGTH),'S','L','P'
+	  WRITE(LUOUT,'(A,3X,3(2X,A))')STRING(1:MAX_NAME_LNGTH),'S','L','P'
 	  DO J=1,NLEV
 	    IF(.NOT. LEVEL_DONE(J))THEN
+	      WRITE(LUOUT,'(A)')' '
 	      DO I=J,NLEV
 	        IF(LS_NAME(J) .EQ. LS_NAME(I))THEN
-	          WRITE(30,'(A,3X,3(2X,A))')NAME(I)(1:MAX_NAME_LNGTH),
+	          WRITE(LUOUT,'(A,3X,3(2X,A))')NAME(I)(1:MAX_NAME_LNGTH),
 	1                                LEV_SPIN(I),LEV_ANG(I),LEV_PARITY(I)
 	          LEVEL_DONE(I)=.TRUE.
 	        END IF
 	      END DO
 	    END IF
 	  END DO
+	  CLOSE(UNIT=LUOUT)
 	END IF
 !
 ! Pack levels
@@ -435,7 +403,7 @@
 	      EXIT
 	    END IF
 	  END DO
-	  WRITE(6,'(A,I5,A)')'Packing levels',IMIN_PACK,' and above.'
+	  WRITE(6,'(/A,I5,A,/)')' Packing levels',IMIN_PACK,' and above.'
 !
 	  CNT=0
 	  DO I=1,IMIN_PACK-1
@@ -487,30 +455,80 @@
 !
 	  ALLOCATE (EDGE_PACK(CNT))
 	  ALLOCATE (G_PACK(CNT))
+	  ALLOCATE (PACK_SPIN(CNT))
 	  ALLOCATE (FOSC_PACK(CNT,CNT))
 	  EDGE_PACK(:)=0.0D0; G_PACK(:)=0.0D0; FOSC_PACK(:,:)=0.0D0
 	  DO I=1,NLEV
 	    J=F_TO_S(I)
 	    G_PACK(J)=G_PACK(J)+G(I)
 	    EDGE_PACK(J)=EDGE_PACK(J)+G(I)*FEDGE(I)
+	    PACK_SPIN(J)=LEV_SPIN(I)
+	    WRITE(75,'(I4,3X,A,3X,A)')J,NAME(I),NAME_PACK(J)
 	  END DO
 	  DO J=1,CNT
 	    EDGE_PACK(J)=EDGE_PACK(J)/G_PACK(J)
-	  END DO	
-	  DO J=2,NLEV
-	    JS=F_TO_S(J)
-	    DO I=1,J
-	      IS=F_TO_S(I)
-	      FOSC_PACK(IS,JS)=FOSC_PACK(IS,JS)+G(I)*FOSC(I,J)
-	      FOSC_PACK(JS,IS)=FOSC_PACK(JS,IS)+G(J)*FOSC(J,I)
+	  END DO
+!
+! Check that states have correct statistical weight.
+!
+	  CALL CHECK_STAT_WT(NAME_PACK,G_PACK,LEV_ANG,PACK_SPIN,CNT,T_OUT,LUER)
+!
+	  FILENAME='GROUPS_'//TRIM(ION_ID)
+	  OPEN(UNIT=LUOUT,STATUS='UNKNOWN',ACTION='WRITE',FILE=FILENAME)
+	    DO I=1,CNT
+	      K=0
+	      WRITE(LUOUT,'(A)')' '
+	      DO J=1,NLEV
+	        IF(F_TO_S(J) .EQ. I)THEN
+	          K=K+1
+	          IF(K .EQ. 1)THEN
+	            WRITE(LUOUT,'(A,T30,A)')TRIM(NAME_PACK(I)),TRIM(NAME(J))
+	          ELSE
+	            WRITE(LUOUT,'(T30,A)')TRIM(NAME(J))
+	          END IF
+	        END IF
+	      END DO
 	    END DO
-	  END DO
-	  DO JS=2,CNT
-	    DO IS=1,JS-1
-	    FOSC_PACK(IS,JS)=FOSC_PACK(IS,JS)/G_PACK(IS)
-	    FOSC_PACK(JS,IS)=FOSC_PACK(JS,IS)/G_PACK(JS)
-	   END DO
-	  END DO
+	  CLOSE(LUOUT)
+!
+	  IF(INCLUDE_F_DEP_ON_E)THEN	
+	    DO J=2,NLEV
+	      JS=F_TO_S(J)
+	      DO I=1,J
+	        IS=MIN(F_TO_S(I),F_TO_S(J))
+	        JS=MAX(F_TO_S(I),F_TO_S(J))
+	        IF(FOSC(I,J) .EQ. 0.0D0)THEN
+	        ELSE IF(FEDGE(I) .NE. FEDGE(J))THEN
+	          FOSC_PACK(IS,JS)=FOSC_PACK(IS,JS)+G(I)*FOSC(I,J)/ABS(FEDGE(I)-FEDGE(J))
+	        ELSE
+	          WRITE(6,*)'Error - non-zero osicilaytor strength but levels equal inenergy.'
+	          WRITE(6,*)I,J
+	          WRITE(6,*)TRIM(NAME(I)),TRIM(NAME(J))
+	        END IF
+	      END DO
+	    END DO
+	    DO JS=2,CNT
+	      DO IS=1,JS-1
+	        FOSC_PACK(IS,JS)=FOSC_PACK(IS,JS)*ABS(EDGE_PACK(IS)-EDGE_PACK(JS))/G_PACK(IS)
+	        FOSC_PACK(JS,IS)=FOSC_PACK(IS,JS)*G_PACK(IS)/G_PACK(JS)
+	      END DO
+	    END DO
+	  ELSE
+	    DO J=2,NLEV
+	      JS=F_TO_S(J)
+	      DO I=1,J
+	        IS=MIN(F_TO_S(I),F_TO_S(J))
+	        JS=MAX(F_TO_S(I),F_TO_S(J))
+	        FOSC_PACK(IS,JS)=FOSC_PACK(IS,JS)+G(I)*FOSC(I,J)
+	      END DO
+	    END DO
+	    DO JS=2,CNT
+	      DO IS=1,JS-1
+	        FOSC_PACK(IS,JS)=FOSC_PACK(IS,JS)/G_PACK(IS)
+	        FOSC_PACK(JS,IS)=FOSC_PACK(IS,JS)*G_PACK(IS)/G_PACK(JS)
+	      END DO
+	    END DO
+	  END IF
 !
 ! Since we have packed the levels, some levels may be out of order.
 ! Therfore need to do a sort.
@@ -534,9 +552,9 @@
 	  END DO
 	  WRITE(6,*)'Finished sorting levels'
 !
-	DO I=1,CNT
-	  WRITE(77,'(A)')TRIM(NAME_PACK(I))
-	END DO
+	  DO I=1,CNT
+	    WRITE(77,'(A)')TRIM(NAME_PACK(I))
+	  END DO
 !
 	  ALLOCATE (KNOWN_ENERGY_LEVEL(CNT))
 	  ALLOCATE (ARAD(CNT))
@@ -615,5 +633,80 @@ C
 	   WRITE(T_OUT,*)'Indeterminate spin for level',NAME
 	   SPIN=' '
 	END IF
+	RETURN
+	END
+!
+!
+!
+	SUBROUTINE CHECK_STAT_WT(NAME,G,LEV_ANG,LEV_SPIN,NLEV,T_OUT,LUER)
+	USE GEN_IN_INTERFACE
+	USE MOD_COLOR_PEN_DEF
+	IMPLICIT NONE
+!
+	INTEGER NLEV
+	REAL*8 G(NLEV)
+	CHARACTER(LEN=30) NAME(NLEV)	!Term (LS) designation
+	CHARACTER(LEN=1) LEV_ANG(NLEV)	!Total angular momentum
+	CHARACTER(LEN=1) LEV_SPIN(NLEV)	!Multiplicity
+!
+	INTEGER T_OUT
+	INTEGER LUER
+!
+	REAL*8 T1
+	INTEGER I,J,K
+	LOGICAL FIRST_ERROR
+!
+	INTEGER, PARAMETER :: NANG=12
+	CHARACTER*1 ANG_STR(NANG)
+	DATA ANG_STR/'S','P','D','F','G','H','I','K','L','M','N','O'/         !,'Z','W'/
+!
+	FIRST_ERROR=.TRUE.
+	WRITE(LUER,*)' '
+	DO I=1,NLEV
+	 LEV_ANG(I)=' '
+	  K=LEN_TRIM(NAME(I))
+	  J=INDEX(NAME(I),'[')
+	  IF(J .NE. 0)K=J-1
+	  IF(NAME(I)(K-2:K) .EQ. 'SNG')THEN
+	  ELSE IF(NAME(I)(K-2:K) .EQ. 'TRP')THEN
+	  ELSE IF(NAME(I)(K-2:K) .EQ. '___')THEN
+	  ELSE
+	    K=K-1
+	    IF(NAME(I)(K:K) .GE. 'a' .AND. NAME(I)(K:K) .LE. 'z')K=K-1
+	    IF(NAME(I)(K:K) .EQ. '1' .OR. NAME(I)(K:K) .LE. '2')THEN
+	      K=K-1
+	    END IF
+	    IF(NAME(I)(K:K) .EQ. 'W' .OR. NAME(I)(K:K) .EQ. 'Z')THEN
+	      LEV_ANG(I)=NAME(I)(K:K)
+	    ELSE
+	      T1=0.0D0
+	      DO J=1,NANG
+	        IF(NAME(I)(K:K) .EQ. ANG_STR(J))THEN
+	          LEV_ANG(I)=ANG_STR(J)
+	          IF(INDEX(NAME(I),'[') .EQ. 0)THEN
+	            READ(LEV_SPIN(I),*)T1
+	            T1=T1*(2*J-1)
+	            IF(NINT(T1) .NE. NINT(G(I)))THEN
+	              IF(FIRST_ERROR)THEN
+	                FIRST_ERROR=.FALSE.
+	                WRITE(T_OUT,*)RED_PEN
+	                WRITE(LUER,'(/,A)')'Invalid statistical weight for the following states: '
+	                WRITE(T_OUT,*)'Invalid statistical weight for the followng states: '
+	              END IF
+	              WRITE(T_OUT,'(5X,A,T35,2F6.1)')TRIM(NAME(I)),T1,G(I)
+	            END IF
+	          END IF
+	          EXIT
+	        END IF
+	      END DO
+	      IF(LEV_ANG(I) .EQ. ' ')THEN
+	         WRITE(LUER,*)'Unable to get L for ',TRIM(NAME(I))
+	         WRITE(T_OUT,*)'Unable to get L for ',TRIM(NAME(I))
+	      END IF
+	    END IF
+	  END IF
+	END DO
+	IF(.NOT. FIRST_ERROR)WRITE(T_OUT,*)DEF_PEN
+!
 	RETURN
 	END	

@@ -1091,6 +1091,7 @@
 	1    '       Ne','Chi(Ross)','  Chi(es)','Kap(Ross)','  Kap(es)'
 	    DO L=1,ND
 	      ROSS_MEAN(L)=INT_dBdT(L)/ROSS_MEAN(L)
+	      IF(ROSS_MEAN(L) .NE.  ROSS_MEAN(L))ROSS_MEAN(L)=6.65D-15*ED(L)
 	      WRITE(150,'(8ES14.4)')T(L),DENSITY(L),POP_ATOM(L),ED(L),
 	1                   ROSS_MEAN(L),6.65D-15*ED(L),1.0D-10*ROSS_MEAN(L)/DENSITY(L),
 	1                   6.65D-25*ED(L)/DENSITY(L)

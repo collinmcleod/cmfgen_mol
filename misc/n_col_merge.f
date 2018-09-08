@@ -96,6 +96,8 @@
 	      WRITE(LU_OUT,'(A)')'  500 8500 translate'
 	    ELSE IF(N_PLTS .EQ. 4)THEN
 	      WRITE(LU_OUT,'(A)')'  500 9400 translate'      !9700
+	    ELSE IF(N_PLTS .EQ. 5)THEN
+	      WRITE(LU_OUT,'(A)')'  -500 9700 translate'  
 	    ELSE
 	      WRITE(LU_OUT,'(A)')'  500 10100 translate'
 	    END IF
@@ -114,6 +116,8 @@ C
 	      WRITE(LU_OUT,'(A)')' 0 -4000 translate'
 	    ELSE IF( N_PLTS .EQ. 4)THEN
 	      WRITE(LU_OUT,'(A)')' 0 -3100 translate'		!1000
+	    ELSE IF( N_PLTS .EQ. 4)THEN
+	      WRITE(LU_OUT,'(A)')' 0 -2475 translate'		!1000
 	    ELSE
 	      I=-(4000*3)/N_PLTS
 	      WRITE(LU_OUT,'(A,I5,A)')' 0 ',I,' translate'

@@ -693,6 +693,7 @@ C
 	         CALL OUT_JH(TA,RSQHNU,T1,T2,FL,NCF,R,V,ND,FIRST_FREQ,'NORMAL')
 	       END IF
 	     ELSE IF(USE_LAM_ES)THEN
+	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Using USE_LAM_ES instead of solving moment equatons'
 	       RJ(1:ND)=TC(1:ND)
 	       IF(.NOT. USE_FORMAL_REL)THEN
 	         IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
