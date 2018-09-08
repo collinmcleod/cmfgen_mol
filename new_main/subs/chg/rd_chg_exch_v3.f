@@ -1,3 +1,4 @@
+! KDW25 - code doesn't stop if the they have the same two out species.
 !
 ! Routine to read in charge exchange reactions and cross-sections.
 ! The first data line in the file should contain the string:
@@ -219,10 +220,11 @@
 	  DO K=1,3
 	    DO L=K+1,4
 	      IF(SPEC_ID_CHG_RD(I,L) .EQ. SPEC_ID_CHG_RD(I,K))THEN
-	        WRITE(LUER,*)'Error in RD_CHG_EXCH'
+!	        WRITE(LUER,*)'Error in RD_CHG_EXCH'
+	        WRITE(LUER,*)'Warning in RD_CHG_EXCH'
 	        WRITE(LUER,*)'Duplication of species ID, reaction:',I
 	        WRITE(LUER,'(A,3X,A)')SPEC_ID_CHG_RD(I,L),SPEC_ID_CHG_RD(I,K)
-	        STOP
+!	        STOP
 	      END IF
 	    END DO
 	  END DO

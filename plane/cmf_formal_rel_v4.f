@@ -420,10 +420,8 @@
 	  IF(INITIALIZE)THEN
 	    CUR_LOC=-1
 	    FREQ_STORE=0.0D0
-	    DO IP=1,NP
-	      DO I=1,NC
-	        RAY(IP)%I_IN_BND_STORE=0.0D0
-	      END DO
+	    DO IP=1,NC
+	      RAY(IP)%I_IN_BND_STORE=0.0D0
 	    END DO
 	  END IF
 	END IF 

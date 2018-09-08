@@ -18,11 +18,11 @@ endif
 #
 if ($2 == "")then
   set sm_main=$dirstack
-  set main="Makefile *.f *.f90  *.INC *.txt"
+  set main="Makefile *.f *.f90  *.INC *.inc *.txt"
   set second = $1
 else
   set sm_main=$1
-  set main = "$1/Makefile $1/*.f $1/*.f90 $1/*.INC $1/*.txt"
+  set main = "$1/Makefile $1/*.f $1/*.f90 $1/*.INC $1/*.inc $1/*.txt"
   set second = $2
 endif
 

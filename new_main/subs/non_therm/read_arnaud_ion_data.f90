@@ -82,6 +82,7 @@
 	               READ(STRING,*) THD(IT)%ZION,THD(IT)%N_ION_EL,THD(IT)%PQN,THD(IT)%ANG,THD(IT)%ION_POT, &
 	                   THD(IT)%A_COL,THD(IT)%B_COL,THD(IT)%C_COL,THD(IT)%D_COL
 	             ELSE
+	               WRITE(6,*)'Reading tabulated value'
 	               READ(STRING,*) THD(IT)%ZION,THD(IT)%N_ION_EL,THD(IT)%PQN,THD(IT)%ANG,THD(IT)%ION_POT, THD(IT)%NTAB
 	               ALLOCATE(THD(IT)%XTAB(THD(IT)%NTAB),STAT=IOS)
 	               IF(IOS .EQ. 0)ALLOCATE(THD(IT)%YTAB(THD(IT)%NTAB),STAT=IOS)

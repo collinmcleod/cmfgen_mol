@@ -5,6 +5,7 @@
 	USE NEW_GEN_IN_INTERFACE
 	USE MOD_CURVE_DATA
 	USE MOD_COLOR_PEN_DEF
+	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
 ! Altered:  01-Mar-2016 : Added XN option to XAR option. This allows Y to be plotted against
@@ -32,7 +33,7 @@
 ! Altered:  04-Apr-2001 : Include option for differen PLT_ST filename.
 !                         Code now ouputs name of stored plots when bad plot id entered.
 ! Altered:  15-Jul-2000 : MOD_CURVE_DATA installed.
-!                         Dynamically allocated data arrays to allow arbitrary
+!                         Dynamically allocated DAta arrays to allow arbitrary
 !                         size plots.
 ! Altered:  31-May-2000 : Now can handel smaller X and Y ranges, because
 !                          exponential format has been included in MON_NUM.
@@ -94,7 +95,7 @@
 !
 	INTEGER, PARAMETER :: N_TITLE=10
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
-	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
+        LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 	CHARACTER*80  XLABEL,YLABEL,TITLE(N_TITLE)
 	CHARACTER*(*) XLAB,YLAB,TITL,PASSED_OPT
         CHARACTER*200 FILNAME
@@ -115,28 +116,7 @@
 	LOGICAL QUERYFLAG
 	INTEGER VECPEN(MAXVEC)
 !
-	INTEGER N_LINE_IDS
-	LOGICAL OBSERVED_WAVE(5000)
-	CHARACTER*10 LINE_ID(5000)
-	REAL*4 ID_WAVE(5000)
-	REAL*4 ID_WAVE_OFF(5000)
-	REAL*4 ID_Y_OFF(5000)
-	REAL*4 TAU(5000)
-	REAL*4 TAU_CUT
-	REAL*4 ID_ORIENT
-	REAL*4 ID_SCL
-	REAL*4 ID_VEC_BEG
-	REAL*4 ID_VEC_END
-	REAL*4 ID_EXPCHAR
-	REAL*4 CUT_ACCURACY
-	INTEGER ID_LOC
-	INTEGER ID_LOC_PG
-	CHARACTER*10 OMIT_ID(10)
-	CHARACTER*10 INC_ID(10)
-	INTEGER N_OMIT_ID
-	INTEGER N_INC_ID
 	LOGICAL AIR_WAVELENGTHS
-	LOGICAL WR_ID(5000)
 	LOGICAL DRAW_GAUSS_HARD
 	EXTERNAL LAM_AIR
 	REAL*8 LAM_AIR
@@ -196,7 +176,6 @@
 	REAL*8 FRAC_SIG_GAU
 	REAL*8, ALLOCATABLE :: WRK1(:)
 	REAL*8, ALLOCATABLE :: WRK2(:)
-	
 !
 	REAL*4,    PARAMETER :: RONE=1.0
 	INTEGER, PARAMETER :: IZERO=0
@@ -307,7 +286,6 @@
 	ID_VEC_BEG=1.04D0
 	ID_VEC_END=1.01D0
 	ID_EXPCHAR=1.0D0
-	ID_FILNAME='LINE_ID'
 	TAU_CUT=0.1D0
 	N_OMIT_ID=0
 	N_INC_ID=0
@@ -317,6 +295,7 @@
 	LONG_PLOT=.FALSE.
 	LENGTH_OF_HC_PLOT=200.0D0       !cm
 	VB_BASE=-1000
+	EW_SCALE_FAC=0.0D0
 	FILL=.FALSE.
 	SIG_GAU_KMS=10.0D0
 	FRAC_SIG_GAU=0.25D0
@@ -354,6 +333,8 @@
 	  LINE_WGT(:)=1
 	  PEN_OFFSET=1
 	  IFILL_PLT1=0; IFILL_PLT2=0
+	  ID_FILNAME='LINE_ID'
+	  EW_CUT=1.0D0
 	END IF
 	TITLE(1:N_TITLE)=' '
 	CALL GEN_ASCI_OPEN(LU_NORM,'NORM_FACTORS','UNKNOWN','APPEND',' ',IZERO,IOS)
@@ -1382,10 +1363,9 @@ C
 	ELSE IF(ANS .EQ. 'RID')THEN
 	  N_LINE_IDS=0
 	  J=0
-	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs')
+	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs -case sensitive')
 	  CALL NEW_GEN_IN(TAU_CUT,'Omit lines with central optical depth <')
 	  CALL NEW_GEN_IN(AIR_WAVELENGTHS,'Air wavelengths?')
-	  CALL SET_CASE_UP(ID_FILNAME,1,0)
           OPEN(UNIT=33,FILE=TRIM(ID_FILNAME),STATUS='OLD',IOSTAT=IOS)
 	  IF(IOS .EQ. 0)THEN
 	    TMP_STR='!'
@@ -1457,6 +1437,17 @@ C
 	    IF(INC_ID(I) .EQ. 'ZZ')EXIT
 	    N_INC_ID=I
 	  END DO
+!
+	ELSE IF(ANS .EQ. 'REW')THEN
+	  N_EW_IDS=0
+	  J=0
+	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs')
+	  CALL NEW_GEN_IN(EW_CUT,'Omit lines with ABS|EW| < ?')
+	  CALL NEW_GEN_IN(EW_SCALE_FAC,'Factor to scale lines by -- set to zero for labels')
+!
+!	  CALL NEW_GEN_IN(AIR_WAVELENGTHS,'Air wavelengths?')
+	  I=33
+	  CALL RD_EW_IDS(XPAR,ID_FILNAME,I,T_OUT)	
 !
 ! 
 	ELSE IF (ANS .EQ. 'REP')THEN
@@ -2047,7 +2038,7 @@ C
 	  END IF
 	  CLOSE(UNIT=30)
 	  GOTO 1000
-!i
+!
 	ELSE IF(ANS .EQ. 'WXY')THEN
 	  FILNAME=' '
 	  CALL NEW_GEN_IN(FILNAME,'FILE=')
@@ -2102,10 +2093,10 @@ C
 	    ELSE
 	      DO J=1,NPTS(IP)
 	        IF( (LAM_ST-CD(IP)%XVEC(J))*(CD(IP)%XVEC(J)-LAM_END) .GE. 0)THEN
-	           WRITE(30,'(2X,ES14.7,ES14.6)')CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	          WRITE(30,'(2X,ES14.7,ES14.6)')CD(IP)%XVEC(J),CD(IP)%DATA(J)
 	        END IF
 	      END DO
-	    END IF 
+	    END IF
 	    WRITE(T_OUT,*)'One plot written to ',TRIM(FILNAME)
 	  END IF
 	  CLOSE(UNIT=30)
@@ -2450,7 +2441,7 @@ C
 	  END DO
 	  CALL SMOOTH_PLT(SMOOTH_PLOT,BOX_FILTER,I)
 !
-	ELSE IF (ANS .EQ. 'GSM')THEN
+        ELSE IF (ANS .EQ. 'GSM')THEN
 	  IP=1; CALL NEW_GEN_IN(IP,'Plot to smooth')
 	  OP=NPLTS+1; CALL NEW_GEN_IN(OP,'Output plot')
 	  CALL NEW_GEN_IN(SIG_GAU_KMS,'Sigma of Gaussian in km/s')
@@ -2998,70 +2989,16 @@ C
 	END IF
 !
 	IF(N_LINE_IDS .NE. 0)THEN
-	  CALL PGSCI(IONE)
-	  ID_LOC=4
-	  ID_ORIENT=90.0D0
-	  ID_LOC_PG=1.0D0
-!
-	  DO I=1,N_LINE_IDS
-	    WR_ID(I)=.TRUE.
-	    DO J=1,N_OMIT_ID
-	      IF( INDEX(LINE_ID(I),TRIM(OMIT_ID(J))//' ') .NE. 0)THEN
-	        WR_ID(I)=.FALSE.
-	        EXIT
-	      END IF
-	    END DO
-	    DO J=1,N_INC_ID
-	      IF(J .EQ. 1)WR_ID(I)=.FALSE.
-	      IF( INDEX(LINE_ID(I),TRIM(INC_ID(J))//' ') .NE. 0 )THEN
-	        WR_ID(I)=.TRUE.
-	        EXIT
-	      END IF
-	    END DO
-	  END DO
-!
-	  ID_WAVE_OFF(1:N_LINE_IDS)=ID_WAVE(1:N_LINE_IDS)
-	  CALL PGQCS(IFOUR,XCHAR_SIZE,YCHAR_SIZE)
-	  WRITE(T_OUT,*)'XCHAR_SIZE=',XCHAR_SIZE
-	  DO L=1,8
-	    DO I=1,N_LINE_IDS-1
-	      IF(WR_ID(I))THEN
-	        K=I+1
-	        DO WHILE(.NOT. WR_ID(K) .AND. K .LT. N_LINE_IDS)
-	          K=K+1
-	        END DO
-	        T1=(ID_WAVE(I)-XPAR(1))*(XPAR(2)-ID_WAVE(2))
-	        IF(T1 .GT. 0)THEN
-	          IF(ID_WAVE_OFF(I)+XCHAR_SIZE .GT. ID_WAVE_OFF(K))THEN
-	            ID_WAVE_OFF(I)=ID_WAVE_OFF(K)-1.1*XCHAR_SIZE
-	          END IF
-	        END IF
-	      END IF
-	    END DO
-	  END DO
-!
-	  DO I=1,N_LINE_IDS
-	    T1=ID_SCL*ID_Y_OFF(I)
-	    ID_VEC_BEG=0.9*(T1-1.0D0)+1.0D0
-	    TMP_STR=' '
-	    WRITE(TMP_STR,'(F12.2)')ID_WAVE(I)
-	    TMP_STR=TRIM(LINE_ID(I))//'-'//ADJUSTL(TMP_STR)
-	    IF(.NOT. OBSERVED_WAVE(I))TMP_STR='*'//TMP_STR
-	    CALL JUSTIFY_CONVERT_V2(ID_WAVE_OFF(I),T1,ID_LOC,ID_LOC_PG,ID_ORIENT,.TRUE.,
-	1                  XSTRPOS(1),YSTRPOS(1),TMP_STR,IONE)
-	    T1=(XSTRPOS(1)-XPAR(1))*(XPAR(2)-XSTRPOS(1))
-	    T2=(YSTRPOS(1)-YPAR(1))*(YPAR(2)-YSTRPOS(1))
-	    IF(T1 .GT. 0 .AND. T2 .GT. 0)THEN
-	      IF(WR_ID(I))THEN
-	        CALL PGSCI(ITWO)
-	        CALL PGSCH(EXPCHAR*ID_EXPCHAR)
-	        CALL PGPTXT(XSTRPOS(1),YSTRPOS(1),ID_ORIENT,ID_LOC_PG,TMP_STR)
-	        T1=ID_SCL*ID_Y_OFF(I)
-	        CALL PGMOVE(ID_WAVE_OFF(I),ID_VEC_BEG)
-	        CALL PGDRAW(ID_WAVE(I),ID_VEC_END)
-	      END IF
-	    END IF
-	  END DO
+	  CALL DRAW_LINE_IDS(XPAR,YPAR,EXPCHAR,T_OUT)
+	  CALL PGSCH(EXPCHAR)		!Reset character size
+	END IF
+	IF(N_EW_IDS .NE. 0)THEN
+	  IF(EW_SCALE_FAC .GT. 0.0)THEN
+	    CALL DRAW_EW_LINES(XPAR,YPAR,EXPCHAR,T_OUT)
+	  ELSE
+	    CALL DRAW_EW_IDS(XPAR,YPAR,EXPCHAR,T_OUT)
+	  END IF
+	  CALL PGSCH(EXPCHAR)		!Reset character size
 	END IF
 !
 ! Draw vectors on graphs.

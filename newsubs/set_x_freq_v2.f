@@ -37,8 +37,9 @@
 !
 	IF(IZ .GT. 30)THEN
 	  LUER=ERROR_LU()
-	  WRITE(LUER,*)'Warning in SET_X_FREQ_V2'
-	  WRITE(LUER,*)'No X-ray data available for species with Atomic No. > ATNO_MAX'
+	  WRITE(LUER,*)'Error in XCROSS_V2'
+	  WRITE(LUER,*)'No X-ray data available for species'//
+	1                     ' with Atomic No.  > 30'
 !	  STOP
 	END IF
 !

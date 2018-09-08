@@ -314,9 +314,9 @@
 	    WRITE(6,*)' LH:    Plot LH  at given depth'
 	    WRITE(6,*)' SS:    Plot STEQ (scaling) at given depth'
 	    WRITE(6,*)' SN:    Plot STEQ (no scaling) at a given depth'
-	    WRITE(6,*)' DIFF   Plit contibution by individual lines to the difference betwenn SCL and NO_SCL'
 	    WRITE(6,*)' FV:    Plot final values (SCL, NO SCL) as a function of depth'
 	    WRITE(6,*)' WR:    Write SS & SN data at a single depth to file'
+	    WRITE(6,*)' DIFF   Plit contibution by individual lines to the difference between SS and SE.'
 	    WRITE(6,*)' E(X):  Exit routine'
 !
 	  ELSE IF(UC(PLT_OPT) .EQ. 'P')THEN

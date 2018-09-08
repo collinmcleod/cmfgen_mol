@@ -28,8 +28,10 @@ C      PARAMETER(NMAX=131072)
         IF (ISIGN.EQ.1) THEN
           ANS(I)=FFT(I)*ANS(I)/dble(NO2)
         ELSE IF (ISIGN.EQ.-1) THEN
-          IF (CDABS(ANS(I)) .EQ. zero) PAUSE 'DECONVOLVING AT A RESPONSE ZERO'
-          ANS(I)=FFT(I)/ANS(I)/dble(NO2)
+          IF (CDABS(ANS(I)) .EQ. zero)THEN
+	     WRITE(6,*)'Warning: DECONVOLVING AT A RESPONSE ZERO'
+          END IF
+	  ANS(I)=FFT(I)/ANS(I)/dble(NO2)
         ELSE
           WRITE(6,*)'NO MEANING FOR ISIGN in CNVLV'
 	  STOP

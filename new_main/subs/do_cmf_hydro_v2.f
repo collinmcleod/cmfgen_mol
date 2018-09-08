@@ -115,6 +115,8 @@
 	REAL*8 RMAX
 	REAL*8 CONNECTION_VEL
 	REAL*8 CONNECTION_RADIUS
+	REAL*8 RP2_ON_CON_RAD
+	REAL*8 VEXT
 	INTEGER CONNECTION_INDX
 !
 	INTEGER ND			!Number of points in RUnge-Kutta integration
@@ -203,6 +205,9 @@
 	RMAX=MOD_RMAX/OLD_R(OLD_ND)
 	VTURB=MOD_VTURB
 	VEL_LAW=ITWO
+	BETA2=0.0D0
+	VEXT=-1.0D0
+	RP2_ON_CON_RAD=-1.0D0
 !
 	VC_ON_SS=0.75D0
 	TAU_REF=2.0D0/3.0D0
@@ -268,6 +273,22 @@
 	CALL RD_STORE_INT(VEL_LAW,'VEL_LAW',L_FALSE,'Velocity law for wind region (2 or 3)')
 	BETA2=BETA
 	CALL RD_STORE_DBLE(BETA2,'BETA2',L_FALSE,'Second exponent for velocity law')
+	CALL RD_STORE_DBLE(VEXT,'VEXT',L_FALSE,'Extension (km/s) to VINFr. Note: VINF1=VINF-VEXT')
+	CALL RD_STORE_DBLE(RP2_ON_CON_RAD,'RP2_ON_RT',L_FALSE,'Ration of RP2 to transition radius')
+	IF(VEL_LAW .EQ. 5)THEN
+	  IF(BETA2 .EQ. 0.0D0)THEN
+	    WRITE(LU_ERR,*)'Error in DO_CMF_HYDRO_V2 -- BETA2 cannot be zero for VEL_LAW 5'
+	    STOP
+	  END IF
+	  IF(VEXT .LT. 0.0D0)THEN
+	    WRITE(LU_ERR,*)'Error in DO_CMF_HYDRO_V2 -- VEXT cannot be less than zero for VEL_LAW 5'
+	    STOP
+	  END IF
+	  IF(RP2_ON_CON_RAD .LT. 0.0D0)THEN
+	    WRITE(LU_ERR,*)'Error in DO_CMF_HYDRO_V2 -- RP2_ON_CON_RAD cannot be less than zero for VEL_LAW 5'
+	    STOP
+	  END IF
+	END IF
 !
 ! Therse are the parameters used to define the new R grid to be output to RVSIG_COL.
 ! 
@@ -304,12 +325,13 @@
 	  CALL GET_LU(LUV)
 	  OPEN(UNIT=LUV,FILE='HYDRO_ITERATION_INFO',STATUS='UNKNOWN')
 	  CALL SET_LINE_BUFFERING(LUV)
-	END IF
+  	END IF
 	CALL GET_LU(LU)				!For files open/shut immediately
 !
 ! In TORSCL_V3, TA is TAU, TB is dTAU, and TC is used fro dCHIdR. 
 !
 	WRITE(6,'(/,A)')' Updating hydrostatic structure of the model'
+	FLUSH(UNIT=6)
 	IF(HYDRO_OPT .EQ. 'FIXED_R_REF')THEN
 	  WRITE(6,'(A)')' Using FIXED_R_REF option in DO_CMF_HYDRO_V2'
 	  CHI_ROSS(1:MOD_ND)=OLD_CLUMP_FAC(1:MOD_ND)*OLD_ROSS_MEAN(1:MOD_ND)
@@ -497,6 +519,7 @@
 !   (2) We have an old model, but will input a new wind.
 !   (3) We don't have an old model.
 !
+	  WRITE(6,*)'WIND_PRESENT=',WIND_PRESENT
 	  IF(WIND_PRESENT)THEN
 !
 ! In this case will use exactly the same grid as for the old model beyond
@@ -525,11 +548,20 @@
                   WRITE(LU_ERR,*)'       New GAM_LIM is',GAM_LIM
 	        END IF
 	      END DO
-	      CALL WIND_VEL_LAW_V2(R,V,SIGMA,VINF,BETA,BETA2,RMAX,
-	1          CONNECTION_RADIUS,CONNECTION_VEL,T2,VEL_LAW,J,ND_MAX)
-	      DO I=1,J
-	        POP_ATOM(I)=MDOT/MU_ATOM/R(I)/R(I)/V(I)
-	      END DO
+!
+	      IF(USE_OLD_VEL)THEN
+	        J=CONNECTION_INDX
+	        R(1:J)=OLD_R(1:J)
+	        V(1:J)=OLD_V(1:J)
+	        SIGMA(1:J)=OLD_SIGMA(1:J)
+	      ELSE  
+	        CALL WIND_VEL_LAW_V3(R,V,SIGMA,VINF,BETA,BETA2,
+	1            VEXT,RP2_ON_CON_RAD,RMAX,
+	1            CONNECTION_RADIUS,CONNECTION_VEL,T2,VEL_LAW,J,ND_MAX)
+	     END IF
+	     DO I=1,J
+	       POP_ATOM(I)=MDOT/MU_ATOM/R(I)/R(I)/V(I)
+	     END DO
 !
 ! To get other quantities we interpolate as a function of density.
 ! The atom density should be monotonic. At the outer boundary,
@@ -551,6 +583,7 @@
 	        GAMMA_FULL(I)=GAM_FULL
 	        CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*CHI_ROSS(I)
 	        P(I)=(BC*T(I)*(1.0D0+ED(I)/POP_ATOM(I))+PTURB_ON_NA)*POP_ATOM(I)
+	        WRITE(6,'(I5,5ES14.5)')I,R(I),ED(I),GAMMA_FULL(I),CHI_ROSS(I),P(I)
 	      END DO
 	      CALL TORSCL(TAU,CHI_ROSS,R,TB,TC,J,'LOGMON',' ')
 	      I=J
@@ -599,8 +632,10 @@
 ! The boudary condition for the integration of the hydrostatic equation
 ! has been set, either at the outer boundary, or at the wind connection point.
 ! we can now perform the integration of the hydrostatic equation.
-!
+	  WRITE(6,*)'CHK: I=',I
+	  WRITE(6,*)TAU(I)
 	  DO WHILE( TAU(I) .LT. MAX(100.0D0,OLD_TAU_MAX) )
+	    WRITE(6,*)I,TAU(I)
 	    I=I+1
 	    IF(I .GT. ND_MAX)THEN
 	      WRITE(6,*)'Error id DO_CMF_HYDRO'
@@ -725,8 +760,15 @@
 ! Output diagnostic files. These are on the calculate grid --- not the final
 ! grid.
 !
-	  ALLOCATE(COEF(ND,4))
+	  ALLOCATE(COEF(ND,4),STAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(6,*)'Error allocating COEF DO_CMF_HYDRO_V2'
+	    WRITE(6,*)'ND=',ND
+	    STOP
+	  END IF
+	  WRITE(6,*)'ND=',ND
 	  CALL MON_INT_FUNS_V2(COEF,P,R,ND)
+	  WRITE(6,*)'ND=',ND
 	  DO I=1,ND
 	    dPdR_VEC(I)=1.0D-10*COEF(I,3)/POP_ATOM(I)/AMU/MU_ATOM
 	  END DO

@@ -7,8 +7,6 @@
 !
 	PROGRAM PLT_JH
 !
-! Altered 18-Mar-2018 :  Updated from OSIRIS.
-!                          BNU option installed in OSIRIS version, 12-Dec-2017        
 ! Altered 02-Nov-2013 :  Modified EXTJ J option -- now uses MON_INTERP.
 ! Altered 09-Jan-2009 :  No longer require RVTJ file.
 ! Altered 23-Nov-2007 :  New option inserted to allow J (in EDDFACTOR File) to be extended to
@@ -389,8 +387,8 @@
 !
 	IF(ND_ATM .EQ. ZM(1)%ND)THEN
           IF(ZM(1)%R(1) .EQ. 0.0D0)THEN
-	    WRITE(6,*)' Setting R and V to values in RVTJ'
-	    ZM(1)%R=R; ZM(1)%V=V
+	    WRITE(6,*)' Setting R, V and T to values in RVTJ'
+	    ZM(1)%R=R; ZM(1)%V=V; ZM(1)%T=T
 	  END IF
 	ELSE IF( MOD(ZM(ID)%ND+1,ND_ATM) .EQ. 0)THEN
 	  NINS=(ZM(ID)%ND+1)/ND_ATM-1
@@ -405,7 +403,7 @@
 	    J=J+1
 	    ZM(ID)%R(J)=R(I+1); ZM(ID)%V(J)=V(I+1)
 	  END DO
-	  WRITE(6,*)'Warning -- set R grin to RVTJ file wiyh interpolation'
+	  WRITE(6,*)'Warning -- set R grin to RVTJ file with interpolation'
 	  WRITE(6,*)'Use interp option to set other values.'
 	ELSE
 	  WRITE(6,*)' ' 
@@ -995,7 +993,7 @@
 	      YV(I)=YV(I+1)+YV(I)
 	    END DO
 	    T2=R(ND)
-	    XV(1:ND)=DLOG10(R(1:ND)/T2)
+	    XV(1:ND)=LOG10(R(1:ND)/T2)
 	    CALL DP_CURVE(ND,XV,YV)
 !
 	    VADAT_FILE='VADAT'
@@ -1164,12 +1162,59 @@
 	      IF(ZM(ID)%RJ(J,NU_INDX) .GT. 0)THEN
 	        IF(PLOT_RSQJ)THEN
 	          T1=ZM(ID)%R(J); T2=ZM(ID)%V(J)
-	          YV(J)=DLOG10(ZM(ID)%RJ(J,NU_INDX)*T1*T1/SQRT(1.0D0-T2*T2/C_KMS/C_KMS))
+	          YV(J)=LOG10(ZM(ID)%RJ(J,NU_INDX)*T1*T1/SQRT(1.0D0-T2*T2/C_KMS/C_KMS))
 	        ELSE
-	          YV(J)=DLOG10(ZM(ID)%RJ(J,NU_INDX))
+	          YV(J)=LOG10(ZM(ID)%RJ(J,NU_INDX))
 	        END IF
 	      ELSE
 	        YV(J)=-100.0
+	      END IF
+	    END DO
+	    CALL DP_CURVE(ND,XV,YV)
+          END DO
+!
+	ELSE IF(X(1:3) .EQ. 'BNU')THEN
+	  DO ID=1,NUM_FILES
+	    IF(.NOT. ZM(ID)%XV_SET)THEN
+	      WRITE(6,*)RED_PEN
+	      WRITE(6,*)' Error -- first use XLOGR, XVEL etc to set X-axis option',DEF_PEN
+	      GOTO 1
+	    END IF
+	  END DO
+!
+	  CALL USR_OPTION(FREQ_VAL,'Lambda',' ','Vacuum wavelength in Ang (-ve for units of 10^15 Hz)')
+	  IF(FREQ_VAL .LE. 0)THEN
+	    FREQ_VAL=ABS(FREQ_VAL)
+	  ELSE
+	    FREQ_VAL=0.299794D+04/FREQ_VAL
+	  END IF
+!
+	  SCALE_FAC=1.0D0
+	  PLOT_RSQJ=.FALSE.
+	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0','Scale factor to prevent overflow')
+	  CALL USR_HIDDEN(PLOT_RSQJ,'RSQJ','F','Plot r^2 Gamma B?')
+!
+	  IF(ALLOCATED(XV))DEALLOCATE(XV)
+	  IF(ALLOCATED(YV))DEALLOCATE(YV)
+	  ALLOCATE (XV(ND_MAX))
+	  ALLOCATE (YV(ND_MAX))
+	  DO ID=1,NUM_FILES
+	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
+	    XV(1:ND)=ZM(ID)%XV(1:ND)
+	    XAXIS=XDEPTH_LAB
+	    YAXIS=ZM(ID)%DATA_TYPE
+	    IF(PLOT_RSQJ)THEN
+	      YAXIS='Log r\u2\d'//YAXIS
+	    ELSE
+	      YAXIS='Log '//YAXIS
+	    END IF
+	    DO J=1,ND
+	      T1=-HDKT*FREQ_VAL/ZM(ID)%T(J)
+	      T2=EXP(T1)
+	      YV(J)=LOG10(TWOHCSQ*(FREQ_VAL**3)/(1.0D0-T2))+T1/LOG(10.0D0)
+	      IF(PLOT_RSQJ)THEN
+	        T1=ZM(ID)%R(J); T2=ZM(ID)%V(J)
+	        YV(J)=YV(J)+LOG10(T1*T1/SQRT(1.0D0-T2*T2/C_KMS/C_KMS))
 	      END IF
 	    END DO
 	    CALL DP_CURVE(ND,XV,YV)

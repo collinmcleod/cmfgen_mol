@@ -1507,11 +1507,17 @@
 !
 ! Zero STEQ and BA arrays.
 !
-	DO ID=1,NION
+	WRITE(6,*)'Zeroing BA matrices'
+	FLUSH(UNIT=6)
+	CALL TUNE(1,'ZBA')
+!$OMP PARALLEL WORKSHARE
+	FORALL (ID=1:NION)
 	  SE(ID)%STEQ   =0.0D0
 	  SE(ID)%BA     =0.0D0
 	  SE(ID)%BA_PAR =0.0D0
-	END DO
+	END FORALL 
+!$OMP END PARALLEL WORKSHARE
+	CALL TUNE(2,'ZBA')
 	STEQ_ED=0.0D0
 	STEQ_T=0.0D0
 	STEQ_T_SCL=0.0D0
@@ -1531,6 +1537,9 @@
 	X_RECOM(:,:)=0.0D0
 	X_COOL(:,:)=0.0D0
 	DIELUM(:)=0.0D0
+	CALL TUNE(3,' ')
+	WRITE(6,*)'Zeroed BA matrices'
+	FLUSH(UNIT=6)
 ! 
 !
 ! Compute the value of the S.E. equations and compute the variation 
@@ -1551,6 +1560,7 @@
 !	  DST=K
 !	  DEND=K
 !
+	  WRITE(6,*)'Call STEQ routines'
 	  CALL TUNE(IONE,'STEQ')
           DO ID=1,NUM_IONS-1
             LOC_ID=ID
@@ -4293,7 +4303,6 @@
 	       MAXCH=100			!To force run to continue
 	    ELSE
 	       CALL UPDATE_KEYWORD(L_FALSE,'[XSLOW]','VADAT',L_TRUE,L_TRUE,LUIN)
-	       ADD_XRAYS_SLOWLY=.FALSE.
 	       IF(DO_LAMBDA_AUTO)THEN
 	         RD_LAMBDA=.FALSE.
 	         LAMBDA_ITERATION=.FALSE.
@@ -4305,8 +4314,8 @@
 ! We do not do the scaling if there is intrinsic X-ray emssion from the star.
 ! DESIRED_XRAY_LUM should be in units of LSTAR.
 !
-	    IF(OBS_XRAY_LUM_0P1 .NE. SUM(XRAY_LUM_0P1) .AND. SCALE_XRAY_LUM)THEN
-	      IF( ABS(LUM*DESIRED_XRAY_LUM/OBS_XRAY_LUM_0P1-1.0D0) .GT. ALLOWED_XRAY_FLUX_ERROR)THEN
+	    IF(OBS_XRAY_LUM_0P1 .LT. SUM(XRAY_LUM_0P1) .AND. SCALE_XRAY_LUM)THEN
+	      IF( (LUM*DESIRED_XRAY_LUM/OBS_XRAY_LUM_0P1-1.0D0) .GT. ALLOWED_XRAY_FLUX_ERROR)THEN
 	        T1=SQRT(LUM*DESIRED_XRAY_LUM/OBS_XRAY_LUM_0P1)
 	        IF(T1 .GT. 10.0D0)T1=10.0D0
 	        IF(T1 .LT. 0.1D0)T1=0.1D0

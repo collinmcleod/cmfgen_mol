@@ -96,6 +96,7 @@
 !
 ! Variables for deleting weak transitions.
 !
+	LOGICAL FIRST_ERROR
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 	REAL*8 DOWN(N)
 	INTEGER INDX(N)
@@ -116,6 +117,7 @@
 	SPEED_LIGHT=SPEED_OF_LIGHT()			!cm/s^-1
 	LUER=ERROR_LU()
 	LUWARN=WARNING_LU()
+	FIRST_ERROR=.TRUE.
 !
 ! Initialize arrays.
 !
@@ -490,6 +492,20 @@
 	  END DO
 	END DO
 	WRITE(LUOUT,'('' Final number of transitions found is: '',I6)')NTRET
+!
+	DO J=2,N
+	  DO I=1,J-1
+	    IF(EINA(I,J) .GT. 10.0D0)THEN
+	      IF(FIRST_ERROR)THEN
+	         WRITE(6,*)'Warning in GENOSC_V9 -- bad oscillator strengths?'
+	         WRITE(6,*)'Reading data from file '//TRIM(FILNAME)
+	         FIRST_ERROR=.FALSE.
+	      END IF
+	      WRITE(6,'(A,ES10.3,2I5,5X,A)')'F value and levels are:',
+	1                   EINA(I,J),I,J,TRIM(LEVNAME(I))//'-'//TRIM(LEVNAME(J))
+	    END IF
+	  END DO
+	END DO
 !
 	RETURN
 	END
