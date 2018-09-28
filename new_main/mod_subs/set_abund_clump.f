@@ -16,6 +16,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 14-Sep-2018 : Added POW option.
 ! Altered 21-Mar-2018 : Added SNCL clumping option.
 ! Altered 25-Jun-2010 : Correctly compute MEAN_ATOMIC_WEIGHT and ABUND_SUM for 
 !                         SN model. Abunances are surface abundances.
@@ -86,6 +87,18 @@
 	1          EXP(-V(K)/CLUMP_PAR(2))+
 	1	   (1.0D0-CLUMP_PAR(1))*EXP( (V(K)-V(1))/CLUMP_PAR(3))
 	    END DO
+!
+	ELSE IF(CLUMP_LAW(1:3) .EQ. 'POW')THEN
+	  IF(N_CLUMP_PAR .NE. 2)THEN
+	    WRITE(LUER,*)'Error in CMFGEN'
+	    WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
+	    STOP
+	  END IF
+	  DO K=1,ND
+	   CLUMP_FAC(K)=1.0D0-(1.0D0-CLUMP_PAR(1))*(V(K)/V(1))**CLUMP_PAR(2)
+	  END DO
+          END IF
+!
 	 ELSE IF(CLUMP_LAW(1:4) .EQ. 'SNCL')THEN
 	    IF (CLUMP_PAR(3) .EQ. 0.0D0) THEN
 	       DO K=1,ND

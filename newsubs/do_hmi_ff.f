@@ -80,6 +80,7 @@
 	    WRITE(6,*)TRIM(STRING)
 	    STOP
 	  END IF
+	  WRITE(6,'(A,I3,4X,A,I3)')' NTHETA=',NT,'NLAM=',NNU
 !
 	  ALLOCATE (LOG_T_TAB(NT))
 	  ALLOCATE (LOG_NU_TAB(NNU))
@@ -91,16 +92,18 @@
 	  END DO
 	  WRITE(6,'(A)')STRING
 !
+! In the table, T is tabulated as 5040/T, is increasing with index.
+! In the table, the wavelenth is in Angstroms.
 ! We change to T, NU(10^15Hz) for table axes -- both monotonically increase with index.
-! Also, T is in units of 10^4 K, NU in units of 10^15 Hz.
+! Note: We read the T axis i backwards to ensure monotonically increasing.
+! Recall: T is in units of 10^4 K, NU in units of 10^15 Hz.
 !
 ! The cross-section tabulated is per hydrodegn atom per unit electron pressures (kT.Ne)
 ! and need to be multipled by 10^{-26}. There is a factor of 10^{10} to keep R.CHI unitless.
 !
-	  WRITE(6,*)NT,NNU
 	  READ(STRING,*)(LOG_T_TAB(I),I=NT,1,-1)
-	  WRITE(6,*)LOG_T_TAB
 	  LOG_T_TAB=LOG(0.504D0/LOG_T_TAB)
+	  I=3; CALL WRITV_V2(LOG_T_TAB,NT,I,'LOG(T/10^4)_TAB',6)
 	  DO J=1,NNU
 	    READ(LUIN,*)LOG_NU_TAB(J),(CROSS(I,J),I=NT,1,-1)
 	    LOG_NU_TAB(J)=LOG(2997.94D0/LOG_NU_TAB(J))	!Convert from Ang to 10^15Hz
@@ -108,8 +111,8 @@
 	  T1=1.0D+04*1.0D-16*BOLTZMANN_CONSTANT()
 	  CROSS=LOG(CROSS*T1)
 	  FIRST_TIME=.FALSE.
-	  WRITE(6,*)LOG_T_TAB
-	  WRITE(6,*)LOG_NU_TAB
+	  I=3; CALL WRITV_V2(LOG_NU_TAB,NNU,I,'LOG(NU/10^15 Hz)_TAB',6)
+	  WRITE(6,'(A)')' '
 !
 	END IF
 !
@@ -141,7 +144,7 @@
 	  END IF
 !
 ! The tabulated cross-section already contains the free-free cross-section.  We need
-! to multiply by TEMP(I) as its per unit lectrn pressurse. The constants were incorporated
+! to multiply by TEMP(I) as its per unit electron pressurse. The constants were incorporated
 ! into the cross-sectins earlier.
 !
 	  T1=(LOG_NU-LOG_NU_TAB(NU_INDX))/(LOG_NU_TAB(NU_INDX+1)-LOG_NU_TAB(NU_INDX))
