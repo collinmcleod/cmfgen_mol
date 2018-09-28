@@ -27,10 +27,10 @@
 ! Altered 09-May-2010: Changed to call OPTDEPTH_V4.
 !                      CUR_LOC is noe set in calling routine. Since independent of ip, allows this routine to be
 !                        in parallel loop.
-! Altered 07-Apr-2103: Source function is now interpolated using linear interpolation for last two intervals for
+! Altered 07-Apr-2013: Source function is now interpolated using linear interpolation for last two intervals for
 !                        outgoing rays. Problems were arising because of rapidly varying source functon and very 
 !                        unequal step sizes.
-!
+! Altered 02-Apr-2018: Changed from nc+1 : if(ip .gt. nc+1 .or. INNER_BND_METH .eq. 'ZERO_FLUX')then
 !--------------------------------------------------------------------
 !
       USE MOD_SPACE_GRID_V2
@@ -214,7 +214,7 @@
 !
 ! At inner boundary use I+ = I- for core and non-core rays
 !
-      if(ip .gt. nc+1 .or. INNER_BND_METH .eq. 'ZERO_FLUX')then
+      if(ip .gt. nc .or. INNER_BND_METH .eq. 'ZERO_FLUX')then
         ray(ip)%I_p(nzz)=ray(ip)%I_m(nzz)
       else if(INNER_BND_METH .eq. 'HOLLOW')then
         ray(ip)%I_p(nzz)=ibound

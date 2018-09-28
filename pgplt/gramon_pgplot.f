@@ -100,7 +100,8 @@
 	CHARACTER*(*) XLAB,YLAB,TITL,PASSED_OPT
         CHARACTER*200 FILNAME
         CHARACTER*80 ID_FILNAME
-        CHARACTER*80, SAVE :: PLT_ST_FILENAME
+        CHARACTER*80 EW_FILNAME
+	CHARACTER*80, SAVE :: PLT_ST_FILENAME
 	CHARACTER*80 WK_STR,OPTION
 	CHARACTER*80 TMP_STR
 	CHARACTER*6 TO_TEK
@@ -334,6 +335,7 @@
 	  PEN_OFFSET=1
 	  IFILL_PLT1=0; IFILL_PLT2=0
 	  ID_FILNAME='LINE_ID'
+	  EW_FILNAME='ewdata_fin'
 	  EW_CUT=1.0D0
 	END IF
 	TITLE(1:N_TITLE)=' '
@@ -524,8 +526,9 @@
 	  WRITE(T_OUT,*)'FILL - Color in region between 2 curves'
 	  WRITE(T_OUT,*)'OFF  - Set offsets when plotting multiple plots'
           WRITE(T_OUT,*)'RPO  - Plot curves in reverse order (switch): does not affect color'
-          WRITE(T_OUT,*)'RID  - Read line ID''s'
-          WRITE(T_OUT,*)'SID  - Change defaults for writing line ID''s'
+	  WRITE(T_OUT,*)'RID  - Read line ID''s - uses file created by DISPGEN (for O stars)'
+	  WRITE(T_OUT,*)'REW  - Read line ID''s - uses EWDATA file created by CMF_FLUX (emission line stars)'
+	  WRITE(T_OUT,*)'SID  - Change defaults for writing line ID''s'
 	  WRITE(T_OUT,*)' '
 !
 	  WRITE(T_OUT,*)'LX  - Switch between LINEAR/LOG labeling of X axis'
@@ -1374,7 +1377,11 @@ C
 	    END DO
 	    BACKSPACE(33)
 	    DO WHILE(J+1 .LE. 5000)
-	      READ(33,*,END=1500)LINE_ID(J+1),ID_WAVE(J+1),TAU(J+1),ID_WAVE_OFF(J+1),ID_Y_OFF(J+1)
+	      READ(33,*,END=1500,IOSTAT=IOS)LINE_ID(J+1),ID_WAVE(J+1),TAU(J+1),ID_WAVE_OFF(J+1),ID_Y_OFF(J+1)
+	      IF(IOS .NE. 0)THEN
+	        WRITE(6,*)'Error reading record in ',TRIM(ID_FILNAME)
+	        GOTO 1000
+	      END IF
 	      IF(ID_WAVE(J+1) .LT. 0.0D0)THEN
 	         ID_WAVE(J+1)=ABS(ID_WAVE(J+1))
 	         OBSERVED_WAVE(J+1)=.FALSE.
@@ -1414,7 +1421,7 @@ C
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'SID')THEN
-	  CALL NEW_GEN_IN(ID_SCL,'Factor to scale line location')
+	  IF(N_LINE_IDS .NE. 0)CALL NEW_GEN_IN(ID_SCL,'Factor to scale line location')
 	  CALL NEW_GEN_IN(ID_VEC_BEG,'Location to start ID line')
 	  CALL NEW_GEN_IN(ID_VEC_END,'Location to end ID line')
 	  CALL NEW_GEN_IN(ID_EXPCHAR,'Factor to scale size of ID')
@@ -1444,6 +1451,11 @@ C
 	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs')
 	  CALL NEW_GEN_IN(EW_CUT,'Omit lines with ABS|EW| < ?')
 	  CALL NEW_GEN_IN(EW_SCALE_FAC,'Factor to scale lines by -- set to zero for labels')
+!
+	  WRITE(6,*)BLUE_PEN
+	  WRITE(6,*)'Can label individual lines, of use vertical bars to indicate contributing species'
+	  WRITE(6,*)'Lines with an EW of the scaling EW are have 25% of the plot height'
+	  WRITE(6,*)DEF_PEN
 !
 !	  CALL NEW_GEN_IN(AIR_WAVELENGTHS,'Air wavelengths?')
 	  I=33

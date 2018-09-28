@@ -9,6 +9,7 @@
 	IMPLICIT NONE
 	INTEGER ND,NT,NIT
 !
+! Altered 13-Sep-2018: Added options SM and NINT
 ! Altered 06-Dec-2017: Made compatible with osiris version
 !                        For multiple fudges, only one new record is now written.
 !                        REP and RAT options inserted                  
@@ -23,6 +24,7 @@
 	REAL*8, ALLOCATABLE :: R_MAT(:,:)		!ND,NIT
 	REAL*8, ALLOCATABLE :: V_MAT(:,:)		!ND,NIT
 	REAL*8, ALLOCATABLE :: RAT(:,:)			!NT,ND
+	REAL*8, ALLOCATABLE :: CORRECTIONS(:,:)			!NT,ND
 !
 	REAL*8, ALLOCATABLE :: R(:)			!ND
 	REAL*8, ALLOCATABLE :: V(:)			!ND
@@ -35,8 +37,19 @@ C
 	INTEGER, ALLOCATABLE :: I_BIG(:)		!NT
 	REAL*8, ALLOCATABLE :: Z_BIG(:)			!NT
 C
+	INTEGER, PARAMETER :: NUM_IONS_MAX=500
+	INTEGER ION_INDEX(NUM_IONS_MAX)
+	INTEGER NION(NUM_IONS_MAX)
+	INTEGER NUM_IONS
+	INTEGER CNT,CNT_NEG,CNT_POS
+	INTEGER NAN_CNT
+	CHARACTER(LEN=10) ION_ID(NUM_IONS_MAX)
+!
 	INTEGER, PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: T_OUT=6
+	INTEGER, PARAMETER :: LU_IN=10
+	INTEGER, PARAMETER :: LU_OUT=20
 C
 	INTEGER, SAVE :: FDG_COUNTER=0
 	INTEGER, PARAMETER :: NLIM_MAX=10
@@ -45,8 +58,12 @@ C
 	INTEGER IREC
 	INTEGER LST_IREC
 	INTEGER IVAR
+	INTEGER IV1,IV2
+	INTEGER ID1,ID2
+	INTEGER LOW_ID,UP_ID
 	INTEGER I
 	INTEGER J
+	INTEGER K
 	INTEGER ID
 	INTEGER IT,IT2
 	INTEGER NY
@@ -54,7 +71,6 @@ C
 	INTEGER LST_NG
 	INTEGER RITE_N_TIMES
 	INTEGER LUSCR
-	INTEGER K
 	INTEGER IOS
 C
 	LOGICAL LOG_Y_AXIS
@@ -65,16 +81,25 @@ C
 	CHARACTER*10 TMP_STR
 	CHARACTER*10 PLT_OPT
 	CHARACTER*80 YLABEL
-	CHARACTER*132 STRING
+	CHARACTER*200 STRING
 C
 	INTEGER IMAX,IMIN
 	REAL*8 RMAX,RMIN
 	REAL*8 T1,T2,T3
+	REAL*8 MAX_CHANGE
+	REAL*8 AVE_NEG_CHANGE, MIN_NEG_CHANGE
+	REAL*8 AVE_POS_CHANGE, MAX_POS_CHANGE
+	LOGICAL COR_READ
+	LOGICAL READ_IN_STEQ
+	LOGICAL READ_AGAIN
 C
 	LUSCR=26
 	RITE_N_TIMES=1
 	NEWMOD=.TRUE.
-C
+	COR_READ=.FALSE.
+	READ_AGAIN=.FALSE.
+	READ_IN_STEQ=.TRUE.
+!C
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'This routine should be run from the data directory'
 	WRITE(T_OUT,*)'It expects to find the following files:'
@@ -100,8 +125,10 @@ C
 	  WRITE(T_OUT,*)'Unable to read MODEL file'
 	  CALL GEN_IN(NT,'Total number of levels')
 	  CALL GEN_IN(ND,'Number of depth points')
+	ELSE
+	  CLOSE(UNIT=12)
+	  CALL RD_ION_LOCATIONS(ION_ID,NION,ION_INDEX,NUM_IONS,NUM_IONS_MAX,LU_IN)
 	END IF 
-	CLOSE(UNIT=12)
 C
 	OPEN(UNIT=12,FILE='POINT1',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .EQ. 0)READ(12,'(A)',IOSTAT=IOS)STRING
@@ -121,6 +148,7 @@ C
 	ALLOCATE (POPS(NT,ND,NIT))
 	ALLOCATE (R_MAT(ND,NIT))
 	ALLOCATE (V_MAT(ND,NIT))
+	ALLOCATE (CORRECTIONS(NT,ND))
 	ALLOCATE (RAT(NT,ND))
 !
 	ALLOCATE (R(ND))
@@ -146,6 +174,27 @@ C
 	  R_MAT(:,IREC)=R(:) 
 	  V_MAT(:,IREC)=V(:) 
 	END DO
+!
+	DO K=1,NIT
+	  DO ID=1,ND
+	    CNT=0
+	    NAN_CNT=0
+	    DO IVAR=1,NT
+	      IF(POPS(IVAR,ID,K) .LE. 0.0D0 .AND. CNT .LE.4)THEN
+	         WRITE(6,*)'Invalid population at depth ',IVAR,ID,NT
+	         CNT=CNT+1
+	      END IF
+	      IF(POPS(IVAR,ID,K) .NE. POPS(IVAR,ID,K))THEN
+	         IF(NAN_CNT .LE. 4)WRITE(6,*)'NaN at depth ',IVAR,ID,K
+	         NAN_CNT=NAN_CNT+1
+	    END IF
+	    END DO
+	    IF(CNT .NE. 0)WRITE(6,'(A,I3,A,I5,A,I3)')
+	1          'Number of invalid poulations at depth ',ID,' is',CNT,' for it',K
+	    IF(NAN_CNT .NE. 0)WRITE(6,'(A,I3,A,I5,A,I3)')
+	1          'Number of NaNs at depth ',ID,' is',NAN_CNT,' for it',K
+	   END DO
+	END DO
 C
 200	CONTINUE
 	WRITE(T_OUT,*)' '
@@ -153,15 +202,19 @@ C
 	WRITE(T_OUT,*)'NT  :: ',NT
 	WRITE(T_OUT,*)'NIT :: ',NIT
 	WRITE(T_OUT,*)' '
+	WRITE(T_OUT,*)' For the next 4 options, we plot versus iteration number '
+	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'F   :: Z(K)=100.0D0*(Y(K+1)-Y(K))/Y(K+1)'
 	WRITE(T_OUT,*)'R   :: [Y(K+2)-Y(K+1)]/[Y(K+1)-Y(K)]'
 	WRITE(T_OUT,*)'D   :: Z(K)=100.0D0*(Y(K)-Y(NIT))/Y(NIT)'
 	WRITE(T_OUT,*)'Y   :: Z(K)=Y(K)'
 	WRITE(T_OUT,*)' '
         WRITE(T_OUT,*)'PD  :: Plot 100.0D0*(Y(K)-Y(K-1))/Y(K) as a function of depth index.'
+	WRITE(T_OUT,*)'PF  :: Plot 100.0D0*(Y(K+1)-Y(K))/Y(K+1) for all variables at a given depth.'
+	WRITE(T_OUT,*)' '
         WRITE(T_OUT,*)'PN  :: Plot a variable as a function of depth index.'
         WRITE(T_OUT,*)'PV  :: Plot a variable as a function of velocity.'
-	WRITE(T_OUT,*)'PF  :: Plot 100.0D0*(Y(K+1)-Y(K))/Y(K+1) for all variables at a given depth.'
+        WRITE(T_OUT,*)'PYD :: Plot all variables at a given depth -- change to log space before using'
         WRITE(T_OUT,*)'VR  :: Plot velocity as a function of radius.'
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'MED_R  :: Median corection as a function of depth'
@@ -169,9 +222,15 @@ C
 	WRITE(T_OUT,*)'IR     :: Z(ID)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
 	WRITE(T_OUT,*)'WRST   :: Writes fractional corections to file (FRAC_COR -- same format as STEQ_VALS'
 	WRITE(T_OUT,*)' '
+	WRITE(T_OUT,*)' '
+	WRITE(T_OUT,*)' The next set of options allow corections to the populations to be made.'
+	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'FDG      :: Fudge individual values at a single depth and output to SCRTEMP'
 	WRITE(T_OUT,*)'FDGV     :: Fudge values over a ranges of depths (% change) and output to SCRTEMP'
-	WRITE(T_OUT,*)'INT      :: Interpolate values whose corrections are above a certain % limit'
+	WRITE(T_OUT,*)'SM       :: Fudge values over a ranges of depths using values at higher/adjacent depth'
+	WRITE(T_OUT,*)'INT      :: Interpolate values using adjacent depths whose',
+	1                             ' corrections are above a certain % limit'
+	WRITE(T_OUT,*)'NINT     :: Interpolate values whose corrections are above a certain % limit'
 	WRITE(T_OUT,*)'RAT      :: Compare populations at adjacent depths'
 	WRITE(T_OUT,*)'REP      :: Replace populations on one iteration with those of another'
 	WRITE(T_OUT,*)'FDG_OSC  ::'
@@ -380,6 +439,31 @@ C
 	  Ylabel=''
 	  CALL GRAMON_PGPLOT('Depth',Ylabel,' ',' ')
 	  GOTO 200
+!
+	ELSE IF(PLT_OPT(1:3) .EQ. 'PYD')THEN
+	  IT=NIT; ID=ND
+	  DO WHILE(1 .EQ. 1)
+	    CALL GEN_IN(IT,'Iteration # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NIT)
+	    IF(IT .EQ. 0)EXIT
+	    CALL GEN_IN(ID,'Depths',LOW_LIM=IONE,UP_LIM=ND)
+	    IF(ID .EQ. 0)EXIT
+	    DO IVAR=1,NT
+	      Y(IVAR)=POPS(IVAR,ID,IT)
+	      Z(IVAR)=LOG10(POPS(IVAR,ID,IT))
+	      X(IVAR)=IVAR
+	    END DO
+	    IF(LOG_Y_AXIS)THEN
+	      CALL DP_CURVE(NT,X,Z)
+	      Ylabel='Log (Pop)'
+	    ELSE
+	      CALL DP_CURVE(NT,X,Y)
+	      Ylabel='Pop'
+	    END IF
+	  END DO
+	  CALL GRAMON_PGPLOT('Variable',Ylabel,' ',' ')
+	  GOTO 200
+!
+!
 	ELSE IF(PLT_OPT(1:2) .EQ. 'PD')THEN
 	  IT=NIT; ID=ND
 	  DO WHILE(1 .EQ. 1)
@@ -397,6 +481,7 @@ C
 	  YLABEL='[Y(I-1)-Y(I)]/Y(I) [%]'
 	  CALL GRAMON_PGPLOT('Depth',Ylabel,' ',' ')
 	  GOTO 200
+!
 	ELSE IF(PLT_OPT(1:2) .EQ. 'PN')THEN
 	  IT=NIT; ID=ND
 	  DO WHILE(1 .EQ. 1)
@@ -451,29 +536,29 @@ C
 	  END IF
 	  GOTO 200
 !
-	ELSE IF(PLT_OPT(1:2) .EQ. 'PT')THEN
-	  IT=NIT; ID=ND
-	  DO WHILE(1 .EQ. 1)
-	    CALL GEN_IN(IT,'Iteration # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NIT)
-	    IF(IT .EQ. 0)EXIT
-	    IVAR=NT
-	    CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
-	    IF(IVAR .EQ. 0)EXIT
-	    DO ID=1,ND
-	      Y(ID)=POPS(IVAR,ID,IT)
-	      Z(ID)=LOG10(POPS(IVAR,ID,IT))
-	      X(ID)=POPS(NT,ID,IT)
-	    END DO
-	    IF(LOG_Y_AXIS)THEN
-	      CALL DP_CURVE(ND,X,Z)
-	      Ylabel='Log'
-	    ELSE
-	      CALL DP_CURVE(ND,X,Y)
-	      Ylabel=''
-	    END IF
-	  END DO
-	  CALL GRAMON_PGPLOT('T(10\u4\ dK))',Ylabel,' ',' ')
-	  GOTO 200
+        ELSE IF(PLT_OPT(1:2) .EQ. 'PT')THEN
+          IT=NIT; ID=ND
+          DO WHILE(1 .EQ. 1)
+            CALL GEN_IN(IT,'Iteration # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NIT)
+            IF(IT .EQ. 0)EXIT
+            IVAR=NT
+            CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
+            IF(IVAR .EQ. 0)EXIT
+            DO ID=1,ND
+              Y(ID)=POPS(IVAR,ID,IT)
+              Z(ID)=LOG10(POPS(IVAR,ID,IT))
+              X(ID)=POPS(NT,ID,IT)
+            END DO
+            IF(LOG_Y_AXIS)THEN
+              CALL DP_CURVE(ND,X,Z)
+              Ylabel='Log'
+            ELSE
+              CALL DP_CURVE(ND,X,Y)
+              Ylabel=''
+            END IF
+          END DO
+          CALL GRAMON_PGPLOT('T(10\u4\ dK))',Ylabel,' ',' ')
+          GOTO 200
 !
 	ELSE IF(PLT_OPT(1:2) .EQ. 'PR')THEN
 	  IT=NIT; ID=ND
@@ -617,6 +702,78 @@ C
 	  WRITE(6,*)'Populations can be compared with older iterations.'
 	  GOTO 200
 !
+	ELSE IF(PLT_OPT(1:2) .EQ. 'SM')THEN
+	  FDG_COUNTER=FDG_COUNTER+1
+	  IT=NIT; ID=ND; IVAR=NT
+	  ID1=1; ID2=ND/2
+!
+	  WRITE(6,'(A)')BLUE_PEN
+	  CALL GEN_IN(IT,'Iteration # (zero to exit) - default is last iteration',
+	1                   LOW_LIM=IZERO,UP_LIM=NIT)
+	  CALL GEN_IN(ID1,'Initital depth index (inclusive)')
+	  CALL GEN_IN(ID2,'Upper depth index (inclusive)')
+	  WRITE(6,'(A)')RED_PEN
+	  WRITE(6,'(A)')' Summary of changes written to SUM_SM_CHANGES'//DEF_PEN
+
+	  IF(ID1*ID2.EQ. 0)GOTO 200
+	  ID1=MIN(ID1,ND-1); ID2=MIN(ID2,ND-1)
+!
+	  OPEN(UNIT=LU_OUT,FILE='SUM_SM_CHANGES',STATUS='UNKNOWN',ACTION='WRITE')
+	  WRITE(LU_OUT,'(1X,A,2X,A,7X,A,8X,A,3X,A,2X,A,2X,A)')'Depth(ID)','IVAR','Average','P(rev)',
+	1               'OP(IVAR,ID)','P(IVAR,ID+1)','Log(P[ID]/P[ID+1])'
+!
+! Compute the average shift (log plane) with next higher depth.
+! We treat each ioization stage separatly.
+!
+	  DO ID=MAX(ID1,ID2),MIN(ID1,ID2),-1
+	    DO I=1,NUM_IONS
+	      CNT=0; T1=0.0D0
+	      DO IVAR=ION_INDEX(I),ION_INDEX(I)+NION(I)-1
+	        T2=DLOG10(POPS(IVAR,ID,IT)/POPS(IVAR,ID+1,IT))
+	        IF(ABS(T2) .LT. 5)THEN
+	          T1=T1+T2
+	          CNT=CNT+1
+	        END IF
+	      END DO
+	      T1=T1/CNT
+!
+! With the factor of 4, these statements will only change the poulations
+! if they change by more than a factor of 5.
+!
+	      T2=0.175D0
+	      IF(T1 .LE. 0.0D0)T1=MIN(-T2,T1)
+	      IF(T1 .GE. 0.0D0)T1=MAX(T2,T1)
+!
+! If shift, for any pop, is 4 times large than average shift, replace
+! the population.
+!
+	      DO IVAR=ION_INDEX(I),ION_INDEX(I)+NION(I)-1
+	        T2=DLOG10(POPS(IVAR,ID,IT)/POPS(IVAR,ID+1,IT))
+	        IF(ABS(T2) .GT. 4*ABS(T1))THEN
+	          T3=10**(DLOG10(POPS(IVAR,ID+1,IT))+T1)
+	          WRITE(LU_OUT,'(I10,I6,4ES14.4,ES20.4)')ID,IVAR,T1,T3,POPS(IVAR,ID,IT),POPS(IVAR,ID+1,IT),T2
+	          POPS(IVAR,ID,IT)=T3
+	        END IF
+	      END DO
+	    END DO
+	  END DO
+	  CLOSE(UNIT=LU_OUT)
+!
+! We only update NITSF for the first correction. 
+!
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
+	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+	1              NT,ND,LUSCR,NEWMOD)
+!
+	  WRITE(6,*)' '
+	  WRITE(6,*)'Corrections written to SCRTEMP as new (and last) iteration.'
+	  WRITE(6,*)'The same record is written if SM is called a second time'
+	  WRITE(6,*)'Restart program if you wish to compare to with pops from last iteration.'
+	  WRITE(6,*)'Populations can be compared with older iterations.'
+	  GOTO 200
+!
 	ELSE IF(PLT_OPT(1:3) .EQ. 'INT')THEN
           FDG_COUNTER=FDG_COUNTER+1
 	  IT=NIT; ID=ND; T2=100.0D0
@@ -646,6 +803,81 @@ C
 	  WRITE(6,*)'Corrections written to SCRTEMP as new iteration.'
 	  WRITE(6,*)'Restart program if you wish to compare to with pops from last iteration.'
 	  WRITE(6,*)'Populations can be compared with older iterations.'
+	  GOTO 200
+!
+	ELSE IF(PLT_OPT(1:4) .EQ. 'FINT')THEN
+	  INCLUDE 'fint.inc'
+!
+! This option intepolates new populations between two deths (not
+! inclusive). Interpolation is only peformed for those population where
+! very the large corrections were made.
+! 
+! Preferred option is to read in STEQ_VALS.
+!
+	ELSE IF(PLT_OPT(1:4) .EQ. 'NINT')THEN
+          FDG_COUNTER=FDG_COUNTER+1
+	  IT=NIT; ID1=2; ID2=ND/2-1; MAX_CHANGE=1000.0D0
+	  CALL GEN_IN(IT,'Iteration # (zero to exit)')
+	  CALL GEN_IN(ID1,'Start of interpolating rangir (exclusive)')
+	  CALL GEN_IN(ID2,'End of interpolating range (exclusive)')
+	  CALL GEN_IN(MAX_CHANGE,'Interpolate values with FRACTIONAL correction > >')
+!
+	  CALL READ_CORRECTIONS(CORRECTIONS,POPS,ND,NT,NIT,LU_IN)
+!
+	  OPEN(UNIT=LU_OUT,FILE='NEW_COR_SUM',STATUS='UNKNOWN',ACTION='WRITE')	
+	  WRITE(LU_OUT,'(A,4X,A,2X,A,6X,A,2(2X,A),4(8X,A))')' Depth','Ion','Ion','N(levs)',
+	1                 'Neg.','Pos.','Ave(-ve)','Min(-ve)','Ave(+ve)','Max(+ve)'
+	  WRITE(LU_OUT,'(34X,A,3X,A)')'Cnt','Cnt'
+	  T2=(1.0D0-1.0D0/MAX_CHANGE)
+	  DO ID=MIN(ID1+1,ID2+1),MAX(ID1-1,ID2-1)
+	    DO I=1,NUM_IONS
+	      CNT_NEG=0; CNT_POS=0
+	      AVE_NEG_CHANGE=0.0D0; MIN_NEG_CHANGE=0.0D0
+	      AVE_POS_CHANGE=0.0D0; MAX_POS_CHANGE=0.0D0
+	      DO IVAR=ION_INDEX(I),ION_INDEX(I)+NION(I)-1
+	        IF(CORRECTIONS(IVAR,ID) .LT. -MAX_CHANGE)THEN
+	          AVE_NEG_CHANGE=AVE_NEG_CHANGE+CORRECTIONS(IVAR,ID)
+	          MIN_NEG_CHANGE=MIN(MIN_NEG_CHANGE,CORRECTIONS(IVAR,ID))
+	          CNT_NEG=CNT_NEG+1
+	        ELSE IF(CORRECTIONS(IVAR,ID) .GT. T2)THEN
+	          AVE_POS_CHANGE=AVE_POS_CHANGE+CORRECTIONS(IVAR,ID)
+	          MAX_POS_CHANGE=MAX(MAX_POS_CHANGE,CORRECTIONS(IVAR,ID))
+	          CNT_POS=CNT_POS+1
+	        END IF
+	      END DO
+	      IF(CNT_NEG .GT. 0)AVE_NEG_CHANGE=AVE_NEG_CHANGE/CNT_NEG
+	      IF(CNT_POS .GT. 0)AVE_POS_CHANGE=AVE_POS_CHANGE/CNT_POS
+	      WRITE(LU_OUT,'(1X,I5,3X,I4,2X,A10,3I6,4ES16.6)')ID,ION_INDEX(I),ION_ID(I),
+	1                  NION(I),CNT_NEG,CNT_POS,
+	1                  AVE_NEG_CHANGE,MIN_NEG_CHANGE,AVE_POS_CHANGE,MAX_POS_CHANGE	
+!
+	      T1=(1.0D0-1.0D0/MAX_CHANGE)
+	      IF(CNT_NEG .GT. NION(I)/3 .OR. CNT_POS .GT. NION(I)/3)THEN
+	        WRITE(6,'(A,A10,A,I5,A,I3)')'Replacing populations for ion ',ION_ID(I),'-',
+	1             ION_INDEX(I),' at depth ',ID
+	        DO IVAR=ION_INDEX(I),ION_INDEX(I)+NION(I)-1
+	          T1=LOG(R(ID)/R(ID1))/LOG(R(ID2)/R(ID1))
+	          POPS(IVAR,ID,IT)=EXP( T1*LOG(POPS(IVAR,ID2,IT)) +
+	1                     (1.0D0-T1)*LOG(POPS(IVAR,ID1,IT)) )
+	        END DO
+	      END IF
+	    END DO
+	  END DO
+	  CLOSE(LU_OUT)
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IREC),IREC,NITSF,
+	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+	1              NT,ND,LUSCR,NEWMOD)
+	  WRITE(6,*)' '
+	  WRITE(6,*)' Broad summary of changes as function of ION written to NEW_COR_SUM'
+	  WRITE(6,*)' Values listed only refer to changes exceeding MAX_CHANGE'
+	  WRITE(6,*)' '
+	  WRITE(6,*)'Corrections written to SCRTEMP as new iteration.'
+	  WRITE(6,*)'Restart program if you wish to compare to with pops from last iteration.'
+	  WRITE(6,*)'Populations can be compared with older iterations.'//RED_PEN
+	  TMP_STR=' '; CALL GEN_IN(TMP_STR,'Hit any character to continue')
+	  WRITE(6,*)DEF_PEN
 	  GOTO 200
 !
 	ELSE IF(PLT_OPT(1:3) .EQ. 'FIX_OSC')THEN

@@ -9,7 +9,7 @@
 !
 ! Altered 05-Mar-2018: Added option to make a plane-parallel models out of an RVSIG_COL
 !                        file that was used for a spherical model. Option is 'STOP'
-!                        i.e., Sphericl To Parallel.
+!                        i.e., Spherical To Parallel.
 ! Altered 06-Nov-2017: Made compatible with version of osiris.
 !                        TAU option cleaned, options added.
 ! Altered 24-Oct-2013: Added VEL_TYPE=3 so that can do a velocity law with 2 components.
