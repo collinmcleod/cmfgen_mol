@@ -140,7 +140,7 @@
 ! vacuum. In practice we are assuming dense spherical shells separated by
 ! a vacuum.
 !
-	INTEGER, PARAMETER ::  N_CLUMP_PAR_MAX=4
+	INTEGER, PARAMETER ::  N_CLUMP_PAR_MAX=5
 	REAL*8 CLUMP_PAR(N_CLUMP_PAR_MAX)
 	INTEGER N_CLUMP_PAR
 	LOGICAL DO_CLUMP_MODEL

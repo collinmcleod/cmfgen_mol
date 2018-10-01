@@ -16,6 +16,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 01-Oct-2018 : Added MEXP option.
 ! Altered 14-Sep-2018 : Added POW option.
 ! Altered 21-Mar-2018 : Added SNCL clumping option.
 ! Altered 25-Jun-2010 : Correctly compute MEAN_ATOMIC_WEIGHT and ABUND_SUM for 
@@ -76,9 +77,22 @@
 	1                     EXP(-V(K)/CLUMP_PAR(2))+
 	1                     CLUMP_PAR(3)*EXP(-V(K)/CLUMP_PAR(4))
 	    END DO
+!
+	  ELSE IF(CLUMP_LAW(1:4) .EQ. 'MEXP')THEN
+	    IF(N_CLUMP_PAR .NE. 5)THEN
+	      WRITE(LUER,*)'Error in SET_ABUND_CLUMP for MEXP N_CLUMP_PAR should be 5'
+	      WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
+	      STOP
+	    END IF
+	    DO K=1,ND
+	      T1=1.0D0-(MAX(1.0D0,CLUMP_PAR(4)*R(1)/R(K)))**CLUMP_PAR(5)
+	      CLUMP_FAC(K)=(CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*EXP(-V(K)/CLUMP_PAR(2)))/
+	1                     (1.0D0+CLUMP_PAR(3)*EXP(T1))
+	    END DO
+
 	  ELSE IF(CLUMP_LAW(1:4) .EQ. 'REXP')THEN
 	    IF(N_CLUMP_PAR .NE. 3)THEN
-	      WRITE(LUER,*)'Error in CMFGEN'
+	      WRITE(LUER,*)'Error in SET_ABUND_CLUMP - for MEXP N_CLUMP_PAR should be 3'
 	      WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
 	      STOP
 	    END IF
@@ -90,14 +104,13 @@
 !
 	ELSE IF(CLUMP_LAW(1:3) .EQ. 'POW')THEN
 	  IF(N_CLUMP_PAR .NE. 2)THEN
-	    WRITE(LUER,*)'Error in CMFGEN'
+	    WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
 	    WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
 	    STOP
 	  END IF
 	  DO K=1,ND
 	   CLUMP_FAC(K)=1.0D0-(1.0D0-CLUMP_PAR(1))*(V(K)/V(1))**CLUMP_PAR(2)
 	  END DO
-          END IF
 !
 	 ELSE IF(CLUMP_LAW(1:4) .EQ. 'SNCL')THEN
 	    IF (CLUMP_PAR(3) .EQ. 0.0D0) THEN
