@@ -2769,6 +2769,15 @@
 	  XAXSAV=XAXIS
 	  XAXIS='Log(r/R\d*\u)'
 !
+	ELSE IF(XOPT .EQ. 'TSTF')THEN
+	  DO I=1,ND
+	    ESEC(I)=6.65D-15*ED(I)*CLUMP_FAC(I)
+	  END DO
+	  CALL TORSCL(TA,ESEC,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  CALL TST_CLUMP_LAW(YV,R,V,TA,ND)
+	  CALL DP_CURVE(ND,XV,YV)
+	  YAXIS='Volume filling factor'
+!
 ! To convert from cm/s to km/s we cale the sound speed by a factor of 10^{-5}. However,
 ! T in units of 10^4 K, thus the scale factor is on 10^{-3}.
 !

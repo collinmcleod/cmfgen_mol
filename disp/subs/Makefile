@@ -54,6 +54,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(sobjbar.o)\
       $(LIB)(starpcyg_tst.o)\
       $(LIB)(terminal_lu.o)\
+      $(LIB)(tst_clump_law.o)\
       $(LIB)(two_phot_opac_disp_v3.o)\
       $(LIB)(update_pops.o)\
       $(LIB)(wrbeta.o)\
