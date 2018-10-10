@@ -48,6 +48,7 @@
 !
 	IMPLICIT NONE
 !
+! Altered 09-Oct-2018 : Now set the b-f gaunt factor to unity for n>30  (previously crashed).
 ! Altered 07-Oct-2015 : Bug fix for Type 7 (modified Seaton formula).
 !                         Offset was beeing added to the current frequency instead
 !                            of the ionization edge.
@@ -401,21 +402,25 @@ C
 ! HYD_N_DATA contains the Bound-free gaunt factor.
 !
 	          N=PD(ID)%CROSS_A(LMIN+1)
-	          X=LOG10(U)
-	          RJ=X/N_DEL_U
-	          J=RJ
-	          T1=RJ-J
-	          J=J+1
-	          IF(J .LT. N_PER_N)THEN
-	            J=J+BF_N_INDX(N)-1
-	            T1=T1*BF_N_GAUNT(J+1)+(1.0D0-T1)*BF_N_GAUNT(J)
+	          IF(N .GT. 30)THEN
+	            T1=1.0D0
 	          ELSE
+	            X=LOG10(U)
+	            RJ=X/N_DEL_U
+	            J=RJ
+	            T1=RJ-J
+	            J=J+1
+	            IF(J .LT. N_PER_N)THEN
+	              J=J+BF_N_INDX(N)-1
+	              T1=T1*BF_N_GAUNT(J+1)+(1.0D0-T1)*BF_N_GAUNT(J)
+	            ELSE
 !
 ! Power law extrapolation.
 !
-	            J=BF_N_INDX(N)+N_PER_N-1
-	            T1=LOG10(BF_N_GAUNT(J-1)/BF_N_GAUNT(J))
-1                   T1=BF_N_GAUNT(J)*( 10.0D0**(T1*(N_PER_N-RJ)) )
+	              J=BF_N_INDX(N)+N_PER_N-1
+	              T1=LOG10(BF_N_GAUNT(J-1)/BF_N_GAUNT(J))
+1                     T1=BF_N_GAUNT(J)*( 10.0D0**(T1*(N_PER_N-RJ)) )
+	            END IF
 	          END IF
 !
 ! NB: ZION is already include in ALPHA_BF
