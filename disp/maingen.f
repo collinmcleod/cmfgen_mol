@@ -6068,15 +6068,16 @@ c
 	    END IF
 	  ELSE
 	    DO I=1,ND
-	      YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
-	      IF(RADIAL)YV(I)=YV(I)/(1.0D0+SIGMA(I))
-	      IF(YV(I) .GT. 0)THEN
-	        YV(I)=LOG10(YV(I))
-	      ELSE
-	        YV(I)=-20.0
-	      END IF
+	        YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
+	        IF(RADIAL)YV(I)=YV(I)/(1.0D0+SIGMA(I))
 	    END DO
-	    YAXIS='Log(\gt\dSob\u)'
+	    YAXIS='\gt\dSob\u'
+	    IF(MINVAL(YV(1:ND)) .GT. 0.0D0)THEN
+	      DO I=1,ND
+	         YV(I)=LOG10(YV(I))
+	      END DO
+	      YAXIS='Log(\gt\dSob\u)'
+	    END IF
 	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
 !

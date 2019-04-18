@@ -8,6 +8,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered: 29-Oct-2018 -- Fixed up issues with clumping. Clumping can now vary with depth.
 ! Altered: 27-May-2016 -- CHI is now multiplied by CLUMP_FAC so that clumping is correctly accounted for.
 ! Altered: 29-Jan-2015 -- LOCAL_ABS_ENEGRY added to call. Fixed bug in luminosity calculation.
 ! Altered: 06-Jan-2015 -- KINETIC_DECAY_ENERGY included in the call.
@@ -41,9 +42,9 @@
 	  END IF
 	END DO
 !
-! Compute the absorbative opacity.
+! Compute the absorbative opacity. This will later be corrected for clumping.
 !
-	CHI(1:ND)=0.06D0*TA(1:ND)*DENSITY(1:ND)*CLUMP_FAC(1:ND)*1.0D+10
+	CHI(1:ND)=0.06D0*TA(1:ND)*DENSITY(1:ND)*1.0D+10
 !
 ! Calculate a larger R grid. We attempt to keep the outer grid spacing small.
 !
@@ -123,8 +124,15 @@
 	DBB=0.0D0
 !
 	CALL MON_INTERP(  V,ND,IONE,R,ND,SM_V,        SM_ND,SM_R,SM_ND)
-	CALL MON_INTERP(CHI,ND,IONE,R,ND,SM_CHI,      SM_ND,SM_R,SM_ND)
-	TA(1:SM_ND)=TOTAL_DECAY_ENERGY(1:SM_ND)-KINETIC_DECAY_ENERGY(1:SM_ND)
+!
+! Correct the opacity for clumping, and interpolate it onto finer grid.
+!
+	TA(1:SM_ND)=SM_CLUMP_FAC(1:SM_ND)*SM_CHI(1:SM_ND)
+	CALL MON_INTERP(CHI,ND,IONE,R,ND,TA,      SM_ND,SM_R,SM_ND)
+!
+! Correct the emissivity for clumping, and interpolate it onto finer grid.
+!
+	TA(1:SM_ND)=SM_CLUMP_FAC(1:SM_ND)*(TOTAL_DECAY_ENERGY(1:SM_ND)-KINETIC_DECAY_ENERGY(1:SM_ND))
 	CALL MON_INTERP(ETA,ND,IONE,R,ND,TA,SM_ND,SM_R,SM_ND)
 !
 	CALL IMPAR(P,R,R(ND),NC,ND,NP)
@@ -139,15 +147,21 @@
 	1      SOURCE,CHI,DCHIDR,JQW,KQW,DBB,HBC_J,HBC_S,
 	1      INBC,IC,THK_CONT,INNER_BND_METH,NC,ND,NP,METHOD)
 !
-! RJ is the absorbed gamma-ray energy.
+! RJ is the gamma-ray mean intensity.
 !
-	RJ=CHI*XM
+	RJ=XM
 !
 ! Interpolate absorbed energy on to the CMFGEN grid, and add in the locally deposited
 ! kinetic energy.
 !
+! We mulitply by SM_CHI since we want the energy absorbed in the CLUMPS (not a volume
+! avearged absorption).
+!
 	CALL MON_INTERP(TA,SM_ND,IONE,SM_R,SM_ND,RJ,ND,R,ND)
+	TA(1:SM_ND)=TA(1:SM_ND)*SM_CHI(1:SM_ND)
 	LOCAL_ABS_ENERGY(1:SM_ND)=TA(1:SM_ND)+KINETIC_DECAY_ENERGY(1:SM_ND)
+!
+! To get the total energy absorbed we need to include the clumping factor.
 !
 	DO I=1,SM_ND
 	  TA(I)=TOTAL_DECAY_ENERGY(I)*SM_CLUMP_FAC(I)*SM_R(I)*SM_R(I)
@@ -175,16 +189,39 @@
 	  WRITE(10,'(A,ES13.5,A)')'!Fraction of radioactive energy absorbed is:',T2/T1
 	  WRITE(10,'(A,ES13.5,A)')'!      Fraction absorbed that is kinetic is:',T3/T2
 	  WRITE(10,'(A)')'!'
+	  WRITE(10,'(A)')'! The energies have been averaged over volume, and thus can be'
+	  WRITE(10,'(A)')'! directly compard with an identical unclumped model.'
+	  WRITE(10,'(A)')'!'
+	  WRITE(10,'(A)')'! V(kms)   E(non local)   E(local)   Eg(local)'
+	  WRITE(10,'(A)')'!'
 !
 	  DO I=1,SM_ND
-	    WRITE(10,'(5ES14.6)')SM_V(I),LOCAL_ABS_ENERGY(I),TOTAL_DECAY_ENERGY(I),KINETIC_DECAY_ENERGY(I)
+	    T1=SM_CLUMP_FAC(I)
+	    WRITE(10,'(5ES14.6)')SM_V(I),LOCAL_ABS_ENERGY(I)*T1,TOTAL_DECAY_ENERGY(I)*T1,
+	1                          KINETIC_DECAY_ENERGY(I)*T1
 	  END DO
+!
+	 IF(MINVAL(SM_CLUMP_FAC) .LT. 0.99999D0)THEN
+	   WRITE(10,'(A)')'!'
+	   WRITE(10,'(A)')'!'
+	   WRITE(10,'(A)')'! These energies have not been averaged over volume'
+	   WRITE(10,'(A)')'!'
+	   WRITE(10,'(A)')'! V(kms)   E(non local)   E(local)   Eg(local)'
+	   WRITE(10,'(A)')'!'
+	   DO I=1,SM_ND
+	     WRITE(10,'(5ES14.6)')SM_V(I),LOCAL_ABS_ENERGY(I),TOTAL_DECAY_ENERGY(I),
+	1                          KINETIC_DECAY_ENERGY(I)
+	   END DO
+	 END IF
 !
 ! Outout the results on the fine grid -- useful for checking.
 ! Get total decay energy on grid -- not just that due to gamma-rays.
 !
-	  CALL MON_INTERP(RJ,ND,IONE,R,ND,LOCAL_ABS_ENERGY,SM_ND,SM_R,SM_ND)
-	  CALL MON_INTERP(TB,ND,IONE,R,ND,TOTAL_DECAY_ENERGY,SM_ND,SM_R,SM_ND)
+	  TA(1:SM_ND)=SM_CLUMP_FAC(1:SM_ND)*LOCAL_ABS_ENERGY(1:SM_ND)
+	  CALL MON_INTERP(RJ,ND,IONE,R,ND,TA,SM_ND,SM_R,SM_ND)
+!
+	  TA(1:SM_ND)=SM_CLUMP_FAC(1:SM_ND)*TOTAL_DECAY_ENERGY(1:SM_ND)
+	  CALL MON_INTERP(TB,ND,IONE,R,ND,TA,SM_ND,SM_R,SM_ND)
 	  WRITE(10,'(A)')'!'
 	  WRITE(10,'(A)')'! Large grid'
 	  WRITE(10,'(A)')'! V(kms)   E(non local)   E(local)   Eg(local)'

@@ -27,6 +27,7 @@ EXE  = $(EXE_DIR)plt_jh.exe\
        $(EXE_DIR)plt_ip.exe\
        $(EXE_DIR)plt_delta.exe\
        $(EXE_DIR)plt_dfr.exe\
+       $(EXE_DIR)plt_many_mod.exe\
        $(EXE_DIR)plt_many_sn_spec.exe\
        $(EXE_DIR)plt_phot_raw.exe\
        $(EXE_DIR)plt_rj.exe\

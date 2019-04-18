@@ -9,6 +9,7 @@
 	IMPLICIT NONE
 	INTEGER ND,NT,NIT
 !
+! Altered 14-Feb-2019: Updated to 3 digit exponent in 2 places
 ! Altered 13-Sep-2018: Added options SM and NINT
 ! Altered 06-Dec-2017: Made compatible with osiris version
 !                        For multiple fudges, only one new record is now written.
@@ -43,6 +44,7 @@ C
 	INTEGER NUM_IONS
 	INTEGER CNT,CNT_NEG,CNT_POS
 	INTEGER NAN_CNT
+	LOGICAL NANS_PRESENT
 	CHARACTER(LEN=10) ION_ID(NUM_IONS_MAX)
 !
 	INTEGER, PARAMETER :: IZERO=0
@@ -175,6 +177,7 @@ C
 	  V_MAT(:,IREC)=V(:) 
 	END DO
 !
+	NANS_PRESENT=.FALSE.
 	DO K=1,NIT
 	  DO ID=1,ND
 	    CNT=0
@@ -193,8 +196,18 @@ C
 	1          'Number of invalid poulations at depth ',ID,' is',CNT,' for it',K
 	    IF(NAN_CNT .NE. 0)WRITE(6,'(A,I3,A,I5,A,I3)')
 	1          'Number of NaNs at depth ',ID,' is',NAN_CNT,' for it',K
+	    IF(NAN_CNT .NE. 0)NANS_PRESENT=.TRUE.
 	   END DO
 	END DO
+!
+	IF(NANS_PRESENT)THEN
+	  WRITE(6,'(A)')RED_PEN
+	  WRITE(6,'(A)')'Your data contains NaNs'
+	  WRITE(6,'(A)')'Depending on the iteration, you may need to reset POINT1 to an eralier iteration'
+	  WRITE(6,'(A)',ADVANCE='NO')'Input any character to continue'
+	  READ(5,'(A)')STRING
+	  WRITE(6,'(A)')DEF_PEN
+	END IF 
 C
 200	CONTINUE
 	WRITE(T_OUT,*)' '
@@ -686,7 +699,7 @@ C
 	    CALL GEN_IN(ID,'Depth of variable')
 	    IF(ID.EQ. 0)EXIT
 	    WRITE(6,'(7(9X,I5))')(I,I=MAX(ID-3,1),MIN(ID+3,ND))
-	    WRITE(6,'(7ES14.4)')(POPS(IVAR,I,IT),I=MAX(ID-3,1),MIN(ID+3,ND))
+	    WRITE(6,'(7ES14.4E3)')(POPS(IVAR,I,IT),I=MAX(ID-3,1),MIN(ID+3,ND))
 	    T1=POPS(IVAR,ID,IT)
 	    CALL GEN_IN(T1,'New value of variable')
 	    POPS(IVAR,ID,IT)=T1
@@ -751,7 +764,7 @@ C
 	        T2=DLOG10(POPS(IVAR,ID,IT)/POPS(IVAR,ID+1,IT))
 	        IF(ABS(T2) .GT. 4*ABS(T1))THEN
 	          T3=10**(DLOG10(POPS(IVAR,ID+1,IT))+T1)
-	          WRITE(LU_OUT,'(I10,I6,4ES14.4,ES20.4)')ID,IVAR,T1,T3,POPS(IVAR,ID,IT),POPS(IVAR,ID+1,IT),T2
+	          WRITE(LU_OUT,'(I10,I6,4ES14.4E3,ES20.4E3)')ID,IVAR,T1,T3,POPS(IVAR,ID,IT),POPS(IVAR,ID+1,IT),T2
 	          POPS(IVAR,ID,IT)=T3
 	        END IF
 	      END DO

@@ -10,6 +10,7 @@
 	1              LST_ITERATION,BAND_FLUX,N_FLUXMEAN_BANDS,LU_OUT,ND)
 	IMPLICIT NONE
 !
+! Altered 13-Feb-2019 : Tau (Rosseland) now output.
 ! Altered 08-Nov-2016 : Now output Gamma (e.s.) at photosphere.
 ! Altered 01-Jan-2015 : Turbulent pressure term added, and also output when non-zero.
 ! Altered 26-Jan-2014 : Changed ouput to TYPE_ATM and increased its length.
@@ -165,20 +166,20 @@
 ! Output file header.
 !
 	IF(PRESSURE_VTURB .EQ. 0.0D0)THEN
-	  WRITE(LU_OUT,'(1X,6X,A,6X, 8X,A,3X, 2X,A, 5(4X,A,1X), 4X,A,2X,A)')
+	  WRITE(LU_OUT,'(1X,6X,A,6X, 8X,A,3X, 2X,A, 5(4X,A,1X), 4X,A,2X,A,9X,A)')
 	1     'R','V','% Error','    VdVdR',
 	1                       ' dPdR/ROH',
 	1                       '    g_TOT',
 	1                       '    g_RAD',
-	1                       '   g_ELEC','Gamma','Depth'
+	1                       '   g_ELEC','Gamma','Depth','  Tau'
 	ELSE
-	  WRITE(LU_OUT,'(1X,6X,A,6X, 8X,A,3X, 2X,A, 6(4X,A,1X), 4X,A,2X,A)')
+	  WRITE(LU_OUT,'(1X,6X,A,6X, 8X,A,3X, 2X,A, 6(4X,A,1X), 4X,A,2X,A,9X,A)')
 	1     'R','V','% Error','    VdVdR',
 	1                       ' dPdR/ROH',
 	1                       'dTPdR/ROH',
 	1                       '    g_TOT',
 	1                       '    g_RAD',
-	1                       '   g_ELEC','Gamma','Depth'
+	1                       '   g_ELEC','Gamma','Depth','Tau'
 	END IF
 ! 
 	DO I=1,ND
@@ -220,22 +221,22 @@
 !
 	  IF(PRESSURE_VTURB .EQ. 0.0D0)THEN
 	    IF(R(I) .GT. 9.99D+04)THEN
-	      FMT='(1X,ES12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7)'
+	      FMT='(1X,ES12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7,2X,F10.2)'
 	    ELSE
-	      FMT='(1X,F12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7)'
+	      FMT='(1X,F12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7,2X,F10.2)'
 	    END IF
 	    WRITE(LU_OUT,FMT)
 	1             R(I),V(I),ERROR,VdVdR,dPdR_ON_ROH,
-	1             g_TOT,g_RAD,g_ELEC,g_RAD/g_GRAV,I
+	1             g_TOT,g_RAD,g_ELEC,g_RAD/g_GRAV,I,TAU(I)
 	  ELSE                  
 	    IF(R(I) .GT. 9.99D+04)THEN
-	      FMT='(1X,ES12.6,ES13.4,F9.2,6(ES14.4),F9.2,I7)'
+	      FMT='(1X,ES12.6,ES13.4,F9.2,6(ES14.4),F9.2,I7,2X,F10.2)'
 	    ELSE
-	      FMT='(1X,F12.6,ES13.4,F9.2,6(ES14.4),F9.2,I7)'
+	      FMT='(1X,F12.6,ES13.4,F9.2,6(ES14.4),F9.2,I7,2X,F10.2)'
 	    END IF
 	    WRITE(LU_OUT,FMT)
 	1             R(I),V(I),ERROR,VdVdR,dPdR_ON_ROH,dPTURBdR_ON_ROH,
-	1             g_TOT,g_RAD,g_ELEC,g_RAD/g_GRAV,I
+	1             g_TOT,g_RAD,g_ELEC,g_RAD/g_GRAV,I,TAU(I)
 	  END IF                    
 !
 	END DO

@@ -8,6 +8,7 @@
 	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
+! Altered: 28-Feb-2019  : Now scale error bars for simple YAR options.
 ! Altered:  01-Mar-2016 : Added XN option to XAR option. This allows Y to be plotted against
 !                          the index I. By default, a new plot is created [24-Feb-2016].
 ! Altered:  29-Jun-2015 : Changed RID o check ABS(TAU) which for pp model can -ve.
@@ -1448,7 +1449,7 @@ C
 	ELSE IF(ANS .EQ. 'REW')THEN
 	  N_EW_IDS=0
 	  J=0
-	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs')
+	  CALL NEW_GEN_IN(EW_FILNAME,'File with line EWs')
 	  CALL NEW_GEN_IN(EW_CUT,'Omit lines with ABS|EW| < ?')
 	  CALL NEW_GEN_IN(EW_SCALE_FAC,'Factor to scale lines by -- set to zero for labels')
 !
@@ -1459,7 +1460,7 @@ C
 !
 !	  CALL NEW_GEN_IN(AIR_WAVELENGTHS,'Air wavelengths?')
 	  I=33
-	  CALL RD_EW_IDS(XPAR,ID_FILNAME,I,T_OUT)	
+	  CALL RD_EW_IDS(XPAR,EW_FILNAME,I,T_OUT)	
 !
 ! 
 	ELSE IF (ANS .EQ. 'REP')THEN
@@ -2328,12 +2329,20 @@ C
 	  DO IP=IP_ST,IP_END
 	    IF(YAR_OPERATION .EQ. '+')THEN
 	      CD(IP)%DATA=CD(IP)%DATA+YAR_VAL
+	      IF(ERR(IP))CD(IP)%EMIN=CD(IP)%EMIN+YAR_VAL
+	      IF(ERR(IP))CD(IP)%EMAX=CD(IP)%EMAX+YAR_VAL
 	    ELSE IF(YAR_OPERATION .EQ. '-')THEN
 	      CD(IP)%DATA=CD(IP)%DATA-YAR_VAL
+	      IF(ERR(IP))CD(IP)%EMIN=CD(IP)%EMIN-YAR_VAL
+	      IF(ERR(IP))CD(IP)%EMAX=CD(IP)%EMAX-YAR_VAL
 	    ELSE IF(YAR_OPERATION .EQ. '*')THEN
 	      CD(IP)%DATA=CD(IP)%DATA*YAR_VAL
+	      IF(ERR(IP))CD(IP)%EMIN=CD(IP)%EMIN*YAR_VAL
+	      IF(ERR(IP))CD(IP)%EMAX=CD(IP)%EMAX*YAR_VAL
 	    ELSE IF(YAR_OPERATION .EQ. '/')THEN
 	      CD(IP)%DATA=CD(IP)%DATA/YAR_VAL
+	      IF(ERR(IP))CD(IP)%EMIN=CD(IP)%EMIN/YAR_VAL
+	      IF(ERR(IP))CD(IP)%EMAX=CD(IP)%EMAX/YAR_VAL
 	    ELSE IF(YAR_OPERATION .EQ. 'ABS')THEN
 	      CD(IP)%DATA=ABS(CD(IP)%DATA)
 	    ELSE IF(YAR_OPERATION .EQ. 'ALG')THEN
@@ -2622,6 +2631,8 @@ C
 	1                          T3,VAR_PLT1,XT(1),XT(2)
 	        DO J=1,NPTS(IP)
 	          CD(IP)%DATA(J)=CD(IP)%DATA(J)*T3
+	          IF(ERR(IP))CD(IP)%EMIN(J)=CD(IP)%EMIN(J)*T3
+	          IF(ERR(IP))CD(IP)%EMAX(J)=CD(IP)%EMAX(J)*T3
 	        END DO
 	      END IF
 	    END IF
@@ -2918,7 +2929,8 @@ C
 !
 	IF(DO_ERROR)THEN
 	  CALL PGSLS(LINE_STYLE(1))
-	  DO IP=1,NPLTS
+	  IP_ST=NPLTS; IP_END=1; IP_INC=-1
+	  DO IP=IP_ST,IP_END,IP_INC
 	    IF(ERR(IP) .AND. TYPE_CURVE(IP) .NE. 'I')THEN
 	      Q=PEN_COL(IP+1)
 	      CALL PGSCI(Q)
@@ -2935,7 +2947,7 @@ C
 !
 	IF(MARK)THEN
 	  CALL PGSCH(EXPMARK)
-	  DO IP=1,NPLTS
+	  DO IP=IP_ST,IP_END,IP_INC
 	    L=ABS(MARKER_STYLE(IP))
 !
 ! Don't draw if invisible curve.

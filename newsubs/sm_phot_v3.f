@@ -89,6 +89,22 @@
 	SIG_GAU=SIG_GAU_KMS/2.998D+05		!C does not need to be accurate
 	DNU=FRAC_SIG_GAU*SIG_GAU
 !
+! Check grid is mononotnic.
+!
+	DO I=2,NCROSS
+	  IF(NU(I) .LT. NU(I-1) .OR. NU(I-1) .LT. 0)THEN
+	    WRITE(6,*)'Original (but modified) frequency grid is not monotonic or has -ve values'
+	    WRITE(6,*)'See unit 30 for information on the unmodified coarse grid'
+	    WRITE(6,*)I,NU(I-1),NU(I)
+	    WRITE(6,*)IBEG,NCROSS
+	    DO J=1,NCROSS-1
+	      WRITE(30,'(I6,3ES16.6)')J,NU(J),3.0D+05*(NU(J+1)/NU(J)-1.0D0),CROSS(J)
+	    END DO
+	    J=NCROSS;  WRITE(30,'(I6,3ES16.6)')J,NU(J),0.0D0,CROSS(J)
+!	    STOP
+	  END IF
+	END DO
+!
 ! If ABOVE is TRUE, we ignore cross-section (except for point immediately
 ! proceeding threshold) when smoothing cross-section.  We reflect the cross 
 ! section about the threshold frequency. This ensures that we conserve area.
@@ -220,7 +236,7 @@
 	IF(T2 .GT. -1.0D0)T2=-1.0D0
 	CROSS(NCROSS)=CROSS(NCROSS-1)*(NU(NCROSS)/NU(NCROSS-1))**T2
 !
-! Chech grid is mononotnic.
+! Check grid is mononotnic.
 !
 	DO I=2,NCROSS
 	  IF(NU(I) .LT. NU(I-1) .OR. NU(I-1) .LT. 0)THEN
@@ -236,7 +252,7 @@
 	    DO J=1,NCROSS-1
 	      WRITE(31,'(I6,3ES16.6)')J,NU(J),3.0D+05*(NU(J+1)/NU(J)-1.0D0),CROSS(J)
 	    END DO
-	    STOP
+!	    STOP
 	  END IF
 	END DO
 !

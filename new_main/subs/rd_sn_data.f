@@ -9,6 +9,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered: 29-Oct-2018 : Fixing bugs and refining handling of clumping.
 ! Altered: 31-Aug-2016 : Better error reporting -- we check taht all chain isotopes are present.
 ! Altered: 15-May-2016 : Fixed minor bug when checking size of isotope abundance changes.
 ! Altered: 01-Mar-2016 : Changed to allow handling of a standard NUC_DECAY_DATA file.
@@ -157,7 +158,7 @@
 	    ELSE IF(INDEX(STRING,'Electron density') .NE. 0)THEN
 	      READ(LU,*)ELEC_DEN_HYDRO
 	    ELSE IF(INDEX(STRING,'Clumping factor') .NE. 0)THEN
-	      READ(LU,*)CLUMP_FAC
+	      READ(LU,*)CLUMP_FAC_HYDRO
 	      CLUMP_FAC_SET=.TRUE.
 	    ELSE IF(INDEX(STRING,'Atom density') .NE. 0)THEN
 	      READ(LU,*)ATOM_DEN_HYDRO
@@ -262,9 +263,15 @@
 	  WRITE(LUER,*)'   RD_SN_DATA has read ED and T'
 	END IF
 !
+! The code assumes the densities read in fron SN_HYDRO_DATA are already clumped.
+!
 	WRK_HYDRO=LOG(DENSITY_HYDRO) 
 	CALL MON_INTERP(DENSITY,ND,IONE,LOG_R,ND,WRK_HYDRO,NX,LOG_R_HYDRO,NX)
 	DENSITY=EXP(DENSITY)
+!
+	IF(CLUMP_FAC_SET)THEN
+	  CALL MON_INTERP(CLUMP_FAC,ND,IONE,LOG_R,ND,CLUMP_FAC_HYDRO,NX,LOG_R_HYDRO,NX)
+	END IF
 !
 ! Changed to LIN_INTERP as some models have humongous grid changes across
 ! grid points which can cause -ve values due to round-off errors.
@@ -540,8 +547,11 @@
 	          WRITE(LU,'(A)')' '
 	          MF_OB=0.0D0; MF_IB=0.0D0
 	        END IF
+!
+! We must take clumping into account when computing the species masses.
+!
 	        DO K=1,ND
-	          WRK(K)=ISO(IS)%POP(K)*R(K)*R(K)
+	          WRK(K)=ISO(IS)%POP(K)*CLUMP_FAC(K)*R(K)*R(K)
 	        END DO
 	        CALL LUM_FROM_ETA(WRK,R,ND)
 	        T1=4.0D0*3.1416D0*1.66D-24*SUM(WRK(1:ND))*ISO(IS)%MASS/1.989D+03

@@ -22,6 +22,7 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(is_line_abs_v2.o)\
          $(LIB)(num_rec.o)\
          $(LIB)(rd_ion_locations.o)\
+         $(LIB)(rd_ion_locations_v2.o)\
          $(LIB)(read_corrections.o)\
          $(LIB)(uvabs_v2.o)\
          $(LIB)(adjust_jes_v2.o)\

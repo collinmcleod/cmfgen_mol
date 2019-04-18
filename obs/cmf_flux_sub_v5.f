@@ -177,6 +177,7 @@
 	INTEGER TMP_MAX_SIM
 	REAL*8 OVER_FREQ_DIF
 	REAL*8 EW
+	REAL*8 EMISS_EW
 	REAL*8 CONT_INT
 	LOGICAL OVERLAP
 	LOGICAL SOBOLEV
@@ -2081,8 +2082,8 @@
 ! Open file to store EW data
 !
 	CALL GEN_ASCI_OPEN(LU_EW,'EWDATA','UNKNOWN',' ',' ',IZERO,IOS)
-	WRITE(LU_EW,'(3X,A,2X,A,3X,A,5X,A,3(2X,A),4X,A)')'Lam(Ang)','C.Flux(Jy)',
-	1                  'EW(Ang)','L.Flux','Sob','  NL',' NUP','Trans. Name'
+	WRITE(LU_EW,'(3X,A,2X,A,3X,A,4X,A,5X,A,3(2X,A),4X,A)')'Lam(Ang)','C.Flux(Jy)',
+	1                  'EW(Ang)','EEW(Ang)''L.Flux','Sob','  NL',' NUP','Trans. Name'
 !
 ! Zero the vector that will be used to store the force-multiplier computed
 ! for all lines using the SOBOLEV approximation.
@@ -2330,8 +2331,8 @@
 ! of the line emission. Not required in this code as used only
 ! for display purposes.
 !
-	CALL SOBEW_GRAD_V2(SOURCE,CHI_CLUMP,CHI_SCAT_CLUMP,CHIL,ETAL,
-	1            V,SIGMA,R,P,FORCE_MULT,STARS_LUM,AQW,HQW,TA,EW,CONT_INT,
+	CALL SOBEW_GRAD_V3(SOURCE,CHI_CLUMP,CHI_SCAT_CLUMP,CHIL,ETAL,
+	1            V,SIGMA,R,P,FORCE_MULT,STARS_LUM,AQW,HQW,TA,EW,EMISS_EW,CONT_INT,
 	1            FL,INNER_BND_METH,DBB,IC,THK_CONT,L_FALSE,NC,NP,ND,METHOD)
 !
 	IF(ABS(EW) .GE. EW_CUT_OFF)THEN
@@ -2340,8 +2341,8 @@
 	    J=SIM_LINE_POINTER(SIM_INDX)
 	    MNL=VEC_MNL_F(J)
 	    MNUP=VEC_MNUP_F(J)
-	    CALL EW_FORMAT_V2(EW_STRING,TRANS_NAME_SIM(SIM_INDX),T1,
-	1                     CONT_INT,EW,SOBOLEV,MNL,MNUP)
+	    CALL EW_FORMAT_V3(EW_STRING,TRANS_NAME_SIM(SIM_INDX),T1,
+	1                     CONT_INT,EW,EMISS_EW,SOBOLEV,MNL,MNUP)
 	    IF(SIM_INDX .NE. 1)THEN
 	      I=INDEX(EW_STRING,'  ')
 	      EW_STRING(3:I+1)=EW_STRING(1:I-1)

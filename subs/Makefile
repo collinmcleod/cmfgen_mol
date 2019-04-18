@@ -41,6 +41,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(eval_ed.o)\
       $(LIB)(ew_format.o)\
       $(LIB)(ew_format_v2.o)\
+      $(LIB)(ew_format_v3.o)\
       $(LIB)(ex_e1x_fun.o)\
       $(LIB)(exponx.o)\
       $(LIB)(extend3opac.o)\
@@ -192,6 +193,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(sobew.o)\
       $(LIB)(sobew_grad.o)\
       $(LIB)(sobew_grad_v2.o)\
+      $(LIB)(sobew_grad_v3.o)\
       $(LIB)(sobjbar_sim.o)\
       $(LIB)(solveba_v3.o)\
       $(LIB)(starfin.o)\
