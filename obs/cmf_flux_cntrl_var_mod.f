@@ -2,6 +2,9 @@
 ! 
 ! Set constants that are regularly used, and passed to subroutines.
 !
+!
+! Altered 26-Apr-2019 : Added RD_NU_MAX_OBS, RD_NU_MIN_OBS to restrict the range of observer's frame int.
+!
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2
@@ -189,6 +192,8 @@
 !
 ! Used to control integration in Observer's frame.
 !
+	REAL*8 RD_NU_MAX_OBS			!To restrict the range of observer's frame integration
+	REAL*8 RD_NU_MIN_OBS
 	REAL*8 OBS_TAU_MAX			!Cut integration off when TAU > OBS_TAU_MAX
 	REAL*8 OBS_ES_DTAU			!Maximum grid spacing, in e.s. optical depth, along ray.
 	INTEGER N_INS_OBS               	!# of additional points inserted/per zone for observer's frame calculation.

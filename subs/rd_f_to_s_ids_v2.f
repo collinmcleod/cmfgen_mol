@@ -115,7 +115,11 @@ C
 ! The ' ' in the call prevents diagnostic information from being output.
 ! Nominally it should be the F_TO_S FILENME.
 !
-	CALL DO_SL_ADJUSTEMENT(F_TO_S,INT_SEQ,N_F,N_S,SL_OPTION,' ')
+        IF(INDEX(SL_OPTION,'SPLIT_LS') .NE. 0)THEN
+          CALL DO_SL_LS_SPLIT(F_TO_S,INT_SEQ,N_F,N_S,LEVNAME_F,SL_OPTION)
+	ELSE
+	  CALL DO_SL_ADJUSTEMENT(F_TO_S,INT_SEQ,N_F,N_S,SL_OPTION,' ')
+	END IF
 !
 	IF(MAXVAL(F_TO_S) .NE. N_S)THEN
 	  WRITE(LUER,*)' '

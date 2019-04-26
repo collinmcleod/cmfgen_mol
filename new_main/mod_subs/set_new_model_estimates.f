@@ -33,6 +33,8 @@
 	USE LINE_MOD
 	IMPLICIT NONE
 !
+! Altered 26-Apr-2019 : Added "CALL AUTO_ADD_ION" (done earlier on OSIRIS).
+!                       Added RSP as a DC_INTERP_METHOD 
 ! Altered 31-Jan-2016 : Added SAVED_TWO_PHOT_METHOD.
 ! Altered 07-Apr-2015 : Changed to SET_TWO_PHOT_V3.
 ! Altered 05-Apr-2011 : Many changes done in order to facilitate the USE of LTE populations
@@ -144,16 +146,20 @@
 ! too allow NDOLD in the input files to be larger than ND.
 ! The first call to REGRIDWS is effectively used to compute DHeI only.
 !
+	WRITE(6,*)'Calling AUTO_ADD_ION'
+	FLUSH(UNIT=6)
+	CALL AUTO_ADD_ION() 
 	IF(GRID) THEN
 	  WRITE(LUER,'(/,A,/)')' Using direct interpolation option (i.e. GRID) for new model.'
 !
+	  IF(DC_INTERP_METHOD .EQ. 'RSP')CALL REGRID_T_ED(R,ED,T,POP_ATOM,ND,'T_IN')
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      TMP_STRING=TRIM(ION_ID(ID))//'_IN'
 	      ISPEC=SPECIES_LNK(ID)
 	      CALL REGRID_LOG_DC_V1( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,CLUMP_FAC,
 	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
-	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,'R',TMP_STRING)
+	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,DC_INTERP_METHOD,TMP_STRING)
 	    END IF
 	  END DO
 !

@@ -16,6 +16,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(adjust_sn_r_grid.o)\
       $(LIB)(adjust_pops.o)\
       $(LIB)(auto_clump_rev.o)\
+      $(LIB)(auto_add_ion.o)\
       $(LIB)(ba_update_v7.o)\
       $(LIB)(check_hydro_def.o)\
       $(LIB)(check_ions_present.o)\
@@ -60,6 +61,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(set_pops_to_pure_lte.o)\
       $(LIB)(set_sn_r_grid.o)\
       $(LIB)(set_new_grid.o)\
+      $(LIB)(smooth_pops_as_we_iterate.o)\
       $(LIB)(solveba_v13.o)\
       $(LIB)(steq_multi_v9.o)\
       $(LIB)(steqne_v4.o)\
@@ -67,6 +69,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(steq_co_mov_deriv_v3.o)\
       $(LIB)(store_old_grid.o)\
       $(LIB)(store_ba_data_v3.o)\
+      $(LIB)(sub_guess_dc.o)\
       $(LIB)(sum_steq_sol.o)\
       $(LIB)(tst_rd_seq.o)\
       $(LIB)(var_op_v10.o)\

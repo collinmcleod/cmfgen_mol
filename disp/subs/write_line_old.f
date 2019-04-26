@@ -4,6 +4,8 @@
 	1            ETA,CHI,ESEC,CHIL,ETAL,ND,LUOUT)
 	IMPLICIT NONE
 !
+! Altered: 12-Dec-2018   CHIL, ETAL no longer altered in rountine if TRAN_NAME set to continuum.
+!
 	CHARACTER(LEN=*) TRAN_NAME
 	CHARACTER(LEN=*) MOD_NAME
 	LOGICAL NEW_FILE
@@ -55,17 +57,20 @@
 	1       '(1X,T9,A,T23,A,T35,A,T51,A,T64,A,T76,A,T91,A,T105,A,T119,A,T133,A,T147,A)')
 	1            'R','T','SIGMA','V','ETA','CHI_TH','ESEC',
 	1            'ETAL','CHIL','ROH','f'
-        IF(TRAN_NAME.EQ. 'Continuum')THEN
+!
+       IF(TRAN_NAME.EQ. 'Continuum')THEN
+         DO I=1,ND
+           WRITE(LUOUT,'(1X,11ES14.6)')R(I),T(I),SIGMA(I),V(I),
+	1                 ETA(I),(CHI(I)-ESEC(I)),
+	1                 ESEC(I),1.0D-10,1.0D-10,MASS_DENSITY(I),CLUMP_FAC(I)
+	  END DO
+	ELSE
           DO I=1,ND
-            CHIL(I)=1.0D-10
-            ETAL(I)=1.0D-10
-          END DO
-       END IF
-       DO I=1,ND
-         WRITE(LUOUT,'(1X,11ES14.6)')R(I),T(I),SIGMA(I),V(I),
+            WRITE(LUOUT,'(1X,11ES14.6)')R(I),T(I),SIGMA(I),V(I),
 	1                 ETA(I),(CHI(I)-ESEC(I)),
 	1                 ESEC(I),ETAL(I),CHIL(I),MASS_DENSITY(I),CLUMP_FAC(I)
-	END DO
+	  END DO
+	END IF
 	CLOSE(UNIT=LUOUT)
 !
 	RETURN

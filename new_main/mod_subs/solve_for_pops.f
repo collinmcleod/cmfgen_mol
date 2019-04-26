@@ -11,6 +11,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered:   26-Apr-2019 : Added "CALL SMOOTH_POPS_AS_WE_ITERATE" (done earlier on OSIRIS).
 ! Altered:   18-Nov-2016 : Before doing AV, check NG acceleration was not done recently.
 ! Altered:   01-Apr-2015 : Changed ESTAU call to ESTAU_V2 to take clumping to account.
 ! Altered:   21-Jan-2014 : Changed to CALL SOLVEBA_V12 - now pass MAIN_COUNTER.
@@ -234,6 +235,10 @@
 !	END IF
 !
         CALL WR2D_V2(SOL,NT,ND,'STEQ SOLUTION ARRAY','#',L_TRUE,LU_SE)
+!
+	IF(AUTO_SMOOTH_POPS)THEN
+	  CALL SMOOTH_POPS_AS_WE_ITERATE(POPS,SOL,ND,NT)
+	END IF
 !
 ! NB: The call to SUM_STEQ_SOL corrupts SOL. I is used for output --
 !      the unit is closed on exit.

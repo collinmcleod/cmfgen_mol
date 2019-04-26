@@ -4,6 +4,8 @@
 	IMPLICIT NONE
 	INTEGER ND
 !
+! Altered : 26-Apr-2019 : better error handling and reporting.
+!
 	INTEGER I,J,K
 	INTEGER IT1,IT2
 	INTEGER IT,ISPEC
@@ -21,6 +23,7 @@
 	REAL*8, PARAMETER :: Hz_TO_eV=4.1356691D0
 	REAL*8 T1,T2
 !
+	LOGICAL MATCH_FOUND
 	INTEGER COUNT_OCCUR
 	EXTERNAL COUNT_OCCUR
 !
@@ -61,13 +64,20 @@
 !
 ! Find species and ionization state match.
 !
-	    READ(STRING,*)RD_AT_NO,IT2
+	    READ(STRING,*,IOSTAT=IOS)RD_AT_NO,IT2
+	    IF(IOS .NE. 0)THEN
+	      WRITE(LU_ER,*)'Error reading in Arnaud atomic No.in READ_ARNAUD_ION_DATA'
+	      WRITE(LU_ER,*)TRIM(STRING)
+	      STOP
+	    END IF
+	    MATCH_FOUND=.FALSE.
 	    DO ISPEC=1,NUM_SPECIES
 	      IF( NINT( AT_NO(ISPEC) ) .EQ. RD_AT_NO .AND. SPECIES_BEG_ID(ISPEC) .NE. 0)THEN
 	        IT1=RD_AT_NO+1-IT2
 	        WRITE(LU_OUT,*)RD_AT_NO,AT_NO(ISPEC),IT1,SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	        DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	          IF( IT1 .EQ. NINT(ATM(ID)%ZXzV) )THEN
+	             MATCH_FOUND=.TRUE.
 	             IT=IT+1
 	             IF(IT .GT. MAX_NUM_THD)THEN
 	               WRITE(LU_ER,*)'Error reading in Arnaud ionization data in READ_ARNAUD_ION_DATA'
@@ -175,6 +185,10 @@
 	        EXIT
               END IF
 	    END DO
+	    IF(.NOT. MATCH_FOUND .AND. COUNT_OCCUR(STRING,'.') .LT. 2)THEN
+	      READ(LU_IN,'(A)')STRING
+	      READ(LU_IN,'(A)')STRING
+	    END IF
 	  END DO
 100	CONTINUE
 	NUM_THD=IT

@@ -36,7 +36,6 @@ OBJ= $(LIB)(ave_level_energy.o)\
      $(LIB)(set_edge_freq_v3.o)\
      $(LIB)(set_edge_freq_v4.o)\
      $(LIB)(set_x_freq_v2.o)\
-     $(LIB)(sm_phot_v3.o)\
      $(LIB)(subcol_multi_v4.o)\
      $(LIB)(subcol_multi_v6.o)\
      $(LIB)(sub_phot_gen.o)\

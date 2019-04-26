@@ -3,6 +3,9 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 26-Apr-2019 : Added        J_CHK_OPTION (CHK_J)     - Done earlier on OSIRIS.
+!                               AUTO_ADD_ION_STAGES (AUTO_ADD)
+!                                  AUTO_SMOOTH_POPS (AUTO_SMOOTH)
 ! Altered : 01-Sep-2016 : Added variabe MINIMUM_ISO_POP (not required)
 !                            TIME_SEQ_NO changed from integer to real.
 ! Altered : 15-Feb-2015 : Added INSTANTANEOUS_ENERGY_DEPOSITION option (12-Jan-2015 on OSPREY[cur_cmf_gam])
@@ -468,7 +471,9 @@ C
 	  CALL RD_STORE_NCHAR(N_TYPE,'N_TYPE',ISIX,L_TRUE,
 	1         'Method for to handle N for MOM_J_CMF -- '//
 	1         'N_ON_J, MIXED, or G_ONLY')
+	  J_CHK_OPTION='ABS_VAL'
 	  H_CHK_OPTION='NONE'
+	  CALL RD_STORE_CHAR(J_CHK_OPTION,'CHK_J',L_FALSE,'NONE, ABS_VAL, or FORM_VAL')
 	  CALL RD_STORE_CHAR(H_CHK_OPTION,'CHK_H',L_FALSE,'NONE, AV_VAL, or MAX_VAL')
 	  CALL RD_STORE_NCHAR(FG_SOL_OPTIONS,'FG_OPT',ITEN,L_TRUE,
 	1         'Solution options for FG_J_CMF: DIFF/INS and INT/INS')
@@ -751,8 +756,14 @@ C
 	  NU_XRAY_END=100.0D0
 	  CALL RD_STORE_DBLE(NU_XRAY_END,'NU_XRAY',L_FALSE,
 	1            'End of X-ray region for continuum definition')
-	  
-C
+!	  
+	  AUTO_ADD_ION_STAGES=.TRUE.
+	  CALL RD_STORE_LOG(AUTO_ADD_ION_STAGES,'AUTO_ADD',L_FALSE,
+	1       'Automatically add files with missing XzV_IN files?')
+	  AUTO_SMOOTH_POPS=.TRUE.
+	  CALL RD_STORE_LOG(AUTO_SMOOTH_POPS,'AUTO_SMOOTH',L_FALSE,
+	1       'Automatically smooth populations as we iterate?')
+!
 	  WRITE(LUSCR,'()')
 	  WRITE(LUSCR,'()')
 	  INTERP_DC_SPH_TAU=.FALSE.
@@ -762,6 +773,7 @@ C
 	  CALL RD_STORE_LOG(GRID,'LIN_INT',L_TRUE,
 	1        'Use direct linear interpolation if  new model ?')
 	  DC_INTERP_METHOD='ED'
+	  IF(GRID)DC_INTERP_METHOD='R'
 	  CALL RD_STORE_NCHAR(DC_INTERP_METHOD,'DC_METH',ITEN,L_FALSE,
 	1        'Interpolation method: ED, R, LTE, SPH_TAU')
 	  CALL RD_STORE_LOG(INTERP_DC_SPH_TAU,'DC_SPH_TAU',L_FALSE,

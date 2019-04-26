@@ -155,7 +155,9 @@
 	LOGICAL SET_LTE_AS_INIT_ESTIMATES
 	LOGICAL DO_HYDRO
 	LOGICAL DONE_HYDRO_REVISION
-        CHARACTER(LEN=10) DC_INTERP_METHOD
+        LOGICAL AUTO_ADD_ION_STAGES
+	LOGICAL AUTO_SMOOTH_POPS
+	CHARACTER(LEN=10) DC_INTERP_METHOD
 !
 ! Used when constructing the Temperature distribution on the first
 ! iteration.
@@ -270,6 +272,7 @@
 ! Method to handle N moment  (N_ON_J, MIXED, or G_ONLY)
 !
 	CHARACTER(LEN=6)  N_TYPE
+	CHARACTER(LEN=10) J_CHK_OPTION
 	CHARACTER(LEN=10) H_CHK_OPTION
 !
 ! These insert extra points into the grid when solving for the radition field.

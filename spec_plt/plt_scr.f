@@ -739,35 +739,49 @@ C
 ! We treat each ioization stage separatly.
 !
 	  DO ID=MAX(ID1,ID2),MIN(ID1,ID2),-1
+	    WRITE(6,*)'ID=',ID
 	    DO I=1,NUM_IONS
 	      CNT=0; T1=0.0D0
 	      DO IVAR=ION_INDEX(I),ION_INDEX(I)+NION(I)-1
 	        T2=DLOG10(POPS(IVAR,ID,IT)/POPS(IVAR,ID+1,IT))
-	        IF(ABS(T2) .LT. 5)THEN
+!	        IF(ABS(T2) .LT. 5)THEN
 	          T1=T1+T2
 	          CNT=CNT+1
-	        END IF
+!	        END IF
 	      END DO
+	      WRITE(6,*)'T1=',CNT,T1,T2
 	      T1=T1/CNT
 !
 ! With the factor of 4, these statements will only change the poulations
 ! if they change by more than a factor of 5.
 !
-	      T2=0.175D0
+!	      T2=0.175D0
+!	      IF(T1 .LE. 0.0D0)T1=MIN(-T2,T1)
+!	      IF(T1 .GE. 0.0D0)T1=MAX(T2,T1)
+!	      WRITE(6,*)IVAR,T1,T2
+!	      T1=SIGN(MIN(0.175D0,T1),T1)
+!
+	      T2=0.7D0
 	      IF(T1 .LE. 0.0D0)T1=MIN(-T2,T1)
 	      IF(T1 .GE. 0.0D0)T1=MAX(T2,T1)
+	      WRITE(6,*)IVAR,T1,T2
+	      T1=SIGN(MIN(0.7D0,ABS(T1)),T1)
 !
 ! If shift, for any pop, is 4 times large than average shift, replace
 ! the population.
 !
+	      WRITE(6,'(A4,4I5)')'LIMS',I,ION_INDEX(I),ION_INDEX(I)+NION(I)-1
 	      DO IVAR=ION_INDEX(I),ION_INDEX(I)+NION(I)-1
 	        T2=DLOG10(POPS(IVAR,ID,IT)/POPS(IVAR,ID+1,IT))
-	        IF(ABS(T2) .GT. 4*ABS(T1))THEN
+	        WRITE(6,*)'HOPE',IVAR,T2
+	        IF(ABS(T2) .GT. ABS(T1))THEN
 	          T3=10**(DLOG10(POPS(IVAR,ID+1,IT))+T1)
-	          WRITE(LU_OUT,'(I10,I6,4ES14.4E3,ES20.4E3)')ID,IVAR,T1,T3,POPS(IVAR,ID,IT),POPS(IVAR,ID+1,IT),T2
+	          WRITE(6,'(I10,I6,4ES14.4E3,ES20.4E3)')ID,IVAR,T1,T3,POPS(IVAR,ID,IT),POPS(IVAR,ID+1,IT),T2
+	          FLUSH(LU_OUT)
 	          POPS(IVAR,ID,IT)=T3
 	        END IF
 	      END DO
+	      WRITE(6,*)NUM_IONS,IVAR,T2
 	    END DO
 	  END DO
 	  CLOSE(UNIT=LU_OUT)

@@ -1,0 +1,59 @@
+!
+! Subroutine does the following:
+!     (a) Determine which ionization stages have input files.
+!     (b) Call a routine to create XZV_IN files for species not present.
+!
+	SUBROUTINE AUTO_ADD_ION()
+	USE MOD_CMFGEN
+	USE CONTROL_VARIABLE_MOD
+	IMPLICIT NONE
+!
+	INTEGER ISPEC
+	INTEGER ID,NID
+	INTEGER FST_ID,LST_ID
+	LOGICAL FILE_PRES
+	CHARACTER(LEN=12) TMP_STR
+!
+	WRITE(6,*)'Entered AUTO_ADD_ION'
+	FLUSH(UNIT=6)
+!
+	IF(.NOT. AUTO_ADD_ION_STAGES)RETURN
+!
+! Determine which ions have the necessary input files.
+! We first look at the lowest ioization stages.
+!
+	DO ISPEC=1,NUM_SPECIES
+	  FST_ID=0
+	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	    TMP_STR=TRIM(ION_ID(ID))//'_IN'
+	    INQUIRE(FILE=TMP_STR,EXIST=FILE_PRES)
+	    IF(FILE_PRES)THEN
+	      FST_ID=ID
+	      EXIT
+	    END IF
+	  END DO
+!
+!	  WRITE(6,'(L,3X,3I4)')FILE_PRES,FST_ID
+	  DO NID=FST_ID-1,SPECIES_BEG_ID(ISPEC),-1
+	    CALL SUB_GUESS_DC(ION_ID(NID),ION_ID(NID),ATM(ID)%GXZV_F(1),ATM(ID+1)%GXZV_F(1))
+	  END DO
+!
+! Now look at the high ionization stages.
+!
+	  LST_ID=SPECIES_END_ID(ISPEC)
+	  DO ID=SPECIES_END_ID(ISPEC)-1,SPECIES_BEG_ID(ISPEC),-1
+	    TMP_STR=TRIM(ION_ID(ID))//'_IN'
+	    INQUIRE(FILE=TMP_STR,EXIST=FILE_PRES)
+	    IF(FILE_PRES)THEN
+	      LST_ID=ID
+	      EXIT
+	    END IF
+	  END DO
+	  DO NID=LST_ID+1,SPECIES_END_ID(ISPEC)-1
+	    CALL SUB_GUESS_DC(ION_ID(NID),ION_ID(NID-1),ATM(ID)%GXZV_F(1),ATM(ID-1)%GXZV_F(1))
+	  END DO
+	END DO
+	CALL DEALLOCATE_MOD_GUESS_DC()
+!
+	RETURN
+	END

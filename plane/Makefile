@@ -26,7 +26,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(drhsdchi_pp.o)\
       $(LIB)(define_grid_v2.o)\
       $(LIB)(expn.o)\
-      $(LIB)(edd_j_hub_var_v2.o)\
+      $(LIB)(edd_j_hub_var_v3.o)\
       $(LIB)(edd_jrel_var_v3.o)\
       $(LIB)(fcomp_pp_v2.o)\
       $(LIB)(fgrey_norel_v1.o)\
@@ -46,7 +46,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(n_weight.o)\
       $(LIB)(mom_j_cmf_v8.o)\
       $(LIB)(mom_j_cmf_v11.o)\
-      $(LIB)(mom_j_ddt_v4.o)\
+      $(LIB)(mom_j_ddt_v5.o)\
       $(LIB)(mom_j_pp_v1.o)\
       $(LIB)(mom_jrel_v8.o)\
       $(LIB)(mom_jrel_grey_v1.o)\
@@ -61,7 +61,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(runge_kutta.o)\
       $(LIB)(solve_cmf_formal_v2.o)\
       $(LIB)(var_jrel_v4.o)\
-      $(LIB)(var_mom_j_ddt_v4.o)\
+      $(LIB)(var_mom_j_ddt_v5.o)\
       $(LIB)(var_mom_pp_v1.o)\
       $(LIB)(var_mom_j_cmf_v9.o)\
       $(LIB)(var_mom_j_cmf_v12.o)\

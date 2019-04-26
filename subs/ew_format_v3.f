@@ -49,7 +49,7 @@
 	TAB=TAB+12
 	WRITE(OUTSTR(TAB:),'(3ES12.3,3X,L1,2X)')EW,EMISS_EW,T1,SOBOLEV
 !
-	TAB=TAB+30
+	TAB=TAB+36
 	WRITE(OUTSTR(TAB:),'(2(I4,2X))')NL,NUP
 !
 ! Idelly allow for a transition name up to 85 characters.

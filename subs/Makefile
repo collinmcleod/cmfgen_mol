@@ -5,7 +5,7 @@ include ../Makefile_definitions
 LIB=$(LIB_DIR)libsubs.a
 LIB_MOD=$(LIB_DIR)libmod.a
 
-OPTION=$(FH)
+OPTION=$(FG)
 
 #
 # Entries for library
@@ -27,6 +27,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(comp_var_jrec.o)\
       $(LIB)(det_main_cont_freq.o)\
       $(LIB)(dop_pro.o)\
+      $(LIB)(do_sl_ls_split.o)\
       $(LIB)(dp_zero.o)\
       $(LIB)(dspheredchi.o)\
       $(LIB)(edd_j_var_v4.o)\

@@ -190,9 +190,9 @@
 	1             V_PROF_LIMIT,MAX_PROF_ED,SET_PROF_LIMS_BY_OPACITY)
 !
 	          T1=0.01D0*C_KMS/VEC_FREQ(ML)
-	          WRITE(134,'(A,T10,A,T25,2I5,2F20.8,2ES15.4)')VEC_SPEC(ML),PROF_TYPE(ML),MNL,MNUP,
-	1                  T1,LAMVACAIR(VEC_FREQ(ML)),VEC_VDOP_MIN(ML),
-	1                  C_KMS*(VEC_STRT_FREQ(ML)/VEC_FREQ(ML)-1.0D0)
+!	          WRITE(134,'(A,T10,A,T25,2I5,2F20.8,2ES15.4)')VEC_SPEC(ML),PROF_TYPE(ML),MNL,MNUP,
+!	1                  T1,LAMVACAIR(VEC_FREQ(ML)),VEC_VDOP_MIN(ML),
+!	1                  C_KMS*(VEC_STRT_FREQ(ML)/VEC_FREQ(ML)-1.0D0)
 	        END IF
 	      END DO
 	    END DO
@@ -226,36 +226,38 @@
 !
 ! Output all lines to TRANS_INFO. Usefule for diagnostic purposes.
 !
-	I=160	!Record length - allow for long names
-	CALL GEN_ASCI_OPEN(LUIN,'TRANS_INFO','UNKNOWN',' ','WRITE',I,IOS)
-	  WRITE(LUIN,*)'!'
-	  WRITE(LUIN,*)' Wavelengths are in air for Lambda > 2000 A'
-	  WRITE(LUIN,*)'!'
-	  WRITE(LUIN,*)
+	IF(VERBOSE_OUTPUT)THEN
+	  I=160	!Record length - allow for long names
+	  CALL GEN_ASCI_OPEN(LUIN,'TRANS_INFO','UNKNOWN',' ','WRITE',I,IOS)
+	    WRITE(LUIN,*)'!'
+	    WRITE(LUIN,*)' Wavelengths are in air for Lambda > 2000 A'
+	    WRITE(LUIN,*)'!'
+	    WRITE(LUIN,*)
 	1     '     I    NL_F  NUP_F        Nu',
 	1     '       Lam(A)    /\V(km/s)    Transition' 
-	  WRITE(LUIN,
+	    WRITE(LUIN,
 	1    '(1X,I6,2(1X,I6),2X,F10.6,2X,F10.3,16X,A)')
 	1         IONE,VEC_MNL_F(1),VEC_MNUP_F(1),
 	1         VEC_FREQ(1),LAMVACAIR(VEC_FREQ(1)),
 	1         TRIM(VEC_TRANS_NAME(VEC_INDX(1)))
-	  DO ML=2,N_LINE_FREQ
-	    T1=LAMVACAIR(VEC_FREQ(ML))
-	    T2=2.998D+05*(VEC_FREQ(ML-1)-VEC_FREQ(ML))/VEC_FREQ(ML)
-	    IF(T2 .GT. 2.998D+05)T2=2.998D+05
-	    IF(T1 .LT. 1.0D+04)THEN
-	      WRITE(LUIN,
-	1      '(1X,I6,2(1X,I6),2X,F10.6,2X,F10.3,2X,F10.2,4X,A)')
+	    DO ML=2,N_LINE_FREQ
+	      T1=LAMVACAIR(VEC_FREQ(ML))
+	      T2=2.998D+05*(VEC_FREQ(ML-1)-VEC_FREQ(ML))/VEC_FREQ(ML)
+	      IF(T2 .GT. 2.998D+05)T2=2.998D+05
+	      IF(T1 .LT. 1.0D+04)THEN
+	        WRITE(LUIN,
+	1        '(1X,I6,2(1X,I6),2X,F10.6,2X,F10.3,2X,F10.2,4X,A)')
+	1           ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
+	1           VEC_FREQ(ML),T1,T2,TRIM(VEC_TRANS_NAME(VEC_INDX(ML)))
+	      ELSE             
+	        WRITE(LUIN,
+	1         '(1X,I6,2(1X,I6),2X,F10.6,1X,1P,E11.4,0P,2X,F10.2,4X,A)')
 	1         ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
 	1         VEC_FREQ(ML),T1,T2,TRIM(VEC_TRANS_NAME(VEC_INDX(ML)))
-	    ELSE             
-	      WRITE(LUIN,
-	1      '(1X,I6,2(1X,I6),2X,F10.6,1X,1P,E11.4,0P,2X,F10.2,4X,A)')
-	1         ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
-	1         VEC_FREQ(ML),T1,T2,TRIM(VEC_TRANS_NAME(VEC_INDX(ML)))
-	    END IF
-	  END DO
-	CLOSE(UNIT=LUIN)
+	      END IF
+	    END DO
+	  CLOSE(UNIT=LUIN)
+	END IF
 	DEALLOCATE (VEC_TRANS_NAME)
 !
 ! Get lines and arrange in numerically decreasing frequency according to

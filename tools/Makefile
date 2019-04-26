@@ -23,7 +23,9 @@ OBJ = $(LIB)(usr_option.o)\
       $(LIB)(get_indx.o)\
       $(LIB)(read_keyword.o)\
       $(LIB)(rd_sing_vec_rvtj.o)\
+      $(LIB)(rd_energy.o)\
       $(LIB)(set_case_fn.o)\
+      $(LIB)(sm_phot_v3.o)\
       $(LIB)(sve_file.o)\
       $(LIB)(update_keyword.o)\
       $(LIB)(upper_case.o)\

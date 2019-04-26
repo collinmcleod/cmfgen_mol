@@ -15,6 +15,9 @@
 	USE EDDFAC_REC_DEFS_MOD
 	IMPLICIT NONE
 !
+! Altered: 26-Apr-2019 : Added variables/option to restrict range of OBS frame calcualtion.
+!                           Added option to compute EW inc CMF (include ability to
+!                               compute Int ABS(I/Ic-1) dv.
 ! Altered: 21-Sep-2016 : Error corrected -- I was writing out KAPPA from RVTJ rather than the from the CMF_FLUX
 !                           calculaton. Note that the ROSSELAND mean is only correct (at depth) if we compute
 !                           the spectrum over the full frequency range.
@@ -62,7 +65,7 @@
 !
 ! Maximum number of lines whose profile overlap at a given frequency.
 !
-	INTEGER, PARAMETER :: MAX_SIM=3000
+	INTEGER, PARAMETER :: MAX_SIM=5000
 !
 ! Define vinteger variables to set aside for storage for the intrinsic line profiles.
 ! These are now computed by a subroutine (as of Nov-2013).
@@ -177,7 +180,6 @@
 	INTEGER TMP_MAX_SIM
 	REAL*8 OVER_FREQ_DIF
 	REAL*8 EW
-	REAL*8 EMISS_EW
 	REAL*8 CONT_INT
 	LOGICAL OVERLAP
 	LOGICAL SOBOLEV
@@ -916,8 +918,10 @@
 	  WRITE(LUER,*)'Calling INS_LINE_OBS_V4'
 	  T1=NU(1)/(1.0D0+2.0D0*VINF/C_KMS)
 	  NU_MAX_OBS=MIN(T1,NU(3))
+	  IF(RD_NU_MAX_OBS .GT. 0.0D0)NU_MAX_OBS=RD_NU_MAX_OBS
 	  T1=NU(NCF)*(1.0D0+2.0D0*VINF/C_KMS)
 	  NU_MIN_OBS=MAX(NU(NCF-3),T1)
+	  IF(RD_NU_MIN_OBS .GT. 0.0D0)NU_MIN_OBS=RD_NU_MIN_OBS
 	  CALL INS_LINE_OBS_V4(OBS_FREQ,N_OBS,NCF_MAX,
 	1               VEC_FREQ,VEC_STRT_FREQ,VEC_VDOP_MIN,VEC_TRANS_TYPE,
 	1               N_LINE_FREQ,SOB_FREQ_IN_OBS,
@@ -2082,8 +2086,8 @@
 ! Open file to store EW data
 !
 	CALL GEN_ASCI_OPEN(LU_EW,'EWDATA','UNKNOWN',' ',' ',IZERO,IOS)
-	WRITE(LU_EW,'(3X,A,2X,A,3X,A,4X,A,5X,A,3(2X,A),4X,A)')'Lam(Ang)','C.Flux(Jy)',
-	1                  'EW(Ang)','EEW(Ang)''L.Flux','Sob','  NL',' NUP','Trans. Name'
+	WRITE(LU_EW,'(3X,A,2X,A,5X,A,5X,A,3(2X,A),4X,A)')'Lam(Ang)','C.Flux(Jy)',
+	1                  'EW(Ang)','L.Flux','Sob','  NL',' NUP','Trans. Name'
 !
 ! Zero the vector that will be used to store the force-multiplier computed
 ! for all lines using the SOBOLEV approximation.
@@ -2113,7 +2117,7 @@
 !
 	OVERLAP=.FALSE.
 	CALL TUNE(1,'SOB_EW')
-	DO WHILE (LINE_INDX .LE. N_LINE_FREQ)
+	DO WHILE (LINE_INDX .LE. NUM_SOB_LINES)      !N_LINE_FREQ)
 !
 	IF(OVERLAP)THEN
 	  TMP_MAX_SIM=MAX_SIM
@@ -2331,9 +2335,13 @@
 ! of the line emission. Not required in this code as used only
 ! for display purposes.
 !
-	CALL SOBEW_GRAD_V3(SOURCE,CHI_CLUMP,CHI_SCAT_CLUMP,CHIL,ETAL,
-	1            V,SIGMA,R,P,FORCE_MULT,STARS_LUM,AQW,HQW,TA,EW,EMISS_EW,CONT_INT,
+	IF(L_TRUE)THEN
+	  INCLUDE 'CMF_ABS_EW.INC'
+	ELSE
+	  CALL SOBEW_GRAD_V2(SOURCE,CHI_CLUMP,CHI_SCAT_CLUMP,CHIL,ETAL,
+	1            V,SIGMA,R,P,FORCE_MULT,STARS_LUM,AQW,HQW,TA,EW,CONT_INT,
 	1            FL,INNER_BND_METH,DBB,IC,THK_CONT,L_FALSE,NC,NP,ND,METHOD)
+	END IF
 !
 	IF(ABS(EW) .GE. EW_CUT_OFF)THEN
 	  T1=LAMVACAIR(FL_SIM(1)) 		!Wavelength(Angstroms)
@@ -2341,8 +2349,8 @@
 	    J=SIM_LINE_POINTER(SIM_INDX)
 	    MNL=VEC_MNL_F(J)
 	    MNUP=VEC_MNUP_F(J)
-	    CALL EW_FORMAT_V3(EW_STRING,TRANS_NAME_SIM(SIM_INDX),T1,
-	1                     CONT_INT,EW,EMISS_EW,SOBOLEV,MNL,MNUP)
+	    CALL EW_FORMAT_V2(EW_STRING,TRANS_NAME_SIM(SIM_INDX),T1,
+	1                     CONT_INT,EW,SOBOLEV,MNL,MNUP)
 	    IF(SIM_INDX .NE. 1)THEN
 	      I=INDEX(EW_STRING,'  ')
 	      EW_STRING(3:I+1)=EW_STRING(1:I-1)

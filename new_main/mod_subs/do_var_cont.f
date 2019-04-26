@@ -37,6 +37,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered 20-Apr-2019 : Changed to VAR_MOM_J_DTT_V5.F (added J_CHK_OPTION).
 ! Altered 17-Oct-2016 : Variation routines changed to: VAR_MOM_J_CMF_V12.F, VAR_MOM_J_DDT_V4.F, and VAR_JREL_V4.F .
 ! Incorporated 02-Jan-2014: Changed to allow depth dependent profiles.
 ! Altered 01-Dec-2012 : Added loop variables to OMP calls.
@@ -324,13 +325,13 @@
 	1                  DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
 	   ELSE IF (USE_LAM_ES)THEN
 	   ELSE IF(USE_DJDT_RTE)THEN
-	     CALL VAR_MOM_J_DDT_V4(TA,CHI_CLUMP,CHI_SCAT_CLUMP,ES_COH_VEC,V,R,
+	     CALL VAR_MOM_J_DDT_V5(TA,CHI_CLUMP,CHI_SCAT_CLUMP,ES_COH_VEC,V,R,
 	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR,
 	1           dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR,
 	1           KI,WM,RHS_dHdCHI,FEDD,
 	1           INCL_DJDT_TERMS,USE_DR4JDT,DJDT_RELAX_PARAM,FIRST_FREQ,FL,dLOG_NU,
 	1           dTdR,DBB,dDBBdT,DO_THIS_TX_MATRIX,METHOD,
-	1           H_CHK_OPTION,INNER_BND_METH,OUTER_BND_METH,
+	1           J_CHK_OPTION,H_CHK_OPTION,INNER_BND_METH,OUTER_BND_METH,
 	1           ND,NM,NM_KI)
 	   ELSE
 	    CALL VAR_MOM_J_CMF_V12(TA,CHI_CLUMP,CHI_SCAT_CLUMP,

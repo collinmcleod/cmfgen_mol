@@ -192,6 +192,45 @@
 	    NX_ST=NX_ST+1
 	  END DO
 	  NX=ND-NX_ST+1
+!
+	ELSE IF(INTERP_OPTION .EQ. 'RSP')THEN
+	  IF(DABS(OLD_R(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
+	    IF(FIRST)THEN
+	      WRITE(LUER,*)'Using RSP option'
+	      WRITE(LUWARN,*)'Warning - core radius not identical in REGRID_LOG_DC_V1'
+	      WRITE(LUER,*)'Warning - core radius not identical in REGRID_LOG_DC_V1'
+	      WRITE(LUER,*)'Rescaling to make Rcore identical --- ',TRIM(FILE_NAME)
+	      WRITE(LUER,*)'Using RSP option'
+	      FIRST=.FALSE.
+	    ELSE
+	      WRITE(LUWARN,*)'Rescaling to make Rcore identical --- ',TRIM(FILE_NAME)
+	    END IF
+	    DO I=1,NDOLD
+	      OLD_R(I)=R(ND)*( OLD_R(I)/OLD_R(NDOLD) )
+	    END DO
+	    OLD_R(NDOLD)=R(ND)
+	  ELSE
+	    OLD_R(NDOLD)=R(ND)
+	  END IF
+	  IF( ABS(1.0D0-OLD_R(1)/R(1)) .LE. 1.0D-10 )OLD_R(1)=R(1)
+	  IF(OLD_R(2) .GE. OLD_R(1))THEN
+	    WRITE(LUER,*)'Reset OLD_R(1) in REGRID_T_ED but now OLD_R(2) .GE. OLD_R(1))'
+	    STOP
+	  END IF
+!
+	  IF( ABS(R(1)-OLD_R(1)) .LT. 1.0D-10)THEN
+	    OLD_R(1)=R(1)
+	  ELSE
+	    T1=LOG(R(1)/OLD_R(1))/(OLD_R(1)/OLD_R(NDOLD)-1)
+	    DO I=2,NDOLD-1
+	      OLD_R(I)=OLD_R(I)*EXP(T1*(OLD_R(I)/OLD_R(1)-1.0D0))
+	    END DO
+	    OLD_R(1)=R(1)
+	  END IF
+	  NX_ST=1; NX=ND
+	  OLD_X=LOG(OLD_R)
+	  NEW_X=LOG(R)
+!
 	ELSE IF(INTERP_OPTION .EQ. 'ED')THEN
 	  OLD_X=LOG(OLD_ED*OLD_CLUMP_FAC)
 	  NEW_X=LOG(ED)
@@ -313,6 +352,19 @@
 	        T_EXCITE=T_EXCITE-DELTA_T
 	      END DO
 	      DPOP(I,J)=DLOG(T_EXCITE)
+	    END DO
+	  END DO
+	END IF
+!
+	IF(INTERP_OPTION .EQ. 'RSP')THEN
+	  CALL LINPOP(OLD_R,TA,NDOLD,R,T,ND)
+	  DO J=1,NDOLD
+	    IF(TA(J) .NE. TA(J))WRITE(6,*)'TA error',TA(J)
+	    IF(T(J) .NE. T(J))WRITE(6,*)'T error',T(J)
+	    DO I=1,NZ
+	      IF(ABS(DPOP(I,J)) .GT. 0.3D0)THEN
+	        DPOP(I,J)=DPOP(I,J)+1.5D0*(TA(J)/OLD_T(J))+HDKT*EDGE(I)*(1.0D0/OLD_T(J)-1.0D0/TA(J))
+	      END IF
 	    END DO
 	  END DO
 	END IF

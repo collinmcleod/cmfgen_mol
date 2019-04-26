@@ -247,6 +247,7 @@
 	END IF
 !
 	IF(WRITE_IP)THEN
+	  IF(ALLOCATED(IP_OBS))DEALLOCATE(IP_OBS)
 	  ALLOCATE (IP_OBS(NP,NOS),STAT=IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'Error in OBS_FRAME_SUB'
@@ -258,6 +259,7 @@
 	END IF
 !
 	IF(WRITE_RTAU)THEN
+	   IF(ALLOCATED(RTAU))DEALLOCATE(RTAU)
 	   ALLOCATE (RTAU(NP,NOS),STAT=IOS)
 	   IF(IOS .NE. 0)THEN
 	      WRITE(LUER,*)'Error in OBS_FRAME_SUB'
@@ -265,6 +267,7 @@
 	      WRITE(LUER,*)'STATUS=',IOS
 	      STOP
 	   END IF
+	   IF(ALLOCATED(ZTAU))DEALLOCATE(ZTAU)
 	   ALLOCATE (ZTAU(NP,NOS),STAT=IOS)
 	   IF(IOS .NE. 0)THEN
 	      WRITE(LUER,*)'Error in OBS_FRAME_SUB'
@@ -276,6 +279,7 @@
 	END IF
 !
 	IF(WRITE_dFR)THEN
+	  IF(ALLOCATED(dI_R))DEALLOCATE(dI_R)
 	  ALLOCATE (dI_R(ND,NOS),STAT=IOS)
 	  IF(IOS .NE. 0)THEN
 	     WRITE(LUER,*)'Error in OBS_FRAME_SUB'
@@ -349,6 +353,7 @@
 !
 	T1=MINVAL(MAX_DEL_V_RES_ZONE)
 	NI_MAX=2*( (V(1)/T1)+ (N_INS_OBS+1)*ND + 2.0D0*TAU_MAX/ES_DTAU )
+	IF(ALLOCATED(Z_RAY))DEALLOCATE(Z_RAY)
 	ALLOCATE (Z_RAY(NI_MAX),STAT=IOS)
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error in OBS_FRAME_SUB'
@@ -679,9 +684,10 @@
 	      K=K+1
 	      IF(K .GT. SM_NCF)THEN
 	        WRITE(LUER,*)'Error in OBS_FRAME_SUB_V5'
-	        WRITE(LUER,*)'Bad K indx: K=',K
+	        WRITE(LUER,*)'Bad K indx (loc 1): K=',K
 	        WRITE(LUER,*)T1,SM_FREQ_CMF(1),SM_FREQ_CMF(SM_NCF)
 	        WRITE(LUER,*)'LS, OUT_ML, ML=',LS,OUT_ML,ML
+	        STOP
 	      END IF
 	    END DO
 	    INDX(1)=K
@@ -723,9 +729,10 @@
 !	        IF(K .GT. SM_NCF)THEN
 	        IF(K .LE. 1)THEN
 	          WRITE(LUER,*)'Error in OBS_FRAME_SUB_V5'
-	          WRITE(LUER,*)'Bad K indx: K=',K
+	          WRITE(LUER,*)'Bad K indx (loc 2): K=',K
 	          WRITE(LUER,*)T1,SM_FREQ_CMF(1),SM_FREQ_CMF(SM_NCF)
 	          WRITE(LUER,*)'LS, OUT_ML, ML, I=',LS,OUT_ML,ML,I
+	          STOP
 	        END IF
 	      END DO
 !
