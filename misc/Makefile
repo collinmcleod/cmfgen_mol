@@ -97,7 +97,7 @@ $(EXE_DIR)chk_phot.exe : chk_phot.o recom_chk_v2.o get_exc_freq.o $(OANDF)
 
 $(EXE_DIR)guess_dc.exe : guess_dc.o $(OANDF) 
 	$(F90) guess_dc.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) -ldisp \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)guess_dc.exe
 
@@ -109,13 +109,13 @@ $(EXE_DIR)pack_osc.exe : pack_osc.o $(OANDF)
 
 $(EXE_DIR)rev_rdinr.exe : rev_rdinr.o 
 	$(F90) rev_rdinr.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) -ldisp \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)rev_rdinr.exe
 
 $(EXE_DIR)tlusty_vel.exe : tlusty_vel.o $(OANDF) 
 	$(F90) tlusty_vel.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) -ldisp \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)tlusty_vel.exe
 
@@ -125,7 +125,7 @@ $(EXE_DIR)solve_ba_mat.exe : solve_ba_mat.o
 
 $(EXE_DIR)wr_f_to_s.exe : wr_f_to_s.o output_term_seq.o $(OANDF)
 	$(F90) wr_f_to_s.o output_term_seq.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) -l$(LN2)  \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)wr_f_to_s.exe
 
