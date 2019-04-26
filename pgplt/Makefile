@@ -72,10 +72,10 @@ $(LIB)(%.o) : %.f
 # fortran moudles. (The order of compilation matters.)
 #
 # NB: change_folor.f, change_pen.f, gramon_pgplot.f, vectorpen.f
-#     depend on ../tools/gen_in
+#     depend on ../subs/gen_in
 
-GEN = ../lib/libtools.a(gen_in.o)
-COL=  ../lib/libtools.a(mod_color_pen_def.o)
+GEN = ../lib/libsubs.a(gen_in.o)
+COL=  ../lib/libsubs.a(mod_color_pen_def.o)
 
 $(LIB)(change_color.o)    : change_color.f  $(GEN)
 $(LIB)(change_pen.o)      : change_pen.f    $(GEN)

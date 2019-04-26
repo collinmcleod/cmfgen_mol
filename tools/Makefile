@@ -5,7 +5,7 @@ include ../Makefile_definitions
 
 # Library where object files will/are stored
 
-LIB=$(LIB_DIR)libtools.a
+LIB=$(LIB_DIR)libsubs.a
 #
 # Entries for library
 #

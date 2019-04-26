@@ -73,12 +73,12 @@ $(LIB) : $(OBJ)	$(NT)
 
 NT =  $(LIB_DIR)libmod.a(mod_non_therm.o)
 
-GEN =  $(LIB_DIR)libtools.a(gen_in.o)\
-	$(LIB_DIR)libtools.a(usr_option.o)\
-	$(LIB_DIR)libtools.a(usr_hidden.o)\
-	$(LIB_DIR)libtools.a(mod_color_pen_def.o)\
+GEN =  $(LIB_DIR)libsubs.a(gen_in.o)\
+	$(LIB_DIR)libsubs.a(usr_option.o)\
+	$(LIB_DIR)libsubs.a(usr_hidden.o)\
+	$(LIB_DIR)libsubs.a(mod_color_pen_def.o)\
 	$(LIB_DIR)libmod.a(mod_lev_dis_blk.o)\
-	$(LIB_DIR)libtools.a(wr_string.o)
+	$(LIB_DIR)libsubs.a(wr_string.o)
 
 # General rules to make obects in a library and object files
 

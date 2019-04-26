@@ -4,23 +4,17 @@ include ../Makefile_definitions
 
 # These names are for the fortran linker
 
-LN1=tools
+LN1=subs
 LN2=pgplt
-LN3=subs
 LN4=disp
 LN5=spec
-LN6=newsubs
-LN7=dev
 
 # These names refer to the full file name
 
 FN1=$(LIB_DIR)lib$(LN1).a
 FN2=$(LIB_DIR)lib$(LN2).a
-FN3=$(LIB_DIR)lib$(LN3).a
 FN4=$(LIB_DIR)lib$(LN4).a
 FN5=$(LIB_DIR)lib$(LN5).a
-FN6=$(LIB_DIR)lib$(LN6).a
-FN7=$(LIB_DIR)lib$(LN7).a
 
 EXE  = $(EXE_DIR)plt_jh.exe\
        $(EXE_DIR)plt_jh_cur.exe\
@@ -39,17 +33,17 @@ EXE  = $(EXE_DIR)plt_jh.exe\
 all : OBJ ALLEXE
 
 
-GEN =  $(LIB_DIR)libtools.a(gen_in.o)\
-		$(LIB_DIR)libtools.a(usr_option.o)\
-		$(LIB_DIR)libtools.a(usr_hidden.o)\
+GEN =  $(LIB_DIR)libsubs.a(gen_in.o)\
+		$(LIB_DIR)libsubs.a(usr_option.o)\
+		$(LIB_DIR)libsubs.a(usr_hidden.o)\
 		$(LIB_DIR)libmod.a(mod_lev_dis_blk.o)\
-		$(LIB_DIR)libtools.a(mod_color_pen_def.o)\
-		$(LIB_DIR)libtools.a(wr_string.o)
+		$(LIB_DIR)libsubs.a(mod_color_pen_def.o)\
+		$(LIB_DIR)libsubs.a(wr_string.o)
 
 # Give the dependencies of dispgen.exe and how it is created.
 
 
-OBJ       : $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
+OBJ       : $(FN1) $(FN2) $(FN4) $(FN5) 
 ALLEXE    : $(EXE)
 
 
@@ -57,15 +51,15 @@ ALLEXE    : $(EXE)
 # UNIX systems, hence we take the easy but tediuos method.
 #	$(F90) $*.o /Users/jdh/pgplot/pgplotsrc/grsy00.o  \
 
-$(EXE_DIR)%.exe : %.o $(OBJ) $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
+$(EXE_DIR)%.exe : %.o $(OBJ) $(FN1) $(FN2) $(FN4) $(FN5)
 	$(F90) $*.o \
-		$(OBJ1) -L$(LIB_DIR) -l$(LN7) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN6) -l$(LN3) -l$(LN1) -l$(LN3) \
+		$(OBJ1) -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN2) -l$(LN1) \
 		$(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \
 		-o $(EXE_DIR)$*.exe
 
-$(EXE_DIR)plt_phot_raw.exe : plt_phot_raw.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
+$(EXE_DIR)plt_phot_raw.exe : plt_phot_raw.o $(FN1) $(FN2) $(FN4) $(FN5) 
 	$(F90) plt_phot_raw.o \
-             -L$(LIB_DIR) -l$(LN5)  -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN6) -l$(LN1) -l$(LN3) \
+             -L$(LIB_DIR) -l$(LN5)  -l$(LN4) -l$(LN2) -l$(LN1) \
                $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -g -o $(EXE_DIR)plt_phot_raw.exe
 
@@ -84,7 +78,6 @@ SUBS:
 
 $(FN1) : lib1
 $(FN2) : lib2
-$(FN3) : lib3
 $(FN4) : lib4
 $(FN5) : lib5
 
@@ -92,10 +85,9 @@ $(FN5) : lib5
 
 lib1:
 	(cd ../tools; make )
+	(cd ../subs; make ) 
 lib2:
 	(cd ../pgplt; make )
-lib3:
-	(cd ../subs; make ) 
 lib4:
 	(cd ../disp/subs; make ) 
 lib5:

@@ -9,39 +9,31 @@ OPTIONS=$(FG)
 
 # These names are for the fortran linker
 
-LN1=tools
+LN1=subs
 LN2=pgplt
-LN3=subs
-LN4=newsubs
-LN5=dev
-LN6=mod
+LN3=mod
 
 # These names refer to the full file name
 
 FN1=$(LIB_DIR)lib$(LN1).a
 FN2=$(LIB_DIR)lib$(LN2).a
 FN3=$(LIB_DIR)lib$(LN3).a
-FN4=$(LIB_DIR)lib$(LN4).a
-FN5=$(LIB_DIR)lib$(LN5).a
-FN6=$(LIB_DIR)lib$(LN6).a
 
-# We only make dispgen.exe if there has been a change to the main *.f files,
 # or if the libraries have changed since the last link.
   
 all : $(EXE_DIR)cmfgen_dev.exe
 
-UPDATE=$(LIB_DIR)libtools.a(update_keyword.o)
+UPDATE=$(LIB_DIR)libsubs.a(update_keyword.o)
 
 # Give the dependencies of dispgen.exe and how it is created.
 
-$(EXE_DIR)cmfgen_dev.exe : cmfgen.o cmfgen_sub.o \
-                                  $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
+$(EXE_DIR)cmfgen_dev.exe : cmfgen.o cmfgen_sub.o  $(FN1) $(FN2) $(FN3) 
 	$(F90) cmfgen.o cmfgen_sub.o \
-              -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN5) -l$(LN3) -l$(LN1) -l$(LN6) \
+              -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) \
                $(LOCLIB) $(LAPACK) $(BLAS) \
               -o $(EXE_DIR)cmfgen_dev.exe
 
-USR=$(LIB_DIR)libtools.a(usr_option.o)
+USR=$(LIB_DIR)libsubs.a(usr_option.o)
 
 MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
       $(LIB_DIR)libmod.a(cmf_sob_mod.o)\
@@ -57,9 +49,6 @@ MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
 
 cmfgen.o : cmfgen.f $(MODS) $(USR)
 	$(F90) -c $(OPTIONS) cmfgen.f 
-
-#cmfgen.o : cmfgen.f $(MODS)
-#	$(F90) -c $(OPTIONS) cmfgen.f 
 
 cmfgen_sub.o : cmfgen_sub.f $(MODS) $(UPDATE) GET_J_CHI.INC  
 	$(F90) -c $(OPTIONS) cmfgen_sub.f 
@@ -82,23 +71,18 @@ mod:
 $(FN1): lib1
 $(FN2): lib2
 $(FN3): lib3
-$(FN4): lib4
-$(FN5): lib5
-$(FN6): lib6
 
 lib1:
 	(cd ../tools; make )
+	(cd ../subs; make )
+	(cd ../newsubs; make )
+	(cd ../stark; make )
+	(cd subs; make )
+
 lib2:
 	(cd ../pgplt; make )
 lib3:
-	(cd ../subs; make )
-	(cd ../stark; make )
-lib4:
-	(cd ../newsubs; make )
-lib5:
-	(cd subs; make )
-lib6:
-	(cd mod_subs; make )
+	(cd  mod_subs; make)
 
 
 clean :

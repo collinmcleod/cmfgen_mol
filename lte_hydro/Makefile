@@ -19,11 +19,8 @@ OBJ = $(LIB)(det_r_grid_v1.o)\
 #
 # These names are for the fortran linker
 #
-LN1=tools
+LN1=subs
 LN2=pgplt
-LN3=subs
-LN4=newsubs
-LN5=dev
 LN6=mod
 LN7=disp
 
@@ -33,9 +30,6 @@ LN7=disp
 
 FN1=$(LIB_DIR)lib$(LN1).a
 FN2=$(LIB_DIR)lib$(LN2).a
-FN3=$(LIB_DIR)lib$(LN3).a
-FN4=$(LIB_DIR)lib$(LN4).a
-FN5=$(LIB_DIR)lib$(LN5).a
 FN6=$(LIB_DIR)lib$(LN6).a
 FN7=$(LIB_DIR)lib$(LN7).a
 
@@ -63,23 +57,23 @@ $(LIB)(%.o) : %.f
 
 $(EXE_DIR)main_lte.exe : lte.o lte_sub.o $(OBJ_FILES) set_lte_est.o det_ed.o lte_pop_sl.o \
                          ltepop_wld_v1.o genopaeta_v8.o set_line_opac.o writedc_v2.o \
-                          $(FN1) $(FN2) $(FN3) $(FN4) $(FN5) $(FN6)
+                          $(FN1) $(FN2) $(FN6)
 	$(F90) lte.o lte_sub.o set_lte_est.o det_ed.o lte_pop_sl.o ltepop_wld_v1.o \
                      genopaeta_v8.o set_line_opac.o writedc_v2.o \
-             -L$(LIB_DIR) -l$(LN6) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) -l$(LN6) \
+             -L$(LIB_DIR) -l$(LN6) -l$(LN2) -l$(LN1)  \
                $(LOCLIB) $(LAPACK) $(BLAS) \
                -o $(EXE_DIR)main_lte.exe
 
 $(EXE_DIR)wind_hyd.exe : wind_hyd.o $(OBJ_FILES) \
-                          $(FN1) $(FN3) $(FN4) $(FN5) $(FN6) $(FN7)
+                          $(FN1) $(FN6) $(FN7)
 	$(F90)  wind_hyd.o  \
-             -L$(LIB_DIR) -l$(LN7) -l$(LN4) -l$(LN2) -l$(LN3) -l$(LN1) -l$(LN6) \
+             -L$(LIB_DIR) -l$(LN7) -l$(LN2) -l$(LN1) -l$(LN6) \
                $(LOCLIB) $(LAPACK) $(BLAS) $(PGLIB) $(G2CLIB) $(X11LIB) \
                -o $(EXE_DIR)wind_hyd.exe
 
 
-USR=$(LIB_DIR)libtools.a(usr_option.o)\
-    $(LIB_DIR)libtools.a(gen_in.o)
+USR=$(LIB_DIR)libsubs.a(usr_option.o)\
+    $(LIB_DIR)libsubs.a(gen_in.o)
 
 MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
       $(LIB_DIR)libmod.a(cmf_sob_mod.o)\
@@ -132,28 +126,21 @@ mod:
 
 $(FN1): lib1
 $(FN2): lib2
-$(FN3): lib3
-$(FN4): lib4
-$(FN5): lib5
 $(FN6): lib6
 $(FN7): lib7
 
 lib1:
 	(cd ../tools; make )
+	(cd ../subs; make )
+	(cd ../newsubs; make )
+	(cd ../stark; make )
+	(cd ../new_main/subs; make )
 lib2:
 	(cd ../pgplt; make )
-lib3:
-	(cd ../subs; make )
-	(cd ../stark; make )
-lib4:
-	(cd ../newsubs; make )
-lib5:
-	(cd ../new_main/subs; make )
 lib6:
 	(cd ../new_main/mod_subs; make )
 lib7:
 	(cd ../disp; make )
-
 
 clean :
 	rm -f *.o

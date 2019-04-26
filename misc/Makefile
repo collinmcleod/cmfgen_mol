@@ -5,25 +5,19 @@ include ../Makefile_definitions
 #
 # These names are for the fortran linker
 #
-LN1=tools
-LN2=subs
-LN3=pgplt
-LN4=newsubs
-LN5=dev
+LN1=subs
+LN2=pgplt
 
 #
 # These names refer to the full file name
 #
 FN1=$(LIB_DIR)lib$(LN1).a
 FN2=$(LIB_DIR)lib$(LN2).a
-FN3=$(LIB_DIR)lib$(LN3).a
-FN4=$(LIB_DIR)lib$(LN4).a
-FN5=$(LIB_DIR)lib$(LN5).a
 
-#
+
 # We only make dispgen.exe if there has been a change to the main *.f files,
 # or if the libraries have changed since the last link.
-#
+
  
 OBJ1  =  update_pg_filename.o adjust_atm_r_grid.o rd_f_to_s_ids.o rd_ba_mat.o rd_f_to_s_ids_v2.o write_osc_v2.o
  
@@ -77,45 +71,45 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
 all: OBJ ALLEXE 
 
 ALLEXE : $(EXE)
-OBJ    :  $(OBJ1) $(FN1) $(FN2) $(FN3)
+OBJ    :  $(OBJ1) $(FN1) $(FN2) 
 
-OANDF = $(OBJ1) $(FN1) $(FN2) $(FN3) $(FN4)
+OANDF = $(OBJ1) $(FN1) $(FN2) 
 
 # Give the dependencies of ?.exe and how it is created.
 
 $(EXE_DIR)%.exe : %.o $(OANDF) 
 	$(F90) $*.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \
               -g -o $(EXE_DIR)$*.exe
 
 $(EXE_DIR)chk_phot.exe : chk_phot.o recom_chk_v2.o get_exc_freq.o $(OANDF)
 	$(F90) chk_phot.o recom_chk_v2.o get_exc_freq.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) -lnewsubs \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)chk_phot.exe
 
 $(EXE_DIR)guess_dc.exe : guess_dc.o $(OANDF) 
 	$(F90) guess_dc.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)guess_dc.exe
 
 $(EXE_DIR)pack_osc.exe : pack_osc.o $(OANDF)
 	$(F90) pack_osc.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
+              $(OBJ1) -L$(LIB_DIR)  -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)pack_osc.exe
 
 $(EXE_DIR)rev_rdinr.exe : rev_rdinr.o 
 	$(F90) rev_rdinr.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)rev_rdinr.exe
 
 $(EXE_DIR)tlusty_vel.exe : tlusty_vel.o $(OANDF) 
 	$(F90) tlusty_vel.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) \
+              $(OBJ1) -L$(LIB_DIR)  -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)tlusty_vel.exe
 
@@ -125,7 +119,7 @@ $(EXE_DIR)solve_ba_mat.exe : solve_ba_mat.o
 
 $(EXE_DIR)wr_f_to_s.exe : wr_f_to_s.o output_term_seq.o $(OANDF)
 	$(F90) wr_f_to_s.o output_term_seq.o \
-              $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) -l$(LN2)  \
+              $(OBJ1) -L$(LIB_DIR) -l$(LN2) -l$(LN1) -l$(LN2)  \
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o $(EXE_DIR)wr_f_to_s.exe
 
@@ -134,8 +128,8 @@ $(EXE_DIR)wr_f_to_s.exe : wr_f_to_s.o output_term_seq.o $(OANDF)
 %.o : %.f
 	$(F90)  -c $(FG)  $<
 
-USR = $(LIB_DIR)libtools.a(usr_option.o)
-GEN = $(LIB_DIR)libtools.a(gen_in.o)
+USR = $(LIB_DIR)libsubs.a(usr_option.o)
+GEN = $(LIB_DIR)libsubs.a(gen_in.o)
 
 wr_f_to_s.o     : wr_f_to_s.f  $(USR)
 
@@ -155,20 +149,14 @@ $(FN5) : lib5
 
 lib1:
 	(cd ../tools; make)
-
-lib2:
 	(cd ../subs; make )
 	(cd ../unix; make )
 	(cd ../stark; make )
-
-lib3:
-	(cd ../pgplt; make )
-
-lib4:
 	(cd ../newsubs; make )
-
-lib5:
 	(cd ../new_main/subs; make )
+
+lib2:
+	(cd ../pgplt; make )
 
 clean :
 	rm -f *.o

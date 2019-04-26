@@ -4,9 +4,8 @@ include ../../Makefile_definitions
 
 # Library where object files will/are stored
 
-LIB=$(LIB_DIR)libdev.a
+LIB=$(LIB_DIR)libsubs.a
 LIB_MOD=$(LIB_DIR)libmod.a
-LIB_TOOLS=$(LIB_DIR)libtools.a
 
 # Entries for library
 
@@ -71,7 +70,7 @@ $(LIB)(%.o) : %.f
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)
 
-$(LIB)(adjust_r_grid_v4.o) : adjust_r_grid_v4.f $(LIB_MOD)(mod_cmfgen.o) $(LIB_TOOLS)(update_keyword.o)
+$(LIB)(adjust_r_grid_v4.o) : adjust_r_grid_v4.f $(LIB_MOD)(mod_cmfgen.o) $(LIB)(update_keyword.o)
 	$(F90) -c $(FG) adjust_r_grid_v4.f
 	ar ruv $(LIB) adjust_r_grid_v4.o
 

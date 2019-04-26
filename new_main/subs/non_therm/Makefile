@@ -5,7 +5,7 @@ include ../../../Makefile_definitions
 # Library where object files will/are stored
 # FX =  -Mextend -Mbackslash    -Ktrap=fp
 
-LIB=$(LIB_DIR)libdev.a
+LIB=$(LIB_DIR)libsubs.a
 LIB_MOD=$(LIB_DIR)libmod.a
 
 #

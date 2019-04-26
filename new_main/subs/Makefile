@@ -6,7 +6,7 @@ OPTION=$(FG)
 
 # Library where object files will/are stored
 
-LIB=$(LIB_DIR)libdev.a
+LIB=$(LIB_DIR)libsubs.a
 LIB_MOD=$(LIB_DIR)libmod.a
 
 # Entries for library
