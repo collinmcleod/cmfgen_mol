@@ -12,7 +12,6 @@ LIB=$(LIB_DIR)/libdisp.a
 OBJ = $(LIB)(betanew.o)\
       $(LIB)(arnaud_cross_v3_disp.o)\
       $(LIB)(branch_rat.o)\
-      $(LIB)(chk_string.o)\
       $(LIB)(comp_jbar.o)\
       $(LIB)(compion.o)\
       $(LIB)(determ_clump_pos.o)\
