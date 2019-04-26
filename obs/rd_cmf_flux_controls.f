@@ -3,6 +3,8 @@
 	USE CMF_FLUX_CNTRL_VAR_MOD
 	IMPLICIT NONE
 !
+! Altered 26-Apr-2019 : Added  J_CHK_OPTION (CHK_J)
+!                       Added  H_CHK_OPTION (CHK_H)
 ! Altered 26-Apr-2019 : Added RD_NU_MAX_OBS, RD_NU_MIN_OBS to restrict the range of observer's frame int.
 ! 
 	INTEGER ND
@@ -96,6 +98,12 @@
 	  CALL RD_STORE_NCHAR(N_TYPE,'N_TYPE',ISIX,L_TRUE,
 	1           'Method for to handle N for MOM_J_CMF -- '//
 	1           'N_ON_J, MIXED, or G_ONLY')
+!
+	  J_CHK_OPTION='ABS_VAL'
+	  H_CHK_OPTION='MAX_VAL'
+	  CALL RD_STORE_CHAR(J_CHK_OPTION,'CHK_J',L_FALSE,'NONE, ABS_VAL, or FORM_VAL')
+	  CALL RD_STORE_CHAR(H_CHK_OPTION,'CHK_H',L_FALSE,'NONE, AV_VAL, or MAX_VAL'
+!
 	  CALL RD_STORE_NCHAR(FG_SOL_OPTIONS,'FG_OPT',ITEN,L_TRUE,
 	1           'Solution options for FG_J_CMF: DIFF/INS and INT/INS')
 	  CALL RD_STORE_LOG(RDTHK_CONT,'THK_CONT',L_TRUE,'Use thick boundary condition for continuum ? ')
