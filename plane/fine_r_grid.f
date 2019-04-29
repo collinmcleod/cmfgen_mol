@@ -171,7 +171,7 @@
 	  IF(IOS .EQ. 0)ALLOCATE (V_COEF(ND_SM,4),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (SIGMA_COEF(ND_SM,4),STAT=IOS)
 	  IF(IOS .NE. 0)THEN
-	     WRITE(2,*)'Unable to allocate COEF memory in EXT_RGRID'
+	     WRITE(6,*)'Unable to allocate COEF memory in EXT_RGRID'
 	     STOP
 	  END IF
 !

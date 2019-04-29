@@ -151,7 +151,6 @@
 	      I=ATM(ID)%EQXzV+ATM(ID)%NXzV
 	      T1=T1+POPS(I,J)
 	      T2=T2+OLD_POPS(I,J)
-	      WRITE(155,'(I5,I5,2ES16.8)')ISPEC,J,T1,T2
 	    END IF
 	  END DO
 	END DO

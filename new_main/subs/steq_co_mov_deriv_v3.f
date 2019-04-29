@@ -49,7 +49,8 @@
 	INTEGER M			!Band index
 	INTEGER I			!Variable index
 	INTEGER J			!Variable index
-	INTEGER LU 
+	INTEGER LU
+	INTEGER LU_VERB
 	INTEGER ION_IVAR
 	INTEGER IVAR
 	INTEGER ID
@@ -57,6 +58,7 @@
 	INTEGER ISPEC
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
+	LOGICAL VERBOSE
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 !
 	SUM(:,:)=0.0D0
@@ -67,6 +69,11 @@
 	END DO
 	BA_ADV_TERM(:,:)=0.0D0
 	IF(.NOT. INCL_DT_TERM)RETURN
+	CALL GET_VERBOSE_INFO(VERBOSE)
+	IF(VERBOSE)THEN
+	  CALL GET_LU(LU_VERB,'Called in steq_co_mov_deriv_v3')
+	  OPEN(UNIT=LU_VERB, FILE='dPOPdT_CHECK',STATUS='UNKNOWN',ACTION='WRITE')
+	END IF
 !
 	IF(.NOT. LINEAR)THEN
 	  LUER=ERROR_LU()
@@ -111,20 +118,21 @@
 	        ELSE
 	          T1=0.0D0
 	        END IF
-	        IF(K .EQ. 1)THEN
-	          WRITE(131,'(I5,4ES14.6)')I,ATM(ID)%XzV(I,K),OLD_POPS(IVAR+I-1,K),T1,SUM(ID,K)
+	        IF(K .EQ. 1 .AND. VERBOSE)THEN
+	          WRITE(LU_VERB,'(I5,4ES14.6)')I,ATM(ID)%XzV(I,K),OLD_POPS(IVAR+I-1,K),T1,SUM(ID,K)
 	        END IF
 	      END DO
 	      IF(ID .EQ. SPECIES_END_ID(ISPEC)-1)THEN
 	        SUM(ID+1,K)=SUM(ID+1,K)+DERIV_CONST*(ATM(ID)%DXzV(K)-OLD_POPS(ION_IVAR,K))
-	        IF(K .EQ. 1)THEN
+	        IF(K .EQ. 1 .AND. VERBOSE)THEN
 	          T1=DERIV_CONST*(ATM(ID)%DXzV(K)-OLD_POPS(ION_IVAR,K))
-	          WRITE(131,'(I5,4ES14.6)')I,ATM(ID)%DXzV(K),OLD_POPS(ION_IVAR,K),T1,SUM(ID,K)
+	          WRITE(LU_VERB,'(I5,4ES14.6)')I,ATM(ID)%DXzV(K),OLD_POPS(ION_IVAR,K),T1,SUM(ID,K)
 	        END IF
 	      END IF
 	    END DO
 	  END DO
 	END DO
+	IF(VERBOSE)CLOSE(UNIT=LU_VERB)
 !
 ! We now have to compute the advection terms for the ion equations. This is complicated
 ! because of stability issues. Want to use the smallest terms possible.

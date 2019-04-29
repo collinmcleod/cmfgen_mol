@@ -1,8 +1,8 @@
 !
-! Data module for MOM_J_DDT_V5. Data placed in this module is automatically
+! Data module for MOM_J_DDT_V6. Data placed in this module is automatically
 ! saved between subroutine calls..
 !
-	MODULE MOD_MOM_J_DDT_V5
+	MODULE MOD_MOM_J_DDT_V6
 	IMPLICIT NONE
 !
 ! Dimensioned ND_SM,4
@@ -110,7 +110,7 @@
 	LOGICAL, SAVE::  FIRST_TIME=.TRUE.
 	DATA VDOP_FRAC_SAV/-10001.1D0/    !Absurd value
 !
-	END MODULE MOD_MOM_J_DDT_V5
+	END MODULE MOD_MOM_J_DDT_V6
 !
 !
 !
@@ -128,19 +128,20 @@
 ! previous frequency are stored internally, while J and H for
 ! the old time step are obtained via a subroutine call.
 !
-	SUBROUTINE MOM_J_DDT_V5(ETA_SM,CHI_SM,ESEC_SM,
+	SUBROUTINE MOM_J_DDT_V6(ETA_SM,CHI_SM,ESEC_SM,
 	1            V_SM,R_SM,F_SM,
 	1            JNU_SM,RSQHNU_SM,DJDt_TERM,
 	1            HFLUX_AT_IB,HFLUX_AT_OB,
 	1            VDOP_VEC,VDOP_FRAC,FREQ,dLOG_NU,DBB,
-	1            J_CHK_OPTION,H_CHK_OPTION,
+	1            XM_CHK_OPTION,J_CHK_OPTION,H_CHK_OPTION,
 	1            INNER_BND_METH,OUTER_BND_METH,
 	1            METHOD,COHERENT,INIT,NEW_FREQ,
 	1            DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,NC,NP,ND_SM,NCF)
-	USE MOD_MOM_J_DDT_V5
+	USE MOD_MOM_J_DDT_V6
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered: 29-Apr-2018 : Added XM_CHK_OPTION. Changed to V6
 ! Altered: 18-Apr-2018 : Added J_CHK_OPTION
 !                        Improved handling of J < 0.
 ! Altered: 16-Apr-2019 : Altered handling the case where XM(I) < 0.0.
@@ -207,6 +208,7 @@
 !
 	CHARACTER(LEN=*) OUTER_BND_METH
 	CHARACTER(LEN=*) INNER_BND_METH
+	CHARACTER(LEN=*) XM_CHK_OPTION
 	CHARACTER(LEN=*) J_CHK_OPTION
 	CHARACTER(LEN=*) H_CHK_OPTION
 !
@@ -288,7 +290,7 @@
 	END IF
 !
 	IF(FIRST_TIME)THEN
-	  CALL GET_LU(LU_MOM,'MOM_J_DDDT_V5')
+	  CALL GET_LU(LU_MOM,'MOM_J_DDDT_V6')
           OPEN(UNIT=LU_MOM,FILE='MOM_J_ERRORS',STATUS='UNKNOWN')
 	ELSE IF(INIT)THEN
 	  REWIND(LU_MOM)
@@ -742,26 +744,34 @@
 	1        PSIPREV(I)*RSQJNU_PREV(I) + DJDt(I)*RSQJNU_OLDt(I)*R_RAT_FOR_J
 	END DO
 !
-	DO I=2,ND-1
-	  T1=1.0D0
-	  ICNT=0
-	  DO WHILE(XM(I) .LT. 0.0D0 .AND. ICNT .LT. 3)
-	    IF(NEW_FREQ)THEN
-	      WRITE(LU_MOM,'(I5,F16.8,F16.6,5ES14.4)')I,FREQ,0.01D0*C_KMS/FREQ,XM(I),
-	1        DTAUONQ(I)*SOURCE(I)*R(I)*R(I),
-	1        T1*(HS(I)*RSQHNU_PREV(I) - HS(I-1)*RSQHNU_PREV(I-1)),
-	1        (HT(I)*RSQHNU_OLDT(I) - HT(I-1)*RSQHNU_OLDT(I-1)),
-	1        PSIPREV(I)*RSQJNU_PREV(I) + DJDt(I)*RSQJNU_OLDt(I)*R_RAT_FOR_J
-	    END IF
+	IF(XM_CHK_OPTION .EQ. 'SET_POS')THEN
+	  DO I=2,ND-1
+	    T1=1.0D0
+	    ICNT=0
+	    DO WHILE(XM(I) .LT. 0.0D0 .AND. ICNT .LT. 5)
+	      IF(NEW_FREQ)THEN
+	        WRITE(LU_MOM,'(I5,F16.8,F16.6,5ES14.4)')I,FREQ,0.01D0*C_KMS/FREQ,XM(I),
+	1          DTAUONQ(I)*SOURCE(I)*R(I)*R(I),
+	1          T1*(HS(I)*RSQHNU_PREV(I) - HS(I-1)*RSQHNU_PREV(I-1)),
+	1          (HT(I)*RSQHNU_OLDT(I) - HT(I-1)*RSQHNU_OLDT(I-1)),
+	1          PSIPREV(I)*RSQJNU_PREV(I) + DJDt(I)*RSQJNU_OLDt(I)*R_RAT_FOR_J
+	      END IF
 !
-	    T1=0.5D0*T1
-	    ICNT=ICNT+1
-	    XM(I)=DTAUONQ(I)*SOURCE(I)*R(I)*R(I) +
-	1        T1*(HS(I)*RSQHNU_PREV(I) - HS(I-1)*RSQHNU_PREV(I-1)) + 
-	1        (HT(I)*RSQHNU_OLDT(I) - HT(I-1)*RSQHNU_OLDT(I-1)) + 
-	1        PSIPREV(I)*RSQJNU_PREV(I) + DJDt(I)*RSQJNU_OLDt(I)*R_RAT_FOR_J
+	      T1=0.5D0*T1
+	      ICNT=ICNT+1
+	      XM(I)=DTAUONQ(I)*SOURCE(I)*R(I)*R(I) +
+	1          T1*(HS(I)*RSQHNU_PREV(I) - HS(I-1)*RSQHNU_PREV(I-1)) + 
+	1          (HT(I)*RSQHNU_OLDT(I) - HT(I-1)*RSQHNU_OLDT(I-1)) + 
+	1          PSIPREV(I)*RSQJNU_PREV(I) + DJDt(I)*RSQJNU_OLDt(I)*R_RAT_FOR_J
+	    END DO
 	  END DO
-	END DO
+	ELSE IF(XM_CHK_OPTION .EQ. 'NONE')THEN
+	ELSE
+	  WRITE(6,*)'Error - XM_CHK_OPTION not recognized in MOM_J_DDT_V6'
+	  WRITE(6,*)'Value is :',TRIM(J_CHK_OPTION)
+	  WRITE(6,*)'Allowed values are: SET_POS, NONE'
+	  STOP
+	END IF
 !
 ! Evaluate TA,TB,TC for boundary conditions. These will automatically
 ! handle INIT=.TRUE. (since GAM=0) and DO_TIME_VR=.FALSE. (since
@@ -916,7 +926,7 @@
 	      XM(I)=ABS(XM(I))/10.0D0
 	    ELSE IF(J_CHK_OPTION .EQ. 'NONE')THEN
 	    ELSE
-	      WRITE(6,*)'Error - J_CHK_OPTION not recognized in MOM_J_DDT_V5'
+	      WRITE(6,*)'Error - J_CHK_OPTION not recognized in MOM_J_DDT_V6'
 	      WRITE(6,*)'Value is :',TRIM(J_CHK_OPTION)
 	      WRITE(6,*)'Allowed values are: FORM_VAL, ABS_VAL, NONE'
 	      STOP
@@ -962,7 +972,7 @@
 	  END DO
 	ELSE IF(H_CHK_OPTION .EQ. 'NONE')THEN
 	ELSE
-	  WRITE(6,*)'Error - H_CHK_OPTION not recognized in MOM_J_DDT_V5'
+	  WRITE(6,*)'Error - H_CHK_OPTION not recognized in MOM_J_DDT_V6'
 	  WRITE(6,*)'Value is :',TRIM(H_CHK_OPTION)
 	  WRITE(6,*)'Allowed values are: NONE, AV_VAL, MAX_VAL'
 	  STOP

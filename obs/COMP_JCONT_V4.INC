@@ -2,6 +2,7 @@
 ! Program section to compute the continuum intensity. Opacities must have
 ! previuosly been evaluated.
 !
+! Altered 29-Apr-2019 - Now call MOM_J_DDT_V6
 ! Altered 26-Apr-2019 - Now call MOM_J_DDT_V5
 ! Altered 22-Apr-2015 - Added USE_DR4JDT option. Changed to MOM_J_DDT_V3
 ! Altered 09-Jun-2015 - The frequency in EDDFACTOR etc now only have to be accurate to 1 part in 1.0D-14.
@@ -377,12 +378,13 @@
 	       HFLUX_AT_OB=HBC_CMF(1)*RJ(1)-HBC_CMF(2)
 	       IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
 	     ELSE IF(USE_DJDT_RTE)THEN
-	      IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling MOM_J_DDT_V5'
-	      CALL MOM_J_DDT_V5(TA,CHIEXT,TB,
+	      IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling MOM_J_DDT_V6'
+	      CALL MOM_J_DDT_V6(TA,CHIEXT,TB,
 	1              VEXT,REXT,FEDD,RJEXT,RSQHNU,XM,                  !Use XM for DJDt_TERM,
 	1              HFLUX_AT_IB,HFLUX_AT_OB,
 	1              VDOP_VEC_EXT,DELV_FRAC_MOM,FL,dLOG_NU,DBB,
-	1              J_CHK_OPTION,H_CHK_OPTION,INNER_BND_METH,OUTER_BND_METH,
+	1              XM_CHK_OPTION,J_CHK_OPTION,H_CHK_OPTION,
+	1              INNER_BND_METH,OUTER_BND_METH,
 	1              METHOD,COHERENT_ES,FIRST_FREQ,NEW_FREQ,
 	1              INCL_DJDT_TERMS,USE_DR4JDT,DJDT_RELAX_PARAM,NCEXT,NPEXT,NDEXT,NCF)
 
@@ -725,12 +727,13 @@
                IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
 !
 	    ELSE IF(USE_DJDT_RTE)THEN
-	      IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling MOM_J_DDT_V5'
-	      CALL MOM_J_DDT_V5(TA,CHI_CLUMP,TB,
+	      IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling MOM_J_DDT_V6'
+	      CALL MOM_J_DDT_V6(TA,CHI_CLUMP,TB,
 	1              V,R,FEDD,RJ,RSQHNU,XM,                    !Use TC for DJDt_TERM,
 	1              HFLUX_AT_IB,HFLUX_AT_OB,
 	1              VDOP_VEC,DELV_FRAC_MOM,FL,dLOG_NU,DBB,
-	1              J_CHK_OPTION,H_CHK_OPTION,INNER_BND_METH,OUTER_BND_METH,
+	1              XM_CHK_OPTION,J_CHK_OPTION,H_CHK_OPTION,
+	1              INNER_BND_METH,OUTER_BND_METH,
 	1              METHOD,COHERENT_ES,FIRST_FREQ,NEW_FREQ,
 	1              INCL_DJDT_TERMS,USE_DR4JDT,DJDT_RELAX_PARAM,NC,NP,ND,NCF)
 

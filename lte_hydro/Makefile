@@ -60,7 +60,7 @@ $(EXE_DIR)main_lte.exe : lte.o lte_sub.o $(OBJ_FILES) set_lte_est.o det_ed.o lte
                           $(FN1) $(FN2) $(FN6)
 	$(F90) lte.o lte_sub.o set_lte_est.o det_ed.o lte_pop_sl.o ltepop_wld_v1.o \
                      genopaeta_v8.o set_line_opac.o writedc_v2.o \
-             -L$(LIB_DIR) -l$(LN6) -l$(LN2) -l$(LN1)  \
+             -L$(LIB_DIR) -l$(LN1) -l$(LN2) -l$(LN6)  \
                $(LOCLIB) $(LAPACK) $(BLAS) \
                -o $(EXE_DIR)main_lte.exe
 

@@ -274,6 +274,7 @@
 	CHARACTER(LEN=6)  N_TYPE
 	CHARACTER(LEN=10) J_CHK_OPTION
 	CHARACTER(LEN=10) H_CHK_OPTION
+	CHARACTER(LEN=10) XM_CHK_OPTION
 !
 ! These insert extra points into the grid when solving for the radition field.
 ! These insertions are done internally, and do not directly effect the returned

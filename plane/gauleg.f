@@ -88,8 +88,8 @@
 	  ANS=(X2**(J+1)-X1**(J+1))/(J+1)
 	  P1=MAX( ABS(X2**(J+1)), ABS(X1**(J+1)) )/(J+1)
 	  IF( ABS(ANS-SUM)/P1 .GT. 1.0D-12)THEN
-	    WRITE(5,*)'Error in GAULEG --- bad quadrature computation.'
-	    WRITE(2,*)'J=',J,'ANS=',ANS,'SUM=',SUM
+	    WRITE(6,*)'Error in GAULEG --- bad quadrature computation.'
+	    WRITE(6,*)'J=',J,'ANS=',ANS,'SUM=',SUM
 	  END IF
 	END DO
 !

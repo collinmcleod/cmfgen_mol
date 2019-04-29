@@ -221,7 +221,6 @@
 	  DO I=1,NX
 	    T2=V_HYDRO(I)
 	    V_HYDRO(I)=R_HYDRO(I)/T1
-	    WRITE(233,*)I,T2,V_HYDRO(I)
 	    SIGMA_HYDRO(I)=0.0D0
 	  END DO
 	END IF
