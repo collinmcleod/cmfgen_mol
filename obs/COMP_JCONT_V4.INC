@@ -2,6 +2,7 @@
 ! Program section to compute the continuum intensity. Opacities must have
 ! previuosly been evaluated.
 !
+! Altered 30-Apr-2019 - Now call MOM_JREL_V9
 ! Altered 29-Apr-2019 - Now call MOM_J_DDT_V6
 ! Altered 26-Apr-2019 - Now call MOM_J_DDT_V5
 ! Altered 22-Apr-2015 - Added USE_DR4JDT option. Changed to MOM_J_DDT_V3
@@ -389,10 +390,11 @@
 	1              INCL_DJDT_TERMS,USE_DR4JDT,DJDT_RELAX_PARAM,NCEXT,NPEXT,NDEXT,NCF)
 
              ELSE IF(USE_J_REL)THEN
-	       IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling MOM_JREL_V8 with accurate grid'
-	       CALL MOM_JREL_V8(TA,CHIEXT,TB,VEXT,SIGMAEXT,REXT,
+	       IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling MOM_JREL_V9 with accurate grid'
+	       CALL MOM_JREL_V9(TA,CHIEXT,TB,VEXT,SIGMAEXT,REXT,
 	1             RJEXT,RSQHNU,HFLUX_AT_IB,HFLUX_AT_OB,
-	1             VDOP_VEC_EXT,DELV_FRAC_MOM,FL,dLOG_NU,DBB,H_CHK_OPTION,
+	1             VDOP_VEC_EXT,DELV_FRAC_MOM,FL,dLOG_NU,DBB,
+	1             XM_CHK_OPTION,J_CHK_OPTION,H_CHK_OPTION,
 	1             IB_STAB_FACTOR,INNER_BND_METH,OUTER_BND_METH,
 	1             METHOD,L_TRUE,N_TYPE,
 	1             INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,FIRST_FREQ,NDEXT)
@@ -738,10 +740,11 @@
 	1              INCL_DJDT_TERMS,USE_DR4JDT,DJDT_RELAX_PARAM,NC,NP,ND,NCF)
 
              ELSE IF(USE_J_REL)THEN
-	       IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling MOM_JREL_V7'
-	       CALL MOM_JREL_V8(TA,CHI_CLUMP,TB,V,SIGMA,R,
+	       IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling MOM_JREL_V9'
+	       CALL MOM_JREL_V9(TA,CHI_CLUMP,TB,V,SIGMA,R,
 	1             RJ,RSQHNU,HFLUX_AT_IB,HFLUX_AT_OB,VDOP_VEC,DELV_FRAC_MOM,
-	1             FL,dLOG_NU,DBB,H_CHK_OPTION,
+	1             FL,dLOG_NU,DBB,
+	1             XM_CHK_OPTION,J_CHK_OPTION,H_CHK_OPTION,
 	1             IB_STAB_FACTOR,INNER_BND_METH,OUTER_BND_METH,
 	1             METHOD,L_TRUE,N_TYPE,
 	1             INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,FIRST_FREQ,ND)

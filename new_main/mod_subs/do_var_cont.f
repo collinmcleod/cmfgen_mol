@@ -37,6 +37,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered 30-Apr-2019 : Changed to VAR_JREL_V5 (added XM_CHK_OPTION, J_CHK_OPTION to call).
 ! Altered 29-Apr-2019 : Changed to VAR_MOM_J_DTT_V6 (added XM_CHK_OPTION).
 ! Altered 20-Apr-2019 : Changed to VAR_MOM_J_DTT_V5 (added J_CHK_OPTION).
 ! Altered 17-Oct-2016 : Variation routines changed to: VAR_MOM_J_CMF_V12.F, VAR_MOM_J_DDT_V4.F, and VAR_JREL_V4.F .
@@ -316,10 +317,11 @@
 	1           FIRST_FREQ,L_FALSE,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
 	1           DO_THIS_TX_MATRIX,METHOD,COHERENT_ES,ND,NM)
            ELSE IF(USE_J_REL)THEN
-             CALL VAR_JREL_V4(TA,CHI_CLUMP,CHI_SCAT_CLUMP,ES_COH_VEC,V,SIGMA,R,
+             CALL VAR_JREL_V5(TA,CHI_CLUMP,CHI_SCAT_CLUMP,ES_COH_VEC,V,SIGMA,R,
 	1                  TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR,
 	1                  dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR,KI,WM,RHS_dHdCHI,
-	1                  FIRST_FREQ,FL,dLOG_NU,H_CHK_OPTION,
+	1                  FIRST_FREQ,FL,dLOG_NU,
+	1                  XM_CHK_OPTION,J_CHK_OPTION,H_CHK_OPTION,
 	1                  INNER_BND_METH,OUTER_BND_METH,IB_STAB_FACTOR,
 	1                  dTdR,DBB,dDBBdT,IC,
 	1                  INCL_ADVEC_TERMS_IN_TRANS_EQ,INCL_REL_TERMS,

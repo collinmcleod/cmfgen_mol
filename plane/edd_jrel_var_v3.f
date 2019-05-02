@@ -15,6 +15,8 @@
 	USE MOD_VAR_JREL_V2
 	IMPLICIT NONE
 !
+! Altered 29-Apr-2019 :  Added DERIV_SCL_FAC. It should be set to unit if XM is not adjusted.
+!
 	INTEGER ND,NM
 	REAL*8 VK(ND,ND,NM)
 	REAL*8 RHS_dHdCHI(ND-1,ND)
@@ -143,17 +145,17 @@
 !
 	  VK(I,J,1)=VK(I,J,1)
 	1             - (dTAdCHI_J*JNU(J)+dTBdCHI_J*JNU(I))
-	1             - dHSDCHI(J)*GAM_RSQHNU_PREV(J)
+	1             - DERIV_SCL_FAC(I)*dHSDCHI(J)*GAM_RSQHNU_PREV(J)
 	1             + dXM_EPS_J
 !
 	  VK(I,K,1)=VK(I,K,1)
 	1             - (dTCdCHI_K*JNU(K)+dTBdCHI_K*JNU(I))
-	1             + dHSDCHI(I)*GAM_RSQHNU_PREV(I)
+	1             + DERIV_SCL_FAC(I)*dHSDCHI(I)*GAM_RSQHNU_PREV(I)
 	1             + dXM_EPS_K
 !
 	  VK(I,I,1)=VK(I,I,1)
 	1             - (dTAdCHI_I*JNU(J)+dTCdCHI_I*JNU(K)+dTBdCHI_I*JNU(I))
-	1             + (dHSDCHI(I)*GAM_RSQHNU_PREV(I)-dHSDCHI(J)*GAM_RSQHNU_PREV(J))
+	1             + DERIV_SCL_FAC(I)*(dHSDCHI(I)*GAM_RSQHNU_PREV(I)-dHSDCHI(J)*GAM_RSQHNU_PREV(J))
 	1             + dXM_EPS_I
 !
 	END DO
