@@ -128,7 +128,7 @@
 	      WRITE(6,'(1X,A,I7,6X,A,I7)')'NLOC-',NLOC,'NCROSS=',NCROSS
 	    STOP
 	    END IF
-	    IF(T1 .GT. 1.0D0 .AND. NU_FINE(K-1) .LT. 2.0D0)THEN
+	    IF(T1 .GT. 1.0D0 .AND. NU_FINE(MAX(1,K-1)) .LT. 2.0D0)THEN
 	      J=T1
 	      T1=(NU(I)-NU(I-1))/(J+1)
 	      dCROSS=(CROSS(I)-CROSS(I-1))/(J+1)
