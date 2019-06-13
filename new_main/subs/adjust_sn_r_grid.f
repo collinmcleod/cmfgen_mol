@@ -6,6 +6,7 @@
 	1           IB_RAT,OB_RAT,DTAU2_ON_DTAU1,N_IB_INS,N_OB_INS,ND,NS)
 	IMPLICIT NONE
 !
+! Altered: 04-Jun-2019 -- Changed way check whether close to outer boundry. Check dR and DTAU. 
 ! Altered: 12-Jun-2017 -- Introduce dTAU_COMP so as to check change in dTAU.
 ! Altered: 27-Jan-2015 -- Do initial loop up to 3 times. Also improved diagnostic output.
 ! Altered: 21-Mar-2014 -- Bug fix -- LOG_OLD_T was being computed over ND instead of NS. 
@@ -151,7 +152,7 @@
 !
 ! We now check that the step in dTAU is not much larger than the previous step size in dTAU.
 !
-	    NEXT_R=LOG_R(I-1)-dLOGR
+	    NEXT_R=MAX(LOG_R(I-1)-dLOGR,LOG_OLD_R(NS))
 	    dTAU_COMP=dTAU
 	    IF(I .GT. 4)dTAU_COMP=MIN( dTAU,1.3D0*(LOG_TAU(I-1)-lOG_TAU(I-2)))
 	    TAU_END=LOG_TAU(I-1)+dTAU_COMP
@@ -202,12 +203,12 @@
 !
 ! Check whether close enough to inner bondary.
 !
-	    IF(LOG_R(I)-dLOGR .LE. LOG_OLD_R(NS))EXIT
-	    IF(LOG_R(I)-1.5D0*(LOG_R(I-1)-LOG_R(I)) .LT. LOG_OLD_R(NS))EXIT
-	    IF(LOG_TAU(I)+1.5D0*(LOG_TAU(I-1)-LOG_TAU(I)) .GT. LOG_OLD_TAU(NS))EXIT
+	    IF(LOG_R(I)-dLOGR .LE. LOG_OLD_R(NS) .AND.  LOG_TAU(I)+dTAU .GE. LOG_OLD_TAU(NS))EXIT
 	  END DO
 	  ND_TMP=I+1
 	  J=ND-N_IB_INS-N_OB_INS
+	  WRITE(6,*)LOG_R(I),1.5D0*(LOG_R(I-1)-LOG_R(I)),LOG_OLD_R(NS)
+          WRITE(6,*)LOG_TAU(I),1.5D0*(LOG_TAU(I-1)-LOG_TAU(I)),LOG_OLD_TAU(NS)
 	  WRITE(6,'(A,I1,2(4X,A,I4))')' Iteration=',ICNT,'ND required=',J,'ND=',ND_TMP
 !
 ! Define grid accurately at the inner boundary.

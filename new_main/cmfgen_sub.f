@@ -389,7 +389,7 @@
 !
 ! X-ray variables.
 ! We dimension from 0 so that we can access a Null vector for the 1st included
-! ioinization stage of each species.
+! ionization stage of each species.
 ! 
 	REAL*8 X_RECOM(ND,0:NION)			!Next X-ray recombination rate
 	REAL*8 X_COOL(ND,0:NION)			!Next X-ray cooling
@@ -4316,11 +4316,11 @@
 	    END IF
 	  ELSE IF(XRAYS .AND. MAXCH .LT. 100.0D0 .AND. .NOT. ADD_XRAYS_SLOWLY)THEN
 !
-! We do not do the scaling if there is intrinsic X-ray emssion from the star.
+! We do not do the scaling if there is significant intrinsic X-ray emission from the star.
 ! DESIRED_XRAY_LUM should be in units of LSTAR.
 !
 	    IF(OBS_XRAY_LUM_0P1 .LT. SUM(XRAY_LUM_0P1) .AND. SCALE_XRAY_LUM)THEN
-	      IF( (LUM*DESIRED_XRAY_LUM/OBS_XRAY_LUM_0P1-1.0D0) .GT. ALLOWED_XRAY_FLUX_ERROR)THEN
+	      IF( ABS(LUM*DESIRED_XRAY_LUM/OBS_XRAY_LUM_0P1-1.0D0) .GT. ALLOWED_XRAY_FLUX_ERROR)THEN
 	        T1=SQRT(LUM*DESIRED_XRAY_LUM/OBS_XRAY_LUM_0P1)
 	        IF(T1 .GT. 10.0D0)T1=10.0D0
 	        IF(T1 .LT. 0.1D0)T1=0.1D0
@@ -4336,11 +4336,11 @@
 	  IF(INCL_ADVECTION .AND. ADVEC_RELAX_PARAM .LT. 1.0D0 .AND. MAXCH .LT. 100)THEN
 	    COMPUTE_BA=.TRUE.
 	    ADVEC_RELAX_PARAM=MIN(1.0D0,ADVEC_RELAX_PARAM*2.0D0)
-	    WRITE(LUER,*)'Have adjuseted advection relaxation parameter to:',ADVEC_RELAX_PARAM
+	    WRITE(LUER,*)'Have adjusted advection relaxation parameter to:',ADVEC_RELAX_PARAM
 	    MAXCH=100
 	  END IF
 !
-! Adjust non-thermal decay energy scale factor. This is option is useful when adding non-thermal ioizations
+! Adjust non-thermal decay energy scale factor. This is option is useful when adding non-thermal ionizations
 ! to a thermal model. During the convergence process we typically increase DEC_NRG_SCL_FAC by a factor of 10.
 ! If only 2 iterations were done, befores changing, we increase it by a factor of 100.
 !

@@ -764,7 +764,7 @@ C
 	  AUTO_ADD_ION_STAGES=.TRUE.
 	  CALL RD_STORE_LOG(AUTO_ADD_ION_STAGES,'AUTO_ADD',L_FALSE,
 	1       'Automatically add files with missing XzV_IN files?')
-	  AUTO_SMOOTH_POPS=.TRUE.
+	  AUTO_SMOOTH_POPS=.FALSE.
 	  CALL RD_STORE_LOG(AUTO_SMOOTH_POPS,'AUTO_SMOOTH',L_FALSE,
 	1       'Automatically smooth populations as we iterate?')
 !

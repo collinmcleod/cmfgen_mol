@@ -54,6 +54,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)plt_cmf_lum.exe\
          $(EXE_DIR)plt_ddt_work.exe\
          $(EXE_DIR)plt_gf.exe\
+         $(EXE_DIR)plt_lte_ross.exe\
          $(EXE_DIR)plt_raw_xray.exe\
          $(EXE_DIR)plt_cool.exe\
          $(EXE_DIR)plt_ln_heat.exe\

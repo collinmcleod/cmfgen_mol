@@ -13,6 +13,7 @@
         USE MOD_CMFGEN
         IMPLICIT NONE
 !
+! Altered 04-Jun-2019  Cooling factor changed from 1.0D-12 to 1.0D-10
 ! Created 24-Sep-2004
 !
 	INTEGER DIAG_INDX
@@ -50,7 +51,7 @@
 	IF(T_MIN .GT. 0.0D0)THEN
 !
 	  DO K=1,ND
-	    TA(K) = 1.0D-12*ED(K)*POPION(K)
+	    TA(K) = 1.0D-10*ED(K)*POPION(K)
 	    HEAT(K)= TA(K)*EXP(1000.0D0*(T_MIN-T(K)))
 	  END DO
 !

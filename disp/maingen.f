@@ -2691,7 +2691,7 @@
 	ELSE IF(XOPT .EQ. 'RONV')THEN
 	  T1=1.0D+10/1.0D+05/24.0D0/3600.0D0
 	  DO I=1,ND
-	    YV(I)=V(I)/R(I)
+	    YV(I)=T1*R(I)/V(I)
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='t(days)'

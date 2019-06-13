@@ -7,6 +7,8 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered 10-Jun-2019: Changed to allow reding of density and clumping fator (necessary, for variable MDOT, 
+!                        and point source models. 
 ! Altered 05-Mar-2018: Added option to make a plane-parallel models out of an RVSIG_COL
 !                        file that was used for a spherical model. Option is 'STOP'
 !                        i.e., Spherical To Parallel.
@@ -25,21 +27,27 @@
 	REAL*8 OLD_R(NMAX)
 	REAL*8 OLD_V(NMAX)
 	REAL*8 OLD_SIGMA(NMAX)
+	REAL*8 OLD_DENSITY(NMAX)
+	REAL*8 OLD_CLUMP_FAC(NMAX)
+	REAL*8 OLD_LOG_R(NMAX)
 !
 	REAL*8 R(NMAX)
 	REAL*8 V(NMAX)
 	REAL*8 SIGMA(NMAX)
+	REAL*8 DENSITY(NMAX)
+	REAL*8 CLUMP_FAC(NMAX)
+	REAL*8 LOG_R(NMAX)
 !
 	REAL*8 RTMP(NMAX)
 	REAL*8 OLD_TAU(NMAX)
 	REAL*8 TAU_SAV(NMAX)
 	REAL*8 TAU(NMAX)
 	REAL*8 CHI_ROSS(NMAX)
-	REAL*8 CLUMP_FAC(NMAX)
 !
 	REAL*8 TMP_R(NMAX)
 	REAL*8 X1(NMAX)
 	REAL*8 X2(NMAX)	
+	REAL*8 WRK_VEC(NMAX)	
 !
 	REAL*8, ALLOCATABLE :: COEF(:,:)
 !
@@ -94,6 +102,7 @@
 	LOGICAL ROUND_ERROR
 	LOGICAL RD_MEANOPAC
 	LOGICAL REPLOT
+	LOGICAL RD_DENSITY
 !
 	INTEGER GET_INDX_DP
         CHARACTER*30 UC
@@ -108,6 +117,8 @@
 !
 	OLD_RVSIG_FILE='RVSIG_COL_OLD'
 	CALL GEN_IN(OLD_RVSIG_FILE,'File containing old R, V and sigma values')
+	RD_DENSITY=.FALSE.
+	CALL GEN_IN(RD_DENSITY,'Does the file contain the density and clumping factors')
 	OPEN(UNIT=10,FILE=OLD_RVSIG_FILE,STATUS='OLD',ACTION='READ')
 	  STRING=' '
 	  N_HEAD=0
@@ -123,10 +134,17 @@
 	  DO WHILE (STRING .EQ. ' ' .OR. STRING(1:1) .EQ. '!')
 	    READ(10,'(A)')STRING
 	  END DO
-	  READ(STRING,*)OLD_R(1),OLD_V(1),OLD_SIGMA(1)
-	  DO I=2,ND_OLD
-	    READ(10,*)OLD_R(I),OLD_V(I),OLD_SIGMA(I)
-	  END DO
+	  IF(RD_DENSITY)THEN
+	    READ(STRING,*)OLD_R(1),OLD_V(1),OLD_SIGMA(1),OLD_DENSITY(1),OLD_CLUMP_FAC(1)
+	    DO I=2,ND_OLD
+	      READ(10,*)OLD_R(I),OLD_V(I),OLD_SIGMA(I),OLD_DENSITY(I),OLD_CLUMP_FAC(I)
+	    END DO
+	  ELSE
+	    READ(STRING,*)OLD_R(1),OLD_V(1),OLD_SIGMA(1)
+	    DO I=2,ND_OLD
+	      READ(10,*)OLD_R(I),OLD_V(I),OLD_SIGMA(I)
+	    END DO
+	  END IF
 	CLOSE(UNIT=10)
 !
 	OPTION='NEW_ND'
@@ -1145,6 +1163,14 @@
 	    END IF
 	    WRITE(10,'(A,ES14.6)')'! R(1)/R(ND)                   =',R(1)/R(ND)
 !
+	    IF(RD_DENSITY)THEN
+	      WRK_VEC(1:ND_OLD)=LOG(OLD_DENSITY(1:ND_OLD))
+	      LOG_R(1:ND)=LOG(R(1:ND)); OLD_LOG_R(1:ND)=LOG(OLD_R(1:ND))
+	      CALL MON_INTERP(DENSITY,ND,IONE,LOG_R,ND,WRK_VEC,ND_OLD,OLD_LOG_R,ND_OLD)
+	      DENSITY(1:ND)=EXP(DENSITY(1:ND))
+	      CALL MON_INTERP(CLUMP_FAC,ND,IONE,LOG_R,ND,OLD_CLUMP_FAC,ND_OLD,OLD_LOG_R,ND_OLD)
+	    END IF
+!
 ! Use a !! to inidicate from old file.
 !
 	    DO I=1,N_HEAD
@@ -1156,9 +1182,15 @@
 	    WRITE(10,'(A)')' '
 	    WRITE(10,'(I4,20X,A)')ND,'!Number of depth points`'
 	    WRITE(10,'(A)')' '
-	    DO I=1,ND
-	      WRITE(10,'(F18.8,ES17.7,F17.7,4X,I4)')R(I),V(I),SIGMA(I),I
-	    END DO
+	    IF(RD_DENSITY)THEN
+	      DO I=1,ND
+	        WRITE(10,'(F18.8,ES20.12,F17.7,2ES18.8,I4)')R(I),V(I),SIGMA(I),DENSITY(I),CLUMP_FAC(I),I
+	      END DO
+	    ELSE
+	      DO I=1,ND
+	        WRITE(10,'(F18.8,ES17.7,F17.7,4X,I4)')R(I),V(I),SIGMA(I),I
+	      END DO
+	    END IF
 	  CLOSE(UNIT=10)
 !
 	  IF(RD_MEANOPAC)THEN

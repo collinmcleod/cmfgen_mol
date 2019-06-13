@@ -3,6 +3,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered 19-May-2019 _ Still under devlopment.
+!
 	INTEGER ND
 	INTEGER NT
 	REAL*8 POPS(NT,ND)
@@ -23,6 +25,9 @@
 !	CALL WR2D_V2(RATIO,NT,ND,'Ratio','*',.TRUE.,LUOUT)
 !	CLOSE(UNIT=LUOUT)
 !
+	WRITE(6,*)'Min of STEQ_VALS array is',MINVAL(STEQ_VALS)
+	WRITE(6,*)'Max of STEQ_VALS array is',MAXVAL(STEQ_VALS)
+!
 	DONE=0
 	DO L=ND-5,1,-1
 	  DO ISPEC=1,NUM_SPECIES
@@ -35,8 +40,16 @@
 	          T2=(POPS(J,L)/POP_SPECIES(L,ISPEC)) / (POPS(J,L+1)/POP_SPECIES(L+1,ISPEC))
 	          IF(ABS(LOG10(T1/T2)) .GT. 2 .AND. DONE(J) .LT. 2 .AND.  ABS(LOG10(T1)) .LT. 3)THEN
 	            T3=T1*(POPS(J,L+1)/POP_SPECIES(L+1,ISPEC))*POP_SPECIES(L,ISPEC) 
+	            WRITE(6,'(A3,2X,4I5,2X,L1,2X,5ES14.4)')' CM',L,ISPEC,ID,I,DONE(J),T1,T2,T3,POPS(J,L),POPS(J,L+1)
 	            POPS(J,L)=T3
 	            DONE(J)=DONE(J)+1
+	          ELSE  IF(ABS(LOG10(T1/T2)) .GT. 5)THEN
+	            T3=T1*(POPS(J,L+1)/POP_SPECIES(L+1,ISPEC))*POP_SPECIES(L,ISPEC) 
+	            WRITE(6,'(A3,2X,4I5,2X,L1,2X,5ES14.4)')' CM',L,ISPEC,ID,I,DONE(J),T1,T2,T3,POPS(J,L),POPS(J,L+1)
+	            POPS(J,L)=T3
+	            DONE(J)=DONE(J)+1
+	          ELSE
+	            WRITE(6,'(A3,2X,4I5,2X,L1,2X,5ES14.4)')'CNM',L,ISPEC,ID,I,DONE(J),T1,T2,T3,POPS(J,L),POPS(J,L+1)
 	          END IF
 	        END IF
 	        DONE(J)=0

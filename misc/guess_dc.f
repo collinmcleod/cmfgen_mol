@@ -109,7 +109,7 @@
 ! Miscellaneous variables.
 !
 	INTEGER IOS			!Used for Input/Output errors.
-	INTEGER I,J,ML
+	INTEGER I,J,L,ML
 	INTEGER EDGE_ML
 	INTEGER ST_REC
 	INTEGER REC_LENGTH
@@ -143,6 +143,10 @@
 	CHARACTER*30 UC
 	EXTERNAL SPEED_OF_LIGHT,UC
 !
+	CHARACTER(LEN=5) GEN_ION_ID(21)
+	DATA GEN_ION_ID/'MI','I','2','III','IV','V',
+	1                'SIX','SEV','VIII','IX','X','XI','XII',
+	1                'XIII','XIV','XV','XSIX','XSEV','X8','X9','XX'/!
 ! 
 ! Set constants.
 !
@@ -255,7 +259,19 @@
 	SPECIES=' '
 5000	CONTINUE
 	WRITE(T_OUT,*)' '
-	CALL GEN_IN(SPECIES,'Species (e.g., OIV, OVI) to guess d.c.''s for (or exit)')
+	IF(SPECIES .NE. ' ')THEN
+	  L=1
+	  IF(SPECIES(2:2) .GE. 'a' .AND. SPECIES(2:2) .LE. 'Z')L=2
+	  DO ID=1,21
+	    IF(GEN_ION_ID(ID) .EQ. SPECIES(L:))THEN
+	      SPECIES(L:)=' '
+	      SPECIES(L:)=GEN_ION_ID(ID+1)
+	      EXIT
+	    END IF
+	  END DO
+	END IF
+!
+	CALL GEN_IN(SPECIES,'Species (e.g., OIV, OV, OSIX) to guess d.c.''s for (or exit)')
 	IF(UC(SPECIES(1:2)) .EQ. 'EX')STOP
 	FILENAME=TRIM(SPECIES)//'_F_OSCDAT'
 !

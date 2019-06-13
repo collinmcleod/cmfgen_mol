@@ -13,6 +13,7 @@
 	1              NU,EMHNUKT,NT,ND,LST_DEPTH_ONLY)
 	IMPLICIT NONE
 !
+! Altered 02-Jun-2019 : Now check if LTE_POP_SUM is close to zero.
 ! Altered 19-May-2002 : Changed to version V4
 !                       LST_DEPTH_ONLY inserted to save time in DTDR computation.
 !                       Rewritten to sum over population variable in order to save
@@ -115,7 +116,11 @@
 ! Convert to dlnHNST_AdlnT. The factor LTE_POP_SUM in inclued
 ! in LTE_POP later.
 !
-	    dLTE_SUM=dLTE_SUM_VEC(J)/LTE_POP_SUM(J)
+	    IF(LTE_POP_SUM(J) .LT. 1.0D-200)THEN
+	      dLTE_SUM=0.0D0
+	    ELSE
+	      dLTE_SUM=dLTE_SUM_VEC(J)/LTE_POP_SUM(J)
+	    END IF
 !
 	    TCHI1=ALPHA*LTE_POP
 	    VCHI(EQION,J)=VCHI(EQION,J)-TCHI1/DI(J)

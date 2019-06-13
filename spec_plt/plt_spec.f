@@ -18,6 +18,7 @@ C
 C
 	IMPLICIT NONE
 C
+C Altered 16-May-2019 : NU, OBSF etc are now allocatable arrays.
 C Altered 18-Jan-2015 : Added REM_BP (automatic removal of bad pixel).
 C Altered 04-Nov-2015 : Fixed SMC redenning law in optical. Previous formula only
 C                         valid for UV. Joined UV smoothly (at 2950A) to CCM law with R=2.74.
@@ -34,7 +35,7 @@ C
 C
 C Determines largest single plot that can read in.
 C
-	INTEGER, PARAMETER :: NCF_MAX=3000000
+	INTEGER, PARAMETER :: NCF_MAX=30000000
 C
 C Used to indicate number of data points in BB spectrum
 c
@@ -43,18 +44,18 @@ C
 	INTEGER NCF		!Number of data points in default data
 	INTEGER NCF_MOD		!Used when plotting another model data set
 c
-	REAL*8 NU(NCF_MAX)
-	REAL*8 OBSF(NCF_MAX)
-	REAL*8 FQW(NCF_MAX)
-	REAL*8 AL_D_EBmV(NCF_MAX)
+	REAL*8, ALLOCATABLE :: NU(:)
+	REAL*8, ALLOCATABLE :: OBSF(:)
+	REAL*8, ALLOCATABLE :: FQW(:)
+	REAL*8, ALLOCATABLE :: AL_D_EBmV(:)
 C
 	INTEGER NCF_CONT
-	REAL*8 NU_CONT(NCF_MAX)
-	REAL*8 OBSF_CONT(NCF_MAX)
+	REAL*8, ALLOCATABLE :: NU_CONT(:)
+	REAL*8, ALLOCATABLE :: OBSF_CONT(:)
 !
 	INTEGER NOBS
-	REAL*8 NU_OBS(NCF_MAX)
-	REAL*8 OBSF_OBS(NCF_MAX)
+	REAL*8, ALLOCATABLE ::  NU_OBS(:)
+	REAL*8, ALLOCATABLE ::  OBSF_OBS(:)
 C
 C Indicates which columns the observatoinal data is in.
 C
@@ -62,9 +63,9 @@ C
 C
 C Vectors for passing data to plot package via calls to CURVE.
 C
-	REAL*4 XV(NCF_MAX)
-	REAL*4 YV(NCF_MAX)
-	REAL*4 ZV(NCF_MAX)
+	REAL*4, ALLOCATABLE ::  XV(:)
+	REAL*4, ALLOCATABLE ::  YV(:)
+	REAL*4, ALLOCATABLE ::  ZV(:)
 	REAL*4 SP_VAL
 C
 	CHARACTER*80 NAME		!Default title for plot
@@ -217,6 +218,24 @@ C
 	DATA FILTZP/3560.0,3560.0,3560.0,3560.0,3560.0,1564.0,1008.0,628.0/
 C
 C 
+C
+	IOS=0
+	ALLOCATE (NU(NCF_MAX),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (OBSF(NCF_MAX),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (FQW(NCF_MAX),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (AL_D_EBmV(NCF_MAX),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (NU_CONT(NCF_MAX),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (OBSF_CONT(NCF_MAX),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (NU_OBS(NCF_MAX),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (OBSF_OBS(NCF_MAX),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (XV(NCF_MAX),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (YV(NCF_MAX),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (ZV(NCF_MAX),STAT=IOS)
+	IF(IOS .NE. 0)THEN
+	  WRITE(6,*)'Error allocating OBSF, FQW etc in PLT_SPEC'
+	  WRITE(6,*)'Error is ',IOS
+	  STOP
+	END IF
 C
 C Set constants.
 C

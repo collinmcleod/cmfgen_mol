@@ -3,9 +3,11 @@
 	INTEGER ID
 !
 ! Created 02-Apr-2019
+! Altered 20-May-2019 - Bug fixes
 !
 ! Needed when reading EDDFACTOR
 !
+	INTEGER ND,NCF			
 	REAL*8, ALLOCATABLE :: RJ(:,:)
 	REAL*8, ALLOCATABLE :: NU(:)
 !
@@ -27,17 +29,17 @@
 !
 	REAL*8, ALLOCATABLE :: PHOT_SUM(:)
 	REAL*8, ALLOCATABLE :: RECOM_SUM(:)
-	REAL*8, ALLOCATABLE :: GS_DC(:)
-	REAL*8, ALLOCATABLE :: DC(:,:)
+	REAL*8, ALLOCATABLE :: GS_DC(:)		!GS denotes GS.
+	REAL*8, ALLOCATABLE :: DC(:,:)		!Departure coefficents
 	REAL*8, ALLOCATABLE :: T_EXC(:)
 !
-	REAL*8, ALLOCATABLE :: GS_ION_POP(:)
+	REAL*8, ALLOCATABLE :: GS_ION_POP(:)	!Ground-state ion population.
 	REAL*8, ALLOCATABLE :: DC_RUB(:)
 	SAVE
 
 	END MODULE MOD_GUESS_DC
 !
-! General routine to guess the departure coefficients for a new species or
+! General subroutine to guess the departure coefficients for a new species or
 ! ionization stage. The following files are required:
 !
 !     EDDFACTOR
@@ -45,16 +47,19 @@
 !     XzV_F_OSCDAT
 !     XzIV_IN          (needed for added high ionization species only)
 !
+! This routine will only be used when the *_IN file does not exist.
+!
 	SUBROUTINE SUB_GUESS_DC(SPECIES,REF_SPECIES,GION_SPEC,GION_REF)
 	USE MOD_GUESS_DC
 	IMPLICIT NONE
 !
+! Altered 20-May-2019 - Bug fixes
 ! Created 02-Apr-2019
 !
 	REAL*8 GION_SPEC
 	REAL*8 GION_REF
 	CHARACTER(LEN=6) SPECIES		!Ionization stage we're adding
-	CHARACTER(LEN=6) REF_SPECIES		!Previous ionizatin staged when adding new species.
+	CHARACTER(LEN=6) REF_SPECIES		!Previous ionization staged when adding new species.
 	LOGICAL, SAVE :: FIRST=.TRUE.
 !
 ! Used when reading file containing energy levels, oscillator strengths, etc
@@ -90,9 +95,6 @@
 ! the ground state departure coefficient, and use the same excitation temperature
 ! for all other levels. If adding a whole new species, start with lowest ionization
 ! species.
-!
-	INTEGER NCF
-	INTEGER ND
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
@@ -200,8 +202,16 @@
 	  CLOSE(LU_IN)
 	  CALL RD_RVTJ_PARAMS_V2(RMDOT,RLUM,ABUND_HYD,TIME,NAME_CONVENTION,
 	1             ND_ATM,NC_ATM,NP_ATM,RVTJ_FILE_NAME,LU_IN)
-	  WRITE(T_OUT,*)'Sussessfully read RVTJ params'
-	  FLUSH(T_OUT)!
+	  WRITE(T_OUT,*)'Successfully read RVTJ params'
+	  FLUSH(T_OUT)
+!
+	  IF(ND .NE. ND_ATM)THEN
+	    WRITE(T_OUT,*)'Error in SUB_GUESS_DC -- ND and ND_ATM must be the same'
+	    WRITE(T_OUT,*)'The files MUST be constructed by the same model atmosphere'
+	    WRITE(T_OUT,*)'ND in EDDFACTOR is', ND
+	    WRITE(T_OUT,*)' ND_ATM in RVTJ is', ND_ATM
+	  END IF
+!
 	  ALLOCATE (R(ND_ATM))
 	  ALLOCATE (V(ND_ATM))
 	  ALLOCATE (SIGMA(ND_ATM))
@@ -217,13 +227,13 @@
 	  CALL RD_RVTJ_VEC(R,V,SIGMA,ED,T,ROSS_MEAN,FLUX_MEAN,
 	1       POP_ATOM,POPION,MASS_DENSITY,CLUMP_FAC,ND_ATM,LU_IN)
 	  CLOSE(LU_IN)
-	  WRITE(T_OUT,*)'Sussessfully read RVTJ'
+	  WRITE(T_OUT,*)'Successfully read RVTJ'
 	  FLUSH(T_OUT)!
 	  FIRST=.FALSE.
 	END IF
 ! 
 !
-! Open Oscillator file.
+! Open Oscillator file, and read in ENEGRY names, levels, and statistical weights..
 !
 	FILENAME=TRIM(SPECIES)//'_F_OSCDAT'
 	CALL GEN_ASCI_OPEN(LU_HEAD,'HEAD_INFO','UNKNOWN',' ','WRITE',IZERO,IOS)
@@ -233,9 +243,9 @@
 	   WRITE(T_OUT,*)'Error occurred reading Oscillator file: try again'
 	   STOP
 	END IF
-	CLOSE(LU_HEAD)
+	CLOSE(LU_HEAD); CLOSE(LU_IN)
 	WRITE(T_OUT,*)'Successfully read oscillator file for ',TRIM(SPECIES)
-	WRITE(T_OUT,*)' '
+	FLUSH(T_OUT)
 !
 ! Check EDDFACTOR file extends to high enough frequencies.
 !
@@ -333,11 +343,15 @@
 	END DO
 !
 ! Read in ION file to get ground state population. For a lower ionization species,
-! ion population does not matter, since the actal ion population gets used when
-! species is read into CMFGEN.
+! ion population does not matter, since the actual ion population gets used when
+! species is read into CMFGEN (ie. level 1 of CIV will get used as the ion population
+! for CIII, not DCIII. This case occurs when we pass REF_SPECIES as the same of species.
+!
+! Setting ION_POP to 10^{-50} should avoid (we hope) floating overflow if adding
+! all species.
 !
 	IF(SPECIES .EQ. REF_SPECIES)THEN
-	  ION_POP(1:ND)=1.0D-10
+	  ION_POP(1:ND)=1.0D-50
 	ELSE
 	  FILENAME=TRIM(REF_SPECIES)//'_IN'
           CALL GEN_ASCI_OPEN(LU_IN,FILENAME,'OLD',' ','READ',IZERO,IOS)
@@ -363,18 +377,20 @@
 	  CLOSE(LU_IN)
 	END IF
 !
-	DO I=1,ND
-	  T1=DLOG(2.07078D-22*ED(I)*DC(1,I))
-	  T2=T1+HDKT*FEDGE(1)/T(I)
-	  WRITE(6,'(4ES16.4)')ED(I),DC(1,I),T1,HDKT*FEDGE(1)/T(I)
-	  T1=GION_REF/(T(I)**1.5D0)/GION_SPEC
-	   ION_POP(I)=EXP(LOG(GS_ION_POP(I)/T1)-T2)
-	END DO
+! Here we acturally compute the ION_POP. ION_POP has already been set for the
+! case SPECIES=REF_SPECIES.
+!
+	IF(SPECIES .NE. REF_SPECIES)THEN
+	  DO I=1,ND
+	    T1=DLOG(2.07078D-22*ED(I)*DC(1,I))
+	    T2=T1+HDKT*FEDGE(1)/T(I)
+	    WRITE(6,'(4ES16.4)')ED(I),DC(1,I),T1,HDKT*FEDGE(1)/T(I)
+	    T1=GION_REF/(T(I)**1.5D0)/GION_SPEC
+	    ION_POP(I)=EXP(LOG(GS_ION_POP(I)/T1)-T2)
+	  END DO
 !
 ! Limit ionization ratio to a factor of 10^10
 !
-	IF(SPECIES .NE. REF_SPECIES)THEN
-	  WRITE(6,*)SPECIES,GS_ION_POP(1),ION_POP(1)
 	  DO I=1,ND
 	    IF(ION_POP(I) .LT. 1.0D-10*GS_ION_POP(I))THEN
 	      T1=1.0D-10*GS_ION_POP(I)/ION_POP(I)
@@ -385,6 +401,8 @@
 	    END IF
 	  END DO
 	END IF
+!
+! Output population estimates to XzV_IN.
 !
 	FILENAME=TRIM(SPECIES)//'_IN'
 	CALL GEN_ASCI_OPEN(LU_OUT,FILENAME,'NEW',' ','WRITE',IZERO,IOS)
