@@ -1638,7 +1638,7 @@
 ! is necessary to save a rewrite of the STEQ*** routines.
 !
 	IF(.NOT. COMPUTE_BA .AND. .NOT. FLUX_CAL_ONLY)THEN
-	  CALL READ_BA_DATA_V3(LU_BA,NION,NUM_BNDS,ND,CHK,FIXED_T,SUCCESS,'BAMAT')
+	  CALL READ_BA_DATA_V3(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,FIXED_T,SUCCESS,'BAMAT')
 	  IF(.NOT. SUCCESS)THEN
 	    WRITE(LUER,*)'Major Error - cant read BA File'
 	    WRITE(LUER,*)'Previously read successfully - '//
@@ -1982,6 +1982,16 @@
 !
 	NUM_OF_WEAK_LINES=0.0D0
 	CONT_FREQ=0.0D0
+!
+!
+	CHK=.FALSE.
+        DO I=1,ND
+          IF(V(I) .LT. 1.0D0 .AND. SIGMA(I) .LT. -1.0D0)THEN
+            SIGMA(I)=0.0D0
+	    CHK=.TRUE.
+          END IF
+        END DO
+	IF(CHK)WRITE(6,*)'Sigma adjusted so that dV/dR is grater than 0 at low velocities'
 !
 ! Enter loop for each continuum frequency.
 !

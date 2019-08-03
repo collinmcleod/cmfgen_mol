@@ -8,7 +8,8 @@
 	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
-! Altered: 28-Feb-2019  : Now scale error bars for simple YAR options.
+! Altered:  10-Jul-2019 : Draw errors first s curves drawn on top.
+! Altered:  28-Feb-2019 : Now scale error bars for simple YAR options.
 ! Altered:  01-Mar-2016 : Added XN option to XAR option. This allows Y to be plotted against
 !                          the index I. By default, a new plot is created [24-Feb-2016].
 ! Altered:  29-Jun-2015 : Changed RID o check ABS(TAU) which for pp model can -ve.
@@ -2268,14 +2269,20 @@ C
 	        XLABEL='\gn(10\u15 \dHz)'
 	      END IF
 	    ELSE IF(XAR_OPERATION .EQ. 'XN')THEN
+	      WRITE(6,*)RED_PEN
 	      WRITE(6,*)'Curent plot is',IP
-	      K=0
-	      CALL NEW_GEN_IN(K,'Output plot: 0 adds new plot?')
+	      K=0; TMP_STR='Output plot: 0 adds new plot?'//DEF_PEN
+	      CALL NEW_GEN_IN(K,TRIM(TMP_STR))
+	      IF(K .GT. NPLTS .OR. K .LT. 0)THEN
+	         WRITE(6,*)'Invlid plot number - maximum number of plots is',NPLTS
+	         GOTO 1000
+	      END IF
 	      IF(K .EQ. IP)THEN
 	        K=IP
 	      ELSE IF(K .EQ. 0)THEN
 	        CALL CURVE(NPTS(IP),CD(IP)%XVEC,CD(IP)%DATA)
 	        K=NPLTS
+	        WRITE(6,'(/,A,I4,/)')BLUE_PEN//' New plot number is '//DEF_PEN,K
 	      END IF
 	      DO I=1,NPTS(K)
 	        CD(K)%XVEC(I)=I
@@ -2777,6 +2784,26 @@ C
 	  END DO
 	END IF
 !
+! Draw error bars if required.
+!
+	IF(DO_ERROR)THEN
+	  CALL PGSLS(LINE_STYLE(1))
+!	  IP_ST=NPLTS; IP_END=1; IP_INC=-1
+	  DO IP=IP_ST,IP_END,IP_INC
+	    IF(ERR(IP) .AND. TYPE_CURVE(IP) .NE. 'I')THEN
+	      Q=PEN_COL(IP+1)
+	      CALL PGSCI(Q)
+	      DO J=1,NPTS(IP)
+	        YT(1)=CD(IP)%EMAX(J)
+	        YT(2)=CD(IP)%EMIN(J)
+	        XT(1)=CD(IP)%XVEC(J)
+	        XT(2)=CD(IP)%XVEC(J)
+	        CALL PGLINE(2,XT,YT)
+	      END DO
+	    END IF
+	  END DO
+	END IF
+!
 	DO IP=IP_ST,IP_END,IP_INC
 	  CALL PGSLW(LINE_WGT(IP))
 	  CALL PGSLS(LINE_STYLE(IP))
@@ -2924,26 +2951,6 @@ C
 ! Draw Gaussian fits if needed.
 !
 	IF(HARD .AND. DRAW_GAUSS_HARD)CALL DRAW_GAUS()
-!
-! Draw error bars if required.
-!
-	IF(DO_ERROR)THEN
-	  CALL PGSLS(LINE_STYLE(1))
-	  IP_ST=NPLTS; IP_END=1; IP_INC=-1
-	  DO IP=IP_ST,IP_END,IP_INC
-	    IF(ERR(IP) .AND. TYPE_CURVE(IP) .NE. 'I')THEN
-	      Q=PEN_COL(IP+1)
-	      CALL PGSCI(Q)
-	      DO J=1,NPTS(IP)
-	        YT(1)=CD(IP)%EMAX(J)
-	        YT(2)=CD(IP)%EMIN(J)
-	        XT(1)=CD(IP)%XVEC(J)
-	        XT(2)=CD(IP)%XVEC(J)
-	        CALL PGLINE(2,XT,YT)
-	      END DO
-	    END IF
-	  END DO
-	END IF
 !
 	IF(MARK)THEN
 	  CALL PGSCH(EXPMARK)

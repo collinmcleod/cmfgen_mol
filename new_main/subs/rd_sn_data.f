@@ -9,6 +9,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered: 03-AUg-2019 : Changed to using MON_INTERP when possible (OSIRIS - 20-Jun-2019)
 ! Altered: 29-Oct-2018 : Fixing bugs and refining handling of clumping.
 ! Altered: 31-Aug-2016 : Better error reporting -- we check taht all chain isotopes are present.
 ! Altered: 15-May-2016 : Fixed minor bug when checking size of isotope abundance changes.
@@ -279,8 +280,13 @@
 	DO L=1,NSP
 	  DO K=1,NUM_SPECIES
 	    IF(SPEC_HYDRO(L) .EQ. SPECIES(K))THEN
-!	      CALL MON_INTERP(POP_SPECIES(1,K),ND,IONE,LOG_R,ND,POP_HYDRO(1,L),NX,LOG_R_HYDRO,NX)
-	      CALL LIN_INTERP(LOG_R,POP_SPECIES(1,K),ND,LOG_R_HYDRO,POP_HYDRO(1,L),NX)
+	      IF(MINVAL(POP_HYDRO(1:NX,L)) .GT. 0.0D0)THEN
+	        WRK_HYDRO=LOG(POP_HYDRO(1:NX,L)) 
+	        CALL MON_INTERP(POP_SPECIES(1,K),ND,IONE,LOG_R,ND,WRK_HYDRO,NX,LOG_R_HYDRO,NX)
+	        POP_SPECIES(1:ND,K)=EXP(POP_SPECIES(1:ND,K))
+	      ELSE
+	        CALL LIN_INTERP(LOG_R,POP_SPECIES(1,K),ND,LOG_R_HYDRO,POP_HYDRO(1,L),NX)
+	      END IF
 	   END IF
 	  END DO
 	END DO
@@ -292,8 +298,13 @@
 	  DO K=1,NUM_ISOTOPES
 	    IF(ISO_SPEC_HYDRO(L) .EQ. ISO(K)%SPECIES .AND. 
 	1               BARY_HYDRO(L) .EQ. ISO(K)%BARYON_NUMBER)THEN
-!	       CALL MON_INTERP(ISO(K)%OLD_POP,ND,IONE,LOG_R,ND,ISO_HYDRO(1:NX,L),NX,LOG_R_HYDRO,NX)
-	       CALL LIN_INTERP(LOG_R,ISO(K)%OLD_POP,ND,LOG_R_HYDRO,ISO_HYDRO(1:NX,L),NX)
+	       IF(MINVAL(ISO_HYDRO(1:NX,L)) .GT. 0.0D0)THEN
+	         WRK_HYDRO=LOG(ISO_HYDRO(1:NX,L)) 
+	         CALL MON_INTERP(ISO(K)%OLD_POP,ND,IONE,LOG_R,ND,WRK_HYDRO,NX,LOG_R_HYDRO,NX)
+	         ISO(K)%OLD_POP=EXP(ISO(K)%OLD_POP)
+	       ELSE
+	         CALL LIN_INTERP(LOG_R,ISO(K)%OLD_POP,ND,LOG_R_HYDRO,ISO_HYDRO(1:NX,L),NX)
+	       END IF
 	       DONE=.TRUE.
 	       ISO(K)%READ_ISO_POPS=.TRUE.
 	       EXIT
