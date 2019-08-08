@@ -17,6 +17,7 @@ FN4=$(LIB_DIR)lib$(LN4).a
 FN5=$(LIB_DIR)lib$(LN5).a
 
 EXE  = $(EXE_DIR)plt_jh.exe\
+       $(EXE_DIR)create_if_file.exe\
        $(EXE_DIR)plt_jh_cur.exe\
        $(EXE_DIR)plt_ip.exe\
        $(EXE_DIR)plt_delta.exe\
