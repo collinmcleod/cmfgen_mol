@@ -1,4 +1,6 @@
 !
+! This program is designed to output the ionization fractions for a single species for the Ia code comparison.
+!
 ! The directory should be specified in the file DIRECTORIES (column format).
 !
 ! Program reads:
@@ -16,6 +18,8 @@
 	USE READ_KEYWORD_INTERFACE
  	IMPLICIT NONE
 !
+! Altered: 16-Aug-2019 - moved to misc diectory.
+! 
 	INTEGER, PARAMETER :: NION_MAX=20
 	INTEGER, PARAMETER :: NTS_MAX=200
 !
@@ -198,21 +202,21 @@
 	OPEN(UNIT=30,FILE='if_cmgen_'//TRIM(CHEM_SYMB),STATUS='UNKNOWN')
 	WRITE(30,'(A,I5)')'#NTIMES:  ',NMOD
 	WRITE(30,'(A,I5)')'#NSTAGES: ',BIGGEST_ID
-	WRITE(30,'(A,100(F8.2))')'#NTIME[d]: ',(TS(L)%SN_AGE,L=1,NMOD)
+	WRITE(30,'(A,100(F9.3))')'#NTIMES[d]: ',(TS(L)%SN_AGE,L=1,NMOD)
 !
 	DO L=1,NMOD
 	  WRITE(30,'(A)')'#'
-	  WRITE(30,'(A,F9.2)')'#TIME: ',TS(L)%SN_AGE
+	  WRITE(30,'(A,F9.3)')'#TIME: ',TS(L)%SN_AGE
 	  WRITE(30,'(A,I3)')'#NVEL: ',TS(L)%ND
 	  WRITE(30,'(A,20(11X,A,I1))')'#vel_mid[km/s]      temp[K]        ne[/cm^3]',(CHEM_SYMB,ID,ID=1,BIGGEST_ID)
-	  DO I=1,TS(L)%ND
+	  DO I=TS(L)%ND,1,-1
 	    WRITE(STRING,'(ES16.6,2ES14.4)')TS(L)%V(I),TS(L)%T(I),TS(L)%ED(I)
 	    DO ID=1,BIGGEST_ID
 	      K=LEN_TRIM(STRING)+1
 	      IF(TS(L)%ION(ID)%PRES)THEN
-	        WRITE(STRING(K:),'(ES14.4)')TS(L)%ION(ID)%ION_POP(I)
+	        WRITE(STRING(K:),'(ES14.4)')TS(L)%ION(ID)%ION_POP(I)/TS(L)%POP_SPEC(I)
 	      ELSE IF(TS(L)%ION(ID-1)%PRES .AND. .NOT. TS(L)%ION(ID)%PRES)THEN
-	        WRITE(STRING(K:),'(ES14.4)')TS(L)%ION(ID-1)%DXzV(I)
+	        WRITE(STRING(K:),'(ES14.4)')TS(L)%ION(ID-1)%DXzV(I)/TS(L)%POP_SPEC(I)
 	      ELSE
 	        WRITE(STRING(K:),'(ES14.4)')1.0D-99
 	      END IF

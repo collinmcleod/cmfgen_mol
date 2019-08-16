@@ -15,6 +15,7 @@
 	INTEGER I
 	CHARACTER(LEN=80)STRING
 !
+	XV=0.0D0
 	OPEN(UNIT=LU,FILE=FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(6,*)'Unable to open ',TRIM(FILE_NAME),' in RD_SING_VEC_RVTJ'
@@ -28,6 +29,7 @@
 	    READ(LU,*,IOSTAT=IOS)(XV(I),I=1,ND)
 	    IF(IOS .NE. 0)THEN
 	      WRITE(6,*)'Error reading vector in RD_SING_VEC_RVTJ'
+	      WRITE(6,*)'Key is ',TRIM(KEY)
 	      WRITE(6,*)'IOS=',IOS
 	      CLOSE(LU)
 	    END IF

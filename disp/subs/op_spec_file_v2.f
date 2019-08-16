@@ -20,7 +20,12 @@ C
 C New asci formatted files.
 C
 	OPEN(UNIT=LU,FILE=FILNAME,STATUS='OLD',IOSTAT=IOS,ACTION='READ')
-	  READ(LU,'(A)')STRING
+	  IF(IOS .NE. 0)THEN
+	    WRITE(6,*)'Error in OP_SPEC_FILE_V2'
+	    WRITE(6,*)'Unable to open ',TRIM(FILNAME)
+	    RETURN
+	   END IF
+	   READ(LU,'(A)')STRING
 	  IF( INDEX(STRING,'Output format date:') .NE. 0)THEN
 	    READ(STRING,'(T30,A11)')FORMAT_DATE
 	  ELSE

@@ -23,6 +23,7 @@ OBJ1  =  update_pg_filename.o adjust_atm_r_grid.o rd_f_to_s_ids.o rd_ba_mat.o rd
  
 EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)ave_dc.exe\
+         $(EXE_DIR)create_kappa_file.exe\
          $(EXE_DIR)count_phot_data.exe\
          $(EXE_DIR)ed_vadat.exe\
          $(EXE_DIR)check_energy_cons.exe\

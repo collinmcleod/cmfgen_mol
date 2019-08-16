@@ -8,7 +8,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
-! Altered: 20-May-2019  - Can do entire species
+! Aletere: 12-Aug-2019 - Better error reporting.
+! Altered: 20-May-2019 - Can do entire species
 !
 	INTEGER ISPEC
 	INTEGER ID,NID
@@ -17,13 +18,19 @@
 	CHARACTER(LEN=12) TMP_STR
 !
 	IF(.NOT. AUTO_ADD_ION_STAGES)RETURN
+!
 	WRITE(6,*)'Entered AUTO_ADD_ION'
+	WRITE(6,*)'To generate input files, this routine requires: RVTJ'
+	WRITE(6,*)'                                                EDDFACTOR_INFO'
+	WRITE(6,*)'                                                EDDFACTOR'
+	WRITE(6,*)'from a previous (similar) model'
 	FLUSH(UNIT=6)
 !
 ! Determine which ions have the necessary input files.
 ! We first look at the lowest ionization stages.
 !
 	DO ISPEC=1,NUM_SPECIES
+	  IF(SPECIES_BEG_ID(ISPEC) .EQ. 0)GOTO 1000
 	  FST_ID=0
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	    TMP_STR=TRIM(ION_ID(ID))//'_IN'
@@ -42,6 +49,7 @@
 !
 !	  WRITE(6,'(L,3X,3I4)')FILE_PRES,FST_ID
 	  DO NID=FST_ID-1,SPECIES_BEG_ID(ISPEC),-1
+	    WRITE(6,*)'Generating input file for ',SPECIES(ISPEC),ION_ID(NID)
 	    CALL SUB_GUESS_DC(ION_ID(NID),ION_ID(NID),ATM(NID)%GXZV_F(1),ATM(NID+1)%GXZV_F(1))
 	  END DO
 !
@@ -62,6 +70,7 @@
 ! adding OV we need to DION(OIV) which is the same as the ground state OV population.
 !
 	  DO NID=LST_ID+1,SPECIES_END_ID(ISPEC)-1
+	    WRITE(6,*)'Generating input file for ',SPECIES(ISPEC),ION_ID(NID)
 	    CALL SUB_GUESS_DC(ION_ID(NID),ION_ID(NID-1),ATM(NID)%GXZV_F(1),ATM(NID-1)%GXZV_F(1))
 	  END DO
 !
@@ -70,12 +79,12 @@
 	  IF(FST_ID .EQ. 0)THEN
 	    WRITE(6,*)SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1; FLUSH(UNIT=6)
 	    DO NID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
-	      WRITE(6,*)'NID=',NID; FLUSH(6)
-	      WRITE(6,*)ION_ID(NID),ION_ID(NID),ATM(NID)%GXZV_F(1),ATM(NID)%GXZV_F(1); FLUSH(UNIT=6)
+	      WRITE(6,*)'Generating input file for ',SPECIES(ISPEC),ION_ID(NID)
 	      CALL SUB_GUESS_DC(ION_ID(NID),ION_ID(NID),ATM(NID)%GXZV_F(1),ATM(NID)%GXZV_F(1))
 	    END DO
 	  END IF
-	    
+!
+1000	  CONTINUE    
 	END DO
 	CALL DEALLOCATE_MOD_GUESS_DC()
 !
