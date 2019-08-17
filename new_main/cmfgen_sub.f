@@ -540,7 +540,7 @@
 	  DO_GREY_T_AUTO=.TRUE.
 	  CALL RD_STORE_LOG(DO_GREY_T_AUTO,'DO_GT_AUTO',L_FALSE,
 	1                      'Do a grey temperature iteration after revising USE_FIXED_J?')
-	  DO_T_AUTO=.FALSE.
+	  DO_T_AUTO=.TRUE.
 	  CALL RD_STORE_LOG(DO_T_AUTO,'DO_T_AUTO',L_FALSE,
 	1                      'Allow temperature to vary when sufficent convergence has been obtained?')
 	  SET_POPS_D2_EQ_D1=.FALSE.
