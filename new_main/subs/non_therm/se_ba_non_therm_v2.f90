@@ -5,6 +5,7 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered 29-Jul-2019 : Added EHB equation.
 ! Altered 06-Jun-2012 : Now use ATM(ID)%XzVLTE_F_ON_S to avoid floating point errors. 
 ! Altered 12-Feb-2012 : Changed ordering of loops, split ionizations from excitations, and paralleized over depth.
 ! Created 16-Sep-2010
@@ -113,6 +114,7 @@
 	          ATM(ID)%NTIXzV(DPTH_INDX)=ATM(ID)%NTIXzV(DPTH_INDX)+T1             ! non-thermal rates?
 	          ATM(ID)%NTCXzV(DPTH_INDX)=ATM(ID)%NTCXzV(DPTH_INDX)  &
 	                          +Hz_to_erg*T1*(ATM(ID)%EDGEXzV_F(NL_F)+ION_EXC_EN)  ! non-thermal cooling?
+!
 	          SE(ID)%STEQ(NL,DPTH_INDX)=SE(ID)%STEQ(NL,DPTH_INDX)-T1
 	          SE(ID)%STEQ(SE_ION_LEV,DPTH_INDX)=SE(ID)%STEQ(SE_ION_LEV,DPTH_INDX)+T1
 	          LOCAL_ION_HEATING(DPTH_INDX)=LOCAL_ION_HEATING(DPTH_INDX)+ T1*(ATM(ID)%EDGEXzV_F(NL_F)+ION_EXC_EN)
@@ -140,6 +142,7 @@
 !&	                         (ATM(ID)%XzVLTE_F(NL_F,DPTH_INDX)/ATM(ID)%XzVLTE(NL,DPTH_INDX))
 	            SE(ID)%BA_PAR(NL,NL,DPTH_INDX)=SE(ID)%BA_PAR(NL,NL,DPTH_INDX)-T1
 	            SE(ID)%BA_PAR(SE_ION_LEV,NL,DPTH_INDX)=SE(ID)%BA_PAR(SE_ION_LEV,NL,DPTH_INDX)+T1
+	            BA_T_PAR_EHB(NL,DPTH_INDX)=BA_T_PAR_EHB(NL,DPTH_INDX)-Hz_to_erg*T1*(ATM(ID)%EDGEXzV_F(NL_F)+ION_EXC_EN)
 	          END DO
 	        END DO
 	      END IF
@@ -177,6 +180,8 @@
 !	              T2=T1*(ATM(ID)%XzVLTE_F(NL_F,DPTH_INDX)/ATM(ID)%XzVLTE(NL,DPTH_INDX))
 	              SE(ID)%BA_PAR(NL,NL,DPTH_INDX)=SE(ID)%BA_PAR(NL,NL,DPTH_INDX)-T2
 	              SE(ID)%BA_PAR(NUP,NL,DPTH_INDX)=SE(ID)%BA_PAR(NUP,NL,DPTH_INDX)+T2
+	              BA_T_PAR_EHB(NL,DPTH_INDX)=BA_T_PAR_EHB(NL,DPTH_INDX) - &
+	                             HZ_TO_ERG*T2*(ATM(ID)%EDGEXzV_F(NL_F)-ATM(ID)%EDGEXzV_F(NUP_F))
 	            END IF
 	            T1=T1*ATM(ID)%XzV_F(NL_F,DPTH_INDX)
 	            SE(ID)%STEQ(NL,DPTH_INDX)=SE(ID)%STEQ(NL,DPTH_INDX) - T1
@@ -194,6 +199,13 @@
 	  END DO		!Loop over ionization stage
 	END IF			!Include excitations?
 !
+! It is a minus sign since ATM(ID)%NTCXzV contains the cooling rate.
+!
+	DO ID=1,NUM_IONS
+	  IF(ATM(ID)%XzV_PRES)THEN
+	    STEQ_T_EHB=STEQ_T_EHB-ATM(ID)%NTCXzV
+	  END IF
+	END DO
 
         OPEN(UNIT=LU_TH,FILE='NON_THERM_SPEC_INFO',STATUS='UNKNOWN',POSITION='APPEND')
         CALL SET_LINE_BUFFERING(LU_TH)

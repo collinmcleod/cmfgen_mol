@@ -13,7 +13,7 @@
         USE MOD_CMFGEN
         IMPLICIT NONE
 !
-! Altered 04-Jun-2019  Cooling factor changed from 1.0D-12 to 1.0D-10
+! Altered 15-Jul-2-19 : Added BA_T_EHB equation.
 ! Created 24-Sep-2004
 !
 	INTEGER DIAG_INDX
@@ -32,6 +32,7 @@
 	INTEGER L,K
 	REAL*8 TA(ND)             !Temporary work vector
 	REAL*8 T1
+	REAL*8 EHB_CONSTANT
 !
         GET_DIAG(K)=(NUM_BNDS/ND)*(K-DIAG_INDX)+DIAG_INDX
 !
@@ -47,6 +48,7 @@
 !
 	HEAT(1:ND)=0.0D0
 	T_MIN_EXTRAP=.FALSE.
+	EHB_CONSTANT=1.25663706D-09		!4P x E-10 (for electron heating equation).
 !
 	IF(T_MIN .GT. 0.0D0)THEN
 !
@@ -66,11 +68,14 @@
 	       IF(HEAT(K) .GT. -100.0D0*STEQ_T(K) .AND. STEQ_T(K) .LT. 0.0D0)THEN
 	         T1=T_MIN-T(K)-LOG(ABS(STEQ_T(K))/TA(K))/1000.0D0
 	         BA_T(NT,L,K)=BA_T(NT,L,K) - (HEAT(K)-STEQ_T(K))/T1
+	         BA_T_EHB(NT,L,K)=BA_T_EHB(NT,L,K) - (EHB_CONSTANT*HEAT(K)-STEQ_T_EHB(K))/T1
 	         T_MIN_EXTRAP=.TRUE.
 	       ELSE
 	         BA_T(NT,L,K)=BA_T(NT,L,K) - 1000.0D0*HEAT(K)
+	         BA_T_EHB(NT,L,K)=BA_T_EHB(NT,L,K) - 1000.0D0*EHB_CONSTANT*HEAT(K)
 	       END IF
 	       BA_T(NT-1,L,K)=BA_T(NT-1,L,K) + 2.0D0*HEAT(K)/ED(K)
+	       BA_T_EHB(NT-1,L,K)=BA_T_EHB(NT-1,L,K) + 2.0D0*EHB_CONSTANT*HEAT(K)/ED(K)
 	     END DO
 	  END IF
 !
@@ -79,8 +84,8 @@
 	  DO K=1,ND
 	    STEQ_T(K)=STEQ_T(K) + HEAT(K)
 	  END DO
-!
-	  HEAT=HEAT*1.25663706D-09		!For electron cooling equiation.
+	  HEAT=HEAT*EHB_CONSTANT
+	  STEQ_T_EHB=STEQ_T_EHB+HEAT
 !
         END IF
 !

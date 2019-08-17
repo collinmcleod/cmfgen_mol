@@ -18,6 +18,8 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(auto_clump_rev.o)\
       $(LIB)(auto_add_ion.o)\
       $(LIB)(ba_update_v7.o)\
+      $(LIB)(ba_ehb_bf_update_v1.o)\
+      $(LIB)(ba_ehb_ff_update_v1.o)\
       $(LIB)(check_hydro_def.o)\
       $(LIB)(check_ions_present.o)\
       $(LIB)(check_tmin.o)\
@@ -34,7 +36,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(do_cmf_hydro_v2.o)\
       $(LIB)(do_ng_accel_band_v2.o)\
       $(LIB)(eval_adiabatic_v3.o)\
-      $(LIB)(evalse_qwvj_v7.o)\
+      $(LIB)(evalse_qwvj_v8.o)\
       $(LIB)(evalse_lowt_v2.o)\
       $(LIB)(evalse_x_qwvj_v4.o)\
       $(LIB)(eval_temp_ddt_v2.o)\
@@ -63,7 +65,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(set_new_grid.o)\
       $(LIB)(smooth_pops_as_we_iterate.o)\
       $(LIB)(solveba_v13.o)\
-      $(LIB)(steq_multi_v9.o)\
+      $(LIB)(steq_multi_v10.o)\
       $(LIB)(steqne_v4.o)\
       $(LIB)(steq_advec_v4.o)\
       $(LIB)(steq_co_mov_deriv_v3.o)\
@@ -72,8 +74,10 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(sub_guess_dc.o)\
       $(LIB)(sum_steq_sol.o)\
       $(LIB)(tst_rd_seq.o)\
+      $(LIB)(var_free_free_v1.o)\
       $(LIB)(var_op_v10.o)\
       $(LIB)(var_x_opa_eta_v4.o)\
+      $(LIB)(vehb_byj_v1.o)\
       $(LIB)(vsebyj_multi_v8.o)\
       $(LIB)(vsebyj_x_v7.o)\
       $(LIB)(write_cmat.o)\
@@ -153,6 +157,10 @@ $(LIB)(update_ba_for_line.o) : update_ba_for_line.f $(UP_MODS)
 	ar ruv $(LIB) update_ba_for_line.o
 
 $(LIB)(var_op_v10.o) : var_op_v10.f $(DIS)
+	$(F90) -c $(OPTION)  var_op_v10.f
+	ar ruv $(LIB) var_op_v10.o
+
+$(LIB)(var_free_free_v1.o) : var_free_free_v1.f $(DIS)
 	$(F90) -c $(OPTION)  var_op_v10.f
 	ar ruv $(LIB) var_op_v10.o
 

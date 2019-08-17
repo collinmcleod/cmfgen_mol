@@ -7,6 +7,7 @@ C
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 15-Jul-2019 - BA_T_EHB now output.
 ! Altered 04-Oct-2016 - Added FIXED_T to call. Changed to V3.
 !                          FIXED_T output to BAMATPNT.
 ! Created 05-Apr-2001 - Based on STOREBA
@@ -50,6 +51,7 @@ C
 	  END DO
 	  WRITE(LU,ERR=600,IOSTAT=IOS)BA_ED
 	  WRITE(LU,ERR=600,IOSTAT=IOS)BA_T
+	  WRITE(LU,ERR=600,IOSTAT=IOS)BA_T_EHB
 	CLOSE(UNIT=LU)
 C
 C Output to BAPNT file that write of BA and STEQ was successful.

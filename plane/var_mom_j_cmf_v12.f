@@ -40,6 +40,7 @@
 	USE MOD_VAR_MOM_J_CMF
 	IMPLICIT NONE
 !
+! Altered:   11-Jun-2109 : Added point source option.
 ! Altered:   17-Oct-2016 : Changed to V12: CHECK_H_ON J replaced by H_CHK_OPTION.
 ! Altered:   17-Feb-2016 : Changed to V11. DIF replaced by INNER_BND_METH and 
 !                            IB_STAB_FACTOR added.
@@ -256,12 +257,17 @@
 	  XM(ND)=DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
 	  LOCAL_DBB=DBB
 	  DIF_OR_ZF=.TRUE.
+	ELSE IF(INNER_BND_METH .EQ. 'PNT_SRCE')THEN
+	  TB(ND)=R(ND)*R(ND)*K_ON_J(ND)/DTAU(ND-1)
+	  XM(ND)=HNU_AT_IB*R(ND)*R(ND)
+	  LOCAL_DBB=HNU_AT_IB                     !Not used
+	  DIF_OR_ZF=.FALSE.
 	ELSE IF(INNER_BND_METH .EQ. 'ZERO_FLUX')THEN
 	  TB(ND)=R(ND)*R(ND)*K_ON_J(ND)/DTAU(ND-1)
 	  XM(ND)=IB_STAB_FACTOR*TB(ND)*R(ND)*R(ND)*(JPLUS_IB+JMIN_IB)
 	  TB(ND)=(1.0D0+IB_STAB_FACTOR)*TB(ND)
 	  LOCAL_DBB=0.0D0
-	  DIF_OR_ZF=.TRUE.
+	  DIF_OR_ZF=.FALSE.
 	ELSE IF(INNER_BND_METH .EQ. 'SCHUSTER')THEN
 	  TB(ND)=R(ND)*R(ND)*K_ON_J(ND)/DTAU(ND-1)+IN_HBC
 	  XM(ND)=R(ND)*R(ND)*IC*(0.25D0+0.5D0*IN_HBC)

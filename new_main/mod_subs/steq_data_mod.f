@@ -6,6 +6,7 @@
 !
       MODULE STEQ_DATA_MOD
 !
+!Altered 12-Jul-2019: Added EHB matrices (added to IBIS 17-Aug-2019).
 !Altered 19-Aug-2015: BA_MAX_IONS_PER_SPECIES increaed to 21 (cur_hmi, 12-Jun-2015)
 !                            
 ! Number of atomic species (e.g. H, C, N is 3 species).
@@ -31,6 +32,8 @@
           REAL*8, POINTER :: STEQ_ADV(:)  		!Statistical equilibrium ion eqns. for advection terms
           REAL*8, POINTER :: QFV_P(:,:)  		!
           REAL*8, POINTER :: QFV_R(:,:)  		!
+          REAL*8, POINTER :: QFV_P_EHB(:,:)  		!
+          REAL*8, POINTER :: QFV_R_EHB(:,:)  		!
           REAL*8, POINTER :: BA(:,:,:,:)		!BA matrix for XzV
           REAL*8, POINTER :: BA_PAR(:,:,:)		!BA matrix for XzV (diagonal terms)
 	  INTEGER, POINTER :: LNK_TO_IV(:)    	!
@@ -53,8 +56,11 @@
         REAL*8, ALLOCATABLE :: BA_T(:,:,:)
         REAL*8, ALLOCATABLE :: BA_ED(:,:,:)
         REAL*8, ALLOCATABLE :: BA_ADV_TERM(:,:)
-!
         REAL*8, ALLOCATABLE :: BA_T_PAR(:,:)
+!
+        REAL*8, ALLOCATABLE :: STEQ_T_EHB(:)
+        REAL*8, ALLOCATABLE :: BA_T_EHB(:,:,:)
+        REAL*8, ALLOCATABLE :: BA_T_PAR_EHB(:,:)
 !
         TYPE (STAT_EQ_DATA)  SE(BA_NUM_SPECIES*BA_MAX_IONS_PER_SPECIES)
 !

@@ -8,7 +8,8 @@
 	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
-! Altered:  10-Jul-2019 : Draw errors first s curves drawn on top.
+! Altered:  17-Aug-2019 : Altered to allow dashed lines
+! Altered:  10-Jul-2019 : Draw errors first so curves drawn on top.
 ! Altered:  28-Feb-2019 : Now scale error bars for simple YAR options.
 ! Altered:  01-Mar-2016 : Added XN option to XAR option. This allows Y to be plotted against
 !                          the index I. By default, a new plot is created [24-Feb-2016].
@@ -118,6 +119,7 @@
 	LOGICAL VEC,FLAGLINE(MAXVEC),INIT
 	LOGICAL QUERYFLAG
 	INTEGER VECPEN(MAXVEC)
+	INTEGER VEC_LINE_STYLE(MAXVEC)
 !
 	LOGICAL AIR_WAVELENGTHS
 	LOGICAL DRAW_GAUSS_HARD
@@ -415,6 +417,7 @@
 	  DO I=11,MAXVEC
 	    VECPEN(I)=14
 	  END DO
+	  VEC_LINE_STYLE(:)=1
 	END IF
 !
 ! Define default type for "Data markers"
@@ -632,8 +635,8 @@
 	          DO I=1,MAXVEC
                     IF(FLAGLINE(I))THEN
 	              WRITE(33,18)LINEXST(I),LINEYST(I),
-	1                         LINEXEND(I),LINEYEND(I),VECPEN(I)
-18	              FORMAT(1X,1P,4E18.8,3X,I3)
+	1                         LINEXEND(I),LINEYEND(I),VECPEN(I),VEC_LINE_STYLE(I)
+18	              FORMAT(1X,1P,4E18.8,3X,2I3)
 	            END IF
 	          END DO
                 CLOSE(UNIT=33)
@@ -1299,7 +1302,7 @@ C
             OPEN(UNIT=33,FILE=TRIM(FILNAME),STATUS='OLD',ERR=1100)
 	    DO ISTR=1,MAXVEC
 	      READ(33,*,END=1110,ERR=1100)LINEXST(ISTR),LINEYST(ISTR),
-	1              LINEXEND(ISTR),LINEYEND(ISTR),VECPEN(ISTR)
+	1              LINEXEND(ISTR),LINEYEND(ISTR),VECPEN(ISTR),VEC_LINE_STYLE(ISTR)
 	      FLAGLINE(ISTR)=.TRUE.
 	    END DO
 1110	    CONTINUE
@@ -1315,9 +1318,9 @@ C
 !
 	  DO I=1,MAXVEC
 	    IF(FLAGLINE(I))THEN
-	      WRITE(T_OUT,'(1X,I2,4(3X,E14.6),I4)')I,
+	      WRITE(T_OUT,'(1X,I2,4(3X,E14.6),2I4)')I,
 	1               LINEXST(I),LINEXEND(I),
-	1               LINEYST(I),LINEYEND(I),VECPEN(I)
+	1               LINEYST(I),LINEYEND(I),VECPEN(I),VEC_LINE_STYLE(I)
 	    END IF
 	  END DO
 !
@@ -1331,6 +1334,7 @@ C
 	      CALL NEW_GEN_IN(LINEYST(ISTR),'YST')
 	      CALL NEW_GEN_IN(LINEXEND(ISTR),'XEND')
 	      CALL NEW_GEN_IN(LINEYEND(ISTR),'YEND')
+	      CALL NEW_GEN_IN(VEC_LINE_STYLE(ISTR),'1,2,3 or 4')
 	    END IF
 	  END DO
  1150	  VEC=.TRUE.
@@ -3036,6 +3040,7 @@ C
 !
 	IF(VEC)THEN
 	  DO I=1,MAXVEC
+	    CALL PGSLS(VEC_LINE_STYLE(I))
 	    Q=VECPEN(I)
 	    CALL PGSCI(Q)
 	    IF(FLAGLINE(I))THEN

@@ -7,6 +7,7 @@
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 16-Jul-2019 - Now reads in BA_T_EHB
 ! Altered 04-Oct-2016 - Added FIXED_T to call.
 ! Altered 12-Mar-2014 - COMPUTE_BA is nolonger changed by the routine. The value in CMFGEN 
 !                         is used to indicate whether the BA matric will be read in.
@@ -37,7 +38,9 @@
 !
 ! If we are still computing the BA matrix, there is no need to read it in.
 ! 
-	IF(COMPUTE_BA)RETURN
+	IF(COMPUTE_BA)THEN
+	  RETURN
+	END IF
 !
 	LUER=ERROR_LU()
 	CALL GEN_ASCI_OPEN(LU,DESC//'PNT','OLD',' ','READ',IZERO,IOS)
@@ -55,6 +58,7 @@
 	  READ(LU,*,ERR=400,IOSTAT=IOS)NUM_BNDS_RD
 	  READ(LU,*,ERR=400,IOSTAT=IOS)ND_RD
 	CLOSE(UNIT=LU)
+	WRITE(6,*)'In BA_READ_V3 routine - read BAMATPNT',SUCCESSFUL_READ
 !
 	IF(NION_RD .NE. NION .OR. NUM_BNDS_RD .NE. NUM_BNDS .OR. ND_RD .NE. ND)THEN
 	  WRITE(LUER,*)'Error : incompatible dimensions in BAREAD'
@@ -65,6 +69,7 @@
           SUCCESSFUL_READ=.FALSE.
 	  RETURN
 	END IF
+	WRITE(6,*)'In BA_READ_V3 routine - NION CHK',SUCCESSFUL_READ
 !
 	OPEN(UNIT=LU,FORM='UNFORMATTED',FILE=DESC,IOSTAT=IOS,ERR=500,
 	1             ACCESS='SEQUENTIAL',STATUS='OLD',ACTION='READ')
@@ -73,7 +78,9 @@
 	  END DO
 	  READ(LU,ERR=605,IOSTAT=IOS)BA_ED
 	  READ(LU,ERR=610,IOSTAT=IOS)BA_T
+	  READ(LU,ERR=610,IOSTAT=IOS)BA_T_EHB
 	CLOSE(UNIT=LU)
+	WRITE(6,*)'In BA_READ_V3 routine - finished',SUCCESSFUL_READ
 	RETURN
 !
 300	WRITE(LUER,*)'Error opening '//DESC//'PNT in READBA'

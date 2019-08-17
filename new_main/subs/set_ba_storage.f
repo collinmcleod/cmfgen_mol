@@ -8,6 +8,7 @@
       USE STEQ_DATA_MOD
       IMPLICIT NONE
 !
+! Altered 12-Jul-2019 : Added EHB matrices.
 ! Altered 04-Apr-2013 : MEMORY made REAL to avoid integer overflow.
 ! Altered 01-Apr-2004 : BA matrices allocated after all STEQ matrices.
 ! Created 05-Apr-2001
@@ -57,6 +58,8 @@
                       ALLOCATE (SE(ID)%STEQ(NX,ND),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE (SE(ID)%QFV_R(NX,ND),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE (SE(ID)%QFV_P(NX,ND),STAT=IOS)
+        IF(IOS .EQ. 0)ALLOCATE (SE(ID)%QFV_R_EHB(NX,ND),STAT=IOS)
+        IF(IOS .EQ. 0)ALLOCATE (SE(ID)%QFV_P_EHB(NX,ND),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE (SE(ID)%EQ_IN_BA(NX),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (SE(ID)%STEQ_ADV(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (SE(ID)%STRT_ADV_ID(ND),STAT=IOS)
@@ -118,6 +121,14 @@
         WRITE(LU_ER,*)'Unable to allocate BA_ED etc in SET_BA_STORAGE'
         WRITE(LU_ER,*)'STAT=',IOS,'ID=',ID
         STOP
+      END IF
+!
+      IF(IOS .EQ. 0)ALLOCATE (STEQ_T_EHB(ND),STAT=IOS)
+      IF(IOS .EQ. 0)ALLOCATE (BA_T_EHB(NT,NUM_BNDS,ND),STAT=IOS)
+      IF(IOS .EQ. 0)ALLOCATE (BA_T_PAR_EHB(NT,ND),STAT=IOS)
+      IF(IOS .NE. 0)THEN
+        WRITE(LU_ER,*)'Unable to allocate STEQ_T_EHB etc in SET_BA_STORAGE'
+        WRITE(LU_ER,*)'STAT=',IOS,'ID=',ID
       END IF
 !
       MEMORY=MEMORY+2*NT*ND*NUM_BNDS+NT*ND

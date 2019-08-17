@@ -18,6 +18,7 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered 15-Jul-2019: Added BA_T_EHB, small amount of cleaning.
 ! Altered 01-Sep-2016: TIME_SEQ_NO changed from integer to real.
 ! Altered 22-Nov-2011 : Changed call to GET_POPS_AT_PREV_TIME_STEP from V4 to V5
 !                          (POPS was added to call).
@@ -80,6 +81,7 @@
 	EXTERNAL BOLTZMANN_CONSTANT,FUN_PI,ERROR_LU,STEFAN_BOLTZ,SPEED_OF_LIGHT
 !
 	REAL*8 SCALE
+	REAL*8 EHB_CONSTANT
 	REAL*8 T1,T2,T3,T4,PI
 	REAL*8 DELTA_T_SECS
 	INTEGER I,J,K,L
@@ -188,6 +190,7 @@
 ! in units of 10^4K.
 !
 	PI=FUN_PI()
+	EHB_CONSTANT=4.0D-10*PI
 	SCALE=1.0D+14*BOLTZMANN_CONSTANT()/4.0D0/PI
 	DO I=1,ND
 	  EK_VEC(I)=1.5D0*SCALE*POP_ATOM(I)/DELTA_T_SECS
@@ -200,13 +203,14 @@
 	  OLD_GAMMA(I)=OLD_ED(I)/OLD_POP_ATOM(I)
 	END DO
 !
+! Note: The internal energy terms do not get included in the EHB equation.
+!
 	IF(INCL_ADIABATIC)THEN
 	  DO I=1,ND
  	    WORK(I)=EK_VEC(I)*( (1.0D0+GAMMA(I))*T(I)- (1.0D0+OLD_GAMMA(I))*OLD_T(I) ) +
-	1           EI_VEC(I)*(INT_EN(I)-OLD_INT_EN(I))      +
 	1           P_VEC(I)*LOG(VOL_EXP_FAC(I))
-	  END DO
-	  DO I=1,ND
+	    STEQ_T_EHB(I)=STEQ_T_EHB(I)-EHB_CONSTANT*WORK(I)
+ 	    WORK(I)=WORK(I) + EI_VEC(I)*(INT_EN(I)-OLD_INT_EN(I))
 	    STEQ_T(I)=STEQ_T(I)-WORK(I)
 	  END DO
 	END IF
@@ -216,16 +220,18 @@
 	IF(INCL_ADIABATIC .AND. COMPUTE_BA)THEN
 	  DO I=1,ND
 	    L=DIAG_INDX
-	    BA_T(NT,L,I)=BA_T(NT,L,I)-EK_VEC(I)*(1+GAMMA(I)) -
-	1                    P_VEC(I)*LOG(VOL_EXP_FAC(I))/T(I)
-	    BA_T(NT-1,L,I)=BA_T(NT-1,L,I)-T(I)*EK_VEC(I)/POP_ATOM(I) -
-	1                    P_VEC(I)*LOG(VOL_EXP_FAC(I))/(POP_ATOM(I)+ED(I))
+	    T1=EK_VEC(I)*(1+GAMMA(I)) + P_VEC(I)*LOG(VOL_EXP_FAC(I))/T(I)
+	    BA_T(NT,L,I)=BA_T(NT,L,I)-T1
+	    BA_T_EHB(NT,L,I)=BA_T_EHB(NT,L,I)-T1*EHB_CONSTANT
+	    T1=T(I)*EK_VEC(I)/POP_ATOM(I) + P_VEC(I)*LOG(VOL_EXP_FAC(I))/(POP_ATOM(I)+ED(I))
+	    BA_T(NT-1,L,I)=BA_T(NT-1,L,I)-T1
+	    BA_T_EHB(NT-1,L,I)=BA_T_EHB(NT-1,L,I)-T1*EHB_CONSTANT
 	    T1=HDKT*EI_VEC(I)/POP_ATOM(I)
 	    DO J=1,NT-2
 	      BA_T(J,L,I)=BA_T(J,L,I)-T1*TOT_ENERGY(J)
 	    END DO
 	  END DO	!Loop of depth.
-	END IF            !End COMPUTE_BA
+	END IF          !End COMPUTE_BA
 !
 ! Now compute the adiabatic cooling rate (in ergs/cm^3/sec) for diagnostic
 ! purposes. The rate is output to the GENCOOL file.
@@ -238,13 +244,12 @@
 ! density (velocity) term. This split was useful for diagnostic purposes,
 ! but has now been kept for simplicity so that GENCOOL does not need to be changed.
 !
-	T1=4.0D-10*PI
 	DO I=1,ND
 	  AD_CR_V(I) =P_VEC(I)*LOG(VOL_EXP_FAC(I))
 	  AD_CR_DT(I)=EK_VEC(I)*( (1.0D0+GAMMA(I))*T(I)- (1.0D0+OLD_GAMMA(I))*OLD_T(I) )
 	END DO
-	AD_CR_V=AD_CR_V*T1
-	AD_CR_DT=AD_CR_DT*T1
+	AD_CR_V=AD_CR_V*EHB_CONSTANT
+	AD_CR_DT=AD_CR_DT*EHB_CONSTANT
 !
 ! Output diagnostic information. As OLD_POP_ATOM has already been corrected for
 ! advection, we don't need to scale it by the change in volume.

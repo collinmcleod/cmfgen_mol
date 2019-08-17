@@ -35,6 +35,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 09-Jun-2019 : Added POINT srce options - osiris (added to IBIS 17-Aug-2019) 
 ! Altered : 30-Apr-2019 : Changed to MOM_JREL_V9 (add XM_CHK_OPTION and J_CHK_OPTION).
 ! Altered : 29-Apr-2019 : XM_CHK_OPTION added. Changed to MOM_J_DDT_V6.
 ! Altered : 20-Apr-2019 : J_CHK_OPTION added. Changed to MOM_J_DDT_V5.
@@ -139,6 +140,11 @@
 	DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
 	DDBBDT=DBB*(T1*(1.0D0+EMHNUKT(ND))/T2-2.0D0)/T(ND)
 	HFLUX_AT_IB=DBB/CHI(ND)/3.0D0
+!
+	IF(PNT_SRCE_MOD)THEN
+	  T1=-HDKT*FL/TEFF_PNT_SRCE
+	  IC=TWOHCSQ*( FL**3 )*EXP(T1)/(1.0D0-EXP(T1))
+	END IF
 !
 ! Switch to using CHI_CLUMP, ETA_CLUMP, and ESEC_CLUMP in case the model 
 ! has clumping.
@@ -657,7 +663,7 @@ C
 	1                  FL,DIF,DBB,IC,METHOD,COHERENT_ES,
 	1                  IZERO,FIRST_FREQ,NEW_FREQ,ND)
 	       HFLUX_AT_OB=HBC_CMF(1)*RJ(1)-HBC_CMF(2)
-	       IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
 	     ELSE IF(PLANE_PARALLEL)THEN
 	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling PP_MOM_CMF_V1'
 	       CALL PP_MOM_CMF_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
@@ -701,7 +707,14 @@ C
 	     ELSE IF(USE_LAM_ES)THEN
 	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Using USE_LAM_ES instead of solving moment equatons'
 	       RJ(1:ND)=TC(1:ND)
-	       IF(.NOT. USE_FORMAL_REL)THEN
+	       IF(INNER_BND_METH .EQ. 'PNT_SRCE')THEN
+	          HFLUX_AT_IB=0.0D0
+	          DO I=1,NC_PNT_SRCE
+	            HFLUX_AT_IB=HFLUX_AT_IB+0.5D0*HQW(ND,I)*IC
+	          END DO
+	       ELSE IF(INNER_BND_METH .EQ. 'ZERO FLUX')THEN
+	          HFLUX_AT_IB=0.0D0
+	       ELSE IF(.NOT. USE_FORMAL_REL)THEN
 	         IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
                  HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
 	       END IF
@@ -721,7 +734,18 @@ C
 	1              FL,dLOG_NU,INNER_BND_METH,DBB,IC,IB_STAB_FACTOR,
 	1              N_TYPE,H_CHK_OPTION,METHOD,COHERENT_ES,OUT_BC_TYPE,
 	1              FIRST_FREQ,NEW_FREQ,NC,NP,ND)
-	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+	       IF(INNER_BND_METH .EQ. 'PNT_SRCE')THEN
+	          HFLUX_AT_IB=0.0D0
+	          DO I=1,NC_PNT_SRCE
+	            HFLUX_AT_IB=HFLUX_AT_IB+0.5D0*HQW(ND,I)*IC
+	          END DO
+	       ELSE IF(INNER_BND_METH .EQ. 'ZERO FLUX')THEN
+	          HFLUX_AT_IB=0.0D0
+	       ELSE IF(INNER_BND_METH(1:3) .EQ. 'DIF')THEN
+	       ELSE
+	          HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+	       END IF 
+!	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
                HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
 	       IF(LST_ITERATION .AND. WRITE_JH)THEN
 	         DO I=1,ND

@@ -282,8 +282,8 @@
 !
 	LOGICAL NEW_FREQ	
 !
-	INTEGER ND_ADD_MAX
-	PARAMETER (ND_ADD_MAX=24)
+	INTEGER, PARAMETER :: ND_ADD_MAX=24
+	INTEGER, PARAMETER :: NC_PNT_SRCE=2
 !
 	INTEGER, SAVE :: FREQ_CNT
 	INTEGER ACCESS_F
@@ -512,6 +512,7 @@
 !
 	  IF(INNER_BND_METH .NE. 'DIFFUSION' .AND.
 	1     INNER_BND_METH .NE. 'ZERO_FLUX' .AND.
+	1     INNER_BND_METH .NE. 'PNT_SRCE' .AND.
 	1     INNER_BND_METH .NE. 'SCHUSTER')THEN
 	    J=ERROR_LU()
 	    WRITE(J,*)'Error in FG_J_CMF_V13: Invalid inner boundary condition'
@@ -1149,6 +1150,10 @@
 	        DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI_RAY(NI)
 	1            *(1.0D0+T1*(1.0D0-CHI_RAY(NI)/OLDCHI(LS)))
 	        DIF_OR_ZF=.TRUE.
+	      ELSE IF(INNER_BND_METH .EQ. 'PNT_SRCE')THEN
+	        DIF_OR_ZF=.TRUE.
+	        DBC=0.0D0
+	        IF(NC .LE. NC_PNT_SRCE)DBC=IC 
 	      ELSE IF(INNER_BND_METH .EQ. 'ZERO_FLUX')THEN
 	        DIF_OR_ZF=.TRUE.
 	        DBC=0.0D0
@@ -1226,6 +1231,8 @@
 	      IF(LS .GT. NC)THEN
 	        XM(NI)=0.5D0*DTAU(NI-1,LS)*SOURCE_RAY(NI)
 	      ELSE IF(INNER_BND_METH .EQ. 'DIFFUSION')THEN
+	        XM(NI)=DBC
+	      ELSE IF(INNER_BND_METH .EQ. 'PNT_SRCE')THEN
 	        XM(NI)=DBC
 	      ELSE IF(INNER_BND_METH .EQ. 'ZERO_FLUX')THEN
 	        XM(NI)=0.0D0
@@ -1387,16 +1394,6 @@ C
 	        dCHIdR_RAY(I)=T2*CHI_RAY(I)/R_RAY(I,LS)
 	      END IF
 	    END DO
-!
-! When an INNER_BND_METH of ZERO_FLUX is used, we set I_CORE after I_M has been
-! computed.
-!
-	    IF(INNER_BND_METH .EQ. 'DIFFUSION' .AND. LS .LE. NC)THEN
-	      I_CORE=( ETA_RAY(NI)+
-	1         DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND) )/CHI_RAY(NI)
-	    ELSE 
-	      I_CORE=IC
-	    END IF
 !
 ! By setting PF(1)=0 when evaluating SOURCE we ensure a pure continuum 
 ! calculation for the first frequency.
@@ -1585,7 +1582,16 @@ C
 	    dS(NI)=( SIGN(ONE,S(NI-1))+SIGN(ONE,dS(NI)) )*
 	1            MIN(ABS(S(NI-1)),0.5D0*ABS(dS(NI)))
 !
-	    IF(INNER_BND_METH .EQ. 'ZERO_FLUX')I_CORE=I_M(NI,LS)
+	    IF(INNER_BND_METH .EQ. 'DIFFUSION' .AND. LS .LE. NC)THEN
+	      I_CORE=( ETA_RAY(NI)+ DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND) )/CHI_RAY(NI)
+	    ELSE IF(INNER_BND_METH .EQ. 'ZERO_FLUX')THEN
+	      I_CORE=I_M(NI,LS)
+	    ELSE IF(INNER_BND_METH .EQ. 'PNT_SRCE')THEN
+	      I_CORE=I_M(NI,LS)
+	      IF(LS .LE. NC_PNT_SRCE)I_CORE=IC+I_M(NI,LS)
+	    ELSE
+	      I_CORE=IC
+	    END IF
 	    IF(LS .LE. NC)THEN
 	      I_P(NI,LS)=I_CORE
 	    ELSE
@@ -1778,6 +1784,12 @@ C
 	  IF(INNER_BND_METH .EQ. 'DIFFUSION')THEN
 	    HNU_AT_IB=DBB/R(ND)/CHI_RAY(NI)/3.0D0
 	    NNU_AT_IB=DBB/R(ND)/CHI_RAY(NI)/5.0D0
+	  ELSE IF(INNER_BND_METH .EQ. 'PNT_SRCE')THEN
+	    HNU_AT_IB=0.0D0; NNU_AT_IB=0.0D0
+	    DO LS=1,NC_PNT_SRCE
+	      HNU_AT_IB=HNU_AT_IB+0.5D0*IC*HQW(ND,LS)
+	      NNU_AT_IB=NNU_AT_IB+0.5D0*IC*NQW(ND,LS)
+	    END DO
 	  ELSE IF(INNER_BND_METH .EQ. 'ZERO_FLUX')THEN
 	    HNU_AT_IB=0.0D0
 	    NNU_AT_IB=0.0D0

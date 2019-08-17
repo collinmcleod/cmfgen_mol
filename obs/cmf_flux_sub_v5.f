@@ -15,6 +15,7 @@
 	USE EDDFAC_REC_DEFS_MOD
 	IMPLICIT NONE
 !
+! Altered: 16-Aug-2019 : PLANCK_MEAN computed
 ! Altered: 26-Apr-2019 : Added variables/option to restrict range of OBS frame calcualtion.
 !                           Added option to compute EW inc CMF (include ability to
 !                               compute Int ABS(I/Ic-1) dv.
@@ -364,8 +365,8 @@
 	REAL*8 FLUXMEAN(ND) 		!Flux mean opacity
 	REAL*8 LINE_FLUXMEAN(ND) 	!Flux mean opacity due to lines.
 	REAL*8 ROSSMEAN(ND)  		!Rosseland mean opacity
-	REAL*8 INT_dBdT(ND)  		!Integral of dB/dT over nu 
-!                                            (to calculate ROSSMEAN)
+	REAL*8 PLANCK_MEAN(ND)  	!Planck mean opacity
+	REAL*8 INT_dBdT(ND)  		!Integral of dB/dT over nu (to calculate ROSSMEAN)
 	REAL*8 FORCE_MULT(ND)
 	REAL*8 NU_FORCE
 	REAL*8 NU_FORCE_FAC
@@ -1693,6 +1694,7 @@
 	    FLUXMEAN(I)=0.0D0
 	    LINE_FLUXMEAN(I)=0.0D0
 	    ROSSMEAN(I)=0.0D0
+	    PLANCK_MEAN(I)=0.0D0
 	    INT_dBdT(I)=0.0d0
 	  END DO
 	END IF
@@ -1710,6 +1712,13 @@
 	    ROSSMEAN(I)=ROSSMEAN(I)+T2/CHI(I)
 	  END DO
 	END IF
+!
+	T1=TWOHCSQ*FQW(ML)*(NU(ML)**3)
+	DO I=1,ND
+	  T2=T1*EMHNUKT(I)/(1.0D0-EMHNUKT(I))
+	  PLANCK_MEAN(I)=PLANCK_MEAN(I)+T2*CHI(I)
+	END DO
+!
 	CALL TUNE(ITWO,'FLUX_DIST')
 !
 ! Compute and output line force contributed by each species.
@@ -1803,8 +1812,18 @@
 	  CLOSE(UNIT=J)
 !
 	END IF
+!
+! We output the PLANCK_MEAN -- this was need for testing.
+!
 	IF(.NOT. COMPUTE_J)THEN
 	  I=3; CALL TUNE(I,' ')
+	  T1=7.218771D+11          ! T1=4 * [STEFAN BOLTZMAN CONS] * 1.0D+16 / pi
+	  DO I=1,ND
+	    PLANCK_MEAN(I)=4.0D0*PLANCK_MEAN(I)/T1/( T(I)**4 )
+	  END DO
+	  OPEN(UNIT=11,STATUS='UNKNOWN',FILE='PLANCK_KAPPA_MEAN')
+	    WRITE(11,'(I5,2ES18.8,ES14.4)')(I,R(I),V(I),1.0D-10*PLANCK_MEAN(I)/DENSITY(I),I=1,ND)
+	  CLOSE(UNIT=11)
 	  STOP
 	END IF
 !
@@ -1869,6 +1888,7 @@
 	  FLUXMEAN(I)=FLUXMEAN(I)/RLUMST(I)
 	  INT_dBdT(I)=INT_dBdT(I)/ROSSMEAN(I)		!Program rosseland opac.
 	  ROSSMEAN(I)=T1*( T(I)**3 )/ROSSMEAN(I)
+	  PLANCK_MEAN(I)=4.0D0*PLANCK_MEAN(I)/T1/( T(I)**4 )
 	END DO
 !
 ! Due to instabilities, the FLUX mean opacity can sometimes be
@@ -1899,9 +1919,9 @@
 	TA(ND)=0.0D0; TB(ND)=0.0D0; TC(ND)=0.0D0; DTAU(ND)=0.0D0
 	CALL GEN_ASCI_OPEN(LU_OPAC,'MEANOPAC','UNKNOWN',' ',' ',IZERO,IOS)
 	  WRITE(LU_OPAC,
-	1  '( ''     R        I    Tau(Ross)   /\Tau   Rat(Ross)'//
-	1  '  Chi(Ross)  Chi(ross)  Chi(Flux)   Chi(es) '//
-	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)     Kappa   V(km/s)'' )' )
+	1  '( ''         R          I   Tau(Ross)   /\Tau  Rat(Ross)'//
+	1  ' Chi(Ross)  Chi(ross)  Chi(Flux)   Chi(es) '//
+	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)   Kappa(R) V(km/s)'' )' )
 	IF(R(1) .GE. 1.0D+05)THEN
 	  FMT='(ES17.10,I4,2ES10.3,ES10.2,4ES11.3,4ES10.2,2ES11.3)'
 	ELSE

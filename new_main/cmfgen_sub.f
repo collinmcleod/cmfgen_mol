@@ -39,6 +39,13 @@
 	USE EDDFAC_REC_DEFS_MOD
 	IMPLICIT NONE
 !
+! Altered 17-Aug-2019 : Default for DO_T_AUTO is now TRUE. Incorporated into IBIS versions.
+! Altered 16-Aug-2019 : Now output Planck mean to RVTJ.
+! Altered Jul/Aug 2019: Extensive changes to treat electron energy balance equation (done on OSIRIS),
+!                          and PNT srce option.
+!                          Call SET_ANG_QW_V2 insted of SET_ANG_QW_V2
+!                          Call STEQ_MULTI_V10 insted of STEQ_MULTI_V9
+!                          Calls to EHB routines added.
 ! Aleterd 06-Sep-2016 : Output more R digits to MEANOPAC.
 ! Altered 29-Sep-2015 : Changed back to COMP_OPAC (Different TWO_PHOT in routine)
 ! Altered 24-Jul-2015 : Added HMI, Changed to COMP_OPAC_V2 (cur_hmi, 19-Aug-2015)
@@ -365,6 +372,7 @@
 	REAL*8 dJRECdT(ND)
 	REAL*8 JPHOT(ND)
 	REAL*8 JREC_CR(ND)
+	REAL*8 dJREC_CRdT(ND)
 	REAL*8 JPHOT_CR(ND)
 	REAL*8 BPHOT_CR(ND)
 !
@@ -389,7 +397,7 @@
 !
 ! X-ray variables.
 ! We dimension from 0 so that we can access a Null vector for the 1st included
-! ionization stage of each species.
+! ioinization stage of each species.
 ! 
 	REAL*8 X_RECOM(ND,0:NION)			!Next X-ray recombination rate
 	REAL*8 X_COOL(ND,0:NION)			!Next X-ray cooling
@@ -540,7 +548,7 @@
 	  DO_GREY_T_AUTO=.TRUE.
 	  CALL RD_STORE_LOG(DO_GREY_T_AUTO,'DO_GT_AUTO',L_FALSE,
 	1                      'Do a grey temperature iteration after revising USE_FIXED_J?')
-	  DO_T_AUTO=.TRUE.
+	  DO_T_AUTO=.FALSE.
 	  CALL RD_STORE_LOG(DO_T_AUTO,'DO_T_AUTO',L_FALSE,
 	1                      'Allow temperature to vary when sufficent convergence has been obtained?')
 	  SET_POPS_D2_EQ_D1=.FALSE.
@@ -1067,7 +1075,8 @@
 ! as these may be required when setting up the initial temperature
 ! distribution of the atmosphere (i.e. required by JGREY).
 !
-	CALL SET_ANG_QW(R,NC,ND,NP,REXT,NCEXT,NDEXT,NPEXT,TRAPFORJ,ACCURATE)
+	CALL SET_ANG_QW_V2(R,NC,ND,NP,REXT,NCEXT,NDEXT,NPEXT,
+	1                  R_PNT_SRCE,NC_PNT_SRCE,TRAPFORJ,ACCURATE)
 !
 ! Allocate memory for opacities.
 !
@@ -1523,11 +1532,13 @@
 	CALL TUNE(2,'ZBA')
 	STEQ_ED=0.0D0
 	STEQ_T=0.0D0
-	STEQ_T_SCL=0.0D0
+	STEQ_T_EHB=0.0D0
 	STEQ_T_NO_SCL=0.0D0
         BA_ED   = 0.0D0
         BA_T    = 0.0D0
         BA_T_PAR=0.0D0
+        BA_T_EHB    = 0.0D0
+        BA_T_PAR_EHB=0.0D0
 !
 	IF(.NOT .ALLOCATED(DIERECOM))THEN
 	  ALLOCATE (DIERECOM(ND,NION))
@@ -1569,15 +1580,16 @@
             LOC_ID=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      TMP_STRING=TRIM(ION_ID(ID))//'_COL_DATA'
-              CALL STEQ_MULTI_V9(CNM,DCNM,ED,T,
+              CALL STEQ_MULTI_V10(CNM,DCNM,ED,T,
 	1         ATM(ID)%XzV,            ATM(ID)%XzVLTE,         ATM(ID)%dlnXzVLTE_dlnT,
+	1         AVE_ENERGY(ATM(ID)%EQXzV),
 	1         ATM(ID)%NXzV,           ATM(ID)%DXzV,           ATM(ID)%XzV_F, 
 	1         ATM(ID)%XzVLTE_F_ON_S,  ATM(ID)%W_XzV_F,        ATM(ID)%AXzV_F,
 	1         ATM(ID)%EDGEXzV_F,      ATM(ID)%GXzV_F,         ATM(ID)%XzVLEVNAME_F,
 	1         ATM(ID)%NXzV_F,         ATM(ID)%F_TO_S_XzV,
 	1         POP_SPECIES(1,SPECIES_LNK(ID)), ATM(ID+1)%XzV_PRES, ATM(ID)%ZXzV,
 	1         LOC_ID,TMP_STRING,OMEGA_GEN_V3,
-	1         ATM(ID)%EQXzV,NUM_BNDS,ND,NION,
+	1         ATM(ID)%EQXzV,NUM_BNDS,ND,NION,NT,
 	1         COMPUTE_BA,FIXED_T,LST_ITERATION,DST,DEND)
 !
 ! Handle states which can partially autoionize.
@@ -1617,6 +1629,7 @@
 !
 ! Compute the collisional cooling terms for digestion.
 !
+	  CALL TUNE(1,'COL_DIGEST')
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      TMP_STRING=TRIM(ION_ID(ID))//'_COL_DATA'
@@ -1630,22 +1643,8 @@
 	1        ID,TMP_STRING,OMEGA_GEN_V3,ED,T,ND)
 	    END IF
 	  END DO
+	  CALL TUNE(2,'COL_DIGEST')
 !
-! 
-!
-! Reread in BA array if we are not to compute it. There should be no problem
-! with this read since it has previously been read in. This double reading
-! is necessary to save a rewrite of the STEQ*** routines.
-!
-	IF(.NOT. COMPUTE_BA .AND. .NOT. FLUX_CAL_ONLY)THEN
-	  CALL READ_BA_DATA_V3(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,FIXED_T,SUCCESS,'BAMAT')
-	  IF(.NOT. SUCCESS)THEN
-	    WRITE(LUER,*)'Major Error - cant read BA File'
-	    WRITE(LUER,*)'Previously read successfully - '//
-	1             'before continuum loop'
-	    STOP
-	  END IF
-	END IF
 ! 
 !
 	EDDINGTON=EDD_LINECONT
@@ -1983,15 +1982,11 @@
 	NUM_OF_WEAK_LINES=0.0D0
 	CONT_FREQ=0.0D0
 !
-!
-	CHK=.FALSE.
-        DO I=1,ND
-          IF(V(I) .LT. 1.0D0 .AND. SIGMA(I) .LT. -1.0D0)THEN
-            SIGMA(I)=0.0D0
-	    CHK=.TRUE.
-          END IF
-        END DO
-	IF(CHK)WRITE(6,*)'Sigma adjusted so that dV/dR is grater than 0 at low velocities'
+	DO I=1,ND
+	  IF(V(I) .LT. 1.0D0 .AND. SIGMA(I) .LT. -1.0D0)THEN
+	    SIGMA(I)=0.0D0
+	  END IF
+	END DO
 !
 ! Enter loop for each continuum frequency.
 !
@@ -2034,8 +2029,8 @@
 	    IF(ATM(ID)%XzV_PRES .AND. COMPUTE_NEW_CROSS)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
 	       PHOT_ID=J
-	       CALL QUAD_MULTI_V9(ATM(ID)%WSXzV(1,1,J), ATM(ID)%dWSXzVdT(1,1,J),
-	1             ATM(ID)%WCRXzV(1,1,J),
+	       CALL QUAD_MULTI_V10(ATM(ID)%WSXzV(1,1,J), ATM(ID)%dWSXzVdT(1,1,J),
+	1             ATM(ID)%WCRXzV(1,1,J),ATM(ID)%dWCRXzVdT(1,1,J),
 	1             ATM(ID)%XzVLTE, ATM(ID)%dlnXzVLTE_dlnT, ATM(ID)%NXzV,
 	1             ATM(ID)%XzVLTE_F_ON_S, ATM(ID)%EDGEXzV_F, ATM(ID)%NXzV_F,
 	1             ATM(ID)%F_TO_S_XzV, CONT_FREQ,T,ND,
@@ -2046,6 +2041,12 @@
 	  END DO
 !$OMP END PARALLEL DO
 	  CALL TUNE(ITWO,'QUAD')
+!
+!	  ID=1; L=71
+!	  DO K=1,ATM(ID)%NXzV
+!	   WRITE(314,'(ES16.8,I6,4ES14.4)')FL,K,ATM(ID)%WSXzV(K,L,1),ATM(ID)%dWSXzVdT(K,L,1),
+!	1             ATM(ID)%WCRXzV(K,L,1),ATM(ID)%dWCRXzVdT(K,L,1)
+!	  END DO
 !
 ! 
 !
@@ -2231,7 +2232,7 @@
 	    STEQ_T(:)=STEQ_T(:)+FQW(ML)*ESEC(:)*(RJ(:)-RJ_ES(:))
 	  END IF
 !
-	  CALL COMP_VAR_JREC(JREC,dJRECdT,JPHOT,JREC_CR,JPHOT_CR,BPHOT_CR,
+	  CALL COMP_VAR_JREC_V2(JREC,dJRECdT,JPHOT,JREC_CR,dJREC_CRdT,JPHOT_CR,BPHOT_CR,
 	1       RJ,EMHNUKT,T,NU(ML),FQW(ML),TWOHCSQ,HDKT,ND,COMPUTE_NEW_CROSS)
 !
 ! Increment the S.E. equations due to radiation field at this
@@ -2248,27 +2249,39 @@
 	    IF(SE(ID)%XzV_PRES)THEN
 	      SE(ID)%QFV_R(:,:)=0.0D0		!NT,ND
 	      SE(ID)%QFV_P(:,:)=0.0D0
+	      SE(ID)%QFV_R_EHB(:,:)=0.0D0		!NT,ND
+	      SE(ID)%QFV_P_EHB(:,:)=0.0D0
 	    END IF
 	  END DO
 	END IF
 !
 	IF(FINAL_CONSTANT_CROSS)THEN
+!	  WRITE(6,*)'Calling EVALSE_QWVJ_V8'
 	  CALL TUNE(IONE,'EVALSE')
 !$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(ID_SAV)
 	  DO ID=1,NUM_IONS-1
+!	WRITE(6,*)'Calling EVALSE_QWVJ_V8',ID
 	    ID_SAV=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
-	      DO J=1,ATM(ID)%N_XzV_PHOT
-	        CALL EVALSE_QWVJ_V7(ID_SAV,
-	1         ATM(ID)%WSXzV(1,1,J), ATM(ID)%XzV, ATM(ID)%XzVLTE,
+	      DO J=1,ATM(ID)%N_XzV_PHOT 
+	        CALL EVALSE_QWVJ_V8(ID_SAV,
+	1         ATM(ID)%WSXzV(1,1,J), ATM(ID)%WCRXzV(1,1,J), 
+	1         ATM(ID)%XzV, ATM(ID)%XzVLTE,
 	1         ATM(ID)%NXzV, ATM(ID)%XzV_ION_LEV_ID(J),
 	1         ATM(ID+1)%XzV, ATM(ID+1)%LOG_XzVLTE, ATM(ID+1)%NXzV, 
-	1         JREC,JPHOT,NT,ND)
+	1         JREC,JPHOT,JREC_CR,JPHOT_CR,NT,ND)
 	      END DO
 	    END IF
 	  END DO
 !$OMP END PARALLEL DO
 	  CALL TUNE(ITWO,'EVALSE')
+!	  WRITE(6,*)'Called EVALSE_QWVJ_V8
+!	  ID=1; L=71
+!	  DO K=1,ATM(ID)%NXzV
+!	   WRITE(316,'(ES16.8,I6,4ES14.4)')FL,K,
+!	1                           SE(ID)%QFV_P(K,L),SE(ID)%QFV_P_EHB(K,L),
+!	1                           SE(ID)%QFV_R(K,L),SE(ID)%QFV_R_EHB(K,L)
+!	  END DO
 	END IF
 !
 	CALL TUNE(IONE,'LOWT')
@@ -2314,6 +2327,9 @@
 	1          ED,T,JREC,JPHOT,JREC_CR,JPHOT_CR,BPHOT_CR,
 	1          FL,CONT_FREQ,ZERO_REC_COOL_ARRAYS,ND)
 	      END DO
+!	      IF(TRIM(ION_ID(ID)) .EQ. 'NI')THEN
+!	        WRITE(184,'(3ES16.8,4ES14.4)')FL,CONT_FREQ,JREC(10),JPHOT(10),ATM(ID)%ARRXzV(1,10)
+!	      END IF
 	    END IF
 !
 	    IF(ATM(ID)%XzV_PRES .AND. ATM(ID+1)%XzV_PRES .AND. XRAYS)THEN
@@ -2409,6 +2425,9 @@
 	  END IF
 !
 ! 
+	  CALL BA_EHB_BF_UPDATE_V1(VJ,ETA,CHI,POPS,RJ,
+	1              FL,FQW(ML),COMPUTE_NEW_CROSS,FINAL_CONSTANT_CROSS,DO_SRCE_VAR_ONLY,
+	1              NION,NT,NUM_BNDS,ND,IONE,ND)
 !
 ! Modify the BA matrix for terms in the statistical equilibrium
 ! equations which are multiplied by RJ. NB. This is not for the
@@ -2631,7 +2650,7 @@
 	1            VEC_NL(LS),VEC_NUP(LS),VEC_MNL_F(LS),VEC_MNUP_F(LS)
 	      T3=(AVE_ENERGY(SIM_NL(SIM_INDX))-
 	1            AVE_ENERGY(SIM_NUP(SIM_INDX)))/VEC_FREQ(LS)
-	      WRITE(LU_HT,'(/,1X,I6,2X,A,2X,F10.6,2X,I6,2X,I6,ES14.5)')
+	      WRITE(LU_HT,'(/,1X,I8,2X,A,2X,F10.6,2X,I6,2X,I6,ES14.5)')
 	1         LS,TRANS_NAME_SIM(SIM_INDX),VEC_FREQ(LS),
 	1            VEC_NL(LS),VEC_NUP(LS),T3
 	      WRITE(LU_NET,'(1P,5E14.6)')(ZNET_SIM(I,SIM_INDX),I=1,ND)
@@ -2669,6 +2688,50 @@
 	      WRITE(LU_HT,'(/,(1X,1P,5E12.4))')(STEQ_T_NO_SCL(I), I=1,ND)
 	    END IF
 	  END DO
+	END IF
+!
+! Needs revising.
+!
+	IF(ML .EQ. 1)WRITE(6,*)'Free-fee correction may need revising'
+	CALL  COMP_FREE_FREE_V1(CHI,ETA,VCHI,VETA,CONT_FREQ,FL,COMPUTE_BA,ND,NT)
+	T1=1.0D-10*16.0D0*ATAN(1.0D0)*FQW(ML)	
+	DO I=1,ND
+	   STEQ_T_EHB(I)=STEQ_T_EHB(I)+T1*(CHI(I)*RJ(I)-ETA(I))
+	END DO
+!
+	IF(COMPUTE_BA)THEN
+	  CALL BA_EHB_FF_UPDATE_V1(VJ,VCHI,VETA,
+	1              ETA,CHI,T,POPS,RJ,
+	1              FQW(ML),COMPUTE_NEW_CROSS,FINAL_CONSTANT_CROSS,DO_SRCE_VAR_ONLY,
+	1              NION,NT,NUM_BNDS,ND,IONE,ND)
+!
+	  TB(1:ND)=BA_T_PAR_EHB(NT,1:ND)
+	  DO ID=1,NUM_IONS
+	    ID_SAV=ID
+	    IF(ATM(ID)%XzV_PRES .AND. FINAL_CONSTANT_CROSS)THEN
+	      DO J=1,ATM(ID)%N_XzV_PHOT
+	        CALL VEHB_BYJ_V1(ID_SAV,
+	1             ATM(ID)%WSXzV(1,1,J), ATM(ID)%dWSXzVdT(1,1,J),
+	1             ATM(ID)%WCRXzV(1,1,J), ATM(ID)%dWCRXzVdT(1,1,J),
+	1             ATM(ID)%XzV, ATM(ID)%XzVLTE, ATM(ID)%dlnXzVLTE_dlnT,
+	1             ATM(ID)%NXzV,ATM(ID)%EQXzV,
+	1             ATM(ID+1)%XzV, ATM(ID+1)%LOG_XzVLTE,
+	1             ATM(ID+1)%dlnXzVLTE_dlnT, ATM(ID+1)%NXzV,
+	1             ATM(ID)%XzV_ION_LEV_ID(J),ED,T,
+	1             JREC,dJRECdt,JPHOT,
+	1             JREC_CR,dJREC_CRdt,JPHOT_CR,
+	1             FIXED_T,ND,IONE,ND,NT)
+	     END DO 
+	   END IF
+	  END DO
+!
+	  IF( MOD(FREQ_INDX,N_PAR) .EQ. 0 .OR. FREQ_INDX .EQ. NCF )THEN
+	    BA_T_EHB(:,DIAG_INDX,:)=BA_T_EHB(:,DIAG_INDX,:)+BA_T_PAR_EHB
+	    BA_T_PAR_EHB=0.0D0
+	  END IF
+!	  WRITE(294,'(I5,6ES14.4)')ML,BA_T_EHB(1:3,DIAG_INDX,75),BA_T_EHB(NT-2:NT,DIAG_INDX,75)
+!	  WRITE(295,'(I5,6ES14.4)')ML,BA_T_PAR_EHB(1:3,75),BA_T_PAR_EHB(NT-2:NT,75)
+!	  FLUSH(UNIT=294); FLUSH(UNIT=295)
 	END IF
 !
 	IF(LST_ITERATION .AND. VERBOSE_OUTPUT)THEN
@@ -2779,6 +2842,7 @@
 !
 	IF(SN_MODEL .AND. INCL_RADIOACTIVE_DECAY)THEN
 	  IF(TREAT_NON_THERMAL_ELECTRONS)THEN
+	    STEQ_T_EHB=STEQ_T_EHB+dE_RAD_DECAY
 	  ELSE IF(SN_MODEL .AND. INCL_RADIOACTIVE_DECAY)THEN
 	    CALL EVAL_RAD_DECAY_V1(dE_RAD_DECAY,NT,ND)
 	    IF(LST_ITERATION .AND. VERBOSE_OUTPUT)THEN
@@ -2934,9 +2998,9 @@
 !
 	CALL GEN_ASCI_OPEN(LU_OPAC,'MEANOPAC','UNKNOWN',' ',' ',IZERO,IOS)
 	  WRITE(LU_OPAC,
-	1  '( ''         R          I   Tau(Ross)   /\Tau   Rat(Ross)'//
-	1  '  Chi(Ross)  Chi(ross)  Chi(Flux)   Chi(es) '//
-	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)     Kappa   V(km/s)'' )' )
+	1  '( ''         R          I   Tau(Ross)   /\Tau  Rat(Ross)'//
+	1  ' Chi(Ross)  Chi(ross)  Chi(Flux)   Chi(es) '//
+	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)   Kappa(R)     V(km/s)'' )' )
 	  IF(R(1) .GE. 1.0D+05)THEN
 	    FMT='(ES17.10,I4,2ES10.3,ES10.2,4ES11.3,4ES10.2,2ES11.3)'
 	  ELSE
@@ -3009,7 +3073,7 @@
 !
 ! Output hydrodynamical terms to allow check on radiation driving of the wind.
 !
-	IF(.NOT. SN_MODEL .AND. .NOT. USE_FIXED_J)THEN
+	IF(.NOT. SN_MODEL .AND. .NOT. USE_FIXED_J .AND. .NOT. PNT_SRCE_MOD)THEN
 !	IF(.NOT. USE_FIXED_J)THEN
 	  I=18
 	  CALL HYDRO_TERMS_V5(POP_ATOM,R,V,T,SIGMA,ED,CLUMP_FAC,RLUMST,
@@ -3702,7 +3766,22 @@
 	   STOP
 	END IF
 !
-	CALL WRITV(STEQ_T,ND,'Radiative Equlibrium Equation',LU_SE)
+	CALL WR2D_V2(STEQ_T,IONE,ND,'Radiative Equlibrium Equation','&',L_TRUE,LU_SE)
+	CALL WR2D_V2(STEQ_T_EHB,IONE,ND,'Electron Energy Balance Equation','%',L_TRUE,LU_SE)
+!
+! 
+! Reread in BA array if we are not to compute it. There should be no problem
+! with this read since it has previously been read in. This double reading
+! is necessary to save a rewrite of the STEQ*** routines.
+!
+	IF(.NOT. COMPUTE_BA)THEN
+	  CALL READ_BA_DATA_V3(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,FIXED_T,SUCCESS,'BAMAT')
+	  IF(.NOT. SUCCESS)THEN
+	    WRITE(LUER,*)'Major Error - cant read BA File'
+	    WRITE(LUER,*)'Previously read successfully - before continuum loop'
+	    STOP
+	  END IF
+	END IF
 !
 	CALL TUNE(IONE,'SOLVE_FOR_POPS')
 	CALL SOLVE_FOR_POPS(POPS,NT,NION,ND,NC,NP,NUM_BNDS,DIAG_INDX,
@@ -3714,7 +3793,8 @@
 ! and put the atom density ect on the new radius grid.
 !
 	IF(REVISE_R_GRID .AND. R_GRID_REVISED)THEN
-	  CALL SET_ANG_QW(R,NC,ND,NP,REXT,NCEXT,NDEXT,NPEXT,TRAPFORJ,ACCURATE)
+	  CALL SET_ANG_QW_V2(R,NC,ND,NP,REXT,NCEXT,NDEXT,NPEXT,
+	1                 R_PNT_SRCE,NC_PNT_SRCE,TRAPFORJ,ACCURATE)
 !
 ! Compute CLUM_FAC(1:ND) which allow for the possibility that the wind is
 ! clumped. At the sime time, we compute the vectors which give the density,
@@ -3801,7 +3881,8 @@
 	      CALL EXTEND_VTSIGMA(VEXT,TEXT,SIGMAEXT,COEF,INDX,NDEXT,V,TA,SIGMA,ND)
               VDOP_VEC_EXT(1:NDEXT)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
 	    END IF
-	    CALL SET_ANG_QW(R,NC,ND,NP,REXT,NCEXT,NDEXT,NPEXT,TRAPFORJ,ACCURATE)
+	    CALL SET_ANG_QW_V2(R,NC,ND,NP,REXT,NCEXT,NDEXT,NPEXT,
+	1                      R_PNT_SRCE,NC_PNT_SRCE,TRAPFORJ,ACCURATE)
 	    CALL SET_ABUND_CLUMP(MEAN_ATOMIC_WEIGHT,ABUND_SUM,LUER,ND)
 	    CALL GREY_T_ITERATE(POPS,Z_POP,NU,NU_EVAL_CONT,FQW,
 	1            LUER,LUIN,NC,ND,NP,NT,NCF,N_LINE_FREQ,MAX_SIM)
@@ -4086,7 +4167,7 @@
 	  CALL DATE_TIME(TIME)
 !
 	  CALL GEN_ASCI_OPEN(LU_POP,'RVTJ','UNKNOWN',' ',' ',IZERO,IOS)
-	    FORMAT_DATE='10-Nov-2009'
+	    FORMAT_DATE='15-Aug-2-2019'
 	    WRITE(LU_POP,'(1X,A,T30,A)')'Output format date:',FORMAT_DATE
 	    WRITE(LU_POP,'(1X,A,T30,A)')'Completion of Model:',TIME
 	    WRITE(LU_POP,'(1X,A,T30,A)')'Program Date:',PRODATE
@@ -4096,13 +4177,11 @@
 	    WRITE(LU_POP,'(1X,A,T30,I5)')'NP:',NP
 	    WRITE(LU_POP,'(1X,A,T30,I6)')'NCF:',N_OBS
 !
-	    WRITE(LU_POP,'(1X,A,T30,1P,E12.5)')'Mdot(Msun/yr):',
-	1                                   RMDOT/3.02286D+23
+	    WRITE(LU_POP,'(1X,A,T30,1P,E12.5)')'Mdot(Msun/yr):',RMDOT/3.02286D+23
 	    WRITE(LU_POP,'(1X,A,T30,1P,E12.5)')'L(Lsun):',LUM
 	    WRITE(LU_POP,'(1X,A,T30,1P,E12.5)')'H/He abundance:',AT_ABUND(1)
 	    WRITE(LU_POP,'(1X,A,T30,L1)')'Was T fixed?:',RD_FIX_T
-	    WRITE(LU_POP,'(1X,A,T30,A)')'Species naming convention:',
-	1                                        NAME_CONVENTION
+	    WRITE(LU_POP,'(1X,A,T30,A)')'Species naming convention:',NAME_CONVENTION
 !
 	    WRITE(LU_POP,'(A)')' Radius (10^10 cm)'
 	    WRITE(LU_POP,'(1X,8ES18.10)')R
@@ -4131,6 +4210,8 @@
 	    WRITE(LU_POP,'(1X,1P8E16.7)')(ROSS_MEAN(I),I=1,ND)
 	    WRITE(LU_POP,'(A)')' Flux Mean Opacity'
 	    WRITE(LU_POP,'(1X,1P8E16.7)')(FLUX_MEAN(I),I=1,ND)
+	    WRITE(LU_POP,'(A)')' Planck Mean Opacity'
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(PLANCK_MEAN(I),I=1,ND)
 !
 ! Compute the ion population at each depth.                          
 ! These are required when evaluation the occupation probabilities.
@@ -4326,11 +4407,11 @@
 	    END IF
 	  ELSE IF(XRAYS .AND. MAXCH .LT. 100.0D0 .AND. .NOT. ADD_XRAYS_SLOWLY)THEN
 !
-! We do not do the scaling if there is significant intrinsic X-ray emission from the star.
+! We do not do the scaling if there is intrinsic X-ray emssion from the star.
 ! DESIRED_XRAY_LUM should be in units of LSTAR.
 !
 	    IF(OBS_XRAY_LUM_0P1 .LT. SUM(XRAY_LUM_0P1) .AND. SCALE_XRAY_LUM)THEN
-	      IF( ABS(LUM*DESIRED_XRAY_LUM/OBS_XRAY_LUM_0P1-1.0D0) .GT. ALLOWED_XRAY_FLUX_ERROR)THEN
+	      IF( (LUM*DESIRED_XRAY_LUM/OBS_XRAY_LUM_0P1-1.0D0) .GT. ALLOWED_XRAY_FLUX_ERROR)THEN
 	        T1=SQRT(LUM*DESIRED_XRAY_LUM/OBS_XRAY_LUM_0P1)
 	        IF(T1 .GT. 10.0D0)T1=10.0D0
 	        IF(T1 .LT. 0.1D0)T1=0.1D0
@@ -4346,11 +4427,11 @@
 	  IF(INCL_ADVECTION .AND. ADVEC_RELAX_PARAM .LT. 1.0D0 .AND. MAXCH .LT. 100)THEN
 	    COMPUTE_BA=.TRUE.
 	    ADVEC_RELAX_PARAM=MIN(1.0D0,ADVEC_RELAX_PARAM*2.0D0)
-	    WRITE(LUER,*)'Have adjusted advection relaxation parameter to:',ADVEC_RELAX_PARAM
+	    WRITE(LUER,*)'Have adjuseted advection relaxation parameter to:',ADVEC_RELAX_PARAM
 	    MAXCH=100
 	  END IF
 !
-! Adjust non-thermal decay energy scale factor. This is option is useful when adding non-thermal ionizations
+! Adjust non-thermal decay energy scale factor. This is option is useful when adding non-thermal ioizations
 ! to a thermal model. During the convergence process we typically increase DEC_NRG_SCL_FAC by a factor of 10.
 ! If only 2 iterations were done, befores changing, we increase it by a factor of 100.
 !

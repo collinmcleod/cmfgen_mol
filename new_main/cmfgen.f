@@ -12,6 +12,8 @@
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
+! Altered 15-Jul-2019 (osiris - added ATM(ID)%dWCRXzVdT allocation).
+!                        Incoprated IBIS -- 17-Aug-2019.
 ! Icorporated 02-Jun-2014: Changes to allow depth dependent profiles.
 ! Altered: 29-Nov-2011: Memory allocation for OLD_LEV_POP_AVAIL added.
 ! Altered: 25-Sep-2011: ION_ID now set for last ioization stage (LAST_ION).
@@ -522,6 +524,7 @@
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%WSXzV(NS,ND,NPHOT_MAX),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%WCRXzV(NS,ND,NPHOT_MAX),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%dWSXzVdT(NS,ND,NPHOT_MAX),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%dWCRXzVdT(NS,ND,NPHOT_MAX),STAT=IOS)
 !
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%WSE_X_XzV(NS,ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%WCR_X_XzV(NS,ND),STAT=IOS)

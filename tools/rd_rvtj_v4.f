@@ -1,0 +1,150 @@
+!
+! Set of two routines to READ in desriptor populations.
+! The Hydrogen and Helium populations aren now READ in from their
+! own file.
+!
+	SUBROUTINE RD_RVTJ_PARAMS_V4(RMDOT,LUM,ABUNDH,TIME,NAME_CONV,
+	1                  ND,NC,NP,FORMAT_DATE,FILNAME,LUIN)
+	IMPLICIT NONE
+!
+! Altered 16-Aug-2019 : Changed to V4 (to maintain consistency with other routine in this file).
+! Altered 15-Jun-2000 : Naming convention inserted.
+!
+	INTEGER ND,NC,NP,LUIN
+	REAL*8 RMDOT,LUM,ABUNDH
+	CHARACTER(LEN=*) TIME,FILNAME,NAME_CONV
+	CHARACTER(LEN=*) FORMAT_DATE
+!
+	INTEGER ERROR_LU
+	EXTERNAL ERROR_LU
+!
+! Local Variables
+!
+	CHARACTER*11 LOC_FORMAT_DATE,PRODATE
+	INTEGER NCF
+	LOGICAL RD_FIX_T
+!
+	OPEN(UNIT=LUIN,FILE=FILNAME,STATUS='OLD',ACTION='READ')
+!
+	LOC_FORMAT_DATE='08-JAN-1996'
+	READ(LUIN,'(T30,A11)')FORMAT_DATE
+	CALL SET_CASE_UP(FORMAT_DATE,0,0)
+	IF(   TRIM(FORMAT_DATE) .NE. '15-JUN-2000' .AND.
+	1     TRIM(FORMAT_DATE) .NE. '10-NOV-2009' .AND.
+	1                      TRIM(FORMAT_DATE) .NE. LOC_FORMAT_DATE)THEN
+	  WRITE(ERROR_LU(),*)'Wrong format date : RVTJ read failure'
+	  WRITE(ERROR_LU(),*)'Subroutine called is RD_ASC_RVTJ_V4'
+	  WRITE(ERROR_LU(),*)'Subroutine date 1 is: ',LOC_FORMAT_DATE
+	  WRITE(ERROR_LU(),*)'Subroutine date 2 is: ','15-JUN-2000'
+	  WRITE(ERROR_LU(),*)'Subroutine date 3 is: ','10-NOV-2009'
+	  WRITE(ERROR_LU(),*)'File format date is: ',FORMAT_DATE
+	  STOP
+	END IF
+	READ(LUIN,'(T30,A20)')TIME
+	READ(LUIN,'(T30,A11)')PRODATE
+	READ(LUIN,'(T30,BN,BZ,I5)')ND
+	READ(LUIN,'(T30,BN,BZ,I5)')NC
+	READ(LUIN,'(T30,BN,I5)')NP
+	READ(LUIN,'(T30,BN,I5)')NCF
+!
+	READ(LUIN,'(T30,1PE12.5)')RMDOT
+	READ(LUIN,'(T30,1PE12.5)')LUM
+	READ(LUIN,'(T30,1PE12.5)')ABUNDH
+	READ(LUIN,'(T30,L1)')RD_FIX_T
+	IF(FORMAT_DATE .EQ. '15-JUN-2000' .OR. FORMAT_DATE .EQ. '10-NOV-2009')THEN
+	   READ(LUIN,'(T30,A)')NAME_CONV
+	ELSE
+	   NAME_CONV='X_FOR_I'
+	END IF
+!
+	RETURN
+	END
+!
+! 
+!
+! This routine reads in the vecors, and returns the number of HI levels.
+!
+	SUBROUTINE RD_RVTJ_VEC_V4(R,V,SIGMA,ED,T,
+	1       TGREY,dE_RAD_DECAY,
+	1       ROSS_MEAN,FLUX_MEAN,PLANCK_MEAN,
+	1       POP_ATOM,POP_ION,
+	1       MASS_DENSITY,CLUMP_FAC,FORMAT_DATE,
+	1       ND,LUIN)
+	IMPLICIT NONE
+!
+!Altered 16-Aug-2019 - changed to V4. PLANCK_MEAN added to call.
+!
+	INTEGER ND
+	REAL*8 R(ND),V(ND),SIGMA(ND),ED(ND)
+	REAL*8 T(ND)
+	REAL*8 TGREY(ND),dE_RAD_DECAY(ND)
+	REAL*8 POP_ATOM(ND),POP_ION(ND)
+	REAL*8 MASS_DENSITY(ND),CLUMP_FAC(ND)
+	REAL*8 ROSS_MEAN(ND),FLUX_MEAN(ND),PLANCK_MEAN(ND)
+	CHARACTER(LEN=*) FORMAT_DATE
+!
+	INTEGER LUIN
+!
+! Local variables
+!
+	CHARACTER*80 STRING
+	INTEGER I
+!
+! At present, all vectors, are assumed to be output in same order.
+! Could be changed by using descriptor string if required. We perform
+! checks to confirm sequencing.
+!
+	CALL CHK_STRING(STRING,LUIN,'Radius','RD_RVTJ')
+	READ(LUIN,*)(R(I),I=1,ND)
+!
+	CALL CHK_STRING(STRING,LUIN,'Velocity','RD_RVTJ')
+	READ(LUIN,*)(V(I),I=1,ND)
+!
+	CALL CHK_STRING(STRING,LUIN,'dlnV/dlnr-1','RD_RVTJ')
+	READ(LUIN,*)(SIGMA(I),I=1,ND)
+!
+	CALL CHK_STRING(STRING,LUIN,'Electron','RD_RVTJ')
+	READ(LUIN,*)(ED(I),I=1,ND)
+!
+	CALL CHK_STRING(STRING,LUIN,'Temperature','RD_RVTJ')
+	READ(LUIN,*)(T(I),I=1,ND)
+!
+	READ(LUIN,'(A)')STRING
+	IF(INDEX(STRING,'Grey temperature') .NE. 0)THEN
+	  READ(LUIN,*)(TGREY(I),I=1,ND)
+	  CALL CHK_STRING(STRING,LUIN,'Heating: radioactive decay','RD_RVTJ')
+	  READ(LUIN,*)(dE_RAD_DECAY(I),I=1,ND)
+	ELSE
+	  TGREY(1:ND)=0.0D0
+	  dE_RAD_DECAY(1:ND)=0.0D0
+	END IF	
+!
+! In this routine, we skip over the continuum data.
+! In new RVTJ files this data is no longer present.
+!
+	DO WHILE( INDEX(STRING,'Rosseland Mean Opacity') .EQ. 0)
+	  READ(LUIN,'(A)')STRING
+	END DO
+	READ(LUIN,*)(ROSS_MEAN(I),I=1,ND)
+	CALL CHK_STRING(STRING,LUIN,'Flux Mean Opacity','RD_RVTJ')
+	READ(LUIN,*)(FLUX_MEAN(I),I=1,ND)
+!
+	READ(LUIN,'(A)')STRING
+	IF(INDEX(STRING,'Planck Mean Opacity')  .NE. 0)THEN
+	  READ(LUIN,*)(PLANCK_MEAN(I),I=1,ND)
+	ELSE
+	  PLANCK_MEAN=0.0D0
+	  BACKSPACE(LUIN)
+	END IF
+!
+	CALL CHK_STRING(STRING,LUIN,'Atom Density','RD_RVTJ')
+	READ(LUIN,*)(POP_ATOM(I),I=1,ND)
+	CALL CHK_STRING(STRING,LUIN,'Ion Density','RD_RVTJ')
+	READ(LUIN,*)(POP_ION(I),I=1,ND)
+	CALL CHK_STRING(STRING,LUIN,'Mass Density','RD_RVTJ')
+	READ(LUIN,*)(MASS_DENSITY(I),I=1,ND)
+	CALL CHK_STRING(STRING,LUIN,'Clumping Factor','RD_RVTJ')
+	READ(LUIN,*)(CLUMP_FAC(I),I=1,ND)
+!
+	RETURN
+	END

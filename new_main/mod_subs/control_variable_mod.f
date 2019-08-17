@@ -1,5 +1,7 @@
 	MODULE CONTROL_VARIABLE_MOD
 !
+! Altered : 14-Jul-2019 : R_PNT_SRCE, TEFF_PNT_SRCE, NC_PNT_SRCE, LOGICAL PNT_SRCE_MOD, USE_ELEC_HEAT_BAL (from osiris)
+!                            Added to ibis 14-Aug-2019
 ! Altered : 17-Oct-2016 : H_CHK_OPTION replaces CHECK_H_ON_J.
 ! Altered : 01-Sep-2016 : TIME_SEQ_NO changed from integer to real.
 ! Altered : 15-Jun-2016 : NT_ITERATION_COUNTER added to this routine so that it is accessible by CMFGEN_SUB.
@@ -209,6 +211,11 @@
 	REAL*8 MIN_FREQ_LEV_DIS		!Minimum frequency for lev dissolution.
 	LOGICAL RD_CONT_FREQ		!Read in cont. frequencies from file.
 	INTEGER FREQ_GRID_OPTION	!Which frequency grid
+!
+	REAL*8 R_PNT_SRCE
+	REAL*8 TEFF_PNT_SRCE
+	INTEGER NC_PNT_SRCE
+	LOGICAL PNT_SRCE_MOD
 !
 ! Used to describe the Doppler lines profile, which is currently assumed
 ! to be constant at all depths.
@@ -488,6 +495,7 @@
 	LOGICAL DO_SRCE_VAR_ONLY
 	LOGICAL FIX_ALL_SPECIES
 	LOGICAL SET_POPS_D2_EQ_D1
+	LOGICAL USE_ELEC_HEAT_BAL
 !
 	REAL*8 ADD_OPAC_SCL_FAC
  	LOGICAL ADD_ADDITIONAL_OPACITY

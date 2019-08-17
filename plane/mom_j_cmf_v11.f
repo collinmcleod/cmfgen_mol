@@ -45,6 +45,7 @@
 	REAL*8, ALLOCATABLE :: TC(:)
 	REAL*8, ALLOCATABLE :: Q(:)
 	REAL*8, ALLOCATABLE :: XM(:)
+	REAL*8, ALLOCATABLE :: XM_SAVE(:)
 	REAL*8, ALLOCATABLE :: SOURCE(:)
 	REAL*8, ALLOCATABLE :: VB(:)
 	REAL*8, ALLOCATABLE :: VC(:)
@@ -121,6 +122,7 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered: 11-Jun-2019 : Added PNT srce treatment.
 ! Altered: 17-Oct-2016 : Changed to V11: H_CHK_OPTION inserted into call.
 !                          Replaces H_ON_J_CHECK option.
 !                          Will allow greater flexibility in testing etc.
@@ -180,6 +182,7 @@
 	REAL*8  DELTA_R
 	INTEGER IT1,I,J,K
 	INTEGER IOS
+	INTEGER ICNT
 	LOGICAL NEW_R_GRID
 !
 !
@@ -237,6 +240,7 @@
 	  DEALLOCATE ( TC )
 	  DEALLOCATE ( Q )
 	  DEALLOCATE ( XM )
+	  DEALLOCATE ( XM_SAVE )
 	  DEALLOCATE ( SOURCE )
 	  DEALLOCATE ( VB )
 	  DEALLOCATE ( VC )
@@ -344,6 +348,7 @@
 	  IF(IOS .EQ. 0)ALLOCATE ( TC(ND),STAT=IOS )
 	  IF(IOS .EQ. 0)ALLOCATE ( Q(ND),STAT=IOS )
 	  IF(IOS .EQ. 0)ALLOCATE ( XM(ND),STAT=IOS )
+	  IF(IOS .EQ. 0)ALLOCATE ( XM_SAVE(ND),STAT=IOS )
 	  IF(IOS .EQ. 0)ALLOCATE ( SOURCE(ND),STAT=IOS )
 	  IF(IOS .EQ. 0)ALLOCATE ( VB(ND),STAT=IOS )
 	  IF(IOS .EQ. 0)ALLOCATE ( VC(ND),STAT=IOS )
@@ -598,6 +603,9 @@
 	IF(INNER_BND_METH .EQ. 'DIFFUSION')THEN
 	  TB(ND)=K_ON_J(ND)/DTAU(ND-1)
 	  XM(ND)=DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
+	ELSE IF(INNER_BND_METH .EQ. 'PNT_SRCE')THEN
+	  TB(ND)=K_ON_J(ND)/DTAU(ND-1)
+	  XM(ND)=HNU_AT_IB*R(ND)*R(ND)
 	ELSE IF(INNER_BND_METH .EQ. 'ZERO_FLUX')THEN
 	  TB(ND)=K_ON_J(ND)/DTAU(ND-1)
 	  XM(ND)=IB_STAB_FACTOR*TB(ND)*R(ND)*R(ND)*(JPLUS_IB+JMIN_IB)
@@ -660,7 +668,32 @@
 !
 ! Solve for the radiation field along ray for this frequency.
 !
+	XM_SAVE=XM
 	CALL THOMAS(TA,TB,TC,XM,ND,1)
+!
+	IF(MINVAL(XM) .LE. -1.0D+20)THEN   !0.0D0)THEN
+	  DO I=2,ND-1
+	    ICNT=0
+	    T1=1.0D0
+	    IF(XM(I) .LE. 0.0D0 .AND. XM_SAVE(I) .LE. 0.0D0)THEN
+              T1=T1*0.5D0
+	      IF(N_TYPE .EQ. 'G_ONLY')THEN
+	        XM(I)=DTAUONQ(I)*SOURCE(I)*R(I)*R(I) + PSIPREV(I)*RSQJNU_PREV(I) +
+	1                T1*(VB(I)*RSQHNU_PREV(I-1) + VC(I)*RSQHNU_PREV(I))
+	      ELSE
+	        XM(I)=DTAUONQ(I)*SOURCE(I)*R(I)*R(I) + PSIPREV(I)*RSQJNU_PREV(I) +
+	1                  T1*( VB(I)*RSQHNU_PREV(I-1) + VC(I)*RSQHNU_PREV(I)
+	1            - EPS_PREV(I-1)*(RSQJNU_PREV(I-1)+RSQJNU_PREV(I))
+	1          + EPS_PREV(I)*(RSQJNU_PREV(I)+RSQJNU_PREV(I+1)) )
+	      END IF
+	      ICNT=ICNT+1
+	    ELSE
+	      XM(I)=XM_SAVE(I)
+	    END IF
+	  END DO
+	  XM(1)=XM_SAVE(1); XM(ND)=XM_SAVE(ND)
+	  CALL SIMPTH(TA,TB,TC,XM,ND,1)
+	END IF
 !
 ! Check that no negative mean intensities have been computed.
 !
@@ -682,6 +715,7 @@
 	    IF(.NOT. VERBOSE)THEN
 	      WRITE(47,'(I5,ES16.8,12ES13.4)')I,FREQ,XM(I),ETA(I),CHI(I),ESEC(I),K_ON_J(I),
 	1                         NMID_ON_J(I),NMID_ON_HMID(I),XM(MAX(1,I-2):MIN(I+2,ND))
+	      WRITE(47,'(T112,5ES13.4)')XM_SAVE(MAX(1,I-2):MIN(I+2,ND))
 	    END IF
 	    XM(I)=ABS(XM(I))/10.0D0
 	    IF(.NOT. RECORDED_ERROR)THEN

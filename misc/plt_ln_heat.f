@@ -33,7 +33,8 @@
 	REAL*8, ALLOCATABLE :: SE_NOSCL(:,:)
 	CHARACTER(LEN=120), ALLOCATABLE ::  TRANS_INFO(:)
 !
-	REAL*8 T1
+	REAL*8 T1,T2
+	REAL*8 CUR_SUM
 	INTEGER ND
 	INTEGER N_LINES
 	INTEGER COUNT
@@ -108,6 +109,7 @@
 	WRITE(6,'(A)')' Reading data -- this may take a while'
 	WRITE(6,'(A)')DEF_PEN
 	COUNT=0
+	CALL TUNE(1,'READ')
 	DO ML=1,N_LINES
 	  STRING=' '
 	  DO WHILE(STRING .EQ. ' ')
@@ -149,6 +151,9 @@
 	  END IF
 	END DO
 5000	CONTINUE
+	CALL TUNE(2,'READ')
+	CALL TUNE(3,'TERMINAL')
+
 	N_LINES=COUNT
 	WRITE(6,'(A)')BLUE_PEN
 	WRITE(6,*)'Number of lines read is',N_LINES 
@@ -225,8 +230,9 @@
 !
 	    IDEPTH=ND
 	    CALL GEN_IN(IDEPTH,'Depth for plotting')
-	    SUMD=0.0D0; SPEC=' '
+	    SUMD=0.0D0; SPEC(1:NS_MAX)=' '
 !
+	    NSPEC=0
 	    DO ML=1,N_LINES
 	      Y(ML)=LH(IDEPTH,ML)*(1.0D0-SCALE_FAC(ML))
 	      I=INDEX(NAME(ML),'(')
@@ -254,7 +260,6 @@
 	      WRITE(27,'(A)')' '
 	      DO I=1,NSPEC
 	        J=INDX(I)
-	        IF(SPEC(J) .EQ. ' ')EXIT
 	        WRITE(27,'(A10,ES14.4)')TRIM(SPEC(J)),SUMD(J)
 	      END DO
 !
@@ -268,15 +273,24 @@
 	        WRITE(27,'(A)')' '
 	        WRITE(27,'(A,2X,I4)')' Lines with cooling (+ve) / heating (-ve) contributions'
 	        WRITE(27,'(A)')' '
-	        WRITE(27,'(1X,A,T71,A,2X,A,4X,A)')'Transition','Lam(A)','Frac. Contr.','Scale Fac.'
+	        WRITE(27,'(1X,A,T71,A,2X,A,6X,A,4X,A)')'Transition','Lam(A)','Frac. Contr.','Cur. Sum','Scale Fac.'
 	        WRITE(27,'(A)')' '
 	        T1=SUM(SUMD)
-	        DO I=1,29
+	        CUR_SUM=0.0D0
+	        DO I=N_LINES,N_LINES-29,-1
 	          J=INDX(I)
-	          WRITE(27,'(1X,A60,ES16.6,ES14.3,ES14.5)')NAME(J),LAM(J),LH(IDEPTH,J)*(1.0D0-SCALE_FAC(J))/T1,SCALE_FAC(J)
+	          T2=LH(IDEPTH,J)*(1.0D0-SCALE_FAC(J))/T1
+	          CUR_SUM=CUR_SUM+T2
+	          WRITE(27,'(1X,A60,ES16.6,2ES14.3,ES14.5)')NAME(J),LAM(J), LH(IDEPTH,J)*(1.0D0-SCALE_FAC(J))/T1,CUR_SUM,SCALE_FAC(J)
 	        END DO
 	      END IF
 	    CLOSE(UNIT=27)
+!
+	  ELSE IF(UC(PLT_OPT) .EQ. 'SF')THEN
+	    CALL GEN_IN(K,'Depth for plotting')
+	    Y(1:N_LINES)=SCALE_FAC(1:N_LINES)-1.0D0
+	    CALL DP_CURVE(N_LINES,XV,Y)
+	    YLABEL='SF-1.0'
 !
 	  ELSE IF(UC(PLT_OPT) .EQ. 'IDI')THEN
 	    CALL GEN_IN(I,'Line index on plot')

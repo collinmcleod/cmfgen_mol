@@ -1,5 +1,6 @@
 	MODULE MOD_DISP
 !
+! Altered 16-Aug-2019 : Added PLACK_MEAN
 ! Altered 12-Jun-2015 : NION_MAX increased to 21. Added MI (cur_hmi,19-Aug-2015)
 ! Altered 13-May-2015 : Inserted ARAD, GAM2, GAM4 and OBSERVED_LEVEL in MODEL_ATOM_DATA.
 ! Altered 28-Mar-2003 : NUM_IONS variable installed.
@@ -71,6 +72,7 @@ C
 !
 	REAL*8, ALLOCATABLE :: ROSS_MEAN(:)
 	REAL*8, ALLOCATABLE :: FLUX_MEAN(:)
+	REAL*8, ALLOCATABLE :: PLANCK_MEAN(:)
 	REAL*8, ALLOCATABLE :: POP_ATOM(:)
 	REAL*8, ALLOCATABLE :: MASS_DENSITY(:)
 	REAL*8, ALLOCATABLE :: CLUMP_FAC(:)

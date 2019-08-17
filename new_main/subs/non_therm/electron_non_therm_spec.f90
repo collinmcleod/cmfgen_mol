@@ -621,9 +621,11 @@
 !
 	IF(DO_LOC_CHK)THEN
 	  WRITE(LU_TH,'(/,X,A,/)')'Summary of energy channels'
-	  WRITE(LU_TH,'(4(5X,A))'),' dE(ELEC)/E','  dE(ION)/E','  dE(EXC)/E','dE(TOTAL)/E'
+	  WRITE(LU_TH,'(A,14X,A,2X,A,4(5X,A))')'Depth','R(I)','V(I)[km/s]', &
+	                 ' dE(ELEC)/E','  dE(ION)/E','  dE(EXC)/E','dE(TOTAL)/E'
 	  DO I=1,ND
-	    WRITE(LU_TH,'(4ES16.6)')FRAC_ELEC_HEATING(I),FRAC_ION_HEATING(I),FRAC_EXCITE_HEATING(I), &
+	    WRITE(LU_TH,'(I5,ES18.8,ES12.4,4ES16.6)')I,R(I),V(I),  &
+	    FRAC_ELEC_HEATING(I),FRAC_ION_HEATING(I),FRAC_EXCITE_HEATING(I), &
 	    FRAC_ELEC_HEATING(I)+FRAC_ION_HEATING(I)+FRAC_EXCITE_HEATING(I)
 	  END DO
 	END IF

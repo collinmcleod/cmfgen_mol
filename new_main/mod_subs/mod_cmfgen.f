@@ -6,6 +6,7 @@
 !
 	MODULE MOD_CMFGEN
 !
+! Altered 17-Aug-2019 : Put on IBIS -- added dWCRXzVd 12-Jul-2019 (cur_cmf_eb)
 ! Altered 19-Aug-2015 : Added HMI, MAX_IONS_PER_SPECIES increased to 21 (cur_hmi,12-Jun-2015)
 ! Incoprated 02-Jan-2015: VTURB_VEC, ARAD, GAM2, etc added (for depth depndent profiles).
 ! Altered 29-Nov-2011 : OLD_LEV_POP_AVAIL added as vector.
@@ -119,6 +120,7 @@
 	  REAL*8, ALLOCATABLE :: WSXzV(:,:,:)		!Weights assoc. with s.e. eval.
 	  REAL*8, ALLOCATABLE :: WCRXzV(:,:,:)		!Weights assoc. with cooling.
 	  REAL*8, ALLOCATABLE :: dWSXzVdT(:,:,:)	!Weights assoc. with d(S.E. Eqn)/dT
+	  REAL*8, ALLOCATABLE :: dWCRXzVdT(:,:,:)	!Weights assoc. with d(EHB)/dT
 	  REAL*8, ALLOCATABLE :: WSE_X_XzV(:,:)		!X-ray photoionization weights.
 	  REAL*8, ALLOCATABLE :: WCR_X_XzV(:,:)		!
 !

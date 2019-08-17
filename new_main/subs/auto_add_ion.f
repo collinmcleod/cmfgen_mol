@@ -8,7 +8,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
-! Aletere: 12-Aug-2019 - Better error reporting.
+! Aleterd: 12-Aug-2019 - Better error reporting.
 ! Altered: 20-May-2019 - Can do entire species
 !
 	INTEGER ISPEC

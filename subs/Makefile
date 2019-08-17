@@ -24,7 +24,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(colcool_sl_v3.o)\
       $(LIB)(comp_j_conv_v2.o)\
       $(LIB)(comp_obs_v2.o)\
-      $(LIB)(comp_var_jrec.o)\
+      $(LIB)(comp_var_jrec_v2.o)\
       $(LIB)(det_main_cont_freq.o)\
       $(LIB)(dop_pro.o)\
       $(LIB)(do_sl_ls_split.o)\
@@ -80,6 +80,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(hyper.o)\
       $(LIB)(ichrlen.o)\
       $(LIB)(impar.o)\
+      $(LIB)(impar_with_pnt_srce.o)\
       $(LIB)(indexx.o)\
       $(LIB)(init_temp_v2.o)\
       $(LIB)(ins_line_obs_v2.o)\

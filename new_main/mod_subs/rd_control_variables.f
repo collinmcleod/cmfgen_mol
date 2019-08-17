@@ -3,6 +3,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 14-Jul-2019 : R_PNT_SRCE, TEFF_PNT_SRCE, NC_PNT_SRCE, LOGICAL PNT_SRCE_MOD, USE_ELEC_HEAT_BAL (from osiris)
+!                            Added to ibis 14-Aug-2019
 ! Altered : 26-Apr-2019 : Added        J_CHK_OPTION (CHK_J)     - Done earlier on OSIRIS.
 !                               AUTO_ADD_ION_STAGES (AUTO_ADD)
 !                                  AUTO_SMOOTH_POPS (AUTO_SMOOTH)
@@ -188,6 +190,17 @@ C
 	    CALL RD_STORE_DBLE(RMDOT,'MDOT',L_TRUE,'Mass Loss rate (Msun/yr) ')
 	  END IF
 	  CALL RD_STORE_DBLE(LUM,'LSTAR',L_TRUE,'Stellar luminosity (Lsun)')
+!
+	  NC_PNT_SRCE=0.0D0
+	  R_PNT_SRCE=0.0D0
+	  TEFF_PNT_SRCE=0.0D0
+	  PNT_SRCE_MOD=.FALSE.
+	  CALL RD_STORE_LOG(PNT_SRCE_MOD,'PNT_SRCE',L_FALSE,'Include point source with hollow shell')
+	  IF(PNT_SRCE_MOD)THEN
+	    CALL RD_STORE_DBLE(R_PNT_SRCE,'R_PNT',L_TRUE,'Radius of point source in Rsun')
+	    CALL RD_STORE_DBLE(TEFF_PNT_SRCE,'TEFF_PNT',L_TRUE,'Effective T of point source in 10^4K')
+	    NC_PNT_SRCE=2
+	  END IF
 !
 ! TEFF and LOGG only need to be present if DO_HYDRO is TRUE. Values will still be read
 ! in when available if DO_HYDRO is FALSE. 
@@ -916,7 +929,11 @@ C
 	1            'Add additional pacity to help converge model?')
 	  CALL RD_STORE_DBLE(ADD_OPAC_SCL_FAC,'OP_SCL_FAC',ADD_ADDITIONAL_OPACITY,
 	1            'Scale factor for addition of extra opacity')
-C
+!
+	  USE_ELEC_HEAT_BAL=.FALSE.
+	  CALL RD_STORE_LOG(USE_ELEC_HEAT_BAL,'USE_EHB',L_FALSE,
+	1            'Use electron heating/cooling balance as T constraint?')
+!
 	  CALL RD_STORE_NCHAR(METH_SOL,'SOL_METH',ISIX,L_TRUE,
 	1            'Which Method To solve Matrix Equations'//
 	1            ' DIAG, TRI, PEN, GSIT or MIN')
