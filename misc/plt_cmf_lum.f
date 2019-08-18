@@ -19,6 +19,8 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 08-Ayg-2018 -- Fixed offsef in RAD_DECAY, ADI, DJDT, MECH -- single point.
+!                            Values are zero at outer boundary.
 ! Altered: 19-Apr-2016 -- Added plot of dT/T and conserved L on same plot.
 !                            Large dT/T (i.e., > 0.1) are a major reason
 !                            why the "conserved" luminosity is not conserved.
@@ -233,7 +235,11 @@
 	CALL DP_CURVE(ND,XAXIS,DJDT)
 	CALL DP_CURVE(ND,XAXIS,RAD_DECAY)
 	CALL GRAMON_PGPLOT(XLABEL,'\gDL(L\d'//char(09)//'\u)',' ',' ')
-!
+
+	MECH(2:ND)=MECH(1:ND-1); MECH(1)=0.0D0
+	DJDT(2:ND)=DJDT(1:ND-1); DJDT(1)=0.0D0
+	ADI(2:ND)=ADI(1:ND-1); ADI(1)=0.0D0
+	RAD_DECAY(2:ND)=RAD_DECAY(1:ND); RAD_DECAY(1)=0.0D0
 	DO I=2,ND
 	  MECH(I)=MECH(I)+MECH(I-1)
 	  DJDT(I)=DJDT(I)+DJDT(I-1)

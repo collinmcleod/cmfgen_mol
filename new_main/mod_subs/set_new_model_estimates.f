@@ -33,6 +33,8 @@
 	USE LINE_MOD
 	IMPLICIT NONE
 !
+! Altered 18-Aug-2019 : Added option 'TR for DC_INTERP_METHOD (initially done on ESTRAVEN).
+!                          Added option validity check for DC_INTERP_METHOD.
 ! Altered 26-Apr-2019 : Added "CALL AUTO_ADD_ION" (done earlier on OSIRIS).
 !                       Added RSP as a DC_INTERP_METHOD 
 ! Altered 31-Jan-2016 : Added SAVED_TWO_PHOT_METHOD.
@@ -294,7 +296,7 @@
 	      END IF
 	    END DO
 !
-	  ELSE IF(DC_INTERP_METHOD .EQ. 'R')THEN
+	  ELSE IF(DC_INTERP_METHOD .EQ. 'R' .OR. DC_INTERP_METHOD .EQ. 'TR')THEN
 !
 ! We use TA for ED and TB for T since ED and T have already been set.
 !
@@ -305,7 +307,7 @@
 	        ISPEC=SPECIES_LNK(ID)
 	        CALL REGRID_LOG_DC_V1( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,CLUMP_FAC,
 	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
-	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,'R',TMP_STRING)
+	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,DC_INTERP_METHOD,TMP_STRING)
 	      END IF
 	    END DO
 !
@@ -323,6 +325,10 @@
 	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,'RTX',TMP_STRING)
 	      END IF
 	    END DO
+	  ELSE
+	    WRITE(LUER,*)'DC_INTERP_METHOD (keyword=DC_METH) is not recognized in SET_NEW_MODEL_ESTIMATES'
+	    WRITE(LUER,*)'DC_METH=',TRIM(DC_INTERP_METHOD)
+	    STOP
 	  END IF
 !
 	END IF				!if(grid)

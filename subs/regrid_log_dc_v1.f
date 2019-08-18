@@ -7,6 +7,11 @@
 	1               POPATOM,N,ND,LU_IN,INTERP_OPTION,FILE_NAME)
 	IMPLICIT NONE
 !
+! Altered 18-Aug-2019 - Added TR option. Designed to interpolate DC's in T in the inner region, and
+!                           in T/R in the outer region (where it it is assumed T has not changed).
+!                           In the inner region, T will be monotonic. The aim is to get reduce changes
+!                              in high ionization species in the outer regions
+!                              where the DC's are a very strong function of T.
 ! Altered 18-Jan-2014 - Fixed minor bug -- needed ABS when checkikng equality of R(1) and OLD_R(1).
 ! Altered 16-Oct-2012 - Added BA_TX_CONV and NO_TX_CONV.
 ! Altered: 18-Nov-2011: Big fix. Not all DPOP was being set and this could cause a crash
@@ -58,8 +63,11 @@
 !
 	REAL*8 T_EXCITE,FX,DELTA_T
 	REAL*8 T1,T2
+	REAL*8 TMAX,TMIN
 	REAL*8 RTAU1,RTAU1_OLD
 !
+	INTEGER, PARAMETER :: IONE=1
+	INTEGER JMIN,JINT
 	INTEGER I,J,K
 	INTEGER NZ,NOLD,NDOLD
 	INTEGER NX,NX_ST,NX_END
@@ -162,7 +170,7 @@
 !
 	NX_ST=1
 	NX_END=ND
-	IF(INTERP_OPTION .EQ. 'R')THEN
+	IF(INTERP_OPTION .EQ. 'R' .OR. INTERP_OPTION .EQ. 'TR')THEN
 	  IF(DABS(OLD_R(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
 	    IF(FIRST)THEN
 	      WRITE(LUWARN,*)'Warning - core radius not identical in REGRID_LOG_DC_V1'
@@ -185,7 +193,9 @@
 	    WRITE(LUER,*)'Reset OLD_R(1) in REGRID_T_ED but now OLD_R(2) .GE. OLD_R(1))'
 	    STOP
 	  END IF
+	END IF
 !
+	IF(INTERP_OPTION .EQ. 'R')THEN
 	  OLD_X=LOG(OLD_R)
 	  NEW_X=LOG(R)
 	  DO WHILE(R(NX_ST) .GT. OLD_R(1))
@@ -233,7 +243,9 @@
 !
 	ELSE IF(INTERP_OPTION .EQ. 'ED')THEN
 	  OLD_X=LOG(OLD_ED*OLD_CLUMP_FAC)
-	  NEW_X=LOG(ED)
+	  NEW_X=LOG(ED) 
+	  CALL WRITV(NEW_X,ND,'ED new',6)
+	  CALL WRITV(OLD_X,NDOLD,'ED old',6)
           DO WHILE (NEW_X(NX_ST) .LT. OLD_X(1))
             NX_ST=NX_ST+1
           END DO
@@ -242,7 +254,59 @@
             NX_END=NX_END-1
           END DO
           NX=NX_END-NX_ST+1
+!
+	ELSE IF(INTERP_OPTION .EQ. 'TR')THEN
+!
+	  WRITE(6,*)'Starting T5 option'; FLUSH(UNIT=6)
+	  TMIN=MINVAL(OLD_T)
+	  TMAX=MAXVAL(OLD_T)
+	  JINT=MINLOC(OLD_T,IONE)
+	  OLD_DI=LOG(OLD_DI)
+	  DO I=1,ND
+	    IF(T(I) .LT. OLD_T(1))THEN
+	       DHEN(1:NZ,I)=DPOP(1:NZ,1)
+	    ELSE
+	      JINT=0	    
+	      DO J=1,NDOLD-1
+	        IF( (T(I)-OLD_T(J))*(OLD_T(J+1)-T(I)) .GE. 0)THEN
+	          IF(JINT .EQ. 0)THEN
+	            JINT=J
+	          ELSE
+	            IF( ABS(R(I)/OLD_R(J)-1.0D0) .LT.  ABS(R(I)/OLD_R(JINT)-1.0D0))JINT=J
+	          END IF
+	        END IF
+	      END DO
+	      IF(JINT .EQ. 0 .AND. T(I) .GE. TMAX)THEN
+	          WRITE(6,'(A,2I5,4E16.6)')'A',I,JINT,T(I),TMIN,TMAX
+	          FLUSH(UNIT=6)
+	          DHEN(1:NZ,I)=DPOP(1:NZ,NDOLD)
+	          DI(I)=EXP(OLD_DI(NDOLD))
+	      ELSE IF(JINT .EQ. 0 .AND. T(I) .LE. TMIN)THEN 
+	          WRITE(6,'(A,2I5,4E16.6)')'B',I,JINT,T(I),TMIN,TMAX
+	          FLUSH(UNIT=6)
+	          DHEN(1:NZ,I)=DPOP(1:NZ,JMIN)
+	          DI(I)=EXP(OLD_DI(JMIN))
+	      ELSE IF(JINT .EQ. 0)THEN
+	          WRITE(6,'(A,2I5,4E16.6)')'C',I,JINT,T(I),TMIN,TMAX
+	          FLUSH(UNIT=6)
+	      ELSE
+	        WRITE(6,'(2I5,3E16.6)')I,JINT,T(I),OLD_T(JINT),OLD_T(JINT+1)
+	        T1=(T(I)-OLD_T(JINT))/(OLD_T(JINT+1)-OLD_T(JINT))
+	        DO K=1,NZ
+	           DHEN(K,I)=T1*DPOP(K,JINT+1)+(1.0D0-T1)*DPOP(K,JINT)
+	        END DO
+	        DI(I)=EXP(T1*OLD_DI(JINT+1)+(1.0D0-T1)*OLD_DI(JINT))
+	      END IF
+	    END IF
+	  END DO
+	  WRITE(6,*)'Done interp'; FLUSH(UNIT=6)
+	  GOTO 1000
+!
 	ELSE IF(INTERP_OPTION .EQ. 'SPH_TAU')THEN
+!
+	  DO I=1,ND
+	    WRITE(6,'(I5,2ES14.4)')I,OLD_ED(I)*OLD_CLUMP_FAC(I),ED(I)
+	  END DO
 !
 ! Determine radius at which optical depth is unity. We use NEW_ED as a
 ! temporary vector for ED*CLUMP_FAC.
@@ -281,7 +345,7 @@
             OLD_TAU(I)=OLD_TAU(I-1)+6.65D-15*(OLD_ED(I-1)+OLD_ED(I))*(OLD_R(I-1)-OLD_R(I))*0.5D0
             IF(OLD_TAU(I) .LE. 1.0D0)K=I
           END DO
-	  IF(K .EQ. 1 .OR. K .EQ. ND)THEN
+	  IF(K .EQ. 1 .OR. K .EQ. NDOLD)THEN
 	    LUER=ERROR_LU()
             WRITE(LUER,*)'Error computing RTAU1_OLD in REGRID_LOG_DC_V1'
           END IF
@@ -297,6 +361,11 @@
           DO I=2,NDOLD
             OLD_TAU(I)=OLD_TAU(I-1)+6.65D-15*(OLD_ED(I-1)+OLD_ED(I))*(OLD_R(I-1)-OLD_R(I))*0.5D0
           END DO
+!
+	  WRITE(6,*)RTAU1,RTAU1_OLD
+	  DO I=1,NDOLD
+	    WRITE(6,'(I5,4ES14.4)')I,OLD_TAU(I),TAU(I),OLD_ED(I),NEW_ED(I)
+	  END DO
 !
 ! Detrmine whether new mesh extends beyond oldmesh.
 ! NX is used to define the region over which we may use a linear
@@ -354,6 +423,9 @@
 	      DPOP(I,J)=DLOG(T_EXCITE)
 	    END DO
 	  END DO
+	ELSE
+	  WRITE(6,*)'Interp option not recognized:',TRIM(INTERP_OPTION)
+	  STOP
 	END IF
 !
 	IF(INTERP_OPTION .EQ. 'RSP')THEN
@@ -416,6 +488,8 @@
 	    DHEN(J,I)=DHEN(J,NX_END)
 	  END DO
 	END DO
+!
+1000	CONTINUE
 !
 ! Compute departure coefficients for N>NZ. These levels are set to have these
 ! same excitation temperature as the highest level.

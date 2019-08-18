@@ -117,6 +117,10 @@ C
 	  END IF
 	  IF(FIRST_TOO_MANY)THEN
 	    WRITE (LUOUT,'(A)')' ***** TOO MANY TUNING POINTS '
+	    WRITE (LUOUT,'(A)')' Current TUNE points follow:'
+	    DO I=1,NUM_IDS
+	      WRITE(6,'(A)')TRIM(IDLIST(I))
+	    END DO
 	    FIRST_TOO_MANY=.FALSE.
 	  END IF
 	  RETURN

@@ -82,7 +82,7 @@ C
 	DO ML=0,M-1,10
 	  MF=ML+10
 	  IF(MF .GT. M)MF=M
-	  WRITE(LU,'()')
+	  IF(ML .EQ. 0 .OR. N .GT. 1)WRITE(LU,'()')
 	  DO I=1,N
 	    WRITE(LU,FORM)I,MS,(A(I,J),J=MS,MF)
 	  END DO
