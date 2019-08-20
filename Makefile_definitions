@@ -19,6 +19,10 @@ ifeq ($(HOST),ibis.phyast.pitt.edu)
 INSTALL_DIR=/Users/jdh/cur_cmf/
 endif
 
+ifeq ($(HOST),osiris-inode01.phyast.pitt.edu)
+INSTALL_DIR=$(HOME)/cur_cmf/
+endif
+
 ifeq ($(HOST),lorikeet.phyast.pitt.edu)
 INSTALL_DIR=/export/home/jdh/cur_cmf/
 endif
