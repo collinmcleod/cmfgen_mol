@@ -152,12 +152,7 @@ $(FN5) : lib5
 # We now MAKE the required libraries.
 
 lib1:
-	(cd ../tools; make)
 	(cd ../subs; make )
-	(cd ../unix; make )
-	(cd ../stark; make )
-	(cd ../newsubs; make )
-	(cd ../new_main/subs; make )
 
 lib2:
 	(cd ../pgplt; make )

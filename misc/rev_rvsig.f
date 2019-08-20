@@ -1,3 +1,19 @@
+	MODULE VEL_LAW_PARAMS
+	INTEGER VEL_TYPE
+	INTEGER TRANS_I
+	REAL*8 R_TRANS,V_TRANS
+	REAL*8 dVdR_TRANS
+	REAL*8 VINF,BETA
+	REAL*8 BETA2
+	REAL*8 VEXT
+	REAL*8 RP2
+	REAL*8 SCALE_HEIGHT
+	REAL*8 RO
+	REAL*8 dVdR
+	REAL*8 ALPHA
+	END MODULE VEL_LAW_PARAMS
+!
+CONTAINS
 !
 ! Program to modify RVSIG_COL. Various options are available.
 ! Ideal for revising grid etc.
@@ -5,8 +21,12 @@
 	PROGRAM REVISE_RVSIG
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
+	USE VEL_LAW_PARAMS
 	IMPLICIT NONE
 !
+! Altered 19-Aug-2019: Added VEL_LAW_PARAMS, and the two subroutines.
+!                        Done to make velocity law calculation for SCLR
+!                        and MDOT full consistent. 
 ! Altered 10-Jun-2019: Changed to allow reding of density and clumping fator (necessary, for variable MDOT, 
 !                        and point source models. 
 ! Altered 05-Mar-2018: Added option to make a plane-parallel models out of an RVSIG_COL
@@ -57,31 +77,17 @@
 	REAL*8 RX
 	REAL*8 NEW_RSTAR
 	REAL*8 T1,T2,T3
-	REAL*8 BETA
-	REAL*8 RP2
-	REAL*8 VEXT
-	REAL*8 BETA2
-	REAL*8 VINF
 	REAL*8 FAC
 	REAL*8 V_MAX
 	REAL*8 V_MIN 
 !
 	REAL*4 XVAL,YVAL
-	REAL*8 R_TRANS
-	REAL*8 V_TRANS
-	REAL*8 dVdR_TRANS
-	REAL*8 SCALE_HEIGHT
-	REAL*8 RO
-	REAL*8 dVdR
 	REAL*8 MDOT
 	REAL*8 OLD_MDOT
 	REAL*8 LSTAR
 	REAL*8 OLD_LSTAR
 	REAL*8 TOP,BOT 
 	REAL*8 dTOPdR,dBOTdR 
-	REAL*8 ALPHA
-	INTEGER TRANS_I
-	INTEGER VEL_TYPE
 !
 	REAL*8 V_CON,V_RAT_MAX,IB_RAT,OB_RAT,DTAU2_ON_DTAU1
 	INTEGER N_IB_INS,N_OB_INS
@@ -702,12 +708,7 @@
 	  WRITE(6,'(A,ES14.4)')'New luminosity if Teff is to be preserved',T1
 	  WRITE(6,*)DEF_PEN
 !
-	  WRITE(6,'(A)')
-	  WRITE(6,'(A)')'Type 1: W(r).V(r) = Vinf*(1-rx/r)**BETA'
-	  WRITE(6,'(A)')'        with W(r) = 1.0D0+exp( (r(t)-r)/h )'
-	  WRITE(6,'(A)')'Type 2: W(r).V(r) = 2V(t) + (Vinf-2V(t))*(1-r(t)/r))**BETA'
-	  WRITE(6,'(A)')'        with W(r) = 1.0D0+exp( (r(t)-r)/h )'
-	  WRITE(6,'(A)')
+	  CALL DESCRIBE_VEL_LAWS()
 !
 	  VEL_TYPE=1
 	  CALL GEN_IN(VEL_TYPE,'Velocity law to be used: 1 or 2')
@@ -750,79 +751,9 @@
 	  R_TRANS=R(TRANS_I)
 	  dVdR_TRANS=(SIGMA(TRANS_I)+1.0D0)*V_TRANS/R_TRANS
 !
-	  IF(VEL_TYPE .EQ. 1)THEN
-	    RO = R_TRANS * (1.0D0 - (2.0D0*V_TRANS/VINF)**(1.0D0/BETA) )
-	    T1= R_TRANS * dVdR_TRANS / V_TRANS
-	    SCALE_HEIGHT =  0.5D0*R_TRANS / (T1 - BETA*RO/(R_TRANS-RO) )
-! 
-	    WRITE(6,*)'  Transition radius is',R_TRANS
-	    WRITE(6,*)'Transition velocity is',V_TRANS
-	    WRITE(6,*)'                 R0 is',RO
-	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
+! Now compute the velocity law beyond the sonic point.
 !
-	    DO I=1,TRANS_I-1
-              T1=RO/R(I)
-              T2=1.0D0-T1
-              TOP = VINF* (T2**BETA)
-              BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
-              V(I) = TOP/BOT
-                                                                                
-!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
-                                                                                
-              dTOPdR = VINF * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
-              dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT )  / SCALE_HEIGHT
-              dVdR = dTOPdR / BOT  + V(I)*dBOTdR/BOT
-              SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
-	    END DO
-	  ELSE IF(VEL_TYPE .EQ. 2)THEN
-	    SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
-	    WRITE(6,*)'  Transition radius is',R_TRANS
-	    WRITE(6,*)'Transition velocity is',V_TRANS
-	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
-	    DO I=1,TRANS_I-1
-	      T1=R_TRANS/R(I)
-	      T2=1.0D0-T1
-	      TOP = 2.0D0*V_TRANS + (VINF-2.0D0*V_TRANS) * T2**BETA
-	      BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
-	      V(I) = TOP/BOT
-                                                                                
-!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
-                                                                                
-	      dTOPdR = (VINF - 2.0D0*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
-	      dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
-	      dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
-              SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
-	    END DO
-	  ELSE IF(VEL_TYPE .EQ. 3 .OR. VEL_TYPE .EQ. 4)THEN
-	    BETA2=BETA
-	    CALL GEN_IN(BETA2,'Beta2 for velocity law')
-!
-	    SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
-	    WRITE(6,*)'  Transition radius is',R_TRANS
-	    WRITE(6,*)'Transition velocity is',V_TRANS
-	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
-	    ALPHA=2.0D0
-	    IF(VEL_TYPE .EQ. 4)ALPHA=3.0D0
-	    CALL GEN_IN(BETA2,'Beta2 for velocity law')
-	    DO I=1,TRANS_I-1
-	      T1=R_TRANS/R(I)
-	      T2=1.0D0-T1
-	      T3=BETA+(BETA2-BETA)*T2
-	      TOP = (VINF-ALPHA*V_TRANS) * T2**T3
-	      BOT = 1.0D0 + (ALPHA-1.0D0)*exp( (R_TRANS-R(I))/SCALE_HEIGHT )
-
-!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
-
-	      dTOPdR = (VINF - ALPHA*V_TRANS) * BETA * T1 / R(I) * T2**(T3-1.0D0) +
-	1                  T1*TOP*(BETA2-BETA)*(1.0D0+LOG(T2))/R(I)
-	      dBOTdR=  (ALPHA-1.0D0)*exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
-!
-	      TOP = ALPHA*V_TRANS + TOP
-	      dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
-	      V(I) = TOP/BOT
-              SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
-	    END DO
-	  END IF
+	  CALL CALCULATE_VEL(R,V,SIGMA,ND)
 !
 	ELSE IF(OPTION .EQ. 'MDOT')THEN
 !
@@ -837,30 +768,7 @@
 	  WRITE(6,*)' If decreasing Mdot, you may need to enter a smaller number,'
 	  WRITE(6,*)' since as you decrease Mdot, the extent of the photosphere increase'
 !
-	  WRITE(6,'(A)')RED_PEN
-	  WRITE(6,'(A)')'Type 1: W(r).V(r) with'
-	  WRITE(6,'(A)')'            W(r) = VINF*(1-rt/r)**BETA'
-	  WRITE(6,'(A)')'        and V(r) = 1.0D0+exp( (rt-r)/h )'
-	  WRITE(6,'(A)')BLUE_PEN
-	  WRITE(6,'(A)')'Type 2: W(r).V(r) with'
-	  WRITE(6,'(A)')'            W(r) = 2*VTRANS + (VINF-2*VTRANS)*(1-rt/r)**BETA'
-	  WRITE(6,'(A)')'        and V(r) = 1.0D0+exp( (rt-r)/h )'
-	  WRITE(6,'(A)')RED_PEN
-	  WRITE(6,'(A)')'Type 3: W(r).V(r) with'
-          WRITE(6,'(A)')'              X  = 1-rt/r'
-	  WRITE(6,'(A)')'            W(r) = 2*VTRANS + (VINF-2*VTRANS)*X**[BETA+(BETA2-BETA)*X]'
-	  WRITE(6,'(A)')'        and V(r) = 1.0D0+exp( (rt-r)/h )'
-	  WRITE(6,'(A)')BLUE_PEN
-	  WRITE(6,'(A)')'Type 4: W(r).V(r) with'
-          WRITE(6,'(A)')'              X  = 1-rt/r'
-	  WRITE(6,'(A)')'            W(r) = 3*VTRANS + (VINF-2*VTRANS)*X**[BETA+(BETA2-BETA)*X]'
-	  WRITE(6,'(A)')'        and V(r) = 1.0D0+exp( (rt-r)/h )'
-	  WRITE(6,'(A)')RED_PEN
-	  WRITE(6,'(A)')'Type 5: (W(r)+E(r))/V(r) with'
-	  WRITE(6,'(A)')'            W(r) = 2*VTRANS + (VINF-2*VTRANS)*(1-rt/r)**BETA'
-	  WRITE(6,'(A)')'            E(r)= VEXT*(1-RP2/r)**BETA2 '
-	  WRITE(6,'(A)')'        and V(r) = 1.0D0+2*exp( (rt-r)/h )'
-	  WRITE(6,'(A)')DEF_PEN
+	  CALL DESCRIBE_VEL_LAWS()
 !
 	  VEL_TYPE=2
 	  CALL GEN_IN(VEL_TYPE,'Velocity law to be used: 1, 2, 3, 4 or 5')
@@ -896,109 +804,7 @@
 	  V_TRANS=MDOT*V_TRANS/OLD_MDOT
 	  dVdR_TRANS=(SIGMA(TRANS_I)+1.0D0)*V_TRANS/R_TRANS
 !
-	  IF(VEL_TYPE .EQ. 1)THEN
-	    RO = R_TRANS * (1.0D0 - (2.0D0*V_TRANS/VINF)**(1.0D0/BETA) )
-	    T1= R_TRANS * dVdR_TRANS / V_TRANS
-	    SCALE_HEIGHT =  0.5D0*R_TRANS / (T1 - BETA*RO/(R_TRANS-RO) )
-! 
-	    WRITE(6,*)'  Transition radius is',R_TRANS
-	    WRITE(6,*)'Transition velocity is',V_TRANS
-	    WRITE(6,*)'                 R0 is',RO
-	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
-!
-	    DO I=1,TRANS_I-1
-              T1=RO/R(I)
-              T2=1.0D0-T1
-              TOP = VINF* (T2**BETA)
-              BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
-              V(I) = TOP/BOT
-                                                                                
-!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
-                                                                                
-              dTOPdR = VINF * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
-              dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT )  / SCALE_HEIGHT
-              dVdR = dTOPdR / BOT  + V(I)*dBOTdR/BOT
-              SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
-	    END DO
-	  ELSE IF(VEL_TYPE .EQ. 2)THEN
-	    SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
-	    WRITE(6,*)'  Transition radius is',R_TRANS
-	    WRITE(6,*)'Transition velocity is',V_TRANS
-	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
-	    DO I=1,TRANS_I-1
-	      T1=R_TRANS/R(I)
-	      T2=1.0D0-T1
-	      TOP = 2.0D0*V_TRANS + (VINF-2.0D0*V_TRANS) * T2**BETA
-	      BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
-	      V(I) = TOP/BOT
-                                                                                
-!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
-                                                                                
-	      dTOPdR = (VINF - 2.0D0*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
-	      dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
-	      dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
-              SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
-	    END DO
-	  ELSE IF(VEL_TYPE .EQ. 3 .OR. VEL_TYPE .EQ. 4)THEN
-!
-	    SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
-	    WRITE(6,*)'  Transition radius is',R_TRANS
-	    WRITE(6,*)'Transition velocity is',V_TRANS
-	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
-	    ALPHA=2.0D0
-	    IF(VEL_TYPE .EQ. 4)ALPHA=3.0D0
-	    CALL GEN_IN(BETA2,'Beta2 for velocity law')
-	    DO I=1,TRANS_I-1
-	      T1=R_TRANS/R(I)
-	      T2=1.0D0-T1
-	      T3=BETA+(BETA2-BETA)*T2
-	      TOP = (VINF-ALPHA*V_TRANS) * T2**T3
-	      BOT = 1.0D0 + (ALPHA-1.0D0)*exp( (R_TRANS-R(I))/SCALE_HEIGHT )
-
-!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
-
-	      dTOPdR = (VINF - ALPHA*V_TRANS) * BETA * T1 / R(I) * T2**(T3-1.0D0) +
-	1                  T1*TOP*(BETA2-BETA)*(1.0D0+LOG(T2))/R(I)
-	      dBOTdR=  (ALPHA-1.0D0)*exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
-!
-	      TOP = ALPHA*V_TRANS + TOP
-	      dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
-	      V(I) = TOP/BOT
-              SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
-	    END DO
-	  ELSE IF(VEL_TYPE .EQ. 5)THEN
-	    BETA2=BETA; VEXT=0.1D0*VINF; RP2=2.0D0
-	    CALL GEN_IN(VEXT,'Additonal V component (add to VINF)- VEXT')
-	    CALL GEN_IN(BETA2,'Beta2 for velocity law')
-	    CALL GEN_IN(RP2,'RP2 for velocity law (in terms of R(ND)')
-	    RP2=RP2*R(ND)
-	    SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
-	    WRITE(6,*)'  '
-	    WRITE(6,*)'  Transition radius is',R_TRANS
-	    WRITE(6,*)'Transition velocity is',V_TRANS
-	    WRITE(6,*)'       Scale height is',SCALE_HEIGHT
-	    WRITE(6,*)'  '
-	    DO I=1,TRANS_I-1
-	      T1=R_TRANS/R(I)
-	      T2=1.0D0-T1
-	      TOP = 2.0D0*V_TRANS + (VINF-2.0D0*V_TRANS) * T2**BETA
-	      BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
-              IF(RP2/R(I) .LT. 1.0D0)THEN
-                 TOP=TOP+ VEXT*(1.0D0-RP2/R(I))**BETA2
-                 dTOPdR=(RP2/R(I)/R(I))*BETA2*VEXT*(1.0D0-RP2/R(I))**(BETA2-1)
-              ELSE
-                 dTOPdR=0.0D0
-	      END IF
-	      V(I) = TOP/BOT
-                                                                                
-!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
-                                                                                
-	      dTOPdR = dTOPdR + (VINF - 2.0D0*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
-	      dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
-	      dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
-              SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
-	    END DO
-	  END IF
+	  CALL CALCULATE_VEL(R,V,SIGMA,ND)
 !
 	ELSE IF(OPTION .EQ. 'STOP')THEN
 !
@@ -1229,4 +1035,164 @@
 	CALL GRAMON_PGPLOT('R/R\d*\u','SIGMA',' ',' ')
 !
 	STOP
+	END
+!
+CONTAINS
+	SUBROUTINE DESCRIBE_VEL_LAWS()	
+	USE MOD_COLOR_PEN_DEF
+!
+	WRITE(6,'(A)')RED_PEN
+	WRITE(6,'(A)')'Type 1: W(r).V(r) with'
+	WRITE(6,'(A)')'            W(r) = VINF*(1-rt/r)**BETA'
+	WRITE(6,'(A)')'        and V(r) = 1.0D0+exp( (rt-r)/h )'
+	WRITE(6,'(A)')BLUE_PEN
+	WRITE(6,'(A)')'Type 2: W(r).V(r) with'
+	WRITE(6,'(A)')'            W(r) = 2*VTRANS + (VINF-2*VTRANS)*(1-rt/r)**BETA'
+	WRITE(6,'(A)')'        and V(r) = 1.0D0+exp( (rt-r)/h )'
+	WRITE(6,'(A)')RED_PEN
+	WRITE(6,'(A)')'Type 3: W(r).V(r) with'
+        WRITE(6,'(A)')'              X  = 1-rt/r'
+	WRITE(6,'(A)')'            W(r) = 2*VTRANS + (VINF-2*VTRANS)*X**[BETA+(BETA2-BETA)*X]'
+	WRITE(6,'(A)')'        and V(r) = 1.0D0+exp( (rt-r)/h )'
+	WRITE(6,'(A)')BLUE_PEN
+	WRITE(6,'(A)')'Type 4: W(r).V(r) with'
+        WRITE(6,'(A)')'              X  = 1-rt/r'
+	WRITE(6,'(A)')'            W(r) = 3*VTRANS + (VINF-2*VTRANS)*X**[BETA+(BETA2-BETA)*X]'
+	WRITE(6,'(A)')'        and V(r) = 1.0D0+exp( (rt-r)/h )'
+	WRITE(6,'(A)')RED_PEN
+	WRITE(6,'(A)')'Type 5: (W(r)+E(r))/V(r) with'
+	WRITE(6,'(A)')'            W(r) = 2*VTRANS + (VINF-2*VTRANS)*(1-rt/r)**BETA'
+	WRITE(6,'(A)')'            E(r)= VEXT*(1-RP2/r)**BETA2 '
+	WRITE(6,'(A)')'        and V(r) = 1.0D0+2*exp( (rt-r)/h )'
+	WRITE(6,'(A)')DEF_PEN
+!
+	RETURN
+	END
+
+	SUBROUTINE CALCULATE_VEL(R,V,SIGMA,ND)
+	USE VEL_LAW_PARAMS
+	USE GEN_IN_INTERFACE
+	IMPLICIT NONE
+!
+	INTEGER ND
+	REAL*8 R(ND)
+	REAL*8 V(ND)
+	REAL*8 SIGMA(ND)
+!
+	REAL*8 T1,T2,T3
+	REAL*8 TOP,BOT
+	REAL*8 dTOPdR,dBOTdR
+!
+	INTEGER I
+	INTEGER V_TYPE
+!
+	IF(VEL_TYPE .EQ. 1)THEN
+	  RO = R_TRANS * (1.0D0 - (2.0D0*V_TRANS/VINF)**(1.0D0/BETA) )
+	  T1= R_TRANS * dVdR_TRANS / V_TRANS
+	  SCALE_HEIGHT =  0.5D0*R_TRANS / (T1 - BETA*RO/(R_TRANS-RO) )
+! 
+	  WRITE(6,*)'  Transition radius is',R_TRANS
+	  WRITE(6,*)'Transition velocity is',V_TRANS
+	  WRITE(6,*)'                 R0 is',RO
+	  WRITE(6,*)'       Scale height is',SCALE_HEIGHT
+!
+	  DO I=1,TRANS_I-1
+            T1=RO/R(I)
+            T2=1.0D0-T1
+            TOP = VINF* (T2**BETA)
+            BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
+            V(I) = TOP/BOT
+                                                                                
+!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
+                                                                                
+            dTOPdR = VINF * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
+            dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT )  / SCALE_HEIGHT
+            dVdR = dTOPdR / BOT  + V(I)*dBOTdR/BOT
+            SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
+	  END DO
+!
+	ELSE IF(VEL_TYPE .EQ. 2)THEN
+	  SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
+	  WRITE(6,*)'  Transition radius is',R_TRANS
+	  WRITE(6,*)'Transition velocity is',V_TRANS
+	  WRITE(6,*)'       Scale height is',SCALE_HEIGHT
+	  DO I=1,TRANS_I-1
+	    T1=R_TRANS/R(I)
+	    T2=1.0D0-T1
+	    TOP = 2.0D0*V_TRANS + (VINF-2.0D0*V_TRANS) * T2**BETA
+	    BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
+	    V(I) = TOP/BOT
+                                                                                
+!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
+                                                                                
+	    dTOPdR = (VINF - 2.0D0*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
+	    dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
+	    dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
+            SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
+	  END DO
+!
+	ELSE IF(VEL_TYPE .EQ. 3 .OR. VEL_TYPE .EQ. 4)THEN
+	  SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
+	  WRITE(6,*)'  Transition radius is',R_TRANS
+	  WRITE(6,*)'Transition velocity is',V_TRANS
+	  WRITE(6,*)'       Scale height is',SCALE_HEIGHT
+	  ALPHA=2.0D0
+	  IF(VEL_TYPE .EQ. 4)ALPHA=3.0D0
+	  CALL GEN_IN(BETA2,'Beta2 for velocity law')
+	  DO I=1,TRANS_I-1
+	    T1=R_TRANS/R(I)
+	    T2=1.0D0-T1
+	    T3=BETA+(BETA2-BETA)*T2
+	    TOP = (VINF-ALPHA*V_TRANS) * T2**T3
+	    BOT = 1.0D0 + (ALPHA-1.0D0)*exp( (R_TRANS-R(I))/SCALE_HEIGHT )
+
+!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
+
+	    dTOPdR = (VINF - ALPHA*V_TRANS) * BETA * T1 / R(I) * T2**(T3-1.0D0) +
+	1                  T1*TOP*(BETA2-BETA)*(1.0D0+LOG(T2))/R(I)
+	    dBOTdR=  (ALPHA-1.0D0)*exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
+!
+	    TOP = ALPHA*V_TRANS + TOP
+	    dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
+	    V(I) = TOP/BOT
+            SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
+	  END DO
+!
+	ELSE IF(VEL_TYPE .EQ. 5)THEN
+	  BETA2=BETA; VEXT=0.1D0*VINF; RP2=2.0D0
+	  CALL GEN_IN(VEXT,'Additonal V component (add to VINF)- VEXT')
+	  CALL GEN_IN(BETA2,'Beta2 for velocity law')
+	  CALL GEN_IN(RP2,'RP2 for velocity law (in terms of R(ND)')
+	  RP2=RP2*R(ND)
+	  SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
+	  WRITE(6,*)'  '
+	  WRITE(6,*)'  Transition radius is',R_TRANS
+	  WRITE(6,*)'Transition velocity is',V_TRANS
+	  WRITE(6,*)'       Scale height is',SCALE_HEIGHT
+	  WRITE(6,*)'  '
+	  DO I=1,TRANS_I-1
+	    T1=R_TRANS/R(I)
+	    T2=1.0D0-T1
+	    TOP = 2.0D0*V_TRANS + (VINF-2.0D0*V_TRANS) * T2**BETA
+	    BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
+            IF(RP2/R(I) .LT. 1.0D0)THEN
+               TOP=TOP+ VEXT*(1.0D0-RP2/R(I))**BETA2
+               dTOPdR=(RP2/R(I)/R(I))*BETA2*VEXT*(1.0D0-RP2/R(I))**(BETA2-1)
+            ELSE
+               dTOPdR=0.0D0
+	    END IF
+	    V(I) = TOP/BOT
+!
+!NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
+!
+	    dTOPdR = dTOPdR + (VINF - 2.0D0*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
+	    dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
+	    dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
+            SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
+	  END DO
+	ELSE
+	  WRITE(6,*)'Unrecognized veloity type: your type is',VEL_TYPE
+	END IF
+!
+	RETURN
 	END

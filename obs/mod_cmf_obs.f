@@ -6,6 +6,7 @@
 !
 	MODULE MOD_CMF_OBS
 !
+! Altered: 20-Aug-2019 : Added PLANCK_MEAN
 ! Altered: 17-Jan-2017 : Added CMFGEN_TGREY and dE_RAD_DECAY.
 ! Altered: 19-Aug-2015 : Added MI, Max number of ions increased to 21
 ! Altered: 18-May-2015 : Changed GAM2, GAM4 to C4 and C6 (quadratic and Van der Waals 
@@ -146,6 +147,7 @@
 !
 	REAL*8, ALLOCATABLE :: ROSS_MEAN(:)	!Rosseland mean opacity.
 	REAL*8, ALLOCATABLE :: FLUX_MEAN(:)	!Flux mean opacity
+	REAL*8, ALLOCATABLE :: PLANCK_MEAN(:)	!Flux mean opacity
 	REAL*8, ALLOCATABLE :: POP_ATOM(:)	!Total atom density (#/cm^3)
 	REAL*8, ALLOCATABLE :: DENSITY(:)	!Mass density (gm/cm^3)
 	REAL*8, ALLOCATABLE :: CLUMP_FAC(:)	!Volume filling factor for clumps

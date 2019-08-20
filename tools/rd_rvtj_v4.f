@@ -31,12 +31,14 @@
 	CALL SET_CASE_UP(FORMAT_DATE,0,0)
 	IF(   TRIM(FORMAT_DATE) .NE. '15-JUN-2000' .AND.
 	1     TRIM(FORMAT_DATE) .NE. '10-NOV-2009' .AND.
+	1     TRIM(FORMAT_DATE) .NE. '15-AUG-2019' .AND.
 	1                      TRIM(FORMAT_DATE) .NE. LOC_FORMAT_DATE)THEN
 	  WRITE(ERROR_LU(),*)'Wrong format date : RVTJ read failure'
 	  WRITE(ERROR_LU(),*)'Subroutine called is RD_ASC_RVTJ_V4'
 	  WRITE(ERROR_LU(),*)'Subroutine date 1 is: ',LOC_FORMAT_DATE
 	  WRITE(ERROR_LU(),*)'Subroutine date 2 is: ','15-JUN-2000'
 	  WRITE(ERROR_LU(),*)'Subroutine date 3 is: ','10-NOV-2009'
+	  WRITE(ERROR_LU(),*)'Subroutine date 3 is: ','15-Aug-2019'
 	  WRITE(ERROR_LU(),*)'File format date is: ',FORMAT_DATE
 	  STOP
 	END IF
@@ -51,7 +53,9 @@
 	READ(LUIN,'(T30,1PE12.5)')LUM
 	READ(LUIN,'(T30,1PE12.5)')ABUNDH
 	READ(LUIN,'(T30,L1)')RD_FIX_T
-	IF(FORMAT_DATE .EQ. '15-JUN-2000' .OR. FORMAT_DATE .EQ. '10-NOV-2009')THEN
+	IF(FORMAT_DATE .EQ. '15-JUN-2000' 
+	1   .OR. FORMAT_DATE .EQ. '10-NOV-2009'
+	1   .OR. FORMAT_DATE .EQ. '15-AUG-2019')THEN
 	   READ(LUIN,'(T30,A)')NAME_CONV
 	ELSE
 	   NAME_CONV='X_FOR_I'

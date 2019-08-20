@@ -384,6 +384,9 @@
 !
 	  OLD_X=LOG(OLD_TAU)
 	  NEW_X=LOG(TAU)
+	ELSE
+	  WRITE(6,*)'Interp option not recognized:',TRIM(INTERP_OPTION)
+	  STOP
 	END IF
 !
 ! Interpolate the ion density.
@@ -423,9 +426,6 @@
 	      DPOP(I,J)=DLOG(T_EXCITE)
 	    END DO
 	  END DO
-	ELSE
-	  WRITE(6,*)'Interp option not recognized:',TRIM(INTERP_OPTION)
-	  STOP
 	END IF
 !
 	IF(INTERP_OPTION .EQ. 'RSP')THEN

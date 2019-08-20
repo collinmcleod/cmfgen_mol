@@ -1,6 +1,8 @@
 !
 ! Subroutine to increment the EHB variation matrix BA due to the variation 
-! of J associated with free-free radiation..
+! of J associated with free-free radiation and level populations.
+!
+! The variation equation is not updated for LAMBDA iterations.
 !
 ! BA_T_PAR_EHB is used for the diagonal variation only. It is updated on each call
 ! rather than BA to improve numerical stability. BA_PAR should contain terms

@@ -74,7 +74,6 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(sub_guess_dc.o)\
       $(LIB)(sum_steq_sol.o)\
       $(LIB)(tst_rd_seq.o)\
-      $(LIB)(var_free_free_v1.o)\
       $(LIB)(var_op_v10.o)\
       $(LIB)(var_x_opa_eta_v4.o)\
       $(LIB)(vehb_byj_v1.o)\
@@ -157,10 +156,6 @@ $(LIB)(update_ba_for_line.o) : update_ba_for_line.f $(UP_MODS)
 	ar ruv $(LIB) update_ba_for_line.o
 
 $(LIB)(var_op_v10.o) : var_op_v10.f $(DIS)
-	$(F90) -c $(OPTION)  var_op_v10.f
-	ar ruv $(LIB) var_op_v10.o
-
-$(LIB)(var_free_free_v1.o) : var_free_free_v1.f $(DIS)
 	$(F90) -c $(OPTION)  var_op_v10.f
 	ar ruv $(LIB) var_op_v10.o
 

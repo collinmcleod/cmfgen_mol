@@ -2425,9 +2425,11 @@
 	  END IF
 !
 ! 
-	  CALL BA_EHB_BF_UPDATE_V1(VJ,ETA,CHI,POPS,RJ,
+	  IF(USE_ELEC_HEAT_BAL .AND. COMPUTE_BA .AND. .NOT. LAMBDA_ITERATION)THEN
+	    CALL BA_EHB_BF_UPDATE_V1(VJ,ETA,CHI,POPS,RJ,
 	1              FL,FQW(ML),COMPUTE_NEW_CROSS,FINAL_CONSTANT_CROSS,DO_SRCE_VAR_ONLY,
 	1              NION,NT,NUM_BNDS,ND,IONE,ND)
+	  END IF
 !
 ! Modify the BA matrix for terms in the statistical equilibrium
 ! equations which are multiplied by RJ. NB. This is not for the
@@ -2692,14 +2694,14 @@
 !
 ! Needs revising.
 !
-	IF(ML .EQ. 1)WRITE(6,*)'Free-fee correction may need revising'
+	IF(ML .EQ. 1)WRITE(6,*)'Free-free correction may need revising'
 	CALL  COMP_FREE_FREE_V1(CHI,ETA,VCHI,VETA,CONT_FREQ,FL,COMPUTE_BA,ND,NT)
 	T1=1.0D-10*16.0D0*ATAN(1.0D0)*FQW(ML)	
 	DO I=1,ND
 	   STEQ_T_EHB(I)=STEQ_T_EHB(I)+T1*(CHI(I)*RJ(I)-ETA(I))
 	END DO
 !
-	IF(COMPUTE_BA)THEN
+	IF(USE_ELEC_HEAT_BAL .AND. COMPUTE_BA .AND. .NOT. LAMBDA_ITERATION)THEN
 	  CALL BA_EHB_FF_UPDATE_V1(VJ,VCHI,VETA,
 	1              ETA,CHI,T,POPS,RJ,
 	1              FQW(ML),COMPUTE_NEW_CROSS,FINAL_CONSTANT_CROSS,DO_SRCE_VAR_ONLY,
@@ -4167,7 +4169,7 @@
 	  CALL DATE_TIME(TIME)
 !
 	  CALL GEN_ASCI_OPEN(LU_POP,'RVTJ','UNKNOWN',' ',' ',IZERO,IOS)
-	    FORMAT_DATE='15-Aug-2-2019'
+	    FORMAT_DATE='15-Aug-2019'
 	    WRITE(LU_POP,'(1X,A,T30,A)')'Output format date:',FORMAT_DATE
 	    WRITE(LU_POP,'(1X,A,T30,A)')'Completion of Model:',TIME
 	    WRITE(LU_POP,'(1X,A,T30,A)')'Program Date:',PRODATE

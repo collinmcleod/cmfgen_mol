@@ -115,4 +115,4 @@ out2in
 
 echo "You may need to delete the GREY_SCL_FAC_IN file since grey scaling may not work."
 
-rm -f GREY_SCL_FAC_IN
+#rm -f GREY_SCL_FAC_IN
