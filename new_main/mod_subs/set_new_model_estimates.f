@@ -33,6 +33,7 @@
 	USE LINE_MOD
 	IMPLICIT NONE
 !
+! Altered 28-Aug-2019 : Compute T and ED before DC's when GRID=TRUE.
 ! Altered 18-Aug-2019 : Added option 'TR for DC_INTERP_METHOD (initially done on ESTRAVEN).
 !                          Added option validity check for DC_INTERP_METHOD.
 ! Altered 26-Apr-2019 : Added "CALL AUTO_ADD_ION" (done earlier on OSIRIS).
@@ -154,7 +155,12 @@
 	IF(GRID) THEN
 	  WRITE(LUER,'(/,A,/)')' Using direct interpolation option (i.e. GRID) for new model.'
 !
-	  IF(DC_INTERP_METHOD .EQ. 'RSP')CALL REGRID_T_ED(R,ED,T,POP_ATOM,ND,'T_IN')
+! Regrid the temperature and the electron density. By using this call the
+! last species can be taken from a different model to the H, He populations 
+! etc. Normally T_IN can be the same as He2_IN (i.e. any input departure
+! coefficient file). 
+!
+	  CALL REGRID_T_ED(R,ED,T,POP_ATOM,ND,'T_IN')
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      TMP_STRING=TRIM(ION_ID(ID))//'_IN'
@@ -164,14 +170,6 @@
 	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,DC_INTERP_METHOD,TMP_STRING)
 	    END IF
 	  END DO
-!
-! Regrid the temperature and the electron density. By using this call the
-! last species can be taken from a different model to the H, He populations 
-! etc. Normally T_IN can be the same as He2_IN (i.e. any input departure
-! coefficient file). 
-!
-	  CALL REGRID_T_ED(R,ED,T,POP_ATOM,ND,'T_IN')
-!
 !
 ! SPEC_DEN will contain the density of each species, while
 ! AT_NO_VEC will contain the the atomic number. These are set at all depths.

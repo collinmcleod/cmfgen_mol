@@ -257,14 +257,15 @@
 !
 	ELSE IF(INTERP_OPTION .EQ. 'TR')THEN
 !
-	  WRITE(6,*)'Starting T5 option'; FLUSH(UNIT=6)
+	  WRITE(6,*)'Starting TR option for '//TRIM(FILE_NAME); FLUSH(UNIT=6)
 	  TMIN=MINVAL(OLD_T)
 	  TMAX=MAXVAL(OLD_T)
-	  JINT=MINLOC(OLD_T,IONE)
+	  JMIN=MINLOC(OLD_T,IONE)
 	  OLD_DI=LOG(OLD_DI)
 	  DO I=1,ND
-	    IF(T(I) .LT. OLD_T(1))THEN
-	       DHEN(1:NZ,I)=DPOP(1:NZ,1)
+	    IF(T(I) .LT. TMIN)THEN
+	       DHEN(1:NZ,I)=DPOP(1:NZ,JMIN)
+	       DI(I)=EXP(OLD_DI(JMIN))
 	    ELSE
 	      JINT=0	    
 	      DO J=1,NDOLD-1
@@ -291,12 +292,19 @@
 	          FLUSH(UNIT=6)
 	      ELSE
 	        WRITE(6,'(2I5,3E16.6)')I,JINT,T(I),OLD_T(JINT),OLD_T(JINT+1)
-	        T1=(T(I)-OLD_T(JINT))/(OLD_T(JINT+1)-OLD_T(JINT))
+	        FLUSH(UNIT=6)
+	        T1= ABS(OLD_T(JINT+1)/OLD_T(JINT)-1.0D0)
+	        IF(T1 .GT. 1.0D-08)THEN
+	          T1=(T(I)-OLD_T(JINT))/(OLD_T(JINT+1)-OLD_T(JINT))
+	        ELSE
+	          T1=1.0D0
+	        END IF
 	        DO K=1,NZ
 	           DHEN(K,I)=T1*DPOP(K,JINT+1)+(1.0D0-T1)*DPOP(K,JINT)
 	        END DO
 	        DI(I)=EXP(T1*OLD_DI(JINT+1)+(1.0D0-T1)*OLD_DI(JINT))
 	      END IF
+	      WRITE(6,*)'Done ',I; FLUSH(UNIT=6)
 	    END IF
 	  END DO
 	  WRITE(6,*)'Done interp'; FLUSH(UNIT=6)
