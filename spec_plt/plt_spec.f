@@ -353,7 +353,7 @@ C
 	   END IF
 C
 C NB: We offer the option to use the central frequency to avoid
-C air/vacuum confusions. Model data is in vacuum wavelngths, which
+C air/vacuum confusions. Model data is in vacuum wavelengths, which
 C we use in plotting at all wavelngths.
 C
 	   IF(X_UNIT .EQ. 'MM/S' .OR. X_UNIT .EQ. 'KM/S')THEN

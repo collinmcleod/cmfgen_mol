@@ -252,6 +252,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(wr_x_info.o)\
       $(LIB)(wrcoolgen_v2.o)\
       $(LIB)(write_j_cmf_err.o)\
+      $(LIB)(write_out_ew.o)\
       $(LIB)(writedc.o)\
       $(LIB)(writedc_v2.o)\
       $(LIB)(writedc_v3.o)\

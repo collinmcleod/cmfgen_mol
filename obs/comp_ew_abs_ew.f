@@ -2,7 +2,7 @@
 ! Routine to compute the the EW of a line using formal solution of the 
 ! transfer equation using the differencing scheme of Mihalas, Kunasz, and Hummer 1975.
 !
-! It also computes the ABS_EW -- this is used to check whether a line
+! It also computes the FLUX_EW -- this is used to check whether a line
 ! has an ifluence on the spectrum. The EW is not, buy itself, always
 ! useful since a P CYgni profile can have an EW of 0. 
 !
@@ -17,12 +17,22 @@
 ! The THK_LINE, THK_CONT options may not work.
 !
 	SUBROUTINE COMP_EW_ABS_EW(ETA,CHI,ESEC,CHIL,ETAL,V,SIGMA,R,P,
-	1                  JCONT,EW,ABS_EW,EW_CUT,CONT_INT,JQW,HQW,
+	1                  JCONT,EW,FLUX_EW,EW_CUT,CONT_INT,JQW,HQW,
 	1                  PF,PROF,LFQW,WERFC,FL,TRANS_NAME,
 	1                  DIF,DBB,IC,AMASS,
 	1                  THK_LINE,THK_CONT,NLF,NC,NP,ND,METHOD)
 !
 	IMPLICIT NONE
+!
+! Alteerd 12-Sep-2019: Check whether the total opacity < 0. If it is we adjust
+!                         TCHI to make it positive. As the routine integrates 
+!                         over the source function, it does not hadle lasing.
+! Altered  6-Sep-2019: Now return FLUX_EW which if Int (ABS[F-F_c])/F_c dnu.
+!                        Emission xomponent to EW= (FLUX_EW+EW)/2
+!                        Absorption component to EW-(FLUX_EW-EW)/2
+!
+! Code assumes siherent scattering in the CMF. Not necessarily a good assumption
+! when Vinf << 500 km [Vth(es)].
 !
 	INTEGER NLF,NC,NP,ND
 	REAL*8 ETA(ND),CHI(ND),ESEC(ND),CHIL(ND),ETAL(ND)
@@ -34,6 +44,7 @@
 	REAL*8 DBB,IC,AMASS,FL
 	REAL*8 EW		!Returned: in Angstroms
 	REAL*8 ABS_EW   	!Returned: in Anstroms
+	REAL*8 FLUX_EW		!Anstroms
 	REAL*8 EW_CUT		!EW only roughly computed (no ES iteration).
 	REAL*8 CONT_INT		!Returned: in Jy.
 ! 
@@ -54,6 +65,8 @@
 	REAL*8 JNU(ND,NLF)
 	REAL*8 HNU(NLF)
 	REAL*8 OLD_JNU(ND,NLF)
+	REAL*8 FLUX_PROF(NLF)
+	REAL*8 OLD_ABS_EW
 	INTEGER NLF_PROF
 !
 ! Local variables.
@@ -61,7 +74,10 @@
 	INTEGER I,LS,ML,NI,NIEXT,IT
 	REAL*8 OLDCHI,T1
 	REAL*8 DBC,TOR,IBOUND,WERF_EXP
+	REAL*8, PARAMETER :: EW_ACC=0.005            !i.e., 0.5%
 	LOGICAL, SAVE :: FIRST=.TRUE.
+	LOGICAL EQUAL
+	EXTERNAL EQUAL
 !
 	FIRST=.FALSE.
 	IF(TRANS_NAME .EQ. 'Ca2(3p6_4p_2Po[3/2]-3p6_3d_2De[3/2])')THEN
@@ -86,6 +102,7 @@
 !	1               THK_CONT,DIF,DBB,IC,NC,ND,NP,METHOD)
 !	WRITE(118,'(A2,2X,2ES14.4,ES18.8)')'JN',JCONT(1),OLD_JCONT(1),FL
 !
+!
 ! Get consistent estimate of the continuum J.
 !
 	IF(METHOD .NE. 'ZERO')THEN
@@ -169,11 +186,12 @@
 	  IF(PROF(ML-1) .NE. 0.0D0 .AND. PROF(ML) .EQ. 0.0D0)EXIT
 	END DO
 !
+	OLD_ABS_EW=0.0D0
 	DO IT=1,10
 	  OLD_JNU=JNU
 	  JNU=0.0D0
 	  HNU=0.0D0
-	  EW=0.0D0; ABS_EW=0.0D0
+	  EW=0.0D0; ABS_EW=0.0D0; FLUX_PROF=0.0D0
 
 	  DO LS=1,MIN(NP,ND+NC-2)
 	    NI=ND-(LS-NC-1)
@@ -212,12 +230,14 @@
 ! 
 !
 ! Perform integration for each frequency in turn.
+! This section loops over frequencies covering the intrisic line profile.
 !
 	    OLDCHI=CHI(NI)
 	    DO ML=1,NLF_PROF
 	      T1=PROF(ML)
 	      DO I=1,NIEXT
 	        TCHI(I)=CHI(I)+CHIL(I)*T1
+	        IF(TCHI(I) .LT. 0.0D0)TCHI(I)=0.01D0*TCHI(I)
 	        SOURCE(I)=(ETA(I)+ETAL(I)*T1+ESEC(I)*OLD_JNU(I,ML))/TCHI(I)
 	      END DO
 	      CALL QKIM(Q,QH,GAM,GAMH,TCHI,PF,ML,NI,NLF)
@@ -269,6 +289,7 @@
 	      IF(ML .EQ. 1)CVCONT(1)=CV(1)
 	      EW=EW+(CV(1)-CVCONT(1))*HQW(1,LS)*LFQW(ML)
 	      ABS_EW=ABS_EW+ABS(CV(1)-CVCONT(1))*HQW(1,LS)*LFQW(ML)
+	      FLUX_PROF(ML)=FLUX_PROF(ML)+(CV(1)-CVCONT(1))*HQW(1,LS)
 !
 	      DO I=1,NI
 	        AVM1(I)=AV(I)
@@ -298,6 +319,8 @@
 	    IF(DIF .AND. LS .LE. NC)THEN
 	      DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI(ND)
 	    END IF
+!
+! We now intgerate over the rest of the lines profile.
 !
 	    DO ML=NLF_PROF+1,NLF
 	      DO I=1,NIEXT
@@ -345,6 +368,7 @@
 !
 	      EW=EW+(CV(1)-CVCONT(1))*HQW(1,LS)*LFQW(ML)
 	      ABS_EW=ABS_EW+ABS(CV(1)-CVCONT(1))*HQW(1,LS)*LFQW(ML)
+	      FLUX_PROF(ML)=FLUX_PROF(ML)+(CV(1)-CVCONT(1))*HQW(1,LS)
 	      OLDCHI=CHI(NI)
 	    END DO  		!End DO ML
 	  END DO		!End DO LS
@@ -357,10 +381,17 @@
           ABS_EW=2.99792458D-12*ABS_EW/HCONT(1)/FL/FL
           CONT_INT=13.19868D0*HCONT(1)*( (R(1)+R(2))**2 )/4.0D0
 	  IF(ABS_EW .LT. EW_CUT)EXIT
+	  IF( EQUAL(ABS_EW,OLD_ABS_EW,EW_ACC) )EXIT
 !
 	END DO			!IT
 !
-        WRITE(119,'(3ES14.6,F14.4,T70,A)')CONT_INT,EW,ABS_EW,2.99792458D+03/FL,TRIM(TRANS_NAME)
+	FLUX_EW=0.0D0
+	DO ML=1,NLF
+	  FLUX_EW=FLUX_EW+ABS(FLUX_PROF(ML))*LFQW(ML)
+	END DO
+        FLUX_EW=2.99792458D-12*FLUX_EW/HCONT(1)/FL/FL
+!	
+        WRITE(119,'(4ES14.6,F14.4,T75,A)')CONT_INT,EW,FLUX_EW,ABS_EW,2.99792458D+03/FL,TRIM(TRANS_NAME)
         FLUSH(UNIT=119)
 	IF( ABS(2.99792458D+03/FL-7774.0827D0) .LT. 0.0001)THEN
 	  DO ML=1,NLF

@@ -180,7 +180,7 @@
 	INTEGER SIM_INDX
 	INTEGER TMP_MAX_SIM
 	REAL*8 OVER_FREQ_DIF
-	REAL*8 EW
+	REAL*8 EW,ABS_EW
 	REAL*8 CONT_INT
 	LOGICAL OVERLAP
 	LOGICAL SOBOLEV
@@ -2106,8 +2106,6 @@
 ! Open file to store EW data
 !
 	CALL GEN_ASCI_OPEN(LU_EW,'EWDATA','UNKNOWN',' ',' ',IZERO,IOS)
-	WRITE(LU_EW,'(3X,A,2X,A,5X,A,5X,A,3(2X,A),4X,A)')'Lam(Ang)','C.Flux(Jy)',
-	1                  'EW(Ang)','L.Flux','Sob','  NL',' NUP','Trans. Name'
 !
 ! Zero the vector that will be used to store the force-multiplier computed
 ! for all lines using the SOBOLEV approximation.
@@ -2363,21 +2361,18 @@
 	1            FL,INNER_BND_METH,DBB,IC,THK_CONT,L_FALSE,NC,NP,ND,METHOD)
 	END IF
 !
-	IF(ABS(EW) .GE. EW_CUT_OFF)THEN
-	  T1=LAMVACAIR(FL_SIM(1)) 		!Wavelength(Angstroms)
+	IF(ABS(ABS_EW) .GE. EW_CUT_OFF)THEN
+	  T1=0.01D0*C_KMS/FL_SIM(1) 		!Wavelength(Angstroms)
 	  DO SIM_INDX=1,NUM_SIM_LINES
 	    J=SIM_LINE_POINTER(SIM_INDX)
 	    MNL=VEC_MNL_F(J)
 	    MNUP=VEC_MNUP_F(J)
-	    CALL EW_FORMAT_V2(EW_STRING,TRANS_NAME_SIM(SIM_INDX),T1,
-	1                     CONT_INT,EW,SOBOLEV,MNL,MNUP)
-	    IF(SIM_INDX .NE. 1)THEN
-	      I=INDEX(EW_STRING,'  ')
-	      EW_STRING(3:I+1)=EW_STRING(1:I-1)
-	      EW_STRING(2:3)='##'
+	    IF(SIM_INDX .EQ. 1)THEN
+	      EW_STRING=TRANS_NAME_SIM(SIM_INDX)	!Used for transition name
+	    ELSE
+	      EW_STRING='## '//TRIM(TRANS_NAME_SIM(SIM_INDX))
 	    END IF
-	    L=ICHRLEN(EW_STRING)
-	    WRITE(LU_EW,'(A)')EW_STRING(1:L)
+	    CALL WRITE_OUT_EW(EW_STRING,T1,CONT_INT,EW,ABS_EW,SOBOLEV,MNL,MNUP,LU_EW)
 	  END DO
 	END IF
 !

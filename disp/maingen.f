@@ -5272,6 +5272,12 @@ c
 	  CALL USR_OPTION(NAME,'Title',' ','Title for all graphs')
 	ELSE IF(XOPT .EQ. 'METHOD')THEN
 	  CALL USR_OPTION(METHOD,'LOGLOG',' ','Tau option (LOGLOG,LOGMON, ZERO')
+	  METHOD=UC(METHOD)
+	  IF(METHOD .NE. 'LOGLOG' .AND. METHOD .NE. 'LOGMON' .AND. METHOD .NE. 'ZERO')THEN
+	    WRITE(6,*)'Invalid value for METHOD -- valid options are ZERO, LOGMON, LOGLOG'
+	    WRITE(6,*)'Setting METHOD to ZERO'
+	    METHOD='ZERO'
+	  END IF
 !
 ! 
 !
