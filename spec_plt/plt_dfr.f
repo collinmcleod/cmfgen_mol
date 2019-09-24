@@ -102,8 +102,11 @@
 	INTEGER I,J,K,L,ML,LS
 	INTEGER ST_REC
 	INTEGER REC_LENGTH
+	INTEGER INDX_RPHOT_ROSS
+	INTEGER INDX_RPHOT_ES
 	REAL*8 PI
 	REAL*8 FREQ
+	REAL*8 RPHOT_ROSS,RPHOT_ES
 	REAL*8 T1,T2,T3
 	REAL*8 RPHOT,VPHOT
 	REAL*8 FRAC
@@ -268,13 +271,23 @@
 	 IF(ROSS_MEAN(ND) .NE. 0)THEN
 	   TA(1:ND2)=ROSS_MEAN(1:ND2)*CLUMP_FAC(1:ND2)
 	   CALL TORSCL(TAU_ROSS,TA,R,TB,TC,ND2,METHOD,TYPETM)
+	   T1=2.0D0/3.0D0
+	   I=GET_INDX_DP(T1,TAU_ROSS,ND2)
+	   T2=(TAU_ROSS(I+1)-T1)/(TAU_ROSS(I+1)-TAU_ROSS(I))
+	   RPHOT_ROSS=T2*R(I)+(1.0D0-T2)*R(I+1) 
+	   INDX_RPHOT_ROSS=I 
 	 END IF
 	 IF(FLUX_MEAN(ND) .NE. 0)THEN
 	   TA(1:ND2)=FLUX_MEAN(1:ND2)*CLUMP_FAC(1:ND2)
 	   CALL TORSCL(TAU_FLUX,TA,R,TB,TC,ND2,METHOD,TYPETM)
 	 END IF
-	 TA(1:ND2)=6.65D-15*ED(1:ND2)
+	 TA(1:ND2)=6.65D-15*ED(1:ND2)*CLUMP_FAC(1:ND2)
 	 CALL TORSCL(TAU_ES,TA,R,TB,TC,ND2,METHOD,TYPETM)
+	 T1=2.0D0/3.0D0
+	 I=GET_INDX_DP(T1,TAU_ES,ND2)
+	 T2=(TAU_ES(I+1)-T1)/(TAU_ES(I+1)-TAU_ES(I))
+	 RPHOT_ES=T2*R(I)+(1.0D0-T2)*R(I+1) 
+	 INDX_RPHOT_ES=I 
 !
 	I=MAX(ND,NCF)
 	ALLOCATE (XV(I))
@@ -403,13 +416,59 @@
 	  J=INDEX(YAXIS,')')
 	  YAXIS(J:)='\d \ukpc\u2\d)'
 !
+	ELSE IF(X(1:3) .EQ. 'RSP')THEN
+!
+	  WRITE(6,'(A)')
+	  WRITE(6,*)'Returns spectrum originating with R>R(I)'
+	  WRITE(6,'(A)')
+	  I=INDX_RPHOT_ROSS; WRITE(6,'(A,3(5X,I5,2X,F7.4))')' TAU_ROSS -',(J,TAU_ROSS(J),J=MAX(1,I-1),MIN(I+1,ND))
+	  I=INDX_RPHOT_ES;   WRITE(6,'(A,3(5X,I5,2X,F7.4))')'   TAU_ES -',(J,TAU_ES(J),J=MAX(1,I-1),MIN(I+1,ND))
+	  WRITE(6,'(A)')
+!
+	  I=0
+	  DO WHILE(I .EQ. 0)
+	    I=INDX_RPHOT_ROSS
+	    CALL USR_OPTION(I,'R',' ','Radial index')
+	    IF(I .LT. 2 .OR. I .GT. ND)THEN
+	      WRITE(6,*)'Invalid depth index -- valid range is 2 to',ND
+	      I=0
+            END IF
+	  END DO
+!  
+	  WRITE(6,'(A)')
+	  WRITE(6,'(4X,A,2(12X,A),2X,A,4X,A,7X,A,9X,A)')
+	1          'I','R(I)','V(I)','RROSS(Tau=2/3)','RES(Tau=2/3)','TAU(ROSS)','TAU(ES)'
+	  WRITE(6,'(1X,I4,6ES16.4)')I,R(I),V(I),RPHOT_ROSS,RPHOT_ES,TAU_ROSS(I),TAU_ES(I)
+	  XV(1:NCF)=NU(1:NCF)
+	  DO ML=1,NCF
+	    YV(ML)=SUM(dFR(1:I-1,ML))
+	  END DO
+!
+! NB: J and I have the same units, apart from per steradian/
+!
+	  CALL CNVRT(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	1         LAMC,XAXIS,YAXIS,L_FALSE)
+	  CALL CURVE(NCF,XV,YV)
+	  J=INDEX(YAXIS,')')
+	  YAXIS(J:)='\d \ukpc\u2\d)'
+!
 	ELSE IF(X(1:2) .EQ. 'IR')THEN
+	  WRITE(6,'(A)')
 	  WRITE(6,*)'Option to plot the contribution at a given radius.'
+	  WRITE(6,*)' '
+	  I=INDX_RPHOT_ROSS; WRITE(6,'(A,3(5X,I5,2X,F7.4))')' TAU_ROSS -',(J,TAU_ROSS(J),J=MAX(1,I-1),MIN(I+1,ND))
+	  I=INDX_RPHOT_ES;   WRITE(6,'(A,3(5X,I5,2X,F7.4))')'   TAU_ES -',(J,TAU_ES(J),J=MAX(1,I-1),MIN(I+1,ND))
+	  WRITE(6,*)' '
+!
 	  CALL USR_OPTION(I,'R',' ','Radial index')
-	  IF(I .GT. ND)THEN
+	  IF(I .LT. 1 .OR. I .GT. ND)THEN
 	    WRITE(T_OUT,*)'Invalid depth; maximum value is',ND
 	    GOTO 1
 	  END IF
+	  WRITE(6,'(A)')
+	  WRITE(6,'(4X,A,2(12X,A),2X,A,4X,A,7X,A,9X,A)')
+	1          'I','R(I)','V(I)','RROSS(Tau=2/3)','RES(Tau=2/3)','TAU(ROSS)','TAU(ES)'
+	  WRITE(6,'(1X,I4,6ES16.4)')I,R(I),V(I),RPHOT_ROSS,RPHOT_ES,TAU_ROSS(I),TAU_ES(I)
 !
 	  XV(1:NCF)=NU(1:NCF)
 	  YV(1:NCF)=dFR(I,1:NCF)
@@ -765,21 +824,25 @@
 	1          .OR. X(1:4) .EQ. 'HELP')THEN
 	  WRITE(6,*)' '
 	  WRITE(6,*)' TIT  LX  LY  '
-	  WRITE(6,*)' XN:      Set X axis to depth indexV'
+	  WRITE(6,*)' XN:      Set X axis to depth index'
 	  WRITE(6,*)' XV:      Set X axis to V'
 	  WRITE(6,*)' XED:     Set X axis to Log(Ne)'
 	  WRITE(6,*)' XROSS:   Set X axis to Log Tau(Ross)'
 	  WRITE(6,*)' XLINR:   Set X axis to R/R*'
 	  WRITE(6,*)' XLOGV:   Set X axis to Log V'
 	  WRITE(6,*)' XLOGR:   Set X axis to Log R/R*'
+	  WRITE(6,*)' '
 	  WRITE(6,*)' SP:      Plot spectrum - sums dF(R) over all radii'
+	  WRITE(6,*)' RSP:     Plot spectrum - sums dF(R) from R(I) to outer boundary'
+	  WRITE(6,*)' IR:      Plot the contribution, as a funtion of lambda, at a given radius'
 	  WRITE(6,*)' '
 	  WRITE(6,*)' DF:      Plot dF(R) for a given frequency'
 	  WRITE(6,*)' DF2:     Plot dF(R) averaged over a given frequency band'
 	  WRITE(6,*)' DDF:     Plots dF/dX (X=default axis) for a given frequency band'
 	  WRITE(6,*)' DDF2:    Plots dF/dX (X=default axis) averaged over a given frequency band'
-	  WRITE(6,*)' IR:      Plot the contribution, as a funtion of lambda, at a given radius'
+	  WRITE(6,*)' '
 	  WRITE(6,*)' RD_OBS:  Read on observed spectrum'
+	  WRITE(6,*)' '
 	  WRITE(6,*)' OR:      Plot the radius, as a funtion of lambda, for a given fractional contribution'
 	  WRITE(6,*)' OV:      Plot the velocity, as a funtion of lambda, for a given fractional contribution'
 	  WRITE(6,*)' ON:      Plot the depth index, as a funtion of lambda, for a given fractional contribution'
