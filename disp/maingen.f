@@ -5311,7 +5311,7 @@ c
 	   T1=-26.68059
 !        
 	   DO I=1,ND
-	     TA(I)=(ED(I)/1.0D+10)*TA(I)*( R(I)**3 )
+	     TA(I)=CLUMP_FAC(I)*(ED(I)/1.0D+10)*TA(I)*( R(I)**3 )
 	     TB(I)=TA(I)*( T(I)**(-T2) )
 	   END DO
 	   IF(ELEC)THEN

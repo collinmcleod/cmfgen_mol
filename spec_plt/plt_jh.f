@@ -7,6 +7,7 @@
 !
 	PROGRAM PLT_JH
 !
+! Altered 15-Nov-2019 : TAU_ES and TAU_ROSS were not being corrected for clumping.
 ! Altered 20-Aug-2019 : Updated RD_RVTJ to V4 routines.
 !                           TGREY,dE_RAD_DECAY,PLANCK_MEAN, and FORMAT_DATE added.
 ! Altered 02-Nov-2013 :  Modified EXTJ J option -- now uses MON_INTERP.
@@ -430,11 +431,12 @@
 	 ALLOCATE (TAU_ES(ND_ATM))
 	 IF(ND_ATM .NE. 10)THEN
 	   IF(ROSS_MEAN(ND_ATM) .NE. 0)THEN
-	     CALL TORSCL(TAU_ROSS,ROSS_MEAN,R,TB,TC,ND_ATM,METHOD,TYPE_ATM)
+	   TA(1:ND_ATM)=ROSS_MEAN(1:ND_ATM)*CLUMP_FAC(1:ND_ATM)
+	     CALL TORSCL(TAU_ROSS,TA,R,TB,TC,ND_ATM,METHOD,TYPE_ATM)
 	   ELSE
 	     TAU_ROSS(1:ND)=0.0D0
 	   END IF
-	   TA(1:ND_ATM)=6.65D-15*ED(1:ND_ATM)
+	   TA(1:ND_ATM)=6.65D-15*ED(1:ND_ATM)*CLUMP_FAC(1:ND_ATM)
 	   CALL TORSCL(TAU_ES,TA,R,TB,TC,ND_ATM,METHOD,TYPE_ATM)
 	 ELSE
 

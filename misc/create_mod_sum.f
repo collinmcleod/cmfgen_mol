@@ -238,9 +238,9 @@
 	  K=INDEX(STRING,'CARB')+4
 	  READ(STRING(K:),*)T3,T2,T1
 	  IF(NO_HYD_RD)THEN
-	    WRITE(XCARB,'(F5.3)')T2
+	    WRITE(XCARB,'(F7.3)')T2
 	  ELSE
-	    WRITE(XCARB,'(F5.3)')T1
+	    WRITE(XCARB,'(F7.3)')T1
 	  END IF
 !	
 	  READ(10,'(A)')STRING
@@ -256,10 +256,10 @@
 	  K=INDEX(STRING,'OXY')+4
 	  READ(STRING(K:),*)T3,T2,T1
 	  IF(NO_HYD_RD)THEN
-	    WRITE(XOXY,'(F5.3)')T2
+	    WRITE(XOXY,'(F6.3)')T2
 	    IF(T3 .LT. 0.05)WRITE(XOXY,'(F6.4)')T2
 	  ELSE 
-	    WRITE(XOXY,'(F5.3)')T1
+	    WRITE(XOXY,'(F6.3)')T1
 	  END IF
 !
 	  READ(10,'(A)')STRING        !Fluorine
