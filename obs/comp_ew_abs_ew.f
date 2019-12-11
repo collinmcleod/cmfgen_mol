@@ -237,7 +237,7 @@
 	      T1=PROF(ML)
 	      DO I=1,NIEXT
 	        TCHI(I)=CHI(I)+CHIL(I)*T1
-	        IF(TCHI(I) .LT. 0.0D0)TCHI(I)=0.01D0*TCHI(I)
+	        IF(TCHI(I) .LT. 1.0D-10*CHI(I))TCHI(I)=0.001D0*CHI(I)
 	        SOURCE(I)=(ETA(I)+ETAL(I)*T1+ESEC(I)*OLD_JNU(I,ML))/TCHI(I)
 	      END DO
 	      CALL QKIM(Q,QH,GAM,GAMH,TCHI,PF,ML,NI,NLF)

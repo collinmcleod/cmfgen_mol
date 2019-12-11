@@ -3645,22 +3645,42 @@
 ! field in the total luminosity, and subtract out radioactive energy deposition..
 !
 ! Altered: 28_Feb-2009: Changed J to  I in dE_RAD_DECAY.
+! Altered: 06-Dec-2019: Normlaize in opposite directions for stars and SN.
 !
 	  T3=0.0D0
-	  DO I=1,ND-1
-	    T3=T3+RAD_DECAY_LUM(I)-MECH_LUM(I)-DJDT_FLUX(I)-dE_WORK(I)
-	    RLUMST(I+1)=RLUMST(I+1) + T3
-	  END DO
+	  IF(SN_MODEL)THEN
+	    DO I=1,ND-1
+	      T3=T3+RAD_DECAY_LUM(I)-MECH_LUM(I)-DJDT_FLUX(I)-dE_WORK(I)
+	      RLUMST(I+1)=RLUMST(I+1) + T3
+	    END DO
+	  ELSE
+	    DO I=ND-1,1,-1
+	      T3=T3+MECH_LUM(I)+DJDT_FLUX(I)+dE_WORK(I)-RAD_DECAY_LUM(I)
+	      RLUMST(I)=RLUMST(I) + T3
+	    END DO
+	  END IF
 	  CALL WRITV(RLUMST,ND,'Luminosity Check (not observed luminosity)',LU_FLUX)
 !
-	  TA(1:ND)=RLUMST(1:ND)/RLUMST(2)
-	  CALL WRITV(TA,ND,'Normalized luminosity check',LU_FLUX)
+	  IF(SN_MODEL)THEN
+	    TA(1:ND)=RLUMST(1:ND)/RLUMST(2)
+	    CALL WRITV(TA,ND,'Normalized luminosity check (normalized by L[2])',LU_FLUX)
+	  ELSE
+	    TA(1:ND)=RLUMST(1:ND)/RLUMST(ND)
+	    CALL WRITV(TA,ND,'Normalized luminosity check (normalized by L[ND])',LU_FLUX)
+	  END IF
 !
 	  T3=0.0D0
-	  DO I=1,ND-1
-	    T3=T3-DEP_RAD_EQ(I)
-	    RLUMST(I+1)=RLUMST(I+1) + T3
-	  END DO
+	  IF(SN_MODEL)THEN
+	    DO I=1,ND-1
+	      T3=T3-DEP_RAD_EQ(I)
+	      RLUMST(I+1)=RLUMST(I+1) + T3
+	    END DO
+	  ELSE
+	    DO I=ND-1,1,-1
+	      T3=T3+DEP_RAD_EQ(I)
+	      RLUMST(I)=RLUMST(I) + T3
+	    END DO
+	  END IF
 	  CALL WRITV(RLUMST,ND,'Consistency check (include dep. from rad. equil.)',LU_FLUX)
 !
 	  WRITE(LU_FLUX,'(A)')' '

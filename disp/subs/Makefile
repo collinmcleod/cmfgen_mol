@@ -28,6 +28,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(ham_formsol.o)\
       $(LIB)(ham_varlam.o)\
       $(LIB)(jfeaunew.o)\
+      $(LIB)(log_mon_interp.o)\
       $(LIB)(map_plot.o)\
       $(LIB)(momham.o)\
       $(LIB)(new_writedc_v5.o)\
@@ -107,7 +108,7 @@ $(LIB)(map_plot.o) : map_plot.f $(GEN)
 	ar ruv $(LIB) map_plot.o
 
 $(LIB)(plt_profs.o) : plt_profs.f ../mod_disp.o $(GEN)
-	$(F90) -c  $(FG) -I../ -I../../mood  plt_profs.f 
+	$(F90) -c  $(FG) -I../ -I../../mod  plt_profs.f 
 	ar ruv $(LIB) plt_profs.o
 
 $(LIB)(wr_spec_sum_v2.o) : wr_spec_sum_v2.f ../mod_disp.o $(GEN)

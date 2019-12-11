@@ -110,6 +110,7 @@
 	LOGICAL SET_TRANS_TYPE_BY_LAM
 	LOGICAL DO_SOBOLEV_LINES
 	LOGICAL DO_ALL_SOB_LINES
+	LOGICAL DO_CMF_EW
 !
 	REAL*8 VTURB_FIX		!Turbelent velocity used with fixed DOPPLER profile.
 	REAL*8 VTURB_MIN		!Minimum turbuleb velocity

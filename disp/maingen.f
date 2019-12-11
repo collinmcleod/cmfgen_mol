@@ -15,6 +15,13 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered  10-Dec-2019 : CLUMP is now allowed for when computing the recombination rate.
+!                          XLOGRM1(LOG10(R(I)/R(ND)-1.0D0) added as option
+!                          FLUX mean opacity added to Y options (FLUX) -- Also ES -- mass abs. coef.
+!                          Option added to plot B(T) and dB/dT.
+!                          Can now output a larger/fine grid with WRC and WRL options.
+!                            (for use with MC calculations).
+!
 ! Altered  01-Jul-2018 : Added species/ion options to TAUSOB.
 ! Altered  21-Mar-2018 : DERAD is now corrected for clumping.
 ! Altered  17-Mar-2018 : Adjusted to be compatible with OSIRIS version.
@@ -132,9 +139,12 @@
 	REAL*8 Z(NP_MAX),DTAU(NP_MAX),XM(NP_MAX),RJ(NP_MAX)
 	REAL*8 CHI(NP_MAX),REXT(NP_MAX),dCHIdr(NP_MAX)
 	REAL*8 INBC,HBC,HBCNEW,NBC,FA(NP_MAX),GAM(NP_MAX),GAMH(NP_MAX)
-
+	REAL*8 VEXT(NP_MAX),TEXT(NP_MAX),SIGMAEXT(NP_MAX)
+	REAL*8 MASS_DENSITYEXT(NP_MAX),CLUMP_FACEXT(NP_MAX)
+!
 	REAL*8 RJEXT(NP_MAX),FEXT(NP_MAX),Q(NP_MAX),FOLD(NP_MAX)
 	REAL*8 CHIEXT(NP_MAX),ETAEXT(NP_MAX),ESECEXT(NP_MAX)
+	REAL*8 CHILEXT(NP_MAX),ETALEXT(NP_MAX)
 	REAL*8 SOURCEEXT(NP_MAX)
 	REAL*8 ZETAEXT(NP_MAX),THETAEXT(NP_MAX)
 	REAL*8 COEF(0:3,NP_MAX)
@@ -1217,6 +1227,14 @@
 	  XAXIS='Log(r/R\d*\u)'
 	  XAXSAV=XAXIS
 !
+	ELSE IF(XOPT .EQ. 'XLOGRM1')THEN
+	  DO I=1,ND-1
+	    XV(I)=LOG10(R(I)/R(ND)-1.0D0)
+	  END DO
+	  XV(ND)=XV(ND-1)-1
+	  XAXIS='Log(r/R\d*\u)-1'
+	  XAXSAV=XAXIS
+!
 	ELSE IF(XOPT .EQ. 'XLINR')THEN
 	  CALL USR_HIDDEN(FLAG,'NORM','T','Normalized X axis (def=T)')
 	  IF(FLAG)THEN
@@ -1898,12 +1916,13 @@
 	      END IF
 	    END DO
 	  ELSE
+	    TA(1:ND)=R(1:ND)            !+1.0D+04
 	    DO ID=1,NUM_IONS
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        FILENAME=TRIM(ION_ID(ID))//TRIM(STRING)
 	        CALL NEW_WRITEDC_V5(ATM(ID)%XzV_F,ATM(ID)%LOG_XzVLTE_F,ATM(ID)%W_XzV_F,
 	1             ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%NXzV_F,
-	1             ATM(ID)%DXzV_F,ATM(ID)%GIONXzV_F,IONE,R,T,ED,V,CLUMP_FAC,
+	1             ATM(ID)%DXzV_F,ATM(ID)%GIONXzV_F,IONE,TA,T,ED,V,CLUMP_FAC,
 	1             DO_DPTH,LUM,ND,FILENAME,TYPE,IONE)
 	      END IF
 	    END DO
@@ -2224,27 +2243,37 @@
 	    CALL DP_CURVE(ND,XV,YV)
 	  END IF
 !
-	ELSE IF(XOPT .EQ. 'ROSS')THEN
+	ELSE IF(XOPT .EQ. 'ROSS' .OR. XOPT .EQ. 'FLUX' .OR. XOPT .EQ.  'ES')THEN
+	  IF(XOPT .EQ. 'ROSS')THEN
+	     TA(1:ND)=1.0D-10*ROSS_MEAN(1:ND)
+	     YAXIS='Rosseland Mean Opacity'
+	  ELSE IF(XOPT .EQ. 'FLUX')THEN
+	     TA(1:ND)=1.0D-10*FLUX_MEAN(1:ND)
+	     YAXIS='Flux Mean Opacity'
+	  ELSE
+	     TA(1:ND)=6.65D-25*ED(1:ND)
+	     YAXIS='E.S. Mean Opacity'
+	  END IF
 	  WRITE(T_OUT,*)'Volume filling factor not allowed for.'
 	  CALL USR_OPTION(ELEC,'KAPPA','T','Mass absorption coefficient?')
-	  IF(ROSS_MEAN(1) .NE. 0.0D0)THEN
+	  IF(TA(1) .NE. 0.0D0)THEN
 	    IF(ELEC)THEN
 	      DO I=1,ND
-	        YV(I)=1.0D-10*ROSS_MEAN(I)/MASS_DENSITY(I)
+	        YV(I)=TA(I)/MASS_DENSITY(I)
 	      END DO
-	      YAXIS='Rosseland Mean Opacity (cm\u2\d/g)'           ! (cm\u-1\d)'
+	      YAXIS=TRIM(YAXIS)//' (cm\u2\d/g)'           ! (cm\u-1\d)'
 	    ELSE
 	      CALL USR_OPTION(ELEC,'ON_NE','T','Normalize by the electron scattering opacity?')
 	      IF(ELEC)THEN
 	        DO I=1,ND
-	          YV(I)=ROSS_MEAN(I)/(6.65D-15*ED(I))
+	          YV(I)=TA(I)/(6.65D-25*ED(I))
 	        END DO
-	      YAXIS='Rosseland Mean Opacity/ \gsNe'           ! (cm\u-1\d)'
+	      YAXIS=TRIM(YAXIS)//'/ \gsNe'           ! (cm\u-1\d)'
 	      ELSE
 	        DO I=1,ND
-	          YV(I)=DLOG10(ROSS_MEAN(I))-10
+	          YV(I)=DLOG10(TA(I))
 	        END DO
-	        YAXIS='Rosseland Mean Opacity (cm\u-1\d)'
+	        YAXIS=TRIM(YAXIS)//'(cm\u-1\d)'
 	      END IF
 	    END IF
 	    CALL DP_CURVE(ND,XV,YV)
@@ -2737,7 +2766,9 @@
 	  CALL USR_OPTION(VCORE,'VCORE','1.0D0',' ')
 	  CALL USR_OPTION(VPHOT,'VPHOT','100.0D0',' ')
 	  CALL USR_OPTION(V_BETA1,'BETA1','1.0D0',' ')
-	  CALL USR_OPTION(V_EPS1,'EPS1','1.0D0',' ')
+	  DEFAULT='1.0D0'
+	  IF(V_BETA1 .LT. 1.0D0)DEFAULT='0.999D0'
+	  CALL USR_OPTION(V_EPS1,'EPS1',DEFAULT,' ')
 	  CALL USR_OPTION(VINF1,'VINF1','1.0D0',' ')
 	  CALL USR_OPTION(V_BETA2,'BETA2','1.0D0',' ')
 	  CALL USR_OPTION(V_EPS2,'EPS2','1.0D0',' ')
@@ -2750,7 +2781,15 @@
 	1                   SCLHT,VCORE,VPHOT,VINF1,V_BETA1,V_EPS1,
 	1                   VINF2,V_BETA2,V_EPS2,ND,TA,TB,TC,L_FALSE,LU_IN)
 !
-	  Z(1:ND)=DLOG10(Z(1:ND)/R(ND))
+	  IF(XAXIS .EQ. 'Log(r/R\d*\u)')THEN
+	    Z(1:ND)=DLOG10(Z(1:ND)/R(ND))
+	  ELSE IF(XAXIS .EQ. 'Log(r/R\d*\u)-1')THEN
+	    XAXIS='Log(r/R\d*\u)-1'
+	    Z(1:ND-1)=DLOG10(Z(1:ND-1)/R(ND)-1)
+	    Z(ND)=Z(ND-1)-1.0D0
+	  ELSE
+	    Z(1:ND)=Z(1:ND)/R(ND)
+	  END IF
 	  TYPE=UC( TRIM(TYPE) )
 	  IF(TYPE .EQ. 'LOGV')THEN
 	    CALL DLOGVEC(DTAU,YV,ND)
@@ -3779,6 +3818,56 @@
 	    CALL DP_CURVE(ND,XV,YV)
 	    YAXIS='Log S'
 	  END IF
+!
+	ELSE IF(XOPT .EQ. 'BB' .OR. XOPT .EQ. 'DBBDT')THEN
+	  I=ND/2
+	  DEFAULT=WR_STRING(I)
+	  VALID_VALUE=.FALSE.
+	  DO WHILE(.NOT. VALID_VALUE)
+	    CALL USR_OPTION(I,'DEPTH',DEFAULT,'Depth for plotting BB')
+	    IF(I .GE. 1 .AND. I .LE. ND)THEN
+	       WRITE(T_OUT,'(A)')BLUE_PEN
+	       WRITE(T_OUT,'(A,I4,A,ES12.4)')'     Radius at depth',I,' is',R(I)
+	       WRITE(T_OUT,'(A,I4,A,ES12.4)')'   Velocity at depth',I,' is',V(I)
+	       WRITE(T_OUT,'(A,I4,A,ES12.4)')'Temperature at depth',I,' is',T(I)
+	       WRITE(T_OUT,'(A)')DEF_PEN
+	       VALID_VALUE=.TRUE.
+	       TEMP=T(I)
+	    END IF
+	  END DO
+	  CALL USR_OPTION(ELEC,'BLAM','T','Compute Blam')
+	  K=MIN(4000,N_PLT_MAX)
+	  T1=0.01D0*C_KMS/10.0D0
+	  T2=10**(4.0D0/(K-1))
+	  XV(1)=T1
+	  IF(XOPT .EQ. 'BB')THEN
+	    DO I=1,K
+	      IF(I .NE. 1)XV(I)=XV(I-1)/T2
+	      T3=EXP(-HDKT*XV(I)/TEMP)
+	      YV(I)=TWOHCSQ*(XV(I)**3)*T3/(1.0D0-T3)
+	    END DO
+	    YAXIS='B\d\gn\u(\gn)(ergs/cm\u2\d/Hz/str)'
+	    IF(ELEC)THEN
+	      YV(1:K)=1.0D+06*YV(1:K)*XV(1:K)*XV(1:K)/C_KMS
+	      YAXIS='B\d\gl\u(\gl)(Gergs/cm\u2\d/\gA/str)'
+	    END IF
+	  ELSE
+	    DO I=1,K
+	      IF(I .NE. 1)XV(I)=XV(I-1)/T2
+	      T4=HDKT*XV(I)/TEMP
+	      T3=EXP(-T4)
+	      YV(I)=1.0D-04*TWOHCSQ*T4*(XV(I)**3)*T3/((1.0D0-T3)**2)/TEMP
+	    END DO
+	    YAXIS='dB\d\gn\u(\gn)/dT(Mergs/cm\u2\d/\gHZ/str/K)'
+	    IF(ELEC)THEN
+	      YV(1:K)=1.0D+09*YV(1:K)*XV(1:K)*XV(1:K)/C_KMS
+	      YAXIS='dB\d\gl\u(\gl)/dT(Mergs/cm\u2\d/\gA/str/K)'
+	    END IF
+	  END IF 
+	  XV(1:K)=0.01*C_KMS/XV(1:K)
+	  CALL DP_CURVE(K,XV,YV) 
+	  XAXIS='\gl(\A)'
+!
 ! 
 !
 
@@ -3994,6 +4083,10 @@
 	  CALL USR_OPTION(RADIAL_TAU,'RD_TAU','TRUE',
 	1      'Use radial (alt. is TANGENTIAL) direction to evaluate the Sobolev optical depth')
 	  CALL USR_OPTION(LINE_STRENGTH,'LS','F','Plot line strength')
+	  TAU_MIN=1.0D-04
+	  DEFAULT=WR_STRING(TAU_MIN)
+	  CALL USR_HIDDEN(TAU_MIN,'TAU_MIN',DEFAULT,'Minimum Tau')
+	  TAU_MIN=LOG10(TAU_MIN)
 !
 	  DEFAULT=WR_STRING(LAM_ST)
 	  CALL USR_OPTION(LAM_ST,'LAMST',DEFAULT,FREQ_INPUT)
@@ -4069,6 +4162,7 @@
 	              IF(WR_LINE)THEN
 	                WRITE(40,'(F12.4,ES12.4,2X,A10,2I6)')XV(J),YV(J),ION_ID(ID), NL, NUP
 	              END IF
+	              IF(YV(J) .LE. TAU_MIN)J=J-1
 	            ELSE
 	              J=J-1
 	            END IF
@@ -4088,7 +4182,7 @@
 	  IF(FLAG)THEN
 	    XAXIS='Log(\gl(\A))'
 	  ELSE
-	    XAXIS='\gl(\gV)'
+	    XAXIS='\gl(\gA)'
 	  END IF
 	  YAXIS='Log(\gt)'
 !
@@ -5272,12 +5366,6 @@ c
 	  CALL USR_OPTION(NAME,'Title',' ','Title for all graphs')
 	ELSE IF(XOPT .EQ. 'METHOD')THEN
 	  CALL USR_OPTION(METHOD,'LOGLOG',' ','Tau option (LOGLOG,LOGMON, ZERO')
-	  METHOD=UC(METHOD)
-	  IF(METHOD .NE. 'LOGLOG' .AND. METHOD .NE. 'LOGMON' .AND. METHOD .NE. 'ZERO')THEN
-	    WRITE(6,*)'Invalid value for METHOD -- valid options are ZERO, LOGMON, LOGLOG'
-	    WRITE(6,*)'Setting METHOD to ZERO'
-	    METHOD='ZERO'
-	  END IF
 !
 ! 
 !
@@ -6180,20 +6268,56 @@ c
 	    END IF
 	  END IF
 !
+	  CALL USR_OPTION(TMP_LOGICAL,'BGRID','F','Use a bigger grid')
+	  IF(TMP_LOGICAL)THEN
+	    IF(XOPT .EQ. 'WRC')THEN 
+	      ETAL=1.0D-10; CHIL=1.0D-10
+	    END IF
+	    CALL USR_OPTION(NPINS,'NPINS','1','0, 1 or 2')
+	    NDX=(ND-1)*NPINS+ND
+	    I=ND-10		!Parabolic interp for > I
+	    CALL REXT_COEF_V2(REXT,COEF,INDX,NDX,R,GRID,ND,NPINS,.TRUE.,I,IONE,ND)
+	    WRITE(6,*)'New R grid set'
+	    CALL LOG_MON_INTERP(ETAEXT,NDX,IONE,REXT,NDX,ETA,ND,R,ND,L_FALSE,L_TRUE)
+	    WRITE(6,*)'Eta defined'
+	    CALL LOG_MON_INTERP(CHIEXT,NDX,IONE,REXT,NDX,CHI,ND,R,ND,L_FALSE,L_TRUE)
+	    WRITE(6,*)'CHI defined'
+	    CALL LOG_MON_INTERP(ESECEXT,NDX,IONE,REXT,NDX,ESEC,ND,R,ND,L_FALSE,L_TRUE)
+	    WRITE(6,*)'ESEC defined'
+	    CALL LOG_MON_INTERP(ETALEXT,NDX,IONE,REXT,NDX,ETAL,ND,R,ND,L_FALSE,L_TRUE)
+	    WRITE(6,*)'Etal defined'
+	    CALL LOG_MON_INTERP(CHILEXT,NDX,IONE,REXT,NDX,CHIL,ND,R,ND,L_FALSE,L_TRUE)
+	    WRITE(6,*)'Chil defined'
+	    CALL LOG_MON_INTERP(VEXT,NDX,IONE,REXT,NDX,V,ND,R,ND,L_FALSE,L_TRUE)
+	    WRITE(6,*)'VEXT defined'
+	    CALL LOG_MON_INTERP(SIGMAEXT,NDX,IONE,REXT,NDX,SIGMA,ND,R,ND,L_FALSE,L_FALSE)
+	    WRITE(6,*)'SIGEXT defined'
+	    CALL LOG_MON_INTERP(TEXT,NDX,IONE,REXT,NDX,T,ND,R,ND,L_FALSE,L_TRUE)
+	    CALL LOG_MON_INTERP(MASS_DENSITYEXT,NDX,IONE,REXT,NDX,MASS_DENSITY,ND,R,ND,L_FALSE,L_TRUE)
+	    CALL LOG_MON_INTERP(CLUMP_FACEXT,NDX,IONE,REXT,NDX,CLUMP_FAC,ND,R,ND,L_FALSE,L_TRUE)
+	    ND_TMP=NDX
+	  ELSE
+	    ND_TMP=ND
+	    REXT(1:ND_TMP)=R; VEXT(1:ND_TMP)=V; SIGMAEXT(1:ND_TMP)=SIGMA;  TEXT(1:ND_TMP)=T 
+	    ETAEXT(1:ND_TMP)=ETA; CHIEXT(1:ND_TMP)=CHI; ESECEXT(1:ND_TMP)=ESEC
+	    ETALEXT(1:ND_TMP)=ETAL; CHILEXT(1:ND_TMP)=CHIL
+	    MASS_DENSITYEXT(1:ND_TMP)=MASS_DENSITY; CLUMP_FACEXT(1:ND_TMP)=CLUMP_FAC
+	  END IF	    
+
 	  IF(FILE_FORMAT .EQ. 'NEW')THEN
 	    CALL WRITE_LINE_12MAY98(TRANS_NAME,MOD_NAME,
-	1          DIF,IC,FREQ,AMASS,R,V,SIGMA,T,
-	1          ETA,CHI,ESEC,CHIL,ETAL,ND,LU_OUT)
+	1          DIF,IC,FREQ,AMASS,REXT,VEXT,SIGMAEXT,TEXT,
+	1          ETAEXT,CHIEXT,ESECEXT,CHILEXT,ETALEXT,ND_TMP,LU_OUT)
 	  ELSE IF(FILE_FORMAT .EQ. 'MULTI')THEN
 	    CALL WRITE_LINE_MULTI(TRANS_NAME,MOD_NAME,NEW_FILE,
-	1          DIF,IC,FREQ,AMASS,R,V,SIGMA,T,
-	1          MASS_DENSITY,CLUMP_FAC,
-	1          ETA,CHI,ESEC,CHIL,ETAL,ND,LU_OUT)
+	1          DIF,IC,FREQ,AMASS,REXT,VEXT,SIGMAEXT,TEXT,
+	1          MASS_DENSITYEXT,CLUMP_FACEXT,
+	1          ETAEXT,CHIEXT,ESECEXT,CHILEXT,ETALEXT,ND_TMP,LU_OUT)
 	  ELSE
 	    CALL WRITE_LINE_OLD(TRANS_NAME,MOD_NAME,
-	1          DIF,IC,FREQ,AMASS,R,V,SIGMA,T,
-	1          MASS_DENSITY,CLUMP_FAC,
-	1          ETA,CHI,ESEC,CHIL,ETAL,ND,LU_OUT)
+	1          DIF,IC,FREQ,AMASS,REXT,VEXT,SIGMAEXT,TEXT,
+	1          MASS_DENSITYEXT,CLUMP_FACEXT,
+	1          ETAEXT,CHIEXT,ESECEXT,CHILEXT,ETALEXT,ND_TMP,LU_OUT)
 	  END IF
 !
 ! Option to output information concerning bound-bound transitions.

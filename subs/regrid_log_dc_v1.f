@@ -312,9 +312,10 @@
 !
 	ELSE IF(INTERP_OPTION .EQ. 'SPH_TAU')THEN
 !
-	  DO I=1,ND
-	    WRITE(6,'(I5,2ES14.4)')I,OLD_ED(I)*OLD_CLUMP_FAC(I),ED(I)
-	  END DO
+!	  WRITE(6,*)'Interp option is SPH_TAU'
+!	  DO I=1,ND
+!	    WRITE(6,'(I5,2ES14.4)')I,OLD_ED(I)*OLD_CLUMP_FAC(I),ED(I)
+!	  END DO
 !
 ! Determine radius at which optical depth is unity. We use NEW_ED as a
 ! temporary vector for ED*CLUMP_FAC.
@@ -370,10 +371,10 @@
             OLD_TAU(I)=OLD_TAU(I-1)+6.65D-15*(OLD_ED(I-1)+OLD_ED(I))*(OLD_R(I-1)-OLD_R(I))*0.5D0
           END DO
 !
-	  WRITE(6,*)RTAU1,RTAU1_OLD
-	  DO I=1,NDOLD
-	    WRITE(6,'(I5,4ES14.4)')I,OLD_TAU(I),TAU(I),OLD_ED(I),NEW_ED(I)
-	  END DO
+!	  WRITE(6,*)RTAU1,RTAU1_OLD
+!	  DO I=1,NDOLD
+!	    WRITE(6,'(I5,4ES14.4)')I,OLD_TAU(I),TAU(I),OLD_ED(I),NEW_ED(I)
+!	  END DO
 !
 ! Detrmine whether new mesh extends beyond oldmesh.
 ! NX is used to define the region over which we may use a linear

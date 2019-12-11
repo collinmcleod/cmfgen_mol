@@ -2350,15 +2350,18 @@
 	END IF
 !
 ! We use TA as a temporary vector which indicates the origin
-! of the line emission. Not required in this code as used only
-! for display purposes.
+! of the line emission. Not required in this code as used only for display purposes.
 !
-	IF(L_TRUE)THEN
+! Note: Using CMF_ABS_EW takes much longer and was added for determining strongest lines
+!          to include in polarizatin calculations.
+!
+	IF(DO_CMF_EW)THEN
 	  INCLUDE 'CMF_ABS_EW.INC'
 	ELSE
 	  CALL SOBEW_GRAD_V2(SOURCE,CHI_CLUMP,CHI_SCAT_CLUMP,CHIL,ETAL,
 	1            V,SIGMA,R,P,FORCE_MULT,STARS_LUM,AQW,HQW,TA,EW,CONT_INT,
 	1            FL,INNER_BND_METH,DBB,IC,THK_CONT,L_FALSE,NC,NP,ND,METHOD)
+	  ABS_EW=EW
 	END IF
 !
 	IF(ABS(ABS_EW) .GE. EW_CUT_OFF)THEN

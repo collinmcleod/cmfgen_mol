@@ -182,8 +182,9 @@
 	1           'Extrapolate the formal solution to larger radii?')
 	  CALL RD_STORE_NCHAR(CMF_FORM_OPTIONS,'FRM_OPT',ITEN,L_TRUE,
 	1           'Solution options for CMF_FORM_SOL')
-	  CALL RD_STORE_LOG(DO_SOBOLEV_LINES,'DO_SOB_LINES',L_TRUE,
-	1        'Compute Sobolev EWs?')
+	  CALL RD_STORE_LOG(DO_SOBOLEV_LINES,'DO_SOB_LINES',L_TRUE,'Compute line EWs?')
+	  DO_CMF_EW=.FALSE.
+	  CALL RD_STORE_LOG(DO_CMF_EW,'DO_CMF_EW',L_FALSE,'Use CMF to compute EWs')
 	  DO_ALL_SOB_LINES=.FALSE.
 	  CALL RD_STORE_LOG(DO_ALL_SOB_LINES,'DO_ALL_SOB',L_FALSE,
 	1        'Compute ALL Sobolev lines EWs?')
