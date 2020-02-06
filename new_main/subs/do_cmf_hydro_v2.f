@@ -554,21 +554,25 @@
 	        R(1:J)=OLD_R(1:J)
 	        V(1:J)=OLD_V(1:J)
 	        SIGMA(1:J)=OLD_SIGMA(1:J)
+!	        CLUMP_FAC(1:J)=OLD_CLUMP_FAC(1:J)
 	      ELSE  
 	        CALL WIND_VEL_LAW_V3(R,V,SIGMA,VINF,BETA,BETA2,
 	1            VEXT,RP2_ON_CON_RAD,RMAX,
 	1            CONNECTION_RADIUS,CONNECTION_VEL,T2,VEL_LAW,J,ND_MAX)
+!	        CALL MON_INTERP(CLUMP_FAC,J,IONE,V,J,OLD_CLUMP_FAC,MOD_ND,OLD_V,MOD_ND)      !Neds range check
 	     END IF
 	     DO I=1,J
-	       POP_ATOM(I)=MDOT/MU_ATOM/R(I)/R(I)/V(I)
+	       POP_ATOM(I)=MDOT/MU_ATOM/R(I)/R(I)/V(I)    !/CLUMP_FAC(I)
 	     END DO
 !
 ! To get other quantities we interpolate as a function of density.
 ! The atom density should be monotonic. At the outer boundary,
 ! we simply use the boundary value.
 !
-	      TA(1:MOD_ND)=LOG(OLD_POP_ATOM(1:MOD_ND))
+! POP_ATOM is not corrected for clumping.
+!
 	      TB(1:MOD_ND)=OLD_ED(1:MOD_ND)/ OLD_POP_ATOM(1:MOD_ND)
+	      TA(1:MOD_ND)=LOG(OLD_POP_ATOM(1:MOD_ND)*OLD_CLUMP_FAC(1:MOD_ND))
 	      TC(1:J)=LOG(POP_ATOM(1:J))
 	      DO I=1,J
 	        IF(TC(I) .LT. TA(1))TC(I)=TA(1)
@@ -583,7 +587,7 @@
 	        GAMMA_FULL(I)=GAM_FULL
 	        CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*CHI_ROSS(I)
 	        P(I)=(BC*T(I)*(1.0D0+ED(I)/POP_ATOM(I))+PTURB_ON_NA)*POP_ATOM(I)
-	        WRITE(6,'(I5,5ES14.5)')I,R(I),ED(I),GAMMA_FULL(I),CHI_ROSS(I),P(I)
+!	        WRITE(6,'(I5,5ES14.5)')I,R(I),ED(I),GAMMA_FULL(I),CHI_ROSS(I),P(I)
 	      END DO
 	      CALL TORSCL(TAU,CHI_ROSS,R,TB,TC,J,'LOGMON',' ')
 	      I=J
@@ -632,10 +636,11 @@
 ! The boudary condition for the integration of the hydrostatic equation
 ! has been set, either at the outer boundary, or at the wind connection point.
 ! we can now perform the integration of the hydrostatic equation.
-	  WRITE(6,*)'CHK: I=',I
-	  WRITE(6,*)TAU(I)
+!
+!	  WRITE(6,*)'CHK: I=',I
+!	  WRITE(6,*)TAU(I)
 	  DO WHILE( TAU(I) .LT. MAX(100.0D0,OLD_TAU_MAX) )
-	    WRITE(6,*)I,TAU(I)
+!	    WRITE(6,*)I,TAU(I)
 	    I=I+1
 	    IF(I .GT. ND_MAX)THEN
 	      WRITE(6,*)'Error id DO_CMF_HYDRO'
@@ -766,9 +771,7 @@
 	    WRITE(6,*)'ND=',ND
 	    STOP
 	  END IF
-	  WRITE(6,*)'ND=',ND
 	  CALL MON_INT_FUNS_V2(COEF,P,R,ND)
-	  WRITE(6,*)'ND=',ND
 	  DO I=1,ND
 	    dPdR_VEC(I)=1.0D-10*COEF(I,3)/POP_ATOM(I)/AMU/MU_ATOM
 	  END DO
@@ -1016,8 +1019,10 @@
 	  END DO
 	CLOSE(UNIT=LU)
 !
-	CALL SET_NEW_GRID(REV_R,REV_V,REV_SIGMA,REV_ED,REV_CHI_ROSS,NEW_ND)
+	CALL SET_NEW_GRID_V2(REV_R,REV_T,REV_V,REV_SIGMA,REV_ED,REV_CHI_ROSS,NEW_ND)
 	CALL SET_ABUND_CLUMP(T1,T2,LU_ERR,NEW_ND)
+!	REV_ED(1:ND)=REV_ED(1:ND)/CLUMP_FAC(1:ND)
+!	CALL SET_NEW_GRID_V2(REV_R,REV_T,REV_V,REV_SIGMA,REV_ED,REV_CHI_ROSS,NEW_ND)
 	CALL ADJUST_POPS(POPS,LU_ERR,NEW_ND,NT)
 !
 	NO_HYDRO_ITS=NO_HYDRO_ITS-1

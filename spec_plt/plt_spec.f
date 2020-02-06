@@ -448,23 +448,33 @@ C
 	ELSE IF(X(1:7) .EQ. 'RD_CONT')THEN
 	  FILENAME=' '
 	  CALL USR_OPTION(FILENAME,'File',' ','Continuum file')
-	  CALL RD_MOD(NU_CONT,OBSF_CONT,NCF_MAX,NCF_CONT,FILENAME,IOS)
-	  IF(IOS .NE. 0)GOTO 1		!Get another option
-	  SCALE_FAC=1.0D0
-	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
-	  DO I=1,NCF_CONT
-	    XV(I)=NU_CONT(I)
-	    YV(I)=OBSF_CONT(I)*SCALE_FAC
-	  END DO
-	  CALL CNVRT(XV,YV,NCF_CONT,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
-	1                 LAMC,XAXIS,YAXIS,L_FALSE)
-	  CALL USR_HIDDEN(WR_PLT,'WR','F','Write data to file')
-	  IF(WR_PLT)THEN
-	    DO I=1,NCF_CONT
-	      WRITE(50,*)XV(I),YV(I)
-	    END DO
+	  OVER=.FALSE.
+	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
+	  IF(OVER)THEN
+	    CALL RD_MOD(NU,OBSF,NCF_MAX,NCF,FILENAME,IOS)
+	    IF(IOS .NE. 0)THEN
+	       WRITE(T_OUT,*)'Error reading ocntinuum data -- no data read'
+	       GOTO 1		!Get another option
+	    END IF
 	  ELSE
-	    CALL CURVE(NCF_CONT,XV,YV)
+	    CALL RD_MOD(NU_CONT,OBSF_CONT,NCF_MAX,NCF_CONT,FILENAME,IOS)
+	    IF(IOS .NE. 0)GOTO 1		!Get another option
+	    SCALE_FAC=1.0D0
+	    CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
+	    DO I=1,NCF_CONT
+	      XV(I)=NU_CONT(I)
+	      YV(I)=OBSF_CONT(I)*SCALE_FAC
+	    END DO
+	    CALL CNVRT(XV,YV,NCF_CONT,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	1                 LAMC,XAXIS,YAXIS,L_FALSE)
+	    CALL USR_HIDDEN(WR_PLT,'WR','F','Write data to file')
+	    IF(WR_PLT)THEN
+	      DO I=1,NCF_CONT
+	        WRITE(50,*)XV(I),YV(I)
+	      END DO
+	    ELSE
+	      CALL CURVE(NCF_CONT,XV,YV)
+	    END IF
 	  END IF
 !
 ! This option simply reads in data in XY format. No conversion is done to the data.

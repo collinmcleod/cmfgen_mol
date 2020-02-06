@@ -8,6 +8,7 @@
 	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
+! Altered:  15-Jan-2020 : Added NMS option to help create automatic plots.
 ! Altered:  17-Aug-2019 : Altered to allow dashed lines
 ! Altered:  10-Jul-2019 : Draw errors first so curves drawn on top.
 ! Altered:  28-Feb-2019 : Now scale error bars for simple YAR options.
@@ -69,6 +70,7 @@
 	CHARACTER(LEN=2) TYPE_CURVE(MAX_PLTS)
 	REAL*8 VB_BASE(MAX_PLTS)
 !
+	LOGICAL DONE_NORMALIZATION
 	LOGICAL DO_ERROR
 	CHARACTER*5 LOG_AXIS
 !
@@ -99,7 +101,7 @@
 	INTEGER, PARAMETER :: N_TITLE=10
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
         LOGICAL, PARAMETER :: L_FALSE=.FALSE.
-	CHARACTER*80  XLABEL,YLABEL,TITLE(N_TITLE)
+	CHARACTER*80  XLABEL,YLABEL,TITLE(N_TITLE),STORED_TITLE(N_TITLE)
 	CHARACTER*(*) XLAB,YLAB,TITL,PASSED_OPT
         CHARACTER*200 FILNAME
         CHARACTER*80 ID_FILNAME
@@ -222,6 +224,7 @@
 	REAL*4 MARGINX(2),MARGINY(2)
 	REAL*4 MEAN,SIGMA
 	REAL*4 T1,T2,T3,T4
+	REAL*4 SCALE_FAC(MAX_PLTS)
  	REAL*4 XVAL,YVAL
 	REAL*4 XVAL_SAV,YVAL_SAV
 	REAL*4, ALLOCATABLE :: TA(:)
@@ -241,6 +244,8 @@
 	REAL*4 RED(0:15),BLUE(0:15),GREEN(0:15)
 	INTEGER PEN_COL(0:MAXPEN)
 	REAL*4 RTEMP,BTEMP,GTEMP
+!
+	INTEGER IPLT(MAX_PLTS)
 !
 ! Variables to read in plot in column format
 !
@@ -307,6 +312,7 @@
 	SIG_GAU_KMS=10.0D0
 	FRAC_SIG_GAU=0.25D0
 	DP_CUT_ACC=0.01D0
+	DONE_NORMALIZATION=.FALSE.
 !
 	IF(NPLTS .GT. MAXPEN)THEN
 	  WRITE(T_OUT,*)'Error n GRAMON_PLOT -- not enough pen loctions'
@@ -2452,6 +2458,16 @@ C
 	  CALL DO_VEC_OP(VAR_PLT1,VAR_PLT2,VAR_PLT3,.TRUE.,VAR_OPERATION)
 	  GOTO 1000
 !
+	ELSE IF (ANS .EQ. 'DER')THEN
+	  CALL NEW_GEN_IN(VAR_PLT1,'Input plot 1?')
+	  VAR_PLT3=NPLTS+1
+	  CALL NEW_GEN_IN(VAR_PLT3,'Output plot?')
+	  TMP_STR='LINMON'
+	  CALL NEW_GEN_IN(TMP_STR,'Derivative option: LINMON or LOGMON')
+	  CALL DO_PG_DERIV(VAR_PLT1,VAR_PLT3,TMP_STR)
+	  TYPE_CURVE(VAR_PLT3)='L'
+	  GOTO 1000
+!
 	ELSE IF (ANS .EQ. 'SM' .OR. ANS .EQ. 'BXSM')THEN
 !
 	  WRITE(6,*)BLUE_PEN
@@ -2650,6 +2666,91 @@ C
 	          IF(ERR(IP))CD(IP)%EMAX(J)=CD(IP)%EMAX(J)*T3
 	        END DO
 	      END IF
+	    END IF
+	  END DO
+	  GOTO 1000
+!
+	ELSE IF(ANS .EQ. 'NMS')THEN
+	  VAR_PLT1=1
+	  CALL NEW_GEN_IN(VAR_PLT1,'Reference plot for normalization ')
+	  IF(VAR_PLT1 .EQ. 0 .OR. VAR_PLT1 .GT. NPLTS)THEN
+	    WRITE(T_OUT,*)'Bad plot number'
+	    GOTO 1000
+	  END IF
+	  XT(1)=XPAR(1); CALL NEW_GEN_IN(XT(1),'Beginning of normalization range')
+	  XT(2)=XPAR(2)
+	  CALL NEW_GEN_IN(XT(2),'End of normalization range')
+	  IF(DONE_NORMALIZATION)THEN
+	    DO IP=1,NPLTS
+	      T3=SCALE_FAC(IP)
+	      DO J=1,NPTS(IP)
+	        CD(IP)%DATA(J)=CD(IP)%DATA(J)/T3
+	        IF(ERR(IP))CD(IP)%EMIN(J)=CD(IP)%EMIN(J)/T3
+	        IF(ERR(IP))CD(IP)%EMAX(J)=CD(IP)%EMAX(J)/T3
+	      END DO
+	    END DO
+	    TITLE=STORED_TITLE
+	    DONE_NORMALIZATION=.FALSE.
+	  ELSE
+	    STORED_TITLE=TITLE
+	  END IF
+	  SCALE_FAC=1.0D0
+!
+	  MEAN=0.0D0
+	  T2=0.0D0
+	  IP=VAR_PLT1
+	  DO J=2,NPTS(VAR_PLT1)-1
+	    T1=(CD(IP)%XVEC(J)-XT(1))*(XT(2)-CD(IP)%XVEC(J))
+	    IF(T1 .GT. 0)THEN
+	       MEAN=MEAN+CD(IP)%DATA(J)*ABS(CD(IP)%XVEC(J-1)-CD(IP)%XVEC(J+1))
+	       T2=T2+ABS(CD(IP)%XVEC(J-1)-CD(IP)%XVEC(J+1))
+	    END IF
+	  END DO
+	  MEAN=0.5D0*MEAN; T2=0.5D0*T2
+	  IF(MEAN .EQ. 0 .OR. T2 .EQ. 0)THEN
+	    WRITE(T_OUT,*)'No normalization will be done'
+	    WRITE(T_OUT,*)'Bad range of data'
+	    GOTO 1000
+	  ELSE
+	    MEAN=MEAN/T2
+	  END IF
+!
+	  IPLT=0
+	  CALL NEW_GEN_IN(IPLT,K,NPLTS,'Plots to scale -- 0 un-normalizes')
+	  DO L=1,K
+	    IP=IPLT(L)
+	    IF(IP .GT. 0 .AND. IP .LE. NPLTS .AND.
+	1      IP .NE. VAR_PLT1 .AND. TYPE_CURVE(IP) .NE. 'I')THEN
+	      T1=0.0D0; T2=0.0D0
+	      DO J=2,NPTS(IP)-1
+	        T3=(CD(IP)%XVEC(J)-XT(1))*(XT(2)-CD(IP)%XVEC(J))
+	        IF(T3 .GT. 0)THEN
+	          T1=T1+CD(IP)%DATA(J)*ABS(CD(IP)%XVEC(J-1)-CD(IP)%XVEC(J+1))
+	          T2=T2+ABS(CD(IP)%XVEC(J-1)-CD(IP)%XVEC(J+1))
+	        END IF
+	      END DO
+	      T1=0.5D0*T1; T2=0.5D0*T2
+	      IF(T2 .EQ. 0 .OR. T1 .EQ. 0)THEN
+	        WRITE(T_OUT,*)IP,' not normalized'
+	      ELSE
+	        T1=T1/T2
+	        T3=MEAN/T1
+	        WRITE(T_OUT,*)'Normalization parameter for plot',IP,' is',T3
+	        WRITE(LU_NORM,'(A,I3,A,ES12.4,2X,I3,2ES12.4)')'Normalization parameters for plot',IP,' are',
+	1                          T3,VAR_PLT1,XT(1),XT(2)
+	        SCALE_FAC(IP)=T3
+	        DO J=1,NPTS(IP)
+	          CD(IP)%DATA(J)=CD(IP)%DATA(J)*T3
+	          IF(ERR(IP))CD(IP)%EMIN(J)=CD(IP)%EMIN(J)*T3
+	          IF(ERR(IP))CD(IP)%EMAX(J)=CD(IP)%EMAX(J)*T3
+	        END DO
+	        DONE_NORMALIZATION=.TRUE.
+	      END IF
+	    END IF
+	    IF(ABS(SCALE_FAC(IP)-1.0D0) .GT. 0.005)THEN
+	      J=MIN(INDEX(STORED_TITLE(IP),'\'),LEN_TRIM(STORED_TITLE(IP)))
+	      WRITE(TMP_STR,'(A3,F5.3)')'\x  ',SCALE_FAC(IP)
+	      IF(J .NE. 0)TITLE(IP)=STORED_TITLE(IP)(1:J-1)//TMP_STR(1:9)//STORED_TITLE(IP)(J:)
 	    END IF
 	  END DO
 	  GOTO 1000

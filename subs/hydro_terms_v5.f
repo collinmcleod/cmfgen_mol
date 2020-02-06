@@ -10,6 +10,7 @@
 	1              LST_ITERATION,BAND_FLUX,N_FLUXMEAN_BANDS,LU_OUT,ND)
 	IMPLICIT NONE
 !
+! Altered 01-Jan-2020 : Increased R precision. Increased Tau precision.
 ! Altered 13-Feb-2019 : Tau (Rosseland) now output.
 ! Altered 08-Nov-2016 : Now output Gamma (e.s.) at photosphere.
 ! Altered 01-Jan-2015 : Turbulent pressure term added, and also output when non-zero.
@@ -91,7 +92,8 @@
 	REAL*8 dP_CON
 	REAL*8 PTURB_CON
 	REAL*8 RAD_CON
-	REAL*8 T1
+	REAL*8 T1,T2
+	REAL*8 SOUND_SPEED
 	REAL*8 RPHOT
 	REAL*8 GAM_ES_PHOT
 	REAL*8 GPHOT
@@ -100,7 +102,8 @@
 	REAL*8 ERROR_SQ
 !
 	CHARACTER(LEN=12) TYPE_ATM
-	CHARACTER(LEN=80) FMT
+	CHARACTER(LEN=100) FMT
+	CHARACTER(LEN=20) TMP_FMT
 	INTEGER I,J,IOS,ERROR_LU
 	INTEGER ERROR_CNT
 	EXTERNAL ERROR_LU
@@ -166,20 +169,20 @@
 ! Output file header.
 !
 	IF(PRESSURE_VTURB .EQ. 0.0D0)THEN
-	  WRITE(LU_OUT,'(1X,6X,A,6X, 8X,A,3X, 2X,A, 5(4X,A,1X), 4X,A,2X,A,9X,A)')
+	  WRITE(LU_OUT,'(1X,6X,A,6X, 8X,A,3X, 2X,A, 5(4X,A,1X),4X,A,2X,A,9X,A,3X,A)')
 	1     'R','V','% Error','    VdVdR',
 	1                       ' dPdR/ROH',
 	1                       '    g_TOT',
 	1                       '    g_RAD',
-	1                       '   g_ELEC','Gamma','Depth','  Tau'
+	1                       '   g_ELEC','Gamma','Depth','Tau','Vsound'
 	ELSE
-	  WRITE(LU_OUT,'(1X,6X,A,6X, 8X,A,3X, 2X,A, 6(4X,A,1X), 4X,A,2X,A,9X,A)')
+	  WRITE(LU_OUT,'(1X,6X,A,6X, 8X,A,3X, 2X,A, 6(4X,A,1X), 4X,A,2X,A,9X,A,3X)')
 	1     'R','V','% Error','    VdVdR',
 	1                       ' dPdR/ROH',
 	1                       'dTPdR/ROH',
 	1                       '    g_TOT',
 	1                       '    g_RAD',
-	1                       '   g_ELEC','Gamma','Depth','Tau'
+	1                       '   g_ELEC','Gamma','Depth','Tau','Vsound'
 	END IF
 ! 
 	DO I=1,ND
@@ -219,24 +222,34 @@
 	    ERROR_CNT=ERROR_CNT+1
 	  END IF
 !
+! Compute the sound speed in km/s. Note: The constant is 1.0D-06 because T is in unts of 10^4 K,
+! and a factor of 10^{-10} is used to convert to km/s.
+!
+	  T1=1.0D-06*BOLTZMANN_CONSTANT()/MEAN_ATOMIC_WEIGHT/ATOMIC_MASS_UNIT()
+	  T2=PRESSURE_VTURB
+	  SOUND_SPEED=SQRT( T1*T(I)*(1.0D0+ED(I)/POP_ATOM(I)) + 0.5D0*T2*T2)
+!
+	  TMP_FMT='F10.2,F10.2)'
+	  IF(TAU(I) .LT. 1.0D0)TMP_FMT='F10.3,F10.2)'
+	  IF(TAU(I) .LT. 0.1D0)TMP_FMT='ES10.2,F10.2)'
 	  IF(PRESSURE_VTURB .EQ. 0.0D0)THEN
 	    IF(R(I) .GT. 9.99D+04)THEN
-	      FMT='(1X,ES12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7,2X,F10.2)'
+	      FMT='(1X,ES12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7,2X,'//TMP_FMT
 	    ELSE
-	      FMT='(1X,F12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7,2X,F10.2)'
+	      FMT='(1X,F12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7,2X,'//TMP_FMT
 	    END IF
 	    WRITE(LU_OUT,FMT)
 	1             R(I),V(I),ERROR,VdVdR,dPdR_ON_ROH,
-	1             g_TOT,g_RAD,g_ELEC,g_RAD/g_GRAV,I,TAU(I)
-	  ELSE                  
+	1             g_TOT,g_RAD,g_ELEC,g_RAD/g_GRAV,I,TAU(I),SOUND_SPEED
+	  ELSE
 	    IF(R(I) .GT. 9.99D+04)THEN
-	      FMT='(1X,ES12.6,ES13.4,F9.2,6(ES14.4),F9.2,I7,2X,F10.2)'
+	      FMT='(1X,ES15.9,ES13.4,F9.2,6(ES14.4),F9.2,I7,2X,'//TMP_FMT
 	    ELSE
-	      FMT='(1X,F12.6,ES13.4,F9.2,6(ES14.4),F9.2,I7,2X,F10.2)'
+	      FMT='(1X,F15.9,ES13.4,F9.2,6(ES14.4),F9.2,I7,2X,'//TMP_FMT
 	    END IF
 	    WRITE(LU_OUT,FMT)
 	1             R(I),V(I),ERROR,VdVdR,dPdR_ON_ROH,dPTURBdR_ON_ROH,
-	1             g_TOT,g_RAD,g_ELEC,g_RAD/g_GRAV,I,TAU(I)
+	1             g_TOT,g_RAD,g_ELEC,g_RAD/g_GRAV,I,TAU(I),SOUND_SPEED
 	  END IF                    
 !
 	END DO

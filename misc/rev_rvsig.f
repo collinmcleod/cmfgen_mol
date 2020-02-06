@@ -24,6 +24,9 @@ CONTAINS
 	USE VEL_LAW_PARAMS
 	IMPLICIT NONE
 !
+! Altered 01-Feb-2020: Added 'm' optoion to CUR option.
+! Altered 23-Jan-2020: Some cleaning done.
+! Altered 02-Jan-2020: Improved CUR option (R is normalized), added SIG option.
 ! Altered 19-Aug-2019: Added VEL_LAW_PARAMS, and the two subroutines.
 !                        Done to make velocity law calculation for SCLR
 !                        and MDOT full consistent. 
@@ -81,7 +84,7 @@ CONTAINS
 	REAL*8 V_MAX
 	REAL*8 V_MIN 
 !
-	REAL*4 XVAL,YVAL
+	REAL*4 XVAL,YVAL,SYMB_EXP_FAC
 	REAL*8 MDOT
 	REAL*8 OLD_MDOT
 	REAL*8 LSTAR
@@ -97,6 +100,7 @@ CONTAINS
 	INTEGER N_ADD
 	INTEGER NX_IN
 	INTEGER NX_OUT
+	INTEGER NINS
 !
 	INTEGER I,J,K
 	INTEGER I_ST,I_END
@@ -156,18 +160,20 @@ CONTAINS
 	OPTION='NEW_ND'
 	WRITE(6,'(A)')
 	WRITE(6,'(A)')'Current options are:'
-	WRITE(6,'(A)')'       NEW_ND: revise number of depth points by simple scaling'
 	WRITE(6,'(A)')'         ADDR: explicitly add extra grid points'
+	WRITE(6,'(A)')'          CUR: Revise V (and/or add extra R values) using a cursor.'
 	WRITE(6,'(A)')'         EXTR: extend grid to larger radii'
 	WRITE(6,'(A)')'         FGOB: insert N points at outer boundary (to make finer grid)'
 	WRITE(6,'(A)')'         MDOT: change the mass-loss rate or velocity law'
 	WRITE(6,'(A)')'         NEWG: revise grid between two velocities or depth indicies'
+	WRITE(6,'(A)')'       NEW_ND: revise number of depth points by simple scaling'
+	WRITE(6,'(A)')'         PLOT: plot V and SIGMA from old RVSIG file'
 	WRITE(6,'(A)')'          RDR: read in new R grid (DC format)'
 	WRITE(6,'(A)')'         SCLR: scale radius of star to new value'
 	WRITE(6,'(A)')'         SCLV: scale velocity law to new value'
+        WRITE(6,'(A)')'         SIGU: update sigma using V read from RVSIG file'
 	WRITE(6,'(A)')'         STOP: convert spherical model to a plane-paralell model'
 	WRITE(6,'(A)')'          TAU: Create entrie grid equally spaced in log[TAU] with constraints on dV'
-	WRITE(6,'(A)')'         PLOT: plot V and SIGMA from old RVSIG file'
 	WRITE(6,'(A)')
 	WRITE(6,'(A)')'R_GRID_CHK (if MEANOPAC readd) will contain dTAU and dV information.'
 	WRITE(6,'(A)')
@@ -338,6 +344,39 @@ CONTAINS
 	      J=J+1
 	    END IF
 	  END DO
+!
+	ELSE IF(OPTION .EQ. 'NINS')THEN
+	  WRITE(6,'(A)')' '
+	  WRITE(6,'(A)')'This option allows grid to be increaed by iserting points in old grid'
+	  WRITE(6,'(A)')'The old grd  points are retained'
+	  WRITE(6,'(A)')' '
+	  NINS=1 
+	  CALL GEN_IN(NINS,'Number of points to insert')
+	  R(1)=OLD_R(1)
+	  J=1
+	  DO I=1,ND_OLD-1
+	    J=J+1
+	    R(J)=0.5D0*(OLD_R(I)+OLD_R(I+1))
+	    J=J+1
+	    R(J)=OLD_R(I+1)
+	  END DO
+	  ND=J
+	  ALLOCATE (COEF(ND_OLD,4))
+	  CALL MON_INT_FUNS_V2(COEF,OLD_V,OLD_R,ND_OLD)
+!
+	  J=1
+	  I=1
+	  DO WHILE (I .LE. ND)
+	    IF(R(I) .GE. OLD_R(J+1))THEN
+	      T1=R(I)-OLD_R(J)
+	      V(I)=COEF(J,4)+T1*(COEF(J,3)+T1*(COEF(J,2)+T1*COEF(J,1)))
+	      SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0*T1*COEF(J,1))
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	      I=I+1
+	    ELSE
+	      J=J+1
+	    END IF
+	  END DO
 	  DEALLOCATE (COEF)
 !
 	ELSE IF(OPTION .EQ. 'SCLV')THEN
@@ -348,7 +387,15 @@ CONTAINS
 	  T1=1.1D0
 	  ND=ND_OLD
 	  CALL GEN_IN(T1,'Factor to sclae velocity')
-	  V(1:ND)=T1*OLD_V(1:ND)
+	  T2=0.0D0
+	  CALL GEN_IN(T2,'Velocity below which scaling is skipped')
+	  DO I=1,ND
+	    IF(OLD_V(I) .GT. T2)THEN
+	      V(I)=T1*OLD_V(I)
+	    ELSE
+	      V(I)=OLD_V(I)
+	    END IF
+	  END DO
 	  R(1:ND)=OLD_R(1:ND)
 	  SIGMA(1:ND)=OLD_SIGMA(1:ND)
 !
@@ -854,31 +901,65 @@ CONTAINS
 	  END DO
 	  DEALLOCATE (COEF)
 !
+	ELSE IF(OPTION .EQ. 'SIGU')THEN
+!
+! Update SIGMA
+!
+	  ND=ND_OLD
+	  ALLOCATE (COEF(ND,4))
+	  R(1:ND)=OLD_R(1:ND)
+	  V(1:ND)=OLD_V(1:ND)
+	  CALL MON_INT_FUNS_V2(COEF,V,R,ND)
+	  DO I=1,ND
+	    SIGMA(I)=COEF(I,3)
+	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	  END DO
+	  DEALLOCATE (COEF)
+!
 	ELSE IF(OPTION .EQ. 'CUR')THEN
 !
-	  WRITE(6,'(A)')BLUE_PEN
-	  WRITE(6,*)'Use ''r'' to replace a data point'
-	  WRITE(6,*)'Use ''a'' to add a data point'
-	  WRITE(6,*)'Use ''d'' to delete a data point'
-	  WRITE(6,*)'Use ''e'' to exit'
-	  WRITE(6,'(A)')DEF_PEN
+          WRITE(6,'(A)')BLUE_PEN
+          WRITE(6,*)' '
+          WRITE(6,*)' First create desired plot, amd use M to mark data point'
+          WRITE(6,*)' Do NOT change type of axes (i.e. take log etc)'
+          WRITE(6,*)' Then exit plot package -- cursor input done outside plot routine'
+          WRITE(6,'(A)')DEF_PEN
 !
-	  CALL DP_CURVE(ND_OLD,OLD_R,OLD_V)
+	  RTMP(1:ND_OLD)=OLD_R(1:ND_OLD)/OLD_R(ND_OLD)
+	  CALL DP_CURVE(ND_OLD,RTMP,OLD_V)
  	  CALL GRAMON_PGPLOT('R/R\d*\u','V(km/s)',' ',' ')
-	  WRITE(6,'(A)')'Cursor now available to modify data points'
-	  ND=ND_OLD
-	  R(1:ND)=OLD_R(1:ND); V(1:ND)=OLD_V(1:ND)
 !
-	  DO WHILE(1 .EQ. 1)
-	    DO WHILE(1 .EQ. 1)
+	  REPLOT=.TRUE.
+	  ND=ND_OLD
+	  R(1:ND)=RTMP(1:ND); V(1:ND)=OLD_V(1:ND)
+!
+	  DO WHILE(1 .EQ. 1)				!Multiple plotting
+!
+	    WRITE(6,'(A)')BLUE_PEN
+	    WRITE(6,'(A)')' '
+	    WRITE(6,*)'Click on top bar of plot window to activate cursor'
+	    WRITE(6,'(A)')' '
+	    WRITE(6,*)'Use ''r'' to replace a data point'
+	    WRITE(6,*)'Use ''a'' to add a data point'
+	    WRITE(6,*)'Use ''d'' to delete a data point'
+	    WRITE(6,*)'Use ''m'' move next, and points further out/inward by a fixed amount'
+	    WRITE(6,*)'Use ''v'' move next, and points further  up/down by a fixed amount in V'
+	    WRITE(6,*)'Use ''e'' to exit'
+	    WRITE(6,'(A)')DEF_PEN
+!
+	    XVAL=5.0; CALL PGSCH(XVAL)
+	    DO WHILE(1 .EQ. 1)				!Multiple cursor entries
 	      CURSERR = PGCURS(XVAL,YVAL,CURSVAL)
-	      WRITE(6,*)XVAL,YVAL
+	      WRITE(6,*)'Cursor values are:',XVAL,YVAL
 	      IF(CURSVAL .EQ. 'e' .OR. CURSVAL .EQ. 'E')EXIT
 	      IF(CURSVAL .EQ. 'r' .OR. CURSVAL .EQ. 'R')THEN
 	        T1=XVAL
 	        TMP_R(1:ND)=ABS(R(1:ND)-XVAL)
 	        I=MINLOC(TMP_R(1:ND),IONE)
 	        V(I)=YVAL
+	        J=1; CALL PGSCI(J)
+!	        SYMB_EXP_FAC=5.0; CALL PGSCH(SYMB_EXP_FAC)
+	        CALL PGPT(IONE,XVAL,YVAL,IONE)
 	        WRITE(6,*)'Replaced V for R=',R(I)
 	      ELSE IF(CURSVAL .EQ. 'd' .OR. CURSVAL .EQ. 'D')THEN
 	        T1=XVAL
@@ -897,10 +978,34 @@ CONTAINS
 	            END DO
 	            R(I+1)=XVAL; V(I+1)=YVAL
 	            ND=ND+1
+	            J=1; CALL PGSCI(J)
+	            CALL PGPT(IONE,XVAL,YVAL,IONE)
 	            WRITE(6,*)'Add R=',R(I),' to grid'
 	            EXIT
 	          END IF
 	        END DO
+	      ELSE IF(CURSVAL .EQ. 'm' .OR. CURSVAL .EQ. 'M')THEN
+	        WRK_VEC(1:ND)=ABS(V(1:ND)-YVAL)
+	        I=MINLOC(WRK_VEC(1:ND),IONE)
+	        J=1; CALL PGSCI(J)
+	        T1=XVAL-R(I)
+	        DO J=1,I
+	          R(J)=R(J)+T1
+	          XVAL=R(J); YVAL=V(J)
+	          CALL PGPT(IONE,XVAL,YVAL,IONE)
+	        END DO	
+	        WRITE(6,*)'Shited R grid by',T1
+	      ELSE IF(CURSVAL .EQ. 'v' .OR. CURSVAL .EQ. 'V')THEN
+	        WRK_VEC(1:ND)=ABS(R(1:ND)-XVAL)
+	        I=MINLOC(WRK_VEC(1:ND),IONE)
+	        J=1; CALL PGSCI(J)
+	        T1=YVAL-V(I)
+	        DO J=1,I
+	          V(J)=V(J)+T1
+	          XVAL=R(J); YVAL=V(J)
+	          CALL PGPT(IONE,XVAL,YVAL,IONE)
+	        END DO	
+	        WRITE(6,*)'Shited R grid by',T1
 	      ELSE
 	        WRITE(6,*)RED_PEN
 	        WRITE(6,*)'Error - use r(eplace), a(dd), d(elete), e'
@@ -909,10 +1014,12 @@ CONTAINS
 	    END DO
 	    CALL GEN_IN(REPLOT,'Replot to see revision to V')
 	    IF(REPLOT)THEN
-	      CALL DP_CURVE(ND_OLD,OLD_R,OLD_V)
+	      CALL DP_CURVE(ND_OLD,RTMP,OLD_V)
 	      CALL DP_CURVE(ND,R,V)
  	      CALL GRAMON_PGPLOT('R/R\d*\u','V(km/s)',' ',' ')
 	    ELSE
+	      R(1:ND)=R(1:ND)*OLD_R(ND_OLD)
+	      R(1)=OLD_R(1); R(ND)=OLD_R(ND_OLD)
 	      EXIT
 	    END IF
 	  END DO

@@ -5,6 +5,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered 04-Jan-2020: Changed LTEPOP_WLD and CNVT_FR_DC to V2.
 ! Altered 20-Jun-2008: Z_POP now set (was not set)a
 !                      Improved handling at boundaries.
 ! Created 
@@ -69,27 +70,37 @@
 	  T(I)=OLD_T(OLD_ND)*(TAU(I)+0.67D0)/(OLD_TAU(OLD_ND)+0.67D0)
 	END DO
 !
+	ED=ED/CLUMP_FAC
+!
+	WRITE(175,'(4X,10(5X,A))')
+	1       '     OLD_R','   OLD_T','  OLD_ED',' OLD_TAU','OLD_ROSS',
+	1       '     NEW_R','   NEW_T','  NEW_ED',' NEW_TAU','NEW_ROSS'
 	DO I=1,ND
-	  WRITE(175,'(I4,8ES14.4)')I,OLD_R(I),OLD_T(I),OLD_TAU(I),OLD_ROSS_MEAN(I),
-	1                            R(I),T(I),TAU(I),ROSS_MEAN(I)
+	  WRITE(175,'(I4,2(ES15.6,4ES13.3))')I,
+	1                OLD_R(I),OLD_T(I),OLD_ED(I),OLD_TAU(I),OLD_ROSS_MEAN(I),
+	1                R(I),T(I),ED(I),TAU(I),ROSS_MEAN(I)/CLUMP_FAC(I)
 	END DO
 !
 ! Loop over all species and ionization stages
 !
 	DO ISPEC=1,NUM_SPECIES
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	    WRITE(6,*)'In loop',ISPEC,ID
 !
 ! Compute departure coefficients
 !
-	    ATM(ID)%XzV_F=ATM(ID)%XzV_F/ATM(ID)%XzVLTE_F
+	    ATM(ID)%XzV_F=LOG(ATM(ID)%XzV_F)-ATM(ID)%LOG_XzVLTE_F
+	    WRITE(101,'(A,3X,3ES14.4)')TRIM(ION_ID(ID)),ATM(ID)%XzV_F(1,1),
+	1                  ATM(ID)%XzVLTE_F(1,1),ATM(ID)%DXzV_F(1)
+	    FLUSH(UNIT=101)
 !
 ! Put the departure coefficients on the new grid.
 !
 	    N_INT=NX-NXST+1
 	    DO I=1,ATM(ID)%NXZV_F
-	       TB(1:OLD_ND)=LOG(ATM(ID)%XzV_F(I,1:OLD_ND))
+	       TB(1:OLD_ND)=ATM(ID)%XzV_F(I,1:OLD_ND)
 	       CALL LINPOP(LOG_TAU(NXST),TA(NXST),N_INT,LOG_OLD_TAU,TB,OLD_ND)
-	       ATM(ID)%XzV_F(I,NXST:NX)=EXP(TA(NXST:NX))
+	       ATM(ID)%XzV_F(I,NXST:NX)=TA(NXST:NX)
 	    END DO
 !
 ! Now do the boudaries which may extend outside the old grid.
@@ -143,26 +154,41 @@
 ! TB is used as a dummy vector when we are dealing with the lowest ionization
 ! stage. It is returned with the ground state population.
 !
-	WRITE(6,*)'Beginning DC interpolation in ADJUST_POPS'
+! CNVT_FR_DC_V2 requires the we pass LOG(DCs) to it.
+!
+	WRITE(6,*)'Beginning DC interpolation in ADJUST_POPS'; FLUSH(UNIT=6)
 	DO ISPEC=1,NUM_SPECIES
 	  FIRST=.TRUE.
 	  DO ID=SPECIES_END_ID(ISPEC),SPECIES_BEG_ID(ISPEC),-1
 	    IF(ATM(ID)%XzV_PRES)THEN
-	      CALL LTEPOP_WLD_V1(ATM(ID)%XzVLTE_F, ATM(ID)%W_XzV_F,
+	      CALL LTEPOP_WLD_V2(ATM(ID)%XzVLTE_F, ATM(ID)%LOG_XzVLTE_F, ATM(ID)%W_XzV_F,
 	1              ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,
 	1              ATM(ID)%ZXzV,      ATM(ID)%GIONXzV_F,
 	1              ATM(ID)%NXzV_F,    ATM(ID)%DXzV_F,     ED,T,ND)
-	      CALL CNVT_FR_DC(ATM(ID)%XzV_F, ATM(ID)%XzVLTE_F,
+!	      ATM(ID)%XzV_F=LOG(ATM(ID)%XzV_F)
+	      WRITE(101,'(A,3X,3ES14.4)')TRIM(ION_ID(ID)),ATM(ID)%XzV_F(1,1),
+	1                                ATM(ID)%LOG_XzVLTE_F(1,1),ATM(ID)%DXzV_F(1)
+	     CALL CNVT_FR_DC_V2(ATM(ID)%XzV_F, ATM(ID)%LOG_XzVLTE_F,
 	1              ATM(ID)%DXzV_F,    ATM(ID)%NXzV_F,
 	1              TB,                TA,ND,
 	1              FIRST,             ATM(ID+1)%XzV_PRES)
+!	    CALL WRITEDC_V3( ATM(ID)%XzV_F, ATM(ID)%LOG_XzVLTE_F,
+!	1          ATM(ID)%NXzV_F, ATM(ID)%DXzV_F,IONE,
+!	1          R,T,ED,V,CLUMP_FAC,LUM,ND,
+!	1          TRIM(ION_ID(ID))//'BFM','DC',IONE)
 	      IF(ID .NE. SPECIES_BEG_ID(ISPEC))ATM(ID-1)%DXzV_F(1:ND)=TB(1:ND)
 	    END IF
 	  END DO
+	WRITE(6,*)'Finalized DC interpolation in ADJUST_POPS'; FLUSH(UNIT=6)
 !
 ! Scale the populatons to match the actual density.
 !
+	  CALL WRITE_VEC(TA,ND,SPECIES(ISPEC),100); FLUSH(UNIT=100)
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+!	    CALL WRITEDC_V3( ATM(ID)%XzV_F, ATM(ID)%LOG_XzVLTE_F,
+!	1          ATM(ID)%NXzV_F, ATM(ID)%DXzV_F,IONE,
+!	1          R,T,ED,V,CLUMP_FAC,LUM,ND,
+!	1          TRIM(ION_ID(ID))//'OUT','DC',IONE)
 	    CALL SCALE_POPS(ATM(ID)%XzV_F,ATM(ID)%DXzV_F,
 	1              POP_SPECIES(1,ISPEC),TA,ATM(ID)%NXzV_F,ND)
 	  END DO

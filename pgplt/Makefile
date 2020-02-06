@@ -19,6 +19,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(curve.o)\
       $(LIB)(cut_points_from_plot.o)\
       $(LIB)(define_more_pens.o)\
+      $(LIB)(do_pg_deriv.o)\
       $(LIB)(do_fill.o)\
       $(LIB)(do_many_ew.o)\
       $(LIB)(do_mult_gf.o)\

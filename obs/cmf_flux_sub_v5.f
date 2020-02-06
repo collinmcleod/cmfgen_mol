@@ -300,6 +300,7 @@
 	REAL*8 TB(NDMAX)
 	REAL*8 TC(NDMAX)
 	REAL*8 XM(NDMAX)		!R.H.S. (SOURCE VECTOR)
+	REAL*8 TCHI(ND)
 !
 ! 
 !
@@ -1895,26 +1896,29 @@
 ! negative. If so we can continue, but we note that the
 ! results may be in error, and need to be checked.
 !
-	IF(MINVAL(ROSSMEAN) .GT. 0.0D0)THEN
-	  CALL DERIVCHI(dCHIdR,ROSSMEAN,R,ND,METHOD)
+	TCHI(1:ND)=ROSSMEAN(1:ND)*CLUMP_FAC(1:ND)
+	IF(MINVAL(TCHI) .GT. 0.0D0)THEN
+	  CALL DERIVCHI(dCHIdR,TCHI,R,ND,METHOD)
         ELSE
 	  dCHIDR(1:ND)=0.0D0
 	  WRITE(LUER,*)'Error in CMF_FLUX_SUB: Check MEANOPAC'
 	  WRITE(LUER,*)'Rosseland mean opacity has negative values'
 	END IF
-	CALL NORDTAU(TA,ROSSMEAN,R,R,dCHIdR,ND)
+	CALL NORDTAU(TA,TCHI,R,R,dCHIdR,ND)
 !
-	IF(MINVAL(FLUXMEAN) .GT. 0.0D0)THEN
+	TCHI(1:ND)=FLUXMEAN(1:ND)*CLUMP_FAC(1:ND)
+	IF(MINVAL(TCHI) .GT. 0.0D0)THEN
 	  CALL DERIVCHI(dCHIdR,FLUXMEAN,R,ND,METHOD)
         ELSE
 	  dCHIDR(1:ND)=0.0D0
 	  WRITE(LUER,*)'Warning from CMF_FLUX_SUB: Check MEANOPAC'
 	  WRITE(LUER,*)'Flux mean opacity has zero or negative values'
 	END IF
-        CALL NORDTAU(TB,FLUXMEAN,R,R,dCHIdR,ND)
+        CALL NORDTAU(TB,TCHI,R,R,dCHIdR,ND)
 !
-	CALL DERIVCHI(dCHIdR,ESEC,R,ND,METHOD)
-        CALL NORDTAU(DTAU,ESEC,R,R,dCHIdR,ND)
+	TCHI(1:ND)=ESEC(1:ND)*CLUMP_FAC(1:ND)
+	CALL DERIVCHI(dCHIdR,TCHI,R,ND,METHOD)
+        CALL NORDTAU(DTAU,TCHI,R,R,dCHIdR,ND)
 !
 	TA(ND)=0.0D0; TB(ND)=0.0D0; TC(ND)=0.0D0; DTAU(ND)=0.0D0
 	CALL GEN_ASCI_OPEN(LU_OPAC,'MEANOPAC','UNKNOWN',' ',' ',IZERO,IOS)
@@ -1946,6 +1950,9 @@
 	1      T2,T3,TC(2),TC(3),1.0D-10*ROSSMEAN(I)/DENSITY(I),V(I)
 	  END DO
 	CLOSE(UNIT=LU_OPAC)
+	WRITE(LU_OPAC,'(//,A,A)')
+	1     'NB: Mean opacities do not include effect of clumping',
+	1     'NB: Optical depth scale includes effect of clumping'
 !
 ! Output hydrodynamical terms to allow check on radiation driving of the wind.
 !

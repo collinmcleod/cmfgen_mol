@@ -62,7 +62,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(set_imp_vec.o)\
       $(LIB)(set_pops_to_pure_lte.o)\
       $(LIB)(set_sn_r_grid.o)\
-      $(LIB)(set_new_grid.o)\
+      $(LIB)(set_new_grid_v2.o)\
       $(LIB)(smooth_pops_as_we_iterate.o)\
       $(LIB)(solveba_v13.o)\
       $(LIB)(steq_multi_v10.o)\
