@@ -257,7 +257,7 @@
 !
 	ELSE IF(INTERP_OPTION .EQ. 'TR')THEN
 !
-	  WRITE(6,*)'Starting TR option for '//TRIM(FILE_NAME); FLUSH(UNIT=6)
+!	  WRITE(6,*)'Starting TR option for '//TRIM(FILE_NAME); FLUSH(UNIT=6)
 	  TMIN=MINVAL(OLD_T)
 	  TMAX=MAXVAL(OLD_T)
 	  JMIN=MINLOC(OLD_T,IONE)
@@ -304,10 +304,10 @@
 	        END DO
 	        DI(I)=EXP(T1*OLD_DI(JINT+1)+(1.0D0-T1)*OLD_DI(JINT))
 	      END IF
-	      WRITE(6,*)'Done ',I; FLUSH(UNIT=6)
+!	      WRITE(6,*)'Done ',I; FLUSH(UNIT=6)
 	    END IF
 	  END DO
-	  WRITE(6,*)'Done interp'; FLUSH(UNIT=6)
+!	  WRITE(6,*)'Done interp'; FLUSH(UNIT=6)
 	  GOTO 1000
 !
 	ELSE IF(INTERP_OPTION .EQ. 'SPH_TAU')THEN
