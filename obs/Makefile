@@ -33,7 +33,7 @@ OBJ1  =  cmf_flux_v5.o cmf_flux_sub_v5.o mod_cmf_obs.o mod_freq_obs.o \
         ins_line_obs_v4.o rd_cont_j_obs.o set_forbid_zero.o form_ew.o \
         comp_ew_abs_ew.o
  
-OBJ2  =  obs_frame.o obs_frame_sub_v2.o 
+OBJ2  =  obs_frame_v2.o obs_frame_sub_v9.o 
 
 INC = ABS_EW.INC CMF_ABS_EW.INC COMP_JCONT_V4.INC EVAL_LTE_INC_V5.INC  OPACITIES_V5.INC XOPAC_V4.INC  
 

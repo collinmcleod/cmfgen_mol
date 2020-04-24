@@ -387,15 +387,16 @@
 ! Variables for performing NG acceleration.
 !
 	INTEGER LAST_NG   		!Indicates iteration on which last
-!                                          NG acceleration occurred.
+!                               	    NG acceleration occurred.
 	INTEGER NEXT_NG   		!Indicates iteration on which next
 !                                          NG acceleration is to occur.
-	INTEGER IT_TO_BEG_NG          !Iteration to beg NG acceleration
+	INTEGER IT_TO_BEG_NG       	!Iteration to beg NG acceleration
 	INTEGER ITS_PER_NG  		!Iterations between NG accelerations.
-	INTEGER NG_BAND_WIDTH         !Number of depths to acclerate simultaneously
+	INTEGER NG_BAND_WIDTH      	!Number of depths to acclerate simultaneously
 	REAL*8 VAL_DO_NG 		!Begin NG when MAXCH < VAL_DO_NG
 	LOGICAL NG_DONE			!iIndicates successfull completion of NG
 	LOGICAL NG_DO			!Switch on NG acceleration.
+	LOGICAL DO_NG_VALIDITY_CHECK
 !
 ! Variables for performing averaging of oscilating populations.
 !

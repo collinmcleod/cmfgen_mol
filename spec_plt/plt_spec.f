@@ -18,6 +18,7 @@ C
 C
 	IMPLICIT NONE
 C
+C Altered 19-Apr-2020 : Added CLIP option to RD_CONT.
 C Altered 16-May-2019 : NU, OBSF etc are now allocatable arrays.
 C Altered 18-Jan-2015 : Added REM_BP (automatic removal of bad pixel).
 C Altered 04-Nov-2015 : Fixed SMC redenning law in optical. Previous formula only
@@ -101,6 +102,7 @@ C
 	LOGICAL TREAT_AS_MOD		
 	LOGICAL READ_OBS
 	LOGICAL AIR_LAM
+	LOGICAL CLIP_FEATURES
 C
 	LOGICAL WR_PLT,OVER
 C
@@ -447,20 +449,26 @@ C
 C
 	ELSE IF(X(1:7) .EQ. 'RD_CONT')THEN
 	  FILENAME=' '
+	  CLIP_FEATURES=.FALSE.
 	  CALL USR_OPTION(FILENAME,'File',' ','Continuum file')
-	  OVER=.FALSE.
+	  CALL RD_MOD(NU_CONT,OBSF_CONT,NCF_MAX,NCF_CONT,FILENAME,IOS)
+	  CALL USR_HIDDEN(CLIP_FEATURES,'CLIP','F','Clipe out continuum features')
 	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
+	  IF(IOS .NE. 0)GOTO 1		!Get another option
+	  SCALE_FAC=1.0D0
+	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
+	  IF(CLIP_FEATURES)THEN
+	    WRITE(6,*)'Clipping fetaures from spectrum'
+	    CALL CLIP(NU_CONT,OBSF_CONT,NCF_CONT)
+	  END IF
+!
 	  IF(OVER)THEN
-	    CALL RD_MOD(NU,OBSF,NCF_MAX,NCF,FILENAME,IOS)
-	    IF(IOS .NE. 0)THEN
-	       WRITE(T_OUT,*)'Error reading ocntinuum data -- no data read'
-	       GOTO 1		!Get another option
-	    END IF
+	    NCF=NCF_CONT
+	    DO I=1,NCF
+	      NU(I)=NU_CONT(I)
+	      OBSF(I)=OBSF_CONT(I)*SCALE_FAC
+	    END DO
 	  ELSE
-	    CALL RD_MOD(NU_CONT,OBSF_CONT,NCF_MAX,NCF_CONT,FILENAME,IOS)
-	    IF(IOS .NE. 0)GOTO 1		!Get another option
-	    SCALE_FAC=1.0D0
-	    CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
 	    DO I=1,NCF_CONT
 	      XV(I)=NU_CONT(I)
 	      YV(I)=OBSF_CONT(I)*SCALE_FAC

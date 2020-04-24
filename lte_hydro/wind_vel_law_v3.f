@@ -13,6 +13,7 @@
 	1              dVdR_TRANS,VEL_TYPE,ND,ND_MAX)
 	IMPLICIT NONE
 !
+! Altered 10-Apr-2020 -- Fixed SIGMA calcualtion for VEL_TYPE=5. Only will effect grid construction.
 ! Altered 15-Jul-2007 -- Added VEL_TYPE=3, and now use LU_DIAG so lees ouput to OUTGEN.
 ! Created 10-Aug-2006.
 !
@@ -251,7 +252,7 @@
               T1=RP2/R(I)
               T2=1.0D0-T1
 	      TOP=TOP+VEXT*(T2**BETA2)
-              dTOPdR = dTOPdR + VEXT*BETA2 * RP2/R(I)*T2**(BETA - 1.0D0)
+              dTOPdR = dTOPdR + VEXT*BETA2 * T1/R(I)*T2**(BETA2 - 1.0D0)
             END IF
 	    BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
             V(I) = TOP/BOT
@@ -261,6 +262,7 @@
             dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT )  / SCALE_HEIGHT
             dVdR = dTOPdR / BOT  + V(I)*dBOTdR/BOT
             SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
+!	    WRITE(6,*)I,R(I),R(I)-R(I-1),V(I),dVdR
 	  END DO
 !
 	ELSE

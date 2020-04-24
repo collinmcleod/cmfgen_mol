@@ -2959,6 +2959,10 @@
 	  CALL WRITV(RLUMST,ND,'Luminosity',LU_FLUX)
 	CLOSE(UNIT=LU_FLUX)
 	CALL TUNE(ITWO,'MLCF')
+	IF(.NOT. LAMBDA_ITERATION .AND. .NOT. LST_ITERATION)THEN
+	  CALL CHECK_SPEC_CONV(OBS_FLUX,OBS_FREQ,T1,T2,CHK,N_OBS)
+	END IF
+	WRITE(6,*)'Exited CHEC_SPECK_CONV';FLUSH(UNIT=6)
 !
 ! Compute ROSSELAND and FLUX mean opacities. These MEAN opacities DO NOT 
 ! include the effect of clumping. Compute the respective optical depth scales; 

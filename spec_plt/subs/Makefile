@@ -10,6 +10,7 @@ LIB=$(LIB_DIR)libspec.a
 # or if the libraries have changed since the last link.
 #
 OBJ    = $(LIB)(convolve.o)\
+         $(LIB)(clip.o)\
          $(LIB)(divide_by_cont.o)\
          $(LIB)(do_int_rec_ap.o)\
          $(LIB)(determ_reddening.o)\

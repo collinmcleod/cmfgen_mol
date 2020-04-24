@@ -1093,6 +1093,8 @@ C
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(NG_DO,'DO_NG',L_TRUE,
 	1         'Perform NG acceleration when applicable ?')
+	  CALL RD_STORE_LOG(DO_NG_VALIDITY_CHECK,'NG_CHK',L_TRUE,
+	1         'Check if NG accleration has made a reasonable correction to T?')
 	  CALL RD_STORE_DBLE(VAL_DO_NG,'BEG_NG',L_TRUE,
 	1       'Percentage accuracy at which to begin NG acceleration')
 	  CALL RD_STORE_INT(IT_TO_BEG_NG,'IBEG_NG',L_TRUE,

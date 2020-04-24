@@ -17,6 +17,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(blkband.o)\
       $(LIB)(chk_eq_num.o)\
       $(LIB)(chk_col_name.o)\
+      $(LIB)(check_spec_conv.o)\
       $(LIB)(cmf_form_sol.o)\
       $(LIB)(cmf_form_sol_v2.o)\
       $(LIB)(cnvt_fr_dc.o)\
