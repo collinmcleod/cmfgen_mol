@@ -833,25 +833,43 @@ CONTAINS
 	    END IF
 	  END DO
 	  IF( OLD_V(TRANS_I)-V_TRANS .GT. V_TRANS-OLD_V(TRANS_I+1))TRANS_I=TRANS_I+1
-	  V_TRANS=OLD_V(TRANS_I)
 	  R(1:ND)=OLD_R(1:ND_OLD)
+!
+	  IF(VEL_TYPE .EQ. 6)THEN
+	    T1=MDOT/OLD_MDOT
+	    DO I=1,ND
+	      T2=1.0D0/(1.0D0+EXP(-5.0D0*(OLD_V(I)/V_TRANS-1.0D0)))
+	      T3= T1+(1.0D0-T1)*T2 
+	      V(I)=OLD_V(I)*T3
+	      WRITE(6,'(5ES14.4)')T1,T2,T3,OLD_V(I),V(I)
+	    EN DDO
+	    ALLOCATE (COEF(ND,4))
+	    CALL MON_INT_FUNS_V2(COEF,V,R,ND)
+	    DO I=1,ND
+	      SIGMA(I)=COEF(I,3)
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	    END DO
+	    DEALLOCATE (COEF)
 !
 ! In the hydrostatic region, the velocity is simply scaled by the change in
 ! mass-loss rate. This preserves the density. Only valid if wind does not have
 ! a significant optical depth.
 !
-	  DO I=TRANS_I,ND
-	    V(I)=MDOT*OLD_V(I)/OLD_MDOT
-	    SIGMA(I)=OLD_SIGMA(I)
-	  END DO
+	  ELSE
+	    V_TRANS=OLD_V(TRANS_I)
+	    DO I=TRANS_I,ND
+	      V(I)=MDOT*OLD_V(I)/OLD_MDOT
+	      SIGMA(I)=OLD_SIGMA(I)
+	    END DO
 !
 ! Now do the new wind law, keeping the same radius grid.
 !
-	  R_TRANS=R(TRANS_I)
-	  V_TRANS=MDOT*V_TRANS/OLD_MDOT
-	  dVdR_TRANS=(SIGMA(TRANS_I)+1.0D0)*V_TRANS/R_TRANS
+	    R_TRANS=R(TRANS_I)
+	    V_TRANS=MDOT*V_TRANS/OLD_MDOT
+	    dVdR_TRANS=(SIGMA(TRANS_I)+1.0D0)*V_TRANS/R_TRANS
 !
-	  CALL CALCULATE_VEL(R,V,SIGMA,ND)
+	    CALL CALCULATE_VEL(R,V,SIGMA,ND)
+	  END IF
 !
 	ELSE IF(OPTION .EQ. 'STOP')THEN
 !
