@@ -24,6 +24,8 @@ CONTAINS
 	USE VEL_LAW_PARAMS
 	IMPLICIT NONE
 !
+! Altered 18-May-2020: Moved from OSIRIS to IBIS. Also has OLD V option with MODT.
+! Altered 05-May-2020: CUR can now be used in log-log spcce
 ! Altered 01-Feb-2020: Added 'm' optoion to CUR option.
 ! Altered 23-Jan-2020: Some cleaning done.
 ! Altered 02-Jan-2020: Improved CUR option (R is normalized), added SIG option.
@@ -53,6 +55,9 @@ CONTAINS
 	REAL*8 OLD_DENSITY(NMAX)
 	REAL*8 OLD_CLUMP_FAC(NMAX)
 	REAL*8 OLD_LOG_R(NMAX)
+!
+	REAL*8 R_PLT(NMAX)
+	REAL*8 V_PLT(NMAX)
 !
 	REAL*8 R(NMAX)
 	REAL*8 V(NMAX)
@@ -113,6 +118,7 @@ CONTAINS
 	LOGICAL RD_MEANOPAC
 	LOGICAL REPLOT
 	LOGICAL RD_DENSITY
+	LOGICAL LOG_LOG
 !
 	INTEGER GET_INDX_DP
         CHARACTER*30 UC
@@ -124,6 +130,7 @@ CONTAINS
 	CHARACTER(LEN=80) NEW_RVSIG_FILE
 	CHARACTER(LEN=80) STRING
 	CHARACTER(LEN=80) OLD_HEADER(30)
+	CHARACTER(LEN=20) XLAB,YLAB	
 !
 	OLD_RVSIG_FILE='RVSIG_COL_OLD'
 	CALL GEN_IN(OLD_RVSIG_FILE,'File containing old R, V and sigma values')
@@ -816,11 +823,14 @@ CONTAINS
 	  WRITE(6,*)' since as you decrease Mdot, the extent of the photosphere increase'
 !
 	  CALL DESCRIBE_VEL_LAWS()
+	  WRITE(6,*)'Type 6 retains the old velocity law beyond the transition velocity'
 !
 	  VEL_TYPE=2
-	  CALL GEN_IN(VEL_TYPE,'Velocity law to be used: 1, 2, 3, 4 or 5')
-	  CALL GEN_IN(VINF,'Velocity at infinity in km/s')
-	  CALL GEN_IN(BETA,'Beta for velocity law')
+	  CALL GEN_IN(VEL_TYPE,'Velocity law to be used: 1, 2, 3, 4, 5, 6')
+	  IF(VEL_TYPE .NE. 6)THEN
+	    CALL GEN_IN(VINF,'Velocity at infinity in km/s')
+	    CALL GEN_IN(BETA,'Beta for velocity law')
+	  END IF
 	  CALL GEN_IN(V_TRANS,'Connection velocity in km/s')
 	  V_TRANS=V_TRANS*OLD_MDOT/MDOT
 !
@@ -835,14 +845,22 @@ CONTAINS
 	  IF( OLD_V(TRANS_I)-V_TRANS .GT. V_TRANS-OLD_V(TRANS_I+1))TRANS_I=TRANS_I+1
 	  R(1:ND)=OLD_R(1:ND_OLD)
 !
+! In the hydrostatic region, the velocity is simply scaled by the change in
+! mass-loss rate. This preserves the density. Only valid if wind does not have
+! a significant optical depth.
+!
+! Now do the new wind law, keeping the same radius grid.
+! Old:
+!    T2=(OLD_V(I)/V_TRANS)**2
+!    V(I)=OLD_V(I)*(T1+(1.0D0-T1)*T2/(1.0D0+T2))
+!
 	  IF(VEL_TYPE .EQ. 6)THEN
 	    T1=MDOT/OLD_MDOT
 	    DO I=1,ND
-	      T2=1.0D0/(1.0D0+EXP(-5.0D0*(OLD_V(I)/V_TRANS-1.0D0)))
-	      T3= T1+(1.0D0-T1)*T2 
-	      V(I)=OLD_V(I)*T3
-	      WRITE(6,'(5ES14.4)')T1,T2,T3,OLD_V(I),V(I)
-	    EN DDO
+              T2=1.0D0/(1.0D0+EXP(-5.0D0*(OLD_V(I)/V_TRANS-1.0D0)))
+              T3= T1+(1.0D0-T1)*T2
+              V(I)=OLD_V(I)*T3
+	    END DO
 	    ALLOCATE (COEF(ND,4))
 	    CALL MON_INT_FUNS_V2(COEF,V,R,ND)
 	    DO I=1,ND
@@ -851,10 +869,6 @@ CONTAINS
 	    END DO
 	    DEALLOCATE (COEF)
 !
-! In the hydrostatic region, the velocity is simply scaled by the change in
-! mass-loss rate. This preserves the density. Only valid if wind does not have
-! a significant optical depth.
-!
 	  ELSE
 	    V_TRANS=OLD_V(TRANS_I)
 	    DO I=TRANS_I,ND
@@ -862,12 +876,9 @@ CONTAINS
 	      SIGMA(I)=OLD_SIGMA(I)
 	    END DO
 !
-! Now do the new wind law, keeping the same radius grid.
-!
 	    R_TRANS=R(TRANS_I)
 	    V_TRANS=MDOT*V_TRANS/OLD_MDOT
 	    dVdR_TRANS=(SIGMA(TRANS_I)+1.0D0)*V_TRANS/R_TRANS
-!
 	    CALL CALCULATE_VEL(R,V,SIGMA,ND)
 	  END IF
 !
@@ -943,13 +954,21 @@ CONTAINS
           WRITE(6,*)' Then exit plot package -- cursor input done outside plot routine'
           WRITE(6,'(A)')DEF_PEN
 !
-	  RTMP(1:ND_OLD)=OLD_R(1:ND_OLD)/OLD_R(ND_OLD)
-	  CALL DP_CURVE(ND_OLD,RTMP,OLD_V)
- 	  CALL GRAMON_PGPLOT('R/R\d*\u','V(km/s)',' ',' ')
+	  LOG_LOG=.FALSE.
+	  CALL GEN_IN(LOG_LOG,'Are we using LOG-LOG axes')	  
+	  ND=ND_OLD;    T1=OLD_R(ND)
+	  IF(LOG_LOG)THEN
+	    R_PLT(1:ND)=LOG10(OLD_R(1:ND)/T1); V_PLT(1:ND)=LOG10(OLD_V(1:ND))
+	    XLAB='Log R/R\d*\u'; YLAB='Log V(km/s)'
+	  ELSE
+	    R_PLT(1:ND)=OLD_R(1:ND)/T1; V_PLT(1:ND)=OLD_V(1:ND)
+	    XLAB='R/R\d*\u'; YLAB='V(km/s)'
+	  END IF
+	  CALL DP_CURVE(ND_OLD,R_PLT,V_PLT)
+ 	  CALL GRAMON_PGPLOT(XLAB,YLAB,' ',' ')
 !
+	  R(1:ND)=R_PLT(1:ND); V(1:ND)=V_PLT(1:ND)
 	  REPLOT=.TRUE.
-	  ND=ND_OLD
-	  R(1:ND)=RTMP(1:ND); V(1:ND)=OLD_V(1:ND)
 !
 	  DO WHILE(1 .EQ. 1)				!Multiple plotting
 !
@@ -1032,11 +1051,16 @@ CONTAINS
 	    END DO
 	    CALL GEN_IN(REPLOT,'Replot to see revision to V')
 	    IF(REPLOT)THEN
-	      CALL DP_CURVE(ND_OLD,RTMP,OLD_V)
+	      CALL DP_CURVE(ND_OLD,R_PLT,V_PLT)
 	      CALL DP_CURVE(ND,R,V)
- 	      CALL GRAMON_PGPLOT('R/R\d*\u','V(km/s)',' ',' ')
+ 	      CALL GRAMON_PGPLOT(XLAB,YLAB,' ',' ')
 	    ELSE
-	      R(1:ND)=R(1:ND)*OLD_R(ND_OLD)
+	      IF(LOG_LOG)THEN
+	        R(1:ND)=(10.0D0**R(1:ND))*OLD_R(ND_OLD)
+	        V(1:ND)=(10.0D0**V(1:ND))
+	      ELSE
+	        R(1:ND)=R(1:ND)*OLD_R(ND_OLD)
+	      END IF
 	      R(1)=OLD_R(1); R(ND)=OLD_R(ND_OLD)
 	      EXIT
 	    END IF

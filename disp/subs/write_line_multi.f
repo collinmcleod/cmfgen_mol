@@ -4,6 +4,8 @@
 	1            ETA,CHI,ESEC,CHIL,ETAL,ND,LUOUT)
 	IMPLICIT NONE
 !
+! Altered 27-May-2020 : Now write out N_CONT and N_LINE strings (values will need to be updated).
+!
 	CHARACTER(LEN=*) TRAN_NAME
 	CHARACTER(LEN=*) MOD_NAME
 	LOGICAL NEW_FILE
@@ -45,6 +47,8 @@
  	  WRITE(LUOUT,'(1X,A,T25,A,T40,A)')'TRUE','[DIF]','Diffusion approximation'
  	  WRITE(LUOUT,'(1X,A,T25,A,T40,A)')'TRUE','[FADJ]','Opacities etc scaled by clumping factor'
 	  WRITE(TMP_STR,'(I5)')ND; TMP_STR=ADJUSTL(TMP_STR)
+	  WRITE(LUOUT,'(1X,A,T25,A,T40,A)')0,'[N_CONT]','Number of continuum frequencies'
+	  WRITE(LUOUT,'(1X,A,T25,A,T40,A)')0,'[N_LINE]','Number of line frequencies'
 	  WRITE(LUOUT,'(1X,A,T25,A,T40,A)')TRIM(TMP_STR),'[ND]','Number of depth points'
 	  WRITE(LUOUT,*)' '
 !

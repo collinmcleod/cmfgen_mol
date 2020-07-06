@@ -1714,6 +1714,7 @@
 	  WRITE(LU_NET,40001)'FORMSOL Transfer Solution'
 	  WRITE(LU_NET,40002)LEV(1),LEV(2)
 	  WRITE(LU_NET,40003)(ZNET(I),I=1,ND)
+	  FLUSH(UNIT=LU_NET)
 ! 
 	ELSE IF(XOPT .EQ. 'MOMR')THEN
 !
@@ -5374,9 +5375,19 @@ c
 !
 	ELSE IF(XOPT .EQ. 'RR')THEN
 	   FOUND=.FALSE.
+	   CALL USR_HIDDEN(LEV,2,2,'LIMS','1,1','Imin, Imax')
 	   DO ID=1,NUM_IONS
 	     IF(XSPEC .EQ. UC(ION_ID(ID)))THEN
-	       CALL SETREC(TA,ATM(ID)%DXzV,ATM(ID+1)%XzV_F,ATM(ID+1)%NXzV_F,ND)
+	       IF(LEV(2) .EQ. 1)THEN
+	         CALL SETREC(TA,ATM(ID)%DXzV,ATM(ID+1)%XzV_F,ATM(ID+1)%NXzV_F,ND)
+	       ELSE
+	         TA=0.0D0
+	         DO J=1,ND
+	           DO I=LEV(1),LEV(2)
+	             TA(J)=TA(J)+ATM(ID+1)%XzV_F(I,J)
+	           END DO
+	         END DO
+	       END IF
 	       FOUND=.TRUE.
 	     END IF
 	   END DO
@@ -6048,8 +6059,9 @@ c
 	      END IF
 	    END DO 
 	    CALL MON_INT_FUNS_V2(JNU,XV,R,ND)
+	    T4=1.0D0; IF(XV(1) .LT. XV(4))T4=-1.0D0
 	    DO I=1,ND
-	      YV(I)=TA(I)/R(I)/JNU(I,3)/T1
+	      YV(I)=T4*TA(I)/R(I)/JNU(I,3)/T1
 	    END DO
 	    CALL DP_CURVE(ND,XV,YV)
 	    YAXIS='\gz'

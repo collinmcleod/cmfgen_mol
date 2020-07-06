@@ -15,6 +15,7 @@
 	USE EDDFAC_REC_DEFS_MOD
 	IMPLICIT NONE
 !
+! Altered: 30-Apr-2020 : RAY_DATA created when Rayleigh scattering included.
 ! Altered: 16-Aug-2019 : PLANCKMEAN computed
 ! Altered: 26-Apr-2019 : Added variables/option to restrict range of OBS frame calcualtion.
 !                           Added option to compute EW inc CMF (include ability to
@@ -193,6 +194,7 @@
 	REAL*8, ALLOCATABLE :: ETA_CMF_ST(:,:)
 	REAL*8, ALLOCATABLE :: CHI_CMF_ST(:,:)
 	REAL*8, ALLOCATABLE :: RJ_CMF_ST(:,:)
+	REAL*8, ALLOCATABLE :: RAY_CMF_ST(:,:)			!Rayleigh scattering opacity
 	REAL*8, ALLOCATABLE :: ION_LINE_FORCE(:,:)
 !
 ! Vectors for treating lines simultaneously with the continuum.
@@ -1103,6 +1105,7 @@
 	ALLOCATE (ETA_CMF_ST(ND,NCF),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (CHI_CMF_ST(ND,NCF),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (RJ_CMF_ST(ND,NCF),STAT=IOS)
+	IF(IOS .EQ. 0 .AND. INCL_RAY_SCAT)ALLOCATE(RAY_CMF_ST(ND,NCF),STAT=IOS)
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error in CMF_FLUX_SUB'
 	  WRITE(LUER,*)'Unable to allocate memory for IPLUS_STORE'
@@ -1125,41 +1128,6 @@
 !
 	DTDR=(T(ND)-T(ND-1))/(R(ND-1)-R(ND))
 ! 
-! 
-!
-! Electron scattering iteration loop. We perform this loop to
-! take into account incoherent electron scattering.
-!
-	IF(RD_COHERENT_ES)NUM_ES_ITERATIONS=1
-	DO ES_COUNTER=1,NUM_ES_ITERATIONS
-!
-! This forces CMF_FORM_SOL_V? to be used for OBSFLUX computation.
-!
-	  IF(ES_COUNTER .EQ. NUM_ES_ITERATIONS)LST_ITERATION=.TRUE.
-!
-! NB: NDEXT contains ND if ACCURATE is false. The +1 arrises since
-! we also write NU(ML) out.
-!
-	IF(ACCURATE .OR. EDD_CONT .OR. EDD_LINECONT)THEN
-	  INQUIRE(UNIT=LU_EDD,OPENED=TMP_LOG)
-	  IF(.NOT. TMP_LOG)THEN
-	    CALL OPEN_RW_EDDFACTOR(R,V,LANG_COORD,ND,
-	1       REXT,VEXT,LANG_COORDEXT,NDEXT,
-	1       ACCESS_F,L_TRUE,COMPUTE_EDDFAC,USE_FIXED_J,'EDDFACTOR',LU_EDD)
-	  END IF
-	END IF
-!
-	IF(.NOT. RD_COHERENT_ES)THEN
-	  I=WORD_SIZE*(ND+1)/UNIT_SIZE
-	  IF(ACCURATE)I=WORD_SIZE*(NDEXT+1)/UNIT_SIZE
-	  OPEN(UNIT=LU_ES,FILE='ES_J_CONV',FORM='UNFORMATTED',
-	1       ACCESS='DIRECT',STATUS='OLD',RECL=I,IOSTAT=IOS)
-	    IF(IOS .NE. 0)THEN
-	      WRITE(LUER,*)'Error opening ES_J_CONV'//
-	1                    ' - will compute new J'
-	      COHERENT_ES=.TRUE.
-	    END IF
-	END IF
 !
 ! Decide whether to use an file with old J values to provide an initial 
 ! estimate of J with incoherent electron scattering. The options
@@ -1175,18 +1143,43 @@
 	  CALL COMP_J_CONV_V2(ETA_CMF_ST,I,NU,TEXT,NDEXT,NCF,LUIN,
 	1        'OLD_J_FILE',
 	1        EDD_CONT_REC,L_FALSE,L_TRUE,LU_ES,'ES_J_CONV')
-!
-! Now open the file so it can be read in the CONTINUUM loop (read in 
-! COMP_JCONT).
-!
-	  OPEN(UNIT=LU_ES,FILE='ES_J_CONV',FORM='UNFORMATTED',
-	1       ACCESS='DIRECT',STATUS='OLD',IOSTAT=IOS)
-	    IF(IOS .NE. 0)THEN
-	      WRITE(LUER,*)'Error opening ES_J_CONV'//
-	1                    ' - will compute new J'
-	      COHERENT_ES=.TRUE.
-	    END IF
 	END IF
+!
+! Electron scattering iteration loop. We perform this loop to
+! take into account incoherent electron scattering.
+!
+	IF(RD_COHERENT_ES)NUM_ES_ITERATIONS=1
+	DO ES_COUNTER=1,NUM_ES_ITERATIONS
+!
+! This forces CMF_FORM_SOL_V? to be used for OBSFLUX computation.
+!
+	  IF(ES_COUNTER .EQ. NUM_ES_ITERATIONS)LST_ITERATION=.TRUE.
+!
+! NB: NDEXT contains ND if ACCURATE is false. The +1 arrises since
+! we also write NU(ML) out.
+!
+	  IF(ACCURATE .OR. EDD_CONT .OR. EDD_LINECONT)THEN
+	    INQUIRE(UNIT=LU_EDD,OPENED=TMP_LOG)
+	    IF(.NOT. TMP_LOG)THEN
+	      CALL OPEN_RW_EDDFACTOR(R,V,LANG_COORD,ND,
+	1       REXT,VEXT,LANG_COORDEXT,NDEXT,
+	1       ACCESS_F,L_TRUE,COMPUTE_EDDFAC,USE_FIXED_J,'EDDFACTOR',LU_EDD)
+	    END IF
+	  END IF
+!
+! Open the file so it can be read in the CONTINUUM loop (read in  COMP_JCONT).
+!
+	  IF(.NOT. COHERENT_ES)THEN
+	    I=WORD_SIZE*(ND+1)/UNIT_SIZE
+	    IF(ACCURATE)I=WORD_SIZE*(NDEXT+1)/UNIT_SIZE
+	    OPEN(UNIT=LU_ES,FILE='ES_J_CONV',FORM='UNFORMATTED',
+	1       ACCESS='DIRECT',STATUS='OLD',RECL=I,IOSTAT=IOS)
+	      IF(IOS .NE. 0)THEN
+	        WRITE(LUER,*)'Error opening ES_J_CONV - will compute new J'
+	        COHERENT_ES=.TRUE.
+	      END IF
+	  END IF
+!
 !
 !***************************************************************************
 !***************************************************************************
@@ -1771,13 +1764,10 @@
 	END DO
 !
 ! Store opacities and emissivities for use in observer's frame 
-! calculation. Rayleigh scattering is assumed to be coherent.
+! calculation. 
 !
-	IF(INCL_RAY_SCAT)THEN
-	  ETA_CMF_ST(1:ND,ML)=ETA(1:ND)+CHI_RAY(1:ND)*RJ(1:ND)
-	ELSE
-	  ETA_CMF_ST(1:ND,ML)=ETA(1:ND)
-	END IF
+	IF(INCL_RAY_SCAT)RAY_CMF_ST(1:ND,ML)=CHI_RAY(1:ND)
+	ETA_CMF_ST(1:ND,ML)=ETA(1:ND)
 	CHI_CMF_ST(1:ND,ML)=CHI(1:ND)
 	RJ_CMF_ST(1:ND,ML)=RJ(1:ND)
 !
@@ -1812,6 +1802,28 @@
 	  T1=1.0D0; WRITE(J,REC=FINISH_REC)T1
 	  CLOSE(UNIT=J)
 !
+	  IF(INCL_RAY_SCAT)THEN
+	    CALL OPEN_RW_EDDFACTOR(R,V,LANG_COORD,ND,
+	1              REXT,VEXT,LANG_COORDEXT,ND,
+	1              K,L_TRUE,L_TRUE,L_FALSE,'RAY_DATA',J)
+	    K=INITIAL_ACCESS_REC
+	    WRITE(J,REC=EDD_CONT_REC)K,NCF,ND
+	    DO ML=1,NCF
+	      WRITE(J,REC=K-1+ML)(RAY_CMF_ST(I,ML),I=1,ND),NU(ML)
+	    END DO
+	    T1=1.0D0; WRITE(J,REC=FINISH_REC)T1
+	    CLOSE(UNIT=J)
+	  END IF
+!
+	END IF
+!
+! Update the emissivity for Rayleigh scattering which is is assumed to be coherent
+! in the comoving frame.
+!
+	IF(INCL_RAY_SCAT)THEN
+	  DO ML=1,NCF
+	    ETA_CMF_ST(1:ND,ML)=ETA_CMF_ST(1:ND,ML)+RAY_CMF_ST(1:ND,ML)*RJ_CMF_ST(1:ND,ML)
+	  END DO
 	END IF
 !
 ! We output the PLANCKMEAN -- this was need for testing.

@@ -15,7 +15,7 @@
 	REAL*4 XCHAR_SIZE,YCHAR_SIZE
 	REAL*4 EXPCHAR
 	INTEGER T_OUT
-	LOGICAL, PARAMETER :: TRACE=.TRUE.  !FALSE.              !Set to TRUE for debugging purposes
+	LOGICAL, PARAMETER :: TRACE=.FALSE.      !TRUE.  !FALSE.              !Set to TRUE for debugging purposes
 !
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2
@@ -71,6 +71,7 @@
 !
           CALL PGSCH(EXPCHAR*ID_EXPCHAR)
           CALL PGQCS(IFOUR,XCHAR_SIZE,YCHAR_SIZE)
+	  IF(TRACE)WRITE(6,*)'EXPCHAR*ID_EXPCHAR=',EXPCHAR*ID_EXPCHAR
           IF(TRACE)WRITE(T_OUT,*)'XCHAR_SIZE=',XCHAR_SIZE
 !
 ! Check if there are any identified lines in the current window. If not, we exit the
@@ -87,8 +88,8 @@
 !
 ! Determine maximum number of label slots. We subtract -3 to avoid issues near the boundaries.
 !
-          LAB_START=XPAR(1)+1.5*LAB_SIZE
           LAB_SIZE=1.1D0*XCHAR_SIZE
+          LAB_START=XPAR(1)+1.5*LAB_SIZE
           NPOS=ABS(XPAR(2)-XPAR(1))/LAB_SIZE-3
           WRITE(6,*)'Number of label slots is:',NPOS
           IF(LOC_NLINES .GT. 0.8*NPOS)THEN
@@ -112,7 +113,8 @@
             LAB_POS(I)=LAB_START+I*LAB_SIZE
             LAB_ID(I)=0
           END DO
-          IF(TRACE)WRITE(6,*)'Set LAB_POS and LAB_ID'
+          IF(TRACE)WRITE(6,*)'Set LAB_POS and LAB_ID in DRAW_EW_IDS'
+!
 ! Store lines whose ID will be written. Initially they occupy
 ! all slots up to LOC_NLINES.
 !
@@ -126,7 +128,7 @@
               END IF
               L=L+1
               LAB_ID(L)=I
-              IF(L .LT. 10)WRITE(6,*)I,ID_WAVE(I)
+              IF(TRACE .AND. L .LT. 10)WRITE(6,*)I,ID_WAVE(I)
             END IF
           END DO
           IF(TRACE)WRITE(6,*)'Stored lines'
@@ -145,8 +147,11 @@
               IF(I .NE. J)LAB_ID(I)=0
             END IF
           END DO
+	  IF(TRACE)WRITE(6,*)'Spread lines'
 !
           IF(TRACE)THEN
+	    WRITE(6,*)'XPAR: ',XPAR(1),XPAR(2)
+	    WRITE(6,*)'ID_VEC: ',ID_VEC_BEG,ID_VEC_END
             J=0
             DO I=1,NPOS
               IF(LAB_ID(I) .NE. 0)THEN
@@ -200,6 +205,7 @@
 	    END IF
 	  END DO
 	END IF
+	WRITE(6,'(A)')' '
 !
 	RETURN
 	END

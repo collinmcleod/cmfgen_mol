@@ -6,6 +6,8 @@
 	SUBROUTINE WR_COL_RATES(OMEGA,XzV,XZVLTE,EDGE,LEV_NAME,N,DESC,LU,OPTION)
 	IMPLICIT NONE
 !
+! Altered  24-May-2020 : When OPTION=NET_RATES we write out to XzV_TOTR_COL the net rate, 
+!                          from all levels, into each leval
 ! Created  29-Jan-2004 : Based on WR_COL
 !
 	INTEGER N,LU
@@ -107,6 +109,7 @@
 	1                J=MAX((N_PER_LINE*(M-1)+1),I),LIM )
 	      END IF
 	    END DO
+!	       
 	  ELSE IF( TRIM(OPTION) .EQ. 'COOL_RATES')THEN
 	    T1=6.626D-12
 	    DO I=1,MIN(N_PER_LINE*M,N)
@@ -162,6 +165,24 @@
 	END IF
 !
 	CLOSE(LU)
+!
+! Determine the NET collision rate into each level. We can simply sum
+! when I=J as the rate will be zero.
+!
+	IF( TRIM(OPTION) .EQ. 'NET_RATES')THEN
+	  FORM=TRIM(DESC)//'_TOTR_COL'
+	  CALL GEN_ASCI_OPEN(LU,FORM,'UNKNOWN',' ',' ',IZERO,IOS)
+	  WRITE(FORM,'(I2.2)')LMAX+5
+	  FORM='(A,T'//FORM(1:2)//',ES16.8)'
+	  DO I=1,N
+	    T1=OMEGA(I,I)*(XzVLTE(I)-XzV(I))
+	    DO J=1,N
+	      T1=T1+(OMEGA(J,I)*XzV(J)-OMEGA(I,J)*XzV(I))
+	    END DO
+	    WRITE(LU,TRIM(FORM))LEV_NAME(I),T1
+	  END DO
+	  CLOSE(LU)
+	END IF
 !
 	RETURN
 	END

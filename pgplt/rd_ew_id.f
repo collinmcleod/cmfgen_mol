@@ -26,7 +26,10 @@
 	IF(FIRST_TIME)THEN
 	  FIRST_TIME=.FALSE.
 	  ID_VEC_BEG=0.7
-	  ID_VEC_END=0.5 
+	  ID_VEC_END=0.5
+	ELSE
+	  WRITE(6,'(A,2ES14.4)')'Current values of ID_VEC_BEG and ID_VEC_END are:',ID_VEC_BEG,ID_VEC_END 
+	  WRITE(6,'(A,2ES14.4)')'            Good values for rectified plots are:',0.7,0.5
 	END IF
 !
 	VAC_WAVELENGTH=.FALSE.
