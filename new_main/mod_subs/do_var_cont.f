@@ -37,6 +37,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered 26-Jun-2020 : Fixed bug related when H- is present.
 ! Altered 30-Apr-2019 : Changed to VAR_JREL_V5 (added XM_CHK_OPTION, J_CHK_OPTION to call).
 ! Altered 29-Apr-2019 : Changed to VAR_MOM_J_DTT_V6 (added XM_CHK_OPTION).
 ! Altered 20-Apr-2019 : Changed to VAR_MOM_J_DTT_V5 (added J_CHK_OPTION).
@@ -792,7 +793,11 @@
 	      END DO
 	      VJ(NT-1,J,K)=VJ(NT-1,J,K) + ESEC(L)*dj_LOC(5,J,K)/ED(L)
 	      IF(SPECIES_PRES(1))THEN
-	        VJ(1,J,K)=VJ(1,J,K) + CHI_RAY(L)*dj_LOC(5,J,K)/ATM(1)%XzV_F(1,L)
+	        IF(ION_ID(1) .EQ. 'HMI')THEN
+	          VJ(2,J,K)=VJ(2,J,K) + CHI_RAY(L)*dj_LOC(5,J,K)/ATM(2)%XzV_F(1,L)
+	        ELSE 
+	          VJ(1,J,K)=VJ(1,J,K) + CHI_RAY(L)*dj_LOC(5,J,K)/ATM(1)%XzV_F(1,L)
+	        END IF
 	      END IF
 !                    
 ! Now must do line terms.

@@ -101,7 +101,8 @@
 	      WRITE(6,*)'Adjusting SIGMA in hydrostatic zone to be monotonic'
 	    ELSE IF(V(I) .LE. V(I+1))THEN
 	      WRITE(LUER,*)'Error in RD_RV_FILE_V2'
-	      WRITE(6,*)'CMFGEN cannot handle a monotonic velocity law'
+	      WRITE(6,*)'CMFGEN cannot handle a non-monotonic velocity law'
+	      WRITE(6,*)I,V(I),V(I+1)
 	      STOP
 	    END IF
 	  END DO

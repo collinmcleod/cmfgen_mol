@@ -7,6 +7,7 @@
 !
 	PROGRAM PLT_JH
 !
+! Altered 05-Apr-2020 : Added RTAU option.
 ! Altered 15-Nov-2019 : TAU_ES and TAU_ROSS were not being corrected for clumping.
 ! Altered 20-Aug-2019 : Updated RD_RVTJ to V4 routines.
 !                           TGREY,dE_RAD_DECAY,PLANCK_MEAN, and FORMAT_DATE added.
@@ -136,6 +137,9 @@
 	REAL*8 RVAL
 	REAL*8 DELR
 	REAL*8 LAMC
+	REAL*8 VMIN
+	REAL*8 dV_DOP
+	REAL*8 LAM_ST,LAM_END
 	REAL*8 FREQ_VAL
 	REAL*8 EDGE_FREQ
 	REAL*8 T_ELEC
@@ -1030,6 +1034,46 @@
 	    WRITE(6,'(A)')DEF_PEN
 	  END DO
 !
+	ELSE IF(X(1:3) .EQ. 'TAU')THEN
+!
+	  IF(ALLOCATED(XV))DEALLOCATE(XV)
+	  IF(ALLOCATED(YV))DEALLOCATE(YV)
+	  ALLOCATE (XV(NCF_MAX))
+	  ALLOCATE (YV(NCF_MAX))
+	  XAXIS='\gl(\A)'
+	  YAXIS='\gt(core)'
+!
+	  CALL USR_OPTION(LAM_ST,'LAM_ST','3000.0D0','Start wavelebgth')
+	  CALL USR_OPTION(LAM_END,'LAM_END','10000.0D0','END wavelength')
+	  CALL USR_OPTION(VMIN,'VMIN','0.0D0','Lower velcoity limit for integration')
+	  CALL USR_OPTION(dV_DOP,'dV','10.0D0','Velocity spacing [enter Vdop/2]')
+	  LAM_ST=LAM_ST/(1.0D0+V(1)/C_KMS)
+	  LAM_END=LAM_END*(1.0D0+V(1)/C_KMS)
+	  T1=2.0D0
+!	
+	  DO ID=1,NUM_FILES
+	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
+	    XV(1:NCF)=0.01*C_KMS/ZM(ID)%NU(1:NCF)
+	    I=1; J=NCF
+	    DO ML=1,NCF
+	      IF(XV(ML) .GT. LAM_ST)THEN
+	        I=ML
+	        EXIT
+	      END IF
+	    END DO
+	    DO ML=NCF,1,-1
+	      IF(XV(ML) .LT. LAM_END)THEN
+	        J=ML
+	        EXIT
+	      END IF
+	    END DO
+	    K=J-I+1
+	    WRITE(6,*)'Number of frequency points is',K
+	    WRITE(6,*)XV(I),XV(J)
+	    CALL COMPUTE_TAU_RADIAL(YV,ZM(ID)%RJ(1,I),ZM(ID)%V,ZM(ID)%R,ZM(ID)%NU(I),dV_DOP,VMIN,ND,K)
+	    CALL DP_CURVE(K,XV(I),YV)
+	  END DO
+! 
 	ELSE IF(X(1:2) .EQ. 'JD' .OR. X(1:5) .EQ. 'RSQJD')THEN
 !
 	  CALL USR_OPTION(I,'Depth',' ','Depth index in model 1')

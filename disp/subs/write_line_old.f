@@ -1,15 +1,20 @@
 	SUBROUTINE WRITE_LINE_OLD(TRAN_NAME,MOD_NAME,
 	1            DIF,CONT_INT,FREQ,AMASS,R,V,SIGMA,T,
 	1            MASS_DENSITY,CLUMP_FAC,
-	1            ETA,CHI,ESEC,CHIL,ETAL,ND,LUOUT)
+	1            ETA,CHI,ESEC,CHIL,ETAL,ND,LUOUT,CHI_TH_PASSED)
 	IMPLICIT NONE
 !
+! Altered: 21-Feb-2020   Added optional variable CHI_TH_PASSED
 ! Altered: 12-Dec-2018   CHIL, ETAL no longer altered in rountine if TRAN_NAME set to continuum.
 !
 	CHARACTER(LEN=*) TRAN_NAME
 	CHARACTER(LEN=*) MOD_NAME
 	LOGICAL NEW_FILE
 !
+! CHI_TH_PASSED indicates whether CHI (total op.)  or just the thermal opacity has
+! been passed in the variable CHI.
+!
+	LOGICAL, OPTIONAL :: CHI_TH_PASSED
 	LOGICAL DIF
 	REAL*8 CONT_INT
 	REAL*8 FREQ
@@ -29,6 +34,7 @@
 	REAL*8 CHIL(ND)
 	REAL*8 MASS_DENSITY(ND)
 	REAL*8 CLUMP_FAC(ND)
+	REAL*8 TA(ND)			!Work array
 !
 	REAL*8 VAC_LAM
 	REAL*8 SPEED_OF_LIGHT
@@ -58,16 +64,21 @@
 	1            'R','T','SIGMA','V','ETA','CHI_TH','ESEC',
 	1            'ETAL','CHIL','ROH','f'
 !
+	TA=CHI-ESEC
+	IF(PRESENT(CHI_TH_PASSED))THEN
+	  IF(CHI_TH_PASSED)TA=CHI
+	END IF
+!
        IF(TRAN_NAME.EQ. 'Continuum')THEN
          DO I=1,ND
            WRITE(LUOUT,'(1X,11ES14.6)')R(I),T(I),SIGMA(I),V(I),
-	1                 ETA(I),(CHI(I)-ESEC(I)),
+	1                 ETA(I),TA(I),
 	1                 ESEC(I),1.0D-10,1.0D-10,MASS_DENSITY(I),CLUMP_FAC(I)
 	  END DO
 	ELSE
           DO I=1,ND
             WRITE(LUOUT,'(1X,11ES14.6)')R(I),T(I),SIGMA(I),V(I),
-	1                 ETA(I),(CHI(I)-ESEC(I)),
+	1                 ETA(I),TA(I),
 	1                 ESEC(I),ETAL(I),CHIL(I),MASS_DENSITY(I),CLUMP_FAC(I)
 	  END DO
 	END IF

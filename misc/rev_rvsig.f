@@ -24,8 +24,7 @@ CONTAINS
 	USE VEL_LAW_PARAMS
 	IMPLICIT NONE
 !
-! Altered 18-May-2020: Moved from OSIRIS to IBIS. Also has OLD V option with MODT.
-! Altered 05-May-2020: CUR can now be used in log-log spcce
+! Altered 08-May-2020: Can use log axis for R or V with CUR option.
 ! Altered 01-Feb-2020: Added 'm' optoion to CUR option.
 ! Altered 23-Jan-2020: Some cleaning done.
 ! Altered 02-Jan-2020: Improved CUR option (R is normalized), added SIG option.
@@ -118,7 +117,7 @@ CONTAINS
 	LOGICAL RD_MEANOPAC
 	LOGICAL REPLOT
 	LOGICAL RD_DENSITY
-	LOGICAL LOG_LOG
+	LOGICAL LOG_X,LOG_Y
 !
 	INTEGER GET_INDX_DP
         CHARACTER*30 UC
@@ -291,7 +290,7 @@ CONTAINS
 !
 	  DO I=1,ND
 	    READ(9,'(A)')STRING
-	    READ(STRING,*)R(I)         !DI(I),ED(I),T(I),IRAT(I),VEL(I),CLUMP_FAC(I)
+	    READ(STRING,*)R(I)
 	    DO WHILE(STRING .NE. ' ')
 	      READ(9,'(A)',END=100)STRING
 	    END DO
@@ -826,7 +825,7 @@ CONTAINS
 	  WRITE(6,*)'Type 6 retains the old velocity law beyond the transition velocity'
 !
 	  VEL_TYPE=2
-	  CALL GEN_IN(VEL_TYPE,'Velocity law to be used: 1, 2, 3, 4, 5, 6')
+	  CALL GEN_IN(VEL_TYPE,'Velocity law to be used: 1, 2, 3, 4 or 5')
 	  IF(VEL_TYPE .NE. 6)THEN
 	    CALL GEN_IN(VINF,'Velocity at infinity in km/s')
 	    CALL GEN_IN(BETA,'Beta for velocity law')
@@ -845,21 +844,18 @@ CONTAINS
 	  IF( OLD_V(TRANS_I)-V_TRANS .GT. V_TRANS-OLD_V(TRANS_I+1))TRANS_I=TRANS_I+1
 	  R(1:ND)=OLD_R(1:ND_OLD)
 !
+! Now adjust the velocity law.
+!
 ! In the hydrostatic region, the velocity is simply scaled by the change in
 ! mass-loss rate. This preserves the density. Only valid if wind does not have
 ! a significant optical depth.
 !
-! Now do the new wind law, keeping the same radius grid.
-! Old:
-!    T2=(OLD_V(I)/V_TRANS)**2
-!    V(I)=OLD_V(I)*(T1+(1.0D0-T1)*T2/(1.0D0+T2))
 !
 	  IF(VEL_TYPE .EQ. 6)THEN
 	    T1=MDOT/OLD_MDOT
 	    DO I=1,ND
-              T2=1.0D0/(1.0D0+EXP(-5.0D0*(OLD_V(I)/V_TRANS-1.0D0)))
-              T3= T1+(1.0D0-T1)*T2
-              V(I)=OLD_V(I)*T3
+	      T2=(OLD_V(I)/V_TRANS)**2
+	      V(I)=OLD_V(I)*(T1+(1.0D0-T1)*T2/(1.0D0+T2))
 	    END DO
 	    ALLOCATE (COEF(ND,4))
 	    CALL MON_INT_FUNS_V2(COEF,V,R,ND)
@@ -954,15 +950,23 @@ CONTAINS
           WRITE(6,*)' Then exit plot package -- cursor input done outside plot routine'
           WRITE(6,'(A)')DEF_PEN
 !
-	  LOG_LOG=.FALSE.
-	  CALL GEN_IN(LOG_LOG,'Are we using LOG-LOG axes')	  
+	  LOG_X=.FALSE.; LOG_Y=.FALSE.
+	  CALL GEN_IN(LOG_X,'Are we using LOG axes for R')	  
+	  CALL GEN_IN(LOG_Y,'Are we using LOG axes for V')	  
 	  ND=ND_OLD;    T1=OLD_R(ND)
-	  IF(LOG_LOG)THEN
-	    R_PLT(1:ND)=LOG10(OLD_R(1:ND)/T1); V_PLT(1:ND)=LOG10(OLD_V(1:ND))
-	    XLAB='Log R/R\d*\u'; YLAB='Log V(km/s)'
+	  IF(LOG_X)THEN
+	    R_PLT(1:ND)=LOG10(OLD_R(1:ND)/T1)
+	    XLAB='Log R/R\d*\u'
 	  ELSE
-	    R_PLT(1:ND)=OLD_R(1:ND)/T1; V_PLT(1:ND)=OLD_V(1:ND)
-	    XLAB='R/R\d*\u'; YLAB='V(km/s)'
+	    R_PLT(1:ND)=OLD_R(1:ND)/T1
+	    XLAB='R/R\d*\u'
+	  END IF
+	  IF(LOG_Y)THEN
+	    V_PLT(1:ND)=LOG10(OLD_V(1:ND))
+	    YLAB='Log V(km/s)'
+	  ELSE
+	    V_PLT(1:ND)=OLD_V(1:ND)
+	    YLAB='V(km/s)'
 	  END IF
 	  CALL DP_CURVE(ND_OLD,R_PLT,V_PLT)
  	  CALL GRAMON_PGPLOT(XLAB,YLAB,' ',' ')
@@ -1055,11 +1059,13 @@ CONTAINS
 	      CALL DP_CURVE(ND,R,V)
  	      CALL GRAMON_PGPLOT(XLAB,YLAB,' ',' ')
 	    ELSE
-	      IF(LOG_LOG)THEN
+	      IF(LOG_X)THEN
 	        R(1:ND)=(10.0D0**R(1:ND))*OLD_R(ND_OLD)
-	        V(1:ND)=(10.0D0**V(1:ND))
 	      ELSE
 	        R(1:ND)=R(1:ND)*OLD_R(ND_OLD)
+	      END IF
+	      IF(LOG_Y)THEN
+	        V(1:ND)=(10.0D0**V(1:ND))
 	      END IF
 	      R(1)=OLD_R(1); R(ND)=OLD_R(ND_OLD)
 	      EXIT

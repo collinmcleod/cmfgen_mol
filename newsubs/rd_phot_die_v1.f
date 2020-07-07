@@ -810,7 +810,7 @@
 	  DO I=1,PD(ID)%NUM_FF
 	    PD(ID)%FF_GAMMA(I)=1.0D-15*PD(ID)%FF_GAMMA(I)
 	  END DO
-	WRITE(LUER,*)'Done FF units'
+	  WRITE(LUER,*)'Done FF units for ',TRIM(DESC)
 !
 ! Compute the frequency range associated with each transition. This
 ! range is chosen to give 1.0% accuracy in the integral across the full
@@ -823,10 +823,10 @@
 	    IF(DEL_NU .LT. 6*NU_DOP)DEL_NU=6.0D0*NU_DOP
 	    PD(ID)%FF_NU_MIN(I)=PD(ID)%FF_NU_ZERO(I)-DEL_NU
 	    PD(ID)%FF_NU_MAX(I)=PD(ID)%FF_NU_ZERO(I)+DEL_NU
-	    WRITE(LUER,*)PD(ID)%FF_GF(I),PD(ID)%FF_NU_ZERO(I),PD(ID)%FF_NU_EXCITE(I)
-	    WRITE(LUER,*)PD(ID)%FF_NU_MIN(I),PD(ID)%FF_NU_MAX(I)
+!	    WRITE(LUER,*)PD(ID)%FF_GF(I),PD(ID)%FF_NU_ZERO(I),PD(ID)%FF_NU_EXCITE(I)
+!	    WRITE(LUER,*)PD(ID)%FF_NU_MIN(I),PD(ID)%FF_NU_MAX(I)
 	  END DO
-	  WRITE(LUER,*)'Done FF limits units'
+	  WRITE(LUER,*)'Done FF limits units ',TRIM(DESC)
 	END IF
 !
 ! Clean up allocated memory.

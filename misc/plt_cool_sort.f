@@ -1,0 +1,318 @@
+	PROGRAM PLT_COOL_SORT
+	USE GEN_IN_INTERFACE
+	IMPLICIT NONE
+!
+! Altered: 29-Mar-2020 -- Designed for nebular SN only (at present).
+!
+	INTEGER, PARAMETER :: ND_MAX=200
+	INTEGER, PARAMETER :: NREC_MAX=200
+	INTEGER, PARAMETER :: N_TIT=5
+	INTEGER, PARAMETER :: LU_RD=7
+	INTEGER, PARAMETER :: IZERO=0
+!
+	REAL*8 R(ND_MAX)
+	REAL*8 V(ND_MAX)
+	REAL*8 T(ND_MAX)
+	REAL*8 ED(ND_MAX)
+	REAL*8 PER_CR(ND_MAX)
+	REAL*8 NET_CR(ND_MAX)
+	REAL*8 COOL_TIME(ND_MAX)
+	REAL*8 XV(ND_MAX)
+	REAL*8 YV(ND_MAX)
+	REAL*8 TOTAL(ND_MAX)
+	REAL*8 RATE(NREC_MAX,ND_MAX)
+	REAL*8 VRATE(NREC_MAX,ND_MAX)
+	REAL*8 dLUM(NREC_MAX,ND_MAX)
+	REAL*8 LUM(NREC_MAX)
+	REAL*8 T1,T2
+!
+	CHARACTER(LEN=12) LABEL(NREC_MAX)
+	CHARACTER*80 FILENAME
+	CHARACTER*200 STRING
+	CHARACTER(LEN=100) TITLE(N_TIT)
+	CHARACTER(LEN=6)  COL
+	CHARACTER(LEN=30) XAXIS
+	CHARACTER(LEN=30) YAXIS
+!
+	INTEGER NREC
+	INTEGER IOS
+	INTEGER I,L,K,IBEG
+	INTEGER ND
+	INTEGER LUM_STAR 
+	INTEGER KK(1)
+	INTEGER INDX(2)
+	INTEGER I_DECAY
+	INTEGER POINT(NREC_MAX)
+	INTEGER NPLT
+!
+	LOGICAL USE_DECAY
+	LOGICAL READ_RATE
+	CHARACTER(LEN=3) XAX_VAR
+!
+	WRITE(6,'(A)')' '
+        ND=0
+	OPEN(UNIT=LU_RD,FILE='MODEL',STATUS='OLD',IOSTAT=IOS)
+	  IF(IOS .EQ. 0)THEN
+	    DO WHILE(1 .EQ. 1)
+	      READ(LU_RD,'(A)',IOSTAT=IOS)STRING
+	      IF(IOS .NE. 0)EXIT
+	      IF(INDEX(STRING,'!Number of depth points') .NE. 0)THEN
+	        READ(STRING,*)ND
+	        WRITE(6,'(A,I4)')' Number of depth points in the model is:',ND
+	      END IF
+	    END DO
+	    CLOSE(LU_RD)
+	  END IF
+	IF(ND .EQ. 0)CALL GEN_IN(ND,'Number of depth points in model')
+        CALL RD_SING_VEC_RVTJ(V,ND,'Velocity','RVTJ',LU_RD,IOS)
+!
+ 	FILENAME='GENCOOL_SORT'
+	CALL GEN_IN(FILENAME,'GENCOOL_SORT file with data to be plotted')
+	IF(FILENAME .EQ. ' ')STOP
+!
+	OPEN(UNIT=LU_RD,FILE=FILENAME,STATUS='OLD',ACTION='READ')
+!
+	  NREC=0
+	  RATE=0.0D0
+	  DO IBEG=1,ND,10
+	    DO WHILE(1 .EQ. 1)
+	      READ(LU_RD,'(A)')STRING
+	      K=INDEX(STRING,'  ')
+	      IF(INDEX(STRING,'Radius') .NE. 0)THEN
+	        READ(STRING(K:),*)(R(I),I=IBEG,MIN(IBEG+9,ND))
+	      ELSE IF(INDEX(STRING,'Tempr') .NE. 0)THEN
+	        READ(STRING(K:),*)(T(I),I=IBEG,MIN(IBEG+9,ND))
+	      ELSE IF(INDEX(STRING,'Electr') .NE. 0)THEN
+	        READ(STRING(K:),*)(ED(I),I=IBEG,MIN(IBEG+9,ND))
+	      ELSE IF(INDEX(STRING,'% C.R.') .NE. 0)THEN
+	        READ(STRING(K:),*)(PER_CR(I),I=IBEG,MIN(IBEG+9,ND))
+	      ELSE IF(INDEX(STRING,'Net C.R.') .NE. 0)THEN
+	        READ(STRING(K:),*)(NET_CR(I),I=IBEG,MIN(IBEG+9,ND))
+	      ELSE IF(INDEX(STRING,'Cool time') .NE. 0)THEN
+	        READ(STRING(K:),*)(COOL_TIME(I),I=IBEG,MIN(IBEG+9,ND))
+	        EXIT 
+	      END IF
+	   END DO
+!
+	  DO WHILE(1 .EQ. 1)
+	    READ(LU_RD,'(A)',END=2000)STRING
+	    READ_RATE=.FALSE.
+	    IF(STRING .EQ. ' ')THEN
+	    ELSE IF(INDEX(STRING,'Depth') .NE. 0)THEN
+	      EXIT
+	    ELSE
+	      K=INDEX(STRING,'  ')
+	      DO L=1,NREC
+	        IF(STRING(1:K) .EQ. LABEL(L))THEN
+	          READ(STRING(K:),*)(RATE(L,I),I=IBEG,MIN(IBEG+9,ND))
+	          READ_RATE=.TRUE.
+	          EXIT
+	        END IF
+	      END DO
+	      IF(.NOT. READ_RATE)THEN
+	        NREC=NREC+1
+	        L=NREC
+	        READ(STRING(K:),*)(RATE(L,I),I=IBEG,MIN(IBEG+9,ND))
+	        LABEL(NREC)=STRING(1:K)
+	      END IF
+	    END IF
+	  END DO
+	END DO
+2000	CONTINUE
+	WRITE(6,*)'Read in data'
+	WRITE(6,*)'ND=',ND
+	WRITE(6,*)'NREC=',NREC
+!
+! Fix label names.
+!
+	DO L=1,NREC
+	  IF(INDEX(LABEL(L),'2') .NE. 0)THEN
+	    K=INDEX(LABEL(L),'2')
+	    LABEL(L)(K:)='II'//LABEL(L)(K+1:)
+	  ELSE IF(INDEX(LABEL(L),'6') .NE. 0)THEN
+	    K=INDEX(LABEL(L),'6')
+	    LABEL(L)(K:)='VI'//LABEL(L)(K+1:)
+	  ELSE IF(INDEX(LABEL(L),'7') .NE. 0)THEN
+	    K=INDEX(LABEL(L),'7')
+	    LABEL(L)(K:)='VII'//LABEL(L)(K+1:)
+	  ELSE IF(INDEX(LABEL(L),'k') .NE. 0)THEN
+	    K=INDEX(LABEL(L),'k')
+	    LABEL(L)(K:)='i'//LABEL(L)(K+1:)
+	  END IF
+	END DO
+!
+! Determine the index for radiactive decay.
+!
+	DO L=1,NREC
+	  IF( INDEX(LABEL(L),'decay') .NE. 0)THEN
+	    I_DECAY=L
+	    EXIT
+	  END IF
+	END DO
+	WRITE(6,*)'I_DECAY=',I_DECAY
+!
+	USE_DECAY=.FALSE.
+	CALL GEN_IN(USE_DECAY,'Use radioactive decay for nomalization?')
+	IF(USE_DECAY)THEN
+	  TOTAL(1:ND)=RATE(I_DECAY,1:ND)
+	  YAXIS='Cooling rate/E[decay]'
+	ELSE
+	  TOTAL=0.0D0
+	  DO I=1,ND
+	    DO L=1,NREC
+	      TOTAL(I)=TOTAL(I)+ABS(RATE(L,I))
+	    END DO
+	  END DO
+	  TOTAL(1:ND)=0.5D0*TOTAL(1:ND)                !Average of heating and cooling rate
+	  YAXIS='Cooling rate/E[heat]'
+	END IF
+	WRITE(6,*)'Computed total cooling/heating rate'
+!
+	NPLT=10
+	CALL GEN_IN(NPLT,'Number of cooling curves to be illustrated')
+	VRATE=RATE
+	DO L=1,ND
+	  VRATE(L,1:ND)=VRATE(L,1:ND)/TOTAL(1:ND)
+	END DO
+	DO L=1,NPLT
+	  INDX=MAXLOC(ABS(VRATE))
+	  VRATE(INDX(1),:)=0.0D0
+	  POINT(L)=INDX(1)
+	END DO
+!
+	XAX_VAR='V'
+	CALL GEN_IN(XAX_VAR,'Use V(elocity), R(adius), or N(depth index) for the X axis')
+	XAX_VAR=ADJUSTL(XAX_VAR)
+	CALL SET_CASE_UP(XAX_VAR,IZERO,IZERO)
+	XAX_VAR=XAX_VAR(1:1)
+	IF(XAX_VAR .EQ. 'V')THEN
+	  XV(1:ND)=V(1:ND)
+	  XAXIS='V(km/s)'
+	  IF(V(1) .GT. 10000.0D0)THEN
+	    XAXIS='V(Mm/s)'
+	    XV(1:ND)=1.0D-03*V(1:ND)
+	  END IF
+	ELSE IF(XAX_VAR .EQ. 'N')THEN
+	  DO I=1,ND
+	    XV(I)=I
+	  END DO
+	  XAXIS='Depth index'
+	ELSE
+	  XV(1:ND)=R(1:ND)/R(ND)
+	  XAXIS='R/R(ND)'
+	END IF
+!
+	WRITE(6,'(A)')' '
+	WRITE(6,'(2X,A,3X,A,11X,A,3X,A)')'Index','Type',' % rate(d=1)','% Rate(d=ND)'
+	DO L=1,NPLT
+	  WRITE(6,'(I7,3X,A,2F15.2)')L,LABEL(POINT(L)),100.0D0*RATE(POINT(L),1)/TOTAL(1),
+	1                                       100.0D0*RATE(POINT(L),ND)/TOTAL(ND)
+	  YV(1:ND)=100.0D0*RATE(POINT(L),1:ND)/TOTAL(1:ND)
+	  CALL DP_CURVE(ND,XV,YV)
+	END DO
+	T1=0.0D0; T2=0.0D0
+	DO L=1,NPLT
+	  IF(L .NE. I_DECAY)THEN
+	    T1=T1+100.0D0*RATE(POINT(L),1)/TOTAL(1)
+	    T2=T2+100.0D0*RATE(POINT(L),ND)/TOTAL(ND)
+	  END IF
+	END DO
+	WRITE(6,'(22X,2F15.2)')T1,T2
+	WRITE(6,'(A)')' '
+	TITLE=' '
+	DO L=1,NPLT
+	  K=POINT(L)
+	  IF(L .LT. 9)WRITE(COL,'(I1)')L+1
+	  IF(L .GT. 8)WRITE(COL,'(I2)')L+1
+	  IF(MOD(L,5) .EQ. 0 .OR. L .EQ. NPLT)THEN
+	    COL=' \p'//TRIM(COL)
+	  ELSE
+	    COL=', \p'//TRIM(COL)
+	  END IF
+	  I=1+(L-1)/5
+	  TITLE(I)=TRIM(TITLE(I))//' '//TRIM(LABEL(K))//TRIM(COL)
+	END DO
+	DO I=1,N_TIT
+	  IF(TITLE(I) .EQ. ' ')EXIT
+	  WRITE(6,'(2X,A)')TRIM(TITLE(I))
+	END DO
+	WRITE(6,'(A)')' '
+	CALL GRAMON_PGPLOT(XAXIS,YAXIS,TITLE(1),' ')
+!
+	dLUM=0.0D0
+	T1=4.0D0*3.1459*1.0D+30
+	DO L=1,NREC
+	  YV(1:ND)=T1*RATE(L,1:ND)*R(1:ND)*R(1:ND)
+	  CALL LUM_FROM_ETA(YV,R,ND)
+	  dLUM(L,1:ND-1)=YV(1:ND-1)
+	  LUM(L)=SUM(dLUM(L,1:ND-1))
+	  WRITE(6,*)L,LUM(L),LABEL(L)
+	END DO
+	WRITE(6,*)'Determined integrated luminosities'
+!
+	YV(1:NREC)=ABS(LUM(1:NREC))
+	DO L=1,NPLT
+	  KK=MAXLOC(YV(1:NREC))
+	  YV(KK(1))=0.0D0
+	  POINT(L)=KK(1)
+	  WRITE(6,*)L,KK(1),LUM(KK(1))
+	END DO
+!
+	dLUM(L,2:ND)=dLUM(L,1:ND-1)
+	dLUM(L,1)=dLUM(L,2)
+	DO L=1,NREC
+	  DO I=2,ND
+	    dLUM(L,I)=dLUM(L,I)+dLUM(L,I-1) 
+	  END DO
+	END DO
+!
+	IF(XAX_VAR .EQ. 'V')THEN
+	  XV(1:ND)=V(1:ND)
+	  XAXIS='V(km/s)'
+	  IF(V(1) .GT. 10000.0D0)THEN
+	    XAXIS='V(Mm/s)'
+	    XV(1:ND)=1.0D-03*V(1:ND)
+	  END IF
+	ELSE IF(XAX_VAR .EQ. 'N')THEN
+	  DO I=1,ND
+	    XV(I)=I
+	  END DO
+	  XAXIS='Depth index'
+	ELSE
+	  XV(1:ND)=R(1:ND)/R(ND)
+	  XAXIS='R/R(ND)'
+	END IF
+	TITLE=' '
+	DO L=1,NPLT
+	  K=POINT(L)
+	  WRITE(6,'(I7,3X,A12,3X,F9.5)')L,LABEL(K),LUM(K)/LUM(I_DECAY)
+	  YV(1:ND)=dLUM(K,1:ND)/LUM(I_DECAY)
+	  CALL DP_CURVE(ND,XV,YV)
+	END DO
+	WRITE(6,'(A)')' '
+	WRITE(6,'(A,ES14.4,A)')'Total radiactive decay energy is',LUM(1),'ergs'
+	WRITE(6,'(A,ES14.4,A)')'Total radiactive decay energy is',LUM(1),LUM(1)/3.826D+33,'Lsun'
+	WRITE(6,'(A)')' '
+!
+	TITLE=' '
+	DO L=1,NPLT
+	  K=POINT(L)
+	  IF(L .LT. 9)WRITE(COL,'(I1)')L+1
+	  IF(L .GT. 8)WRITE(COL,'(I2)')L+1
+	  IF(MOD(L,5) .EQ. 0 .OR. L .EQ. NPLT)THEN
+	    COL=' \p'//TRIM(COL)
+	  ELSE
+	    COL=', \p'//TRIM(COL)
+	  END IF
+	  I=1+(L-1)/5
+	  TITLE(I)=TRIM(TITLE(I))//' '//TRIM(LABEL(K))//TRIM(COL)
+	END DO
+	DO I=1,N_TIT
+	  IF(TITLE(I) .EQ. ' ')EXIT
+	  WRITE(6,'(2X,A)')TRIM(TITLE(I))
+	END DO
+	WRITE(6,'(A)')' '
+	CALL GRAMON_PGPLOT(XAXIS,'Fractional cooling',TITLE(1),' ')
+!	
+	STOP
+	END

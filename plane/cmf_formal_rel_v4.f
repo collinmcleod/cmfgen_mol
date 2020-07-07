@@ -38,6 +38,7 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered 26-Mar-2020: Increased N_STORE by a factor of 5.
 ! Altered 19-Nov-2016: CHI_COEF, ETA_COEF, and VDOP_VEC_EXT were not being deallocated.
 !                        Only reallocate vectors if ND_EXT changes.
 ! Altered 04-Apr-2013: Fixed bug. NP_LIMIT(not NP) is limit when THICK_OB=FALSE.
@@ -400,8 +401,10 @@
 !
 	IF(INNER_BND_METH .EQ. 'HOLLOW')THEN
 	  IF(.NOT. ALLOCATED(FREQ_STORE))THEN
-	    N_STORE=2.0D0*V(ND)/5.0D0
+	    N_STORE=2.0D0*V(ND)                   !/5.0D0
 	    WRITE(6,*)'N_STORE=',N_STORE
+	    WRITE(6,*)'VDOP_FRAC=',VDOP_FRAC
+	    WRITE(6,*)'MIN(VDOP)=',MINVAL(VDOP_VEC)
 	    ALLOCATE (FREQ_STORE(0:N_STORE-1))
 	    DO IP=1,NC
 	      ALLOCATE (RAY(IP)%I_IN_BND_STORE(0:N_STORE-1))

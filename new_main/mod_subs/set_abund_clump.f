@@ -90,6 +90,19 @@
 	1                     (1.0D0+CLUMP_PAR(3)*EXP(T1))
 	    END DO
 
+	  ELSE IF(CLUMP_LAW(1:4) .EQ. 'DBLE')THEN
+!
+! CLUMP_PAR(1) is the clumping factor at infinity.
+! CLUMP_PAR(2) 
+!
+	    DO K=1,ND
+	      T1=10.0D0/CLUMP_PAR(4)
+	      T2=10.0D0/CLUMP_PAR(3)
+	      CLUMP_FAC(K)= CLUMP_PAR(1)
+	1             + (CLUMP_PAR(2)-CLUMP_PAR(1))/(1.0D0+EXP( T1*(V(K)-CLUMP_PAR(4)) ) )
+	1             + (1.0D0-CLUMP_PAR(2)-CLUMP_PAR(1))/(1.0D0+EXP( T2*(V(K)-CLUMP_PAR(3)) ) )
+	    END DO
+!
 	  ELSE IF(CLUMP_LAW(1:4) .EQ. 'REXP')THEN
 	    IF(N_CLUMP_PAR .NE. 3)THEN
 	      WRITE(LUER,*)'Error in SET_ABUND_CLUMP - for MEXP N_CLUMP_PAR should be 3'

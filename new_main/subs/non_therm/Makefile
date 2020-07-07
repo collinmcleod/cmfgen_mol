@@ -23,7 +23,8 @@ OBJ = $(LIB)(read_arnaud_ion_data.o)\
       $(LIB)(par_vec_sum.o)\
       $(LIB)(total_bethe_rate_v3.o)\
       $(LIB)(total_bethe_rate_v4.o)\
-      $(LIB)(electron_non_therm_spec.o)
+      $(LIB)(electron_non_therm_spec.o)\
+      $(LIB)(write_non_therm_v1.o)
 
 all : $(LIB)
 	rm -f *.o

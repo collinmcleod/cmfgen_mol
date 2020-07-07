@@ -1,5 +1,5 @@
 !
-! Data module for MOM_J_CMF_V8. Data placed in this module is automatically
+! Data module for MOM_J_CMF_V11. Data placed in this module is automatically
 ! saved between subroutine calls..
 !
 	MODULE MOD_MOM_J_V11
@@ -192,7 +192,7 @@
 	  DO I=1,ND_SM
 	    IF(LOG(R_SM(I)) .NE. LOG_R_SM(I))THEN
 	      NEW_R_GRID=.TRUE.
-	      WRITE(171,*)'Updating RGRID in MOM_J_CMF_V8'
+	      WRITE(171,*)'Updating RGRID in MOM_J_CMF_V11'
 	      EXIT
 	    END IF
 	  END DO
@@ -285,7 +285,7 @@
 	  IF(IOS .EQ. 0)ALLOCATE ( R_PNT(ND),STAT=IOS )
 	  IF(IOS .NE. 0)THEN
 	     LUER=ERROR_LU()
-	     WRITE(LUER,*)'Unable to allocate R and R_PNT in MOM_J_CMF_V8'
+	     WRITE(LUER,*)'Unable to allocate R and R_PNT in MOM_J_CMF_V11'
 	     STOP
 	  END IF
           K=1
@@ -315,7 +315,7 @@
 	  IF(IOS .EQ. 0)ALLOCATE ( CHI_COEF(ND_SM,4),STAT=IOS)
 	  IF(IOS .NE. 0)THEN
 	     LUER=ERROR_LU()
-	     WRITE(LUER,*)'Unable to allocate COEF memory in MOM_J_CMF_V8'
+	     WRITE(LUER,*)'Unable to allocate COEF memory in MOM_J_CMF_V11'
 	     STOP
 	  END IF
 !
@@ -331,7 +331,7 @@
 	  IF(IOS .EQ. 0)ALLOCATE ( RSQHNU_PREV(ND),STAT=IOS )
 	  IF(IOS .NE. 0)THEN
 	     LUER=ERROR_LU()
-	     WRITE(LUER,*)'Unable to allocate V_BLOCK in MOM_J_CMF_V8'
+	     WRITE(LUER,*)'Unable to allocate V_BLOCK in MOM_J_CMF_V11'
 	     STOP
 	  END IF
 	  RSQJNU(1:ND)=0.0D0; RSQJNU_PREV(1:ND)=0.0D0
@@ -366,7 +366,7 @@
 	  IF(IOS .EQ. 0)ALLOCATE ( EPS_PREV(ND),STAT=IOS )
 	  IF(IOS .NE. 0)THEN
 	     LUER=ERROR_LU()
-	     WRITE(LUER,*)'Unable to allocate CON_GAM block in MOM_J_CMF_V8'
+	     WRITE(LUER,*)'Unable to allocate CON_GAM block in MOM_J_CMF_V11'
 	     STOP
 	  END IF
 !
@@ -413,7 +413,7 @@
 	  IF(N_TYPE .NE. 'G_ONLY' .AND. N_TYPE .NE. 'N_ON_J')THEN
 	    IF(ND .NE. ND_SM)THEN
 	      LUER=ERROR_LU()
-	      WRITE(LUER,*)'Error in MOM_J_CMF_V8'
+	      WRITE(LUER,*)'Error in MOM_J_CMF_V11'
 	      WRITE(LUER,*)'Cannot use N_TYPE=''MIXED'' when inserting extra points'
 	    END IF
 	  END IF
@@ -788,7 +788,7 @@
 	IN_HBC_SAVE=IN_HBC
 	NBC_SAVE=NBC
 !
-	IF(NEW_R_GRID)WRITE(171,*)'Exiting MOM_J_CMF_V8'
+	IF(NEW_R_GRID)WRITE(171,*)'Exiting MOM_J_CMF_V11'
 !
 	RETURN
 	END

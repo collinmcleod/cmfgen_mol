@@ -9,6 +9,7 @@
 	IMPLICIT NONE
 	INTEGER ND,NT,NIT
 !
+! Altered 04-Jul-2020: Altered FDG option so harder to put in depth for variable.
 ! Altered 14-Feb-2019: Updated to 3 digit exponent in 2 places
 ! Altered 13-Sep-2018: Added options SM and NINT
 ! Altered 06-Dec-2017: Made compatible with osiris version
@@ -45,6 +46,7 @@ C
 	INTEGER CNT,CNT_NEG,CNT_POS
 	INTEGER NAN_CNT
 	LOGICAL NANS_PRESENT
+	LOGICAL NORM_R
 	CHARACTER(LEN=10) ION_ID(NUM_IONS_MAX)
 !
 	INTEGER, PARAMETER :: IZERO=0
@@ -82,6 +84,7 @@ C
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	CHARACTER*10 TMP_STR
 	CHARACTER*10 PLT_OPT
+	CHARACTER*80 XLABEL
 	CHARACTER*80 YLABEL
 	CHARACTER*200 STRING
 C
@@ -605,11 +608,23 @@ C
 !
 	ELSE IF(PLT_OPT(1:2) .EQ. 'VR')THEN
 	  IT=NIT; ID=ND
+	  NORM_R=.TRUE.
+	  CALL GEN_IN(NORM_R,'Normlize R by R(ND)?')
 	  DO WHILE(1 .EQ. 1)
 	    CALL GEN_IN(IT,'Iteration # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NIT)
-	    IF(IT .EQ. 0)EXIT
 	    T1=1.0D0; T2=1.0D0
-	    IF(R(1) .GT. 1.0D+04)T1=1.0D-04
+	    IF(IT .EQ. 0)EXIT
+	    IF(NORM_R)THEN
+	      T1=1.0D0/R_MAT(ND,IT)
+	      XLABEL='R/R(ND)'
+	    ELSE
+	      IF(R(1) .GT. 1.0D+04)THEN
+	        T1=1.0D-04
+	        XLABEL='R(10\u14 \dcm)'
+	      ELSE
+	        XLABEL='R(10\u10 \dcm)'
+	      END IF
+	    END IF
 	    IF(V(1) .GT. 1.0D+04)T2=1.0D-04
 	    DO ID=1,ND
 	      X(ID)=T1*R_MAT(ID,IT)
@@ -619,11 +634,7 @@ C
 	  END DO
 	  Ylabel='V(km/s)'
 	  IF(V(1) .GT. 1.0D+04)Ylabel='V(Mm/s)'
-	  IF(R(1) .GT. 1.0D+04)THEN
-	    CALL GRAMON_PGPLOT('R(10\u14 \dcm)',Ylabel,' ',' ')
-	  ELSE
-	    CALL GRAMON_PGPLOT('R(10\u10 \dcm)',Ylabel,' ',' ')
-	  END IF
+	  CALL GRAMON_PGPLOT(XLABEL,Ylabel,' ',' ')
 	  GOTO 200
 !
 	ELSE IF(PLT_OPT(1:4) .EQ. 'UNDO')THEN
@@ -700,9 +711,17 @@ C
 	    IF(ID.EQ. 0)EXIT
 	    WRITE(6,'(7(9X,I5))')(I,I=MAX(ID-3,1),MIN(ID+3,ND))
 	    WRITE(6,'(7ES14.4E3)')(POPS(IVAR,I,IT),I=MAX(ID-3,1),MIN(ID+3,ND))
-	    T1=POPS(IVAR,ID,IT)
-	    CALL GEN_IN(T1,'New value of variable')
-	    POPS(IVAR,ID,IT)=T1
+	    STRING=' '
+	    DO WHILE(INDEX(STRING,'.') .EQ. 0)
+	      WRITE(STRING,'(ES14.4E3)')POPS(IVAR,ID,IT); STRING=ADJUSTL(STRING)
+	      CALL GEN_IN(STRING,'New value of variable - must contain decimal point')
+	    END DO
+	    READ(STRING,*,IOSTAT=IOS)T1
+	    IF(IOS .EQ. 0)THEN
+	      POPS(IVAR,ID,IT)=T1
+	    ELSE
+	      WRITE(6,'(A)')'Error reading value -- variable not updated.'
+	    END IF
 	  END DO
 	  IREC=NIT			!IREC is updated on write
           IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1

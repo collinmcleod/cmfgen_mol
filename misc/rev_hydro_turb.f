@@ -7,6 +7,9 @@
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
 !
+! Altered: 05-Jun-2020 - Error now defined using ABS(GRAD)+ABS(G) rather than ABS(G_TOT) which can be
+!                          small at sonic point.
+!                          Output additional column: 100E/G_RAD
 ! Altered: 23-Jun-2003 - ND and STRING now initialized.
 ! Cleaned: 07-Nov-2000
 !
@@ -23,7 +26,7 @@
 	REAL*8 R
 	REAL*8 RSQ
 	REAL*8 V
-	REAL*8 E
+	REAL*8 E,E_ON_GRAD
 	REAL*8 VdVdR
 	REAL*8 dPdR
 	REAL*8 g_tot
@@ -100,13 +103,13 @@
 	FILENAME='REV_HYDRO'
 	CALL GEN_IN(FILENAME,'Output hydro file')
 	CALL GEN_ASCI_OPEN(LU_OUT,FILENAME,'UNKNOWN',' ',' ',I,IOS)
-	WRITE(LU_OUT,'(5X,A,15X,A,6X,A, 6(4X,A,1X), 6X,A, 6X,A)')
+	WRITE(LU_OUT,'(5X,A,15X,A,6X,A, 6(4X,A,1X), 6X,A, 6X,A, 3X, A)')
 	1        'R','V','% Error','    VdVdR',
 	1                   ' dPdR/ROH',
 	1                   'dTPdR/ROH',
 	1                   '    g_TOT',
 	1                   '    g_RAD',
-	1                    '   g_ELEC','Gamma','M(t)'
+	1                    '   g_ELEC','Gamma','M(t)','E/G_RAD'
 !
 	MASS_OLD=0.0D0
 	READ(STRING(ND+1),*)RND
@@ -161,8 +164,9 @@
 	  IF(VTURB .NE. 0.0D0)THEN
 	    dTPdR=-0.5D0*VTURB*VTURB*(2.0D0/R+VdVdR/V/V)
 	  END IF
-          DENOM=(ABS(VdVdR)+ ABS(dPdR)+ ABS(dTPdR)+ABS(g_TOT))
+          DENOM=ABS(VdVdR)+ ABS(dPdR)+ ABS(dTPdR)+ABS(P_GRAV(I))+ABS(G_RAD) !ABS(g_TOT))
           E=200.0D0*(VdVdR+dPdR+dTPdR-g_TOT)/DENOM
+          E_ON_GRAD=100.0D0*(VdVdR+dPdR+dTPdR-g_TOT)/G_RAD
           MT=g_rad/g_elec-1.0D0
           IF(I .GE. LOW_LIM .AND. I .LE. HIGH_LIM)THEN
             SUM_ERROR=SUM_ERROR+0.005*E/R**2/DENOM
@@ -181,9 +185,9 @@
 	  IF(R .GT. 9.99E+04)THEN
 	    FMT='(1X,ES12.6,ES13.4,F9.2,6(ES14.4),2F11.2)'
 	  ELSE
-	    FMT='(1X,F12.6,ES13.4,F9.2,6(ES14.4),2F11.3)'
+	    FMT='(1X,F12.6,ES13.4,F9.2,6(ES14.4),3F11.3)'
 	  END IF                    
-	  WRITE(LU_OUT,FMT)R,V,E,VdVdR,dPdR,dTPdR,g_TOT,g_RAD,g_ELEC,Gamma,MT
+	  WRITE(LU_OUT,FMT)R,V,E,VdVdR,dPdR,dTPdR,g_TOT,g_RAD,g_ELEC,Gamma,MT,E_ON_GRAD
 	END DO
 !
         DEL_M=SUM_ERROR/SUM_R

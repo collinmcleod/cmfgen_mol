@@ -11,6 +11,7 @@ LIB=$(LIB_DIR)libspec.a
 #
 OBJ    = $(LIB)(convolve.o)\
          $(LIB)(clip.o)\
+         $(LIB)(compute_tau_radial.o)\
          $(LIB)(divide_by_cont.o)\
          $(LIB)(do_int_rec_ap.o)\
          $(LIB)(determ_reddening.o)\

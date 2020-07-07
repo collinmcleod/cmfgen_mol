@@ -60,11 +60,13 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)plt_lte_ross.exe\
          $(EXE_DIR)plt_raw_xray.exe\
          $(EXE_DIR)plt_cool.exe\
+         $(EXE_DIR)plt_cool_sort.exe\
          $(EXE_DIR)plt_ln_heat.exe\
          $(EXE_DIR)plt_j_comp.exe\
          $(EXE_DIR)plt_q_col.exe\
          $(EXE_DIR)plt_net.exe\
          $(EXE_DIR)plt_non_therm.exe\
+         $(EXE_DIR)plt_rates.exe\
          $(EXE_DIR)set_new_sn_mod.exe\
          $(EXE_DIR)solve_ba_mat.exe\
          $(EXE_DIR)tst_ba_mat_sol.exe\

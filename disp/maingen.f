@@ -6281,10 +6281,10 @@ c
 	  END IF
 !
 	  CALL USR_OPTION(TMP_LOGICAL,'BGRID','F','Use a bigger grid')
+	  IF(XOPT .EQ. 'WRC')THEN 
+	    ETAL=1.0D-10; CHIL=1.0D-10
+	  END IF
 	  IF(TMP_LOGICAL)THEN
-	    IF(XOPT .EQ. 'WRC')THEN 
-	      ETAL=1.0D-10; CHIL=1.0D-10
-	    END IF
 	    CALL USR_OPTION(NPINS,'NPINS','1','0, 1 or 2')
 	    NDX=(ND-1)*NPINS+ND
 	    I=ND-10		!Parabolic interp for > I
@@ -6329,7 +6329,7 @@ c
 	    CALL WRITE_LINE_OLD(TRANS_NAME,MOD_NAME,
 	1          DIF,IC,FREQ,AMASS,REXT,VEXT,SIGMAEXT,TEXT,
 	1          MASS_DENSITYEXT,CLUMP_FACEXT,
-	1          ETAEXT,CHIEXT,ESECEXT,CHILEXT,ETALEXT,ND_TMP,LU_OUT)
+	1          ETAEXT,CHIEXT,ESECEXT,CHILEXT,ETALEXT,ND_TMP,LU_OUT,L_FALSE)
 	  END IF
 !
 ! Option to output information concerning bound-bound transitions.

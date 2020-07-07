@@ -9,6 +9,7 @@
 	USE OPAC_MOD
 	IMPLICIT NONE
 !
+! Altered 26-Jun-2020 : Fixed bug related to Rayleigh scattering when H- is present.
 ! Altered 05-Apr-2011 : Now call GENOPAETA_V10 (6-Feb-2011)
 ! Altered 11-Jun-2006: Installed CHI_NOSCAT and ETA_NOSCAT. Scattering
 !                        opacity now computed after bound-free, free-free,
@@ -171,8 +172,9 @@
 ! Add in Rayleigh scattering contribution.
 !
 	  CHI_RAY(1:ND)=0.0D0
+	  ID=1; IF(ION_ID(1) .EQ. 'HMI')ID=2
 	  IF(SPECIES_PRES(1) .AND. INCL_RAY_SCAT)THEN
-	    CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
+	    CALL RAYLEIGH_SCAT(CHI_RAY,ATM(ID)%XzV_F,ATM(ID)%AXzV_F,ATM(ID)%EDGEXZV_F,
 	1             ATM(1)%NXzV_F,CONT_FREQ,ND)
 	  END IF
 	  CHI_SCAT(1:ND)=ESEC(1:ND)+CHI_RAY(1:ND)

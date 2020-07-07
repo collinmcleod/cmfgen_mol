@@ -291,8 +291,8 @@
 	          WRITE(6,'(A,2I5,4E16.6)')'C',I,JINT,T(I),TMIN,TMAX
 	          FLUSH(UNIT=6)
 	      ELSE
-	        WRITE(6,'(2I5,3E16.6)')I,JINT,T(I),OLD_T(JINT),OLD_T(JINT+1)
-	        FLUSH(UNIT=6)
+!	        WRITE(6,'(2I5,3E16.6)')I,JINT,T(I),OLD_T(JINT),OLD_T(JINT+1)
+!	        FLUSH(UNIT=6)
 	        T1= ABS(OLD_T(JINT+1)/OLD_T(JINT)-1.0D0)
 	        IF(T1 .GT. 1.0D-08)THEN
 	          T1=(T(I)-OLD_T(JINT))/(OLD_T(JINT+1)-OLD_T(JINT))

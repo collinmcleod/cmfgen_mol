@@ -2962,7 +2962,7 @@
 	IF(.NOT. LAMBDA_ITERATION .AND. .NOT. LST_ITERATION)THEN
 	  CALL CHECK_SPEC_CONV(OBS_FLUX,OBS_FREQ,T1,T2,CHK,N_OBS)
 	END IF
-	WRITE(6,*)'Exited CHEC_SPECK_CONV';FLUSH(UNIT=6)
+	WRITE(6,*)'Exited CHEC_SPEC_CONV';FLUSH(UNIT=6)
 !
 ! Compute ROSSELAND and FLUX mean opacities. These MEAN opacities DO NOT 
 ! include the effect of clumping. Compute the respective optical depth scales; 
@@ -4384,6 +4384,11 @@
 !
 	  CLOSE(UNIT=LUER)
 	  CLOSE(UNIT=LU_SE)
+!
+	  IF(TREAT_NON_THERMAL_ELECTRONS .AND. WRITE_RATES)THEN
+	    CALL WRITE_NON_THERM_V1(dE_RAD_DECAY,NT,ND,DEC_NRG_SCL_FAC)
+	  END IF
+!
 	  STOP
 !
 ! 
