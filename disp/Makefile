@@ -30,7 +30,7 @@ all : $(EXE_DIR)dispgen.exe
 # Give the depeedencies of dispgen.exe and how it is created.
 #
 
-$(EXE_DIR)dispgen.exe : mod_disp.o dispgen.o maingen.o pltphot_sub.o $(FN1) $(FN2) $(FN3) $(FN4)
+$(EXE_DIR)dispgen.exe : mod_disp.o dispgen.o maingen.o pltphot_sub.o $(FN1) $(FN2) $(FN3) $(FN4) $(FN5)
 	$(F90) dispgen.o mod_disp.o maingen.o pltphot_sub.o \
              -L$(LIB_DIR) -l$(LN5) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1)  \
                $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
