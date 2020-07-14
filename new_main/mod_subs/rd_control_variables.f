@@ -792,7 +792,7 @@ C
 	  DC_INTERP_METHOD='ED'
 	  IF(GRID)DC_INTERP_METHOD='R'
 	  CALL RD_STORE_NCHAR(DC_INTERP_METHOD,'DC_METH',ITEN,L_FALSE,
-	1        'Interpolation method: ED, R, LTE, SPH_TAU')
+	1        'Interpolation method: TR, R, ED, LTE, SPH_TAU')
 	  CALL RD_STORE_LOG(INTERP_DC_SPH_TAU,'DC_SPH_TAU',L_FALSE,
 	1        'Interpolate d.c''s on the spherical TAU scale?')
 	  IF(INTERP_DC_SPH_TAU)DC_INTERP_METHOD='SPH_TAU'

@@ -7,6 +7,7 @@
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
+! Altered 12-Jul-2020 : Fixed bug with svae file when levels initially set to -1,-1.
 ! Created 10-Feb-2011 : 
 !
 	INTEGER NLINE_FREQ
@@ -120,7 +121,7 @@
 	WRITE(6,'(A)')' '
 !
 	WRITE(DEFAULT,'(I3,A,I3)')VEC_MNL_F(PNT(I)),',',VEC_MNUP_F(PNT(I)) 
-	CALL USR_OPTION(LEV,ITWO,ITWO,'Levels',DEFAULT,'NL and NUP')
+	CALL USR_OPTION(LEV,ITWO,ITWO,'Newlev',DEFAULT,'NL and NUP')
 	NL=LEV(1); NUP=LEV(2)
 	LINE_FOUND=.TRUE.
 !

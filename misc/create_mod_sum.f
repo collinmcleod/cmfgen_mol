@@ -222,7 +222,7 @@
 	      STRING=STRING(K+6:)
 	      K=INDEX(STRING,' ')
 	      READ(STRING(1:K),*)T1
-	      WRITE(BETA2,'(F4.1)')T1
+	      WRITE(BETA2,'(F5.1)')T1
 	      IF(INDEX(VINF2,'E+04') .NE. 0)THEN
 	         READ(VINF2,*)T1; VINF2=' '
 	         WRITE(VINF2(3:9),'(F7.1)')T1

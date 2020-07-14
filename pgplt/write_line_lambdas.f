@@ -103,6 +103,12 @@
 	  DONE=.TRUE.	
 	END IF
 !
+	IF(OPTION .EQ. ' ' .OR. OPTION .EQ. 'FE2' .OR. OPTION .EQ. 'IRON')THEN
+	  WRITE(6,*)'[Fe II]:   4640.972   4665.753   4729.392   4799.617   4890.988  4959.611   5008.027'
+	  WRITE(6,*)'Fe II:     4925.296   5109.835   5170.468'
+	  DONE=.TRUE.	
+	END IF
+!
 	IF(.NOT. DONE)THEN
 	  WRITE(6,*)'Species not recognized'
 	  WRITE(6,*)'Current ionization stages are:'
@@ -111,6 +117,7 @@
 	  WRITE(6,*)'OIV   OV     OSIX'
 	  WRITE(6,*)'Sk2   SkIV'
 	  WRITE(6,*)'SV    NaI    CaII'
+	  WRITE(6,*)'Fe2   FeIII'
 	  WRITE(6,*)' '
 	  WRITE(6,*)'HYD   HE  NIT  CARB  OXY  SIL   SUL   SOD  CAL'
 	  WRITE(6,*)' '
