@@ -46,6 +46,7 @@
 	  WRITE(6,*)'N III:    4098.51   4104.55    M4100.53'
           WRITE(6,*)'N III:    4635.42   4641.94    4643.15    M4639.9'
 	  DONE=.TRUE.	
+	END IF
 	IF(OPTION .EQ. ' ' .OR. OPTION .EQ. 'NIV' .OR. OPTION .EQ. 'NIT')THEN
           WRITE(6,*)'N IV:    1485.50    1718.550   4058.91'
           WRITE(6,*)'N IV:    3479.72    3484.00    3485.93    M3481.83'
