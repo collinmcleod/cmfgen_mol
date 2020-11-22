@@ -23,6 +23,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(do_fill.o)\
       $(LIB)(do_many_ew.o)\
       $(LIB)(do_mult_gf.o)\
+      $(LIB)(do_pg_regrid.o)\
       $(LIB)(do_vec_op.o)\
       $(LIB)(draw_line_ids.o)\
       $(LIB)(draw_ew_ids.o)\
@@ -44,6 +45,8 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(mon_num.o)\
       $(LIB)(monbord_v3.o)\
       $(LIB)(moninside.o)\
+      $(LIB)(pg_regrid.o)\
+      $(LIB)(pg_add_noise.o)\
       $(LIB)(put_text.o)\
       $(LIB)(rd_ew_id.o)\
       $(LIB)(simp_ew.o)\

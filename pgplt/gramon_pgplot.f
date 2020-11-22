@@ -1,4 +1,4 @@
-!
+
 ! General purpose line plotting routiine.
 !
 	SUBROUTINE GRAMON_PGPLOT(XLAB,YLAB,TITL,PASSED_OPT)
@@ -91,6 +91,7 @@
 	INTEGER IDY_R_AX,IYTICK_R_AX
 	CHARACTER*1 WHICH_Y_AX(MAX_PLTS)
 	CHARACTER*80 YLABEL_R_AX
+	CHARACTER(LEN=80) XLAB_FILE,YLAB_FILE
 !
 	INTEGER IFILL_PLT1(10)
 	INTEGER IFILL_PLT2(10)
@@ -208,6 +209,7 @@
 ! For XAR and YAR arithmetic options.
 !
 	CHARACTER*3 XAR_OPERATION,YAR_OPERATION,VAR_OPERATION
+	CHARACTER(LEN=5) REG_OPT
 	REAL*4 YAR_VAL,XAR_VAL
 	INTEGER XAR_PLT,YAR_PLT
 	INTEGER VAR_PLT1,VAR_PLT2,VAR_PLT3
@@ -314,6 +316,7 @@
 	FRAC_SIG_GAU=0.25D0
 	DP_CUT_ACC=0.01D0
 	DONE_NORMALIZATION=.FALSE.
+	XLAB_FILE=' '; YLAB_FILE=' '
 !
 	IF(NPLTS .GT. MAXPEN)THEN
 	  WRITE(T_OUT,*)'Error n GRAMON_PLOT -- not enough pen loctions'
@@ -532,6 +535,7 @@
 	  WRITE(T_OUT,*)'CC  - Change Color setting'
 	  WRITE(T_OUT,*)'CP  - Change Pen (Color Index)'
 	  WRITE(T_OUT,*)'RCP - Reset default color pens'
+	  WRITE(T_OUT,*)'CBP - Set pens for color blindness'
 	  WRITE(T_OUT,*)'GP  - Set default for grey pens'
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
@@ -558,12 +562,17 @@
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
 !
-	  WRITE(T_OUT,*)'LAM - List wavelengths of common lines'
-	  WRITE(T_OUT,*)'VEL - Convert X axis to km/s space'
-	  WRITE(T_OUT,*)'XAR - Simple X axis arithmetic'
-	  WRITE(T_OUT,*)'YAR - Simple Y axis arithmetic'
-	  WRITE(T_OUT,*)'VAR - Simple arithmetic on two plots'
-	  WRITE(T_OUT,*)'NM  - Scale average to 1 or to another plot'
+	  WRITE(T_OUT,*)'LAM  - List wavelengths of common lines'
+	  WRITE(T_OUT,*)'VEL  - Convert X axis to km/s space'
+!
+	  WRITE(T_OUT,*)'XAR  - Simple X axis arithmetic'
+	  WRITE(T_OUT,*)'YAR  - Simple Y axis arithmetic'
+	  WRITE(T_OUT,*)'VAR  - Simple arithmetic on two plots'
+	  WRITE(T_OUT,*)'NM   - Scale average to 1 or to another plot'
+	  WRITE(T_OUT,*)'REG  - Regrid plot - dX, R or NINS'
+	  WRITE(T_OUT,*)'ADDN - Add Poisonian noise'
+	  WRITE(T_OUT,*)'SM   - Smooth data -- ignires X-spaicng of data'
+	  WRITE(T_OUT,*)'GSM  - Gaussian smoothing -- set resolution'
 !
 	  WRITE(T_OUT,*)' '
 	  WRITE(T_OUT,*)'LOC - Use a cursor to read of (X,Y) coordinates on a plot'
@@ -576,13 +585,15 @@
 	  WRITE(T_OUT,*)'WGF - Write gauss-fit parameters to a file'
 !
 	  WRITE(T_OUT,*)' '
-	  WRITE(T_OUT,*)'RXY - Read plot from asci file'
-	  WRITE(T_OUT,*)'WXY - Write plot to asci file'
-	  WRITE(T_OUT,*)'SXY - Write section of data to terminal'
-	  WRITE(T_OUT,*)'RP  - Read labeled plots from direct accecs file'
-	  WRITE(T_OUT,*)'RPF - Similar to RP but asks for filename'
-	  WRITE(T_OUT,*)'WP  - Write labeled plots to direct access file'
-	  WRITE(T_OUT,*)'WPF - Similar to WP but asks for filename'
+	  WRITE(T_OUT,*)'RXY  - Read plot from asci file'
+	  WRITE(T_OUT,*)'WXY  - Write plot to asci file'
+	  WRITE(T_OUT,*)'SXY  - Write section of data to terminal'
+	  WRITE(T_OUT,*)'RP   - Read labeled plots from direct accecs file'
+	  WRITE(T_OUT,*)'RPF  - Similar to RP but asks for filename'
+	  WRITE(T_OUT,*)'WP   - Write labeled plots to direct access file'
+	  WRITE(T_OUT,*)'WPF  - Similar to WP but asks for filename'
+	  WRITE(T_OUT,*)'WTIT - Write titles to ascii file'
+	  WRITE(T_OUT,*)'RTIT - Read titles from ascii file'
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
 !
@@ -892,10 +903,33 @@ C
 	  CALL NEW_GEN_IN(TITONRHS,'TITONRHS')
 	  GOTO 1000
 !
-	ELSE IF(ANS .EQ. 'GL')THEN
+	ELSE IF(ANS .EQ. 'WTIT')THEN
+	  FILNAME='TITLE.SAV'
+	  TMP_LOG=.TRUE.
+	  DO WHILE(TMP_LOG)
+	    CALL NEW_GEN_IN(FILNAME,'File for plot titles')
+	    INQUIRE(FILE=FILNAME,EXIST=TMP_LOG)
+	    IF(TMP_LOG)THEN
+	      CALL NEW_GEN_IN(TMP_LOG,'Overwrite existing file?')
+	      TMP_LOG=.NOT. TMP_LOG
+	    END IF
+	  END DO
+	  OPEN(UNIT=10,FILE=TRIM(FILNAME),STATUS='UNKNOWN',IOSTAT=IOS)
+	  IF(IOS .EQ .0)THEN
+	    DO J=1,N_TITLE
+	      IF(TITLE(J) .EQ. ' ')EXIT
+	      WRITE(10,'(A)')TRIM(TITLE(J))
+	    END DO
+	    CLOSE(UNIT=10)
+	  ELSE
+	    WRITE(6,*)'Unable to open file ',TRIM(FILNAME)
+	  END IF
+	  GOTO 1000
+!
+	ELSE IF(ANS .EQ. 'RTIT')THEN
 	  CALL NEW_GEN_IN(FILNAME,'FILE')
-	  CALL GET_TITLES(FILNAME,TITLE,N_TITLE)
-	  CALL NEW_GEN_IN(TITONRHS,'TITONRHS')
+	  CALL GET_TITLES(FILNAME,TITLE,N_TITLE,IOS)
+	  IF(IOS .EQ. 0)CALL NEW_GEN_IN(TITONRHS,'TITONRHS')
 	  GOTO 1000
 !
 ! Switch to prevent inialization of data curves on exit from routine.
@@ -914,6 +948,7 @@ C
 	ELSE IF(ANS .EQ. 'CC')THEN
 	  CALL CHANGE_COLOR(RED,BLUE,GREEN)
 	  GOTO 1000
+!
 	ELSE IF(ANS .EQ. 'CP')THEN
 	  CALL CHANGE_PEN(PEN_COL,MAXPEN,NPLTS)
 	  GOTO 1000
@@ -935,6 +970,24 @@ C
           DO I=0,15                  !Get these + def color representations.
             CALL PGQCR(I,RED(I),GREEN(I),BLUE(I))
           END DO
+!
+! Set pens better suited for color blindness
+!
+	ELSE IF(ANS .EQ. 'CBP')THEN
+	  CALL PGSCR(0,1.0,1.0,1.0)     !set color representations
+	  CALL PGSCR(1,0.0,0.0,0.0)     !set color representations
+	  CALL PGSCR(2,0.9,0.6,0.0)
+	  CALL PGSCR(3,0.35,0.70,0.90)
+	  CALL PGSCR(4,0.0,0.6,0.5)
+	  CALL PGSCR(5,0.95,0.9,0.25)
+	  CALL PGSCR(6,0.0,0.45,.7)
+	  CALL PGSCR(7,0.8,0.40,0.0)
+	  CALL PGSCR(8,0.8,0.6,0.7)
+	  CALL PGSCR(13,0.0,1.0,1.0)
+	  DO I=0,15                  !Get these + def color representations.
+	    CALL PGQCR(I,RED(I),GREEN(I),BLUE(I))
+	  END DO
+!
 	ELSE IF(ANS .EQ. 'GP')THEN
 !
 ! Set preferred defaults for grey pens.
@@ -1094,6 +1147,14 @@ C
 	  END IF
 	  GOTO 1000
 C
+	ELSE IF(ANS .EQ. 'RDXL')THEN
+	  CALL NEW_GEN_IN(XLAB_FILE,'File with X abscissa values')
+	  GOTO 1000
+!
+	ELSE IF(ANS .EQ. 'RDYL')THEN
+	  CALL NEW_GEN_IN(YLAB_FILE,'File with Y ordinate values')
+	  GOTO 1000
+!
 	ELSE IF(ANS .EQ. 'LXY')THEN
 	  IF(LOG_AXIS(1:3) .EQ. 'LOG')THEN
             WRITE(T_OUT,*)'Swithcing off ALL LOG axes'
@@ -2235,6 +2296,7 @@ C
 	  CALL NEW_GEN_IN(XAR_OPERATION,'Operation: *,+,-,/,LG,ALG[=10^x],R[=1/x],XN')
 	  CALL SET_CASE_UP(XAR_OPERATION,IZERO,IZERO)
 	  IF(XAR_OPERATION .NE. 'LG' .AND. XAR_OPERATION .NE. 'ALG' .AND. 
+	1           XAR_OPERATION .NE. 'UG' .AND.
 	1           XAR_OPERATION .NE. 'XN' .AND. XAR_OPERATION .NE. 'R')THEN
 	    CALL NEW_GEN_IN(XAR_VAL,'Value')
 	  END IF
@@ -2304,10 +2366,23 @@ C
 	        CALL CURVE(NPTS(IP),CD(IP)%XVEC,CD(IP)%DATA)
 	        K=NPLTS
 	        WRITE(6,'(/,A,I4,/)')BLUE_PEN//' New plot number is '//DEF_PEN,K
+	      ELSE
+	        IF(ALLOCATED(CD(IP)%XVEC))DEALLOCATE(CD(IP)%XVEC,CD(IP)%DATA)
+	        ALLOCATE(CD(IP)%XVEC(NPTS(IP)),CD(IP)%DATA(NPTS(IP)))
+	        NPTS(K)=NPTS(IP)
+	        NPLTS=NPLTS+1
+	        CD(K)%DATA=CD(I)%DATA
 	      END IF
 	      DO I=1,NPTS(K)
 	        CD(K)%XVEC(I)=I
 	      END DO
+	      TYPE_CURVE(K)=TYPE_CURVE(IP)
+	    ELSE IF(XAR_OPERATION .EQ. 'UG')THEN
+	      WRITE(6,*)RED_PEN
+	      WRITE(6,*)'Curent plot is',IP
+	      K=NPLTS+1; TMP_STR='Output plot:?'//DEF_PEN
+	      CALL NEW_GEN_IN(K,TRIM(TMP_STR))
+	      CALL PG_REGRID(IP,K,XPAR(1),XPAR(2))
 	      TYPE_CURVE(K)=TYPE_CURVE(IP)
 	    ELSE
 	      WRITE(T_OUT,*)'Invalid operation: try again'
@@ -2449,6 +2524,33 @@ C
 	     END DO
 	  END IF
 !
+	ELSE IF (ANS .EQ. 'REG')THEN
+!
+	  WRITE(6,'(A)')RED_PEN
+	  WRITE(6,'(A)')'Option for creating a new grid'
+	  WRITE(6,'(A)')'Plot window is used for defining X-regridding range'
+	  WRITE(6,'(A)')DEF_PEN
+!
+	  CALL NEW_GEN_IN(VAR_PLT1,'Input plot 1?')
+	  VAR_PLT3=NPLTS+1
+	  CALL NEW_GEN_IN(VAR_PLT3,'Output plot?')
+	  TYPE_CURVE(VAR_PLT3)='L'
+	  T1=0.0; T2=0.0
+	  CALL NEW_GEN_IN(REG_OPT,'Regrid option: dX, R, NINS')
+	  CALL SET_CASE_UP(REG_OPT,1,0)
+	  CALL NEW_GEN_IN(T1,'dX, R, or NINS (zero to quit)')
+	  IF(T1 .NE. 0)THEN
+	    CALL DO_PG_REGRID(VAR_PLT1,VAR_PLT3,XPAR(1),XPAR(2),REG_OPT,T1)
+	  END IF
+!
+	ELSE IF(ANS .EQ. 'ADDN')THEN
+	  CALL NEW_GEN_IN(VAR_PLT1,'Input plot 1?')
+	  VAR_PLT3=NPLTS+1
+	  CALL NEW_GEN_IN(VAR_PLT3,'Output plot?')
+	  T1=1000.0; CALL NEW_GEN_IN(T1,'Counts in continnum')
+	  T2=0.2;    CALL NEW_GEN_IN(T2,'Random number 0 to 1)')
+	  CALL PG_ADD_NOISE(VAR_PLT1,VAR_PLT3,XMIN,XMAX,T1,T2)
+!	  
 	ELSE IF (ANS .EQ. 'VAR')THEN
 	  CALL NEW_GEN_IN(VAR_PLT1,'Input plot 1?')
 	  CALL NEW_GEN_IN(VAR_OPERATION,'Operation: *,+,-,/,c(opy)')
@@ -3101,11 +3203,12 @@ C
 !	CALL PGBOX('ABCNT',0.0,0,'ABCNT',0.0,0)
 !
 	IF(DO_BORDER)THEN
-	  CALL MONBORD_V3(XPAR,XINC,XNUMST,IXTICK,IDX,
+	  CALL MONBORD_V4(XPAR,XINC,XNUMST,IXTICK,IDX,
 	1             YPAR,YINC,YNUMST,IYTICK,IDY,
 	1             TICK_FAC,EXPCHAR,
 	1             XLABEL,YLABEL,TITLE,N_TITLE,TITONRHS,
-	1             LOG_AXIS,OPTION,NORMAL_R_Y_AXIS)
+	1             LOG_AXIS,OPTION,NORMAL_R_Y_AXIS,
+	1             XLAB_FILE,YLAB_FILE)
 	  IF(.NOT. NORMAL_R_Y_AXIS)THEN
 	    CALL DRAW_RIGHT_Y_AXIS(YPAR_R_AX,YINC_R_AX,YNUMST_R_AX,
 	1          IYTICK_R_AX,IDY_R_AX,TICK_FAC,
