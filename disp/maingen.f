@@ -156,7 +156,7 @@
 	LOGICAL PLANE_PARALLEL_NOV
 	LOGICAL FLUSH_FILE
 !
-	REAL*8 XV(N_PLT_MAX),XNU(N_PLT_MAX),XV_SAV(N_PLT_MAX)
+	REAL*8 XV(N_PLT_MAX),XNU(N_PLT_MAX)
 	REAL*8 YV(N_PLT_MAX),ZV(N_PLT_MAX),WV(N_PLT_MAX)
 !
 ! 
@@ -286,6 +286,7 @@
 	LOGICAL LEVEL_DISSOLUTION
 !
 	CHARACTER*80 NAME,XAXIS,YAXIS,XAXSAV
+	CHARACTER(LEN=200) TITLE(10)
 !
 	INTEGER, PARAMETER :: NSC=31
 	COMMON/TOPBORD/ SCED(NSC),XED(NSC),NXED,TOPLABEL
@@ -1900,24 +1901,26 @@
 	      DO_DPTH(LEV(I):LEV(I+1))=.FALSE.
 	    END IF
 	  END DO      
+	  T2=0.0D0
+	  CALL USR_HIDDEN(T2,'ROFFSET','0.0D0','Value to subtract from R')
 !
 ! Write out departure coefficients to ASCI file.
 ! NB - 1 refers to dimension of DHYD (i.e. DHYD(1,nd)
 !      1 refers to format for output.
 !      1,NHY - For use with HEI.
 !
+	  TA(1:ND)=R(1:ND)-T2
 	  IF(XOPT .EQ. 'WRLTE')THEN
 	    DO ID=1,NUM_IONS
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        FILENAME=TRIM(ION_ID(ID))//TRIM(STRING)
 	        CALL NEW_WRITEDC_V5(ATM(ID)%XzVLTE_F,ATM(ID)%LOG_XzVLTE_F,ATM(ID)%W_XzV_F,
 	1             ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%NXzV_F,
-	1             ATM(ID)%DXzV_F,ATM(ID)%GIONXzV_F,IONE,R,T,ED,V,CLUMP_FAC,
+	1             ATM(ID)%DXzV_F,ATM(ID)%GIONXzV_F,IONE,TA,T,ED,V,CLUMP_FAC,
 	1             DO_DPTH,LUM,ND,FILENAME,TYPE,IONE)
 	      END IF
 	    END DO
 	  ELSE
-	    TA(1:ND)=R(1:ND)            !+1.0D+04
 	    DO ID=1,NUM_IONS
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        FILENAME=TRIM(ION_ID(ID))//TRIM(STRING)
@@ -2838,6 +2841,12 @@
 	  TC(1)=TC(2); TC(ND)=TC(ND-1)
 	  CALL DP_CURVE(ND,XV,YV)
 	  CALL DP_CURVE(ND,XV,TC)
+	  DO I=1,ND
+	    TA(I)=LOG(R(I))
+	    TB(I)=LOG(V(I))
+	  END DO
+	  CALL DP_CURVE(ND,XV,YV)
+	  CALL DERIVCHI(V,TB,TA,ND,'LINMON')
 	  YAXIS='Log(\gs+1)'
 !
 	ELSE IF(XOPT .EQ. 'FONR')THEN
@@ -2934,6 +2943,8 @@
 	  FOUND=.FALSE.
 	  ELEC=.FALSE.
 	  FLAG=.FALSE.
+	  TITLE=' '
+	  CNT=0
 !
 	  WRITE(6,*)'Option plots fractional abundance (N/N[atom]), mass fraction, or species density.'
 !
@@ -2946,6 +2957,10 @@
 	        YV(1:ND)=LOG10(POPDUM(1:ND,ISPEC)/POP_ATOM(1:ND)+1.0D-100)
 	        CALL DP_CURVE(ND,XV,YV)
 	        FOUND=.TRUE.
+	        CNT=CNT+1; WRITE(DEFAULT,'(I2)')MOD(CNT,14)+1; DEFAULT=ADJUSTL(DEFAULT)
+	        DEFAULT=TRIM(SPECIES_ABR(ISPEC))//', \p'//TRIM(DEFAULT)//' '
+	        J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
+	        TITLE(CNT/10+1)=TRIM(TITLE(CNT/10+1))//' '//TRIM(DEFAULT)//' '
 	        IF(XSPEC .NE. 'ALL')EXIT
 	      END IF
 	    END DO
@@ -2960,6 +2975,10 @@
 	        END DO
 	        FOUND=.TRUE.
 	        CALL DP_CURVE(ND,XV,YV)
+	        CNT=CNT+1; WRITE(DEFAULT,'(I2)')MOD(CNT,14)+1; DEFAULT=ADJUSTL(DEFAULT)
+	        DEFAULT=TRIM(SPECIES_ABR(ISPEC))//', \p'//TRIM(DEFAULT)//' '
+	        J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
+	        TITLE(CNT/10+1)=TRIM(TITLE(CNT/10+1))//' '//TRIM(DEFAULT)//' '
 	        IF(XSPEC .NE. 'ALL')EXIT
 	      END IF
 	    END DO
@@ -2971,11 +2990,17 @@
 	        YV(1:ND)=LOG10(POPDUM(1:ND,ISPEC)+1.0D-100)
 	        CALL DP_CURVE(ND,XV,YV)
 	        FOUND=.TRUE.
+	        CNT=CNT+1; WRITE(DEFAULT,'(I2)')MOD(CNT,14)+1; DEFAULT=ADJUSTL(DEFAULT)
+	        DEFAULT=TRIM(SPECIES_ABR(ISPEC))//', \p'//TRIM(DEFAULT)
+	        J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
+	        TITLE(CNT/10+1)=TRIM(TITLE(CNT/10+1))//' '//TRIM(DEFAULT)//' '
 	        IF(XSPEC .NE. 'ALL')EXIT
 	      END IF
 	    END DO
 	    YAXIS='Log Species density (cm\u-3\d)'
 	  END IF
+	  J=CNT/10+1; CALL SET_PG_TITLES(TITLE,J,L_TRUE)
+	  WRITE(6,'(A)')' '
 !
 	  IF(XSPEC .EQ. 'ALL')THEN
 	    CALL WR_SPEC_SUM_V2(ELEC,FLAG,XV,ND)
@@ -4068,7 +4093,7 @@
 !
 	ELSE IF(XOPT .EQ. 'LTAU')THEN
 !
-	  XV_SAV=XV
+	  XV_SAV=XV 
 	  I=ND/2
 	  DEFAULT=WR_STRING(I)
 	  VALID_VALUE=.FALSE.
@@ -4190,7 +4215,7 @@
 !
 	  IF(J .NE. 0)WRITE(T_OUT,*)J,' lines plotted'
 	  IF(J  .NE. 0)CALL DP_CURVE(J,XV,YV)
-	  XV=XV_SAV
+	  XV=XV_SAV 
 !
 !`
 	ELSE IF(XOPT .EQ. 'VLTAU')THEN
@@ -4959,6 +4984,7 @@
 	        YAXIS='Log '//TRIM(SPECIES_ABR(ISPEC))//'\un+\d/N(total)'
 	      END IF
 	      CNT=0
+	      TITLE=' '
 	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
 	        IF(ATM(ID)%XzV_PRES)THEN
 	          DO I=1,ND
@@ -4969,8 +4995,11 @@
 	            YV(I)=LOG10(T1/TA(I))
 	            ZV(I)=LOG10(ATM(ID)%DXzV_F(I)/TA(I))
 	          END DO
+	          CNT=CNT+1; WRITE(DEFAULT,'(I2)')MOD(CNT,14)+1; DEFAULT=ADJUSTL(DEFAULT)
+	          DEFAULT=TRIM(ION_ID(ID))//', \p'//TRIM(DEFAULT)//' '
+	          J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
+	          TITLE(CNT/10+1)=TRIM(TITLE(CNT/10+1))//' '//TRIM(DEFAULT)
 	          CALL DP_CURVE(ND,XV,YV)
-	          CNT=CNT+1
 	          WRITE(6,'(A,I2,A,A)')' Curve ',CNT,' is due to: ',TRIM(ION_ID(ID))
 	        END IF
 	      END DO
@@ -4980,6 +5009,7 @@
 	      WRITE(6,'(A,I2,A,A)')' Curve ',CNT,' is due to: ',TRIM(ION_ID(ID))
 	    END IF
 	  END DO
+	  J=CNT/10+1; CALL SET_PG_TITLES(TITLE,J,L_TRUE)
 ! 
 	ELSE IF(XOPT .EQ. 'MODSUM')THEN
 !
@@ -6153,7 +6183,7 @@ c
 !
 ! Assumes V_D=10kms.
 !
-	    IF(MINVAL(YV(1:ND)) .LE. 0.0D0)THEN
+	    IF(MINVAL(TA(1:ND)) .LE. 0.0D0)THEN
 	      WRITE(6,*)'Negative optical depth encountered using linear plot'
 	      T1=1.6914D-11/FREQ
 	      DO I=1,ND
@@ -6178,13 +6208,16 @@ c
 	    DO I=1,ND
 	      YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
 	      IF(RADIAL)YV(I)=YV(I)/(1.0D0+SIGMA(I))
-	      IF(YV(I) .GT. 0)THEN
-	        YV(I)=LOG10(YV(I))
-	      ELSE
-	        YV(I)=-20.0
-	      END IF
 	    END DO
-	    YAXIS='Log(\gt\dSob\u)'
+	    IF(MINVAL(YV(1:ND)) .LE. 0)THEN
+	      WRITE(6,*)'Use C option in PGPLT with LG to plot on log scale'
+	      YAXIS='\gt\dSob\u'
+	    ELSE
+	      DO I=1,ND
+	        YV(I)=LOG10(YV(I))
+	      END DO
+	      YAXIS='Log(\gt\dSob\u)'
+	    END IF 
 	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
 !
@@ -6407,7 +6440,7 @@ c
 	  CALL GEN_ASCI_OPEN(LU_OUT,'NEW_RVSIG','UNKNOWN',' ','WRITE',I,IOS)
 	  WRITE(LU_OUT,'(A)')'!'
 	  IF(ELEC)THEN
-	    WRITE(LU_OUT,'(A,7X,A,9X,10X,A,12X,A,2(7X,A),3X,A)')'!','R','V(km/s)','Sigma',
+	    WRITE(LU_OUT,'(A,10X,A,9X,10X,A,12X,A,2(7X,A),3X,A)')'!','R','V(km/s)','Sigma',
 	1                   '    Density','Clump. Fac.','Depth'
 	  ELSE
 	    WRITE(LU_OUT,'(A,7X,A,9X,10X,A,12X,A,3X,A)')'!','R','V(km/s)','Sigma','Depth'
@@ -6418,7 +6451,7 @@ c
 	  WRITE(LU_OUT,'(A)')' '
 	  IF(ELEC)THEN
 	    DO I=1,ND
-	      WRITE(LU_OUT,'(F18.8,ES17.7,F17.7,2ES18.8,4X,I4)')R(I),V(I),SIGMA(I),MASS_DENSITY(I),CLUMP_FAC(I),I
+	      WRITE(LU_OUT,'(F18.8,ES20.10,F17.7,2ES18.8,4X,I4)')R(I),V(I),SIGMA(I),MASS_DENSITY(I),CLUMP_FAC(I),I
 	    END DO
 	  ELSE
 	    DO I=1,ND

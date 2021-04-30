@@ -20,7 +20,7 @@ FN2=$(LIB_DIR)lib$(LN2).a
 # or if the libraries have changed since the last link.
 
  
-OBJ1  =  update_pg_filename.o adjust_atm_r_grid.o rd_f_to_s_ids.o rd_ba_mat.o rd_f_to_s_ids_v2.o write_osc_v2.o
+OBJ1  =  set_hydro_hd_loc.o update_pg_filename.o adjust_atm_r_grid.o rd_f_to_s_ids.o rd_ba_mat.o rd_f_to_s_ids_v2.o write_osc_v2.o
  
 EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)ave_dc.exe\
@@ -56,8 +56,8 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)plt_alpha.exe\
          $(EXE_DIR)plt_cmf_lum.exe\
          $(EXE_DIR)plt_ddt_work.exe\
-         $(EXE_DIR)plt_hydro.exe\
          $(EXE_DIR)plt_gf.exe\
+         $(EXE_DIR)plt_hydro.exe\
          $(EXE_DIR)plt_lte_ross.exe\
          $(EXE_DIR)plt_raw_xray.exe\
          $(EXE_DIR)plt_cool.exe\
@@ -85,7 +85,7 @@ OANDF = $(OBJ1) $(FN1) $(FN2) $(FN3)
 # Give the dependencies of ?.exe and how it is created.
 
 $(EXE_DIR)%.exe : %.o $(OANDF) 
-	$(F90) $*.o \
+	$(F90) -g $*.o \
               $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) \
               $(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \
               -g -o $(EXE_DIR)$*.exe
@@ -133,7 +133,7 @@ $(EXE_DIR)wr_f_to_s.exe : wr_f_to_s.o output_term_seq.o $(OANDF)
 # General rule to compile a fortran ".f" file.
 
 %.o : %.f
-	$(F90)  -c $(FG)  $<
+	$(F90)  -c $(FD)  $<
 
 USR = $(LIB_DIR)libsubs.a(usr_option.o)
 GEN = $(LIB_DIR)libsubs.a(gen_in.o)

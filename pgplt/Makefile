@@ -51,6 +51,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(pg_mod_cont_nodes.o)\
       $(LIB)(put_text.o)\
       $(LIB)(rd_ew_id.o)\
+      $(LIB)(set_pg_titles.o)\
       $(LIB)(simp_ew.o)\
       $(LIB)(strip_slash_p.o)\
       $(LIB)(shrink_vectors.o)\

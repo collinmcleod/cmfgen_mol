@@ -7,7 +7,7 @@
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
-! Altered 12-Jul-2020 : Fixed bug with svae file when levels initially set to -1,-1.
+! Altered 12-Jul-2020 : Fixed bug with save file when levels initially set to -1,-1.
 ! Created 10-Feb-2011 : 
 !
 	INTEGER NLINE_FREQ

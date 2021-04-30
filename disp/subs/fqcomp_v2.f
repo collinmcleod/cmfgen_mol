@@ -145,12 +145,22 @@
 	INBCNEW=INBCNEW/(2.0D0*NEWRJ(ND)-IC)
 	WRITE(6,*)NEWRJ(1)
 !
-!
 ! Compute the new Feautrier factors.
 !
 	DO I=1,ND
 	  NEWRK(I)=NEWRK(I)/NEWRJ(I)
 	END DO
+!
+	DO I=1,ND
+	  IF(NEWRJ(I) .LE. 0 .OR. NEWRK(I) .LE. 0)THEN
+	   WRITE(6,*)'INNER_BND_METH=',INNER_BND_METH
+	   CALL WRITE_VEC(NEWRJ,ND,'NEWRJ in FQCOMP_V2',6)
+	   CALL WRITE_VEC(SOURCE,ND,'SOURCin FQCOMP_V2',6)
+	   CALL WRITE_VEC(CHI,ND,'CHIin FQCOMP_V2',6)
+	   STOP
+	 END IF
+	END DO
+	WRITE(6,*)'Checked for negative J values in FQCOM_V2'
 !
 ! Compute the Q factors from F. The Q values are stored in NEWRJ.
 ! We now compute Q in JFEAUNEW so that we nolonger need to save Q (only f).

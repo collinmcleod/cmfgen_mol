@@ -24,6 +24,7 @@ CONTAINS
 	USE VEL_LAW_PARAMS
 	IMPLICIT NONE
 !
+! Altered 07-Dec-2020: Updated SCLR from IBIS version -- to used old V(r) law'
 ! Altered 08-May-2020: Can use log axis for R or V with CUR option.
 ! Altered 01-Feb-2020: Added 'm' optoion to CUR option.
 ! Altered 23-Jan-2020: Some cleaning done.
@@ -135,7 +136,11 @@ CONTAINS
 	CALL GEN_IN(OLD_RVSIG_FILE,'File containing old R, V and sigma values')
 	RD_DENSITY=.FALSE.
 	CALL GEN_IN(RD_DENSITY,'Does the file contain the density and clumping factors')
-	OPEN(UNIT=10,FILE=OLD_RVSIG_FILE,STATUS='OLD',ACTION='READ')
+	OPEN(UNIT=10,FILE=OLD_RVSIG_FILE,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(6,*)'Old RVSIG_COL file: ',TRIM(OLD_RVSIG_FILE),' does not exist'
+	    STOP
+	  END IF
 	  STRING=' '
 	  N_HEAD=0
 	  DO WHILE (INDEX(STRING,'!Number of depth points') .EQ. 0)
@@ -170,15 +175,20 @@ CONTAINS
 	WRITE(6,'(A)')'          CUR: Revise V (and/or add extra R values) using a cursor.'
 	WRITE(6,'(A)')'         EXTR: extend grid to larger radii'
 	WRITE(6,'(A)')'         FGOB: insert N points at outer boundary (to make finer grid)'
+	WRITE(6,'(A)')'           FG: insert N points ito make a fine grid (uniform spacing)'
+	WRITE(6,'(A)')'          FGT: insert N points ito make a fine grid (uniform spacing in TAU)'
 	WRITE(6,'(A)')'         MDOT: change the mass-loss rate or velocity law'
 	WRITE(6,'(A)')'         NEWG: revise grid between two velocities or depth indicies'
 	WRITE(6,'(A)')'       NEW_ND: revise number of depth points by simple scaling'
+	WRITE(6,'(A)')'         NINS: insert points in specified region'
 	WRITE(6,'(A)')'         PLOT: plot V and SIGMA from old RVSIG file'
 	WRITE(6,'(A)')'          RDR: read in new R grid (DC format)'
 	WRITE(6,'(A)')'         SCLR: scale radius of star to new value'
 	WRITE(6,'(A)')'         SCLV: scale velocity law to new value'
         WRITE(6,'(A)')'         SIGU: update sigma using V read from RVSIG file'
+	WRITE(6,'(A)')'          SPP: convert plane-parallel model to a spherical -paralell model'
 	WRITE(6,'(A)')'         STOP: convert spherical model to a plane-paralell model'
+	WRITE(6,'(A)')'         SUBO: subtract constant offset from R grid (for a plane-paralell model)'
 	WRITE(6,'(A)')'          TAU: Create entrie grid equally spaced in log[TAU] with constraints on dV'
 	WRITE(6,'(A)')
 	WRITE(6,'(A)')'R_GRID_CHK (if MEANOPAC readd) will contain dTAU and dV information.'
@@ -354,19 +364,29 @@ CONTAINS
 	ELSE IF(OPTION .EQ. 'NINS')THEN
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')'This option allows grid to be increaed by iserting points in old grid'
-	  WRITE(6,'(A)')'The old grd  points are retained'
+	  WRITE(6,'(A)')'The old grid points are retained'
 	  WRITE(6,'(A)')' '
 	  NINS=1 
 	  CALL GEN_IN(NINS,'Number of points to insert')
-	  R(1)=OLD_R(1)
-	  J=1
-	  DO I=1,ND_OLD-1
-	    J=J+1
-	    R(J)=0.5D0*(OLD_R(I)+OLD_R(I+1))
+	  CALL GEN_IN(I_ST,'Miminum index for grid reginement')
+	  CALL GEN_IN(I_END,'Maximumindex for grid reginement')
+!
+	  R(1:I_ST)=OLD_R(1:I_ST); J=I_ST
+	  DO I=I_ST,I_END-1
+	    T1=(OLD_R(I+1)-OLD_R(I))/(NINS+1)
+	    DO K=1,NINS
+	      J=J+1
+	      R(J)=R(J-1)+T1
+	    END DO
 	    J=J+1
 	    R(J)=OLD_R(I+1)
 	  END DO
+	  DO I=I_END+1,ND_OLD
+	    J=J+1
+	    R(J)=OLD_R(I)
+	  END DO
 	  ND=J
+!
 	  ALLOCATE (COEF(ND_OLD,4))
 	  CALL MON_INT_FUNS_V2(COEF,OLD_V,OLD_R,ND_OLD)
 !
@@ -405,7 +425,7 @@ CONTAINS
 	  R(1:ND)=OLD_R(1:ND)
 	  SIGMA(1:ND)=OLD_SIGMA(1:ND)
 !
-	ELSE IF(OPTION .EQ. 'FG')THEN
+	ELSE IF(OPTION .EQ. 'FG' .OR. OPTION .EQ. 'FGT')THEN
           I_ST=1; I_END=ND
           CALL GEN_IN(I_ST,'Start index for fine grid')
           CALL GEN_IN(I_END,'End index for fine grid')
@@ -414,6 +434,7 @@ CONTAINS
           CALL GEN_IN(NX,'New number of grid points for this interval')
           ND=I_ST+NX+(ND_OLD-I_END)+1
 !
+	  IF(OPTION .EQ. 'FG')THEN
             DO I=1,I_ST
               X2(I)=I
             END DO
@@ -424,11 +445,34 @@ CONTAINS
             DO I=I_END,ND_OLD
               X2(I_ST+NX+I+1-I_END)=I
             END DO
-           DO I=1,ND
-             X1(I)=I
-           END DO
-           CALL MON_INTERP(R,ND,IONE,X2,ND,OLD_R,ND_OLD,X1,ND_OLD)
-	   WRITE(6,*)'Done interpolation'
+            DO I=1,ND_OLD
+              X1(I)=I
+            END DO
+	  ELSE
+            DO I=1,I_ST
+              X2(I)=OLD_TAU(I)
+            END DO
+            T1=EXP(LOG(OLD_TAU(I_END)/OLD_TAU(I_ST))/(NX+1.0D0))
+            DO I=1,NX
+              X2(I_ST+I)=X2(I_ST+I-1)*T1
+	      WRITE(6,*)X2(I_ST+I),X2(I_ST+I-1)
+            END DO
+            DO I=I_END,ND_OLD
+              X2(I_ST+NX+I+1-I_END)=OLD_TAU(I)
+	      WRITE(6,*)X2(I_ST+NX+I+1-I_END)
+            END DO
+            DO I=1,ND_OLD
+              X1(I)=OLD_TAU(I)
+            END DO
+          END IF
+	  CALL MON_INTERP(R,ND,IONE,X2,ND,OLD_R,ND_OLD,X1,ND_OLD)
+	  DO I=1,ND_OLD
+	     WRITE(33,*)I,OLD_R(I),X1(I),OLD_TAU(I)
+	   END DO
+	  DO I=1,ND
+	     WRITE(34,*)I,R(I),X2(I)
+	   END DO
+	  WRITE(6,*)'Done interpolation'
 !
 ! Now compute the revised V and SIGMA.
 !
@@ -945,6 +989,33 @@ CONTAINS
 	  END DO
 	  DEALLOCATE (COEF)
 !
+	ELSE IF(OPTION .EQ. 'SUBO')THEN
+!
+	  WRITE(6,*)' '
+	  WRITE(6,*)' Create a new RVSIG_COL file for a plane-parallel model'
+	  WRITE(6,*)' Subtract a constant offset off - designed to facilitate WD modeling.'
+	  WRITE(6,*)' Gives a more reasonable scale height compard to R'
+	  WRITE(6,*)' '
+!
+	  CALL GEN_IN(T1,'Radius value to subtract from file')
+!
+! The scaling of V preserves the density for the aopted mass-loss rate.
+!
+	  ND=ND_OLD
+	  R=OLD_R; V=OLD_V
+	  DO I=1,ND
+	    R(I)=R(I)-T1
+	  END DO
+	  V(1:ND)=V(1:ND)*(OLD_R(1:ND)/R(1:ND))**2
+!
+	  ALLOCATE (COEF(ND,4))
+	  CALL MON_INT_FUNS_V2(COEF,V,R,ND)
+	  DO I=1,ND
+	    SIGMA(I)=COEF(I,3)
+	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	  END DO
+	  DEALLOCATE (COEF)
+!
 	ELSE IF(OPTION .EQ. 'SIGU')THEN
 !
 ! Update SIGMA
@@ -1164,11 +1235,11 @@ CONTAINS
 	    WRITE(10,'(A)')' '
 	    IF(RD_DENSITY)THEN
 	      DO I=1,ND
-	        WRITE(10,'(F18.8,ES20.12,F17.7,2ES18.8,I4)')R(I),V(I),SIGMA(I),DENSITY(I),CLUMP_FAC(I),I
+	        WRITE(10,'(F22.12,ES20.12,F17.7,2ES18.8,I4)')R(I),V(I),SIGMA(I),DENSITY(I),CLUMP_FAC(I),I
 	      END DO
 	    ELSE
 	      DO I=1,ND
-	        WRITE(10,'(F18.8,ES17.7,F17.7,4X,I4)')R(I),V(I),SIGMA(I),I
+	        WRITE(10,'(F22.12,ES17.7,F17.7,4X,I4)')R(I),V(I),SIGMA(I),I
 	      END DO
 	    END IF
 	  CLOSE(UNIT=10)

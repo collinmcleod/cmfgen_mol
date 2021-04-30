@@ -199,8 +199,10 @@
 	WRITE(LU_OUT,'(1X,A,A)')'        or          :',
 	1                    ' VdV/dr = - dPdR/ROH + g_tot'
 	WRITE(LU_OUT,'(1X,A)')' '
+	WRITE(LU_OUT,'(1X,A)')'Note: The definition of the error has changed (Sep-2020) '
+	WRITE(LU_OUT,'(1X,A)')' '
 	WRITE(LU_OUT,'(1X,A,A)')'Error is 200.0D0*(VdVdR+dPdR_ON_ROH-g_TOT)/',
-	1        '( ABS(VdVdR)+ ABS(dPdR_ON_ROH)+ ABS(g_TOT) )'
+	1        '( ABS(VdVdR)+ ABS(dPdR_ON_ROH)+ g + g_RAD )'
 C
 	WRITE(LU_OUT,'(1X,A)')' '
 	WRITE(LU_OUT,'(1X,A)')'Gamma = g_rad/g [g=g_GRAV] '
@@ -331,6 +333,12 @@ C
 	ELSE IF(XOPT .EQ. 'REQ')THEN
 	  CALL DP_CURVE(ND,XVEC,P_REQ)
 	  YLAB=TRIM(YLAB)//'; ( vdv/dr + \gr\u-1\d dP/dr + g )'
+	ELSE IF(XOPT .EQ. 'TST')THEN
+	  DO I=1,ND
+	    TA(I)=LOG( (P_GRAD(I)-P_GELEC(I))*P_VEL(I)*P_R(I)*P_R(I)*P_dVdR(I) )
+	  END DO
+	  CALL DP_CURVE(ND,XVEC,TA)
+	  YLAB=TRIM(YLAB)//' '
 	ELSE IF(XOPT .EQ. 'NGL')THEN
 	  DO I=1,ND
 	    TA(I)=(P_GRAD(I)-P_GELEC(I))/(P_GRAV(I)-P_GELEC(I))

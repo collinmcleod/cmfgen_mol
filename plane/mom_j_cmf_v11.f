@@ -192,7 +192,8 @@
 	  DO I=1,ND_SM
 	    IF(LOG(R_SM(I)) .NE. LOG_R_SM(I))THEN
 	      NEW_R_GRID=.TRUE.
-	      WRITE(171,*)'Updating RGRID in MOM_J_CMF_V11'
+	      LUER=ERROR_LU()
+	      WRITE(LUER,*)'Updating RGRID in MOM_J_CMF_V11'
 	      EXIT
 	    END IF
 	  END DO
@@ -787,8 +788,6 @@
 	HBC_SAVE=HBC
 	IN_HBC_SAVE=IN_HBC
 	NBC_SAVE=NBC
-!
-	IF(NEW_R_GRID)WRITE(171,*)'Exiting MOM_J_CMF_V11'
 !
 	RETURN
 	END

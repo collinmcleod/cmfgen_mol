@@ -189,7 +189,7 @@
 ! scale, exept at the outer boundaries.
 !
 	IF( TRIM(GRID_TYPE) .EQ. 'MODUN')THEN
-	  IF(STRETCH_POW .GT. 1 .OR. STRETCH_POW .LT. 0.2D0)THEN
+	  IF(STRETCH_POW .GT. 5 .OR. STRETCH_POW .LT. 1.0D0)THEN
 	    WRITE(T_OUT,*)'Error in ADJUST_R_GRID_V3'
 	    WRITE(T_OUT,*)'Error --- STRETCH_POW outside expected range'
 	    WRITE(T_OUT,*)'STRETCH_POW read=',STRETCH_POW

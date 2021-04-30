@@ -49,6 +49,7 @@ OBJ = $(LIB)(adjust_r_grid_v4.o)\
       $(LIB)(solve_for_pops.o)\
       $(LIB)(sub_cmf_line.o)\
       $(LIB)(sub_sob_line_v3.o)\
+      $(LIB)(wind_scale_pops_v1.o)\
       $(LIB)(sup_to_full_v4.o)
 
 all : $(LIB)

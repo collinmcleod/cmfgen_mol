@@ -14,7 +14,7 @@
 	REAL*8 VEL(ND)
 	REAL*8 TAU(ND)
 !
-	INTEGER, PARAMETER :: NPAR_MAX=5
+	INTEGER, PARAMETER :: NPAR_MAX=6
 	INTEGER, PARAMETER :: LUER=6
 	REAL*8 CLUMP_PAR(NPAR_MAX)
 	REAL*8 T1,T2
@@ -82,9 +82,13 @@
 	  CALL USR_OPTION(CLUMP_PAR(1),'CLP1','0.1','Clumping factor at infinity')
 	  CALL USR_OPTION(CLUMP_PAR(2),'CLP2','500','Velocity scale factor')
 	  CALL USR_OPTION(CLUMP_PAR(3),'CLP3','0.1','Second velocity factor')
+	  CALL USR_OPTION(CLUMP_PAR(4),'CLP4','0.0','Hard minimum velocity')
+	  CALL USR_OPTION(CLUMP_PAR(5),'CLP5','0.2','Smoothing param')
+	  T2=CLUMP_PAR(5)
 	  DO K=1,ND
+	    T1=LOG(1.0D0+EXP(T2*(VEL(K)-CLUMP_PAR(4))))/T2
 	    CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
-	1         EXP(-VEL(K)/CLUMP_PAR(2))+
+	1         EXP(-T1/CLUMP_PAR(2))+
 	1        (1.0D0-CLUMP_PAR(1))*EXP( (VEL(K)-VEL(1))/CLUMP_PAR(3))
 	  END DO
 !

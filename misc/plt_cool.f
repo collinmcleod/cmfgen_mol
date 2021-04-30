@@ -6,7 +6,7 @@
 !                          Changed reading -- string is 'Luminosity Check' rather than
 !                               'Total (Rad. + Mech.'. May need updating.
 !
-	INTEGER, PARAMETER :: ND_MAX=200
+	INTEGER, PARAMETER :: ND_MAX=300
 	INTEGER, PARAMETER :: LU_RD=7
 !
 	REAL*8 R(ND_MAX)

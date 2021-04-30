@@ -58,6 +58,12 @@
 	WRITE(6,'(A)')' See R_GRID_SELECTION for computational information'
 	WRITE(6,'(A)')
 !
+	DO I=1,NS
+	  T1=OLD_TAU(I)
+	  OLD_TAU(I)=OLD_TAU(I)/(0.1D0+MIN(OLD_V(1)/2,OLD_V(I)))
+	  WRITE(30,'(I4,3ES14.3)')I,OLD_V(I),T1,OLD_TAU(I)
+	END DO
+!
 	LOG_OLD_TAU=LOG(OLD_TAU)
 	LOG_OLD_R=LOG(OLD_R)
 	LOG_OLD_V=LOG(OLD_V)
@@ -91,9 +97,9 @@
 !
 	LOG_V_CON=LOG(V_CON)
 	I=I_CON
-	T1=(LOG_V_CON-LOG_OLD_V(I-1))/(LOG_OLD_V(I)-LOG_OLD_V(I-1))
-	LOG_R_CON=(1.0D0-T1)*LOG_OLD_R(I-1)+T1*LOG_OLD_R(I)
-	LOG_TAU_CON=(1.0D0-T1)*LOG_OLD_TAU(I-1)+T1*LOG_OLD_TAU(I)
+	T1=(LOG_V_CON-LOG_OLD_V(I+1))/(LOG_OLD_V(I)-LOG_OLD_V(I+1))
+	LOG_R_CON=(1.0D0-T1)*LOG_OLD_R(I+1)+T1*LOG_OLD_R(I)
+	LOG_TAU_CON=(1.0D0-T1)*LOG_OLD_TAU(I+1)+T1*LOG_OLD_TAU(I)
 !
 	J=ND-1-N_IB_INS-N_OB_INS
 	T1=(LOG_TAU_CON-LOG_OLD_TAU(1))/(LOG_OLD_TAU(NS)-LOG_OLD_TAU(1))
@@ -110,12 +116,13 @@
 	TAU(ND1)=EXP(LOG_TAU_CON)
 !
 	WRITE(6,*)'I_CON=',I_CON,TAU_CON
+	WRITE(6,*)OLD_R(I_CON),R_CON,OLD_R(I_CON+1)
 	WRITE(6,*)'ND1=',ND1
 !
 ! We define grid about transition point. We choose grid to satisfy V
 ! criterion, and then we make sure change in DTAU is not too large.
 !
-	K=ND1-1
+	K=ND1-1; L=I_CON
 	dLOG_TAU1=dLOG_TAU
 50      CONTINUE
 	LOG_TAU(K)=LOG_TAU(ND1)-dLOG_TAU1
@@ -140,9 +147,10 @@
 	WRITE(6,*)R(K),V(K),TAU(K)
 	WRITE(6,*)R(K+1),V(K+1),TAU(K+1)
 !
-	K=ND1+1
+	WRITE(6,*)' V_RAT_MAX=', V_RAT_MAX
 	dLOG_TAU2=dLOG_TAU
 60      CONTINUE
+	K=ND1+1; L=I_CON
 	LOG_TAU(K)=LOG_TAU(ND1)+dLOG_TAU2
 	DO I=I_CON,NS
 	  IF( LOG_OLD_TAU(I+1) .GT. LOG_TAU(K))THEN
@@ -153,6 +161,7 @@
 	T1=(LOG_TAU(K)-LOG_OLD_TAU(L))/(LOG_OLD_TAU(L+1)-LOG_OLD_TAU(L))
 	LOG_V(K)=T1*LOG_OLD_V(L+1)+(1.0D0-T1)*LOG_OLD_V(L)
 	V(K)=EXP(LOG_V(K))
+	WRITE(6,*)V(K-1),V(K)
 	IF(V(K-1)/V(K) .GT. V_RAT_MAX)THEN
 	  dLOG_TAU2=dLOG_TAU2/1.1D0
 	  GOTO 60
@@ -165,9 +174,10 @@
 !
 ! Now check that the step sizes at the connection point are similar.
 !
-	K=I_CON+1
+	K=ND1+1      !I_CON+1
 	IF( TAU(K)-TAU(K-1) .GT. 1.25D0*(TAU(K-1)-TAU(K-2)) )THEN
-          TAU(K)=TAU(K-1)+1.25D0*(TAU(K-1)-TAU(K-2))
+          WRITE(6,*)TAU(K),TAU(K-1),TAU(K-2)
+	  TAU(K)=TAU(K-1)+1.25D0*(TAU(K-1)-TAU(K-2))
 	  LOG_TAU(K)=LOG(TAU(K))
 	  DO I=I_CON,NS
 	    IF( LOG_OLD_TAU(I+1) .GT. LOG_TAU(K))THEN
@@ -216,7 +226,6 @@
 	  T3=LOG_TAU(K-1)+dLOG_TAU
 	  LOG_TAU(K)=MIN(T2,T3)
           TAU(K)=EXP(LOG_TAU(K))
-	  WRITE(6,*)K,TAU(K-1),TAU(K)
 !
 	  DO I=IBEG,NS-1
 	    IF( LOG_OLD_TAU(I+1) .GT. LOG_TAU(K))THEN
@@ -230,6 +239,7 @@
 	  V(K)=EXP(LOG_V(K))
 	  LOG_R(K)=T1*LOG_OLD_R(L+1)+(1.0D0-T1)*LOG_OLD_R(L)
 	  R(K)=EXP(LOG_R(K))
+	  WRITE(6,*)K,R(K),TAU(K-1),TAU(K)
 !
 	  IF(T3 .LT. T2)EXIT
 	END DO

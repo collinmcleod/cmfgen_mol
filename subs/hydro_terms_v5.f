@@ -10,6 +10,8 @@
 	1              LST_ITERATION,BAND_FLUX,N_FLUXMEAN_BANDS,LU_OUT,ND)
 	IMPLICIT NONE
 !
+! ALtered 11-Jan-2021 : Increased minimum size of record in HYDRO_TERMS
+! Altered 20-Oct-2020 : Outout new error (100 E/g_rad) in final column.
 ! Altered 01-Jan-2020 : Increased R precision. Increased Tau precision.
 ! Altered 13-Feb-2019 : Tau (Rosseland) now output.
 ! Altered 08-Nov-2016 : Now output Gamma (e.s.) at photosphere.
@@ -85,7 +87,7 @@
 	REAL*8 g_ELEC
 	REAL*8 g_GRAV
 	REAL*8 g_RAD
-	REAL*8 ERROR
+	REAL*8 ERROR,REV_ERROR
 	REAL*8 RLUMST(ND)
 !
 	REAL*8 GRAV_CON
@@ -109,7 +111,7 @@
 	EXTERNAL ERROR_LU
 	INTEGER, PARAMETER :: IONE=1
 !
-	I=MAX(132,(N_FLUXMEAN_BANDS+1)*12+16)
+	I=MAX(200,(N_FLUXMEAN_BANDS+1)*12+16)
 	CALL GEN_ASCI_OPEN(LU_OUT,'HYDRO','UNKNOWN',' ',' ',I,IOS)
 	IF(IOS .NE. 0)THEN
 	  I=ERROR_LU()
@@ -169,20 +171,20 @@
 ! Output file header.
 !
 	IF(PRESSURE_VTURB .EQ. 0.0D0)THEN
-	  WRITE(LU_OUT,'(1X,6X,A,6X, 8X,A,3X, 2X,A, 5(4X,A,1X),4X,A,2X,A,9X,A,3X,A)')
+	  WRITE(LU_OUT,'(1X,6X,A,6X, 12X,A,3X, 2X,A, 5(4X,A,1X),4X,A,2X,A,9X,A,3X,A9,3X,A)')
 	1     'R','V','% Error','    VdVdR',
 	1                       ' dPdR/ROH',
 	1                       '    g_TOT',
 	1                       '    g_RAD',
-	1                       '   g_ELEC','Gamma','Depth','Tau','Vsound'
+	1                       '   g_ELEC','Gamma','Depth','Tau','Vsound','E/g_rad%'
 	ELSE
-	  WRITE(LU_OUT,'(1X,6X,A,6X, 8X,A,3X, 2X,A, 6(4X,A,1X), 4X,A,2X,A,9X,A,3X)')
+	  WRITE(LU_OUT,'(1X,6X,A,6X, 12X,A,3X, 2X,A, 6(4X,A,1X), 4X,A,2X,A,9X,A,3X,A,3X,A)')
 	1     'R','V','% Error','    VdVdR',
 	1                       ' dPdR/ROH',
 	1                       'dTPdR/ROH',
 	1                       '    g_TOT',
 	1                       '    g_RAD',
-	1                       '   g_ELEC','Gamma','Depth','Tau','Vsound'
+	1                       '   g_ELEC','Gamma','Depth','Tau','Vsound','E/g_rad)%'
 	END IF
 ! 
 	DO I=1,ND
@@ -214,6 +216,7 @@
 	  g_TOT= g_RAD-g_GRAV
 	  ERROR=200.0D0*(VdVdR+dPdR_ON_ROH+dPTURBdR_ON_ROH-g_TOT)/
 	1        ( ABS(VdVdR)+ ABS(dPdR_ON_ROH)+ ABS(dPTURBdR_ON_ROH)+ ABS(g_TOT) )
+	  REV_ERROR=100.0D0*(VdVdR+dPdR_ON_ROH+dPTURBdR_ON_ROH-g_TOT)/ABS(g_RAD)
 !
 	  IF(V(I) .LT. 5.0D0)THEN
 	    ERROR_SUM=ERROR_SUM+ERROR
@@ -229,27 +232,27 @@
 	  T2=PRESSURE_VTURB
 	  SOUND_SPEED=SQRT( T1*T(I)*(1.0D0+ED(I)/POP_ATOM(I)) + 0.5D0*T2*T2)
 !
-	  TMP_FMT='F10.2,F10.2)'
-	  IF(TAU(I) .LT. 1.0D0)TMP_FMT='F10.3,F10.2)'
-	  IF(TAU(I) .LT. 0.1D0)TMP_FMT='ES10.2,F10.2)'
+	  TMP_FMT='F10.2,F10.2,F12.2)'
+	  IF(TAU(I) .LT. 1.0D0)TMP_FMT='F10.3,F10.2,F12.2)'
+	  IF(TAU(I) .LT. 0.1D0)TMP_FMT='ES10.2,F10.2,F12.2)'
 	  IF(PRESSURE_VTURB .EQ. 0.0D0)THEN
 	    IF(R(I) .GT. 9.99D+04)THEN
-	      FMT='(1X,ES12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7,2X,'//TMP_FMT
+	      FMT='(1X,ES12.6,ES17.8,F9.2,5(ES14.4),F9.2,I7,2X,'//TMP_FMT
 	    ELSE
-	      FMT='(1X,F12.6,ES13.4,F9.2,5(ES14.4),F9.2,I7,2X,'//TMP_FMT
+	      FMT='(1X,F12.6,ES17.8,F9.2,5(ES14.4),F9.2,I7,2X,'//TMP_FMT
 	    END IF
 	    WRITE(LU_OUT,FMT)
 	1             R(I),V(I),ERROR,VdVdR,dPdR_ON_ROH,
-	1             g_TOT,g_RAD,g_ELEC,g_RAD/g_GRAV,I,TAU(I),SOUND_SPEED
+	1             g_TOT,g_RAD,g_ELEC,g_RAD/g_GRAV,I,TAU(I),SOUND_SPEED,REV_ERROR
 	  ELSE
 	    IF(R(I) .GT. 9.99D+04)THEN
-	      FMT='(1X,ES15.9,ES13.4,F9.2,6(ES14.4),F9.2,I7,2X,'//TMP_FMT
+	      FMT='(1X,ES15.9,ES17.8,F9.2,6(ES14.4),F9.2,I7,2X,'//TMP_FMT
 	    ELSE
-	      FMT='(1X,F15.9,ES13.4,F9.2,6(ES14.4),F9.2,I7,2X,'//TMP_FMT
+	      FMT='(1X,F15.9,ES17.8,F9.2,6(ES14.4),F9.2,I7,2X,'//TMP_FMT
 	    END IF
 	    WRITE(LU_OUT,FMT)
 	1             R(I),V(I),ERROR,VdVdR,dPdR_ON_ROH,dPTURBdR_ON_ROH,
-	1             g_TOT,g_RAD,g_ELEC,g_RAD/g_GRAV,I,TAU(I),SOUND_SPEED
+	1             g_TOT,g_RAD,g_ELEC,g_RAD/g_GRAV,I,TAU(I),SOUND_SPEED,REV_ERROR
 	  END IF                    
 !
 	END DO
@@ -277,7 +280,7 @@
 	1          'Photospheric surface gravity is: ',T1,' (',LOG10(T1),')'
 	WRITE(LU_OUT,'(1X,A,ES14.4,A,F7.4,A)')
 	1          '   Specified surface gravity is: ',10**LOGG,' (',LOGG,')'
-	WRITE(LU_OUT,'(1X,A,F8.2,A)')
+	WRITE(LU_OUT,'(1X,A,F10.4,A)')
 	1          '                  Stars mass is: ',STARS_MASS,' Msun'
 	WRITE(LU_OUT,'(1X,A,F8.5,A)')
 	1          'Edd. fac. (e.s.) at photosphere: ',GAM_ES_PHOT

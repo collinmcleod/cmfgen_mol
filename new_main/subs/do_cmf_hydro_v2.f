@@ -15,6 +15,7 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 21-Apr-2021 - More accrate R write to RVSIG_COL for PLANE_PARALLEL models.
 ! Altered 05-Jun-2015 - Fixed bug; GAM_LIM_STORE was not being set to GAM_LIM when it was read
 !                           in from the HDYRO_DEFAULTS file.
 !                       Now save old RVSIG_COL file as RVSIG_COL_IT_#.
@@ -476,6 +477,10 @@
 ! Compute Eddington ratio, GAM_EDD. This formulae is set for one electron per ion.
 ! This formula holds at all radii, since g and Teff both scale as 1/r^2.
 !
+! Note: The factor of 10^6 in the expression occurs because:
+!          (a) Teff is units of 10^4 K ==> 10^{16}
+!          (b) SIGMA_TH * R is unitless, and R is in units of 10^10 cm.
+!
 	MAX_ED_ON_NA=0.0D0
 	DO I=1,MOD_ND
 	  MAX_ED_ON_NA=MAX(MAX_ED_ON_NA,OLD_ED(I)/OLD_POP_ATOM(I))
@@ -498,6 +503,7 @@
 	  WRITE(LUV,'(A,ES14.6)')'             Atom density is:',NI_ZERO
 	  WRITE(LUV,'(A,ES14.6)')'New effective temperature is:',TEFF
 	  WRITE(LUV,'(A,ES14.6)')'      Eddington parameter is:',GAM_EDD
+	  WRITE(LUV,'(A,ES14.6)')'               MAX(Ne/Na) is:',MAX_ED_ON_NA
 	END IF
 !
 	PREV_REF_RADIUS=-1.0D0
@@ -539,6 +545,8 @@
 	        T2=CONNECTION_VEL*(1.0D0/T1-2.0D0/CONNECTION_RADIUS)
 	        WRITE(LU_ERR,*)'      Scale height is',T1
 	        WRITE(LU_ERR,*)'      Connection dVdR',T2
+	        WRITE(LU_ERR,*)'       Ne/Na estimate',ED_ON_NA_EST
+	        WRITE(LU_ERR,*)'        Flux Op./esec',OLD_FLUX_MEAN(I)/OLD_ESEC(I)
                 IF(T2 .LE. 0.0D0)THEN
 	          WRITE(LU_ERR,*)'    Connection radius',CONNECTION_RADIUS
                   WRITE(LU_ERR,*)'Resetting GAM_LIM due to -ve velocity gradient'
@@ -988,14 +996,20 @@
 	  WRITE(LU,'(A)')'!'
 	  WRITE(LU,'(3X,I5,10X,A)')NEW_ND,'!Number of depth points'
 	  WRITE(LU,'(A)')'!'
-	  WRITE(LU,'(A,4X,A,3(7X,A),3X,A)')'!','R(10^10cm)','V(km/s)','  Sigma','    Tau','  Index'
 	  IF(REV_R(1) .GT. 999999.0D0)THEN
+	    WRITE(LU,'(A,4X,A,3(7X,A),3X,A)')'!','R(10^10cm)','V(km/s)','  Sigma','    Tau','  Index'
 	    DO I=1,NEW_ND
-	      WRITE(LU,'(F18.8,3ES14.6,6X,I4)')REV_R(I),REV_V(I),REV_SIGMA(I),EXP(REV_TAU(I)),I
+	      WRITE(LU,'(F18.8,ES16.8,2ES14.6,6X,I4)')REV_R(I),REV_V(I),REV_SIGMA(I),EXP(REV_TAU(I)),I
+	    END DO
+	  ELSE IF( (REV_R(1)-REV_R(ND)) .LT. 1.0D0)THEN
+	    WRITE(LU,'(A,10X,A,3(7X,A),3X,A)')'!','R(10^10cm)','V(km/s)','  Sigma','    Tau','  Index'
+	    DO I=1,NEW_ND
+	      WRITE(LU,'(F24.12,ES16.8,2ES14.6,6X,I4)')REV_R(I),REV_V(I),REV_SIGMA(I),EXP(REV_TAU(I)),I
 	    END DO
 	  ELSE
+	    WRITE(LU,'(A,1X,A,3(7X,A),3X,A)')'!','R(10^10cm)','V(km/s)','  Sigma','    Tau','  Index'
 	    DO I=1,NEW_ND
-	      WRITE(LU,'(F15.8,3ES14.6,6X,I4)')REV_R(I),REV_V(I),REV_SIGMA(I),EXP(REV_TAU(I)),I
+	      WRITE(LU,'(F15.8,ES16.8,2ES14.6,6X,I4)')REV_R(I),REV_V(I),REV_SIGMA(I),EXP(REV_TAU(I)),I
 	    END DO
 	  END IF
 	CLOSE(UNIT=LU)

@@ -43,10 +43,12 @@ C
 	INTEGER, PARAMETER :: T_IN=5
 	INTEGER, PARAMETER :: T_OUT=6
 C
+C Altered 26-Jul-2020 : Increased length of STRING to 120; added error message.
 C Altered 13-Oct-1997 : Ability to input single blank character.
 C
 	INTEGER L,J
-	CHARACTER DESC*(*),STR*(*),STRING*80,LOC_STR*80
+	CHARACTER DESC*(*),STR*(*)
+	CHARACTER(LEN=120) STRING,LOC_STR
 C
 900	STRING=DESC
 	L=LEN_TRIM(STRING)
@@ -60,6 +62,13 @@ C
 C
 	L=LEN_TRIM(STRING)
 	IF(L .EQ. 0)RETURN		!Take default value
+	IF(L .EQ. LEN(STRING))THEN
+	  WRITE(6,*)'Possible error in GEN_IN_STR'
+	  WRITE(6,*)'Input string may be truncated: string follows'
+	  WRITE(6,*)STRING
+	  WRITE(6,*)'May need to increase length of string'
+	  STOP
+	END IF
 C
 C The following statement allows a single blank character to be returned.
 C It assumed that the progammer will never have need to enter these

@@ -4,7 +4,7 @@
 !
 ! Altered: 29-Mar-2020 -- Designed for nebular SN only (at present).
 !
-	INTEGER, PARAMETER :: ND_MAX=200
+	INTEGER, PARAMETER :: ND_MAX=300
 	INTEGER, PARAMETER :: NREC_MAX=200
 	INTEGER, PARAMETER :: N_TIT=5
 	INTEGER, PARAMETER :: LU_RD=7

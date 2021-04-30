@@ -13,7 +13,7 @@
 	REAL*8, ALLOCATABLE :: YV(:)
 !
 	INTEGER N_T,I_T
-	INTEGER N_D,I_D
+	INTEGER N_D,I_D,ID_MIN
 	INTEGER LUER
 !
 	LOGICAL, SAVE :: FIRST_TIME=.TRUE.
@@ -110,12 +110,51 @@
 	  FIRST_TIME=.FALSE.
 	END IF
 !
-	DO I_D=1,N_D,2
+	WRITE(6,*)' Atom density'
+	DO I_D=1,N_D
+	  IF(POP_ATOM(1,I_D) .GT. 1.0D+10)EXIT
+	END DO
+	ID_MIN=I_D 
+!
+	WRITE(6,'(/,A)')' Atom density'
+	WRITE(6,'(5ES12.4)')(POP_ATOM(1,I_D),I_D=ID_MIN,N_D,2)
+	WRITE(6,'(/,A,/)')' Plotting Kappa(Ross)/Kappa(es) versus the electron temperature '
+	DO I_D=ID_MIN,N_D,2
 	   XV(1:N_T)=TEMP(1:N_T)
 	   YV(1:N_T)=KAP(1:N_T,I_D)/KES(1:N_T,I_D)
 	   CALL DP_CURVE(N_T,XV,YV)
 	END DO
-	CALL GRAMON_PGPLOT(' ',' ',' ',' ')
+	CALL GRAMON_PGPLOT('Log T(10\u4\d)\,K','\gK/\K\des\u',' ',' ')
+!
+	WRITE(6,'(/,A)')' Atom density'
+	WRITE(6,'(5ES12.4)')(POP_ATOM(1,I_D),I_D=ID_MIN,N_D,2)
+	WRITE(6,'(/,A,/)')' Plotting Kappa(Ross) versus the electron temperature '
+	DO I_D=ID_MIN,N_D,2
+	   XV(1:N_T)=TEMP(1:N_T)
+	   YV(1:N_T)=KAP(1:N_T,I_D)
+	   CALL DP_CURVE(N_T,XV,YV)
+	END DO
+	CALL GRAMON_PGPLOT('Log T(10\u4\d)\,K','\gK',' ',' ')
+!
+	WRITE(6,'(/,A)')' Atom density'
+	WRITE(6,'(5ES12.4)')(POP_ATOM(1,I_D),I_D=ID_MIN,N_D,2)
+	WRITE(6,'(/,A,/)')' Plotting T^{3.5}.Kappa(Ross)/rho versus the electron temperature '
+	DO I_D=ID_MIN,N_D,2
+	   XV(1:N_T)=TEMP(1:N_T)
+	   YV(1:N_T)=(TEMP(1:N_T)**3.5)*(KAP(1:N_T,I_D)/KES(1:N_T,I_D))/RHO(I_D)
+	   CALL DP_CURVE(N_T,XV,YV)
+	END DO
+	CALL GRAMON_PGPLOT('Log T(10\u4\d)\,K','T\u3.5\d(\gK/\K\des\u)/\gr',' ',' ')
+!
+	WRITE(6,'(/,A)')' Atom density'
+	WRITE(6,'(5ES12.4)')(POP_ATOM(1,I_D),I_D=ID_MIN,N_D,2)
+	WRITE(6,'(/,A,/)')' Plotting T^{3.5}.(Kappa(Ross)/K(es)-1)/rho versus the electron temperature '
+	DO I_D=ID_MIN,N_D,2
+	   XV(1:N_T)=TEMP(1:N_T)
+	   YV(1:N_T)=(TEMP(1:N_T)**3.5)*(KAP(1:N_T,I_D)/KES(1:N_T,I_D)-1.0D0)/RHO(I_D)
+	   CALL DP_CURVE(N_T,XV,YV)
+	END DO
+	CALL GRAMON_PGPLOT('Log T(10\u4\d)\,K','T\u3.5\d(\gK/\K\des\u-1)/\gr',' ',' ')
 !
 	STOP
 	END

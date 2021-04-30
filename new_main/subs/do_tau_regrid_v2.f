@@ -186,7 +186,8 @@
 	    TAU_OLD(I)=TAU_OLD(I-1)+dTAU_OLD(I-1)
 	  END DO
 !	  TAU_OLD(1:ND)=DLOG10( TAU_OLD(1:ND)/(0.1D0+V(1:ND)) )
-	  TAU_OLD(1:ND)=DLOG10( TAU_OLD(1:ND)/(0.1D0+MIN(V(1)/2,V(1:ND)))**2 )
+	  TAU_OLD(1:ND)=DLOG10( TAU_OLD(1:ND)/(1.0D0 + MIN(20.0D0,V(1:ND))) )   !(0.1D0+MIN(V(1)/2,V(1:ND)))**2 )
+	  TAU_OLD(1:ND)=TAU_OLD(1:ND)/(1.0+0.5D0*MIN(ABS(TAU_OLD(1:ND)),2.0D0))
 	END IF
 !
 ! We modify the tau scale so that extra points are inserted around
@@ -194,8 +195,8 @@
 ! scale, exept at the outer boundaries.
 !
 	IF( TRIM(GRID_TYPE) .EQ. 'MODUN')THEN
-	  IF(STRETCH_POW .GT. 1 .OR. STRETCH_POW .LT. 0.2D0)THEN
-	    WRITE(T_OUT,*)'Error in ADJUST_R_GRID_V3'
+	  IF(STRETCH_POW .LT. 1 .OR. STRETCH_POW .GT. 5.0D0)THEN
+	    WRITE(T_OUT,*)'Error in DO_TAU_GRID_V2'
 	    WRITE(T_OUT,*)'Error --- STRETCH_POW outside expected range'
 	    WRITE(T_OUT,*)'STRETCH_POW read=',STRETCH_POW
 	    STOP

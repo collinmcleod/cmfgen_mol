@@ -40,13 +40,29 @@
 	DO I=2,OLD_ND
 	  OLD_TAU(I)=OLD_TAU(I-1)+0.5D0*(OLD_R(I-1)-OLD_R(I))*(TB(I-1)+TB(I))
 	END DO
+	WRITE(72,*)ND
+	WRITE(72,*)OLD_TAU
+	FLUSH(UNIT=72)
 !
 	TA(1:ND)=ROSS_MEAN(1:ND)			!*CLUMP_FAC(1:ND)
 	T1=LOG(TA(5)/TA(1))/LOG(R(1)/R(5))
-	TAU(1)=TA(1)*R(1)/T1
+	IF(T1 .LT. 2.0)THEN
+	  IF(R(1) .GT. 4*R(ND))THEN
+	    TAU(1)=TA(1)*R(1)
+	  ELSE 
+	    TAU(1)=TA(1)*(R(1)-R(ND))/8.0D0
+	  END IF
+	ELSE
+	  TAU(1)=TA(1)*R(1)/T1
+	END IF
 	DO I=2,ND
 	  TAU(I)=TAU(I-1)+0.5D0*(R(I-1)-R(I))*(TA(I-1)+TA(I))
 	END DO
+	WRITE(72,*)ND
+	WRITE(72,*)'R',R
+	WRITE(72,*)'ROSS_MEAN',ROSS_MEAN
+	WRITE(72,*)'TAU',TAU
+	FLUSH(UNIT=72)
 !
 ! Find indices for new tau grid contained in old tau grid.
 !
@@ -69,6 +85,10 @@
 	DO I=NX+1,ND
 	  T(I)=OLD_T(OLD_ND)*(TAU(I)+0.67D0)/(OLD_TAU(OLD_ND)+0.67D0)
 	END DO
+	WRITE(72,*)ND
+	WRITE(72,*)T
+	WRITE(72,*)CLUMP_FAC
+	FLUSH(UNIT=72)
 !
 	ED=ED/CLUMP_FAC
 !

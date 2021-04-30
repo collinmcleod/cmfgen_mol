@@ -9,7 +9,9 @@
 	1                  NEW_GEN_IN_MULT_SP,
 	1                  NEW_GEN_IN_MULT_DP
 	END INTERFACE
-C
+!
+! Altered 26-Jul-2020: Increased length of GSTRING from 80 to 120
+!
 	INTEGER, PARAMETER :: GT_IN=5
 	INTEGER, PARAMETER :: GT_OUT=6
 	INTEGER  LF_IN
@@ -17,8 +19,8 @@ C
 	LOGICAL TERM_INPUT
 	LOGICAL LOG_FILE
 	CHARACTER*3 ADV_OPT
-	CHARACTER*80 GSTRING
-	CHARACTER*80 KEY_GSTRING
+	CHARACTER(LEN=120) GSTRING
+	CHARACTER(LEN=120) KEY_GSTRING
 	DATA ADV_OPT/'NO'/
 	DATA TERM_INPUT/.TRUE./
 	DATA LOG_FILE/.FALSE./
@@ -117,10 +119,11 @@ C
 C 
 C
 	SUBROUTINE NEW_GEN_IN_STR(STR,DESC)
+	IMPLICIT NONE
 C
 C Altered 13-Oct-1997 : Ability to input single blank character.
 C
-	INTEGER L,J
+	INTEGER L,J,IOS
 	CHARACTER DESC*(*),STR*(*),LOC_STR*80
 C
 900	GSTRING=DESC
@@ -157,6 +160,12 @@ C
 C
 	L=LEN_TRIM(GSTRING)
 	IF(L .EQ. 0)RETURN		!Take default value
+	IF(L .EQ. LEN(GSTRING))THEN
+	  WRITE(6,*)'Possible error ins NEW_GEN_IN_STR'
+	  WRITE(6,*)'Input string may get truncated: string follows'
+	  WRITE(6,*)GSTRING
+	  WRITE(6,*)'Increases length of GSTRING'
+	END IF 
 C
 C The following statement allows a single blank character to be returned.
 C It assumed that the progammer will never have need to enter these
