@@ -28,32 +28,34 @@
 !                
 	TYPE MODEL_ATOM_DATA
 !
-	  REAL*8, ALLOCATABLE :: XzV_F(:,:)
-	  REAL*8, ALLOCATABLE :: XzVLTE_F(:,:)
-	  REAL*8, ALLOCATABLE :: LOG_XzVLTE_F(:,:)
-	  REAL*8, ALLOCATABLE :: W_XzV_F(:,:)
-	  REAL*8, ALLOCATABLE :: DXzV_F(:)
-	  REAL*8, ALLOCATABLE :: DXzV(:)
-	  REAL*8, ALLOCATABLE :: AXzV_F(:,:)
-	  REAL*8, ALLOCATABLE :: EDGEXzV_F(:)
-	  REAL*8, ALLOCATABLE :: GXzV_F(:)
-	  REAL*8, ALLOCATABLE :: ARAD(:)                !Inverse radiative lifetime of level
-	  REAL*8, ALLOCATABLE :: GAM2(:)                !Collisional profile parameter.
-	  REAL*8, ALLOCATABLE :: GAM4(:)                !Collisional profile parameter.
-	  LOGICAL, ALLOCATABLE :: OBSERVED_LEVEL(:)     !Does level have a know energy.
+	  REAL*8, ALLOCATABLE :: XzV_F(:,:)		!Level populations in FULL atom (NF.ND)
+	  REAL*8, ALLOCATABLE :: XzVLTE_F(:,:)		!LTE level populations in FULL atom (NF.ND)
+	  REAL*8, ALLOCATABLE :: LOG_XzVLTE_F(:,:)	!Log LTE level populations in FULL atom (NF.ND)
+	  REAL*8, ALLOCATABLE :: W_XzV_F(:,:)           !Level dissolution factors (NF.ND)
+	  REAL*8, ALLOCATABLE :: DXzV_F(:)		!Ion population for full atom (ND)
+	  REAL*8, ALLOCATABLE :: DXzV(:)		!Ion population SL atom (ND)
+	  REAL*8, ALLOCATABLE :: AXzV_F(:,:)		!Oscillator strength (A(I,j), i<j) (NF,NF) Ein. A (i>j)
+	  REAL*8, ALLOCATABLE :: EDGEXzV_F(:)           !Ionization energy to g.s. (10^15 Hz) (NF)
+	  REAL*8, ALLOCATABLE :: GXzV_F(:) 		!Level statistical weights in full atom (NF)
+	  REAL*8, ALLOCATABLE :: ARAD(:)                !Inverse radiative lifetime of level (NF)
+	  REAL*8, ALLOCATABLE :: GAM2(:)                !Collisional profile parameter (NF).
+	  REAL*8, ALLOCATABLE :: GAM4(:)                !Collisional profile parameter (NF).
+	  LOGICAL, ALLOCATABLE :: OBSERVED_LEVEL(:)     !Does level have a know energy (NF).
 !
-	  REAL*8 ZXzV
-	  REAL*8 GIONXzV_F
+	  REAL*8 ZXzV					!Charge on ion (e.g. 1 for H)
+	  REAL*8 GIONXzV_F				!Statistical weight of gs. of ion
 !
-	  INTEGER, ALLOCATABLE :: F_TO_S_XzV(:)
+	  INTEGER, ALLOCATABLE :: F_TO_S_XzV(:)		!Link of full levels to super levels
 !
-	  INTEGER NXzV_F
-	  INTEGER N_XzV_PHOT
-	  INTEGER XzV_ION_LEV_ID(NPHOT_MAX)
-	  LOGICAL XzV_PRES
+	  INTEGER NXzV_F				!What I am call NF aboev
+	  INTEGER N_XzV_PHOT				!Number of photoioization routes
+	  INTEGER XzV_ION_LEV_ID(NPHOT_MAX)             !
+	  LOGICAL XzV_PRES 				!Indicates whether this ionization stage is present.
+!
 	  CHARACTER(LEN=40), ALLOCATABLE :: XzVLEVNAME_F(:)
 	  CHARACTER(LEN=11) XzV_OSCDATE
 	  CHARACTER(LEN=11) NEW_XzV_OSCDATE
+!
 	END TYPE MODEL_ATOM_DATA
 	TYPE (MODEL_ATOM_DATA) ATM(NSPEC*NION_MAX)
 C

@@ -6,6 +6,8 @@
 !
 	PROGRAM PLT_IP
 !
+! Altered 05-Feb-2021 : XV, YV etc now REAL*8 
+!                         Tyring to make all non-PGPLOT routines REAL*8.
 ! Altered 20-Aug-2019 : Updated RD_RVTJ to V4 routines.
 !                         TGREY,dE_RAD_DECAY,PLANCK_MEAN, and FORMAT_DATE added. 
 ! Altered 01-Mar-2016 : Updated to better handle plane-parallel models [5-Feb-2016].
@@ -29,6 +31,7 @@
 	INTEGER NP
 	REAL*8, ALLOCATABLE :: IP(:,:)
 	REAL*8, ALLOCATABLE :: NU(:)
+	REAL*8, ALLOCATABLE :: LAM(:)
 	REAL*8, ALLOCATABLE :: P(:)
 	REAL*8, ALLOCATABLE :: MU(:)
 	REAL*8, ALLOCATABLE :: TMP_MU(:)
@@ -44,6 +47,7 @@
 !
 	REAL*8, ALLOCATABLE :: TEMP_P(:)
 	REAL*8, ALLOCATABLE :: TEMP_IP(:)
+	REAL*8, ALLOCATABLE :: COEF(:,:)
 !
 	REAL*8 RMDOT
 	REAL*8 RLUM
@@ -65,15 +69,13 @@
 	REAL*8, ALLOCATABLE :: MASS_DENSITY(:)
 	REAL*8, ALLOCATABLE :: POPION(:)
 	REAL*8, ALLOCATABLE :: CLUMP_FAC(:)
-
-!
 !
 ! Vectors for passing data to plot package via calls to CURVE.
 !
-	REAL*4, ALLOCATABLE :: XV(:)
-	REAL*4, ALLOCATABLE :: YV(:)
-	REAL*4, ALLOCATABLE :: WV(:)
-	REAL*4, ALLOCATABLE :: ZV(:)
+	REAL*8, ALLOCATABLE :: XV(:)
+	REAL*8, ALLOCATABLE :: YV(:)
+	REAL*8, ALLOCATABLE :: WV(:)
+	REAL*8, ALLOCATABLE :: ZV(:)
 !
 	CHARACTER*80 NAME		!Default title for plot
 	CHARACTER*80 XAXIS,XAXSAV	!Label for Absisca
@@ -99,6 +101,7 @@
 	CHARACTER*10 Y_PLT_OPT,X_UNIT
 	CHARACTER*80 FILENAME
 	CHARACTER*80 FILE_DATE
+	CHARACTER(LEN=10) YUNIT
 !
 	CHARACTER*6 METHOD,TYPETM
 	CHARACTER*10 NAME_CONVENTION
@@ -228,6 +231,7 @@
 	  ALLOCATE (P(NP))
 	  ALLOCATE (MU(NP)); MU=0.0D0
 	  ALLOCATE (NU(NCF))
+	  ALLOCATE (LAM(NCF))
 	  IF( INDEX(FILE_DATE,'20-Aug-2000') .NE. 0)THEN
 	    READ(LU_IN,REC=ST_REC)(P(I),I=1,NP)
 	    ST_REC=ST_REC+1
@@ -247,6 +251,7 @@
 	  END IF
 	  DO ML=1,NCF
 	    READ(LU_IN,REC=ST_REC+ML-1)(IP(I,ML),I=1,NP),NU(ML)
+	    LAM(ML)=ANG_TO_HZ/NU(ML)
 	  END DO
 	CLOSE(LU_IN)
 	WRITE(T_OUT,*)'Successfully read in IP_DATA file as MODEL A (default)'
@@ -320,11 +325,17 @@
 	  ALLOCATE (HQW_AT_RMAX(NP))
 	  CALL GAULEG(RZERO,RONE,TMP_MU,HQW_AT_RMAX,NP)
 	  PLANE_PARALLEL_MOD=.TRUE.
-	  WRITE(6,*)'Model assumed to be plae-parallel'
+	  WRITE(6,*)'Model assumed to be plane-parallel'
 	ELSE
 	  ALLOCATE (HQW_AT_RMAX(NP))
+	  IF(MU(5) .EQ. 0.0D0)THEN
+	    DO I=1,NP
+	      MU(I)=SQRT(R(1)*R(1)-P(I)*P(I))/R(1)
+	    END DO
+	  END IF
 	  CALL HWEIGHT(MU,HQW_AT_RMAX,NP)
 	  PLANE_PARALLEL_MOD=.FALSE.
+	  WRITE(6,*)'Model assumed to be sphereical'
 	END IF
 !
 	CALL GEN_IN(DISTANCE,'Distance to star (kpc)')
@@ -432,11 +443,11 @@
 	  IF(LOG_Y)WRITE(T_OUT,*)'Now using Logarithmic Y axis'
 	  IF(.NOT. LOG_Y)WRITE(T_OUT,*)'Now using Linear Y axis'
 	ELSE IF(X(1:2) .EQ.'YU' .OR. X(1:6) .EQ. 'YUNITS')THEN
-	  CALL USR_OPTION(Y_PLT_OPT,'X_UNIT',' ',
-	1          'FNU, NU_FNU, FLAM')
+	  CALL USR_OPTION(Y_PLT_OPT,'Y_UNIT',' ','FNU, NU_FNU, FLAM')
 	  CALL SET_CASE_UP(Y_PLT_OPT,IZERO,IZERO)
 	  IF(Y_PLT_OPT .NE. 'FNU' .AND.
 	1        Y_PLT_OPT .NE. 'NU_FNU' .AND.
+	1        Y_PLT_OPT .NE. 'LAM_FLAM' .AND.
 	1        Y_PLT_OPT .NE. 'FLAM')THEN
 	     WRITE(T_OUT,*)'Invalid Y Plot option: Try again'
 	  END IF
@@ -455,6 +466,7 @@
 	  XV(1:NCF)=NU(1:NCF)
 	  YV(1:NCF)=0.0D0
 	  DO J=1,NP
+	    WRITE(50,*)J,MU(J),HQW_AT_RMAX(J)
 	    YV(1:NCF)=YV(1:NCF)+HQW_AT_RMAX(J)*IP(J,1:NCF)
 	  END DO
           T1=DISTANCE*1.0D+03*PARSEC()
@@ -464,13 +476,13 @@
 	    T1=2.0D0*R(1)*R(1)*PI*1.0D+23*(1.0E+10/T1)**2
 	  END IF
 	  YV(1:NCF)=YV(1:NCF)*T1
+	  WRITE(6,*)T1
 !
 ! NB: J and I have the same units, apart from per steradian.
 !
-	  CALL CNVRT_J(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	  CALL DP_CNVRT(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         LAMC,XAXIS,YAXIS,L_FALSE)
-	  CALL CURVE(NCF,XV,YV)
-	  YAXIS='F\gn(Jy)'
+	  CALL DP_CURVE(NCF,XV,YV)
 !
 ! Option to compute spetrum inside, and outside, a particular impact parameter.
 !
@@ -483,6 +495,7 @@
 !
 	  T1=P(I)*1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
 	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',P(I)*1.0E+10,' cm'
+	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',P(I)*1.0E+10/1.495978D+13,' AU'
 	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',T1,' arcsec'
 	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',P(I)/6.96D0,' Rsun'
 	  WRITE(T_OUT,'(1X,A,1P,E14.6)')'    P(I)/R*=',P(I)/R(ND)
@@ -507,12 +520,10 @@
 	  T1=2.0D0*PI*1.0D+23*(1.0E+10/T1)**2
 	  YV(1:NCF)=YV(1:NCF)*T1
 !
-! NB: J and I have the same units, apart from per steradian.
-!
-	  CALL CNVRT_J(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	  CALL DP_CNVRT(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         LAMC,XAXIS,YAXIS,L_FALSE)
 !
-	  CALL CURVE(NCF,XV,YV)
+	  CALL DP_CURVE(NCF,XV,YV)
 !
 	  XV(1:NCF)=NU(1:NCF)
 	  YV(1:NCF)=0.0D0
@@ -526,10 +537,13 @@
 ! NB: J and I have the same units, apart from per steradian/
 !
 	  WRITE(6,*)XV(1),YV(1)
-	  CALL CNVRT_J(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	  CALL DP_CNVRT(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         LAMC,XAXIS,YAXIS,L_FALSE)
-	  CALL CURVE(NCF,XV,YV)
-	  YAXIS='F\gn(Jy)'
+	  CALL DP_CURVE(NCF,XV,YV)
+
+!
+	ELSE IF(X(1:3) .EQ. 'EWP')THEN
+	  CALL COMP_IP_EW(IP,NU,LAM,P,R,DISTANCE,NCF,NP,ND)
 !
 	ELSE IF(X(1:2) .EQ. 'IP' .OR. X(1:2) .EQ. 'FP' .OR.
 	1          X(1:3) .EQ. 'FAP')THEN
@@ -579,7 +593,7 @@
 !
 ! NB: J and I have the same units, apart from per steradian/
 !
-	  CALL CNVRT_J(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	  CALL DP_CNVRT_J(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         LAMC,XAXIS,YAXIS,L_FALSE)
 !
 	  J=INDEX(YAXIS,'J')
@@ -601,22 +615,27 @@
 	    YAXIS(J:)=' \gW\u-1\d)'
 	  END IF
 !
-	  CALL CURVE(NCF,XV,YV)
+	  CALL DP_CURVE(NCF,XV,YV)
 !
 	ELSE IF(X(1:4) .EQ. 'SZ')THEN
-	  CALL USR_OPTION(T1,'Lambda',' ','Start wavelength in Ang')
+!
+	  WRITE(6,'(A)')RED_PEN
+	  WRITE(6,'(A)')'Returns impact parameter such that FRAC of the light'
+	  WRITE(6,'(A)')'originates inside that radius'
+	  WRITE(6,'(A)')DEF_PEN
+	
+	  CALL USR_OPTION(T1,'LAM_ST',' ','Start wavelength in Ang')
 	  T1=0.299794D+04/T1
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
-	  CALL USR_OPTION(T1,'Lambda',' ','End wavelength in Ang')
+	  CALL USR_OPTION(T1,'LAM_END',' ','End wavelength in Ang')
 	  T1=0.299794D+04/T1
           J=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
 !
 	  CALL USR_OPTION(DELV,'/\V','0.0D0','Smoothing size in km/s')
-	  CALL USR_OPTION(FRAC,'/\V','0.5D0',
-	1            'Fraction used to define radius (0<FRAC<1)')
+	  CALL USR_OPTION(FRAC,'FRAC','0.5D0','Fraction used to define radius (0<FRAC<1)')
 !
 	  K_ST=MIN(I,J)
 	  K_END=MAX(I,J)
@@ -624,17 +643,17 @@
 !
 	  IF(ALLOCATED(XV))DEALLOCATE(XV)
 	  IF(ALLOCATED(YV))DEALLOCATE(YV)
-	  IF(ALLOCATED(ZV))DEALLOCATE(WV)
+	  IF(ALLOCATED(WV))DEALLOCATE(WV)
 	  IF(ALLOCATED(ZV))DEALLOCATE(ZV)
 	  ALLOCATE (XV(NX))
 	  ALLOCATE (YV(NX))
 	  ALLOCATE (ZV(NP))
 	  ALLOCATE (WV(NP))
 !
+	  T1=1.0D-05*SPEED_OF_LIGHT()
           WRITE(6,*)'Allocated arrays'
-          WRITE(6,*)K_ST,K_END
-          WRITE(6,*)NU(1),NU(NCF)
-          WRITE(6,*)DELV
+          WRITE(6,*)'Frequency limits:',NU(K_ST),NU(K_END)
+          WRITE(6,*)'Wavelength limits:',T1/NU(K_ST),T1/NU(K_END)
 !
 	  DO K=K_ST,K_END
 	    XV(K-K_ST+1)=0.299794D+04/NU(K)
@@ -673,27 +692,50 @@
 	         EXIT
 	      END IF
 	    END DO
-!
 	  END DO 
-!
           WRITE(6,*)'Found radii'
 !
-	  CALL USR_OPTION(USE_ARCSEC,'Arcsec','T','Use arcseconds?')
+	  CALL USR_OPTION(YUNIT,'YUNIT','AU','Arc(secs), P, PONR, V, AU')
 !
-	  IF(USE_ARCSEC)THEN
+	  YUNIT=ADJUSTL(YUNIT)
+	  IF(UC(YUNIT(1:3)) .EQ. 'ARC')THEN
 	    T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
 	    DO K=1,NX
 	      YV(K)=LOG10(YV(K)*T1)
 	    END DO
-	    YAXIS='Log P(")'
-	  ELSE
-	    T2=R(ND)
+	    YAXIS='Log p(")'
+	  ELSE IF(UC(YUNIT(1:4)) .EQ. 'PONR')THEN
+	    T1=R(ND)
 	    YV(1:NX)=LOG10(YV(1:NX)/T2)
-	    YAXIS='Log P/R\d*\u'
+	    YAXIS='Log p/R\d*\u'
+	  ELSE IF(UC(YUNIT(1:1)) .EQ. 'P')THEN
+	    T1=6.96D0
+	    YV(1:NX)=LOG10(YV(1:NX)/T1)
+	    YAXIS='Log p(R\dsun\u)'
+	  ELSE IF(UC(YUNIT(1:2)) .EQ. 'AU')THEN
+	    T1=1.496D+03                           !1AU=1.496D+13 cm
+	    YV(1:NX)=LOG10(YV(1:NX)/T1)
+	    YAXIS='Log p(AU)'
+	  ELSE IF(UC(YUNIT(1:1)) .EQ. 'V')THEN
+	    IF(ALLOCATED(COEF))DEALLOCATE(COEF)
+	    ALLOCATE(COEF(ND,4))
+	    CALL MON_INT_FUNS_V2(COEF,V,R,ND)
+	    DO I=1,NX
+	      T2=YV(I)
+	      IF(YV(I) .LE. R(ND))THEN
+	        YV(I)=R(ND)
+	      ELSE
+	        J=GET_INDX_DP(T2,R,ND)
+	        T1=YV(I)-R(J)
+	        YV(I)=((COEF(J,1)*T1+COEF(J,2))*T1+COEF(J,3))*T1+COEF(J,4)
+!	        WRITE(6,'(I7,4ES14.4)')J,T2,R(J),V(J),YV(I)
+	      END IF
+	    END DO
+	    YAXIS='V(km s\u-1\d)'
 	  END IF
-	  XAXIS='\gl(\V)'
+	  XAXIS='\gl(\A)'
 !
-	  CALL CURVE(NX,XV,YV)
+	  CALL DP_CURVE(NX,XV,YV)
 !
 	ELSE IF(X(1:4) .EQ. 'IF2')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Start wavelength in Ang')
@@ -706,25 +748,14 @@
           J=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
 !
-	  CALL USR_OPTION(USE_ARCSEC,'Arcsec','T','Use arcseconds?')
 	  IF(ALLOCATED(XV))DEALLOCATE(XV)
 	  IF(ALLOCATED(YV))DEALLOCATE(YV)
 	  IF(ALLOCATED(ZV))DEALLOCATE(ZV)
 	  ALLOCATE (XV(NP))
 	  ALLOCATE (YV(NP))
 	  ALLOCATE (ZV(NP))
+	  CALL SET_IP_XSPAT_UNIT(XV,P,XAXIS,R(ND),DISTANCE,NP)
 !
-	  IF(USE_ARCSEC)THEN
-	    T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
-	    DO K=1,NP-1
-	      XV(K)=LOG10(P(K+1)*T1)
-	    END DO
-	    XAXIS='Log P(")'
-	  ELSE
-	    T2=R(ND)
-	    XV(1:NP-1)=LOG10(P(2:NP)/T2)
-	    XAXIS='Log P/R\d*\u'
-	  END IF
 	  YV(:)=0.0D0
 	  DO K=MIN(I,J),MAX(I,J)
 	    YV(1:NP)=YV(1:NP)+IP(1:NP,K)*0.5D0*(NU(K-1)-NU(K+1))
@@ -746,7 +777,7 @@
 	  WRITE(6,'(A,ES12.3,A)')'The average flux in band is',T1*T2,'Jy'
 !
 	  YAXIS='F(p)'
-	  CALL CURVE(NP-1,XV,ZV)
+	  CALL DP_CURVE(NP-1,XV,ZV)
 !
 	ELSE IF(X(1:4) .EQ. 'INU2' .OR. X(1:5) .EQ. 'WINU2')THEN
 	  CALL USR_OPTION(T1,'lam_st',' ','Start wavelength in Ang')
@@ -759,7 +790,6 @@
           J=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
 !
-	  CALL USR_OPTION(USE_ARCSEC,'Arcsec','T','Use arcseconds?')
 	  CALL USR_OPTION(MULT_BY_PSQ,'PSQ','F','Multiply by P^2?')
 	  MULT_BY_P=.FALSE.
 	  IF(.NOT. MULT_BY_PSQ)THEN
@@ -769,18 +799,11 @@
 	  IF(ALLOCATED(YV))DEALLOCATE(YV)
 	  ALLOCATE (XV(NP))
 	  ALLOCATE (YV(NP))
+	  CALL SET_IP_XSPAT_UNIT(XV,P,XAXIS,R(ND),DISTANCE,NP)
 !
 ! In this case we return linear axes --- usefule for SN.
 !
 	  IF(MULT_BY_P)THEN
-	    IF(USE_ARCSEC)THEN
-	      T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
-	      XV(1:NP)=P(1:NP)*T1 
-	      XAXIS='P(")'
-	    ELSE
-	      XV(1:NP)=P(1:NP)/R(ND)
-	      XAXIS='P/R\d*\u'
-	    END IF
 !
 ! Average I(p) over frequnecy.
 !
@@ -799,20 +822,10 @@
 !
 	    YV(1:NP-1)=YV(1:NP-1)*P(1:NP-1)
 	    YAXIS='10\u-10 \dpI\d\gn\u(ergs cm\u-1\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
-	    CALL CURVE(NP-1,XV,YV)
+	    CALL DP_CURVE(NP-1,XV,YV)
 !
 	  ELSE
-	    IF(USE_ARCSEC)THEN
-	      T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
-	      DO K=1,NP-2
-	        XV(K)=LOG10(P(K+1)*T1)
-	      END DO
-	      XAXIS='Log P(")'
-	    ELSE
-	      T2=R(ND)
-	      XV(1:NP-2)=LOG10(P(2:NP-1)/T2)
-	      XAXIS='Log P/R\d*\u'
-	    END IF
+!
 	    YV(:)=0.0D0
 	    K=MIN(I,J); J=MAX(I,J); I=K
 	    IF(J .EQ. I)J=I+1
@@ -840,8 +853,7 @@
 	      ELSE
 	        YAXIS='Log I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
 	      END IF
-	      XAXIS='\gm'
-	      CALL CURVE(NP-2,XV,YV)
+	      CALL DP_CURVE(NP-2,XV,YV)
 	    END IF
 	  END IF
 !
@@ -877,11 +889,12 @@
 	    WRITE(TMP_STR,*)J; TMP_STR=ADJUSTL(TMP_STR)
 	    YAXIS=TRIM(YAXIS)//' x 10\u'//TRIM(TMP_STR)//'\d'
 	  END IF
-	  CALL CURVE(NP,XV,YV)
+	  CALL DP_CURVE(NP,XV,YV)
 
 	ELSE IF(X(1:3) .EQ. 'INU')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
-	  T1=0.299794E+04/T1
+	  CALL USR_OPTION(T2,'Velocity offset','0.0D0','V in lm/s')
+	  T1=0.299794E+04/T1/(1.0D0+T2/C_KMS)
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
@@ -889,27 +902,11 @@
 	  IF(ALLOCATED(YV))DEALLOCATE(YV)
 	  ALLOCATE (XV(NP))
 	  ALLOCATE (YV(NP))
+	  CALL SET_IP_XSPAT_UNIT(XV,P,XAXIS,R(ND),DISTANCE,NP)
 !
-	  CALL USR_OPTION(USE_ARCSEC,'Arcsec','F','Use arcseconds?')
-	  IF(USE_ARCSEC)THEN
-	    T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
-	    DO K=2,NP-1
-	      XV(K)=LOG10(P(K+1)*T1)
-	    END DO
-	    XV(1)=XV(2)-3
-	    XAXIS='Log P(")'
-	  ELSE
-	    T2=R(ND)
-	    XV(2:NP-1)=LOG10(P(2:NP-1)/T2)
-	    XAXIS='Log P/R\d*\u'
-	    XV(1)=XV(2)-2
-	  END IF
 	  YV(1:NP-1)=IP(1:NP-1,I)
-	  DO I=1,NP-1
-	    WRITE(6,*)I,XV(I),YV(I)
-	  END DO
 	  YAXIS='I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
-	  CALL CURVE(NP-1,XV,YV)
+	  CALL DP_CURVE(NP-1,XV,YV)
 !
 	ELSE IF(X(1:3) .EQ. 'WIP')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Start wavelength in Ang')
@@ -968,11 +965,11 @@
 	  DO I=1,NP
 	    YV(I)=TA(I)/TA(1)
 	  END DO
-!	  CALL CNVRT_J(XV,YV,ND,LOG_X,LOG_Y,' ',Y_PLT_OPT,
+!	  CALL DP_CNVRT_J(XV,YV,ND,LOG_X,LOG_Y,' ',Y_PLT_OPT,
 !	1         LAMC,XAXIS,YAXIS,L_FALSE)
 !
 	  YAXIS='I(ergs cm\u-2\d s\u-1\d steradian\u-1\d)' 
-	  CALL CURVE(ND,XV,YV)
+	  CALL DP_CURVE(ND,XV,YV)
 ! 
 !
 ! Read in observation data as done in PLT_SPEC
@@ -1010,7 +1007,7 @@
 	  ALLOCATE (YV(NCF_MAX))
 !
 	  CALL USR_HIDDEN(OBS_COLS,2,2,'COLS','1,2','Columns with data')
-	  CALL RD_OBS_DATA_V2(XV,YV,NCF_MAX,J,FILENAME,OBS_COLS,IOS)
+	  CALL DP_RD_OBS_DATA_V2(XV,YV,NCF_MAX,J,FILENAME,OBS_COLS,IOS)
 	  IF(IOS .NE. 0)GOTO 1          !Get another option
 	  DO I=1,J
 	    XV(I)=ANG_TO_HZ/XV(I)
@@ -1099,9 +1096,9 @@
             END DO
           END IF
 !
-	  CALL CNVRT(XV,YV,J,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	  CALL DP_CNVRT(XV,YV,J,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1                 LAMC,XAXIS,YAXIS,L_FALSE)
-          CALL CURVE(J,XV,YV)
+          CALL DP_CURVE(J,XV,YV)
 !
 	ELSE IF(X(1:3) .EQ. 'SLT')THEN
 	  CALL USR_OPTION(X_CENT,'XC','0.0D0','X center of aperture (across width)')
@@ -1206,7 +1203,7 @@
 	    CALL INT_REC_AP(IP_NEW,P,YV(I),T2,Y_CENT,S_WIDTH,S_LNGTH,
 	1                     NP,IONE,NINS)
 	  END DO
-	  CALL CURVE(K,XV,YV)
+	  CALL DP_CURVE(K,XV,YV)
 !
 	ELSE IF(X(1:2) .EQ. 'SQ')THEN
 	  CALL USR_OPTION(X_CENT,'XC','0.0D0','X center of aperture (across width)')
@@ -1235,7 +1232,7 @@
 !
 ! NB: J and I have the same units, apart from per steradian/
 !
-	  CALL CNVRT_J(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	  CALL DP_CNVRT_J(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         LAMC,XAXIS,YAXIS,L_FALSE)
 !
 	  T2=1.0D+03*PARSEC()*DISTANCE
@@ -1246,7 +1243,8 @@
 	    YAXIS='F(Jy\d \uarcsec\u-2\d)'
             IF(LOG_Y)YAXIS='Log F(Jy\d \uarcsec\u-2\d)'
 	  END IF
-	  CALL CURVE(NCF,XV,YV)
+	  CALL DP_CURVE(NCF,XV,YV)
+	  WRITE(6,'(A,ES10.4)')' Apperture size in square arc seconds is ',APP_SIZE
 !
 ! 
 ! Plot section:
@@ -1275,14 +1273,22 @@
 	    WRITE(T_OUT,*)'Error opening HELP or DESCRIPTER file for PLT_JH'
 	    WRITE(6,*)' '
 	    WRITE(6,*)' TIT  LX  LY  XU '
-	    WRITE(6,*)' CF:   Plot cummulative spectrum as a function of impact parameter'
-	    WRITE(6,*)' IP:   Plot spectrum at a given impact parameter'
-	    WRITE(6,*)' IMU:  Plot intensity as a function of MU for a given frequency'
-	    WRITE(6,*)' SP:   Plot full spectrum'
-	    WRITE(6,*)' ISP:  Plot spectrum inside and outside impact parameter p'
-	    WRITE(6,*)' INU:  Plot I(p) for a given frequency'
-	    WRITE(6,*)' INU2: Plot I(p) for a given frequency band'
-	    WRITE(6,*)' IF2:  Plot normalize Flux originating inside p for a given frequency band'
+	    WRITE(6,*)' CF:      Plot cummulative spectrum as a function of impact parameter'
+	    WRITE(6,*)' IP:      Plot spectrum at a given impact parameter'
+	    WRITE(6,*)' IMU:     Plot intensity as a function of MU for a given frequency'
+	    WRITE(6,*)' SP:      Plot full spectrum'
+	    WRITE(6,*)' ISP:     Plot spectrum inside and outside impact parameter p'
+	    WRITE(6,*)' INU:     Plot I(p) for a given frequency'
+	    WRITE(6,*)' INU2:    Plot I(p) for a given frequency band'
+	    WRITE(6,*)' IF2:     Plot normalize Flux originating inside p for a given frequency band'
+	    WRITE(6,*)' '
+	    WRITE(6,*)' RD_OBS:  Read in an observational data set'
+	    WRITE(6,*)' WIP:     Write IP to individual files for a band of wavelengths'
+	    WRITE(6,*)' WINU2:   WRITE I(p) for a given frequency band'
+	    WRITE(6,*)' '
+	    WRITE(6,*)' SZ:   Determine radius (at fixed flux level) of star'
+	    WRITE(6,*)' SLT:  Determine radius (at fixed flux level) of star'
+	    WRITE(6,*)' SQ:   Souput intesity over  rectangluar apperture'
 	    WRITE(6,*)' '
 	    WRITE(6,*)' GR:   Enter polot packgae to plot passed data'
 	    WRITE(6,*)' GRL:  As for GR but no labels passed'

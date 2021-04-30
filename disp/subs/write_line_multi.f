@@ -74,7 +74,7 @@
 	  WRITE(LUOUT,*)' '
 	  WRITE(LUOUT,'(1X,A,T25,A,T40,A)')TRIM(TRAN_NAME),'[TR_ID]','Transition identification'
 	  WRITE(LUOUT,'(1X,1PE15.8,T25,A,T40,A)')CONT_INT,'[IC]','Schuster intensity'
-	  WRITE(LUOUT,'(1X,1PE15.8,T25,A,T40,A)')AMASS,'[AMASS]','Atmoic mass (AMUs)'
+	  WRITE(LUOUT,'(1X,1PE15.8,T25,A,T40,A)')AMASS,'[AMASS]','Atomic mass (AMUs)'
 	  WRITE(LUOUT,'(1X,1PE15.8,T25,A,T40,A)')FREQ,'[FREQ]','Frequency (10^15 Hz)'
 	  WRITE(LUOUT,'(1X,1PE12.5,T25,A,T40,A)')VAC_LAM,'[LAM]','Vacuum wavelength (Ang)'
 	  WRITE(LUOUT,'(1X,A,/,(1P,1X,9E14.6))')'ETAL',(ETAL(I),I=1,ND)

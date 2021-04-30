@@ -54,7 +54,7 @@
  	WRITE(LUOUT,'(1X,A,T25,A,T40,A)')'TRUE','[DIF]','Diffusion approximation'
 	WRITE(LUOUT,'(1X,1PE15.8,T25,A,T40,A)')FREQ,'[FREQ]','Frequency (10^15 Hz)'
 	WRITE(LUOUT,'(1X,1PE12.5,T25,A,T40,A)')VAC_LAM,'[LAM]','Vacuum wavelength (Ang)'
-	WRITE(LUOUT,'(1X,1PE15.8,T25,A,T40,A)')AMASS,'[AMASS]','Atmoic mass (AMUs)'
+	WRITE(LUOUT,'(1X,1PE15.8,T25,A,T40,A)')AMASS,'[AMASS]','Atomic mass (AMUs)'
 	WRITE(LUOUT,'(1X,1PE15.8,T25,A,T40,A)')CONT_INT,'[IC]','Schuster intensity'
 	WRITE(TMP_STR,'(I5)')ND; TMP_STR=ADJUSTL(TMP_STR)
 	WRITE(LUOUT,'(1X,A,T25,A,T40,A)')TRIM(TMP_STR),'[ND]','Number of depth points'

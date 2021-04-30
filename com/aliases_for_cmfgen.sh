@@ -10,8 +10,8 @@
 #set cmfdist = ~jdh/cur_cmf
 #set CMFDIST = ~jdh/cur_cmf
 
-setenv cmfdist  ~jdh/cur_cmf
-setenv CMFDIST  ~jdh/cur_cmf
+setenv cmfdist  ~jdh/Dropbox/Ibis/cur_cmf
+setenv CMFDIST  ~jdh/Dropbox/Ibis/cur_cmf
 
 set atomic  = ~jdh/atomic 
 set ATOMIC  = ~jdh/atomic 

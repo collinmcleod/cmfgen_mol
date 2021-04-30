@@ -181,7 +181,6 @@ C
 	    WRITE(LUER,*)'Warning in RD_F_TO_S_IDS'
 	    WRITE(LUER,*)'Currently treating ',FILENAME
 	    WRITE(LUER,*)'Super level ',I,' has a mix of odd and even levels'
-	    STOP
 	  END IF
 	END DO
 C

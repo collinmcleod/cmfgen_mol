@@ -152,5 +152,22 @@
 !
 	END DO		!Loop over depth (I)
 !
+	IF(DST .EQ. 1 .AND. DEND .EQ. ND)THEN
+	  OPEN(UNIT=10,FILE=TRIM(AUTO_FILE)//'RATE',STATUS='UNKNOWN')
+	    WRITE(10,'(A)')'!'
+	    WRITE(10,'(A)')'! Anti-autoionization ratse, Autoionization rates '
+	    WRITE(10,'(A)')'!'
+	    WRITE(10,'(I5,T20,A)')N_F-IBEG_AUTO+1,'!Number of transitions '
+	    WRITE(10,'(I5,T20,A)')ND,'!Number of depths'
+	    WRITE(10,'(A)')'!'
+	    DO K=IBEG_AUTO,N_F
+	      J=F_TO_S_MAPPING(K)
+	      WRITE(10,'(A,3X,I5)')LEVNAME_F(K),K
+	      WRITE(10,'(8ES16.8)')(AUTO(K)*HNST_F(K,I),AUTO(K)*HN_F(K,I),I=1,ND)
+	      WRITE(10,'(A)')' '
+	    END DO
+	  CLOSE(UNIT=10)
+	END IF
+!	
 	RETURN
 	END

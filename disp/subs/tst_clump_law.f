@@ -17,7 +17,7 @@
 	INTEGER, PARAMETER :: NPAR_MAX=5
 	INTEGER, PARAMETER :: LUER=6
 	REAL*8 CLUMP_PAR(NPAR_MAX)
-	REAL*8 T1
+	REAL*8 T1,T2
 	INTEGER NPAR
 	INTEGER K
 	CHARACTER(LEN=10) CLUMP_LAW
@@ -26,13 +26,15 @@
         EXTERNAL UC
 !
 	WRITE(LUER,'(A)')BLUE_PEN
-	WRITE(LUER,'(A)')'EXPO:   F=C1 + (1-C1-C3)EXP(-V/C2) + C3.EXP(-V/C4)'
+	WRITE(LUER,'(A)')'EXPO:   F=C1 + (1-C1-C3)EXP(-V/C2) + C3.EXP(-V/C4) (4 params)'
+	WRITE(LUER,'(A)')'EXPO:   F=C1 + (1-C1-C3)EXP(-A/C2) + C3.EXP(-A/C4), A=MAX[0,(V-C5)] C6 softens MAX function(6 params)'
 	WRITE(LUER,'(A)')'MEXP:   F=(C1 + (1-C1-C3)EXP(-V/C2))EXP(-R/R(1))'
 	WRITE(LUER,'(A)')'REXP:   F=C1 + (1-C1)EXP(-V/C2)    + (1-C1)EXP((V-VINF)/C3)'
 	WRITE(LUER,'(A)')'POW:    F=C1 + (1-C1)(-V/VINF)**C2'
+	WRITE(LUER,'(A)')'RPOW:   F=1/[ (1/C1-1)*(-V/VINF)**C2 ]'
 	WRITE(LUER,'(A)')DEF_PEN
 !
-	CALL USR_OPTION(CLUMP_LAW,'LAW','EXPO','Clumping law: EXPO, CREXP, POW')
+	CALL USR_OPTION(CLUMP_LAW,'LAW','EXPO','Clumping law: EXPO, MEXP, REXP, POW, RPOW')
 	CALL USR_OPTION(NPAR,'NPAR','2','Number of clumping parameters [ <6 ]')
 	CLUMP_LAW=UC(CLUMP_LAW)
 !
@@ -42,17 +44,25 @@
 ! CLUMP_PAR(2) is a velocity, and determines how fast the clumping factor
 ! approach CLUMP_PAR(1).
 !
+	  CLUMP_PAR=0.0D0
+	  CLUMP_PAR(4)=1.0D0
 	  CALL USR_OPTION(CLUMP_PAR(1),'CLP1','0.1','Clumping factor at infinity')
 	  CALL USR_OPTION(CLUMP_PAR(2),'CLP2','500','Velocity scale factor')
-	  IF(NPAR .EQ. 3 .OR. NPAR .EQ. 4)THEN
+	  IF(NPAR .GT. 2)THEN
 	    CALL USR_OPTION(CLUMP_PAR(3),'CLP3','0.1','Second clumping factor')
 	    CALL USR_OPTION(CLUMP_PAR(4),'CLP4','1.0','Second velocity scale')
 	  END IF
-	  IF(CLUMP_PAR(3) .EQ. 0.0D0)CLUMP_PAR(4)=1.0D0
+	  IF(NPAR .EQ. 6)THEN
+	    CALL USR_OPTION(CLUMP_PAR(5),'CLP5','0.0','Hard minimum velocity')
+	    CALL USR_OPTION(CLUMP_PAR(6),'CLP6','0.2','Smoothing param')
+	  END IF
+	  T2=CLUMP_PAR(6)
 	  DO K=1,ND
+	    T1=VEL(K)
+	    IF(NPAR .EQ. 6)T1=LOG(1.0D0+EXP(T2*(VEL(K)-CLUMP_PAR(5))))/T2
 	    CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1)-CLUMP_PAR(3))*
-	1                   EXP(-VEL(K)/CLUMP_PAR(2))+
-	1                   CLUMP_PAR(3)*EXP(-VEL(K)/CLUMP_PAR(4))
+	1                   EXP(-T1/CLUMP_PAR(2))+
+	1                   CLUMP_PAR(3)*EXP(-T1/CLUMP_PAR(4))
 	  END DO
 !
 	ELSE IF(CLUMP_LAW(1:4) .EQ. 'MEXP')THEN
@@ -89,6 +99,19 @@
 	  DO K=1,ND
 	    CLUMP_FAC(K)=1.0D0-(1.0D0-CLUMP_PAR(1))*(VEL(K)/VEL(1))**CLUMP_PAR(2)
 	  END DO
+        ELSE IF(CLUMP_LAW(1:4) .EQ. 'RPOW')THEN
+	  CALL USR_OPTION(CLUMP_PAR(1),'CLP1','0.1','Clumping factor at infinity')
+	  CALL USR_OPTION(CLUMP_PAR(2),'CLP2','1.0D0','Power law exponent (+ve)')
+	  IF(NPAR .NE. 2)THEN
+	    WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
+	    WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',NPAR
+	    STOP
+	  END IF
+	  DO K=1,ND
+	    T1=1.0D0/CLUMP_PAR(1)-1.0D0
+	    CLUMP_FAC(K)=1.0D0/(1.0D0+T1*(VEL(K)/VEL(1))**CLUMP_PAR(2))
+	  END DO
+!
 	ELSE
 	  WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
 	  WRITE(LUER,*)'Invalid law for computing clumping factor'

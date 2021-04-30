@@ -341,11 +341,12 @@ C
 	  IF(.NOT. LOG_X)WRITE(T_OUT,*)'Now using Linear X axis'
 	ELSE IF(X(1:2) .EQ.'XU' .OR. X(1:6) .EQ. 'XUNITS')THEN
 	  CALL USR_OPTION(X_UNIT,'X_UNIT','Ang',
-	1                  'Ang, AA[Air Ang], um, eV, keV, Hz, Mm/s, km/s')
+	1                  'Ang, AA[Air Ang], nm, um, eV, keV, Hz, Mm/s, km/s')
 	  CALL SET_CASE_UP(X_UNIT,IZERO,IZERO)
 	  IF(X_UNIT .NE. 'ANG' .AND.
 	1        X_UNIT .NE. 'AA' .AND.
 	1        X_UNIT .NE. 'UM' .AND.
+	1        X_UNIT .NE. 'NM' .AND.
 	1        X_UNIT .NE. 'EV' .AND.
 	1        X_UNIT .NE. 'KEV' .AND.
 	1        X_UNIT .NE. 'HZ' .AND.

@@ -15,7 +15,7 @@ C SCALE_FACTOR=
 C
 C Where:
 C      The Flux Unit can Jy, or ergs/cm^2/s/Ang, or Norm.
-C      The WAVE_UNIT can be Anstroms
+C      The WAVE_UNIT can be Anstroms, um, nm
 C      AIR_LAM can be TRUE (air) or FALSE (vac)
 C
 C If WAVE_UNIT is not specifed, Angstoms is assumed
@@ -41,6 +41,7 @@ C
 	1                         FILENAME,COLS,IOS)
 	IMPLICIT NONE
 C
+C Altered 16-Apr-2021 : Added nm to unit list.
 C Altered 07-Jul-2011 : Improved error message when reading bad data.
 C Altered 11-May-2008 : Altered to handle blank lines/comments at end of file.
 C Altered 18-Nov-1999 : Altered to allow for multiple data sets in the same
@@ -167,6 +168,7 @@ C
 	    IF(WAVE_UNIT .EQ. 'ANGSTROMS' )THEN
 	    ELSE IF(WAVE_UNIT .EQ. 'LOG(ANGSTROMS)' )THEN
 	    ELSE IF(WAVE_UNIT .EQ. 'MICROMETERS')THEN
+	    ELSE IF(WAVE_UNIT .EQ. 'NM')THEN
 	    ELSE IF(WAVE_UNIT .EQ. 'UM')THEN
 	        WAVE_UNIT='MICROMETERS'
 	    ELSE IF(WAVE_UNIT .EQ. 'HZ')THEN
@@ -338,10 +340,12 @@ C Do nothing as unit we want.
 C
 	ELSE IF(WAVE_UNIT .EQ. 'LOG(ANGSTROMS)')THEN
 	  LAM(NLST+1:NPTS)=10**(LAM(NLST+1:NPTS))
+	ELSE IF(WAVE_UNIT .EQ. 'NM')THEN
+	  LAM(NLST+1:NPTS)=10.0D0*LAM(NLST+1:NPTS)
 	ELSE IF(WAVE_UNIT .EQ. 'MICROMETERS')THEN
 	  LAM(NLST+1:NPTS)=1.0D+04*LAM(NLST+1:NPTS)
 	ELSE IF(WAVE_UNIT .EQ. 'HZ')THEN
-	  LAM(NLST+1:NPTS)=2.99794E+18/LAM(NLST+1:NPTS)
+	  LAM(NLST+1:NPTS)=2.99792458D+18/LAM(NLST+1:NPTS)
 	  AIR_LAM='FALSE'
 	END IF
 C

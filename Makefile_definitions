@@ -16,7 +16,7 @@
 HOST :=$(shell hostname)
 
 ifeq ($(HOST),ibis.phyast.pitt.edu)
-INSTALL_DIR=/Users/jdh/cur_cmf/
+INSTALL_DIR=/Users/jdh/Dropbox/Ibis/cur_cmf/
 endif
 
 ifeq ($(HOST),osiris-inode01.phyast.pitt.edu)

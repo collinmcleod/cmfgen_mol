@@ -12,6 +12,7 @@ LIB=$(LIB_DIR)libsubs.a
 # Entries in a library
 #
 OBJ= $(LIB)(dir_acc_pars_gen.o)\
+     $(LIB)(dir_delimiter.o)\
      $(LIB)(date_time.o)\
      $(LIB)(verbose_info.o)\
      $(LIB)(wr_pwd.o)\

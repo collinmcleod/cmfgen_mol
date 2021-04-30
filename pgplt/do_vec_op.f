@@ -175,12 +175,15 @@ C
 	    YV(IL:IU)=CD(IN1)%DATA(IL:IU)+YV(IL:IU)
 	  ELSE IF(OPERATION .EQ. '-')THEN
 	    YV(IL:IU)=CD(IN1)%DATA(IL:IU)-YV(IL:IU)
-	  ELSE IF(OPERATION .EQ. 'AC')THEN
+!
+! Cross-correlate two spectra. This assumes that model 1 is on 
+! a uniform gird. For spectra, it should also be in log space.
+!
+	  ELSE IF(OPERATION .EQ. 'CC')THEN
 	    J=(IU-IL)/2-1
 	    IF(ALLOCATED(ZV))DEALLOCATE(ZV)
-	    ALLOCATE (ZV(MAX(N1,N2)),STAT=IOS)
 	    IF(ALLOCATED(XV))DEALLOCATE(XV)
-	    ALLOCATE (XV(MAX(N1,N2)),STAT=IOS)
+	    ALLOCATE (XV(MAX(N1,N2)),ZV(MAX(N1,N2)),STAT=IOS)
 	    ZV=0.0D0; XV=0.0D0
 	    DO L=-J,J
 	      DO I=IL,IU
@@ -191,6 +194,7 @@ C
 	    YV(IL:IU)=ZV(IL:IU)
 	    T1=(CD(IN1)%XVEC(IL)-CD(IN1)%XVEC(IU))/(IU-IL-1)
 	    XV(IL:IU)=XV(IL:IU)*ABS(T1)
+!
 	  ELSE IF(OPERATION .EQ. '/')THEN
 !
 ! The test for overflow needs improving.
@@ -213,7 +217,7 @@ C
 	  END IF
 !
 	IF(.NOT. ALLOCATED(XV))ALLOCATE (XV(1:IU))
-	IF(OPERATION .NE. 'AC')XV(IL:IU)=CD(IN1)%XVEC(IL:IU)
+	IF(OPERATION .NE. 'CC')XV(IL:IU)=CD(IN1)%XVEC(IL:IU)
 	IF(ALLOCATED(CD(OUT)%XVEC))THEN
 	  DEALLOCATE (CD(OUT)%XVEC)
 	  DEALLOCATE (CD(OUT)%DATA)

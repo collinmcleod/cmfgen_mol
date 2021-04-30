@@ -1,4 +1,4 @@
-
+!
 ! General purpose line plotting routiine.
 !
 	SUBROUTINE GRAMON_PGPLOT(XLAB,YLAB,TITL,PASSED_OPT)
@@ -8,12 +8,18 @@
 	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
+! Altered:  22-Nov-2020 : Now call MONBORD_V4 (updated from osiris)
+!                       :   Cleaned title label writing
+!                       :   Added REG option (removed UG from XAR -- inclued with REG)
+!                       :   Added option to add noise (ADDN)
+!                       :   Added color blind pens (udated from osiris).
+!                       :   Added options to read abcissca (RDXL) and ordnate (RDYL) values (udated from osiris).
 ! Altered:  15-Jan-2020 : Added NMS option to help create automatic plots.
 ! Altered:  17-Aug-2019 : Altered to allow dashed lines
 ! Altered:  10-Jul-2019 : Draw errors first so curves drawn on top.
 ! Altered:  28-Feb-2019 : Now scale error bars for simple YAR options.
 ! Altered:  01-Mar-2016 : Added XN option to XAR option. This allows Y to be plotted against
-!                          the index I. By default, a new plot is created [24-Feb-2016].
+!                           the index I. By default, a new plot is created [24-Feb-2016].
 ! Altered:  29-Jun-2015 : Changed RID o check ABS(TAU) which for pp model can -ve.
 ! Altered:  22-Apr-2015 : Added FILL option to fill the space between two curves that create a polygon.
 !                           ANS changed to length 4 (from 3)
@@ -108,6 +114,7 @@
         CHARACTER*80 ID_FILNAME
         CHARACTER*80 EW_FILNAME
 	CHARACTER*80, SAVE :: PLT_ST_FILENAME
+	CHARACTER*80, SAVE :: TITLE_FILENAME
 	CHARACTER*80 WK_STR,OPTION
 	CHARACTER*80 TMP_STR
 	CHARACTER*6 TO_TEK
@@ -166,12 +173,15 @@
 	REAL*4 EW,CENTROID
 	REAL*4 XCUR(2),YCUR(2),SLOPE
 	INTEGER PLOT_ID,CURSERR
+	INTEGER IP_CONT
 	INTEGER L_CHAN(2)
 	INTEGER, SAVE :: LU_EW=30
 	INTEGER, SAVE :: LU_NORM=31
 	LOGICAL, SAVE :: FIRST_EW=.TRUE.
 	CHARACTER*1 CURSVAL
 	LOGICAL CONTINUUM_DEFINED
+	CHARACTER(LEN=10) DC_CURVE_OPTION
+	CHARACTER(LEN=10) DC_INPUT_OPTION
 !
 ! Functions
 !
@@ -248,7 +258,10 @@
 	INTEGER PEN_COL(0:MAXPEN)
 	REAL*4 RTEMP,BTEMP,GTEMP
 !
+	INTEGER NP_OUT
+	INTEGER NX_MAX
 	INTEGER IPLT(MAX_PLTS)
+	INTEGER IPST(MAX_PLTS)
 !
 ! Variables to read in plot in column format
 !
@@ -347,12 +360,14 @@
 	  TICK_FAC_SCALE=1.5D0
 	  PLT_LINE_WGT=1
           PLT_ST_FILENAME=' '
+          TITLE_FILENAME='TITLE.SAV'
 	  LINE_WGT(:)=1
 	  PEN_OFFSET=1
 	  IFILL_PLT1=0; IFILL_PLT2=0
 	  ID_FILNAME='LINE_ID'
 	  EW_FILNAME='ewdata_fin'
 	  EW_CUT=1.0D0
+	  IP_CONT=0
 	END IF
 	TITLE(1:N_TITLE)=' '
 	CALL GEN_ASCI_OPEN(LU_NORM,'NORM_FACTORS','UNKNOWN','APPEND',' ',IZERO,IOS)
@@ -369,8 +384,10 @@
 	DO I=1,MAXSTR
 	  FLAGSTR(I)=.FALSE.
 	  FLAGLINE(I)=.FALSE.
-	  STR_EXP(I)=1.0	   !Default (changed using SE option only)
-	  STR_COL(I)=1		   !Default (changed using SE option only)
+	  STR_EXP(I)=1.0	   	!Default (changed using SE option only)
+	  STR_COL(I)=1			!Default (changed using SE option only)
+	  LINEXST(I)=1; LINEYST(I)=1
+	  LINEXEND(I)=1; LINEYEND(I)=1
 	END DO
 	DO_ERROR=.TRUE.
 	OPTION=PASSED_OPT
@@ -569,7 +586,7 @@
 	  WRITE(T_OUT,*)'YAR  - Simple Y axis arithmetic'
 	  WRITE(T_OUT,*)'VAR  - Simple arithmetic on two plots'
 	  WRITE(T_OUT,*)'NM   - Scale average to 1 or to another plot'
-	  WRITE(T_OUT,*)'REG  - Regrid plot - dX, R or NINS'
+	  WRITE(T_OUT,*)'REG  - Regrid plot - UG, dX, R or NINS'
 	  WRITE(T_OUT,*)'ADDN - Add Poisonian noise'
 	  WRITE(T_OUT,*)'SM   - Smooth data -- ignires X-spaicng of data'
 	  WRITE(T_OUT,*)'GSM  - Gaussian smoothing -- set resolution'
@@ -594,6 +611,8 @@
 	  WRITE(T_OUT,*)'WPF  - Similar to WP but asks for filename'
 	  WRITE(T_OUT,*)'WTIT - Write titles to ascii file'
 	  WRITE(T_OUT,*)'RTIT - Read titles from ascii file'
+	  WRITE(T_OUT,*)'RDXL - Read abscica values from file'
+	  WRITE(T_OUT,*)'RDYL - Read ordinate values from file'
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
 !
@@ -610,11 +629,18 @@
 !
 ! Exit from Ploting package, saving STRING and VECTOR information.
 ! If the NOI option has been issued, the plots will still be 
-! retained.
+! retained. ROutine checks that CONTINUUM defition saved is it has been set.
 !
 	ELSE IF(ANS .EQ. 'E')THEN
-	  CLOSE(LU_NORM)
 	  IF(INITIALIZE_ON_EXIT)THEN
+	    IF(IP_CONT .NE. 0)THEN
+	      WRITE(6,*)'Have you saved you defined continuum values'
+	      QUERYFLAG=.FALSE.
+	      CALL NEW_GEN_IN(QUERYFLAG,'Return to OPTION input to use WXY option?')
+	      IF(QUERYFLAG)GOTO 1000
+	    ELSE
+	      IP_CONT=0
+	    END IF
 	    DO IP=1,NPLTS
 	      IF(ALLOCATED(CD(IP)%XVEC))DEALLOCATE(CD(IP)%XVEC)
 	      IF(ALLOCATED(CD(IP)%DATA))DEALLOCATE(CD(IP)%DATA)
@@ -625,6 +651,7 @@
 	    END DO
 	    NPLTS=0
 	  END IF
+	  CLOSE(LU_NORM)
           IF(STR .OR. VEC)THEN
 	    FILNAME='PGOUT'
 	    CALL NEW_GEN_IN(FILNAME,'Filname for STRING/VEC storage (no ext)')
@@ -904,17 +931,17 @@ C
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'WTIT')THEN
-	  FILNAME='TITLE.SAV'
+	  TITLE_FILENAME='TITLE.SAV'
 	  TMP_LOG=.TRUE.
 	  DO WHILE(TMP_LOG)
-	    CALL NEW_GEN_IN(FILNAME,'File for plot titles')
-	    INQUIRE(FILE=FILNAME,EXIST=TMP_LOG)
+	    CALL NEW_GEN_IN(TITLE_FILENAME,'File for plot titles')
+	    INQUIRE(FILE=TITLE_FILENAME,EXIST=TMP_LOG)
 	    IF(TMP_LOG)THEN
 	      CALL NEW_GEN_IN(TMP_LOG,'Overwrite existing file?')
 	      TMP_LOG=.NOT. TMP_LOG
 	    END IF
 	  END DO
-	  OPEN(UNIT=10,FILE=TRIM(FILNAME),STATUS='UNKNOWN',IOSTAT=IOS)
+	  OPEN(UNIT=10,FILE=TRIM(TITLE_FILENAME),STATUS='UNKNOWN',IOSTAT=IOS)
 	  IF(IOS .EQ .0)THEN
 	    DO J=1,N_TITLE
 	      IF(TITLE(J) .EQ. ' ')EXIT
@@ -927,8 +954,8 @@ C
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'RTIT')THEN
-	  CALL NEW_GEN_IN(FILNAME,'FILE')
-	  CALL GET_TITLES(FILNAME,TITLE,N_TITLE,IOS)
+	  CALL NEW_GEN_IN(TITLE_FILENAME,'FILE')
+	  CALL GET_TITLES(TITLE_FILENAME,TITLE,N_TITLE,IOS)
 	  IF(IOS .EQ. 0)CALL NEW_GEN_IN(TITONRHS,'TITONRHS')
 	  GOTO 1000
 !
@@ -1566,40 +1593,36 @@ C
 	  ELSE
 	    CALL NEW_GEN_IN(PLOT_ID,'Plot to determine EW for:')
 	  END IF
-	  CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
-	  CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
-	  SLOPE=(YCUR(2)-YCUR(1))/(XCUR(2)-XCUR(1))
+!
+	  DC_INPUT_OPTION='CURSOR'
+	  CALL NEW_GEN_IN(DC_INPUT_OPTION,'CURSOR or name of file')
+	  DC_CURVE_OPTION='MONCUB'
+	  IF(DC_INPUT_OPTION .EQ. 'CURSOR')DC_CURVE_OPTION='LINEAR'
+	  CALL NEW_GEN_IN(DC_CURVE_OPTION,'Curve type -- LINEAR of MONCUB')
+!
 	  IF(ALLOCATED(CONT))DEALLOCATE(CONT)
 	  ALLOCATE(CONT(NPTS(PLOT_ID)))
-	  DO I=1,NPTS(PLOT_ID)
-            CONT(I)=YCUR(1)+SLOPE*(CD(PLOT_ID)%XVEC(I)-XCUR(1))
-	  END DO
-	  WRITE(T_OUT,*)XCUR(1:2),YCUR(1:2)
-	  CALL PGLINE(NPTS(PLOT_ID),CD(PLOT_ID)%XVEC,CONT)
-	  CONTINUUM_DEFINED=.TRUE.
+	  CONT=CD(PLOT_ID)%DATA
+!
 	  IP=NPLTS+1
 	  CALL NEW_GEN_IN(IP,'Output plot?')
-	  IF(IP .NE. 0)THEN
-	    I=NPTS(PLOT_ID)
-	    TYPE_CURVE(IP)='L'
-	    IF(ALLOCATED(CD(IP)%XVEC))THEN
-	      DEALLOCATE (CD(IP)%XVEC)
-	      DEALLOCATE (CD(IP)%DATA)
-	    END IF
-            ALLOCATE (CD(IP)%XVEC(I),STAT=IOS)
-            IF(IOS .EQ. 0)ALLOCATE (CD(IP)%DATA(I),STAT=IOS)
-	    IF(IOS .NE. 0)THEN
-	      WRITE(T_OUT,*)'Error: unable to allocate new data vectors'
-	      WRITE(T_OUT,*)'IOS=',IOS
-	      STOP
-	    END IF
-	    CD(IP)%XVEC(1:I)=CD(PLOT_ID)%XVEC(1:I)
-            CD(IP)%DATA(1:I)=CONT(1:I)
-            NPTS(IP)=I
-            ERR(IP)=.FALSE.
-            IF(IP .GT. NPLTS)NPLTS=IP
-	  END IF
+	  CALL PG_DEF_CONTINUUM(CONT,PLOT_ID,IP,DC_INPUT_OPTION,DC_CURVE_OPTION,IOS)
+	  IF(IOS .EQ. 0)CONTINUUM_DEFINED=.TRUE.
+          IF(IP .NE. 0)TYPE_CURVE(IP)='L'
 	  GOTO 1000
+!
+! This option allows a curve to be defined using currors. Can be used to define
+! a continuum. Can be called multiples times.
+!
+	ELSE IF (ANS .EQ. 'MCN')THEN
+	  IF(IP_CONT .EQ. 0)THEN
+	    IP_CONT=NPLTS+1
+	    NPLTS=NPLTS+1
+	    NPTS(IP)=0
+	  END IF
+	  CALL NEW_GEN_IN(IP_CONT,'Plot with continuum nodes')
+	  CALL PG_MOD_CONT_NODES(IP_CONT)
+          TYPE_CURVE(IP_CONT)='L'
 !
 	ELSE IF (ANS .EQ. 'CONT')THEN
 	  IF(NPLTS .EQ. 1)THEN
@@ -1701,49 +1724,65 @@ C
 !
 	ELSE IF(ANS .EQ. 'EW')THEN
 !
+	  IF(FIRST_EW)THEN
+	    OPEN(UNIT=LU_EW,FILE='EW_FR_SPEC_PLT',STATUS='UNKNOWN',POSITION='APPEND')
+	    FIRST_EW=.FALSE.
+	    WRITE(LU_EW,'(A10,4A15)')'   Plot ID','  EW(X units)','  X(centroid)','     X(start)','       X(end)'
+	    FLUSH(LU_EW)
+	  END IF
+!
 	  IF(CONTINUUM_DEFINED)THEN
 !
-	  CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
-	  CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
+	    DO WHILE(1 .EQ. 1)
+	      CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
+	      IF(CURSVAL .EQ. 'e' .OR. CURSVAL .EQ. 'E')GOTO 1000
+	      IF(END_CURS(CURSVAL))GOTO 1000
+	      CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
+	      IF(CURSVAL .EQ. 'e' .OR. CURSVAL .EQ. 'E')GOTO 1000
+	      IF(END_CURS(CURSVAL))GOTO 1000
 !
 ! Find nearest channels to curser positions.
 !
-	    IP=PLOT_ID
-	    L_CHAN(1)=GET_INDX_SP(XCUR(1),CD(IP)%XVEC,NPTS(IP))
-	    L_CHAN(2)=GET_INDX_SP(XCUR(2),CD(IP)%XVEC,NPTS(IP))
+	      IP=PLOT_ID
+	      L_CHAN(1)=GET_INDX_SP(XCUR(1),CD(IP)%XVEC,NPTS(IP))
+	      L_CHAN(2)=GET_INDX_SP(XCUR(2),CD(IP)%XVEC,NPTS(IP))
 !
 ! Draw in line limits
 !
-	    CALL PGMOVE(CD(IP)%XVEC(L_CHAN(1)),YPAR(1))
-	    CALL PGDRAW(CD(IP)%XVEC(L_CHAN(1)),CONT(L_CHAN(1)))
-	    CALL PGMOVE(CD(IP)%XVEC(L_CHAN(2)),YPAR(1))
-	    CALL PGDRAW(CD(IP)%XVEC(L_CHAN(2)),CONT(L_CHAN(2)))
+	      CALL PGMOVE(CD(IP)%XVEC(L_CHAN(1)),YPAR(1))
+	      CALL PGDRAW(CD(IP)%XVEC(L_CHAN(1)),CONT(L_CHAN(1)))
+	      CALL PGMOVE(CD(IP)%XVEC(L_CHAN(2)),YPAR(1))
+	      CALL PGDRAW(CD(IP)%XVEC(L_CHAN(2)),CONT(L_CHAN(2)))
 !
-	    EW=0.0
-            CENTROID=0.0
-	    IF(L_CHAN(1) .LT. L_CHAN(2))THEN
-	      T1=0.5D0
-	    ELSE
-	      K=L_CHAN(1)
-	      L_CHAN(1)=L_CHAN(2)
-	      L_CHAN(2)=K
-	      T1=-0.5D0
-	    END IF
-	    DO I=L_CHAN(1),L_CHAN(2)-1
-	      EW=EW+T1*( (CD(IP)%DATA(I)-CONT(I))/CONT(I) + 
+	      EW=0.0
+              CENTROID=0.0
+	      IF(L_CHAN(1) .LT. L_CHAN(2))THEN
+	        T1=0.5D0
+	      ELSE
+	        K=L_CHAN(1)
+	        L_CHAN(1)=L_CHAN(2)
+	        L_CHAN(2)=K
+	        T1=-0.5D0
+	      END IF
+	      DO I=L_CHAN(1),L_CHAN(2)-1
+	        EW=EW+T1*( (CD(IP)%DATA(I)-CONT(I))/CONT(I) + 
 	1               (CD(IP)%DATA(I+1)-CONT(I+1))/CONT(I+1) )*
 	1               (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
-	      CENTROID=CENTROID+T1*( CD(IP)%XVEC(I)*(CD(IP)%DATA(I)-CONT(I))/CONT(I)
+	        CENTROID=CENTROID+T1*( CD(IP)%XVEC(I)*(CD(IP)%DATA(I)-CONT(I))/CONT(I)
 	1               + CD(IP)%XVEC(I+1)*(CD(IP)%DATA(I+1)-CONT(I+1))/CONT(I+1) )*
 	1                 (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
+	      END DO
+	      IF(EW .NE. 0.0)THEN
+	        CENTROID=CENTROID/EW
+	      ELSE
+	        CENTROID=0.0D0
+	      END IF
+	      WRITE(T_OUT,'(A,I3,5X,A,1PE10.3,A,A,ES14.6,2ES14.4)')
+	1             ' Plot ID=',IP,'EW=',EW,' X(units);','   Centroid=',CENTROID,
+	1             CD(IP)%XVEC(L_CHAN(1)),CD(IP)%XVEC(L_CHAN(2))
+	      WRITE(LU_EW,'(6X,I4,4ES15.6)')IP,EW,CENTROID,CD(IP)%XVEC(L_CHAN(1)),CD(IP)%XVEC(L_CHAN(2))
+	      FLUSH(LU_EW)
 	    END DO
-	    IF(EW .NE. 0.0)THEN
-	      CENTROID=CENTROID/EW
-	    ELSE
-	      CENTROID=0.0D0
-	    END IF
-	    WRITE(T_OUT,*)'The equivalent width of the line is =',EW,'X(units)'
-	    WRITE(T_OUT,*)'The central postion of the line is   ',CENTROID
 	    GOTO 1000
 !
 	  ELSE
@@ -1765,8 +1804,10 @@ C
 !
 	    DO WHILE(1 .EQ. 1)
 	      CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
+	      IF(CURSVAL .EQ. 'e' .OR. CURSVAL .EQ. 'E')GOTO 1000
 	      IF(END_CURS(CURSVAL))GOTO 1000
 	      CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
+	      IF(CURSVAL .EQ. 'e' .OR. CURSVAL .EQ. 'E')GOTO 1000
 	      IF(END_CURS(CURSVAL))GOTO 1000
 !
 ! We do all plot provided the cover the range indicated by the cursors.
@@ -1774,54 +1815,54 @@ C
 !
 ! Draw in line limits
 !
-	    IF(QUERYFLAG)THEN
-	      T3=0.3*(YPAR(2)-YPAR(1))+YPAR(1)
-	    ELSE
-	      T3=1.0D0
-	    END IF
-	    CALL PGMOVE(XCUR(1),YPAR(1))
-	    CALL PGDRAW(XCUR(1),T3)
-	    CALL PGMOVE(XCUR(2),YPAR(1))
-	    CALL PGDRAW(XCUR(2),T3)
+	      IF(QUERYFLAG)THEN
+	        T3=0.3*(YPAR(2)-YPAR(1))+YPAR(1)
+	      ELSE
+	        T3=1.0D0
+	      END IF
+	      CALL PGMOVE(XCUR(1),YPAR(1))
+	      CALL PGDRAW(XCUR(1),T3)
+	      CALL PGMOVE(XCUR(2),YPAR(1))
+	      CALL PGDRAW(XCUR(2),T3)
 !
-	    DO IP=1,NPLTS
-	      T1=XCUR(1)-CD(IP)%XVEC(1)
-	      T2=XCUR(1)-CD(IP)%XVEC(NPTS(IP))
-	      T3=XCUR(2)-CD(IP)%XVEC(1)
-	      T4=XCUR(2)-CD(IP)%XVEC(NPTS(IP))
-	      IF(T1*T2 .LT. 0 .AND. T3*T4 .LT. 0)THEN
-	        L_CHAN(1)=GET_INDX_SP(XCUR(1),CD(IP)%XVEC,NPTS(IP))
-	        L_CHAN(2)=GET_INDX_SP(XCUR(2),CD(IP)%XVEC,NPTS(IP))
+	      DO IP=1,NPLTS
+	        T1=XCUR(1)-CD(IP)%XVEC(1)
+	        T2=XCUR(1)-CD(IP)%XVEC(NPTS(IP))
+	        T3=XCUR(2)-CD(IP)%XVEC(1)
+	        T4=XCUR(2)-CD(IP)%XVEC(NPTS(IP))
+	        IF(T1*T2 .LT. 0 .AND. T3*T4 .LT. 0)THEN
+	          L_CHAN(1)=GET_INDX_SP(XCUR(1),CD(IP)%XVEC,NPTS(IP))
+	          L_CHAN(2)=GET_INDX_SP(XCUR(2),CD(IP)%XVEC,NPTS(IP))
 !
-	        IF(QUERYFLAG)THEN
+	          IF(QUERYFLAG)THEN
 !
 ! Compute area of marked region.
 !
-	          EW=0.0
-                  CENTROID=0.0
-	          K=1
-	          IF(L_CHAN(1) .LT. L_CHAN(2))THEN
-	            T1=0.5D0
-	          ELSE
-	            K=L_CHAN(1)
-	            L_CHAN(1)=L_CHAN(2)
-	            L_CHAN(2)=K
-	            T1=-0.5D0
-	          END IF
-	          DO I=L_CHAN(1),L_CHAN(2)-1
-	            EW=EW+T1*( CD(IP)%DATA(I) + CD(IP)%DATA(I+1) )*
+	            EW=0.0
+                    CENTROID=0.0
+	            K=1
+	            IF(L_CHAN(1) .LT. L_CHAN(2))THEN
+	              T1=0.5D0
+	            ELSE
+	              K=L_CHAN(1)
+	              L_CHAN(1)=L_CHAN(2)
+	              L_CHAN(2)=K
+	              T1=-0.5D0
+	            END IF
+	            DO I=L_CHAN(1),L_CHAN(2)-1
+	              EW=EW+T1*( CD(IP)%DATA(I) + CD(IP)%DATA(I+1) )*
 	1                 (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
-	            CENTROID=CENTROID+T1*( CD(IP)%XVEC(I)*CD(IP)%DATA(I)
-	1               + CD(IP)%XVEC(I+1)*CD(IP)%DATA(I+1) )*
-	1                 (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
-	          END DO
-	          IF(EW .NE. 0.0)THEN
-	            CENTROID=CENTROID/EW
-	          ELSE
-	            CENTROID=0.0
-	          END IF
-	          WRITE(T_OUT,'(A,I3,3X,5X,A,1PE10.3,A,A,1PE14.6)')' Plot ID=',IP,'  AREA=',EW,' X(units);','  Centroid=',CENTROID
-	          WRITE(LU_EW,'(A,I3,3X,5X,A,1PE10.3,A,A,1PE14.6)')' Plot ID=',IP,'  AREA=',EW,' X(units);','  Centroid=',CENTROID
+	              CENTROID=CENTROID+T1*( CD(IP)%XVEC(I)*CD(IP)%DATA(I)
+	1                 + CD(IP)%XVEC(I+1)*CD(IP)%DATA(I+1) )*
+	1                  (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
+	            END DO
+	            IF(EW .NE. 0.0)THEN
+	              CENTROID=CENTROID/EW
+	            ELSE
+	              CENTROID=0.0
+	            END IF
+	            WRITE(T_OUT,'(A,I3,3X,5X,A,1PE10.3,A,A,1PE14.6)')' Plot ID=',IP,'  AREA=',EW,' X(units);','  Centroid=',CENTROID
+	            WRITE(LU_EW,'(A,I3,3X,5X,A,1PE10.3,A,A,1PE14.6)')' Plot ID=',IP,'  AREA=',EW,' X(units);','  Centroid=',CENTROID
 	        ELSE
 !
 ! Compute EW
@@ -1841,14 +1882,8 @@ C
 	            CENTROID=0.0
 	          END IF
 !
-	          IF(FIRST_EW)THEN
-	            OPEN(UNIT=LU_EW,FILE='EW_FR_SPEC_PLT',STATUS='UNKNOWN')
-	            FIRST_EW=.FALSE.
-	            WRITE(LU_EW,'(5A14)')'     Plot ID',' EW(X units)',' X(centroid)',
-	1                        '    X(start)','      X(end)'
-	          END IF
 	          WRITE(T_OUT,'(A,I3,5X,A,1PE10.3,A,A,ES14.6,2ES14.4)')
-	1            ' Plot ID=',IP,'  EW=',EW,' X(units);','  Centroid=',CENTROID,
+	1            ' Plot ID=',IP,'EW=',EW,' X(units);','   Centroid=',CENTROID,
 	1                  CD(IP)%XVEC(L_CHAN(1)),CD(IP)%XVEC(L_CHAN(2))
 	          IF(IP .EQ. 1)THEN
 	            WRITE(LU_EW,'(A)')' '
@@ -1862,8 +1897,8 @@ C
 	              IF(TMP_STR .NE. ' ')WRITE(LU_EW,'(A)')TRIM(TMP_STR)
 	            END IF
 	          END IF
-	          WRITE(LU_EW,'(10X,I4,4ES14.6)')
-	1            IP,EW,CENTROID,CD(IP)%XVEC(L_CHAN(1)),CD(IP)%XVEC(L_CHAN(2))
+	          WRITE(LU_EW,'(6X,I4,4ES15.6)')IP,EW,CENTROID,CD(IP)%XVEC(L_CHAN(1)),CD(IP)%XVEC(L_CHAN(2))
+	          FLUSH(LU_EW)
 	        END IF
 	      END IF
 	    END DO
@@ -2145,56 +2180,76 @@ C
 	  CALL NEW_GEN_IN(LAM_ST,'Start wavelength for output (def=ALL)')
 	  CALL NEW_GEN_IN(LAM_END,'End waveliength for output (def=ALL)')
 !
-	  L=-1
-	  CALL NEW_GEN_IN(L,'Plot to output (def=-1=ALL)')
+	  IPLT=-1
+	  CALL NEW_GEN_IN(IPLT,NP_OUT,NPLTS,'Plots to output (def=-1=ALL)')
+	  IF(IPLT(1) .EQ. -1)THEN
+	    DO I=1,NPLTS; IPLT(I)=I; END DO
+	    NP_OUT=NPLTS
+	  END IF
+	  DO I=1,NP_OUT
+	    IF(IPLT(I) .LT. 0 .OR. IPLT(I) .GT. NPLTS)THEN
+	      WRITE(6,*)'Error invalid plot -- ',IPLT(I)
+	      WRITE(6,*)'Valid plot range is 1:',NPLTS
+	      GOTO 1000
+	    END IF
+	  END DO
 !
-	  IF(L .EQ. -1)THEN
-	    WRITE(30,*)NPLTS
-	    WRITE(30,*)(NPTS(I),I=1,NPLTS)
-	    DO J=1,MAXVAL(NPTS)
-	      IF(LAM_ST .EQ. LAM_END)THEN
-	        DO IP=1,NPLTS
-	          ADVANCE_OPT='NO'
-	          IF(IP .EQ. NPLTS)ADVANCE_OPT='YES'
-	          IF(J .LE. NPTS(IP))THEN
-	            WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE=ADVANCE_OPT)CD(IP)%XVEC(J),CD(IP)%DATA(J)
-	          ELSE
-	            WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE=ADVANCE_OPT)0.0D0,0.0D0
-	          END IF
-	        END DO
-	      ELSE
-	        OUTPUT_STRING=' '
-	        CNT=0
-	        DO IP=1,NPLTS
-	          K=LEN_TRIM(OUTPUT_STRING)
-	          IF(J .LE. NPTS(IP) .AND. (LAM_ST-CD(IP)%XVEC(J))*(CD(IP)%XVEC(J)-LAM_END) .GE. 0)THEN
-	            WRITE(OUTPUT_STRING(K+1:),'(2X,ES14.7,ES14.6)')CD(IP)%XVEC(J),CD(IP)%DATA(J)
-	            CNT=CNT+1
-	          ELSE IF(NPLTS .NE. 1)THEN
-	            WRITE(OUTPUT_STRING(K+1:),'(2X,ES14.7,ES14.6)')0.0D0,0.0D0
-	          END IF
-	        END DO
-	        IF(CNT .NE. 0)WRITE(30,'(A)')TRIM(OUTPUT_STRING)
-	      END IF
-	    END DO
-	    WRITE(T_OUT,*)NPLTS,' plots written to ',TRIM(FILNAME)
-	  ELSE
-	    WRITE(30,*)NPLTS
-	    WRITE(30,*)NPTS(L)
-	    IP=L
-	    IF(LAM_ST .EQ. LAM_END)THEN
-	      DO J=1,NPTS(IP)
-	        WRITE(30,'(2X,ES14.7,ES14.6)')CD(IP)%XVEC(J),CD(IP)%DATA(J)
-	      END DO
-	    ELSE
-	      DO J=1,NPTS(IP)
-	        IF( (LAM_ST-CD(IP)%XVEC(J))*(CD(IP)%XVEC(J)-LAM_END) .GE. 0)THEN
-	          WRITE(30,'(2X,ES14.7,ES14.6)')CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	  WRITE(30,*)NP_OUT
+	  NX_MAX=0.0D0
+	  DO I=1,NP_OUT
+	    NX_MAX=MAX(NX_MAX,NPTS(IPLT(I)))
+	  END DO
+!
+! Output data for all plots. Plots are padded with zero.
+!
+	  IF(LAM_ST .EQ. LAM_END)THEN
+	    WRITE(30,*)(NPTS(IPLT(I)),I=1,NP_OUT)
+	    DO J=1,NX_MAX
+	      DO I=1,NP_OUT
+	        IP=IPLT(I)
+	        ADVANCE_OPT='NO'
+	        IF(I .EQ. NP_OUT)ADVANCE_OPT='YES'
+	        IF(J .LE. NPTS(IP))THEN
+	          WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE=ADVANCE_OPT)CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	        ELSE
+	          WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE=ADVANCE_OPT)0.0D0,0.0D0
 	        END IF
 	      END DO
-	    END IF
-	    WRITE(T_OUT,*)'One plot written to ',TRIM(FILNAME)
+	    END DO
+	  ELSE
+	    OUTPUT_STRING=' '
+	    IPST=0
+	    DO I=1,NP_OUT
+	      CNT=0
+	      IP=IPLT(I)
+	      DO J=1,NPTS(I)
+	        IF((LAM_ST-CD(IP)%XVEC(J))*(CD(IP)%XVEC(J)-LAM_END) .GE. 0)THEN
+	          CNT=CNT+1
+	          IF(IPST(I) .EQ. 0)IPST(I)=J
+	        END IF
+	      END DO
+	      K=LEN_TRIM(OUTPUT_STRING)
+	      WRITE(OUTPUT_STRING(K+1:),'(2X,I10)')CNT
+	    END DO
+	    WRITE(30,'(A)')TRIM(OUTPUT_STRING)
+!
+	    DO L=1,NX_MAX 
+	      OUTPUT_STRING=' ';  CNT=0
+	      DO I=1,NP_OUT
+	        J=IPST(I)+L-1
+	        IP=IPLT(I)
+	        K=LEN_TRIM(OUTPUT_STRING)
+	        IF(J .LE. NPTS(IP) .AND. (LAM_ST-CD(IP)%XVEC(J))*(CD(IP)%XVEC(J)-LAM_END) .GE. 0)THEN
+	          WRITE(OUTPUT_STRING(K+1:),'(2X,ES14.7,ES14.6)')CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	          CNT=CNT+1
+	        ELSE IF(NPLTS .NE. 1)THEN
+	          WRITE(OUTPUT_STRING(K+1:),'(2X,ES14.7,ES14.6)')0.0D0,0.0D0
+	        END IF
+	      END DO
+	      IF(CNT .NE. 0)WRITE(30,'(A)')TRIM(OUTPUT_STRING)
+	    END DO
 	  END IF
+	  WRITE(T_OUT,*)NP_OUT,' plots written to ',TRIM(FILNAME)
 	  CLOSE(UNIT=30)
 !
 ! 
@@ -2296,7 +2351,6 @@ C
 	  CALL NEW_GEN_IN(XAR_OPERATION,'Operation: *,+,-,/,LG,ALG[=10^x],R[=1/x],XN')
 	  CALL SET_CASE_UP(XAR_OPERATION,IZERO,IZERO)
 	  IF(XAR_OPERATION .NE. 'LG' .AND. XAR_OPERATION .NE. 'ALG' .AND. 
-	1           XAR_OPERATION .NE. 'UG' .AND.
 	1           XAR_OPERATION .NE. 'XN' .AND. XAR_OPERATION .NE. 'R')THEN
 	    CALL NEW_GEN_IN(XAR_VAL,'Value')
 	  END IF
@@ -2335,6 +2389,7 @@ C
 	      IF(XLABEL(1:3) .NE. 'Log')THEN
 	        XLABEL='Log '//XLABEL
 	      END IF
+!
 	    ELSE IF(XAR_OPERATION .EQ. 'R')THEN
 	      T1=0.01D0*C_KMS
 	      T2=0.01D0*C_KMS
@@ -2351,6 +2406,9 @@ C
 	      ELSE IF(XLABEL .EQ. '\gl(\A)' .AND. T1 .EQ. T2)THEN
 	        XLABEL='\gn(10\u15 \dHz)'
 	      END IF
+!
+! Set X axis to integer counter.
+!
 	    ELSE IF(XAR_OPERATION .EQ. 'XN')THEN
 	      WRITE(6,*)RED_PEN
 	      WRITE(6,*)'Curent plot is',IP
@@ -2376,13 +2434,6 @@ C
 	      DO I=1,NPTS(K)
 	        CD(K)%XVEC(I)=I
 	      END DO
-	      TYPE_CURVE(K)=TYPE_CURVE(IP)
-	    ELSE IF(XAR_OPERATION .EQ. 'UG')THEN
-	      WRITE(6,*)RED_PEN
-	      WRITE(6,*)'Curent plot is',IP
-	      K=NPLTS+1; TMP_STR='Output plot:?'//DEF_PEN
-	      CALL NEW_GEN_IN(K,TRIM(TMP_STR))
-	      CALL PG_REGRID(IP,K,XPAR(1),XPAR(2))
 	      TYPE_CURVE(K)=TYPE_CURVE(IP)
 	    ELSE
 	      WRITE(T_OUT,*)'Invalid operation: try again'
@@ -2536,12 +2587,10 @@ C
 	  CALL NEW_GEN_IN(VAR_PLT3,'Output plot?')
 	  TYPE_CURVE(VAR_PLT3)='L'
 	  T1=0.0; T2=0.0
-	  CALL NEW_GEN_IN(REG_OPT,'Regrid option: dX, R, NINS')
+	  CALL NEW_GEN_IN(REG_OPT,'Regrid option: UG, dX, R, NINS')
 	  CALL SET_CASE_UP(REG_OPT,1,0)
-	  CALL NEW_GEN_IN(T1,'dX, R, or NINS (zero to quit)')
-	  IF(T1 .NE. 0)THEN
-	    CALL DO_PG_REGRID(VAR_PLT1,VAR_PLT3,XPAR(1),XPAR(2),REG_OPT,T1)
-	  END IF
+	  IF(REG_OPT .NE. 'UG')CALL NEW_GEN_IN(T1,'UG, dX, R, or NINS (zero to quit)')
+	  CALL DO_PG_REGRID(VAR_PLT1,VAR_PLT3,XPAR(1),XPAR(2),REG_OPT,T1)
 !
 	ELSE IF(ANS .EQ. 'ADDN')THEN
 	  CALL NEW_GEN_IN(VAR_PLT1,'Input plot 1?')
@@ -2553,16 +2602,25 @@ C
 !	  
 	ELSE IF (ANS .EQ. 'VAR')THEN
 	  CALL NEW_GEN_IN(VAR_PLT1,'Input plot 1?')
-	  CALL NEW_GEN_IN(VAR_OPERATION,'Operation: *,+,-,/,c(opy)')
+	  CALL NEW_GEN_IN(VAR_OPERATION,'Operation: *,+,-,/,c(opy),cc')
 	  CALL SET_CASE_UP(VAR_OPERATION,IZERO,IZERO)
-	  IF(VAR_OPERATION(1:1) .EQ. 'c' .OR. VAR_OPERATION(1:1) .EQ. 'C' )THEN
+	  IF(VAR_OPERATION(1:2) .EQ. 'c ' .OR. VAR_OPERATION(1:2) .EQ. 'C ')THEN
 	    VAR_OPERATION='C'
 	    VAR_PLT2=VAR_PLT1
 	  ELSE
 	    CALL NEW_GEN_IN(VAR_PLT2,'Input plot 2?')
 	  END IF
 	  VAR_PLT3=NPLTS+1
+	  IF(VAR_OPERATION(1:2) .EQ. 'cc' .OR. VAR_OPERATION(1:2) .EQ. 'CC')THEN
+	    WRITE(6,*)RED_PEN
+	    WRITE(6,*)'For cross-correlation of spectra plot 1 should be on a uniform grid'
+	    WRITE(6,*)'and in log space. The second pot should also be in log space'
+	    WRITE(6,*)'Use REG option to create a uniform grid'
+	    WRITE(6,*)'Enter 0 for output plot to exit this option'
+	    WRITE(6,*)DEF_PEN
+	  END IF
 	  CALL NEW_GEN_IN(VAR_PLT3,'Output plot?')
+	  IF(VAR_PLT3 .EQ. 0)GOTO 1000
 	  TYPE_CURVE(VAR_PLT3)='L'
 	  CALL DO_VEC_OP(VAR_PLT1,VAR_PLT2,VAR_PLT3,.TRUE.,VAR_OPERATION)
 	  GOTO 1000

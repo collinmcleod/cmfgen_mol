@@ -739,6 +739,7 @@ CONTAINS
 	    SIGMA(J)=OLD_SIGMA(I)
 	  END DO
 	  ND=NN+ND_OLD
+!
 	ELSE IF(OPTION .EQ. 'SCLR')THEN
 !
 	  ND=ND_OLD
@@ -789,6 +790,24 @@ CONTAINS
 	  R(1:ND)=OLD_R(1:ND_OLD)+(NEW_RSTAR-OLD_R(ND_OLD))
 	  R(ND)=NEW_RSTAR
 !
+! Now do the new wind law, keeping the same radius grid.
+!
+	  IF(VEL_TYPE .EQ. 6)THEN
+	    T1=MDOT/OLD_MDOT
+	    DO I=1,ND
+	      T3=(OLD_R(I)/R(I))**2
+	      T2=(OLD_V(I)/V_TRANS)**2
+	      V(I)=T3*OLD_V(I)*(T1+(1.0D0-T1)*T2/(1.0D0+T2))
+	    END DO
+	    ALLOCATE (COEF(ND,4))
+	    CALL MON_INT_FUNS_V2(COEF,V,R,ND)
+	    DO I=1,ND
+	      SIGMA(I)=COEF(I,3)
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	    END DO
+	    DEALLOCATE (COEF)
+	  ELSE
+!
 ! In the hydrostatic region, the velocity is simply scaled so as to keep the
 ! density constant.
 !
@@ -799,14 +818,14 @@ CONTAINS
 	  END DO
 	  V_TRANS=V(TRANS_I)
 !
-! Now do the new wind law, keeping the same radius grid.
 !
-	  R_TRANS=R(TRANS_I)
-	  dVdR_TRANS=(SIGMA(TRANS_I)+1.0D0)*V_TRANS/R_TRANS
 !
 ! Now compute the velocity law beyond the sonic point.
 !
+	  R_TRANS=R(TRANS_I)
+	  dVdR_TRANS=(SIGMA(TRANS_I)+1.0D0)*V_TRANS/R_TRANS
 	  CALL CALCULATE_VEL(R,V,SIGMA,ND)
+	  END IF
 !
 	ELSE IF(OPTION .EQ. 'MDOT')THEN
 !

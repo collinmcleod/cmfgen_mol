@@ -4,6 +4,7 @@ include ../../Makefile_definitions
 
 #
 LIB=$(LIB_DIR)libspec.a
+LIB2=$(LIB_DIR)libsubs.a
 #
 #
 # We only make dispgen.exe if there has been a changen to the main *.f files,
@@ -12,6 +13,7 @@ LIB=$(LIB_DIR)libspec.a
 OBJ    = $(LIB)(convolve.o)\
          $(LIB)(clip.o)\
          $(LIB)(compute_tau_radial.o)\
+         $(LIB)(comp_ip_ew.o)\
          $(LIB)(divide_by_cont.o)\
          $(LIB)(do_int_rec_ap.o)\
          $(LIB)(determ_reddening.o)\
@@ -26,6 +28,7 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(rd_ion_locations.o)\
          $(LIB)(rd_ion_locations_v2.o)\
          $(LIB)(read_corrections.o)\
+         $(LIB)(set_ip_xspat_unit.o)\
          $(LIB)(uvabs_v2.o)\
          $(LIB)(adjust_jes_v2.o)\
          $(LIB)(filt_pass_band.o)\
@@ -34,32 +37,39 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(cnvlv_es_two_par_v2.o)\
          $(LIB)(cnvrt.o)\
          $(LIB)(cnvrt_j.o)\
+         $(LIB)(dp_cnvrt.o)\
          $(LIB)(dp_cnvrt_j.o)\
          $(LIB)(dp_cnvrt_j_v2.o)\
          $(LIB)(plt_jh_opt_desc.o)\
-         $(LIB)(poidev.o)\
          $(LIB)(raw_subphot_v2.o)\
-         $(LIB)(ran2.o)\
          $(LIB)(rd_ew.o)\
          $(LIB)(rd_mod.o)\
          $(LIB)(recom_opac_v2.o)\
          $(LIB)(rd_row_data.o)\
          $(LIB)(rd_xy_data_usr.o)\
          $(LIB)(rd_monte_line.o)\
+         $(LIB)(dp_rd_obs_data_v2.o)\
          $(LIB)(rd_obs_data_v2.o)
   
+OBJ2    = $(LIB2)(poidev.o)\
+          $(LIB2)(ran2.o)
+
 all : $(LIB)
 	cp $(INSTALL_DIR)perm_mod_file jnk.mod
 	mv -f *.mod $(MOD_DIR)
 	rm -f *.o
 
-$(LIB) : $(OBJ)
+$(LIB) : $(OBJ) $(OBJ2)
 
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f
 	$(F90) -c $(FG)  $<
 	ar ruv $(LIB) $*.o
+
+$(LIB2)(%.o) : %.f
+	$(F90) -c $(FG)  $<
+	ar ruv $(LIB2) $*.o
 
 convolve.o : convolve.f parameters.inc constants.inc
 num_rec.o  : num_rec.f   parameters.inc constants.inc

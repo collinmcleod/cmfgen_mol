@@ -1,6 +1,8 @@
 	SUBROUTINE DO_INT_REC_AP(IP,P,YV,A,B,WIDTH,LENGTH,ZERO_YV,NP,NCF,NINS)
 	IMPLICIT NONE
 !
+! 05-Fev-2021: All arrays made REAL*8.
+!
 	INTEGER NP
 	INTEGER NCF
 	INTEGER NINS
@@ -12,7 +14,7 @@
 	REAL*8 WIDTH
 	REAL*8 LENGTH
 !
-	REAL*4 YV(NCF)
+	REAL*8 YV(NCF)
 	LOGICAL ZERO_YV
 !
 ! Local variables
@@ -308,9 +310,12 @@
 !
 	WRITE(71,*)' '
 	WRITE(71,*)'QW'
+	T1=0.0D0
 	DO I=1,NP_REV
 	  WRITE(71,'(I3,2X,3ES16.8)')I,P_REV(I),dTHETA(I),QW(I)
+	  T1=T1+QW(I)
 	END DO
+	WRITE(6,*)'Sum of quadrature weights is',T1
 !
 	 WRITE(6,*)'Computed the quadrature weights'
 !	
@@ -322,11 +327,13 @@
 	ALLOCATE (IP_REV(NP_REV))
 !
 	WRITE(6,*)'Beginning intepolation/integration section'
+	WRITE(6,*)'NP_REV=',NP_REV
 !
 	IF(ALLOCATED(INDX))DEALLOCATE(INDX)
 	ALLOCATE (INDX(NP_REV))
 	IF(ALLOCATED(INT_COEF))DEALLOCATE(INT_COEF)
 	ALLOCATE (INT_COEF(NP_REV))
+	WRITE(6,*)'Allocate P_REV'
 !
 	J=1
         DO I=1,NP_REV

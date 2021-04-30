@@ -43,10 +43,12 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(justify_convert_v2.o)\
       $(LIB)(modify_pgi_ps.o)\
       $(LIB)(mon_num.o)\
-      $(LIB)(monbord_v3.o)\
+      $(LIB)(monbord_v4.o)\
       $(LIB)(moninside.o)\
-      $(LIB)(pg_regrid.o)\
+      $(LIB)(mon_interp_sp.o)\
       $(LIB)(pg_add_noise.o)\
+      $(LIB)(pg_def_continuum.o)\
+      $(LIB)(pg_mod_cont_nodes.o)\
       $(LIB)(put_text.o)\
       $(LIB)(rd_ew_id.o)\
       $(LIB)(simp_ew.o)\

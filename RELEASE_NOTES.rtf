@@ -1,9 +1,11 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1348\cocoasubrtf170
+{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf610
 {\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;\red255\green0\blue0;\red0\green0\blue255;\red153\green102\blue51;
-\red59\green35\blue34;\red16\green73\blue188;}
+{\colortbl;\red255\green255\blue255;\red251\green2\blue7;\red0\green0\blue255;\red255\green0\blue0;
+\red0\green0\blue255;\red153\green102\blue51;\red59\green35\blue34;\red16\green73\blue188;}
+{\*\expandedcolortbl;;\cssrgb\c100000\c14913\c0;\cssrgb\c1680\c19835\c100000;\csgenericrgb\c100000\c0\c0;
+\csgenericrgb\c0\c0\c100000;\csgenericrgb\c60000\c40000\c20000;\csgenericrgb\c23137\c13725\c13333;\csgenericrgb\c6275\c28627\c73725;}
 \margl1440\margr1440\vieww18180\viewh15520\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs28 \cf0 RELEASE NOTES\
 \
@@ -13,20 +15,48 @@ Please report any compile difficulties. I cannot fix bugs/features if I don't kn
 \
 I very much appreciate those users who reported issues with the previous release.\
 \
-A updated atomic data release will follow in the near future.\
-\
 John Hillier\
 \
 ****************************************************************************\
 ****************************************************************************\
 \
-\cf2 30-Oct-2016\cf0 \
+\cf2 20-Jul-2020\cf0 \
 \
-\cf3 Major changes to CMFGEN.\cf0 \
+  Cleaned object libraries to make linking simpler.\
 \
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+  Changes to the solution of the moment equations designed to improve stability.\
+  Particularly important for nebular analyses of type II SN\
+\
+  Procedure to automatically estimate input files for new ions and/or species.\
+  Requires RVTJ and EDDFACTOR file from similar model. Change can be\
+  very large, but new procedure implemented to help convergence.\
+\
+  AUTO_SMOOTH smooth option (T of F) added to VADAT. Will smooth\
+  populations to help facilitate convergence. Still under development,\
+  but seems to work well for stars. May be some issues with SN.\
+ \
+ Improvement to \cf3 rev_rvsig.exe\cf0 . Can now adjust the velocity law by hand.\
+\
+ Electron energy balance now explicitly calculated with radiative energy/\
+ kinetic equations.\
+\
+ Added new interpolation when reading in old departure coefficient files.\
+ Option is \'91TR\'92 and is the new preferred option \'97 set by keyword [DC_METH] in VADAT.\
+\
+Changed PHOT_DIS_PARAMETER in $cmfdist/new_main/mod_subs/mod_lev_dis_blk.f from\
+1.0E-06 to 1.0E-04. This can effect O star models (e.g., near the He II 228A edge in Zeta Pup).\
+Unclear which value should be used. Should not effect SN models.\
+\
+Many improvements to the auxiliary routines. To be discussed in update of documentation.\
+\
+\
+\cf4 30-Oct-2016\cf0 \
+\
+\cf5 Major changes to CMFGEN.\cf0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \cf0   Added H-  (labelled HMI) as opacity source and ion.\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0   Revision to handling of two-photon opacity. Can now be done exactly.\
   Improvements in parallelization.\
   Changes to time-dependent radiative transfer routines. More options for handling boundary conditions.\
@@ -36,34 +66,34 @@ John Hillier\
   X-ray flux for stellar models can be specified \'97 filling factors are adjusted to match the requested\
       X-ray luminosity.\
 \
-\cf3 New programs:\cf0 \
+\cf5 New programs:\cf0 \
 \
-   \cf4 $cmfdist/misc/check_energy_cons.f\cf0 \
+   \cf6 $cmfdist/misc/check_energy_cons.f\cf0 \
           Allows any conservation to be checked in a sequence of time-dependent SN models.\
 \
-   \cf4 $cmfdist/misc/extrtap_scr.f\cf0 \
+   \cf6 $cmfdist/misc/extrtap_scr.f\cf0 \
            Generates starting models for new SN model based on an time extrapolation of two \
                  previous models. Works well for type Ia models.\
 \
-\cf3 Improvements to the following auxiliary routines.\
+\cf5 Improvements to the following auxiliary routines.\
           \cf0 \
           $cmfdist/misc/n_multi_merge.f\
-          \cf5 \CocoaLigature0 $cmfdist/misc/\cf0 \CocoaLigature1 mod_cool.f \
+          \cf7 \CocoaLigature0 $cmfdist/misc/\cf0 \CocoaLigature1 mod_cool.f \
                   Estimate of calling time output.\
-          \cf5 \CocoaLigature0 $cmfdist/misc/\cf0 \CocoaLigature1 plt_net.f (used to plot data from an XzVPRRR file).\
+          \cf7 \CocoaLigature0 $cmfdist/misc/\cf0 \CocoaLigature1 plt_net.f (used to plot data from an XzVPRRR file).\
           $cmfdist/misc/plt_cmf_lum.f\
           $cmfdist/misc/plt_cool.f\
-          \cf5 \CocoaLigature0 $cmfdist/\cf0 \CocoaLigature1 misc/rev_rdinr.f\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
-\cf5 \CocoaLigature0           $cmfdist/\cf0 \CocoaLigature1 misc/rev_rvsig,.f\
-          \cf5 \CocoaLigature0 $cmfdist/new_main/mod_subs/adjust_r_grid_v4.f\
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
-\cf5           $cmfdist/new_main/adjust_sn_r_grid.f\
+          \cf7 \CocoaLigature0 $cmfdist/\cf0 \CocoaLigature1 misc/rev_rdinr.f\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf7 \CocoaLigature0           $cmfdist/\cf0 \CocoaLigature1 misc/rev_rvsig,.f\
+          \cf7 \CocoaLigature0 $cmfdist/new_main/mod_subs/adjust_r_grid_v4.f\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf7           $cmfdist/new_main/adjust_sn_r_grid.f\
           $cmfdist/new_main/subs/do_cmf_hydro_v2.f\cf0 \CocoaLigature1 \
           $cmfdist/subs/rd_sn_data.f\
           $cmfdist/subs/two/two_phot_rate.f\
 \
-\cf3  Additional changes:\cf0 \
+\cf5  Additional changes:\cf0 \
 \
           Additional options added to:\
                Plotting package\
@@ -71,7 +101,7 @@ John Hillier\
 \
           Bug fix for disp/plt_phot_sub.f\
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 ****************************************************************************\
 ****************************************************************************\
 \
@@ -86,14 +116,14 @@ John Hillier\
 3. On the MAC, there may be linking issues if using this years release (I have not checked the latest version). There is a bug with the\
 linker -- some module files don't get found. Adding a statement like (use a unique variable name): \
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\fs24 \cf6 integer :: VPHOT_DATA_MOD = 1
+\fs24 \cf8 integer :: VPHOT_DATA_MOD = 1
 \fs28 \cf0 \
 \
 to each of the affected modules apparently solves the problem. Routines that may need to be changed include:\
 \
-\pard\pardeftab720
+\pard\pardeftab720\partightenfactor0
 
 \fs24 \cf0 new_subs/phot_data_mod.f\
 new_main/mod_subs/ang_qw_mod.f\
@@ -107,7 +137,7 @@ new_main/mod_subs/steq_data_mod\
 plane/mod_ray_mom_store.f\
 newsubs/xray_data_mod.f
 \fs28 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
 4. With some intel compilers, there were some linking issues regarding programs in $cmfdist/spec_plt.  The fix is to change\
 the ordering of the libraries in the link (i.e., the creation of the executable), but its unclear why this is necessary.\
@@ -419,7 +449,7 @@ These procedures are still under development and refinement, and still need rigo
 \
 (7) Improved Gauss-fitting option in PLT_SPEC. Designed to measure EWs in normalized multiple model spectra in a semi-automatic fashion.\
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \fs38 \cf0 (8) Help files for DISPGEN, PLT_SPEC, WR_F_TO_S etc are now now accessible by a web page in $cmfdist/web.\
 \

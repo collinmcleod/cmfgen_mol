@@ -8,6 +8,7 @@
 	SUBROUTINE CHECK_SPEC_CONV(OBS_FLUX,OBS_FREQ,LAM_ST,LAM_END,SPECTRUM_CONVERGED,NOBS)
 	IMPLICIT NONE
 !
+! Altered 21-Aug-2020: Changed output format; Dimension LAMS from 0.
 ! Created 10-Feb-2020
 !
 	INTEGER NOBS
@@ -21,11 +22,11 @@
 	INTEGER, PARAMETER :: NHIST=8
 	INTEGER, PARAMETER :: NITS=5
 	INTEGER, SAVE :: HIST(NHIST,NLAM,NITS)
-	REAL*8, SAVE :: LAM_LIMS(NLAM)
+	REAL*8, SAVE :: LAM_LIMS(0:NLAM)
 	REAL*8, SAVE :: HIST_LIMS(NHIST)
 	REAL*8, SAVE :: MAX_FRAC_CHNG(NITS)
 !
-	DATA LAM_LIMS/10.0D0,100.0D0,228.0D0,911.0D0,3600.0D0,10000.0D0,1.0D+05,1.0D+10/
+	DATA LAM_LIMS/0,10.0D0,100.0D0,228.0D0,911.0D0,3600.0D0,10000.0D0,1.0D+05,1.0D+10/
 	DATA HIST_LIMS/1.0D-04,1.0D-03,1.0D-02,1.0D-01,1.0,10.0D0,100.0D0,1000.0D0/
 !
 	INTEGER, SAVE :: NIT_CUR 
@@ -65,9 +66,9 @@
 	HIST(:,:,1)=0
 	MAX_FRAC_CHNG(1)=0.0D0
 !
-! The factor of 10^8 arrises as follows:
+! The factor of 10^7 arrises as follows:
 !   100 to get in percentage terms.
-!   10^6 to get the corect index when we take the log.
+!   10^5 to get the corect index when we take the log.
 !	
 	IL=1; IT=1
 	DO I=1,NOBS
@@ -75,9 +76,9 @@
 	  IF(T1 .NE. 0.0D0)THEN
 	    WRK_VEC(I)=ABS( (OBS_SAVE(I)-OBS_FLUX(I))/T1 )
 	    MAX_FRAC_CHNG(IT)=MAX(MAX_FRAC_CHNG(IT),WRK_VEC(I))
-	    WRK_VEC(I)=1.0D+08*WRK_VEC(I)
+	    WRK_VEC(I)=1.0D+07*WRK_VEC(I)
 	  ELSE
-	    WRK_VEC(I)=0
+	    WRK_VEC(I)=1.0D-20
 	  END IF
 	  LAM=0.01D0*C_KMS/OBS_FREQ(I)
 	  IF(LAM .GT. LAM_LIMS(IL))IL=IL+1
@@ -88,16 +89,16 @@
 !
 	WRITE(6,'(A)')' '
 	WRITE(6,*)'Spectrum convergence information -- % changes'
-	WRITE(6,'(9X,8(2X,ES7.1))')(HIST_LIMS(IH),IH=1,NHIST)
+	WRITE(6,'(17X,8(2X,ES7.1))')(HIST_LIMS(IH),IH=1,NHIST)
 	DO IL=1,NLAM
 	  IF(IL .LE. 6)THEN
-	    WRITE(6,'(2X,F7.1,8(2X,I7))')LAM_LIMS(IL),(HIST(IH,IL,IT),IH=1,NHIST)
+	    WRITE(6,'(2X,F7.1,A,F7.1,8(2X,I7))')LAM_LIMS(IL-1),'-',LAM_LIMS(IL),(HIST(IH,IL,IT),IH=1,NHIST)
 	  ELSE
-	    WRITE(6,'(2X,ES7.1,8(2X,I7))')LAM_LIMS(IL),(HIST(IH,IL,IT),IH=1,NHIST)
+	    WRITE(6,'(2X,ES7.1,A,ES7.1,8(2X,I7))')LAM_LIMS(IL-1),'-',LAM_LIMS(IL),(HIST(IH,IL,IT),IH=1,NHIST)
 	  END IF
 	END DO
 	WRITE(6,'(A)')' '
-	WRITE(6,'(A)')'Largest % change for last 5 full iterations - last listed first'
+	WRITE(6,'(A)')' Largest % change in spectrum for last 5 full iterations - last listed first'
 	WRITE(6,'(10ES10.2)')100.0D0*MAX_FRAC_CHNG
 	WRITE(6,'(A)')' '
 !

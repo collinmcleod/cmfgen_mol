@@ -8,6 +8,8 @@ C
 	1                    LAMC,X_LAB,Y_LAB,X_ONLY)
 	IMPLICIT NONE
 C
+C Altered 16-Apr-2021 : Added nm to unit list.
+C
 	INTEGER NBB
 	REAL*4 XV(NBB),YV(NBB)
 	LOGICAL LOG_X,LOG_Y,X_ONLY
@@ -70,6 +72,12 @@ C
 	ELSE IF(X_UNIT .EQ. 'ANG')THEN
 	  DO I=1,NBB
 	    XV(I)=ANG_TO_HZ/XV(I)
+	  END DO
+	  X_LAB='\gl(\A)'
+	  IF(LOG_X)X_LAB='Log \gl(\A)'
+	ELSE IF(X_UNIT .EQ. 'NM')THEN
+	  DO I=1,NBB
+	    XV(I)=0.1D0*ANG_TO_HZ/XV(I)
 	  END DO
 	  X_LAB='\gl(\A)'
 	  IF(LOG_X)X_LAB='Log \gl(\A)'

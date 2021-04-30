@@ -16,6 +16,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Aleterd 14-Dec-2020 : Altered EXPO option to inhibit clumping below a certain to velocity.
 ! Altered 01-Oct-2018 : Added MEXP option.
 ! Altered 14-Sep-2018 : Added POW option.
 ! Altered 21-Mar-2018 : Added SNCL clumping option.
@@ -72,10 +73,13 @@
 ! approach CLUMP_PAR(1).
 !
 	    IF(CLUMP_PAR(3) .EQ. 0.0D0)CLUMP_PAR(4)=1.0D0
+	    T2=CLUMP_PAR(6)
 	    DO K=1,ND
+	      T1=V(K)
+	      IF(N_CLUMP_PAR .EQ. 6)T1=LOG(1.0D0+EXP(T2*(V(K)-CLUMP_PAR(5))))/T2
 	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1)-CLUMP_PAR(3))*
-	1                     EXP(-V(K)/CLUMP_PAR(2))+
-	1                     CLUMP_PAR(3)*EXP(-V(K)/CLUMP_PAR(4))
+	1                     EXP(-T1/CLUMP_PAR(2))+
+	1                     CLUMP_PAR(3)*EXP(-T1/CLUMP_PAR(4))
 	    END DO
 !
 	  ELSE IF(CLUMP_LAW(1:4) .EQ. 'MEXP')THEN
@@ -141,6 +145,21 @@
 		  ENDIF
 	       END DO
 	    ENDIF
+!
+	  ELSE IF(CLUMP_LAW(1:4) .EQ. 'RUNA')THEN
+	    IF(N_CLUMP_PAR .NE. 4)THEN
+	      WRITE(LUER,*)'Error in CMFGEN'
+	      WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
+	      STOP
+	    END IF
+	    DO K=1,ND
+	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
+	1     EXP(-V(K)/CLUMP_PAR(2))+
+	1     (CLUMP_PAR(4)-CLUMP_PAR(1))*
+	1     EXP( (V(K)-V(1))/CLUMP_PAR(3))
+	      IF(CLUMP_FAC(K).GT. 1.D0) CLUMP_FAC(K)=1.0D0
+	    END DO
+!
 	 ELSE
 	    WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
 	    WRITE(LUER,*)'Invalid law for computing clumping factor'
