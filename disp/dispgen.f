@@ -5,12 +5,14 @@ C
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 18-May-2021 : If you use EXIT as a POPC filenam with RVTJ(ASK) command, no more
+!                          POP files are READ in. Updated from OSIRIS (21-Jul-2021).
 ! Altered 16-Aug-2019 : Call RD_RVTJ..._V4, PLANCK_MEAN now read in
 ! Altered 19-Aug-2015 : Changed to GENOSC_V9 (from _V8).
 ! Altered 13-May-2015 : Changed to GENOSC_V8 (from _V5). Updated MOD_DISP.
 ! Altered 07-Sep-2005 : XRAYS option set to TRUE. Lithium cross-sections will be set.
 ! Altered 20-Apr-2004 : Use RDHOTGEN_V2 will allows for dynamic smoothing of 
-!                         photoioization cross-sections.
+!                          photoioization cross-sections.
 !
 	INTEGER ND,NP,NC
 	INTEGER N_MAX,ND_MAX,NC_MAX,NP_MAX
@@ -47,7 +49,10 @@ C
 !
 	CHARACTER*80 TMP_STRING
 	INTEGER ID,ISPEC
-C
+!
+	CHARACTER(LEN=30) UC
+	EXTERNAL UC
+!
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
@@ -380,7 +385,8 @@ C
 	  FILENAME=DIR_NAME(1:LEN_DIR)//'POP'//TRIM(SPECIES(ISPEC))//FILE_EXTENT
 	  IF(ASK)THEN
 	    WRITE(6,*)' '
-	    CALL GEN_IN(FILENAME,'Filename')
+	    CALL GEN_IN(FILENAME,'Filename (EXIT terminates file input)')
+	    IF(UC(FILENAME) .EQ. 'EXIT')EXIT
 	    INQUIRE(FILE=FILENAME,EXIST=FILE_PRES)
 	    IF(.NOT. FILE_PRES)FILENAME=BLANK
 	  ELSE

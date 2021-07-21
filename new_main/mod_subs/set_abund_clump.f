@@ -16,7 +16,8 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
-! Aleterd 14-Dec-2020 : Altered EXPO option to inhibit clumping below a certain to velocity.
+! Altered 09-May-2021 : Added RPOW option.
+! Altered 14-Dec-2020 : Altered EXPO option to inhibit clumping below a certain to velocity.
 ! Altered 01-Oct-2018 : Added MEXP option.
 ! Altered 14-Sep-2018 : Added POW option.
 ! Altered 21-Mar-2018 : Added SNCL clumping option.
@@ -127,6 +128,17 @@
 	  END IF
 	  DO K=1,ND
 	   CLUMP_FAC(K)=1.0D0-(1.0D0-CLUMP_PAR(1))*(V(K)/V(1))**CLUMP_PAR(2)
+	  END DO
+!
+	ELSE IF(CLUMP_LAW(1:4) .EQ. 'RPOW')THEN
+	  IF(N_CLUMP_PAR .NE. 2)THEN
+	    WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
+	    WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
+	    STOP
+	  END IF
+	  DO K=1,ND
+	    T1=1.0D0/CLUMP_PAR(1)-1.0D0
+	    CLUMP_FAC(K)=1.0D0/(1.0D0+T1*(V(K)/V(1))**CLUMP_PAR(2))
 	  END DO
 !
 	 ELSE IF(CLUMP_LAW(1:4) .EQ. 'SNCL')THEN

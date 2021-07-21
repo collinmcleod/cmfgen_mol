@@ -134,7 +134,7 @@
 !
 	CALL GEN_ASCI_OPEN(LUIN,FILNAME,'OLD',' ','READ',IZERO,IOS)
 	IF(IOS .NE. 0)THEN
-	  WRITE(LUER,*)'Error opening '//FILNAME//' in GENOSCIL'
+	  WRITE(LUER,*)'Error opening '//FILNAME//' in GENOSC_V9'
 	  STOP
 	END IF
 !
@@ -149,8 +149,7 @@
 	  DO WHILE(L1 .EQ. 0 .AND. L2 .EQ. 0)
 	    READ(LUIN,'(A)',IOSTAT=IOS)STRING
 	    IF(IOS .NE. 0)THEN
-	      WRITE(LUER,*)'Error reading in Oscillator Date from '//
-	1                  FILNAME
+	      WRITE(LUER,*)'Error reading in Oscillator Date from ',TRIM(FILNAME)
 	      WRITE(LUER,*)'IOSTAT=',IOS
 	      STOP
 	    END IF
@@ -188,15 +187,14 @@
 	  L1=INDEX(STRING,'!Number of energy levels')
 	  IF(L1 .NE. 0)THEN
 	    L1=INDEX(STRING,'  ')
-	    DESC='NW Read in GENOSCIL-'//FILNAME
+	    DESC='NW Read in GENOSC_V9-'//TRIM(FILNAME)
 	    NW=RD_FREE_VAL(STRING,IONE,L1-1,NEXT,DESC)
 	  ELSE
-	    WRITE(LUER,*)
-	1     'Error reading in # of energy levels from '//FILNAME
+	    WRITE(LUER,*)'Error reading in # of energy levels from '//FILNAME
 	    STOP
 	  END IF
 	  IF(N .GT. NW)THEN
-	    WRITE(LUER,*)'Error reading '//FILNAME//' in GENOSCIL '//
+	    WRITE(LUER,*)'Error reading '//TRIM(FILNAME)//' in GENOSC_V9 '//
 	1         ' - incorrect number energy levels'
 	    STOP
 	  END IF
@@ -207,11 +205,10 @@
 	  L1=INDEX(STRING,'!Ionization energy') 
 	  IF(L1 .NE. 0)THEN
 	    L1=INDEX(STRING,'  ')
-	    DESC='Ionization energy read in GENOSCIL-'//FILNAME
+	    DESC='Ionization energy read in GENOSC_V9-'//FILNAME
 	    IONIZATION_EN=RD_FREE_VAL(STRING,IONE,L1-1,NEXT,DESC)
 	  ELSE
-	    WRITE(LUER,*)
-	1    'Error reading in Ionization Energy from '//FILNAME
+	    WRITE(LUER,*)'Error reading in Ionization Energy from '//FILNAME
 	    STOP
 	  END IF
 !
@@ -221,11 +218,10 @@
 	  L1=INDEX(STRING,'!Screened nuclear charge') 
 	  IF(L1 .NE. 0)THEN
 	    L1=INDEX(STRING,'  ')
-	    DESC='NW Read in GENOSCIL-'//FILNAME
+	    DESC='NW Read in GENOSC_V9-'//FILNAME
 	    ZION=RD_FREE_VAL(STRING,IONE,L1-1,NEXT,DESC)
 	  ELSE
-	    WRITE(LUER,*)
-	1     'Error reading in Screened Charge from '//FILNAME
+	    WRITE(LUER,*)'Error reading in Screened Charge from '//FILNAME
 	    STOP
 	  END IF
 !
@@ -235,11 +231,10 @@
 	  L1=INDEX(STRING,'!Number of transitions')
 	  IF(L1 .NE. 0)THEN
 	    L1=INDEX(STRING,'  ')
-	    DESC='NTRET Read in GENOSCIL-'//FILNAME
+	    DESC='NTRET Read in GENOSC_V9 -'//FILNAME
 	    NTRET=RD_FREE_VAL(STRING,IONE,L1-1,NEXT,DESC)
 	  ELSE
-	    WRITE(LUER,*)
-	1     'Error reading in # of transitions from '//FILNAME
+	    WRITE(LUER,*)'Error reading in # of transitions from '//FILNAME
 	    STOP
 	  END IF
 !
@@ -247,7 +242,7 @@
 !
 	  READ(LUIN,'(A)')STRING
 	  IF(STRING .NE. ' ')THEN
-	    WRITE(LUER,*)'Error reading blank(1) from '//FILNAME
+	    WRITE(LUER,*)'Error reading blank(1) from '//TRIM(FILNAME)
 	    STOP
 	  END IF	    
 !
@@ -300,8 +295,10 @@
 	      READ(LUIN,'(A)')STRING
 	      L1=INDEX(STRING,'  ')-1
 	      IF( L1 .LE. 0 .OR. L1 .GT. MAXLEN )THEN
-	        WRITE(LUER,*)
-	1             'Error reading in Level Names from '//FILNAME
+	        WRITE(LUER,*)'Error reading in Level Names from '//FILNAME
+	        WRITE(LUER,*)'Reading levels not included in model. Level=',I
+	        WRITE(LUER,*)'Invalid length -- string being read follows.'
+	        WRITE(LUER,*)TRIM(STRING)
 	        STOP
 	      END IF
 	    END DO
@@ -341,7 +338,7 @@
 	L1=INDEX(STRING,'Lam(A)')
 	IF(L1 .EQ. 0)THEN
 	  WRITE(LUER,*)
-	1    'Error reading oscillator header in '//FILNAME
+	1    'Error reading header before transition list in '//FILNAME
 	  STOP
 	END IF
 !
@@ -497,11 +494,11 @@
 	  DO I=1,J-1
 	    IF(EINA(I,J) .GT. 10.0D0)THEN
 	      IF(FIRST_ERROR)THEN
-	         WRITE(6,*)'Warning in GENOSC_V9 -- bad oscillator strengths?'
-	         WRITE(6,*)'Reading data from file '//TRIM(FILNAME)
+	         WRITE(LUER,*)'Warning in GENOSC_V9 -- bad oscillator strengths?'
+	         WRITE(LUER,*)'Reading data from file '//TRIM(FILNAME)
 	         FIRST_ERROR=.FALSE.
 	      END IF
-	      WRITE(6,'(A,ES10.3,2I5,5X,A)')'F value and levels are:',
+	      WRITE(LUER,'(A,ES10.3,2I5,5X,A)')'F value and levels are:',
 	1                   EINA(I,J),I,J,TRIM(LEVNAME(I))//'-'//TRIM(LEVNAME(J))
 	    END IF
 	  END DO

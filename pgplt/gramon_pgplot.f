@@ -1600,8 +1600,15 @@ C
 	    CALL NEW_GEN_IN(PLOT_ID,'Plot to determine EW for:')
 	  END IF
 !
+          WRITE(6,*)' '
+          WRITE(6,*)'CURSOR -- input X and Y values'
+          WRITE(6,*)'CURX -- input X only, average Y between the X values'
+          WRITE(6,*)'FILENAME -- first line -- number of data pairs '
+          WRITE(6,*)'FILENAME -- input X1 and X2 on each line; averages Y between the X values'
+          WRITE(6,*)' '
+!
 	  DC_INPUT_OPTION='CURSOR'
-	  CALL NEW_GEN_IN(DC_INPUT_OPTION,'CURSOR or name of file')
+	  CALL NEW_GEN_IN(DC_INPUT_OPTION,'CURSOR, CURX, or name of file')
 	  DC_CURVE_OPTION='MONCUB'
 	  IF(DC_INPUT_OPTION .EQ. 'CURSOR')DC_CURVE_OPTION='LINEAR'
 	  CALL NEW_GEN_IN(DC_CURVE_OPTION,'Curve type -- LINEAR of MONCUB')

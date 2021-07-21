@@ -6,6 +6,8 @@
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
+! Altered 20-May-2010 - Extra clump options added (updated from OSIRS
+!                          21-May-2021.
 ! Created 01-Oct-2018
 !
 	INTEGER ND
@@ -13,14 +15,16 @@
 	REAL*8 R(ND)
 	REAL*8 VEL(ND)
 	REAL*8 TAU(ND)
+	REAL*8, ALLOCATABLE :: VNODE(:), FVAL(:)
 !
 	INTEGER, PARAMETER :: NPAR_MAX=6
 	INTEGER, PARAMETER :: LUER=6
 	REAL*8 CLUMP_PAR(NPAR_MAX)
 	REAL*8 T1,T2
 	INTEGER NPAR
-	INTEGER K
+	INTEGER I,J,K,IOS,LU
 	CHARACTER(LEN=10) CLUMP_LAW
+	CHARACTER(LEN=120) FILENAME
 !
         CHARACTER(LEN=30) UC
         EXTERNAL UC
@@ -34,9 +38,15 @@
 	WRITE(LUER,'(A)')'RPOW:   F=1/[ (1/C1-1)*(-V/VINF)**C2 ]'
 	WRITE(LUER,'(A)')DEF_PEN
 !
-	CALL USR_OPTION(CLUMP_LAW,'LAW','EXPO','Clumping law: EXPO, MEXP, REXP, POW, RPOW')
-	CALL USR_OPTION(NPAR,'NPAR','2','Number of clumping parameters [ <6 ]')
+	CALL USR_OPTION(CLUMP_LAW,'LAW','EXPO','Clumping law: EXPO, MEXP, REXP, POW, RPOW, SPLINE')
 	CLUMP_LAW=UC(CLUMP_LAW)
+	IF(CLUMP_LAW .NE. 'SPLINE')THEN
+	  CALL USR_OPTION(NPAR,'NPAR','2','Number of clumping parameters [ <6 ]')
+	  IF(NPAR .LE. 0 .OR. NPAR .GT. 6)THEN
+	    WRITE(6,*)'Invalid  number of NPAR --- valid ranges is 1 to 6'
+	    RETURN
+	  END IF
+	END IF
 !
 	IF(CLUMP_LAW(1:4) .EQ. 'EXPO')THEN
 !
@@ -104,17 +114,53 @@
 	    CLUMP_FAC(K)=1.0D0-(1.0D0-CLUMP_PAR(1))*(VEL(K)/VEL(1))**CLUMP_PAR(2)
 	  END DO
         ELSE IF(CLUMP_LAW(1:4) .EQ. 'RPOW')THEN
-	  CALL USR_OPTION(CLUMP_PAR(1),'CLP1','0.1','Clumping factor at infinity')
-	  CALL USR_OPTION(CLUMP_PAR(2),'CLP2','1.0D0','Power law exponent (+ve)')
-	  IF(NPAR .NE. 2)THEN
+	  IF(NPAR .EQ. 2 .OR. NPAR .EQ. 4)THEN
+	    CALL USR_OPTION(CLUMP_PAR(1),'CLP1','0.1','Clumping factor at infinity')
+	    CALL USR_OPTION(CLUMP_PAR(2),'CLP2','1.0D0','Power law exponent (+ve)')
+	    CLUMP_PAR(3)=0.0D0; CLUMP_PAR(4)=1.0D0
+	  END IF
+	  IF(NPAR .EQ. 4)THEN
+	    CALL USR_OPTION(CLUMP_PAR(3),'CLP3','0.0','Clumping factor at infinity')
+	    CALL USR_OPTION(CLUMP_PAR(4),'CLP4','2.0D0','Power law exponent (+ve)')
+	  END IF
+	  IF(NPAR .NE. 2 .AND. NPAR .NE. 4)THEN
 	    WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
 	    WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',NPAR
 	    STOP
 	  END IF
 	  DO K=1,ND
 	    T1=1.0D0/CLUMP_PAR(1)-1.0D0
-	    CLUMP_FAC(K)=1.0D0/(1.0D0+T1*(VEL(K)/VEL(1))**CLUMP_PAR(2))
+	    CLUMP_FAC(K)=1.0D0/(1.0D0+T1*(VEL(K)/VEL(1))**CLUMP_PAR(2))/
+	1         (1.0D0+CLUMP_PAR(3)*(VEL(K)/VEL(1))**CLUMP_PAR(4))
 	  END DO
+!
+        ELSE IF(CLUMP_LAW(1:6) .EQ. 'SPLINE')THEN
+	  CALL USR_OPTION(FILENAME,'FILE','CLUMP_NODES','File with clump claw (or TERM')
+	  IF(UC(FILENAME(1:4)) .EQ. 'TERM')THEN
+	    LU=5
+	  ELSE
+	    LU=11
+	    OPEN(UNIT=11,FILE=FILENAME,STATUS='OLD',IOSTAT=IOS,ACTION='READ')
+	  END IF
+	  READ(LU,*)NPAR
+	  NPAR=NPAR+2
+	  ALLOCATE(VNODE(NPAR),FVAL(NPAR))
+	  DO I=2,NPAR-1
+	    READ(LU,*)VNODE(I),FVAL(I)  
+	  END DO
+	  IF(LU .EQ. 11)CLOSE(UNIT=LU)
+	  IF(VNODE(2) .LT. VNODE(3))THEN
+	    DO I=1,NPAR/2
+	      J=NPAR-I+1
+	      T1=VNODE(I); VNODE(I)=VNODE(J); VNODE(J)=T1
+	      T1=FVAL(I);  FVAL(I)=FVAL(J);   FVAL(J)=T1
+	    END DO
+	  END IF
+	  VNODE(1)=VEL(1); FVAL(1)=FVAL(2)
+	  VNODE(NPAR)=VEL(ND); FVAL(NPAR)=FVAL(NPAR-1)
+	  I=1
+	  CALL MON_INTERP(CLUMP_FAC,ND,I,VEL,ND,FVAL,NPAR,VNODE,NPAR) 
+	  DEALLOCATE(VNODE,FVAL)
 !
 	ELSE
 	  WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
