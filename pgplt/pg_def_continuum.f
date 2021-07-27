@@ -23,15 +23,14 @@
         INTEGER PLOT_ID,CURSERR
         CHARACTER(LEN=1) CURSVAL
 !
-	CHARACTER(LEN=30) UC
 	INTEGER GET_INDX_SP,PGCURS
-	EXTERNAL GET_INDX_SP,UC
+	EXTERNAL GET_INDX_SP
 	INTEGER, PARAMETER :: IONE=1
 !
 ! Get continuum locations as defined by cursor. CURSOR
 ! position is used to define continum.
 !
-	IF (UC(INPUT_OPTION) .EQ. 'CURSOR')THEN
+	IF (INPUT_OPTION .EQ. 'CURSOR')THEN
 	  J=1; CALL PGSCI(J)
 	  DO I=1,50 
 	    CURSERR = PGCURS(XCUR(I),YCUR(I),CURSVAL)
@@ -41,7 +40,12 @@
 	    WRITE(6,*)CURSVAL
 	  END DO
 !
-	ELSE IF (UC(INPUT_OPTION) .EQ. 'CURX')THEN
+! Use cursors to define bands to define the continuum. In each band,
+! the continuum is defined by averaging the data. BANDS are written
+! to fort.35, and these can be reread in by the DC option. Top of
+! file will need to be updated with hnumber of nodes. 
+!
+	ELSE IF (INPUT_OPTION .EQ. 'CURX')THEN
 	  J=1; CALL PGSCI(J)
 	  DO I=1,50 
 	    CURSERR = PGCURS(X1,Y1,CURSVAL)
@@ -62,7 +66,7 @@
 	    YCUR(I)=Y_SUM/ABS(I2-I1+1)
 	    WRITE(35,*)X1,X2
 	  END DO
-	  WRITE(6,*)'Nodes written to uniet 35'
+	  WRITE(6,*)'Nodes written to unit 35'
 !
 	ELSE
 	  LU=7
@@ -75,6 +79,7 @@
 	  END IF
 !
 	  READ(LU,*)N_NODES
+	  WRITE(20,*)N_NODES
 	  DO I=1,N_NODES
 	    READ(LU,*)X1,X2
 	    I1=GET_INDX_SP(X1,CD(IPLT)%XVEC,NPTS(IPLT))
@@ -86,8 +91,10 @@
 	    END DO
 	    XCUR(I)=XY_SUM/Y_SUM
 	    YCUR(I)=Y_SUM/ABS(I2-I1+1)
+	    WRITE(20,*)XCUR(I),YCUR(I)
 	  END DO
 	  WRITE(6,*)'Defined node averages'
+	  CLOSE(UNIT=20)
 	  CLOSE(UNIT=7)
 	END IF
 !
@@ -116,7 +123,7 @@
 	  CALL MON_INTERP_SP(CONT(ILOW),J,IONE,CD(IPLT)%XVEC(ILOW),J,YCUR,N_NODES,XCUR,N_NODES)
 	END IF
 !
-! If IP is non-zero, we store plot in a regulad data vector. 
+! If IP is non-zero, we store plot in a regular data vector. 
 !
 	IF(OPLT .NE. 0)THEN
 	  I=NPTS(IPLT)

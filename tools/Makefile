@@ -26,6 +26,7 @@ OBJ = $(LIB)(usr_option.o)\
       $(LIB)(read_keyword.o)\
       $(LIB)(rd_sing_vec_rvtj.o)\
       $(LIB)(rd_energy.o)\
+      $(LIB)(rd_energy_v2.o)\
       $(LIB)(rd_rvtj_v4.o)\
       $(LIB)(read_chi_data_file.o)\
       $(LIB)(set_case_fn.o)\

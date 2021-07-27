@@ -10,6 +10,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 27-May-2021: Small bug fixis (transferred from OSIRIS 21-Jul-20201).
 ! Altered: 17-Nov-2009: Now read in charge exchange cooling.
 !                         Slight format change.
 ! Altered: 29-Jan-2009: ND is now read in from MODEL (if it exists).
@@ -48,6 +49,7 @@
 	REAL*8 MIN_VAL
 	LOGICAL FILE_OPEN
 	LOGICAL NET_RECOM_PER_LEVEL
+	LOGICAL DO_INDIV_RATES
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
         CHARACTER(LEN=2), PARAMETER :: FORMFEED=' '//CHAR(12)
@@ -114,6 +116,8 @@
 	END IF
 !
 	NET_RECOM_PER_LEVEL=.FALSE.
+	DO_INDIV_RATES=.FALSE.
+	CALL GEN_IN(DO_INDIV_RATES,'Ouput recombination rate and photioization rate for each leve')
 	CALL GEN_IN(NET_RECOM_PER_LEVEL,'Ouput net recombination rate to each level?')
 	SPECIES='FeI'
 !
@@ -195,12 +199,15 @@
 !
 	   WRITE(21,'(A,I4,A,I4,A)')'   Total photoionization rate (d=',IST,' to',IEND,'):'
 	   WRITE(21,'(X,10ES12.4)')(PHOT_SUM(I),I=IST,IEND)
-	   WRITE(21,'(A)')
 !
-	   WRITE(21,'(A)')TRIM(STRING)
-	   DO J=1,NLEV
-	     WRITE(21,'(X,10ES12.4)')(PHOT(I,J),I=IST,IEND)
-	   END DO
+	   IF(.NOT. DO_INDIV_RATES)THEN
+	   ELSE
+	     WRITE(21,'(A)')
+	     WRITE(21,'(A)')TRIM(STRING)
+	     DO J=1,NLEV
+	       WRITE(21,'(X,10ES12.4)')(PHOT(I,J),I=IST,IEND)
+	     END DO
+	   END IF
 !
 	   DO WHILE(INDEX(STRING,'Recombination Rates') .EQ. 0)
 	     READ(20,'(A)')STRING
@@ -225,14 +232,17 @@
 !
 	   WRITE(21,'(A,I4,A,I4,A)')'   Total recombination rate (d=',IST,' to',IEND,'):'
 	   WRITE(21,'(X,10ES12.4)')(RECOM_SUM(I),I=IST,IEND)
-	   WRITE(21,'(A)')' '
 !
-	   IF(NET_RECOM_PER_LEVEL)THEN
+	   IF(.NOT. DO_INDIV_RATES)THEN
+	     WRITE(21,'(A)')' '
+	   ELSE IF(NET_RECOM_PER_LEVEL)THEN
+	     WRITE(21,'(A)')' '
 	     WRITE(21,'(A,A)')'   Net ',TRIM(STRING(4:))
 	     DO J=1,NLEV
 	       WRITE(21,'(X,10ES12.4)')(RECOM(I,J)-PHOT(I,J),I=IST,IEND)
 	     END DO
 	   ELSE
+	     WRITE(21,'(A)')' '
 	     WRITE(21,'(A)')TRIM(STRING)
 	     DO J=1,NLEV
 	       WRITE(21,'(X,10ES12.4)')(RECOM(I,J),I=IST,IEND)

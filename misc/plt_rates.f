@@ -16,10 +16,12 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered: 6-Jul-2021: Small bug fixis (transferred from OSIRIS 21-Jul-20201).
 ! Created 24-May-2020
 !
 	INTEGER, PARAMETER :: NMAX=600000
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
+	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
 	REAL*8, ALLOCATABLE :: NT_NU(:)
 	REAL*8, ALLOCATABLE :: NT_LAM(:)
@@ -83,7 +85,9 @@
 	INTEGER N_AUTO
 	INTEGER RD_COUNT
 	INTEGER I,J,K,L,ML,IBEG,IDEPTH
+	INTEGER N_TRANS_LIM
 	INTEGER SL_INDX
+	INTEGER CNT
 	INTEGER MAX_TRANS_LENGTH
 	INTEGER DPTH_INDX
 	INTEGER NF            	!Number of full levels
@@ -100,6 +104,7 @@
 !
 	CHARACTER(LEN=80) FILENAME
 	CHARACTER(LEN=80) TMP_STR
+	CHARACTER(LEN=80) TMP_FMT
 	CHARACTER(LEN=200) STRING
         CHARACTER(LEN=30) UC
 	CHARACTER(LEN=20) PLT_OPT
@@ -112,7 +117,7 @@
 	SL_OPTION=' '
 !
 	WRITE(6,'(A)')' '
-	WRITE(6,'(A)')' Program to plot/examin NETRATE or TOTRATE'
+	WRITE(6,'(A)')' Program to plot/examine NETRATE or TOTRATE'
 	WRITE(6,'(A)')' '
 !
 100	CONTINUE
@@ -196,7 +201,12 @@
 	  K=INDEX(STRING,'  ')
 	  STRING=STRING(K+2:)
 	  K=INDEX(STRING,'  ')
-	  TRANS_NAME(ML)=STRING(1:K)
+	  IF(K .GT. LEN(TRANS_NAME(1)))THEN
+	   WRITE(6,*)'Error -- TRANS_NAME too short: needed length=',K
+	   STOP
+	  ELSE
+	    TRANS_NAME(ML)=STRING(1:K)
+	  END IF  
 	  READ(STRING(K+1:),*)NU(ML)
 	  RD_COUNT=ML
 	  READ(LUIN,*)(RATES(ML,I),I=1,ND)
@@ -382,12 +392,13 @@
 	    ALLOCATE (LEVEL_NAME(NF),STAT_WT(NF),ENERGY(NF),FEDGE(NF))
 	    FILENAME=TRIM(SPECIES)//'_F_OSCDAT'
 	    WRITE(6,*)'Getting energy levels',TRIM(SPECIES),'/',NF
-	    CALL RD_ENERGY(LEVEL_NAME,STAT_WT,ENERGY,FEDGE,NF,NF,
+	    CALL RD_ENERGY_V2(LEVEL_NAME,STAT_WT,ENERGY,FEDGE,NF,NF,L_TRUE,
 	1             IONIZATION_ENERGY,ZION,OSCDATE,FILENAME,LUIN,LUOUT,IOS)
-	    WRITE(6,*)'Got energy levels'
 	    IF(IOS .NE. 0)THEN
 	      WRITE(6,*)'Unable to read in energy level names'
 	      GOTO 1000
+	    ELSE
+	      WRITE(6,*)'Got energy levels'
 	    END IF
 	    CLOSE(LUIN)
 ! 
@@ -440,7 +451,7 @@
 ! Get the SL link.
 !
 	  DO I=1,NF
-	    IF(INDEX(LEVEL_NAME(I),LEVEL) .NE. 0)THEN
+	    IF(INDEX(LEVEL_NAME(I),TRIM(LEVEL)) .NE. 0)THEN
 	      SL_INDX=F_TO_S(I)
 	      EXIT 
 	    END IF
@@ -450,7 +461,7 @@
 	  WRITE(6,*)' The following levels have the same super level assignment'
 	  DO I=1,NF
 	    IF(F_TO_S(I) .EQ. SL_INDX)THEN
-	      WRITE(6,'(A,T50,A)')TRIM(LEVEL_NAME(I)),TRIM(LEVEL)
+	      WRITE(6,'(4X,A,T50,A)')TRIM(LEVEL_NAME(I)),TRIM(LEVEL)
 	    END IF
 	  END DO  
 !
@@ -463,6 +474,11 @@
 	      GOTO 1000
 	    END IF
 !
+	    DPTH_INDX=ND/2
+	    CALL GEN_IN(DPTH_INDX,'Depth to for choosing important transitions')
+	    N_TRANS_LIM=10
+	    CALL GEN_IN(N_TRANS_LIM,'Transition limit')
+!
 	    DO I=1,ND
 	      T1=0.0D0
 	      DO ML=1,N_TRANS
@@ -474,10 +490,27 @@
 	      NEW_RATES(:,I)=NEW_RATES(:,I)/T1
 	      IF(DO_NT_RATES)NEW_NT_RATES(:,I)=NEW_NT_RATES(:,I)/T1
 	    END DO
-	    DO ML=1,N_TRANS
-	      DPTH_VEC=NEW_RATES(ML,:)
+	    WRITE(6,*)' '
+	    WRITE(6,*)'Rates have bee corrupted - use LEVEL option to reset rates'
+	    WRITE(6,*)' '
+!
+	    IF(ALLOCATED(WRK_VEC))DEALLOCATE(WRK_VEC)
+	    IF(ALLOCATED(INDX))DEALLOCATE(INDX)
+	    ALLOCATE (WRK_VEC(N_TRANS),INDX(N_TRANS))
+	    WRK_VEC(:)=ABS(NEW_RATES(1:N_TRANS,DPTH_INDX))
+	    CALL INDEXX(N_TRANS,WRK_VEC,INDX,L_FALSE)
+!
+	    DO ML=1,N_TRANS_LIM
+	      DPTH_VEC=NEW_RATES(INDX(ML),:)
+	      L=INDX(ML)
+	      K=INDEX(TRANS_NAME(LINK(L)),'-')
+              IF( INDEX(TRANS_NAME(LINK(L)),TRIM(LEVEL)) .GT.  K )DPTH_VEC=-DPTH_VEC
+	      WRITE(6,'(A)')TRIM(TRANS_NAME(LINK(L))) 
 	      CALL DP_CURVE(ND,XV,DPTH_VEC)
 	    END DO
+	    YLABEL='Normalized rates'
+!
+	    DEALLOCATE(INDX,WRK_VEC)
 !
 ! Examine the rates at a specific depth.
 !
@@ -488,8 +521,12 @@
 	      GOTO 1000
 	    END IF
 !
+	    N_TRANS_LIM=10
+	    CALL GEN_IN(N_TRANS_LIM,'Transition limit')
+!
 	    CALL DERIVCHI(YV,XV,R,ND,'LINEAR')
 	    WRITE(6,*)'Done deriv'
+!
 	    DO I=1,ND
 	      NEW_RATES(1:N_TRANS,I)=NEW_RATES(1:N_TRANS,I)*R(I)*R(I)/XV(I)
 	      IF(DO_NT_RATES)NEW_NT_RATES(:,I)=NEW_NT_RATES(:,I)*R(I)*R(I)/XV(I)
@@ -501,13 +538,16 @@
 	       END DO
 	    END DO
 	    WRITE(6,*)'Set sum rates'
+	    WRITE(6,*)'Rates have bee corrupted - use LEVEL option to reset rates'
+	    WRITE(6,*)' '
 !
-	    DO ML=1,MIN(6,N_TRANS)
+	    DO ML=1,MIN(N_TRANS_LIM,N_TRANS)
 	      J=MAXLOC(SUM_RATES(1:N_TRANS),1)
 	      DPTH_VEC=NEW_RATES(J,:)
+	      K=INDEX(TRANS_NAME(LINK(J)),'-')
+              IF( INDEX(TRANS_NAME(LINK(J)),TRIM(LEVEL)) .GT.  K )DPTH_VEC=-DPTH_VEC
 	      CALL DP_CURVE(ND,XV,DPTH_VEC)
-	      L=LINK(J)
-              WRITE(6,'(1X,A)')TRIM(TRANS_NAME(LINK(L)))
+              WRITE(6,'(1X,A)')TRIM(TRANS_NAME(LINK(J)))
 	      SUM_RATES(J)=0.0D0
 	    END DO
 	    WRITE(6,*)'Done line curves'
@@ -525,6 +565,7 @@
 1	      CALL DP_CURVE(ND,XV,ZV)
 	      WRITE(6,'(1X,A,T30,ES12.3)')'Maximum auto/anti autoionization rate',T1
 	    END IF
+	    YLABEL='Normalized origin'
 !
 ! Examine the rates at a specific depth.
 !
@@ -537,6 +578,8 @@
 !
 	    DPTH_INDX=ND/2
 	    CALL GEN_IN(DPTH_INDX,'Depth to be examined')
+	    N_TRANS_LIM=10
+	    CALL GEN_IN(N_TRANS_LIM,'Transition limit')
 !
 ! We first deduce the maximum rate to each level.
 !
@@ -576,23 +619,55 @@
 	    WRITE(6,'(2X,A,ES16.8)'),'    ED(DPTH_INDX) =',ED(DPTH_INDX)
 	    WRITE(6,'(2X,A,ES16.8)'),'  Scaling Factor  =',MAX_RATE
 	    WRITE(6,*)' '
+	    WRITE(6,*)' Upper level is listed first in transition name.'
+	    WRITE(6,*)' Negative rate imples there is a net flow to the upper state'
+	    WRITE(6,*)' '
+	    WRITE(6,*)' Transitions draining ',TRIM(LEVEL)
+	    WRITE(6,*)' '
 !
 	    ALLOCATE (WRK_VEC(N_TRANS),INDX(N_TRANS))
-	    WRK_VEC(:)=ABS(NEW_RATES(:,DPTH_INDX))
+	    WRK_VEC(:)=ABS(NEW_RATES(1:N_TRANS,DPTH_INDX))
 	    CALL INDEXX(N_TRANS,WRK_VEC,INDX,L_TRUE)
 !
 	    WRITE(TMP_STR,'(I2.2)')MAX_TRANS_LENGTH+6
-	    TMP_STR='(1X,A,T'//TMP_STR(1:2)//',F8.5,3X,F12.5)'
-	    DO ML=1,N_TRANS
+	    TMP_FMT='(1X,A,T'//TMP_STR(1:2)//',26X,F9.5)'
+	    TMP_STR='(1X,A,T'//TMP_STR(1:2)//',F8.5,3X,F12.5,3X,F9.5)'
+!
+	    T1=0.0D0; I=DPTH_INDX; CNT=0
+	    DO ML=N_TRANS,1,-1
 	      L=INDX(ML)
-	      WRITE(6,TMP_STR)TRIM(TRANS_NAME(LINK(L))),NEW_RATES(L,DPTH_INDX)/MAX_RATE,LAM(LINK(L))
+	      IF( (INDEX(TRANS_NAME(LINK(L)),'('//TRIM(LEVEL)) .NE.  0 .AND. NEW_RATES(L,I) .GT. 0) .OR.
+	1         (INDEX(TRANS_NAME(LINK(L)),'('//TRIM(LEVEL)) .EQ.  0 .AND. NEW_RATES(L,I) .LT. 0) )THEN
+	        T1=T1+ABS(NEW_RATES(L,I))
+	        CNT=CNT+1
+	        IF(CNT .LE. N_TRANS_LIM)THEN
+                  WRITE(6,TMP_STR)TRIM(TRANS_NAME(LINK(L))),NEW_RATES(L,I)/MAX_RATE,LAM(LINK(L)),T1/MAX_RATE
+	        END IF
+	      END IF
 	    END DO
-	    DEALLOCATE(WRK_VEC,INDX)
+	    WRITE(6,TMP_FMT)'Total',T1/MAX_RATE
+!
+	    WRITE(6,*)' '
+	    WRITE(6,*)' Transitions populating ',TRIM(LEVEL)
+	    WRITE(6,*)' '
+	    T1=0.0D0; CNT=0.0D0
+	    DO ML=N_TRANS,1,-1
+	      L=INDX(ML)
+	      IF( (INDEX(TRANS_NAME(LINK(L)),'('//TRIM(LEVEL)) .EQ.  0 .AND. NEW_RATES(L,I) .GT. 0) .OR.
+	1         (INDEX(TRANS_NAME(LINK(L)),'('//TRIM(LEVEL)) .NE.  0 .AND. NEW_RATES(L,I) .LT. 0) )THEN
+	        T1=T1+ABS(NEW_RATES(L,I))
+	        CNT=CNT+1
+	        IF(CNT .LE. N_TRANS_LIM)THEN
+                  WRITE(6,TMP_STR)TRIM(TRANS_NAME(LINK(L))),NEW_RATES(L,I)/MAX_RATE,LAM(LINK(L)),T1/MAX_RATE
+	        END IF
+	      END IF
+	    END DO
+	    WRITE(6,TMP_FMT)'Total',T1/MAX_RATE
 !
 	    IF(N_NT_TRANS .NE. 0)WRITE(6,*)'Non thermal transitions'
 	    DO ML=1,N_NT_TRANS
 	      WRITE(6,TMP_STR)TRIM(NT_TRANS_NAME(NT_LINK(ML))),
-	1              NEW_NT_RATES(I,ML)/MAX_RATE,NEW_NT_RATES(ML,I),NT_LAM(NT_LINK(ML))
+	1              NEW_NT_RATES(ML,I)/MAX_RATE,NT_LAM(NT_LINK(ML))
 	    END DO
 !
 ! Compute the total rates. 
@@ -626,7 +701,7 @@
 	      WRITE(6,'(A,ES14.4,F11.5)')' Recombination rate               =',
 	1             REC_RATE(SL_INDX,DPTH_INDX),REC_RATE(SL_INDX,DPTH_INDX)/MAX_RATE
 	      T2=REC_RATE(SL_INDX,DPTH_INDX)-PHOT_RATE(SL_INDX,DPTH_INDX)
-	      WRITE(6,'(A,ES14.4,F11.5)')' Net Recombination rate           =',T2,T2/MAX_RATE
+	      WRITE(6,'(A,ES14.4,F11.5)')' Net recombination rate           =',T2,T2/MAX_RATE
 	    END IF
 !
 	    IF(DO_AUTO_RATES)THEN
@@ -646,6 +721,8 @@
 	    WRITE(6,'(A)')' '
 	    T2=(SUM_TO-SUM_FROM)+(REC_RATE(SL_INDX,I)-PHOT_RATE(SL_INDX,I))+NET_AUTO
 	    WRITE(6,'(A,T35,A,ES14.4,F11.5)')' Net Rate','=',T2,T2/MAX_RATE
+!
+	    DEALLOCATE(INDX,WRK_VEC)
 !
 	  ELSE IF(UC(PLT_OPT(1:1)) .EQ. 'H')THEN
 !

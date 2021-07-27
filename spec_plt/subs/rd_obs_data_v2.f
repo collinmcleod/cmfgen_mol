@@ -41,6 +41,7 @@ C
 	1                         FILENAME,COLS,IOS)
 	IMPLICIT NONE
 C
+C Altered 05-jul-2021 : NKEY_WRDS_MAX installed, and check added.
 C Altered 16-Apr-2021 : Added nm to unit list.
 C Altered 07-Jul-2011 : Improved error message when reading bad data.
 C Altered 11-May-2008 : Altered to handle blank lines/comments at end of file.
@@ -66,6 +67,7 @@ C
 !
 ! Local variables and arrays.
 !
+	INTEGER, PARAMETER :: NKEY_WRD_MAX=30
 	REAL*8 TEMP_STORE( MAX(COLS(1),COLS(2)) )
 	REAL*8 TO_JANSKY
 	REAL*8 LAM_ST
@@ -76,7 +78,8 @@ C
 	INTEGER CONFUSE_CNT
 	INTEGER N_STR
 	INTEGER NLST
-	CHARACTER*200 STRING(10)
+	CHARACTER*200 STRING(NKEY_WRD_MAX)
+	CHARACTER*200 TMP_STRING
 	CHARACTER*80 WAVE_UNIT
 	CHARACTER*80 AIR_LAM
 	CHARACTER*80 FLUX_UNIT
@@ -111,7 +114,7 @@ C
 	STRING(1)=' '
 	DO WHILE(INDEX(STRING(1),'FLUX_UNIT=') .EQ. 0 .AND.
 	1                INDEX(STRING(1),'FLUX_UNIT_2=') .EQ. 0)
-	  WRITE(T_OUT,'(A)')STRING(1)
+	  WRITE(T_OUT,'(A)')TRIM(STRING(1))
 	  READ(10,'(A)',IOSTAT=IOS)STRING(1)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(T_OUT,*)'FLUX_UNIT not found in file for RD_OBS_DATA'
@@ -127,10 +130,16 @@ C
 C
 C Read in all keywords.
 C
-	N_STR=0
-	DO WHILE(INDEX(STRING(N_STR+1),'=') .NE. 0)
+	N_STR=1
+	READ(10,'(A)')TMP_STRING
+	DO WHILE(INDEX(TMP_STRING,'=') .NE. 0)
 	  N_STR=N_STR+1
-	  READ(10,'(A)')STRING(N_STR+1)
+	  IF(N_STR .GT. NKEY_WRD_MAX)THEN
+	    WRITE(6,*)'Error in RD_OBS_V2 - Number of jeywords to large'
+	    WRITE(6,*)'Maximum number of keywords is',NKEY_WRD_MAX
+	  END IF
+	  STRING(N_STR)=TMP_STRING
+	  READ(10,'(A)')TMP_STRING
 	END DO
 	BACKSPACE(UNIT=10)
 C
@@ -167,8 +176,8 @@ C
 	    CALL SET_CASE_UP(WAVE_UNIT,IZERO,IZERO)
 	    IF(WAVE_UNIT .EQ. 'ANGSTROMS' )THEN
 	    ELSE IF(WAVE_UNIT .EQ. 'LOG(ANGSTROMS)' )THEN
-	    ELSE IF(WAVE_UNIT .EQ. 'MICROMETERS')THEN
 	    ELSE IF(WAVE_UNIT .EQ. 'NM')THEN
+	    ELSE IF(WAVE_UNIT .EQ. 'MICROMETERS')THEN
 	    ELSE IF(WAVE_UNIT .EQ. 'UM')THEN
 	        WAVE_UNIT='MICROMETERS'
 	    ELSE IF(WAVE_UNIT .EQ. 'HZ')THEN

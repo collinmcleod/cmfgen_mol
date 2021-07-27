@@ -24,6 +24,7 @@ CONTAINS
 	USE VEL_LAW_PARAMS
 	IMPLICIT NONE
 !
+! Altered 06-Jul-2021: Added SSCLR option (transferred from OSIRIS: 21-Jul-2021).
 ! Altered 07-Dec-2020: Updated SCLR from IBIS version -- to used old V(r) law'
 ! Altered 08-May-2020: Can use log axis for R or V with CUR option.
 ! Altered 01-Feb-2020: Added 'm' optoion to CUR option.
@@ -184,6 +185,7 @@ CONTAINS
 	WRITE(6,'(A)')'         PLOT: plot V and SIGMA from old RVSIG file'
 	WRITE(6,'(A)')'          RDR: read in new R grid (DC format)'
 	WRITE(6,'(A)')'         SCLR: scale radius of star to new value'
+	WRITE(6,'(A)')'        SSCLR: simple scale radius of star to new value (all radii changed).'
 	WRITE(6,'(A)')'         SCLV: scale velocity law to new value'
         WRITE(6,'(A)')'         SIGU: update sigma using V read from RVSIG file'
 	WRITE(6,'(A)')'          SPP: convert plane-parallel model to a spherical -paralell model'
@@ -783,6 +785,15 @@ CONTAINS
 	    SIGMA(J)=OLD_SIGMA(I)
 	  END DO
 	  ND=NN+ND_OLD
+!
+	ELSE IF(OPTION .EQ. 'SSCLR')THEN
+!
+	  ND=ND_OLD
+	  NEW_RSTAR=OLD_R(ND_OLD)
+	  CALL GEN_IN(NEW_RSTAR,'New radius')
+	  R(1:ND)=OLD_R(1:ND)*(NEW_RSTAR/OLD_R(ND_OLD))
+	  V(1:ND)=OLD_V(1:ND)
+	  SIGMA(1:ND)=OLD_SIGMA(1:ND)
 !
 	ELSE IF(OPTION .EQ. 'SCLR')THEN
 !

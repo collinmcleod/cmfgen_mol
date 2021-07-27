@@ -126,6 +126,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(mon_interp.o)\
       $(LIB)(mon_interp_fast.o)\
       $(LIB)(mon_interp_fast_v2.o)\
+      $(LIB)(mon_interp_nonmon.o)\
       $(LIB)(monotonic_integrate.o)\
       $(LIB)(mult2d.o)\
       $(LIB)(multvec.o)\

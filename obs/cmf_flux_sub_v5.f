@@ -1677,6 +1677,20 @@
 	  NU_FORCE=NU_FORCE*NU_FORCE_FAC
 	END IF
 !
+! The L_TRUE indicate NEW_MOD and that we will open a new file. 
+! J is used for ACCESS_F.
+!
+	   IF(WRITE_FLUX .AND. ES_COUNTER .EQ. NUM_ES_ITERATIONS)THEN
+	     IF(ML .EQ. 1)THEN
+	        CALL OPEN_RW_EDDFACTOR(R,V,LANG_COORD,ND,
+	1              REXT,VEXT,LANG_COORDEXT,ND,
+	1              J,L_TRUE,L_TRUE,L_FALSE,'FLUX_FILE',LU_FLUX)
+	     END IF
+	     TA(1:ND)=13.1986D0*SOB(1:ND)
+	     WRITE(LU_FLUX,REC=EDD_CONT_REC)INITIAL_ACCESS_REC,NCF,ND
+	     WRITE(LU_FLUX,REC=INITIAL_ACCESS_REC+ML-1)(SOB(I),I=1,ND),FL
+	   END IF
+!
 ! Compute the luminosity, the FLUX mean opacity, and the ROSSELAND
 ! mean opacities.
 !

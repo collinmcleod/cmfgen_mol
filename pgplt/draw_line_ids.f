@@ -91,7 +91,7 @@
 !
 	  LAB_START=XPAR(1)+1.5*LAB_SIZE
 	  LAB_SIZE=1.1D0*XCHAR_SIZE
-	  NPOS=ABS(XPAR(2)-XPAR(1))/LAB_SIZE-3
+	  NPOS=ABS( (XPAR(2)-XPAR(1))/LAB_SIZE )-3
 	  WRITE(6,*)'Number of label slots is:',NPOS
 	  IF(LOC_NLINES .GT. 0.8*NPOS)THEN
 	    WRITE(6,*)'Error -- too many lines to label in plot window'
@@ -130,10 +130,13 @@
 	      END IF
 	      L=L+1
 	      LAB_ID(L)=I
-	      IF(L .LT. 10)WRITE(6,*)I,ID_WAVE(I)
+!	      IF(L .LT. 10)WRITE(6,*)I,ID_WAVE(I)
 	    END IF
 	  END DO
-	  IF(TRACE)WRITE(6,*)'Stored lines'
+	  IF(TRACE)THEN
+	    WRITE(6,*)'Stored lines'
+	    WRITE(6,*)LAB_START,ID_WAVE(LAB_ID(NPOS)),LAB_SIZE
+	  END IF
 !
 ! Spread lines out where possible.
 !
@@ -151,12 +154,18 @@
 	  END DO
 !
 	  IF(TRACE)THEN
+	    WRITE(6,*)'Done spread out lines'; FLUSH(UNIT=6)
 	    J=0
 	    DO I=1,NPOS
+	      WRITE(6,*)LAB_ID(I); FLUSH(UNIT=6)
 	      IF(LAB_ID(I) .NE. 0)THEN
 	        J=J+1
+	        WRITE(6,*)LAB_ID(I); FLUSH(UNIT=6)
+	        WRITE(6,*)ID_WAVE(LAB_ID(I)); FLUSH(UNIT=6)
+	        WRITE(6,*)TRIM(LINE_ID(LAB_ID(I))); FLUSH(UNIT=6)
 	        WRITE(6,'(I7,F12.4,A)')LAB_ID(I),ID_WAVE(LAB_ID(I)),TRIM(LINE_ID(LAB_ID(I)))
-	       END IF
+	        FLUSH(UNIT=6)
+	      END IF
 	    END DO
 	    WRITE(6,*)'Number of non zero LAB_IDs is',J
 	  END IF

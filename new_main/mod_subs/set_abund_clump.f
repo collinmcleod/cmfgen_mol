@@ -16,6 +16,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 15-May-2012 : Modications to clumping laws (imported from OSIRIS: 21-Jul-2021).
 ! Altered 09-May-2021 : Added RPOW option.
 ! Altered 14-Dec-2020 : Altered EXPO option to inhibit clumping below a certain to velocity.
 ! Altered 01-Oct-2018 : Added MEXP option.
@@ -131,14 +132,18 @@
 	  END DO
 !
 	ELSE IF(CLUMP_LAW(1:4) .EQ. 'RPOW')THEN
-	  IF(N_CLUMP_PAR .NE. 2)THEN
+	  IF(N_CLUMP_PAR .NE. 2 .AND. N_CLUMP_PAR .NE. 4)THEN
 	    WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
 	    WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
 	    STOP
 	  END IF
+	  IF(N_CLUMP_PAR .EQ. 2)THEN
+	     CLUMP_PAR(3)=0.0D0; CLUMP_PAR(4)=1.0D0
+	  END IF
 	  DO K=1,ND
 	    T1=1.0D0/CLUMP_PAR(1)-1.0D0
-	    CLUMP_FAC(K)=1.0D0/(1.0D0+T1*(V(K)/V(1))**CLUMP_PAR(2))
+	    CLUMP_FAC(K)=1.0D0/(1.0D0+T1*(V(K)/V(1))**CLUMP_PAR(2))/
+	1               (1.0D0+CLUMP_PAR(3)*(V(K)/V(1))**CLUMP_PAR(4))
 	  END DO
 !
 	 ELSE IF(CLUMP_LAW(1:4) .EQ. 'SNCL')THEN

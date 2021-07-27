@@ -16,6 +16,7 @@
 !
 	IMPLICIT NONE
 !
+! Altered 01-Jul-2021 : ED and CLUMP options added (updated from OSIRIS 21-Jul-2021).
 ! Altered 20-Aug-2019 : Updated RD_RVTJ to V4 routines.
 !                          TGREY,dE_RAD_DECAY,PLANCK_MEAN, and FORMAT_DATE added.
 ! Altered:  2-Nov-2013 - Remove an excess allocation of XV_SAV.
@@ -402,6 +403,16 @@
 	1        Y_PLT_OPT .NE. 'FLAM')THEN
 	     WRITE(T_OUT,*)'Invalid Y Plot option: Try again'
 	  END IF
+!
+	ELSE IF(X(1:5) .EQ. 'CLUMP')THEN
+	  YV(1:ND)=CLUMP_FAC(1:ND)
+	  CALL CURVE(ND,XV_SAV,YV)
+	  XAXIS='f'
+!
+	ELSE IF(X(1:2) .EQ. 'ED')THEN
+	  YV(1:ND)=LOG10(ED)
+	  CALL CURVE(ND,XV_SAV,YV)
+	  XAXIS='Ne'
 !
 ! 
 !
@@ -846,6 +857,9 @@
 	  WRITE(6,*)' DDF2:    Plots dF/dX (X=default axis) averaged over a given frequency band'
 	  WRITE(6,*)' '
 	  WRITE(6,*)' RD_OBS:  Read on observed spectrum'
+	  WRITE(6,*)' '
+	  WRITE(6,*)' F:       Plot the clumping factor'
+	  WRITE(6,*)' ED:      Plot the electron density'
 	  WRITE(6,*)' '
 	  WRITE(6,*)' OR:      Plot the radius, as a funtion of lambda, for a given fractional contribution'
 	  WRITE(6,*)' OV:      Plot the velocity, as a funtion of lambda, for a given fractional contribution'

@@ -8,6 +8,9 @@
 	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
+! Altered:  16-Jul-2021 : Added error to link error vector to another vector.
+!                           Clarifcation notes added to DC option.
+!                           (based on GANNET version - 8-Jul-2021)
 ! Altered:  22-Nov-2020 : Now call MONBORD_V4 (updated from osiris)
 !                       :   Cleaned title label writing
 !                       :   Added REG option (removed UG from XAR -- inclued with REG)
@@ -554,7 +557,6 @@
  	  WRITE(T_OUT,*)'WE  - Edit line weights one by one'
 	  WRITE(T_OUT,*)'M   - Switch marking data points on/off'
 	  WRITE(T_OUT,*)'C   - Indicate how curves are to be connected (L,H,A,E,I,V,B)'
-	  WRITE(T_OUT,*)'B   - Switch error bars on/off'
 	  WRITE(T_OUT,*)'CC  - Change Color setting'
 	  WRITE(T_OUT,*)'CP  - Change Pen (Color Index)'
 	  WRITE(T_OUT,*)'RCP - Reset default color pens'
@@ -563,6 +565,8 @@
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
 !
+	  WRITE(T_OUT,*)'B    - Switch error bars on/off'
+	  WRITE(T_OUT,*)'LNKE - Link a vector as errors to another plot'
 	  WRITE(T_OUT,*)'BRD  - Switch border potting on (def) or off'
 	  WRITE(T_OUT,*)'FILL - Color in region between 2 curves'
 	  WRITE(T_OUT,*)'OFF  - Set offsets when plotting multiple plots'
@@ -2512,6 +2516,7 @@ C
 	      IF(ERR(IP))CD(IP)%EMAX=CD(IP)%EMAX/YAR_VAL
 	    ELSE IF(YAR_OPERATION .EQ. 'ABS')THEN
 	      CD(IP)%DATA=ABS(CD(IP)%DATA)
+	      WRITE(6,*)'Warning -- error vector not adjusted'
 	    ELSE IF(YAR_OPERATION .EQ. 'ALG')THEN
 	      CD(IP)%DATA=10.0D0**(CD(IP)%DATA)
 	      IF(YLABEL(1:3) .EQ. 'Log')THEN
@@ -2960,7 +2965,27 @@ C
 	    END IF
 	  END DO
 	  GOTO 1000
-
+	ELSE IF(ANS .EQ. 'LNKE')THEN
+	  COLUMN(1)=1; COLUMN(2)=2
+	  CALL NEW_GEN_IN(COLUMN,I,ITWO,'Data and error plot numbers')
+	  IP=COLUMN(1)
+	  IF(NPTS(IP) .NE. NPTS(COLUMN(2)))THEN
+	    WRITE(6,*)'Can only link error to plot when number of data points is zero'
+	    WRITE(6,*)'Number of points in  data vector:',NPTS(IP)
+	    WRITE(6,*)'Number of points in error vector:',NPTS(COLUMN(2))
+	    GOTO 1000
+	  END IF
+	  ERR(IP)=.TRUE.
+	  IF(ALLOCATED(CD(IP)%EMAX))DEALLOCATE(CD(IP)%EMAX,CD(IP)%EMIN)
+	  ALLOCATE(CD(IP)%EMAX(NPTS(IP)),CD(IP)%EMIN(NPTS(IP)))
+	  J=COLUMN(2)
+	  DO I=1,NPTS(IP)
+	    CD(IP)%EMAX(I)=CD(IP)%DATA(I)+CD(J)%DATA(I)
+	    CD(IP)%EMIN(I)=CD(IP)%DATA(I)-CD(J)%DATA(I)
+	  END DO
+	  TYPE_CURVE(J)='I'
+	  WRITE(6,*)'Error curve made invisible'
+!
 	ELSE IF (ANS .NE. 'P' .AND. ANS .NE. 'R')THEN
 	  WRITE(T_OUT,*)' Invalid option - try again'
 	  GOTO 1000

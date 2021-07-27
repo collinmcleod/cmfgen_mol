@@ -59,7 +59,13 @@
 	END IF
 !
 	IF(OPTION .EQ. ' ' .OR. OPTION .EQ. 'OIV' .OR. OPTION .EQ. 'OXY')THEN
-	  WRITE(6,*)'O IV:    1338.615   1342.990   1343.514   3063.426   3071.59'
+	  WRITE(6,*)'O IV:    1338.615   1342.990   1343.514   '
+	  WRITE(6,*)'O IV:    1397.23    1399.78    1401.16    1404.81'
+	  WRITE(6,*)'O IV:    2916.31    2921.46    2926.18                         2s_2p(3Po)3d_2Do-2s_2p(3Po)3p_2Pe'
+	  WRITE(6,*)'O IV:    3063.426   3071.59'
+	  WRITE(6,*)'O IV:    3404.50    3412.67    3414.62    M3410.08             2s2_3d_2De-2s2_3p_2Po'
+	  WRITE(6,*)'O IV:    3382.17    3386.49    3397.76    3410.64    M3389.72  2s_2p(3Po)3p_4De-2s_2p(3Po)3s_4Po'
+	  WRITE(6,*)'O IV:    7032.34    7053.62'
 	  DONE=.TRUE.	
 	END IF
 !

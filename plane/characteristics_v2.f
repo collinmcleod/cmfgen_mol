@@ -101,11 +101,11 @@
 	LUER=ERROR_LU()
 !
 	DO I=1,ND
-	  WRITE(101,'(2ES14.4)')R_GRID(I),V_GRID(I),VDOP_VEC(I)
+	  WRITE(101,'(I5,3X,3ES14.4)')I,R_GRID(I),V_GRID(I),VDOP_VEC(I)
 	END DO
 	WRITE(101,*)'P '
 	DO I=1,NP
-	  WRITE(101,'(2ES14.4)')P(I)
+	  WRITE(101,'(I5,2X,ES14.4)')I,P(I)
 	END DO
 !
 ! If we are defining a new grid, we need to deallocate variables defined
