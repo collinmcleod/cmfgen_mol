@@ -2307,14 +2307,26 @@
 	  CALL DP_CURVE(ND,XV,YV)
 !
 	ELSE IF(XOPT .EQ. 'YCOLD')THEN
-	  DO I=1,ND
-	    ZETA(I)=1.0D+10*MASS_DENSITY(I)*CLUMP_FAC(I)
-	  END DO
-	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
-	  DO I=1,ND
-	    YV(I)=DLOG10(TA(I))
-	  END DO
-	  YAXIS='m(gm cm\u-2\d)'
+	  CALL USR_OPTION(ELEC,'NA','F','Atom column density?')
+	  IF(ELEC)THEN
+	    DO I=1,ND
+	       ZETA(I)=1.0D+10*POP_ATOM(I)*CLUMP_FAC(I)
+	    END DO
+	    CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	    DO I=1,ND
+	      YV(I)=DLOG10(TA(I))
+	    END DO
+	    YAXIS='N(atoms cm\u-2\d)'
+	  ELSE
+	    DO I=1,ND
+	       ZETA(I)=1.0D+10*MASS_DENSITY(I)*CLUMP_FAC(I)
+	    END DO
+	    CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	    DO I=1,ND
+	      YV(I)=DLOG10(TA(I))
+	    END DO
+	    YAXIS='m(gm cm\u-2\d)'
+	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
 !
 ! Used to verify that model has a constant mass-loss rate. It can also be used to

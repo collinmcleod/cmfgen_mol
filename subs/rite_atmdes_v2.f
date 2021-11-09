@@ -10,6 +10,7 @@ C
 	1                      LUMOD,DESC)
 	IMPLICIT NONE
 C
+C Altered 13-Oct-2021 --- Changed format so masses > 100 can be written correctly.
 C Altered 29-May-1996 --- <> deleted from FORMAT 100.
 C Altered 22-Sep-1990 --- STRING installed, varaible format <> deleted for
 C                         CRAY compatibility.
@@ -47,7 +48,7 @@ C
 	END IF
 	AT_NO_SAVE=AT_NO_CARB
 C
-100	FORMAT(1X,A,T12,A4,:2(2X,I4):,4(4X,F4.1,1X),4X,I2,4X,I4)
+100	FORMAT(1X,A,T12,A4,:2(2X,I4):,4(3X,F5.1,1X),4X,I2,4X,I4)
 C
 	RETURN
 	END

@@ -362,6 +362,9 @@
 	ELSE IF(X(1:5) .EQ. 'XLOGR')THEN
 	  XV_SAV(1:ND)=LOG10(R/R(ND))
 	  XAXIS_SAV='Log R/R\d*\u)'
+	ELSE IF(X(1:3) .EQ. 'XAU')THEN
+	  XV_SAV(1:ND)=LOG10(R/1.4959787D+03)	!Recall R is in units of 10^10 cm
+	  XAXIS_SAV='Log R(AU)'
 	ELSE IF(X(1:5) .EQ. 'XLINR')THEN
 	  XV_SAV(1:ND)=R/R(ND)
 	  XAXIS_SAV='R/R\d*\u)'

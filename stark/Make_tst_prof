@@ -2,15 +2,12 @@
 
 include ../Makefile_definitions
 
-
-LN1=tools
 LN2=pgplt
 LN3=disp
 LN4=subs
 
 # Library where object files will/are stored
 
-FN1=$(LIB_DIR)lib$(LN1).a
 FN2=$(LIB_DIR)lib$(LN2).a
 FN3=$(LIB_DIR)lib$(LN3).a
 FN4=$(LIB_DIR)lib$(LN4).a
@@ -26,7 +23,7 @@ OBJ = prof_mod.o init_prof_module.o set_prof_v3.o \
 NEWF = strk_hei_ir.o strk_ds.o
 
 all : $(LIB) $(LIB2) tst_set_prof.exe
-	rm -f *.o
+	rm -f tst_set_prof.o
 	cp $(INSTALL_DIR)perm_mod_file  jnk.mod
 	mv -f *.mod $(MOD_DIR)
 
@@ -47,7 +44,7 @@ $(LIB2)(%.o) : %.f90
 	ar ruv $(LIB) $*.o
 
 tst_set_prof.exe : tst_set_prof.o  $(LIB) $(LIB2)
-	$(F90) tst_set_prof.o mon_interp_fast.o -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2) -l$(LN1) -l$(LN4) -l$(LN3)\
+	$(F90) tst_set_prof.o  -L$(LIB_DIR) -l$(LN4) -l$(LN3) -l$(LN2)  -l$(LN4) -l$(LN3)\
               $(LOCLIB) $(PGLIB) $(X11LIB) $(G2CLIB) \
               -o tst_set_prof.exe
                            

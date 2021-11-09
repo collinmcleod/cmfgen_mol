@@ -6,7 +6,7 @@
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
-! Altered 20-May-2010 - Extra clump options added (updated from OSIRS
+! Altered 20-May-2021 - Extra clump options added (updated from OSIRS
 !                          21-May-2021.
 ! Created 01-Oct-2018
 !
@@ -32,7 +32,7 @@
 	WRITE(LUER,'(A)')BLUE_PEN
 	WRITE(LUER,'(A)')'EXPO:   F=C1 + (1-C1-C3)EXP(-V/C2) + C3.EXP(-V/C4) (4 params)'
 	WRITE(LUER,'(A)')'EXPO:   F=C1 + (1-C1-C3)EXP(-A/C2) + C3.EXP(-A/C4), A=MAX[0,(V-C5)] C6 softens MAX function(6 params)'
-	WRITE(LUER,'(A)')'MEXP:   F=(C1 + (1-C1-C3)EXP(-V/C2))EXP(-R/R(1))'
+	WRITE(LUER,'(A)')'MEXP:   F=(C1 + (1-C1-C3)EXP(-V/C2))EXP(-R/R(1))/(1.0+C2*EXP(T1); T1=(1-MAX(1-C4*R(1)/R)**C5'
 	WRITE(LUER,'(A)')'REXP:   F=C1 + (1-C1)EXP(-V/C2)    + (1-C1)EXP((V-VINF)/C3)'
 	WRITE(LUER,'(A)')'POW:    F=C1 + (1-C1)(-V/VINF)**C2'
 	WRITE(LUER,'(A)')'RPOW:   F=1/[ (1/C1-1)*(-V/VINF)**C2 ]'
