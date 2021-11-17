@@ -16,8 +16,9 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
-! Altered: 6-Jul-2021: Small bug fixis (transferred from OSIRIS 21-Jul-20201).
-! Created 24-May-2020
+! Altered: 20-Sep-2021: Will skip over collisional and continuum terms if present (OSIRIS: 17-Nov-2021).
+! Altered:  6-Jul-2021: Small bug fixis (transferred from OSIRIS 21-Jul-20201)
+! Created: 24-May-2020
 !
 	INTEGER, PARAMETER :: NMAX=600000
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
@@ -191,11 +192,23 @@
 	WRITE(6,'(A)')' Reading data -- this may take a while'
 	WRITE(6,'(A)')DEF_PEN
 	RD_COUNT=0
+!
+! Skip over collisional and continuum terms if they are present.
+!
+	IF(FILENAME .EQ. 'TOTRATE')THEN
+	  DO WHILE(1 .EQ. 1)
+	    READ(LUIN,'(A)')STRING
+	    IF(INDEX(STRING,'(') .NE. 0)EXIT
+	  END DO
+	  BACKSPACE(LUIN)
+	END IF
+!
 	CALL TUNE(1,'READ')
 	DO ML=1,N_LINES
 	  STRING=' '
 	  DO WHILE(STRING .EQ. ' ' .OR. STRING(1:2) .EQ. '--')
 	    READ(LUIN,'(A)',END=5000)STRING
+	    IF(INDEX(STRING,'STEQ') .NE. 0)GOTO 5000
 	  END DO
 	  STRING=ADJUSTL(STRING)
 	  K=INDEX(STRING,'  ')
@@ -298,12 +311,12 @@
 ! Set the species, and reads in the SPECIES//'PRRR' file.
 !
 	  ELSE IF(UC(PLT_OPT(1:4)) .EQ. 'SPEC')THEN
-	    CALL GEN_IN(SPECIES,'Species that will be examined: e.g. C2, NIII')
-	    SPECIES=UC(SPECIES)
+	    CALL GEN_IN(SPECIES,'Species that will be examined: e.g. He2, C2, NIII (case sensitive')
 !
 ! Get number of super levels. This is need when we read in the the
 ! recombination and photoioizations rates for each super level.
 !
+	    WRITE(6,'(A)')'Opening MODEL_SPEC'
 	    FILENAME='MODEL_SPEC'
 	    OPEN(UNIT=LUIN,FILE=FILENAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	      IF(IOS .NE. 0)THEN
@@ -323,12 +336,14 @@
 	        GOTO 1000
 	      END IF
 	    CLOSE(UNIT=LUIN)
+	    WRITE(6,'(A)')'Read MODEL_SPEC'
 	    IF(ALLOCATED(PHOT_RATE))DEALLOCATE(PHOT_RATE,REC_RATE)
 	    ALLOCATE (PHOT_RATE(NLEV,ND),REC_RATE(NLEV,ND))
 !
 ! Read in the recombination and photoioizations rates for each super level.
 ! Note that ND is the second index.
-!
+
+	    WRITE(6,'(A)')'Opening PRRR file'
 	    FILENAME=TRIM(SPECIES)//'PRRR'
 	    OPEN(UNIT=LUIN,FILE=FILENAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	    IF(IOS .NE. 0)THEN
@@ -353,6 +368,7 @@
 	    END DO
 	    CLOSE(UNIT=LUIN)
 	    PR_SPECIES=SPECIES 
+	    WRITE(6,'(A)')'Read PRRR file'
 !
 	    DO_AUTO_RATES=.FALSE.
 	    CALL GEN_IN(DO_AUTO_RATES,'Read in autoioization rates?')
@@ -593,8 +609,8 @@
 	         END IF
 	      END DO
 	      WRITE(6,'(1X,A,T30,ES12.3)')'Maximum auto/anti autoionization rate',T1
+	      MAX_RATE=T1
 	    END IF
-	    MAX_RATE=T1
 !
 	    T1=REC_RATE(SL_INDX,DPTH_INDX)
 	    T1=MAX(T1,PHOT_RATE(SL_INDX,DPTH_INDX))
@@ -610,7 +626,6 @@
 	    END DO
 	    WRITE(6,'(1X,A,T30,ES12.3)')'Maximum line rate=',T1
 	    MAX_RATE=MAX(MAX_RATE,T1)
-
 !
 	    WRITE(6,*)' '
 	    WRITE(6,'(2X,A,I5)')'Depth index=',DPTH_INDX
@@ -720,8 +735,12 @@
 	    END IF
 	    WRITE(6,'(A)')' '
 	    T2=(SUM_TO-SUM_FROM)+(REC_RATE(SL_INDX,I)-PHOT_RATE(SL_INDX,I))+NET_AUTO
-	    WRITE(6,'(A,T35,A,ES14.4,F11.5)')' Net Rate','=',T2,T2/MAX_RATE
+	    WRITE(6,'(A,T35,A,ES14.4,F11.5)')' Net Rate (into if +ve)','=',T2,T2/MAX_RATE
 !
+	    WRITE(6,'(/,A)')' The last # is the fractional rate and should be small (i.e, < 0.1)'
+	    WRITE(6,'(A)')  ' If 0.1, for example, 10% of the rate into a level is missing'
+	    WRITE(6,'(A)')  ' This may be due to collision processes which can checked with DISPGEN'
+	    WRITE(6,'(A,/)')' Use COLR with the SL option'
 	    DEALLOCATE(INDX,WRK_VEC)
 !
 	  ELSE IF(UC(PLT_OPT(1:1)) .EQ. 'H')THEN

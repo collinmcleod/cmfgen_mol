@@ -20,6 +20,7 @@
 	1                           BA_COMPUTED,WR_BA_INV,WR_PRT_INV)
 	IMPLICIT NONE
 !
+! Altered 15-Nov-2021: Changed RUB to matrix to avoid scale/matrix conflicts in calls.
 ! Altered 28-Jan-2001: Based on CMF_BLKBAND_V2
 !                      BA_COMPUTED and WR_BA_INV included in call.
 !                      Routine will write out INVERSE of BA matrix if requested.
@@ -208,12 +209,13 @@
         REAL*8, ALLOCATABLE :: ORIG_POPS(:,:)
         REAL*8, ALLOCATABLE :: PREV_D_MAT(:,:)
         REAL*8, ALLOCATABLE :: D_MAT_STORE(:,:,:)
+        REAL*8, ALLOCATABLE :: RUB(:,:)	      	      !Not accessed when passed.
 !
         REAL*8 ROW_SF(N)
         REAL*8 COL_SF(N)
         REAL*8 ROW_CND,COL_CND,MAX_VAL
-        REAL*8 RUB	      !Not accessed when passed.
 	INTEGER IPIVOT(N)
+	INTEGER RUB_VEC(N)
 !
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL REPLACE_EQ(NION)
@@ -252,6 +254,7 @@
 	  USE_PASSED_REP=.TRUE.
           ALLOCATE (C_MAT(N,N),STAT=IOS)
           IF(IOS .EQ. 0)ALLOCATE (D_MAT(N,N),STAT=IOS)
+          IF(IOS .EQ. 0)ALLOCATE (RUB(N,N),STAT=IOS)
           IF(IOS .EQ. 0)ALLOCATE (ORIG_POPS(N,ND),STAT=IOS)
           IF(IOS .NE. 0)THEN
             WRITE(LUER,*)'Error in CMF_BLKBAND'
@@ -308,9 +311,7 @@
 !
 	  END DO
           FLAG=.TRUE.
-          DEALLOCATE (C_MAT)
-          DEALLOCATE (D_MAT)
-          DEALLOCATE (ORIG_POPS)
+          DEALLOCATE (C_MAT,D_MAT,ORIG_POPS,RUB)
 	  CALL WR2D_V2(STEQ_STORE,N,ND,'STEQ_ARRAY','*',L_TRUE,16)
 !
 	  RETURN
@@ -327,6 +328,7 @@
 	  LAST_MATRIX=.FALSE.
 	  USE_PASSED_REP=.FALSE.
           ALLOCATE (C_MAT(N,N),STAT=IOS)
+          ALLOCATE (RUB(N,N),STAT=IOS)
           IF(IOS .NE. 0)THEN
             WRITE(LUER,*)'Error in CMF_BLKBAND'
             WRITE(LUER,*)'Unable to allocate C_MAT etc'
@@ -394,7 +396,7 @@
 500	    CONTINUE
 	  END DO
           FLAG=.TRUE.
-          DEALLOCATE (C_MAT)
+          DEALLOCATE (C_MAT,RUB)
 	  CALL WR2D_V2(STEQ_STORE,N,ND,'STEQ_ARRAY','*',L_TRUE,16)
 	  RETURN
 	END IF
@@ -426,6 +428,7 @@
           ALLOCATE (B_MAT(N,N),STAT=IOS)
           IF(IOS .EQ. 0)ALLOCATE (C_MAT(N,N),STAT=IOS)
           IF(IOS .EQ. 0)ALLOCATE (D_MAT(N,N),STAT=IOS)
+          IF(IOS .EQ. 0)ALLOCATE (RUB(N,N),STAT=IOS)
           IF(IOS .EQ. 0)ALLOCATE (ORIG_POPS(N,ND),STAT=IOS)
           IF(IOS .NE. 0)THEN
             WRITE(LUER,*)'Error in CMF_BLKBAND'
@@ -504,7 +507,7 @@
 	  DO K=ND-1,1,-1
 !
 	    DEPTH_INDX=K
-	    CALL READ_BCD_MAT(RUB,RUB,D_MAT,RUB,RUB,RUB,
+	    CALL READ_BCD_MAT(RUB,RUB,D_MAT,RUB,RUB,RUB_VEC,
 	1          ORIG_POPS(:,K),REPLACE_EQ,ZERO_STEQ,N,NION,DEPTH_INDX,'D')
 	    CALL DGEMV(NO_TRANS,N,N,DP_NEG_ONE,D_MAT,N,STEQ(1,K+1),
 	1                 INT_ONE,DP_ONE,STEQ(1,K),INT_ONE)
@@ -527,10 +530,8 @@
 !
 	  FLAG=.TRUE.
 !
-	  DEALLOCATE (B_MAT)
-	  DEALLOCATE (C_MAT)
-	  DEALLOCATE (D_MAT)
-	  DEALLOCATE (ORIG_POPS)
+	  DEALLOCATE (B_MAT,C_MAT,D_MAT)
+	  DEALLOCATE (ORIG_POPS,RUB)
 	  CALL WR2D_V2(STEQ_STORE,N,ND,'STEQ_ARRAY','*',L_TRUE,16)
 !
 	  RETURN
@@ -546,6 +547,7 @@
 	ALLOCATE (B_MAT(N,N),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE (C_MAT(N,N),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE (D_MAT(N,N),STAT=IOS)
+        IF(IOS .EQ. 0)ALLOCATE (RUB(N,N),STAT=IOS)
         IF(IOS .EQ. 0)ALLOCATE (PREV_D_MAT(N,N),STAT=IOS)
         IF(IOS .NE. 0)THEN
           WRITE(LUER,*)'Error in CMF_BLKBAND'
@@ -684,7 +686,7 @@ C
 	    END IF
 !
 	    IF(WR_BA_INV .OR. WR_D_MAT)THEN
-	      CALL WRITE_BCD_MAT(RUB,RUB,D_MAT,RUB,RUB,RUB,
+	      CALL WRITE_BCD_MAT(RUB,RUB,D_MAT,RUB,RUB,RUB_VEC,
 	1            POPS(:,K),REPLACE_EQ,ZERO_STEQ,N,NION,DEPTH_INDX,'D')
 	    ELSE
 	      D_MAT_STORE(:,:,K)=D_MAT
@@ -710,7 +712,7 @@ C
 !
 	  DEPTH_INDX=K
 	  IF(WR_BA_INV .OR. WR_D_MAT)THEN
-	    CALL READ_BCD_MAT(RUB,RUB,D_MAT,RUB,RUB,RUB,
+	    CALL READ_BCD_MAT(RUB,RUB,D_MAT,RUB,RUB,RUB_VEC,
 	1         POPS(:,K),REPLACE_EQ,ZERO_STEQ,N,NION,DEPTH_INDX,'D')
 	  ELSE
 	    D_MAT=D_MAT_STORE(:,:,K)
@@ -728,10 +730,7 @@ C Successfull solution obtained.
 C
 	FLAG=.TRUE.
 !
-	DEALLOCATE (B_MAT)
-	DEALLOCATE (C_MAT)
-	DEALLOCATE (D_MAT)
-	DEALLOCATE (PREV_D_MAT)
+	DEALLOCATE (B_MAT,C_MAT,D_MAT,PREV_D_MAT,RUB)
 	IF(ALLOCATED(D_MAT_STORE))DEALLOCATE (D_MAT_STORE)
 C
 	RETURN

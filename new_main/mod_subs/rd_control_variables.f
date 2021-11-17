@@ -3,6 +3,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 15-Nov-2021 : Fixed read in calls for FIX_ALL_SPEC and BC_PAR1.
 ! Altered : 14-Jul-2019 : R_PNT_SRCE, TEFF_PNT_SRCE, NC_PNT_SRCE, LOGICAL PNT_SRCE_MOD, USE_ELEC_HEAT_BAL (from osiris)
 !                            Added to ibis 14-Aug-2019
 ! Altered : 26-Apr-2019 : Added        J_CHK_OPTION (CHK_J)     - Done earlier on OSIRIS.
@@ -287,6 +288,7 @@ C
 	    NT_EMIN=1.0D0               !ev
 	    NON_THERMAL_IT_CNTRL=1
 	    NT_SOURCE_TYPE='BELL_SHAPE'
+	    READ_NON_THERM_SPEC=.FALSE.
 	    IF(TREAT_NON_THERMAL_ELECTRONS)THEN
 	      CALL RD_STORE_INT(NT_NKT,'NT_NKT',L_FALSE,'Number of energy bins')
 	      CALL RD_STORE_DBLE(NT_EMIN,'NT_EMIN',L_FALSE,'Minimum energy of non-thermal electrons in eV')
@@ -302,6 +304,8 @@ C
 	      CALL RD_STORE_DBLE(NT_OMIT_ION_SCALE,'NT_OMIT_ION_SCALE',L_FALSE,
 	1               'Excludes ions with population NT_OMIT_SCALE_FRAC*(species of ion pop)')
 	      CALL RD_STORE_CHAR(NT_SOURCE_TYPE,'NT_SOURCE',L_FALSE,'Non-thermal source type - INJECT_DIRAC, CONSTANT or BELL_SHAPE')
+	      CALL RD_STORE_LOG(READ_NON_THERM_SPEC,'RD_NT_SPEC',L_FALSE,
+	1               'Read non-thermal electron spectrum?')
 	    ENDIF
 !
 	    ADD_DEC_NRG_SLOWLY=.FALSE.
@@ -504,7 +508,7 @@ C
 	  OUT_BC_TYPE=1 
 	  OUT_BC_PARAM_ONE=0.299794D0
 	  CALL RD_STORE_INT(RD_OUT_BC_TYPE,'OBC_TYPE',L_FALSE,'Outer boundary condition type: 1=def=old')
-	  CALL RD_STORE_INT(OUT_BC_PARAM_ONE,'BC_PAR1',L_FALSE,'Frequency to switch to new BC')
+	  CALL RD_STORE_DBLE(OUT_BC_PARAM_ONE,'BC_PAR1',L_FALSE,'Frequency to switch to new BC')
 	  REXT_FAC=0.0D0
 	  CALL RD_STORE_DBLE(REXT_FAC,'REXT_FAC',L_FALSE,'Factor ot extend R grid by for thick continuum')
 !
@@ -846,7 +850,7 @@ C
 ! NB: None of  the keywords need be present.
 !
 	  FIX_ALL_SPECIES=.FALSE.
-	  CALL RD_STORE_INT(FIX_ALL_SPECIES,'FIX_ALL_SPEC',L_FALSE,'Fix all species?')
+	  CALL RD_STORE_LOG(FIX_ALL_SPECIES,'FIX_ALL_SPEC',L_FALSE,'Fix all species?')
 !
 ! Since we don't use FIX_XzV very much, these have been changed to a hidden variable.
 !

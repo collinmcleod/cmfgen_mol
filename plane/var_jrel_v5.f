@@ -42,6 +42,7 @@
 	USE MOD_TRAP_DERIVATIVES
 	IMPLICIT NONE
 !
+! Altered: 21-Sep-2021 : Fixed bug with J_CHK_OPTION='FORM_VAL' option.
 ! Altered: 02-May-2019 : FIxed problem whith H check.
 ! Altered: 29-Apr-2019 : Changed to V5. XM_CHK_OPTION and J_CHK_OPTION added to call.
 ! Altered: 17-Oct-2016 : Changed to V4: CHECK_H_ON J added to call.
@@ -519,7 +520,12 @@
 	    END IF
 	  END DO
 	ELSE IF(J_CHK_OPTION .EQ. 'FORM_VAL')THEN
-	  XM(I)=JNU_STORE(I)
+	  DO I=1,ND
+	    IF(XM(I) .LT. 0.0D0)THEN
+	      XM(I)=JNU_STORE(I)
+	      JERR(I)=.TRUE.
+	    END IF
+	  END DO
 	ELSE IF(J_CHK_OPTION .EQ. 'NONE')THEN
 	ELSE
           WRITE(LUER,*)'Error - J_CHK_OPTION not recognized in MOM_JREL_V9'

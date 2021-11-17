@@ -40,7 +40,7 @@
 	WRITE(6,'(A)')'    MOD_B	Switch to model B as the default. A data is not destroyed.'
 !
 	WRITE(6,'(A)')' '
-	WRITE(6,'(3A)'),RED_PEN,'Output',DEF_PEN
+	WRITE(6,'(3A)')RED_PEN,'Output',DEF_PEN
 	WRITE(6,'(A)')'   EXTJ          Extends J (from A model) in R, creating a new data file J_DATA'
 	WRITE(6,'(A)')'                    and its corresponding file J_DATA_INFO. These can be used to'
 	WRITE(6,'(A)')'                    help facilitate convergence when extending model to much'

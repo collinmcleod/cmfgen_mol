@@ -6,6 +6,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 15-Nov-2021 : Bug fix -- STRETCH_POW was being read in as character.
 ! Altered 12-Jul-2013 : Modified so that grid size changes more uniformly near FG_MAX
 !                          when using the refine option. Also updated output to LOG file.
 !                          (most changes done 09-Jul or earlier). 
@@ -89,7 +90,7 @@
 	I=10; CALL RD_STORE_NCHAR(GRID_TYPE,'GRID_TYPE',I,L_TRUE,'Regridding method: MODUN, UNIFORM, FIX_NX, REFINE')
 	IF(GRID_TYPE .EQ. 'MODUN')THEN
 	  STRETCH_POW=1.5D0
-	  CALL RD_STORE_NCHAR(STRETCH_POW,'STRETCH',I,L_FALSE,'Exponent to stretch optical depth scale')
+	  CALL RD_STORE_DBLE(STRETCH_POW,'STRETCH',L_FALSE,'Exponent to stretch optical depth scale')
 	ELSE IF(GRID_TYPE .EQ. 'VTAU')THEN
 	  STRETCH_POW=1.0D0
 	ELSE IF(GRID_TYPE .EQ. 'UNIFORM')THEN
@@ -394,7 +395,7 @@
 	    WRITE(LU,'(A)')'!'
 	    WRITE(LU,'(A,A,3(7X,A))')'! ','  J',' TAU(1)','dLOGTAU','OBND(1)'
 	    DO J=1,NUM_OBND_PARAMS
-	      WRITE(LU,'(A,I3,3ES14.4)'),'! ',J,TAU(1),dLOG_TAU,OBND_PARAMS(J)
+	      WRITE(LU,'(A,I3,3ES14.4)')'! ',J,TAU(1),dLOG_TAU,OBND_PARAMS(J)
 	      TAU(1+J)=TAU(1)+dLOG_TAU/OBND_PARAMS(J)
 	    END DO
 	    WRITE(LU,'(A)')'!'

@@ -333,7 +333,13 @@
 !
 	WRITE(6,'(/,A)')' Updating hydrostatic structure of the model'
 	FLUSH(UNIT=6)
+!
 	IF(HYDRO_OPT .EQ. 'FIXED_R_REF')THEN
+!
+! This option keeps the radius, at a pre-specified TAU, fixed.
+! To preserve the specifed effective temperature, the luminosity is
+! updated.
+!
 	  WRITE(6,'(A)')' Using FIXED_R_REF option in DO_CMF_HYDRO_V2'
 	  CHI_ROSS(1:MOD_ND)=OLD_CLUMP_FAC(1:MOD_ND)*OLD_ROSS_MEAN(1:MOD_ND)
 	  I=7			!Use CHI(1) and CHI(I) to computed exponent.
@@ -351,6 +357,31 @@
 	  CALL UPDATE_KEYWORD(MOD_LUM,'[LSTAR]','VADAT',L_TRUE,L_TRUE,LUIN)
 	  CALL UPDATE_KEYWORD('DEFAULT','[HYDRO_OPT]','HYDRO_DEFAULTS',L_TRUE,L_TRUE,LUIN)
 	  WRITE(6,'(A)')' DO_CMF_HYDRO_V2 has adjusted LSTAR in VADAT'
+!
+! This option is useful for WR models where the key variable controlling the observed 
+! spectrum is the luminosity.
+!
+	ELSE IF(HYDRO_OPT .EQ. 'FIXED_LUM')THEN
+	  WRITE(6,'(A)')' Using FIXED_LUM option in DO_CMF_HYDRO_V2'
+	  CHI_ROSS(1:MOD_ND)=OLD_CLUMP_FAC(1:MOD_ND)*OLD_ROSS_MEAN(1:MOD_ND)
+	  I=7			!Use CHI(1) and CHI(I) to computed exponent.
+	  CALL TORSCL_V3(TA,CHI_ROSS,OLD_R,TB,TC,MOD_ND,'LOGMON','PCOMP',I,L_FALSE)
+	  DO I=1,MOD_ND
+	    IF(TA(I) .GT. TAU_REF)THEN
+	      T1=(TAU_REF-TA(I-1))/(TA(I)-TA(I-1))
+	      REFERENCE_RADIUS=T1*OLD_R(I)+(1.0D0-T1)*OLD_R(I-1)
+	      EXIT
+	    END IF
+	  END DO
+!
+! Compute the revised effective temperature.
+!
+	  T1=4.0D+36*PI*STEFAN_BC*REFERENCE_RADIUS*REFERENCE_RADIUS
+	  TEFF=(MOD_LUM*LUM_SUN()/T1)**0.25D0
+	  CALL UPDATE_KEYWORD(TEFF,'[TEFF]','VADAT',L_TRUE,L_TRUE,LUIN)
+	  WRITE(6,'(A,ES14.4)')' DO_CMF_HYDRO_V2 has adjusted TEFF in VADAT: Teff=',TEFF
+!
+! This option (useful for O stars) attempts to preserve the V =-band flux.
 !
 	ELSE IF(HYDRO_OPT .EQ. 'FIXED_V_FLUX')THEN
 	  WRITE(6,'(A)')' Using FIXED_V_FLUX option in DO_CMF_HYDRO_V2'
@@ -375,8 +406,13 @@
 	  WRITE(6,'(A)')' DO_CMF_HYDRO_V2 has adjusted LSTAR in VADAT'
 !
 	ELSE IF(HYDRO_OPT .EQ. 'DEFAULT')THEN
+	  IF( ABS(TAU_REF-2.0D0/3.0D0) .GT. 0.001D0)THEN
+	    WRITE(6,*)'Error -- for the DEFAULT HYDRO_OPTION, TAU_REF must be 2/3'
+	    STOP
+	  END IF
 	  WRITE(6,'(A)')' Reference radius: based on effective temperature and luminosity of star'
 	  REFERENCE_RADIUS=1.0D-18*SQRT(MOD_LUM*LUM_SUN()/TEFF**4/STEFAN_BC/4.0D0/PI)
+!
 	ELSE
 	  WRITE(6,'(A)')' Error in do_cmf_hydro_v3.f: invlaid HYDRO_OPT option'
 	  WRITE(6,'(2A)')' HYDRO_OPT=',TRIM(HYDRO_OPT)
@@ -437,7 +473,7 @@
 	1        OLD_T(I),OLD_KAP_ROSS(I),OLD_ROSS_MEAN(I)/OLD_ESEC(I),OLD_FLUX_MEAN(I)/OLD_ESEC(I)
 	  END DO
 !
-	  WRITE(LU,'(/,A,/,A)')FORMFEED,' Old model mass absorption coeficients'
+	  WRITE(LU,'(/,A,/,A)')FORMFEED,' Old model mass absorption coefficients'
 	  WRITE(LU,'(A,3(8X,A))')' Index',' Kross',' Kflux','  Kes'
 	  DO I=1,MOD_ND
 	    WRITE(LU,'(I6,3ES14.5)')I,OLD_KAP_ROSS(I),OLD_KAP_FLUX(I),OLD_KAP_ESEC(I)
@@ -502,7 +538,7 @@
 	  WRITE(LUV,'(A,ES14.6)')'         Mean atomic mass is:',MU_ATOM
 	  WRITE(LUV,'(A,ES14.6)')'             Atom density is:',NI_ZERO
 	  WRITE(LUV,'(A,ES14.6)')'New effective temperature is:',TEFF
-	  WRITE(LUV,'(A,ES14.6)')'      Eddington parameter is:',GAM_EDD
+	  WRITE(LUV,'(A,ES14.6,A)')'      Eddington parameter is:',GAM_EDD,'  (assuming Ne/NA=1)'
 	  WRITE(LUV,'(A,ES14.6)')'               MAX(Ne/Na) is:',MAX_ED_ON_NA
 	END IF
 !

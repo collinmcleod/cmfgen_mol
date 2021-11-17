@@ -353,6 +353,7 @@ C
 	INTEGER N,NMAX,VAL(NMAX)
 	CHARACTER STR*(*)
 C
+	INTEGER I1,I2,I3
 	INTEGER L,IOS,LEN_FORM,LEN_TOT
 	CHARACTER STRING*80
 	CHARACTER FORM*20,TOT_FORM*80
@@ -393,51 +394,75 @@ C
 	  N=NMAX
 	  RETURN		!Take default values
 	END IF
+!
+	IF(INDEX(STRING,':') .NE. 0)THEN
+	  L=INDEX(STRING,':')
+	  K=INDEX(STRING(L+1:),':')+L
+	  READ(STRING(1:L-1),*)I1
+	  IF(K .EQ. L)THEN
+	    READ(STRING(L+1:),*)I2
+	    I3=1
+	  ELSE
+	    READ(STRING(L+1:K-1),*)I2
+	    READ(STRING(K+1:),*)I3
+	  END IF
+	  WRITE(6,*)I1,I2,I3
+	  N=0
+	  DO I=1,NMAX
+	    VAL(I)=I1+(I-1)*I3
+	    N=N+1
+	    IF(VAL(I) .GE. I2)EXIT
+	  END DO
+	  RETURN
+!
+	ELSE
 C
 C Now read in up to NMAX values. The actual number of values returned is
 C returned in N.
 C
-	DO I=1,NMAX
+	  DO I=1,NMAX
 C
 C Strip leading blanks and commas.
 C
-	  DO WHILE(STRING(1:1) .EQ. ' ' .OR. STRING(1:1) .EQ. ',')
-	    STRING(1:)=STRING(2:)
-	    L=L-1
-	    IF(L .EQ. 0)THEN
-	      WRITE(T_OUT,*)'Error reading multiple INT values - try again'
-	      WRITE(T_OUT,*)'Currently reading variable',I
-	      GOTO 900
-	    END IF
-	  END DO
+	    DO WHILE(STRING(1:1) .EQ. ' ' .OR. STRING(1:1) .EQ. ',')
+	      STRING(1:)=STRING(2:)
+	      L=L-1
+	      IF(L .EQ. 0)THEN
+	        WRITE(T_OUT,*)'Error reading multiple INT values - try again'
+	        WRITE(T_OUT,*)'Currently reading variable',I
+	        GOTO 900
+	      END IF
+	    END DO
 C
 C Read next value
 C
-	  READ(STRING(1:L),*,IOSTAT=IOS)VAL(I)
-	  IF(IOS .NE. 0)THEN
-	     WRITE(T_OUT,*)'Error reading multiple INT values - try again'
-	     WRITE(T_OUT,*)'Currently reading variable',I
-	     GOTO 900
-	  END IF
+	    READ(STRING(1:L),*,IOSTAT=IOS)VAL(I)
+	    IF(IOS .NE. 0)THEN
+	       WRITE(T_OUT,*)'Error reading multiple INT values - try again'
+	       WRITE(T_OUT,*)'Currently reading variable',I
+	       GOTO 900
+	    END IF
 C
 C Strip the value just read from the string.
 C
-	  DO WHILE(STRING(1:1) .NE. ' ' .AND. STRING(1:1) .NE. ',')
-	    STRING(1:)=STRING(2:)
-	    L=L-1
+	    DO WHILE(STRING(1:1) .NE. ' ' .AND. STRING(1:1) .NE. ',')
+	      STRING(1:)=STRING(2:)
+	        L=L-1
+	    END DO
+	    IF(L .LE. 0)THEN
+	      N=I
+	      RETURN
+	    END IF
 	  END DO
-	  IF(L .LE. 0)THEN
-	    N=I
-	    RETURN
-	  END IF
-	END DO
-	READ(T_IN,'(A)')STRING
-	L=LEN_TRIM(STRING)
-	IF(L .EQ. 0)RETURN		!Take default value
-	READ(STRING(1:L),*,IOSTAT=IOS)(VAL(I),I=1,N)
-	IF(IOS .EQ. 0)RETURN		!Succesful read
-	WRITE(T_OUT,*)'Error reading integer value - try again'
-	GOTO 900
+	  READ(T_IN,'(A)')STRING
+	  L=LEN_TRIM(STRING)
+	  IF(L .EQ. 0)RETURN		!Take default value
+	  READ(STRING(1:L),*,IOSTAT=IOS)(VAL(I),I=1,N)
+	  IF(IOS .EQ. 0)RETURN		!Succesful read
+	  WRITE(T_OUT,*)'Error reading integer value - try again'
+	  GOTO 900
+	END IF
+!
 	END SUBROUTINE GEN_IN_MULT_INT
 C
 	END MODULE GEN_IN_INTERFACE

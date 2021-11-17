@@ -4,14 +4,17 @@
 ! multiple times. Options are avilable to add new nodes, replace nodes
 ! or delete nodes.
 !
-! On the first call, the memory associated with IP need not be nallocated.
+! On the first call, the memory associated with IP need not be allocated.
 !
-! This routine can also be used to update corrupted pixels.
+! You can fit monotonic cubic splines using the DC option, and reading
+! the data froma file.
 !
 	SUBROUTINE PG_MOD_CONT_NODES(IP)
 	USE MOD_COLOR_PEN_DEF
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
+!
+! Altered: 3-Oct-2021
 !
 	INTEGER IP           !Address of vector as in CD(IP)%.. (MOD_CURVE_DATA)
 !
@@ -22,7 +25,9 @@
 	REAL*4, ALLOCATABLE :: YVEC(:)
 !
 	REAL*4 XVAL,YVAL,SYMB_EXP_FAC
+	REAL*4 X1,X2,Y1,Y2
 	REAL*4 T1
+	INTEGER LU
 	INTEGER I,J
 	INTEGER ND		!Curren number of points in continuum vector
 	INTEGER NX		!Mximum number of points in continuum vector
@@ -40,8 +45,8 @@
 	NX=NPTS(IP)+100
 	ALLOCATE (XVEC(NX),YVEC(NX),TMP_XVEC(NX))
 	XVEC=0; YVEC=0
-	IF(ND .NE. 0)XVEC=CD(IP)%XVEC(1:ND)
-	IF(ND .NE. 0)YVEC=CD(IP)%DATA(1:ND)
+	IF(ND .NE. 0)XVEC(1:ND)=CD(IP)%XVEC(1:ND)
+	IF(ND .NE. 0)YVEC(1:ND)=CD(IP)%DATA(1:ND)
 !
 	WRITE(6,'(A)')BLUE_PEN
 	WRITE(6,'(A)')' '
@@ -54,6 +59,8 @@
 	WRITE(6,'(A)')DEF_PEN
 !
 	XVAL=5.0; CALL PGSCH(XVAL)
+	CALL PGQWIN(X1,X2,Y1,Y2)
+	XVAL=0.5D0*(X1+X2); YVAL=0.5D0*(Y1+Y2)
 	DO WHILE(1 .EQ. 1)				!Multiple cursor entries
 	  CURSERR = PGCURS(XVAL,YVAL,CURSVAL)
 	  WRITE(6,*)'Cursor values are:',XVAL,YVAL
@@ -65,7 +72,6 @@
 	    I=MINLOC(TMP_XVEC(1:ND),IONE)
 	    YVEC(I)=YVAL
 	    J=1; CALL PGSCI(J)
-!	    SYMB_EXP_FAC=5.0; CALL PGSCH(SYMB_EXP_FAC)
 	    CALL PGPT(IONE,XVAL,YVAL,IONE)
 	    WRITE(6,*)'Replaced X,Y for X=',XVEC(I)
 !
@@ -91,10 +97,8 @@
 	      XVEC(1)=XVAL
 	      YVEC(1)=YVAL
 	    ELSE IF(XVAL .LT. XVEC(1))THEN
-	      DO I=1,ND
-	        XVEC(I+1)=XVEC(I-1)
-	        YVEC(I+1)=YVEC(I-1)
-	      END DO
+	      XVEC(2:ND+1)=XVEC(1:ND)
+	      YVEC(2:ND+1)=YVEC(1:ND)
 	      XVEC(1)=XVAL;  YVEC(1)=YVAL
 	      ND=ND+1
 	    ELSE IF(XVAL .GT. XVEC(ND))THEN
@@ -122,15 +126,26 @@
 	  END IF
 	END DO
 !
+	CALL GET_LU(LU,'In pg_mod_cont_nodes')
+	OPEN(UNIT=LU,FILE='MOD_CONT_DEFS_SCRATCH',STATUS='UNKNOWN',ACTION='WRITE',ACCESS='APPEND')
+	  WRITE(LU,'(A)')' '
+	  WRITE(LU,'(I3,T40,A)')ND,'!Number of data points'
+	  WRITE(LU,'(8X,A1,16X,A1,T40,A)')'X','Y','!Data type'
+	  DO I=1,ND
+	    WRITE(LU,'(2ES16.7)')XVEC(I),YVEC(I)
+	  END DO
+	CLOSE(LU)
+	WRITE(6,'(/,A,/)')'All the data has beend appended to MOD_CONT_DEFS_SCRATCH'
+!
 	IF(ND .NE. NPTS(IP))THEN
 	  IF(ALLOCATED(CD(IP)%XVEC))DEALLOCATE (CD(IP)%XVEC,CD(IP)%DATA)
 	  ALLOCATE (CD(IP)%XVEC(ND),CD(IP)%DATA(ND))
-	  CD(IP)%XVEC(1:ND)=XVEC(1:ND)
-	  CD(IP)%DATA(1:ND)=YVEC(1:ND)
-	  NPTS(IP)=ND
-	  ERR(IP)=.FALSE.
 	END IF
+	CD(IP)%XVEC(1:ND)=XVEC(1:ND)
+	CD(IP)%DATA(1:ND)=YVEC(1:ND)
+	NPTS(IP)=ND
+	ERR(IP)=.FALSE.
 	DEALLOCATE (XVEC,YVEC,TMP_XVEC)
-	
+!	
 	RETURN
 	END

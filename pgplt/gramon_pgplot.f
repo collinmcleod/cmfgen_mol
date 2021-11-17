@@ -166,6 +166,8 @@
 	LOGICAL HARD,TITONRHS,FIRST,FSTOPEN,DASH,MARK
 	LOGICAL FILE_IS_OPEN
 	LOGICAL INITIALIZE_ON_EXIT
+	LOGICAL RESET_CURVE_LAB
+	LOGICAL ADD_COMMA
 	LOGICAL, SAVE :: REVERSE_PLOTTING_ORDER=.FALSE.
 	LOGICAL REVERSE
 !
@@ -183,7 +185,7 @@
 	CHARACTER*1 CURSVAL
 	LOGICAL CONTINUUM_DEFINED
 	CHARACTER(LEN=10) DC_CURVE_OPTION
-	CHARACTER(LEN=10) DC_INPUT_OPTION
+	CHARACTER(LEN=80) DC_INPUT_OPTION
 !
 ! Functions
 !
@@ -199,7 +201,7 @@
 	REAL*8, ALLOCATABLE :: WRK1(:)
 	REAL*8, ALLOCATABLE :: WRK2(:)
 !
-	REAL*4,    PARAMETER :: RONE=1.0
+	REAL*4,  PARAMETER :: RONE=1.0
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2
@@ -371,25 +373,25 @@
 	  EW_CUT=1.0D0
 	  IP_CONT=0
 	END IF
-	IF(N_TIT_SET .EQ. 0)TITLE(1:N_TITLE)=' '
 	CALL GEN_ASCI_OPEN(LU_NORM,'NORM_FACTORS','UNKNOWN','APPEND',' ',IZERO,IOS)
 !
 	LOG_AXIS=' '
 	XLABEL=XLAB
 	YLABEL=YLAB
 	YLABEL_R_AX=' '
-	IF(N_TIT_SET .EQ. 0)THEN
-          TITLE(1)=TITL
-	ELSE IF(TITL .NE. ' ')THEN
-	  DO I=1,N_TIT_SET
-	    TITLE(I+1)=TITLE(I)
-	  END DO
-	  TITLE(1)=TITL
+	IF(N_HEADER.EQ. 0)THEN
+          IF(TITL .NE. ' ')THEN
+	    TITLE(1)=TITL
+	    N_HEADER=1
+	  END IF
 	END IF
+	N_TIT_SET=N_HEADER
 	STR=.FALSE.
 	VEC=.FALSE.
 	NORMAL_R_Y_AXIS=.TRUE.
 	INITIALIZE_ON_EXIT=.TRUE.
+	RESET_CURVE_LAB=.TRUE.
+	ADD_COMMA=.TRUE.
 	DO I=1,MAXSTR
 	  FLAGSTR(I)=.FALSE.
 	  FLAGLINE(I)=.FALSE.
@@ -499,7 +501,7 @@
 	  CALL PGASK(.FALSE.)                      !TURNS OFF PAGE PROMPT
 	  CALL PGVSTD
 	  CALL PGENV(XPAR(1),XPAR(2),YPAR(1),YPAR(2),IZERO,IZERO)
-	  CALL PGQVP(0.,MARGINX(1),MARGINX(2),MARGINY(1),MARGINY(2))
+	  CALL PGQVP(IZERO,MARGINX(1),MARGINX(2),MARGINY(1),MARGINY(2))
 	  IF (MARGINX(1) .LT. (.9)) MARGINX(1)=MARGINX(1)+.05
 !
 ! Increase default border size.
@@ -545,11 +547,12 @@
 	  WRITE(T_OUT,*)'Z   - Hardcopy (ZN=Asks for new hard device)'
           WRITE(T_OUT,*)'LP  - Allow a long hard copy postscript plot to be created (with CPS)'
 	  WRITE(T_OUT,*)' '
-          WRITE(T_OUT,*)'A   - Define Axis Parameters'
-          WRITE(T_OUT,*)'2A  - Define labeling of right-hand axis'
-          WRITE(T_OUT,*)'F   - Change default axis parameters'
-          WRITE(T_OUT,*)'N   - Define aspect ratio, plot margins, character height etc'
-	  WRITE(T_OUT,*)'L   - Modify Axis Labels and Titles'
+          WRITE(T_OUT,*)'A    - Define Axis Parameters'
+          WRITE(T_OUT,*)'2A   - Define labeling of right-hand axis'
+          WRITE(T_OUT,*)'F    - Change default axis parameters'
+          WRITE(T_OUT,*)'N    - Define aspect ratio, plot margins, character height etc'
+	  WRITE(T_OUT,*)'L    - Modify Axis Labels and Titles'
+	  WRITE(T_OUT,*)'EDCL - Edit curve IDs/labels'
 	  WRITE(T_OUT,*)' '
  	  WRITE(T_OUT,*)'D   - Switch dashed lines on/off'
  	  WRITE(T_OUT,*)'DE  - Edit dashed lines one by one'
@@ -643,6 +646,7 @@
 !
 	ELSE IF(ANS .EQ. 'E')THEN
 	  IF(INITIALIZE_ON_EXIT)THEN
+	    N_TIT_SET=0
 	    IF(IP_CONT .NE. 0)THEN
 	      WRITE(6,*)'Have you saved you defined continuum values'
 	      QUERYFLAG=.FALSE.
@@ -660,6 +664,8 @@
 	      NPTS(IP)=0
 	    END DO
 	    NPLTS=0
+	    N_TIT_SET=0
+	    TITLE=' '
 	  END IF
 	  CLOSE(LU_NORM)
           IF(STR .OR. VEC)THEN
@@ -926,16 +932,23 @@ C
 	  CALL NEW_GEN_IN(YLABEL_R_AX,'RHS AXIS LABEL')
 C
 	  GOTO 1000
-
+!
+! We do not edit CURVE labs here -- done with EDCL
+!
 	ELSE IF(ANS .EQ. 'L')THEN
 	  CALL NEW_GEN_IN(XLABEL,'XLAB')
 	  CALL NEW_GEN_IN(YLABEL,'YLAB')
 	  DO J=1,N_TITLE
+	    IF(J .GT. N_HEADER)THEN
+	      TITLE(J+1:N_TITLE)=TITLE(J:N_TITLE-1)
+	      TITLE(J)=' '
+	    END IF
 	    CALL NEW_GEN_IN(TITLE(J),'TITLE')
 	    IF(TITLE(J) .EQ. ' ')THEN
 	      TITLE(J+1:N_TITLE)=' '
 	      EXIT
 	    END IF
+	    N_HEADER=J
 	  END DO
 	  CALL NEW_GEN_IN(TITONRHS,'TITONRHS')
 	  GOTO 1000
@@ -953,7 +966,7 @@ C
 	  END DO
 	  OPEN(UNIT=10,FILE=TRIM(TITLE_FILENAME),STATUS='UNKNOWN',IOSTAT=IOS)
 	  IF(IOS .EQ .0)THEN
-	    DO J=1,N_TITLE
+	    DO J=1,N_HEADER                  !TITLE
 	      IF(TITLE(J) .EQ. ' ')EXIT
 	      WRITE(10,'(A)')TRIM(TITLE(J))
 	    END DO
@@ -968,6 +981,19 @@ C
 	  CALL GET_TITLES(TITLE_FILENAME,TITLE,N_TITLE,IOS)
 	  IF(IOS .EQ. 0)CALL NEW_GEN_IN(TITONRHS,'TITONRHS')
 	  GOTO 1000
+!
+! Edit curve labels
+!
+	ELSE IF(ANS .EQ. 'EDCL')THEN
+	  CALL NEW_GEN_IN(RESET_CURVE_LAB,'RES_CL')
+	  CALL NEW_GEN_IN(ADD_COMMA,'ADD_COMMA')
+	  DO IP=1,NPLTS
+	    WRITE(TMP_STR,'(A,I2)')'IP=',IP
+	    CALL NEW_GEN_IN(CD(IP)%CURVE_ID,TMP_STR)
+	    IF(CD(IP)%CURVE_ID .EQ. '""')CD(IP)%CURVE_ID=' '
+	  END DO
+	  GOTO 1000
+!
 !
 ! Switch to prevent inialization of data curves on exit from routine.
 ! By default, the plot count is set to zero on exit, and the data is lost on
@@ -1183,7 +1209,7 @@ C
 	    DO_ERROR=.TRUE.
 	  END IF
 	  GOTO 1000
-C
+!
 	ELSE IF(ANS .EQ. 'RDXL')THEN
 	  CALL NEW_GEN_IN(XLAB_FILE,'File with X abscissa values')
 	  GOTO 1000
@@ -1507,20 +1533,20 @@ C
 	      END IF
 	      IF( (ID_WAVE(J+1)-XPAR(1))*(XPAR(2)-ID_WAVE(J+1)) .GT. 0 .AND.
 	1                   ABS(TAU(J+1)) .GT. TAU_CUT)THEN
-	         J=J+1
-	         N_LINE_IDS=J
+	        J=J+1
+	        N_LINE_IDS=J
+	        IF(LINE_ID(J)(2:2) .EQ. 'k')LINE_ID(J)(2:2)='i'
+	        IF(LINE_ID(J)(2:2) .EQ. '2')LINE_ID(J)(2:)='II'//LINE_ID(J)(3:)
+	        IF(LINE_ID(J)(3:3) .EQ. '2')LINE_ID(J)(3:)='II'//LINE_ID(J)(4:)
+	        IF(LINE_ID(J)(2:5) .EQ. 'XSIX')LINE_ID(J)(2:)='XVI'//LINE_ID(J)(6:)
+	        IF(LINE_ID(J)(2:5) .EQ. 'XSEV')LINE_ID(J)(2:)='XVII'//LINE_ID(J)(6:)
+	        IF(LINE_ID(J)(3:6) .EQ. 'XSIX')LINE_ID(J)(3:)='XVI'//LINE_ID(J)(7:)
+	        IF(LINE_ID(J)(3:6) .EQ. 'XSEV')LINE_ID(J)(3:)='XVII'//LINE_ID(J)(7:)
+	        IF(LINE_ID(J)(2:4) .EQ. 'SIX')LINE_ID(J)(2:)='VI'//LINE_ID(J)(5:)
+	        IF(LINE_ID(J)(2:4) .EQ. 'SEV')LINE_ID(J)(2:)='VII'//LINE_ID(J)(5:)
+	        IF(LINE_ID(J)(3:5) .EQ. 'SIX')LINE_ID(J)(3:)='VI'//LINE_ID(J)(6:)
+	        IF(LINE_ID(J)(3:5) .EQ. 'SEV')LINE_ID(J)(3:)='VII'//LINE_ID(J)(6:)
 	      END IF
-	      IF(LINE_ID(J)(2:2) .EQ. 'k')LINE_ID(J)(2:2)='i'
-	      IF(LINE_ID(J)(2:2) .EQ. '2')LINE_ID(J)(2:)='II'//LINE_ID(J)(3:)
-	      IF(LINE_ID(J)(3:3) .EQ. '2')LINE_ID(J)(3:)='II'//LINE_ID(J)(4:)
-	      IF(LINE_ID(J)(2:5) .EQ. 'XSIX')LINE_ID(J)(2:)='XVI'//LINE_ID(J)(6:)
-	      IF(LINE_ID(J)(2:5) .EQ. 'XSEV')LINE_ID(J)(2:)='XVII'//LINE_ID(J)(6:)
-	      IF(LINE_ID(J)(3:6) .EQ. 'XSIX')LINE_ID(J)(3:)='XVI'//LINE_ID(J)(7:)
-	      IF(LINE_ID(J)(3:6) .EQ. 'XSEV')LINE_ID(J)(3:)='XVII'//LINE_ID(J)(7:)
-	      IF(LINE_ID(J)(2:4) .EQ. 'SIX')LINE_ID(J)(2:)='VI'//LINE_ID(J)(5:)
-	      IF(LINE_ID(J)(2:4) .EQ. 'SEV')LINE_ID(J)(2:)='VII'//LINE_ID(J)(5:)
-	      IF(LINE_ID(J)(3:5) .EQ. 'SIX')LINE_ID(J)(3:)='VI'//LINE_ID(J)(6:)
-	      IF(LINE_ID(J)(3:5) .EQ. 'SEV')LINE_ID(J)(3:)='VII'//LINE_ID(J)(6:)
 	    END DO
 	  ELSE
 	    WRITE(T_OUT,*)'Unable top open file'
@@ -1634,16 +1660,21 @@ C
 	ELSE IF (ANS .EQ. 'MCN')THEN
 	  IF(IP_CONT .EQ. 0)THEN
 	    IP_CONT=NPLTS+1
-	  END IF
-	  CALL NEW_GEN_IN(IP_CONT,'Plot with continuum nodes')
-	  IF(NPTS(IP_CONT) .EQ. 0)THEN
-	    IP_CONT=NPLTS+1
+	    NPLTS=NPLTS+1
 	    NPTS(IP_CONT)=0
 	    ERR(IP_CONT)=.FALSE.
 	    TYPE_CURVE(IP_CONT)='L'
 	  END IF
+	  CALL NEW_GEN_IN(IP_CONT,'Plot with continuum nodes')
+	  IF(IP_CONT .GT. NPLTS)THEN
+	    IP_CONT=NPLTS+1
+	    NPLTS=NPLTS+1
+	    NPTS(IP_CONT)=0
+	    WRITE(6,*)'Using ',IP_CONT,' for continuum definition'
+	  END IF
 	  CALL PG_MOD_CONT_NODES(IP_CONT)
           TYPE_CURVE(IP_CONT)='L'
+	  GOTO 1000
 !
 	ELSE IF (ANS .EQ. 'CONT')THEN
 	  IF(NPLTS .EQ. 1)THEN
@@ -3028,7 +3059,7 @@ C
 ! aspect ratio is preserved on the screen and hardcopy device)
 ! 0 implies leave aspect ratio at default value
 !
-	CALL PGQVP(2,DXST,DXEND,DYST,DYEND)
+	CALL PGQVP(ITWO,DXST,DXEND,DYST,DYEND)
 	DASR=(DYEND-DYST)/(DXEND-DXST)
 	TEMPASR=DASR
 	IF(ASR .LT. 0)TEMPASR=-1.0/ASR
@@ -3191,7 +3222,7 @@ C
 	    END DO
 	    DO WHILE(IEND .LT. NPTS(IP))
 	      DO WHILE(IEND .LT. NPTS(IP))
-	         IF( CD(IP)%DATA(IEND)*CD(IP)%DATA(IEND-1) .GT. 0)THEN
+	         IF( CD(IP)%DATA(IEND)*CD(IP)%DATA(IEND-1) .GE. 0)THEN
 	           IEND=IEND+1
 	         ELSE
 	           EXIT
@@ -3302,6 +3333,7 @@ C
 !
 !	CALL PGBOX('ABCNT',0.0,0,'ABCNT',0.0,0)
 !
+	CALL ARRANGE_PG_CURVE_IDS(PEN_COL,PEN_OFFSET,MAXPEN,ADD_COMMA,RESET_CURVE_LAB)
 	IF(DO_BORDER)THEN
 	  CALL MONBORD_V4(XPAR,XINC,XNUMST,IXTICK,IDX,
 	1             YPAR,YINC,YNUMST,IYTICK,IDY,

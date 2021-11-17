@@ -152,6 +152,7 @@
 	USE FG_J_CMF_MOD_V9
 	IMPLICIT NONE
 !
+! Altered 15-Nov-2021 : Fixed scaler/vector issue with call to MON_INT_INS_V1. 
 ! Altered 06-Sep-1999 : Output to FOR111 improved. Error message output to
 !                         LUER when JNU negative. Small bug fixed when
 !                         evaluating JNU when INSERT is false.
@@ -723,10 +724,13 @@ C
 ! dCHIdR, and dCHIdR_INS.
 !
 ! In the first call T1 is a dummy variable for the HP compiler.
+! In the first cal dCHIdR, dCHIdR_INS are not used. Previously:
+!
+!	1                         LFALSE,LFALSE,T1,T1,LFALSE)
 !
 	IF(INSERT)THEN
 	  CALL MON_INT_INS_V1(ETA_INS,R_INS,NINS,ETA,R,ND,
-	1                         LFALSE,LFALSE,T1,T1,LFALSE)
+	1                         LFALSE,LFALSE,dCHIdR(ND_ADD+1),dCHIdR_INS,LFALSE)
 	  IF(NEW_FREQ)THEN
 	    CALL MON_INT_INS_V1(CHI_INS,R_INS,NINS,CHI,R,ND,
 	1                   LFALSE,LFALSE,dCHIdR(ND_ADD+1),dCHIdR_INS,LTRUE)

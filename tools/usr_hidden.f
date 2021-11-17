@@ -774,6 +774,7 @@ c
 c
 c Read input either from answer or default
 c
+      sve_string=' '
       if(len_trim(answer).ne.0)then
 !        fmt_string=wr_fmt_string(l)
 !        read(answer,fmt_string,err=300)input

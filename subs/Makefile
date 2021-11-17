@@ -20,6 +20,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(check_spec_conv.o)\
       $(LIB)(cmf_form_sol.o)\
       $(LIB)(cmf_form_sol_v2.o)\
+      $(LIB)(cmf_form_sol_v3.o)\
       $(LIB)(cnvt_fr_dc.o)\
       $(LIB)(cnvt_fr_dc_v2.o)\
       $(LIB)(colcool_sl_v3.o)\

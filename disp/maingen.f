@@ -15,6 +15,10 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered  17-Nov-2021 : Copied from OSIRIS.
+!                        Fixed call to SOBEW_GRAD_V2.
+!                        Now call DU_CURVE_LAB (change done initially on OSIRIS).
+! Altered  09-Sep-2021 : Now call FQCOMP_IBC_V2 and JEAU_IBC_V2.
 ! Altered  10-Dec-2019 : CLUMP is now allowed for when computing the recombination rate.
 !                          XLOGRM1(LOG10(R(I)/R(ND)-1.0D0) added as option
 !                          FLUX mean opacity added to Y options (FLUX) -- Also ES -- mass abs. coef.
@@ -141,6 +145,7 @@
 	REAL*8 INBC,HBC,HBCNEW,NBC,FA(NP_MAX),GAM(NP_MAX),GAMH(NP_MAX)
 	REAL*8 VEXT(NP_MAX),TEXT(NP_MAX),SIGMAEXT(NP_MAX)
 	REAL*8 MASS_DENSITYEXT(NP_MAX),CLUMP_FACEXT(NP_MAX)
+	REAL*8 HBC_J,HBC_S
 !
 	REAL*8 RJEXT(NP_MAX),FEXT(NP_MAX),Q(NP_MAX),FOLD(NP_MAX)
 	REAL*8 CHIEXT(NP_MAX),ETAEXT(NP_MAX),ESECEXT(NP_MAX)
@@ -230,6 +235,7 @@
 	LOGICAL WEIGHT_NV
 	LOGICAL MEAN_TAU
 	LOGICAL RADIAL_TAU
+	LOGICAL RAY_TAU
 !
 	INTEGER I,J,K,L
 	INTEGER IMIN,IMAX
@@ -255,6 +261,7 @@
 	REAL*8 NU_ST,NU_EN
 	REAL*8 FREQ_RES,FREQ_MAX
 	REAL*8 T1,T2,T3,T4
+	REAL*8 VSHIFT,VDOP,DEL_V
 	REAL*8 EK_EJECTA
 	REAL*8 TMP_ED
 	REAL*8 TAU_LIM
@@ -359,6 +366,7 @@
 	CHARACTER*120 DEFAULT
 	CHARACTER*120 TAUSOB_DEF
 	CHARACTER*120 DESCRIPTION
+	CHARACTER*10 XAXIS_OPT
 	CHARACTER(LEN=1) FIRST_COLR
 !
 ! External functions
@@ -408,16 +416,19 @@
 	DPTH_INDX=ND/2
 	COL_OPT='CL'
 	FILE_FORMAT='OLD'
+	IC=0.0D0
 !
 ! NB: ZERO_FLUX condition is equivalent to DIF=.TRUE. and DBB=0.
 !     Thus, for routine compatibility, we set DBB=0 when DIF is false.
 !
-	IF(V(1) .GT. 10000.0D0)THEN
+	IF(V(1) .GT. 10000.0D0 .OR. V(ND) .GT. 100.0D0)THEN
 	  INNER_BND_METH='ZERO_FLUX'		!Default for SN model
 	  DIF=.FALSE.
+	  WRITE(6,*)'Inner boudary option zet to zero_flux'
 	ELSE
 	  INNER_BND_METH='DIFFUSION'		!Default for normal stars
 	  DIF=.TRUE.
+	  WRITE(6,*)'Inner boudary option zet to diffusion approximation'
 	END IF
 	TRAPFORJ=.TRUE.
 	TSTAR=T(ND)
@@ -809,6 +820,9 @@
 	1          .OR. XOPT .EQ. 'EP'
 	1          .OR. XOPT .EQ. 'CHIL'
 	1          .OR. XOPT .EQ. 'TAUL'
+	1          .OR. XOPT .EQ. 'TAULIP'
+	1          .OR. XOPT .EQ. 'MTAULIP'
+	1          .OR. XOPT .EQ. 'LINRC'
 	1          .OR. XOPT .EQ. 'WRL'
 	1          .OR. XOPT .EQ. 'BETA')THEN
 !
@@ -1157,17 +1171,15 @@
 	      SOURCE(I)=ZETA(I)
 	    END DO
 	    INACCURATE=.TRUE.
-	    HBC=0.99D0
+	    HBC=0.99D0; HBC_S=0.0D0
 	    THK_CONT=.FALSE.
 	    DO WHILE(INACCURATE)
-	      CALL FQCOMP_V2(TA,TB,TC,XM,DTAU,R,Z,P,Q,FEXT,
-	1            SOURCE,CHI,DCHIDR,JQW,KQW,DBB,HBC,
-	1            INBC,IC,S1,THK_CONT,INNER_BND_METH,NC,ND,NP,METHOD)
-	      T1=DBB
-	      IF(INNER_BND_METH .EQ. 'ZERO_FLUX' .OR. INNER_BND_METH .EQ. 'HOLLOW')T1=0.0D0
-	      CALL JFEAUNEW(TA,TB,TC,DTAU,R,RJ,Q,FEXT,
-	1            ZETA,THETA,CHI,T1,IC,HBC,
-	1            INBC,THK_CONT,DIF,ND,METHOD)
+	      CALL FQCOMP_IBC_V2(TA,TB,TC,XM,DTAU,R,Z,P,Q,FEXT,
+	1            SOURCE,CHI,DCHIDR,JQW,KQW,DBB,HBC_J,HBC_S,
+	1            INBC,IC,THK_CONT,INNER_BND_METH,NC,ND,NP,METHOD)
+	      CALL JFEAU_IBC_V2(TA,TB,TC,DTAU,R,RJ,Q,FEXT,
+	1            ZETA,THETA,CHI,DBB,IC,HBC_J,HBC_S,
+	1            INBC,THK_CONT,INNER_BND_METH,ND,METHOD)
 	      S1=ZETA(1)+THETA(1)*RJ(1)
 	      INACCURATE=.FALSE.
 	      T1=0.0D0
@@ -1458,9 +1470,10 @@
 	  DEFAULT=INNER_BND_METH
 	  CALL USR_OPTION(INNER_BND_METH,'IBC',DEFAULT,
 	1      'Inner boundary condition: DIFFUSION, SCHUSTER, ZERO_FLUX, HOLLOW')
+	  INNER_BND_METH=UC(INNER_BND_METH)
 	  IF(INNER_BND_METH .NE. 'DIFFUSION' .AND. INNER_BND_METH .NE. 'SCHUSTER' .AND.
 	1       INNER_BND_METH .NE. 'ZERO_FLUX' .AND. INNER_BND_METH .NE. 'HOLLOW')THEN
-	    INNER_BND_METH='DIFFSION'
+	    INNER_BND_METH='DIFFUSION'
 	    WRITE(T_OUT,*)'Did not recognize option'
 	    WRITE(T_OUT,*)'Setting INNER_BND_METH to DIFFUSION'
 	  ENDIF
@@ -1492,6 +1505,11 @@
 	1        'Number of levels in FULL'//TRIM(ION_ID(ID)),
 	1        ' model atom is:',ATM(ID)%NXzV_F
 	  END DO
+!
+        ELSE IF(XOPT .EQ. 'WRA')THEN
+	  CALL USR_HIDDEN(ELEC,'WRF','T','Write final ionization stage for each species?')
+	  CALL USR_HIDDEN(FOUND,'DIAG','F','Output diagnostic info for name convesiont to latex format')
+	  CALL WR_ATOM_SUM(ELEC,FOUND)
 !
         ELSE IF(XOPT .EQ. 'WRID')THEN
 !
@@ -2307,19 +2325,18 @@
 	  CALL DP_CURVE(ND,XV,YV)
 !
 	ELSE IF(XOPT .EQ. 'YCOLD')THEN
-	  CALL USR_OPTION(ELEC,'NA','F','Atom column density?')
+          CALL USR_OPTION(ELEC,'NA','F','Atom column density?')
 	  IF(ELEC)THEN
 	    DO I=1,ND
-	       ZETA(I)=1.0D+10*POP_ATOM(I)*CLUMP_FAC(I)
+	      ZETA(I)=1.0D+10*POP_ATOM(I)*CLUMP_FAC(I)
 	    END DO
 	    CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
 	    DO I=1,ND
 	      YV(I)=DLOG10(TA(I))
 	    END DO
-	    YAXIS='N(atoms cm\u-2\d)'
 	  ELSE
 	    DO I=1,ND
-	       ZETA(I)=1.0D+10*MASS_DENSITY(I)*CLUMP_FAC(I)
+	      ZETA(I)=1.0D+10*MASS_DENSITY(I)*CLUMP_FAC(I)
 	    END DO
 	    CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
 	    DO I=1,ND
@@ -2967,12 +2984,10 @@
 	      IF(XSPEC .EQ. SPECIES(ISPEC) .OR. (XSPEC .EQ. 'ALL' .AND.
 	1              POPDUM(ND,ISPEC) .GT. 0.0D0))THEN
 	        YV(1:ND)=LOG10(POPDUM(1:ND,ISPEC)/POP_ATOM(1:ND)+1.0D-100)
-	        CALL DP_CURVE(ND,XV,YV)
-	        FOUND=.TRUE.
-	        CNT=CNT+1; WRITE(DEFAULT,'(I2)')MOD(CNT,14)+1; DEFAULT=ADJUSTL(DEFAULT)
-	        DEFAULT=TRIM(SPECIES_ABR(ISPEC))//', \p'//TRIM(DEFAULT)//' '
+	        DEFAULT=TRIM(SPECIES_ABR(ISPEC))
 	        J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
-	        TITLE(CNT/10+1)=TRIM(TITLE(CNT/10+1))//' '//TRIM(DEFAULT)//' '
+	        CALL DP_CURVE_LAB(ND,XV,YV,DEFAULT)
+	        FOUND=.TRUE.
 	        IF(XSPEC .NE. 'ALL')EXIT
 	      END IF
 	    END DO
@@ -3000,18 +3015,14 @@
 	      IF(XSPEC .EQ. SPECIES(ISPEC) .OR. (XSPEC .EQ. 'ALL' .AND.
 	1              POPDUM(ND,ISPEC) .GT. 0.0D0))THEN
 	        YV(1:ND)=LOG10(POPDUM(1:ND,ISPEC)+1.0D-100)
-	        CALL DP_CURVE(ND,XV,YV)
-	        FOUND=.TRUE.
-	        CNT=CNT+1; WRITE(DEFAULT,'(I2)')MOD(CNT,14)+1; DEFAULT=ADJUSTL(DEFAULT)
-	        DEFAULT=TRIM(SPECIES_ABR(ISPEC))//', \p'//TRIM(DEFAULT)
+	        DEFAULT=TRIM(SPECIES_ABR(ISPEC))
 	        J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
-	        TITLE(CNT/10+1)=TRIM(TITLE(CNT/10+1))//' '//TRIM(DEFAULT)//' '
+	        CALL DP_CURVE(ND,XV,YV,DEFAULT)
 	        IF(XSPEC .NE. 'ALL')EXIT
 	      END IF
 	    END DO
 	    YAXIS='Log Species density (cm\u-3\d)'
 	  END IF
-	  J=CNT/10+1; CALL SET_PG_TITLES(TITLE,J,L_TRUE)
 	  WRITE(6,'(A)')' '
 !
 	  IF(XSPEC .EQ. 'ALL')THEN
@@ -3698,13 +3709,11 @@
 	    J=J+1
 	    WRITE(T_OUT,'('' Beginning '',I3,''th loop'')')J
 	    CALL FQCOMP_V2(TA,TB,TC,XM,DTAU,REXT,Z,PEXT,Q,FEXT,
-	1          SOURCEEXT,CHIEXT,ETAEXT,JQWEXT,KQWEXT,DBB,HBC,
-	1          INBC,IC,S1,THICK,INNER_BND_METH,NCX,NDX,NPX,METHOD)
-	    T1=DBB
-	    IF(INNER_BND_METH .EQ. 'ZERO_FLUX' .OR. INNER_BND_METH .EQ. 'HOLLOW')T1=0.0D0
-	    CALL JFEAUNEW(TA,TB,TC,DTAU,REXT,RJEXT,Q,FEXT,
-	1          ZETAEXT,THETAEXT,CHIEXT,T1,IC,HBC,
-	1          INBC,THICK,DIF,NDX,METHOD)
+	1          SOURCEEXT,CHIEXT,ETAEXT,JQWEXT,KQWEXT,DBB,HBC_J,HBC_S,
+	1          INBC,IC,THICK,INNER_BND_METH,NCX,NDX,NPX,METHOD)
+	    CALL JFEAU_IBC_V2(TA,TB,TC,DTAU,REXT,RJEXT,Q,FEXT,
+	1          ZETAEXT,THETAEXT,CHIEXT,DBB,IC,HBC_J,HBC_S,
+	1          INBC,THICK,INNER_BND_METH,NDX,METHOD)
 	    S1=ZETAEXT(1)+THETAEXT(1)*RJEXT(1)
 	    INACCURATE=.FALSE.
 	    T1=0.0D0
@@ -3764,8 +3773,8 @@
 ! the line EW.
 !
 	    CALL SOBEW_GRAD_V2(SOURCE,CHI,CHI_SCAT,CHIL,ETAL,
-	1              FORCE_MULT,LUM,
-	1              V,SIGMA,R,P,JQW,HQW,TA,T1,S1,
+	1              V,SIGMA,R,P,FORCE_MULT,LUM,
+	1              JQW,HQW,TA,T1,S1,
 	1              FREQ,'HOLLOW',DBB,IC,THICK,.FALSE.,NC,NP,ND,METHOD)
 !
 	    CALL DP_CURVE(ND,XV,FORCE_MULT)
@@ -3784,11 +3793,12 @@
 !
 	    T2=LAMVACAIR(FREQ)		!Wavelength(Angstroms)
 	    T3=T1*S1*1.0D-23*FREQ*1.0D+15/T2
-	    WRITE(LU_NET,40008)T1,S1,T2,T3
+	    T4=T3*4*PI*(3.0856D+21)**2/LUM_SUN()
+	    WRITE(LU_NET,40008)T1,S1,T2,T3,T4
 	    WRITE(T_OUT,'(A)')RED_PEN
-	    WRITE(T_OUT,40008)T1,S1,T2,T3
-40008	    FORMAT(1X,'EW =',ES10.3,' Ang',5X,'I =',ES10.3,' Jy',5X,
-	1             'Lambda =',ES11.4,' Ang',5X,'Line flux=',ES10.3,' ergs/cm^2/s')
+	    WRITE(T_OUT,40008)T1,S1,T2,T3,T4
+40008	    FORMAT(1X,'EW =',ES10.3,' Ang',3X,'I =',ES10.3,' Jy',3X,
+	1      'Lam =',ES11.4,' Ang',3X,'Line flux=',ES10.3,' ergs/cm^2/s =',ES10.3,' Lsun')
 	    WRITE(T_OUT,'(A)')DEF_PEN
 	  END IF
 !
@@ -4679,6 +4689,28 @@
 	  CALL GRAMON_PGPLOT(XAXIS,YAXIS,NAME,'TOPLAB')
 	  XAXIS=XAXSAV
 !
+	ELSE IF(XOPT .EQ. 'GRV')THEN
+	  TA(1:ND)=XV(1:ND)
+!
+	  SCED(1)=100*INT(V(1)/100)
+	  SCED(2)=2000
+	  SCED(3)=1500
+	  SCED(4)=1250
+	  SCED(5)=1000
+	  SCED(6)=750
+	  SCED(7)=500
+	  SCED(8)=300
+	  SCED(9)=100
+	  SCED(10)=20
+	  SCED(11)=10
+	  SCED(12)=1
+	  NXED=12
+	  TB(1:ND)=V(1:ND)
+	  CALL MON_INTERP(XED,NXED,IONE,SCED,NXED,TA,ND,TB,ND)
+	  TOPLABEL='V(km/s)'
+	  CALL GRAMON_PGPLOT(XAXIS,YAXIS,NAME,'TOPLAB/ALL')
+	  XAXIS=XAXSAV
+!
 	ELSE IF(XOPT .EQ. 'GROSS')THEN
 	  DO I=1,ND
 	    CHIROSS(I)=CLUMP_FAC(I)*ROSS_MEAN(I)
@@ -4839,7 +4871,8 @@
 	          END IF
 	        END IF
 !
-	        CALL DP_CURVE(ND,XV,YV)
+	        WRITE(DEFAULT,'(I4)')LEV(I); DEFAULT=ADJUSTL(DEFAULT)
+	        CALL DP_CURVE_LAB(ND,XV,YV,DEFAULT)
 	      END DO
 	    END IF
 	  END DO
@@ -4995,10 +5028,11 @@
 	        END DO
 	        YAXIS='Log '//TRIM(SPECIES_ABR(ISPEC))//'\un+\d/N(total)'
 	      END IF
-	      CNT=0
 	      TITLE=' '
+	      CNT=0
 	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
 	        IF(ATM(ID)%XzV_PRES)THEN
+	          CNT=CNT+1
 	          DO I=1,ND
 	            T1=0.0D0			!Using T1 avoids underflow
 	            DO J=1,ATM(ID)%NXzV_F
@@ -5007,21 +5041,19 @@
 	            YV(I)=LOG10(T1/TA(I))
 	            ZV(I)=LOG10(ATM(ID)%DXzV_F(I)/TA(I))
 	          END DO
-	          CNT=CNT+1; WRITE(DEFAULT,'(I2)')MOD(CNT,14)+1; DEFAULT=ADJUSTL(DEFAULT)
-	          DEFAULT=TRIM(ION_ID(ID))//', \p'//TRIM(DEFAULT)//' '
+	          DEFAULT=TRIM(ION_ID(ID))
 	          J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
-	          TITLE(CNT/10+1)=TRIM(TITLE(CNT/10+1))//' '//TRIM(DEFAULT)
-	          CALL DP_CURVE(ND,XV,YV)
+	          CALL DP_CURVE_LAB(ND,XV,YV,DEFAULT)
 	          WRITE(6,'(A,I2,A,A)')' Curve ',CNT,' is due to: ',TRIM(ION_ID(ID))
 	        END IF
 	      END DO
-	      CALL DP_CURVE(ND,XV,ZV)
-	      CNT=CNT+1
 	      ID=SPECIES_END_ID(ISPEC)
+	      DEFAULT=TRIM(ION_ID(ID))
+	      J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
+	      CALL DP_CURVE_LAB(ND,XV,ZV,DEFAULT)
 	      WRITE(6,'(A,I2,A,A)')' Curve ',CNT,' is due to: ',TRIM(ION_ID(ID))
 	    END IF
 	  END DO
-	  J=CNT/10+1; CALL SET_PG_TITLES(TITLE,J,L_TRUE)
 ! 
 	ELSE IF(XOPT .EQ. 'MODSUM')THEN
 !
@@ -5177,20 +5209,28 @@
 	  IF(DPTH_INDX .LT. 1 .OR. DPTH_INDX .GT. ND)DPTH_INDX=ND/2
 	  DEFAULT=WR_STRING(DPTH_INDX)
 	  CALL USR_OPTION(DPTH_INDX,'Depth',DEFAULT,'Input depth to check collision quantities')
+!
+	  WRITE(6,'(/,A,3X,ES14.4)')' Radius (10^10 cm)', ED(DPTH_INDX)
+	  WRITE(6,'(A,3X,ES14.4)')' Electron density', ED(DPTH_INDX)
+	  WRITE(6,'(A,3X,ES14.4)')' Velocity (km/s) ', ED(DPTH_INDX)
+!
 	  STRING=' '
 	  WRITE(6,*)' '
 	  WRITE(6,*)'Options are:'
 	  WRITE(6,*)'   NR: Output net rates;       DR: Downward rates'
 	  WRITE(6,*)'   CR: Output cooling terms;   CL: Cooling lines'
+	  WRITE(6,*)'   SL: Ouput rates for a single level (or multiple levels in SL)'
 	  WRITE(6,*)' '
 	  DEFAULT=COL_OPT
-	  CALL USR_OPTION(COL_OPT,'TYPE',DEFAULT,'NR, DR, CR, CL')
+	  CALL USR_OPTION(COL_OPT,'TYPE',DEFAULT,'NR, DR, CR, CL,  SL')
 	  IF(UC(COL_OPT(1:2)) .EQ. 'NR')THEN
 	    STRING='NET_RATES'
 	  ELSE IF(UC(COL_OPT(1:2)) .EQ. 'CR')THEN
 	    STRING='COOL_RATES'
 	  ELSE IF(UC(COL_OPT(1:2)) .EQ. 'CL')THEN
 	    STRING='COOL_LINES'
+	  ELSE IF(UC(COL_OPT(1:2)) .EQ. 'SL')THEN
+	    STRING='SUPER_LEVEL'
 	  ELSE
 	    STRING=' '
 	  END IF
@@ -5216,7 +5256,15 @@
 	1               ATM(ID)%W_XzV_F(1,I),ATM(ID)%GXzV_F,
 	1               ATM(ID)%EDGEXzV_F,ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,
 	1               TRIM(ION_ID(ID)),R(I),V(I),SIGMA(I),I,J,LU_COL,FLAG)
-	      ELSE
+	      ELSE IF(STRING .EQ. 'SUPER_LEVEL')THEN
+!
+	        WRITE(6,'(/,A)')' You may input a single level or multiple levels that are linked into a super level.'
+	  	WRITE(6,'(A,/)')' At this stage you mus use the level number as input.'
+	        CALL USR_OPTION(LEV,ITEN,IONE,'LEV','1','Levels of interest')
+	        CALL WR_COL_SL(OMEGA_S,ATM(ID)%XzV_F(1,I),ATM(ID)%XzVLTE_F(1,I),
+	1                ATM(ID)%EDGEXzV_F,ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,
+	1                TRIM(XSPEC),LU_COL,LEV,ITEN,DPTH_INDX)
+	      ELSE   
 	        CALL WR_COL_RATES(OMEGA_S,ATM(ID)%XzV_F(1,I),ATM(ID)%XzVLTE_F(1,I),
 	1               ATM(ID)%EDGEXzV_F,ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,
 	1               TRIM(XSPEC)//'R',LU_COL,STRING)
@@ -6078,12 +6126,13 @@ c
 !
 	  T2=LAMVACAIR(FREQ)		!Wavelength(Angstroms)
 	  T3=T1*S1*1.0D-23*FREQ*1.0D+15/T2
-	  WRITE(LU_NET,40008)T1,S1,T2,T3
+	  T4=T3*4*PI*(3.0856D+21)**2/LUM_SUN()
+	  WRITE(LU_NET,40008)T1,S1,T2,T3,T4
 	  WRITE(T_OUT,'(A)')RED_PEN
-	  WRITE(T_OUT,40008)T1,S1,T2,T3
+	  WRITE(T_OUT,40008)T1,S1,T2,T3,T4
 	  WRITE(T_OUT,'(A)')DEF_PEN
 !
-	  CALL USR_OPTION(ELEC,'PLOT','F','PLot Line Origin?')
+	  CALL USR_OPTION(ELEC,'PLOT','T','PLot Line Origin?')
 !
 ! We can now use the current X-axis for the X-axis. Zeta(x)
 ! is defined similarly to before: Zeta(x) dx gives the
@@ -6183,6 +6232,18 @@ c
 	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
 !
+	ELSE IF(XOPT .EQ. 'LINRC')THEN
+	  DO I=1,ND
+	    ZV(I)=DLOG10(R(I)/R(ND))
+	    YV(I)=R(I)*R(I)*R(I)*ETAL(I)
+	  END DO
+	  WV=0.0D0
+	  WV(1)=YV(1)
+	  DO I=2,ND
+	    WV(I)=WV(I-1)+0.5D0*(YV(I-1)+YV(I))*(ZV(I-1)-ZV(I))
+	  END DO 
+	  CALL DP_CURVE(ND,XV,WV)
+!
 ! 
 !
 ! Require CHIL to have been computed in setup.
@@ -6190,6 +6251,7 @@ c
 	ELSE IF(XOPT .EQ. 'TAUL')THEN
 	  CALL USR_HIDDEN(ELEC,'STAT','F','Stationary opactical depth?')
 	  CALL USR_HIDDEN(RADIAL,'RADS','F','Radial Sobolev optical depth?')
+	  CALL USR_HIDDEN(RAY_TAU,'RAY_TAU','F','Ray Sobolev optical depth?')
 	  IF(ELEC)THEN
 	    CALL TORSCL(TA,CHIL,R,TB,TC,ND,METHOD,TYPE_ATM)
 !
@@ -6216,6 +6278,24 @@ c
 	      END DO
 	      YAXIS='Log(\gt\dstat\u)'
 	    END IF
+	    CALL DP_CURVE(ND,XV,YV)
+	  ELSE IF(RAY_TAU)THEN
+	    CALL IMPAR(P,R,R(ND),NC,ND,NP)
+	    WRITE(6,*)'NC,ND=',NC,ND
+	    CALL USR_OPTION(K,'RAY_INDX','20','Depth indx (-ve for rays 1 to NC')
+	    IF(K .LT. 0)THEN
+	      T1=P(ABS(K))*P(ABS(K))
+	      K=ABS(K)
+	    ELSE
+	      T1=R(K)*R(K)
+	    END IF
+	    DO I=1,K
+	      ZV(I)=SQRT(R(I)*R(I)-T1)
+	      T2=ZV(I)/R(I)
+	      YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
+	      YV(I)=YV(I)/(1.0D0+T2*T2*SIGMA(I))
+	    END DO
+	    CALL DP_CURVE(K,ZV,YV)
 	  ELSE
 	    DO I=1,ND
 	      YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
@@ -6230,8 +6310,44 @@ c
 	      END DO
 	      YAXIS='Log(\gt\dSob\u)'
 	    END IF 
+	    CALL DP_CURVE(ND,XV,YV)
 	  END IF
-	  CALL DP_CURVE(ND,XV,YV)
+	
+!
+	ELSE IF(XOPT .EQ. 'TAULIP')THEN
+	  CALL IMPAR(P,R,R(ND),NC,ND,NP)
+	  WRITE(6,*)'NC,ND=',NC,ND
+	  CALL USR_OPTION(I,'RAY_INDX','20','Depth indx (-ve for rays 1 to NC')
+	  CALL USR_OPTION(VSHIFT,'VSHIFT','0','Velicity for line center in km/s')
+	  CALL USR_OPTION(XAXIS_OPT,'XAXIS','R,Z,uV,I','What X axis')
+	  XAXIS_OPT=UC(XAXIS_OPT)
+	  IF(I .LT. 0)THEN
+	    I=ABS(I)
+	    T1=V(ND)
+	  ELSE
+	    T1=V(I)
+	    I=NC+(ND-I)+1
+	  END IF
+	  WRITE(6,*)'P, V=',P(I),T1
+	  VDOP=10.0D0
+	  DEL_V=VDOP/2.0D0 
+	  CALL SET_FINE_RAY_GRID(ETAL,CHIL,
+	1     R,V,SIGMA,MASS_DENSITY,P(I),DEL_V,ND)	
+	  CALL NON_SOB_TAUL(VSHIFT,VDOP,FREQ,METHOD,TYPE_ATM,XAXIS_OPT)
+!
+	ELSE IF(XOPT .EQ. 'MTAULIP')THEN
+	  CALL IMPAR(P,R,R(ND),NC,ND,NP)
+	  WRITE(6,*)'NC,ND=',NC,ND
+	  CALL USR_OPTION(VSHIFT,'VSHIFT','0','Velicity for line center in km/s')
+	  DO I=1,ND-1
+	    VDOP=10.0D0
+	    DEL_V=VDOP/2.0D0 
+	    CALL SET_FINE_RAY_GRID(ETAL,CHIL,
+	1       R,V,SIGMA,MASS_DENSITY,R(I+1),DEL_V,ND)	
+	    CALL MAX_NON_SOB_TAUL(YV(I),VSHIFT,VDOP,FREQ,METHOD,TYPE_ATM)
+	    WV(I)=R(I+1)
+	  END DO
+	  CALL DP_CURVE(ND-1,WV,YV)
 !
 ! Require CHIL to have been computed in setup.
 !

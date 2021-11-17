@@ -7,6 +7,7 @@
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
 !
+! Altered: 20-Sep-2020 - Now use MODEL_SPEC to get ND.
 ! Altered: 05-Jun-2020 - Error now defined using ABS(GRAD)+ABS(G) rather than ABS(G_TOT) which can be
 !                          small at sonic point.
 !                          Output additional column: 100E/G_RAD
@@ -84,22 +85,38 @@
 	GRAV_CON=1.0D-20*GRAVITATIONAL_CONSTANT()*MASS_SUN()
 !
 	ND=0
+	FILENAME='MODEL_SPEC'
+	OPEN(UNIT=20,FILE=FILENAME,STATUS='OLD',IOSTAT=IOS)
+        IF(IOS .EQ. 0)THEN
+	  READ(20,'(A)',IOSTAT=IOS)STRING(1)
+	 IF(INDEX(STRING(1),'[ND]') .NE. 0)THEN
+	   READ(STRING(1),*)ND
+	   WRITE(6,*)'Number of depth points is',ND
+	 ELSE
+	   WRITE(6,*)'Invalid error reading MODEL_SPEC'
+	 END IF 
+	 CLOSE(UNIT=20)
+	ELSE
+	   WRITE(6,*)'Unable to open MODEL_SPEC. IOS=',IOS
+	END IF
+	IF(ND .EQ. 0)THEN
+	  WRITE(6,'(A)',ADVANCE='NO')'Input number od depth points in model: '
+	  READ(5,*)ND
+	END IF
+!
 	STRING(:)=' '
 	FILENAME='HYDRO'
 	CALL GEN_IN(FILENAME,'Input hydro file')
 	OPEN(UNIT=10,FILE=FILENAME,ACTION='READ',STATUS='OLD')
-	  NSTR=0        
+	  NSTR=0
 	  DO WHILE(1 .EQ. 1)
 	    READ(10,'(A)',END=1000)STRING(NSTR+1)
-	    IF(STRING(NSTR+1) .EQ. ' ' .AND. ND .EQ. 0)ND=NSTR-1
 	    NSTR=NSTR+1
 	  END DO         
+1000	  CONTINUE
 	CLOSE(UNIT=10)
-1000	CONTINUE
 !
-	WRITE(T_OUT,*)'Number of depth points is',ND
         I=160
-!
 	FILENAME='REV_HYDRO'
 	CALL GEN_IN(FILENAME,'Output hydro file')
 	CALL GEN_ASCI_OPEN(LU_OUT,FILENAME,'UNKNOWN',' ',' ',I,IOS)
@@ -112,8 +129,7 @@
 	1                    '   g_ELEC','Gamma','M(t)','E/G_RAD'
 !
 	MASS_OLD=0.0D0
-	READ(STRING(ND+1),*)RND
-	DO I=1,NSTR
+	DO I=ND+1,NSTR
 	  IF(INDEX(STRING(I),'urface gravity is:') .NE. 0)THEN
 	    J=INDEX(STRING(I),':')
 	    READ(STRING(I)(J+1:),*)GSUR_OLD

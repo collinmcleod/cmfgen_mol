@@ -18,6 +18,7 @@ FN5=$(LIB_DIR)lib$(LN5).a
 
 EXE  = $(EXE_DIR)plt_jh.exe\
        $(EXE_DIR)plt_jh_cur.exe\
+       $(EXE_DIR)plt_jh_shell.exe\
        $(EXE_DIR)plt_ip.exe\
        $(EXE_DIR)plt_delta.exe\
        $(EXE_DIR)plt_dfr.exe\

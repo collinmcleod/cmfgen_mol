@@ -2,8 +2,9 @@
 	INTEGER NUM_FILES
 	INTEGER ID
 !
-! Created 02-Apr-2019
+! Altered 18-Oct-2021 - Added depth index to DC ouput. More output  precision for R.
 ! Altered 20-May-2019 - Bug fixes
+! Created 02-Apr-2019
 !
 ! Needed when reading EDDFACTOR
 !
@@ -198,8 +199,8 @@
 10	  RVTJ_FILE_NAME='RVTJ'
 	  OPEN(UNIT=LU_IN,FILE=RVTJ_FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
-	    WRITE(T_OUT,*)'Unable to open RVTJ: IOS=',IOS
-	    GOTO 10
+	    WRITE(T_OUT,*)'Unable to open RVTJ in new_main/subs/sub_guess_dc.f: IOS=',IOS
+	   STOP
 	  END IF
 	  CLOSE(LU_IN)
 	  CALL RD_RVTJ_PARAMS_V4(RMDOT,RLUM,ABUND_HYD,TIME,NAME_CONVENTION,
@@ -413,12 +414,12 @@
 	  WRITE(LU_OUT,'(/,1X,A,T40,A)')'07-Jul-1997','!Format date'
 	  WRITE(LU_OUT,2120)R(ND),RLUM,NLEV,ND
 	  DO I=1,ND
-	    WRITE(LU_OUT,2122)R(I),ION_POP(I),ED(I),T(I),0.0,V(I),CLUMP_FAC(I)
+	    WRITE(LU_OUT,2122)R(I),ION_POP(I),ED(I),T(I),0.0,V(I),CLUMP_FAC(I),I
 	    WRITE(LU_OUT,'(1X,1P,5E17.7)')(DC(J,I),J=1,NLEV)
 	  END DO
 	CLOSE(LU_OUT)
 2120	FORMAT(/,1X,ES14.8,5X,1PE12.6,5X,0P,I4,5X,I4)
-2122	FORMAT(/,1X,1P,E16.8,6E17.8)
+2122	FORMAT(/,1X,ES17.10,6ES17.8,2X,I4,1X)
 !
 	RETURN
 	END

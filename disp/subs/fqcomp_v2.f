@@ -44,8 +44,7 @@
 	  NI=ND-(LS-NC-1)
 	  IF(LS .LE. NC)THEN
 	    NI=ND
-	    DBC=DBB*DSQRT( (R(ND)-P(LS))*(R(ND)+P(LS)) )
-	1   /R(ND)/CHI(ND)
+	    DBC=DBB*DSQRT( (R(ND)-P(LS))*(R(ND)+P(LS)) )/R(ND)/CHI(ND)
 	  END IF
 !
 	  IF(THK)THEN
@@ -99,15 +98,27 @@
               TB(NI)=1-TA(NI)
               XM(NI)=IC
 	   ELSE
+!
+! HOLLOW core or ZERO_FLUX. For continuum, this is the same as for LS >
+! NC. Done as separate option for clarity.
+!
 	      TA(NI)=-TC(NI-1)
-	      TB(NI)=0.0D0
-	      XM(NI)=0.0D0
+	      TB(NI)=-DTAU(NI-1)/2.0D0
+	      XM(NI)=0.5D0*DTAU(NI-1)*SOURCE(NI)
 	    END IF
 	    TC(NI)=0.0
 !
 ! Solve the tridiagonal system of equations.
 !
 	    CALL THOMAS_RH(TA,TB,TC,XM,NI,1)
+	    IF(MINVAL(XM) .LT. 0)THEN
+	      WRITE(6,*)'Negative intensities for LS=',LS,DBC,IBOUND
+	      CALL WRITE_VEC(XM,NI,'U in FQCOMP_V2',6)
+	      CALL WRITE_VEC(SOURCE,ND,'SOURCE in FQCOMP_V2',6)
+	      CALL WRITE_VEC(CHI,NI,'CHI in FQCOMP_V2',6)
+	      CALL WRITE_VEC(DTAU,NI-1,'DTAU in FQCOMP_V2',6)
+	      STOP
+	    END IF
 !
 	  ELSE IF(NI .EQ. 1)THEN
 	    XM(1)=IBOUND
@@ -143,7 +154,6 @@
 !
 	HBCNEW=HBCNEW/NEWRJ(1)
 	INBCNEW=INBCNEW/(2.0D0*NEWRJ(ND)-IC)
-	WRITE(6,*)NEWRJ(1)
 !
 ! Compute the new Feautrier factors.
 !
@@ -153,14 +163,16 @@
 !
 	DO I=1,ND
 	  IF(NEWRJ(I) .LE. 0 .OR. NEWRK(I) .LE. 0)THEN
+	   WRITE(6,*)'Error in FQCOMP_V2 -- J or K(f) is -ve'
 	   WRITE(6,*)'INNER_BND_METH=',INNER_BND_METH
 	   CALL WRITE_VEC(NEWRJ,ND,'NEWRJ in FQCOMP_V2',6)
-	   CALL WRITE_VEC(SOURCE,ND,'SOURCin FQCOMP_V2',6)
-	   CALL WRITE_VEC(CHI,ND,'CHIin FQCOMP_V2',6)
+	   CALL WRITE_VEC(NEWRK,ND,'F in FQCOMP_V2',6)
+	   CALL WRITE_VEC(SOURCE,ND,'SOURCE in FQCOMP_V2',6)
+	   CALL WRITE_VEC(CHI,ND,'CHI in FQCOMP_V2',6)
 	   STOP
 	 END IF
 	END DO
-	WRITE(6,*)'Checked for negative J values in FQCOM_V2'
+	WRITE(6,*)'Checked for negative J values in FQCOMP_V2'
 !
 ! Compute the Q factors from F. The Q values are stored in NEWRJ.
 ! We now compute Q in JFEAUNEW so that we nolonger need to save Q (only f).

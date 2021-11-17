@@ -45,6 +45,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(set_dc_or_pop_or_tx_v2.o)\
       $(LIB)(set_two_phot_disp_v3.o)\
       $(LIB)(setdc_or_pop.o)\
+      $(LIB)(set_fine_ray_grid.o)\
       $(LIB)(setforng.o)\
       $(LIB)(setrec.o)\
       $(LIB)(setvec.o)\
@@ -58,9 +59,11 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(wrbeta.o)\
       $(LIB)(write_line.o)\
       $(LIB)(writscrat.o)\
+      $(LIB)(wr_atom_sum.o)\
       $(LIB)(wr_col.o)\
       $(LIB)(wr_col_lines.o)\
       $(LIB)(wr_col_rates.o)\
+      $(LIB)(wr_col_sl.o)\
       $(LIB)(wr_spec_sum_v2.o)\
       $(LIB)(wr_crit.o)\
       $(LIB)(write_line_12may98.o)\

@@ -494,7 +494,12 @@
 	    WRITE(LUER,*)' Error -- you have read in one isotope in a decay chain but not both'
 	    WRITE(LUER,'(1X,A5,I4,3X,A,:L1)') NUC(IN)%SPECIES,NUC(IN)%BARYON_NUMBER,'Read=',ISO(IS)%READ_ISO_POPS
 	    WRITE(LUER,'(1X,A5,I4,3X,A,:L1)') NUC(IN)%DAUGHTER,NUC(IN)%DAUGHTER_BARYON_NUMBER,'Read=',ISO(ID)%READ_ISO_POPS
-	    STOP
+	    IF(.NOT. ISO(ID)%READ_ISO_POPS)THEN
+	      WRITE(6,*)'Stopping execution',ISO(ID)%READ_ISO_POPS
+	      STOP
+	    ELSE
+	      WRITE(6,*)'Continuuing execution'
+	    END IF
 	  END IF
 	END DO
 !

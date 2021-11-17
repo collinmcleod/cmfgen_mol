@@ -77,6 +77,7 @@
 	REAL*8 CMAT(N,N)
 	REAL*8 STAT_WT(N)
 	REAL*8 EDGE(N)
+	REAL*8 POP_SOLS(N,5)
 !
 	REAL*8 SAV_CMAT(N,N)
 	REAL*8 SAV_STEQ(N)
@@ -110,12 +111,18 @@
 	INTEGER I,J,K,L
 	INTEGER, PARAMETER :: NSNG=1
 	LOGICAL USE_DC
+	LOGICAL FILE_EXISTS
 !
 	HDKT=4.7994145
 !
 	WRITE(FILENAME,*)ID
 	FILENAME=ADJUSTL(FILENAME)
 	FILENAME='BA_ASCI_N_D'//TRIM(FILENAME)
+	INQUIRE(FILE=FILENAME,EXIST=FILE_EXISTS)
+	IF(.NOT. FILE_EXISTS)THEN
+	  WRITE(FILENAME,'(I3.3)')ID
+	  FILENAME='BA_ASCI_N_D'//TRIM(FILENAME) 
+	END IF
 	OPEN(UNIT=10, FILE=FILENAME,STATUS='OLD',ACTION='READ')
 	  STRING=' '
 	  DO WHILE(INDEX(STRING,'POP') .EQ. 0)		
@@ -228,9 +235,9 @@
 	WRITE(6,*)'Performing LU decomposition'
         CALL DGETRF(N,N,CMAT,N,IPIVOT,IFAIL)
         IF(IFAIL .NE. 0)THEN
-          WRITE(6,*)'Error in solution using DGETRF'
+          WRITE(6,*)'Error in solution using DGETRF --A1'
           WRITE(6,*)'IFAIL=',IFAIL
-	  STOP
+	  GOTO 500
 	END IF
 !
 ! Now perform the solution.
@@ -313,6 +320,10 @@
 	END IF
 	WRITE(6,*)'Check fort.12 for accuracy check'
 !
+	DO J=1,N
+	  POP_SOLS(J,1)=POPS(J)*(1.0D0-STEQ(J))
+	END DO
+!
 ! The following computes the residual to the equations, and then solves
 ! for the values needed to make the residuals zero. The solutions
 ! are the  updated.
@@ -342,6 +353,10 @@
 	DO I=1,N
 	  WRITE(12,'(1X,I5,5ES14.4)')I,STEQ(I),SAV_STEQ(I),RHS(I),
 	1             LARGEST_VAL(I),ABS(SAV_STEQ(I)-RHS(I))/LARGEST_VAL(I)
+	END DO
+!
+	DO J=1,N
+	  POP_SOLS(J,2)=POPS(J)*(1.0D0-STEQ(J))
 	END DO
 !
 ! Try a different scaling of CMAT to see if this makes any difference to the
@@ -380,6 +395,10 @@
           STEQ(J)=STEQ(J)*COL_SF(J)*OLD_SOL(J)
         END DO
 !
+	DO J=1,N
+	  POP_SOLS(J,3)=POPS(J)*(1.0D0-STEQ(J))
+	END DO
+!
 ! Check to see whether solution is accurate, by computing RHS with
 ! the newly determined solutions.
 !
@@ -404,6 +423,77 @@
 !
 	DO I=1,NT
 	  WRITE(30,'(1X,I5,3ES14.4)')I,STEQ(I),STEQ(I)*CMAT_RD(NT,I)
+	END DO
+!
+500	CONTINUE
+!
+! Solve directly for the populatons.
+!
+	CMAT=SAV_CMAT
+	STEQ=SAV_STEQ
+!
+	DO J=1,N
+	  DO I=1,N
+	    CMAT(I,J)=CMAT(I,J)/POPS(J)
+	  END DO
+	END DO
+	IF(N .EQ. NT)THEN
+	   CMAT(:,N-1)=0.0D0
+	   CMAT(:,N)=0.0D0
+	   CMAT(N-1,N-1)=1.0;
+	   CMAT(N,N)=1.0;
+	END IF
+	WRITE(36,*)CMAT(N-1,1:N)
+	WRITE(36,*)CMAT(N,1:N)
+	CALL DGEEQU(N,N,CMAT,N,ROW_SF,COL_SF,ROW_CND,COL_CND,MAX_VAL,IFAIL)
+        IF(IFAIL .NE. 0)THEN
+          WRITE(6,*)'Error in solution using DGEEQU'
+	END IF
+        DO J=1,N
+          STEQ(J)=STEQ(J)*ROW_SF(J)
+          DO I=1,N
+            CMAT(I,J)=CMAT(I,J)*ROW_SF(I)*COL_SF(J)
+          END DO
+        END DO
+	WRITE(6,*)'Performing LU decomposition'
+        CALL DGETRF(N,N,CMAT,N,IPIVOT,IFAIL)
+        IF(IFAIL .NE. 0)THEN
+          WRITE(6,*)'Error in solution using DGETRF'
+	END IF
+!
+! Now perform the solution.
+!
+        WRITE(6,*)'Do the back substituton to get solution'
+	CALL DGETRS(NO_TRANS,N,NSNG,CMAT,N,IPIVOT,STEQ,N,IFAIL)
+        DO J=1,N
+          STEQ(J)=STEQ(J)*COL_SF(J)
+        END DO
+!
+	DO J=1,N
+	  POP_SOLS(J,4)=POPS(J)-STEQ(J)
+	END DO
+!
+	DO J=1,N
+	  WRITE(35,'(I5,5ES16.6)')J,POPS(J),(POP_SOLS(J,I),I=1,4)
+	END DO
+!
+	CMAT=SAV_CMAT
+	IF(N .EQ. NT)THEN
+	   CMAT(:,N-1)=0.0D0
+	   CMAT(:,N)=0.0D0
+	   CMAT(N-1,N-1)=1.0;
+	   CMAT(N,N)=1.0;
+	END IF
+
+	COL_SF=0.0D0
+	DO I=1,N
+	  DO J=1,N
+	    COL_SF(I)=COL_SF(I)+CMAT(I,J)
+	    WRITE(38,*)I,J,COL_SF(I)
+	  END DO
+	END DO
+	DO J=1,N
+	  WRITE(37,'(I5,5ES16.6)')J,POPS(J),SAV_STEQ(J),COL_SF(J),COL_SF(J)-SAV_STEQ(J)
 	END DO
 !
 	STOP

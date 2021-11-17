@@ -4,6 +4,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered 30-Oct-2021 : Can now read in electron thermal spectrum. Useful when testing.
+!                          Ouput file changed, additional data output.
 ! Altered 15-Jun-2016 : NT_ITERATION_COUNTER is now defined in CONTROL_VARIABLE_MOD
 ! Altered 23-Feb-2102 : ASUM was changed to QSUM, since A can be zero for some transition.
 ! Altered 16-Feb-2012 : Cleaned (many prior changes to this date also).
@@ -98,6 +100,7 @@
 	LOGICAL INJECT_DIRAC_AT_EMAX
 	CHARACTER(LEN=10) SOURCE_TYPE
 	CHARACTER(LEN=40) TMP_NAME
+	CHARACTER(LEN=40) FMT
 !
 !
 	XKT_MIN=NT_EMIN	
@@ -210,6 +213,12 @@
 	END IF
 !
 	FIRST_TIME=.FALSE.
+!
+	IF(READ_NON_THERM_SPEC)THEN
+	  CALL RD_NON_THERM_ELEC_SPEC_V1(ND,LU_BETHE)
+	  RETURN
+	END IF
+!
 	FRAC_ELEC_HEATING=0.0D0
 	FRAC_ION_HEATING=0.0D0
 	FRAC_EXCITE_HEATING=0.0D0
@@ -655,22 +664,35 @@
 !
 ! Output the degradation spectrum
 !
+	FMT='(1x,8ES20.10)'
 	open(unit=lu_bethe,file='NON_THERM_DEGRADATION_SPEC',status='unknown')
 	write(lu_bethe,'(1x,A,I5)')'Number of energy grid: ',NKT
 	write(lu_bethe,'(1x,A,I5)')'Number of depth: ',ND
 	write(lu_bethe,*)''
 	write(lu_bethe,'(A)')'Energy grids (eV)'
-	write(lu_bethe,'(1x,1p8e16.7)')(XKT(IKT),IKT=1,NKT)
+	write(lu_bethe,FMT)(XKT(IKT),IKT=1,NKT)
+	write(lu_bethe,*)''
+	write(lu_bethe,'(A)')'Energy quadrature weights'
+	write(lu_bethe,FMT)(dXKT(IKT),IKT=1,NKT)
 	write(lu_bethe,*)''
 	write(lu_bethe,'(A)')'Source'
-	write(lu_bethe,'(1x,1p8e16.7)')(SOURCE(IKT),IKT=1,NKT)
+	write(lu_bethe,FMT)(SOURCE(IKT),IKT=1,NKT)
 	write(lu_bethe,*)''
 	write(lu_bethe,'(A)')'Lelec'
-	write(lu_bethe,'(1x,1p8e16.7)')(LELEC(IKT),IKT=1,NKT)
+	write(lu_bethe,FMT)(LELEC(IKT),IKT=1,NKT)
+	write(lu_bethe,*)''
+	write(lu_bethe,'(A)')'Fraction electron heating'
+	write(lu_bethe,FMT)(FRAC_ELEC_HEATING(ID),ID=1,ND)
+	write(lu_bethe,*)''
+	write(lu_bethe,'(A)')'Fraction ion heating'
+	write(lu_bethe,FMT)(FRAC_ION_HEATING(ID),ID=1,ND)
+	write(lu_bethe,*)''
+	write(lu_bethe,'(A)')'Fraction excitation heating'
+	write(lu_bethe,FMT)(FRAC_EXCITE_HEATING(ID),ID=1,ND)
 	write(lu_bethe,*)''
 	do dpth_indx=1,nd
 	  write(lu_bethe,'(A,I5)')'Depth: ',dpth_indx
-	  write(lu_bethe,'(1x,1p8e16.7)')(YE(IKT,DPTH_INDX),IKT=1,NKT)
+	  write(lu_bethe,FMT)(YE(IKT,DPTH_INDX),IKT=1,NKT)
 	  write(lu_bethe,*)''
 	end do
 	close(unit=lu_bethe)

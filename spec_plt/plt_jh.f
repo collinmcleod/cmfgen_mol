@@ -861,7 +861,8 @@
 	      TB(I)=TA(I)*ZM(1)%RJ(1,ML)
 	    END DO
 	    I=NEW_ND-K
-            CALL MON_INTERP(TB(K+1),I,IONE,NEW_R(K+1),I,ZM(1)%RJ(1,ML),ZM(1)%ND,R,ZM(1)%ND)
+	    TC=ZM(1)%RJ(1:ND,ML)
+            CALL MON_INTERP(TB(K+1),I,IONE,NEW_R(K+1),I,TC,ZM(1)%ND,R,ZM(1)%ND)
             WRITE(83,REC=ACCESS_F-1+ML)(TB(I),I=1,NEW_ND),ZM(ID)%NU(ML)
 	  END DO
 	  CLOSE(UNIT=83)

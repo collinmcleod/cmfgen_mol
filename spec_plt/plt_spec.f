@@ -72,6 +72,7 @@ C
 	CHARACTER*80 NAME		!Default title for plot
 	CHARACTER*80 XAXIS,XAXSAV	!Label for Absisca
 	CHARACTER*80 YAXIS		!Label for Ordinate
+	CHARACTER*80 TITLE
 C
 	REAL*8 LUM
 	REAL*8 TOT_LUM
@@ -183,7 +184,7 @@ C
 	LOGICAL EQUAL
 	CHARACTER*30 UC
 	CHARACTER*30 FILTER_SET 
-	EXTERNAL SPEED_OF_LIGHT,EQUAL,FAC,UC,LAM_VAC,GET_INDX_SP
+	EXTERNAL SPEED_OF_LIGHT,EQUAL,FAC,UC,LAM_VAC,GET_INDX_DP
 C
 C 
 C Filter and extinction data:
@@ -256,6 +257,7 @@ C
 	XAXSAV=' '
 	YAXIS=' '
 	NAME=' '
+	TITLE=' '
 !	PI=FUN_PI()
 C
 	LOG_X=.FALSE.
@@ -401,6 +403,7 @@ C
 	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
 	  CALL USR_HIDDEN(XFAC,'XFAC','1.0D0',' ')
+	  CALL USR_HIDDEN(TITLE,'TIT',' ',' ')
 	  CALL USR_HIDDEN(RAD_VEL,'RAD_VEL','0.0D0','Radial velocity(km/s) of star')
 	  IF(XFAC .NE. 1.0D0 .AND. RAD_VEL .NE. 0.0D0)THEN
 	    WRITE(6,*)'Only one of XFAC and RAD_VEL can be changed from their default values of 1 and 0'
@@ -445,7 +448,7 @@ C
 	    END DO
 	    CALL CNVRT(XV,YV,NCF_MOD,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1                 LAMC,XAXIS,YAXIS,L_FALSE)
-	    CALL CURVE(NCF_MOD,XV,YV)
+	    CALL CURVE_LAB(NCF_MOD,XV,YV,TITLE)
 	  END IF
 C
 	ELSE IF(X(1:7) .EQ. 'RD_CONT')THEN
@@ -455,6 +458,7 @@ C
 	  CALL RD_MOD(NU_CONT,OBSF_CONT,NCF_MAX,NCF_CONT,FILENAME,IOS)
 	  CALL USR_HIDDEN(CLIP_FEATURES,'CLIP','F','Clipe out continuum features')
 	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
+	  CALL USR_HIDDEN(TITLE,'TIT',' ',' ')
 	  IF(IOS .NE. 0)GOTO 1		!Get another option
 	  SCALE_FAC=1.0D0
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
@@ -482,7 +486,36 @@ C
 	        WRITE(50,*)XV(I),YV(I)
 	      END DO
 	    ELSE
-	      CALL CURVE(NCF_CONT,XV,YV)
+	      CALL CURVE_LAB(NCF_CONT,XV,YV,TITLE)
+	    END IF
+	  END IF
+!
+	ELSE IF(X(1:6) .EQ. 'RD_POL')THEN
+	  FILENAME=' '
+	  CALL USR_OPTION(FILENAME,'File',' ','Polarization file')
+	  CALL USR_OPTION(IST,'IREC','1','Angle (polarization record)')
+	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
+	  CALL USR_HIDDEN(TITLE,'TIT',' ',' ')
+	  IF(OVER)THEN
+	    CALL RD_SING_POL_I(OBSF,NU,NCF,NCF_MAX,IST,FILENAME,LU_IN,IOS)
+	    IF(IOS .NE. 1)GOTO 1
+	  ELSE
+	    CALL USR_HIDDEN(WR_PLT,'WR','F','Write data to file')
+	    CALL RD_SING_POL_I(OBSF_CONT,NU_CONT,NCF_CONT,NCF_MAX,IST,FILENAME,LU_IN,IOS)
+	    IF(IOS .NE. 0)GOTO 1
+	    DO I=1,NCF_CONT
+	      XV(I)=NU_CONT(I)
+	      YV(I)=OBSF_CONT(I)
+	    END DO
+	    CALL CNVRT(XV,YV,NCF_CONT,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
+	1                 LAMC,XAXIS,YAXIS,L_FALSE)
+	    CALL USR_HIDDEN(WR_PLT,'WR','F','Write data to file')
+	    IF(WR_PLT)THEN
+	      DO I=1,NCF_CONT
+	        WRITE(50,*)XV(I),YV(I)
+	      END DO
+	    ELSE
+	      CALL CURVE_LAB(NCF_CONT,XV,YV,TITLE)
 	    END IF
 	  END IF
 !
@@ -494,6 +527,7 @@ C
 	  CALL USR_OPTION(FILENAME,'File',' ','Model file')
 	  CALL RD_XY_DATA_USR(NU_CONT,OBSF_CONT,NCF_CONT,NCF_MAX,FILENAME,LU_IN,IOS)
 	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
+	  CALL USR_HIDDEN(TITLE,'TIT',' ',' ')
 	  IF(OVER .AND. IOS .EQ. 0)THEN
 	    NCF=NCF_CONT
 	    NU(1:NCF)=NU_CONT(1:NCF)
@@ -508,7 +542,7 @@ C
 	      CALL USR_OPTION(T1,'SCL_FAC','1.0D+40','Factor to divide data by')
 	      OBSF_CONT(1:NCF_CONT)=OBSF_CONT(1:NCF_CONT)/T1
 	    END IF
-	    CALL DP_CURVE(NCF_CONT,NU_CONT,OBSF_CONT)
+	    CALL DP_CURVE_LAB(NCF_CONT,NU_CONT,OBSF_CONT,TITLE)
 	  END IF
 !
 	ELSE IF(X(1:7) .EQ. 'RROW')THEN
@@ -518,12 +552,15 @@ C
 	  CALL USR_OPTION(YKEY,'YKEY',' ','Key with Y data')
 	  CALL USR_OPTION(NCF_CONT,'N',' ','Number of data points')
 	  CALL RD_ROW_DATA(NU_CONT,OBSF_CONT,NCF_CONT,XKEY,YKEY,FILENAME,LU_IN,IOS)
-	  IF(IOS .EQ. 0)CALL DP_CURVE(NCF_CONT,NU_CONT,OBSF_CONT)
+	  IF(IOS .EQ. 0)THEN
+	    CALL DP_CURVE_LAB(NCF_CONT,NU_CONT,OBSF_CONT,TITLE)
+	  END IF
 C
 	ELSE IF(X(1:4) .EQ. 'NORM')THEN
 C
 	  READ_OBS=.FALSE.
 	  CALL USR_HIDDEN(READ_OBS,'RD_OBS','F',' ')
+	  CALL USR_HIDDEN(TITLE,'TIT',' ',' ')
 C
 	  FILENAME=' '
 	  CALL USR_OPTION(FILENAME,'File',' ','Continuum file')
@@ -644,7 +681,7 @@ C
 	      WRITE(50,*)XV(I),YV(I)
 	    END DO
 	  ELSE
-	    CALL CURVE(NCF,XV,YV)
+	    CALL CURVE_LAB(NCF,XV,YV,TITLE)
 	  END IF
 	  YAXIS='F\d\gn\u/F\dc\u'
 C
@@ -656,7 +693,7 @@ C
 C
 	    CALL RD_EW(XV,YV,NCF_MAX,J,FILENAME,IOS)
 	    IF(IOS .NE. 0)GOTO 1		!Get another option
-	    CALL CURVE(J,XV,YV)
+	    CALL CURVE_LAB(J,XV,YV,TITLE)
 C
 C 
 C
@@ -668,6 +705,7 @@ C
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
 	  ADD_FAC=0.0D0
 	  CALL USR_HIDDEN(ADD_FAC,'ADD','0.0D0',' ')
+	  CALL USR_HIDDEN(TITLE,'TIT',' ',' ')
 C
 	  RAD_VEL=0.0D0
 	  CALL USR_HIDDEN(RAD_VEL,'RAD_VEL','0.0D0','Radial velocity of star (+ve if away)')
@@ -874,7 +912,7 @@ C
 	        WRITE(50,*)XV(I),YV(I)
 	      END DO
 	    ELSE
-	      CALL CURVE(J,XV,YV)
+	      CALL CURVE_LAB(J,XV,YV,TITLE)
 	    END IF
 	  END IF
 !
@@ -931,7 +969,7 @@ C
 	    END DO
 	    CALL CNVRT(XV,YV,NCF_MOD,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1                 LAMC,XAXIS,YAXIS,L_FALSE)
-	    CALL CURVE(NCF_MOD,XV,YV)
+	    CALL CURVE_LAB(NCF_MOD,XV,YV,TITLE)
 	  END IF
 !
 	ELSE IF(X(1:5) .EQ. 'ISABS') THEN
@@ -1227,7 +1265,7 @@ C
 !
 	  CALL CNVRT(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1                 LAMC,XAXIS,YAXIS,L_TRUE)
-	  CALL CURVE(NCF,XV,YV)
+	  CALL CURVE_LAB(NCF,XV,YV,TITLE)
 	  YAXIS='F\d\gn\u/F\dc\u'
 !
 	  WRITE(T_OUT,*)' '
@@ -1472,7 +1510,7 @@ C
 	  ELSE IF(OVER)THEN
 	    OBSF(1:NCF)=YV(1:NCF)
 	  ELSE 
-	    CALL CURVE(NCF,XV,YV)
+	    CALL CURVE_LAB(NCF,XV,YV,TITLE)
 	  END IF
 	ELSE IF(X(1:2) .EQ.'RV')THEN
 	  RAD_VEL=0.0D0
@@ -1548,7 +1586,7 @@ C
 	  I=NCF-1
 	  CALL CNVRT(XV(2),YV(2),I,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1                 LAMC,XAXIS,YAXIS,L_TRUE)
-	  CALL CURVE(I,XV(2),YV(2))
+	  CALL CURVE_LAB(I,XV(2),YV(2),TITLE)
 	  YAXIS='Log(N)'
 C
 	ELSE IF(X(1:3) .EQ.'CUM')THEN
@@ -1571,7 +1609,7 @@ C
 	  WRITE(T_OUT,*)'Total Luminosity is',T2
 	  CALL CNVRT(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1                 LAMC,XAXIS,YAXIS,L_TRUE)
-	  CALL CURVE(NCF,XV,YV)
+	  CALL CURVE_LAB(NCF,XV,YV,TITLE)
 C
 	ELSE IF(X(1:4) .EQ. 'FILT')THEN
 	  XV(1:NCF)=NU(1:NCF)
@@ -1672,26 +1710,6 @@ C
 !	  CLOSE(UNIT=LU_OUT)
 !
 C
-	ELSE IF(X(1:4) .EQ. 'FLUX')THEN
-	  T1=5500
-	  DO I=1,NCF
-	    XV(I)=NU(I)
-	    YV(I)=OBSF(I)
-	  END DO
-	  CALL CNVRT(XV,YV,NCF,L_FALSE,L_FALSE,'ANG','FLAM',
-	1                 LAMC,XAXIS,YAXIS,L_FALSE)
-	  SP_VAL=5400.0D0; I=GET_INDX_SP(SP_VAL,XV,NCF)
-	  T1=YV(I)+(YV(I+1)-YV(I))*(SP_VAL-XV(I))/(XV(I+1)-XV(I))
-	  SP_VAL=5500.0D0; I=GET_INDX_SP(SP_VAL,XV,NCF)
-	  T2=YV(I)+(YV(I+1)-YV(I))*(SP_VAL-XV(I))/(XV(I+1)-XV(I))
-	  SP_VAL=5600.0D0; I=GET_INDX_SP(SP_VAL,XV,NCF)
-	  T3=YV(I)+(YV(I+1)-YV(I))*(SP_VAL-XV(I))/(XV(I+1)-XV(I))
-	  SP_VAL=ANG_TO_HZ/5500.0D0
-	  SP_VAL=1.0D+08*T2*5500.0D0/SP_VAL
-	  WRITE(6,'(10X,A,4X,A,7X,A)')'Jy','ergs/cm^2/s/A','Slope'
-	  WRITE(6,'(F12.2,5X,ES12.4,5X,F7.3,6X,A)')SP_VAL,T2,
-	1             LOG(T3/T1)/LOG(5600.0/5400.0),TRIM(FILENAME)
-!
 	ELSE IF(X .EQ. 'BB')THEN
 	  
 	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model data')
@@ -1771,7 +1789,7 @@ C
 	       T1=MAXVAL(YV(1:NBB))
 	       YV(1:NBB)=YV(1:NBB)/T1
 	    END IF
-	    CALL CURVE(NBB,XV,YV)
+	    CALL CURVE_LAB(NBB,XV,YV,TITLE)
 	  END IF
 !
 	ELSE IF(X(1:5) .EQ. 'AV_EN')THEN
@@ -1804,7 +1822,6 @@ C
 	  WRITE(T_OUT,*)'Please see the HTML web pages in $CMFDIST/txt_files for help'
 	  WRITE(T_OUT,*)' '
 	ELSE IF(X(1:2) .EQ. 'EX') THEN
-	  CALL CURVE(0,XV,YV)
 	  STOP
 	ELSE IF(X(1:3) .EQ. 'BOX') THEN
 	  CALL WR_BOX_FILE(MAIN_OPT_STR)

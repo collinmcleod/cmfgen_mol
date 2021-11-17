@@ -23,7 +23,7 @@
 	CHARACTER(LEN=200) SUB_STR(NMAX)
 	CHARACTER(LEN=200) FULL_STR
 !
-	INTEGER I,K,L
+	INTEGER I,K,KC,L
 !
 	DO L=1,N
 	  FULL_STR=STRING(L)
@@ -49,6 +49,7 @@
 	      SUB_STR(I)=FULL_STR(1:K-1)
 	      FULL_STR=FULL_STR(K+2:)
 	      K=INDEX(FULL_STR,' ')
+	      KC=INDEX(FULL_STR,',')
 	      IF(K .GE. 3)THEN
 	        IF(FULL_STR(2:2) .LT. '0' .AND. FULL_STR(2:0) .GT. '9')K=K-1
 	      END IF
@@ -57,6 +58,7 @@
 	        WRITE(6,*)'Invalid pen color in STRING'
 	        WRITE(6,*)TRIM(STRING(L))
 	      END IF
+	      IF(KC .EQ. K-1)K=KC
 	      FULL_STR=FULL_STR(K:)
 	    END IF
 	  END DO

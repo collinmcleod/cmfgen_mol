@@ -15,6 +15,7 @@ OBJ = $(LIB)(read_arnaud_ion_data.o)\
       $(LIB)(arnaud_cross_v3.o)\
       $(LIB)(bethe_approx_v5.o)\
       $(LIB)(intsigc.o)\
+      $(LIB)(rd_non_therm_elec_spec_v1.o)\
       $(LIB)(rd_nt_crosec_sclfac_v2.o)\
       $(LIB)(se_ba_non_therm_v2.o)\
       $(LIB)(set_xkt_array.o)\
@@ -43,7 +44,7 @@ $(LIB_DIR)libmod.a(mod_non_therm.o) : mod_non_therm.f90
 	ar ruv $(LIB_DIR)libmod.a mod_non_therm.o
 
 $(LIB)(%.o) : %.f90 $(LIB_DIR)libmod.a(mod_non_therm.o) $(ST) $(CMF) $(CNT)
-	$(F90) -c $(FFREE) -I..  $<
+	$(F90) -c $(FFRED) -I..  $<
 	ar ruv $(LIB) $*.o
 
 $(ST):

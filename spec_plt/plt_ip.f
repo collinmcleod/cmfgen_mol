@@ -904,8 +904,21 @@
 	  ALLOCATE (YV(NP))
 	  CALL SET_IP_XSPAT_UNIT(XV,P,XAXIS,R(ND),DISTANCE,NP)
 !
-	  YV(1:NP-1)=IP(1:NP-1,I)
-	  YAXIS='I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	  CALL USR_OPTION(MULT_BY_PSQ,'PSQ','F','Multiply by P^2?')
+	  MULT_BY_P=.FALSE.
+	  IF(.NOT. MULT_BY_PSQ)THEN
+	    CALL USR_OPTION(MULT_BY_P,'P','F','Multiply by P?')
+	  END IF
+	  IF(MULT_BY_PSQ)THEN
+	    YV(1:NP-1)=1.0D+20*P(1:NP-1)*P(1:NP-1)*IP(1:NP-1,I)
+	    YAXIS='p\u2\d.I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	  ELSE IF(MULT_BY_P)THEN
+	    YV(1:NP-1)=1.0D+10*P(1:NP-1)*IP(1:NP-1,I)
+	    YAXIS='p.I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	  ELSE
+	    YV(1:NP-1)=IP(1:NP-1,I)
+	    YAXIS='I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	  END IF
 	  CALL DP_CURVE(NP-1,XV,YV)
 !
 	ELSE IF(X(1:3) .EQ. 'WIP')THEN

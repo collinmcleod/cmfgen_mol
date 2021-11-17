@@ -14,9 +14,11 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(line_id_mod.o)\
       $(LIB)(amoeba.o)\
       $(LIB)(amotry.o)\
+      $(LIB)(arrange_pg_curve_ids.o)\
       $(LIB)(change_color.o)\
       $(LIB)(change_pen.o)\
       $(LIB)(curve.o)\
+      $(LIB)(curve_lab.o)\
       $(LIB)(cut_points_from_plot.o)\
       $(LIB)(define_more_pens.o)\
       $(LIB)(do_pg_deriv.o)\
@@ -51,7 +53,6 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(pg_mod_cont_nodes.o)\
       $(LIB)(put_text.o)\
       $(LIB)(rd_ew_id.o)\
-      $(LIB)(set_pg_titles.o)\
       $(LIB)(simp_ew.o)\
       $(LIB)(strip_slash_p.o)\
       $(LIB)(shrink_vectors.o)\
@@ -71,7 +72,7 @@ $(LIB) : $(OBJ)
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f 
-	$(F90) -c $(FG)  $<
+	$(F90) -c $(FG) -fbounds-check  $<
 	ar ruv $(LIB) $*.o
 
 # 
@@ -92,9 +93,11 @@ $(LIB)(draw_ew_ids.o)     : draw_ew_ids.f   $(LIB)(line_id_mod.o)  $(COL)
 $(LIB)(draw_ew_lines.o)   : draw_ew_lines.f $(LIB)(line_id_mod.o)  $(COL) 
 $(LIB)(rd_ew_id.o)        : rd_ew_id.f      $(LIB)(line_id_mod.o)  $(COL) 
 
-$(LIB)(gramon_pgplot.o)   : gramon_pgplot.f $(LIB)(mod_curve_data.o) $(LIB)(line_id_mod.o) $(GEN) $(COL) 
-$(LIB)(curve.o)           : curve.f         $(LIB)(mod_curve_data.o) $(GEN)
-$(LIB)(vectorpen.o)       : vectorpen.f     $(LIB)(mod_curve_data.o) $(GEN)
+$(LIB)(gramon_pgplot.o)         : gramon_pgplot.f          $(LIB)(mod_curve_data.o) $(LIB)(line_id_mod.o) $(GEN) $(COL) 
+$(LIB)(curve.o)                 : curve.f                  $(LIB)(mod_curve_data.o) $(GEN)
+$(LIB)(curve_lab.o)             : curve_lab.f              $(LIB)(mod_curve_data.o) $(GEN)
+$(LIB)(vectorpen.o)             : vectorpen.f              $(LIB)(mod_curve_data.o) $(GEN)
+$(LIB)(arrange_pg_curve_ids.o)  : arrange_pg_curve_ids.f   $(LIB)(mod_curve_data.o) $(GEN)
 
 $(LIB)(wr_gaus_fit.o)     : wr_gaus_fit.f   $(LIB)(gaus_fit_data.o)
 $(LIB)(do_gaus_fit.o)     : do_gaus_fit.f   $(LIB)(gaus_fit_data.o)

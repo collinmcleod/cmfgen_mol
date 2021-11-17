@@ -926,6 +926,7 @@ C     *   .or.(all_caps(1:4).eq.'BOX='))then
 C      elseif(.not.sve_read)then
        else
         o_end=index(answer,' ')-1
+	if(o_end .eq. 0)o_end=1
         l=index(answer,'(')-1
         if((l.gt.0).and.(l.lt.o_end))o_end=l
         if(main_option)then

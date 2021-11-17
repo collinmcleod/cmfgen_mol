@@ -44,6 +44,7 @@ C
 C
 	IMPLICIT NONE
 C
+C Altered 15-Nov-2021 - Fixed call to WRITE_VEC to fix vector/scaler issue.
 C Altered 28-Oct-1996 - Bug fix: COS corrected back to ACOS in TOR expression.
 C Altered 24-May-1996 - SCRTEMP common block removed.
 C                       Dynamic allocation now used for temporary arrays.
@@ -142,8 +143,8 @@ C
 	  CALL WRITE_VEC(PF,NLF,'PF',116)
 	  CALL WRITE_VEC(PROF,NLF,'PROF',116)
 	  CALL WRITE_VEC(LFQW,NLF,'LFQW',116)
-	  I=1; CALL WRITE_VEC(DBB,I,'DBB',116)
-	  I=1; CALL WRITE_VEC(FL,I,'FL',116)
+	  TA(1)=DBB; I=1; CALL WRITE_VEC(TA,I,'DBB',116)
+	  TA(1)=FL;  I=1; CALL WRITE_VEC(TA,I,'FL',116)
 	  FIRST=.FALSE.
 	  CALL WRITE_VEC(JCONT,ND,'JCONT',116)
 	  CALL WRITE_VEC(JINT_PREV,ND,'JINT_PREV',116)

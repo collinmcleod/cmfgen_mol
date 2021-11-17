@@ -15,7 +15,7 @@
 	REAL*4 XCHAR_SIZE,YCHAR_SIZE
 	REAL*4 EXPCHAR
 	INTEGER T_OUT
-	LOGICAL, PARAMETER :: TRACE=.FALSE.              !Set to TRUE for debugging purposes
+	LOGICAL, PARAMETER :: TRACE=.TRUE.              !Set to TRUE for debugging purposes
 !
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2
@@ -87,11 +87,11 @@
 	  WRITE(6,*)'Number of lines in spectral window to be indentified is:',LOC_NLINES
 	  IF(LOC_NLINES .EQ. 0)RETURN
 !
-! Determine maximum number of label slots. We subtract -3 to avoid issues near the boundaries.
+! Determine maximum number of label slots. 
 !
 	  LAB_START=XPAR(1)+1.5*LAB_SIZE
 	  LAB_SIZE=1.1D0*XCHAR_SIZE
-	  NPOS=ABS( (XPAR(2)-XPAR(1))/LAB_SIZE )-3
+	  NPOS=ABS( (XPAR(2)-XPAR(1))/LAB_SIZE )
 	  WRITE(6,*)'Number of label slots is:',NPOS
 	  IF(LOC_NLINES .GT. 0.8*NPOS)THEN
 	    WRITE(6,*)'Error -- too many lines to label in plot window'
@@ -108,6 +108,7 @@
 	    WRITE(6,*)'Unable to allocate LAB_POS or LAB_ID in DRAW_LINE_IDS'
 	    WRITE(6,*)'ERROR=',IOS
 	  END IF
+	  LAB_ID=0; LAB_POS=0
 !
 ! Define label positions and initialize label links.
 !
@@ -118,11 +119,11 @@
 	  IF(TRACE)WRITE(6,*)'Set LAB_POS and LAB_ID'
 !
 ! Store lines whose ID will be written. Initially they occupy
-! all slots up to LOC_NLINES.
+! all slots from location 3 up to LOC_NLINES+2.
 !
-	  L=0
+	  L=2; T2=2*LAB_SIZE
 	  DO I=1,N_LINE_IDS-1
-	    T1=(ID_WAVE(I)-XPAR(1))*(XPAR(2)-ID_WAVE(I))
+	    T1=(ID_WAVE(I)-XPAR(1)-T2)*(XPAR(2)+T2-ID_WAVE(I))
 	    IF(WR_ID(I) .AND. T1 .GT. 0.0D0)THEN
 	      IF(L+1 .GT. NPOS)THEN
 	        L=L-1
@@ -135,21 +136,28 @@
 	  END DO
 	  IF(TRACE)THEN
 	    WRITE(6,*)'Stored lines'
-	    WRITE(6,*)LAB_START,ID_WAVE(LAB_ID(NPOS)),LAB_SIZE
+	    WRITE(6,*)NPOS,LAB_SIZE,XPAR(1)
+	    WRITE(6,*)LAB_START
 	  END IF
 !
 ! Spread lines out where possible.
 !
-	  DO I=NPOS,1,-1
+	  DO I=NPOS-2,3,-1
 	    IF(LAB_ID(I) .NE. 0)THEN
 	      J=(ID_WAVE(LAB_ID(I))-LAB_START)/LAB_SIZE+1
-	      DO WHILE(LAB_ID(J) .NE. 0)
-	        J=J-1
+	      IF(J .LE. NPOS)THEN
+	        DO WHILE(LAB_ID(J) .NE. 0)
+	          J=J-1
+	          IF(J .LT. 1)EXIT
+	        END DO
 	        IF(J .LT. 1)EXIT
-	      END DO
-	      IF(J .LT. 1)EXIT
-	      LAB_ID(J)=LAB_ID(I)
-	      IF(I .NE. J)LAB_ID(I)=0
+	        LAB_ID(J)=LAB_ID(I)
+	        IF(I .NE. J)LAB_ID(I)=0
+	      ELSE
+	        WRITE(6,*)'Possible error'
+	        WRITE(6,*)J,NPOS
+	        WRITE(6,*)ID_WAVE(LAB_ID(I)),XPAR(1),XPAR(2)
+	      END IF
 	    END IF
 	  END DO
 !

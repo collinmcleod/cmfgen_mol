@@ -58,6 +58,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)plt_ddt_work.exe\
          $(EXE_DIR)plt_gf.exe\
          $(EXE_DIR)plt_hydro.exe\
+         $(EXE_DIR)plt_ion_mf.exe\
          $(EXE_DIR)plt_lte_ross.exe\
          $(EXE_DIR)plt_raw_xray.exe\
          $(EXE_DIR)plt_cool.exe\

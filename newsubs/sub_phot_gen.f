@@ -48,6 +48,7 @@
 !
 	IMPLICIT NONE
 !
+! Altered 15-Nov-2021 : Fixed call to XCROSS_V2 for type 31. Added STOP type 30.
 ! Altered 09-Oct-2018 : Now set the b-f gaunt factor to unity for n>30  (previously crashed).
 ! Altered 07-Oct-2015 : Bug fix for Type 7 (modified Seaton formula).
 !                         Offset was beeing added to the current frequency instead
@@ -517,11 +518,13 @@ C
 	          WRITE(6,*)'Error in SUB_PHOT_GEN -- calling CROSS TYPE 30 - 31'
 	          WRITE(6,*)'Loop   needs fixing'
 	          WRITE(6,*)GS_EDGE,NLEVS,PHOT_ID
+	          STOP
 !
 	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 31)THEN
 	          T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION	!# of elec. in species.
-	          T1=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,PD(ID)%CROSS_A(LMIN),PD(ID)%CROSS_A(LMIN),
-	1                        L_FALSE,L_FALSE)
+	          N=NINT(PD(ID)%CROSS_A(LMIN))
+	          L=NINT(PD(ID)%CROSS_A(LMIN))
+	          T1=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,N,L,L_FALSE,L_FALSE)
 	          IF(T1 .GT. 0)PHOT(I)=PHOT(I)+T1
 	          WRITE(6,*)'Error in SUB_PHOT_GEN -- calling CROSS TYPE 30 - 31'
 	          WRITE(6,*)'Loop   needs fixing'

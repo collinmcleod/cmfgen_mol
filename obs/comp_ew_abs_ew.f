@@ -24,7 +24,8 @@
 !
 	IMPLICIT NONE
 !
-! Alteerd 12-Sep-2019: Check whether the total opacity < 0. If it is we adjust
+! Altered 15-Nov-2021: Fixed call to WRITE_VEC to fix vector/scaler issue.
+! Altered 12-Sep-2019: Check whether the total opacity < 0. If it is we adjust
 !                         TCHI to make it positive. As the routine integrates 
 !                         over the source function, it does not hadle lasing.
 ! Altered  6-Sep-2019: Now return FLUX_EW which if Int (ABS[F-F_c])/F_c dnu.
@@ -89,8 +90,8 @@
 	  CALL WRITE_VEC(PF,NLF,'PF',116)
 	  CALL WRITE_VEC(PROF,NLF,'PROF',116)
 	  CALL WRITE_VEC(LFQW,NLF,'LFQW',116)
-	  I=1; CALL WRITE_VEC(DBB,I,'DBB',116)
-	  I=1; CALL WRITE_VEC(FL,I,'FL',116)
+	  TA(1)=DBB; I=1; CALL WRITE_VEC(TA,I,'DBB',116)
+	  TA(1)=FL;  I=1; CALL WRITE_VEC(TA,I,'FL',116)
 	  FIRST=.FALSE.
 	  CALL WRITE_VEC(JCONT,ND,'JCONT',116)
 	END IF

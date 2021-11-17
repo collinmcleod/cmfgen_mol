@@ -1642,11 +1642,13 @@
 	     WRITE(LU_FLUX,REC=INITIAL_ACCESS_REC+ML-1)(SOB(I),I=1,ND),FL
 	   END IF
 !
+	   CALL TUNE(1,'COMP_OBS_CMF')
 	   CALL COMP_OBS_V2(IPLUS,FL,
 	1           IPLUS_STORE,NU_STORE,NST_CMF,
 	1           MU_AT_RMAX,HQW_AT_RMAX,OBS_FREQ,OBS_FLUX,N_OBS,
 	1           V_AT_RMAX,RMAX_OBS,'IPLUS','LIN_INT',DO_CMF_REL_OBS,
 	1           FIRST_OBS_COMP,NP_OBS)
+	   CALL TUNE(2,'COMP_OBS_CMF')
 !
 	ELSE                          
 	  S1=(ETA(1)+RJ(1)*CHI_SCAT(1))/CHI(1)
@@ -1681,6 +1683,7 @@
 ! J is used for ACCESS_F.
 !
 	   IF(WRITE_FLUX .AND. ES_COUNTER .EQ. NUM_ES_ITERATIONS)THEN
+	     CALL TUNE(1,'WR_FLUX')
 	     IF(ML .EQ. 1)THEN
 	        CALL OPEN_RW_EDDFACTOR(R,V,LANG_COORD,ND,
 	1              REXT,VEXT,LANG_COORDEXT,ND,
@@ -1689,6 +1692,7 @@
 	     TA(1:ND)=13.1986D0*SOB(1:ND)
 	     WRITE(LU_FLUX,REC=EDD_CONT_REC)INITIAL_ACCESS_REC,NCF,ND
 	     WRITE(LU_FLUX,REC=INITIAL_ACCESS_REC+ML-1)(SOB(I),I=1,ND),FL
+	     CALL TUNE(2,'WR_FLUX')
 	   END IF
 !
 ! Compute the luminosity, the FLUX mean opacity, and the ROSSELAND
@@ -1706,6 +1710,7 @@
 	    INT_dBdT(I)=0.0d0
 	  END DO
 	END IF
+!
 	IF(COMPUTE_J)THEN
 	  T1=TWOHCSQ*HDKT*FQW(ML)*(NU(ML)**4)
 	  DO I=1,ND		              !(4*PI)**2*Dex(+20)/L(sun)
@@ -1748,25 +1753,6 @@
 	      END DO
 	    END IF
 	  END DO
-	  IF(ML .EQ. NCF)THEN
-	    DO I=1,ND
-	       ION_LINE_FORCE(I,:)=ION_LINE_FORCE(I,:)/ESEC(I)/STARS_LUM
-	       TA(I)=FLUXMEAN(I)/ESEC(I)/STARS_LUM
-	    END DO
-	    OPEN(UNIT=LUIN,FILE='ION_LINE_FORCE',STATUS='UNKNOWN',ACTION='WRITE')
-	      WRITE(LUIN,'(A)')' '
-	      WRITE(LUIN,'(A)')' Summary of line force contributions by individual ions.'
-	      WRITE(LUIN,'(A)')' Ion contributions are expressed as a % of total radiation force.'
-	      WRITE(LUIN,'(A)')' At depth, continuum opacities will also be important.'
-	      WRITE(LUIN,'(A)')' '
-	      WRITE(LUIN,'(3X,A,500(A8))')'d',' V(km/s)','    M(t)',(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
-	      DO I=1,ND
-	        WRITE(LUIN,'(I4,1X,F8.3,500(F8.2))')I,V(I),TA(I),
-	1                    (100.0D0*ION_LINE_FORCE(I,ID)/TA(I),ID=1,NUM_IONS)
-	      END DO
-	      WRITE(LUIN,'(3X,A,500(A8))')'d',' V(km/s)','    M(t)',(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
-	    CLOSE(LUIN)
-	  END IF
 	END IF
 !
 ! The current opacities and emissivities are stored for the variation of the
@@ -1917,6 +1903,11 @@
 	  ROSSMEAN(I)=T1*( T(I)**3 )/ROSSMEAN(I)
 	  PLANCKMEAN(I)=4.0D0*PLANCKMEAN(I)/T1/( T(I)**4 )
 	END DO
+!
+	IF(WR_ION_LINE_FORCE)THEN
+	    CALL OUT_LINE_FORCE(ION_LINE_FORCE,FLUXMEAN,ROSSMEAN,RLUMST,ESEC,
+	1          R,V,DENSITY,ION_ID,ND,NUM_IONS)
+	END IF
 !
 ! Due to instabilities, the FLUX mean opacity can sometimes be
 ! negative. If so we can continue, but we note that the

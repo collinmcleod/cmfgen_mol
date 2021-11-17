@@ -10,6 +10,8 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 17-Nov-2021: Transfered from OSIRIS.
+! Altered: 22-Oct-2021: Major editing to improve optios (and earlier)
 ! Altered: 27-May-2021: Small bug fixis (transferred from OSIRIS 21-Jul-20201).
 ! Altered: 17-Nov-2009: Now read in charge exchange cooling.
 !                         Slight format change.
@@ -25,6 +27,7 @@
 	REAL*8, ALLOCATABLE :: CHG_IR(:)
 	REAL*8, ALLOCATABLE :: NT_IR(:)
 	REAL*8, ALLOCATABLE :: COL_RR(:)
+	REAL*8, ALLOCATABLE :: XRAY_RR(:)
 	REAL*8, ALLOCATABLE :: CHG_RR(:)
 	REAL*8, ALLOCATABLE :: ADVEC_RR(:)
 !
@@ -36,7 +39,7 @@
 !
 	REAL*8, ALLOCATABLE :: XVEC(:)
 	REAL*8, ALLOCATABLE :: YVEC(:)
-	REAL*8, ALLOCATABLE :: YSUM(:)
+	REAL*8, ALLOCATABLE :: TOT_SUM(:)
 !
 	INTEGER ND
 	INTEGER NV
@@ -50,6 +53,8 @@
 	LOGICAL FILE_OPEN
 	LOGICAL NET_RECOM_PER_LEVEL
 	LOGICAL DO_INDIV_RATES
+	LOGICAL NORM
+	LOGICAL ABS_VALUE
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
         CHARACTER(LEN=2), PARAMETER :: FORMFEED=' '//CHAR(12)
@@ -58,7 +63,7 @@
 	CHARACTER(LEN=132) STRING
 	CHARACTER(LEN=132) FILE_NAME
 	CHARACTER(LEN=10) SPECIES
-	CHARACTER(LEN=2) XAX_OPT
+	CHARACTER(LEN=5) OPTION
 	CHARACTER(LEN=30) XLABEL
 	CHARACTER(LEN=30) YLABEL
         CHARACTER(LEN=30) UC
@@ -90,6 +95,7 @@
 	IF(IOS .EQ. 0)ALLOCATE(CHG_IR(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE(NT_IR(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE(COL_RR(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE(XRAY_RR(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE(CHG_RR(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE(ADVEC_RR(ND),STAT=IOS)
 !
@@ -101,7 +107,7 @@
 !
 	IF(IOS .EQ. 0)ALLOCATE(XVEC(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE(YVEC(ND),STAT=IOS)
-	IF(IOS .EQ. 0)ALLOCATE(YSUM(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE(TOT_SUM(ND),STAT=IOS)
 !
 	IOS=0
 	OPEN(UNIT=20,FILE='RVTJ',STATUS='OLD',IOSTAT=IOS)
@@ -128,6 +134,7 @@
 	NT_IR(1:ND)=0.0D0
 	CHG_RR(1:ND)=0.0D0
 	COL_RR(1:ND)=0.0D0
+	XRAY_RR(1:ND)=0.0D0
 	ADVEC_RR(1:ND)=0.0D0
 	RECOM_SUM(1:ND)=0.0D0
 	PHOT_SUM(1:ND)=0.0D0
@@ -270,6 +277,10 @@
 	       READ(20,'(A)')STRING
 	       WRITE(21,'(A)')TRIM(STRING)
 	       READ(STRING,*)(NT_IR(I),I=IST,IEND)
+	     ELSE IF(INDEX(STRING,'Net X-ray recombination rate') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       WRITE(21,'(A)')TRIM(STRING)
+	       READ(STRING,*)(XRAY_RR(I),I=IST,IEND)
 	     END IF
 	   END DO
 !
@@ -296,118 +307,139 @@
 	WRITE(6,'(8ES14.4)')R(1),V(1),TEMP(1),R(ND),V(ND),TEMP(ND)
 !
 	DO I=1,ND
-	   YSUM(I)=( PHOT_SUM(I)+RECOM_SUM(I) +
+	   TOT_SUM(I)=( PHOT_SUM(I)+RECOM_SUM(I) +
 	1             COL_IR(I)+CHG_IR(I) +
-	1             COL_RR(I)+CHG_RR(I) +
+	1             COL_RR(I)+CHG_RR(I) + 
+	1             ABS(XRAY_RR(I)) +
 	1             ABS(NT_IR(I)) +
 	1             ABS(ADVEC_RR(I)) )/2.0D0
-	   PHOT_SUM(I)=PHOT_SUM(I)/YSUM(I)
-	   COL_IR(I)=COL_IR(I)/YSUM(I)
-	   CHG_IR(I)=CHG_IR(I)/YSUM(I)
-	   NT_IR(I)=NT_IR(I)/YSUM(I)
+	   PHOT_SUM(I)=-PHOT_SUM(I)
+	   COL_IR(I)=-COL_IR(I)
+	   CHG_IR(I)=-CHG_IR(I)
+	   NT_IR(I)=NT_IR(I)
 !
-	   RECOM_SUM(I)=-RECOM_SUM(I)/YSUM(I)
-	   COL_RR(I)=-COL_RR(I)/YSUM(I)
-	   CHG_RR(I)=-CHG_RR(I)/YSUM(I)
-	   ADVEC_RR(I)=-ADVEC_RR(I)/YSUM(I)
+	   RECOM_SUM(I)=RECOM_SUM(I)
+	   XRAY_RR(I)=XRAY_RR(I)
+	   COL_RR(I)=COL_RR(I)
+	   CHG_RR(I)=CHG_RR(I)
+	   ADVEC_RR(I)=ADVEC_RR(I)
 	END DO
 	YLABEL='Normalized rate'
+	XVEC(1:ND)=V(1:ND)
+	XLABEL='V(km/s)'
 !
 2000	CONTINUE
-	XAX_OPT='XN'
-	CALL GEN_IN(XAX_OPT,'X axis option: XN, R, V, T, ED, EX(stop), NS (new species)')
-	XAX_OPT=UC(XAX_OPT)
-	IF(XAX_OPT(1:2) .EQ. 'XN')THEN
+	OPTION='XN'
+	CALL GEN_IN(OPTION,'Plot option: XN, R, V, T, ED, EX(stop), NS (new species),RATES')
+	OPTION=UC(OPTION)
+	WRITE(6,*)'Option=',OPTION
+	IF(OPTION(1:2) .EQ. 'XN')THEN
 	  DO I=1,ND
 	    XVEC(I)=I
 	  END DO
 	  XLABEL='Depth index'
-	ELSE IF(XAX_OPT(1:2) .EQ. 'NS')THEN
+	  GOTO 2000
+	ELSE IF(OPTION .EQ. 'NS')THEN
 	  GOTO 1000
-	ELSE IF(XAX_OPT(1:1) .EQ. 'R')THEN
+	ELSE IF(OPTION .EQ. 'R')THEN
 	  XVEC(1:ND)=R(1:ND)
 	  XLABEL='Radius(10\u10\d cm)'
-	ELSE IF(XAX_OPT(1:1) .EQ. 'V')THEN
+	  GOTO 2000
+	ELSE IF(OPTION .EQ. 'V')THEN
 	  XVEC(1:ND)=V(1:ND)
 	  XLABEL='V(km/s)'
-	ELSE IF(XAX_OPT(1:1) .EQ. 'T')THEN
+	  GOTO 2000
+	ELSE IF(OPTION .EQ. 'T')THEN
 	  XVEC(1:ND)=TEMP(1:ND)
 	  XLABEL='T(10\u4\dK)'
-	ELSE IF(XAX_OPT(1:2) .EQ. 'ED')THEN
+	ELSE IF(OPTION .EQ. 'ED')THEN
 	  XVEC(1:ND)=ED(1:ND)
 	  XLABEL='Ne(cm\u-3\d)'
-	ELSE IF(XAX_OPT(1:2) .EQ. 'EX')THEN
+	ELSE IF(OPTION(1:2) .EQ. 'EX')THEN
 	  STOP
+!
+	ELSE IF(OPTION(1:5) .EQ. 'RATES')THEN
+!
+	  NORM=.TRUE.;  ABS_VALUE=.FALSE.
+	  CALL GEN_IN(NORM,'Normalize rates')
+	  CALL GEN_IN(ABS_VALUE,'Plot absolute values')
+	  WRITE(6,*)' '
+	  WRITE(6,*)'Calling DP_CURVE'
+	  WRITE(6,*)'                : +ve means recombination'
+	  WRITE(6,*)'                : -ve means ionizing'
+	  WRITE(6,*)' '
+!
+	  YLABEL='Rates'; I=1
+	  CALL PLT_RATE(XVEC,PHOT_SUM,TOT_SUM,'Photoionization rate',NORM,ABS_VALUE,I,ND)
+	  CALL PLT_RATE(XVEC,RECOM_SUM,TOT_SUM,'Recombination rate',NORM,ABS_VALUE,I,ND)
+	  CALL PLT_RATE(XVEC,NT_IR,TOT_SUM,'Non-thermal ionization rat',NORM,ABS_VALUE,I,ND)
+	  CALL PLT_RATE(XVEC,ADVEC_RR,TOT_SUM,'Advection rate',NORM,ABS_VALUE,I,ND)
+	  CALL PLT_RATE(XVEC,CHG_IR,TOT_SUM,'Charge exch. ionization rate',NORM,ABS_VALUE,I,ND)
+	  CALL PLT_RATE(XVEC,CHG_RR,TOT_SUM,'Charge exch. recombination rate',NORM,ABS_VALUE,I,ND)
+	  CALL PLT_RATE(XVEC,COL_IR,TOT_SUM,'Collisional ionization rate',NORM,ABS_VALUE,I,ND)
+	  CALL PLT_RATE(XVEC,COL_RR,TOT_SUM,'Collisional recombination rate',NORM,ABS_VALUE,I,ND)
+	  CALL PLT_RATE(XVEC,XRAY_RR,TOT_SUM,'Net X-ray recombination rate',NORM,ABS_VALUE,I,ND)
+!
+	ELSE IF(OPTION .EQ. 'P')THEN
+	  CALL GRAMON_PGPLOT(XLABEL,YLABEL,' ',' ')
+!
+	ELSE IF(OPTION(1:5) .EQ. 'WEIRD')THEN
+	  WRITE(6,*)ED
+	  WRITE(6,*)DI
+	  J=1
+	  DO WHILE(J .NE. 0)
+	    CALL GEN_IN(J,'Level - zero to cease')
+	    IF(J .NE. 0)THEN
+	      YVEC(1:ND)=1.0D+14*PHOT(1:ND,J)/ED/DI
+	      CALL DP_CURVE(ND,XVEC,YVEC)
+	      YVEC(1:ND)=1.0D+14*RECOM(1:ND,J)/ED/DI
+	      CALL DP_CURVE(ND,XVEC,YVEC)
+	    END IF
+	  END DO
+	  CALL GRAMON_PGPLOT(XLABEL,'1.0D+14\ga',' ',' ')
+	  GOTO 2000
 	ELSE
 	  WRITE(6,*)'Unrecognized X-axis option'
 	  GOTO 2000
 	END IF
-!
-	MIN_VAL=0.01D0
-	WRITE(6,*)' '
-	WRITE(6,*)'Calling DP_CURVE'
-	WRITE(6,*)'                : +ve means ionizing'
-	WRITE(6,*)'                : -ve means recombination'
-	WRITE(6,*)' '
-!
-	WRITE(6,'(A,I2,2A)')PG_PEN(2)//'   Curve ',1,': Photoionization rate',DEF_PEN
-	CALL DP_CURVE(ND,XVEC,PHOT_SUM)
-	I=2
-	IF(MINVAL(RECOM_SUM(1:ND)) .LE. -MIN_VAL)THEN
-	  CALL DP_CURVE(ND,XVEC,RECOM_SUM)
-	  I=I+1
-	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Radiative recombination rate',DEF_PEN
-	END IF
-!
-	IF(MAXVAL(NT_IR(1:ND)) .GE. MIN_VAL)THEN
-	  CALL DP_CURVE(ND,XVEC,NT_IR)
-	  I=I+1
-	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Non-thermal ionization rate',DEF_PEN
-	END IF
-	IF(MAXVAL(ABS(ADVEC_RR(1:ND))) .GE. MIN_VAL)THEN
-	  CALL DP_CURVE(ND,XVEC,ADVEC_RR)
-	  I=I+1
-	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Advection rate',DEF_PEN
-	END IF
-!
-	IF(MAXVAL(CHG_IR(1:ND)) .GE. MIN_VAL)THEN
-	  CALL DP_CURVE(ND,XVEC,CHG_IR)
-	  I=I+1
-	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Charge exch. ionization rate',DEF_PEN
-	END IF
-	IF(MINVAL(CHG_RR(1:ND)) .LE. -MIN_VAL)THEN
-	  CALL DP_CURVE(ND,XVEC,CHG_RR)
-	  I=I+1
-	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Charge exch. recombination rate',DEF_PEN
-	END IF
-!
-	IF(MAXVAL(COL_IR(1:ND)) .GE. MIN_VAL)THEN
-	  CALL DP_CURVE(ND,XVEC,COL_IR)
-	  I=I+1
-	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Collsional ionization rate',DEF_PEN
-	END IF
-	IF(MINVAL(COL_RR(1:ND)) .LE. -MIN_VAL)THEN
-	  CALL DP_CURVE(ND,XVEC,COL_RR)
-	  I=I+1
-	  WRITE(6,'(A,I2,2A)')PG_PEN(I)//'   Curve ',I-1,': Collisional recombination rate',DEF_PEN
-	END IF
-!
-	WRITE(6,*)' '
-	CALL GRAMON_PGPLOT(XLABEL,YLABEL,' ',' ')
-!
-	WRITE(6,*)ED
-	WRITE(6,*)DI
-	J=1
-	DO WHILE(J .NE. 0)
-	  CALL GEN_IN(J,'Level - zero to cease')
-	  IF(J .NE. 0)THEN
-	    YVEC(1:ND)=1.0D+14*PHOT(1:ND,J)/ED/DI
-	    CALL DP_CURVE(ND,XVEC,YVEC)
-	    YVEC(1:ND)=1.0D+14*RECOM(1:ND,J)/ED/DI
-	    CALL DP_CURVE(ND,XVEC,YVEC)
-	  END IF
-	END DO
-	CALL GRAMON_PGPLOT(XLABEL,'1.0D+14\ga',' ',' ')
 	GOTO 2000
 !
+	END
+!
+	SUBROUTINE PLT_RATE(XVEC,PHOT_SUM,TOT_SUM,DESC,NORM,ABS_VALUE,IP,ND)
+	USE MOD_COLOR_PEN_DEF
+	IMPLICIT NONE
+!
+	INTEGER ND
+	INTEGER IP
+!
+	REAL*8 XVEC(ND)
+	REAL*8 PHOT_SUM(ND)
+	REAL*8 TOT_SUM(ND)
+	REAL*8 YVEC(ND)
+	CHARACTER(LEN=*) DESC
+!
+	INTEGER I
+	LOGICAL NORM
+	LOGICAL ABS_VALUE
+!
+	IF(MAXVAL(ABS(PHOT_SUM)) .EQ. 0.0D0)RETURN
+!
+	IF(NORM)THEN
+	  YVEC=PHOT_SUM/TOT_SUM
+	  CALL DP_CURVE(ND,XVEC,YVEC)
+	ELSE IF(ABS_VALUE)THEN
+	  YVEC=-40
+	  DO I=1,ND
+	    IF(PHOT_SUM(I) .GT. 0.0D0)YVEC(I)=LOG10(PHOT_SUM(I))
+	  END DO
+	  CALL DP_CURVE(ND,XVEC,YVEC)
+	ELSE
+	  YVEC=PHOT_SUM
+	  CALL DP_CURVE(ND,XVEC,YVEC)
+	END IF
+	WRITE(6,'(A,I2,2A)')PG_PEN(IP+1)//'   Curve ',IP,TRIM(DESC),DEF_PEN
+	IP=IP+1
+!
+	RETURN
 	END

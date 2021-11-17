@@ -1,10 +1,14 @@
 !
 ! Program to initialize plotting arrays.
 !
-	SUBROUTINE CURVE(NUM,X,Y)
+! The routines in this file should be identical to those in curve.f
+! except I have add CURVE_LABEL to the calls, and CURVE_ID is set.
+!
+	SUBROUTINE CURVE_LAB(NUM,X,Y,CURVE_LABEL)
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
+! Modified 14-Nov-2021 : Add _ID to calls.
 ! Modified 28-Mar-2003 : Check on NUM=0 installed. Minor clean.
 ! Modified 15-Jul-2000 : Incorporated MOD_CURVE DATA
 !                        Dynamically allocated arrays.
@@ -13,6 +17,7 @@
 !
 	INTEGER NUM
 	REAL X(NUM),Y(NUM)
+	CHARACTER(LEN=*) CURVE_LABEL
 !
 	INTEGER J
 !
@@ -37,7 +42,7 @@
 !
 	CD(J)%XVEC(1:NUM)=X(1:NUM)
 	CD(J)%DATA(1:NUM)=Y(1:NUM)
-	CD(J)%CURVE_ID=' '
+	CD(J)%CURVE_ID=CURVE_LABEL
 	NPTS(J)=NUM
 	ERR(J)=.FALSE.
 	NPLTS=J
@@ -51,13 +56,14 @@
 !
 ! Created 06-Mar-1990 - Based on curve
 !                   
-	SUBROUTINE CURVE_AND_ER(NUM,X,Y,SIGMA,OPT)
+	SUBROUTINE CURVE_AND_ER_LAB(NUM,X,Y,SIGMA,OPT,CURVE_LABEL)
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
 	INTEGER NUM
 	REAL X(NUM),Y(NUM),SIGMA(NUM)
 	CHARACTER*(*) OPT
+	CHARACTER(LEN=*) CURVE_LABEL
 !
 	REAL T1
 	INTEGER I,J
@@ -111,7 +117,7 @@
 	  CD(J)%EMIN=Y-SIGMA
 	END IF
 !
-	CD(J)%CURVE_ID=' '
+	CD(J)%CURVE_ID=CURVE_LABEL
 	NPLTS=J
 	NPTS(J)=NUM
 	ERR(NPLTS)=.TRUE.
@@ -123,12 +129,13 @@
 !
 ! Program to initialize plotting arrays.
 !
-	SUBROUTINE DP_CURVE(NUM,X,Y)
+	SUBROUTINE DP_CURVE_LAB(NUM,X,Y,CURVE_LABEL)
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
 	INTEGER NUM
 	REAL*8 X(NUM),Y(NUM)
+	CHARACTER(LEN=*) CURVE_LABEL
 !
 	INTEGER J
 !
@@ -153,7 +160,7 @@
 !
 	CD(J)%XVEC(1:NUM)=X(1:NUM)
 	CD(J)%DATA(1:NUM)=Y(1:NUM)
-	CD(J)%CURVE_ID=' '
+	CD(J)%CURVE_ID=CURVE_LABEL
 	NPTS(J)=NUM
 	ERR(J)=.FALSE.
 	NPLTS=J
@@ -167,13 +174,14 @@
 !
 ! Created 06-Mar-1990 - Based on curve
 !
-	SUBROUTINE DP_CURVE_AND_ER(NUM,X,Y,SIGMA,OPT)
+	SUBROUTINE DP_CURVE_AND_ER_LAB(NUM,X,Y,SIGMA,OPT,CURVE_LABEL)
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
 	INTEGER NUM
 	REAL*8 X(NUM),Y(NUM),SIGMA(NUM)
 	CHARACTER*(*) OPT
+	CHARACTER*(*) CURVE_LABEL 
 C
 	REAL T1
 	INTEGER I,J
@@ -227,7 +235,7 @@ C
 	  CD(J)%EMIN=Y-SIGMA
 	END IF
 !
-	CD(J)%CURVE_ID=' '
+	CD(J)%CURVE_ID=CURVE_LABEL
 	NPLTS=J
 	NPTS(J)=NUM
 	ERR(NPLTS)=.TRUE.

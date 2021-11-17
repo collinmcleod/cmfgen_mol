@@ -734,6 +734,30 @@ C
 	  WRITE(6,*)'Populations can be compared with older iterations.'
 	  GOTO 200
 !
+! This option flips the sign of the correctons predicted by NG. Developed
+! mainly for testing purposes. The flip is done in LOG space.
+!
+	ELSE IF(PLT_OPT(1:4) .EQ. 'FLIP')THEN
+	  IT=NIT; ID=ND; IVAR=NT
+	  IREC=NIT			!IREC is updated on write
+          NITSF=NITSF+1
+	  DO J=1,ND
+	    DO I=1,NT
+ 	      T1=LOG(POPS(I,J,IT-1))-LOG(POPS(I,J,IT)/POPS(I,J,IT-1))
+	      POPS(I,J,IT)=EXP(T1)
+	    END DO
+	  END DO
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
+	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+	1              NT,ND,LUSCR,NEWMOD)
+	  WRITE(6,*)'Corrections written to SCRTEMP as new (and last) iteration.'
+	  WRITE(6,*)'Flip should only be called once -- it make nos sense to call it more than once'
+	  WRITE(6,*)'Restart program if you wish to compare to with pops from last iteration.'
+	  WRITE(6,*)'Populations can be compared with older iterations.'
+	  WRITE(6,'(A)')' Input any character to continue: '
+	  READ(6,'(A)')STRING
+	  GOTO 200
+!
 	ELSE IF(PLT_OPT(1:2) .EQ. 'SM')THEN
 	  FDG_COUNTER=FDG_COUNTER+1
 	  IT=NIT; ID=ND; IVAR=NT
@@ -959,6 +983,70 @@ C
 	    WRITE(6,'(1X,A,I4,2(3X,A,I5,ES11.2E3),A)')'At depth',ID,RED_PEN,IMAX,RMAX,
 	1                 BLUE_PEN,IMIN,RMIN,DEF_PEN
 	  END DO
+	  GOTO 200
+!
+	ELSE IF(PLT_OPT(1:4) .EQ. 'RNEW')THEN
+	  WRITE(6,*)' '
+          FDG_COUNTER=FDG_COUNTER+1
+	  IT=NIT; ID=ND
+	  CALL GEN_IN(IT,'Iteration to be replaced')
+	  IF(IT .GT. NIT)THEN 
+	    WRITE(6,*)'Invalid iteration -- maximum is ',NIT
+	    GOTO 200
+	  END IF
+	  CALL GEN_IN(ID,'Depth to to be replaced')
+	  IF(ID .LE. 0)GOTO 200
+	  IF(ID .GT. ND)THEN
+	    WRITE(6,*)'Invalid depth -- maximum is ',ND
+	    GOTO 200
+	  END IF
+	  CALL GEN_IN(STRING,'File with new POP estimates')
+	  OPEN(UNIT=10,FILE=STRING,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(6,*)'Unable to open file. IOS=',IOS
+	    GOTO 200
+	  END IF
+	  K=1; CALL GEN_IN(K,'Column')
+!
+	  DO J=1,NT
+	    READ(10,*)(T1,I=1,K-1),POPS(J,ID,IT)
+	  END DO
+!	  CALL GEN_IN(LIMITS,I,2,'Variable range')
+!	  DO IVAR=LIMITS(1),LIMITS(2)
+!	    POPS(IVAR,ID,IT)=POPS(IVAR,ID+1,IT)
+!	  END DO
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
+	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+	1              NT,ND,LUSCR,NEWMOD)
+	  GOTO 200
+!
+!
+	ELSE IF(PLT_OPT(1:4) .EQ. 'DREP')THEN
+	  WRITE(6,*)' '
+          FDG_COUNTER=FDG_COUNTER+1
+	  IT=NIT; ID=ND
+	  CALL GEN_IN(IT,'Iteration to be replaced')
+	  IF(IT .GT. NIT)THEN 
+	    WRITE(6,*)'Invalid iteration -- maximum is ',NIT
+	    GOTO 200
+	  END IF
+	  CALL GEN_IN(ID,'Depth to to be replaced')
+	  IF(ID .LE. 0)GOTO 200
+	  IF(ID .GT. ND)THEN
+	    WRITE(6,*)'Invalid depth -- maximum is ',ND
+	    GOTO 200
+	  END IF
+	  CALL GEN_IN(LIMITS,I,2,'Variable range')
+	  DO IVAR=LIMITS(1),LIMITS(2)
+	    POPS(IVAR,ID,IT)=POPS(IVAR,ID+1,IT)
+	  END DO
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
+	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+	1              NT,ND,LUSCR,NEWMOD)
 	  GOTO 200
 !
 	ELSE IF(PLT_OPT(1:3) .EQ. 'REP')THEN

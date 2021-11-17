@@ -31,7 +31,7 @@
 	REAL*4 XW1,XW2,YW1,YW2		!Location of viewport in world coordinates
 	REAL*4 XP1,XP2,YP1,YP2    	!Location of viewport in pixels 
 	REAL*4 SCALE_FAC		!Used to adjust string location
-	INTEGER I,K
+	INTEGER I,K,KC
 	INTEGER CI_SAV
 !
 ! We use FULL_STR so that we dont change the passed text.
@@ -59,6 +59,7 @@
 	    SUB_STR(I)=FULL_STR(1:K-1)
 	    FULL_STR=FULL_STR(K+2:)
 	    K=INDEX(FULL_STR,' ')
+	    KC=INDEX(FULL_STR,',')
 	    IF(K .GE. 3)THEN
 	      IF(FULL_STR(2:2) .LT. '0' .AND. FULL_STR(2:0) .GT. '9')K=K-1
 	    END IF
@@ -70,6 +71,7 @@
 	      RETURN
 	    END IF
 	    READ(FULL_STR(1:K-1),*)PEN(I)
+	    IF(KC .EQ. K-1)SUB_STR(I)=TRIM(SUB_STR(I))//','
 	    FULL_STR=FULL_STR(K:)
 	  END IF
 	END DO
