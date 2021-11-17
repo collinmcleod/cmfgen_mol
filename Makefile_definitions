@@ -13,6 +13,10 @@
 # Installation directory for CMFGEN
 # Site dependent.
 
+# Define options for the ar command. On UBUNTU systems this might be Uruv
+
+AR_OPTION = ruv
+
 HOST :=$(shell hostname)
 
 ifeq ($(HOST),ibis.phyast.pitt.edu)
