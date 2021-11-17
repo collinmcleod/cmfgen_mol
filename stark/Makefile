@@ -26,11 +26,11 @@ $(LIB2) : $(LIB2)($(NEWF))
 
 $(LIB)(%.o) : %.f
 	$(F90) -c $(FG)  $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
                            
 $(LIB2)(%.o) : %.f90
 	$(F90) -c $(FFREE)  $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
                            
 # Dependencies
 

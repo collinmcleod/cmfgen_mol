@@ -26,7 +26,7 @@ $(LIB) : $(OBJ)
 
 $(LIB)(%.o) : %.f $(LIB_MOD)(two_phot_mod.o) 
 	$(F90) -c $(FG)  $< 
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)

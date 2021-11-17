@@ -49,7 +49,7 @@ OBJ_FILES : $(OBJ)
 
 $(LIB)(%.o) : %.f 
 	$(F90) -c $(FG)  $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 #
 # Give the dependencies of dispgen.exe and how it is created.

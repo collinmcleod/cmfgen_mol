@@ -1,5 +1,11 @@
 # TEST MAKEFILE
 
+
+# Set parameters for arechiv .o files into libraries.
+# On UBUNTU systems msy nrrf Uruv
+
+AR_OPTION = ruv
+
 HOST :=$(shell hostname)
 
 #Include local system dependent definitions

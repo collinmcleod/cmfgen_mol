@@ -117,7 +117,7 @@ UP_MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
 
 $(LIB)(%.o) : %.f  $(STEQ) $(MOD) $(CONT)
 	$(F90) -c $(OPTION) $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 # General rules to make obects in a library and object files
 # Specific dependency of source files which uses external 
@@ -125,41 +125,41 @@ $(LIB)(%.o) : %.f  $(STEQ) $(MOD) $(CONT)
 
 $(LIB)(adjust_pops.o) : adjust_pops.f $(LIB)(old_grid_module.o) $(MOD) $(CONT)
 	$(F90) -c $(OPTION) adjust_pops.f
-	ar ruv $(LIB) adjust_pops.o
+	ar $(AR_OPTION) $(LIB) adjust_pops.o
 
 $(LIB)(determine_nse.o) : determine_nse.f $(STEQ) $(CHG) $(MOD)
 	$(F90) -c $(OPTION) determine_nse.f
-	ar ruv $(LIB) determine_nse.o
+	ar $(AR_OPTION) $(LIB) determine_nse.o
 
 $(LIB)(do_cmf_hydro_v2.o) : do_cmf_hydro_v2.f $(LIB)(old_grid_module.o) $(LIB)(cmf_hydro_module.o)
 	$(F90) -c $(OPTION) do_cmf_hydro_v2.f
-	ar ruv $(LIB) do_cmf_hydro_v2.o
+	ar $(AR_OPTION) $(LIB) do_cmf_hydro_v2.o
 
 # Optimizaton seems not to work with PGF95 compiler for next routine
 
 $(LIB)(eval_temp_ddt_v2.o) : eval_temp_ddt_v2.f $(STEQ) $(MOD)
 	$(F90) -c $(OPTION)  eval_temp_ddt_v2.f
-	ar ruv $(LIB) eval_temp_ddt_v2.o
+	ar $(AR_OPTION) $(LIB) eval_temp_ddt_v2.o
 
 $(LIB)(open_rw_eddfactor.o) : open_rw_eddfactor.f $(EDD)
 	$(F90) -c $(OPTION)  open_rw_eddfactor.f
-	ar ruv $(LIB) open_rw_eddfactor.o
+	ar $(AR_OPTION) $(LIB) open_rw_eddfactor.o
 
 $(LIB)(get_non_loc_gamma_energy.o) : get_non_loc_gamma_energy.f $(CONT) $(NUC)
 	$(F90) -c $(OPTION) get_non_loc_gamma_energy.f
-	ar ruv $(LIB) get_non_loc_gamma_energy.o
+	ar $(AR_OPTION) $(LIB) get_non_loc_gamma_energy.o
 
 $(LIB)(store_old_grid.o) : store_old_grid.f $(MOD)  $(LIB)(old_grid_module.o)
 	$(F90) -c $(OPTION) store_old_grid.f
-	ar ruv $(LIB) store_old_grid.o
+	ar $(AR_OPTION) $(LIB) store_old_grid.o
 
 $(LIB)(update_ba_for_line.o) : update_ba_for_line.f $(UP_MODS)
 	$(F90) -c $(OPTION)  update_ba_for_line.f
-	ar ruv $(LIB) update_ba_for_line.o
+	ar $(AR_OPTION) $(LIB) update_ba_for_line.o
 
 $(LIB)(var_op_v10.o) : var_op_v10.f $(DIS)
 	$(F90) -c $(OPTION)  var_op_v10.f
-	ar ruv $(LIB) var_op_v10.o
+	ar $(AR_OPTION) $(LIB) var_op_v10.o
 
 $(STEQ):
 	(cd ../mod_subs ; make)

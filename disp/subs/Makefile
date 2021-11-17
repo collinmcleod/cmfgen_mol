@@ -88,39 +88,39 @@ GEN =  $(LIB_DIR)libsubs.a(gen_in.o)\
 
 $(LIB)(%.o) : %.f 
 	$(F90) -c $(FG)  $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 $(LIB)(%.o) : %.f90 ../mod_disp.o $(NT)
 	$(F90) -c $(FFREE)  -I../ -I../../new_main/subs/non_therm $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 $(LIB)(branch_rat.o) : branch_rat.f ../mod_disp.o  $(GEN)
 	$(F90) -c  $(FG) -I../ branch_rat.f
-	ar ruv $(LIB) branch_rat.o
+	ar $(AR_OPTION) $(LIB) branch_rat.o
 
 $(LIB)(comp_jbar.o) : comp_jbar.f ../mod_disp.o  $(GEN)
 	$(F90) -c  $(FG) -I../ comp_jbar.f
-	ar ruv $(LIB) comp_jbar.o
+	ar $(AR_OPTION) $(LIB) comp_jbar.o
 
 $(LIB)(disp_bethe_approx_v5.o) : disp_bethe_approx_v5.f ../mod_disp.o  $(GEN)
 	$(F90) -c  $(FG) -I../ disp_bethe_approx_v5.f
-	ar ruv $(LIB) disp_bethe_approx_v5.o
+	ar $(AR_OPTION) $(LIB) disp_bethe_approx_v5.o
 
 $(LIB)(map_plot.o) : map_plot.f $(GEN)
 	$(F90) -c  $(FD) -O1 map_plot.f 
-	ar ruv $(LIB) map_plot.o
+	ar $(AR_OPTION) $(LIB) map_plot.o
 
 $(LIB)(plt_profs.o) : plt_profs.f ../mod_disp.o $(GEN)
 	$(F90) -c  $(FG) -I../ -I../../mod  plt_profs.f 
-	ar ruv $(LIB) plt_profs.o
+	ar $(AR_OPTION) $(LIB) plt_profs.o
 
 $(LIB)(wr_atom_sum.o) : wr_atom_sum.f ../mod_disp.o $(GEN)
 	$(F90) -c  $(FG) -I../ -I../../mod  wr_atom_sum.f 
-	ar ruv $(LIB) wr_atom_sum.o
+	ar $(AR_OPTION) $(LIB) wr_atom_sum.o
 
 $(LIB)(wr_spec_sum_v2.o) : wr_spec_sum_v2.f ../mod_disp.o $(GEN)
 	$(F90) -c  $(FG) -I../ wr_spec_sum_v2.f
-	ar ruv $(LIB) wr_spec_sum_v2.o
+	ar $(AR_OPTION) $(LIB) wr_spec_sum_v2.o
 
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)

@@ -26,14 +26,14 @@ $(LIB) : $(OBJ)
 
 $(LIB)(%.o) : %.f $(LIB)(chg_exch_mod.o) 
 	$(F90) -c $(FG)  $< 
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)
 
 $(LIB)(chg_exch_mod.o) : chg_exch_mod.f 
 	$(F90) -c $(FG) chg_exch_mod.f 
-	ar ruv $(LIB) chg_exch_mod.o
+	ar $(AR_OPTION) $(LIB) chg_exch_mod.o
 
 #$(LIB)(.o) : usr_option.f $(LIB)(wr_string.o) 
 

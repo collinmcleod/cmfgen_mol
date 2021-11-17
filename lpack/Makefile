@@ -15,7 +15,7 @@ $(LIB) : $(LIB)($(OBJ))
 
 $(LIB)(%.o) : %.f
 	$(F90) -c $(FG)  $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 #
 # Specific dependency of source files which uses external

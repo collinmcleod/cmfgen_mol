@@ -27,7 +27,7 @@ $(LIB) : $(OBJ)
 
 $(LIB)(%.o) : %.f $(TWO)
 	$(F90) -c  $(FG) $< 
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)
@@ -39,7 +39,7 @@ ST = $(LIB_MOD)(steq_data_mod.o)
 
 $(LIB)(steq_ba_two_phot_rate_v3.o) : steq_ba_two_phot_rate_v3.f $(TWO) $(ST) 
 	$(F90) -c  $(FG) steq_ba_two_phot_rate_v3.f
-	ar ruv $(LIB) steq_ba_two_phot_rate_v3.o
+	ar $(AR_OPTION) $(LIB) steq_ba_two_phot_rate_v3.o
 
 $(TWO):
 	(cd ../../mod_subs ; make)

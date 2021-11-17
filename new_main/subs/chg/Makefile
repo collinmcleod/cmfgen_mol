@@ -33,17 +33,17 @@ CMF = $(LIB_DIR)libmod.a(mod_cmfgen.o)
 
 $(LIB)(%.o) : %.f $(CG)
 	$(F90) -c $(FG) $< 
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 # Specific rules
 
 $(LIB)(steq_ba_chg_exch_v3.o) : steq_ba_chg_exch_v3.f $(CG) $(ST) 
 	$(F90) -c $(FG) steq_ba_chg_exch_v3.f
-	ar ruv $(LIB) steq_ba_chg_exch_v3.o
+	ar $(AR_OPTION) $(LIB) steq_ba_chg_exch_v3.o
 
 $(LIB)(set_chg_lev_id_v4.o) : set_chg_lev_id_v4.f $(CG) $(CMF)
 	$(F90) -c $(FG) set_chg_lev_id_v4.f
-	ar ruv $(LIB) set_chg_lev_id_v4.o
+	ar $(AR_OPTION) $(LIB) set_chg_lev_id_v4.o
 
 $(CG):
 	(cd ../mod_subs ; make)

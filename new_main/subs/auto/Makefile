@@ -22,7 +22,7 @@ $(LIB) : $(OBJ)
 
 $(LIB)(%.o) : %.f 
 	$(F90) -c $(FG)  $< 
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)
@@ -31,7 +31,7 @@ ST = $(LIB_MOD)(steq_data_mod.o)
 
 $(LIB)(steq_auto_v2.o) : steq_auto_v2.f  $(ST)
 	$(F90) -c $(FG) steq_auto_v2.f
-	ar ruv $(LIB) steq_auto_v2.o
+	ar $(AR_OPTION) $(LIB) steq_auto_v2.o
 
 $(ST):
 	(cd ../mod_subs ; make)

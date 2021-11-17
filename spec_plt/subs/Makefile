@@ -66,11 +66,11 @@ $(LIB) : $(OBJ) $(OBJ2)
 
 $(LIB)(%.o) : %.f
 	$(F90) -c $(FG)  $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 $(LIB2)(%.o) : %.f
 	$(F90) -c $(FG)  $<
-	ar ruv $(LIB2) $*.o
+	ar $(AR_OPTION) $(LIB2) $*.o
 
 convolve.o : convolve.f parameters.inc constants.inc
 num_rec.o  : num_rec.f   parameters.inc constants.inc

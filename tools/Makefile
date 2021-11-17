@@ -50,16 +50,16 @@ $(LIB) : $(OBJ)
 
 $(LIB)(%.o) : %.f 
 	$(F90) -c $(FG)  $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 $(LIB)(usr_option.o) : usr_option.f $(LIB)(wr_string.o) 
 $(LIB)(usr_hidden.o) : usr_hidden.f $(LIB)(wr_string.o) $(LIB)(sve_file.o)
 
 #
 #	$(F90) -c $(FG) usr_option.f 
-#	ar ruv $(LIB) usr_option.o
+#	ar $(AR_OPTION) $(LIB) usr_option.o
 #	$(F90) -c $(FG) usr_hidden.f 
-#	ar ruv $(LIB) usr_hidden.o
+#	ar $(AR_OPTION) $(LIB) usr_hidden.o
 # 
 # basic dependency
 #

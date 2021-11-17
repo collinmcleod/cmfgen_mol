@@ -282,7 +282,7 @@ $(LIB) : $(OBJ)
 
 $(LIB)(%.o) : %.f 
 	$(F90) -c $(OPTION)  $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 # 
 # Specific dependency of source files which uses external 
@@ -292,11 +292,11 @@ DIS=$(LIB_MOD)(mod_lev_dis_blk.o)
 
 $(LIB)(dspheredchi.o) : dspheredchi.f $(LIB)(mod_trap_derivatives.o) 
 	$(F90) -c $(OPTION) dspheredchi.f
-	ar ruv $(LIB) dspheredchi.o
+	ar $(AR_OPTION) $(LIB) dspheredchi.o
 
 $(LIB)(occupation_prob.o) : occupation_prob.f $(DIS)
 	$(F90) -c $(OPTION) occupation_prob.f
-	ar ruv $(LIB) occupation_prob.o
+	ar $(AR_OPTION) $(LIB) occupation_prob.o
 
 $(DIS):
 	(cd ../new_main/mod_subs ; make)

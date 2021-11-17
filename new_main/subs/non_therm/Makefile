@@ -41,11 +41,11 @@ CNT = $(LIB_DIR)libmod.a(control_variable_mod.o)
 
 $(LIB_DIR)libmod.a(mod_non_therm.o) : mod_non_therm.f90
 	$(F90) -c $(FFREE) -I..  mod_non_therm.f90
-	ar ruv $(LIB_DIR)libmod.a mod_non_therm.o
+	ar $(AR_OPTION) $(LIB_DIR)libmod.a mod_non_therm.o
 
 $(LIB)(%.o) : %.f90 $(LIB_DIR)libmod.a(mod_non_therm.o) $(ST) $(CMF) $(CNT)
 	$(F90) -c $(FFRED) -I..  $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 $(ST):
 	(cd ../../mod_subs ; make)

@@ -80,79 +80,79 @@ $(LIB) : $(MOD) $(OBJ)
 
 $(LIB)(%.o) : %.f 
 	$(F90) -c $(OPTION) $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 %.o : %.f 
 	$(F90) -c $(OPTION) $<
-	ar ruv $(LIB) $*.o
+	ar $(AR_OPTION) $(LIB) $*.o
 
 $(LIB)(characteristics_v2.o) : characteristics_v2.f $(LIB)(mod_space_grid_v2.o)
 	$(F90) -c $(OPTION) characteristics_v2.f
-	ar ruv $(LIB) characteristics_v2.o
+	ar $(AR_OPTION) $(LIB) characteristics_v2.o
 
 $(LIB)(cmf_formal_rel_v2.o) : cmf_formal_rel_v2.f $(LIB)(mod_space_grid_v2.o) $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) cmf_formal_rel_v2.f
-	ar ruv $(LIB) cmf_formal_rel_v2.o
+	ar $(AR_OPTION) $(LIB) cmf_formal_rel_v2.o
 
 $(LIB)(define_grid_v2.o) : define_grid_v2.f $(LIB)(mod_space_grid_v2.o)
 	$(F90) -c $(OPTION) define_grid_v2.f
-	ar ruv $(LIB) define_grid_v2.o
+	ar $(AR_OPTION) $(LIB) define_grid_v2.o
 
 $(LIB)(drhsdchi_pp.o) : drhsdchi_pp.f $(LIB)(mod_trap_derivatives.o)
 	$(F90) -c $(OPTION) drhsdchi_pp.f
-	ar ruv $(LIB) drhsdchi_pp.o
+	ar $(AR_OPTION) $(LIB) drhsdchi_pp.o
 
 $(LIB)(edd_jrel_var_v2.o) : edd_jrel_var_v3.f $(LIB)(mod_var_jrel_v2.o)
 	$(F90) -c $(OPTION) edd_jrel_var_v3.f
-	ar ruv $(LIB) edd_jrel_var_v3.o
+	ar $(AR_OPTION) $(LIB) edd_jrel_var_v3.o
 
 $(LIB)(fg_j_cmf_v12.o) : fg_j_cmf_v12.f $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) fg_j_cmf_v12.f
-	ar ruv $(LIB) fg_j_cmf_v12.o
+	ar $(AR_OPTION) $(LIB) fg_j_cmf_v12.o
 
 $(LIB)(get_moms_rel.o) : get_moms_rel.f $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) get_moms_rel.f
-	ar ruv $(LIB) get_moms_rel.o
+	ar $(AR_OPTION) $(LIB) get_moms_rel.o
 
 $(LIB)(get_moms_non_rel.o) : get_moms_non_rel.f $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) get_moms_non_rel.f
-	ar ruv $(LIB) get_moms_non_rel.o
+	ar $(AR_OPTION) $(LIB) get_moms_non_rel.o
 
 $(LIB)(mom_j_cmf_v8.o) : mom_j_cmf_v8.f $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) mom_j_cmf_v8.f
-	ar ruv $(LIB) mom_j_cmf_v8.o
+	ar $(AR_OPTION) $(LIB) mom_j_cmf_v8.o
 
 $(LIB)(mom_j_ddt_v2.o) : mom_j_ddt_v2.f $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) mom_j_ddt_v2.f
-	ar ruv $(LIB) mom_j_ddt_v2.o
+	ar $(AR_OPTION) $(LIB) mom_j_ddt_v2.o
 
 $(LIB)(mom_jrel_v9.o) : mom_jrel_v9.f $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) mom_jrel_v9.f
-	ar ruv $(LIB) mom_jrel_v9.o
+	ar $(AR_OPTION) $(LIB) mom_jrel_v9.o
 
 $(LIB)(optdepth_v2.o) : optdepth_v2.f $(LIB)(mod_space_grid_v2.o)
 	$(F90) -c $(OPTION) optdepth_v2.f
-	ar ruv $(LIB) optdepth_v2.o
+	ar $(AR_OPTION) $(LIB) optdepth_v2.o
 
 $(LIB)(solve_cmf_formal_v2.o) : solve_cmf_formal_v2.f $(LIB)(mod_space_grid_v2.o)
 	$(F90) -c $(OPTION) solve_cmf_formal_v2.f
-	ar ruv $(LIB) solve_cmf_formal_v2.o
+	ar $(AR_OPTION) $(LIB) solve_cmf_formal_v2.o
 
 $(LIB)(var_mom_j_cmf_v9.o) : var_mom_j_cmf_v9.f $(LIB)(mod_ray_mom_store.o) $(LIB)(mod_var_mom_j_cmf.o)
 	$(F90) -c $(OPTION) var_mom_j_cmf_v9.f
-	ar ruv $(LIB) var_mom_j_cmf_v9.o
+	ar $(AR_OPTION) $(LIB) var_mom_j_cmf_v9.o
 
 $(LIB)(var_mom_j_ddt_v2.o) : var_mom_j_ddt_v2.f $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) var_mom_j_ddt_v2.f
-	ar ruv $(LIB) var_mom_j_ddt_v2.o
+	ar $(AR_OPTION) $(LIB) var_mom_j_ddt_v2.o
 
 $(LIB)(var_jrel_v5.o) : var_jrel_v5.f $(LIB)(mod_var_jrel_v2.o) $(LIB)(mod_ray_mom_store.o) $(LIB)(mod_trap_derivatives.o) 
 	$(F90) -c $(OPTION) var_jrel_v5.f
-	ar ruv $(LIB) var_jrel_v5.o
+	ar $(AR_OPTION) $(LIB) var_jrel_v5.o
 
 $(LIB)(var_mom_jext_cmf_v3.o) : var_mom_jext_cmf_v3.f $(LIB)(mod_ray_mom_store.o)
 	$(F90) -c $(OPTION) var_mom_jext_cmf_v3.f
-	ar ruv $(LIB) var_mom_jext_cmf_v3.o
+	ar $(AR_OPTION) $(LIB) var_mom_jext_cmf_v3.o
 
 $(LIB)(mod_trap_derivatives.o) :
 	(cd ../subs ; make)
