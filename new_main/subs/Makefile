@@ -51,6 +51,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(get_pops_at_prev_time_step_v5.o)\
       $(LIB)(old_grid_module.o)\
       $(LIB)(open_rw_eddfactor.o)\
+      $(LIB)(out_line_force.o)\
       $(LIB)(prevent_low_t.o)\
       $(LIB)(read_ba_data_v3.o)\
       $(LIB)(read_bcd_mat.o)\

@@ -72,7 +72,7 @@ $(LIB) : $(OBJ)
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f 
-	$(F90) -c $(FG) -fbounds-check  $<
+	$(F90) -c $(FG)  $<
 	ar ruv $(LIB) $*.o
 
 # 

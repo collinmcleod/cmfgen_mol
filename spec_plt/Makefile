@@ -15,10 +15,11 @@ FN1=$(LIB_DIR)lib$(LN1).a
 FN2=$(LIB_DIR)lib$(LN2).a
 FN4=$(LIB_DIR)lib$(LN4).a
 FN5=$(LIB_DIR)lib$(LN5).a
+     
+#  $(EXE_DIR)plt_jh_shell.exe\
 
 EXE  = $(EXE_DIR)plt_jh.exe\
        $(EXE_DIR)plt_jh_cur.exe\
-       $(EXE_DIR)plt_jh_shell.exe\
        $(EXE_DIR)plt_ip.exe\
        $(EXE_DIR)plt_delta.exe\
        $(EXE_DIR)plt_dfr.exe\

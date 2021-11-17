@@ -27,6 +27,7 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(num_rec.o)\
          $(LIB)(rd_ion_locations.o)\
          $(LIB)(rd_ion_locations_v2.o)\
+         $(LIB)(rd_sing_pol_i.o)\
          $(LIB)(read_corrections.o)\
          $(LIB)(set_ip_xspat_unit.o)\
          $(LIB)(uvabs_v2.o)\

@@ -114,6 +114,10 @@ $(LIB)(plt_profs.o) : plt_profs.f ../mod_disp.o $(GEN)
 	$(F90) -c  $(FG) -I../ -I../../mod  plt_profs.f 
 	ar ruv $(LIB) plt_profs.o
 
+$(LIB)(wr_atom_sum.o) : wr_atom_sum.f ../mod_disp.o $(GEN)
+	$(F90) -c  $(FG) -I../ -I../../mod  wr_atom_sum.f 
+	ar ruv $(LIB) wr_atom_sum.o
+
 $(LIB)(wr_spec_sum_v2.o) : wr_spec_sum_v2.f ../mod_disp.o $(GEN)
 	$(F90) -c  $(FG) -I../ wr_spec_sum_v2.f
 	ar ruv $(LIB) wr_spec_sum_v2.o
