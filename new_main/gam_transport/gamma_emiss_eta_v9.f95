@@ -38,6 +38,7 @@
 	REAL*8 :: PI
 	REAL*8 :: FOURPI
 	REAL*8 :: NORM_FAC
+	REAL*8 :: DEL_T
 	REAL*8, PARAMETER :: PLANCK = 4.135668D-021 ! UNITS OF MeV*s SINCE PHOTON ENERGIES IN MeV
 	REAL*8, PARAMETER :: MeV_ERG = 1.602177D-06 
 	REAL*8, PARAMETER :: ERGS_TO_MEV = 624150.9 
@@ -65,6 +66,7 @@
 !
 ! DEL_T is saved from the subroutine DO_SPECIES_DECAYS
 !
+	DEL_T=NUC_ISO_MOD_DELTA_T
 	WRITE(6,*)"DELTA_T:",DEL_T
 !
 ! Looping through frequency then elements read in by RD_NUC_DECAY_DATA_GAM and

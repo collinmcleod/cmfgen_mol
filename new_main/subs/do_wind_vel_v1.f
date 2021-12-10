@@ -111,7 +111,7 @@ CONTAINS
 	CALL RD_STORE_DBLE(ALLOWED_CHANGE_IN_GRAD,'dGRAD',L_FALSE,'Maximum fractional change in GRAD allowed')
 	CALL RD_STORE_DBLE(VSOUND,'VSOUND',L_TRUE,'Sound speed in km/s')
 	CALL RD_STORE_DBLE(ALPHA,'ALPAH',L_FALSE,'Exponent relating grad with vdvdr')
-	CALL RD_STORE_DBLE(NINS,'NINS',L_FALSE,'Number of points/interval to be inserted into grid')
+	CALL RD_STORE_INT(NINS,'NINS',L_FALSE,'Number of points/interval to be inserted into grid')
 !	
 	F_FUN_V=.FALSE.
 	AVERAGE_V=.FALSE.

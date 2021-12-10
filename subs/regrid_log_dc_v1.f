@@ -7,6 +7,7 @@
 	1               POPATOM,N,ND,LU_IN,INTERP_OPTION,FILE_NAME)
 	IMPLICIT NONE
 !
+! Altered 06-Dec-2021 - Removed write ED, OLD_E from ED option.
 ! Altered 18-Aug-2019 - Added TR option. Designed to interpolate DC's in T in the inner region, and
 !                           in T/R in the outer region (where it it is assumed T has not changed).
 !                           In the inner region, T will be monotonic. The aim is to get reduce changes
@@ -244,8 +245,8 @@
 	ELSE IF(INTERP_OPTION .EQ. 'ED')THEN
 	  OLD_X=LOG(OLD_ED*OLD_CLUMP_FAC)
 	  NEW_X=LOG(ED) 
-	  CALL WRITV(NEW_X,ND,'ED new',6)
-	  CALL WRITV(OLD_X,NDOLD,'ED old',6)
+!	  CALL WRITV(NEW_X,ND,'ED new',6)
+!	  CALL WRITV(OLD_X,NDOLD,'ED old',6)
           DO WHILE (NEW_X(NX_ST) .LT. OLD_X(1))
             NX_ST=NX_ST+1
           END DO

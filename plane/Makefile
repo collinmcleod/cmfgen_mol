@@ -16,15 +16,22 @@ LIB_MOD=$(LIB_DIR)libmod.a
 MOD=  $(LIB)(mod_ray_mom_store.o)\
       $(LIB)(mod_var_mom_j_cmf.o)\
       $(LIB)(mod_var_jrel_v2.o)\
-      $(LIB)(mod_space_grid_v2.o)
+      $(LIB)(mod_space_grid_v2.o)\
+      $(LIB)(mod_space_grid_v2_gam.o)
+
+MODS= $(LIB_MOD)(gam_mud_mod.o)\
+      $(LIB_MOD)(mod_rd_gamray_cntrl_variables.o)
 
 OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(characteristics_v2.o)\
+      $(LIB)(characteristics_v2_gam.o)\
       $(LIB)(cmf_formal_rel_v4.o)\
+      $(LIB)(cmf_formal_rel_v4_gam.o)\
       $(LIB)(derivr.o)\
       $(LIB)(derivs.o)\
       $(LIB)(drhsdchi_pp.o)\
       $(LIB)(define_grid_v2.o)\
+      $(LIB)(define_grid_v2_gam.o)\
       $(LIB)(expn.o)\
       $(LIB)(edd_j_hub_var_v3.o)\
       $(LIB)(edd_jrel_var_v3.o)\
@@ -53,6 +60,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(mom_jrel_grey_v1.o)\
       $(LIB)(mom_jrel_grey_v2.o)\
       $(LIB)(optdepth_v4.o)\
+      $(LIB)(optdepth_v4_gam.o)\
       $(LIB)(out_jh.o)\
       $(LIB)(pp_form_cmf_v2.o)\
       $(LIB)(pp_var_mom_cmf_v1.o)\
@@ -61,6 +69,7 @@ OBJ = $(LIB)(comp_add_edd_facs.o)\
       $(LIB)(rel_variables.o)\
       $(LIB)(runge_kutta.o)\
       $(LIB)(solve_cmf_formal_v2.o)\
+      $(LIB)(solve_cmf_formal_v3_gam.o)\
       $(LIB)(var_jrel_v5.o)\
       $(LIB)(var_mom_j_ddt_v6.o)\
       $(LIB)(var_mom_pp_v1.o)\
@@ -90,9 +99,21 @@ $(LIB)(characteristics_v2.o) : characteristics_v2.f $(LIB)(mod_space_grid_v2.o)
 	$(F90) -c $(OPTION) characteristics_v2.f
 	ar $(AR_OPTION) $(LIB) characteristics_v2.o
 
-$(LIB)(cmf_formal_rel_v2.o) : cmf_formal_rel_v2.f $(LIB)(mod_space_grid_v2.o) $(LIB)(mod_ray_mom_store.o)
-	$(F90) -c $(OPTION) cmf_formal_rel_v2.f
-	ar $(AR_OPTION) $(LIB) cmf_formal_rel_v2.o
+$(LIB)(characteristics_v2_gam.o) : characteristics_v2_gam.f $(LIB)(mod_space_grid_v2_gam.o)
+	$(F90) -c $(OPTION) characteristics_v2_gam.f
+	ar $(AR_OPTION) $(LIB) characteristics_v2_gam.o
+
+$(LIB)(cmf_formal_rel_v4.o) : cmf_formal_rel_v4.f $(LIB)(mod_space_grid_v2.o) $(LIB)(mod_ray_mom_store.o)
+	$(F90) -c $(OPTION) cmf_formal_rel_v4.f
+	ar $(AR_OPTION) $(LIB) cmf_formal_rel_v4.o
+
+$(LIB)(cmf_formal_rel_v4_gam.o) : cmf_formal_rel_v4_gam.f $(LIB)(mod_space_grid_v2_gam.o) $(LIB_MOD)(mod_ray_mom_store.o)
+	$(F90) -c $(OPTION) cmf_formal_rel_v4_gam.f
+	ar $(AR_OPTION) $(LIB) cmf_formal_rel_v4_gam.o
+
+$(LIB)(define_grid_v2_gam.o) : define_grid_v2_gam.f $(LIB)(mod_space_grid_v2_gam.o) $(LIB_MOD)(mod_rd_gamray_cntrl_variables.o) $(LIB_MOD(gam_mu_mod.o)
+	$(F90) -c $(OPTION) define_grid_v2_gam.f
+	ar $(AR_OPTION) $(LIB) define_grid_v2_gam.o
 
 $(LIB)(define_grid_v2.o) : define_grid_v2.f $(LIB)(mod_space_grid_v2.o)
 	$(F90) -c $(OPTION) define_grid_v2.f
@@ -134,6 +155,10 @@ $(LIB)(optdepth_v2.o) : optdepth_v2.f $(LIB)(mod_space_grid_v2.o)
 	$(F90) -c $(OPTION) optdepth_v2.f
 	ar $(AR_OPTION) $(LIB) optdepth_v2.o
 
+$(LIB)(optdepth_v2_gam.o) : optdepth_v2_gam.f $(LIB)(mod_space_grid_v2_gam.o)
+	$(F90) -c $(OPTION) optdepth_v2_gam.f
+	ar $(AR_OPTION) $(LIB) optdepth_v2_gam.o
+
 $(LIB)(solve_cmf_formal_v2.o) : solve_cmf_formal_v2.f $(LIB)(mod_space_grid_v2.o)
 	$(F90) -c $(OPTION) solve_cmf_formal_v2.f
 	ar $(AR_OPTION) $(LIB) solve_cmf_formal_v2.o
@@ -156,6 +181,9 @@ $(LIB)(var_mom_jext_cmf_v3.o) : var_mom_jext_cmf_v3.f $(LIB)(mod_ray_mom_store.o
 
 $(LIB)(mod_trap_derivatives.o) :
 	(cd ../subs ; make)
+
+MODS:
+	(cd  new_main/mod_subs; make)
 
 clean :
 	rm -f *.o 

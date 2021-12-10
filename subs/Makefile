@@ -253,7 +253,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(wr_art_heat.o)\
       $(LIB)(wr_cooling_term.o)\
       $(LIB)(wr_x_info.o)\
-      $(LIB)(wrcoolgen_v2.o)\
+      $(LIB)(wrcoolgen_v3.o)\
       $(LIB)(write_j_cmf_err.o)\
       $(LIB)(write_out_ew.o)\
       $(LIB)(writedc.o)\

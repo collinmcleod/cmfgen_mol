@@ -10,6 +10,7 @@ C
 	1                 FILNAM,STRDESC)
 	IMPLICIT NONE
 C
+C Altered 10-Dec-2021 : Added depth index to output
 C Altered 25-Sep-2011 : Based on WRRECOM_CHK_V3: NT_ION_RATE added to call.
 C                         Originally done: 4-Apr-2011  
 C Altered 13-May-2004 : ADVEC_RR inserted into call, & changed to V3.
@@ -66,7 +67,8 @@ C
 	  IF(MF .GT. ND)MF=ND
 	  IF(ML .NE. 0)WRITE(LU,'(1H1)')
 C
-C
+	  WRITE(LU,'(3X,''Depth index'')')
+	  WRITE(LU,'(2X,10(I11,'' '')')(J,J=MS,MF)
 	  WRITE(LU,'(/,3X,''Radius [1.0E+10cm] '')')
 	  WRITE(LU,999)(R(J),J=MS,MF)
 	  WRITE(LU,'(/,3X,''Temperature [1.0E+4K] '')')

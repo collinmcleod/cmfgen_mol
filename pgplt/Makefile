@@ -97,7 +97,7 @@ $(LIB)(gramon_pgplot.o)         : gramon_pgplot.f          $(LIB)(mod_curve_data
 $(LIB)(curve.o)                 : curve.f                  $(LIB)(mod_curve_data.o) $(GEN)
 $(LIB)(curve_lab.o)             : curve_lab.f              $(LIB)(mod_curve_data.o) $(GEN)
 $(LIB)(vectorpen.o)             : vectorpen.f              $(LIB)(mod_curve_data.o) $(GEN)
-$(LIB)(arrange_pg_curve_id.o)   : arrange_pg_curve_ids.f   $(LIB)(mod_curve_data.o) $(GEN)
+$(LIB)(arrange_pg_curve_ids.o)  : arrange_pg_curve_ids.f   $(LIB)(mod_curve_data.o) $(GEN)
 
 $(LIB)(wr_gaus_fit.o)     : wr_gaus_fit.f   $(LIB)(gaus_fit_data.o)
 $(LIB)(do_gaus_fit.o)     : do_gaus_fit.f   $(LIB)(gaus_fit_data.o)

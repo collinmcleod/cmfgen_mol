@@ -9,9 +9,11 @@
 !					similar to John Hillier's format for his structure
 !------------------------------------------------------------------------------------------
 !
-	SUBROUTINE GAM_NUC_DECAY_DATA_SUB_V3()
+	SUBROUTINE GAM_NUC_DECAY_DATA_SUB_V3(VERBOSE_GAMMA)
 	USE GAMMA_NUC_DECAY_V2
 	IMPLICIT NONE
+!
+! Altered 19-Nov-2021 - Added VERBOSE_GAMMA to call
 !
 	CHARACTER(LEN=140) :: STRING
 	CHARACTER(LEN=30) :: FILENAME
@@ -22,6 +24,7 @@
 	INTEGER :: COUNTER, IOS
 	INTEGER :: I,J,K,L,R,S
 	INTEGER :: LU
+	LOGICAL VERBOSE_GAMMA
 !
 ! Opening and skipping to the probabilities and energies part since
 ! rd_nuc_decay_data.f already reads in the top part of the file
@@ -108,15 +111,18 @@
 	WRITE(6,'(A,1X,I3)')'# of isotopes read:',N_SPECIES
 	CLOSE(LU)
 !
-	OPEN(UNIT=7,FILE='./data/GAMMA_RAY_LINE_INFO',STATUS='UNKNOWN',ACTION='WRITE')
-	DO I=1,N_SPECIES
-	  WRITE(7,'(A10,2X,F11.6)')GAM_ISO(I)%SPECIES,GAM_ISO(I)%ATOMIC_MASS
-	  WRITE(7,'(A10,4X,A10)')'ENERGY','PROB'
-	  DO J=1,GAM_ISO(I)%NUM_GAMMA
-	    WRITE(7,'(F10.4,4X,F10.4)')GAM_ISO(I)%E_GAMMA(J),GAM_ISO(I)%PROB(J)
+	IF(VERBOSE_GAMMA)THEN
+	  OPEN(UNIT=7,FILE='./data/GAMMA_RAY_LINE_INFO',STATUS='UNKNOWN',ACTION='WRITE')
+	  DO I=1,N_SPECIES
+	    WRITE(7,'(A10,2X,F11.6)')GAM_ISO(I)%SPECIES,GAM_ISO(I)%ATOMIC_MASS
+	    WRITE(7,'(A10,4X,A10)')'ENERGY','PROB'
+	    DO J=1,GAM_ISO(I)%NUM_GAMMA
+	      WRITE(7,'(F10.4,4X,F10.4)')GAM_ISO(I)%E_GAMMA(J),GAM_ISO(I)%PROB(J)
+	    END DO
+	    WRITE(7,*)' '
 	  END DO
-	  WRITE(7,*)' '
-	END DO
-	CLOSE(UNIT=7)
+	  CLOSE(UNIT=7)
+	END IF
+!
 	RETURN
         END SUBROUTINE GAM_NUC_DECAY_DATA_SUB_V3

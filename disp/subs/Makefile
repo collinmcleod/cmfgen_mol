@@ -29,6 +29,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(ham_varlam.o)\
       $(LIB)(jfeaunew.o)\
       $(LIB)(log_mon_interp.o)\
+      $(LIB)(modify_density.o)\
       $(LIB)(map_plot.o)\
       $(LIB)(momham.o)\
       $(LIB)(new_writedc_v5.o)\

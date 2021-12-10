@@ -1,7 +1,10 @@
 !
-! Altered : 17-Feb-2016 : Added READ_ISO_POPS to NUC_ISOTOPE_DATA typee.
+! Altered : 18-Nov-2021 : NUM_DAYS and DECAY_LUM(:) added to  NUC_ISOTOPE_DATA (KDW change)
+!                           DEL_T changed to NUC_ISO_MOD_DELTA_T
+! Altered : 26-Feb-2019 : DECAY_CHAIN_AVAILABLE added (or earlier)
+! Altered : 17-Feb-2016 : Added READ_ISO_POPS to NUC_ISOTOPE_DATA type.
 ! Altered : 15-Feb-2015 : Added KINETIC_DACAY_ENERGY (12-Jan-2015 on OSPREY[cur_cmf_gam])
-! Altered 15-Jul-2010 : Increased MAX_NUM_ISOTOPES from 20 to 50.
+! Altered 15-Jul-2010   : Increased MAX_NUM_ISOTOPES from 20 to 50.
 !
 	MODULE NUC_ISO_MOD
 	IMPLICIT NONE
@@ -11,6 +14,7 @@
 	INTEGER NUM_DECAY_PATHS
 	INTEGER NUM_PARENTS
 	LOGICAL DO_RAD_DECAYS
+	REAL*8 :: NUC_ISO_MOD_DELTA_T
 !
 	REAL*8, POINTER :: RADIOACTIVE_DECAY_ENERGY(:)
 	REAL*8, POINTER :: KINETIC_DECAY_ENERGY(:)
@@ -33,6 +37,9 @@
 	  REAL*8, POINTER :: POP(:)
 	  REAL*8, POINTER :: OLD_POP(:)
 	  REAL*8, POINTER :: OLD_POP_DECAY(:)
+	  REAL*8, POINTER :: NUM_DECAYS(:)	! added to count the amount of gamma rays for decay purposes
+	  REAL*8, POINTER :: DECAY_LUM(:) 	! Ergs/cm^3/s
+!
 	  REAL*8 MASS
           INTEGER BARYON_NUMBER
 	  INTEGER LNK_TO_PAR

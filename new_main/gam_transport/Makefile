@@ -4,13 +4,13 @@ include ../../Makefile_definitions
 
 # Library where object files will/are stored
 
-LIB=$(LIB_DIR)libdev.a
+LIB=$(LIB_DIR)libsubs.a
 LIB_MOD=$(LIB_DIR)libmod.a
 
 #
 # Entries for library
 #
-OBJ = $(LIB)(do_species_decays_v2_gam.o)\
+OBJ = $(LIB)(electron_density_calc_v2.o)\
       $(LIB)(eta_scat_v6.o)\
       $(LIB)(gamma_emiss_eta_v9.o)\
       $(LIB)(gamma_energy_dep_v7.o)\
@@ -42,9 +42,9 @@ $(LIB)(%.o) : %.f $(STEQ) $(MOD) $(NUC)
 	$(F90) -c $(FG) $<
 	ar ruv $(LIB) $*.o
 
-$(LIB)(electron_density_v2.o) : electron_density_v2.f95 $(MOD)
-	$(F90) -c $(FFREE) -l$(MOD_DIR) electron_density_v2.f95
-	ar ruv $(LIB) electron_density_v2.o
+$(LIB)(electron_density_calc_v2.o) : electron_density_calc_v2.f95 $(MOD)
+	$(F90) -c $(FFREE) -l$(MOD_DIR) electron_density_calc_v2.f95
+	ar ruv $(LIB) electron_density_calc_v2.o
 
 $(LIB)(eta_scat_v6.o) : eta_scat_v6.f95 $(GAM_MU)
 	$(F90) -c $(FFREE) -l$(MOD_DIR)  eta_scat_v6.f95
@@ -66,7 +66,7 @@ $(LIB)(gamma_xray_opac_v4_test.o) : gamma_xray_opac_v4_test.f $(MOD)
 	$(F90) -c $(FG) -l$(MOD_DIR) gamma_xray_opac_v4_test.f
 	ar ruv $(LIB) gamma_xray_opac_v4_test.o
 
-$(LIB)(gamray_sub_v3.o) : gamray_sub_v3.f95 $(GAM) $(GAM_CNTRL)
+$(LIB)(gamray_sub_v3.o) : gamray_sub_v3.f95 $(GAM) $(GAM_CNTRL) $(NUC)
 	$(F90) -c $(FFREE) -l$(MOD_DIR)  gamray_sub_v3.f95
 	ar ruv $(LIB) gamray_sub_v3.o
 

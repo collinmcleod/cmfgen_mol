@@ -1173,7 +1173,7 @@ C
 	  CALL UVABS_V2(NU,OBSF,NCF,NCF_MAX,
      1              T_IN_K,V_TURB,LOG_NTOT,
      1	            LOG_H2_NTOT,V_R,MIN_RES_KMS,WAVE_MAX,WAVE_MIN,
-     1	            HI_ABS,H2_ABS)
+     1	            HI_ABS,H2_ABS,IS_FILE)
 !
 	  WRITE(T_OUT,*)'ISABS correction has been performed'
 !

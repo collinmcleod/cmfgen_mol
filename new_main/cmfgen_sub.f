@@ -1206,6 +1206,25 @@
 !	CALL WRITE_SEQ_TIME_FILE_V1(SN_AGE_DAYS,ND,LUIN)
 !	CALL TST_RD_EQ_FILE(POPS,ND,NT,LUIN)
 !
+!************************************************************************************************
+!  Running the gamma-ray code for SNe. This calculation only needs to be run one, since it
+!  (generally) only depends on the total electron density.
+!
+!************************************************************************************************
+!
+	INQUIRE(FILE='GAMRAY_ENERGY_DEP',EXIST=CHK)       
+	IF(GAMRAY_TRANS .EQ. 'RAD_TRANS' .AND. .NOT. CHK)THEN
+	  WRITE(6,'(A)')'Running the gamma-ray routine GAMRAY_SUB_V3'
+	  CALL TUNE(1,'FULL_GAMMA')
+	  CALL GAMRAY_SUB_V3(ND,NC,NP,P,R,V,SIGMA,VDOP_VEC,CLUMP_FAC,
+	1         MU_AT_RMAX,HQW_AT_RMAX,DELV_FRAC_FG,REXT_FAC,METHOD,
+	1         INSTANTANEOUS_ENERGY_DEPOSITION,SN_AGE_DAYS)
+	  CALL TUNE(2,'FULL_GAMMA')
+	  CALL TUNE(3,' ')
+	ELSE IF(GAMRAY_TRANS .EQ. 'RAD_TRANS')THEN
+	  WRITE(6,'(A)')'Using previosuly computed GAMRAY_ENERGY_DEP file'
+	END IF
+
 ! 
 !
 !**************************************************************************
@@ -2912,10 +2931,10 @@
 !
 	  DO ML=1,(ND+9)/10
 	    LS=ML                
-	    CALL FSTCOOL(R,T,ED,TA,TB,ML,ND,LU_REC_CHK)
+	    CALL FSTCOOL_V3(R,V,T,ED,TA,TB,ML,ND,LU_REC_CHK)
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
-	        CALL WRCOOLGEN_V2(ATM(ID)%BFCRXzV, ATM(ID)%FFXzV, ATM(ID)%COOLXzV,
+	        CALL WRCOOLGEN_V3(ATM(ID)%BFCRXzV, ATM(ID)%FFXzV, ATM(ID)%COOLXzV,
 	1           DIECOOL(1,ATM(ID)%INDX_XzV), X_COOL(1,ATM(ID)%INDX_XzV), ATM(ID)%NTCXzV,
 	1           ATM(ID)%XzV_PRES, ATM(ID)%NXzV, ION_ID(ID),
 	1           TA,TB,LS,ND,LU_REC_CHK)
@@ -2935,7 +2954,7 @@
 	1             'Radiative decay heating term',LS,ND,LU_REC_CHK)
 	    CALL WR_ART_HEAT(ARTIFICIAL_HEAT_TERM,TA,TB,LS,ND,LU_REC_CHK)
 !
-	    CALL ENDCOOL(TA,TB,LS,ND,LU_REC_CHK)
+	    CALL ENDCOOL_V3(TA,TB,LS,ND,LU_REC_CHK)
 	  END DO
 	END IF		!Only output if last iteration.
 ! 

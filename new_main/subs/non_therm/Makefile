@@ -44,7 +44,7 @@ $(LIB_DIR)libmod.a(mod_non_therm.o) : mod_non_therm.f90
 	ar $(AR_OPTION) $(LIB_DIR)libmod.a mod_non_therm.o
 
 $(LIB)(%.o) : %.f90 $(LIB_DIR)libmod.a(mod_non_therm.o) $(ST) $(CMF) $(CNT)
-	$(F90) -c $(FFRED) -I..  $<
+	$(F90) -c $(FFREE) -I..  $<
 	ar $(AR_OPTION) $(LIB) $*.o
 
 $(ST):

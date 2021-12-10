@@ -37,6 +37,7 @@
 	REAL*8, ALLOCATABLE :: ATOM_DENSITY(:)
 	REAL*8, ALLOCATABLE :: T(:)
 	REAL*8, ALLOCATABLE :: R(:)
+	REAL*8, ALLOCATABLE :: V(:)
 	REAL*8, ALLOCATABLE :: NET_RATE(:)
 	REAL*8, ALLOCATABLE :: COOLING_TIME(:)
 !
@@ -93,7 +94,8 @@
 	ALLOCATE (ED(ND)); ED=0.0D0
 	ALLOCATE (T(ND)); T=0.0D0
 	ALLOCATE (R(ND)); R=0.0D0
-	ALLOCATE (NET_RATE(ND)); R=0.0D0
+	ALLOCATE (V(ND)); V=0.0D0
+	ALLOCATE (NET_RATE(ND)); NET_RATE=0.0D0
 !
 	ALLOCATE (RAD_DECAY(ND)); RAD_DECAY=0.0D0
 	ALLOCATE (COL_RATE(ND));   COL_RATE=0.0D0
@@ -115,17 +117,27 @@
 !
 	   READ(20,'(A)')STRING
 	   WRITE(21,'(A)')TRIM(STRING)
-	   DO J=1,3
+	   DO WHILE(1 .EQ. 1)
 	     READ(20,'(A)')TMP_STR
-	     READ(20,'(A)')STRING
-	     IF(J .EQ. 1)THEN
-	        WRITE(21,'(A,T12,10I12)')'Depth',(K,K=ID,MIN(ID+9,ND))
-	        READ(STRING,*)(R(K),K=ID,MIN(ID+9,ND))
+	     IF(INDEX(TMP_STR,'Radius') .NE. 0)THEN
+	       WRITE(21,'(A,T12,10I12)')'Depth',(K,K=ID,MIN(ID+9,ND))
+	       READ(20,'(A)')STRING
+	       READ(STRING,*)(R(K),K=ID,MIN(ID+9,ND))
+	       WRITE(21,'(A)')TMP_STR(4:9)//'     '//TRIM(STRING)
+	     ELSE IF(INDEX(TMP_STR,'Velocity') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       READ(STRING,*)(V(K),K=ID,MIN(ID+9,ND))
+	       WRITE(21,'(A)')TMP_STR(4:9)//'     '//TRIM(STRING)
+	     ELSE IF(INDEX(TMP_STR,'Temperature') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       READ(STRING,*)(T(K),K=ID,MIN(ID+9,ND))
+	       WRITE(21,'(A)')TMP_STR(4:9)//'     '//TRIM(STRING)
+	     ELSE IF(INDEX(TMP_STR,'Electron') .NE. 0)THEN
+	       READ(20,'(A)')STRING
+	       READ(STRING,*)(ED(K),K=ID,MIN(ID+9,ND))
+	       WRITE(21,'(A)')TMP_STR(4:9)//'     '//TRIM(STRING)
+	       EXIT
 	     END IF
-	     IF(J .EQ. 2)READ(STRING,*)(T(K),K=ID,MIN(ID+9,ND))
-	     IF(J .EQ. 3)READ(STRING,*)(ED(K),K=ID,MIN(ID+9,ND))
-	     WRITE(21,'(A)')TMP_STR(4:9)//'     '//TRIM(STRING)
-	     READ(20,'(A)')STRING
 	   END DO
 !
 	   T1=0.0D0
@@ -331,6 +343,9 @@
 	DO ID=1,ND,10
 	  WRITE(22,'(A,T12,10I12)')' Depth',(K,K=ID,MIN(ID+9,ND))
 	  WRITE(22,'(A,T12,10ES12.4)')' R(10^10cm)',(R(K),K=ID,MIN(ID+9,ND))
+	  IF(V(1) .GT. 0.0D0)THEN
+	    WRITE(22,'(A,T12,10ES12.4)')' V(km/s)',(V(K),K=ID,MIN(ID+9,ND))
+	  END IF
 	  WRITE(22,'(A,T12,10ES12.4)')' T(10^4K)',(T(K),K=ID,MIN(ID+9,ND))
 	  WRITE(22,'(A,T12,10ES12.4)')' ED', (ED(K),K=ID,MIN(ID+9,ND))
 !

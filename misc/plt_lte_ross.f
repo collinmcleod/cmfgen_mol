@@ -241,7 +241,7 @@
 	ELSE IF(XOPT .EQ. 'EX' .OR. XOPT .EQ. 'EXIT') THEN
 	  STOP
 	ELSE
-	  WRITE(6,*),'Option requested does not exist'
+	  WRITE(6,*)'Option requested does not exist'
 	END IF
 !
 1       GO TO 3

@@ -45,6 +45,7 @@
 	EXTERNAL ERROR_LU
 	CHARACTER(LEN=20) TMP_STR
 !
+	NUC_ISO_MOD_DELTA_T=DELTA_T
 	LUER=ERROR_LU()
 	DO IS=1,NUM_ISOTOPES
 	  ISO(IS)%OLD_POP_DECAY=ISO(IS)%OLD_POP
@@ -61,6 +62,10 @@
 	WRITE(LUER,*)'Summary of chains contributing to radioactive energy depostions.'
 	WRITE(LUER,*)' '
 !
+! Testing file for KDW25 for gamma-ray code
+!
+	OPEN(UNIT=7,FILE='NUM_DECAYS_INFO',ACTION='WRITE',STATUS='UNKNOWN')
+!
 	DO IN=1,NUM_DECAY_PATHS
 	  PREV_RAD_SUM=CUR_RAD_SUM
 	  PREV_EK_SUM=CUR_EK_SUM
@@ -74,8 +79,25 @@
 !	    WRITE(6,*)'Found one step nuclear reaction chain:',IN
 	    ISO(IS)%OLD_POP_DECAY=ISO(IS)%OLD_POP*VEC1
 	    ISO(JS)%OLD_POP_DECAY=ISO(JS)%OLD_POP + ISO(IS)%OLD_POP*(1.0D0-VEC1)
+!
+! This next piece is to count the number of gamma rays via change in
+! populations - added by KDW25
+!
+	      ISO(IS)%NUM_DECAYS=ISO(IS)%OLD_POP*(1.0D0-VEC1)
+	      WRITE(7,'(A8,2X,A10,5X,A5,1X,F11.6)')'Isotope:',ISO(IS)%SPECIES,'MASS:',ISO(IS)%MASS
+	      CALL WRITV_V2(ISO(IS)%NUM_DECAYS,ND,6,'DECAYS',7)
+!^
+!
 	    IF(DELTA_T .EQ. 0.0D0)THEN
-	    ELSE IF(INSTANTANEOUS_ENERGY_DEPOSITION)THEN 
+	    ELSE IF(INSTANTANEOUS_ENERGY_DEPOSITION)THEN
+!
+! Next part added for gamma-ray code. The energy per decay is left out
+! since the intrinsic emissivity will acount for each line's energy.
+! - added by KDW25
+!
+	      ISO(IS)%DECAY_LUM=NUC(IN)%DECAY_CONST*ISO(IS)%OLD_POP_DECAY
+!^
+!
 	      RADIOACTIVE_DECAY_ENERGY=RADIOACTIVE_DECAY_ENERGY +  
 	1            ISO(IS)%OLD_POP_DECAY*NUC(IN)%ENERGY_PER_DECAY*NUC(IN)%DECAY_CONST
 	      KINETIC_DECAY_ENERGY=KINETIC_DECAY_ENERGY +  
@@ -120,8 +142,30 @@
 	        ISO(LS)%OLD_POP_DECAY=ISO(LS)%OLD_POP +
 	1                             ISO(JS)%OLD_POP*(1.0D0-VEC2) + 
 	1                             ISO(IS)%OLD_POP*(1.0D0-VEC1-VEC3)
+!
+! This next piece is to count the number of gamma rays via change in
+! populations - added by KDW25
+!
+		ISO(IS)%NUM_DECAYS=ISO(IS)%OLD_POP*(1.0D0-VEC1)
+		ISO(JS)%NUM_DECAYS=ISO(JS)%OLD_POP*(1.0D0-VEC2) +
+	1            ISO(IS)%OLD_POP*(1.0D0-VEC1-VEC3)
+	        WRITE(7,'(A8,2X,A10,5X,A5,1X,F11.6)')'Isotope:',ISO(IS)%SPECIES,'MASS:',ISO(IS)%MASS
+		CALL WRITV_V2(ISO(IS)%NUM_DECAYS,ND,6,'DECAYS',7)
+		WRITE(7,'(A8,2X,A10,5X,A5,1X,F11.6)')'Isotope:',ISO(JS)%SPECIES,'MASS:',ISO(JS)%MASS
+		CALL WRITV_V2(ISO(JS)%NUM_DECAYS,ND,6,'DECAYS',7)
+!^
+!
 	        IF(DELTA_T .EQ. 0.0D0)THEN
 	        ELSE IF(INSTANTANEOUS_ENERGY_DEPOSITION)THEN 
+!
+! Next part added for gamma-ray code. The energy per decay is left out
+! since the intrinsic emissivity will acount for each line's energy.
+! - added by KDW25
+!
+	          ISO(IS)%DECAY_LUM=NUC(IN)%DECAY_CONST*ISO(IS)%OLD_POP_DECAY
+		  ISO(JS)%DECAY_LUM=NUC(JN)%DECAY_CONST*ISO(JS)%OLD_POP_DECAY
+!^
+!
 	          RADIOACTIVE_DECAY_ENERGY=RADIOACTIVE_DECAY_ENERGY +  
 	1            ISO(IS)%OLD_POP_DECAY*NUC(IN)%ENERGY_PER_DECAY*NUC(IN)%DECAY_CONST +
 	1            ISO(JS)%OLD_POP_DECAY*NUC(JN)%ENERGY_PER_DECAY*NUC(JN)%DECAY_CONST 
@@ -157,6 +201,8 @@
 	    END DO
 	  END IF
 	END DO
+!
+	CLOSE(UNIT=7)
 !
 	IF(DELTA_T .EQ. 0.0D0)THEN
 	ELSE IF(INSTANTANEOUS_ENERGY_DEPOSITION)THEN

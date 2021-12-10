@@ -3017,7 +3017,7 @@
 	        YV(1:ND)=LOG10(POPDUM(1:ND,ISPEC)+1.0D-100)
 	        DEFAULT=TRIM(SPECIES_ABR(ISPEC))
 	        J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
-	        CALL DP_CURVE(ND,XV,YV,DEFAULT)
+	        CALL DP_CURVE_LAB(ND,XV,YV,DEFAULT)
 	        IF(XSPEC .NE. 'ALL')EXIT
 	      END IF
 	    END DO
@@ -3050,6 +3050,18 @@
 	    YAXIS='Filling Factor'
 	  END IF
 	  CALL DP_CURVE(ND,XV,YV)
+!
+	ELSE IF(XOPT .EQ. 'MOD-DEN')THEN
+	  CALL DP_CURVE(ND,XV,MASS_DENSITY)
+	  CALL MODIFY_DENSITY(MASS_DENSITY,R,V,TYPE_ATM,ND)
+	  CALL DP_CURVE(ND,XV,MASS_DENSITY)
+	  WRITE(6,*)'Mass density has been corrupted'
+!
+	ELSE IF(XOPT .EQ. 'SCL-DEN')THEN
+	  CALL USR_OPTION(T1,'SF','1.0D0','Factor to mass scale density')
+	  MASS_DENSITY=MASS_DENSITY*T1 
+	  WRITE(6,*)'Mass density has been corrupted'
+!	  
 	ELSE IF(XOPT .EQ. 'PROF')THEN
 	  CALL PLT_PROFS()
 !
@@ -6563,6 +6575,7 @@ c
 	1          MASS_DENSITY(I),T1,
 	1          LOG10(T1),LOG10(T(I))+4.0D0,LOG10(MASS_DENSITY(I)/T(I)**3)+6.0D0
 	  END DO
+!
 	ELSE IF(XOPT .EQ. 'WRRVSIG')THEN
 	  CALL USR_OPTION(ELEC,'DCF','F','Include the density and clumping factor in file?')
 	  CALL GEN_ASCI_OPEN(LU_OUT,'NEW_RVSIG','UNKNOWN',' ','WRITE',I,IOS)

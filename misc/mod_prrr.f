@@ -1,22 +1,24 @@
 !
 ! Program to put the GENCOOL file into a more user friendly format.
-! Two files are created:
+! Two files are created
 !
-!     GENCOOL_SUM:   Same as GENCOOL but we have summed up over all bound-free rates.
-!     GENSCOOL_SORT: Only the top rates are printed: Sorted using depths 1, 11, 21 etc. 
+!     GENCOOL_SUM   Same as GENCOOL but we have summed up over all bound-free rates.
+!     GENSCOOL_SORT Only the top rates are printed: Sorted using depths 1, 11, 21 etc. 
 !
 	PROGRAM MOD_PRRR
 	USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
-! Altered: 17-Nov-2021: Transfered from OSIRIS.
-! Altered: 22-Oct-2021: Major editing to improve optios (and earlier)
-! Altered: 27-May-2021: Small bug fixis (transferred from OSIRIS 21-Jul-20201).
-! Altered: 17-Nov-2009: Now read in charge exchange cooling.
+! Altered 10-Dec-2021: Improved output to ?_PRRR_SUM. Now much easier to read.
+!                         Improved read in of header data.
+! Altered 17-Nov-2021: Transfered from OSIRIS.
+! Altered 22-Oct-2021: Major editing to improve optios (and earlier)
+! Altered 27-May-2021: Small bug fixis (transferred from OSIRIS 21-Jul-20201).
+! Altered 17-Nov-2009: Now read in charge exchange cooling.
 !                         Slight format change.
-! Altered: 29-Jan-2009: ND is now read in from MODEL (if it exists).
-! Altered: 08-Feb-2008: Extra terms (such as V term) sheck and output.
+! Altered 29-Jan-2009: ND is now read in from MODEL (if it exists).
+! Altered 08-Feb-2008: Extra terms (such as V term) sheck and output.
 !
 !
 	REAL*8, ALLOCATABLE :: PHOT(:,:)
@@ -28,6 +30,7 @@
 	REAL*8, ALLOCATABLE :: NT_IR(:)
 	REAL*8, ALLOCATABLE :: COL_RR(:)
 	REAL*8, ALLOCATABLE :: XRAY_RR(:)
+	REAL*8, ALLOCATABLE :: RR_COEF(:)
 	REAL*8, ALLOCATABLE :: CHG_RR(:)
 	REAL*8, ALLOCATABLE :: ADVEC_RR(:)
 !
@@ -48,6 +51,7 @@
 	INTEGER NRECS
 	INTEGER IOS
 	INTEGER IST,IEND,NLEV
+	INTEGER NPRINT
 	REAL*8 T1
 	REAL*8 MIN_VAL
 	LOGICAL FILE_OPEN
@@ -67,6 +71,7 @@
 	CHARACTER(LEN=30) XLABEL
 	CHARACTER(LEN=30) YLABEL
         CHARACTER(LEN=30) UC
+        CHARACTER(LEN=30) FRMT
         EXTERNAL UC
 !
 	OPEN(UNIT=20,FILE='MODEL',STATUS='OLD',IOSTAT=IOS)
@@ -76,7 +81,7 @@
 	      IF(IOS .NE. 0)EXIT
 	      IF(INDEX(STRING,'!Number of depth points') .NE. 0)THEN
 	        READ(STRING,*)ND
-	        WRITE(6,'(A,I4)')' Number of depth points in the model is:',ND
+	        WRITE(6,'(A,I4)')' Number of depth points in the model is',ND
 	        EXIT
 	      END IF
 	    END DO
@@ -96,6 +101,7 @@
 	IF(IOS .EQ. 0)ALLOCATE(NT_IR(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE(COL_RR(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE(XRAY_RR(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE(RR_COEF(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE(CHG_RR(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE(ADVEC_RR(ND),STAT=IOS)
 !
@@ -124,9 +130,11 @@
 	NET_RECOM_PER_LEVEL=.FALSE.
 	DO_INDIV_RATES=.FALSE.
 	CALL GEN_IN(DO_INDIV_RATES,'Ouput recombination rate and photioization rate for each leve')
-	CALL GEN_IN(NET_RECOM_PER_LEVEL,'Ouput net recombination rate to each level?')
-	SPECIES='FeI'
+	IF(.NOT. DO_INDIV_RATES)THEN
+	   CALL GEN_IN(NET_RECOM_PER_LEVEL,'Ouput net recombination rate to each level?')
+	END IF
 !
+	SPECIES='FeI'
 1000	CONTINUE
 !
 	CHG_IR(1:ND)=0.0D0
@@ -146,7 +154,7 @@
 	  FILE_NAME=TRIM(SPECIES)//'PRRR'
 	  OPEN(UNIT=20,FILE=FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .NE. 0)THEN
-	    WRITE(6,'(2A,I5,A)')' Error -- unable to open file: '//TRIM(FILE_NAME),' (IOS=',IOS,')'
+	    WRITE(6,'(2A,I5,A)')' Error -- unable to open file '//TRIM(FILE_NAME),' (IOS=',IOS,')'
 	    WRITE(6,'(A)')' Check capatilzation of ION name'
 	  END IF
 	END DO
@@ -160,74 +168,76 @@
 	   READ(20,'(A)')STRING
 	   NLEV=NLEV+1
 	END DO
-	WRITE(6,'(A,I4)')' Number of levels in the model is:',NLEV
+	WRITE(6,'(A,I4)')' Number of levels in the model is',NLEV
 	CLOSE(UNIT=20)
 !
 	ALLOCATE (PHOT(ND,NLEV))
 	ALLOCATE (RECOM(ND,NLEV))
 	OPEN(UNIT=20,FILE=FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 !
+	IF(DO_INDIV_RATES .OR. NET_RECOM_PER_LEVEL)THEN
+	  NPRINT=NLEV
+	  CALL GEN_IN(NPRINT,'Number of levels to output for phot/red or net to each level?')
+	END IF
 	FILE_NAME=TRIM(FILE_NAME)//'_SUM'
 	OPEN(UNIT=21,FILE=FILE_NAME,STATUS='UNKNOWN',ACTION='WRITE')
 !
 	STRING=' '
+	FRMT='(1X,A,T21,A)'
 	DO L=1,ND,10
 	   IST=L; IEND=MIN(ND,IST+9)
-	   WRITE(6,*)IST,IEND
+	   WRITE(6,*)'Reading depths',IST,IEND
 !
+	   STRING=' '
+	   WRITE(21,'(1X,A,T23,10(I11,'' ''))')'Depth',(I,I=IST,IEND)
 	   DO WHILE(INDEX(STRING,'Photoionization Rate') .EQ. 0)
 	     READ(20,'(A)')STRING
-	     IF(INDEX(STRING,'Photoionization Rate') .EQ. 0)THEN
-	       WRITE(21,'(A)')TRIM(STRING)
-	     END IF
 	     IF(INDEX(STRING,'Radius') .NE. 0)THEN
 	       READ(20,'(A)')STRING
-	       WRITE(21,'(A)')TRIM(STRING)
+	       WRITE(21,FRMT)'Radius(10^10cm)',TRIM(STRING)
 	       READ(STRING,*)(R(I),I=IST,IEND)
+	       WRITE(21,'(1X,A,T22,10ES12.4)')'V(km/s)',(V(I),I=IST,IEND)
 	     ELSE IF(INDEX(STRING,'Temperature') .NE. 0)THEN
 	       READ(20,'(A)')STRING
-	       WRITE(21,'(A)')TRIM(STRING)
+	       WRITE(21,FRMT)'Temp(10^4K)',TRIM(STRING)
 	       READ(STRING,*)(TEMP(I),I=IST,IEND)
 	     ELSE IF(INDEX(STRING,'Electron Density') .NE. 0)THEN
 	       READ(20,'(A)')STRING
-	       WRITE(21,'(A)')TRIM(STRING)
+	       WRITE(21,FRMT)'ED(cm^-3)',TRIM(STRING)
 	       READ(STRING,*)(ED(I),I=IST,IEND)
 	     ELSE IF(INDEX(STRING,'Ion Density') .NE. 0)THEN
 	       READ(20,'(A)')STRING
-	       WRITE(21,'(A)')TRIM(STRING)
+	       WRITE(21,FRMT)'Ion D.(cm^-3)',TRIM(STRING)
 	       READ(STRING,*)(DI(I),I=IST,IEND)
 	     END IF
 	   END DO
+	   WRITE(21,'(A)')' '
 !
 	   DO J=1,NLEV
 	     READ(20,*)(PHOT(I,J),I=IST,IEND)
 	     PHOT_SUM(IST:IEND)=PHOT_SUM(IST:IEND)+PHOT(IST:IEND,J)
 	   END DO
+	   WRITE(21,'(1X,A,T22,10ES12.4)')'Tot. Phot. IR',(PHOT_SUM(I),I=IST,IEND)
 !
-	   WRITE(21,'(A,I4,A,I4,A)')'   Total photoionization rate (d=',IST,' to',IEND,'):'
-	   WRITE(21,'(X,10ES12.4)')(PHOT_SUM(I),I=IST,IEND)
-!
-	   IF(.NOT. DO_INDIV_RATES)THEN
-	   ELSE
-	     WRITE(21,'(A)')
-	     WRITE(21,'(A)')TRIM(STRING)
-	     DO J=1,NLEV
-	       WRITE(21,'(X,10ES12.4)')(PHOT(I,J),I=IST,IEND)
+	   IF(DO_INDIV_RATES)THEN
+	     DO J=1,NPRINT
+	       WRITE(21,'(A,I4,A,T24,10ES12.4)')'  Phot(',J,')',(PHOT(I,J),I=IST,IEND)
 	     END DO
+	     IF(NPRINT .GT. 0 .AND. NPRINT .LT. NLEV)THEN
+	       WRITE(TMP_STR,'(I3,A,I3,A)')NPRINT,'-',NLEV,')'
+	       WRITE(21,'(A,A,T24,10ES12.4)')'  Phot(',TRIM(TMP_STR),(SUM(PHOT(I,NPRINT+1:NLEV)),I=IST,IEND)
+	     END IF
 	   END IF
 !
 	   DO WHILE(INDEX(STRING,'Recombination Rates') .EQ. 0)
 	     READ(20,'(A)')STRING
-	     IF(INDEX(STRING,'Recombination Rates') .EQ. 0)THEN
-	       WRITE(21,'(A)')TRIM(STRING)
-	     END IF
 	     IF(INDEX(STRING,'Colisional Ionization Rate') .NE. 0)THEN
 	        READ(20,'(A)')STRING
-	        WRITE(21,'(A)')TRIM(STRING)
+	        WRITE(21,FRMT)'Col. IR',TRIM(STRING)
 	        READ(STRING,*)(COL_IR(I),I=IST,IEND)
 	     ELSE IF(INDEX(STRING,'Charge Transfer Ionization Rate') .NE. 0)THEN
 	        READ(20,'(A)')STRING
-	        WRITE(21,'(A)')TRIM(STRING)
+	        WRITE(21,FRMT)'Chg. TR. IR',TRIM(STRING)
 	        READ(STRING,*)(CHG_IR(I),I=IST,IEND)
 	     END IF
 	   END DO
@@ -237,55 +247,68 @@
 	     RECOM_SUM(IST:IEND)=RECOM_SUM(IST:IEND)+RECOM(IST:IEND,J)
 	   END DO
 !
-	   WRITE(21,'(A,I4,A,I4,A)')'   Total recombination rate (d=',IST,' to',IEND,'):'
-	   WRITE(21,'(X,10ES12.4)')(RECOM_SUM(I),I=IST,IEND)
-!
-	   IF(.NOT. DO_INDIV_RATES)THEN
-	     WRITE(21,'(A)')' '
-	   ELSE IF(NET_RECOM_PER_LEVEL)THEN
-	     WRITE(21,'(A)')' '
-	     WRITE(21,'(A,A)')'   Net ',TRIM(STRING(4:))
-	     DO J=1,NLEV
-	       WRITE(21,'(X,10ES12.4)')(RECOM(I,J)-PHOT(I,J),I=IST,IEND)
+	   WRITE(21,'(1X,A,T22,10ES12.4)')'Tot. Rad. Rec. R',(RECOM_SUM(I),I=IST,IEND)
+	   IF(NET_RECOM_PER_LEVEL)THEN
+	     DO J=1,NPRINT
+	       WRITE(21,'(3X,A,I4,A,T24,10ES12.4)')'Net(',J,')',((RECOM(I,J)-PHOT(I,J)),I=IST,IEND)
 	     END DO
-	   ELSE
-	     WRITE(21,'(A)')' '
-	     WRITE(21,'(A)')TRIM(STRING)
-	     DO J=1,NLEV
-	       WRITE(21,'(X,10ES12.4)')(RECOM(I,J),I=IST,IEND)
+	     IF(NPRINT .GT. 0 .AND. NPRINT .LT. NLEV)THEN
+	       WRITE(TMP_STR,'(I3,A,I3,A)')NPRINT,'-',NLEV,')'
+	       WRITE(21,'(3X,A,A,T24,10ES12.4)')'Phot(',TRIM(TMP_STR),
+	1           ((SUM(RECOM(I,NPRINT+1:NLEV))-SUM(PHOT(I,NPRINT+1:NLEV))),I=IST,IEND)
+	     END IF
+	   ELSE IF(DO_INDIV_RATES)THEN
+	     DO J=1,NPRINT
+	       WRITE(21,'(3X,A,I4,A,T22,10ES12.4)')'REC(',J,')',(RECOM(I,J),I=IST,IEND)
 	     END DO
+	     IF(NPRINT .GT. 0 .AND. NPRINT .LT. NLEV)THEN
+	       WRITE(TMP_STR,'(I3,A,I3,A)')NPRINT,'-',NLEV,')'
+	       WRITE(21,'(3X,A,A,T24,10ES12.4)')'Phot(',TRIM(TMP_STR),(SUM(RECOM(I,NPRINT+1:NLEV)),I=IST,IEND)
+	     END IF
 	   END IF
 !
 	   DO WHILE(INDEX(STRING,'Net Recombination Rate') .EQ. 0)
 	     READ(20,'(A)')STRING
-	     IF(INDEX(STRING,'Net Recombination Rate') .EQ. 0)THEN
-	       WRITE(21,'(A)')TRIM(STRING)
-	     END IF
 	     IF(INDEX(STRING,'Colisional Recombination Rate') .NE. 0)THEN
 	       READ(20,'(A)')STRING
-	       WRITE(21,'(A)')TRIM(STRING)
+	       WRITE(21,FRMT)'Col. RR',TRIM(STRING)
 	       READ(STRING,*)(COL_RR(I),I=IST,IEND)
 	     ELSE IF(INDEX(STRING,'Charge Transfer Recombination Rate') .NE. 0)THEN
 	       READ(20,'(A)')STRING
+	       WRITE(21,FRMT)'Chg TR RR',TRIM(STRING)
 	       WRITE(21,'(A)')TRIM(STRING)
 	       READ(STRING,*)(CHG_RR(I),I=IST,IEND)
 	     ELSE IF(INDEX(STRING,'Effective Advection Recombination Rate') .NE. 0)THEN
 	       READ(20,'(A)')STRING
-	       WRITE(21,'(A)')TRIM(STRING)
+	       WRITE(21,FRMT)'Eff. Adv. RR',TRIM(STRING)
 	       READ(STRING,*)(ADVEC_RR(I),I=IST,IEND)
 	     ELSE IF(INDEX(STRING,'Non-Thermal Ionization') .NE. 0)THEN
 	       READ(20,'(A)')STRING
-	       WRITE(21,'(A)')TRIM(STRING)
+	       WRITE(21,FRMT)'Non therm. IR',TRIM(STRING)
 	       READ(STRING,*)(NT_IR(I),I=IST,IEND)
 	     ELSE IF(INDEX(STRING,'Net X-ray recombination rate') .NE. 0)THEN
 	       READ(20,'(A)')STRING
-	       WRITE(21,'(A)')TRIM(STRING)
+	       WRITE(21,FRMT)'Net Xray RR',TRIM(STRING)
 	       READ(STRING,*)(XRAY_RR(I),I=IST,IEND)
 	     END IF
 	   END DO
 !
-	   WRITE(21,'(A)')TRIM(STRING)
+	   READ(20,'(A)')STRING
+	   WRITE(21,'(A)')' '
+	   WRITE(21,FRMT),'Net dN/dt(%)',TRIM(STRING)
 	   FLUSH(21)
+!
+	   STRING=' '
+	   DO WHILE(STRING .EQ. ' ')
+	     READ(20,'(A)')STRING
+	   END DO
+	   IF(INDEX(STRING,'Radiative Recombination Coefficient') .NE. 0)THEN
+	     READ(20,'(A)')STRING
+	     WRITE(21,FRMT)'Rad Rec alpha',TRIM(STRING)
+	     READ(STRING,*)(RR_COEF(I),I=IST,IEND)
+	   END IF
+	   WRITE(21,'(/,/,A)')' '
+!
 	   DO WHILE(1 .EQ. 1)
 	     READ(20,'(A)',END=200)STRING
 	     IF(STRING(1:1) .EQ. '1' .OR. STRING(1:1) .EQ. FORMFEED)THEN
@@ -297,14 +320,6 @@
 	   FLUSH(21)
 	END DO
 200	CONTINUE
-!
-	WRITE(6,'(8ES14.4)')PHOT_SUM(1),RECOM_SUM(1),
-	1             COL_IR(1),CHG_IR(1),COL_RR(1),CHG_RR(1),
-	1             ADVEC_RR(1),NT_IR(1)
-	WRITE(6,'(8ES14.4)')PHOT_SUM(ND),RECOM_SUM(ND),
-	1             COL_IR(ND),CHG_IR(ND),COL_RR(ND),CHG_RR(ND),
-	1             ADVEC_RR(ND),NT_IR(ND)
-	WRITE(6,'(8ES14.4)')R(1),V(1),TEMP(1),R(ND),V(ND),TEMP(ND)
 !
 	DO I=1,ND
 	   TOT_SUM(I)=( PHOT_SUM(I)+RECOM_SUM(I) +
@@ -329,8 +344,8 @@
 	XLABEL='V(km/s)'
 !
 2000	CONTINUE
-	OPTION='XN'
-	CALL GEN_IN(OPTION,'Plot option: XN, R, V, T, ED, EX(stop), NS (new species),RATES')
+	OPTION='XN'; WRITE(6,'(A)')' '
+	CALL GEN_IN(OPTION,'Plot option XN, R, V, T, ED, EX(stop), NS (new species),RATES')
 	OPTION=UC(OPTION)
 	WRITE(6,*)'Option=',OPTION
 	IF(OPTION(1:2) .EQ. 'XN')THEN
@@ -365,8 +380,8 @@
 	  CALL GEN_IN(ABS_VALUE,'Plot absolute values')
 	  WRITE(6,*)' '
 	  WRITE(6,*)'Calling DP_CURVE'
-	  WRITE(6,*)'                : +ve means recombination'
-	  WRITE(6,*)'                : -ve means ionizing'
+	  WRITE(6,*)'                 +ve means recombination'
+	  WRITE(6,*)'                 -ve means ionizing'
 	  WRITE(6,*)' '
 !
 	  YLABEL='Rates'; I=1

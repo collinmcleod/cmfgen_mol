@@ -35,7 +35,7 @@
 !
 ! Local variables.
 !
-	REAL*8 T1,T2,T3,T4
+	REAL*8 T1,T2,T3,T4,PI
 !
 	INTEGER I
 	INTEGER ISPEC
@@ -174,6 +174,20 @@
 	1     EXP(-V(K)/CLUMP_PAR(2))+
 	1     (CLUMP_PAR(4)-CLUMP_PAR(1))*
 	1     EXP( (V(K)-V(1))/CLUMP_PAR(3))
+	      IF(CLUMP_FAC(K).GT. 1.D0) CLUMP_FAC(K)=1.0D0
+	    END DO
+!
+	  ELSE IF(CLUMP_LAW(1:3) .EQ. 'SIN')THEN
+	    IF(N_CLUMP_PAR .NE. 2)THEN
+	      WRITE(LUER,*)'Error in CMFGEN'
+	      WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
+	      STOP
+	    END IF
+	    PI=ACOS(-1.0D0)
+	    DO K=1,ND
+	      T1=MOD(CLUMP_PAR(1)*LOG(R(K)/R(ND)),LOG(R(1)/R(ND)))/LOG(R(1)/R(ND))
+	      T2=V(K)*(SIN(2*PI*T1)-CLUMP_PAR(2))/V(1)
+	      CLUMP_FAC(K)=10**T2
 	      IF(CLUMP_FAC(K).GT. 1.D0) CLUMP_FAC(K)=1.0D0
 	    END DO
 !

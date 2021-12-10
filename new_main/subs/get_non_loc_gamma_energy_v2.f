@@ -63,12 +63,22 @@
 	   ENDDO
 	   CLOSE(LU)
 !
+! Allow for rounding error at the outer boundary.
+!
+	   IF(V(1) .GT. VTMP(1))THEN
+	     VTMP(1)=VTMP(1)+0.01D0*(VTMP(1)-VTMP(2))
+	     IF(V(1) .GT. VTMP(1))THEN
+	       WRITE(6,*)'Error in interpolating energy deposition in get_non_local_gamma_energy_v2'
+	       WRITE(6,*)'VTMP(1) in file is to small: VTMP(1)=',VTMP(1)
+	       WRITE(6,*)'V(1) in model is',V(1)
+	       STOP
+	     END IF
+	   END IF
 	   VTMP(NDTMP) = V(ND)
 	   CALL LIN_INTERP(V,EDEPNEW,ND,VTMP,EDEPTMP,NDTMP)
 !
 	   OPEN(LU,FILE='check_edep.dat',STATUS='UNKNOWN')
 	   WRITE(LU,'(I5,A50)') ND,' !Number of depth points'
-!
 !
 ! The conversion factor:
 !   (a) 4pi r^2 dr --> 4pi .10^30 (as R is in units of 10^10 cm).

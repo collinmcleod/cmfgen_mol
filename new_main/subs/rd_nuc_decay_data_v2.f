@@ -3,6 +3,7 @@
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
+! Altered 18-Nov-2919 : Added allocations of NUM_DECAYS and DECAY_LUM (for KDW gammra-ray routines)
 ! Altered 15-Feb-2016 : Changed to V2 - GAMRAY_TRANS added to call. Kinetic energy MUST be present in 
 !                           the chain table of the NUCLEAR_DATA file if GAMRAY_TRANS is ABS_TRANS.
 ! Altered 23-Jan-2015 : Code checks for Date record -- for bookeeping.
@@ -280,6 +281,8 @@
 	  ALLOCATE (ISO(IS)%POP(ND));              ISO(IS)%POP=0.0D0
 	  ALLOCATE (ISO(IS)%OLD_POP(ND));          ISO(IS)%OLD_POP=0.0D0
 	  ALLOCATE (ISO(IS)%OLD_POP_DECAY(ND));    ISO(IS)%OLD_POP_DECAY=0.0D0
+	  ALLOCATE (ISO(IS)%NUM_DECAYS(ND));       ISO(IS)%NUM_DECAYS=0.0D0
+	  ALLOCATE (ISO(IS)%DECAY_LUM(ND));        ISO(IS)%DECAY_LUM=0.0D0
 	END DO
 !
 	ALLOCATE (RADIOACTIVE_DECAY_ENERGY(ND));   RADIOACTIVE_DECAY_ENERGY=0.0D0

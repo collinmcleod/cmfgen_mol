@@ -15,8 +15,12 @@ MOD = $(LIB_MOD)(mod_cmfgen.o)\
       $(LIB_MOD)(cmf_sob_mod.o)\
       $(LIB_MOD)(control_variable_mod.o)\
       $(LIB_MOD)(eddfac_rec_defs_mod.o)\
+      $(LIB_MOD)(gamma_mu_mod.o)\
       $(LIB_MOD)(line_mod.o)\
       $(LIB_MOD)(line_vec_mod.o)\
+      $(LIB_MOD)(mod_gamma_trans_v3.o)\
+      $(LIB_MOD)(mod_rd_gamray_cntrl_variables.o)\
+      $(LIB_MOD)(mod_read_nuc_decay_data_v2.o)\
       $(LIB_MOD)(mod_lev_dis_blk.o)\
       $(LIB_MOD)(nuc_iso_mod.o)\
       $(LIB_MOD)(opac_mod.o)\
@@ -68,6 +72,10 @@ $(LIB_MOD)(%.o) : %.f
 $(LIB)(%.o) : %.f 
 	$(F90) -c $(FG) $< 
 	ar $(AR_OPTION) $(LIB) $*.o
+
+$(MOD_LIB)(%.o) : %.f95
+	$(F90) -c $(FFREE) $<
+	ar $(AR_OPTION) $(LIB_MOD) $*.o
 
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)

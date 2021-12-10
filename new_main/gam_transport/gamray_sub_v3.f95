@@ -2,14 +2,18 @@
 ! gamma-ray routine.
 !
 !
-	SUBROUTINE GAMRAY_SUB_V3(ND,NC,NP,P,R,V,SIGMA,VDOP_VEC,CLUMP_FAC,&
-		MU_AT_RMAX,HQW_AT_RMAX,DELV_FRAC_FG,REXT_FAC,METHOD,INST_DECAY)
+	SUBROUTINE GAMRAY_SUB_V3(ND,NC,NP,P,R,V,SIGMA,VDOP_VEC,CLUMP_FAC,    &
+		MU_AT_RMAX,HQW_AT_RMAX,DELV_FRAC_FG,REXT_FAC,METHOD,INST_DECAY,SN_AGE_DAYS)
 	USE MOD_GAMMA_V3
         USE GAMMA_NUC_DECAY_V2
         USE GAM_MU_MOD
 	USE MOD_RD_GAMRAY_CNTRL_VARIABLES
+	USE NUC_ISO_MOD, ONLY : RADIOACTIVE_DECAY_ENERGY
 	IMPLICIT NONE
 !
+! Altered 21-Nov-2021 : Added access to RADIOACTIVE_DECAY_ENERGY
+! Altered 19-Nov-2021 : Added SN_AGE_DAYS to call. Added SN_AGE_DAYS to gamma_energy_dep_v7 call.
+! Altered 18-Nov-2021 : THK_CONT initialized to FALSE.
 ! Altered 17-Mar-2019 : Fixed allocation of TC_WRK (DJH)
 !
 	INTEGER :: I,J,K
@@ -25,7 +29,7 @@
 	INTEGER, PARAMETER :: IFIVE =5
 	INTEGER, PARAMETER :: ISIX  =6
 	REAL*8 :: T1,T2,T3,T4,T5
-	REAL*8 :: P(ND)
+	REAL*8 :: P(NP)
 	REAL*8 :: R(ND)
 	REAL*8 :: V(ND)
 	REAL*8 :: SIGMA(ND)
@@ -33,6 +37,8 @@
 	REAL*8 :: CLUMP_FAC(ND)
 	REAL*8 :: MU_AT_RMAX(NP)
 	REAL*8 :: HQW_AT_RMAX(NP)
+!
+	REAL*8 :: SN_AGE_DAYS
 	REAL*8 :: DELV_FRAC_FG
 	REAL*8 :: REXT_FAC
 	REAL*8 :: CHI_SCAT_CLUMP(ND)
@@ -44,7 +50,7 @@
 	REAL*8, ALLOCATABLE :: TC_WRK(:)
 !
 	LOGICAL :: INST_DECAY
-	LOGICAL :: THK_CONT
+	LOGICAL :: THK_CONT=.FALSE.
 	CHARACTER(LEN=6) :: METHOD
 	CHARACTER(LEN=40) :: FILENAME
 	CHARACTER(LEN=30) :: OPTION
@@ -90,25 +96,27 @@
 !
 	ALLOCATE (NU_GRID_VEC(NU_GRID_MAX))
 !
-	CALL GAM_NUC_DECAY_DATA_SUB_V3()
+	CALL GAM_NUC_DECAY_DATA_SUB_V3(VERBOSE_GAMMA)
 !
 	ALLOCATE (NU_VEC(N_GAMMA))
 !
 	NU_VEC=0.0D0
 	WRITE(6,*)'N_GAMMA is (before call to NU_GRID_V16)',N_GAMMA,NU_GRID_MAX
-	CALL NU_GRID_V16(N_GAMMA,NU_VEC,NU_GRID_VEC,NF_GRID_PTS)
+	CALL GAMMA_NU_GRID_V16(N_GAMMA,NU_VEC,NU_GRID_VEC,NF_GRID_PTS)
 	ALLOCATE(NU_VEC_15(NF_GRID_PTS))
 	NU_VEC_15(1:NF_GRID_PTS)=NU_GRID_VEC(1:NF_GRID_PTS)/1.0D15
 	ALLOCATE(GAMMA_TAU(NF_GRID_PTS),XRAY_TAU(NF_GRID_PTS))
 	ALLOCATE(NU_END(NF_GRID_PTS))
 !	ALLOCATE(GAM_NU_MAX(NF_GRID_PTS))
 !
-	OPEN(UNIT=7,FILE='./data/gamma_nu_grid.dat',ACTION='WRITE',STATUS='UNKNOWN')
-	CALL WRITV_V2(NU_GRID_VEC,NF_GRID_PTS,6,'Gamma ray freq grid',7)
-	CLOSE(UNIT=7)
+	IF(VERBOSE_GAMMA)THEN
+	  OPEN(UNIT=7,FILE='./data/gamma_nu_grid.dat',ACTION='WRITE',STATUS='UNKNOWN')
+	  CALL WRITV_V2(NU_GRID_VEC,NF_GRID_PTS,6,'Gamma ray freq grid',7)
+	  CLOSE(UNIT=7)
+	END IF
 !
 	OPEN(UNIT=LU_GAM,FILE='kevin_testing',STATUS='UNKNOWN',ACTION='WRITE',IOSTAT=IOS)
-	  IF (IOS .NE. 0 ) STOP '*****Cannot open kevin_testing*****'
+	IF (IOS .NE. 0 ) STOP '*****Cannot open kevin_testing*****'
 	CALL SET_LINE_BUFFERING(LU_GAM)
 !
 	ALLOCATE(GAM_E_ME(NF_GRID_PTS))
@@ -145,19 +153,23 @@
 ! These next pieces are just diagnosing and supplemental pieces. They
 ! can be removed if needed.
 !
-	OPEN(UNIT=7,FILE='./data/scattering_diff.dat',STATUS='UNKNOWN',ACTION='WRITE',IOSTAT=IOS)
-	  DO I=1,NF_GRID_PTS
-	    WRITE(7,'(ES18.8,2X,ES18.8,2X,ES18.8)')NU_GRID_VEC(I),NU_GRID_VEC(I)*H_PL,&
+	IF(VERBOSE_GAMMA)THEN
+	  OPEN(UNIT=7,FILE='./data/scattering_diff.dat',STATUS='UNKNOWN',ACTION='WRITE',IOSTAT=IOS)
+	    DO I=1,NF_GRID_PTS
+	      WRITE(7,'(ES18.8,2X,ES18.8,2X,ES18.8)')NU_GRID_VEC(I),NU_GRID_VEC(I)*H_PL,&
 		(NU_GRID_VEC(I)-NU_GRID_VEC(I)/(1.0D0+2.0D0*GAM_E_ME(I)))/NU_GRID_VEC(I)*SOL
-	  END DO
-	CLOSE(7)
+	    END DO
+	  CLOSE(7)
+	END IF
 !
-	OPEN(UNIT=7,FILE='./data/velocity_step.dat',STATUS='UNKNOWN',ACTION='WRITE',IOSTAT=IOS)
-	  DO I=1,NF_GRID_PTS-1
-	    WRITE(7,'(ES18.8,2X,ES18.8,2X,ES18.8)')NU_GRID_VEC(I),NU_GRID_VEC(I)*H_PL,&
+	IF(VERBOSE_GAMMA)THEN
+	  OPEN(UNIT=7,FILE='./data/velocity_step.dat',STATUS='UNKNOWN',ACTION='WRITE',IOSTAT=IOS)
+	    DO I=1,NF_GRID_PTS-1
+	      WRITE(7,'(ES18.8,2X,ES18.8,2X,ES18.8)')NU_GRID_VEC(I),NU_GRID_VEC(I)*H_PL,&
 		(NU_GRID_VEC(I)-NU_GRID_VEC(I+1))/NU_GRID_VEC(I)*SOL
-	  END DO
-	CLOSE(7)
+	    END DO
+	  CLOSE(7)
+	END IF
 !
 ! ^
 !
@@ -177,11 +189,6 @@
 !
 	GAMRAY_EMISS=0.0D0
 	DO I=1,ND
-!	  DO K=1,NF_GRID_PTS-1
-!	    T1=NU_GRID_VEC(K)
-!	    T2=NU_GRID_VEC(K+1)
-!	    GAMRAY_EMISS(I)=GAMRAY_EMISS(I)+0.5D0*(T1-T2)*(ETA_ISO(I,K)+ETA_ISO(I,K+1))
-!	  END DO
 	  DO K=1,NF_GRID_PTS
 	    TA_WRK(K)=ETA_ISO(I,K)
 	  END DO
@@ -189,12 +196,8 @@
 	  GAMRAY_EMISS(I)=SUM(TA_WRK)*FOURPI
 	  TOTAL_DECAY_LUM(I)=GAMRAY_EMISS(I)+DECAY_KIN_E(I)
 	END DO
+!
 	T3=0.0D0
-!	DO I=1,ND-1
-!	  T1=R(I)
-!	  T2=R(I+1)
-!	  T3=T3+0.5D0*(T1-T2)*(TOTAL_DECAY_LUM(I)*T1*T1+TOTAL_DECAY_LUM(I+1)*T2*T2)
-!	END DO
 	ALLOCATE(TB_WRK(ND))
 	TB_WRK=0.0D0
 	DO I=1,ND
@@ -204,30 +207,38 @@
 	T3=SUM(TB_WRK)
 	T3=T3*FOURPI*1.0D+30
 	GAMRAY_EMISS=GAMRAY_EMISS + DECAY_KIN_E
-	OPEN(UNIT=7,FILE='./data/gamma_ray_local_emission.dat',STATUS='UNKNOWN',&
-		ACTION='WRITE',IOSTAT=IOS)
-	  WRITE(7,'(A,ES20.10)')'Total Nuclear Luminosity in ergs/s:',T3
-	  WRITE(7,'(A,ES20.10)')'Total Nuclear Luminosity in Lsun:',T3/3.826D+33
-	  WRITE(7,'(A)')'!Gamma ray energies from the different lines and K.E. for each depth in ergs/cm^3/s'
-	  WRITE(7,'(A)')'!Local emission is both line energies and positron/electron K.E.'
-	  WRITE(7,'(4(A20,1X))')'! Radius','Velocity km/s','Local Emiss','Decay K.E.'
-	  DO I=1,ND
-	    WRITE(7,'(4(ES20.10,4X))')R(I),V(I),GAMRAY_EMISS(I),DECAY_KIN_E(I)
-	  END DO
-	CLOSE(UNIT=7)
 !
-	FILENAME='./data/ETA_ISO_'
-	OPTION='ETA_ISO'
-	CALL WRITE_ARRAY_ISO(ETA_ISO,ND,NF_GRID_PTS,NU_GRID_VEC,FILENAME)
+	IF(VERBOSE_GAMMA)THEN
+	  OPEN(UNIT=7,FILE='./data/gamma_ray_local_emission.dat',STATUS='UNKNOWN',&
+		ACTION='WRITE',IOSTAT=IOS)
+	    WRITE(7,'(A,ES20.10)')'Total Nuclear Luminosity in ergs/s:',T3
+	    WRITE(7,'(A,ES20.10)')'Total Nuclear Luminosity in Lsun:',T3/3.826D+33
+	    WRITE(7,'(A)')'!Gamma ray energies from the different lines and K.E. for each depth in ergs/cm^3/s'
+	    WRITE(7,'(A)')'!Local emission is both line energies and positron/electron K.E.'
+	    WRITE(7,'(4(A20,1X))')'! Radius','Velocity km/s','Local Emiss','Decay K.E.'
+	    DO I=1,ND
+	      WRITE(7,'(4(ES20.10,4X))')R(I),V(I),GAMRAY_EMISS(I),DECAY_KIN_E(I)
+	    END DO
+	  CLOSE(UNIT=7)
+	END IF
+!
+	IF(VERBOSE_GAMMA)THEN
+	  FILENAME='./data/ETA_ISO_'
+	  OPTION='ETA_ISO'
+	  CALL WRITE_ARRAY_ISO(ETA_ISO,ND,NF_GRID_PTS,NU_GRID_VEC,FILENAME)
+	END IF
 !
 	CALL ELECTRON_DENSITY_CALC_V2(ED_TOT,ND)
-	OPEN(UNIT=7,FILE='./data/electron_density.dat',ACTION='WRITE',&
+!
+	IF(VERBOSE_GAMMA)THEN
+	  OPEN(UNIT=7,FILE='./data/electron_density.dat',ACTION='WRITE',&
 		STATUS='UNKNOWN')
-	WRITE(7,'(A6,4X,A18)') 'Depth:','Electron density:'
-	DO I=1,ND
-	  WRITE(7,'(2X,I3,5X,ES16.6)')I,ED_TOT(I)
-	END DO
-	CLOSE(UNIT=7)
+	  WRITE(7,'(A6,4X,A18)') 'Depth:','Electron density:'
+	  DO I=1,ND
+	    WRITE(7,'(2X,I3,5X,ES16.6)')I,ED_TOT(I)
+	  END DO
+	  CLOSE(UNIT=7)
+	END IF
 !
 	NA=2*NP-1  ! Max number of mu angles
 	NA_MON=NA*ANG_MULT ! Max number of linear mu grid angles
@@ -235,13 +246,14 @@
 !
 ! NU_END is used to find the NU_GRID_VEC index of the back-scattered frequecny of all the frequencies in the grid
 !
-	OPEN(UNIT=7,FILE='./data/nu_end.dat',STATUS='UNKNOWN',ACTION='WRITE',IOSTAT=IOS)
-	IF(IOS .NE. 0)THEN
-	  WRITE(LUER,*)'Trouble opening ./data/nu_end.dat'
-	  WRITE(LUER,*)'IOSTAT:',IOS
-	  STOP
+	IF(VERBOSE_GAMMA)THEN
+	  OPEN(UNIT=7,FILE='./data/nu_end.dat',STATUS='UNKNOWN',ACTION='WRITE',IOSTAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(LUER,*)'Trouble opening ./data/nu_end.dat; IOSTAT=',IOS
+	    STOP
+	  END IF
+	  WRITE(7,'(A5,2X,A5,2X,5(A16,2X)))')'!  I','IEND','NU','NU_BACK_SCAT','NU(IEND-1)','NU(IEND)','NU(IEND+1)'
 	END IF
-	WRITE(7,'(A5,2X,A5,2X,5(A16,2X)))')'!  I','IEND','NU','NU_BACK_SCAT','NU(IEND-1)','NU(IEND)','NU(IEND+1)'
 	DO I=1,NF_GRID_PTS
 	  T1=NU_GRID_VEC(I)/(1.0D0+2.0D0*HoMC2*NU_GRID_VEC(I))
 	  J=1
@@ -253,15 +265,17 @@
 	  ELSE IF(I .LT. J-1)THEN
 	    NU_END(I)=J-1
 	  END IF
-	  IF(NU_END(I) .EQ.1)THEN
-	    WRITE(7,'(I5,2X,I5,2X,2(ES16.6,2X),A18,2(ES16.6,2X))')I,NU_END(I),NU_GRID_VEC(I), &
-		T1,' ',NU_GRID_VEC(NU_END(I)),NU_GRID_VEC(NU_END(I)+1)
-	  ELSE IF(NU_END(I) .NE. 1 .AND. NU_END(I) .NE. NF_GRID_PTS)THEN
-	    WRITE(7,'(I5,2X,I5,2X,5(ES16.6,2X))')I,NU_END(I),NU_GRID_VEC(I),T1, &
+	  IF(VERBOSE_GAMMA)THEN
+	    IF(NU_END(I) .EQ.1)THEN
+	      WRITE(7,'(I5,2X,I5,2X,2(ES16.6,2X),A18,2(ES16.6,2X))')I,NU_END(I),NU_GRID_VEC(I), &
+	   	T1,' ',NU_GRID_VEC(NU_END(I)),NU_GRID_VEC(NU_END(I)+1)
+	    ELSE IF(NU_END(I) .NE. 1 .AND. NU_END(I) .NE. NF_GRID_PTS)THEN
+	      WRITE(7,'(I5,2X,I5,2X,5(ES16.6,2X))')I,NU_END(I),NU_GRID_VEC(I),T1, &
 	        NU_GRID_VEC(NU_END(I)-1),NU_GRID_VEC(NU_END(I)),NU_GRID_VEC(NU_END(I)+1)
-	  ELSE IF(I .EQ. NF_GRID_PTS .OR. NU_END(I) .EQ. NF_GRID_PTS)THEN
-	    WRITE(7,'(I5,2X,I5,2X,4(ES16.6,2X),A18)')I,NU_END(I),NU_GRID_VEC(I),T1, &
+	    ELSE IF(I .EQ. NF_GRID_PTS .OR. NU_END(I) .EQ. NF_GRID_PTS)THEN
+	      WRITE(7,'(I5,2X,I5,2X,4(ES16.6,2X),A18)')I,NU_END(I),NU_GRID_VEC(I),T1, &
 	        NU_GRID_VEC(NU_END(I)-1),NU_GRID_VEC(NU_END(I)),' '
+	    END IF
 	  END IF
 	END DO
 	CLOSE(UNIT=7)
@@ -270,6 +284,7 @@
 	ALLOCATE(GAM_I_T(ND,NA,NF_GRID_PTS),GAM_ETA_SCAT_T(ND,NA,NF_GRID_PTS))
 	ALLOCATE(GAMMA_J(NF_GRID_PTS,ND))
 	ALLOCATE(GAM_ETA_MUAVG(NF_GRID_PTS,ND))
+!
 ! ^^^^  "_T" means transpose on arrays to use them in the transfer routine  ^^^^
 !
 	GAM_I=0.0D0 !gamma-ray intensity
@@ -298,31 +313,32 @@
 	GAM_OPAC_COPY=0.0D0
 	GAM_OPAC_CLUMP=0.0D0
 !
-	OPEN(UNIT=7,FILE='./data/E_SCAT_ARRAY',STATUS='UNKNOWN',ACTION='WRITE')
-        WRITE(7,*)"!Opened E_SCAT_ARRAY"
-        CLOSE(UNIT=7)
-        OPEN(UNIT=7,FILE='./data/GAMRAY_E_DEP',STATUS='UNKNOWN',ACTION='WRITE')
-        WRITE(7,*)"!Opened GAMRAY_E_DEP"
-        CLOSE(UNIT=7)
-        OPEN(UNIT=7,FILE='./data/gamma_ray_lum.dat',STATUS='UNKNOWN',ACTION='WRITE')
-        WRITE(7,*)"!Opened gamma_ray_lum.dat"
-        CLOSE(UNIT=7)
-        OPEN(UNIT=7,FILE='./data/gamma_ray_lum_J.dat',STATUS='UNKNOWN',ACTION='WRITE')
-        WRITE(7,*)"!Opened gamma_ray_lum.dat"
-        CLOSE(UNIT=7)
-        OPEN(UNIT=7,FILE='./data/ray1_intensity.dat',STATUS='UNKNOWN',ACTION='WRITE')
-        WRITE(7,*)'!Opened ray1_intensity.dat'
-        CLOSE(UNIT=7)
-        OPEN(UNIT=7,FILE='./data/DIAGN_EDEP',STATUS='UNKNOWN',ACTION='WRITE')
-        WRITE(7,*)'!Opened DIAGN_EDEP'
-        CLOSE(UNIT=7)
-        OPEN(UNIT=7,FILE='./data/photons.dat',STATUS='UNKNOWN',ACTION='WRITE')
-        WRITE(7,*)'!Opened photons.dat'
-        CLOSE(UNIT=7)
-        OPEN(UNIT=7,FILE='./data/TAU_RAY.dat',STATUS='UNKNOWN',ACTION='WRITE')
-        WRITE(7,*)'!Opened TAU_RAY.dat'
-        WRITE(7,*)'ND:',ND
-        CLOSE(UNIT=7)
+!	OPEN(UNIT=7,FILE='./data/E_SCAT_ARRAY',STATUS='UNKNOWN',ACTION='WRITE')
+!        WRITE(7,*)"!Opened E_SCAT_ARRAY"
+!        CLOSE(UNIT=7)
+!        OPEN(UNIT=7,FILE='./data/GAMRAY_E_DEP',STATUS='UNKNOWN',ACTION='WRITE')
+!        WRITE(7,*)"!Opened GAMRAY_E_DEP"
+!        CLOSE(UNIT=7)
+!        OPEN(UNIT=7,FILE='./data/gamma_ray_lum.dat',STATUS='UNKNOWN',ACTION='WRITE')
+!        WRITE(7,*)"!Opened gamma_ray_lum.dat"
+!        CLOSE(UNIT=7)
+!        OPEN(UNIT=7,FILE='./data/gamma_ray_lum_J.dat',STATUS='UNKNOWN',ACTION='WRITE')
+!        WRITE(7,*)"!Opened gamma_ray_lum.dat"
+!        CLOSE(UNIT=7)
+!        OPEN(UNIT=7,FILE='./data/ray1_intensity.dat',STATUS='UNKNOWN',ACTION='WRITE')
+!        WRITE(7,*)'!Opened ray1_intensity.dat'
+!        CLOSE(UNIT=7)
+!        OPEN(UNIT=7,FILE='./data/DIAGN_EDEP',STATUS='UNKNOWN',ACTION='WRITE')
+!        WRITE(7,*)'!Opened DIAGN_EDEP'
+!        CLOSE(UNIT=7)
+!        OPEN(UNIT=7,FILE='./data/photons.dat',STATUS='UNKNOWN',ACTION='WRITE')
+!        WRITE(7,*)'!Opened photons.dat'
+!        CLOSE(UNIT=7)
+!        OPEN(UNIT=7,FILE='./data/TAU_RAY.dat',STATUS='UNKNOWN',ACTION='WRITE')
+!        WRITE(7,*)'!Opened TAU_RAY.dat'
+!        WRITE(7,*)'ND:',ND
+!        CLOSE(UNIT=7)
+!
 	WRITE(LUER,*)'Set up gamma-ray transfer routine variables...'
 !
 !************************************************************************************
@@ -474,18 +490,23 @@
 	END DO
 	GAMMA_TAU=GAMMA_TAU*1.0D10
 	XRAY_TAU=XRAY_TAU*1.0D10
-	OPEN(UNIT=7,FILE='./data/TAU_gam_xray.dat',STATUS='UNKNOWN',ACTION='WRITE')
-	WRITE(7,'(A1,1X,A12,2X,A14,2X,A14)')'!','NU (keV)','TAU_GAM','TAU_XRAY'
-	DO I=1,NF_GRID_PTS
-	  WRITE(7,'(2X,F14.6,ES16.6,ES16.6)')NU_GRID_VEC(I)*H_PL,GAMMA_TAU(I),XRAY_TAU(I)
-	END DO
-	CLOSE(UNIT=7)
+!
+	IF(VERBOSE_GAMMA)THEN
+	  OPEN(UNIT=7,FILE='./data/TAU_gam_xray.dat',STATUS='UNKNOWN',ACTION='WRITE')
+	  WRITE(7,'(A1,1X,A12,2X,A14,2X,A14)')'!','NU (keV)','TAU_GAM','TAU_XRAY'
+	  DO I=1,NF_GRID_PTS
+	    WRITE(7,'(2X,F14.6,ES16.6,ES16.6)')NU_GRID_VEC(I)*H_PL,GAMMA_TAU(I),XRAY_TAU(I)
+	  END DO
+	  CLOSE(UNIT=7)
+	END IF
 !
 ! Now we calculate the energy deposited from gamma-ray scattering.
 ! This calculates the difference between integral (chi*I-eta) dnu*dOmega
 !
-	CALL GAMRAY_ENERGY_DEPOSIT_V7(GAM_I,GAM_ETA_SCAT,E_SCAT_ARRAY,CHI_ARRAY_ABS, &
-		GAM_ENERGY_DEP,DECAY_KIN_E,NU_GRID_VEC,NF_GRID_PTS,V,R,NA,ND,GAMRAY_EMISS)
+	CALL GAMMA_ENERGY_DEP_V7(GAM_I,GAM_ETA_SCAT,E_SCAT_ARRAY,CHI_ARRAY_ABS, &
+		GAM_ENERGY_DEP,DECAY_KIN_E,NU_GRID_VEC,NF_GRID_PTS,V,R,NA,ND, &
+	        GAMRAY_EMISS,SN_AGE_DAYS)
+	RADIOACTIVE_DECAY_ENERGY=GAM_ENERGY_DEP
 !
 	K=0
 	DO I=1,ND
@@ -493,43 +514,42 @@
 	END DO
 	ALLOCATE(TC_WRK(K))
 !
-	GAMMA_J=0D0
-	DO K=1,NF_GRID_PTS
-	  DO I=1,ND
-	    ID=R_MU(I)%MU_PTS
-!	    DO J=1,ID-1
-!	      T1=R_MU(I)%MU_VECTOR(J)
-!	      T2=R_MU(I)%MU_VECTOR(J+1)
-!	      GAMMA_J(K,I)=GAMMA_J(K,I)+5.0D-1*(T1-T2)*(GAM_I(J,I,K)+GAM_I(J+1,I,K))
-!	    END DO
-	    TC_WRK=0.0D0
-	    DO J=1,ID
-	      TC_WRK(J)=GAM_I(J,I,K)
+	IF(WRITE_J_DATA)THEN
+	  GAMMA_J=0D0
+	  DO K=1,NF_GRID_PTS
+	    DO I=1,ND
+	      ID=R_MU(I)%MU_PTS
+	      TC_WRK=0.0D0
+	      DO J=1,ID
+	        TC_WRK(J)=GAM_I(J,I,K)
+	      END DO
+	      CALL LUM_FROM_ETA(TC_WRK,R_MU(I)%MU_VECTOR,ID)
+	      GAMMA_J(K,I)=SUM(TC_WRK(1:ID))
 	    END DO
-	    CALL LUM_FROM_ETA(TC_WRK,R_MU(I)%MU_VECTOR,ID)
-	    GAMMA_J(K,I)=SUM(TC_WRK(1:ID))
 	  END DO
-	END DO
-	GAMMA_J=GAMMA_J/2.0D0
-	FILENAME='./data/GAMMA_J_'
-	OPTION='FREQ'
-	CALL WRITE_ARRAY_V2(GAMMA_J,ND,NF_GRID_PTS,NU_GRID_VEC,FILENAME,IZERO,OPTION)
+	  GAMMA_J=GAMMA_J/2.0D0
+	  FILENAME='./data/GAMMA_J_'
+	  OPTION='FREQ'
+	  CALL WRITE_ARRAY_V2(GAMMA_J,ND,NF_GRID_PTS,NU_GRID_VEC,FILENAME,IZERO,OPTION)
+	END IF
 !
-	GAM_ETA_MUAVG=0D0
-	DO K=1,NF_GRID_PTS
-	  DO I=1,ND
-	    ID=R_MU(I)%MU_PTS
-	    DO J=1,ID-1
-	      T1=R_MU(I)%MU_VECTOR(J)
-	      T2=R_MU(I)%MU_VECTOR(J+1)
-	      GAM_ETA_MUAVG(K,I)=GAM_ETA_MUAVG(K,I)+5.0D-1*(T1-T2)*( &
+	IF(VERBOSE_GAMMA)THEN
+	  GAM_ETA_MUAVG=0D0
+	  DO K=1,NF_GRID_PTS
+	    DO I=1,ND
+	      ID=R_MU(I)%MU_PTS
+	      DO J=1,ID-1
+	        T1=R_MU(I)%MU_VECTOR(J)
+	        T2=R_MU(I)%MU_VECTOR(J+1)
+	        GAM_ETA_MUAVG(K,I)=GAM_ETA_MUAVG(K,I)+5.0D-1*(T1-T2)*( &
 			GAM_ETA_SCAT(J,I,K)+GAM_ETA_SCAT(J+1,I,K))
+	      END DO
 	    END DO
 	  END DO
-	END DO
-	FILENAME='./data/ETA_MUAVG_'
-	OPTION='FREQ'
-	CALL WRITE_ARRAY_V2(GAM_ETA_MUAVG,ND,NF_GRID_PTS,NU_GRID_VEC,FILENAME,IZERO,OPTION)
+	  FILENAME='./data/ETA_MUAVG_'
+	  OPTION='FREQ'
+	  CALL WRITE_ARRAY_V2(GAM_ETA_MUAVG,ND,NF_GRID_PTS,NU_GRID_VEC,FILENAME,IZERO,OPTION)
+	END IF
 !
 	CALL TUNE(3,'')
 	CLOSE(LU_GAM)
