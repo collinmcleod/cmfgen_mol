@@ -28,6 +28,9 @@
 	ALLOCATE(TMP_PAR(NG_PAR_MAX)); TMP_PAR(:)=0.0D0
 	TMP_PAR(1:NG_PAR)=PAR(1:NG_PAR)
 !
+	CALL GEN_IN(TMP_PAR(1),'Y value at begining of fit range')
+	CALL GEN_IN(TMP_PAR(2),'Baseline slope')
+!
 ! Loop edit section until finished. NB: For historical reasons, the third parameter
 ! is the height. Howver we write it out second, since it is more important for
 ! seein the importance of the Gaussian component.

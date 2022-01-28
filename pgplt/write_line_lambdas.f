@@ -58,6 +58,19 @@
 	  DONE=.TRUE.	
 	END IF
 !
+	IF(OPTION .EQ. ' ' .OR. OPTION .EQ. 'OI' .OR. OPTION .EQ. 'OXY')THEN
+	  WRITE(6,*)'O I:     1302.17    1306.03'
+	  WRITE(6,*)'O I:     [6302.5]   [6365.5]'
+	  WRITE(6,*)'O I:     7774.08    7776.31   7777.53                           2s2_2p3(4So)3s_5So -2s2_2p3(4So)3p_5Pe'
+	  DONE=.TRUE.
+	END IF
+!
+	IF(OPTION .EQ. ' ' .OR. OPTION .EQ. 'O2' .OR. OPTION .EQ. 'OXY')THEN
+	  WRITE(6,*)'O II:     [3727.09]    [3729.86]                                     2s2_2p3_4So-2s2_2p3_2Do'
+	  WRITE(6,*)'O II:     [7320.94]    [7322.01]    [7331.68]    [7332.75]           2s2_2p3_2Do-2s2_2p3_2Po'
+	  DONE=.TRUE.
+	END IF	
+!
 	IF(OPTION .EQ. ' ' .OR. OPTION .EQ. 'OIV' .OR. OPTION .EQ. 'OXY')THEN
 	  WRITE(6,*)'O IV:    1338.615   1342.990   1343.514   '
 	  WRITE(6,*)'O IV:    1397.23    1399.78    1401.16    1404.81'

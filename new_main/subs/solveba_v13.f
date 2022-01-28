@@ -100,7 +100,7 @@
 	1              DIAG_INDX,NT,NION,NUM_BNDS,ND,
 	1              BA_COMPUTED,LOC_WR_BA_INV,WR_PRT_INV)
 	    IF(.NOT. SUCCESS)THEN
-	      WRITE(LUER,*)'Error in CMF_BLKBAND_V2 - shutting code down'
+	      WRITE(LUER,*)'Error in CMF_BLKBAND_V3 - shutting code down'
 	      STOP
 	    END IF
 !
@@ -135,7 +135,7 @@
 	    END DO
 	  END DO
 	  IF(COUNT(1) .NE. 0)
-	1   WRITE(LUER,*)'Warning -- using  LIMIT option for LAMBDA iteration in SOLVEBA_V9.f'
+	1   WRITE(LUER,*)'Warning -- using  LIMIT option for LAMBDA iteration in SOLVEBA_V13.f'
 	END IF
 !
 ! Determine maximum corrections to the 'population parameters', and output
@@ -265,7 +265,7 @@
 	  MAXCH=MAX( ABS(MAX_INC_VEC(NV)), MAX_DEC_VEC(NV)/(1.0D0-MIN(MAX_DEC_VEC(NV),0.9999D0)))
 	  MAXCH=100.0D0*MAXCH
 	END IF
-	WRITE(6,*)'Maximm changes as returned by SOLVEBA_V9 is',MAXCH
+	WRITE(6,*)'Maximm changes as returned by SOLVEBA_V13 is',MAXCH
 	WRITE(6,'(A,10ES10.2)')' DEC_VEC: ',MAX_DEC_VEC(1:10)
 	WRITE(6,'(A,10ES10.2)')' INC_VEC: ',MAX_INC_VEC(1:10)
 !
@@ -288,7 +288,7 @@
 !**********************************************************************************
 
 	IF(CHANGE_LIM .LE. 1.0D0)THEN
-          WRITE(LUER,'(A,1PE12.4)')' Error in SOLVEBA_V9'
+          WRITE(LUER,'(A,1PE12.4)')' Error in SOLVEBA_V13'
           WRITE(LUER,'(A,1PE12.4)')' Maximum change for normal iteration must be > 1.'
 	  STOP
 	END IF

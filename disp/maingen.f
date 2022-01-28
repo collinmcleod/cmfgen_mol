@@ -2861,6 +2861,12 @@
 	  YAXIS='c(km/s)'
 !
 	ELSE IF(XOPT .EQ. 'SIGMA')THEN
+!
+	  WRITE(6,'(/,1X,A)')'Plotting 3 curves for comparison:'
+	  WRITE(6,'(6X,A)')'log10(sigma+1)'
+	  WRITE(6,'(6X,A)')'log10(ln(V(I+1)/V(I-1))/ln(R(I+1)/R(I-1)))'
+	  WRITE(6,'(6X,A,/)')'log10(dlni/dlnr)'
+!
 	  DO I=1,ND
 	    YV(I)=DLOG10(SIGMA(I)+1.0)
 	  END DO
@@ -2868,15 +2874,16 @@
 	    TC(I)=DLOG10(LOG(V(I+1)/V(I-1))/LOG(R(I+1)/R(I-1)))
 	  END DO
 	  TC(1)=TC(2); TC(ND)=TC(ND-1)
-	  CALL DP_CURVE(ND,XV,YV)
+	  CALL DP_CURVE_LAB(ND,XV,YV)
 	  CALL DP_CURVE(ND,XV,TC)
 	  DO I=1,ND
 	    TA(I)=LOG(R(I))
 	    TB(I)=LOG(V(I))
 	  END DO
+	  CALL DERIVCHI(YV,TB,TA,ND,'LINMON')
+	  YV(1:ND)=DLOG10(YV(1:ND))
 	  CALL DP_CURVE(ND,XV,YV)
-	  CALL DERIVCHI(V,TB,TA,ND,'LINMON')
-	  YAXIS='Log(\gs+1)'
+	  YAXIS='log(\gs+1)'
 !
 	ELSE IF(XOPT .EQ. 'FONR')THEN
 	  IF(ROSS_MEAN(1) .NE. 0.0D0)THEN

@@ -120,22 +120,22 @@
 	   DO WHILE(1 .EQ. 1)
 	     READ(20,'(A)')TMP_STR
 	     IF(INDEX(TMP_STR,'Radius') .NE. 0)THEN
-	       WRITE(21,'(A,T12,10I12)')'Depth',(K,K=ID,MIN(ID+9,ND))
+	       WRITE(21,'(A,T13,10I12)')'Depth',(K,K=ID,MIN(ID+9,ND))
 	       READ(20,'(A)')STRING
 	       READ(STRING,*)(R(K),K=ID,MIN(ID+9,ND))
 	       WRITE(21,'(A)')TMP_STR(4:9)//'     '//TRIM(STRING)
 	     ELSE IF(INDEX(TMP_STR,'Velocity') .NE. 0)THEN
 	       READ(20,'(A)')STRING
 	       READ(STRING,*)(V(K),K=ID,MIN(ID+9,ND))
-	       WRITE(21,'(A)')TMP_STR(4:9)//'     '//TRIM(STRING)
+	       WRITE(21,'(A)')TMP_STR(4:11)//'   '//TRIM(STRING)
 	     ELSE IF(INDEX(TMP_STR,'Temperature') .NE. 0)THEN
 	       READ(20,'(A)')STRING
 	       READ(STRING,*)(T(K),K=ID,MIN(ID+9,ND))
-	       WRITE(21,'(A)')TMP_STR(4:9)//'     '//TRIM(STRING)
+	       WRITE(21,'(A)')TMP_STR(4:11)//'.  '//TRIM(STRING)
 	     ELSE IF(INDEX(TMP_STR,'Electron') .NE. 0)THEN
 	       READ(20,'(A)')STRING
 	       READ(STRING,*)(ED(K),K=ID,MIN(ID+9,ND))
-	       WRITE(21,'(A)')TMP_STR(4:9)//'     '//TRIM(STRING)
+	       WRITE(21,'(A)')TMP_STR(4:11)//'   '//TRIM(STRING)
 	       EXIT
 	     END IF
 	   END DO
@@ -290,11 +290,11 @@
 	NRECS=12
 	CALL GEN_IN(NRECS,'Maximum number of records per depth to be output to sorted file')
 !
-	N_INIT_RECS=5
+	N_INIT_RECS=6
 	VALS=0.0D0
 	DO I=1,1+(ND-1)/10
 	  ID=1+(I-1)*10
-	  DO K=1,5
+	  DO K=1,N_INIT_RECS
 	    READ(20,'(A)')STR_VEC(K)
 	  END DO
 !

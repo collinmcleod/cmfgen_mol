@@ -272,8 +272,13 @@
 	    NPLT=10
 	    CALL GEN_IN(NPLT,'Number of cooling curves to be illustrated (0 to read from file')
 	    WRITE(6,'(A,A)')'X vector is ',TRIM(XAXIS)
-	    T1=XV(1);  CALL GEN_IN(T1,'First depth for plotting')
-	    T2=XV(ND); CALL GEN_IN(T2,'Last depth for plotting')
+	    IF(XV(1) .LT. XV(ND))THEN
+	      T1=XV(1);  CALL GEN_IN(T1,'First depth for plotting')
+	      T2=XV(ND); CALL GEN_IN(T2,'Last depth for plotting')
+	    ELSE
+	      T1=XV(ND); CALL GEN_IN(T1,'First depth for plotting')
+	      T2=XV(1);  CALL GEN_IN(T2,'Last depth for plotting')
+	    END IF
 	    IF(XAXIS .EQ. 'Depth index')THEN
 	      IST=NINT(T1); IEND=NINT(T2)
 	    ELSE

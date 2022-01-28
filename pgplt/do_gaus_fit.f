@@ -10,6 +10,7 @@
 !
 ! Altered   -Sep-07
 !
+	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: NL_MAX=100
 	REAL*8 LINE_HEIGHT(NL_MAX)
 	REAL*8 LINE_CENTER(NL_MAX)
@@ -30,9 +31,16 @@
 	INTEGER NO_LINES
 	INTEGER ITER
 !
-	REAL*4 SP_XST,SP_XEND
+	LOGICAL USE_CURSOR
+	REAL*4 XVAL,YVAL
+	REAL*4 DEF_SIGMA
+        INTEGER PGCURS
+        INTEGER CURSERR
+	CHARACTER(LEN=1) CURSVAL
+!
 	REAL*8, SAVE :: XST=0.0D0
 	REAL*8, SAVE :: XEND=1.0D0
+	REAL*4 SP_XST,SP_XEND
 	REAL*4, SAVE :: XST_PASSED_SAVED,XEND_PASSED_SAVED
 	INTEGER, SAVE :: IP=1
 	INTEGER, SAVE :: NG_PAR_OLD
@@ -47,6 +55,11 @@
 	LOGICAL GUESSED
 	LOGICAL NEW_REGION
 !
+	NG_PAR=4*NL_MAX+2
+	IF(.NOT. ALLOCATED(PAR))THEN
+	  ALLOCATE(PAR(NG_PAR))
+	END IF
+!
 ! If we are fitting the same regon as previously, we can use the previous findings.
 !
 	WRITE(6,*)NPLTS,NPTS(1)
@@ -54,27 +67,70 @@
 	   NEW_REGION=.FALSE.
 	ELSE
 	  NUM_GAUS=0
-	  XST=XST_PASSED
-	  XEND=XEND_PASSED
+	  XST_PASSED_SAVED=XST_PASSED
+	  XEND_PASSED_SAVED=XEND_PASSED
 	  NEW_REGION=.TRUE.
 	END IF
 !
-	CALL GEN_IN(XST,'Start wavelength for fitting')
-	CALL GEN_IN(XEND,'End wavelength for fitting')
-	XST_PASSED_SAVED=XST_PASSED
-	XEND_PASSED_SAVED=XEND_PASSED
+	USE_CURSOR=.TRUE.
 	CALL GEN_IN(IP,'Plot for fitting')
+	CALL GEN_IN(USE_CURSOR,'Use cursor')
+	DEF_SIGMA=0.5D0
+	CALL GEN_IN(DEF_SIGMA,'Default sigma')
+	IF(.NOT. NEW_REGION)CALL GEN_IN(NEW_REGION,'Reset Gauss selection')
 !
-	CALL GEN_IN(NUM_GAUS,'Number of gaussians to fit: (0 to find)')
-	GUESSED=.FALSE.
-	IF(NUM_GAUS .EQ. 0)THEN
-	   DO_FIND=.TRUE.
-	   DO WHILE(DO_FIND)
-	     CALL GEN_IN(FIND_LINE_TOLERANCE,'Departure from unity for lines')
-	     FIND_LINE_TOLERANCE=ABS(FIND_LINE_TOLERANCE)
-	     SP_XST=XST; SP_XEND=XEND
-	     WRITE(6,*)IP,NPTS(IP),SP_XST,SP_XEND,T1
-	     CALL FIND_LINES(LINE_CENTER, LINE_HEIGHT, LINE_SIGMA, NUM_GAUS, NL_MAX,
+	USE_CURSOR=.TRUE.
+	IF(.NOT. NEW_REGION)THEN
+	  NG_PAR=NG_PAR_OLD
+	ELSE IF(USE_CURSOR)THEN
+!
+	  WRITE(6,'(A)')' '
+	  WRITE(6,'(A)')' First 2 cursor inputs to define input band '
+	  WRITE(6,'(A)')' Then use each cursor position to indicate height and lacation of line'
+	  WRITE(6,'(A)')' '
+!
+	  XVAL=5.0; CALL PGSCH(XVAL)
+	  J=1; CALL PGSCI(J)
+	  XVAL=0.5D0*(XST_PASSED+XEND_PASSED)
+	  YVAL=1.0
+	  CURSERR = PGCURS(XVAL,YVAL,CURSVAL)
+	  CALL PGPT(IONE,XVAL,YVAL,IONE)
+	  XST=XVAL; YST=YVAL
+	  CURSERR = PGCURS(XVAL,YVAL,CURSVAL)
+	  CALL PGPT(IONE,XVAL,YVAL,IONE)
+	  XEND=XVAL; YEND=YVAL
+	  PAR(1)=YST
+	  PAR(2)=(YEND-YST)/(XEND-XST)
+	  WRITE(6,*)PAR(1),PAR(2)
+	  DO J=1,NL_MAX
+	    CURSERR = PGCURS(XVAL,YVAL,CURSVAL)
+	    CALL PGPT(IONE,XVAL,YVAL,IONE)
+	    IF(CURSVAL .EQ. 'e' .OR. CURSVAL .EQ. 'E')EXIT
+	    K=2+(J-1)*4+1
+	    PAR(K)=XVAL; PAR(K+2)=YVAL-(PAR(1)+PAR(2)*(XVAL-XST))
+	    PAR(K+3)=2.0
+	    PAR(K+1)=DEF_SIGMA
+	    NUM_GAUS=J
+	  END DO
+	  NG_PAR=2+4*NUM_GAUS
+!
+	ELSE
+!
+	  XST_PASSED_SAVED=XST_PASSED
+	  XEND_PASSED_SAVED=XEND_PASSED
+	  CALL GEN_IN(XST,'Start wavelength for fitting')
+	  CALL GEN_IN(XEND,'End wavelength for fitting')
+	  CALL GEN_IN(NUM_GAUS,'Number of gaussians to fit: (0 to find)')
+	  GUESSED=.FALSE.
+!
+	  IF(NUM_GAUS .EQ. 0)THEN
+	    DO_FIND=.TRUE.
+	    DO WHILE(DO_FIND)
+	      CALL GEN_IN(FIND_LINE_TOLERANCE,'Departure from unity for lines')
+	      FIND_LINE_TOLERANCE=ABS(FIND_LINE_TOLERANCE)
+	      SP_XST=XST; SP_XEND=XEND
+	      WRITE(6,*)IP,NPTS(IP),SP_XST,SP_XEND,T1
+	      CALL FIND_LINES(LINE_CENTER, LINE_HEIGHT, LINE_SIGMA, NUM_GAUS, NL_MAX,
 	1                 CD(IP)%DATA(1),CD(IP)%XVEC(1),NPTS(IP),
 	1                 SP_XST,SP_XEND,FIND_LINE_TOLERANCE)
 	      DO_FIND=.FALSE.
@@ -82,64 +138,60 @@
 	      CALL GEN_IN(DO_FIND,'Do automatic find again with different tolerance?')
 	    END DO
 	    GUESSED=.TRUE.
-	END IF              
+	    NG_PAR=4*NUM_GAUS+2
 !
 ! If possible, we use previous fit parameters as default.
 !
-	NG_PAR_OLD=0
-	IF(ALLOCATED(PAR))NG_PAR_OLD=NG_PAR
-	NG_PAR=4*NUM_GAUS+2
-	IF(GUESSED)THEN
-	  IF(ALLOCATED(PAR))NG_PAR_OLD=NG_PAR
-	  IF(ALLOCATED(PAR))DEALLOCATE(PAR)
-	  ALLOCATE (PAR(NG_PAR))
-	  PAR(1)=1.0D0		!Mean value
-	  PAR(2)=0.0D0		!Continuum slope
-	  DO J=1,NUM_GAUS
-	    K=3+(J-1)*4
-	    PAR(K)=LINE_CENTER(J)
-	    PAR(K+1)=LINE_SIGMA(J)
-	    PAR(K+2)=LINE_HEIGHT(J)		!-ve if absorption line
-	    PAR(K+3)=2.0D0			!i.e., assume Gaussian
-	  END DO
-	  CALL ED_GAUS_FIT()
-	  NUM_GAUS=(NG_PAR-2)/4
-	ELSE IF(NEW_REGION)THEN
-	  IF(ALLOCATED(PAR))DEALLOCATE(PAR)
-	  ALLOCATE (PAR(NG_PAR)); PAR=0.0D0; PAR(1)=1.0D0
-	  CALL GEN_IN(PAR(1),'Mean value')
-	  CALL GEN_IN(PAR(2),'Continuum slope')
-	  NG_PAR_OLD=NG_PAR
-	  DO J=1,NUM_GAUS
-	    K=2+(J-1)*4+1
-	    CALL GEN_IN(PAR(K),'Central wavlength of Gaussian')
-            IF(PAR(K+1) .EQ. 0.0D0 .AND. J .GT. 1)PAR(K+1)=PAR(K-3)
-	    CALL GEN_IN(PAR(K+1),'Modified sigma (scale) of Gaussian')
-	    IF(PAR(K+2) .EQ. 0.0D0)PAR(K+2)=-0.2D0
-	    CALL GEN_IN(PAR(K+2),'Offset from continuum (-ve for absorption)')
-	    IF(PAR(K+3) .EQ. 0.0D0)PAR(K+3)=2.0D0
-	    CALL GEN_IN(PAR(K+3),'Guassian exponent')
-	  END DO
-	  WRITE(6,*)'You may now make corrections to the Gaussian data'
-	  CALL ED_GAUS_FIT()
-	  NUM_GAUS=(NG_PAR-2)/4
-	ELSE
-	  CALL GEN_IN(PAR(1),'Mean value')
-	  CALL GEN_IN(PAR(2),'Continuum slope')
-	  CALL ED_GAUS_FIT()
-	  NUM_GAUS=(NG_PAR-2)/4
+	    PAR(1)=1.0D0		!Mean value
+	    PAR(2)=0.0D0		!Continuum slope
+	    DO J=1,NUM_GAUS
+	      K=3+(J-1)*4
+	      PAR(K)=LINE_CENTER(J)
+	      PAR(K+1)=LINE_SIGMA(J)
+	      PAR(K+2)=LINE_HEIGHT(J)		!-ve if absorption line
+	      PAR(K+3)=2.0D0			!i.e., assume Gaussian
+	    END DO
+	  ELSE IF(NEW_REGION)THEN
+	    CALL GEN_IN(DEF_SIGMA,'Default sigma')
+	    CALL GEN_IN(USE_CURSOR,'Use cursor')
+	    PAR=0.0D0; PAR(1)=1.0D0
+	    CALL GEN_IN(PAR(1),'Mean value')
+	    CALL GEN_IN(PAR(2),'Continuum slope')
+	    DO J=1,NUM_GAUS
+	      K=2+(J-1)*4+1
+	      CALL GEN_IN(PAR(K),'Central wavlength of Gaussian')
+              IF(PAR(K+1) .EQ. 0.0D0 .AND. J .GT. 1)PAR(K+1)=PAR(K-3)
+	      CALL GEN_IN(DEF_SIGMA,'Modified sigma (scale) of Gaussian')
+	      PAR(K+1)=DEF_SIGMA
+	      IF(PAR(K+2) .EQ. 0.0D0)PAR(K+2)=-0.2D0
+	      CALL GEN_IN(PAR(K+2),'Offset from continuum (-ve for absorption)')
+	      IF(PAR(K+3) .EQ. 0.0D0)PAR(K+3)=2.0D0
+	      CALL GEN_IN(PAR(K+3),'Guassian exponent')
+	      WRITE(6,*)'You may now make corrections to the Gaussian data'
+	    END DO
+	  END IF
 	END IF
 !
+! Allow Gaussians to be adjustd by hand.
+!
 	NG_PAR=2+4*NUM_GAUS
+	CALL ED_GAUS_FIT()
+	NG_PAR=2+4*NUM_GAUS
+	NG_PAR_OLD=NG_PAR
+!
+	WRITE(6,*)'Exited ED_GAUS_FIT'; FLUSH(UNIT=6)
 	IF(ALLOCATED(SIM))DEALLOCATE(SIM,SUM_SQ,SCALE,EW)
 	ALLOCATE (SIM(NG_PAR+1,NG_PAR))
 	ALLOCATE (SUM_SQ(NG_PAR+1))
 	ALLOCATE (SCALE(NG_PAR+1))
 	ALLOCATE (EW(NUM_GAUS))
+	WRITE(6,*)'Done allocate', NUM_GAUS, NG_PAR; FLUSH(UNIT=6)
 !
 	WRITE(6,*)CD(IP)%XVEC(1),CD(IP)%XVEC(NPTS(IP))
 	WRITE(6,*)CD(IP)%DATA(1),CD(IP)%DATA(NPTS(IP))
+	WRITE(6,*)'Call set gaus_data'; FLUSH(UNIT=6)
 	CALL SET_GAUS_DATA(CD(IP)%XVEC,CD(IP)%DATA,XST,XEND,NPTS(IP),YST,YEND)
+	WRITE(6,*)'Called set gaus_data'; FLUSH(UNIT=6)
 !
 	SIM(1,1:NG_PAR)=PAR(1:NG_PAR)
 !
@@ -174,7 +226,7 @@
           PAR(1:NG_PAR)=SIM(I,1:NG_PAR)
           SUM_SQ(I)=GAUS_FIT_FUNC(PAR)
         END DO
-	WRITE(6,*)'Evaluated SUM_SQ: Will no do the fit'
+	WRITE(6,*)'Evaluated SUM_SQ: Will now do the fit'
 !
         TOL=1.0D-08
 	I=NG_PAR+1
@@ -205,7 +257,7 @@
 	  K=2+(I-1)*4+1
 	  T1=2.99794D+05*SIM(1,K+1)/SIM(1,K)
 	  FWHM=2.0D0*T1*(DLOG(2.0D0))**(1.0D0/SIM(I,K+3))
-	  WRITE(6,'(2X,ES16.6,5ES14.4,4F10.2)')SIM(I,K),SIM(1,K+2),SIM(1,K+1),SIM(I,K+3),
+	  WRITE(6,'(2X,ES16.6,5ES14.4,4F10.2)')SIM(I,K),SIM(I,K+2),SIM(I,K+1),SIM(I,K+3),
 	1               T1/SQRT(2.0D0),FWHM,EW(I),EW_ERROR(I),ALT_ERROR(I),MIN_ERROR(I)
 	END DO
 !

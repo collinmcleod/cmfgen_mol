@@ -123,7 +123,7 @@
 	CHARACTER*2 TO_VT
 	CHARACTER*3 ADVANCE_OPT
 	CHARACTER(LEN=10) LAM_OPTION
-	CHARACTER(LEN=50) PLT_ID,RD_PLT_ID,PLT_ID_SAV
+	CHARACTER(LEN=80) PLT_ID,RD_PLT_ID,PLT_ID_SAV
 !
 ! Vector arrays
 !
@@ -1607,18 +1607,39 @@ C
 	  ELSE
 	    CALL NEW_GEN_IN(PLOT_ID,'Plot for simple data replacement:')
 	  END IF
-	  DO J=1,10
-	    CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
-	    IF(END_CURS(CURSVAL))EXIT
-	    CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
-	    IF(END_CURS(CURSVAL))EXIT
-	    SLOPE=(YCUR(2)-YCUR(1))/(XCUR(2)-XCUR(1))
-	    DO I=1,NPTS(PLOT_ID)
-	      IF( (CD(PLOT_ID)%XVEC(I)-XCUR(1))*(CD(PLOT_ID)%XVEC(I)-XCUR(2)) .LT. 0.0D0)THEN
-                CD(PLOT_ID)%DATA(I)=YCUR(1)+SLOPE*(CD(PLOT_ID)%XVEC(I)-XCUR(1))
-	      END IF
+	  TMP_LOG=.TRUE.
+	  CALL NEW_GEN_IN(TMP_LOG,'Use cursor to devine regions:')
+	  IF(TMP_LOG)THEN
+	    DO J=1,10
+	      CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
+	      IF(END_CURS(CURSVAL))EXIT
+	      CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
+	      IF(END_CURS(CURSVAL))EXIT
+	      SLOPE=(YCUR(2)-YCUR(1))/(XCUR(2)-XCUR(1))
+	      DO I=1,NPTS(PLOT_ID)
+	        IF( (CD(PLOT_ID)%XVEC(I)-XCUR(1))*(CD(PLOT_ID)%XVEC(I)-XCUR(2)) .LT. 0.0D0)THEN
+                  CD(PLOT_ID)%DATA(I)=YCUR(1)+SLOPE*(CD(PLOT_ID)%XVEC(I)-XCUR(1))
+	        END IF
+	      END DO
 	    END DO
-	  END DO
+	  ELSE 
+	    FILNAME='CONT_NODES'
+	    CALL NEW_GEN_IN(FILNAME,'File with cursor nodes')
+	    OPEN(UNIT=10,FILE=TRIM(FILNAME),STATUS='OLD',ACTION='READ')
+	      READ(10,*)K,J
+	      DO L=1,K
+	        READ(10,*)XCUR(1),XCUR(2)
+	        L_CHAN(1)=GET_INDX_SP(XCUR(1),CD(PLOT_ID)%XVEC,NPTS(PLOT_ID))
+	        L_CHAN(2)=GET_INDX_SP(XCUR(2),CD(PLOT_ID)%XVEC,NPTS(PLOT_ID))
+	        SLOPE=(CD(PLOT_ID)%DATA(L_CHAN(2))-CD(PLOT_ID)%DATA(L_CHAN(1)))/(XCUR(2)-XCUR(1))
+	        DO I=1,NPTS(PLOT_ID)
+	          IF( (CD(PLOT_ID)%XVEC(I)-XCUR(1))*(CD(PLOT_ID)%XVEC(I)-XCUR(2)) .LT. 0.0D0)THEN
+                    CD(PLOT_ID)%DATA(I)=CD(PLOT_ID)%DATA(L_CHAN(1))+SLOPE*(CD(PLOT_ID)%XVEC(I)-XCUR(1))
+	          END IF
+	        END DO
+	      END DO
+	    CLOSE(UNIT=10)
+	  END IF
 !
 ! Define a crude straight line continuum about a line, so the EW can be
 ! computed.
@@ -2018,6 +2039,7 @@ C
 	    READ(T_IN,'(A)')ANS
 	  END IF
 	  GOTO 1000
+!
 	ELSE IF(ANS .EQ. 'WP' .OR. ANS .EQ. 'WPF')THEN
 	  IF(PLT_ST_FILENAME .EQ. ' ')THEN
 	    PLT_ST_FILENAME='PLT_ST'
@@ -2306,6 +2328,24 @@ C
 	    END DO
 	  END IF
 	  WRITE(T_OUT,*)NP_OUT,' plots written to ',TRIM(FILNAME)
+	  CLOSE(UNIT=30)
+!
+	ELSE IF(ANS .EQ. 'WOBS')THEN
+	  FILNAME=' '
+	  CALL NEW_GEN_IN(FILNAME,'FILE=')
+	  OPEN(UNIT=30,FILE=FILNAME,STATUS='UNKNOWN',ACTION='WRITE',IOSTAT=IOS)
+	  IF(IOS .NE. 0)THEN
+	    WRITE(T_OUT,*)'Error opening file'
+	    GOTO 1000
+	  END IF
+	  J=30
+	  IP=1; CALL NEW_GEN_IN(IP,'Which plot to output?')
+	  WRITE(WK_STR,'(I10)')NPTS(IP)
+	  WK_STR=ADJUSTL(WK_STR)
+	  WRITE(30,'(/,A,/)')' Continuum Frequencies ( '//TRIM(WK_STR)//' )'
+	  WRITE(30,'(8ES15.7)')(CD(IP)%XVEC(I),I=1,NPTS(IP))	
+	  WRITE(30,'(//,A,/)')' Observed intensity (Janskys)'
+	  WRITE(30,'(10ES12.4)')(CD(IP)%DATA(I),I=1,NPTS(IP))	
 	  CLOSE(UNIT=30)
 !
 ! 
@@ -2671,15 +2711,26 @@ C
 	  IF(VAR_OPERATION(1:2) .EQ. 'cc' .OR. VAR_OPERATION(1:2) .EQ. 'CC')THEN
 	    WRITE(6,*)RED_PEN
 	    WRITE(6,*)'For cross-correlation of spectra plot 1 should be on a uniform grid'
-	    WRITE(6,*)'and in log space. The second pot should also be in log space'
-	    WRITE(6,*)'Use REG option to create a uniform grid'
+	    WRITE(6,*)'and in log space. The second plot should also be in log space'
+	    WRITE(6,*)'Use REG option to create a uniform grid (UG option)'
 	    WRITE(6,*)'Enter 0 for output plot to exit this option'
+	    WRITE(6,*)' '
+	    WRITE(6,*)'Plot 1 should be the reference plot'
+	    WRITE(6,*)'Use GF to measure location of peak'
+	    WRITE(6,*)'Result is the required radial velocity'
 	    WRITE(6,*)DEF_PEN
+	    TMP_LOG=.TRUE.
+	    CALL NEW_GEN_IN(TMP_LOG,'Scale X axis of output (only) to km/s')
 	  END IF
 	  CALL NEW_GEN_IN(VAR_PLT3,'Output plot?')
 	  IF(VAR_PLT3 .EQ. 0)GOTO 1000
 	  TYPE_CURVE(VAR_PLT3)='L'
 	  CALL DO_VEC_OP(VAR_PLT1,VAR_PLT2,VAR_PLT3,.TRUE.,VAR_OPERATION)
+	  IF(TMP_LOG)THEN
+	   K=NPTS(VAR_PLT3)
+	   T1=C_KMS*LOG(10.0D0)
+	   CD(VAR_PLT3)%XVEC(1:K)=T1*CD(VAR_PLT3)%XVEC(1:K)
+	  END IF
 	  GOTO 1000
 !
 	ELSE IF (ANS .EQ. 'DER')THEN

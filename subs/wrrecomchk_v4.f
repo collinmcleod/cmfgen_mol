@@ -68,7 +68,7 @@ C
 	  IF(ML .NE. 0)WRITE(LU,'(1H1)')
 C
 	  WRITE(LU,'(3X,''Depth index'')')
-	  WRITE(LU,'(2X,10(I11,'' '')')(J,J=MS,MF)
+	  WRITE(LU,'(2X,10(I11,'' ''))')(J,J=MS,MF)
 	  WRITE(LU,'(/,3X,''Radius [1.0E+10cm] '')')
 	  WRITE(LU,999)(R(J),J=MS,MF)
 	  WRITE(LU,'(/,3X,''Temperature [1.0E+4K] '')')
