@@ -190,9 +190,12 @@
 	      CLUMP_FAC(K)=10**T2
 	      IF(CLUMP_FAC(K).GT. 1.D0) CLUMP_FAC(K)=1.0D0
 	    END DO
+	  ELSE IF(CLUMP_LAW(1:6) .EQ. 'SPLINE')THEN
+	    CALL SPL_CLUMP(CLUMP_FAC,V,ND)
 !
 	 ELSE
 	    WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
+	    WRITE(LUER,*)'Clump law=',TRIM(CLUMP_LAW)
 	    WRITE(LUER,*)'Invalid law for computing clumping factor'
 	    STOP
 	 END IF

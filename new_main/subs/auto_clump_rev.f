@@ -362,8 +362,12 @@
 	1           EXP(-V(K)/CLUMP_PAR(2))+
 	1           (1.0D0-CLUMP_PAR(1))*EXP( (V(K)-V(1))/CLUMP_PAR(3))
 	  END DO
+
+	ELSE IF(CLUMP_LAW(1:6) .EQ. 'SPLINE')THEN
+	  CALL SPL_CLUMP(CLUMP_FAC,V,ND)
+!
 	ELSE
-	  WRITE(6,*)'Error in DO_CLUMP_REV'
+	  WRITE(6,*)'Error in AUTO_CLUMP_REV'
 	  WRITE(6,*)'Invalid law for computing clumping factor'
 	  STOP
 	END IF

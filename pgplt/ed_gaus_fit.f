@@ -7,6 +7,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 01-Feb-2022          !Now allow a maximum of 20 new Gaussians to be added.
 ! Created:  -Sep-2007		!Author: D. J. Hillier
 !
 	REAL*8, ALLOCATABLE :: TMP_PAR(:)

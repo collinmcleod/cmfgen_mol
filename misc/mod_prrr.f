@@ -344,7 +344,7 @@
 	XLABEL='V(km/s)'
 !
 2000	CONTINUE
-	OPTION='XN'; WRITE(6,'(A)')' '
+	OPTION='P'; WRITE(6,'(A)')' '
 	CALL GEN_IN(OPTION,'Plot option XN, R, V, T, ED, EX(stop), NS (new species),RATES')
 	OPTION=UC(OPTION)
 	WRITE(6,*)'Option=',OPTION
@@ -356,22 +356,41 @@
 	  GOTO 2000
 	ELSE IF(OPTION .EQ. 'NS')THEN
 	  GOTO 1000
-	ELSE IF(OPTION .EQ. 'R')THEN
-	  XVEC(1:ND)=R(1:ND)
-	  XLABEL='Radius(10\u10\d cm)'
+	ELSE IF(OPTION .EQ. 'XR')THEN
+	  XVEC(1:ND)=R(1:ND)/R(ND)
+	  XLABEL='Radius(R/R\d*\u)         !(10\u10\d cm)'
 	  GOTO 2000
-	ELSE IF(OPTION .EQ. 'V')THEN
+	ELSE IF(OPTION .EQ. 'XV')THEN
 	  XVEC(1:ND)=V(1:ND)
 	  XLABEL='V(km/s)'
 	  GOTO 2000
-	ELSE IF(OPTION .EQ. 'T')THEN
+	ELSE IF(OPTION .EQ. 'XT')THEN
 	  XVEC(1:ND)=TEMP(1:ND)
 	  XLABEL='T(10\u4\dK)'
-	ELSE IF(OPTION .EQ. 'ED')THEN
+	ELSE IF(OPTION .EQ. 'XED')THEN
 	  XVEC(1:ND)=ED(1:ND)
 	  XLABEL='Ne(cm\u-3\d)'
 	ELSE IF(OPTION(1:2) .EQ. 'EX')THEN
 	  STOP
+!
+        ELSE IF(OPTION(1:2) .EQ. 'SP')THEN
+	  CALL GEN_IN(K,'Number of levels to plot individually')
+	  DO J=1,K
+            DO I=1,ND
+              YVEC(I)=(PHOT(I,J)-RECOM(I,J))/RECOM_SUM(I)
+              YVEC(I)=PHOT(I,J)/RECOM_SUM(I)
+            END DO
+            CALL DP_CURVE(ND,XVEC,YVEC)
+          END DO
+!
+	  CALL GEN_IN(K,'Final level to sum')
+          DO J=K+1,L
+            DO I=1,ND
+!              YVEC(I)=YVEC(I)+(PHOT(I,J)-RECOM(I,J))/RECOM_SUM(I)
+              YVEC(I)=YVEC(I)+PHOT(I,J)/RECOM_SUM(I)
+            END DO
+          END DO
+          CALL DP_CURVE(ND,XVEC,YVEC)
 !
 	ELSE IF(OPTION(1:5) .EQ. 'RATES')THEN
 !

@@ -386,6 +386,7 @@
 	  END IF
 	END IF
 	N_TIT_SET=N_HEADER
+	TITLE(N_HEADER+1:)=' '
 	STR=.FALSE.
 	VEC=.FALSE.
 	NORMAL_R_Y_AXIS=.TRUE.
@@ -599,6 +600,8 @@
 	  WRITE(T_OUT,*)'YAR  - Simple Y axis arithmetic'
 	  WRITE(T_OUT,*)'VAR  - Simple arithmetic on two plots'
 	  WRITE(T_OUT,*)'NM   - Scale average to 1 or to another plot'
+	  WRITE(T_OUT,*)'REP  - Simple replacment of data -- cursor or file with node information'
+	  WRITE(T_OUT,*)'RREP - A more fancy approach to data replacment'
 	  WRITE(T_OUT,*)'REG  - Regrid plot - UG, dX, R or NINS'
 	  WRITE(T_OUT,*)'ADDN - Add Poisonian noise'
 	  WRITE(T_OUT,*)'SM   - Smooth data -- ignires X-spaicng of data'
@@ -933,22 +936,29 @@ C
 C
 	  GOTO 1000
 !
-! We do not edit CURVE labs here -- done with EDCL
+! We do not edit CURVE labels here -- this is done with EDCL
 !
 	ELSE IF(ANS .EQ. 'L')THEN
+	  WRITE(6,*)'Use EDCL to edit curve labels'
 	  CALL NEW_GEN_IN(XLABEL,'XLAB')
 	  CALL NEW_GEN_IN(YLABEL,'YLAB')
-	  DO J=1,N_TITLE
-	    IF(J .GT. N_HEADER)THEN
-	      TITLE(J+1:N_TITLE)=TITLE(J:N_TITLE-1)
-	      TITLE(J)=' '
-	    END IF
+!
+! This section allows us to edit a title, and delete a title but keep remaining titles.
+!
+	  J=1
+	  DO WHILE(J .LE. N_TITLE)
 	    CALL NEW_GEN_IN(TITLE(J),'TITLE')
-	    IF(TITLE(J) .EQ. ' ')THEN
-	      TITLE(J+1:N_TITLE)=' '
+	    IF(TITLE(J) .EQ. ' ' .AND. TITLE(MIN(J,N_TITLE)) .EQ. ' ')THEN
+	      N_HEADER=J-1
 	      EXIT
+	    ELSE IF(J .EQ. N_TITLE)THEN
+	      N_HEADER=N_TITLE
+	      EXIT
+	    ELSE IF(TITLE(J) .EQ. ' ')THEN
+	      TITLE(J:N_TITLE-1)=TITLE(J:N_TITLE)
+	    ELSE
+	      J=J+1
 	    END IF
-	    N_HEADER=J
 	  END DO
 	  CALL NEW_GEN_IN(TITONRHS,'TITONRHS')
 	  GOTO 1000
@@ -984,14 +994,27 @@ C
 !
 ! Edit curve labels
 !
-	ELSE IF(ANS .EQ. 'EDCL')THEN
+        ELSE IF(ANS .EQ. 'EDCL')THEN
 	  CALL NEW_GEN_IN(RESET_CURVE_LAB,'RES_CL')
-	  CALL NEW_GEN_IN(ADD_COMMA,'ADD_COMMA')
-	  DO IP=1,NPLTS
-	    WRITE(TMP_STR,'(A,I2)')'IP=',IP
-	    CALL NEW_GEN_IN(CD(IP)%CURVE_ID,TMP_STR)
-	    IF(CD(IP)%CURVE_ID .EQ. '""')CD(IP)%CURVE_ID=' '
-	  END DO
+	  IF(RESET_CURVE_LAB)THEN
+	    CALL NEW_GEN_IN(ADD_COMMA,'ADD_COMMA')
+	    DO IP=1,NPLTS
+	      WRITE(TMP_STR,'(A,I2)')'IP=',IP
+	      CALL NEW_GEN_IN(CD(IP)%CURVE_ID,TMP_STR)
+	      IF(CD(IP)%CURVE_ID .EQ. '""')CD(IP)%CURVE_ID=' '
+	    END DO
+	  ELSE
+	    DO J=1,N_TITLE
+	      IF(CURVE_TITLE(J) .NE. ' ')WRITE(6,'(I3,3X,A)')J,TRIM(CURVE_TITLE(J))
+	    END DO
+	    DO J=1,N_TITLE
+	      IF(CURVE_TITLE(J) .EQ. ' ')EXIT
+	      CALL NEW_GEN_IN(CURVE_TITLE(J),'TITLE')
+	    END DO
+	    DO J=1,N_TITLE-1
+	      IF(CURVE_TITLE(J) .EQ. ' ')CURVE_TITLE(J:N_TITLE-1)=CURVE_TITLE(J+1:N_TITLE)
+	    END DO
+	  END IF
 	  GOTO 1000
 !
 !
@@ -1640,6 +1663,17 @@ C
 	      END DO
 	    CLOSE(UNIT=10)
 	  END IF
+!
+	ELSE IF (ANS .EQ. 'FREP')THEN
+	  IF(NPLTS .EQ. 1)THEN
+	    PLOT_ID=1; IP=2
+	  ELSE
+	    PLOT_ID=NPLTS; IP=NPLTS
+	  END IF
+	  CALL NEW_GEN_IN(PLOT_ID,'Plot for simple data replacement:')
+	  CALL NEW_GEN_IN(IP,'Output plot:')
+	  CALL REP_DATA(PLOT_ID,IP)
+	  TYPE_CURVE(IP)=TYPE_CURVE(PLOT_ID)
 !
 ! Define a crude straight line continuum about a line, so the EW can be
 ! computed.

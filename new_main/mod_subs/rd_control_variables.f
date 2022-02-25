@@ -910,7 +910,7 @@ C
           FIX_IN_BOUND_T=.FALSE.
           CALL RD_STORE_LOG(FIX_IN_BOUND_T,'FIX_INB_T',L_FALSE,
 	1            'Fix the Temperature at the inner boundary ?')
-          FIX_LST_X_DPTHS=1
+          FIX_LST_X_DPTHS=0
 	  CALL RD_STORE_INT(FIX_LST_X_DPTHS,'FIX_X_DPTH',L_FALSE,
 	1            'Fix the Temperature at the last ? depths')
 	  CALL RD_STORE_LOG(VARFIXT,'FIX_T_AUTO',L_TRUE,

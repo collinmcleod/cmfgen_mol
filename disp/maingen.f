@@ -849,6 +849,14 @@
 	        CALL WRITE_LINE(LEV(1),LEV(2),FREQ,ION_ID(ID))
 	        AMASS=AT_MASS(SPECIES_LNK(ID))
 	        FLAG=.TRUE.
+	        T1=ANG_TO_HZ/FREQ
+	        IF(T1 .GT. 1000)THEN
+	          I=NINT(T1)
+	          WRITE(TRANS_NAME,'(I6)')I; TRANS_NAME=ADJUSTL(TRANS_NAME)
+	        ELSE
+	          WRITE(TRANS_NAME,'(F6.1)')I; TRANS_NAME=ADJUSTL(TRANS_NAME)
+	        END IF
+	        TRANS_NAME=TRIM(PLT_ION_ID(ID))//' \gl'//TRIM(TRANS_NAME)
 	      ELSE
 	        WRITE(T_OUT,*)'Levels outside valid range'
 	        WRITE(T_OUT,*)'Maximum level is',ATM(ID)%NXzV_F
@@ -2354,8 +2362,8 @@
 	    DO I=1,ND
 	      YV(I)=DLOG10(TA(I))
 	    END DO
-	    CALL DP_CURVE_LAB(ND,XV,YV,DEFAULT)
 	  END IF
+	  CALL DP_CURVE_LAB(ND,XV,YV,DEFAULT)
 !
 ! Used to verify that model has a constant mass-loss rate. It can also be used to
 ! see Mdot variation in time dependent model.
@@ -2891,10 +2899,9 @@
 	    TA(I)=LOG(R(I))
 	    TB(I)=LOG(V(I))
 	  END DO
-	  CALL DERIVCHI(YV,TB,TA,ND,'LINMON')
-	  YV(1:ND)=DLOG10(YV(1:ND))
 	  CALL DP_CURVE(ND,XV,YV)
-	  YAXIS='log(\gs+1)'
+	  CALL DERIVCHI(V,TB,TA,ND,'LINMON')
+	  YAXIS='Log(\gs+1)'
 !
 	ELSE IF(XOPT .EQ. 'FONR')THEN
 	  IF(ROSS_MEAN(1) .NE. 0.0D0)THEN
@@ -5071,17 +5078,19 @@
 	            YV(I)=LOG10(T1/TA(I))
 	            ZV(I)=LOG10(ATM(ID)%DXzV_F(I)/TA(I))
 	          END DO
-	          DEFAULT=TRIM(ION_ID(ID))
+	          DEFAULT=TRIM(PLT_ION_ID(ID))
 	          J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
 	          CALL DP_CURVE_LAB(ND,XV,YV,DEFAULT)
 	          WRITE(6,'(A,I2,A,A)')' Curve ',CNT,' is due to: ',TRIM(ION_ID(ID))
 	        END IF
 	      END DO
 	      ID=SPECIES_END_ID(ISPEC)
-	      DEFAULT=TRIM(ION_ID(ID))
-	      J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
+              DEFAULT=TRIM(PLT_ION_ID(ID))
+              J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
 	      CALL DP_CURVE_LAB(ND,XV,ZV,DEFAULT)
-	      WRITE(6,'(A,I2,A,A)')' Curve ',CNT,' is due to: ',TRIM(ION_ID(ID))
+	      CNT=CNT+1
+!	      WRITE(6,'(A,I2,A,A)')' Curve ',CNT,' is due to: ',TRIM(ION_ID(ID))
+	      WRITE(6,'(A,I2,A,A,F6.2)')' Curve ',CNT,' is due to: ',TRIM(ION_ID(ID)),ATM(ID)%ZXzV
 	    END IF
 	  END DO
 ! 
@@ -6186,10 +6195,10 @@ c
 	    DO I=1,ND
 	      YV(I)=T4*TA(I)/R(I)/JNU(I,3)/T1
 	    END DO
-	    CALL DP_CURVE(ND,XV,YV)
+	    CALL DP_CURVE_LAB(ND,XV,YV,TRANS_NAME)
 	    YAXIS='\gz'
 	  ELSE
-	    CALL DP_CURVE(ND,XV,FORCE_MULT)
+	    CALL DP_CURVE(ND,XV,FORCE_MULT,TRANS_NAME)
 	    YAXIS='Force Multiplier'
 	  END IF
 !

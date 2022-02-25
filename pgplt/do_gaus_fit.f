@@ -8,6 +8,9 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 25-Feb-2022: Some cleaning
+! Altered 01-Feb-2022: Extensive changes implmented to allow cursor input of
+!                        parameters for gauss fitting.
 ! Altered   -Sep-07
 !
 	INTEGER, PARAMETER :: IONE=1
@@ -72,21 +75,25 @@
 	  NEW_REGION=.TRUE.
 	END IF
 !
-	USE_CURSOR=.TRUE.
+	USE_CURSOR=.FALSE.
 	CALL GEN_IN(IP,'Plot for fitting')
-	CALL GEN_IN(USE_CURSOR,'Use cursor')
-	DEF_SIGMA=0.5D0
-	CALL GEN_IN(DEF_SIGMA,'Default sigma')
 	IF(.NOT. NEW_REGION)CALL GEN_IN(NEW_REGION,'Reset Gauss selection')
+	IF(NEW_REGION)THEN
+	  USE_CURSOR=.TRUE.
+	  CALL GEN_IN(USE_CURSOR,'Use cursor')
+	END IF
+	CALL GEN_IN(DEF_SIGMA,'Default sigma for line profiles')
+	DEF_SIGMA=0.5D0
 !
 	USE_CURSOR=.TRUE.
 	IF(.NOT. NEW_REGION)THEN
 	  NG_PAR=NG_PAR_OLD
+!
 	ELSE IF(USE_CURSOR)THEN
 !
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')' First 2 cursor inputs to define input band '
-	  WRITE(6,'(A)')' Then use each cursor position to indicate height and lacation of line'
+	  WRITE(6,'(A)')' Then use each cursor position to indicate height and location of line'
 	  WRITE(6,'(A)')' '
 !
 	  XVAL=5.0; CALL PGSCH(XVAL)
@@ -120,8 +127,10 @@
 	  XEND_PASSED_SAVED=XEND_PASSED
 	  CALL GEN_IN(XST,'Start wavelength for fitting')
 	  CALL GEN_IN(XEND,'End wavelength for fitting')
-	  CALL GEN_IN(NUM_GAUS,'Number of gaussians to fit: (0 to find)')
+	  CALL GEN_IN(NUM_GAUS,'Number of gaussians to fit: (0 to find automatically)')
 	  GUESSED=.FALSE.
+!
+! Find Lines automatically.
 !
 	  IF(NUM_GAUS .EQ. 0)THEN
 	    DO_FIND=.TRUE.
@@ -151,9 +160,11 @@
 	      PAR(K+2)=LINE_HEIGHT(J)		!-ve if absorption line
 	      PAR(K+3)=2.0D0			!i.e., assume Gaussian
 	    END DO
+!
+! Add Lines by hand
+!
 	  ELSE IF(NEW_REGION)THEN
 	    CALL GEN_IN(DEF_SIGMA,'Default sigma')
-	    CALL GEN_IN(USE_CURSOR,'Use cursor')
 	    PAR=0.0D0; PAR(1)=1.0D0
 	    CALL GEN_IN(PAR(1),'Mean value')
 	    CALL GEN_IN(PAR(2),'Continuum slope')

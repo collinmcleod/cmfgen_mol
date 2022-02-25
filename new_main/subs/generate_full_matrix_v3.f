@@ -13,6 +13,8 @@
 	USE CONTROL_VARIABLE_MOD, ONLY : LTE_MODEL, USE_ELEC_HEAT_BAL
 	IMPLICIT NONE
 !
+! Altered 21-Feb-2022 : Added a quick fudge to STOP equation replacement from occuring.
+!                          Change will be invisible to the average user.
 ! Altered 13-Mar-2014 : Issues with crude electron-energy balance equation when
 !                          non-thermal ionization was included.
 ! Altered 30-Jan-2002 : Changed to V2
@@ -67,7 +69,8 @@
 ! equilibrium equation is replaced by the ionization equation.
 !
 !	REAL*8, PARAMETER :: FAC=1.0D+05
-	REAL*8, PARAMETER :: FAC=1.0D+02
+!	REAL*8, PARAMETER :: FAC=1.0D+02
+	REAL*8, SAVE ::  FAC=1.0D+02
 !
 	LOGICAL DIAG_BAND
 !
@@ -88,6 +91,7 @@
 	INTEGER ERROR_LU,WARNING_LU
 	INTEGER LUER,LUWARN
 	EXTERNAL ERROR_LU,WARNING_LU
+	LOGICAL FILE_PRES
 !
 ! To save typing.
 !
@@ -104,6 +108,14 @@
 	    WRITE(LUER,*)'DEPTH_INDX=',DEPTH_INDX
 	    STOP
 	  END IF
+	END IF
+!
+	INQUIRE(FILE='BA_REPLACEMENT_FACTOR',EXIST=FILE_PRES)
+	IF(FILE_PRES)THEN
+	  CALL GET_LU(I,'BA_REP')
+	  OPEN(UNIT=I,FILE='BA_REPLACEMENT_FACTOR',STATUS='OLD',ACTION='READ')
+	    READ(I,*)FAC
+	  CLOSE(UNIT=I)
 	END IF
 !
 	C_MAT(:,:)=0.0D0

@@ -4,6 +4,8 @@
       REAL*8 AMOTRY,FAC,P(MP,NP),PSUM(NP),Y(MP),FUNK
       EXTERNAL FUNK
 !
+! Altered 01-Feb-2022: PTRY is now automatically dimensioned.
+!
 ! Uses function FUNK
 !
       INTEGER J
