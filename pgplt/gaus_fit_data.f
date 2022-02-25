@@ -2,6 +2,7 @@
 !
 	INTEGER NUM_GAUS			!Number of Gaussians
 	INTEGER NG_PAR				!Total number of parameters in fit
+	INTEGER NG_PAR_MAX		 	!Maximum total number of parameters in fit
 	INTEGER NG_DATA				!Number of data points
 !
 	REAL*8, ALLOCATABLE :: X_GAUS(:)	!Absica data as stored in module

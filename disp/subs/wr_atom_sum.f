@@ -26,6 +26,7 @@
 	INTEGER NF
 	INTEGER I,K,ID
 	INTEGER II,IS
+	INTEGER NL,NUP,CNT
 	INTEGER LU
 	INTEGER LU_DIAG
 	INTEGER NS(NUM_IONS)
@@ -79,9 +80,15 @@
 	        K=INDEX(TMP_STR,'k')
 	        IF(K .NE. 0)TMP_STR(K:K)='i'
 	        MOD_NAME=ATM(ID)%XzVLEVNAME_F(NF)
+	        CNT=0
+	        DO NL=1,NF-1
+	          DO NUP=2,NF
+	            IF(ATM(ID)%AXzV_F(NUP,NL) .GT. 0.0D0)CNT=CNT+1
+	          END DO
+	        END DO
 	        CALL LATEX_NAME(MOD_NAME,VERBOSE,LU_DIAG)
-	        WRITE(LU,'(A,T20,I4,A,I7,A,T40,A,T90,A,5X,A)')TRIM(TMP_STR),NS(ID),'  &',NF,'  &',
-	1                  TRIM(MOD_NAME),'     \\',TRIM(ATM(ID)%XzVLEVNAME_F(NF))
+	        WRITE(LU,'(A,T20,I4,A,I7,A,T40,A,T90,A,I10,3A)')TRIM(TMP_STR),NS(ID),'  &',NF,'  &',
+	1                  TRIM(MOD_NAME),'&',CNT,'     \\','%',TRIM(ATM(ID)%XzVLEVNAME_F(NF))
 	        EXIT
 	      END IF
 	    END DO

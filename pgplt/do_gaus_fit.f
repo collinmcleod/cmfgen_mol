@@ -55,9 +55,9 @@
 	LOGICAL GUESSED
 	LOGICAL NEW_REGION
 !
-	NG_PAR=4*NL_MAX+2
+	NG_PAR_MAX=4*NL_MAX+2
 	IF(.NOT. ALLOCATED(PAR))THEN
-	  ALLOCATE(PAR(NG_PAR))
+	  ALLOCATE(PAR(NG_PAR_MAX))
 	END IF
 !
 ! If we are fitting the same regon as previously, we can use the previous findings.

@@ -2325,26 +2325,37 @@
 	  CALL DP_CURVE(ND,XV,YV)
 !
 	ELSE IF(XOPT .EQ. 'YCOLD')THEN
-          CALL USR_OPTION(ELEC,'NA','F','Atom column density?')
-	  IF(ELEC)THEN
-	    DO I=1,ND
-	      ZETA(I)=1.0D+10*POP_ATOM(I)*CLUMP_FAC(I)
+	  IF(XSPEC .EQ. ' ')THEN
+            CALL USR_OPTION(ELEC,'NA','F','Atom column density?')
+	    IF(ELEC)THEN
+	      DO I=1,ND
+	        ZETA(I)=1.0D+10*POP_ATOM(I)*CLUMP_FAC(I)
+	      END DO
+	      YAXIS='N(atoms cm\u-2\d)'
+	      DEFAULT='Atom column density'
+	    ELSE
+	      DO I=1,ND
+	        ZETA(I)=1.0D+10*MASS_DENSITY(I)*CLUMP_FAC(I)
+	      END DO
+	      YAXIS='m(gm cm\u-2\d)'
+	      DEFAULT=' '
+	    END IF
+	  ELSE 
+	    DO ID=1,NUM_IONS
+	      IF(ATM(ID)%XzV_PRES .AND. XSPEC .EQ. UC(ION_ID(ID)))THEN
+	        ZETA(1:ND)=SUM(ATM(ID)%XzV_F,1)
+	        ZETA(1:ND)=1.0D+10*ZETA(1:ND)*CLUMP_FAC(1:ND)
+	        YAXIS='N(atoms cm\u-2\d)'
+	        DEFAULT='N('//TRIM(ION_ID(ID))//')'
+	        EXIT
+	      END IF
 	    END DO
 	    CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
 	    DO I=1,ND
 	      YV(I)=DLOG10(TA(I))
 	    END DO
-	  ELSE
-	    DO I=1,ND
-	      ZETA(I)=1.0D+10*MASS_DENSITY(I)*CLUMP_FAC(I)
-	    END DO
-	    CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
-	    DO I=1,ND
-	      YV(I)=DLOG10(TA(I))
-	    END DO
-	    YAXIS='m(gm cm\u-2\d)'
+	    CALL DP_CURVE_LAB(ND,XV,YV,DEFAULT)
 	  END IF
-	  CALL DP_CURVE(ND,XV,YV)
 !
 ! Used to verify that model has a constant mass-loss rate. It can also be used to
 ! see Mdot variation in time dependent model.
@@ -2874,7 +2885,7 @@
 	    TC(I)=DLOG10(LOG(V(I+1)/V(I-1))/LOG(R(I+1)/R(I-1)))
 	  END DO
 	  TC(1)=TC(2); TC(ND)=TC(ND-1)
-	  CALL DP_CURVE_LAB(ND,XV,YV)
+	  CALL DP_CURVE(ND,XV,YV)
 	  CALL DP_CURVE(ND,XV,TC)
 	  DO I=1,ND
 	    TA(I)=LOG(R(I))
@@ -2919,7 +2930,7 @@
 	  YAXIS='M(t)'
 !
 ! Sobolev radial optical depth scale. Assumes fg=1, POP_ATOM for the
-! levelp population.
+! level population.
 !
 	ELSE IF(XOPT .EQ. 'TAUSOB')THEN
 	  CALL USR_OPTION(FL,'LAM',TAUSOB_DEF,'Wavelength in Ang')

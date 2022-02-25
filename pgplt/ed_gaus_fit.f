@@ -12,7 +12,6 @@
 	REAL*8, ALLOCATABLE :: TMP_PAR(:)
 	INTEGER K			!Array index
 	INTEGER IP			!# of Gaussian
-	INTEGER NG_PAR_MAX		!Allows for new gaussians to be added.
 !
 	IF( NUM_GAUS .NE. (NG_PAR-2)/4 )THEN
 	  WRITE(6,*)'Error in ED_GAUS_FIT: NM_GAUS inconsistent with NG_PAR'
@@ -24,7 +23,6 @@
 !
 ! We allow a maximum of 20 new Gaussians to be added.
 !
-	NG_PAR_MAX=(NUM_GAUS+20)*4+2
 	ALLOCATE(TMP_PAR(NG_PAR_MAX)); TMP_PAR(:)=0.0D0
 	TMP_PAR(1:NG_PAR)=PAR(1:NG_PAR)
 !
@@ -76,8 +74,6 @@
 ! Clean up and save the modified Gaussian parameters.
 !
 	NG_PAR=2+NUM_GAUS*4
-	DEALLOCATE (PAR)
-	ALLOCATE (PAR(NG_PAR))
 	PAR(1:NG_PAR)=TMP_PAR(1:NG_PAR)
 	DEALLOCATE (TMP_PAR)
 !	

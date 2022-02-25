@@ -5,6 +5,7 @@ C
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 12-Dec-2021 : Added ROM_ION_ID for plotting (osiris)
 ! Altered 18-May-2021 : If you use EXIT as a POPC filenam with RVTJ(ASK) command, no more
 !                          POP files are READ in. Updated from OSIRIS (21-Jul-2021).
 ! Altered 16-Aug-2019 : Call RD_RVTJ..._V4, PLANCK_MEAN now read in
@@ -407,6 +408,7 @@ C
 	    DO J=1,NION_MAX
 	      ID=ID+1
 	      ION_ID(ID)=TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(J))
+	      PLT_ION_ID(ID)=TRIM(SPECIES_ABR(ISPEC))//' '//TRIM(ROM_ION_ID(J))
 	      CALL RD_POP_DIM(ATM(ID)%NXzV_F,ATM(ID)%XzV_PRES,
 	1                    TRIM(ION_ID(ID)),FORMAT_DATE,LU)
 !

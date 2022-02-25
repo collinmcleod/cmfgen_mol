@@ -1,5 +1,6 @@
 	MODULE MOD_DISP
 !
+! Altered 15-Dec-2021 : Added ROM_ION_ID for plotting labels (osiris)
 ! Altered 16-Aug-2019 : Added PLACK_MEAN
 ! Altered 12-Jun-2015 : NION_MAX increased to 21. Added MI (cur_hmi,19-Aug-2015)
 ! Altered 13-May-2015 : Inserted ARAD, GAM2, GAM4 and OBSERVED_LEVEL in MODEL_ATOM_DATA.
@@ -18,10 +19,12 @@
         REAL*8 SOL_MASS_FRAC(NSPEC)       	!Solar mass fraction
         REAL*8 SOL_ABUND_HSCL(NSPEC)      	!Solar abundance with H=12.0
 !
-	CHARACTER*10 SPECIES(NSPEC)
-	CHARACTER*2  SPECIES_ABR(NSPEC)
-	CHARACTER*12 ION_ID(MAX_ION)
-	CHARACTER*5  GEN_ION_ID(NION_MAX)
+	CHARACTER(LEN=10)  SPECIES(NSPEC)
+	CHARACTER(LEN=12)  SPECIES_ABR(NSPEC)
+	CHARACTER(LEN=12)  ION_ID(MAX_ION)
+	CHARACTER(LEN=12)  PLT_ION_ID(MAX_ION)
+	CHARACTER(LEN=5)   GEN_ION_ID(NION_MAX)
+	CHARACTER(LEN=12)  ROM_ION_ID(NION_MAX)
 	INTEGER  SPECIES_LNK(MAX_ION)
 	INTEGER SPECIES_BEG_ID(NSPEC)
 	INTEGER SPECIES_END_ID(NSPEC)
@@ -82,11 +85,16 @@ C
 !
 	REAL*8, ALLOCATABLE :: POPDUM(:,:)
 !
-!	DATA GEN_ION_ID /'I','II','III','IV','V',
-!	1                'VI','VII','VIII','IX','X','XI','XII'/
+! This is the same ID used in CMFGEN, and used to read files etc.
 !
 	DATA GEN_ION_ID /'MI','I','2','III','IV','V',
 	1                'SIX','SEV','VIII','IX','X','XI','XII',
 	1                'XIII','XIV','XV','XSIX','XSEV','X8','X9','XX'/
+!
+! This is used for writing plot title etc.
+!
+	DATA ROM_ION_ID /'MI','I','II','III','IV','V',
+	1                'VI','VII','VIII','IX','X','XI','XII',
+	1                'XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX'/
 !
 	END MODULE MOD_DISP
