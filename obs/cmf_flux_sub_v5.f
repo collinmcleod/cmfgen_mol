@@ -15,6 +15,9 @@
 	USE EDDFAC_REC_DEFS_MOD
 	IMPLICIT NONE
 !
+! Altered: 27-Feb-2022 : Code no linger computes the opacities and emissivities on the
+!                          2nd (and higher) electron scattering iterations. Instead it
+!                          uses the data store in ETA_CMF_ST, CHI_CMF_ST
 ! Altered: 30-Apr-2020 : RAY_DATA created when Rayleigh scattering included.
 ! Altered: 16-Aug-2019 : PLANCKMEAN computed
 ! Altered: 26-Apr-2019 : Added variables/option to restrict range of OBS frame calcualtion.
@@ -1422,6 +1425,17 @@
 	  END IF
 	END DO
 !
+	IF(ES_COUNTER .GT. 1)THEN
+	  CALL ESOPAC(ESEC,ED,ND)		!Electron scattering emission factor.
+	  CHI_SCAT=ESEC
+	  IF(INCL_RAY_SCAT)THEN
+	    CHI_RAY(1:ND)=RAY_CMF_ST(1:ND,ML)
+	    CHI_SCAT=CHI_SCAT+ESEC
+	  END IF
+	  CHI(1:ND)=CHI_CMF_ST(1:ND,ML)
+	  ETA(1:ND)=ETA_CMF_ST(1:ND,ML)
+	ELSE
+!
 ! Compute profile: Doppler or Stark: T2 and T3 are presently garbage.
 ! TB is the proton density.
 ! TC is the He+ density.
@@ -1548,6 +1562,7 @@
 	    WRITE(LU_NEG,'(A,2X,I3,5X,A,2XI3)')
 	1        ' 1st depth',K,'Last depth',J
 	  END IF
+	END IF
 !
 	  DO I=1,ND
 	    ZETA(I)=ETA(I)/CHI(I)
@@ -1766,10 +1781,12 @@
 ! Store opacities and emissivities for use in observer's frame 
 ! calculation. 
 !
-	IF(INCL_RAY_SCAT)RAY_CMF_ST(1:ND,ML)=CHI_RAY(1:ND)
-	ETA_CMF_ST(1:ND,ML)=ETA(1:ND)
-	CHI_CMF_ST(1:ND,ML)=CHI(1:ND)
-	RJ_CMF_ST(1:ND,ML)=RJ(1:ND)
+	IF(ES_COUNTER .EQ. 1)THEN
+	  IF(INCL_RAY_SCAT)RAY_CMF_ST(1:ND,ML)=CHI_RAY(1:ND)
+	  ETA_CMF_ST(1:ND,ML)=ETA(1:ND)
+	  CHI_CMF_ST(1:ND,ML)=CHI(1:ND)
+	  RJ_CMF_ST(1:ND,ML)=RJ(1:ND)
+	END IF
 !
 10000	CONTINUE
 	T1=1.0D0; WRITE(LU_EDD,REC=FINISH_REC)T1

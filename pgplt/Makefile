@@ -27,6 +27,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(do_mult_gf.o)\
       $(LIB)(do_pg_regrid.o)\
       $(LIB)(do_vec_op.o)\
+      $(LIB)(do_cursor_ew.o)\
       $(LIB)(draw_line_ids.o)\
       $(LIB)(draw_ew_ids.o)\
       $(LIB)(draw_ew_lines.o)\
@@ -53,6 +54,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(pg_mod_cont_nodes.o)\
       $(LIB)(put_text.o)\
       $(LIB)(rd_ew_id.o)\
+      $(LIB)(rep_data.o)\
       $(LIB)(simp_ew.o)\
       $(LIB)(strip_slash_p.o)\
       $(LIB)(shrink_vectors.o)\

@@ -8,6 +8,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 27-Feb-2022: Fixed bug in EW error estimates when using unormalized data.
 ! Altered 25-Feb-2022: Some cleaning
 ! Altered 01-Feb-2022: Extensive changes implmented to allow cursor input of
 !                        parameters for gauss fitting.
@@ -191,11 +192,12 @@
 	NG_PAR_OLD=NG_PAR
 !
 	WRITE(6,*)'Exited ED_GAUS_FIT'; FLUSH(UNIT=6)
-	IF(ALLOCATED(SIM))DEALLOCATE(SIM,SUM_SQ,SCALE,EW)
+	IF(ALLOCATED(SIM))DEALLOCATE(SIM,SUM_SQ,SCALE,EW,EW_CONT)
 	ALLOCATE (SIM(NG_PAR+1,NG_PAR))
 	ALLOCATE (SUM_SQ(NG_PAR+1))
 	ALLOCATE (SCALE(NG_PAR+1))
 	ALLOCATE (EW(NUM_GAUS))
+	ALLOCATE (EW_CONT(NUM_GAUS))
 	WRITE(6,*)'Done allocate', NUM_GAUS, NG_PAR; FLUSH(UNIT=6)
 !
 	WRITE(6,*)CD(IP)%XVEC(1),CD(IP)%XVEC(NPTS(IP))
@@ -252,11 +254,17 @@
 	  CALL GAUS_ROMB(EW(I),SIM(1,K+2),SIM(1,K+1),SIM(1,K+3),TOLERANCE)
 	  T1=SIM(1,1)+SIM(1,2)*(SIM(I,K)-X_GAUS(1))				!Continuum value
 	  EW(I)=EW(I)/T1
+	  EW_CONT(I)=T1
 	END DO
 	EW=EW*1000.0D0			!mAng
         PAR(1:NG_PAR)=SIM(1,1:NG_PAR)
 	CALL GAUS_FIT_ER(PAR)
-	EW_ERROR=EW_ERROR*1000.0D0; ALT_ERROR=ALT_ERROR*1000.0D0; MIN_ERROR=MIN_ERROR*1000.0D0
+	DO I=1,NUM_GAUS
+	  T1=1000.0D0/EW_CONT(I)
+	  EW_ERROR(I)=EW_ERROR(I)*T1
+	  ALT_ERROR(I)=ALT_ERROR(I)*T1
+	  MIN_ERROR(I)=MIN_ERROR(I)*1000.0D0
+	END DO
 !
 	WRITE(6,*)'Called AMOEBA'
 	WRITE(6,*)'Fit parameters are (NB SIGMA is not Stan. Dev.):'
