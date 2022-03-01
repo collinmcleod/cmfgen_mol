@@ -32,7 +32,7 @@
 !
 ! Loop edit section until finished. NB: For historical reasons, the third parameter
 ! is the height. Howver we write it out second, since it is more important for
-! seein the importance of the Gaussian component.
+! seeing the importance of the Gaussian component.
 !
 	DO WHILE(1 .EQ. 1)
 !
@@ -54,10 +54,10 @@
 	    TMP_PAR(K:NG_PAR-4)=TMP_PAR(K+4:NG_PAR)
 	    NUM_GAUS=NUM_GAUS-1
 	    NG_PAR=2+NUM_GAUS*4
-	  ELSE IF(IP .GT. 0)THEN
 !
 ! Can now edit the  Gaussian.
 !
+	  ELSE IF(IP .GT. 0)THEN
 	    IP=MIN(NUM_GAUS+1,IP)
 	    K=2+(IP-1)*4+1
 	    CALL GEN_IN(TMP_PAR(K),'Central wavlength of Gaussian')

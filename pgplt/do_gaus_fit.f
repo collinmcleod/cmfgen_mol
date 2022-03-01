@@ -16,6 +16,7 @@
 !
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: NL_MAX=100
+	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 	REAL*8 LINE_HEIGHT(NL_MAX)
 	REAL*8 LINE_CENTER(NL_MAX)
 	REAL*8 LINE_SIGMA(NL_MAX)
@@ -58,6 +59,7 @@
 	INTEGER I,J,K
 	LOGICAL GUESSED
 	LOGICAL NEW_REGION
+	LOGICAL SHOW_INIT_GAUS
 !
 	NG_PAR_MAX=4*NL_MAX+2
 	IF(.NOT. ALLOCATED(PAR))THEN
@@ -83,8 +85,10 @@
 	  USE_CURSOR=.TRUE.
 	  CALL GEN_IN(USE_CURSOR,'Use cursor')
 	END IF
+	DEF_SIGMA=0.1
 	CALL GEN_IN(DEF_SIGMA,'Default sigma for line profiles')
-	DEF_SIGMA=0.5D0
+	SHOW_INIT_GAUS=.FALSE.
+	CALL GEN_IN(SHOW_INIT_GAUS,'Show initial Gaussian estimates on the plot?')
 !
 	USE_CURSOR=.TRUE.
 	IF(.NOT. NEW_REGION)THEN
@@ -184,6 +188,16 @@
 	  END IF
 	END IF
 !
+! Draw initial Gaussians using a dashed black pen.
+!
+	IF(SHOW_INIT_GAUS)THEN
+	  I=2; CALL PGSLS(I)			!Dashed curve
+	  CALL SET_GAUS_DATA(CD(IP)%XVEC,CD(IP)%DATA,XST,XEND,NPTS(IP),YST,YEND)
+	  CALL DRAW_GAUS(L_FALSE)
+	  CALL PGEBUF				!Clear buffer
+	  I=1; CALL PGSLS(I)			!Reset to solid lines
+	END IF
+!
 ! Allow Gaussians to be adjustd by hand.
 !
 	NG_PAR=2+4*NUM_GAUS
@@ -274,9 +288,9 @@
 	1          '        EXP','Sigma(km/s)',' FWHM(km/s)',' EW(mA)','Err(mA)'
 	DO I=1,NUM_GAUS
 	  K=2+(I-1)*4+1
-	  T1=2.99794D+05*SIM(1,K+1)/SIM(1,K)
-	  FWHM=2.0D0*T1*(DLOG(2.0D0))**(1.0D0/SIM(I,K+3))
-	  WRITE(6,'(2X,ES16.6,5ES14.4,4F10.2)')SIM(I,K),SIM(I,K+2),SIM(I,K+1),SIM(I,K+3),
+	  T1=2.99794D+05*PAR(K+1)/PAR(K)
+	  FWHM=2.0D0*T1*(DLOG(2.0D0))**(1.0D0/PAR(K+3))
+	  WRITE(6,'(2X,ES16.6,5ES14.4,4F10.2)')PAR(K),PAR(K+2),PAR(K+1),PAR(K+3),
 	1               T1/SQRT(2.0D0),FWHM,EW(I),EW_ERROR(I),ALT_ERROR(I),MIN_ERROR(I)
 	END DO
 !
@@ -362,16 +376,16 @@
 	REAL*8 GAUS_FIT_FUNC
 	EXTERNAL GAUS_FIT_FUNC
 	INTEGER I
+	REAL*8 T1
 !
-        SUM_SQ(:)=0.0D0
-        PAR(1:NG_PAR)=SIM(1,1:NG_PAR)
-        SUM_SQ(1)=GAUS_FIT_FUNC(PAR)
-	I=1
-	CALL PGSCI(I)
+! PAR must be set on entry.
+! The Gaussians are drwan in black.
+!
+        T1=GAUS_FIT_FUNC(PAR)
+	I=1; CALL PGSCI(I)
 	CALL PGLINE(NG_DATA,XFIT,YFIT)
 	IF(DIFF_ALSO)THEN
-	  I=10
-	  CALL PGSCI(I)
+	  I=10; CALL PGSCI(I)
 	  FIT_DIF=Y_GAUS-YFIT
 	  CALL PGLINE(NG_DATA,XFIT,FIT_DIF)
 	END IF
