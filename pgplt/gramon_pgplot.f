@@ -89,7 +89,7 @@
 	INTEGER IDY,IYTICK
 	REAL*4 XPAR(2),YPAR(2),XT(2),YT(2)
 	REAL*4 XMIN,XMAX,YMIN,YMAX
-	REAL*4 XPAR_SAV(2)
+	REAL*4 XPAR_SAV(2),YPAR_SAV(2)
 	REAL*8 YMIN_SAV,YMAX_SAV
 !
 	REAL*4 YPAR_R_AX(2)
@@ -245,6 +245,8 @@
 	REAL*4 XVAL_SAV,YVAL_SAV
 	REAL*4, ALLOCATABLE :: TA(:)
 	LOGICAL TMP_LOG
+	LOGICAL KEEP_YAXIS_LIMITS
+	LOGICAL, SAVE :: WRITE_COMMENT
 !
 	INTEGER, SAVE :: PEN_OFFSET
 	INTEGER BEG
@@ -372,6 +374,7 @@
 	  EW_FILNAME='ewdata_fin'
 	  EW_CUT=1.0D0
 	  IP_CONT=0
+	  WRITE_COMMENT=.FALSE.
 	END IF
 	CALL GEN_ASCI_OPEN(LU_NORM,'NORM_FACTORS','UNKNOWN','APPEND',' ',IZERO,IOS)
 !
@@ -409,6 +412,7 @@
 	CONTINUUM_DEFINED=.FALSE.
 	AIR_WAVELENGTHS=.FALSE.
 	PLOT_ID=1
+	KEEP_YAXIS_LIMITS=.FALSE.
 !
 	YPAR_R_AX(1)=0.0D0 ; YPAR_R_AX(2)=0.0D0
 !
@@ -803,21 +807,30 @@ C
 	      YMAX=1.0
 	    END IF
 !
-	  WRITE(6,*)YMIN,YMAX
-	  IF(XPAR(2) .NE. XPAR_SAV(2) .OR. XPAR(1) .NE. XPAR_SAV(1) .OR.
-	1    YMAX .NE. YMAX_SAV .OR. YMIN .NE. YMIN_SAV)THEN
-	    YINC=SPACING(YMIN,YMAX)
-	    IYTICK=2
-	    V1=1000
-	    YPAR(1)=ABS(YINC)*(AINT(YMIN/ABS(YINC)+V1)-V1)
-	    YPAR(2)=ABS(YINC)*(AINT(YMAX/ABS(YINC)-V1)+V1)
-	    XPAR_SAV(1)=XPAR(1)		!Indicate value limits evaluated for.
-	    XPAR_SAV(2)=XPAR(2)
-	    YMIN_SAV=YMIN; YMAX_SAV=YMAX
+	  IF(KEEP_YAXIS_LIMITS)THEN
+	  ELSE
+	    WRITE(6,*)YMIN,YMAX
+	    IF(XPAR(2) .NE. XPAR_SAV(2) .OR. XPAR(1) .NE. XPAR_SAV(1) .OR.
+	1      YMAX .NE. YMAX_SAV .OR. YMIN .NE. YMIN_SAV)THEN
+	       YINC=SPACING(YMIN,YMAX)
+	       IYTICK=2
+	      V1=1000
+	      YPAR(1)=ABS(YINC)*(AINT(YMIN/ABS(YINC)+V1)-V1)
+	      YPAR(2)=ABS(YINC)*(AINT(YMAX/ABS(YINC)-V1)+V1)
+	      XPAR_SAV(1)=XPAR(1)		!Indicate value limits evaluated for.
+	      X PAR_SAV(2)=XPAR(2)
+	      YMIN_SAV=YMIN; YMAX_SAV=YMAX
+	    END IF
 	  END IF
 C
 	  WRITE(T_OUT,11)YMIN,YMAX
-	  CALL NEW_GEN_IN(YPAR,I,ITWO,'YST,YEND')
+	  IF(KEEP_YAXIS_LIMITS)THEN
+	    YPAR_SAV=YPAR
+	    CALL NEW_GEN_IN(YPAR,I,ITWO,'YST,YEND')
+	    IF(YPAR(2) .NE. YPAR_SAV(2) .OR. YPAR(1) .NE. YPAR_SAV(1))KEEP_YAXIS_LIMITS=.FALSE.
+	  ELSE
+	    CALL NEW_GEN_IN(YPAR,I,ITWO,'YST,YEND')
+	  END IF
 C
 C Check that limits inserted are not absurd.
 C
@@ -1531,6 +1544,7 @@ C
 	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs -case sensitive')
 	  CALL NEW_GEN_IN(TAU_CUT,'Omit lines with central optical depth <')
 	  CALL NEW_GEN_IN(AIR_WAVELENGTHS,'Air wavelengths?')
+	  CALL NEW_GEN_IN(KEEP_YAXIS_LIMITS,'Keep same Y axis limits?')
           OPEN(UNIT=33,FILE=TRIM(ID_FILNAME),STATUS='OLD',IOSTAT=IOS)
 	  IF(IOS .EQ. 0)THEN
 	    TMP_STR='!'
@@ -1685,12 +1699,12 @@ C
 	    CALL NEW_GEN_IN(PLOT_ID,'Plot to determine EW for:')
 	  END IF
 !
-          WRITE(6,*)' '
+          WRITE(6,*)RED_PEN
           WRITE(6,*)'CURSOR -- input X and Y values'
           WRITE(6,*)'CURX -- input X only, average Y between the X values'
           WRITE(6,*)'FILENAME -- first line -- number of data pairs '
           WRITE(6,*)'FILENAME -- input X1 and X2 on each line; averages Y between the X values'
-          WRITE(6,*)' '
+          WRITE(6,*)DEF_PEN
 !
 	  DC_INPUT_OPTION='CURSOR'
 	  CALL NEW_GEN_IN(DC_INPUT_OPTION,'CURSOR, CURX, or name of file')
@@ -1701,6 +1715,7 @@ C
 	  IF(ALLOCATED(CONT))DEALLOCATE(CONT)
 	  ALLOCATE(CONT(NPTS(PLOT_ID)))
 	  CONT=CD(PLOT_ID)%DATA
+	  CD(PLOT_ID)%CURVE_ID=' '
 !
 	  IP=NPLTS+1
 	  CALL NEW_GEN_IN(IP,'Output plot?')
@@ -1826,7 +1841,7 @@ C
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'DG')THEN
-	  CALL DRAW_GAUS()
+	  CALL DRAW_GAUS(L_FALSE)
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'CEW')THEN
@@ -1847,6 +1862,7 @@ C
 	      CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
 	      IF(CURSVAL .EQ. 'e' .OR. CURSVAL .EQ. 'E')GOTO 1000
 	      IF(END_CURS(CURSVAL))GOTO 1000
+	      XCUR(2)=XCUR(1); YCUR(2)=YCUR(1)
 	      CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
 	      IF(CURSVAL .EQ. 'e' .OR. CURSVAL .EQ. 'E')GOTO 1000
 	      IF(END_CURS(CURSVAL))GOTO 1000
@@ -1892,6 +1908,7 @@ C
 	1             CD(IP)%XVEC(L_CHAN(1)),CD(IP)%XVEC(L_CHAN(2))
 	      WRITE(LU_EW,'(6X,I4,4ES15.6)')IP,EW,CENTROID,CD(IP)%XVEC(L_CHAN(1)),CD(IP)%XVEC(L_CHAN(2))
 	      FLUSH(LU_EW)
+	      XCUR(1)=XCUR(2); YCUR(1)=YCUR(2)
 	    END DO
 	    GOTO 1000
 !
@@ -1899,9 +1916,13 @@ C
 !
 	    QUERYFLAG=.FALSE.
 	    CALL NEW_GEN_IN(QUERYFLAG,'Compute area?')
+	    CALL NEW_GEN_IN(WRITE_COMMENT,'Write a comment after each EW measurment?')
 	    IF(.NOT. QUERYFLAG)THEN
-              WRITE(T_OUT,*)'Continuum not defined'
+              WRITE(T_OUT,*)RED_PEN
+	      WRITE(T_OUT,*)'Continuum not defined - use DC to define non-unit continnum'
 	      WRITE(T_OUT,*)'Assuming Ic=1 (i.e. normalized data)'
+	      WRITE(T_OUT,*)'Use e or E to exit line selection'
+              WRITE(T_OUT,*)DEF_PEN
 !
 ! Show the continuum
 !
@@ -1916,6 +1937,7 @@ C
 	      CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
 	      IF(CURSVAL .EQ. 'e' .OR. CURSVAL .EQ. 'E')GOTO 1000
 	      IF(END_CURS(CURSVAL))GOTO 1000
+	      XCUR(2)=XCUR(1); YCUR(2)=YCUR(1)
 	      CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
 	      IF(CURSVAL .EQ. 'e' .OR. CURSVAL .EQ. 'E')GOTO 1000
 	      IF(END_CURS(CURSVAL))GOTO 1000
@@ -1995,7 +2017,7 @@ C
 	          WRITE(T_OUT,'(A,I3,5X,A,1PE10.3,A,A,ES14.6,2ES14.4)')
 	1            ' Plot ID=',IP,'EW=',EW,' X(units);','   Centroid=',CENTROID,
 	1                  CD(IP)%XVEC(L_CHAN(1)),CD(IP)%XVEC(L_CHAN(2))
-	          IF(IP .EQ. 1)THEN
+	          IF(IP .EQ. 1 .AND. WRITE_COMMENT)THEN
 	            WRITE(LU_EW,'(A)')' '
 	            TMP_STR=' '
 	            CALL NEW_GEN_IN(TMP_STR,'Comment=')
@@ -2011,6 +2033,7 @@ C
 	          FLUSH(LU_EW)
 	        END IF
 	      END IF
+	      XCUR(1)=XCUR(2); YCUR(1)=YCUR(2)
 	    END DO
 	    END DO		!Multiple plots
 	    GOTO 1000
@@ -2768,6 +2791,7 @@ C
 	   T1=C_KMS*LOG(10.0D0)
 	   CD(VAR_PLT3)%XVEC(1:K)=T1*CD(VAR_PLT3)%XVEC(1:K)
 	  END IF
+	  CD(VAR_PLT3)%CURVE_ID=' '
 	  GOTO 1000
 !
 	ELSE IF (ANS .EQ. 'DER')THEN
@@ -2896,6 +2920,11 @@ C
 	  GOTO 1000
 !
 	ELSE IF (ANS .EQ. 'SUM')THEN
+	  WRITE(6,'(A)')RED_PEN
+	  WRITE(6,'(A)')'This option simply sums the data over X.'
+	  WRITE(6,'(A)')'No allowance is made for the X values or spacing'
+	  WRITE(6,'(A)')'Use CUM option to intergate over X'
+	  WRITE(6,'(A)')DEF_PEN
 	  CALL NEW_GEN_IN(IP,'Input plot 1?')
 	  OP=NPLTS+1
 	  CALL NEW_GEN_IN(OP,'Output plot?')
@@ -3391,7 +3420,7 @@ C
 !
 ! Draw Gaussian fits if needed.
 !
-	IF(HARD .AND. DRAW_GAUSS_HARD)CALL DRAW_GAUS()
+	IF(HARD .AND. DRAW_GAUSS_HARD)CALL DRAW_GAUS(L_FALSE)
 !
 	IF(MARK)THEN
 	  CALL PGSCH(EXPMARK)

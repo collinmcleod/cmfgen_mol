@@ -3183,8 +3183,8 @@
 	          TAU_SOB=T4*TA(DPTH_INDX)+(1.0D0-T4)*TA(DPTH_INDX-1)
 	          STRING=' ';  IF(FLAG)STRING=VEC_TRANS_NAME(LINE_INDX)
 	          IF(TAU_SOB .GT. TAU_LIM)THEN
-	            WRITE(73,'(A,3ES14.5,3X,F3.0,I6,5X,A)')ION_ID(ID),ANG_TO_HZ/FL,
-	1                                TAU_SOB,ANG_TO_HZ/FL,1.0,2,TRIM(STRING)
+	            WRITE(73,'(A,F12.3,ES15.5,F12.3,3X,F3.0,I6,5X,A)')ION_ID(ID),ANG_TO_HZ/FL,
+	1                               TAU_SOB,ANG_TO_HZ/FL,1.0,2,TRIM(STRING)
 	          END IF
 	        END IF
 	      END DO
@@ -3294,7 +3294,7 @@
 	      STRING=' ';  IF(FLAG)STRING=VEC_TRANS_NAME(LINE_INDX)
 	      T1=ANG_TO_HZ/FL
 	      IF(.NOT. ATM(ID)%OBSERVED_LEVEL(MNL_F) .OR. .NOT. ATM(ID)%OBSERVED_LEVEL(MNUP_F))T1=-T1
-	      WRITE(73,'(A,3ES14.5,3X,F3.0,I6,5X,A)')ION_ID(ID),T1,
+	      WRITE(73,'(A,F12.3,ES14.5,F12.3,3X,F3.0,I6,5X,A)')ION_ID(ID),T1,
 	1                               T2,ANG_TO_HZ/FL,1.0,2,TRIM(STRING)
 	      IF(FLUSH_FILE)FLUSH(UNIT=73)
 	    END IF

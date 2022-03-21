@@ -755,7 +755,7 @@ C
 	  WRITE(6,*)'Restart program if you wish to compare to with pops from last iteration.'
 	  WRITE(6,*)'Populations can be compared with older iterations.'
 	  WRITE(6,'(A)')' Input any character to continue: '
-	  READ(6,'(A)')STRING
+	  READ(5,'(A)')STRING
 	  GOTO 200
 !
 	ELSE IF(PLT_OPT(1:2) .EQ. 'SM')THEN

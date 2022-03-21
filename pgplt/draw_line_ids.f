@@ -15,7 +15,7 @@
 	REAL*4 XCHAR_SIZE,YCHAR_SIZE
 	REAL*4 EXPCHAR
 	INTEGER T_OUT
-	LOGICAL, PARAMETER :: TRACE=.TRUE.              !Set to TRUE for debugging purposes
+	LOGICAL, PARAMETER :: TRACE=.FALSE.          !TRUE.              !Set to TRUE for debugging purposes
 !
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2
@@ -89,8 +89,8 @@
 !
 ! Determine maximum number of label slots. 
 !
-	  LAB_START=XPAR(1)+1.5*LAB_SIZE
 	  LAB_SIZE=1.1D0*XCHAR_SIZE
+	  LAB_START=XPAR(1)+1.5*LAB_SIZE
 	  NPOS=ABS( (XPAR(2)-XPAR(1))/LAB_SIZE )
 	  WRITE(6,*)'Number of label slots is:',NPOS
 	  IF(LOC_NLINES .GT. 0.8*NPOS)THEN

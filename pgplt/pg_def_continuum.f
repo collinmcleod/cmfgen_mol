@@ -77,7 +77,12 @@
 	  J=1; CALL PGSCI(J)
 	  WRITE(LUOUT,'(T40,A)')'Number of data points'
 	  WRITE(LUOUT,'(8X,A1,15X,A1,T40,A)')'X','Y','!Data type'
+	  XCUR(1)=1; YCUR(1)=1
 	  DO I=1,50 
+	    IF(I .NE. 1)THEN
+	      XCUR(I)=XCUR(I-1)
+	      YCUR(I)=YCUR(I-1)
+	    END IF
 	    CURSERR = PGCURS(XCUR(I),YCUR(I),CURSVAL)
 	    IF(CURSVAL .EQ. 'E' .OR. CURSVAL .EQ. 'e')EXIT
 	    CALL PGPT(IONE,XCUR(I),YCUR(I),IONE)
@@ -95,13 +100,17 @@
 !
 	ELSE IF (LOCAL_OPTION .EQ. 'CURX')THEN
 	  J=1; CALL PGSCI(J)
-	  X1=0; Y1=0
+	  X1=1; Y1=1
 	  WRITE(LUOUT,'(T40,A)')'Number of data points'
 	  WRITE(LUOUT,'(8X,A1,15X,A1,T40,A)')'X1','X2','!Data type'
+	  WRITE(LUOUT,'(A)')' '
+	  WRITE(LUOUT,'(A)')'Use cursors to define continuum bands'
+	  WRITE(LUOUT,'(A)')' '
 	  DO I=1,50 
 	    CURSERR = PGCURS(X1,Y1,CURSVAL)
 	    IF(CURSVAL .EQ. 'E' .OR. CURSVAL .EQ. 'e')EXIT
 	    CALL PGPT(IONE,X1,Y1,IONE)
+	    X2=X1; Y2=Y1
 	    CURSERR = PGCURS(X2,Y2,CURSVAL)
 	    IF(CURSVAL .EQ. 'E' .OR. CURSVAL .EQ. 'e')EXIT
 	    CALL PGPT(IONE,X2,Y2,IONE)
@@ -116,6 +125,7 @@
 	    XCUR(I)=XY_SUM/Y_SUM
 	    YCUR(I)=Y_SUM/ABS(I2-I1+1)
 	    WRITE(LUOUT,*)X1,X2
+	    X1=X2; Y1=Y2
 	  END DO
 	  CLOSE(LUOUT)
 	  WRITE(6,*)'Nodes written to ',TRIM(OUT_FILE)
