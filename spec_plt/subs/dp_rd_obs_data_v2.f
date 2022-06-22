@@ -346,13 +346,13 @@ C
 	END IF
 C
 	IF(INDEX(FLUX_UNIT,'ergs/cm^2/s/Ang') .NE. 0 .OR.
-	1  INDEX(FLUX_UNIT,'erg/cm^2/s/Ang'))THEN
+	1  INDEX(FLUX_UNIT,'erg/cm^2/s/Ang') .NE. 0)THEN
 	  DO I=NLST+1,NPTS
 	    FLUX(I)=TO_JANSKY*FLUX(I)*(LAM(I)**2)
 	  END DO
 C
 	ELSE IF(INDEX(FLUX_UNIT,'ergs/cm^2/s/Hz') .NE. 0 .OR.
-	1       INDEX(FLUX_UNIT,'erg/cm^2/s/Hz')THEN
+	1       INDEX(FLUX_UNIT,'erg/cm^2/s/Hz') .NE. 0)THEN
 	  DO I=NLST+1,NPTS
 	    FLUX(I)=1.0D+23*FLUX(I)
 	  END DO

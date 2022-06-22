@@ -23,6 +23,7 @@
 ! Comment out SETVBUF line for non PGI systems
 ! or put a RETURN here.
 !
+	RETURN
 !
 ! Check if the logical unit already has an assciated buffer.
 !
