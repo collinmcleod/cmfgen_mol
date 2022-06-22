@@ -295,7 +295,7 @@
 !
 	   READ(20,'(A)')STRING
 	   WRITE(21,'(A)')' '
-	   WRITE(21,FRMT),'Net dN/dt(%)',TRIM(STRING)
+	   WRITE(21,FRMT)'Net dN/dt(%)',TRIM(STRING)
 	   FLUSH(21)
 !
 	   STRING=' '

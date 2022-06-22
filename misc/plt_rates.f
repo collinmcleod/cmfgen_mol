@@ -652,10 +652,10 @@
 !
 	    WRITE(6,*)' '
 	    WRITE(6,'(2X,A,I5)')'Depth index=',DPTH_INDX
-	    WRITE(6,'(2X,A,ES16.8)'),'     R(DPTH_INDX) =',R(DPTH_INDX)
-	    WRITE(6,'(2X,A,ES16.8)'),'     V(DPTH_INDX) =',V(DPTH_INDX)
-	    WRITE(6,'(2X,A,ES16.8)'),'    ED(DPTH_INDX) =',ED(DPTH_INDX)
-	    WRITE(6,'(2X,A,ES16.8)'),'  Scaling Factor  =',MAX_RATE
+	    WRITE(6,'(2X,A,ES16.8)')'     R(DPTH_INDX) =',R(DPTH_INDX)
+	    WRITE(6,'(2X,A,ES16.8)')'     V(DPTH_INDX) =',V(DPTH_INDX)
+	    WRITE(6,'(2X,A,ES16.8)')'    ED(DPTH_INDX) =',ED(DPTH_INDX)
+	    WRITE(6,'(2X,A,ES16.8)')'  Scaling Factor  =',MAX_RATE
 	    WRITE(6,*)' '
 	    WRITE(6,*)' Upper level is listed first in transition name.'
 	    WRITE(6,*)' Negative rate imples there is a net flow to the upper state'

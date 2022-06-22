@@ -7,6 +7,7 @@ C
 	SUBROUTINE FQNEW(FQAF,F2DA,FC,W,ESEC,ND,NM)
 	IMPLICIT NONE
 C
+C Altered 22-Jun-2022 Removed shared DO end.
 C Altered 05-Dec-1996 DO 100 I(J) replaced by DO, END DO
 C Altered 24-May-1996  IMPLICIT NONE installed.
 C Altered  7-SEP-1982 (%CHI changed to 3 and %ETA changed to 4)
@@ -26,12 +27,14 @@ C
 	  END DO
 	END DO
 C
-	DO 200 K=1,ND
-	DO 200 J=1,ND
-	DO 200 I=1,ND
-	FQAF(J,K,3)=FQAF(J,K,3)+W(J,I)*F2DA(I,K)
-	FQAF(J,K,4)=FQAF(J,K,4)+W(J,I)*FC(I,K)
-200	CONTINUE
+	DO K=1,ND
+	  DO J=1,ND
+	    DO I=1,ND
+	      FQAF(J,K,3)=FQAF(J,K,3)+W(J,I)*F2DA(I,K)
+	      FQAF(J,K,4)=FQAF(J,K,4)+W(J,I)*FC(I,K)
+	    END DO
+	  END DO
+	END DO
 C
 	RETURN
 	END

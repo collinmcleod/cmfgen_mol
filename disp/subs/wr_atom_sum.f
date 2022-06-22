@@ -50,7 +50,7 @@
 	        EXIT
 	      END IF
 	    END DO
-	    READ(LU,'(A)',END=100),STRING
+	    READ(LU,'(A)',END=100)STRING
 	  END DO
 100	  CONTINUE
 	CLOSE(LU)
