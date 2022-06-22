@@ -8,6 +8,9 @@
       FUNCTION POIDEV(XM,IDUM)
       IMPLICIT NONE
 !
+! Altered: 16-Apr-2022 : Error - ALXM was not being correctly saved.
+!                           Not apparent incontinuous calls to POIDEV if
+!                           values distinct.
 ! Altered: 10-Apr-2015 : RAN2_DP accessed (there was a precision issue)
 !                        SAVE variables fixed.
 ! 
@@ -19,10 +22,9 @@
       REAL*8 Y
       REAL*8 GAMMLN
       REAL*8 EM
-      REAL*8 ALXM
 !
       REAL*8 RAN2_DP
-      REAL*8, SAVE :: G,SQ,AXLM
+      REAL*8, SAVE :: G,SQ,ALXM
       REAL*8, SAVE :: OLDM=-1
       REAL*8, PARAMETER :: PI=3.141592654D0
 !

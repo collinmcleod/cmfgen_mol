@@ -1,4 +1,5 @@
 !
+! Altered: 19-Jul-2022:  Name of file being read is output on error.
 ! Altered: 16-Jan-2019:  Added RD_STORE_2DBLE
 ! Altered: 23-Mar-2012:  Improved error reporting.
 ! Altered: 11-Mar-2008:  For output changed T35 to T40
@@ -18,6 +19,7 @@
 	IMPLICIT NONE
 !
 	INTEGER, PARAMETER :: NST_MAX=700
+	CHARACTER(LEN=80) FILE_NAME
 	CHARACTER(LEN=80), ALLOCATABLE :: STORE(:)
 	INTEGER, ALLOCATABLE ::  KEY_ST(:)
 	INTEGER, ALLOCATABLE :: KEY_END(:)
@@ -46,13 +48,15 @@
 	LUO=LU_OUT
 	I_UP=1
 	I_DWN=1
+	INQUIRE(UNIT=LU_IN,NAME=FILE_NAME)
 !
 	ALLOCATE (STORE(NST_MAX),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (KEY_ST(NST_MAX),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (KEY_END(NST_MAX),STAT=IOS)
 	IF(IOS .NE. 0)THEN
-	  WRITE(LUER,*)'Error in RD_FILEE_OPTIONS'
+	  WRITE(LUER,*)'Error in RD_OPTIONS_INTO_STORE'
 	  WRITE(LUER,*)'Unable to allocate memory'
+	  WRITE(LUER,*)'File is ',TRIM(FILE_NAME)
 	  WRITE(LUER,*)'IOS=',IOS
 	  STOP                                                      
 	END IF
@@ -75,11 +79,13 @@
 	    ELSE IF(KEY_ST(I) .NE. 0 .OR. KEY_END(I) .NE. 0)THEN
 	      WRITE(LUER,*)'Possible error in RD_OPTIONS_INTO_STORE'
 	      WRITE(LUER,*)'String with inconsistent [ brackets found'
+	      WRITE(LUER,*)'File is ',TRIM(FILE_NAME)
 	      WRITE(LUER,*)STORE(I)
 	      STOP
 	    ELSE	
 	      WRITE(LUER,*)'Error in RD_OPTIONS_INTO_STORE'
 	      WRITE(LUER,*)'Comments (i.e., strings without [KEY]) must begin with !'
+	      WRITE(LUER,*)'File is ',TRIM(FILE_NAME)
 	      WRITE(LUER,*)STORE(I)
 	      STOP
 	    END IF
@@ -99,7 +105,7 @@
 	  DO J=I+1,NST
 	    IF( STORE(I)(KEY_ST(I):KEY_END(I)) .EQ.
 	1             STORE(J)(KEY_ST(J):KEY_END(J))    )THEN
-	      WRITE(LUER,*)'Error in RD_OPTIONS_INTO_STORE'
+	      WRITE(LUER,*)'Error in RD_OPTIONS_INTO_STORE. File is ',TRIM(FILE_NAME)
 	      WRITE(LUER,*)'The following key is not unique'
 	      WRITE(LUER,*)'Record=',I,'  KEY=',STORE(I)(KEY_ST(I):KEY_END(I)) 
 	      WRITE(LUER,*)'Record=',J,'  KEY=',STORE(J)(KEY_ST(J):KEY_END(J)) 

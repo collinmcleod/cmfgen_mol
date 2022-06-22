@@ -1,22 +1,46 @@
 #
 # Put these aliases in you .cshrc file. If in your directory,
 # you will need to replace hillier by you username
+#
 ##############################################################
 ##############################################################
 #
 # cmfdist will be defined for general use (e.g. cd cmfdist)
 # Change to you local distribution directory
 
-#set cmfdist = ~jdh/cur_cmf
-#set CMFDIST = ~jdh/cur_cmf
+# Altered 22-Jun-2022 - Adjusted to require less changing with updates
+#                         and the use of GITHUB.
 
-setenv cmfdist  ~jdh/Dropbox/Ibis/cur_cmf
-setenv CMFDIST  ~jdh/Dropbox/Ibis/cur_cmf
-
-set atomic  = ~jdh/atomic 
-set ATOMIC  = ~jdh/atomic 
-set sn_atomic  = ~jdh/sn_atomic 
-set SN_ATOMIC  = ~jdh/sn_atomic 
+if ($machine =~ *'osiris'*)then
+  set atomic  = ~hillier/atomic 
+  set ATOMIC  = ~hillier/atomic 
+  set sn_atomic  = ~hillier/sn_atomic 
+  set SN_ATOMIC  = ~hillier/sn_atomic 
+  if ($machine =~ *'wnode04'*)then
+    setenv cmfdist  ~hillier/wnode04/cur_cmf
+    setenv CMFDIST  ~hillier/wnode04/cur_cmf
+  else
+    setenv cmfdist  ~hillier/cur_cmf
+    setenv CMFDIST  ~hillier/cur_cmf
+  endif
+else if ($machine =~ "ibis.phyast.pitt.edu" )then
+  setenv cmfdist  ~jdh/Dropbox/Ibis/cur_cmf
+  setenv CMFDIST  ~jdh/Dropbox/Ibis/cur_cmf
+  set atomic  = ~jdh/atomic 
+  set ATOMIC  = ~jdh/atomic 
+  set sn_atomic  = ~jdh/sn_atomic 
+  set SN_ATOMIC  = ~jdh/sn_atomic 
+else if ($machine =~ *'Emu'* )then
+  setenv cmfdist  ~jdh/cur_cmf
+  setenv CMFDIST  ~jdh/cur_cmf
+  set atomic  = ~jdh/atomic 
+  set ATOMIC  = ~jdh/atomic 
+  set sn_atomic  = ~jdh/sn_atomic 
+  set SN_ATOMIC  = ~jdh/sn_atomic 
+else
+  echo 'Name of machine not recognized'
+  echo 'Update cmfdist/com/aliases_for_cmfgen.sh'
+endif
 
 
 # Used to assign help fles for DISPGEN, PLT_SPEC etc

@@ -1,5 +1,5 @@
 C
-C Subroutine to convert from the default Jv units (ergs/cm^2/s/Hz) to other
+C Subroutine to convert from the default Jv units (erg/cm^2/s/Hz) to other
 C units: Current options are:
 C        For X axis:  Ang, um, 10^15 Hz, ev, keV, km/s, Mm/s (and Log)
 C        For Y axis:  Jv, vF(v), Flam (and Log0
@@ -43,11 +43,11 @@ C
 	      YV(I)=T1*XV(I)*YV(I)
 	    END DO
 	    IF(DATA_TYPE .EQ. 'J')THEN
-	      Y_LAB='\gnJ\d\gn\u(ergs\d cm\u-2 \ds\u-1\d)' 
-	      IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(ergs\d \ucm\u-2 \ds\u-1\d)' 
+	      Y_LAB='\gnJ\d\gn\u(erg\d cm\u-2 \ds\u-1\d)' 
+	      IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)' 
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
-	      Y_LAB='\gnH\d\gn\u(ergs\d cm\u-2 \ds\u-1\d)' 
-	      IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(ergs\d \ucm\u-2 \ds\u-1\d)' 
+	      Y_LAB='\gnH\d\gn\u(erg\d cm\u-2 \ds\u-1\d)' 
+	      IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)' 
 	    ELSE 
 	      WRITE(6,*)'Unrecognized DATA_TYPE for NU_FNU'
 	    ELSE
@@ -57,11 +57,11 @@ C
 	      YV(I)=T1*YV(I)*XV(I)*XV(I)
 	    END DO
 	    IF(DATA_TYPE .EQ. 'J')THEN
-	      Y_LAB='J\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)' 
-	      IF(LOG_Y)Y_LAB='Log J\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)' 
+	      Y_LAB='J\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)' 
+	      IF(LOG_Y)Y_LAB='Log J\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)' 
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
-	      Y_LAB='H\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)' 
-	      IF(LOG_Y)Y_LAB='Log H\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)' 
+	      Y_LAB='H\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)' 
+	      IF(LOG_Y)Y_LAB='Log H\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)' 
 	    ELSE 
 	      WRITE(6,*)'Unrecognized DATA_TYPE for FLAM'
 	    ELSE
@@ -70,17 +70,17 @@ C
 ! Plots the data units as read in.
 !
 	    IF(DATA_TYPE .EQ. 'J')THEN
-	      Y_LAB='J\d\gn\u(ergs\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)' 
-	      IF(LOG_Y)Y_LAB='Log J\d\gn\u(ergs\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
+	      Y_LAB='J\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)' 
+	      IF(LOG_Y)Y_LAB='Log J\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
-	      Y_LAB='H\d\gn\u(ergs\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)' 
-	      IF(LOG_Y)Y_LAB='Log H\d\gn\u(ergs\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
+	      Y_LAB='H\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)' 
+	      IF(LOG_Y)Y_LAB='Log H\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
 	    ELSE IF(DATA_TYPE .EQ. 'M(t)')THEN
 	      Y_LAB='M(t)'
 	      IF(LOG_Y)Y_LAB='Log M(t)'
 	    ELSE IF(DATA_TYPE .EQ. 'ETA')THEN
-	      Y_LAB='/ge(ergs\d \ucm\u-3 \ds\u-1 \dHz\u-1\d \gO\u-1\d)'
-	      IF(LOG_Y)Y_LAB='Log /ge(ergs\d \ucm\u-3 \ds\u-1 \dHz\u-1\d \gO\u-1\d)'
+	      Y_LAB='/ge(erg\d \ucm\u-3 \ds\u-1 \dHz\u-1\d \gO\u-1\d)'
+	      IF(LOG_Y)Y_LAB='Log /ge(erg\d \ucm\u-3 \ds\u-1 \dHz\u-1\d \gO\u-1\d)'
 	    ELSE IF(DATA_TYPE .EQ. 'CHI')THEN
 	      Y_LAB='\gx(cm\u-1\d)'
 	      IF(LOG_Y)Y_LAB='Log \gx(cm\u-1\d)'

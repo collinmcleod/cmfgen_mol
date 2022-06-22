@@ -172,6 +172,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(regrid_tx_r.o)\
       $(LIB)(regrid_t_ed.o)\
       $(LIB)(regrid_t_ed_v2.o)\
+      $(LIB)(regrid_t_ed_v3.o)\
       $(LIB)(regrid_log_dc_v1.o)\
       $(LIB)(rext_coef_v2.o)\
       $(LIB)(rite_asc.o)\

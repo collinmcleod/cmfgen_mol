@@ -7,6 +7,7 @@
 	1               POPATOM,N,ND,LU_IN,INTERP_OPTION,FILE_NAME)
 	IMPLICIT NONE
 !
+! Altered 31-May-2022 - Added RNS option: R grid not scaled.
 ! Altered 06-Dec-2021 - Removed write ED, OLD_E from ED option.
 ! Altered 18-Aug-2019 - Added TR option. Designed to interpolate DC's in T in the inner region, and
 !                           in T/R in the outer region (where it it is assumed T has not changed).
@@ -84,7 +85,7 @@
 !
 	LUER=ERROR_LU()
 	LUWARN=WARNING_LU()
-!
+	WRITE(6,*)'IN REGRID_DC_V1';FLUSH(UNIT=6)!
 ! Read in values from previous model.
 !
 	OPEN(UNIT=LU_IN,STATUS='OLD',FILE=FILE_NAME,IOSTAT=IOS)
@@ -203,6 +204,20 @@
 	    NX_ST=NX_ST+1
 	  END DO
 	  NX=ND-NX_ST+1
+!
+	ELSE IF(INTERP_OPTION .EQ. 'RNS')THEN
+	  OLD_X=LOG(OLD_R)
+	  NEW_X=LOG(R)
+	  DO WHILE(R(NX_ST) .GT. OLD_R(1))
+	    NX_ST=NX_ST+1
+	  END DO
+          NX_END=ND
+          DO WHILE (NEW_X(NX_END) .LT. OLD_X(NDOLD))
+            NX_END=NX_END-1
+          END DO
+          NX=NX_END-NX_ST+1
+	  WRITE(6,*)NX_ST,NX_END,NX
+	  FLUSH(UNIT=6)
 !
 	ELSE IF(INTERP_OPTION .EQ. 'RSP')THEN
 	  IF(DABS(OLD_R(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN

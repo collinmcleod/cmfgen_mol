@@ -9,19 +9,23 @@
 	INTEGER IP,IT,J,K,IPEN
 	CHARACTER(LEN=5) CPEN
 !
-	IF(RESET_TITLES)THEN
-	  N_TIT_SET=0
-	  TITLE(N_HEADER+1:)=' '
-	  CURVE_TITLE=' '
-	ELSE
+! Check if want to use the the existing curvxre titles
+! which have already be formatted.
+!
+	IF(.NOT. RESET_TITLES)THEN
 	  DO J=N_HEADER+1,N_TITLE
 	    TITLE(J)=CURVE_TITLE(J-N_HEADER)
 	  END DO
 	  RETURN
 	END IF
+!
+! If we reach here, we need to constrct the CURVE headers.
+!
+	TITLE(N_HEADER+1:)=' '
+	CURVE_TITLE=' '
 	N_TIT_SET=N_HEADER
 !
-! Now arrange the curve titles. We can force a line to end by ending it
+! Now arrange and concantenate the curve titles. We can force a line to end by ending it
 ! with \\ (as in latex). Maximum title length is 50.
 !
 	DO IP=1,NPLTS
@@ -52,9 +56,12 @@
 	      IT=IT+1; N_TIT_SET=IT
 	      TITLE(IT)=TRIM(CD(IP)%CURVE_ID)//TRIM(CPEN)
 	    END IF
-	    WRITE(6,'(A)')TRIM(TITLE(IT))
+!	    WRITE(6,'(A)')TRIM(TITLE(IT))
 	  END IF
 	END DO
+!
+! Store concateneted curve titles. These can be edited directly in  GRAMON_PGPLT.
+!
 	CURVE_TITLE(1:N_TIT_SET-N_HEADER)=TITLE(N_HEADER+1:N_TIT_SET)
 !
 	RETURN

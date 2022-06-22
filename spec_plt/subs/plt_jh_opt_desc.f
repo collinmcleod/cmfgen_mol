@@ -69,9 +69,9 @@
 	WRITE(6,'(A)')'    LINY'
 	WRITE(6,'(A)')'    YU	        Change Y plot unit. Options are:'
 	WRITE(6,'(A)')'          NAT         Default - avoids stuffing up ETA etc.'
-	WRITE(6,'(A)')'          Flam        ergs/cm^2/s/Ang)'
+	WRITE(6,'(A)')'          Flam        erg/cm^2/s/Ang)'
 	WRITE(6,'(A)')'          FNU         Jy'
-	WRITE(6,'(A)')'          NU_FNU      ergs/cm^2/s'
+	WRITE(6,'(A)')'          NU_FNU      erg/cm^2/s'
 !
         WRITE(6,'(A)')' '
 	WRITE(6,'(3A)')RED_PEN,'Hit return to continue',DEF_PEN

@@ -24,6 +24,7 @@ OBJ1  =  set_hydro_hd_loc.o update_pg_filename.o adjust_atm_r_grid.o rd_f_to_s_i
  
 EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)ave_dc.exe\
+         $(EXE_DIR)check_ba_estimates.exe\
          $(EXE_DIR)create_kappa_file.exe\
          $(EXE_DIR)create_if_file.exe\
          $(EXE_DIR)count_phot_data.exe\

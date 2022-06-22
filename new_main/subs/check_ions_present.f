@@ -150,26 +150,21 @@
 !
 ! Check to see if lower ionization species need to be included.
 !
-	FIRST_TIME=.TRUE.
-	DO ISPEC=1,NUM_SPECIES
-	  IF(SPECIES_PRES(ISPEC))THEN
-	    ID=SPECIES_BEG_ID(ISPEC)
-	  ELSE
-	    ID=1
-	  END IF
-	  IF(SPECIES_PRES(ISPEC) .AND. ATM(ID)%ZXzV .GT. 1.1D0)THEN
-	    IF(FIRST_TIME)THEN
-	      WRITE(LUWARN,'(A,A)')' Checking whether lower ionization stages ',
+	WRITE(LUWARN,'(A)')' '
+	WRITE(LUWARN,'(A,A)')' Checking whether lower ionization stages ',
 	1                             'need to be included in model'
-	      FIRST_TIME=.FALSE.
-	    END IF
+	DO ISPEC=1,NUM_SPECIES
+	  ID=1
+	  K=NINT(AT_NO(ISPEC))
+	  IF(SPECIES_PRES(ISPEC))ID=SPECIES_BEG_ID(ISPEC)
+	  IF(SPECIES_PRES(ISPEC) .AND. ATM(ID)%ZXzV .GT. 1.1D0)THEN
 	    IF(MAX_RATIO(ID) .GT. 0.1D0)THEN
-	         K=NINT(ATM(ID)%ZXzV)-1
-	         WRITE(LUWARN,'(3X,A,T11,A,A,A,ES8.1,A)')TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(K)),
+	      J=NINT(ATM(ID)%ZXzV)
+	      WRITE(LUWARN,'(3X,A,T11,A,A,A,ES8.1,A,F7.2)')TRIM(SPECIES_ABR(ISPEC))//TRIM(GEN_ION_ID(J)),
 	1              'may need to be included in the model (Maximum ',TRIM(ION_ID(ID)),
-	1              ' ionization fraction is',MAX_RATIO(ID),')'
+	1              ' ionization fraction is',MAX_RATIO(ID),');   IP=',IP(J-1,K)
 	    ELSE
-	         EXIT
+	      EXIT
 	    END IF
 	  END IF
 	END DO

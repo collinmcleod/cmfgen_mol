@@ -2358,11 +2358,11 @@
 	        EXIT
 	      END IF
 	    END DO
-	    CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
-	    DO I=1,ND
-	      YV(I)=DLOG10(TA(I))
-	    END DO
 	  END IF
+	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
+	  DO I=1,ND
+	    YV(I)=DLOG10(TA(I))
+	  END DO
 	  CALL DP_CURVE_LAB(ND,XV,YV,DEFAULT)
 !
 ! Used to verify that model has a constant mass-loss rate. It can also be used to
@@ -2514,7 +2514,9 @@
 	          TA(I)=TA(I+1)+TB(I)
 	        END DO
 	      END IF
-	      CALL DP_CURVE(ND,XV,TA)
+              DEFAULT=TRIM(SPECIES_ABR(ISPEC))
+              J=INDEX(DEFAULT,'k'); IF(J .NE. 0)DEFAULT(J:J)='i'
+              CALL DP_CURVE_LAB(ND,XV,TA,DEFAULT)
 	      K=K+1
 	      WRITE(6,'( A,A4,A,ES9.2,A)',ADVANCE='NO')' Mass of ',TRIM(SPECIES(ISPEC)),' is',TA(ND),' Msun'
 	      IF(MOD(K,2) .NE. 0)WRITE(6,'(10X)',ADVANCE='NO')
@@ -4423,7 +4425,7 @@
 	ELSE IF(XOPT .EQ. 'MCHI')THEN
 	  CALL USR_OPTION(LAM_ST,'LAM_ST','50.0',FREQ_INPUT)
 	  CALL USR_OPTION(LAM_EN,'LAM_END','10000.0',FREQ_INPUT)
-	  CALL USR_OPTION(NLAM,'NLAM','1000.0','# of wavlengths')
+	  CALL USR_OPTION(NLAM,'NLAM','1000','# of wavlengths')
 	  CALL USR_OPTION(ELEC,'ELEC','F','Include electron scattering?')
 	  CALL USR_OPTION(DO_KAP,'DO_KAP','F','Plot species dependent contributions?')
 	  IF(DO_KAP)THEN

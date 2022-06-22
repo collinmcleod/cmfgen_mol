@@ -10,6 +10,7 @@ C
 	SUBROUTINE RD_POP_DIM(NCIII,CIII_PRES,DESC,FORMAT_DATE,LUIN)
 	IMPLICIT NONE
 C
+C Altered 19-Jun-2022 : Added 5001 to IOS end of file check because of issues with GFORTRAN.
 C Altered 23-Jan-2013 : Changed location of "Number of levels" warning to overcome
 C                         an issue with GFORTRAN which ignored the "END=" statement.
 C Altered 04-Jun-1998 : Routine checks for occurrence of DESC and upper case
@@ -52,7 +53,7 @@ C The test against 5008 is to overcome an issue with GFROTRAN which does not det
 C end of the file. This should cause no issues with othr compilers.
 C Changed from 5001.
 C
-	  IF(IS_IOSTAT_END(IOS) .OR. IOS .EQ. 5008)THEN
+	  IF(IS_IOSTAT_END(IOS) .OR. IOS .EQ. 5008 .OR. IOS .EQ. 5001)THEN
 	    GOTO 1000
 	  ELSE IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'***************************************************'

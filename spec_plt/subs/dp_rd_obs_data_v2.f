@@ -14,7 +14,7 @@ C AIR_LAM=
 C SCALE_FACTOR=
 C
 C Where:
-C      The Flux Unit can Jy, or ergs/cm^2/s/Ang, or Norm.
+C      The Flux Unit can Jy, or ergs/cm^2/s/Ang (or erg/cm^2/s/Ang), or Norm.
 C      The WAVE_UNIT can be Anstroms
 C      AIR_LAM can be TRUE (air) or FALSE (vac)
 C
@@ -345,12 +345,14 @@ C
 	  AIR_LAM='FALSE'
 	END IF
 C
-	IF(INDEX(FLUX_UNIT,'ergs/cm^2/s/Ang') .NE. 0)THEN
+	IF(INDEX(FLUX_UNIT,'ergs/cm^2/s/Ang') .NE. 0 .OR.
+	1  INDEX(FLUX_UNIT,'erg/cm^2/s/Ang'))THEN
 	  DO I=NLST+1,NPTS
 	    FLUX(I)=TO_JANSKY*FLUX(I)*(LAM(I)**2)
 	  END DO
 C
-	ELSE IF(INDEX(FLUX_UNIT,'ergs/cm^2/s/Hz') .NE. 0)THEN
+	ELSE IF(INDEX(FLUX_UNIT,'ergs/cm^2/s/Hz') .NE. 0 .OR.
+	1       INDEX(FLUX_UNIT,'erg/cm^2/s/Hz')THEN
 	  DO I=NLST+1,NPTS
 	    FLUX(I)=1.0D+23*FLUX(I)
 	  END DO

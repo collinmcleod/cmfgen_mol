@@ -15,6 +15,7 @@
 	1                     NU,NU_CONT,INIT_ARRAYS,ND)
 	IMPLICIT NONE
 !
+! Altered 04-May-2022 : Changed HMI to H0
 ! Altered 23-Jun-2015 - Added H- free-free cooling.
 ! Altered 20-Oct-2011 - Now sum up all in ion levels for FF. Only do this when PHOT_ID=1
 ! Altered 05-Apr-2011 - Changed to V6.
@@ -132,7 +133,7 @@
 ! population of neutral hydrogen.
 !
 	  GFF_VAL(1:ND)=DI(1,1:ND)
-	  CALL DO_HMI_FF_COOL(FF,GFF_VAL,ED,T,BPHOT_CR,JPHOT_CR,NU_CONT,ND)
+	  CALL DO_H0_FF_COOL(FF,GFF_VAL,ED,T,BPHOT_CR,JPHOT_CR,NU_CONT,ND)
 	ELSE IF(ION_LEV .EQ. 1)THEN
 !
 ! Compute free-free gaunt factors. Replaces call to GFF in following DO loop.

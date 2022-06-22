@@ -3,7 +3,8 @@
 ! by FREE-FREE and BOUND-FREE processes for a general ion. The
 ! contribution is added directly to the opacity CHI and emissivity ETA.
 !
-	SUBROUTINE COMP_FREE_FREE_V1(CHI_FF,ETA_FF,VCHI_FF,VETA_FF,CONT_FREQ,FREQ,DO_VAR,ND,NT)
+	SUBROUTINE COMP_FREE_FREE_V2(CHI_FF,ETA_FF,VCHI_FF,VETA_FF,CONT_FREQ,FREQ,
+	1                 INIT,USE_EHB,DO_VAR,ND,NT)
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -18,6 +19,8 @@
 	REAL*8 ETA_FF(ND)			!Emissivity
 	REAL*8 VCHI_FF(NT,ND)			!Opacity
 	REAL*8 VETA_FF(NT,ND)			!Emissivity
+	LOGICAL INIT
+	LOGICAL USE_EHB
 	LOGICAL DO_VAR
 !
 ! Constants for opacity etc.
@@ -29,7 +32,9 @@
 !
 	REAL*8 EMHNUKT(ND)		!EXP(-hv/kT)
 	REAL*8 GFF_VAL(ND)		!g(ff) as a function of depth
-	REAL*8 POP_SUM(ND)		!Factor to convert HNST for ION_LEV
+!
+	REAL*8, ALLOCATABLE, SAVE :: POP_SUM(:,:)
+	REAL*8, ALLOCATABLE, SAVE :: GFF_STORE(:,:)
 !
 ! Local constants.
 !
@@ -42,6 +47,26 @@
 	REAL*8 ALPHA,TCHI1,TETA1
 	REAL*8 EMIS
 	REAL*8 HNUONKT
+!
+	IF(INIT)THEN
+	  IF(.NOT. ALLOCATED(POP_SUM))ALLOCATE(POP_SUM(ND,NUM_IONS))
+	  IF(.NOT. ALLOCATED(GFF_STORE))ALLOCATE(GFF_STORE(ND,20))
+	  GFF_STORE=0.0D0
+	  POP_SUM=0.0D0
+	  DO ID=1,NUM_IONS
+	    IF(ATM(ID)%XzV_PRES)THEN
+	      POP_SUM(1:ND,ID)=SUM(ATM(ID+1)%XzV,1)
+	      I=NINT(ATM(ID)%ZXzV)
+	      IF(I .GT. 20)THEN
+	        WRITE(6,*)'Insufficient storage for GFF_STORE in COMP_FREE_FREE_V2'
+	        STOP
+	      ELSE IF(I .LE. 0)THEN
+	      ELSE IF(GFF_STORE(1,I) .EQ. 0.0D0)THEN
+	        CALL GFF_VEC(GFF_STORE(1,I),NU,T,ATM(ID)%ZXzV,ND)
+	      END IF
+	    END IF
+	  END DO
+	END IF
 !
 	NU=FREQ
         T1=-HDKT*NU
@@ -57,35 +82,45 @@
 ! than H and He, we now sum over all levels. To make sure that we only do this
 ! once, we only include the FREE-FREE contribution for the ion when PHOT_ID is one.
 !
+!!!$OMP  PARALLEL DO SCHEDULE(DYNAMIC) REDUCTION(+:CHI_FF,ETA_FF)
+!!!$OMP1 PRIVATE(ID,I,GFF_VAL,TCHI1,TETA1,ALPHA)
 	DO ID=1,NUM_IONS
 	  IF(.NOT. ATM(ID)%XzV_PRES)THEN
-	  ELSE IF(ATM(ID)%ZXzV .EQ. 0.0D0)THEN
-	    POP_SUM=ATM(ID)%XzV_F(1,1:ND)
+	  ELSE IF(ION_ID(ID) .EQ. 'H0')THEN
 	    I=7                                 !Used to read in data on first entry (will not be used here.)
-	    CALL DO_H0_FF(ETA_FF,CHI_FF,POP_SUM,ED,T,EMHNUKT,NU,I,ND)
-	  ELSE
+	    CALL DO_H0_FF(ETA_FF,CHI_FF,POP_SUM(1,ID),ED,T,EMHNUKT,NU,I,ND)
+	  ELSE IF(NINT(ATM(ID)%ZXzV) .GT. 0.0D0)THEN
 !
 ! Compute free-free gaunt factors. Replaces call to GFF in following DO loop.
 !
-	    CALL GFF_VEC(GFF_VAL,NU,T,ATM(ID)%ZXzV,ND)
+	    GFF_VAL=GFF_STORE(:,NINT(ATM(ID)%ZXzV))
 	    CALL FF_RES_GAUNT(GFF_VAL,NU,T,ID,ATM(ID)%GIONXzV_F,ATM(ID)%ZXzV,ND)
 !
 ! We use POP_SUM as a temporary vector containing the sum of all level populations in
 ! the ion at each depth.
 !
-	    POP_SUM(1:ND)=SUM(ATM(ID+1)%XzV,1)
 	    TCHI1=CHIFF*ATM(ID)%ZXzV*ATM(ID)%ZXzV/(FREQ*FREQ*FREQ)
 	    TETA1=CHIFF*ATM(ID)%ZXzV*ATM(ID)%ZXzV*TWOHCSQ
 	    DO I=1,ND
-	      ALPHA=ED(I)*POP_SUM(I)*GFF_VAL(I)/SQRT(T(I))
+	      ALPHA=ED(I)*POP_SUM(I,ID)*GFF_VAL(I)/SQRT(T(I))
 	      CHI_FF(I)=CHI_FF(I)+TCHI1*ALPHA*(1.0D0-EMHNUKT(I))
 	      ETA_FF(I)=ETA_FF(I)+TETA1*ALPHA*EMHNUKT(I)
 	    END DO
+	  END IF
+	END DO
+!!!$OMP END PARALLEL DO
 !
-	    IF(DO_VAR)THEN
+	IF(USE_EHB .AND. DO_VAR)THEN
+	  DO ID=1,NUM_IONS
+	    IF(.NOT. ATM(ID)%XzV_PRES)THEN
+	    ELSE
+	      GFF_VAL=GFF_STORE(:,NINT(ATM(ID)%ZXzV))
+	      CALL FF_RES_GAUNT(GFF_VAL,NU,T,ID,ATM(ID)%GIONXzV_F,ATM(ID)%ZXzV,ND)
 	      EQION=ATM(ID+1)%EQXzV
+	      TCHI1=CHIFF*ATM(ID)%ZXzV*ATM(ID)%ZXzV/(FREQ*FREQ*FREQ)
+	      TETA1=CHIFF*ATM(ID)%ZXzV*ATM(ID)%ZXzV*TWOHCSQ
 	      DO I=1,ND
-	        ALPHA=POP_SUM(I)*GFF_VAL(I)/SQRT(T(I))
+	        ALPHA=POP_SUM(I,ID)*GFF_VAL(I)/SQRT(T(I))
 	        VCHI_FF(NT-1,I)=VCHI_FF(NT-1,I)+TCHI1*ALPHA*(1.0D0-EMHNUKT(I))
 	        VETA_FF(NT-1,I)=VETA_FF(NT-1,I)+TETA1*ALPHA*EMHNUKT(I)
 !
@@ -98,13 +133,13 @@
 	        END DO
 !
 	        HNUONKT=HDKT*NU/T(I)
-	        ALPHA=ED(I)*POP_SUM(I)*GFF_VAL(I)/SQRT(T(I))/T(I)
+	        ALPHA=ED(I)*POP_SUM(I,ID)*GFF_VAL(I)/SQRT(T(I))/T(I)
 		VCHI_FF(NT,I)=VCHI_FF(NT,I)-TCHI1*ALPHA*(0.5D0+(HNUONKT-0.5D0)*EMHNUKT(I))
 		VETA_FF(NT,I)=VETA_FF(NT,I)+TETA1*ALPHA*(HNUONKT-0.5D0)*EMHNUKT(I)
 	      END DO
 	    END IF
-	  END IF
-	END DO
+	  END DO
+	END IF
 !
 	RETURN
 	END

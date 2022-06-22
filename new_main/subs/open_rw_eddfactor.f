@@ -99,10 +99,11 @@
 !
 	IF(COMPUTE_EDDFAC)THEN
 	  IF(USE_FIXED_J)THEN
-	    WRITE(LUER,*)'Error in CMFGEN_SUB'
+	    WRITE(LUER,'(//,A,/)')'Error in OPEN_RW_EDDFACTOR'
 	    WRITE(LUER,*)'Program will compute new values but this is'//
 	1                      ' incompatable with US_FIXED_J=T'
-	    WRITE(LUER,'(A)')'Currently trying to read ',TRIM(FILENAME)
+	    WRITE(LUER,*)'Currently trying to read ',TRIM(FILENAME)
+	    WRITE(LUER,'(A,//)')'Stopping program'
 	    STOP
 	  END IF
 !

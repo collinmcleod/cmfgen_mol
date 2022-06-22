@@ -87,13 +87,13 @@ C
 !
 ! This is the same ID used in CMFGEN, and used to read files etc.
 !
-	DATA GEN_ION_ID /'MI','I','2','III','IV','V',
+	DATA GEN_ION_ID /'0','I','2','III','IV','V',
 	1                'SIX','SEV','VIII','IX','X','XI','XII',
 	1                'XIII','XIV','XV','XSIX','XSEV','X8','X9','XX'/
 !
 ! This is used for writing plot title etc.
 !
-	DATA ROM_ION_ID /'MI','I','II','III','IV','V',
+	DATA ROM_ION_ID /'\u-1\d','I','II','III','IV','V',
 	1                'VI','VII','VIII','IX','X','XI','XII',
 	1                'XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX'/
 !

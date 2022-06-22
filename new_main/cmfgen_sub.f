@@ -1215,11 +1215,11 @@
 	INQUIRE(FILE='GAMRAY_ENERGY_DEP',EXIST=CHK)       
 	IF(GAMRAY_TRANS .EQ. 'RAD_TRANS' .AND. .NOT. CHK)THEN
 	  WRITE(6,'(A)')'Running the gamma-ray routine GAMRAY_SUB_V3'
-	  CALL TUNE(1,'FULL_GAMMA')
+	  CALL TUNE(IONE,'FULL_GAMMA')
 	  CALL GAMRAY_SUB_V3(ND,NC,NP,P,R,V,SIGMA,VDOP_VEC,CLUMP_FAC,
 	1         MU_AT_RMAX,HQW_AT_RMAX,DELV_FRAC_FG,REXT_FAC,METHOD,
 	1         INSTANTANEOUS_ENERGY_DEPOSITION,SN_AGE_DAYS)
-	  CALL TUNE(2,'FULL_GAMMA')
+	  CALL TUNE(ITWO,'FULL_GAMMA')
 	  CALL TUNE(3,' ')
 	ELSE IF(GAMRAY_TRANS .EQ. 'RAD_TRANS')THEN
 	  WRITE(6,'(A)')'Using previosuly computed GAMRAY_ENERGY_DEP file'
@@ -1464,10 +1464,10 @@
 ! NB: Care must taken to ensure that this section remains consistent
 !      with that in continuum calculation section.
 !
-	  CALL TUNE(1,'SET_LINE_OPAC')
+	  CALL TUNE(IONE,'SET_LINE_OPAC')
 	    CALL SET_LINE_OPAC(POPS,NU,FREQ_INDX,LAST_LINE,N_LINE_FREQ,
 	1          LST_DEPTH_ONLY,LUER,ND,NT,NCF,MAX_SIM)
-	  CALL TUNE(2,'SET_LINE_OPAC')
+	  CALL TUNE(ITWO,'SET_LINE_OPAC')
 !
 ! Add in line opacity.
 !
@@ -1540,7 +1540,7 @@
 !
 	WRITE(6,*)'Zeroing BA matrices'
 	FLUSH(UNIT=6)
-	CALL TUNE(1,'ZBA')
+	CALL TUNE(IONE,'ZBA')
 !$OMP PARALLEL WORKSHARE
 	FORALL (ID=1:NION)
 	  SE(ID)%STEQ   =0.0D0
@@ -1548,7 +1548,7 @@
 	  SE(ID)%BA_PAR =0.0D0
 	END FORALL 
 !$OMP END PARALLEL WORKSHARE
-	CALL TUNE(2,'ZBA')
+	CALL TUNE(ITWO,'ZBA')
 	STEQ_ED=0.0D0
 	STEQ_T=0.0D0
 	STEQ_T_EHB=0.0D0
@@ -1648,7 +1648,7 @@
 !
 ! Compute the collisional cooling terms for digestion.
 !
-	  CALL TUNE(1,'COL_DIGEST')
+	  CALL TUNE(IONE,'COL_DIGEST')
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      TMP_STRING=TRIM(ION_ID(ID))//'_COL_DATA'
@@ -1662,7 +1662,7 @@
 	1        ID,TMP_STRING,OMEGA_GEN_V3,ED,T,ND)
 	    END IF
 	  END DO
-	  CALL TUNE(2,'COL_DIGEST')
+	  CALL TUNE(ITWO,'COL_DIGEST')
 !
 ! 
 !
@@ -2089,10 +2089,10 @@
 !
 ! Include lines 
 !
-	CALL TUNE(1,'SET_LINE_OPAC')
+	CALL TUNE(IONE,'SET_LINE_OPAC')
         CALL SET_LINE_OPAC(POPS,NU,ML,LAST_LINE,N_LINE_FREQ,
 	1         LST_DEPTH_ONLY,LUER,ND,NT,NCF,MAX_SIM)
-	CALL TUNE(2,'SET_LINE_OPAC')
+	CALL TUNE(ITWO,'SET_LINE_OPAC')
 !
 	CALL INIT_LINE_OPAC_VAR_V2(LAST_LINE,LUER,ND,TX_OFFSET,MAX_SIM,NM)
 !
@@ -2127,7 +2127,7 @@
 ! opacity and emissivity. These are used in carrying the variation of J from 
 ! one frequency to the next.
 !
-	    CALL TUNE(1,'RS_ZONE')
+	    CALL TUNE(IONE,'RS_ZONE')
 	    DO SIM_INDX=1,MAX_SIM
 	      IF(RESONANCE_ZONE(SIM_INDX))THEN
 	        DO I=1,ND
@@ -2136,7 +2136,7 @@
 	        END DO
 	      END IF
 	    END DO
-	    CALL TUNE(2,'RS_ZONE')
+	    CALL TUNE(ITWO,'RS_ZONE')
 !
 !	    DO I=1,ND
 !	      IF(CHI(I)*R(I) .LT. 1.0D-04)THEN
@@ -2375,7 +2375,7 @@
 ! Update line net rates, and the S.E. Eq. IFF we have finished a line 
 ! transition.
 !
-	CALL TUNE(1,'JBAR_SIM')                      
+	CALL TUNE(IONE,'JBAR_SIM')                      
 	DO SIM_INDX=1,MAX_SIM
 	  IF(RESONANCE_ZONE(SIM_INDX))THEN
 	    DO I=1,ND
@@ -2386,7 +2386,7 @@
 	    END DO
 	  END IF
 	END DO
-	CALL TUNE(2,'JBAR_SIM')                      
+	CALL TUNE(ITWO,'JBAR_SIM')                      
 !
 ! Update the S.E. Eq. IFF we have finished a line transition (i.e. are at
 ! the final point of the resonance zone.) 
@@ -2713,12 +2713,20 @@
 !
 ! Needs revising.
 !
-	IF(ML .EQ. 1)WRITE(6,*)'Free-free correction may need revising'
-	CALL  COMP_FREE_FREE_V1(CHI,ETA,VCHI,VETA,CONT_FREQ,FL,COMPUTE_BA,ND,NT)
-	T1=1.0D-10*16.0D0*ATAN(1.0D0)*FQW(ML)	
-	DO I=1,ND
-	   STEQ_T_EHB(I)=STEQ_T_EHB(I)+T1*(CHI(I)*RJ(I)-ETA(I))
-	END DO
+!
+! Needs revising.
+!
+	IF(USE_ELEC_HEAT_BAL .OR. COMP_STEQ_T_EHB)THEN
+	  CALL TUNE(IONE,'FF_EB_COR')
+	  IF(ML .EQ. 1)WRITE(6,*)'Free-free correction may need revising'
+	  CALL  COMP_FREE_FREE_V2(CHI,ETA,VCHI,VETA,CONT_FREQ,FL,
+	1           FIRST_FREQ,USE_ELEC_HEAT_BAL,COMPUTE_BA,ND,NT)
+	  T1=1.0D-10*16.0D0*ATAN(1.0D0)*FQW(ML)
+	  DO I=1,ND
+	    STEQ_T_EHB(I)=STEQ_T_EHB(I)+T1*(CHI(I)*RJ(I)-ETA(I))
+	  END DO
+	  CALL TUNE(ITWO,'FF_EB_COR')
+	END IF
 !
 	IF(USE_ELEC_HEAT_BAL .AND. COMPUTE_BA .AND. .NOT. LAMBDA_ITERATION)THEN
 	  CALL BA_EHB_FF_UPDATE_V1(VJ,VCHI,VETA,
@@ -3812,7 +3820,12 @@
 	END IF
 !
 	CALL WR2D_V2(STEQ_T,IONE,ND,'Radiative Equlibrium Equation','&',L_TRUE,LU_SE)
-	CALL WR2D_V2(STEQ_T_EHB,IONE,ND,'Electron Energy Balance Equation','%',L_TRUE,LU_SE)
+	IF(USE_ELEC_HEAT_BAL .OR. COMP_STEQ_T_EHB)THEN
+	  CALL WR2D_V2(STEQ_T_EHB,IONE,ND,'Electron Energy Balance Equation','%',L_TRUE,LU_SE)
+	ELSE
+	  STEQ_T_EHB=0.0D0
+	  CALL WR2D_V2(STEQ_T_EHB,IONE,ND,'Electron Energy Balance Equation (not computed)','%',L_TRUE,LU_SE)
+	END IF
 !
 ! 
 ! Reread in BA array if we are not to compute it. There should be no problem

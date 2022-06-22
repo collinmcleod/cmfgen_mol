@@ -15,6 +15,8 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
+!
+! ALtered 190Jun-2022 - Reactivated lowering of GAM_LIM to avoid -ve velocity gradients. 
 ! Altered 21-Apr-2021 - More accrate R write to RVSIG_COL for PLANE_PARALLEL models.
 ! Altered 05-Jun-2015 - Fixed bug; GAM_LIM_STORE was not being set to GAM_LIM when it was read
 !                           in from the HDYRO_DEFAULTS file.
@@ -787,13 +789,13 @@
 	    CHI_ROSS(I)=ED_ON_NA(I)*SIGMA_TH*POP_ATOM(I)*ROSS_ON_ES
 	    GAMMA_FULL(I)=GAM_FULL
 	    V(I)=MDOT/MU_ATOM/POP_ATOM(I)/R(I)/R(I)
-!	    IF(.NOT. PLANE_PARALLEL_NO_V)THEN
-!	      IF(V(I) .GE. V(I-1))THEN
-!	        GAM_LIM=GAM_LIM-0.01
-!	        IF(VERBOSE_OUTPUT)WRITE(LUV,*)'Resetting GAM_LIM due to -ve velocity gradient'
-!	        GOTO 100
-!	      END IF 
-!	    END IF
+	    IF(.NOT. PLANE_PARALLEL_NO_V)THEN
+	      IF(V(I) .GE. V(I-1))THEN
+	        GAM_LIM=GAM_LIM-0.01
+	        IF(VERBOSE_OUTPUT)WRITE(LUV,*)'Resetting GAM_LIM due to -ve velocity gradient'
+	        GOTO 100
+	      END IF 
+	    END IF
 	    GAM_LIM=GAM_LIM_STORE
 	    ND=I
 !

@@ -27,6 +27,10 @@ ifeq ($(HOST),osiris-inode01.phyast.pitt.edu)
 INSTALL_DIR=$(HOME)/cur_cmf/
 endif
 
+ifeq ($(HOST),osiris-wnode04.phyast.pitt.edu)
+INSTALL_DIR=$(HOME)/wnode04/cur_cmf/
+endif
+
 ifeq ($(HOST),lorikeet.phyast.pitt.edu)
 INSTALL_DIR=/export/home/jdh/cur_cmf/
 endif
@@ -96,6 +100,22 @@ ifeq ($(HOST),osiris-inode01.phyast.pitt.edu)
  BLAS=
  LAPACK=-L/opt/intel/compilers_and_libraries/linux/mkl/lib/intel64 -lmkl_blas95_lp64 -lmkl_lapack95_lp64 \
 -L/opt/intel/compilers_and_libraries/linux/lib/intel64 -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core -lgomp -lpthread -lm -ldl
+ X11LIB=-L/usr/X11R6/lib -lX11
+ PGLIB=-L/nfs-share/home/hillier/pgplot -lpgplot
+endif
+
+ifeq ($(HOST),osiris-wnode04.phyast.pitt.edu)
+ F90 = gfortran -fopenmp -m64 -I/opt/intel/compilers_and_libraries/linux/include
+ F90nomp = gfortran -I/opt/intel/compilers_and_libraries/linux/mkl/lib/intel64/lp64 -m64 -I/opt/intel/compilers_and_libraries/linux/include
+ FG  = -O -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -fbacktrace -ffpe-trap=invalid -I$(MOD_DIR) -J$(MOD_DIR)
+ FH  = -O -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments -fbacktrace -I$(MOD_DIR) -J$(MOD_DIR)
+ FD  = -g -O0  -ffixed-line-length-0 -fno-backslash -fd-lines-as-comments  -ffpe-trap=invalid -fbacktrace -I$(MOD_DIR) -J$(MOD_DIR)
+ FFREE  = -O -fno-backslash -I$(MOD_DIR) -J$(MOD_DIR)
+ FFRED  = -g -fno-backslash -O0 -I$(MOD_DIR) -J$(MOD_DIR)
+
+ BLAS=
+ LAPACK=-L/opt/intel/compilers_and_libraries/linux/mkl/lib/intel64 -lmkl_blas95_lp64 -lmkl_lapack95_lp64 \
+-L/opt/intel/compilers_and_libraries_/linux/lib/intel64 -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core -lgomp -lpthread -lm -ldl
  X11LIB=-L/usr/X11R6/lib -lX11
  PGLIB=-L/nfs-share/home/hillier/pgplot -lpgplot
 endif

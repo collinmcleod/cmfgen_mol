@@ -1,5 +1,5 @@
 C
-C Subroutine to convert from the default Jv units (ergs/cm^2/s/Hz) to other
+C Subroutine to convert from the default Jv units (erg/cm^2/s/Hz) to other
 C units: Current options are:
 C        For X axis:  Ang, um, 10^15 Hz, ev, keV, km/s, Mm/s (and Log)
 C        For Y axis:  Jv, vF(v), Flam (and Log0
@@ -38,18 +38,18 @@ C
 	      T1=1.0D+15
 	      YV(I)=T1*XV(I)*YV(I)
 	    END DO
-	    Y_LAB='\gnJ\d\gn\u(ergs\d cm\u-2 \ds\u-1\d)' 
-	    IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(ergs\d \ucm\u-2 \ds\u-1\d)' 
+	    Y_LAB='\gnJ\d\gn\u(erg\d cm\u-2 \ds\u-1\d)' 
+	    IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)' 
 	  ELSE IF(Y_PLT_OPT .EQ. 'FLAM')THEN
 	    T1=1.0E+22/C_CMS	  	!1.0E+30*1.0E-08
 	    DO I=1,NBB
 	      YV(I)=T1*YV(I)*XV(I)*XV(I)
 	    END DO
-	    Y_LAB='J\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)' 
-	    IF(LOG_Y)Y_LAB='Log J\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A)' 
+	    Y_LAB='J\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)' 
+	    IF(LOG_Y)Y_LAB='Log J\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)' 
 	  ELSE IF(Y_PLT_OPT .EQ. 'FNU')THEN
-	    Y_LAB='J\d\gn\u(ergs\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)' 
-	    IF(LOG_Y)Y_LAB='Log J\d\gn\u(ergs\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
+	    Y_LAB='J\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)' 
+	    IF(LOG_Y)Y_LAB='Log J\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
 	  END IF
 	END IF
 C

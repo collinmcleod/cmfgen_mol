@@ -177,8 +177,8 @@
 	REAL*4 EW,CENTROID
 	REAL*4 XCUR(2),YCUR(2),SLOPE
 	INTEGER PLOT_ID,CURSERR
-	INTEGER IP_CONT
 	INTEGER L_CHAN(2)
+	INTEGER, SAVE :: IP_CONT=0
 	INTEGER, SAVE :: LU_EW=30
 	INTEGER, SAVE :: LU_NORM=31
 	LOGICAL, SAVE :: FIRST_EW=.TRUE.
@@ -206,6 +206,7 @@
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2
 	INTEGER, PARAMETER :: IFOUR=4
+	INTEGER, PARAMETER :: IFIVE=5
 !
 ! Parameters for indicating the size of the plot.
 !
@@ -373,7 +374,6 @@
 	  ID_FILNAME='LINE_ID'
 	  EW_FILNAME='ewdata_fin'
 	  EW_CUT=1.0D0
-	  IP_CONT=0
 	  WRITE_COMMENT=.FALSE.
 	END IF
 	CALL GEN_ASCI_OPEN(LU_NORM,'NORM_FACTORS','UNKNOWN','APPEND',' ',IZERO,IOS)
@@ -551,6 +551,7 @@
           WRITE(T_OUT,*)'E   - EXIT from PLOT package'
 	  WRITE(T_OUT,*)'Z   - Hardcopy (ZN=Asks for new hard device)'
           WRITE(T_OUT,*)'LP  - Allow a long hard copy postscript plot to be created (with CPS)'
+	  WRITE(T_OUT,*)'CUT - Cut unecessary points from a curve to reduce final plot size'
 	  WRITE(T_OUT,*)' '
           WRITE(T_OUT,*)'A    - Define Axis Parameters'
           WRITE(T_OUT,*)'2A   - Define labeling of right-hand axis'
@@ -570,6 +571,7 @@
 	  WRITE(T_OUT,*)'RCP - Reset default color pens'
 	  WRITE(T_OUT,*)'CBP - Set pens for color blindness'
 	  WRITE(T_OUT,*)'GP  - Set default for grey pens'
+	  WRITE(T_OUT,*)'SFP - Adds an offset to color pen defs. (may not work with all opts)'
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
 !
@@ -604,26 +606,37 @@
 	  WRITE(T_OUT,*)'YAR  - Simple Y axis arithmetic'
 	  WRITE(T_OUT,*)'VAR  - Simple arithmetic on two plots'
 	  WRITE(T_OUT,*)'NM   - Scale average to 1 or to another plot'
+	  WRITE(T_OUT,*)'NMS  - Similar to NM but for automatic plotting'
 	  WRITE(T_OUT,*)'REP  - Simple replacment of data -- cursor or file with node information'
-	  WRITE(T_OUT,*)'RREP - A more fancy approach to data replacment'
+	  WRITE(T_OUT,*)'FREP - A more fancy approach to data replacment'
 	  WRITE(T_OUT,*)'REG  - Regrid plot - UG, dX, R or NINS'
 	  WRITE(T_OUT,*)'ADDN - Add Poisonian noise'
-	  WRITE(T_OUT,*)'SM   - Smooth data -- ignires X-spaicng of data'
+	  WRITE(T_OUT,*)'SM   - Smooth data (Han) -- ignores X-spacing of data'
+	  WRITE(T_OUT,*)'BXSM - Smooth data (box filter) -- ignores X-spacing of data'
 	  WRITE(T_OUT,*)'GSM  - Gaussian smoothing -- set resolution'
 !
 	  WRITE(T_OUT,*)' '
-	  WRITE(T_OUT,*)'LOC - Use a cursor to read of (X,Y) coordinates on a plot'
-	  WRITE(T_OUT,*)'DC  - Define a straight line continuum for EW'
+	  WRITE(T_OUT,*)'LOC  - Use a cursor to read of (X,Y) coordinates on a plot'
+	  WRITE(T_OUT,*)'CONT - Define a continuumi using cursors'
+	  WRITE(T_OUT,*)'DC   - Define a continuum for EW measurmenst (line segments or monotonc cubic'
+	  WRITE(T_OUT,*)'MCN  - Define a continuum with repeate call using cursors'
+	  WRITE(T_OUT,*)' '
+!
+	  WRITE(T_OUT,*)'CEW - Measure the EW of a single line using cursors and a local continuum'
 	  WRITE(T_OUT,*)'EW  - Measure the EW of a single line'
+	  WRITE(T_OUT,*)'EWG - Measure the EW of many lines use Gaussian fiting usig data from a file'
 	  WRITE(T_OUT,*)'GF  - Fit a (modfied) gaussian to an absorption or emission line'  
 	  WRITE(T_OUT,*)'MGF - Fit multiple gaussian to an absorption or emission complex'  
 	  WRITE(T_OUT,*)'EGF - Edit gauss-fit arameters'
 	  WRITE(T_OUT,*)'DG  - Draw gauss-fit.'
 	  WRITE(T_OUT,*)'WGF - Write gauss-fit parameters to a file'
+	  READ(T_IN,'(A)')ANS				!can use ANS here.
+	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
 !
 	  WRITE(T_OUT,*)' '
 	  WRITE(T_OUT,*)'RXY  - Read plot from asci file'
 	  WRITE(T_OUT,*)'WXY  - Write plot to asci file'
+	  WRITE(T_OUT,*)'WOBS - Write plot to asci file in same format as OBSFLUX'
 	  WRITE(T_OUT,*)'SXY  - Write section of data to terminal'
 	  WRITE(T_OUT,*)'RP   - Read labeled plots from direct accecs file'
 	  WRITE(T_OUT,*)'RPF  - Similar to RP but asks for filename'
@@ -952,13 +965,14 @@ C
 ! We do not edit CURVE labels here -- this is done with EDCL
 !
 	ELSE IF(ANS .EQ. 'L')THEN
-	  WRITE(6,*)'Use EDCL to edit curve labels'
+	  WRITE(6,*)'Use EDCL to edit curve labels and titles'
 	  CALL NEW_GEN_IN(XLABEL,'XLAB')
 	  CALL NEW_GEN_IN(YLABEL,'YLAB')
 !
 ! This section allows us to edit a title, and delete a title but keep remaining titles.
 !
 	  J=1
+	  TITLE(N_HEADER+1:)=' '
 	  DO WHILE(J .LE. N_TITLE)
 	    CALL NEW_GEN_IN(TITLE(J),'TITLE')
 	    IF(TITLE(J) .EQ. ' ' .AND. TITLE(MIN(J+1,N_TITLE)) .EQ. ' ')THEN
@@ -1646,12 +1660,35 @@ C
 	  END IF
 	  TMP_LOG=.TRUE.
 	  CALL NEW_GEN_IN(TMP_LOG,'Use cursor to devine regions:')
+!
 	  IF(TMP_LOG)THEN
+!
+	    WRITE(6,'(A)')' '
+	    WRITE(6,'(A)')' Default uses data to define y vale'
+	    WRITE(6,'(A)')' Use Y (or y) with cursor to use cursor value'
+	    WRITE(6,'(A)')' Use E or e to exit'
+	    WRITE(6,'(A)')' '
 	    DO J=1,10
+!
 	      CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
-	      IF(END_CURS(CURSVAL))EXIT
+	      XCUR(2)=XCUR(1); YCUR(2)=YCUR(1)
+	      IF(CURSVAL .EQ. 'E' .OR. CURSVAL .EQ. 'e')EXIT
+	      IF(CURSVAL .EQ. 'Y' .OR. CURSVAL .EQ. 'y')THEN
+	      ELSE
+	        I=GET_INDX_SP(XCUR(1),CD(PLOT_ID)%XVEC,NPTS(PLOT_ID))
+	        YCUR(1)=CD(PLOT_ID)%DATA(I)
+	      END IF
+	      CALL PGPT(IONE,XCUR(1),YCUR(1),ITWO)
+!
 	      CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
-	      IF(END_CURS(CURSVAL))EXIT
+	      IF(CURSVAL .EQ. 'E' .OR. CURSVAL .EQ. 'e')EXIT
+	      IF(CURSVAL .EQ. 'Y' .OR. CURSVAL .EQ. 'y')THEN
+	      ELSE
+	        I=GET_INDX_SP(XCUR(2),CD(PLOT_ID)%XVEC,NPTS(PLOT_ID))
+	        YCUR(2)=CD(PLOT_ID)%DATA(I)
+	      END IF
+	      CALL PGPT(IONE,XCUR(2),YCUR(2),ITWO)
+!
 	      SLOPE=(YCUR(2)-YCUR(1))/(XCUR(2)-XCUR(1))
 	      DO I=1,NPTS(PLOT_ID)
 	        IF( (CD(PLOT_ID)%XVEC(I)-XCUR(1))*(CD(PLOT_ID)%XVEC(I)-XCUR(2)) .LT. 0.0D0)THEN
@@ -1659,6 +1696,7 @@ C
 	        END IF
 	      END DO
 	    END DO
+!
 	  ELSE 
 	    FILNAME='CONT_NODES'
 	    CALL NEW_GEN_IN(FILNAME,'File with cursor nodes')
@@ -1747,6 +1785,13 @@ C
 	  GOTO 1000
 !
 	ELSE IF (ANS .EQ. 'CONT')THEN
+!
+	  WRITE(6,'(A)')' '
+	  WRITE(6,'(A)')' Define continuum using X & Y cursor locations'
+	  WRITE(6,'(A)')' Striaght line firt across cursor band'
+	  WRITE(6,'(A)')' ROutine can be called multiple times'
+	  WRITE(6,'(A)')' Use E to exit cursor selection.'
+	  WRITE(6,'(A)')' '
 	  IF(NPLTS .EQ. 1)THEN
 	    PLOT_ID=1
 	  ELSE
@@ -1816,6 +1861,7 @@ C
             NPTS(IP)=I
             IF(IP .GT. NPLTS)NPLTS=IP
 	  END IF
+	  CD(IP)%CURVE_ID=' '
 	  GOTO 1000
 C
 	ELSE IF(ANS .EQ. 'GF')THEN
@@ -2390,6 +2436,9 @@ C
 	  WRITE(T_OUT,*)NP_OUT,' plots written to ',TRIM(FILNAME)
 	  CLOSE(UNIT=30)
 !
+!  Writes data to a file with same format as OBSFLUX. Option assumes
+!  units are 10^15 Hz and Jy at 1 kps.
+!
 	ELSE IF(ANS .EQ. 'WOBS')THEN
 	  FILNAME=' '
 	  CALL NEW_GEN_IN(FILNAME,'FILE=')
@@ -2746,7 +2795,7 @@ C
 	  T1=0.0; T2=0.0
 	  CALL NEW_GEN_IN(REG_OPT,'Regrid option: UG, dX, R, NINS')
 	  CALL SET_CASE_UP(REG_OPT,1,0)
-	  IF(REG_OPT .NE. 'UG')CALL NEW_GEN_IN(T1,'UG, dX, R, or NINS (zero to quit)')
+	  IF(REG_OPT .NE. 'UG')CALL NEW_GEN_IN(T1,'dX, R, or NINS (zero to quit)')
 	  CALL DO_PG_REGRID(VAR_PLT1,VAR_PLT3,XPAR(1),XPAR(2),REG_OPT,T1)
 !
 	ELSE IF(ANS .EQ. 'ADDN')THEN

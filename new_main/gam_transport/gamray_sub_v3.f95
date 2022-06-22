@@ -11,6 +11,7 @@
 	USE NUC_ISO_MOD, ONLY : RADIOACTIVE_DECAY_ENERGY
 	IMPLICIT NONE
 !
+! Altered 02-Jun-2022 : Fixed bug with format statement (extra )).
 ! Altered 21-Nov-2021 : Added access to RADIOACTIVE_DECAY_ENERGY
 ! Altered 19-Nov-2021 : Added SN_AGE_DAYS to call. Added SN_AGE_DAYS to gamma_energy_dep_v7 call.
 ! Altered 18-Nov-2021 : THK_CONT initialized to FALSE.
@@ -252,7 +253,7 @@
 	    WRITE(LUER,*)'Trouble opening ./data/nu_end.dat; IOSTAT=',IOS
 	    STOP
 	  END IF
-	  WRITE(7,'(A5,2X,A5,2X,5(A16,2X)))')'!  I','IEND','NU','NU_BACK_SCAT','NU(IEND-1)','NU(IEND)','NU(IEND+1)'
+	  WRITE(7,'(A5,2X,A5,2X,5(A16,2X))')'!  I','IEND','NU','NU_BACK_SCAT','NU(IEND-1)','NU(IEND)','NU(IEND+1)'
 	END IF
 	DO I=1,NF_GRID_PTS
 	  T1=NU_GRID_VEC(I)/(1.0D0+2.0D0*HoMC2*NU_GRID_VEC(I))

@@ -160,7 +160,7 @@
 ! etc. Normally T_IN can be the same as He2_IN (i.e. any input departure
 ! coefficient file). 
 !
-	  CALL REGRID_T_ED(R,ED,T,POP_ATOM,ND,'T_IN')
+	  CALL REGRID_T_ED_V3(R,ED,T,POP_ATOM,ND,DC_INTERP_METHOD,'T_IN')
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      TMP_STRING=TRIM(ION_ID(ID))//'_IN'

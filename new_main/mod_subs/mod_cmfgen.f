@@ -244,7 +244,7 @@
 !
 ! Indicates generic ionization names.
 !
-	DATA GEN_ION_ID /'MI','I','2','III','IV','V',
+	DATA GEN_ION_ID /'0','I','2','III','IV','V',
 	1                'SIX','SEV','VIII','IX','X','XI','XII',
 	1                'XIII','XIV','XV','XSIX','XSEV','X8','X9','XX'/
 !

@@ -89,7 +89,7 @@
 	  T1=2.0D0*PI*1.0D+23*(1.0E+10/T1)**2
 	  YV(1:NCF)=YV(1:NCF)*T1
 !
-! Now convert to ergs/cm^/s/Ang
+! Now convert to erg/cm^/s/Ang
 !
 	  T1=1.0D-23*1.0D+15
 	  YV(1:NCF)=T1*YV(1:NCF)*NU(1:NCF)/LAM(1:NCF)
@@ -170,7 +170,7 @@
 	  CALL GRAMON_PGPLOT(XLAB,'Jy',' ',' ')
 	ELSE IF(UC(FLUX_OPT(1:1)) .EQ. 'E')THEN
 	  CALL DP_CURVE(SM_NP,XV,CONT_FLUX)
-	  CALL GRAMON_PGPLOT(XLAB,'ergs/cm\u2\d/s',' ',' ')
+	  CALL GRAMON_PGPLOT(XLAB,'erg/cm\u2\d/s',' ',' ')
 	ELSE
 	  WRITE(6,*)'Unknown unit - skipping continuum flux plot'
 	END IF

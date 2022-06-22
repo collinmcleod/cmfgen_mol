@@ -663,6 +663,8 @@
 	CALL CMF_FLUX_SUB_V5(ND,NC,NP,ND_MAX,NP_MAX,NT,N_LINE_MAX)
 !
 	CALL TUNE(3,' ')
+!
+	WRITE(LUER,'(//,A,//)')' CMF_FLUX has finished'
 	STOP
 !
 	END

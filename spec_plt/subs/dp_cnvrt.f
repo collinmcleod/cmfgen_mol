@@ -38,22 +38,22 @@ C
 	      T1=1.0D-08			!*1.0E-23*1.0E+15
 	      YV(I)=T1*XV(I)*YV(I)
 	    END DO
-	    Y_LAB='\gnF\d\gn\u(ergs\d cm\u-2 \ds\u-1\d)' 
-	    IF(LOG_Y)Y_LAB='Log \gnF\d\gn\u(ergs\d \ucm\u-2 \ds\u-1\d)' 
+	    Y_LAB='\gnF\d\gn\u(erg\d cm\u-2 \ds\u-1\d)' 
+	    IF(LOG_Y)Y_LAB='Log \gnF\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)' 
 	  ELSE IF(Y_PLT_OPT .EQ. 'FLAM')THEN
 	    T1=1.0E-01/C_CMS	  	!1.0E-23*1.0E+30*1.0E-08
 	    DO I=1,NBB
 	      YV(I)=T1*YV(I)*XV(I)*XV(I)
 	    END DO
-	    Y_LAB='F\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A\u-1\d)' 
-	    IF(LOG_Y)Y_LAB='Log F\d\gl\u(ergs\d \ucm\u-2 \ds\u-1 \d\A\u-1\d)'
+	    Y_LAB='F\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A\u-1\d)' 
+	    IF(LOG_Y)Y_LAB='Log F\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A\u-1\d)'
 	  ELSE IF(Y_PLT_OPT .EQ. 'LAM_FLAM')THEN
 	    T1=1.0E-08		  	!1.0E-23*1.0E+15
 	    DO I=1,NBB
 	      YV(I)=T1*XV(I)*YV(I)
 	    END DO
-	    Y_LAB='\glF\d\gl\u(ergs\d \ucm\u-2 \ds\u-1\d)'
-	    IF(LOG_Y)Y_LAB='Log \glF\d\gl\u(ergs\d \ucm\u-2 \ds\u-1\d)'
+	    Y_LAB='\glF\d\gl\u(erg\d \ucm\u-2 \ds\u-1\d)'
+	    IF(LOG_Y)Y_LAB='Log \glF\d\gl\u(erg\d \ucm\u-2 \ds\u-1\d)'
 	  ELSE IF(Y_PLT_OPT .EQ. 'FNU')THEN
 	    Y_LAB='F\d\gn\u(Jy)'
 	    IF(LOG_Y)Y_LAB='Log F\d\gn\u(Jy)'

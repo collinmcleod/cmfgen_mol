@@ -3,6 +3,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 06-Jun-2022 : Variable COMP_STEQ_T_EHB ([COMP_EHB]) added.
 ! Altered : 15-Nov-2021 : Fixed read in calls for FIX_ALL_SPEC and BC_PAR1.
 ! Altered : 14-Jul-2019 : R_PNT_SRCE, TEFF_PNT_SRCE, NC_PNT_SRCE, LOGICAL PNT_SRCE_MOD, USE_ELEC_HEAT_BAL (from osiris)
 !                            Added to ibis 14-Aug-2019
@@ -937,6 +938,10 @@ C
 	  USE_ELEC_HEAT_BAL=.FALSE.
 	  CALL RD_STORE_LOG(USE_ELEC_HEAT_BAL,'USE_EHB',L_FALSE,
 	1            'Use electron heating/cooling balance as T constraint?')
+	  COMP_STEQ_T_EHB=USE_ELEC_HEAT_BAL
+	  CALL RD_STORE_LOG(COMP_STEQ_T_EHB,'COMP_EHB',L_FALSE,
+	1            'Compute electron heating/cooling balance as T constraint check?')
+
 !
 	  CALL RD_STORE_NCHAR(METH_SOL,'SOL_METH',ISIX,L_TRUE,
 	1            'Which Method To solve Matrix Equations'//
@@ -1097,7 +1102,7 @@ C
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(NG_DO,'DO_NG',L_TRUE,
 	1         'Perform NG acceleration when applicable ?')
-	  CALL RD_STORE_LOG(DO_NG_VALIDITY_CHECK,'NG_CHK',L_TRUE,
+	  CALL RD_STORE_LOG(DO_NG_VALIDITY_CHECK,'CHK_NG',L_TRUE,
 	1         'Check if NG accleration has made a reasonable correction to T?')
 	  CALL RD_STORE_DBLE(VAL_DO_NG,'BEG_NG',L_TRUE,
 	1       'Percentage accuracy at which to begin NG acceleration')

@@ -31,6 +31,8 @@
 	REAL*8, ALLOCATABLE :: XV(:)
 	REAL*8, ALLOCATABLE :: YV(:)
 	REAL*8, ALLOCATABLE :: ZV(:)
+	REAL*8, ALLOCATABLE :: LONG_XV(:)
+	REAL*8, ALLOCATABLE :: LONG_YV(:)
 	CHARACTER(LEN=60), ALLOCATABLE :: TRANS_NAME(:)
 	CHARACTER(LEN=60), ALLOCATABLE :: NT_TRANS_NAME(:)
 	CHARACTER(LEN=60), ALLOCATABLE :: AUTO_LEV_NAME(:)
@@ -582,7 +584,28 @@
 	      WRITE(6,'(1X,A,T30,ES12.3)')'Maximum auto/anti autoionization rate',T1
 	    END IF
 	    YLABEL='Normalized origin'
+! Set the level for which rates will be examined, and store the
 !
+	  ELSE IF(UC(PLT_OPT) .EQ. 'AEXD')THEN
+	    IF(SPECIES .EQ. ' ')THEN
+	       WRITE(6,*)'Need to use SPECIES option first to set the species'
+	       GOTO 1000
+	    END IF
+	    DPTH_INDX=ND/2
+	    CALL GEN_IN(DPTH_INDX,'Depth to be examined')
+	    IF(.NOT. ALLOCATED(LONG_XV))THEN
+	       ALLOCATE(LONG_XV(N_LINES),LONG_YV(N_LINES))
+	    END IF
+	    N_TRANS=0
+	    DO ML=1,N_LINES
+	       IF(INDEX(TRANS_NAME(ML),TRIM(SPECIES)) .NE. 0)THEN
+	         N_TRANS=N_TRANS+1; I=N_TRANS
+	         LONG_XV(I)=LAM(ML)
+	         LONG_YV(I)=RATES(ML,DPTH_INDX)
+	       END IF
+	    END DO
+	    CALL DP_CURVE(N_TRANS,LONG_XV,LONG_YV)
+	    YLABEL='Rate'
 ! Examine the rates at a specific depth.
 !
 	  ELSE IF(UC(PLT_OPT) .EQ. 'EXD')THEN
