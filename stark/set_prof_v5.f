@@ -38,6 +38,8 @@
 	1             TDOP,AMASS_DOP,VTURB,MAX_PROF_ED,
 	1             END_RES_ZONE,NORM_PROFILE,LU_STK)
 !
+! Altered 05-Jul-2022: Call to GRIEM_V2 now in parallel loop. This paralleization 
+!                        required some changes to GRIEM_STARK_MOD.
 ! Altered 18-May-2015: LOC_GAM_COL is set to C4 unless specifically set in STRK_LIST.
 ! Altered 20-May-2014: VERBOSE option introduced, and sone diagnostic output was modified.
 ! Altered 14-May-2014: MAX_PROF_ED now applies to all profiles
@@ -321,6 +323,7 @@
 ! depth. We assume that the profile is zero outside the computational range.
 !
 	  PROF_STORE(1:ND,1:NF,LOC_INDX)=0.0D0
+!$OMP PARALLEL DO PRIVATE(I,PR_GRIEM,TMP_ED)
 	  DO I=1,ND
 	    TMP_ED=MIN(ED_IN(I),MAX_PROF_ED)
             CALL GRIEM_V2(PR_GRIEM,DWS_GRIEM,NF,
@@ -328,6 +331,7 @@
 	1        NL,NUP,Z_IN,AMASS_IN,RET_LOG)
 	    PROF_STORE(I,1:NF,LOC_INDX)=PR_GRIEM(1:NF)
 	  END DO
+!$OMP END PARALLEL DO
 	ELSE
 	  WRITE(LUER,*)'Error in SET_PROF_V3'
 	  WRITE(LUER,*)'Unrecognized profile type'

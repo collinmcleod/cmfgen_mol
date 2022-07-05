@@ -27,8 +27,8 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(do_mult_gf.o)\
       $(LIB)(do_pg_regrid.o)\
       $(LIB)(do_vec_op.o)\
-      $(LIB)(do_cursor_ew.o)\
-      $(LIB)(draw_line_ids.o)\
+      $(LIB)(do_cursor_ew_v2.o)\
+      $(LIB)(draw_line_ids_v2.o)\
       $(LIB)(draw_ew_ids.o)\
       $(LIB)(draw_ew_lines.o)\
       $(LIB)(draw_right_y_axis.o)\
@@ -39,6 +39,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(gaus_romb.o)\
       $(LIB)(gaus_fit_er.o)\
       $(LIB)(get_gramon_min_max.o)\
+      $(LIB)(get_line_id_pg.o)\
       $(LIB)(get_pgi_file_info.o)\
       $(LIB)(get_titles.o)\
       $(LIB)(gramon_pgplot.o)\
@@ -74,7 +75,7 @@ $(LIB) : $(OBJ)
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f 
-	$(F90) -c $(FG)  $<
+	$(F90) -c $(FD)  $<
 	ar $(AR_OPTION) $(LIB) $*.o
 
 # 
@@ -90,10 +91,12 @@ COL=  ../lib/libsubs.a(mod_color_pen_def.o)
 $(LIB)(change_color.o)    : change_color.f  $(GEN)
 $(LIB)(change_pen.o)      : change_pen.f    $(GEN)
 
-$(LIB)(draw_line_ids.o)   : draw_line_ids.f $(LIB)(line_id_mod.o)  $(COL) 
-$(LIB)(draw_ew_ids.o)     : draw_ew_ids.f   $(LIB)(line_id_mod.o)  $(COL) 
-$(LIB)(draw_ew_lines.o)   : draw_ew_lines.f $(LIB)(line_id_mod.o)  $(COL) 
-$(LIB)(rd_ew_id.o)        : rd_ew_id.f      $(LIB)(line_id_mod.o)  $(COL) 
+$(LIB)(draw_line_ids.o)      : draw_line_ids_v2.f $(LIB)(line_id_mod.o)  $(COL) 
+$(LIB)(draw_line_ids_v2.o)   : draw_line_ids.f    $(LIB)(line_id_mod.o)  $(COL) 
+$(LIB)(draw_ew_ids.o)        : draw_ew_ids.f      $(LIB)(line_id_mod.o)  $(COL) 
+$(LIB)(draw_ew_lines.o)      : draw_ew_lines.f    $(LIB)(line_id_mod.o)  $(COL) 
+$(LIB)(rd_ew_id.o)           : rd_ew_id.f         $(LIB)(line_id_mod.o)  $(COL) 
+$(LIB)(get_line_id.o)        : get_line_id.f      $(LIB)(line_id_mod.o)  $(COL) 
 
 $(LIB)(gramon_pgplot.o)         : gramon_pgplot.f          $(LIB)(mod_curve_data.o) $(LIB)(line_id_mod.o) $(GEN) $(COL) 
 $(LIB)(curve.o)                 : curve.f                  $(LIB)(mod_curve_data.o) $(GEN)

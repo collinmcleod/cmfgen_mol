@@ -3,6 +3,7 @@
 	USE CMF_FLUX_CNTRL_VAR_MOD
 	IMPLICIT NONE
 !
+! Altered 05-Jul-2022 : Added WRITE_TRANS_INFO option (not required).
 ! Altered 26-Apr-2019 : Added  J_CHK_OPTION (CHK_J)
 !                       Added  H_CHK_OPTION (CHK_H)
 ! Altered 26-Apr-2019 : Added RD_NU_MAX_OBS, RD_NU_MIN_OBS to restrict the range of observer's frame int.
@@ -196,6 +197,9 @@
 !
 	  COMPUTE_J=.TRUE.
 	  CALL RD_STORE_LOG(COMPUTE_J,'COMP_J',L_FALSE,'Compute the radiation field')
+!
+	  WRITE_TRANS_INFO=.FALSE.
+	  CALL RD_STORE_LOG(WRITE_TRANS_INFO,'WR_TRANS',L_FALSE,'Output large TRANS_INFO file?')
 	  CALL RD_STORE_LOG(WRITE_ETA_AND_CHI,'WR_ETA',L_TRUE,'Output ETA and CHI? ')
 	  CALL RD_STORE_LOG(WRITE_FLUX,'WR_FLUX',L_TRUE, 'Output Flux as a function of depth? ')
 	  CALL RD_STORE_LOG(WRITE_CMF_FORCE,'WR_CMF_FORCE',L_TRUE,

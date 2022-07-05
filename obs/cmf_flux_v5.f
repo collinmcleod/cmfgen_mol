@@ -652,6 +652,7 @@
 	ND_MAX=4*ND-1
 	NC_MAX=4*NC
 	NP_MAX=ND_MAX+NC_MAX
+	FLUSH(LUER)
 !
 !*****************************************************************************
 !*****************************************************************************
@@ -660,7 +661,9 @@
 ! in the CMF. The routine then passes (calls) OBS_FRAM_SUb to compute the
 ! model spectrum
 !
+	CALL TUNE(1,'CMF_FLUX_SUB')
 	CALL CMF_FLUX_SUB_V5(ND,NC,NP,ND_MAX,NP_MAX,NT,N_LINE_MAX)
+	CALL TUNE(2,'CMF_FLUX_SUB')
 !
 	CALL TUNE(3,' ')
 !

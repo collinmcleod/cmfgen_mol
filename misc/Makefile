@@ -25,8 +25,11 @@ OBJ1  =  set_hydro_hd_loc.o update_pg_filename.o adjust_atm_r_grid.o rd_f_to_s_i
 EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)ave_dc.exe\
          $(EXE_DIR)check_ba_estimates.exe\
+         $(EXE_DIR)create_batobs_ins.exe\
          $(EXE_DIR)create_kappa_file.exe\
          $(EXE_DIR)create_if_file.exe\
+         $(EXE_DIR)create_mod_sum.exe\
+         $(EXE_DIR)create_pp_mod_sum.exe\
          $(EXE_DIR)count_phot_data.exe\
          $(EXE_DIR)ed_vadat.exe\
          $(EXE_DIR)check_energy_cons.exe\
@@ -34,7 +37,6 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)chk_phot.exe\
          $(EXE_DIR)pack_osc.exe\
          $(EXE_DIR)do_ng_v2.exe\
-         $(EXE_DIR)create_mod_sum.exe\
          $(EXE_DIR)extrap_scr.exe\
          $(EXE_DIR)guess_dc.exe\
          $(EXE_DIR)land_col_merge.exe\

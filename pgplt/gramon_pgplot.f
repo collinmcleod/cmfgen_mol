@@ -8,6 +8,7 @@
 	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
+! Altered:  30-Jun-2022 : Changed to allow transition name to be added to EW measurements.
 ! Altered:  16-Jul-2021 : Added error to link error vector to another vector.
 !                           Clarifcation notes added to DC option.
 !                           (based on GANNET version - 8-Jul-2021)
@@ -118,7 +119,7 @@
 	CHARACTER*80, SAVE :: PLT_ST_FILENAME
 	CHARACTER*80, SAVE :: TITLE_FILENAME
 	CHARACTER*80 WK_STR,OPTION
-	CHARACTER*80 TMP_STR
+	CHARACTER*200 TMP_STR
 	CHARACTER*6 TO_TEK
 	CHARACTER*2 TO_VT
 	CHARACTER*3 ADVANCE_OPT
@@ -244,6 +245,7 @@
 	REAL*4 SCALE_FAC(MAX_PLTS)
  	REAL*4 XVAL,YVAL
 	REAL*4 XVAL_SAV,YVAL_SAV
+	REAL*8 LINE_CUT_PARAM
 	REAL*4, ALLOCATABLE :: TA(:)
 	LOGICAL TMP_LOG
 	LOGICAL KEEP_YAXIS_LIMITS
@@ -337,6 +339,7 @@
 	DP_CUT_ACC=0.01D0
 	DONE_NORMALIZATION=.FALSE.
 	XLAB_FILE=' '; YLAB_FILE=' '
+	LINE_CUT_PARAM=0.03
 !
 	IF(NPLTS .GT. MAXPEN)THEN
 	  WRITE(T_OUT,*)'Error n GRAMON_PLOT -- not enough pen loctions'
@@ -1557,6 +1560,7 @@ C
 	  J=0
 	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs -case sensitive')
 	  CALL NEW_GEN_IN(TAU_CUT,'Omit lines with central optical depth <')
+	  CALL NEW_GEN_IN(LINE_CUT_PARAM,'Omit lines whose central intensity differ by less than this amount')
 	  CALL NEW_GEN_IN(AIR_WAVELENGTHS,'Air wavelengths?')
 	  CALL NEW_GEN_IN(KEEP_YAXIS_LIMITS,'Keep same Y axis limits?')
           OPEN(UNIT=33,FILE=TRIM(ID_FILNAME),STATUS='OLD',IOSTAT=IOS)
@@ -1567,7 +1571,12 @@ C
 	    END DO
 	    BACKSPACE(33)
 	    DO WHILE(J+1 .LE. 5000)
-	      READ(33,*,END=1500,IOSTAT=IOS)LINE_ID(J+1),ID_WAVE(J+1),TAU(J+1),ID_WAVE_OFF(J+1),ID_Y_OFF(J+1)
+	      READ(33,'(A)',END=1500,IOSTAT=IOS)TMP_STR
+	      READ(TMP_STR,*)LINE_ID(J+1),ID_WAVE(J+1),TAU(J+1),ID_WAVE_OFF(J+1),ID_Y_OFF(J+1)
+	      TMP_STR=TMP_STR(20:)
+	      K=INDEX(TMP_STR,TRIM(LINE_ID(J+1)))
+	      FULL_LINE_ID(J+1)=TMP_STR(K:)
+	      WRITE(70,'(A)')TRIM(FULL_LINE_ID(J+1))
 	      IF(IOS .NE. 0)THEN
 	        WRITE(6,*)'Error reading record in ',TRIM(ID_FILNAME)
 	        GOTO 1000
@@ -1891,7 +1900,7 @@ C
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'CEW')THEN
-	  CALL DO_CURSOR_EW(XPAR,YPAR)
+	  CALL DO_CURSOR_EW_V2(XPAR,YPAR,L_FALSE,' ')
 !
 	ELSE IF(ANS .EQ. 'EW')THEN
 !
@@ -3541,7 +3550,7 @@ C
 	END IF
 !
 	IF(N_LINE_IDS .NE. 0)THEN
-	  CALL DRAW_LINE_IDS(XPAR,YPAR,EXPCHAR,T_OUT)
+	  CALL DRAW_LINE_IDS_V2(XPAR,YPAR,EXPCHAR,IONE,LINE_CUT_PARAM,T_OUT)
 	  CALL PGSCH(EXPCHAR)		!Reset character size
 	END IF
 	IF(N_EW_IDS .NE. 0)THEN

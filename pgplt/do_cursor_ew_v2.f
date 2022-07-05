@@ -17,6 +17,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Alteres: 30-Jun-2022 - Can no append transition name to EW file.
 ! Created: 27-FEb-2022
 !
 	INTEGER, PARAMETER :: IONE=1
@@ -77,6 +78,7 @@
 	CHARACTER(LEN=80) LOC_FILE_WITH_LINE_LIMS
 	CHARACTER(LEN=80) OUT_FILE 
 	CHARACTER(LEN=80) STRING
+	CHARACTER(LEN=80) TRANS_NAME
 !
 	XLOC=0.5D0*(XRANGE(1)+XRANGE(2))
 	YLOC=0.5D0*(YRANGE(1)+YRANGE(2))
@@ -122,7 +124,7 @@
 	  IF(AUTO)THEN
 	    LOC_FILE_WITH_LINE_LIMS=FILE_WITH_LINE_LIMS
 	  ELSE
-	    LOC_FILE_WITH_LINE_LIMS='FILE_WITH_LINE_LIMS'
+	    LOC_FILE_WITH_LINE_LIMS='LINE_LIMS'
 	    CALL GEN_IN(LOC_FILE_WITH_LINE_LIMS,'File with XSTART, XEND defining lines')
 	  END IF
 	  OPEN(UNIT=LUIN,FILE=LOC_FILE_WITH_LINE_LIMS,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
@@ -148,22 +150,22 @@
 	  ELSE
 	    OPEN(UNIT=LUOUT,FILE=OUT_FILE,STATUS='NEW',ACTION='WRITE')
 	    IF(USE_MILLI_ANG)THEN
-	      WRITE(LUOUT,'(A,5(6X,A),20X,3A)')'    XST','    XEND','Line Loc',' F(cont)',' EW(mA)',
-	1                          '      FWHM',' Sig(km/s)','    Sig(A)'
+	      WRITE(LUOUT,'(A,5(6X,A),20X,3A)')'!','    XST','    XEND','Line Loc',' F(cont)','  EW(mA)',
+	1                          'FWHM(km/s)',' Sig(km/s)','    Sig(A)'
 	    ELSE
-	      WRITE(LUOUT,'(A,(6X,A),20X,3A)')'    XST','    XEND','Line Loc',' F(cont)','  EW(A)',
-	1                          '      FWHM',' Sig(km/s)','    Sig(A)'
+	      WRITE(LUOUT,'(A,(6X,A),20X,3A)')'!','    XST','    XEND','Line Loc',' F(cont)','   EW(A)',
+	1                          'FWHM(km/s)',' Sig(km/s)','    Sig(A)'
 	    END IF
 	  END IF
 	END IF
 !
 	WRITE(6,'(A)')' '
 	IF(USE_MILLI_ANG)THEN
-	  WRITE( 6,'(5(6X,A),20X,3A)')'     XST','    XEND','Line Loc',' F(cont)',' EW(mA)',
-	1                          '      FWHM',' Sig(km/s)','    Sig(A)'
+	  WRITE( 6,'(5(6X,A),20X,3A)')'     XST','    XEND','Line Loc',' F(cont)','  EW(mA)',
+	1                          'FWHM(km/s)',' Sig(km/s)','    Sig(A)'
 	ELSE
-	  WRITE( 6,'(5(6X,A),20X,3A)')'     XST','    XEND','Line Loc',' F(cont)','  EW(A)',
-	1                          '      FWHM',' Sig(km/s)','    Sig(A)'
+	  WRITE( 6,'(5(6X,A),20X,3A)')'     XST','    XEND','Line Loc',' F(cont)','   EW(A)',
+	1                          'FWHM(km/s)',' Sig(km/s)','    Sig(A)'
 	END IF
 	WRITE(6,'(A)')' '
 !
@@ -313,31 +315,35 @@
 	    SKEWNESS=SKEWNESS/YINT/SIGMA**3
 	    KURTOSIS=KURTOSIS/YINT/SIGMA**4
 	  END IF
+	  CALL GET_LINE_ID_PG(TRANS_NAME,EW,XMEAN,T1)
 !
 ! The FWHM assume the line is Gaussian in shape.
 !
 	  T1=2.998D+05*SIGMA/XMEAN
 	  IF(USE_MILLI_ANG)THEN
-	    WRITE(6,'(3F14.3,ES14.4,F14.2,7F10.2)')XST,XEND,XMEAN,YCONT,1000.0*EW, 
-	1                     100.0D0*(EW-EWL)/EW, 100.0D0*(EW-EWH)/EW,
-	1                     2.355*T1,T1,SIGMA,SKEWNESS,KURTOSIS
-	    WRITE(LUOUT,'(3F14.3,ES14.4,F14.2,7F10.2)')XST,XEND,XMEAN,YCONT,1000.0*EW, 
-	1                     100.0D0*(EW-EWL)/EW, 100.0D0*(EW-EWH)/EW,
-	1                     2.355*T1,T1,SIGMA,SKEWNESS,KURTOSIS
+	    WRITE(6,'(3F14.3,ES14.4,F14.2,7F10.2,3X,A)')XST,XEND,XMEAN,YCONT,1000.0*EW, 
+	1                100.0D0*(EW-EWL)/EW, 100.0D0*(EW-EWH)/EW,
+	1                2.355*T1,T1,SIGMA,SKEWNESS,KURTOSIS,TRIM(TRANS_NAME)
+	    WRITE(LUOUT,'(3F14.3,ES14.4,F14.2,4F10.2,3F10.3,3X,A)')
+	1                XST,XEND,XMEAN,YCONT,1000.0*EW, 
+	1                100.0D0*(EW-EWL)/EW, 100.0D0*(EW-EWH)/EW,
+	1                2.355*T1,T1,SIGMA,SKEWNESS,KURTOSIS,TRIM(TRANS_NAME)
+
 	  ELSE
-	    WRITE(6,'(3F14.3,2ES14.4,7F10.2)')XST,XEND,XMEAN,YCONT,EW, 
+	    WRITE(6,'(3F14.3,2ES14.4,7F10.2,2X,A)')XST,XEND,XMEAN,YCONT,EW, 
 	1                     100.0D0*(EW-EWL)/EW, 100.0D0*(EW-EWH)/EW,
-	1                     2.355*T1,T1,SIGMA,SKEWNESS,KURTOSIS
-	    WRITE(LUOUT,'(3F14.3,2ES14.4,7F10.2)')XST,XEND,XMEAN,YCONT,EW, 
+	1                      2.355*T1,T1,SIGMA,SKEWNESS,KURTOSIS,TRIM(TRANS_NAME)
+	    WRITE(LUOUT,'(3F14.3,2ES14.4,4F10.2,3F10.3,3X,A)')
+	1                     XST,XEND,XMEAN,YCONT,EW, 
 	1                     100.0D0*(EW-EWL)/EW, 100.0D0*(EW-EWH)/EW,
-	1                     2.355*T1,T1,SIGMA,SKEWNESS,KURTOSIS
+	1                      2.355*T1,T1,SIGMA,SKEWNESS,KURTOSIS,TRIM(TRANS_NAME)
 	  END IF
 	  FLUSH(LUOUT)
 !
 1000	  CONTINUE
 	END DO
 2000	CONTINUE
-!	CALL PGSLW(CUR_LW)
+	IF(.NOT. USE_CURSOR)CLOSE(LUIN)
 !
 	RETURN
 	END

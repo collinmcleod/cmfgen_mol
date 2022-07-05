@@ -57,6 +57,7 @@
 	      END IF
 	      I=INDEX(TMP_STR,'(')
 	      LINE_ID(J+1)=TMP_STR(1:I-1)
+	      FULL_LINE_ID=TMP_STR
 	      IF( (ID_WAVE(J+1)-XPAR(1))*(XPAR(2)-ID_WAVE(J+1)) .GT. 0 .AND. ABS(ID_EW(J+1)) .GT. EW_CUT)THEN
 	        J=J+1
 		N_EW_IDS=J

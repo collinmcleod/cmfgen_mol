@@ -118,3 +118,7 @@ lib6:
 
 clean :
 	rm -f *.o
+
+mod_freq_obs.o : mod_freq_obs.f
+mod_freq:
+	$(F90) -c $(OPTION) mod_freq_obs.f 

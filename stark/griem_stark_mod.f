@@ -9,6 +9,8 @@
         REAL*8 PS
         REAL*8 ODOP
 !
+!$OMP THREADPRIVATE(SS,SX,AS,PS,ODOP)
+!
       DATA BET/ 0.D0 ,0.1D0 ,0.2D0 ,0.3D0 ,0.4D0 ,0.5D0 , 0.6D0 ,
      .         0.7D0 ,0.8D0 , 0.9D0 ,1.0D0 ,1.2D0 ,1.4D0 ,1.6D0 ,
      .         1.8D0 ,2.0D0 , 2.2D0 ,2.4D0 ,2.6D0 ,2.8D0 ,3.0D0 ,

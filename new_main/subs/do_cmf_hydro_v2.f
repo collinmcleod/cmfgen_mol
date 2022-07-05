@@ -16,7 +16,7 @@
 	IMPLICIT NONE
 !
 !
-! ALtered 190Jun-2022 - Reactivated lowering of GAM_LIM to avoid -ve velocity gradients. 
+! Altered 190Jun-2022 - Reactivated lowering of GAM_LIM to avoid -ve velocity gradients. 
 ! Altered 21-Apr-2021 - More accrate R write to RVSIG_COL for PLANE_PARALLEL models.
 ! Altered 05-Jun-2015 - Fixed bug; GAM_LIM_STORE was not being set to GAM_LIM when it was read
 !                           in from the HDYRO_DEFAULTS file.
