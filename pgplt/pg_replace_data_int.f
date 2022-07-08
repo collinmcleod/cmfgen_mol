@@ -1,6 +1,7 @@
 !
-! Subroutine to measure line EWs using direct numerical integration of the data.
-! Routine is designed to be called in GRAMON_PGPLOT.
+! Subroutine to replace a section of data by a straight line. Average of aound current
+! location, oy y cursor vlaue can be used. Controls allow plot to moved
+! and shifted (in X).
 !
 ! Options:
 !      (1) Cursor control
@@ -9,10 +10,7 @@
 !                 Y location indicates the continuum
 !             or  Continuum defined by average (over NPIX) of the data at the X coordinates.
 !
-!      (2) Read in range limits from file. In this case the continuum is ALWAYS defined
-!             by an integration centered on the line limits.
-!
-	SUBROUTINE DO_CURSOR_EW_V3(
+	SUBROUTINE PG_REPLACE_DATA_INT(
 	1             XPAR,XINC,XNUMST,IXTICK,IDX,
 	1             YPAR,YINC,YNUMST,IYTICK,IDY,
 	1             TICK_FAC,EXPCHAR,
@@ -26,15 +24,14 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
-! Altered: 08-Jul-2022 - Only lower case options allowed.
-! Altered: 07-Jul-2022 - Call updated, and cleaned.
-!                          Plot can be shifted 
-! Altered: 30-Jun-2022 - Can no append transition name to EW file.
-! Created: 27-FEb-2022
+! Created: 30-Jun-2022 - Can no append transition name to EW file.
 !
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2
 	INTEGER, PARAMETER :: ISIX=6
+!
+! Most of the passed variables are simply required for redrawing the
+! plot.
 !
 	REAL*4 XPAR(2),XT(2)
 	REAL*4 YPAR(2),YT(2)
@@ -42,17 +39,18 @@
         REAL*4 YINC,YNUMST
 	REAL*4 dY
         REAL*4 EXPCHAR,TICK_FAC
-!
         INTEGER IDX,IXTICK
         INTEGER IDY,IYTICK
 !
 	LOGICAL TITONRHS
 	LOGICAL NORMAL_R_Y_AXIS
 !
-	CHARACTER(LEN=80) XLABEL,YLABEL
-        CHARACTER(LEN=5)  LOG_AXIS
-	CHARACTER(LEN=80) OPTION
-	CHARACTER(LEN=80) XLAB_FILE,YLAB_FILE
+	CHARACTER(LEN=*) XLABEL,YLABEL
+        CHARACTER(LEN=*) LOG_AXIS
+	CHARACTER(LEN=*) OPTION
+	CHARACTER(LEN=*) XLAB_FILE,YLAB_FILE
+!
+! Local vairables.
 !
 	INTEGER, SAVE :: NPIX=3  	!Integraton band pass around line limits
 	INTEGER, SAVE :: IP=1
@@ -88,12 +86,9 @@
 !
         LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, SAVE :: FIRST_WRITE=.TRUE.
+	INTEGER I,J,K
 	INTEGER, SAVE :: LUIN=0
 	INTEGER, SAVE :: LUOUT=0
-!
-	INTEGER I,J,K
-!
-! External function.
 !
 	INTEGER GET_INDX_SP
 	EXTERNAL GET_INDX_SP
@@ -101,12 +96,11 @@
 	LOGICAL RESET_DEFAULTS
 	LOGICAL END_FILE
 	LOGICAL FILE_PRES
-!
 	CHARACTER(LEN=80) LOC_FILE_WITH_LINE_LIMS
 	CHARACTER(LEN=80) OUT_FILE 
 	CHARACTER(LEN=80) STRING
 !
-! XLOC, YLOC will define initial cursor location.
+! XLOC,YLOC will set inital cursor location.
 !
 	XLOC=0.5D0*(XPAR(1)+XPAR(2))
 	YLOC=0.5D0*(YPAR(1)+YPAR(2))
@@ -121,25 +115,19 @@
 	    CALL GEN_IN(IP,'Plot for fitting')
 	  END IF
 !
-! Used if average data on X-limits to defined the continuum level.
+! Used if average data within X-limits is used to define the level.
 !
-	  NPIX=1
-	  CALL GEN_IN(NPIX,'Number of pixels at X location to average continuum (must be odd)')
+	  CALL GEN_IN(NPIX,'Number of pixels at X location to average data (must be odd)')
 	  IF(MOD(NPIX,2) .EQ. 0)THEN
 	    NPIX=NPIX+1
 	    WRITE(6,*)'NPIX increase by 1 to make odd; NPIX=',NPIX
 	  END IF
-	  CALL GEN_IN(USE_MILLI_ANG,'Output EWs in milli-Angstroms?')
-	  CALL GEN_IN(CONT_ACC,'Measure accuracy for continuum -- percentage?')
-	  LOW_CONT=1.0-CONT_ACC/100.0D0
-	  HIGH_CONT=1.0+CONT_ACC/100.0D0
 	END IF
-
 !
 ! Open output file. Data is appended if it alread exists.
 !
 	IF(LUOUT .EQ. 0)THEN
-	  OUT_FILE='EW_DATA'
+	  OUT_FILE='INT_REG'
 	  CALL GET_LU(LUOUT,'LUOUT in DO_CURSOR_EW_V2')
 	  CALL GEN_IN(OUT_FILE,'File to OUTPUT EWs etc')
 	  INQUIRE(FILE=OUT_FILE,EXIST=FILE_PRES)
@@ -156,7 +144,6 @@
 	I=6; CALL WRITE_EW_HEADER(I)
 	WRITE(6,'(A)')' '
 !
-	CALL PRINT_CURSOR_DESC
 	DO WHILE(1 .EQ. 1)
 !
 ! Change pen colors for defining limits of the next line.
@@ -201,7 +188,8 @@
 	  ELSE IF(CURSVAL .EQ. 'n' .OR.
 	1           CURSVAL .EQ. 'p' .OR.
 	1           CURSVAL .EQ. 'x' .OR.
-	1           CURSVAL .EQ. 'c')THEN
+	1           CURSVAL .EQ. 'c' .OR.
+	1           CURSVAL .EQ. 'r')THEN
 	    T1=XPAR(2)-XPAR(1)
 	    IF(CURSVAL .EQ. 'n')THEN
 	      XPAR(1)=XPAR(2)-XINC
@@ -245,7 +233,8 @@
 	1           XLAB_FILE,YLAB_FILE)
 	    GOTO 1000
 	  ELSE
-	    WRITE(6,*)RED_PEN,' Cursor value not recognized'	
+	    WRITE(6,*)RED_PEN
+	    WRITE(6,*)' Cursor value not recognized'	
 	    CALL PRINT_CURSOR_DESC
 	    GOTO 1000
 	  END IF
@@ -275,16 +264,15 @@
 	    XT(1)=XLOC; XT(2)=XLOC
 	    CALL PGLINE(2,XT,YT)
 	  ELSE
-	    WRITE(6,*)RED_PEN,' Cursor value not recognized'	
+	    WRITE(6,*)RED_PEN
+	    WRITE(6,*)' Cursor value not recognized'	
 	    CALL PRINT_CURSOR_DESC
 	    GOTO 1000
 	  END IF
 !
 	  IF(IST .EQ. IEND)THEN
-	    WRITE(6,*)RED_PEN
 	    WRITE(6,*)'Error -- limits on line are identical'
 	    WRITE(6,*)'Need to redefine the line'
-	    WRITE(6,*)DEF_PEN
 	    GOTO 1000
 	  END IF
 !
@@ -294,67 +282,25 @@
 	  SLOPE=(YEND-YST)/(CD(IP)%XVEC(IEND)-CD(IP)%XVEC(IST))
 	  DO I=IST,IEND
 	    YVAL=YST+(CD(IP)%XVEC(I)-CD(IP)%XVEC(IST))*SLOPE
-	    dX=(CD(IP)%XVEC(MIN(I+1,IEND))-CD(IP)%XVEC(MAX(IST,I-1)))/2
-	    EW=EW+dX*(YVAL-CD(IP)%DATA(I))
-	    EWL=EW+dX*(LOW_CONT*YVAL-CD(IP)%DATA(I))
-	    EWH=EW+dX*(HIGH_CONT*YVAL-CD(IP)%DATA(I))
-	    XMEAN=XMEAN+CD(IP)%XVEC(I)*(YVAL-CD(IP)%DATA(I))*dX
+	    CD(IP)%DATA(I)=YVAL
 	  END DO
-!
-	  IF(ABS(EW)/YST .LT. 1.0D-10)THEN
-	    WRITE(6,*)'Possibe error EW is close to zero', EW/YST
-	    WRITE(6,*)'Skipping this line. XST,END=',XST,XEND
-	    GOTO 1000
-	  END IF
-	  XMEAN=XMEAN/EW
-	  YCONT=YST+(XMEAN-CD(IP)%XVEC(IST))*SLOPE
-	  YINT=EW
-	  YMEAN=EW/(CD(IP)%XVEC(IEND)-CD(IP)%XVEC(IST))
-	  EW=EW/YCONT
-	  EWL=EWL/(YCONT*LOW_CONT)
-	  EWH=EWH/(YCONT*HIGH_CONT)
-!
-! These parameters are used to provide information on whether a line is blended.
-!
-	  SIGMA=0.0D0; SKEWNESS=0.0D0; KURTOSIS=0.0D0
-	  DO I=IST,IEND
-	    XVAL=CD(IP)%XVEC(I)
-	    YVAL=YST+(CD(IP)%XVEC(I)-CD(IP)%XVEC(IST))*SLOPE - CD(IP)%DATA(I)
-	    dX=(CD(IP)%XVEC(MIN(I+1,IEND))-CD(IP)%XVEC(MAX(IST,I-1)))/2
-	    SIGMA=SIGMA+dX*YVAL*(XVAL-XMEAN)**2
-	    SKEWNESS=SKEWNESS+dX*YVAL*(XVAL-XMEAN)**3
-	    KURTOSIS=KURTOSIS+dX*YVAL*(XVAL-XMEAN)**4
-	  END DO
-	  IF(SIGMA*YINT .LE. 0)THEN
-	    SIGMA=-1.0; SKEWNESS=-1.0; KURTOSIS=-1.0
-	  ELSE
-	    SIGMA=SQRT(SIGMA/YINT)
-	    SKEWNESS=SKEWNESS/YINT/SIGMA**3
-	    KURTOSIS=KURTOSIS/YINT/SIGMA**4
-	  END IF
-	  CALL GET_LINE_ID_PG(TRANS_NAME,EW,XMEAN,T1)
-
-	  CALL WR_EW_VARIABLES(IP,LUOUT)
-	  I=6; CALL WR_EW_VARIABLES(IP,I)
+	  WRITE(6,*)XST,XEND
+	  WRITE(LUOUT,*)XST,XEND
 !
 1000	  CONTINUE
 	END DO
 !
 2000	CONTINUE
 	RETURN
-!
 	CONTAINS
+!
 	SUBROUTINE PRINT_CURSOR_DESC
-!
-! We restrict options to lower case to avoid accidental use of
-! the mouse which returns A.
-!
 	  WRITE(6,'(A)')BLUE_PEN
 	  WRITE(6,'(A)')' Program assumes X axis increases with X index '
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')' Use cursor to define left and right side of line:'
-	  WRITE(6,'(A)')'   y - uses cursor Y value for continuum location'
-	  WRITE(6,'(A)')'   s - reset and start line selection again'
+	  WRITE(6,'(A)')'   y - uses cursor Y value for location'
+	  WRITE(6,'(A)')'   s - reset and start selection again'
 	  WRITE(6,'(A)')'   a - Y value is average over data at X location'
 	  WRITE(6,'(A)')'   e - exit line selection'
 	  WRITE(6,'(A)')' '
@@ -362,9 +308,9 @@
 	  WRITE(6,'(A)')'   n(ext)      -- shift window to left by X increment'
 	  WRITE(6,'(A)')'   p(revious)  -- shift window to right by X increment'
 	  WRITE(6,'(A)')'   x(extend)   -- expand window by increment but no shift'
-	  WRITE(6,'(A)')'   c(ontract)  -- contract window by increment but no shift'
+ 	  WRITE(6,'(A)')'   c(ontract)  -- contract window by increment but no shift'
+ 	  WRITE(6,'(A)')'   r(edraw)    -- redraw display'
 	  WRITE(6,'(A)')DEF_PEN
-!
 	  RETURN
 	END SUBROUTINE PRINT_CURSOR_DESC
-	END SUBROUTINE DO_CURSOR_EW_V3
+	END SUBROUTINE PG_REPLACE_DATA_INT

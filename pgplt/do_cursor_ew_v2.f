@@ -30,7 +30,13 @@
 	REAL*4 YRANGE(2),YT(2)
 	REAL*4 dY
 !
-	INTEGER NPIX  			!Integraton band pass around line limits
+	INTEGER, SAVE :: NPIX=3  	!Integraton band pass around line limits
+	INTEGER, SAVE :: IP=1
+	LOGICAL, SAVE :: USE_CURSOR=.TRUE.
+	LOGICAL, SAVE :: USE_MILLI_ANG=.TRUE.
+	REAL*4,  SAVE :: LOW_CONT=0.01
+	REAL*4,  SAVE :: HIGH_CONT=0.01
+!
 	INTEGER IST,IEND		!Line limits in pixel space
 	REAL*4 XLOC,YLOC		!Used to read cursor location
 	REAL*4 XST,XEND                 !Line limits in world coordinates
@@ -50,19 +56,18 @@
 	REAL*4 YCONT  		!Flux at line center
 	REAL*4 SLOPE  		!Continuum slope
 	REAL*4 T1		!Work variable
+	REAL*4 CONT_ACC
 !
 	REAL*4 SIGMA		!Standard deviation
 	REAL*4 KURTOSIS
 	REAL*4 SKEWNESS
 !
-	LOGICAL USE_CURSOR
         INTEGER PGCURS
         INTEGER CURSERR
 	INTEGER CUR_LW
 	INTEGER IPEN
 	CHARACTER(LEN=1) CURSVAL
 !
-	INTEGER, SAVE :: IP=1
         LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, SAVE :: FIRST_WRITE=.TRUE.
 	INTEGER I,J,K
@@ -72,7 +77,7 @@
 	INTEGER GET_INDX_SP
 	EXTERNAL GET_INDX_SP
 !
-	LOGICAL, SAVE :: USE_MILLI_ANG=.TRUE.
+	LOGICAL RESET_DEFAULTS
 	LOGICAL END_FILE
 	LOGICAL FILE_PRES
 	CHARACTER(LEN=80) LOC_FILE_WITH_LINE_LIMS
@@ -88,23 +93,29 @@
 	  IP=1
 	  USE_CURSOR=.FALSE.
 	ELSE
-	  IF(NPLTS .EQ. 1)THEN
-	    IP=1
-	  ELSE
-	    CALL GEN_IN(IP,'Plot for fitting')
-	  END IF
-	  USE_CURSOR=.TRUE.
-	  CALL GEN_IN(USE_CURSOR,'Use cursor (T) or read locations from file (F)')
+	  RESET_DEFAULTS=.FALSE.
+	  CALL GEN_IN(RESET_DEFAULTS,'Reset default parameters/settings?')
+	  IF(RESET_DEFAULTS)THEN
+	    IF(NPLTS .EQ. 1)THEN
+	      IP=1
+	    ELSE
+	      CALL GEN_IN(IP,'Plot for fitting')
+	    END IF
+	    CALL GEN_IN(USE_CURSOR,'Use cursor (T) or read locations from file (F)')
 !
 ! Used if average data on X-limits to defined the continuum level.
 !
-	  NPIX=1
-	  CALL GEN_IN(NPIX,'Number of pixels at X location to average continuum (must be odd)')
-	  IF(MOD(NPIX,2) .EQ. 0)THEN
-	    NPIX=NPIX+1
-	    WRITE(6,*)'NPIX increase by 1 to make odd; NPIX=',NPIX
+	    NPIX=1
+	    CALL GEN_IN(NPIX,'Number of pixels at X location to average continuum (must be odd)')
+	    IF(MOD(NPIX,2) .EQ. 0)THEN
+	      NPIX=NPIX+1
+	      WRITE(6,*)'NPIX increase by 1 to make odd; NPIX=',NPIX
+	     END IF
+	    CALL GEN_IN(USE_MILLI_ANG,'Output EWs in milli-Angstroms?')
+	    CALL GEN_IN(CONT_ACC,'Measure accuracy for continuum -- percentage?')
+	    LOW_CONT=1.0-CONT_ACC
+	    HIGH_CONT=1.0+CONT_ACC
 	  END IF
-	  CALL GEN_IN(USE_MILLI_ANG,'Output EWs in milli-Angstroms?')
 	END IF
 !
 	IF(USE_CURSOR)THEN
@@ -161,10 +172,10 @@
 !
 	WRITE(6,'(A)')' '
 	IF(USE_MILLI_ANG)THEN
-	  WRITE( 6,'(5(6X,A),20X,3A)')'     XST','    XEND','Line Loc',' F(cont)','  EW(mA)',
+	  WRITE( 6,'(5(3X,A),20X,3A)')'     XST','    XEND','Line Loc','    F(cont)','  EW(mA)',
 	1                          'FWHM(km/s)',' Sig(km/s)','    Sig(A)'
 	ELSE
-	  WRITE( 6,'(5(6X,A),20X,3A)')'     XST','    XEND','Line Loc',' F(cont)','   EW(A)',
+	  WRITE( 6,'(5(3X,A),20X,3A)')'     XST','    XEND','Line Loc','    F(cont)','   EW(A)',
 	1                          'FWHM(km/s)',' Sig(km/s)','    Sig(A)'
 	END IF
 	WRITE(6,'(A)')' '
@@ -278,8 +289,8 @@
 	    YVAL=YST+(CD(IP)%XVEC(I)-CD(IP)%XVEC(IST))*SLOPE
 	    dX=(CD(IP)%XVEC(MIN(I+1,IEND))-CD(IP)%XVEC(MAX(IST,I-1)))/2
 	    EW=EW+dX*(YVAL-CD(IP)%DATA(I))
-	    EWL=EW+dX*(0.99*YVAL-CD(IP)%DATA(I))
-	    EWH=EW+dX*(1.01*YVAL-CD(IP)%DATA(I))
+	    EWL=EW+dX*(LOW_CONT*YVAL-CD(IP)%DATA(I))
+	    EWH=EW+dX*(HIGH_CONT*YVAL-CD(IP)%DATA(I))
 	    XMEAN=XMEAN+CD(IP)%XVEC(I)*(YVAL-CD(IP)%DATA(I))*dX
 	  END DO
 !
@@ -293,8 +304,8 @@
 	  YINT=EW
 	  YMEAN=EW/(CD(IP)%XVEC(IEND)-CD(IP)%XVEC(IST))
 	  EW=EW/YCONT
-	  EWL=EWL/(YCONT*0.99)
-	  EWH=EWH/(YCONT*1.01)
+	  EWL=EWL/(YCONT*LOW_CONT)
+	  EWH=EWH/(YCONT*HIGH_CONT)
 !
 ! These parameters are used to provide information on whether a line is blended.
 !
@@ -321,10 +332,10 @@
 !
 	  T1=2.998D+05*SIGMA/XMEAN
 	  IF(USE_MILLI_ANG)THEN
-	    WRITE(6,'(3F14.3,ES14.4,F14.2,7F10.2,3X,A)')XST,XEND,XMEAN,YCONT,1000.0*EW, 
+	    WRITE(6,'(3F11.3,ES14.4,F11.2,7F10.2,3X,A)')XST,XEND,XMEAN,YCONT,1000.0*EW, 
 	1                100.0D0*(EW-EWL)/EW, 100.0D0*(EW-EWH)/EW,
 	1                2.355*T1,T1,SIGMA,SKEWNESS,KURTOSIS,TRIM(TRANS_NAME)
-	    WRITE(LUOUT,'(3F14.3,ES14.4,F14.2,4F10.2,3F10.3,3X,A)')
+	    WRITE(LUOUT,'(3F11.3,ES14.4,F11.2,4F10.2,3F10.3,3X,A)')
 	1                XST,XEND,XMEAN,YCONT,1000.0*EW, 
 	1                100.0D0*(EW-EWL)/EW, 100.0D0*(EW-EWH)/EW,
 	1                2.355*T1,T1,SIGMA,SKEWNESS,KURTOSIS,TRIM(TRANS_NAME)

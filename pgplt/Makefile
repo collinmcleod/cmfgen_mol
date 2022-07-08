@@ -22,12 +22,13 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(cut_points_from_plot.o)\
       $(LIB)(define_more_pens.o)\
       $(LIB)(do_pg_deriv.o)\
+      $(LIB)(do_file_ew_v1.o)\
       $(LIB)(do_fill.o)\
       $(LIB)(do_many_ew.o)\
       $(LIB)(do_mult_gf.o)\
       $(LIB)(do_pg_regrid.o)\
       $(LIB)(do_vec_op.o)\
-      $(LIB)(do_cursor_ew_v2.o)\
+      $(LIB)(do_cursor_ew_v3.o)\
       $(LIB)(draw_line_ids_v2.o)\
       $(LIB)(draw_ew_ids.o)\
       $(LIB)(draw_ew_lines.o)\
@@ -46,16 +47,18 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(hist_adj.o)\
       $(LIB)(justify_convert_v2.o)\
       $(LIB)(modify_pgi_ps.o)\
+      $(LIB)(mod_ew_variables.o)\
       $(LIB)(mon_num.o)\
       $(LIB)(monbord_v4.o)\
       $(LIB)(moninside.o)\
       $(LIB)(mon_interp_sp.o)\
       $(LIB)(pg_add_noise.o)\
       $(LIB)(pg_def_continuum.o)\
+      $(LIB)(pg_replace_data_int.o)\
       $(LIB)(pg_mod_cont_nodes.o)\
       $(LIB)(put_text.o)\
       $(LIB)(rd_ew_id.o)\
-      $(LIB)(rep_data.o)\
+      $(LIB)(modify_curve.o)\
       $(LIB)(simp_ew.o)\
       $(LIB)(strip_slash_p.o)\
       $(LIB)(shrink_vectors.o)\
@@ -103,6 +106,9 @@ $(LIB)(curve.o)                 : curve.f                  $(LIB)(mod_curve_data
 $(LIB)(curve_lab.o)             : curve_lab.f              $(LIB)(mod_curve_data.o) $(GEN)
 $(LIB)(vectorpen.o)             : vectorpen.f              $(LIB)(mod_curve_data.o) $(GEN)
 $(LIB)(arrange_pg_curve_ids.o)  : arrange_pg_curve_ids.f   $(LIB)(mod_curve_data.o) $(GEN)
+
+$(LIB)(do_cursor_ew_v3.o) : do_cursor_ew_v3.f   $(LIB)(mod_curve_data.o) $(GEN) $(COL)  $(LIB)(mod_ew_variables.o)
+$(LIB)(do_file_ew_v1.o)   : do_file_ew_v1.f     $(LIB)(mod_curve_data.o) $(GEN) $(COL)  $(LIB)(mod_ew_variables.o)
 
 $(LIB)(wr_gaus_fit.o)     : wr_gaus_fit.f   $(LIB)(gaus_fit_data.o)
 $(LIB)(do_gaus_fit.o)     : do_gaus_fit.f   $(LIB)(gaus_fit_data.o)

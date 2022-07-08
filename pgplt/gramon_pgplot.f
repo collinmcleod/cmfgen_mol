@@ -245,7 +245,6 @@
 	REAL*4 SCALE_FAC(MAX_PLTS)
  	REAL*4 XVAL,YVAL
 	REAL*4 XVAL_SAV,YVAL_SAV
-	REAL*8 LINE_CUT_PARAM
 	REAL*4, ALLOCATABLE :: TA(:)
 	LOGICAL TMP_LOG
 	LOGICAL KEEP_YAXIS_LIMITS
@@ -1662,78 +1661,43 @@ C
 !
 ! 
 	ELSE IF (ANS .EQ. 'REP')THEN
-	  IF(NPLTS .EQ. 1)THEN
-	    PLOT_ID=1
-	  ELSE
-	    CALL NEW_GEN_IN(PLOT_ID,'Plot for simple data replacement:')
-	  END IF
-	  TMP_LOG=.TRUE.
-	  CALL NEW_GEN_IN(TMP_LOG,'Use cursor to devine regions:')
+	  CALL PG_REPLACE_DATA_INT(
+	1             XPAR,XINC,XNUMST,IXTICK,IDX,
+	1             YPAR,YINC,YNUMST,IYTICK,IDY,
+	1             TICK_FAC,EXPCHAR,
+	1             XLABEL,YLABEL,TITONRHS,
+	1             LOG_AXIS,OPTION,NORMAL_R_Y_AXIS,
+	1             XLAB_FILE,YLAB_FILE,
+	1             PEN_COL,PEN_OFFSET,
+	1             REVERSE_PLOTTING_ORDER)
 !
-	  IF(TMP_LOG)THEN
-!
-	    WRITE(6,'(A)')' '
-	    WRITE(6,'(A)')' Default uses data to define y vale'
-	    WRITE(6,'(A)')' Use Y (or y) with cursor to use cursor value'
-	    WRITE(6,'(A)')' Use E or e to exit'
-	    WRITE(6,'(A)')' '
-	    DO J=1,10
-!
-	      CURSERR = PGCURS(XCUR(1),YCUR(1),CURSVAL)
-	      XCUR(2)=XCUR(1); YCUR(2)=YCUR(1)
-	      IF(CURSVAL .EQ. 'E' .OR. CURSVAL .EQ. 'e')EXIT
-	      IF(CURSVAL .EQ. 'Y' .OR. CURSVAL .EQ. 'y')THEN
-	      ELSE
-	        I=GET_INDX_SP(XCUR(1),CD(PLOT_ID)%XVEC,NPTS(PLOT_ID))
-	        YCUR(1)=CD(PLOT_ID)%DATA(I)
-	      END IF
-	      CALL PGPT(IONE,XCUR(1),YCUR(1),ITWO)
-!
-	      CURSERR = PGCURS(XCUR(2),YCUR(2),CURSVAL)
-	      IF(CURSVAL .EQ. 'E' .OR. CURSVAL .EQ. 'e')EXIT
-	      IF(CURSVAL .EQ. 'Y' .OR. CURSVAL .EQ. 'y')THEN
-	      ELSE
-	        I=GET_INDX_SP(XCUR(2),CD(PLOT_ID)%XVEC,NPTS(PLOT_ID))
-	        YCUR(2)=CD(PLOT_ID)%DATA(I)
-	      END IF
-	      CALL PGPT(IONE,XCUR(2),YCUR(2),ITWO)
-!
-	      SLOPE=(YCUR(2)-YCUR(1))/(XCUR(2)-XCUR(1))
+	ELSE IF (ANS .EQ. 'FREP')THEN
+	  FILNAME='CONT_NODES'
+	  CALL NEW_GEN_IN(FILNAME,'File with cursor nodes')
+	  OPEN(UNIT=10,FILE=TRIM(FILNAME),STATUS='OLD',ACTION='READ')
+	    READ(10,*)K,J
+	    DO L=1,K
+	      READ(10,*)XCUR(1),XCUR(2)
+	      L_CHAN(1)=GET_INDX_SP(XCUR(1),CD(PLOT_ID)%XVEC,NPTS(PLOT_ID))
+	      L_CHAN(2)=GET_INDX_SP(XCUR(2),CD(PLOT_ID)%XVEC,NPTS(PLOT_ID))
+	      SLOPE=(CD(PLOT_ID)%DATA(L_CHAN(2))-CD(PLOT_ID)%DATA(L_CHAN(1)))/(XCUR(2)-XCUR(1))
 	      DO I=1,NPTS(PLOT_ID)
 	        IF( (CD(PLOT_ID)%XVEC(I)-XCUR(1))*(CD(PLOT_ID)%XVEC(I)-XCUR(2)) .LT. 0.0D0)THEN
-                  CD(PLOT_ID)%DATA(I)=YCUR(1)+SLOPE*(CD(PLOT_ID)%XVEC(I)-XCUR(1))
+                  CD(PLOT_ID)%DATA(I)=CD(PLOT_ID)%DATA(L_CHAN(1))+SLOPE*(CD(PLOT_ID)%XVEC(I)-XCUR(1))
 	        END IF
 	      END DO
 	    END DO
+	  CLOSE(UNIT=10)
 !
-	  ELSE 
-	    FILNAME='CONT_NODES'
-	    CALL NEW_GEN_IN(FILNAME,'File with cursor nodes')
-	    OPEN(UNIT=10,FILE=TRIM(FILNAME),STATUS='OLD',ACTION='READ')
-	      READ(10,*)K,J
-	      DO L=1,K
-	        READ(10,*)XCUR(1),XCUR(2)
-	        L_CHAN(1)=GET_INDX_SP(XCUR(1),CD(PLOT_ID)%XVEC,NPTS(PLOT_ID))
-	        L_CHAN(2)=GET_INDX_SP(XCUR(2),CD(PLOT_ID)%XVEC,NPTS(PLOT_ID))
-	        SLOPE=(CD(PLOT_ID)%DATA(L_CHAN(2))-CD(PLOT_ID)%DATA(L_CHAN(1)))/(XCUR(2)-XCUR(1))
-	        DO I=1,NPTS(PLOT_ID)
-	          IF( (CD(PLOT_ID)%XVEC(I)-XCUR(1))*(CD(PLOT_ID)%XVEC(I)-XCUR(2)) .LT. 0.0D0)THEN
-                    CD(PLOT_ID)%DATA(I)=CD(PLOT_ID)%DATA(L_CHAN(1))+SLOPE*(CD(PLOT_ID)%XVEC(I)-XCUR(1))
-	          END IF
-	        END DO
-	      END DO
-	    CLOSE(UNIT=10)
-	  END IF
-!
-	ELSE IF (ANS .EQ. 'FREP')THEN
+	ELSE IF (ANS .EQ. 'MODC')THEN
 	  IF(NPLTS .EQ. 1)THEN
 	    PLOT_ID=1; IP=2
 	  ELSE
 	    PLOT_ID=NPLTS; IP=NPLTS
 	  END IF
-	  CALL NEW_GEN_IN(PLOT_ID,'Plot for simple data replacement:')
+	  CALL NEW_GEN_IN(PLOT_ID,'Plot for simple modification:')
 	  CALL NEW_GEN_IN(IP,'Output plot:')
-	  CALL REP_DATA(PLOT_ID,IP)
+	  CALL MODIFY_CURVE(PLOT_ID,IP)
 	  TYPE_CURVE(IP)=TYPE_CURVE(PLOT_ID)
 !
 ! Define a crude straight line continuum about a line, so the EW can be
@@ -1900,7 +1864,18 @@ C
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'CEW')THEN
-	  CALL DO_CURSOR_EW_V2(XPAR,YPAR,L_FALSE,' ')
+	  CALL DO_CURSOR_EW_V3(
+	1             XPAR,XINC,XNUMST,IXTICK,IDX,
+	1             YPAR,YINC,YNUMST,IYTICK,IDY,
+	1             TICK_FAC,EXPCHAR,
+	1             XLABEL,YLABEL,TITONRHS,
+	1             LOG_AXIS,OPTION,NORMAL_R_Y_AXIS,
+	1             XLAB_FILE,YLAB_FILE,
+	1             PEN_COL,PEN_OFFSET,
+	1             REVERSE_PLOTTING_ORDER)
+!
+	ELSE IF(ANS .EQ. 'FEW')THEN
+	  CALL DO_FILE_EW_V1(' ')
 !
 	ELSE IF(ANS .EQ. 'EW')THEN
 !
