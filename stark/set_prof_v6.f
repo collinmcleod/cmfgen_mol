@@ -188,7 +188,7 @@
 	            VGT(IS)%NF=ML_END-ML_ST+1
 	            ALLOCATE(VGT(IS)%VGT_PROF(ND,VGT(IS)%NF))
 	            VGT_POINTER(SIM_INDX)=IS
-	            WRITE(6,*)IS,SIM_INDX,ML_END-ML_ST+1; FLUSH(UNIT=6)
+!	            WRITE(6,*)IS,SIM_INDX,ML_END-ML_ST+1; FLUSH(UNIT=6)
 !
 	            T2=NU_ZERO*12.85D0/C_KMS
 	            LOC_GAM_RAD=GAM_RAD
