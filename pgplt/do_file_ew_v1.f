@@ -8,6 +8,9 @@
 	USE MOD_EW_VARIABLES
 	IMPLICIT NONE
 !
+! Altered: 22-Jul-2023 - FWHM was not being set before call to GET_LINE_ID_PG.
+!                        FWHM computed using 50% points
+!                        Improved EW computation.
 ! Altered: 30-Jun-2022 - Can no append transition name to EW file.
 ! Created: 27-FEb-2022
 !
@@ -15,7 +18,6 @@
 	INTEGER, PARAMETER :: ITWO=2
 !
 	CHARACTER(LEN=80) FILE_WITH_LINE_LIMS
-!
 !
 	INTEGER, SAVE :: NPIX=3		!Integraton band pass around line limits
 	INTEGER IST,IEND		!Line limits in pixel space
@@ -33,7 +35,7 @@
 	REAL*4 SLOPE  		!Continuum slope
 	REAL*4 T1		!Work variable
 !
-	REAL*4, SAVE :: CONT_ACC=0.2		!percentage
+	REAL*4, SAVE :: CONT_ACC=0.1		!percentage
 	REAL*4, SAVE :: LOW_CONT=0.998
 	REAL*4, SAVE :: HIGH_CONT=1.002
 !
@@ -88,12 +90,18 @@
 	  IF(FILE_PRES)THEN
 	    WRITE(6,*)'File already exists -- appending new data'
 	    OPEN(UNIT=LUOUT,FILE=OUT_FILE,STATUS='OLD',ACTION='WRITE',POSITION='APPEND')
+	    CALL WRITE_EW_HEADER(6)
 	  ELSE
 	    OPEN(UNIT=LUOUT,FILE=OUT_FILE,STATUS='NEW',ACTION='WRITE')
 	    CALL WRITE_EW_HEADER(LUOUT)
 	    CALL WRITE_EW_HEADER(6)
 	  END IF
 	END IF
+!
+! Used as a work array -- needed for getting FWHM.
+!
+	  I=MAXVAL(NPTS)
+	  ALLOCATE (ONE_MIN_FDFC(I))
 !
 ! File input
 !
@@ -132,15 +140,16 @@
 !
 ! We now determine the line parameters
 !
-	    EW=0.0;  XMEAN=0.0
+	    EW=0.0; EWL=0.0; EWH=0.0; XMEAN=0.0
 	    SLOPE=(YEND-YST)/(CD(IP)%XVEC(IEND)-CD(IP)%XVEC(IST))
 	    DO I=IST,IEND
 	      YVAL=YST+(CD(IP)%XVEC(I)-CD(IP)%XVEC(IST))*SLOPE
+	      ONE_MIN_FDFC(I)=1.0D0-CD(IP)%DATA(I)/YVAL
 	      dX=(CD(IP)%XVEC(MIN(I+1,IEND))-CD(IP)%XVEC(MAX(IST,I-1)))/2
-	      EW=EW+dX*(YVAL-CD(IP)%DATA(I))
-	      EWL=EW+dX*(LOW_CONT*YVAL-CD(IP)%DATA(I))
-	      EWH=EW+dX*(HIGH_CONT*YVAL-CD(IP)%DATA(I))
-	      XMEAN=XMEAN+CD(IP)%XVEC(I)*(YVAL-CD(IP)%DATA(I))*dX
+	      EW =EW +dX*(1.0D0-CD(IP)%DATA(I)/YVAL)
+	      EWL=EWL+dX*(1.0D0-CD(IP)%DATA(I)/(LOW_CONT*YVAL))
+	      EWH=EWH+dX*(1.0D0-CD(IP)%DATA(I)/(HIGH_CONT*YVAL))
+	      XMEAN=XMEAN+dX*CD(IP)%XVEC(I)*ONE_MIN_FDFC(I)
 	    END DO
 !
 	    IF(ABS(EW)/YST .LT. 1.0D-10)THEN
@@ -151,31 +160,49 @@
 	    XMEAN=XMEAN/EW
 	    YCONT=YST+(XMEAN-CD(IP)%XVEC(IST))*SLOPE
 	    YINT=EW
-	    YMEAN=EW/(CD(IP)%XVEC(IEND)-CD(IP)%XVEC(IST))
-	    EW=EW/YCONT
-	    EWL=EWL/(YCONT*LOW_CONT)
-	    EWH=EWH/(YCONT*HIGH_CONT)
 !
 ! These parameters are used to provide information on whether a line is blended.
 !
 	    SIGMA=0.0D0; SKEWNESS=0.0D0; KURTOSIS=0.0D0
 	    DO I=IST,IEND
 	      XVAL=CD(IP)%XVEC(I)
-	      YVAL=YST+(CD(IP)%XVEC(I)-CD(IP)%XVEC(IST))*SLOPE - CD(IP)%DATA(I)
 	      dX=(CD(IP)%XVEC(MIN(I+1,IEND))-CD(IP)%XVEC(MAX(IST,I-1)))/2
-	      SIGMA=SIGMA+dX*YVAL*(XVAL-XMEAN)**2
-	      SKEWNESS=SKEWNESS+dX*YVAL*(XVAL-XMEAN)**3
-	      KURTOSIS=KURTOSIS+dX*YVAL*(XVAL-XMEAN)**4
+	      SIGMA=SIGMA+dX*ONE_MIN_FDFC(I)*(XVAL-XMEAN)**2
+	      SKEWNESS=SKEWNESS+dX*ONE_MIN_FDFC(I)*(XVAL-XMEAN)**3
+	      KURTOSIS=KURTOSIS+dX*ONE_MIN_FDFC(I)*(XVAL-XMEAN)**4
 	    END DO
-	    IF(SIGMA*YINT .LE. 0)THEN
+	    IF(SIGMA .LE. 0)THEN
 	      SIGMA=-1.0; SKEWNESS=-1.0; KURTOSIS=-1.0
 	    ELSE
-	      SIGMA=SQRT(SIGMA/YINT)
-	      SKEWNESS=SKEWNESS/YINT/SIGMA**3
-	      KURTOSIS=KURTOSIS/YINT/SIGMA**4
+	      SIGMA=SQRT(SIGMA/EW)
+	      SKEWNESS=SKEWNESS/EW/SIGMA**3
+	      KURTOSIS=KURTOSIS/EW/SIGMA**4
 	    END IF
-	    CALL GET_LINE_ID_PG(TRANS_NAME,EW,XMEAN,T1)
 !
+! Get FWHM. At present, this will only work well for
+! isolated lines in theoretical spectra.
+!
+	    IF(EW .LT. 0.0D0)ONE_MIN_FDFC=-ONE_MIN_FDFC
+	    I=MAXLOC(ONE_MIN_FDFC(IST:IEND),IONE)+IST-1
+	    YINT=ONE_MIN_FDFC(I)
+	    ONE_MIN_FDFC(IST:IEND)=(ONE_MIN_FDFC(IST:IEND)-0.5*YINT)
+	    DO J=I+1,IEND
+	      IF(ONE_MIN_FDFC(J) .LT. 0.0D0)THEN
+	        T1=ONE_MIN_FDFC(J)/(ONE_MIN_FDFC(J)-ONE_MIN_FDFC(J-1))
+	        XHIGH_FWHM=T1*CD(IP)%XVEC(J-1)+(1.0D0-T1)*CD(IP)%XVEC(J)
+	        EXIT
+	      END IF
+	    END DO
+	    DO J=I-1,IST,-1
+	      IF(ONE_MIN_FDFC(J) .LT. 0.0D0)THEN
+	        T1=ONE_MIN_FDFC(J)/(ONE_MIN_FDFC(J)-ONE_MIN_FDFC(J+1))
+	        XLOW_FWHM=T1*CD(IP)%XVEC(J+1)+(1.0D0-T1)*CD(IP)%XVEC(J)
+	        EXIT
+	      END IF
+	    END DO
+	    FWHM=2.998D+05*(XHIGH_FWHM-XLOW_FWHM)/XMEAN
+!
+	    CALL GET_LINE_ID_PG(TRANS_NAME,LINE_WAVE,EW,XMEAN,FWHM)
 	    CALL WR_EW_VARIABLES(IP,LUOUT)
 	    I=6; CALL WR_EW_VARIABLES(IP,I)
 	  END DO
@@ -183,6 +210,8 @@
 1000	  CONTINUE
 	END DO
 2000	CONTINUE
+	CLOSE(LUIN)
+	DEALLOCATE(ONE_MIN_FDFC)
 !
 	RETURN
 	END
