@@ -16,6 +16,8 @@
 !    etc
 !    
 	PROGRAM CREATE_BATOBS_INS
+	USE GEN_IN_INTERFACE
+	USE MOD_COLOR_PEN_DEF
 !
 ! Created 19-Jun-2022
 !
@@ -30,6 +32,7 @@
 	LOGICAL ANS
 	LOGICAL FILE_EXISTS
 	LOGICAL STORE_EDDFACTOR
+	LOGICAL KEEP_ALL
 !
 	CHARACTER(LEN=30) NAME_MOD
 	CHARACTER(LEN=80) STRING
@@ -39,6 +42,18 @@
 !
 	INTEGER, PARAMETER :: LUIN=10
 	INTEGER, PARAMETER :: LUOUT=30
+!
+	KEEP_ALL=.FALSE.
+!
+	WRITE(6,'(A)')RED_PEN
+	WRITE(6,'(A)')' After each model:'
+	WRITE(6,'(A)')'      ES_J_CONV will be deleted'
+	WRITE(6,'(A)')'      EDDFACTOR will be deleted unless STORE has been set in BAT_PARAMS'
+	WRITE(6,'(A)')' '
+	WRITE(6,'(A)')'  MEANOPC, J_COMP, OBSFLUX (obs_cmf) HYDRO and TIMING will be deleted'
+	WRITE(6,'(A)')'      They will be saved if KEEP_ALL is set to true.'
+	WRITE(6,'(A)')DEF_PEN
+	CALL GEN_IN(KEEP_ALL,'Keep unnecessary file -- MEANOPC, J_COMP, etc?')
 !
 ! Get keys in CMF_FLUX_PARAM_INIT. These will be compared to the
 ! requested keys. All requested keys must exist in CMF_FLUX_PARAM_INIT
@@ -58,7 +73,7 @@
 	       CMF_KEYS(NUM_KEYS)=STRING(K1:K2)
 	       IF(INDEX(CMF_KEYS(NUM_KEYS),'[TRANS_') .NE. 0)THEN
 	         WRITE(6,*)'To avoid posisble conflicts, TRANS_XzV keys'//
-	1                  '  should be removed from CMFFLUX_PARAM_INIT'
+	1                  '  should be removed from CMF_FLUX_PARAM_INIT'
 	         STOP
 	       END IF
 	    END IF
@@ -121,7 +136,7 @@
 	        IF(INDEX(STRING,'[SCL_') .NE. 0)THEN
 	          N_ADDS=N_ADDS+1
 	          ADD_STORE(N_ADDS)="sed    -i -e '$a"//TRIM(STRING)//"'  CMF_FLUX_PARAM"
-	        ELSE IF(INDEX(STRING,'[NTRANS_') .NE. 0)THEN
+	        ELSE IF(INDEX(STRING,'[TRANS_') .NE. 0)THEN
 	          N_ADDS=N_ADDS+1
 	          ADD_STORE(N_ADDS)="sed    -i -e '$a"//TRIM(STRING)//"'  CMF_FLUX_PARAM"
 	        ELSE
@@ -168,12 +183,20 @@
 	    WRITE(LUOUT,'(/,A,/)')'# Clean up the directory structure, removing all uneccessary files.'
 
 	    WRITE(LUOUT,'(A)')'mv -f OBSFRAME           obs_fin'//TRIM(NAME_MOD)
-	    WRITE(LUOUT,'(A)')'mv -f OBSFLUX            obs_cmf'//TRIM(NAME_MOD)
-	    WRITE(LUOUT,'(A)')'mv -f HYDRO              hydro_fin'//TRIM(NAME_MOD)
-	    WRITE(LUOUT,'(A)')'mv -f MEANOPAC           meanopac'//TRIM(NAME_MOD)
-	    WRITE(LUOUT,'(A)')'mv -f TIMING             full_timing'//TRIM(NAME_MOD)
-	    WRITE(LUOUT,'(A)')'mv -f J_COMP             J_COMP'//TRIM(NAME_MOD)
-	    WRITE(LUOUT,'(A)')'mv -f CMF_FLUX_PARAM     CMF_FLUX_PARAM'//TRIM(NAME_MOD)
+	    WRITE(LUOUT,'(A,/)')'mv -f CMF_FLUX_PARAM     CMF_FLUX_PARAM'//TRIM(NAME_MOD)
+	    IF(KEEP_ALL)THEN
+	      WRITE(LUOUT,'(A)')'mv -f OBSFLUX            obs_cmf'//TRIM(NAME_MOD)
+	      WRITE(LUOUT,'(A)')'mv -f HYDRO              hydro_fin'//TRIM(NAME_MOD)
+	      WRITE(LUOUT,'(A)')'mv -f MEANOPAC           meanopac'//TRIM(NAME_MOD)
+	      WRITE(LUOUT,'(A)')'mv -f TIMING             full_timing'//TRIM(NAME_MOD)
+	      WRITE(LUOUT,'(A,/)')'mv -f J_COMP             J_COMP'//TRIM(NAME_MOD)
+	    ELSE
+	      WRITE(LUOUT,'(A)')'rm -f OBSFLUX'
+	      WRITE(LUOUT,'(A)')'rm -f HYDRO'
+	      WRITE(LUOUT,'(A)')'rm -f MEANOPAC'
+	      WRITE(LUOUT,'(A)')'rm -f TIMING'
+	      WRITE(LUOUT,'(A)')'rm -f J_COMP'
+	    END IF
 	    WRITE(LUOUT,'(A)')'rm -f ES_J_CONV*'
 	    WRITE(LUOUT,'(A)')'rm -f fort.*'
 !
