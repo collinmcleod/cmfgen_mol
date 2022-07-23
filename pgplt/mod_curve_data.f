@@ -1,6 +1,7 @@
 	MODULE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
+! Altered 22-Jul-2022: Extra variables added.
 ! Altered 24-Jan-2013: Vectors in CURVE_DATA in no longer a pointer.
 !                      This required ASSOICATED test to be replaced by ALLOCATED
 !                         test in several routines. 

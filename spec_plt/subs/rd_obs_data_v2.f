@@ -41,6 +41,8 @@ C
 	1                         FILENAME,COLS,IOS)
 	IMPLICIT NONE
 C
+C Altered 22-Jul-2022 : Added new flux unit.
+C                         Earlier had updated ergs to erg in units.
 C Altered 05-jul-2021 : NKEY_WRDS_MAX installed, and check added.
 C Altered 16-Apr-2021 : Added nm to unit list.
 C Altered 07-Jul-2011 : Improved error message when reading bad data.
@@ -372,6 +374,11 @@ C
 	ELSE IF(INDEX(FLUX_UNIT,'mJy') .NE. 0 .OR.
 	1          INDEX(FLUX_UNIT,'milli-Jansky') .NE. 0)THEN
 	  FLUX(NLST+1:NPTS)=1.0D-03*FLUX(NLST+1:NPTS)
+C
+	ELSE IF(INDEX(FLUX_UNIT,'W/m^2/nm') .NE. 0)THEN
+	  DO I=NLST+1,NPTS
+	    FLUX(I)=1.0D+02*TO_JANSKY*FLUX(I)*(LAM(I)**2)
+	  END DO
 C
 	ELSE IF(INDEX(FLUX_UNIT,'Jy') .NE. 0 .OR.
 	1          INDEX(FLUX_UNIT,'Jansky') .NE. 0)THEN
