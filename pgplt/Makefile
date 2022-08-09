@@ -33,12 +33,15 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(draw_ew_ids.o)\
       $(LIB)(draw_ew_lines.o)\
       $(LIB)(draw_right_y_axis.o)\
-      $(LIB)(ed_gaus_fit.o)\
+      $(LIB)(ed_gauss_fit.o)\
       $(LIB)(ew_group.o)\
       $(LIB)(find_lines.o)\
       $(LIB)(fntick.o)\
-      $(LIB)(gaus_romb.o)\
-      $(LIB)(gaus_fit_er.o)\
+      $(LIB)(gauss_fit.o)\
+      $(LIB)(gauss_fit_data.o)\
+      $(LIB)(gauss_fit_func.o)\
+      $(LIB)(gauss_fit_er.o)\
+      $(LIB)(gauss_romb_v2.o)\
       $(LIB)(get_gramon_min_max.o)\
       $(LIB)(get_line_id_pg.o)\
       $(LIB)(get_pgi_file_info.o)\
@@ -65,11 +68,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(smooth_plt.o)\
       $(LIB)(spacing.o)\
       $(LIB)(vectorpen.o)\
-      $(LIB)(gaus_fit_data.o)\
-      $(LIB)(do_gaus_fit.o)\
-      $(LIB)(wr_gaus_fit.o)\
-      $(LIB)(write_line_lambdas.o)\
-      $(LIB)(gaus_fit_func.o)
+      $(LIB)(write_line_lambdas.o)
 
 all : $(LIB)
 	rm -f *.o
@@ -110,14 +109,11 @@ $(LIB)(arrange_pg_curve_ids.o)  : arrange_pg_curve_ids.f   $(LIB)(mod_curve_data
 $(LIB)(do_cursor_ew_v3.o) : do_cursor_ew_v3.f   $(LIB)(mod_curve_data.o) $(GEN) $(COL)  $(LIB)(mod_ew_variables.o)
 $(LIB)(do_file_ew_v1.o)   : do_file_ew_v1.f     $(LIB)(mod_curve_data.o) $(GEN) $(COL)  $(LIB)(mod_ew_variables.o)
 
-$(LIB)(wr_gaus_fit.o)     : wr_gaus_fit.f   $(LIB)(gaus_fit_data.o)
-$(LIB)(do_gaus_fit.o)     : do_gaus_fit.f   $(LIB)(gaus_fit_data.o)
-$(LIB)(do_mult_gf.o)      : do_mult_gf.f    $(LIB)(gaus_fit_data.o)
-$(LIB)(gaus_fit_func.o)   : gaus_fit_func.f $(LIB)(gaus_fit_data.o)
-$(LIB)(gaus_fit_er.o)     : gaus_fit_er.f   $(LIB)(gaus_fit_data.o)
-$(LIB)(gaus_romb.o)       : gaus_romb.f     $(LIB)(gaus_fit_data.o)
-$(LIB)(ed_gaus_fit.o)     : ed_gaus_fit.f   $(LIB)(gaus_fit_data.o)
-$(LIB)(find_lines.o)      : find_lines.f    $(LIB)(gaus_fit_data.o)
+$(LIB)(gauss_fit.o)        : gauss_fit.f         $(LIB)(gauss_fit_data.o)
+$(LIB)(gauss_fit_func.o)   : gauss_fit_func.f    $(LIB)(gauss_fit_data.o)
+$(LIB)(gauss_fit_er.o)     : gauss_fit_er.f      $(LIB)(gauss_fit_data.o)
+$(LIB)(gauss_romb_v2.o)    : gauss_romb_v2.f     $(LIB)(gauss_fit_data.o)
+$(LIB)(ed_gauss_fit.o)     : ed_gaus_fit.f       $(LIB)(gauss_fit_data.o)
 
 $(GEN):
 	(cd ../tools; make )

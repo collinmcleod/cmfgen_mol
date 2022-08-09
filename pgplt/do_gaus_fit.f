@@ -8,6 +8,9 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 09-Aug-2022: Now allows automatic movement along a spectrum.
+!                      Selection of initial Gauss parameters now done by cursor.
+!                      This routine is being superceded by GAUSS_FIT.
 ! Altered 27-Feb-2022: Fixed bug in EW error estimates when using unormalized data.
 ! Altered 25-Feb-2022: Some cleaning
 ! Altered 01-Feb-2022: Extensive changes implmented to allow cursor input of

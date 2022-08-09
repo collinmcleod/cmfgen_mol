@@ -6,6 +6,7 @@
 	REAL*4 FWHM_KS
 	REAL*4 LINE_WAVE
 !
+! Altered 02-Jul-2022: Now use TAU_VAL rather than 3 times, and use ABS value. 
 ! Altered 23-Jul-2022: Added LINE_WAVE to call.
 ! Altered 22-Jul-2022: Better check if ID exits.
 !
@@ -24,6 +25,7 @@
 	  RETURN
 	END IF
 !
+	WRITE(6,*)'Hope',LINE_CENTER,FWHM_KMS
 	OFF_STORE=1.0D+10
 	PNT_STORE=0
 	DO I=1,N_LINE_IDS-1
@@ -31,6 +33,7 @@
 	  DO K=1,NMATCH
 	    IF(T1 .LT. OFF_STORE(K))THEN
 	      OFF_STORE(K+1:NMATCH)=OFF_STORE(K:NMATCH-1)
+              PNT_STORE(K+1:NMATCH)=PNT_STORE(K:NMATCH-1)
 	      OFF_STORE(K)=T1
               PNT_STORE(K)=I
 	      EXIT
@@ -38,18 +41,15 @@
 	  END DO
 	END DO
 !
-! Now decide on best line
+! Now decide on best line. We use ABS values since values from the
+! file created with PLNID can be negative.
 !
 	IF(PNT_STORE(1) .EQ. 0)THEN
 	ELSE
-	  I=PNT_STORE(1)
-	  TRANS_NAME=FULL_LINE_ID(I)
-	  TAU_VAL=TAU(I)
-	  LINE_WAVE=ID_WAVE(I)
-	  DO K=2,NMATCH
+	  DO K=1,NMATCH
 	    IF(OFF_STORE(K) .LT. 0.1)THEN
 	      I=PNT_STORE(K)
-	      IF(TAU(I) .GT. 3*TAU_VAL)THEN
+	      IF(TAU(I) .GT. ABS(TAU_VAL))THEN
 	        TRANS_NAME=FULL_LINE_ID(I)
 	        TAU_VAL=TAU(I)
 	        LINE_WAVE=ID_WAVE(I)

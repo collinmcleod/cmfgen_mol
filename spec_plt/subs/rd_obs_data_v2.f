@@ -41,6 +41,7 @@ C
 	1                         FILENAME,COLS,IOS)
 	IMPLICIT NONE
 C
+C Altered 09-Aug-2022: Changed to detect possible problem with type of input file.
 C Altered 22-Jul-2022 : Added new flux unit.
 C                         Earlier had updated ergs to erg in units.
 C Altered 05-jul-2021 : NKEY_WRDS_MAX installed, and check added.
@@ -80,6 +81,8 @@ C
 	INTEGER CONFUSE_CNT
 	INTEGER N_STR
 	INTEGER NLST
+	INTEGER CNT
+!
 	CHARACTER*200 STRING(NKEY_WRD_MAX)
 	CHARACTER*200 TMP_STRING
 	CHARACTER*80 WAVE_UNIT
@@ -87,6 +90,8 @@ C
 	CHARACTER*80 FLUX_UNIT
 	CHARACTER*20 FLUX_KEY_WORD
 	CHARACTER*20 DATA_FORM
+	CHARACTER(LEN=1) ANS
+!
 	LOGICAL FINISHED
 	LOGICAL OMIT
 C
@@ -114,10 +119,21 @@ C
 C Get default flux unit.
 C
 	STRING(1)=' '
+	CNT=0
 	DO WHILE(INDEX(STRING(1),'FLUX_UNIT=') .EQ. 0 .AND.
 	1                INDEX(STRING(1),'FLUX_UNIT_2=') .EQ. 0)
 	  WRITE(T_OUT,'(A)')TRIM(STRING(1))
 	  READ(10,'(A)',IOSTAT=IOS)STRING(1)
+	  CNT=CNT+1
+	  IF(CNT .EQ. 30)THEN
+	    WRITE(6,'(//,A)',ADVANCE='NO')'FLUX_UNIT not found after 30 lines -- any character exits: '
+	    READ(5,'(A)')ANS
+	    IF(ANS .NE. ' ')THEN
+	      CLOSE(UNIT=10)
+	      RETURN
+	    END IF
+	  END IF 
+!
 	  IF(IOS .NE. 0)THEN
 	    WRITE(T_OUT,*)'FLUX_UNIT not found in file for RD_OBS_DATA'
 	    WRITE(T_OUT,'(A)')STRING(1)
