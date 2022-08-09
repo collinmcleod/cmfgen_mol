@@ -8,6 +8,9 @@
 	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
+! Altered:  09-Aug-2022 : Improvements to GF option 
+!                           (options to draw GF not yet working).
+!                           Most old options now part of CGF.
 ! Altered:  30-Jun-2022 : Changed to allow transition name to be added to EW measurements.
 ! Altered:  16-Jul-2021 : Added error to link error vector to another vector.
 !                           Clarifcation notes added to DC option.
@@ -221,6 +224,7 @@
 	REAL*8 C_VAL
 	LOGICAL AIR_LAM
 	CHARACTER(LEN=5), SAVE :: VEL_UNIT='km/s'
+	CHARACTER(LEN=10) GF_OPTION
 !
 ! For XAR and YAR arithmetic options.
 !
@@ -629,11 +633,11 @@
 	  WRITE(T_OUT,*)'FEW - Measure the EW of a line using locations read in from file set by CEW'
 	  WRITE(T_OUT,*)'EW  - Measure the EW of a single line'
 	  WRITE(T_OUT,*)'EWG - Measure the EW of many lines use Gaussian fiting usig data from a file'
-	  WRITE(T_OUT,*)'GF  - Fit a (modfied) gaussian to an absorption or emission line'  
-	  WRITE(T_OUT,*)'MGF - Fit multiple gaussian to an absorption or emission complex'  
-	  WRITE(T_OUT,*)'EGF - Edit gauss-fit arameters'
-	  WRITE(T_OUT,*)'DG  - Draw gauss-fit.'
-	  WRITE(T_OUT,*)'WGF - Write gauss-fit parameters to a file'
+	  WRITE(T_OUT,*)'CGF - Fit a (modfied) gaussian to an absorption or emission line'  
+	  WRITE(T_OUT,*)'FGF - Fit multiple spctral regions using params read in fro GAUSS_PARAMS'
+!	  WRITE(T_OUT,*)'EGF - Edit gauss-fit arameters'
+!	  WRITE(T_OUT,*)'DG  - Draw gauss-fit.'
+!	  WRITE(T_OUT,*)'WGF - Write gauss-fit parameters to a file'
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
 !
@@ -1556,6 +1560,7 @@ C
 	    ISTR=ISTR+1
 	  END DO
 	  GOTO 1000
+!
 	ELSE IF(ANS .EQ. 'RID')THEN
 	  N_LINE_IDS=0
 	  J=0
@@ -1838,22 +1843,20 @@ C
 	  END IF
 	  CD(IP)%CURVE_ID=' '
 	  GOTO 1000
-C
-	ELSE IF(ANS .EQ. 'GF')THEN
+!
+	ELSE IF(ANS .EQ. 'CGF' .OR. ANS .EQ. 'FGF')THEN
 	  DRAW_GAUSS_HARD=.TRUE.
-	  CALL DO_GAUS_FIT(XPAR(1),XPAR(2))
-	  GOTO 1000
-!
-	ELSE IF(ANS .EQ. 'WGF')THEN
-	  CALL WR_GAUS_FIT
-	  GOTO 1000
-!
-	ELSE IF(ANS .EQ. 'MGF')THEN
-	  CALL DO_MULT_GF(XPAR(1),XPAR(2))
-	  GOTO 1000
-!
-	ELSE IF(ANS .EQ. 'EG')THEN
-	  CALL ED_GAUS_FIT()
+	  IF(ANS .EQ. 'CGF')GF_OPTION='CURSOR'
+	  IF(ANS .EQ. 'FGF')GF_OPTION='FILE'
+	  CALL GAUSS_FIT(GF_OPTION,
+	1             XPAR,XINC,XNUMST,IXTICK,IDX,
+	1             YPAR,YINC,YNUMST,IYTICK,IDY,
+	1             TICK_FAC,EXPCHAR,
+	1             XLABEL,YLABEL,TITONRHS,
+	1             LOG_AXIS,OPTION,NORMAL_R_Y_AXIS,
+	1             XLAB_FILE,YLAB_FILE,
+	1             PEN_COL,PEN_OFFSET,
+	1             REVERSE_PLOTTING_ORDER)
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'SEW')THEN
@@ -1862,7 +1865,7 @@ C
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'DG')THEN
-	  CALL DRAW_GAUS(L_FALSE)
+!	  CALL DRAW_GAUS(L_FALSE)
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'CEW')THEN
@@ -3455,7 +3458,7 @@ C
 !
 ! Draw Gaussian fits if needed.
 !
-	IF(HARD .AND. DRAW_GAUSS_HARD)CALL DRAW_GAUS(L_FALSE)
+!	IF(HARD .AND. DRAW_GAUSS_HARD)CALL DRAW_GAUS(L_FALSE)
 !
 	IF(MARK)THEN
 	  CALL PGSCH(EXPMARK)

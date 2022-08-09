@@ -99,11 +99,13 @@
 ! External function.
 !
 	INTEGER GET_INDX_SP
+	CHARACTER(LEN=30) UC
 	EXTERNAL GET_INDX_SP
+	EXTERNAL UC
 !
-	LOGICAL RESET_DEFAULTS
 	LOGICAL END_FILE
 	LOGICAL FILE_PRES
+	LOGICAL, SAVE ::  RESET_DEFAULTS=.TRUE.
 !
 	CHARACTER(LEN=80) LOC_FILE_WITH_LINE_LIMS
 	CHARACTER(LEN=80) OUT_FILE 
@@ -115,8 +117,9 @@
 	YLOC=0.5D0*(YPAR(1)+YPAR(2))
 	dY=0.05*(YPAR(2)-YPAR(1))
 !
-	RESET_DEFAULTS=.FALSE.
-	CALL GEN_IN(RESET_DEFAULTS,'Reset default parameters/settings?')
+	IF(.NOT. RESET_DEFAULTS)THEN
+	  CALL GEN_IN(RESET_DEFAULTS,'Reset plot and parameters/settings?')
+	END IF
 	IF(RESET_DEFAULTS)THEN
 	  IF(NPLTS .EQ. 1)THEN
 	    IP=1
@@ -124,7 +127,7 @@
 	    CALL GEN_IN(IP,'Plot for fitting')
 	  END IF
 !
-! Used if average data on X-limits to defined the continuum level.
+! Used if average data at X-limits is used to define the continuum level.
 !
 	  NPIX=1
 	  CALL GEN_IN(NPIX,'Number of pixels at X location to average continuum (must be odd)')
@@ -136,6 +139,7 @@
 	  CALL GEN_IN(CONT_ACC,'Measure accuracy for continuum -- percentage?')
 	  LOW_CONT=1.0-CONT_ACC/100.0D0
 	  HIGH_CONT=1.0+CONT_ACC/100.0D0
+	  RESET_DEFAULTS=.FALSE.
 	END IF
 !
 ! Used as a work array -- needed for getting FWHM.
@@ -183,16 +187,17 @@
 	    WRITE(6,*)'Invalid X start location -- start again'
 	    GOTO 1000
 	  END IF
-	  IF(CURSVAL .EQ. 'e')THEN
+!
+	  IF(UC(CURSVAL) .EQ. 'Q')THEN
 	    EXIT
-	  ELSE IF(CURSVAL .EQ. 's')THEN
+	  ELSE IF(UC(CURSVAL) .EQ. 'S')THEN
 	    GOTO 1000
-	  ELSE IF(CURSVAL .EQ. 'y')THEN
+	  ELSE IF(UC(CURSVAL) .EQ. 'Y')THEN
 	    CALL PGPT(IONE,XLOC,YLOC,ITWO)
 !
 ! Y value set by average at cursor location
 !
-	  ELSE IF(CURSVAL .EQ. 'a')THEN
+	  ELSE IF(UC(CURSVAL) .EQ. 'A')THEN
 	    YST=0.0
 	    DO J=IST-NPIX/2,IST+NPIX/2
 	      YST=YST+CD(IP)%DATA(J)
@@ -204,20 +209,20 @@
 !
 ! Options to move/expand/contract plot in X direction.
 !
-	  ELSE IF(CURSVAL .EQ. 'n' .OR.
-	1           CURSVAL .EQ. 'p' .OR.
-	1           CURSVAL .EQ. 'x' .OR.
-	1           CURSVAL .EQ. 'c')THEN
+	  ELSE IF(UC(CURSVAL) .EQ. 'N' .OR.
+	1         UC(CURSVAL) .EQ. 'P' .OR.
+	1         UC(CURSVAL) .EQ. 'X' .OR.
+	1         UC(CURSVAL) .EQ. 'C')THEN
 	    T1=XPAR(2)-XPAR(1)
-	    IF(CURSVAL .EQ. 'n')THEN
+	    IF(UC(CURSVAL) .EQ. 'N')THEN
 	      XPAR(1)=XPAR(2)-XINC
 	      XPAR(2)=XPAR(1)+T1
-	    ELSE IF(CURSVAL .EQ. 'p')THEN
+	    ELSE IF(UC(CURSVAL) .EQ. 'P')THEN
 	      XPAR(1)=XPAR(1)+XINC-(XPAR(2)-XPAR(1))
 	      XPAR(2)=XPAR(1)+T1
-	    ELSE IF(CURSVAL .EQ. 'x')THEN
+	    ELSE IF(UC(CURSVAL) .EQ. 'X')THEN
 	      XPAR(2)=XPAR(2)+XINC
-	    ELSE IF(CURSVAL .EQ. 'c')THEN
+	    ELSE IF(UC(CURSVAL) .EQ. 'C')THEN
 	      XPAR(2)=XPAR(2)-XINC
 	    END IF
 	    XLOC=XPAR(1)+XINC
@@ -265,13 +270,14 @@
 	  END IF
 	  IEND=GET_INDX_SP(XLOC,CD(IP)%XVEC,NPTS(IP))
 	  XEND=XLOC; YEND=YLOC
-	  IF(CURSVAL .EQ. 'e')THEN
+	  IF(UC(CURSVAL) .EQ. 'Q')THEN
 	    EXIT
-	  ELSE IF(CURSVAL .EQ. 's')THEN
+	  ELSE IF(UC(CURSVAL) .EQ. 'S')THEN
+	    WRITE(6,*)'Restarting line selection again'
 	    GOTO 1000
-	  ELSE IF(CURSVAL .EQ. 'y')THEN
+	  ELSE IF(UC(CURSVAL) .EQ. 'Y')THEN
 	    CALL PGPT(IONE,XLOC,YLOC,ITWO)
-	  ELSE IF(CURSVAL .EQ. 'a')THEN
+	  ELSE IF(UC(CURSVAL) .EQ. 'A')THEN
 	    YEND=0.0
 	    DO J=IEND-NPIX/2,IEND+NPIX/2
 	      YEND=YEND+CD(IP)%DATA(J)
@@ -377,18 +383,19 @@
 !
 	  WRITE(6,'(A)')BLUE_PEN
 	  WRITE(6,'(A)')' Program assumes X axis increases with X index '
+	  WRITE(6,'(A)')' Cursor controls are case INsensitive'
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')' Use cursor to define left and right side of line:'
-	  WRITE(6,'(A)')'   y - uses cursor Y value for continuum location'
-	  WRITE(6,'(A)')'   s - reset and start line selection again'
-	  WRITE(6,'(A)')'   a - Y value is average over data at X location'
-	  WRITE(6,'(A)')'   e - exit line selection'
+	  WRITE(6,'(A)')'   Y - uses Y cursor value for continuum location'
+	  WRITE(6,'(A)')'   S - reset and start line selection again'
+	  WRITE(6,'(A)')'   A - Y value is average over data at X location'
+	  WRITE(6,'(A)')'   Q - quit line selection'
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')'Plot movement'
-	  WRITE(6,'(A)')'   n(ext)      -- shift window to left by X increment'
-	  WRITE(6,'(A)')'   p(revious)  -- shift window to right by X increment'
-	  WRITE(6,'(A)')'   x(extend)   -- expand window by increment but no shift'
-	  WRITE(6,'(A)')'   c(ontract)  -- contract window by increment but no shift'
+	  WRITE(6,'(A)')'   N(ext)      -- shift window to left by X increment'
+	  WRITE(6,'(A)')'   P(revious)  -- shift window to right by X increment'
+	  WRITE(6,'(A)')'   X(extend)   -- expand window by increment but no shift'
+	  WRITE(6,'(A)')'   C(ontract)  -- contract window by increment but no shift'
 	  WRITE(6,'(A)')DEF_PEN
 !
 	  RETURN

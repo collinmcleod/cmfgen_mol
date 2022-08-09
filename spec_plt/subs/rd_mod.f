@@ -1,6 +1,7 @@
 	SUBROUTINE RD_MOD(OBS_FREQ,OBS_FLUX,NCF_MAX,NCF,FILENAME,IOS)
 	IMPLICIT NONE
 C
+C Altered 09-Aug-2022: Changed to detect possible problem with type of input file.
 C Altered 04-Jan-1999: Can now read in an arbitrary number of frequencies
 C                       on a given line.
 C Altered 02-May-1995: IOS installed in call.
@@ -16,7 +17,8 @@ C
 	INTEGER, PARAMETER :: T_OUT=6
 C
 	CHARACTER*132 STRING
-	INTEGER I
+	CHARACTER(LEN=10) ANS
+	INTEGER I,CNT
 C
 	OPEN(UNIT=10,FILE=FILENAME,ACTION='READ',STATUS='OLD',IOSTAT=IOS)
 	IF(IOS .NE. 0)THEN
@@ -33,8 +35,19 @@ C
 C Continue reading observed frequencies until we hit FLUX header string.
 C
 	STRING=' '
+	CNT=0
 	DO WHILE (INDEX(STRING,'Frequencies') .EQ. 0)
 	  READ(10,'(A)')STRING
+	  CNT=CNT+1
+	  IF(CNT .EQ. 30)THEN
+	    WRITE(6,'(/,/,A)')'30 lines have been read -- does this file have the correct OBSFLUX format?'
+	    WRITE(6,'(A)',ADVANCE='NO')'Do you wish to continue (return continues): '
+	    READ(5,'(A)')ANS
+	    IF(ANS(1:1) .NE. ' ')THEN
+	      CLOSE(UNIT=30)
+	      RETURN
+	    END IF
+	  END IF
 	END DO
 	READ(10,*,ERR=50)( OBS_FREQ(I),I=1,NCF_MAX)
 50	CONTINUE
