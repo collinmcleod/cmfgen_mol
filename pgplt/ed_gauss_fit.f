@@ -2,11 +2,12 @@
 ! Subroutine designed to edit the modified Gaussian data. New Gaussians may also
 ! be added. After each edit, the full Gaussian list is output for inspection.
 !
-	SUBROUTINE ED_GAUS_FIT
-	USE GAUS_FIT_DATA
+	SUBROUTINE ED_GAUSS_FIT
+	USE GAUSS_FIT_DATA
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 09-Aug-2022  To get consistency inthe different routines changed to use Gauss.
 ! Altered: 01-Feb-2022          !Now allow a maximum of 20 new Gaussians to be added.
 ! Created:  -Sep-2007		!Author: D. J. Hillier
 !
@@ -15,11 +16,11 @@
 	INTEGER IP			!# of Gaussian
 	LOGICAL SCRAP
 !
-	IF( NUM_GAUS .NE. (NG_PAR-2)/4 )THEN
-	  WRITE(6,*)'Error in ED_GAUS_FIT: NM_GAUS inconsistent with NG_PAR'
-	  WRITE(6,*)'    NUM_GAUS=',NUM_GAUS
+	IF( NUM_GAUSS .NE. (NG_PAR-2)/4 )THEN
+	  WRITE(6,*)'Error in ED_GAUSS_FIT: NM_GAUSS inconsistent with NG_PAR'
+	  WRITE(6,*)'    NUM_GAUSS=',NUM_GAUSS
 	  WRITE(6,*)'      NG_PAR=',NG_PAR
-	  WRITE(6,*)'4*NUM_GAUS+2=',4*NUM_GAUS+2
+	  WRITE(6,*)'4*NUM_GAUSS+2=',4*NUM_GAUSS+2
 	  STOP
 	END IF
 !
@@ -44,11 +45,11 @@
 	  END DO
 	  IF(NG_PAR .EQ. NG_PAR_MAX)THEN
 	    WRITE(6,*)'You have reached the maximum number of Gaussians that you can add'
-	    WRITE(6,*)'Fit the data, and renter edit routine (ED_GAUS_FIT)'
+	    WRITE(6,*)'Fit the data, and renter edit routine (ED_GAUSS_FIT)'
 	  END IF
 	  SCRAP=.FALSE.; CALL GEN_IN(SCRAP,'Discard all Gaussians?')
 	  IF(SCRAP)THEN
-	    NUM_GAUS=0
+	    NUM_GAUSS=0
 	    WRITE(6,*)'Enter 0 for next option to exit this routine'
 	    WRITE(6,*)'You can still add a set of Gaussian parameters by hand'
 	    IP=0
@@ -56,12 +57,12 @@
 !
 	  CALL GEN_IN(IP,'Gaussian data to edit: 0 to exit, -ve # to delete that Gaussian')
 	  IF(IP .EQ. 0)EXIT
-	  IF(IP .LT. 0 .AND. ABS(IP) .LE. NUM_GAUS)THEN
+	  IF(IP .LT. 0 .AND. ABS(IP) .LE. NUM_GAUSS)THEN
 	    IP=-IP
 	    K=3+4*(IP-1)
 	    TMP_PAR(K:NG_PAR-4)=TMP_PAR(K+4:NG_PAR)
-	    NUM_GAUS=NUM_GAUS-1
-	    NG_PAR=2+NUM_GAUS*4
+	    NUM_GAUSS=NUM_GAUSS-1
+	    NG_PAR=2+NUM_GAUSS*4
 !
 	    WRITE(6,'(A,4(8X,A))')'Index','  Lambda','  Height','Sigma(a)','Exponent'
 	    DO K=3,NG_PAR,4
@@ -71,7 +72,7 @@
 ! Can now edit the  Gaussian.
 !
 	  ELSE IF(IP .GT. 0)THEN
-	    IP=MIN(NUM_GAUS+1,IP)
+	    IP=MIN(NUM_GAUSS+1,IP)
 	    K=2+(IP-1)*4+1
 	    CALL GEN_IN(TMP_PAR(K),'Central wavlength of Gaussian')
 	    IF(TMP_PAR(K+2) .EQ. 0.0D0)TMP_PAR(K+2)=-0.2D0
@@ -80,14 +81,14 @@
 	    CALL GEN_IN(TMP_PAR(K+1),'Sigma of Gassian')
 	    IF(TMP_PAR(K+3) .EQ. 0.0D0)TMP_PAR(K+3)=2.0D0
 	    CALL GEN_IN(TMP_PAR(K+3),'Guassian exponent')
-	    NUM_GAUS=MAX(NUM_GAUS,IP)
-	    NG_PAR=2+NUM_GAUS*4
+	    NUM_GAUSS=MAX(NUM_GAUSS,IP)
+	    NG_PAR=2+NUM_GAUSS*4
 	  END IF
 	END DO
 !
 ! Clean up and save the modified Gaussian parameters.
 !
-	NG_PAR=2+NUM_GAUS*4
+	NG_PAR=2+NUM_GAUSS*4
 	PAR(1:NG_PAR)=TMP_PAR(1:NG_PAR)
 	DEALLOCATE (TMP_PAR)
 !	

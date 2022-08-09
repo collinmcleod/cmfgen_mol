@@ -15,6 +15,7 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered  09-Aug-2022 : Improved handling of FLUX_DEFICIT line id's (PLNID option).
 ! Altered  17-Nov-2021 : Copied from OSIRIS.
 !                        Fixed call to SOBEW_GRAD_V2.
 !                        Now call DU_CURVE_LAB (change done initially on OSIRIS).
@@ -260,7 +261,8 @@
 	REAL*8 FREQ_ST,FREQ_EN
 	REAL*8 NU_ST,NU_EN
 	REAL*8 FREQ_RES,FREQ_MAX
-	REAL*8 T1,T2,T3,T4
+	REAL*8 T1,T2,T3,T4,T5
+	REAL*8 FLUX_DEFICIT
 	REAL*8 VSHIFT,VDOP,DEL_V
 	REAL*8 EK_EJECTA
 	REAL*8 TMP_ED
@@ -3183,12 +3185,21 @@
 	            T2=12.86D0*SQRT( T(I)/AT_MASS(SPECIES_LNK(ID))+(VTURB/12.86D0)**2 )/C_KMS
 	            CHIL(I)=MAX(1.0D-15*CHIL(I)/FL/T2/SQRT(PI),1.0D-10)
 	          END DO
+	          T1=(ANG_TO_HZ/FL)/5000.0D0                               !Normalized to 5000 Ang.
+                  T2=LOG10(VEC_OSCIL(LINE_INDX)*ATM(ID)%GXzV_F(MNL_F)*T1)
+                  T3=HDKT*(ATM(ID)%EDGEXzV_F(1)-ATM(ID)%EDGEXzV_F(MNL_F))
+!
+! NB: The EW in ANg is proportional to tau.(lambda)^2. Hence EW/lambda
+! is propotional to tau.lambda
+!
                   CALL TORSCL_V2(TA,CHIL,R,TB,TC,DPTH_INDX,'ZERO',TYPE_ATM,L_FALSE)
 	          TAU_SOB=T4*TA(DPTH_INDX)+(1.0D0-T4)*TA(DPTH_INDX-1)
+	          T5=(10.0**T2)*EXP(-T3/2.75D0)/(TAU_SOB*T1)
+!
 	          STRING=' ';  IF(FLAG)STRING=VEC_TRANS_NAME(LINE_INDX)
 	          IF(TAU_SOB .GT. TAU_LIM)THEN
-	            WRITE(73,'(A,F12.3,ES15.5,F12.3,3X,F3.0,I6,5X,A)')ION_ID(ID),ANG_TO_HZ/FL,
-	1                               TAU_SOB,ANG_TO_HZ/FL,1.0,2,TRIM(STRING)
+	            WRITE(73,'(A,F12.3,ES15.5,F12.3,3(3X,ES10.3),2I6,3X,F3.0,I6,5X,A)')ION_ID(ID),ANG_TO_HZ/FL,
+	1                               TAU_SOB,ANG_TO_HZ/FL,T2,T3,T5,MNL_F,MNUP_F,1.0,2,TRIM(STRING)
 	          END IF
 	        END IF
 	      END DO
@@ -3292,14 +3303,18 @@
 	      CHIL(I)=MAX(T2*CHIL(I)*CLUMP_FAC(I),1.0D-10)
 	      ETAL(I)=ETAL(I)*T2*CLUMP_FAC(I)
 	    END DO
-	    CALL GET_FLUX_DEFICIT(T2,R,ETA,CHI,CHI_RAY,CHI_SCAT,ESEC,ETAL,CHIL,FL,DBB,ND)
+	    CALL GET_FLUX_DEFICIT(FLUX_DEFICIT,R,ETA,CHI,CHI_RAY,CHI_SCAT,ESEC,ETAL,CHIL,FL,DBB,ND)
 !
-	    IF(ABS(T2).GT. DEPTH_LIM)THEN
+            T1=(ANG_TO_HZ/FL)/5000.0D0
+            T2=LOG10(VEC_OSCIL(LINE_INDX)*ATM(ID)%GXzV_F(MNL_F)*T1)
+            T3=HDKT*(ATM(ID)%EDGEXzV_F(1)-ATM(ID)%EDGEXzV_F(MNL_F))
+!
+	    IF(ABS(FLUX_DEFICIT).GT. DEPTH_LIM)THEN
 	      STRING=' ';  IF(FLAG)STRING=VEC_TRANS_NAME(LINE_INDX)
 	      T1=ANG_TO_HZ/FL
 	      IF(.NOT. ATM(ID)%OBSERVED_LEVEL(MNL_F) .OR. .NOT. ATM(ID)%OBSERVED_LEVEL(MNUP_F))T1=-T1
-	      WRITE(73,'(A,F12.3,ES14.5,F12.3,3X,F3.0,I6,5X,A)')ION_ID(ID),T1,
-	1                               T2,ANG_TO_HZ/FL,1.0,2,TRIM(STRING)
+	      WRITE(73,'(A,F12.3,ES15.5,F12.3,2(3X,ES10.3),2I6,3X,F3.0,I6,5X,A)')ION_ID(ID),ANG_TO_HZ/FL,
+	1                         FLUX_DEFICIT,ANG_TO_HZ/FL,T2,T3,MNL_F,MNUP_F,1.0,2,TRIM(STRING)
 	      IF(FLUSH_FILE)FLUSH(UNIT=73)
 	    END IF
 	    IF(MOD(LINE_INDX-NL,MAX(10,(NUP-NL)/10)) .EQ. 0)THEN
