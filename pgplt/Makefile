@@ -61,6 +61,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(pg_mod_cont_nodes.o)\
       $(LIB)(put_text.o)\
       $(LIB)(rd_ew_id.o)\
+      $(LIB)(rd_line_ids.o)\
       $(LIB)(modify_curve.o)\
       $(LIB)(simp_ew.o)\
       $(LIB)(strip_slash_p.o)\
@@ -99,6 +100,7 @@ $(LIB)(draw_ew_ids.o)        : draw_ew_ids.f      $(LIB)(line_id_mod.o)  $(COL)
 $(LIB)(draw_ew_lines.o)      : draw_ew_lines.f    $(LIB)(line_id_mod.o)  $(COL) 
 $(LIB)(rd_ew_id.o)           : rd_ew_id.f         $(LIB)(line_id_mod.o)  $(COL) 
 $(LIB)(get_line_id.o)        : get_line_id.f      $(LIB)(line_id_mod.o)  $(COL) 
+$(LIB)(rd_line_ids.o)        : rd_line_ids.f      $(LIB)(line_id_mod.o)  $(COL) 
 
 $(LIB)(gramon_pgplot.o)         : gramon_pgplot.f          $(LIB)(mod_curve_data.o) $(LIB)(line_id_mod.o) $(GEN) $(COL) 
 $(LIB)(curve.o)                 : curve.f                  $(LIB)(mod_curve_data.o) $(GEN)
@@ -114,6 +116,8 @@ $(LIB)(gauss_fit_func.o)   : gauss_fit_func.f    $(LIB)(gauss_fit_data.o)
 $(LIB)(gauss_fit_er.o)     : gauss_fit_er.f      $(LIB)(gauss_fit_data.o)
 $(LIB)(gauss_romb_v2.o)    : gauss_romb_v2.f     $(LIB)(gauss_fit_data.o)
 $(LIB)(ed_gauss_fit.o)     : ed_gaus_fit.f       $(LIB)(gauss_fit_data.o)
+
+$(LIB)(do_mult_gf.o)     : do_mult_gf.f       $(LIB)(gaus_fit_data.o)
 
 $(GEN):
 	(cd ../tools; make )

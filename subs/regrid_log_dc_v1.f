@@ -7,6 +7,7 @@
 	1               POPATOM,N,ND,LU_IN,INTERP_OPTION,FILE_NAME)
 	IMPLICIT NONE
 !
+! Altered 20-Aug-2022 - Error/warning messages improved for TR option.
 ! Altered 31-May-2022 - Added RNS option: R grid not scaled.
 ! Altered 06-Dec-2021 - Removed write ED, OLD_E from ED option.
 ! Altered 18-Aug-2019 - Added TR option. Designed to interpolate DC's in T in the inner region, and
@@ -85,7 +86,11 @@
 !
 	LUER=ERROR_LU()
 	LUWARN=WARNING_LU()
-	WRITE(6,*)'IN REGRID_DC_V1';FLUSH(UNIT=6)!
+	IF(FIRST)THEN
+	  WRITE(6,'(/,A)')' Using REGRID_LOG_DC_V1 to read in initial population estimates'
+	  WRITE(6,'(A,/)')' Using option:',TRIM(INTERP_OPTION)
+	END IF
+!
 ! Read in values from previous model.
 !
 	OPEN(UNIT=LU_IN,STATUS='OLD',FILE=FILE_NAME,IOSTAT=IOS)
@@ -179,7 +184,6 @@
 	      WRITE(LUER,*)'Warning - core radius not identical in REGRID_LOG_DC_V1'
 	      WRITE(LUER,*)'Rescaling to make Rcore identical --- ',TRIM(FILE_NAME)
 	      WRITE(LUER,*)'Additional warnings will be output to WARNINGS'
-	      FIRST=.FALSE.
 	    ELSE
 	      WRITE(LUWARN,*)'Rescaling to make Rcore identical --- ',TRIM(FILE_NAME)
 	    END IF
@@ -227,7 +231,6 @@
 	      WRITE(LUER,*)'Warning - core radius not identical in REGRID_LOG_DC_V1'
 	      WRITE(LUER,*)'Rescaling to make Rcore identical --- ',TRIM(FILE_NAME)
 	      WRITE(LUER,*)'Using RSP option'
-	      FIRST=.FALSE.
 	    ELSE
 	      WRITE(LUWARN,*)'Rescaling to make Rcore identical --- ',TRIM(FILE_NAME)
 	    END IF
@@ -273,7 +276,6 @@
 !
 	ELSE IF(INTERP_OPTION .EQ. 'TR')THEN
 !
-!	  WRITE(6,*)'Starting TR option for '//TRIM(FILE_NAME); FLUSH(UNIT=6)
 	  TMIN=MINVAL(OLD_T)
 	  TMAX=MAXVAL(OLD_T)
 	  JMIN=MINLOC(OLD_T,IONE)
@@ -294,21 +296,30 @@
 	        END IF
 	      END DO
 	      IF(JINT .EQ. 0 .AND. T(I) .GE. TMAX)THEN
-	          WRITE(6,'(A,2I5,4E16.6)')'A',I,JINT,T(I),TMIN,TMAX
-	          FLUSH(UNIT=6)
+	          IF(FIRST .AND. T(I) .GT. 1.0001*TMAX)THEN
+	            WRITE(6,'(/,A)')'Warning: T at inner boundary outside old model range in REGRID_LOG_DC_V1'
+	            WRITE(6,'(2A,3(10X,A))')'    I',' JINT','T(I)','TMIN','TMAX'
+	            WRITE(6,'(2I5,3E16.6)')I,JINT,T(I),TMIN,TMAX
+	            FLUSH(UNIT=6)
+	          END IF
 	          DHEN(1:NZ,I)=DPOP(1:NZ,NDOLD)
 	          DI(I)=EXP(OLD_DI(NDOLD))
 	      ELSE IF(JINT .EQ. 0 .AND. T(I) .LE. TMIN)THEN 
-	          WRITE(6,'(A,2I5,4E16.6)')'B',I,JINT,T(I),TMIN,TMAX
-	          FLUSH(UNIT=6)
+	          IF(FIRST .AND. T(I) .LT. 0.9999*TMIN)THEN
+	            WRITE(6,'(/,A)')'Warning: T at outer boundary outside old model range in REGRID_LOG_DC_V1'
+	            WRITE(6,'(2A,3(10X,A))')'    I',' JINT','T(I)','TMIN','TMAX'
+	            WRITE(6,'(2I5,3E16.6)')I,JINT,T(I),TMIN,TMAX
+	            FLUSH(UNIT=6)
+	          END IF
 	          DHEN(1:NZ,I)=DPOP(1:NZ,JMIN)
 	          DI(I)=EXP(OLD_DI(JMIN))
 	      ELSE IF(JINT .EQ. 0)THEN
-	          WRITE(6,'(A,2I5,4E16.6)')'C',I,JINT,T(I),TMIN,TMAX
+	          WRITE(6,'(/,A)')'Error in REGRID_LOG_DC_V1 - JINT=0'
+	          WRITE(6,'(2A,3(10X,A))')'    I',' JINT','T(I)','TMIN','TMAX'
+	          WRITE(6,'(2I5,3E16.6)')I,JINT,T(I),TMIN,TMAX
 	          FLUSH(UNIT=6)
+	          STOP
 	      ELSE
-!	        WRITE(6,'(2I5,3E16.6)')I,JINT,T(I),OLD_T(JINT),OLD_T(JINT+1)
-!	        FLUSH(UNIT=6)
 	        T1= ABS(OLD_T(JINT+1)/OLD_T(JINT)-1.0D0)
 	        IF(T1 .GT. 1.0D-08)THEN
 	          T1=(T(I)-OLD_T(JINT))/(OLD_T(JINT+1)-OLD_T(JINT))
@@ -597,5 +608,6 @@
 	DEALLOCATE (TA)
 	DEALLOCATE (TB)
 !
+	FIRST=.FALSE.
 	RETURN
 	END

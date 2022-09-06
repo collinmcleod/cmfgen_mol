@@ -3,6 +3,7 @@
 ! Set constants that are regularly used, and passed to subroutines.
 !
 !
+! Altered 24-Aug-2022 : Added SOB_EW_LAM_BEG (and _END) to make Sobolev EW calculation more transparent
 ! Altered 26-Apr-2019 : Added RD_NU_MAX_OBS, RD_NU_MIN_OBS to restrict the range of observer's frame int.
 !
 	INTEGER, PARAMETER :: IZERO=0
@@ -106,6 +107,8 @@
 	CHARACTER*10 GLOBAL_LINE_SWITCH
 	REAL*8 FLUX_CAL_LAM_BEG
 	REAL*8 FLUX_CAL_LAM_END
+	REAL*8 SOB_EW_LAM_BEG
+	REAL*8 SOB_EW_LAM_END
 	INTEGER NUM_SOB_LINES
 	LOGICAL SET_TRANS_TYPE_BY_LAM
 	LOGICAL DO_SOBOLEV_LINES

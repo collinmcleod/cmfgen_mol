@@ -1,5 +1,6 @@
 	MODULE CONTROL_VARIABLE_MOD
 !
+! Altered : 12-Aug-2022 : Added SN shock variables (following work by LUC.)
 ! Altered : 06-Jun-2022 : Added COMP_STEQ_T_EHB
 ! Altered : 14-Jul-2019 : R_PNT_SRCE, TEFF_PNT_SRCE, NC_PNT_SRCE, LOGICAL PNT_SRCE_MOD, USE_ELEC_HEAT_BAL (from osiris)
 !                            Added to ibis 14-Aug-2019
@@ -92,6 +93,17 @@
 	LOGICAL DO_CO_MOV_DDT		!Include comoving drivative in SE equations.
 	LOGICAL DO_FULL_REL_OBS         !Include all relativistic terms in obs. frame computation.
 	LOGICAL DO_FULL_REL_CMF         !Include all relativistic terms in CMF obs. frame computation.
+!
+! LUC: parameters to treat the SHOCK POWER in interacting supernova models
+!
+	LOGICAL INC_SHOCK_POWER        !Include shock power
+	LOGICAL ADD_SHOCK_POWER_SLOWLY !Introduce the shock power slowly starting with scaling SHOCK_POWER_FAC_BEG
+	LOGICAL SCL_PWR_BY_FCL         !Do we scale the shock_power by CLUMP_FAC?
+	REAL*8  SHOCK_POWER_FAC_BEG    !Initial scaling factor read from VADAT file
+	REAL*8  SHOCK_POWER_FAC        !Current scaling factor
+	REAL*8  PRESCRIBED_SHOCK_POWER !Value in erg/s of the desired power
+	REAL*8  VLOC_SHOCK_POWER       !Velocity at which we dump the shock power
+	REAL*8  DVLOC_SHOCK_POWER      !Gaussian width for the shock power deposition profile
 !
 ! Non thermal parameters
 !

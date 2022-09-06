@@ -28,8 +28,9 @@ $(LIB) : $(OBJ)
 STEQ=$(LIB_MOD)(steq_data_mod.o)
 MOD=$(LIB_MOD)(mod_cmfgen.o)
 NUC=$(LIB_MOD)(nuc_iso_mod.o)
+SHK=$(LIB_MOD)(shock_power_mod.o)
 
-$(LIB)(%.o) : %.f $(STEQ) $(MOD) $(NUC)
+$(LIB)(%.o) : %.f $(STEQ) $(MOD) $(NUC) $(SHOCK)
 	$(F90) -c $(FG) $<
 	ar ruv $(LIB) $*.o
 

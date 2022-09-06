@@ -3,6 +3,7 @@
 	USE CMF_FLUX_CNTRL_VAR_MOD
 	IMPLICIT NONE
 !
+! Altered 24-Aug-2022 : Added SOB_EW_LAM_BEG (and _END) to make Sobolev EW calculation more transparent.
 ! Altered 05-Jul-2022 : Added WRITE_TRANS_INFO option (not required).
 ! Altered 26-Apr-2019 : Added  J_CHK_OPTION (CHK_J)
 !                       Added  H_CHK_OPTION (CHK_H)
@@ -183,6 +184,7 @@
 	1           'Extrapolate the formal solution to larger radii?')
 	  CALL RD_STORE_NCHAR(CMF_FORM_OPTIONS,'FRM_OPT',ITEN,L_TRUE,
 	1           'Solution options for CMF_FORM_SOL')
+!
 	  CALL RD_STORE_LOG(DO_SOBOLEV_LINES,'DO_SOB_LINES',L_TRUE,'Compute line EWs?')
 	  DO_CMF_EW=.FALSE.
 	  CALL RD_STORE_LOG(DO_CMF_EW,'DO_CMF_EW',L_FALSE,'Use CMF to compute EWs')
@@ -194,6 +196,17 @@
 	  CALL RD_STORE_LOG(SOB_FREQ_IN_OBS,'SOB_FREQ_IN_OBS',L_TRUE,
 	1        ' Allow for SOB & CMF lines in defining observers'//
 	1        ' frequencies?')
+	  SOB_EW_LAM_BEG=900.0D0; SOB_EW_LAM_END=5.0E+04
+	  CALL RD_STORE_DBLE(SOB_EW_LAM_BEG,'SOB_EW_LAM_BEG',L_FALSE,
+	1         'Inital wavelength (A) for calculating Sobolev EWs')
+	  CALL RD_STORE_DBLE(SOB_EW_LAM_END,'SOB_EW_LAM_END',L_FALSE,
+	1         'Final wavelength (A) for calculating Sobolev EWs')
+	  IF(SOB_EW_LAM_END .LE. SOB_EW_LAM_BEG)THEN
+	    WRITE(6,*)'Error in RD_CMF_FLUX_CNTRLS - start wavelength less than end wavelength'
+	    WRITE(6,*)'SOB_EW_LAM_BEG=',SOB_EW_LAM_BEG
+	    WRITE(6,*)'SOB_EW_LAM_END=',SOB_EW_LAM_END
+	    STOP
+	  END IF
 !
 	  COMPUTE_J=.TRUE.
 	  CALL RD_STORE_LOG(COMPUTE_J,'COMP_J',L_FALSE,'Compute the radiation field')

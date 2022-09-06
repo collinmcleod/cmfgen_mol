@@ -6,6 +6,7 @@
 	1                NU_EVAL,DOPV,DELV_CONT,COMPUTE_ALL_CROSS)
 	IMPLICIT NONE
 !
+! Altered : 04-Sep-2022 : Update format associated wth write statement (too handle large NCF).
 ! Altered : 26-Jul-2010 : Bug fix. Frequencies used for continuum evaluations
 !                           were not monotonic. Check now inserted.
 !                           Format of CONT_FREQ file changes.
@@ -131,7 +132,7 @@
 	  IF(NU(ML) .EQ. NU_EVAL(ML))K=K+1
 	END DO
 	WRITE(LU_OUT,'(A)')' '
-	WRITE(LU_OUT,'(A,I5,A)')' The continuum will be evaluated at ',K,' frequencies'
+	WRITE(LU_OUT,'(A,I7,A)')' The continuum will be evaluated at ',K,' frequencies'
 !
 ! Check monotocity of continuum evaluations.
 !
