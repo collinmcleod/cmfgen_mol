@@ -7,6 +7,7 @@
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
 !
+! Altered 06-Sep-2022 :  Minore bug fix when RVTJ not found (30-Aug-2022).
 ! Altered 09-Jan-2021 :  Altered to read in HYDRO files with different sets of columns.
 !                        The HYDRO file can  have extra columns but the same header 
 !                        ID must be the same in all formats.
@@ -134,7 +135,6 @@
 	  ALLOCATE(ATM(ID)%ATOM(ND)); ATM(ID)%ATOM=0.0D0
 	  ALLOCATE(ATM(ID)%CLUMP_FAC(ND)); ATM(ID)%CLUMP_FAC=0.0D0
 !
-	  WRITE(6,*)'ID=',ID
 	  OLD_FORMAT=.TRUE.
 	  FILENAME=TRIM(ATM(ID)%DIR_NAME)//'HYDRO'
 	  WRITE(6,'(A)')TRIM(FILENAME)
@@ -144,6 +144,7 @@
 ! Note: The value of NVECS returned is NHEAD+1.
 !
 	  CALL SET_HYDRO_HD_LOC(STRING,NVECS)
+	  WRITE(6,*)'ID=',ID,'NVECS=',NVECS
 	  IF(ALLOCATED(DATA_VECS))DEALLOCATE(DATA_VECS)
 	  ALLOCATE(DATA_VECS(ATM(ID)%ND,NVECS)); DATA_VECS=0.0D0
 !
@@ -152,6 +153,7 @@
 	  DO I=1,ATM(ID)%ND
 	    READ(10,*)(DATA_VECS(I,J),J=1,NVECS-1)
 	  END DO
+	  CLOSE(UNIT=10)
 	  J=GET_HYDRO_VEC_LOC('R');         ATM(ID)%R=DATA_VECS(:,J)
 	  J=GET_HYDRO_VEC_LOC('V');         ATM(ID)%VEL=DATA_VECS(:,J)
 	  J=GET_HYDRO_VEC_LOC('VdVdR');     ATM(ID)%VdVDR=DATA_VECS(:,J)
@@ -162,7 +164,6 @@
 	  J=GET_HYDRO_VEC_LOC('g_ELEC');    ATM(ID)%GELEC=DATA_VECS(:,J)
 	  J=GET_HYDRO_VEC_LOC('Gamma');     ATM(ID)%GAM=DATA_VECS(:,J)
 	  J=GET_HYDRO_VEC_LOC('Vsound');    ATM(ID)%SOUND=DATA_VECS(:,J)
-	  J=GET_HYDRO_VEC_LOC('R');        ATM(ID)%R=DATA_VECS(:,J)
 !
 	  DO I=1,ATM(ID)%ND
 	    ATM(ID)%GRAV(I)=ATM(ID)%GRAD(I)/ATM(ID)%GAM(I)
@@ -182,10 +183,12 @@
 	  RVTJ_FILE_NAME=TRIM(ATM(ID)%DIR_NAME)//'RVTJ'
 	  DO WHILE(IOS .NE. 0)
             OPEN(UNIT=LU_IN,FILE=RVTJ_FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
-            IF(IOS .NE. 0)WRITE(T_OUT,*)'Unable to open RVTJ: IOS=',IOS
-	    RVTJ_FILE_NAME='../RVTJ'
-            CALL GEN_IN(RVTJ_FILE_NAME,'File with R, V, T etc (RVTJ)')
-	    IF(RVTJ_FILE_NAME .EQ. ' ')GOTO 5000
+            IF(IOS .NE. 0)THEN
+	      WRITE(T_OUT,*)'Unable to open RVTJ: IOS=',IOS
+	      RVTJ_FILE_NAME='../RVTJ'
+              CALL GEN_IN(RVTJ_FILE_NAME,'File with R, V, T etc (RVTJ)')
+	      IF(RVTJ_FILE_NAME .EQ. ' ')GOTO 5000
+	    END IF
           END DO
 	  STRING=' '
 	  DO WHILE(ATM(ID)%ATOM(1) .EQ. 0.0D0 .OR. ATM(ID)%CLUMP_FAC(1) .EQ. 0.0D0)

@@ -9,7 +9,8 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
-! Altered: 03-AUg-2019 : Changed to using MON_INTERP when possible (OSIRIS - 20-Jun-2019)
+! Altered: 14-Aug-2022 : Call to GET_EDEP_SHOCK_POWER added
+! Altered: 03-Aug-2019 : Changed to using MON_INTERP when possible (OSIRIS - 20-Jun-2019)
 ! Altered: 29-Oct-2018 : Fixing bugs and refining handling of clumping.
 ! Altered: 31-Aug-2016 : Better error reporting -- we check taht all chain isotopes are present.
 ! Altered: 15-May-2016 : Fixed minor bug when checking size of isotope abundance changes.
@@ -612,6 +613,8 @@
 ! This replaces that computed by DO_SPECIES_DECAYS computed earlier.
 !
 	CALL GET_NON_LOCAL_GAMMA_ENERGY_V2(R,V,ND,LU)
+!
+	IF (INC_SHOCK_POWER) CALL GET_EDEP_SHOCK_POWER(R,V,DENSITY,ND)
 !
 	CALL OUT_SN_POPS_V3('SN_DATA_INPUT_CHK',SN_AGE_DAYS,USE_OLD_MF_OUTPUT,ND,LU)
 !

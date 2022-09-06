@@ -3,6 +3,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 12-Aug-2022 : Added SN shock variables (following work by LUC.)
 ! Altered : 06-Jun-2022 : Variable COMP_STEQ_T_EHB ([COMP_EHB]) added.
 ! Altered : 15-Nov-2021 : Fixed read in calls for FIX_ALL_SPEC and BC_PAR1.
 ! Altered : 14-Jul-2019 : R_PNT_SRCE, TEFF_PNT_SRCE, NC_PNT_SRCE, LOGICAL PNT_SRCE_MOD, USE_ELEC_HEAT_BAL (from osiris)
@@ -316,11 +317,32 @@ C
 	       CALL RD_STORE_DBLE(DEC_NRG_SCL_FAC_BEG,'DECNRG_SCLFAC_BEG',ADD_DEC_NRG_SLOWLY,
 	1            'Initial Scale factor for adding decay energy')
             END IF
+!       
+!       LUC: Parameters for SHOCK POWER
+!       
+	    CALL RD_STORE_LOG(INC_SHOCK_POWER,'INC_SHOCK_POWER',L_TRUE,
+	1             'Include the shock power from HYDRO simulation')
+	    IF (INC_SHOCK_POWER) THEN
+	      SCL_PWR_BY_FCL = .FALSE.
+	      CALL RD_STORE_LOG(SCL_PWR_BY_FCL,'SCL_PWR_BY_FCL',L_TRUE,
+	1             'Scale shock power by CLUMP_FAC')
+	      ADD_SHOCK_POWER_SLOWLY = .FALSE.
+	      CALL RD_STORE_LOG(ADD_SHOCK_POWER_SLOWLY,'ADD_SHOCK_POWER_SLOWLY',L_TRUE,
+	1            'Introduce shock power slowly')
+	     IF (ADD_SHOCK_POWER_SLOWLY) THEN
+	       CALL RD_STORE_DBLE(SHOCK_POWER_FAC_BEG,'SHOCK_POWER_FAC_BEG',ADD_SHOCK_POWER_SLOWLY,
+	1              'Initial Scale factor for adding shock power')
+	     ENDIF
+	     CALL RD_STORE_DBLE(PRESCRIBED_SHOCK_POWER,'PRESCRIBED_SHOCK_POWER',L_FALSE,'Luminosity for the shock')
+	     CALL RD_STORE_DBLE(VLOC_SHOCK_POWER,'VLOC_SHOCK_POWER',L_FALSE,'Velocity location for shock power')
+	     CALL RD_STORE_DBLE(DVLOC_SHOCK_POWER,'DVLOC_SHOCK_POWER',L_FALSE,'Gausian width for shock power')
+	   ENDIF
+!
 	    MINIMUM_ISO_POP=1.0D-20
 	    CALL RD_STORE_DBLE(MINIMUM_ISO_POP,'MIN_ISO_POP',L_FALSE,'Minimum population for ant ISOTOPE')
 !
 	    CALL RD_STORE_LOG(COMP_GREY_LST_IT,'COMP_GREY_LST_IT',L_FALSE,'Compute grey solution on last iteration?')
-!
+
 	    CALL RD_STORE_NCHAR(SN_T_OPTION,'SN_T_OPT',ITEN,L_TRUE,
 	1           'Method to get T with non-GRID option (USE_T_IN or USE_HYDRO)')
 	    CALL RD_STORE_NCHAR(GAMRAY_TRANS,'GAMRAY_TRANS',ITEN,L_TRUE,

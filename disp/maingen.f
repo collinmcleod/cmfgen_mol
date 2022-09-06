@@ -15,6 +15,7 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered  06-Sep-2022 : Changes to LINE_ID output (29-Aug-2022).
 ! Altered  09-Aug-2022 : Improved handling of FLUX_DEFICIT line id's (PLNID option).
 ! Altered  17-Nov-2021 : Copied from OSIRIS.
 !                        Fixed call to SOBEW_GRAD_V2.
@@ -856,7 +857,7 @@
 	          I=NINT(T1)
 	          WRITE(TRANS_NAME,'(I6)')I; TRANS_NAME=ADJUSTL(TRANS_NAME)
 	        ELSE
-	          WRITE(TRANS_NAME,'(F6.1)')I; TRANS_NAME=ADJUSTL(TRANS_NAME)
+	          WRITE(TRANS_NAME,'(F6.1)')T1; TRANS_NAME=ADJUSTL(TRANS_NAME)
 	        END IF
 	        TRANS_NAME=TRIM(PLT_ION_ID(ID))//' \gl'//TRIM(TRANS_NAME)
 	      ELSE
@@ -3142,6 +3143,8 @@
 	  DEFAULT='LINE_ID'
 	  CALL USR_OPTION(FILENAME,'FILE',DEFAULT,'Output file for line IDs')
 	  CALL GEN_ASCI_OPEN(73,FILENAME,'UNKNOWN',' ',' ',IZERO,IOS)
+	  WRITE(73,'(A)')'Species         Lambda      Tau            Lam        B_loc'//
+	1                '   E_loc       log gf        hv/kT    NL   NUP                  Name'
 !
 ! MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
 !
@@ -3198,8 +3201,9 @@
 !
 	          STRING=' ';  IF(FLAG)STRING=VEC_TRANS_NAME(LINE_INDX)
 	          IF(TAU_SOB .GT. TAU_LIM)THEN
-	            WRITE(73,'(A,F12.3,ES15.5,F12.3,3(3X,ES10.3),2I6,3X,F3.0,I6,5X,A)')ION_ID(ID),ANG_TO_HZ/FL,
-	1                               TAU_SOB,ANG_TO_HZ/FL,T2,T3,T5,MNL_F,MNUP_F,1.0,2,TRIM(STRING)
+	            WRITE(73,'(A,F12.3,ES15.5,F12.3,2F8.2,2(3X,ES10.3),2I6,3X,E10.3,5X,A)')
+	1                        ION_ID(ID),ANG_TO_HZ/FL, TAU_SOB,ANG_TO_HZ/FL,
+	1                        1.01,1.04,T2,T3,MNL_F,MNUP_F,T5,TRIM(STRING)
 	          END IF
 	        END IF
 	      END DO
@@ -3233,6 +3237,8 @@
 	  DEFAULT='LINE_ID'
 	  CALL USR_OPTION(FILENAME,'FILE',DEFAULT,'Output file for line IDs')
 	  CALL GEN_ASCI_OPEN(73,FILENAME,'UNKNOWN',' ',' ',IZERO,IOS)
+	  WRITE(73,'(A)')'Species         Lambda      Tau            Lam        B_loc'//
+	1                '   E_loc       log gf        hv/kT    NL   NUP     Name'
 	  CALL USR_HIDDEN(FLUSH_FILE,'FLUSH','F','Flush outout immediately?')
 !
 ! MNL_F (MNUP_F) denotes the lower (upper) level in the full atom.
@@ -3313,8 +3319,8 @@
 	      STRING=' ';  IF(FLAG)STRING=VEC_TRANS_NAME(LINE_INDX)
 	      T1=ANG_TO_HZ/FL
 	      IF(.NOT. ATM(ID)%OBSERVED_LEVEL(MNL_F) .OR. .NOT. ATM(ID)%OBSERVED_LEVEL(MNUP_F))T1=-T1
-	      WRITE(73,'(A,F12.3,ES15.5,F12.3,2(3X,ES10.3),2I6,3X,F3.0,I6,5X,A)')ION_ID(ID),ANG_TO_HZ/FL,
-	1                         FLUX_DEFICIT,ANG_TO_HZ/FL,T2,T3,MNL_F,MNUP_F,1.0,2,TRIM(STRING)
+	      WRITE(73,'(A,F12.3,ES15.5,F12.3,2F8.2,2(3X,ES10.3),2I6,5X,A)')ION_ID(ID),ANG_TO_HZ/FL,
+	1                         FLUX_DEFICIT,ANG_TO_HZ/FL,1.01,1.04,T2,T3,MNL_F,MNUP_F,TRIM(STRING)
 	      IF(FLUSH_FILE)FLUSH(UNIT=73)
 	    END IF
 	    IF(MOD(LINE_INDX-NL,MAX(10,(NUP-NL)/10)) .EQ. 0)THEN
@@ -6336,7 +6342,8 @@ c
 	      END DO
 	      YAXIS='Log(\gt\dstat\u)'
 	    END IF
-	    CALL DP_CURVE(ND,XV,YV)
+	    DEFAULT=TRIM(TRANS_NAME)//'(stat)'
+	    CALL DP_CURVE(ND,XV,YV,DEFAULT)
 	  ELSE IF(RAY_TAU)THEN
 	    CALL IMPAR(P,R,R(ND),NC,ND,NP)
 	    WRITE(6,*)'NC,ND=',NC,ND
@@ -6353,7 +6360,8 @@ c
 	      YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
 	      YV(I)=YV(I)/(1.0D0+T2*T2*SIGMA(I))
 	    END DO
-	    CALL DP_CURVE(K,ZV,YV)
+	    DEFAULT=TRIM(TRANS_NAME)
+	    CALL DP_CURVE(K,ZV,YV,DEFAULT)
 	  ELSE
 	    DO I=1,ND
 	      YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
@@ -6368,7 +6376,9 @@ c
 	      END DO
 	      YAXIS='Log(\gt\dSob\u)'
 	    END IF 
-	    CALL DP_CURVE(ND,XV,YV)
+	    DEFAULT=TRIM(TRANS_NAME)
+	    IF(RADIAL)DEFAULT=TRIM(TRANS_NAME)//'(radial)'
+	    CALL DP_CURVE_LAB(ND,XV,YV,DEFAULT)
 	  END IF
 	
 !

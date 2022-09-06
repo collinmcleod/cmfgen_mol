@@ -3,6 +3,8 @@
 	CHARACTER(LEN=*) OPTION
 	LOGICAL DONE
 !
+! Altered: Fixed NaI wavelengths.
+
 	DONE=.FALSE.	
 	IF(OPTION .EQ. ' ' .OR. OPTION .EQ. 'HI' .OR. OPTION .EQ. 'HYD')THEN
 	  WRITE(6,*)'H I:     3971.204   4102.900   4341.692   4862.691   6564.60'
@@ -98,7 +100,9 @@
 	END IF
 !
 	IF(OPTION .EQ. ' ' .OR. OPTION .EQ. 'NAI' .OR. OPTION .EQ. 'SOD')THEN
-	  WRITE(6,*)'Na I:    5889.951   5895.924'
+	  WRITE(6,*)'Na I:    2853.649   2853.851   3303.320   3303.930'
+	  WRITE(6,*)'Na I:    5891.583   5897.558'
+	  WRITE(6,*)'Na I:   10749.38   10752.23   22062.42    22089.69'
 	  DONE=.TRUE.	
 	END IF
 !
