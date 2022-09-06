@@ -41,12 +41,14 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(evalse_lowt_v2.o)\
       $(LIB)(evalse_x_qwvj_v4.o)\
       $(LIB)(eval_temp_ddt_v2.o)\
+      $(LIB)(eval_shock_power.o)\
       $(LIB)(fiddle_pop_corrections_v2.o)\
       $(LIB)(fixpop_in_ba_v2.o)\
       $(LIB)(fixpop_t.o)\
       $(LIB)(fixpop_in_ba_v3.o)\
       $(LIB)(generate_full_matrix_v3.o)\
       $(LIB)(get_decay_lum_v1.o)\
+      $(LIB)(get_edep_shock_power.o)\
       $(LIB)(get_non_loc_gamma_energy_v2.o)\
       $(LIB)(get_pops_at_prev_time_step_v5.o)\
       $(LIB)(old_grid_module.o)\

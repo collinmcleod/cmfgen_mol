@@ -1,4 +1,4 @@
-!
+
 ! General purpose line plotting routiine.
 !
 	SUBROUTINE GRAMON_PGPLOT(XLAB,YLAB,TITL,PASSED_OPT)
@@ -114,20 +114,22 @@
 !
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
         LOGICAL, PARAMETER :: L_FALSE=.FALSE.
-	CHARACTER*80  XLABEL,YLABEL
-	CHARACTER*(*) XLAB,YLAB,TITL,PASSED_OPT
-        CHARACTER*200 FILNAME
-        CHARACTER*80 ID_FILNAME
-        CHARACTER*80 EW_FILNAME
-	CHARACTER*80, SAVE :: PLT_ST_FILENAME
-	CHARACTER*80, SAVE :: TITLE_FILENAME
-	CHARACTER*80 WK_STR,OPTION
-	CHARACTER*200 TMP_STR
-	CHARACTER*6 TO_TEK
-	CHARACTER*2 TO_VT
-	CHARACTER*3 ADVANCE_OPT
-	CHARACTER(LEN=10) LAM_OPTION
-	CHARACTER(LEN=80) PLT_ID,RD_PLT_ID,PLT_ID_SAV
+	CHARACTER(LEN=80)  XLABEL,YLABEL
+	CHARACTER(LEN=*)   XLAB,YLAB,TITL,PASSED_OPT
+        CHARACTER(LEN=200) FILNAME
+	CHARACTER(LEN=80)  WK_STR,OPTION
+	CHARACTER(LEN=200) TMP_STR
+	CHARACTER(LEN=6)   TO_TEK
+	CHARACTER(LEN=2)   TO_VT
+	CHARACTER(LEN=3)   ADVANCE_OPT
+	CHARACTER(LEN=10)  LAM_OPTION
+	CHARACTER(LEN=80)  PLT_ID,RD_PLT_ID,PLT_ID_SAV
+!
+	CHARACTER(LEN=80), SAVE :: ID_FILNAME=' '
+        CHARACTER(LEN=80), SAVE :: EW_FILNAME=' '
+        CHARACTER(LEN=80), SAVE :: EW_LINE_ID=' '
+	CHARACTER(LEN=80), SAVE :: PLT_ST_FILENAME
+	CHARACTER(LEN=80), SAVE :: TITLE_FILENAME
 !
 ! Vector arrays
 !
@@ -323,8 +325,8 @@
 	END IF
 	N_LINE_IDS=0
 	ID_SCL=1.05D0
-	ID_VEC_BEG=1.04D0
-	ID_VEC_END=1.01D0
+	ID_VEC_BEG=1.01D0
+	ID_VEC_END=1.04D0
 	ID_EXPCHAR=1.0D0
 	TAU_CUT=0.1D0
 	N_OMIT_ID=0
@@ -343,6 +345,7 @@
 	DONE_NORMALIZATION=.FALSE.
 	XLAB_FILE=' '; YLAB_FILE=' '
 	LINE_CUT_PARAM=0.03
+	USE_DEF_OFFSET=.TRUE.
 !
 	IF(NPLTS .GT. MAXPEN)THEN
 	  WRITE(T_OUT,*)'Error n GRAMON_PLOT -- not enough pen loctions'
@@ -378,9 +381,11 @@
 	  PEN_OFFSET=1
 	  IFILL_PLT1=0; IFILL_PLT2=0
 	  ID_FILNAME='LINE_ID'
-	  EW_FILNAME='ewdata_fin'
+	  EW_FILNAME='EWDATA'
+	  EW_LINE_ID='ewdata_fin'
 	  EW_CUT=1.0D0
 	  WRITE_COMMENT=.FALSE.
+	  ID_LINE_PEN=1
 	END IF
 	CALL GEN_ASCI_OPEN(LU_NORM,'NORM_FACTORS','UNKNOWN','APPEND',' ',IZERO,IOS)
 !
@@ -1563,73 +1568,21 @@ C
 !
 	ELSE IF(ANS .EQ. 'RID')THEN
 	  N_LINE_IDS=0
-	  J=0
 	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs -case sensitive')
 	  CALL NEW_GEN_IN(TAU_CUT,'Omit lines with central optical depth <')
 	  CALL NEW_GEN_IN(LINE_CUT_PARAM,'Omit lines whose central intensity differ by less than this amount')
 	  CALL NEW_GEN_IN(AIR_WAVELENGTHS,'Air wavelengths?')
 	  CALL NEW_GEN_IN(KEEP_YAXIS_LIMITS,'Keep same Y axis limits?')
-          OPEN(UNIT=33,FILE=TRIM(ID_FILNAME),STATUS='OLD',IOSTAT=IOS)
-	  IF(IOS .EQ. 0)THEN
-	    TMP_STR='!'
-	    DO WHILE(TMP_STR(1:1) .EQ. '!')
-	      READ(33,'(A)')TMP_STR
-	    END DO
-	    BACKSPACE(33)
-	    DO WHILE(J+1 .LE. 5000)
-	      READ(33,'(A)',END=1500,IOSTAT=IOS)TMP_STR
-	      READ(TMP_STR,*)LINE_ID(J+1),ID_WAVE(J+1),TAU(J+1),ID_WAVE_OFF(J+1),ID_Y_OFF(J+1)
-	      TMP_STR=TMP_STR(20:)
-	      K=INDEX(TMP_STR,TRIM(LINE_ID(J+1)))
-	      FULL_LINE_ID(J+1)=TMP_STR(K:)
-	      WRITE(70,'(A)')TRIM(FULL_LINE_ID(J+1))
-	      IF(IOS .NE. 0)THEN
-	        WRITE(6,*)'Error reading record in ',TRIM(ID_FILNAME)
-	        GOTO 1000
-	      END IF
-	      IF(ID_WAVE(J+1) .LT. 0.0D0)THEN
-	         ID_WAVE(J+1)=ABS(ID_WAVE(J+1))
-	         OBSERVED_WAVE(J+1)=.FALSE.
-	      ELSE
-	         OBSERVED_WAVE(J+1)=.TRUE.
-	      END IF
-	     IF(AIR_WAVELENGTHS)THEN
-	         DP_T1=ID_WAVE(J+1)
-	         ID_WAVE(J+1)=LAM_AIR(DP_T1)
-	      END IF
-	      IF( (ID_WAVE(J+1)-XPAR(1))*(XPAR(2)-ID_WAVE(J+1)) .GT. 0 .AND.
-	1                   ABS(TAU(J+1)) .GT. TAU_CUT)THEN
-	        J=J+1
-	        N_LINE_IDS=J
-	        IF(LINE_ID(J)(2:2) .EQ. 'k')LINE_ID(J)(2:2)='i'
-	        IF(LINE_ID(J)(2:2) .EQ. '2')LINE_ID(J)(2:)='II'//LINE_ID(J)(3:)
-	        IF(LINE_ID(J)(3:3) .EQ. '2')LINE_ID(J)(3:)='II'//LINE_ID(J)(4:)
-	        IF(LINE_ID(J)(2:5) .EQ. 'XSIX')LINE_ID(J)(2:)='XVI'//LINE_ID(J)(6:)
-	        IF(LINE_ID(J)(2:5) .EQ. 'XSEV')LINE_ID(J)(2:)='XVII'//LINE_ID(J)(6:)
-	        IF(LINE_ID(J)(3:6) .EQ. 'XSIX')LINE_ID(J)(3:)='XVI'//LINE_ID(J)(7:)
-	        IF(LINE_ID(J)(3:6) .EQ. 'XSEV')LINE_ID(J)(3:)='XVII'//LINE_ID(J)(7:)
-	        IF(LINE_ID(J)(2:4) .EQ. 'SIX')LINE_ID(J)(2:)='VI'//LINE_ID(J)(5:)
-	        IF(LINE_ID(J)(2:4) .EQ. 'SEV')LINE_ID(J)(2:)='VII'//LINE_ID(J)(5:)
-	        IF(LINE_ID(J)(3:5) .EQ. 'SIX')LINE_ID(J)(3:)='VI'//LINE_ID(J)(6:)
-	        IF(LINE_ID(J)(3:5) .EQ. 'SEV')LINE_ID(J)(3:)='VII'//LINE_ID(J)(6:)
-	      END IF
-	    END DO
-	  ELSE
-	    WRITE(T_OUT,*)'Unable top open file'
-	    GOTO 1000
-	  END IF
-1500	  CONTINUE
-	  CLOSE(UNIT=33)
-	  WRITE(T_OUT,*)'Number of lines read in is',N_LINE_IDS
-	  CALL NEW_GEN_IN(ID_SCL,'Factor to scale line location')
 	  CALL NEW_GEN_IN(ID_EXPCHAR,'Factor to scale size of ID')
+	  CALL RD_LINE_IDS(ID_FILNAME,AIR_WAVELENGTHS,XPAR)
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'SID')THEN
-	  IF(N_LINE_IDS .NE. 0)CALL NEW_GEN_IN(ID_SCL,'Factor to scale line location')
 	  CALL NEW_GEN_IN(ID_VEC_BEG,'Location to start ID line')
 	  CALL NEW_GEN_IN(ID_VEC_END,'Location to end ID line')
 	  CALL NEW_GEN_IN(ID_EXPCHAR,'Factor to scale size of ID')
+	  CALL NEW_GEN_IN(ID_LINE_PEN,'Color of pen for line labels')
+	  CALL NEW_GEN_IN(USE_DEF_OFFSET,'Use same offset for all lines')
 	  N_OMIT_ID=0
 !
 	  WRITE(T_OUT,*)' '
@@ -1653,18 +1606,17 @@ C
 	ELSE IF(ANS .EQ. 'REW')THEN
 	  N_EW_IDS=0
 	  J=0
-	  CALL NEW_GEN_IN(EW_FILNAME,'File with line EWs')
+	  CALL NEW_GEN_IN(EW_LINE_ID,'File with line EWs')
 	  CALL NEW_GEN_IN(EW_CUT,'Omit lines with ABS|EW| < ?')
-	  CALL NEW_GEN_IN(EW_SCALE_FAC,'Factor to scale lines by -- set to zero for labels')
 !
-	  WRITE(6,*)BLUE_PEN
-	  WRITE(6,*)'Can label individual lines, of use vertical bars to indicate contributing species'
-	  WRITE(6,*)'Lines with an EW of the scaling EW are have 25% of the plot height'
-	  WRITE(6,*)DEF_PEN
+!	  WRITE(6,*)BLUE_PEN
+!	  WRITE(6,*)'Can label individual lines, of use vertical bars to indicate contributing species'
+!	  WRITE(6,*)'Lines with an EW of the scaling EW are have 25% of the plot height'
+!	  WRITE(6,*)DEF_PEN
 !
 !	  CALL NEW_GEN_IN(AIR_WAVELENGTHS,'Air wavelengths?')
 	  I=33
-	  CALL RD_EW_IDS(XPAR,EW_FILNAME,I,T_OUT)	
+	  CALL RD_EW_IDS(XPAR,EW_LINE_ID,I,T_OUT)	
 !
 ! 
 	ELSE IF (ANS .EQ. 'REP')THEN
@@ -3533,14 +3485,14 @@ C
 	  CALL DRAW_LINE_IDS_V2(XPAR,YPAR,EXPCHAR,IONE,LINE_CUT_PARAM,T_OUT)
 	  CALL PGSCH(EXPCHAR)		!Reset character size
 	END IF
-	IF(N_EW_IDS .NE. 0)THEN
-	  IF(EW_SCALE_FAC .GT. 0.0)THEN
-	    CALL DRAW_EW_LINES(XPAR,YPAR,EXPCHAR,T_OUT)
-	  ELSE
-	    CALL DRAW_EW_IDS(XPAR,YPAR,EXPCHAR,T_OUT)
-	  END IF
-	  CALL PGSCH(EXPCHAR)		!Reset character size
-	END IF
+!	IF(N_EW_IDS .NE. 0)THEN
+!	  IF(EW_SCALE_FAC .GT. 0.0)THEN
+!	    CALL DRAW_EW_LINES(XPAR,YPAR,EXPCHAR,T_OUT)
+!	  ELSE
+!	    CALL DRAW_EW_IDS(XPAR,YPAR,EXPCHAR,T_OUT)
+!	  END IF
+!	  CALL PGSCH(EXPCHAR)		!Reset character size
+!	END IF
 !
 ! Draw vectors on graphs.
 !

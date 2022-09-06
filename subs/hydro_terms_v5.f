@@ -10,7 +10,8 @@
 	1              LST_ITERATION,BAND_FLUX,N_FLUXMEAN_BANDS,LU_OUT,ND)
 	IMPLICIT NONE
 !
-! ALtered 11-Jan-2021 : Increased minimum size of record in HYDRO_TERMS
+! Altered 24-Aug-2022 : Added descrition for flux and flux mean opacity output.
+! Altered 11-Jan-2021 : Increased minimum size of record in HYDRO_TERMS
 ! Altered 20-Oct-2020 : Outout new error (100 E/g_rad) in final column.
 ! Altered 01-Jan-2020 : Increased R precision. Increased Tau precision.
 ! Altered 13-Feb-2019 : Tau (Rosseland) now output.
@@ -299,7 +300,11 @@
         END DO
 !
 	WRITE(LU_OUT,'(A)')CHAR(12)                         !Formfeed
-        WRITE(LU_OUT,'(3X,A,5X,A,6X,14F12.2)')'I','V',
+	WRITE(LU_OUT,'(/,A)')'Row 1: Fraction of flux mean opacity contained in the band.'
+	WRITE(LU_OUT,  '(A)')'Row 2: Fraction of flux contained in the band.'
+	WRITE(LU_OUT,'(A,/)')'Row 3: Flux mean opacity normalized by the electron scatering opacity in the band.'
+!
+        WRITE(LU_OUT,'(3X,A,5X,A,6X,13F12.2,ES12.2)')'I','V',
 	1                      (LAM_FLUXMEAN_BAND_END(J),J=1,N_FLUXMEAN_BANDS)
         DO I=1,ND
           WRITE(LU_OUT,'(X,I3,15ES12.3)')I,V(I),(BAND_FLUXMEAN(I,J),J=1,N_FLUXMEAN_BANDS)

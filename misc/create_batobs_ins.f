@@ -94,6 +94,10 @@
 	END IF
 	OPEN(UNIT=LUOUT,FILE='bat_ins.sh',STATUS='UNKNOWN',ACTION='WRITE')
 !
+	WRITE(LUOUT,'(/,A)')
+	1     '# Ensure CMF_FLUX_PARAM is not in the directory, since it will stop the editing.'
+	WRITE(LUOUT,'(/,A,/)')'rm -f CMF_FLUX_PARAM' 
+!
 ! Read in required model runs.
 !	
 	OPEN(UNIT=LUIN,FILE='BAT_PARAMS',STATUS='OLD',ACTION='READ')

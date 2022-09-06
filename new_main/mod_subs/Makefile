@@ -25,6 +25,7 @@ MOD = $(LIB_MOD)(mod_cmfgen.o)\
       $(LIB_MOD)(nuc_iso_mod.o)\
       $(LIB_MOD)(opac_mod.o)\
       $(LIB_MOD)(radiation_mod.o)\
+      $(LIB_MOD)(shock_power_mod.o)\
       $(LIB_MOD)(steq_data_mod.o)\
       $(LIB_MOD)(two_phot_mod.o)\
       $(LIB_MOD)(var_rad_mod.o)

@@ -55,6 +55,7 @@
 	        T1=ID_WAVE(J+1)
 	        ID_WAVE(J+1)=LAM_AIR(T1)
 	      END IF
+	      OBSERVED_WAVE(I)=.TRUE.
 	      I=INDEX(TMP_STR,'(')
 	      LINE_ID(J+1)=TMP_STR(1:I-1)
 	      FULL_LINE_ID=TMP_STR
@@ -62,7 +63,8 @@
 	        J=J+1
 		N_EW_IDS=J
 	        ID_WAVE_OFF(J)=ID_WAVE(J)
-	        ID_Y_OFF(J)=0.2D0
+	        ID_Y_BEG(J)=0.9D0
+	        ID_Y_END(J)=0.8D0
 	        IF(LINE_ID(J)(2:2) .EQ. 'k')LINE_ID(J)(2:2)='i'
 	        IF(LINE_ID(J)(2:2) .EQ. '2')LINE_ID(J)(2:)='II'//LINE_ID(J)(3:)
 	        IF(LINE_ID(J)(3:3) .EQ. '2')LINE_ID(J)(3:)='II'//LINE_ID(J)(4:)
@@ -84,6 +86,7 @@
 	WRITE(6,*)'Number of EW line IDs is',N_EW_IDS
 	INQUIRE(UNIT=LU_IN,OPENED=FILE_OPEN)
 	IF(FILE_OPEN)CLOSE(UNIT=LU_IN)
+	N_LINE_IDS=N_EW_IDS
 !
 	RETURN
 	END
