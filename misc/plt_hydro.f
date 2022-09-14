@@ -300,7 +300,7 @@
 	    END IF
 	  END DO
 	  XLAB='R/R(ND)'
-	  IF(TMP_LOG)XLAB='R(10\u10\d cm)'
+	  IF(.NOT. TMP_LOG)XLAB='R(10\u10\d cm)'
 !
 	ELSE IF(XOPT .EQ. 'XLOGR')THEN
 	  TMP_LOG=.TRUE.
@@ -314,7 +314,7 @@
 	    END IF
 	  END DO
 	  XLAB='R/R(ND)'
-	  IF(TMP_LOG)XLAB='R(10\u10\d cm)'
+	  IF(TMP_LOG)XLAB='Log R(10\u10\d cm)'
 !
 	ELSE IF(XOPT .EQ. 'VEL')THEN
 	  DO ID=1,NMOD

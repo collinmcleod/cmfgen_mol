@@ -8,6 +8,7 @@
 	USE MOD_EW_VARIABLES
 	IMPLICIT NONE
 !
+! Altered: 13-Sep-2023 - Fixed possible crawh when EW & SIGMA have opposited signs.
 ! Altered: 22-Jul-2023 - FWHM was not being set before call to GET_LINE_ID_PG.
 !                        FWHM computed using 50% points
 !                        Improved EW computation.
@@ -171,13 +172,14 @@
 	      SKEWNESS=SKEWNESS+dX*ONE_MIN_FDFC(I)*(XVAL-XMEAN)**3
 	      KURTOSIS=KURTOSIS+dX*ONE_MIN_FDFC(I)*(XVAL-XMEAN)**4
 	    END DO
-	    IF(SIGMA .LE. 0)THEN
+	    IF(SIGMA*EW .LE. 0)THEN
 	      SIGMA=-1.0; SKEWNESS=-1.0; KURTOSIS=-1.0
 	    ELSE
 	      SIGMA=SQRT(SIGMA/EW)
 	      SKEWNESS=SKEWNESS/EW/SIGMA**3
 	      KURTOSIS=KURTOSIS/EW/SIGMA**4
 	    END IF
+	    SIGMA=ABS(SIGMA)		!Will be negative for emission lines
 !
 ! Get FWHM. At present, this will only work well for
 ! isolated lines in theoretical spectra.
