@@ -19,6 +19,7 @@
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
 !
+! Altered 26-Sep-2022 : Option to use lower case name for IDs, _ added automatically to identifiers.
 ! Created 19-Jun-2022
 !
 	IMPLICIT NONE
@@ -33,7 +34,9 @@
 	LOGICAL FILE_EXISTS
 	LOGICAL STORE_EDDFACTOR
 	LOGICAL KEEP_ALL
+	LOGICAL LOWER_CASE
 !
+	CHARACTER(LEN=30), EXTERNAL :: LC
 	CHARACTER(LEN=30) NAME_MOD
 	CHARACTER(LEN=80) STRING
 	CHARACTER(LEN=80) FILE_NAME 
@@ -44,6 +47,7 @@
 	INTEGER, PARAMETER :: LUOUT=30
 !
 	KEEP_ALL=.FALSE.
+	LOWER_CASE=.TRUE.
 !
 	WRITE(6,'(A)')RED_PEN
 	WRITE(6,'(A)')' After each model:'
@@ -54,6 +58,7 @@
 	WRITE(6,'(A)')'      They will be saved if KEEP_ALL is set to true.'
 	WRITE(6,'(A)')DEF_PEN
 	CALL GEN_IN(KEEP_ALL,'Keep unnecessary file -- MEANOPC, J_COMP, etc?')
+	CALL GEN_IN(LOWER_CASE,'Lower case name identifier?')
 !
 ! Get keys in CMF_FLUX_PARAM_INIT. These will be compared to the
 ! requested keys. All requested keys must exist in CMF_FLUX_PARAM_INIT
@@ -108,7 +113,8 @@
 	  K=INDEX(STRING,'RUNID')
 	  IF(K .NE. 0)THEN
 	    N_ADDS=0
-	    NAME_MOD=ADJUSTL(STRING(K+5:))
+	    NAME_MOD='_'//ADJUSTL(STRING(K+5:))
+	    IF(LOWER_CASE)NAME_MOD=LC(NAME_MOD)
 	    DONE_SED=.FALSE.
 	    IF(INDEX(STRING,'LINK') .NE. 0)THEN
 	      WRITE(LUOUT,'(/,A)')'ln -sf EDDFACTOR_STORE          EDDFACTOR'

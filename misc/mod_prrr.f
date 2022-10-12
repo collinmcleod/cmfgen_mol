@@ -10,6 +10,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! ALtered 22-Sep-2022: Minor bug fix -- Recom. charge exchange was being output twice.
 ! Altered 10-Dec-2021: Improved output to ?_PRRR_SUM. Now much easier to read.
 !                         Improved read in of header data.
 ! Altered 17-Nov-2021: Transfered from OSIRIS.
@@ -52,7 +53,11 @@
 	INTEGER IOS
 	INTEGER IST,IEND,NLEV
 	INTEGER NPRINT
-	REAL*8 T1
+	INTEGER NUM_HTDR_RATES
+	INTEGER NREC
+	INTEGER NHT
+!
+	REAL*8 T1,T2,T3,T4
 	REAL*8 MIN_VAL
 	LOGICAL FILE_OPEN
 	LOGICAL NET_RECOM_PER_LEVEL
@@ -67,6 +72,7 @@
 	CHARACTER(LEN=132) STRING
 	CHARACTER(LEN=132) FILE_NAME
 	CHARACTER(LEN=10) SPECIES
+	CHARACTER(LEN=10) HTDR_SPECIES
 	CHARACTER(LEN=5) OPTION
 	CHARACTER(LEN=30) XLABEL
 	CHARACTER(LEN=30) YLABEL
@@ -171,6 +177,7 @@
 	WRITE(6,'(A,I4)')' Number of levels in the model is',NLEV
 	CLOSE(UNIT=20)
 !
+	IF(ALLOCATED(PHOT))DEALLOCATE(PHOT,RECOM)
 	ALLOCATE (PHOT(ND,NLEV))
 	ALLOCATE (RECOM(ND,NLEV))
 	OPEN(UNIT=20,FILE=FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
@@ -276,7 +283,6 @@
 	     ELSE IF(INDEX(STRING,'Charge Transfer Recombination Rate') .NE. 0)THEN
 	       READ(20,'(A)')STRING
 	       WRITE(21,FRMT)'Chg TR RR',TRIM(STRING)
-	       WRITE(21,'(A)')TRIM(STRING)
 	       READ(STRING,*)(CHG_RR(I),I=IST,IEND)
 	     ELSE IF(INDEX(STRING,'Effective Advection Recombination Rate') .NE. 0)THEN
 	       READ(20,'(A)')STRING
@@ -345,7 +351,7 @@
 !
 2000	CONTINUE
 	OPTION='P'; WRITE(6,'(A)')' '
-	CALL GEN_IN(OPTION,'Plot option XN, R, V, T, ED, EX(stop), NS (new species),RATES')
+	CALL GEN_IN(OPTION,'Plot option XN, R, V, T, ED, EX(stop), NS (new species), NRR, RATES')
 	OPTION=UC(OPTION)
 	WRITE(6,*)'Option=',OPTION
 	IF(OPTION(1:2) .EQ. 'XN')THEN
@@ -391,6 +397,47 @@
             END DO
           END DO
           CALL DP_CURVE(ND,XVEC,YVEC)
+!
+	ELSE IF(OPTION(1:4) .EQ. 'FRAC')THEN
+	  DO I=1,ND
+	    YVEC(I)=DI(I)/ED(I)
+	  END DO
+	  CALL DP_CURVE_LAB(ND,XVEC,YVEC,'DI/ED')
+!
+	ELSE IF(OPTION(1:5) .EQ. 'RHTDR')THEN
+!
+	   OPEN(UNIT=10,FILE='HTDR_RATES',STATUS='OLD',ACTION='READ')
+	   STRING=' '
+	   DO WHILE(STRING .EQ. ' ' .OR. STRING(1:1) .EQ. '!')
+	     READ(10,'(A)')STRING
+	   END DO
+	   READ(STRING,*)NUM_HTDR_RATES
+	   DO I=1,NUM_HTDR_RATES
+	     READ(10,'(A)')HTDR_SPECIES
+	     READ(10,*)NREC
+	     READ(10,*)K,T1,T2
+	     IF(HTDR_SPECIES .EQ. SPECIES)THEN
+	        YVEC(1:ND)=T1*TEMP(1:ND)**(-T2)
+	        CALL DP_CURVE_LAB(ND,XVEC,YVEC,'File recom. rate')
+	     END IF
+	     READ(10,*)NHT
+	     READ(10,*)K,T1,T2,T3,T4
+	     IF(HTDR_SPECIES .EQ. SPECIES)THEN
+	       T1=T1/1.0D+06; T3=T3/1.0D+04; T4=T4/1.0D+04
+	       DO K=1,ND
+	         YVEC(K)=T1*(TEMP(K)**(-1.5D0))*EXP(-T3/TEMP(K))*(1.0D0+T2*EXP(-T4/TEMP(K)))
+	       END DO
+	       CALL DP_CURVE_LAB(ND,XVEC,YVEC,'HTDR recom. rate')
+	     END IF
+	     IF(HTDR_SPECIES .EQ. SPECIES)EXIT
+	   END DO
+	   CLOSE(UNIT=10)
+!
+	ELSE IF(OPTION(1:5) .EQ. 'NRR')THEN
+	  DO I=1,ND
+	    YVEC(I)=RECOM_SUM(I)/ED(I)/DI(I)
+	  END DO
+	  CALL DP_CURVE_LAB(ND,XVEC,YVEC,'Recom. Rate')
 !
 	ELSE IF(OPTION(1:5) .EQ. 'RATES')THEN
 !
