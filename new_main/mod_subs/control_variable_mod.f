@@ -287,6 +287,7 @@
 	LOGICAL COMPUTE_ALL_CROSS
 	LOGICAL COMPUTE_NEW_CROSS
 	LOGICAL USE_FIXED_J
+	LOGICAL AUTO_OFF_FIXED_J
 !
 !***************************************************************************************
 !

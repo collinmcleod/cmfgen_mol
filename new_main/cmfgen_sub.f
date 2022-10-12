@@ -4583,7 +4583,8 @@
 ! If we are USING a fixed J, autmatically switched to variable J when convergence achieved.
 ! We switch when the convergence is 20%.
 !
-	    IF(USE_FIXED_J .AND. DO_LAMBDA_AUTO .AND. RD_LAMBDA .AND. MAXCH .LT. 50.0D0)THEN
+	    IF(.NOT. AUTO_OFF_FIXED_J)THEN
+	    ELSE IF(USE_FIXED_J .AND. DO_LAMBDA_AUTO .AND. RD_LAMBDA .AND. MAXCH .LT. 50.0D0)THEN
 	       USE_FIXED_J=.FALSE.
 	       CALL UPDATE_KEYWORD(L_FALSE,'[USE_FIXED_J]','VADAT',L_TRUE,L_TRUE,LUIN)
 	       COMPUTE_EDDFAC=.TRUE.

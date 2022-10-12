@@ -59,6 +59,7 @@
 !
 	TEST=.FALSE.
 	FILE1='pgplot.ps'
+	WRITE(6,*)' Append (test) to use same pgplot file'
 10	CALL GEN_IN(FILE1,'Top PGPLOT  file')
 	I=INDEX(FILE1,'(test)')
 	IF(I .NE. 0)THEN

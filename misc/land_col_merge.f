@@ -30,6 +30,7 @@
 !
 	LOGICAL FILE_EXISTS
 	LOGICAL OVER_WRITE
+	LOGICAL USE_SAME_PG_FILE
 !
 	WRITE(LU_TERM,*)' '
 	WRITE(LU_TERM,*)'For N=2: EXPAND_CHAR=1.6; EXPAND_TICK=1.6; ASR=0.35; Plot Size=20 cm'
@@ -39,9 +40,16 @@
 	FILE1='pgplot_1.ps'
 	DO WHILE(1 .EQ. 1)
 	  WRITE(LU_TERM,*)' '
-	  N_PLTS=2; OUTF='merged' 
+	  N_PLTS=2; OUTF='merged'; USE_SAME_PG_FILE=.FALSE.
+!
+	  WRITE(6,'(/,A)')' When testing formatting you can use the same input pgplot file'
+	  WRITE(6,*)'    by def by inputing a -ve number of plots'
 	  CALL GEN_IN(N_PLTS,'Number of plots to merge (0 to exit)')
-	  IF(N_PLTS .LE. 0)STOP
+	  IF(N_PLTS .EQ. 0)STOP
+	  IF(N_PLTS .LT. 0)THEN
+	    N_PLTS=ABS(N_PLTS)
+	    USE_SAME_PG_FILE=.TRUE.
+	  END IF
 !
 10	  CALL GEN_IN(OUTF,'Output file')
 	  INQUIRE(FILE=OUTF,EXIST=FILE_EXISTS)
@@ -108,7 +116,7 @@ C
 ! Update file name in a systematic way to save typing.
 ! NB: A blank filename means that we have no more files.
 !
-	    CALL UPDATE_PG_FILENAME(FILE1)
+	    IF(.NOT. USE_SAME_PG_FILE)CALL UPDATE_PG_FILENAME(FILE1)
 150	    CALL GEN_IN(FILE1,'Next PGPLOT file')
 	    CALL GEN_ASCI_OPEN(LU_IN,FILE1,'OLD',' ','READ',IREC,IOS)
 	    IF(FILE1 .EQ. ' ')GOTO 1000

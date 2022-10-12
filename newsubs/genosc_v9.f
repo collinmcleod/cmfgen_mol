@@ -31,6 +31,7 @@
 	1              LUIN,LUOUT,FILNAME)
 	IMPLICIT NONE
 !
+! Altered 28-Sep-2022 - Adjusted check for zero frequency.
 ! Altered 23-Sep-2021 - Check for trasitions with zero frequency.
 ! Altered 19-Aug-2015 - Changed to V9; ONLY_UNOBS_LINES added to call.
 ! Altered 19-May-2015 - Added '17-Jun-2014' as a valid format date (9-Jun-2015). 
@@ -393,13 +394,15 @@
 	  DO J=I+1,N                
 	    EINA(J,I)=T1*EINA(I,J)*STAT_WT(I)/STAT_WT(J)
 	1     *( (FEDGE(I)-FEDGE(J))**2 )
-	    IF(EINA(I,J) .NE. 0.0D0 .AND. FEDGE(I) .EQ. FEDGE(J))THEN
-	      WRITE(LUER,*)'Error -- transition has a frequency of zero'
-	      WRITE(LUER,*)'To fix, make a slight adjustment to one energy'
-	      WRITE(LUER,*)'File is ',TRIM(FILNAME)
-	      WRITE(LUER,*)'Levels are: ',I,J
-	      WRITE(LUER,*)TRIM(LEVNAME(I)),TRIM(LEVNAME(J))
-	      STOP
+	    IF(EINA(I,J) .NE. 0.0D0)THEN
+	      IF(FEDGE(I) .EQ. FEDGE(J))THEN
+	        WRITE(LUER,*)'Error -- transition has a frequency of zero'
+	        WRITE(LUER,*)'To fix, make a slight adjustment to one energy'
+	        WRITE(LUER,*)'File is ',TRIM(FILNAME)
+	        WRITE(LUER,*)'Levels are: ',I,J
+	        WRITE(LUER,*)TRIM(LEVNAME(I)),TRIM(LEVNAME(J))
+	        STOP
+	      END IF
 	    END IF
 	  END DO
 	END DO
