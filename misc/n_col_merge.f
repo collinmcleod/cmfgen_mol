@@ -13,7 +13,8 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
-! Altered   29-Apr-2014 : pgplot_1 now defualt 1st plot, multiple mergers.
+! Altered   10-Oct-2022 : Can automatically use same plot when testing format.
+! Altered   29-Apr-2014 : pgplot_1 now default 1st plot, multiple mergers.
 ! Altered   06-Jan-2001 : Automatic file naming. Top plot input first.
 ! Finalized 29-May-1997
 !
@@ -33,6 +34,7 @@
 	LOGICAL OVER_WRITE
 	LOGICAL FILE_OPENED
 	LOGICAL FILE_EXISTS
+	LOGICAL USE_SAME_PG_FILE 
 !
 	WRITE(LU_TERM,*)' '
 	WRITE(LU_TERM,*)'For N=2: EXPAND_CHAR=1.3; EXPAND_TICK=1.3; ASR=0.6; Plot Size=20 cm'
@@ -45,12 +47,20 @@
 	IOS=0
 	OUTF='merged'
 	FILE1='pgplot_1.ps'
+	USE_SAME_PG_FILE=.FALSE.
 !
 	DO WHILE(1 .EQ. 1)
 	  N_PLTS=2
+!
+	  WRITE(6,'(/,A)')' When testing formatting you can use the same input pgplot file'
+	  WRITE(6,*)'    by def by inputing a -ve number of plots'
 	  CALL GEN_IN(N_PLTS,'Number of plots to merge (0 to exit)')
-	  IF(N_PLTS .LE. 0)STOP
-	
+	  IF(N_PLTS .EQ. 0)STOP
+	  IF(N_PLTS .LT. 0)THEN
+	    N_PLTS=ABS(N_PLTS)
+	    USE_SAME_PG_FILE=.TRUE.
+	  END IF
+!	
 	  FILE_OPENED=.FALSE.
 	  DO WHILE(.NOT. FILE_OPENED)
 	    IF(IOS .NE. 0)THEN
@@ -121,8 +131,11 @@ C
 !
 ! Update file name in a systematic way to save typing.
 !
-	    CALL UPDATE_PG_FILENAME(FILE1)
-	    IF(FILE1 .EQ. 'pgplot.ps')FILE1='pgplot_2.ps'
+	    IF(USE_SAME_PG_FILE)THEN
+	    ELSE
+	      CALL UPDATE_PG_FILENAME(FILE1)
+	      IF(FILE1 .EQ. 'pgplot.ps')FILE1='pgplot_2.ps'
+	    END IF
 !
 ! NB: A blank filename means that we have no more files.
 !

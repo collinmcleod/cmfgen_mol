@@ -14,6 +14,7 @@
 	SUBROUTINE PUT_TEXT(X,Y,ANGLE,OFFSET,STRING)
 	IMPLICIT NONE
 !
+! Altered 09-Oct-2022 : Fixed label of curve titles when axis goes from high to low.
 ! Created 02-Feb-2015
 !
 	REAL*4 X,Y
@@ -88,12 +89,17 @@
 	CALL PGQVP(3,XP1,XP2,YP1,YP2)
 	SCALE_FAC=ABS(YW2-YW1)/ABS(XW2-XW1)*ABS(XP1-XP2)/ABS(YP1-YP2)
 !
+! The sign change in XLEN and YLEN is made when the coordinate axis is
+! labeled from high to low.
+!
 	X1=X; Y1=Y
 	DO I=1,NMAX
 	  IF(SUB_STR(I) .EQ. ' ')EXIT
 	  IF(PEN(I) .NE. 0)CALL PGSCI(PEN(I))
 	  CALL PGPTXT(X1,Y1,ANGLE,OFFSET,SUB_STR(I))
 	  K=4; CALL PGLEN(K,TRIM(SUB_STR(I)),XLEN,YLEN)		!Get string length in world coords.
+	  IF(XW2 .LT. XW1)XLEN=-XLEN
+	  IF(YW2 .LT. YW1)YLEN=-YLEN
 	  X1=X1+COS(ANGLE*3.1415926D0/180.0D0)*XLEN
 	  Y1=Y1+SIN(ANGLE*3.1415926D0/180.0D0)*XLEN*SCALE_FAC
 	END DO

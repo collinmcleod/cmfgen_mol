@@ -3,6 +3,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 11-Oct-2022 : Added AUTO_OFF_FIXED_J.
 ! Altered : 12-Aug-2022 : Added SN shock variables (following work by LUC.)
 ! Altered : 06-Jun-2022 : Variable COMP_STEQ_T_EHB ([COMP_EHB]) added.
 ! Altered : 15-Nov-2021 : Fixed read in calls for FIX_ALL_SPEC and BC_PAR1.
@@ -319,8 +320,9 @@ C
             END IF
 !       
 !       LUC: Parameters for SHOCK POWER
-!       
-	    CALL RD_STORE_LOG(INC_SHOCK_POWER,'INC_SHOCK_POWER',L_TRUE,
+!
+	    INC_SHOCK_POWER=.FALSE.       
+	    CALL RD_STORE_LOG(INC_SHOCK_POWER,'INC_SHOCK_POWER',L_FALSE,
 	1             'Include the shock power from HYDRO simulation')
 	    IF (INC_SHOCK_POWER) THEN
 	      SCL_PWR_BY_FCL = .FALSE.
@@ -625,9 +627,11 @@ C
 	1      'Frequency spacing between lines (in km/s)')
 C
 	  WRITE(LUSCR,'()')
-	  USE_FIXED_J=.FALSE.
+	  USE_FIXED_J=.FALSE.; AUTO_OFF_FIXED_J=.TRUE.
 	  CALL RD_STORE_LOG(USE_FIXED_J,'USE_FIXED_J',L_FALSE,
 	1           'Use previously computed J to evaluate ALL rates?')
+	  CALL RD_STORE_LOG(AUTO_OFF_FIXED_J,'AUTO_OFF_FJ',USE_FIXED_J,
+	1           'Swithch USE_FIXED_J off automatically')
 	  IF(USE_FIXED_J .AND. .NOT. RD_LAMBDA)THEN
 	    WRITE(LUER,'(A)')' Warning: RD_LAMBDA must be TRUE when USE_FIXED_J is TRUE.'
 	    WRITE(LUER,'(A)')' Please change the setting in IN_ITS which is read after each iteration'
