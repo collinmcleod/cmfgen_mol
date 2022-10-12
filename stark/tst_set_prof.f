@@ -171,7 +171,7 @@ C
 	DO I=1,ND
 	  CALL DP_CURVE(NFREQ,VEL_KMS,PROF(1,I))
 	END DO
-	CALL GRAMON_PGPLOT('\gDV/c','Prof',' ',' ')
+	CALL GRAMON_PGPLOT('dV(km s\u-1\)','Prof',' ',' ')
 !
 	PLT=.FALSE.
 	CALL GEN_IN(PLT,'Plot log of profile?')
@@ -180,7 +180,7 @@ C
 	  DO I=1,ND
 	    CALL DP_CURVE(NFREQ,VEL_KMS,PROF(1,I))
 	  END DO
-	  CALL GRAMON_PGPLOT('\gDV/c','Prof',' ',' ')
+	  CALL GRAMON_PGPLOT('dV(km s\u-1\)','Prof',' ',' ')
 	END IF
 !
 	PLT=.FALSE.

@@ -1,6 +1,6 @@
 !
-! Subroutine to replace a section of data by a straight line. Average of aound current
-! location, oy y cursor vlaue can be used. Controls allow plot to moved
+! Subroutine to replace a section of data by a straight line. Average of data around current
+! location, or y cursor vlaue can be used. Controls allow plot to moved
 ! and shifted (in X).
 !
 ! Options:
@@ -97,7 +97,7 @@
 	CHARACTER(LEN=30), EXTERNAL :: UC
 	REAL*4, EXTERNAL :: SPACING
 !
-	LOGICAL RESET_DEFAULTS
+	LOGICAL, SAVE :: RESET_DEFAULTS=.TRUE.
 	LOGICAL END_FILE
 	LOGICAL FILE_PRES
 	CHARACTER(LEN=80) LOC_FILE_WITH_LINE_LIMS
@@ -110,8 +110,9 @@
 	YLOC=0.5D0*(YPAR(1)+YPAR(2))
 	dY=0.05*(YPAR(2)-YPAR(1))
 !
-	RESET_DEFAULTS=.FALSE.
-	CALL GEN_IN(RESET_DEFAULTS,'Reset default parameters/settings?')
+	IF(.NOT. RESET_DEFAULTS)THEN
+	  CALL GEN_IN(RESET_DEFAULTS,'Reset default parameters/settings?')
+	END IF
 	IF(RESET_DEFAULTS)THEN
 	  IF(NPLTS .EQ. 1)THEN
 	    IP=1
@@ -126,21 +127,21 @@
 	    NPIX=NPIX+1
 	    WRITE(6,*)'NPIX increase by 1 to make odd; NPIX=',NPIX
 	  END IF
+	  RESET_DEFAULTS=.FALSE.
 	END IF
 !
-! Open output file. Data is appended if it alread exists.
+! Open output file. Data is appended if it already exists.
 !
 	IF(LUOUT .EQ. 0)THEN
-	  OUT_FILE='INT_REG'
-	  CALL GET_LU(LUOUT,'LUOUT in DO_CURSOR_EW_V2')
-	  CALL GEN_IN(OUT_FILE,'File to OUTPUT EWs etc')
+	  OUT_FILE='CONT_NODES'
+	  CALL GET_LU(LUOUT,'LUOUT in PG_REPLACE_DATA_INT')
+	  CALL GEN_IN(OUT_FILE,'File to OUTPUT continuum nodes when repacing data')
 	  INQUIRE(FILE=OUT_FILE,EXIST=FILE_PRES)
 	  IF(FILE_PRES)THEN
 	    WRITE(6,*)'File already exists -- appending new data'
 	    OPEN(UNIT=LUOUT,FILE=OUT_FILE,STATUS='OLD',ACTION='WRITE',POSITION='APPEND')
 	  ELSE
 	    OPEN(UNIT=LUOUT,FILE=OUT_FILE,STATUS='NEW',ACTION='WRITE')
-	    CALL WRITE_EW_HEADER(LUOUT)
 	  END IF
 	END IF
 !
@@ -177,6 +178,14 @@
 	    GOTO 1000
 	  ELSE IF(CURSVAL .EQ. 'Y')THEN
 	    CALL PGPT(IONE,XLOC,YLOC,ITWO)
+!
+	  ELSE IF(CURSVAL .EQ. 'D')THEN
+	    IF( ABS(XST-CD(IP)%XVEC(IST+1)) .LT. ABS(XST-CD(IP)%XVEC(IST)))IST=IST+1
+	    WRITE(6,*)'Index of point to be omitted is',IST,' out of', NPTS(IP)
+	    CD(IP)%XVEC(IST:NPTS(IP)-1)=CD(IP)%XVEC(IST+1:NPTS(IP))
+	    CD(IP)%DATA(IST:NPTS(IP)-1)=CD(IP)%DATA(IST+1:NPTS(IP))
+	    NPTS(IP)=NPTS(IP)-1
+	    GOTO 1000
 !
 ! Y value set by average at cursor location
 !
@@ -270,6 +279,7 @@
 	  END IF
 	  IEND=GET_INDX_SP(XLOC,CD(IP)%XVEC,NPTS(IP))
 	  XEND=XLOC; YEND=YLOC
+	  WRITE(LUOUT,*)XST,IEND,IST,IEND; FLUSH(LUOUT)
 	  IF(CURSVAL .EQ. 'Q')THEN
 	    EXIT
 	  ELSE IF(CURSVAL .EQ. 'S')THEN
@@ -298,7 +308,7 @@
 	    GOTO 1000
 	  END IF
 !
-! We now determine the line parameters
+! We now determine the replacement flux.
 !
 	  EW=0.0;  XMEAN=0.0
 	  SLOPE=(YEND-YST)/(CD(IP)%XVEC(IEND)-CD(IP)%XVEC(IST))

@@ -7,6 +7,7 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered 10-Oct-2022 : Changed NPOS limit, and avoid lINE check when outside limits.
 ! Altered 05-Sep-2022 : Changed labeling algorithm slightly. Works better but not efficient/perfect.
 ! Altered 22-Apr-2020 : Labeling algorithim altered to prevent overlap. Label loction may
 !                         not be optimal.
@@ -72,6 +73,14 @@
 	        EXIT
 	      END IF
 	    END DO
+! 
+! We only check lines that lie in the FULL spectral window.
+! This is necessary forobserved data.
+!
+	    IF( (ID_WAVE(I)-CD(IP)%XVEC(1))*
+	1          (CD(IP)%XVEC(NPTS(IP))-ID_WAVE(I)) .LE. 0)THEN
+	      WR_ID(I)=.FALSE.
+	    END IF
 	  END DO
 !
 	  IF(LINE_CUT_PARAM .GT. 0.0)THEN
@@ -109,9 +118,9 @@
 !
 	  LAB_SIZE=1.1D0*XCHAR_SIZE
 	  LAB_START=XPAR(1)+1.5*LAB_SIZE
-	  NPOS=ABS( (XPAR(2)-XPAR(1))/LAB_SIZE )
+	  NPOS=ABS( (XPAR(2)-XPAR(1))/LAB_SIZE )-6
 	  WRITE(6,*)'Number of label slots is:',NPOS
-	  IF(LOC_NLINES .GT. 0.8*NPOS)THEN
+	  IF(LOC_NLINES .GT. NPOS)THEN
 	    WRITE(6,*)'Error -- too many lines to label in plot window'
 	    WRITE(6,*)'Change line selectrion parameters or label size'
 	    RETURN
