@@ -13,6 +13,7 @@
 	USE LINE_MOD
 	IMPLICIT NONE
 !
+! Altered 04-Jan-2022 : Updated to call SET_TWO_PHOT_V3
 ! Altered 27-Jan-2014 : Now call TORSCL_V3
 ! Altered 05-Apr-2011 : Now call PAR_FUN_V2 (instead of V2), LTEPOP_WLD_V2 and LTE_POP_SL_V2 (28-Nov-2010).
 !                         Changes donw to give a wider dynamic rangs in LTE populations. 
@@ -141,11 +142,12 @@
 !
 	    DO ID=1,NUM_IONS-1
 	       ID_SAV=ID
-	       CALL SET_TWO_PHOT_V2(ION_ID(ID), ID_SAV, ATM(ID)%XzVLTE, ATM(ID)%NXzV,
-	1          ATM(ID)%XzVLTE_F,   ATM(ID)%XzVLEVNAME_F,
-	1          ATM(ID)%EDGEXzV_F,  ATM(ID)%GXzV_F,
-	1          ATM(ID)%F_TO_S_XzV, ATM(ID)%NXzV_F, ND,
-	1          ATM(ID)%ZXzV,       ATM(ID)%EQXzV,  ATM(ID)%XzV_PRES)
+	       CALL SET_TWO_PHOT_V3(ION_ID(ID), ID_SAV, 
+	1          ATM(ID)%XzVLTE,          ATM(ID)%NXzV,
+	1          ATM(ID)%XzVLTE_F_ON_S,   ATM(ID)%XzVLEVNAME_F,
+	1          ATM(ID)%EDGEXzV_F,       ATM(ID)%GXzV_F,
+	1          ATM(ID)%F_TO_S_XzV,      ATM(ID)%NXzV_F, ND,
+	1          ATM(ID)%ZXzV,            ATM(ID)%EQXzV,  ATM(ID)%XzV_PRES)
 	    END DO
 !
 ! 

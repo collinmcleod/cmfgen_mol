@@ -34,7 +34,7 @@ $(LIB)(steq_auto_v2.o) : steq_auto_v2.f  $(ST)
 	ar $(AR_OPTION) $(LIB) steq_auto_v2.o
 
 $(ST):
-	(cd ../mod_subs ; make)
+	(cd ../../mod_subs ; make)
 
 clean :
 	rm -f *.o 

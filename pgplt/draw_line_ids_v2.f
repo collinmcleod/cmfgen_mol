@@ -7,6 +7,8 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered 04-Mar-2023 : Now adjustble number of decimal digits (passed in LIND_ID_MOD).
+!                         Many other changes donw to improve code.
 ! Altered 10-Oct-2022 : Changed NPOS limit, and avoid lINE check when outside limits.
 ! Altered 05-Sep-2022 : Changed labeling algorithm slightly. Works better but not efficient/perfect.
 ! Altered 22-Apr-2020 : Labeling algorithim altered to prevent overlap. Label loction may
@@ -21,7 +23,7 @@
 !
 	INTEGER T_OUT
 	INTEGER IP
-	LOGICAL, PARAMETER :: TRACE=.FALSE.          !TRUE.              !Set to TRUE for debugging purposes
+	LOGICAL, PARAMETER :: TRACE=.FALSE.              !Set to TRUE for debugging purposes
 !
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2
@@ -44,10 +46,14 @@
 	INTEGER, ALLOCATABLE :: LAB_ID(:)
 !
 	INTEGER I,J,K,L
+	INTEGER CNT
 	REAL*4 T1,T2
+	REAL*4 XLOW,XUP
 	CHARACTER(LEN=80) TMP_STR
+	CHARACTER(LEN=10) TMP_FMT
 	INTEGER GET_INDX_SP
 	EXTERNAL GET_INDX_SP
+	LOGICAL CHANGE_MADE
 !
 ! We do nothing if no lines have been read in.
 !
@@ -102,29 +108,11 @@
 	  CALL PGQCS(IFOUR,XCHAR_SIZE,YCHAR_SIZE)
 	  IF(TRACE)WRITE(T_OUT,*)'XCHAR_SIZE=',XCHAR_SIZE
 !
-! Check if there are any identified lines in the current window. If not, we exit the
-! program. This can occur if we have read in lines, but then changed the limits on the
-! spectral window.
-!
-	  LOC_NLINES=0
-	  DO I=1,N_LINE_IDS-1
-	    T1=(ID_WAVE(I)-XPAR(1))*(XPAR(2)-ID_WAVE(I))
-	    IF(WR_ID(I) .AND. T1 .GT. 0.0D0)LOC_NLINES=LOC_NLINES+1
-	  END DO
-	  WRITE(6,*)'Number of lines in spectral window to be indentified is:',LOC_NLINES
-	  IF(LOC_NLINES .EQ. 0)RETURN
-!
 ! Determine maximum number of label slots. 
 !
 	  LAB_SIZE=1.1D0*XCHAR_SIZE
-	  LAB_START=XPAR(1)+1.5*LAB_SIZE
-	  NPOS=ABS( (XPAR(2)-XPAR(1))/LAB_SIZE )-6
-	  WRITE(6,*)'Number of label slots is:',NPOS
-	  IF(LOC_NLINES .GT. NPOS)THEN
-	    WRITE(6,*)'Error -- too many lines to label in plot window'
-	    WRITE(6,*)'Change line selectrion parameters or label size'
-	    RETURN
-	  END IF
+	  LAB_START=XPAR(1)+2*LAB_SIZE
+	  NPOS=ABS((XPAR(2)-XPAR(1))/LAB_SIZE)-4
 !
 	  IF(ALLOCATED(LAB_POS))DEALLOCATE(LAB_POS,LAB_ID)
           ALLOCATE (LAB_POS(NPOS),STAT=IOS)
@@ -144,14 +132,38 @@
 	    LAB_ID(I)=0
 	  END DO
 	  IF(TRACE)WRITE(6,*)'Set LAB_POS and LAB_ID'
+	  XLOW=XPAR(1)+2*LAB_SIZE
+	  XUP=XPAR(2)-2*LAB_SIZE
+!
+! Check if there are any identified lines in the current window. If not, we exit the
+! program. This can occur if we have read in lines, but then changed the limits on the
+! spectral window.
+!
+	  LOC_NLINES=0
+	  DO I=1,N_LINE_IDS
+	    T1=(ID_WAVE(I)-XLOW)*(XUP-ID_WAVE(I))
+	    IF(WR_ID(I) .AND. T1 .GT. 0.0D0)LOC_NLINES=LOC_NLINES+1
+	    IF(T1 .LT. 0)WR_ID(I)=.FALSE.
+	  END DO
+!
+	  WRITE(6,*)RED_PEN
+	  WRITE(6,*)'                                  Number of label slots is:',NPOS
+	  WRITE(6,*)'   Number of lines in spectral window to be indentified is:',LOC_NLINES
+	  WRITE(6,*)DEF_PEN
+!
+	  IF(LOC_NLINES .EQ. 0)RETURN
+	  IF(LOC_NLINES .GT. NPOS)THEN
+	    WRITE(6,*)'Error -- too many lines to label in plot window'
+	    WRITE(6,*)'Change line selectrion parameters or label size'
+	    RETURN
+	  END IF
 !
 ! Store lines whose ID will be written. Initially they occupy
 ! all slots from location 3 up to LOC_NLINES+2.
 !
 	  L=2; T2=2*LAB_SIZE
 	  DO I=1,N_LINE_IDS-1
-	    T1=(ID_WAVE(I)-XPAR(1)-T2)*(XPAR(2)+T2-ID_WAVE(I))
-	    IF(WR_ID(I) .AND. T1 .GT. 0.0D0)THEN
+	    IF(WR_ID(I))THEN
 	      IF(L+1 .GT. NPOS)THEN
 	        L=L-1
 	        EXIT
@@ -180,7 +192,11 @@
 	        IF(J .LT. 1)EXIT
 	        LAB_ID(J)=LAB_ID(I)
 	        IF(I .NE. J)LAB_ID(I)=0
-	      ELSE
+!
+! J can be > NPOS because I don't use the last two slots because of
+! possile ovelap with axes markers.
+!
+	      ELSE IF(J .GT. NPOS+2)THEN
 	        WRITE(6,*)'Possible error'
 	        WRITE(6,*)J,NPOS
 	        WRITE(6,*)ID_WAVE(LAB_ID(I)),XPAR(1),XPAR(2)
@@ -195,7 +211,7 @@
 	   K=1
 	   DO WHILE(LAB_ID(I) .NE. 0 .AND. K .NE. 0)
 	     K=0
-	     DO J=NPOS-1,I+1,-1
+	     DO J=NPOS,I+1,-1
 	       IF(LAB_ID(J) .NE. 0)THEN
 	         IF(ID_WAVE(LAB_ID(I)) .GT. ID_WAVE(LAB_ID(J)))THEN
 	           K=LAB_ID(J)
@@ -211,35 +227,41 @@
 ! These two loops move lines closer (when possible) to ther correct
 ! locations.
 !
-	 DO I=1,NPOS-1
-	   IF(LAB_ID(I) .NE. 0 .AND. LAB_ID(I+1) .EQ. 0)THEN
-	     IF(ID_WAVE(LAB_ID(I)) .GT. LAB_POS(I+1)-0.5*LAB_SIZE)THEN
-	       LAB_ID(I+1)=LAB_ID(I)
-	       LAB_ID(I)=0
+	 CHANGE_MADE=.TRUE.; CNT=0
+	 DO WHILE(CHANGE_MADE .AND. CNT .LT. 10)
+	   CHANGE_MADE=.FALSE.; CNT=CNT+1
+	   DO I=1,NPOS-1
+	     IF(LAB_ID(I) .NE. 0 .AND. LAB_ID(I+1) .EQ. 0)THEN
+	       IF(ID_WAVE(LAB_ID(I)) .GT. LAB_POS(I+1)-0.5*LAB_SIZE)THEN
+	         LAB_ID(I+1)=LAB_ID(I)
+	         LAB_ID(I)=0
+	         CHANGE_MADE=.TRUE.
+	       END IF
 	     END IF
-	   END IF
+	   END DO
 	 END DO
 !
-	 DO I=NPOS-1,2,-1
-	   IF(LAB_ID(I) .NE. 0 .AND. LAB_ID(I-1) .EQ. 0)THEN
-	     IF(ID_WAVE(LAB_ID(I)) .LT. LAB_POS(I-1)+0.5*LAB_SIZE)THEN
-	       LAB_ID(I-1)=LAB_ID(I)
-	       LAB_ID(I)=0
+	 CHANGE_MADE=.TRUE.; CNT=0
+	 DO WHILE(CHANGE_MADE .AND. CNT .LT. 10)
+	   CHANGE_MADE=.FALSE.; CNT=CNT+1
+	   DO I=NPOS,2,-1
+	     IF(LAB_ID(I) .NE. 0 .AND. LAB_ID(I-1) .EQ. 0)THEN
+	       IF(ID_WAVE(LAB_ID(I)) .LT. LAB_POS(I-1)+0.5*LAB_SIZE)THEN
+	         LAB_ID(I-1)=LAB_ID(I)
+	         LAB_ID(I)=0
+	         CHANGE_MADE=.TRUE.
+	       END IF
 	     END IF
-	   END IF
+	   END DO
 	 END DO
 !
 	  IF(TRACE)THEN
 	    WRITE(6,*)'Done spread out lines'; FLUSH(UNIT=6)
 	    J=0
 	    DO I=1,NPOS
-	      WRITE(6,*)LAB_ID(I); FLUSH(UNIT=6)
 	      IF(LAB_ID(I) .NE. 0)THEN
 	        J=J+1
-	        WRITE(6,*)LAB_ID(I); FLUSH(UNIT=6)
-	        WRITE(6,*)ID_WAVE(LAB_ID(I)); FLUSH(UNIT=6)
-	        WRITE(6,*)TRIM(LINE_ID(LAB_ID(I))); FLUSH(UNIT=6)
-	        WRITE(6,'(I7,F12.4,A)')LAB_ID(I),ID_WAVE(LAB_ID(I)),TRIM(LINE_ID(LAB_ID(I)))
+	        WRITE(6,'(1X,2I6,2F12.2,3X,2X,A)')I,LAB_ID(I),LAB_POS(I),ID_WAVE(LAB_ID(I)),TRIM(LINE_ID(LAB_ID(I)))
 	        FLUSH(UNIT=6)
 	      END IF
 	    END DO
@@ -262,6 +284,17 @@
 	    END IF
 	  END DO
 !
+	  IF(TRACE)THEN
+	    J=0
+	    DO I=1,NPOS
+	      IF(LAB_ID(I) .NE. 0)THEN
+	        J=J+1
+	        WRITE(6,'(1X,2I6,2F12.2,3X,2X,A)')I,LAB_ID(I),LAB_POS(I),ID_WAVE(LAB_ID(I)),TRIM(LINE_ID(LAB_ID(I)))
+	      END IF
+	    END DO
+	    FLUSH(UNIT=6)
+	  END IF
+!
 ! Now set the label positions so the strings cann be written out.
 !
 	  ID_WAVE_OFF=XPAR(1)-(XPAR(2)-XPAR(1))
@@ -280,10 +313,13 @@
 	        LOC_ID_VEC_BEG=ID_Y_BEG(I)
 	        LOC_ID_VEC_END=ID_Y_END(I)
 	      END IF
+!
+	      TMP_FMT='(F12.'
+	      WRITE(TMP_FMT(6:7),'(I1,A1)')NO_DEC_DIGITS,')'
 	      TMP_STR=' '
-	      WRITE(TMP_STR,'(F12.2)')ID_WAVE(I)
+	      WRITE(TMP_STR,TMP_FMT)ID_WAVE(I)
 	      TMP_STR=TRIM(LINE_ID(I))//'-'//ADJUSTL(TMP_STR)
-	      IF(.NOT. OBSERVED_WAVE(I))TMP_STR='*'//TMP_STR
+!	      IF(.NOT. OBSERVED_WAVE(I))TMP_STR='*'//TMP_STR
 !
 	      IF(ID_VEC_BEG .LT. ID_VEC_END)THEN
 	        T1=ID_VEC_END+0.2*(ID_VEC_END-ID_VEC_BEG)

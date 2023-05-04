@@ -28,7 +28,7 @@ INSTALL_DIR=$(HOME)/cur_cmf/
 endif
 
 ifeq ($(HOST),osiris-wnode04.phyast.pitt.edu)
-INSTALL_DIR=$(HOME)/wnode04/cur_cmf/
+INSTALL_DIR=$(HOME)/wnode04/cmf_testing/
 endif
 
 ifeq ($(HOST),lorikeet.phyast.pitt.edu)

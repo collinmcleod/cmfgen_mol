@@ -6,6 +6,7 @@
 !
 	MODULE MOD_CMFGEN
 !
+! Altered 20-Jan-2023 : Added ABS_MEAN opacity.
 ! Altered 17-Aug-2019 : Put on IBIS -- added dWCRXzVd 12-Jul-2019 (cur_cmf_eb)
 ! Altered 19-Aug-2015 : Added HMI, MAX_IONS_PER_SPECIES increased to 21 (cur_hmi,12-Jun-2015)
 ! Incoprated 02-Jan-2015: VTURB_VEC, ARAD, GAM2, etc added (for depth depndent profiles).
@@ -208,6 +209,7 @@
 !
 	REAL*8, ALLOCATABLE :: ROSS_MEAN(:)	!Rosseland mean opacity.
 	REAL*8, ALLOCATABLE :: PLANCK_MEAN(:)	!Planck mean opacity.
+	REAL*8, ALLOCATABLE :: ABS_MEAN(:)	!Absorption mean opacity.
 	REAL*8, ALLOCATABLE :: FLUX_MEAN(:)	!Flux mean opacity
 	REAL*8, ALLOCATABLE :: POP_ATOM(:)	!Total atom density (#/cm^3)
 	REAL*8, ALLOCATABLE :: DENSITY(:)	!Mass density (gm/cm^3)
@@ -228,6 +230,7 @@
 	LOGICAL MOD_FIXED_T
 	LOGICAL MOD_FIX_IMPURITY
 	LOGICAL FIX_IN_BOUND_T
+	LOGICAL LIN_INTERP_RD_SN_DATA
 	INTEGER FIX_LST_X_DPTHS
 !
 	LOGICAL, ALLOCATABLE :: IMP_VAR(:)

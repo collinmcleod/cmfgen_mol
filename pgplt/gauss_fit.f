@@ -16,6 +16,9 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered 06-MAr-2023 : Fixed to use classical Gaussian with factor of 0.5 in 
+!                          argument of exponent. Parameters are:
+!                             Lambda, Sigma, Height, Exponent
 ! Altered 09-Aug-2022: New file. Based on do_gaus_fit.f
 !                      Selection of initial Gauss parameters now done by cursor.
 !                      Now allows automatic movement along a spectrum.
@@ -177,7 +180,7 @@
 	    CALL PGPT(IONE,XVAL,YVAL,IMONE)
 	    CURSERR = PGCURS(XVAL,YVAL,CURSVAL)
 	    CALL PGPT(IONE,XVAL,YVAL,IMONE)
-	    DEF_SIGMA=ABS(XVAL-T1)/2.2
+	    DEF_SIGMA=ABS(XVAL-T1)/2.355D0
 !
 	  ELSE IF(UC(CURSVAL) .EQ. 'S')THEN
 	    CALL PGPT(IONE,XVAL,YVAL,IMONE)
@@ -283,17 +286,17 @@
 	      CALL DO_GAUSSIAN_FITS(IP)	
 !
 	      WRITE(6,*)'Called AMOEBA'
-	      WRITE(6,*)'Fit parameters are (NB SIGMA is not Stan. Dev.):'
+	      WRITE(6,*)'Fit parameters are (NB SIGMA is only Stan. Dev. if EXP=2.0):'
 	      WRITE(6,*)SIM(1,1),SIM(1,2)
 	      WRITE(6,'(2X,(5X,A),5(3X,A),2(3X,A))')
 	1          '        Lam','     Height','          a',
 	1          '        EXP','Sigma(km/s)',' FWHM(km/s)',' EW(mA)','Err(mA)'
 	      DO I=1,NUM_GAUSS
 	        K=2+(I-1)*4+1
-	        T1=2.99794D+05*PAR(K+1)/PAR(K)
-	        FWHM=2.0D0*T1*(DLOG(2.0D0))**(1.0D0/PAR(K+3))
+	        T1=2.99794D+05*PAR(K+1)/PAR(K)                             !Sigma in km/s
+	        FWHM=2.0D0*T1*(2.0D0*DLOG(2.0D0))**(1.0D0/PAR(K+3))        !Sigma in km/s
 	        WRITE(6,'(2X,ES16.6,5ES14.4,4F10.2)')PAR(K),PAR(K+2),PAR(K+1),PAR(K+3),
-	1                   T1/SQRT(2.0D0),FWHM,EW(I),EW_ERROR(I),ALT_ERROR(I),MIN_ERROR(I)
+	1                   T1,FWHM,EW(I),EW_ERROR(I),ALT_ERROR(I),MIN_ERROR(I)
 	      END DO
 !
               SUM_SQ(:)=0.0D0
@@ -443,8 +446,8 @@
 	I=NG_PAR+1
         CALL AMOEBA(SIM,SUM_SQ,I,NG_PAR,NG_PAR,TOL,GAUSS_FIT_FUNC,ITER)
 !
-! Compute EW of profile. The order of passing the variables is HEIGHT,
-! SIGMA, EXPONENT. The location is not needed.
+! Compute EW of profile. The order of passing the variables is LOCATION,
+! HEIGHT, SIGMA, EXPONENT. 
 !
 	TOLERANCE=1.0D-05
 	DO I=1,NUM_GAUSS
@@ -459,11 +462,11 @@
         PAR(1:NG_PAR)=SIM(1,1:NG_PAR)
 	CALL GAUSS_FIT_ER(PAR)
 !
+	T1=1000.0D0		!To conver to mAng
 	DO I=1,NUM_GAUSS
-	  T1=1000.0D0/EW_CONT(I)
 	  EW_ERROR(I)=EW_ERROR(I)*T1
 	  ALT_ERROR(I)=ALT_ERROR(I)*T1
-	  MIN_ERROR(I)=MIN_ERROR(I)*1000.0D0
+	  MIN_ERROR(I)=MIN_ERROR(I)*T1
 	END DO
 !
 	RETURN
@@ -573,7 +576,7 @@
 	WRITE(6,'(A)')' '
 	WRITE(6,'(A)')' B  -  set input band and initial continnum estimate (require two inputs)'
 	WRITE(6,'(A)')' L  -  indicate line center and height/depth'
-	WRITE(6,'(A)')' D  -  use to set def sigma (use line mid-points)'
+	WRITE(6,'(A)')' D  -  use to set def sigma (use line mid-points i.e. FWHM)'
 	WRITE(6,'(A)')' S  -  use to  sigma estimate for next line only (use line mid points)'
 	WRITE(6,'(A)')' E  -  edit current line fit (setting NUM_GAUSS to 0 restarts process'
 	WRITE(6,'(A)')' F  -  finish line selection and do fit'

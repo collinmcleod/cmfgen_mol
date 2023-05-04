@@ -13,6 +13,24 @@
 	  PRIVATE nonfftconvolve,fillresponse, fill_rot_response, linearize_v2,
 	1         nu_to_lambda, lambda_to_lnlambda, map, map2, gauss,
 	1         log2, larger_index , smaller_index 
+
+!       physical constants
+
+	real*8, parameter :: c_kms=2.99792458d5            !km/s
+	real*8, parameter :: jimpi=3.141592653589793d0
+	real*8, parameter :: zero=0d0
+	real*8, parameter :: one=1d0
+	real*8, parameter :: two=2d0
+	real*8, parameter :: onehalf=0.5d0
+!
+	integer, parameter :: izero=0
+	integer, parameter :: ione=1
+!
+	logical, parameter :: true=.true.
+	logical, parameter :: false=.false.
+	logical, parameter :: forward=.true.
+	logical, parameter :: backward=.false.
+
         CONTAINS
 !----------------------------------------------------------------------------
 !
@@ -39,7 +57,6 @@
 	1                min_res_kms,num_res)
 !
 	implicit none
-	include 'constants.inc'
 !
 ! Altered 21-Mar-2023 : Extended range now activated when "resolution" or "vsini" is set.
 ! Altered 18-Apr-2008 : tempwave & tempflux now allocated with max(Nmod,Ntmp)
@@ -191,7 +208,6 @@ C
 
 	subroutine nonfftconvolve(wave,flux,Nmod,sigma,vsini,epsilon)
 	implicit none
-	include 'constants.inc'
 
 	integer Nmod
 	real*8 wave(Nmod)
@@ -267,7 +283,6 @@ C
 	subroutine fillresponse(wave,response,Nmod,Nresponse,sigma,wrap)
 
 	implicit none
-	include 'constants.inc'
 
 	integer Nmod           ! size of data array
 	real*8 wave(Nmod)        ! wavelength array
@@ -340,7 +355,6 @@ C
 	1                              vsini,epsilon,wrap)
 
 	implicit none
-	include 'constants.inc'
 !
 	integer Nmod           ! size of data array
 	real*8 wave(Nmod)     	! wavelength array
@@ -433,7 +447,6 @@ C
 	function gauss(x,mu,sigma)
 
 	implicit none
-	include 'constants.inc'
 
 	real*8 sigma,x,mu
 	real*8 gauss
@@ -512,7 +525,6 @@ C
 	subroutine nu_to_lambda(freq,wave,n,nutolambda)
 
 	implicit none
-	include 'constants.inc'
 
 	integer*4 n
 	real*8 freq(n)
@@ -547,7 +559,6 @@ C
 	subroutine lambda_to_lnlambda(wave,n,ltolnl)
 
 	implicit none
-	include 'constants.inc'
 
 	integer*4 n
 	real*8 wave(n)
@@ -574,7 +585,6 @@ C subroutine to map array A onto array B using linear interpolation
 	subroutine map(Awave,Aflux,AN,Bwave,Bflux,BN)
 
 	implicit none
-	include 'constants.inc'
 
 	integer*4 AN,BN
 	real*8 Awave(AN),Aflux(AN)
@@ -609,9 +619,7 @@ C range.  The fluxes are weighted by their wavelength distance (?) from
 C the considered point.
 
 	subroutine map2(Awave,Aflux,AN,Bwave,Bflux,BN,dlam)
-
 	implicit none
-	include 'constants.inc'
 
 	integer*4 AN,BN
 	real*8 Awave(AN),Aflux(AN)
@@ -622,6 +630,7 @@ C the considered point.
 
 	real*8 fluxsum
 	real*8 dlamsum
+	real*8 t1
 
 	dlamover2=dlam/two
 	i = 1
@@ -654,12 +663,21 @@ C
 	 end do
 	 if(awave(i_max) .lt. bwave(j))i_max=i_max+1
 !
+! Installed t1 to prevent division by zero (23-Mar-2023). Did not
+! occur in older version -- may be due to rounding error. Code
+! gave same answer with additional check.
+!
 	 fluxsum = zero
 	 dlamsum = zero    ! this is actulally the sum of dlam^-1
 	 i = i_min
 	 do while (i .le. i_max)
-	   dlamsum = dlamsum + one/(abs(Bwave(j) - Awave(i)))
-	   fluxsum = fluxsum + Aflux(i)/abs(Bwave(j) - Awave(i))
+	   t1=MAX(abs(Bwave(j) - Awave(i)),ABS(1.0D-12*Awave(i)))
+	   dlamsum = dlamsum + one/t1
+	   fluxsum = fluxsum + Aflux(i)/t1
+	   if(dlamsum .gt. 1.0e+10)then
+	     write(6,*)bwave(j),awave(i),i,j
+	     write(6,*)i_min,i_max
+	   end if
 	   i = i+1
 	 end do
 	 Bflux(j) = fluxsum/dlamsum

@@ -12,6 +12,9 @@
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
+! Altered 20-Jan-2023: ABS_MEAN added. The code now checks that star models go to
+!                           sufficently high optical depth. It also issues a
+!                           warning when there is poor flux convergence.
 ! Altered 15-Jul-2019 (osiris - added ATM(ID)%dWCRXzVdT allocation).
 !                        Incoprated IBIS -- 17-Aug-2019.
 ! Icorporated 02-Jun-2014: Changes to allow depth dependent profiles.
@@ -458,6 +461,7 @@
 	IF(IOS .EQ. 0)ALLOCATE (ED(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (ROSS_MEAN(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (PLANCK_MEAN(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (ABS_MEAN(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (FLUX_MEAN(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (POP_ATOM(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (DENSITY(ND),STAT=IOS)

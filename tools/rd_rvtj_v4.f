@@ -7,6 +7,10 @@
 	1                  ND,NC,NP,FORMAT_DATE,FILNAME,LUIN)
 	IMPLICIT NONE
 !
+! Altered 24-Mar-2023 : Simplified reading of variables after temperture.
+!                         Changed to read MEAN_ABS opacity (20-Jan-2023).
+!                         Should be backwards compatable.
+!                         Not returned (done by separte read in DISPGEN).
 ! Altered 16-Aug-2019 : Changed to V4 (to maintain consistency with other routine in this file).
 ! Altered 15-Jun-2000 : Naming convention inserted.
 !
@@ -91,6 +95,7 @@
 !
 ! Local variables
 !
+	REAL*8 T1
 	CHARACTER*80 STRING
 	INTEGER I
 !
@@ -113,35 +118,37 @@
 	CALL CHK_STRING(STRING,LUIN,'Temperature','RD_RVTJ')
 	READ(LUIN,*)(T(I),I=1,ND)
 !
-	READ(LUIN,'(A)')STRING
-	IF(INDEX(STRING,'Grey temperature') .NE. 0)THEN
-	  READ(LUIN,*)(TGREY(I),I=1,ND)
-	  CALL CHK_STRING(STRING,LUIN,'Heating: radioactive decay','RD_RVTJ')
-	  READ(LUIN,*)(dE_RAD_DECAY(I),I=1,ND)
-	ELSE
-	  TGREY(1:ND)=0.0D0
-	  dE_RAD_DECAY(1:ND)=0.0D0
-	END IF	
+! This format will allow new variables to be added after the temperature
+! without affecting the reading of RVTJ.
 !
-! In this routine, we skip over the continuum data.
-! In new RVTJ files this data is no longer present.
-!
-	DO WHILE( INDEX(STRING,'Rosseland Mean Opacity') .EQ. 0)
+	TGREY=0.0D0; dE_RAD_DECAY=0.0D0; ROSS_MEAN=0.0D0
+	FLUX_MEAN=0.0D0; PLANCK_MEAN=0.0D0
+	STRING=' '
+	DO WHILE(INDEX(STRING,'Atom Density') .EQ. 0)
 	  READ(LUIN,'(A)')STRING
+	  IF(INDEX(STRING,'Grey temperature') .NE. 0)THEN
+	    READ(LUIN,*)(TGREY(I),I=1,ND)
+	  ELSE IF(INDEX(STRING,'Heating: radioactive decay') .NE.  0)THEN
+	    READ(LUIN,*)(dE_RAD_DECAY(I),I=1,ND)
+	  ELSE IF(INDEX(STRING,'Rosseland Mean Opacity') .NE. 0)THEN
+	    READ(LUIN,*)(ROSS_MEAN(I),I=1,ND)
+	  ELSE IF(INDEX(STRING,'Flux Mean Opacity') .NE. 0)THEN
+	    READ(LUIN,*)(FLUX_MEAN(I),I=1,ND)
+	  ELSE IF(INDEX(STRING,'Planck Mean Opacity')  .NE. 0)THEN
+	    READ(LUIN,*)(PLANCK_MEAN(I),I=1,ND)
+	  ELSE IF(INDEX(STRING,'Absorption Mean Opacity')  .NE. 0)THEN
+	    READ(LUIN,*)(T1,I=1,ND)
+	  END IF
 	END DO
-	READ(LUIN,*)(ROSS_MEAN(I),I=1,ND)
-	CALL CHK_STRING(STRING,LUIN,'Flux Mean Opacity','RD_RVTJ')
-	READ(LUIN,*)(FLUX_MEAN(I),I=1,ND)
 !
-	READ(LUIN,'(A)')STRING
-	IF(INDEX(STRING,'Planck Mean Opacity')  .NE. 0)THEN
-	  READ(LUIN,*)(PLANCK_MEAN(I),I=1,ND)
-	ELSE
-	  PLANCK_MEAN=0.0D0
-	  BACKSPACE(LUIN)
-	END IF
+	IF(SUM(TGREY) .EQ. 0.0D0)WRITE(6,*)'Grey temperature not set'
+	IF(SUM(dE_RAD_DECAY) .EQ. 0.0D0)WRITE(6,*)'Radioactive decay heating not set'
+	IF(SUM(ROSS_MEAN) .EQ. 0.0D0)WRITE(6,*)'Rosseland mean opacity not set'
+	IF(SUM(FLUX_MEAN) .EQ. 0.0D0)WRITE(6,*)'Flux mean opacity not set'
+	IF(SUM(PLANCK_MEAN) .EQ. 0.0D0)WRITE(6,*)'Planck mean opacity not set'
 !
-	CALL CHK_STRING(STRING,LUIN,'Atom Density','RD_RVTJ')
+! Already read in header containg 'Atom Density'
+!
 	READ(LUIN,*)(POP_ATOM(I),I=1,ND)
 	CALL CHK_STRING(STRING,LUIN,'Ion Density','RD_RVTJ')
 	READ(LUIN,*)(POP_ION(I),I=1,ND)

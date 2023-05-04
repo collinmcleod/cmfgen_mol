@@ -46,13 +46,16 @@ $(LIB)(set_chg_lev_id_v4.o) : set_chg_lev_id_v4.f $(CG) $(CMF)
 	ar $(AR_OPTION) $(LIB) set_chg_lev_id_v4.o
 
 $(CG):
-	(cd ../mod_subs ; make)
+	(cd ../../mod_subs ; make)
 
 $(ST):
-	(cd ../mod_subs ; make)
+	(cd ../../mod_subs ; make)
 
 $(MOD):
-	(cd ../mod_subs ; make)
+	(cd ../../mod_subs ; make)
+
+$(CMF):
+	(cd ../../mod_subs ; make)
 
 clean :
 	rm -f *.o 

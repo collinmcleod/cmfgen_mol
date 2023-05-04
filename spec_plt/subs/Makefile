@@ -14,6 +14,7 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(clip.o)\
          $(LIB)(compute_tau_radial.o)\
          $(LIB)(comp_ip_ew.o)\
+         $(LIB)(create_gauss.o)\
          $(LIB)(divide_by_cont.o)\
          $(LIB)(do_int_rec_ap.o)\
          $(LIB)(determ_reddening.o)\

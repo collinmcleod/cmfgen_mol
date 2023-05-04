@@ -38,7 +38,7 @@ C
 	      T1=1.0D+15
 	      YV(I)=T1*XV(I)*YV(I)
 	    END DO
-	    Y_LAB='\gnJ\d\gn\u(erg\d cm\u-2 \ds\u-1\d)' 
+	    Y_LAB='\gnJ\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)' 
 	    IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)' 
 	  ELSE IF(Y_PLT_OPT .EQ. 'FLAM')THEN
 	    T1=1.0E+22/C_CMS	  	!1.0E+30*1.0E-08

@@ -17,6 +17,7 @@
 	1                      MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE)
 	IMPLICIT NONE
 !
+! Altered 17-Apr-2023 : Added check on length of strings for level names. 
 ! Altered 24-Apr-2015 : Code now checks "validity" of T values and collision strengths.
 ! Altered 25-Jan-2015 : Minor bug fix - could print out a wrong matching name.
 ! Altered 20-Dec-2014 : Code checks if non-matching level corresponds to a higher level not 
@@ -91,28 +92,40 @@
 	INTEGER LST_NL
 	INTEGER LST_NUP
 	INTEGER LUER,ERROR_LU,ICHRLEN
-	CHARACTER*80 STRIP_LD_BLANK
+	CHARACTER(LEN=80) STRIP_LD_BLANK
 	EXTERNAL ERROR_LU,ICHRLEN
 !
-	CHARACTER*132 LOW_LEV,UP_LEV
-	CHARACTER*500 STRING
-	CHARACTER*60 LOCNAME(NLEV)
+	CHARACTER(LEN=132) LOW_LEV,UP_LEV
+	CHARACTER(LEN=500) STRING
+	CHARACTER(LEN=40) LOCNAME(NLEV)
 !
 	LOGICAL, SAVE :: DO_WARNING_OUTPUT
 	CHARACTER(LEN=80), SAVE :: FIRST_FILE=' '
 !
+	LUER=ERROR_LU()
 	IF(FIRST_FILE .EQ. ' ')THEN
 	  FIRST_FILE=FILE_NAME
 	  DO_WARNING_OUTPUT=.TRUE.
+	  IF(LEN(NO_MATCH_NAME(1)) .LT. LEN(LEVNAME(1)))THEN
+	    WRITE(LUER,'(A)')'Error in GEN_OMEGA_RD_V2 -- character string may be too short'
+	    WRITE(LUER,'(A)')'LEN(NO_MATCH_NAME(1))=',LEN(NO_MATCH_NAME(1))
+	    WRITE(LUER,'(A)')'LEN(LEVNAME)=',LEN(LEVNAME(1))
+	    STOP
+	  END IF
+	  IF(LEN(LOCNAME(1)) .LT. LEN(LEVNAME(1)))THEN
+	    WRITE(LUER,'(A)')'Error in GEN_OMEGA_RD_V2 -- character string may be too short'
+	    WRITE(LUER,'(A)')'LEN(LOCNAME)=',LEN(LOCNAME(1))
+	    WRITE(LUER,'(A)')'LEN(LEVNAME)=',LEN(LEVNAME(1))
+	    STOP
+	  END IF
 	ELSE IF(FIRST_FILE .EQ. FILE_NAME)THEN
 	  DO_WARNING_OUTPUT=.FALSE.
 	END IF
-	LUER=ERROR_LU()
 	NUM_NO_MATCH=0
 	NO_MATCH_NAME=' '
 !
 	DO NL=1,NLEV
-	  LOCNAME(NL)=STRIP_LD_BLANK(LEVNAME(NL))
+	  LOCNAME(NL)=ADJUSTL(LEVNAME(NL))
 	END DO
 	LST_SPLIT_LEVEL=0
 	DO NL=1,NLEV
@@ -175,7 +188,8 @@
 	READ(STRING,*)NUM_TVALS
 	IF(NUM_TVALS .GT. MAX_TVALS)THEN
 	  WRITE(LUER,*)'Error reading collisonal data from '//FILE_NAME
-	  WRITE(LUER,*)'NU_TVALS too small'
+	  WRITE(LUER,*)'MAX_TVALS too small -- MAX_TAVLS= ',MAX_TVALS
+	  WRITE(LUER,*)'NUM_TVALS = ',NUM_TVALS
 	  STOP
 	END IF
 !         
@@ -213,6 +227,7 @@
 !
 	IF(NUM_TRANS .EQ. 0)THEN
 	  CLOSE(LUIN)
+	  CALL OUT_COL_SUMMARY()
 	  RETURN			!i.e use approximate formulae only.
 	END IF
 !
@@ -241,7 +256,7 @@
 	STRING=' '
 	DO WHILE(ICHRLEN(STRING) .EQ. 0)
 	  READ(LUIN,'(A)')STRING
-	END DO             
+	END DO
 !
 ! TRANS_CNT is the index used to read in all collisional data. 
 ! TRANS_INDX is used to specify the number of collisional transitions that
@@ -411,7 +426,9 @@
 	  READ(STRING,*,IOSTAT=IOS)(COL_VEC(I),I=1,NUM_TVALS)
 	  IF(IOS .NE. 0)THEN
 	    WRITE(LUER,*)'Error in GEN_OMEGA_RD_V2'  
-	    WRITE(LUER,*)'Error reading collisional data from',FILE_NAME
+	    WRITE(LUER,*)'Error reading collisional data from ',FILE_NAME
+	    WRITE(LUER,*)'TRANS_INDX=',TRANS_INDX
+	    WRITE(LUER,*)'TRANS_CNT=',TRANS_CNT
 	    WRITE(LUER,*)TRIM(STRING)
 	    WRITE(LUER,*)'IOS=',IOS
 	    STOP
@@ -516,6 +533,7 @@
 	CLOSE(LUIN)
 	IF(DO_WARNING_OUTPUT)THEN
 	  CALL CHK_COL_NAME(NO_MATCH_NAME,NUM_NO_MATCH,NLEV,LUIN,LUER,FILE_NAME)
+	  CALL OUT_COL_SUMMARY()
 	END IF
 !
 ! NUM_TRANS is now set equal to the actual number of transitions read.
@@ -523,18 +541,51 @@
 	NUM_TRANS=TRANS_INDX
 !
 	RETURN
-	END
-
-	FUNCTION STRIP_LD_BLANK(STRING)
+!
+	CONTAINS
+!
+	SUBROUTINE OUT_COL_SUMMARY()
 	IMPLICIT NONE
-C
-	INTEGER I
-	CHARACTER*(*) STRING
-	CHARACTER*80 STRIP_LD_BLANK
-	I=1
-	DO WHILE(I .LT. LEN(STRING) .AND. STRING(I:I) .EQ. ' ')
-	 I=I+1
-	END DO
-	STRIP_LD_BLANK=STRING(I:)
+	INTEGER, SAVE :: LU_CS
+	LOGICAL, SAVE :: FIRST_OUT=.TRUE.
+!
+	IF(FIRST_OUT)THEN
+	  CALL GET_LU(LU_CS,'OUT_COL_SUMMARY -- gen_omega_rd_v2')
+	  OPEN(UNIT=LU_CS,STATUS='UNKNOWN',ACTION='WRITE',FILE='COLLISION_SUMMARY')
+	  FIRST_OUT=.FALSE.
+	  WRITE(LU_CS,*)' '
+	  WRITE(LU_CS,*)' NT_RD is the number of transitions read in from the collisonal data file.'
+	  WRITE(LU_CS,*)' NT is the number of transitions computed'
+	  WRITE(LU_CS,*)' It may be larger than NT_RD is the collision rates ar split'
+	  WRITE(LU_CS,*)' '
+	  WRITE(LU_CS,*)' Tranisitions to the ground term without a collision rate are listed.'
+	  WRITE(LU_CS,*)' For permitted transiiotns, collison rates will be stimated using their gf value.'
+	  WRITE(LU_CS,*)' Missing data for forbiddentransition is more omportant as their values cannot be'
+	  WRITE(LU_CS,*)'     reliably estimated.'
+	  WRITE(LU_CS,*)' '
+	  WRITE(LU_CS,'(1X,A,T20,2X,A,5X,A,2(7X,A))')'Data file','NT_RD','NT','T(min)','T(max)'
+	END IF
+!
+	IF(NUM_TRANS .EQ. 0)THEN
+	   WRITE(LU_CS,'(/,1X,A)')'No collisional data present'
+	   WRITE(LU_CS,'(1X,A,T20,I6)')TRIM(FILE_NAME),NUM_TRANS
+	   NL=1
+	   DO NUP=2,MIN(10,NLEV)
+	     WRITE(LU_CS,'(10X,2I6,4X,A)')NL, NUP,TRIM(LEVNAME(NL))//'-'//TRIM(LEVNAME(NUP))
+	   END DO
+	ELSE
+	   WRITE(LU_CS,*)' '
+	   WRITE(LU_CS,'(1X,A,T20,2I7,2ES14.2)')TRIM(FILE_NAME),NUM_TRANS,TRANS_INDX,T_TABLE(1),T_TABLE(NUM_TVALS)
+	   NL=1
+	   DO NUP=2,MIN(10,NLEV)
+	     IF(LOC_INDX(NL,NUP) .EQ. 0)THEN
+	       WRITE(LU_CS,'(10X,2I6,4X,A)')NL, NUP,TRIM(LEVNAME(NL))//'-'//TRIM(LEVNAME(NUP))
+	     END IF
+	   END DO
+	END IF
+	FLUSH(LU_CS)
+!
 	RETURN
-	END
+!
+	END SUBROUTINE OUT_COL_SUMMARY
+	END SUBROUTINE GEN_OMEGA_RD_V2

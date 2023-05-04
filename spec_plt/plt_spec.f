@@ -18,6 +18,7 @@ C
 C
 	IMPLICIT NONE
 C
+C Altered 22-Jan-2034 : MKGL option added (make Gaussian line).
 C Altered 19-Apr-2020 : Added CLIP option to RD_CONT.
 C Altered 16-May-2019 : NU, OBSF etc are now allocatable arrays.
 C Altered 18-Jan-2015 : Added REM_BP (automatic removal of bad pixel).
@@ -57,6 +58,9 @@ C
 	INTEGER NOBS
 	REAL*8, ALLOCATABLE ::  NU_OBS(:)
 	REAL*8, ALLOCATABLE ::  OBSF_OBS(:)
+!
+	REAL*8, ALLOCATABLE :: XVEC(:)
+	REAL*8, ALLOCATABLE :: YVEC(:)
 C
 C Indicates which columns the observatoinal data is in.
 C
@@ -142,6 +146,11 @@ C
 	INTEGER IST,IEND
 	INTEGER CNT
 	INTEGER NHAN
+!
+	REAL*8 LAM_CENT
+	REAL*8 HEIGHT
+	REAL*8 SIGMA
+!
 	REAL*8 T1,T2,T3
 	REAL*8 SUM
 	REAL*8 TEMP
@@ -1791,6 +1800,25 @@ C
 	    END IF
 	    CALL CURVE_LAB(NBB,XV,YV,TITLE)
 	  END IF
+!
+	ELSE IF(X(1:5) .EQ. 'MKGL')THEN
+!
+	  WRITE(6,*)' '
+	  WRITE(6,*)' Note:  FWHM - 2.35482*SIGMA '
+	  WRITE(6,*)' '
+	  CALL USR_OPTION(LAM_CENT,'LAMC','6562','Central wavelngth')
+	  CALL USR_OPTION(SIGMA,'SIGMA','1.0','Sigma (-ve for km/s)')
+	  IF(SIGMA .LE. 0.0D0)THEN
+	     SIGMA=LAM_CENT*ABS(SIGMA)/(1.0D-05*C_CMS)
+	  END IF
+	  CALL USR_OPTION(HEIGHT,'HEIGHT','1.0','Height (-ve for absorption line)')
+	  WRITE(DEFAULT,'(ES10.4)')0.2D0*SIGMA
+	  CALL USR_OPTION(T1,'dLAM',DEFAULT,'Spacing (def=SIGMA/5.0)')
+	  K=20.0D0*SIGMA/T1
+	  IF(ALLOCATED(XVEC))DEALLOCATE(XVEC,YVEC)
+	  ALLOCATE (XVEC(K),YVEC(K))
+	  CALL CREATE_GAUSS(XVEC,YVEC,LAM_CENT,SIGMA,HEIGHT,T1,K) 
+	  CALL DP_CURVE(K,XVEC,YVEC)
 !
 	ELSE IF(X(1:5) .EQ. 'AV_EN')THEN
 	  T1=0.0D0

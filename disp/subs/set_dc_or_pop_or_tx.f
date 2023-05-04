@@ -1,7 +1,8 @@
 	SUBROUTINE SET_DC_OR_POP_OR_TX(YV,LEV,HE2,HE2LTE,EDGEHE2,NHE2,ND,T,X,DESC,FLAG)
 	IMPLICIT NONE
 !
-! Aletered 20-Mar-1997 : YV is now REAL*8
+! Altered 11-Apr-2023 : Added DCRGS option.
+! Altered 20-Mar-1997 : YV is now REAL*8
 !
 	INTEGER NHE2,ND,LEV,I,J
 	REAL*8 YV(ND)
@@ -31,7 +32,19 @@
 	  XSPEC=X(J+1:)
 	END IF
 !	
-	IF(X(1:2) .EQ. 'DC' .AND. XSPEC .EQ. DESC)THEN
+	IF(X(1:5) .EQ. 'DCRGS' .AND. XSPEC .EQ. DESC)THEN
+	  IF(LEV .LE. 0 .OR. LEV .GT. NHE2)THEN
+	    WRITE(T_OUT,*)'Error in SET_DC_OR_POP_OR_TX - invalid level'
+	    WRITE(T_OUT,*)'Lev=',LEV
+	    WRITE(T_OUT,*)'NSPEC=',NHE2
+	    RETURN
+	  END IF
+	  DO J=1,ND
+	    YV(J)=LOG10(HE2(LEV,J)/HE2(1,J)) -
+	1             LOG10(HE2LTE(LEV,J)/HE2LTE(1,J))
+	  END DO
+	  LOCAL=.TRUE.
+	ELSE IF(X(1:2) .EQ. 'DC' .AND. XSPEC .EQ. DESC)THEN
 	  IF(LEV .LE. 0 .OR. LEV .GT. NHE2)THEN
 	    WRITE(T_OUT,*)'Error in SET_DC_OR_POP_OR_TX - invalid level'
 	    WRITE(T_OUT,*)'Lev=',LEV
@@ -72,7 +85,7 @@
 	    YV(J)=LOG10(T1)
 	  END DO
 	  LOCAL=.TRUE.
-	ELSE IF(XSPEC .EQ. DESC )THEN  		!RAT or POP
+	ELSE IF(XSPEC .EQ. DESC)THEN  		!RAT or POP
 	  IF(LEV .LE. 0 .OR. LEV .GT. NHE2)THEN
 	    WRITE(T_OUT,*)'Error in SET_DC_OR_POP_OR_TX - invalid level'
 	    WRITE(T_OUT,*)'Lev=',LEV

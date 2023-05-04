@@ -10,7 +10,8 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
-! ALtered 22-Sep-2022: Minor bug fix -- Recom. charge exchange was being output twice.
+! Altered 01-Mar-2023: PCUM and RCUM options installed.
+! Altered 22-Sep-2022: Minor bug fix -- Recom. charge exchange was being output twice.
 ! Altered 10-Dec-2021: Improved output to ?_PRRR_SUM. Now much easier to read.
 !                         Improved read in of header data.
 ! Altered 17-Nov-2021: Transfered from OSIRIS.
@@ -44,6 +45,9 @@
 	REAL*8, ALLOCATABLE :: XVEC(:)
 	REAL*8, ALLOCATABLE :: YVEC(:)
 	REAL*8, ALLOCATABLE :: TOT_SUM(:)
+!
+	REAL*8, ALLOCATABLE :: YLEV(:)
+	REAL*8, ALLOCATABLE :: XLEV(:)
 !
 	INTEGER ND
 	INTEGER NV
@@ -121,6 +125,9 @@
 	IF(IOS .EQ. 0)ALLOCATE(YVEC(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE(TOT_SUM(ND),STAT=IOS)
 !
+	IF(IOS .EQ. 0)ALLOCATE(XVEC(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE(YVEC(ND),STAT=IOS)
+!
 	IOS=0
 	OPEN(UNIT=20,FILE='RVTJ',STATUS='OLD',IOSTAT=IOS)
 	  DO WHILE(INDEX(STRING,'Velocity (km/s)') .EQ. 0)
@@ -180,6 +187,8 @@
 	IF(ALLOCATED(PHOT))DEALLOCATE(PHOT,RECOM)
 	ALLOCATE (PHOT(ND,NLEV))
 	ALLOCATE (RECOM(ND,NLEV))
+	ALLOCATE(XLEV(NLEV),STAT=IOS)
+	ALLOCATE(YlEV(NLEV),STAT=IOS)
 	OPEN(UNIT=20,FILE=FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 !
 	IF(DO_INDIV_RATES .OR. NET_RECOM_PER_LEVEL)THEN
@@ -398,6 +407,30 @@
           END DO
           CALL DP_CURVE(ND,XVEC,YVEC)
 !
+	ELSE IF(OPTION(1:4) .EQ. 'PCUM')THEN
+	  CALL GEN_IN(J,'Depth to examine')
+	  YLEV=0.0D0; YLEV(1)=PHOT(J,1); XLEV(1)=1
+	  DO I=2,NLEV
+	    XLEV(I)=I
+	    YLEV(I)=YLEV(I-1)+PHOT(J,I)
+	  END DO
+	  YLEV=-YLEV/PHOT_SUM(J)
+	  YLABEL='\gs\di\un Phot. Rate.'
+	  CALL DP_CURVE(NLEV,XLEV,YLEV)
+!
+	ELSE IF(OPTION(1:4) .EQ. 'RCUM')THEN
+	  CALL GEN_IN(J,'Depth to examine')
+	  YLEV=0; YLEV(1)=RECOM(J,1); XLEV(1)=1
+	  DO I=2,NLEV
+	    XLEV(I)=I
+	    YLEV(I)=YLEV(I-1)+RECOM(J,I)
+	  END DO
+	  YLEV=YLEV/RECOM_SUM(J)
+	  YLABEL='\gs\di\un Phot. Rate.'
+	  CALL DP_CURVE(NLEV,XLEV,YLEV)
+!
+	     
+	  
 	ELSE IF(OPTION(1:4) .EQ. 'FRAC')THEN
 	  DO I=1,ND
 	    YVEC(I)=DI(I)/ED(I)

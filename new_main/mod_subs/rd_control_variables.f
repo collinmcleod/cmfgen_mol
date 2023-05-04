@@ -3,7 +3,6 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
-! Altered : 11-Oct-2022 : Added AUTO_OFF_FIXED_J.
 ! Altered : 12-Aug-2022 : Added SN shock variables (following work by LUC.)
 ! Altered : 06-Jun-2022 : Variable COMP_STEQ_T_EHB ([COMP_EHB]) added.
 ! Altered : 15-Nov-2021 : Fixed read in calls for FIX_ALL_SPEC and BC_PAR1.
@@ -338,6 +337,8 @@ C
 	     CALL RD_STORE_DBLE(PRESCRIBED_SHOCK_POWER,'PRESCRIBED_SHOCK_POWER',L_FALSE,'Luminosity for the shock')
 	     CALL RD_STORE_DBLE(VLOC_SHOCK_POWER,'VLOC_SHOCK_POWER',L_FALSE,'Velocity location for shock power')
 	     CALL RD_STORE_DBLE(DVLOC_SHOCK_POWER,'DVLOC_SHOCK_POWER',L_FALSE,'Gausian width for shock power')
+	     LIN_INTERP_RD_SN_DATA=.FALSE.
+	     CALL RD_STORE_LOG(LIN_INTERP_RD_SN_DATA,'LIN_RD_SN_DATA',L_FALSE,'Linear interpolaton in RD_SN_DATA?')
 	   ENDIF
 !
 	    MINIMUM_ISO_POP=1.0D-20
@@ -627,11 +628,9 @@ C
 	1      'Frequency spacing between lines (in km/s)')
 C
 	  WRITE(LUSCR,'()')
-	  USE_FIXED_J=.FALSE.; AUTO_OFF_FIXED_J=.TRUE.
+	  USE_FIXED_J=.FALSE.
 	  CALL RD_STORE_LOG(USE_FIXED_J,'USE_FIXED_J',L_FALSE,
 	1           'Use previously computed J to evaluate ALL rates?')
-	  CALL RD_STORE_LOG(AUTO_OFF_FIXED_J,'AUTO_OFF_FJ',USE_FIXED_J,
-	1           'Swithch USE_FIXED_J off automatically')
 	  IF(USE_FIXED_J .AND. .NOT. RD_LAMBDA)THEN
 	    WRITE(LUER,'(A)')' Warning: RD_LAMBDA must be TRUE when USE_FIXED_J is TRUE.'
 	    WRITE(LUER,'(A)')' Please change the setting in IN_ITS which is read after each iteration'
@@ -1154,7 +1153,9 @@ C
 	  CALL RD_STORE_LOG(UNDO_LAST_IT,'DO_UNDO',L_FALSE,'Undo corrections at last 5 depths')
 !
 	  STOP_IF_BAD_PARAM=.TRUE.
-	  CALL RD_STORE_LOG(STOP_IF_BAD_PARAM,'STOP_IF_BP',L_FALSE,'Undo corrections at last 5 depths')
+	  CALL RD_STORE_LOG(STOP_IF_BAD_PARAM,'STOP_IF_BP',L_FALSE,'Stop if bad/inconsistent parameters have been set')
+	  STOP_IF_MAJOR_WARNING=.TRUE.
+	  CALL RD_STORE_LOG(STOP_IF_MAJOR_WARNING,'STOP_IF_MW',L_FALSE,'Stop if code has potentially a major issue')
 !
 	  CALL CLEAN_RD_STORE()
 !

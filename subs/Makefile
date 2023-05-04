@@ -160,6 +160,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(quad_x_lit_v3.o)\
       $(LIB)(rd_f_to_s_ids.o)\
       $(LIB)(rd_f_to_s_ids_v2.o)\
+      $(LIB)(rd_f_to_s_ids_v3.o)\
       $(LIB)(rd_free_val.o)\
       $(LIB)(rd_log.o)\
       $(LIB)(rd_t_ed.o)\
@@ -177,6 +178,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(rext_coef_v2.o)\
       $(LIB)(rite_asc.o)\
       $(LIB)(rite_atmdes_v2.o)\
+      $(LIB)(rite_atmdes_v3.o)\
       $(LIB)(rite_gam_v2.o)\
       $(LIB)(rv_sn_model_v2.o)\
       $(LIB)(s15adf.o)\

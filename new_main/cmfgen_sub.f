@@ -108,6 +108,7 @@
 	REAL*8 SUM_BA
 	REAL*8 RLUMST_BND
 	REAL*8 LUM_FOR_TEFF
+	REAL*8 LUM_SCL_FAC
 !
 	LOGICAL LST_DEPTH_ONLY
 !
@@ -174,6 +175,7 @@
 	INTEGER MNL_F,MNUP_F
 	INTEGER PHOT_ID
 	INTEGER DPTH_INDX
+	INTEGER ROSS_PHOT_DPTH_INDX
 	INTEGER VAR_INDX
 	INTEGER I,J,K,L,ML,LS,LINE_INDX,NEXT_LOC
 	INTEGER IREC,MATELIM
@@ -427,6 +429,7 @@
 	LOGICAL AT_LEAST_ONE_NEG_OPAC
 	LOGICAL FILE_OPEN
 	LOGICAL VERBOSE
+	LOGICAL F_TO_S_RD_ERROR
 !
 ! Inidicates approximate frequencies for which TAU at outer boundary is written
 ! to OUTGEN on the last iteration.
@@ -716,6 +719,7 @@
 ! NB: The passed GF_CUT is set to zero if the Atomic NO. of the species
 !      under consideration is less than AT_NO_GF_CUT.
 !
+	F_TO_S_RD_ERROR=.FALSE.
 	WRITE(LUWARN,'(/,A,/)')' Reading in atomic data'
 	DO ISPEC=1,NUM_SPECIES
 	  DO ID=SPECIES_END_ID(ISPEC),SPECIES_BEG_ID(ISPEC),-1
@@ -733,8 +737,9 @@
 	1                 'SET_ZERO',T2,GF_LEV_CUT,MIN_NUM_TRANS,L_FALSE,L_FALSE,
 	1                 LUIN,LUSCR,TMP_STRING)
 	      TMP_STRING=TRIM(ION_ID(ID))//'_F_TO_S'
-	      CALL RD_F_TO_S_IDS_V2( ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
-	1           ATM(ID)%XzVLEVNAME_F, ATM(ID)%NXzV_F, ATM(ID)%NXzV, LUIN,TMP_STRING,SL_OPTION)
+	      CALL RD_F_TO_S_IDS_V3( ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
+	1           ATM(ID)%XzVLEVNAME_F, ATM(ID)%NXzV_F, ATM(ID)%NXzV, 
+	1           LUIN,TMP_STRING,SL_OPTION,F_TO_S_RD_ERROR)
 	      CALL RDPHOT_GEN_V2( ATM(ID)%EDGEXzV_F, ATM(ID)%XzVLEVNAME_F,
 	1           ATM(ID)%GIONXzV_F,AT_NO(SPECIES_LNK(ID)),
 	1           ATM(ID)%ZXzV, ATM(ID)%NXzV_F,
@@ -768,6 +773,14 @@
 	   END IF
 	  END DO
 	END DO
+	IF(F_TO_S_RD_ERROR)THEN
+	  WRITE(6,*)' '
+	  WRITE(6,*)'There are errors reading in the super level links.'
+	  WRITE(6,*)'These need to be fixed before the code can run.'
+	  WRITE(6,*)'See F_TO_S_RD_ERRORS for details.'
+	  WRITE(6,*)' '
+	  STOP
+	END IF
 !
 ! Read in data for treating non-thermal ionization.
 !
@@ -810,13 +823,13 @@
 	  WRITE(LUMOD,FMT)NUM_BNDS
 !	  
 	  WRITE(LUMOD,'()')
-	  CALL RITE_ATMHD_V2(LUMOD)
+	  CALL RITE_ATMHD_V3(LUMOD)
 !
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      ISPEC=SPECIES_LNK(ID)
-	      CALL RITE_ATMDES_V2( ATM(ID)%XzV_PRES, ATM(ID)%NXzV, 
-	1          ATM(ID)%ZXzV, ATM(ID)%EQXzV,
+	      CALL RITE_ATMDES_V3( ATM(ID)%XzV_PRES, ATM(ID)%NXzV, 
+	1          ATM(ID)%ZXzV, ATM(ID)%EQXzV, ATM(ID)%XzVLEVNAME_F,
 	1          ATM(ID)%NXzV_F, ATM(ID)%GIONXzV_F, ATM(ID)%N_XzV_PHOT,
 	1          AT_NO(ISPEC),AT_MASS(ISPEC),LUMOD,ION_ID(ID))
 	    END IF
@@ -2609,6 +2622,12 @@
 	  OBS_FLUX(ML)=6.599341D0*SOB(1)*2.0D0		!2 DUE TO 0.5U
 	END IF
 !
+	IF(PLANE_PARALLEL .OR. PLANE_PARALLEL_NO_V)THEN
+	  H_MOM(1:ND)=SOB(1:ND)/R(ND)/R(ND)
+	ELSE
+	  H_MOM(1:ND)=SOB(1:ND)/R(1:ND)/R(1:ND)
+	END IF
+!
 ! Evaluate (CMF) observd X-ray luminosities.
 !
 	  IF(ML .EQ. 1)THEN
@@ -2626,24 +2645,29 @@
 	  DO I=1,ND
 	    RLUMST(I)=0.0D0
 	    J_INT(I)=0.0D0
+	    H_INT(I)=0.0D0
 	    DJDt_TERM(I)=0.0D0
 	    DJDt_FLUX(I)=0.0D0
 	    K_INT(I)=0.0D0
 	    FLUX_MEAN(I)=0.0D0
 	    ROSS_MEAN(I)=0.0D0
 	    PLANCK_MEAN(I)=0.0D0
+	    ABS_MEAN(I)=0.0D0
 	    INT_dBdT(I)=0.0d0
 	  END DO
 	END IF
 	T1=TWOHCSQ*HDKT*FQW(ML)*(NU(ML)**4)
 	T3=TWOHCSQ*FQW(ML)*(NU(ML)**3)
+	LUM_SCL_FAC=4.1274D-12
 	DO I=1,ND		              !(4*PI)**2*Dex(+20)/L(sun)
 	  T2=SOB(I)*FQW(ML)*4.1274D-12
 	  RLUMST(I)=RLUMST(I)+T2
 	  J_INT(I)=J_INT(I)+RJ(I)*FQW(ML)*4.1274D-12
-	  DJDt_FLUX(I)=DJDt_FLUX(I)+DJDt_TERM(I)*FQW(ML)*4.1274D-12
+	  H_INT(I)=H_INT(I)+H_MOM(I)*FQW(ML)*4.1274D-12
 	  K_INT(I)=K_INT(I)+K_MOM(I)*FQW(ML)*4.1274D-12
+	  DJDt_FLUX(I)=DJDt_FLUX(I)+DJDt_TERM(I)*FQW(ML)*4.1274D-12
 	  FLUX_MEAN(I)=FLUX_MEAN(I)+T2*CHI(I)
+	  ABS_MEAN(I)=ABS_MEAN(I)+4.1274D-12*FQW(ML)*(CHI(I)-CHI_SCAT(I))*RJ(I)
 	  T2=T1*EMHNUKT(I)/(  ( (1.0D0-EMHNUKT(I))*T(I) )**2  )
 	  INT_dBdT(I)=INT_dBdT(I)+T2
 	  ROSS_MEAN(I)=ROSS_MEAN(I)+T2/CHI(I)
@@ -3006,7 +3030,7 @@
 	IF(.NOT. LAMBDA_ITERATION .AND. .NOT. LST_ITERATION)THEN
 	  CALL CHECK_SPEC_CONV(OBS_FLUX,OBS_FREQ,T1,T2,CHK,N_OBS)
 	END IF
-	WRITE(6,*)'Exited CHEC_SPEC_CONV';FLUSH(UNIT=6)
+	WRITE(6,*)'Exited CHECK_SPEC_CONV';FLUSH(UNIT=6)
 !
 ! Compute ROSSELAND and FLUX mean opacities. These MEAN opacities DO NOT 
 ! include the effect of clumping. Compute the respective optical depth scales; 
@@ -3020,6 +3044,7 @@
 	T1=7.218771D+11
 	DO I=1,ND
 	  FLUX_MEAN(I)=FLUX_MEAN(I)/RLUMST(I)
+	  ABS_MEAN(I)=ABS_MEAN(I)/J_INT(I)
 	  INT_dBdT(I)=INT_dBdT(I)/ROSS_MEAN(I)		!Program rosseland opac.
 	  ROSS_MEAN(I)=T1*( T(I)**3 )/ROSS_MEAN(I)
 	  PLANCK_MEAN(I)=4.0D0*PLANCK_MEAN(I)/T1/(T(I)**4)
@@ -3045,6 +3070,7 @@
 	TB(ND)=0.0D0
 	TC(ND)=0.0D0
 	DTAU(ND)=0.0D0
+	ROSS_PHOT_DPTH_INDX=ND
 !
 	CALL GEN_ASCI_OPEN(LU_OPAC,'MEANOPAC','UNKNOWN',' ',' ',IZERO,IOS)
 	  WRITE(LU_OPAC,
@@ -3069,9 +3095,10 @@
 	      T3=ESEC(1)*CLUMP_FAC(1)*R(1)/(T3-1.0D0)			!Electon scattering optical depth scale
 	      TC(1:3)=0.0D0
 	    ELSE
-	      T1=T1+TA(I-1)
-	      T2=T2+TB(I-1)
-	      T3=T3+DTAU(I-1)
+	      T1=T1+TA(I-1)                                             !Rosseland optical depth scale
+	      IF(T1 .LT. 0.667)ROSS_PHOT_DPTH_INDX=I
+	      T2=T2+TB(I-1)                                             !Flux optical depth scale
+	      T3=T3+DTAU(I-1)                                           !Electon scattering optical depth scale
 	      TC(1)=TA(I)/TA(I-1)
 	      TC(2)=TB(I)/TB(I-1)
 	      TC(3)=DTAU(I)/DTAU(I-1)
@@ -3080,6 +3107,12 @@
 	1      ROSS_MEAN(I),INT_dBdT(I),FLUX_MEAN(I),ESEC(I),
 	1      T2,T3,TC(2),TC(3),1.0D-10*ROSS_MEAN(I)/DENSITY(I),V(I)
 	  END DO
+	  IF(T1 .LT. 30.0D0 .AND. .NOT. SN_MODEL)THEN
+	    WRITE(6,*)'This model does not extend sufficiently deeply to guarantee the accuracy of'
+	    WRITE(6,*)' the inner boundary condition. You need to adjust you model so that the'
+	    WRITE(6,*)' minimum optical depth is 50, and preferably 100'
+	    IF(STOP_IF_MAJOR_WARNING)STOP
+	  END IF
 	  WRITE(LU_OPAC,'(//,A,A)')
 	1     'NB: Mean opacities do not include effect of clumping',
 	1     'NB: Optical depth scale includes effect of clumping'
@@ -3632,8 +3665,6 @@
 	CALL LUM_FROM_ETA_V2(XRAY_LUM_TOT,R,LUM_FROM_ETA_METHOD,ND)
 	CALL LUM_FROM_ETA_V2(XRAY_LUM_0P1,R,LUM_FROM_ETA_METHOD,ND)
 	CALL LUM_FROM_ETA_V2(XRAY_LUM_1KeV,R,LUM_FROM_ETA_METHOD,ND)
-	WRITE(6,'(5ES14.4)')SHOCK_POWER_LUM(1:ND)
-	WRITE(6,*)'SUM=',SUM(SHOCK_POWER_LUM)
 !
 	IF(PLANE_PARALLEL_NO_V)THEN
 	  MECH_LUM(1:ND)=0.0D0
@@ -3721,7 +3752,23 @@
 	  ELSE
 	    TA(1:ND)=RLUMST(1:ND)/RLUMST(ND)
 	    CALL WRITV(TA,ND,'Normalized luminosity check (normalized by L[ND])',LU_FLUX)
-	  END IF
+	    IF(.NOT. USE_FIXED_J)THEN
+	      DO I=ROSS_PHOT_DPTH_INDX,ND
+	        IF(TA(I) .LT. 0.5D0 .OR. TA(I) .GT. 2.0D0)THEN
+	          WRITE(6,*)'You have poor flux accuracy in the inner region of the model'
+	          WRITE(6,*)'You should restart you model changing the input options or input files'
+	          WRITE(6,*)'Some normalized luminosities are out by a factor of 2'
+	          WRITE(6,*)'You should check OBSFLUX'
+	          IF(STOP_IF_MAJOR_WARNING)STOP
+	        ELSE IF(TA(I) .LT. 0.8D0 .OR. TA(I) .GT. 1.25D0)THEN
+	          WRITE(6,*)'You have poor flux accuracy in the inner region of the model'
+	          WRITE(6,*)'You may need to restart you model changing the input options or input files'
+	          WRITE(6,*)'Some normalized luminosities are out by 25%'
+	          WRITE(6,*)'You should check OBSFLUX'
+	        END IF
+	       END DO
+	    END IF
+      	  END IF
 !
 	  T3=0.0D0
 	  IF(SN_MODEL)THEN
@@ -4303,6 +4350,15 @@
 	    WRITE(LU_POP,'(1X,1P8E16.7)')(FLUX_MEAN(I),I=1,ND)
 	    WRITE(LU_POP,'(A)')' Planck Mean Opacity'
 	    WRITE(LU_POP,'(1X,1P8E16.7)')(PLANCK_MEAN(I),I=1,ND)
+	    WRITE(LU_POP,'(A)')' Absorption Mean Opacity'
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(ABS_MEAN(I),I=1,ND)
+!
+	    WRITE(LU_POP,'(A)')' J moment of radiation field'
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(J_INT(I)/LUM_SCL_FAC,I=1,ND)
+	    WRITE(LU_POP,'(A)')' H moment of radiation field'
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(H_INT(I)/LUM_SCL_FAC,I=1,ND)
+	    WRITE(LU_POP,'(A)')' K moment of radiation field'
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(K_INT(I)/LUM_SCL_FAC,I=1,ND)
 !
 ! Compute the ion population at each depth.                          
 ! These are required when evaluation the occupation probabilities.
@@ -4583,8 +4639,7 @@
 ! If we are USING a fixed J, autmatically switched to variable J when convergence achieved.
 ! We switch when the convergence is 20%.
 !
-	    IF(.NOT. AUTO_OFF_FIXED_J)THEN
-	    ELSE IF(USE_FIXED_J .AND. DO_LAMBDA_AUTO .AND. RD_LAMBDA .AND. MAXCH .LT. 50.0D0)THEN
+	    IF(USE_FIXED_J .AND. DO_LAMBDA_AUTO .AND. RD_LAMBDA .AND. MAXCH .LT. 50.0D0)THEN
 	       USE_FIXED_J=.FALSE.
 	       CALL UPDATE_KEYWORD(L_FALSE,'[USE_FIXED_J]','VADAT',L_TRUE,L_TRUE,LUIN)
 	       COMPUTE_EDDFAC=.TRUE.

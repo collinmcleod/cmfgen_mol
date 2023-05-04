@@ -506,11 +506,11 @@
 	  DO I=1,J-1
 	    IF(EINA(I,J) .GT. 10.0D0)THEN
 	      IF(FIRST_ERROR)THEN
-	         WRITE(LUER,*)'Warning in GENOSC_V9 -- bad oscillator strengths?'
+	         WRITE(LUER,'(/,A)')' Warning in GENOSC_V9 -- bad oscillator strengths?'
 	         WRITE(LUER,*)'Reading data from file '//TRIM(FILNAME)
 	         FIRST_ERROR=.FALSE.
 	      END IF
-	      WRITE(LUER,'(A,ES10.3,2I5,5X,A)')'F value and levels are:',
+	      WRITE(LUER,'(A,ES10.3,2I5,5X,A)')' F value and levels are:',
 	1                   EINA(I,J),I,J,TRIM(LEVNAME(I))//'-'//TRIM(LEVNAME(J))
 	    END IF
 	  END DO

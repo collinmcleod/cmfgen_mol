@@ -84,6 +84,9 @@
 	1              LOCAL_ABS_ENERGY,TOTAL_DECAY_ENERGY,KINETIC_DECAY_ENERGY,SM_ND)
 	IMPLICIT NONE
 !
+! ALtered 20-Nov-2022 : Fixed bug affecting the computation of the diagnostics for the energy
+!                          emitted and absorbed (I was summing to ND instead of ND_SM).
+!
 	INTEGER SM_ND
 	INTEGER ND,NC,NP
 	REAL*8 R(ND)
@@ -108,6 +111,7 @@
 	REAL*8 JQW(ND,NP),KQW(ND,NP)
 	REAL*8 WM(ND,ND),FB(ND,ND)
 !
+	REAL*8 ABS_OPT_DEPTH
 	REAL*8 IC,T1,T2,T3,CONV_FAC,DBB,HBC_J,HBC_S,INBC
 	LOGICAL THK_CONT
 	CHARACTER(LEN=6) METHOD
@@ -118,10 +122,25 @@
 	CHARACTER(LEN=132) STRING
         EXTERNAL JTRPWGT,HTRPWGT,KTRPWGT,NTRPWGT
 !
+! NB: When using FQCOM_INC_V2, DBB=0 and the diffusion approximation
+! will give the same result as a ZERO_FLUX option, and this will be
+! essentially the same as using the HOLLOW_CORE option. The later
+! will potentially be out because of the small velcoity shifts induced
+! by the non-zero velocity of the inner boudary.
+! 
 	METHOD='LOGLOG'
 	INNER_BND_METH='DIFFUSION'
 	THK_CONT=.FALSE.
 	DBB=0.0D0
+!
+! Estimate effective X-ray absorbative optical depth to the inner core.
+!
+	TA(1:SM_ND)=SM_CLUMP_FAC(1:SM_ND)*SM_CHI(1:SM_ND)
+	T1=0.0D0
+	DO I=1,SM_ND-1
+	  T1=T1+(SM_R(I)-SM_R(I+1))*(TA(I)+TA(I+1))
+	END DO
+	ABS_OPT_DEPTH=0.5D0*T1
 !
 	CALL MON_INTERP(  V,ND,IONE,R,ND,SM_V,        SM_ND,SM_R,SM_ND)
 !
@@ -177,17 +196,21 @@
 !   (b) The extra factor of 4 arises as ATAN(1.0D0) is pi/4.
 !   (c) /Lsun to convert to solar luminosities
 !
+! NB: TA etc are decarled to be of length ND, thus I need to explictly give the 
+!       upper limit in the SUM.
+
 	CONV_FAC=16.0D0*ATAN(1.0D0)*1.0D+30/3.826D+33
-	T1=SUM(TA)*CONV_FAC
-	T2=SUM(TB)*CONV_FAC
-	T3=SUM(TC)*CONV_FAC
+	T1=SUM(TA(1:SM_ND))*CONV_FAC
+	T2=SUM(TB(1:SM_ND))*CONV_FAC
+	T3=SUM(TC(1:SM_ND))*CONV_FAC
 !
 	OPEN(UNIT=10,FILE='check_edep.dat',STATUS='UNKNOWN',ACTION='WRITE')
 	  WRITE(10,'(A)')'!'
-	  WRITE(10,'(A,ES13.5,A)')'!            Radioactive energy emitted is :',T1,' Lsun'
-	  WRITE(10,'(A,ES13.5,A)')'!            Radioactive energy absorbed is:',T2,' Lsun'
-	  WRITE(10,'(A,ES13.5,A)')'!Fraction of radioactive energy absorbed is:',T2/T1
-	  WRITE(10,'(A,ES13.5,A)')'!      Fraction absorbed that is kinetic is:',T3/T2
+	  WRITE(10,'(A,ES13.5,A)')'!                Radioactive energy emitted is :',T1,' Lsun'
+	  WRITE(10,'(A,ES13.5,A)')'!                Radioactive energy absorbed is:',T2,' Lsun'
+	  WRITE(10,'(A,ES13.5,A)')'!    Fraction of radioactive energy absorbed is:',T2/T1
+	  WRITE(10,'(A,ES13.5,A)')'!          Fraction absorbed that is kinetic is:',T3/T2
+	  WRITE(10,'(A,ES13.5,A)')'! Effec. absorbative gamma-ray optical depth is:',ABS_OPT_DEPTH
 	  WRITE(10,'(A)')'!'
 	  WRITE(10,'(A)')'! The energies have been averaged over volume, and thus can be'
 	  WRITE(10,'(A)')'! directly compard with an identical unclumped model.'

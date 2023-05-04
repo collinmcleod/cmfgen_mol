@@ -53,6 +53,9 @@ $(ST):
 $(CMF):
 	(cd ../../mod_subs ; make)
 
+$(CNT):
+	(cd ../../mod_subs ; make)
+
 clean :
 	rm -f *.o 
 

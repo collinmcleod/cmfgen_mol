@@ -1,9 +1,10 @@
 	SUBROUTINE SET_DC_OR_POP_OR_TX_V2(YV,LEV,HE2,LOG_HE2LTE,EDGEHE2,NHE2,ND,T,X,DESC,FLAG)
 	IMPLICIT NONE
 !
+! Altered 11-Apr-2023 : Added DCRGS option.
 ! Altered 10-Dec-2010 : Changed to V2
 !                       Pass LOG_He2LTE rather than He2LTE.
-! Aletered 20-Mar-1997 : YV is now REAL*8
+! Altered 20-Mar-1997 : YV is now REAL*8
 !
 	INTEGER NHE2,ND,LEV,I,J
 !
@@ -36,7 +37,19 @@
 	  XSPEC=X(J+1:)
 	END IF
 !	
-	IF(X(1:2) .EQ. 'DC' .AND. XSPEC .EQ. DESC)THEN
+	IF(X(1:5) .EQ. 'DCRGS' .AND. XSPEC .EQ. DESC)THEN
+	  IF(LEV .LE. 0 .OR. LEV .GT. NHE2)THEN
+	    WRITE(T_OUT,*)'Error in SET_DC_OR_POP_OR_TX - invalid level'
+	    WRITE(T_OUT,*)'Lev=',LEV
+	    WRITE(T_OUT,*)'NSPEC=',NHE2
+	    RETURN
+	  END IF
+	  DO J=1,ND
+	    YV(J)=LOG10(HE2(LEV,J)/HE2(1,J)) -
+	1             (LOG_HE2LTE(LEV,J)-LOG_HE2LTE(1,J))/LOG(10.0D0)
+	  END DO
+	  LOCAL=.TRUE.
+	ELSE IF(X(1:2) .EQ. 'DC' .AND. XSPEC .EQ. DESC)THEN
 	  IF(LEV .LE. 0 .OR. LEV .GT. NHE2)THEN
 	    WRITE(T_OUT,*)'Error in SET_DC_OR_POP_OR_TX - invalid level'
 	    WRITE(T_OUT,*)'Lev=',LEV
