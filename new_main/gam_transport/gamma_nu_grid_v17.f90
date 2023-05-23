@@ -120,7 +120,6 @@
 		  IF(T2 .LE. 1.0D-5)THEN
 		    K=K-1
 		    OVERLAP=.TRUE.
-		    WRITE(LUER,'(A,1X,F10.6)')'Gamma-ray line energy repeated:',T1
 		    EXIT
 		  END IF
 		END DO
@@ -134,9 +133,8 @@
 	END DO
 	CLOSE(7)
 	NGAM=K
-	WRITE(LUER,'(A,1X,I3)')"Number of Gamma ray lines allocated:",N_GAMMA
-	WRITE(LUER,'(A,1X,I3)')"Number of Gamma ray lines used:",NGAM
-!
+	WRITE(LUER,'(A,1X,I3)')" Number of Gamma ray lines allocated:",N_GAMMA
+	WRITE(LUER,'(A,1X,I3)')" Number of distinct Gamma ray lines used:",NGAM
 !
 	ALLOCATE(MY_INDEX(NGAM),WORK1(NGAM))
 	IF(NGAM .GT. 1)THEN

@@ -1,8 +1,8 @@
 !
-! Porgram design to plot data from an XzVPRRR file.
+! Program design to plot data from an XzVPRRR file.
 !
 ! NS is read in from MODEL
-! The velocity os read in from RVTJ.
+! The velocity is read in from RVTJ.
 !
 	PROGRAM PLT_NRR
 	USE MOD_USR_OPTION

@@ -11,6 +11,7 @@
 	USE NUC_ISO_MOD, ONLY : RADIOACTIVE_DECAY_ENERGY
 	IMPLICIT NONE
 !
+! Altered 20-May-2023 : When now check if the data directory (data) exists.
 ! Altered 02-Jun-2022 : Fixed bug with format statement (extra )).
 ! Altered 21-Nov-2021 : Added access to RADIOACTIVE_DECAY_ENERGY
 ! Altered 19-Nov-2021 : Added SN_AGE_DAYS to call. Added SN_AGE_DAYS to gamma_energy_dep_v7 call.
@@ -80,6 +81,7 @@
 	INTEGER, PARAMETER :: LU_GAM=57
 	INTEGER, PARAMETER :: LU_GAMOBS=88
 !
+	LOGICAL :: FILE_EXISTS
 	LOGICAL :: FIRST_OBS_COMP
 	LOGICAL :: FIRST_FREQ
 	LOGICAL :: NEW_FREQ
@@ -89,6 +91,14 @@
 	FOURPI=4.0D0*PI
 	LUER=ERROR_LU()
 	H_PL=PLANCK*1.0D+3
+!
+	INQUIRE(FILE='data',EXIST=FILE_EXISTS)
+	IF(.NOT. FILE_EXISTS)THEN
+	  WRITE(6,*)' Error in GAMRAY_SUB_V3'
+	  WRITE(6,*)' When VERBOSE_GAMMA is TRUE the directore data has to exist'
+	  WRITE(6,*)' Most of the gamma-ray diagnistics are output to the data directory'
+	  STOP
+	END IF
 !
 ! RD_GAMRAY_CNTRL to read in the control parameters (GAMRAY_PARAMS) for the gamma-ray code
 !
@@ -102,7 +112,6 @@
 	ALLOCATE (NU_VEC(N_GAMMA))
 !
 	NU_VEC=0.0D0
-	WRITE(6,*)'N_GAMMA is (before call to NU_GRID_V16)',N_GAMMA,NU_GRID_MAX
 	CALL GAMMA_NU_GRID_V16(N_GAMMA,NU_VEC,NU_GRID_VEC,NF_GRID_PTS)
 	ALLOCATE(NU_VEC_15(NF_GRID_PTS))
 	NU_VEC_15(1:NF_GRID_PTS)=NU_GRID_VEC(1:NF_GRID_PTS)/1.0D15
@@ -314,33 +323,7 @@
 	GAM_OPAC_COPY=0.0D0
 	GAM_OPAC_CLUMP=0.0D0
 !
-!	OPEN(UNIT=7,FILE='./data/E_SCAT_ARRAY',STATUS='UNKNOWN',ACTION='WRITE')
-!        WRITE(7,*)"!Opened E_SCAT_ARRAY"
-!        CLOSE(UNIT=7)
-!        OPEN(UNIT=7,FILE='./data/GAMRAY_E_DEP',STATUS='UNKNOWN',ACTION='WRITE')
-!        WRITE(7,*)"!Opened GAMRAY_E_DEP"
-!        CLOSE(UNIT=7)
-!        OPEN(UNIT=7,FILE='./data/gamma_ray_lum.dat',STATUS='UNKNOWN',ACTION='WRITE')
-!        WRITE(7,*)"!Opened gamma_ray_lum.dat"
-!        CLOSE(UNIT=7)
-!        OPEN(UNIT=7,FILE='./data/gamma_ray_lum_J.dat',STATUS='UNKNOWN',ACTION='WRITE')
-!        WRITE(7,*)"!Opened gamma_ray_lum.dat"
-!        CLOSE(UNIT=7)
-!        OPEN(UNIT=7,FILE='./data/ray1_intensity.dat',STATUS='UNKNOWN',ACTION='WRITE')
-!        WRITE(7,*)'!Opened ray1_intensity.dat'
-!        CLOSE(UNIT=7)
-!        OPEN(UNIT=7,FILE='./data/DIAGN_EDEP',STATUS='UNKNOWN',ACTION='WRITE')
-!        WRITE(7,*)'!Opened DIAGN_EDEP'
-!        CLOSE(UNIT=7)
-!        OPEN(UNIT=7,FILE='./data/photons.dat',STATUS='UNKNOWN',ACTION='WRITE')
-!        WRITE(7,*)'!Opened photons.dat'
-!        CLOSE(UNIT=7)
-!        OPEN(UNIT=7,FILE='./data/TAU_RAY.dat',STATUS='UNKNOWN',ACTION='WRITE')
-!        WRITE(7,*)'!Opened TAU_RAY.dat'
-!        WRITE(7,*)'ND:',ND
-!        CLOSE(UNIT=7)
-!
-	WRITE(LUER,*)'Set up gamma-ray transfer routine variables...'
+	WRITE(LUER,'(/,A)')' Set up gamma-ray transfer routine variables...'
 !
 !************************************************************************************
 !************************************************************************************
@@ -554,8 +537,7 @@
 !
 	CALL TUNE(3,'')
 	CLOSE(LU_GAM)
-	WRITE(LUER,'(A)')'Finished gamma-ray scattering and deposition'
-	WRITE(LUER,'(A)')'Leaving GAMRAY_SUB_V3'
+	WRITE(LUER,'(A)')' Finished gamma-ray scattering and deposition - Leaving gamray_sub_v3.f90'
 !
 	DEALLOCATE (TC_WRK)
 	DEALLOCATE (NU_GRID_VEC)

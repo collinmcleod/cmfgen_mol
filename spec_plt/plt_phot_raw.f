@@ -9,6 +9,7 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered 18-May-2023 : Can now plot recombination to a level as a function of level index or lambda.
 ! Altered 20-Sep-2012 : Bug fix with incorrect link test for 2nd photoionization data set.
 !                         Cleaned.
 ! Altered 16-Apr-2008 : Read in energy levels form oscilator file (if available).
@@ -61,6 +62,7 @@
 !
 	CHARACTER*40 LEVEL_NAME1
 	CHARACTER*40 LEVEL_NAME2
+	CHARACTER*40 LABEL
 !
 	REAL*8 T1,T2
 	REAL*8 FREQ_SCL_FAC
@@ -78,7 +80,10 @@
 	INTEGER, PARAMETER :: NCF_MAX=10000
 	REAL*8 XV(NCF_MAX),YV(NCF_MAX)
 !
+!
 	INTEGER, PARAMETER :: NREC_MAX=5
+	REAL*8, ALLOCATABLE :: LEVEL_INDX(:)
+	REAL*8, ALLOCATABLE :: RECOM(:,:)
 	REAL*8 TEMP_VEC(NREC_MAX)
 	REAL*8 TOTAL_REC_VEC(NREC_MAX)
 	REAL*8 LEVEL_REC_VEC(NREC_MAX)
@@ -95,6 +100,7 @@
 	LOGICAL DO_SEQ_PLTS
 	LOGICAL OSCILLATOR_FILE_AVAIL
 	LOGICAL OUT_PHOT
+	LOGICAL NORM
 	EXTERNAL SPEED_OF_LIGHT
 !
 	CHARACTER(LEN=30) UC; EXTERNAL UC
@@ -296,7 +302,7 @@
 !
 !
 !
-20	NPAIRS_2=0
+20	NPAIRS_2=0; NLEV_2=0
 	FILENAME='PHOT2'
 	WRITE(6,*)RED_PEN
 	CALL GEN_IN(FILENAME,'SECOND'//DEF_PEN//'photoionization file ("" for null):')
@@ -406,6 +412,15 @@
 	  WRITE(6,*)GREEN_PEN
 	  WRITE(6,'(A,T30,5(5X,F6.2))')' Temperature (10^4 K)=',(TEMP_VEC(I),I=1,NT)
 	  WRITE(LUOUT,'(A,T30,5(5X,F6.2))')' Level / Temperature (10^4 K)',(TEMP_VEC(I),I=1,NT)
+!
+! Needed for plotting.
+!
+	  ALLOCATE(RECOM(NLEV_1,NT))
+	  ALLOCATE(LEVEL_INDX(MAX(NLEV_1,NLEV_2)))
+	  DO I=1,MAX(NLEV_1,NLEV_2)
+	    LEVEL_INDX(I)=I
+	  END DO
+!	
 	  DO INDX_1=1,NLEV_1
 	    EDGE=ENERGY_1(INDX_1)
 	    STAT_WEIGHT=STAT_WT_1(INDX_1)
@@ -447,13 +462,43 @@
 	    DO I=1,NT
 	      CALL RECOM_OPAC_V2(YV,XV,T1,FREQ_SCL_FAC,STAT_WEIGHT,GION_1,NV,NV,LEVEL_REC_VEC(I),TEMP_VEC(I))
 	      TOTAL_REC_VEC(I)=TOTAL_REC_VEC(I)+LEVEL_REC_VEC(I)
+	      RECOM(INDX_1,I)=LEVEL_REC_VEC(I)
 	    END DO
+	   
 	    WRITE(6,'(A,T30,5ES11.3)')TRIM(NAME_1(INDX_1)),(LEVEL_REC_VEC(I),I=1,NT)
 	    WRITE(LUOUT,'(X,A,T30,5ES11.3)')TRIM(NAME_1(INDX_1)),(LEVEL_REC_VEC(I),I=1,NT)
 	    FLUSH(LUOUT)
 	  END DO
 	  WRITE(6,'(A,T30,5ES11.3)')' Total Recom. Rate/ion=',(TOTAL_REC_VEC(I),I=1,NT)
 	  WRITE(LUOUT,'(A,T30,5ES11.3)')' Total Recom. Rate/ion=',(TOTAL_REC_VEC(I),I=1,NT)
+!
+	  WRITE(6,*)DEF_PEN
+	  NORM=.FALSE.; CALL GEN_IN(NORM,'Normalize by total recombination rate')
+	  DO I=1,NT
+	    WRITE(LABEL,'(F7.2)')TEMP_VEC(I)
+	    YV(1:NLEV_1)=RECOM(1:NLEV_1,I)
+	    IF(NORM)YV(1:NLEV_1)=YV(1:NLEV_1)/TOTAL_REC_VEC(I)
+	    CALL DP_CURVE_LAB(NLEV_1,LEVEL_INDX,YV,LABEL)
+	  END DO
+	  IF(NORM)THEN
+	    CALL GRAMON_PGPLOT('Level index','Normalized recombination rate',' ',' ')
+	  ELSE
+	    CALL GRAMON_PGPLOT('Level index','Recombination rate',' ',' ')
+	  END IF
+!
+	  WRITE(6,*)DEF_PEN
+	  XV(1:NLEV_1)=1.0D+08/(IONIZATION_ENERGY-ENERGY(1:NLEV_1))
+	  DO I=1,NT
+	    WRITE(LABEL,'(F7.2)')TEMP_VEC(I)
+	    YV(1:NLEV_1)=RECOM(1:NLEV_1,I)
+	    IF(NORM)YV(1:NLEV_1)=YV(1:NLEV_1)/TOTAL_REC_VEC(I)
+	    CALL DP_CURVE_LAB(NLEV_1,XV,YV,LABEL)
+	  END DO
+	  IF(NORM)THEN
+	    CALL GRAMON_PGPLOT('\gl(\A)','Normalized ecombination rate',' ',' ')
+	  ELSE 
+	    CALL GRAMON_PGPLOT('\gl(\A)','Recombination rate',' ',' ')
+	  END IF
 !
 	  IF(EXC_EN_1 .NE. 0.0D0)THEN
 	    WRITE(6,*)' '

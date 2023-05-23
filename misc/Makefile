@@ -33,6 +33,7 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)create_mod_sum.exe\
          $(EXE_DIR)create_pp_mod_sum.exe\
          $(EXE_DIR)count_phot_data.exe\
+         $(EXE_DIR)do_recom_sum.exe\
          $(EXE_DIR)ed_vadat.exe\
          $(EXE_DIR)check_energy_cons.exe\
          $(EXE_DIR)chk_ba_est.exe\

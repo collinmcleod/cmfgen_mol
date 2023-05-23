@@ -86,7 +86,7 @@
 !
 ! Frequencies have to be extracted from the structures and sorted for ONLY the lines being used
 !
-	WRITE(LUER,*)"Making the frequency grid with version 16"
+	WRITE(LUER,*)" Making the frequency grid with version 16 (gamma_nu_grid_v16)"
 	K=0
 	EN_SUM=0.0D0
 	OPEN(UNIT=7,FILE='Check_decays.dat',STATUS='UNKNOWN',ACTION='WRITE')
@@ -115,7 +115,6 @@
 		  IF(T2 .LE. 1.0D-5)THEN
 		    K=K-1
 		    OVERLAP=.TRUE.
-		    WRITE(LUER,'(A,1X,F10.6)')'Gamma-ray line energy repeated:',T1
 		    EXIT
 		  END IF
 		END DO
@@ -129,8 +128,8 @@
 	END DO
 	CLOSE(7)
 	NGAM=K
-	WRITE(LUER,'(A,1X,I3)')"Number of Gamma ray lines allocated:",N_GAMMA_PASSED
-	WRITE(LUER,'(A,1X,I3)')"Number of Gamma ray lines used:",NGAM
+	WRITE(LUER,'(A,1X,I3)')" Number of Gamma ray lines allocated:",N_GAMMA_PASSED
+	WRITE(LUER,'(A,1X,I3)')" Number of distinct Gamma ray lines used:",NGAM
 !
 !
 	ALLOCATE(MY_INDEX(NGAM),WORK1(NGAM))
@@ -161,9 +160,6 @@
 !	
 ! Assigning blue and red edges to the lines based on doppler shifts
 !
-	WRITE(6,*)'NG=',N_GAMMA,N_GAMMA_PASSED
-	WRITE(6,*)SIZE(NU_BLUE)
-	WRITE(6,*)SIZE(NU_VEC)
 	NU_BLUE(1:NGAM)=NU_VEC(1:NGAM)*(1.0D0+BLUE_GAUSS*VGAUSS)
 	NU_RED(1:NGAM)=NU_VEC(1:NGAM)*(1.0D0-RED_GAUSS*VGAUSS)
 !	
@@ -178,14 +174,13 @@
         FWHM=SQRT(8.0D0*LOG(2.0D0))*VGAUSS
 	NU_MAX=(1.0D0+100.0D0*FWHM)*NU_VEC(1)
 	IF(EGAM_MAX/PLANCK .LT. NU_MAX)THEN
-	  WRITE(LUER,'(A)')'Using code definition for NU_MAX instead of '//&
+	  WRITE(LUER,'(A)')' Using code definition for NU_MAX instead of '//&
 		'user input..'
-	  WRITE(LUER,'(A,1X,F10.4)')'NU_MAX (MeV):',NU_MAX*PLANCK
+	  WRITE(LUER,'(A,1X,F10.4)')' NU_MAX (MeV):',NU_MAX*PLANCK
 	ELSE
 	  NU_MAX=EGAM_MAX/PLANCK
 	END IF
-	T1=NU_RED_INF2(NGAM)/&
-		(1.0D0+2.0D0*HoMC2*NU_RED_INF2(NGAM))
+	T1=NU_RED_INF2(NGAM)/(1.0D0+2.0D0*HoMC2*NU_RED_INF2(NGAM))
 	T2=0.1D0*T1/(1.0D0+2.0D0*HoMC2*T1)
 	NU_MIN=EGAM_MIN/PLANCK ! Lowest frequency will be set as parameter
 	IF(T2*PLANCK .LT. EGAM_MIN)THEN
@@ -197,10 +192,10 @@
 	    NU_MIN=5.0D0*T2
 	  END IF
 	END IF
-	WRITE(LUER,*)"NU_MIN:",NU_MIN
-	WRITE(LUER,*)"NU_MIN (keV):",NU_MIN*PLANCK*1.0D3
-	WRITE(LUER,*)"NU_RED_INF2(NGAM):",NU_RED_INF2(NGAM)
-	WRITE(LUER,*)"NU_RED_INF2(NGAM) (keV):",NU_RED_INF2(NGAM)*PLANCK*1.0D3
+	WRITE(LUER,*)"             NU_MIN (Hz):",NU_MIN
+	WRITE(LUER,*)"            NU_MIN (keV):",NU_MIN*PLANCK*1.0D3
+	WRITE(LUER,*)"  NU_RED_INF2(NGAM) (Hz):",NU_RED_INF2(NGAM)
+	WRITE(LUER,*)" NU_RED_INF2(NGAM) (keV):",NU_RED_INF2(NGAM)*PLANCK*1.0D3
 !
 !--------------------------------------------------------------------- 
 ! Establishing the starting value for our NU grid
@@ -496,7 +491,7 @@
 !
 	NF_GRID_PTS=INU
 !
-	WRITE(LUER,'(A,I6)')"Number of gamma frequency grid pts:",NF_GRID_PTS
+	WRITE(LUER,'(A,I6)')" Number of gamma frequency grid pts:",NF_GRID_PTS
 ! Now let's check to make sure the frequency grid is monotonicly decreasing
 	I=0
 	DO L=1,NF_GRID_PTS
@@ -517,8 +512,11 @@
 	  WRITE(LUER,*) "Fails for line indexes", L, S
 	  WRITE(LUER,*)NU_GRID_VEC(L),NU_GRID_VEC(S)
 	END IF
-	WRITE(LUER,'(A,I10)') "# of non-monotonicly decreasing gamma nu grid pts:", I
-	IF(I .NE. 0) STOP "*** GAMMA-RAY FREQUENCY GRID NOT MONOTONICALLY DECREASING ***"
+	IF(I .NE. 0)THEN
+	   WRITE(LUER,'(A)')' Error in gamma_nu_grid_v16.f90'
+	   WRITE(LUER,'(A,I10)') "# of non-monotonicly decreasing gamma nu grid pts:", I
+	   STOP "*** GAMMA-RAY FREQUENCY GRID NOT MONOTONICALLY DECREASING ***"
+	END IF
 !
 	DEALLOCATE (MY_INDEX,WORK1,NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2)
 !

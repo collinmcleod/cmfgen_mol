@@ -15,8 +15,9 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
-! Altered  22-Feb-203  : Minor changes to some plotting option. Variable CURVE_LAB added.
-!          20-Jan-200  : ABS_MEAN added.
+! Altered  19-May-2023 : Fixed bug with COLL option -- size of work vectors TA, TB, and TC increased.
+! Altered  22-Feb-2023 : Minor changes to some plotting option. Variable CURVE_LAB added.
+!          20-Jan-2023 : ABS_MEAN added.
 ! Altered  06-Sep-2022 : Changes to LINE_ID output (29-Aug-2022).
 ! Altered  09-Aug-2022 : Improved handling of FLUX_DEFICIT line id's (PLNID option).
 ! Altered  17-Nov-2021 : Copied from OSIRIS.
@@ -140,10 +141,15 @@
 	REAL*8 JBAR(ND),ZNET(ND)
 	REAL*8 CHIROSS(ND),TAUROSS(ND)
 !
+! Generalized work vectors.
+!
+	REAL*8 TA(MAX(NP_MAX,N_MAX))
+	REAL*8 TB(MAX(NP_MAX,N_MAX))
+	REAL*8 TC(MAX(NP_MAX,N_MAX))
+!
 ! Variables required to compute TGREY and for interpolations.
 !
 	REAL*8 JQWEXT(NP_MAX,NP_MAX),KQWEXT(NP_MAX,NP_MAX),PEXT(NP_MAX)
-	REAL*8 TA(NP_MAX),TB(NP_MAX),TC(NP_MAX)
 	REAL*8 Z(NP_MAX),DTAU(NP_MAX),XM(NP_MAX),RJ(NP_MAX)
 	REAL*8 CHI(NP_MAX),REXT(NP_MAX),dCHIdr(NP_MAX)
 	REAL*8 INBC,HBC,HBCNEW,NBC,FA(NP_MAX),GAM(NP_MAX),GAMH(NP_MAX)
@@ -5494,6 +5500,18 @@
 !	    END IF
 !	  END DO
 !
+	ELSE IF(XOPT .EQ. 'CSUM')THEN
+	  TMP_ED=1.0D0
+	  CALL USR_OPTION(TEMP,'T','1.0','Input T')
+	  DO ID=1,NUM_IONS
+	    IF(XSPEC .EQ. UC(ION_ID(ID)) .OR. (XSPEC .EQ. 'ALL' .AND.  ATM(ID)%XzV_PRES))THEN
+	      CALL GET_COL_SUMMARY_V1(OMEGA_F,
+	1         ATM(ID)%EDGEXzV_F,ATM(ID)%AXzV_F,ATM(ID)%GXzV_F,
+	1         ATM(ID)%XzVLEVNAME_F,ATM(ID)%ZXzV,ATM(ID)%NXzV_F,
+	1         TEMP,TRIM(ION_ID(ID))//'_COL_DATA')
+	     END IF
+	   END DO
+!
 	ELSE IF(XOPT .EQ. 'COL' .OR. XOPT .EQ. 'CRIT')THEN
 	  TMP_ED=1.0D0
 	  CALL USR_OPTION(T1,'T','1.0','Input T')
@@ -5604,7 +5622,7 @@ c
 	  EXC_EN=0.0D0
 	  IF(PHOT_ID .NE. 1)THEN
 	    CALL USR_OPTION(EXC_EN,'EXC_EN',' ',
-	1     'Excitaiton Energy (cm^-1) of final state')
+	1     'Excitation Energy (cm^-1) of final state')
 	  END IF
 	  EXC_EN=1.0D-15*C_CMS*EXC_EN
 	  CALL USR_OPTION(TMP_GION,'GION',' ',

@@ -1238,7 +1238,7 @@
 !
 	INQUIRE(FILE='GAMRAY_ENERGY_DEP',EXIST=CHK)       
 	IF(GAMRAY_TRANS .EQ. 'RAD_TRANS' .AND. .NOT. CHK)THEN
-	  WRITE(6,'(A)')'Running the gamma-ray routine GAMRAY_SUB_V3'
+	  WRITE(6,'(/,A)')' Running the gamma-ray routine GAMRAY_SUB_V3'
 	  CALL TUNE(IONE,'FULL_GAMMA')
 	  CALL GAMRAY_SUB_V3(ND,NC,NP,P,R,V,SIGMA,VDOP_VEC,CLUMP_FAC,
 	1         MU_AT_RMAX,HQW_AT_RMAX,DELV_FRAC_FG,REXT_FAC,METHOD,
@@ -1246,7 +1246,7 @@
 	  CALL TUNE(ITWO,'FULL_GAMMA')
 	  CALL TUNE(3,' ')
 	ELSE IF(GAMRAY_TRANS .EQ. 'RAD_TRANS')THEN
-	  WRITE(6,'(A)')'Using previosuly computed GAMRAY_ENERGY_DEP file'
+	  WRITE(6,'(/,A)')' Using previosuly computed GAMRAY_ENERGY_DEP file'
 	END IF
 
 ! 

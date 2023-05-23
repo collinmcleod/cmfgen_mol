@@ -88,7 +88,7 @@
 	LUWARN=WARNING_LU()
 	IF(FIRST)THEN
 	  WRITE(6,'(/,A)')' Using REGRID_LOG_DC_V1 to read in initial population estimates'
-	  WRITE(6,'(A,/)')' Using option:',TRIM(INTERP_OPTION)
+	  WRITE(6,'(2A,/)')' Using option: ',TRIM(INTERP_OPTION)
 	END IF
 !
 ! Read in values from previous model.
@@ -565,12 +565,12 @@
 	    END IF
 	  END DO
 	  IF(BAD_TX_CONV)THEN
-	    WRITE(LUER,*)'Error in REGRID_LOG_DC_V1 - TX did not converge in 100 iterations'
-	    WRITE(LUER,*)'File is ',TRIM(FILE_NAME)
+	    WRITE(LUER,*)'Warning in REGRID_LOG_DC_V1 - TX did not converge in 100 iterations'
+	    WRITE(LUER,*)'This might affect convergence. File is ',TRIM(FILE_NAME)
 	    WRITE(LUER,*)'It occurred at the following depths:'
 	    DO I=1,ND
 	      IF(NO_TX_CONV(I))WRITE(LUER,'(I5)',ADVANCE='NO')I
-	      IF(MOD(I,10) .EQ. 0)WRITE(LUER,'(A)')' '
+	      IF(MOD(I,15) .EQ. 0)WRITE(LUER,'(A)')' '
 	    END DO
           END IF
 	END IF

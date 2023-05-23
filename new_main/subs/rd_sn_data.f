@@ -563,6 +563,8 @@
 	            WRITE(LUER,*)'Do diff SN_HYDRO_DATA SN_HYDRO_FOR_NEXT_MODEL to see changes.'
 	            WRITE(LUER,*)'This may affect the heating, partyicularly when using energy'//
 	1                        ' deposition averaged over time.'
+	            WRITE(LUER,*)'It may be unimportat if the species is an impurity ion, such as'
+	            WRITE(LUER,*)'  56Ni at > 100 days and you are using a time step > than the half life of 56Ni.'
 	            WRITE(LUER,'(3X,A,T12,I3)')TRIM(ISO(IS)%SPECIES),ISO(IS)%BARYON_NUMBER
 	          ELSE
 	            WRITE(LUER,'(3X,A,T12,I3)')TRIM(ISO(IS)%SPECIES),ISO(IS)%BARYON_NUMBER

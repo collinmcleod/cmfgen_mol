@@ -212,8 +212,7 @@
 !
 ! saving the inverted array for the gamma-ray transfer routines
 !
-	WRITE(LUER,*)'Saving angles for gamma ray routines'
-	IF(.NOT. ALLOCATED(R_MU))THEN
+	IF(.NOT. ALLOCATED(R_MU) .AND. VERBOSE_GAMMA)THEN
 	  ALLOCATE(R_MU(ND))
 	  WRITE(LUER,*)'ALLOCATED R_MU'
 	  WRITE(LUER,*)'Size of R_MU:',SIZE(R_MU)
@@ -264,6 +263,6 @@
 	    R_MU(ID)%MON_MU(NA)=-1.0D0
 	  END IF
 	END DO
-	WRITE(LUER,*)'  leaving DEFINE_GRID_V2_GAM'
+!
       RETURN
       END

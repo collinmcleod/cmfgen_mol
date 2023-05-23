@@ -107,8 +107,8 @@
         200 CONTINUE
         N_GAMMA=LINE_INDEX
         N_SPECIES=INDX
-	WRITE(6,'(A,1X,I3)')'# of Gamma-Ray decay lines read:',N_GAMMA
-	WRITE(6,'(A,1X,I3)')'# of isotopes read:',N_SPECIES
+	WRITE(6,'(A,1X,I3)')' # of Gamma-Ray decay lines read:',N_GAMMA
+	WRITE(6,'(A,1X,I3)')' # of isotopes read:',N_SPECIES
 	CLOSE(LU)
 !
 	IF(VERBOSE_GAMMA)THEN

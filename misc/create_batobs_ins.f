@@ -19,6 +19,7 @@
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
 !
+! Aleterd 10-May-2023 : Improved documentation.
 ! Altered 26-Sep-2022 : Option to use lower case name for IDs, _ added automatically to identifiers.
 ! Created 19-Jun-2022
 !
@@ -27,6 +28,7 @@
 	INTEGER NUM_KEYS
 	INTEGER N_ADDS
 	INTEGER I,K,K1,K2,KEY_ID
+	INTEGER IOS
 !
 	LOGICAL VALID_KEY
 	LOGICAL DONE_SED
@@ -49,13 +51,25 @@
 	KEEP_ALL=.FALSE.
 	LOWER_CASE=.TRUE.
 !
+	WRITE(6,*)BLUE_PEN
+	WRITE(6,*)'BAT_PARAMS must exist'
+	WRITE(6,*)'For simple model BAT_PARAMS should have the following three lines.'
+	WRITE(6,*)'It must end with the blankline'
+	WRITE(6,*)'   RUNID'
+	WRITE(6,*)'   T      [TRAP_J]'
+	WRITE(6,*)'  '
+	WRITE(6,*)'It may contain any valid key which will be set to the value you enter.'
+	WRITE(6,*)'After the blank line you can enter a new RUNID etc for a new spectrum calcualtion'
+	WRITE(6,*)'    with a new set  of paramters'
+	WRITE(6,*)DEF_PEN
+!
 	WRITE(6,'(A)')RED_PEN
 	WRITE(6,'(A)')' After each model:'
 	WRITE(6,'(A)')'      ES_J_CONV will be deleted'
 	WRITE(6,'(A)')'      EDDFACTOR will be deleted unless STORE has been set in BAT_PARAMS'
 	WRITE(6,'(A)')' '
 	WRITE(6,'(A)')'  MEANOPC, J_COMP, OBSFLUX (obs_cmf) HYDRO and TIMING will be deleted'
-	WRITE(6,'(A)')'      They will be saved if KEEP_ALL is set to true.'
+	WRITE(6,'(A)')'      They will be saved if next option is set to true.'
 	WRITE(6,'(A)')DEF_PEN
 	CALL GEN_IN(KEEP_ALL,'Keep unnecessary file -- MEANOPC, J_COMP, etc?')
 	CALL GEN_IN(LOWER_CASE,'Lower case name identifier?')
@@ -105,7 +119,12 @@
 !
 ! Read in required model runs.
 !	
-	OPEN(UNIT=LUIN,FILE='BAT_PARAMS',STATUS='OLD',ACTION='READ')
+	OPEN(UNIT=LUIN,FILE='BAT_PARAMS',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	IF(IOS .NE. 0)THEN
+	  WRITE(6,*)'BAT_PARAMS must exist'
+	  STOP
+	END IF
+!
 	DO WHILE(1 .EQ. 1)
 	  READ(LUIN,'(A)',END=1000)STRING
 	  STORE_EDDFACTOR=.FALSE.
@@ -114,6 +133,7 @@
 	  IF(K .NE. 0)THEN
 	    N_ADDS=0
 	    NAME_MOD='_'//ADJUSTL(STRING(K+5:))
+	    IF(NAME_MOD .EQ. '_')NAME_MOD=' '
 	    IF(LOWER_CASE)NAME_MOD=LC(NAME_MOD)
 	    DONE_SED=.FALSE.
 	    IF(INDEX(STRING,'LINK') .NE. 0)THEN

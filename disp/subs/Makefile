@@ -20,6 +20,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(fg_ham.o)\
       $(LIB)(fqcomp_v2.o)\
       $(LIB)(gam_abs.o)\
+      $(LIB)(get_col_summary_v1.o)\
       $(LIB)(get_dtaulam.o)\
       $(LIB)(get_filename.o)\
       $(LIB)(get_flux_deficit.o)\

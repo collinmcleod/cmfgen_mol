@@ -288,7 +288,11 @@
 ! Get data describing number of depth points, number of atomic levels
 ! etc.
 !
-	OPEN(UNIT=LU_IN,FILE='MODEL_SPEC',STATUS='OLD',ACTION='READ')
+	OPEN(UNIT=LU_IN,FILE='MODEL_SPEC',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	IF(IOS .NE. 0)THEN
+	  WRITE(6,*)'Unable to open MODEL_SPEC in cmfgen.f'
+	  STOP
+	END IF
 	CALL RD_OPTIONS_INTO_STORE(LU_IN,LU_OUT)
 	CALL RD_STORE_INT(ND,'ND',L_TRUE,'Number of depth points')
 	CALL RD_STORE_INT(NC,'NC',L_TRUE,'Number of core rays')

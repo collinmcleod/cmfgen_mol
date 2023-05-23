@@ -10,6 +10,7 @@ C
 	USE MOD_USR_HIDDEN
 	IMPLICIT NONE
 C
+C Altered 08-MAy-2023 : Improved header of F_TO_S file.
 C Altered 25-Sec-2011 : NAME AND LS_NAME SET TO *40
 C Altered 13-Dec-2009 : LOWN option installed (comments added 13-Jan-2010). 
 C Altered 21-Apr-2008 : SEQ_WR installed; Improved handling of INT_SEQ.
@@ -107,7 +108,6 @@ C
 	CHARACTER ANS*1			!Used for halting LI and HE options
 	CHARACTER(LEN=10) TMP_STR
 C
-	LOGICAL HEAD
 	LOGICAL L_TRUE,L_FALSE
 	DATA L_TRUE/.TRUE./
 	DATA L_FALSE/.FALSE./
@@ -294,6 +294,7 @@ C
 C Group all terms belonging to the same LS multiplet.
 C               
 	ELSE IF(X(1:3) .EQ. 'TLS')THEN	!LS coupling
+!
 	  F_TO_S(:)=0
 	  F_TO_S(1)=1
 	  CNT=1
@@ -718,30 +719,39 @@ C
 	  CLOSE(UNIT=16)
 C
 C Output links to file in a format suitable for CMFGEN.
+C No longer output full header.
 C
 	ELSE IF(X .EQ. 'WR')THEN
 	  CALL USR_OPTION(FILENAME,'File','F_TO_S_OUT',
 	1                     'F_TO_S output file')
 	  CALL USR_HIDDEN(WRITE_DC,'DC','F',' ')
-	  CALL USR_HIDDEN(HEAD,'HEAD','T',' ')
-	  CALL GEN_ASCI_OPEN(LUOUT,FILENAME,'UNKNOWN',' ',
-	1                               'WRITE',IZERO,IOS)
-	  IF(HEAD)THEN
-	    CALL GEN_ASCI_OPEN(LUHEAD,'HEAD_INFO','OLD',' ',
-	1                               'READ',IZERO,IOS)
-	    DO WHILE(IOS .EQ. 0)  
-	      READ(LUHEAD,'(A)',IOSTAT=IOS)STRING
-	      IF(INDEX(STRING,'!Date') .EQ. 0)THEN
-	         WRITE(LUOUT,'(A)')STRING
-	      ELSE
-	         IOS=100
-	      END IF
-	    END DO
-	  ELSE
-	    WRITE(LUOUT,'(A)')'  '
-	  END IF
+	  CALL GEN_ASCI_OPEN(LUOUT,FILENAME,'UNKNOWN',' ','WRITE',IZERO,IOS)
+	  WRITE(LUOUT,'(90A)')('*',I=1,90)
+	  WRITE(LUOUT,'(A)')'  '
+	  CALL GEN_ASCI_OPEN(LUHEAD,'HEAD_INFO','OLD',' ','READ',IZERO,IOS)
+!
+	  IOS=0
+	  DO WHILE(IOS .EQ. 0)  
+	    READ(LUHEAD,'(A)',IOSTAT=IOS)STRING
+	    IF(INDEX(STRING,'and statistical weights for') .NE. 0)THEN
+	      K=INDEX(STRING,'for')+3
+	      WRITE(LUOUT,'(T20,2A)')'F TO S super level assignments for ',
+	1                                     ADJUSTL(TRIM(STRING(K:)))
+	      EXIT
+	    END IF
+	  END DO
+!
+	  WRITE(LUOUT,'(A)')'  '
+	  STRING='Level name'
+	  MAX_NAME_LNGTH=MAX(MAX_NAME_LNGTH,10)
+	  WRITE(LUOUT,'(A,10X,A,8X,A,3X,A,6X,A,4X,A,3X,A,2X,A)')
+	1      STRING(1:MAX_NAME_LNGTH),'g','E(cm^-1)','10^15 Hz','Lam(A)','SL','Int','Level'
+	  WRITE(LUOUT,'(A)')'  '
+	  WRITE(LUOUT,'(90A)')('*',I=1,90)
+	  WRITE(LUOUT,'(A)')'  '
 C
 	  CALL DATE_TIME(TIME)
+	  WRITE(LUOUT,'(A,T40,A)')'17-Jun-2014','!Format date'
 	  WRITE(LUOUT,'(A,T40,A)')TIME(1:11),'!Date'
 	  STRING=' '
 	  WRITE(STRING,'(I5)')NLEV
