@@ -26,8 +26,9 @@
 !
 	REAL*4, ALLOCATABLE :: XFIT(:)		!Same as X_GAUSS but for PGPLOT routines
 	REAL*4, ALLOCATABLE :: YFIT(:)		!Function fit (evaluated by GAUSS_FIT_FUNC)
-	REAL*4, ALLOCATABLE :: YCONT_FIT(:)		!Function fit (evaluated by GAUSS_FIT_FUNC)
+	REAL*4, ALLOCATABLE :: YCONT_FIT(:)	!Function fit (evaluated by GAUSS_FIT_FUNC)
 	REAL*4, ALLOCATABLE :: FIT_DIF(:)	!Function fit (evaluated by GAUSS_FIT_FUNC)
+	SAVE
 !
 	END MODULE GAUSS_FIT_DATA
 !

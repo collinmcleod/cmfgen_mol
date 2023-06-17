@@ -1577,6 +1577,7 @@ C
 !
 	ELSE IF(ANS .EQ. 'RID')THEN
 	  N_LINE_IDS=0
+	  WRITE(6,'(A)')' '
 	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs -case sensitive')
 	  CALL NEW_GEN_IN(TAU_CUT,'Omit lines with central optical depth <')
 	  CALL NEW_GEN_IN(LINE_CUT_PARAM,'Omit lines whose central intensity differ by less than this amount')
@@ -1585,6 +1586,7 @@ C
 	  CALL NEW_GEN_IN(ID_EXPCHAR,'Factor to scale size of ID')
 	  CALL NEW_GEN_IN(XUNIT,'Ang, um, or nm?')
 	  CALL NEW_GEN_IN(NO_DEC_DIGITS,' 0 to 9')
+	  WRITE(6,'(A)')' '
 !
 	  XT=XPAR
 	  IF(XUNIT .EQ. 'nm')XT=10.0D0*XPAR    			!Convert range to Ang
@@ -1741,8 +1743,8 @@ C
 !
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')' Define continuum using X & Y cursor locations'
-	  WRITE(6,'(A)')' Striaght line firt across cursor band'
-	  WRITE(6,'(A)')' ROutine can be called multiple times'
+	  WRITE(6,'(A)')' Striaght line fit across cursor band'
+	  WRITE(6,'(A)')' Routine can be called multiple times'
 	  WRITE(6,'(A)')' Use E to exit cursor selection.'
 	  WRITE(6,'(A)')' '
 	  IF(NPLTS .EQ. 1)THEN
@@ -1863,6 +1865,19 @@ C
 	1             XLAB_FILE,YLAB_FILE,
 	1             PEN_COL,PEN_OFFSET,
 	1             REVERSE_PLOTTING_ORDER)
+!
+	ELSE IF(ANS .EQ. 'BAL')THEN
+	  I=NPLTS
+	  CALL DO_CURSOR_BALMER(
+	1             XPAR,XINC,XNUMST,IXTICK,IDX,
+	1             YPAR,YINC,YNUMST,IYTICK,IDY,
+	1             TICK_FAC,EXPCHAR,
+	1             XLABEL,YLABEL,TITONRHS,
+	1             LOG_AXIS,OPTION,NORMAL_R_Y_AXIS,
+	1             XLAB_FILE,YLAB_FILE,
+	1             PEN_COL,PEN_OFFSET,
+	1             REVERSE_PLOTTING_ORDER)
+	  IF(NPLTS .GT. I)TYPE_CURVE(NPLTS)='L'
 !
 	ELSE IF(ANS .EQ. 'FEW')THEN
 	  CALL DO_FILE_EW_V1(' ')

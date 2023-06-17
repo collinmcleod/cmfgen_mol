@@ -76,6 +76,11 @@
 	        IF(LINE_ID(J)(2:4) .EQ. 'SEV')LINE_ID(J)(2:)='VII'//LINE_ID(J)(5:)
 	        IF(LINE_ID(J)(3:5) .EQ. 'SIX')LINE_ID(J)(3:)='VI'//LINE_ID(J)(6:)
 	        IF(LINE_ID(J)(3:5) .EQ. 'SEV')LINE_ID(J)(3:)='VII'//LINE_ID(J)(6:)
+	        IF(LINE_ID(J)(2:2) .GE. 'a' .AND. LINE_ID(J)(2:2) .LE.  'z')THEN
+	          LINE_ID(J)(3:)=' '//LINE_ID(J)(3:)
+	        ELSE
+	          LINE_ID(J)(2:)=' '//LINE_ID(J)(2:)
+	        END IF
 	      END IF
 	    END DO
 	ELSE

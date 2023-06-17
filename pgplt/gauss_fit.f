@@ -16,6 +16,7 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered 17-Jun-2023: Fixed some crash issues and some cleaning.
 ! Altered 06-MAr-2023 : Fixed to use classical Gaussian with factor of 0.5 in 
 !                          argument of exponent. Parameters are:
 !                             Lambda, Sigma, Height, Exponent
@@ -104,12 +105,14 @@
 	INTEGER, SAVE :: IP=1
 	INTEGER, SAVE :: NG_PAR_OLD
 	INTEGER, SAVE :: LU_GF,LU_EW,LU_PARAMS
-        LOGICAL, PARAMETER :: L_TRUE=.TRUE.
+        INTEGER, SAVE :: IPEN=1
+	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, SAVE :: FIRST_WRITE=.TRUE.
 	LOGICAL NEW_FILE
 	LOGICAL FILE_EXISTS
 	LOGICAL DO_FIND
 	LOGICAL EDIT_FIT
+	LOGICAL FIT_DONE
 !
 	INTEGER I,J,K
 	INTEGER LW_SAVE
@@ -135,9 +138,15 @@
 	SUBROUTINE CURSOR_GAUSS_FIT
 	IMPLICIT NONE
 !
+! Open output files, and print headers.
+!
+	CALL WRITE_GAUSS_FIT()
+!
 ! Set plot and defaults.
 !
 	IP=1; DEF_SIGMA=0.1; SHOW_INIT_GAUSS=.FALSE.
+!
+	WRITE(6,'(A)')
 	CALL GEN_IN(IP,'Plot number for Gaussian fitting')
 	CALL GEN_IN(DEF_SIGMA,'Default sigma for fitting line profiles')
 	CALL GEN_IN(SHOW_INIT_GAUSS,'Show initial Gaussian estimates on the plot?')
@@ -158,10 +167,11 @@
 	DO WHILE(1 .EQ. 1)
 	  CURSERR = PGCURS(XVAL,YVAL,CURSVAL)
 	  IF(UC(CURSVAL) .EQ. 'B')THEN
-	    IF(NUM_GAUSS .NE. 0)THEN
+	    IF(NUM_GAUSS .NE. 0 .AND. FIT_DONE)THEN
 	      WRITE(6,*)'Final SUM_SQ=',SUM_SQ(1)
 	      CALL WRITE_GAUSS_FIT()
 	      NUM_GAUSS=0
+	      FIT_DONE=.FALSE.
 	    END IF
 	    YT(1)=YVAL-dY; YT(2)=YVAL+dY
 	    XT(1)=XVAL; XT(2)=XVAL
@@ -173,34 +183,72 @@
 	    CALL PGLINE(2,XT,YT)
 	    XEND=XVAL; YEND=YVAL
 	    PAR(1)=YST
-	    PAR(2)=(YEND-YST)/(XEND-XST)
+	    IF( ABS( (XEND-XST)/(XPAR(2)-XPAR(1)) ) .LT. 1.0D-08)THEN
+	      WRITE(6,*)'Bad band selection -- do band selection again'
+	    ELSE   
+	      PAR(2)=(YEND-YST)/(XEND-XST)
+	    END IF
+!
+! Change pen colors for defining limits of the next line.
+!
+	    IF(IPEN .EQ. 6)THEN
+	      IPEN=1
+	    ELSE
+	      IPEN=6
+	    END IF
+            CALL PGSCI(IPEN)
 !
 	  ELSE IF(UC(CURSVAL) .EQ. 'D')THEN
 	    T1=XVAL
 	    CALL PGPT(IONE,XVAL,YVAL,IMONE)
 	    CURSERR = PGCURS(XVAL,YVAL,CURSVAL)
 	    CALL PGPT(IONE,XVAL,YVAL,IMONE)
-	    DEF_SIGMA=ABS(XVAL-T1)/2.355D0
+	    IF( XVAL .EQ. T1 .OR. ABS(XVAL-T1) .GT.  0.5*ABS(XPAR(2)-XPAR(1)) )THEN
+	      WRITE(6,*)' Bad sigma value: ABS(XVAL-T1)=',ABS(XVAL-T1)
+	      WRITE(6,*)' Must be > 0, and less than half X-axis length'
+	      WRITE(6,*)' Default sigma not set'
+	    ELSE
+	      DEF_SIGMA=ABS(XVAL-T1)/2.355D0
+	    END IF
+	    FIT_DONE=.FALSE.
 !
 	  ELSE IF(UC(CURSVAL) .EQ. 'S')THEN
 	    CALL PGPT(IONE,XVAL,YVAL,IMONE)
 	    T1=XVAL
 	    CURSERR = PGCURS(XVAL,YVAL,CURSVAL)
 	    CALL PGPT(IONE,XVAL,YVAL,IMONE)
-	    T1=XVAL
-	    SIGMA_THIS_LINE=ABS(XVAL-T1)/2.2
-
+	    IF( XVAL .EQ. T1 .OR. ABS(XVAL-T1) .GT.  0.5*ABS(XPAR(2)-XPAR(1)) )THEN
+	      WRITE(6,*)' Bad sigma value: ABS(XVAL-T1)=',ABS(XVAL-T1)
+	      WRITE(6,*)' Must be > 0, and less than half X-axis length'
+	    ELSE
+	      SIGMA_THIS_LINE=ABS(XVAL-T1)/2.2
+	    END IF
+	    FIT_DONE=.FALSE.
+!
 	  ELSE IF(UC(CURSVAL) .EQ. 'L')THEN
 	    CALL PGPT(IONE,XVAL,YVAL,IMONE)
 	    T1=XVAL
-	    NUM_GAUSS=NUM_GAUSS+1
-	    J=NUM_GAUSS
-	    K=2+(J-1)*4+1
-	    PAR(K)=XVAL; PAR(K+2)=YVAL-(PAR(1)+PAR(2)*(XVAL-XST))
-	    PAR(K+3)=2.0
-	    PAR(K+1)=DEF_SIGMA
-	    IF(SIGMA_THIS_LINE .NE. 0)PAR(K+1)=SIGMA_THIS_LINE
-	    SIGMA_THIS_LINE=0
+	    IF( (XVAL-XST)*(XEND-XST) .LE. 0.0D0 )THEN
+	      WRITE(6,*)' Line not contained in band'
+	      WRITE(6,*)' Redo band or line selection'
+	    ELSE
+	      NUM_GAUSS=NUM_GAUSS+1
+	      J=NUM_GAUSS
+	      K=2+(J-1)*4+1
+	      PAR(K)=XVAL; PAR(K+2)=YVAL-(PAR(1)+PAR(2)*(XVAL-XST))
+	      PAR(K+3)=2.0
+	      PAR(K+1)=DEF_SIGMA
+	      IF(SIGMA_THIS_LINE .NE. 0)PAR(K+1)=SIGMA_THIS_LINE
+	      SIGMA_THIS_LINE=0
+!
+	      YT(1)=YVAL-dY/2; YT(2)=YVAL+dY/2
+	      XT(1)=XVAL; XT(2)=XVAL
+	      K=5; CALL PGSCI(K);
+	      CALL PGLINE(2,XT,YT)
+	      CALL PGSCI(IPEN)
+	      FIT_DONE=.FALSE.
+!
+	    END IF
 !
 ! Options to move/expand/contract plot in X direction.
 !
@@ -233,6 +281,7 @@
 	      END DO
 	      IF(YPAR(1) .LT. 0)YPAR(1)=0
 	      YPAR(2)=1.1*YPAR(2)
+	      IF(YPAR(1) .LT. 0.7)YPAR(2)=MAX(1.2,YPAR(2))
 	      YINC=SPACING(YPAR(1),YPAR(2))
 	      dY=0.05*(YPAR(2)-YPAR(1))	
 	    END IF
@@ -281,6 +330,7 @@
 	    IF(NUM_GAUSS .EQ. 0)THEN
 	      WRITE(6,*)'Error -- no lines selected'
 	      WRITE(6,*)'Select lines, and if necssary, redefine the fitting band'
+	      FIT_DONE=.FALSE.
 	    ELSE
 !
 	      CALL DO_GAUSSIAN_FITS(IP)	
@@ -310,6 +360,7 @@
 	      CALL PGLINE(NG_DATA,XFIT,YFIT)
 	      CALL PGEBUF				!Clear buffer
 	      CALL PGSLW(MARKER_LW)
+	      FIT_DONE=.TRUE.
 	    END IF
 !
 	  ELSE IF(UC(CURSVAL) .EQ. 'Q')THEN
@@ -484,7 +535,7 @@
 	  FIRST_WRITE=.FALSE.
 	  INQUIRE(FILE='GAUSS_FITS',EXIST=NEW_FILE); NEW_FILE=.NOT. NEW_FILE
 	  IF(.NOT. NEW_FILE)THEN
-	    WRITE(6,*)'If file GAUSS_FITS exists: Default is to append new fits'
+	    WRITE(6,'(/,A,X,A)')RED_PEN,'If file GAUSS_FITS exists: Default is to append new fits'
 	    CALL GEN_IN(NEW_FILE,'Open new file (T) or append data (F)')
 	  END IF
 	  IF(NEW_FILE)THEN
@@ -500,22 +551,22 @@
 	  END IF
 !
 	  CALL GET_LU(LU_EW,'In CURSOR_GAUSS_EW --  LU_EW')
-	  INQUIRE(FILE='GAUSS_FIT_EWS',EXIST=NEW_FILE); NEW_FILE=.NOT. NEW_FILE
+	  INQUIRE(FILE='GAUSS_FIT_EW',EXIST=NEW_FILE); NEW_FILE=.NOT. NEW_FILE
 	  IF(.NOT. NEW_FILE)THEN
-	    WRITE(6,*)'If file GAUSS_FIT)EW exists: Default is to append new fits'
+	    WRITE(6,'(/,A,X,A)')RED_PEN,'If file GAUSS_FIT_EW exists: Default is to append new fits'
 	    CALL GEN_IN(NEW_FILE,'Open new file (T) or append data (F)')
 	  END IF
 	  IF(NEW_FILE)THEN
 	    OPEN(UNIT=LU_EW,FILE='GAUSS_FIT_EW',STATUS='UNKNOWN')
-	    WRITE(LU_EW,'(4X,A,5(4X,A),2X,A,4X,A,4X,A)')
+	    WRITE(LU_EW,'(4X,A,5(4X,A),2X,A,3X,A,4X,A)')
 	1          'IP','Line Lam','Line Loc',' F(cont)','  EW(mA)',
 	1          '   E(mA)','FWHM(km/s)','dLAM(km/s)','Transition'
 	  ELSE
 	    OPEN(UNIT=LU_EW,FILE='GAUSS_FIT_EW',STATUS='UNKNOWN',POSITION='APPEND')
 	  END IF
-	ELSE
-!	  OPEN(UNIT=LU_GF,FILE='GAUSS_FITS',STATUS='UNKNOWN',POSITION='APPEND')
-!	  OPEN(UNIT=LU_EW,FILE='GAUSS_FIT_EW',STATUS='UNKNOWN',POSITION='APPEND')
+	  FIRST_WRITE=.FALSE.
+	  WRITE(6,'(A)')DEF_PEN
+	  RETURN
 	END IF
 !
 	IF(ALLOCATED(INDX_VEC))DEALLOCATE(INDX_VEC)
@@ -543,15 +594,15 @@
 	1               T1/SQRT(2.0D0),FWHM,EW(I),EW_ERROR(I),ALT_ERROR(I),MIN_ERROR(I)
 	   CONT_FLUX=SIM(1,1)+SIM(1,2)*(SIM(I,K)-X_GAUSS(1))
 	   IF(TRANS_NAME .EQ. ' ')THEN
-	     WRITE(LU_EW,'(2X,I4,2F12.3,F12.4,3F12.2,16X,A)')IP,SP_LINE_CENTER,SP_LOC,CONT_FLUX,
+	     WRITE(LU_EW,'(2X,I4,2F12.3,F12.4,3F12.3,16X,A)')IP,SP_LINE_CENTER,SP_LOC,CONT_FLUX,
 	1                    EW(I),EW_ERROR(I),FWHM,'#'
 	   ELSE
 	     T2=2.998D+05*ABS(SP_LINE_CENTER-SP_LOC)/SP_LINE_CENTER
-	     WRITE(LU_EW,'(2X,I4,2F12.3,F12.4,4F12.2,4X,A)')IP,SP_LINE_CENTER,SP_LOC,CONT_FLUX,
+	     WRITE(LU_EW,'(2X,I4,2F12.3,F12.4,4F12.3,4X,A)')IP,SP_LINE_CENTER,SP_LOC,CONT_FLUX,
 	1                    EW(I),EW_ERROR(I),FWHM,T2,TRIM(TRANS_NAME)
 	   END IF
 	END DO
-	FLUSH(UNIT=LU_EW)
+	FLUSH(UNIT=LU_EW); FLUSH(UNIT=LU_GF)
 	END SUBROUTINE WRITE_GAUSS_FIT
 !
 	SUBROUTINE PRINT_CURSOR_DESC
@@ -588,6 +639,7 @@
 	WRITE(6,'(A)')'   P(revious)  -- shift window to right by X increment'
 	WRITE(6,'(A)')'   X(extend)   -- expand window by increment but no shift'
 	WRITE(6,'(A)')'   C(ontract)  -- contract window by increment but no shift'
+	WRITE(6,'(A)')'   Y           -- reset Y limits to encompass min/max of plot'
 	WRITE(6,'(A)')DEF_PEN
 !
 	RETURN
