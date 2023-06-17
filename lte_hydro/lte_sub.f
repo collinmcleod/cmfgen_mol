@@ -37,6 +37,8 @@
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !
+! Altered 31-Mar-2023 : Slightly improved output. SET_LINE_OPAC routine has been updated to reduce number
+!                          lines treated simultaneously.
 ! Altered 04-Apr-2014 : Bug fix -- needed to move computation of V(r) before the
 !                         computation of VTURB_VEC.
 ! Incorporated 02-Jan-2013: Chagend to allow depth dependent line profiles.
@@ -67,7 +69,7 @@
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
 	CHARACTER*12 PRODATE
-	PARAMETER (PRODATE='16-Feb-2006')	!Must be changed after alterations
+	PARAMETER (PRODATE='31-May-2023')	!Must be changed after alterations
 !
 ! 
 !
@@ -154,6 +156,7 @@
 	INTEGER PHOT_ID
 	INTEGER I,J,K,L,ML,LS,LINE_INDX,NEXT_LOC
 	INTEGER IREC,MATELIM
+	INTEGER LU_ML
 !
 	CHARACTER*80 TMP_STRING
 	CHARACTER*20 TMP_KEY
@@ -700,9 +703,6 @@
 	  CALL SET_Z_POP(Z_POP, ATM(ID)%ZXzV, ATM(ID)%EQXzV,
 	1              ATM(ID)%NXzV, NT, ATM(ID)%XzV_PRES)
 	END DO
-	DO I=1,NT
-	  WRITE(6,*)Z_POP(I)
-	END DO
 !
 ! Store atomic masses in vector of LENGTH NT for later use by line 
 ! calculations. G_ALL and LEVEL_ID  are no longer used due to the use
@@ -759,6 +759,9 @@
 	CALL SET_FREQUENCY_GRID_V2(NU,FQW,LINES_THIS_FREQ,NU_EVAL_CONT,
 	1               NCF,NCF_MAX,N_LINE_FREQ,ND,
 	1               OBS_FREQ,OBS,N_OBS,LUIN,IMPURITY_CODE)
+!
+!       CALL CHECK_LINE_OVERLAP(LINE_ST_INDX_IN_NU,LINE_END_INDX_IN_NU,
+!	1                        VEC_TRANS_TYPE,N_LINE_FREQ,MAX_SIM)
 !
 ! Define the average energy of each super level. At present this is
 ! depth independent, which should be adequate for most models.
@@ -971,6 +974,13 @@
 	  ROSS_MEAN=0.0D0
 !
 	  CONT_FREQ=0.0D0
+!
+	  WRITE(6,'(/,A)')' Beginning loop over frequencies for all grid points.'
+	  WRITE(6,'(A,I7,/)')' Number of frequencies is',NCF
+	  WRITE(6,'(A,I7,/)')' Current ML is provided in ML_COUNTER to give an indication of progress.'
+	  FLUSH(UNIT=6)
+	  CALL GET_LU(LU_ML,'LU for ML_COUNTER in lte_sub')
+!
 	  DO ML=1,NCF
 	    FREQ_INDX=ML
 ! 
@@ -982,12 +992,12 @@
 	      COMPUTE_NEW_CROSS=.FALSE.
 	    END IF
 !
-	    CALL TUNE(1,'DTDR_OPAC')
+	    CALL TUNE(1,'OPAC')
 	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONLY)
 !	    INCLUDE 'OPACITIES_V4.INC'
-	    CALL TUNE(2,'DTDR_OPAC')
+	    CALL TUNE(2,'OPAC')
 !
 ! 
 !
@@ -1009,18 +1019,22 @@
 ! NB: Care must taken to ensure that this section remains consistent
 !      with that in continuum calculation section.
 !
+	CALL TUNE(1,'SET_LINE_OPAC')
 	    CALL SET_LINE_OPAC(POPS,NU,FREQ_INDX,LAST_LINE,N_LINE_FREQ,
 	1          LST_DEPTH_ONLY,LUER,ND,NT,NCF,MAX_SIM)
+	CALL TUNE(2,'SET_LINE_OPAC')
 !
 ! Add in line opacity.
 !
+	CALL TUNE(1,'ADD_LINE_OPAC')
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) REDUCTION(+:CHI) 
 	  DO SIM_INDX=1,MAX_SIM
 	    IF(RESONANCE_ZONE(SIM_INDX))THEN
-	      DO L=1,ND
-	         CHI(L)=CHI(L)+CHIL_MAT(L,SIM_INDX)*LINE_PROF_SIM(L,SIM_INDX)
-	      END DO
+	      CHI(:)=CHI(:)+CHIL_MAT(:,SIM_INDX)*LINE_PROF_SIM(:,SIM_INDX)
 	    END IF
 	  END DO
+!$OMP END PARALLEL DO
+	CALL TUNE(2,'ADD_LINE_OPAC')
 !
 ! Now do the line variation. This presently ignores the effect of a 
 ! temperature variation.
@@ -1066,8 +1080,11 @@
 	      ROSS_MEAN(L)=ROSS_MEAN(L)+T2/CHI(L)
 	    END DO
 !
-	    IF(MOD(ML,1000) .EQ. 0)WRITE(6,*)'ML=',ML
+	    IF(MOD(ML,10000) .EQ. 0)WRITE(LU_ML,*)' '
+	    IF(MOD(ML,1000) .EQ. 0)WRITE(LU_ML,'(I8)',ADVANCE='NO')ML
+	    FLUSH(UNIT=LU_ML)
 	  END DO
+	  WRITE(ML,*)' '; FLUSH(UNIT=ML)
 !
 ! Output the Rosseland mean data, first determining the number
 ! of uniques temperatures.
