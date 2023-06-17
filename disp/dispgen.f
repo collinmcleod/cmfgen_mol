@@ -559,6 +559,10 @@ C
 !*****************************************************************************
 !*****************************************************************************
 !
+!	CALL RD_SOL_ABUND_SCAL(SOL_ABUND_HSCL,AT_NO,'AAG2020','TRUE',NSPEC)
+	DO I=1,NSPEC
+	   WRITE(23,'(F5.1,3X,A4,F12.4)')AT_NO(I),TRIM(SPECIES_ABR(I)),SOL_ABUND_HSCL(I)
+	END DO
 	CALL MAINGEN(RMDOT,RLUM,
 	1                ND,NP,NC,
 	1                N_MAX,ND_MAX,NC_MAX,NP_MAX,

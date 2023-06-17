@@ -418,7 +418,7 @@
 	    J=J+1
 	    ZM(ID)%R(J)=R(I+1); ZM(ID)%V(J)=V(I+1)
 	  END DO
-	  WRITE(6,*)'Warning -- set R grin to RVTJ file with interpolation'
+	  WRITE(6,*)'Warning -- set R grid to RVTJ file with interpolation'
 	  WRITE(6,*)'Use interp option to set other values.'
 	ELSE
 	  WRITE(6,*)' ' 
@@ -438,7 +438,7 @@
 	   TA(1:ND_ATM)=ROSS_MEAN(1:ND_ATM)*CLUMP_FAC(1:ND_ATM)
 	     CALL TORSCL(TAU_ROSS,TA,R,TB,TC,ND_ATM,METHOD,TYPE_ATM)
 	   ELSE
-	     TAU_ROSS(1:ND)=0.0D0
+	     TAU_ROSS(1:ND_ATM)=0.0D0
 	   END IF
 	   TA(1:ND_ATM)=6.65D-15*ED(1:ND_ATM)*CLUMP_FAC(1:ND_ATM)
 	   CALL TORSCL(TAU_ES,TA,R,TB,TC,ND_ATM,METHOD,TYPE_ATM)
