@@ -199,7 +199,7 @@
 	origflux(alter_min:alter_max) = modflux(i_min:i_max)
 !
 	return 
-	end 
+	end subroutine smear_v3_pg
 
 C-----------------------------------------------------------------------------
 C subroutine to convolve data with gaussian of the given sigma (non-FFT).
@@ -272,7 +272,7 @@ C
 	flux(1:Nmod)=Answer(1:Nmod)
 !	  
 	return 
-	end
+	end subroutine nonfftconvolve
 
 C 
 C
@@ -345,7 +345,7 @@ C       so that their sum adds to one (Normalize the response function)
 	end do
 
 	return
-	end
+	end subroutine fillresponse
 C
 C-----------------------------------------------------------------------------
 C function fills response array with a gaussian of the given sigma
@@ -436,7 +436,7 @@ C
 	end do
 
 	return
-	end
+	end subroutine fill_rot_response
 
 C-----------------------------------------------------------------------------
 C
@@ -453,7 +453,7 @@ C
 
 	gauss = exp(-onehalf*(((x-mu)/sigma)**two))/(sigma*sqrt(two*jimPI))
 	return
-	end
+	end function gauss
 C---------------------------------------------------------------------------
 C
 C function returns the log-base-2 of number, rounded down.
@@ -471,7 +471,7 @@ C
 	end do
 	
 	return
-	end
+	end function log2
 
 C-----------------------------------------------------------------------------
 C
@@ -515,7 +515,7 @@ C
 	nmax = nnew
 !
 	return
-	end
+	end subroutine linearize_v2
 
 C-----------------------------------------------------------------------------
 C subroutine to build wavelength array from frequency array (if forward=true)
@@ -550,7 +550,7 @@ C
         end if
 
 	return
-	end
+	end subroutine nu_to_lambda
 
 C-----------------------------------------------------------------------------
 C subroutine to convert lambda array to ln(lambda) array if forward=true
@@ -577,7 +577,7 @@ C
 	end if 
 
 	return
-	end
+	end subroutine lambda_to_lnlambda
 
 C-----------------------------------------------------------------------------
 C subroutine to map array A onto array B using linear interpolation
@@ -608,7 +608,7 @@ C subroutine to map array A onto array B using linear interpolation
 	end do
 
 	return 
-	end
+	end subroutine map
 
 
 C-----------------------------------------------------------------------------
@@ -685,7 +685,7 @@ C
 	end do
 
 	return 
-	end
+	end subroutine map2
 
 C-----------------------------------------------------------------------------
 C function which returns the index of the first array element *larger* than
@@ -711,7 +711,7 @@ C or equal to the supplied number
 	larger_index = i
 
 	return
-	end
+	end function larger_index
 
 C-----------------------------------------------------------------------------
 C function which returns the index of the last array element *smaller* or
@@ -737,6 +737,6 @@ C equal to the supplied number
 	smaller_index = i-1
 
 	return
-	end function
+	end function smaller_index
 !
 	END MODULE MOD_SMEAR_PG
