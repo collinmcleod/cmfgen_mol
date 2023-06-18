@@ -106,11 +106,11 @@ CONTAINS
 	CALL RD_STORE_INT(NUM_ITS,'N_GRAD_ITS',L_TRUE,'Number of iterations adjusting g(rad)')
 	CALL RD_STORE_INT(ND,'DST',L_TRUE,'Depth to integrate from')
 	CALL RD_STORE_INT(FIRST_IT,'FST_IT',L_TRUE,'First iteration')
-	CALL RD_STORE_INT(MAX_ITS,'MAX_IT',L_TRUE,'Maximum numer of iterations')
-	CALL RD_STORE_INT(IT_FREQ,'IT_FREQ',L_FALSE,'Frequenct of revisions of V')
+	CALL RD_STORE_INT(MAX_ITS,'MAX_IT',L_TRUE,'Maximum number of iterations')
+	CALL RD_STORE_INT(IT_FREQ,'IT_FREQ',L_FALSE,'Frequency of revisions of V')
 	CALL RD_STORE_DBLE(ALLOWED_CHANGE_IN_GRAD,'dGRAD',L_FALSE,'Maximum fractional change in GRAD allowed')
 	CALL RD_STORE_DBLE(VSOUND,'VSOUND',L_TRUE,'Sound speed in km/s')
-	CALL RD_STORE_DBLE(ALPHA,'ALPAH',L_FALSE,'Exponent relating grad with vdvdr')
+	CALL RD_STORE_DBLE(ALPHA,'ALPHA',L_FALSE,'Exponent relating grad with vdvdr')
 	CALL RD_STORE_INT(NINS,'NINS',L_FALSE,'Number of points/interval to be inserted into grid')
 !	
 	F_FUN_V=.FALSE.

@@ -8,6 +8,7 @@
 ! Edited 25 May 2017:   Doing testing to make sure no error with energy being created
 !
 ! Edited 20 June 2017:	Added normalized gamma-ray lines as a parameter
+! Edited 20 May  2023:  ETT_EMISS set to 1.0E-120 when zero.
 !------------------------------------------------------------------------------------------------
 !
 	SUBROUTINE GAMMA_INT_EMISS_V9(ETA_EMISS,NU_GRID_VEC,NF_GRID_PTS,&
@@ -62,7 +63,7 @@
 	DECAY_KIN_E=0.0D0
 	PI=ACOS(-1.0D0)
 	FOURPI=4.0D0*ACOS(-1.0D0)
-	WRITE(6,*)"USING GAMMA_INT_EMISS_V9"
+	WRITE(6,'(/,A)')" Using gamma_int_emiss_v9.f90 to compute the gamma-ray emission"
 !
 ! DEL_T is saved from the subroutine DO_SPECIES_DECAYS
 !
@@ -72,7 +73,7 @@
 ! Looping through frequency then elements read in by RD_NUC_DECAY_DATA_GAM and
 ! READ_NUC_DECAY_DATA_V3
 !
-	WRITE(6,'(A)')'Calculating and normalizing energies of G-ray lines...'
+	WRITE(6,'(A)')' Calculating and normalizing energies of G-ray lines...'
 !
 !
 ! There is a problem with line energies and Kin. En. not summing
@@ -82,8 +83,8 @@
 ! and the read in ENERGY_PER_DECAY (same units must be compared)
 !
 	IF(NORM_GAM_LINES)THEN
-20	  FORMAT(A7,1X,A10,2X,4(A10,6X),A10)
-21	  FORMAT(A7,1X,F12.4,4(F10.5,6X),F10.5)
+20	  FORMAT(1X,A7,1X,A10,2X,4(A10,6X),A10)
+21	  FORMAT(1X,A7,1X,F12.4,4(F10.5,6X),F10.5)
 	  WRITE(6,20)'Species','Mass','Kin. E','TOT_EGAM','E/DECAY','%diff','NORM_FAC'
 	  DO K=1,N_SPECIES
 	    DO L=1,NUM_DECAY_PATHS
@@ -164,6 +165,7 @@
 		END IF
 	      END DO !decay paths loop
 	    END DO !species loop
+	    IF(ETA_EMISS(I,J) .EQ. 0.0D0)ETA_EMISS(I,J)=1.0D-120
 	  END DO !depth loop
 	END DO !frequency loop
 !

@@ -225,5 +225,5 @@
 	  END DO
 	END DO
 !
-	RETURN
+	STOP
 	END

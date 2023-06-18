@@ -13,6 +13,9 @@
 	1                       ID,FILE_NAME)
 	IMPLICIT NONE
 !
+! Altered 15-Jan-2023 : Now set Omega=0.1 when f < 1.0E-05. This will primarily affect
+!                         low lying forbidden and semi-forbidden transiotions without atomic data.
+!                         Higher levels will have lots of other collional processes occuring.
 ! Altered 04-Oct-2016 : Efectively we now only compute the threshold photoionzation cross sections
 !                         on the first entry (change was done in test routine earlier). 
 ! Altered 12-Oct-2012 : MAX_TRANS increased to 50,000
@@ -155,7 +158,10 @@
 !$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(I,J,FL,X,IFAIL,EX_E1X,GBAR,dln_GBAR_dlnT,G1,G2)
 	DO I=1,NLEV
 	  DO J=I+1,NLEV
-	    IF(OMEGA(I,J) .EQ. 0.0D0 .AND. EIN_A(I,J) .NE. 0.0D0)THEN
+	    IF(OMEGA(I,J) .EQ. 0.0D0 .AND. EIN_A(I,J) .LE. 1.0D-05)THEN
+	      OMEGA(I,J)=OMEGA_SET
+	      dln_OMEGA_dlnT(I,J)=0.0D0
+	    ELSE IF(OMEGA(I,J) .EQ. 0.0D0 .AND. EIN_A(I,J) .NE. 0.0D0)THEN
 	      FL=EDGE(I)-EDGE(J)
 	      X=HDKT*FL/TEMP
 	      IFAIL=0

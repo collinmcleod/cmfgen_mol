@@ -2,7 +2,7 @@
 ! Subroutine to return the integral (in ANSWER) of a Gaussian line function
 ! of the form:
 !
-!           -HEIGHT*EXP(- [ABS([X-POS]/SCALE)]**EXPONENT )/(A+B(X-X0)
+!           -HEIGHT*EXP(- 0.5D0*[ABS([X-POS]/SCALE)]**EXPONENT )/(A+B(X-X0)
 !
 ! TOLERANCE is the absolute tolerance desired, such that the absolute error
 !
@@ -17,6 +17,7 @@
 	SUBROUTINE GAUSS_ROMB_V2(ANSWER,A,B,X0,POS,HEIGHT,SCALE,EXPONENT,TOLERANCE)
 	IMPLICIT NONE
 !
+! Altered 06-MAr-2023 : Fixed to use classical Gaussian with factor of 0.5 in argument of exponent.
 ! Altered 09-Aug-2022 : To get consistency inthe different routines changed to use Gauss.
 ! Altered 05-AUg-2022 : Now use rigorous definition of EW (not based on Ic at line 
 !                          center only). Call changed because need add.
@@ -80,7 +81,7 @@
 	  DO L=-N+1,N
 	    W=(L-1)*H
 	    X=ABS(SCALE)*W+POS
-	    R(K,1)=R(K,1)+EXP(-(ABS(W))**EXPONENT )/(A+B*(X-X0))
+	    R(K,1)=R(K,1)+EXP(-0.5D0*(ABS(W))**EXPONENT )/(A+B*(X-X0))
 	  END DO
 	  R(K,1)=R(K,1)*H                          !*1.0D0/SQRT(ACOS(-1.0D0))
 	  IF(TESTING)THEN

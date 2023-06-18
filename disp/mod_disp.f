@@ -1,5 +1,6 @@
 	MODULE MOD_DISP
 !
+! Altered 20-Jan-2023 : Added ABS_MEAN
 ! Altered 15-Dec-2021 : Added ROM_ION_ID for plotting labels (osiris)
 ! Altered 16-Aug-2019 : Added PLACK_MEAN
 ! Altered 12-Jun-2015 : NION_MAX increased to 21. Added MI (cur_hmi,19-Aug-2015)
@@ -78,6 +79,12 @@ C
 	REAL*8, ALLOCATABLE :: ROSS_MEAN(:)
 	REAL*8, ALLOCATABLE :: FLUX_MEAN(:)
 	REAL*8, ALLOCATABLE :: PLANCK_MEAN(:)
+	REAL*8, ALLOCATABLE :: ABS_MEAN(:)
+!
+	REAL*8, ALLOCATABLE :: J_INT(:)
+	REAL*8, ALLOCATABLE :: H_INT(:)
+	REAL*8, ALLOCATABLE :: K_INT(:)
+!
 	REAL*8, ALLOCATABLE :: POP_ATOM(:)
 	REAL*8, ALLOCATABLE :: MASS_DENSITY(:)
 	REAL*8, ALLOCATABLE :: CLUMP_FAC(:)

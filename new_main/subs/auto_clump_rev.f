@@ -8,6 +8,8 @@
 	IMPLICIT NONE
 !
 ! Altered 11-Mar-2014: CALL TO REV_SN_HYDRO updated. Updated temperature now output to SN_HYDRO.
+! Altered 15-Feb-2023: REXP -> PEXP to allow non-unity factor at infinity (PC)
+! requiring an extra (4th) CLUMP_PAR with respect to REXP
 !
 	INTEGER ND
 	INTEGER NT
@@ -361,6 +363,12 @@
 	    CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
 	1           EXP(-V(K)/CLUMP_PAR(2))+
 	1           (1.0D0-CLUMP_PAR(1))*EXP( (V(K)-V(1))/CLUMP_PAR(3))
+	  END DO
+	ELSE IF(CLUMP_LAW(1:4) .EQ. 'PEXP')THEN
+	  DO K=1,ND
+	    CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
+	1           EXP(-V(K)/CLUMP_PAR(2))+
+	1           (CLUMP_PAR(4)-CLUMP_PAR(1))*EXP( (V(K)-V(1))/CLUMP_PAR(3))
 	  END DO
 
 	ELSE IF(CLUMP_LAW(1:6) .EQ. 'SPLINE')THEN

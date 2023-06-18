@@ -12,8 +12,8 @@
 #                         and the use of GITHUB.
 
 if ($machine =~ *'osiris'*)then
-  set atomic  = ~hillier/atomic 
-  set ATOMIC  = ~hillier/atomic 
+  set atomic  = ~hillier/cmfgen_atomic_data/atomic_9may23
+  set ATOMIC   = ~hillier/cmfgen_atomic_data/atomic_9may23
   set sn_atomic  = ~hillier/sn_atomic 
   set SN_ATOMIC  = ~hillier/sn_atomic 
   if ($machine =~ *'wnode04'*)then

@@ -28,6 +28,7 @@ C
 C
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
+	LOGICAL, SAVE :: CHECK=.TRUE.
 C
 	LUER=ERROR_LU()
 	W(:)=0.0D0
@@ -92,6 +93,15 @@ C
 	IF(ABS(SUM-1.0D0) .GT. 1.0D-12)
 	1  WRITE(LUER,*)' Warning - weights require normalization in HWEIGHT'
 C
+	IF(CHECK)THEN
+	  WRITE(6,*)'Check on H weights in HTRPWGT_V2'
+	  WRITE(6,'(A,A,A)')'MU','dMU','W'
+	  DO I=1,N-1
+	    WRITE(6,'(F20.16,2ES14.6)')X(I),X(I)-X(I+1),W(I)
+	  END DO
+	  I=N;  WRITE(6,'(F20.16,3ES14.6)')X(I),0.0D0,W(I)
+	END IF 
+
 C
 	RETURN
 	END

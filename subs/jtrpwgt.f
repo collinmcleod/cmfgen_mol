@@ -13,6 +13,7 @@ C
 	REAL*8 X(N),W(N),H,T1,SUM
 C
 	INTEGER ERROR_LU,LUER
+	LOGICAL, SAVE :: CHECK=.TRUE.
 	EXTERNAL ERROR_LU
 C
 	W(:)=0.0D0
@@ -68,5 +69,14 @@ C
 	   WRITE(LUER,*)' Warning - weights require normalization in JWEIGHT'
 	END IF
 C
+	IF(CHECK)THEN
+	  WRITE(6,*)'Check on J weights in JTRPWGT'
+	  WRITE(6,'(18X,A,11X,A,13X,A)')'MU','dMU','W'
+	  DO I=1,N-1
+	    WRITE(6,'(F20.16,2ES14.6)')X(I),X(I)-X(I+1),W(I)
+	  END DO
+	  I=N;  WRITE(6,'(F20.16,3ES14.6)')X(I),0.0D0,W(I)
+	END IF
+!
 	RETURN
 	END

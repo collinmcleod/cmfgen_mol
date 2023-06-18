@@ -128,7 +128,7 @@
 !
 	INTEGER NPNTS_TOT
 	INTEGER N_CROSS
-	INTEGER, PARAMETER :: N_CROSS_MAX=500000
+	INTEGER, PARAMETER :: N_CROSS_MAX=1000000
 	REAL*8 TMP_NU(N_CROSS_MAX)
 	REAL*8 TMP_CROSS(N_CROSS_MAX)
 !
@@ -434,6 +434,7 @@
 	  END DO
 	  SIG_REV_KMS=SIG_GAU_KMS
 	  IF(L1 .EQ. 0)THEN
+	      WRITE(LUER,*)' '
 	      WRITE(LUER,*)'Warning in RDPHOT_GEN_V1: ',DESC
 	      WRITE(LUER,*)'Sigma of smoothing Gaussian is unavailable'
 	      WRITE(LUER,*)'Assuming data does not need to be smoothed'

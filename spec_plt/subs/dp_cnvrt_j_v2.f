@@ -46,7 +46,7 @@ C
 	      YV(I)=T1*XV(I)*YV(I)
 	    END DO
 	    IF(DATA_TYPE .EQ. 'J')THEN
-	      Y_LAB='\gnJ\d\gn\u(erg\d cm\u-2 \ds\u-1\d)' 
+	      Y_LAB='\gnJ\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)' 
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
 	      Y_LAB='\gnH\d\gn\u(erg\d cm\u-2 \ds\u-1\d)' 
 	    ELSE IF(DATA_TYPE .EQ. 'RSQJ')THEN

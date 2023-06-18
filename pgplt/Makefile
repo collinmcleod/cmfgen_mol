@@ -12,6 +12,7 @@ LIB_MOD=$(LIB_DIR)libmod.a
 #
 OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(line_id_mod.o)\
+      $(LIB)(adjust_id_waves.o)\
       $(LIB)(amoeba.o)\
       $(LIB)(amotry.o)\
       $(LIB)(arrange_pg_curve_ids.o)\
@@ -21,6 +22,8 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(curve_lab.o)\
       $(LIB)(cut_points_from_plot.o)\
       $(LIB)(define_more_pens.o)\
+      $(LIB)(do_cursor_balmer.o)\
+      $(LIB)(do_gauss_smooth.o)\
       $(LIB)(do_pg_deriv.o)\
       $(LIB)(do_file_ew_v1.o)\
       $(LIB)(do_fill.o)\
@@ -59,15 +62,19 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(pg_def_continuum.o)\
       $(LIB)(pg_replace_data_int.o)\
       $(LIB)(pg_mod_cont_nodes.o)\
+      $(LIB)(pg_set_curve_tit_length.o)\
       $(LIB)(put_text.o)\
       $(LIB)(rd_ew_id.o)\
       $(LIB)(rd_line_ids.o)\
       $(LIB)(modify_curve.o)\
+      $(LIB)(mod_smear_pg.o)\
+      $(LIB)(set_upper_axis.o)\
       $(LIB)(simp_ew.o)\
       $(LIB)(strip_slash_p.o)\
       $(LIB)(shrink_vectors.o)\
       $(LIB)(smooth_plt.o)\
       $(LIB)(spacing.o)\
+      $(LIB)(step_plot_v1.o)\
       $(LIB)(vectorpen.o)\
       $(LIB)(write_line_lambdas.o)
 
@@ -102,7 +109,7 @@ $(LIB)(rd_ew_id.o)           : rd_ew_id.f         $(LIB)(line_id_mod.o)  $(COL)
 $(LIB)(get_line_id.o)        : get_line_id.f      $(LIB)(line_id_mod.o)  $(COL) 
 $(LIB)(rd_line_ids.o)        : rd_line_ids.f      $(LIB)(line_id_mod.o)  $(COL) 
 
-$(LIB)(gramon_pgplot.o)         : gramon_pgplot.f          $(LIB)(mod_curve_data.o) $(LIB)(line_id_mod.o) $(GEN) $(COL) 
+$(LIB)(gramon_pgplot.o)         : gramon_pgplot.f       $(LIB)(mod_curve_data.o) $(LIB)(line_id_mod.o) $(GEN) $(COL) 
 $(LIB)(curve.o)                 : curve.f                  $(LIB)(mod_curve_data.o) $(GEN)
 $(LIB)(curve_lab.o)             : curve_lab.f              $(LIB)(mod_curve_data.o) $(GEN)
 $(LIB)(vectorpen.o)             : vectorpen.f              $(LIB)(mod_curve_data.o) $(GEN)
@@ -117,7 +124,8 @@ $(LIB)(gauss_fit_er.o)     : gauss_fit_er.f      $(LIB)(gauss_fit_data.o)
 $(LIB)(gauss_romb_v2.o)    : gauss_romb_v2.f     $(LIB)(gauss_fit_data.o)
 $(LIB)(ed_gauss_fit.o)     : ed_gaus_fit.f       $(LIB)(gauss_fit_data.o)
 
-$(LIB)(do_mult_gf.o)     : do_mult_gf.f       $(LIB)(gaus_fit_data.o)
+$(LIB)(do_mult_gf.o)          : do_mult_gf.f            $(LIB)(gaus_fit_data.o)
+$(LIB)(do_gauss_smooth.o)     : do_gauss_smooth.f       $(LIB)(mod_smear_pg.o)
 
 $(GEN):
 	(cd ../tools; make )

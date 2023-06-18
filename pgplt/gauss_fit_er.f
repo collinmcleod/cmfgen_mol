@@ -8,6 +8,8 @@
 !
 ! This routine must be kept compatible with GAUSS_FIT_FUNC
 !
+! Altered 06-MAr-2023 : Fixed to use classical Gaussian with factor of 0.5 in argument of exponent.
+!                       Normalize error calculation by continuum.
 ! Altered 09-Aug-2022 : To get consistency inthe different routines changed to use Gauss.
 ! Created 05-Oct-2007
 !
@@ -24,8 +26,9 @@
 !
 	DO J=1,NG_DATA
 	  SUM=PARAMS(1)+PARAMS(2)*(X_GAUSS(J)-X_GAUSS(1))
+	  YCONT_FIT(J)=SUM
 	  DO K=3,NG_PAR,4
-	   SUM=SUM+PARAMS(K+2)*EXP(-(ABS((X_GAUSS(J)-PARAMS(K))/PARAMS(K+1)))**PARAMS(K+3))
+	    SUM=SUM+PARAMS(K+2)*EXP(-0.5*(ABS((X_GAUSS(J)-PARAMS(K))/PARAMS(K+1)))**PARAMS(K+3))
 	  END DO
 	  YFIT(J)=SUM
 	END DO
@@ -42,13 +45,13 @@
 	    T1=EXP(-(ABS((X_GAUSS(J)-PARAMS(K))/PARAMS(K+1)))**PARAMS(K+3))
 	    IF(T1 .GT. 1.0D-03)THEN
 	      EW_ERROR(I)=EW_ERROR(I)+(X_GAUSS(MIN(J+1,NG_DATA))-X_GAUSS(MAX(1,J-1)))*
-	1                ABS(Y_GAUSS(J)-YFIT(J))
+	1                ABS(Y_GAUSS(J)-YFIT(J))/YCONT_FIT(J)
 	    END IF
 	    IF(ABS((X_GAUSS(J)-PARAMS(K))/PARAMS(K+1)) .LT. 4)THEN
 	      ALT_ERROR(I)=ALT_ERROR(I)+(X_GAUSS(MIN(J+1,NG_DATA))-X_GAUSS(MAX(1,J-1)))*
-	1                ABS(Y_GAUSS(J)-YFIT(J))
+	1                ABS(Y_GAUSS(J)-YFIT(J))/YCONT_FIT(J)
 	      MIN_ERROR(I)=MIN_ERROR(I)+(X_GAUSS(MIN(J+1,NG_DATA))-X_GAUSS(MAX(1,J-1)))*
-	1                (Y_GAUSS(J)-YFIT(J))
+	1                (Y_GAUSS(J)-YFIT(J))/YCONT_FIT(J)
 	    END IF
 	  END DO
 	END DO

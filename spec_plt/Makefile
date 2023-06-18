@@ -71,12 +71,16 @@ $(EXE_DIR)plt_phot_raw.exe : plt_phot_raw.o $(FN1) $(FN2) $(FN4) $(FN5)
 plt_phot_raw.o : plt_phot_raw.f $(GEN) $(hyd_bf)
 	$(F90) -c $(FD) plt_phot_raw.f
 
-HYD_BF = ../lib/libnewsubs.a(rd__hyd_bf_data.o)
+HYD_BF = ../lib/libnewsubs.a(rd_hyd_bf_data.o)
 
-(HYD_BF):
+$(HYD_BF):
 	(cd ../newsubs; make)
-SUBS:
+
+$(SUBS):
 	(cd subs; make)
+
+$(GEN):
+	(cd ../tools; make)
 
 $(FN1) : lib1
 $(FN2) : lib2

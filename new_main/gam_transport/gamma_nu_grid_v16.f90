@@ -1,8 +1,3 @@
-
-        HAS ISSUES BECAUSE NU_VEC has inconsistent length if using 
-        ARRAY OPS
-
-
 !	SUBROUTINE sets up the frequency grid
 !	This NU_GRID_VEC(k) = NU_NEW should set up a frequency grid for the NUC_DECAY_DATA lines
 !	For now I am going to work on just getting one line to work and then two lines
@@ -28,7 +23,7 @@
 !              value less than lowest line energy, then code will stop.
 !-----------------------------------------------------------------------------------------------
 !
-	SUBROUTINE GAMMA_NU_GRID_V17(NU_VEC,NU_GRID_VEC,NF_GRID_PTS)
+	SUBROUTINE GAMMA_NU_GRID_V16(N_GAMMA_PASSED,NU_VEC,NU_GRID_VEC,NF_GRID_PTS)
 	USE GAMMA_NUC_DECAY_V2
 	USE NUC_ISO_MOD
 	USE MOD_RD_GAMRAY_CNTRL_VARIABLES
@@ -36,12 +31,12 @@
 !
 ! Altered 20-Nov-2021 : Subroutine name changed to be consistent with file name.
 !                          Changed names of internal subroutines.
-!                          Added deeallocate statement.
 !
 	INTEGER :: I,J,K,L,S 
 	INTEGER :: IJ,JK
 	INTEGER :: IGAM
 	INTEGER :: INU
+        INTEGER :: N_GAMMA_PASSED
         INTEGER :: IOS
 	INTEGER :: NF_GRID_PTS
 !
@@ -91,7 +86,7 @@
 !
 ! Frequencies have to be extracted from the structures and sorted for ONLY the lines being used
 !
-	WRITE(LUER,*)"Making the frequency grid with version 16"
+	WRITE(LUER,*)" Making the frequency grid with version 16 (gamma_nu_grid_v16)"
 	K=0
 	EN_SUM=0.0D0
 	OPEN(UNIT=7,FILE='Check_decays.dat',STATUS='UNKNOWN',ACTION='WRITE')
@@ -120,7 +115,6 @@
 		  IF(T2 .LE. 1.0D-5)THEN
 		    K=K-1
 		    OVERLAP=.TRUE.
-		    WRITE(LUER,'(A,1X,F10.6)')'Gamma-ray line energy repeated:',T1
 		    EXIT
 		  END IF
 		END DO
@@ -134,8 +128,8 @@
 	END DO
 	CLOSE(7)
 	NGAM=K
-	WRITE(LUER,'(A,1X,I3)')"Number of Gamma ray lines allocated:",N_GAMMA
-	WRITE(LUER,'(A,1X,I3)')"Number of Gamma ray lines used:",NGAM
+	WRITE(LUER,'(A,1X,I3)')" Number of Gamma ray lines allocated:",N_GAMMA_PASSED
+	WRITE(LUER,'(A,1X,I3)')" Number of distinct Gamma ray lines used:",NGAM
 !
 !
 	ALLOCATE(MY_INDEX(NGAM),WORK1(NGAM))
@@ -166,28 +160,27 @@
 !	
 ! Assigning blue and red edges to the lines based on doppler shifts
 !
-	NU_BLUE=NU_VEC*(1.0D0+BLUE_GAUSS*VGAUSS)
-	NU_RED=NU_VEC*(1.0D0-RED_GAUSS*VGAUSS)
+	NU_BLUE(1:NGAM)=NU_VEC(1:NGAM)*(1.0D0+BLUE_GAUSS*VGAUSS)
+	NU_RED(1:NGAM)=NU_VEC(1:NGAM)*(1.0D0-RED_GAUSS*VGAUSS)
 !	
 ! Changing the definition of the red tail might sample the grid better.
 ! Splitting NU_RED_INF into two parts may make grid smaller.
 !
-	NU_RED_INF2=NU_RED/(1.0D0+2.0D0*NU_RED*HoMC2)
-	NU_RED_INF1=NU_RED-COMP_TAIL_SPLIT_FRAC*(NU_RED-NU_RED_INF2)
+	NU_RED_INF2(1:NGAM)=NU_RED(1:NGAM)/(1.0D0+2.0D0*NU_RED(1:NGAM)*HoMC2)
+	NU_RED_INF1(1:NGAM)=NU_RED(1:NGAM)-COMP_TAIL_SPLIT_FRAC*(NU_RED(1:NGAM)-NU_RED_INF2(1:NGAM))
 !
 ! Initializing the code for the first values of the grid values
 !
         FWHM=SQRT(8.0D0*LOG(2.0D0))*VGAUSS
 	NU_MAX=(1.0D0+100.0D0*FWHM)*NU_VEC(1)
 	IF(EGAM_MAX/PLANCK .LT. NU_MAX)THEN
-	  WRITE(LUER,'(A)')'Using code definition for NU_MAX instead of '//&
+	  WRITE(LUER,'(A)')' Using code definition for NU_MAX instead of '//&
 		'user input..'
-	  WRITE(LUER,'(A,1X,F10.4)')'NU_MAX (MeV):',NU_MAX*PLANCK
+	  WRITE(LUER,'(A,1X,F10.4)')' NU_MAX (MeV):',NU_MAX*PLANCK
 	ELSE
 	  NU_MAX=EGAM_MAX/PLANCK
 	END IF
-	T1=NU_RED_INF2(NGAM)/&
-		(1.0D0+2.0D0*HoMC2*NU_RED_INF2(NGAM))
+	T1=NU_RED_INF2(NGAM)/(1.0D0+2.0D0*HoMC2*NU_RED_INF2(NGAM))
 	T2=0.1D0*T1/(1.0D0+2.0D0*HoMC2*T1)
 	NU_MIN=EGAM_MIN/PLANCK ! Lowest frequency will be set as parameter
 	IF(T2*PLANCK .LT. EGAM_MIN)THEN
@@ -199,10 +192,10 @@
 	    NU_MIN=5.0D0*T2
 	  END IF
 	END IF
-	WRITE(LUER,*)"NU_MIN:",NU_MIN
-	WRITE(LUER,*)"NU_MIN (keV):",NU_MIN*PLANCK*1.0D3
-	WRITE(LUER,*)"NU_RED_INF2(NGAM):",NU_RED_INF2(NGAM)
-	WRITE(LUER,*)"NU_RED_INF2(NGAM) (keV):",NU_RED_INF2(NGAM)*PLANCK*1.0D3
+	WRITE(LUER,*)"             NU_MIN (Hz):",NU_MIN
+	WRITE(LUER,*)"            NU_MIN (keV):",NU_MIN*PLANCK*1.0D3
+	WRITE(LUER,*)"  NU_RED_INF2(NGAM) (Hz):",NU_RED_INF2(NGAM)
+	WRITE(LUER,*)" NU_RED_INF2(NGAM) (keV):",NU_RED_INF2(NGAM)*PLANCK*1.0D3
 !
 !--------------------------------------------------------------------- 
 ! Establishing the starting value for our NU grid
@@ -253,7 +246,7 @@
 		NU_NEW=NU_BLUE(IGAM)
 		INU=INU+1
 		NU_GRID_VEC(INU)=NU_NEW
-		IF(GRID_TST)GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
+		IF(GRID_TST)CALL GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
 		CALL GAM_NU_GRID_ERR(INU,NU_GRID_VEC,NU_GRID_MAX,IGAM,NU_VEC,&
 		    NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2,NGAM,STRING,STRING2,LUER)
 	      ELSE IF(DNU .EQ. T1)THEN
@@ -314,7 +307,7 @@
 		NU_NEW=NU_NEW-DNU_RED
 		INU=INU+1
 		NU_GRID_VEC(INU)=NU_NEW
-		IF(GRID_TST)GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
+		IF(GRID_TST)CALL GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
 		CALL GAM_NU_GRID_ERR(INU,NU_GRID_VEC,NU_GRID_MAX,IGAM,NU_VEC,&
 		    NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2,NGAM,STRING,STRING2,LUER)
 	      ELSE IF(DNU_LINE_MIN .EQ. T1)THEN
@@ -329,7 +322,7 @@
 		NU_NEW=NU_BLUE(IGAM+1)
 		INU=INU+1
 		NU_GRID_VEC(INU)=NU_NEW
-		IF(GRID_TST)GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
+		IF(GRID_TST)CALL GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
 		CALL GAM_NU_GRID_ERR(INU,NU_GRID_VEC,NU_GRID_MAX,IGAM,NU_VEC,&
 		    NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2,NGAM,STRING,STRING2,LUER)
 		! The code hit the next blue edge of the next line, so
@@ -370,7 +363,7 @@
 		NU_NEW=NU_RED_INF1(IGAM)
 		INU=INU+1
 		NU_GRID_VEC(INU)=NU_NEW
-		IF(GRID_TST)GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
+		IF(GRID_TST)CALL GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
 		CALL GAM_NU_GRID_ERR(INU,NU_GRID_VEC,NU_GRID_MAX,IGAM,NU_VEC,&
 		    NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2,NGAM,STRING,STRING2,LUER)
 	      ELSE IF(DNU_TAIL_MIN .EQ. T1) THEN
@@ -385,7 +378,7 @@
 		NU_NEW=NU_BLUE(IGAM+1)
 		INU=INU+1
 		NU_GRID_VEC(INU)=NU_NEW
-		IF(GRID_TST)GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
+		IF(GRID_TST)CALL GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
 		CALL GAM_NU_GRID_ERR(INU,NU_GRID_VEC,NU_GRID_MAX,IGAM,NU_VEC,&
 		    NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2,NGAM,STRING,STRING2,LUER)
 		! The code hit the next blue edge of the next line, so
@@ -396,7 +389,7 @@
 		NU_NEW=NU_NEW-DNU_INF2
 		INU=INU+1
 		NU_GRID_VEC(INU)=NU_NEW
-		IF(GRID_TST)GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
+		IF(GRID_TST)CALL GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
 		CALL GAM_NU_GRID_ERR(INU,NU_GRID_VEC,NU_GRID_MAX,IGAM,NU_VEC,&
 		    NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2,NGAM,STRING,STRING2,LUER)
 	      END IF
@@ -433,7 +426,7 @@
 		NU_NEW=NU_RED_INF2(IGAM)
 		INU=INU+1
 		NU_GRID_VEC(INU)=NU_NEW
-		IF(GRID_TST)GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
+		IF(GRID_TST)CALL GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
 		CALL GAM_NU_GRID_ERR(INU,NU_GRID_VEC,NU_GRID_MAX,IGAM,NU_VEC,&
 		    NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2,NGAM,STRING,STRING2,LUER)
 		EXIT
@@ -456,7 +449,7 @@
 		NU_NEW=NU_BLUE(IGAM+1)
 		INU=INU+1
 		NU_GRID_VEC(INU)=NU_NEW
-		IF(GRID_TST)GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
+		IF(GRID_TST)CALL GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
 		CALL GAM_NU_GRID_ERR(INU,NU_GRID_VEC,NU_GRID_MAX,IGAM,NU_VEC,&
 		    NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2,NGAM,STRING,STRING2,LUER)
 		! The code hit the next blue edge of the next line, so
@@ -489,7 +482,7 @@
 	    NU_NEW=NU_MIN
 	    INU=INU+1
 	    NU_GRID_VEC(INU)=NU_NEW
-	    IF(GRID_TST)GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
+	    IF(GRID_TST)CALL GAM_TST_NU_GRID(IGAM,NGAM,INU,NU_GRID_MAX,STRING,LUER)
 	    CALL GAM_NU_GRID_ERR(INU,NU_GRID_VEC,NU_GRID_MAX,NGAM,NU_VEC,&
 		NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2,NGAM,STRING,STRING2,LUER)
 	    EXIT
@@ -498,7 +491,7 @@
 !
 	NF_GRID_PTS=INU
 !
-	WRITE(LUER,'(A,I6)')"Number of gamma frequency grid pts:",NF_GRID_PTS
+	WRITE(LUER,'(A,I6)')" Number of gamma frequency grid pts:",NF_GRID_PTS
 ! Now let's check to make sure the frequency grid is monotonicly decreasing
 	I=0
 	DO L=1,NF_GRID_PTS
@@ -519,9 +512,15 @@
 	  WRITE(LUER,*) "Fails for line indexes", L, S
 	  WRITE(LUER,*)NU_GRID_VEC(L),NU_GRID_VEC(S)
 	END IF
-	WRITE(LUER,'(A,I10)') "# of non-monotonicly decreasing gamma nu grid pts:", I
-	IF(I .NE. 0) STOP "*** GAMMA-RAY FREQUENCY GRID NOT MONOTONICALLY DECREASING ***"
+	IF(I .NE. 0)THEN
+	   WRITE(LUER,'(A)')' Error in gamma_nu_grid_v16.f90'
+	   WRITE(LUER,'(A,I10)') "# of non-monotonicly decreasing gamma nu grid pts:", I
+	   STOP "*** GAMMA-RAY FREQUENCY GRID NOT MONOTONICALLY DECREASING ***"
+	END IF
 !
+	DEALLOCATE (MY_INDEX,WORK1,NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2)
+!
+	RETURN
         END SUBROUTINE
 !
 	SUBROUTINE GAM_NU_GRID_ERR(INU,NU,NMAX,IGAM,NU_LINES,NU_BLUE,NU_RED,&
@@ -578,8 +577,7 @@
 	  END IF
 	  STOP
 	END IF
-	DEALLOCATE (MY_INDEX,WORK1,NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2)
-
+!
 	RETURN
 	END
 !

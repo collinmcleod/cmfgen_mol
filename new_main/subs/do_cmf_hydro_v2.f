@@ -15,7 +15,8 @@
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
 !
-!
+! Altered 04-Jan-2023 - Changed was connection radius adjusted if excessive iteratons (> 50).
+!                           May need further work.
 ! Altered 190Jun-2022 - Reactivated lowering of GAM_LIM to avoid -ve velocity gradients. 
 ! Altered 21-Apr-2021 - More accrate R write to RVSIG_COL for PLANE_PARALLEL models.
 ! Altered 05-Jun-2015 - Fixed bug; GAM_LIM_STORE was not being set to GAM_LIM when it was read
@@ -863,7 +864,11 @@
 	    PREV_REF_RADIUS=REFERENCE_RADIUS
 	  ELSE IF(WIND_PRESENT)THEN
 	    PREV_REF_RADIUS=T2
-	    CONNECTION_RADIUS=CONNECTION_RADIUS-T1
+	    IF(ITERATION_COUNTER .GT. 50)THEN
+	      CONNECTION_RADIUS=CONNECTION_RADIUS-0.2*T1
+	    ELSE
+	      CONNECTION_RADIUS=CONNECTION_RADIUS-T1
+	    END IF
 	    IF(VERBOSE_OUTPUT)THEN
 	      WRITE(LUV,*)'    Old reference radius is',T2
 	      WRITE(LUV,*)'Desired reference radius is',REFERENCE_RADIUS
@@ -898,6 +903,8 @@
 	  IF(ITERATION_COUNTER .GE. 100)THEN
 	    WRITE(LU_ERR,*)'Exceed iteration count in DO_CMF_HYDRO_V2.'
 	    WRITE(LU_ERR,*)'Aborting update of the hydro structure.'
+	    WRITE(LU_ERR,*)'Iteration conunt =',ITERATION_COUNTER
+	    IF(VERBOSE_OUTPUT)CLOSE(UNIT=LUV)
 	    RETURN
 	  END IF
 	END DO			!Loop to set R(Tau=2/3)=REFERENCE_RADIUS

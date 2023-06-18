@@ -22,6 +22,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered 04-Apr-2023 : Changed plotting section.
 ! Altered 22-Feb-2014 : Default for NG acceleration has been reset to use 4 iterations.
 ! Altered 17-Jan-2014 : Changed I3 to I4 to allow for ND > 99
 ! Altered 01-Nov-2012 : Bug fix with TG option. Values when r < 1 were not being updated.
@@ -553,6 +554,7 @@
 	REAL*8 RAT(NT)
 	REAL*8 TA(MAX(NT,ND))
 	REAL*8 TB(MAX(NT,ND))
+	REAL*8 TC(MAX(NT,ND))
 !
 	REAL*8 T1
 	REAL*8 LOCINC,LOCDEC
@@ -601,7 +603,8 @@
 	DO L=1,ND
 	  INT_ARRAY(L)=L
 	  TA(L)=100.0D0*(1.0D0-RDPOPS(T_INDEX,L,1)/NEWPOP(T_INDEX,L))
-	  TB(L)=100.0D0*(1.0D0-RDPOPS(T_INDEX,L,3)/RDPOPS(T_INDEX,L,2))
+	  TB(L)=100.0D0*(1.0D0-RDPOPS(T_INDEX,L,2)/RDPOPS(T_INDEX,L,1))
+	  TC(L)=100.0D0*(1.0D0-RDPOPS(T_INDEX,L,3)/RDPOPS(T_INDEX,L,2))
 	  T1=MAX(ABS(TA(L)),T1);  T1=MAX(ABS(TB(L)),T1)
 	END DO
 	IF(T1 .EQ. 0.0D0)THEN
@@ -617,14 +620,15 @@
 	  CALL GEN_IN(K,'Input new variable to be plotted as T correction is zero')
 	  DO L=1,ND
 	    TA(L)=100.0D0*(1.0D0-RDPOPS(K,L,1)/NEWPOP(K,L))
-	    TB(L)=100.0D0*(1.0D0-RDPOPS(K,L,3)/RDPOPS(K,L,2))
+	    TB(L)=100.0D0*(1.0D0-RDPOPS(K,L,2)/RDPOPS(K,L,1))
 	  END DO
 	  CALL DP_CURVE(ND,INT_ARRAY,TA)
 	  CALL DP_CURVE(ND,INT_ARRAY,TB)
 	  CALL GRAMON_PGPLOT('Depth Index','100[X(new)-X(old)]/X(new)',' ',' ')
 	ELSE
-	  CALL DP_CURVE(ND,INT_ARRAY,TA)
-	  CALL DP_CURVE(ND,INT_ARRAY,TB)
+	  CALL DP_CURVE_LAB(ND,INT_ARRAY,TA,'Accelerated (A:I)')
+	  CALL DP_CURVE_LAB(ND,INT_ARRAY,TB,'I:I-1')
+	  CALL DP_CURVE_LAB(ND,INT_ARRAY,TC,'I-1:I-2')
 	  CALL GRAMON_PGPLOT('Depth Index','100[T(new)-T(old)]/T(new)',' ',' ')
 	END IF
 !

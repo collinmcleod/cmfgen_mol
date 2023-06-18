@@ -363,9 +363,9 @@
 ! This must be after the call to DEFINE_GRID so that RAY_POINTS_INSERTED is defined.
 !
 	IF(FIRST_TIME .OR. NEW_R_GRID)THEN
-	  WRITE(LUER,*)' Entering DEFINE_GRID_V2_GAM'
+	  WRITE(LUER,*)' Entering define_grid_v2_gam.f90'
 	  CALL DEFINE_GRID_V2_GAM(R_EXT,V_EXT,VDOP_VEC_EXT,VDOP_FRAC,ND_EXT,R,P,ND,NC,NP,ANG_MULT)
-	  WRITE(LUER,*)' Exiting DEFINE_GRID_V2_GAM'
+	  WRITE(LUER,*)' Exiting define_grid_v2_gam.f90'
 	  J=0
 	  OPEN(UNIT=7,FILE='MU_VALUE_CHK',STATUS='UNKNOWN')
 	  WRITE(7,'(A)')' '

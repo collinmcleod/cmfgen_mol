@@ -8,6 +8,7 @@
 	SUBROUTINE CHECK_SPEC_CONV(OBS_FLUX,OBS_FREQ,LAM_ST,LAM_END,SPECTRUM_CONVERGED,NOBS)
 	IMPLICIT NONE
 !
+! Altered 06-Mar-2023: Fixed error that occured when no change in spectrum at a particular freqency.
 ! Altered 21-Aug-2020: Changed output format; Dimension LAMS from 0.
 ! Created 10-Feb-2020
 !
@@ -80,6 +81,7 @@
 	  ELSE
 	    WRK_VEC(I)=1.0D-20
 	  END IF
+	  IF(WRK_VEC(I) .LT. 1.0D-20)WRK_VEC(I)=1.0D-20
 	  LAM=0.01D0*C_KMS/OBS_FREQ(I)
 	  IF(LAM .GT. LAM_LIMS(IL))IL=IL+1
 	  IH=MAX(1,INT(LOG10(WRK_VEC(I))))

@@ -16,6 +16,9 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 16-Apr-2023 : Added RUN2 and REX2 from Paco (Paul now uses RUNA which is 
+!	                      the same option).
+! Altered 03-MAr-2023 : Added clumping law from Paul Crowther
 ! Altered 15-May-2012 : Modications to clumping laws (imported from OSIRIS: 21-Jul-2021).
 ! Altered 09-May-2021 : Added RPOW option.
 ! Altered 14-Dec-2020 : Altered EXPO option to inhibit clumping below a certain to velocity.
@@ -121,32 +124,32 @@
 	1	   (1.0D0-CLUMP_PAR(1))*EXP( (V(K)-V(1))/CLUMP_PAR(3))
 	    END DO
 !
-	ELSE IF(CLUMP_LAW(1:3) .EQ. 'POW')THEN
-	  IF(N_CLUMP_PAR .NE. 2)THEN
-	    WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
-	    WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
-	    STOP
-	  END IF
-	  DO K=1,ND
-	   CLUMP_FAC(K)=1.0D0-(1.0D0-CLUMP_PAR(1))*(V(K)/V(1))**CLUMP_PAR(2)
-	  END DO
+	  ELSE IF(CLUMP_LAW(1:3) .EQ. 'POW')THEN
+	    IF(N_CLUMP_PAR .NE. 2)THEN
+	      WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
+	      WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
+	      STOP
+	    END IF
+	    DO K=1,ND
+	     CLUMP_FAC(K)=1.0D0-(1.0D0-CLUMP_PAR(1))*(V(K)/V(1))**CLUMP_PAR(2)
+	    END DO
 !
-	ELSE IF(CLUMP_LAW(1:4) .EQ. 'RPOW')THEN
-	  IF(N_CLUMP_PAR .NE. 2 .AND. N_CLUMP_PAR .NE. 4)THEN
-	    WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
-	    WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
-	    STOP
-	  END IF
-	  IF(N_CLUMP_PAR .EQ. 2)THEN
-	     CLUMP_PAR(3)=0.0D0; CLUMP_PAR(4)=1.0D0
-	  END IF
-	  DO K=1,ND
-	    T1=1.0D0/CLUMP_PAR(1)-1.0D0
-	    CLUMP_FAC(K)=1.0D0/(1.0D0+T1*(V(K)/V(1))**CLUMP_PAR(2))/
+	  ELSE IF(CLUMP_LAW(1:4) .EQ. 'RPOW')THEN
+	    IF(N_CLUMP_PAR .NE. 2 .AND. N_CLUMP_PAR .NE. 4)THEN
+	      WRITE(LUER,*)'Error in SET_ABUND_CLUMP'
+	      WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
+	      STOP
+	    END IF
+	    IF(N_CLUMP_PAR .EQ. 2)THEN
+	      CLUMP_PAR(3)=0.0D0; CLUMP_PAR(4)=1.0D0
+	    END IF
+	    DO K=1,ND
+	      T1=1.0D0/CLUMP_PAR(1)-1.0D0
+	      CLUMP_FAC(K)=1.0D0/(1.0D0+T1*(V(K)/V(1))**CLUMP_PAR(2))/
 	1               (1.0D0+CLUMP_PAR(3)*(V(K)/V(1))**CLUMP_PAR(4))
-	  END DO
+	    END DO
 !
-	 ELSE IF(CLUMP_LAW(1:4) .EQ. 'SNCL')THEN
+	  ELSE IF(CLUMP_LAW(1:4) .EQ. 'SNCL')THEN
 	    IF (CLUMP_PAR(3) .EQ. 0.0D0) THEN
 	       DO K=1,ND
 		  T1 = (V(K) - V(ND)) / CLUMP_PAR(2)
@@ -163,7 +166,9 @@
 	       END DO
 	    ENDIF
 !
-	  ELSE IF(CLUMP_LAW(1:4) .EQ. 'RUNA')THEN
+! For consistency with bith Paul and Paco nomenclature.
+!
+	  ELSE IF(CLUMP_LAW(1:4) .EQ. 'RUNA' .OR. CLUMP_LAW(1:4) .EQ. 'PEXP')THEN
 	    IF(N_CLUMP_PAR .NE. 4)THEN
 	      WRITE(LUER,*)'Error in CMFGEN'
 	      WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
@@ -175,6 +180,33 @@
 	1     (CLUMP_PAR(4)-CLUMP_PAR(1))*
 	1     EXP( (V(K)-V(1))/CLUMP_PAR(3))
 	      IF(CLUMP_FAC(K).GT. 1.D0) CLUMP_FAC(K)=1.0D0
+	    END DO
+!
+          ELSE IF(CLUMP_LAW(1:4) .EQ. 'REX2')THEN
+	    IF(N_CLUMP_PAR .NE. 3)THEN
+	      WRITE(LUER,*)'Error in CMFGEN'
+	      WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
+	      STOP
+	    END IF
+	    DO K=1,ND
+	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
+	1          EXP(-(V(K)/CLUMP_PAR(2))**2.)+
+	1	   (1.0D0-CLUMP_PAR(1))*EXP(-((V(K)-V(1))/CLUMP_PAR(3))**2.)
+              IF(CLUMP_FAC(K).GT. 1.D0) CLUMP_FAC(K)=1.0D0
+	    END DO
+!
+          ELSE IF(CLUMP_LAW(1:4) .EQ. 'RUN2')THEN
+            IF(N_CLUMP_PAR .NE. 4)THEN
+	     WRITE(LUER,*)'Error in CMFGEN'
+             WRITE(LUER,*)' WRONG VALUE N_CLUMP_PAR=',N_CLUMP_PAR
+	     STOP
+	    END IF
+	    DO K=1,ND
+              CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
+     &          EXP(-(V(K)/CLUMP_PAR(2))**2.)+
+     &          (CLUMP_PAR(4)-CLUMP_PAR(1))*
+     &          EXP(-((V(K)-V(1))/CLUMP_PAR(3))**2.)
+              IF(CLUMP_FAC(K).GT. 1.D0) CLUMP_FAC(K)=1.0D0
 	    END DO
 !
 	  ELSE IF(CLUMP_LAW(1:3) .EQ. 'SIN')THEN

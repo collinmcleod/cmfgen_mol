@@ -1,8 +1,8 @@
 !
-! Porgram design to plot data from an XzVPRRR file.
+! Program design to plot data from an XzVPRRR file.
 !
 ! NS is read in from MODEL
-! The velocity os read in from RVTJ.
+! The velocity is read in from RVTJ.
 !
 	PROGRAM PLT_NRR
 	USE MOD_USR_OPTION
@@ -12,6 +12,7 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 26-Feb-2023: Minor label chaneges. XED and GRED options added.
 ! Altered: 06-Sep-2017: Made compatible with osiris version.
 !                         Osiris version had been cleaned and had additional options.
 ! Altered: 12-Sep-2016: Extensively modified. Routine is now option driven (as for PLTSPEC and DISPGEN).
@@ -68,7 +69,7 @@
 !
 	LEV=1
 	NORM_RATE=.TRUE.
-	YLABEL='1.0E+12 Rate /Ne/Di'
+	YLABEL='1.0E+12 Rate/Ne/Di'
 !	
  	ION_STAGE=' '
 	CALL GEN_IN(ION_STAGE,'Ionization stage (e.g., OSIX)')
@@ -234,10 +235,9 @@
 !
 ! Set plot defaults.
 !
-        XV=R
+        XV=LOG10(R/R(ND))
 	YV=0.0D0
-        XLABEL='R'
-        YLABEL=' '
+        XLABEL='Log R/R\d*\u'
 !
 ! This call resets the .sve algorithm.  Specifically it sets the next
 ! input answer to be a main option, and all subsequent inputs to be
@@ -341,12 +341,13 @@
         ELSE IF(XOPT .EQ. 'XNLOGR')THEN
           XV=LOG10(R/R(ND))
           XLABEL='Log(R/R(ND))'
+        ELSE IF(XOPT .EQ. 'XED')THEN
+          XV=LOG10(ED)
+          XLABEL='Log Ne(cm\u-3\d)'
 !
 	ELSE IF(XOPT .EQ. 'NORM')THEN
 	  NORM_RATE=.NOT. NORM_RATE
 	  IF(NORM_RATE)THEN
-	    WRITE(6,*)'Rate will be normalized'
-	    YLABEL='1.0E+12 Rate /Ne/Di'
 	  ELSE
 	    WRITE(6,*)'Rate will NOT be normalized'
 	    YLABEL='Rate'
@@ -401,6 +402,11 @@
 !
         ELSE IF(XOPT .EQ. 'P' .OR. XOPT .EQ. 'GR')THEN
           CALL GRAMON_PGPLOT(XLABEL,YLABEL,' ',' ')
+!
+        ELSE IF(XOPT .EQ. 'GRED')THEN
+	  CALL SET_UPPER_AXIS(ED,XV,ND,'Log Ne(cm\u-3\d)')
+          CALL GRAMON_PGPLOT(XLABEL,YLABEL,' ','TOPLAB ')
+!
         ELSE IF(XOPT .EQ. 'HE' .OR. XOPT .EQ. 'HELP')THEN
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(1X,A,A,A1,T20,A)')RED_PEN,'XR',BLUE_PEN,'Set X axis to R'

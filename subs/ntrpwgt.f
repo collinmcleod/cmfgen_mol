@@ -17,9 +17,12 @@ C Altered 25-May-1996 - Call to DP_ZERO removed.
 C                       ERROR_LU inserted.
 C Created 26-Apr-1989 - Based on HWEIGHT
 C
-	INTEGER N,I
-	REAL*8 X(N),W(N),T1,T2,SUM
+	INTEGER N
+	REAL*8 X(N),W(N)
 C
+	REAL*8 T1,T2,SUM
+	INTEGER I
+	LOGICAL, SAVE :: CHECK=.TRUE.
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
@@ -75,6 +78,16 @@ C
 	  LUER=ERROR_LU()
 	  WRITE(LUER,*)' Warning - weights require normalization in HWEIGHT'
 	END IF
+C
+	IF(CHECK)THEN
+	  WRITE(6,*)'Check on N weights in NTRPWGT'
+	  WRITE(6,'(18X,A,11X,A,13X,A)')'MU','dMU','W'
+	  DO I=1,N-1
+	    T1=X(I)-X(I+1)
+	    WRITE(6,'(F20.16,3ES14.6)')X(I),T1,W(I)
+	  END DO
+	  I=N;  WRITE(6,'(F20.16,3ES14.6)')X(I),0.0D0,W(I)
+	END IF 
 C
 	RETURN
 	END

@@ -19,7 +19,7 @@ MOD=  $(LIB)(mod_ray_mom_store.o)\
       $(LIB)(mod_space_grid_v2.o)\
       $(LIB)(mod_space_grid_v2_gam.o)
 
-MODS= $(LIB_MOD)(gam_mud_mod.o)\
+MODS= $(LIB_MOD)(gam_mu_mod.o)\
       $(LIB_MOD)(mod_rd_gamray_cntrl_variables.o)
 
 OBJ = $(LIB)(comp_add_edd_facs.o)\
@@ -111,7 +111,7 @@ $(LIB)(cmf_formal_rel_v4_gam.o) : cmf_formal_rel_v4_gam.f $(LIB)(mod_space_grid_
 	$(F90) -c $(OPTION) cmf_formal_rel_v4_gam.f
 	ar $(AR_OPTION) $(LIB) cmf_formal_rel_v4_gam.o
 
-$(LIB)(define_grid_v2_gam.o) : define_grid_v2_gam.f $(LIB)(mod_space_grid_v2_gam.o) $(LIB_MOD)(mod_rd_gamray_cntrl_variables.o) $(LIB_MOD(gam_mu_mod.o)
+$(LIB)(define_grid_v2_gam.o) : define_grid_v2_gam.f $(LIB)(mod_space_grid_v2_gam.o) $(LIB_MOD)(mod_rd_gamray_cntrl_variables.o) $(LIB_MOD)(gam_mu_mod.o)
 	$(F90) -c $(OPTION) define_grid_v2_gam.f
 	ar $(AR_OPTION) $(LIB) define_grid_v2_gam.o
 
@@ -180,10 +180,10 @@ $(LIB)(var_mom_jext_cmf_v3.o) : var_mom_jext_cmf_v3.f $(LIB)(mod_ray_mom_store.o
 	ar $(AR_OPTION) $(LIB) var_mom_jext_cmf_v3.o
 
 $(LIB)(mod_trap_derivatives.o) :
-	(cd ../subs ; make)
+	(cd ../subs; make)
 
-MODS:
-	(cd  new_main/mod_subs; make)
+$(MODS):
+	(cd  ../new_main/mod_subs; make)
 
 clean :
 	rm -f *.o 

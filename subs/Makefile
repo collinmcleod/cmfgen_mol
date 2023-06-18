@@ -18,6 +18,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(chk_eq_num.o)\
       $(LIB)(chk_col_name.o)\
       $(LIB)(check_spec_conv.o)\
+      $(LIB)(check_line_overlap.o)\
       $(LIB)(cmf_form_sol.o)\
       $(LIB)(cmf_form_sol_v2.o)\
       $(LIB)(cmf_form_sol_v3.o)\
@@ -67,6 +68,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(gen_omega_rd_v2.o)\
       $(LIB)(genaccel.o)\
       $(LIB)(genangqw.o)\
+      $(LIB)(genangqw_v2.o)\
       $(LIB)(genosc_v5.o)\
       $(LIB)(genosc_v6.o)\
       $(LIB)(get_col_ref.o)\
@@ -74,7 +76,9 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(gff.o)\
       $(LIB)(gnthydl.o)\
       $(LIB)(htrpwgt.o)\
+      $(LIB)(htrpwgt_v2.o)\
       $(LIB)(hweight.o)\
+      $(LIB)(hweight_v2.o)\
       $(LIB)(hydanggaunt.o)\
       $(LIB)(hydcrossl.o)\
       $(LIB)(hydro_terms.o)\
@@ -96,10 +100,14 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(jgrey.o)\
       $(LIB)(jgrey_with_fvt.o)\
       $(LIB)(jtrpwgt.o)\
+      $(LIB)(jtrpwgt_v2.o)\
       $(LIB)(jweight.o)\
+      $(LIB)(jweight_v2.o)\
       $(LIB)(kivarnm.o)\
       $(LIB)(ktrpwgt.o)\
+      $(LIB)(ktrpwgt_v2.o)\
       $(LIB)(kweight.o)\
+      $(LIB)(kweight_v2.o)\
       $(LIB)(lam_vac.o)\
       $(LIB)(lamvacair.o)\
       $(LIB)(last2rays.o)\
@@ -141,10 +149,13 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(ngaccel.o)\
       $(LIB)(ngaccel_arb_ord.o)\
       $(LIB)(nordangqw.o)\
+      $(LIB)(nordangqw_v2.o)\
       $(LIB)(nordflux.o)\
       $(LIB)(nordtau.o)\
       $(LIB)(ntrpwgt.o)\
+      $(LIB)(ntrpwgt_v2.o)\
       $(LIB)(nweight.o)\
+      $(LIB)(nweight_v2.o)\
       $(LIB)(occupation_prob.o)\
       $(LIB)(omega_gen_v2.o)\
       $(LIB)(open_dir_acc_v1.o)\
@@ -160,8 +171,10 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(quad_x_lit_v3.o)\
       $(LIB)(rd_f_to_s_ids.o)\
       $(LIB)(rd_f_to_s_ids_v2.o)\
+      $(LIB)(rd_f_to_s_ids_v3.o)\
       $(LIB)(rd_free_val.o)\
       $(LIB)(rd_log.o)\
+      $(LIB)(rd_sol_abund_scale.o)\
       $(LIB)(rd_t_ed.o)\
       $(LIB)(rdgendie_v4.o)\
       $(LIB)(readba.o)\
@@ -177,6 +190,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(rext_coef_v2.o)\
       $(LIB)(rite_asc.o)\
       $(LIB)(rite_atmdes_v2.o)\
+      $(LIB)(rite_atmdes_v3.o)\
       $(LIB)(rite_gam_v2.o)\
       $(LIB)(rv_sn_model_v2.o)\
       $(LIB)(s15adf.o)\
@@ -184,6 +198,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(scale_grey.o)\
       $(LIB)(scale_pops.o)\
       $(LIB)(scr_read_v2.o)\
+      $(LIB)(set_acc_dmu.o)\
       $(LIB)(set_case.o)\
       $(LIB)(set_cont_freq.o)\
       $(LIB)(set_cont_freq_v3.o)\

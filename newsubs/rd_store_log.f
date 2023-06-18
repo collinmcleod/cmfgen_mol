@@ -1,4 +1,5 @@
 !
+! Altered: 28-Apr-2023:  Now write out KEY with error message.
 ! Altered: 19-Jul-2022:  Name of file being read is output on error.
 ! Altered: 16-Jan-2019:  Added RD_STORE_2DBLE
 ! Altered: 23-Mar-2012:  Improved error reporting.
@@ -177,7 +178,7 @@
 	KEY_FOUND=.FALSE.
 	IF(.NOT. MUST_BE_PRES)RETURN
 	WRITE(LUER,*)'Error in GET_KEY_STRING'
-	WRITE(LUER,*)'Unable to locate string contianing the key ',KEY
+	WRITE(LUER,*)'Unable to locate string containing the key ',KEY
 	STOP
 !
 	END
@@ -196,6 +197,7 @@
 	READ(STRING,*,IOSTAT=IOS)VALUE
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error reading logical value with RD_STORE_LOG'
+	  WRITE(LUER,*)'KEY is ',TRIM(KEY)
 	  WRITE(LUER,*)'String with error follows:'
 	  WRITE(LUER,*)TRIM(STRING)
 	  STOP
@@ -204,6 +206,7 @@
 	IF(STRING(1:1) .NE. 'T' .AND. STRING(1:1) .NE. 'F')THEN
 	  WRITE(LUER,*)'Error reading logical value with RD_STORE_LOG'
 	  WRITE(LUER,*)'Use F [or FALSE] and T [or TRUE] for logical variables'
+	  WRITE(LUER,*)'KEY is ',TRIM(KEY)
 	  WRITE(LUER,*)'String with error follows'
 	  WRITE(LUER,*)TRIM(STRING)
 	  STOP
@@ -226,7 +229,14 @@
 !
 	CALL GET_KEY_STRING(STRING,KEY,MUST_BE_PRES,KEY_FOUND)
 	IF(.NOT. KEY_FOUND)RETURN
-	READ(STRING,*)VALUE1,VALUE2
+	READ(STRING,*,IOSTAT=IOS)VALUE1,VALUE2
+	IF(IOS .NE. 0)THEN
+	  WRITE(LUER,*)'Error reading 2 logical values with RD_STORE_LOG (RD_STORE_2LOG).'
+	  WRITE(LUER,*)'KEY is ',TRIM(KEY)
+	  WRITE(LUER,*)'String with error follows:'
+	  WRITE(LUER,*)TRIM(STRING)
+	  STOP
+	END IF
 	WRITE(LUO,10)VALUE1,VALUE2,TRIM(KEY),TRIM(A)
 10	FORMAT(10X,L1,',',L1,5X,'[',A,']',T40,A)
 !
@@ -248,6 +258,7 @@
 	READ(STRING,*,IOSTAT=IOS)VALUE
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error reading integer value with RD_STORE_INT'
+	  WRITE(LUER,*)'KEY is ',TRIM(KEY)
 	  WRITE(LUER,*)'String with error follows:'
 	  WRITE(LUER,*)TRIM(STRING)
 	  STOP
@@ -275,6 +286,7 @@
 	READ(STRING,*,IOSTAT=IOS)VALUE1,VALUE2
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error reading integer values with RD_STORE_2INT'
+	  WRITE(LUER,*)'KEY is ',TRIM(KEY)
 	  WRITE(LUER,*)'String with error follows:'
 	  WRITE(LUER,*)TRIM(STRING)
 	  STOP
@@ -309,6 +321,7 @@
 	READ(STRING,*,IOSTAT=IOS)VALUE
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error reading double precision value with RD_STORE_DBLE'
+	  WRITE(LUER,*)'KEY is ',TRIM(KEY)
 	  WRITE(LUER,*)'String with error follows:'
 	  WRITE(LUER,*)TRIM(STRING)
 	  STOP
@@ -334,6 +347,7 @@
 	READ(STRING,*,IOSTAT=IOS)VALUE1,VALUE2
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error reading integer values with RD_STORE_2INT'
+	  WRITE(LUER,*)'KEY is ',TRIM(KEY)
 	  WRITE(LUER,*)'String with error follows:'
 	  WRITE(LUER,*)TRIM(STRING)
 	  STOP
@@ -504,9 +518,10 @@
 !
 	CALL GET_KEY_STRING(STRING,KEY,MUST_BE_PRES,KEY_FOUND)
 	IF(.NOT. KEY_FOUND)RETURN
-	READ(STRING,*)VALUE1,VALUE2,VALUE3
+	READ(STRING,*,IOSTAT=IOS)VALUE1,VALUE2,VALUE3
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error reading 3 integer values with RD_STORE_3INT'
+	  WRITE(LUER,*)'KEY is ',TRIM(KEY)
 	  WRITE(LUER,*)'String with error follows:'
 	  WRITE(LUER,*)TRIM(STRING)
 	  STOP

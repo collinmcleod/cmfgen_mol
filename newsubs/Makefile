@@ -34,7 +34,7 @@ OBJ= $(LIB)(ave_level_energy.o)\
      $(LIB)(rd_rv_file_v2.o)\
      $(LIB)(rd_mod_density.o)\
      $(LIB)(rd_store_log.o)\
-     $(LIB)(rd_xray_spec.f)\
+     $(LIB)(rd_xray_spec.o)\
      $(LIB)(set_edge_freq_v3.o)\
      $(LIB)(set_edge_freq_v4.o)\
      $(LIB)(set_x_freq_v2.o)\

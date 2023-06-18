@@ -170,10 +170,16 @@ $(STEQ):
 $(MOD):
 	(cd ../mod_subs ; make)
 
+$(CONT):
+	(cd ../mod_subs ; make)
+
+$(EDD):
+	(cd ../mod_subs ; make)
+
 $(NUC):
 	(cd ../mod_subs ; make)
 
-$(UP_MOD):
+$(UP_MODS):
 	(cd ../mod_subs ; make)
 
 $(DIS):

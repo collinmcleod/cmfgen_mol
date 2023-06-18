@@ -26,7 +26,7 @@
 	N_TIT_SET=N_HEADER
 !
 ! Now arrange and concantenate the curve titles. We can force a line to end by ending it
-! with \\ (as in latex). Maximum title length is 50.
+! with \\ (as in latex). Maximum title length is MAX_TIT_LENGTH.
 !
 	DO IP=1,NPLTS
 	  IF(CD(IP)%CURVE_ID .EQ. ' ')THEN
@@ -44,7 +44,7 @@
 	    CPEN=' \p'//ADJUSTL(CPEN)
 	    IT=N_TIT_SET
 	    K=LEN_TRIM(TITLE(IT))
-	    IF(LEN_TRIM(TITLE(IT))+LEN_TRIM(CD(IP)%CURVE_ID) .LT. 47)THEN
+	    IF(LEN_TRIM(TITLE(IT))+LEN_TRIM(CD(IP)%CURVE_ID) .LT.  MAX_TIT_LENGTH-3)THEN
 	      IF(K .EQ. 0)THEN
 	        TITLE(IT)=TRIM(CD(IP)%CURVE_ID)//TRIM(CPEN)
 	      ELSE IF(ADD_COMMA)THEN

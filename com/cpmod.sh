@@ -52,6 +52,12 @@ cp $1/MODEL_SPEC         $2/
 echo " "
 echo " Copyed startup files"
 
+if(-e $1/batch_ins.sh)then
+  cp $1/batch_ins.sh          $2/
+  echo " "
+  echo " Copyed batch_ins.sh"
+endif
+
 if(-e $1/RVSIG_COL)then
   cp $1/RVSIG_COL          $2/
   echo " "

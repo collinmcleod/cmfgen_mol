@@ -15,7 +15,7 @@ MOD = $(LIB_MOD)(mod_cmfgen.o)\
       $(LIB_MOD)(cmf_sob_mod.o)\
       $(LIB_MOD)(control_variable_mod.o)\
       $(LIB_MOD)(eddfac_rec_defs_mod.o)\
-      $(LIB_MOD)(gamma_mu_mod.o)\
+      $(LIB_MOD)(gam_mu_mod.o)\
       $(LIB_MOD)(line_mod.o)\
       $(LIB_MOD)(line_vec_mod.o)\
       $(LIB_MOD)(mod_gamma_trans_v3.o)\
@@ -64,6 +64,8 @@ all : $(LIB)
 
 $(LIB) : $(MOD) $(OBJ)	
 
+UK=$(LIB)(update_keyword.o)
+
 # General rules to make obects in a library and object files
 
 $(LIB_MOD)(%.o) : %.f 
@@ -74,14 +76,14 @@ $(LIB)(%.o) : %.f
 	$(F90) -c $(FG) $< 
 	ar $(AR_OPTION) $(LIB) $*.o
 
-$(MOD_LIB)(%.o) : %.f95
+$(MOD_LIB)(%.o) : %.f90
 	$(F90) -c $(FFREE) $<
 	ar $(AR_OPTION) $(LIB_MOD) $*.o
 
 # Specific dependency of source files which uses external 
 # fortran moudles. (The order of compilation matters.)
 
-$(LIB)(adjust_r_grid_v4.o) : adjust_r_grid_v4.f $(LIB_MOD)(mod_cmfgen.o) $(LIB)(update_keyword.o)
+$(LIB)(adjust_r_grid_v4.o) : adjust_r_grid_v4.f $(LIB_MOD)(mod_cmfgen.o) $(UK)
 	$(F90) -c $(FG) adjust_r_grid_v4.f
 	ar $(AR_OPTION) $(LIB) adjust_r_grid_v4.o
 
@@ -183,6 +185,9 @@ $(LIB)(sub_sob_line_v3.o) : sub_sob_line_v3.f $(LIB)(opac_mod.o) $(LIB_MOD)(cont
 $(LIB)(sup_to_full_v4.o) : sup_to_full_v4.f $(LIB_MOD)(mod_cmfgen.o)
 	$(F90) -c $(FG) sup_to_full_v4.f
 	ar $(AR_OPTION) $(LIB) sup_to_full_v4.o
+
+$(UK):
+	(cd ../../tools ; make)
 
 clean :
 	rm -f *.o 

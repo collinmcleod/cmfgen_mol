@@ -49,6 +49,7 @@
 !
         INTEGER IDX,IXTICK
         INTEGER IDY,IYTICK
+	INTEGER IY_DIR
 !
 	LOGICAL TITONRHS
 	LOGICAL NORMAL_R_Y_AXIS
@@ -116,6 +117,7 @@
 	XLOC=0.5D0*(XPAR(1)+XPAR(2))
 	YLOC=0.5D0*(YPAR(1)+YPAR(2))
 	dY=0.05*(YPAR(2)-YPAR(1))
+	IY_DIR=1
 !
 	IF(.NOT. RESET_DEFAULTS)THEN
 	  CALL GEN_IN(RESET_DEFAULTS,'Reset plot and parameters/settings?')
@@ -207,25 +209,39 @@
 	    XT(1)=XLOC; XT(2)=XLOC
 	    CALL PGLINE(2,XT,YT)
 !
-! Options to move/expand/contract plot in X direction.
+! Options to move/expand/contract plot in X and Y directions.
 !
 	  ELSE IF(UC(CURSVAL) .EQ. 'N' .OR.
 	1         UC(CURSVAL) .EQ. 'P' .OR.
 	1         UC(CURSVAL) .EQ. 'X' .OR.
-	1         UC(CURSVAL) .EQ. 'C')THEN
+	1         UC(CURSVAL) .EQ. 'C' .OR.
+	1         UC(CURSVAL) .EQ. 'U' .OR.
+	1         UC(CURSVAL) .EQ. 'L' .OR.
+	1         UC(CURSVAL) .EQ. 'T')THEN
 	    T1=XPAR(2)-XPAR(1)
 	    IF(UC(CURSVAL) .EQ. 'N')THEN
 	      XPAR(1)=XPAR(2)-XINC
 	      XPAR(2)=XPAR(1)+T1
+	      XLOC=XPAR(1)+XINC
 	    ELSE IF(UC(CURSVAL) .EQ. 'P')THEN
 	      XPAR(1)=XPAR(1)+XINC-(XPAR(2)-XPAR(1))
 	      XPAR(2)=XPAR(1)+T1
+	      XLOC=XPAR(1)+XINC
 	    ELSE IF(UC(CURSVAL) .EQ. 'X')THEN
 	      XPAR(2)=XPAR(2)+XINC
+	      XLOC=XPAR(1)+XINC
 	    ELSE IF(UC(CURSVAL) .EQ. 'C')THEN
 	      XPAR(2)=XPAR(2)-XINC
+	      XLOC=XPAR(1)+XINC
+	    ELSE IF(UC(CURSVAL) .EQ. 'U')THEN
+	      YPAR(2)=YPAR(2)-YINC*IY_DIR
+	      IF(YLOC .GT. YPAR(2))YLOC=YPAR(2)-YINC
+	    ELSE IF(UC(CURSVAL) .EQ. 'L')THEN
+	      YPAR(1)=YPAR(1)+YINC*IY_DIR
+	      IF(YLOC .LT. YPAR(1))YLOC=YPAR(1)+YINC
+	    ELSE IF(UC(CURSVAL) .EQ. 'T')THEN
+	      IY_DIR=-1*IY_DIR
 	    END IF
-	    XLOC=XPAR(1)+XINC
 	    CALL PGSWIN(XPAR(1),XPAR(2),YPAR(1),YPAR(2))
             CALL PGERAS
 	    IF(REVERSE_PLOT_ORDER)THEN
@@ -383,19 +399,22 @@
 !
 	  WRITE(6,'(A)')BLUE_PEN
 	  WRITE(6,'(A)')' Program assumes X axis increases with X index '
-	  WRITE(6,'(A)')' Cursor controls are case INsensitive'
+	  WRITE(6,'(A)')' Cursor controls are case Insensitive'
 	  WRITE(6,'(A)')' '
-	  WRITE(6,'(A)')' Use cursor to define left and right side of line:'
+	  WRITE(6,'(A)')' Use cursor to define left and right side of line and continuum option:'
 	  WRITE(6,'(A)')'   Y - uses Y cursor value for continuum location'
-	  WRITE(6,'(A)')'   S - reset and start line selection again'
 	  WRITE(6,'(A)')'   A - Y value is average over data at X location'
+	  WRITE(6,'(A)')'   S - reset and start line selection again'
 	  WRITE(6,'(A)')'   Q - quit line selection'
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')'Plot movement'
 	  WRITE(6,'(A)')'   N(ext)      -- shift window to left by X increment'
 	  WRITE(6,'(A)')'   P(revious)  -- shift window to right by X increment'
-	  WRITE(6,'(A)')'   X(extend)   -- expand window by increment but no shift'
-	  WRITE(6,'(A)')'   C(ontract)  -- contract window by increment but no shift'
+	  WRITE(6,'(A)')'   X(extend)   -- expand plotted region by y increment but no shift'
+	  WRITE(6,'(A)')'   C(ontract)  -- contract plotted region by by increment but no shift'
+	  WRITE(6,'(A)')'   U(pper)     -- expand (shrink) top of window by increment but no shift'
+	  WRITE(6,'(A)')'   L(lower))   -- expand (shrink) bottom of window by y increment but no shift'
+	  WRITE(6,'(A)')'   T(oggle))   -- Toggle direction of U and L directions'
 	  WRITE(6,'(A)')DEF_PEN
 !
 	  RETURN

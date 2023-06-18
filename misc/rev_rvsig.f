@@ -24,6 +24,7 @@ CONTAINS
 	USE VEL_LAW_PARAMS
 	IMPLICIT NONE
 !
+! Altered 08-Jan-2023: Option 6 no longer askes for VINF and BETA.
 ! Altered 06-Jul-2021: Added SSCLR option (transferred from OSIRIS: 21-Jul-2021).
 ! Altered 07-Dec-2020: Updated SCLR from IBIS version -- to used old V(r) law'
 ! Altered 08-May-2020: Can use log axis for R or V with CUR option.
@@ -821,10 +822,12 @@ CONTAINS
 !
 	  VEL_TYPE=1
 	  CALL GEN_IN(VEL_TYPE,'Velocity law to be used: 1 or 2')
-	  VINF=1000.0D0
-	  CALL GEN_IN(VINF,'Velocity at infinity in km/s')
-	  BETA=1.0D0
-	  CALL GEN_IN(BETA,'Beta for velocity law')
+	  IF(VEL_TYPE .NE. 6)THEN
+	    VINF=1000.0D0
+	    CALL GEN_IN(VINF,'Velocity at infinity in km/s')
+	    BETA=1.0D0
+	    CALL GEN_IN(BETA,'Beta for velocity law')
+	  END IF
 !
 ! Find conection velocity and index.
 !
@@ -896,10 +899,9 @@ CONTAINS
 	  WRITE(6,*)' since as you decrease Mdot, the extent of the photosphere increase'
 !
 	  CALL DESCRIBE_VEL_LAWS()
-	  WRITE(6,*)'Type 6 retains the old velocity law beyond the transition velocity'
 !
 	  VEL_TYPE=2
-	  CALL GEN_IN(VEL_TYPE,'Velocity law to be used: 1, 2, 3, 4 or 5')
+	  CALL GEN_IN(VEL_TYPE,'Velocity law to be used: 1, 2, 3, 4, 5, or 6')
 	  IF(VEL_TYPE .NE. 6)THEN
 	    CALL GEN_IN(VINF,'Velocity at infinity in km/s')
 	    CALL GEN_IN(BETA,'Beta for velocity law')
@@ -1320,6 +1322,8 @@ CONTAINS
 	WRITE(6,'(A)')'            W(r) = 2*VTRANS + (VINF-2*VTRANS)*(1-rt/r)**BETA'
 	WRITE(6,'(A)')'            E(r)= VEXT*(1-RP2/r)**BETA2 '
 	WRITE(6,'(A)')'        and V(r) = 1.0D0+2*exp( (rt-r)/h )'
+	WRITE(6,'(A)')RED_PEN
+	WRITE(6,'(A)')'Type 6: Attach existing existing velocity law at connection depth'
 	WRITE(6,'(A)')DEF_PEN
 !
 	RETURN

@@ -52,7 +52,7 @@
 	REAL*8 :: FOURPI
 	REAL*8 :: SN_AGE_DAYS
 !
-	WRITE(6,*)'Using GAMRAY_ENERGY_DEPOSIT_V6'
+	WRITE(6,*)'Using gamray_energy_deposit_v7.f90'
 	PI=ACOS(-1.0D0)
 	FOURPI=4.0D0*PI
 	TEMP_INT1=0.0D0

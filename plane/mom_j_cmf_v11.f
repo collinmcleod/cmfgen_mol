@@ -122,6 +122,7 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered: 04-Apr-2023 : Fixed access error when MOM_ERR_CNT=0
 ! Altered: 11-Jun-2019 : Added PNT srce treatment.
 ! Altered: 17-Oct-2016 : Changed to V11: H_CHK_OPTION inserted into call.
 !                          Replaces H_ON_J_CHECK option.
@@ -720,7 +721,10 @@
 	    END IF
 	    XM(I)=ABS(XM(I))/10.0D0
 	    IF(.NOT. RECORDED_ERROR)THEN
-	      IF(MOM_ERR_CNT .GT. N_ERR_MAX)THEN
+	      IF(MOM_ERR_CNT .EQ. 0)THEN
+	        MOM_ERR_CNT=MOM_ERR_CNT+1
+	        MOM_ERR_ON_FREQ(MOM_ERR_CNT)=FREQ
+	      ELSE IF(MOM_ERR_CNT .GT. N_ERR_MAX)THEN
 	        MOM_ERR_CNT=MOM_ERR_CNT+1
 	      ELSE IF(MOM_ERR_ON_FREQ(MOM_ERR_CNT) .NE. FREQ)THEN
 	        MOM_ERR_CNT=MOM_ERR_CNT+1

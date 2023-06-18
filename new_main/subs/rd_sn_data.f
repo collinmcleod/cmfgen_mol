@@ -9,10 +9,13 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered: 17-Apr-2023 : MASS frcation now outout to MASS_FRACTION_SUMMARY_CHK rather than OUTGEN.
+! Altered: 24-Mar-2023 : LIN_INTERP_RD_SN_DTA now passed via the control module.
+!                           Replaces USE_LIN_INTERP that was added 18-Nov-2022.
 ! Altered: 14-Aug-2022 : Call to GET_EDEP_SHOCK_POWER added
 ! Altered: 03-Aug-2019 : Changed to using MON_INTERP when possible (OSIRIS - 20-Jun-2019)
 ! Altered: 29-Oct-2018 : Fixing bugs and refining handling of clumping.
-! Altered: 31-Aug-2016 : Better error reporting -- we check taht all chain isotopes are present.
+! Altered: 31-Aug-2016 : Better error reporting -- we check that all chain isotopes are present.
 ! Altered: 15-May-2016 : Fixed minor bug when checking size of isotope abundance changes.
 ! Altered: 01-Mar-2016 : Changed to allow handling of a standard NUC_DECAY_DATA file.
 !                         Code checks availability of decay route. This is important
@@ -75,6 +78,7 @@
 	INTEGER I,L,K,CNT
 	INTEGER IS,IP,ID,IN
 	INTEGER LUER,ERROR_LU
+	INTEGER LU_MF
 	EXTERNAL ERROR_LU
 	CHARACTER(LEN=200) STRING
 	LOGICAL, SAVE :: FIRST=.TRUE.
@@ -274,14 +278,16 @@
 	  CALL MON_INTERP(CLUMP_FAC,ND,IONE,LOG_R,ND,CLUMP_FAC_HYDRO,NX,LOG_R_HYDRO,NX)
 	END IF
 !
-! Changed to LIN_INTERP as some models have humongous grid changes across
-! grid points which can cause -ve values due to round-off errors.
+! Changed to have LIN_INTERP option as some models have humongous grid changes across
+! grid points which can cause issues due to round-off errors.
 ! 
+	LIN_INTERP_RD_SN_DATA=.TRUE.
 	POP_SPECIES=0.0D0
+	T1=0.0D0
 	DO L=1,NSP
 	  DO K=1,NUM_SPECIES
 	    IF(SPEC_HYDRO(L) .EQ. SPECIES(K))THEN
-	      IF(MINVAL(POP_HYDRO(1:NX,L)) .GT. 0.0D0)THEN
+	      IF(MINVAL(POP_HYDRO(1:NX,L)) .GT. 0.0D0 .AND. .NOT. LIN_INTERP_RD_SN_DATA)THEN
 	        WRK_HYDRO=LOG(POP_HYDRO(1:NX,L)) 
 	        CALL MON_INTERP(POP_SPECIES(1,K),ND,IONE,LOG_R,ND,WRK_HYDRO,NX,LOG_R_HYDRO,NX)
 	        POP_SPECIES(1:ND,K)=EXP(POP_SPECIES(1:ND,K))
@@ -293,13 +299,27 @@
 	END DO
 	WRITE(LUER,*)'   Read SN populations in RD_SN_DATA'
 !
+	CALL GET_LU(LU_MF,'In RD_SN_DATA')
+	WRITE(LU,'(/,1X,A,/)')'Original and Cummulative sums of mass fractions'
+	OPEN(UNIT=LU_MF,STATUS='UNKNOWN',ACTION='WRITE',FILE='MASS_FRACTION_SUM_CHK')
+!
+	WRK_HYDRO=0.0D0
+	DO K=1,NUM_SPECIES
+	   WRK_HYDRO=WRK_HYDRO+POP_HYDRO(:,K)
+	END DO
+	I=5; CALL WRITV_V2(WRK_HYDRO,NX,I,'Sum HYDRO mass frac',LU_MF)
+	WRITE(LUER,*)' '
+	WRITE(LUER,*)'   Normalized HYDRO mass fractions in RD_SN_DATA'
+	WRITE(LUER,*)'   Maximum normalization factor was',MAXVAL(WRK_HYDRO)
+	WRITE(LUER,*)'   Minimum normalization factor was',MINVAL(WRK_HYDRO)
+!
 	ISO(:)%READ_ISO_POPS=.FALSE.
 	DO L=1,NISO
 	  DONE=.FALSE.
 	  DO K=1,NUM_ISOTOPES
 	    IF(ISO_SPEC_HYDRO(L) .EQ. ISO(K)%SPECIES .AND. 
 	1               BARY_HYDRO(L) .EQ. ISO(K)%BARYON_NUMBER)THEN
-	       IF(MINVAL(ISO_HYDRO(1:NX,L)) .GT. 0.0D0)THEN
+	       IF(MINVAL(ISO_HYDRO(1:NX,L)) .GT. 0.0D0 .AND. .NOT.  LIN_INTERP_RD_SN_DATA)THEN
 	         WRK_HYDRO=LOG(ISO_HYDRO(1:NX,L)) 
 	         CALL MON_INTERP(ISO(K)%OLD_POP,ND,IONE,LOG_R,ND,WRK_HYDRO,NX,LOG_R_HYDRO,NX)
 	         ISO(K)%OLD_POP=EXP(ISO(K)%OLD_POP)
@@ -317,7 +337,7 @@
 	    STOP
 	  END IF
 	END DO
-	WRITE(LUER,*)'   Read SN isotope populations in RD_SN_DATA'
+	WRITE(LUER,'(/,1X,A)')'   Read SN isotope populations in RD_SN_DATA'
 !
 	DO IS=1,NUM_ISOTOPES
 	  IF(ISO(IS)%READ_ISO_POPS)THEN
@@ -339,13 +359,22 @@
 	  ELSE
 	    POP_SPECIES(:,L)=0.0D0
 	  END IF
+	  WRITE(STRING,'(I3)')L
+	  STRING=TRIM(STRING)//'  Mass fraction sum'
+	  I=5;CALL WRITV_V2(WRK,ND,I,TRIM(STRING),LU_MF)
 	END DO
 	DO L=1,NUM_SPECIES
 	  POP_SPECIES(:,L)=POP_SPECIES(:,L)/WRK(:)
 	END DO
+!
+	I=6;CALL WRITV_V2(WRK,ND,I,'Mass fraction sum',LU_MF)
+	CLOSE(LU_MF)
+!
+	WRITE(LUER,*)' '
 	WRITE(LUER,*)'   Normalized mass fractions in RD_SN_DATA'
 	WRITE(LUER,*)'   Maximum normalization factor was',MAXVAL(WRK)
 	WRITE(LUER,*)'   Minimum normalization factor was',MINVAL(WRK)
+	WRITE(LUER,*)'   See MASS_FRACTION_SUMMARY_CHK for more details'
 !
 ! Compute the mass of each species present in the ejecta.
 !
@@ -416,7 +445,10 @@
 	           WRITE(LUER,*)'Error in RD_SN_DATA: inconsistent total/isotope populations'
 	           WRITE(LUER,*)'Species:',SPECIES(PAR(IP)%ISPEC)
 	           WRITE(LUER,*)'Depth=',I,'  Fractional difference=',T2
+	           L=PAR(IP)%ISPEC
+	           T1=DENSITY(I)/AT_MASS(L)/1.66D-24
 	           WRITE(LUER,*)WRK(I),POP_SPECIES(I,PAR(IP)%ISPEC)
+	           WRITE(LUER,*)WRK(I)/T1,POP_SPECIES(I,PAR(IP)%ISPEC)/T1
 	           STOP
 	         END IF
 	      END DO 
@@ -531,6 +563,8 @@
 	            WRITE(LUER,*)'Do diff SN_HYDRO_DATA SN_HYDRO_FOR_NEXT_MODEL to see changes.'
 	            WRITE(LUER,*)'This may affect the heating, partyicularly when using energy'//
 	1                        ' deposition averaged over time.'
+	            WRITE(LUER,*)'It may be unimportat if the species is an impurity ion, such as'
+	            WRITE(LUER,*)'  56Ni at > 100 days and you are using a time step > than the half life of 56Ni.'
 	            WRITE(LUER,'(3X,A,T12,I3)')TRIM(ISO(IS)%SPECIES),ISO(IS)%BARYON_NUMBER
 	          ELSE
 	            WRITE(LUER,'(3X,A,T12,I3)')TRIM(ISO(IS)%SPECIES),ISO(IS)%BARYON_NUMBER

@@ -8,6 +8,10 @@
 	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
+! Altered:  22-Mar-2022 : List of changes compareed with earlier GITHUB version.
+!                           SP -- step plot option installed.
+!                           Better handling of line IDs
+!                           Option installed to do Gauss smoothing.
 ! Altered:  09-Aug-2022 : Improvements to GF option 
 !                           (options to draw GF not yet working).
 !                           Most old options now part of CGF.
@@ -124,6 +128,7 @@
 	CHARACTER(LEN=3)   ADVANCE_OPT
 	CHARACTER(LEN=10)  LAM_OPTION
 	CHARACTER(LEN=80)  PLT_ID,RD_PLT_ID,PLT_ID_SAV
+	CHARACTER(LEN=3)   XUNIT
 !
 	CHARACTER(LEN=80), SAVE :: ID_FILNAME=' '
         CHARACTER(LEN=80), SAVE :: EW_FILNAME=' '
@@ -152,7 +157,7 @@
 	REAL*4 STR_EXP(MAXSTR),LOC_PG(MAXSTR)
 	REAL*4 XSTRPOS(MAXSTR),YSTRPOS(MAXSTR)
 	CHARACTER*80 STRING(MAXSTR)
-	CHARACTER(LEN=200) OUTPUT_STRING
+	CHARACTER(LEN=500) OUTPUT_STRING
 	INTEGER ISTR
 	INTEGER LOC(MAXSTR)
 	INTEGER STR_COL(MAXVEC)
@@ -204,6 +209,7 @@
 	REAL*8 DP_CUT_ACC
 	REAL*8 SIG_GAU_KMS
 	REAL*8 FRAC_SIG_GAU
+	INTEGER NPTS_PER_SIGMA
 	REAL*8, ALLOCATABLE :: WRK1(:)
 	REAL*8, ALLOCATABLE :: WRK2(:)
 !
@@ -341,11 +347,14 @@
 	FILL=.FALSE.
 	SIG_GAU_KMS=10.0D0
 	FRAC_SIG_GAU=0.25D0
+	NPTS_PER_SIGMA=4
 	DP_CUT_ACC=0.01D0
 	DONE_NORMALIZATION=.FALSE.
 	XLAB_FILE=' '; YLAB_FILE=' '
 	LINE_CUT_PARAM=0.03
 	USE_DEF_OFFSET=.TRUE.
+	XUNIT='Ang'
+	NO_DEC_DIGITS=1
 !
 	IF(NPLTS .GT. MAXPEN)THEN
 	  WRITE(T_OUT,*)'Error n GRAMON_PLOT -- not enough pen loctions'
@@ -1568,13 +1577,22 @@ C
 !
 	ELSE IF(ANS .EQ. 'RID')THEN
 	  N_LINE_IDS=0
+	  WRITE(6,'(A)')' '
 	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs -case sensitive')
 	  CALL NEW_GEN_IN(TAU_CUT,'Omit lines with central optical depth <')
 	  CALL NEW_GEN_IN(LINE_CUT_PARAM,'Omit lines whose central intensity differ by less than this amount')
 	  CALL NEW_GEN_IN(AIR_WAVELENGTHS,'Air wavelengths?')
 	  CALL NEW_GEN_IN(KEEP_YAXIS_LIMITS,'Keep same Y axis limits?')
 	  CALL NEW_GEN_IN(ID_EXPCHAR,'Factor to scale size of ID')
-	  CALL RD_LINE_IDS(ID_FILNAME,AIR_WAVELENGTHS,XPAR)
+	  CALL NEW_GEN_IN(XUNIT,'Ang, um, or nm?')
+	  CALL NEW_GEN_IN(NO_DEC_DIGITS,' 0 to 9')
+	  WRITE(6,'(A)')' '
+!
+	  XT=XPAR
+	  IF(XUNIT .EQ. 'nm')XT=10.0D0*XPAR    			!Convert range to Ang
+	  IF(XUNIT .EQ. 'um')XT=1.0D+04*XPAR
+	  CALL RD_LINE_IDS(ID_FILNAME,AIR_WAVELENGTHS,XT)
+	  CALL ADJUST_ID_WAVES(XUNIT)
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'SID')THEN
@@ -1608,6 +1626,8 @@ C
 	  J=0
 	  CALL NEW_GEN_IN(EW_LINE_ID,'File with line EWs')
 	  CALL NEW_GEN_IN(EW_CUT,'Omit lines with ABS|EW| < ?')
+	  CALL NEW_GEN_IN(XUNIT,'Ang, um, or nm?')
+	  CALL NEW_GEN_IN(NO_DEC_DIGITS,' 0 to 9')
 !
 !	  WRITE(6,*)BLUE_PEN
 !	  WRITE(6,*)'Can label individual lines, of use vertical bars to indicate contributing species'
@@ -1615,8 +1635,11 @@ C
 !	  WRITE(6,*)DEF_PEN
 !
 !	  CALL NEW_GEN_IN(AIR_WAVELENGTHS,'Air wavelengths?')
-	  I=33
-	  CALL RD_EW_IDS(XPAR,EW_LINE_ID,I,T_OUT)	
+	  I=33; XT=XPAR
+	  IF(XUNIT .EQ. 'nm')XT=10.0D0*XPAR  		!Convert range to Ang.
+	  IF(XUNIT .EQ. 'um')XT=1.0D+04*XPAR
+	  CALL RD_EW_IDS(XT,EW_LINE_ID,I,T_OUT)
+	  CALL ADJUST_ID_WAVES(XUNIT)
 !
 ! 
 	ELSE IF (ANS .EQ. 'REP')THEN
@@ -1720,8 +1743,8 @@ C
 !
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')' Define continuum using X & Y cursor locations'
-	  WRITE(6,'(A)')' Striaght line firt across cursor band'
-	  WRITE(6,'(A)')' ROutine can be called multiple times'
+	  WRITE(6,'(A)')' Striaght line fit across cursor band'
+	  WRITE(6,'(A)')' Routine can be called multiple times'
 	  WRITE(6,'(A)')' Use E to exit cursor selection.'
 	  WRITE(6,'(A)')' '
 	  IF(NPLTS .EQ. 1)THEN
@@ -1820,6 +1843,18 @@ C
 !	  CALL DRAW_GAUS(L_FALSE)
 	  GOTO 1000
 !
+	ELSE IF(ANS .EQ. 'SP')THEN
+	  CALL STEP_PLOT_V1(
+	1             XPAR,XINC,XNUMST,IXTICK,IDX,
+	1             YPAR,YINC,YNUMST,IYTICK,IDY,
+	1             TICK_FAC,EXPCHAR,
+	1             XLABEL,YLABEL,TITONRHS,
+	1             LOG_AXIS,OPTION,NORMAL_R_Y_AXIS,
+	1             XLAB_FILE,YLAB_FILE,
+	1             LINE_STYLE,LINE_WGT,
+	1             PEN_COL,PEN_OFFSET,
+	1             REVERSE_PLOTTING_ORDER)
+!
 	ELSE IF(ANS .EQ. 'CEW')THEN
 	  CALL DO_CURSOR_EW_V3(
 	1             XPAR,XINC,XNUMST,IXTICK,IDX,
@@ -1830,6 +1865,19 @@ C
 	1             XLAB_FILE,YLAB_FILE,
 	1             PEN_COL,PEN_OFFSET,
 	1             REVERSE_PLOTTING_ORDER)
+!
+	ELSE IF(ANS .EQ. 'BAL')THEN
+	  I=NPLTS
+	  CALL DO_CURSOR_BALMER(
+	1             XPAR,XINC,XNUMST,IXTICK,IDX,
+	1             YPAR,YINC,YNUMST,IYTICK,IDY,
+	1             TICK_FAC,EXPCHAR,
+	1             XLABEL,YLABEL,TITONRHS,
+	1             LOG_AXIS,OPTION,NORMAL_R_Y_AXIS,
+	1             XLAB_FILE,YLAB_FILE,
+	1             PEN_COL,PEN_OFFSET,
+	1             REVERSE_PLOTTING_ORDER)
+	  IF(NPLTS .GT. I)TYPE_CURVE(NPLTS)='L'
 !
 	ELSE IF(ANS .EQ. 'FEW')THEN
 	  CALL DO_FILE_EW_V1(' ')
@@ -2342,8 +2390,15 @@ C
 	      END DO
 	    END DO
 	  ELSE
+	    DO I=1,NP_OUT
+	      IP=IPLT(I)
+	      ADVANCE_OPT='NO'
+	      IF(I .EQ. NP_OUT)ADVANCE_OPT='YES'
+	      WRITE(30,'(15X,A15)',ADVANCE=ADVANCE_OPT)TRIM(CD(IP)%CURVE_ID)
+	    END DO
+!
 	    OUTPUT_STRING=' '
-	    IPST=0
+	    IPST=0; NX_MAX=0
 	    DO I=1,NP_OUT
 	      CNT=0
 	      IP=IPLT(I)
@@ -2353,10 +2408,12 @@ C
 	          IF(IPST(I) .EQ. 0)IPST(I)=J
 	        END IF
 	      END DO
+	      NX_MAX=MAX(NX_MAX,CNT)
+	      ADVANCE_OPT='NO'
+	      IF(I .EQ. NP_OUT)ADVANCE_OPT='YES'
 	      K=LEN_TRIM(OUTPUT_STRING)
-	      WRITE(OUTPUT_STRING(K+1:),'(2X,I10)')CNT
+	      WRITE(30,'(20X,I10)',ADVANCE=ADVANCE_OPT)CNT
 	    END DO
-	    WRITE(30,'(A)')TRIM(OUTPUT_STRING)
 !
 	    DO L=1,NX_MAX 
 	      OUTPUT_STRING=' ';  CNT=0
@@ -2364,14 +2421,17 @@ C
 	        J=IPST(I)+L-1
 	        IP=IPLT(I)
 	        K=LEN_TRIM(OUTPUT_STRING)
-	        IF(J .LE. NPTS(IP) .AND. (LAM_ST-CD(IP)%XVEC(J))*(CD(IP)%XVEC(J)-LAM_END) .GE. 0)THEN
-	          WRITE(OUTPUT_STRING(K+1:),'(2X,ES14.7,ES14.6)')CD(IP)%XVEC(J),CD(IP)%DATA(J)
-	          CNT=CNT+1
+	        ADVANCE_OPT='NO'
+	        IF(I .EQ. NP_OUT)ADVANCE_OPT='YES'
+	        IF(J .LE. NPTS(IP))THEN
+	          IF( (LAM_ST-CD(IP)%XVEC(J))*(CD(IP)%XVEC(J)-LAM_END) .GE. 0)THEN
+	            WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE=ADVANCE_OPT)CD(IP)%XVEC(J),CD(IP)%DATA(J)
+	            CNT=CNT+1
+	          END IF
 	        ELSE IF(NPLTS .NE. 1)THEN
-	          WRITE(OUTPUT_STRING(K+1:),'(2X,ES14.7,ES14.6)')0.0D0,0.0D0
+	          WRITE(30,'(2X,ES14.7,ES14.6)',ADVANCE=ADVANCE_OPT)0.0D0,0.0D0
 	        END IF
 	      END DO
-	      IF(CNT .NE. 0)WRITE(30,'(A)')TRIM(OUTPUT_STRING)
 	    END DO
 	  END IF
 	  WRITE(T_OUT,*)NP_OUT,' plots written to ',TRIM(FILNAME)
@@ -2523,6 +2583,12 @@ C
 	        XLABEL=XLABEL(4:)
 	        XLABEL=ADJUSTL(XLABEL)
 	      END IF
+	    ELSE IF(XAR_OPERATION .EQ. 'SSQR')THEN
+	      DO I=1,NPTS(IP)
+	        T1=SQRT(ABS(CD(IP)%XVEC(I)))
+	        CD(IP)%XVEC(I)=SIGN(T1,CD(IP)%XVEC(I))
+	      END DO
+	      XLABEL=TRIM(XLABEL)//'/SQRT(|'//TRIM(XLABEL)//'|)'
 	    ELSE IF(XAR_OPERATION .EQ. 'LG')THEN
 	      T1=TINY(CD(IP)%XVEC(1))
 	      DO J=1,NPTS(IP)
@@ -2745,6 +2811,10 @@ C
 	  CALL NEW_GEN_IN(VAR_PLT3,'Output plot?')
 	  T1=1000.0; CALL NEW_GEN_IN(T1,'Counts in continnum')
 	  T2=0.2;    CALL NEW_GEN_IN(T2,'Random number 0 to 1)')
+	  IF(VAR_PLT3 .NE. VAR_PLT1)THEN
+	    TYPE_CURVE(VAR_PLT3)='L'
+	    CD(VAR_PLT3)%CURVE_ID=CD(VAR_PLT1)%CURVE_ID
+	  END IF
 	  CALL PG_ADD_NOISE(VAR_PLT1,VAR_PLT3,XMIN,XMAX,T1,T2)
 !	  
 	ELSE IF (ANS .EQ. 'VAR')THEN
@@ -2820,37 +2890,23 @@ C
 	  CALL SMOOTH_PLT(SMOOTH_PLOT,BOX_FILTER,I)
 !
         ELSE IF (ANS .EQ. 'GSM')THEN
+!
+	  WRITE(6,*)RED_PEN
+	  WRITE(6,*)' In general the X and Y and axes should be in linear space'
+	  WRITE(6,*)' When RESOLUTION is set, constant velocity res. at all X vlaues.'
+	  WRITE(6,*)' Otherwise a fixed dX will be used'
+	  WRITE(6,*)DEF_PEN
+!
 	  IP=1; CALL NEW_GEN_IN(IP,'Plot to smooth')
 	  OP=NPLTS+1; CALL NEW_GEN_IN(OP,'Output plot')
-	  CALL NEW_GEN_IN(SIG_GAU_KMS,'Sigma of Gaussian in km/s')
-	  CALL NEW_GEN_IN(FRAC_SIG_GAU,'Number of points per Gaussian')
-	  CALL NEW_GEN_IN(DP_CUT_ACC,'Fractional accuracy to cut points')
-!
-! Estimate size of vectors so smoothing can occur.
-!
-	  J=ABS(LOG10(CD(IP)%DATA(1)/CD(IP)%DATA(NPTS(IP)))/LOG(1.0D0+SIG_GAU_KMS*FRAC_SIG_GAU/3.0D+05))
-	  J=2*MAX(NPTS(IP),J)
-	  WRITE(6,*)NPTS(IP),J
-	  IF(ALLOCATED(WRK1))DEALLOCATE(WRK1)
-	  IF(ALLOCATED(WRK2))DEALLOCATE(WRK2)
-	  ALLOCATE(WRK1(J),WRK2(J))
-	  WRK1(1:NPTS(IP))=CD(IP)%XVEC
-	  WRK2(1:NPTS(IP))=CD(IP)%DATA
-	  K=NPTS(IP)
-	  WRITE(6,*)'Calling smoothing function'
-	  CALL SM_PHOT_V3(WRK1,WRK2,K,J,SIG_GAU_KMS,FRAC_SIG_GAU,DP_CUT_ACC,L_TRUE)
-	  WRITE(6,*)'Number of data points in unsmoothed data set is',NPTS(IP)
-	  WRITE(6,*)'Number of data points in   smoothed data set is',K
-	  IF(ALLOCATED(CD(OP)%XVEC))THEN
-	    DEALLOCATE(CD(OP)%XVEC,CD(OP)%DATA)
-	  END IF
-	  ALLOCATE(CD(OP)%XVEC(K),CD(OP)%DATA(K))
-	  CD(OP)%XVEC=WRK1(1:K)
-	  CD(OP)%DATA=WRK2(1:K)
-	  NPTS(OP)=K
-	  IF(OP .GT. NPLTS)NPLTS=OP
+	  LAM_ST=MIN(XPAR(1),XPAR(2)); LAM_END=MAX(XPAR(1),XPAR(2)) !Passed as R*8
+	  CALL DO_GAUSS_SMOOTH(LAM_ST,LAM_END,IP,OP,T_OUT)
 	  ERR(OP)=.FALSE.
-	  TYPE_CURVE(OP)=TYPE_CURVE(IP)
+	  IF(OP .NE. IP .AND .IOS .EQ. 0)THEN
+	    TYPE_CURVE(OP)=TYPE_CURVE(IP)
+            TYPE_CURVE(OP)='L'
+            LINE_WGT(OP)=1
+	  END IF
 !
 	ELSE IF (ANS .EQ. 'FILL')THEN
 	  CALL NEW_GEN_IN(FILL,'Fill enclosed areas?')

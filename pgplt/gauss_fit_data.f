@@ -1,6 +1,7 @@
 	MODULE GAUSS_FIT_DATA
 !
-! Altered 09-Aug-2022 : To get consistency inthe different routines changed to use Gauss.
+! Altered 06-Mar-2023 : YCONT_FIT added
+! Altered 09-Aug-2022 : To get consistency in the different routines changed to use Gauss.
 !
 	INTEGER NUM_GAUSS			!Number of Gaussians
 	INTEGER NG_PAR				!Total number of parameters in fit
@@ -25,7 +26,9 @@
 !
 	REAL*4, ALLOCATABLE :: XFIT(:)		!Same as X_GAUSS but for PGPLOT routines
 	REAL*4, ALLOCATABLE :: YFIT(:)		!Function fit (evaluated by GAUSS_FIT_FUNC)
+	REAL*4, ALLOCATABLE :: YCONT_FIT(:)	!Function fit (evaluated by GAUSS_FIT_FUNC)
 	REAL*4, ALLOCATABLE :: FIT_DIF(:)	!Function fit (evaluated by GAUSS_FIT_FUNC)
+	SAVE
 !
 	END MODULE GAUSS_FIT_DATA
 !
@@ -95,9 +98,11 @@
 	IF(ALLOCATED(Y_GAUSS))DEALLOCATE(Y_GAUSS)
 	IF(ALLOCATED(XFIT))DEALLOCATE(XFIT)
 	IF(ALLOCATED(YFIT))DEALLOCATE(YFIT)
+	IF(ALLOCATED(YCONT_FIT))DEALLOCATE(YCONT_FIT)
 	IF(ALLOCATED(FIT_DIF))DEALLOCATE(FIT_DIF)
 	ALLOCATE (X_GAUSS(NG_DATA),Y_GAUSS(NG_DATA))
-	ALLOCATE (XFIT(NG_DATA),YFIT(NG_DATA),FIT_DIF(NG_DATA))
+	ALLOCATE (XFIT(NG_DATA),YFIT(NG_DATA))
+	ALLOCATE (YCONT_FIT(NG_DATA),FIT_DIF(NG_DATA))
 	DO I=IXST,IXEND
 	  X_GAUSS(I-IXST+1)=XVEC(I)
 	  Y_GAUSS(I-IXST+1)=YVEC(I)

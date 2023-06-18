@@ -10,7 +10,9 @@
 	REAL*8, ALLOCATABLE :: RJ_ES(:)   	!ND - Convolution of RJ with e.s. R(v'v')
 !
 	REAL*8, ALLOCATABLE :: J_INT(:)   	!ND - Frequency integrated J
+	REAL*8, ALLOCATABLE :: H_INT(:)   	!ND - Frequency integrated K
 	REAL*8, ALLOCATABLE :: K_INT(:)   	!ND - Frequency integrated K
+	REAL*8, ALLOCATABLE :: H_MOM(:)   	!ND - Frequency dependent H moment
 	REAL*8, ALLOCATABLE :: K_MOM(:)   	!ND - Frequency dependent K moment
 !
 ! Arrays for calculating mean opacities.
@@ -132,7 +134,9 @@
 	IF(IOS .EQ. 0)ALLOCATE ( RJ(ND),STAT=IOS )		!Mean intensity
 	IF(IOS .EQ. 0)ALLOCATE ( RJ_ES(ND),STAT=IOS )		!Convolution of RJ with e.s. R(v'v')
 	IF(IOS .EQ. 0)ALLOCATE ( J_INT(ND),STAT=IOS )		!Frequency integrated J
+	IF(IOS .EQ. 0)ALLOCATE ( H_INT(ND),STAT=IOS )		!Frequency integrated H
 	IF(IOS .EQ. 0)ALLOCATE ( K_INT(ND),STAT=IOS )		!Frequency integrated K
+	IF(IOS .EQ. 0)ALLOCATE ( H_MOM(ND),STAT=IOS )		!Frequency dependent H moment
 	IF(IOS .EQ. 0)ALLOCATE ( K_MOM(ND),STAT=IOS )		!Frequency dependent K moment
 !
 ! Arrays for calculating mean opacities.

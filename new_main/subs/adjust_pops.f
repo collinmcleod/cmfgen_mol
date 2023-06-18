@@ -5,6 +5,8 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered 27-MAr-2023: Added VERBOSE_OUTPUT to most of the output options.
+!                        File 175 now has name (HYDRO_GRID_SUMMARIES).
 ! Altered 04-Jan-2020: Changed LTEPOP_WLD and CNVT_FR_DC to V2.
 ! Altered 20-Jun-2008: Z_POP now set (was not set)a
 !                      Improved handling at boundaries.
@@ -13,6 +15,7 @@
 	INTEGER ND
 	INTEGER NT
 	INTEGER LUER				!Unit for error messages
+	INTEGER LU_GRID
 !
 	REAL*8 LOG_OLD_TAU(OLD_ND)
 	REAL*8 TB(OLD_ND)
@@ -40,9 +43,12 @@
 	DO I=2,OLD_ND
 	  OLD_TAU(I)=OLD_TAU(I-1)+0.5D0*(OLD_R(I-1)-OLD_R(I))*(TB(I-1)+TB(I))
 	END DO
-	WRITE(72,*)ND
-	WRITE(72,*)OLD_TAU
-	FLUSH(UNIT=72)
+!
+	IF(VERBOSE_OUTPUT)THEN
+	  WRITE(72,*)ND
+	  WRITE(72,*)OLD_TAU
+	  FLUSH(UNIT=72)
+	END IF
 !
 	TA(1:ND)=ROSS_MEAN(1:ND)			!*CLUMP_FAC(1:ND)
 	T1=LOG(TA(5)/TA(1))/LOG(R(1)/R(5))
@@ -58,11 +64,14 @@
 	DO I=2,ND
 	  TAU(I)=TAU(I-1)+0.5D0*(R(I-1)-R(I))*(TA(I-1)+TA(I))
 	END DO
-	WRITE(72,*)ND
-	WRITE(72,*)'R',R
-	WRITE(72,*)'ROSS_MEAN',ROSS_MEAN
-	WRITE(72,*)'TAU',TAU
-	FLUSH(UNIT=72)
+!
+	IF(VERBOSE_OUTPUT)THEN
+	  WRITE(72,*)ND
+	  WRITE(72,*)'R',R
+	  WRITE(72,*)'ROSS_MEAN',ROSS_MEAN
+	  WRITE(72,*)'TAU',TAU
+	  FLUSH(UNIT=72)
+	END IF
 !
 ! Find indices for new tau grid contained in old tau grid.
 !
@@ -85,34 +94,45 @@
 	DO I=NX+1,ND
 	  T(I)=OLD_T(OLD_ND)*(TAU(I)+0.67D0)/(OLD_TAU(OLD_ND)+0.67D0)
 	END DO
-	WRITE(72,*)ND
-	WRITE(72,*)T
-	WRITE(72,*)CLUMP_FAC
-	FLUSH(UNIT=72)
+!
+	IF(VERBOSE_OUTPUT)THEN
+	  WRITE(72,*)ND
+	  WRITE(72,*)T
+	  WRITE(72,*)CLUMP_FAC
+	  FLUSH(UNIT=72)
+	END IF
 !
 	ED=ED/CLUMP_FAC
 !
-	WRITE(175,'(4X,10(5X,A))')
+	IF(VERBOSE_OUTPUT)THEN
+	  CALL GET_LU(LU_GRID,'Grid summaries in ADJUST_POPS')
+	  OPEN(UNIT=LU_GRID,FILE='HYDRO_GRID_SUMMARIES',STATUS='UNKNOWN',ACTION='WRITE',POSITION='APPEND')
+	    WRITE(LU_GRID,'(4X,10(5X,A))')
 	1       '     OLD_R','   OLD_T','  OLD_ED',' OLD_TAU','OLD_ROSS',
 	1       '     NEW_R','   NEW_T','  NEW_ED',' NEW_TAU','NEW_ROSS'
-	DO I=1,ND
-	  WRITE(175,'(I4,2(ES15.6,4ES13.3))')I,
+	    DO I=1,ND
+	      WRITE(LU_GRID,'(I4,2(ES15.6,4ES13.3))')I,
 	1                OLD_R(I),OLD_T(I),OLD_ED(I),OLD_TAU(I),OLD_ROSS_MEAN(I),
 	1                R(I),T(I),ED(I),TAU(I),ROSS_MEAN(I)/CLUMP_FAC(I)
-	END DO
+	    END DO
+	    FLUSH(UNIT=LU_GRID)
+	  CLOSE(LU_GRID)
+	END IF
 !
 ! Loop over all species and ionization stages
 !
 	DO ISPEC=1,NUM_SPECIES
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
-	    WRITE(6,*)'In loop',ISPEC,ID
+	    IF(VERBOSE_OUTPUT)WRITE(6,*)'In loop',ISPEC,ID
 !
 ! Compute departure coefficients
 !
 	    ATM(ID)%XzV_F=LOG(ATM(ID)%XzV_F)-ATM(ID)%LOG_XzVLTE_F
-	    WRITE(101,'(A,3X,3ES14.4)')TRIM(ION_ID(ID)),ATM(ID)%XzV_F(1,1),
+	    IF(VERBOSE_OUTPUT)THEN
+	      WRITE(101,'(A,3X,3ES14.4)')TRIM(ION_ID(ID)),ATM(ID)%XzV_F(1,1),
 	1                  ATM(ID)%XzVLTE_F(1,1),ATM(ID)%DXzV_F(1)
-	    FLUSH(UNIT=101)
+	      FLUSH(UNIT=101)
+	    END IF
 !
 ! Put the departure coefficients on the new grid.
 !
@@ -186,9 +206,11 @@
 	1              ATM(ID)%ZXzV,      ATM(ID)%GIONXzV_F,
 	1              ATM(ID)%NXzV_F,    ATM(ID)%DXzV_F,     ED,T,ND)
 !	      ATM(ID)%XzV_F=LOG(ATM(ID)%XzV_F)
-	      WRITE(101,'(A,3X,3ES14.4)')TRIM(ION_ID(ID)),ATM(ID)%XzV_F(1,1),
+	      IF(VERBOSE_OUTPUT)THEN
+	        WRITE(101,'(A,3X,3ES14.4)')TRIM(ION_ID(ID)),ATM(ID)%XzV_F(1,1),
 	1                                ATM(ID)%LOG_XzVLTE_F(1,1),ATM(ID)%DXzV_F(1)
-	     CALL CNVT_FR_DC_V2(ATM(ID)%XzV_F, ATM(ID)%LOG_XzVLTE_F,
+	      END IF
+	      CALL CNVT_FR_DC_V2(ATM(ID)%XzV_F, ATM(ID)%LOG_XzVLTE_F,
 	1              ATM(ID)%DXzV_F,    ATM(ID)%NXzV_F,
 	1              TB,                TA,ND,
 	1              FIRST,             ATM(ID+1)%XzV_PRES)
@@ -199,11 +221,15 @@
 	      IF(ID .NE. SPECIES_BEG_ID(ISPEC))ATM(ID-1)%DXzV_F(1:ND)=TB(1:ND)
 	    END IF
 	  END DO
-	WRITE(6,*)'Finalized DC interpolation in ADJUST_POPS'; FLUSH(UNIT=6)
+	  IF(VERBOSE_OUTPUT)THEN
+	    WRITE(6,*)'Finalized DC interpolation in ADJUST_POPS'; FLUSH(UNIT=6)
+	  END IF
 !
 ! Scale the populatons to match the actual density.
 !
-	  CALL WRITE_VEC(TA,ND,SPECIES(ISPEC),100); FLUSH(UNIT=100)
+	  IF(VERBOSE_OUTPUT)THEN
+	    CALL WRITE_VEC(TA,ND,SPECIES(ISPEC),100); FLUSH(UNIT=100)
+	  END IF
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 !	    CALL WRITEDC_V3( ATM(ID)%XzV_F, ATM(ID)%LOG_XzVLTE_F,
 !	1          ATM(ID)%NXzV_F, ATM(ID)%DXzV_F,IONE,

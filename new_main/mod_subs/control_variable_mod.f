@@ -287,7 +287,6 @@
 	LOGICAL COMPUTE_ALL_CROSS
 	LOGICAL COMPUTE_NEW_CROSS
 	LOGICAL USE_FIXED_J
-	LOGICAL AUTO_OFF_FIXED_J
 !
 !***************************************************************************************
 !
@@ -499,6 +498,7 @@
 	LOGICAL DO_T_AUTO
 	LOGICAL LAMBDA_ITERATION
 	LOGICAL STOP_IF_BAD_PARAM
+	LOGICAL STOP_IF_MAJOR_WARNING
 !
 ! Variables for determining whether some populations are held fixed
 ! when the new populations are solved for.

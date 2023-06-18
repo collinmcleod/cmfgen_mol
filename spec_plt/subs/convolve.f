@@ -25,6 +25,7 @@
 	implicit none
 	include 'constants.inc'
 !
+! Altered 21-Mar-2023 : Extended range now activated when "resolution" or "vsini" is set.
 ! Altered 18-Apr-2008 : tempwave & tempflux now allocated with max(Nmod,Ntmp)
 ! 27-Jan-2000 : Cleaned; Converted to version 2.
 !               Rotation option installed.
@@ -55,6 +56,8 @@
 	real*8 kernal_sig   ! the corresponding sigma (fwhm = 2.354sig)
 	real*8 extend       ! wavelength extension to consider
                             ! in convolution
+	real*8 t1
+!
 	integer alter_min ! min and max indices of original array to be
 	integer alter_max ! changed.
 	integer con_min   ! the min and max indices of original
@@ -68,8 +71,14 @@
 !
 	call tune(1,'mainc')
         call nu_to_lambda(origfreq,origwave,Norig,forward)
-
-	extend = num_res * inst_res
+!
+	if(vsini .ne. 0.0d0)then
+	  extend=2*(wave_max+wave_min)*vsini/3.0e+05
+	else if(resolution .ne. 0.0d0)then
+	  extend=num_res * (wave_max+wave_min)/resolution
+	else
+	  extend = num_res * inst_res
+	end if
 	cwave_max = wave_max + extend
 	cwave_min = wave_min - extend
 	
@@ -143,7 +152,8 @@
 ! below.
 !
 	kernal_sig = inst_res/2.35482
-	write(6,'(A,F7.2,A)')' Sigma of smoothing Gausian is',kernal_sig*c_kms,'km/s'
+	t1=0.5D0*(wave_min+wave_max)
+	write(6,'(A,F7.2,A)')' Sigma of smoothing Gausian is',kernal_sig*c_kms/t1,'km/s'
 	call tune(1,'cnvlv')
 	call convolve(tempwave,tempflux,Ntmp,kernal_sig,vsini,epsilon,fft)
 	call tune(2,'cnvlv')

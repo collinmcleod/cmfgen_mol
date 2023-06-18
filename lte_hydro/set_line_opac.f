@@ -19,7 +19,10 @@
 	USE LINE_MOD
         IMPLICIT NONE
 !
-! Incorporated 2-Jan-2014: Changes for depth depndent line profiles.
+! Altered 31-May-2023 : Some cleaning. This routines omits the line with the highest resonance 
+!                         zone end frequency when freeing up space. This primarily affects models using Voigt
+!                         profiles which have very wide lines. Improved error message.
+! Altered  2-Jan-2014 : Incorporated changes for depth depndent line profiles.
 ! Altered 05-Apr-2011 : L_STAR_RATIO and U_STAR_RATIO now computed using XzVLTE_F_ON_S (29-Nov-2010).
 !                         Done to facilitate use of lower temperaturs.
 ! Altered 20-Feb-2006 : Minor bug fix --- incorrect acces VAR_IN_USE_CNT when BA not being computed
@@ -106,9 +109,8 @@
 ! LINE_END_INDX_IN_NU --- Integer vector [N_LINES] which specifies the final
 !                          frequency index for this lines resonance zone.
 !
-! FIRST_LINE   ---- Integer specifying the index of the highest frequency
-!                         line which we are taking into account in the
-!                         transfer.
+! FIRST_LINE   ---- Integer specifying the index of the line with the
+!                         highest (resonance zone) end frequency.
 !
 ! LAST_LINE  ---- Integer specifying the index of the lowest frequency
 !                         line which we are taking into account in the
@@ -134,18 +136,14 @@
 	  DO WHILE(LINE_STORAGE_USED(I))
 	    I=I+1
 	    IF(I .GT. MAX_SIM)THEN
-	      T1=1.0D+08
+	      K=NCF+1
 	      DO SIM_INDX=1,MAX_SIM             !Not 0 as used!
-	        IF(LINE_END_INDX_IN_NU(SIM_LINE_POINTER(SIM_INDX)) .LT. T1)THEN
+	        IF(LINE_END_INDX_IN_NU(SIM_LINE_POINTER(SIM_INDX)) .LT. K)THEN
 	          FIRST_LINE=SIM_LINE_POINTER(SIM_INDX)
-	          T1=LINE_END_INDX_IN_NU(SIM_LINE_POINTER(SIM_INDX))
+	          K=LINE_END_INDX_IN_NU(SIM_LINE_POINTER(SIM_INDX))
                 END IF
               END DO
-!	      FIRST_LINE=N_LINE_FREQ
-!	      DO SIM_INDX=1,MAX_SIM		!Not 0 as used!
-!	        FIRST_LINE=MIN(FIRST_LINE,SIM_LINE_POINTER(SIM_INDX)) 
-!	      END DO
-	      IF( FREQ_INDX .GT. LINE_END_INDX_IN_NU(FIRST_LINE))THEN
+	      IF(FREQ_INDX .GT. LINE_END_INDX_IN_NU(FIRST_LINE))THEN
 !
 ! Free up storage location for line.
 !
@@ -170,9 +168,16 @@
 	        END IF
 	        UP_POINTER(I)=0
 	      ELSE
-	        WRITE(LUER,*)'Too many lines have overlapping '//
-	1                      'resonance zones'
-	        WRITE(LUER,*)'Current frequency is:',FL
+	        WRITE(LUER,'(/,/,1X,A)')'Too many lines have overlapping resonance zones'
+	        WRITE(LUER,*)'Current frequency and index are: ',FL,FREQ_INDX
+	        DO I=1,MAX_SIM
+	          K=SIM_LINE_POINTER(I)
+	          NL=LINE_END_INDX_IN_NU(K)
+	          NUP=LINE_ST_INDX_IN_NU(K)
+	          T1=2.99792458D+05*(FL/NU(NUP)-1.0D0)
+	          T2=2.99792458D+05*(1.0D0-FL/NU(NL))
+	          WRITE(6,'(2I10,2ES14.4,3X,A)')NUP,NL,T1,T2,TRIM(TRANS_NAME_SIM(I))
+	        END DO
 	        STOP
 	      END IF
 	    END IF
