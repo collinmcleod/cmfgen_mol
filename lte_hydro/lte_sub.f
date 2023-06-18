@@ -980,6 +980,7 @@
 	  WRITE(6,'(A,I7,/)')' Current ML is provided in ML_COUNTER to give an indication of progress.'
 	  FLUSH(UNIT=6)
 	  CALL GET_LU(LU_ML,'LU for ML_COUNTER in lte_sub')
+	  OPEN(UNIT=LU_ML,STATUS='UNKNOWN',ACTION='WRITE',FILE='ML_COUNTER')
 !
 	  DO ML=1,NCF
 	    FREQ_INDX=ML
@@ -1081,8 +1082,10 @@
 	    END DO
 !
 	    IF(MOD(ML,10000) .EQ. 0)WRITE(LU_ML,*)' '
-	    IF(MOD(ML,1000) .EQ. 0)WRITE(LU_ML,'(I8)',ADVANCE='NO')ML
-	    FLUSH(UNIT=LU_ML)
+	    IF(MOD(ML,1000) .EQ. 0)THEN
+	      WRITE(LU_ML,'(I8)',ADVANCE='NO')ML
+	      FLUSH(UNIT=LU_ML)
+	    END IF
 	  END DO
 	  WRITE(ML,*)' '; FLUSH(UNIT=ML)
 !

@@ -10,6 +10,7 @@
 !
 	SUBROUTINE JWEIGHT_V2(X,dX,W,N)
 !
+! Altered 18-Jun-2023 - Fixed typo.
 ! Created 14-Jun-2023 - Changed to V2. dX added to call.
 ! Altered 24-May-1996 - DP_ZERO deleted
 !                       ERROR_LU etc installed.
@@ -30,14 +31,14 @@
 !
 	H=dX(1)
 	HN=dX(2)
-	RF=H+RF
+	RF=H+HN
 	W(1)=0.5D0*H-H*H/12.0D0/RF-HN*H/RF/12.0D0
 	W(2)=0.5D0*H+H*H/RF/6.0D0*(1.0D0+0.5D0*H/HN)+HN*H/RF/12.0D0
 	W(3)=H*H/RF/12.0*(-1.0-H/HN)
 !
 	DO I=3,N-2
 	  H=dX(I-1)
-	  RF=dX(I-2)+X(I-1)
+	  RF=dX(I-2)+dX(I-1)
 	  RE=dX(I-1)+dX(I)
 	  W(I-2)=W(I-2)-H*H/12.0D0/RF	
 	  W(I-1)=W(I-1)+0.5D0*H+H*H/12.0D0/RE
