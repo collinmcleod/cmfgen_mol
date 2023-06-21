@@ -517,6 +517,10 @@
 	REAL*8 ADD_OPAC_SCL_FAC
  	LOGICAL ADD_ADDITIONAL_OPACITY
 !
+! Variable for specifying abundance set;
+!
+	CHARACTER(LEN=10) SOL_ABUND_REF_SET
+!
 ! 
 ! Indicates whether level dissolution should be included in the model.
 !

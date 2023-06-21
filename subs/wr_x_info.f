@@ -116,9 +116,10 @@ C
 C Routine to output abundance information: Both the relative number 
 C abundance and the mass fractions are printed.
 C
-	SUBROUTINE WR_ABUND_INFO_V2(SPECIES,MASS,ABUND,ABUND_SUM,
-	1           MEAN_ATOMIC_WEIGHT,SOL_MASS_FRAC,LUOUT)
+	SUBROUTINE WR_ABUND_INFO_V3(SPECIES,MASS,ABUND,ABUND_SUM,
+	1           MEAN_ATOMIC_WEIGHT,SOL_MASS_FRAC,SOL_ABUND_REF_SET,LUOUT)
 C
+C Altered 19-Jun-2023: Changed to V3 -- SOL_ABUND_REF_SET added to call.
 C Altered 17-Dec-2007: Now output mean atomic mass.
 C
 	IMPLICIT NONE
@@ -129,6 +130,7 @@ C
 	REAL*8 SOL_MASS_FRAC
 	INTEGER LUOUT
 	CHARACTER*(*) SPECIES		!e.g. HYD or CARB
+	CHARACTER*(*) SOL_ABUND_REF_SET 
 C
 	REAL*8 T1
 	LOGICAL FIRST			!Indicate whether header should 
@@ -139,7 +141,7 @@ C
 	  WRITE(LUOUT,'(A,F7.4)')'Mean atomic mass (amu) is: ',MEAN_ATOMIC_WEIGHT
 	  WRITE(LUOUT,'(A)')' '
 	  WRITE(LUOUT,'(3X,A,5X,A,5X,A,4X,A,6X,A)')
-	1    'SPECIES','Rel. # Fraction','Mass Fraction','Z/Z(sun)','Z(sun)'
+	1    'SPECIES','Rel. # Fraction','Mass Fraction','Z/Z(sun)','Z(sun)-'//TRIM(SOL_ABUND_REF_SET)
 	  FIRST=.FALSE.    
 	END IF
 C
