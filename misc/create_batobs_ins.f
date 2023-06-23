@@ -19,7 +19,8 @@
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
 !
-! Aleterd 10-May-2023 : Improved documentation.
+! Altered 22-Jun-2023 : Fixed initialization error (affected some compilers).
+! Altered 10-May-2023 : Improved documentation.
 ! Altered 26-Sep-2022 : Option to use lower case name for IDs, _ added automatically to identifiers.
 ! Created 19-Jun-2022
 !
@@ -79,7 +80,7 @@
 ! except those related to scaling of abundances, which may/may not
 ! exist in the file (better if they don't exist).
 !
-	NUM_KEYS=0; CMF_KEYS=' '
+	K=0; NUM_KEYS=0; CMF_KEYS=' '
 	OPEN(UNIT=LUIN,FILE='CMF_FLUX_PARAM_INIT',STATUS='OLD',ACTION='READ')
 	DO WHILE(K .LT. NUM_KEYS_MAX)
 	  READ(LUIN,'(A)',END=100)STRING
