@@ -10,9 +10,10 @@
 	1              LST_ITERATION,BAND_FLUX,N_FLUXMEAN_BANDS,LU_OUT,ND)
 	IMPLICIT NONE
 !
+! Altered 21-Jun-2023 : Added log g consistency check.
 ! Altered 24-Aug-2022 : Added descrition for flux and flux mean opacity output.
 ! Altered 11-Jan-2021 : Increased minimum size of record in HYDRO_TERMS
-! Altered 20-Oct-2020 : Outout new error (100 E/g_rad) in final column.
+! Altered 20-Oct-2020 : Output new error (100 E/g_rad) in final column.
 ! Altered 01-Jan-2020 : Increased R precision. Increased Tau precision.
 ! Altered 13-Feb-2019 : Tau (Rosseland) now output.
 ! Altered 08-Nov-2016 : Now output Gamma (e.s.) at photosphere.
@@ -103,6 +104,7 @@
 	REAL*8 ERROR_MAX
 	REAL*8 ERROR_SUM
 	REAL*8 ERROR_SQ
+	REAL*8 PHOT_LOGG
 !
 	CHARACTER(LEN=12) TYPE_ATM
 	CHARACTER(LEN=100) FMT
@@ -274,11 +276,11 @@
 	WRITE(LU_OUT,'(1X,A)')'Gamma = g_rad/g [g=g_GRAV] '
 !
 	WRITE(LU_OUT,'(1X,A)')' '
-	T1=GRAV_CON/RPHOT/RPHOT
+	PHOT_LOGG=GRAV_CON/RPHOT/RPHOT
 	WRITE(LU_OUT,'(1X,A,ES14.4,A,4X,ES10.4,A)')
 	1          '         Photospheric radius is: ',RPHOT,'(10^10 cm)',RPHOT/6.96D0,'(Rsun)'
 	WRITE(LU_OUT,'(1X,A,ES14.4,A,F7.4,A)')
-	1          'Photospheric surface gravity is: ',T1,' (',LOG10(T1),')'
+	1          'Photospheric surface gravity is: ',PHOT_LOGG,' (',LOG10(PHOT_LOGG),')'
 	WRITE(LU_OUT,'(1X,A,ES14.4,A,F7.4,A)')
 	1          '   Specified surface gravity is: ',10**LOGG,' (',LOGG,')'
 	WRITE(LU_OUT,'(1X,A,F10.4,A)')
@@ -319,6 +321,17 @@
 	CLOSE(LU_OUT)
 !
 	IF(LST_ITERATION)THEN
+!
+	  IF( ABS(LOG10(PHOT_LOGG)-LOGG) .GT. 0.02 )THEN
+	    I=ERROR_LU()
+	    WRITE(I,*)'*****************************************************************************************'
+	    WRITE(I,*)'Warning inconsistent surface gravities'
+	    WRITE(I,*)'This error has occured because you forgot to set HYDRO_DEFAULTS or'
+	    WRITE(I,*)'       or you have done insufficient interations'
+	    WRITE(I,*)'You can ignore this error if not doing Hydro iterations.'
+	    WRITE(I,*)'*****************************************************************************************'
+	  END IF
+
 	  ERROR_SQ=SQRT(ERROR_SQ/MAX(1,ERROR_CNT))
 	  ERROR_SUM=ERROR_SUM/MAX(1,ERROR_CNT)
 	  T1=ABS(LOGG-LOG10(GPHOT))

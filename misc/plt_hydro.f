@@ -345,7 +345,7 @@
 	    ATM(ID)%YVEC(1:ND)=ATM(ID)%VdVdR(1:ND)
 	    CALL DP_CURVE(ND,ATM(ID)%XVEC,ATM(ID)%YVEC)
 	  END DO
-	  XLAB='VdV/dR(cm s\u-2\d)'
+	  YLAB='VdV/dR(cm s\u-2\d)'
 !
 	ELSE IF(XOPT .EQ. 'INT')THEN
 !

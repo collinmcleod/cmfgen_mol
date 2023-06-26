@@ -29,6 +29,8 @@
 	INTEGER IP
 !
 	WRITE(LUOUT,'(A)')'!'
+	WRITE(LUOUT,'(A)')'! Estimates of the error in the EW values may be poor.'
+	WRITE(LUOUT,'(A)')'!'
 	DO IP=1,NPLTS
 	  WRITE(LUOUT,'(A,I3,5X,A,2X,A)')'! Plot #:',IP,'Plot title:',TRIM(CD(IP)%CURVE_ID)
 	END DO
