@@ -135,6 +135,7 @@
         CHARACTER(LEN=80), SAVE :: EW_LINE_ID=' '
 	CHARACTER(LEN=80), SAVE :: PLT_ST_FILENAME
 	CHARACTER(LEN=80), SAVE :: TITLE_FILENAME
+	CHARACTER(LEN=80), SAVE :: BALMER_INPUT_FILE
 !
 ! Vector arrays
 !
@@ -395,6 +396,8 @@
 	  EW_CUT=1.0D0
 	  WRITE_COMMENT=.FALSE.
 	  ID_LINE_PEN=1
+	  BALMER_INPUT_FILE='BALMER_LINE_LIMS'
+	  TYPE_CURVE='L'
 	END IF
 	CALL GEN_ASCI_OPEN(LU_NORM,'NORM_FACTORS','UNKNOWN','APPEND',' ',IZERO,IOS)
 !
@@ -1585,7 +1588,8 @@ C
 	  CALL NEW_GEN_IN(KEEP_YAXIS_LIMITS,'Keep same Y axis limits?')
 	  CALL NEW_GEN_IN(ID_EXPCHAR,'Factor to scale size of ID')
 	  CALL NEW_GEN_IN(XUNIT,'Ang, um, or nm?')
-	  CALL NEW_GEN_IN(NO_DEC_DIGITS,' 0 to 9')
+	  CALL NEW_GEN_IN(NO_DEC_DIGITS,'# of digits afer . :  0 to 9')
+	  IF(NO_DEC_DIGITS .LE. 0 .OR. NO_DEC_DIGITS .GT.  9)NO_DEC_DIGITS=1
 	  WRITE(6,'(A)')' '
 !
 	  XT=XPAR
@@ -1820,6 +1824,18 @@ C
 	  GOTO 1000
 !
 	ELSE IF(ANS .EQ. 'CGF' .OR. ANS .EQ. 'FGF')THEN
+!
+	  WRITE(6,'(A)')BLUE_PEN
+	  WRITE(6,'(A)')' Calling a routine to do Gaussian Fitting using cursors to define lines'
+	  WRITE(6,'(A)')' When using the CGF fit routine to define a file for FGF you should do the following:'
+	  WRITE(6,'(A)')'       (a) Fit regions containing the minimum number of lines. The more lines in the fit,'
+	  WRITE(6,'(A)')'              the more likely a subsequent fit is to mess up.'
+	  WRITE(6,'(A)')'       (b) Choose the low turbulence model for the first fit, and also plot the high'
+	  WRITE(6,'(A)')'              turbulence model so you can see how broad the lines are. This will help you '
+	  WRITE(6,'(A)')'              choose a fitting region that has necessary lambda coverage.'
+	  WRITE(6,'(A)')'       (c) In the FGF routines the central line wavelengths are held fixed .'
+	  WRITE(6,'(A)')DEF_PEN
+!
 	  DRAW_GAUSS_HARD=.TRUE.
 	  IF(ANS .EQ. 'CGF')GF_OPTION='CURSOR'
 	  IF(ANS .EQ. 'FGF')GF_OPTION='FILE'
@@ -1866,7 +1882,7 @@ C
 	1             PEN_COL,PEN_OFFSET,
 	1             REVERSE_PLOTTING_ORDER)
 !
-	ELSE IF(ANS .EQ. 'BAL')THEN
+	ELSE IF(ANS .EQ. 'CBAL')THEN
 	  I=NPLTS
 	  CALL DO_CURSOR_BALMER(
 	1             XPAR,XINC,XNUMST,IXTICK,IDX,
@@ -1878,6 +1894,11 @@ C
 	1             PEN_COL,PEN_OFFSET,
 	1             REVERSE_PLOTTING_ORDER)
 	  IF(NPLTS .GT. I)TYPE_CURVE(NPLTS)='L'
+!
+	ELSE IF(ANS .EQ. 'FBAL')THEN
+	  IP=1; CALL NEW_GEN_IN(IP,'Observational plot ID?')
+	  CALL NEW_GEN_IN(BALMER_INPUT_FILE,'File wth data for auto chi^2 computation')
+	  CALL DO_FILE_BALMER_V1(BALMER_INPUT_FILE,IP)
 !
 	ELSE IF(ANS .EQ. 'FEW')THEN
 	  CALL DO_FILE_EW_V1(' ')

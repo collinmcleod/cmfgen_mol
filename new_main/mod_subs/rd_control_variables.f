@@ -3,6 +3,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered : 19-Jun-2023 : Added SOL_ABUND_REF_SET
 ! Altered : 12-Aug-2022 : Added SN shock variables (following work by LUC.)
 ! Altered : 06-Jun-2022 : Variable COMP_STEQ_T_EHB ([COMP_EHB]) added.
 ! Altered : 15-Nov-2021 : Fixed read in calls for FIX_ALL_SPEC and BC_PAR1.
@@ -48,10 +49,10 @@
 	  STOP
 	END IF
 	CALL RD_OPTIONS_INTO_STORE(LUIN,LUSCR)
-C 
-C
-C Input model parameters and modelling specifications.
-C
+! 
+!
+! Input model parameters and modelling specifications.
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_DBLE(RP,'RSTAR',L_TRUE,'Stellar radius (in 10^10 cm)')
 	  CALL RD_STORE_DBLE(RMAX,'RMAX',L_TRUE,'Maximum radius (in R*)')
@@ -137,9 +138,9 @@ C
 	      CONS_FOR_R_GRID=1.0D0
 	      EXP_FOR_R_GRID=0.0D0
 	    END IF
-C
-C !Required by routines other than STARPCYG
-C
+!
+! !Required by routines other than STARPCYG
+!
 	    VINF=VINF2	
 	  ELSE IF(VELTYPE .EQ. 7)THEN
 	    CALL RD_STORE_NCHAR(VEL_OPTION,'VEL_OPT',ITEN,L_TRUE,
@@ -186,7 +187,7 @@ C
 	    CALL RD_STORE_NCHAR(VAR_MDOT_FILE,'VM_FILE',ITEN,VAR_MDOT,
 	1                        'File with density and clumping info')
 	  END IF
-C
+!
 	  IF(VAR_MDOT .OR. SN_MODEL)THEN
 	    RMDOT=1.0D-20
 	  ELSE
@@ -226,9 +227,9 @@ C
 	  END IF
 
 	  CALL RD_STORE_DBLE(STARS_MASS,'MASS',L_TRUE,'Stellar mass (Msun)')
-C
-C All clumping parameters are read in, even when CLUMPING is switched off.
-C
+!
+! All clumping parameters are read in, even when CLUMPING is switched off.
+!
 	  CALL RD_STORE_LOG(DO_CLUMP_MODEL,'DO_CL',L_TRUE,
 	1            'Calculate a model with clumping?')
 	  CALL RD_STORE_NCHAR(CLUMP_LAW,'CL_LAW',ISIX,L_TRUE,
@@ -376,9 +377,10 @@ C
 	  CALL RD_STORE_LOG(USE_OLD_MF_OUTPUT,'OLD_MFO',L_FALSE,
 	1        'Use old mass scaling when reading SN_HYDRO_DATA')
 !
-C
-C Read in the un-normalized fractional abundances.
-C
+	  CALL RD_STORE_NCHAR(SOL_ABUND_REF_SET,'SOL_ABUND_SCL',ITEN,L_FALSE,'Solar abundance reference set')
+!
+! Read in the un-normalized fractional abundances.
+!
 	  DO ISPEC=1,NUM_SPECIES
 	    TMP_KEY=TRIM(SPECIES(ISPEC))//'/X'
 	    TMP_STRING=TRIM(SPECIES(ISPEC))//
@@ -387,7 +389,7 @@ C
 	1            TMP_STRING)
 	  END DO
 	  WRITE(LUSCR,'()')
-C
+!
 	  CALL RD_STORE_LOG(RD_CONT_FREQ,'RD_CF_FILE',L_TRUE,
 	1            'Read in continuum frequencies from file')
 	  CALL RD_STORE_DBLE(MIN_CONT_FREQ,'MIN_CF',L_TRUE,
@@ -407,7 +409,7 @@ C
 	  FREQ_GRID_OPTION=0
 	  CALL RD_STORE_INT(FREQ_GRID_OPTION,'FR_GRID',L_FALSE,
 	1            'Which method to compute frequency grid?')
-C
+!
 	  CALL RD_STORE_LOG(DO_LEV_DISSOLUTION,'DO_DIS',L_TRUE,
 	1            'Allow for level dissolution of upper levels?')
 	  CALL RD_STORE_DBLE(dV_LEV_DIS,'dV_LEV',L_TRUE,
@@ -417,7 +419,7 @@ C
 	1            'Amplification factor on low side bf edge')
 	  CALL RD_STORE_DBLE(MIN_FREQ_LEV_DIS,'MIN_DIS',L_TRUE,
 	1            'Minimum frequency for level dissolution')
-C
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(COMPUTE_ALL_CROSS,'CROSS',L_TRUE,
 	1            'Compute all photoionization cross-sections?')
@@ -488,7 +490,7 @@ C
 	  CALL RD_STORE_DBLE(IB_STAB_FACTOR,'IB_STAB',L_FALSE,'Inner boundary stabilization factor')
 	  OUTER_BND_METH='HONJ'
 	  CALL RD_STORE_CHAR(OUTER_BND_METH,'OB_METH',L_FALSE,'Outer boundary method (HONJ or HALF_MOM)')
-C
+!
 	  CALL RD_STORE_LOG(RD_COHERENT_ES,'COH_ES',L_TRUE,
 	1            'Assume coherent electron scattering? ')
 	  CALL RD_STORE_LOG(USE_OLDJ_FOR_ES,'OLD_J',L_TRUE,
@@ -616,7 +618,7 @@ C
 	1      'Extent of BLUE e.s. wings from resonance core (in km/s)')
 	  CALL RD_STORE_DBLE(R_CMF_WING_EXT,'R_CMF_WING_EXT',L_TRUE,
 	1      'Extent of RED e.s. wings from RESONANCE core (in Vinf)')
-C
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_DBLE(OBS_PRO_EXT_RAT,'OBS_EXT_RAT',L_TRUE,
 	1      'Half width of profile in Vinf.')
@@ -626,7 +628,7 @@ C
 	1      'Spacing across e.s. wings of observed profile(in km/s)')
 	  CALL RD_STORE_DBLE(dV_OBS_BIG,'dV_OBS_BIG',L_TRUE,
 	1      'Frequency spacing between lines (in km/s)')
-C
+!
 	  WRITE(LUSCR,'()')
 	  USE_FIXED_J=.FALSE.
 	  CALL RD_STORE_LOG(USE_FIXED_J,'USE_FIXED_J',L_FALSE,
@@ -685,7 +687,7 @@ C
 	1          'Level above whit transitions omitted if gf < GF_CUT')
 	  CALL RD_STORE_INT(MIN_NUM_TRANS,'MIN_TRANS',L_TRUE,
 	1          'Minimum number of transitions from each level')
-C
+!
 	  CALL RD_STORE_LOG(THK_LINE,'THK_LINE',L_TRUE,
 	1           'Use thick boundary condition for lines?')
 	  CALL RD_STORE_LOG(CHECK_LINE_OPAC,'CHK_L_POS',L_TRUE,
@@ -702,7 +704,7 @@ C
 	  END IF
 	  CALL RD_STORE_LOG(SETZERO,'He2_RES=0',L_TRUE,
 	1           'Set rates in He2 resonance lines to zero ?')
-C
+!
 	  CALL RD_STORE_LOG(OVERLAP,'ALLOW_OL',L_TRUE,
 	1           'Allow for overlap of close lines (SOB only) ?')
 	  CALL RD_STORE_DBLE(OVER_FREQ_DIF,'OL_DIF',L_TRUE,
@@ -857,7 +859,7 @@ C
 	1          ISIX,ATM(ID)%XZV_PRES,TMP_STRING)
 	    END DO
 	  END IF
-C
+!
 	  WRITE(LUSCR,'()')
 	  DO ID=1,NUM_IONS-1
 	    TMP_KEY='DIE_'//TRIM(ION_ID(ID))
@@ -922,13 +924,13 @@ C
 	      CALL RD_STORE_INT(FIX_SPECIES(ISPEC),TMP_KEY,L_FALSE,TMP_STRING)
 	    END DO
 	  END IF
-C
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(FIXED_NE,'FIX_NE',L_TRUE,'Fix the electron density ?')
-C
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(RD_FIX_IMP,'FIX_IMP',L_TRUE,'Automatically fix impurity species?')
-C
+!
 	  WRITE(LUSCR,'()')                             
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(RD_FIX_T,'FIX_T',L_TRUE,
@@ -1022,7 +1024,7 @@ C
 	  CNT_LAM=0
 	  CALL RD_STORE_LOG(RDINSOL,'RD_SOL',L_TRUE,
 	1            'RD in solution vector to update populations')
-C
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(EDD_CONT,'JC_W_EDD',L_TRUE,
 	1        'Compute continuum intensity using Eddington factors')
@@ -1111,19 +1113,19 @@ C
 	1         'Quadratic interpolation from ND-? to ND')
 	  CALL RD_STORE_NCHAR(INTERP_TYPE,'INTERP_TYPE',10,L_TRUE,
 	1         'Perform interpolations in LOG or LIN plane')
-C
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_INT(N_PAR,'N_PAR',L_TRUE,
 	1    'Rate of BA incrementation by BA_PAR in cont. loop (# of freq)')
-C
-C Next two variables apply for both ACCURATE and EDDINGTON.
-C
+!
+! Next two variables apply for both ACCURATE and EDDINGTON.
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(COMPUTE_EDDFAC,'COMP_F',L_TRUE,
 	1      'Compute new Eddington factors (f)')
 	  CALL RD_STORE_DBLE(ACC_EDD_FAC,'ACC_F',L_TRUE,
 	1      'Accuracy with which to compute the eddington factor f')
-C
+!
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(NG_DO,'DO_NG',L_TRUE,
 	1         'Perform NG acceleration when applicable ?')

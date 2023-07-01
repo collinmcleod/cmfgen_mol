@@ -1,9 +1,21 @@
-	SUBROUTINE RD_SOL_ABUND_SCAL(SOL_ABUND_HSCL,AT_NO,SOL_ABUND_REF_SET,MUST_GET_SET,NSPEC)
+!
+! Simple subroutine to read in different abundance data sets. This will
+! allow the user to define the reference data set used in the summary file,
+! MOD_SUM.
+!
+! NB: These abudnaces DO not affect the CMFGEN calcualtions -- only MOD_SUM.
+!
+	SUBROUTINE RD_SOL_ABUND_SCAL(SOL_MASS_FRAC,SOL_ABUND_HSCL,AT_MASS,AT_NO,
+	1                              SOL_ABUND_REF_SET,MUST_GET_SET,NSPEC)
 	IMPLICIT NONE
 !
+! Finalized: 19-Jun-2023
+!
 	INTEGER NSPEC
+	REAL*8 AT_MASS(NSPEC)
 	REAL*8 AT_NO(NSPEC)
 	REAL*8 SOL_ABUND_HSCL(NSPEC)
+	REAL*8 SOL_MASS_FRAC(NSPEC)
 	LOGICAL MUST_GET_SET
 	CHARACTER(LEN=*) SOL_ABUND_REF_SET
 !
@@ -14,8 +26,9 @@
 	INTEGER COL(MAX_N_ABUND)
 	CHARACTER(LEN=10) REF_SET(MAX_N_ABUND)
 !
+	REAL*8 T1
 	REAL*8 LOCAL_AT_NO
-	REAL*8 AT_MASS
+	REAL*8 LOC_AT_MASS
 	INTEGER LUIN
 	INTEGER I,J,K
 	INTEGER INDX
@@ -38,7 +51,7 @@
 	IF(IOS .NE. 0)THEN
 	  IF(MUST_GET_SET)THEN
 	    WRITE(6,*)'Error -- file SOL_ABUNDANCE not found.'
-	    WRITE(6,*)'File must be present as abundance scale must get sea.t'
+	    WRITE(6,*)'File must be present as abundance scale must get set'
 	    STOP
 	  ELSE
 	    WRITE(6,*)'Warning -- file SOL_ABUNDANCE not found.'
@@ -85,7 +98,7 @@
 	    REF_SET(K)=STRING(1:J)
 	    READ(STRING(J:),*)COL(K)
 	  ELSE
-	    WRITE(6,*)'Abundance keys in SOL_ABUND not found.'
+	    WRITE(6,*)'Abundance keys in SOL_ABUNDANCE not found.'
 	    WRITE(6,*)'Available abundance keys are listed below.'
 	    WRITE(6,'(A)')REF_SET(1:N_ABUND)
 	    STOP
@@ -119,7 +132,8 @@
 	WRITE(6,*)COL
 	WRITE(6,*)INDX
 	DO WHILE(1 .EQ. 1)
-          READ(LUIN,*,END=100)LOCAL_AT_NO,SYMB,ELEMENT,AT_MASS,(ABUND(J),J=ST_AB_COL,N_ABUND+ST_AB_COL-1)
+          READ(LUIN,*,END=100)LOCAL_AT_NO,SYMB,ELEMENT,LOC_AT_MASS,
+	1                        (ABUND(J),J=ST_AB_COL,N_ABUND+ST_AB_COL-1)
 	  DO I=1,NSPEC
 	    IF( NINT(AT_NO(I)) .EQ. NINT(LOCAL_AT_NO) )THEN
 	      SOL_ABUND_HSCL(I)=ABUND(INDX)
@@ -140,6 +154,17 @@
 	  END DO
 	  IF(ERROR)STOP
 	END IF
+!
+! Convert from the abundance on a logarithmic scale with H=12.0 dex, to
+! mass-fractions.
+!
+	T1=0.0D0
+	DO I=1,NSPEC
+	  SOL_MASS_FRAC(I)=10.0D0**(SOL_ABUND_HSCL(I)-12.0D0)
+	  SOL_MASS_FRAC(I)=AT_MASS(I)*SOL_MASS_FRAC(I)
+	  T1=T1+SOL_MASS_FRAC(I)
+	END DO
+	SOL_MASS_FRAC(:)=SOL_MASS_FRAC(:)/T1
 !
 	RETURN
 	END

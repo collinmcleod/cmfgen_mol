@@ -29,6 +29,8 @@
 	INTEGER IP
 !
 	WRITE(LUOUT,'(A)')'!'
+	WRITE(LUOUT,'(A)')'! Estimates of the error in the EW values may be poor.'
+	WRITE(LUOUT,'(A)')'!'
 	DO IP=1,NPLTS
 	  WRITE(LUOUT,'(A,I3,5X,A,2X,A)')'! Plot #:',IP,'Plot title:',TRIM(CD(IP)%CURVE_ID)
 	END DO
@@ -55,7 +57,7 @@
 	INTEGER IP,LUOUT
 	REAL*4 T1,T2
 !
-! Since th epercentage errors computed from EWL and EWH are the same
+! Since the percentage errors computed from EWL and EWH are the same
 ! (apart from the sign) we simply print the average value.
 !
 	T1=2.998D+05*SIGMA/XMEAN
