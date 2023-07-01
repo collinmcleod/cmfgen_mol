@@ -154,7 +154,7 @@
 	  IF(LOC_NLINES .EQ. 0)RETURN
 	  IF(LOC_NLINES .GT. NPOS)THEN
 	    WRITE(6,*)'Error -- too many lines to label in plot window'
-	    WRITE(6,*)'Change line selectrion parameters or label size'
+	    WRITE(6,*)'Change line selection parameters or label size'
 	    RETURN
 	  END IF
 !

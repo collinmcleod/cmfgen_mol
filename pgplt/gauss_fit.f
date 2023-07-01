@@ -16,6 +16,7 @@
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
+! Altered 30-Jun-2023 : Bug fix and impiorved error message.
 ! Altered 17-Jun-2023: Fixed some crash issues and some cleaning.
 ! Altered 06-MAr-2023 : Fixed to use classical Gaussian with factor of 0.5 in 
 !                          argument of exponent. Parameters are:
@@ -66,7 +67,7 @@
 	REAL*8 LINE_CENTER(NL_MAX)
 !
 	REAL*4, SAVE :: FIND_LINE_TOLERANCE=0.002
-	REAL*4 GET_INDX_SP
+	INTEGER  GET_INDX_SP
 	EXTERNAL GET_INDX_SP
 !
 	CHARACTER(LEN=200) STRING
@@ -74,6 +75,11 @@
 	REAL*8 TOLERANCE
 	REAL*8 GAUSS_FIT_FUNC
 	EXTERNAL GAUSS_FIT_FUNC,UC
+!
+! If wet these to zero, their values will be held fixed.
+!
+	REAL*8 WAVE_SCALE
+	REAL*8 EXPONENT_SCALE
 !
 	REAL*8 YST,YEND
 !
@@ -333,7 +339,9 @@
 	      FIT_DONE=.FALSE.
 	    ELSE
 !
-	      CALL DO_GAUSSIAN_FITS(IP)	
+	      WAVE_SCALE=0.2
+	      EXPONENT_SCALE=0.2
+	      CALL DO_GAUSSIAN_FITS(IP)
 !
 	      WRITE(6,*)'Called AMOEBA'
 	      WRITE(6,*)'Fit parameters are (NB SIGMA is only Stan. Dev. if EXP=2.0):'
@@ -382,7 +390,11 @@
 	INTEGER I
 !
 	CALL GET_LU(LU_PARAMS,'FILE_GAUSS_FIT')
-	OPEN(LU_PARAMS,FILE='GAUSS_PARAMS',STATUS='OLD',ACTION='READ')
+	OPEN(LU_PARAMS,FILE='GAUSS_PARAMS',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
+	IF(IOS .NE. 0)THEN
+	   WRITE(6,*)'Error in GAUSS_FIT -- GAUSS_PARAMS file does not exist'
+	   RETURN
+	END IF
 !
 	DO WHILE(1 .EQ. 1)
 	  DO WHILE(1 .EQ. 1)
@@ -393,20 +405,21 @@
 	    END IF
 	  END DO
 !
-	  READ(STRING,*)NUM_GAUSS,XST,XEND
+	  READ(STRING,*,IOSTAT=IOS)NUM_GAUSS,XST,XEND
+	  IF(IOS .NE. 0)THEN
+	    WRITE(6,*)'Error reading first record of next Gaussian fit'
+	    WRITE(6,*)'Record follows'
+	    WRITE(6,*)TRIM(STRING)
+	    RETURN
+	  END IF
 	  DO K=1,NUM_GAUSS
 	    I=3+(K-1)*4 
 	    READ(LU_PARAMS,*)PAR(I),PAR(I+2),PAR(I+1),PAR(I+3)
 	  END DO
 	  SP_XST=XST; SP_XEND=XEND
 !
-	  IF(ALLOCATED(SIM))DEALLOCATE(SIM,SUM_SQ,SCALE,EW,EW_CONT)
-	  ALLOCATE (SIM(NG_PAR+1,NG_PAR))
-	  ALLOCATE (SUM_SQ(NG_PAR+1))
-	  ALLOCATE (SCALE(NG_PAR+1))
-	  ALLOCATE (EW(NUM_GAUSS))
-	  ALLOCATE (EW_CONT(NUM_GAUSS))
-!
+	  WAVE_SCALE=0.0
+	  EXPONENT_SCALE=0.2
 	  DO I=1,NPLTS
 	    IP=I
 	    CALL SET_GAUSS_DATA(CD(IP)%XVEC,CD(IP)%DATA,XST,XEND,NPTS(IP),YST,YEND)
@@ -466,10 +479,10 @@
 	SCALE(1)=0.002			!Mean level
 	SCALE(2)=0.02/(XEND-XST)	!Slope
 	DO I=3,NG_PAR,4
-	  SCALE(I)=0.2			!Wavelength
+	  SCALE(I)=WAVE_SCALE
 	  SCALE(I+1)=0.10		!Sigma
 	  SCALE(I+2)=0.05		!Height
-	  SCALE(I+3)=0.2		!Exponent
+	  SCALE(I+3)=EXPONENT_SCALE
 	END DO
 !
 	DO J=2,NG_PAR+1
@@ -540,7 +553,10 @@
 	  END IF
 	  IF(NEW_FILE)THEN
 	    OPEN(UNIT=LU_GF,FILE='GAUSS_FITS',STATUS='UNKNOWN')
-	    WRITE(LU_GF,'(//,(I3,2X,A))')(I,CURVE_TITLE(I),I=1,NPLTS)
+	    WRITE(LU_GF,*)' '
+	    DO IP=1,NPLTS
+	      WRITE(LU_GF,'(A,I3,5X,A,2X,A)')'! Plot #:',IP,'Plot title:',TRIM(CD(IP)%CURVE_ID)
+	    END DO
             WRITE(LU_GF,'(//,A,1X,4(10X,A))')
 	1          '!  NG',' XST','XEND','   A','   B    [as in A+B(x-xst)]'
             WRITE(LU_GF,'(A,5X,(3X,A),5(3X,A),2(3X,A))')'!',
@@ -558,6 +574,11 @@
 	  END IF
 	  IF(NEW_FILE)THEN
 	    OPEN(UNIT=LU_EW,FILE='GAUSS_FIT_EW',STATUS='UNKNOWN')
+	    WRITE(LU_EW,*)' '
+	    DO IP=1,NPLTS
+	      WRITE(LU_EW,'(A,I3,5X,A,2X,A)')'! Plot #:',IP,'Plot title:',TRIM(CD(IP)%CURVE_ID)
+	    END DO
+	    WRITE(LU_EW,*)' '
 	    WRITE(LU_EW,'(4X,A,5(4X,A),2X,A,3X,A,4X,A)')
 	1          'IP','Line Lam','Line Loc',' F(cont)','  EW(mA)',
 	1          '   E(mA)','FWHM(km/s)','dLAM(km/s)','Transition'

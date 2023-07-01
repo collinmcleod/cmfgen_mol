@@ -25,6 +25,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(do_cursor_balmer.o)\
       $(LIB)(do_gauss_smooth.o)\
       $(LIB)(do_pg_deriv.o)\
+      $(LIB)(do_file_balmer_v1.o)\
       $(LIB)(do_file_ew_v1.o)\
       $(LIB)(do_fill.o)\
       $(LIB)(do_many_ew.o)\

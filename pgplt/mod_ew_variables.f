@@ -57,7 +57,7 @@
 	INTEGER IP,LUOUT
 	REAL*4 T1,T2
 !
-! Since th epercentage errors computed from EWL and EWH are the same
+! Since the percentage errors computed from EWL and EWH are the same
 ! (apart from the sign) we simply print the average value.
 !
 	T1=2.998D+05*SIGMA/XMEAN
