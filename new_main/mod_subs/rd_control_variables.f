@@ -215,7 +215,7 @@
 	    CALL RD_STORE_DBLE(LOGG,'LOGG',DO_HYDRO,'Log surface gravity (cgs units)')
 	    CALL RD_STORE_DBLE(V_BETA1,'BETA',DO_HYDRO,'Beta exponent for velocity law')
 	    PRESSURE_VTURB=0.0D0
-	    CALL RD_STORE_DBLE(PRESSURE_VTURB,'P_VTURB',L_FALSE,'Ipressure trubulent velocity')
+	    CALL RD_STORE_DBLE(PRESSURE_VTURB,'P_VTURB',L_FALSE,'Pressure trubulent velocity')
 	  END IF
 	  IF(TEFF .NE. 0.0D0 .AND. .NOT. DO_HYDRO)THEN
 	    WRITE(LUER,'(A)')' Possible Error in VADAT file.'

@@ -493,6 +493,25 @@
 	    YLAB=TRIM(YLAB)//'; (vdv/dr + \gr\u-1\d dP/dr + g - g\dr\u)/(g\d\r\u-g\de\u)'
 	  END IF
 !
+	ELSE IF(XOPT .EQ. 'NGERR')THEN
+	  TMP_LOG=.TRUE.
+	  CALL GEN_IN(TMP_LOG,'Normalize by grav-ge (F) or grav (T)')
+	  DO ID=1,NMOD
+	    ND=ATM(ID)%ND
+	    IF(TMP_LOG)THEN
+	      ATM(ID)%TA(1:ND)=(ATM(ID)%REQ(1:ND)-ATM(ID)%GRAD(1:ND))/ATM(ID)%GRAV(1:ND)
+	    ELSE
+	      ATM(ID)%TA(1:ND)=(ATM(ID)%REQ(1:ND)-ATM(ID)%GRAD(1:ND))/(ATM(ID)%GRAV(1:ND)-ATM(ID)%GELEC(1:ND))
+	    END IF
+	    CALL DP_CURVE(ND,ATM(ID)%XVEC,ATM(ID)%TA)
+	  END DO
+	  IF(TMP_LOG)THEN
+	    YLAB=TRIM(YLAB)//'; (vdv/dr + \gr\u-1\d dP/dr + g - g\dr\u)/g'
+	  ELSE
+	    YLAB=TRIM(YLAB)//'; (vdv/dr + \gr\u-1\d dP/dr + g - g\dr\u)/(g-g\de\u)'
+	  END IF
+
+!
 	ELSE IF(XOPT .EQ. 'NGRAD')THEN
 	  DO ID=1,NMOD
 	    ND=ATM(ID)%ND
