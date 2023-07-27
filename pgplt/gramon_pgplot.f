@@ -8,6 +8,7 @@
 	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
+! Altered:  26-Jul-2023 : Added (finalized?) CBAL and FBAL options.
 ! Altered:  22-Mar-2022 : List of changes compareed with earlier GITHUB version.
 !                           SP -- step plot option installed.
 !                           Better handling of line IDs
@@ -630,10 +631,13 @@
 	  WRITE(T_OUT,*)'VAR  - Simple arithmetic on two plots'
 	  WRITE(T_OUT,*)'NM   - Scale average to 1 or to another plot'
 	  WRITE(T_OUT,*)'NMS  - Similar to NM but for automatic plotting'
+	  WRITE(T_OUT,*)'SP   - Step plot accross screen'
+	  WRITE(T_OUT,*)' '
 	  WRITE(T_OUT,*)'REP  - Simple replacment of data using a cursor'
 	  WRITE(T_OUT,*)'FREP - Same as REP except nodes read in from file'
 	  WRITE(T_OUT,*)'MODC - Routine for modifying/shifting a simple curve'
 	  WRITE(T_OUT,*)'REG  - Regrid plot - UG, dX, R or NINS'
+	  WRITE(T_OUT,*)'SIG  - Measure signal to noise of a spectral region'
 	  WRITE(T_OUT,*)'ADDN - Add Poisonian noise'
 	  WRITE(T_OUT,*)'SM   - Smooth data (Han) -- ignores X-spacing of data'
 	  WRITE(T_OUT,*)'BXSM - Smooth data (box filter) -- ignores X-spacing of data'
@@ -646,15 +650,17 @@
 	  WRITE(T_OUT,*)'MCN  - Define a continuum with repeate call using cursors'
 	  WRITE(T_OUT,*)' '
 !
-	  WRITE(T_OUT,*)'CEW - Measure the EW of a single line using cursors and a local continuum'
-	  WRITE(T_OUT,*)'FEW - Measure the EW of a line using locations read in from file set by CEW'
-	  WRITE(T_OUT,*)'EW  - Measure the EW of a single line'
-	  WRITE(T_OUT,*)'EWG - Measure the EW of many lines use Gaussian fiting usig data from a file'
-	  WRITE(T_OUT,*)'CGF - Fit a (modfied) gaussian to an absorption or emission line'  
-	  WRITE(T_OUT,*)'FGF - Fit multiple spctral regions using params read in fro GAUSS_PARAMS'
-!	  WRITE(T_OUT,*)'EGF - Edit gauss-fit arameters'
-!	  WRITE(T_OUT,*)'DG  - Draw gauss-fit.'
-!	  WRITE(T_OUT,*)'WGF - Write gauss-fit parameters to a file'
+	  WRITE(T_OUT,*)'CEW  - Measure the EW of a single line using cursors and a local continuum'
+	  WRITE(T_OUT,*)'FEW  - Measure the EW of a line using locations read in from file set by CEW'
+	  WRITE(T_OUT,*)'EW   - Measure the EW of a single line'
+	  WRITE(T_OUT,*)'EWG  - Measure the EW of many lines use Gaussian fiting usig data from a file'
+	  WRITE(T_OUT,*)'CGF  - Fit a (modfied) gaussian to an absorption or emission line'  
+	  WRITE(T_OUT,*)'FGF  - Fit multiple spctral regions using params read in fro GAUSS_PARAMS'
+	  WRITE(T_OUT,*)'CBAL - Measure Chi^2 of model fit to observations and line EW (mainly for broad lines)'
+	  WRITE(T_OUT,*)'FBAL - Use the results of CBAL to model fit to observatuobs and line EW'
+!	  WRITE(T_OUT,*)'EGF  - Edit gauss-fit arameters'
+!	  WRITE(T_OUT,*)'DG   - Draw gauss-fit.'
+!	  WRITE(T_OUT,*)'WGF  - Write gauss-fit parameters to a file'
 	  READ(T_IN,'(A)')ANS				!can use ANS here.
 	  IF(ANS(1:1) .EQ. 'E' .OR. ANS(1:1) .EQ. 'e')GOTO 1000
 !
@@ -1675,6 +1681,8 @@ C
 	    END DO
 	  CLOSE(UNIT=10)
 !
+! Allow manipulation of a plot using cursors.
+!
 	ELSE IF (ANS .EQ. 'MODC')THEN
 	  IF(NPLTS .EQ. 1)THEN
 	    PLOT_ID=1; IP=2
@@ -1881,6 +1889,11 @@ C
 	1             XLAB_FILE,YLAB_FILE,
 	1             PEN_COL,PEN_OFFSET,
 	1             REVERSE_PLOTTING_ORDER)
+!
+! This option is designed to use cursors to measure the EW of a broad line (e.g. H-gamma)
+! in a model and its  corresponding observation. The observations are normalized to the 
+! model using a straight line fit, and done to minimize the chi^2 difference between the 
+! model and observations.
 !
 	ELSE IF(ANS .EQ. 'CBAL')THEN
 	  I=NPLTS

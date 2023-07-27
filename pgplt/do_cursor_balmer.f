@@ -56,6 +56,9 @@
 	REAL*4  OLAM_ST(20), OLAM_END(20)
 	INTEGER OMIT_ST(20), OMIT_END(20)
 !
+	REAL*4  C_OLAM_ST(20), C_OLAM_END(20)
+	INTEGER C_OMIT_ST(20), C_OMIT_END(20)
+!
 	INTEGER PEN_COL(0:MAX_PLTS)
 	INTEGER PEN_OFFSET
 	LOGICAL REVERSE_PLOT_ORDER
@@ -85,6 +88,7 @@
 	REAL*8 DET, DA, DB
 	REAL*8 CHISQ,RAW_CHISQ,RED_CHISQ
 	REAL*8 EW_OBS,EW_MOD
+	REAL*8 EW_OBS_OMIT,EW_MOD_OMIT
 	REAL*8 SLOPE,INTER,CONT
 !
 	REAL*4 LAM
@@ -92,6 +96,7 @@
 	REAL*4, ALLOCATABLE :: OBS_DATA(:)
 	REAL*4, ALLOCATABLE :: MOD_DATA(:)
 	REAL*4, ALLOCATABLE :: MASK(:)
+	REAL*4, ALLOCATABLE :: C_MASK(:)
 	REAL*4, ALLOCATABLE :: CHISQ_CONTRIB(:)
 !
         INTEGER PGCURS
@@ -103,9 +108,11 @@
         LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, SAVE :: FIRST_WRITE=.TRUE.
 	INTEGER, SAVE :: LUIN=0
-	INTEGER, SAVE :: LUOUT=0
+	INTEGER, SAVE :: LU_OUT=0
 !
-	INTEGER NOMIT
+	INTEGER IPEN_SAVE
+	INTEGER N_OMIT
+	INTEGER NC_OMIT
 	INTEGER IP_MOD
 	INTEGER IP_OBS
 	INTEGER IP_OUT
@@ -153,31 +160,32 @@
 ! Interpolate data onto OBSERVATIONAL grid.
 !
 	IF(ALLOCATED(MOD_DATA))THEN
-	  DEALLOCATE(MOD_DATA,OBS_DATA,MASK,CHISQ_CONTRIB)
+	  DEALLOCATE(MOD_DATA,OBS_DATA,MASK,C_MASK,CHISQ_CONTRIB)
 	END IF
 	NP=NPTS(IP_OBS)
 	WRITE(6,*)'NP=',NP
-	ALLOCATE(MOD_DATA(NP),MASK(NP),OBS_DATA(NP),CHISQ_CONTRIB(NP))
+	ALLOCATE(MOD_DATA(NP),MASK(NP),C_MASK(NP),OBS_DATA(NP),CHISQ_CONTRIB(NP))
 	CALL MON_INTERP_SP(MOD_DATA,NP,IONE,CD(IP_OBS)%XVEC,NP,CD(IP_MOD)%DATA,NPTS(IP_MOD),CD(IP_MOD)%XVEC,NPTS(IP_MOD))
 	OBS_DATA=CD(IP_OBS)%DATA
 	CHISQ_CONTRIB=0.0D0
 !
 ! Open output file. Data is appended if it alread exists.
 !
-	IF(LUOUT .EQ. 0)THEN
+	IF(LU_OUT .EQ. 0)THEN
 	  OUT_FILE='BALMER_DATA'
-	  CALL GET_LU(LUOUT,'LUOUT in DO_CURSOR_BALMER_V1')
+	  CALL GET_LU(LU_OUT,'LU_OUT in DO_CURSOR_BALMER_V1')
 	  CALL GEN_IN(OUT_FILE,'File to OUTPUT chi^2 and EW etc')
 	  INQUIRE(FILE=OUT_FILE,EXIST=FILE_PRES)
 	  IF(FILE_PRES)THEN
 	    WRITE(6,*)'File already exists -- appending new data'
-	    OPEN(UNIT=LUOUT,FILE=OUT_FILE,STATUS='OLD',ACTION='WRITE',POSITION='APPEND')
+	    OPEN(UNIT=LU_OUT,FILE=OUT_FILE,STATUS='OLD',ACTION='WRITE',POSITION='APPEND')
 	  ELSE
-	    OPEN(UNIT=LUOUT,FILE=OUT_FILE,STATUS='NEW',ACTION='WRITE')
-	    CALL WRITE_BALMER_HEADER(LUOUT)
+	    OPEN(UNIT=LU_OUT,FILE=OUT_FILE,STATUS='NEW',ACTION='WRITE')
+	    CALL WRITE_BALMER_HEADER(LU_OUT)
 	  END IF
 	END IF
 !
+	IST=0; IEND=0
 	CALL PRINT_CURSOR_DESC
 	DO WHILE(1 .EQ. 1)
 !
@@ -185,6 +193,7 @@
 	  IF(UC(CURSVAL) .EQ. 'Q')THEN
 	    EXIT
 	  ELSE IF(UC(CURSVAL) .EQ. 'S')THEN
+	    FIT_DONE=.FALSE.
 	    GOTO 1000
 	  ELSE IF(UC(CURSVAL) .EQ. 'B')THEN
 !
@@ -201,9 +210,43 @@
             YT(1)=YLOC-2*dY; YT(2)=YLOC+2*dY
             XT(1)=XLOC; XT(2)=XLOC
             CALL PGLINE(2,XT,YT)
-	    NOMIT=0
+	    N_OMIT=0
+	    NC_OMIT=0
+!
+	  ELSE IF(UC(CURSVAL) .EQ. 'Z')THEN
+!
+	    IF(IST .EQ. 0 .OR. IEND .EQ. 0)THEN
+	      WRITE(6,*)'Line region is undefined -- use B to defined line region'
+	      GOTO 1000
+	    END IF
+!
+	    IPEN_SAVE=IPEN
+	    IPEN=7
+            CALL PGSCI(IPEN)
+!
+! Note -- we already have the first cursor location.
+!
+	    I=NC_OMIT+1; C_OLAM_ST(I)=XLOC
+	    C_OMIT_ST(I)=GET_INDX_SP(XLOC,CD(IP_OBS)%XVEC,NPTS(IP_OBS))
+            YT(1)=YLOC-dY; YT(2)=YLOC+dY
+            XT(1)=XLOC; XT(2)=XLOC
+            CALL PGLINE(2,XT,YT)
+!
+	    CURSERR = PGCURS(XLOC,YLOC,CURSVAL); C_OLAM_END(I)=XLOC
+	    C_OMIT_END(I)=GET_INDX_SP(XLOC,CD(IP_OBS)%XVEC,NPTS(IP_OBS))
+            YT(1)=YLOC-dY; YT(2)=YLOC+dY
+            XT(1)=XLOC; XT(2)=XLOC
+            CALL PGLINE(2,XT,YT)
+	    NC_OMIT=NC_OMIT+1
+	    IPEN=IPEN_SAVE
 !
 	  ELSE IF(UC(CURSVAL) .EQ. 'O')THEN
+!
+	    IF(IST .EQ. 0 .OR. IEND .EQ. 0)THEN
+	      WRITE(6,*)'Line region is undefined -- use B to defined line region'
+	      GOTO 1000
+	    END IF
+! 
             IF(IPEN .EQ. 6)THEN ! Change pen colors for defining limits of the next line.
               IPEN=1
             ELSE
@@ -213,7 +256,7 @@
 !
 ! Note -- we already have the first cursor location.
 !
-	    I=NOMIT+1; OLAM_ST(I)=XLOC
+	    I=N_OMIT+1; OLAM_ST(I)=XLOC
 	    OMIT_ST(I)=GET_INDX_SP(XLOC,CD(IP_OBS)%XVEC,NPTS(IP_OBS))
             YT(1)=YLOC-dY; YT(2)=YLOC+dY
             XT(1)=XLOC; XT(2)=XLOC
@@ -224,18 +267,30 @@
             YT(1)=YLOC-dY; YT(2)=YLOC+dY
             XT(1)=XLOC; XT(2)=XLOC
             CALL PGLINE(2,XT,YT)
-	    NOMIT=NOMIT+1
+	    N_OMIT=N_OMIT+1
 !
 	  ELSE IF(UC(CURSVAL) .EQ. 'F')THEN
+!
+	    IF(IST .EQ. 0 .OR. IEND .EQ. 0)THEN
+	      WRITE(6,*)'Line region is undefined -- use B to defined line region'
+	      GOTO 1000
+	    END IF
+! 
 	    NPIX=0
-	    MASK=1.0D0
+	    MASK=1.0D0; C_MASK=1.0D0
+	    DO I=1,N_OMIT
+	      MASK(OMIT_ST(I):OMIT_END(I))=0.0D0
+	    END DO
+	    DO I=1,NC_OMIT
+	      C_MASK(C_OMIT_ST(I):C_OMIT_END(I))=0.0D0
+	    END DO
 !
 	    SUM_OSQ=0.0D0;    SUM_LOSQ=0.0D0;   SUM_LSQ_OSQ=0.0D0 
 	    SUM_MO=0.0D0;     SUM_LMO=0.0D0
 	    DO I=IST,IEND
 	      NPIX=NPIX+NINT(MASK(I)*1.0D0)
 	      LAM=CD(IP_OBS)%XVEC(I)-CD(IP_OBS)%XVEC(IST)
-	      O_DATA=CD(IP_OBS)%DATA(I)*MASK(I)
+	      O_DATA=CD(IP_OBS)%DATA(I)*MASK(I)*C_MASK(I)
 !
 	      SUM_OSQ=SUM_OSQ+O_DATA*O_DATA
 	      SUM_LOSQ=SUM_LOSQ+LAM*O_DATA*O_DATA
@@ -249,20 +304,20 @@
 	    DB=SUM_OSQ*SUM_LMO-SUM_LOSQ*SUM_MO
 	    A=DA/DET; B=DB/DET 
 !
-! Compute CHI^2
+! Compute CHI^2. We always fit the original data.
 !
 	    RAW_CHISQ=0.0D0; CHISQ=0.0D0
 	    DO I=IST,IEND
 	      T1=CD(IP_OBS)%XVEC(I)-CD(IP_OBS)%XVEC(IST)
 	      RAW_CHISQ=RAW_CHISQ+MASK(I)*(MOD_DATA(I)-OBS_DATA(I))**2/MOD_DATA(I)
-	      OBS_DATA(I)=(A+B*T1)*OBS_DATA(I)
+	      OBS_DATA(I)=(A+B*T1)*CD(IP_OBS)%DATA(I)
 	      CHISQ=CHISQ+MASK(I)*(MOD_DATA(I)-OBS_DATA(I))**2/MOD_DATA(I)
 	      CHISQ_CONTRIB(I)=MASK(I)*(MOD_DATA(I)-OBS_DATA(I))**2/MOD_DATA(I)
 	    END DO
 !
 ! Simple trapzoidal rule integration.
 ! Compute model continuum level assuming it is defined close to the line
-! bounds.
+! bounds of the model.
 !
 	    T1=0.0D0; T2=0.0D0
 	    DO I=IST,IST+2
@@ -275,18 +330,33 @@
 	    SLOPE=(T2-T1)/(CD(IP_OBS)%XVEC(IEND-1)-CD(IP_OBS)%XVEC(IST+1))
 	    INTER=T1
 !
-! Simple trapzoidal rule integration.
+! Simple trapzoidal rule integration. These EWs include the omitted regions.
 !
 	    EW_OBS=0.0D0; EW_MOD=0.0D0
 	    DO I=IST,IEND
 	      CONT=INTER+SLOPE*(CD(IP_OBS)%XVEC(I)-CD(IP_OBS)%XVEC(IST+1))
-	      T1=CD(IP_OBS)%XVEC(I)-CD(IP_OBS)%XVEC(IST)
-	      T2=0.5D0*(CD(IP_OBS)%XVEC(MAX(IST,I-1))-CD(IP_OBS)%XVEC(MIN(I+1,IEND)))
-	      EW_OBS=EW_OBS+(1.0D0-OBS_DATA(I)/CONT)*ABS(T2)
-	      EW_MOD=EW_MOD+(1.0D0-MOD_DATA(I)/CONT)*ABS(T2)
+	      T1=0.5D0*(CD(IP_OBS)%XVEC(MAX(IST,I-1))-CD(IP_OBS)%XVEC(MIN(I+1,IEND)))
+	      EW_OBS=EW_OBS+(1.0D0-OBS_DATA(I)/CONT)*ABS(T1)
+	      EW_MOD=EW_MOD+(1.0D0-MOD_DATA(I)/CONT)*ABS(T1)
 	    END DO
 !
-! We ignore the clipped regions for comouting the mean wavelength.
+! Simple trapzoidal rule integration. These EWs exclude the omitted regions.
+!
+	    EW_OBS_OMIT=0.0D0; EW_MOD_OMIT=0.0D0
+	    DO I=IST,IEND
+	      CONT=INTER+SLOPE*(CD(IP_OBS)%XVEC(I)-CD(IP_OBS)%XVEC(IST+1))
+	      IF(MASK(I) .GT. 0.01)THEN
+	        J=MAX(I-1,IST)
+	        IF(MASK(J) .LT. 0.01)J=I
+	        K=MIN(I+1,IEND)
+	        IF(MASK(K) .LT. 0.01)K=I
+	        T1=0.5D0*(CD(IP_OBS)%XVEC(J)-CD(IP_OBS)%XVEC(K))
+	        EW_OBS_OMIT=EW_OBS_OMIT+(1.0D0-OBS_DATA(I)/CONT)*ABS(T1)
+	        EW_MOD_OMIT=EW_MOD_OMIT+(1.0D0-MOD_DATA(I)/CONT)*ABS(T1)
+	      END IF
+	    END DO
+!
+! We ignore the clipped regions for computing the mean wavelength.
 !
 	    MEAN=0.0D0; LAM_CENT=0.0D0	
 	    DO I=IST,IEND-1
@@ -311,12 +381,14 @@
 	    I=1; CALL PGSCI(I); J=IEND-IST+1
             CALL PGLINE(J,CD(IP_OBS)%XVEC(IST),OBS_DATA(IST))
 !
-	    T2=EW_MOD; T3=LAM_CENT; T4=50.0   !Rough FWHN in km/s to get closest line
+	    T2=EW_MOD; T3=LAM_CENT; T4=50.0   !Rough FWHM in km/s to get closest line
 	    CALL GET_LINE_ID_PG(TRANS_NAME,T1,T2,T3,T4)
-	    WRITE(LUOUT,'(I4,F12.4,4F12.3,6X,A)')IP_MOD,LAM_CENT,EW_MOD,EW_OBS,RED_CHISQ,T1,TRIM(TRANS_NAME)
-	    WRITE(LUOUT,'(16X,2F12.4,I12)')XST,XEND,NOMIT
-	    WRITE(LUOUT,'(16X,8F12.3)')(OLAM_ST(J),OLAM_END(J),J=1,NOMIT)
-	    WRITE(LUOUT,*)' '; FLUSH(LUOUT)
+	    WRITE(LU_OUT,'(I4,F12.4,6F12.3,6X,A)')IP_MOD,LAM_CENT,EW_MOD,EW_OBS,
+	1                          EW_MOD_OMIT,EW_OBS_OMIT,RED_CHISQ,T1,TRIM(TRANS_NAME)
+	    WRITE(LU_OUT,'(16X,2F12.4,2I12)')XST,XEND,N_OMIT,NC_OMIT
+	    IF(N_OMIT .NE. 0)WRITE(LU_OUT,'(16X,8F12.3)')(OLAM_ST(J),OLAM_END(J),J=1,N_OMIT)
+	    IF(NC_OMIT .NE. 0)WRITE(LU_OUT,'(16X,8F12.3)')(C_OLAM_ST(J),C_OLAM_END(J),J=1,NC_OMIT)
+	    WRITE(LU_OUT,*)' '; FLUSH(LU_OUT)
 !
 	  ELSE IF(UC(CURSVAL) .EQ. 'H')THEN
 	    CALL PRINT_CURSOR_DESC()
@@ -440,11 +512,14 @@
 	  WRITE(6,'(A)')' Program assumes X axis increases with X index '
 	  WRITE(6,'(A)')' Cursor controls are case Insensitive'
 	  WRITE(6,'(A)')' '
-	  WRITE(6,'(A)')' Use the cursor to define left and right side of the line.'
-	  WRITE(6,'(A)')'   Then use o to omit regions not to be included in the fit.'
+	  WRITE(6,'(A)')' Use the cursor and B to define left and right side of the line.'
+	  WRITE(6,'(A)')'   Then use O to omit regions not to be included in the fit.'
+	  WRITE(6,'(A)')' '
+	  WRITE(6,'(A)')RED_PEN//' NB: All cursor input should be lower case'//BLUE_PEN
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')'   B - define full line region'
-	  WRITE(6,'(A)')'   O - define regions to omit'
+	  WRITE(6,'(A)')'   O - define regions to omit from the chi^2 & EW computation.'
+	  WRITE(6,'(A)')'   Z - define regions to omit from the chi^2 computaton only.'
 	  WRITE(6,'(A)')'   F - do the fitting'
 	  WRITE(6,'(A)')'   S - reset and start line selection again'
 	  WRITE(6,'(A)')'   Q - quit line selection'
@@ -471,7 +546,8 @@
  	WRITE(LU,'(A)')'! Reduced Chi^2 value assumes a SN to 100.'
  	WRITE(LU,'(A)')'! Reduced Chi^2 at another SN =  Chi^2 * (SN/100)^2.'
  	WRITE(LU,'(A)')'! Lam refers to the centroid wavelength (no regions omitted).'
- 	WRITE(LU,'(A)')'! The EW''s include the omitted regions.'
+ 	WRITE(LU,'(A)')'! The first  2 EW''s include the omitted regions.'
+ 	WRITE(LU,'(A)')'! The second 2 EW''s exclude the omitted regions.'
  	WRITE(LU,'(A)')'! '
  	WRITE(LU,'(A)')'! Omit window pairs follow each EW & Chi^2 measurement.'
  	WRITE(LU,'(A)')'! '
@@ -479,8 +555,8 @@
           WRITE(LU,'(A,I3,5X,A,2X,A)')'! Plot #:',IP,'Plot title:',TRIM(CD(IP)%CURVE_ID)
         END DO
         WRITE(LU,'(A)')'!'
- 	WRITE(LU,'(A,1X,A,9X,A,5X,A,5X,A,5X,A,5X,A,5X,A,5X,A)')'!','IP','Lam','EW(mod)','EW(obs)',
-	1                     'Chi^2','Lam(ID)','Transition'
+ 	WRITE(LU,'(A,1X,A,9X,A,7(5X,A))')'!','IP','Lam','EW(mod)','EW(obs)',
+	1                 'EW(mod)','EW(obs)','Chi^2','Lam(ID)','Transition'
 	WRITE(LU,'(A,8X,A,5X,A,4X,A)')'!','Line st','Line end','N(omit)'
  	WRITE(LU,'(A)')'! '
 	FLUSH(LU)

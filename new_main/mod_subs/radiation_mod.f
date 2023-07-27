@@ -220,5 +220,9 @@
 	  STOP
 	END IF
 !
+! The following initializations are required when we do a model with 0 iterations.
+!
+	J_INT=0.0D0; H_INT=0.0D0; K_INT=0.0D0
+!
 	RETURN
 	END

@@ -17,9 +17,13 @@
 !
 ! Local parameters.
 !
-	INTEGER NOMIT
+	INTEGER N_OMIT
+	INTEGER NC_OMIT
 	INTEGER OMIT_ST(20), OMIT_END(20)
 	REAL*4  OLAM_ST(20), OLAM_END(20)
+!
+        REAL*4  C_OLAM_ST(20), C_OLAM_END(20)
+        INTEGER C_OMIT_ST(20), C_OMIT_END(20)
 !
 	INTEGER NPIX
 	INTEGER IST,IEND		!Line limits in pixel space
@@ -27,6 +31,7 @@
 	REAL*8 LAM_CENT			!Line centroid
 	REAL*8 MEAN 			!Used computing line centroid
 	REAL*8 EW_MOD,EW_OBS
+        REAL*8 EW_OBS_OMIT,EW_MOD_OMIT
 !
 ! Work variables
 !
@@ -50,6 +55,7 @@
 	REAL*4, ALLOCATABLE :: OBS_DATA(:)
 	REAL*4, ALLOCATABLE :: MOD_DATA(:)
 	REAL*4, ALLOCATABLE :: MASK(:)
+	REAL*4, ALLOCATABLE :: C_MASK(:)
 !
 	INTEGER, SAVE :: LU_LIMS=7
 	INTEGER, SAVE :: LU_OUT=10
@@ -100,32 +106,44 @@
 	     WRITE(6,*)'STRING follows:'
 	     WRITE(6,*)TRIM(STRING)
 	  END IF
-	  READ(LU_LIMS,*)LAM_ST,LAM_END,NOMIT
-	  READ(LU_LIMS,*)(OLAM_ST(I),OLAM_END(I),I=1,NOMIT)
+	  READ(LU_LIMS,*)LAM_ST,LAM_END,N_OMIT,NC_OMIT
+	  IF(N_OMIT .NE. 0)READ(LU_LIMS,*)(OLAM_ST(I),OLAM_END(I),I=1,N_OMIT)
+	  IF(NC_OMIT .NE. 0)READ(LU_LIMS,*)(C_OLAM_ST(I),C_OLAM_END(I),I=1,NC_OMIT)
 	  DO IP_MOD=1,NPLTS
+	    WRITE(6,*)'IP_MOD=',IP_MOD
 	    IF(IP_MOD .EQ. IP_OBS)THEN
 	    ELSE
 !
 ! Interpolate data onto OBSERVATIONAL grid.
 !
 	      IF(ALLOCATED(MOD_DATA))THEN
-	        DEALLOCATE(MOD_DATA,OBS_DATA,MASK)
+	        DEALLOCATE(MOD_DATA,OBS_DATA,MASK,C_MASK)
 	      END IF
 	      NP=NPTS(IP_OBS)
-	      ALLOCATE(MOD_DATA(NP),MASK(NP),OBS_DATA(NP))
+	      ALLOCATE(MOD_DATA(NP),MASK(NP),C_MASK(NP),OBS_DATA(NP))
 	      CALL MON_INTERP_SP(MOD_DATA,NP,IONE,CD(IP_OBS)%XVEC,NP,CD(IP_MOD)%DATA,NPTS(IP_MOD),CD(IP_MOD)%XVEC,NPTS(IP_MOD))
 	      OBS_DATA=CD(IP_OBS)%DATA
+	      WRITE(6,*)'Interpolated data'
 !
 ! This defines the full extent of the line.
 !
 	      IST=GET_INDX_SP(LAM_ST,CD(IP_OBS)%XVEC,NPTS(IP_OBS))
 	      IEND=GET_INDX_SP(LAM_END,CD(IP_OBS)%XVEC,NPTS(IP_OBS))
 !
-	      MASK=1.0D0
-	      DO J=1,NOMIT
+	      NPIX=0; MASK=1.0D0; C_MASK=1.0D0
+	      DO J=1,N_OMIT
 	        OMIT_ST(J)=GET_INDX_SP(OLAM_ST(J),CD(IP_OBS)%XVEC,NPTS(IP_OBS))
 	        OMIT_END(J)=GET_INDX_SP(OLAM_END(J),CD(IP_OBS)%XVEC,NPTS(IP_OBS))
 	        DO I=OMIT_ST(J)+1,OMIT_END(J)-1
+	          MASK(I)=0.0D0
+	        END DO
+	      END DO
+	      WRITE(6,*)'Aq'
+!
+	      DO J=1,NC_OMIT
+	        C_OMIT_ST(J)=GET_INDX_SP(OLAM_ST(J),CD(IP_OBS)%XVEC,NPTS(IP_OBS))
+	        C_OMIT_END(J)=GET_INDX_SP(OLAM_END(J),CD(IP_OBS)%XVEC,NPTS(IP_OBS))
+	        DO I=C_OMIT_ST(J)+1,C_OMIT_END(J)-1
 	          MASK(I)=0.0D0
 	        END DO
 	      END DO
@@ -135,7 +153,7 @@
 	      DO I=IST,IEND
 	        NPIX=NPIX+NINT(MASK(I)*1.0D0)
 	        LAM=CD(IP_OBS)%XVEC(I)-CD(IP_OBS)%XVEC(IST)
-	        O_DATA=CD(IP_OBS)%DATA(I)*MASK(I)
+	        O_DATA=CD(IP_OBS)%DATA(I)*MASK(I)*C_MASK(I)
 !
 	        SUM_OSQ=SUM_OSQ+O_DATA*O_DATA
 	        SUM_LOSQ=SUM_LOSQ+LAM*O_DATA*O_DATA
@@ -158,6 +176,7 @@
 	        OBS_DATA(I)=(A+B*T1)*OBS_DATA(I)
 	        CHISQ=CHISQ+MASK(I)*(MOD_DATA(I)-OBS_DATA(I))**2/MOD_DATA(I)
 	      END DO
+	      WRITE(6,*)'A'
 !
 ! Simple trapzoidal rule integration.
 ! Compute model continuum level assuming it is defined close to the line bounds.
@@ -172,6 +191,7 @@
 	     T1=T1/3; T2=T2/3
 	     SLOPE=(T2-T1)/(CD(IP_OBS)%XVEC(IEND-1)-CD(IP_OBS)%XVEC(IST+1))
 	     INTER=T1 
+	    WRITE(6,*)'B'
 ! 
 ! Since the obersevations have been "normalized" we assume that the
 ! continuum is the same for the observations.
@@ -184,6 +204,23 @@
 	       EW_OBS=EW_OBS+(1.0D0-OBS_DATA(I)/CONT)*ABS(T2)
 	       EW_MOD=EW_MOD+(1.0D0-MOD_DATA(I)/CONT)*ABS(T2)
 	     END DO
+	    WRITE(6,*)'C'
+!       
+! Simple trapzoidal rule integration. These EWs exclude the omitted regions.
+!       
+	     EW_OBS_OMIT=0.0D0; EW_MOD_OMIT=0.0D0
+	     DO I=IST,IEND
+	       CONT=INTER+SLOPE*(CD(IP_OBS)%XVEC(I)-CD(IP_OBS)%XVEC(IST+1))
+	       IF(MASK(I) .GT. 0.01)THEN
+	         J=MAX(I-1,IST)
+	         IF(MASK(J) .LT. 0.01)J=I
+	         K=MIN(I+1,IEND)
+	        IF(MASK(K) .LT. 0.01)K=I
+	        T1=0.5D0*(CD(IP_OBS)%XVEC(J)-CD(IP_OBS)%XVEC(K))
+	        EW_OBS_OMIT=EW_OBS_OMIT+(1.0D0-OBS_DATA(I)/CONT)*ABS(T1)
+	        EW_MOD_OMIT=EW_MOD_OMIT+(1.0D0-MOD_DATA(I)/CONT)*ABS(T1)
+	      END IF
+	    END DO
 !
 ! We ignore the clipped regions for computing the mean wavelength.
 !
@@ -200,7 +237,8 @@
 	     RED_CHISQ=CHISQ*1.0D+04/(NPIX-2)
              T2=EW_MOD; T3=LAM_CENT; T4=50.0   !Rough FWHN in km/s to get closest line
              CALL GET_LINE_ID_PG(TRANS_NAME,T1,T2,T3,T4)
-             WRITE(LU_OUT,'(I4,F12.4,4F12.3,6X,A)')IP_MOD,LAM_CENT,EW_MOD,EW_OBS,RED_CHISQ,T1,TRIM(TRANS_NAME)
+             WRITE(LU_OUT,'(I4,F12.4,6F12.3,6X,A)')IP_MOD,LAM_CENT,EW_MOD,EW_OBS,
+	1                          EW_MOD_OMIT,EW_OBS_OMIT,RED_CHISQ,T1,TRIM(TRANS_NAME)
 	     FLUSH(LU_OUT)
 !
 	    END IF		!IP NE IP_OPS
@@ -227,8 +265,8 @@
 	  WRITE(LU,'(A,I3,5X,A,2X,A)')'! Plot #:',IP,'Plot title:',TRIM(CD(IP)%CURVE_ID)
         END DO
         WRITE(LU,'(A)')'!'
-	WRITE(LU,'(A,1X,A,9X,A,5X,A,5X,A,5X,A,5X,A,5X,A,5X,A)')'!','IP','Lam','EW(mod)','EW(obs)',
-	1                     'Chi^2','Lam(ID)','Transition'
+	WRITE(LU,'(A,1X,A,9X,A,8(5X,A))')'!','IP','Lam','EW(mod)','EW(obs)',
+	1	         'EW(mod)','EW(obs)','Chi^2','Lam(ID)','Transition'
  	WRITE(LU,'(A,7X)')'!',' Omit window pairs'
  	WRITE(LU,'(A)')'! '
 	FLUSH(LU)
