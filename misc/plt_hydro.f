@@ -6,8 +6,9 @@
 	PROGRAM PLT_HYDRO
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
+	USE READ_KEYWORD_INTERFACE
 !
-! Altered 06-Sep-2022 :  Minore bug fix when RVTJ not found (30-Aug-2022).
+! Altered 06-Sep-2022 :  Minor bug fix when RVTJ not found (30-Aug-2022).
 ! Altered 09-Jan-2021 :  Altered to read in HYDRO files with different sets of columns.
 !                        The HYDRO file can  have extra columns but the same header 
 !                        ID must be the same in all formats.
@@ -25,10 +26,12 @@
 	INTEGER, PARAMETER :: T_OUT=6
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
+	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
+	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 !
 	REAL*8 GRAV_CON
-	REAL*8 T1,T2
-!
+	REAL*8 T1,T2,T3,T4
+	REAL*8 STAR_MASS
 	REAL*8 GRAVITATIONAL_CONSTANT, MASS_SUN,BOLTZMANN_CONSTANT
 	EXTERNAL GRAVITATIONAL_CONSTANT, MASS_SUN,BOLTZMANN_CONSTANT
 	INTEGER GET_HYDRO_VEC_LOC
@@ -59,12 +62,23 @@
 	  REAL*8, ALLOCATABLE :: TEMP(:)
 	  REAL*8, ALLOCATABLE :: GAS_PRES(:)
 	  REAL*8, ALLOCATABLE :: TA(:)
+	  REAL*8, ALLOCATABLE :: TB(:)
 	  REAL*8, ALLOCATABLE :: XVEC(:)
 	  REAL*8, ALLOCATABLE :: YVEC(:)
 	  REAL*8, ALLOCATABLE :: ZVEC(:)
 	  REAL*8, ALLOCATABLE :: SOUND(:)
 	  REAL*8, ALLOCATABLE :: TAU(:)
 	  REAL*8, ALLOCATABLE :: CLUMP_FAC(:)
+	  REAL*8, ALLOCATABLE :: DENSITY(:)
+	  REAL*8, ALLOCATABLE :: TAU_FLUX(:)
+	  REAL*8, ALLOCATABLE :: FLUX_MEAN(:)
+	  REAL*8 STARS_MASS
+	  REAL*8 STARS_MDOT
+	  REAL*8 DEP_WIND_MOM
+	  REAL*8 WIND_MOM_MDOT
+	  REAL*8 TAU_SONIC
+	  REAL*8 R_SONIC
+	  REAL*8 C_SONIC
 	  INTEGER ND
 	  CHARACTER(LEN=80) DIR_NAME
 	END TYPE HYDRO_DATA
@@ -127,13 +141,27 @@
 	  ALLOCATE(ATM(ID)%TEMP(ND));  ATM(ID)%TEMP=0.0D0
 	  ALLOCATE(ATM(ID)%GAS_PRES(ND)); ATM(ID)%GAS_PRES=0.0D0
 	  ALLOCATE(ATM(ID)%TA(ND))
+	  ALLOCATE(ATM(ID)%TB(ND))
 	  ALLOCATE(ATM(ID)%XVEC(ND))
 	  ALLOCATE(ATM(ID)%YVEC(ND))
 	  ALLOCATE(ATM(ID)%ZVEC(ND))
-	  ALLOCATE(ATM(ID)%TAU(ND)); ATM(ID)%TAU=0.0D0
-	  ALLOCATE(ATM(ID)%SOUND(ND)); ATM(ID)%SOUND=0.0D0
-	  ALLOCATE(ATM(ID)%ATOM(ND)); ATM(ID)%ATOM=0.0D0
-	  ALLOCATE(ATM(ID)%CLUMP_FAC(ND)); ATM(ID)%CLUMP_FAC=0.0D0
+	  ALLOCATE(ATM(ID)%TAU(ND));           ATM(ID)%TAU=0.0D0
+	  ALLOCATE(ATM(ID)%SOUND(ND));         ATM(ID)%SOUND=0.0D0
+	  ALLOCATE(ATM(ID)%ATOM(ND));          ATM(ID)%ATOM=0.0D0
+	  ALLOCATE(ATM(ID)%CLUMP_FAC(ND));     ATM(ID)%CLUMP_FAC=0.0D0
+	  ALLOCATE(ATM(ID)%DENSITY(ND));       ATM(ID)%DENSITY=0.0D0
+	  ALLOCATE(ATM(ID)%TAU_FLUX(ND));      ATM(ID)%TAU_FLUX=0.0D0
+	  ALLOCATE(ATM(ID)%FLUX_MEAN(ND));     ATM(ID)%FLUX_MEAN=0.0D0
+!
+	  FILENAME=TRIM(ATM(NMOD)%DIR_NAME)//'VADAT'
+	  INQUIRE(FILE=FILENAME,EXIST=TMP_LOG)
+	  IF(TMP_LOG)THEN
+	    ATM(ID)%STARS_MASS=0.0D0
+	    CALL READ_KEYWORD(ATM(ID)%STARS_MASS,'[MASS]',L_FALSE,FILENAME,L_TRUE,L_FALSE,10)
+	    CALL READ_KEYWORD(ATM(ID)%STARS_MDOT,'[MDOT]',L_FALSE,FILENAME,L_FALSE,L_TRUE,10)
+	  END IF
+	  IF(ATM(ID)%STARS_MASS .EQ. 0.0D0)CALL GEN_IN(ATM(ID)%STARS_MASS,'Stars surface gravity')
+	  IF(ATM(ID)%STARS_MDOT .EQ. 0.0D0)CALL GEN_IN(ATM(ID)%STARS_MDOT,'Stars mass loss rate')
 !
 	  OLD_FORMAT=.TRUE.
 	  FILENAME=TRIM(ATM(ID)%DIR_NAME)//'HYDRO'
@@ -201,6 +229,10 @@
 	      READ(LU_IN,*)(ATM(ID)%TEMP(I),I=1,ND)
 	    ELSE IF(INDEX(STRING,'Clumping Factor') .NE. 0)THEN
 	      READ(LU_IN,*)(ATM(ID)%CLUMP_FAC(I),I=1,ND)
+	    ELSE IF(INDEX(STRING,'Mass Density') .NE. 0)THEN
+	      READ(LU_IN,*)(ATM(ID)%DENSITY(I),I=1,ND)
+	    ELSE IF(INDEX(STRING,'Flux Mean') .NE. 0)THEN
+	      READ(LU_IN,*)(ATM(ID)%FLUX_MEAN(I),I=1,ND)
 	    END IF
 	    ATM(ID)%GAS_PRES=1.0D+04*BOLTZMANN_CONSTANT()*(ATM(ID)%ED+ATM(ID)%ATOM)*ATM(ID)%TEMP
 	  END DO
@@ -234,6 +266,7 @@
 	   WRITE(6,*)'dVdR    -- plot dV/dR'
 	   WRITE(6,*)'PRES    -- plot gas pressure'
 	   WRITE(6,*)'CDP     -- plot individual derivatives of 1/rho dP/dr components'
+	   WRITE(6,*)'MOM     -- plot momentum dep'
 !
 	   WRITE(6,*)' '
 	   WRITE(6,*)'REQ     -- plot VdVdR+dPdR+dTPdR+g'
@@ -421,6 +454,64 @@
 	    CALL DP_CURVE(ATM(ID)%ND,ATM(ID)%XVEC,ATM(ID)%ZVEC)
 	  END DO
 	  YLAB=TRIM(YLAB)//'; \gr\u-1\d dP\dg\u/dr'
+!
+	ELSE IF(XOPT .EQ. 'MOM')THEN
+!
+	  DO ID=1,NMOD
+!
+! Compute the flux mean optical depth scale.
+!
+	    ATM(ID)%TAU_FLUX(1)=ATM(ID)%FLUX_MEAN(1)*ATM(ID)%R(1)
+	    DO I=2,ND
+	       ATM(ID)%TAU_FLUX(I)=ATM(ID)%TAU_FLUX(I-1)+0.5D0*(ATM(ID)%R(I-1)-ATM(ID)%R(I))*
+	1                           (ATM(ID)%FLUX_MEAN(I-1)*ATM(ID)%CLUMP_FAC(I-1) +
+	1                            ATM(ID)%FLUX_MEAN(I)*ATM(ID)%CLUMP_FAC(I) )
+	    END DO
+	    ATM(ID)%TAU_SONIC=ATM(ID)%TAU_FLUX(K)
+!
+! Get the sound speed and the location of the sonic point.
+!
+	    DO I=1,ND
+	      IF(ATM(ID)%SOUND(I) .GT. ATM(ID)%VEL(I))THEN
+	        K=I
+	        EXIT
+	      END IF
+	    END DO
+	    T1=ATM(ID)%VEL(K); T2=(ATM(ID)%VEL(K-1)-ATM(ID)%VEL(K))/(ATM(ID)%R(K-1)-ATM(ID)%R(K))
+	    T3=ATM(ID)%SOUND(K); T4=(ATM(ID)%SOUND(K-1)-ATM(ID)%SOUND(K))/(ATM(ID)%R(K-1)-ATM(ID)%R(K))
+	    ATM(ID)%R_SONIC=(T1-T3)/(T4-T2)		!Initially dR
+	    ATM(ID)%C_SONIC=T3+ATM(ID)%R_SONIC*T4
+	    ATM(ID)%R_SONIC=ATM(ID)%R_SONIC+ATM(ID)%R(K)
+	    WRITE(6,*)ID,ATM(ID)%R_SONIC,ATM(ID)%C_SONIC
+!
+	    ATM(ID)%TA(:)=0.0D0; ATM(ID)%TB(:)=0.0D0
+	    DO I=K-1,1,-1
+	       T2=0.5D+10*(ATM(ID)%R(I)-ATM(ID)%R(I+1))
+	       ATM(ID)%TA(I)=ATM(ID)%TA(I+1)+ T2*( (ATM(ID)%GAM(I)-1.0D0)*ATM(ID)%DENSITY(I)*ATM(ID)%CLUMP_FAC(I) +
+	1                                        (ATM(ID)%GAM(I+1)-1.0D0)*ATM(ID)%DENSITY(I+1)*ATM(ID)%CLUMP_FAC(I+1) )
+	       T3=ATM(ID)%dPdR(I)*ATM(ID)%DENSITY(I)*ATM(ID)%CLUMP_FAC(I)/ATM(ID)%GRAV(I)
+	       T4=ATM(ID)%dPdR(I+1)*ATM(ID)%DENSITY(I+1)*ATM(ID)%CLUMP_FAC(I+1)/ATM(ID)%GRAV(I+1)
+	       ATM(ID)%TB(I)=ATM(ID)%TB(I+1)+ T2*(T3+T4) 
+	    END DO
+	    CALL DP_CURVE(K,ATM(ID)%XVEC,ATM(ID)%TA)
+	    CALL DP_CURVE(K,ATM(ID)%XVEC,ATM(ID)%TB)
+!	    WRITE(6,*)'Ratio to flux=',ATM(ID)%TAU_FLUX(K),ATM(ID)%TA(1)/ATM(ID)%TAU_FLUX(K)
+!
+	    T1=1.0D+20*365.25*24*3600/1.0D+05 	!1.0D+20*1year/1km/s
+	    ATM(ID)%DEP_WIND_MOM=4.0D0*3.1459D0*T1*ATM(ID)%STARS_MASS*GRAV_CON*ATM(ID)%TA(1)/MASS_SUN()
+	    ATM(ID)%WIND_MOM_MDOT=ATM(ID)%DEP_WIND_MOM/ATM(ID)%VEL(1)
+	 END DO
+!
+	 WRITE(6,*)'Deposited wind momentum is in units of Msun km/s' 
+	 WRITE(6,*)'Mass loss rate is in units of Msun/yr'
+	 WRITE(6,*)' '
+	 WRITE(6,'(1X,A,3X,A,1X,A,9X,A,4X,A,3X,A,9X,A)')'ID','Tau(Sonic)','Mom(Msun km/s)',
+	1             'Msun/yr','Msun/yr(mod)','Vinf(mod)'
+	 DO ID=1,NMOD
+	   WRITE(6,'(I3,F12.4,3ES16.4,F12.2,5X,A)')
+	1       ID,ATM(ID)%TAU_SONIC,ATM(ID)%DEP_WIND_MOM,ATM(ID)%WIND_MOM_MDOT,
+	1                   ATM(ID)%STARS_MDOT,ATM(ID)%VEL(1),TRIM(ATM(ID)%DIR_NAME)
+	 END DO
 !
 	ELSE IF(XOPT .EQ. 'GRAD')THEN
 	  DO ID=1,NMOD
