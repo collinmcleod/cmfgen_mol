@@ -37,7 +37,7 @@
 !                       ERROR_LU installed.
 !                       Generic call for LOG and EXP.
 !
-! Altered 02-Aug-1994 - PROGRDESC change from INTEGER to REAL*8. Corrects
+! Altered 02-Aug-1994 - PROGRDESC change from INTEGER to REAL(10). Corrects
 !                       alignment problem. PROGDESC is now check for
 !                       corruption, even if too many iterations occur.
 ! Altered 3-May-1989 - NV and check installed.
@@ -55,20 +55,20 @@
 ! Altered 28-FEB-1984
 !
 	INTEGER N,ND
-	REAL*8 DHEN(N,ND),R(ND),T(ND),ED(ND),DI(ND),EDGE(N)
-	REAL*8 POPATOM(ND)
+	REAL(10) DHEN(N,ND),R(ND),T(ND),ED(ND),DI(ND),EDGE(N)
+	REAL(10) POPATOM(ND)
 	INTEGER F_TO_S(N)
 	INTEGER INT_SEQ(N)
 !
-	REAL*8, ALLOCATABLE :: DPOP(:,:)
-	REAL*8, ALLOCATABLE :: OLDED(:)
-	REAL*8, ALLOCATABLE :: OLDDI(:)
-	REAL*8, ALLOCATABLE :: OLDT(:)
-	REAL*8, ALLOCATABLE :: RLOG(:)
-	REAL*8, ALLOCATABLE :: TA(:)
-	REAL*8, ALLOCATABLE :: OLDR(:)
+	REAL(10), ALLOCATABLE :: DPOP(:,:)
+	REAL(10), ALLOCATABLE :: OLDED(:)
+	REAL(10), ALLOCATABLE :: OLDDI(:)
+	REAL(10), ALLOCATABLE :: OLDT(:)
+	REAL(10), ALLOCATABLE :: RLOG(:)
+	REAL(10), ALLOCATABLE :: TA(:)
+	REAL(10), ALLOCATABLE :: OLDR(:)
 !
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER ERROR_LU,LUER
@@ -77,7 +77,7 @@
 ! Local Variables.
 !
 	INTEGER I,J,NOLD,NDOLD,COUNT,NX,NXST,NZ,IOS
-	REAL*8 RPOLD,TX,FX,DELTA_T,T1,T2
+	REAL(10) RPOLD,TX,FX,DELTA_T,T1,T2
 	LOGICAL BAD_TX_CONV
 	LOGICAL NO_TX_CONV(ND)
 	LOGICAL CHECK_DC
@@ -139,9 +139,9 @@
 !
 ! Using the highest level read in, decide whether b, or b-1 have been read in.
 !
-	IF( DABS( TA(NOLD) ) .LT. 0.2D0 .AND. CHECK_DC)DPOP=DPOP+1.0D0
+	IF( ABS( TA(NOLD) ) .LT. 0.2D0 .AND. CHECK_DC)DPOP=DPOP+1.0D0
 !
-	IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
+	IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
 	  WRITE(LUER,*)'Warning - core radius not identical in REGRIDWSC_V3'
 	  WRITE(LUER,*)'Rescaling to make Rcore identical'
 	  DO I=1,NDOLD
@@ -214,7 +214,7 @@
 	  END DO
 	  DO I=1,NXST-1
 	    T1=POPATOM(NXST)/POPATOM(I)
-	    T2=MIN(1.0D0, ABS(LOG(DPOP(J,1)))/ABS(DLOG(DPOP(1,1))) )
+	    T2=MIN(1.0D0, ABS(LOG(DPOP(J,1)))/ABS(LOG(DPOP(1,1))) )
 	    DHEN(J,I)=DPOP(J,1)*(T1**T2)
 	  END DO
 	END DO

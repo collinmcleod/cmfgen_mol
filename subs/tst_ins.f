@@ -10,7 +10,7 @@ C
 C Vecters returned by subroutine:
 C
 C Line+continuum frequencies
-	REAL*8 FREQ(NFREQ_MAX)			!Continuum frequencies
+	REAL(10) FREQ(NFREQ_MAX)			!Continuum frequencies
 	INTEGER LINES_THIS_FREQ(NFREQ_MAX) !Indicates that this 
 						!  frequency has line 
 						!  contriubutions,
@@ -23,27 +23,27 @@ C
 C
 C Passed vectors.
 C
-	REAL*8 NU_CONT(NCF)		!Continuum frequencies
-	REAL*8 NU_LINE(N_LINES)		!Line frequencies
+	REAL(10) NU_CONT(NCF)		!Continuum frequencies
+	REAL(10) NU_LINE(N_LINES)		!Line frequencies
 C
 C Passed constants:
-	REAL*8 VINF		!Terminal velocity of wind.
-	REAL*8 V_DOP		!Doppler velocity (km/s).
-	REAL*8 FRAC_DOP		!Indicates dNU across line in Doppler widths.
-	REAL*8 MAX_DOP		!Half the extent of intrinsic profile
+	REAL(10) VINF		!Terminal velocity of wind.
+	REAL(10) V_DOP		!Doppler velocity (km/s).
+	REAL(10) FRAC_DOP		!Indicates dNU across line in Doppler widths.
+	REAL(10) MAX_DOP		!Half the extent of intrinsic profile
 				!  in Doppler widths,
 C
-	REAL*8 dV_CMF_PROF
-	REAL*8 dV_CMF_WING
-	REAL*8 ES_WING_ExT
-	REAL*8 R_CMF_WING_EXT
+	REAL(10) dV_CMF_PROF
+	REAL(10) dV_CMF_WING
+	REAL(10) ES_WING_ExT
+	REAL(10) R_CMF_WING_EXT
 	INTEGER NCF1,N_LINES1
 	INTEGER ML
-	REAL*8 C_KMS
+	REAL(10) C_KMS
 C
 C External functions
 C
-	REAL*8 SPEED_OF_LIGHT
+	REAL(10) SPEED_OF_LIGHT
 	EXTERNAL SPEED_OF_LIGHT
 C
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()

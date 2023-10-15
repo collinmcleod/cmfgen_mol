@@ -40,7 +40,7 @@ C
 	REAL*4 XINC,YINC		!Spacing between axis coordinates
 	REAL*4 TICK_FAC
 	REAL*4 EXPCHAR
-	REAL*8 LST_X_VAL
+	REAL(10) LST_X_VAL
 C
 	INTEGER IXTICK,IYTICK		!Number of ticks between coordinates
 	INTEGER IDX,IDY		!Number of digits after decimal point.
@@ -100,7 +100,7 @@ C
 C If TOP_AX_OPT='TOPLAB' a different scale (nonlinear) can be put on the top
 C axis, as specifed by SCED, and ED. 
 C
-	REAL*8 SCED,XED
+	REAL(10) SCED,XED
 	INTEGER NXED
 	CHARACTER(LEN=30) TOPLABEL
 	COMMON /TOPBORD/ SCED(31),XED(31),NXED,TOPLABEL

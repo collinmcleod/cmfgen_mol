@@ -1,8 +1,8 @@
-      DOUBLE PRECISION FUNCTION DNRM2 ( N, X, INCX )
+      REAL(10) FUNCTION DNRM2 ( N, X, INCX )
 *     .. Scalar Arguments ..
       INTEGER                           INCX, N
 *     .. Array Arguments ..
-      DOUBLE PRECISION                  X( * )
+      REAL(10)                  X( * )
 *     ..
 *
 *  DNRM2 returns the euclidean norm of a vector via the function
@@ -18,11 +18,11 @@
 *
 *
 *     .. Parameters ..
-      DOUBLE PRECISION      ONE         , ZERO
+      REAL(10)      ONE         , ZERO
       PARAMETER           ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     .. Local Scalars ..
       INTEGER               IX
-      DOUBLE PRECISION      ABSXI, NORM, SCALE, SSQ
+      REAL(10)      ABSXI, NORM, SCALE, SSQ
 *     .. Intrinsic Functions ..
       INTRINSIC             ABS, SQRT
 *     ..

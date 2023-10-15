@@ -1,4 +1,4 @@
-      double precision function dzasum(n,zx,incx)
+      REAL(10) function dzasum(n,zx,incx)
 c
 c     takes the sum of the absolute values.
 c     jack dongarra, 3/11/78.
@@ -6,7 +6,7 @@ c     modified 3/93 to return if incx .le. 0.
 c     modified 12/3/93, array(1) declarations changed to array(*)
 c
       double complex zx(*)
-      double precision stemp,dcabs1
+      REAL(10) stemp,dcabs1
       integer i,incx,ix,n
 c
       dzasum = 0.0d0

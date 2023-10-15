@@ -15,8 +15,8 @@
 	INTEGER ND
 	INTEGER NION
 	INTEGER DEPTH_INDX
-	REAL*8 BA(NT,NT)
-	REAL*8 STEQ(NT)
+	REAL(10) BA(NT,NT)
+	REAL(10) STEQ(NT)
 	LOGICAL FIRST_MATRIX
 	LOGICAL LAST_MATRIX
 	LOGICAL DIAG_BAND
@@ -35,7 +35,7 @@
 ! Variables to allow information to be output regarding the number
 ! of levels and depths where a population was held fixed.
 !
-	REAL*8 T1
+	REAL(10) T1
 	INTEGER, SAVE, ALLOCATABLE :: CNT(:)
 !
 	LUER=ERROR_LU()

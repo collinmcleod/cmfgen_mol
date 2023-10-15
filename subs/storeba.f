@@ -28,7 +28,7 @@ C included since it changes during program execution, and hence is not
 C the same as in VADAT file.
 C
 	LOGICAL COMPUTE_BA
-	REAL*8 BA(NT),STEQ(NS)
+	REAL(10) BA(NT),STEQ(NS)
 	CHARACTER DESC*(*)		!File name for BA &STEQ output.
 C
 	LOGICAL FILE_OPEN

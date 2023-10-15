@@ -18,9 +18,9 @@
 ! Some othe common parameters which often vary for a promted for, or, in
 ! the case of parameters associated with NG aceleration, set to default values.
 !
-	REAL*8 FRAC_TIME_STEP
-	REAL*8 AGE
-	REAL*8 T1
+	REAL(10) FRAC_TIME_STEP
+	REAL(10) AGE
+	REAL(10) T1
 !
         INTEGER, PARAMETER :: NMAX=2000
         INTEGER I,J

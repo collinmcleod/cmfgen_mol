@@ -1,4 +1,4 @@
-      DOUBLE PRECISION FUNCTION DLAMCH( CMACH )
+      REAL(10) FUNCTION DLAMCH( CMACH )
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -46,13 +46,13 @@
 * =====================================================================
 *
 *     .. Parameters ..
-      DOUBLE PRECISION   ONE, ZERO
+      REAL(10)   ONE, ZERO
       PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Local Scalars ..
       LOGICAL            FIRST, LRND
       INTEGER            BETA, IMAX, IMIN, IT
-      DOUBLE PRECISION   BASE, EMAX, EMIN, EPS, PREC, RMACH, RMAX, RMIN,
+      REAL(10)   BASE, EMAX, EMIN, EPS, PREC, RMACH, RMAX, RMIN,
      $                   RND, SFMIN, SMALL, T
 *     ..
 *     .. External Functions ..
@@ -183,10 +183,10 @@
 *     .. Local Scalars ..
       LOGICAL            FIRST, LIEEE1, LRND
       INTEGER            LBETA, LT
-      DOUBLE PRECISION   A, B, C, F, ONE, QTR, SAVEC, T1, T2
+      REAL(10)   A, B, C, F, ONE, QTR, SAVEC, T1, T2
 *     ..
 *     .. External Functions ..
-      DOUBLE PRECISION   DLAMC3
+      REAL(10)   DLAMC3
       EXTERNAL           DLAMC3
 *     ..
 *     .. Save statement ..
@@ -325,7 +325,7 @@
 *     .. Scalar Arguments ..
       LOGICAL            RND
       INTEGER            BETA, EMAX, EMIN, T
-      DOUBLE PRECISION   EPS, RMAX, RMIN
+      REAL(10)   EPS, RMAX, RMIN
 *     ..
 *
 *  Purpose
@@ -349,7 +349,7 @@
 *          be a reliable guide to the way in which the machine performs
 *          its arithmetic.
 *
-*  EPS     (output) DOUBLE PRECISION
+*  EPS     (output) REAL(10)
 *          The smallest positive number such that
 *
 *             fl( 1.0 - EPS ) .LT. 1.0,
@@ -359,7 +359,7 @@
 *  EMIN    (output) INTEGER
 *          The minimum exponent before (gradual) underflow occurs.
 *
-*  RMIN    (output) DOUBLE PRECISION
+*  RMIN    (output) REAL(10)
 *          The smallest normalized number for the machine, given by
 *          BASE**( EMIN - 1 ), where  BASE  is the floating point value
 *          of BETA.
@@ -367,7 +367,7 @@
 *  EMAX    (output) INTEGER
 *          The maximum exponent before overflow occurs.
 *
-*  RMAX    (output) DOUBLE PRECISION
+*  RMAX    (output) REAL(10)
 *          The largest positive number for the machine, given by
 *          BASE**EMAX * ( 1 - EPS ), where  BASE  is the floating point
 *          value of BETA.
@@ -384,11 +384,11 @@
       LOGICAL            FIRST, IEEE, IWARN, LIEEE1, LRND
       INTEGER            GNMIN, GPMIN, I, LBETA, LEMAX, LEMIN, LT,
      $                   NGNMIN, NGPMIN
-      DOUBLE PRECISION   A, B, C, HALF, LEPS, LRMAX, LRMIN, ONE, RBASE,
+      REAL(10)   A, B, C, HALF, LEPS, LRMAX, LRMIN, ONE, RBASE,
      $                   SIXTH, SMALL, THIRD, TWO, ZERO
 *     ..
 *     .. External Functions ..
-      DOUBLE PRECISION   DLAMC3
+      REAL(10)   DLAMC3
       EXTERNAL           DLAMC3
 *     ..
 *     .. External Subroutines ..
@@ -574,7 +574,7 @@
 *
 ************************************************************************
 *
-      DOUBLE PRECISION FUNCTION DLAMC3( A, B )
+      REAL(10) FUNCTION DLAMC3( A, B )
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -582,7 +582,7 @@
 *     October 31, 1992
 *
 *     .. Scalar Arguments ..
-      DOUBLE PRECISION   A, B
+      REAL(10)   A, B
 *     ..
 *
 *  Purpose
@@ -595,7 +595,7 @@
 *  Arguments
 *  =========
 *
-*  A, B    (input) DOUBLE PRECISION
+*  A, B    (input) REAL(10)
 *          The values A and B.
 *
 * =====================================================================
@@ -621,7 +621,7 @@
 *
 *     .. Scalar Arguments ..
       INTEGER            BASE, EMIN
-      DOUBLE PRECISION   START
+      REAL(10)   START
 *     ..
 *
 *  Purpose
@@ -637,7 +637,7 @@
 *          setting A = START and dividing by BASE until the previous A
 *          can not be recovered.
 *
-*  START   (input) DOUBLE PRECISION
+*  START   (input) REAL(10)
 *          The starting point for determining EMIN.
 *
 *  BASE    (input) INTEGER
@@ -647,10 +647,10 @@
 *
 *     .. Local Scalars ..
       INTEGER            I
-      DOUBLE PRECISION   A, B1, B2, C1, C2, D1, D2, ONE, RBASE, ZERO
+      REAL(10)   A, B1, B2, C1, C2, D1, D2, ONE, RBASE, ZERO
 *     ..
 *     .. External Functions ..
-      DOUBLE PRECISION   DLAMC3
+      REAL(10)   DLAMC3
       EXTERNAL           DLAMC3
 *     ..
 *     .. Executable Statements ..
@@ -706,7 +706,7 @@
 *     .. Scalar Arguments ..
       LOGICAL            IEEE
       INTEGER            BETA, EMAX, EMIN, P
-      DOUBLE PRECISION   RMAX
+      REAL(10)   RMAX
 *     ..
 *
 *  Purpose
@@ -739,21 +739,21 @@
 *  EMAX    (output) INTEGER
 *          The largest exponent before overflow
 *
-*  RMAX    (output) DOUBLE PRECISION
+*  RMAX    (output) REAL(10)
 *          The largest machine floating-point number.
 *
 * =====================================================================
 *
 *     .. Parameters ..
-      DOUBLE PRECISION   ZERO, ONE
+      REAL(10)   ZERO, ONE
       PARAMETER          ( ZERO = 0.0D0, ONE = 1.0D0 )
 *     ..
 *     .. Local Scalars ..
       INTEGER            EXBITS, EXPSUM, I, LEXP, NBITS, TRY, UEXP
-      DOUBLE PRECISION   OLDY, RECBAS, Y, Z
+      REAL(10)   OLDY, RECBAS, Y, Z
 *     ..
 *     .. External Functions ..
-      DOUBLE PRECISION   DLAMC3
+      REAL(10)   DLAMC3
       EXTERNAL           DLAMC3
 *     ..
 *     .. Intrinsic Functions ..

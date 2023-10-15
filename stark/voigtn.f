@@ -6,21 +6,21 @@
 !
 ! Cleaned : 20-Nov-2000
 !
-      REAL*8 VOIGTN,AA,VV
+      REAL(10) VOIGTN,AA,VV
 !
-      REAL*8 H(25)
+      REAL(10) H(25)
       DATA C1,C2/1.128379167095512D0  ,5.64189583547756D-1/
       SAVE C1,C2
 !
-      REAL*8 V,V2,V4,V6
-      REAL*8 A,A2,A4,A6
-      REAL*8 Z,Z2                       
-      REAL*8 X,W
-      REAL*8 C1,C2
+      REAL(10) V,V2,V4,V6
+      REAL(10) A,A2,A4,A6
+      REAL(10) Z,Z2                       
+      REAL(10) X,W
+      REAL(10) C1,C2
 !
       INTEGER I,J
 !
-      REAL*8 DAWSON
+      REAL(10) DAWSON
       EXTERNAL DAWSON
 !
       V=ABS(VV)
@@ -80,9 +80,9 @@ C-----GRONWALL EXPANSION
       FUNCTION DAWSON(XX)
       IMPLICIT NONE
 !
-      REAL*8 DAWSON,XX
-      REAL*8 X,U
-      REAL*8 UP,DOWN
+      REAL(10) DAWSON,XX
+      REAL(10) X,U
+      REAL(10) UP,DOWN
 !
       X=XX
       U=X*X

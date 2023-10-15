@@ -1,5 +1,5 @@
       SUBROUTINE GRIEM(PR,DWS,NWS,ED_IN,TEMP_IN,IL,IU,ZZ,AMASS,VDOP)
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      IMPLICIT REAL(10) (A-H,O-Z)
 C 
 C Create a profile table using the griem theory as used by A and M
 C in their AP J S24 paper.
@@ -157,7 +157,7 @@ C
 C 
 C
       FUNCTION DCONV(DLAM)
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      IMPLICIT REAL(10) (A-H,O-Z)
 C 
 C Convolution of gaussian profile with S function  6 AUG 77
 C 
@@ -207,7 +207,7 @@ C BY S SEGMENT
       RETURN
       END
       FUNCTION TBG(BET,GAM)
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      IMPLICIT REAL(10) (A-H,O-Z)
       DATA PI/3.14159265358979  /
       IF(GAM.GT.1.E-2) GOTO 10
 C     SMALL GAMMA
@@ -226,7 +226,7 @@ C
 C 
 C
       FUNCTION TG(BET,GAM)
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      IMPLICIT REAL(10) (A-H,O-Z)
       DATA C4,C5,C6/1.5  ,3.4636008E1,-1.3253986E2/
       DATA PI2/1.57079632679489  /
       G2=GAM*GAM
@@ -288,7 +288,7 @@ C
 C 
 C
       FUNCTION TF(B,G)
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      IMPLICIT REAL(10) (A-H,O-Z)
       DATA C0,C1,C2,C3/1.0007744E-1,4.93208719E-3,-7.09873526E-3,
      . 7.11559325E-4/
       D3=C3
@@ -305,7 +305,7 @@ C
 C 
 C
       FUNCTION TH(X)
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      IMPLICIT REAL(10) (A-H,O-Z)
 C GRIEM MICROFIELD FUDGE - NORMALIZED TO UNIT B INTEGRAL
       DATA C0,C1,C2,C3/1.0007744E-1,4.93208719E-3,-7.09873526E-3,
      . 7.11559325E-4/
@@ -323,7 +323,7 @@ C
 C 
 C
       FUNCTION ASINT(X0,X1,DB)
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      IMPLICIT REAL(10) (A-H,O-Z)
 C
 C Integral over asymtotic region by SIMPSONS rule.
 C
@@ -351,7 +351,7 @@ C
 C 
 C
       FUNCTION DOPLER(X)
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      IMPLICIT REAL(10) (A-H,O-Z)
       SQ=X*X
       IF(SQ.GT.64.) THEN
         DOPLER=0.
@@ -366,7 +366,7 @@ C
 C Error function.
 C
       FUNCTION ERR(X)
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      IMPLICIT REAL(10) (A-H,O-Z)
       ONE=1.0D0
       T=ABS(X)
       IF(T.GT.5.)THEN

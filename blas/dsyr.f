@@ -1,10 +1,10 @@
       SUBROUTINE DSYR  ( UPLO, N, ALPHA, X, INCX, A, LDA )
 *     .. Scalar Arguments ..
-      DOUBLE PRECISION   ALPHA
+      REAL(10)   ALPHA
       INTEGER            INCX, LDA, N
       CHARACTER*1        UPLO
 *     .. Array Arguments ..
-      DOUBLE PRECISION   A( LDA, * ), X( * )
+      REAL(10)   A( LDA, * ), X( * )
 *     ..
 *
 *  Purpose
@@ -38,11 +38,11 @@
 *           N must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - DOUBLE PRECISION.
+*  ALPHA  - REAL(10).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
-*  X      - DOUBLE PRECISION array of dimension at least
+*  X      - REAL(10) array of dimension at least
 *           ( 1 + ( n - 1 )*abs( INCX ) ).
 *           Before entry, the incremented array X must contain the n
 *           element vector x.
@@ -53,7 +53,7 @@
 *           X. INCX must not be zero.
 *           Unchanged on exit.
 *
-*  A      - DOUBLE PRECISION array of DIMENSION ( LDA, n ).
+*  A      - REAL(10) array of DIMENSION ( LDA, n ).
 *           Before entry with  UPLO = 'U' or 'u', the leading n by n
 *           upper triangular part of the array A must contain the upper
 *           triangular part of the symmetric matrix and the strictly
@@ -84,10 +84,10 @@
 *
 *
 *     .. Parameters ..
-      DOUBLE PRECISION   ZERO
+      REAL(10)   ZERO
       PARAMETER        ( ZERO = 0.0D+0 )
 *     .. Local Scalars ..
-      DOUBLE PRECISION   TEMP
+      REAL(10)   TEMP
       INTEGER            I, INFO, IX, J, JX, KX
 *     .. External Functions ..
       LOGICAL            LSAME

@@ -2,12 +2,12 @@
         IMPLICIT NONE
         INTEGER, PARAMETER :: NBET=55
         INTEGER, PARAMETER :: NS=2*NBET-1
-        REAL*8 BET(NBET)
-        REAL*8 SS(NS)
-        REAL*8 SX(NS)
-        REAL*8 AS
-        REAL*8 PS
-        REAL*8 ODOP
+        REAL(10) BET(NBET)
+        REAL(10) SS(NS)
+        REAL(10) SX(NS)
+        REAL(10) AS
+        REAL(10) PS
+        REAL(10) ODOP
 !
 !$OMP THREADPRIVATE(SS,SX,AS,PS,ODOP)
 !

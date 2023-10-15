@@ -10,16 +10,16 @@ C
 	INTEGER*4, PARAMETER :: NLINE_MAX=200000
 	INTEGER*4, PARAMETER :: LUOUT=40
 !
-	REAL*8 NU_EVAL(NFREQ_MAX)		!Frequencies at which continuum is evaluated.
-	REAL*8 NU_CONT(NFREQ_MAX)		!Pure continuum frequencies
-	REAL*8 FREQ(NFREQ_MAX)			!Continuum frequencies
-	REAL*8 EDGE_FREQ(NFREQ_MAX) 		
+	REAL(10) NU_EVAL(NFREQ_MAX)		!Frequencies at which continuum is evaluated.
+	REAL(10) NU_CONT(NFREQ_MAX)		!Pure continuum frequencies
+	REAL(10) FREQ(NFREQ_MAX)			!Continuum frequencies
+	REAL(10) EDGE_FREQ(NFREQ_MAX) 		
 	CHARACTER*6 EDGE_TYPE(NFREQ_MAX)	!End index for the line 
 	INTEGER*4 INDX(NFREQ_MAX)
 !
-	REAL*8 NU_LINE(NLINE_MAX)
-	REAL*8 NU_STRT_LINE(NLINE_MAX)
-	REAL*8 VEC_MIN_VDOP(NLINE_MAX)
+	REAL(10) NU_LINE(NLINE_MAX)
+	REAL(10) NU_STRT_LINE(NLINE_MAX)
+	REAL(10) VEC_MIN_VDOP(NLINE_MAX)
 	INTEGER*4 LINE_ST_INDX(NLINE_MAX)
 	INTEGER*4 LINE_END_INDX(NLINE_MAX)
 	CHARACTER*6 TRANS_TYPE(NLINE_MAX)
@@ -31,30 +31,30 @@ C
 !
 ! Passed constants:
 !
-        REAL*8 VINF             !Terminal velocity of wind.
-        REAL*8 FRAC_DOP         !Indicates dNU across line in Doppler widths.
+        REAL(10) VINF             !Terminal velocity of wind.
+        REAL(10) FRAC_DOP         !Indicates dNU across line in Doppler widths.
 C
-        REAL*8 MAX_DOP
-        REAL*8 dV_CMF_PROF
-        REAL*8 dV_CMF_WING
-        REAL*8 ES_WING_ExT
-        REAL*8 R_CMF_WING_EXT
+        REAL(10) MAX_DOP
+        REAL(10) dV_CMF_PROF
+        REAL(10) dV_CMF_WING
+        REAL(10) ES_WING_ExT
+        REAL(10) R_CMF_WING_EXT
 !
-	REAL*8 MAX_FREQ
-	REAL*8 MIN_FREQ
-	REAL*8 SMALL_RAT
-	REAL*8 BIG_AMP
-	REAL*8 DNU_MAX
-	REAL*8 dV_LEV
-	REAL*8 AMP_DIS
-	REAL*8 MIN_FREQ_LEV_DIS
+	REAL(10) MAX_FREQ
+	REAL(10) MIN_FREQ
+	REAL(10) SMALL_RAT
+	REAL(10) BIG_AMP
+	REAL(10) DNU_MAX
+	REAL(10) dV_LEV
+	REAL(10) AMP_DIS
+	REAL(10) MIN_FREQ_LEV_DIS
 !
-	REAL*8 dV_DOP
-	REAL*8 dV_CONT
-	REAL*8 MIN_dV_CONT
+	REAL(10) dV_DOP
+	REAL(10) dV_CONT
+	REAL(10) MIN_dV_CONT
 !
-	REAL*8 C_KMS,T1
-	REAL*8 SPEED_OF_LIGHT
+	REAL(10) C_KMS,T1
+	REAL(10) SPEED_OF_LIGHT
 	EXTERNAL SPEED_OF_LIGHT
 !
 	INTEGER *4 I,ML,K,J,ISEED

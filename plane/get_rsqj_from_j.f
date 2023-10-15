@@ -6,14 +6,14 @@
 !
 	IMPLICIT NONE
 	INTEGER NW
-	REAL*8 JNU(NW)  	!
-	REAL*8 R(NW)		!Independent variable
-	REAL*8 RVAL		!Value at which function is to be interp. to.
-	REAL*8 GET_RSQJ_FROM_J
+	REAL(10) JNU(NW)  	!
+	REAL(10) R(NW)		!Independent variable
+	REAL(10) RVAL		!Value at which function is to be interp. to.
+	REAL(10) GET_RSQJ_FROM_J
 !
 	INTEGER J,ILOW,IHIGH,ILOW_SAV
-	REAL*8 FRAC
-	REAL*8 T1,T2
+	REAL(10) FRAC
+	REAL(10) T1,T2
 	SAVE ILOW_SAV
 	DATA ILOW_SAV/1/
 !

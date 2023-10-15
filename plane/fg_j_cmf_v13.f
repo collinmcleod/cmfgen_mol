@@ -20,34 +20,34 @@
 !
 ! Dimensionded NRAY_MAX,NP
 !
-	REAL*8, ALLOCATABLE :: R_RAY(:,:)
-	REAL*8, ALLOCATABLE :: Z(:,:)
-	REAL*8, ALLOCATABLE :: GAM(:,:)
-	REAL*8, ALLOCATABLE :: DTAU(:,:)
-	REAL*8, ALLOCATABLE :: AV(:,:)
-	REAL*8, ALLOCATABLE :: CV(:,:)
+	REAL(10), ALLOCATABLE :: R_RAY(:,:)
+	REAL(10), ALLOCATABLE :: Z(:,:)
+	REAL(10), ALLOCATABLE :: GAM(:,:)
+	REAL(10), ALLOCATABLE :: DTAU(:,:)
+	REAL(10), ALLOCATABLE :: AV(:,:)
+	REAL(10), ALLOCATABLE :: CV(:,:)
 !
 ! Dimensiond ND_EXT,4
 !
-	REAL*8, ALLOCATABLE :: V_COEF(:,:)
-	REAL*8, ALLOCATABLE :: SIGMA_COEF(:,:)
-	REAL*8, ALLOCATABLE :: CHI_COEF(:,:)
-	REAL*8, ALLOCATABLE :: ETA_COEF(:,:)
+	REAL(10), ALLOCATABLE :: V_COEF(:,:)
+	REAL(10), ALLOCATABLE :: SIGMA_COEF(:,:)
+	REAL(10), ALLOCATABLE :: CHI_COEF(:,:)
+	REAL(10), ALLOCATABLE :: ETA_COEF(:,:)
 !
 	INTEGER, ALLOCATABLE :: J_PNT(:,:)
 	INTEGER, ALLOCATABLE :: H_PNT(:,:)
 !
 ! Dimensioned ND+ND_ADD=ND_EXT
 !
-	REAL*8, ALLOCATABLE :: R_EXT(:)
-	REAL*8, ALLOCATABLE :: LOG_R_EXT(:)
-	REAL*8, ALLOCATABLE :: Z_EXT(:)
-	REAL*8, ALLOCATABLE :: V_EXT(:)
-	REAL*8, ALLOCATABLE :: SIGMA_EXT(:)
-	REAL*8, ALLOCATABLE :: ETA_EXT(:)
-	REAL*8, ALLOCATABLE :: CHI_EXT(:)
-	REAL*8, ALLOCATABLE :: LOG_ETA_EXT(:)
-	REAL*8, ALLOCATABLE :: LOG_CHI_EXT(:)
+	REAL(10), ALLOCATABLE :: R_EXT(:)
+	REAL(10), ALLOCATABLE :: LOG_R_EXT(:)
+	REAL(10), ALLOCATABLE :: Z_EXT(:)
+	REAL(10), ALLOCATABLE :: V_EXT(:)
+	REAL(10), ALLOCATABLE :: SIGMA_EXT(:)
+	REAL(10), ALLOCATABLE :: ETA_EXT(:)
+	REAL(10), ALLOCATABLE :: CHI_EXT(:)
+	REAL(10), ALLOCATABLE :: LOG_ETA_EXT(:)
+	REAL(10), ALLOCATABLE :: LOG_CHI_EXT(:)
 !
 ! Dimensioned NRAY_MAX,NP
 !
@@ -58,16 +58,16 @@
 !
 ! Dimensioned NRAY_MAX
 !
-	REAL*8, ALLOCATABLE :: dCHIdR(:)
-	REAL*8, ALLOCATABLE :: Q(:)
-	REAL*8, ALLOCATABLE :: QH(:)
-	REAL*8, ALLOCATABLE :: V_RAY(:)
+	REAL(10), ALLOCATABLE :: dCHIdR(:)
+	REAL(10), ALLOCATABLE :: Q(:)
+	REAL(10), ALLOCATABLE :: QH(:)
+	REAL(10), ALLOCATABLE :: V_RAY(:)
 !
-	REAL*8, ALLOCATABLE :: SIGMA_RAY(:)
-	REAL*8, ALLOCATABLE :: ETA_RAY(:)
-	REAL*8, ALLOCATABLE :: CHI_RAY(:)
-	REAL*8, ALLOCATABLE :: dCHIdR_RAY(:)
-	REAL*8, ALLOCATABLE :: SOURCE_RAY(:)
+	REAL(10), ALLOCATABLE :: SIGMA_RAY(:)
+	REAL(10), ALLOCATABLE :: ETA_RAY(:)
+	REAL(10), ALLOCATABLE :: CHI_RAY(:)
+	REAL(10), ALLOCATABLE :: dCHIdR_RAY(:)
+	REAL(10), ALLOCATABLE :: SOURCE_RAY(:)
 !
 !***************************************************************************
 !***************************************************************************
@@ -75,27 +75,27 @@
 ! Variables specific to the DIFFERENCE equation approach for  solving the
 ! transfer equation.
 !	
-	REAL*8, ALLOCATABLE :: AV_PREV(:,:)
-	REAL*8, ALLOCATABLE :: AV_STORE(:,:)
-	REAL*8, ALLOCATABLE :: CV_PREV(:,:)
-	REAL*8, ALLOCATABLE :: CV_STORE(:,:)
-	REAL*8, ALLOCATABLE :: PAR_AV(:,:)
+	REAL(10), ALLOCATABLE :: AV_PREV(:,:)
+	REAL(10), ALLOCATABLE :: AV_STORE(:,:)
+	REAL(10), ALLOCATABLE :: CV_PREV(:,:)
+	REAL(10), ALLOCATABLE :: CV_STORE(:,:)
+	REAL(10), ALLOCATABLE :: PAR_AV(:,:)
 !
-	REAL*8, ALLOCATABLE :: GAMH(:,:)
-	REAL*8, ALLOCATABLE :: TA(:,:)
-	REAL*8, ALLOCATABLE :: TB(:,:)
-	REAL*8, ALLOCATABLE :: TC(:,:)
-	REAL*8, ALLOCATABLE :: GB(:,:)
-	REAL*8, ALLOCATABLE :: H(:,:)
+	REAL(10), ALLOCATABLE :: GAMH(:,:)
+	REAL(10), ALLOCATABLE :: TA(:,:)
+	REAL(10), ALLOCATABLE :: TB(:,:)
+	REAL(10), ALLOCATABLE :: TC(:,:)
+	REAL(10), ALLOCATABLE :: GB(:,:)
+	REAL(10), ALLOCATABLE :: H(:,:)
 !
-	REAL*8, ALLOCATABLE :: XM(:)
-	REAL*8, ALLOCATABLE :: U(:)
-	REAL*8, ALLOCATABLE :: VB(:)
-	REAL*8, ALLOCATABLE :: VC(:)
-	REAL*8, ALLOCATABLE :: DIV(:)
+	REAL(10), ALLOCATABLE :: XM(:)
+	REAL(10), ALLOCATABLE :: U(:)
+	REAL(10), ALLOCATABLE :: VB(:)
+	REAL(10), ALLOCATABLE :: VC(:)
+	REAL(10), ALLOCATABLE :: DIV(:)
 !
-	REAL*8, ALLOCATABLE :: OLDCHI(:)
-	REAL*8, ALLOCATABLE :: OLDCHI_STORE(:)
+	REAL(10), ALLOCATABLE :: OLDCHI(:)
+	REAL(10), ALLOCATABLE :: OLDCHI_STORE(:)
 !
 !***************************************************************************
 !***************************************************************************
@@ -105,35 +105,35 @@
 !
 ! Dimensioned NRAY_MAX,NP
 !
-	REAL*8, ALLOCATABLE :: I_P_PREV(:,:)
-	REAL*8, ALLOCATABLE :: I_P_STORE(:,:)
-	REAL*8, ALLOCATABLE :: I_M_PREV(:,:)
-	REAL*8, ALLOCATABLE :: I_M_STORE(:,:)
-	REAL*8, ALLOCATABLE :: dGAMdR(:,:)
+	REAL(10), ALLOCATABLE :: I_P_PREV(:,:)
+	REAL(10), ALLOCATABLE :: I_P_STORE(:,:)
+	REAL(10), ALLOCATABLE :: I_M_PREV(:,:)
+	REAL(10), ALLOCATABLE :: I_M_STORE(:,:)
+	REAL(10), ALLOCATABLE :: dGAMdR(:,:)
 !
-	REAL*8, ALLOCATABLE :: A0(:,:)
-	REAL*8, ALLOCATABLE :: A1(:,:)
-	REAL*8, ALLOCATABLE :: A2(:,:)
-	REAL*8, ALLOCATABLE :: A3(:,:)
-	REAL*8, ALLOCATABLE :: A4(:,:)
+	REAL(10), ALLOCATABLE :: A0(:,:)
+	REAL(10), ALLOCATABLE :: A1(:,:)
+	REAL(10), ALLOCATABLE :: A2(:,:)
+	REAL(10), ALLOCATABLE :: A3(:,:)
+	REAL(10), ALLOCATABLE :: A4(:,:)
 !
-	REAL*8, ALLOCATABLE :: I_P(:,:)
-	REAL*8, ALLOCATABLE :: I_M(:,:)
+	REAL(10), ALLOCATABLE :: I_P(:,:)
+	REAL(10), ALLOCATABLE :: I_M(:,:)
 !
 ! Dimensioned NRAY_MAX
 !
-	REAL*8, ALLOCATABLE :: EE(:)
-	REAL*8, ALLOCATABLE :: E0(:)
-	REAL*8, ALLOCATABLE :: E1(:)
-	REAL*8, ALLOCATABLE :: E2(:)
-	REAL*8, ALLOCATABLE :: E3(:)
+	REAL(10), ALLOCATABLE :: EE(:)
+	REAL(10), ALLOCATABLE :: E0(:)
+	REAL(10), ALLOCATABLE :: E1(:)
+	REAL(10), ALLOCATABLE :: E2(:)
+	REAL(10), ALLOCATABLE :: E3(:)
 !
-	REAL*8, ALLOCATABLE :: SOURCE_PRIME(:)
-	REAL*8, ALLOCATABLE :: S(:)
-	REAL*8, ALLOCATABLE :: dS(:)
+	REAL(10), ALLOCATABLE :: SOURCE_PRIME(:)
+	REAL(10), ALLOCATABLE :: S(:)
+	REAL(10), ALLOCATABLE :: dS(:)
 !
-	REAL*8 PREVIOUS_FREQ
-	REAL*8 VDOP_FRAC_SAV
+	REAL(10) PREVIOUS_FREQ
+	REAL(10) VDOP_FRAC_SAV
 !
 	INTEGER ND_EXT
 	INTEGER ND_ADD
@@ -202,7 +202,7 @@
 	SUBROUTINE FG_J_CMF_V13(ETA,CHI,ESEC,V,SIGMA,R,P,
 	1                  JNU,FEDD,JQW,HQW,KQW,NQW,HMIDQW,NMIDQW,
 	1                  RETURNED_IN_HBC,RETURNED_OUT_HBC,IPLUS_P,
-	1                  FREQ,dLOG_NU,INNER_BND_METH,DBB,IC,
+	1                  FREQ,LOG_NU,INNER_BND_METH,DBB,IC,
 	1                  VDOP_VEC,VDOP_FRAC,REXT_FAC,
 	1                  METHOD,SOLUTION_OPTIONS,
 	1                  THK,INIT,NEW_FREQ,NC,NP,ND)
@@ -225,38 +225,38 @@
 ! Created 17-Dec-2008: Based on FG_J_CMF_V10
 !
 	INTEGER NC,NP,ND
-	REAL*8 ETA(ND),CHI(ND),ESEC(ND)
-	REAL*8 V(ND),SIGMA(ND),R(ND),P(NP)
+	REAL(10) ETA(ND),CHI(ND),ESEC(ND)
+	REAL(10) V(ND),SIGMA(ND),R(ND),P(NP)
 !
 ! NB: J,H,K,N refer to the first 4 moments of the radiation field.
 !     QW denotes quadrature weight.
 !
-	REAL*8 JQW(ND,NP)
-	REAL*8 HQW(ND,NP)
-	REAL*8 KQW(ND,NP)
-	REAL*8 NQW(ND,NP)
+	REAL(10) JQW(ND,NP)
+	REAL(10) HQW(ND,NP)
+	REAL(10) KQW(ND,NP)
+	REAL(10) NQW(ND,NP)
 !
-	REAL*8 HMIDQW(ND,NP)
-	REAL*8 NMIDQW(ND,NP)
+	REAL(10) HMIDQW(ND,NP)
+	REAL(10) NMIDQW(ND,NP)
 !
-	REAL*8 JNU(ND)
-	REAL*8 FEDD(ND)
-	REAL*8 IPLUS_P(NP)
+	REAL(10) JNU(ND)
+	REAL(10) FEDD(ND)
+	REAL(10) IPLUS_P(NP)
 !
 ! VDOP_VEC(I) is the minimum DOPPLER width for all species at depth I. It will include
 ! both a turbulent, and and thermal contribution for the ionization species with the 
 ! highest mass. VDOP_FRAC is used to set the minimum velocity step size along a ray.
 !
-	REAL*8 VDOP_VEC(ND)
-	REAL*8 VDOP_FRAC
-	REAL*8 REXT_FAC		!Factor to scale RMAX by if thick atmosphere.
-	REAL*8 RETURNED_IN_HBC
-	REAL*8 RETURNED_OUT_HBC
+	REAL(10) VDOP_VEC(ND)
+	REAL(10) VDOP_FRAC
+	REAL(10) REXT_FAC		!Factor to scale RMAX by if thick atmosphere.
+	REAL(10) RETURNED_IN_HBC
+	REAL(10) RETURNED_OUT_HBC
 !
-	REAL*8 DBB
-	REAL*8 IC
-	REAL*8 FREQ
-	REAL*8 dLOG_NU
+	REAL(10) DBB
+	REAL(10) IC
+	REAL(10) FREQ
+	REAL(10) LOG_NU
 !
 	CHARACTER*(*) SOLUTION_OPTIONS
 	CHARACTER*6 METHOD
@@ -293,13 +293,13 @@
 ! The following arrays do not need to be stored, and hence can be created 
 ! each time.
 !
-	REAL*8 CV_BOUND(NP)		!Outer boundary V
-	REAL*8 I_M_IN_BND(NP)		!Inner boundary
-	REAL*8 IBOUND(NP)		!Incident intensity on outer boundary.
+	REAL(10) CV_BOUND(NP)		!Outer boundary V
+	REAL(10) I_M_IN_BND(NP)		!Inner boundary
+	REAL(10) IBOUND(NP)		!Incident intensity on outer boundary.
 !
 	INTEGER N_ERR_MAX,FG_ERR_CNT
 	PARAMETER (N_ERR_MAX=1000)
-	REAL*8 FG_ERR_ON_FREQ
+	REAL(10) FG_ERR_ON_FREQ
 	INTEGER FG_ERR_TYPE
 	COMMON /FG_J_CMF_ERR/FG_ERR_ON_FREQ(N_ERR_MAX),
 	1                    FG_ERR_TYPE(N_ERR_MAX),FG_ERR_CNT
@@ -310,7 +310,7 @@
 !
 ! Local variables.
 !
-	REAL*8, PARAMETER :: ONE=1
+	REAL(10), PARAMETER :: ONE=1
 	INTEGER, PARAMETER :: NINS=4
 !
 	LOGICAL, PARAMETER :: LFALSE=.FALSE.
@@ -321,17 +321,17 @@
 	INTEGER NI
 	INTEGER NP_TMP
 !
-	REAL*8 DBC
-	REAL*8 I_CORE
-	REAL*8 T1,T2
-	REAL*8 DELTA_Z
-	REAL*8 ALPHA
-	REAL*8 ESEC_POW
-	REAL*8 BETA
-	REAL*8 VINF
-	REAL*8 RMAX,DEL_R_FAC
-	REAL*8 MU,dZ,PSQ
-	REAL*8 DEL_R
+	REAL(10) DBC
+	REAL(10) I_CORE
+	REAL(10) T1,T2
+	REAL(10) DELTA_Z
+	REAL(10) ALPHA
+	REAL(10) ESEC_POW
+	REAL(10) BETA
+	REAL(10) VINF
+	REAL(10) RMAX,DEL_R_FAC
+	REAL(10) MU,dZ,PSQ
+	REAL(10) DEL_R
 !
 ! Change the following statement to TRUE if running on a VECTOR machine.
 !
@@ -1094,7 +1094,7 @@
 	  DO LS=1,NP
 	    NI=NI_RAY(LS)
 !
-! NB: dCHIdR = dLOG(CHI)/dLOG(R) * CHI/R
+! NB: dCHIdR = LOG(CHI)/LOG(R) * CHI/R
 !
 	    DO I=1,NI_RAY(LS)
 	      K=RAY_PNT(I,LS)
@@ -1134,11 +1134,11 @@
 	      OLDCHI(LS)=CHI_RAY(NI)
 	    ELSE IF(NEW_FREQ)THEN
 	      DO I=1,NI-1
-	        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*dLOG_NU)
-	        Q(I)=GAM(I,LS)/(CHI_RAY(I)*dLOG_NU)
+	        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*LOG_NU)
+	        Q(I)=GAM(I,LS)/(CHI_RAY(I)*LOG_NU)
 	      END DO
 	      QH(NI)=0.0D0
-	      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)
+	      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)
 	    END IF
 !
 	    IF(LS .LE. NC)THEN
@@ -1146,7 +1146,7 @@
 	      DIF_OR_ZF=.FALSE.
 	      IF(INNER_BND_METH .EQ. 'DIFFUSION')THEN
 	        T1=0.0D0
-	        IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)	     !Q(NI)
+	        IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)	     !Q(NI)
 	        DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI_RAY(NI)
 	1            *(1.0D0+T1*(1.0D0-CHI_RAY(NI)/OLDCHI(LS)))
 	        DIF_OR_ZF=.TRUE.
@@ -1374,7 +1374,7 @@ C
 	      GOTO 1000
 	    END IF
 !
-! NB: dCHIdR = dLOG(CHI)/dLOG(R) * CHI/R
+! NB: dCHIdR = LOG(CHI)/LOG(R) * CHI/R
 !
 !	    CALL TUNE(1,'FG_CHI_Q')
 	    NI=NI_RAY(LS)
@@ -1402,9 +1402,9 @@ C
 	      Q(1:NI)=0.0D0
 	      SOURCE_RAY(1:NI)=ETA_RAY(1:NI)/CHI_RAY(1:NI)
 	    ELSE
-	      Q(1:NI)=GAM(1:NI,LS)/dLOG_NU
+	      Q(1:NI)=GAM(1:NI,LS)/LOG_NU
 	      CHI_RAY(1:NI)=CHI_RAY(1:NI)+Q(1:NI)
-	      dCHIdR_RAY(1:NI)=dCHIdR_RAY(1:NI)+dGAMdR(1:NI,LS)/dLOG_NU
+	      dCHIdR_RAY(1:NI)=dCHIdR_RAY(1:NI)+dGAMdR(1:NI,LS)/LOG_NU
 	      Q(1:NI)=Q(1:NI)/CHI_RAY(1:NI)
 	      SOURCE_RAY(1:NI)=ETA_RAY(1:NI)/CHI_RAY(1:NI)
 	    END IF

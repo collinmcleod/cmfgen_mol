@@ -42,11 +42,11 @@
 	INTEGER NPHOT			!Number of photoionization routes.
 	INTEGER NUM_IMP_LEVELS	!Number of level which must have a continuum edge.
 !
-	REAL*8 EDGEHI_F(NHI_F)
+	REAL(10) EDGEHI_F(NHI_F)
 	INTEGER F_TO_S_HI(NHI_F)
 	LOGICAL HI_PRES
 !
-	REAL*8 EDGE_FREQ(NCF_MAX)
+	REAL(10) EDGE_FREQ(NCF_MAX)
 !
 ! EDGE_TYPE(1:1)=
 !                 I : Important level ---
@@ -75,7 +75,7 @@
 !
 ! Local variables.
 !
-	REAL*8 T1
+	REAL(10) T1
 	INTEGER NEW_ID
 	INTEGER PHOT_ID
 	INTEGER J
@@ -83,13 +83,13 @@
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 !
-	REAL*8, PARAMETER :: ZERO=0.0D0
+	REAL(10), PARAMETER :: ZERO=0.0D0
 	LOGICAL, PARAMETER :: RET_EDGE_CROSS=.TRUE.
 !
 ! Used to get photoionization cross-sections.
 !
-	REAL*8 PHOT_CROSS(NHI_F)
-	REAL*8 LOC_EDGE_FREQ(NHI_F)
+	REAL(10) PHOT_CROSS(NHI_F)
+	REAL(10) LOC_EDGE_FREQ(NHI_F)
 	LOGICAL DONE(NHI_S)
 !
 	WRITE(167,*)ID

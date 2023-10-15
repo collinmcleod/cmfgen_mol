@@ -9,9 +9,9 @@
 !                       Computes more accrate dX when X ~ 1
 !
 	INTEGER N
-	REAL*8 X(N),dX(N),W(N)
+	REAL(10) X(N),dX(N),W(N)
 !
-	REAL*8 T1,T2,SUM,XSUM
+	REAL(10) T1,T2,SUM,XSUM
 	INTEGER I
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU

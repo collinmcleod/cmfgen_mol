@@ -48,24 +48,24 @@ c
 c
 c Opacity and emissivity variables
 c
-      real*8, dimension(nd) :: chi,eta
+      REAL(10), dimension(nd) :: chi,eta
 c
 c Intensity variable
 c
-      real*8, dimension(nd) :: I_prev
+      REAL(10), dimension(nd) :: I_prev
 c
 c Frequency variable
 c
-      real*8 nu_dnu
+      REAL(10) nu_dnu
 c
 c Advection and abberation terms
 c
-      real*8, dimension(nd) :: b
+      REAL(10), dimension(nd) :: b
 c
 c Transfer variables
 c
-      real*8, dimension(nd) :: chi_tau
-      real*8, dimension(nd) :: source_prime
+      REAL(10), dimension(nd) :: chi_tau
+      REAL(10), dimension(nd) :: source_prime
 c
 c--------------------------------------------------------------------
 c

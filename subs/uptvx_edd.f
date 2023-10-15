@@ -18,11 +18,11 @@ C
 C Created  6-Jun-1989 - Based on UPDATE_TVX which in turn was based on UPVNOT.
 C
 	INTEGER NI,NM
-	REAL*8 TVX(NI-1,NI,NM)
-	REAL*8 TX(NI,NI,NM)
-	REAL*8 HU(NI),HL(NI),HS(NI)
-	REAL*8 RHS_dHdCHI(NI-1,NI)
-	REAL*8 DEPTH_PHI(NI)
+	REAL(10) TVX(NI-1,NI,NM)
+	REAL(10) TX(NI,NI,NM)
+	REAL(10) HU(NI),HL(NI),HS(NI)
+	REAL(10) RHS_dHdCHI(NI-1,NI)
+	REAL(10) DEPTH_PHI(NI)
 C
 C Local varaiables.
 C

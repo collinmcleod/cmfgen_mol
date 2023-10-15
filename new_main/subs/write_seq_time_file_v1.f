@@ -11,7 +11,7 @@
 !                           ion is now output.
 ! Created 14-Mar-2007 :  Based on READ_TIME_MODEL_V2
 !
-	REAL*8 SN_AGE
+	REAL(10) SN_AGE
 	INTEGER ND
 	INTEGER LU
 !

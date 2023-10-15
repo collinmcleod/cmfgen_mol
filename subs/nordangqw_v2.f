@@ -11,17 +11,17 @@
 !                       allocation.
 !
 	INTEGER NC,ND,NP
-	REAL*8 QW(ND,NP),R(ND),P(NP)
+	REAL(10) QW(ND,NP),R(ND),P(NP)
 !
-	REAL*8 MU(NP)
-	REAL*8 dMU(NP)
-	REAL*8 WEIGHT(NP)
-	REAL*8 PSQ(NP)
+	REAL(10) MU(NP)
+	REAL(10) dMU(NP)
+	REAL(10) WEIGHT(NP)
+	REAL(10) PSQ(NP)
 !
 ! Local variables
 !
 	INTEGER I,J,NW
-	REAL*8 T1
+	REAL(10) T1
 !
 	DO I=1,NP
 	  PSQ(I)=P(I)*P(I)

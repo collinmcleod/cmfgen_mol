@@ -20,10 +20,10 @@ C                        TRAPDERIVATIVES. Same variable names (A, B and C).
 C Created 04-May-1989.
 C
 	INTEGER NI
-	REAL*8 WA(NI),WB(NI),Z(NI),R(NI)
+	REAL(10) WA(NI),WB(NI),Z(NI),R(NI)
 C
 	INTEGER I,K
-	REAL*8 ALPHA
+	REAL(10) ALPHA
 C
 	DO I=1,NI
 	  WA(I)=0.0D0

@@ -11,7 +11,8 @@ C---------------------------------------------------------------------------
 
       integer*4 n,m,isign,i,no2
 C      PARAMETER(NMAX=131072)
-      real*8 data(NMAX), respns(NMAX)
+      REAL(10) data(NMAX), respns(NMAX)
+      REAL(10) :: HALF=0.5D0
       complex*16 FFT(NMAX),ANS(NMAX)
       
 
@@ -28,7 +29,7 @@ C      PARAMETER(NMAX=131072)
         IF (ISIGN.EQ.1) THEN
           ANS(I)=FFT(I)*ANS(I)/dble(NO2)
         ELSE IF (ISIGN.EQ.-1) THEN
-          IF (CDABS(ANS(I)) .EQ. zero)THEN
+          IF (CABS(ANS(I)) .EQ. zero)THEN
 	     WRITE(6,*)'Warning: DECONVOLVING AT A RESPONSE ZERO'
           END IF
 	  ANS(I)=FFT(I)/ANS(I)/dble(NO2)
@@ -49,7 +50,7 @@ C      PARAMETER(NMAX=131072)
       include 'constants.inc'
 
       integer*4 n
-      real*8 DATA1(NMAX),DATA2(NMAX)
+      REAL(10) DATA1(NMAX),DATA2(NMAX)
       COMPLEX*16 FFT1(NMAX),FFT2(NMAX),H1,H2,C1,C2
       integer*4 j,n2,i
 
@@ -82,11 +83,12 @@ C      PARAMETER(NMAX=131072)
       include 'constants.inc'
       include 'parameters.inc'
 
-      REAL*8 WR,WI,WPR,WPI,WTEMP,THETA
-      real*8 DATA(NMAX)
+      REAL(10) WR,WI,WPR,WPI,WTEMP,THETA
+      REAL(10) DATA(NMAX)
       integer*4 n,isign,i,i1,i2,i3,i4,n2p3
-      real*8 wis,wrs
-      real*8 c1,c2,h1r,h1i,h2r,h2i
+      REAL(10) wis,wrs
+      REAL(10) c1,c2,h1r,h1i,h2r,h2i
+      REAL(10) :: HALF=0.5D0
 
       write(*,*)'realft'
 
@@ -99,8 +101,8 @@ C      PARAMETER(NMAX=131072)
         C2=0.5d0
         THETA=-THETA
       ENDIF
-      WPR=-2.0D0*DSIN(0.5D0*THETA)**2d0
-      WPI=DSIN(THETA)
+      WPR=-2.0D0*SIN(HALF*THETA)**2d0
+      WPI=SIN(THETA)
       WR=1.0D0+WPR
       WI=WPI
       N2P3=2*N+3
@@ -145,11 +147,11 @@ C        WIS=SNGL(WI)
       include 'constants.inc'
       include 'parameters.inc'
 
-      REAL*8 WR,WI,WPR,WPI,WTEMP,THETA
+      REAL(10) WR,WI,WPR,WPI,WTEMP,THETA
       integer*4 N,NN,I,J,M,mmax,istep,isign
-      real*8 data(NMAX)
-      real*8 tempi,tempr
-
+      REAL(10) data(NMAX)
+      REAL(10) tempi,tempr
+      REAL(10) :: HALF=0.5D0	
       write(*,*)'four1'
 
       
@@ -177,8 +179,8 @@ C        WIS=SNGL(WI)
 2     IF (N.GT.MMAX) THEN
         ISTEP=2*MMAX
         THETA=6.28318530717959D0/dble(ISIGN*MMAX)
-        WPR=-2.D0*DSIN(0.5D0*THETA)**2d0
-        WPI=DSIN(THETA)
+        WPR=-2.D0*SIN(HALF*THETA)**2d0
+        WPI=SIN(THETA)
         WR=one
         WI=zero
         DO 13 M=1,MMAX,2

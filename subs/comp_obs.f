@@ -19,33 +19,33 @@ C Altered 14-Dec-1996 : Bug fix for MON_INTER option. NU_STORE was being
 C                         accesd outside valid range (1 to NEXT_ST_LOC-1).
 C
 	INTEGER NP
-	REAL*8 NEW_IPLUS(NP)		!RAW CMF intensities as a function of
+	REAL(10) NEW_IPLUS(NP)		!RAW CMF intensities as a function of
 					!  impact parameter.
-	REAL*8 NEW_NU			!Current CMF frequency.
+	REAL(10) NEW_NU			!Current CMF frequency.
 C
-	REAL*8 MU(NP)
-	REAL*8 FLUX_WGHTS(NP)
+	REAL(10) MU(NP)
+	REAL(10) FLUX_WGHTS(NP)
 C
 	INTEGER N_OBS
-	REAL*8 OBS_FREQ(N_OBS)
-	REAL*8 OBS_FLUX(N_OBS)
+	REAL(10) OBS_FREQ(N_OBS)
+	REAL(10) OBS_FLUX(N_OBS)
 C
 C Storage arrays
 C
 	INTEGER NST_CMF
-	REAL*8 IPLUS_STORE(NST_CMF,NP)
-	REAL*8 NU_STORE(NST_CMF)
+	REAL(10) IPLUS_STORE(NST_CMF,NP)
+	REAL(10) NU_STORE(NST_CMF)
 C
-	REAL*8 VINF			!
-	REAL*8 RMAX			!Radius at outer boundary.
+	REAL(10) VINF			!
+	REAL(10) RMAX			!Radius at outer boundary.
 	LOGICAL FIRST_OBS_COMP
 	CHARACTER*(*) INTERP_PROC
 	CHARACTER*(*) IPLUS_OR_U
 C
 C Local variables passed from one call to the next.
 C
-	REAL*8 C_KMS
-	REAL*8 FLUX_CONST
+	REAL(10) C_KMS
+	REAL(10) FLUX_CONST
 	INTEGER NEXT_ST_LOC		!Keeps track of storage location.
 	INTEGER OBS_INDX		!Current observers frequency
 	INTEGER LUER
@@ -53,25 +53,25 @@ C
 C
 C External functions.
 C
-	REAL*8 SPEED_OF_LIGHT,PARSEC,FUN_PI
+	REAL(10) SPEED_OF_LIGHT,PARSEC,FUN_PI
 	INTEGER ERROR_LU
 	EXTERNAL SPEED_OF_LIGHT,ERROR_LU,PARSEC,FUN_PI
 C
 C Local variables
 C
-	REAL*8 NU_SM_CMF
+	REAL(10) NU_SM_CMF
 	INTEGER L,LS,ML,ML_ST,ML_END
 C
 C Variables for interpolation.
 C
-	REAL*8 FLUX,T1
-	REAL*8 CMF_FREQ		!Observer's frequency transformed to comoving
+	REAL(10) FLUX,T1
+	REAL(10) CMF_FREQ		!Observer's frequency transformed to comoving
 				!  frame.
-	REAL*8 HIM1,HI,HIP1
-	REAL*8 SGN,SIM1,SI,SIP1
-	REAL*8 DYI,DYIP1
-	REAL*8 A,B,C,D
-	REAL*8 ONE
+	REAL(10) HIM1,HI,HIP1
+	REAL(10) SGN,SIM1,SI,SIP1
+	REAL(10) DYI,DYIP1
+	REAL(10) A,B,C,D
+	REAL(10) ONE
 	PARAMETER (ONE=1.0D0)
 C
 C Initialize variables if we a beginning the Observer flux calculation.

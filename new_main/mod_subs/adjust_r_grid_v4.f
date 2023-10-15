@@ -22,8 +22,8 @@
 	INTEGER ND,NT
 	INTEGER MAIN_COUNTER
 !
-	REAL*8 POPS(NT,ND)
-	REAL*8 ESEC(ND)			!Electron scattering opacity
+	REAL(10) POPS(NT,ND)
+	REAL(10) ESEC(ND)			!Electron scattering opacity
 !
 	LOGICAL DONE_R_REV
 !
@@ -36,34 +36,34 @@
 !
 ! Local variables.
 !
-	REAL*8 R_OLD(ND)
-	REAL*8 V_OLD(ND)
-	REAL*8 SIGMA_OLD(ND)
+	REAL(10) R_OLD(ND)
+	REAL(10) V_OLD(ND)
+	REAL(10) SIGMA_OLD(ND)
 !
-	REAL*8 LOG_R_OLD(ND)
-	REAL*8 LOG_R(ND)
-	REAL*8 dTAU_OLD(ND)
-	REAL*8 TAU_OLD(ND)
-	REAL*8 TAU(ND)
+	REAL(10) LOG_R_OLD(ND)
+	REAL(10) LOG_R(ND)
+	REAL(10) dTAU_OLD(ND)
+	REAL(10) TAU_OLD(ND)
+	REAL(10) TAU(ND)
 !
-	REAL*8 TA(ND)			!Work vectors
-	REAL*8 TB(ND)
-	REAL*8 COEF(ND,4)
+	REAL(10) TA(ND)			!Work vectors
+	REAL(10) TB(ND)
+	REAL(10) COEF(ND,4)
 !
 ! The fine grid (FG) is chosen to cover the ionization front. The default values are
 ! -2.0 to 1.0D0 in log(TAU) space.
 !
-	REAL*8 FG_MIN			!Min Tau for FG
-	REAL*8 FG_MAX			!Max Tau for FG
-	REAL*8 FG_RANGE
+	REAL(10) FG_MIN			!Min Tau for FG
+	REAL(10) FG_MAX			!Max Tau for FG
+	REAL(10) FG_RANGE
 !
-	REAL*8 T1,T2
-	REAL*8 DTAU2_ON_DTAU1
-	REAL*8 DLOG_TAU
-	REAL*8 STRETCH_POW		!Power law exponent to stretch tau scale about 1
+	REAL(10) T1,T2
+	REAL(10) DTAU2_ON_DTAU1
+	REAL(10) LOG_TAU
+	REAL(10) STRETCH_POW		!Power law exponent to stretch tau scale about 1
 !
-	REAL*8 OBND_PARAMS(5)		!Parameters specifying grid placement at outer boundary.
-	REAL*8 IBND_PARAMS(5)		!Parameters specifying grid placement at nner boundary.
+	REAL(10) OBND_PARAMS(5)		!Parameters specifying grid placement at outer boundary.
+	REAL(10) IBND_PARAMS(5)		!Parameters specifying grid placement at nner boundary.
 !
 	INTEGER NUM_IBND_PARAMS		!Number of points inserted near inner boundary.
 	INTEGER NUM_OBND_PARAMS		!Number of points inserted near outer boundary.

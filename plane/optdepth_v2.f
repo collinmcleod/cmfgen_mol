@@ -24,13 +24,13 @@
 !
       integer nz
       integer ip
-      real*8 chi(nz)
+      REAL(10) chi(nz)
       logical do_p_ray
 !
 ! Local variables
 !
       integer iz
-      real*8 dchidz(nz)
+      REAL(10) dchidz(nz)
 !
 !--------------------------------------------------------------------
 !

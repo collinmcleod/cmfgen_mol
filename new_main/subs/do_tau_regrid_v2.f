@@ -16,8 +16,8 @@
 !
 	INTEGER ND,NT,LU
 !
-	REAL*8 POPS(NT,ND)
-	REAL*8 ESEC(ND)			!Electron scattering opacity
+	REAL(10) POPS(NT,ND)
+	REAL(10) ESEC(ND)			!Electron scattering opacity
 	LOGICAL DONE_R_REV
 !
 ! For specifying grid.
@@ -28,31 +28,31 @@
 !
 ! Local variables.
 !
-	REAL*8 R_OLD(ND)
-	REAL*8 LOG_R(ND)
-	REAL*8 LOG_R_OLD(ND)
-	REAL*8 V_OLD(ND)
-	REAL*8 SIGMA_OLD(ND)
-	REAL*8 dTAU_OLD(ND)
-	REAL*8 TAU_OLD(ND)
-	REAL*8 TAU(ND)
+	REAL(10) R_OLD(ND)
+	REAL(10) LOG_R(ND)
+	REAL(10) LOG_R_OLD(ND)
+	REAL(10) V_OLD(ND)
+	REAL(10) SIGMA_OLD(ND)
+	REAL(10) dTAU_OLD(ND)
+	REAL(10) TAU_OLD(ND)
+	REAL(10) TAU(ND)
 !
-	REAL*8 TA(ND)			!Work vectors
-	REAL*8 TB(ND)
+	REAL(10) TA(ND)			!Work vectors
+	REAL(10) TB(ND)
 !
 ! The fine grid (FG) is chosen to cover the ionization front. The default values are
 ! -2.0 to 1.0D0 in log(TAU) space.
 !
-	REAL*8 FG_MIN			!Min Tau for FG
-	REAL*8 FG_MAX			!Max Tau for FG
-	REAL*8 FG_RANGE
+	REAL(10) FG_MIN			!Min Tau for FG
+	REAL(10) FG_MAX			!Max Tau for FG
+	REAL(10) FG_RANGE
 !
-	REAL*8 T1,T2
-	REAL*8 DLOG_TAU
-	REAL*8 STRETCH_POW		!Power law exponent to stretch tau scale about 1
+	REAL(10) T1,T2
+	REAL(10) DLOG_TAU
+	REAL(10) STRETCH_POW		!Power law exponent to stretch tau scale about 1
 !
-	REAL*8 OBND_PARAMS(5)		!Parameters specifying grid placement at outer boundary.
-	REAL*8 IBND_PARAMS(5)		!Parameters specifying grid placement at nner boundary.
+	REAL(10) OBND_PARAMS(5)		!Parameters specifying grid placement at outer boundary.
+	REAL(10) IBND_PARAMS(5)		!Parameters specifying grid placement at nner boundary.
 !
 	INTEGER NUM_IBND_PARAMS		!Number of points inserted near inner boundary.
 	INTEGER NUM_OBND_PARAMS		!Number of points inserted near outer boundary.
@@ -167,7 +167,7 @@
 	END DO
 	WRITE(LU,'(A,ES12.4)')'! Tau(min)=',TAU_OLD(1)
 	WRITE(LU,'(A,ES12.4)')'! Tau(max)=',TAU_OLD(ND)
-	TAU_OLD(1:ND)=DLOG10(TAU_OLD(1:ND))
+	TAU_OLD(1:ND)=LOG10(TAU_OLD(1:ND))
 !
 	IF(GRID_TYPE .EQ. 'VTAU')THEN
 !	  DO I=1,ND
@@ -186,8 +186,8 @@
 	  DO I=2,ND
 	    TAU_OLD(I)=TAU_OLD(I-1)+dTAU_OLD(I-1)
 	  END DO
-!	  TAU_OLD(1:ND)=DLOG10( TAU_OLD(1:ND)/(0.1D0+V(1:ND)) )
-	  TAU_OLD(1:ND)=DLOG10( TAU_OLD(1:ND)/(1.0D0 + MIN(20.0D0,V(1:ND))) )   !(0.1D0+MIN(V(1)/2,V(1:ND)))**2 )
+!	  TAU_OLD(1:ND)=LOG10( TAU_OLD(1:ND)/(0.1D0+V(1:ND)) )
+	  TAU_OLD(1:ND)=LOG10( TAU_OLD(1:ND)/(1.0D0 + MIN(20.0D0,V(1:ND))) )   !(0.1D0+MIN(V(1)/2,V(1:ND)))**2 )
 	  TAU_OLD(1:ND)=TAU_OLD(1:ND)/(1.0+0.5D0*MIN(ABS(TAU_OLD(1:ND)),2.0D0))
 	END IF
 !
@@ -286,7 +286,7 @@
 ! Now do the last section, towards the inner boundary.
 !
 	  I2=ND-(NX+I1+NUM_IBND_PARAMS)
-	  dLOG_TAU=(TAU_OLD(ND)-FG_MAX)/I2
+	  DLOG_TAU=(TAU_OLD(ND)-FG_MAX)/I2
 	  DO I=I1+NX+1,ND-NUM_IBND_PARAMS-1
 	    TAU(I)=TAU(I-1)+DLOG_TAU
 	  END DO
@@ -354,7 +354,7 @@
 	    IF(T2 .GT. 1.4D0 .AND. T2 .GT. T1)THEN
 	      T1=(LOG(TAU(IEND+1)/TAU(IEND-4)))/5
 	      DO I=IEND-3,IEND
-	        TAU(I)=EXP(DLOG(TAU(IEND-4))+(I+4-IEND)*T1)
+	        TAU(I)=EXP(LOG(TAU(IEND-4))+(I+4-IEND)*T1)
 	      END DO
 	    END IF
 	  END IF
@@ -368,13 +368,13 @@
 ! Do grid at inner boundary. We set NUM_IBND_PARAMS extra points.
 !
 	IF(TRIM(GRID_TYPE) .NE. 'REFINE')THEN
-	  dLOG_TAU=TAU(ND)-TAU(ND-NUM_IBND_PARAMS-1)
+	  DLOG_TAU=TAU(ND)-TAU(ND-NUM_IBND_PARAMS-1)
 	  IF(IN_BND_OPT .EQ. 'DEFAULT')THEN
-	    TAU(ND-1)=TAU(ND)-0.1D0*dLOG_TAU
-	    TAU(ND-2)=TAU(ND)-0.35D0*dLOG_TAU
+	    TAU(ND-1)=TAU(ND)-0.1D0*DLOG_TAU
+	    TAU(ND-2)=TAU(ND)-0.35D0*DLOG_TAU
 	  ELSE IF(IN_BND_OPT .EQ. 'SPECIFY')THEN
 	    DO J=1,NUM_IBND_PARAMS
-	      TAU(ND-J)=TAU(ND)-dLOG_TAU/IBND_PARAMS(J)
+	      TAU(ND-J)=TAU(ND)-DLOG_TAU/IBND_PARAMS(J)
 	    END DO
 	  ELSE
 	    WRITE(T_OUT,*)'Invalid inner boundary option in ADJUST_R_GRID_V3'
@@ -387,16 +387,16 @@
 ! Now do outer boundary. 
 !
 	IF(TRIM(GRID_TYPE) .NE. 'REFINE')THEN
-	  dLOG_TAU=TAU(NUM_OBND_PARAMS+2)-TAU(1)
+	  DLOG_TAU=TAU(NUM_OBND_PARAMS+2)-TAU(1)
 	  IF(OUT_BND_OPT .EQ. 'DEFAULT')THEN
-	    TAU(2)=TAU(1)+0.02D0*dLOG_TAU
-	    TAU(3)=TAU(1)+0.2D0*dLOG_TAU
+	    TAU(2)=TAU(1)+0.02D0*DLOG_TAU
+	    TAU(3)=TAU(1)+0.2D0*DLOG_TAU
 	  ELSE IF(OUT_BND_OPT .EQ. 'SPECIFY')THEN
 	    WRITE(LU,'(A)')'!'
 	    WRITE(LU,'(A,A,3(7X,A))')'! ','  J',' TAU(1)','dLOGTAU','OBND(1)'
 	    DO J=1,NUM_OBND_PARAMS
-	      WRITE(LU,'(A,I3,3ES14.4)')'! ',J,TAU(1),dLOG_TAU,OBND_PARAMS(J)
-	      TAU(1+J)=TAU(1)+dLOG_TAU/OBND_PARAMS(J)
+	      WRITE(LU,'(A,I3,3ES14.4)')'! ',J,TAU(1),DLOG_TAU,OBND_PARAMS(J)
+	      TAU(1+J)=TAU(1)+DLOG_TAU/OBND_PARAMS(J)
 	    END DO
 	    WRITE(LU,'(A)')'!'
 	  ELSE

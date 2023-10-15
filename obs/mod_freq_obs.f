@@ -24,25 +24,25 @@
 !
 ! Continuum frequency variables and arrays.
 !
-	REAL*8 FQW(NCF_MAX)			!Frequency weights
-        REAL*8 NU(NCF_MAX)              	!Continuum and line frequencies
-        REAL*8 NU_EVAL_CONT(NCF_MAX)    	!Frequencies to evaluate continuum
-        REAL*8 OBS(NCF_MAX)             	!Observers spectrum
+	REAL(10) FQW(NCF_MAX)			!Frequency weights
+        REAL(10) NU(NCF_MAX)              	!Continuum and line frequencies
+        REAL(10) NU_EVAL_CONT(NCF_MAX)    	!Frequencies to evaluate continuum
+        REAL(10) OBS(NCF_MAX)             	!Observers spectrum
 !
-        REAL*8 OBS_FREQ(NCF_MAX)                !Since N_OBS < NCF =< NCF_MAX
-        REAL*8 OBS_FLUX(NCF_MAX)
+        REAL(10) OBS_FREQ(NCF_MAX)                !Since N_OBS < NCF =< NCF_MAX
+        REAL(10) OBS_FLUX(NCF_MAX)
 !
 ! Arrays for performing LINE frequencies in numerical order
 !
         INTEGER N_LINE_FREQ
-        REAL*8, ALLOCATABLE :: VEC_FREQ(:)
-        REAL*8, ALLOCATABLE :: VEC_STRT_FREQ(:)
-        REAL*8, ALLOCATABLE :: VEC_OSCIL(:)
-        REAL*8, ALLOCATABLE :: VEC_EINA(:)
-        REAL*8, ALLOCATABLE :: VEC_ARAD(:)
-        REAL*8, ALLOCATABLE :: VEC_C4(:)
-        REAL*8, ALLOCATABLE :: VEC_DP_WRK(:)
-        REAL*8, ALLOCATABLE :: VEC_VDOP_MIN(:)
+        REAL(10), ALLOCATABLE :: VEC_FREQ(:)
+        REAL(10), ALLOCATABLE :: VEC_STRT_FREQ(:)
+        REAL(10), ALLOCATABLE :: VEC_OSCIL(:)
+        REAL(10), ALLOCATABLE :: VEC_EINA(:)
+        REAL(10), ALLOCATABLE :: VEC_ARAD(:)
+        REAL(10), ALLOCATABLE :: VEC_C4(:)
+        REAL(10), ALLOCATABLE :: VEC_DP_WRK(:)
+        REAL(10), ALLOCATABLE :: VEC_VDOP_MIN(:)
 !
         INTEGER, ALLOCATABLE :: VEC_INDX(:)
         INTEGER, ALLOCATABLE :: VEC_NL(:)

@@ -7,7 +7,7 @@
 ! Altered: 14-Aug-2022: Include SHOCK_POWER -- based on LUC.
 !
 	INTEGER ND
-	REAL*8 E_RAD_DECAY(ND)
+	REAL(10) E_RAD_DECAY(ND)
 !
 ! No need for IF statement at present, since SHOCK_POWER will be zero
 !          if unimportant.

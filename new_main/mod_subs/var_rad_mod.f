@@ -4,46 +4,46 @@
 !
 	MODULE VAR_RAD_MOD
 !
-	REAL*8, ALLOCATABLE :: DIFFW(:)         !NT - Variation of diffusion approx. at inner boundary.
+	REAL(10), ALLOCATABLE :: DIFFW(:)         !NT - Variation of diffusion approx. at inner boundary.
 !
-	REAL*8, ALLOCATABLE :: VK(:,:)    	!ND,ND - Coef. matrix of %CHI vector
-	REAL*8, ALLOCATABLE :: FC(:,:)    	!ND,ND - Coef. of %EMIS vector in angular equ.
-	REAL*8, ALLOCATABLE :: F2DA(:,:)    	!ND,ND - Coef. of %CHi in angular equ.
-	REAL*8, ALLOCATABLE :: FA(:)    		!ND 
+	REAL(10), ALLOCATABLE :: VK(:,:)    	!ND,ND - Coef. matrix of %CHI vector
+	REAL(10), ALLOCATABLE :: FC(:,:)    	!ND,ND - Coef. of %EMIS vector in angular equ.
+	REAL(10), ALLOCATABLE :: F2DA(:,:)    	!ND,ND - Coef. of %CHi in angular equ.
+	REAL(10), ALLOCATABLE :: FA(:)    		!ND 
 !
-	REAL*8, ALLOCATABLE :: F2DAEXT(:,:)    	!NDMAX,NDMAX 
-	REAL*8, ALLOCATABLE :: FCEXT(:,:)    	!NDMAX,NDMAX 
-	REAL*8, ALLOCATABLE :: FAEXT(:)    	!NDMAX- 
+	REAL(10), ALLOCATABLE :: F2DAEXT(:,:)    	!NDMAX,NDMAX 
+	REAL(10), ALLOCATABLE :: FCEXT(:,:)    	!NDMAX,NDMAX 
+	REAL(10), ALLOCATABLE :: FAEXT(:)    	!NDMAX- 
 !
 ! Variation arrays
 ! Variable,depth of variable,depth of J. If NUM_BNDS .ne. ND the
 ! the variable depth is given by [ VJ(I1,I2,I3) ] I3+I2-NDIAG.
 !
-	REAL*8, ALLOCATABLE :: VJ(:,:,:)    	!NT,NUM_BNDS,ND - 
+	REAL(10), ALLOCATABLE :: VJ(:,:,:)    	!NT,NUM_BNDS,ND - 
 !
 ! Variation line arrays
 !
-	REAL*8, ALLOCATABLE :: TX(:,:,:)    	!ND,ND,NM - 
-	REAL*8, ALLOCATABLE :: TVX(:,:,:)    	!ND-1,ND,NM - 
+	REAL(10), ALLOCATABLE :: TX(:,:,:)    	!ND,ND,NM - 
+	REAL(10), ALLOCATABLE :: TVX(:,:,:)    	!ND-1,ND,NM - 
 !
 ! We make TX_EXT and TVX_EXT allocatable as they are accessed directly
 ! in VARCONT and thus must have the correct dimensions.
 !
-	REAL*8, ALLOCATABLE :: TX_EXT(:,:,:)
-	REAL*8, ALLOCATABLE :: TVX_EXT(:,:,:)
-	REAL*8, ALLOCATABLE :: KI(:,:,:)    		  !NDMAX,ND,NM_KI - 
+	REAL(10), ALLOCATABLE :: TX_EXT(:,:,:)
+	REAL(10), ALLOCATABLE :: TVX_EXT(:,:,:)
+	REAL(10), ALLOCATABLE :: KI(:,:,:)    		  !NDMAX,ND,NM_KI - 
 !
-        REAL*8, ALLOCATABLE :: dJ_LOC(:,:,:)              !NM,NUM_BNDS,ND
-        REAL*8, ALLOCATABLE :: dZ(:,:,:,:)                !NM,NUM_BNDS,ND,MAX_SIM
-        REAL*8, ALLOCATABLE :: dZ_POPS(:,:,:)             !NT,NUM_BNDS,ND
+        REAL(10), ALLOCATABLE :: dJ_LOC(:,:,:)              !NM,NUM_BNDS,ND
+        REAL(10), ALLOCATABLE :: dZ(:,:,:,:)                !NM,NUM_BNDS,ND,MAX_SIM
+        REAL(10), ALLOCATABLE :: dZ_POPS(:,:,:)             !NT,NUM_BNDS,ND
 !
-	REAL*8, ALLOCATABLE :: dJ_DIF_d_T_EXT(:)          !NDMAX -
-	REAL*8, ALLOCATABLE :: dJ_DIF_d_dTdR_EXT(:)       !NDMAX -
-	REAL*8, ALLOCATABLE :: dJ_DIF_d_T(:)              !NDMAX -
-	REAL*8, ALLOCATABLE :: dJ_DIF_d_dTdR(:)           !NDMAX -
-	REAL*8, ALLOCATABLE :: RHS_dHdCHI(:,:)            !NDMAX,ND -
-	REAL*8, ALLOCATABLE :: dRSQH_DIF_d_T(:)           !NDMAX -
-	REAL*8, ALLOCATABLE :: dRSQH_DIF_d_dTdR(:)        !NDMAX -
+	REAL(10), ALLOCATABLE :: dJ_DIF_d_T_EXT(:)          !NDMAX -
+	REAL(10), ALLOCATABLE :: dJ_DIF_d_dTdR_EXT(:)       !NDMAX -
+	REAL(10), ALLOCATABLE :: dJ_DIF_d_T(:)              !NDMAX -
+	REAL(10), ALLOCATABLE :: dJ_DIF_d_dTdR(:)           !NDMAX -
+	REAL(10), ALLOCATABLE :: RHS_dHdCHI(:,:)            !NDMAX,ND -
+	REAL(10), ALLOCATABLE :: dRSQH_DIF_d_T(:)           !NDMAX -
+	REAL(10), ALLOCATABLE :: dRSQH_DIF_d_dTdR(:)        !NDMAX -
 !
 	END MODULE VAR_RAD_MOD
 !

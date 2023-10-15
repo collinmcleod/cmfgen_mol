@@ -30,24 +30,24 @@
 	INTEGER EQSPEC	!Eqaution of G.S. in BA matrix
 	INTEGER EQHYD		!Sepecies equation in BA amtrix
 !
-	REAL*8 EDGE_F(N_F)
-	REAL*8 G_F(N_F)
+	REAL(10) EDGE_F(N_F)
+	REAL(10) G_F(N_F)
 	INTEGER F_TO_S(N_F)
 !
 	CHARACTER(LEN=*) LEVEL_NAMES(N_F)
 !
-	REAL*8 T(ND)
-	REAL*8 GION		!Statistical weight of ion
+	REAL(10) T(ND)
+	REAL(10) GION		!Statistical weight of ion
 !
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local vectors and variables
 !
-	REAL*8 G_CHG_VEC(ND)
-	REAL*8 dG_CHG_VEC(ND)
-	REAL*8 T_VEC(ND)
-	REAL*8 T1
+	REAL(10) G_CHG_VEC(ND)
+	REAL(10) dG_CHG_VEC(ND)
+	REAL(10) T_VEC(ND)
+	REAL(10) T1
 !
 	INTEGER I,J,K,L
 	INTEGER I_S,I_F

@@ -15,10 +15,10 @@ C                         offset.
 C Created 25-Jun-1998
 C
 	INTEGER ND
-	REAL*8 LINE_LUM(ND)
-	REAL*8 R(ND)
+	REAL(10) LINE_LUM(ND)
+	REAL(10) R(ND)
 C
-	REAL*8 DERIV(ND)
+	REAL(10) DERIV(ND)
 	INTEGER I
 C
 C We compute the amount of energy emitted between R(I) and R(I+1), and

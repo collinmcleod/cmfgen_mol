@@ -26,12 +26,12 @@ c Local and temparary variables
 c
       integer :: j
 c
-      real*8 :: a1,a2,sum,check
-      real*8, dimension(nw) :: temp
+      REAL(10) :: a1,a2,sum,check
+      REAL(10), dimension(nw) :: temp
 c
 c Angle variables
 c
-      real*8, dimension(nw) :: angle
+      REAL(10), dimension(nw) :: angle
 c
 c--------------------------------------------------------------------
 c

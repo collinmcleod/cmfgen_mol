@@ -11,13 +11,13 @@
 !
 	INTEGER ND
 	INTEGER LU
-	REAL*8 V(ND)
+	REAL(10) V(ND)
 !
 ! Variables for reading in the non-local energy deposition from outside file
 !
 	INTEGER NDTMP
-	REAL*8, ALLOCATABLE :: VTMP(:),EDEPTMP(:),EDEPNEW(:)
-	REAL*8 T1
+	REAL(10), ALLOCATABLE :: VTMP(:),EDEPTMP(:),EDEPNEW(:)
+	REAL(10) T1
 	INTEGER LUER
 	INTEGER I
 	INTEGER ERROR_LU

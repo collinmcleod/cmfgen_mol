@@ -34,25 +34,25 @@
 !
 	INTEGER NUM_BNDS,DST,DEND
 !
-	REAL*8 WSE(NLEV,ND),dWSEdT(NLEV,ND)
+	REAL(10) WSE(NLEV,ND),dWSEdT(NLEV,ND)
 !
 ! Populations of species undergoing photoionization.
 !
-	REAL*8 HN(NLEV,ND),HNST(NLEV,ND),dlnHNST_dlnT(NLEV,ND)
+	REAL(10) HN(NLEV,ND),HNST(NLEV,ND),dlnHNST_dlnT(NLEV,ND)
 !
 ! Ion populations.
 !
-	REAL*8 DI(N_DI,ND),DIST(N_DI,ND)
-	REAL*8 dlnDIST_dlnT(N_DI,ND)
+	REAL(10) DI(N_DI,ND),DIST(N_DI,ND)
+	REAL(10) dlnDIST_dlnT(N_DI,ND)
 !
-	REAL*8 ED(ND),T(ND)
-	REAL*8 JREC(ND)
-	REAL*8 dJRECdT(ND)
-	REAL*8 JPHOT(ND)
+	REAL(10) ED(ND),T(ND)
+	REAL(10) JREC(ND)
+	REAL(10) dJRECdT(ND)
+	REAL(10) JPHOT(ND)
 !
 ! Constants for opacity etc.
 !
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local variables
@@ -61,14 +61,14 @@
 	INTEGER NT
 	INTEGER ION_V
 	INTEGER ION_EQ
-	REAL*8 T3
-	REAL*8 B_RAT
+	REAL(10) T3
+	REAL(10) B_RAT
 !
 ! REV_HNST referes to the LTE population  of the level defined with respect
 ! to the actual destination (target) level.
 !
-	REAL*8 REV_HNST
-	REAL*8 WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC
+	REAL(10) REV_HNST
+	REAL(10) WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC
 !
 !
 !

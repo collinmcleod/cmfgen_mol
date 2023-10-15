@@ -19,34 +19,34 @@ C
 C Vecters returned by subroutine:
 C
 C Line+continuum frequencies
-	REAL*8 FREQ(NFREQ_MAX)			!New observers frequencies
+	REAL(10) FREQ(NFREQ_MAX)			!New observers frequencies
 C
 C Passed vectors.
 C
-	REAL*8 NU_LINE(N_LINES)		!Line frequencies
+	REAL(10) NU_LINE(N_LINES)		!Line frequencies
 C
 C Passed constants:
-	REAL*8 VINF		!Terminal velocity of wind.
-	REAL*8 dV_OBS_PROF
-	REAL*8 dV_OBS_WING
-	REAL*8 dV_OBS_BIG
-	REAL*8 NU_MIN
-	REAL*8 NU_MAX
-	REAL*8 OBS_PRO_EXT_RAT
-	REAL*8 ES_WING_EXT
-	REAL*8 V_DOP
+	REAL(10) VINF		!Terminal velocity of wind.
+	REAL(10) dV_OBS_PROF
+	REAL(10) dV_OBS_WING
+	REAL(10) dV_OBS_BIG
+	REAL(10) NU_MIN
+	REAL(10) NU_MAX
+	REAL(10) OBS_PRO_EXT_RAT
+	REAL(10) ES_WING_EXT
+	REAL(10) V_DOP
 C
 C Local variables.
 C
-	REAL*8 MAX_B_EXTENT
-	REAL*8 MAX_R_EXTENT
-	REAL*8 MAX_BW_EXTENT
-	REAL*8 MAX_RW_EXTENT
+	REAL(10) MAX_B_EXTENT
+	REAL(10) MAX_R_EXTENT
+	REAL(10) MAX_BW_EXTENT
+	REAL(10) MAX_RW_EXTENT
 C
-	REAL*8 PROF_SPACING
-	REAL*8 WING_SPACING
-	REAL*8 BIG_SPACING
-	REAL*8 T1
+	REAL(10) PROF_SPACING
+	REAL(10) WING_SPACING
+	REAL(10) BIG_SPACING
+	REAL(10) T1
 C
 	INTEGER INDX		!Current frequency index.
 	INTEGER LN_INDX	!Current line whose frequencies we are 
@@ -54,12 +54,12 @@ C
 C
 	INTEGER I,J		!Micellaneous loop variables.
 	INTEGER LU_ER
-	REAL*8 C_KMS,MIN_FREQ
+	REAL(10) C_KMS,MIN_FREQ
 C
 C External functions
 C
 	INTEGER ERROR_LU
-	REAL*8 SPEED_OF_LIGHT
+	REAL(10) SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 C
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()

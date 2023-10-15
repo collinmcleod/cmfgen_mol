@@ -14,9 +14,9 @@
 !
 ! Local variables
 !
-	REAL*8, ALLOCATABLE :: XV(:)
-	REAL*8, ALLOCATABLE :: YV(:)
-	REAL*8, ALLOCATABLE :: ZV(:)
+	REAL(10), ALLOCATABLE :: XV(:)
+	REAL(10), ALLOCATABLE :: YV(:)
+	REAL(10), ALLOCATABLE :: ZV(:)
 !
 	INTEGER NX
 !

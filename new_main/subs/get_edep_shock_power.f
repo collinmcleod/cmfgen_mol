@@ -7,13 +7,13 @@
 
       integer i, nd
 
-      real*8 r(nd)
-      real*8 v(nd)
-      real*8 density(nd)
-      real*8 wgt(nd)
-      real*8 wrk(nd)
+      REAL(10) r(nd)
+      REAL(10) v(nd)
+      REAL(10) density(nd)
+      REAL(10) wgt(nd)
+      REAL(10) wrk(nd)
 
-      real*8 t1
+      REAL(10) t1
 
       ! set up the deposition profile
       wgt(1:nd) = 0.0d0
@@ -21,7 +21,7 @@
          write(6,*) 'In get_edep i, V, FCL: ',i,v(i),clump_fac(i)
          call flush(6)
          t1 = (v(i) - vloc_shock_power) / dvloc_shock_power
-         if (dabs(t1).lt.8.d0) wgt(i) = exp(-t1*t1)
+         if (abs(t1).lt.8.d0) wgt(i) = exp(-t1*t1)
          ! dividing by clump_fac makes the shock edep max in clumped regions 
          ! since CMFGEN scales the edep by clump_fac
          if (scl_pwr_by_fcl) then

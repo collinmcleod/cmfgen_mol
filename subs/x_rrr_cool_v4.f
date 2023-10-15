@@ -20,18 +20,18 @@ C                        _V2 append to name.
 C Created 18-Jul-1994 : Based on PRRRCOOL
 C
 	INTEGER N_A,N_B,ND,ML
-	REAL*8 NET_X_RR(ND),X_BFCR(ND)
-	REAL*8 HN_A(N_A,ND),HNST_A(N_A,ND)
-	REAL*8 HN_B(N_B,ND),HNST_B(N_B,ND)
-	REAL*8 WSE_X_A(N_A,ND)
-	REAL*8 WCR_X_A(N_A,ND)
-	REAL*8 JREC(ND)			!In (2hv^3/c^2 + J) EXP(-hv/kT)/v  dv
-	REAL*8 JPHOT(ND)		!In J/v dv
-	REAL*8 JREC_CR(ND)		!In (2hv^3/c^2 + J) EXP(-hv/kT)   dv
-	REAL*8 JPHOT_CR(ND)		!In J dv
+	REAL(10) NET_X_RR(ND),X_BFCR(ND)
+	REAL(10) HN_A(N_A,ND),HNST_A(N_A,ND)
+	REAL(10) HN_B(N_B,ND),HNST_B(N_B,ND)
+	REAL(10) WSE_X_A(N_A,ND)
+	REAL(10) WCR_X_A(N_A,ND)
+	REAL(10) JREC(ND)			!In (2hv^3/c^2 + J) EXP(-hv/kT)/v  dv
+	REAL(10) JPHOT(ND)		!In J/v dv
+	REAL(10) JREC_CR(ND)		!In (2hv^3/c^2 + J) EXP(-hv/kT)   dv
+	REAL(10) JPHOT_CR(ND)		!In J dv
 C
 	INTEGER I,J
-	REAL*8 A1
+	REAL(10) A1
 	LOGICAL FLAG
 C
 C If ML=1 and flag is set, then zero all arrays. FLAG should be

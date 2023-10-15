@@ -4,13 +4,13 @@
 !
 ! Arrays for putting LINE frequencies in numerical order
 !
-	REAL*8,      ALLOCATABLE :: VEC_FREQ(:)             !NLINE_MAX
-	REAL*8,      ALLOCATABLE :: VEC_STRT_FREQ(:)        !NLINE_MAX
-	REAL*8,      ALLOCATABLE :: VEC_OSCIL(:)            !NLINE_MAX
-	REAL*8,      ALLOCATABLE :: VEC_EINA(:)             !NLINE_MAX
-	REAL*8,      ALLOCATABLE :: VEC_ARAD(:)             !NLINE_MAX
-	REAL*8,      ALLOCATABLE :: VEC_VDOP_MIN(:)         !NLINE_MAX
-	REAL*8,      ALLOCATABLE :: VEC_DP_WRK(:)           !NLINE_MAX
+	REAL(10),      ALLOCATABLE :: VEC_FREQ(:)             !NLINE_MAX
+	REAL(10),      ALLOCATABLE :: VEC_STRT_FREQ(:)        !NLINE_MAX
+	REAL(10),      ALLOCATABLE :: VEC_OSCIL(:)            !NLINE_MAX
+	REAL(10),      ALLOCATABLE :: VEC_EINA(:)             !NLINE_MAX
+	REAL(10),      ALLOCATABLE :: VEC_ARAD(:)             !NLINE_MAX
+	REAL(10),      ALLOCATABLE :: VEC_VDOP_MIN(:)         !NLINE_MAX
+	REAL(10),      ALLOCATABLE :: VEC_DP_WRK(:)           !NLINE_MAX
 	INTEGER,     ALLOCATABLE :: VEC_INDX(:)             !NLINE_MAX
 	INTEGER,     ALLOCATABLE :: VEC_ID(:)               !NLINE_MAX
 	INTEGER,     ALLOCATABLE :: VEC_NL(:)               !NLINE_MAX

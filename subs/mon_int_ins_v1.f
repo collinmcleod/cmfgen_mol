@@ -30,28 +30,28 @@ C NB: These arrays are dimensioned ND-1 since there are ONLY ND-1
 C intervals. By doing this we can use MATRIX operations, and operate
 C on the whole array.
 C
-	REAL*8 CHI_INS(ND-1,NINS)
-	REAL*8 R_INS(ND-1,NINS)
-	REAL*8 dCHIdR_INS(ND-1,NINS)
+	REAL(10) CHI_INS(ND-1,NINS)
+	REAL(10) R_INS(ND-1,NINS)
+	REAL(10) dCHIdR_INS(ND-1,NINS)
 
-	REAL*8 R(ND)
-	REAL*8 CHI(ND)
-	REAL*8 dCHIdR(ND)
+	REAL(10) R(ND)
+	REAL(10) CHI(ND)
+	REAL(10) dCHIdR(ND)
 C
 	LOGICAL LOGX			!Indicates interpolation in LOG(R)
 	LOGICAL LOGY			!Indicate interpolation in LOG(Y)
 	LOGICAL DERIV			!Indicates to compute derivatives.
 C
-	REAL*8 X(ND)			!Revised R array
-	REAL*8 Y(ND)			!Revised CHI array
+	REAL(10) X(ND)			!Revised R array
+	REAL(10) Y(ND)			!Revised CHI array
 C
-	REAL*8 H(ND)			!Delta R [ R(I+1)-R(I) ]
-	REAL*8 S(ND)			!Slope in interval (I to I+1)
-	REAL*8 D(ND)			!First derivative at node I
-	REAL*8 COEF(ND,4)
+	REAL(10) H(ND)			!Delta R [ R(I+1)-R(I) ]
+	REAL(10) S(ND)			!Slope in interval (I to I+1)
+	REAL(10) D(ND)			!First derivative at node I
+	REAL(10) COEF(ND,4)
 C
-	REAL*8 ONE
-	REAL*8 DELR
+	REAL(10) ONE
+	REAL(10) DELR
 	PARAMETER (ONE=1.0D0)
 	INTEGER I,K
 C

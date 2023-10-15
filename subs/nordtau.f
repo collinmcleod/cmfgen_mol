@@ -15,7 +15,7 @@ C
 C Altered 25-NOV-1986 (Based on TAU)
 C
 	INTEGER NI,I
-	REAL*8 DTAU(NI),CHI(NI),Z(NI),R(NI),dCHIdR(NI)
+	REAL(10) DTAU(NI),CHI(NI),Z(NI),R(NI),dCHIdR(NI)
 C
 	DO I=1,NI-1
 	  DTAU(I)=0.5D0*(Z(I)-Z(I+1))*(CHI(I)+CHI(I+1)+(Z(I)-Z(I+1))
@@ -69,11 +69,11 @@ C ALtered 25-JAn-88 - Boundary condition checked.
 C Altered 20-Feb-1987 (Method option installed)
 C
 	INTEGER ND,I
-	REAL*8 CHI(ND),dCHIdR(ND),R(ND),LIM
+	REAL(10) CHI(ND),dCHIdR(ND),R(ND),LIM
 	CHARACTER*6 METHOD
 C                        
-	REAL*8 H(ND),SLOPE(ND)
-	REAL*8, PARAMETER :: ONE=1.0D0
+	REAL(10) H(ND),SLOPE(ND)
+	REAL(10), PARAMETER :: ONE=1.0D0
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -231,16 +231,16 @@ C                         fitting cubic.
 C ALtered 24-May-1996 ; ERROR_LU installed.
 C
 	INTEGER ND,I
-	REAL*8 CHI(ND),dCHIdR(ND),R(ND),LIM
+	REAL(10) CHI(ND),dCHIdR(ND),R(ND),LIM
 	CHARACTER*6 METHOD
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
-	REAL*8 SLOPE(ND),H(ND)
-	REAL*8 LIN_SLOPE(ND),LIN_H(ND)
-	REAL*8 T1,ORIG_dCHIdR
-	REAL*8, PARAMETER :: ONE=1.0D0
+	REAL(10) SLOPE(ND),H(ND)
+	REAL(10) LIN_SLOPE(ND),LIN_H(ND)
+	REAL(10) T1,T2,ORIG_dCHIdR
+	REAL(10), PARAMETER :: ONE=1.0D0
 C
 	LIM=3.0D0
 	LUER=ERROR_LU()
@@ -480,7 +480,8 @@ C
 	        C(I)=T1/H(I)*SIGN(ONE,SLOPE(I))
  	      END IF
 	    ELSE
-	      T1=T1*SIGN(0.5D0,ORIG_dCHIdR)/(H(I-1)+H(I))
+	      T2=0.5D0
+	      T1=T1*SIGN(T2,ORIG_dCHIdR)/(H(I-1)+H(I))
 	      A(I)=-T1*H(I)/H(I-1)
 	      C(I)=T1*H(I-1)/H(I)
 	      B(I)=-A(I)-C(I)

@@ -11,10 +11,10 @@
 ! Output: STEQ_T in MOD_CMFGEN is modified.
 !
       INTEGER ND
-      REAL*8 SCALE
-      REAL*8 PI
-      REAL*8 dE_SHOCK_POWER(ND)
-      REAL*8 SHOCK_POWER_FAC
+      REAL(10) SCALE
+      REAL(10) PI
+      REAL(10) dE_SHOCK_POWER(ND)
+      REAL(10) SHOCK_POWER_FAC
 !
 ! For historical reasons STEQ contains Int[chi.J - eta]dv. Rather than multiply
 ! this term everywhere by 4pi, we divide the radiactive heating by 4pi.

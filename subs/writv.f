@@ -6,7 +6,7 @@
 ! Altered 30-APR-1985 : Now writes 10 columns instead of five across a page.)
 !
 	INTEGER ND,LU
-	REAL*8 F(ND)
+	REAL(10) F(ND)
 !
 ! Local variables.
 !

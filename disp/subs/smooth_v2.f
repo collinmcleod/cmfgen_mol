@@ -5,14 +5,14 @@
 ! Altered: 13-Dec-2013 : Instaled LEV option -- still under development.
 !
 	INTEGER N,ND,DEPTH_LIM
-	REAL*8 SPEC(N,ND),LTE(N,ND),VAL
+	REAL(10) SPEC(N,ND),LTE(N,ND),VAL
 	CHARACTER*(*) IDENT,OPT,TYPE
 	LOGICAL FLAG
 !
 ! Local variables
 !
 	INTEGER I,J,K
-	REAL*8 T1,T2
+	REAL(10) T1,T2
 !
 	IF( (OPT .NE. IDENT) .AND. (OPT .NE. 'ALL') )RETURN
 !

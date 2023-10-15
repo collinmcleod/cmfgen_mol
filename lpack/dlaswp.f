@@ -10,7 +10,7 @@
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * )
-      DOUBLE PRECISION   A( LDA, * )
+      REAL(10)   A( LDA, * )
 *     ..
 *
 *  Purpose
@@ -25,7 +25,7 @@
 *  N       (input) INTEGER
 *          The number of columns of the matrix A.
 *
-*  A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)
+*  A       (input/output) REAL(10) array, dimension (LDA,N)
 *          On entry, the matrix of column dimension N to which the row
 *          interchanges will be applied.
 *          On exit, the permuted matrix.
@@ -60,7 +60,7 @@
 *
 *     .. Local Scalars ..
       INTEGER            I, I1, I2, INC, IP, IX, IX0, J, K, N32
-      DOUBLE PRECISION   TEMP
+      REAL(10)   TEMP
 *     ..
 *     .. Executable Statements ..
 *

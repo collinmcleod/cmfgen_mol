@@ -192,9 +192,9 @@
 !
 	INTEGER N,NION,ND,NUM_BNDS,DIAG_INDX
 	CHARACTER*(*) SOL_TYPE
-	REAL*8 STEQ_STORE(N,ND)
-        REAL*8 STEQ(N,ND)
-        REAL*8 POPS(N,ND)
+	REAL(10) STEQ_STORE(N,ND)
+        REAL(10) STEQ(N,ND)
+        REAL(10) POPS(N,ND)
 	LOGICAL FLAG
 !
 	LOGICAL BA_COMPUTED
@@ -203,17 +203,17 @@
 !
 ! Local variables
 !
-        REAL*8, ALLOCATABLE :: B_MAT(:,:)
-        REAL*8, ALLOCATABLE :: C_MAT(:,:)
-        REAL*8, ALLOCATABLE :: D_MAT(:,:)
-        REAL*8, ALLOCATABLE :: ORIG_POPS(:,:)
-        REAL*8, ALLOCATABLE :: PREV_D_MAT(:,:)
-        REAL*8, ALLOCATABLE :: D_MAT_STORE(:,:,:)
-        REAL*8, ALLOCATABLE :: RUB(:,:)	      	      !Not accessed when passed.
+        REAL(10), ALLOCATABLE :: B_MAT(:,:)
+        REAL(10), ALLOCATABLE :: C_MAT(:,:)
+        REAL(10), ALLOCATABLE :: D_MAT(:,:)
+        REAL(10), ALLOCATABLE :: ORIG_POPS(:,:)
+        REAL(10), ALLOCATABLE :: PREV_D_MAT(:,:)
+        REAL(10), ALLOCATABLE :: D_MAT_STORE(:,:,:)
+        REAL(10), ALLOCATABLE :: RUB(:,:)	      	      !Not accessed when passed.
 !
-        REAL*8 ROW_SF(N)
-        REAL*8 COL_SF(N)
-        REAL*8 ROW_CND,COL_CND,MAX_VAL
+        REAL(10) ROW_SF(N)
+        REAL(10) COL_SF(N)
+        REAL(10) ROW_CND,COL_CND,MAX_VAL
 	INTEGER IPIVOT(N)
 	INTEGER RUB_VEC(N)
 !
@@ -232,8 +232,8 @@
 	LOGICAL FIRST_MATRIX,LAST_MATRIX
 	LOGICAL WR_D_MAT
 !
-        REAL*8,      PARAMETER :: DP_NEG_ONE=-1.0D0
-        REAL*8,      PARAMETER :: DP_ONE=1.0D0
+        REAL(10),      PARAMETER :: DP_NEG_ONE=-1.0D0
+        REAL(10),      PARAMETER :: DP_ONE=1.0D0
         INTEGER,   PARAMETER :: INT_ONE=1
         INTEGER,   PARAMETER :: NSNG=1
         CHARACTER*1, PARAMETER :: NO_TRANS='N'

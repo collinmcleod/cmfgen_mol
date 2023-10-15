@@ -51,13 +51,13 @@ C                         DO LOOPS. Changes verified.
 C Altered 26-May-1996: Implicit none installed.
 C
       INTEGER N,KS
-      REAL*8 A(N),B(N)
+      REAL(10) A(N),B(N)
 C
 C Local variables.
 C
-      REAL*8 TOL
-      REAL*8 BIGA
-      REAL*8 SAVE
+      REAL(10) TOL
+      REAL(10) BIGA
+      REAL(10) SAVE
 C
       INTEGER I,J,K
       INTEGER I1,I2,IJ,IT,IA,IB,IC,IX

@@ -32,21 +32,21 @@
 	INTEGER LUSCR
 	INTEGER LUER
 !
-	REAL*8 POPS(NT,ND)
-	REAL*8 ROLD(ND)
-	REAL*8 R(ND)
-	REAL*8 V(ND)
-	REAL*8 SIGMA(ND)
+	REAL(10) POPS(NT,ND)
+	REAL(10) ROLD(ND)
+	REAL(10) R(ND)
+	REAL(10) V(ND)
+	REAL(10) SIGMA(ND)
 !
-	REAL*8 MAXDEC
-	REAL*8 MAXINC
+	REAL(10) MAXDEC
+	REAL(10) MAXINC
 	LOGICAL NG_DONE
 !
 ! Local arrays. We will acelerate R, V, and SIGMA as well. If R is not changing,
 ! the accleration wiull keep R constant since acceleration is linear.
 !
-	REAL*8 BIG_POPS(NT+3,ND)
-	REAL*8 RDPOPS(NT+3,ND,4)
+	REAL(10) BIG_POPS(NT+3,ND)
+	REAL(10) RDPOPS(NT+3,ND,4)
 !
 ! Local variables which are adjusted to match the particular model under
 ! consideration.
@@ -153,27 +153,27 @@
 	INTEGER NT
 	INTEGER NBAND
 	INTEGER LUER
-	REAL*8 POPS(NT,ND)              !Initial/corrected populations (I/O) 
-	REAL*8 RDPOPS(NT,ND,4)		!Populations to be accelerated
+	REAL(10) POPS(NT,ND)              !Initial/corrected populations (I/O) 
+	REAL(10) RDPOPS(NT,ND,4)		!Populations to be accelerated
 !
 ! Return maximum % increase and decrease, and whether the NG acceleration
 ! was succesful.
 !
-	REAL*8 MAXINC
-	REAL*8 MAXDEC
+	REAL(10) MAXINC
+	REAL(10) MAXDEC
 	LOGICAL NG_DONE
 !
 ! Local arrays
 !
-	REAL*8 NEWPOP(NT,ND)
-	REAL*8 VEC_INC(ND)
-	REAL*8 VEC_DEC(ND)
-	REAL*8 INT_ARRAY(ND)
+	REAL(10) NEWPOP(NT,ND)
+	REAL(10) VEC_INC(ND)
+	REAL(10) VEC_DEC(ND)
+	REAL(10) INT_ARRAY(ND)
 !
 ! Local variables
 !
-	REAL*8 T1
-	REAL*8 LOCINC,LOCDEC
+	REAL(10) T1
+	REAL(10) LOCINC,LOCDEC
 !
 	INTEGER NS
 	INTEGER NUM_BAD_NG
@@ -288,10 +288,10 @@
 !
 	INTEGER NS
 !
-	REAL*8 NEWPOP(NS)             !Returned with new estimates.
-	REAL*8 RDPOPS(NT,ND,4)
+	REAL(10) NEWPOP(NS)             !Returned with new estimates.
+	REAL(10) RDPOPS(NT,ND,4)
 !
-	REAL*8 TEMP(4,NS)
+	REAL(10) TEMP(4,NS)
 	INTEGER I,J,K,L
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU

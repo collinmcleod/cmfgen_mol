@@ -11,16 +11,16 @@
 ! Created 10-Apr-1995
 !
 	INTEGER N
-	REAL*8 X1,X2,X(N),W(N)
+	REAL(10) X1,X2,X(N),W(N)
 !
 ! Local variables.
 !
-	REAL*8, PARAMETER :: EPS=3.0D-14
+	REAL(10), PARAMETER :: EPS=3.0D-14
 !
-	REAL*8 XM,XL
-	REAL*8 P1,P2,P3,dP
-	REAL*8 Z,Z1
-	REAL*8 ANS,SUM
+	REAL(10) XM,XL
+	REAL(10) P1,P2,P3,dP
+	REAL(10) Z,Z1
+	REAL(10) ANS,SUM
 	INTEGER I,J,M
 !
 ! Check sensible limits.

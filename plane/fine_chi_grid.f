@@ -6,17 +6,17 @@
 ! Created:
 !
 	INTEGER ND_SM
-	REAL*8 ETA_SM(ND_SM)
-	REAL*8 CHI_SM(ND_SM)
-	REAL*8 ESEC_SM(ND_SM)
-	REAL*8 R_SM(ND_SM)
+	REAL(10) ETA_SM(ND_SM)
+	REAL(10) CHI_SM(ND_SM)
+	REAL(10) ESEC_SM(ND_SM)
+	REAL(10) R_SM(ND_SM)
 	LOGICAL INIT
 	LOGICAL NEW_FREQ
 !
 ! Local variables.
 !
-	REAL*8 TA(ND_SM)
-	REAL*8 T1,T2
+	REAL(10) TA(ND_SM)
+	REAL(10) T1,T2
 	INTEGER I,J,K
 !
 ! Deallocate all arrayes if we have changed VDOP_FRAC. This will only

@@ -9,7 +9,7 @@ C
 C Created 11-Aug-1997
 C
 	INTEGER N,LU
-	REAL*8 OMEGA(N,N)
+	REAL(10) OMEGA(N,N)
 	CHARACTER*(*) LEV_NAME(N),OPTION,DESC
 C
 C Internal variables.

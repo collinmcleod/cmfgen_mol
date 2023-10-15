@@ -1,7 +1,7 @@
       subroutine zrotg(ca,cb,c,s)
       double complex ca,cb,s
-      double precision c
-      double precision norm,scale
+      REAL(10) c
+      REAL(10) norm,scale
       double complex alpha
       if (cdabs(ca) .ne. 0.0d0) go to 10
          c = 0.0d0

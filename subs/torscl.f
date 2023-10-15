@@ -22,12 +22,12 @@
 !                     estimate of optical depth to infinity.
 !
 	INTEGER ND
-	REAL*8 TOR(ND),CHI(ND),R(ND),DTAU(ND),dCHI_dR(ND)
+	REAL(10) TOR(ND),CHI(ND),R(ND),DTAU(ND),dCHI_dR(ND)
 	CHARACTER*(*) METHOD,TYPE_ATM
 !
 	INTEGER I
 	INTEGER INDX
-	REAL*8 T1
+	REAL(10) T1
 !
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU

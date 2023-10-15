@@ -3,32 +3,32 @@
 !
 	INTEGER MOM_ERR_CNT
 	INTEGER, PARAMETER :: N_ERR_MAX=1000
-	REAL*8 MOM_ERR_ON_FREQ
+	REAL(10) MOM_ERR_ON_FREQ
 	COMMON /MOM_J_CMF_ERR/MOM_ERR_ON_FREQ(N_ERR_MAX),MOM_ERR_CNT
 	LOGICAL RECORDED_ERROR
 !
 ! These vectors must be supplied by the calling routine. We use these
 ! vectors to contain the data on a finer grid.
 !
-	REAL*8, ALLOCATABLE ::  ETA(:)
-	REAL*8, ALLOCATABLE ::  CHI(:)
-	REAL*8, ALLOCATABLE ::  ESEC(:)
-	REAL*8, ALLOCATABLE ::  V(:)			!in km/s
-	REAL*8, ALLOCATABLE ::  SIGMA(:)		!dlnV/dlnR
-	REAL*8, ALLOCATABLE ::  R(:)			!in units of 10^10 cm
+	REAL(10), ALLOCATABLE ::  ETA(:)
+	REAL(10), ALLOCATABLE ::  CHI(:)
+	REAL(10), ALLOCATABLE ::  ESEC(:)
+	REAL(10), ALLOCATABLE ::  V(:)			!in km/s
+	REAL(10), ALLOCATABLE ::  SIGMA(:)		!dlnV/dlnR
+	REAL(10), ALLOCATABLE ::  R(:)			!in units of 10^10 cm
 !
-	REAL*8, ALLOCATABLE ::  FEDD(:)			!J/K at nodes
-	REAL*8, ALLOCATABLE ::  GEDD(:)			!N/G at midpoints
-	REAL*8, ALLOCATABLE ::  H_ON_J(:)		!H/J at nodes
-	REAL*8, ALLOCATABLE ::  N_ON_J(:)		!N/J at nodes
-	REAL*8, ALLOCATABLE ::  RSQN_ON_RSQJ(:)		!N/J at nodes
-	REAL*8, ALLOCATABLE ::  KMID_ON_J(:)		!
+	REAL(10), ALLOCATABLE ::  FEDD(:)			!J/K at nodes
+	REAL(10), ALLOCATABLE ::  GEDD(:)			!N/G at midpoints
+	REAL(10), ALLOCATABLE ::  H_ON_J(:)		!H/J at nodes
+	REAL(10), ALLOCATABLE ::  N_ON_J(:)		!N/J at nodes
+	REAL(10), ALLOCATABLE ::  RSQN_ON_RSQJ(:)		!N/J at nodes
+	REAL(10), ALLOCATABLE ::  KMID_ON_J(:)		!
 !
 ! These values are computed, and returned.
 !
-	REAL*8, ALLOCATABLE ::  JNU(:)
-	REAL*8, ALLOCATABLE ::  RSQHNU(:)
-	REAL*8, ALLOCATABLE ::  dlnJdlnR(:)
+	REAL(10), ALLOCATABLE ::  JNU(:)
+	REAL(10), ALLOCATABLE ::  RSQHNU(:)
+	REAL(10), ALLOCATABLE ::  dlnJdlnR(:)
 !
 !
 ! R_PNT(K) defines the interpolation for the variable at depth K.
@@ -41,55 +41,55 @@
 !
 ! These vectors must be saved as they will be used on subsequent iterations.
 !
-	REAL*8, ALLOCATABLE :: AV_SIGMA(:)
-	REAL*8, ALLOCATABLE :: BETA(:)
-	REAL*8, ALLOCATABLE :: BETA_FREQ(:)
-	REAL*8, ALLOCATABLE :: GAM_REL(:)
-	REAL*8, ALLOCATABLE :: GAM_REL_SQ(:)
-	REAL*8, ALLOCATABLE :: CON_DELTA(:)
-	REAL*8, ALLOCATABLE :: CON_DELTAH(:)
-	REAL*8, ALLOCATABLE :: CON_dKdNUH(:)
-	REAL*8, ALLOCATABLE :: CON_dNdNUH(:)
-	REAL*8, ALLOCATABLE :: CON_dKdNU(:)
-	REAL*8, ALLOCATABLE :: CON_dHdNU(:)
-	REAL*8, ALLOCATABLE :: GAM_RSQHNU(:)
+	REAL(10), ALLOCATABLE :: AV_SIGMA(:)
+	REAL(10), ALLOCATABLE :: BETA(:)
+	REAL(10), ALLOCATABLE :: BETA_FREQ(:)
+	REAL(10), ALLOCATABLE :: GAM_REL(:)
+	REAL(10), ALLOCATABLE :: GAM_REL_SQ(:)
+	REAL(10), ALLOCATABLE :: CON_DELTA(:)
+	REAL(10), ALLOCATABLE :: CON_DELTAH(:)
+	REAL(10), ALLOCATABLE :: CON_dKdNUH(:)
+	REAL(10), ALLOCATABLE :: CON_dNdNUH(:)
+	REAL(10), ALLOCATABLE :: CON_dKdNU(:)
+	REAL(10), ALLOCATABLE :: CON_dHdNU(:)
+	REAL(10), ALLOCATABLE :: GAM_RSQHNU(:)
 !
-        REAL*8, ALLOCATABLE :: FEDD_PREV(:)
-        REAL*8, ALLOCATABLE :: GEDD_PREV(:)
-        REAL*8, ALLOCATABLE :: H_ON_J_PREV(:)
-        REAL*8, ALLOCATABLE :: N_ON_J_PREV(:)
-        REAL*8, ALLOCATABLE :: RSQN_ON_RSQJ_PREV(:)
-        REAL*8, ALLOCATABLE :: KMID_ON_J_PREV(:)
-        REAL*8, ALLOCATABLE :: JNU_PREV(:)
-        REAL*8, ALLOCATABLE :: GAM_RSQHNU_PREV(:)
+        REAL(10), ALLOCATABLE :: FEDD_PREV(:)
+        REAL(10), ALLOCATABLE :: GEDD_PREV(:)
+        REAL(10), ALLOCATABLE :: H_ON_J_PREV(:)
+        REAL(10), ALLOCATABLE :: N_ON_J_PREV(:)
+        REAL(10), ALLOCATABLE :: RSQN_ON_RSQJ_PREV(:)
+        REAL(10), ALLOCATABLE :: KMID_ON_J_PREV(:)
+        REAL(10), ALLOCATABLE :: JNU_PREV(:)
+        REAL(10), ALLOCATABLE :: GAM_RSQHNU_PREV(:)
 !
-        REAL*8, ALLOCATABLE :: FEDD_SAVE(:)
-        REAL*8, ALLOCATABLE :: GEDD_SAVE(:)
-        REAL*8, ALLOCATABLE :: H_ON_J_SAVE(:)
-        REAL*8, ALLOCATABLE :: N_ON_J_SAVE(:)
-        REAL*8, ALLOCATABLE :: RSQN_ON_RSQJ_SAVE(:)
-        REAL*8, ALLOCATABLE :: KMID_ON_J_SAVE(:)
-        REAL*8, ALLOCATABLE :: JNU_SAVE(:)
-        REAL*8, ALLOCATABLE :: GAM_RSQHNU_SAVE(:)
+        REAL(10), ALLOCATABLE :: FEDD_SAVE(:)
+        REAL(10), ALLOCATABLE :: GEDD_SAVE(:)
+        REAL(10), ALLOCATABLE :: H_ON_J_SAVE(:)
+        REAL(10), ALLOCATABLE :: N_ON_J_SAVE(:)
+        REAL(10), ALLOCATABLE :: RSQN_ON_RSQJ_SAVE(:)
+        REAL(10), ALLOCATABLE :: KMID_ON_J_SAVE(:)
+        REAL(10), ALLOCATABLE :: JNU_SAVE(:)
+        REAL(10), ALLOCATABLE :: GAM_RSQHNU_SAVE(:)
 !
-	REAL*8, ALLOCATABLE :: TA(:),TB(:),TC(:)
-	REAL*8, ALLOCATABLE :: CHI_H(:),CHI_J(:)
-	REAL*8, ALLOCATABLE :: DTAU_H(:),DTAU_J(:),DTAUONQ(:)
-	REAL*8, ALLOCATABLE :: Q(:),XM(:),SOURCE(:)
-	REAL*8, ALLOCATABLE :: VB(:),VC(:),COH_VEC(:)
-	REAL*8, ALLOCATABLE :: HU(:),HL(:),HS(:),HD(:)
-	REAL*8, ALLOCATABLE :: P_H(:),P_J(:),JOLD(:)
-	REAL*8, ALLOCATABLE :: VdJdR_TERM(:),VdHdR_TERM(:)
-	REAL*8, ALLOCATABLE :: DELTA(:),DELTAH(:),W(:),WPREV(:)
-	REAL*8, ALLOCATABLE :: PSI(:),PSIPREV(:)
-	REAL*8, ALLOCATABLE :: EPS(:),EPS_PREV(:)
-	REAL*8, ALLOCATABLE :: GAM_RSQJNU_PREV(:)
+	REAL(10), ALLOCATABLE :: TA(:),TB(:),TC(:)
+	REAL(10), ALLOCATABLE :: CHI_H(:),CHI_J(:)
+	REAL(10), ALLOCATABLE :: DTAU_H(:),DTAU_J(:),DTAUONQ(:)
+	REAL(10), ALLOCATABLE :: Q(:),XM(:),SOURCE(:)
+	REAL(10), ALLOCATABLE :: VB(:),VC(:),COH_VEC(:)
+	REAL(10), ALLOCATABLE :: HU(:),HL(:),HS(:),HD(:)
+	REAL(10), ALLOCATABLE :: P_H(:),P_J(:),JOLD(:)
+	REAL(10), ALLOCATABLE :: VdJdR_TERM(:),VdHdR_TERM(:)
+	REAL(10), ALLOCATABLE :: DELTA(:),DELTAH(:),W(:),WPREV(:)
+	REAL(10), ALLOCATABLE :: PSI(:),PSIPREV(:)
+	REAL(10), ALLOCATABLE :: EPS(:),EPS_PREV(:)
+	REAL(10), ALLOCATABLE :: GAM_RSQJNU_PREV(:)
 !
-	REAL*8 HBC_PREV,HBC_SAVE
-	REAL*8 NBC_PREV,NBC_SAVE
-	REAL*8 IN_HBC_PREV,IN_HBC_SAVE
+	REAL(10) HBC_PREV,HBC_SAVE
+	REAL(10) NBC_PREV,NBC_SAVE
+	REAL(10) IN_HBC_PREV,IN_HBC_SAVE
 !
-	REAL*8 FREQ_SAVE
+	REAL(10) FREQ_SAVE
 	INTEGER ND_SAV
 !
 	END MODULE MOD_J_REL
@@ -293,7 +293,7 @@
 	SUBROUTINE MOM_JREL_V3(ETA_SM,CHI_SM,ESEC_SM,V_SM,SIGMA_SM,R_SM,
 	1               JNU_SM,RSQHNU_SM,dlnJdlnR_SM,
 	1		FEDD_SM,GEDD_SM,H_ON_J_SM,N_ON_J_SM,RSQN_ON_RSQJ_SM,KMID_ON_J_SM,
-	1               HBC,IN_HBC,NBC,FREQ,dLOG_NU,
+	1               HBC,IN_HBC,NBC,FREQ,LOG_NU,
 	1               DIF,DBB,IC,METHOD,COHERENT,
 	1               INCL_ADVEC_TERMS,INCL_REL_TERMS,INIT,ND)
 	USE MOD_J_REL
@@ -305,34 +305,34 @@
 !
 	INTEGER ND_SM
 !
-	REAL*8 ETA_SM(ND_SM)
-	REAL*8 CHI_SM(ND_SM)
-	REAL*8 ESEC_SM(ND_SM)
-	REAL*8 V_SM(ND_SM)			!in km/s
-	REAL*8 SIGMA_SM(ND_SM)		!dlnV/dlnR
-	REAL*8 R_SM(ND_SM)			!in units of 10^10 cm
+	REAL(10) ETA_SM(ND_SM)
+	REAL(10) CHI_SM(ND_SM)
+	REAL(10) ESEC_SM(ND_SM)
+	REAL(10) V_SM(ND_SM)			!in km/s
+	REAL(10) SIGMA_SM(ND_SM)		!dlnV/dlnR
+	REAL(10) R_SM(ND_SM)			!in units of 10^10 cm
 !
 ! Moment ratio variables. All must be supplied.
 !
-	REAL*8 FEDD_SM(ND_SM)			!J/K at nodes
-	REAL*8 GEDD_SM(ND_SM)			!N/G at midpoints
-	REAL*8 H_ON_J_SM(ND_SM)		!H/J at nodes
-	REAL*8 N_ON_J_SM(ND_SM)		!N/J at nodes
-	REAL*8 RSQN_ON_RSQJ_SM(ND_SM)		!N/J at nodes
-	REAL*8 KMID_ON_J_SM(ND_SM)		!
+	REAL(10) FEDD_SM(ND_SM)			!J/K at nodes
+	REAL(10) GEDD_SM(ND_SM)			!N/G at midpoints
+	REAL(10) H_ON_J_SM(ND_SM)		!H/J at nodes
+	REAL(10) N_ON_J_SM(ND_SM)		!N/J at nodes
+	REAL(10) RSQN_ON_RSQJ_SM(ND_SM)		!N/J at nodes
+	REAL(10) KMID_ON_J_SM(ND_SM)		!
 !
 ! These values are computed, and returned.
 !
-	REAL*8 JNU_SM(ND_SM)
-	REAL*8 RSQHNU_SM(ND_SM)
-	REAL*8 dlnJdlnR_SM(ND_SM)
+	REAL(10) JNU_SM(ND_SM)
+	REAL(10) RSQHNU_SM(ND_SM)
+	REAL(10) dlnJdlnR_SM(ND_SM)
 !
 ! Boundary conditions: Must be supplied.
 !
-	REAL*8 HBC,NBC,IN_HBC
+	REAL(10) HBC,NBC,IN_HBC
 !
-	REAL*8 DBB,IC
-	REAL*8 FREQ,dLOG_NU
+	REAL(10) DBB,IC
+	REAL(10) FREQ,LOG_NU
 	CHARACTER*6 METHOD
 !
 ! INIT is used to indicate that there is no coupling to the previous frequency.
@@ -365,9 +365,9 @@
 !
 ! Local variables.
 !
-	REAL*8 DAMP_FAC 
-	REAL*8 T1
-	REAL*8 MAX_ER
+	REAL(10) DAMP_FAC 
+	REAL(10) T1
+	REAL(10) MAX_ER
 	INTEGER COUNT
 	INTEGER IFAIL
 	INTEGER I,J
@@ -671,14 +671,14 @@
 !
 	IF(.NOT. INIT)THEN
 !
-! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 
 ! the same as d / d ln v.
 !
 ! EPS is used if we define N in terms of J rather than H, This is sometimes
 ! useful as H can approach zero, and hence N/H is undefined.
 !
 	  DO I=1,ND-1
-	    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))
 	    W(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*GEDD(I))
 	    WPREV(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*GEDD_PREV(I))
 	    EPS(I)=DELTAH(I)*(CON_dNdNUH(I)*RSQN_ON_RSQJ(I)+
@@ -688,9 +688,9 @@
 	  END DO
 !
 	  DO I=2,ND
-	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU
 	  END DO
-	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU
 !
 ! PSIPREV is equivalent to the U vector of FORMSOL.
 !

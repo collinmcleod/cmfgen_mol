@@ -11,10 +11,10 @@ C
 	INTEGER N,ND
 	INTEGER I,J,K,L,KP,LP
 C
-	REAL*8 BA(N,N,ND,ND)
-	REAL*8 NEWBA(N,ND,N,ND)
-	REAL*8 TBA(N,N)
-	REAL*8 VJ(N,ND,N)
+	REAL(10) BA(N,N,ND,ND)
+	REAL(10) NEWBA(N,ND,N,ND)
+	REAL(10) TBA(N,N)
+	REAL(10) VJ(N,ND,N)
 C
 C Interchange last two indices in BA array. At the same time we reorder
 C the eqations so that the deepest part of the atmosphere occurs first

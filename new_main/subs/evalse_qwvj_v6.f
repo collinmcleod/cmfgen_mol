@@ -46,29 +46,29 @@
 ! NB --- NION is the total number of ionic species i.e. for
 ! HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and CV).
 !
-	REAL*8 HN(NLEV,ND),HNST(NLEV,ND)
-	REAL*8 WSE(NLEV,ND)
-	REAL*8 DI(N_DI,ND),DIST(N_DI,ND)
-	REAL*8 JREC(ND)
-	REAL*8 JPHOT(ND)
+	REAL(10) HN(NLEV,ND),HNST(NLEV,ND)
+	REAL(10) WSE(NLEV,ND)
+	REAL(10) DI(N_DI,ND),DIST(N_DI,ND)
+	REAL(10) JREC(ND)
+	REAL(10) JPHOT(ND)
 !
 ! Constants for opacity etc.
 !
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local variables.
 !
 	INTEGER I,J
-	REAL*8 NETR
+	REAL(10) NETR
 !
 ! REV_HNST referes to the LTE population  of the level defined with respect
 ! to the actual destination (target) level.
 !
-	REAL*8 REV_HNST
+	REAL(10) REV_HNST
 !
-	REAL*8 SUM_SE,SUM_VJ_R,SUM_VJ_P
-	REAL*8 B_RAT
+	REAL(10) SUM_SE,SUM_VJ_R,SUM_VJ_P
+	REAL(10) B_RAT
 !
 	IF(ION_LEV .EQ. 0)RETURN
 !

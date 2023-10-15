@@ -17,12 +17,12 @@ C
 C
 C Specifications for arguments
 C
-      REAL*8 S15ADF,Y
+      REAL(10) S15ADF,Y
 C
 C Local variables
 C
-      REAL*8 P(5),Q(4),P1(9),Q1(8),P2(6),Q2(5)              
-      REAL*8 XMIN,XLARGE,SQRPI,X,           
+      REAL(10) P(5),Q(4),P1(9),Q1(8),P2(6),Q2(5)              
+      REAL(10) XMIN,XLARGE,SQRPI,X,           
      *                   RES,XSQ,XNUM,XDEN,XI,XBIG                      
       INTEGER            ISW,I,IFAIL                                          
 C
@@ -125,7 +125,7 @@ C                                  MINIMAX APPROXIMATION FOR ERFC
          XDEN = XDEN*XI+Q2(I)                                           
    50 CONTINUE                                                          
       RES = (SQRPI+XI*XNUM/XDEN)/X                                      
-   60 RES = RES*DEXP(-XSQ)                                              
+   60 RES = RES*EXP(-XSQ)                                              
       IF (ISW.EQ.-1) RES = 2.0D0-RES                                    
       GO TO 70                                                          
    65 RES = 0.0D0                                                       

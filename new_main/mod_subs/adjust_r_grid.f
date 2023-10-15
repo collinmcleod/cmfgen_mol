@@ -17,28 +17,28 @@
 !
 	INTEGER ND,NT,NC,NP
 !
-	REAL*8 POPS(NT,ND)
+	REAL(10) POPS(NT,ND)
 !
 ! NB: dTAU_OLD(I) = Optical depth increment between depth I & I+1.
 !                   It is NOT the optical depth scale.
 !                   Generally computed using the FLUX_MEAN opacity.
 !
 	LOGICAL TRAPFORJ
-	REAL*8 P(NP)
-	REAL*8 JQW(ND,NP)
-	REAL*8 HQW(ND,NP)
-	REAL*8 KQW(ND,NP)
-	REAL*8 HMIDQW(ND,NP)
-	REAL*8 NMIDQW(ND,NP)
-	REAL*8 MU_AT_RMAX(NP)
-	REAL*8 HQW_AT_RMAX(NP)
+	REAL(10) P(NP)
+	REAL(10) JQW(ND,NP)
+	REAL(10) HQW(ND,NP)
+	REAL(10) KQW(ND,NP)
+	REAL(10) HMIDQW(ND,NP)
+	REAL(10) NMIDQW(ND,NP)
+	REAL(10) MU_AT_RMAX(NP)
+	REAL(10) HQW_AT_RMAX(NP)
 !
-	REAL*8 FLUXMEAN(ND)
-	REAL*8 ESEC(ND)
+	REAL(10) FLUXMEAN(ND)
+	REAL(10) ESEC(ND)
 !
 	INTEGER N_PARS
 	CHARACTER(LEN=*) GRID_TYPE
-	REAL*8 RG_PARS(N_PARS)
+	REAL(10) RG_PARS(N_PARS)
 !
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -47,26 +47,26 @@
 !
 ! Local variables.
 !
-	REAL*8 dTAU_OLD(ND)
-	REAL*8 R_OLD(ND)
-	REAL*8 LOG_R_OLD(ND)
-	REAL*8 LOG_R(ND)
-	REAL*8 TAU_OLD(ND)
-	REAL*8 TAU(ND)
-	REAL*8 TA(ND)
-	REAL*8 TB(ND)
+	REAL(10) dTAU_OLD(ND)
+	REAL(10) R_OLD(ND)
+	REAL(10) LOG_R_OLD(ND)
+	REAL(10) LOG_R(ND)
+	REAL(10) TAU_OLD(ND)
+	REAL(10) TAU(ND)
+	REAL(10) TA(ND)
+	REAL(10) TB(ND)
 !
 ! The fine grid (FG) is chosen to cover the ioization front. The default valuse are
 ! -3.0 to 1.5D0 in log(TAU) space.
 !
-	REAL*8 FG_MIN                   !Default=-3.0D0
-	REAL*8 FG_MAX			!Default=1.5D0
-	REAL*8 FG_RANGE			!Default=4.5D0
+	REAL(10) FG_MIN                   !Default=-3.0D0
+	REAL(10) FG_MAX			!Default=1.5D0
+	REAL(10) FG_RANGE			!Default=4.5D0
 !
-	REAL*8 W1(NP),W2(NP),W3(NP)
+	REAL(10) W1(NP),W2(NP),W3(NP)
 !
-	REAL*8 DTAU
-	REAL*8 T1
+	REAL(10) DTAU
+	REAL(10) T1
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER LS,I,I1,I2
 	INTEGER NX
@@ -102,7 +102,7 @@
 !
 	TAU_OLD(1)=TAU_OLD(3)*R_OLD(3)/R_OLD(1)
 	TAU_OLD(2)=TAU_OLD(3)*R_OLD(2)/R_OLD(1)
-	TAU_OLD(1:ND)=DLOG10(TAU_OLD(1:ND))
+	TAU_OLD(1:ND)=LOG10(TAU_OLD(1:ND))
 !
 	FG_MIN=-3.0D0
 	FG_MAX=1.50D0

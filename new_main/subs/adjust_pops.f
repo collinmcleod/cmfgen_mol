@@ -17,16 +17,16 @@
 	INTEGER LUER				!Unit for error messages
 	INTEGER LU_GRID
 !
-	REAL*8 LOG_OLD_TAU(OLD_ND)
-	REAL*8 TB(OLD_ND)
+	REAL(10) LOG_OLD_TAU(OLD_ND)
+	REAL(10) TB(OLD_ND)
 !
-	REAL*8 POPS(NT,ND)
-	REAL*8 Z_POP(NT)			!Vector containing Z of atom/ion (not core)
+	REAL(10) POPS(NT,ND)
+	REAL(10) Z_POP(NT)			!Vector containing Z of atom/ion (not core)
 !
-	REAL*8 TAU(ND)
-	REAL*8 LOG_TAU(ND)
-	REAL*8 TA(ND)
-	REAL*8 T1
+	REAL(10) TAU(ND)
+	REAL(10) LOG_TAU(ND)
+	REAL(10) TA(ND)
+	REAL(10) T1
 !
 	INTEGER NXST,NX
 	INTEGER I,J,L

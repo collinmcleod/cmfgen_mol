@@ -12,19 +12,19 @@
 	INTEGER ND		!Number of depth points
 	INTEGER NT		!Number of equations
 !
-	REAL*8 STEQ_VALS(NT,ND)         !Suggested corrections to current populations
-	REAL*8 POPS(NT,ND)
-	REAL*8 BAD_INCREASE_LIMIT	!Should be large and neagtive.
-	REAL*8 BAD_DECREASE_LIMIT	!Should be negative (typically just less than 1).
+	REAL(10) STEQ_VALS(NT,ND)         !Suggested corrections to current populations
+	REAL(10) POPS(NT,ND)
+	REAL(10) BAD_INCREASE_LIMIT	!Should be large and neagtive.
+	REAL(10) BAD_DECREASE_LIMIT	!Should be negative (typically just less than 1).
 	CHARACTER(LEN=*) OPTION		!Not used currently (installed for later changes)
 !
 ! Local variables.
 !
-	REAL*8 MAX_COR_VEC(ND)
-	REAL*8 MIN_COR_VEC(ND)
-	REAL*8 MAX_COR
-	REAL*8 MIN_COR
-	REAL*8 T1
+	REAL(10) MAX_COR_VEC(ND)
+	REAL(10) MIN_COR_VEC(ND)
+	REAL(10) MAX_COR
+	REAL(10) MIN_COR
+	REAL(10) T1
 !
 	INTEGER ID
 	INTEGER ISPEC

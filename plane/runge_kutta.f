@@ -23,13 +23,13 @@ c Local variables
 c
       integer :: i
       integer, parameter :: nmax=2
-      real*8, dimension(nmax) :: dym,dyt,yt
-      real*8 h6,hh,xh
+      REAL(10), dimension(nmax) :: dym,dyt,yt
+      REAL(10) h6,hh,xh
 c
 c  Value to be determine
 c
-      real*8,  dimension(n) :: dydx,y
-      real*8 h,x,beta,dbetadr,gamma
+      REAL(10),  dimension(n) :: dydx,y
+      REAL(10) h,x,beta,dbetadr,gamma
 c
       hh=h*0.5d0
       h6=h/6.0d0

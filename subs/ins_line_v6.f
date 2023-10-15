@@ -32,7 +32,7 @@
 !
 ! Line+continuum frequencies
 !
-	REAL*8 FREQ(NFREQ_MAX)			!Continuum frequencies
+	REAL(10) FREQ(NFREQ_MAX)			!Continuum frequencies
 	INTEGER LINES_THIS_FREQ(NFREQ_MAX)	!Indicates that this frequency 
 						!  has line contributions,
 	INTEGER LINE_ST_INDX(N_LINES)		!Start index for the line 
@@ -42,18 +42,18 @@
 !
 ! Passed vectors.
 !
-	REAL*8 NU_CONT(NCF)			!Continuum frequencies
-	REAL*8 NU_LINE(N_LINES)			!Line frequencies
-	REAL*8 NU_STRT_LINE(N_LINES)		!Start frequency of resoance zone.
-	REAL*8 VEC_MIN_VDOP(N_LINES)		!Minimum doppler velocity for line.
+	REAL(10) NU_CONT(NCF)			!Continuum frequencies
+	REAL(10) NU_LINE(N_LINES)			!Line frequencies
+	REAL(10) NU_STRT_LINE(N_LINES)		!Start frequency of resoance zone.
+	REAL(10) VEC_MIN_VDOP(N_LINES)		!Minimum doppler velocity for line.
 	CHARACTER*(*) TRANS_TYPE(N_LINES)
 !
 ! Passed constants:
-	REAL*8 VINF		!Terminal velocity of wind.
-	REAL*8 FRAC_DOP		!Indicates dNU across line in Doppler widths.
-	REAL*8 dV_CMF_PROF	!Indicate spacing in profile but outside
+	REAL(10) VINF		!Terminal velocity of wind.
+	REAL(10) FRAC_DOP		!Indicates dNU across line in Doppler widths.
+	REAL(10) dV_CMF_PROF	!Indicate spacing in profile but outside
                                 !  resonance zone (in km/s).
-	REAL*8 dV_CMF_WING	!Indicate spacing in wings (i.e. outside 
+	REAL(10) dV_CMF_WING	!Indicate spacing in wings (i.e. outside 
 				!  intrinsic profile) (in km/s).
 !
 ! R_CMF_WING_EXT indicates how far profile should extend beyond red edge
@@ -64,24 +64,24 @@
 ! ES_WING_EXT is useful when have non-coherent electron scattering.
 ! Used for both blue and red sides of the line profile.
 !
-	REAL*8 ES_WING_EXT
-	REAL*8 R_CMF_WING_EXT
+	REAL(10) ES_WING_EXT
+	REAL(10) R_CMF_WING_EXT
 !
 	LOGICAL INCLUDE_LINE_CENTERS
 !
 ! 
-	REAL*8 NU_END_LINE(N_LINES)
+	REAL(10) NU_END_LINE(N_LINES)
 !
 ! Local variables.
 !
-	REAL*8 dNU_on_NU	!Actual spacing used across intrinsic line 
+	REAL(10) dNU_on_NU	!Actual spacing used across intrinsic line 
 				!  profile given by dNU =NU*dNU_on_NU
 !
-	REAL*8 ES_BLUE_WING_EXT		!In km/s
-	REAL*8 ES_RED_WING_EXT
-	REAL*8 CUR_RED_PROF_EXT		!10^15 Hz
-	REAL*8 EDGE_SEP_FAC
-	REAL*8 MIN_FREQ_RAT
+	REAL(10) ES_BLUE_WING_EXT		!In km/s
+	REAL(10) ES_RED_WING_EXT
+	REAL(10) CUR_RED_PROF_EXT		!10^15 Hz
+	REAL(10) EDGE_SEP_FAC
+	REAL(10) MIN_FREQ_RAT
 !
 	INTEGER INDX		!Current frequency index.
 	INTEGER LN_INDX		!Current line whose frequencies we are installing.
@@ -92,10 +92,10 @@
 	INTEGER I,J,K		!Miscellaneous loop variables.
 	INTEGER LU_ER
 	INTEGER LU
-	REAL*8 C_KMS
-	REAL*8 dNU
-	REAL*8 dNU_NEXT
-	REAL*8 T1
+	REAL(10) C_KMS
+	REAL(10) dNU
+	REAL(10) dNU_NEXT
+	REAL(10) T1
 !
 	LOGICAL EDGE_FREQ(NCF)
 	LOGICAL VERBOSE
@@ -103,7 +103,7 @@
 ! External functions
 !
 	INTEGER ERROR_LU
-	REAL*8 SPEED_OF_LIGHT
+	REAL(10) SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()

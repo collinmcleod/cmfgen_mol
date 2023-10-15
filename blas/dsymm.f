@@ -3,9 +3,9 @@
 *     .. Scalar Arguments ..
       CHARACTER*1        SIDE, UPLO
       INTEGER            M, N, LDA, LDB, LDC
-      DOUBLE PRECISION   ALPHA, BETA
+      REAL(10)   ALPHA, BETA
 *     .. Array Arguments ..
-      DOUBLE PRECISION   A( LDA, * ), B( LDB, * ), C( LDC, * )
+      REAL(10)   A( LDA, * ), B( LDB, * ), C( LDC, * )
 *     ..
 *
 *  Purpose
@@ -58,11 +58,11 @@
 *           N  must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - DOUBLE PRECISION.
+*  ALPHA  - REAL(10).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
-*  A      - DOUBLE PRECISION array of DIMENSION ( LDA, ka ), where ka is
+*  A      - REAL(10) array of DIMENSION ( LDA, ka ), where ka is
 *           m  when  SIDE = 'L' or 'l'  and is  n otherwise.
 *           Before entry  with  SIDE = 'L' or 'l',  the  m by m  part of
 *           the array  A  must contain the  symmetric matrix,  such that
@@ -93,7 +93,7 @@
 *           least  max( 1, n ).
 *           Unchanged on exit.
 *
-*  B      - DOUBLE PRECISION array of DIMENSION ( LDB, n ).
+*  B      - REAL(10) array of DIMENSION ( LDB, n ).
 *           Before entry, the leading  m by n part of the array  B  must
 *           contain the matrix B.
 *           Unchanged on exit.
@@ -104,12 +104,12 @@
 *           max( 1, m ).
 *           Unchanged on exit.
 *
-*  BETA   - DOUBLE PRECISION.
+*  BETA   - REAL(10).
 *           On entry,  BETA  specifies the scalar  beta.  When  BETA  is
 *           supplied as zero then C need not be set on input.
 *           Unchanged on exit.
 *
-*  C      - DOUBLE PRECISION array of DIMENSION ( LDC, n ).
+*  C      - REAL(10) array of DIMENSION ( LDC, n ).
 *           Before entry, the leading  m by n  part of the array  C must
 *           contain the matrix  C,  except when  beta  is zero, in which
 *           case C need not be set on entry.
@@ -142,9 +142,9 @@
 *     .. Local Scalars ..
       LOGICAL            UPPER
       INTEGER            I, INFO, J, K, NROWA
-      DOUBLE PRECISION   TEMP1, TEMP2
+      REAL(10)   TEMP1, TEMP2
 *     .. Parameters ..
-      DOUBLE PRECISION   ONE         , ZERO
+      REAL(10)   ONE         , ZERO
       PARAMETER        ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Executable Statements ..

@@ -5,7 +5,7 @@ include ../Makefile_definitions
 LIB=$(LIB_DIR)libsubs.a
 LIB_MOD=$(LIB_DIR)libmod.a
 
-OPTION=$(FG)
+OPTION=$(FD)
 
 #
 # Entries for library

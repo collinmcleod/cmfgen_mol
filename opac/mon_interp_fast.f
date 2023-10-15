@@ -23,25 +23,25 @@ C                       Design to be fast when from creating a large
 C                           array from a much smaller array.
 C
 	INTEGER*4 NQ,LIN_END,NX,NV,ND
-	REAL*8 QZ(NQ,LIN_END),QZR(NX)
-	REAL*8 VARRAY(NV,LIN_END),R(ND)
+	REAL(10) QZ(NQ,LIN_END),QZR(NX)
+	REAL(10) VARRAY(NV,LIN_END),R(ND)
 C
-	REAL*8 S(ND)		!Slopes
-	REAL*8 H(ND)
+	REAL(10) S(ND)		!Slopes
+	REAL(10) H(ND)
 	INTEGER*4 LST_INTERVAL
 	INTEGER*4 ND_SM
 	INTEGER*4 IVEC(NX)
 C
-	REAL*8 ONE
+	REAL(10) ONE
 	PARAMETER (ONE=1.0D0)
 	INTEGER*4 I,J,ML
-	REAL*8 T1
-	REAL*8 A(ND)
-	REAL*8 B(ND)
-	REAL*8 C(ND)
-	REAL*8 D(ND)		!Used for derivative at I.
-	REAL*8 E(ND)
-	REAL*8 SGN
+	REAL(10) T1
+	REAL(10) A(ND)
+	REAL(10) B(ND)
+	REAL(10) C(ND)
+	REAL(10) D(ND)		!Used for derivative at I.
+	REAL(10) E(ND)
+	REAL(10) SGN
 C
 	INTEGER*4 ERROR_LU,LUER
 	EXTERNAL ERROR_LU

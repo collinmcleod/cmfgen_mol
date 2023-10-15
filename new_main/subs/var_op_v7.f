@@ -63,56 +63,56 @@ C
 C
 C Constants for opacity etc.
 C
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
-	REAL*8 VCHI(NT,ND)		!VCHI(I,K)=dCHI(K)/dN(I,K)
-	REAL*8 VETA(NT,ND)		!VETA(I,K)=dETA(K)/dN(I,K)
+	REAL(10) VCHI(NT,ND)		!VCHI(I,K)=dCHI(K)/dN(I,K)
+	REAL(10) VETA(NT,ND)		!VETA(I,K)=dETA(K)/dN(I,K)
 C
-	REAL*8 HN_S(N_S,ND)
-	REAL*8 HNST_S(N_S,ND)
-	REAL*8 dlnHNST_S_dlnT(N_S,ND)
+	REAL(10) HN_S(N_S,ND)
+	REAL(10) HNST_S(N_S,ND)
+	REAL(10) dlnHNST_S_dlnT(N_S,ND)
 C
-	REAL*8 HNST_F(N_F,ND)
-	REAL*8 EDGE_F(N_F)
+	REAL(10) HNST_F(N_F,ND)
+	REAL(10) EDGE_F(N_F)
 	INTEGER F_TO_S_MAPPING(N_F)
 C
 C Ion population information.
 C
-	REAL*8 DI_S(N_DI,ND)
-	REAL*8 DIST_S(N_DI,ND)
-	REAL*8 dlnDIST_S_dlnT(N_DI,ND)
+	REAL(10) DI_S(N_DI,ND)
+	REAL(10) DIST_S(N_DI,ND)
+	REAL(10) dlnDIST_S_dlnT(N_DI,ND)
 C
 	LOGICAL IMP_VAR(NT)
 C
 	INTEGER PHOT_ID		!Photoionization ID
 	INTEGER ION_LEV		!target level in ION for ionizations.
 C
-	REAL*8 NU			!Frequency (10^15 Hz)
-	REAL*8 Z			!Charge on ion
-	REAL*8 ED(ND)			!Electron density
-	REAL*8 T(ND)			!Temperatuure (10^4 K)
-	REAL*8 EMHNUKT(ND)		!exp(-hv/kT)
+	REAL(10) NU			!Frequency (10^15 Hz)
+	REAL(10) Z			!Charge on ion
+	REAL(10) ED(ND)			!Electron density
+	REAL(10) T(ND)			!Temperatuure (10^4 K)
+	REAL(10) EMHNUKT(ND)		!exp(-hv/kT)
 C
 C Local variables.
 C
-	REAL*8 GFF_VAL(ND)		!Used as work vector
-	REAL*8 DI_RAT(ND)		!Used as work vector
-	REAL*8 DT_TERM(ND)		!Used as work vector
-	REAL*8 HDKT_ON_T(ND)		!Used as work vector
+	REAL(10) GFF_VAL(ND)		!Used as work vector
+	REAL(10) DI_RAT(ND)		!Used as work vector
+	REAL(10) DT_TERM(ND)		!Used as work vector
+	REAL(10) HDKT_ON_T(ND)		!Used as work vector
 C
-	REAL*8 YDIS(ND)			!Constant for computing level dissolution/
-	REAL*8 XDIS(ND)			!Constant for computing level dissolution/
-	REAL*8 DIS_CONST(N_F)		!Constant appearing in dissolution formula.
-	REAL*8 ALPHA_VEC(N_F)		!Photionization cross-section
-	REAL*8 VCHI_ION(N_F)
-	REAL*8 VCHI_T1(N_F)
-	REAL*8 VCHI_T2(N_F)
-	REAL*8 VCHI_TMP(N_F,ND)
-	REAL*8 SUM_ION
-	REAL*8 SUM_T1
-	REAL*8 SUM_T2
-	REAL*8 NEFF,ZION_CUBED,T1,T2
+	REAL(10) YDIS(ND)			!Constant for computing level dissolution/
+	REAL(10) XDIS(ND)			!Constant for computing level dissolution/
+	REAL(10) DIS_CONST(N_F)		!Constant appearing in dissolution formula.
+	REAL(10) ALPHA_VEC(N_F)		!Photionization cross-section
+	REAL(10) VCHI_ION(N_F)
+	REAL(10) VCHI_T1(N_F)
+	REAL(10) VCHI_T2(N_F)
+	REAL(10) VCHI_TMP(N_F,ND)
+	REAL(10) SUM_ION
+	REAL(10) SUM_T1
+	REAL(10) SUM_T2
+	REAL(10) NEFF,ZION_CUBED,T1,T2
 C
 	INTEGER ND_LOC
 	INTEGER I                     !Used as level index (same) in atom.
@@ -122,15 +122,15 @@ C
 	INTEGER EQION			!Ion variable in VCHI,VETA
 	INTEGER NO_NON_ZERO_PHOT
 C
-	REAL*8 TCHI1,TCHI2,TETA1,TETA2,TETA3
-	REAL*8 HNUONK,ALPHA
+	REAL(10) TCHI1,TCHI2,TETA1,TETA2,TETA3
+	REAL(10) HNUONK,ALPHA
 C
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 C
 C HNST as defined by the actual population of the destination (target) level.
 C
-	REAL*8 REV_HNST
+	REAL(10) REV_HNST
 !
 	HNUONK=HDKT*NU
 	EQION=GS_ION_EQ+(ION_LEV-1)

@@ -10,7 +10,7 @@ C                       ERROR_LU etc installed.
 C Created 17-May-1989 - Based on HWEIGHT
 C
 	INTEGER N,I
-	REAL*8 X(N),W(N),T1,T2,SUM
+	REAL(10) X(N),W(N),T1,T2,SUM
 C
 	INTEGER ERROR_LU,LUER
 	LOGICAL, SAVE :: CHECK=.TRUE.

@@ -40,31 +40,31 @@
 !
 	INTEGER DST,DEND
 !
-	REAL*8 WSE_X(N_A,ND)		!Quadrature weights (incl. cross. sec.)
+	REAL(10) WSE_X(N_A,ND)		!Quadrature weights (incl. cross. sec.)
 !
 ! _A refers to quantities associated with the atom WITH super levels.
 !
-	REAL*8 HN_A(N_A,ND)		!Pops. of ith ionzation stage
-	REAL*8 HNST_A(N_A,ND)		!LTE   "    "  "      "       "
-	REAL*8 dlnHNST_AdlnT(N_A,ND)	
+	REAL(10) HN_A(N_A,ND)		!Pops. of ith ionzation stage
+	REAL(10) HNST_A(N_A,ND)		!LTE   "    "  "      "       "
+	REAL(10) dlnHNST_AdlnT(N_A,ND)	
 !
 ! _B refers to quantities associated with the FULL atom of the next 
 !  ionization stage.
 !
-	REAL*8 HN_B(N_B,ND)		!Pops. of (i+1)th ionization stage
-	REAL*8 HNST_B(N_B,ND)		!LTE   "   "    "       "        "
-	REAL*8 EDGE_B(N_B)
+	REAL(10) HN_B(N_B,ND)		!Pops. of (i+1)th ionization stage
+	REAL(10) HNST_B(N_B,ND)		!LTE   "   "    "       "        "
+	REAL(10) EDGE_B(N_B)
 !
-	REAL*8 DI(ND)			!Ion density for B levels.
-	REAL*8 ED(ND)			!Electron density
-	REAL*8 T(ND)			!Temperature in 10^4K.
-	REAL*8 JREC(ND)			! (2hv^3/c/c+J).exp()*FQW/v
-	REAL*8 dJRECdT(ND)		!
-	REAL*8 JPHOT(ND)	        ! J*FQW/v	
+	REAL(10) DI(ND)			!Ion density for B levels.
+	REAL(10) ED(ND)			!Electron density
+	REAL(10) T(ND)			!Temperature in 10^4K.
+	REAL(10) JREC(ND)			! (2hv^3/c/c+J).exp()*FQW/v
+	REAL(10) dJRECdT(ND)		!
+	REAL(10) JPHOT(ND)	        ! J*FQW/v	
 !
 ! Constants for opacity etc.
 !
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local variables
@@ -73,9 +73,9 @@
 	INTEGER ION_EQ		!Ion eqation in SE(ID)%BA matrix.
 	INTEGER ION_V                 !Location of ion variable in SE(ID)%BA.
 	INTEGER I,J
-	REAL*8 T3,T4
-	REAL*8 RECIP_B_ION,BSTIM
-	REAL*8 WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC
+	REAL(10) T3,T4
+	REAL(10) RECIP_B_ION,BSTIM
+	REAL(10) WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC
 !
 	NIV=SE(ID)%N_IV
 	ION_EQ=SE(ID)%XRAY_EQ

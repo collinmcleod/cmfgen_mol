@@ -7,30 +7,30 @@
 ! Incorporated 02-Jan-2013 : Altered to allow depth dependent profiles (from cur_cmf_25jun13).
 ! Arrays and variables for treating lines simultaneously.
 !
-	REAL*8,  ALLOCATABLE :: EINA(:)                !MAX_SIM
-	REAL*8,  ALLOCATABLE :: OSCIL(:)               !MAX_SIM
-	REAL*8,  ALLOCATABLE :: GLDGU(:)               !MAX_SIM
-	REAL*8,  ALLOCATABLE :: AMASS_SIM(:)           !MAX_SIM
-	REAL*8,  ALLOCATABLE :: FL_SIM(:)              !MAX_SIM
+	REAL(10),  ALLOCATABLE :: EINA(:)                !MAX_SIM
+	REAL(10),  ALLOCATABLE :: OSCIL(:)               !MAX_SIM
+	REAL(10),  ALLOCATABLE :: GLDGU(:)               !MAX_SIM
+	REAL(10),  ALLOCATABLE :: AMASS_SIM(:)           !MAX_SIM
+	REAL(10),  ALLOCATABLE :: FL_SIM(:)              !MAX_SIM
 	INTEGER, ALLOCATABLE :: SIM_NL(:)              !MAX_SIM
 	INTEGER, ALLOCATABLE :: SIM_NUP(:)             !MAX_SIM
 	LOGICAL, ALLOCATABLE :: WEAK_LINE(:)           !MAX_SIM
 !
-	REAL*8,  ALLOCATABLE :: CHIL_MAT(:,:)          !ND,MAX_SIM
-	REAL*8,  ALLOCATABLE :: ETAL_MAT(:,:)          !ND,MAX_SIM
-	REAL*8,  ALLOCATABLE :: BB_COR(:,:)            !ND,MAX_SIM
+	REAL(10),  ALLOCATABLE :: CHIL_MAT(:,:)          !ND,MAX_SIM
+	REAL(10),  ALLOCATABLE :: ETAL_MAT(:,:)          !ND,MAX_SIM
+	REAL(10),  ALLOCATABLE :: BB_COR(:,:)            !ND,MAX_SIM
 !
-	REAL*8,  ALLOCATABLE :: VB_SIM(:,:)            !ND,MAX_SIM
-	REAL*8,  ALLOCATABLE :: VC_SIM(:,:)                            !ND,MAX_SIM)
-	REAL*8,  ALLOCATABLE :: VB_2(:)                !ND
-	REAL*8,  ALLOCATABLE :: VC_2(:)                !ND
+	REAL(10),  ALLOCATABLE :: VB_SIM(:,:)            !ND,MAX_SIM
+	REAL(10),  ALLOCATABLE :: VC_SIM(:,:)                            !ND,MAX_SIM)
+	REAL(10),  ALLOCATABLE :: VB_2(:)                !ND
+	REAL(10),  ALLOCATABLE :: VC_2(:)                !ND
 !
-	REAL*8,  ALLOCATABLE :: BETA(:)                !ND : Sobolev escape probability
-	REAL*8,  ALLOCATABLE :: BETAC(:)               !ND : Dilution factor weighted "escape probaility"
+	REAL(10),  ALLOCATABLE :: BETA(:)                !ND : Sobolev escape probability
+	REAL(10),  ALLOCATABLE :: BETAC(:)               !ND : Dilution factor weighted "escape probaility"
 !
-	REAL*8,  ALLOCATABLE :: BETAC_SIM(:,:)         !ND,MAX_SIM
-	REAL*8,  ALLOCATABLE :: ZNET_SIM(:,:)          !ND,MAX_SIM
-	REAL*8,  ALLOCATABLE :: JBAR_SIM(:,:)          !ND,MAX_SIM
+	REAL(10),  ALLOCATABLE :: BETAC_SIM(:,:)         !ND,MAX_SIM
+	REAL(10),  ALLOCATABLE :: ZNET_SIM(:,:)          !ND,MAX_SIM
+	REAL(10),  ALLOCATABLE :: JBAR_SIM(:,:)          !ND,MAX_SIM
 !
 	CHARACTER(LEN=50), ALLOCATABLE :: TRANS_NAME_SIM(:)          !MAX_SIM
 !
@@ -41,14 +41,14 @@
 ! Temporary variables used only local to compute quantities associated with
 ! the opacity and emissivity, and the rate equations.
 !
-	REAL*8 OPAC_FAC
-	REAL*8 EMIS_FAC
-	REAL*8 STIM_FAC
-	REAL*8 MUL_FAC
-	REAL*8 dRATE_dT
-	REAL*8 dRATE_dLOW
-	REAL*8 dRATE_dUP
-	REAL*8 RATE_FAC
+	REAL(10) OPAC_FAC
+	REAL(10) EMIS_FAC
+	REAL(10) STIM_FAC
+	REAL(10) MUL_FAC
+	REAL(10) dRATE_dT
+	REAL(10) dRATE_dLOW
+	REAL(10) dRATE_dUP
+	REAL(10) RATE_FAC
 C
 C These pointers are used to indicate which locations are being used in
 C the SIM variation arrays. LOW refers to the lower level of the transition,
@@ -79,22 +79,22 @@ C       [LTE Pop. of uncombined level / LTE Pop. of SUPER level]
 C                        
 C L refers to the lower level, U to the upper level.
 C
-	REAL*8, ALLOCATABLE :: L_STAR_RATIO(:,:)    !ND,MAX_SIM
-	REAL*8, ALLOCATABLE :: U_STAR_RATIO(:,:)    !ND,MAX_SIM
-	REAL*8, ALLOCATABLE :: dL_RAT_dT(:,:)       !ND,MAX_SIM
-	REAL*8, ALLOCATABLE :: dU_RAT_dT(:,:)       !ND,MAX_SIM
-	REAL*8, ALLOCATABLE :: LOW_OCC_PROB(:)      !ND
+	REAL(10), ALLOCATABLE :: L_STAR_RATIO(:,:)    !ND,MAX_SIM
+	REAL(10), ALLOCATABLE :: U_STAR_RATIO(:,:)    !ND,MAX_SIM
+	REAL(10), ALLOCATABLE :: dL_RAT_dT(:,:)       !ND,MAX_SIM
+	REAL(10), ALLOCATABLE :: dU_RAT_dT(:,:)       !ND,MAX_SIM
+	REAL(10), ALLOCATABLE :: LOW_OCC_PROB(:)      !ND
 C
 C Variables, vectors and arrays for treating lines simultaneously with the
 C continuum.
 C
-	REAL*8, ALLOCATABLE :: LINE_PROF_SIM(:,:)             !ND,MAX_SIM
-	REAL*8, ALLOCATABLE :: LINE_QW_SIM(:,:)               !ND,MAX_SIM
-	REAL*8, ALLOCATABLE :: LINE_QW_SUM(:,:)               !ND,MAX_SIM
-	REAL*8, ALLOCATABLE :: NEG_OPAC_FAC(:)                !ND
+	REAL(10), ALLOCATABLE :: LINE_PROF_SIM(:,:)             !ND,MAX_SIM
+	REAL(10), ALLOCATABLE :: LINE_QW_SIM(:,:)               !ND,MAX_SIM
+	REAL(10), ALLOCATABLE :: LINE_QW_SUM(:,:)               !ND,MAX_SIM
+	REAL(10), ALLOCATABLE :: NEG_OPAC_FAC(:)                !ND
 
-	REAL*8, ALLOCATABLE :: LINE_OPAC_CON(:)               !MAX_SIM
-	REAL*8, ALLOCATABLE :: LINE_EMIS_CON(:)               !MAX_SIM
+	REAL(10), ALLOCATABLE :: LINE_OPAC_CON(:)               !MAX_SIM
+	REAL(10), ALLOCATABLE :: LINE_EMIS_CON(:)               !MAX_SIM
 C
 	LOGICAL, ALLOCATABLE :: RESONANCE_ZONE(:)             !MAX_SIM
 	LOGICAL, ALLOCATABLE :: END_RES_ZONE(:)               !MAX_SIM
@@ -104,7 +104,7 @@ C
 C
 	INTEGER, ALLOCATABLE ::  SIM_LINE_POINTER(:)          !MAX_SIM
 !
-	REAL*8, ALLOCATABLE ::  AVE_ENERGY(:)                 !NT
+	REAL(10), ALLOCATABLE ::  AVE_ENERGY(:)                 !NT
 !
 	END MODULE LINE_MOD
 !

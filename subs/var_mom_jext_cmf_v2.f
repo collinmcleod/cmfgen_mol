@@ -68,41 +68,41 @@ C
 C
 C Emissivities etc on the transfer grid.
 C
-	REAL*8 ETA(ND),CHI(ND),ESEC(ND)
-	REAL*8 V(ND),SIGMA(ND),R(ND)
+	REAL(10) ETA(ND),CHI(ND),ESEC(ND)
+	REAL(10) V(ND),SIGMA(ND),R(ND)
 C
 C Emissivities etc on the (small) population grid.
 C
-	REAL*8 ETA_SM(ND_SM),CHI_SM(ND_SM),ESEC_SM(ND_SM)
+	REAL(10) ETA_SM(ND_SM),CHI_SM(ND_SM),ESEC_SM(ND_SM)
 	INTEGER INDX(ND)
-	REAL*8 COEF(0:3,ND)
+	REAL(10) COEF(0:3,ND)
 	CHARACTER*(*) INTERP_TYPE
 C
 C Variation arrays and vectors. NB: The variation is defined as the
 C variation of J (or H) on the transfer grid with respect to the
 C opacity/emissivity on the population (small) grid.
 C
-	REAL*8 TX(ND,ND_SM,NM)
-	REAL*8 TVX(ND-1,ND_SM,NM)
+	REAL(10) TX(ND,ND_SM,NM)
+	REAL(10) TVX(ND-1,ND_SM,NM)
 C
 C KI and RHS_dHdCHI are defined on the full grid, and then reduced to
 C the smaller grid.
 C
-	REAL*8 KI(ND,ND,NM_KI)
-	REAL*8 RHS_dHdCHI(ND-1,ND)
-	REAL*8 TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
-	REAL*8 TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
+	REAL(10) KI(ND,ND,NM_KI)
+	REAL(10) RHS_dHdCHI(ND-1,ND)
+	REAL(10) TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
+	REAL(10) TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
 C
 	LOGICAL DO_THIS_TX_MATRIX(NM)
 C
 C "Eddington factors"
 C
-	REAL*8 F(ND),G(ND),RSQN_ON_RSQJ(ND)
-	REAL*8 HBC,NBC,IN_HBC
-	REAL*8 F_PREV(ND),G_PREV(ND),RSQN_ON_RSQJ_PREV(ND)
-	REAL*8 HBC_PREV,NBC_PREV,IN_HBC_PREV
+	REAL(10) F(ND),G(ND),RSQN_ON_RSQJ(ND)
+	REAL(10) HBC,NBC,IN_HBC
+	REAL(10) F_PREV(ND),G_PREV(ND),RSQN_ON_RSQJ_PREV(ND)
+	REAL(10) HBC_PREV,NBC_PREV,IN_HBC_PREV
 C
-	REAL*8 dLOG_NU,dTdR,DBB,dDBBdT,IC
+	REAL(10) dLOG_NU,dTdR,DBB,dDBBdT,IC
 	CHARACTER*6 METHOD
 C
 C INIT is used to indicate that there is no coupling to the previous frequency.
@@ -120,12 +120,12 @@ C Vectors required by future calls to VAR_MOM_J_CMF.
 C
 	INTEGER NV
 	PARAMETER (NV=200)
-	REAL*8 JNUM1(NV),RSQ_HNUM1(NV)
+	REAL(10) JNUM1(NV),RSQ_HNUM1(NV)
 	SAVE JNUM1,RSQ_HNUM1
 C
-	REAL*8 KI_SM(ND,ND_SM,NM_KI)
-	REAL*8 RHS_dHdCHI_SM(ND-1,ND_SM)
-	REAL*8 WORKMAT(ND,ND)
+	REAL(10) KI_SM(ND,ND_SM,NM_KI)
+	REAL(10) RHS_dHdCHI_SM(ND-1,ND_SM)
+	REAL(10) WORKMAT(ND,ND)
 C
 C Work vectors.
 C
@@ -136,17 +136,17 @@ C
 	1                   TX_OLD_d_T,TX_OLD_d_dTdR,
 	1                   GAM,GAMH,W,WPREV,PSI,PSIPREV_MOD,PSIPREV
 C
-	REAL*8 TA(NV),TB(NV),TC(NV),DTAU(NV),RSQ_DTAUONQ(NV)
-	REAL*8 XM(NV),SOURCE(NV),Q(NV),JNU(NV),RSQ_HNU(NV)
-	REAL*8 VB(NV),VC(NV),HU(NV),HL(NV),HS(NV),THETA(NV)
-	REAL*8 GAM(NV),GAMH(NV),W(NV),WPREV(NV)
-	REAL*8 PSI(NV),PSIPREV_MOD(NV),PSIPREV(NV)
-	REAL*8 EPS_A(NV),EPS_B(NV)
-	REAL*8 EPS_PREV_A(NV),EPS_PREV_B(NV)
-	REAL*8 TX_OLD_d_T(NV),TX_OLD_d_dTdR(NV)
+	REAL(10) TA(NV),TB(NV),TC(NV),DTAU(NV),RSQ_DTAUONQ(NV)
+	REAL(10) XM(NV),SOURCE(NV),Q(NV),JNU(NV),RSQ_HNU(NV)
+	REAL(10) VB(NV),VC(NV),HU(NV),HL(NV),HS(NV),THETA(NV)
+	REAL(10) GAM(NV),GAMH(NV),W(NV),WPREV(NV)
+	REAL(10) PSI(NV),PSIPREV_MOD(NV),PSIPREV(NV)
+	REAL(10) EPS_A(NV),EPS_B(NV)
+	REAL(10) EPS_PREV_A(NV),EPS_PREV_B(NV)
+	REAL(10) TX_OLD_d_T(NV),TX_OLD_d_dTdR(NV)
 C
-	REAL*8 PROGDESC	
-	REAL*8, PARAMETER :: PROG_ID=3.4281463D+08  !Must be unique (VAR_MOM_)
+	REAL(10) PROGDESC	
+	REAL(10), PARAMETER :: PROG_ID=3.4281463D+08  !Must be unique (VAR_MOM_)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
@@ -154,7 +154,7 @@ C
 C Local variables.
 C
 	INTEGER I
-	REAL*8 AV_SIGMA
+	REAL(10) AV_SIGMA
 C
 C PROGDESC is a variable used to confirm that the scratch block is not
 C being used by some other routine.

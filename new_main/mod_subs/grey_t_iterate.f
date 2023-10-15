@@ -33,55 +33,55 @@
 	INTEGER LUIN				!Unit for input
 	INTEGER MAX_SIM				!Maximum number of lines that can be treated simultaneously.
 !
-	REAL*8 POPS(NT,ND)
-	REAL*8 Z_POP(NT)			!Vector containing Z of atom/ion (not core)
+	REAL(10) POPS(NT,ND)
+	REAL(10) Z_POP(NT)			!Vector containing Z of atom/ion (not core)
 !
-	REAL*8 FQW(NCF)
-	REAL*8 NU_EVAL_CONT(NCF)
-	REAL*8 NU(NCF)
+	REAL(10) FQW(NCF)
+	REAL(10) NU_EVAL_CONT(NCF)
+	REAL(10) NU(NCF)
 !
 ! These are set in CMFGEN.
 !
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL*8 OPLIN,EMLIN
+	REAL(10) OPLIN,EMLIN
 !
 ! Arrays for improving on the initial T structure --- partition functions.
 ! Need one for each atomic species.
 !
-        REAL*8, ALLOCATABLE :: U_PAR_FN(:,:)
-        REAL*8, ALLOCATABLE :: PHI_PAR_FN(:,:)
-        REAL*8, ALLOCATABLE :: Z_PAR_FN(:)
-        REAL*8 SPEC_DEN(ND,NUM_SPECIES)         !Used by ELEC_PREP
-	REAL*8 AT_NO_VEC(ND,NUM_SPECIES)
+        REAL(10), ALLOCATABLE :: U_PAR_FN(:,:)
+        REAL(10), ALLOCATABLE :: PHI_PAR_FN(:,:)
+        REAL(10), ALLOCATABLE :: Z_PAR_FN(:)
+        REAL(10) SPEC_DEN(ND,NUM_SPECIES)         !Used by ELEC_PREP
+	REAL(10) AT_NO_VEC(ND,NUM_SPECIES)
 !
-	REAL*8 TGREY(ND)			!Grey temperature structure
-	REAL*8 T_SAVE(ND)
-	REAL*8 ROSSMEAN(ND)			!Rosseland mean opacity
+	REAL(10) TGREY(ND)			!Grey temperature structure
+	REAL(10) T_SAVE(ND)
+	REAL(10) ROSSMEAN(ND)			!Rosseland mean opacity
 !
 ! These are all work vectors.
 !
-	REAL*8 RJ(ND)
-	REAL*8 DTAU(ND)
-	REAL*8 Z(ND)
-	REAL*8 dCHIdR(ND)
+	REAL(10) RJ(ND)
+	REAL(10) DTAU(ND)
+	REAL(10) Z(ND)
+	REAL(10) dCHIdR(ND)
 !
-	REAL*8 TA(ND)
-	REAL*8 TB(ND)
-	REAL*8 TC(ND)
-	REAL*8 QH(ND)
-	REAL*8 Q(ND)
-	REAL*8 GAM(ND)
-	REAL*8 GAMH(ND)
-	REAL*8 H(ND)
-	REAL*8 SOB(ND)
-	REAL*8 XM(ND)
-	REAL*8 FEDD(ND)
+	REAL(10) TA(ND)
+	REAL(10) TB(ND)
+	REAL(10) TC(ND)
+	REAL(10) QH(ND)
+	REAL(10) Q(ND)
+	REAL(10) GAM(ND)
+	REAL(10) GAMH(ND)
+	REAL(10) H(ND)
+	REAL(10) SOB(ND)
+	REAL(10) XM(ND)
+	REAL(10) FEDD(ND)
 !
-	REAL*8 T1,T2,T3
-	REAL*8 HBC_J
-	REAL*8 NU_DOP
-	REAL*8 FL		!Current frequency
-	REAL*8 CONT_FREQ	!Frequency at which current ETA/CHI was evaluated
+	REAL(10) T1,T2,T3
+	REAL(10) HBC_J
+	REAL(10) NU_DOP
+	REAL(10) FL		!Current frequency
+	REAL(10) CONT_FREQ	!Frequency at which current ETA/CHI was evaluated
 !
 	INTEGER FREQ_INDX 	!Index of current frequency in NU
 	INTEGER ML		!Same as FREQ_INDX
@@ -106,7 +106,7 @@
 ! Constants for opacity etc.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	LST_DEPTH_ONLY=.FALSE.
 	SECTION='CONTINUUM'

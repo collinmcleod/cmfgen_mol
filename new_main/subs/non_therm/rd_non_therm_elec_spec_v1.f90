@@ -8,7 +8,7 @@
 !
 	INTEGER ND  		!Number of depth points
 	INTEGER LU
-	REAL*8 LOC_XKT(NKT)
+	REAL(10) LOC_XKT(NKT)
 	CHARACTER(LEN=132) STRING
 !
 ! Local variables.

@@ -10,27 +10,27 @@
 !
 	INTEGER NF		!Number of frequency points
 	INTEGER ND		!Numer of depth points
-	REAL*8 dV		!Spacing in velcity space -- set to V(DOP)/2
-	REAL*8 VMIN		!Lower limit for integration
+	REAL(10) dV		!Spacing in velcity space -- set to V(DOP)/2
+	REAL(10) VMIN		!Lower limit for integration
 !
-	REAL*8 NU(NF)		!Freuqency (10^15 Hz)
-	REAL*8 TAU(NF)
-	REAL*8 CHI(ND,NF)	!Opacity (scaled by 10^10) in comoving frame
-	REAL*8 VEL(ND)		!Velocity (km/s)
-	REAL*8 R(ND)		!Radius (in units of 10^10 cm).
+	REAL(10) NU(NF)		!Freuqency (10^15 Hz)
+	REAL(10) TAU(NF)
+	REAL(10) CHI(ND,NF)	!Opacity (scaled by 10^10) in comoving frame
+	REAL(10) VEL(ND)		!Velocity (km/s)
+	REAL(10) R(ND)		!Radius (in units of 10^10 cm).
 !
-	REAL*8, ALLOCATABLE :: NEW_CHI(:,:)		!New opacity (interpolated in space and frequency).
-	REAL*8, ALLOCATABLE :: NEW_VEL(:)
-	REAL*8, ALLOCATABLE :: NEW_R(:)
+	REAL(10), ALLOCATABLE :: NEW_CHI(:,:)		!New opacity (interpolated in space and frequency).
+	REAL(10), ALLOCATABLE :: NEW_VEL(:)
+	REAL(10), ALLOCATABLE :: NEW_R(:)
 !
 ! Work vectors
 !
-	REAL*8, ALLOCATABLE :: TMP_CHI(:)
-	REAL*8, ALLOCATABLE :: TMP_FREQ(:)
-	REAL*8, ALLOCATABLE :: WRK_VEC(:)
+	REAL(10), ALLOCATABLE :: TMP_CHI(:)
+	REAL(10), ALLOCATABLE :: TMP_FREQ(:)
+	REAL(10), ALLOCATABLE :: WRK_VEC(:)
 !
-	REAL*8 T1
-	REAL*8 T2
+	REAL(10) T1
+	REAL(10) T2
 !
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER NF_INT
@@ -42,7 +42,7 @@
 	INTEGER N_THREAD
 	INTEGER N_THREAD_MAX
 !
-	REAL*8 SPEED_OF_LIGHT,C_KMS
+	REAL(10) SPEED_OF_LIGHT,C_KMS
 	EXTERNAL SPEED_OF_LIGHT
 !
 ! Determine new grid size.

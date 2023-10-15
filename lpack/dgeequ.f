@@ -8,10 +8,10 @@
 *
 *     .. Scalar Arguments ..
       INTEGER            INFO, LDA, M, N
-      DOUBLE PRECISION   AMAX, COLCND, ROWCND
+      REAL(10)   AMAX, COLCND, ROWCND
 *     ..
 *     .. Array Arguments ..
-      DOUBLE PRECISION   A( LDA, * ), C( * ), R( * )
+      REAL(10)   A( LDA, * ), C( * ), R( * )
 *     ..
 *
 *  Purpose
@@ -37,32 +37,32 @@
 *  N       (input) INTEGER
 *          The number of columns of the matrix A.  N >= 0.
 *
-*  A       (input) DOUBLE PRECISION array, dimension (LDA,N)
+*  A       (input) REAL(10) array, dimension (LDA,N)
 *          The M-by-N matrix whose equilibration factors are
 *          to be computed.
 *
 *  LDA     (input) INTEGER
 *          The leading dimension of the array A.  LDA >= max(1,M).
 *
-*  R       (output) DOUBLE PRECISION array, dimension (M)
+*  R       (output) REAL(10) array, dimension (M)
 *          If INFO = 0 or INFO > M, R contains the row scale factors
 *          for A.
 *
-*  C       (output) DOUBLE PRECISION array, dimension (N)
+*  C       (output) REAL(10) array, dimension (N)
 *          If INFO = 0,  C contains the column scale factors for A.
 *
-*  ROWCND  (output) DOUBLE PRECISION
+*  ROWCND  (output) REAL(10)
 *          If INFO = 0 or INFO > M, ROWCND contains the ratio of the
 *          smallest R(i) to the largest R(i).  If ROWCND >= 0.1 and
 *          AMAX is neither too large nor too small, it is not worth
 *          scaling by R.
 *
-*  COLCND  (output) DOUBLE PRECISION
+*  COLCND  (output) REAL(10)
 *          If INFO = 0, COLCND contains the ratio of the smallest
 *          C(i) to the largest C(i).  If COLCND >= 0.1, it is not
 *          worth scaling by C.
 *
-*  AMAX    (output) DOUBLE PRECISION
+*  AMAX    (output) REAL(10)
 *          Absolute value of largest matrix element.  If AMAX is very
 *          close to overflow or very close to underflow, the matrix
 *          should be scaled.
@@ -77,15 +77,15 @@
 *  =====================================================================
 *
 *     .. Parameters ..
-      DOUBLE PRECISION   ONE, ZERO
+      REAL(10)   ONE, ZERO
       PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Local Scalars ..
       INTEGER            I, J
-      DOUBLE PRECISION   BIGNUM, RCMAX, RCMIN, SMLNUM
+      REAL(10)   BIGNUM, RCMAX, RCMIN, SMLNUM
 *     ..
 *     .. External Functions ..
-      DOUBLE PRECISION   DLAMCH
+      REAL(10)   DLAMCH
       EXTERNAL           DLAMCH
 *     ..
 *     .. External Subroutines ..

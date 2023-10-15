@@ -18,11 +18,11 @@ C Created 06-Jun-1989 - Based on UPDATE_TX which was originally
 C                       based on UPDATEU.
 C
 	INTEGER NI,NM
-	REAL*8 TX(NI,NI,NM)
-	REAL*8 TVX(NI-1,NI,NM)
-	REAL*8 KI(NI,NI,NM)
-	REAL*8 TA(NI),TB(NI),TC(NI)
-	REAL*8 U(NI),VB(NI),VC(NI)
+	REAL(10) TX(NI,NI,NM)
+	REAL(10) TVX(NI-1,NI,NM)
+	REAL(10) KI(NI,NI,NM)
+	REAL(10) TA(NI),TB(NI),TC(NI)
+	REAL(10) U(NI),VB(NI),VC(NI)
 	LOGICAL ML_NE_ONE
 C
 C Local varables.

@@ -1,11 +1,11 @@
       SUBROUTINE DSBMV ( UPLO, N, K, ALPHA, A, LDA, X, INCX,
      $                   BETA, Y, INCY )
 *     .. Scalar Arguments ..
-      DOUBLE PRECISION   ALPHA, BETA
+      REAL(10)   ALPHA, BETA
       INTEGER            INCX, INCY, K, LDA, N
       CHARACTER*1        UPLO
 *     .. Array Arguments ..
-      DOUBLE PRECISION   A( LDA, * ), X( * ), Y( * )
+      REAL(10)   A( LDA, * ), X( * ), Y( * )
 *     ..
 *
 *  Purpose
@@ -44,11 +44,11 @@
 *           matrix A. K must satisfy  0 .le. K.
 *           Unchanged on exit.
 *
-*  ALPHA  - DOUBLE PRECISION.
+*  ALPHA  - REAL(10).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
-*  A      - DOUBLE PRECISION array of DIMENSION ( LDA, n ).
+*  A      - REAL(10) array of DIMENSION ( LDA, n ).
 *           Before entry with UPLO = 'U' or 'u', the leading ( k + 1 )
 *           by n part of the array A must contain the upper triangular
 *           band part of the symmetric matrix, supplied column by
@@ -93,7 +93,7 @@
 *           ( k + 1 ).
 *           Unchanged on exit.
 *
-*  X      - DOUBLE PRECISION array of DIMENSION at least
+*  X      - REAL(10) array of DIMENSION at least
 *           ( 1 + ( n - 1 )*abs( INCX ) ).
 *           Before entry, the incremented array X must contain the
 *           vector x.
@@ -104,11 +104,11 @@
 *           X. INCX must not be zero.
 *           Unchanged on exit.
 *
-*  BETA   - DOUBLE PRECISION.
+*  BETA   - REAL(10).
 *           On entry, BETA specifies the scalar beta.
 *           Unchanged on exit.
 *
-*  Y      - DOUBLE PRECISION array of DIMENSION at least
+*  Y      - REAL(10) array of DIMENSION at least
 *           ( 1 + ( n - 1 )*abs( INCY ) ).
 *           Before entry, the incremented array Y must contain the
 *           vector y. On exit, Y is overwritten by the updated vector y.
@@ -129,10 +129,10 @@
 *
 *
 *     .. Parameters ..
-      DOUBLE PRECISION   ONE         , ZERO
+      REAL(10)   ONE         , ZERO
       PARAMETER        ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     .. Local Scalars ..
-      DOUBLE PRECISION   TEMP1, TEMP2
+      REAL(10)   TEMP1, TEMP2
       INTEGER            I, INFO, IX, IY, J, JX, JY, KPLUS1, KX, KY, L
 *     .. External Functions ..
       LOGICAL            LSAME

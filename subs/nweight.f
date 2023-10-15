@@ -17,7 +17,7 @@ C                       ERROR_LU inserted.
 C Created 11-JAN-1988 - Based on KWEIGHT.
 C
 	INTEGER N,I
-	REAL*8 X(N),W(N),H,R,RE,RF,T1,SUM
+	REAL(10) X(N),W(N),H,R,RE,RF,T1,SUM
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU

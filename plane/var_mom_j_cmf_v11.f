@@ -32,7 +32,7 @@
 	1               TX,TVX,TX_DIF_d_T,TX_DIF_d_dTdR,
 	1               TVX_DIF_d_T,TVX_DIF_d_dTdR,
 	1               KI,WORKMAT,RHS_dHdCHI,
-	1               INIT,dLOG_NU,
+	1               INIT,LOG_NU,
 	1               INNER_BND_METH,dTdR,DBB,dDBBdT,IC,IB_STAB_FACTOR,
 	1               FREQ,CHECK_H_ON_J,OUT_BC_TYPE,
 	1               DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
@@ -52,7 +52,7 @@
 !                            for the variation calculation. Logical variable
 !                            COHERENT no longer required.
 ! Altered:   12-Dec-1996 : NM_KI installed. Changed to version V6.
-! Altered:   05-Dec-1996 : PROGDESC set to REAL*8 value, PROG_ID installed
+! Altered:   05-Dec-1996 : PROGDESC set to REAL(10) value, PROG_ID installed
 !                             ERROR_LU installed. TUNE installed.
 ! Altered:   25-Jan-1996 : HBC, NBC (and HBC_PREV, NBC_PREV) are now
 !                            scalers. Other quantities were not needed
@@ -75,22 +75,22 @@
 	INTEGER ND
 	INTEGER NM
 	INTEGER NM_KI
-	REAL*8 ETA(ND),CHI(ND),ESEC(ND),THETA(ND)
-	REAL*8 V(ND),SIGMA(ND),R(ND)
+	REAL(10) ETA(ND),CHI(ND),ESEC(ND),THETA(ND)
+	REAL(10) V(ND),SIGMA(ND),R(ND)
 !
 ! Variation arrays and vectors.
 !
-	REAL*8 TX(ND,ND,NM),TVX(ND-1,ND,NM)
-	REAL*8 KI(ND,ND,NM_KI)
-	REAL*8 WORKMAT(ND,ND),RHS_dHdCHI(ND-1,ND)
-	REAL*8 TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
-	REAL*8 TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
+	REAL(10) TX(ND,ND,NM),TVX(ND-1,ND,NM)
+	REAL(10) KI(ND,ND,NM_KI)
+	REAL(10) WORKMAT(ND,ND),RHS_dHdCHI(ND-1,ND)
+	REAL(10) TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
+	REAL(10) TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
 !
 	LOGICAL DO_THIS_TX_MATRIX(NM)
 !
-	REAL*8 dLOG_NU,dTdR,DBB,dDBBdT,IC
-	REAL*8 FREQ
-	REAL*8 IB_STAB_FACTOR
+	REAL(10) LOG_NU,dTdR,DBB,dDBBdT,IC
+	REAL(10) FREQ
+	REAL(10) IB_STAB_FACTOR
 	CHARACTER*6 METHOD
 !
 ! INIT is used to indicate that there is no coupling to the previous frequency.
@@ -102,8 +102,8 @@
 	INTEGER OUT_BC_TYPE
 	CHARACTER(LEN=*) INNER_BND_METH
 !
-	REAL*8 T1
-	REAL*8 DTAU_BND
+	REAL(10) T1
+	REAL(10) DTAU_BND
 !
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
@@ -111,8 +111,8 @@
 ! Local variables.
 !
 	INTEGER I
-	REAL*8 AV_SIGMA
-	REAL*8 LOCAL_DBB
+	REAL(10) AV_SIGMA
+	REAL(10) LOCAL_DBB
 	LOGICAL DIF_OR_ZF
 !
 ! 
@@ -183,7 +183,7 @@
 	  DO I=1,ND-1
 	    AV_SIGMA=0.5D0*(SIGMA(I)+SIGMA(I+1))
 	    GAMH(I)=2.0D0*3.33564D-06*(V(I)+V(I+1))/(R(I)+R(I+1))
-	1         /dLOG_NU/( CHI(I)+CHI(I+1) )
+	1         /LOG_NU/( CHI(I)+CHI(I+1) )
 	    W(I)=GAMH(I)*( 1.0D0+AV_SIGMA*NMID_ON_HMID(I) )
 	    WPREV(I)=GAMH(I)*( 1.0D0+AV_SIGMA*NMID_ON_HMID_PREV(I) )
 	    EPS_A(I)=GAMH(I)*AV_SIGMA*NMID_ON_J(I)/(1.0D0+W(I))
@@ -194,7 +194,7 @@
 	    EPS_PREV_A(I)=EPS_PREV_A(I)*R(I)*R(I)
 	  END DO
 	  DO I=1,ND
-	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/dLOG_NU
+	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/LOG_NU
 	  END DO
 !
 ! PSIPREV is equivalent to the U vector of FORMSOL.

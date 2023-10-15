@@ -7,28 +7,28 @@
 !
 ! Arrays for computation of JBAR using moment equations.
 !
-        REAL*8, ALLOCATABLE :: JNU(:,:)
-        REAL*8, ALLOCATABLE :: HNU(:,:)
-        REAL*8, ALLOCATABLE :: F_LINE(:,:)
-        REAL*8, ALLOCATABLE :: G_LINE(:,:)               !ND,NLF+1
-        REAL*8, ALLOCATABLE :: HBC_LINE(:,:)             !3,NLF+1
-        REAL*8, ALLOCATABLE :: NBC_LINE(:,:)             !3,NLF+1
-        REAL*8, ALLOCATABLE :: IN_HBC_LINE(:)            !NLF+1
+        REAL(10), ALLOCATABLE :: JNU(:,:)
+        REAL(10), ALLOCATABLE :: HNU(:,:)
+        REAL(10), ALLOCATABLE :: F_LINE(:,:)
+        REAL(10), ALLOCATABLE :: G_LINE(:,:)               !ND,NLF+1
+        REAL(10), ALLOCATABLE :: HBC_LINE(:,:)             !3,NLF+1
+        REAL(10), ALLOCATABLE :: NBC_LINE(:,:)             !3,NLF+1
+        REAL(10), ALLOCATABLE :: IN_HBC_LINE(:)            !NLF+1
 !
 ! Variables and Vectors for EW's and LINE blanketing.
 !
-	REAL*8, ALLOCATABLE :: JBLANK(:)                !ND
-	REAL*8, ALLOCATABLE :: HBLANK(:)                !ND
-	REAL*8, ALLOCATABLE :: JEW(:)                   !ND : Used to compute line Ew's.
-	REAL*8, ALLOCATABLE :: JBAR(:)                  !ND : Mean line intensity.
-	REAL*8, ALLOCATABLE :: ZNET(:)                  !ND : Net radiative rate
+	REAL(10), ALLOCATABLE :: JBLANK(:)                !ND
+	REAL(10), ALLOCATABLE :: HBLANK(:)                !ND
+	REAL(10), ALLOCATABLE :: JEW(:)                   !ND : Used to compute line Ew's.
+	REAL(10), ALLOCATABLE :: JBAR(:)                  !ND : Mean line intensity.
+	REAL(10), ALLOCATABLE :: ZNET(:)                  !ND : Net radiative rate
 !
 ! Line profile arrays and variables.
 !
-	REAL*8, ALLOCATABLE :: PF(:)                    !NLF : Prof. freq. for line computations
-	REAL*8, ALLOCATABLE :: PROF(:)                  !NLF : Line profile
-	REAL*8, ALLOCATABLE :: LFQW(:)                  !NLF : Quad. weights assoc. with line prof
-	REAL*8, ALLOCATABLE :: ERF(:)
+	REAL(10), ALLOCATABLE :: PF(:)                    !NLF : Prof. freq. for line computations
+	REAL(10), ALLOCATABLE :: PROF(:)                  !NLF : Line profile
+	REAL(10), ALLOCATABLE :: LFQW(:)                  !NLF : Quad. weights assoc. with line prof
+	REAL(10), ALLOCATABLE :: ERF(:)
 !
 ! Used only in LINEGEN.INC
 !
@@ -36,9 +36,9 @@
 ! Variable,depth of variable,depth of J. If NUM_BNDS .ne. ND the
 ! the variable depth is given by [ VJ(I1,I2,I3) ] I3+I2-NDIAG.
 !
-	REAL*8, ALLOCATABLE :: VZNET(:,:,:)             !NT,NUM_BNDS,ND
-	REAL*8, ALLOCATABLE :: FQAF(:,:,:)              !ND,ND,NM_KI
-	REAL*8, ALLOCATABLE :: FQAFD(:)                 !ND
+	REAL(10), ALLOCATABLE :: VZNET(:,:,:)             !NT,NUM_BNDS,ND
+	REAL(10), ALLOCATABLE :: FQAF(:,:,:)              !ND,ND,NM_KI
+	REAL(10), ALLOCATABLE :: FQAFD(:)                 !ND
 !
 	END MODULE CMF_SOB_MOD 
 !

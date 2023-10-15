@@ -7,7 +7,7 @@
 	SUBROUTINE WRITE_VEC(F,ND,A,LU)
 	IMPLICIT NONE
 	INTEGER ND,LU
-	REAL*8 F(ND)
+	REAL(10) F(ND)
 !
 ! Local variables.
 !

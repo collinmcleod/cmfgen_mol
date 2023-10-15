@@ -8,9 +8,9 @@
 !
 	INTEGER ND,NT
 
-	REAL*8 POPS(NT,ND)
-	REAL*8 ESEC(ND)			!Electron scattering opacity
-	REAL*8 R_OLD(ND)
+	REAL(10) POPS(NT,ND)
+	REAL(10) ESEC(ND)			!Electron scattering opacity
+	REAL(10) R_OLD(ND)
 	LOGICAL DONE_R_REV
 !
 ! For specifying grid.
@@ -21,29 +21,29 @@
 !
 ! Local variables.
 !
-	REAL*8 LOG_R(ND)
-	REAL*8 LOG_R_OLD(ND)
-	REAL*8 NEW_V(ND)
-	REAL*8 dTAU_OLD(ND)
-	REAL*8 TAU_OLD(ND)
-	REAL*8 TAU(ND)
+	REAL(10) LOG_R(ND)
+	REAL(10) LOG_R_OLD(ND)
+	REAL(10) NEW_V(ND)
+	REAL(10) dTAU_OLD(ND)
+	REAL(10) TAU_OLD(ND)
+	REAL(10) TAU(ND)
 !
-	REAL*8 TA(ND)			!Work vectors
-	REAL*8 TB(ND)
+	REAL(10) TA(ND)			!Work vectors
+	REAL(10) TB(ND)
 !
 ! The fine grid (FG) is chosen to cover the ionization front. The default values are
 ! -2.0 to 1.0D0 in log(TAU) space.
 !
-	REAL*8 FG_MIN			!Min Tau for FG
-	REAL*8 FG_MAX			!Max Tau for FG
-	REAL*8 FG_RANGE
+	REAL(10) FG_MIN			!Min Tau for FG
+	REAL(10) FG_MAX			!Max Tau for FG
+	REAL(10) FG_RANGE
 !
-	REAL*8 T1
-	REAL*8 DLOG_TAU
-	REAL*8 STRETCH_POW		!Power law exponent to stretch tau scale about 1
+	REAL(10) T1
+	REAL(10) LOG_TAU
+	REAL(10) STRETCH_POW		!Power law exponent to stretch tau scale about 1
 !
-	REAL*8 OBND_PARAMS(5)		!Parameters specifying grid placement at outer boundary.
-	REAL*8 IBND_PARAMS(5)		!Parameters specifying grid placement at nner boundary.
+	REAL(10) OBND_PARAMS(5)		!Parameters specifying grid placement at outer boundary.
+	REAL(10) IBND_PARAMS(5)		!Parameters specifying grid placement at nner boundary.
 !
 	INTEGER NUM_IBND_PARAMS		!Number of points inserted near inner boundary.
 	INTEGER NUM_OBND_PARAMS		!Number of points inserted near outer boundary.
@@ -150,7 +150,7 @@
 	END DO
 	WRITE(LU,'(A,ES12.4)')'! Tau(min)=',TAU_OLD(1)
 	WRITE(LU,'(A,ES12.4)')'! Tau(max)=',TAU_OLD(ND)
-	TAU_OLD(1:ND)=DLOG10(TAU_OLD(1:ND))
+	TAU_OLD(1:ND)=LOG10(TAU_OLD(1:ND))
 !
 ! Save existing grid, which will be used for the interplations.
 !
@@ -181,10 +181,10 @@
 !
 ! Set grid away from boundaries.
 !
-	  DLOG_TAU=(TAU_OLD(ND)-TAU_OLD(1))/(ND-NUM_OBND_PARAMS-NUM_IBND_PARAMS-1)
+	  LOG_TAU=(TAU_OLD(ND)-TAU_OLD(1))/(ND-NUM_OBND_PARAMS-NUM_IBND_PARAMS-1)
 	  TAU(1)=TAU_OLD(1)
 	  DO I=NUM_OBND_PARAMS+2,ND-NUM_IBND_PARAMS-1
-	    TAU(I)=TAU_OLD(1)+DLOG_TAU*(I-NUM_IBND_PARAMS-1)
+	    TAU(I)=TAU_OLD(1)+LOG_TAU*(I-NUM_IBND_PARAMS-1)
 	  END DO
 	  TAU(ND)=TAU_OLD(ND)
 !
@@ -230,22 +230,22 @@
 ! ar either boundary.
 !
 	  T1=TAU_OLD(ND)-TAU_OLD(1)-FG_RANGE
-          DLOG_TAU=T1/(ND-NUM_IBND_PARAMS-NUM_OBND_PARAMS-NX)
-	  I1=(FG_MIN-TAU_OLD(1))/DLOG_TAU
-	  DLOG_TAU=(FG_MIN-TAU_OLD(1))/I1
+          LOG_TAU=T1/(ND-NUM_IBND_PARAMS-NUM_OBND_PARAMS-NX)
+	  I1=(FG_MIN-TAU_OLD(1))/LOG_TAU
+	  LOG_TAU=(FG_MIN-TAU_OLD(1))/I1
           I1=I1+NUM_OBND_PARAMS
 	  TAU(1)=TAU_OLD(1)
 	  DO I=NUM_OBND_PARAMS+2,I1
-	    TAU(I)=TAU_OLD(1)+DLOG_TAU*(I-3)
+	    TAU(I)=TAU_OLD(1)+LOG_TAU*(I-3)
 	  END DO
 	  WRITE(LU,'(A,I3)')'! Number of points from outer boundary to zone is ',I1
 	  WRITE(LU,'(A,I3)')'! Number of points in zone is',NX
 !
 ! Do the insertion in the crtical section.
 !
-	  DLOG_TAU=FG_RANGE/(NX-1)
+	  LOG_TAU=FG_RANGE/(NX-1)
 	  DO I=I1+1,I1+NX
-	    TAU(I)=FG_MIN+DLOG_TAU*(I-I1-1)
+	    TAU(I)=FG_MIN+LOG_TAU*(I-I1-1)
 	  END DO
 !
 ! Now do the last section, towards the inner boundary.
@@ -253,7 +253,7 @@
 	  I2=ND-(NX+I1+NUM_IBND_PARAMS)
 	  dLOG_TAU=(TAU_OLD(ND)-FG_MAX)/I2
 	  DO I=I1+NX+1,ND-NUM_IBND_PARAMS-1
-	    TAU(I)=TAU(I-1)+DLOG_TAU
+	    TAU(I)=TAU(I-1)+LOG_TAU
 	  END DO
 	  TAU(ND)=TAU_OLD(ND)
 	  WRITE(LU,'(A,I3)')'! Number of points from zone to inner boundary is ',I2

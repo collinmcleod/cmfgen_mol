@@ -37,35 +37,35 @@
 	INTEGER ND				!Number of TLUSTY depths input
 	INTEGER ND_MAX			!Maximum number of TLUSTY depths in file
 	INTEGER, ALLOCATABLE :: INDX(:)
-	REAL*8, ALLOCATABLE :: DM(:)		!Column mass density
-	REAL*8, ALLOCATABLE :: TAUR(:)		!Rosseland optical depth
-	REAL*8, ALLOCATABLE :: AROSS(:)		!Absorption Rosseland optical depth scale
-	REAL*8, ALLOCATABLE :: T(:)		!Temperature
-	REAL*8, ALLOCATABLE :: ED(:)		!Electron density (/cm^3)
-	REAL*8, ALLOCATABLE :: DSH(:)		!Density (gm/cm^3)
+	REAL(10), ALLOCATABLE :: DM(:)		!Column mass density
+	REAL(10), ALLOCATABLE :: TAUR(:)		!Rosseland optical depth
+	REAL(10), ALLOCATABLE :: AROSS(:)		!Absorption Rosseland optical depth scale
+	REAL(10), ALLOCATABLE :: T(:)		!Temperature
+	REAL(10), ALLOCATABLE :: ED(:)		!Electron density (/cm^3)
+	REAL(10), ALLOCATABLE :: DSH(:)		!Density (gm/cm^3)
 !
 ! Calculated directly from TLUSTY data. Same grid.
 !
-	REAL*8, ALLOCATABLE :: RD(:)		!Radius
-	REAL*8, ALLOCATABLE :: RD_NORM(:)	!Radius normalized by core radius
-	REAL*8, ALLOCATABLE :: ZZ(:)            !Height above core
-	REAL*8, ALLOCATABLE :: VPH(:)		!Velocity deduced from density structure (assuming Mdot)
-	REAL*8, ALLOCATABLE :: dVdR_PH(:)	!dVdR deduced from density structure
-	REAL*8, ALLOCATABLE :: KAPPA(:)		!Mass absorption coefficient
+	REAL(10), ALLOCATABLE :: RD(:)		!Radius
+	REAL(10), ALLOCATABLE :: RD_NORM(:)	!Radius normalized by core radius
+	REAL(10), ALLOCATABLE :: ZZ(:)            !Height above core
+	REAL(10), ALLOCATABLE :: VPH(:)		!Velocity deduced from density structure (assuming Mdot)
+	REAL(10), ALLOCATABLE :: dVdR_PH(:)	!dVdR deduced from density structure
+	REAL(10), ALLOCATABLE :: KAPPA(:)		!Mass absorption coefficient
 !
 ! Arrays used to generate a FINE grid of the TLUSTY hydrostatic data data.
 !
 	INTEGER, PARAMETER :: NBIG=2500
 
-	REAL*8, ALLOCATABLE :: RA(:)
-	REAL*8, ALLOCATABLE :: TA(:)
-	REAL*8, ALLOCATABLE :: TB(:)
-	REAL*8, ALLOCATABLE :: RA_NORM(:)
-	REAL*8, ALLOCATABLE :: VPA(:)		!Velocity deduced from density structure
-	REAL*8, ALLOCATABLE :: VW(:)		!Beta-wind velocity
-	REAL*8, ALLOCATABLE :: DSHA(:)		!Density
-	REAL*8, ALLOCATABLE :: TAUR_A(:)
-	REAL*8, ALLOCATABLE :: KAPPA_A(:)
+	REAL(10), ALLOCATABLE :: RA(:)
+	REAL(10), ALLOCATABLE :: TA(:)
+	REAL(10), ALLOCATABLE :: TB(:)
+	REAL(10), ALLOCATABLE :: RA_NORM(:)
+	REAL(10), ALLOCATABLE :: VPA(:)		!Velocity deduced from density structure
+	REAL(10), ALLOCATABLE :: VW(:)		!Beta-wind velocity
+	REAL(10), ALLOCATABLE :: DSHA(:)		!Density
+	REAL(10), ALLOCATABLE :: TAUR_A(:)
+	REAL(10), ALLOCATABLE :: KAPPA_A(:)
 !
 ! Arrays for grid containing TLUSTY hydrostatic structure merged with
 ! the Beta-Velocity. Below the connection point TLUSTY structure is used.
@@ -73,43 +73,43 @@
 !
 	INTEGER, PARAMETER :: NEXT=1000	!Number of points used to extend R-grid
 	INTEGER NF				!Number of points in merged model
-	REAL*8, ALLOCATABLE :: R_F(:)
-	REAL*8, ALLOCATABLE :: T_F(:)
-	REAL*8, ALLOCATABLE :: VW_F(:)
-	REAL*8, ALLOCATABLE :: DSH_F(:)
-	REAL*8, ALLOCATABLE ::dVdR_F(:)
-	REAL*8, ALLOCATABLE :: TAUR_F(:)
-	REAL*8, ALLOCATABLE :: TEMP_F(:)
+	REAL(10), ALLOCATABLE :: R_F(:)
+	REAL(10), ALLOCATABLE :: T_F(:)
+	REAL(10), ALLOCATABLE :: VW_F(:)
+	REAL(10), ALLOCATABLE :: DSH_F(:)
+	REAL(10), ALLOCATABLE ::dVdR_F(:)
+	REAL(10), ALLOCATABLE :: TAUR_F(:)
+	REAL(10), ALLOCATABLE :: TEMP_F(:)
 !
 ! Grid for CMFGEN
 !
 	INTEGER ND_CMF
 	INTEGER ND_SM
 	INTEGER ND_BEL
-	REAL*8, ALLOCATABLE :: R_CMF(:)
-	REAL*8, ALLOCATABLE :: DENS_CMF(:)
-	REAL*8, ALLOCATABLE :: V_CMF(:)
-	REAL*8, ALLOCATABLE :: T_CMF(:)
-	REAL*8, ALLOCATABLE :: dVdR_CMF(:)
-	REAL*8, ALLOCATABLE :: TAUR_CMF(:)
+	REAL(10), ALLOCATABLE :: R_CMF(:)
+	REAL(10), ALLOCATABLE :: DENS_CMF(:)
+	REAL(10), ALLOCATABLE :: V_CMF(:)
+	REAL(10), ALLOCATABLE :: T_CMF(:)
+	REAL(10), ALLOCATABLE :: dVdR_CMF(:)
+	REAL(10), ALLOCATABLE :: TAUR_CMF(:)
 !
-	REAL*8 RSTAR			!Radius of Rstar in Rsun
-	REAL*8 RMAX			!Outer radius of star
-	REAL*8 MDOT			!Mass-loss in Msun/yr
-	REAL*8 VINF			!Velocity (km/s)
-	REAL*8 BETA			!Exponent for Beta-velocity law in outer wind.
-	REAL*8 BETA_MIN			!Exponent for Beta-velocity law in inner wind.
-	REAL*8 BETA_SCL			!Exponent for Beta-velocity law.
-	REAL*8 VW_BEG                   !Velocity at wind/photosphere interface when defining CMFGEN grid.
+	REAL(10) RSTAR			!Radius of Rstar in Rsun
+	REAL(10) RMAX			!Outer radius of star
+	REAL(10) MDOT			!Mass-loss in Msun/yr
+	REAL(10) VINF			!Velocity (km/s)
+	REAL(10) BETA			!Exponent for Beta-velocity law in outer wind.
+	REAL(10) BETA_MIN			!Exponent for Beta-velocity law in inner wind.
+	REAL(10) BETA_SCL			!Exponent for Beta-velocity law.
+	REAL(10) VW_BEG                   !Velocity at wind/photosphere interface when defining CMFGEN grid.
 !
-	REAL*8 AMDOT
-	REAL*8 RCORE
+	REAL(10) AMDOT
+	REAL(10) RCORE
 !
-	REAL*8 MIN_VAL
-	REAL*8 T1
-	REAL*8 CONS,EPS
-	REAL*8 DELR
-	REAL*8 R0
+	REAL(10) MIN_VAL
+	REAL(10) T1
+	REAL(10) CONS,EPS
+	REAL(10) DELR
+	REAL(10) R0
 	INTEGER IND0
 	INTEGER C_INDX
 	INTEGER NV_WIND 		!Index in *_F arrays at wind/photosphere interface 
@@ -134,7 +134,7 @@
 	INTEGER, PARAMETER :: LU_PHOT=11
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 !
-	REAL*8 FUN_PI,PI
+	REAL(10) FUN_PI,PI
 	EXTERNAL FUN_PI
 !
 	INTEGER I,ID,K,IOS
@@ -588,7 +588,7 @@
 	    NV_WIND=NV_WIND+1
 	  END DO
 !
-	  TEMP_F(1:NF)=DLOG(TAUR_F(1:NF))
+	  TEMP_F(1:NF)=LOG(TAUR_F(1:NF))
 	  DO I=1,NF
 	    WRITE(45,*)I,DSH_F(I),TAUR_F(I)
 	  END DO
@@ -648,7 +648,7 @@
 	    EPS=0.75D00
 	    CALL GEN_IN(CONS,'Constant for Velocity scaling of Tau (>0) ')
 	    CALL GEN_IN(EPS,'Exponent for Velocity scaling of Tau')
-	    TEMP_F(1:NF)=DLOG( TAUR_F(1:NF)/(CONS+VW_F(1:NF))**EPS )
+	    TEMP_F(1:NF)=LOG( TAUR_F(1:NF)/(CONS+VW_F(1:NF))**EPS )
 	    T1=(TEMP_F(NF)-TEMP_F(1))/(ND_CMF-5)
 	    TAUR_CMF(1)=TEMP_F(1)
 	    TAUR_CMF(2)=TEMP_F(1)+0.1*T1

@@ -11,9 +11,9 @@ C
 C
 C Created 11-Apr-1997 : Based on LAMVACAIR
 C
-	REAL*8 LAM_VAC			!Vacuum wavelength in Ang.
-	REAL*8 LAM_AIR			!Air wavelength in Ang.
-	REAL*8 T1
+	REAL(10) LAM_VAC			!Vacuum wavelength in Ang.
+	REAL(10) LAM_AIR			!Air wavelength in Ang.
+	REAL(10) T1
 	INTEGER I
 C
 	IF(LAM_AIR .LT. 1999.352D0)THEN

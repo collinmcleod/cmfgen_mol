@@ -16,9 +16,9 @@
 ! Reaction data
 !
           INTEGER*4, ALLOCATABLE :: TYPE_CHG(:)
-          REAL*8, ALLOCATABLE :: COEF_CHG(:,:)
-          REAL*8, ALLOCATABLE :: TLO_CHG(:)
-          REAL*8, ALLOCATABLE :: THI_CHG(:)
+          REAL(10), ALLOCATABLE :: COEF_CHG(:,:)
+          REAL(10), ALLOCATABLE :: TLO_CHG(:)
+          REAL(10), ALLOCATABLE :: THI_CHG(:)
 	  CHARACTER*8, ALLOCATABLE :: SPEC_ID_CHG(:,:)
 	  CHARACTER*30, ALLOCATABLE :: LEV_NAME_CHG(:,:)
 	  CHARACTER*30, ALLOCATABLE :: ALT_LEV_NAME_CHG(:,:)
@@ -26,10 +26,10 @@
 ! Arrays required to update STEQ (statistical equilibrium) and BA (vartiation
 ! of STEQ) arrays.
 !
-          REAL*8, ALLOCATABLE :: Z_CHG(:,:)
-          REAL*8, ALLOCATABLE :: AI_AR_CHG(:,:)
-          REAL*8, ALLOCATABLE :: dlnAI_AR_CHG_dlnT(:,:)
-          REAL*8, ALLOCATABLE :: COOL_CHG(:,:)
+          REAL(10), ALLOCATABLE :: Z_CHG(:,:)
+          REAL(10), ALLOCATABLE :: AI_AR_CHG(:,:)
+          REAL(10), ALLOCATABLE :: dlnAI_AR_CHG_dlnT(:,:)
+          REAL(10), ALLOCATABLE :: COOL_CHG(:,:)
 	  INTEGER*4, ALLOCATABLE ::  LEV_CHG(:,:)
 	  INTEGER*4, ALLOCATABLE ::  EQ_CHG(:,:)
 	  INTEGER*4, ALLOCATABLE ::  EQION_CHG(:,:)

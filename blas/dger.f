@@ -1,9 +1,9 @@
       SUBROUTINE DGER  ( M, N, ALPHA, X, INCX, Y, INCY, A, LDA )
 *     .. Scalar Arguments ..
-      DOUBLE PRECISION   ALPHA
+      REAL(10)   ALPHA
       INTEGER            INCX, INCY, LDA, M, N
 *     .. Array Arguments ..
-      DOUBLE PRECISION   A( LDA, * ), X( * ), Y( * )
+      REAL(10)   A( LDA, * ), X( * ), Y( * )
 *     ..
 *
 *  Purpose
@@ -29,11 +29,11 @@
 *           N must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - DOUBLE PRECISION.
+*  ALPHA  - REAL(10).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
-*  X      - DOUBLE PRECISION array of dimension at least
+*  X      - REAL(10) array of dimension at least
 *           ( 1 + ( m - 1 )*abs( INCX ) ).
 *           Before entry, the incremented array X must contain the m
 *           element vector x.
@@ -44,7 +44,7 @@
 *           X. INCX must not be zero.
 *           Unchanged on exit.
 *
-*  Y      - DOUBLE PRECISION array of dimension at least
+*  Y      - REAL(10) array of dimension at least
 *           ( 1 + ( n - 1 )*abs( INCY ) ).
 *           Before entry, the incremented array Y must contain the n
 *           element vector y.
@@ -55,7 +55,7 @@
 *           Y. INCY must not be zero.
 *           Unchanged on exit.
 *
-*  A      - DOUBLE PRECISION array of DIMENSION ( LDA, n ).
+*  A      - REAL(10) array of DIMENSION ( LDA, n ).
 *           Before entry, the leading m by n part of the array A must
 *           contain the matrix of coefficients. On exit, A is
 *           overwritten by the updated matrix.
@@ -77,10 +77,10 @@
 *
 *
 *     .. Parameters ..
-      DOUBLE PRECISION   ZERO
+      REAL(10)   ZERO
       PARAMETER        ( ZERO = 0.0D+0 )
 *     .. Local Scalars ..
-      DOUBLE PRECISION   TEMP
+      REAL(10)   TEMP
       INTEGER            I, INFO, IX, J, JY, KX
 *     .. External Subroutines ..
       EXTERNAL           XERBLA

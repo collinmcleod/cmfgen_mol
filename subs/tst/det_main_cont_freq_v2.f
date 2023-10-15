@@ -11,13 +11,13 @@
 ! has been chosen to sample all lines and continuum edges adequately.
 !
 	INTEGER*4 NCF
-	REAL*8 NU(NCF)
+	REAL(10) NU(NCF)
 !
 ! For each frequncy NU(I), the continuum cross-section will be evaluated at
 ! freqency NU_EVAL(I).
 !
-	REAL*8 NU_EVAL(NCF)
-	REAL*8 NU_EVAL_SAV(NCF)
+	REAL(10) NU_EVAL(NCF)
+	REAL(10) NU_EVAL_SAV(NCF)
 !
 ! NCF_CONT represents the number of continuum frequencies before line 
 ! insertion. NU_CONT contains these frequencies, and has been chosen to 
@@ -25,7 +25,7 @@
 ! important bound-free edges) adequately. 
 !
 	INTEGER*4 NCF_CONT
-	REAL*8 NU_CONT(NCF_CONT)
+	REAL(10) NU_CONT(NCF_CONT)
 !
 	LOGICAL COMPUTE_ALL_CROSS
 	LOGICAL MID_POINT_EVAL
@@ -36,7 +36,7 @@
 ! Local variables:
 !
 	INTEGER*4 LU_OUT,L,K,ML,ML_ST,ML_END,LST_COMP
-	REAL*8 T1,T2,DOP_RAT,VRAT,C_KMS
+	REAL(10) T1,T2,DOP_RAT,VRAT,C_KMS
 !
 	LU_OUT=ERROR_LU()
 	IF(COMPUTE_ALL_CROSS)THEN

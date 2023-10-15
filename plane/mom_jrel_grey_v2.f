@@ -38,36 +38,36 @@
 !
 	INTEGER ND
 !
-	REAL*8 R(ND)
-	REAL*8 ETA(ND)
-	REAL*8 CHI(ND)
-	REAL*8 ESEC(ND)
-	REAL*8 V(ND)
-	REAL*8 SIGMA(ND)
+	REAL(10) R(ND)
+	REAL(10) ETA(ND)
+	REAL(10) CHI(ND)
+	REAL(10) ESEC(ND)
+	REAL(10) V(ND)
+	REAL(10) SIGMA(ND)
 !
 ! Moment ratio variables. All must be supplied.
 !
-	REAL*8 H_ON_J(ND)
-	REAL*8 F(ND)
+	REAL(10) H_ON_J(ND)
+	REAL(10) F(ND)
 !
 ! If INIT is true, the initial vector values are irrelevant, and
 ! the variable is returned. If false, vector must be
 ! supplied, but it will be updated inside this routine.
 !
-	REAL*8 dlnJdlnR(ND)
+	REAL(10) dlnJdlnR(ND)
 !
 ! These values are computed, and returned.
 !
-	REAL*8 JNU(ND)
-	REAL*8 RSQHNU(ND)
+	REAL(10) JNU(ND)
+	REAL(10) RSQHNU(ND)
 !
 ! Boundary conditions: Must be supplied.
 !
-	REAL*8 HBC			!H/J at outer boundary
-	REAL*8 IN_HBC			!H/J at inner boundary
+	REAL(10) HBC			!H/J at outer boundary
+	REAL(10) IN_HBC			!H/J at inner boundary
 !
-	REAL*8 DBB
-	REAL*8 IC
+	REAL(10) DBB
+	REAL(10) IC
 	CHARACTER*6 METHOD
 !
 ! COHERENT indicates whether the scattering is coherent. If it is, we
@@ -92,22 +92,22 @@
 !
 ! Local vectors
 !
-	REAL*8 TA(ND),TB(ND),TC(ND)
-	REAL*8 CHI_H(ND),CHI_J(ND)
-	REAL*8 DTAU_H(ND),DTAU_J(ND),DTAUONQ(ND)
-	REAL*8 Q(ND),XM(ND),SOURCE(ND)
-	REAL*8 HU(ND),HL(ND)
-	REAL*8 BETA(ND),H_ADV_FAC(ND),GAM_REL(ND)
-	REAL*8 GAM_REL_SQ(ND),CON_DELTA(ND)
-	REAL*8 JOLD(ND),P_H(ND),P_J(ND)
-	REAL*8 COH_VEC(ND)
+	REAL(10) TA(ND),TB(ND),TC(ND)
+	REAL(10) CHI_H(ND),CHI_J(ND)
+	REAL(10) DTAU_H(ND),DTAU_J(ND),DTAUONQ(ND)
+	REAL(10) Q(ND),XM(ND),SOURCE(ND)
+	REAL(10) HU(ND),HL(ND)
+	REAL(10) BETA(ND),H_ADV_FAC(ND),GAM_REL(ND)
+	REAL(10) GAM_REL_SQ(ND),CON_DELTA(ND)
+	REAL(10) JOLD(ND),P_H(ND),P_J(ND)
+	REAL(10) COH_VEC(ND)
 !
 ! Local variables.
 !
-	REAL*8 T1,T2
-	REAL*8 DAMP_FAC
-	REAL*8 MAX_ER
-	REAL*8 MAX_ER_LST_IT
+	REAL(10) T1,T2
+	REAL(10) DAMP_FAC
+	REAL(10) MAX_ER
+	REAL(10) MAX_ER_LST_IT
 	INTEGER LUER,ERROR_LU
 	INTEGER I,J,IFAIL
 	INTEGER IT_COUNT

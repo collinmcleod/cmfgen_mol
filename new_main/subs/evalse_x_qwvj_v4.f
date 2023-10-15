@@ -38,27 +38,27 @@
 	INTEGER NION		!Total number of IONS
 	INTEGER ND		!Number of depth points
 !
-	REAL*8 HN_A(N_A,ND)		!    Pops. of ith ionzation stage
-	REAL*8 HNST_A(N_A,ND)		!LTE   "    "  "      "       "
-	REAL*8 HN_B(N_B,ND)		!    Pops. of (i+1)th ionization stage
-	REAL*8 HNST_B(N_B,ND)		!LTE   "   "    "       "        "
+	REAL(10) HN_A(N_A,ND)		!    Pops. of ith ionzation stage
+	REAL(10) HNST_A(N_A,ND)		!LTE   "    "  "      "       "
+	REAL(10) HN_B(N_B,ND)		!    Pops. of (i+1)th ionization stage
+	REAL(10) HNST_B(N_B,ND)		!LTE   "   "    "       "        "
 !
 ! WSE_X is the quadrature weight for X-ray ionization (with 2e ejected) for
 ! ionization state i [final product is (i+1)].
 !
-	REAL*8 WSE_X(N_A,ND)
-	REAL*8 JREC(ND)			! Int (2h/c2v^3+J)*EXP(-hv/kT)/v dv
-	REAL*8 JPHOT(ND)		! Int J/v dv
+	REAL(10) WSE_X(N_A,ND)
+	REAL(10) JREC(ND)			! Int (2h/c2v^3+J)*EXP(-hv/kT)/v dv
+	REAL(10) JPHOT(ND)		! Int J/v dv
 !
 ! Local variables.
 !
 	INTEGER ION_EQ		!Ion eqation in SE(ID)%BA matrix.
 	INTEGER ION_V                 !Location of ion variable in SE(ID)%BA.
 	INTEGER I,J
-	REAL*8 NETR
-	REAL*8 SUM_SE
-	REAL*8 SUM_VJ_R,SUM_VJ_P
-	REAL*8 J_B_ION,B_ION
+	REAL(10) NETR
+	REAL(10) SUM_SE
+	REAL(10) SUM_VJ_R,SUM_VJ_P
+	REAL(10) J_B_ION,B_ION
 !
 	ION_EQ=SE(ID)%XRAY_EQ
 	ION_V=SE(ID)%LNK_TO_IV(ION_EQ_IN_BA)

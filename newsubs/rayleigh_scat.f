@@ -18,24 +18,24 @@
 	INTEGER NHYD
 	INTEGER ND
 !
-	REAL*8 AHYD(NHYD,NHYD)		!No longer used
-	REAL*8 HYD(NHYD,ND)
-	REAL*8 EDGE_HYD(NHYD)		!Ground state value used only.
-	REAL*8 RKI(ND)
-	REAL*8 FREQ
+	REAL(10) AHYD(NHYD,NHYD)		!No longer used
+	REAL(10) HYD(NHYD,ND)
+	REAL(10) EDGE_HYD(NHYD)		!Ground state value used only.
+	REAL(10) RKI(ND)
+	REAL(10) FREQ
 !
 ! We include the oscillator strength in the file. That way we don't
 ! have to worry about whether the l states are split.
 !
-	REAL*8, SAVE ::  FOSC(20)
+	REAL(10), SAVE ::  FOSC(20)
 	DATA FOSC(2:20)/4.162D-01,7.910D-02,2.899D-02,1.394D-02,7.799D-03,
 	1         4.814D-03,3.183D-03,2.216D-03,1.605D-03,1.201D-03,
 	1         9.214D-04,7.227D-04,5.774D-04,4.686D-04,3.856D-04,
 	1         3.211D-04,2.702D-04,2.296D-04,1.967D-04/
 !
-	REAL*8 EDGE_FREQ
-	REAL*8 T1,T2
-	REAL*8 DELF
+	REAL(10) EDGE_FREQ
+	REAL(10) T1,T2
+	REAL(10) DELF
 	INTEGER I,IRES
 !
 ! Use the results of Gavrila (Phys Rev., 1967, 163, p147) below

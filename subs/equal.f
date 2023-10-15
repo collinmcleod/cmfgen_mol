@@ -15,7 +15,7 @@ C                       overflow.
 C Altered  4-NOV-86 (Bug for X or Y=0 fixed).
 C
 	LOGICAL EQUAL
-	REAL*8 X,Y,Z
+	REAL(10) X,Y,Z
 C
 	EQUAL=.FALSE.
 	IF(X .EQ. 0.0D0 .AND. Y .EQ. 0.0D0)THEN

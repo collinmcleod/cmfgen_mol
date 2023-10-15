@@ -16,36 +16,36 @@
 	INTEGER IREC_ST
 	INTEGER NCF
 	INTEGER NT,ND
-	REAL*8 NU(NCF)
-	REAL*8 ETA(ND)		!Emisivity 
-	REAL*8 CHI(ND)		!Opacity [in (10^10 cm)^-1]
-	REAL*8 POPS(NT,ND)	!Atomic populations
-	REAL*8 T(ND)		!in 10^4 K
-	REAL*8 FREQ		!Current frequency (10^15 Hz)
+	REAL(10) NU(NCF)
+	REAL(10) ETA(ND)		!Emisivity 
+	REAL(10) CHI(ND)		!Opacity [in (10^10 cm)^-1]
+	REAL(10) POPS(NT,ND)	!Atomic populations
+	REAL(10) T(ND)		!in 10^4 K
+	REAL(10) FREQ		!Current frequency (10^15 Hz)
 !
 	CHARACTER(LEN=*) TWO_PHOTON_METHOD
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local vectors and constants.
 !
-	REAL*8 TA(ND)
-	REAL*8 TB(ND)
-	REAL*8 PLANKS_CONSTANT	!cgs units
-	REAL*8 PI
-	REAL*8 CONST
-	REAL*8 ETA_CONST	!Used to evaluate ETA
-	REAL*8 CHI_CONST	!Used to evaluate CHI
-	REAL*8 FREQ_B		!Frequency of other photon
-	REAL*8 T1,T2
+	REAL(10) TA(ND)
+	REAL(10) TB(ND)
+	REAL(10) PLANKS_CONSTANT	!cgs units
+	REAL(10) PI
+	REAL(10) CONST
+	REAL(10) ETA_CONST	!Used to evaluate ETA
+	REAL(10) CHI_CONST	!Used to evaluate CHI
+	REAL(10) FREQ_B		!Frequency of other photon
+	REAL(10) T1,T2
 !
 ! The 2-photon distribution functions, AY, are usually in wrtten in terms
 ! of the variable y=FREQ/MAX_FREQ, and which extends from 0 to 1.
 ! As the distribution, AY, is symmetric about y/2 we have defined the 
 ! variables  U=Y(1-Y) and FU=4*U
 !
-	REAL*8 AY,Y,U,FU
+	REAL(10) AY,Y,U,FU
 !
 	INTEGER LUER,ERROR_LU,GET_TWO_INDX
 	EXTERNAL ERROR_LU,GET_TWO_INDX

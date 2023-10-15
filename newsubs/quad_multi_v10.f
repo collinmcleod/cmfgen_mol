@@ -28,6 +28,7 @@
 	IMPLICIT NONE
 	EXTERNAL SUB_PHOT_GEN
 !
+! Altered 01-Oct-2023 - Bug fix. T2 instead of T3 was being compared to PHOT_DIS_PARAMETER.
 ! Altered 26-Jul-2019 - Added dWCRdT to call. 
 !                          Changes made for electron energy balance addition.
 !                          Incorporated into IBIS -- 17-Aug-2019
@@ -61,32 +62,32 @@
 !
 	INTEGER ID
 	INTEGER N_S,N_F,ND
-	REAL*8 WSE_S(N_S,ND)
-	REAL*8 dWSE_SdT(N_S,ND)
-	REAL*8 WCR(N_S,ND)
-	REAL*8 dWCRdT(N_S,ND)
-	REAL*8 HNST_S(N_S,ND)
-	REAL*8 dlnHNST_S_dlnT(N_S,ND)
+	REAL(10) WSE_S(N_S,ND)
+	REAL(10) dWSE_SdT(N_S,ND)
+	REAL(10) WCR(N_S,ND)
+	REAL(10) dWCRdT(N_S,ND)
+	REAL(10) HNST_S(N_S,ND)
+	REAL(10) dlnHNST_S_dlnT(N_S,ND)
 !
-	REAL*8 HNST_F_ON_S(N_F,ND)
-	REAL*8 EDGE_F(N_F)			!In 10^15 Hz
+	REAL(10) HNST_F_ON_S(N_F,ND)
+	REAL(10) EDGE_F(N_F)			!In 10^15 Hz
 	INTEGER F_TO_S_MAPPING(N_F)
-	REAL*8 T(ND)
+	REAL(10) T(ND)
 !
-	REAL*8 NU_CONT
-	REAL*8 ZION
+	REAL(10) NU_CONT
+	REAL(10) ZION
 	CHARACTER*(*) DESC
 	INTEGER PHOT_ID
 !
-	REAL*8 YDIS(ND)		!Constant for computing level dissolution/
-	REAL*8 XDIS(ND)		!Constant for computing level dissolution/
-	REAL*8 DIS_CONST(N_F)	!Constant appearing in dissolution formula.
-	REAL*8 ALPHA_VEC(N_F)
+	REAL(10) YDIS(ND)		!Constant for computing level dissolution/
+	REAL(10) XDIS(ND)		!Constant for computing level dissolution/
+	REAL(10) DIS_CONST(N_F)	!Constant appearing in dissolution formula.
+	REAL(10) ALPHA_VEC(N_F)
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 OPLIN,EMLIN
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) OPLIN,EMLIN
 !
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
@@ -95,7 +96,7 @@
 ! Local Variables,
 !
 	INTEGER I_S,I_F,J
-	REAL*8 T1,T2,T3,ZION_CUBED,NEFF,FOUR_PI_D_H
+	REAL(10) T1,T2,T3,ZION_CUBED,NEFF,FOUR_PI_D_H
 	LOGICAL DO_ALL
 !
 ! NB: WSE_OLD=WSE*FQW/NU
@@ -184,7 +185,7 @@
 	      DO J=1,ND
 	        T2=7.782D0+XDIS(J)*DIS_CONST(I_F)
 	        T3=T2/(T2+YDIS(J)*DIS_CONST(I_F)*DIS_CONST(I_F))
-	        IF(T2 .GT. PHOT_DIS_PARAMETER)THEN
+	        IF(T3 .GT. PHOT_DIS_PARAMETER)THEN
 	          T3=T1*T3
 	          WSE_S(I_S,J)=WSE_S(I_S,J) + T3*HNST_F_ON_S(I_F,J)
 	          WCR(I_S,J)=WCR(I_S,J) - EDGE_F(I_F)*T3*HNST_F_ON_S(I_F,J)
@@ -213,7 +214,7 @@
 	      DO J=1,ND
 	        T2=7.782D0+XDIS(J)*DIS_CONST(I_F)
 	        T3=T2/(T2+YDIS(J)*DIS_CONST(I_F)*DIS_CONST(I_F))
-	        IF(T2 .GT. PHOT_DIS_PARAMETER)THEN
+	        IF(T3 .GT. PHOT_DIS_PARAMETER)THEN
 	          T3=T1*T3
 	          WSE_S(I_S,J)=WSE_S(I_S,J) + T3*HNST_F_ON_S(I_F,J)
 	          WCR(I_S,J)=WCR(I_S,J) - EDGE_F(I_F)*T3*HNST_F_ON_S(I_F,J)

@@ -12,24 +12,24 @@
 !
 	INTEGER ND
 	INTEGER NT
-	REAL*8 FREQ
-	REAL*8 CONT_FREQ
-	REAL*8 CHI_FF(ND)			!Opacity
-	REAL*8 ETA_FF(ND)			!Emissivity
-	REAL*8 VCHI_FF(NT,ND)			!Opacity
-	REAL*8 VETA_FF(NT,ND)			!Emissivity
+	REAL(10) FREQ
+	REAL(10) CONT_FREQ
+	REAL(10) CHI_FF(ND)			!Opacity
+	REAL(10) ETA_FF(ND)			!Emissivity
+	REAL(10) VCHI_FF(NT,ND)			!Opacity
+	REAL(10) VETA_FF(NT,ND)			!Emissivity
 	LOGICAL DO_VAR
 !
 ! Constants for opacity etc.
 !
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Vectors to save computational effort.
 !
-	REAL*8 EMHNUKT(ND)		!EXP(-hv/kT)
-	REAL*8 GFF_VAL(ND)		!g(ff) as a function of depth
-	REAL*8 POP_SUM(ND)		!Factor to convert HNST for ION_LEV
+	REAL(10) EMHNUKT(ND)		!EXP(-hv/kT)
+	REAL(10) GFF_VAL(ND)		!g(ff) as a function of depth
+	REAL(10) POP_SUM(ND)		!Factor to convert HNST for ION_LEV
 !
 ! Local constants.
 !
@@ -37,11 +37,11 @@
 	INTEGER EQION
 	INTEGER I,K,L
 !
-	REAL*8 T1
-	REAL*8 NU
-	REAL*8 ALPHA,TCHI1,TETA1
-	REAL*8 EMIS
-	REAL*8 HNUONKT
+	REAL(10) T1
+	REAL(10) NU
+	REAL(10) ALPHA,TCHI1,TETA1
+	REAL(10) EMIS
+	REAL(10) HNUONKT
 !
 	NU=FREQ
         T1=-HDKT*NU

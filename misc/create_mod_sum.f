@@ -9,7 +9,7 @@
 !
 ! Altered 06-Sep-2022 : Added Teff and Rcore at inner boudary to the output.
 !
-	REAL*8 T1,T2,T3
+	REAL(10) T1,T2,T3
 	INTEGER K,IOS
 	INTEGER LDIR
 	INTEGER I,J

@@ -27,38 +27,38 @@
 	INTEGER NEW_ND				!Requested number of grid points in new grid.
 	INTEGER ND_MAX				!Maximum number of grid points in grid.
 	INTEGER NUM_OBND_PARAMS
-	REAL*8 REV_TAU_GRID(NEW_ND)
-	REAL*8 OBND_PARS(NUM_OBND_PARAMS)
-	REAL*8 TAU_MAX				!Maximum optical depth for new grid.
-	REAL*8 R_SCL_FAC			!Maxium values for R(I+1)/V(I)
-	REAL*8 V_SCL_FAC			!Maxium values for V(I+1)/V(I)
-	REAL*8 dLOG_TAU				!Maximu value for /\Tau
+	REAL(10) REV_TAU_GRID(NEW_ND)
+	REAL(10) OBND_PARS(NUM_OBND_PARAMS)
+	REAL(10) TAU_MAX				!Maximum optical depth for new grid.
+	REAL(10) R_SCL_FAC			!Maxium values for R(I+1)/V(I)
+	REAL(10) V_SCL_FAC			!Maxium values for V(I+1)/V(I)
+	REAL(10) dLOG_TAU				!Maximu value for /\Tau
 	CHARACTER(LEN=*) OUT_BND_OPT
 !
 ! These describe the old grid.
 !
 	INTEGER ND
-	REAL*8 R(ND)
-	REAL*8 V(ND)
-	REAL*8 TAU(ND)
+	REAL(10) R(ND)
+	REAL(10) V(ND)
+	REAL(10) TAU(ND)
 !
 	INTEGER N_BND_PNTS		!Number of extra points used at boundaries
 	INTEGER NS			!NEW_ND - N_BND_PNTS (initally)
 !
 ! Local arrays.
 !
-	REAL*8 REV_R(ND_MAX)
-	REAL*8 REV_V(ND_MAX)
-	REAL*8 REV_TAU(ND_MAX)
-	REAL*8 OLD_R(ND_MAX)
-	REAL*8 OLD_TAU(ND_MAX)
-	REAL*8 LOG_TAU(ND)
+	REAL(10) REV_R(ND_MAX)
+	REAL(10) REV_V(ND_MAX)
+	REAL(10) REV_TAU(ND_MAX)
+	REAL(10) OLD_R(ND_MAX)
+	REAL(10) OLD_TAU(ND_MAX)
+	REAL(10) LOG_TAU(ND)
 !
 ! Local variables.
 !
-	REAL*8 LOG_TAU_MAX
-	REAL*8 dTAU
-	REAL*8 T1,T2
+	REAL(10) LOG_TAU_MAX
+	REAL(10) dTAU
+	REAL(10) T1,T2
 	INTEGER ND_TMP
 	INTEGER I,J,K,JST
 	INTEGER LUER,ERROR_LU

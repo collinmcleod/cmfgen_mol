@@ -31,7 +31,7 @@
 	SUBROUTINE VAR_JREL_V3(ETA,CHI,ESEC,THETA,V,SIGMA,R,
 	1                  TX,TVX,TX_DIF_d_T,TX_DIF_d_dTdR,
 	1                  TVX_DIF_d_T,TVX_DIF_d_dTdR,KI,WORKMAT,RHS_dHdCHI,
-	1                  INIT,FREQ,dLOG_NU,
+	1                  INIT,FREQ,LOG_NU,
 	1                  INNER_BND_METH,OUTER_BND_METH,IB_STAB_FACTOR,
 	1                  dTdR,DBB,dDBBdT,IC,
 	1	           INCL_ADVEC_TERMS,INCL_REL_TERMS,
@@ -52,29 +52,29 @@
 	INTEGER NM
 	INTEGER NM_KI
 !
-	REAL*8 ETA(ND)
-	REAL*8 CHI(ND)
-	REAL*8 ESEC(ND)
-	REAL*8 THETA(ND)
-	REAL*8 R(ND)
-	REAL*8 V(ND)
-	REAL*8 SIGMA(ND)
+	REAL(10) ETA(ND)
+	REAL(10) CHI(ND)
+	REAL(10) ESEC(ND)
+	REAL(10) THETA(ND)
+	REAL(10) R(ND)
+	REAL(10) V(ND)
+	REAL(10) SIGMA(ND)
 !
 ! Variation arrays and vectors.
 !
-	REAL*8 TX(ND,ND,NM)
-	REAL*8 TVX(ND-1,ND,NM)
-	REAL*8 KI(ND,ND,NM_KI)
-	REAL*8 WORKMAT(ND,ND)
-	REAL*8 RHS_dHdCHI(ND-1,ND)
-	REAL*8 TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
-	REAL*8 TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
+	REAL(10) TX(ND,ND,NM)
+	REAL(10) TVX(ND-1,ND,NM)
+	REAL(10) KI(ND,ND,NM_KI)
+	REAL(10) WORKMAT(ND,ND)
+	REAL(10) RHS_dHdCHI(ND-1,ND)
+	REAL(10) TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
+	REAL(10) TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
 !
 	LOGICAL DO_THIS_TX_MATRIX(NM)
 !
-	REAL*8 IB_STAB_FACTOR
-	REAL*8 dLOG_NU,dTdR,DBB,dDBBdT,IC
-	REAL*8 dIBCHI_A,dIBCHI_B
+	REAL(10) IB_STAB_FACTOR
+	REAL(10) LOG_NU,dTdR,DBB,dDBBdT,IC
+	REAL(10) dIBCHI_A,dIBCHI_B
 	CHARACTER(LEN=*) METHOD
 	CHARACTER(LEN=*) INNER_BND_METH
 	CHARACTER(LEN=*) OUTER_BND_METH
@@ -94,12 +94,12 @@
 !
 ! Local variables.
 !
-	REAL*8 T1
-	REAL*8 DTAU
-	REAL*8 FREQ
-        REAL*8 RSQ_JP,RSQ_HP,RSQ_NP
-        REAL*8 FMIN,FPLUS,HMIN,NMIN
-	REAL*8 RHS_JNU
+	REAL(10) T1
+	REAL(10) DTAU
+	REAL(10) FREQ
+        REAL(10) RSQ_JP,RSQ_HP,RSQ_NP
+        REAL(10) FMIN,FPLUS,HMIN,NMIN
+	REAL(10) RHS_JNU
 !
 	INTEGER LUER,ERROR_LU
         EXTERNAL ERROR_LU
@@ -290,14 +290,14 @@
 !
 	IF(.NOT. INIT)THEN
 !
-! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 
 ! the same as d / d ln v.
 !
 ! EPS is used if we define N in terms of J rather than H, This is sometimes
 ! useful as H can approach zero, and hence N/H is undefined.
 !
 	  DO I=1,ND-1
-	    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))
 	    W(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*NMID_ON_HMID(I))
 	    WPREV(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*NMID_ON_HMID_PREV(I))
 	    EPS_A(I)=DELTAH(I)*(CON_dNdNUH(I)*NMID_ON_J(I)+
@@ -311,9 +311,9 @@
 	  END DO
 !
 	  DO I=2,ND
-	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU
 	  END DO
-	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU
 	END IF
 !
 	DO I=2,ND-1
@@ -412,7 +412,7 @@
 	    XM(ND)=RSQ_HP-FPLUS*RSQ_JP/DTAU-(1.0D0-FPLUS)*RSQ_JP/R(ND)/CHI(ND)
 	    XM(ND-1)=XM(ND-1)-RSQ_JP*TC(ND-1)
 	  ELSE
-            T1=CON_DELTA(ND)/dLOG_NU/CHI(ND)
+            T1=CON_DELTA(ND)/LOG_NU/CHI(ND)
             TA(ND)=-GAM_RSQ(ND-1)*K_ON_J(ND-1)/DTAU
             TB(ND)=GAM_RSQ(ND)*(FMIN/DTAU + (1.0D0-FMIN)/R(ND)/CHI(ND) + HMIN*(1.0D0+T1))
             XM(ND)=RSQ_HP-FPLUS*RSQ_JP/DTAU-(1.0D0-FPLUS)*RSQ_JP/R(ND)/CHI(ND)

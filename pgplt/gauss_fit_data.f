@@ -8,20 +8,20 @@
 	INTEGER NG_PAR_MAX		 	!Maximum total number of parameters in fit
 	INTEGER NG_DATA				!Number of data points
 !
-	REAL*8, ALLOCATABLE :: X_GAUSS(:)	!Absica data as stored in module
-	REAL*8, ALLOCATABLE :: Y_GAUSS(:)	!Data to be fitted
+	REAL(10), ALLOCATABLE :: X_GAUSS(:)	!Absica data as stored in module
+	REAL(10), ALLOCATABLE :: Y_GAUSS(:)	!Data to be fitted
 !
-	REAL*8, ALLOCATABLE :: SIM(:,:)		!Simplex (NG_PAR+1 parameter set estimates)
-	REAL*8, ALLOCATABLE :: PAR(:)		!Single parameter set
-	REAL*8, ALLOCATABLE :: SUM_SQ(:)
-	REAL*8, ALLOCATABLE :: SCALE(:)
-	REAL*8, ALLOCATABLE :: EW_TABLE(:,:)
-	REAL*8, ALLOCATABLE :: LAM_TABLE(:,:)
-	REAL*8, ALLOCATABLE :: EW(:)
-	REAL*8, ALLOCATABLE :: EW_CONT(:)
-	REAL*8, ALLOCATABLE :: EW_ERROR(:)
-	REAL*8, ALLOCATABLE :: ALT_ERROR(:)
-	REAL*8, ALLOCATABLE :: MIN_ERROR(:)
+	REAL(10), ALLOCATABLE :: SIM(:,:)		!Simplex (NG_PAR+1 parameter set estimates)
+	REAL(10), ALLOCATABLE :: PAR(:)		!Single parameter set
+	REAL(10), ALLOCATABLE :: SUM_SQ(:)
+	REAL(10), ALLOCATABLE :: SCALE(:)
+	REAL(10), ALLOCATABLE :: EW_TABLE(:,:)
+	REAL(10), ALLOCATABLE :: LAM_TABLE(:,:)
+	REAL(10), ALLOCATABLE :: EW(:)
+	REAL(10), ALLOCATABLE :: EW_CONT(:)
+	REAL(10), ALLOCATABLE :: EW_ERROR(:)
+	REAL(10), ALLOCATABLE :: ALT_ERROR(:)
+	REAL(10), ALLOCATABLE :: MIN_ERROR(:)
 	INTEGER, ALLOCATABLE :: INDX_VEC(:)
 !
 	REAL*4, ALLOCATABLE :: XFIT(:)		!Same as X_GAUSS but for PGPLOT routines
@@ -43,8 +43,8 @@
 	INTEGER NX
 	REAL*4 XVEC(NX)
 	REAL*4 YVEC(NX)
-	REAL*8 XST,XEND
-	REAL*8 YST,YEND
+	REAL(10) XST,XEND
+	REAL(10) YST,YEND
 !
 	INTEGER I
 	INTEGER IXST,IXEND

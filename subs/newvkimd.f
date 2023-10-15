@@ -30,12 +30,12 @@ C Created 21-Jan-1988 - Based on VKIMD. Program does full linearization
 C                           allowing for the corrections to the trapazoidal rule.
 C
 	INTEGER LS,NC,ND,NI
-	REAL*8 W(NI,NI),DTAU(NI),S(NI),U(NI),Z(NI)
-	REAL*8 R(ND),RKI(ND),DBC
+	REAL(10) W(NI,NI),DTAU(NI),S(NI),U(NI),Z(NI)
+	REAL(10) R(ND),RKI(ND),DBC
 	LOGICAL DIFF
 C
 	INTEGER I,J,K
-	REAL*8 ALPHA,BETA
+	REAL(10) ALPHA,BETA
 C
 	W(:,:)=0.0D0
 C

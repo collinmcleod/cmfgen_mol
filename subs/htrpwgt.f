@@ -14,7 +14,7 @@ C                     accuracy.
 C Created 25-Nov-1986 (Based on KWEIGHT)
 C
 	INTEGER N,I
-	REAL*8 X(N),W(N),T1,T2,SUM
+	REAL(10) X(N),W(N),T1,T2,SUM
 C
 	INTEGER ERROR_LU,LUER
 	LOGICAL, SAVE :: CHECK

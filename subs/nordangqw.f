@@ -11,12 +11,12 @@ C Altered 24-May-1996 - IMPLICIT NONE installed.
 C Created 25-Nov-1986
 C
 	INTEGER NC,ND,NP
-	REAL*8 QW(ND,NP),R(ND),TA(NP),TB(NP),TC(NP),P(NP)
+	REAL(10) QW(ND,NP),R(ND),TA(NP),TB(NP),TC(NP),P(NP)
 C
 C Local variables
 C
 	INTEGER I,J,NW
-	REAL*8 T1
+	REAL(10) T1
 C
 	DO 10 I=1,NP
 	  TA(I)=P(I)*P(I)

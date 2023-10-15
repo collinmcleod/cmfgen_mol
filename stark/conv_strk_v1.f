@@ -19,12 +19,12 @@
 !
 	INTEGER NF
 !
-	REAL*8 PRO(NF)		!Should contain LOG10 of the STARK profile. 
-	REAL*8 PROF_LAM(NF)	!Offset from line center in Angstroms.
+	REAL(10) PRO(NF)		!Should contain LOG10 of the STARK profile. 
+	REAL(10) PROF_LAM(NF)	!Offset from line center in Angstroms.
 !
 	INTEGER NWS
-	REAL*8 STARK(NWS)
-	REAL*8 DWS(NWS)
+	REAL(10) STARK(NWS)
+	REAL(10) DWS(NWS)
 	LOGICAL SYM_STARK
 	LOGICAL TRAP_QUAD
 	LOGICAL NORMALIZE_PROFILE
@@ -39,25 +39,25 @@
 ! profile has NOT already been convolved with a Doppler profile, 
 ! the Doppler contributions should be included.
 !
-	REAL*8 DLAM_THERM		!Thermal velocity
-	REAL*8 DLAM_TURB		!Turbulent velocity
-	REAL*8 WAVE			!Central wavelength of line in Ang.
+	REAL(10) DLAM_THERM		!Thermal velocity
+	REAL(10) DLAM_TURB		!Turbulent velocity
+	REAL(10) WAVE			!Central wavelength of line in Ang.
 !                
 ! Local variables
 !
-	REAL*8 MAX_DWS,MIN_DWS
-	REAL*8 DLAM
-	REAL*8 MAX_INT_LAM
-	REAL*8 MIN_INT_LAM
-	REAL*8 SLOPE_RHS,SLOPE_LHS
-	REAL*8 VAL_RHS,VAL_LHS
-	REAL*8 T1
-	REAL*8 SQRT_PI
-	REAL*8 LAM_VAL
-	REAL*8 STARK_VAL
+	REAL(10) MAX_DWS,MIN_DWS
+	REAL(10) DLAM
+	REAL(10) MAX_INT_LAM
+	REAL(10) MIN_INT_LAM
+	REAL(10) SLOPE_RHS,SLOPE_LHS
+	REAL(10) VAL_RHS,VAL_LHS
+	REAL(10) T1
+	REAL(10) SQRT_PI
+	REAL(10) LAM_VAL
+	REAL(10) STARK_VAL
 !
-	REAL*8, ALLOCATABLE :: DLAM_INT(:)
-	REAL*8, ALLOCATABLE :: STARK_INT(:)
+	REAL(10), ALLOCATABLE :: DLAM_INT(:)
+	REAL(10), ALLOCATABLE :: STARK_INT(:)
 	SAVE DLAM_INT,STARK_INT
 !
 	INTEGER NI,NG
@@ -245,7 +245,7 @@ convolution bandpass extends beyond
 	  WRITE(6,*)'The area under the INTERP profile is',T1
 	  DLAM_INT(1:NI)=2.998D+18/DLAM_INT(1:NI)
 	  DLAM_INT(1:NI)=DLAM_INT(1:NI)-WAVE
-	  STARK_INT(1:NI)=DLOG10(STARK_INT(1:NI))
+	  STARK_INT(1:NI)=LOG10(STARK_INT(1:NI))
 	  CALL DP_CURVE(NI,DLAM_INT,STARK_INT)
 	END IF
 !

@@ -103,7 +103,7 @@ C                         Can now handle very small numbers.
 C
 	INTEGER LENGTH,I,J,POW,NUM_SIG_DIG
 	PARAMETER (NUM_SIG_DIG=7)
-	REAL*8 VAL
+	REAL(10) VAL
 	CHARACTER(LEN=*) FORM
 	CHARACTER(LEN=80) STR
 C

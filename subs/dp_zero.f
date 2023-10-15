@@ -2,7 +2,7 @@
 	IMPLICIT NONE
 !
 	INTEGER ND
-	REAL*8 Z(ND)
+	REAL(10) Z(ND)
 !
 ! Altered 13-Mar-2013 : WORKSHARE installed
 ! Altered 28-May-1996 : F90 updated, IMPLCIT NONE installed.

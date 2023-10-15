@@ -15,8 +15,8 @@
 !
 	INTEGER IOS
 	INTEGER ERROR_LU
-	REAL*8 SPEED_OF_LIGHT
-	REAL*8 FUN_PI
+	REAL(10) SPEED_OF_LIGHT
+	REAL(10) FUN_PI
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
 ! Memory allocation. This should not be a problem, unless no more

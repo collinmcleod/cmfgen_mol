@@ -63,9 +63,9 @@
 	INTEGER FREQ_INDX
 	INTEGER TX_OFFSET
 !
-	REAL*8 POPS(NT,ND)
-	REAL*8 FL				!Current frequency in units of 10^15 Hz
-	REAL*8 CONT_FREQ			!frequency at which opacity was evaluated.
+	REAL(10) POPS(NT,ND)
+	REAL(10) FL				!Current frequency in units of 10^15 Hz
+	REAL(10) CONT_FREQ			!frequency at which opacity was evaluated.
 !
 	CHARACTER(LEN=*) SECTION
 	LOGICAL FIRST_FREQ
@@ -77,21 +77,21 @@
 !
 ! Local variables
 !
-	REAL*8 T1
+	REAL(10) T1
 	INTEGER X_INDX
 	INTEGER I,J,L,K
 	INTEGER NL,NUP
 	INTEGER LOW,UP
 	LOGICAL RAT_TOO_BIG
 	LOGICAL LST_DEPTH_ONLY
-	REAL*8, SAVE :: FL_OLD
+	REAL(10), SAVE :: FL_OLD
 !
 ! Constants for opacity etc. These are set in CMFGEN.
 !
         COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
         COMMON/LINE/ OPLIN,EMLIN
-        REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
-        REAL*8 OPLIN,EMLIN
+        REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+        REAL(10) OPLIN,EMLIN
 !
 ! These two functions compute the start and end indices when updating
 ! VJ. eg. we do not wish to update VJ( ,1, ) if we are using the banded
@@ -315,13 +315,13 @@
 	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR, 
 	1           dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR,FEDD,GEDD,N_ON_J,
 	1           INBC,HBC_CMF(1),HBC_CMF(2),NBC_CMF(1),NBC_CMF(2),
-	1           FIRST_FREQ,L_FALSE,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
+	1           FIRST_FREQ,L_FALSE,LOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
 	1           DO_THIS_TX_MATRIX,METHOD,COHERENT_ES,ND,NM)
            ELSE IF(USE_J_REL)THEN
              CALL VAR_JREL_V5(TA,CHI_CLUMP,CHI_SCAT_CLUMP,ES_COH_VEC,V,SIGMA,R,
 	1                  TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR,
 	1                  dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR,KI,WM,RHS_dHdCHI,
-	1                  FIRST_FREQ,FL,dLOG_NU,
+	1                  FIRST_FREQ,FL,LOG_NU,
 	1                  XM_CHK_OPTION,J_CHK_OPTION,H_CHK_OPTION,
 	1                  INNER_BND_METH,OUTER_BND_METH,IB_STAB_FACTOR,
 	1                  dTdR,DBB,dDBBdT,IC,
@@ -333,7 +333,7 @@
 	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR,
 	1           dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR,
 	1           KI,WM,RHS_dHdCHI,FEDD,
-	1           INCL_DJDT_TERMS,USE_DR4JDT,DJDT_RELAX_PARAM,FIRST_FREQ,FL,dLOG_NU,
+	1           INCL_DJDT_TERMS,USE_DR4JDT,DJDT_RELAX_PARAM,FIRST_FREQ,FL,LOG_NU,
 	1           dTdR,DBB,dDBBdT,DO_THIS_TX_MATRIX,METHOD,
 	1           XM_CHK_OPTION,J_CHK_OPTION,H_CHK_OPTION,
 	1           INNER_BND_METH,OUTER_BND_METH,
@@ -344,7 +344,7 @@
 	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR, 
 	1           dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR, 
 	1           KI,WM,RHS_dHdCHI,
-	1           FIRST_FREQ,dLOG_NU,
+	1           FIRST_FREQ,LOG_NU,
 	1           INNER_BND_METH,dTdR,DBB,dDBBdT,IC,IB_STAB_FACTOR,
 	1           FL,H_CHK_OPTION,OUT_BC_TYPE,DO_THIS_TX_MATRIX,
 	1           METHOD,ND,NM,NM_KI)
@@ -565,7 +565,7 @@
 	1                  dJ_DIF_d_T_EXT,dJ_DIF_d_dTdR_EXT,
 	1                  dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR, 
 	1                  KI,RHS_dHdCHI,
-	1                  FIRST_FREQ,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
+	1                  FIRST_FREQ,LOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
 	1                  DO_THIS_TX_MATRIX,METHOD,COHERENT_ES,NDEXT,NM,NM_KI)
 !
 ! Correcting for clumping this way does it for both the continuum and lines.

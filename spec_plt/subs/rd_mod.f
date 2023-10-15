@@ -9,8 +9,8 @@ C Altered 02-Aug-1995: Bug fix --- OBS_FREQ needed to be zeroed for correct
 C                         input operations.
 C
 	INTEGER NCF,NCF_MAX
-	REAL*8 OBS_FREQ(NCF_MAX)
-	REAL*8 OBS_FLUX(NCF_MAX)
+	REAL(10) OBS_FREQ(NCF_MAX)
+	REAL(10) OBS_FLUX(NCF_MAX)
 	CHARACTER*(*) FILENAME
 C
 	INTEGER IOS

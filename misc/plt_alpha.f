@@ -19,29 +19,29 @@
 	INTEGER, PARAMETER :: T_OUT=6
 !
 	INTEGER, PARAMETER :: NMAX=200
-	REAL*8 R(NMAX,2)
-	REAL*8 V(NMAX,2)
-	REAL*8 E(NMAX,2)
-	REAL*8 VdVdR(NMAX,2)
-	REAL*8 dPdR(NMAX,2)
-	REAL*8 g_tot(NMAX,2)
-	REAL*8 g_rad(NMAX,2)
-	REAL*8 g_elec(NMAX,2)
-	REAL*8 Gamma(NMAX,2)
+	REAL(10) R(NMAX,2)
+	REAL(10) V(NMAX,2)
+	REAL(10) E(NMAX,2)
+	REAL(10) VdVdR(NMAX,2)
+	REAL(10) dPdR(NMAX,2)
+	REAL(10) g_tot(NMAX,2)
+	REAL(10) g_rad(NMAX,2)
+	REAL(10) g_elec(NMAX,2)
+	REAL(10) Gamma(NMAX,2)
 !
-	REAL*8 XV(NMAX)
-	REAL*8 YV(NMAX)
+	REAL(10) XV(NMAX)
+	REAL(10) YV(NMAX)
 !
-	REAL*8 T1
+	REAL(10) T1
 !
 	CHARACTER*132 STRING(500)
 	CHARACTER*132 FMT
 	CHARACTER*132 FILENAME
 !
-	REAL*8 P_VEL(200)
-	REAL*8 P_REQ(200)
-	REAL*8 P_GRAD(200)
-	REAL*8 P_GELEC(200)
+	REAL(10) P_VEL(200)
+	REAL(10) P_REQ(200)
+	REAL(10) P_GRAD(200)
+	REAL(10) P_GELEC(200)
 !
 ! Read in the two HYDRO files constructed by two different models.
 ! These models should be identical, except for a slight difference in VINF.

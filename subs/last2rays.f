@@ -8,7 +8,7 @@ C
 	SUBROUTINE LAST2RAYS(XM,WM,R,Z,P,DTAU,ZETA,THETA,CHI,TOR,NI)
 	IMPLICIT NONE
 C
-C Altered 24-May-1996. - DEXP replaced by EXP
+C Altered 24-May-1996. - EXP replaced by EXP
 C Altered 30-Jan-1989. - Two minor bug fixes:- DTAU and Z are now
 C                        passed to the routine - they are no longer
 C                        computed internally. Thus DTAU is effected
@@ -17,9 +17,9 @@ C                        A [ -THETA(1)*T1 ] term was inadvertantly
 C                        omitted from the WM(1,1) term.
 C
 	INTEGER NI
-	REAL*8 XM(NI),WM(NI,NI),THETA(NI),CHI(NI),P
-	REAL*8 DTAU(NI),R(NI),Z(NI),ZETA(NI)
-	REAL*8 TOR,E1,E2,E3,T1,IBOUND
+	REAL(10) XM(NI),WM(NI,NI),THETA(NI),CHI(NI),P
+	REAL(10) DTAU(NI),R(NI),Z(NI),ZETA(NI)
+	REAL(10) TOR,E1,E2,E3,T1,IBOUND
 C
 C The normal boundary condition of no incident radiation is obtained when
 C TOR is equal to ZERO. IF TOR is not ZERO, the thick boundary condition

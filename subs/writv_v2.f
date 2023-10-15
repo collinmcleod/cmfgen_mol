@@ -11,7 +11,7 @@
 	INTEGER ND
 	INTEGER LU
 	INTEGER NDEC		!Number of decimal digits.
-	REAL*8 F(ND)
+	REAL(10) F(ND)
 	CHARACTER*(*) A
 !
 ! Local variables.

@@ -17,29 +17,29 @@
 !
 ! Atmospheric variables: these are supplied.
 !
-	REAL*8 R(ND)
-	REAL*8 ETA(ND)
-	REAL*8 CHI(ND)
-	REAL*8 ESEC(ND)
-	REAL*8 F(ND)		!F (=J/K) must be supplied.
+	REAL(10) R(ND)
+	REAL(10) ETA(ND)
+	REAL(10) CHI(ND)
+	REAL(10) ESEC(ND)
+	REAL(10) F(ND)		!F (=J/K) must be supplied.
 !
 ! Radiation field variables.These are computed.
 !
-	REAL*8 TX(ND,ND,NM)
-	REAL*8 dJ_DIFF_dT(ND)
-	REAL*8 dJ_DIFF_ddTdR(ND)
+	REAL(10) TX(ND,ND,NM)
+	REAL(10) dJ_DIFF_dT(ND)
+	REAL(10) dJ_DIFF_ddTdR(ND)
 	LOGICAL DO_THIS_MATRIX(NM)
 !
 ! Boundary conditions: required input.
 !
-	REAL*8 HBC_J		!H = HBC_J*J(1) + HBC_J*S(1) 
-	REAL*8 HBC_S
-	REAL*8 IN_HBC		!H = 0.25Ic - hJ -hIc/2 (inner boundary)
+	REAL(10) HBC_J		!H = HBC_J*J(1) + HBC_J*S(1) 
+	REAL(10) HBC_S
+	REAL(10) IN_HBC		!H = 0.25Ic - hJ -hIc/2 (inner boundary)
 !
-	REAL*8 DBB		!|dB/dR| -- for diffusion approximation.
-	REAL*8 dDBBdT
-	REAL*8 dTdR
-	REAL*8 IC		!Intensity at inner boundary (used if DIFF=.FALSE.)
+	REAL(10) DBB		!|dB/dR| -- for diffusion approximation.
+	REAL(10) dDBBdT
+	REAL(10) dTdR
+	REAL(10) IC		!Intensity at inner boundary (used if DIFF=.FALSE.)
 !
 	LOGICAL DIFF		!Use diffusion approximation?
 	LOGICAL COHERENT	!Assume coherent scattering?
@@ -47,18 +47,18 @@
 !
 ! Local vectors.
 !
-	REAL*8 dJ_dDBB(ND)
-	REAL*8 JNU(ND)
+	REAL(10) dJ_dDBB(ND)
+	REAL(10) JNU(ND)
 !
-	REAL*8 TA(ND)
-	REAL*8 DD(ND)
-	REAL*8 TC(ND)
-	REAL*8 DTAU(ND)
-	REAL*8 RHS(ND)
-	REAL*8 dCHIdR(ND)
-	REAL*8 SOURCE(ND)
-	REAL*8 COH_VEC(ND)
-	REAL*8 TOR,E2TOR,EXPN
+	REAL(10) TA(ND)
+	REAL(10) DD(ND)
+	REAL(10) TC(ND)
+	REAL(10) DTAU(ND)
+	REAL(10) RHS(ND)
+	REAL(10) dCHIdR(ND)
+	REAL(10) SOURCE(ND)
+	REAL(10) COH_VEC(ND)
+	REAL(10) TOR,E2TOR,EXPN
 	EXTERNAL EXPN
 !
 	INTEGER, PARAMETER :: IONE=1

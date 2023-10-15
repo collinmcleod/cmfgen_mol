@@ -14,31 +14,31 @@ C                             assumed to vary as a powr law (rather than 1/r^2).
 C                             Based on NEW_R_SCALE_V1.
 C
 	INTEGER ND,NI
-	REAL*8 R_NEW(ND)	!New radius grid
-	REAL*8 R(NI)		!Old radius grid
-	REAL*8 CHI(NI)		!Opacity
-	REAL*8 P		!Impact parameter (scaler)
+	REAL(10) R_NEW(ND)	!New radius grid
+	REAL(10) R(NI)		!Old radius grid
+	REAL(10) CHI(NI)		!Opacity
+	REAL(10) P		!Impact parameter (scaler)
 	LOGICAL RAMP_IN		!Finer spacing at inner boundary?
 	LOGICAL RAMP_OUT	!Finer spacing at outer boundary?
 C
-	REAL*8 Z(NI)
-	REAL*8 TAU(NI)
+	REAL(10) Z(NI)
+	REAL(10) TAU(NI)
 C
-	REAL*8 TAU_NEW(ND)
-	REAL*8 Z_NEW(ND)
+	REAL(10) TAU_NEW(ND)
+	REAL(10) Z_NEW(ND)
 C
 C Variables to compute TAU at outer boundary.
 C
-	REAL*8 ALPHA,DELR
-	REAL*8 R_MAX,R_BIG,R_SMALL
-	REAL*8 Z_BIG,Z_SMALL
-	REAL*8 CHI_BIG,CHI_SMALL
+	REAL(10) ALPHA,DELR
+	REAL(10) R_MAX,R_BIG,R_SMALL
+	REAL(10) Z_BIG,Z_SMALL
+	REAL(10) CHI_BIG,CHI_SMALL
 	INTEGER IEND
 C
 C Variables to compute new TAU scale.
 C
 	INTEGER I,IST,ND_DIV,lU_ER
-	REAL*8 DTAU
+	REAL(10) DTAU
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU

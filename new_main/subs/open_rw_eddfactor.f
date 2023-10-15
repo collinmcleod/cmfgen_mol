@@ -17,15 +17,15 @@
 	LOGICAL USE_FIXED_J
 	CHARACTER(LEN=*) FILENAME
 !
-	REAL*8 R(ND)
-	REAL*8 V(ND)
-	REAL*8 LANG_COORD(ND)
+	REAL(10) R(ND)
+	REAL(10) V(ND)
+	REAL(10) LANG_COORD(ND)
 !
-	REAL*8 R_EXT(ND)
-	REAL*8 V_EXT(ND)
-	REAL*8 LANG_COORD_EXT(ND)
+	REAL(10) R_EXT(ND)
+	REAL(10) V_EXT(ND)
+	REAL(10) LANG_COORD_EXT(ND)
 !
-	REAL*8 T1
+	REAL(10) T1
 !
 ! REC_SIZE     is the (maximum) record length in bytes.
 ! UNIT_SIZE    is the number of bytes per unit that is used to specify
@@ -152,13 +152,13 @@
 	INTEGER ACCESS_F
 	INTEGER LU_EDD
 !
-	REAL*8 R(ND)
-	REAL*8 V(ND)
-	REAL*8 LANG_COORD(ND)
+	REAL(10) R(ND)
+	REAL(10) V(ND)
+	REAL(10) LANG_COORD(ND)
 !
-	REAL*8 R_EXT(ND)
-	REAL*8 V_EXT(ND)
-	REAL*8 LANG_COORD_EXT(ND)
+	REAL(10) R_EXT(ND)
+	REAL(10) V_EXT(ND)
+	REAL(10) LANG_COORD_EXT(ND)
 	CHARACTER(LEN=*) FILENAME
 !
 ! REC_SIZE     is the (maximum) record length in bytes.

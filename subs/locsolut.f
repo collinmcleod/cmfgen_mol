@@ -5,10 +5,10 @@ C
 C Altered 24-May-1996 : DOUBLE PRECISION declaration removed.
 C
 	INTEGER ND,NT,LU
-	REAL*8 STEQ(NT,ND),POPS(NT,ND),TA(ND)
+	REAL(10) STEQ(NT,ND),POPS(NT,ND),TA(ND)
 C
 	INTEGER I,J,K,M,MIN,MAX
-	REAL*8 T1,T2,T3,SCALE
+	REAL(10) T1,T2,T3,SCALE
 C
 C Read in solution matrix (STEQ) , and scaling vector (TA).
 C

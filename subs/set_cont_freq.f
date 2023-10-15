@@ -20,43 +20,43 @@ C Cleaned
 C Created 29-Mar-1990 (Based on GEN_FREQ).
 C
 	INTEGER N,NCF,NCF_MAX,LUOUT,INDX(NCF_MAX)
-	REAL*8 FREQ(NCF_MAX),NEW_FREQ(NCF_MAX)
+	REAL(10) FREQ(NCF_MAX),NEW_FREQ(NCF_MAX)
 C
-	REAL*8 MAX_FREQ		!Maximum continuum frequency
-	REAL*8 MIN_FREQ		!Minimum continuum frequency
-	REAL*8 DNU_MAX		! Twice the maximum frequency spacing near/above
+	REAL(10) MAX_FREQ		!Maximum continuum frequency
+	REAL(10) MIN_FREQ		!Minimum continuum frequency
+	REAL(10) DNU_MAX		! Twice the maximum frequency spacing near/above
 				!  bound-free edge: i.e. dNU < 0.5* DNU_MAX
-	REAL*8 BIG_AMP  	!Amplification. dNU increases by a factor
+	REAL(10) BIG_AMP  	!Amplification. dNU increases by a factor
 				! BIG_AMP as we move away from the b.f. edge.
 				! for frequencies above SWITCH_FREQ.
-   	REAL*8 SMALL_RAT	!Used to define frequency spacing for
+   	REAL(10) SMALL_RAT	!Used to define frequency spacing for
 				! frequencies less than SWITCH_FREQ.
 				! dNU/NU=SMALL_RAT-1
 C
 C Parameters for installing etra frequencies near bound-free edges
 C (low frequency side) to allow for level dissolution.
 C
-	REAL*8 dV_LEV			!Spacing near b-f edge.
-	REAL*8 AMP_DIS			!Amplification factor for dNU as we
+	REAL(10) dV_LEV			!Spacing near b-f edge.
+	REAL(10) AMP_DIS			!Amplification factor for dNU as we
 					!  move to smaller frequencies.
-	REAL*8 MIN_FREQ_LEV_DIS		!Indicates that the extra frequencies
+	REAL(10) MIN_FREQ_LEV_DIS		!Indicates that the extra frequencies
 					! should only be installed for
 					! frequencies above MIN_FREQ_LEV_DIS.
 C
-        REAL*8, PARAMETER :: RZERO=0.0D0
-        REAL*8, PARAMETER :: RHALF=0.5D0
-        REAL*8, PARAMETER :: RONE=1.0D0
-        REAL*8, PARAMETER :: RTWO=2.0D0
+        REAL(10), PARAMETER :: RZERO=0.0D0
+        REAL(10), PARAMETER :: RHALF=0.5D0
+        REAL(10), PARAMETER :: RONE=1.0D0
+        REAL(10), PARAMETER :: RTWO=2.0D0
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
-	REAL*8 T1,dV_NEW,dV
+	REAL(10) T1,dV_NEW,dV
 C
 	INTEGER I,J,K,L,NPTS,K_BEG
 	LOGICAL NUMER,EQUAL
-	REAL*8 FAC,EQUAL_FAC
-	REAL*8 UP,LOW,DELF,DIFF,RAT,SWITCH_FREQ
+	REAL(10) FAC,EQUAL_FAC
+	REAL(10) UP,LOW,DELF,DIFF,RAT,SWITCH_FREQ
 C
 	LUER=ERROR_LU()
 C

@@ -21,7 +21,7 @@ C Altered 23-Apr-1990 - Check that RVAL is inside range given by R included.
 C Created 11-Apr-1990
 C
 	INTEGER NW
-	REAL*8 R(NW),RVAL
+	REAL(10) R(NW),RVAL
 C
 	INTEGER J,ILOW,IHIGH,ILOW_SAV
 	SAVE ILOW_SAV

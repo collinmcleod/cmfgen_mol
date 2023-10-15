@@ -2,7 +2,7 @@
 	IMPLICIT NONE
 C
 	INTEGER ND
-	REAL*8 Z(ND)
+	REAL(10) Z(ND)
 C
 C Altered 28-May-1996 : F90 updated, IMPLCIT NONE installed.
 C

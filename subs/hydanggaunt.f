@@ -11,8 +11,8 @@ C Altered 26-Mar-88 - Extended to n=6 although g(5s,5p,6s,6p) set to 1.
 C
 	SUBROUTINE HYDANGGAUNT
 	COMMON /HYDCROSS/ HYD(0:24,1:18)
-	REAL*8 HYD
-	REAL*8 TMP_HYD(0:24,1:18)
+	REAL(10) HYD
+	REAL(10) TMP_HYD(0:24,1:18)
 C
 C The first 50 elements correspond to 1s and 2s, and are never used
 C hence they are set to Zero.

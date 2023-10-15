@@ -16,12 +16,12 @@
 
 !       physical constants
 
-	real*8, parameter :: c_kms=2.99792458d5            !km/s
-	real*8, parameter :: jimpi=3.141592653589793d0
-	real*8, parameter :: zero=0d0
-	real*8, parameter :: one=1d0
-	real*8, parameter :: two=2d0
-	real*8, parameter :: onehalf=0.5d0
+	REAL(10), parameter :: c_kms=2.99792458d5            !km/s
+	REAL(10), parameter :: jimpi=3.141592653589793d0
+	REAL(10), parameter :: zero=0d0
+	REAL(10), parameter :: one=1d0
+	REAL(10), parameter :: two=2d0
+	REAL(10), parameter :: onehalf=0.5d0
 !
 	integer, parameter :: izero=0
 	integer, parameter :: ione=1
@@ -64,32 +64,32 @@
 !               Rotation option installed.
 !
 	integer Norig
-	real*8 origwave(Norig),origflux(Norig)
-	real*8 wave_max,wave_min
-	real*8 inst_res     	! the instrumental resolution (dlambda)
-	real*8 Resolution   	! resolving power (R = lambda/dlambda)
-	real*8 min_res_kms  	! minimum resolution to work with
-	real*8 num_res      	! num resolution elements to consider beyond
+	REAL(10) origwave(Norig),origflux(Norig)
+	REAL(10) wave_max,wave_min
+	REAL(10) inst_res     	! the instrumental resolution (dlambda)
+	REAL(10) Resolution   	! resolving power (R = lambda/dlambda)
+	REAL(10) min_res_kms  	! minimum resolution to work with
+	REAL(10) num_res      	! num resolution elements to consider beyond
                             	! wavelength range.
-	real*8 vsini		! Projected rotational velocity in km/s
-	real*8 epsilon		! Limb darkenin parameter: 
+	REAL(10) vsini		! Projected rotational velocity in km/s
+	REAL(10) epsilon		! Limb darkenin parameter: 
 	                        !         I/I(o)=1 - epsilon + epsilon mu
 !
-	real*8 origfreq(Norig)
-	real*8, allocatable :: modwave(:)
-	real*8, allocatable :: modflux(:)
-	real*8, allocatable :: tempwave(:)
-	real*8, allocatable :: tempflux(:)
+	REAL(10) origfreq(Norig)
+	REAL(10), allocatable :: modwave(:)
+	REAL(10), allocatable :: modflux(:)
+	REAL(10), allocatable :: tempwave(:)
+	REAL(10), allocatable :: tempflux(:)
 !
 	integer Nmod
 	integer Ntmp
-	real*8 cwave_max,cwave_min
-	real*8 model_res    ! the model resolution
-	real*8 min_dlam     ! the model resolution
-	real*8 kernal_sig   ! the corresponding sigma (fwhm = 2.354sig)
-	real*8 extend       ! wavelength extension to consider
+	REAL(10) cwave_max,cwave_min
+	REAL(10) model_res    ! the model resolution
+	REAL(10) min_dlam     ! the model resolution
+	REAL(10) kernal_sig   ! the corresponding sigma (fwhm = 2.354sig)
+	REAL(10) extend       ! wavelength extension to consider
                             ! in convolution
-	real*8 t1
+	REAL(10) t1
 !
 	integer alter_min ! min and max indices of original array to be
 	integer alter_max ! changed.
@@ -142,7 +142,7 @@
 	if(vsini .ne. 0)then
 	 min_dlam=min_res_kms/c_kms
 	else if(resolution .ne. 0)then
-	 inst_res = dlog((two*resolution+one)/(two*resolution-one))
+	 inst_res = log((two*resolution+one)/(two*resolution-one))
 	 min_dlam=min_res_kms/c_kms
 	else
 	 min_dlam=wave_min*min_res_kms/c_kms
@@ -210,14 +210,14 @@ C
 	implicit none
 
 	integer Nmod
-	real*8 wave(Nmod)
-	real*8 flux(Nmod)
-	real*8 sigma
-	real*8 vsini
-	real*8 epsilon
+	REAL(10) wave(Nmod)
+	REAL(10) flux(Nmod)
+	REAL(10) sigma
+	REAL(10) vsini
+	REAL(10) epsilon
 !
-	real*8 answer(Nmod)
-	real*8 response(Nmod)
+	REAL(10) answer(Nmod)
+	REAL(10) response(Nmod)
 	integer Nresponse,nron2
 	integer i       ! index for convolution array
 	integer j       ! index for response array
@@ -285,16 +285,16 @@ C
 	implicit none
 
 	integer Nmod           ! size of data array
-	real*8 wave(Nmod)        ! wavelength array
-	real*8 response(Nmod)    ! response array
-	real*8 sigma             ! sigma of gaussian 
+	REAL(10) wave(Nmod)        ! wavelength array
+	REAL(10) response(Nmod)    ! response array
+	REAL(10) sigma             ! sigma of gaussian 
 	integer Nresponse      ! size of response array
 	integer wrap           ! fill in wrap-around order?
 !
 	integer, parameter :: num_sigmas=5
 	integer i
-	real*8 lambda,dlam,cutoff,mu
-	real*8 response_area
+	REAL(10) lambda,dlam,cutoff,mu
+	REAL(10) response_area
 
 	dlam = (wave(Nmod)-wave(1))/(Nmod-1)
 	response_area = zero
@@ -357,17 +357,17 @@ C
 	implicit none
 !
 	integer Nmod           ! size of data array
-	real*8 wave(Nmod)     	! wavelength array
-	real*8 response(Nmod) 	! response array
-	real*8 vsini
-	real*8 epsilon
+	REAL(10) wave(Nmod)     	! wavelength array
+	REAL(10) response(Nmod) 	! response array
+	REAL(10) vsini
+	REAL(10) epsilon
 	integer Nresponse      ! size of response array
 	integer wrap           ! fill in wrap-around order?
 
 	integer i
-	real*8 lambda,dlam,cutoff,mu
-	real*8 response_area
-	real*8 t1,dlam_rot,a1,a2
+	REAL(10) lambda,dlam,cutoff,mu
+	REAL(10) response_area
+	REAL(10) t1,dlam_rot,a1,a2
 !
 	dlam = (wave(Nmod)-wave(1))/(Nmod-1)
 	response_area = zero
@@ -448,8 +448,8 @@ C
 
 	implicit none
 
-	real*8 sigma,x,mu
-	real*8 gauss
+	REAL(10) sigma,x,mu
+	REAL(10) gauss
 
 	gauss = exp(-onehalf*(((x-mu)/sigma)**two))/(sigma*sqrt(two*jimPI))
 	return
@@ -484,11 +484,11 @@ C
 !
 	integer n
 	integer nmax
-	real*8 wave(NMAX),flux(NMAX)
-	real*8 dlam 				! even spacing in wavelength
+	REAL(10) wave(NMAX),flux(NMAX)
+	REAL(10) dlam 				! even spacing in wavelength
 !
-	real*8 tempwave(N),tempflux(N)
-	real*8 dlamover2
+	REAL(10) tempwave(N),tempflux(N)
+	REAL(10) dlamover2
 	integer nnew
 	integer i
 !
@@ -527,8 +527,8 @@ C
 	implicit none
 
 	integer*4 n
-	real*8 freq(n)
-	real*8 wave(n)
+	REAL(10) freq(n)
+	REAL(10) wave(n)
 	logical nutolambda ! true=nu->lambda, false=lambda->nu
 
 	integer*4 i
@@ -561,18 +561,18 @@ C
 	implicit none
 
 	integer*4 n
-	real*8 wave(n)
+	REAL(10) wave(n)
 	logical ltolnl  ! if T, lambda->lnlambda, if F, nlambda->lambda.
 
 	integer*4 i
 
 	if (ltolnl) then
 	 do i=1,n
-	  wave(i) = dlog(wave(i))
+	  wave(i) = log(wave(i))
 	 end do
 	else 
 	 do i=1,n
-	  wave(i) = dexp(wave(i))
+	  wave(i) = exp(wave(i))
 	 end do
 	end if 
 
@@ -587,8 +587,8 @@ C subroutine to map array A onto array B using linear interpolation
 	implicit none
 
 	integer*4 AN,BN
-	real*8 Awave(AN),Aflux(AN)
-	real*8 Bwave(BN),Bflux(BN)
+	REAL(10) Awave(AN),Aflux(AN)
+	REAL(10) Bwave(BN),Bflux(BN)
 
 	integer*4 i,j
 
@@ -622,15 +622,15 @@ C the considered point.
 	implicit none
 
 	integer*4 AN,BN
-	real*8 Awave(AN),Aflux(AN)
-	real*8 Bwave(BN),Bflux(BN)
-	real*8 dlam,dlamover2
+	REAL(10) Awave(AN),Aflux(AN)
+	REAL(10) Bwave(BN),Bflux(BN)
+	REAL(10) dlam,dlamover2
 
 	integer*4 i,j,i_min,i_max
 
-	real*8 fluxsum
-	real*8 dlamsum
-	real*8 t1
+	REAL(10) fluxsum
+	REAL(10) dlamsum
+	REAL(10) t1
 
 	dlamover2=dlam/two
 	i = 1
@@ -696,7 +696,7 @@ C or equal to the supplied number
 	implicit none
 
 	integer*4 larger_index,n
-	real*8 list(n),value
+	REAL(10) list(n),value
 
 	integer*4 i
 
@@ -722,7 +722,7 @@ C equal to the supplied number
 	implicit none
 
 	integer*4 smaller_index,n
-	real*8 list(n),value
+	REAL(10) list(n),value
 
 	integer*4 i
 

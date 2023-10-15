@@ -54,34 +54,36 @@
 	INTEGER PHOT_ID		!Photoionization ID
 	INTEGER ION_LEV		!Final (destination) level in ion.
 !
-	REAL*8 PR(NLEV,ND),RR(NLEV,ND),BFCR(NLEV,ND),FF(ND)
-	REAL*8 HN(NLEV,ND),HNST(NLEV,ND),WSE(NLEV,ND),WCR(NLEV,ND)
-	REAL*8 DI(N_DI,ND),LOG_DIST(N_DI,ND)
+	REAL(10) PR(NLEV,ND),RR(NLEV,ND),BFCR(NLEV,ND),FF(ND)
+	REAL(10) HN(NLEV,ND),HNST(NLEV,ND),WSE(NLEV,ND),WCR(NLEV,ND)
+	REAL(10) DI(N_DI,ND),LOG_DIST(N_DI,ND)
 !
-	REAL*8 ED(ND),T(ND)
-	REAL*8 JREC(ND)
-	REAL*8 JPHOT(ND)
-	REAL*8 JREC_CR(ND)
-	REAL*8 JPHOT_CR(ND)
-	REAL*8 BPHOT_CR(ND)
-	REAL*8 NU
-	REAL*8 NU_CONT
+	REAL(10) ED(ND),T(ND)
+	REAL(10) JREC(ND)
+	REAL(10) JPHOT(ND)
+	REAL(10) JREC_CR(ND)
+	REAL(10) JPHOT_CR(ND)
+	REAL(10) BPHOT_CR(ND)
+	REAL(10) NU
+	REAL(10) NU_CONT
 !
 	LOGICAL INIT_ARRAYS	        !Used to signify initialization
 !
 	INTEGER I,J
-	REAL*8 POP_SUM,T2,A1,TMP_HNST
-	REAL*8 JB_RAT, JC_RAT
-	REAL*8 H,ZHYD,CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) POP_SUM,T2,A1,TMP_HNST
+	REAL(10) JB_RAT, JC_RAT
+	REAL(10) H,ZHYD,CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Dynamic memory allocation for free-free gaunt factor as a function of depth.
 !
-	REAL*8 GFF_VAL(ND)
+	REAL(10) GFF_VAL(ND)
+	REAL(10) PLANCKS_CONSTANT
+	EXTERNAL PLANCKS_CONSTANT
 !
 ! 4PI*1.0E-10 (R scaling) Note that ordering is important or get underflow.
 ! FQW is approximately 10^15.
 !
-	H=6.6261965D-12					!ergs/s (*1.0E+15 due to *nu)
+	H=PLANCKS_CONSTANT()*1.0D+15   		!ergs/s (*1.0E+15 due to *nu)
 !
 ! If ML=1 and and PHOT_ID .EQ. 1 then initialize all arrays. This routine
 ! should be called first for ionizations to the ground state.
@@ -124,6 +126,8 @@
 	    END IF
 	  END DO
 	END DO
+!	WRITE(186,'(I5,2X,I3,2X,F5.1,3X,ES16.8,7ES16.6E3)')NLEV,PHOT_ID,ZHYD,NU,WSE(1:2,5),WCR(1:2,5),RR(1:2,5),JREC(5)
+!	WRITE(184,'(I5,2X,I3,2X,F5.1,3X,ES16.8,7ES16.6E3)')NLEV,PHOT_ID,ZHYD,NU,BFCR(1:5,5),SUM(BFCR(:,5)),JREC(5)
 !
 ! Compute Free-Free cooling.
 !

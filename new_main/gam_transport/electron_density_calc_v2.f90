@@ -4,7 +4,7 @@
 	IMPLICIT NONE
 !
 	INTEGER :: ND
-	REAL*8 :: ED_TOT(ND)
+	REAL(10) :: ED_TOT(ND)
 !
 	INTEGER :: ISPEC
 !

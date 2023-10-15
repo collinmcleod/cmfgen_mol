@@ -17,12 +17,12 @@
 ! has been chosen to sample all lines and continuum edges adequately.
 !
 	INTEGER NCF
-	REAL*8 NU(NCF)
+	REAL(10) NU(NCF)
 !
 ! For each frequncy NU(I), the continuum cross-section will be evaluated at
 ! freqency NU_EVAL(I).
 !
-	REAL*8 NU_EVAL(NCF)
+	REAL(10) NU_EVAL(NCF)
 !
 ! NCF_CONT represents the number of continuum frequencies before line 
 ! insertion. NU_CONT contains these frequencies, and has been chosen to 
@@ -30,25 +30,25 @@
 ! important bound-free edges) adequately. 
 !
 	INTEGER NCF_CONT
-	REAL*8 NU_CONT(NCF_CONT)
+	REAL(10) NU_CONT(NCF_CONT)
 !
-	REAL*8 DOPV		!Doppler spacing across lines
+	REAL(10) DOPV		!Doppler spacing across lines
 !
 ! DELV_CONT is the maximum sparation between points at which the continuum
 !   opacity is evaluated.
 !
-	REAL*8 DELV_CONT
+	REAL(10) DELV_CONT
 !
 	LOGICAL COMPUTE_ALL_CROSS
 !
-	REAL*8 SPEED_OF_LIGHT
+	REAL(10) SPEED_OF_LIGHT
 	INTEGER ERROR_LU
 	EXTERNAL SPEED_OF_LIGHT,ERROR_LU
 !
 ! Local variables:
 !
 	INTEGER LU_OUT,L,K,ML,ML_ST,ML_END,LST_COMP
-	REAL*8 T1,T2,T3,T4,DOP_RAT,VRAT,C_KMS
+	REAL(10) T1,T2,T3,T4,DOP_RAT,VRAT,C_KMS
 !
 	LU_OUT=ERROR_LU()
 	IF(COMPUTE_ALL_CROSS .OR. DELV_CONT .EQ. 0)THEN

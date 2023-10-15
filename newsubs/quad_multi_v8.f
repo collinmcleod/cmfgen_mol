@@ -52,31 +52,31 @@
 !
 	INTEGER ID
 	INTEGER N_S,N_F,ND
-	REAL*8 WSE_S(N_S,ND)
-	REAL*8 dWSE_SdT(N_S,ND)
-	REAL*8 WSE_CR_S(N_S,ND)
-	REAL*8 HNST_S(N_S,ND)
-	REAL*8 dlnHNST_S_dlnT(N_S,ND)
+	REAL(10) WSE_S(N_S,ND)
+	REAL(10) dWSE_SdT(N_S,ND)
+	REAL(10) WSE_CR_S(N_S,ND)
+	REAL(10) HNST_S(N_S,ND)
+	REAL(10) dlnHNST_S_dlnT(N_S,ND)
 !
-	REAL*8 HNST_F_ON_S(N_F,ND)
-	REAL*8 EDGE_F(N_F)			!In 10^15 Hz
+	REAL(10) HNST_F_ON_S(N_F,ND)
+	REAL(10) EDGE_F(N_F)			!In 10^15 Hz
 	INTEGER F_TO_S_MAPPING(N_F)
-	REAL*8 T(ND)
+	REAL(10) T(ND)
 !
-	REAL*8 NU_CONT
-	REAL*8 ZION
+	REAL(10) NU_CONT
+	REAL(10) ZION
 	CHARACTER*(*) DESC
 	INTEGER PHOT_ID
 !
-	REAL*8 YDIS(ND)		!Constant for computing level dissolution/
-	REAL*8 XDIS(ND)		!Constant for computing level dissolution/
-	REAL*8 DIS_CONST(N_F)	!Constant appearing in dissolution formula.
-	REAL*8 ALPHA_VEC(N_F)
+	REAL(10) YDIS(ND)		!Constant for computing level dissolution/
+	REAL(10) XDIS(ND)		!Constant for computing level dissolution/
+	REAL(10) DIS_CONST(N_F)	!Constant appearing in dissolution formula.
+	REAL(10) ALPHA_VEC(N_F)
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 OPLIN,EMLIN
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) OPLIN,EMLIN
 !
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
@@ -84,7 +84,7 @@
 ! Local Variables,
 !
 	INTEGER I_S,I_F,J
-	REAL*8 T1,T2,T3,ZION_CUBED,NEFF,FOUR_PI_D_H
+	REAL(10) T1,T2,T3,ZION_CUBED,NEFF,FOUR_PI_D_H
 !
 ! NB: WSE_OLD=WSE*FQW/NU
 !     dWSEdT_OLD=dWSEdT*FQW/NU

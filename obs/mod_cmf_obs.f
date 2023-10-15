@@ -32,16 +32,16 @@
 !
 	INTEGER NUM_IONS
 !
-	REAL*8 AT_MASS(NUM_SPECIES)		!Atomic mass in amu
-	REAL*8 AT_NO(NUM_SPECIES)		!Atomic number of species
-	REAL*8 AT_ABUND(NUM_SPECIES)		!Fractional species abundance
-	REAL*8 ABUND_SCALE_FAC(NUM_SPECIES)	!To scale species abundance
-	REAL*8 SOL_MASS_FRAC(NUM_SPECIES)	!Solar mass fraction
-	REAL*8 SOL_ABUND_HSCL(NUM_SPECIES)	!Solar abundance with H=12.0
+	REAL(10) AT_MASS(NUM_SPECIES)		!Atomic mass in amu
+	REAL(10) AT_NO(NUM_SPECIES)		!Atomic number of species
+	REAL(10) AT_ABUND(NUM_SPECIES)		!Fractional species abundance
+	REAL(10) ABUND_SCALE_FAC(NUM_SPECIES)	!To scale species abundance
+	REAL(10) SOL_MASS_FRAC(NUM_SPECIES)	!Solar mass fraction
+	REAL(10) SOL_ABUND_HSCL(NUM_SPECIES)	!Solar abundance with H=12.0
 !
 ! Total population density of each species (#/cm^3).
 !
-	REAL*8, ALLOCATABLE :: POP_SPECIES(:,:)
+	REAL(10), ALLOCATABLE :: POP_SPECIES(:,:)
 !
 ! Conservation equation for each species.
 !
@@ -81,27 +81,27 @@
 !
 	TYPE MODEL_ATOM_DATA
 !
-	  REAL*8, ALLOCATABLE :: XzV_F(:,:)		!Level populations in FULL atom
-	  REAL*8, ALLOCATABLE :: XzVLTE_F(:,:)		!LTE level populations in FULL atom
-	  REAL*8, ALLOCATABLE :: LOG_XzVLTE_F(:,:)      !Log(LTE level populations in FULL atom)
-	  REAL*8, ALLOCATABLE :: XzVLTE_F_ON_S(:,:)     !Log(LTE level populations in FULL atom
-	  REAL*8, ALLOCATABLE :: W_XzV_F(:,:)		!Level dissolution factors
-	  REAL*8, ALLOCATABLE :: DXzV_F(:)		!Ion population for full atom
-	  REAL*8, ALLOCATABLE :: AXzV_F(:,:)		!Oscillator strength (A(I,j), i<j)
-	  REAL*8, ALLOCATABLE :: EDGEXzV_F(:)		!Ionization energy to g.s. (10^15 Hz)
-	  REAL*8, ALLOCATABLE :: GXzV_F(:)		!Level statistical weights in full atom
-	  REAL*8, ALLOCATABLE :: ARAD(:)		!Inverse radiative lifetime of level
-	  REAL*8, ALLOCATABLE :: C4(:)  		!Collisional profile parameter.
-	  REAL*8, ALLOCATABLE :: C6(:)	 		!Collisional profile parameter.
+	  REAL(10), ALLOCATABLE :: XzV_F(:,:)		!Level populations in FULL atom
+	  REAL(10), ALLOCATABLE :: XzVLTE_F(:,:)		!LTE level populations in FULL atom
+	  REAL(10), ALLOCATABLE :: LOG_XzVLTE_F(:,:)      !Log(LTE level populations in FULL atom)
+	  REAL(10), ALLOCATABLE :: XzVLTE_F_ON_S(:,:)     !Log(LTE level populations in FULL atom
+	  REAL(10), ALLOCATABLE :: W_XzV_F(:,:)		!Level dissolution factors
+	  REAL(10), ALLOCATABLE :: DXzV_F(:)		!Ion population for full atom
+	  REAL(10), ALLOCATABLE :: AXzV_F(:,:)		!Oscillator strength (A(I,j), i<j)
+	  REAL(10), ALLOCATABLE :: EDGEXzV_F(:)		!Ionization energy to g.s. (10^15 Hz)
+	  REAL(10), ALLOCATABLE :: GXzV_F(:)		!Level statistical weights in full atom
+	  REAL(10), ALLOCATABLE :: ARAD(:)		!Inverse radiative lifetime of level
+	  REAL(10), ALLOCATABLE :: C4(:)  		!Collisional profile parameter.
+	  REAL(10), ALLOCATABLE :: C6(:)	 		!Collisional profile parameter.
 !
-	  REAL*8, ALLOCATABLE :: DXzV(:)		!Ion population for super level
-	  REAL*8, ALLOCATABLE :: XzV(:,:)		!Level population in SL atom
-	  REAL*8, ALLOCATABLE :: XzVLTE(:,:)		!LTE populations in SL atom
-	  REAL*8, ALLOCATABLE :: LOG_XzVLTE(:,:)        !LOG(LTE populations in SL at
-	  REAL*8, ALLOCATABLE :: dlnXzVLTE_dlnT(:,:)
+	  REAL(10), ALLOCATABLE :: DXzV(:)		!Ion population for super level
+	  REAL(10), ALLOCATABLE :: XzV(:,:)		!Level population in SL atom
+	  REAL(10), ALLOCATABLE :: XzVLTE(:,:)		!LTE populations in SL atom
+	  REAL(10), ALLOCATABLE :: LOG_XzVLTE(:,:)        !LOG(LTE populations in SL at
+	  REAL(10), ALLOCATABLE :: dlnXzVLTE_dlnT(:,:)
 !
-	  REAL*8 ZXzV			!Charge on ion (=1 for HI)
-	  REAL*8 GIONXzV_F		!Statistical weight of ion
+	  REAL(10) ZXzV			!Charge on ion (=1 for HI)
+	  REAL(10) GIONXzV_F		!Statistical weight of ion
 !
 ! Identifications corresponding to each photoionization route.
 !
@@ -138,26 +138,26 @@
 !
 	INTEGER EQNE		!Electron conservation equation
 !
-	REAL*8, ALLOCATABLE :: R(:)		!Radius in units of 10^10 cm
-	REAL*8, ALLOCATABLE :: V(:)		!V in units of km/s
-	REAL*8, ALLOCATABLE :: SIGMA(:)		!dlnV/dlnR-1
-	REAL*8, ALLOCATABLE :: T(:)		!Temperature in units of 10^4 K
-	REAL*8, ALLOCATABLE :: ED(:)		!Electron density (#/cm^3)
-	REAL*8, ALLOCATABLE :: LANG_COORD(:)	!Langrangian coordinate
+	REAL(10), ALLOCATABLE :: R(:)		!Radius in units of 10^10 cm
+	REAL(10), ALLOCATABLE :: V(:)		!V in units of km/s
+	REAL(10), ALLOCATABLE :: SIGMA(:)		!dlnV/dlnR-1
+	REAL(10), ALLOCATABLE :: T(:)		!Temperature in units of 10^4 K
+	REAL(10), ALLOCATABLE :: ED(:)		!Electron density (#/cm^3)
+	REAL(10), ALLOCATABLE :: LANG_COORD(:)	!Langrangian coordinate
 !
-	REAL*8, ALLOCATABLE :: ROSS_MEAN(:)	!Rosseland mean opacity.
-	REAL*8, ALLOCATABLE :: FLUX_MEAN(:)	!Flux mean opacity
-	REAL*8, ALLOCATABLE :: PLANCK_MEAN(:)	!Flux mean opacity
-	REAL*8, ALLOCATABLE :: POP_ATOM(:)	!Total atom density (#/cm^3)
-	REAL*8, ALLOCATABLE :: DENSITY(:)	!Mass density (gm/cm^3)
-	REAL*8, ALLOCATABLE :: CLUMP_FAC(:)	!Volume filling factor for clumps
-	REAL*8, ALLOCATABLE :: POPION(:)	!Ion density
-	REAL*8, ALLOCATABLE :: CMFGEN_TGREY(:)	!Computed by CMFGEN (named consistently with DISPGEN)
-	REAL*8, ALLOCATABLE :: dE_RAD_DECAY(:)	!Computed by CMFGEN
+	REAL(10), ALLOCATABLE :: ROSS_MEAN(:)	!Rosseland mean opacity.
+	REAL(10), ALLOCATABLE :: FLUX_MEAN(:)	!Flux mean opacity
+	REAL(10), ALLOCATABLE :: PLANCK_MEAN(:)	!Flux mean opacity
+	REAL(10), ALLOCATABLE :: POP_ATOM(:)	!Total atom density (#/cm^3)
+	REAL(10), ALLOCATABLE :: DENSITY(:)	!Mass density (gm/cm^3)
+	REAL(10), ALLOCATABLE :: CLUMP_FAC(:)	!Volume filling factor for clumps
+	REAL(10), ALLOCATABLE :: POPION(:)	!Ion density
+	REAL(10), ALLOCATABLE :: CMFGEN_TGREY(:)	!Computed by CMFGEN (named consistently with DISPGEN)
+	REAL(10), ALLOCATABLE :: dE_RAD_DECAY(:)	!Computed by CMFGEN
 !
-	REAL*8 STARS_MASS			!In Msun
-	REAL*8 STARS_LUM			!In Lsun
-	REAL*8 PRESSURE_VTURB			!In km/s
+	REAL(10) STARS_MASS			!In Msun
+	REAL(10) STARS_LUM			!In Lsun
+	REAL(10) PRESSURE_VTURB			!In km/s
 !
 	TYPE (MODEL_ATOM_DATA) ATM(NUM_SPECIES*MAX_IONS_PER_SPECIES)
 !

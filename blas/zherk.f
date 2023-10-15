@@ -2,7 +2,7 @@
 *     .. Scalar Arguments ..
       CHARACTER          TRANS, UPLO
       INTEGER            K, LDA, LDC, N
-      DOUBLE PRECISION   ALPHA, BETA
+      REAL(10)   ALPHA, BETA
 *     ..
 *     .. Array Arguments ..
       COMPLEX*16         A( LDA, * ), C( LDC, * )
@@ -61,7 +61,7 @@
 *           matrix A.  K must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - DOUBLE PRECISION            .
+*  ALPHA  - REAL(10)            .
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
@@ -80,7 +80,7 @@
 *           be at least  max( 1, k ).
 *           Unchanged on exit.
 *
-*  BETA   - DOUBLE PRECISION.
+*  BETA   - REAL(10).
 *           On entry, BETA specifies the scalar beta.
 *           Unchanged on exit.
 *
@@ -133,11 +133,11 @@
 *     .. Local Scalars ..
       LOGICAL            UPPER
       INTEGER            I, INFO, J, L, NROWA
-      DOUBLE PRECISION   RTEMP
+      REAL(10)   RTEMP
       COMPLEX*16         TEMP
 *     ..
 *     .. Parameters ..
-      DOUBLE PRECISION   ONE, ZERO
+      REAL(10)   ONE, ZERO
       PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Executable Statements ..

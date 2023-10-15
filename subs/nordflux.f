@@ -8,7 +8,7 @@ C
 C
 C Altered 28-Oct-1996 - COS converted back to ACOS in TOR expression.
 C Altered 24-May-1996 - Call to DP_ZERO removed.
-C                       DEXP etc replaced by GENRIC calls.
+C                       EXP etc replaced by GENRIC calls.
 C                       IONE used in call to THOMAS
 C
 C Altered 07-Jan-1991 - Computation of TA,TB,TC split into two loops
@@ -19,16 +19,16 @@ C Altered 10-Feb-1987 - NI=2 is now handled correctly. Dont have to
 C                       consider the case NI=1 since the flux is zero.
 C
 	INTEGER NC,ND,NP
-	REAL*8 TA(ND),TB(ND),TC(ND),XM(ND),DTAU(ND),dCHIdr(ND)
-	REAL*8 R(ND),Z(ND),P(NP),SOURCE(ND),CHI(ND),SOB(ND)
-	REAL*8 HAQW(ND,NP),S1,DBB,IC
+	REAL(10) TA(ND),TB(ND),TC(ND),XM(ND),DTAU(ND),dCHIdr(ND)
+	REAL(10) R(ND),Z(ND),P(NP),SOURCE(ND),CHI(ND),SOB(ND)
+	REAL(10) HAQW(ND,NP),S1,DBB,IC
 	LOGICAL THICK,DIF
 	CHARACTER*6 METHOD
 C
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER  LS,I,NI
-	REAL*8 IBOUND,TOR,DBC
-	REAL*8 E1,E2,E3,PP
+	REAL(10) IBOUND,TOR,DBC
+	REAL(10) E1,E2,E3,PP
 C
 C Compute dCHIdr
 C

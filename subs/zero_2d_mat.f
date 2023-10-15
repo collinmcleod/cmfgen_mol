@@ -7,7 +7,7 @@
 ! Created 28-Oct-2102
 !
 	INTEGER N,M
-	REAL*8 A(N,M)
+	REAL(10) A(N,M)
 	INTEGER I,J
 !
 !$OMP PARALLEL DO

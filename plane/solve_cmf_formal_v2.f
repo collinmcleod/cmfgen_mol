@@ -43,16 +43,16 @@
 !
 ! Opacity and emissivity variables
 !
-      real*8, dimension(nd) :: chi,eta
+      REAL(10), dimension(nd) :: chi,eta
 !
 ! Frequency variable
 !
-      real*8 :: freq
-      real*8 :: nu_dnu
+      REAL(10) :: freq
+      REAL(10) :: nu_dnu
 !
 ! Boundary conditions
 !
-      real*8 :: B_nue,dBdtau
+      REAL(10) :: B_nue,dBdtau
 !
       character(len=*) :: INNER_BND_METH
 !
@@ -61,13 +61,13 @@
       LOGICAL, PARAMETER :: L_TRUE=.TRUE.
       LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
-      real*8 ibound
-      real*8 ee,e0,e1,e2,alpha,beta,gamma,t1
-      real*8, dimension(nd) :: chi_tau
-      real*8, dimension(nd) :: source_prime
-      real*8, dimension(nd) :: tau_loc
-      real*8, dimension(nd) :: dtau_loc
-      real*8 new_freq
+      REAL(10) ibound
+      REAL(10) ee,e0,e1,e2,alpha,beta,gamma,t1
+      REAL(10), dimension(nd) :: chi_tau
+      REAL(10), dimension(nd) :: source_prime
+      REAL(10), dimension(nd) :: tau_loc
+      REAL(10), dimension(nd) :: dtau_loc
+      REAL(10) new_freq
 !
       integer ist,iend,imid
       integer k

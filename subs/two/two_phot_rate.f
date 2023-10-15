@@ -10,26 +10,26 @@
 ! Created 26-Jun-1998
 !
 	INTEGER*4 NT,ND
-	REAL*8 T(ND)
-	REAL*8 RJ(ND)
+	REAL(10) T(ND)
+	REAL(10) RJ(ND)
 !
-	REAL*8 FREQ		!In units of 10^15Hz
-	REAL*8 FQW		!In Hz
+	REAL(10) FREQ		!In units of 10^15Hz
+	REAL(10) FQW		!In Hz
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local constants.
 !
-	REAL*8 DOWN_CONST
-	REAL*8 UP_CONST
-	REAL*8 T1
-	REAL*8 ALPHA_A		!2 h v^3 / c^2
-	REAL*8 FREQ_B		!Frequency of other photon
+	REAL(10) DOWN_CONST
+	REAL(10) UP_CONST
+	REAL(10) T1
+	REAL(10) ALPHA_A		!2 h v^3 / c^2
+	REAL(10) FREQ_B		!Frequency of other photon
 !
 ! See TWO_PHOT_OPAC for definitions of AY,Y, U, and FU.
 !
-	REAL*8 AY,Y,U,FU
+	REAL(10) AY,Y,U,FU
 !
 	INTEGER*4 LUER,ERROR_LU
 	EXTERNAL ERROR_LU

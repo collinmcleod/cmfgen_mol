@@ -15,6 +15,7 @@ C
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 C
+C Altered 12-Oct-2023 - Occupation prob set to 1 if >  0.99999999D0.
 C Altered 08-Sep-2015 - Limit NEFF to be less than 31. All levels we include
 C                         have n< 30. If neff> 30, mut have different core.
 C                         Temporary fix -- we need to provide core information.
@@ -26,14 +27,14 @@ C Altered 27-Aug-1995 - K was declared integer instead of REAL
 C Created 23-May-1995
 C
 	INTEGER NC2,ND
-	REAL*8 W_C2(NC2,ND)		!Occupation probability
-	REAL*8 EDGE_C2(NC2)		!Ionization frequency (10^15 Hz)
-	REAL*8 ZC2			!Charge in ion
+	REAL(10) W_C2(NC2,ND)		!Occupation probability
+	REAL(10) EDGE_C2(NC2)		!Ionization frequency (10^15 Hz)
+	REAL(10) ZC2			!Charge in ion
 C
 C Local variables.
 C
 	INTEGER I,LEV
-	REAL*8 NEFF,F,Y,BETA,REAL_K,T1
+	REAL(10) NEFF,F,Y,BETA,REAL_K,T1
 C
 	IF(MOD_DO_LEV_DIS)THEN
 	  DO LEV=1,NC2
@@ -53,6 +54,7 @@ C
 	        BETA=REAL_K*B_LEV_DIS(I)
 	        F=Y*BETA*BETA/(7.782D0+X_LEV_DIS(I)*BETA)
 	        W_C2(LEV,I)=F/(1.0D0+F)
+	        IF(W_C2(LEV,I) .GT. 0.99999999D0)W_C2(LEV,I)=1.0D0
 	      END DO
 	    END IF
 	  END DO

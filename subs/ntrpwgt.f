@@ -18,9 +18,9 @@ C                       ERROR_LU inserted.
 C Created 26-Apr-1989 - Based on HWEIGHT
 C
 	INTEGER N
-	REAL*8 X(N),W(N)
+	REAL(10) X(N),W(N)
 C
-	REAL*8 T1,T2,SUM
+	REAL(10) T1,T2,SUM
 	INTEGER I
 	LOGICAL, SAVE :: CHECK=.TRUE.
 	INTEGER ERROR_LU,LUER

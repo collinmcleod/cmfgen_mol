@@ -44,87 +44,87 @@
 	INTEGER NP
 	INTEGER NT
 !
-	REAL*8 RJ(ND)			!Mean intensity (computed and returned)
-	REAL*8 RSQ_HFLUX(ND)            !r^2 . Flux
-	REAL*8 R(ND)			!Radius grid (in units of 10^10 cm)
-	REAL*8 CLUMP_FAC(ND)		!Clumping factor
-	REAL*8 CHI_PLANCK(ND)
-	REAL*8 CHI(ND)			!Opacity
-	REAL*8 VEL(ND)			!Velocity (in km/s)
-	REAL*8 SIGMA(ND)		!dlnV/dlnr-1
-	REAL*8 POPS(NT,ND)
+	REAL(10) RJ(ND)			!Mean intensity (computed and returned)
+	REAL(10) RSQ_HFLUX(ND)            !r^2 . Flux
+	REAL(10) R(ND)			!Radius grid (in units of 10^10 cm)
+	REAL(10) CLUMP_FAC(ND)		!Clumping factor
+	REAL(10) CHI_PLANCK(ND)
+	REAL(10) CHI(ND)			!Opacity
+	REAL(10) VEL(ND)			!Velocity (in km/s)
+	REAL(10) SIGMA(ND)		!dlnV/dlnr-1
+	REAL(10) POPS(NT,ND)
 !
-	REAL*8 P(NP)			!Impact parameters
-	REAL*8 JQW(ND,NP)		!Quadrature weight for J (on grid)
-	REAL*8 KQW(ND,NP) 		!Quadrature weight for K (on grid)
-	REAL*8 HQW(ND,NP)		!Quadrature weight for H (at midpoints)
+	REAL(10) P(NP)			!Impact parameters
+	REAL(10) JQW(ND,NP)		!Quadrature weight for J (on grid)
+	REAL(10) KQW(ND,NP) 		!Quadrature weight for K (on grid)
+	REAL(10) HQW(ND,NP)		!Quadrature weight for H (at midpoints)
 !
-	REAL*8 LUMINOSITY               !Luminosity at inner boundary in Lsun.
-	REAL*8 IC                       !Not used
-	REAL*8 ACCURACY			!Convergence accuracy for computing f.
-	REAL*8 TIME_SEQ_NO              !Does not need to be an integer
+	REAL(10) LUMINOSITY               !Luminosity at inner boundary in Lsun.
+	REAL(10) IC                       !Not used
+	REAL(10) ACCURACY			!Convergence accuracy for computing f.
+	REAL(10) TIME_SEQ_NO              !Does not need to be an integer
 	LOGICAL COMPUTED		!Indicates whether grey solution was successfully computed
 	LOGICAL DIFF_APPROX		!Use a diffusion approximation (as opposed to a Schuster core)
 	CHARACTER(LEN=6) METHOD
 !
 ! Local vectors & arrays
 !
-	REAL*8 TA(ND),TB(ND),TC(ND)
-	REAL*8 XM(ND)
-	REAL*8 HU(ND)
-	REAL*8 HL(ND)
-	REAL*8 HT(ND)
-	REAL*8 JFAC(ND)
-	REAL*8 JT(ND)
-	REAL*8 WMID(ND)
-	REAL*8 Z(ND)
-	REAL*8 CHI_MOD(ND)
-	REAL*8 dCHIdR(ND)
-	REAL*8 dCHI_MODdR(ND)
-	REAL*8 Q(ND)
-	REAL*8 F(ND)
-	REAL*8 DTAU(ND)
-	REAL*8 BETA(ND)
-	REAL*8 VU(ND)
-	REAL*8 CV(ND)
-	REAL*8 AVE_DTAU_ON_Q(ND)
-	REAL*8 RAD_DECAY_TERM(ND)
-	REAL*8 E_RAD_DECAY(ND)
-	REAL*8 WORK(ND)
-	REAL*8 OLD_T(ND)
-	REAL*8 T_FROM_J(ND)
-	REAL*8 TSTORE(ND)
+	REAL(10) TA(ND),TB(ND),TC(ND)
+	REAL(10) XM(ND)
+	REAL(10) HU(ND)
+	REAL(10) HL(ND)
+	REAL(10) HT(ND)
+	REAL(10) JFAC(ND)
+	REAL(10) JT(ND)
+	REAL(10) WMID(ND)
+	REAL(10) Z(ND)
+	REAL(10) CHI_MOD(ND)
+	REAL(10) dCHIdR(ND)
+	REAL(10) dCHI_MODdR(ND)
+	REAL(10) Q(ND)
+	REAL(10) F(ND)
+	REAL(10) DTAU(ND)
+	REAL(10) BETA(ND)
+	REAL(10) VU(ND)
+	REAL(10) CV(ND)
+	REAL(10) AVE_DTAU_ON_Q(ND)
+	REAL(10) RAD_DECAY_TERM(ND)
+	REAL(10) E_RAD_DECAY(ND)
+	REAL(10) WORK(ND)
+	REAL(10) OLD_T(ND)
+	REAL(10) T_FROM_J(ND)
+	REAL(10) TSTORE(ND)
 !
-	REAL*8 RSQ_J_OLDT(ND)
-	REAL*8 RSQ_H_OLDT(ND)
+	REAL(10) RSQ_J_OLDT(ND)
+	REAL(10) RSQ_H_OLDT(ND)
 !
 ! FS indicates the following quantities (J, H, K & N) have been computed using the
 ! formal solution.
 !
-	REAL*8 FS_RSQJ(ND)
-	REAL*8 FS_RSQH(ND)
-	REAL*8 FS_RSQK(ND)
+	REAL(10) FS_RSQJ(ND)
+	REAL(10) FS_RSQH(ND)
+	REAL(10) FS_RSQK(ND)
 !
-	REAL*8 H_OUTBC		!Eddington factor for H at outer boundary.
-	REAL*8 H_INBC
-	REAL*8 H_OUTBC_OLDT	!Eddington factor for H at outer boundary (prev. time step).
-	REAL*8 H_INBC_OLDT
-	REAL*8 DTAU_INB_SAVE
-	REAL*8 IBOUND
-	REAL*8 DBB
-	REAL*8 DBC
-	REAL*8 C_KMS
-	REAL*8 RECIP_CDELTAT
-	REAL*8 ROLD_ON_R
-	REAL*8 DELTA_TIME_SECS
+	REAL(10) H_OUTBC		!Eddington factor for H at outer boundary.
+	REAL(10) H_INBC
+	REAL(10) H_OUTBC_OLDT	!Eddington factor for H at outer boundary (prev. time step).
+	REAL(10) H_INBC_OLDT
+	REAL(10) DTAU_INB_SAVE
+	REAL(10) IBOUND
+	REAL(10) DBB
+	REAL(10) DBC
+	REAL(10) C_KMS
+	REAL(10) RECIP_CDELTAT
+	REAL(10) ROLD_ON_R
+	REAL(10) DELTA_TIME_SECS
 !
 	INTEGER, PARAMETER :: IONE=1
-	REAL*8 PI
-	REAL*8 T1,T2,T3
-	REAL*8 E1,E2,E3
-	REAL*8 REDUCTION_FACTOR
+	REAL(10) PI
+	REAL(10) T1,T2,T3
+	REAL(10) E1,E2,E3
+	REAL(10) REDUCTION_FACTOR
 	INTEGER I,J,NI,LS
-	REAL*8 SPEED_OF_LIGHT
+	REAL(10) SPEED_OF_LIGHT
 	EXTERNAL SPEED_OF_LIGHT
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	INTEGER LUER,ERROR_LU,LU
@@ -449,14 +449,14 @@
 	  NI=ND-(LS-NC-1)
 	  IF(LS .LE. NC)THEN
 	    NI=ND
-	    DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)
+	    DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)
 	  END IF
 !
 ! Compute Z for this impact parameter
 !
 	  IF(NI .GT. 1)THEN
 	    DO I=1,NI
-	      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
+	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
 	      T1=Z(I)/R(I)
 	      TA(I)=BETA(I)/R(I)
 	      CHI_MOD(I)=CHI(I)+TA(I)
@@ -525,7 +525,7 @@
 	  ELSE IF(NI .EQ. 2)THEN
 	    Z(1)=SQRT(R(1)*R(1)-P(LS)*P(LS))
 	    DTAU(1)=0.5D0*Z(1)*(CHI_MOD(1)+CHI_MOD(2))		!Z(2)=0.0
-	    E1=DEXP(-DTAU(1))
+	    E1=EXP(-DTAU(1))
 	    E2=1.0D0-(1.0D0-E1)/DTAU(1)
 	    E3=(1.0D0-E1)/DTAU(1)-E1
 	    IF(DTAU(1) .LT. 1.0D-03)THEN

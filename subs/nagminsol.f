@@ -20,12 +20,12 @@ C                        equations. This routine assumes a paged enviroment.
 C Changed 22-JUL-82 -total number of variables passed
 C
 	INTEGER ND,NV
-	REAL*8 BA(NV,NV,ND,ND),STEQ(NV,ND)
-	REAL*8 ABT(NV*NV*ND),FQ(NV*ND)
+	REAL(10) BA(NV,NV,ND,ND),STEQ(NV,ND)
+	REAL(10) ABT(NV*NV*ND),FQ(NV*ND)
 C
 C Local variables.
 C
-	REAL*8 DP
+	REAL(10) DP
 C
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2

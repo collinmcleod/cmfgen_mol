@@ -26,17 +26,17 @@
 ! Created 23-Oct-2006 - Based on MON_INT_FUNS_V2.
 !
 	INTEGER ND
-	REAL*8 INTEGRAL(ND)
-	REAL*8 CHI(ND)
-	REAL*8 R(ND)
+	REAL(10) INTEGRAL(ND)
+	REAL(10) CHI(ND)
+	REAL(10) R(ND)
 !
-	REAL*8 ONE
+	REAL(10) ONE
 	PARAMETER (ONE=1.0D0)
 	INTEGER I
 !
-	REAL*8 H(ND)			!Delta R [ R(I+1)-R(I) ]
-	REAL*8 S(ND)			!Slope in interval (I to I+1)
-	REAL*8 D(ND)			!First derivative at node I
+	REAL(10) H(ND)			!Delta R [ R(I+1)-R(I) ]
+	REAL(10) S(ND)			!Slope in interval (I to I+1)
+	REAL(10) D(ND)			!First derivative at node I
 !
 ! The array R may be either monotonically increasing, or decreasing.
 !

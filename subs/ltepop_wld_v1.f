@@ -17,19 +17,19 @@
 ! Created 30-May-1995 : Based on LTEPOP.
 !             
 	INTEGER ND
-	REAL*8 ED(ND)			!Electron density
-	REAL*8 T(ND)			!Temperature 10^4K
-	REAL*8 DIC2(ND)			!Ion density (Full model atom)
+	REAL(10) ED(ND)			!Electron density
+	REAL(10) T(ND)			!Temperature 10^4K
+	REAL(10) DIC2(ND)			!Ion density (Full model atom)
 !
 	INTEGER NC2
-	REAL*8 C2LTE(NC2,ND)
-	REAL*8 W_C2(NC2,ND)
-	REAL*8 EDGEC2(NC2)
-	REAL*8 GC2(NC2)
-	REAL*8 GION_C2			!Statistical weight of ion groun state.
-	REAL*8 ZC2			!Ion charge
+	REAL(10) C2LTE(NC2,ND)
+	REAL(10) W_C2(NC2,ND)
+	REAL(10) EDGEC2(NC2)
+	REAL(10) GC2(NC2)
+	REAL(10) GION_C2			!Statistical weight of ion groun state.
+	REAL(10) ZC2			!Ion charge
 !
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER ERROR_LU
@@ -38,7 +38,7 @@
 ! Local variables.
 !
 	INTEGER I,K
-	REAL*8 X,Y,RGU
+	REAL(10) X,Y,RGU
 	LOGICAL, PARAMETER :: NEW_METHOD=.TRUE.
 !
 ! Compute the occupation probabilities.
@@ -52,13 +52,13 @@
 	  DO K=1,ND
 	    X=HDKT/T(K)
 	    RGU=2.07078D-22*ED(K)*DIC2(K)*( T(K)**(-1.5D0) )/GION_C2
-	    RGU=DLOG(RGU)
+	    RGU=LOG(RGU)
 	    DO I=1,NC2
 	      C2LTE(I,K)=W_C2(I,K)*GC2(I)*EXP(EDGEC2(I)*X+RGU)
 	    END DO
 	  END DO
 	ELSE
-	  RGU=DLOG(2.07078D-22)
+	  RGU=LOG(2.07078D-22)
 	  DO K=1,ND
 	    X=HDKT/T(K)
 	    Y=ED(K)*DIC2(K)*( T(K)**(-1.5D0) )/GION_C2

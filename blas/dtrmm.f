@@ -3,9 +3,9 @@
 *     .. Scalar Arguments ..
       CHARACTER*1        SIDE, UPLO, TRANSA, DIAG
       INTEGER            M, N, LDA, LDB
-      DOUBLE PRECISION   ALPHA
+      REAL(10)   ALPHA
 *     .. Array Arguments ..
-      DOUBLE PRECISION   A( LDA, * ), B( LDB, * )
+      REAL(10)   A( LDA, * ), B( LDB, * )
 *     ..
 *
 *  Purpose
@@ -76,13 +76,13 @@
 *           at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - DOUBLE PRECISION.
+*  ALPHA  - REAL(10).
 *           On entry,  ALPHA specifies the scalar  alpha. When  alpha is
 *           zero then  A is not referenced and  B need not be set before
 *           entry.
 *           Unchanged on exit.
 *
-*  A      - DOUBLE PRECISION array of DIMENSION ( LDA, k ), where k is m
+*  A      - REAL(10) array of DIMENSION ( LDA, k ), where k is m
 *           when  SIDE = 'L' or 'l'  and is  n  when  SIDE = 'R' or 'r'.
 *           Before entry  with  UPLO = 'U' or 'u',  the  leading  k by k
 *           upper triangular part of the array  A must contain the upper
@@ -103,7 +103,7 @@
 *           then LDA must be at least max( 1, n ).
 *           Unchanged on exit.
 *
-*  B      - DOUBLE PRECISION array of DIMENSION ( LDB, n ).
+*  B      - REAL(10) array of DIMENSION ( LDB, n ).
 *           Before entry,  the leading  m by n part of the array  B must
 *           contain the matrix  B,  and  on exit  is overwritten  by the
 *           transformed matrix.
@@ -134,9 +134,9 @@
 *     .. Local Scalars ..
       LOGICAL            LSIDE, NOUNIT, UPPER
       INTEGER            I, INFO, J, K, NROWA
-      DOUBLE PRECISION   TEMP
+      REAL(10)   TEMP
 *     .. Parameters ..
-      DOUBLE PRECISION   ONE         , ZERO
+      REAL(10)   ONE         , ZERO
       PARAMETER        ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Executable Statements ..

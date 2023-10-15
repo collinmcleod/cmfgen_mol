@@ -30,7 +30,7 @@
 !
 	  INTEGER, PARAMETER :: MAX_COEF=10
           INTEGER, ALLOCATABLE :: N_COEF_TWO(:)
-	  REAL*8, ALLOCATABLE:: COEF_TWO(:,:)
+	  REAL(10), ALLOCATABLE:: COEF_TWO(:,:)
 	
 !
 ! Arrays required to update STEQ (statistical equilibrium) and BA (variation
@@ -52,16 +52,16 @@
 !
 !TWO_PHOT_AVAILABLE  : Inidcates transition has been set, and species available.
 !
-          REAL*8, ALLOCATABLE :: Z_TWO(:)
-          REAL*8, ALLOCATABLE :: G_LOW_TWO(:)
-          REAL*8, ALLOCATABLE :: G_UP_TWO(:)
-          REAL*8, ALLOCATABLE :: FS_RAT_LOW(:,:)
-          REAL*8, ALLOCATABLE :: FS_RAT_UP(:,:)
-          REAL*8, ALLOCATABLE :: FREQ_TWO(:)
+          REAL(10), ALLOCATABLE :: Z_TWO(:)
+          REAL(10), ALLOCATABLE :: G_LOW_TWO(:)
+          REAL(10), ALLOCATABLE :: G_UP_TWO(:)
+          REAL(10), ALLOCATABLE :: FS_RAT_LOW(:,:)
+          REAL(10), ALLOCATABLE :: FS_RAT_UP(:,:)
+          REAL(10), ALLOCATABLE :: FREQ_TWO(:)
 !
-	  REAL*8, ALLOCATABLE :: DOWN_RATE_TWO(:,:)
-	  REAL*8, ALLOCATABLE :: UP_RATE_TWO(:,:)
-	  REAL*8, ALLOCATABLE :: PHOT_OC_TWO(:,:)
+	  REAL(10), ALLOCATABLE :: DOWN_RATE_TWO(:,:)
+	  REAL(10), ALLOCATABLE :: UP_RATE_TWO(:,:)
+	  REAL(10), ALLOCATABLE :: PHOT_OC_TWO(:,:)
 !
           INTEGER, ALLOCATABLE :: ION_ID_TWO(:)
           INTEGER, ALLOCATABLE :: ION_LOW_LEV_TWO(:)

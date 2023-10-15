@@ -24,7 +24,7 @@ C                     accuracy.
 C Created 25-Nov-1986 (Based on KWEIGHT)
 C
 	INTEGER N,I
-	REAL*8 X(N),W(N),H,HN,RF,RE,SUM
+	REAL(10) X(N),W(N),H,HN,RF,RE,SUM
 C
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU

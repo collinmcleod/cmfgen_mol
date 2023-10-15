@@ -43,12 +43,12 @@
 	INTEGER ND
 	INTEGER NL
 	INTEGER NUP
-	REAL*8 PROF(ND)
-	REAL*8 NU(ML_END)  		!Can actually be larger
-	REAL*8 ED_IN(ND)
-	REAL*8 TEMP_IN(ND)
-	REAL*8 VTURB_IN(ND)
-	REAL*8 AMASS_IN,Z_IN,NU_ZERO
+	REAL(10) PROF(ND)
+	REAL(10) NU(ML_END)  		!Can actually be larger
+	REAL(10) ED_IN(ND)
+	REAL(10) TEMP_IN(ND)
+	REAL(10) VTURB_IN(ND)
+	REAL(10) AMASS_IN,Z_IN,NU_ZERO
 	LOGICAL END_RES_ZONE
 	LOGICAL NORM_PROFILE
 !
@@ -59,9 +59,9 @@
 	INTEGER I,J,ML
 	INTEGER LOC_INDX		!Indicates which storage
 	INTEGER NF_GR
-	REAL*8 T1,T2
-	REAL*8 TMP_ED,NU_DOP
-	REAL*8 TMP_VEC(ND)
+	REAL(10) T1,T2
+	REAL(10) TMP_ED,NU_DOP
+	REAL(10) TMP_VEC(ND)
 !
 ! Compute Doppler profile for species other than HI and HeII. Stark
 ! profile for H(lowest 3 levels) and He2 (lowest 6 levels).

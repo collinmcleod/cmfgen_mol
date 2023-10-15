@@ -22,21 +22,21 @@
       INTEGER NC
 !
       INTEGER ND_EXT
-      REAL*8 R_EXT(ND_EXT)
-      REAL*8 V_EXT(ND_EXT)
-      REAL*8 VDOP_VEC(ND_EXT)
-      REAL*8 VDOP_FRAC
+      REAL(10) R_EXT(ND_EXT)
+      REAL(10) V_EXT(ND_EXT)
+      REAL(10) VDOP_VEC(ND_EXT)
+      REAL(10) VDOP_FRAC
 !
 ! Grid variables
 !
-      REAL*8 R(ND)
-      REAL*8 V(ND)
-      REAL*8 P(NP)
+      REAL(10) R(ND)
+      REAL(10) V(ND)
+      REAL(10) P(NP)
 !
 ! Local variables
 !
-      REAL*8 MU(NP)
-      REAL*8 TEMP_VEC(NP)
+      REAL(10) MU(NP)
+      REAL(10) TEMP_VEC(NP)
 !
       INTEGER ID,IP
       INTEGER I,J

@@ -3,7 +3,7 @@
 *     .. Scalar Arguments ..
       CHARACTER          TRANS, UPLO
       INTEGER            K, LDA, LDB, LDC, N
-      DOUBLE PRECISION   BETA
+      REAL(10)   BETA
       COMPLEX*16         ALPHA
 *     ..
 *     .. Array Arguments ..
@@ -101,7 +101,7 @@
 *           be at least  max( 1, k ).
 *           Unchanged on exit.
 *
-*  BETA   - DOUBLE PRECISION            .
+*  BETA   - REAL(10)            .
 *           On entry, BETA specifies the scalar beta.
 *           Unchanged on exit.
 *
@@ -157,7 +157,7 @@
       COMPLEX*16         TEMP1, TEMP2
 *     ..
 *     .. Parameters ..
-      DOUBLE PRECISION   ONE
+      REAL(10)   ONE
       PARAMETER          ( ONE = 1.0D+0 )
       COMPLEX*16         ZERO
       PARAMETER          ( ZERO = ( 0.0D+0, 0.0D+0 ) )

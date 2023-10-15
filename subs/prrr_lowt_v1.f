@@ -16,21 +16,21 @@
 ! Created 01-Feb-2011 - Based on prrr_sl_v6.f 
 !
 	INTEGER ND			!Number of depth points.
-	REAL*8 RJ(ND)
-	REAL*8 NU
-	REAL*8 FQW
+	REAL(10) RJ(ND)
+	REAL(10) NU
+	REAL(10) FQW
 !
 	INTEGER I,J,ID,IPR
 	INTEGER ION_LEV			!Final (destination) level in ion.
-	REAL*8 T1,T2
-	REAL*8 LOG_JB_RAT
-	REAL*8 H
+	REAL(10) T1,T2
+	REAL(10) LOG_JB_RAT
+	REAL(10) H
 !
 ! ConstantS for opacity etC.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 CHIBF,CHIFF
-	REAL*8 HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF
+	REAL(10) HDKT,TWOHCSQ
 !
         H=6.6261965D-12                                 !ergs/s (*1.0E+15 due to *nu)
 !

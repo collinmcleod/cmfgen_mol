@@ -13,12 +13,12 @@ C                        same statement).
 C Altered 24-May-1996 : IMPLICIT NONE installed
 C
 	INTEGER N,NR,KS
-	REAL*8 A(N,N),B(N,NR),C(N)
+	REAL(10) A(N,N),B(N,NR),C(N)
 C
-	REAL*8, PARAMETER :: TOL=1.0D-30
+	REAL(10), PARAMETER :: TOL=1.0D-30
 C
 	INTEGER I,J,L,M,JM
-	REAL*8 BIG,RBIG,T1
+	REAL(10) BIG,RBIG,T1
 C
 C NOTE THAT C IS A WORKING ARRAY.
 C

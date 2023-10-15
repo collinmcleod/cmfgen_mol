@@ -3,7 +3,7 @@
       INTEGER            INCX, N
       CHARACTER*1        DIAG, TRANS, UPLO
 *     .. Array Arguments ..
-      DOUBLE PRECISION   AP( * ), X( * )
+      REAL(10)   AP( * ), X( * )
 *     ..
 *
 *  Purpose
@@ -60,7 +60,7 @@
 *           N must be at least zero.
 *           Unchanged on exit.
 *
-*  AP     - DOUBLE PRECISION array of DIMENSION at least
+*  AP     - REAL(10) array of DIMENSION at least
 *           ( ( n*( n + 1 ) )/2 ).
 *           Before entry with  UPLO = 'U' or 'u', the array AP must
 *           contain the upper triangular matrix packed sequentially,
@@ -76,7 +76,7 @@
 *           A are not referenced, but are assumed to be unity.
 *           Unchanged on exit.
 *
-*  X      - DOUBLE PRECISION array of dimension at least
+*  X      - REAL(10) array of dimension at least
 *           ( 1 + ( n - 1 )*abs( INCX ) ).
 *           Before entry, the incremented array X must contain the n
 *           element right-hand side vector b. On exit, X is overwritten
@@ -98,10 +98,10 @@
 *
 *
 *     .. Parameters ..
-      DOUBLE PRECISION   ZERO
+      REAL(10)   ZERO
       PARAMETER        ( ZERO = 0.0D+0 )
 *     .. Local Scalars ..
-      DOUBLE PRECISION   TEMP
+      REAL(10)   TEMP
       INTEGER            I, INFO, IX, J, JX, K, KK, KX
       LOGICAL            NOUNIT
 *     .. External Functions ..

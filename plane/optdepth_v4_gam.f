@@ -26,16 +26,16 @@
 !
       INTEGER NZ
       INTEGER IP
-      REAL*8 CHI(NZ)
-      REAL*8 DTAU_LOC(NZ)
+      REAL(10) CHI(NZ)
+      REAL(10) DTAU_LOC(NZ)
       LOGICAL DO_P_RAY
       CHARACTER(LEN=*) METHOD
 !
 ! Local variables
 !
       INTEGER IZ
-      REAL*8 T1
-      REAL*8 DCHIDZ(NZ)
+      REAL(10) T1
+      REAL(10) DCHIDZ(NZ)
 !
 !--------------------------------------------------------------------
 !

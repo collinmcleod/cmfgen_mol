@@ -28,25 +28,25 @@ C Altered 24-May-1996 - Work arrays made allocateable.
 C Created 07-Apr-1989 - Based on TEMPDIST
 C
 	INTEGER ND,LU
-	REAL*8 LUM               !Luminosity of star in Lsun
-        REAL*8 R(ND)             !Radius Units 10^10 cm)
-        REAL*8 ED(ND)            !Electron density
-        REAL*8 CLUMP_FAC(ND)     !Volume filling factor
-        REAL*8 T(ND)             !Temperature in units od 10^4 K
+	REAL(10) LUM               !Luminosity of star in Lsun
+        REAL(10) R(ND)             !Radius Units 10^10 cm)
+        REAL(10) ED(ND)            !Electron density
+        REAL(10) CLUMP_FAC(ND)     !Volume filling factor
+        REAL(10) T(ND)             !Temperature in units od 10^4 K
 !
 ! Tau below which we (slowly) switch of the interpolation.
 !
-        REAL*8 TAU_SWITCH
+        REAL(10) TAU_SWITCH
 	CHARACTER*(*) FILNAME
 C
-	REAL*8, ALLOCATABLE :: NEWED(:)
-	REAL*8, ALLOCATABLE :: TAU(:)
+	REAL(10), ALLOCATABLE :: NEWED(:)
+	REAL(10), ALLOCATABLE :: TAU(:)
 C
-        REAL*8, ALLOCATABLE :: ROLD(:)
-	REAL*8, ALLOCATABLE :: EDOLD(:)
-	REAL*8, ALLOCATABLE :: TOLD(:)
-	REAL*8, ALLOCATABLE :: TAUOLD(:)
-	REAL*8, ALLOCATABLE :: CLUMP_FAC_OLD(:)
+        REAL(10), ALLOCATABLE :: ROLD(:)
+	REAL(10), ALLOCATABLE :: EDOLD(:)
+	REAL(10), ALLOCATABLE :: TOLD(:)
+	REAL(10), ALLOCATABLE :: TAUOLD(:)
+	REAL(10), ALLOCATABLE :: CLUMP_FAC_OLD(:)
 !
 ! Local variables.
 !
@@ -54,11 +54,11 @@ C
 	EXTERNAL ERROR_LU
 !
         INTEGER I,K,NOLD,NDOLD,IOS
-        REAL*8 LUMOLD                  !Luminosity of old model in Lsun
-        REAL*8 LDL,MLDL                !Used for interpolation.
-        REAL*8 T1,DI,ION_FRAC,VEL      !Used when reading T_IN
-        REAL*8 RTAU1		       !Radius in new model where TAU(e.s.)=1.0
-        REAL*8 RTAU1_OLD               !Radius in old model where TAU(e.s.)=1.0
+        REAL(10) LUMOLD                  !Luminosity of old model in Lsun
+        REAL(10) LDL,MLDL                !Used for interpolation.
+        REAL(10) T1,DI,ION_FRAC,VEL      !Used when reading T_IN
+        REAL(10) RTAU1		       !Radius in new model where TAU(e.s.)=1.0
+        REAL(10) RTAU1_OLD               !Radius in old model where TAU(e.s.)=1.0
 	CHARACTER*132 STRING
 	LOGICAL CLMP_PRES
 C

@@ -50,42 +50,42 @@ C
 C
 C Constants for opacity etc.
 C
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
-	REAL*8 CHI(ND)			!Opacity
-	REAL*8 ETA(ND)			!Emissivity
+	REAL(10) CHI(ND)			!Opacity
+	REAL(10) ETA(ND)			!Emissivity
 C
 C Large Model Atom Populations.
 C
-	REAL*8 HN(N,ND),HNST(N,ND)
-	REAL*8 EDGE(N)
+	REAL(10) HN(N,ND),HNST(N,ND)
+	REAL(10) EDGE(N)
 C
 C Ion populations. These populations should refer to the small model atoms.
 C (i.e. the model atom with super levels_
 C
-	REAL*8 DI(N_DI,ND),DIST(N_DI,ND)
+	REAL(10) DI(N_DI,ND),DIST(N_DI,ND)
 C
-	REAL*8 T(ND)			!Temperature (K)
-	REAL*8 ED(ND)			!Electron density
-	REAL*8 EMHNUKT(ND)		!EXP(-hv/kT)
-	REAL*8 NU			!Frequency (10^15 Hz)
-	REAL*8 ZION			!Charge on resultiong ion.
-	REAL*8 GION			!Charge on resultiong ion.
+	REAL(10) T(ND)			!Temperature (K)
+	REAL(10) ED(ND)			!Electron density
+	REAL(10) EMHNUKT(ND)		!EXP(-hv/kT)
+	REAL(10) NU			!Frequency (10^15 Hz)
+	REAL(10) ZION			!Charge on resultiong ion.
+	REAL(10) GION			!Charge on resultiong ion.
 C
 	INTEGER PHOT_ID		!Photoionization ID (path)
 	INTEGER ION_LEV		!Target level for ionizations in ion.
 C
 C Vectors to save computational effort.
 C
-	REAL*8 GFF_VAL(ND)		!g(ff) as a function of depth
-	REAL*8 COR_FAC(ND)		!Factor to convert HNST for ION_LEV
-	REAL*8 YDIS(ND)			!Constant for computing level dissolution/
-	REAL*8 XDIS(ND)			!Constant for computing level dissolution/
-	REAL*8 DIS_CONST(N)		!Constant appearing in dissolution formula.
-	REAL*8 ALPHA_VEC(N)		!Photionization cross-section
-	REAL*8 TMP_CHI(N)		!Photionization cross-section
-	REAL*8 TMP_ETA(N)		!Photionization cross-section
+	REAL(10) GFF_VAL(ND)		!g(ff) as a function of depth
+	REAL(10) COR_FAC(ND)		!Factor to convert HNST for ION_LEV
+	REAL(10) YDIS(ND)			!Constant for computing level dissolution/
+	REAL(10) XDIS(ND)			!Constant for computing level dissolution/
+	REAL(10) DIS_CONST(N)		!Constant appearing in dissolution formula.
+	REAL(10) ALPHA_VEC(N)		!Photionization cross-section
+	REAL(10) TMP_CHI(N)		!Photionization cross-section
+	REAL(10) TMP_ETA(N)		!Photionization cross-section
 C
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
@@ -93,8 +93,8 @@ C
 C Local constants.
 C
 	INTEGER I,K,K_ST,ND_LOC,NO_NON_ZERO_PHOT
-	REAL*8 ALPHA,TCHI1,TETA1,TETA2
-	REAL*8 T1,T2,ZION_CUBED,NEFF
+	REAL(10) ALPHA,TCHI1,TETA1,TETA2
+	REAL(10) T1,T2,ZION_CUBED,NEFF
 C
 	CALL TUNE(1,'GENOPA')
 C

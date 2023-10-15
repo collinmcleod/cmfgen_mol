@@ -4,27 +4,27 @@ C saved between subroutine calls..
 C
 	MODULE CMF_FORM_MOD_V2
 C
-	REAL*8, ALLOCATABLE :: R_EXT(:)
-	REAL*8, ALLOCATABLE :: P_EXT(:)
-	REAL*8, ALLOCATABLE :: ROH_EXT(:)
+	REAL(10), ALLOCATABLE :: R_EXT(:)
+	REAL(10), ALLOCATABLE :: P_EXT(:)
+	REAL(10), ALLOCATABLE :: ROH_EXT(:)
 !
-	REAL*8, ALLOCATABLE :: AV_PREV(:,:)
-	REAL*8, ALLOCATABLE :: CV_PREV(:,:)
-	REAL*8, ALLOCATABLE :: I_P_PREV(:,:)
-	REAL*8, ALLOCATABLE :: I_M_PREV(:,:)
+	REAL(10), ALLOCATABLE :: AV_PREV(:,:)
+	REAL(10), ALLOCATABLE :: CV_PREV(:,:)
+	REAL(10), ALLOCATABLE :: I_P_PREV(:,:)
+	REAL(10), ALLOCATABLE :: I_M_PREV(:,:)
 !
-	REAL*8, ALLOCATABLE :: R_RAY(:,:)
-	REAL*8, ALLOCATABLE :: Z(:,:)
-	REAL*8, ALLOCATABLE :: GAM(:,:)
-	REAL*8, ALLOCATABLE :: GAMH(:,:)
-	REAL*8, ALLOCATABLE :: dGAMdR(:,:)
+	REAL(10), ALLOCATABLE :: R_RAY(:,:)
+	REAL(10), ALLOCATABLE :: Z(:,:)
+	REAL(10), ALLOCATABLE :: GAM(:,:)
+	REAL(10), ALLOCATABLE :: GAMH(:,:)
+	REAL(10), ALLOCATABLE :: dGAMdR(:,:)
 C
-	REAL*8, ALLOCATABLE :: CHI_COEF(:,:)
-	REAL*8, ALLOCATABLE :: ETA_COEF(:,:)
+	REAL(10), ALLOCATABLE :: CHI_COEF(:,:)
+	REAL(10), ALLOCATABLE :: ETA_COEF(:,:)
 C
-	REAL*8, ALLOCATABLE :: ESEC_OLD(:)
-	REAL*8, ALLOCATABLE :: ETA_OLD(:)
-	REAL*8, ALLOCATABLE :: CHI_OLD(:)
+	REAL(10), ALLOCATABLE :: ESEC_OLD(:)
+	REAL(10), ALLOCATABLE :: ETA_OLD(:)
+	REAL(10), ALLOCATABLE :: CHI_OLD(:)
 C
 C Used to compute the boundary iteration factors (HBC and NBC).
 C
@@ -35,10 +35,10 @@ C monotonic cubic polynomials. To save time, interpolations in CHI and ETA
 C are done onto a fine grid --- once for each frequency. Values of CHI and
 C ETA on a RAY are then obtained from the fine grid using linear interpolation.
 C
-	REAL*8, ALLOCATABLE :: R_FINE(:)
-	REAL*8, ALLOCATABLE :: CHI_FINE(:)
-	REAL*8, ALLOCATABLE :: ETA_FINE(:)
-	REAL*8, ALLOCATABLE :: dCHIdR_FINE(:)
+	REAL(10), ALLOCATABLE :: R_FINE(:)
+	REAL(10), ALLOCATABLE :: CHI_FINE(:)
+	REAL(10), ALLOCATABLE :: ETA_FINE(:)
+	REAL(10), ALLOCATABLE :: dCHIdR_FINE(:)
 	INTEGER, ALLOCATABLE :: INDX_FINE(:,:)
 C
 C INDX(I) gives the location of R_RAY(I,...) in R. It is also used to give the
@@ -46,11 +46,11 @@ C location of R_FINE(I) in R.
 C
 	INTEGER, ALLOCATABLE :: INDX(:)
 C
-	REAL*8 BETA
-	REAL*8 VINF
-	REAL*8 C_KMS
-	REAL*8 FL_PREV
-	REAL*8 OLD_CHI_AT_IN_BND
+	REAL(10) BETA
+	REAL(10) VINF
+	REAL(10) C_KMS
+	REAL(10) FL_PREV
+	REAL(10) OLD_CHI_AT_IN_BND
 	INTEGER I_START
 C
 	LOGICAL FIRST_TIME
@@ -150,31 +150,31 @@ C _NEW refer to the opacities/emissivities at the frequency passed in the
 C call. They are to be distinguished from the opacities/emissivities on the
 C previous call [ _OLD], and those at intermediate frequencies (no appendage).
 C
-	REAL*8 ETA_NEW(ND)	!Emissivity --- contains e.s. term.
-	REAL*8 CHI_NEW(ND)
-	REAL*8 ESEC_NEW(ND)
+	REAL(10) ETA_NEW(ND)	!Emissivity --- contains e.s. term.
+	REAL(10) CHI_NEW(ND)
+	REAL(10) ESEC_NEW(ND)
 C
 C We use the density to determine  the grid spacing along a ray. This should
 C always be well behaved.
 C
-	REAL*8 ROH(ND)
-	REAL*8 V(ND)
-	REAL*8 SIGMA(ND)
-	REAL*8 R(ND)
-	REAL*8 P(NP)
+	REAL(10) ROH(ND)
+	REAL(10) V(ND)
+	REAL(10) SIGMA(ND)
+	REAL(10) R(ND)
+	REAL(10) P(NP)
 C
-	REAL*8 P_OBS(NP_OBS_MAX)
-	REAL*8 IPLUS_P(NP_OBS_MAX)
-	REAL*8 MU_AT_RMAX(NP_OBS_MAX)
-	REAL*8 HQW_AT_RMAX(NP_OBS_MAX)
-	REAL*8 RMAX_OBS,V_AT_RMAX
+	REAL(10) P_OBS(NP_OBS_MAX)
+	REAL(10) IPLUS_P(NP_OBS_MAX)
+	REAL(10) MU_AT_RMAX(NP_OBS_MAX)
+	REAL(10) HQW_AT_RMAX(NP_OBS_MAX)
+	REAL(10) RMAX_OBS,V_AT_RMAX
 C
 C These parameters are use to estimate how many extra points will be inserted
 C for the frequency integration.
 C
-	REAL*8 FRAC_DOP,V_DOP,dV_CMF_PROF,dV_CMF_WING
+	REAL(10) FRAC_DOP,V_DOP,dV_CMF_PROF,dV_CMF_WING
 C
-	REAL*8 DBB,IC,FL,dLOG_NU
+	REAL(10) DBB,IC,FL,dLOG_NU
 	CHARACTER*6 METHOD
 	CHARACTER*(*) SOLUTION_OPTION
 	LOGICAL DIF		!Use diffusion approximation
@@ -183,7 +183,7 @@ C First frequency -- no frequency coupling.
  
 	LOGICAL INIT
 C
-	REAL*8,  PARAMETER :: ONE=1.0D0
+	REAL(10),  PARAMETER :: ONE=1.0D0
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 C
@@ -193,16 +193,16 @@ C
 	LOGICAL EXTEND
 	LOGICAL INSERT_ADD_FREQ
 C
-	REAL*8,    PARAMETER :: EXT_FAC=10.0D0
+	REAL(10),    PARAMETER :: EXT_FAC=10.0D0
 	INTEGER, PARAMETER :: ND_ADD_MAX=10		!10*LOG10(EXT_FAC))
 	INTEGER NP_EXT
 C
 C Intermediate opacities/emissivities. They are obtained by linear
 C extrapolation in frequency from .._NEW and ..._OLD.
 C
-	REAL*8 CHI(ND)
-	REAL*8 ETA(ND)
-	REAL*8 ESEC(ND)
+	REAL(10) CHI(ND)
+	REAL(10) ETA(ND)
+	REAL(10) ESEC(ND)
 C
 C The following arrays do not need to be stored, and hence can be created
 C dynamically on each call. They must have a MINIMUM length NRAY where
@@ -211,59 +211,59 @@ C PNT_FAC can be adjusted to different integer values so that more points
 C can be inserted along a ray.
 C
 	INTEGER, PARAMETER :: PNT_FAC=3
-	REAL*8 TA(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 TB(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 TC(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 AV(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 CV(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 DTAU(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 XM(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 SOURCE(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 U(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 VB(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 VC(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 GB(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 H(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 Q(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 QH(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) TA(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) TB(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) TC(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) AV(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) CV(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) DTAU(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) XM(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) SOURCE(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) U(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) VB(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) VC(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) GB(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) H(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) Q(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) QH(PNT_FAC*(ND+ND_ADD_MAX))
 C
 C Ray quantities. V_RAY and SIGMA ray are only used to compute GAM and GAMH
 C in the initialization. CHI_RAY, ETA_RAY and dCHIdR are needed in the
 C formal solution loop.
 C
-	REAL*8 V_RAY(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 SIGMA_RAY(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 CHI_RAY(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 ETA_RAY(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8 dCHIdR(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) V_RAY(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) SIGMA_RAY(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) CHI_RAY(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) ETA_RAY(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) dCHIdR(PNT_FAC*(ND+ND_ADD_MAX))
 !
 ! Vectors required when using INTEGERAL solution method.
 !
-	REAL*8           I_P(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8           I_M(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           I_P(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           I_M(PNT_FAC*(ND+ND_ADD_MAX))
 !
-	REAL*8           EE(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8           E0(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8           E1(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8           E2(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8           E3(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           EE(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           E0(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           E1(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           E2(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           E3(PNT_FAC*(ND+ND_ADD_MAX))
 !
-	REAL*8           A0(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8           A1(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8           A2(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8           A3(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8           A4(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           A0(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           A1(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           A2(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           A3(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           A4(PNT_FAC*(ND+ND_ADD_MAX))
 !
-	REAL*8 SOURCE_PRIME(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8            S(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL*8           dS(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10) SOURCE_PRIME(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)            S(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(10)           dS(PNT_FAC*(ND+ND_ADD_MAX))
 !
 ! Used to perform interpolation of CHI and ETA onto the FINE radius grid.
 !
-	REAL*8 LOG_R(ND)
-	REAL*8 LOG_V(ND)
-	REAL*8 LOG_CHI(ND)
-	REAL*8 LOG_ETA(ND)
+	REAL(10) LOG_R(ND)
+	REAL(10) LOG_V(ND)
+	REAL(10) LOG_CHI(ND)
+	REAL(10) LOG_ETA(ND)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
@@ -276,27 +276,27 @@ C
 	INTEGER I,J,K,L,ML,LS
 	INTEGER N_FREQ
 	INTEGER TMP_PNT_FAC
-	REAL*8 DBC
-	REAL*8 IBOUND			!Incident intensity on outer boundary.
-	REAL*8 T1,T2
-	REAL*8 DELR
-	REAL*8 DELZ
-	REAL*8 I_CORE
+	REAL(10) DBC
+	REAL(10) IBOUND			!Incident intensity on outer boundary.
+	REAL(10) T1,T2
+	REAL(10) DELR
+	REAL(10) DELZ
+	REAL(10) I_CORE
 C
-	REAL*8 NEW_dLOG_NU		!dv
-	REAL*8 RMAX
-	REAL*8 CV_BOUND
-	REAL*8 MU,dZ
+	REAL(10) NEW_dLOG_NU		!dv
+	REAL(10) RMAX
+	REAL(10) CV_BOUND
+	REAL(10) MU,dZ
 C
 C Power law exponents for the extrapolations.
 C
-	REAL*8 ROH_ALPHA
-	REAL*8 ESEC_ALPHA
-	REAL*8 CHI_ALPHA
-	REAL*8 ETA_ALPHA
+	REAL(10) ROH_ALPHA
+	REAL(10) ESEC_ALPHA
+	REAL(10) CHI_ALPHA
+	REAL(10) ETA_ALPHA
  !
 	EXTERNAL SPEED_OF_LIGHT
-	REAL*8 SPEED_OF_LIGHT
+	REAL(10) SPEED_OF_LIGHT
 !
 	IF(FIRST_TIME)THEN
 !

@@ -9,8 +9,8 @@ C Altered 24-May-1996 - IONE inserted
 C Altered 17-Feb-1986 - Core rays distributed equally in mu rather than p.
 C
 	INTEGER NC,ND,NP,I
-	REAL*8 P(NP),R(ND),RP,DELMU
-	REAL*8, PARAMETER :: RONE=1.0D0
+	REAL(10) P(NP),R(ND),RP,DELMU
+	REAL(10), PARAMETER :: RONE=1.0D0
 C
 	DELMU=RONE/NC
 	P(1)=0.0D0

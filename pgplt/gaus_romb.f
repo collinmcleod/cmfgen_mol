@@ -20,20 +20,20 @@
 ! Altered 02-Apr-2008 : Use convention that EWs are +ve for absorption lines
 ! Created 28-Sep-2007
 !
-	REAL*8 ANSWER
-	REAL*8 HEIGHT
-	REAL*8 SCALE
-	REAL*8 EXPONENT
-	REAL*8 TOLERANCE
+	REAL(10) ANSWER
+	REAL(10) HEIGHT
+	REAL(10) SCALE
+	REAL(10) EXPONENT
+	REAL(10) TOLERANCE
 !
 ! R(I,1) stores the ith trapazoidal integration.
 !
 	INTEGER, PARAMETER :: M=8
-	REAL*8 R(M,M)
+	REAL(10) R(M,M)
 !
-	REAL*8 H		!Step size
-	REAL*8 HMAX		!Maximumstep size adopted
-	REAL*8 RANGE		!Range of integration
+	REAL(10) H		!Step size
+	REAL(10) HMAX		!Maximumstep size adopted
+	REAL(10) RANGE		!Range of integration
 !
 	INTEGER J,K,L		!Loop indices
 	INTEGER N		!Number of steps

@@ -25,14 +25,14 @@
 	LOGICAL LAMBDA_ITERATION
 	LOGICAL T_MIN_EXTRAP
 !
-	REAL*8 HEAT(ND)           !Full heating term
-	REAL*8 T_MIN
+	REAL(10) HEAT(ND)           !Full heating term
+	REAL(10) T_MIN
 !
 	INTEGER GET_DIAG
 	INTEGER L,K
-	REAL*8 TA(ND)             !Temporary work vector
-	REAL*8 T1
-	REAL*8 EHB_CONSTANT
+	REAL(10) TA(ND)             !Temporary work vector
+	REAL(10) T1
+	REAL(10) EHB_CONSTANT
 !
         GET_DIAG(K)=(NUM_BNDS/ND)*(K-DIAG_INDX)+DIAG_INDX
 !

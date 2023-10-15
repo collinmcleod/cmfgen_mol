@@ -14,19 +14,19 @@
 ! Altered: 10-Apr-2015 : RAN2_DP accessed (there was a precision issue)
 !                        SAVE variables fixed.
 ! 
-      REAL*8 XM
-      REAL*8 POIDEV
+      REAL(10) XM
+      REAL(10) POIDEV
       INTEGER IDUM
 !
-      REAL*8 T
-      REAL*8 Y
-      REAL*8 GAMMLN
-      REAL*8 EM
+      REAL(10) T
+      REAL(10) Y
+      REAL(10) GAMMLN
+      REAL(10) EM
 !
-      REAL*8 RAN2_DP
-      REAL*8, SAVE :: G,SQ,ALXM
-      REAL*8, SAVE :: OLDM=-1
-      REAL*8, PARAMETER :: PI=3.141592654D0
+      REAL(10) RAN2_DP
+      REAL(10), SAVE :: G,SQ,ALXM
+      REAL(10), SAVE :: OLDM=-1
+      REAL(10), PARAMETER :: PI=3.141592654D0
 !
       IF (XM .LT. 12.0D0)THEN
         IF (XM.NE.OLDM) THEN
@@ -59,9 +59,9 @@
 !
       FUNCTION GAMMLN(XX)
       IMPLICIT NONE
-      REAL*8 XX
-      REAL*8 COF(6),STP,HALF,ONE,FPF,X,TMP,SER
-      REAL*8 GAMMLN
+      REAL(10) XX
+      REAL(10) COF(6),STP,HALF,ONE,FPF,X,TMP,SER
+      REAL(10) GAMMLN
       INTEGER J
 !
       DATA COF,STP/76.18009173D0,-86.50532033D0,24.01409822D0,

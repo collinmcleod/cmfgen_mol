@@ -73,23 +73,23 @@
 !
 ! 
 !
-	REAL*8 SOL(NT,ND)		!Temp. stor. area for ST. EQ.
+	REAL(10) SOL(NT,ND)		!Temp. stor. area for ST. EQ.
 	INTEGER DST,DEND
 !
 ! Constants for opacity etc. These are set in CMFGEN.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 OPLIN,EMLIN
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) OPLIN,EMLIN
 !
 ! Internally used variables
 !
-	REAL*8 S1,REPA
-	REAL*8 MAXCH,MAXCH_SUM
-	REAL*8 T1,T2,T3,T4,SRAT
-	REAL*8 FL,AMASS,FL_OLD
-	REAL*8 FG_COUNT
+	REAL(10) S1,REPA
+	REAL(10) MAXCH,MAXCH_SUM
+	REAL(10) T1,T2,T3,T4,SRAT
+	REAL(10) FL,AMASS,FL_OLD
+	REAL(10) FG_COUNT
 !
 	LOGICAL LST_DEPTH_ONLY
 !
@@ -173,13 +173,13 @@
 ! Functions called
 !
 	INTEGER ICHRLEN,ERROR_LU
-	REAL*8 DOP_PRO
-	REAL*8 S15ADF
-	REAL*8 LAMVACAIR
-	REAL*8 ATOMIC_MASS_UNIT
-	REAL*8 SPEED_OF_LIGHT
-	REAL*8 RAD_SUN
-	REAL*8 TEFF_SUN
+	REAL(10) DOP_PRO
+	REAL(10) S15ADF
+	REAL(10) LAMVACAIR
+	REAL(10) ATOMIC_MASS_UNIT
+	REAL(10) SPEED_OF_LIGHT
+	REAL(10) RAD_SUN
+	REAL(10) TEFF_SUN
 	LOGICAL EQUAL
 	EXTERNAL ICHRLEN,ERROR_LU,SPEED_OF_LIGHT,RAD_SUN,TEFF_SUN
 !
@@ -191,21 +191,21 @@
 !
 ! Wind variablity arrays.
 !
-	REAL*8 POPS(NT,ND)		!Population for all species.
-	REAL*8 MEAN_ATOMIC_WEIGHT	!Mean atomic weight of atoms  (neutrals
+	REAL(10) POPS(NT,ND)		!Population for all species.
+	REAL(10) MEAN_ATOMIC_WEIGHT	!Mean atomic weight of atoms  (neutrals
 !                          		! and ions) in atomic mass units.
-	REAL*8 ABUND_SUM
+	REAL(10) ABUND_SUM
 !
 !
 ! Arrays for improving on the initial T structure --- partition functions. 
 ! Need one for each atomic species.
 !
-	REAL*8, ALLOCATABLE :: U_PAR_FN(:,:)
-	REAL*8, ALLOCATABLE :: PHI_PAR_FN(:,:)
-	REAL*8, ALLOCATABLE :: Z_PAR_FN(:)
+	REAL(10), ALLOCATABLE :: U_PAR_FN(:,:)
+	REAL(10), ALLOCATABLE :: PHI_PAR_FN(:,:)
+	REAL(10), ALLOCATABLE :: Z_PAR_FN(:)
 !
-	REAL*8 TGREY(ND)
-	REAL*8 T_SAVE(ND)
+	REAL(10) TGREY(ND)
+	REAL(10) T_SAVE(ND)
 !
 ! Variables for scaling the line cooling rates in oder that the radiative
 ! equilibrium equation is more consistent with the electron heating/cooling 
@@ -213,9 +213,9 @@
 ! of SCL_LINE_HT_FAC of the tmean frequency for the super-level under 
 ! consideration. 0.5 is presently the prefered value.
 !
-!	REAL*8 AVE_ENERGY(NT)		!Average energy of each super level
-	REAL*8 STEQ_T_SCL(ND)
-	REAL*8 STEQ_T_NO_SCL(ND)
+!	REAL(10) AVE_ENERGY(NT)		!Average energy of each super level
+	REAL(10) STEQ_T_SCL(ND)
+	REAL(10) STEQ_T_NO_SCL(ND)
 ! 
 !
 ! Dielectronic recombination variables and arrays.
@@ -223,9 +223,9 @@
 	INTEGER NMAXDIE
 	PARAMETER (NMAXDIE=500)
 !
-	REAL*8 EDGEDIE(NMAXDIE)		!Ionization frequency (negative)
-	REAL*8 EINADIE(NMAXDIE)		!Einstein A coefficient
-	REAL*8 GUPDIE(NMAXDIE)		!Stat. weight of autoionizing level.
+	REAL(10) EDGEDIE(NMAXDIE)		!Ionization frequency (negative)
+	REAL(10) EINADIE(NMAXDIE)		!Einstein A coefficient
+	REAL(10) GUPDIE(NMAXDIE)		!Stat. weight of autoionizing level.
 !
 	INTEGER LEVDIE(NMAXDIE)  	!Indicates MNL of low state
 	INTEGER INDXDIE(NMAXDIE)
@@ -242,35 +242,35 @@
 ! the implicit recombination.
 !
 	INTEGER EQION,EQSPEC
-	REAL*8 GLOW,GION
-	REAL*8 NUST(ND)			!LTE autoionizing population.
-	REAL*8 DION(ND)			!Ion population
-	REAL*8, ALLOCATABLE :: DIERECOM(:,:)   !Chk for all species.
-	REAL*8, ALLOCATABLE :: DIECOOL(:,:)    !Dielec. cooling check for all spec.
-	REAL*8, ALLOCATABLE :: ADDRECOM(:,:)     
+	REAL(10) GLOW,GION
+	REAL(10) NUST(ND)			!LTE autoionizing population.
+	REAL(10) DION(ND)			!Ion population
+	REAL(10), ALLOCATABLE :: DIERECOM(:,:)   !Chk for all species.
+	REAL(10), ALLOCATABLE :: DIECOOL(:,:)    !Dielec. cooling check for all spec.
+	REAL(10), ALLOCATABLE :: ADDRECOM(:,:)     
 ! 
 !
 ! Opacity/emissivity
 !
-	REAL*8 CHIL(ND)                 !Line opacity (without prof.)
-	REAL*8 ETAL(ND)                 !Line emissivity (without prof.)
+	REAL(10) CHIL(ND)                 !Line opacity (without prof.)
+	REAL(10) ETAL(ND)                 !Line emissivity (without prof.)
 !
 ! Quadrature weights.
 !
-	REAL*8 FQW(NCF_MAX)		!Frequency weights
+	REAL(10) FQW(NCF_MAX)		!Frequency weights
 !
 ! Transfer equation vectors
-	REAL*8 R_OLD(NDMAX)		!Used to store previous R grid in SN models.
+	REAL(10) R_OLD(NDMAX)		!Used to store previous R grid in SN models.
 !
 ! Line vectors
-	REAL*8 AV(ND)
-	REAL*8 VB(NDMAX)		!Used for error calculations
-	REAL*8 VC(NDMAX)		!Used for error calculations
-	REAL*8 H(ND)
-	REAL*8 Q(ND)			!FREQ DEPENDENT.
-	REAL*8 QH(ND)			!  "      "
-	REAL*8 GAM(ND)			!FREQ INDEPENDENT
-	REAL*8 GAMH(ND)			!  "      "
+	REAL(10) AV(ND)
+	REAL(10) VB(NDMAX)		!Used for error calculations
+	REAL(10) VC(NDMAX)		!Used for error calculations
+	REAL(10) H(ND)
+	REAL(10) Q(ND)			!FREQ DEPENDENT.
+	REAL(10) QH(ND)			!  "      "
+	REAL(10) GAM(ND)			!FREQ INDEPENDENT
+	REAL(10) GAMH(ND)			!  "      "
 ! 
 !
 ! Arrays and variables for computation of the continuum intensity
@@ -281,7 +281,7 @@
 !
 ! Variables for EW's and LINE blanketing.
 !
-	REAL*8 CONT_INT,EW
+	REAL(10) CONT_INT,EW
 	INTEGER ACCESS_JEW
 	LOGICAL COMPUTE_EW,COMPUTE_JEW,COMPUTE_LAM,MID,FULL_ES
 !
@@ -294,29 +294,29 @@
 !
 	INTEGER NDEXT,NCEXT,NPEXT
 !
-	REAL*8 CNM(NDMAX,NDMAX)		!For collisions cross-section in
-	REAL*8 DCNM(NDMAX,NDMAX)	!STEQGEN
+	REAL(10) CNM(NDMAX,NDMAX)		!For collisions cross-section in
+	REAL(10) DCNM(NDMAX,NDMAX)	!STEQGEN
 !
 !
 	INTEGER, PARAMETER :: N_FLUX_MEAN_BANDS=12
-	REAL*8     LAM_FLUX_MEAN_BAND_END(N_FLUX_MEAN_BANDS)
-	REAL*8     BAND_FLUX_MEAN(ND,N_FLUX_MEAN_BANDS)
-	REAL*8     BAND_FLUX(ND,N_FLUX_MEAN_BANDS)
+	REAL(10)     LAM_FLUX_MEAN_BAND_END(N_FLUX_MEAN_BANDS)
+	REAL(10)     BAND_FLUX_MEAN(ND,N_FLUX_MEAN_BANDS)
+	REAL(10)     BAND_FLUX(ND,N_FLUX_MEAN_BANDS)
 	DATA LAM_FLUX_MEAN_BAND_END/100.0D0,150.0D0,200.0D0,227.83D0,258.90D0,300.0D0,504.25D0,911.75D0,
 	1                         1200.0D0,1500.0D0,2000.0D0,1.0D+08/
 !
 !
 ! Continuum frequency variables and arrays.
 !
-	REAL*8 NU(NCF_MAX)		!Continuum and line frequencies
-	REAL*8 NU_EVAL_CONT(NCF_MAX)	!Frequencies to evaluate continuum
-	REAL*8 OBS(NCF_MAX)		!Observers spectrum
+	REAL(10) NU(NCF_MAX)		!Continuum and line frequencies
+	REAL(10) NU_EVAL_CONT(NCF_MAX)	!Frequencies to evaluate continuum
+	REAL(10) OBS(NCF_MAX)		!Observers spectrum
 !
 ! Vectors and arrays used for the observed flux.
 !
 	INTEGER N_OBS
-	REAL*8 OBS_FREQ(NCF_MAX)		!Since N_OBS < NCF =< NCF_MAX
-	REAL*8 OBS_FLUX(NCF_MAX)
+	REAL(10) OBS_FREQ(NCF_MAX)		!Since N_OBS < NCF =< NCF_MAX
+	REAL(10) OBS_FLUX(NCF_MAX)
 	LOGICAL FIRST_OBS_COMP
 !
 	CHARACTER TIME*20
@@ -329,14 +329,14 @@
 !
 ! Global vectors:
 !
-	REAL*8 AMASS_ALL(NT)
+	REAL(10) AMASS_ALL(NT)
 	INTEGER N_LINE_FREQ
 !
 	INTEGER LINES_THIS_FREQ(NCF_MAX)
 !
-	REAL*8 NU_DOP
-	REAL*8 NU_MAX_OBS
-	REAL*8 NU_MIN_OBS
+	REAL(10) NU_DOP
+	REAL(10) NU_MAX_OBS
+	REAL(10) NU_MIN_OBS
 !
 	INTEGER FREQ_INDX
 	INTEGER X_INDX
@@ -346,14 +346,14 @@
 ! Variables to limit the computation of the continuum opacities and
 ! emissivities.
 !
-	REAL*8 JREC(ND)
-	REAL*8 dJRECdT(ND)
-	REAL*8 JPHOT(ND)
-	REAL*8 JREC_CR(ND)
-	REAL*8 JPHOT_CR(ND)
-	REAL*8 BPHOT_CR(ND)
+	REAL(10) JREC(ND)
+	REAL(10) dJRECdT(ND)
+	REAL(10) JPHOT(ND)
+	REAL(10) JREC_CR(ND)
+	REAL(10) JPHOT_CR(ND)
+	REAL(10) BPHOT_CR(ND)
 !
-	REAL*8 CONT_FREQ
+	REAL(10) CONT_FREQ
 	LOGICAL FINAL_CONSTANT_CROSS
 !
 ! Indicates whether APRXzV, FFXzZ etc should be zeroed.
@@ -362,7 +362,7 @@
 !
 ! 
 !
-	REAL*8 Z_POP(NT)		!Ionic charge for each species
+	REAL(10) Z_POP(NT)		!Ionic charge for each species
 !
 ! Variables etc for computation of continuum in comoving frame.
 !
@@ -376,20 +376,20 @@
 ! We dimension from 0 so that we can access a Null vector for the 1st included
 ! ioinization stage of each species.
 ! 
-	REAL*8 X_RECOM(ND,0:NION)			!Next X-ray recombination rate
-	REAL*8 X_COOL(ND,0:NION)			!Next X-ray cooling
+	REAL(10) X_RECOM(ND,0:NION)			!Next X-ray recombination rate
+	REAL(10) X_COOL(ND,0:NION)			!Next X-ray cooling
 !
-	REAL*8 OBS_XRAY_LUM_0P1
-	REAL*8 OBS_XRAY_LUM_1KEV
-	REAL*8 GFF,XCROSS_V2
+	REAL(10) OBS_XRAY_LUM_0P1
+	REAL(10) OBS_XRAY_LUM_1KEV
+	REAL(10) GFF,XCROSS_V2
 	EXTERNAL GFF,XCROSS_V2
 !
-	REAL*8 SPEC_DEN(ND,NUM_SPECIES)		!Used by ELEC_PREP
-	REAL*8 AT_NO_VEC(ND,NUM_SPECIES)
+	REAL(10) SPEC_DEN(ND,NUM_SPECIES)		!Used by ELEC_PREP
+	REAL(10) AT_NO_VEC(ND,NUM_SPECIES)
 !
-	REAL*8 AD_COOL_V(ND)
-	REAL*8 AD_COOL_DT(ND)
-	REAL*8 ARTIFICIAL_HEAT_TERM(ND)
+	REAL(10) AD_COOL_V(ND)
+	REAL(10) AD_COOL_DT(ND)
+	REAL(10) ARTIFICIAL_HEAT_TERM(ND)
 !
 	LOGICAL FIRST
 	LOGICAL CHK,SUCCESS
@@ -404,7 +404,7 @@
 ! They are the He2 ege, NIII/CIII egde, HeI, HI, HI(N=2).
 !
 	INTEGER, PARAMETER :: N_TAU_EDGE=5
-	REAL*8 TAU_EDGE(N_TAU_EDGE)
+	REAL(10) TAU_EDGE(N_TAU_EDGE)
 	DATA TAU_EDGE/13.16D0,11.60D0,5.95D0,3.29D0,0.83D0/
 !
 ! 

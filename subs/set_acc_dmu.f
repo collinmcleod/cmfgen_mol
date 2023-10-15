@@ -8,11 +8,11 @@
 ! Created 14-Jun-2023
 !
 	INTEGER N
-	REAL*8 X(N),dX(N)
-	REAL*8 P(N),RVAL
+	REAL(10) X(N),dX(N)
+	REAL(10) P(N),RVAL
 !
-	REAL*8 A(8)
-	REAL*8 T1,T2
+	REAL(10) A(8)
+	REAL(10) T1,T2
 	INTEGER I
 !
 ! Compute the coeficients in the binomial expansion of 1-sqrt(1-x^2)

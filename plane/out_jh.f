@@ -6,13 +6,13 @@
 !                         been wrtten out with GREY option.  
 	INTEGER ND
 	INTEGER NCF
-	REAL*8 NU
-	REAL*8 R(ND)
-	REAL*8 V(ND)
-        REAL*8 RSQ_J(ND)
-	REAL*8 RSQ_H(ND)
-	REAL*8 H_INBC
-	REAL*8 H_OUTBC
+	REAL(10) NU
+	REAL(10) R(ND)
+	REAL(10) V(ND)
+        REAL(10) RSQ_J(ND)
+	REAL(10) RSQ_H(ND)
+	REAL(10) H_INBC
+	REAL(10) H_OUTBC
 !
 ! Used to indicate that we are passing the first frequency.
 !
@@ -21,7 +21,7 @@
 !
 ! Lcoal variables:
 !
-	REAL*8  T1
+	REAL(10)  T1
 !
 ! REC_SIZE     is the (maximum) record length in bytes.
 ! UNIT_SIZE    is the number of bytes per unit that is used to specify
@@ -40,7 +40,7 @@
 	INTEGER LU_ER,ERROR_LU,WARNING_LU,LU_WARN
 	EXTERNAL ERROR_LU,WARNING_LU
 !
-	REAL*8,  SAVE :: NU_STORE=0.0D0
+	REAL(10),  SAVE :: NU_STORE=0.0D0
 	INTEGER, SAVE :: ST_IREC=6
 	INTEGER, SAVE :: IREC=0
 	INTEGER, SAVE :: LU_OUT=0

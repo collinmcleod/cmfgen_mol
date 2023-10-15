@@ -14,8 +14,8 @@ c--------------------------------------------------------------------
 c
       implicit none
 c
-      real*8, dimension(2) :: j,djdr
-      real*8 x,r,mu,beta,dbetadr,gamma
+      REAL(10), dimension(2) :: j,djdr
+      REAL(10) x,r,mu,beta,dbetadr,gamma
 c
       r=x
       mu=j(2)

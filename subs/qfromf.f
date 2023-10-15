@@ -5,14 +5,14 @@ C
 	SUBROUTINE QFROMF(F,Q,R,TA,TB,ND)
 	IMPLICIT NONE
 C
-C Altered 26-May-1996 - GENERIC calls now used for DLOG and DEXp
+C Altered 26-May-1996 - GENERIC calls now used for LOG and DEXp
 C                       TWO used.
 C Created 17-FEB-1986
 C
 	INTEGER ND,I,IFAIL
-	REAL*8 F(ND),Q(ND),R(ND),TA(ND),TB(ND)
+	REAL(10) F(ND),Q(ND),R(ND),TA(ND),TB(ND)
 C
-	REAL*8, PARAMETER :: TWO=2.0D0
+	REAL(10), PARAMETER :: TWO=2.0D0
 C
 C TA and TB are work vectors.
 C

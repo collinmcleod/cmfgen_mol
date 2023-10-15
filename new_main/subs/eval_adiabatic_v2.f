@@ -27,24 +27,24 @@
 	INTEGER DIAG_INDX
 	INTEGER NUM_BNDS
 !
-	REAL*8 AD_CR_V(ND)
-	REAL*8 AD_CR_DT(ND)
-	REAL*8 POPION(ND)
-	REAL*8 ED(ND)
-	REAL*8 T(ND)
-	REAL*8 R(ND)
-	REAL*8 VEL(ND)
-	REAL*8 SIGMA(ND)
-	REAL*8 WORK(ND)
-	REAL*8 DIFFW(NT)		!d(dT/dR)/d?
-	REAL*8 DTDR			!dT/dR (Program units)
+	REAL(10) AD_CR_V(ND)
+	REAL(10) AD_CR_DT(ND)
+	REAL(10) POPION(ND)
+	REAL(10) ED(ND)
+	REAL(10) T(ND)
+	REAL(10) R(ND)
+	REAL(10) VEL(ND)
+	REAL(10) SIGMA(ND)
+	REAL(10) WORK(ND)
+	REAL(10) DIFFW(NT)		!d(dT/dR)/d?
+	REAL(10) DTDR			!dT/dR (Program units)
 	LOGICAL COMPUTE_BA,INCL_ADIABATIC
 !
-	REAL*8 BOLTZMANN_CONSTANT,FUN_PI
+	REAL(10) BOLTZMANN_CONSTANT,FUN_PI
 	EXTERNAL BOLTZMANN_CONSTANT,FUN_PI
 !
 	INTEGER I,J,L,GET_DIAG
-	REAL*8 SCALE,T1,PI
+	REAL(10) SCALE,T1,PI
 !
 ! Compute dlnT/dlnR using a simple difference formulae, which is
 ! second order accurate for equally space data. dlnT/dlnR is dimensionless.

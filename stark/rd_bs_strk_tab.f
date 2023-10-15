@@ -6,10 +6,10 @@
 	INTEGER STKTA_NES		!Number of Ne densities prof. tabulated at.
 	INTEGER STKTA_NPS		!Number of Ne densities prof. tabulated at.
 !
-	REAL*8, ALLOCATABLE :: STKTA_DWS(:)	!Offset from line center (Ang)
-	REAL*8, ALLOCATABLE :: STKTA_TS(:)	!Temperature (Log T(K))
-	REAL*8, ALLOCATABLE :: STKTA_ES(:)	!Log Ne (cgs units) 
-	REAL*8, ALLOCATABLE :: STKTA_PS(:)	!Phi(v)
+	REAL(10), ALLOCATABLE :: STKTA_DWS(:)	!Offset from line center (Ang)
+	REAL(10), ALLOCATABLE :: STKTA_TS(:)	!Temperature (Log T(K))
+	REAL(10), ALLOCATABLE :: STKTA_ES(:)	!Log Ne (cgs units) 
+	REAL(10), ALLOCATABLE :: STKTA_PS(:)	!Phi(v)
 !
 	INTEGER NL_STRK	!Lower levels
 	INTEGER NUP_STRK	!Upper level
@@ -25,7 +25,7 @@
 	USE STRK_MOD_HHE
 	IMPLICIT NONE
 !
-	REAL*8 NU_ZERO
+	REAL(10) NU_ZERO
 	CHARACTER*(*) SPECIES
 	CHARACTER*(*) PROF_TYPE
 	INTEGER NL,NUP

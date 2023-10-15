@@ -22,7 +22,7 @@ C                         backward substitution to allow CRAY vectorization.
 C Altered 21-Feb-1995 :  Cleaned
 C
 	INTEGER N1,N2
-	REAL*8 A(N1),B(N1),C(N1),D(N1,N2)
+	REAL(10) A(N1),B(N1),C(N1),D(N1,N2)
 C
 C Local variables
 C

@@ -23,19 +23,19 @@ C                         included.
 C Created  5-Oct-1987 (Based on WRPRRRGEN)
 C
 	INTEGER N,ND,LU,ML,MF,I,MS,J,IOS
-	REAL*8 PR(N,ND)			!Radiative photioization rate
-	REAL*8 RR(N,ND)			!Radiative recombination rate
-	REAL*8 CPR(ND)			!Collisional ioization rate
-	REAL*8 CRR(ND)			!Collisional recombination rate
-	REAL*8 CHG_PR(ND)		!Charge ionization rate
-	REAL*8 CHG_RR(ND)		!Charge recombination rate
-	REAL*8 DIERECOM(ND)
-	REAL*8 ADDRECOM(ND)
-	REAL*8 X_RECOM_1(ND),X_RECOM_2(ND)
-	REAL*8 TOTRR(ND),NETRR(ND)
-	REAL*8 R(ND),T(ND),ED(ND),DHYD(ND)
+	REAL(10) PR(N,ND)			!Radiative photioization rate
+	REAL(10) RR(N,ND)			!Radiative recombination rate
+	REAL(10) CPR(ND)			!Collisional ioization rate
+	REAL(10) CRR(ND)			!Collisional recombination rate
+	REAL(10) CHG_PR(ND)		!Charge ionization rate
+	REAL(10) CHG_RR(ND)		!Charge recombination rate
+	REAL(10) DIERECOM(ND)
+	REAL(10) ADDRECOM(ND)
+	REAL(10) X_RECOM_1(ND),X_RECOM_2(ND)
+	REAL(10) TOTRR(ND),NETRR(ND)
+	REAL(10) R(ND),T(ND),ED(ND),DHYD(ND)
 	CHARACTER*(*) FILNAM,STRDESC
-	REAL*8 ABS_SUM
+	REAL(10) ABS_SUM
 C
 	INTEGER ERROR_LU,LUER
 	INTEGER, PARAMETER :: IZERO=0

@@ -3,9 +3,9 @@
 *     .. Scalar Arguments ..
       CHARACTER*1        UPLO, TRANS
       INTEGER            N, K, LDA, LDC
-      DOUBLE PRECISION   ALPHA, BETA
+      REAL(10)   ALPHA, BETA
 *     .. Array Arguments ..
-      DOUBLE PRECISION   A( LDA, * ), C( LDC, * )
+      REAL(10)   A( LDA, * ), C( LDC, * )
 *     ..
 *
 *  Purpose
@@ -63,11 +63,11 @@
 *           of rows of the matrix  A.  K must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - DOUBLE PRECISION.
+*  ALPHA  - REAL(10).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
-*  A      - DOUBLE PRECISION array of DIMENSION ( LDA, ka ), where ka is
+*  A      - REAL(10) array of DIMENSION ( LDA, ka ), where ka is
 *           k  when  TRANS = 'N' or 'n',  and is  n  otherwise.
 *           Before entry with  TRANS = 'N' or 'n',  the  leading  n by k
 *           part of the array  A  must contain the matrix  A,  otherwise
@@ -82,11 +82,11 @@
 *           be at least  max( 1, k ).
 *           Unchanged on exit.
 *
-*  BETA   - DOUBLE PRECISION.
+*  BETA   - REAL(10).
 *           On entry, BETA specifies the scalar beta.
 *           Unchanged on exit.
 *
-*  C      - DOUBLE PRECISION array of DIMENSION ( LDC, n ).
+*  C      - REAL(10) array of DIMENSION ( LDC, n ).
 *           Before entry  with  UPLO = 'U' or 'u',  the leading  n by n
 *           upper triangular part of the array C must contain the upper
 *           triangular part  of the  symmetric matrix  and the strictly
@@ -126,9 +126,9 @@
 *     .. Local Scalars ..
       LOGICAL            UPPER
       INTEGER            I, INFO, J, L, NROWA
-      DOUBLE PRECISION   TEMP
+      REAL(10)   TEMP
 *     .. Parameters ..
-      DOUBLE PRECISION   ONE ,         ZERO
+      REAL(10)   ONE ,         ZERO
       PARAMETER        ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Executable Statements ..

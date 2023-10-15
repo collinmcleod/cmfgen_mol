@@ -31,42 +31,42 @@
 !
 ! Line+continuum frequencies
 
-	REAL*8 FREQ(NFREQ_MAX)			!New observers frequencies
+	REAL(10) FREQ(NFREQ_MAX)			!New observers frequencies
 !
 ! Passed vectors.
 !
-	REAL*8 NU_LINE(N_LINES)		!Line frequencies
-	REAL*8 NU_STRT_LINE(N_LINES)	!Frequencies of start of res. zone.
-	REAL*8 VEC_VMIN_VDOP(N_LINES)	!Minium Doppler velocity in km/s.
+	REAL(10) NU_LINE(N_LINES)		!Line frequencies
+	REAL(10) NU_STRT_LINE(N_LINES)	!Frequencies of start of res. zone.
+	REAL(10) VEC_VMIN_VDOP(N_LINES)	!Minium Doppler velocity in km/s.
 !
 	CHARACTER*(*) TRANS_TYPE(N_LINES)
 	LOGICAL      INCL_ALL_LINES
 !
 ! Passed constants:
-	REAL*8 VINF		!Terminal velocity of wind.
-	REAL*8 dV_OBS_PROF
-	REAL*8 dV_OBS_WING
-	REAL*8 dV_OBS_BIG
-	REAL*8 NU_MIN
-	REAL*8 NU_MAX
-	REAL*8 OBS_PRO_EXT_RAT
-	REAL*8 ES_WING_EXT
-	REAL*8 V_DOP
-	REAL*8 FRAC_DOP_OBS
+	REAL(10) VINF		!Terminal velocity of wind.
+	REAL(10) dV_OBS_PROF
+	REAL(10) dV_OBS_WING
+	REAL(10) dV_OBS_BIG
+	REAL(10) NU_MIN
+	REAL(10) NU_MAX
+	REAL(10) OBS_PRO_EXT_RAT
+	REAL(10) ES_WING_EXT
+	REAL(10) V_DOP
+	REAL(10) FRAC_DOP_OBS
 !
 ! Local variables.
 !
-	REAL*8 MAX_B_EXTENT		!Maximum blueward extent of line profile
-	REAL*8 MAX_R_EXTENT		!Maximum  redward extent of line profile
-	REAL*8 MAX_BW_EXTENT		!Maximum blueward extent of e.s. wings
-	REAL*8 MAX_RW_EXTENT		!Maximum  redward extent of e.s. wings
+	REAL(10) MAX_B_EXTENT		!Maximum blueward extent of line profile
+	REAL(10) MAX_R_EXTENT		!Maximum  redward extent of line profile
+	REAL(10) MAX_BW_EXTENT		!Maximum blueward extent of e.s. wings
+	REAL(10) MAX_RW_EXTENT		!Maximum  redward extent of e.s. wings
 !
-	REAL*8 PROF_SPACING
-	REAL*8 WING_SPACING
-	REAL*8 BIG_SPACING
-	REAL*8 T1,T2
-	REAL*8 dNU
-	REAL*8 NU_END_LINE
+	REAL(10) PROF_SPACING
+	REAL(10) WING_SPACING
+	REAL(10) BIG_SPACING
+	REAL(10) T1,T2
+	REAL(10) dNU
+	REAL(10) NU_END_LINE
 !
 	INTEGER INDX		!Current frequency index.
 	INTEGER LN_INDX	!Current line whose frequencies we are 
@@ -74,12 +74,12 @@
 !
 	INTEGER I,J,K		!Micellaneous loop variables.
 	INTEGER LU_ER
-	REAL*8 C_KMS
+	REAL(10) C_KMS
 !
 ! External functions
 !
 	INTEGER ERROR_LU
-	REAL*8 SPEED_OF_LIGHT
+	REAL(10) SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()

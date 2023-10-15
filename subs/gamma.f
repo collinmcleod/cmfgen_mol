@@ -9,13 +9,13 @@ C
 	IMPLICIT NONE
 C
 	INTEGER ND,NI
-	REAL*8 GAM(NI),GAMH(NI)
-	REAL*8 SIGMA(ND),Z(NI),R(ND),V(ND)
+	REAL(10) GAM(NI),GAMH(NI)
+	REAL(10) SIGMA(ND),Z(NI),R(ND),V(ND)
 C
 C Local variables.
 C
 	INTEGER I
-	REAL*8 MU
+	REAL(10) MU
 C
 C Assume (1)	SIGMAd+1/2 = 0.5*( SIGMAd+1+SIGMAd )
 C 	 (2)	Vd+1/2=0.5*( Vd + Vd+1 )

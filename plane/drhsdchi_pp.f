@@ -12,25 +12,25 @@
 !                      Q and R^2 terms have been omitted.
 !
 	INTEGER ND
-	REAL*8 SOURCE(ND)
-	REAL*8 CHI(ND)
-	REAL*8 DTAU(ND)
-	REAL*8 COH_VEC(ND)
-	REAL*8 RJ(ND)
-	REAL*8 R(ND)
-	REAL*8 F(ND)
-	REAL*8 DBB
+	REAL(10) SOURCE(ND)
+	REAL(10) CHI(ND)
+	REAL(10) DTAU(ND)
+	REAL(10) COH_VEC(ND)
+	REAL(10) RJ(ND)
+	REAL(10) R(ND)
+	REAL(10) F(ND)
+	REAL(10) DBB
 	LOGICAL DIFF
 !
 ! Output:
 !
-	REAL*8 W(ND,ND)
+	REAL(10) W(ND,ND)
 !
 ! Local varaibles.
 !
-	REAL*8 dTAU_dCHI(ND,ND)
-	REAL*8 ALPHA,BETA,T1
-	REAL*8 UIJ,UII
+	REAL(10) dTAU_dCHI(ND,ND)
+	REAL(10) ALPHA,BETA,T1
+	REAL(10) UIJ,UII
 	INTEGER I,J,K
 !
 ! Compute dDTAU(I)/dCHI

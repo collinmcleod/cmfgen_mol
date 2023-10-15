@@ -23,7 +23,7 @@ C
 C
 C Altered 16-Jun-1996 : Call to ZERO removed. COL and dCOL now initializd
 C                         outside depth loop.
-C                       Bug FIX: COL_FILE was declared REAL*8, NOW declared
+C                       Bug FIX: COL_FILE was declared REAL(10), NOW declared
 C                           as CHARACTER. No efffect on VAX, important on CRAY.
 C Altered 27-May-1996 : Generic calls used for EXP, SQRT.
 C Altered 03-Jan-1995 - HN_F  inserted in call (_V2 changed to _V3)
@@ -45,43 +45,43 @@ C                       Vector COOL was installed to enable checking of
 C                         collisonal cooling rates.
 C
 	INTEGER N_S,N_F,ND  
-	REAL*8 OMEGA_F(N_F,N_F),dln_OMEGA_dlnT(N_F,N_F)
-	REAL*8 COL_S(N_S,N_S,ND),DCOL_S(N_S,N_S,ND)
+	REAL(10) OMEGA_F(N_F,N_F),dln_OMEGA_dlnT(N_F,N_F)
+	REAL(10) COL_S(N_S,N_S,ND),DCOL_S(N_S,N_S,ND)
 C
-	REAL*8 HN_S(N_S,ND)		!Population of atom with super levels.
-	REAL*8 HNST_S(N_S,ND)		!LTE pop. of atom with super levels.
-	REAL*8 dlnHNST_S_dlnT(N_S,ND)
+	REAL(10) HN_S(N_S,ND)		!Population of atom with super levels.
+	REAL(10) HNST_S(N_S,ND)		!LTE pop. of atom with super levels.
+	REAL(10) dlnHNST_S_dlnT(N_S,ND)
 C
-	REAL*8 HN_F(N_F,ND)		!Population of FULL atom
-	REAL*8 HNST_F(N_F,ND)		!LTE population of FULL atom
-	REAL*8 W_F(N_F,ND)		!Occupation probability
-	REAL*8 AHYD_F(N_F,N_F)		!Einstein A coefficient
-	REAL*8 EDGE_F(N_F)		!Ionization frequency (10^15 Hz)
-	REAL*8 GHYD_F(N_F)		!Statistical weight.
-	REAL*8 ZION			!Charge on ion (i.e. 1 for H)
+	REAL(10) HN_F(N_F,ND)		!Population of FULL atom
+	REAL(10) HNST_F(N_F,ND)		!LTE population of FULL atom
+	REAL(10) W_F(N_F,ND)		!Occupation probability
+	REAL(10) AHYD_F(N_F,N_F)		!Einstein A coefficient
+	REAL(10) EDGE_F(N_F)		!Ionization frequency (10^15 Hz)
+	REAL(10) GHYD_F(N_F)		!Statistical weight.
+	REAL(10) ZION			!Charge on ion (i.e. 1 for H)
 	CHARACTER*(*) COL_FILE		!Name of file with collisonal data.
 	CHARACTER*(*) LEVNAME_F(N_F)	!Level names in FULL ATOM.
 	EXTERNAL SUB_PHOT
 C
 	INTEGER F_TO_S_MAPPING(N_F)
 C
-	REAL*8 T(ND)			!Temperature (10^4 K)
-	REAL*8 ED(ND)			!Electron density
+	REAL(10) T(ND)			!Temperature (10^4 K)
+	REAL(10) ED(ND)			!Electron density
 C
 C NB: On exit COOL needs to be multiplied by COOL.
 C
-	REAL*8 COOL(ND)			!Net collisional cooling
+	REAL(10) COOL(ND)			!Net collisional cooling
 C
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 	EXTERNAL OMEGA_COL
 C
 	INTEGER I,J,K
 	INTEGER L,U
-	REAL*8 X
-	REAL*8 BRAT
-	REAL*8 CIJ,CJI,CII
+	REAL(10) X
+	REAL(10) BRAT
+	REAL(10) CIJ,CJI,CII
 C
 	COL_S(:,:,:)=0.0D0  		!N_S, N_S, ND
 	dCOL_S(:,:,:)=0.0D0  		!N_S, N_S, ND

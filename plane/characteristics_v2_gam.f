@@ -34,11 +34,11 @@
 !
 ! Grid variables
 !
-      REAL*8, DIMENSION(ND) :: R_GRID
-      REAL*8, DIMENSION(NP) :: P
-      REAL*8, DIMENSION(ND) :: V_GRID
-      REAL*8, DIMENSION(ND) :: VDOP_VEC(ND)
-      REAL*8  VDOP_FRAC
+      REAL(10), DIMENSION(ND) :: R_GRID
+      REAL(10), DIMENSION(NP) :: P
+      REAL(10), DIMENSION(ND) :: V_GRID
+      REAL(10), DIMENSION(ND) :: VDOP_VEC(ND)
+      REAL(10)  VDOP_FRAC
 !
 ! 'ns' is number of steps to take between each grid point when
 ! integrating wrt r.  'mu_step' is mu step to use when integrating wrt s.
@@ -47,7 +47,7 @@
       INTEGER, PARAMETER :: NS=20
       INTEGER, PARAMETER :: IONE=1
 !
-      REAL*8, PARAMETER ::  MU_STEP=0.005D0
+      REAL(10), PARAMETER ::  MU_STEP=0.005D0
 !
 ! Number of equations in Runge-Kutta solution
 !
@@ -65,28 +65,28 @@
 !
 ! Determine direction of characteristic ray (+1,-1)
 !
-      REAL*8 :: DIRECTION
+      REAL(10) :: DIRECTION
 !
 ! Radius variables
 !
-      REAL*8 dZ,dV,dR
-      REAL*8 :: RMIN,RMAX,DS,SS,RR,VEL,A_OLD,DR_OLD,DS_1,DR_1
-      REAL*8 :: MU_E,MU_H
+      REAL(10) dZ,dV,dR
+      REAL(10) :: RMIN,RMAX,DS,SS,RR,VEL,A_OLD,DR_OLD,DS_1,DR_1
+      REAL(10) :: MU_E,MU_H
 !
 ! Velocity variables
 !
-      REAL*8 :: BETAMAX,BETA,DBETADR,GAMMA
+      REAL(10) :: BETAMAX,BETA,DBETADR,GAMMA
 !
 ! Runge-Kutta variables
 !
-      REAL*8, DIMENSION(EQU) :: A,DADS,DADR
+      REAL(10), DIMENSION(EQU) :: A,DADS,DADR
 !
-	REAL*8, ALLOCATABLE :: Z(:)
-	REAL*8, ALLOCATABLE :: R(:)
-	REAL*8, ALLOCATABLE :: V(:)
-	REAL*8, ALLOCATABLE :: S(:)
-	REAL*8, ALLOCATABLE :: MU(:)
-	REAL*8, ALLOCATABLE :: B(:)
+	REAL(10), ALLOCATABLE :: Z(:)
+	REAL(10), ALLOCATABLE :: R(:)
+	REAL(10), ALLOCATABLE :: V(:)
+	REAL(10), ALLOCATABLE :: S(:)
+	REAL(10), ALLOCATABLE :: MU(:)
+	REAL(10), ALLOCATABLE :: B(:)
 !
 	INTEGER NINS
 	INTEGER NRAY

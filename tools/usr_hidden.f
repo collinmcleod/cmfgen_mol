@@ -104,7 +104,7 @@ c
 c
       integer :: l,o_start,o_end
 c
-      real*8 :: input
+      REAL(10) :: input
 c
       character(len=*) :: var_name,description,default
       character(len=120) :: answer,sve_string,option,all_caps
@@ -218,8 +218,8 @@ c
       integer :: i,l,o_start,o_end,found
       integer :: m,start,stop,step,count
 c
-      real*8, dimension(dim) :: input
-      real*8 t1
+      REAL(10), dimension(dim) :: input
+      REAL(10) t1
 c
       character(len=*) :: var_name,description,default
       character(len=120) :: answer,sve_string,option,number,all_caps

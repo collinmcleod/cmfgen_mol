@@ -20,8 +20,8 @@ C                       answers for a linear function (also quadratic and cubic)
 C Altered 28-SEP-1982 (6.9 in simuneq replaced by 6.0)
 C
 	INTEGER N,I
-	REAL*8 U(N),W(N)
-	REAL*8 T1,T2,TT
+	REAL(10) U(N),W(N)
+	REAL(10) T1,T2,TT
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -116,8 +116,8 @@ C
 	  W(:)=0.0D0
 	  I=N
 	  DO WHILE (I .GE. 2)
-	    T1=DABS(U(I-1)-U(I))
-	    IF(I .NE. 2)T2=DABS(DABS(U(I-2)-U(I-1))/T1-1.0D0)
+	    T1=ABS(U(I-1)-U(I))
+	    IF(I .NE. 2)T2=ABS(ABS(U(I-2)-U(I-1))/T1-1.0D0)
 	    IF(T2 .LT. 1.0D-06 .AND. I .NE. 2)THEN
 	      W(I)=W(I)+T1/3.0D0
 	      W(I-1)=W(I-1)+4.0D0*T1/3.0D0

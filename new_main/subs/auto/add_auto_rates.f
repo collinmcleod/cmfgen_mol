@@ -18,9 +18,9 @@
 ! Created: 29-Aug-2015
 !
 	INTEGER N_F
-	REAL*8 ARAD(N_F)
-	REAL*8 FEDGE_F(N_F)
-	REAL*8 G_F(N_F)
+	REAL(10) ARAD(N_F)
+	REAL(10) FEDGE_F(N_F)
+	REAL(10) G_F(N_F)
 	CHARACTER(LEN=*) LEVNAME_F(N_F)
 	CHARACTER(LEN=*) AUTO_FILE
 !
@@ -30,7 +30,7 @@
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
 !
-	REAL*8 AUTO(N_F)
+	REAL(10) AUTO(N_F)
 	LOGICAL AUTO_FILE_EXISTS
 !
 ! The autoionization probabilities are depth independent, and hence can be

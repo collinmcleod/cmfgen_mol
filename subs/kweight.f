@@ -18,7 +18,7 @@ C                      for U= a + b*mu*mu .
 C Created 25-Nov-1986 (Based on NORDWEIGHT)
 C
 	INTEGER N,I
-	REAL*8 X(N),W(N),H,HN,RE,RF,SUM
+	REAL(10) X(N),W(N),H,HN,RE,RF,SUM
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU

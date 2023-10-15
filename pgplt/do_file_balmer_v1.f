@@ -28,10 +28,10 @@
 	INTEGER NPIX
 	INTEGER IST,IEND		!Line limits in pixel space
 	REAL*4 LAM_ST,LAM_END           !Line limits in lambda space
-	REAL*8 LAM_CENT			!Line centroid
-	REAL*8 MEAN 			!Used computing line centroid
-	REAL*8 EW_MOD,EW_OBS
-        REAL*8 EW_OBS_OMIT,EW_MOD_OMIT
+	REAL(10) LAM_CENT			!Line centroid
+	REAL(10) MEAN 			!Used computing line centroid
+	REAL(10) EW_MOD,EW_OBS
+        REAL(10) EW_OBS_OMIT,EW_MOD_OMIT
 !
 ! Work variables
 !
@@ -44,11 +44,11 @@
 !
 ! Work variable used to compute slope of line that yields the lowest chi^2.
 !
-	REAL*8 SUM_OSQ, SUM_LOSQ, SUM_LSQ_OSQ
-	REAL*8 SUM_MO, SUM_LMO
-	REAL*8 A, B
-	REAL*8 DET, DA, DB
-	REAL*8 CHISQ,RAW_CHISQ,RED_CHISQ
+	REAL(10) SUM_OSQ, SUM_LOSQ, SUM_LSQ_OSQ
+	REAL(10) SUM_MO, SUM_LMO
+	REAL(10) A, B
+	REAL(10) DET, DA, DB
+	REAL(10) CHISQ,RAW_CHISQ,RED_CHISQ
 !
 ! Mask is to omit regions containg weak lines in the Balmer wings.
 !

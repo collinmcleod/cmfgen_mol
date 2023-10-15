@@ -22,27 +22,27 @@ C                           line origin.
 C Created 6-Oct-1988  : Based on SOBJBARANDEW which in turn based on SOBJBAR
 C
 	INTEGER NC,NP,ND
-	REAL*8 SOURCE(ND),CHI(ND),ESEC(ND),CHIL(ND),ETAL(ND)
-	REAL*8 V(ND),SIGMA(ND),R(ND),P(NP),AQW(ND,NP),HAQW(ND,NP)
-	REAL*8 DBB,IC,FL,EW,CONT_FLUX,LINE_FLUX(ND)
+	REAL(10) SOURCE(ND),CHI(ND),ESEC(ND),CHIL(ND),ETAL(ND)
+	REAL(10) V(ND),SIGMA(ND),R(ND),P(NP),AQW(ND,NP),HAQW(ND,NP)
+	REAL(10) DBB,IC,FL,EW,CONT_FLUX,LINE_FLUX(ND)
 	CHARACTER*(*) METHOD
 	LOGICAL DIF,THICK,DIE
 C
 C Use dynamic allocation for required vectors.
 C
-	REAL*8 TA(ND),TB(ND),TC(ND),AV(ND),DTAU(ND),Z(ND)
-	REAL*8 GAM(ND),GAMH(ND),dCHIdR(ND),NOES(ND)
+	REAL(10) TA(ND),TB(ND),TC(ND),AV(ND),DTAU(ND),Z(ND)
+	REAL(10) GAM(ND),GAMH(ND),dCHIdR(ND),NOES(ND)
 C
-	REAL*8 EXPONX
+	REAL(10) EXPONX
 C
 C Local variables.
 C
 	INTEGER, PARAMETER :: IONE=1
 C
 	INTEGER I,LS,NI
-	REAL*8 T1,T2,T3,T4,DBC,TOR
-	REAL*8 E1,E2,E3
-	REAL*8 IBOUND
+	REAL(10) T1,T2,T3,T4,DBC,TOR
+	REAL(10) E1,E2,E3
+	REAL(10) IBOUND
 C
 C Zero arrays which are incremented as we integrate over angle.
 C Evaluate the SOBOLEV optical depth without angle factor (GAMH).

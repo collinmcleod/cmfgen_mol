@@ -11,7 +11,7 @@
 ! Altered: 01-Feb-2022          !Now allow a maximum of 20 new Gaussians to be added.
 ! Created:  -Sep-2007		!Author: D. J. Hillier
 !
-	REAL*8, ALLOCATABLE :: TMP_PAR(:)
+	REAL(10), ALLOCATABLE :: TMP_PAR(:)
 	INTEGER K			!Array index
 	INTEGER IP			!# of Gaussian
 	LOGICAL SCRAP

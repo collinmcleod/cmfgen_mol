@@ -7,8 +7,8 @@
         INTEGER :: I,J,K
 	INTEGER :: INDX
 	INTEGER :: V
-        REAL*8 :: A(N,ND)
-        REAL*8 :: B(N)
+        REAL(10) :: A(N,ND)
+        REAL(10) :: B(N)
         CHARACTER(LEN=40) :: FILENAME1
         CHARACTER(LEN=40) :: FILENAME2
         CHARACTER(LEN=15) :: STRING

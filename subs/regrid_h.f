@@ -10,16 +10,16 @@ C                            No effect on computation.
 C Finalized 05-Jan-1995
 C
 	INTEGER ND
-	REAL*8 HNU(ND)		!Returned - Flux on nodes
+	REAL(10) HNU(ND)		!Returned - Flux on nodes
 C
-	REAL*8 R(ND)
-	REAL*8 RSQHNU(ND-1)
+	REAL(10) R(ND)
+	REAL(10) RSQHNU(ND-1)
 C
-	REAL*8 H_OUT		!H flux at outer boundary (from boundary 
+	REAL(10) H_OUT		!H flux at outer boundary (from boundary 
 	                        !                          conditions)
-	REAL*8 H_IN             !H flux at inner boundary.
+	REAL(10) H_IN             !H flux at inner boundary.
 C
-	REAL*8 MIDR(ND)		!Work array
+	REAL(10) MIDR(ND)		!Work array
 C
 C Local variables
 C

@@ -11,10 +11,10 @@
 !
 	INTEGER ND
 	INTEGER NT
-	REAL*8 R(ND)
-	REAL*8 V(ND)
-	REAL*8 SIGMA(ND)
-	REAL*8 POPS(NT*ND)
+	REAL(10) R(ND)
+	REAL(10) V(ND)
+	REAL(10) SIGMA(ND)
+	REAL(10) POPS(NT*ND)
 !
 !  On input,  IREC_RD is the time step record to be read. If zero, the last
 !                time step is read.
@@ -233,10 +233,10 @@
 !
 	INTEGER ND
 	INTEGER NT
-	REAL*8 R(ND)
-	REAL*8 V(ND)
-	REAL*8 SIGMA(ND)
-	REAL*8 POPS(NT*ND)
+	REAL(10) R(ND)
+	REAL(10) V(ND)
+	REAL(10) SIGMA(ND)
+	REAL(10) POPS(NT*ND)
 	INTEGER IREC
 	INTEGER LU
 	LOGICAL NEW_FILE 

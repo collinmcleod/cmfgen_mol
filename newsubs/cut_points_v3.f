@@ -27,17 +27,17 @@
 ! Both the *_cut and *_sm arrays are assumed to have a maximum length of NUM_SM.
 !
       INTEGER NUM_SM
-      REAL*8 NU_SM(NUM_SM),CROSS_SM(NUM_SM)
-      REAL*8 CUT_ACCURACY
+      REAL(10) NU_SM(NUM_SM),CROSS_SM(NUM_SM)
+      REAL(10) CUT_ACCURACY
 !
-      REAL*8 NU_CUT(NUM_SM)
-      REAL*8 CROSS_CUT(NUM_SM)
-      REAL*8 DERIV(NUM_SM)
-      REAL*8 DIST(NUM_SM)
+      REAL(10) NU_CUT(NUM_SM)
+      REAL(10) CROSS_CUT(NUM_SM)
+      REAL(10) DERIV(NUM_SM)
+      REAL(10) DIST(NUM_SM)
 !
       INTEGER I,LOW,HIGH,MID,NUM_CUT,NUM_AREA
-      REAL*8 X,Y,M
-      REAL*8 COMP_VAL
+      REAL(10) X,Y,M
+      REAL(10) COMP_VAL
 !
 ! Find derivatives
 !

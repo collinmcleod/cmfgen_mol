@@ -18,13 +18,13 @@ C                         backward substitution to allow CRAY vectorization.
 C Altered 17-May-1996 : DIV now dimension by N1 (using F90 advantages).
 C
 	INTEGER N1,N2
-	REAL*8 A(N1),H(N1),C(N1),D(N1,N2)
+	REAL(10) A(N1),H(N1),C(N1),D(N1,N2)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
 	INTEGER I,J
-	REAL*8 DIV(N1)
+	REAL(10) DIV(N1)
 C
 C Change the following statement to TRUE if running on a VECTOR machine.
 C

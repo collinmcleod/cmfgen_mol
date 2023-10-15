@@ -28,14 +28,14 @@
 ! variation.
 !
 	TYPE STAT_EQ_DATA 
-          REAL*8, POINTER :: STEQ(:,:)  		!Statistical equilibrium Eqns. for XzV
-          REAL*8, POINTER :: STEQ_ADV(:)  		!Statistical equilibrium ion eqns. for advection terms
-          REAL*8, POINTER :: QFV_P(:,:)  		!
-          REAL*8, POINTER :: QFV_R(:,:)  		!
-          REAL*8, POINTER :: QFV_P_EHB(:,:)  		!
-          REAL*8, POINTER :: QFV_R_EHB(:,:)  		!
-          REAL*8, POINTER :: BA(:,:,:,:)		!BA matrix for XzV
-          REAL*8, POINTER :: BA_PAR(:,:,:)		!BA matrix for XzV (diagonal terms)
+          REAL(10), POINTER :: STEQ(:,:)  		!Statistical equilibrium Eqns. for XzV
+          REAL(10), POINTER :: STEQ_ADV(:)  		!Statistical equilibrium ion eqns. for advection terms
+          REAL(10), POINTER :: QFV_P(:,:)  		!
+          REAL(10), POINTER :: QFV_R(:,:)  		!
+          REAL(10), POINTER :: QFV_P_EHB(:,:)  		!
+          REAL(10), POINTER :: QFV_R_EHB(:,:)  		!
+          REAL(10), POINTER :: BA(:,:,:,:)		!BA matrix for XzV
+          REAL(10), POINTER :: BA_PAR(:,:,:)		!BA matrix for XzV (diagonal terms)
 	  INTEGER, POINTER :: LNK_TO_IV(:)    	!
 	  INTEGER, POINTER :: LNK_TO_F(:)     	!
 	  INTEGER, POINTER :: EQ_IN_BA(:)     	!
@@ -51,16 +51,16 @@
           LOGICAL IMPURITY_SPECIES
 	END TYPE STAT_EQ_DATA
 !
-        REAL*8, ALLOCATABLE :: STEQ_T(:)
-        REAL*8, ALLOCATABLE :: STEQ_ED(:)
-        REAL*8, ALLOCATABLE :: BA_T(:,:,:)
-        REAL*8, ALLOCATABLE :: BA_ED(:,:,:)
-        REAL*8, ALLOCATABLE :: BA_ADV_TERM(:,:)
-        REAL*8, ALLOCATABLE :: BA_T_PAR(:,:)
+        REAL(10), ALLOCATABLE :: STEQ_T(:)
+        REAL(10), ALLOCATABLE :: STEQ_ED(:)
+        REAL(10), ALLOCATABLE :: BA_T(:,:,:)
+        REAL(10), ALLOCATABLE :: BA_ED(:,:,:)
+        REAL(10), ALLOCATABLE :: BA_ADV_TERM(:,:)
+        REAL(10), ALLOCATABLE :: BA_T_PAR(:,:)
 !
-        REAL*8, ALLOCATABLE :: STEQ_T_EHB(:)
-        REAL*8, ALLOCATABLE :: BA_T_EHB(:,:,:)
-        REAL*8, ALLOCATABLE :: BA_T_PAR_EHB(:,:)
+        REAL(10), ALLOCATABLE :: STEQ_T_EHB(:)
+        REAL(10), ALLOCATABLE :: BA_T_EHB(:,:,:)
+        REAL(10), ALLOCATABLE :: BA_T_PAR_EHB(:,:)
 !
         TYPE (STAT_EQ_DATA)  SE(BA_NUM_SPECIES*BA_MAX_IONS_PER_SPECIES)
 !

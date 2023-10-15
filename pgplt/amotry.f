@@ -1,7 +1,7 @@
       FUNCTION AMOTRY(P,Y,PSUM,MP,NP,NDIM,FUNK,IHI,FAC)
       IMPLICIT NONE
       INTEGER IHI,MP,NDIM,NP
-      REAL*8 AMOTRY,FAC,P(MP,NP),PSUM(NP),Y(MP),FUNK
+      REAL(10) AMOTRY,FAC,P(MP,NP),PSUM(NP),Y(MP),FUNK
       EXTERNAL FUNK
 !
 ! Altered 01-Feb-2022: PTRY is now automatically dimensioned.
@@ -9,8 +9,8 @@
 ! Uses function FUNK
 !
       INTEGER J
-      REAL*8 FAC1,FAC2,YTRY
-      REAL*8 PTRY(NDIM)
+      REAL(10) FAC1,FAC2,YTRY
+      REAL(10) PTRY(NDIM)
 !
       FAC1=(1.D0-FAC)/NDIM
       FAC2=FAC1-FAC

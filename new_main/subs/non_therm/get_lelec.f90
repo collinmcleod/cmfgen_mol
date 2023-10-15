@@ -2,9 +2,9 @@
 	IMPLICIT NONE
 !
 	INTEGER NKT
-	REAL*8 LELEC(NKT)
-	REAL*8 XKT(NKT)
-	REAL*8 N_ELEC
+	REAL(10) LELEC(NKT)
+	REAL(10) XKT(NKT)
+	REAL(10) N_ELEC
 !
 	real*8, parameter :: ELECTRON_VOLT=1.60217733D-12  ! erg
 	real*8, parameter :: PLANCKS_CONSTANT=6.626075D-27 ! erg sec
@@ -16,10 +16,10 @@
 !
 	INTEGER I
 	INTEGER IKT
-	REAL*8 T1,T2,XV,XE_CGS
-	REAL*8 XI_E
-	REAL*8 PLASMA_FREQ
-	REAL*8 GAMMA_EULER
+	REAL(10) T1,T2,XV,XE_CGS
+	REAL(10) XI_E
+	REAL(10) PLASMA_FREQ
+	REAL(10) GAMMA_EULER
 !
 ! plasma_freq is in 1/s, i.e. cgs
 ! xi_e is put in erg !!! [e^2] has dimensions of energy x length
@@ -43,11 +43,11 @@
 	
 	     if (xkt(ikt).lt.14.0D0) then
 	        t1 = n_elec * 2.D0 * PI * ELECTRON_CHARGE**4 / xe_cgs * &
-	             dlog( ELECTRON_MASS * xv**3/ gamma_euler / ELECTRON_CHARGE**2 / plasma_freq  )
+	             log( ELECTRON_MASS * xv**3/ gamma_euler / ELECTRON_CHARGE**2 / plasma_freq  )
 	        lelec(ikt) = t1
 	     else
 	        t2 = n_elec * 2.D0 * PI * ELECTRON_CHARGE**4 / xe_cgs * &
-	             dlog(2.0D0 * xe_cgs / xi_e)
+	             log(2.0D0 * xe_cgs / xi_e)
 	        lelec(ikt) =  t2
 	     endif
 	  enddo

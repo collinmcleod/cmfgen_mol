@@ -23,19 +23,19 @@ C
 	IMPLICIT NONE
 C
 	INTEGER ND
-	REAL*8 DC2_S(ND)		!Ion density (Super levels)
-	REAL*8 DC2_F(ND)		!Ion density (Full model atom)
+	REAL(10) DC2_S(ND)		!Ion density (Super levels)
+	REAL(10) DC2_F(ND)		!Ion density (Full model atom)
 C
 	INTEGER NC2_F
-	REAL*8 C2_F(NC2_F,ND)
+	REAL(10) C2_F(NC2_F,ND)
 	INTEGER F_TO_S_MAP_C2(NC2_F)
 C
 	INTEGER NC2_S
-	REAL*8 C2_S(NC2_S,ND)
+	REAL(10) C2_S(NC2_S,ND)
 	LOGICAL C2_PRES
 C
 	INTEGER NCIII_S
-	REAL*8 CIII_S(NCIII_S,ND)
+	REAL(10) CIII_S(NCIII_S,ND)
 	LOGICAL CIII_PRES
 C
 C Local variables.

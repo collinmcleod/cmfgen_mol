@@ -48,70 +48,70 @@
 ! supplied by calling routine. At present it is assumed that these are
 ! on the same depth grid, and on the same frequency grid.
 !
-	REAL*8 ETA_CMF(ND,NCF)
-	REAL*8 CHI_CMF(ND,NCF)
-	REAL*8 FREQ_CMF(NCF)
+	REAL(10) ETA_CMF(ND,NCF)
+	REAL(10) CHI_CMF(ND,NCF)
+	REAL(10) FREQ_CMF(NCF)
 !
-	REAL*8 R(ND)
-	REAL*8 V(ND)
-	REAL*8 T(ND)
-	REAL*8 ED(ND)
+	REAL(10) R(ND)
+	REAL(10) V(ND)
+	REAL(10) T(ND)
+	REAL(10) ED(ND)
 !
 ! Impact parameters: For rays not striking the core, P must be defined by
 ! the R grid. NP should be ND+NC
 !
 	INTEGER NC
 	INTEGER NP
-	REAL*8 P(NP)
-	REAL*8 MU_AT_RMAX(NP)
-	REAL*8 HQW_AT_RMAX(NP)
+	REAL(10) P(NP)
+	REAL(10) MU_AT_RMAX(NP)
+	REAL(10) HQW_AT_RMAX(NP)
 !
 ! Observer's frame frequencies in units of 10^15 Hz. Should be monotonically
 ! decreasing.
 !
 	INTEGER NOS
-	REAL*8 OBS_FREQ(NOS)
-	REAL*8 OBS_FLUX(NOS)
+	REAL(10) OBS_FREQ(NOS)
+	REAL(10) OBS_FLUX(NOS)
 !
 ! Maximum velocity spacing across consequitive grid points. Ideally this
 ! should be least than 0.25 of a Doppler width.
 !
-	REAL*8 MAX_DEL_V_RES_ZONE(ND)
+	REAL(10) MAX_DEL_V_RES_ZONE(ND)
 !
-	REAL*8 TAU_MAX
-	REAL*8 ES_DTAU
+	REAL(10) TAU_MAX
+	REAL(10) ES_DTAU
 	INTEGER N_INS_OBS
 	CHARACTER*(*) INT_METHOD
 !
 ! Local vectors and arrays.
 !
-	REAL*8 VMU(ND)		!Velocity*(Z/R) on R grid.
-	REAL*8 Z(ND)		!Distance along ray on R grid.
-	REAL*8 ESEC(ND)		!Electron scattering opacity
-	REAL*8 TAU_ES(ND)	!Rough TAU_ES along ray
-	REAL*8 DTAU_ES(ND)	!Rough DTAU_ES along ray
+	REAL(10) VMU(ND)		!Velocity*(Z/R) on R grid.
+	REAL(10) Z(ND)		!Distance along ray on R grid.
+	REAL(10) ESEC(ND)		!Electron scattering opacity
+	REAL(10) TAU_ES(ND)	!Rough TAU_ES along ray
+	REAL(10) DTAU_ES(ND)	!Rough DTAU_ES along ray
 !
 ! Emissivities and Opacities in the CMF frame. These are created in this
 ! routing from ETA_CMF and CHI_CMF, and are on the fine grid used to solve
 ! the transfer equation.
 !
-	REAL*8, ALLOCATABLE ::  ETA_CMF_RAY(:,:)
-	REAL*8, ALLOCATABLE ::  CHI_CMF_RAY(:,:)
-	REAL*8, ALLOCATABLE ::  SM_FREQ_CMF(:)
+	REAL(10), ALLOCATABLE ::  ETA_CMF_RAY(:,:)
+	REAL(10), ALLOCATABLE ::  CHI_CMF_RAY(:,:)
+	REAL(10), ALLOCATABLE ::  SM_FREQ_CMF(:)
 !
 ! Intensity as a function of impact parameter and frequency in the observers
 ! frame. Need for interpreting observations of Eta Car, and for understanding
 ! interferometric observations.
 !
 	LOGICAL WRITE_IP
-	REAL*8, ALLOCATABLE ::  IP_OBS(:,:)
+	REAL(10), ALLOCATABLE ::  IP_OBS(:,:)
 
         LOGICAL WRITE_RTAU
 	LOGICAL WRITE_dFR
-        REAL*8 TAU_REF
-        REAL*8, ALLOCATABLE ::  RTAU(:,:)
-        REAL*8, ALLOCATABLE ::  ZTAU(:,:)
-        REAL*8, ALLOCATABLE ::  dI_R(:,:)
+        REAL(10) TAU_REF
+        REAL(10), ALLOCATABLE ::  RTAU(:,:)
+        REAL(10), ALLOCATABLE ::  ZTAU(:,:)
+        REAL(10), ALLOCATABLE ::  dI_R(:,:)
 !
 	LOGICAL DO_REL_CORRECTIONS
 	LOGICAL PLANE_PARALLEL
@@ -119,36 +119,36 @@
 !       Vectors defined along a ray. HALF_DZ, DZSQ_ON_12, and RECIP_DEL_Z are used
 !       to minimize computations.
 !
-	REAL*8, ALLOCATABLE ::  ETA_VEC(:)
-	REAL*8, ALLOCATABLE ::  CHI_VEC(:)
-	REAL*8, ALLOCATABLE ::  R_RAY(:)
-	REAL*8, ALLOCATABLE ::  V_RAY(:)
-	REAL*8, ALLOCATABLE ::  VMU_RAY(:)
-	REAL*8, ALLOCATABLE ::  GAM_RAY(:)
-	REAL*8, ALLOCATABLE ::  NU_ON_NU0_RAY(:)
-	REAL*8, ALLOCATABLE ::  Z_RAY(:)
-	REAL*8, ALLOCATABLE ::  TAU(:)
-	REAL*8, ALLOCATABLE ::  dZ(:)
-	REAL*8, ALLOCATABLE ::  HALF_DZ(:)
-	REAL*8, ALLOCATABLE ::  DZSQ_ON_12(:)
-	REAL*8, ALLOCATABLE ::  RECIP_DEL_Z(:)
+	REAL(10), ALLOCATABLE ::  ETA_VEC(:)
+	REAL(10), ALLOCATABLE ::  CHI_VEC(:)
+	REAL(10), ALLOCATABLE ::  R_RAY(:)
+	REAL(10), ALLOCATABLE ::  V_RAY(:)
+	REAL(10), ALLOCATABLE ::  VMU_RAY(:)
+	REAL(10), ALLOCATABLE ::  GAM_RAY(:)
+	REAL(10), ALLOCATABLE ::  NU_ON_NU0_RAY(:)
+	REAL(10), ALLOCATABLE ::  Z_RAY(:)
+	REAL(10), ALLOCATABLE ::  TAU(:)
+	REAL(10), ALLOCATABLE ::  dZ(:)
+	REAL(10), ALLOCATABLE ::  HALF_DZ(:)
+	REAL(10), ALLOCATABLE ::  DZSQ_ON_12(:)
+	REAL(10), ALLOCATABLE ::  RECIP_DEL_Z(:)
 !
-	REAL*8, ALLOCATABLE ::  A0(:)
-	REAL*8, ALLOCATABLE ::  A1(:)
-	REAL*8, ALLOCATABLE ::  A2(:)
-	REAL*8, ALLOCATABLE ::  A3(:)
-	REAL*8, ALLOCATABLE ::  A4(:)
+	REAL(10), ALLOCATABLE ::  A0(:)
+	REAL(10), ALLOCATABLE ::  A1(:)
+	REAL(10), ALLOCATABLE ::  A2(:)
+	REAL(10), ALLOCATABLE ::  A3(:)
+	REAL(10), ALLOCATABLE ::  A4(:)
 !
-	REAL*8, ALLOCATABLE ::  EE(:)
-	REAL*8, ALLOCATABLE ::  E0(:)
-	REAL*8, ALLOCATABLE ::  E1(:)
-	REAL*8, ALLOCATABLE ::  E2(:)
-	REAL*8, ALLOCATABLE ::  E3(:)
+	REAL(10), ALLOCATABLE ::  EE(:)
+	REAL(10), ALLOCATABLE ::  E0(:)
+	REAL(10), ALLOCATABLE ::  E1(:)
+	REAL(10), ALLOCATABLE ::  E2(:)
+	REAL(10), ALLOCATABLE ::  E3(:)
 !
-	REAL*8, ALLOCATABLE ::  DTAU(:)
-	REAL*8, ALLOCATABLE ::  S(:)
-	REAL*8, ALLOCATABLE ::  dS(:)
-	REAL*8, ALLOCATABLE ::  dI_RAY(:)
+	REAL(10), ALLOCATABLE ::  DTAU(:)
+	REAL(10), ALLOCATABLE ::  S(:)
+	REAL(10), ALLOCATABLE ::  dS(:)
+	REAL(10), ALLOCATABLE ::  dI_RAY(:)
 !
 	INTEGER NOS_INC
 	INTEGER OUT_ML
@@ -183,21 +183,21 @@
 	INTEGER WORD_SIZE,N_PER_REC,ACCESS_F
 	INTEGER IST,IEND
 !
-	REAL*8 MAX_VMU
-	REAL*8 T1,T2,T3,T4
-	REAL*8 RPHOT
-	REAL*8 VPHOT
-	REAL*8 PSQ
-	REAL*8 C_KMS
-	REAL*8 PAR_FLUX
+	REAL(10) MAX_VMU
+	REAL(10) T1,T2,T3,T4
+	REAL(10) RPHOT
+	REAL(10) VPHOT
+	REAL(10) PSQ
+	REAL(10) C_KMS
+	REAL(10) PAR_FLUX
 !
 	LOGICAL BACK_SIDE
 	LOGICAL HOLLOW_CORE
 	INTEGER ERROR_LU
-	REAL*8 SPEED_OF_LIGHT,FUN_PI,PI
+	REAL(10) SPEED_OF_LIGHT,FUN_PI,PI
 	EXTERNAL SPEED_OF_LIGHT,FUN_PI,ERROR_LU
 !
-	REAL*8, PARAMETER :: ONE=1
+	REAL(10), PARAMETER :: ONE=1
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 !
@@ -972,7 +972,7 @@
 !
 !	      CALL TUNE(1,'FLUX INTEG')
 	      DO I=IST,IEND
-	        ETA_VEC(I)=ETA_VEC(I)*DEXP(-TAU(I))
+	        ETA_VEC(I)=ETA_VEC(I)*EXP(-TAU(I))
 	      END DO
 !
 ! Use the Euler-Mclaurin Summation formula to compute the integrand.

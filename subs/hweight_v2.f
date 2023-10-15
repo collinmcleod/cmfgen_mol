@@ -21,12 +21,12 @@
 !                       Changed to V2 as dX added to call.
 !
 	INTEGER N
-	REAL*8 X(N)        !MU
-	REAL*8 dX(N)       !dMU
-	REAL*8 W(N)        !Quadrature weight
+	REAL(10) X(N)        !MU
+	REAL(10) dX(N)       !dMU
+	REAL(10) W(N)        !Quadrature weight
 !
-	REAL*8 H,HN,RF,RE,SUM
-	REAL*8 T1,T2
+	REAL(10) H,HN,RF,RE,SUM
+	REAL(10) T1,T2
 !
 	INTEGER I
 	INTEGER LS

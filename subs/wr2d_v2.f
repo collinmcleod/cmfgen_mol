@@ -11,12 +11,12 @@ C
 ! Altered 13-Dec-1989 - Implicit none installed. I index written out.
 !
 	INTEGER N,M,LU
-	REAL*8 A(N,M)
+	REAL(10) A(N,M)
 	LOGICAL WR_INDEX
 	CHARACTER*(*) MES
 	CHARACTER*(*) SYMB
 C
-	REAL*8 T1
+	REAL(10) T1
 	INTEGER MS,MF,ML,I,J
 	CHARACTER*80 FORM
 C

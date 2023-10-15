@@ -22,37 +22,37 @@
 !
 ! Arrays output.
 !
-	REAL*8 R(ND_MAX)
-	REAL*8 V(ND_MAX)
-	REAL*8 SIGMA(ND_MAX)
+	REAL(10) R(ND_MAX)
+	REAL(10) V(ND_MAX)
+	REAL(10) SIGMA(ND_MAX)
 !
 ! The following quantities must be specified on entry.
 !
-	REAL*8 VINF
-	REAL*8 BETA
-	REAL*8 BETA2
-	REAL*8 RMAX
-	REAL*8 R_TRANS
-	REAL*8 V_TRANS
-	REAL*8 dVdR_TRANS
-	REAL*8 R2_ON_RTRANS
-	REAL*8 VEXT
+	REAL(10) VINF
+	REAL(10) BETA
+	REAL(10) BETA2
+	REAL(10) RMAX
+	REAL(10) R_TRANS
+	REAL(10) V_TRANS
+	REAL(10) dVdR_TRANS
+	REAL(10) R2_ON_RTRANS
+	REAL(10) VEXT
 	INTEGER VEL_TYPE
 !
 ! Local variables.
 !
-	REAL*8 RO
-	REAL*8 RP2
-	REAL*8 dR
-	REAL*8 SCALE_HEIGHT
-	REAL*8 TOP		!Numerator of velocity expression 
-	REAL*8 BOT		!Denominator of velocity expression.
-	REAL*8 dTOPdR,dBOTdR
-	REAL*8 dVdR		!Velocity gradient
-	REAL*8 ALPHA
-	REAL*8 SM_VINF
+	REAL(10) RO
+	REAL(10) RP2
+	REAL(10) dR
+	REAL(10) SCALE_HEIGHT
+	REAL(10) TOP		!Numerator of velocity expression 
+	REAL(10) BOT		!Denominator of velocity expression.
+	REAL(10) dTOPdR,dBOTdR
+	REAL(10) dVdR		!Velocity gradient
+	REAL(10) ALPHA
+	REAL(10) SM_VINF
 !
-	REAL*8 T1,T2,T3
+	REAL(10) T1,T2,T3
 	INTEGER COUNT
 	INTEGER I
 	INTEGER LU_DIAG

@@ -6,10 +6,10 @@ C
 C
 	IMPLICIT NONE
 	INTEGER NX,ND,INDX(NX)
-	REAL*8 VEXT(NX),SIGMAEXT(NX),TEXT(NX),COEF(0:3,NX)
-	REAL*8 V(ND),SIGMA(ND),T(ND)
+	REAL(10) VEXT(NX),SIGMAEXT(NX),TEXT(NX),COEF(0:3,NX)
+	REAL(10) V(ND),SIGMA(ND),T(ND)
 C
-	REAL*8 T1
+	REAL(10) T1
 	INTEGER I,J
 C
 C Do intepolation in the log plane - need to add 1 to Sigma as it can be

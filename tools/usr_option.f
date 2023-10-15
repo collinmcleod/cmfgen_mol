@@ -112,7 +112,7 @@ c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       implicit none
 c
-      real*8 :: input
+      REAL(10) :: input
 c
       character(len=*) :: var_name,description,default
       character(len=120) :: answer,sve_string,all_caps
@@ -211,8 +211,8 @@ c
       integer :: dim,required,found
       integer :: i,l,m,start,stop,step,count
 c
-      real*8, dimension(dim) :: input
-      real*8 t1
+      REAL(10), dimension(dim) :: input
+      REAL(10) t1
 c
       character(len=*) :: var_name,description,default
       character(len=120) :: answer,sve_string,number,all_caps

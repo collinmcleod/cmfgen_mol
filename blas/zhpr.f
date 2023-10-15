@@ -1,6 +1,6 @@
       SUBROUTINE ZHPR  ( UPLO, N, ALPHA, X, INCX, AP )
 *     .. Scalar Arguments ..
-      DOUBLE PRECISION   ALPHA
+      REAL(10)   ALPHA
       INTEGER            INCX, N
       CHARACTER*1        UPLO
 *     .. Array Arguments ..
@@ -38,7 +38,7 @@
 *           N must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - DOUBLE PRECISION.
+*  ALPHA  - REAL(10).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *

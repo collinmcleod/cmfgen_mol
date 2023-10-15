@@ -9,8 +9,8 @@
 !
 	INTEGER*4 COUNTER
 	INTEGER*4 ND,LU
-	REAL*8 NETCR(ND)	!Accumlated net cooling rate
-	REAL*8 TOTCR(ND)	!Accumulated sum of absoulte cooling rates.
+	REAL(10) NETCR(ND)	!Accumlated net cooling rate
+	REAL(10) TOTCR(ND)	!Accumulated sum of absoulte cooling rates.
 !
 	INTEGER*4 I,J
 	INTEGER*4 MS,MF

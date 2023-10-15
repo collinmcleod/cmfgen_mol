@@ -5,11 +5,11 @@ C
 	FUNCTION  EXPONX(X)
 	IMPLICIT NONE
 C
-C ALtered 24-May-1996 :  DOUBLE PRECISION replaced by REAL*8
+C ALtered 24-May-1996 :  DOUBLE PRECISION replaced by REAL(10)
 C Altered 26-May-1988 : Exponential no longer computed if X is greater than
 C                        40. Necessary to overcome a bug with Dec software.
 
-	REAL*8 EXPONX,X
+	REAL(10) EXPONX,X
 C
 	IF( ABS(X) .LT. 1.0D-03 )THEN
 	  EXPONX=1.0D0-X*(  0.5D0-X/6.0D0*( 1.0D0-X/4.0D0 )  )

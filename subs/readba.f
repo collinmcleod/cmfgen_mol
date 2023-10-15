@@ -20,7 +20,7 @@ C
 	LOGICAL COMPUTE_BA  		!Indicates whether BA is being computed.
 	LOGICAL STATUS                !Indicates whether BA/STEQ read successful
 	CHARACTER DESC*(*)              !Used for filename
-	REAL*8 BA(NT),STEQ(NS)
+	REAL(10) BA(NT),STEQ(NS)
 C
 C Local Variables and external functions.
 C

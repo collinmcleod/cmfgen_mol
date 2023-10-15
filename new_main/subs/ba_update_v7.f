@@ -9,10 +9,10 @@
 ! VJ_C = Int ( dJ)
 ! RJ_SUM = Int (J)
 !
-	REAL*8, ALLOCATABLE :: VJ_R(:,:,:)
-	REAL*8, ALLOCATABLE :: VJ_P(:,:,:)
-	REAL*8, ALLOCATABLE :: VJ_T(:,:,:)
-	REAL*8, ALLOCATABLE :: RJ_SUM(:)
+	REAL(10), ALLOCATABLE :: VJ_R(:,:,:)
+	REAL(10), ALLOCATABLE :: VJ_P(:,:,:)
+	REAL(10), ALLOCATABLE :: VJ_T(:,:,:)
+	REAL(10), ALLOCATABLE :: RJ_SUM(:)
 !
 	END MODULE BA_J_DATA_MOD_V7
 !
@@ -77,25 +77,25 @@
 !                           innermost loop is executed.
 !
 ! Altered: 24-May-1996 :: IONE, ITWO, RMAX_FAC inserted
-!                         DABS changed to ABS.
+!                         ABS changed to ABS.
 ! Created: 28-Feb-1995
 !
 	INTEGER NION
   	INTEGER NT,NUM_BNDS,ND,DST,DEND
-	REAL*8 VJ(NT,NUM_BNDS,ND)
-	REAL*8 POPS(NT,ND)
-	REAL*8 VCHI(NT,ND)
-	REAL*8 VETA(NT,ND)
-	REAL*8 RJ(ND)
-	REAL*8 dJ_CHK_FAC
+	REAL(10) VJ(NT,NUM_BNDS,ND)
+	REAL(10) POPS(NT,ND)
+	REAL(10) VCHI(NT,ND)
+	REAL(10) VETA(NT,ND)
+	REAL(10) RJ(ND)
+	REAL(10) dJ_CHK_FAC
 !
-	REAL*8 ETA_CONT(ND)
-	REAL*8 CHI_CONT(ND)
-	REAL*8 ESEC(ND)
-	REAL*8 T(ND)
+	REAL(10) ETA_CONT(ND)
+	REAL(10) CHI_CONT(ND)
+	REAL(10) ESEC(ND)
+	REAL(10) T(ND)
 !
-	REAL*8 NU
-	REAL*8 FQW
+	REAL(10) NU
+	REAL(10) FQW
 !
 ! NEW_CONT indicates that this is the first frequency of a new continuum band
 ! in which the continuum cross-sections are constant. FINAL_FREQ indicates
@@ -105,18 +105,18 @@
 	LOGICAL NEW_CONT
 	LOGICAL DO_SRCE_VAR_ONLY
 !
-	REAL*8 COMP_VEC(NT,NUM_BNDS,ND)
+	REAL(10) COMP_VEC(NT,NUM_BNDS,ND)
 !
 ! Constants for opacity etc.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 !
-	REAL*8 T1,T2,QFV_T
-	REAL*8 RJ_RAD(ND)
+	REAL(10) T1,T2,QFV_T
+	REAL(10) RJ_RAD(ND)
 	INTEGER I,J,K,L,LS,IOS,JJ,ID
 	INTEGER DIAG_INDX,BNDST,BNDEND
 !

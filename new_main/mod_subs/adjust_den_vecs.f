@@ -9,7 +9,7 @@
 ! Created : 02-May-2004
 !
 	INTEGER ND
-	REAL*8 R_OLD(ND)
+	REAL(10) R_OLD(ND)
 	LOGICAL TRAPFORJ
 !
 	INTEGER, PARAMETER :: IONE=1
@@ -18,10 +18,10 @@
 !
 ! Local variables.
 !
-	REAL*8 LOG_R_OLD(ND)
-	REAL*8 LOG_R(ND)
-	REAL*8 TA(ND)
-	REAL*8 TB(ND)
+	REAL(10) LOG_R_OLD(ND)
+	REAL(10) LOG_R(ND)
+	REAL(10) TA(ND)
+	REAL(10) TB(ND)
 	INTEGER ISPEC
 !
 ! We now need to regrid all the populations. All interpolations (except 

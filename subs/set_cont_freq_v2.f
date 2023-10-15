@@ -22,35 +22,35 @@
 ! Created 29-Mar-1990 (Based on GEN_FREQ).
 !
 	INTEGER N,NCF,NCF_MAX,LUOUT,INDX(NCF_MAX)
-	REAL*8 EDGE(NCF_MAX)
-	REAL*8 NEW_FREQ(NCF_MAX)
+	REAL(10) EDGE(NCF_MAX)
+	REAL(10) NEW_FREQ(NCF_MAX)
 	CHARACTER*(*) TYPE(NCF)
 !
-	REAL*8 MAX_FREQ		!Maximum continuum frequency
-	REAL*8 MIN_FREQ		!Minimum continuum frequency
+	REAL(10) MAX_FREQ		!Maximum continuum frequency
+	REAL(10) MIN_FREQ		!Minimum continuum frequency
 !
-	REAL*8 DNU_MAX		!Maximum frequency spacing near/above
+	REAL(10) DNU_MAX		!Maximum frequency spacing near/above
 				!  bound-free edge: i.e. dNU <  DNU_MAX
-	REAL*8 BIG_AMP  	!Amplification. dNU increases by a factor
+	REAL(10) BIG_AMP  	!Amplification. dNU increases by a factor
 				! BIG_AMP as we move away from the b.f. edge.
 				! for frequencies above SWITCH_FREQ.
-   	REAL*8 SMALL_RAT	!Used to define frequency spacing for
+   	REAL(10) SMALL_RAT	!Used to define frequency spacing for
 				! frequencies less than SWITCH_FREQ.
 				! dNU/NU=SMALL_RAT-1
 !
 ! Parameters for installing etra frequencies near bound-free edges
 ! (low frequency side) to allow for level dissolution.
 !
-	REAL*8 dV_LEV			!Spacing near b-f edge.
-	REAL*8 AMP_DIS			!Amplification factor for dNU as we
+	REAL(10) dV_LEV			!Spacing near b-f edge.
+	REAL(10) AMP_DIS			!Amplification factor for dNU as we
 					!  move to smaller frequencies.
-	REAL*8 MIN_FREQ_LEV_DIS		!Indicates that the extra frequencies
+	REAL(10) MIN_FREQ_LEV_DIS		!Indicates that the extra frequencies
 					!  should only be installed for
 					!  frequencies above MIN_FREQ_LEV_DIS.
-	REAL*8 dV_DOP			!Minimum spacing in Doppler line profiles
+	REAL(10) dV_DOP			!Minimum spacing in Doppler line profiles
                                         !  (km/s). Used to set minimum frequecny
                                         !  spacing.
-	REAL*8 dV_CONT                  !Maximum spacing in arbitrary section of 
+	REAL(10) dV_CONT                  !Maximum spacing in arbitrary section of 
                                         !  continuum (km/s)
 !
 	INTEGER, PARAMETER :: RZERO=0.0D0
@@ -61,22 +61,22 @@
 !
 	CHARACTER*10   CHAR_WRK(N+2)
 ! 
-	REAL*8 C_KMS
-	REAL*8 SPEED_OF_LIGHT
+	REAL(10) C_KMS
+	REAL(10) SPEED_OF_LIGHT
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
-	REAL*8 T1,T2
-	REAL*8 RN
-	REAL*8 COINCIDENT_FRAC
-	REAL*8 DEL_NU
-	REAL*8 DEL_NU_TO_NEXT_EDGE
+	REAL(10) T1,T2
+	REAL(10) RN
+	REAL(10) COINCIDENT_FRAC
+	REAL(10) DEL_NU
+	REAL(10) DEL_NU_TO_NEXT_EDGE
 !
 	INTEGER INDX_DIS
 	INTEGER I,J,K
 	LOGICAL NUMER,EQUAL
-	REAL*8 FAC,EQUAL_FAC
-	REAL*8 SWITCH_FREQ
+	REAL(10) FAC,EQUAL_FAC
+	REAL(10) SWITCH_FREQ
 !
 	LUER=ERROR_LU()
 	COINCIDENT_FRAC=0.2D0

@@ -14,17 +14,17 @@
       INTEGER ND
       INTEGER ID
 !
-      REAL*8 RVAL
-      REAL*8 R(ND)
-      REAL*8 V(ND)
+      REAL(10) RVAL
+      REAL(10) R(ND)
+      REAL(10) V(ND)
 !
-      REAL*8 VEL
-      REAL*8 BETA
-      REAL*8 DBETADR
-      REAL*8 GAMMA
+      REAL(10) VEL
+      REAL(10) BETA
+      REAL(10) DBETADR
+      REAL(10) GAMMA
 !
-      REAL*8, PARAMETER :: C_KMS=2.99792458D+05
-      REAL*8 T1
+      REAL(10), PARAMETER :: C_KMS=2.99792458D+05
+      REAL(10) T1
 !
 !--------------------------------------------------------------------
 !

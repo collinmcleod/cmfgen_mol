@@ -6,7 +6,7 @@ c     modified 12/3/93, array(1) declarations changed to array(*)
 c
       double complex zx(*),zy(*),za
       integer i,incx,incy,ix,iy,n
-      double precision dcabs1
+      REAL(10) dcabs1
       if(n.le.0)return
       if (dcabs1(za) .eq. 0.0d0) return
       if (incx.eq.1.and.incy.eq.1)go to 20

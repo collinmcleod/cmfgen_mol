@@ -11,7 +11,7 @@
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * )
-      DOUBLE PRECISION   A( LDA, * ), B( LDB, * )
+      REAL(10)   A( LDA, * ), B( LDB, * )
 *     ..
 *
 *  Purpose
@@ -38,7 +38,7 @@
 *          The number of right hand sides, i.e., the number of columns
 *          of the matrix B.  NRHS >= 0.
 *
-*  A       (input) DOUBLE PRECISION array, dimension (LDA,N)
+*  A       (input) REAL(10) array, dimension (LDA,N)
 *          The factors L and U from the factorization A = P*L*U
 *          as computed by DGETRF.
 *
@@ -49,7 +49,7 @@
 *          The pivot indices from DGETRF; for 1<=i<=N, row i of the
 *          matrix was interchanged with row IPIV(i).
 *
-*  B       (input/output) DOUBLE PRECISION array, dimension (LDB,NRHS)
+*  B       (input/output) REAL(10) array, dimension (LDB,NRHS)
 *          On entry, the right hand side matrix B.
 *          On exit, the solution matrix X.
 *
@@ -63,7 +63,7 @@
 *  =====================================================================
 *
 *     .. Parameters ..
-      DOUBLE PRECISION   ONE
+      REAL(10)   ONE
       PARAMETER          ( ONE = 1.0D+0 )
 *     ..
 *     .. Local Scalars ..

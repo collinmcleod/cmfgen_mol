@@ -25,27 +25,27 @@
 ! Altered 02-Apr-2008 : Use convention that EWs are +ve for absorption lines
 ! Created 28-Sep-2007
 !
-	REAL*8 ANSWER		!Returned EW
-	REAL*8 A		!Continuum is defoned by A+B(X-X0)
-	REAL*8 B
-	REAL*8 X0
-	REAL*8 POS		!Line center	
-	REAL*8 HEIGHT		!
-	REAL*8 SCALE		!Scale factor descibing eponential -- similar to sigma
-	REAL*8 EXPONENT
-	REAL*8 TOLERANCE	!Tolerence for final answer.
+	REAL(10) ANSWER		!Returned EW
+	REAL(10) A		!Continuum is defoned by A+B(X-X0)
+	REAL(10) B
+	REAL(10) X0
+	REAL(10) POS		!Line center	
+	REAL(10) HEIGHT		!
+	REAL(10) SCALE		!Scale factor descibing eponential -- similar to sigma
+	REAL(10) EXPONENT
+	REAL(10) TOLERANCE	!Tolerence for final answer.
 !
-	REAL*8 X 		!X coordinate (as in original data)
-	REAL*8 W		!Scaled and offset coodrinate: w=(X-POS)/SIGMA
+	REAL(10) X 		!X coordinate (as in original data)
+	REAL(10) W		!Scaled and offset coodrinate: w=(X-POS)/SIGMA
 !
 ! R(I,1) stores the ith trapazoidal integration.
 !
 	INTEGER, PARAMETER :: M=8
-	REAL*8 R(M,M)
+	REAL(10) R(M,M)
 !
-	REAL*8 H		!Step size
-	REAL*8 HMAX		!Maximumstep size adopted
-	REAL*8 RANGE		!Range of integration
+	REAL(10) H		!Step size
+	REAL(10) HMAX		!Maximumstep size adopted
+	REAL(10) RANGE		!Range of integration
 !
 	INTEGER J,K,L		!Loop indices
 	INTEGER N		!Number of steps

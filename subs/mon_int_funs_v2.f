@@ -34,17 +34,17 @@ C Altered 25-Sep-1997 - Rewritten for speed and to vectorize efficiently.
 C Created 25-Mar-1996 - Based on MON_INTERP
 C
 	INTEGER ND
-	REAL*8 COEF(ND,4)
-	REAL*8 R(ND)
-	REAL*8 CHI(ND)
+	REAL(10) COEF(ND,4)
+	REAL(10) R(ND)
+	REAL(10) CHI(ND)
 C
-	REAL*8 ONE
+	REAL(10) ONE
 	PARAMETER (ONE=1.0D0)
 	INTEGER I
 C
-	REAL*8 H(ND)			!Delta R [ R(I+1)-R(I) ]
-	REAL*8 S(ND)			!Slope in interval (I to I+1)
-	REAL*8 D(ND)			!First derivative at node I
+	REAL(10) H(ND)			!Delta R [ R(I+1)-R(I) ]
+	REAL(10) S(ND)			!Slope in interval (I to I+1)
+	REAL(10) D(ND)			!First derivative at node I
 C
 C The array R may be either monotonically increasing, or decreasing.
 C

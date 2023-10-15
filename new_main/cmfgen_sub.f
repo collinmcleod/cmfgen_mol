@@ -87,28 +87,28 @@
 !
 ! 
 !
-	REAL*8 SOL(NT,ND)		!Temp. stor. area for ST. EQ.
+	REAL(10) SOL(NT,ND)		!Temp. stor. area for ST. EQ.
 	INTEGER DST,DEND
 !
 ! Constants for opacity etc. These are set in CMFGEN.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 OPLIN,EMLIN
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) OPLIN,EMLIN
 !
 ! Internally used variables
 !
-	REAL*8 S1,REPA
-	REAL*8 MAXCH,MAXCH_SUM
-	REAL*8 T1,T2,T3,T4,SRAT
-	REAL*8 FL,AMASS,FL_OLD
-	REAL*8 FG_COUNT
-	REAL*8 SCL_FAC
-	REAL*8 SUM_BA
-	REAL*8 RLUMST_BND
-	REAL*8 LUM_FOR_TEFF
-	REAL*8 LUM_SCL_FAC
+	REAL(10) S1,REPA
+	REAL(10) MAXCH,MAXCH_SUM
+	REAL(10) T1,T2,T3,T4,SRAT
+	REAL(10) FL,AMASS,FL_OLD
+	REAL(10) FG_COUNT
+	REAL(10) SCL_FAC
+	REAL(10) SUM_BA
+	REAL(10) RLUMST_BND
+	REAL(10) LUM_FOR_TEFF
+	REAL(10) LUM_SCL_FAC
 !
 	LOGICAL LST_DEPTH_ONLY
 !
@@ -196,15 +196,15 @@
 ! Functions called
 !
 	INTEGER ICHRLEN,ERROR_LU,WARNING_LU
-	REAL*8 DOP_PRO
-	REAL*8 S15ADF
-	REAL*8 LAMVACAIR
-	REAL*8 ATOMIC_MASS_UNIT
-	REAL*8 SPEED_OF_LIGHT
-	REAL*8 GRAVITATIONAL_CONSTANT
-	REAL*8 RAD_SUN
-	REAL*8 TEFF_SUN
-	REAL*8 MASS_SUN
+	REAL(10) DOP_PRO
+	REAL(10) S15ADF
+	REAL(10) LAMVACAIR
+	REAL(10) ATOMIC_MASS_UNIT
+	REAL(10) SPEED_OF_LIGHT
+	REAL(10) GRAVITATIONAL_CONSTANT
+	REAL(10) RAD_SUN
+	REAL(10) TEFF_SUN
+	REAL(10) MASS_SUN
 	LOGICAL EQUAL
 	EXTERNAL ICHRLEN,ERROR_LU,WARNING_LU,SPEED_OF_LIGHT,GRAVITATIONAL_CONSTANT
 	EXTERNAL MASS_SUN,RAD_SUN,TEFF_SUN
@@ -222,21 +222,21 @@
 !
 ! Wind variablity arrays.
 !
-	REAL*8 POPS(NT,ND)		!Population for all species.
-	REAL*8 MEAN_ATOMIC_WEIGHT	!Mean atomic weight of atoms  (neutrals
+	REAL(10) POPS(NT,ND)		!Population for all species.
+	REAL(10) MEAN_ATOMIC_WEIGHT	!Mean atomic weight of atoms  (neutrals
 !                          		! and ions) in atomic mass units.
-	REAL*8 ABUND_SUM
+	REAL(10) ABUND_SUM
 !
 !
 ! Arrays for improving on the initial T structure --- partition functions. 
 ! Need one for each atomic species.
 !
-	REAL*8, ALLOCATABLE :: U_PAR_FN(:,:)
-	REAL*8, ALLOCATABLE :: PHI_PAR_FN(:,:)
-	REAL*8, ALLOCATABLE :: Z_PAR_FN(:)
+	REAL(10), ALLOCATABLE :: U_PAR_FN(:,:)
+	REAL(10), ALLOCATABLE :: PHI_PAR_FN(:,:)
+	REAL(10), ALLOCATABLE :: Z_PAR_FN(:)
 !
-	REAL*8 TGREY(ND)
-	REAL*8 T_SAVE(ND)
+	REAL(10) TGREY(ND)
+	REAL(10) T_SAVE(ND)
 !
 ! Variables for scaling the line cooling rates in oder that the radiative
 ! equilibrium equation is more consistent with the electron heating/cooling 
@@ -244,9 +244,9 @@
 ! of SCL_LINE_HT_FAC of the tmean frequency for the super-level under 
 ! consideration. 0.5 is presently the prefered value.
 !
-!	REAL*8 AVE_ENERGY(NT)		!Average energy of each super level
-	REAL*8 STEQ_T_SCL(ND)
-	REAL*8 STEQ_T_NO_SCL(ND)
+!	REAL(10) AVE_ENERGY(NT)		!Average energy of each super level
+	REAL(10) STEQ_T_SCL(ND)
+	REAL(10) STEQ_T_NO_SCL(ND)
 ! 
 !
 ! Dielectronic recombination variables and arrays.
@@ -254,9 +254,9 @@
 	INTEGER NMAXDIE
 	PARAMETER (NMAXDIE=500)
 !
-	REAL*8 EDGEDIE(NMAXDIE)		!Ionization frequency (negative)
-	REAL*8 EINADIE(NMAXDIE)		!Einstein A coefficient
-	REAL*8 GUPDIE(NMAXDIE)		!Stat. weight of autoionizing level.
+	REAL(10) EDGEDIE(NMAXDIE)		!Ionization frequency (negative)
+	REAL(10) EINADIE(NMAXDIE)		!Einstein A coefficient
+	REAL(10) GUPDIE(NMAXDIE)		!Stat. weight of autoionizing level.
 !
 	INTEGER LEVDIE(NMAXDIE)  	!Indicates MNL of low state
 	INTEGER INDXDIE(NMAXDIE)
@@ -273,35 +273,35 @@
 ! the implicit recombination.
 !
 	INTEGER EQION,EQSPEC
-	REAL*8 GLOW,GION
-	REAL*8 NUST(ND)			!LTE autoionizing population.
-	REAL*8 DION(ND)			!Ion population
-	REAL*8, ALLOCATABLE :: DIERECOM(:,:)   !Chk for all species.
-	REAL*8, ALLOCATABLE :: DIECOOL(:,:)    !Dielec. cooling check for all spec.
-	REAL*8, ALLOCATABLE :: ADDRECOM(:,:)     
+	REAL(10) GLOW,GION
+	REAL(10) NUST(ND)			!LTE autoionizing population.
+	REAL(10) DION(ND)			!Ion population
+	REAL(10), ALLOCATABLE :: DIERECOM(:,:)   !Chk for all species.
+	REAL(10), ALLOCATABLE :: DIECOOL(:,:)    !Dielec. cooling check for all spec.
+	REAL(10), ALLOCATABLE :: ADDRECOM(:,:)     
 ! 
 !
 ! Opacity/emissivity
 !
-	REAL*8 CHIL(ND)                 !Line opacity (without prof.)
-	REAL*8 ETAL(ND)                 !Line emissivity (without prof.)
+	REAL(10) CHIL(ND)                 !Line opacity (without prof.)
+	REAL(10) ETAL(ND)                 !Line emissivity (without prof.)
 !
 ! Quadrature weights.
 !
-	REAL*8 FQW(NCF_MAX)		!Frequency weights
+	REAL(10) FQW(NCF_MAX)		!Frequency weights
 !
 ! Transfer equation vectors
-	REAL*8 R_OLD(NDMAX)		!Used to store previous R grid in SN models.
+	REAL(10) R_OLD(NDMAX)		!Used to store previous R grid in SN models.
 !
 ! Line vectors
-	REAL*8 AV(ND)
-	REAL*8 VB(NDMAX)		!Used for error calculations
-	REAL*8 VC(NDMAX)		!Used for error calculations
-	REAL*8 H(ND)
-	REAL*8 Q(ND)			!FREQ DEPENDENT.
-	REAL*8 QH(ND)			!  "      "
-	REAL*8 GAM(ND)			!FREQ INDEPENDENT
-	REAL*8 GAMH(ND)			!  "      "
+	REAL(10) AV(ND)
+	REAL(10) VB(NDMAX)		!Used for error calculations
+	REAL(10) VC(NDMAX)		!Used for error calculations
+	REAL(10) H(ND)
+	REAL(10) Q(ND)			!FREQ DEPENDENT.
+	REAL(10) QH(ND)			!  "      "
+	REAL(10) GAM(ND)			!FREQ INDEPENDENT
+	REAL(10) GAMH(ND)			!  "      "
 ! 
 !
 ! Arrays and variables for computation of the continuum intensity
@@ -312,7 +312,7 @@
 !
 ! Variables for EW's and LINE blanketing.
 !
-	REAL*8 CONT_INT,EW
+	REAL(10) CONT_INT,EW
 	INTEGER ACCESS_JEW
 	LOGICAL COMPUTE_EW,COMPUTE_JEW,COMPUTE_LAM,MID,FULL_ES
 !
@@ -321,27 +321,27 @@
 	INTEGER ACCESS_F
 	INTEGER NDEXT,NCEXT,NPEXT
 !
-	REAL*8 CNM(NDMAX,NDMAX)		!For collisions cross-section in
-	REAL*8 DCNM(NDMAX,NDMAX)	!STEQGEN
+	REAL(10) CNM(NDMAX,NDMAX)		!For collisions cross-section in
+	REAL(10) DCNM(NDMAX,NDMAX)	!STEQGEN
 !
 	INTEGER, PARAMETER :: N_FLUX_MEAN_BANDS=12
-	REAL*8     LAM_FLUX_MEAN_BAND_END(N_FLUX_MEAN_BANDS)
-	REAL*8     BAND_FLUX_MEAN(ND,N_FLUX_MEAN_BANDS)
-	REAL*8     BAND_FLUX(ND,N_FLUX_MEAN_BANDS)
+	REAL(10)     LAM_FLUX_MEAN_BAND_END(N_FLUX_MEAN_BANDS)
+	REAL(10)     BAND_FLUX_MEAN(ND,N_FLUX_MEAN_BANDS)
+	REAL(10)     BAND_FLUX(ND,N_FLUX_MEAN_BANDS)
 	DATA LAM_FLUX_MEAN_BAND_END/100.0D0,150.0D0,200.0D0,227.83D0,258.90D0,300.0D0,504.25D0,911.75D0,
 	1                         1200.0D0,1500.0D0,2000.0D0,1.0D+08/
 !
 ! Continuum frequency variables and arrays.
 !
-	REAL*8 NU(NCF_MAX)		!Continuum and line frequencies
-	REAL*8 NU_EVAL_CONT(NCF_MAX)	!Frequencies to evaluate continuum
-	REAL*8 OBS(NCF_MAX)		!Observers spectrum
+	REAL(10) NU(NCF_MAX)		!Continuum and line frequencies
+	REAL(10) NU_EVAL_CONT(NCF_MAX)	!Frequencies to evaluate continuum
+	REAL(10) OBS(NCF_MAX)		!Observers spectrum
 !
 ! Vectors and arrays used for the observed flux.
 !
 	INTEGER N_OBS
-	REAL*8 OBS_FREQ(NCF_MAX)		!Since N_OBS < NCF =< NCF_MAX
-	REAL*8 OBS_FLUX(NCF_MAX)
+	REAL(10) OBS_FREQ(NCF_MAX)		!Since N_OBS < NCF =< NCF_MAX
+	REAL(10) OBS_FLUX(NCF_MAX)
 	LOGICAL FIRST_OBS_COMP
 !
 	CHARACTER TIME*20
@@ -354,14 +354,14 @@
 !
 ! Global vectors:
 !
-	REAL*8 AMASS_ALL(NT)
+	REAL(10) AMASS_ALL(NT)
 	INTEGER N_LINE_FREQ
 !
 	INTEGER LINES_THIS_FREQ(NCF_MAX)
 !
-	REAL*8 NU_DOP
-	REAL*8 NU_MAX_OBS
-	REAL*8 NU_MIN_OBS
+	REAL(10) NU_DOP
+	REAL(10) NU_MAX_OBS
+	REAL(10) NU_MIN_OBS
 !
 	INTEGER FREQ_INDX
 	INTEGER X_INDX
@@ -371,15 +371,15 @@
 ! Variables to limit the computation of the continuum opacities and
 ! emissivities.
 !
-	REAL*8 JREC(ND)
-	REAL*8 dJRECdT(ND)
-	REAL*8 JPHOT(ND)
-	REAL*8 JREC_CR(ND)
-	REAL*8 dJREC_CRdT(ND)
-	REAL*8 JPHOT_CR(ND)
-	REAL*8 BPHOT_CR(ND)
+	REAL(10) JREC(ND)
+	REAL(10) dJRECdT(ND)
+	REAL(10) JPHOT(ND)
+	REAL(10) JREC_CR(ND)
+	REAL(10) dJREC_CRdT(ND)
+	REAL(10) JPHOT_CR(ND)
+	REAL(10) BPHOT_CR(ND)
 !
-	REAL*8 CONT_FREQ
+	REAL(10) CONT_FREQ
 	LOGICAL FINAL_CONSTANT_CROSS
 !
 ! Indicates whether APRXzV, FFXzZ etc should be zeroed.
@@ -388,7 +388,7 @@
 !
 ! 
 !
-	REAL*8 Z_POP(NT)		!Ionic charge for each species
+	REAL(10) Z_POP(NT)		!Ionic charge for each species
 !
 ! Variables etc for computation of continuum in comoving frame.
 !
@@ -402,25 +402,25 @@
 ! We dimension from 0 so that we can access a Null vector for the 1st included
 ! ioinization stage of each species.
 ! 
-	REAL*8 X_RECOM(ND,0:NION)			!Next X-ray recombination rate
-	REAL*8 X_COOL(ND,0:NION)			!Next X-ray cooling
+	REAL(10) X_RECOM(ND,0:NION)			!Next X-ray recombination rate
+	REAL(10) X_COOL(ND,0:NION)			!Next X-ray cooling
 !
-	REAL*8 OBS_XRAY_LUM_0P1
-	REAL*8 OBS_XRAY_LUM_1KEV
-	REAL*8 GFF,XCROSS_V2
+	REAL(10) OBS_XRAY_LUM_0P1
+	REAL(10) OBS_XRAY_LUM_1KEV
+	REAL(10) GFF,XCROSS_V2
 	EXTERNAL GFF,XCROSS_V2
 !
-	REAL*8 SPEC_DEN(ND,NUM_SPECIES)		!Used by ELEC_PREP
-	REAL*8 AT_NO_VEC(ND,NUM_SPECIES)
+	REAL(10) SPEC_DEN(ND,NUM_SPECIES)		!Used by ELEC_PREP
+	REAL(10) AT_NO_VEC(ND,NUM_SPECIES)
 !
-	REAL*8 AD_COOL_V(ND)
-	REAL*8 AD_COOL_DT(ND)
-	REAL*8 ARTIFICIAL_HEAT_TERM(ND)
-	REAL*8 dE_RAD_DECAY(ND)
-	REAL*8 RAD_DECAY_LUM(ND)
-	REAL*8 dE_WORK(ND)
-	REAL*8 dE_SHOCK_POWER(ND)
-	REAL*8 SHOCK_POWER_LUM(ND)
+	REAL(10) AD_COOL_V(ND)
+	REAL(10) AD_COOL_DT(ND)
+	REAL(10) ARTIFICIAL_HEAT_TERM(ND)
+	REAL(10) dE_RAD_DECAY(ND)
+	REAL(10) RAD_DECAY_LUM(ND)
+	REAL(10) dE_WORK(ND)
+	REAL(10) dE_SHOCK_POWER(ND)
+	REAL(10) SHOCK_POWER_LUM(ND)
 !
 	LOGICAL FIRST
 	LOGICAL CHK,SUCCESS
@@ -437,7 +437,7 @@
 ! They are the He2 ege, NIII/CIII egde, HeI, HI, HI(N=2).
 !
 	INTEGER, PARAMETER :: N_TAU_EDGE=5
-	REAL*8 TAU_EDGE(N_TAU_EDGE)
+	REAL(10) TAU_EDGE(N_TAU_EDGE)
 	DATA TAU_EDGE/13.16D0,11.60D0,5.95D0,3.29D0,0.83D0/
 !
 !***********************************************************************
@@ -787,6 +787,17 @@
 	  WRITE(6,*)' '
 	  STOP
 	END IF
+!
+	OPEN(UNIT=173,FILE='SOL_LINKS',STATUS='UNKNOWN')
+        DO ID=1,NUM_IONS
+           IF(ATM(ID)%XzV_PRES)THEN
+             DO J=1,ATM(ID)%NXzV_F
+               WRITE(173,'(1X,A10,A40,I6)')ION_ID(ID),ATM(ID)%XzVLEVNAME_F(J),
+	1                   ATM(ID)%F_TO_S_XzV(J)
+             END DO
+           END IF
+        END DO
+	CLOSE(UNIT=173)
 !
 ! Read in data for treating non-thermal ionization.
 !
@@ -1510,6 +1521,7 @@
 ! Now do the line variation. This presently ignores the effect of a 
 ! temperature variation.
 !
+	    IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN
 	  DO SIM_INDX=1,MAX_SIM
 	    IF(RESONANCE_ZONE(SIM_INDX))THEN
 	      NL=SIM_NL(SIM_INDX)
@@ -1521,27 +1533,32 @@
 	1        GLDGU(SIM_INDX)
 	    END IF
 	  END DO
+	END IF
 !
 ! 
 !
 ! Set TA = to the variation vector at the inner boundary.
 !
 	    CALL TUNE(IONE,'DTDR_VEC')
+	    IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN
 	    DO I=1,NT
 	      TA(I)=VCHI(I,ND)
 	    END DO
-	    T1=HDKT*NU(ML)/T(ND)
+	    END IF
 !
 ! Increment Parameters
 !
+	    T1=HDKT*NU(ML)/T(ND)
 	    T3=FQW(ML)*TWOHCSQ*( NU(ML)**3 )*T1*EMHNUKT(ND)/
-	1         CHI(ND)/T(ND)/(1.0D0-EMHNUKT(ND))**2
+	1         CHI(ND)/T(ND)/(1.0_DP-EMHNUKT(ND))**2
 	    DTDR=DTDR+T3
-	    DO I=1,NT-1
-	      DIFFW(I)=DIFFW(I)+T3*TA(I)/CHI(ND)
-	    END DO
-	    DIFFW(NT)=DIFFW(NT)+T3*(TA(NT)/CHI(ND)-(T1*(1.0D0+EMHNUKT(ND))
-	1           /(1.0D0-EMHNUKT(ND))-2.0D0)/T(ND))
+	    IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN
+	      DO I=1,NT-1
+	        DIFFW(I)=DIFFW(I)+T3*TA(I)/CHI(ND)
+	       END DO
+	       DIFFW(NT)=DIFFW(NT)+T3*(TA(NT)/CHI(ND)-(T1*(1.0_DP+EMHNUKT(ND))
+	1           /(1.0_DP-EMHNUKT(ND))-2.0_DP)/T(ND))
+	    END IF
 	    CALL TUNE(ITWO,'DTDR_VEC')
 !
 	  END DO
@@ -1628,6 +1645,9 @@
           DO ID=1,NUM_IONS-1
             LOC_ID=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
+	      IF(ION_ID(ID) .EQ. 'CIII')THEN
+	          WRITE(173,'(A,3X,ES16.5E4)')'COL',SE(ID)%STEQ(56,5)
+	      END IF
 	      TMP_STRING=TRIM(ION_ID(ID))//'_COL_DATA'
               CALL STEQ_MULTI_V10(CNM,DCNM,ED,T,
 	1         ATM(ID)%XzV,            ATM(ID)%XzVLTE,         ATM(ID)%dlnXzVLTE_dlnT,
@@ -1640,6 +1660,11 @@
 	1         LOC_ID,TMP_STRING,OMEGA_GEN_V3,
 	1         ATM(ID)%EQXzV,NUM_BNDS,ND,NION,NT,
 	1         COMPUTE_BA,FIXED_T,LST_ITERATION,DST,DEND)
+!
+	          IF(ION_ID(ID) .EQ. 'CIII')THEN
+	            WRITE(173,'(A,3X,ES16.5E4)')'COL',SE(ID)%STEQ(56,5)
+	            FLUSH(UNIT=173)
+	          END IF
 !
 ! Handle states which can partially autoionize.
 !
@@ -2151,6 +2176,7 @@
 	1                SECTION,ND,NT,LST_DEPTH_ONlY)
 !	    INCLUDE 'OPACITIES_V4.INC'
 	    CALL TUNE(ITWO,'C_OPAC')
+	    WRITE(190,'(ES18.8)')EMHNUKT(1:5); FLUSH(UNIT=190)
 !
 ! Since resonance zones included, we must add the line opacity and 
 ! emissivity to the raw continuum values. We first save the pure continuum 
@@ -2447,6 +2473,12 @@
 	      SE(ID)%STEQ(MNL,K) =SE(ID)%STEQ(MNL,K) + T2
 	      STEQ_T(K)=STEQ_T(K) - T3
 	    END DO
+	    T2=EINA(SIM_INDX)*ATM(ID)%XzV_F(MNUP_F,5)*ZNET_SIM(5,SIM_INDX)
+	    IF(NL .EQ. 284 .OR. NUP .EQ. 284)THEN
+	      WRITE(173,'(I7,3ES16.5E3,3X,A50)')ML,T2,SE(ID)%STEQ(MNL,5),
+	1       SE(ID)%STEQ(MNUP,5),TRIM(TRANS_NAME_SIM(SIM_INDX))
+	      FLUSH(UNIT=173)
+	    END IF    
 	  END IF    
 	END DO
 !
@@ -4353,18 +4385,18 @@
 	    WRITE(LU_POP,'(A)')' Rosseland Mean Opacity'
 	    WRITE(LU_POP,'(1X,1P8E16.7)')(ROSS_MEAN(I),I=1,ND)
 	    WRITE(LU_POP,'(A)')' Flux Mean Opacity'
-	    WRITE(LU_POP,'(1X,1P8E16.7)')(FLUX_MEAN(I),I=1,ND)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(FLUX_MEAN(I),I=1,ND); FLUSH(LU_POP)
 	    WRITE(LU_POP,'(A)')' Planck Mean Opacity'
-	    WRITE(LU_POP,'(1X,1P8E16.7)')(PLANCK_MEAN(I),I=1,ND)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(PLANCK_MEAN(I),I=1,ND); FLUSH(LU_POP)
 	    WRITE(LU_POP,'(A)')' Absorption Mean Opacity'
-	    WRITE(LU_POP,'(1X,1P8E16.7)')(ABS_MEAN(I),I=1,ND)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(ABS_MEAN(I),I=1,ND); FLUSH(LU_POP)
 !
 	    WRITE(LU_POP,'(A)')' J moment of radiation field'
-	    WRITE(LU_POP,'(1X,1P8E16.7)')(J_INT(I)/LUM_SCL_FAC,I=1,ND)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(J_INT(I)/LUM_SCL_FAC,I=1,ND); FLUSH(LU_POP)
 	    WRITE(LU_POP,'(A)')' H moment of radiation field'
-	    WRITE(LU_POP,'(1X,1P8E16.7)')(H_INT(I)/LUM_SCL_FAC,I=1,ND)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(H_INT(I)/LUM_SCL_FAC,I=1,ND); FLUSH(LU_POP)
 	    WRITE(LU_POP,'(A)')' K moment of radiation field'
-	    WRITE(LU_POP,'(1X,1P8E16.7)')(K_INT(I)/LUM_SCL_FAC,I=1,ND)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(K_INT(I)/LUM_SCL_FAC,I=1,ND); FLUSH(LU_POP)
 !
 ! Compute the ion population at each depth.                          
 ! These are required when evaluation the occupation probabilities.

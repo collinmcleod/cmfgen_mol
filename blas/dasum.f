@@ -1,11 +1,11 @@
-      double precision function dasum(n,dx,incx)
+      REAL(10) function dasum(n,dx,incx)
 c
 c     takes the sum of the absolute values.
 c     jack dongarra, linpack, 3/11/78.
 c     modified 3/93 to return if incx .le. 0.
 c     modified 12/3/93, array(1) declarations changed to array(*)
 c
-      double precision dx(*),dtemp
+      REAL(10) dx(*),dtemp
       integer i,incx,m,mp1,n,nincx
 c
       dasum = 0.0d0
@@ -17,7 +17,7 @@ c        code for increment not equal to 1
 c
       nincx = n*incx
       do 10 i = 1,nincx,incx
-        dtemp = dtemp + dabs(dx(i))
+        dtemp = dtemp + abs(dx(i))
    10 continue
       dasum = dtemp
       return
@@ -30,13 +30,13 @@ c
    20 m = mod(n,6)
       if( m .eq. 0 ) go to 40
       do 30 i = 1,m
-        dtemp = dtemp + dabs(dx(i))
+        dtemp = dtemp + abs(dx(i))
    30 continue
       if( n .lt. 6 ) go to 60
    40 mp1 = m + 1
       do 50 i = mp1,n,6
-        dtemp = dtemp + dabs(dx(i)) + dabs(dx(i + 1)) + dabs(dx(i + 2))
-     *  + dabs(dx(i + 3)) + dabs(dx(i + 4)) + dabs(dx(i + 5))
+        dtemp = dtemp + abs(dx(i)) + abs(dx(i + 1)) + abs(dx(i + 2))
+     *  + abs(dx(i + 3)) + abs(dx(i + 4)) + abs(dx(i + 5))
    50 continue
    60 dasum = dtemp
       return

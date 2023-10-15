@@ -1,4 +1,4 @@
-      DOUBLE PRECISION FUNCTION DZNRM2( N, X, INCX )
+      REAL(10) FUNCTION DZNRM2( N, X, INCX )
 *     .. Scalar Arguments ..
       INTEGER                           INCX, N
 *     .. Array Arguments ..
@@ -18,11 +18,11 @@
 *
 *
 *     .. Parameters ..
-      DOUBLE PRECISION      ONE         , ZERO
+      REAL(10)      ONE         , ZERO
       PARAMETER           ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     .. Local Scalars ..
       INTEGER               IX
-      DOUBLE PRECISION      NORM, SCALE, SSQ, TEMP
+      REAL(10)      NORM, SCALE, SSQ, TEMP
 *     .. Intrinsic Functions ..
       INTRINSIC             ABS, DIMAG, DBLE, SQRT
 *     ..

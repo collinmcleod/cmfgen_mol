@@ -1,10 +1,10 @@
-	REAL*8 FUNCTION INTSIGC(ENR,XION_POT,EMIN,EMAX)
+	REAL(10) FUNCTION INTSIGC(ENR,XION_POT,EMIN,EMAX)
 	IMPLICIT NONE
 !
-	REAL*8 ENR              ! Energy at which we compute the integral of the cross section
-	REAL*8 XION_POT         ! (first) ionization potential of species under consideration
-	REAL*8 EMIN,EMAX        ! Bounds of integration
-	REAL*8 XJ,ONEOVERJ
+	REAL(10) ENR              ! Energy at which we compute the integral of the cross section
+	REAL(10) XION_POT         ! (first) ionization potential of species under consideration
+	REAL(10) EMIN,EMAX        ! Bounds of integration
+	REAL(10) XJ,ONEOVERJ
 !
 	INTSIGC = 0.0D0
 	IF (EMIN.GE.EMAX) THEN
@@ -13,8 +13,8 @@
 	ELSE
 	   XJ = 0.6D0 * XION_POT
 	   ONEOVERJ =  1.0D0/XJ
-	   INTSIGC = (DATAN((EMAX-XION_POT)*ONEOVERJ)-DATAN((EMIN-XION_POT)*ONEOVERJ) ) &
-	          / DATAN((ENR-XION_POT)*ONEOVERJ/2.0D0)
+	   INTSIGC = (ATAN((EMAX-XION_POT)*ONEOVERJ)-ATAN((EMIN-XION_POT)*ONEOVERJ) ) &
+	          / ATAN((ENR-XION_POT)*ONEOVERJ/2.0D0)
 	ENDIF
 	
 	RETURN

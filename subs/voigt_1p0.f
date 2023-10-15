@@ -19,18 +19,18 @@ C         < 0.3% for a < 0.05
 C
 	IMPLICIT NONE
 C                                                                   
-	REAL*8  VOIGT,V,A
+	REAL(10)  VOIGT,V,A
 C
 C Variables for interpolation (a < 0.1).
 C
 	INTEGER N,N1
-	REAL*8  V0,V2
-	REAL*8  H1(81)
+	REAL(10)  V0,V2
+	REAL(10)  H1(81)
 C
 C variables for functional form (a > 0.1)
 C
 	COMPLEX ZH,F
-	REAL*8 C(7),D(7)
+	REAL(10) C(7),D(7)
 C
 C Interpolation constants.
 C

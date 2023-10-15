@@ -22,12 +22,12 @@
 	IMPLICIT NONE
 !
 	INTEGER ND
-	REAL*8 R(ND)			!Radial grin in 10^10 cm
-	REAL*8 V(ND)			!V in km/s
-	REAL*8 SIGMA(ND)		!dlnV/dlnr-1
-	REAL*8 RMAX			!Maximum radius  (in 10^10 cm)
-	REAL*8 RP			!Core radius  (in 10^10 cm)
-	REAL*8 VINF                     !Terminal velocity
+	REAL(10) R(ND)			!Radial grin in 10^10 cm
+	REAL(10) V(ND)			!V in km/s
+	REAL(10) SIGMA(ND)		!dlnV/dlnr-1
+	REAL(10) RMAX			!Maximum radius  (in 10^10 cm)
+	REAL(10) RP			!Core radius  (in 10^10 cm)
+	REAL(10) VINF                     !Terminal velocity
 !
 ! Only OPTIONS(1) is presently utilized. This indicates the format
 ! of the data in the file.
@@ -37,13 +37,13 @@
 !
 ! Local vectors.
 !
-	REAL*8 HT(ND-1)	
-	REAL*8 VEL(ND-1)
-	REAL*8 dVdR(ND-1)
+	REAL(10) HT(ND-1)	
+	REAL(10) VEL(ND-1)
+	REAL(10) dVdR(ND-1)
 !
 ! Local variables.
 !
-	REAL*8 T1
+	REAL(10) T1
 	INTEGER LUIN
 	INTEGER LUER
 	INTEGER I

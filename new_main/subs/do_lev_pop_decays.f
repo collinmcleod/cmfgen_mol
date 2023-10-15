@@ -5,11 +5,11 @@
 !
 	INTEGER ND
 	INTEGER NT
-        REAL*8 OLD_POPS(NT,ND)
+        REAL(10) OLD_POPS(NT,ND)
 !
 ! Local variables.
 !
-	REAL*8 RATIO(ND)
+	REAL(10) RATIO(ND)
 !
 	INTEGER ID		!Ion index
 	INTEGER IP		!Parent index

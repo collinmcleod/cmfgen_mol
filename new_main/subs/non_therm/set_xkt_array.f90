@@ -52,7 +52,7 @@
           stop
         endif
         x11 = 0.99999D0*x1
-        t1 = dlog(x11/x0) / dble(n-2)
+        t1 = log(x11/x0) / dble(n-2)
         x(n) = x1
         dx(n) = x1-x11
         x(n-1) = x11

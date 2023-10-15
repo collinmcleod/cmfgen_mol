@@ -12,7 +12,7 @@
 ! Altered : 05-Apr-2011 : Added vriable R_GRD_REVISED (10-Feb-2011).
 ! Altered : 16-Jul-2010 : Added FIX_ALL_SPECIES variable.
 ! Altered : 23-Nov-2007 : LAM_SCALE_OPT included.
-! Altered : 20-Feb-2006 : ABOVE_EDGE changed to LOGICAL from REAL*8
+! Altered : 20-Feb-2006 : ABOVE_EDGE changed to LOGICAL from REAL(10)
 ! Altered : 29-Jan-2006 : Control variable fors relativistic transfer and time
 !                          dependent statistical equilibrium equations installed.
 ! 
@@ -28,9 +28,10 @@
 	INTEGER, PARAMETER :: ISEV=7
 	INTEGER, PARAMETER :: ITEN=10
 !
-	REAL*8, PARAMETER :: RZERO=0.0D0
-	REAL*8, PARAMETER :: RONE=1.0D0
-	REAL*8, PARAMETER :: RTWO=2.0D0
+	INTEGER, PARAMETER :: DP=SELECTED_REAL_KIND(15,3000)
+	REAL(10), PARAMETER :: RZERO=0.0_DP
+	REAL(10), PARAMETER :: RONE=1.0_DP
+	REAL(10), PARAMETER :: RTWO=2.0_DP
 !
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
@@ -43,17 +44,17 @@
 !
 ! Star and velocity specifications
 !
-	REAL*8 RP			!Stellar radius in units of 10^10 cm
-	REAL*8 RMAX
-	REAL*8 RMDOT
-      	REAL*8 VRP,RN,VINF,EPPS1,GAMMA1
-	REAL*8 LUM
-	REAL*8 TEFF
-	REAL*8 LOGG
-	REAL*8 PRESSURE_VTURB
-	REAL*8 RP2,VRP2,RN2,VINF2,EPPS2,GAMMA2
-	REAL*8 CONS_FOR_R_GRID
-	REAL*8 EXP_FOR_R_GRID
+	REAL(10) RP			!Stellar radius in units of 10^10 cm
+	REAL(10) RMAX
+	REAL(10) RMDOT
+      	REAL(10) VRP,RN,VINF,EPPS1,GAMMA1
+	REAL(10) LUM
+	REAL(10) TEFF
+	REAL(10) LOGG
+	REAL(10) PRESSURE_VTURB
+	REAL(10) RP2,VRP2,RN2,VINF2,EPPS2,GAMMA2
+	REAL(10) CONS_FOR_R_GRID
+	REAL(10) EXP_FOR_R_GRID
 !
 	INTEGER N_IB_INS			!Number of points for fine grid at inner boundary
 	INTEGER N_OB_INS			!Number of points for fine grid at outer boundary
@@ -62,9 +63,9 @@
 !
 ! Parameters for VELTYPE=3 or VELTYPE=6 (STARPCYG_V2)
 !
-	REAL*8 SCL_HT,VCORE,VPHOT
-	REAL*8 VINF1,V_BETA1,V_EPPS1
-	REAL*8 V_BETA2,V_EPPS2		!VINF2 above
+	REAL(10) SCL_HT,VCORE,VPHOT
+	REAL(10) VINF1,V_BETA1,V_EPPS1
+	REAL(10) V_BETA2,V_EPPS2		!VINF2 above
 	INTEGER VELTYPE
 !
 ! Variable Mdot parameters
@@ -74,13 +75,13 @@
 !
 ! Supernova variables
 !
-	REAL*8 RHO_ZERO			!Density at core in gm/cm^3
-	REAL*8 RCUB_RHO_ZERO            !r^3 . density at core in (in 10^{-30} gm}
-	REAL*8 N_RHO			!Exponent for density (+ve)
-	REAL*8 DJDT_RELAX_PARAM         !Factor to assist inclusion of DJDT terms.
-	REAL*8 SN_AGE_DAYS              !Age of SN in days.
-	REAL*8 RMAX_ON_RCORE
-	REAL*8 TIME_SEQ_NO              !Number of model in time sequence (need not be an integer).
+	REAL(10) RHO_ZERO			!Density at core in gm/cm^3
+	REAL(10) RCUB_RHO_ZERO            !r^3 . density at core in (in 10^{-30} gm}
+	REAL(10) N_RHO			!Exponent for density (+ve)
+	REAL(10) DJDT_RELAX_PARAM         !Factor to assist inclusion of DJDT terms.
+	REAL(10) SN_AGE_DAYS              !Age of SN in days.
+	REAL(10) RMAX_ON_RCORE
+	REAL(10) TIME_SEQ_NO              !Number of model in time sequence (need not be an integer).
 !
 	LOGICAL SN_MODEL
 	LOGICAL SN_HYDRO_MODEL		!Use HYDRO model for SN input
@@ -99,23 +100,23 @@
 	LOGICAL INC_SHOCK_POWER        !Include shock power
 	LOGICAL ADD_SHOCK_POWER_SLOWLY !Introduce the shock power slowly starting with scaling SHOCK_POWER_FAC_BEG
 	LOGICAL SCL_PWR_BY_FCL         !Do we scale the shock_power by CLUMP_FAC?
-	REAL*8  SHOCK_POWER_FAC_BEG    !Initial scaling factor read from VADAT file
-	REAL*8  SHOCK_POWER_FAC        !Current scaling factor
-	REAL*8  PRESCRIBED_SHOCK_POWER !Value in erg/s of the desired power
-	REAL*8  VLOC_SHOCK_POWER       !Velocity at which we dump the shock power
-	REAL*8  DVLOC_SHOCK_POWER      !Gaussian width for the shock power deposition profile
+	REAL(10)  SHOCK_POWER_FAC_BEG    !Initial scaling factor read from VADAT file
+	REAL(10)  SHOCK_POWER_FAC        !Current scaling factor
+	REAL(10)  PRESCRIBED_SHOCK_POWER !Value in erg/s of the desired power
+	REAL(10)  VLOC_SHOCK_POWER       !Velocity at which we dump the shock power
+	REAL(10)  DVLOC_SHOCK_POWER      !Gaussian width for the shock power deposition profile
 !
 ! Non thermal parameters
 !
 	LOGICAL TREAT_NON_THERMAL_ELECTRONS     !
 	LOGICAL ADD_DEC_NRG_SLOWLY
 	LOGICAL READ_NON_THERM_SPEC
-	REAL*8 DEC_NRG_SCL_FAC_BEG
-	REAL*8 DEC_NRG_SCL_FAC
-	REAL*8 NT_OMIT_ION_SCALE        !Ion omitted if < NT_OMIT_ION_SCL*(largest ion pop.).
-	REAL*8 NT_OMIT_LEV_SCALE        !Fractional pops omitted if < NT_OMIT_SCL
-        REAL*8 NT_EMAX			!Maximum energy of non-thermal electrons
-        REAL*8 NT_EMIN			!Minimum energy of non-thermal electrons
+	REAL(10) DEC_NRG_SCL_FAC_BEG
+	REAL(10) DEC_NRG_SCL_FAC
+	REAL(10) NT_OMIT_ION_SCALE        !Ion omitted if < NT_OMIT_ION_SCL*(largest ion pop.).
+	REAL(10) NT_OMIT_LEV_SCALE        !Fractional pops omitted if < NT_OMIT_SCL
+        REAL(10) NT_EMAX			!Maximum energy of non-thermal electrons
+        REAL(10) NT_EMIN			!Minimum energy of non-thermal electrons
 	INTEGER NT_NKT
 	INTEGER NON_THERMAL_IT_CNTRL    !Controls how often we update the nonthermal electron distribution.
 	INTEGER NT_ITERATION_COUNTER
@@ -124,7 +125,7 @@
 	LOGICAL SCL_NT_ION_CROSEC
 	CHARACTER(LEN=12) NT_SOURCE_TYPE
 !
-	REAL*8 MINIMUM_ISO_POP          !Minimum isotop population for included isotope.
+	REAL(10) MINIMUM_ISO_POP          !Minimum isotop population for included isotope.
 !
 	LOGICAL USE_J_REL
 	LOGICAL USE_FORMAL_REL
@@ -138,7 +139,7 @@
 !
 	INTEGER, PARAMETER :: N_RG_PAR_MAX=4
 	INTEGER N_RG_PAR
-	REAL*8 RG_PAR(N_RG_PAR_MAX)
+	REAL(10) RG_PAR(N_RG_PAR_MAX)
 	LOGICAL REVISE_R_GRID
 	LOGICAL R_GRID_REVISED
         LOGICAL INSTANTANEOUS_ENERGY_DEPOSITION
@@ -157,7 +158,7 @@
 ! a vacuum.
 !
 	INTEGER, PARAMETER ::  N_CLUMP_PAR_MAX=6
-	REAL*8 CLUMP_PAR(N_CLUMP_PAR_MAX)
+	REAL(10) CLUMP_PAR(N_CLUMP_PAR_MAX)
 	INTEGER N_CLUMP_PAR
 	LOGICAL DO_CLUMP_MODEL
 	CHARACTER(LEN=6) CLUMP_LAW
@@ -178,20 +179,20 @@
 ! Used when constructing the Temperature distribution on the first
 ! iteration.
 !
-	REAL*8 GREY_PAR
-	REAL*8 T_INIT_TAU
+	REAL(10) GREY_PAR
+	REAL(10) T_INIT_TAU
 	LOGICAL ITERATE_INIT_T
 	LOGICAL T_MIN_BA_EXTRAP
 	LOGICAL INTERP_T_ON_R_GRID
 !
 ! Used to limit the temperature while iterating on T.
 !
-	REAL*8 T_MIN
+	REAL(10) T_MIN
 !
 ! When you use the LTE option to set the departure coefficients, T_EXCITE_MIN
 ! is used in the outer region to set the escitation coefficient. 
 
-	REAL*8 T_EXCITE_MIN
+	REAL(10) T_EXCITE_MIN
 !
 ! Indicates that the R grid for the NEWMODEL should be rad in from a file --
 ! ist is not computed.
@@ -206,46 +207,46 @@
 ! Controls for dynamic smoothing of the photoioization cross-sections, and for
 ! treating dielectronic lines.
 !
-	REAL*8 SIG_GAU_KMS
-	REAL*8 FRAC_SIG_GAU
-	REAL*8 CUT_ACCURACY
-	REAL*8 VSM_DIE_KMS
+	REAL(10) SIG_GAU_KMS
+	REAL(10) FRAC_SIG_GAU
+	REAL(10) CUT_ACCURACY
+	REAL(10) VSM_DIE_KMS
 	LOGICAL DIE_AS_LINE
 	LOGICAL ABOVE_EDGE
 !
 ! Variables for controlling the frequency grid.
 !
-	REAL*8 MIN_CONT_FREQ 		!Minimum continuum frequency.
-	REAL*8 MAX_CONT_FREQ    	!Maximum continuum frequency.
-	REAL*8 SMALL_FREQ_RAT 		!Fractional spacing for small frequencies'
-	REAL*8 dFREQ_bf_MAX		!Maximum spacing close to bf edge.
-	REAL*8 BIG_FREQ_AMP		!Amplification factor
-	REAL*8 dV_LEV_DIS		!dV on low side of bound-free edge.
-	REAL*8 AMP_DIS			!Amplification factor
-	REAL*8 MIN_FREQ_LEV_DIS		!Minimum frequency for lev dissolution.
+	REAL(10) MIN_CONT_FREQ 		!Minimum continuum frequency.
+	REAL(10) MAX_CONT_FREQ    	!Maximum continuum frequency.
+	REAL(10) SMALL_FREQ_RAT 		!Fractional spacing for small frequencies'
+	REAL(10) dFREQ_bf_MAX		!Maximum spacing close to bf edge.
+	REAL(10) BIG_FREQ_AMP		!Amplification factor
+	REAL(10) dV_LEV_DIS		!dV on low side of bound-free edge.
+	REAL(10) AMP_DIS			!Amplification factor
+	REAL(10) MIN_FREQ_LEV_DIS		!Minimum frequency for lev dissolution.
 	LOGICAL RD_CONT_FREQ		!Read in cont. frequencies from file.
 	INTEGER FREQ_GRID_OPTION	!Which frequency grid
 !
-	REAL*8 R_PNT_SRCE
-	REAL*8 TEFF_PNT_SRCE
+	REAL(10) R_PNT_SRCE
+	REAL(10) TEFF_PNT_SRCE
 	INTEGER NC_PNT_SRCE
 	LOGICAL PNT_SRCE_MOD
 !
 ! Used to describe the Doppler lines profile, which is currently assumed
 ! to be constant at all depths.
 !
-	REAL*8 TDOP
-	REAL*8 VDOP_FIX
-	REAL*8 VTURB
-	REAL*8 AMASS_DOP
-	REAL*8 VTURB_MIN
-	REAL*8 VTURB_MAX
+	REAL(10) TDOP
+	REAL(10) VDOP_FIX
+	REAL(10) VTURB
+	REAL(10) AMASS_DOP
+	REAL(10) VTURB_MIN
+	REAL(10) VTURB_MAX
 	LOGICAL FIX_DOP
 !
-	REAL*8 DOP_PROF_LIMIT
-	REAL*8 VOIGT_PROF_LIMIT
-	REAL*8 V_PROF_LIMIT
-	REAL*8 MAX_PROF_ED
+	REAL(10) DOP_PROF_LIMIT
+	REAL(10) VOIGT_PROF_LIMIT
+	REAL(10) V_PROF_LIMIT
+	REAL(10) MAX_PROF_ED
 	LOGICAL SET_PROF_LIMS_BY_OPACITY
 	LOGICAL RD_STARK_FILE
 	LOGICAL NORM_PROFILE
@@ -254,36 +255,36 @@
 ! Variables used to define what transitions are neglected. Cut is
 ! presently by the gf value, and the lower level of the transition.
 !
-	REAL*8 GF_CUT
-	REAL*8 AT_NO_GF_CUT
+	REAL(10) GF_CUT
+	REAL(10) AT_NO_GF_CUT
 	INTEGER GF_LEV_CUT
 	INTEGER MIN_NUM_TRANS
 !
 ! Variables for treating lines simultaneously with the continuum.
 !
-	REAL*8 V_DOP
-	REAL*8 MAX_DOP
-	REAL*8 FRAC_DOP
-	REAL*8 dV_CMF_PROF
-	REAL*8 dV_CMF_WING
-	REAL*8 ES_WING_EXT
-	REAL*8 R_CMF_WING_EXT
-	REAL*8 EXT_LINE_VAR
-	REAL*8 ZNET_VAR_LIMIT
+	REAL(10) V_DOP
+	REAL(10) MAX_DOP
+	REAL(10) FRAC_DOP
+	REAL(10) dV_CMF_PROF
+	REAL(10) dV_CMF_WING
+	REAL(10) ES_WING_EXT
+	REAL(10) R_CMF_WING_EXT
+	REAL(10) EXT_LINE_VAR
+	REAL(10) ZNET_VAR_LIMIT
 !
 ! Variables for controlling the frequency grid in the Observer's frame.
 !
-	REAL*8 OBS_PRO_EXT_RAT
-	REAL*8 dV_OBS_PROF
-	REAL*8 dV_OBS_WING
-	REAL*8 dV_OBS_BIG
+	REAL(10) OBS_PRO_EXT_RAT
+	REAL(10) dV_OBS_PROF
+	REAL(10) dV_OBS_WING
+	REAL(10) dV_OBS_BIG
 !
 ! Compute all photoionization cross-sections at all frequencies. If not,
 ! we assume thei value from an earlier frequncy. Saves considerable computational 
 ! effort. DELV_CONT gives the maximum velocity separation in km/s between 
 ! evaluations of the phot. cross-sections.
 
-	REAL*8 DELV_CONT
+	REAL(10) DELV_CONT
 	LOGICAL COMPUTE_ALL_CROSS
 	LOGICAL COMPUTE_NEW_CROSS
 	LOGICAL USE_FIXED_J
@@ -301,8 +302,8 @@
 ! These insertions are done internally, and do not directly effect the returned
 ! results. USed mainly with CMF_FLUX.
 !
-	REAL*8 DELV_FRAC_FG
-	REAL*8 DELV_FRAC_MOM
+	REAL(10) DELV_FRAC_FG
+	REAL(10) DELV_FRAC_MOM
 !
 ! Indicate solution method used to ocmpute the Eddington factors by FG_J_CMF_V?.
 ! Options is usually  INT/INS (or DIFF/INS).
@@ -321,9 +322,9 @@
 	CHARACTER(LEN=6)  METHOD
 	CHARACTER(LEN=6)  LUM_FROM_ETA_METHOD
 !
-        REAL*8 OVER_FREQ_DIF
-        REAL*8 WEAK_LINE_LIMIT
-	REAL*8 WEAK_TAU_LINE_LIMIT
+        REAL(10) OVER_FREQ_DIF
+        REAL(10) WEAK_LINE_LIMIT
+	REAL(10) WEAK_TAU_LINE_LIMIT
 !
 	LOGICAL WEAK_WITH_NET
         LOGICAL USE_WEAK_TAU_LIM
@@ -337,8 +338,8 @@
 	LOGICAL SET_TRANS_TYPE_BY_LAM
 	LOGICAL DO_SOBOLEV_LINES
 !
-	REAL*8 FLUX_CAL_LAM_BEG
-	REAL*8 FLUX_CAL_LAM_END
+	REAL(10) FLUX_CAL_LAM_BEG
+	REAL(10) FLUX_CAL_LAM_END
 !
 ! FLUX_CAL_ONLY provides a method for computing the continuous spectrum
 ! only (i.e. no linearization or population corrections):
@@ -372,7 +373,7 @@
 ! grid. Allows an increase in program accuracy to overcome
 ! rapid ionization changes.
 !
-	REAL*8 ACC_FREQ_END
+	REAL(10) ACC_FREQ_END
 	INTEGER NPINS			!Points inserted for error calc.
         INTEGER ST_INTERP_INDX        !Interp from ST_INT.. to END_INTERP..
         INTEGER END_INTERP_INDX
@@ -389,12 +390,12 @@
 ! and preserve "FLUX" in the diffusion approximation.
 !
 	INTEGER DEEP
-	REAL*8 ACC_EDD_FAC
+	REAL(10) ACC_EDD_FAC
 !
 	LOGICAL EXTEND_FRM_SOL
 	LOGICAL INSERT_FREQ_FRM_SOL
 !
-	REAL*8 ES_VAR_FAC
+	REAL(10) ES_VAR_FAC
 	LOGICAL MIXED_ES_VAR
 !
 !***********************************************************************************
@@ -407,7 +408,7 @@
 	INTEGER IT_TO_BEG_NG       	!Iteration to beg NG acceleration
 	INTEGER ITS_PER_NG  		!Iterations between NG accelerations.
 	INTEGER NG_BAND_WIDTH      	!Number of depths to acclerate simultaneously
-	REAL*8 VAL_DO_NG 		!Begin NG when MAXCH < VAL_DO_NG
+	REAL(10) VAL_DO_NG 		!Begin NG when MAXCH < VAL_DO_NG
 	LOGICAL NG_DONE			!iIndicates successfull completion of NG
 	LOGICAL NG_DO			!Switch on NG acceleration.
 	LOGICAL DO_NG_VALIDITY_CHECK
@@ -427,10 +428,10 @@
 ! by BA_PAR. After the incrementation, the PAR matrices are zeroed.
 !
 	INTEGER N_PAR
-	REAL*8 MAX_LAM_COR	!Maximum fractional change for Lambda iteration.
-	REAL*8 MAX_LIN_COR	!Maximum fractional change for linearization.
-	REAL*8 MAX_dT_COR       !Maximum allowed change in the temperature.
-	REAL*8 MAX_CHNG_LIM
+	REAL(10) MAX_LAM_COR	!Maximum fractional change for Lambda iteration.
+	REAL(10) MAX_LIN_COR	!Maximum fractional change for linearization.
+	REAL(10) MAX_dT_COR       !Maximum allowed change in the temperature.
+	REAL(10) MAX_CHNG_LIM
 !
 ! Indicates how to scale the corections to the populations, so that
 ! populations don't go negative, and MAX_LIN_COR (or MAX_LAM_COR) is
@@ -450,7 +451,7 @@
 ! models run with 1.0D-04. Basically updates to BA ignored if their effect
 ! on RJ is less than BA_CHK_FAC*RJ.
 !
-	REAL*8 BA_CHK_FAC
+	REAL(10) BA_CHK_FAC
 	LOGICAL INCLUDE_dSLdT
 	LOGICAL NEW_LINE_BA
 	INTEGER INDX_BA_METH_RD
@@ -467,13 +468,13 @@
 !
 	LOGICAL SCL_SL_LINE_OPAC
 	LOGICAL SCL_LINE_COOL_RATES
-	REAL*8 SCL_LINE_HT_FAC
-	REAL*8 SCL_LINE_DENSITY_LIMIT
-	REAL*8 EPS                    !If maximum fractional % change < EPS we terminate model
+	REAL(10) SCL_LINE_HT_FAC
+	REAL(10) SCL_LINE_DENSITY_LIMIT
+	REAL(10) EPS                    !If maximum fractional % change < EPS we terminate model
 !
 ! Fix BA variation matrix if % change less than VAL_FIX_BA.
 !
-	REAL*8 VAL_FIX_BA
+	REAL(10) VAL_FIX_BA
 	INTEGER N_ITS_TO_FIX_BA
 	INTEGER CNT_FIX_BA
 	LOGICAL COMPUTE_BARDIN,COMPUTE_BA
@@ -488,7 +489,7 @@
 !
 ! Performs a lambda iteration if % change > VAL_DO_LAM
 !
-	REAL*8 VAL_DO_LAM
+	REAL(10) VAL_DO_LAM
 	INTEGER CNT_LAM
 	INTEGER RD_CNT_LAM
 	LOGICAL OLD_RD_LAMBDA
@@ -503,8 +504,8 @@
 ! Variables for determining whether some populations are held fixed
 ! when the new populations are solved for.
 !
-	REAL*8 CON_SCL_T
-	REAL*8 TAU_SCL_T
+	REAL(10) CON_SCL_T
+	REAL(10) TAU_SCL_T
 	LOGICAL RD_FIX_T,RD_FIX_IMP
 	LOGICAL FIXED_T,FIXED_NE,FIX_IMPURITY
 	LOGICAL VARFIXT
@@ -514,7 +515,7 @@
 	LOGICAL USE_ELEC_HEAT_BAL
 	LOGICAL COMP_STEQ_T_EHB
 !
-	REAL*8 ADD_OPAC_SCL_FAC
+	REAL(10) ADD_OPAC_SCL_FAC
  	LOGICAL ADD_ADDITIONAL_OPACITY
 !
 ! Variable for specifying abundance set;
@@ -536,7 +537,7 @@
 	LOGICAL LINEAR_ADV              !Comput derivatives using linear approximation.
 !
 	LOGICAL INCL_ADVECTION          !Include advection terms in rate equations.
-	REAL*8  ADVEC_RELAX_PARAM       !Allows advection terms to be added slowly
+	REAL(10)  ADVEC_RELAX_PARAM       !Allows advection terms to be added slowly
 !
 ! Variables specifying computaion of e.s. souce function.
 !
@@ -544,8 +545,8 @@
 	LOGICAL RD_COHERENT_ES
 	LOGICAL USE_OLDJ_FOR_ES
 !
-	REAL*8 TSTAR
-	REAL*8 IC
+	REAL(10) TSTAR
+	REAL(10) IC
 !
 ! X-ray variables. XRAYS indicates whether or not to include X-ray emission 
 ! from shocks in the wind? If FF_XRAYS is true, we assume the X-rays are 
@@ -559,20 +560,20 @@
 !
 ! The shocks are characterized by up to 2 temperatures.
 !
-	REAL*8 FILL_FAC_XRAYS_1,T_SHOCK_1,V_SHOCK_1
-	REAL*8 FILL_FAC_XRAYS_2,T_SHOCK_2,V_SHOCK_2
-	REAL*8 FILL_FAC_X1_BEG,FILL_X1_SAV
-	REAL*8 FILL_FAC_X2_BEG,FILL_X2_SAV
-	REAL*8 SLOW_XRAY_SCL_FAC
-	REAL*8 XRAY_EMISS_1,XRAY_EMISS_2
-	REAL*8 VSMOOTH_XRAYS
+	REAL(10) FILL_FAC_XRAYS_1,T_SHOCK_1,V_SHOCK_1
+	REAL(10) FILL_FAC_XRAYS_2,T_SHOCK_2,V_SHOCK_2
+	REAL(10) FILL_FAC_X1_BEG,FILL_X1_SAV
+	REAL(10) FILL_FAC_X2_BEG,FILL_X2_SAV
+	REAL(10) SLOW_XRAY_SCL_FAC
+	REAL(10) XRAY_EMISS_1,XRAY_EMISS_2
+	REAL(10) VSMOOTH_XRAYS
 !
-	REAL*8 ALLOWED_XRAY_FLUX_ERROR       !Fractional error allowed before X-ray emissivties are scaled 
-        REAL*8 DESIRED_XRAY_LUM              !Desired X-ray luminosity (> 0.1 keV)
+	REAL(10) ALLOWED_XRAY_FLUX_ERROR       !Fractional error allowed before X-ray emissivties are scaled 
+        REAL(10) DESIRED_XRAY_LUM              !Desired X-ray luminosity (> 0.1 keV)
 	LOGICAL SCALE_XRAY_LUM               !Indicates whether the X-ray emissivities will be scaled automatically.
 !
-	REAL*8 NU_XRAY_END
-	REAL*8 DELV_XRAY
+	REAL(10) NU_XRAY_END
+	REAL(10) DELV_XRAY
 !
 ! Indicates number of time POPS array is to be written to scratch
 ! file per iteration.
@@ -587,9 +588,9 @@
 	CHARACTER(LEN=10) OUTER_BND_METH
 	CHARACTER(LEN=10) INNER_BND_METH
 !
-	REAL*8 IB_STAB_FACTOR
-	REAL*8 OUT_BC_PARAM_ONE
-	REAL*8 REXT_FAC
+	REAL(10) IB_STAB_FACTOR
+	REAL(10) OUT_BC_PARAM_ONE
+	REAL(10) REXT_FAC
 	INTEGER RD_OUT_BC_TYPE
 	INTEGER OUT_BC_TYPE
 	LOGICAL RDTHK_CONT

@@ -36,7 +36,7 @@ c
       integer, parameter :: num_e_decimal=6
       integer, parameter :: num_f_decimal=6
 c
-      real*8 :: input,t1
+      REAL(10) :: input,t1
 c
       character(len=120) :: default
       character(len=20) :: fmt
@@ -117,8 +117,8 @@ c
       integer, parameter :: num_e_decimal=6
       integer, parameter :: num_f_decimal=6
 c
-      real*8, dimension(dim) :: input
-      real*8 :: t1
+      REAL(10), dimension(dim) :: input
+      REAL(10) :: t1
 c
       character(len=120) :: default
       character(len=20) :: fmt
@@ -211,7 +211,7 @@ c
 c
       integer :: input
 c
-      real*8 :: t1
+      REAL(10) :: t1
 c
       character(len=120) :: default
       character(len=20) :: fmt
@@ -258,7 +258,7 @@ c
 c
       integer, dimension(dim) :: input
 c
-      real*8 :: t1
+      REAL(10) :: t1
 c
       character(len=120) :: default
       character(len=20) :: fmt

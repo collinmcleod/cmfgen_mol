@@ -24,9 +24,9 @@
 	INTEGER DIAG_INDX
 	INTEGER DEPTH_INDX
 !
-        REAL*8 POPS(NT,ND)
-        REAL*8 C_MAT(NT,NT)
-	REAL*8 STEQ_VEC(NT)
+        REAL(10) POPS(NT,ND)
+        REAL(10) C_MAT(NT,NT)
+	REAL(10) STEQ_VEC(NT)
 	LOGICAL FIRST_MATRIX
 	LOGICAL LAST_MATRIX
 	LOGICAL FIX_IMPURITY
@@ -36,21 +36,21 @@
 ! We use ?_ION to create the ionization balance equations for each
 ! ionization stage.
 !
-	REAL*8 C_ION(NION,NT)
-	REAL*8 STEQ_ION(NION)
+	REAL(10) C_ION(NION,NT)
+	REAL(10) STEQ_ION(NION)
 !
 ! We use ?_NC for the Number conservation equation for each species.
 ! We don't replace them directly into C_MAT and STEQ_VEC for ease of
 ! programming.
 !
-	REAL*8 C_NC(NUM_SPECIES,NT)
-	REAL*8 STEQ_NC(NUM_SPECIES)
+	REAL(10) C_NC(NUM_SPECIES,NT)
+	REAL(10) STEQ_NC(NUM_SPECIES)
 !
 ! FAC is used as a scale factor to determine at what depth the ground-state
 ! equilibrium equation is replaced by the ionization equation.
 !
-!	REAL*8, PARAMETER :: FAC=1.0D+05
-	REAL*8, PARAMETER :: FAC=1.0D+02
+!	REAL(10), PARAMETER :: FAC=1.0D+05
+	REAL(10), PARAMETER :: FAC=1.0D+02
 !
 	LOGICAL DIAG_BAND
 !

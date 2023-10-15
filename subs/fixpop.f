@@ -17,8 +17,8 @@ C
 	LOGICAL FIX_IMPURITY,SPEC_PRES
 	INTEGER NT,ND,NUM_BNDS,DST,DEND
 	INTEGER EQSPEC,NSPEC,FIX_NSPEC
-	REAL*8 BA(NT,NT,NUM_BNDS,ND),STEQ(NT,ND)
-	REAL*8 POP(NSPEC,ND),POPVEC(ND)
+	REAL(10) BA(NT,NT,NUM_BNDS,ND),STEQ(NT,ND)
+	REAL(10) POP(NSPEC,ND),POPVEC(ND)
 	CHARACTER*(*) DESC	
 C
 C Local variables.
@@ -30,7 +30,7 @@ C
 C Varaibles to allow information to be output regarding the number
 C of levels and depths where a population was held fixed.
 C
-	REAL*8 T1
+	REAL(10) T1
 	INTEGER, SAVE, ALLOCATABLE :: CNT(:)
  
 C FIX_NSPEC takes priority in determining the number of levels

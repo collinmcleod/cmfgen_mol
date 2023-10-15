@@ -81,27 +81,27 @@
 	INTEGER ID
 	INTEGER NLEVS			!Number of levels
 	INTEGER PHOT_ID		!Which photoionization route.
-	REAL*8 PHOT(NLEVS)		!Cross-section
-	REAL*8 GS_EDGE(NLEVS)		!Energy for ionization to Ground State!
-	REAL*8 FREQ
+	REAL(10) PHOT(NLEVS)		!Cross-section
+	REAL(10) GS_EDGE(NLEVS)		!Energy for ionization to Ground State!
+	REAL(10) FREQ
 	LOGICAL SET_TO_EDGE
 !
 ! External functions.
 !
 	INTEGER ERROR_LU
-	REAL*8 VOIGT,HYDCROSSL,XCROSS_V2,GBF
+	REAL(10) VOIGT,HYDCROSSL,XCROSS_V2,GBF
 	EXTERNAL VOIGT,HYDCROSSL,XCROSS_V2,GBF,ERROR_LU
 !
 ! Common block with opacity/emissivity constants.
 !
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 !
 ! Local vectors
 !
-	REAL*8 FREQ_VEC(NLEVS)
-	REAL*8 INDX(NLEVS)
+	REAL(10) FREQ_VEC(NLEVS)
+	REAL(10) INDX(NLEVS)
 !
 ! Local variables.
 !
@@ -111,20 +111,20 @@
 	INTEGER INC,INC_SAV
 	INTEGER LST,LEND
 !
-	REAL*8 U			!Defined as FREQ/EDGE
-	REAL*8 RU			!Defined as EDGE/FREQ
+	REAL(10) U			!Defined as FREQ/EDGE
+	REAL(10) RU			!Defined as EDGE/FREQ
 !
-	REAL*8 T1,T2,T3
-	REAL*8 DOP_NU
-	REAL*8 EDGE			!Ionization energy
-	REAL*8 A_VOIGT
-	REAL*8 V_VOIGT
-	REAL*8 X
-	REAL*8 RJ
-	REAL*8 SUM
+	REAL(10) T1,T2,T3
+	REAL(10) DOP_NU
+	REAL(10) EDGE			!Ionization energy
+	REAL(10) A_VOIGT
+	REAL(10) V_VOIGT
+	REAL(10) X
+	REAL(10) RJ
+	REAL(10) SUM
 !
-	REAL*8, PARAMETER :: EV_TO_HZ=0.241798840766D0
-	REAL*8, PARAMETER :: EQUAL_COR_FAC=1.0D0+1.0D-14
+	REAL(10), PARAMETER :: EV_TO_HZ=0.241798840766D0
+	REAL(10), PARAMETER :: EQUAL_COR_FAC=1.0D0+1.0D-14
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2
@@ -451,7 +451,7 @@ C
 ! that it scales as nu^{-2}. The values in this region should be unimportant.
 !
 	          X=MIN( U,PD(ID)%CROSS_A(LMIN+4) )
-	          X=DLOG10(X)
+	          X=LOG10(X)
 	          T1=10**(  PD(ID)%CROSS_A(LMIN)+X*( PD(ID)%CROSS_A(LMIN+1) +
 	1                 X*(PD(ID)%CROSS_A(LMIN+2) +
 	1                 X*PD(ID)%CROSS_A(LMIN+3)) ) + LG10_CONV_FAC  )

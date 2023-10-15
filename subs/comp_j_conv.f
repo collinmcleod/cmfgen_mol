@@ -38,9 +38,9 @@ C It is assumed that BA can be passed for J_STORE. If not the vector should
 C have dimension (ND,NCF). As not BA pass NUM_BNDS as one, and NT as
 C ROOT(NCF)+1.
 C
-	REAL*8 J_STORE(ND,NT*NT*NUM_BNDS)	!BA matrix in main program.
-	REAL*8 NU(NCF)				!Frequency (10^15 Hz)
-	REAL*8 TEMP(ND)				!Temperature (10^4 K)
+	REAL(10) J_STORE(ND,NT*NT*NUM_BNDS)	!BA matrix in main program.
+	REAL(10) NU(NCF)				!Frequency (10^15 Hz)
+	REAL(10) TEMP(ND)				!Temperature (10^4 K)
 C
 	CHARACTER*(*) FILE_IN
 	CHARACTER*(*) FILE_OUT
@@ -49,23 +49,23 @@ C Simultaneous equations are assumed to have the form
 C
 C    A(i).X(i-1) - [H(i)+A(i)+B(i)].X(i) - C(i).X(i+1) = D(i)
 C
-	REAL*8 A(NCF)
-	REAL*8 H(NCF)
-	REAL*8 C(NCF)
-	REAL*8 D(NCF)
+	REAL(10) A(NCF)
+	REAL(10) H(NCF)
+	REAL(10) C(NCF)
+	REAL(10) D(NCF)
 C
-	REAL*8 A_STORE(NCF)
-	REAL*8 C_STORE(NCF)
-	REAL*8 J_ES(NCF)
+	REAL(10) A_STORE(NCF)
+	REAL(10) C_STORE(NCF)
+	REAL(10) J_ES(NCF)
 C
-	REAL*8 PLANCK_FN(NCF)
-	REAL*8 PLANCK_ES(NCF)
-	REAL*8 PLANCK_NU(NCF)
+	REAL(10) PLANCK_FN(NCF)
+	REAL(10) PLANCK_ES(NCF)
+	REAL(10) PLANCK_NU(NCF)
 C
 C Provide some extra storage in case J_STORE dimensions are not large
 C enough.
 C
-	REAL*8, ALLOCATABLE :: EXTRA_J_ST(:,:)
+	REAL(10), ALLOCATABLE :: EXTRA_J_ST(:,:)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
@@ -74,9 +74,9 @@ C
 	INTEGER IONE
 	PARAMETER (IONE=1)
 C
-	REAL*8 BETA
-	REAL*8 T1
-	REAL*8 D1,D2,DH
+	REAL(10) BETA
+	REAL(10) T1
+	REAL(10) D1,D2,DH
 	INTEGER I,K,L,ML,INIT_REC,IOS
 	INTEGER IREC_LEN
 	INTEGER J_DIM
@@ -85,15 +85,15 @@ C Constants for opacity etc [Set in CMFGEN].
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 OPLIN,EMLIN
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) OPLIN,EMLIN
 C
 C Parameters for fit to Electrons Scattering redistribution function
 C (dipole form). From Rybicki and Hummer (A&A, 290,553)
 C
 	INTEGER NCOEF
 	PARAMETER (NCOEF=2)
-	REAL*8 ACOEF(2),BCOEF(2)
+	REAL(10) ACOEF(2),BCOEF(2)
 	DATA ACOEF/1.690703717290D0,-0.690703717290D0/
 	DATA BCOEF/1.614249968779D0,2.154326524957D0/
 C
@@ -230,7 +230,7 @@ C
 C No interpolation is done for the end points (which have coherent scatering).
 C The immediate interior points, if necessary, are handled by extrapolation.
 C
-	  A(:)=DLOG(J_ES(:))
+	  A(:)=LOG(J_ES(:))
 	  J_ES(1)=A(1)		!Must be in LOG form: not modifed by interp.
 	  J_ES(NCF)=A(NCF)
 	  C(:)=PLANCK_ES(:)	!Already taken LOG

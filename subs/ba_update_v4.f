@@ -9,10 +9,10 @@ C VJ_P = Int ( dJ/v)
 C VJ_C = Int ( dJ)
 C RJ_SUM = Int (J)
 C
-	REAL*8, ALLOCATABLE :: VJ_R(:,:,:)
-	REAL*8, ALLOCATABLE :: VJ_P(:,:,:)
-	REAL*8, ALLOCATABLE :: VJ_T(:,:,:)
-	REAL*8, ALLOCATABLE :: RJ_SUM(:)
+	REAL(10), ALLOCATABLE :: VJ_R(:,:,:)
+	REAL(10), ALLOCATABLE :: VJ_P(:,:,:)
+	REAL(10), ALLOCATABLE :: VJ_T(:,:,:)
+	REAL(10), ALLOCATABLE :: RJ_SUM(:)
 C
 	END MODULE BA_J_DATA_MOD_V4
 C
@@ -56,27 +56,27 @@ C                           Improvement will depend on how many times
 C                           innermost loop is executed.
 C
 C Altered: 24-May-1996 :: IONE, ITWO, RMAX_FAC inserted
-C                         DABS changed to ABS.
+C                         ABS changed to ABS.
 C Created: 28-Feb-1995
 C
   	INTEGER NT,NUM_BNDS,ND,DST,DEND
-	REAL*8 BA(NT,NT,NUM_BNDS,ND)
-	REAL*8 BA_PAR(NT,NT,ND)
-	REAL*8 QFV_R(NT,ND)
-	REAL*8 QFV_P(NT,ND)
-	REAL*8 VJ(NT,NUM_BNDS,ND)
-	REAL*8 POPS(NT,ND)
-	REAL*8 VCHI(NT,ND)
-	REAL*8 VETA(NT,ND)
-	REAL*8 RJ(ND)
-	REAL*8 dJ_CHK_FAC
+	REAL(10) BA(NT,NT,NUM_BNDS,ND)
+	REAL(10) BA_PAR(NT,NT,ND)
+	REAL(10) QFV_R(NT,ND)
+	REAL(10) QFV_P(NT,ND)
+	REAL(10) VJ(NT,NUM_BNDS,ND)
+	REAL(10) POPS(NT,ND)
+	REAL(10) VCHI(NT,ND)
+	REAL(10) VETA(NT,ND)
+	REAL(10) RJ(ND)
+	REAL(10) dJ_CHK_FAC
 C
-	REAL*8 CHI_CONT(ND)
-	REAL*8 ESEC(ND)
-	REAL*8 T(ND)
+	REAL(10) CHI_CONT(ND)
+	REAL(10) ESEC(ND)
+	REAL(10) T(ND)
 C
-	REAL*8 NU
-	REAL*8 FQW
+	REAL(10) NU
+	REAL(10) FQW
 C
 C NEW_CONT indicates that this is the first frequency of a new continuum band
 C in which the continuum cross-sections are constant. FINAL_FREQ indicates
@@ -85,17 +85,17 @@ C
 	LOGICAL FINAL_FREQ
 	LOGICAL NEW_CONT
 C
-	REAL*8 COMP_VEC(NT)
+	REAL(10) COMP_VEC(NT)
 C
 C Constants for opacity etc.
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
-	REAL*8 T1,T2,QFV_T
+	REAL(10) T1,T2,QFV_T
 	INTEGER I,J,K,L,LS,IOS
 	INTEGER DIAG_INDX,BNDST,BNDEND
 C

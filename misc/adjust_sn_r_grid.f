@@ -12,42 +12,42 @@
 	INTEGER NS			!For old grid
 	INTEGER ND			!For final grid.
 !
-	REAL*8 R(ND)			!Returned
-	REAL*8 OLD_R(NS)		!Input
-	REAL*8 OLD_T(NS)		!Input
-	REAL*8 OLD_TAU(NS)		!Input
+	REAL(10) R(ND)			!Returned
+	REAL(10) OLD_R(NS)		!Input
+	REAL(10) OLD_T(NS)		!Input
+	REAL(10) OLD_TAU(NS)		!Input
 !
-	REAL*8 LOG_OLD_R(NS)
-	REAL*8 LOG_OLD_T(NS)
-	REAL*8 LOG_OLD_TAU(NS)
+	REAL(10) LOG_OLD_R(NS)
+	REAL(10) LOG_OLD_T(NS)
+	REAL(10) LOG_OLD_TAU(NS)
 !
 	INTEGER, PARAMETER :: IND=2
-	REAL*8 XN(ND)                   !Used as integer grid
-	REAL*8 ZN(IND*ND)		!Used as integer grid.
-	REAL*8 LOG_R(IND*ND)
-	REAL*8 TAU(IND*ND)
-	REAL*8 LOG_T(IND*ND)
-	REAL*8 LOG_TAU(IND*ND)
+	REAL(10) XN(ND)                   !Used as integer grid
+	REAL(10) ZN(IND*ND)		!Used as integer grid.
+	REAL(10) LOG_R(IND*ND)
+	REAL(10) TAU(IND*ND)
+	REAL(10) LOG_T(IND*ND)
+	REAL(10) LOG_TAU(IND*ND)
 !
-	REAL*8 IB_RAT			!dTAU(I+1)/dTAU(I) near inner boudary.
-	REAL*8 OB_RAT			!dTAU(I+1)/dRAU(I) near outer bunary
-	REAL*8 R_SCALE_FAC		!Factor to increase dLOGR by so that TAU scale has higher importance.
-	REAL*8 DTAU2_ON_DTAU1		!DTAU(2)/DTAU(1) at outer boundary.
-	REAL*8 dLOGT_MAX
+	REAL(10) IB_RAT			!dTAU(I+1)/dTAU(I) near inner boudary.
+	REAL(10) OB_RAT			!dTAU(I+1)/dRAU(I) near outer bunary
+	REAL(10) R_SCALE_FAC		!Factor to increase dLOGR by so that TAU scale has higher importance.
+	REAL(10) DTAU2_ON_DTAU1		!DTAU(2)/DTAU(1) at outer boundary.
+	REAL(10) dLOGT_MAX
 !
 	INTEGER N_IB_INS
 	INTEGER N_OB_INS
 !
-	REAL*8 dTAU			!d(LOG(TAU))
-	REAL*8 dTAU_OLD
-	REAL*8 dLOGR
-	REAL*8 dLOGT
-	REAL*8 LOG_TAU_MIN
-	REAL*8 LOG_R_MAX
-	REAL*8 TAU_BEG,TAU_END
-	REAL*8 T1,T2,T3
-	REAL*8 NEXT_R
-	REAL*8 OB_RAT_LOC
+	REAL(10) dTAU			!d(LOG(TAU))
+	REAL(10) dTAU_OLD
+	REAL(10) dLOGR
+	REAL(10) dLOGT
+	REAL(10) LOG_TAU_MIN
+	REAL(10) LOG_R_MAX
+	REAL(10) TAU_BEG,TAU_END
+	REAL(10) T1,T2,T3
+	REAL(10) NEXT_R
+	REAL(10) OB_RAT_LOC
 !
 	INTEGER LU
 	INTEGER, PARAMETER :: IONE=1

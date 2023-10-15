@@ -1,9 +1,9 @@
       FUNCTION expint(n,x)
       INTEGER n,MAXIT
-      REAL*8  expint,x,EPS,FPMIN,EULER
+      REAL(10)  expint,x,EPS,FPMIN,EULER
       PARAMETER (MAXIT=100,EPS=1.D-7,FPMIN=1.D-200,EULER=.5772156649)
       INTEGER i,ii,nm1
-      REAL*8 a,b,c,d,del,fact,h,psi
+      REAL(10) a,b,c,d,del,fact,h,psi
       nm1=n-1
       if(n.lt.0.or.x.lt.0..or.(x.eq.0..and.(n.eq.0.or.n.eq.1)))then
         pause 'bad arguments in expint'

@@ -1,11 +1,11 @@
-      double precision function ddot(n,dx,incx,dy,incy)
+      REAL(10) function ddot(n,dx,incx,dy,incy)
 c
 c     forms the dot product of two vectors.
 c     uses unrolled loops for increments equal to one.
 c     jack dongarra, linpack, 3/11/78.
 c     modified 12/3/93, array(1) declarations changed to array(*)
 c
-      double precision dx(*),dy(*),dtemp
+      REAL(10) dx(*),dy(*),dtemp
       integer i,incx,incy,ix,iy,m,mp1,n
 c
       ddot = 0.0d0

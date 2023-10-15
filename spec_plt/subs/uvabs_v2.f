@@ -28,33 +28,33 @@ C
 C
 	integer*4 Norig_new
 C
-	real*8 origwave(Norig_max)
-	real*8 origflux(Norig_max)
-	real*8 origfreq(Norig_max)
+	REAL(10) origwave(Norig_max)
+	REAL(10) origflux(Norig_max)
+	REAL(10) origfreq(Norig_max)
 !
-	real*8, allocatable ::  modwave(:)
-	real*8, allocatable ::  modflux(:)
-	real*8, allocatable ::  tempwave(:)
-	real*8, allocatable ::  tempflux(:)
-	real*8, allocatable ::  Hwave(:)
-	real*8, allocatable ::  Hflux(:)
-	real*8, allocatable ::  Hfreq(:)
+	REAL(10), allocatable ::  modwave(:)
+	REAL(10), allocatable ::  modflux(:)
+	REAL(10), allocatable ::  tempwave(:)
+	REAL(10), allocatable ::  tempflux(:)
+	REAL(10), allocatable ::  Hwave(:)
+	REAL(10), allocatable ::  Hflux(:)
+	REAL(10), allocatable ::  Hfreq(:)
 !
-	real*8 t1
+	REAL(10) t1
 C
 C       HIABS variables
 C
-	real*8 v_turb        ! turbulent velocity in km/s
-	real*8 v_r           ! radial velocity of star w.r.t. ISM
-	real*8 log_ntot      ! log base 10 of H column density
-	real*8 log_h2_ntot   ! log base 10 of HII column density
-	real*8 t_in_k        ! temperature in K
-	real*8 wave_max      ! maximum wavelength
-	real*8 wave_min      ! minimum wavelength
-	real*8 hut_res       ! resolution of H.U.T. in angstroms
-	real*8 model_res     ! model resolution in angstroms
-	real*8 kernal_res    ! kernal to convolve model spectrm with res.
-	real*8 min_res_kms   ! minimum resolution to work with
+	REAL(10) v_turb        ! turbulent velocity in km/s
+	REAL(10) v_r           ! radial velocity of star w.r.t. ISM
+	REAL(10) log_ntot      ! log base 10 of H column density
+	REAL(10) log_h2_ntot   ! log base 10 of HII column density
+	REAL(10) t_in_k        ! temperature in K
+	REAL(10) wave_max      ! maximum wavelength
+	REAL(10) wave_min      ! minimum wavelength
+	REAL(10) hut_res       ! resolution of H.U.T. in angstroms
+	REAL(10) model_res     ! model resolution in angstroms
+	REAL(10) kernal_res    ! kernal to convolve model spectrm with res.
+	REAL(10) min_res_kms   ! minimum resolution to work with
 	logical fft          ! 1 = convolve via fft, 0 = straight convolution
 	integer*4 alter_min  ! min and max indices of original array to be
         integer*4 alter_max  ! changed.
@@ -167,8 +167,8 @@ C
 	implicit none
 
 	integer*4 n
-	real*8 wave(n)
-	real*8 model_res
+	REAL(10) wave(n)
+	REAL(10) model_res
 
 	integer*4 i
 
@@ -195,18 +195,18 @@ C
 	implicit none
 
 	integer*4 n_new
-	real*8 new_wave(n_new)
-	real*8 New_flux(n_new)
+	REAL(10) new_wave(n_new)
+	REAL(10) New_flux(n_new)
 !
 	integer*4 n_old
-	real*8 old_wave(n_old)
-	real*8 old_flux(n_old)
+	REAL(10) old_wave(n_old)
+	REAL(10) old_flux(n_old)
 !
-	real*8 dlam 	! even spacing in wavelength
+	REAL(10) dlam 	! even spacing in wavelength
 
 	integer*4 nnew
 	integer*4 i
-	real*8 dlamover2
+	REAL(10) dlamover2
 
 	dlamover2 = dlam/2.0d0
 
@@ -242,8 +242,8 @@ C
 	include 'constants.inc'
 
 	integer*4 n
-	real*8 freq(n)
-	real*8 wave(n)
+	REAL(10) freq(n)
+	REAL(10) wave(n)
 	logical nutolambda ! true=nu->lambda, false=lambda->nu
 
 	integer*4 i
@@ -277,18 +277,18 @@ C
 	include 'constants.inc'
 
 	integer*4 n
-	real*8 wave(n)
+	REAL(10) wave(n)
 	logical ltolnl  ! if T, lambda->lnlambda, if F, nlambda->lambda.
 
 	integer*4 i
 
 	if (ltolnl) then
 	 do i=1,n
-	  wave(i) = dlog(wave(i))
+	  wave(i) = log(wave(i))
 	 end do
 	else 
 	 do i=1,n
-	  wave(i) = dexp(wave(i))
+	  wave(i) = exp(wave(i))
 	 end do
 	end if 
 
@@ -305,11 +305,11 @@ C
 	include 'parameters.inc'
 
 	integer*4 n
-	real*8 freq(n)
-	real*8 flux(n)
+	REAL(10) freq(n)
+	REAL(10) flux(n)
 
 	integer*4 i,j
-	real*8 prev
+	REAL(10) prev
 
 	prev = zero
 	j=0
@@ -338,8 +338,8 @@ C
 	include 'constants.inc'
 
 	integer*4 n
-	real*8 modwave(n)
-	real*8 wave(n),flux(n),freq(n)
+	REAL(10) modwave(n)
+	REAL(10) wave(n),flux(n),freq(n)
 
 	integer*4 i
 
@@ -359,8 +359,8 @@ C subroutine to map array A onto array B using linear interpolation
 	include 'constants.inc'
 
 	integer*4 AN,BN
-	real*8 Awave(AN),Aflux(AN)
-	real*8 Bwave(BN),Bflux(BN)
+	REAL(10) Awave(AN),Aflux(AN)
+	REAL(10) Bwave(BN),Bflux(BN)
 
 	integer*4 i,j
 
@@ -396,15 +396,15 @@ C the considered point.
 	include 'constants.inc'
 
 	integer*4 AN,BN
-	real*8 Awave(AN),Aflux(AN)
-	real*8 Bwave(BN),Bflux(BN)
-	real*8 dlam,dlamover2
+	REAL(10) Awave(AN),Aflux(AN)
+	REAL(10) Bwave(BN),Bflux(BN)
+	REAL(10) dlam,dlamover2
 
 	integer*4 i,j,i_min,i_max
 	integer*4 smaller_index,larger_index
 
-	real*8 fluxsum
-	real*8 dlamsum
+	REAL(10) fluxsum
+	REAL(10) dlamsum
 
 	dlamover2=dlam/two
 	i = 1
@@ -461,7 +461,7 @@ C or equal to the supplied number
 	implicit none
 
 	integer*4 larger_index,n
-	real*8 list(n),value
+	REAL(10) list(n),value
 
 	integer*4 i
 
@@ -487,7 +487,7 @@ C equal to the supplied number
 	implicit none
 
 	integer*4 smaller_index,n
-	real*8 list(n),value
+	REAL(10) list(n),value
 
 	integer*4 i
 

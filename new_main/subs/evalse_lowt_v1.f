@@ -13,9 +13,9 @@
 !
 	INTEGER NT		!Total number of levels
 	INTEGER ND		!Number of depth points
-	REAL*8 RJ(ND)
-	REAL*8 NU
-	REAL*8 FQW
+	REAL(10) RJ(ND)
+	REAL(10) NU
+	REAL(10) FQW
 !
 	LOGICAL COMPUTE_BA
 !	
@@ -27,7 +27,7 @@
 !
 ! Constants for opacity etc.
 !
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local variables.
@@ -40,17 +40,17 @@
 ! REV_HNST referes to the LTE population  of the level defined with respect
 ! to the actual destination (target) level.
 !
-	REAL*8 REV_HNST
-	REAL*8 LOG_B_RAT
-	REAL*8 DI_FAC
-	REAL*8 ED_FAC
-	REAL*8 T_FAC
-	REAL*8 JREC
-	REAL*8 dRR			!Increment to radiative recombinaton rate.
+	REAL(10) REV_HNST
+	REAL(10) LOG_B_RAT
+	REAL(10) DI_FAC
+	REAL(10) ED_FAC
+	REAL(10) T_FAC
+	REAL(10) JREC
+	REAL(10) dRR			!Increment to radiative recombinaton rate.
 !
-	REAL*8 SUM_SE
-	REAL*8 SUM_VK_R
-	REAL*8 T1,T2,T3,T4
+	REAL(10) SUM_SE
+	REAL(10) SUM_VK_R
+	REAL(10) T1,T2,T3,T4
 !
 ! REV_HNST= HNST * B(ION_LEV)/B(1) where b is the deparure coefficient.
 !

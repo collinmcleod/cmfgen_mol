@@ -10,8 +10,8 @@ C Altered 28-May-1996 : IMPLICIT NONE isntalled.
 C Created 28-JUL-1982 : Schuster condition inserted
 C
 	INTEGER LS,NI,ND,NC
-	REAL*8 DTAU(ND),SOURCE(ND),X(ND)
-	REAL*8 DBC,IC
+	REAL(10) DTAU(ND),SOURCE(ND),X(ND)
+	REAL(10) DBC,IC
 	LOGICAL DIFF
 C
 C Local variables.

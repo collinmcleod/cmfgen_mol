@@ -7,29 +7,29 @@
 ! YE contains the distribution of non-thermal electrons as a function
 !   of energy and depth.
 !
-        REAL*8, ALLOCATABLE :: XKT(:)
-        REAL*8, ALLOCATABLE :: dXKT(:)
-        REAL*8, ALLOCATABLE :: dXKT_ON_XKT(:)
-        REAL*8, ALLOCATABLE :: YE(:,:)
+        REAL(10), ALLOCATABLE :: XKT(:)
+        REAL(10), ALLOCATABLE :: dXKT(:)
+        REAL(10), ALLOCATABLE :: dXKT_ON_XKT(:)
+        REAL(10), ALLOCATABLE :: YE(:,:)
 !
 ! These quantities provide the fraction of the total energy going into the
 ! three forms of heating --- electron, ionization, and excitation at each depth.
 !
-        REAL*8, ALLOCATABLE ::  FRAC_ELEC_HEATING(:)
-        REAL*8, ALLOCATABLE ::  FRAC_ION_HEATING(:)
-        REAL*8, ALLOCATABLE ::  FRAC_EXCITE_HEATING(:)
+        REAL(10), ALLOCATABLE ::  FRAC_ELEC_HEATING(:)
+        REAL(10), ALLOCATABLE ::  FRAC_ION_HEATING(:)
+        REAL(10), ALLOCATABLE ::  FRAC_EXCITE_HEATING(:)
 !
 	TYPE NON_THERM_ION_DATA
-	  REAL*8 :: N_ION_EL
-	  REAL*8 :: ZION
-	  REAL*8 :: PQN
-	  REAL*8 :: ANG
-	  REAL*8 :: ION_POT
-	  REAL*8 :: N_ATOM
-	  REAL*8 :: A_COL,B_COL,C_COL, D_COL
-	  REAL*8, POINTER :: CROSS_SEC(:)
-	  REAL*8, ALLOCATABLE :: XTAB(:)
-	  REAL*8, ALLOCATABLE :: YTAB(:)
+	  REAL(10) :: N_ION_EL
+	  REAL(10) :: ZION
+	  REAL(10) :: PQN
+	  REAL(10) :: ANG
+	  REAL(10) :: ION_POT
+	  REAL(10) :: N_ATOM
+	  REAL(10) :: A_COL,B_COL,C_COL, D_COL
+	  REAL(10), POINTER :: CROSS_SEC(:)
+	  REAL(10), ALLOCATABLE :: XTAB(:)
+	  REAL(10), ALLOCATABLE :: YTAB(:)
 !
           INTEGER :: N_STATES=0
 	  INTEGER :: ATOM_STATES(10)

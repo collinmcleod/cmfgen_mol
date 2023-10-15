@@ -5,19 +5,19 @@
 	INTEGER ND_SAV
 	INTEGER MOM_ERR_CNT
 	INTEGER, PARAMETER :: N_ERR_MAX=1000
-	REAL*8 MOM_ERR_ON_FREQ
+	REAL(10) MOM_ERR_ON_FREQ
 	COMMON /MOM_J_CMF_ERR/MOM_ERR_ON_FREQ(N_ERR_MAX),MOM_ERR_CNT
 	LOGICAL RECORDED_ERROR
 !
 ! These vectors must be supplied by the calling routine. We use these
 ! vectors to contain the data on a finer grid.
 !
-	REAL*8, ALLOCATABLE ::  ETA(:)
-	REAL*8, ALLOCATABLE ::  CHI(:)
-	REAL*8, ALLOCATABLE ::  ESEC(:)
-	REAL*8, ALLOCATABLE ::  V(:)			!in km/s
-	REAL*8, ALLOCATABLE ::  SIGMA(:)		!dlnV/dlnR
-	REAL*8, ALLOCATABLE ::  R(:)			!in units of 10^10 cm
+	REAL(10), ALLOCATABLE ::  ETA(:)
+	REAL(10), ALLOCATABLE ::  CHI(:)
+	REAL(10), ALLOCATABLE ::  ESEC(:)
+	REAL(10), ALLOCATABLE ::  V(:)			!in km/s
+	REAL(10), ALLOCATABLE ::  SIGMA(:)		!dlnV/dlnR
+	REAL(10), ALLOCATABLE ::  R(:)			!in units of 10^10 cm
 !
 ! These values are computed, and returned.
 !
@@ -31,42 +31,42 @@
 !
 ! These vectors must be saved as they will be used on subsequent iterations.
 !
-	REAL*8, ALLOCATABLE :: AV_SIGMA(:)
-	REAL*8, ALLOCATABLE :: BETA(:)
-	REAL*8, ALLOCATABLE :: BETA_FREQ(:)
-	REAL*8, ALLOCATABLE :: GAM_REL(:)
-	REAL*8, ALLOCATABLE :: GAM_REL_SQ(:)
-	REAL*8, ALLOCATABLE :: CON_DELTA(:)
-	REAL*8, ALLOCATABLE :: CON_DELTAH(:)
-	REAL*8, ALLOCATABLE :: CON_dKdNUH(:)
-	REAL*8, ALLOCATABLE :: CON_dNdNUH(:)
-	REAL*8, ALLOCATABLE :: CON_dKdNU(:)
-	REAL*8, ALLOCATABLE :: CON_dHdNU(:)
-	REAL*8, ALLOCATABLE :: GAM_RSQJNU(:)
-	REAL*8, ALLOCATABLE :: GAM_RSQHNU(:)
+	REAL(10), ALLOCATABLE :: AV_SIGMA(:)
+	REAL(10), ALLOCATABLE :: BETA(:)
+	REAL(10), ALLOCATABLE :: BETA_FREQ(:)
+	REAL(10), ALLOCATABLE :: GAM_REL(:)
+	REAL(10), ALLOCATABLE :: GAM_REL_SQ(:)
+	REAL(10), ALLOCATABLE :: CON_DELTA(:)
+	REAL(10), ALLOCATABLE :: CON_DELTAH(:)
+	REAL(10), ALLOCATABLE :: CON_dKdNUH(:)
+	REAL(10), ALLOCATABLE :: CON_dNdNUH(:)
+	REAL(10), ALLOCATABLE :: CON_dKdNU(:)
+	REAL(10), ALLOCATABLE :: CON_dHdNU(:)
+	REAL(10), ALLOCATABLE :: GAM_RSQJNU(:)
+	REAL(10), ALLOCATABLE :: GAM_RSQHNU(:)
 !
-        REAL*8, ALLOCATABLE :: GAM_RSQJNU_PREV(:)
-        REAL*8, ALLOCATABLE :: GAM_RSQHNU_PREV(:)
+        REAL(10), ALLOCATABLE :: GAM_RSQJNU_PREV(:)
+        REAL(10), ALLOCATABLE :: GAM_RSQHNU_PREV(:)
 !
-        REAL*8, ALLOCATABLE :: GAM_RSQJNU_SAVE(:)
-        REAL*8, ALLOCATABLE :: GAM_RSQHNU_SAVE(:)
-	REAL*8, ALLOCATABLE :: GAM_RSQJOLD(:)
+        REAL(10), ALLOCATABLE :: GAM_RSQJNU_SAVE(:)
+        REAL(10), ALLOCATABLE :: GAM_RSQHNU_SAVE(:)
+	REAL(10), ALLOCATABLE :: GAM_RSQJOLD(:)
 !
-	REAL*8, ALLOCATABLE :: TA(:),TB(:),TC(:)
-	REAL*8, ALLOCATABLE :: CHI_H(:),CHI_J(:)
-	REAL*8, ALLOCATABLE :: DTAU_H(:),DTAU_J(:),DTAUONQ(:)
-	REAL*8, ALLOCATABLE :: Q(:),XM(:),SOURCE(:)
-	REAL*8, ALLOCATABLE :: VB(:),VC(:),COH_VEC(:)
-	REAL*8, ALLOCATABLE :: HU(:),HL(:),HS(:),HD(:)
-	REAL*8, ALLOCATABLE :: P_H(:),P_J(:)
-	REAL*8, ALLOCATABLE :: VdJdR_TERM(:),VdHdR_TERM(:)
-	REAL*8, ALLOCATABLE :: DELTA(:),DELTAH(:),W(:),WPREV(:)
-	REAL*8, ALLOCATABLE :: PSI(:),PSIPREV(:)
-	REAL*8, ALLOCATABLE :: EPS(:),EPS_PREV(:)
+	REAL(10), ALLOCATABLE :: TA(:),TB(:),TC(:)
+	REAL(10), ALLOCATABLE :: CHI_H(:),CHI_J(:)
+	REAL(10), ALLOCATABLE :: DTAU_H(:),DTAU_J(:),DTAUONQ(:)
+	REAL(10), ALLOCATABLE :: Q(:),XM(:),SOURCE(:)
+	REAL(10), ALLOCATABLE :: VB(:),VC(:),COH_VEC(:)
+	REAL(10), ALLOCATABLE :: HU(:),HL(:),HS(:),HD(:)
+	REAL(10), ALLOCATABLE :: P_H(:),P_J(:)
+	REAL(10), ALLOCATABLE :: VdJdR_TERM(:),VdHdR_TERM(:)
+	REAL(10), ALLOCATABLE :: DELTA(:),DELTAH(:),W(:),WPREV(:)
+	REAL(10), ALLOCATABLE :: PSI(:),PSIPREV(:)
+	REAL(10), ALLOCATABLE :: EPS(:),EPS_PREV(:)
 !
-	REAL*8 FREQ_SAVE
-	REAL*8 IN_NBC_SAVE
-	REAL*8 IN_NBC_PREV
+	REAL(10) FREQ_SAVE
+	REAL(10) IN_NBC_SAVE
+	REAL(10) IN_NBC_PREV
 !
 	END MODULE MOD_JREL_V8
 !
@@ -228,7 +228,7 @@
 	SUBROUTINE MOM_JREL_V8(ETA_SM,CHI_SM,ESEC_SM,V_SM,SIGMA_SM,R_SM,
 	1               JNU_SM,RSQHNU_SM,HFLUX_AT_IB,HFLUX_AT_OB,
 	1               VDOP_VEC,VDOP_FRAC,
-	1               FREQ,dLOG_NU,DBB,H_CHK_OPTION,IB_STAB_FACTOR,
+	1               FREQ,LOG_NU,DBB,H_CHK_OPTION,IB_STAB_FACTOR,
 	1               INNER_BND_METH,OUTER_BND_METH,METHOD,COHERENT,N_TYPE,
 	1               INCL_ADVEC_TERMS,INCL_REL_TERMS,INIT,ND_SM)
 	USE MOD_JREL_V8
@@ -244,7 +244,7 @@
 !                          Modified error output to MOM_J_ERRORS
 !                          [OSPREY/cur_cmf_gam: 24-Jan-2015]
 ! Altered: 15-Feb-2014 : Changed to V7. Added IB_STAB_FACTOR to call.
-! Altered: 28-Jan-2012 : Minor bug fix. dLOG_NU was being used with HOLLOW option when INIT was true.
+! Altered: 28-Jan-2012 : Minor bug fix. LOG_NU was being used with HOLLOW option when INIT was true.
 ! Altered: 25-Aug-2010 : Bug fix with IN_NBC_SAVE/ IN_HBC_SAVE. Both values
 !                          incorrectly set because of type'o.
 ! Altered: 17-Dec-2009 : Call changed: changed to V6
@@ -257,34 +257,34 @@
 !
 	INTEGER ND_SM
 !
-	REAL*8 ETA_SM(ND_SM)
-	REAL*8 CHI_SM(ND_SM)
-	REAL*8 ESEC_SM(ND_SM)
-	REAL*8 V_SM(ND_SM)			!in km/s
-	REAL*8 SIGMA_SM(ND_SM)			!dlnV/dlnR
-	REAL*8 R_SM(ND_SM)			!in units of 10^10 cm
+	REAL(10) ETA_SM(ND_SM)
+	REAL(10) CHI_SM(ND_SM)
+	REAL(10) ESEC_SM(ND_SM)
+	REAL(10) V_SM(ND_SM)			!in km/s
+	REAL(10) SIGMA_SM(ND_SM)			!dlnV/dlnR
+	REAL(10) R_SM(ND_SM)			!in units of 10^10 cm
 !
 ! These values are computed, and returned.
 !
-	REAL*8 JNU_SM(ND_SM)
-	REAL*8 RSQHNU_SM(ND_SM)
-	REAL*8 VDOP_VEC(ND_SM)
-	REAL*8 VDOP_FRAC
+	REAL(10) JNU_SM(ND_SM)
+	REAL(10) RSQHNU_SM(ND_SM)
+	REAL(10) VDOP_VEC(ND_SM)
+	REAL(10) VDOP_FRAC
 !
 ! These are returned
 !
-	REAL*8 HFLUX_AT_OB
-	REAL*8 HFLUX_AT_IB
+	REAL(10) HFLUX_AT_OB
+	REAL(10) HFLUX_AT_IB
 !
 ! Boundary conditions: Must be supplied.
 !
-	REAL*8 DBB
-	REAL*8 IB_STAB_FACTOR
+	REAL(10) DBB
+	REAL(10) IB_STAB_FACTOR
 	CHARACTER(LEN=*) INNER_BND_METH
 	CHARACTER(LEN=*) OUTER_BND_METH
 	CHARACTER(LEN=*) H_CHK_OPTION
 !
-	REAL*8 FREQ,dLOG_NU
+	REAL(10) FREQ,LOG_NU
 	CHARACTER*6 METHOD
 !
 ! INIT is used to indicate that there is no coupling to the previous frequency.
@@ -318,15 +318,15 @@
 !
 ! Local variables.
 !
-	REAL*8 DAMP_FAC 
-	REAL*8 T1,T2
-	REAL*8 DTAU
-	REAL*8 RSQ_JP,RSQ_HP,RSQ_NP
-	REAL*8 FMIN,FPLUS,HMIN,NMIN
-	REAL*8 MAX_ER
-	REAL*8 DELTA_R
-	REAL*8 VDOP_MIN
-	REAL*8 TA_SAV,TB_SAV,XM_SAV
+	REAL(10) DAMP_FAC 
+	REAL(10) T1,T2
+	REAL(10) DTAU
+	REAL(10) RSQ_JP,RSQ_HP,RSQ_NP
+	REAL(10) FMIN,FPLUS,HMIN,NMIN
+	REAL(10) MAX_ER
+	REAL(10) DELTA_R
+	REAL(10) VDOP_MIN
+	REAL(10) TA_SAV,TB_SAV,XM_SAV
 !
 	INTEGER COUNT
 	INTEGER IFAIL
@@ -654,14 +654,14 @@
 !
 	IF(.NOT. INIT)THEN
 !
-! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 
 ! the same as d / d ln v.
 !
 ! EPS is used if we define N in terms of J rather than H, This is sometimes
 ! useful as H can approach zero, and hence N/H is undefined.
 !
 	  DO I=1,ND-1
-	    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))
 	    W(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*NMID_ON_HMID(I))
 	    WPREV(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*NMID_ON_HMID_PREV(I))
 	    EPS(I)=DELTAH(I)*(CON_dNdNUH(I)*NMID_ON_J(I)+
@@ -671,9 +671,9 @@
 	  END DO
 !
 	  DO I=2,ND
-	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU
 	  END DO
-	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU
 !
 ! PSIPREV is equivalent to the U vector of FORMSOL.
 !
@@ -793,7 +793,7 @@
 	      XM(ND)=RSQ_HP-FPLUS*RSQ_JP/DTAU-(1.0D0-FPLUS)*RSQ_JP/R(ND)/CHI(ND)
 	      XM(ND-1)=XM(ND-1)-RSQ_JP*TC(ND-1)
 	    ELSE
-	      T1=CON_DELTA(ND)/dLOG_NU/CHI(ND)
+	      T1=CON_DELTA(ND)/LOG_NU/CHI(ND)
 	      TA(ND)=-K_ON_J(ND-1)/DTAU
 	      TB(ND)=FMIN/DTAU + (1.0D0-FMIN)/R(ND)/CHI(ND) + HMIN*(1.0D0+T1)
 	      XM(ND)=RSQ_HP-FPLUS*RSQ_JP/DTAU- (1.0D0-FPLUS)*RSQ_JP/R(ND)/CHI(ND)
@@ -811,12 +811,12 @@
 	    TB(ND)=(K_ON_J(ND)+VdHdR_TERM(ND))/DTAU_H(ND-1)
 	    XM(ND)=GAM_REL(ND)*R(ND)*R(ND)*HNU_AT_IB
 	    IF(.NOT. INIT)THEN
-	      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/DLOG_NU
+	      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/LOG_NU
 	      XM(ND)=XM(ND)-T1*K_ON_J_PREV(ND)*GAM_RSQJNU_PREV(ND)
 	      TB(ND)=TB(ND)-T1*K_ON_J(ND)
 	      T1=GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)-1.0D0
 	      XM(ND)=XM(ND)+GAM_REL(ND)*R(ND)*BETA(ND)*( (HNU_AT_IB-HNU_AT_IB_PREV) +
-	1                   T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/DLOG_NU
+	1                   T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/LOG_NU
 	    END IF
 	  END IF
 	  TC(ND)=0.0D0

@@ -12,9 +12,9 @@
 	INTEGER*4 NT,ND
 	INTEGER*4 NUM_BNDS,DIAG_INDX
 !
-	REAL*8 STEQ(NT,ND)			!Statistical Equilibrium equations
-	REAL*8 POPS(NT,ND)
-	REAL*8 BA(NT,NT,NUM_BNDS,ND)		!Variation of STEQ
+	REAL(10) STEQ(NT,ND)			!Statistical Equilibrium equations
+	REAL(10) POPS(NT,ND)
+	REAL(10) BA(NT,NT,NUM_BNDS,ND)		!Variation of STEQ
 !
 	LOGICAL UPDATE_BA
 !
@@ -27,8 +27,8 @@
 	INTEGER*4, PARAMETER :: IZERO=0
 	INTEGER*4 L,J,II,IOS
 	INTEGER*4 NL,NUP
-	REAL*8 TA(ND)
-	REAL*8 T1
+	REAL(10) TA(ND)
+	REAL(10) T1
 !
 	DO L=1,ND
 	  DO J=1,N_TWO

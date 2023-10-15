@@ -1,7 +1,7 @@
 C
 C 21-Nov-2000 : BACKSPACE statement removed from all routines.
 C               Now use a free-format read from STRING.
-C 24-Mar-1993 : Created - Based on routines in RDLOG.
+C 24-Mar-1993 : Created - Based on routines in RLOG.
 C	        All calls now RD_...
 C               KEY inserted to allow checking of input data, especially
 C               useful when input file formats have changed.
@@ -104,7 +104,7 @@ C
 C
 	SUBROUTINE RD_DBLE(VALUE,KEY,LUI,LUO,A)
 	IMPLICIT NONE
-	REAL*8 VALUE
+	REAL(10) VALUE
 	INTEGER LUI,LUO
 	CHARACTER*(*) KEY,A
 	CHARACTER*80 STRING

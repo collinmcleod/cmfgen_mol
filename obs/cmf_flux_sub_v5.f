@@ -89,7 +89,7 @@
 	INTEGER NDMAX,NPMAX
 	INTEGER NT,NLINE_MAX
 !
-	REAL*8 POPS(NT,ND)
+	REAL(10) POPS(NT,ND)
 !
 ! Constants for opacity etc.
 !
@@ -98,15 +98,15 @@
 !
 ! Internally used variables
 !
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL*8 OPLIN,EMLIN
-	REAL*8 DTDR,BNUE,DBB,DDBBDT
-	REAL*8 MEAN_ATOMIC_WEIGHT
-	REAL*8 TSTAR,S1,IC,MAXCH
-	REAL*8 C_KMS
-	REAL*8 T1,T2,T3,T4
-	REAL*8 FL,FL_OLD
-	REAL*8 FG_COUNT
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) OPLIN,EMLIN
+	REAL(10) DTDR,BNUE,DBB,DDBBDT
+	REAL(10) MEAN_ATOMIC_WEIGHT
+	REAL(10) TSTAR,S1,IC,MAXCH
+	REAL(10) C_KMS
+	REAL(10) T1,T2,T3,T4
+	REAL(10) FL,FL_OLD
+	REAL(10) FG_COUNT
 !
 !
 ! REC_SIZE     is the (maximum) record length in bytes.
@@ -152,9 +152,9 @@
 ! Functions called
 !
 	INTEGER ICHRLEN,ERROR_LU
-	REAL*8 LAMVACAIR
-	REAL*8 ATOMIC_MASS_UNIT
-	REAL*8 SPEED_OF_LIGHT
+	REAL(10) LAMVACAIR
+	REAL(10) ATOMIC_MASS_UNIT
+	REAL(10) SPEED_OF_LIGHT
 	EXTERNAL JWEIGHT_V2,HWEIGHT_V2,KWEIGHT_V2,NWEIGHT_V2
 	EXTERNAL JTRPWGT_V2,HTRPWGT_V2,KTRPWGT_V2,NTRPWGT_V2
 	EXTERNAL ICHRLEN,ERROR_LU,SPEED_OF_LIGHT
@@ -170,50 +170,50 @@
 !
 ! Global vectors:
 !
-	REAL*8 AMASS_ALL(NT)
+	REAL(10) AMASS_ALL(NT)
 !
 ! Arrays and variables for treating lines simultaneously.
 !
-	REAL*8, ALLOCATABLE :: EINA(:)
-	REAL*8, ALLOCATABLE :: OSCIL(:)
-	REAL*8, ALLOCATABLE :: GLDGU(:)
-	REAL*8, ALLOCATABLE :: AMASS_SIM(:)
-	REAL*8, ALLOCATABLE :: FL_SIM(:)
+	REAL(10), ALLOCATABLE :: EINA(:)
+	REAL(10), ALLOCATABLE :: OSCIL(:)
+	REAL(10), ALLOCATABLE :: GLDGU(:)
+	REAL(10), ALLOCATABLE :: AMASS_SIM(:)
+	REAL(10), ALLOCATABLE :: FL_SIM(:)
 	INTEGER, ALLOCATABLE :: SIM_NL(:)
 	INTEGER, ALLOCATABLE :: SIM_NUP(:)
 !
-	REAL*8, ALLOCATABLE :: CHIL_MAT(:,:)
-	REAL*8, ALLOCATABLE :: ETAL_MAT(:,:)
-	REAL*8, ALLOCATABLE :: BB_COR(:,:)
+	REAL(10), ALLOCATABLE :: CHIL_MAT(:,:)
+	REAL(10), ALLOCATABLE :: ETAL_MAT(:,:)
+	REAL(10), ALLOCATABLE :: BB_COR(:,:)
 !
 	INTEGER NUM_SIM_LINES
 	INTEGER SIM_INDX
 	INTEGER TMP_MAX_SIM
-	REAL*8 OVER_FREQ_DIF
-	REAL*8 EW,ABS_EW
-	REAL*8 CONT_INT
+	REAL(10) OVER_FREQ_DIF
+	REAL(10) EW,ABS_EW
+	REAL(10) CONT_INT
 	LOGICAL OVERLAP
 	LOGICAL SOBOLEV
 !
 ! L refers to the lower level, U to the upper level.
 !
-	REAL*8, ALLOCATABLE :: L_STAR_RATIO(:,:)   !ND,MAX_SIM)
-	REAL*8, ALLOCATABLE :: U_STAR_RATIO(:,:)   !ND,MAX_SIM)
+	REAL(10), ALLOCATABLE :: L_STAR_RATIO(:,:)   !ND,MAX_SIM)
+	REAL(10), ALLOCATABLE :: U_STAR_RATIO(:,:)   !ND,MAX_SIM)
 !
-	REAL*8, ALLOCATABLE :: ETA_CMF_ST(:,:)
-	REAL*8, ALLOCATABLE :: CHI_CMF_ST(:,:)
-	REAL*8, ALLOCATABLE :: RJ_CMF_ST(:,:)
-	REAL*8, ALLOCATABLE :: RAY_CMF_ST(:,:)			!Rayleigh scattering opacity
-	REAL*8, ALLOCATABLE :: ION_LINE_FORCE(:,:)
+	REAL(10), ALLOCATABLE :: ETA_CMF_ST(:,:)
+	REAL(10), ALLOCATABLE :: CHI_CMF_ST(:,:)
+	REAL(10), ALLOCATABLE :: RJ_CMF_ST(:,:)
+	REAL(10), ALLOCATABLE :: RAY_CMF_ST(:,:)			!Rayleigh scattering opacity
+	REAL(10), ALLOCATABLE :: ION_LINE_FORCE(:,:)
 !
 ! Vectors for treating lines simultaneously with the continuum.
 !
-	REAL*8, ALLOCATABLE :: LINE_PROF_SIM(:,:)   !ND,MAX_SIM)
+	REAL(10), ALLOCATABLE :: LINE_PROF_SIM(:,:)   !ND,MAX_SIM)
 !
-	REAL*8 NU_MAX_OBS
-	REAL*8 NU_MIN_OBS
+	REAL(10) NU_MAX_OBS
+	REAL(10) NU_MIN_OBS
 !
-	REAL*8 CONT_FREQ
+	REAL(10) CONT_FREQ
 !
 	CHARACTER*50, ALLOCATABLE :: TRANS_NAME_SIM(:)
 !
@@ -229,89 +229,89 @@
 ! 
 !
 ! Opacity/emissivity
-	REAL*8 CHI(ND)			!Continuum opacity (all sources)
-	REAL*8 CHI_RAY(ND)
-	REAL*8 CHI_SCAT(ND)
-	REAL*8 ETA(ND)			!Continuum emissivity (all sources)
-	REAL*8 CHIL(ND)			!Line opacity (without prof.)
-	REAL*8 ETAL(ND)			!Line emissivity (without prof.)
-	REAL*8 ESEC(ND)			!Continuum electron scattering coef.
-	REAL*8 ZETA(ND)			!Source func. (all except elec. scat.)
-	REAL*8 THETA(ND)		!Elec. scat. source coef.
-	REAL*8 SOURCE(ND)		!Complete source function.
-	REAL*8 DTAU(NDMAX)		!Optical depth (used in error calcs)
+	REAL(10) CHI(ND)			!Continuum opacity (all sources)
+	REAL(10) CHI_RAY(ND)
+	REAL(10) CHI_SCAT(ND)
+	REAL(10) ETA(ND)			!Continuum emissivity (all sources)
+	REAL(10) CHIL(ND)			!Line opacity (without prof.)
+	REAL(10) ETAL(ND)			!Line emissivity (without prof.)
+	REAL(10) ESEC(ND)			!Continuum electron scattering coef.
+	REAL(10) ZETA(ND)			!Source func. (all except elec. scat.)
+	REAL(10) THETA(ND)		!Elec. scat. source coef.
+	REAL(10) SOURCE(ND)		!Complete source function.
+	REAL(10) DTAU(NDMAX)		!Optical depth (used in error calcs)
 !		DTAU(I)=0.5*(CHI(I)+CHI(I+1))*(Z(I)-Z(I+1))
-	REAL*8 dCHIdR(NDMAX) 		!Derivative of opacity.
+	REAL(10) dCHIdR(NDMAX) 		!Derivative of opacity.
 !
-	REAL*8 P(NP)
+	REAL(10) P(NP)
 !
-	REAL*8 CHI_CONT(ND)
-	REAL*8 ETA_CONT(ND)
+	REAL(10) CHI_CONT(ND)
+	REAL(10) ETA_CONT(ND)
 !
 ! These parameters are used when computing J and the variation of J.
 !
-	REAL*8 CHI_SCAT_CLUMP(ND)
-	REAL*8 CHI_RAY_CLUMP(ND)
-	REAL*8 CHI_CLUMP(ND)		!==CHI(I)*CLUMP_FAC(I)
-	REAL*8 ETA_CLUMP(ND)		!==ETA(I)*CLUMP_FAC(I)
-	REAL*8 ESEC_CLUMP(ND)		!==ESEC(I)*CLUMP_FAC(I)
+	REAL(10) CHI_SCAT_CLUMP(ND)
+	REAL(10) CHI_RAY_CLUMP(ND)
+	REAL(10) CHI_CLUMP(ND)		!==CHI(I)*CLUMP_FAC(I)
+	REAL(10) ETA_CLUMP(ND)		!==ETA(I)*CLUMP_FAC(I)
+	REAL(10) ESEC_CLUMP(ND)		!==ESEC(I)*CLUMP_FAC(I)
 !
 ! Variables to limit the computation of the continuum opacities and 
 ! emissivities. 
 !
-	REAL*8 EMHNUKT_CONT(ND)
-	REAL*8 ETA_C_EVAL(ND)
-	REAL*8 CHI_C_EVAL(ND)
+	REAL(10) EMHNUKT_CONT(ND)
+	REAL(10) ETA_C_EVAL(ND)
+	REAL(10) CHI_C_EVAL(ND)
 !
 ! 
 !
-	REAL*8 Z_POP(NT)		!Ionic charge for each species
+	REAL(10) Z_POP(NT)		!Ionic charge for each species
 !
 ! Variables etc for computation of continuum in comoving frame.
 !
 	LOGICAL FIRST_FREQ
 	LOGICAL NEW_FREQ
-	REAL*8 dLOG_NU			!Step in frequency in Log plane
-	REAL*8 FEDD_PREV(NDMAX)
-	REAL*8 GEDD_PREV(NDMAX)
-	REAL*8 H_ON_J(NDMAX)
-	REAL*8 N_ON_J_NODE(NDMAX)
-	REAL*8 dlnJdlnR(NDMAX)
-	REAL*8 KMID_ON_J(NDMAX)
-	REAL*8 N_ON_J(NDMAX)
-	REAL*8 N_ON_J_PREV(NDMAX)
-	REAL*8 JNU_PREV(NDMAX)
-	REAL*8 RSQHNU_PREV(NDMAX)
-	REAL*8 GEDD(NDMAX)
-	REAL*8 RSQHNU(NDMAX)
-	REAL*8 CHI_PREV(ND)
-	REAL*8 ETA_PREV(ND)
-	REAL*8 HBC_CMF(3),HBC_PREV(3)
-	REAL*8 NBC_CMF(3),NBC_PREV(3),INBC_PREV
-	REAL*8 HFLUX_AT_IB,HFLUX_AT_OB
+	REAL(10) dLOG_NU			!Step in frequency in Log plane
+	REAL(10) FEDD_PREV(NDMAX)
+	REAL(10) GEDD_PREV(NDMAX)
+	REAL(10) H_ON_J(NDMAX)
+	REAL(10) N_ON_J_NODE(NDMAX)
+	REAL(10) dlnJdlnR(NDMAX)
+	REAL(10) KMID_ON_J(NDMAX)
+	REAL(10) N_ON_J(NDMAX)
+	REAL(10) N_ON_J_PREV(NDMAX)
+	REAL(10) JNU_PREV(NDMAX)
+	REAL(10) RSQHNU_PREV(NDMAX)
+	REAL(10) GEDD(NDMAX)
+	REAL(10) RSQHNU(NDMAX)
+	REAL(10) CHI_PREV(ND)
+	REAL(10) ETA_PREV(ND)
+	REAL(10) HBC_CMF(3),HBC_PREV(3)
+	REAL(10) NBC_CMF(3),NBC_PREV(3),INBC_PREV
+	REAL(10) HFLUX_AT_IB,HFLUX_AT_OB
 !
 ! Quadrature weights.
-	REAL*8 AQW(ND,NP)		!Angular quad. weights. (indep. of v)
-	REAL*8 HQW(ND,NP)		!Angular quad. weights. (indep. of v) for flux integration.
-	REAL*8 KQW(ND,NP)		!Angular quad. weights for K integration.
-	REAL*8 NQW(ND,NP)		!Angular quad. weights. (indep. of v) for N integration.
-	REAL*8 HMIDQW(ND,NP)		!Angular quad. weights. (indep. of v)
+	REAL(10) AQW(ND,NP)		!Angular quad. weights. (indep. of v)
+	REAL(10) HQW(ND,NP)		!Angular quad. weights. (indep. of v) for flux integration.
+	REAL(10) KQW(ND,NP)		!Angular quad. weights for K integration.
+	REAL(10) NQW(ND,NP)		!Angular quad. weights. (indep. of v) for N integration.
+	REAL(10) HMIDQW(ND,NP)		!Angular quad. weights. (indep. of v)
                                         !for flux integration. Defined at the
                                         !mid points of the radius mesh.
-	REAL*8 NMIDQW(ND,NP)		!Angular quad. weights. (indep. of v)
+	REAL(10) NMIDQW(ND,NP)		!Angular quad. weights. (indep. of v)
                                         !for N integration. Defined at the
                                         !mid points of the radius mesh.
 !
 ! Continuum matrices
-	REAL*8 WM(ND,ND)		!Coef. matrix of J & %J vector
-	REAL*8 FB(ND,ND)		!Coef. of J & %J vects in angular equ.
+	REAL(10) WM(ND,ND)		!Coef. matrix of J & %J vector
+	REAL(10) FB(ND,ND)		!Coef. of J & %J vects in angular equ.
 !
 ! Transfer equation vectors
-	REAL*8 TA(NDMAX)
-	REAL*8 TB(NDMAX)
-	REAL*8 TC(NDMAX)
-	REAL*8 XM(NDMAX)		!R.H.S. (SOURCE VECTOR)
-	REAL*8 TCHI(ND)
+	REAL(10) TA(NDMAX)
+	REAL(10) TB(NDMAX)
+	REAL(10) TC(NDMAX)
+	REAL(10) XM(NDMAX)		!R.H.S. (SOURCE VECTOR)
+	REAL(10) TCHI(ND)
 !
 ! 
 !
@@ -319,8 +319,8 @@
 ! using Eddington factors. This is separate to the "inclusion of
 ! additional points".
 !
-	REAL*8 FEDD(NDMAX)
-	REAL*8 QEDD(NDMAX)
+	REAL(10) FEDD(NDMAX)
+	REAL(10) QEDD(NDMAX)
 !
 	LOGICAL MID
 	LOGICAL FIRST
@@ -334,9 +334,9 @@
 !
 ! X-ray variables.
 !
-	REAL*8 FILL_VEC_SQ(ND)
-	REAL*8 XRAY_LUM(ND)
-	REAL*8 GFF,XCROSS_V2
+	REAL(10) FILL_VEC_SQ(ND)
+	REAL(10) XRAY_LUM(ND)
+	REAL(10) GFF,XCROSS_V2
 	EXTERNAL GFF,XCROSS_V2
 !
 !
@@ -348,63 +348,63 @@
 !
 	INTEGER NDEXT,NCEXT,NPEXT
 	INTEGER INDX(NDMAX),POS_IN_NEW_GRID(ND)
-	REAL*8 COEF(0:3,NDMAX)
-	REAL*8 INBC,HBC_J,HBC_S			!Bound. Cond. for JFEAU
+	REAL(10) COEF(0:3,NDMAX)
+	REAL(10) INBC,HBC_J,HBC_S			!Bound. Cond. for JFEAU
 !
-	REAL*8 REXT(NDMAX),PEXT(NPMAX),VEXT(NDMAX),LANG_COORDEXT(NDMAX)
-	REAL*8 TEXT(NDMAX),SIGMAEXT(NDMAX)
-	REAL*8 CHIEXT(NDMAX),ESECEXT(NDMAX),ETAEXT(NDMAX)
-	REAL*8 CHI_RAY_EXT(NDMAX),CHI_SCAT_EXT(NDMAX)
-	REAL*8 ZETAEXT(NDMAX),THETAEXT(NDMAX)
-	REAL*8 RJEXT(NDMAX),RJEXT_ES(NDMAX)
-	REAL*8 FOLD(NDMAX),FEXT(NDMAX),QEXT(NDMAX),SOURCEEXT(NDMAX)
-	REAL*8 VDOP_VEC_EXT(NDMAX)
+	REAL(10) REXT(NDMAX),PEXT(NPMAX),VEXT(NDMAX),LANG_COORDEXT(NDMAX)
+	REAL(10) TEXT(NDMAX),SIGMAEXT(NDMAX)
+	REAL(10) CHIEXT(NDMAX),ESECEXT(NDMAX),ETAEXT(NDMAX)
+	REAL(10) CHI_RAY_EXT(NDMAX),CHI_SCAT_EXT(NDMAX)
+	REAL(10) ZETAEXT(NDMAX),THETAEXT(NDMAX)
+	REAL(10) RJEXT(NDMAX),RJEXT_ES(NDMAX)
+	REAL(10) FOLD(NDMAX),FEXT(NDMAX),QEXT(NDMAX),SOURCEEXT(NDMAX)
+	REAL(10) VDOP_VEC_EXT(NDMAX)
 !
 !
-	REAL*8 F2DAEXT(NDMAX,NDMAX)     !These arrays don't need to be
+	REAL(10) F2DAEXT(NDMAX,NDMAX)     !These arrays don't need to be
 !
 ! If required, these arrays shoukd have size NDEXT*NPEXT
 !
-	REAL*8, ALLOCATABLE :: AQWEXT(:,:)	!Angular quad. weights. (indep. of v)
-	REAL*8, ALLOCATABLE :: HQWEXT(:,:)	!Angular quad. weights for flux integration.
-	REAL*8, ALLOCATABLE :: KQWEXT(:,:)	!Angular quad. weights for K integration.
-	REAL*8, ALLOCATABLE :: NQWEXT(:,:)	!Angular quad. weights for N integration.
-	REAL*8, ALLOCATABLE :: HMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
-	REAL*8, ALLOCATABLE :: NMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
+	REAL(10), ALLOCATABLE :: AQWEXT(:,:)	!Angular quad. weights. (indep. of v)
+	REAL(10), ALLOCATABLE :: HQWEXT(:,:)	!Angular quad. weights for flux integration.
+	REAL(10), ALLOCATABLE :: KQWEXT(:,:)	!Angular quad. weights for K integration.
+	REAL(10), ALLOCATABLE :: NQWEXT(:,:)	!Angular quad. weights for N integration.
+	REAL(10), ALLOCATABLE :: HMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
+	REAL(10), ALLOCATABLE :: NMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
 !
 ! Arrays for calculating mean opacities.
 !
-	REAL*8 FLUXMEAN(ND) 		!Flux mean opacity
-	REAL*8 LINE_FLUXMEAN(ND) 	!Flux mean opacity due to lines.
-	REAL*8 ROSSMEAN(ND)  		!Rosseland mean opacity
-	REAL*8 PLANCKMEAN(ND)  	!Planck mean opacity
-	REAL*8 INT_dBdT(ND)  		!Integral of dB/dT over nu (to calculate ROSSMEAN)
-	REAL*8 FORCE_MULT(ND)
-	REAL*8 NU_FORCE
-	REAL*8 NU_FORCE_FAC
+	REAL(10) FLUXMEAN(ND) 		!Flux mean opacity
+	REAL(10) LINE_FLUXMEAN(ND) 	!Flux mean opacity due to lines.
+	REAL(10) ROSSMEAN(ND)  		!Rosseland mean opacity
+	REAL(10) PLANCKMEAN(ND)  	!Planck mean opacity
+	REAL(10) INT_dBdT(ND)  		!Integral of dB/dT over nu (to calculate ROSSMEAN)
+	REAL(10) FORCE_MULT(ND)
+	REAL(10) NU_FORCE
+	REAL(10) NU_FORCE_FAC
 	INTEGER N_FORCE
 	INTEGER ML_FORCE
 	LOGICAL TMP_LOG
 !
 ! Other arrays
-	REAL*8 Z(NDMAX)			!Z displacement along a given array
-	REAL*8 EMHNUKT(ND)		!EXP(-hv/kT)
-	REAL*8 RLUMST(ND)		!Luminosity as a function of depth
-	REAL*8 J_INT(ND)		!Frequency integrated J
-	REAL*8 K_INT(ND)		!Frequency integrated K
-	REAL*8 K_MOM(ND)		!Frequency dependent K moment
-	REAL*8 SOB(ND)   	    	!Used in computing continuum flux
-	REAL*8 RJ(ND)			!Mean intensity
-	REAL*8 RJ_ES(ND)		!Convolution of RJ with e.s. R(v'v')
+	REAL(10) Z(NDMAX)			!Z displacement along a given array
+	REAL(10) EMHNUKT(ND)		!EXP(-hv/kT)
+	REAL(10) RLUMST(ND)		!Luminosity as a function of depth
+	REAL(10) J_INT(ND)		!Frequency integrated J
+	REAL(10) K_INT(ND)		!Frequency integrated K
+	REAL(10) K_MOM(ND)		!Frequency dependent K moment
+	REAL(10) SOB(ND)   	    	!Used in computing continuum flux
+	REAL(10) RJ(ND)			!Mean intensity
+	REAL(10) RJ_ES(ND)		!Convolution of RJ with e.s. R(v'v')
 !
 ! Line variables.
 !
-	REAL*8 VAL_DO_NG
-	REAL*8 RP
-	REAL*8 VINF
-	REAL*8 VTURB_VEC(ND)
-	REAL*8 VDOP_VEC(ND)
-	REAL*8 MAX_DEL_V_RES_ZONE(ND)
+	REAL(10) VAL_DO_NG
+	REAL(10) RP
+	REAL(10) VINF
+	REAL(10) VTURB_VEC(ND)
+	REAL(10) VDOP_VEC(ND)
+	REAL(10) MAX_DEL_V_RES_ZONE(ND)
 !
 ! Parameters, vectors, and arrays for computing the observed flux.
 !
@@ -412,20 +412,20 @@
 	INTEGER NP_OBS_MAX
 	INTEGER NP_OBS
 	INTEGER NC_OBS
-	REAL*8  NU_STORE(NST_CMF)
-	REAL*8 V_AT_RMAX		!Used if we extend the atmosphere.
-	REAL*8 RMAX_OBS
-	REAL*8 H_OUT,H_IN
+	REAL(10)  NU_STORE(NST_CMF)
+	REAL(10) V_AT_RMAX		!Used if we extend the atmosphere.
+	REAL(10) RMAX_OBS
+	REAL(10) H_OUT,H_IN
 !
 ! We allocate memory for the following vectors as we use them for the regular
 ! flux computation, and when extra depth points are inserted (ACCURATE=.TRUE.)
 !
-	REAL*8, ALLOCATABLE :: IPLUS_STORE(:,:)
-	REAL*8, ALLOCATABLE :: P_OBS(:)
-	REAL*8, ALLOCATABLE :: IPLUS(:)
-	REAL*8, ALLOCATABLE :: MU_AT_RMAX(:)
-	REAL*8, ALLOCATABLE :: dMU_AT_RMAX(:)
-	REAL*8, ALLOCATABLE :: HQW_AT_RMAX(:)
+	REAL(10), ALLOCATABLE :: IPLUS_STORE(:,:)
+	REAL(10), ALLOCATABLE :: P_OBS(:)
+	REAL(10), ALLOCATABLE :: IPLUS(:)
+	REAL(10), ALLOCATABLE :: MU_AT_RMAX(:)
+	REAL(10), ALLOCATABLE :: dMU_AT_RMAX(:)
+	REAL(10), ALLOCATABLE :: HQW_AT_RMAX(:)
 !
 ! Supercedes OBS
 !
@@ -438,7 +438,7 @@
 ! They are the He2 ege, NIII/CIII egde, HeI, HI, HI(N=2).
 !
 	INTEGER, PARAMETER :: N_TAU_EDGE=5
-	REAL*8 TAU_EDGE(N_TAU_EDGE)
+	REAL(10) TAU_EDGE(N_TAU_EDGE)
 	DATA TAU_EDGE/13.16D0,11.60D0,5.95D0,3.29D0,0.83D0/
 !
 !
@@ -1238,7 +1238,7 @@
 ! Define parameters to allow the Cummulative force multipler to be output at
 ! a function of frequency. We presently output the force multiplier every 500km/s.
 !
-	N_FORCE=DLOG(NU(NCF)/NU(1))/DLOG(1.0D0-500.0D0/C_KMS)
+	N_FORCE=LOG(NU(NCF)/NU(1))/LOG(1.0D0-500.0D0/C_KMS)
 	NU_FORCE=NU(1)
 	NU_FORCE_FAC=(1.0D0-500.0D0/C_KMS)
 	ML_FORCE=1
@@ -2161,7 +2161,7 @@
 ! for all lines using the SOBOLEV approximation.
 !
 	FORCE_MULT(1:ND)=0.0D0
-	N_FORCE=DLOG(NU(NCF)/NU(1))/DLOG(1.0D0- 500.0D0/C_KMS)
+	N_FORCE=LOG(NU(NCF)/NU(1))/LOG(1.0D0- 500.0D0/C_KMS)
 	NU_FORCE=NU(1)
 	NU_FORCE_FAC=(1.0D0-500.0D0/C_KMS)
 	ML_FORCE=1

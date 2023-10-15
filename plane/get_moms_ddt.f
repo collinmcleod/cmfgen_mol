@@ -5,20 +5,20 @@
 ! Altered 16-June-2009 : Fixed bugs with N calculation at boundary, and on nodes.
 !
 	INTEGER ND
-	REAL*8 R(ND)
-	REAL*8 V(ND)
-	REAL*8 FREQ
+	REAL(10) R(ND)
+	REAL(10) V(ND)
+	REAL(10) FREQ
 	CHARACTER(LEN=*) N_TYPE
 !
-	REAL*8 RSQ_JNU(1:ND)
-	REAL*8 RSQ_HNU_MID(1:ND)
+	REAL(10) RSQ_JNU(1:ND)
+	REAL(10) RSQ_HNU_MID(1:ND)
 !
 ! Local vectors
 !
-	REAL*8 RSQ(ND_STORE)
-	REAL*8 TMP_VEC(1:ND+1)
+	REAL(10) RSQ(ND_STORE)
+	REAL(10) TMP_VEC(1:ND+1)
 !
-	REAL*8 T1,T2
+	REAL(10) T1,T2
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER I
 	INTEGER NS

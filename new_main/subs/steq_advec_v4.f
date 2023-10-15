@@ -14,7 +14,7 @@
 !                          ion terms for ionizaton/recombination equations.
 ! Created 20-Jan-2003
 !
-	REAL*8 RELAXATION_PARAMETER
+	REAL(10) RELAXATION_PARAMETER
 !
 	INTEGER NUM_BNDS
 	INTEGER ND
@@ -26,10 +26,10 @@
 !
 ! Local variables.
 !
-	REAL*8 SUM(NUM_IONS,ND)
-	REAL*8 T1,T2
-	REAL*8 DERIV_CONST
-	REAL*8 UNIT_CONST
+	REAL(10) SUM(NUM_IONS,ND)
+	REAL(10) T1,T2
+	REAL(10) DERIV_CONST
+	REAL(10) UNIT_CONST
 !
 	INTEGER K,KP1			!Depth index
 	INTEGER M,MP1			!Band index

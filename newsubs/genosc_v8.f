@@ -46,16 +46,16 @@
 ! The following data values are returned.
 !
 	INTEGER NTRET			!Number of transitions returned
-	REAL*8 EINA(N,N)		!f(i,j)/A(j,i) values (i < j)
-	REAL*8 FEDGE(N)			!Level ionization energy (10^15 Hz)
-	REAL*8 STAT_WT(N)		!Statistical weight of level
-	REAL*8 ARAD(N)			!Inverse radiative lifetime of upper level.
-	REAL*8 GAM2(N)			!Collisional broadening parameter
-	REAL*8 GAM4(N)			!Collisional broadening parameter
+	REAL(10) EINA(N,N)		!f(i,j)/A(j,i) values (i < j)
+	REAL(10) FEDGE(N)			!Level ionization energy (10^15 Hz)
+	REAL(10) STAT_WT(N)		!Statistical weight of level
+	REAL(10) ARAD(N)			!Inverse radiative lifetime of upper level.
+	REAL(10) GAM2(N)			!Collisional broadening parameter
+	REAL(10) GAM4(N)			!Collisional broadening parameter
 	LOGICAL OBSERVED_LEVEL(N)	!If true, level energy is known.
 !
-	REAL*8 IONIZATION_EN		!Ionization energy of ion (cm^-1}
-	REAL*8 ZION			!Charge on core (i.e. ion charge +1)
+	REAL(10) IONIZATION_EN		!Ionization energy of ion (cm^-1}
+	REAL(10) ZION			!Charge on core (i.e. ion charge +1)
 	CHARACTER*(*) OSCDATE		!Date oscillator file was written.
 !
 	CHARACTER*(*) LEVNAME(N)	!
@@ -66,7 +66,7 @@
 ! kept for each level, independent of there gf value. GF_ACTION indicates 
 ! whether to set the f values of the weak transitions to zero, or negative.
 !
-	REAL*8    GF_CUT
+	REAL(10)    GF_CUT
 	INTEGER LEV_CUT
 	INTEGER MIN_NUM_TRANS
 	CHARACTER*(*) GF_ACTION
@@ -75,7 +75,7 @@
 ! External functions.
 !
 	EXTERNAL SPEED_OF_LIGHT,ICHRLEN,RD_FREE_VAL,ERROR_LU,WARNING_LU
-	REAL*8 SPEED_OF_LIGHT,RD_FREE_VAL
+	REAL(10) SPEED_OF_LIGHT,RD_FREE_VAL
 	INTEGER ICHRLEN,ERROR_LU,WARNING_LU
 !
 ! Local variables
@@ -83,7 +83,7 @@
 	CHARACTER*40 LOCNAME(N)
 	CHARACTER*40 LOW_NAME,UP_NAME
 	CHARACTER*11 FORMAT_DATE
-	REAL*8 T1,T2,T3,SPEED_LIGHT
+	REAL(10) T1,T2,T3,SPEED_LIGHT
 	INTEGER I,J,K,NW,L1,L2,IOS,LEV_ID
 	INTEGER MAXLEN,CUT_CNT
 	INTEGER LUER,LUWARN
@@ -94,7 +94,7 @@
 ! Variables for deleting weak transitions.
 !
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
-	REAL*8 DOWN(N)
+	REAL(10) DOWN(N)
 	INTEGER INDX(N)
 !
 ! Variables for free-format internal reads.
@@ -106,7 +106,7 @@
 ! Constants for opacity etc. These must be set in the calling program. 
 ! They are used to keep absolute consistency between the f and A values.
 !
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 !

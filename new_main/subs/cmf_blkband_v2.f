@@ -185,23 +185,23 @@ C******************************************************************************
 C
 	INTEGER N,NION,ND,NUM_BNDS,DIAG_INDX
 	CHARACTER*(*) SOL_TYPE
-	REAL*8 STEQ_STORE(N,ND)
-        REAL*8 STEQ(N,ND)
-        REAL*8 POPS(N,ND)
+	REAL(10) STEQ_STORE(N,ND)
+        REAL(10) STEQ(N,ND)
+        REAL(10) POPS(N,ND)
 	LOGICAL FLAG
 	LOGICAL FIX_IMPURITY
 !
 ! Local variables
 !
-        REAL*8, ALLOCATABLE :: B_MAT(:,:)
-        REAL*8, ALLOCATABLE :: C_MAT(:,:)
-        REAL*8, ALLOCATABLE :: D_MAT(:,:,:)
+        REAL(10), ALLOCATABLE :: B_MAT(:,:)
+        REAL(10), ALLOCATABLE :: C_MAT(:,:)
+        REAL(10), ALLOCATABLE :: D_MAT(:,:,:)
 C
-        REAL*8 ROW_SF(N)
-        REAL*8 COL_SF(N)
-        REAL*8 VEC(N)
-        REAL*8 ROW_CND,COL_CND,MAX_VAL
-        REAL*8 RUB	      !Not accessed when passed.
+        REAL(10) ROW_SF(N)
+        REAL(10) COL_SF(N)
+        REAL(10) VEC(N)
+        REAL(10) ROW_CND,COL_CND,MAX_VAL
+        REAL(10) RUB	      !Not accessed when passed.
 !
 	INTEGER DEPTH_INDX
 	INTEGER BAND_INDX
@@ -218,8 +218,8 @@ C
 	INTEGER KD
 	LOGICAL SMALL_D_MAT
 C
-        REAL*8,      PARAMETER :: DP_NEG_ONE=-1.0D0
-        REAL*8,      PARAMETER :: DP_ONE=1.0D0
+        REAL(10),      PARAMETER :: DP_NEG_ONE=-1.0D0
+        REAL(10),      PARAMETER :: DP_ONE=1.0D0
         INTEGER,   PARAMETER :: INT_ONE=1
         INTEGER,   PARAMETER :: NSNG=1
         CHARACTER*1, PARAMETER :: NO_TRANS='N'

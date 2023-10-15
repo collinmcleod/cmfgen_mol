@@ -21,7 +21,7 @@ C                         allocation used.
 C                       ERROR_LU installed.
 C                       Generic call for OOG and EXP.
 C
-C Altered 02-Aug-1994 - PROGRDESC change from INTEGER to REAL*8. Corrects
+C Altered 02-Aug-1994 - PROGRDESC change from INTEGER to REAL(10). Corrects
 C                       alignment problem. PROGDESC is now check for
 C                       corruption, even if too many iterations occur.
 C Altered 3-May-1989 - NV and check installed.
@@ -39,17 +39,17 @@ C Altered 30-APR-1985 - (Bug fixed in error messages - import when ND .ne. NDOLD
 C Altered 28-FEB-1984
 C
 	INTEGER N,ND
-	REAL*8 DHEN(N,ND),R(ND),T(ND),ED(ND),DI(ND),EDGE(N)
+	REAL(10) DHEN(N,ND),R(ND),T(ND),ED(ND),DI(ND),EDGE(N)
 C
-	REAL*8, ALLOCATABLE :: DPOP(:,:)
-	REAL*8, ALLOCATABLE :: OLDED(:)
-	REAL*8, ALLOCATABLE :: OLDDI(:)
-	REAL*8, ALLOCATABLE :: OLDT(:)
-	REAL*8, ALLOCATABLE :: RLOG(:)
-	REAL*8, ALLOCATABLE :: TA(:)
-	REAL*8, ALLOCATABLE :: OLDR(:)
+	REAL(10), ALLOCATABLE :: DPOP(:,:)
+	REAL(10), ALLOCATABLE :: OLDED(:)
+	REAL(10), ALLOCATABLE :: OLDDI(:)
+	REAL(10), ALLOCATABLE :: OLDT(:)
+	REAL(10), ALLOCATABLE :: RLOG(:)
+	REAL(10), ALLOCATABLE :: TA(:)
+	REAL(10), ALLOCATABLE :: OLDR(:)
 C
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 	INTEGER ERROR_LU,LUER
@@ -58,7 +58,7 @@ C
 C Local Variables.
 C
 	INTEGER I,J,NOLD,NDOLD,COUNT,NX,NXST,NZ,IOS
-	REAL*8 RPOLD,TX,DELTA_T,T1,ADD1
+	REAL(10) RPOLD,TX,DELTA_T,T1,ADD1
 	CHARACTER*80 STRING
 	CHARACTER*(*) FILNAME
 C
@@ -114,9 +114,9 @@ C
 C Using the highest level read in, decide whether b, or b-1 have been read in.
 C
 	ADD1=0.0D0
-	IF( DABS( TA(NOLD) ) .LT. 0.2 )ADD1=1.0D0
+	IF( ABS( TA(NOLD) ) .LT. 0.2 )ADD1=1.0D0
 C
-	IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN
+	IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN
 	  WRITE(LUER,*)'Warning - core radius not identical in REGRIDWSC'
 	  WRITE(LUER,*)'Rescaling to make Rcore identical'
 	  DO I=1,NDOLD

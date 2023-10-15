@@ -19,11 +19,11 @@
 ! Created 19-Jan-2014 - Based on LUM_FROM_ETA (included METHOD in call).
 !
 	INTEGER ND
-	REAL*8 LINE_LUM(ND)
-	REAL*8 R(ND)
+	REAL(10) LINE_LUM(ND)
+	REAL(10) R(ND)
 	CHARACTER(LEN=*) METHOD
 !
-	REAL*8 DERIV(ND)
+	REAL(10) DERIV(ND)
 	INTEGER I
 !
 ! We compute the amount of energy emitted between R(I) and R(I+1), and

@@ -10,7 +10,7 @@ C
 	INTEGER NF		!Number of level in full atom
 	INTEGER NS		!Number of super levels
 	INTEGER LUOUT		!Output unit for string if ``full''
-	REAL*8 ZION		!Charge on ion (or core)
+	REAL(10) ZION		!Charge on ion (or core)
 	CHARACTER*(*) STRING	!Output string
 	CHARACTER*(*) DESC	!Species description (i.e. C2)
 C
@@ -23,7 +23,7 @@ C
 	INTEGER NEXT_LOC
 	INTEGER J
 	INTEGER I_NF,I_NS
-	REAL*8 T1
+	REAL(10) T1
 	CHARACTER*15 FMT
 C
 	T1=NVAR_PER_LINE
@@ -81,7 +81,7 @@ C
 	SUBROUTINE WR_VAL_INFO(STRING,NEXT_LOC,DESC,VAL)
 	IMPLICIT NONE
 	INTEGER NEXT_LOC	!Next location for output (updated)
-	REAL*8 VAL		!Real value to be output to string
+	REAL(10) VAL		!Real value to be output to string
 	CHARACTER*(*) STRING	!Output string
 	CHARACTER*(*) DESC	!Species description (i.e. C2)
 C
@@ -123,16 +123,16 @@ C Altered 19-Jun-2023: Changed to V3 -- SOL_ABUND_REF_SET added to call.
 C Altered 17-Dec-2007: Now output mean atomic mass.
 C
 	IMPLICIT NONE
-	REAL*8 ABUND			!Relative abundance by number
-	REAL*8 ABUND_SUM		!Sum of relative abundances
-	REAL*8 MASS			!Mass in atomic mass units
-	REAL*8 MEAN_ATOMIC_WEIGHT	!Mean ioic atomic weight (all)
-	REAL*8 SOL_MASS_FRAC
+	REAL(10) ABUND			!Relative abundance by number
+	REAL(10) ABUND_SUM		!Sum of relative abundances
+	REAL(10) MASS			!Mass in atomic mass units
+	REAL(10) MEAN_ATOMIC_WEIGHT	!Mean ioic atomic weight (all)
+	REAL(10) SOL_MASS_FRAC
 	INTEGER LUOUT
 	CHARACTER*(*) SPECIES		!e.g. HYD or CARB
 	CHARACTER*(*) SOL_ABUND_REF_SET 
 C
-	REAL*8 T1
+	REAL(10) T1
 	LOGICAL FIRST			!Indicate whether header should 
 	DATA FIRST/.TRUE./		!    be output.
 C

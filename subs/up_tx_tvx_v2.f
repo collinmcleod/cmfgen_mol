@@ -37,26 +37,26 @@ C                        TX and TVX modified in the same routine, since
 C                          TVX may depend on TX at the previus frequency.
 C
 	INTEGER ND,NM_TX,NM_KI
-	REAL*8 TX(ND,ND,NM_TX)
-	REAL*8 TVX(ND-1,ND,NM_TX)
-	REAL*8 KI(ND,ND,NM_KI)
-	REAL*8 TA(ND),TB(ND),TC(ND)
-	REAL*8 PSIPREV_MOD(ND),VB(ND),VC(ND)
-	REAL*8 HU(ND),HL(ND),HS(ND)
-	REAL*8 RHS_dHdCHI(ND-1,ND)
+	REAL(10) TX(ND,ND,NM_TX)
+	REAL(10) TVX(ND-1,ND,NM_TX)
+	REAL(10) KI(ND,ND,NM_KI)
+	REAL(10) TA(ND),TB(ND),TC(ND)
+	REAL(10) PSIPREV_MOD(ND),VB(ND),VC(ND)
+	REAL(10) HU(ND),HL(ND),HS(ND)
+	REAL(10) RHS_dHdCHI(ND-1,ND)
 C
 C NB: _A denotes that EPS(I) multiples RJ(I)
 C     _B denotes that EPS(I) multiples RJ(I+1)
 C
-	REAL*8 EPS_A(ND),EPS_B(ND)
-	REAL*8 EPS_PREV_A(ND),EPS_PREV_B(ND)
-	REAL*8 DTAU_BND
+	REAL(10) EPS_A(ND),EPS_B(ND)
+	REAL(10) EPS_PREV_A(ND),EPS_PREV_B(ND)
+	REAL(10) DTAU_BND
 	LOGICAL INIT,DO_THIS_TX_MATRIX(NM_TX)
 	INTEGER OUT_BC_TYPE
 C
 C Work Array.
 C
-	REAL*8 OLD_TX(ND,ND)
+	REAL(10) OLD_TX(ND,ND)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU

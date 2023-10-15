@@ -25,7 +25,7 @@
       INTEGER LU_ER,ERROR_LU
       EXTERNAL ERROR_LU
 !
-      REAL*8 MEMORY
+      REAL(10) MEMORY
       INTEGER I,NX,NY
 !
       LU_ER=ERROR_LU()

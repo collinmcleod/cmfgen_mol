@@ -9,7 +9,7 @@
 ! Altered 07-Jul-2008: changed input LU from 6 to 5.
 !
 	INTEGER I
-	REAL*8 Z,A,GAMMA,T,N,E,ALPHA
+	REAL(10) Z,A,GAMMA,T,N,E,ALPHA
 !
 	GAMMA=0.5772
 !

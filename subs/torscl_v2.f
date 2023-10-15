@@ -21,13 +21,13 @@
 !                     estimate of optical depth to infinity.
 !
 	INTEGER ND
-	REAL*8 TOR(ND),CHI(ND),R(ND),DTAU(ND),dCHI_dR(ND)
+	REAL(10) TOR(ND),CHI(ND),R(ND),DTAU(ND),dCHI_dR(ND)
 	LOGICAL WR_ASSUMED_ATM
 	CHARACTER*(*) METHOD,TYPE_ATM
 !
 	INTEGER I
 	INTEGER INDX
-	REAL*8 T1
+	REAL(10) T1
 !
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -48,7 +48,7 @@
 	    WRITE(LUER,*)'Warning - optical depth at boundary set to 10^{-5} in TORSCL'
 	  END IF
 	ELSE IF (CHI(1) .GT. 0 .AND. CHI(INDX) .GT. CHI(1))THEN
-	  T1=DLOG(CHI(1)/CHI(INDX))/DLOG(R(INDX)/R(1))
+	  T1=LOG(CHI(1)/CHI(INDX))/LOG(R(INDX)/R(1))
 	  IF(T1 .GT. 1.5D0)THEN
 	   TOR(1)=CHI(1)*R(1)/(T1-1.0D0)
 	  ELSE

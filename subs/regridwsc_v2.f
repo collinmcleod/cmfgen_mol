@@ -26,7 +26,7 @@
 !                       ERROR_LU installed.
 !                       Generic call for OOG and EXP.
 !
-! Altered 02-Aug-1994 - PROGRDESC change from INTEGER to REAL*8. Corrects
+! Altered 02-Aug-1994 - PROGRDESC change from INTEGER to REAL(10). Corrects
 !                       alignment problem. PROGDESC is now check for
 !                       corruption, even if too many iterations occur.
 ! Altered 3-May-1989 - NV and check installed.
@@ -44,19 +44,19 @@
 ! Altered 28-FEB-1984
 !
 	INTEGER N,ND
-	REAL*8 DHEN(N,ND),R(ND),T(ND),ED(ND),DI(ND),EDGE(N)
+	REAL(10) DHEN(N,ND),R(ND),T(ND),ED(ND),DI(ND),EDGE(N)
 	INTEGER F_TO_S(N)
 	INTEGER INT_SEQ(N)
 !
-	REAL*8, ALLOCATABLE :: DPOP(:,:)
-	REAL*8, ALLOCATABLE :: OLDED(:)
-	REAL*8, ALLOCATABLE :: OLDDI(:)
-	REAL*8, ALLOCATABLE :: OLDT(:)
-	REAL*8, ALLOCATABLE :: RLOG(:)
-	REAL*8, ALLOCATABLE :: TA(:)
-	REAL*8, ALLOCATABLE :: OLDR(:)
+	REAL(10), ALLOCATABLE :: DPOP(:,:)
+	REAL(10), ALLOCATABLE :: OLDED(:)
+	REAL(10), ALLOCATABLE :: OLDDI(:)
+	REAL(10), ALLOCATABLE :: OLDT(:)
+	REAL(10), ALLOCATABLE :: RLOG(:)
+	REAL(10), ALLOCATABLE :: TA(:)
+	REAL(10), ALLOCATABLE :: OLDR(:)
 !
-	REAL*8 CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER ERROR_LU,LUER
@@ -65,7 +65,7 @@
 ! Local Variables.
 !
 	INTEGER I,J,NOLD,NDOLD,COUNT,NX,NXST,NZ,IOS
-	REAL*8 RPOLD,TX,DELTA_T,T1,ADD1,DC_MOD
+	REAL(10) RPOLD,TX,DELTA_T,T1,ADD1,DC_MOD
 	LOGICAL CHECK_DC
 	CHARACTER*80 STRING
 	CHARACTER*(*) FILNAME
@@ -126,9 +126,9 @@
 ! Using the highest level read in, decide whether b, or b-1 have been read in.
 !
 	ADD1=0.0D0
-	IF( DABS( TA(NOLD) ) .LT. 0.2 .AND. CHECK_DC)ADD1=1.0D0
+	IF( ABS( TA(NOLD) ) .LT. 0.2 .AND. CHECK_DC)ADD1=1.0D0
 !
-	IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN
+	IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN
 	  WRITE(LUER,*)'Warning - core radius not identical in REGRIDWSC'
 	  WRITE(LUER,*)'Rescaling to make Rcore identical'
 	  DO I=1,NDOLD

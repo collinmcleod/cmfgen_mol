@@ -31,32 +31,32 @@
 !               Rotation option installed.
 !
 	integer Norig
-	real*8 origwave(Norig),origflux(Norig)
-	real*8 wave_max,wave_min
-	real*8 inst_res     	! the instrumental resolution (dlambda)
-	real*8 Resolution   	! resolving power (R = lambda/dlambda)
-	real*8 min_res_kms  	! minimum resolution to work with
-	real*8 num_res      	! num resolution elements to consider beyond
+	REAL(10) origwave(Norig),origflux(Norig)
+	REAL(10) wave_max,wave_min
+	REAL(10) inst_res     	! the instrumental resolution (dlambda)
+	REAL(10) Resolution   	! resolving power (R = lambda/dlambda)
+	REAL(10) min_res_kms  	! minimum resolution to work with
+	REAL(10) num_res      	! num resolution elements to consider beyond
                             	! wavelength range.
-	real*8 vsini		! Projected rotational velocity in km/s
-	real*8 epsilon		! Limb darkenin parameter: 
+	REAL(10) vsini		! Projected rotational velocity in km/s
+	REAL(10) epsilon		! Limb darkenin parameter: 
 	                        !         I/I(o)=1 - epsilon + epsilon mu
 !
-	real*8 origfreq(Norig)
-	real*8, allocatable :: modwave(:)
-	real*8, allocatable :: modflux(:)
-	real*8, allocatable :: tempwave(:)
-	real*8, allocatable :: tempflux(:)
+	REAL(10) origfreq(Norig)
+	REAL(10), allocatable :: modwave(:)
+	REAL(10), allocatable :: modflux(:)
+	REAL(10), allocatable :: tempwave(:)
+	REAL(10), allocatable :: tempflux(:)
 !
 	integer Nmod
 	integer Ntmp
-	real*8 cwave_max,cwave_min
-	real*8 model_res    ! the model resolution
-	real*8 min_dlam     ! the model resolution
-	real*8 kernal_sig   ! the corresponding sigma (fwhm = 2.354sig)
-	real*8 extend       ! wavelength extension to consider
+	REAL(10) cwave_max,cwave_min
+	REAL(10) model_res    ! the model resolution
+	REAL(10) min_dlam     ! the model resolution
+	REAL(10) kernal_sig   ! the corresponding sigma (fwhm = 2.354sig)
+	REAL(10) extend       ! wavelength extension to consider
                             ! in convolution
-	real*8 t1
+	REAL(10) t1
 !
 	integer alter_min ! min and max indices of original array to be
 	integer alter_max ! changed.
@@ -113,7 +113,7 @@
 	if(vsini .ne. 0)then
 	 min_dlam=min_res_kms/c_kms
 	else if(resolution .ne. 0)then
-	 inst_res = dlog((two*resolution+one)/(two*resolution-one))
+	 inst_res = log((two*resolution+one)/(two*resolution-one))
 	 min_dlam=min_res_kms/c_kms
 	else
 	 min_dlam=wave_min*min_res_kms/c_kms
@@ -181,16 +181,18 @@ C
 	subroutine convolve(wave,flux,Nmod,sigma,vsini,epsilon,fft)
 	implicit none
 !
+! 14-Oct-2023 - Disablled call to FFT routine.
+!
 	integer Nmod
-	real*8 wave(Nmod)
-	real*8 flux(Nmod)
-	real*8 sigma
-	real*8 vsini
-	real*8 epsilon
+	REAL(10) wave(Nmod)
+	REAL(10) flux(Nmod)
+	REAL(10) sigma
+	REAL(10) vsini
+	REAL(10) epsilon
 	logical fft         ! 1=fft method, 0=straight convolution
 
 	if (fft) then
-	   call fftconvolve(wave,flux,Nmod,sigma)
+!	   call fftconvolve(wave,flux,Nmod,sigma)
 	else
 	   call nonfftconvolve(wave,flux,Nmod,sigma,vsini,epsilon)
 	endif
@@ -208,14 +210,14 @@ C
 	include 'constants.inc'
 
 	integer Nmod
-	real*8 wave(Nmod)
-	real*8 flux(Nmod)
-	real*8 sigma
-	real*8 vsini
-	real*8 epsilon
+	REAL(10) wave(Nmod)
+	REAL(10) flux(Nmod)
+	REAL(10) sigma
+	REAL(10) vsini
+	REAL(10) epsilon
 !
-	real*8 answer(Nmod)
-	real*8 response(Nmod)
+	REAL(10) answer(Nmod)
+	REAL(10) response(Nmod)
 	integer Nresponse,nron2
 	integer i       ! index for convolution array
 	integer j       ! index for response array
@@ -280,21 +282,22 @@ C 2^n, and initializes the response array to be a gaussian of the
 C appropriate width.  It assumes that the data is evenly spaced in 
 C wavelength.
 C
-
+C Altered 14-Oct-2034 -- Disabble call to CONVLV --- needs to be fixed.
+C
 	subroutine fftconvolve(wave,flux,Nmod,sigma)
 
 	implicit none
 	include 'parameters.inc'
 	include 'constants.inc'
 
-	real*8 wave(NMAX)
-	real*8 flux(NMAX)
-	real*8 response(NMAX)
-	real*8 ans(NMAX)
+	REAL(10) wave(NMAX)
+	REAL(10) flux(NMAX)
+	REAL(10) response(NMAX)
+	REAL(10) ans(NMAX)
 	integer Nmod
-	real*8 sigma
+	REAL(10) sigma
 
-	real*8 dlam
+	REAL(10) dlam
 	integer length,i
 	integer isign,Nresponse
 !
@@ -322,7 +325,7 @@ C       Fill out data the rest of the data array with zeros.
 C	call dp_curve(Nresponse,wave,response)
 
 	isign = 1  ! 1 for convolution, -1 for deconvolution
-	call convlv(flux,length,response,Nresponse,isign,ans)
+!	call convlv(flux,length,response,Nresponse,isign,ans)
 	
 	do i=1,length
 	   flux(i) = ans(i)
@@ -343,17 +346,17 @@ C
 	include 'constants.inc'
 
 	integer Nmod           ! size of data array
-	real*8 wave(Nmod)        ! wavelength array
-	real*8 response(Nmod)    ! response array
-	real*8 sigma             ! sigma of gaussian 
+	REAL(10) wave(Nmod)        ! wavelength array
+	REAL(10) response(Nmod)    ! response array
+	REAL(10) sigma             ! sigma of gaussian 
 	integer Nresponse      ! size of response array
 	integer wrap           ! fill in wrap-around order?
 !
 	integer, parameter :: num_sigmas=5
 	integer i
-	real*8 lambda,dlam,cutoff,mu
-	real*8 gauss
-	real*8 response_area
+	REAL(10) lambda,dlam,cutoff,mu
+	REAL(10) gauss
+	REAL(10) response_area
 
 	dlam = (wave(Nmod)-wave(1))/(Nmod-1)
 	response_area = zero
@@ -417,17 +420,17 @@ C
 	include 'constants.inc'
 !
 	integer Nmod           ! size of data array
-	real*8 wave(Nmod)     	! wavelength array
-	real*8 response(Nmod) 	! response array
-	real*8 vsini
-	real*8 epsilon
+	REAL(10) wave(Nmod)     	! wavelength array
+	REAL(10) response(Nmod) 	! response array
+	REAL(10) vsini
+	REAL(10) epsilon
 	integer Nresponse      ! size of response array
 	integer wrap           ! fill in wrap-around order?
 
 	integer i
-	real*8 lambda,dlam,cutoff,mu
-	real*8 response_area
-	real*8 t1,dlam_rot,a1,a2
+	REAL(10) lambda,dlam,cutoff,mu
+	REAL(10) response_area
+	REAL(10) t1,dlam_rot,a1,a2
 !
 	dlam = (wave(Nmod)-wave(1))/(Nmod-1)
 	response_area = zero
@@ -509,8 +512,8 @@ C
 	implicit none
 	include 'constants.inc'
 
-	real*8 sigma,x,mu
-	real*8 gauss
+	REAL(10) sigma,x,mu
+	REAL(10) gauss
 
 	gauss = exp(-onehalf*(((x-mu)/sigma)**two))/(sigma*sqrt(two*jimPI))
 	return
@@ -545,11 +548,11 @@ C
 !
 	integer n
 	integer nmax
-	real*8 wave(NMAX),flux(NMAX)
-	real*8 dlam 				! even spacing in wavelength
+	REAL(10) wave(NMAX),flux(NMAX)
+	REAL(10) dlam 				! even spacing in wavelength
 !
-	real*8 tempwave(N),tempflux(N)
-	real*8 dlamover2
+	REAL(10) tempwave(N),tempflux(N)
+	REAL(10) dlamover2
 	integer nnew
 	integer i
 !
