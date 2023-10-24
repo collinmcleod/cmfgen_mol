@@ -19,6 +19,8 @@
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
+! Altered: 30-Aug-2023 -- Added LOC_SHOCK and cleaned up curve labeling.
+!                            Zero curves now omitted from plots.
 ! Altered: 08-Ayg-2018 -- Fixed offsef in RAD_DECAY, ADI, DJDT, MECH -- single point.
 !                            Values are zero at outer boundary.
 ! Altered: 19-Apr-2016 -- Added plot of dT/T and conserved L on same plot.
@@ -37,6 +39,7 @@
 	REAL(10), ALLOCATABLE :: LUM(:)
 	REAL(10), ALLOCATABLE :: HJ_LUM(:)
 	REAL(10), ALLOCATABLE :: MECH(:)
+	REAL(10), ALLOCATABLE :: LOC_SHOCK(:)
 	REAL(10), ALLOCATABLE :: ADI(:)
 	REAL(10), ALLOCATABLE :: DJDT(:)
 	REAL(10), ALLOCATABLE :: dT_ON_T(:)
@@ -57,7 +60,12 @@
 	LOGICAL WRITE_RVSIG,NEWMOD
 	LOGICAL PLT_AGAINST_DEPTH_INDX
 	LOGICAL PLT_AGAINST_T
-	LOGICAL HJ_NOT_ZERO
+	LOGICAL NON_ZERO_HJ_LUM
+	LOGICAL NON_ZERO_MECH
+	LOGICAL NON_ZERO_ADI
+	LOGICAL NON_ZERO_DJDt
+	LOGICAL NON_ZERO_LOC_SHOCK
+	LOGICAL NON_ZERO_RAD_DECAY
 !
 	INTEGER ND
 	INTEGER NT
@@ -100,6 +108,7 @@
 	IF(IOS .EQ. 0)ALLOCATE (LUM(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (HJ_LUM(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (MECH(ND),STAT=IOS)
+	IF(IOS .EQ. 0)ALLOCATE (LOC_SHOCK(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (DJDT(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (dT_ON_T(ND),STAT=IOS)
 	IF(IOS .EQ. 0)ALLOCATE (ADI(ND),STAT=IOS)
@@ -113,9 +122,8 @@
 	  STOP
 	END IF
 !
-	LUM=0.0D0; HJ_LUM=0.0D0; MECH=0.0D0; DJDT=0.0D0; ADI=0.0D0
+	LUM=0.0D0; HJ_LUM=0.0D0; MECH=0.0D0; DJDT=0.0D0; ADI=0.0D0; LOC_SHOCK=0.0D0
 	RAD_DECAY=0.0D0; TOTAL=0.0D0; CHANGE=0.0D0; T=0.0D0; WRK_VEC=0.0D0
-	HJ_NOT_ZERO=.FALSE.
 !
 	OPEN(UNIT=LU_RD,FILE='RVTJ',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .EQ. 0)THEN
@@ -174,6 +182,9 @@
 	  END DO
 	  READ(20,*)(LUM(I),I=1,ND)
 !
+	  NON_ZERO_MECH=.FALSE.; NON_ZERO_LOC_SHOCK=.FALSE.
+	  NON_ZERO_ADI=.FALSE.; NON_ZERO_DJDT=.FALSE.
+	  NON_ZERO_HJ_LUM=.FALSE.; NON_ZERO_RAD_DECAY=.FALSE.
 	  DO WHILE(1 .EQ. 1)
 	    STRING=' '
 	    DO WHILE(STRING .EQ. ' ')
@@ -181,14 +192,22 @@
 	    END DO
 	    IF(INDEX(STRING,'Mechanical Luminosity') .NE. 0)THEN
 	      READ(20,*)(MECH(I),I=1,ND)
+	      IF(MAXVAL(ABS(MECH)) .GT. 0.0D0)NON_ZERO_MECH=.TRUE.
+	    ELSE IF(INDEX(STRING,'locally by the shock') .NE. 0)THEN
+	      READ(20,*)(LOC_SHOCK(I),I=1,ND)
+	      IF(MAXVAL(ABS(LOC_SHOCK)) .GT. 0.0D0)NON_ZERO_LOC_SHOCK=.TRUE.
 	    ELSE IF(INDEX(STRING,'Internal') .NE. 0)THEN
 	      READ(20,*)(ADI(I),I=1,ND)
+	      IF(MAXVAL(ABS(ADI)) .GT. 0.0D0)NON_ZERO_ADI=.TRUE.
 	    ELSE IF(INDEX(STRING,'Luminosity [g.r^2.H + beta.g.r^2.J]') .NE. 0)THEN
 	      READ(20,*)(HJ_LUM(I),I=1,ND)
+	      IF(MAXVAL(ABS(HJ_LUM)) .GT. 0.0D0)NON_ZERO_HJ_LUM=.TRUE.
 	    ELSE IF(INDEX(STRING,'Flux arrising') .NE. 0)THEN
 	      READ(20,*)(DJDt(I),I=1,ND)
+	      IF(MAXVAL(ABS(DJDt)) .GT. 0.0D0)NON_ZERO_DJDt=.TRUE.
 	    ELSE IF (INDEX(STRING,'Energy deposited') .NE. 0)THEN
 	      READ(20,*)(RAD_DECAY(I),I=1,ND)
+	      IF(MAXVAL(ABS(RAD_DECAY)) .GT. 0.0D0)NON_ZERO_RAD_DECAY=.TRUE.
 	    ELSE IF (INDEX(STRING,'Total Radiative') .NE. 0)THEN
 	      EXIT
 	    END IF
@@ -201,15 +220,14 @@
 	WRITE(6,'(3A)')PG_PEN(3),' The "conserved" luminosity is plotted in blue',DEF_PEN
 	WRITE(6,*)' '
 	T1=0.0D0
-	IF(SUM(HJ_LUM) .NE. 0.0D0)HJ_NOT_ZERO=.TRUE.
 	TOTAL=LUM
-	IF(HJ_NOT_ZERO)TOTAL=HJ_LUM
+	IF(NON_ZERO_HJ_LUM)TOTAL=HJ_LUM
 	DO I=1,ND-1
-	  T1=T1+RAD_DECAY(I)-MECH(I)-ADI(I)-DJDT(I)
+	  T1=T1+LOC_SHOCK(I)+RAD_DECAY(I)-MECH(I)-ADI(I)-DJDT(I)
 	  TOTAL(I+1)=TOTAL(I+1)+T1
 	END DO
-	CALL DP_CURVE(ND,XAXIS,LUM)
-	CALL DP_CURVE(ND,XAXIS,TOTAL)
+	CALL DP_CURVE_LAB(ND,XAXIS,LUM,'L(cmf)')
+	CALL DP_CURVE_LAB(ND,XAXIS,TOTAL,'L(cons)')
 	CALL GRAMON_PGPLOT(XLABEL,'Luminosity (L\d'//char(09)//'\u)',' ',' ')
 !
 	WRITE(6,*)' '
@@ -218,29 +236,44 @@
 	WRITE(6,'(3A)')PG_PEN(3),' The "conserved" luminosity has been scaled to 0.1 at the outer boundary',DEF_PEN
 	WRITE(6,*)' '
 	WRK_VEC=0.1*TOTAL/TOTAL(2)
-	CALL DP_CURVE(ND,XAXIS,dT_ON_T)
-	CALL DP_CURVE(ND,XAXIS,WRK_VEC)
+	CALL DP_CURVE_LAB(ND,XAXIS,dT_ON_T,'dT/T')
+	CALL DP_CURVE_LAB(ND,XAXIS,WRK_VEC,'L(cons)')
 	CALL GRAMON_PGPLOT(XLABEL,'Scaled cons. L; dT/T',' ',' ')
 	
 	WRITE(6,*)' '
 	WRITE(6,*)' Plotting the corrections at each depth'
 	WRITE(6,*)' '
-	WRITE(6,'(3A)')PG_PEN(2)//' The "mechanical" luminosity contribution at each depth is plotted in red',DEF_PEN
-	WRITE(6,'(3A)')PG_PEN(3)//' The "adiabatic" luminosity contribution at each depth is plotted in blue',DEF_PEN
-	WRITE(6,'(3A)')PG_PEN(4)//' The "DJDTt" luminosity contribution at each depth is plotted in green',DEF_PEN
-	WRITE(6,'(3A)')PG_PEN(5)//' The "radioactove"  contribution at each depth is plotted in purple',DEF_PEN
+	I=1
+	IF(NON_ZERO_RAD_DECAY)THEN
+	  CALL DP_CURVE_LAB(ND,XAXIS,RAD_DECAY,'Rad. Dec.'); I=I+1
+	  WRITE(6,'(3A)')PG_PEN(I)//' The "radioactive decay" contribution at each depth.',DEF_PEN
+	END IF
+	IF(NON_ZERO_LOC_SHOCK)THEN
+	  CALL DP_CURVE_LAB(ND,XAXIS,LOC_SHOCK,'Shock');  I=I+1
+	  WRITE(6,'(3A)')PG_PEN(I)//' The "local shock" contribution at each depth.',DEF_PEN
+	END IF
+	IF(NON_ZERO_MECH)THEN
+	  CALL DP_CURVE_LAB(ND,XAXIS,MECH,'Mechanical');  I=I+1
+	  WRITE(6,'(3A)')PG_PEN(I)//' The "mechanical" luminosity contribution at each depth.',DEF_PEN
+	END IF
+	IF(NON_ZERO_ADI)THEN
+	  CALL DP_CURVE_LAB(ND,XAXIS,ADI,'Adibat.');    I=I+1
+	  WRITE(6,'(3A)')PG_PEN(I)//' The "adiabatic" luminosity contribution at each depth.',DEF_PEN
+	END IF
+	IF(NON_ZERO_ADI)THEN
+	  CALL DP_CURVE_LAB(ND,XAXIS,DJDT,'DJDt');   I=I+1
+	  WRITE(6,'(3A)')PG_PEN(I)//' The "DJDt" luminosity contribution at each depth. ',DEF_PEN
+	END IF
 	WRITE(6,*)' '
-	CALL DP_CURVE(ND,XAXIS,MECH)
-	CALL DP_CURVE(ND,XAXIS,ADI)
-	CALL DP_CURVE(ND,XAXIS,DJDT)
-	CALL DP_CURVE(ND,XAXIS,RAD_DECAY)
 	CALL GRAMON_PGPLOT(XLABEL,'\gDL(L\d'//char(09)//'\u)',' ',' ')
 
+	LOC_SHOCK(2:ND)=LOC_SHOCK(1:ND-1); LOC_SHOCK(1)=0.0D0
 	MECH(2:ND)=MECH(1:ND-1); MECH(1)=0.0D0
 	DJDT(2:ND)=DJDT(1:ND-1); DJDT(1)=0.0D0
 	ADI(2:ND)=ADI(1:ND-1); ADI(1)=0.0D0
 	RAD_DECAY(2:ND)=RAD_DECAY(1:ND); RAD_DECAY(1)=0.0D0
 	DO I=2,ND
+	  LOC_SHOCK(I)=LOC_SHOCK(I)+LOC_SHOCK(I-1)
 	  MECH(I)=MECH(I)+MECH(I-1)
 	  DJDT(I)=DJDT(I)+DJDT(I-1)
 	  ADI(I)=ADI(I)+ADI(I-1)
@@ -250,32 +283,53 @@
 	DJDT=-DJDT
 	ADI=-ADI
 !
+	WRITE(6,*)
 	WRITE(6,*)' '
 	CALL WR_COL_STR(' |1*** |0Plotting cummalative contributions (intgerated inwards). |1***')
 	CALL WR_COL_STR(' |1*** |0These represent the contributions to the "conserved luminosity)". |1***')
 	WRITE(6,*)' '
 !
+	I=2
 	WRITE(6,'(3A)')PG_PEN(2)//'            The "corrected luminosity" is in red',DEF_PEN
-	CALL DP_CURVE(ND,XAXIS,TOTAL)
+	CALL DP_CURVE_LAB(ND,XAXIS,TOTAL,'Cor. Lum.')
 !
-	WRITE(6,'(3A)')PG_PEN(3)//'    The term due to radioactive decay is in blue',DEF_PEN
-	CALL DP_CURVE(ND,XAXIS,RAD_DECAY)
+	IF(NON_ZERO_RAD_DECAY)THEN
+	  CALL DP_CURVE_LAB(ND,XAXIS,RAD_DECAY,'Rad. decay'); I=I+1
+	  WRITE(6,'(3A)')PG_PEN(I)//'    The term due to radioactive decay',DEF_PEN
+	END IF
 !
-	WRITE(6,'(3A)')PG_PEN(4)//'                       The DJDT term is in green',DEF_PEN
-	CALL DP_CURVE(ND,XAXIS,DJDT)
+	IF(NON_ZERO_LOC_SHOCK)THEN
+	  CALL DP_CURVE_LAB(ND,XAXIS,LOC_SHOCK,'Shock');  I=I+1
+	WRITE(6,'(3A)')PG_PEN(I)//'  Local shock energy is in yellow',DEF_PEN
+	END IF
 !
-	WRITE(6,'(3A)')PG_PEN(5)//'      The work on the gas term (MECH) is in purple',DEF_PEN
-	CALL DP_CURVE(ND,XAXIS,MECH)
+	IF(NON_ZERO_DJDt)THEN
+	  CALL DP_CURVE_LAB(ND,XAXIS,DJDT,'DJDt');   I=I+1
+	  WRITE(6,'(3A)')PG_PEN(I)//'                       The DJDT term is in green',DEF_PEN
+	END IF
 !
-	WRITE(6,'(3A)')PG_PEN(6)//'  Adiabatic cooling/internal energy is in pink',DEF_PEN
-	CALL DP_CURVE(ND,XAXIS,ADI)
+	IF(NON_ZERO_MECH)THEN
+	  CALL DP_CURVE_LAB(ND,XAXIS,MECH,'Mech.');    I=I+1
+	  WRITE(6,'(3A)')PG_PEN(I)//'      The work on the gas term (MECH) is in purple',DEF_PEN
+	END IF
 !
-	WRITE(6,'(3A)')PG_PEN(7)//' The total of the corrections terms in in yellow',DEF_PEN
-	CHANGE=MECH+ADI+DJDT+RAD_DECAY
+	IF(NON_ZERO_ADI)THEN
+	  CALL DP_CURVE_LAB(ND,XAXIS,ADI,'Adiab.');  I=I+1
+	  WRITE(6,'(3A)')PG_PEN(I)//'  Adiabatic cooling/internal energy is in pink',DEF_PEN
+	END IF
+!
+	I=I+1
+	WRITE(6,'(3A)')PG_PEN(I)//' The total of the corrections terms in in yellow',DEF_PEN
+	CHANGE=MECH+ADI+DJDT+RAD_DECAY+LOC_SHOCK
+	CALL DP_CURVE_LAB(ND,XAXIS,CHANGE,'Total Cor.')
 !
 	WRITE(6,*)' '
+	WRITE(6,*)'MECH',MECH(ND)
+	WRITE(6,*)'ADI',ADI(ND)
+	WRITE(6,*)'DJDT',DJDT(ND)
+	WRITE(6,*)'RAD_DECAY',RAD_DECAY(ND)
+	WRITE(6,*)'LOC_SHOCK',LOC_SHOCK(ND)
 !
-	CALL DP_CURVE(ND,XAXIS,CHANGE)
 	CALL GRAMON_PGPLOT(XLABEL,'Luminosity (L\d\m9\u)',' ',' ')
 !
 	WRITE(6,*)' '
@@ -286,9 +340,9 @@
 !
 	T1=TOTAL(2)
 	TOTAL=TOTAL/T1
-	CALL DP_CURVE(ND,XAXIS,TOTAL)
+	CALL DP_CURVE_LAB(ND,XAXIS,TOTAL,'Cor. Lum.')
 	CHANGE=CHANGE/T1
-	CALL DP_CURVE(ND,XAXIS,CHANGE)
+	CALL DP_CURVE_LAB(ND,XAXIS,CHANGE,'Total Cor.')
 	CALL GRAMON_PGPLOT(XLABEL,' ',' ',' ')
 !
 	STOP

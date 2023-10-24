@@ -8,6 +8,7 @@
 	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
+! Altered:  24-Sep-2023 : Added abillity to disallow data initialiazation using PASSED_OPT (05-Sep-2023).
 ! Altered:  26-Jul-2023 : Added (finalized?) CBAL and FBAL options.
 ! Altered:  22-Mar-2022 : List of changes compareed with earlier GITHUB version.
 !                           SP -- step plot option installed.
@@ -226,7 +227,7 @@
 !
 	REAL*4 XCM,ASR,TEMPASR,DASR
 !
-! CENTRAL_LAM must be REAL(10) as LAM_VAC is REAL(10) function.
+! CENTRAL_LAM must be REAL(10) as LAM_VAC is REAL*8 function.
 !
 	REAL(10) CENTRAL_LAM
 	REAL(10) OLD_CENTRAL_LAM
@@ -417,7 +418,6 @@
 	STR=.FALSE.
 	VEC=.FALSE.
 	NORMAL_R_Y_AXIS=.TRUE.
-	INITIALIZE_ON_EXIT=.TRUE.
 	RESET_CURVE_LAB=.TRUE.
 	ADD_COMMA=.TRUE.
 	DO I=1,MAXSTR
@@ -453,6 +453,11 @@
 	ELSE
 	  TYPE_CURVE(1:NPLTS)='L'
 	  MARK=.FALSE.
+	END IF
+	IF(OPTION(1:3) .EQ. 'NOI')THEN  !Don't initialize plots on exit
+	  INITIALIZE_ON_EXIT=.FALSE.
+	ELSE
+	  INITIALIZE_ON_EXIT=.TRUE.
 	END IF
 	WHICH_Y_AX(1:NPLTS)='L'
 !
@@ -2333,7 +2338,12 @@ C
 !
 	  IP=NPLTS+1
 	  NPTS(IP)=CNT
-	  CALL NEW_GEN_IN(NPTS(IP),'Number of data points')
+	  IF(CNT .EQ. 0)THEN
+	    CALL NEW_GEN_IN(NPTS(IP),'Number of data points')
+	    FILNAME='Skip this record: '//TRIM(FILNAME)
+	    CALL NEW_GEN_IN(TMP_LOG,FILNAME)
+	    IF(TMP_LOG)READ(30,'(A200)',IOSTAT=IOS)FILNAME
+	  END IF
 	  COLUMN(1)=1; COLUMN(2)=2
 	  CALL NEW_GEN_IN(COLUMN,I,ITWO,'Data columns')
 	  K=MAX(COLUMN(1),COLUMN(2))

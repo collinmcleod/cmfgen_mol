@@ -134,7 +134,7 @@
 	1                  JNU_SM,HNU_SM,
 	1                  VDOP_VEC,VDOP_FRAC,
 	1                  IN_HBC,HBC,HBC_INCID,NBC,NBC_INCID,
-	1                  FREQ,LOG_NU,DIF,DBB,IC,
+	1                  FREQ,dLOG_NU,DIF,DBB,IC,
 	1                  N_TYPE,METHOD,COHERENT,
 	1                  INIT,NEW_FREQ,ND_SM)
 	USE PP_MOM_CMF_MOD
@@ -174,7 +174,7 @@
 	REAL(10) NBC,NBC_INCID
 	REAL(10) IN_HBC
 !
-	REAL(10) DBB,IC,FREQ,LOG_NU
+	REAL(10) DBB,IC,FREQ,dLOG_NU
 	CHARACTER*6 METHOD
 	CHARACTER*6 N_TYPE 
 !
@@ -501,20 +501,20 @@
 	  CON_GAM(ND)=3.33564D-06*V(ND)/R(ND)
 !
 ! Since we are intgerating from blue to red, FL_PREV is always larger than
-! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.
+! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
 !
 ! EPS is used if we define N in terms of J rather than H, This is sometimes
 ! useful as H can approach zero, and hence N/H is undefined.
 !
 	  IF(N_TYPE .EQ. 'G_ONLY')THEN
 	    DO I=1,ND-1
-	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )
+	      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
 	      W(I)=GAMH(I)*(1.0D0+AV_SIGMA(I))*G(I)
 	      WPREV(I)=GAMH(I)*(1.0D0+AV_SIGMA(I))*G_PREV(I) 
 	    END DO
 	  ELSE
 	    DO I=1,ND-1
-	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )
+	      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
 	      W(I)=GAMH(I)*(1.0D0+AV_SIGMA(I))*G(I)
 	      WPREV(I)=GAMH(I)*(1.0D0+AV_SIGMA(I))*G_PREV(I)
 	      EPS(I)=GAMH(I)*(1.0D0+AV_SIGMA(I))*N_ON_J(I)/(1.0D0+W(I))
@@ -523,7 +523,7 @@
 	  END IF
 !
 	  DO I=1,ND
-	    GAM(I)=CON_GAM(I)/CHI(I)/LOG_NU
+	    GAM(I)=CON_GAM(I)/CHI(I)/dLOG_NU
 	  END DO
 !
 ! PSIPREV is equivalent to the U vector of FORMSOL.

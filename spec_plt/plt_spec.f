@@ -19,6 +19,7 @@ C
 	IMPLICIT NONE
 C
 C Altered 14-Oct-2023 : Disablled FFT option
+C Altered S4-Sep-2023 : Modifiex RXY option so as to take logs if logy is set -- LONG ver -- 25-Oct-2023)
 C Altered 22-Jan-2023 : MKGL option added (make Gaussian line).
 C Altered 19-Apr-2020 : Added CLIP option to RD_CONT.
 C Altered 16-May-2019 : NU, OBSF etc are now allocatable arrays.
@@ -109,8 +110,9 @@ C
 	LOGICAL READ_OBS
 	LOGICAL AIR_LAM
 	LOGICAL CLIP_FEATURES
+	LOGICAL FIRST
 C
-	LOGICAL WR_PLT,OVER
+	LOGICAL WR_PLT,OVER,ABS_VALUE
 C
 	LOGICAL LIN_INT
 	LOGICAL UNEQUAL
@@ -532,11 +534,14 @@ C
 ! This option simply reads in data in XY format. No conversion is done to the data.
 ! Comments (bginning with !) and blank lines are ignored in the data file.
 !
+! If logy is set, the logarithm of the y data is taken.
+!
 	ELSE IF(X(1:3) .EQ. 'RXY')THEN
 	  FILENAME=' '
 	  CALL USR_OPTION(FILENAME,'File',' ','Model file')
 	  CALL RD_XY_DATA_USR(NU_CONT,OBSF_CONT,NCF_CONT,NCF_MAX,FILENAME,LU_IN,IOS)
 	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
+	  CALL USR_HIDDEN(ABS_VALUE,'ABSR','F','Use absolute values when taking log')
 	  CALL USR_HIDDEN(TITLE,'TIT',' ',' ')
 	  IF(OVER .AND. IOS .EQ. 0)THEN
 	    NCF=NCF_CONT
@@ -551,6 +556,23 @@ C
 	      T1=1.0D0
 	      CALL USR_OPTION(T1,'SCL_FAC','1.0D+40','Factor to divide data by')
 	      OBSF_CONT(1:NCF_CONT)=OBSF_CONT(1:NCF_CONT)/T1
+	    END IF
+	    IF(LOG_Y .AND. ABS_VALUE)THEN
+	      OBSF_CONT(1:NCF_CONT)=LOG10(ABS(OBSF_CONT(1:NCF_CONT)))
+	    ELSE IF(LOG_Y)THEN 
+	      FIRST=.TRUE.
+	      DO I=1,NCF_CONT
+	        IF(OBSF_CONT(I) .GT. 0)THEN 
+	          OBSF_CONT(I)=LOG10(OBSF_CONT(I)) 
+	        ELSE
+	          OBSF_CONT(I)=-200
+	          IF(FIRST)THEN
+	             FIRST=.FALSE.
+	             WRITE(6,*)'Warning -- zero or neagtive values encountered'
+	 	     WRITE(6,*)'Log set to -200'
+	          END IF 
+	        END IF
+	      END DO
 	    END IF
 	    CALL DP_CURVE_LAB(NCF_CONT,NU_CONT,OBSF_CONT,TITLE)
 	  END IF

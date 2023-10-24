@@ -3,6 +3,7 @@ C File contains physical and astrophysical constants of general interest.
 C Each constant can be obtained by a FUNCTION call, and all units are CGS
 C unless otherwise is specified in the function name.
 C
+C Altered 22-Sep-2023: Revised physical constants (LONG ver -- 15-Oct-2023).
 C Altered 07-Jan-2008: Rsun revised very slightly, TEFF_SUN inserted
 C Altered 29-Oct-2007: Stefan Boltzman constant added.
 C Altered 29-Apr-1991: ALL routines. REAL(10) now specified in separate
@@ -20,7 +21,7 @@ C
 	FUNCTION ELECTRON_VOLT()
 	IMPLICIT NONE
 	REAL(10) ELECTRON_VOLT
-	ELECTRON_VOLT=1.60217733D-12                    !ergs
+	ELECTRON_VOLT=1.602176634D-12                    !ergs
 	RETURN
 	END
 
@@ -34,35 +35,42 @@ C
 	FUNCTION PLANCKS_CONSTANT()
 	IMPLICIT NONE
 	REAL(10) PLANCKS_CONSTANT
-	PLANCKS_CONSTANT=6.626075D-27			!erg sec
+	PLANCKS_CONSTANT=6.62607015D-27			!erg sec
 	RETURN
 	END
 
 	FUNCTION ATOMIC_MASS_UNIT()
 	IMPLICIT NONE
 	REAL(10) ATOMIC_MASS_UNIT
-	ATOMIC_MASS_UNIT=1.660540D-24			!gm
+	ATOMIC_MASS_UNIT=1.6605390666D-24		!gm
 	RETURN
 	END
 
 	FUNCTION ELECTRON_MASS()
 	IMPLICIT NONE
 	REAL(10) ELECTRON_MASS
-	ELECTRON_MASS=9.109389D-28			!gm
+	ELECTRON_MASS=9.1093837015D-28			!gm
+	RETURN
+	END
+!
+	FUNCTION ELECTRON_CHARGE()
+	IMPLICIT NONE
+	REAL(10) ELECTRON_CHARGE
+	ELECTRON_CHARGE=4.80320427E-10                    !esu
 	RETURN
 	END
 
 	FUNCTION BOLTZMANN_CONSTANT()
 	IMPLICIT NONE
 	REAL(10) BOLTZMANN_CONSTANT
-	BOLTZMANN_CONSTANT=1.380658D-16			!erg/K
+	BOLTZMANN_CONSTANT=1.380649D-16			!erg/K
 	RETURN
 	END
 
 	FUNCTION STEFAN_BOLTZ()
 	IMPLICIT NONE
 	REAL(10) STEFAN_BOLTZ
-	STEFAN_BOLTZ=5.670400D-05			!ergs/cm^2/K^4
+	STEFAN_BOLTZ=5.670374419D-05			!ergs/cm^2/K^4
 	RETURN
 	END
 

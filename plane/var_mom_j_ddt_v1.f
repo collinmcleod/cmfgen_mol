@@ -86,7 +86,7 @@
 	1                  TVX_DIF_d_T,TVX_DIF_d_dTdR,
 	1                  KI,WORKMAT,RHS_dHdCHI,
 	1                  F,HONJ_OUTBC,HFLUX_AT_INB,F_PREV,
-	1                  DO_TIME_VAR,RELAX_PARAM,INIT,FREQ,LOG_NU,
+	1                  DO_TIME_VAR,RELAX_PARAM,INIT,FREQ,dLOG_NU,
 	1                  DIF,dTdR,DBB,dDBBdT,IC,
 	1                  DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
  	USE MOD_VAR_HUB_J_V1
@@ -126,7 +126,7 @@
 	REAL(10) HONJ_OUTBC
 	REAL(10) HFLUX_AT_INB
 !
-	REAL(10) LOG_NU,dTdR,DBB,dDBBdT,IC
+	REAL(10) dLOG_NU,dTdR,DBB,dDBBdT,IC
 	REAL(10) dNU_TERM_DIF_BC
 	REAL(10) dRHSdCHI_DIF_BC
 	REAL(10) FREQ
@@ -280,14 +280,14 @@
 	  CHI_AT_INB_PREV=1.0D0
 	ELSE
 	  DO I=1,ND-1
-	    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/LOG_NU/( CHI(I)+CHI(I+1) )/C_KMS
+	    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/dLOG_NU/( CHI(I)+CHI(I+1) )/C_KMS
 	    dH(I)=2.0D0*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
 	    dH_OLDT(I)=dH(I)*ROLD_ON_R
 	    W(I)=GAMH(I)+dH(I)
 	    WPREV(I)=GAMH(I)
 	  END DO
 	  DO I=1,ND
-	    GAM(I)=V(I)/R(I)/CHI(I)/LOG_NU/C_KMS
+	    GAM(I)=V(I)/R(I)/CHI(I)/dLOG_NU/C_KMS
 	  END DO
 	  T1=ROLD_ON_R**3
 	  DO I=2,ND-1
@@ -405,12 +405,12 @@
 	  WRITE(194,'(5ES22.8)')FREQ,T1,RECIP_CDELTAT,XM(I),JNU_OLDT(I)
 	  WRITE(195,'(8ES22.14)')FREQ,RECIP_CDELTAT*(XM(I)-T1*JNU_OLDT(I)),
 	1        2.0D0*(RSQ_HNU(I-1)-RSQ_HNU(I))/R(I)/R(I)/(R(I+1)-R(I-1)),
-	1        V(I)*(XM(I)-JNUM1(I))/R(I)/LOG_NU/C_KMS,
+	1        V(I)*(XM(I)-JNUM1(I))/R(I)/dLOG_NU/C_KMS,
 	1        (CHI(I)-ESEC(I))*XM(I)-ETA(I),
 	1        CHI(I),ESEC(I),ETA(I)
 	  WRITE(196,'(8ES22.14)')FREQ,RECIP_CDELTAT*(XM(I)-T1*JNU_OLDT(I))/CHI(I),
 	1        2.0D0*Q(I)*(RSQ_HNU(I-1)-RSQ_HNU(I))/R(I)/R(I)/(DTAU(I)+DTAU(I-1)),
-	1        V(I)*(XM(I)-JNUM1(I))/R(I)/LOG_NU/C_KMS/CHI(I),
+	1        V(I)*(XM(I)-JNUM1(I))/R(I)/dLOG_NU/C_KMS/CHI(I),
 	1        XM(I)*(1.0D0-THETA(I))-SOURCE(I),
 	1        CHI(I),ESEC(I),ETA(I)
 	  I=ND

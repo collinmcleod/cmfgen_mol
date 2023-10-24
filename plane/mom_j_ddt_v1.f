@@ -127,7 +127,7 @@
 	1                  JNU_SM,RSQHNU_SM,DJDt_TERM,
 	1                  VDOP_VEC,VDOP_FRAC,
 	1                  HONJ_OUTBC,HFLUX_AT_INB,
-	1                  FREQ,LOG_NU,DIF,DBB,IC,
+	1                  FREQ,dLOG_NU,DIF,DBB,IC,
 	1                  METHOD,COHERENT,INIT,NEW_FREQ,
 	1                  DO_TIME_VAR,RELAX_PARAM,NC,NP,ND_SM,NCF)
 	USE MOD_MOM_J_DDT_V1
@@ -175,7 +175,7 @@
 	REAL(10) DBB
 	REAL(10) IC
 	REAL(10) FREQ
-	REAL(10) LOG_NU
+	REAL(10) dLOG_NU
 	CHARACTER*6 METHOD
 !
 ! INIT is used to indicate that there is no coupling to the previous frequency.
@@ -610,15 +610,15 @@
 !
 !
 ! Since we are integrating from blue to red, FL_PREV is always larger than
-! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.
+! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
 !
 	  DO I=1,ND-1
-	    GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )
+	    GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
 	    dH(I)=2.0D0*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
 	    dH_OLDT(I)=dH(I)*ROLD_ON_R
 	    W(I)=GAMH(I)+dH(I)
 	  END DO
-	  GAM(:)=CON_GAM(:)/CHI(:)/LOG_NU
+	  GAM(:)=CON_GAM(:)/CHI(:)/dLOG_NU
 	END IF
 !
 ! Even if it is the first frequency, we still need to allow for the time 
@@ -777,12 +777,12 @@
 	  T2=R(I)*R(I)
 	  WRITE(170,'(8ES22.14)')FREQ,RECIP_CDELTAT*(XM(I)-T1*RSQJNU_OLDT(I))/T2,
 	1        2.0D0*(RSQHNU(I-1)-RSQHNU(I))/(R(I-1)-R(I+1))/T2,
-	1        V(I)*(XM(I)-RSQJNU_PREV(I))/R(I)/LOG_NU/C_KMS/T2,
+	1        V(I)*(XM(I)-RSQJNU_PREV(I))/R(I)/dLOG_NU/C_KMS/T2,
 	1        (CHI(I)-ESEC(I))*XM(I)/T2-ETA(I),
 	1        CHI(I),ESEC(I),ETA(I)
 	  WRITE(172,'(8ES22.14)')FREQ,RECIP_CDELTAT*(XM(I)-T1*RSQJNU_OLDT(I))/CHI(I)/T2,
 	1        2.0D0*Q(I)*(RSQHNU(I-1)-RSQHNU(I))/(DTAU(I)+DTAU(I-1))/T2,
-	1        V(I)*(XM(I)-RSQJNU_PREV(I))/R(I)/LOG_NU/C_KMS/CHI(I)/T2,
+	1        V(I)*(XM(I)-RSQJNU_PREV(I))/R(I)/dLOG_NU/C_KMS/CHI(I)/T2,
 	1        XM(I)*(1.0D0-ESEC(I)/CHI(I))/T2-SOURCE(I),
 	1        CHI(I),ESEC(I),ETA(I)
           I=ND

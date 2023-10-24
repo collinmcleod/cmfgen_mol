@@ -152,7 +152,7 @@ $(LIB)(set_ang_qw.o) : set_ang_qw.f $(LIB_MOD)(ang_qw_mod.o)
 
 $(LIB)(set_frequency_grid_v2.o) : set_frequency_grid_v2.f $(LIB_MOD)(control_variable_mod.o)\
               $(LIB_MOD)(line_vec_mod.o) $(LIB_MOD)(mod_cmfgen.o) 
-	$(F90) -c $(FG) set_frequency_grid_v2.f
+	$(F90) -c $(FD) set_frequency_grid_v2.f
 	ar $(AR_OPTION) $(LIB) set_frequency_grid_v2.o
                                                                                                                       
 $(LIB)(set_line_opac.o) : set_line_opac.f $(LIB)(opac_mod.o) $(LIB_MOD)(control_variable_mod.o)\

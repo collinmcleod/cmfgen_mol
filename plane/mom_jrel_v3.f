@@ -232,7 +232,7 @@
 	SUBROUTINE MOM_JREL_V3(ETA,CHI,ESEC,V,SIGMA,R,
 	1               JNU,RSQHNU,dlnJdlnR,
 	1		FEDD,GEDD,H_ON_J,N_ON_J,RSQN_ON_RSQJ,KMID_ON_J,
-	1               HBC,IN_HBC,NBC,FREQ,LOG_NU,
+	1               HBC,IN_HBC,NBC,FREQ,dLOG_NU,
 	1               DIF,DBB,IC,METHOD,COHERENT,
 	1               INCL_ADVEC_TERMS,INCL_REL_TERMS,INIT,ND)
 	USE MOD_J_REL
@@ -273,7 +273,7 @@
 	REAL(10) HBC,NBC,IN_HBC
 !
 	REAL(10) DBB,IC
-	REAL(10) FREQ,LOG_NU
+	REAL(10) FREQ,dLOG_NU
 	CHARACTER*6 METHOD
 !
 ! INIT is used to indicate that there is no coupling to the previous frequency.
@@ -513,14 +513,14 @@
 !
 	IF(.NOT. INIT)THEN
 !
-! We are integrating from blue to red. LOG_NU is define as vd / dv which is 
+! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
 ! the same as d / d ln v.
 !
 ! EPS is used if we define N in terms of J rather than H, This is sometimes
 ! useful as H can approach zero, and hence N/H is undefined.
 !
 	  DO I=1,ND-1
-	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
 	    W(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*GEDD(I))
 	    WPREV(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*GEDD_PREV(I))
 	    EPS(I)=DELTAH(I)*(CON_dNdNUH(I)*RSQN_ON_RSQJ(I)+
@@ -530,9 +530,9 @@
 	  END DO
 !
 	  DO I=2,ND
-	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
 	  END DO
-	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
 !
 ! PSIPREV is equivalent to the U vector of FORMSOL.
 !

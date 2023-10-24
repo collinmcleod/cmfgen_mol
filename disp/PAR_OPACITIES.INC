@@ -58,8 +58,8 @@ C
 	1         J,ATM(ID)%XzV_ION_LEV_ID(J),ED,T,EMHNUKT,
 	1         L_TRUE,ND,LST_DEPTH_ONLY)
 	    END DO
-	    CHI_PAR(:,ID)=CHI(:)
-	    ETA_PAR(:,ID)=ETA(:)
+	    CHI_PAR(1:ND,ID)=CHI(1:ND)
+	    ETA_PAR(1:ND,ID)=ETA(1:ND)
 	  END IF
 	END DO
 !

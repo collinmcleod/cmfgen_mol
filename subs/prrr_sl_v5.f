@@ -65,13 +65,13 @@ C
 C Dynamic memory allocation for free-free gaunt factor as a function of depth.
 C
 	REAL(10) GFF_VAL(ND)
-	REAL*8 PLANCKS_CONSTANT
+	REAL(10) PLANCKS_CONSTANT
 	EXTERNAL PLANCKS_CONSTANT
 C
 C 4PI*1.0E-10 (R scaling) Note that ordering is important or get underflow.
 C FQW is approximately 10^15.
 C
-	H=6.6261965D-12					!ergs/s (*1.0E+15 due to *nu)
+	H=PLANCKS_CONSTANT*1.0D+15					!ergs/s (*1.0E+15 due to *nu)
 C
 C If ML=1 and and PHOT_ID .EQ. 1 then initialize all arrays. This routine
 C should be called first for ionizations to the ground state.

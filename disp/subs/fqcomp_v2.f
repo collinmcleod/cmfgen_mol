@@ -13,6 +13,7 @@
 ! Altered 08-Jun-2010 --- Changed to RH algorithm so that very low optical depths
 !                           can be treated. DIFF replaced by INNER_BND_METH.
 !                           Changed to V2.
+! Altered 15-Oct-2023 - Fixed bug -- DACOS was relaced by COS instead of ACOS.
 !
 	SUBROUTINE FQCOMP_V2(TA,TB,TC,XM,DTAU,R,Z,P,NEWRJ,NEWRK
 	1  ,SOURCE,CHI,dCHIdr,AQW,AQW3,DBB,HBCNEW
@@ -49,7 +50,7 @@
 !
 	  IF(THK)THEN
 	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-COS(P(LS)/R(1)))/P(LS)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF

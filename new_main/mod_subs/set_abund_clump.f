@@ -16,6 +16,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 29-Jul-2023 : Update VTURB_VEC -- now allow for POW law option (LONG ver -- 15-Oct-2023).
 ! Altered 16-Apr-2023 : Added RUN2 and REX2 from Paco (Paul now uses RUNA which is 
 !	                      the same option).
 ! Altered 03-MAr-2023 : Added clumping law from Paul Crowther
@@ -246,6 +247,7 @@
 	    END IF
 	  END DO
 	  MEAN_ATOMIC_WEIGHT=MEAN_ATOMIC_WEIGHT/ABUND_SUM
+	  CALL UPDATE_VTURB()
 	  RETURN
 	END IF
 ! 
@@ -364,5 +366,25 @@
 	  DENSITY(I)=POP_ATOM(I)*T1			!gm/cm^3
 	END DO
 !
+	CALL UPDATE_VTURB()
+!	
 	RETURN
-	END
+!
+	CONTAINS
+	SUBROUTINE UPDATE_VTURB()
+	IMPLICIT NONE
+!
+	IF(VTURB_LAW .EQ. 'POW')THEN
+	  VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*(V(1:ND)/V(1))**VTURB_POW
+	ELSE IF(VTURB_LAW .EQ. 'TRUNC_POW')THEN
+	  DO I=1,ND
+	    T1=MIN(V(I),VTURB_VEND)/VTURB_VEND
+	    VTURB_VEC(I)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*(T1**VTURB_POW)
+	  END DO
+	ELSE
+	  WRITE(6,*)'Error VTURB law not recognized in SET_ABUND_CLUMP'
+	  STOP
+	END IF
+	RETURN
+	END SUBROUTINE UPDATE_VTURB
+	END SUBROUTINE SET_ABUND_CLUMP

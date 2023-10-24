@@ -9,6 +9,7 @@
 	1             ZION,ID,COL_FILE,OMEGA_COL,ED,T,ND)
 	IMPLICIT NONE
 !
+! Altered 20-Sec-2023 : Updated to use standard value for Planck's constant (LONG -- 15-Oct-2023).
 ! Altered 04-Oct-2016 : SUBCOL_MULTI updated to V6.
 ! Altered 05-Apr-2011 : Updated from V4 
 !                          Most changes 02-Dec-10.
@@ -22,7 +23,8 @@
 !                          Changed to _V3 for consistency with SUBCOL.
 ! Created 07-JUn-1995 :Based on COLGENCOOL
 !
-	EXTERNAL OMEGA_COL
+	REAL(10) PLANCKS_CONSTANT
+	EXTERNAL OMEGA_COL, PLANCKS_CONSTANT
 	EXTERNAL ERROR_LU
 	INTEGER ERROR_LU	
 !
@@ -56,7 +58,7 @@
 	REAL(10) OMEGA_F(N_F,N_F)
 	REAL(10) dln_OMEGA_F_dlnT(N_F,N_F)
 !
-	H=6.6261965D-12		!H*1.0E+15  (1.0E+15 due to times frequency)
+	H=PLANCKS_CONSTANT()*1.0D+15             !ergs/s (*1.0E+15 due to *nu)
 	TMP_ED=1.0D0
 !
 	DO I=1,ND			!Which depth

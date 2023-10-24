@@ -9,6 +9,7 @@ C
 	1                     JREC,JPHOT,JREC_CR,JPHOT_CR,INIT_ARRAYS,ND,FLAG)
 	IMPLICIT NONE
 !
+! Altered 24-Sep-2023 : Adjusted constants for consistency.
 ! Altered 05-Apr-2011 : Adapted from X_RRR_COOL_V5 (29-Nov-2010).
 !                         LOG_HNST_A replaces HNST_A in call.
 !                         Changed to facilitate a larger dynamic range in the LTE populations.
@@ -50,10 +51,12 @@ C
 	REAL(10) A1
 	REAL(10) H
 	LOGICAL FLAG
+	REAL(10) PLANCKS_CONSTANT
+	EXTERNAL PLANCKS_CONSTANT
 C
 C As we multiply by hv
 C
-        H=6.6261965D-12 
+        H=PLANCKS_CONSTANT()*1.0D+15
 C
 C If INIT_ARRAYS and FLAG is set, then zero all arrays. FLAG should be
 C false for incrementing rates due to ionizations/recombinations to

@@ -9,7 +9,8 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
-! Altered: 17-Apr-2023 : MASS frcation now outout to MASS_FRACTION_SUMMARY_CHK rather than OUTGEN.
+! Altered: 24-Sep-2023 : Now scale ISO pops so mass fractions add correctly (08-Sep-2023)
+! Altered: 17-Apr-2023 : MASS fraction now output to MASS_FRACTION_SUMMARY_CHK rather than OUTGEN.
 ! Altered: 24-Mar-2023 : LIN_INTERP_RD_SN_DTA now passed via the control module.
 !                           Replaces USE_LIN_INTERP that was added 18-Nov-2022.
 ! Altered: 14-Aug-2022 : Call to GET_EDEP_SHOCK_POWER added
@@ -87,7 +88,9 @@
 	LOGICAL FIRST_WARN
 !
 	LUER=ERROR_LU()
-	WRITE(LUER,'(/,A)')' Entering RD_SN_DATA'
+	WRITE(LUER,'(/,A)')' Entering RD_SN_DATA';    FLUSH(LUER)
+	WRITE(LUER,*)'NUM_SPECIES=',NUM_SPECIES
+	FLUSH(LUER)
 	OPEN(UNIT=LU,FILE='SN_HYDRO_DATA',STATUS='OLD',IOSTAT=IOS)
 	IF(IOS .NE. 0)THEN
 	  WRITE(LUER,*)'Error opening SN_HYDRO_DATA ins rd_sn_data.f'
@@ -126,6 +129,8 @@
 	      END IF
    	    END IF
 	  END DO
+	  WRITE(LUER,*)'Read in SN_HYDRO_DATA data headers'
+	  FLUSH(UNIT=LUER)
 !
 	  ALLOCATE (R_HYDRO(NX));           R_HYDRO=0.0D0
 	  ALLOCATE (LOG_R_HYDRO(NX));       LOG_R_HYDRO=0.0D0
@@ -183,6 +188,7 @@
 	   STRING=' '
 	 END DO
 	 WRITE(LUER,*)'   Obtained non-POP vectors in RD_SN_DATA'
+	 FLUSH(LUER)
 !
 ! We can now read in the mass-fractions.
 !
@@ -266,6 +272,7 @@
 	  CALL MON_INTERP(ED,ND,IONE,LOG_R,ND,ELEC_DEN_HYDRO,NX,LOG_R_HYDRO,NX)
 	  ED=EXP(ED)
 	  WRITE(LUER,*)'   RD_SN_DATA has read ED and T'
+	  FLUSH(UNIT=LUER)
 	END IF
 !
 ! The code assumes the densities read in fron SN_HYDRO_DATA are already clumped.
@@ -297,14 +304,16 @@
 	   END IF
 	  END DO
 	END DO
-	WRITE(LUER,*)'   Read SN populations in RD_SN_DATA'
+	WRITE(LUER,*)'   Read SN populations in RD_SN_DATA'; FLUSH(UNIT=LUER)
 !
 	CALL GET_LU(LU_MF,'In RD_SN_DATA')
 	WRITE(LU,'(/,1X,A,/)')'Original and Cummulative sums of mass fractions'
 	OPEN(UNIT=LU_MF,STATUS='UNKNOWN',ACTION='WRITE',FILE='MASS_FRACTION_SUM_CHK')
 !
+	WRITE(LUER,*)'NUM_SPECIES=',NUM_SPECIES,NSP
+	FLUSH(LUER)
 	WRK_HYDRO=0.0D0
-	DO K=1,NUM_SPECIES
+	DO K=1,NSP                               !NUM_SPECIES
 	   WRK_HYDRO=WRK_HYDRO+POP_HYDRO(:,K)
 	END DO
 	I=5; CALL WRITV_V2(WRK_HYDRO,NX,I,'Sum HYDRO mass frac',LU_MF)
@@ -312,6 +321,7 @@
 	WRITE(LUER,*)'   Normalized HYDRO mass fractions in RD_SN_DATA'
 	WRITE(LUER,*)'   Maximum normalization factor was',MAXVAL(WRK_HYDRO)
 	WRITE(LUER,*)'   Minimum normalization factor was',MINVAL(WRK_HYDRO)
+	FLUSH(UNIT=LUER)
 !
 	ISO(:)%READ_ISO_POPS=.FALSE.
 	DO L=1,NISO
@@ -365,6 +375,12 @@
 	END DO
 	DO L=1,NUM_SPECIES
 	  POP_SPECIES(:,L)=POP_SPECIES(:,L)/WRK(:)
+	END DO
+!
+! Write -- also scaling ISO pops so MF conserved.
+!
+	DO IS=1,NUM_ISOTOPES
+	  ISO(IS)%OLD_POP=ISO(IS)%OLD_POP/WRK
 	END DO
 !
 	I=6;CALL WRITV_V2(WRK,ND,I,'Mass fraction sum',LU_MF)
@@ -569,6 +585,7 @@
 	          ELSE
 	            WRITE(LUER,'(3X,A,T12,I3)')TRIM(ISO(IS)%SPECIES),ISO(IS)%BARYON_NUMBER
 	          END IF
+	          FLUSH(LUER)
 	          EXIT
 	        END IF
 	      END DO

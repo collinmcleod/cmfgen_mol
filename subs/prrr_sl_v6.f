@@ -15,6 +15,8 @@
 	1                     NU,NU_CONT,INIT_ARRAYS,ND)
 	IMPLICIT NONE
 !
+! Altered 24-Sep-2023 : Adjusted constants for consistency. Some data ouput for checking between 
+!                            RE and EHB equations (LONG ver -- 15-Oct-2023).
 ! Altered 04-May-2022 : Changed HMI to H0
 ! Altered 23-Jun-2015 - Added H- free-free cooling.
 ! Altered 20-Oct-2011 - Now sum up all in ion levels for FF. Only do this when PHOT_ID=1
@@ -83,7 +85,7 @@
 ! 4PI*1.0E-10 (R scaling) Note that ordering is important or get underflow.
 ! FQW is approximately 10^15.
 !
-	H=PLANCKS_CONSTANT()*1.0D+15   		!ergs/s (*1.0E+15 due to *nu)
+	H=PLANCKS_CONSTANT()*1.0D+15   		 !ergs/s (*1.0E+15 due to *nu)
 !
 ! If ML=1 and and PHOT_ID .EQ. 1 then initialize all arrays. This routine
 ! should be called first for ionizations to the ground state.
@@ -126,8 +128,6 @@
 	    END IF
 	  END DO
 	END DO
-!	WRITE(186,'(I5,2X,I3,2X,F5.1,3X,ES16.8,7ES16.6E3)')NLEV,PHOT_ID,ZHYD,NU,WSE(1:2,5),WCR(1:2,5),RR(1:2,5),JREC(5)
-!	WRITE(184,'(I5,2X,I3,2X,F5.1,3X,ES16.8,7ES16.6E3)')NLEV,PHOT_ID,ZHYD,NU,BFCR(1:5,5),SUM(BFCR(:,5)),JREC(5)
 !
 ! Compute Free-Free cooling.
 !

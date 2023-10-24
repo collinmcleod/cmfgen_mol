@@ -4,16 +4,18 @@
 ! Module contains physical and astrophysical constants of general interest.
 ! All constants are cgs. Designed to replace function calls in phys_con.f.
 !
-! Created 7-Jan-2008 :: Based on cur_cmf/subs/phys_con.f
+! Altered 15-Sep-2023 :" Updated values of several constants.
+! Created  7-Jan-2008 :: Based on cur_cmf/subs/phys_con.f
 !
-	REAL(10), PARAMETER :: SPEED_OF_LIGHT        =2.99792458D+10 	!Exact cm/s
-	REAL(10), PARAMETER :: ELECTRON_VOLT         =1.60217733D-12      !ergs
-	REAL(10), PARAMETER :: GRAVITATIONAL_CONSTANT=6.67259D-08		!cm^3/gm/s
-	REAL(10), PARAMETER :: PLANCKS_CONSTANT      =6.626075D-27	!erg sec
-	REAL(10), PARAMETER :: ATOMIC_MASS_UNIT      =1.660540D-24	!gm
-	REAL(10), PARAMETER :: ELECTRON_MASS         =9.109389D-28	!gm
-	REAL(10), PARAMETER :: BOLTZMANN_CONSTANT    =1.380658D-16	!erg/K
-	REAL(10), PARAMETER :: STEFAN_BOLTZ          =5.670400D-05	!ergs/cm^2/K^4
+	REAL(10), PARAMETER :: SPEED_OF_LIGHT         = 2.99792458D+10      !Exact cm/s
+	REAL(10), PARAMETER :: ELECTRON_VOLT          = 1.60217733D-12      !ergs
+	REAL(10), PARAMETER :: GRAVITATIONAL_CONSTANT = 6.67259D-08         !cm^3/gm/s
+	REAL(10), PARAMETER :: PLANCKS_CONSTANT       = 6.62607015D-27      !erg sec
+	REAL(10), PARAMETER :: ATOMIC_MASS_UNIT       = 1.6605390666D-24    !gm
+	REAL(10), PARAMETER :: ELECTRON_MASS          = 9.1093837015D-28    !gm
+	REAL(10), PARAMETER :: ELECTRON_CHARGE        = 4.80320427E-10      !esu
+	REAL(10), PARAMETER :: BOLTZMANN_CONSTANT     = 1.380649D-16        !erg/K
+	REAL(10), PARAMETER :: STEFAN_BOLTZ           = 5.670374419D-05     !ergs/cm^2/K^4
 !
 	REAL(10), PARAMETER :: RYDBERG_INF     =109737.31534D0		!/cm
 	REAL(10), PARAMETER :: RYDBERG_HYDROGEN=109677.6D0		!/cm

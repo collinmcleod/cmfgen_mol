@@ -9,6 +9,10 @@
 	IMPLICIT NONE
 	INTEGER ND,NT,NIT
 !
+! Altered 24-Sep-2023: Added SFDG option (needs work) - 7sep23.
+!                      Added DREP option -- allows one depth to replace other depths.
+!                      Added (modified) DNRG option -- designed to allow testing of subroutine.
+!                      Added CNRG option -- designed to allow modification of R grid using cursors.
 ! Altered 04-Jul-2020: Altered FDG option so harder to put in depth for variable.
 ! Altered 14-Feb-2019: Updated to 3 digit exponent in 2 places
 ! Altered 13-Sep-2018: Added options SM and NINT
@@ -35,6 +39,8 @@ C
 	REAL(10), ALLOCATABLE :: X(:)			!NIT
 	REAL(10), ALLOCATABLE :: Y(:)			!NIT
 	REAL(10), ALLOCATABLE :: Z(:)			!NIT
+	REAL(10), ALLOCATABLE :: TA(:)			!
+	REAL(10), ALLOCATABLE :: TB(:)			!
 !
 	INTEGER, ALLOCATABLE :: I_BIG(:)		!NT
 	REAL(10), ALLOCATABLE :: Z_BIG(:)			!NT
@@ -76,6 +82,9 @@ C
 	INTEGER RITE_N_TIMES
 	INTEGER LUSCR
 	INTEGER IOS
+!
+	INTEGER, PARAMETER :: NLEV_MAX=10
+	INTEGER LEVELS(NLEV_MAX)
 C
 	LOGICAL LOG_Y_AXIS
 	LOGICAL NEWMOD
@@ -97,6 +106,7 @@ C
 	LOGICAL COR_READ
 	LOGICAL READ_IN_STEQ
 	LOGICAL READ_AGAIN
+	LOGICAL TMP_LOG
 C
 	LUSCR=26
 	RITE_N_TIMES=1
@@ -164,6 +174,8 @@ C
 	ALLOCATE (X(J))
 	ALLOCATE (Y(J))
 	ALLOCATE (Z(J))
+	ALLOCATE (TA(J))
+	ALLOCATE (TB(J))
 !
 	WRITE(6,*)'   Number of depth points is:',ND
 	WRITE(6,*)'Number of variables/depth is:',NT
@@ -698,6 +710,43 @@ C
 	  WRITE(6,*)'Populations can be compared with older iterations.'
 	  GOTO 200
 !
+	ELSE IF(PLT_OPT(1:4) .EQ. 'SFDG')THEN
+	  FDG_COUNTER=FDG_COUNTER+1
+	  IT=NIT; ID=ND; IVAR=NT
+	  CALL GEN_IN(IT,'Iteration # (zero to exit) - default is last iteration',
+	1                   LOW_LIM=IZERO,UP_LIM=NIT)
+	  DO K=1,16
+	    DO J=1,26
+	       POPS(27,K,IT)=POPS(27,K,IT)+POPS(J,K,IT)
+	       POPS(J,K,IT)=POPS(J,K,IT)/100.0D0
+	    END DO
+	  END DO
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
+	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+	1              NT,ND,LUSCR,NEWMOD)
+!
+	ELSE IF(PLT_OPT(1:4) .EQ. 'DREP')THEN
+	  FDG_COUNTER=FDG_COUNTER+1
+	  IT=NIT; ID=ND; IVAR=NT
+	  CALL GEN_IN(IT,'Iteration # (zero to exit) - default is last iteration',
+	1                   LOW_LIM=IZERO,UP_LIM=NIT)
+	  CALL GEN_IN(ID1,'Depth to be used for replacement')
+	  CALL GEN_IN(ID2,'ID2: Depths ID2 to ID1 pm 1 to be replaced')
+	  I=1
+	  IF(ID2 .LT. ID1)I=-1
+	  DO K=ID1+I,ID2,I
+	    DO J=1,NT
+	       POPS(J,K,IT)=POPS(J,ID1,IT)
+	    END DO
+	  END DO
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
+	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+	1              NT,ND,LUSCR,NEWMOD)
+!
 	ELSE IF(PLT_OPT(1:3) .EQ. 'FDG')THEN
 	  FDG_COUNTER=FDG_COUNTER+1
 	  IT=NIT; ID=ND; IVAR=NT
@@ -962,6 +1011,59 @@ C
 	  WRITE(6,*)'Restart program if you wish to compare to with pops from last iteration.'
 	  WRITE(6,*)'Populations can be compared with older iterations.'
 	  GOTO 200
+!
+	ELSE IF(PLT_OPT(1:4) .EQ. 'DNRG')THEN
+	  LEVELS=0; T1=1.2D0; T2=0.0D0; T3=0.0D0
+	  CALL GEN_IN(LEVELS,I,NLEV_MAX,'Levels for defining new r grid')
+	  CALL GEN_IN(T1,'Max ratio of level populations between cons. grid points')
+	  CALL DEF_NEW_RG_V1(Y,R,POPS(1,1,NIT),LEVELS,T1,T2,T3,TMP_LOG,I,NT,ND)
+	  IF(TMP_LOG)THEN
+	    DO J=1,I
+	      TA(1:ND)=LOG10(POPS(LEVELS(J),1:ND,NIT))
+	      WRITE(STRING,*)LEVELS(J); STRING='OLD '//ADJUSTL(STRING)
+	      CALL DP_CURVE_LAB(ND,R,TA,STRING)
+	      CALL MON_INTERP(TB,ND,IONE,Y,ND,TA,ND,R,ND)
+	      WRITE(STRING,*)LEVELS(J); STRING='NEW '//ADJUSTL(STRING)
+	      CALL DP_CURVE_LAB(ND,Y,TB,STRING)
+	    END DO
+	    CALL GRAMON_PGPLOT(' ',' ',' ',' ')
+!
+	    DO I=2,ND-1
+	      TA(I)=(Y(I-1)-Y(I))/(Y(I)-Y(I+1))
+	    END DO
+	    CALL DP_CURVE(ND-2,Y(2:ND-1),TA(2:ND-1))
+	    CALL GRAMON_PGPLOT('R','dR/dR',' ',' ')
+	  ELSE
+	    WRITE(6,*)'Construction of a new R Grid failed'
+	    WRITE(6,*)'Iteration failed to converge to required number of grid points'
+	    WRITE(6,'(A)',ADVANCE='NO')' Enter any character to continue: '; READ(5,*)TMP_STR
+	  END IF
+	  GOTO 200
+!
+	ELSE IF(PLT_OPT(1:4) .EQ. 'CNRG')THEN
+!
+	   WRITE(6,*)RED_PEN
+	   WRITE(6,*)'This option assumes you have created plots using the PR option'
+	   WRITE(6,*)'It also assumes that you used the NOI option so that the plots were not initialized'
+	   WRITE(6,*)DEF_PEN
+! 
+	   I=MIN(3*ND,SIZE(TA))
+	   CALL CHANGE_XAXIS_GRIDDING(TA,K,I)
+!
+! For SN models, we sometimes plot in uts of 10^14 cm.
+! We also ensure boundary vales are absolutely correct.
+!
+	   IF(R(1) .GT. 1.0D+04)TA(1:K)=1.0D+04*TA(1:K)
+	   TA(1)=R(1); TA(K)=R(ND)
+	   OPEN(UNIT=LU_OUT,FILE='NEW_RDINR',STATUS='UNKNOWN',ACTION='WRITE')
+	   WRITE(LU_OUT,'(/,2X,A,10X,A,/)')'24-FEB-2004','!Format date'
+	   WRITE(LU_OUT,'(2ES14.5,3X,I5,3X,I5,/)')1.0E+05,1.0D0,1,K
+	   DO I=1,K
+	     WRITE(LU_OUT,'(ES20.12,6ES14.7,3X,I5)')TA(I),(1.0D0, J=1,6),I
+	     WRITE(LU_OUT,'(F12.4,/)')1.0D0
+	   END DO
+	   CLOSE(LU_OUT)
+	   GOTO 200
 !
 	ELSE IF(PLT_OPT(1:3) .EQ. 'RAT')THEN
 	  WRITE(6,*)' '

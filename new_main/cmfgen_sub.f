@@ -788,17 +788,6 @@
 	  STOP
 	END IF
 !
-	OPEN(UNIT=173,FILE='SOL_LINKS',STATUS='UNKNOWN')
-        DO ID=1,NUM_IONS
-           IF(ATM(ID)%XzV_PRES)THEN
-             DO J=1,ATM(ID)%NXzV_F
-               WRITE(173,'(1X,A10,A40,I6)')ION_ID(ID),ATM(ID)%XzVLEVNAME_F(J),
-	1                   ATM(ID)%F_TO_S_XzV(J)
-             END DO
-           END IF
-        END DO
-	CLOSE(UNIT=173)
-!
 ! Read in data for treating non-thermal ionization.
 !
 	IF(TREAT_NON_THERMAL_ELECTRONS)THEN
@@ -1046,6 +1035,16 @@
 !
 	IF(VINF .EQ. 0.0D0)VINF=V(1)
 !
+! 
+!
+! Compute CLUMP_FAC(1:ND) which allow for the possibility that the wind is
+! clumped. At the sime time, we compute the vectors which give the density,
+! the atom density, and the species density at each depth.
+!
+! This routine also computes VTURB_VEC.
+!
+	CALL SET_ABUND_CLUMP(MEAN_ATOMIC_WEIGHT,ABUND_SUM,LUER,ND)
+!
 ! Compute profile frequencies such that for the adopted doppler
 ! velocity the profile ranges from 5 to -5 doppler widths.
 ! This section needs to be rewritten if we want the profile to
@@ -1067,7 +1066,6 @@
 	  PF(I)=PF(I)*T1
 	END DO
         VDOP_VEC(1:ND)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
-	VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*V(1:ND)/V(1)
 !
 	IF(GLOBAL_LINE_PROF(1:4) .EQ. 'LIST')THEN
 	  CALL RD_STRK_LIST(LUIN)
@@ -1081,14 +1079,6 @@
 	1               NCF,NCF_MAX,N_LINE_FREQ,ND,
 	1               OBS_FREQ,OBS,N_OBS,LUIN,IMPURITY_CODE)
 !
-!
-! 
-!
-! Compute CLUMP_FAC(1:ND) which allow for the possibility that the wind is
-! clumped. At the sime time, we compute the vectors which give the density,
-! the atom density, and the species density at each depth.
-!
-	CALL SET_ABUND_CLUMP(MEAN_ATOMIC_WEIGHT,ABUND_SUM,LUER,ND)
 !
 ! 
 !
@@ -1522,41 +1512,43 @@
 ! temperature variation.
 !
 	    IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN
-	  DO SIM_INDX=1,MAX_SIM
-	    IF(RESONANCE_ZONE(SIM_INDX))THEN
-	      NL=SIM_NL(SIM_INDX)
-	      NUP=SIM_NUP(SIM_INDX)
-	      VCHI(NL,ND)=VCHI(NL,ND)+LINE_PROF_SIM(ND,SIM_INDX)*
-	1        LINE_OPAC_CON(SIM_INDX)*L_STAR_RATIO(ND,SIM_INDX)
-	      VCHI(NUP,ND)=VCHI(NUP,ND)-LINE_PROF_SIM(ND,SIM_INDX)*
-	1        LINE_OPAC_CON(SIM_INDX)*U_STAR_RATIO(ND,SIM_INDX)*
-	1        GLDGU(SIM_INDX)
+	      DO SIM_INDX=1,MAX_SIM
+	        IF(RESONANCE_ZONE(SIM_INDX))THEN
+	          NL=SIM_NL(SIM_INDX)
+	          NUP=SIM_NUP(SIM_INDX)
+	          VCHI(NL,ND)=VCHI(NL,ND)+LINE_PROF_SIM(ND,SIM_INDX)*
+	1            LINE_OPAC_CON(SIM_INDX)*L_STAR_RATIO(ND,SIM_INDX)
+	          VCHI(NUP,ND)=VCHI(NUP,ND)-LINE_PROF_SIM(ND,SIM_INDX)*
+	1            LINE_OPAC_CON(SIM_INDX)*U_STAR_RATIO(ND,SIM_INDX)*
+	1            GLDGU(SIM_INDX)
+	        END IF
+	      END DO
 	    END IF
-	  END DO
-	END IF
 !
 ! 
 !
-! Set TA = to the variation vector at the inner boundary.
-!
-	    CALL TUNE(IONE,'DTDR_VEC')
-	    IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN
-	    DO I=1,NT
-	      TA(I)=VCHI(I,ND)
-	    END DO
-	    END IF
-!
-! Increment Parameters
+! Update DTDR. Ordering changed to fix issues when BA not computed.
 !
 	    T1=HDKT*NU(ML)/T(ND)
 	    T3=FQW(ML)*TWOHCSQ*( NU(ML)**3 )*T1*EMHNUKT(ND)/
 	1         CHI(ND)/T(ND)/(1.0_DP-EMHNUKT(ND))**2
 	    DTDR=DTDR+T3
+!
+! Set TA = to the variation vector at the inner boundary.
+!
+	    CALL TUNE(IONE,'DTDR_VEC')
 	    IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN
+!
+! Increment Parameters
+!
+	      T1=HDKT*NU(ML)/T(ND)
+	      T3=FQW(ML)*TWOHCSQ*( NU(ML)**3 )*T1*EMHNUKT(ND)/
+	1           CHI(ND)/T(ND)/(1.0_DP-EMHNUKT(ND))**2
+	      TA(1:NT)=VCHI(1:NT,ND)
 	      DO I=1,NT-1
 	        DIFFW(I)=DIFFW(I)+T3*TA(I)/CHI(ND)
-	       END DO
-	       DIFFW(NT)=DIFFW(NT)+T3*(TA(NT)/CHI(ND)-(T1*(1.0_DP+EMHNUKT(ND))
+	      END DO
+	      DIFFW(NT)=DIFFW(NT)+T3*(TA(NT)/CHI(ND)-(T1*(1.0_DP+EMHNUKT(ND))
 	1           /(1.0_DP-EMHNUKT(ND))-2.0_DP)/T(ND))
 	    END IF
 	    CALL TUNE(ITWO,'DTDR_VEC')
@@ -1568,13 +1560,14 @@
 !
 	  T1=LUM*7.2685D+11/R(ND)/R(ND)
 	  DTDR=T1/DTDR
-	  T1=( DTDR**2 )/T1
-	  DO I=1,NT
-	    DIFFW(I)=DIFFW(I)*T1
-	  END DO
-	END IF
-	IF(LAMBDA_ITERATION .OR. .NOT. COMPUTE_BA)THEN
-	  DIFFW(1:NT)=0.0D0
+	  IF(LAMBDA_ITERATION .OR. .NOT. COMPUTE_BA)THEN
+	    DIFFW(1:NT)=0.0D0
+	  ELSE
+	    T1=( DTDR**2 )/T1
+	    DO I=1,NT
+	      DIFFW(I)=DIFFW(I)*T1
+	    END DO
+	  END IF
 	END IF
 	CALL TUNE(ITWO,'DTDR')
 !
@@ -1645,9 +1638,6 @@
           DO ID=1,NUM_IONS-1
             LOC_ID=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
-	      IF(ION_ID(ID) .EQ. 'CIII')THEN
-	          WRITE(173,'(A,3X,ES16.5E4)')'COL',SE(ID)%STEQ(56,5)
-	      END IF
 	      TMP_STRING=TRIM(ION_ID(ID))//'_COL_DATA'
               CALL STEQ_MULTI_V10(CNM,DCNM,ED,T,
 	1         ATM(ID)%XzV,            ATM(ID)%XzVLTE,         ATM(ID)%dlnXzVLTE_dlnT,
@@ -1660,11 +1650,6 @@
 	1         LOC_ID,TMP_STRING,OMEGA_GEN_V3,
 	1         ATM(ID)%EQXzV,NUM_BNDS,ND,NION,NT,
 	1         COMPUTE_BA,FIXED_T,LST_ITERATION,DST,DEND)
-!
-	          IF(ION_ID(ID) .EQ. 'CIII')THEN
-	            WRITE(173,'(A,3X,ES16.5E4)')'COL',SE(ID)%STEQ(56,5)
-	            FLUSH(UNIT=173)
-	          END IF
 !
 ! Handle states which can partially autoionize.
 !
@@ -2176,7 +2161,6 @@
 	1                SECTION,ND,NT,LST_DEPTH_ONlY)
 !	    INCLUDE 'OPACITIES_V4.INC'
 	    CALL TUNE(ITWO,'C_OPAC')
-	    WRITE(190,'(ES18.8)')EMHNUKT(1:5); FLUSH(UNIT=190)
 !
 ! Since resonance zones included, we must add the line opacity and 
 ! emissivity to the raw continuum values. We first save the pure continuum 
@@ -2330,12 +2314,12 @@
 	  END DO
 	END IF
 !
+! Need to fix parallization issue with update of STEQ_T_ED inside  EVALSE_QWVJ_V8
+!
 	IF(FINAL_CONSTANT_CROSS)THEN
-!	  WRITE(6,*)'Calling EVALSE_QWVJ_V8'
 	  CALL TUNE(IONE,'EVALSE')
-!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(ID_SAV)
+!!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(ID_SAV)
 	  DO ID=1,NUM_IONS-1
-!	WRITE(6,*)'Calling EVALSE_QWVJ_V8',ID
 	    ID_SAV=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT 
@@ -2348,15 +2332,8 @@
 	      END DO
 	    END IF
 	  END DO
-!$OMP END PARALLEL DO
+!!$OMP END PARALLEL DO
 	  CALL TUNE(ITWO,'EVALSE')
-!	  WRITE(6,*)'Called EVALSE_QWVJ_V8
-!	  ID=1; L=71
-!	  DO K=1,ATM(ID)%NXzV
-!	   WRITE(316,'(ES16.8,I6,4ES14.4)')FL,K,
-!	1                           SE(ID)%QFV_P(K,L),SE(ID)%QFV_P_EHB(K,L),
-!	1                           SE(ID)%QFV_R(K,L),SE(ID)%QFV_R_EHB(K,L)
-!	  END DO
 	END IF
 !
 	CALL TUNE(IONE,'LOWT')
@@ -2474,11 +2451,6 @@
 	      STEQ_T(K)=STEQ_T(K) - T3
 	    END DO
 	    T2=EINA(SIM_INDX)*ATM(ID)%XzV_F(MNUP_F,5)*ZNET_SIM(5,SIM_INDX)
-	    IF(NL .EQ. 284 .OR. NUP .EQ. 284)THEN
-	      WRITE(173,'(I7,3ES16.5E3,3X,A50)')ML,T2,SE(ID)%STEQ(MNL,5),
-	1       SE(ID)%STEQ(MNUP,5),TRIM(TRANS_NAME_SIM(SIM_INDX))
-	      FLUSH(UNIT=173)
-	    END IF    
 	  END IF    
 	END DO
 !
@@ -2945,12 +2917,16 @@
 	  END IF
 	END IF
 !
+	IF(INC_SHOCK_POWER)THEN
+	  CALL EVAL_SHOCK_POWER(dE_SHOCK_POWER,ND,SHOCK_POWER_FAC)
+	  STEQ_T_EHB=STEQ_T_EHB+SHOCK_POWER_FAC*dE_SHOCK_POWER
+	END IF
+!
 	IF(SN_MODEL .AND. INCL_RADIOACTIVE_DECAY)THEN
 	  IF(TREAT_NON_THERMAL_ELECTRONS)THEN
 	    STEQ_T_EHB=STEQ_T_EHB+dE_RAD_DECAY
 	  ELSE IF(SN_MODEL .AND. INCL_RADIOACTIVE_DECAY)THEN
 	    CALL EVAL_RAD_DECAY_V1(dE_RAD_DECAY,NT,ND)
-	    IF (INC_SHOCK_POWER)CALL EVAL_SHOCK_POWER(dE_SHOCK_POWER,ND,SHOCK_POWER_FAC)
 	  END IF
 	  IF(LST_ITERATION .AND. VERBOSE_OUTPUT)THEN
 	    WRITE(199,'(I10,2ES18.8,3X,A)')ML,STEQ_T(DPTH_INDX),BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),'SN_Rad_Decay'
@@ -4374,27 +4350,19 @@
 	    WRITE(LU_POP,'(A)')' Heating: radioactive decay (ergs/cm^3/s) '
 	    WRITE(LU_POP,'(1X,1P8E16.7)')dE_RAD_DECAY
 !
-! These are written to OBSFLUX, and hence do not need to be output to
-! RVTJ. They are not accessed by DISPGEN.
-!
-!	    WRITE(LU_POP,'(A)')' Continuum Frequencies (10^15 Hz)'
-!	    WRITE(LU_POP,'(1X,1P6E20.12)')(OBS_FREQ(I),I=1,N_OBS)
-!	    WRITE(LU_POP,'(A)')' Continuum Fluxes (Jy kpc^2)'
-!	    WRITE(LU_POP,'(1X,1P8E16.7)')(OBS_FLUX(I),I=1,N_OBS)
-!
 	    WRITE(LU_POP,'(A)')' Rosseland Mean Opacity'
 	    WRITE(LU_POP,'(1X,1P8E16.7)')(ROSS_MEAN(I),I=1,ND)
 	    WRITE(LU_POP,'(A)')' Flux Mean Opacity'
-	    WRITE(LU_POP,'(1X,1P8E16.7)')(FLUX_MEAN(I),I=1,ND); FLUSH(LU_POP)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(FLUX_MEAN(I),I=1,ND)
 	    WRITE(LU_POP,'(A)')' Planck Mean Opacity'
-	    WRITE(LU_POP,'(1X,1P8E16.7)')(PLANCK_MEAN(I),I=1,ND); FLUSH(LU_POP)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(PLANCK_MEAN(I),I=1,ND)
 	    WRITE(LU_POP,'(A)')' Absorption Mean Opacity'
 	    WRITE(LU_POP,'(1X,1P8E16.7)')(ABS_MEAN(I),I=1,ND); FLUSH(LU_POP)
 !
 	    WRITE(LU_POP,'(A)')' J moment of radiation field'
-	    WRITE(LU_POP,'(1X,1P8E16.7)')(J_INT(I)/LUM_SCL_FAC,I=1,ND); FLUSH(LU_POP)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(J_INT(I)/LUM_SCL_FAC,I=1,ND)
 	    WRITE(LU_POP,'(A)')' H moment of radiation field'
-	    WRITE(LU_POP,'(1X,1P8E16.7)')(H_INT(I)/LUM_SCL_FAC,I=1,ND); FLUSH(LU_POP)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(H_INT(I)/LUM_SCL_FAC,I=1,ND)
 	    WRITE(LU_POP,'(A)')' K moment of radiation field'
 	    WRITE(LU_POP,'(1X,1P8E16.7)')(K_INT(I)/LUM_SCL_FAC,I=1,ND); FLUSH(LU_POP)
 !

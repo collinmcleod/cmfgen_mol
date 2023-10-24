@@ -5,6 +5,7 @@
 	USE TWO_PHOT_MOD
 	IMPLICIT NONE
 !
+! Altered 24-Sep-2023: Updated to use consistent physical constants (Long ver -- 15-Oct-23)
 ! Altered 14-Jul-2015: Added two options to improve two photon absorption.
 !                        USE_TWO  - Uses actual radiation field from EDDFACTOR file.
 !                        USE_W    - Uses dilution factor.
@@ -27,13 +28,14 @@
 !
 	REAL(10) TA(ND)
 	REAL(10) TB(ND)
-	REAL(10) PLANKS_CONSTANT	!cgs units
 	REAL(10) PI
 	REAL(10) CONST
 	REAL(10) ETA_CONST	!Used to evaluate ETA
 	REAL(10) CHI_CONST	!Used to evaluate CHI
 	REAL(10) FREQ_B		!Frequency of other photon
 	REAL(10) T1,T2
+	EXTERNAL PLANCKS_CONSTANT
+	REAL(10) PLANCKS_CONSTANT	!cgs units
 !
 ! The 2-photon distribution functions, AY, are usually in wrtten in terms
 ! of the variable y=FREQ/MAX_FREQ, and which extends from 0 to 1.
@@ -48,7 +50,6 @@
 	INTEGER J,L,ML
 	INTEGER NL,NUP
 !
-	PLANKS_CONSTANT=6.626D-27			!cgs units
 	PI=4.0D0*ATAN(1.0D0)
 	LUER=ERROR_LU()
 	IF(TWO_METHOD .NE. TWO_PHOTON_METHOD)THEN
@@ -62,7 +63,7 @@
 ! We don't have to worry about the frequency units, as it is
 ! multilplied by a ratio of 2 frequencies.
 !
-	CONST=1.0D+10*PLANKS_CONSTANT/4.0D0/PI
+	CONST=1.0D+10*PLANCKS_CONSTANT()/4.0D0/PI
 !
 	DO J=1,N_TWO
 	  IF(TWO_PHOT_AVAILABLE(J) .AND. FREQ .LT. FREQ_TWO(J))THEN

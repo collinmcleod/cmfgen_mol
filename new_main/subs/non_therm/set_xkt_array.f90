@@ -13,14 +13,14 @@
 ! Created 13-Sep-2011 : Based on set_array (from Luc).
 !
       integer n              !Number of points in grid
-      real*8 x0 	     !Minimum energy in eV
-      real*8 x1              !Maximm energy in eV
-      real*8 x(n)            !Energy vector (returned)
-      real*8 dx(n)           !Quadrature weight
+      real(10) x0 	     !Minimum energy in eV
+      real(10) x1              !Maximm energy in eV
+      real(10) x(n)            !Energy vector (returned)
+      real(10) dx(n)           !Quadrature weight
       character*3 method     ! `lin' or 'log'
 !
       integer i
-      real*8 t1,x11
+      real(10) t1,x11
 !
       if ((method.ne.'lin').and.(method.ne.'log')) then
          write(6,*) ' method in set array not properly set'

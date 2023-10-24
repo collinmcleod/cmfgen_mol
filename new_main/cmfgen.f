@@ -12,6 +12,8 @@
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
+! Altered 02-Sep-2023: Now zero ABS_MEAN
+! Altered 24-Sep-2023: Updated phsical and opacity constants.
 ! Altered 20-Jan-2023: ABS_MEAN added. The code now checks that star models go to
 !                           sufficently high optical depth. It also issues a
 !                           warning when there is poor flux convergence.
@@ -72,30 +74,24 @@
 	INTEGER ISPEC
 	INTEGER NUM_IONS_RD
 !
-	INTEGER LUER,LUWARN
-	INTEGER ERROR_LU,WARNING_LU
-	EXTERNAL ERROR_LU,WARNING_LU
+	INTEGER  LUER,LUWARN
+	INTEGER  ERROR_LU,WARNING_LU
+	REAL(10)   PLANCKS_CONSTANT, FUN_PI, SPEED_OF_LIGHT, BOLTZMANN_CONSTANT
+	REAL(10)   ELECTRON_MASS, ELECTRON_CHARGE
+	EXTERNAL ERROR_LU,WARNING_LU, PLANCKS_CONSTANT, FUN_PI
+	EXTERNAL SPEED_OF_LIGHT, BOLTZMANN_CONSTANT, ELECTRON_CHARGE, ELECTRON_MASS
 !
 	LOGICAL AT_LEAST_ONE_ION_PRES
 	LOGICAL FND_END_OF_IONS
 	LOGICAL DO_TERM_OUT
 	CHARACTER(LEN=20) TIME
 !
-! Set constants.
-!
-	CHIBF=2.815D-06
-	CHIFF=3.69D-29
-	HDKT=4.7994145D0
-	TWOHCSQ=0.0147452575D0
-	OPLIN=2.6540081D+08
-	EMLIN=5.27296D-03
-	LUER=ERROR_LU()
-	LUWARN=WARNING_LU()
-!
-! Open output file for all errors and comments. Change DO_TERM_OUT to
+! Open output files for all errors and comments. Change DO_TERM_OUT to
 ! have the output go to the terminal/batch log file. NB: The WARNINGS
 ! file is overwritten.
 !
+	LUER=ERROR_LU()
+	LUWARN=WARNING_LU()
 	DO_TERM_OUT=.FALSE.                                   !TRUE.
 	IF(.NOT. DO_TERM_OUT)THEN
 	  CALL GEN_ASCI_OPEN(LUER,'OUTGEN','UNKNOWN','APPEND',' ',IZERO,IOS)
@@ -113,6 +109,26 @@
 	CALL SET_LINE_BUFFERING(LUWARN)
         CALL DATE_TIME(TIME)
         WRITE(LUER,'(//,'' Model started on:'',15X,(A))')TIME
+!
+! Set constants.
+!
+	CHIBF=2.815D-06
+	CHIFF=3.69D-29
+	HDKT=1.0D+11*PLANCKS_CONSTANT()/BOLTZMANN_CONSTANT()                                  !Old value: HDKT=4.7994145D0
+	TWOHCSQ=2.0D45*PLANCKS_CONSTANT()/(SPEED_OF_LIGHT())**2                               !Old value: TWOHCSQ=0.0147452575D0
+	OPLIN=1.0D+10*FUN_PI()*(ELECTRON_CHARGE())**2/ELECTRON_MASS()/SPEED_OF_LIGHT()        !Old value  OPLIN=2.6540081D+08
+	EMLIN=1.0D+25*PLANCKS_CONSTANT()/4.0D0/FUN_PI()                                       !Old value: EMLIN=5.27296D-03
+!
+	WRITE(LUER,*)' '
+	WRITE(LUER,*)' Opacity/excitaion parameters adopted in CMFGEN are:'
+	WRITE(LUER,'(30X,A,ES16.8)')'     CHIBF=',CHIBF
+	WRITE(LUER,'(30X,A,ES16.8)')'     CHIFF=',CHIFF
+	WRITE(LUER,'(30X,A,ES16.8)')'      HDKT=',HDKT
+	WRITE(LUER,'(30X,A,ES16.8)')' TWOHONCSQ=',TWOHCSQ
+	WRITE(LUER,'(30X,A,ES16.8)')'     OPLIN=',OPLIN
+	WRITE(LUER,'(30X,A,ES16.8)')'     EMLIN=',EMLIN
+	WRITE(LUER,*)' '
+	
 !
 ! Set all atomic data. New species can be simple added by insertion.
 ! Try to add species in order of atomic number. Hydrogen should ALWAYS
@@ -504,12 +520,12 @@
 !
 	  NF=ATM(ID)%NXzV_F
 	  NS=ATM(ID)%NXzV
-	                ALLOCATE (ATM(ID)%XzV(NS,ND),STAT=IOS)
+	                ALLOCATE (ATM(ID)%XzV(NS,ND),STAT=IOS);            ATM(ID)%XzV=0.0D0
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%XzVLTE(NS,ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%LOG_XzVLTE(NS,ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%dlnXzVLTE_dlnT(NS,ND),STAT=IOS)
 !
-	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%XzV_F(NF,ND),STAT=IOS)
+	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%XzV_F(NF,ND),STAT=IOS);          ATM(ID)%XzV_F=0.0D0
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%XzVLTE_F(NF,ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%LOG_XzVLTE_F(NF,ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%XzVLTE_F_ON_S(NF,ND),STAT=IOS)

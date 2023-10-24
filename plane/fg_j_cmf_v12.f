@@ -201,7 +201,7 @@
 	SUBROUTINE FG_J_CMF_V12(ETA,CHI,ESEC,V,SIGMA,R,P,
 	1                  JNU,FEDD,JQW,HQW,KQW,NQW,HMIDQW,NMIDQW,
 	1                  RETURNED_IN_HBC,RETURNED_OUT_HBC,IPLUS_P,
-	1                  FREQ,LOG_NU,DIF,DBB,IC,
+	1                  FREQ,dLOG_NU,DIF,DBB,IC,
 	1                  VDOP_VEC,VDOP_FRAC,REXT_FAC,
 	1                  METHOD,SOLUTION_OPTIONS,
 	1                  THK,INIT,NEW_FREQ,NC,NP,ND)
@@ -255,7 +255,7 @@
 	REAL(10) DBB
 	REAL(10) IC
 	REAL(10) FREQ
-	REAL(10) LOG_NU
+	REAL(10) dLOG_NU
 !
 	CHARACTER*(*) SOLUTION_OPTIONS
 	CHARACTER*6 METHOD
@@ -1123,16 +1123,16 @@
 	      OLDCHI(LS)=CHI_RAY(NI)
 	    ELSE IF(NEW_FREQ)THEN
 	      DO I=1,NI-1
-	        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*LOG_NU)
-	        Q(I)=GAM(I,LS)/(CHI_RAY(I)*LOG_NU)
+	        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*dLOG_NU)
+	        Q(I)=GAM(I,LS)/(CHI_RAY(I)*dLOG_NU)
 	      END DO
 	      QH(NI)=0.0D0
-	      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)
+	      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)
 	    END IF
 !
 	    IF(DIF .AND. LS .LE. NC)THEN
 	      T1=0.0D0
-	      IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)	     !Q(NI)
+	      IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)	     !Q(NI)
 	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI_RAY(NI)
 	1            *(1.0D0+T1*(1.0D0-CHI_RAY(NI)/OLDCHI(LS)))
 	    END IF
@@ -1383,9 +1383,9 @@ C
 	      Q(1:NI)=0.0D0
 	      SOURCE_RAY(1:NI)=ETA_RAY(1:NI)/CHI_RAY(1:NI)
 	    ELSE
-	      Q(1:NI)=GAM(1:NI,LS)/LOG_NU
+	      Q(1:NI)=GAM(1:NI,LS)/dLOG_NU
 	      CHI_RAY(1:NI)=CHI_RAY(1:NI)+Q(1:NI)
-	      dCHIdR_RAY(1:NI)=dCHIdR_RAY(1:NI)+dGAMdR(1:NI,LS)/LOG_NU
+	      dCHIdR_RAY(1:NI)=dCHIdR_RAY(1:NI)+dGAMdR(1:NI,LS)/dLOG_NU
 	      Q(1:NI)=Q(1:NI)/CHI_RAY(1:NI)
 	      SOURCE_RAY(1:NI)=ETA_RAY(1:NI)/CHI_RAY(1:NI)
 	    END IF

@@ -10,6 +10,8 @@ LIB2=$(LIB_DIR)libsubs.a
 # We only make dispgen.exe if there has been a changen to the main *.f files,
 # or if the libraries have changed since the last link.
 #
+##         $(LIB)(num_rec.o)\
+#
 OBJ    = $(LIB)(convolve.o)\
          $(LIB)(clip.o)\
          $(LIB)(compute_tau_radial.o)\
@@ -25,7 +27,6 @@ OBJ    = $(LIB)(convolve.o)\
          $(LIB)(h2abs.o)\
          $(LIB)(int_rec_ap.o)\
          $(LIB)(is_line_abs_v2.o)\
-         $(LIB)(num_rec.o)\
          $(LIB)(rd_ion_locations.o)\
          $(LIB)(rd_ion_locations_v2.o)\
          $(LIB)(rd_sing_pol_i.o)\

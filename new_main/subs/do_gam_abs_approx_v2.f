@@ -8,6 +8,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered: 26-Aug-2023 -- Updated to use new JTRPWGT_V2 and KTRPWGT_V2.
 ! Altered: 29-Oct-2018 -- Fixed up issues with clumping. Clumping can now vary with depth.
 ! Altered: 27-May-2016 -- CHI is now multiplied by CLUMP_FAC so that clumping is correctly accounted for.
 ! Altered: 29-Jan-2015 -- LOCAL_ABS_ENEGRY added to call. Fixed bug in luminosity calculation.
@@ -120,7 +121,7 @@
 	INTEGER I
 	INTEGER IOS
 	CHARACTER(LEN=132) STRING
-        EXTERNAL JTRPWGT,HTRPWGT,KTRPWGT,NTRPWGT
+        EXTERNAL JTRPWGT_V2,HTRPWGT_V2,KTRPWGT_V2,NTRPWGT_V2
 !
 ! NB: When using FQCOM_INC_V2, DBB=0 and the diffusion approximation
 ! will give the same result as a ZERO_FLUX option, and this will be
@@ -155,8 +156,8 @@
 	CALL MON_INTERP(ETA,ND,IONE,R,ND,TA,SM_ND,SM_R,SM_ND)
 !
 	CALL IMPAR(P,R,R(ND),NC,ND,NP)
-        CALL GENANGQW(JQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,JTRPWGT,.FALSE.)
-        CALL GENANGQW(KQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,KTRPWGT,.FALSE.)
+        CALL GENANGQW_V2(JQW,R,P,NC,ND,NP,JTRPWGT_V2,.FALSE.)
+        CALL GENANGQW_V2(KQW,R,P,NC,ND,NP,KTRPWGT_V2,.FALSE.)
 !
 ! The emissivity is actually ETA/4PI, but we would need to multiply again to get
 ! the absorbed energy.

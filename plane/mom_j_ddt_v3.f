@@ -130,7 +130,7 @@
 	1            V_SM,R_SM,F_SM,
 	1            JNU_SM,RSQHNU_SM,DJDt_TERM,
 	1            HFLUX_AT_IB,HFLUX_AT_OB,
-	1            VDOP_VEC,VDOP_FRAC,FREQ,LOG_NU,DBB,
+	1            VDOP_VEC,VDOP_FRAC,FREQ,dLOG_NU,DBB,
 	1            INNER_BND_METH,OUTER_BND_METH,
 	1            METHOD,COHERENT,INIT,NEW_FREQ,
 	1            DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,NC,NP,ND_SM,NCF)
@@ -193,7 +193,7 @@
 	REAL(10) RELAX_PARAM
 	REAL(10) DBB
 	REAL(10) FREQ
-	REAL(10) LOG_NU
+	REAL(10) dLOG_NU
 	CHARACTER*6 METHOD
 !
 	CHARACTER(LEN=*) OUTER_BND_METH
@@ -656,15 +656,15 @@
 !
 !
 ! Since we are integrating from blue to red, FL_PREV is always larger than
-! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.
+! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
 !
 	  DO I=1,ND-1
-	    GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )
+	    GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
 	    dH(I)=2.0D0*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
 	    dH_OLDT(I)=dH(I)*ROLD_ON_R
 	    W(I)=GAMH(I)+dH(I)
 	  END DO
-	  GAM(:)=CON_GAM(:)/CHI(:)/LOG_NU
+	  GAM(:)=CON_GAM(:)/CHI(:)/dLOG_NU
 	END IF
 !
 ! Even if it is the first frequency, we still need to allow for the time 

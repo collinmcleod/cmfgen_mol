@@ -9,6 +9,7 @@ C
 	1             ZION,SUB_PHOT,COL_FILE,OMEGA_COL,ED,T,ND)
 	IMPLICIT NONE
 C
+C Altered 24-Sep-2023 : Adjusted constants for consistency (LONG -- 15-Oct-2303).
 C Altered 24-Dec-1996 : SUB_PHOT replaces PHOT_FUN (superficial).
 C Altered 24-May-1995 : N_F_MAX removed using F90
 C Altered 01-Feb-1996 : Routine now calls SUBCOL_MULTI_V3 (not _V2). The _V3
@@ -18,8 +19,9 @@ C                        Changed to _V3 for consistency with SUBCOL.
 C Created 07-JUn-1995 :Based on COLGENCOOL
 C
 	EXTERNAL SUB_PHOT,OMEGA_COL
-	EXTERNAL ERROR_LU
+	EXTERNAL ERROR_LU, PLANCKS_CONSTANT
 	INTEGER ERROR_LU	
+        REAL(10) PLANCKS_CONSTANT
 C
 	INTEGER N_S,N_F,ND
 	REAL(10) COOL(ND),CRR(ND),CPR(ND)
@@ -47,7 +49,7 @@ C
 	REAL(10) OMEGA_F(N_F,N_F)
 	REAL(10) dln_OMEGA_F_dlnT(N_F,N_F)
 C
-	H=6.6261965D-12		!H*1.0E+15  (1.0E+15 due to times frequency)
+	H=PLANCKS_CONSTANT()*1.0D+15		!H*1.0E+15  (1.0E+15 due to times frequency)
 	TMP_ED=1.0D0
 C
 	DO I=1,ND			!Which depth

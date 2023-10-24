@@ -197,7 +197,7 @@
 	SUBROUTINE PP_FORM_CMF_V2(ETA,CHI,ESEC,V,SIGMA,R,
 	1               JNU,HNU,KNU,NNU,N_ON_J,
 	1               IN_HBC,HBC,HBC_INCID,NBC,NBC_INCID,
-	1               IPLUS_P,FREQ,LOG_NU,DIF,DBB,IC,
+	1               IPLUS_P,FREQ,dLOG_NU,DIF,DBB,IC,
 	1               VDOP_VEC,VDOP_FRAC,
 	1               METHOD,SOLUTION_OPTIONS,THK,INCL_INCID_RAD,
 	1               INIT,NEW_FREQ,N_TYPE,NP,ND)
@@ -234,7 +234,7 @@
 	REAL(10) VDOP_VEC(ND)
 	REAL(10) VDOP_FRAC
 !
-	REAL(10) DBB,IC,FREQ,LOG_NU
+	REAL(10) DBB,IC,FREQ,dLOG_NU
 	CHARACTER*(*) SOLUTION_OPTIONS
 	CHARACTER*6 METHOD
 	CHARACTER*6 N_TYPE
@@ -950,7 +950,7 @@
 	  ELSE
 	    DO LS=1,NP
 	      DO I=1,NI-1
-	        DTAU(I,LS)=TMPV(I)/MU(LS)+ 3.33564D-06*MU(LS)*(V_RAY(I)-V_RAY(I+1))/LOG_NU
+	        DTAU(I,LS)=TMPV(I)/MU(LS)+ 3.33564D-06*MU(LS)*(V_RAY(I)-V_RAY(I+1))/dLOG_NU
 	      END DO
 	    END DO
 	  END IF
@@ -995,16 +995,16 @@
 	      OLDCHI(LS)=CHI_RAY(NI)
 	    ELSE IF(NEW_FREQ)THEN
 	      DO I=1,NI-1
-	        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*LOG_NU)
-	        Q(I)=GAM(I,LS)/(CHI_RAY(I)*LOG_NU)
+	        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*dLOG_NU)
+	        Q(I)=GAM(I,LS)/(CHI_RAY(I)*dLOG_NU)
 	      END DO
 	      QH(NI)=0.0D0
-	      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)
+	      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)
 	    END IF
 !
 	    IF(DIF)THEN
 	      T1=0.0D0
-	      IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)	     !Q(NI)
+	      IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)	     !Q(NI)
 	      DBC=DBB*MU(LS)/CHI_RAY(NI)
 	1            *(1.0D0+T1*(1.0D0-CHI_RAY(NI)/OLDCHI(LS)))
 	    END IF
@@ -1194,7 +1194,7 @@ C
 	      Q(1:NI)=0.0D0
 	      SOURCE_RAY(1:NI)=ETA_RAY(1:NI)/CHI_RAY(1:NI)
 	    ELSE
-	      Q(1:NI)=GAM(1:NI,LS)/LOG_NU
+	      Q(1:NI)=GAM(1:NI,LS)/dLOG_NU
 	      SOURCE_RAY(1:NI)=ETA_RAY(1:NI)/(Q(1:NI)+CHI_RAY(1:NI))
 	      Q(1:NI)=Q(1:NI)/(Q(1:NI)+CHI_RAY(1:NI))
 	    END IF

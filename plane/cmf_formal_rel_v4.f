@@ -29,7 +29,7 @@
 	SUBROUTINE CMF_FORMAL_REL_V4
 	1           (ETA,CHI,ESEC,V,SIGMA,R,P,
 	1            JNU,FEDD,RET_HNU_AT_IB,RET_HNU_AT_OB,IPLUS,
-	1            FREQ,LOG_NU,B_PLANCK,DBB,
+	1            FREQ,dLOG_NU,B_PLANCK,DBB,
 	1            INNER_BND_METH,THICK_OB,
 	1            VDOP_VEC,VDOP_FRAC,REXT_FAC,
 	1            METHOD,INITIALIZE,NEW_FREQ,NC,NP,ND)
@@ -73,7 +73,7 @@
 	REAL(10) B_PLANCK
 	REAL(10) DBB
 	REAL(10) FREQ
-	REAL(10) LOG_NU
+	REAL(10) dLOG_NU
 !
 	CHARACTER*6 METHOD
 !
@@ -137,7 +137,7 @@
 	IF(INITIALIZE)THEN
 	  NU_ON_dNU=0.0D0
 	ELSE
-	  NU_ON_dNU=1.0D0/LOG_NU
+	  NU_ON_dNU=1.0D0/dLOG_NU
 	END IF
 !
 ! Allocate data for moments which will be used to construct the Eddington 
@@ -540,7 +540,7 @@
 !	      WRITE(LUER,*)'Check file CMF_FORMAL_REL_ERRORS'
 !	      OPEN(UNIT=7,FILE='CMF_FORMAL_REL_ERRORS',STATUS='UNKNOWN')
 !	        WRITE(7,*)IP,NRAY
-!	        WRITE(7,'(6ES14.4)')FREQ,LOG_NU,NU_ON_dNU,B_PLANCK,DBB
+!	        WRITE(7,'(6ES14.4)')FREQ,dLOG_NU,NU_ON_dNU,B_PLANCK,DBB
 !	        WRITE(7,'(A)')' '
 !	        DO I=1,NRAY
 !	          WRITE(7,'(8ES14.4)')CHI_RAY(I),ETA_RAY(I),

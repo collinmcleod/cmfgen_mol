@@ -225,7 +225,7 @@
 !
 	SUBROUTINE MOM_JREL_V5(ETA_SM,CHI_SM,ESEC_SM,V_SM,SIGMA_SM,R_SM,
 	1               JNU_SM,RSQHNU_SM,VDOP_VEC,VDOP_FRAC,
-	1               FREQ,LOG_NU,DIF,DBB,IC,METHOD,COHERENT,N_TYPE,
+	1               FREQ,dLOG_NU,DIF,DBB,IC,METHOD,COHERENT,N_TYPE,
 	1               INCL_ADVEC_TERMS,INCL_REL_TERMS,INIT,ND_SM)
 	USE MOD_JREL_V5
 	USE MOD_RAY_MOM_STORE
@@ -256,7 +256,7 @@
 ! Boundary conditions: Must be supplied.
 !
 	REAL(10) DBB,IC
-	REAL(10) FREQ,LOG_NU
+	REAL(10) FREQ,dLOG_NU
 	CHARACTER*6 METHOD
 !
 ! INIT is used to indicate that there is no coupling to the previous frequency.
@@ -610,14 +610,14 @@
 !
 	IF(.NOT. INIT)THEN
 !
-! We are integrating from blue to red. LOG_NU is define as vd / dv which is 
+! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
 ! the same as d / d ln v.
 !
 ! EPS is used if we define N in terms of J rather than H, This is sometimes
 ! useful as H can approach zero, and hence N/H is undefined.
 !
 	  DO I=1,ND-1
-	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
 	    W(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*NMID_ON_HMID(I))
 	    WPREV(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*NMID_ON_HMID_PREV(I))
 	    EPS(I)=DELTAH(I)*(CON_dNdNUH(I)*NMID_ON_J(I)+
@@ -627,9 +627,9 @@
 	  END DO
 !
 	  DO I=2,ND
-	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
 	  END DO
-	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
 !
 ! PSIPREV is equivalent to the U vector of FORMSOL.
 !
@@ -722,11 +722,11 @@
 	    XM(ND)=GAM_REL(ND)*R(ND)*R(ND)*HNU_AT_IB
 !
 	    IF(.NOT. INIT)THEN
-	      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/LOG_NU
+	      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/dLOG_NU
 	      XM(ND)=XM(ND)-T1*K_ON_J_PREV(ND)*GAM_RSQJNU_PREV(ND)
 	      TB(ND)=TB(ND)-T1*K_ON_J(ND)
 	      T1=GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)-1.0D0
-	      XM(ND)=XM(ND)+GAM_REL(ND)*R(ND)*BETA(ND)*( (HNU_AT_IB-HNU_AT_IB_PREV) + T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/LOG_NU
+	      XM(ND)=XM(ND)+GAM_REL(ND)*R(ND)*BETA(ND)*( (HNU_AT_IB-HNU_AT_IB_PREV) + T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/dLOG_NU
 	    END IF
 !	    XM(ND)=0.0D0   !GAM_REL(ND)*R(ND)*R(ND)*IN_HBC
 !	    TA(ND)=0.0D0; TC(ND)=0.0D0

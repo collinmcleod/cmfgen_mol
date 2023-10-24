@@ -114,7 +114,7 @@
 	1                  V_SM,SIGMA_SM,R_SM,
 	1                  JNU,RSQHNU_SM,
 	1                  VDOP_VEC,VDOP_FRAC,
-	1                  FREQ,LOG_NU,
+	1                  FREQ,dLOG_NU,
 	1                  INNER_BND_METH,DBB,IC,IB_STAB_FACTOR,
 	1                  N_TYPE,H_CHK_OPTION,METHOD,COHERENT,OUT_BC_TYPE,
 	1                  INIT,NEW_FREQ,NC,NP,ND_SM)
@@ -152,7 +152,7 @@
 ! Boundary conditions.
 !
 	INTEGER OUT_BC_TYPE
-	REAL(10) DBB,IC,FREQ,LOG_NU
+	REAL(10) DBB,IC,FREQ,dLOG_NU
 	REAL(10) IB_STAB_FACTOR
 	CHARACTER(LEN=*) INNER_BND_METH
 	CHARACTER(LEN=*) H_CHK_OPTION
@@ -535,20 +535,20 @@
 	  CON_GAM(ND)=3.33564D-06*V(ND)/R(ND)
 !
 ! Since we are intgerating from blue to red, FL_PREV is always larger than
-! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.
+! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
 !
 ! EPS is used if we define N in terms of J rather than H, This is sometimes
 ! useful as H can approach zero, and hence N/H is undefined.
 !
 	  IF(N_TYPE .EQ. 'G_ONLY')THEN
 	    DO I=1,ND-1
-	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )
+	      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
 	      W(I)=GAMH(I)*( 1.0D0+AV_SIGMA(I)*NMID_ON_HMID(I) )
 	      WPREV(I)=GAMH(I)*( 1.0D0+AV_SIGMA(I)*NMID_ON_HMID_PREV(I) )
 	    END DO
 	  ELSE
 	    DO I=1,ND-1
-	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )
+	      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
 	      W(I)=GAMH(I)*( 1.0D0+AV_SIGMA(I)*NMID_ON_HMID(I) )
 	      WPREV(I)=GAMH(I)*( 1.0D0+AV_SIGMA(I)*NMID_ON_HMID_PREV(I) )
 	      EPS(I)=GAMH(I)*AV_SIGMA(I)*NMID_ON_J(I)/(1.0D0+W(I))
@@ -557,7 +557,7 @@
 	  END IF
 !
 	  DO I=1,ND
-	    GAM(I)=CON_GAM(I)/CHI(I)/LOG_NU
+	    GAM(I)=CON_GAM(I)/CHI(I)/dLOG_NU
 	  END DO
 !
 	END IF

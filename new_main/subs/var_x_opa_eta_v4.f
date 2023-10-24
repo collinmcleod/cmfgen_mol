@@ -93,17 +93,45 @@
 	  LTE_POP_SUM(1:ND)=0.0D0
 	  dLTE_SUM_VEC(1:ND)=0.0D0
 !
-!$OMP PARALLEL DO PRIVATE(I,LEV,J)
-	  DO I=1,N_A
-	    LEV=EQ_A+I-1
-            IF( IMP_VAR(LEV) )THEN
-	      DO J=J_D_ST,ND
+!!$OMP PARALLEL DO PRIVATE(I,LEV,J)
+!	  DO I=1,N_A
+!	    LEV=EQ_A+I-1
+!           IF( IMP_VAR(LEV) )THEN
+!	      WRITE(6,*)N_A,I,LEV; FLUSH(UNIT=6)
+!	      DO J=J_D_ST,ND
+!	        WRITE(6,*)VCHI(LEV,J),ALPHA; FLUSH(UNIT=6)
+!	        WRITE(6,*)LTE_POP_SUM(J); FLUSH(UNIT=6)
+!	        WRITE(6,*)HNST_A(I,J); FLUSH(UNIT=6)
+!	        VCHI(LEV,J)=VCHI(LEV,J)+ALPHA
+!	        LTE_POP_SUM(J)=LTE_POP_SUM(J)+HNST_A(I,J)
+!	        dLTE_SUM_VEC(J)=dLTE_SUM_VEC(J)+HNST_A(I,J)*dlnHNST_AdlnT(I,J)
+!	      END DO
+!	    END IF
+!	  END DO
+!
+	  IF(J_D_ST .EQ. ND)THEN
+	    J=ND
+	    DO I=1,N_A
+	      LEV=EQ_A+I-1
+              IF( IMP_VAR(LEV) )THEN
 	        VCHI(LEV,J)=VCHI(LEV,J)+ALPHA
 	        LTE_POP_SUM(J)=LTE_POP_SUM(J)+HNST_A(I,J)
 	        dLTE_SUM_VEC(J)=dLTE_SUM_VEC(J)+HNST_A(I,J)*dlnHNST_AdlnT(I,J)
+	      END IF
+	    END DO
+	  ELSE
+!$OMP PARALLEL DO PRIVATE(I,LEV,J)
+	    DO J=J_D_ST,ND
+	      DO I=1,N_A
+	        LEV=EQ_A+I-1
+                IF( IMP_VAR(LEV) )THEN
+	          VCHI(LEV,J)=VCHI(LEV,J)+ALPHA
+	          LTE_POP_SUM(J)=LTE_POP_SUM(J)+HNST_A(I,J)
+	          dLTE_SUM_VEC(J)=dLTE_SUM_VEC(J)+HNST_A(I,J)*dlnHNST_AdlnT(I,J)
+	        END IF
 	      END DO
-	    END IF
-	  END DO
+	    END DO
+	  END IF
 !
 ! If LTE_POP_SUM is zero, we have no IMPORTANT variables.
 !

@@ -88,7 +88,7 @@
 	1                  TX,TVX,TX_DIF_d_T,TX_DIF_d_dTdR,
 	1                  TVX_DIF_d_T,TVX_DIF_d_dTdR,
 	1                  KI,WORKMAT,RHS_dHdCHI,F,
-	1                  DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,INIT,FREQ,LOG_NU,
+	1                  DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,INIT,FREQ,dLOG_NU,
 	1                  dTdR,DBB,dDBBdT,
 	1                  DO_THIS_TX_MATRIX,METHOD,
 	1                  INNER_BND_METH,OUTER_BND_METH,
@@ -138,7 +138,7 @@
 	REAL(10) RSQH_AT_IB
 	REAL(10) RSQH_AT_OB
 !
-	REAL(10) LOG_NU,dTdR,DBB,dDBBdT,IC
+	REAL(10) dLOG_NU,dTdR,DBB,dDBBdT,IC
 	REAL(10) dNU_TERM_DIF_BC
 	REAL(10) dRHSdCHI_IB
 	REAL(10) dRHSdCHI_OB
@@ -305,14 +305,14 @@
 	  CHI_AT_INB_PREV=1.0D0
 	ELSE
 	  DO I=1,ND-1
-	    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/LOG_NU/( CHI(I)+CHI(I+1) )/C_KMS
+	    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/dLOG_NU/( CHI(I)+CHI(I+1) )/C_KMS
 	    dH(I)=2.0D0*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
 	    dH_OLDT(I)=dH(I)*ROLD_ON_R
 	    W(I)=GAMH(I)+dH(I)
 	    WPREV(I)=GAMH(I)
 	  END DO
 	  DO I=1,ND
-	    GAM(I)=V(I)/R(I)/CHI(I)/LOG_NU/C_KMS
+	    GAM(I)=V(I)/R(I)/CHI(I)/dLOG_NU/C_KMS
 	  END DO
 	  T1=R_FAC_FOR_J*ROLD_ON_R*ROLD_ON_R
 	  DO I=2,ND-1

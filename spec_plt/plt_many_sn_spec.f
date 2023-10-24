@@ -151,7 +151,7 @@
 	  END DO
 	END DO
 	WRITE(6,*)'Read in SN terminal velocities'
-	WRITE(6,'(A,T20,A,4X,A,3X,A)')'Model','Age(days)','logt','Vinf(kms)'
+	WRITE(6,'(A,T20,A,4X,A,3X,A)')'Model','Age(days)','dlogt','Vinf(kms)'
 	DO I=1,NMOD
 	  WRITE(6,'(A,T20,F9.3,3X,F6.3,4X,F8.1)')TRIM(DIR_NAME(I)),SN_AGE(I),
 	1            SN_AGE(I)/SN_AGE(MAX(I-1,1)),VINF(I)

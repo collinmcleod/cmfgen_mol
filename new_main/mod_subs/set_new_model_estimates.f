@@ -149,8 +149,7 @@
 ! too allow NDOLD in the input files to be larger than ND.
 ! The first call to REGRIDWS is effectively used to compute DHeI only.
 !
-	WRITE(6,*)'Calling AUTO_ADD_ION'
-	FLUSH(UNIT=6)
+	WRITE(6,*)'Calling AUTO_ADD_ION';  FLUSH(UNIT=6)
 	CALL AUTO_ADD_ION() 
 	IF(GRID) THEN
 	  WRITE(LUER,'(/,A,/)')' Using direct interpolation option (i.e. GRID) for new model.'
@@ -296,14 +295,17 @@
 !
 	  ELSE IF(DC_INTERP_METHOD .EQ. 'R' .OR. DC_INTERP_METHOD .EQ. 'TR')THEN
 !
-! We use TA for ED and TB for T since ED and T have already been set.
-!
-	    WRITE(LUER,*)'Departure coefficients assumed to be function of R.'
+	    TC(1:ND)=ED(1:ND)*CLUMP_FAC(1:ND)
+	    IF(DC_INTERP_METHOD .EQ. 'R')THEN
+	      WRITE(LUER,*)'Departure coefficients assumed to be function of R.'
+	    ELSE
+	      WRITE(LUER,*)'Departure coefficients assumed to be function of R and T.'
+	    END IF
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        TMP_STRING=TRIM(ION_ID(ID))//'_IN'
 	        ISPEC=SPECIES_LNK(ID)
-	        CALL REGRID_LOG_DC_V1( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,CLUMP_FAC,
+	        CALL REGRID_LOG_DC_V1( ATM(ID)%XzV_F,R,TC,T, ATM(ID)%DXzV_F,CLUMP_FAC,
 	1             ATM(ID)%EDGEXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
 	1             POP_SPECIES(1,ISPEC),ATM(ID)%NXzV_F,ND,LUIN,DC_INTERP_METHOD,TMP_STRING)
 	      END IF

@@ -32,7 +32,7 @@
 	1               TX,TVX,TX_DIF_d_T,TX_DIF_d_dTdR,
 	1               TVX_DIF_d_T,TVX_DIF_d_dTdR,
 	1               KI,WORKMAT,RHS_dHdCHI,
-	1               INIT,LOG_NU,
+	1               INIT,dLOG_NU,
 	1               INNER_BND_METH,dTdR,DBB,dDBBdT,IC,IB_STAB_FACTOR,
 	1               FREQ,H_CHK_OPTION,OUT_BC_TYPE,
 	1               DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
@@ -90,7 +90,7 @@
 !
 	LOGICAL DO_THIS_TX_MATRIX(NM)
 !
-	REAL(10) LOG_NU,dTdR,DBB,dDBBdT,IC
+	REAL(10) dLOG_NU,dTdR,DBB,dDBBdT,IC
 	REAL(10) FREQ
 	REAL(10) IB_STAB_FACTOR
 	CHARACTER*6 METHOD
@@ -185,7 +185,7 @@
 	  DO I=1,ND-1
 	    AV_SIGMA=0.5D0*(SIGMA(I)+SIGMA(I+1))
 	    GAMH(I)=2.0D0*3.33564D-06*(V(I)+V(I+1))/(R(I)+R(I+1))
-	1         /LOG_NU/( CHI(I)+CHI(I+1) )
+	1         /dLOG_NU/( CHI(I)+CHI(I+1) )
 	    W(I)=GAMH(I)*( 1.0D0+AV_SIGMA*NMID_ON_HMID(I) )
 	    WPREV(I)=GAMH(I)*( 1.0D0+AV_SIGMA*NMID_ON_HMID_PREV(I) )
 	    EPS_A(I)=GAMH(I)*AV_SIGMA*NMID_ON_J(I)/(1.0D0+W(I))
@@ -196,7 +196,7 @@
 	    EPS_PREV_A(I)=EPS_PREV_A(I)*R(I)*R(I)
 	  END DO
 	  DO I=1,ND
-	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/LOG_NU
+	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/dLOG_NU
 	  END DO
 !
 ! PSIPREV is equivalent to the U vector of FORMSOL.

@@ -29,6 +29,7 @@ C Altered 12-May-88 - NV put at 150. Check put on ND
 C Altered 26-Aug-91 - When computing VB(I) routine had
 C                        +-AV(I)*T2/ETAL(I) )*AQW(I,LS)
 C                     (ie two operators). Minus sign is correct.
+C Altered 15-Oct-2023 - Fixed bug -- DACOS was relaced by COS instead of ACOS.
 C
 	SUBROUTINE SOBJBAR(SOURCE,CHI,CHIL,ETAL,V,SIGMA,R,P,AQW,
 	1                  JBAR,ZNET,VB,VC,BETA,BETAC,
@@ -104,7 +105,7 @@ C SOURCE(1) is the boundary continuum source function.
 C
 	  IF(THICK)THEN
 	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-COS(P(LS)/R(1)))/P(LS)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF

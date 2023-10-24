@@ -228,10 +228,6 @@
 	      T2=T2+( HN_S(L,I)*DCNM(L,J)-HN_S(J,I)*DCNM(J,L) )
 	    END DO
 	    SE(ID)%STEQ(J,I)=SE(ID)%STEQ(J,I)+(T1+(HNST_S(J,I)-HN_S(J,I))*CNM(J,J))*ED(I)
-!	    IF(ZION .EQ. 3 .AND. J .EQ. 56 .AND. I .EQ. 5)THEN
-!	      WRITE(174,'(F5.1,I5,7ES16.5E4)')ZION,ID,T1,HNST_S(J,I),HN_S(J,I),CNM(J,J),ED(I),SE(ID)%STEQ(J,I),OMEGA_F(83,83)
-!	      FLUSH(UNIT=174)
-!	     END IF
 	  END DO
 !
 	  IF(COMPUTE_BA)THEN
@@ -318,10 +314,6 @@
 	    SE(ID)%BA(JJ,VION,M,I)=SE(ID)%BA(JJ,VION,M,I)+1.0D0
 	    JJ=EQGS+N_S
 	    BA_ED(JJ,M,I)=BA_ED(JJ,M,I)+ZION
-	  END IF
-	  IF(ZION .EQ. 3 .AND.  I .EQ. 5)THEN
-	    WRITE(174,'(F5.1,I5,6ES16.5E4)')ZION,ID,SE(ID)%STEQ(56,I)
-	    FLUSH(UNIT=174)
 	  END IF
 !
 	END DO		!Loop over depth (I)

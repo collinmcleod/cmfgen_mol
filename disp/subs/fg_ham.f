@@ -19,6 +19,7 @@ C Created 10-May-1989 Based on FG_COMP and HAM_FORMSOL.
 C Altered 12-May-1989 - Thick boundary condition in EW section fixed.
 C Altered 02-Jun-1989 - Thick boundary correction corrected. HBC was
 C                       being computed incorrectly.
+C Altered 15-Oct-2023 - Fixed bug -- DACOS was relaced by COS instead of ACOS.
 C
 	SUBROUTINE FG_HAM(ETA,CHI,ESEC,JCONT,
 	1                  CHIL,ETAL,V,SIGMA,R,P,
@@ -156,7 +157,7 @@ C Determine boundary condition for continuum intensity.
 C
 	  IF(THK_CONT)THEN
 	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-COS(P(LS)/R(1)))/P(LS)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF

@@ -237,6 +237,7 @@
         INTEGER,   PARAMETER :: INT_ONE=1
         INTEGER,   PARAMETER :: NSNG=1
         CHARACTER*1, PARAMETER :: NO_TRANS='N'
+	CHARACTER(LEN=50) TMP_STR
 !
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
@@ -351,6 +352,13 @@
 	    FIRST_MATRIX=.FALSE.
 !
 	    STEQ_STORE(:,K)=STEQ(:,K)
+!
+!	  WRITE(TMP_STR,'(I2)')K; TMP_STR='BA_ASCI_N_D'//ADJUSTL(TMP_STR)
+!	  OPEN(UNIT=96,FILE=TMP_STR,STATUS='UNKNOWN')
+!           CALL WR2D_MA(POPS(1,K),N,1,'POPS_D1',96)
+!           CALL WR2D_MA(STEQ(1,K),N,1,'STEQ_VEC_D1',96)
+!            CALL WR2D_MA(C_MAT,N,N,'C_MAT_D1',96)
+!         CLOSE(UNIT=96)
 !
 ! Perform the LU decomposition using DGETRF. We first equilibrize the matrix
 ! using DGEEQU sot the the maximum row and column values are approximately

@@ -23,8 +23,10 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(check_hydro_def.o)\
       $(LIB)(check_ions_present.o)\
       $(LIB)(check_tmin.o)\
+      $(LIB)(chk_cool_rates_consist.o)\
       $(LIB)(cmf_blkband_v3.o)\
       $(LIB)(create_iv_links_v2.o)\
+      $(LIB)(def_new_rg_v1.o)\
       $(LIB)(determine_nse.o)\
       $(LIB)(det_lte_ed.o)\
       $(LIB)(ddt_work.o)\

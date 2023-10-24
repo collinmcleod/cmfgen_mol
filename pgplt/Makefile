@@ -18,6 +18,7 @@ OBJ = $(LIB)(mod_curve_data.o)\
       $(LIB)(arrange_pg_curve_ids.o)\
       $(LIB)(change_color.o)\
       $(LIB)(change_pen.o)\
+      $(LIB)(change_xaxis_gridding.o)\
       $(LIB)(curve.o)\
       $(LIB)(curve_lab.o)\
       $(LIB)(cut_points_from_plot.o)\
@@ -86,7 +87,7 @@ $(LIB) : $(OBJ)
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f 
-	$(F90) -c $(FD)  $<
+	$(F90) -c $(FG)  $<
 	ar $(AR_OPTION) $(LIB) $*.o
 
 # 

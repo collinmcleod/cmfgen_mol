@@ -7,6 +7,7 @@
 	1               POPATOM,N,ND,LU_IN,INTERP_OPTION,FILE_NAME)
 	IMPLICIT NONE
 !
+! Altered 21-Aug-2023 - Fixed issue with TR option and rounding.
 ! Altered 20-Aug-2022 - Error/warning messages improved for TR option.
 ! Altered 31-May-2022 - Added RNS option: R grid not scaled.
 ! Altered 06-Dec-2021 - Removed write ED, OLD_E from ED option.
@@ -276,18 +277,21 @@
 !
 	ELSE IF(INTERP_OPTION .EQ. 'TR')THEN
 !
+! This code may have issues if T is very nomonotonic.
+!
 	  TMIN=MINVAL(OLD_T)
 	  TMAX=MAXVAL(OLD_T)
 	  JMIN=MINLOC(OLD_T,IONE)
 	  OLD_DI=LOG(OLD_DI)
+	  OLD_X=LOG(OLD_ED*OLD_CLUMP_FAC)
 	  DO I=1,ND
-	    IF(T(I) .LT. TMIN)THEN
+	    IF(T(I) .LT. TMIN .AND. ABS(LOG(OLD_X(JMIN)/ED(I))) .LT. 1.0D0)THEN
 	       DHEN(1:NZ,I)=DPOP(1:NZ,JMIN)
 	       DI(I)=EXP(OLD_DI(JMIN))
 	    ELSE
 	      JINT=0	    
 	      DO J=1,NDOLD-1
-	        IF( (T(I)-OLD_T(J))*(OLD_T(J+1)-T(I)) .GE. 0)THEN
+	        IF( (T(I)-OLD_T(J))*(OLD_T(J+1)-T(I)) .GE. -1.0D-10)THEN
 	          IF(JINT .EQ. 0)THEN
 	            JINT=J
 	          ELSE
@@ -306,7 +310,7 @@
 	          DI(I)=EXP(OLD_DI(NDOLD))
 	      ELSE IF(JINT .EQ. 0 .AND. T(I) .LE. TMIN)THEN 
 	          IF(FIRST .AND. T(I) .LT. 0.9999*TMIN)THEN
-	            WRITE(6,'(/,A)')'Warning: T at outer boundary outside old model range in REGRID_LOG_DC_V1'
+	            WRITE(6,'(/,A)')'Warning: T outside old model range in REGRID_LOG_DC_V1'
 	            WRITE(6,'(2A,3(10X,A))')'    I',' JINT','T(I)','TMIN','TMAX'
 	            WRITE(6,'(2I5,3E16.6)')I,JINT,T(I),TMIN,TMAX
 	            FLUSH(UNIT=6)

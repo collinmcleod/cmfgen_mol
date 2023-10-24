@@ -12,6 +12,7 @@
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
+! Altered 24-Sep-2023 : Adjusted constants for consistency.
 ! Altered 04-Apr-2011 - Changed check on whether minval is zero (added XzVLTE_MIN).
 ! Altered 05-Apr-2011 - Bug fixed and cleaned.
 ! Created 01-Feb-2011 - Based on prrr_sl_v6.f 
@@ -27,6 +28,8 @@
 	REAL(10) T1,T2
 	REAL(10) LOG_JB_RAT
 	REAL(10) H
+        REAL(10) PLANCKS_CONSTANT
+        EXTERNAL PLANCKS_CONSTANT
 !
 ! ConstantS for opacity etC.
 !
@@ -47,7 +50,7 @@
 	  END DO
 	END IF
 !
-        H=6.6261965D-12                                 !ergs/s (*1.0E+15 due to *nu)
+        H=PLANCKS_CONSTANT()*1.0D+15                                 !ergs/s (*1.0E+15 due to *nu)
 !
 ! Note that JREC     = Int [ (2hv^3/c^2 +J) exp(-hv/kT)/v dv ]
 !           JREC_CR  = Int [ (2hv^3/c^2 +J) exp(-hv/kT)   dv ]

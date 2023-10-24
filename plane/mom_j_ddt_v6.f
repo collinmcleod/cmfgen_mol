@@ -132,7 +132,7 @@
 	1            V_SM,R_SM,F_SM,
 	1            JNU_SM,RSQHNU_SM,DJDt_TERM,
 	1            HFLUX_AT_IB,HFLUX_AT_OB,
-	1            VDOP_VEC,VDOP_FRAC,FREQ,LOG_NU,DBB,
+	1            VDOP_VEC,VDOP_FRAC,FREQ,dLOG_NU,DBB,
 	1            XM_CHK_OPTION,J_CHK_OPTION,H_CHK_OPTION,
 	1            INNER_BND_METH,OUTER_BND_METH,
 	1            METHOD,COHERENT,INIT,NEW_FREQ,
@@ -141,6 +141,7 @@
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
+! Altered: 20-Aug-2023 : Fixed out-of bound issue with MOM_ERR_ON_FREQ in first error.
 ! Altered: 29-Apr-2018 : Added XM_CHK_OPTION. Changed to V6
 ! Altered: 18-Apr-2018 : Added J_CHK_OPTION
 !                        Improved handling of J < 0.
@@ -203,7 +204,7 @@
 	REAL(10) RELAX_PARAM
 	REAL(10) DBB
 	REAL(10) FREQ
-	REAL(10) LOG_NU
+	REAL(10) dLOG_NU
 	CHARACTER*6 METHOD
 !
 	CHARACTER(LEN=*) OUTER_BND_METH
@@ -682,15 +683,15 @@
 !
 !
 ! Since we are integrating from blue to red, FL_PREV is always larger than
-! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.
+! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
 !
 	  DO I=1,ND-1
-	    GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )
+	    GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
 	    dH(I)=2.0D0*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
 	    dH_OLDT(I)=dH(I)*ROLD_ON_R
 	    W(I)=GAMH(I)+dH(I)
 	  END DO
-	  GAM(:)=CON_GAM(:)/CHI(:)/LOG_NU
+	  GAM(:)=CON_GAM(:)/CHI(:)/dLOG_NU
 	END IF
 !
 ! Even if it is the first frequency, we still need to allow for the time 
@@ -937,7 +938,10 @@
 	      STOP
 	    END IF
 	    IF(.NOT. RECORDED_ERROR)THEN
-	      IF(MOM_ERR_CNT .GT. N_ERR_MAX)THEN
+	      IF(MOM_ERR_CNT .EQ. 0)THEN
+	        MOM_ERR_CNT=MOM_ERR_CNT+1
+	        MOM_ERR_ON_FREQ(MOM_ERR_CNT)=FREQ
+	      ELSE IF(MOM_ERR_CNT .GT. N_ERR_MAX)THEN
 	        MOM_ERR_CNT=MOM_ERR_CNT+1
 	      ELSE IF(MOM_ERR_ON_FREQ(MOM_ERR_CNT) .NE. FREQ)THEN
 	        MOM_ERR_CNT=MOM_ERR_CNT+1

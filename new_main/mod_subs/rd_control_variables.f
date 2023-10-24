@@ -561,9 +561,18 @@
 	1      'Atomic mass to be used in Doppler profile (amu''s)')
 	    CALL RD_STORE_DBLE(VTURB,'VTURB',L_TRUE,
 	1      'Turbulent velocity to be used in Doppler profile (km/s)')
-	    VTURB_MIN=VTURB; VTURB_MAX=VTURB
+	    VTURB_MIN=VTURB; VTURB_MAX=VTURB; VTURB_POW=1; VTURB_LAW='POW'
 	    GLOBAL_LINE_PROF='DOP_FIX'
 	  ELSE
+	    VTURB_LAW='POW'; VTURB_POW=1
+	    CALL RD_STORE_NCHAR(VTURB_LAW,'VTURB_LAW',ITEN,L_FALSE,
+	1      'Law describing variation of turbulent velocity with V')
+	    CALL RD_STORE_DBLE(VTURB_POW,'VTURB_POW',L_FALSE,
+	1      'Power describing variation of turbulent velocity with V')
+	    IF(VTURB_LAW .EQ. 'TRUNC_POW')THEN
+	      CALL RD_STORE_DBLE(VTURB_VEND,'VTURB_VEND',L_TRUE,
+	1        'V(km/s) at which lineare increase in Vturb ends')
+	    END IF
 	    CALL RD_STORE_DBLE(VTURB_MIN,'VTURB_MIN',L_TRUE,
 	1      'Minimum turbulent velocity for Doppler profile (km/s)')
 	    CALL RD_STORE_DBLE(VTURB_MAX,'VTURB_MAX',L_TRUE,

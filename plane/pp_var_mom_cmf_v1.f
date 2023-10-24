@@ -63,7 +63,7 @@
 	1              TVX_DIF_d_T,TVX_DIF_d_dTdR,F,G,N_ON_J,
 	1              IN_HBC,HBC,HBC_INCID,NBC,NBC_INCID,
 	1              INIT,REALLOCATE_ARRAYS,
-	1              LOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
+	1              dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
 	1              DO_THIS_TX_MATRIX,METHOD,COHERENT,ND,NM)
 	USE PP_VAR_MOM_CMF_MOD_V1
 	IMPLICIT NONE
@@ -97,7 +97,7 @@
 	REAL(10) NBC,NBC_INCID
 	REAL(10) IN_HBC
 !
-	REAL(10) LOG_NU
+	REAL(10) dLOG_NU
 	REAL(10) dTdR
 	REAL(10) DBB
 	REAL(10) dDBBdT
@@ -209,14 +209,14 @@
 	  DO I=1,ND-1
 	    AV_SIGMA=0.5D0*(SIGMA(I)+SIGMA(I+1))
 	    GAMH(I)=2.0D0*3.33564D-06*(V(I)+V(I+1))/(R(I)+R(I+1))
-	1         /LOG_NU/(CHI(I)+CHI(I+1))
+	1         /dLOG_NU/(CHI(I)+CHI(I+1))
 	    W(I)=GAMH(I)*(1.0D0+AV_SIGMA)*G(I)
 	    WPREV(I)=GAMH(I)*(1.0D0+AV_SIGMA)*G_PREV(I)
 	    EPS(I)=GAMH(I)*(1.0D0+AV_SIGMA)*N_ON_J(I)/(1.0D0+W(I))
 	    EPS_PREV(I)=GAMH(I)*(1.0D0+AV_SIGMA)*N_ON_J_PREV(I)/(1.0D0+W(I))
 	  END DO
 	  DO I=1,ND
-	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/LOG_NU
+	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/dLOG_NU
 	  END DO
 !
 ! PSIPREV is equivalent to the U vector of FORMSOL.

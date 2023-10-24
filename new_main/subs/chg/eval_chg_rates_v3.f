@@ -9,6 +9,7 @@
 	USE CHG_EXCH_MOD_V3
 	IMPLICIT NONE
 !
+! Altered 24-Dec-2024 : Now used call to get Planck's constant (LONG ver -- 15-Oct-23).
 ! Altered 12-Dec-2000 : Fixed reaction evaluation for TYPE_CHG=3
 ! Altered 10-Sep-2000 : THI_CHG limit not being correctly utilized.
 ! Altered 01-Oct-1999 : TLO_CHG and THI_CHG installed.
@@ -27,7 +28,9 @@
 	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
-	REAL(10), PARAMETER :: H=6.6261965D-27
+	REAL(10) H
+	REAL(10) PLANCKS_CONSTANT
+	EXTERNAL PLANCKS_CONSTANT
 !
 ! Local variables.
 !
@@ -46,6 +49,7 @@
 ! be zero even if no charge reactions are included since they are tested in
 ! WRRECOMCHKB.
 !
+	H=1.0D+15*PLANCKS_CONSTANT()
 	CHG_PR(:)=0.0D0
 	CHG_RR(:)=0.0D0
 	IF(.NOT. DO_CHG_EXCH)RETURN
@@ -107,7 +111,7 @@
 ! rate in ergs/cm^3/sec.
 !
 	        IF( SPECIES .EQ. SPEC_ID_CHG(J,2))THEN
-	          COOL_CHG(J,L)=COOL_CHG(J,L)*(FRD_R-REV_R)*H*1.0D+15
+	          COOL_CHG(J,L)=COOL_CHG(J,L)*(FRD_R-REV_R)*H
 	        END IF
 !
 	      END DO			!L (depth)

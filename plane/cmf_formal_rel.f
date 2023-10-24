@@ -40,7 +40,7 @@
 	1                  K_ON_J_MID,RSQN_MID_ON_RSQJ,N_ON_H_MID,
 	1                  IN_HBC,HBC,NBC,
 	1                  IPLUS,MU_AT_RMAX,HQW_AT_RMAX,
-	1                  FREQ,LOG_NU,DIF,B_PLANCK,DBB,IC,THICK_OB,
+	1                  FREQ,dLOG_NU,DIF,B_PLANCK,DBB,IC,THICK_OB,
 	1                  N_TYPE,VDOP_VEC,VDOP_FRAC,
 	1                  METHOD,INITIALIZE,NEW_FREQ,NC,NP,ND)
         USE EXT_REL_GRID
@@ -87,7 +87,7 @@
 	REAL(10) DBB
 	REAL(10) IC
 	REAL(10) FREQ
-	REAL(10) LOG_NU
+	REAL(10) dLOG_NU
 	CHARACTER*6 METHOD
 	CHARACTER*6 N_TYPE
 	LOGICAL DIF		!Use diffusion approximation
@@ -146,9 +146,9 @@
 	IF(INITIALIZE)THEN
 	  NU_ON_dNU=0.0D0
 	ELSE
-	  NU_ON_dNU=1.0D0/LOG_NU
+	  NU_ON_dNU=1.0D0/dLOG_NU
 	END IF
-!	IF(LOG_NU .NE. 0.0D0)NU_ON_dNU=1.0D0/LOG_NU
+!	IF(dLOG_NU .NE. 0.0D0)NU_ON_dNU=1.0D0/dLOG_NU
 !
 ! Check to see whether we have a new R grid, or the solution options have
 ! change. This can only happen when INIT is TRUE.
@@ -425,7 +425,7 @@
 	    IF( I_P_GRID(ID) .LT. 0 .OR. I_M_GRID(ID) .LT. 0.0D0)THEN
 	      WRITE(145,*)'Error: invalid intensities is SOVE_CMF_REL'
 	      WRITE(145,*)IP,NRAY
-	      WRITE(145,'(4ES14.4)')FREQ,LOG_NU,B_PLANCK,DBB
+	      WRITE(145,'(4ES14.4)')FREQ,dLOG_NU,B_PLANCK,DBB
 	      WRITE(145,'(A)')' '
 	      DO I=1,NRAY
 	        WRITE(145,'(4ES14.4)')CHI_RAY(I),ETA_RAY(I),RAY(IP)%I_P(I),RAY(IP)%I_M(I)

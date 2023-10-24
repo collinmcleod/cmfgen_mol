@@ -228,7 +228,7 @@
 	SUBROUTINE MOM_JREL_V7(ETA_SM,CHI_SM,ESEC_SM,V_SM,SIGMA_SM,R_SM,
 	1               JNU_SM,RSQHNU_SM,HFLUX_AT_IB,HFLUX_AT_OB,
 	1               VDOP_VEC,VDOP_FRAC,
-	1               FREQ,LOG_NU,DBB,IB_STAB_FACTOR,
+	1               FREQ,dLOG_NU,DBB,IB_STAB_FACTOR,
 	1               INNER_BND_METH,OUTER_BND_METH,METHOD,COHERENT,N_TYPE,
 	1               INCL_ADVEC_TERMS,INCL_REL_TERMS,INIT,ND_SM)
 	USE MOD_JREL_V7
@@ -242,7 +242,7 @@
 !                          Modified error output to MOM_J_ERRORS
 !                          [OSPREY/cur_cmf_gam: 24-Jan-2015]
 ! Altered: 15-Feb-2014 : Changed to V7. Added IB_STAB_FACTOR to call.
-! Altered: 28-Jan-2012 : Minor bug fix. LOG_NU was being used with HOLLOW option when INIT was true.
+! Altered: 28-Jan-2012 : Minor bug fix. dLOG_NU was being used with HOLLOW option when INIT was true.
 ! Altered: 25-Aug-2010 : Bug fix with IN_NBC_SAVE/ IN_HBC_SAVE. Both values
 !                          incorrectly set because of type'o.
 ! Altered: 17-Dec-2009 : Call changed: changed to V6
@@ -281,7 +281,7 @@
 	CHARACTER(LEN=*) INNER_BND_METH
 	CHARACTER(LEN=*) OUTER_BND_METH
 !
-	REAL(10) FREQ,LOG_NU
+	REAL(10) FREQ,dLOG_NU
 	CHARACTER*6 METHOD
 !
 ! INIT is used to indicate that there is no coupling to the previous frequency.
@@ -651,14 +651,14 @@
 !
 	IF(.NOT. INIT)THEN
 !
-! We are integrating from blue to red. LOG_NU is define as vd / dv which is 
+! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
 ! the same as d / d ln v.
 !
 ! EPS is used if we define N in terms of J rather than H, This is sometimes
 ! useful as H can approach zero, and hence N/H is undefined.
 !
 	  DO I=1,ND-1
-	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
 	    W(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*NMID_ON_HMID(I))
 	    WPREV(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*NMID_ON_HMID_PREV(I))
 	    EPS(I)=DELTAH(I)*(CON_dNdNUH(I)*NMID_ON_J(I)+
@@ -668,9 +668,9 @@
 	  END DO
 !
 	  DO I=2,ND
-	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
 	  END DO
-	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
 !
 ! PSIPREV is equivalent to the U vector of FORMSOL.
 !
@@ -790,7 +790,7 @@
 	      XM(ND)=RSQ_HP-FPLUS*RSQ_JP/DTAU-(1.0D0-FPLUS)*RSQ_JP/R(ND)/CHI(ND)
 	      XM(ND-1)=XM(ND-1)-RSQ_JP*TC(ND-1)
 	    ELSE
-	      T1=CON_DELTA(ND)/LOG_NU/CHI(ND)
+	      T1=CON_DELTA(ND)/dLOG_NU/CHI(ND)
 	      TA(ND)=-K_ON_J(ND-1)/DTAU
 	      TB(ND)=FMIN/DTAU + (1.0D0-FMIN)/R(ND)/CHI(ND) + HMIN*(1.0D0+T1)
 	      XM(ND)=RSQ_HP-FPLUS*RSQ_JP/DTAU- (1.0D0-FPLUS)*RSQ_JP/R(ND)/CHI(ND)
@@ -808,12 +808,12 @@
 	    TB(ND)=(K_ON_J(ND)+VdHdR_TERM(ND))/DTAU_H(ND-1)
 	    XM(ND)=GAM_REL(ND)*R(ND)*R(ND)*HNU_AT_IB
 	    IF(.NOT. INIT)THEN
-	      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/LOG_NU
+	      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/dLOG_NU
 	      XM(ND)=XM(ND)-T1*K_ON_J_PREV(ND)*GAM_RSQJNU_PREV(ND)
 	      TB(ND)=TB(ND)-T1*K_ON_J(ND)
 	      T1=GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)-1.0D0
 	      XM(ND)=XM(ND)+GAM_REL(ND)*R(ND)*BETA(ND)*( (HNU_AT_IB-HNU_AT_IB_PREV) +
-	1                   T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/LOG_NU
+	1                   T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/dLOG_NU
 	    END IF
 	  END IF
 	  TC(ND)=0.0D0

@@ -7,6 +7,7 @@
 	USE TWO_PHOT_MOD
 	IMPLICIT NONE
 !
+! Altered 24-Sep-2023: Updated to use consistent physical constants (24-Sep-223).
 ! Altered 01-Oct-2015 : Added TWO_METHOD option (passed by module). i
 ! Created 26-Jun-1998
 !
@@ -30,6 +31,8 @@
 	REAL(10) CHI_CONST
 	REAL(10) T1
 	REAL(10) FREQ_B
+	REAL(10) PLANCKS_CONSTANT
+	EXTERNAL PLANCKS_CONSTANT
 !
 ! See TWO_PHOT_OPAC for definitions
 !
@@ -41,7 +44,7 @@
 	INTEGER J,L
 	INTEGER NL,NUP
 	
-	h=6.626D-27			!cgs units
+	h=PLANCKS_CONSTANT()			!cgs units
 	PI=4.0D0*ATAN(1.0D0)
 	CONST=1.0D+10*H/4.0D0/PI
 !
