@@ -48,6 +48,7 @@
 !
 	IMPLICIT NONE
 !
+! Altered 25-Oct-2023 : Added error messages concerning MAX_N_PQN and MAX_L_PQN (20-Aug-2023) 
 ! Altered 15-Nov-2021 : Fixed call to XCROSS_V2 for type 31. Added STOP type 30.
 ! Altered 09-Oct-2018 : Now set the b-f gaunt factor to unity for n>30  (previously crashed).
 ! Altered 07-Oct-2015 : Bug fix for Type 7 (modified Seaton formula).
@@ -319,6 +320,28 @@ C
 	            N=NINT( PD(ID)%CROSS_A(LMIN) )
 	            LST=NINT( PD(ID)%CROSS_A(LMIN+1) )
 	            LEND=NINT( PD(ID)%CROSS_A(LMIN+2) )
+!
+	            IF(N .GT. MAX_N_PQN)THEN
+	              WRITE(6,*)'Error in SUB_PHOT_GEN -- invalid N value for cross-section type 8' 
+	              WRITE(6,*)'Maximum N value is ',MAX_N_PQN
+	              WRITE(6,*)'N,LST,LEND=',N,LST,LEND
+	              WRITE(6,*)'ID=',ID,'NLEVS=',NLEVS
+	              WRITE(6,*)'PHOT_ID=',PHOT_ID,'SET_TO_EDGE=',SET_TO_EDGE
+	              WRITE(6,*)'TERM=',TERM,K,PD(ID)%CROSS_TYPE(TERM,K)
+	              FLUSH(UNIT=6)
+	              STOP
+	            END IF
+!
+	            IF(LST .GT. MAX_L_PQN .OR. LEND .GT. MAX_L_PQN)THEN
+	              WRITE(6,*)'Error in SUB_PHOT_GEN -- invalid L value for cross-section type 8' 
+	              WRITE(6,*)'Maximum L value is ',MAX_L_PQN
+	              WRITE(6,*)'N,LST,LEND=',N,LST,LEND
+	              WRITE(6,*)'ID=',ID,'NLEVS=',NLEVS
+	              WRITE(6,*)'PHOT_ID=',PHOT_ID,'SET_TO_EDGE=',SET_TO_EDGE
+	              WRITE(6,*)'TERM=',TERM,K,PD(ID)%CROSS_TYPE(TERM,K)
+	              FLUSH(UNIT=6)
+	              STOP
+	            END IF
 !
 	            X=LOG10(U)
 	            RJ=X/L_DEL_U

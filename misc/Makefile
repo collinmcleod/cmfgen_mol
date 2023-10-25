@@ -50,6 +50,8 @@ EXE   =  $(EXE_DIR)wr_f_to_s.exe\
          $(EXE_DIR)n_multi_merge.exe\
          $(EXE_DIR)rewrite_scr.exe\
          $(EXE_DIR)rewrite_dc_v2.exe\
+         $(EXE_DIR)rewrite_old_model_data.exe\
+         $(EXE_DIR)rewrite_jh.exe\
          $(EXE_DIR)rev_rdinr.exe\
          $(EXE_DIR)rev_rvsig.exe\
          $(EXE_DIR)recomz.exe\
