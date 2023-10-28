@@ -298,10 +298,12 @@
 	END DO
 !
 	IF(COUNTER .EQ. NCF_OLD .AND. NU .LT. NUST(NSM))THEN
-	  WRITE(LU_ER,*)'Warning in GET_JH_AT_PREV_TIME_STEP'
-	  WRITE(LU_ER,*)'Invalid minmum frequency --- outside range'
-	  WRITE(LU_ER,*)'NU=',NU
-	  WRITE(LU_ER,*)'NUST=',NUST(NSM)
+	  IF(ABS(NU/NUST(1)-1.0D0) .GT. 1.0D-10)THEN
+	    WRITE(LU_ER,*)'Warning in GET_JH_AT_PREV_TIME_STEP'
+	    WRITE(LU_ER,*)'Invalid minimum frequency --- outside range'
+	    WRITE(LU_ER,*)'NU=',NU
+	    WRITE(LU_ER,*)'NUST=',NUST(NSM)
+	  END IF
 	END IF
 !
 	IF(INIT .AND. NU .GT. NUST(1))THEN

@@ -114,7 +114,8 @@ UP_MODS= $(LIB_DIR)libmod.a(mod_cmfgen.o)\
        $(LIB_DIR)libmod.a(opac_mod.o)\
        $(LIB_DIR)libmod.a(radiation_mod.o)\
        $(LIB_DIR)libmod.a(steq_data_mod.o)\
-       $(LIB_DIR)libmod.a(var_rad_mod.o)
+       $(LIB_DIR)libmod.a(var_rad_mod.o)\
+       $(LIB_DIR)libmod.a(wr_levels_links.o)
 
 
 # Note: Not all files depend on mod_cmfgen and steq_data_mod, but assuming this dependency
@@ -165,6 +166,10 @@ $(LIB)(update_ba_for_line.o) : update_ba_for_line.f $(UP_MODS)
 $(LIB)(var_op_v10.o) : var_op_v10.f $(DIS)
 	$(F90) -c $(OPTION)  var_op_v10.f
 	ar $(AR_OPTION) $(LIB) var_op_v10.o
+
+$(LIB)(wr_level_links.o) : wr_level_links.f $(MOD)
+	$(F90) -c $(OPTION)  wr_level_links.f
+	ar $(AR_OPTION) $(LIB) wr_level_links.o
 
 $(STEQ):
 	(cd ../mod_subs ; make)
