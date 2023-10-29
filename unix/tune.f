@@ -1,5 +1,5 @@
 C
-C Routine to replace VMS TUNE routine for collecting tuning statistics for 
+C Routine to replace VMS TUNE routine for collecting tuning statistics for
 C a program section.
 C
 C Usage:
@@ -22,6 +22,7 @@ C NB: Total time for each code section is accumulated on successive calls.
 C i.e. TUNE(1,'Unique ID') does not initialize the counters.
 C
         SUBROUTINE TUNE(LRUN,IDENT)
+	USE SET_KIND_MODULE
         IMPLICIT NONE
 !
 ! Altered 18-Feb-2013 : MAX_IDS increased. STACK introduced.
@@ -37,14 +38,14 @@ C
 !
 	INTEGER, PARAMETER :: MAX_IDS=80
 !
-        REAL(10), SAVE :: T0,OVERHEAD
-        REAL(10), SAVE :: ST_CPU(MAX_IDS)
-	REAL(10), SAVE :: CPUTOT(MAX_IDS)
-        REAL(10), SAVE :: WALLTOT(MAX_IDS)
+        REAL(KIND=LDP), SAVE :: T0,OVERHEAD
+        REAL(KIND=LDP), SAVE :: ST_CPU(MAX_IDS)
+	REAL(KIND=LDP), SAVE :: CPUTOT(MAX_IDS)
+        REAL(KIND=LDP), SAVE :: WALLTOT(MAX_IDS)
 	INTEGER, SAVE :: STACK(MAX_IDS)
         CHARACTER(LEN=20), SAVE ::  IDLIST(MAX_IDS)
 !
-	REAL(10), SAVE :: RR0
+	REAL(KIND=LDP), SAVE :: RR0
 	INTEGER*8, SAVE :: IEND_WALL
 	INTEGER*8, SAVE :: IC0,IR0,IM0,IT1
 	INTEGER*8, SAVE :: IST_WALL(MAX_IDS)
@@ -52,7 +53,7 @@ C
         INTEGER, SAVE :: NUM_STACK
 !
 	INTEGER LUOUT
-	INTEGER CURRENT_ID 
+	INTEGER CURRENT_ID
 	INTEGER ACTIVE_ID
         INTEGER I,LU,TERM_OUT
 	EXTERNAL TERM_OUT
@@ -93,7 +94,7 @@ C
         ENDIF
 !
 ! If LRUN =1, we are beginning the TIME bracket. Therefore we find the
-! correct storage location first. 
+! correct storage location first.
 !
 	IF (LRUN .EQ. 1) THEN
 	  DO I=NUM_IDS,1,-1
@@ -106,7 +107,7 @@ C
 	    END IF
 	  END DO
 	  NUM_IDS=NUM_IDS+1
-	  IF(NUM_IDS .LE. MAX_IDS)THEN 
+	  IF(NUM_IDS .LE. MAX_IDS)THEN
 	    I=NUM_IDS
 	    IDLIST(I)=IDENT
 	    NUM_STACK=NUM_STACK+1
@@ -127,10 +128,10 @@ C
 !
 	ELSE IF (LRUN .EQ. 2) THEN
 !
-! If LRUN=2, we are ending the TIME bracket. Therefore we call the timing 
+! If LRUN=2, we are ending the TIME bracket. Therefore we call the timing
 ! routine first.
 !
-! If TUNE has called been called correctly, then STACK should always be set correctly. 
+! If TUNE has called been called correctly, then STACK should always be set correctly.
 !
           T0=ETIME(TARRY)
 	  CALL SYSTEM_CLOCK(IEND_WALL)
@@ -201,6 +202,6 @@ C
 	  WRITE(LU,*)' LRUN=',LRUN
 	  STOP
 	ENDIF
-        
+
 	RETURN
 	END

@@ -5,8 +5,8 @@
 !    Shock X_RAY emisison
 !    Mechanical energy term
 !    Deposition of radioactive energy etc
-! 
-! On entry LINE_LUM should contain r^2 * EMISSIVITY at radius R 
+!
+! On entry LINE_LUM should contain r^2 * EMISSIVITY at radius R
 !  (possibly corrected for the LOCAL escape probablity).
 !
 ! We compute the amount of energy emitted between R(I) and R(I+1), and
@@ -14,16 +14,17 @@
 ! rule (i.e. the trapazoidal rule with a correction for the first derivatives).
 !
 	SUBROUTINE LUM_FROM_ETA_V2(LINE_LUM,R,METHOD,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 19-Jan-2014 - Based on LUM_FROM_ETA (included METHOD in call).
 !
 	INTEGER ND
-	REAL(10) LINE_LUM(ND)
-	REAL(10) R(ND)
+	REAL(KIND=LDP) LINE_LUM(ND)
+	REAL(KIND=LDP) R(ND)
 	CHARACTER(LEN=*) METHOD
 !
-	REAL(10) DERIV(ND)
+	REAL(KIND=LDP) DERIV(ND)
 	INTEGER I
 !
 ! We compute the amount of energy emitted between R(I) and R(I+1), and
@@ -41,7 +42,7 @@
 	END IF
 !
 	DO I=1,ND-1
-	  LINE_LUM(I)=0.5D0*(R(I)-R(I+1))*( LINE_LUM(I)+LINE_LUM(I+1) 
+	  LINE_LUM(I)=0.5D0*(R(I)-R(I+1))*( LINE_LUM(I)+LINE_LUM(I+1)
 	1            +(R(I)-R(I+1))*(DERIV(I+1)-DERIV(I))/6.0D0 )
 	END DO
 	LINE_LUM(ND)=0.0D0

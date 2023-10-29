@@ -4,6 +4,7 @@ C computation of the mean intensity. The weights are based on
 C the technique illustrated by Nordulund.
 C
 	SUBROUTINE NORDANGQW(QW,R,P,TA,TB,TC,NC,ND,NP,MOMWEIGHT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 06-Sep-2002 - Check before taking SQRT installed (for INTEL compiler).
@@ -11,12 +12,12 @@ C Altered 24-May-1996 - IMPLICIT NONE installed.
 C Created 25-Nov-1986
 C
 	INTEGER NC,ND,NP
-	REAL(10) QW(ND,NP),R(ND),TA(NP),TB(NP),TC(NP),P(NP)
+	REAL(KIND=LDP) QW(ND,NP),R(ND),TA(NP),TB(NP),TC(NP),P(NP)
 C
 C Local variables
 C
 	INTEGER I,J,NW
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 C
 	DO 10 I=1,NP
 	  TA(I)=P(I)*P(I)

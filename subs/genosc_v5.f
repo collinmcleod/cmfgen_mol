@@ -1,8 +1,8 @@
 C
 C Subroutine to compute the oscillator strengths and Einstein A coefficients
-C for an arbitrary species. Two auxilary arrays are returned. One of 
-C these indicates if the transition is allowed and contains a transition 
-C number. The second array is used to indicate the transitions of secondary 
+C for an arbitrary species. Two auxilary arrays are returned. One of
+C these indicates if the transition is allowed and contains a transition
+C number. The second array is used to indicate the transitions of secondary
 C importance.
 C
 	SUBROUTINE GENOSC_V5(EINA,FEDGE,STAT_WT,LEVNAME,
@@ -10,6 +10,7 @@ C
 	1                   OSCDATE,N,NTRET,
 	1                   GF_CUT,LEV_CUT,
 	1                   LUIN,LUOUT,FILNAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 05-Feb-1998 - ROutine allways cut out "negative" oscillator strengths.
@@ -19,12 +20,12 @@ C                       CUT_CNT instituted.
 C                       GEN_SEQ_OPEN removed.
 C                       Addittional levelnames are NOT stored in LOCNAME.
 C                       IONE inserted in RD_FREE_VAL calls.
-C Altered 24-OCt-1995 - GION deleted fromc all an now readin with 
+C Altered 24-OCt-1995 - GION deleted fromc all an now readin with
 C                       photoionization cross section.
 C                       Blanks suppresed from beginning of level names.
 C
 C Altered 05-Oct-1995 - GION inserted in call. GION represents the statistical
-C                       weight of the next ionization stage and is used in 
+C                       weight of the next ionization stage and is used in
 C                       the absence of that ionization stage.
 C Altered  1-Aug-1995 - GF_CUT and LEV_CUT installed.
 C Altered 27-Jul-1995 - Bug fix. Oscilator strengths were not read in when
@@ -34,29 +35,29 @@ C Created 30-May-1995 - Based on GENOSCIL --- called V2 for this reason.
 C                       Arrays SECND and TRANS were deleted from call.
 C
 	INTEGER N,NTRET,LUIN,LUOUT
-	REAL(10) EINA(N,N),FEDGE(N),STAT_WT(N)
-	REAL(10) IONIZATION_EN,ZION
+	REAL(KIND=LDP) EINA(N,N),FEDGE(N),STAT_WT(N)
+	REAL(KIND=LDP) IONIZATION_EN,ZION
 	CHARACTER*(*) LEVNAME(N)
 	CHARACTER*(*) FILNAME,OSCDATE
 C
 C The following allows us to ignore transitions with gf < GF_CUT and whose
 C lower level is > LEV_CUT.
 C
-	REAL(10) GF_CUT
+	REAL(KIND=LDP) GF_CUT
 	INTEGER LEV_CUT
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 C
 C External functions.
 C
 	EXTERNAL SPEED_OF_LIGHT,ICHRLEN,RD_FREE_VAL,ERROR_LU
-	REAL(10) SPEED_OF_LIGHT,RD_FREE_VAL
+	REAL(KIND=LDP) SPEED_OF_LIGHT,RD_FREE_VAL
 	INTEGER ICHRLEN,ERROR_LU
 C
 C Local variables
 C
 	CHARACTER*30 LOCNAME(N)
-	REAL(10) T1,SPEED_LIGHT
+	REAL(KIND=LDP) T1,SPEED_LIGHT
 	INTEGER I,J,K,NW,L1,L2,IOS,BIGLEN,MAXLEN,LUER,CUT_CNT
 	CHARACTER*132 STRING
 	INTEGER, PARAMETER :: IZERO=0
@@ -138,7 +139,7 @@ C
 	  READ(LUIN,'(A)')STRING
 	  J=ICHRLEN(STRING)
 	  WRITE(LUOUT,'(A)')STRING(1:J)
-	  L1=INDEX(STRING,'!Ionization energy') 
+	  L1=INDEX(STRING,'!Ionization energy')
 	  IF(L1 .NE. 0)THEN
 	    L1=INDEX(STRING,'  ')
 	    DESC='IOnization energy read in GENOSCIL-'//FILNAME
@@ -152,7 +153,7 @@ C
 	  READ(LUIN,'(A)')STRING
 	  J=ICHRLEN(STRING)
 	  WRITE(LUOUT,'(A)')STRING(1:J)
-	  L1=INDEX(STRING,'!Screened nuclear charge') 
+	  L1=INDEX(STRING,'!Screened nuclear charge')
 	  IF(L1 .NE. 0)THEN
 	    L1=INDEX(STRING,'  ')
 	    DESC='NW Read in GENOSCIL-'//FILNAME
@@ -183,12 +184,12 @@ C
 	  IF(STRING .NE. ' ')THEN
 	    WRITE(LUER,*)'Error reading blank(1) from '//FILNAME
 	    STOP
-	  END IF	    
+	  END IF	
 C
 C We first read the record into a character string so that we can do
 C an unformatted read on the real variables. LEVNAME name (or transition)
-C must be separated by at least 2 spaces from the real data. 
-C Level names need not be the same length. Note that FEDGE is initially 
+C must be separated by at least 2 spaces from the real data.
+C Level names need not be the same length. Note that FEDGE is initially
 C the excitation energy in cm^-1.
 C
 	  BIGLEN=0
@@ -302,7 +303,7 @@ C Compute the Einstein A coefficients.
 C
 	T1=OPLIN/EMLIN*TWOHCSQ
 	DO I=1,N-1
-	  DO J=I+1,N                
+	  DO J=I+1,N
 	    EINA(J,I)=T1*EINA(I,J)*STAT_WT(I)/STAT_WT(J)
 	1     *( (FEDGE(I)-FEDGE(J))**2 )
 	  END DO

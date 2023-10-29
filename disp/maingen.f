@@ -7,6 +7,7 @@
 	1                    ND,NP,NC,
 	1                    N_MAX,ND_MAX,NC_MAX,NP_MAX,
 	1                    N_LINE_MAX,N_PLT_MAX)
+	USE SET_KIND_MODULE
 	USE MOD_DISP
 	USE MOD_USR_OPTION
 	USE MOD_USR_HIDDEN
@@ -62,13 +63,13 @@
 ! altered  12/16/96  DLM  Changed USRINP call to USR_OPTION.  USR_OPTION
 !                         is a generic subroutine call which is defined in
 !                         MOD_USR_OPTION.  The interface in MOD_USR_OPTION
-!                         determines which usr_option subroutine to call by 
+!                         determines which usr_option subroutine to call by
 !                         examining the types of variables passed to USR_OPTION.
 !
 !                         .sve files created by SVE_FILE routines
 !
 !                         Also cleaned up a few places:
-!                           1) Changed all comparisons to input value X to compare 
+!                           1) Changed all comparisons to input value X to compare
 !                              to X(1:?) => needed by new .sve routines.
 !                           2) Changed LOGR and LINR options to XLOGR and XLINR
 !                              to be consistant => needed by new .sve routines.
@@ -82,7 +83,7 @@
 	INTEGER N_MAX,ND_MAX,NC_MAX,NP_MAX
 	INTEGER N_LINE_MAX,N_PLT_MAX
 !
-	REAL(10) LUM,RMDOT
+	REAL(KIND=LDP) LUM,RMDOT
 !
 	INTEGER, PARAMETER :: NLF_MAX=1001
 !
@@ -92,21 +93,21 @@
 !
 ! 
 !
-	REAL(10) EINA
-	REAL(10) OSCIL
-	REAL(10) GUPDIE
-	REAL(10) GLDGU
-	REAL(10) EDGEDIE
-	REAL(10) GLOW
-	REAL(10) NUST(ND)
+	REAL(KIND=LDP) EINA
+	REAL(KIND=LDP) OSCIL
+	REAL(KIND=LDP) GUPDIE
+	REAL(KIND=LDP) GLDGU
+	REAL(KIND=LDP) EDGEDIE
+	REAL(KIND=LDP) GLOW
+	REAL(KIND=LDP) NUST(ND)
 ! 
 !
 ! Arrays containing LINE frequencies in numerical order.
 !
-	REAL(10) VEC_FREQ(N_LINE_MAX)
-	REAL(10) VEC_OSCIL(N_LINE_MAX)
-	REAL(10) VEC_EINA(N_LINE_MAX)
-	REAL(10) VEC_DP_WRK(N_LINE_MAX)
+	REAL(KIND=LDP) VEC_FREQ(N_LINE_MAX)
+	REAL(KIND=LDP) VEC_OSCIL(N_LINE_MAX)
+	REAL(KIND=LDP) VEC_EINA(N_LINE_MAX)
+	REAL(KIND=LDP) VEC_DP_WRK(N_LINE_MAX)
 	INTEGER VEC_INDX(N_LINE_MAX)
 	INTEGER VEC_ION_INDX(N_LINE_MAX)
 	INTEGER VEC_MNL_F(N_LINE_MAX)
@@ -123,48 +124,48 @@
 !
 ! Angular quadrature weights.
 !
-	REAL(10) P(NP)				!Impact parameters
-	REAL(10) JQW(ND,NP),HMIDQW(ND,NP)
-	REAL(10) KQW(ND,NP),NMIDQW(ND,NP)
-	REAL(10) HQW(ND,NP)
+	REAL(KIND=LDP) P(NP)				!Impact parameters
+	REAL(KIND=LDP) JQW(ND,NP),HMIDQW(ND,NP)
+	REAL(KIND=LDP) KQW(ND,NP),NMIDQW(ND,NP)
+	REAL(KIND=LDP) HQW(ND,NP)
 !
 ! Note that PFDOP contains the lineprofile in doppler units, whilst
 ! PF is use for the line profile in frequency units.
 !
-	REAL(10) LINE_PRO(NLF_MAX),LFQW(NLF_MAX),PF(NLF_MAX)
-	REAL(10) ERF(NLF_MAX),PFDOP(NLF_MAX)
-	REAL(10) JNU(ND,NLF_MAX+1),HNU(ND,NLF_MAX+1)
-	REAL(10) FEDD(ND,NLF_MAX+1),GEDD(ND,NLF_MAX+1)
-	REAL(10) HBC_VEC(3,NLF_MAX+1),NBC_VEC(3,NLF_MAX+1)
-	REAL(10) INBC_VEC(NLF_MAX+1)
-	REAL(10) TDOP,VTURB
+	REAL(KIND=LDP) LINE_PRO(NLF_MAX),LFQW(NLF_MAX),PF(NLF_MAX)
+	REAL(KIND=LDP) ERF(NLF_MAX),PFDOP(NLF_MAX)
+	REAL(KIND=LDP) JNU(ND,NLF_MAX+1),HNU(ND,NLF_MAX+1)
+	REAL(KIND=LDP) FEDD(ND,NLF_MAX+1),GEDD(ND,NLF_MAX+1)
+	REAL(KIND=LDP) HBC_VEC(3,NLF_MAX+1),NBC_VEC(3,NLF_MAX+1)
+	REAL(KIND=LDP) INBC_VEC(NLF_MAX+1)
+	REAL(KIND=LDP) TDOP,VTURB
 !
-	REAL(10) JBAR(ND),ZNET(ND)
-	REAL(10) CHIROSS(ND),TAUROSS(ND)
+	REAL(KIND=LDP) JBAR(ND),ZNET(ND)
+	REAL(KIND=LDP) CHIROSS(ND),TAUROSS(ND)
 !
 ! Generalized work vectors.
 !
-	REAL(10) TA(MAX(NP_MAX,N_MAX))
-	REAL(10) TB(MAX(NP_MAX,N_MAX))
-	REAL(10) TC(MAX(NP_MAX,N_MAX))
+	REAL(KIND=LDP) TA(MAX(NP_MAX,N_MAX))
+	REAL(KIND=LDP) TB(MAX(NP_MAX,N_MAX))
+	REAL(KIND=LDP) TC(MAX(NP_MAX,N_MAX))
 !
 ! Variables required to compute TGREY and for interpolations.
 !
-	REAL(10) JQWEXT(NP_MAX,NP_MAX),KQWEXT(NP_MAX,NP_MAX),PEXT(NP_MAX)
-	REAL(10) Z(NP_MAX),DTAU(NP_MAX),XM(NP_MAX),RJ(NP_MAX)
-	REAL(10) CHI(NP_MAX),REXT(NP_MAX),dCHIdr(NP_MAX)
-	REAL(10) INBC,HBC,HBCNEW,NBC,FA(NP_MAX),GAM(NP_MAX),GAMH(NP_MAX)
-	REAL(10) VEXT(NP_MAX),TEXT(NP_MAX),SIGMAEXT(NP_MAX)
-	REAL(10) MASS_DENSITYEXT(NP_MAX),CLUMP_FACEXT(NP_MAX)
-	REAL(10) HBC_J,HBC_S
+	REAL(KIND=LDP) JQWEXT(NP_MAX,NP_MAX),KQWEXT(NP_MAX,NP_MAX),PEXT(NP_MAX)
+	REAL(KIND=LDP) Z(NP_MAX),DTAU(NP_MAX),XM(NP_MAX),RJ(NP_MAX)
+	REAL(KIND=LDP) CHI(NP_MAX),REXT(NP_MAX),dCHIdr(NP_MAX)
+	REAL(KIND=LDP) INBC,HBC,HBCNEW,NBC,FA(NP_MAX),GAM(NP_MAX),GAMH(NP_MAX)
+	REAL(KIND=LDP) VEXT(NP_MAX),TEXT(NP_MAX),SIGMAEXT(NP_MAX)
+	REAL(KIND=LDP) MASS_DENSITYEXT(NP_MAX),CLUMP_FACEXT(NP_MAX)
+	REAL(KIND=LDP) HBC_J,HBC_S
 !
-	REAL(10) RJEXT(NP_MAX),FEXT(NP_MAX),Q(NP_MAX),FOLD(NP_MAX)
-	REAL(10) CHIEXT(NP_MAX),ETAEXT(NP_MAX),ESECEXT(NP_MAX)
-	REAL(10) CHILEXT(NP_MAX),ETALEXT(NP_MAX)
-	REAL(10) SOURCEEXT(NP_MAX)
-	REAL(10) ZETAEXT(NP_MAX),THETAEXT(NP_MAX)
-	REAL(10) COEF(0:3,NP_MAX)
-	REAL(10) TGREY(NP_MAX)
+	REAL(KIND=LDP) RJEXT(NP_MAX),FEXT(NP_MAX),Q(NP_MAX),FOLD(NP_MAX)
+	REAL(KIND=LDP) CHIEXT(NP_MAX),ETAEXT(NP_MAX),ESECEXT(NP_MAX)
+	REAL(KIND=LDP) CHILEXT(NP_MAX),ETALEXT(NP_MAX)
+	REAL(KIND=LDP) SOURCEEXT(NP_MAX)
+	REAL(KIND=LDP) ZETAEXT(NP_MAX),THETAEXT(NP_MAX)
+	REAL(KIND=LDP) COEF(0:3,NP_MAX)
+	REAL(KIND=LDP) TGREY(NP_MAX)
 	INTEGER GRID(NP_MAX),INDX(NP_MAX)
 	LOGICAL INACCURATE,REXT_COMPUTED,GREY_COMP
 	LOGICAL GREY_WITH_V_TERMS
@@ -172,28 +173,28 @@
 	LOGICAL PLANE_PARALLEL_NOV
 	LOGICAL FLUSH_FILE
 !
-	REAL(10) XV(N_PLT_MAX),XV_SAV(N_PLT_MAX),XNU(N_PLT_MAX)
-	REAL(10) YV(N_PLT_MAX),ZV(N_PLT_MAX),WV(N_PLT_MAX)
+	REAL(KIND=LDP) XV(N_PLT_MAX),XV_SAV(N_PLT_MAX),XNU(N_PLT_MAX)
+	REAL(KIND=LDP) YV(N_PLT_MAX),ZV(N_PLT_MAX),WV(N_PLT_MAX)
 !
 ! 
 !
 ! Collisional matrices.
 !
-	REAL(10) OMEGA_F(N_MAX,N_MAX)
-	REAL(10) dln_OMEGA_F_dlnT(N_MAX,N_MAX)
-	REAL(10) OMEGA_S(N_MAX,N_MAX)
-	REAL(10) dln_OMEGA_S_dlnT(N_MAX,N_MAX)
+	REAL(KIND=LDP) OMEGA_F(N_MAX,N_MAX)
+	REAL(KIND=LDP) dln_OMEGA_F_dlnT(N_MAX,N_MAX)
+	REAL(KIND=LDP) OMEGA_S(N_MAX,N_MAX)
+	REAL(KIND=LDP) dln_OMEGA_S_dlnT(N_MAX,N_MAX)
 	EXTERNAL OMEGA_GEN_V3
 !
 	CHARACTER(LEN=120) COL_RATE_FILE
-	REAL(10), ALLOCATABLE :: COL(:,:,:)
-	REAL(10), ALLOCATABLE :: dCOL(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: COL(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: dCOL(:,:,:)
 !
-	REAL(10) UNIT_VEC(N_MAX)
-	REAL(10) ZERO_VEC(N_MAX)
+	REAL(KIND=LDP) UNIT_VEC(N_MAX)
+	REAL(KIND=LDP) ZERO_VEC(N_MAX)
 !
-	REAL(10) DOP_PRO
-	REAL(10) S15ADF,XCROSS_V2
+	REAL(KIND=LDP) DOP_PRO
+	REAL(KIND=LDP) S15ADF,XCROSS_V2
 	EXTERNAL JTRPWGT_V2,HTRPWGT_V2,KTRPWGT_V2,NTRPWGT_V2
 	EXTERNAL JWEIGHT_V2,HWEIGHT_V2,KWEIGHT_V2,NWEIGHT_V2,XCROSS
 !
@@ -203,50 +204,50 @@
 !
 	CHARACTER*30 UC
 	EXTERNAL UC
-	REAL(10) KEV_TO_HZ,ANG_TO_HZ
-	REAL(10) PI
-	REAL(10) C_CMS
-	REAL(10) C_KMS
+	REAL(KIND=LDP) KEV_TO_HZ,ANG_TO_HZ
+	REAL(KIND=LDP) PI
+	REAL(KIND=LDP) C_CMS
+	REAL(KIND=LDP) C_KMS
 !
 	CHARACTER(LEN=6) METHOD
 	CHARACTER(LEN=10) TYPE_ATM
 	CHARACTER(LEN=10) INNER_BND_METH
 !
-	REAL(10), ALLOCATABLE :: CHI_PAR(:,:)
-	REAL(10), ALLOCATABLE :: ETA_PAR(:,:)
-	REAL(10) YMAPV(MAX_ION)			!Defined so use instead of NUM_IONS
-	REAL(10) XMAPV(ND)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_PAR(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETA_PAR(:,:)
+	REAL(KIND=LDP) YMAPV(MAX_ION)			!Defined so use instead of NUM_IONS
+	REAL(KIND=LDP) XMAPV(ND)
 	LOGICAL LAST_NON_ZERO
 	CHARACTER*10 LOC_ION_ID
 !
-	REAL(10), ALLOCATABLE :: CHI_LAM(:,:)
-	REAL(10), ALLOCATABLE :: ETA_LAM(:,:)
-	REAL(10), ALLOCATABLE :: CHI_TOT_LAM(:)
-	REAL(10), ALLOCATABLE :: ETA_TOT_LAM(:)
-	REAL(10), ALLOCATABLE :: LAM_VEC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_LAM(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETA_LAM(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_TOT_LAM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETA_TOT_LAM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LAM_VEC(:)
 	INTEGER NLAM
 	INTEGER NION
 !
 ! Local variables
 !
-	REAL(10) FB(ND,ND),WM(ND,ND)
-	REAL(10) GB(ND),U(ND),VB(ND),VC(ND),CHIL(ND),ETAL(ND)
-	REAL(10) SOURCE(ND),TCHI(ND),ZETA(ND),THETA(ND)
-	REAL(10) ETA(ND),ETA_WITH_ES(ND)
-	REAL(10) ESEC(ND),EMHNUKT(ND),VT(ND)
-	REAL(10) CHI_SCAT(ND),CHI_RAY(ND)
-	REAL(10) AV(ND),CV(ND)
-	REAL(10) FORCE_MULT(ND_MAX)
+	REAL(KIND=LDP) FB(ND,ND),WM(ND,ND)
+	REAL(KIND=LDP) GB(ND),U(ND),VB(ND),VC(ND),CHIL(ND),ETAL(ND)
+	REAL(KIND=LDP) SOURCE(ND),TCHI(ND),ZETA(ND),THETA(ND)
+	REAL(KIND=LDP) ETA(ND),ETA_WITH_ES(ND)
+	REAL(KIND=LDP) ESEC(ND),EMHNUKT(ND),VT(ND)
+	REAL(KIND=LDP) CHI_SCAT(ND),CHI_RAY(ND)
+	REAL(KIND=LDP) AV(ND),CV(ND)
+	REAL(KIND=LDP) FORCE_MULT(ND_MAX)
 	LOGICAL DO_DPTH(ND)
 !
 ! Used for computing distrbution of lines with respect to the Sobolev Line
 ! optical depth.
 !
 	INTEGER NBINS
-	REAL(10) DELTA_TAU
-	REAL(10) TAU_BEG
-	REAL(10) TAU_MIN
-	REAL(10) TAU_CONSTANT
+	REAL(KIND=LDP) DELTA_TAU
+	REAL(KIND=LDP) TAU_BEG
+	REAL(KIND=LDP) TAU_MIN
+	REAL(KIND=LDP) TAU_CONSTANT
 	LOGICAL WEIGHT_NV
 	LOGICAL MEAN_TAU
 	LOGICAL RADIAL_TAU
@@ -266,36 +267,36 @@
 	INTEGER, PARAMETER :: ITAU_GRT_LIM=6
 	INTEGER TAU_GRT_LOGX(-ITAU_GRT_LIM:ITAU_GRT_LIM)
 !
-	REAL(10) DTDR,DBB,S1,IC
-	REAL(10) HFLUX
-	REAL(10) EXC_EN,EDGE_FREQ
-	REAL(10) RVAL,TAU_VAL,ED_VAL
-	REAL(10) XDIS,YDIS,DIS_CONST
-	REAL(10) LAM_ST,LAM_EN,DEL_NU
-	REAL(10) FREQ_ST,FREQ_EN
-	REAL(10) NU_ST,NU_EN
-	REAL(10) FREQ_RES,FREQ_MAX
-	REAL(10) T1,T2,T3,T4,T5
-	REAL(10) FLUX_DEFICIT
-	REAL(10) VSHIFT,VDOP,DEL_V
-	REAL(10) EK_EJECTA
-	REAL(10) TMP_ED
-	REAL(10) TAU_LIM
-	REAL(10) DEPTH_LIM
-	REAL(10) TEMP,TSTAR,NEW_RSTAR,NEW_VSTAR
-	REAL(10) VSM_DIE_KMS
-	REAL(10) DIST_KPC
+	REAL(KIND=LDP) DTDR,DBB,S1,IC
+	REAL(KIND=LDP) HFLUX
+	REAL(KIND=LDP) EXC_EN,EDGE_FREQ
+	REAL(KIND=LDP) RVAL,TAU_VAL,ED_VAL
+	REAL(KIND=LDP) XDIS,YDIS,DIS_CONST
+	REAL(KIND=LDP) LAM_ST,LAM_EN,DEL_NU
+	REAL(KIND=LDP) FREQ_ST,FREQ_EN
+	REAL(KIND=LDP) NU_ST,NU_EN
+	REAL(KIND=LDP) FREQ_RES,FREQ_MAX
+	REAL(KIND=LDP) T1,T2,T3,T4,T5
+	REAL(KIND=LDP) FLUX_DEFICIT
+	REAL(KIND=LDP) VSHIFT,VDOP,DEL_V
+	REAL(KIND=LDP) EK_EJECTA
+	REAL(KIND=LDP) TMP_ED
+	REAL(KIND=LDP) TAU_LIM
+	REAL(KIND=LDP) DEPTH_LIM
+	REAL(KIND=LDP) TEMP,TSTAR,NEW_RSTAR,NEW_VSTAR
+	REAL(KIND=LDP) VSM_DIE_KMS
+	REAL(KIND=LDP) DIST_KPC
 !
 	INTEGER NPINS,NCX,NDX,NPX
 	INTEGER ND_TMP
-	REAL(10) FREQ,FL,FL_SAVE
-	REAL(10) TAU_SOB
-	REAL(10)  TMP_GION
+	REAL(KIND=LDP) FREQ,FL,FL_SAVE
+	REAL(KIND=LDP) TAU_SOB
+	REAL(KIND=LDP)  TMP_GION
 	EQUIVALENCE (FREQ,FL)
 !
 !
-	REAL(10) SCLHT,VCORE,VPHOT,VINF1,V_BETA1,V_EPS1
-	REAL(10) VINF2,V_BETA2,V_EPS2
+	REAL(KIND=LDP) SCLHT,VCORE,VPHOT,VINF1,V_BETA1,V_EPS1
+	REAL(KIND=LDP) VINF2,V_BETA2,V_EPS2
 !
 	CHARACTER(LEN=20) FILE_FORMAT
 	CHARACTER(LEN=20) MOD_NAME
@@ -313,7 +314,7 @@
 !
 	INTEGER, PARAMETER :: NSC=31
 	COMMON/TOPBORD/ SCED(NSC),XED(NSC),NXED,TOPLABEL
-	REAL(10) SCED,XED
+	REAL(KIND=LDP) SCED,XED
 	INTEGER NXED
 	CHARACTER(LEN=30) TOPLABEL
 	DATA SCED/2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0,
@@ -338,9 +339,9 @@
 	LOGICAL LINE_STRENGTH
 	LOGICAL PLT_J,PLT_H,PLT_LF,PLT_FM
 !
-	REAL(10) RED_EXT
-	REAL(10) VDOP_FG_FRAC
-	REAL(10) VDOP_MOM_FRAC
+	REAL(KIND=LDP) RED_EXT
+	REAL(KIND=LDP) VDOP_FG_FRAC
+	REAL(KIND=LDP) VDOP_MOM_FRAC
 	CHARACTER*30 TWO_PHOT_OPTION
 	CHARACTER*30 FREQ_INPUT
 	CHARACTER*10 SOL_OPT
@@ -358,16 +359,16 @@
 	DATA L_FALSE/.FALSE./
 !
 	LOGICAL XRAYS
-	REAL(10) FILL_FAC_XRAYS,T_SHOCK,V_SHOCK
-	REAL(10) FILL_VEC_SQ(ND)
+	REAL(KIND=LDP) FILL_FAC_XRAYS,T_SHOCK,V_SHOCK
+	REAL(KIND=LDP) FILL_VEC_SQ(ND)
 !
 ! Equivalent width and flux variables.
 !
 	INTEGER CNT
-	REAL(10) ERR(ND),EWACC
-	REAL(10) EW,EWOLD,MOMEW,CONT_INT,MOMCONT_INT
+	REAL(KIND=LDP) ERR(ND),EWACC
+	REAL(KIND=LDP) EW,EWOLD,MOMEW,CONT_INT,MOMCONT_INT
 !
-	REAL(10) AMASS
+	REAL(KIND=LDP) AMASS
 !
 	CHARACTER MAIN_OPT_STR*80
 	CHARACTER X*20
@@ -392,9 +393,9 @@
 	EXTERNAL WR_PWD
 	CHARACTER*120 WR_PWD
 !
-	REAL(10) GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT,BOLTZMANN_CONSTANT
-	REAL(10) FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
-	REAL(10) ASTRONOMICAL_UNIT,RAD_SUN,TEFF_SUN,STEFAN_BOLTZ
+	REAL(KIND=LDP) GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT,BOLTZMANN_CONSTANT
+	REAL(KIND=LDP) FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
+	REAL(KIND=LDP) ASTRONOMICAL_UNIT,RAD_SUN,TEFF_SUN,STEFAN_BOLTZ
 	INTEGER GET_INDX_DP
 	EXTERNAL GFF,GBF,LAMVACAIR,SPEED_OF_LIGHT,GET_INDX_DP
 	EXTERNAL FUN_PI,SECS_IN_YEAR,MASS_SUN,LUM_SUN,ATOMIC_MASS_UNIT
@@ -419,10 +420,10 @@
 	INTEGER, PARAMETER :: ITEN=10
 	INTEGER, PARAMETER :: ITHREE=3
 !
-	REAL(10), PARAMETER :: RZERO=0.0D0
-	REAL(10), PARAMETER :: RONE=1.0D0
-	REAL(10), PARAMETER :: RTWO=2.0D0
-	REAL(10), PARAMETER :: RTHREE=3.0D0
+	REAL(KIND=LDP), PARAMETER :: RZERO=0.0D0
+	REAL(KIND=LDP), PARAMETER :: RONE=1.0D0
+	REAL(KIND=LDP), PARAMETER :: RTWO=2.0D0
+	REAL(KIND=LDP), PARAMETER :: RTHREE=3.0D0
 !
 ! 
 !
@@ -711,7 +712,7 @@
 !
 ! This call resets the .sve algorithm.  Specifically it sets the next
 ! input answer to be a main option, and all subsequent inputs to be
-! sub-options.  
+! sub-options.
 !
  3	CALL SVE_FILE('RESET')
 !
@@ -747,7 +748,7 @@
 	END IF
 !
 ! Remove possile file names etc.
-!          
+!
 	I=INDEX(X,' ')
 	IF(I .EQ. 0)THEN
 	  X=UC(TRIM(X))
@@ -761,7 +762,7 @@
 !
 ! _ is presently used to separate the OPTION (e.g. DC) from the species
 ! (He2). This is the only location it needs ti specified.
-! 
+!
 	I=INDEX(X,'_')
 	IF(I .EQ. 0)THEN
 	  XSPEC=' '
@@ -772,7 +773,7 @@
 	  XSPEC=X(I+1:J)
 	END IF
 !
-! Check whether the species is 
+! Check whether the species is
 !                             (i)  In code
 !                             (ii) Available
 !
@@ -945,7 +946,7 @@
 ! **************************************************************************
 !
 ! Continuum options requiring an INPUT frequency, and an indication of whether
-! electron scattering is to be included in the opacity. Electron scattering 
+! electron scattering is to be included in the opacity. Electron scattering
 ! opacity should be included for all radiation field options.
 !
 ! **************************************************************************
@@ -1197,7 +1198,7 @@
 	      INACCURATE=.FALSE.
 	      T1=0.0D0
 	      DO I=1,ND
-	       T1=MAX(ABS(FOLD(I)-FEXT(I)),T1) 
+	       T1=MAX(ABS(FOLD(I)-FEXT(I)),T1)
 	       FOLD(I)=FEXT(I)
 	       SOURCE(I)=ZETA(I)+THETA(I)*RJ(I)
 	      END DO
@@ -1918,7 +1919,7 @@
 	1        LEV(I+1) .LE. ND)THEN
 	      DO_DPTH(LEV(I):LEV(I+1))=.FALSE.
 	    END IF
-	  END DO      
+	  END DO
 	  T2=0.0D0
 	  CALL USR_HIDDEN(T2,'ROFFSET','0.0D0','Value to subtract from R')
 !
@@ -2025,7 +2026,7 @@
 	      CALL USR_HIDDEN(PLANE_PARALLEL_NOV,'PPNOV','F','Plane parallel model no V?')
 	    END IF
 !
-! Compute Grey temperature distribution. 
+! Compute Grey temperature distribution.
 !
 ! Will use FA for F, GAM for NEWRJ, and GAMH for NEWRK
 !
@@ -2043,8 +2044,8 @@
 !
 ! Note
 !   HFLUX=LUM*Lsun/16/(PI*PI)/10**2/R**2 (10**2 for 1/R**2).
-!   DBB = dBdR = 3.Chi.L/16(piR)**2 
-!   DBB is used for the lower boundary diffusion approximation. 
+!   DBB = dBdR = 3.Chi.L/16(piR)**2
+!   DBB is used for the lower boundary diffusion approximation.
 !
 	      HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
 	      DBB=3.0D0*HFLUX*CHIROSS(ND)
@@ -2148,13 +2149,13 @@
 !
 ! Compute the temperature distribution, and the Rossland optical depth scale.
 ! Assumes LTE. NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert
-! T from units of K to units of 10^4 K. 
+! T from units of K to units of 10^4 K.
 !
 	      GREY_COMP=.TRUE.
 	      DO I=1,ND
 	        TGREY(I)=((3.14159265D0/5.67D-05*RJ(I))**0.25D0)*1.0D-04
 	      END DO
-	      WRITE(T_OUT,*)'Use TGREY to plot T' 
+	      WRITE(T_OUT,*)'Use TGREY to plot T'
 !
 	    ELSE
 !
@@ -2361,7 +2362,7 @@
 	      YAXIS='m(gm cm\u-2\d)'
 	      DEFAULT=' '
 	    END IF
-	  ELSE 
+	  ELSE
 	    DO ID=1,NUM_IONS
 	      IF(ATM(ID)%XzV_PRES .AND. XSPEC .EQ. UC(ION_ID(ID)))THEN
 	        ZETA(1:ND)=SUM(ATM(ID)%XzV_F,1)
@@ -2430,7 +2431,7 @@
 	  YAXIS='Clumping factor'
 	  CALL DP_CURVE(ND,XV,CLUMP_FAC)
 !
-! Designed to look at f, the clumping factor, in shell models. Since these models are not 
+! Designed to look at f, the clumping factor, in shell models. Since these models are not
 ! smooth, we avearge (sum) data over the smoothing step size.
 !
 	ELSE IF(XOPT .EQ. 'YAVF')THEN
@@ -3082,7 +3083,7 @@
 	  WRITE(T_OUT,*)'Warning: this option plots ionized species only'
 !
 	ELSE IF(XOPT .EQ. 'CLUMP')THEN
-	  
+	
 	  CALL USR_HIDDEN(ELEC,'RECIP','F','Plot 1 / fillingfactor')
 	  IF(ELEC)THEN
 	    YV(1:ND)=1.0D0/CLUMP_FAC(1:ND)
@@ -3101,9 +3102,9 @@
 !
 	ELSE IF(XOPT .EQ. 'SCL-DEN')THEN
 	  CALL USR_OPTION(T1,'SF','1.0D0','Factor to mass scale density')
-	  MASS_DENSITY=MASS_DENSITY*T1 
+	  MASS_DENSITY=MASS_DENSITY*T1
 	  WRITE(6,*)'Mass density has been corrupted'
-!	  
+!	
 	ELSE IF(XOPT .EQ. 'PROF')THEN
 	  CALL PLT_PROFS()
 !
@@ -3279,7 +3280,7 @@
 	    MNUP_F=VEC_MNUP_F(LINE_INDX)
 	    FL=VEC_FREQ(LINE_INDX)
 !
-! Since the opacities are sequentially computed, we dont need to compute them 
+! Since the opacities are sequentially computed, we dont need to compute them
 ! at all frequencies. At present we simply compute them every 1000 km/s.
 ! This saves considerable computing time.
 !
@@ -3345,14 +3346,14 @@
 !         is 0.25 wide in LOG10 space. For Log(tau) space, the line optical depth is normalized by
 !         the elctron scatering opacity.
 !
-! 2. DIST: PLots the the ilogaritmic Sobolev optical depth (radial, or angle averaged) for every 
+! 2. DIST: PLots the the ilogaritmic Sobolev optical depth (radial, or angle averaged) for every
 !          line in a given wavelenth interval as a function of the line wavelngth. Lines with
 !          a negative optical depth are set to -20.
 !
 ! 3. NV:   Plots the  number of lines with optical depth > TAU_MIN in a given velocity interval.
-! 
-	ELSE IF(XOPT .EQ. 'DIST' 
-	1        .OR. XOPT .EQ. 'NV' 
+!
+	ELSE IF(XOPT .EQ. 'DIST'
+	1        .OR. XOPT .EQ. 'NV'
 	1        .OR. XOPT .EQ. 'POW')THEN
 !
 ! Used to count the number lines as a function of optical depth over the entire
@@ -3404,7 +3405,7 @@
 !    (2) Angle avearged optical depth. Might be more appropriated at depth.
 !           For an O star it would be better to average over the disk of the
 !           star. For a W-R star the disk is not well defined.
-! 
+!
 	  I=DPTH_INDX
 	  TAU_CONSTANT=1.0D-15*C_KMS*R(I)/V(I)
 	  IF(MEAN_TAU)THEN
@@ -3475,7 +3476,7 @@
 	      IF(XSPEC .EQ. 'ALL')XSPEC=' '
 	      DO ID=1,NUM_IONS
 	        IF(VEC_SPEC(LINE_INDX) .EQ. ION_ID(ID) .AND.
-	1           ( XSPEC .EQ. ' ' .OR. XSPEC .EQ. UC(ION_ID(ID)) .OR. 
+	1           ( XSPEC .EQ. ' ' .OR. XSPEC .EQ. UC(ION_ID(ID)) .OR.
 	1             XSPEC .EQ. SPECIES(SPECIES_LNK(ID)) ))THEN
 	          T1=ATM(ID)%W_XzV_F(MNUP_F,I)/ATM(ID)%W_XzV_F(MNL_F,I)
 	          CHIL(I)=OPLIN*VEC_OSCIL(LINE_INDX)*(
@@ -3983,9 +3984,9 @@
 	      YV(1:K)=1.0D+09*YV(1:K)*XV(1:K)*XV(1:K)/C_KMS
 	      YAXIS='dB\d\gl\u(\gl)/dT(Mergs/cm\u2\d/\gA/str/K)'
 	    END IF
-	  END IF 
+	  END IF
 	  XV(1:K)=0.01*C_KMS/XV(1:K)
-	  CALL DP_CURVE(K,XV,YV) 
+	  CALL DP_CURVE(K,XV,YV)
 	  XAXIS='\gl(\A)'
 !
 ! 
@@ -4168,7 +4169,7 @@
 	1    'that of main code to avoid inconsisteancies.'
 !
 ! 
-! Computes the optical depth of lines of a given ionization stage and species at a 
+! Computes the optical depth of lines of a given ionization stage and species at a
 ! given depth in the atmosphere. Either the radial or tangential Sobolev optical
 ! depth is used.
 !
@@ -4181,13 +4182,13 @@
 	  XAXSAV=XAXIS
           CALL BRANCH_RAT(OMEGA_F,XV,YV,XAXIS,YAXIS,XSPEC,N_MAX,N_PLT_MAX,ND)
 !
-! Computes the optical depth of lines of a given ionization stage and species at a 
+! Computes the optical depth of lines of a given ionization stage and species at a
 ! given depth in the atmosphere. Either the radial or tangential Sobolev optical
 ! depth is used.
 !
 	ELSE IF(XOPT .EQ. 'LTAU')THEN
 !
-	  XV_SAV=XV 
+	  XV_SAV=XV
 	  I=ND/2
 	  DEFAULT=WR_STRING(I)
 	  VALID_VALUE=.FALSE.
@@ -4231,7 +4232,7 @@
 !
 ! Vdop=10 km/s and ignoring SQRT(PI)
 !
-	    WRITE(6,*)'Opacity at line center(for Vdop=10km/s) * SQRT(PI) normalized be e.s. opacity' 
+	    WRITE(6,*)'Opacity at line center(for Vdop=10km/s) * SQRT(PI) normalized be e.s. opacity'
 	    TAU_CONSTANT=1.0D-15*OPLIN*2.998D+04/(6.65D-15*ED(I))
 	  ELSE IF(V(I) .LE. 20.0D0)THEN
 	    WRITE(6,*)'Using modified static optical depth'
@@ -4309,7 +4310,7 @@
 !
 	  IF(J .NE. 0)WRITE(T_OUT,*)J,' lines plotted'
 	  IF(J  .NE. 0)CALL DP_CURVE(J,XV,YV)
-	  XV=XV_SAV 
+	  XV=XV_SAV
 !
 !`
 	ELSE IF(XOPT .EQ. 'VLTAU')THEN
@@ -4381,7 +4382,7 @@
 !
 ! This section creates an image of the partial opacities (i.e., the opacities due
 ! to each ionizaion stage) at a given frequency as a function of depth.
-! 
+!
 	ELSE IF(XOPT .EQ. 'DCHI')THEN
 	  CALL USR_OPTION(FREQ,'LAM','0.0',FREQ_INPUT)
 	  IF(FREQ .EQ. 0)GOTO 1
@@ -4398,7 +4399,7 @@
 	    CALL ESOPAC(CHI,ED,ND)
 	  ELSE
 	    CHI(1:ND)=0.0D0
-	  END IF 
+	  END IF
 !
 	  DO ID=1,NUM_IONS
 	    CHI(1:ND)=CHI(1:ND)+CHI_PAR(1:ND,ID)
@@ -4454,7 +4455,7 @@
 !           2. When no species is specified, the maximum fractional contribution
 !               of each species at ANY depth is ouput to the terminal
 !           3. Plot species dependent contributions at a given depth.
-!           
+!
 	ELSE IF(XOPT .EQ. 'MCHI')THEN
 	  CALL USR_OPTION(LAM_ST,'LAM_ST','50.0',FREQ_INPUT)
 	  CALL USR_OPTION(LAM_EN,'LAM_END','10000.0',FREQ_INPUT)
@@ -4488,7 +4489,7 @@
 	  ELSE
 	    NU_ST=LAM_ST
 	    NU_EN=LAM_EN
-	  END IF 
+	  END IF
 	  DEL_NU=10.0D0**( LOG10(NU_EN/NU_ST)/(NLAM-1) )
 !
 	  IF(LOC_ION_ID .NE. ' ')THEN
@@ -4686,7 +4687,7 @@
 	  CALL ESOPAC(ESEC,ED,ND)
 	  IF(ELEC)THEN
 	    CHI_TOT_LAM(1:NLAM)=CHI_TOT_LAM(1:NLAM)+ESEC(K)
-	  END IF 
+	  END IF
 !
 	  IF(XOPT .EQ. 'PPHOT')THEN
 	    WRITE(6,*)'Total opacity is plotted in red'
@@ -4915,23 +4916,23 @@
 	          END IF
 !
 	        IF(XOPT .EQ. 'DCRGS')THEN
-	          YAXIS='Log(b/b\d1\u)'            
+	          YAXIS='Log(b/b\d1\u)'
 	          IF(LIN_DC)THEN		!Saves altering SETDC_OR_POP
 	            DO J=1,ND
 	              YV(J)=10.0**(YV(J))
 	            END DO
 	            YAXIS='b/b\d1\u'
-	          END IF                 
+	          END IF
 	        ELSE IF(XOPT .EQ. 'DC')THEN
-	          YAXIS='Log(b)'            
+	          YAXIS='Log(b)'
 	          IF(LIN_DC)THEN		!Saves altering SETDC_OR_POP
 	            DO J=1,ND
 	              YV(J)=10.0**(YV(J))
 	            END DO
 	            YAXIS='b'
-	          END IF                 
+	          END IF
 	        ELSE IF(XOPT .EQ. 'TX')THEN
-	          YAXIS='T\dX\u(10\u4\ \dK)'            
+	          YAXIS='T\dX\u(10\u4\ \dK)'
 	        ELSE IF(XOPT .EQ. 'RAT')THEN
 	          IF(SPEC_FRAC)THEN
 	          ELSE
@@ -4995,7 +4996,7 @@
 	          ZV(I)=I
 	        END DO
 	        YAXIS='log b'
-	      ELSE 
+	      ELSE
 	        DO I=1,ATM(ID)%NXzV_F
 	          YV(I)=LOG10(ATM(ID)%XzV_F(I,K))
 	          ZV(I)=I
@@ -5204,7 +5205,7 @@
 !
 	ELSE IF(XOPT .EQ. 'MEANOPAC')THEN
 !
-! Output Opacities, Optical depth scales and optical depth increments to file 
+! Output Opacities, Optical depth scales and optical depth increments to file
 ! in an identical format to MEANOPAC created by CMFGEN.
 !
 	  TCHI(1:ND)=ROSS_MEAN(1:ND)*CLUMP_FAC(1:ND)
@@ -5346,7 +5347,7 @@
 	        CALL WR_COL_SL(OMEGA_S,ATM(ID)%XzV_F(1,I),ATM(ID)%XzVLTE_F(1,I),
 	1                ATM(ID)%EDGEXzV_F,ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,
 	1                TRIM(XSPEC),LU_COL,LEV,ITEN,DPTH_INDX)
-	      ELSE   
+	      ELSE
 	        CALL WR_COL_RATES(OMEGA_S,ATM(ID)%XzV_F(1,I),ATM(ID)%XzVLTE_F(1,I),
 	1               ATM(ID)%EDGEXzV_F,ATM(ID)%XzVLEVNAME_F,ATM(ID)%NXzV_F,
 	1               TRIM(XSPEC)//'R',LU_COL,STRING)
@@ -5392,7 +5393,7 @@
 	      END IF
 	      EXIT
 	    END IF
-	  END DO   
+	  END DO
 !
 	  CALL USR_OPTION(NL,'NL','1','Level of interest (1 to NF)')
 	  DO ID=1,NUM_IONS
@@ -5434,7 +5435,7 @@
 	          LEV(1:1)=MAXLOC(TA); K=LEV(1)
 	          STRING=TRIM(ION_ID(ID))//'('//TRIM(ATM(ID)%XzVLEVNAME_F(K))//
 	1                  '-'//TRIM(ATM(ID)%XzVLEVNAME_F(NL))//')'
-	          TC(1:ND)=COL(K,NL,1:ND)*ATM(ID)%XzV_F(K,1:ND)	- 
+	          TC(1:ND)=COL(K,NL,1:ND)*ATM(ID)%XzV_F(K,1:ND)	-
 	1                  COL(NL,K,1:ND)*ATM(ID)%XzV_F(NL,1:ND)		!Col rates out of NL
 	          CALL WRITE_VEC(TC,ND,STRING,LU_COL)
 	          TA(K)=0.0D0
@@ -5466,7 +5467,7 @@
 	          LEV(1:1)=MAXLOC(TB); K=LEV(1)
 	          IF(K .EQ. NL)THEN
 	            STRING=TRIM(ION_ID(ID))//'('//TRIM(ATM(ID)%XzVLEVNAME_F(NL))//'-ION)'
-	          ELSE 
+	          ELSE
 	            STRING=TRIM(ION_ID(ID))//'('//TRIM(ATM(ID)%XzVLEVNAME_F(NL))//
 	1                  '-'//TRIM(ATM(ID)%XzVLEVNAME_F(K))//')'
 	    	  END IF
@@ -5571,7 +5572,7 @@
 	    WRITE(LU_CROSS,'(1X,I4,3X,1P,E12.5)')I,OMEGA_F(I,1)/1.0D-08
 	  END DO
 ! 
-!  
+!
 	ELSE IF(XOPT .EQ. 'PLTPHOT')THEN
 	  CALL PLTPHOT_SUB(XSPEC,XV,YV,WV,ZV,N_PLT_MAX,OMEGA_F,N_MAX,XAXIS,YAXIS,XRAYS,VSM_DIE_KMS,ND)
 !
@@ -5594,7 +5595,7 @@
 	      END IF
 	    END IF
 	  END DO
-!  
+!
 c 
 !
 ! Section to compute the recombination rates for various species.
@@ -5720,7 +5721,7 @@ c
 	1	'Exponent for T variation?')
 !
 	   T1=-26.68059
-!        
+!
 	   DO I=1,ND
 	     TA(I)=CLUMP_FAC(I)*(ED(I)/1.0D+10)*TA(I)*( R(I)**3 )
 	     TB(I)=TA(I)*( T(I)**(-T2) )
@@ -5833,7 +5834,7 @@ c
 	  IF(ELEC)THEN
 	    ZV(1)=0.0D0
 	    DO I=2,ND
-	      ZV(I)=ZV(I-1)+YV(I-1) 
+	      ZV(I)=ZV(I-1)+YV(I-1)
 	    END DO
 	    CALL DP_CURVE(J,XV,ZV)
 	    YAXIS='Diffusion time to outer boundary (days)'
@@ -6000,8 +6001,8 @@ c
 !
 ! To be read TAU_at_R and R_at_TAU respectively.
 !
-	ELSE IF(XOPT .EQ. 'RTAU'  .OR. XOPT .EQ. 'VTAU' .OR. XOPT .EQ. 'TAUR' .OR. 
-	1       XOPT .EQ. 'EDTAU' .OR. 
+	ELSE IF(XOPT .EQ. 'RTAU'  .OR. XOPT .EQ. 'VTAU' .OR. XOPT .EQ. 'TAUR' .OR.
+	1       XOPT .EQ. 'EDTAU' .OR.
 	1       XOPT .EQ. 'KAPR'  .OR. XOPT .EQ. 'CHIR' .OR. XOPT .EQ. 'ALBEDO' .OR.
 	1       XOPT .EQ. 'ETAR'  .OR. XOPT .EQ. 'WROPAC')THEN
 	  IF(XRAYS)WRITE(T_OUT,*)'Xray opacities (i.e. K shell) are included'
@@ -6156,7 +6157,7 @@ c
 	      T3=CHI(R_INDX)/MASS_DENSITY(R_INDX)
 	      YV(ML)=1.0D-10*( T1*T2 + (1.0-T1)*T3 )
 	      IF(.NOT. LINY)YV(ML)=LOG10(YV(ML))
-	    ELSE 
+	    ELSE
 !
 ! Adjust opacities for the effect of clumping.
 !
@@ -6370,7 +6371,7 @@ c
 	        WRITE(T_OUT,*)RED_PEN//'Error -- can only plot line origin against a mononotonix X-axis'//DEF_PEN
 	        GOTO 1
 	      END IF
-	    END DO 
+	    END DO
 	    CALL MON_INT_FUNS_V2(JNU,XV,R,ND)
 	    T4=1.0D0; IF(XV(1) .LT. XV(4))T4=-1.0D0
 	    DO I=1,ND
@@ -6461,7 +6462,7 @@ c
 	  WV(1)=YV(1)
 	  DO I=2,ND
 	    WV(I)=WV(I-1)+0.5D0*(YV(I-1)+YV(I))*(ZV(I-1)-ZV(I))
-	  END DO 
+	  END DO
 	  CALL DP_CURVE(ND,XV,WV)
 !
 ! 
@@ -6531,7 +6532,7 @@ c
 	        YV(I)=LOG10(YV(I))
 	      END DO
 	      YAXIS='Log(\gt\dSob\u)'
-	    END IF 
+	    END IF
 	    DEFAULT=TRIM(TRANS_NAME)
 	    IF(RADIAL)DEFAULT=TRIM(TRANS_NAME)//'(radial)'
 	    CALL DP_CURVE_LAB(ND,XV,YV,DEFAULT)
@@ -6545,7 +6546,7 @@ c
 	  CALL USR_OPTION(VSHIFT,'VSHIFT','0','Velocity for line center in km/s')
 	  CALL USR_OPTION(XAXIS_OPT,'XAXIS','NZ','What X axisi (R,NR,Z,NZ,uV,I)?')
 	  CALL USR_OPTION(VDOP,'VDOP','10.0D0','Doppler veolicity')
-	  DEL_V=VDOP/2.0D0 
+	  DEL_V=VDOP/2.0D0
 	  XAXIS_OPT=UC(XAXIS_OPT)
 	  IF(I .LT. 0)THEN
 	    I=ABS(I)
@@ -6562,7 +6563,7 @@ c
 	ELSE IF(XOPT .EQ. 'MTAULIP')THEN
 	  CALL IMPAR(P,R,R(ND),NC,ND,NP)
 	  CALL USR_OPTION(VDOP,'VDOP','10.0D0','Doppler veolicity')
-	  DEL_V=VDOP/2.0D0 
+	  DEL_V=VDOP/2.0D0
 	  CALL USR_OPTION(VSHIFT,'VSHIFT','0','Velocity for line center in km/s')
 	  DO I=1,NP-2
 	    T1=P(I)
@@ -6630,14 +6631,14 @@ c
 	    FILE_PRES=.TRUE.
 	    DO WHILE(FILE_PRES)
 	      CALL USR_OPTION(FILE_FOR_WRL,'FILE',FILE_FOR_WRL,'Output file')
-	      INQUIRE(FILE=FILE_FOR_WRL,EXIST=FILE_PRES) 
+	      INQUIRE(FILE=FILE_FOR_WRL,EXIST=FILE_PRES)
 	      IF(FILE_PRES)THEN
 	        WRITE(6,*)'Error - file exists - enter alternate name'
 	      END IF
 	    END DO
 	    OPEN(UNIT=LU_OUT,FILE=FILE_FOR_WRL,STATUS='NEW')
 	  ELSE
-	    INQUIRE(FILE=FILE_FOR_WRL,EXIST=FILE_PRES) 
+	    INQUIRE(FILE=FILE_FOR_WRL,EXIST=FILE_PRES)
 	    IF(.NOT. FILE_PRES)THEN
 	      WRITE(6,*)'Error - file does not exist'
 	      CALL USR_OPTION(FILE_FOR_WRL,'FILE',FILE_FOR_WRL,'Output file')
@@ -6670,7 +6671,7 @@ c
 	  END IF
 !
 	  CALL USR_OPTION(TMP_LOGICAL,'BGRID','F','Use a bigger grid')
-	  IF(XOPT .EQ. 'WRC')THEN 
+	  IF(XOPT .EQ. 'WRC')THEN
 	    ETAL=1.0D-10; CHIL=1.0D-10
 	  END IF
 	  IF(TMP_LOGICAL)THEN
@@ -6699,11 +6700,11 @@ c
 	    ND_TMP=NDX
 	  ELSE
 	    ND_TMP=ND
-	    REXT(1:ND_TMP)=R; VEXT(1:ND_TMP)=V; SIGMAEXT(1:ND_TMP)=SIGMA;  TEXT(1:ND_TMP)=T 
+	    REXT(1:ND_TMP)=R; VEXT(1:ND_TMP)=V; SIGMAEXT(1:ND_TMP)=SIGMA;  TEXT(1:ND_TMP)=T
 	    ETAEXT(1:ND_TMP)=ETA; CHIEXT(1:ND_TMP)=CHI; ESECEXT(1:ND_TMP)=ESEC
 	    ETALEXT(1:ND_TMP)=ETAL; CHILEXT(1:ND_TMP)=CHIL
 	    MASS_DENSITYEXT(1:ND_TMP)=MASS_DENSITY; CLUMP_FACEXT(1:ND_TMP)=CLUMP_FAC
-	  END IF	    
+	  END IF	
 
 	  IF(FILE_FORMAT .EQ. 'NEW')THEN
 	    CALL WRITE_LINE_12MAY98(TRANS_NAME,MOD_NAME,
@@ -6745,15 +6746,15 @@ c
 !
 	  NL=GET_INDX_DP(NU_ST,VEC_FREQ,N_LINE_FREQ)
 	  NUP=GET_INDX_DP(NU_EN,VEC_FREQ,N_LINE_FREQ)
-!	  
+!	
 	  I=160	!Record length - allow for long names
 	  CALL GEN_ASCI_OPEN(LU_OUT,'TRANS_INFO','UNKNOWN',' ','WRITE',I,IOS)
 	  WRITE(LU_OUT,*)
 	1     '     I  NL_F  NUP_F      Nu',
-	1     '       Lam(A)      gf      /\V(km/s)    Transition' 
+	1     '       Lam(A)      gf      /\V(km/s)    Transition'
 	  IF(NUP-NL .LT. 50)WRITE(T_OUT,*)
 	1     '     I  NL_F  NUP_F      Nu',
-	1     '       Lam(A)      gf      /\V(km/s)    Transition' 
+	1     '       Lam(A)      gf      /\V(km/s)    Transition'
 	  DO ML=NL,NUP
 	    T1=LAMVACAIR(VEC_FREQ(ML))
 	    T2=2.998D+05*(VEC_FREQ(MAX(1,ML-1))-VEC_FREQ(ML))/VEC_FREQ(ML)
@@ -6769,7 +6770,7 @@ c
 	1      '(1X,I6,2I6,F10.6,2X,F10.3,ES10.2,1X,F10.2,4X,A)')
 	1         ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
 	1         VEC_FREQ(ML),T1,T3,T2,TRIM(VEC_TRANS_NAME(ML))
-	    ELSE             
+	    ELSE
 	      WRITE(LU_OUT,
 	1      '(1X,I6,2(1X,I6),F10.6,1X,ES11.4,ES10.2,1X,F10.2,4X,A)')
 	1         ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
@@ -6835,7 +6836,7 @@ c
 	  IF(XOPT(1:2) .EQ. 'LI')THEN
 	    CALL GEN_ASCI_OPEN(LU_IN,'MAINGEN_OPT_DESC','OLD',' ','READ',
 	1                  IZERO,IOS)
-	  ELSE 
+	  ELSE
 	    CALL GEN_ASCI_OPEN(LU_IN,'MAINGEN_OPTIONS','OLD',' ','READ',
 	1                  IZERO,IOS)
 	  END IF

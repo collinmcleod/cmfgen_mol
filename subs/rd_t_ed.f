@@ -3,15 +3,16 @@
 ! set profile limits. Accuracy is not crucial.
 !
 	SUBROUTINE RD_T_ED(T,ED,ND,LU_IN,FILE_NAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created: 04-Nov-2013
 !
 	INTEGER ND
 	INTEGER LU_IN
-	REAL(10) T(ND)
-	REAL(10) ED(ND)
-	REAL(10) T1,T2
+	REAL(KIND=LDP) T(ND)
+	REAL(KIND=LDP) ED(ND)
+	REAL(KIND=LDP) T1,T2
 !
 	INTEGER LUER
 	INTEGER ERROR_LU
@@ -34,7 +35,7 @@
 	END IF
 !
 ! Check whether the file has a record containing 'Format date'. Its presence
-! effects the way we read the file. 
+! effects the way we read the file.
 !
         I=0
         STRING=' '

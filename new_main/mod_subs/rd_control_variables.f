@@ -1,4 +1,5 @@
 	SUBROUTINE RD_CONTROL_VARIABLES(LUIN,LUSCR,LUER,NUM_BNDS)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
@@ -24,7 +25,7 @@
 ! Altered : 23-Nov-2007 : Optional LAM_SCALE_OPT variable included.
 ! Altered : 29-Jan-2006 : Control variables for relativistic transfer and time
 !                          dependent statistical equilibrium equations installed.
-! 
+!
 	INTEGER LUIN
 	INTEGER LUSCR
 	INTEGER LUER
@@ -40,7 +41,7 @@
 	INTEGER ISPEC
 	INTEGER ID
 !
-	REAL(10) ATOMIC_MASS_UNIT
+	REAL(KIND=LDP) ATOMIC_MASS_UNIT
 	EXTERNAL ATOMIC_MASS_UNIT
 !
 	CALL GEN_ASCI_OPEN(LUIN,'VADAT','OLD',' ','READ',IZERO,IOS)
@@ -183,7 +184,7 @@
 !
 	  VAR_MDOT=.FALSE.
 	  IF(VELTYPE .EQ. 7)THEN
-	    CALL RD_STORE_LOG(VAR_MDOT,'VAR_MDOT',L_FALSE,'Variable mass-loss rate model?') 
+	    CALL RD_STORE_LOG(VAR_MDOT,'VAR_MDOT',L_FALSE,'Variable mass-loss rate model?')
 	    CALL RD_STORE_NCHAR(VAR_MDOT_FILE,'VM_FILE',ITEN,VAR_MDOT,
 	1                        'File with density and clumping info')
 	  END IF
@@ -207,7 +208,7 @@
 	  END IF
 !
 ! TEFF and LOGG only need to be present if DO_HYDRO is TRUE. Values will still be read
-! in when available if DO_HYDRO is FALSE. 
+! in when available if DO_HYDRO is FALSE.
 !
 	  TEFF=0.0D0; LOGG=0.0D0
 	  IF(DO_HYDRO)THEN
@@ -318,10 +319,10 @@
 	       CALL RD_STORE_DBLE(DEC_NRG_SCL_FAC_BEG,'DECNRG_SCLFAC_BEG',ADD_DEC_NRG_SLOWLY,
 	1            'Initial Scale factor for adding decay energy')
             END IF
-!       
+!
 !       LUC: Parameters for SHOCK POWER
 !
-	    INC_SHOCK_POWER=.FALSE.       
+	    INC_SHOCK_POWER=.FALSE.
 	    CALL RD_STORE_LOG(INC_SHOCK_POWER,'INC_SHOCK_POWER',L_FALSE,
 	1             'Include the shock power from HYDRO simulation')
 	    IF (INC_SHOCK_POWER) THEN
@@ -360,7 +361,7 @@
 	    CALL RD_STORE_INT(N_IB_INS,'N_IB_INS',L_FALSE,'# of points for fine grid at inner boundary')
 	    CALL RD_STORE_INT(N_OB_INS,'N_OB_INS',L_FALSE,'# of points for fine grid at outer boundary')
 	    CALL RD_STORE_DBLE(RMAX_ON_RCORE,'RMAX_ON_RCORE',L_FALSE,'RMAX/RCORE for SN if shrinking radius')
-	  END IF	  
+	  END IF	
 	  DO_FULL_REL_OBS=.FALSE.
 	  DO_FULL_REL_CMF=.FALSE.
 	  CALL RD_STORE_LOG(DO_FULL_REL_OBS,'REL_OBS',L_FALSE,
@@ -453,8 +454,8 @@
 	  CALL RD_STORE_LOG(NEW_VAR_STORAGE_METHOD,'NEW_VST_METH',L_FALSE,
 	1         'Use new storage method for lines (different storage for each line)?')
 	!
-! NB: An ideal vale for ZNET_VAR_LIMIT is probably 0.01 or 0.001. If 
-! ZNET_VAR_LIMIT is zero, all depths will be included in the linearization, 
+! NB: An ideal vale for ZNET_VAR_LIMIT is probably 0.01 or 0.001. If
+! ZNET_VAR_LIMIT is zero, all depths will be included in the linearization,
 ! independent of ZNET. A very large value of ZNET (i.e. 10^4), will imply
 ! an interation on the NET_RATES, with no linearization.
 !
@@ -533,7 +534,7 @@
 !
 	  CALL RD_STORE_LOG(RDTHK_CONT,'THK_CONT',L_TRUE,'Use thick boundary condition for continuum ? ')
 	  RD_OUT_BC_TYPE=1
-	  OUT_BC_TYPE=1 
+	  OUT_BC_TYPE=1
 	  OUT_BC_PARAM_ONE=0.299794D0
 	  CALL RD_STORE_INT(RD_OUT_BC_TYPE,'OBC_TYPE',L_FALSE,'Outer boundary condition type: 1=def=old')
 	  CALL RD_STORE_DBLE(OUT_BC_PARAM_ONE,'BC_PAR1',L_FALSE,'Frequency to switch to new BC')
@@ -704,7 +705,7 @@
 	  CALL RD_STORE_NCHAR(NEG_OPAC_OPTION,'NEG_OPAC_OPT',ITEN,L_TRUE,
 	1            'Method for negative opacities in BLANKETING mode')
 	  CALL SET_CASE_UP(NEG_OPAC_OPTION,IZERO,IZERO)
-	  IF(NEG_OPAC_OPTION .NE. 'SRCE_CHK' .AND. 
+	  IF(NEG_OPAC_OPTION .NE. 'SRCE_CHK' .AND.
 	1                           NEG_OPAC_OPTION .NE. 'ESEC_CHK')THEN
 	     WRITE(LUER,*)'Error in CMFGEN_SUB'
 	     WRITE(LUER,*)'Invalid NEG_OPAC_OPTION'
@@ -765,7 +766,7 @@
 	  CALL RD_STORE_DBLE(ADVEC_RELAX_PARAM,'ADV_RELAX',L_FALSE,
 	1           'Parameter to allow advection terms to be included slowly')
 !
-! Except for the X-ray switch, the X-ray options are only needed if we 
+! Except for the X-ray switch, the X-ray options are only needed if we
 ! are including X-rays.
 !
 	  VSMOOTH_XRAYS=3000.0D0
@@ -799,7 +800,7 @@
 	1           'Rate to increase X-ray filling factor')
 !
 	  SCALE_XRAY_LUM=.FALSE.
-	  ALLOWED_XRAY_FLUX_ERROR=0.1D0 
+	  ALLOWED_XRAY_FLUX_ERROR=0.1D0
 	  CALL RD_STORE_LOG(SCALE_XRAY_LUM,'SCL_XLUM',L_FALSE,
 	1           'Scale X-ray emissivities to get a specified X-ray luminosiity')
 	  CALL RD_STORE_DBLE(DESIRED_XRAY_LUM,'XRAY_LUM',SCALE_XRAY_LUM,
@@ -814,7 +815,7 @@
 	  NU_XRAY_END=100.0D0
 	  CALL RD_STORE_DBLE(NU_XRAY_END,'NU_XRAY',L_FALSE,
 	1            'End of X-ray region for continuum definition')
-!	  
+!	
 	  AUTO_ADD_ION_STAGES=.TRUE.
 	  CALL RD_STORE_LOG(AUTO_ADD_ION_STAGES,'AUTO_ADD',L_FALSE,
 	1       'Automatically add files with missing XzV_IN files?')
@@ -940,7 +941,7 @@
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(RD_FIX_IMP,'FIX_IMP',L_TRUE,'Automatically fix impurity species?')
 !
-	  WRITE(LUSCR,'()')                             
+	  WRITE(LUSCR,'()')
 	  WRITE(LUSCR,'()')
 	  CALL RD_STORE_LOG(RD_FIX_T,'FIX_T',L_TRUE,
 	1            'Keep the Temperature fixed ?')
@@ -961,7 +962,7 @@
 	  END IF
 	  T_MIN=0.0D0
 	  CALL RD_STORE_DBLE(T_MIN,'T_MIN',L_FALSE,'Minimum electron temperature')
-	  DO_SRCE_VAR_ONLY=.FALSE. 
+	  DO_SRCE_VAR_ONLY=.FALSE.
 	  CALL RD_STORE_LOG(DO_SRCE_VAR_ONLY,'SRCE_ONLY',L_FALSE,
 	1            'Allow only ths source function to vary?')
 	  ADD_ADDITIONAL_OPACITY=.FALSE.

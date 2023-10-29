@@ -13,9 +13,10 @@
 	1                     PHOT_ID,ION_LEV,ED,T,
 	1                     JREC,JPHOT,JREC_CR,JPHOT_CR,BPHOT_CR,
 	1                     NU,NU_CONT,INIT_ARRAYS,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
-! Altered 24-Sep-2023 : Adjusted constants for consistency. Some data ouput for checking between 
+! Altered 24-Sep-2023 : Adjusted constants for consistency. Some data ouput for checking between
 !                            RE and EHB equations (LONG ver -- 15-Oct-2023).
 ! Altered 04-May-2022 : Changed HMI to H0
 ! Altered 23-Jun-2015 - Added H- free-free cooling.
@@ -56,30 +57,30 @@
 	INTEGER PHOT_ID		!Photoionization ID
 	INTEGER ION_LEV		!Final (destination) level in ion.
 !
-	REAL(10) PR(NLEV,ND),RR(NLEV,ND),BFCR(NLEV,ND),FF(ND)
-	REAL(10) HN(NLEV,ND),HNST(NLEV,ND),WSE(NLEV,ND),WCR(NLEV,ND)
-	REAL(10) DI(N_DI,ND),LOG_DIST(N_DI,ND)
+	REAL(KIND=LDP) PR(NLEV,ND),RR(NLEV,ND),BFCR(NLEV,ND),FF(ND)
+	REAL(KIND=LDP) HN(NLEV,ND),HNST(NLEV,ND),WSE(NLEV,ND),WCR(NLEV,ND)
+	REAL(KIND=LDP) DI(N_DI,ND),LOG_DIST(N_DI,ND)
 !
-	REAL(10) ED(ND),T(ND)
-	REAL(10) JREC(ND)
-	REAL(10) JPHOT(ND)
-	REAL(10) JREC_CR(ND)
-	REAL(10) JPHOT_CR(ND)
-	REAL(10) BPHOT_CR(ND)
-	REAL(10) NU
-	REAL(10) NU_CONT
+	REAL(KIND=LDP) ED(ND),T(ND)
+	REAL(KIND=LDP) JREC(ND)
+	REAL(KIND=LDP) JPHOT(ND)
+	REAL(KIND=LDP) JREC_CR(ND)
+	REAL(KIND=LDP) JPHOT_CR(ND)
+	REAL(KIND=LDP) BPHOT_CR(ND)
+	REAL(KIND=LDP) NU
+	REAL(KIND=LDP) NU_CONT
 !
 	LOGICAL INIT_ARRAYS	        !Used to signify initialization
 !
 	INTEGER I,J
-	REAL(10) POP_SUM,T2,A1,TMP_HNST
-	REAL(10) JB_RAT, JC_RAT
-	REAL(10) H,ZHYD,CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) POP_SUM,T2,A1,TMP_HNST
+	REAL(KIND=LDP) JB_RAT, JC_RAT
+	REAL(KIND=LDP) H,ZHYD,CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Dynamic memory allocation for free-free gaunt factor as a function of depth.
 !
-	REAL(10) GFF_VAL(ND)
-	REAL(10) PLANCKS_CONSTANT
+	REAL(KIND=LDP) GFF_VAL(ND)
+	REAL(KIND=LDP) PLANCKS_CONSTANT
 	EXTERNAL PLANCKS_CONSTANT
 !
 ! 4PI*1.0E-10 (R scaling) Note that ordering is important or get underflow.

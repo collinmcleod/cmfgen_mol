@@ -1,10 +1,10 @@
 !
-! Program to evaluate the error assoiciated with a multiple pseudo-Gaussian fit 
+! Program to evaluate the error assoiciated with a multiple pseudo-Gaussian fit
 ! to a set of data points passed by the module GAUSS_FIT_DATA.
 !
 ! The function has the form
 !
-!   Y =P1 + P2*(X-X(1))+ P5*EXP( -((X-P3)/P4)^P6) + ... 
+!   Y =P1 + P2*(X-X(1))+ P5*EXP( -((X-P3)/P4)^P6) + ...
 !
 ! This routine must be kept compatible with GAUSS_FIT_FUNC
 !
@@ -14,12 +14,13 @@
 ! Created 05-Oct-2007
 !
 	SUBROUTINE GAUSS_FIT_ER(PARAMS)
+	USE SET_KIND_MODULE
 	USE GAUSS_FIT_DATA
 	IMPLICIT NONE
-	REAL(10) PARAMS(NG_PAR)
+	REAL(KIND=LDP) PARAMS(NG_PAR)
 !
-	REAL(10) T1
-	REAL(10) SUM
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) SUM
 	INTEGER I,J,K
 !
 ! Make sure YFIT is up to date.

@@ -3,6 +3,7 @@ C Subroutine to compute the quadrature weights for the K integration
 C (the second moment of the radiation field). A trapazoidal rule is used.
 C
 	SUBROUTINE KTRPWGT(X,W,N)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 - Call to DP_ZERO removed.
@@ -10,7 +11,7 @@ C                       ERROR_LU etc installed.
 C Created 17-May-1989 - Based on HWEIGHT
 C
 	INTEGER N,I
-	REAL(10) X(N),W(N),T1,T2,SUM
+	REAL(KIND=LDP) X(N),W(N),T1,T2,SUM
 C
 	INTEGER ERROR_LU,LUER
 	LOGICAL, SAVE :: CHECK=.FALSE.

@@ -1,5 +1,6 @@
       SUBROUTINE PALETT(TYPE, CONTRA, BRIGHT)
 C-----------------------------------------------------------------------
+	USE SET_KIND_MODULE
 C Set a "palette" of colors in the range of color indices used by
 C PGIMAG.
 C-----------------------------------------------------------------------

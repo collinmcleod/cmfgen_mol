@@ -1,4 +1,5 @@
       SUBROUTINE DGETF2( M, N, A, LDA, IPIV, INFO )
+	USE SET_KIND_MODULE
 *
 *  -- LAPACK routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -10,7 +11,7 @@
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * )
-      REAL(10)   A( LDA, * )
+      REAL(KIND=LDP)   A( LDA, * )
 *     ..
 *
 *  Purpose
@@ -36,7 +37,7 @@
 *  N       (input) INTEGER
 *          The number of columns of the matrix A.  N >= 0.
 *
-*  A       (input/output) REAL(10) array, dimension (LDA,N)
+*  A       (input/output) REAL(KIND=LDP) array, dimension (LDA,N)
 *          On entry, the m by n matrix to be factored.
 *          On exit, the factors L and U from the factorization
 *          A = P*L*U; the unit diagonal elements of L are not stored.
@@ -59,7 +60,7 @@
 *  =====================================================================
 *
 *     .. Parameters ..
-      REAL(10)   ONE, ZERO
+      REAL(KIND=LDP)   ONE, ZERO
       PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Local Scalars ..

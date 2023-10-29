@@ -1,4 +1,5 @@
       SUBROUTINE ZTPMV ( UPLO, TRANS, DIAG, N, AP, X, INCX )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       INTEGER            INCX, N
       CHARACTER*1        DIAG, TRANS, UPLO

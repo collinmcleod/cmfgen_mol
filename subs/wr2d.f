@@ -5,9 +5,10 @@ C
 C Altered 13-Dec-1989 - Implicit none installed. I index written out.
 C
 	SUBROUTINE WR2D(A,N,M,MES,LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER N,M,LU
-	REAL(10) A(N,M)
+	REAL(KIND=LDP) A(N,M)
 	CHARACTER*(*) MES
 C
 	INTEGER MS,MF,ML,I,J

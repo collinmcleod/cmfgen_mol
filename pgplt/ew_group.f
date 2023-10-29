@@ -9,6 +9,7 @@
 !
 	SUBROUTINE EW_GROUP(NLINES,NAMEIONS,L1,L2,EW,
 	1                   CENTROID)
+	USE SET_KIND_MODULE
 !
 	USE MOD_CURVE_DATA
 !
@@ -61,7 +62,7 @@
 	          YL1(2*IL-1)=CD(IP)%DATA(L_CHAN(1))		!Get the corresponding flux for each curve
 	          YL1(2*IL)=CD(IP)%DATA(L_CHAN(2))		!Get the corresponding flux for each curve
 	    ENDIF
-! 
+!
 !  Compute de equivalent width and the centroid for each line.
 !
 	    DO I=L_CHAN(1),L_CHAN(2)-1
@@ -70,16 +71,16 @@
 	       CENTROID(IL)=CENTROID(IL)+0.5*( CD(IP)%XVEC(I)*(CD(IP)%DATA(I)-1.0)
 	1            + CD(IP)%XVEC(I+1)*(CD(IP)%DATA(I+1)-1.0) )*
 	1            (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
-	       write(20,*)ew(il),IL 
+	       write(20,*)ew(il),IL
 	    END DO
             IF (IP .EQ. 1) EWOBS(IL)=EW(IL)   !store the EW from data
 !
 ! Comupte the "statistics", SUM1 and SUM2
 !
-	    IF (IP .GT. 1) THEN 
+	    IF (IP .GT. 1) THEN
 	      WRITE(19,*)(EWOBS(IL)-EW(IL))**2,(1.0-EWOBS(IL)/EW(IL))**2,EWOBS(IL),IL,IP
 	      SUM1=SUM1+(EWOBS(IL)-EW(IL))**2
-	      SUM2=SUM2+(1.0-EWOBS(IL)/EW(IL))**2	      
+	      SUM2=SUM2+(1.0-EWOBS(IL)/EW(IL))**2	
 !	      SUM2=SUM2+(1.0-EW(IL)/EWOBS(IL))**2
 	    ENDIF
 	    IF(EW(IL) .NE. 0.0)THEN
@@ -99,5 +100,5 @@
 !	write(6,*)yl1
 	write(6,*)'nplts2: ',NPLTS
 	close(unit=22)
-	RETURN 
+	RETURN
 	END

@@ -16,6 +16,7 @@ C are contained in MOD_TRAP_DERIVATIVES.
 C
 	SUBROUTINE NEWVKIMD(W,DTAU,RKI,S,U,R,Z
 	1                          ,DIFF,DBC,LS,NC,ND,NI)
+	USE SET_KIND_MODULE
 	USE MOD_TRAP_DERIVATIVES
 	IMPLICIT NONE
 C
@@ -30,12 +31,12 @@ C Created 21-Jan-1988 - Based on VKIMD. Program does full linearization
 C                           allowing for the corrections to the trapazoidal rule.
 C
 	INTEGER LS,NC,ND,NI
-	REAL(10) W(NI,NI),DTAU(NI),S(NI),U(NI),Z(NI)
-	REAL(10) R(ND),RKI(ND),DBC
+	REAL(KIND=LDP) W(NI,NI),DTAU(NI),S(NI),U(NI),Z(NI)
+	REAL(KIND=LDP) R(ND),RKI(ND),DBC
 	LOGICAL DIFF
 C
 	INTEGER I,J,K
-	REAL(10) ALPHA,BETA
+	REAL(KIND=LDP) ALPHA,BETA
 C
 	W(:,:)=0.0D0
 C
@@ -73,7 +74,7 @@ C
 	ALPHA=(U(NI)-U(NI-1))/DTAU(NI-1)/DTAU(NI-1)
 	IF(LS .GT. NC)ALPHA=ALPHA+0.5D0*( S(NI)-U(NI) )
 	ALPHA=0.5D0*(Z(NI-1)-Z(NI))*ALPHA
- 
+
 	W(NI,NI-2)=-ALPHA*(Z(NI-1)-Z(NI))*A(NI-1)*Z(NI-1)/R(NI-1)/6.0D0
 	W(NI,NI-1)=ALPHA*(  1.0D0 + (Z(NI-1)-Z(NI))*( A(NI)*Z(NI)/R(NI)
 	1                 - B(NI-1)*Z(NI-1)/R(NI-1) )/6.0D0  )

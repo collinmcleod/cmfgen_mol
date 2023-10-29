@@ -8,6 +8,7 @@
 	1              ED,DI,T,IMP_VAR,
 	1              EQ_A,EQION,AT_NO,Z_A,
 	1              NU,EMHNUKT,NT,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 07-May-2001 : Inserted IMP_VAR vector in call. Only compute
@@ -20,28 +21,28 @@
 	EXTERNAL XCROSS_V2
 !
 	INTEGER ND,NT,N_A,N_B,EQ_A,EQION
-	REAL(10) VCHI(NT,ND),VETA(NT,ND)
-	REAL(10) HN_A(N_A,ND),HNST_A(N_A,ND),dlnHNST_AdlnT(N_A,ND)
-	REAL(10) HN_B(N_B,ND),HNST_B(N_B,ND),dlnHNST_BdlnT(N_B,ND)
-	REAL(10) ED(ND),DI(ND),T(ND),EMHNUKT(ND),NU
-	REAL(10) AT_NO,Z_A
+	REAL(KIND=LDP) VCHI(NT,ND),VETA(NT,ND)
+	REAL(KIND=LDP) HN_A(N_A,ND),HNST_A(N_A,ND),dlnHNST_AdlnT(N_A,ND)
+	REAL(KIND=LDP) HN_B(N_B,ND),HNST_B(N_B,ND),dlnHNST_BdlnT(N_B,ND)
+	REAL(KIND=LDP) ED(ND),DI(ND),T(ND),EMHNUKT(ND),NU
+	REAL(KIND=LDP) AT_NO,Z_A
 	LOGICAL IMP_VAR(NT)
 !
 ! Functions called.
 !
-	REAL(10) XCROSS_V2
+	REAL(KIND=LDP) XCROSS_V2
 	INTEGER ERROR_LU
 !
 ! Constants for opacity etc.
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local constants.
 !
 	INTEGER I,J,LEV
-	REAL(10) ALPHA,LTE_POP,NO_ELEC
-	REAL(10) TCHI1,TETA2,TETA3
+	REAL(KIND=LDP) ALPHA,LTE_POP,NO_ELEC
+	REAL(KIND=LDP) TCHI1,TETA2,TETA3
 	INTEGER, PARAMETER :: IZERO=0
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 	LOGICAL ERROR_OUTPUT
@@ -52,7 +53,7 @@
 ! We only include the variation terms if the ION and the level are regared as
 ! important variables. T and ED are always regarded as important, and are therefore
 ! not checked.
-!                            
+!
 ! Add in BOUND-FREE contributions (if any). XCROSS_V2 must return 0
 ! if frequency is to low to cause ionizations. The cross-section
 ! is assumed to be independent of the level of the valence electron.

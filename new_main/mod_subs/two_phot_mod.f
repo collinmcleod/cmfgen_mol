@@ -1,9 +1,10 @@
 !
 ! Module containing 2-photon data. It is also used to
-! contain rate data so that STEQ (statistical equilibrium 
+! contain rate data so that STEQ (statistical equilibrium
 ! equations) and BA matrices can be updated.
 !
 	MODULE TWO_PHOT_MOD
+	USE SET_KIND_MODULE
 	INTEGER N_TWO
 !
 ! Altered 19-Aug-2015: Extra variables added to improve two photon opacity calculation (cur_hmi, 8-Jul-2015).
@@ -11,7 +12,7 @@
 !
 ! Reaction data
 !
-! TYPE_TWO       : Indentifies formula to evaluate photon emission as a 
+! TYPE_TWO       : Indentifies formula to evaluate photon emission as a
 !                     function of frequency.
 ! SPEC_ID        : Species identifer (e.g. HI)
 ! LOW_NAME_TWO   : Level name of lower level
@@ -30,7 +31,7 @@
 !
 	  INTEGER, PARAMETER :: MAX_COEF=10
           INTEGER, ALLOCATABLE :: N_COEF_TWO(:)
-	  REAL(10), ALLOCATABLE:: COEF_TWO(:,:)
+	  REAL(KIND=LDP), ALLOCATABLE:: COEF_TWO(:,:)
 	
 !
 ! Arrays required to update STEQ (statistical equilibrium) and BA (variation
@@ -41,9 +42,9 @@
 ! G_UP_TWO       : Statistical weight of upper level
 ! LOW_LEV_TWO    : Pointer to lower level in POPS and STEQ arrays
 ! UP_LEV_TWO     : Pointer to upper level in POPS and STEQ arrays
-! FS_RAT_LOW     : LTE ratio of population in FULL ATOM to that in the super 
+! FS_RAT_LOW     : LTE ratio of population in FULL ATOM to that in the super
 !                       level for the lower level
-! FS_RAT_UP      : LTE ratio of population in FULL ATOM to that in the super 
+! FS_RAT_UP      : LTE ratio of population in FULL ATOM to that in the super
 !                       upper for the lower level
 ! FREQ_TWO       : Maximum frequency for 2-photon transition
 !
@@ -52,16 +53,16 @@
 !
 !TWO_PHOT_AVAILABLE  : Inidcates transition has been set, and species available.
 !
-          REAL(10), ALLOCATABLE :: Z_TWO(:)
-          REAL(10), ALLOCATABLE :: G_LOW_TWO(:)
-          REAL(10), ALLOCATABLE :: G_UP_TWO(:)
-          REAL(10), ALLOCATABLE :: FS_RAT_LOW(:,:)
-          REAL(10), ALLOCATABLE :: FS_RAT_UP(:,:)
-          REAL(10), ALLOCATABLE :: FREQ_TWO(:)
+          REAL(KIND=LDP), ALLOCATABLE :: Z_TWO(:)
+          REAL(KIND=LDP), ALLOCATABLE :: G_LOW_TWO(:)
+          REAL(KIND=LDP), ALLOCATABLE :: G_UP_TWO(:)
+          REAL(KIND=LDP), ALLOCATABLE :: FS_RAT_LOW(:,:)
+          REAL(KIND=LDP), ALLOCATABLE :: FS_RAT_UP(:,:)
+          REAL(KIND=LDP), ALLOCATABLE :: FREQ_TWO(:)
 !
-	  REAL(10), ALLOCATABLE :: DOWN_RATE_TWO(:,:)
-	  REAL(10), ALLOCATABLE :: UP_RATE_TWO(:,:)
-	  REAL(10), ALLOCATABLE :: PHOT_OC_TWO(:,:)
+	  REAL(KIND=LDP), ALLOCATABLE :: DOWN_RATE_TWO(:,:)
+	  REAL(KIND=LDP), ALLOCATABLE :: UP_RATE_TWO(:,:)
+	  REAL(KIND=LDP), ALLOCATABLE :: PHOT_OC_TWO(:,:)
 !
           INTEGER, ALLOCATABLE :: ION_ID_TWO(:)
           INTEGER, ALLOCATABLE :: ION_LOW_LEV_TWO(:)
@@ -69,7 +70,7 @@
           INTEGER, ALLOCATABLE :: LOW_LEV_TWO(:)
           INTEGER, ALLOCATABLE :: UP_LEV_TWO(:)
           INTEGER, ALLOCATABLE :: LST_FREQ_INDX_TWO(:)
-!	  
+!	
 	  LOGICAL, ALLOCATABLE :: TWO_PHOT_AVAILABLE(:)
 	  LOGICAL, ALLOCATABLE :: TWO_PHOT_COEF_FIXED(:)
 !
@@ -94,6 +95,7 @@
 ! where N is the nubmer of 2 photon transitions.
 !
 	SUBROUTINE RD_TWO_PHOT(LUIN,INCL_TWO_PHOT)
+	USE SET_KIND_MODULE
 	USE TWO_PHOT_MOD	
 	IMPLICIT NONE
 !
@@ -198,7 +200,7 @@ C
 C Replace all TABS with 2 spaces. NB: CHAR(9) is TAB.
 C
 	    DO WHILE(INDEX(STRING,CHAR(9)) .NE. 0)
-	      L=INDEX(STRING,CHAR(9)) 
+	      L=INDEX(STRING,CHAR(9))
 	      STRING(L:)='  '//STRING(L+1:)
 	    END DO
 C
@@ -221,7 +223,7 @@ C
 	    END IF
 	    DO WHILE(STRING(1:1) .EQ. ' ')
 	      STRING(1:)=STRING(2:)
-	    END DO   
+	    END DO
 	    L=INDEX(STRING,' ')
 	    LOW_NAME_TWO(J)=STRING(1:L-1)
 
@@ -233,7 +235,7 @@ C
 	    END IF
 	    DO WHILE(STRING(1:1) .EQ. '  ')
 	      STRING(1:)=STRING(2:)
-	    END DO   
+	    END DO
 	    L=INDEX(STRING,'  ')
 	    UP_NAME_TWO(J)=STRING(1:L-1)
 	    STRING(1:)=STRING(L+1:)
@@ -245,7 +247,7 @@ C
 !
 	      DO WHILE(STRING(1:1) .EQ. ' ')
 	        STRING(1:)=STRING(2:)
-	      END DO   
+	      END DO
 	      L=INDEX(STRING,'  ')
 	      A_LOW_NAME_TWO(J)=STRING(1:L-1)
 	      STRING(1:)=STRING(L+1:)
@@ -258,7 +260,7 @@ C
 	      END IF
 	      DO WHILE(STRING(1:1) .EQ. ' ')
 	        STRING(1:)=STRING(2:)
-	      END DO   
+	      END DO
 	      L=INDEX(STRING,'  ')
 	      A_UP_NAME_TWO(J)=STRING(1:L-1)
 	      STRING(1:)=STRING(L+1:)

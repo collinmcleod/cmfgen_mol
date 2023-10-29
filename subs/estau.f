@@ -4,10 +4,11 @@ C rule is used, and at the outer boundary it is assumed the Ne varies as
 C r^{-2}. Will need to be altered for an exponential atmosphere.
 C
 	SUBROUTINE ESTAU(OPT_DEP,R,ED,DTAU,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 	INTEGER ND,I
-	REAL(10) R(ND),ED(ND),DTAU(ND),OPT_DEP(ND)
+	REAL(KIND=LDP) R(ND),ED(ND),DTAU(ND),OPT_DEP(ND)
 C
 	DO I=1,ND
 	  OPT_DEP(I)=0.0D0

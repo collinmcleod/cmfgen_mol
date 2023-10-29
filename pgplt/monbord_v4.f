@@ -8,6 +8,7 @@ C
 	1                  XLABEL,YLABEL,TITLE,N_TITLE,
 	1                  TITONRHS,AX_OPT,TOP_AX_OPT,NORMAL_R_AXIS,
 	1                  XLAB_FILE,YLAB_FILE)
+	USE SET_KIND_MODULE
 C
 	IMPLICIT NONE
 	REAL*4 FNTICK
@@ -41,7 +42,7 @@ C
 	REAL*4 XINC,YINC		!Spacing between axis coordinates
 	REAL*4 TICK_FAC
 	REAL*4 EXPCHAR
-	REAL(10) LST_X_VAL
+	REAL(KIND=LDP) LST_X_VAL
 C
 	INTEGER IXTICK,IYTICK		!Number of ticks between coordinates
 	INTEGER IDX,IDY		!Number of digits after decimal point.
@@ -104,9 +105,9 @@ C
 	LOGICAL TAKE_LOG
 C
 C If TOP_AX_OPT='TOPLAB' a different scale (nonlinear) can be put on the top
-C axis, as specifed by SCED, and ED. 
+C axis, as specifed by SCED, and ED.
 C
-	REAL(10) SCED,XED
+	REAL(KIND=LDP) SCED,XED
 	INTEGER NXED
 	CHARACTER(LEN=30) TOPLABEL
 	COMMON /TOPBORD/ SCED(31),XED(31),NXED,TOPLABEL
@@ -121,7 +122,7 @@ C
 	  LOG_OFFSET(I)=LOG10( FLOAT(I) )
 	END DO
 C
-C Estimate appropriate tick sizes (Default is tick same size as 
+C Estimate appropriate tick sizes (Default is tick same size as
 C character with expand=1)
 C
  	CALL PGQTXT(RZERO,RZERO,RZERO,RZERO,'X',XBOX,YBOX)
@@ -132,7 +133,7 @@ C
 C
 C It is possible using a \pn (n=0,1...) on the end of the TITLE to specify the
 C title color.
-C     
+C
 	LOC_TIT(1:N_TITLE)=TITLE(1:N_TITLE)
 	PEN_TIT(1:N_TITLE)=0
 	PEN_XLAB=0
@@ -177,8 +178,8 @@ C
 C
 C 
 C
-C Set parameters for drawing tick marks and putting on coordinates depending 
-C on the choice of Axes chosen. 
+C Set parameters for drawing tick marks and putting on coordinates depending
+C on the choice of Axes chosen.
 C
 	IF(AX_OPT .EQ. 'LOGX')THEN
 	  XINC=1.0
@@ -213,7 +214,7 @@ C
 	  IYST=INT( (YNUMST-YPAR(1))*1.0001/ (YINC/IYTICK) )
 	END IF
 C
-C If we are switching to LOG axes with full numbers marked we strip Log from 
+C If we are switching to LOG axes with full numbers marked we strip Log from
 C the label.
 C
 	IF(INDEX(AX_OPT,'X') .NE. 0)THEN
@@ -225,7 +226,7 @@ C
 	      LOC_XLAB=LOC_XLAB(4:)
 	    END IF
 	  END IF
-	END IF	    
+	END IF	
 	IF(INDEX(AX_OPT,'Y') .NE. 0)THEN
 	  IF(UC(LOC_YLAB(1:3)) .EQ. 'LOG')THEN
 	    IF(UC(LOC_YLAB(1:4)) .EQ. 'LOG(')THEN
@@ -411,7 +412,7 @@ C
 	    CLOSE(UNIT=10)
 	  ELSE
 	    WRITE(6,*)'Unable to open file with Y ordinate labels'
-	  END IF 
+	  END IF
 	ELSE IF(AX_OPT .EQ. 'LOGY' .OR. AX_OPT .EQ. 'LOGXY')THEN
 	  DO I=0,NY
 	    DO J=1,9
@@ -536,14 +537,14 @@ C
 	  DO I=0,NX
 	    X=XNUMST+(I-IXST)*XINC/IXTICK
 	    IF( MOD(I-IXST,IXTICK) .EQ. 0 )THEN
-	      IF( MONINSIDE(X,XPAR) )THEN 
+	      IF( MONINSIDE(X,XPAR) )THEN
 	        CALL PGMOVE(X,YPAR(1))
 	        CALL PGDRAW(X,YPAR(1)+YTCK_SIZE)
 	      END IF
 	      Y=YPAR(1)-YTCK_SIZE
 	      CALL MON_NUM(X,Y-(YCHAR_SIZE),X,2,IDX)
 	    ELSE
-	      IF( MONINSIDE(X,XPAR) )THEN 
+	      IF( MONINSIDE(X,XPAR) )THEN
 	        CALL PGMOVE(X,YPAR(1))
 	        CALL PGDRAW(X,YPAR(1)+0.67*YTCK_SIZE)
 	      END IF

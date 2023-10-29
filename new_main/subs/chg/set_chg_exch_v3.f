@@ -11,11 +11,12 @@
 !
 	SUBROUTINE SET_CHG_EXCH_V3(ID,LEVEL_NAMES,EDGE_F,G_F,F_TO_S,
 	1            GION,N_F,N_S,ND,EQSPEC,EQHYD,T)
+	USE SET_KIND_MODULE
 	USE CHG_EXCH_MOD_V3
 	IMPLICIT NONE
 !
 ! Altered 18-Apr-2001 : ID inserted in call.
-!                       Principal matching of levels is now done elsewehere 
+!                       Principal matching of levels is now done elsewehere
 !                         (SET_CHG_LEV_ID_V3).
 ! Altered 09-Oct-1999 : Error reporting inproved.
 ! Created 20-Aug-1998 : BASED on V1. Very different calls and a change in
@@ -28,24 +29,24 @@
 	INTEGER EQSPEC	!Eqaution of G.S. in BA matrix
 	INTEGER EQHYD		!Sepecies equation in BA amtrix
 !
-	REAL(10) EDGE_F(N_F)
-	REAL(10) G_F(N_F)
+	REAL(KIND=LDP) EDGE_F(N_F)
+	REAL(KIND=LDP) G_F(N_F)
 	INTEGER F_TO_S(N_F)
 !
 	CHARACTER*(*) LEVEL_NAMES(N_F)
 !
-	REAL(10) T(ND)
-	REAL(10) GION		!Statistical weight of ion
+	REAL(KIND=LDP) T(ND)
+	REAL(KIND=LDP) GION		!Statistical weight of ion
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local vectors and variables
 !
-	REAL(10) G_CHG_VEC(ND)
-	REAL(10) dG_CHG_VEC(ND)
-	REAL(10) T_VEC(ND)
-	REAL(10) T1
+	REAL(KIND=LDP) G_CHG_VEC(ND)
+	REAL(KIND=LDP) dG_CHG_VEC(ND)
+	REAL(KIND=LDP) T_VEC(ND)
+	REAL(KIND=LDP) T1
 !
 	INTEGER I,J,K,L
 	INTEGER I_S,I_F
@@ -99,7 +100,7 @@
 	                G_CHG_VEC(L)=G_CHG_VEC(L)+G_F(I_F)*T1
 	                dG_CHG_VEC(L)=dG_CHG_VEC(L)-G_F(I_F)*T_VEC(L)*T1
 	              END DO
-	            ELSE 
+	            ELSE
 	              WRITE(LUER,*)'Inconsistent level IDs in SET_CHG_EXCH_V3'
 	              WRITE(LUER,*)'Charge exchange reaction:',J
 	              WRITE(LUER,*)'Species:',K
@@ -139,9 +140,9 @@ C
 C
 	          IF(K .EQ. 1 .OR. K .EQ. 2)THEN
 	            AI_AR_CHG(J,1:ND)=AI_AR_CHG(J,1:ND)*G_CHG_VEC(1:ND)
-	            dlnAI_AR_CHG_dlnT(J,1:ND)=dlnAI_AR_CHG_dlnT(J,1:ND) + 
+	            dlnAI_AR_CHG_dlnT(J,1:ND)=dlnAI_AR_CHG_dlnT(J,1:ND) +
 	1                            dG_CHG_VEC(1:ND)/G_CHG_VEC(1:ND)
-	          ELSE 
+	          ELSE
 	            AI_AR_CHG(J,1:ND)=AI_AR_CHG(J,1:ND)/G_CHG_VEC(1:ND)
 	            dlnAI_AR_CHG_dlnT(J,1:ND)=dlnAI_AR_CHG_dlnT(J,1:ND) -
 	1                            dG_CHG_VEC(1:ND)/G_CHG_VEC(1:ND)

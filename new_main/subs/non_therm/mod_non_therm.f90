@@ -1,4 +1,5 @@
 	MODULE MOD_NON_THERM
+	USE SET_KIND_MODULE
 !
         INTEGER NKT
 !
@@ -7,29 +8,29 @@
 ! YE contains the distribution of non-thermal electrons as a function
 !   of energy and depth.
 !
-        REAL(10), ALLOCATABLE :: XKT(:)
-        REAL(10), ALLOCATABLE :: dXKT(:)
-        REAL(10), ALLOCATABLE :: dXKT_ON_XKT(:)
-        REAL(10), ALLOCATABLE :: YE(:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: XKT(:)
+        REAL(KIND=LDP), ALLOCATABLE :: dXKT(:)
+        REAL(KIND=LDP), ALLOCATABLE :: dXKT_ON_XKT(:)
+        REAL(KIND=LDP), ALLOCATABLE :: YE(:,:)
 !
 ! These quantities provide the fraction of the total energy going into the
 ! three forms of heating --- electron, ionization, and excitation at each depth.
 !
-        REAL(10), ALLOCATABLE ::  FRAC_ELEC_HEATING(:)
-        REAL(10), ALLOCATABLE ::  FRAC_ION_HEATING(:)
-        REAL(10), ALLOCATABLE ::  FRAC_EXCITE_HEATING(:)
+        REAL(KIND=LDP), ALLOCATABLE ::  FRAC_ELEC_HEATING(:)
+        REAL(KIND=LDP), ALLOCATABLE ::  FRAC_ION_HEATING(:)
+        REAL(KIND=LDP), ALLOCATABLE ::  FRAC_EXCITE_HEATING(:)
 !
 	TYPE NON_THERM_ION_DATA
-	  REAL(10) :: N_ION_EL
-	  REAL(10) :: ZION
-	  REAL(10) :: PQN
-	  REAL(10) :: ANG
-	  REAL(10) :: ION_POT
-	  REAL(10) :: N_ATOM
-	  REAL(10) :: A_COL,B_COL,C_COL, D_COL
-	  REAL(10), POINTER :: CROSS_SEC(:)
-	  REAL(10), ALLOCATABLE :: XTAB(:)
-	  REAL(10), ALLOCATABLE :: YTAB(:)
+	  REAL(KIND=LDP) :: N_ION_EL
+	  REAL(KIND=LDP) :: ZION
+	  REAL(KIND=LDP) :: PQN
+	  REAL(KIND=LDP) :: ANG
+	  REAL(KIND=LDP) :: ION_POT
+	  REAL(KIND=LDP) :: N_ATOM
+	  REAL(KIND=LDP) :: A_COL,B_COL,C_COL, D_COL
+	  REAL(KIND=LDP), POINTER :: CROSS_SEC(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: XTAB(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: YTAB(:)
 !
           INTEGER :: N_STATES=0
 	  INTEGER :: ATOM_STATES(10)

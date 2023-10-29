@@ -2,6 +2,7 @@ c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rel_variables(nd,chi,eta,nu_dnu,b,
      *       I_prev,chi_tau,source_prime)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -48,24 +49,24 @@ c
 c
 c Opacity and emissivity variables
 c
-      REAL(10), dimension(nd) :: chi,eta
+      REAL(KIND=LDP), dimension(nd) :: chi,eta
 c
 c Intensity variable
 c
-      REAL(10), dimension(nd) :: I_prev
+      REAL(KIND=LDP), dimension(nd) :: I_prev
 c
 c Frequency variable
 c
-      REAL(10) nu_dnu
+      REAL(KIND=LDP) nu_dnu
 c
 c Advection and abberation terms
 c
-      REAL(10), dimension(nd) :: b
+      REAL(KIND=LDP), dimension(nd) :: b
 c
 c Transfer variables
 c
-      REAL(10), dimension(nd) :: chi_tau
-      REAL(10), dimension(nd) :: source_prime
+      REAL(KIND=LDP), dimension(nd) :: chi_tau
+      REAL(KIND=LDP), dimension(nd) :: source_prime
 c
 c--------------------------------------------------------------------
 c

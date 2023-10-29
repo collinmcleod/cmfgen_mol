@@ -3,15 +3,16 @@ C Returns index value J such that RVAL lies between R(J) and
 C R(J+1).
 C
 	INTEGER FUNCTION GET_INDX_DP(RVAL,R,NW)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 17-Jan-2018 - Error reporting improved (added to IBIS 17-Mar-2018)
-C Altered 19-May-2014 - Changed error unit form 2 to 6 (25-May-2014).                              
+C Altered 19-May-2014 - Changed error unit form 2 to 6 (25-May-2014).
 C Altered 02-May-1990 - Bug fix: If on two consecutive calls, RVAL was the
 C                       same but the R array different, the returned index
 C                       was incorrect (referring to the first array). No
 C                       longer use RVAL_SAV, but directly check R array.
-C                       Routine now correctly returns 1 or NW-1 if RVAL is 
+C                       Routine now correctly returns 1 or NW-1 if RVAL is
 C                       outside R range. Previously only J and not GET_INDX_DP
 C                       was being set. (Minor correction on 8/May/91).
 C
@@ -21,7 +22,7 @@ C Altered 23-Apr-1990 - Check that RVAL is inside range given by R included.
 C Created 11-Apr-1990
 C
 	INTEGER NW
-	REAL(10) R(NW),RVAL
+	REAL(KIND=LDP) R(NW),RVAL
 C
 	INTEGER J,ILOW,IHIGH,ILOW_SAV
 	SAVE ILOW_SAV
@@ -41,7 +42,7 @@ C
 C Need t compare RVAl with R array (and not RSAV) in case value is
 C same, but array is different.
 C
-	  IF( (RVAL .GE.  R(ILOW_SAV+1)) .AND. 
+	  IF( (RVAL .GE.  R(ILOW_SAV+1)) .AND.
 	1       (RVAL .LE. R(ILOW_SAV)) )THEN
             GET_INDX_DP=ILOW_SAV
 	    RETURN
@@ -87,7 +88,7 @@ C
 C Need t compare RVAl with R array (and not RSAV) in case value is
 C same, but array is different.
 C
-	  IF( (RVAL .LE.  R(ILOW_SAV+1)) .AND. 
+	  IF( (RVAL .LE.  R(ILOW_SAV+1)) .AND.
 	1       (RVAL .GE. R(ILOW_SAV)) )THEN
             GET_INDX_DP=ILOW_SAV
 	    RETURN
@@ -129,13 +130,14 @@ C Returns index value J such that RVAL lies between R(J) and
 C R(J+1).
 C
 	INTEGER FUNCTION GET_INDX_SP(RVAL,R,NW)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 02-May-1990 - Bug fix: If on two consecutive calls, RVAL was the
 C                       same but the R array different, the returned index
 C                       was incorrect (referring to the first array). No
 C                       longer use RVAL_SAV, but directly check R array.
-C                       Routine now correctly returns 1 or NW-1 if RVAL is 
+C                       Routine now correctly returns 1 or NW-1 if RVAL is
 C                       outside R range. Previously only J and not GET_INDX
 C                       was being set. (Minor correction on 8/May/91).
 C
@@ -165,7 +167,7 @@ C
 C Need t compare RVAl with R array (and not RSAV) in case value is
 C same, but array is different.
 C
-	  IF( (RVAL .GE.  R(ILOW_SAV+1)) .AND. 
+	  IF( (RVAL .GE.  R(ILOW_SAV+1)) .AND.
 	1       (RVAL .LE. R(ILOW_SAV)) )THEN
             GET_INDX_SP=ILOW_SAV
 	    RETURN
@@ -207,7 +209,7 @@ C
 C Need t compare RVAl with R array (and not RSAV) in case value is
 C same, but array is different.
 C
-	  IF( (RVAL .LE.  R(ILOW_SAV+1)) .AND. 
+	  IF( (RVAL .LE.  R(ILOW_SAV+1)) .AND.
 	1       (RVAL .GE. R(ILOW_SAV)) )THEN
             GET_INDX_SP=ILOW_SAV
 	    RETURN

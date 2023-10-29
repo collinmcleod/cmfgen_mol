@@ -6,13 +6,14 @@
 ! FS_RAT_LOW and FS_RAT_UP need to be updated.
 !
 ! This routine should be identical to SET_TWO_PHOT_V3 except we do not
-! access HNST_F_ON_S (we assume it unity) and EQSPC. We also set 
+! access HNST_F_ON_S (we assume it unity) and EQSPC. We also set
 ! UP_LEV_TWO and LOW_LEV_TWO to the level in the FULL atom -- not in POPS.
 !
 	SUBROUTINE SET_TWO_PHOT_DISP_V3(SPECIES,ID,
 	1            HNST_S,N_S,
 	1            HNST_F_ON_S,LEVEL_NAME,EDGE_F,G_F,F_TO_S,N_F,
 	1            ND,ZION,EQSPEC,SPECIES_PRESENT)
+	USE SET_KIND_MODULE
 	USE TWO_PHOT_MOD
 	IMPLICIT NONE
 !
@@ -29,10 +30,10 @@
 	INTEGER ID
 	INTEGER EQSPEC
 !
-	REAL(10) HNST_S(N_S,ND)
-	REAL(10) HNST_F_ON_S(N_F,ND)
-	REAL(10) EDGE_F(N_F)
-	REAL(10) G_F(N_F)
+	REAL(KIND=LDP) HNST_S(N_S,ND)
+	REAL(KIND=LDP) HNST_F_ON_S(N_F,ND)
+	REAL(KIND=LDP) EDGE_F(N_F)
+	REAL(KIND=LDP) G_F(N_F)
 	INTEGER F_TO_S(N_F)
 !
 	LOGICAL SPECIES_PRESENT
@@ -40,10 +41,10 @@
 	CHARACTER*(*) SPECIES
 	CHARACTER*(*) LEVEL_NAME(N_F)
 !
-	REAL(10) GION
-	REAL(10) ZION
+	REAL(KIND=LDP) GION
+	REAL(KIND=LDP) ZION
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER ERROR_LU,LUER
@@ -108,7 +109,7 @@ C
 	    Z_TWO(J)=ZION
 	    ION_ID_TWO(J)=ID
 	    DO I=1,N_F
-	       IF( LEVEL_NAME(I) .EQ. LOW_NAME_TWO(J) .OR. 
+	       IF( LEVEL_NAME(I) .EQ. LOW_NAME_TWO(J) .OR.
 	1              LEVEL_NAME(I) .EQ. A_LOW_NAME_TWO(J) )THEN
 	          I_F=I
 	          I_S=I                          !F_TO_S(I)
@@ -123,7 +124,7 @@ C
 ! Identify upper level of 2-photon transition
 !
 	    DO I=1,N_F
-	       IF( LEVEL_NAME(I) .EQ. UP_NAME_TWO(J) .OR. 
+	       IF( LEVEL_NAME(I) .EQ. UP_NAME_TWO(J) .OR.
 	1                 LEVEL_NAME(I) .EQ. A_UP_NAME_TWO(J))THEN
 	          I_F=I
 	          I_S=I                                 !F_TO_S(I)

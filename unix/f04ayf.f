@@ -2,6 +2,7 @@ C
 C Dummy error routine to replace NAG routine.
 C
 	SUBROUTINE F04AYF
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Created 28-May-1996

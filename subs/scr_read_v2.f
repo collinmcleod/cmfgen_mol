@@ -2,6 +2,7 @@
 	SUBROUTINE SCR_READ_V2(R,V,SIGMA,POPS,
 	1             IREC_RD,NITSF,NUM_TIMES,LST_NG,RVSIG_WRITTEN,
 	1             NT,ND,LU,NEWMOD)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 04-Nov-2013 : Bug fix -- incorrect read when R, V and SIGMA written, and not
@@ -31,12 +32,12 @@
 !
 	INTEGER IREC_RD
 	INTEGER NITSF,NT,ND,NUM_TIMES,LST_NG,LU
-	REAL(10) R(ND),V(ND),SIGMA(ND),POPS(NT*ND)
+	REAL(KIND=LDP) R(ND),V(ND),SIGMA(ND),POPS(NT*ND)
 	LOGICAL RVSIG_WRITTEN
 !
 ! Used to read R, V & SIGMA (allows for 3*ND to be > N_PER_REC.
 !
-	REAL(10) RVSIG_VEC(3*ND)
+	REAL(KIND=LDP) RVSIG_VEC(3*ND)
 !
 ! Local variables.
 !
@@ -75,7 +76,7 @@
 ! These are computer dependent, hence call to DIR_ACC_PARS. NB.
 ! REC_SIZE is not the same as REC_LEN --- it is REC_LEN which is
 ! passed to the OPEN statement.
- 
+
 	CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
 	ARRAYSIZE=NT*ND
 	NUMRECS=INT( (ARRAYSIZE-1)/N_PER_REC )+1
@@ -244,6 +245,7 @@
 	SUBROUTINE SCR_RITE_V2(R,V,SIGMA,POPS,
 	1               IREC,NITSF,NUM_TIMES,LST_NG,WRITE_RVSIG,
 	1               NT,ND,LU,WRITFAIL)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 28-Sep-2009 : Changed to allow an increase in the number of depth points.
@@ -261,11 +263,11 @@
 	LOGICAL WRITFAIL
 	LOGICAL WRITE_RVSIG
 	INTEGER IREC,NITSF,NT,ND,NUM_TIMES,LST_NG,LU
-	REAL(10) R(ND),V(ND),SIGMA(ND),POPS(NT*ND)
+	REAL(KIND=LDP) R(ND),V(ND),SIGMA(ND),POPS(NT*ND)
 !
 ! Used to read R, V & SIGMA (allows for 3*ND to be > N_PER_REC.
 !
-	REAL(10) RVSIG_VEC(3*ND)
+	REAL(KIND=LDP) RVSIG_VEC(3*ND)
 !
 ! Local variables.
 !
@@ -366,7 +368,7 @@
 	    END IF
 	  END IF
 !
-! We now write out R,V and SIGMA on every iteration. This is also 
+! We now write out R,V and SIGMA on every iteration. This is also
 ! done for SN models where R can change with iteration. R read here will
 ! only be correct for the last iteration. Fixed with a later read.
 !
@@ -479,6 +481,7 @@
 	SUBROUTINE SCR_RITE_NAM_V2(R,V,SIGMA,POPS,
 	1               IREC,NITSF,NUM_TIMES,LST_NG,WRITE_RVSIG,
 	1               NT,ND,LU,WRITFAIL)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 28-Sep-2009 : Changed to allow an increase in the number of depth points.
@@ -496,11 +499,11 @@
 	LOGICAL WRITFAIL
 	LOGICAL WRITE_RVSIG
 	INTEGER IREC,NITSF,NT,ND,NUM_TIMES,LST_NG,LU
-	REAL(10) R(ND),V(ND),SIGMA(ND),POPS(NT*ND)
+	REAL(KIND=LDP) R(ND),V(ND),SIGMA(ND),POPS(NT*ND)
 !
 ! Used to read R, V & SIGMA (allows for 3*ND to be > N_PER_REC.
 !
-	REAL(10) RVSIG_VEC(3*ND)
+	REAL(KIND=LDP) RVSIG_VEC(3*ND)
 !
 ! Local variables.
 !
@@ -602,7 +605,7 @@
 	    END IF
 	  END IF
 !
-! We now write out R,V and SIGMA on every iteration. This is also 
+! We now write out R,V and SIGMA on every iteration. This is also
 ! done for SN models where R can change with iteration. R read here will
 ! only be correct for the last iteration. Fixed with a later read.
 !

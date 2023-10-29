@@ -1,7 +1,7 @@
 !
 ! Program reads in departire coefficient estimates from a file and uses
 ! linear interpolation in the log-tau plane to lay these estimates
-! on the grid. The electron density is assumed to be known on entering 
+! on the grid. The electron density is assumed to be known on entering
 ! the program. The ion density is also returned.
 !
 ! The subroutine uses the same tau scale as in INIT_TEMP_V2 for the
@@ -12,41 +12,42 @@
 ! non-monotonic electron distributions.
 !
 	SUBROUTINE REGRID_B_ON_SPH_TAU(DHEN,ION,ED,CLUMP_FAC,R,N,ND,LU,FILNAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 07-Jun-2005 - Based on REGRID_B_ON_NE
 !
 	INTEGER N,ND,LU
-	REAL(10) DHEN(N,ND)
-	REAL(10) ION(ND)
-	REAL(10) CLUMP_FAC(ND)
-	REAL(10) ED(ND)
-	REAL(10) R(ND)
+	REAL(KIND=LDP) DHEN(N,ND)
+	REAL(KIND=LDP) ION(ND)
+	REAL(KIND=LDP) CLUMP_FAC(ND)
+	REAL(KIND=LDP) ED(ND)
+	REAL(KIND=LDP) R(ND)
 	CHARACTER(LEN=*) FILNAME
 !
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 !
-	REAL(10) NEW_ED(ND)
-	REAL(10) TAU(ND)
+	REAL(KIND=LDP) NEW_ED(ND)
+	REAL(KIND=LDP) TAU(ND)
 !
 ! Old values read in from file. HYD is the old d.c.'s
 !
-	REAL(10), ALLOCATABLE :: HYD(:,:)
-	REAL(10), ALLOCATABLE :: ROLD(:)
-	REAL(10), ALLOCATABLE :: OLDED(:)
-	REAL(10), ALLOCATABLE :: OLDTAU(:)
-	REAL(10), ALLOCATABLE :: OLDION(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HYD(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: ROLD(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDED(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDTAU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDION(:)
 !
-	REAL(10), ALLOCATABLE :: TA(:)
-	REAL(10), ALLOCATABLE :: TB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)
 !
 	INTEGER I,J,K
 	INTEGER NX,NXST,NX_END,NZ
 	INTEGER NOLD,NDOLD,IOS
-	REAL(10) CONST,TSTAROLD,RPOLD
-	REAL(10) ION_FRAC,VEL,OLD_CLUMP_FAC
-	REAL(10) RTAU1,RTAU1_OLD,T1
+	REAL(KIND=LDP) CONST,TSTAROLD,RPOLD
+	REAL(KIND=LDP) ION_FRAC,VEL,OLD_CLUMP_FAC
+	REAL(KIND=LDP) RTAU1,RTAU1_OLD,T1
 	LOGICAL CLMP_PRES
 	LOGICAL CHECK_DC
 	CHARACTER*80 STRING
@@ -214,7 +215,7 @@
 	    DHEN(J,I)=EXP(TA(I))
 	  END DO
 !
-! Assume d.c. is constant in outer region. This option is consistent with 
+! Assume d.c. is constant in outer region. This option is consistent with
 ! the assumption of constant T.
 !
 	  IF(NXST .NE. 1)THEN

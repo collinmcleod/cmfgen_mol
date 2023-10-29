@@ -3,12 +3,12 @@
 ! Feautrier Technique for a spherical gray atmosphere. A diffusion approximation
 ! is used for the lower boundary condition. Radiative equilibrium is assumed.
 !
-! The time dependent radiative transfer equation is solved including all terms 
-! to first order in v/c, and assumes a Hubble flow. Thus sigma=dlnv/dlnr-1 =0. 
-! A Langrangian description is used to handle the time dependence. The frequency 
+! The time dependent radiative transfer equation is solved including all terms
+! to first order in v/c, and assumes a Hubble flow. Thus sigma=dlnv/dlnr-1 =0.
+! A Langrangian description is used to handle the time dependence. The frequency
 ! integrated moments J and H (and the associated boundary conditions) at the previous
 ! time step need to be available, and are read in from the file JH_AT_PREV_TIME.
-! If desired, the full D/Dt term can be neglected, in which case the code should give 
+! If desired, the full D/Dt term can be neglected, in which case the code should give
 ! identical answers to JGREY_WITH_FVT.
 !
 ! Partially based on the routine ../subs/jgrey_with_fvt.f
@@ -16,6 +16,7 @@
 	SUBROUTINE JGREY_HUB_DDT_V1(RJ,RSQ_HFLUX,CHI,R,VEL,SIGMA,
 	1              P,JQW,HQW,KQW,LUMINOSITY,METHOD,DIFF_APPROX,IC,
 	1              ACCURACY,DO_TIME_VAR,ND,NC,NP)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 22-July-2006
@@ -24,77 +25,77 @@
 	INTEGER ND
 	INTEGER NP
 !
-	REAL(10) RJ(ND)			!Mean intensity (computed and returned)
-	REAL(10) RSQ_HFLUX(ND)            !r^2 . Flux
-	REAL(10) R(ND)			!Radius grid (in units of 10^10 cm)
-	REAL(10) CHI(ND)			!Opacity
-	REAL(10) VEL(ND)			!Velocity (in km/s)
-	REAL(10) SIGMA(ND)		!dlnV/dlnr-1
+	REAL(KIND=LDP) RJ(ND)			!Mean intensity (computed and returned)
+	REAL(KIND=LDP) RSQ_HFLUX(ND)            !r^2 . Flux
+	REAL(KIND=LDP) R(ND)			!Radius grid (in units of 10^10 cm)
+	REAL(KIND=LDP) CHI(ND)			!Opacity
+	REAL(KIND=LDP) VEL(ND)			!Velocity (in km/s)
+	REAL(KIND=LDP) SIGMA(ND)		!dlnV/dlnr-1
 !
-	REAL(10) P(NP)			!Impact parameters
-	REAL(10) JQW(ND,NP)		!Quadrature weight for J (on grid)
-	REAL(10) KQW(ND,NP) 		!Quadrature weight for K (on grid)
-	REAL(10) HQW(ND,NP)		!Quadrature weight for H (at midpoints)
+	REAL(KIND=LDP) P(NP)			!Impact parameters
+	REAL(KIND=LDP) JQW(ND,NP)		!Quadrature weight for J (on grid)
+	REAL(KIND=LDP) KQW(ND,NP) 		!Quadrature weight for K (on grid)
+	REAL(KIND=LDP) HQW(ND,NP)		!Quadrature weight for H (at midpoints)
 !
-	REAL(10) LUMINOSITY               !Luminosity at inner boundary in Lsun.
-	REAL(10) IC                       !Not used
-	REAL(10) ACCURACY			!Convergence accuracy for computing f.
+	REAL(KIND=LDP) LUMINOSITY               !Luminosity at inner boundary in Lsun.
+	REAL(KIND=LDP) IC                       !Not used
+	REAL(KIND=LDP) ACCURACY			!Convergence accuracy for computing f.
 	LOGICAL DIFF_APPROX		!Use a diffusion approximation (as opposed to a Schuster core)
 	CHARACTER(LEN=6) METHOD
 !
 ! Local vectors & arrays
 !
-	REAL(10) TA(ND),TB(ND),TC(ND)
-	REAL(10) XM(ND)
-	REAL(10) HU(ND)
-	REAL(10) HL(ND)
-	REAL(10) HT(ND)
-	REAL(10) JFAC(ND)
-	REAL(10) JT(ND)
-	REAL(10) WMID(ND)
-	REAL(10) Z(ND)
-	REAL(10) CHI_MOD(ND)
-	REAL(10) dCHIdR(ND)
-	REAL(10) dCHI_MODdR(ND)
-	REAL(10) Q(ND)
-	REAL(10) F(ND)
-	REAL(10) DTAU(ND)
-	REAL(10) BETA(ND)
-	REAL(10) VU(ND)
-	REAL(10) CV(ND)
-	REAL(10) AVE_DTAU_ON_Q(ND)
-	REAL(10) RAD_DECAY_TERM(ND)
-	REAL(10) E_RAD_DECAY(ND)
+	REAL(KIND=LDP) TA(ND),TB(ND),TC(ND)
+	REAL(KIND=LDP) XM(ND)
+	REAL(KIND=LDP) HU(ND)
+	REAL(KIND=LDP) HL(ND)
+	REAL(KIND=LDP) HT(ND)
+	REAL(KIND=LDP) JFAC(ND)
+	REAL(KIND=LDP) JT(ND)
+	REAL(KIND=LDP) WMID(ND)
+	REAL(KIND=LDP) Z(ND)
+	REAL(KIND=LDP) CHI_MOD(ND)
+	REAL(KIND=LDP) dCHIdR(ND)
+	REAL(KIND=LDP) dCHI_MODdR(ND)
+	REAL(KIND=LDP) Q(ND)
+	REAL(KIND=LDP) F(ND)
+	REAL(KIND=LDP) DTAU(ND)
+	REAL(KIND=LDP) BETA(ND)
+	REAL(KIND=LDP) VU(ND)
+	REAL(KIND=LDP) CV(ND)
+	REAL(KIND=LDP) AVE_DTAU_ON_Q(ND)
+	REAL(KIND=LDP) RAD_DECAY_TERM(ND)
+	REAL(KIND=LDP) E_RAD_DECAY(ND)
 !
-	REAL(10) RSQ_J_OLDT(ND)
-	REAL(10) RSQ_H_OLDT(ND)
+	REAL(KIND=LDP) RSQ_J_OLDT(ND)
+	REAL(KIND=LDP) RSQ_H_OLDT(ND)
 !
 ! FS indicates the following quantities (J, H, K & N) have been computed using the
 ! formal solution.
 !
-	REAL(10) FS_RSQJ(ND)
-	REAL(10) FS_RSQH(ND)
-	REAL(10) FS_RSQK(ND)
+	REAL(KIND=LDP) FS_RSQJ(ND)
+	REAL(KIND=LDP) FS_RSQH(ND)
+	REAL(KIND=LDP) FS_RSQK(ND)
 !
-	REAL(10) H_OUTBC		!Eddington factor for H at outer boundary.
-	REAL(10) H_INBC
-	REAL(10) H_OUTBC_OLDT	!Eddington factor for H at outer boundary (prev. time step).
-	REAL(10) H_INBC_OLDT
-	REAL(10) DTAU_INB_SAVE
-	REAL(10) IBOUND
-	REAL(10) DBB
-	REAL(10) DBC
-	REAL(10) C_KMS
-	REAL(10) RECIP_CDELTAT
-	REAL(10) ROLD_ON_R
-	REAL(10) DELTA_TIME_SECS
+	REAL(KIND=LDP) H_OUTBC		!Eddington factor for H at outer boundary.
+	REAL(KIND=LDP) H_INBC
+	REAL(KIND=LDP) H_OUTBC_OLDT	!Eddington factor for H at outer boundary (prev. time step).
+	REAL(KIND=LDP) H_INBC_OLDT
+	REAL(KIND=LDP) DTAU_INB_SAVE
+	REAL(KIND=LDP) IBOUND
+	REAL(KIND=LDP) DBB
+	REAL(KIND=LDP) DBC
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) RECIP_CDELTAT
+	REAL(KIND=LDP) ROLD_ON_R
+	REAL(KIND=LDP) DELTA_TIME_SECS
 !
 	INTEGER, PARAMETER :: IONE=1
-	REAL(10) PI
-	REAL(10) T1,T2,T3
-	REAL(10) E1,E2,E3
+	REAL(KIND=LDP) PI
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) E1,E2,E3
 	INTEGER I,NI,LS
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL SPEED_OF_LIGHT
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	INTEGER LUER,ERROR_LU,LU
@@ -118,7 +119,7 @@
 	T1=1.0D+10/4.0D0/PI
 	E_RAD_DECAY=T1*E_RAD_DECAY
 !
-! When DO_TIME_VAR=.FALSE., this routine should give the same answers as 
+! When DO_TIME_VAR=.FALSE., this routine should give the same answers as
 ! JGREY_WITH_FVT.
 !
 ! NB: The factor of 10^10 occurs because c. /\t is a length, and R in
@@ -243,7 +244,7 @@
 	  DO I=2,ND-1
 	    T1=RECIP_CDELTAT*(XM(I)-ROLD_ON_R*ROLD_ON_R*RSQ_J_OLDT(I))
 	    T2=-2.0D0*Q(I)*CHI(I)*(RSQ_HFLUX(I)-RSQ_HFLUX(I-1))/(DTAU(I-1)+DTAU(I))
-	    T3=R(I)*R(I)*E_RAD_DECAY(I) 
+	    T3=R(I)*R(I)*E_RAD_DECAY(I)
 	    WRITE(LU,'(10ES12.4)')R(I),CHI(I),XM(I),ROLD_ON_R*ROLD_ON_R*RSQ_J_OLDt(I),RSQ_HFLUX(I),
 	1         T1,T2,2.0D0*(RSQ_HFLUX(I-1)-RSQ_HFLUX(I))/(R(I-1)-R(I+1)),T3,(T1+T2-T3)
 	  END DO
@@ -328,7 +329,7 @@
 	    DO I=1,NI-1
 	      VU(I)=1.0D0/DTAU(I)
 	    END DO
-! 
+!
 	    XM(1)=-IBOUND
 	    TA(1)=0.0D0
 	    TC(1)=1.0D0/DTAU(1)
@@ -391,7 +392,7 @@ C
 	  END DO
 !
 	  H_OUTBC=H_OUTBC+JQW(1,LS)*(XM(1)-IBOUND)*Z(1)/R(1)
-!  
+!
 2000	CONTINUE
 !
 ! Compute the new Feautrier factors. These are stored in FS_RSQK so as not
@@ -423,7 +424,7 @@ C
 	  WRITE(LU,'(I5,ES14.5,11ES13.4)')I,R(I),VEL(I),CHI(I),BETA(I)/R(I),
 	1       R(I)*R(I)*E_RAD_DECAY(I),R(I)*R(I)*RJ(I),
 	1       R(I)*R(I)*(RJ(I)+E_RAD_DECAY(I)/CHI(I)),RSQ_J_OLDt(I),
-	1       RSQ_HFLUX(I),RSQ_H_OLDt(I),T1*(RJ(I)**0.25),T1*(T2 **0.25) 
+	1       RSQ_HFLUX(I),RSQ_H_OLDt(I),T1*(RJ(I)**0.25),T1*(T2 **0.25)
 	END DO
 	WRITE(LU,'(A,13X,A,12X,A,10X,A,9(1X,A))')'    I','R','V','CHI','        V/cR',
 	1           '   RSQE(rad)','        RSQJ','RSQ(J+E/CHI)','   RSQJ(old)',

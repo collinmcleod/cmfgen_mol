@@ -1,9 +1,10 @@
 !
-! Subroutine to determine those frequencies at which the continuum opacity 
+! Subroutine to determine those frequencies at which the continuum opacity
 ! will be evaluated. At other frequenecies it can be held fixed.
 !
 	SUBROUTINE DET_MAIN_CONT_FREQ(NU,NCF,NU_CONT,NCF_CONT,
 	1                NU_EVAL,DOPV,DELV_CONT,COMPUTE_ALL_CROSS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered : 04-Sep-2022 : Update format associated wth write statement (too handle large NCF).
@@ -17,38 +18,38 @@
 ! has been chosen to sample all lines and continuum edges adequately.
 !
 	INTEGER NCF
-	REAL(10) NU(NCF)
+	REAL(KIND=LDP) NU(NCF)
 !
 ! For each frequncy NU(I), the continuum cross-section will be evaluated at
 ! freqency NU_EVAL(I).
 !
-	REAL(10) NU_EVAL(NCF)
+	REAL(KIND=LDP) NU_EVAL(NCF)
 !
-! NCF_CONT represents the number of continuum frequencies before line 
-! insertion. NU_CONT contains these frequencies, and has been chosen to 
-! sample continuum cross-sections (with allowance for level dissolution and 
-! important bound-free edges) adequately. 
+! NCF_CONT represents the number of continuum frequencies before line
+! insertion. NU_CONT contains these frequencies, and has been chosen to
+! sample continuum cross-sections (with allowance for level dissolution and
+! important bound-free edges) adequately.
 !
 	INTEGER NCF_CONT
-	REAL(10) NU_CONT(NCF_CONT)
+	REAL(KIND=LDP) NU_CONT(NCF_CONT)
 !
-	REAL(10) DOPV		!Doppler spacing across lines
+	REAL(KIND=LDP) DOPV		!Doppler spacing across lines
 !
 ! DELV_CONT is the maximum sparation between points at which the continuum
 !   opacity is evaluated.
 !
-	REAL(10) DELV_CONT
+	REAL(KIND=LDP) DELV_CONT
 !
 	LOGICAL COMPUTE_ALL_CROSS
 !
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	INTEGER ERROR_LU
 	EXTERNAL SPEED_OF_LIGHT,ERROR_LU
 !
 ! Local variables:
 !
 	INTEGER LU_OUT,L,K,ML,ML_ST,ML_END,LST_COMP
-	REAL(10) T1,T2,T3,T4,DOP_RAT,VRAT,C_KMS
+	REAL(KIND=LDP) T1,T2,T3,T4,DOP_RAT,VRAT,C_KMS
 !
 	LU_OUT=ERROR_LU()
 	IF(COMPUTE_ALL_CROSS .OR. DELV_CONT .EQ. 0)THEN
@@ -79,7 +80,7 @@
 	  END DO
 	  L=K
 	  DO WHILE( ABS( (NU_CONT(ML)-NU(L))/NU_CONT(ML)) .LE. DOP_RAT)
-	    NU_EVAL(L)=NU(L) 
+	    NU_EVAL(L)=NU(L)
 	    L=L+1
 	    IF(L .GT. NCF)EXIT
 	  END DO
@@ -110,7 +111,7 @@
 ! Set evaluation frequencies.
 !
 	  DO L=ML_ST,ML_END-1
-	    T1=(NU(LST_COMP)-NU(L))/NU(L) 
+	    T1=(NU(LST_COMP)-NU(L))/NU(L)
 	    T2=(NU(L)-NU(ML_END))/NU(L)
 	    IF(T1+T2 .GT. 1.25D0*VRAT .AND. T1 .GT. 0.75D0*VRAT)THEN
 	      NU_EVAL(L)=NU(L)
@@ -179,7 +180,7 @@
 	     IF(L .LT. NCF)T4=C_KMS*(NU_EVAL(L+1)-NU_CONT(ML))/NU_CONT(ML)
 	     WRITE(17,'(X,I6,ES15.7,4ES12.3)')ML,NU_CONT(ML),T1,T2,T3,T4
 	   END DO
-	   
+	
 	CLOSE(UNIT=17)
 !
 	RETURN

@@ -3,6 +3,7 @@
 ! are work vectors.
 !
 	SUBROUTINE TORSCL(TOR,CHI,R,DTAU,dCHI_dR,ND,METHOD,TYPE_ATM)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 26-Jan-2014 : No longer use fixed format for reading exponent from TYPE_ATM.
@@ -22,12 +23,12 @@
 !                     estimate of optical depth to infinity.
 !
 	INTEGER ND
-	REAL(10) TOR(ND),CHI(ND),R(ND),DTAU(ND),dCHI_dR(ND)
+	REAL(KIND=LDP) TOR(ND),CHI(ND),R(ND),DTAU(ND),dCHI_dR(ND)
 	CHARACTER*(*) METHOD,TYPE_ATM
 !
 	INTEGER I
 	INTEGER INDX
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 !
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -35,7 +36,7 @@
 	CALL DERIVCHI(dCHI_dR,CHI,R,ND,METHOD)
 	CALL NORDTAU(DTAU,CHI,R,R,dCHI_dR,ND)
 !
-! Determine optical depth from outer boundary to infinity. 
+! Determine optical depth from outer boundary to infinity.
 ! For the extrapolations, we use depths 1 & 5 (=INDX).
 !
 	INDX=5

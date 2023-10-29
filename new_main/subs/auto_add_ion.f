@@ -4,6 +4,7 @@
 !     (b) Call a routine to create XZV_IN files for species not present.
 !
 	SUBROUTINE AUTO_ADD_ION()
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
@@ -84,7 +85,7 @@
 	    END DO
 	  END IF
 !
-1000	  CONTINUE    
+1000	  CONTINUE
 	END DO
 	CALL DEALLOCATE_MOD_GUESS_DC()
 !

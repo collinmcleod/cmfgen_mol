@@ -1,6 +1,6 @@
 !
 ! Subroutine to perform an NG accleration for a Comoving-Frame Model. Progam
-! uses the last 4 iterations which are stored in the last "4 records" 
+! uses the last 4 iterations which are stored in the last "4 records"
 ! (effectively) of SCRTEMP.
 !
 ! The NG acceleration is perfomed separately on each depth, or over a band
@@ -19,6 +19,7 @@
 	SUBROUTINE DO_NG_BAND_ACCEL_V4(POPS,R,V,SIGMA,ROLD,
 	1             NT,ND,NG_BAND,NG_DONE,MAXDEC,MAXINC,
 	1             DO_NG_VALIDITY_CHECK,LUSCR,LUER)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 15-Jan-2009 : Minor bug fixed.
@@ -33,27 +34,27 @@
 	INTEGER LUSCR
 	INTEGER LUER
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) ROLD(ND)
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-	REAL(10) SIGMA(ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) ROLD(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) SIGMA(ND)
 !
-	REAL(10) MAXDEC
-	REAL(10) MAXINC
+	REAL(KIND=LDP) MAXDEC
+	REAL(KIND=LDP) MAXINC
 	LOGICAL NG_DONE
 	LOGICAL DO_NG_VALIDITY_CHECK
 !
 ! Local arrays. We will acelerate R, V, and SIGMA as well. If R is not changing,
 ! the accleration wiull keep R constant since acceleration is linear.
 !
-	REAL(10) BIG_POPS(NT+3,ND)
-	REAL(10) RDPOPS(NT+3,ND,4)
+	REAL(KIND=LDP) BIG_POPS(NT+3,ND)
+	REAL(KIND=LDP) RDPOPS(NT+3,ND,4)
 !
-	REAL(10) RATIO
-	REAL(10) MEAN
-	REAL(10) MIN_RATIO, MAX_RATIO
-	REAL(10) T1
+	REAL(KIND=LDP) RATIO
+	REAL(KIND=LDP) MEAN
+	REAL(KIND=LDP) MIN_RATIO, MAX_RATIO
+	REAL(KIND=LDP) T1
 !
 ! Local variables which are adjusted to match the particular model under
 ! consideration.
@@ -77,7 +78,7 @@
 !
 ! Read POPULATIONS that were output on last iteration. This is primarily
 ! done to get NITSF etc.
-! 
+!
 	NEWMOD=.FALSE.
 	IREC=0
 	CALL SCR_READ_V2(R,V,SIGMA,POPS,IREC,NITSF,RITE_N_TIMES,LST_NG,
@@ -144,7 +145,7 @@
 	    END DO
 	    MEAN=MEAN/ND
 	    WRITE(6,*)' '
-	    IF(MEAN .GT. 5.0 .AND. MIN_RATIO .GT. 0.5D0*MEAN .AND. 
+	    IF(MEAN .GT. 5.0 .AND. MIN_RATIO .GT. 0.5D0*MEAN .AND.
 	1             MAX_RATIO .LT. 2.0D0*MEAN)THEN
 	      WRITE(6,*)'NG acceleration will be performed'
 	    ELSE
@@ -182,6 +183,7 @@
 !
 	SUBROUTINE NG_MIT_BAND_OPT_V1(POPS,RDPOPS,ND,NT,NBAND,
 	1                NG_DONE,MAXDEC,MAXINC,LUER)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 01-Jun-2003: NUM_BAD_NG now correctly initialized to zero.
@@ -190,27 +192,27 @@
 	INTEGER NT
 	INTEGER NBAND
 	INTEGER LUER
-	REAL(10) POPS(NT,ND)              !Initial/corrected populations (I/O) 
-	REAL(10) RDPOPS(NT,ND,4)		!Populations to be accelerated
+	REAL(KIND=LDP) POPS(NT,ND)              !Initial/corrected populations (I/O)
+	REAL(KIND=LDP) RDPOPS(NT,ND,4)		!Populations to be accelerated
 !
 ! Return maximum % increase and decrease, and whether the NG acceleration
 ! was succesful.
 !
-	REAL(10) MAXINC
-	REAL(10) MAXDEC
+	REAL(KIND=LDP) MAXINC
+	REAL(KIND=LDP) MAXDEC
 	LOGICAL NG_DONE
 !
 ! Local arrays
 !
-	REAL(10) NEWPOP(NT,ND)
-	REAL(10) VEC_INC(ND)
-	REAL(10) VEC_DEC(ND)
-	REAL(10) INT_ARRAY(ND)
+	REAL(KIND=LDP) NEWPOP(NT,ND)
+	REAL(KIND=LDP) VEC_INC(ND)
+	REAL(KIND=LDP) VEC_DEC(ND)
+	REAL(KIND=LDP) INT_ARRAY(ND)
 !
 ! Local variables
 !
-	REAL(10) T1,T2
-	REAL(10) LOCINC,LOCDEC
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) LOCINC,LOCDEC
 !
 	INTEGER NS
 	INTEGER NUM_BAD_NG
@@ -240,7 +242,7 @@
 !
 	MAXINC=-1000.0D0
 	MAXDEC=1000.0D0
-	DO L=1,ND 
+	DO L=1,ND
 	  LOCINC=-1000.0D0
 	  LOCDEC=1000.0D0
 	  DO K=1,NT
@@ -288,7 +290,7 @@
 	IF(NUM_BAD_NG .GT. 3)THEN
 	  WRITE(LUER,*)'Too many bad NG accelerations - '//
 	1              'NG acceleration cancelled'
-	  NG_DONE=.FALSE. 
+	  NG_DONE=.FALSE.
 !
 ! Restore old population estimates for all depths.
 !
@@ -320,6 +322,7 @@
 ! 
 !
 	SUBROUTINE DO_TRANS_AND_NG_V1(NEWPOP,RDPOPS,LST,LEND,NT,ND,NS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER LST            !Start depth
@@ -332,10 +335,10 @@
 !
 	INTEGER NS
 !
-	REAL(10) NEWPOP(NS)             !Returned with new estimates.
-	REAL(10) RDPOPS(NT,ND,4)
+	REAL(KIND=LDP) NEWPOP(NS)             !Returned with new estimates.
+	REAL(KIND=LDP) RDPOPS(NT,ND,4)
 !
-	REAL(10) TEMP(4,NS)
+	REAL(KIND=LDP) TEMP(4,NS)
 	INTEGER I,J,K,L
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -350,7 +353,7 @@
 	  STOP
 	END IF
 !
-! Use the NG acceleration method to improve the population estimates. 
+! Use the NG acceleration method to improve the population estimates.
 ! We can perform the NG acceleration at each depth individually, or
 ! over a range of depths. Weight is used to indicate that we
 ! are to minimize the percentage errors - not the absolute magnitudec

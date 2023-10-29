@@ -7,6 +7,7 @@
 	1            OBS_FREQ,OBS_FLUX,NOS,
 	1            MAX_DEL_V_RES_ZONE,
 	1            TAU_MAX,ES_DTAU,N_INS_OBS,INT_METHOD,WRITE_IP)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 06-Jun-2003 : Evaluation of Z(I) chnaged to avoid bad FP numbers
@@ -22,7 +23,7 @@
 !                         the continuum optical dpeth near TAU=1.
 !                         We now check that Z_RAY is big enough for the
 !                         the point insertions.
-! Altered 22-Jan-1998 : Treatment of optically thick lines at the outer 
+! Altered 22-Jan-1998 : Treatment of optically thick lines at the outer
 !                         boundary improved.
 !
 	INTEGER ND
@@ -32,93 +33,93 @@
 ! supplied by calling routine. At present it is assumed that these are
 ! on the same depth grid, and on the same frequecy grid.
 !
-	REAL(10) ETA_CMF(ND,NCF)
-	REAL(10) CHI_CMF(ND,NCF)
-	REAL(10) FREQ_CMF(NCF)
+	REAL(KIND=LDP) ETA_CMF(ND,NCF)
+	REAL(KIND=LDP) CHI_CMF(ND,NCF)
+	REAL(KIND=LDP) FREQ_CMF(NCF)
 !
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-	REAL(10) T(ND)
-	REAL(10) ED(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) T(ND)
+	REAL(KIND=LDP) ED(ND)
 !
 ! Impact prameters: For rays not striking the core, P must be defined by
 ! the R grid. NP should be ND+NC
 !
 	INTEGER NC
 	INTEGER NP
-	REAL(10) P(NP)
-	REAL(10) HQW_AT_RMAX(NP)
+	REAL(KIND=LDP) P(NP)
+	REAL(KIND=LDP) HQW_AT_RMAX(NP)
 !
 ! Observer's frame frequencies in units of 10^15 Hz. Should be monontonically
 ! decreasing.
 !
 	INTEGER NOS
-	REAL(10) OBS_FREQ(NOS)
-	REAL(10) OBS_FLUX(NOS)
+	REAL(KIND=LDP) OBS_FREQ(NOS)
+	REAL(KIND=LDP) OBS_FLUX(NOS)
 !
-! Maximum velocity spacing across consequitive grid points. Ideally this 
+! Maximum velocity spacing across consequitive grid points. Ideally this
 ! should be least than 0.25 of a Doppler width.
 !
-	REAL(10) MAX_DEL_V_RES_ZONE(ND)
+	REAL(KIND=LDP) MAX_DEL_V_RES_ZONE(ND)
 !
-	REAL(10) TAU_MAX
-	REAL(10) ES_DTAU
+	REAL(KIND=LDP) TAU_MAX
+	REAL(KIND=LDP) ES_DTAU
 	INTEGER N_INS_OBS
 	CHARACTER*(*) INT_METHOD
 !
 ! Local vectors and arrays.
 !
-	REAL(10) VMU(ND)		!Velocity*(Z/R) on R grid.
-	REAL(10) Z(ND)		!Distance along ray on R grid.
-	REAL(10) ESEC(ND)		!Electron scattering opacity
-	REAL(10) TAU_ES(ND)	!Rough TAU_ES along ray
-	REAL(10) DTAU_ES(ND)	!Rough DTAU_ES along ray
+	REAL(KIND=LDP) VMU(ND)		!Velocity*(Z/R) on R grid.
+	REAL(KIND=LDP) Z(ND)		!Distance along ray on R grid.
+	REAL(KIND=LDP) ESEC(ND)		!Electron scattering opacity
+	REAL(KIND=LDP) TAU_ES(ND)	!Rough TAU_ES along ray
+	REAL(KIND=LDP) DTAU_ES(ND)	!Rough DTAU_ES along ray
 !
 ! Emissivities and Opacities in the CMF frame. These are created in this
 ! routing from ETA_CMF and CHI_CMF, and are on the fine grid used to solve
 ! the transfer equation.
 !
-	REAL(10), ALLOCATABLE ::  ETA_CMF_RAY(:,:)
-	REAL(10), ALLOCATABLE ::  CHI_CMF_RAY(:,:)
-	REAL(10), ALLOCATABLE ::  SM_FREQ_CMF(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  ETA_CMF_RAY(:,:)
+	REAL(KIND=LDP), ALLOCATABLE ::  CHI_CMF_RAY(:,:)
+	REAL(KIND=LDP), ALLOCATABLE ::  SM_FREQ_CMF(:)
 !
 ! Intensity as a function of impact parameter and frequency in the observers
 ! frame. Need for interpeting observations of Eta Car, and for understanding
 ! interferometric observations.
 !
 	LOGICAL WRITE_IP
-	REAL(10), ALLOCATABLE ::  IP_OBS(:,:)
+	REAL(KIND=LDP), ALLOCATABLE ::  IP_OBS(:,:)
 !
 ! Vectors defined along a ray. HALF_DZ, DZSQ_ON_12, and RECIP_DEL_Z are used
 ! to minimize computations.
 !
-	REAL(10), ALLOCATABLE ::  ETA_VEC(:)
-	REAL(10), ALLOCATABLE ::  CHI_VEC(:)
-	REAL(10), ALLOCATABLE ::  R_RAY(:)
-	REAL(10), ALLOCATABLE ::  V_RAY(:)
-	REAL(10), ALLOCATABLE ::  VMU_RAY(:)
-	REAL(10), ALLOCATABLE ::  Z_RAY(:)
-	REAL(10), ALLOCATABLE ::  TAU(:)
-	REAL(10), ALLOCATABLE ::  dZ(:)
-	REAL(10), ALLOCATABLE ::  HALF_DZ(:)
-	REAL(10), ALLOCATABLE ::  DZSQ_ON_12(:)
-	REAL(10), ALLOCATABLE ::  RECIP_DEL_Z(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  ETA_VEC(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  CHI_VEC(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  R_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  V_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  VMU_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  Z_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  TAU(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  dZ(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  HALF_DZ(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  DZSQ_ON_12(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  RECIP_DEL_Z(:)
 !
-	REAL(10), ALLOCATABLE ::  A0(:)
-	REAL(10), ALLOCATABLE ::  A1(:)
-	REAL(10), ALLOCATABLE ::  A2(:)
-	REAL(10), ALLOCATABLE ::  A3(:)
-	REAL(10), ALLOCATABLE ::  A4(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  A0(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  A1(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  A2(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  A3(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  A4(:)
 !
-	REAL(10), ALLOCATABLE ::  EE(:)
-	REAL(10), ALLOCATABLE ::  E0(:)
-	REAL(10), ALLOCATABLE ::  E1(:)
-	REAL(10), ALLOCATABLE ::  E2(:)
-	REAL(10), ALLOCATABLE ::  E3(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  EE(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  E0(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  E1(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  E2(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  E3(:)
 !
-	REAL(10), ALLOCATABLE ::  DTAU(:)
-	REAL(10), ALLOCATABLE ::  S(:)
-	REAL(10), ALLOCATABLE ::  dS(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  DTAU(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  S(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  dS(:)
 !
 	INTEGER NOS_INC
 	INTEGER OUT_ML
@@ -151,17 +152,17 @@
 	INTEGER REC_SIZE,UNIT_SIZE
 	INTEGER WORD_SIZE,N_PER_REC,ACCESS_F
 !
-	REAL(10) MAX_VMU
-	REAL(10) T1,T2,T3,T4
-	REAL(10) PSQ
-	REAL(10) C_KMS
-	REAL(10) PAR_FLUX
+	REAL(KIND=LDP) MAX_VMU
+	REAL(KIND=LDP) T1,T2,T3,T4
+	REAL(KIND=LDP) PSQ
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) PAR_FLUX
 !
 	INTEGER ERROR_LU
-	REAL(10) SPEED_OF_LIGHT,FUN_PI,PI
+	REAL(KIND=LDP) SPEED_OF_LIGHT,FUN_PI,PI
 	EXTERNAL SPEED_OF_LIGHT,FUN_PI,ERROR_LU
 !
-	REAL(10), PARAMETER :: ONE=1
+	REAL(KIND=LDP), PARAMETER :: ONE=1
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 !
@@ -173,7 +174,7 @@
 	OBS_FLUX(1:NOS)=0.0D0
 	ERR_COUNT=0
 !
-	IF(INT_METHOD .NE. 'STAU' .AND. 
+	IF(INT_METHOD .NE. 'STAU' .AND.
 	1         INT_METHOD .NE. 'ETAZ')THEN
 	  WRITE(LUER,*)'Error in OBS_FRAME_SUB_V4'
 	  WRITE(LUER,*)'Invalid integration method'
@@ -267,7 +268,7 @@
 !
 	ESEC(1:ND)=6.65D-15*ED(1:ND)
 !
-! 2* since ray can extend across whole atmosphere. The 2TAU_MAX/ES_DTAU is 
+! 2* since ray can extend across whole atmosphere. The 2TAU_MAX/ES_DTAU is
 ! for the insertion of extra continuum points if DTAU_ES > ES_DTAU (for
 ! TAU_ES < TAU_MAX).
 !
@@ -280,7 +281,7 @@
 	  WRITE(LUER,*)'STATUS=',IOS
 	  STOP
 	END IF
-!                               
+!
 ! Only do for NP-1 since last ray of a single point contains no flux.
 !
 	DO 50000 LS=1,NP-1
@@ -316,9 +317,9 @@
 	      NINS_CONT=1
 	    END IF
 	    NINS=MAX(NINS,NINS_CONT)
-	    NINS=MAX(NINS,N_INS_OBS+1)	    
+	    NINS=MAX(NINS,N_INS_OBS+1)	
 	    IF(J+NINS .GT. NI_MAX)THEN
-	      WRITE(LUER,*)'Error in OBS_FRAME_SUB'                   
+	      WRITE(LUER,*)'Error in OBS_FRAME_SUB'
 	      WRITE(LUER,*)'NI_MAX is too small: NI_MAX=',NI_MAX
 	      WRITE(LUER,*)'I=',I
 	      STOP
@@ -432,7 +433,7 @@
 ! 
 !
 ! We split the loop over observer's frame frequencies into two loops.
-! While this makes the code logic more complicated, it can be used to minimize 
+! While this makes the code logic more complicated, it can be used to minimize
 ! the amount of storage use by ETA_CMF_RAY and CHI_CMF_RAY. Without this
 ! loop, ETA_CMF_RY would have to be dimensioned ETA_CMF_RAY(NR,CMF) which
 ! is a very big array for NCF large, since NR generally will be > 100.
@@ -525,7 +526,7 @@
 	1      T2*(CHI_CMF_RAY(1,K-1)-CHI_CMF_RAY(1,K))+CHI_CMF_RAY(1,K)
 !
 ! Set TAU(1) to a reasonable value at the outer boundary. This avoids
-! having TAU(1)=0 and TAU2(300) which can cause wild oscilations in the 
+! having TAU(1)=0 and TAU2(300) which can cause wild oscilations in the
 ! Flux for lines which are optically thick at the outer boundary
 ! (eg CIII 976 in WCE stars, MGII 2780 in LBVs).
 !
@@ -563,8 +564,8 @@
 	    CALL TUNE(2,'FREQ INTERP')
 !
 ! Use the first derivatives in conjunction with the Euler-MaucLarin summation
-! formula to increase the accuracy of the opticaldepth integration. No 
-! correction is made for the integration over the end points. Note that TAU(I) 
+! formula to increase the accuracy of the opticaldepth integration. No
+! correction is made for the integration over the end points. Note that TAU(I)
 ! already contains the trapazoidal estimate for the optical depth scale.
 ! The derivative at each node is estmated using the function values at the
 ! two adjacent data points.
@@ -573,7 +574,7 @@
 !	    T3=0.0D0
 !	    T2=(CHI_VEC(1)-CHI_VEC(3))*RECIP_DEL_Z(2)
 !	    DO I=3,SM_NRAY-1
-!	      T1=T2     
+!	      T1=T2
 !	      T2=(CHI_VEC(I-1)-CHI_VEC(I+1))*RECIP_DEL_Z(I)
 !	      T4=DZSQ_ON_12(I)*(T2-T1)
 !	      IF(ABS(T4) .LT. 0.5*(TAU(I)-TAU(I-1)))T3=T3+T4
@@ -588,7 +589,7 @@
                 S(I)=(CHI_VEC(I)-CHI_VEC(I+1))/dZ(I)
 	      END DO
 !
-! Now compute the derivatives of CHI at node I. 
+! Now compute the derivatives of CHI at node I.
 !
 	      dS(1)=S(1) +(S(1)-S(2))*DZ(1)/(DZ(1)+DZ(2))
 	      DO I=2,SM_NRAY-1
@@ -598,7 +599,7 @@
 	      dS(SM_NRAY)=S(SM_NRAY-1)+
 	1                  (S(SM_NRAY-1)-S(SM_NRAY-2))*DZ(SM_NRAY-1)/
 	1                  (DZ(SM_NRAY-2)+DZ(SM_NRAY-1))
-!             
+!
 ! Adjust the first derivatives so that function is monotonic in each interval.
 !
 	      dS(1)=( SIGN(ONE,S(1))+SIGN(ONE,dS(1)) )*
@@ -672,7 +673,7 @@
 	        A4(I)=DTAU(I)*(E3(I)-E2(I))
 	      END DO
 !
-! Now compute the derivatives at node I. 
+! Now compute the derivatives at node I.
 !
 	      dS(1)=S(1) +(S(1)-S(2))*DTAU(1)/(DTAU(1)+DTAU(2))
 	      DO I=2,SM_NRAY-1
@@ -682,7 +683,7 @@
 	      dS(SM_NRAY)=S(SM_NRAY-1)+
 	1                  (S(SM_NRAY-1)-S(SM_NRAY-2))*DTAU(SM_NRAY-1)/
 	1                  (DTAU(SM_NRAY-2)+DTAU(SM_NRAY-1))
-!             
+!
 ! Adjust the first derivatives so that function is monotonic in each interval.
 !
 	      dS(1)=( SIGN(ONE,S(1))+SIGN(ONE,dS(1)) )*
@@ -727,7 +728,7 @@
 	      CALL TUNE(1,'FLUX INTEG')
 	      DO I=1,SM_NRAY
 	        ETA_VEC(I)=ETA_VEC(I)*EXP(-TAU(I))
-	      END DO 
+	      END DO
 !
 ! Use the Euler-Mclaurin Summation formula to compute the integrand.
 ! NB: We intgerate with Z as the independent variable, since TAU may not
@@ -738,7 +739,7 @@
 	      DO I=2,SM_NRAY-1
 	        T1=T2
 	        T2=(ETA_VEC(I-1)-ETA_VEC(I+1))*RECIP_DEL_Z(I)
-	        T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I)) 
+	        T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
 	        T4=DZSQ_ON_12(I-1)*(T2-T1)
 	        IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
 	        PAR_FLUX=PAR_FLUX + T3 + T4
@@ -746,14 +747,14 @@
 	      I=SM_NRAY
 	      T1=T2
 	      T2=(ETA_VEC(I-1)-ETA_VEC(I))/dZ(I-1)
-	      T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I)) 
+	      T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
 	      T4=DZSQ_ON_12(I-1)*(T2-T1)
 	      IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
 	      PAR_FLUX=PAR_FLUX + (T3+T4)
 !
 	      CALL TUNE(2,'FLUX INTEG')
 	    END IF
-!	    
+!	
 !
 ! Integrate this solution on to line profile.
 !
@@ -761,7 +762,7 @@
 	    IF(WRITE_IP)IP_OBS(LS,ML)=PAR_FLUX
 !
 40000	  CONTINUE
-	  CALL TUNE(2,'ML')      
+	  CALL TUNE(2,'ML')
 45000	  CONTINUE
 !
 	  WRITE(LUER,'(A,I3,A)')' LS loop',LS,' is finished.'

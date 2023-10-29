@@ -15,6 +15,7 @@
 !           X+  must be specfied before Y++
 !
 	SUBROUTINE RD_CHG_EXCH_V3(LUIN,INCL_CHG_EXCH)
+	USE SET_KIND_MODULE
 	USE CHG_EXCH_MOD_V3
 	IMPLICIT NONE
 !
@@ -22,7 +23,7 @@
 ! Altered 04-Dec-200:  Bug fix: Could enter infinite loop when left adjusting
 !                      reaction string.
 !                      Now use / to allow the specification of one alternate
-!                      name (not {} since some names now contain these 
+!                      name (not {} since some names now contain these
 !                      brackets).
 	INTEGER LUIN
 	LOGICAL INCL_CHG_EXCH
@@ -36,7 +37,7 @@
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 	CHARACTER*132 STRING,OLD_STRING
-	CHARACTER*11  FORMAT_DATE 
+	CHARACTER*11  FORMAT_DATE
 !
 	IF(INCL_CHG_EXCH)THEN
 	  DO_CHG_EXCH=.TRUE.
@@ -230,7 +231,7 @@
 	  END DO
 !
 	  L=1
-	  IF(SPEC_ID_CHG_RD(I,1)(2:2) .GE. 'a' .AND. 
+	  IF(SPEC_ID_CHG_RD(I,1)(2:2) .GE. 'a' .AND.
 	1             SPEC_ID_CHG_RD(I,1)(2:2) .LE. 'z')L=2
 	  IF(SPEC_ID_CHG_RD(I,1)(1:L) .NE. SPEC_ID_CHG_RD(I,3)(1:L))THEN
 	    WRITE(LUER,*)'Error in RD_CHG_EXCH',
@@ -239,7 +240,7 @@
 	  END IF
 !
 	  L=1
-	  IF(SPEC_ID_CHG_RD(I,2)(2:2) .GE. 'a' .AND. 
+	  IF(SPEC_ID_CHG_RD(I,2)(2:2) .GE. 'a' .AND.
 	1              SPEC_ID_CHG_RD(I,2)(2:2) .LE. 'z')L=2
 	  IF(SPEC_ID_CHG_RD(I,2)(1:L) .NE. SPEC_ID_CHG_RD(I,4)(1:L))THEN
 	    WRITE(LUER,*)'Error in RD_CHG_EXCH',

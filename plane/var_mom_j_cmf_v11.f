@@ -14,9 +14,9 @@
 ! NB TX(i,m, ) =dJ(i)/d(CHI(m),ETA(m),...)
 ! NB TVX(i,m, ) =dRSQH(i)/d(CHI(m),ETA(m),...)
 !
-! NM_KI reflects the 3rd dimension of KI. For this routine only the first 2 
-!   are important and are used to compute the variation of J with respect to 
-!   the CURRENT opacity and the CURRENT emissivity. 
+! NM_KI reflects the 3rd dimension of KI. For this routine only the first 2
+!   are important and are used to compute the variation of J with respect to
+!   the CURRENT opacity and the CURRENT emissivity.
 !
 ! TX_DIF_d_T and TX_DIFF_d_dTdR are used to describe the variations in J
 ! caused by the DIFFUSION approximation at the inner boundary.
@@ -36,11 +36,12 @@
 	1               INNER_BND_METH,dTdR,DBB,dDBBdT,IC,IB_STAB_FACTOR,
 	1               FREQ,CHECK_H_ON_J,OUT_BC_TYPE,
 	1               DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
+	USE SET_KIND_MODULE
 	USE MOD_RAY_MOM_STORE
 	USE MOD_VAR_MOM_J_CMF
 	IMPLICIT NONE
 !
-! Altered:   17-Feb-2016 : Changed to V11. DIF replaced by INNER_BND_METH and 
+! Altered:   17-Feb-2016 : Changed to V11. DIF replaced by INNER_BND_METH and
 !                            IB_STAB_FACTOR added.
 ! Altered:   24-Feb-2015 : Added CHECK_H_ON_J to call.
 ! Altered:   06-Aug-2007 : Installed integer OUT_BC_TYPE
@@ -52,7 +53,7 @@
 !                            for the variation calculation. Logical variable
 !                            COHERENT no longer required.
 ! Altered:   12-Dec-1996 : NM_KI installed. Changed to version V6.
-! Altered:   05-Dec-1996 : PROGDESC set to REAL(10) value, PROG_ID installed
+! Altered:   05-Dec-1996 : PROGDESC set to REAL(KIND=LDP) value, PROG_ID installed
 !                             ERROR_LU installed. TUNE installed.
 ! Altered:   25-Jan-1996 : HBC, NBC (and HBC_PREV, NBC_PREV) are now
 !                            scalers. Other quantities were not needed
@@ -62,7 +63,7 @@
 !
 ! Altered:   11-Jan-1996 : Bug in calculation of DT_DIF_d_dTDR when using
 !                             RSQN_ON_RSQJ. Initiliazation improved.
- 
+
 ! Altered:   11-Mar-1995 : RSQN_ON_RSQJ installed so that N may be written in
 !                          terms of H (using G) or J.
 !                          Call modified, as were subroutines UP_TX_TVX and
@@ -75,22 +76,22 @@
 	INTEGER ND
 	INTEGER NM
 	INTEGER NM_KI
-	REAL(10) ETA(ND),CHI(ND),ESEC(ND),THETA(ND)
-	REAL(10) V(ND),SIGMA(ND),R(ND)
+	REAL(KIND=LDP) ETA(ND),CHI(ND),ESEC(ND),THETA(ND)
+	REAL(KIND=LDP) V(ND),SIGMA(ND),R(ND)
 !
 ! Variation arrays and vectors.
 !
-	REAL(10) TX(ND,ND,NM),TVX(ND-1,ND,NM)
-	REAL(10) KI(ND,ND,NM_KI)
-	REAL(10) WORKMAT(ND,ND),RHS_dHdCHI(ND-1,ND)
-	REAL(10) TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
-	REAL(10) TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
+	REAL(KIND=LDP) TX(ND,ND,NM),TVX(ND-1,ND,NM)
+	REAL(KIND=LDP) KI(ND,ND,NM_KI)
+	REAL(KIND=LDP) WORKMAT(ND,ND),RHS_dHdCHI(ND-1,ND)
+	REAL(KIND=LDP) TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
+	REAL(KIND=LDP) TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
 !
 	LOGICAL DO_THIS_TX_MATRIX(NM)
 !
-	REAL(10) dLOG_NU,dTdR,DBB,dDBBdT,IC
-	REAL(10) FREQ
-	REAL(10) IB_STAB_FACTOR
+	REAL(KIND=LDP) dLOG_NU,dTdR,DBB,dDBBdT,IC
+	REAL(KIND=LDP) FREQ
+	REAL(KIND=LDP) IB_STAB_FACTOR
 	CHARACTER*6 METHOD
 !
 ! INIT is used to indicate that there is no coupling to the previous frequency.
@@ -102,8 +103,8 @@
 	INTEGER OUT_BC_TYPE
 	CHARACTER(LEN=*) INNER_BND_METH
 !
-	REAL(10) T1
-	REAL(10) DTAU_BND
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) DTAU_BND
 !
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
@@ -111,8 +112,8 @@
 ! Local variables.
 !
 	INTEGER I
-	REAL(10) AV_SIGMA
-	REAL(10) LOCAL_DBB
+	REAL(KIND=LDP) AV_SIGMA
+	REAL(KIND=LDP) LOCAL_DBB
 	LOGICAL DIF_OR_ZF
 !
 ! 

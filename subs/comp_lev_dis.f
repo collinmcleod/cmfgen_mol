@@ -8,8 +8,8 @@ C  B_LEV_DIS=( 8.589E+14*(POPION**0.333333D0)/ED)**1.5D0
 C  A_LEV_DIS=0.0009*(ED**0.1667)/SQRT(T)
 C  X_LEV_DIS=(1+A_LEV_DIS)**3.15
 C
-C NB: B_LEV_DIS is undefined for ED=0, but this should be of no 
-C       practical concern, if we specifically handle the case when 
+C NB: B_LEV_DIS is undefined for ED=0, but this should be of no
+C       practical concern, if we specifically handle the case when
 C       level dissoultion is switched off (corresponds to ED=0)
 C
 C Based on the include file LEV_DIS_BLK.INC. Has dynamic allocation
@@ -17,9 +17,9 @@ C and variable indicating whether level dissolution is switched on
 C in now explicitly included in the data block.
 C
 	MODULE MOD_LEV_DIS_BLK
-	REAL(10), ALLOCATABLE :: B_LEV_DIS(:)
-	REAL(10), ALLOCATABLE :: A_LEV_DIS(:)
-	REAL(10), ALLOCATABLE :: X_LEV_DIS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: B_LEV_DIS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: A_LEV_DIS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: X_LEV_DIS(:)
 	LOGICAL MOD_DO_LEV_DIS
 C
 	END MODULE MOD_LEV_DIS_BLK
@@ -29,13 +29,14 @@ C          (1) Allocate desired memory if not done already.
 C          (2) Compute level dissolution constants.
 C
 	SUBROUTINE COMP_LEV_DIS_BLK(ED,POPION,T,DO_LEV_DIS,ND)
+	USE SET_KIND_MODULE
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 C
 	INTEGER ND
-	REAL(10) ED(ND)
-	REAL(10) POPION(ND)
-	REAL(10) T(ND)
+	REAL(KIND=LDP) ED(ND)
+	REAL(KIND=LDP) POPION(ND)
+	REAL(KIND=LDP) T(ND)
 	LOGICAL DO_LEV_DIS
 C
 	IF(.NOT. ALLOCATED(B_LEV_DIS))THEN

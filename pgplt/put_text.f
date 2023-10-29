@@ -4,7 +4,7 @@
 ! are left justified (i.e., OFFSETs of 1, 4, and 7).
 !
 ! The color of the text is changed by \pn where n=1, to 99.
-! Assuming the default definitions, 
+! Assuming the default definitions,
 !            this is red \p2 this is blue \p3.
 ! The space before the \p is ignored.
 !
@@ -12,6 +12,7 @@
 ! is allowed.
 !
 	SUBROUTINE PUT_TEXT(X,Y,ANGLE,OFFSET,STRING)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 09-Oct-2022 : Fixed label of curve titles when axis goes from high to low.
@@ -30,7 +31,7 @@
 	REAL*4 X1,Y1			!Internal variables controlling location of string (world coord).
 	REAL*4 XLEN,YLEN		!Length os string (world coord.)
 	REAL*4 XW1,XW2,YW1,YW2		!Location of viewport in world coordinates
-	REAL*4 XP1,XP2,YP1,YP2    	!Location of viewport in pixels 
+	REAL*4 XP1,XP2,YP1,YP2    	!Location of viewport in pixels
 	REAL*4 SCALE_FAC		!Used to adjust string location
 	INTEGER I,K,KC
 	INTEGER CI_SAV

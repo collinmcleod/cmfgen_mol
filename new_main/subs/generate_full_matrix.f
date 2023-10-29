@@ -7,6 +7,7 @@
 	SUBROUTINE GENERATE_FULL_MATRIX(C_MAT,STEQ_VEC,POPS,NT,ND,NION,
 	1                    NUM_BNDS,BAND_INDX,DIAG_INDX,DEPTH_INDX,
 	1                    FIRST_MATRIX,LAST_MATRIX,FIX_IMPURITY)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
@@ -20,13 +21,13 @@
 	INTEGER ND
 	INTEGER NION
 	INTEGER NUM_BNDS
-	INTEGER BAND_INDX 
+	INTEGER BAND_INDX
 	INTEGER DIAG_INDX
 	INTEGER DEPTH_INDX
 !
-        REAL(10) POPS(NT,ND)
-        REAL(10) C_MAT(NT,NT)
-	REAL(10) STEQ_VEC(NT)
+        REAL(KIND=LDP) POPS(NT,ND)
+        REAL(KIND=LDP) C_MAT(NT,NT)
+	REAL(KIND=LDP) STEQ_VEC(NT)
 	LOGICAL FIRST_MATRIX
 	LOGICAL LAST_MATRIX
 	LOGICAL FIX_IMPURITY
@@ -36,21 +37,21 @@
 ! We use ?_ION to create the ionization balance equations for each
 ! ionization stage.
 !
-	REAL(10) C_ION(NION,NT)
-	REAL(10) STEQ_ION(NION)
+	REAL(KIND=LDP) C_ION(NION,NT)
+	REAL(KIND=LDP) STEQ_ION(NION)
 !
 ! We use ?_NC for the Number conservation equation for each species.
 ! We don't replace them directly into C_MAT and STEQ_VEC for ease of
 ! programming.
 !
-	REAL(10) C_NC(NUM_SPECIES,NT)
-	REAL(10) STEQ_NC(NUM_SPECIES)
+	REAL(KIND=LDP) C_NC(NUM_SPECIES,NT)
+	REAL(KIND=LDP) STEQ_NC(NUM_SPECIES)
 !
 ! FAC is used as a scale factor to determine at what depth the ground-state
 ! equilibrium equation is replaced by the ionization equation.
 !
-!	REAL(10), PARAMETER :: FAC=1.0D+05
-	REAL(10), PARAMETER :: FAC=1.0D+02
+!	REAL(KIND=LDP), PARAMETER :: FAC=1.0D+05
+	REAL(KIND=LDP), PARAMETER :: FAC=1.0D+02
 !
 	LOGICAL DIAG_BAND
 !
@@ -116,9 +117,9 @@
 !
 ! NB: C_ION(1,:) refers to to the ionization/recombination equation
 !                for ion 1 (e.g. CI in the carbon sequence). It is
-!                dN(CI)/dt. Since the eqaution (i.e. BA(I,:,:,:) with 
-!                I > ATMD(ID)%NXzV refers to dN/dt for the recombining 
-!                level (i.e. C2) we need a - sign when we evaluate 
+!                dN(CI)/dt. Since the eqaution (i.e. BA(I,:,:,:) with
+!                I > ATMD(ID)%NXzV refers to dN/dt for the recombining
+!                level (i.e. C2) we need a - sign when we evaluate
 !                C_ION and STEQ_ION.
 !
 	DO ISPEC=1,NUM_SPECIES
@@ -158,7 +159,7 @@
 !
 ! Update the ionization equations for when X-rays are included.
 ! The following is photoionizations/recombinations which change z by 2.
-! Only other process allowed are /\z=1. The corrections to the ionization 
+! Only other process allowed are /\z=1. The corrections to the ionization
 ! equations follow from simple algebraic manipulations.
 !
 	DO ISPEC=1,NUM_SPECIES
@@ -252,14 +253,14 @@
 	END IF
 !
 ! Fix any populations.
-!        
+!
 	CALL FIXPOP_IN_BA_V2(C_MAT,STEQ_VEC,NT,ND,NION,DIAG_BAND,K,
 	1       FIRST_MATRIX,LAST_MATRIX,FIX_IMPURITY)
 !
 ! Scale the BA matrix so that we solve for the fractional corrections to
 ! the populations. This seems to yield better solutions for large matrices,
 ! especially when we subsequently condition the matrices.
-!                
+!
 	L=DEPTH_INDX-DIAG_INDX+BAND_INDX
 	DO J=1,NT
 	  DO I=1,NT

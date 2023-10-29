@@ -1,10 +1,11 @@
 !
 ! Designed to create a new R-grid so that the variations in certain populations (as specified by LEVELS)
 ! are better resolved. As present, thw whole R gird is adjusted. The step size in R and scale factor
-! can be passed, but are computed if pased as zero. Originally developed for SN shock model. 
+! can be passed, but are computed if pased as zero. Originally developed for SN shock model.
 !
 	SUBROUTINE DEF_NEW_RG_V1(RNEW,R,POPS,LEVELS,PASS_MAX_RATIO,PASS_DR_STEP,PASS_DR_FAC,
 	1                           DONE_R_REV,NLEVS,NT,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 28-Aug-2024:
@@ -12,15 +13,15 @@
 	INTEGER NLEVS
 	INTEGER NT
 	INTEGER ND
-	REAL(10) RNEW(ND)
-	REAL(10) R(ND)
-	REAL(10) POPS(NT,ND)
+	REAL(KIND=LDP) RNEW(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) POPS(NT,ND)
 !
 ! Control variable for controlling the new R grid
 !
-	REAL(10) PASS_MAX_RATIO		!Input
-	REAL(10) PASS_DR_STEP		!Computed if 0
-	REAL(10) PASS_DR_FAC		!Computed if 0
+	REAL(KIND=LDP) PASS_MAX_RATIO		!Input
+	REAL(KIND=LDP) PASS_DR_STEP		!Computed if 0
+	REAL(KIND=LDP) PASS_DR_FAC		!Computed if 0
 	INTEGER LEVELS(NLEVS)
 	LOGICAL DONE_R_REV
 !
@@ -28,23 +29,23 @@
 !
 ! Used to store populations that are being used to define the new R grid.
 !
-	REAL(10), ALLOCATABLE :: OLD_POPS(:,:)
-	REAL(10), ALLOCATABLE :: RF(:)		!Fine R grid
-	REAL(10), ALLOCATABLE :: RTMP(:)		!Temporary stroage for the new R grid.
-	REAL(10), ALLOCATABLE :: TA(:)		!Used for plotting, interpolation etc
-	REAL(10), ALLOCATABLE :: TB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLD_POPS(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: RF(:)		!Fine R grid
+	REAL(KIND=LDP), ALLOCATABLE :: RTMP(:)		!Temporary stroage for the new R grid.
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)		!Used for plotting, interpolation etc
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)
 !
-	REAL(10) CUR_POPS(NLEVS)
-	REAL(10) NEXT_POPS(NLEVS)
-	REAL(10) RATIO(NLEVS)
+	REAL(KIND=LDP) CUR_POPS(NLEVS)
+	REAL(KIND=LDP) NEXT_POPS(NLEVS)
+	REAL(KIND=LDP) RATIO(NLEVS)
 !
-	REAL(10) MAX_RATIO
-	REAL(10) DR_STEP
-	REAL(10) DR_FAC
-	REAL(10) T1,T2,T3
-	REAL(10) dR
-	REAL(10) dR_STEP_RATIO
-	REAL(10) PREV_STEP_SIZE
+	REAL(KIND=LDP) MAX_RATIO
+	REAL(KIND=LDP) DR_STEP
+	REAL(KIND=LDP) DR_FAC
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) dR
+	REAL(KIND=LDP) dR_STEP_RATIO
+	REAL(KIND=LDP) PREV_STEP_SIZE
 !
 	INTEGER, PARAMETER :: NINS=30
 !
@@ -83,7 +84,7 @@
 	END DO
 	RF(NF)=R(ND)
 !
-! Put the old pops onto the fine grid. 
+! Put the old pops onto the fine grid.
 !
 	IF(ALLOCATED(OLD_POPS))DEALLOCATE(OLD_POPS)
 	ALLOCATE(OLD_POPS(NLEVS,NF))
@@ -96,7 +97,7 @@
 !
 ! Allocate a long array so we can iterate on the new R grid until we get
 ! the correct number of grid points.
-!  
+!
 	ND_MAX=10*ND
 	IF(ALLOCATED(RTMP))DEALLOCATE(RTMP)
 	ALLOCATE(RTMP(ND_MAX))
@@ -121,8 +122,8 @@
 	LST_NX=0
 !
 ! Iterate until we get the correct number of data points
-! 
-	WRITE(6,'(A,9X,A,3X,A,3X,A,3X,A)')' Count','dR_STEP','MAX_RATIO','Need NX',' Cur NX' 
+!
+	WRITE(6,'(A,9X,A,3X,A,3X,A,3X,A)')' Count','dR_STEP','MAX_RATIO','Need NX',' Cur NX'
 	DO WHILE(CNT .LE. 30)
 !
 	  IOLD=(OB_INDX-1)*(NINS+1)+1
@@ -199,13 +200,13 @@
 	  CNT=CNT+1
 	END DO
 !
-	RNEW(1:IB_INDX-1)=RTMP(1:IB_INDX-1)   
+	RNEW(1:IB_INDX-1)=RTMP(1:IB_INDX-1)
 	RNEW(IB_INDX:ND)=R(IB_INDX:ND)
 !
 	IF(CNT .GE. 30)THEN
 	  WRITE(6,*)'Insufficient iterations to get desired number of grid pointss'
 	  DONE_R_REV=.FALSE.
-	ELSE 
+	ELSE
 	  DONE_R_REV=.TRUE.
 	  DO I=1,ND-1
 	    WRITE(16,*)I,RNEW(I)
@@ -232,7 +233,7 @@
 	      WRITE(LUOUT,'(/,ES17.10,6ES17.7,3X,I5)')RNEW(I),(1.0D0, J=1,6),I
 	      WRITE(LUOUT,'(4X,ES14.7)')1.0D0
 	  END DO
-	  CLOSE(LUOUT)	  
+	  CLOSE(LUOUT)	
 !
 	  DO I=1,NLEVS
 	    K=LEVELS(I)
@@ -241,6 +242,6 @@
 	    TB(1:ND)=EXP(TB(1:ND))
 	  END DO
 	END IF
-! 
+!
 	RETURN
 	END

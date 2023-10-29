@@ -16,6 +16,7 @@ C General input routines ---generally read a single value from user only.
 C Default value is output to user.
 C
 	SUBROUTINE GEN_IN_LOG(VAL,DESC)
+	USE SET_KIND_MODULE
 	INTEGER, PARAMETER :: T_IN=5
 	INTEGER, PARAMETER :: T_OUT=6
 C
@@ -40,6 +41,7 @@ C
 C 
 C
 	SUBROUTINE GEN_IN_STR(STR,DESC)
+	USE SET_KIND_MODULE
 	INTEGER, PARAMETER :: T_IN=5
 	INTEGER, PARAMETER :: T_OUT=6
 C
@@ -92,6 +94,7 @@ C
 C
 C 
 	SUBROUTINE GEN_IN_INT(VAL,STR,LOW_LIM,UP_LIM)
+	USE SET_KIND_MODULE
 	INTEGER, PARAMETER :: T_IN=5
 	INTEGER, PARAMETER :: T_OUT=6
 	INTEGER, OPTIONAL :: LOW_LIM
@@ -144,12 +147,13 @@ C
 C 
 C
 	SUBROUTINE GEN_IN_DBLE(VAL,STR)
+	USE SET_KIND_MODULE
 	INTEGER, PARAMETER :: T_IN=5
 	INTEGER, PARAMETER :: T_OUT=6
 C
 C Altered 10-Dec-1990 --- FORM_SP_NUM routine installed.
 C
-	REAL(10) VAL
+	REAL(KIND=LDP) VAL
 	INTEGER L,IOS,LEN_FORM
 	CHARACTER STR*(*),STRING*80,FORM*20
 C
@@ -171,6 +175,7 @@ C
 C 
 C
 	SUBROUTINE GEN_IN_SP(VAL,STR)
+	USE SET_KIND_MODULE
 	INTEGER, PARAMETER :: T_IN=5
 	INTEGER, PARAMETER :: T_OUT=6
 C
@@ -198,6 +203,7 @@ C
 C 
 C
 	SUBROUTINE GEN_IN_MULT_DP(VAL,N,NMAX,STR)
+	USE SET_KIND_MODULE
 C
 C Altered 7-Jul-1997 : NMAX installed. Number of values input returned in N.
 C                      Previously all NMAX values had to be input.
@@ -206,7 +212,7 @@ C
 	INTEGER, PARAMETER :: T_OUT=6
 C
 	INTEGER N,NMAX
-	REAL(10) VAL(NMAX)
+	REAL(KIND=LDP) VAL(NMAX)
 	CHARACTER STR*(*)
 C
 	INTEGER K,L,IOS,LEN_FORM,LEN_TOT
@@ -270,6 +276,7 @@ C
 C 
 C
 	SUBROUTINE GEN_IN_MULT_SP(VAL,N,NMAX,STR)
+	USE SET_KIND_MODULE
 C
 C Altered 7-Jul-1997 : NMAX installed. Number of values input returned in N.
 C                      Previously all NMAX values had to be input.
@@ -343,6 +350,7 @@ C
 C 
 C
 	SUBROUTINE GEN_IN_MULT_INT(VAL,N,NMAX,STR)
+	USE SET_KIND_MODULE
 C
 C Altered 7-Jul-1997 : NMAX installed. Number of values input returned in N.
 C                      Previously all NMAX values had to be input.

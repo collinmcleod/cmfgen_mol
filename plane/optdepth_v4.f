@@ -1,6 +1,7 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
       SUBROUTINE OPTDEPTH_V4(DTAU_LOC,CHI,NZ,IP,DO_P_RAY,METHOD)
+	USE SET_KIND_MODULE
       USE MOD_SPACE_GRID_V2
       IMPLICIT NONE
 !
@@ -26,16 +27,16 @@
 !
       INTEGER NZ
       INTEGER IP
-      REAL(10) CHI(NZ)
-      REAL(10) DTAU_LOC(NZ)
+      REAL(KIND=LDP) CHI(NZ)
+      REAL(KIND=LDP) DTAU_LOC(NZ)
       LOGICAL DO_P_RAY
       CHARACTER(LEN=*) METHOD
 !
 ! Local variables
 !
       INTEGER IZ
-      REAL(10) T1
-      REAL(10) DCHIDZ(NZ)
+      REAL(KIND=LDP) T1
+      REAL(KIND=LDP) DCHIDZ(NZ)
 !
 !--------------------------------------------------------------------
 !

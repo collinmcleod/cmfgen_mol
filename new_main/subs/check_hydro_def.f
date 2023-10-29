@@ -4,6 +4,7 @@
 ! for compatability with earlier versions.
 !
 	SUBROUTINE CHECK_HYDRO_DEF(STRING,LUIN,LUER)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created: 04-April-2011

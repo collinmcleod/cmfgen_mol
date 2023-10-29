@@ -2,6 +2,7 @@ C
 C***************************************************************
 C
 	FUNCTION VOIGT(A,V)
+	USE SET_KIND_MODULE
 C
 C Subroutine to evaluate a VOIGT profile, normalized so that the integral
 C over V is unity.
@@ -13,24 +14,24 @@ C  S L Wright /UCL/ and a routine from Peter Hofflich which inturn
 C was based on HUI,A.K.,ARMSTRONG,E.H.,WRAY,A.A. 1978,JQSRT 19,P.509
 C
 C Accuracy:
-C         < 0.1% for 0.1 < a 
+C         < 0.1% for 0.1 < a
 C         < 0.5% for a < 0.1
 C         < 0.3% for a < 0.05
 C
 	IMPLICIT NONE
-C                                                                   
-	REAL(10)  VOIGT,V,A
+C
+	REAL(KIND=LDP)  VOIGT,V,A
 C
 C Variables for interpolation (a < 0.1).
 C
 	INTEGER N,N1
-	REAL(10)  V0,V2
-	REAL(10)  H1(81)
+	REAL(KIND=LDP)  V0,V2
+	REAL(KIND=LDP)  H1(81)
 C
 C variables for functional form (a > 0.1)
 C
 	COMPLEX ZH,F
-	REAL(10) C(7),D(7)
+	REAL(KIND=LDP) C(7),D(7)
 C
 C Interpolation constants.
 C
@@ -73,10 +74,10 @@ C
 	  V0=ABS(V)*10.D0
 	  N=V0
           IF(N.LT.40)THEN
-	    V2=V0-N                     
+	    V2=V0-N
 	    N=N+1
 	    N1=N+1
-	    VOIGT=(1.0D0+A*A*(1.0D0-2*V*V))*EXP(-V*V) + 
+	    VOIGT=(1.0D0+A*A*(1.0D0-2*V*V))*EXP(-V*V) +
 	1            A*(H1(N)+V2*(H1(N1)-H1(N)) )
 	  ELSE IF(N.LT.120)THEN
 	    N=N/2+20

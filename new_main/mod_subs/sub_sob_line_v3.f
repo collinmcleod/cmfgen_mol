@@ -1,5 +1,5 @@
 !
-! Subroutine to compute JBAR and update the variation matrix (BA) for lines treated using 
+! Subroutine to compute JBAR and update the variation matrix (BA) for lines treated using
 ! the solution Sobolev approximation. Routine is based on a section of code in CMFGEN_SUB.F
 !
 ! Routine was tested and appears to work. This option is becoming obsolete in CMFGEN.
@@ -11,6 +11,7 @@
 	1                    NL,NUP,NT,ND,NC,NP,
 	1                    NDEXT,NCEXT,NPEXT,
 	1                    NLF,DIAG_INDX,NUM_BNDS)
+	USE SET_KIND_MODULE
 !
 	USE ANG_QW_MOD
 	USE CONTROL_VARIABLE_MOD
@@ -28,11 +29,11 @@
 ! Altered 24-Feb-2006 : Implmented option to scale line cooling rates (SCL_LINE_COOL_RATES)
 ! Cleaned 17-Dec-2004
 !
-	REAL(10) FL
-	REAL(10) CONT_FREQ
-	REAL(10) AMASS
-	REAL(10) EW
-	REAL(10) CONT_INT
+	REAL(KIND=LDP) FL
+	REAL(KIND=LDP) CONT_FREQ
+	REAL(KIND=LDP) AMASS
+	REAL(KIND=LDP) EW
+	REAL(KIND=LDP) CONT_INT
 !
 	INTEGER NL
 	INTEGER NUP
@@ -48,24 +49,24 @@
 	LOGICAL IMPURITY_CODE
 	CHARACTER(LEN=*) SECTION
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) CHIL(ND)
-	REAL(10) ETAL(ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) CHIL(ND)
+	REAL(KIND=LDP) ETAL(ND)
 	LOGICAL NEG_OPACITY(ND)
 !
 ! Constants for opacity etc.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) OPLIN,EMLIN
 !
 ! Local variables.
 !
-	REAL(10) VB(ND)
-	REAL(10) VC(ND)
-	REAL(10) T1,T2,T3,T4
-	REAL(10) SRAT
+	REAL(KIND=LDP) VB(ND)
+	REAL(KIND=LDP) VC(ND)
+	REAL(KIND=LDP) T1,T2,T3,T4
+	REAL(KIND=LDP) SRAT
 	INTEGER I,J,K,L
 	INTEGER L1,L2,U1,U2,IT
 	INTEGER MNL,MNL_F
@@ -87,7 +88,7 @@
 	INTEGER BNDST
 	INTEGER BNDEND
 	INTEGER BND_TO_FULL
-	LOGICAL LST_DEPTH_ONLY 
+	LOGICAL LST_DEPTH_ONLY
 	LOGICAL COMPUTE_LAM
 	LOGICAL FULL_ES
 	LOGICAL FIRST_FREQ
@@ -163,7 +164,7 @@ C
 C
 C Allow for the variation of the continuous radiation field.
 C
-	  IF(COMPUTE_BA .AND. VAR_SOB_JC .AND. .NOT. 
+	  IF(COMPUTE_BA .AND. VAR_SOB_JC .AND. .NOT.
 	1                LAMBDA_ITERATION .AND. .NOT. IMPURITY_CODE)THEN
 C
 C	    INCLUDE 'VARCONT.INC'
@@ -180,11 +181,11 @@ C
 C
 C Increment the large simultaneous perturbation matrix. Note that terms are
 C
-C EINA*POPS(NUP,L)*BETAC*VJ(J,K,L) 
+C EINA*POPS(NUP,L)*BETAC*VJ(J,K,L)
 C
 C        and
 C
-C ETAL(L)*BETAC(L)*VJ(J,K,L) but 
+C ETAL(L)*BETAC(L)*VJ(J,K,L) but
 C
 C ETAL=FL*EINA(1)*EMLIN*POPS. Therefore use FL*EMLIN as constant.
 C
@@ -267,7 +268,7 @@ C
 	END DO
 C
 C NB: We now include the temperature variation of L_STAR_RATIO and U_STAR_RATIO
-C     in the variation of the net rate. 
+C     in the variation of the net rate.
 C
 C Definitions:
 C            RATE_FAC : Factor which multiplies the net rate to form the total
@@ -277,7 +278,7 @@ C                       function corrected for any difference in frequency.
 C            SIM_INDX   is used to refer to the transition of interest.
 C            K          Depth index
 C            J          Line opacity/emissivity identifier
-C                                    
+C
 	IF(COMPUTE_BA)THEN
 	  DO SIM_INDX=1,NUM_SIM_LINES
 	    NL=SIM_NL(SIM_INDX)

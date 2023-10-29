@@ -4,14 +4,15 @@ C uses either the diffusion approximation or a Schuster condition
 C for the lower boundary condition.
 C
 	SUBROUTINE XVECD(DTAU,SOURCE,X,DIFF,DBC,IC,LS,NC,ND,NI)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 28-May-1996 : IMPLICIT NONE isntalled.
 C Created 28-JUL-1982 : Schuster condition inserted
 C
 	INTEGER LS,NI,ND,NC
-	REAL(10) DTAU(ND),SOURCE(ND),X(ND)
-	REAL(10) DBC,IC
+	REAL(KIND=LDP) DTAU(ND),SOURCE(ND),X(ND)
+	REAL(KIND=LDP) DBC,IC
 	LOGICAL DIFF
 C
 C Local variables.

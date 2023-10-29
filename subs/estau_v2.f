@@ -4,6 +4,7 @@
 ! r^{-2}. Will need to be altered for an exponential atmosphere.
 !
 	SUBROUTINE ESTAU_V2(OPT_DEP,R,ED,CLUMP_FAC,DTAU,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 01-Apr-2015: Changed to V2, CLUMP_FAC added to call.
@@ -11,8 +12,8 @@
 !                        MEANOPAC.
 !
 	INTEGER ND,I
-	REAL(10) R(ND),ED(ND),CLUMP_FAC(ND),DTAU(ND),OPT_DEP(ND)
-	REAL(10) T1,TAU_BND
+	REAL(KIND=LDP) R(ND),ED(ND),CLUMP_FAC(ND),DTAU(ND),OPT_DEP(ND)
+	REAL(KIND=LDP) T1,TAU_BND
 !
 	DO I=1,ND
 	  OPT_DEP(I)=0.0D0

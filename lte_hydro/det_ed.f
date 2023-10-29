@@ -1,35 +1,36 @@
 	SUBROUTINE DET_ED(ND,ABUND_SUM,DO_LEV_DIS)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
 	INTEGER ND
-	REAL(10) ABUND_SUM
+	REAL(KIND=LDP) ABUND_SUM
 	LOGICAL DO_LEV_DIS
 !
-	REAL(10) ION_POPS(ND,NUM_IONS)
-	REAL(10) FSAHA(NUM_IONS)
-	REAL(10) XZ(NUM_IONS)
-	REAL(10) XZW(NUM_IONS)
-	REAL(10) ED_OLD(ND)
-	REAL(10) POPION_OLD(ND)
+	REAL(KIND=LDP) ION_POPS(ND,NUM_IONS)
+	REAL(KIND=LDP) FSAHA(NUM_IONS)
+	REAL(KIND=LDP) XZ(NUM_IONS)
+	REAL(KIND=LDP) XZW(NUM_IONS)
+	REAL(KIND=LDP) ED_OLD(ND)
+	REAL(KIND=LDP) POPION_OLD(ND)
 !
-	REAL(10) XEDW
-	REAL(10) XED_OLD
-	REAL(10) XERR
-	REAL(10) XKBT
-	REAL(10) XG0
-	REAL(10) XG1
-	REAL(10) XGE
-	REAL(10) T1,T2,T3
-	REAL(10) PI
-	REAL(10) HSQR
-	REAL(10), PARAMETER :: HDKT=4.7994145D0
-	REAL(10), PARAMETER :: EPS=1.0D-05
+	REAL(KIND=LDP) XEDW
+	REAL(KIND=LDP) XED_OLD
+	REAL(KIND=LDP) XERR
+	REAL(KIND=LDP) XKBT
+	REAL(KIND=LDP) XG0
+	REAL(KIND=LDP) XG1
+	REAL(KIND=LDP) XGE
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) PI
+	REAL(KIND=LDP) HSQR
+	REAL(KIND=LDP), PARAMETER :: HDKT=4.7994145D0
+	REAL(KIND=LDP), PARAMETER :: EPS=1.0D-05
 !
-	REAL(10) PLANCKS_CONSTANT
-	REAL(10) BOLTZMANN_CONSTANT
-	REAL(10) ELECTRON_MASS
-	EXTERNAL PLANCKS_CONSTANT 
+	REAL(KIND=LDP) PLANCKS_CONSTANT
+	REAL(KIND=LDP) BOLTZMANN_CONSTANT
+	REAL(KIND=LDP) ELECTRON_MASS
+	EXTERNAL PLANCKS_CONSTANT
 	EXTERNAL BOLTZMANN_CONSTANT
 	EXTERNAL ELECTRON_MASS
 !
@@ -65,7 +66,7 @@
 ! level population vector.
 !
 	DO L=1,ND
-          XKBT = BOLTZMANN_CONSTANT() * T(L) * 1.0D4 
+          XKBT = BOLTZMANN_CONSTANT() * T(L) * 1.0D4
           T1 = (2.0D0*PI*ELECTRON_MASS()*XKBT/HSQR)**1.5
           T2 = HDKT/T(L)
           DO ID=1,NUM_IONS
@@ -95,13 +96,13 @@
 ! and the relative population of all ions.
 !
 	  DO L=1,ND
-	    DO WHILE( ABS(1.0D0-ED_OLD(L)/ED(L)) .GT. EPS .OR.  
+	    DO WHILE( ABS(1.0D0-ED_OLD(L)/ED(L)) .GT. EPS .OR.
 	1             ABS(1.0D0-POPION_OLD(L)/POPION(L)) .GT. EPS )
 	      ED_OLD(L)=ED(L)
 	      POPION_OLD(L)=POPION(L)
 	      CONVERGED=.FALSE.
 !
-              XKBT = BOLTZMANN_CONSTANT() * T(L) * 1.0D4 
+              XKBT = BOLTZMANN_CONSTANT() * T(L) * 1.0D4
               T1 = (2.0D0*PI*ELECTRON_MASS()*XKBT/HSQR)**1.5
               T2 = HDKT/T(L)
               DO ID=1,NUM_IONS
@@ -117,7 +118,7 @@
 	              XG1=XG1+ATM(ID+1)%W_XzV_F(I,L)*ATM(ID+1)%XzV_F(I,L)
                     END DO
 	          END IF
-	          FSAHA(ID) = (XG1*XGE/XG0) * T1 * EXP(-ATM(ID)%EDGEXzV_F(1)*T2)  
+	          FSAHA(ID) = (XG1*XGE/XG0) * T1 * EXP(-ATM(ID)%EDGEXzV_F(1)*T2)
                 END IF
               END DO	!ion loop.
 !
@@ -125,13 +126,13 @@
               XED_OLD = XEDW
               XERR = 2.0D0 * EPS
 	      DO WHILE (XERR .GT. EPS)
-                T3 = 0.0D0                
+                T3 = 0.0D0
                 DO ISPEC=1,NUM_SPECIES
                   ISTART = SPECIES_BEG_ID(ISPEC)
                   IF (ISTART.NE.0) THEN
-                    IEND = SPECIES_END_ID(ISPEC)          
+                    IEND = SPECIES_END_ID(ISPEC)
                     T1 = 1.0D0
-                    T2 = 1.0D0 
+                    T2 = 1.0D0
                     DO IW=ISTART+1,IEND
                       T1 = (FSAHA(IW-1)/XEDW) * T1
                       T2 = T2 + T1
@@ -146,10 +147,10 @@
                   END IF
                 END DO
                 XED_OLD = XEDW
-                XEDW = T3 
+                XEDW = T3
                 XERR = ABS(1.0D0-XED_OLD/XEDW)
               END DO
-              ED(L)=XEDW 
+              ED(L)=XEDW
               ION_POPS(L,:) = XZ(:)  ! each entry corresponds to ions ID=1,NUM_IONS
 !
 	    END DO	!Only do depths that are not finished
@@ -195,7 +196,7 @@
 	  IF(ATM(ID)%XzV_PRES)THEN
 !
 	    DO L=1,ND
-	      T1 = 0.0D0    
+	      T1 = 0.0D0
 	      DO I=1,ATM(ID)%NXzV_F
 	        T3 = HDKT*(ATM(ID)%EDGEXzV_F(1)-ATM(ID)%EDGEXzV_F(I))/T(L)
                 T2 = ATM(ID)%W_XzV_F(I,L)*ATM(ID)%GXzV_F(I)*EXP(-T3)

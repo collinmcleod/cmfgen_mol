@@ -4,6 +4,7 @@ C to that in the model atom with super levels.
 C
 	SUBROUTINE RD_F_TO_S_IDS(F_TO_S,INT_SEQ,
 	1               LEVNAME_F,N_F,N_S,LUIN,FILENAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 30-Sep-2005 : Removed warning about mixed parity.

@@ -4,6 +4,7 @@ C is nearing convergence, the BA matrix does not need to be recomputed.
 C Instead it is read in from disk, when needed.
 C
 	SUBROUTINE STORE_BA_DATA_V2(LU,NION,NUM_BANDS,ND,COMPUTE_BA,DESC)
+	USE SET_KIND_MODULE
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !

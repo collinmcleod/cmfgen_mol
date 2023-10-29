@@ -7,6 +7,7 @@ C other quantities other than 2nd moment of the intensity. The program assumes
 C that the first point corresponds to mu=1.0 .
 C
 	SUBROUTINE KWEIGHT(X,W,N)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered  24-May-1996 Call to DP_ZERO removed
@@ -18,7 +19,7 @@ C                      for U= a + b*mu*mu .
 C Created 25-Nov-1986 (Based on NORDWEIGHT)
 C
 	INTEGER N,I
-	REAL(10) X(N),W(N),H,HN,RE,RF,SUM
+	REAL(KIND=LDP) X(N),W(N),H,HN,RE,RF,SUM
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -66,7 +67,7 @@ C
 	  WRITE(LUER,*)'Warning - Extrapolation to zero required in KWEIGHT'
 	END IF
 C
-C Ensure that the weights have the correct normalization (shouldnt be 
+C Ensure that the weights have the correct normalization (shouldnt be
 C necessary.
 C
 	SUM=0.0D0

@@ -5,6 +5,7 @@ C both are equal to zero in which case it is set true. Neither X, Y or
 C Z are altered.
 C
 	FUNCTION EQUAL(X,Y,Z)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 - File now contains DP version only (i.e. not SP_EQUAL)
@@ -15,7 +16,7 @@ C                       overflow.
 C Altered  4-NOV-86 (Bug for X or Y=0 fixed).
 C
 	LOGICAL EQUAL
-	REAL(10) X,Y,Z
+	REAL(KIND=LDP) X,Y,Z
 C
 	EQUAL=.FALSE.
 	IF(X .EQ. 0.0D0 .AND. Y .EQ. 0.0D0)THEN

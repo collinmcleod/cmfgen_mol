@@ -15,10 +15,11 @@
 ! then adding to full BA matrix in which terms have arbitrary size.
 !
 	SUBROUTINE ADD_PAR_TO_FULL_V2(NION,DIAG_INDX)
+	USE SET_KIND_MODULE
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
-! Altered: 09-Apr-2001  Changed to utilize STEQ_DATA_MOD 
+! Altered: 09-Apr-2001  Changed to utilize STEQ_DATA_MOD
 ! Created: 28-Feb-1995
 !
 	INTEGER NION
@@ -36,7 +37,7 @@
 	ND=NX(4)
 !
 	DO ID=1,NION
-!$OMP PARALLEL DO 
+!$OMP PARALLEL DO
 	  DO K=1,ND
 	    DO IV=1,SE(ID)%N_IV
 	      DO IS=1,SE(ID)%N_SE
@@ -48,7 +49,7 @@
 	END DO
 !
 	DO ID=1,NION
-!$OMP PARALLEL DO 
+!$OMP PARALLEL DO
 	  DO K=1,ND
 	    DO IV=1,SE(ID)%N_IV
 	      DO IS=1,SE(ID)%N_SE

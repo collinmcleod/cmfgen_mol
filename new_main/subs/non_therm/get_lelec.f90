@@ -1,25 +1,26 @@
 	SUBROUTINE GET_LELEC(LELEC,XKT,NKT,N_ELEC)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER NKT
-	REAL(10) LELEC(NKT)
-	REAL(10) XKT(NKT)
-	REAL(10) N_ELEC
+	REAL(KIND=LDP) LELEC(NKT)
+	REAL(KIND=LDP) XKT(NKT)
+	REAL(KIND=LDP) N_ELEC
 !
-	real(10), parameter :: ELECTRON_VOLT=1.60217733D-12  ! erg
-	real(10), parameter :: PLANCKS_CONSTANT=6.626075D-27 ! erg sec
-	real(10), parameter :: SPEED_OF_LIGHT=2.99792458D+10 ! cm / sec
-	real(10), parameter :: PI = 3.141592653589793238462643D0
-	real(10), parameter :: ELECTRON_MASS=9.109389D-28    !gm
-	real(10), parameter :: ELECTRON_CHARGE = 4.803206814D-10 ! esu
-	real(10), parameter :: a0 = 0.529189379D-8    ! Bohr radius in cm
+	real(kind=LDP), parameter :: ELECTRON_VOLT=1.60217733D-12  ! erg
+	real(kind=LDP), parameter :: PLANCKS_CONSTANT=6.626075D-27 ! erg sec
+	real(kind=LDP), parameter :: SPEED_OF_LIGHT=2.99792458D+10 ! cm / sec
+	real(kind=LDP), parameter :: PI = 3.141592653589793238462643D0
+	real(kind=LDP), parameter :: ELECTRON_MASS=9.109389D-28    !gm
+	real(kind=LDP), parameter :: ELECTRON_CHARGE = 4.803206814D-10 ! esu
+	real(kind=LDP), parameter :: a0 = 0.529189379D-8    ! Bohr radius in cm
 !
 	INTEGER I
 	INTEGER IKT
-	REAL(10) T1,T2,XV,XE_CGS
-	REAL(10) XI_E
-	REAL(10) PLASMA_FREQ
-	REAL(10) GAMMA_EULER
+	REAL(KIND=LDP) T1,T2,XV,XE_CGS
+	REAL(KIND=LDP) XI_E
+	REAL(KIND=LDP) PLASMA_FREQ
+	REAL(KIND=LDP) GAMMA_EULER
 !
 ! plasma_freq is in 1/s, i.e. cgs
 ! xi_e is put in erg !!! [e^2] has dimensions of energy x length

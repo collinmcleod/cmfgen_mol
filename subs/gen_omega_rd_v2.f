@@ -1,5 +1,5 @@
 !
-! Read in collsion strengths from a file. The values are tabulated as a 
+! Read in collsion strengths from a file. The values are tabulated as a
 ! function of temperature.
 !
 ! OMEGA_SET is used to set the collison strength for those transitions in which
@@ -15,12 +15,13 @@
 	1                      LEVNAME,STAT_WT,NLEV,FILE_NAME,
 	1                      NUM_TRANS,NUM_TVALS,
 	1                      MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
-! Altered 17-Apr-2023 : Added check on length of strings for level names. 
+! Altered 17-Apr-2023 : Added check on length of strings for level names.
 ! Altered 24-Apr-2015 : Code now checks "validity" of T values and collision strengths.
 ! Altered 25-Jan-2015 : Minor bug fix - could print out a wrong matching name.
-! Altered 20-Dec-2014 : Code checks if non-matching level corresponds to a higher level not 
+! Altered 20-Dec-2014 : Code checks if non-matching level corresponds to a higher level not
 !                          included in the model atom (call CHL_COL_NAME).
 ! Altered 15-Dec-2013 : Code now only outputs error message on first call for each species.
 ! Altered 02-Sep-2012 : Outputs error messgae when matching transition not found.
@@ -30,7 +31,7 @@
 !                         collisonal ioization term. LST_NUP was being set to 0.
 ! Altered 20-Dec-2004 : Eror message now output if error occurs reading
 !                         the actual collison values.
-! Altered 02-Mar-1998 : Ientifying the connection betwen table and model 
+! Altered 02-Mar-1998 : Ientifying the connection betwen table and model
 !                         levels improved. Routine can now handle split and
 !                         combined LS stars in both the model and input data.
 ! Altered 08-Feb-1998 : STRING length invreased from 132 to 500 for Fe2.
@@ -43,12 +44,12 @@
 ! Altered 01-Mar-1996 : Warning about invalid levels commented out.
 !                       Warning was occuring just because of additional levels
 !                       in data file.
-! Created 13-Sep-1995 
+! Created 13-Sep-1995
 !
 	INTEGER NLEV
 	CHARACTER*(*) LEVNAME(NLEV),FILE_NAME
-	REAL(10) STAT_WT(NLEV)
-	REAL(10) OMEGA_SCALE,OMEGA_SET
+	REAL(KIND=LDP) STAT_WT(NLEV)
+	REAL(KIND=LDP) OMEGA_SCALE,OMEGA_SET
 !
 ! ID_LOW:  ID of lower level of transition
 ! ID_UP:   ID of upper level of transition
@@ -59,9 +60,9 @@
 	INTEGER MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE
 	INTEGER ID_LOW(MAX_TRANS)
 	INTEGER ID_UP(MAX_TRANS)
-	INTEGER ID_INDX(MAX_TRANS)    
-	REAL(10) T_TABLE(MAX_TVALS)
-	REAL(10) OMEGA_TABLE(MAX_TAB_SIZE)
+	INTEGER ID_INDX(MAX_TRANS)
+	REAL(KIND=LDP) T_TABLE(MAX_TVALS)
+	REAL(KIND=LDP) OMEGA_TABLE(MAX_TAB_SIZE)
 !
 	INTEGER NUM_TRANS,NUM_TVALS
 !
@@ -71,8 +72,8 @@
 	INTEGER NUM_NO_MATCH
 	CHARACTER(LEN=40) NO_MATCH_NAME(MAX_NUM_NO_MATCH)
 
-	REAL(10) COL_VEC(MAX_TVALS)
-	REAL(10) GL_SUM,GU_SUM,NORM_FAC
+	REAL(KIND=LDP) COL_VEC(MAX_TVALS)
+	REAL(KIND=LDP) GL_SUM,GU_SUM,NORM_FAC
 	INTEGER NL_VEC(10)
 	INTEGER NUP_VEC(10)
 	INTEGER NL_CNT
@@ -175,7 +176,7 @@
 	END IF
 	STRING=' '
 !
-	DO WHILE( INDEX(STRING,'!Number of T values OMEGA tabulated at')  
+	DO WHILE( INDEX(STRING,'!Number of T values OMEGA tabulated at')
 	1               .EQ. 0 )
 	  READ(LUIN,'(A)',IOSTAT=IOS)STRING
 	  IF(IOS .NE. 0)THEN
@@ -192,7 +193,7 @@
 	  WRITE(LUER,*)'NUM_TVALS = ',NUM_TVALS
 	  STOP
 	END IF
-!         
+!
 ! OMEGA_SCALE provides a means of scaling the OMEGA that have not been read in.
 !
 	STRING=' '
@@ -206,7 +207,7 @@
 	  END IF
 	END DO
 	READ(STRING,*)OMEGA_SCALE
-!         
+!
 ! OMEGA_SET provides a means to set OMEGA for transition for which
 ! no atomic data is availaable, and for which the oscilator strength
 ! is zero.
@@ -258,7 +259,7 @@
 	  READ(LUIN,'(A)')STRING
 	END DO
 !
-! TRANS_CNT is the index used to read in all collisional data. 
+! TRANS_CNT is the index used to read in all collisional data.
 ! TRANS_INDX is used to specify the number of collisional transitions that
 ! are used by the present model. It will differ from TRANS_CNT because
 ! collisional data may be available for levels not included in the model
@@ -280,7 +281,7 @@
 	  DO WHILE (STRING(I:I) .EQ. ' ')
 	    I=I+1
 	  END DO
-	  L=INDEX(STRING,'-')          
+	  L=INDEX(STRING,'-')
 	  LOW_LEV=STRING(I:L-1)
 !
 ! Determine corespondance of lower level. NB: The MOD function allows us
@@ -345,7 +346,7 @@
 	  STRING(1:)=STRING(L+1:)
 	  I=1
 	  DO WHILE (STRING(I:I) .EQ. ' ')
-	    I=I+1                 
+	    I=I+1
 	  END DO
 	  STRING(1:)=STRING(I:)
 	  L=INDEX(STRING,'  ')
@@ -414,7 +415,7 @@
 	  IF(UP_LEV .NE. 'I')LST_NUP=NUP_VEC(1)
 	  STRING(1:)=STRING(L:)
 !
-! The multiplet collision strengths are converted to individual collision 
+! The multiplet collision strengths are converted to individual collision
 ! strengths using:
 !
 ! Omega(i,j)= g(i)g(j) OMEGA(MULITPLET) / G(L)/G(U)
@@ -425,7 +426,7 @@
 !
 	  READ(STRING,*,IOSTAT=IOS)(COL_VEC(I),I=1,NUM_TVALS)
 	  IF(IOS .NE. 0)THEN
-	    WRITE(LUER,*)'Error in GEN_OMEGA_RD_V2'  
+	    WRITE(LUER,*)'Error in GEN_OMEGA_RD_V2'
 	    WRITE(LUER,*)'Error reading collisional data from ',FILE_NAME
 	    WRITE(LUER,*)'TRANS_INDX=',TRANS_INDX
 	    WRITE(LUER,*)'TRANS_CNT=',TRANS_CNT
@@ -434,7 +435,7 @@
 	    STOP
 	  END IF
 	  IF( MINVAL(COL_VEC(1:NUM_TVALS)) .LE. 0.0D0 )THEN
-	    WRITE(LUER,*)'Error in GEN_OMEGA_RD_V2'  
+	    WRITE(LUER,*)'Error in GEN_OMEGA_RD_V2'
 	    WRITE(LUER,*)'Error in collisional data for',FILE_NAME
 	    WRITE(LUER,*)'Tabulated values are -ve or zero'
 	    WRITE(LUER,*)'UP_LEV=',TRIM(UP_LEV)
@@ -463,7 +464,7 @@
 	    DO NL=1,NL_CNT
 	      DO NUP=1,NUP_CNT
 	        IF(NL_VEC(NL) .EQ. NUP_VEC(NUP))THEN
-	        ELSE 
+	        ELSE
 	          IF(LOC_INDX(NL_VEC(NL),NUP_VEC(NUP)) .EQ. 0)THEN
 	            TRANS_INDX=TRANS_INDX+1
 	            IF(NL_VEC(NL) .LT. NUP_VEC(NUP))THEN
@@ -545,6 +546,7 @@
 	CONTAINS
 !
 	SUBROUTINE OUT_COL_SUMMARY()
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER, SAVE :: LU_CS
 	LOGICAL, SAVE :: FIRST_OUT=.TRUE.

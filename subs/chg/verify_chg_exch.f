@@ -1,9 +1,10 @@
 !
 ! Routine checks which charge exchange reactions can be utilized (i.e. those
-! with all species present), and whether the species in the charge exchange 
+! with all species present), and whether the species in the charge exchange
 ! reactions have the correct ordering.
 !
 	SUBROUTINE VERIFY_CHG_EXCH()
+	USE SET_KIND_MODULE
 	USE CHG_EXCH_MOD
 	IMPLICIT NONE
 !

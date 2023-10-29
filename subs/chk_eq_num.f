@@ -8,6 +8,7 @@ C ATOM_PRES is set TRUE when ion is present. Used to indicate whether
 C any ionic species of a particular element (eg carbon) is present.
 C
 	SUBROUTINE CHK_EQ_NUM(C2_PRES,EQC2,NC2,CV,ATOM_PRES,STRING)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 : ERROR_LU, LUER inserted

@@ -10,6 +10,7 @@
 !
 	SUBROUTINE MAP_PLOT(DP_MAP,DP_THETA,DP_XVEC,DP_YVEC,XDIM,YDIM,
 	1                   XLAB,YLAB,TITL,PASSED_OPT)
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -27,10 +28,10 @@
 	REAL*4 SPACING
 !
 	INTEGER XDIM,YDIM
-	REAL(10) DP_MAP(XDIM,YDIM)
-	REAL(10) DP_THETA(XDIM,YDIM)
-	REAL(10) DP_XVEC(XDIM)
-	REAL(10) DP_YVEC(YDIM)
+	REAL(KIND=LDP) DP_MAP(XDIM,YDIM)
+	REAL(KIND=LDP) DP_THETA(XDIM,YDIM)
+	REAL(KIND=LDP) DP_XVEC(XDIM)
+	REAL(KIND=LDP) DP_YVEC(YDIM)
 !
 	REAL*4 THETA(XDIM,YDIM)
 	REAL*4, ALLOCATABLE :: XVEC(:)
@@ -80,10 +81,10 @@
 !
 	LOGICAL HAN
 	INTEGER XHAN,YHAN,KST,KEND,LST,LEND
-	REAL(10) SM_ARRAY(-10:10,-10:10)			!Array for smoothing
-	REAL(10) FAC
-	REAL(10) MAXSIZEY
-	REAL(10) MAXSIZEX
+	REAL(KIND=LDP) SM_ARRAY(-10:10,-10:10)			!Array for smoothing
+	REAL(KIND=LDP) FAC
+	REAL(KIND=LDP) MAXSIZEY
+	REAL(KIND=LDP) MAXSIZEX
 	EXTERNAL FAC
 !
 	INTEGER, PARAMETER :: MAX_N_CONT=20
@@ -108,10 +109,10 @@
 	LOGICAL QUERYFLAG
 	INTEGER VECPEN(MAXVEC)
 !
-	REAL(10) LCI(256)
-	REAL(10) RCI(256)
-	REAL(10) BCI(256)
-	REAL(10) GCI(256)
+	REAL(KIND=LDP) LCI(256)
+	REAL(KIND=LDP) RCI(256)
+	REAL(KIND=LDP) BCI(256)
+	REAL(KIND=LDP) GCI(256)
 	REAL*4 CONTRAST
 	REAL*4 BRIGHTNESS
 !
@@ -413,7 +414,7 @@
 !	  BEG = PGBEG(IZERO,'?',IONE,IONE)
 	  BEG=PGOPEN('?')
 	  CALL PGQID(ID)
-! 
+!
 ! Initialize viewport.
 !
 	  CALL PGASK(.FALSE.)                      !TURNS OFF PAGE PROMPT
@@ -566,7 +567,7 @@ c
 	  WRITE(T_OUT,4) XMIN,XMAX
 	  CALL GEN_IN(XPAR,I,ITWO,'XST,XEND')
 !
-! Look for ordinate limits in X range. This will now generate a plot with 
+! Look for ordinate limits in X range. This will now generate a plot with
 ! roughly the correct scaling even though the oridinates values may be vastly
 ! different outside the plot window.
 !
@@ -642,7 +643,7 @@ c
 !
 ! This section is for additional axis fiddling. Can change number
 ! of digits after decimal point, and numbers at which axis labeling
-! begins. These parameters are restored to their original values 
+! begins. These parameters are restored to their original values
 ! everytime 'A' option is called.
 !
 	  CALL GEN_IN(IXTICK,'X minor divisions')
@@ -766,7 +767,7 @@ c
 !
 ! Do smoothing in Y direction. It is assumed that data outside
 ! array is zero (reasonable approximation if spatial array
-! is bigger than image). 
+! is bigger than image).
 !
 	  T1=FAC(XHAN-1)/(2.0**(XHAN-1))
 	  DO K=0,XHAN/2
@@ -814,11 +815,11 @@ c
 	  IF((MARGINY(1) .GT. 1.0) .OR. (MARGINY(1) .LT. 0)) THEN
 	    WRITE(T_OUT,*)'Bottom-Margin is incorrect, try again.'
 	    GOTO 710
-	  END IF 
+	  END IF
 	  IF((MARGINY(2) .GT. 1.0) .OR. (MARGINY(2) .LT. 0)) THEN
 	    WRITE(T_OUT,*)'Top-Margin is incorrect, try again.'
 	    GOTO 710
-	  END IF 
+	  END IF
 	  GOTO 1000
 !
 	ELSE IF( ANS .EQ. 'W')THEN
@@ -854,7 +855,7 @@ c
 	    END IF
 	  END DO
 	  GOTO 1000
-!	    
+!	
  	ELSE IF( ANS .EQ. 'D')THEN
 	  IF(DASH)THEN
             WRITE(T_OUT,*)'Now all solid line plots '
@@ -980,7 +981,7 @@ c
 	  END DO
 !
 ! Allow online editing of strings. GEN_IN is used so user can
-! see current value. 
+! see current value.
 !
 	  DO WHILE (0 .EQ. 0)
 	    ISTR=0			!Default terminates input
@@ -1205,7 +1206,7 @@ c
 !
 	  HARD=.TRUE.
 !
-1200	  CALL GEN_IN(PLT_LINE_WGT,'line weight') 
+1200	  CALL GEN_IN(PLT_LINE_WGT,'line weight')
 	  IF (PLT_LINE_WGT .GT. 201) THEN
 	    WRITE(T_OUT,*)'value too large'
 	    GOTO 1200
@@ -1281,7 +1282,7 @@ c
 	    SCALEFAC=SCALEFAC*T1
 	    SCALEFACY=SCALEFACY*T1
 	  END IF
-	ELSE 
+	ELSE
 	  SCALEFAC=TEMPASR/DASR
 	  SCALEFACY=1
           IF(DASR .GT. TEMPASR)THEN
@@ -1290,7 +1291,7 @@ c
 	    SCALEFACY=SCALEFACY*T1
 	  END IF
 	ENDIF
-! 
+!
 	PRINTX1=MARGINX(1)
 	PRINTX2=MARGINX(1)+(MARGINX(2)-MARGINX(1))*SCALEFAC
 !	PRINTX1_SCL=MARGINX_SCL(1)
@@ -1370,7 +1371,7 @@ c
 	  CONTRAST=1.0
 	  BRIGHTNESS=0.5
 	  CALL GEN_IN(IPALLET,'Pallet?')
-	  CALL PALETT(IPALLET,CONTRAST,BRIGHTNESS) 
+	  CALL PALETT(IPALLET,CONTRAST,BRIGHTNESS)
 	  CALL PGIMAG(MAP,XDIM,YDIM,IONE,XDIM,IONE,YDIM,ZPAR(1),ZPAR(2),TR_VEC)
 	  IF(DO_SCALE)THEN
 	    CALL PGSVP(MARGINX_SCL(1),MARGINX_SCL(2),MARGINY(1),MARGINY(2))
@@ -1441,7 +1442,7 @@ c
 	IF(.NOT. NORMAL_R_Y_AXIS)THEN
 	  CALL DRAW_RIGHT_Y_AXIS(YPAR_R_AX,YINC_R_AX,YNUMST_R_AX,
 	1        IYTICK_R_AX,IDY_R_AX,TICK_FAC,
-	1        EXPCHAR,YLABEL_R_AX,LOG_AXIS) 
+	1        EXPCHAR,YLABEL_R_AX,LOG_AXIS)
 	END IF
 !
 ! Draw strings on graph

@@ -1,4 +1,5 @@
       SUBROUTINE ZHPMV ( UPLO, N, ALPHA, AP, X, INCX, BETA, Y, INCY )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       COMPLEX*16         ALPHA, BETA
       INTEGER            INCX, INCY, N

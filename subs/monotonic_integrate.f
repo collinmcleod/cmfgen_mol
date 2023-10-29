@@ -1,6 +1,6 @@
 !
 ! Subroutine to comput the integral of a numerically defined function using
-! monotonic cubic integration. The grid vector must be 
+! monotonic cubic integration. The grid vector must be
 ! either a monotonically decreasing or increasing function. A modified cubic
 ! polynomial is used to do the interpolation. Instead of using
 ! the excact cubic estiamtes for the first derivative at the two nodes,
@@ -21,22 +21,23 @@
 ! Ref: Steffen. M, 1990, A/&A, 239, 443-450
 !
 	SUBROUTINE MONOTONIC_INTEGRATE(INTEGRAL,CHI,R,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 23-Oct-2006 - Based on MON_INT_FUNS_V2.
 !
 	INTEGER ND
-	REAL(10) INTEGRAL(ND)
-	REAL(10) CHI(ND)
-	REAL(10) R(ND)
+	REAL(KIND=LDP) INTEGRAL(ND)
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) R(ND)
 !
-	REAL(10) ONE
+	REAL(KIND=LDP) ONE
 	PARAMETER (ONE=1.0D0)
 	INTEGER I
 !
-	REAL(10) H(ND)			!Delta R [ R(I+1)-R(I) ]
-	REAL(10) S(ND)			!Slope in interval (I to I+1)
-	REAL(10) D(ND)			!First derivative at node I
+	REAL(KIND=LDP) H(ND)			!Delta R [ R(I+1)-R(I) ]
+	REAL(KIND=LDP) S(ND)			!Slope in interval (I to I+1)
+	REAL(KIND=LDP) D(ND)			!First derivative at node I
 !
 ! The array R may be either monotonically increasing, or decreasing.
 !

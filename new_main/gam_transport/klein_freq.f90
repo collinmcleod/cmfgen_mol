@@ -6,15 +6,16 @@
 !-------------------------------------------------------------------------------------
 !
 	SUBROUTINE KLEIN_SCAT(KLEIN_ARRAY,NF_GRID_PTS,E_VEC)
+	USE SET_KIND_MODULE
 !
 	IMPLICIT NONE
 !
 	INTEGER :: NF_GRID_PTS
-	REAL(10) :: KLEIN_ARRAY(NF_GRID_PTS,NF_GRID_PTS) ! KLEIN_ARRAY(INCOMING,OUTGOING)
-	REAL(10) :: E_VEC(NF_GRID_PTS)
+	REAL(KIND=LDP) :: KLEIN_ARRAY(NF_GRID_PTS,NF_GRID_PTS) ! KLEIN_ARRAY(INCOMING,OUTGOING)
+	REAL(KIND=LDP) :: E_VEC(NF_GRID_PTS)
 	INTEGER :: IN_FI,FI  ! FI=frequency index, IN denotes incoming
-        REAL(10), PARAMETER :: a=8.09330118E-21 ! a=h/mc^2 in units of seconds
-	REAL(10), PARAMETER :: ONE=1.0D0
+        REAL(KIND=LDP), PARAMETER :: a=8.09330118E-21 ! a=h/mc^2 in units of seconds
+	REAL(KIND=LDP), PARAMETER :: ONE=1.0D0
 !
 	KLEIN_ARRAY=0.0D0
 	DO FI=1,NF_GRID_PTS

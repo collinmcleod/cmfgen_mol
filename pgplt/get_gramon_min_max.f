@@ -2,11 +2,12 @@
 ! Get absica and ordinate maxima and minima for plotting.
 !
 	SUBROUTINE GET_GRAMON_MIN_MAX(XMIN,XMAX,YMIN,YMAX,TYPE_CURVE,T_OUT)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
 ! Altered 24-Feb-2016: Bug fix - no longer use plot 1 to set initial
-!                           values of XMIN and XMAX. 
+!                           values of XMIN and XMAX.
 ! Altered 12-Jan-2014: Installed check to see if LG option.
 ! Created 06-Sep-2005
 !

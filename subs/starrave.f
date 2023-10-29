@@ -1,21 +1,22 @@
 C
-C  Routine to read in a R,V,GRADV grid from file  
+C  Routine to read in a R,V,GRADV grid from file
 C    R(ND)= RP / 10**10cm and V in km/seg and SIGMA is dimensionless
 C    sigma=R/V dv/dr -1.
 C
 	SUBROUTINE STARRAVE(R,V,SIGMA,ND,LU,RMAX,RP)
+	USE SET_KIND_MODULE
         IMPLICIT NONE
 C
 C Altered 26-May-1996 ERROR_LU installed.
 C
 	INTEGER ND,LU,I,NDOLD
-	REAL(10) R(ND),V(ND),SIGMA(ND)
-	REAL(10) RMAX,RP
+	REAL(KIND=LDP) R(ND),V(ND),SIGMA(ND)
+	REAL(KIND=LDP) RMAX,RP
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
-	LUER=ERROR_LU()                        
+	LUER=ERROR_LU()
         OPEN(UNIT=LU,STATUS='OLD',FILE='RDINR',ACTION='READ')
         READ(LU,*) NDOLD
 C Check relative values.
@@ -32,5 +33,5 @@ C Check relative values.
         RMAX=R(1)
         CLOSE(UNIT=LU)
         RETURN
- 
+
 	END

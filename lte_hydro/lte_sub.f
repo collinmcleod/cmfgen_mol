@@ -1,13 +1,13 @@
-!                                                     
+!
 ! Main Subroutine to self consistently solve the equation of transfer and the
-! equations of statistical equilibrium for a spherically extended atmosphere 
+! equations of statistical equilibrium for a spherically extended atmosphere
 ! in the presence of outflows.
-!                                 
-! At present the atmosphere considered to consist of 
+!
+! At present the atmosphere considered to consist of
 !      H, He, plus other species such as C, N, O and Fe.
 ! Eithe H or He must be present.
 !
-! Abundances are un-normalized relative fractional abundances (i.e. specified 
+! Abundances are un-normalized relative fractional abundances (i.e. specified
 ! specified with respect to some arbitrary species X. Generally we have used
 ! He as X. If negative they are interpreted as mass-fractions.
 !
@@ -24,6 +24,7 @@
 	1                     NUM_BNDS,NION,DIAG_INDX,
 	1                     NDMAX,NPMAX,NCF_MAX,NLINE_MAX,
 	1                     TX_OFFSET,MAX_SIM,NM,NM_KI,NLF)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE ANG_QW_MOD
 	USE CMF_SOB_MOD
@@ -44,20 +45,20 @@
 ! Incorporated 02-Jan-2013: Chagend to allow depth dependent line profiles.
 ! Altered 20-Oct-2010 : Commented out statements accessing DIFFW.
 !                         No longer call CALL SET_VAR_RAD_MOD_V2
-!                         This reduces memory requirements by not declaring 
+!                         This reduces memory requirements by not declaring
 !                         CMFGEN variation arrays. DIFFW had to be commented out, as
 !                         declared in SET_VAR_RAD_MOD_V2.
 !
 ! Altered 16-Feb-2006 : Changed and modified over 2 month period. Section solving for
 !                         populations and performing NG acceleration etc removed to
-!                         subroutine (SOLVE_FOR_POPS). Routines added to allow time 
-!                         variability of the statistical equilibrium equations. 
-!                         Currently these are only for a Hubble law flow. Relativistic 
+!                         subroutine (SOLVE_FOR_POPS). Routines added to allow time
+!                         variability of the statistical equilibrium equations.
+!                         Currently these are only for a Hubble law flow. Relativistic
 !                         terms added to COMP_OBS (now COMP_OBS_V2).
 ! Altered 20-Feb-2005 : Changed to use FLUX_MEAN & ROSS_MEAN which are defined in
 !                         MOD_CMFGEN. Previusly used FLUXMEAN & ROSSMEAN defined in
 !                         RADIATION_MOD.
-! 
+!
 	INTEGER ND,NC,NP,NT
 	INTEGER NUM_BNDS,NION,DIAG_INDX
 	INTEGER NDMAX,NPMAX
@@ -73,23 +74,23 @@
 !
 ! 
 !
-	REAL(10) SOL(NT,ND)		!Temp. stor. area for ST. EQ.
+	REAL(KIND=LDP) SOL(NT,ND)		!Temp. stor. area for ST. EQ.
 	INTEGER DST,DEND
 !
 ! Constants for opacity etc. These are set in CMFGEN.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) OPLIN,EMLIN
 !
 ! Internally used variables
 !
-	REAL(10) S1,REPA
-	REAL(10) MAXCH,MAXCH_SUM
-	REAL(10) T1,T2,T3,T4,SRAT
-	REAL(10) FL,AMASS,FL_OLD
-	REAL(10) FG_COUNT
+	REAL(KIND=LDP) S1,REPA
+	REAL(KIND=LDP) MAXCH,MAXCH_SUM
+	REAL(KIND=LDP) T1,T2,T3,T4,SRAT
+	REAL(KIND=LDP) FL,AMASS,FL_OLD
+	REAL(KIND=LDP) FG_COUNT
 !
 	LOGICAL LST_DEPTH_ONLY
 !
@@ -141,7 +142,7 @@
 ! Following is used output the BA matrix, and its associated
 ! pointer file.
 !
-	INTEGER, PARAMETER :: LU_BA=40 
+	INTEGER, PARAMETER :: LU_BA=40
 !
 ! For listing of transitions with TOTAL negative opacity values at some depths.
 !
@@ -173,13 +174,13 @@
 ! Functions called
 !
 	INTEGER ICHRLEN,ERROR_LU
-	REAL(10) DOP_PRO
-	REAL(10) S15ADF
-	REAL(10) LAMVACAIR
-	REAL(10) ATOMIC_MASS_UNIT
-	REAL(10) SPEED_OF_LIGHT
-	REAL(10) RAD_SUN
-	REAL(10) TEFF_SUN
+	REAL(KIND=LDP) DOP_PRO
+	REAL(KIND=LDP) S15ADF
+	REAL(KIND=LDP) LAMVACAIR
+	REAL(KIND=LDP) ATOMIC_MASS_UNIT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
+	REAL(KIND=LDP) RAD_SUN
+	REAL(KIND=LDP) TEFF_SUN
 	LOGICAL EQUAL
 	EXTERNAL ICHRLEN,ERROR_LU,SPEED_OF_LIGHT,RAD_SUN,TEFF_SUN
 !
@@ -191,31 +192,31 @@
 !
 ! Wind variablity arrays.
 !
-	REAL(10) POPS(NT,ND)		!Population for all species.
-	REAL(10) MEAN_ATOMIC_WEIGHT	!Mean atomic weight of atoms  (neutrals
+	REAL(KIND=LDP) POPS(NT,ND)		!Population for all species.
+	REAL(KIND=LDP) MEAN_ATOMIC_WEIGHT	!Mean atomic weight of atoms  (neutrals
 !                          		! and ions) in atomic mass units.
-	REAL(10) ABUND_SUM
+	REAL(KIND=LDP) ABUND_SUM
 !
 !
-! Arrays for improving on the initial T structure --- partition functions. 
+! Arrays for improving on the initial T structure --- partition functions.
 ! Need one for each atomic species.
 !
-	REAL(10), ALLOCATABLE :: U_PAR_FN(:,:)
-	REAL(10), ALLOCATABLE :: PHI_PAR_FN(:,:)
-	REAL(10), ALLOCATABLE :: Z_PAR_FN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: U_PAR_FN(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: PHI_PAR_FN(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: Z_PAR_FN(:)
 !
-	REAL(10) TGREY(ND)
-	REAL(10) T_SAVE(ND)
+	REAL(KIND=LDP) TGREY(ND)
+	REAL(KIND=LDP) T_SAVE(ND)
 !
 ! Variables for scaling the line cooling rates in oder that the radiative
-! equilibrium equation is more consistent with the electron heating/cooling 
+! equilibrium equation is more consistent with the electron heating/cooling
 ! equation. The scaling is done when the line frequency is with a fraction
-! of SCL_LINE_HT_FAC of the tmean frequency for the super-level under 
+! of SCL_LINE_HT_FAC of the tmean frequency for the super-level under
 ! consideration. 0.5 is presently the prefered value.
 !
-!	REAL(10) AVE_ENERGY(NT)		!Average energy of each super level
-	REAL(10) STEQ_T_SCL(ND)
-	REAL(10) STEQ_T_NO_SCL(ND)
+!	REAL(KIND=LDP) AVE_ENERGY(NT)		!Average energy of each super level
+	REAL(KIND=LDP) STEQ_T_SCL(ND)
+	REAL(KIND=LDP) STEQ_T_NO_SCL(ND)
 ! 
 !
 ! Dielectronic recombination variables and arrays.
@@ -223,9 +224,9 @@
 	INTEGER NMAXDIE
 	PARAMETER (NMAXDIE=500)
 !
-	REAL(10) EDGEDIE(NMAXDIE)		!Ionization frequency (negative)
-	REAL(10) EINADIE(NMAXDIE)		!Einstein A coefficient
-	REAL(10) GUPDIE(NMAXDIE)		!Stat. weight of autoionizing level.
+	REAL(KIND=LDP) EDGEDIE(NMAXDIE)		!Ionization frequency (negative)
+	REAL(KIND=LDP) EINADIE(NMAXDIE)		!Einstein A coefficient
+	REAL(KIND=LDP) GUPDIE(NMAXDIE)		!Stat. weight of autoionizing level.
 !
 	INTEGER LEVDIE(NMAXDIE)  	!Indicates MNL of low state
 	INTEGER INDXDIE(NMAXDIE)
@@ -242,35 +243,35 @@
 ! the implicit recombination.
 !
 	INTEGER EQION,EQSPEC
-	REAL(10) GLOW,GION
-	REAL(10) NUST(ND)			!LTE autoionizing population.
-	REAL(10) DION(ND)			!Ion population
-	REAL(10), ALLOCATABLE :: DIERECOM(:,:)   !Chk for all species.
-	REAL(10), ALLOCATABLE :: DIECOOL(:,:)    !Dielec. cooling check for all spec.
-	REAL(10), ALLOCATABLE :: ADDRECOM(:,:)     
+	REAL(KIND=LDP) GLOW,GION
+	REAL(KIND=LDP) NUST(ND)			!LTE autoionizing population.
+	REAL(KIND=LDP) DION(ND)			!Ion population
+	REAL(KIND=LDP), ALLOCATABLE :: DIERECOM(:,:)   !Chk for all species.
+	REAL(KIND=LDP), ALLOCATABLE :: DIECOOL(:,:)    !Dielec. cooling check for all spec.
+	REAL(KIND=LDP), ALLOCATABLE :: ADDRECOM(:,:)
 ! 
 !
 ! Opacity/emissivity
 !
-	REAL(10) CHIL(ND)                 !Line opacity (without prof.)
-	REAL(10) ETAL(ND)                 !Line emissivity (without prof.)
+	REAL(KIND=LDP) CHIL(ND)                 !Line opacity (without prof.)
+	REAL(KIND=LDP) ETAL(ND)                 !Line emissivity (without prof.)
 !
 ! Quadrature weights.
 !
-	REAL(10) FQW(NCF_MAX)		!Frequency weights
+	REAL(KIND=LDP) FQW(NCF_MAX)		!Frequency weights
 !
 ! Transfer equation vectors
-	REAL(10) R_OLD(NDMAX)		!Used to store previous R grid in SN models.
+	REAL(KIND=LDP) R_OLD(NDMAX)		!Used to store previous R grid in SN models.
 !
 ! Line vectors
-	REAL(10) AV(ND)
-	REAL(10) VB(NDMAX)		!Used for error calculations
-	REAL(10) VC(NDMAX)		!Used for error calculations
-	REAL(10) H(ND)
-	REAL(10) Q(ND)			!FREQ DEPENDENT.
-	REAL(10) QH(ND)			!  "      "
-	REAL(10) GAM(ND)			!FREQ INDEPENDENT
-	REAL(10) GAMH(ND)			!  "      "
+	REAL(KIND=LDP) AV(ND)
+	REAL(KIND=LDP) VB(NDMAX)		!Used for error calculations
+	REAL(KIND=LDP) VC(NDMAX)		!Used for error calculations
+	REAL(KIND=LDP) H(ND)
+	REAL(KIND=LDP) Q(ND)			!FREQ DEPENDENT.
+	REAL(KIND=LDP) QH(ND)			!  "      "
+	REAL(KIND=LDP) GAM(ND)			!FREQ INDEPENDENT
+	REAL(KIND=LDP) GAMH(ND)			!  "      "
 ! 
 !
 ! Arrays and variables for computation of the continuum intensity
@@ -281,7 +282,7 @@
 !
 ! Variables for EW's and LINE blanketing.
 !
-	REAL(10) CONT_INT,EW
+	REAL(KIND=LDP) CONT_INT,EW
 	INTEGER ACCESS_JEW
 	LOGICAL COMPUTE_EW,COMPUTE_JEW,COMPUTE_LAM,MID,FULL_ES
 !
@@ -294,29 +295,29 @@
 !
 	INTEGER NDEXT,NCEXT,NPEXT
 !
-	REAL(10) CNM(NDMAX,NDMAX)		!For collisions cross-section in
-	REAL(10) DCNM(NDMAX,NDMAX)	!STEQGEN
+	REAL(KIND=LDP) CNM(NDMAX,NDMAX)		!For collisions cross-section in
+	REAL(KIND=LDP) DCNM(NDMAX,NDMAX)	!STEQGEN
 !
 !
 	INTEGER, PARAMETER :: N_FLUX_MEAN_BANDS=12
-	REAL(10)     LAM_FLUX_MEAN_BAND_END(N_FLUX_MEAN_BANDS)
-	REAL(10)     BAND_FLUX_MEAN(ND,N_FLUX_MEAN_BANDS)
-	REAL(10)     BAND_FLUX(ND,N_FLUX_MEAN_BANDS)
+	REAL(KIND=LDP)     LAM_FLUX_MEAN_BAND_END(N_FLUX_MEAN_BANDS)
+	REAL(KIND=LDP)     BAND_FLUX_MEAN(ND,N_FLUX_MEAN_BANDS)
+	REAL(KIND=LDP)     BAND_FLUX(ND,N_FLUX_MEAN_BANDS)
 	DATA LAM_FLUX_MEAN_BAND_END/100.0D0,150.0D0,200.0D0,227.83D0,258.90D0,300.0D0,504.25D0,911.75D0,
 	1                         1200.0D0,1500.0D0,2000.0D0,1.0D+08/
 !
 !
 ! Continuum frequency variables and arrays.
 !
-	REAL(10) NU(NCF_MAX)		!Continuum and line frequencies
-	REAL(10) NU_EVAL_CONT(NCF_MAX)	!Frequencies to evaluate continuum
-	REAL(10) OBS(NCF_MAX)		!Observers spectrum
+	REAL(KIND=LDP) NU(NCF_MAX)		!Continuum and line frequencies
+	REAL(KIND=LDP) NU_EVAL_CONT(NCF_MAX)	!Frequencies to evaluate continuum
+	REAL(KIND=LDP) OBS(NCF_MAX)		!Observers spectrum
 !
 ! Vectors and arrays used for the observed flux.
 !
 	INTEGER N_OBS
-	REAL(10) OBS_FREQ(NCF_MAX)		!Since N_OBS < NCF =< NCF_MAX
-	REAL(10) OBS_FLUX(NCF_MAX)
+	REAL(KIND=LDP) OBS_FREQ(NCF_MAX)		!Since N_OBS < NCF =< NCF_MAX
+	REAL(KIND=LDP) OBS_FLUX(NCF_MAX)
 	LOGICAL FIRST_OBS_COMP
 !
 	CHARACTER TIME*20
@@ -329,14 +330,14 @@
 !
 ! Global vectors:
 !
-	REAL(10) AMASS_ALL(NT)
+	REAL(KIND=LDP) AMASS_ALL(NT)
 	INTEGER N_LINE_FREQ
 !
 	INTEGER LINES_THIS_FREQ(NCF_MAX)
 !
-	REAL(10) NU_DOP
-	REAL(10) NU_MAX_OBS
-	REAL(10) NU_MIN_OBS
+	REAL(KIND=LDP) NU_DOP
+	REAL(KIND=LDP) NU_MAX_OBS
+	REAL(KIND=LDP) NU_MIN_OBS
 !
 	INTEGER FREQ_INDX
 	INTEGER X_INDX
@@ -346,23 +347,23 @@
 ! Variables to limit the computation of the continuum opacities and
 ! emissivities.
 !
-	REAL(10) JREC(ND)
-	REAL(10) dJRECdT(ND)
-	REAL(10) JPHOT(ND)
-	REAL(10) JREC_CR(ND)
-	REAL(10) JPHOT_CR(ND)
-	REAL(10) BPHOT_CR(ND)
+	REAL(KIND=LDP) JREC(ND)
+	REAL(KIND=LDP) dJRECdT(ND)
+	REAL(KIND=LDP) JPHOT(ND)
+	REAL(KIND=LDP) JREC_CR(ND)
+	REAL(KIND=LDP) JPHOT_CR(ND)
+	REAL(KIND=LDP) BPHOT_CR(ND)
 !
-	REAL(10) CONT_FREQ
+	REAL(KIND=LDP) CONT_FREQ
 	LOGICAL FINAL_CONSTANT_CROSS
 !
 ! Indicates whether APRXzV, FFXzZ etc should be zeroed.
 !
-	LOGICAL ZERO_REC_COOL_ARRAYS 
+	LOGICAL ZERO_REC_COOL_ARRAYS
 !
 ! 
 !
-	REAL(10) Z_POP(NT)		!Ionic charge for each species
+	REAL(KIND=LDP) Z_POP(NT)		!Ionic charge for each species
 !
 ! Variables etc for computation of continuum in comoving frame.
 !
@@ -375,21 +376,21 @@
 ! X-ray variables.
 ! We dimension from 0 so that we can access a Null vector for the 1st included
 ! ioinization stage of each species.
-! 
-	REAL(10) X_RECOM(ND,0:NION)			!Next X-ray recombination rate
-	REAL(10) X_COOL(ND,0:NION)			!Next X-ray cooling
 !
-	REAL(10) OBS_XRAY_LUM_0P1
-	REAL(10) OBS_XRAY_LUM_1KEV
-	REAL(10) GFF,XCROSS_V2
+	REAL(KIND=LDP) X_RECOM(ND,0:NION)			!Next X-ray recombination rate
+	REAL(KIND=LDP) X_COOL(ND,0:NION)			!Next X-ray cooling
+!
+	REAL(KIND=LDP) OBS_XRAY_LUM_0P1
+	REAL(KIND=LDP) OBS_XRAY_LUM_1KEV
+	REAL(KIND=LDP) GFF,XCROSS_V2
 	EXTERNAL GFF,XCROSS_V2
 !
-	REAL(10) SPEC_DEN(ND,NUM_SPECIES)		!Used by ELEC_PREP
-	REAL(10) AT_NO_VEC(ND,NUM_SPECIES)
+	REAL(KIND=LDP) SPEC_DEN(ND,NUM_SPECIES)		!Used by ELEC_PREP
+	REAL(KIND=LDP) AT_NO_VEC(ND,NUM_SPECIES)
 !
-	REAL(10) AD_COOL_V(ND)
-	REAL(10) AD_COOL_DT(ND)
-	REAL(10) ARTIFICIAL_HEAT_TERM(ND)
+	REAL(KIND=LDP) AD_COOL_V(ND)
+	REAL(KIND=LDP) AD_COOL_DT(ND)
+	REAL(KIND=LDP) ARTIFICIAL_HEAT_TERM(ND)
 !
 	LOGICAL FIRST
 	LOGICAL CHK,SUCCESS
@@ -404,7 +405,7 @@
 ! They are the He2 ege, NIII/CIII egde, HeI, HI, HI(N=2).
 !
 	INTEGER, PARAMETER :: N_TAU_EDGE=5
-	REAL(10) TAU_EDGE(N_TAU_EDGE)
+	REAL(KIND=LDP) TAU_EDGE(N_TAU_EDGE)
 	DATA TAU_EDGE/13.16D0,11.60D0,5.95D0,3.29D0,0.83D0/
 !
 ! 
@@ -428,7 +429,7 @@
 !
 !
 ! When TRUE, FIXED_T indicated that T is to be heled fixed (at least at some
-! depths) in the linearization. This variable is set automatically by the 
+! depths) in the linearization. This variable is set automatically by the
 ! code depending on the magnitude of the corrections.
 !
 	FIXED_T=.FALSE.
@@ -446,7 +447,7 @@
 ! A value of 1000 is used to indicate that the last change was greater them
 ! VAL_DO_NG, or a NEW_MODEL.
 !
-! A value of 2000 indicates a continuing model. In this case LAST_NG 
+! A value of 2000 indicates a continuing model. In this case LAST_NG
 ! take precedence. NB: NEXT_NG is reset to 1000 for a new model in the
 ! new model section.
 !
@@ -535,7 +536,7 @@
 !
 	CALL RD_TWO_PHOT(LUIN,INCL_TWO_PHOT)
 !
-! Read in data for charge exchange reactions. 
+! Read in data for charge exchange reactions.
 !
 	CALL RD_CHG_EXCH_V3(LUIN,INCL_CHG_EXCH)
 !
@@ -557,7 +558,7 @@
 ! 
 !
 ! Read in oscillator strengths, the photoionization cross section data,
-! dielectronic data, and implicit recombination data for carbon. 
+! dielectronic data, and implicit recombination data for carbon.
 ! Individual species are grouped together (rather than grouping all the
 ! oscillator reads) so that the headers of the INPUT files are grouped
 ! in the MODEL output file.
@@ -604,7 +605,7 @@
 	1           ATM(ID+1)%XzV_PRES,     ATM(ID+1)%EDGEXzV_F, ATM(ID+1)%GXzV_F,
 	1           ATM(ID+1)%F_TO_S_XzV,   ATM(ID+1)%XzVLEVNAME_F, ATM(ID+1)%NXzV_F,
 	1           SIG_GAU_KMS,FRAC_SIG_GAU,CUT_ACCURACY,ABOVE_EDGE,
-	1           XRAYS,ID,ION_ID(ID),LUIN,LUSCR)   
+	1           XRAYS,ID,ION_ID(ID),LUIN,LUSCR)
               IF(ATM(ID+1)%XzV_PRES) ATM(ID)%GIONXzV_F= ATM(ID+1)%GXzV_F(1)
  	      IF(DIE_AS_LINE .AND. (ATM(ID)%DIE_AUTO_XzV .OR.  ATM(ID)%DIE_WI_XzV) )THEN
 	        TMP_STRING='DIE'//TRIM(ION_ID(ID))
@@ -657,14 +658,14 @@
 	  WRITE(LUMOD,FMT)NCF_MAX
 	  FMT='(5X,I8,5X,''!Number of bands'')'
 	  WRITE(LUMOD,FMT)NUM_BNDS
-!	  
+!	
 	  WRITE(LUMOD,'()')
 	  CALL RITE_ATMHD_V2(LUMOD)
 !
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      ISPEC=SPECIES_LNK(ID)
-	      CALL RITE_ATMDES_V2( ATM(ID)%XzV_PRES, ATM(ID)%NXzV, 
+	      CALL RITE_ATMDES_V2( ATM(ID)%XzV_PRES, ATM(ID)%NXzV,
 	1          ATM(ID)%ZXzV, ATM(ID)%EQXzV,
 	1          ATM(ID)%NXzV_F, ATM(ID)%GIONXzV_F, ATM(ID)%N_XzV_PHOT,
 	1          AT_NO(ISPEC),AT_MASS(ISPEC),LUMOD,ION_ID(ID))
@@ -704,7 +705,7 @@
 	1              ATM(ID)%NXzV, NT, ATM(ID)%XzV_PRES)
 	END DO
 !
-! Store atomic masses in vector of LENGTH NT for later use by line 
+! Store atomic masses in vector of LENGTH NT for later use by line
 ! calculations. G_ALL and LEVEL_ID  are no longer used due to the use
 ! of super levels.
 !
@@ -752,8 +753,8 @@
           CALL RD_STRK_LIST(LUIN)
         END IF
 !
-! Compute the frequency grid for CMFGEN. Routine also allocates the vectors 
-! needed for the line data, sets the line data, and puts the line data into 
+! Compute the frequency grid for CMFGEN. Routine also allocates the vectors
+! needed for the line data, sets the line data, and puts the line data into
 ! numerical order.
 !
 	CALL SET_FREQUENCY_GRID_V2(NU,FQW,LINES_THIS_FREQ,NU_EVAL_CONT,
@@ -774,7 +775,7 @@
 	AVE_ENERGY(:)=0.0D0
 	DO ID=1,NUM_IONS-1
 	   CALL AVE_LEVEL_ENERGY(AVE_ENERGY, ATM(ID)%EDGEXzV_F,
-	1         ATM(ID)%GXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%EQXzV, 
+	1         ATM(ID)%GXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%EQXzV,
 	1         ATM(ID)%NXzV,   ATM(ID)%NXzV_F, NT, ATM(ID)%XzV_PRES)
 	END DO
 !
@@ -846,7 +847,7 @@
 !
 ! Set TSTAR which is required by TOTOPA_JILA. Its precise value is
 ! irrelevant (provided >0) as we always adopt the diffusion
-! approximation. 
+! approximation.
 !
 	TSTAR=T(ND)
 !
@@ -984,7 +985,7 @@
 !
 	  DO ML=1,NCF
 	    FREQ_INDX=ML
-! 
+!
 	    FL=NU(ML)
 	    IF(NU_EVAL_CONT(ML) .NE. CONT_FREQ)THEN
 	      COMPUTE_NEW_CROSS=.TRUE.
@@ -1028,7 +1029,7 @@
 ! Add in line opacity.
 !
 	CALL TUNE(1,'ADD_LINE_OPAC')
-!$OMP PARALLEL DO SCHEDULE(DYNAMIC) REDUCTION(+:CHI) 
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) REDUCTION(+:CHI)
 	  DO SIM_INDX=1,MAX_SIM
 	    IF(RESONANCE_ZONE(SIM_INDX))THEN
 	      CHI(:)=CHI(:)+CHIL_MAT(:,SIM_INDX)*LINE_PROF_SIM(:,SIM_INDX)
@@ -1037,7 +1038,7 @@
 !$OMP END PARALLEL DO
 	CALL TUNE(2,'ADD_LINE_OPAC')
 !
-! Now do the line variation. This presently ignores the effect of a 
+! Now do the line variation. This presently ignores the effect of a
 ! temperature variation.
 !
 !	  DO SIM_INDX=1,MAX_SIM
@@ -1387,7 +1388,7 @@
 	    WRITE(LU_POP,'(A)')' Flux Mean Opacity'
 	    WRITE(LU_POP,'(1X,1P8E16.7)')(FLUX_MEAN(I),I=1,ND)
 !
-! Compute the ion population at each depth.                          
+! Compute the ion population at each depth.
 ! These are required when evaluation the occupation probabilities.
 !
 	    DO J=1,ND
@@ -1463,13 +1464,13 @@
 	  END DO
 ! 
 !
-! Write out departure coefficients to ASCI file. 
+! Write out departure coefficients to ASCI file.
 ! NB - 1 refers to dimension of DHYD (i.e. DHYD(1,nd)
 !      1 refers to format for output.
 !      1,NHY - For use with HeI.
 !
 	CALL EVAL_LTE_V5(DO_LEV_DISSOLUTION,ND)
-!      
+!
 ! GAM_SPECIES refers to the number of electrons arising from each species (eg
 ! carbon).
 !
@@ -1515,4 +1516,4 @@
 	  STOP
 	END IF
 !
-	END 
+	END

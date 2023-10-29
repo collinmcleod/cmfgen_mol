@@ -3,9 +3,10 @@
 	SUBROUTINE SM_PHOT_V3(NU,CROSS,NCROSS,NSM_MAX,
 	1                        SIG_GAU_KMS,FRAC_SIG_GAU,
 	1                        CUT_ACCURACY,ABOVE)
+	USE SET_KIND_MODULE
 !
 ! Altered: 17-Sep-2018 : Bug fix -- caused crash with certain opacity cross-sections.
-! Altered:  8-Oct-2008 : Bug fixed 
+! Altered:  8-Oct-2008 : Bug fixed
 !                        Ensure cross section falls off at least as 1/nu
 !                         in extrapolation region.
 !
@@ -44,18 +45,18 @@
 	INTEGER NCROSS
 !
 	INTEGER NSM_MAX
-	REAL(10) NU(NSM_MAX)
-	REAL(10) CROSS(NSM_MAX)
+	REAL(KIND=LDP) NU(NSM_MAX)
+	REAL(KIND=LDP) CROSS(NSM_MAX)
 !
-	REAL(10) SIG_GAU_KMS
-	REAL(10) FRAC_SIG_GAU
-	REAL(10) CUT_ACCURACY
+	REAL(KIND=LDP) SIG_GAU_KMS
+	REAL(KIND=LDP) FRAC_SIG_GAU
+	REAL(KIND=LDP) CUT_ACCURACY
 	LOGICAL ABOVE
 !
 ! Work arrays.
 !
-	REAL(10) NU_SM(NSM_MAX)
-	REAL(10) CROSS_SM(NSM_MAX)
+	REAL(KIND=LDP) NU_SM(NSM_MAX)
+	REAL(KIND=LDP) CROSS_SM(NSM_MAX)
 !
 	LOGICAL FLAG
 	EXTERNAL EQUAL
@@ -65,25 +66,25 @@
 !
 	INTEGER, PARAMETER :: NZ=10000
 	INTEGER, PARAMETER :: NLOC=1000000
-	REAL(10) Z(NZ)
-	REAL(10) NU_FINE(NLOC)
-	REAL(10) CROSS_FINE(NLOC)
+	REAL(KIND=LDP) Z(NZ)
+	REAL(KIND=LDP) NU_FINE(NLOC)
+	REAL(KIND=LDP) CROSS_FINE(NLOC)
 	INTEGER NFINE
 !
-	REAL(10) T1,T2,DIFF,SUM,SIG_NEW
-	REAL(10) LAST_FREQ
-	REAL(10) DNU
-	REAL(10) dCROSS
-	REAL(10) SIG_GAU
+	REAL(KIND=LDP) T1,T2,DIFF,SUM,SIG_NEW
+	REAL(KIND=LDP) LAST_FREQ
+	REAL(KIND=LDP) DNU
+	REAL(KIND=LDP) dCROSS
+	REAL(KIND=LDP) SIG_GAU
 	INTEGER I,J,K,ML
 	INTEGER IST,IEND,IBEG,N_INS
 	INTEGER NSM
 !
 	INTEGER NU_INDX_ST
-	REAL(10) NU_ST
+	REAL(KIND=LDP) NU_ST
 !
-	REAL(10) MAX_DEL
-	REAL(10) PTS_PER_SIG
+	REAL(KIND=LDP) MAX_DEL
+	REAL(KIND=LDP) PTS_PER_SIG
 !
 	PTS_PER_SIG=4.0D0			!Used for the convolution.
 	SIG_GAU=SIG_GAU_KMS/2.998D+05		!C does not need to be accurate
@@ -106,9 +107,9 @@
 	END DO
 !
 ! If ABOVE is TRUE, we ignore cross-section (except for point immediately
-! proceeding threshold) when smoothing cross-section.  We reflect the cross 
+! proceeding threshold) when smoothing cross-section.  We reflect the cross
 ! section about the threshold frequency. This ensures that we conserve area.
-! If ABOVE is FALSE, we smooth across the threshold. 
+! If ABOVE is FALSE, we smooth across the threshold.
 !
 	IF(ABOVE)THEN
 !
@@ -259,7 +260,7 @@
 !	CALL DP_CURVE(NCROSS,NU,CROSS)
 !
 ! Interpolate cross-section onto a sufficiently fine grid so that the Gaussian
-! correctly samples the cross-section data. At present we assume linear 
+! correctly samples the cross-section data. At present we assume linear
 ! interpolation. This is satisfactory given the accuracy of the cross-sections.
 !
 ! NB: The Gaussian is assumed to have constant width in velocity space.
@@ -294,7 +295,7 @@
 !
 !	CALL DP_CURVE(NFINE,NU_FINE,CROSS_FINE)
 !
-! Define the smooth mesh. DNU is the frequency spacing for the 
+! Define the smooth mesh. DNU is the frequency spacing for the
 ! smoothed cross-section output.
 !
 	FLAG=.TRUE.
@@ -380,10 +381,10 @@ C
 	    WRITE(6,*)'See unit 31 for information on the (modified) coarse grid'
 	    WRITE(30,*)NFINE
 	    DO J=1,NFINE
-	      WRITE(30,'(I6,2ES16.6)')J,NU_FINE(J),CROSS_FINE(J) 
+	      WRITE(30,'(I6,2ES16.6)')J,NU_FINE(J),CROSS_FINE(J)
 	    END DO
 	    DO J=1,NCROSS
-	      WRITE(31,'(I6,2ES16.6)')J,NU(J),CROSS(J) 
+	      WRITE(31,'(I6,2ES16.6)')J,NU(J),CROSS(J)
 	    END DO
 	    STOP
 	  END IF

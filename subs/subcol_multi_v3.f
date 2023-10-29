@@ -2,7 +2,7 @@ C
 C Subroutine to compute the collisional excitation and ionization cross
 C sections for an arbitrary species taking into account super levels.
 C
-C The collison rates among the levels in the full atom are first computed. 
+C The collison rates among the levels in the full atom are first computed.
 C These are then used to compute the rates amongst the super levels.
 C
 C The collison strengths (OMEGA) must be supplied by OMEGA_COL ---
@@ -19,11 +19,12 @@ C
 	1                 LEVNAME_F,N_F,
 	1                 ZION,SUB_PHOT,COL_FILE,OMEGA_COL,
 	1                 F_TO_S_MAPPING,COOL,T,ED,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 16-Jun-1996 : Call to ZERO removed. COL and dCOL now initializd
 C                         outside depth loop.
-C                       Bug FIX: COL_FILE was declared REAL(10), NOW declared
+C                       Bug FIX: COL_FILE was declared REAL(KIND=LDP), NOW declared
 C                           as CHARACTER. No efffect on VAX, important on CRAY.
 C Altered 27-May-1996 : Generic calls used for EXP, SQRT.
 C Altered 03-Jan-1995 - HN_F  inserted in call (_V2 changed to _V3)
@@ -33,7 +34,7 @@ C                          excitation nad dexciation only).
 C                       Collisional ionization rates still assume constant
 C                          departure coeficients among levels in a given super
 C                          levl.
-C  
+C
 C Altered 24-Nov-1995 - Bug fixed: Incorrect dimension for HN_S
 C Altered 10-Nov-1995 - Bug fixed in DCOL.
 C                       HN_S inserted in call, and HN_F deleted.
@@ -41,58 +42,58 @@ C Created 06-Sep-1995 - Based on SUBCOL_HYD version.
 C                       Created so that all species with super-levels use
 C                         the same collisional routine. Only the routine to
 C                         compute OMEGA in the FULL atom is distinct.
-C                       Vector COOL was installed to enable checking of 
+C                       Vector COOL was installed to enable checking of
 C                         collisonal cooling rates.
 C
-	INTEGER N_S,N_F,ND  
-	REAL(10) OMEGA_F(N_F,N_F),dln_OMEGA_dlnT(N_F,N_F)
-	REAL(10) COL_S(N_S,N_S,ND),DCOL_S(N_S,N_S,ND)
+	INTEGER N_S,N_F,ND
+	REAL(KIND=LDP) OMEGA_F(N_F,N_F),dln_OMEGA_dlnT(N_F,N_F)
+	REAL(KIND=LDP) COL_S(N_S,N_S,ND),DCOL_S(N_S,N_S,ND)
 C
-	REAL(10) HN_S(N_S,ND)		!Population of atom with super levels.
-	REAL(10) HNST_S(N_S,ND)		!LTE pop. of atom with super levels.
-	REAL(10) dlnHNST_S_dlnT(N_S,ND)
+	REAL(KIND=LDP) HN_S(N_S,ND)		!Population of atom with super levels.
+	REAL(KIND=LDP) HNST_S(N_S,ND)		!LTE pop. of atom with super levels.
+	REAL(KIND=LDP) dlnHNST_S_dlnT(N_S,ND)
 C
-	REAL(10) HN_F(N_F,ND)		!Population of FULL atom
-	REAL(10) HNST_F(N_F,ND)		!LTE population of FULL atom
-	REAL(10) W_F(N_F,ND)		!Occupation probability
-	REAL(10) AHYD_F(N_F,N_F)		!Einstein A coefficient
-	REAL(10) EDGE_F(N_F)		!Ionization frequency (10^15 Hz)
-	REAL(10) GHYD_F(N_F)		!Statistical weight.
-	REAL(10) ZION			!Charge on ion (i.e. 1 for H)
+	REAL(KIND=LDP) HN_F(N_F,ND)		!Population of FULL atom
+	REAL(KIND=LDP) HNST_F(N_F,ND)		!LTE population of FULL atom
+	REAL(KIND=LDP) W_F(N_F,ND)		!Occupation probability
+	REAL(KIND=LDP) AHYD_F(N_F,N_F)		!Einstein A coefficient
+	REAL(KIND=LDP) EDGE_F(N_F)		!Ionization frequency (10^15 Hz)
+	REAL(KIND=LDP) GHYD_F(N_F)		!Statistical weight.
+	REAL(KIND=LDP) ZION			!Charge on ion (i.e. 1 for H)
 	CHARACTER*(*) COL_FILE		!Name of file with collisonal data.
 	CHARACTER*(*) LEVNAME_F(N_F)	!Level names in FULL ATOM.
 	EXTERNAL SUB_PHOT
 C
 	INTEGER F_TO_S_MAPPING(N_F)
 C
-	REAL(10) T(ND)			!Temperature (10^4 K)
-	REAL(10) ED(ND)			!Electron density
+	REAL(KIND=LDP) T(ND)			!Temperature (10^4 K)
+	REAL(KIND=LDP) ED(ND)			!Electron density
 C
 C NB: On exit COOL needs to be multiplied by COOL.
 C
-	REAL(10) COOL(ND)			!Net collisional cooling
+	REAL(KIND=LDP) COOL(ND)			!Net collisional cooling
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 	EXTERNAL OMEGA_COL
 C
 	INTEGER I,J,K
 	INTEGER L,U
-	REAL(10) X
-	REAL(10) BRAT
-	REAL(10) CIJ,CJI,CII
+	REAL(KIND=LDP) X
+	REAL(KIND=LDP) BRAT
+	REAL(KIND=LDP) CIJ,CJI,CII
 C
 	COL_S(:,:,:)=0.0D0  		!N_S, N_S, ND
 	dCOL_S(:,:,:)=0.0D0  		!N_S, N_S, ND
 C
 C Loop over all depths. This is provided for consistency with other collisonal
-C routines. We operate on a single depth at a time to minimize the size of 
+C routines. We operate on a single depth at a time to minimize the size of
 C OMEGA and dln_OMEGA_dlnT.
 C
 	DO K=1,ND
 C
-C The following correspond to the collision rates between levels I and J in 
+C The following correspond to the collision rates between levels I and J in
 C the FULL atom.
 C
 	  OMEGA_F(:,:)=0.0D0
@@ -103,7 +104,7 @@ C
 	1                  SUB_PHOT,COL_FILE)
 C
 	  DO I=1,N_F-1
-	    DO J=I+1,N_F                           
+	    DO J=I+1,N_F
 C
 	      CIJ=8.63D-08*ED(K)*OMEGA_F(I,J)/SQRT(T(K))
 	      CJI=CIJ/GHYD_F(J)
@@ -111,8 +112,8 @@ C
 	      CIJ=CIJ*EXP(-X)/GHYD_F(I)
 C
 C Allow for collisional ionization through level dissolution.
-C                        
-	      L=F_TO_S_MAPPING(I)    
+C
+	      L=F_TO_S_MAPPING(I)
 	      CII=CIJ*HNST_F(I,K)/HNST_S(L,K)*(1.0D0-W_F(J,K)/W_F(I,K))
 	      COL_S(L,L,K)=COL_S(L,L,K)+CII
 	      DCOL_S(L,L,K)=DCOL_S(L,L,K)+CII*( dln_OMEGA_dlnT(I,J) +
@@ -130,7 +131,7 @@ C F_TO_S_MAPPING to describe how the FULL atom is mapped on to the smaller
 C atom. Note that the collsion rate is only important when L is not equal to
 C U.
 C
-	      L=F_TO_S_MAPPING(I)    
+	      L=F_TO_S_MAPPING(I)
 	      U=F_TO_S_MAPPING(J)
 C
 C BRAT is the ration of b (level in full atom) to b (in the super level).
@@ -151,9 +152,9 @@ C We now compute the derivatives of the collision rates with respect to T.
 C
 	        DCOL_S(L,U,K)=DCOL_S(L,U,K)+CIJ*( dln_OMEGA_dlnT(I,J) + X -
 	1           2.0D0 - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
-	        DCOL_S(U,L,K)=DCOL_S(U,L,K)+CJI*( dln_OMEGA_dlnT(I,J) - 
+	        DCOL_S(U,L,K)=DCOL_S(U,L,K)+CJI*( dln_OMEGA_dlnT(I,J) -
 	1           2.0D0 - HDKT*EDGE_F(J)/T(K)-dlnHNST_S_dlnT(U,K) )/T(K)
-C                                                                          
+C
 	        COOL(K)=COOL(K)+(HN_S(L,K)*CIJ-HN_S(U,K)*CJI)*
 	1                          (EDGE_F(I)-EDGE_F(J))
 	      END IF
@@ -166,7 +167,7 @@ C excitation. NB: The variation due to a change in X cancels out with the
 C change in HNST_F.
 C
 	  DO I=1,N_F
-	    L=F_TO_S_MAPPING(I)    
+	    L=F_TO_S_MAPPING(I)
 	    CII=8.63D-08*ED(K)*OMEGA_F(I,I)/GHYD_F(I)/SQRT(T(K))
 	    X=HDKT*EDGE_F(I)/T(K)
 	    CII=CII*EXP(-X)*HNST_F(I,K)/HNST_S(L,K)

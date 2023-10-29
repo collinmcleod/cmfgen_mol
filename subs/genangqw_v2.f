@@ -4,6 +4,7 @@ C computation of the angular moments of the radiation field
 C assuming spherical geometry.
 C
 	SUBROUTINE GENANGQW_V2(QW,R,P,NC,ND,NP,MOMWEIGHT,AT_HALF)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C 23-Dec-2004 : Only print out warning message when AT_HALF is FALSE.
@@ -20,14 +21,14 @@ C 25-Nov-1986 - Created
 C
 	LOGICAL AT_HALF
 	INTEGER NC,ND,NP
-	REAL(10) QW(ND,NP),R(ND),P(NP)
+	REAL(KIND=LDP) QW(ND,NP),R(ND),P(NP)
 C
-	REAL(10) PSQ(NP),MU(NP),dMU(NP),WEIGHT(NP)
+	REAL(KIND=LDP) PSQ(NP),MU(NP),dMU(NP),WEIGHT(NP)
 	INTEGER ERROR_LU,LUER
 	EXTERNAL MOMWEIGHT,ERROR_LU
 C
 	INTEGER I,J,NW,MAXND,COUNTER
-	REAL(10) T1,T2
+	REAL(KIND=LDP) T1,T2
 C
 C Initialization section
 C

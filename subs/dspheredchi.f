@@ -15,10 +15,11 @@ C and Q is the spherical optical depth fcator.
 C
 C
 	SUBROUTINE dSPHEREdCHI(W,DTAU,R,Q,ND)
+	USE SET_KIND_MODULE
 	USE MOD_TRAP_DERIVATIVES
 	IMPLICIT NONE
 	INTEGER ND
-	REAL(10) W(ND,ND),DTAU(ND),Q(ND),R(ND)
+	REAL(KIND=LDP) W(ND,ND),DTAU(ND),Q(ND),R(ND)
 C
 C Altered 02-Mar-1999 - Module MOD_TRAP_DERIVATIVES replaces COMMON block
 C                          TRAPDERIVATIVES. Variable names remain same.
@@ -26,7 +27,7 @@ C Altered 24-May-1996 - Call to DP_ZERO removed.
 C Created 27-Apr-1989 - Based on NEWVKIMD
 C
 	INTEGER I,K
-	REAL(10) ALPHA,BETA
+	REAL(KIND=LDP) ALPHA,BETA
 C
 	W(:,:)=0.0D0
 C

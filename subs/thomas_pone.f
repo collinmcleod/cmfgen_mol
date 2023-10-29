@@ -12,17 +12,18 @@ C This routine should not be used for solving the transfer equation when
 C the optical depth steps are less than approximately 10^{-5}.
 C
 	SUBROUTINE THOMAS_PONE(A,B,C,D,N1,N2)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 08-Feb-2004 : Forced constants to be double precission.
 C Altered 29-Sep-1997 : Scaler loop code installed to improve speed on a
 C                         an Alphastation.
-C Altered 29-May-1996 : Loops reversed in forward elimination and the 
+C Altered 29-May-1996 : Loops reversed in forward elimination and the
 C                         backward substitution to allow CRAY vectorization.
 C Altered 21-Feb-1995 :  Cleaned
 C
 	INTEGER N1,N2
-	REAL(10) A(N1),B(N1),C(N1),D(N1,N2)
+	REAL(KIND=LDP) A(N1),B(N1),C(N1),D(N1,N2)
 C
 C Local variables
 C

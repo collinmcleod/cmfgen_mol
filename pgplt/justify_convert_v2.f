@@ -5,6 +5,7 @@
 !
       SUBROUTINE JUSTIFY_CONVERT_V2(XSTR,YSTR,LOC,LOC_PG,ORIENTATION,
      *             FLAGSTR,XSTRPOS,YSTRPOS,STRING,MAX_NUM_STR)
+	USE SET_KIND_MODULE
 !
 !Altered 18-Nov-1990 : Changed to V2: MAX_NUM_STR passed in call
 !                      Absolute value of LOC used.
@@ -52,5 +53,5 @@
         END IF
       END DO
 !
-      RETURN 
+      RETURN
       END

@@ -1,9 +1,9 @@
 ! Subroutine to evaluate the downscattered emissivity given an intensity
 ! at a specific frequency. This will use interpolation to sample the
 ! angular dependence in order to use Gauss-Chebyshev quadrature.
-! 
+!
 ! This routine is different than gamma_eta_sub_v*.f95 because it
-! will calculate the emissivity of all the downscattered photons given 
+! will calculate the emissivity of all the downscattered photons given
 ! the specific intensity at a particular frequency.
 !
 ! One thing to note is that for the integration, the angle grid
@@ -20,13 +20,14 @@
 	SUBROUTINE ETA_SCAT_V6(NF_GRID_PTS,NU_GRID_VEC,IN_NU,NU_END, &
 		ETA,INTENSITY,ND,NA,MON_NA,KLEIN_ARRAY,E_VEC,CHEB_ORDER,ED, &
 		DO_NORM_ETA)
+	USE SET_KIND_MODULE
 	USE GAM_MU_MOD
 	IMPLICIT NONE
 !
 	INTEGER :: I,J,K,L,MS,MK,MON_MS
 	INTEGER :: CHEB_ORDER
 	INTEGER :: NF_GRID_PTS
-	INTEGER :: ND 
+	INTEGER :: ND
         INTEGER :: LOC
         INTEGER :: IN_NU,FI,MI,DI ! FI=frequency index, MI=mu index, DI=depth index
 	INTEGER :: IONE=1,ITWO=2
@@ -36,52 +37,52 @@
 !
 	LOGICAL :: DO_NORM_ETA
 !
-	REAL(10) :: NU_GRID_VEC(NF_GRID_PTS)
-        REAL(10) :: ETA(NA,ND,NF_GRID_PTS) ! (MU,DEPTH,FREQ)
-        REAL(10) :: INTENSITY(NA,ND,NF_GRID_PTS) ! (MU,ND,FREQ)
-	REAL(10) :: MON_I(MON_NA,ND)
-	REAL(10) :: KLEIN_ARRAY(NF_GRID_PTS,NF_GRID_PTS)
-	REAL(10) :: ED(ND)
+	REAL(KIND=LDP) :: NU_GRID_VEC(NF_GRID_PTS)
+        REAL(KIND=LDP) :: ETA(NA,ND,NF_GRID_PTS) ! (MU,DEPTH,FREQ)
+        REAL(KIND=LDP) :: INTENSITY(NA,ND,NF_GRID_PTS) ! (MU,ND,FREQ)
+	REAL(KIND=LDP) :: MON_I(MON_NA,ND)
+	REAL(KIND=LDP) :: KLEIN_ARRAY(NF_GRID_PTS,NF_GRID_PTS)
+	REAL(KIND=LDP) :: ED(ND)
 !
-        REAL(10) :: C1,C2
-        REAL(10) :: R_ELEC_SQRD
-        REAL(10) :: A1
-	REAL(10) :: A2
-	REAL(10) :: GAM_DIFF
-	REAL(10) :: GAM_DIFF_SQD
-	REAL(10) :: ROOT1
-	REAL(10) :: ROOT2
-	REAL(10) :: B1,B2
-        REAL(10) :: DISC
-        REAL(10) :: CHEB_W
-        REAL(10) :: X(CHEB_ORDER),X2(CHEB_ORDER)
-        REAL(10) :: E_VEC(NF_GRID_PTS) ! will be h*nu/mec^2 thus unitless
-	REAL(10) :: TEMPINT
-	REAL(10) :: MU
-	REAL(10) :: PI
-	REAL(10) :: NU_PRIME_ON_NU
-	REAL(10) :: FAC
-	REAL(10) :: PRE_FAC(ND)
-	REAL(10) :: T1,T2,T3,T4
-	REAL(10) :: DELTA_NU
-	REAL(10), DIMENSION(:), ALLOCATABLE :: INTERP
-	REAL(10), DIMENSION(:), ALLOCATABLE :: INTERP2
-	REAL(10), DIMENSION(:,:), ALLOCATABLE :: COEF
-	REAL(10), DIMENSION(:,:), ALLOCATABLE :: COEF2
+        REAL(KIND=LDP) :: C1,C2
+        REAL(KIND=LDP) :: R_ELEC_SQRD
+        REAL(KIND=LDP) :: A1
+	REAL(KIND=LDP) :: A2
+	REAL(KIND=LDP) :: GAM_DIFF
+	REAL(KIND=LDP) :: GAM_DIFF_SQD
+	REAL(KIND=LDP) :: ROOT1
+	REAL(KIND=LDP) :: ROOT2
+	REAL(KIND=LDP) :: B1,B2
+        REAL(KIND=LDP) :: DISC
+        REAL(KIND=LDP) :: CHEB_W
+        REAL(KIND=LDP) :: X(CHEB_ORDER),X2(CHEB_ORDER)
+        REAL(KIND=LDP) :: E_VEC(NF_GRID_PTS) ! will be h*nu/mec^2 thus unitless
+	REAL(KIND=LDP) :: TEMPINT
+	REAL(KIND=LDP) :: MU
+	REAL(KIND=LDP) :: PI
+	REAL(KIND=LDP) :: NU_PRIME_ON_NU
+	REAL(KIND=LDP) :: FAC
+	REAL(KIND=LDP) :: PRE_FAC(ND)
+	REAL(KIND=LDP) :: T1,T2,T3,T4
+	REAL(KIND=LDP) :: DELTA_NU
+	REAL(KIND=LDP), DIMENSION(:), ALLOCATABLE :: INTERP
+	REAL(KIND=LDP), DIMENSION(:), ALLOCATABLE :: INTERP2
+	REAL(KIND=LDP), DIMENSION(:,:), ALLOCATABLE :: COEF
+	REAL(KIND=LDP), DIMENSION(:,:), ALLOCATABLE :: COEF2
 !
-	REAL(10), SAVE, ALLOCATABLE :: SQRT_ONE_MIN_B2(:,:)
-	REAL(10)  SQRT_ONE_MIN_GAM_DIFF_SQD
+	REAL(KIND=LDP), SAVE, ALLOCATABLE :: SQRT_ONE_MIN_B2(:,:)
+	REAL(KIND=LDP)  SQRT_ONE_MIN_GAM_DIFF_SQD
 	LOGICAL, SAVE :: FIRST=.TRUE.
 !
 ! Variables to norm for photon number.
 !
 	INTEGER :: NLEN
-	REAL(10), DIMENSION(:,:,:), ALLOCATABLE :: ETA_NORM
-	REAL(10), DIMENSION(:), ALLOCATABLE :: I_NORM
-	REAL(10), DIMENSION(:), ALLOCATABLE :: WRK
-	REAL(10), DIMENSION(:,:), ALLOCATABLE :: WRK2
-	REAL(10), DIMENSION(:), ALLOCATABLE :: NORM
-	REAL(10) :: COMPTON_SIG
+	REAL(KIND=LDP), DIMENSION(:,:,:), ALLOCATABLE :: ETA_NORM
+	REAL(KIND=LDP), DIMENSION(:), ALLOCATABLE :: I_NORM
+	REAL(KIND=LDP), DIMENSION(:), ALLOCATABLE :: WRK
+	REAL(KIND=LDP), DIMENSION(:,:), ALLOCATABLE :: WRK2
+	REAL(KIND=LDP), DIMENSION(:), ALLOCATABLE :: NORM
+	REAL(KIND=LDP) :: COMPTON_SIG
 	EXTERNAL COMPTON_SIG
 !
 ! In order to make the code faster, we can interpolate
@@ -89,15 +90,15 @@
 ! of length ND with components that will be the coefficients
 !
 	TYPE INTERP_COEF
-	   REAL(10), DIMENSION(:,:), ALLOCATABLE :: C
+	   REAL(KIND=LDP), DIMENSION(:,:), ALLOCATABLE :: C
 	END TYPE
 	TYPE(INTERP_COEF) :: Y(ND)
 !
-	REAL(10), PARAMETER :: ONE=1.0D0
-	REAL(10), PARAMETER :: TWO=2.0D0
-	REAL(10), PARAMETER :: PLANCK = 4.135668E-021 ! UNITS OF MeV*s SINCE PHOTON ENERGIES IN MeV
-	REAL(10), PARAMETER :: R_ELEC = 2.8179403227D-13 ! Units of cm
-	REAL(10), PARAMETER :: HoMC2 = 8.09330118D-21     ! HoMC2 = h/mc^2 in units of seconds
+	REAL(KIND=LDP), PARAMETER :: ONE=1.0D0
+	REAL(KIND=LDP), PARAMETER :: TWO=2.0D0
+	REAL(KIND=LDP), PARAMETER :: PLANCK = 4.135668E-021 ! UNITS OF MeV*s SINCE PHOTON ENERGIES IN MeV
+	REAL(KIND=LDP), PARAMETER :: R_ELEC = 2.8179403227D-13 ! Units of cm
+	REAL(KIND=LDP), PARAMETER :: HoMC2 = 8.09330118D-21     ! HoMC2 = h/mc^2 in units of seconds
 !
 	MON_I=0.0D0
 	IF(DO_NORM_ETA)THEN
@@ -115,7 +116,7 @@
 !
 ! ^^ 0.5D0 is removed from R_ELEC_SQRD because it is cancelled by a 2
 ! from having two roots for Dirac delta which each contribute the same
-! term to the integral. See paper or notes. 
+! term to the integral. See paper or notes.
 !
         DO K=1,CHEB_ORDER
           X(K)=COS(((TWO*K-ONE)*PI)/(TWO*CHEB_ORDER))
@@ -187,7 +188,7 @@
 !
 !-------------------------------------------------------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------------------------------------------------------
-! Starting the main loops for calculating ETA. Outermost loop will be frequency so I can update all downgraded photons 
+! Starting the main loops for calculating ETA. Outermost loop will be frequency so I can update all downgraded photons
 !-------------------------------------------------------------------------------------------------------------------------------
 !-------------------------------------------------------------------------------------------------------------------------------
 !
@@ -201,7 +202,7 @@
 	  T1=(E_VEC(IN_NU)-E_VEC(FI))/E_VEC(FI)/E_VEC(IN_NU)
 	  SQRT_ONE_MIN_GAM_DIFF_SQD=SQRT(2*T1-T1*T1)
 !
-!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(DI,MS,MON_MS,I,T1,MU,& 
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(DI,MS,MON_MS,I,T1,MU,&
 !$OMP& TEMPINT,A1,A2,ROOT1,ROOT2,DISC,C1,C2,X2,T2,J,LOC,B1,B2,K)
 	  DO DI=1,ND
 	    MS=R_MU(DI)%MU_PTS
@@ -272,7 +273,7 @@
 !
 !
 ! This next little piece is to to figure out the limits on the incoming mu integration
-! which is a result of removing the phi dependence of the dirac delta 
+! which is a result of removing the phi dependence of the dirac delta
 !
 ! Original form was (-A2 +- SQRT(A2*A2 - 4*A1*A3))/(2*A1) However, A1 is
 ! -1 (see notes) or paper, so I can just ignore it and relabel A2->A1
@@ -283,11 +284,11 @@
 !	      A1=B1*(ONE+ONE/E_VEC(IN_NU)-ONE/E_VEC(FI))
 !	      A2=(ONE/E_VEC(IN_NU))*(TWO/E_VEC(FI)-ONE/E_VEC(IN_NU)-TWO)&
 !			+(ONE/E_VEC(FI))*(TWO-ONE/E_VEC(FI))-B2
-!	      DISC=A1*A1+4.0D0*A2 
+!	      DISC=A1*A1+4.0D0*A2
 	      B1=R_MU(DI)%MU_VECTOR(MI)
 	      B2=R_MU(DI)%MU_VECTOR(MI)*R_MU(DI)%MU_VECTOR(MI)
 !	      DISC=(ONE-B2)*(ONE-GAM_DIFF_SQD)
-	      DISC=SQRT_ONE_MIN_B2(MI,DI)*SQRT_ONE_MIN_GAM_DIFF_SQD 
+	      DISC=SQRT_ONE_MIN_B2(MI,DI)*SQRT_ONE_MIN_GAM_DIFF_SQD
 	      IF (DISC .LT. 0.0D0) THEN
 		WRITE(6,*) "*** ERROR! NAN PROBLEM WITH DISCRIMINANT IN CALCULATING ETA SCAT ***"
 		WRITE(6,'(A,ES16.6)')'DISCRIMINANT:',DISC
@@ -354,7 +355,7 @@
       IF(DO_NORM_ETA .AND. NU_END .LT. NF_GRID_PTS)THEN
 	DO DI=1,ND
 	  MS=R_MU(DI)%MU_PTS
-!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(T1,T2,T3,FI,MI) 
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(T1,T2,T3,FI,MI)
 	  DO FI=IN_NU+1,NU_END
 	    DO MI=1,MS-1
 	      T1=R_MU(DI)%MU_VECTOR(MI)-R_MU(DI)%MU_VECTOR(MI+1)
@@ -404,24 +405,25 @@
 	CALL TUNE(2,'GAM_NORM')
 !
 	RETURN
-	END SUBROUTINE 
+	END SUBROUTINE
 !
 	FUNCTION COMPTON_SIG(NU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
-	REAL(10) :: NU
-	REAL(10) :: COMPTON_SIG
+	REAL(KIND=LDP) :: NU
+	REAL(KIND=LDP) :: COMPTON_SIG
 !
-	REAL(10) :: EPSI
-	REAL(10) :: X
-	REAL(10) :: PI
-	REAL(10) :: R_E2
+	REAL(KIND=LDP) :: EPSI
+	REAL(KIND=LDP) :: X
+	REAL(KIND=LDP) :: PI
+	REAL(KIND=LDP) :: R_E2
 !
-	REAL(10), PARAMETER :: R_EL=2.8179403227D-13   ! cm
-	REAL(10), PARAMETER :: ONE=1.0D0
-	REAL(10), PARAMETER :: TWO=2.0D0
-	REAL(10), PARAMETER :: H  =4.135668D-21	     ! MeV*sec
-        REAL(10), PARAMETER :: M_E=5.109989D-1         ! Units of MeV
+	REAL(KIND=LDP), PARAMETER :: R_EL=2.8179403227D-13   ! cm
+	REAL(KIND=LDP), PARAMETER :: ONE=1.0D0
+	REAL(KIND=LDP), PARAMETER :: TWO=2.0D0
+	REAL(KIND=LDP), PARAMETER :: H  =4.135668D-21	     ! MeV*sec
+        REAL(KIND=LDP), PARAMETER :: M_E=5.109989D-1         ! Units of MeV
 !
 	PI=ACOS(-ONE)
 	R_E2=R_EL*R_EL

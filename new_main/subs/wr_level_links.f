@@ -3,6 +3,7 @@
 !            ION_ID, Level name, SL, Level.
 !
 	SUBROUTINE WR_LEVEL_LINKS
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	INTEGER LU
 !

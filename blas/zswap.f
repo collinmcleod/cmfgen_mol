@@ -1,4 +1,5 @@
       subroutine  zswap (n,zx,incx,zy,incy)
+	USE SET_KIND_MODULE
 c
 c     interchanges two vectors.
 c     jack dongarra, 3/11/78.

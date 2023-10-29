@@ -3,6 +3,7 @@ C Routine to write a 2D Matrix out as a "MATRIX" . A maximum of ten
 C numbers are written across the page.
 C
 	SUBROUTINE WR2D_V2(A,N,M,MES,SYMB,WR_INDEX,LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 10-Feb-2002: SYMB installed as pass option
@@ -11,12 +12,12 @@ C
 ! Altered 13-Dec-1989 - Implicit none installed. I index written out.
 !
 	INTEGER N,M,LU
-	REAL(10) A(N,M)
+	REAL(KIND=LDP) A(N,M)
 	LOGICAL WR_INDEX
 	CHARACTER*(*) MES
 	CHARACTER*(*) SYMB
 C
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER MS,MF,ML,I,J
 	CHARACTER*80 FORM
 C
@@ -65,7 +66,7 @@ C
 	  FORM=TRIM(FORM)//'''('',I3,'')'','
 	ELSE IF(M .LT. 10000)THEN
 	  FORM=TRIM(FORM)//'''('',I4,'')'','
-	ELSE 
+	ELSE
 	   T1=M
 	   T1=LOG10(T1)+1
 	   FORM=TRIM(FORM)//'''('',I'

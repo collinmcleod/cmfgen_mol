@@ -1,10 +1,11 @@
 !
 ! Subroutine to compute the LTE populations (at NR depth points)
 ! given ED (electron density) and DI,GU (density and statistical
-! weight of the ground state of the next ionization state 
+! weight of the ground state of the next ionization state
 ! respectively).
 !
 	SUBROUTINE LTEPOP(HNST,ED,DI,G,NUION,T,GU,N,NR)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 18-FEb-2010 : Take log of density to extend range of LTE populations.
@@ -16,14 +17,14 @@
 ! Altered 14-AUG-1984
 !
 	INTEGER N,NR
-	REAL(10) HNST(N,NR),ED(NR),DI(NR),T(NR),G(N),NUION(N),GU
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) HNST(N,NR),ED(NR),DI(NR),T(NR),G(N),NUION(N),GU
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local varaiables.
 !
 	INTEGER I,J
-	REAL(10) X,Y,RGU
+	REAL(KIND=LDP) X,Y,RGU
 	LOGICAL, PARAMETER :: NEW_METHOD=.TRUE.
 !
 	IF(NEW_METHOD)THEN

@@ -1,15 +1,16 @@
 !
 ! Subroutine to store entie BA variation file on disk. The BA data in
 ! this version is passed via a data module. Unlike earlier routines,
-! STEQ is NOT written out. 
+! STEQ is NOT written out.
 !
 	SUBROUTINE READ_BA_DATA_V3(LU,NION,NUM_BNDS,ND,COMPUTE_BA,FIXED_T,SUCCESSFUL_READ,DESC)
+	USE SET_KIND_MODULE
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
 ! Altered 16-Jul-2019 - Now reads in BA_T_EHB
 ! Altered 04-Oct-2016 - Added FIXED_T to call.
-! Altered 12-Mar-2014 - COMPUTE_BA is nolonger changed by the routine. The value in CMFGEN 
+! Altered 12-Mar-2014 - COMPUTE_BA is nolonger changed by the routine. The value in CMFGEN
 !                         is used to indicate whether the BA matric will be read in.
 ! Altered 07-Mar-2004 - BA no longer read in if COMPUTE_BA=.TRUE.
 ! Created 02-Apr-2001 - Created to handle SE data structure.
@@ -37,7 +38,7 @@
 	SUCCESSFUL_READ=.FALSE.
 !
 ! If we are still computing the BA matrix, there is no need to read it in.
-! 
+!
 	IF(COMPUTE_BA)THEN
 	  RETURN
 	END IF

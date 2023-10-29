@@ -1,4 +1,5 @@
 	MODULE GAUSS_FIT_DATA
+	USE SET_KIND_MODULE
 !
 ! Altered 06-Mar-2023 : YCONT_FIT added
 ! Altered 09-Aug-2022 : To get consistency in the different routines changed to use Gauss.
@@ -8,20 +9,20 @@
 	INTEGER NG_PAR_MAX		 	!Maximum total number of parameters in fit
 	INTEGER NG_DATA				!Number of data points
 !
-	REAL(10), ALLOCATABLE :: X_GAUSS(:)	!Absica data as stored in module
-	REAL(10), ALLOCATABLE :: Y_GAUSS(:)	!Data to be fitted
+	REAL(KIND=LDP), ALLOCATABLE :: X_GAUSS(:)	!Absica data as stored in module
+	REAL(KIND=LDP), ALLOCATABLE :: Y_GAUSS(:)	!Data to be fitted
 !
-	REAL(10), ALLOCATABLE :: SIM(:,:)		!Simplex (NG_PAR+1 parameter set estimates)
-	REAL(10), ALLOCATABLE :: PAR(:)		!Single parameter set
-	REAL(10), ALLOCATABLE :: SUM_SQ(:)
-	REAL(10), ALLOCATABLE :: SCALE(:)
-	REAL(10), ALLOCATABLE :: EW_TABLE(:,:)
-	REAL(10), ALLOCATABLE :: LAM_TABLE(:,:)
-	REAL(10), ALLOCATABLE :: EW(:)
-	REAL(10), ALLOCATABLE :: EW_CONT(:)
-	REAL(10), ALLOCATABLE :: EW_ERROR(:)
-	REAL(10), ALLOCATABLE :: ALT_ERROR(:)
-	REAL(10), ALLOCATABLE :: MIN_ERROR(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SIM(:,:)		!Simplex (NG_PAR+1 parameter set estimates)
+	REAL(KIND=LDP), ALLOCATABLE :: PAR(:)		!Single parameter set
+	REAL(KIND=LDP), ALLOCATABLE :: SUM_SQ(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SCALE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: EW_TABLE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: LAM_TABLE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: EW(:)
+	REAL(KIND=LDP), ALLOCATABLE :: EW_CONT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: EW_ERROR(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ALT_ERROR(:)
+	REAL(KIND=LDP), ALLOCATABLE :: MIN_ERROR(:)
 	INTEGER, ALLOCATABLE :: INDX_VEC(:)
 !
 	REAL*4, ALLOCATABLE :: XFIT(:)		!Same as X_GAUSS but for PGPLOT routines
@@ -37,14 +38,15 @@
 ! precision as routines is for use with GRAMON_PGPLOT.
 !
 	SUBROUTINE SET_GAUSS_DATA(XVEC,YVEC,XST,XEND,NX,YST,YEND)
+	USE SET_KIND_MODULE
 	USE GAUSS_FIT_DATA
 	IMPLICIT NONE
 !
 	INTEGER NX
 	REAL*4 XVEC(NX)
 	REAL*4 YVEC(NX)
-	REAL(10) XST,XEND
-	REAL(10) YST,YEND
+	REAL(KIND=LDP) XST,XEND
+	REAL(KIND=LDP) YST,YEND
 !
 	INTEGER I
 	INTEGER IXST,IXEND
@@ -52,7 +54,7 @@
 	IXST=0
 	DO I=1,NX-1
 	  IF( (XST-XVEC(I))*(XVEC(I+1)-XST) .GE. 0)THEN
-	    IF(ABS(XST-XVEC(I)) .GT. ABS(XVEC(I+1)-XST) )THEN 
+	    IF(ABS(XST-XVEC(I)) .GT. ABS(XVEC(I+1)-XST) )THEN
 	      IXST=I
 	      EXIT
 	    ELSE
@@ -70,7 +72,7 @@
 	IXEND=0
 	DO I=1,NX-1
 	  IF( (XEND-XVEC(I))*(XVEC(I+1)-XEND) .GE. 0)THEN
-	    IF(ABS(XEND-XVEC(I)) .GT. ABS(XVEC(I+1)-XEND) )THEN 
+	    IF(ABS(XEND-XVEC(I)) .GT. ABS(XVEC(I+1)-XEND) )THEN
 	      IXEND=I
 	      EXIT
 	    ELSE

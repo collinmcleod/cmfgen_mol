@@ -1,5 +1,6 @@
 	SUBROUTINE READBA(BA,STEQ,LU,NT,NS,NLBEGIN,
 	1                   COMPUTE_BA,STATUS,DESC)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 13-Dec-1996 - GEN_ASCI_OPEN used to open BA pointer files.
@@ -20,7 +21,7 @@ C
 	LOGICAL COMPUTE_BA  		!Indicates whether BA is being computed.
 	LOGICAL STATUS                !Indicates whether BA/STEQ read successful
 	CHARACTER DESC*(*)              !Used for filename
-	REAL(10) BA(NT),STEQ(NS)
+	REAL(KIND=LDP) BA(NT),STEQ(NS)
 C
 C Local Variables and external functions.
 C

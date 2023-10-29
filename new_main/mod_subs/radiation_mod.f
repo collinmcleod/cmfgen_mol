@@ -5,83 +5,84 @@
 ! Vectors required for dJ are in VAR_RAD_MOD.
 !
 	MODULE RADIATION_MOD
+	USE SET_KIND_MODULE
 !
-	REAL(10), ALLOCATABLE :: RJ(:)      	!ND - Mean intensity  (ND)
-	REAL(10), ALLOCATABLE :: RJ_ES(:)   	!ND - Convolution of RJ with e.s. R(v'v')
+	REAL(KIND=LDP), ALLOCATABLE :: RJ(:)      	!ND - Mean intensity  (ND)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_ES(:)   	!ND - Convolution of RJ with e.s. R(v'v')
 !
-	REAL(10), ALLOCATABLE :: J_INT(:)   	!ND - Frequency integrated J
-	REAL(10), ALLOCATABLE :: H_INT(:)   	!ND - Frequency integrated K
-	REAL(10), ALLOCATABLE :: K_INT(:)   	!ND - Frequency integrated K
-	REAL(10), ALLOCATABLE :: H_MOM(:)   	!ND - Frequency dependent H moment
-	REAL(10), ALLOCATABLE :: K_MOM(:)   	!ND - Frequency dependent K moment
+	REAL(KIND=LDP), ALLOCATABLE :: J_INT(:)   	!ND - Frequency integrated J
+	REAL(KIND=LDP), ALLOCATABLE :: H_INT(:)   	!ND - Frequency integrated K
+	REAL(KIND=LDP), ALLOCATABLE :: K_INT(:)   	!ND - Frequency integrated K
+	REAL(KIND=LDP), ALLOCATABLE :: H_MOM(:)   	!ND - Frequency dependent H moment
+	REAL(KIND=LDP), ALLOCATABLE :: K_MOM(:)   	!ND - Frequency dependent K moment
 !
 ! Arrays for calculating mean opacities.
 !
-	REAL(10), ALLOCATABLE :: INT_dBdT(:)     	!ND - Int. of dB/dT dv (to calculate ROSSMEAN)
+	REAL(KIND=LDP), ALLOCATABLE :: INT_dBdT(:)     	!ND - Int. of dB/dT dv (to calculate ROSSMEAN)
 !
-	REAL(10), ALLOCATABLE :: RLUMST(:)      	!ND - Luminosity as a function of depth
-	REAL(10), ALLOCATABLE :: MECH_LUM(:)     	!ND - Mechanical luminosity
-	REAL(10), ALLOCATABLE :: SOB(:)      	!ND - Used in computing continuum flux
-	REAL(10), ALLOCATABLE :: LLUMST(:)      	!ND - Line luminosity.
-	REAL(10), ALLOCATABLE :: DIELUM(:)      	!ND - Dielectronic line emission luminosity.
-	REAL(10), ALLOCATABLE :: DEP_RAD_EQ(:)    !ND - Integrated departure from radiative equilibrium
-	REAL(10), ALLOCATABLE :: DJDt_FLUX(:)     !ND - DJDT correction to integrated flux.
-	REAL(10), ALLOCATABLE :: DJDt_TERM(:)     !ND - 
+	REAL(KIND=LDP), ALLOCATABLE :: RLUMST(:)      	!ND - Luminosity as a function of depth
+	REAL(KIND=LDP), ALLOCATABLE :: MECH_LUM(:)     	!ND - Mechanical luminosity
+	REAL(KIND=LDP), ALLOCATABLE :: SOB(:)      	!ND - Used in computing continuum flux
+	REAL(KIND=LDP), ALLOCATABLE :: LLUMST(:)      	!ND - Line luminosity.
+	REAL(KIND=LDP), ALLOCATABLE :: DIELUM(:)      	!ND - Dielectronic line emission luminosity.
+	REAL(KIND=LDP), ALLOCATABLE :: DEP_RAD_EQ(:)    !ND - Integrated departure from radiative equilibrium
+	REAL(KIND=LDP), ALLOCATABLE :: DJDt_FLUX(:)     !ND - DJDT correction to integrated flux.
+	REAL(KIND=LDP), ALLOCATABLE :: DJDt_TERM(:)     !ND -
 !
 ! Vector giving the MINIMUM Doppler width at each depth.
 !
-	REAL(10), ALLOCATABLE :: VDOP_VEC(:)      !ND
+	REAL(KIND=LDP), ALLOCATABLE :: VDOP_VEC(:)      !ND
 !
 ! Transfer equation vectors
 !
-	REAL(10), ALLOCATABLE :: Z(:)        	!NDMAX - Z displacement along a given array
-	REAL(10), ALLOCATABLE :: TA(:)        	!NDMAX -
-	REAL(10), ALLOCATABLE :: TB(:)        	!NDMAX -
-	REAL(10), ALLOCATABLE :: TC(:)        	!NDMAX -
-	REAL(10), ALLOCATABLE :: XM(:)        	!NDMAX - R.H.S. (SOURCE VECTOR)
-	REAL(10), ALLOCATABLE :: DTAU(:)        	!NDMAX - Optical depth (used in error calcs)
-	REAL(10), ALLOCATABLE :: dCHIdR(:)        !NDMAX - Derivative of opacity.
+	REAL(KIND=LDP), ALLOCATABLE :: Z(:)        	!NDMAX - Z displacement along a given array
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)        	!NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)        	!NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: TC(:)        	!NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: XM(:)        	!NDMAX - R.H.S. (SOURCE VECTOR)
+	REAL(KIND=LDP), ALLOCATABLE :: DTAU(:)        	!NDMAX - Optical depth (used in error calcs)
+	REAL(KIND=LDP), ALLOCATABLE :: dCHIdR(:)        !NDMAX - Derivative of opacity.
 !
 ! Continuum matrices
 !
-	REAL(10), ALLOCATABLE :: WM(:,:)        	!ND,ND - Coef. matrix of J & %J vector
-	REAL(10), ALLOCATABLE :: FB(:,:)        	!ND,ND - Coef. of J & %J vects in angular equ.
+	REAL(KIND=LDP), ALLOCATABLE :: WM(:,:)        	!ND,ND - Coef. matrix of J & %J vector
+	REAL(KIND=LDP), ALLOCATABLE :: FB(:,:)        	!ND,ND - Coef. of J & %J vects in angular equ.
 !
 ! Arrays and variables for computation of the continuum intensity
 ! using Eddington factors. This is separate to the "inclusion of
 ! additional points".
 !
-	REAL(10), ALLOCATABLE :: FEDD(:)        	!NDMAX -
-	REAL(10), ALLOCATABLE :: GEDD(:)        	!NDMAX -
-	REAL(10), ALLOCATABLE :: QEDD(:)        	!NDMAX -
-	REAL(10), ALLOCATABLE :: N_ON_J(:)        !NDMAX -
-	REAL(10), ALLOCATABLE :: RSQHNU(:)        !NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: FEDD(:)        	!NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: GEDD(:)        	!NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: QEDD(:)        	!NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: N_ON_J(:)        !NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: RSQHNU(:)        !NDMAX -
 !
 ! For MOM_J_REL_V2 --- i.e., the inclusion of relatvistic, but not time
 ! dependence, for the computation of J.
 !
-	REAL(10), ALLOCATABLE :: N_ON_J_NODE(:)		!
-	REAL(10), ALLOCATABLE :: H_ON_J(:)		!
-	REAL(10), ALLOCATABLE :: KMID_ON_J(:)		!
-	REAL(10), ALLOCATABLE :: dlnJdlNR(:)		!
+	REAL(KIND=LDP), ALLOCATABLE :: N_ON_J_NODE(:)		!
+	REAL(KIND=LDP), ALLOCATABLE :: H_ON_J(:)		!
+	REAL(KIND=LDP), ALLOCATABLE :: KMID_ON_J(:)		!
+	REAL(KIND=LDP), ALLOCATABLE :: dlnJdlNR(:)		!
 !
 ! Boundary conditions.
 !
-	REAL(10) HBC_CMF(3)
-	REAL(10) NBC_CMF(3)
-	REAL(10) INBC
-	REAL(10) HBC_J
-	REAL(10) HBC_S			!Bound. Cond. for JFEAU
-	REAL(10) HBC_PREV(3)
-	REAL(10) NBC_PREV(3)
-	REAL(10) INBC_PREV
+	REAL(KIND=LDP) HBC_CMF(3)
+	REAL(KIND=LDP) NBC_CMF(3)
+	REAL(KIND=LDP) INBC
+	REAL(KIND=LDP) HBC_J
+	REAL(KIND=LDP) HBC_S			!Bound. Cond. for JFEAU
+	REAL(KIND=LDP) HBC_PREV(3)
+	REAL(KIND=LDP) NBC_PREV(3)
+	REAL(KIND=LDP) INBC_PREV
 !
-	REAL(10), ALLOCATABLE :: FEDD_PREV(:)        	!NDMAX -
-	REAL(10), ALLOCATABLE :: GEDD_PREV(:)        	!NDMAX -
-	REAL(10), ALLOCATABLE :: N_ON_J_PREV(:)        	!NDMAX -
-	REAL(10), ALLOCATABLE :: JNU_PREV(:)        	!NDMAX -
-	REAL(10), ALLOCATABLE :: RSQHNU_PREV(:)        	!NDMAX -
-	REAL(10), ALLOCATABLE :: FOLD(:)        		!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: FEDD_PREV(:)        	!NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: GEDD_PREV(:)        	!NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: N_ON_J_PREV(:)        	!NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: JNU_PREV(:)        	!NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: RSQHNU_PREV(:)        	!NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: FOLD(:)        		!NDMAX
 !
 ! 
 !
@@ -89,39 +90,40 @@
 !
 	INTEGER, ALLOCATABLE :: INDX(:)                 !NDMAX
 	INTEGER, ALLOCATABLE :: POS_IN_NEW_GRID(:)      !ND
-	REAL(10), ALLOCATABLE :: COEF(:,:)        	!0:3,NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: COEF(:,:)        	!0:3,NDMAX
 !
 ! Variables and arrays required on the fine grid.
 !
-	REAL(10), ALLOCATABLE :: REXT(:)        		!NDMAX
-	REAL(10), ALLOCATABLE :: VEXT(:)        		!NDMAX
-	REAL(10), ALLOCATABLE :: LANG_COORDEXT(:)        	!NDMAX
-	REAL(10), ALLOCATABLE :: TEXT(:)        		!NDMAX
-	REAL(10), ALLOCATABLE :: SIGMAEXT(:)        	!NDMAX
-	REAL(10), ALLOCATABLE :: VDOP_VEC_EXT(:)        	!NDMAX
-	REAL(10), ALLOCATABLE :: CHIEXT(:)        	!NDMAX
-	REAL(10), ALLOCATABLE :: ESECEXT(:)        	!NDMAX
-	REAL(10), ALLOCATABLE :: ETAEXT(:)        	!NDMAX
-	REAL(10), ALLOCATABLE :: ZETAEXT(:)        	!NDMAX
-	REAL(10), ALLOCATABLE :: THETAEXT(:)        	!NDMAX
-	REAL(10), ALLOCATABLE :: RJEXT(:)        		!NDMAX
-	REAL(10), ALLOCATABLE :: RJEXT_ES(:)        	!NDMAX
-	REAL(10), ALLOCATABLE :: FEXT(:)        		!NDMAX
-	REAL(10), ALLOCATABLE :: QEXT(:)        		!NDMAX
-	REAL(10), ALLOCATABLE :: SOURCEEXT(:)        	!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: REXT(:)        		!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: VEXT(:)        		!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: LANG_COORDEXT(:)        	!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: TEXT(:)        		!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMAEXT(:)        	!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: VDOP_VEC_EXT(:)        	!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: CHIEXT(:)        	!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: ESECEXT(:)        	!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: ETAEXT(:)        	!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: ZETAEXT(:)        	!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: THETAEXT(:)        	!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: RJEXT(:)        		!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: RJEXT_ES(:)        	!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: FEXT(:)        		!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: QEXT(:)        		!NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: SOURCEEXT(:)        	!NDMAX
 !
 ! Diffusion approximation variables
 !
-	REAL(10) DTDR
-	REAL(10) DBB
-	REAL(10) DDBBDT
+	REAL(KIND=LDP) DTDR
+	REAL(KIND=LDP) DBB
+	REAL(KIND=LDP) DDBBDT
 !
-	REAL(10) dLOG_NU
+	REAL(KIND=LDP) dLOG_NU
 	LOGICAL CONT_VEL
 !
 	END MODULE RADIATION_MOD
 !
 	SUBROUTINE SET_RADIATION_MOD(ND,NDMAX,NPMAX)
+	USE SET_KIND_MODULE
 	USE RADIATION_MOD
 	IMPLICIT NONE
 	INTEGER ND,NDMAX,NPMAX

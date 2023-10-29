@@ -5,9 +5,10 @@
 ! routines.
 !
 	SUBROUTINE WRITE_VEC(F,ND,A,LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER ND,LU
-	REAL(10) F(ND)
+	REAL(KIND=LDP) F(ND)
 !
 ! Local variables.
 !

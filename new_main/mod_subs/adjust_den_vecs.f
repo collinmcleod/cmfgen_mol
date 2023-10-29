@@ -3,13 +3,14 @@
 ! TAU is based on the FLUX mean opacity.
 !
 	SUBROUTINE ADJUST_DEN_VECS(R_OLD,ND)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
 ! Created : 02-May-2004
 !
 	INTEGER ND
-	REAL(10) R_OLD(ND)
+	REAL(KIND=LDP) R_OLD(ND)
 	LOGICAL TRAPFORJ
 !
 	INTEGER, PARAMETER :: IONE=1
@@ -18,15 +19,15 @@
 !
 ! Local variables.
 !
-	REAL(10) LOG_R_OLD(ND)
-	REAL(10) LOG_R(ND)
-	REAL(10) TA(ND)
-	REAL(10) TB(ND)
+	REAL(KIND=LDP) LOG_R_OLD(ND)
+	REAL(KIND=LDP) LOG_R(ND)
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) TB(ND)
 	INTEGER ISPEC
 !
-! We now need to regrid all the populations. All interpolations (except 
+! We now need to regrid all the populations. All interpolations (except
 ! sigma) are performed in the LOG-LOG plane. For SN this is ideal, since
-! the density and velocity are power laws in r. 
+! the density and velocity are power laws in r.
 !
 	LOG_R_OLD=LOG(R_OLD)
 	LOG_R=LOG(R)

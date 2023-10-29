@@ -11,6 +11,7 @@
 	1             HN_B,HNST_B,EDGE_B,N_B,DI,ION_EQ_IN_BA,
 	1             ED,T,EMHNUKT,NU,ML,RJ,
 	1             NCF,ND,NION,DST,DEND)
+	USE SET_KIND_MODULE
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
@@ -26,7 +27,7 @@
 	INTEGER ID		!Ion identification
 	INTEGER N_A		!Number of levels in ionizations state i
 	INTEGER N_B		!Number of levels in ionizations state i+1
-	INTEGER NCF		!Number of freuencies in NU 
+	INTEGER NCF		!Number of freuencies in NU
 	INTEGER ML		!Indicates current freqency in vector NU
 	INTEGER ND		!Number of depth points
         INTEGER NION		!Total Number of ions in model.
@@ -34,31 +35,31 @@
 !
 	INTEGER DST,DEND
 !
-	REAL(10) WSE_X(N_A,ND)		!Quadrature weights (incl. cross. sec.)
+	REAL(KIND=LDP) WSE_X(N_A,ND)		!Quadrature weights (incl. cross. sec.)
 !
 ! _A refers to quantities associated with the atom WITH super levels.
 !
-	REAL(10) HN_A(N_A,ND)		!Pops. of ith ionzation stage
-	REAL(10) HNST_A(N_A,ND)		!LTE   "    "  "      "       "
-	REAL(10) dlnHNST_AdlnT(N_A,ND)	
+	REAL(KIND=LDP) HN_A(N_A,ND)		!Pops. of ith ionzation stage
+	REAL(KIND=LDP) HNST_A(N_A,ND)		!LTE   "    "  "      "       "
+	REAL(KIND=LDP) dlnHNST_AdlnT(N_A,ND)	
 !
-! _B refers to quantities assiciated with the FULL atom of the next 
+! _B refers to quantities assiciated with the FULL atom of the next
 !  ionization stage.
 !
-	REAL(10) HN_B(N_B,ND)		!Pops. of (i+1)th ionization stage
-	REAL(10) HNST_B(N_B,ND)		!LTE   "   "    "       "        "
-	REAL(10) EDGE_B(N_B)
+	REAL(KIND=LDP) HN_B(N_B,ND)		!Pops. of (i+1)th ionization stage
+	REAL(KIND=LDP) HNST_B(N_B,ND)		!LTE   "   "    "       "        "
+	REAL(KIND=LDP) EDGE_B(N_B)
 !
-	REAL(10) DI(ND)			!Ion density for B levels.
-	REAL(10) ED(ND)			!Electron density
-	REAL(10) T(ND)			!Temperature in 10^4K.
-	REAL(10) EMHNUKT(ND)		!EXP(-hv/kT)
-	REAL(10) RJ(ND)			!Mean intensity
-	REAL(10) NU(NCF)			!frequency (10^15 Hz)
+	REAL(KIND=LDP) DI(ND)			!Ion density for B levels.
+	REAL(KIND=LDP) ED(ND)			!Electron density
+	REAL(KIND=LDP) T(ND)			!Temperature in 10^4K.
+	REAL(KIND=LDP) EMHNUKT(ND)		!EXP(-hv/kT)
+	REAL(KIND=LDP) RJ(ND)			!Mean intensity
+	REAL(KIND=LDP) NU(NCF)			!frequency (10^15 Hz)
 !
 ! Constants for opacity etc.
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local variables
@@ -67,8 +68,8 @@
 	INTEGER ION_EQ		!Ion eqation in SE(ID)%BA matrix.
 	INTEGER ION_V                 !Location of ion variable in SE(ID)%BA.
 	INTEGER I,J
-	REAL(10) T1,T3,BSTIM
-	REAL(10) WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC
+	REAL(KIND=LDP) T1,T3,BSTIM
+	REAL(KIND=LDP) WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC
 !
 	NIV=SE(ID)%N_IV
 	ION_EQ=SE(ID)%XRAY_EQ
@@ -82,12 +83,12 @@
 	      WSE_BY_RJ=WSE_X(J,I)*RJ(I)
 	      SE(ID)%BA_PAR(J,J,I)=SE(ID)%BA_PAR(J,J,I)-WSE_BY_RJ
 !
-! NB: In the following, the factor of 2.0 for ED_FAC arrises because 
-! the rate is prop. to 
+! NB: In the following, the factor of 2.0 for ED_FAC arrises because
+! the rate is prop. to
 !
 !        HNST_A(J,I)*HNST_B(1,I) .
 !
-! The variation with respect to HN_B(1,I) is intrinsically zero, since 
+! The variation with respect to HN_B(1,I) is intrinsically zero, since
 ! HNST_A(J,I)/HN_B(1,I) is independent of HN_B(1,I)
 !
 	      T3=HNST_A(J,I)*WSE_X(J,I)*BSTIM
@@ -101,7 +102,7 @@
 	      SE(ID)%BA_PAR(J,NIV,I)  =SE(ID)%BA_PAR(J,NIV,I)   +T_FAC
 !
 ! Include ionizations/recombinations explicitly in the rate equation
-! of the target ion (eg He++(gs) for He+ ion/recoms). 
+! of the target ion (eg He++(gs) for He+ ion/recoms).
 !
 	      SE(ID)%BA_PAR(ION_EQ,J,I)    =SE(ID)%BA_PAR(ION_EQ,J,I)    +WSE_BY_RJ
 	      SE(ID)%BA_PAR(ION_EQ,ION_V,I)=SE(ID)%BA_PAR(ION_EQ,ION_V,I)-DI_FAC

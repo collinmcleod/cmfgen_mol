@@ -33,8 +33,8 @@ C JNU and r^2 HNU.
 C
 C This routine assumes that we are computing the radiation field at ND
 C grid points. The radiation field is a function of the Emissivity and
-C Opacity at these points. The opacity and emissivity at the transfer 
-C nodes have been derived from their values at ND_SM nodes. The 
+C Opacity at these points. The opacity and emissivity at the transfer
+C nodes have been derived from their values at ND_SM nodes. The
 C populations are only computed on the ND_SM nodes. INDX and COEF are
 C used to specify how the opacity and emissivities have been interpolated.
 C
@@ -50,6 +50,7 @@ C
 	1                  KI,RHS_dHdCHI,
 	1                  INIT,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
 	1                  DO_THIS_TX_MATRIX,METHOD,COHERENT,ND,NM,NM_KI)
+	USE SET_KIND_MODULE
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
 !
@@ -63,34 +64,34 @@ C
 C
 C Emissivities etc on the transfer grid.
 C
-	REAL(10) ETA(ND),CHI(ND),ESEC(ND)
-	REAL(10) V(ND),SIGMA(ND),R(ND)
+	REAL(KIND=LDP) ETA(ND),CHI(ND),ESEC(ND)
+	REAL(KIND=LDP) V(ND),SIGMA(ND),R(ND)
 C
 C Emissivities etc on the (small) population grid.
 C
-	REAL(10) ETA_SM(ND_SM),CHI_SM(ND_SM),ESEC_SM(ND_SM)
+	REAL(KIND=LDP) ETA_SM(ND_SM),CHI_SM(ND_SM),ESEC_SM(ND_SM)
 	INTEGER INDX(ND)
-	REAL(10) COEF(0:3,ND)
+	REAL(KIND=LDP) COEF(0:3,ND)
 	CHARACTER*(*) INTERP_TYPE
 C
 C Variation arrays and vectors. NB: The variation is defined as the
 C variation of J (or H) on the transfer grid with respect to the
 C opacity/emissivity on the population (small) grid.
 C
-	REAL(10) TX(ND,ND_SM,NM)
-	REAL(10) TVX(ND-1,ND_SM,NM)
+	REAL(KIND=LDP) TX(ND,ND_SM,NM)
+	REAL(KIND=LDP) TVX(ND-1,ND_SM,NM)
 C
 C KI and RHS_dHdCHI are defined on the full grid, and then reduced to
 C the smaller grid.
 C
-	REAL(10) KI(ND,ND,NM_KI)
-	REAL(10) RHS_dHdCHI(ND-1,ND)
-	REAL(10) TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
-	REAL(10) TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
+	REAL(KIND=LDP) KI(ND,ND,NM_KI)
+	REAL(KIND=LDP) RHS_dHdCHI(ND-1,ND)
+	REAL(KIND=LDP) TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
+	REAL(KIND=LDP) TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
 C
 	LOGICAL DO_THIS_TX_MATRIX(NM)
 C
-	REAL(10) dLOG_NU,dTdR,DBB,dDBBdT,IC
+	REAL(KIND=LDP) dLOG_NU,dTdR,DBB,dDBBdT,IC
 	CHARACTER*6 METHOD
 C
 C INIT is used to indicate that there is no coupling to the previous frequency.
@@ -108,12 +109,12 @@ C Vectors required by future calls to VAR_MOM_J_CMF.
 C
 	INTEGER NV
 	PARAMETER (NV=200)
-	REAL(10) JNUM1(NV),RSQ_HNUM1(NV)
+	REAL(KIND=LDP) JNUM1(NV),RSQ_HNUM1(NV)
 	SAVE JNUM1,RSQ_HNUM1
 C
-	REAL(10) KI_SM(ND,ND_SM,NM_KI)
-	REAL(10) RHS_dHdCHI_SM(ND-1,ND_SM)
-	REAL(10) WORKMAT(ND,ND)
+	REAL(KIND=LDP) KI_SM(ND,ND_SM,NM_KI)
+	REAL(KIND=LDP) RHS_dHdCHI_SM(ND-1,ND_SM)
+	REAL(KIND=LDP) WORKMAT(ND,ND)
 C
 C Work vectors.
 C
@@ -124,17 +125,17 @@ C
 	1                   TX_OLD_d_T,TX_OLD_d_dTdR,
 	1                   GAM,GAMH,W,WPREV,PSI,PSIPREV_MOD,PSIPREV
 C
-	REAL(10) TA(NV),TB(NV),TC(NV),DTAU(NV),RSQ_DTAUONQ(NV)
-	REAL(10) XM(NV),SOURCE(NV),Q(NV),JNU(NV),RSQ_HNU(NV)
-	REAL(10) VB(NV),VC(NV),HU(NV),HL(NV),HS(NV),THETA(NV)
-	REAL(10) GAM(NV),GAMH(NV),W(NV),WPREV(NV)
-	REAL(10) PSI(NV),PSIPREV_MOD(NV),PSIPREV(NV)
-	REAL(10) EPS_A(NV),EPS_B(NV)
-	REAL(10) EPS_PREV_A(NV),EPS_PREV_B(NV)
-	REAL(10) TX_OLD_d_T(NV),TX_OLD_d_dTdR(NV)
+	REAL(KIND=LDP) TA(NV),TB(NV),TC(NV),DTAU(NV),RSQ_DTAUONQ(NV)
+	REAL(KIND=LDP) XM(NV),SOURCE(NV),Q(NV),JNU(NV),RSQ_HNU(NV)
+	REAL(KIND=LDP) VB(NV),VC(NV),HU(NV),HL(NV),HS(NV),THETA(NV)
+	REAL(KIND=LDP) GAM(NV),GAMH(NV),W(NV),WPREV(NV)
+	REAL(KIND=LDP) PSI(NV),PSIPREV_MOD(NV),PSIPREV(NV)
+	REAL(KIND=LDP) EPS_A(NV),EPS_B(NV)
+	REAL(KIND=LDP) EPS_PREV_A(NV),EPS_PREV_B(NV)
+	REAL(KIND=LDP) TX_OLD_d_T(NV),TX_OLD_d_dTdR(NV)
 C
-	REAL(10) PROGDESC	
-	REAL(10), PARAMETER :: PROG_ID=3.4281463D+08  !Must be unique (VAR_MOM_)
+	REAL(KIND=LDP) PROGDESC	
+	REAL(KIND=LDP), PARAMETER :: PROG_ID=3.4281463D+08  !Must be unique (VAR_MOM_)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
@@ -142,7 +143,7 @@ C
 C Local variables.
 C
 	INTEGER I
-	REAL(10) AV_SIGMA
+	REAL(KIND=LDP) AV_SIGMA
 C
 C PROGDESC is a variable used to confirm that the scratch block is not
 C being used by some other routine.
@@ -374,7 +375,7 @@ C Evaluate the intensity variations.
 C                                  TX=dJ/d(chi,eta,....)
 C                          and     TVX=dRSQH/d(chi,eta,...)
 C
-C WORKMAT is dimension (ND,ND_SM) is is used to temporaily save 
+C WORKMAT is dimension (ND,ND_SM) is is used to temporaily save
 c TX( , ,K) for each K.
 C
 	CALL TUNE(1,'UP_TX')

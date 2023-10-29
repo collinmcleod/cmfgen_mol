@@ -2,10 +2,11 @@ C
 C Subroutine to compute the solution for the intensity along the last two
 C rays. In this case there is only one or two points, and the normal tridiagonal
 C solution does not work. Note that for the thick case, it is assumed that
-C Theta << 1. Program will not give a good estimate if the electron scattering 
+C Theta << 1. Program will not give a good estimate if the electron scattering
 C opacity dominates when the total optical depth is much greater than unity.
 C
 	SUBROUTINE LAST2RAYS(XM,WM,R,Z,P,DTAU,ZETA,THETA,CHI,TOR,NI)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996. - EXP replaced by EXP
@@ -17,9 +18,9 @@ C                        A [ -THETA(1)*T1 ] term was inadvertantly
 C                        omitted from the WM(1,1) term.
 C
 	INTEGER NI
-	REAL(10) XM(NI),WM(NI,NI),THETA(NI),CHI(NI),P
-	REAL(10) DTAU(NI),R(NI),Z(NI),ZETA(NI)
-	REAL(10) TOR,E1,E2,E3,T1,IBOUND
+	REAL(KIND=LDP) XM(NI),WM(NI,NI),THETA(NI),CHI(NI),P
+	REAL(KIND=LDP) DTAU(NI),R(NI),Z(NI),ZETA(NI)
+	REAL(KIND=LDP) TOR,E1,E2,E3,T1,IBOUND
 C
 C The normal boundary condition of no incident radiation is obtained when
 C TOR is equal to ZERO. IF TOR is not ZERO, the thick boundary condition

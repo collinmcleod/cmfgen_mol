@@ -1,7 +1,7 @@
 !
 ! Subroutine to compute CLUMP_FAC, and the abundance vectors for
 ! each species. R and V must be defined. This subroutine can be
-! called again if the R grid is altered. 
+! called again if the R grid is altered.
 !
 ! Notes:
 !     AT_ABUND can be a number abundance or a mass fraction (if -ve).
@@ -12,12 +12,13 @@
 !         species (usually H or He) is one.
 !
 	SUBROUTINE SET_ABUND_CLUMP(MEAN_ATOMIC_WEIGHT,ABUND_SUM,LUER,ND)
+	USE SET_KIND_MODULE
 	USE CONTROL_VARIABLE_MOD
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
 ! Altered 29-Jul-2023 : Update VTURB_VEC -- now allow for POW law option (LONG ver -- 15-Oct-2023).
-! Altered 16-Apr-2023 : Added RUN2 and REX2 from Paco (Paul now uses RUNA which is 
+! Altered 16-Apr-2023 : Added RUN2 and REX2 from Paco (Paul now uses RUNA which is
 !	                      the same option).
 ! Altered 03-MAr-2023 : Added clumping law from Paul Crowther
 ! Altered 15-May-2012 : Modications to clumping laws (imported from OSIRIS: 21-Jul-2021).
@@ -26,7 +27,7 @@
 ! Altered 01-Oct-2018 : Added MEXP option.
 ! Altered 14-Sep-2018 : Added POW option.
 ! Altered 21-Mar-2018 : Added SNCL clumping option.
-! Altered 25-Jun-2010 : Correctly compute MEAN_ATOMIC_WEIGHT and ABUND_SUM for 
+! Altered 25-Jun-2010 : Correctly compute MEAN_ATOMIC_WEIGHT and ABUND_SUM for
 !                         SN model. Abunances are surface abundances.
 ! Altered 08-Feb-2006 : New clumping law installed (used by PACO for P Cygni).
 ! Altered 05-Sep-2005 : VAR_MDOT section included.
@@ -34,24 +35,24 @@
 !
 	INTEGER ND
 	INTEGER LUER
-	REAL(10) MEAN_ATOMIC_WEIGHT	!In amu (does not include electrons)
-	REAL(10) ABUND_SUM
+	REAL(KIND=LDP) MEAN_ATOMIC_WEIGHT	!In amu (does not include electrons)
+	REAL(KIND=LDP) ABUND_SUM
 !
 ! Local variables.
 !
-	REAL(10) T1,T2,T3,T4,PI
+	REAL(KIND=LDP) T1,T2,T3,T4,PI
 !
 	INTEGER I
 	INTEGER ISPEC
 	INTEGER K
 !
 	INTEGER LUIN,NHYDRO
-	REAL(10) LOG_R(ND)
-	REAL(10), ALLOCATABLE :: R_HYDRO(:),RHO_HYDRO(:),T_HYDRO(:),LOG_R_HYDRO(:)
+	REAL(KIND=LDP) LOG_R(ND)
+	REAL(KIND=LDP), ALLOCATABLE :: R_HYDRO(:),RHO_HYDRO(:),T_HYDRO(:),LOG_R_HYDRO(:)
 	CHARACTER*80 STRING
 	LOGICAL ADD_ACC_ZONE
 !
-        REAL(10) ATOMIC_MASS_UNIT
+        REAL(KIND=LDP) ATOMIC_MASS_UNIT
 	EXTERNAL ATOMIC_MASS_UNIT
 !
 !
@@ -103,7 +104,7 @@
 	  ELSE IF(CLUMP_LAW(1:4) .EQ. 'DBLE')THEN
 !
 ! CLUMP_PAR(1) is the clumping factor at infinity.
-! CLUMP_PAR(2) 
+! CLUMP_PAR(2)
 !
 	    DO K=1,ND
 	      T1=10.0D0/CLUMP_PAR(4)
@@ -251,7 +252,7 @@
 	  RETURN
 	END IF
 ! 
-! Compute the atomic number density as function of radius. The abundances 
+! Compute the atomic number density as function of radius. The abundances
 ! can be specified in two ways:
 !     (1) As a fractional abundance relative to some arbitrary species X.
 !     (2) As a mass fraction: Assumed when the abundance is negative.
@@ -295,7 +296,7 @@
 	MEAN_ATOMIC_WEIGHT=1.0D0/(T2+T4)
 !
 ! Convert any mass fractions to number fractions. If no number fractions
-! are present, the first species with non-zero abundance is arbitrarily set 
+! are present, the first species with non-zero abundance is arbitrarily set
 ! to have an abundance of unity.
 !
 	ABUND_SUM=0.0D0
@@ -372,6 +373,7 @@
 !
 	CONTAINS
 	SUBROUTINE UPDATE_VTURB()
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	IF(VTURB_LAW .EQ. 'POW')THEN

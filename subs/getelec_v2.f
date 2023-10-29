@@ -1,5 +1,6 @@
 !
 	SUBROUTINE GETELEC_V2(SPEC_DENS,AT_NO,N_SPEC,ED,ND,LU,FILNAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 24-Apr-2004 : Check monoticty of ED. Bug fixed on 24th.
@@ -9,28 +10,28 @@
 !                         is not monotonic.
 ! Altered 11-Jun-1996 : Populations of all specied no passed through matrix
 !                         SPEC_DENS. AT_NO must also be passed.
-!                        
+!
 ! Altered 24-May-1996 : Dynamic memmoray allocation now used.
 !                       ERROR_LU and LUER installed.
 ! Altered 18-Apr-1990 - Change correction had bug. Comparing ED(log)
 !                       with non log ED.
 !
 	INTEGER N_SPEC,ND,LU
-	REAL(10) ED(ND)
-	REAL(10) SPEC_DENS(ND,N_SPEC)
-	REAL(10) AT_NO(N_SPEC)
+	REAL(KIND=LDP) ED(ND)
+	REAL(KIND=LDP) SPEC_DENS(ND,N_SPEC)
+	REAL(KIND=LDP) AT_NO(N_SPEC)
 	CHARACTER*(*) FILNAME
 C
-	REAL(10), ALLOCATABLE :: OLD_ED(:)		!NGAM
-	REAL(10), ALLOCATABLE :: OLD_GAM(:,:)		!NGAM,N_SPEC
-	REAL(10), ALLOCATABLE :: NEW_GAM(:)		!ND
-	REAL(10), ALLOCATABLE :: NEW_ED(:)		!ND
+	REAL(KIND=LDP), ALLOCATABLE :: OLD_ED(:)		!NGAM
+	REAL(KIND=LDP), ALLOCATABLE :: OLD_GAM(:,:)		!NGAM,N_SPEC
+	REAL(KIND=LDP), ALLOCATABLE :: NEW_GAM(:)		!ND
+	REAL(KIND=LDP), ALLOCATABLE :: NEW_ED(:)		!ND
 C
 	CHARACTER*132 STRING
 	INTEGER I,J,K,NGAM
 	INTEGER ID,XST,XEND,NX
-	REAL(10) CHANGE,T1,T2
-	REAL(10) LOC_AT_NO
+	REAL(KIND=LDP) CHANGE,T1,T2
+	REAL(KIND=LDP) LOC_AT_NO
 C
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
@@ -82,7 +83,7 @@ C
 !
 ! Estimate the GAMMAS by simply using the grid index.
 !
-	ED(:)=0.0D0	  
+	ED(:)=0.0D0	
 	DO ID=1,N_SPEC
 	  DO I=1,ND
 	    J=I+(NGAM-ND)

@@ -7,6 +7,7 @@ C
 	SUBROUTINE X_RRR_COOL_V6(NET_X_RR,X_BFCR,WSE_X_A,WCR_X_A,
 	1                     HN_A,LOG_HNST_A,N_A,HN_B,LOG_HNST_B,N_B,
 	1                     JREC,JPHOT,JREC_CR,JPHOT_CR,INIT_ARRAYS,ND,FLAG)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 24-Sep-2023 : Adjusted constants for consistency.
@@ -36,22 +37,22 @@ C                        _V2 append to name.
 C Created 18-Jul-1994 : Based on PRRRCOOL
 C
 	INTEGER N_A,N_B,ND
-	REAL(10) NET_X_RR(ND),X_BFCR(ND)
-	REAL(10) HN_A(N_A,ND),LOG_HNST_A(N_A,ND)
-	REAL(10) HN_B(N_B,ND),LOG_HNST_B(N_B,ND)
-	REAL(10) WSE_X_A(N_A,ND)
-	REAL(10) WCR_X_A(N_A,ND)
-	REAL(10) JREC(ND)			!In (2hv^3/c^2 + J) EXP(-hv/kT)/v  dv
-	REAL(10) JPHOT(ND)		!In J/v dv
-	REAL(10) JREC_CR(ND)		!In (2hv^3/c^2 + J) EXP(-hv/kT)   dv
-	REAL(10) JPHOT_CR(ND)		!In J dv
+	REAL(KIND=LDP) NET_X_RR(ND),X_BFCR(ND)
+	REAL(KIND=LDP) HN_A(N_A,ND),LOG_HNST_A(N_A,ND)
+	REAL(KIND=LDP) HN_B(N_B,ND),LOG_HNST_B(N_B,ND)
+	REAL(KIND=LDP) WSE_X_A(N_A,ND)
+	REAL(KIND=LDP) WCR_X_A(N_A,ND)
+	REAL(KIND=LDP) JREC(ND)			!In (2hv^3/c^2 + J) EXP(-hv/kT)/v  dv
+	REAL(KIND=LDP) JPHOT(ND)		!In J/v dv
+	REAL(KIND=LDP) JREC_CR(ND)		!In (2hv^3/c^2 + J) EXP(-hv/kT)   dv
+	REAL(KIND=LDP) JPHOT_CR(ND)		!In J dv
 	LOGICAL INIT_ARRAYS
 C
 	INTEGER I,J
-	REAL(10) A1
-	REAL(10) H
+	REAL(KIND=LDP) A1
+	REAL(KIND=LDP) H
 	LOGICAL FLAG
-	REAL(10) PLANCKS_CONSTANT
+	REAL(KIND=LDP) PLANCKS_CONSTANT
 	EXTERNAL PLANCKS_CONSTANT
 C
 C As we multiply by hv
@@ -83,9 +84,9 @@ C
 	      ELSE
 	         A1=0.0D0
 	      END IF
-	      NET_X_RR(J)=NET_X_RR(J) + 
+	      NET_X_RR(J)=NET_X_RR(J) +
 	1       WSE_X_A(I,J)*( A1*JREC(J)-HN_A(I,J)*JPHOT(J) )
-	      X_BFCR(J)=X_BFCR(J)   +   
+	      X_BFCR(J)=X_BFCR(J)   +
 	1       (  A1*( WCR_X_A(I,J)*JREC(J) + WSE_X_A(I,J)*JREC_CR(J) ) -
 	1       HN_A(I,J)*( WCR_X_A(I,J)*JPHOT(J) + WSE_X_A(I,J)*JPHOT_CR(J) )  )*H
 	    END DO

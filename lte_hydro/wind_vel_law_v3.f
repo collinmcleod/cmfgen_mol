@@ -11,6 +11,7 @@
 	SUBROUTINE WIND_VEL_LAW_V3(R,V,SIGMA,VINF,BETA,BETA2,
 	1              VEXT,R2_ON_RTRANS,RMAX,R_TRANS,V_TRANS,
 	1              dVdR_TRANS,VEL_TYPE,ND,ND_MAX)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 10-Apr-2020 -- Fixed SIGMA calcualtion for VEL_TYPE=5. Only will effect grid construction.
@@ -22,37 +23,37 @@
 !
 ! Arrays output.
 !
-	REAL(10) R(ND_MAX)
-	REAL(10) V(ND_MAX)
-	REAL(10) SIGMA(ND_MAX)
+	REAL(KIND=LDP) R(ND_MAX)
+	REAL(KIND=LDP) V(ND_MAX)
+	REAL(KIND=LDP) SIGMA(ND_MAX)
 !
 ! The following quantities must be specified on entry.
 !
-	REAL(10) VINF
-	REAL(10) BETA
-	REAL(10) BETA2
-	REAL(10) RMAX
-	REAL(10) R_TRANS
-	REAL(10) V_TRANS
-	REAL(10) dVdR_TRANS
-	REAL(10) R2_ON_RTRANS
-	REAL(10) VEXT
+	REAL(KIND=LDP) VINF
+	REAL(KIND=LDP) BETA
+	REAL(KIND=LDP) BETA2
+	REAL(KIND=LDP) RMAX
+	REAL(KIND=LDP) R_TRANS
+	REAL(KIND=LDP) V_TRANS
+	REAL(KIND=LDP) dVdR_TRANS
+	REAL(KIND=LDP) R2_ON_RTRANS
+	REAL(KIND=LDP) VEXT
 	INTEGER VEL_TYPE
 !
 ! Local variables.
 !
-	REAL(10) RO
-	REAL(10) RP2
-	REAL(10) dR
-	REAL(10) SCALE_HEIGHT
-	REAL(10) TOP		!Numerator of velocity expression 
-	REAL(10) BOT		!Denominator of velocity expression.
-	REAL(10) dTOPdR,dBOTdR
-	REAL(10) dVdR		!Velocity gradient
-	REAL(10) ALPHA
-	REAL(10) SM_VINF
+	REAL(KIND=LDP) RO
+	REAL(KIND=LDP) RP2
+	REAL(KIND=LDP) dR
+	REAL(KIND=LDP) SCALE_HEIGHT
+	REAL(KIND=LDP) TOP		!Numerator of velocity expression
+	REAL(KIND=LDP) BOT		!Denominator of velocity expression.
+	REAL(KIND=LDP) dTOPdR,dBOTdR
+	REAL(KIND=LDP) dVdR		!Velocity gradient
+	REAL(KIND=LDP) ALPHA
+	REAL(KIND=LDP) SM_VINF
 !
-	REAL(10) T1,T2,T3
+	REAL(KIND=LDP) T1,T2,T3
 	INTEGER COUNT
 	INTEGER I
 	INTEGER LU_DIAG
@@ -83,7 +84,7 @@
 	  RO = R_TRANS * (1.0D0 - (2.0D0*V_TRANS/VINF)**(1.0D0/BETA) )
 	  T1= R_TRANS * dVdR_TRANS / V_TRANS
 	  SCALE_HEIGHT =  0.5D0*R_TRANS / (T1 - BETA*RO/(R_TRANS-RO) )
-! 
+!
 	  WRITE(LU_DIAG,*)'  Transition radius is',R_TRANS
 	  WRITE(LU_DIAG,*)'Transition velocity is',V_TRANS
 	  WRITE(LU_DIAG,*)'                 R0 is',RO
@@ -109,7 +110,7 @@
 	      ELSE
 	        R(I)=RMAX
 	      END IF
-	    ELSE 
+	    ELSE
 	      T1=(SIGMA(I-1)+1.0D0)*V(I-1)/R(I-1)
 	      dR=MIN(0.3D0*R(I-1),0.3D0*V(I-1)/T1)
 	      R(I)=R(I-1)+dR
@@ -125,9 +126,9 @@
             TOP = VINF* (T2**BETA)
             BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
             V(I) = TOP/BOT
-!                                                                                
+!
 !NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
-!                                                                               
+!
             dTOPdR = VINF * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
             dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT )  / SCALE_HEIGHT
             dVdR = dTOPdR / BOT  + V(I)*dBOTdR/BOT
@@ -207,7 +208,7 @@
 	  RO = R_TRANS * (1.0D0 - (2.0D0*V_TRANS/SM_VINF)**(1.0D0/BETA) )
 	  T1 = R_TRANS * dVdR_TRANS / V_TRANS
 	  SCALE_HEIGHT =  0.5D0*R_TRANS / (T1 - BETA*RO/(R_TRANS-RO) )
-! 
+!
 	  WRITE(LU_DIAG,*)'  Transition radius is',R_TRANS
 	  WRITE(LU_DIAG,*)'Transition velocity is',V_TRANS
 	  WRITE(LU_DIAG,*)'                 R0 is',RO
@@ -233,7 +234,7 @@
 	      ELSE
 	        R(I)=RMAX
 	      END IF
-	    ELSE 
+	    ELSE
 	      T1=(SIGMA(I-1)+1.0D0)*V(I-1)/R(I-1)
 	      dR=MIN(0.3D0*R(I-1),0.3D0*V(I-1)/T1)
 	      R(I)=R(I-1)+dR
@@ -256,9 +257,9 @@
             END IF
 	    BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
             V(I) = TOP/BOT
-!                                                                                
+!
 !NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
-!                                                                               
+!
             dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT )  / SCALE_HEIGHT
             dVdR = dTOPdR / BOT  + V(I)*dBOTdR/BOT
             SIGMA(I)=R(I)*dVdR/V(I)-1.0D0

@@ -44,9 +44,10 @@ C
 	1       SUB_PHOT,COL_FILE,OMEGA_GEN,
 	1       NST,EQPOP,NT,NUM_BNDS,ND,
 	1       BAION,STEQION,EQUAT,NION,DST,DEND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
-C Altered 20-Sep-1999 : TMP_VEC_ED and TMP_VEC_COOL used in call to 
+C Altered 20-Sep-1999 : TMP_VEC_ED and TMP_VEC_COOL used in call to
 C                                                         SUBCOL_MULTI_V3
 C Altered 14-Dec-1996 : SUB_PHOT replaces PHOT_FUN (superficial).
 C Altered 15-Jun-1996 : T1 initialized before being passed to SUMBCOL_MULTI_V3.
@@ -65,36 +66,36 @@ C
 	EXTERNAL OMEGA_GEN,SUB_PHOT
 C
 	INTEGER EQPOP,NST,NT,ND,NUM_BNDS,EQUAT,NION,DST,DEND
-	REAL(10) BA(2-NST:NT-NST+1,2-NST:NT-NST+1,NUM_BNDS,ND)
-	REAL(10) SE(2-NST:NT-NST+1,ND)
-	REAL(10) BAION(NION,2-NST:NT-NST+1,NUM_BNDS,ND),STEQION(NION,ND)
+	REAL(KIND=LDP) BA(2-NST:NT-NST+1,2-NST:NT-NST+1,NUM_BNDS,ND)
+	REAL(KIND=LDP) SE(2-NST:NT-NST+1,ND)
+	REAL(KIND=LDP) BAION(NION,2-NST:NT-NST+1,NUM_BNDS,ND),STEQION(NION,ND)
 C
 C CNM, and DCNM are used as work arrays. DCNM refers to dCNMdT
 C
 	INTEGER N_S,N_F
-	REAL(10) CNM(N_S,N_S),DCNM(N_S,N_S)
+	REAL(KIND=LDP) CNM(N_S,N_S),DCNM(N_S,N_S)
 C
-	REAL(10) T(ND)
-	REAL(10) ED(ND)
-	REAL(10) DI_S(ND)
+	REAL(KIND=LDP) T(ND)
+	REAL(KIND=LDP) ED(ND)
+	REAL(KIND=LDP) DI_S(ND)
 C
-	REAL(10) HN_S(N_S,ND)
-	REAL(10) HNST_S(N_S,ND)
-	REAL(10) dlnHNST_S_dlnT(N_S,ND)
+	REAL(KIND=LDP) HN_S(N_S,ND)
+	REAL(KIND=LDP) HNST_S(N_S,ND)
+	REAL(KIND=LDP) dlnHNST_S_dlnT(N_S,ND)
 C
-	REAL(10) HN_F(N_F,ND)
-	REAL(10) HNST_F(N_F,ND)
-	REAL(10) W_F(N_F,ND)
-	REAL(10) A_F(N_F,N_F)
-	REAL(10) FEDGE_F(N_F)
-	REAL(10) G_F(N_F)
+	REAL(KIND=LDP) HN_F(N_F,ND)
+	REAL(KIND=LDP) HNST_F(N_F,ND)
+	REAL(KIND=LDP) W_F(N_F,ND)
+	REAL(KIND=LDP) A_F(N_F,N_F)
+	REAL(KIND=LDP) FEDGE_F(N_F)
+	REAL(KIND=LDP) G_F(N_F)
 	CHARACTER*(*) LEVNAME_F(N_F),COL_FILE
 	INTEGER F_TO_S_MAPPING(N_F)
-	REAL(10) ZION
+	REAL(KIND=LDP) ZION
 C
-	REAL(10) POP(ND)		!Population of species.
+	REAL(KIND=LDP) POP(ND)		!Population of species.
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 	LOGICAL NEXT_PRES
@@ -103,13 +104,13 @@ C Local variables.
 C
 	INTEGER EQION,IONE
 	INTEGER I,J,K,L,M,NW
-	REAL(10) T1,T2
-	REAL(10) TMP_VEC_ED(1)
-	REAL(10) TMP_VEC_COOL(1)
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) TMP_VEC_ED(1)
+	REAL(KIND=LDP) TMP_VEC_COOL(1)
 	PARAMETER (IONE=1)
 C
-	REAL(10) OMEGA_F(N_F,N_F)
-	REAL(10) dln_OMEGA_F_dlnT(N_F,N_F)
+	REAL(KIND=LDP) OMEGA_F(N_F,N_F)
+	REAL(KIND=LDP) dln_OMEGA_F_dlnT(N_F,N_F)
 C
 	NW=NT-NST+1
 	EQION=N_S+1			!Ion equation : Local dimensions
@@ -123,11 +124,11 @@ C smaller (i.e. no ND dimension).
 C
 C OMEGA_F,dln_OMEGA_dlnT are work arrays only.
 C T1 is returned with the toal cooling rate. Not used in this routine.
-C We use arrays (even though of length 1) so that some F90 compilers 
+C We use arrays (even though of length 1) so that some F90 compilers
 C don't give an error message because a scaler is passed a vector.
 C
 	  TMP_VEC_ED(1)=1.0D0		!Electron density
-	  TMP_VEC_COOL(1)=0.0D0		!Initialize cooling rate even 
+	  TMP_VEC_COOL(1)=0.0D0		!Initialize cooling rate even
 !                                                        though not used here.
 C
 	  CALL SUBCOL_MULTI_V3(

@@ -11,10 +11,11 @@ C                 a single record.
 C
 	SUBROUTINE DIR_ACC_PARS(REC_SIZE_LIM,UNIT_SIZE,
 	1                        WORD_SIZE,MAX_NUM_REC)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
-	REAL(10) X
+	REAL(KIND=LDP) X
 C
-C Created 24-Jun-1998 : Machine independent version 
+C Created 24-Jun-1998 : Machine independent version
 C
 	INTEGER REC_SIZE_LIM,UNIT_SIZE,WORD_SIZE,MAX_NUM_REC
 C
@@ -29,5 +30,5 @@ C
 	MAX_NUM_REC=REC_SIZE_LIM/WORD_SIZE
 C
 	RETURN
-	END                        
- 
+	END
+

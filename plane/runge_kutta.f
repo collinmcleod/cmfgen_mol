@@ -1,6 +1,7 @@
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine runge_kutta(y,dydx,n,x,h,beta,dbetadr,gamma,deriv)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -23,13 +24,13 @@ c Local variables
 c
       integer :: i
       integer, parameter :: nmax=2
-      REAL(10), dimension(nmax) :: dym,dyt,yt
-      REAL(10) h6,hh,xh
+      REAL(KIND=LDP), dimension(nmax) :: dym,dyt,yt
+      REAL(KIND=LDP) h6,hh,xh
 c
 c  Value to be determine
 c
-      REAL(10),  dimension(n) :: dydx,y
-      REAL(10) h,x,beta,dbetadr,gamma
+      REAL(KIND=LDP),  dimension(n) :: dydx,y
+      REAL(KIND=LDP) h,x,beta,dbetadr,gamma
 c
       hh=h*0.5d0
       h6=h/6.0d0

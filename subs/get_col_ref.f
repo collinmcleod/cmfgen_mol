@@ -3,6 +3,7 @@
 ! all occurnces of [Reference] to OUTGEN.
 !
 	SUBROUTINE GET_COL_REF(FILENAME,LUIN,LUOUT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 8-Sep-2012

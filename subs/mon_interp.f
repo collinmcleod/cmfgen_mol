@@ -1,5 +1,5 @@
 C
-C Subroutine to interpolate an array onto a new grid. The grid vector must be 
+C Subroutine to interpolate an array onto a new grid. The grid vector must be
 C either a monotonically decreasing or increasing function. A modified cubic
 C polynomial is used to do the interpolation. Instead of using
 C the excact cubic estiamtes for the first derivative at the two nodes,
@@ -18,6 +18,7 @@ C
 C Ref: Steffen. M, 1990, A/&A, 239, 443-450
 C
 	SUBROUTINE MON_INTERP(QZ,NQ,LIN_END,QZR,NX,VARRAY,NV,R,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 : ERROR_LU installed
@@ -25,16 +26,16 @@ C Created 01-Apr-1992 : Code may need recoding for optimal speed, and for
 C                         vectorization.
 C
 	INTEGER NQ,LIN_END,NX,NV,ND
-	REAL(10) QZ(NQ,LIN_END),QZR(NX)
-	REAL(10) VARRAY(NV,LIN_END),R(ND)
+	REAL(KIND=LDP) QZ(NQ,LIN_END),QZR(NX)
+	REAL(KIND=LDP) VARRAY(NV,LIN_END),R(ND)
 C
-	REAL(10) ONE
+	REAL(KIND=LDP) ONE
 	PARAMETER (ONE=1.0D0)
 	INTEGER I,J,M
-	REAL(10) T1
-	REAL(10) HI,HIM1,HIP1
-	REAL(10) SI,SIM1,SIP1
-	REAL(10) A,B,C,D,DYI,DYIP1,SGN
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) HI,HIM1,HIP1
+	REAL(KIND=LDP) SI,SIM1,SIP1
+	REAL(KIND=LDP) A,B,C,D,DYI,DYIP1,SGN
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU

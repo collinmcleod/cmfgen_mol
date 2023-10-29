@@ -3,6 +3,7 @@ C Subroutine formulates a string (>= 132 characters) containing the
 C transition name, wavelength, continuum flux and line EW.
 C
 	SUBROUTINE EW_FORMAT(OUTSTR,TRANSITION,LAMBDA,FLUX,EW,SOBOLEV)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 01-Aug-1997 : OUTSTR increased to 132 characters.
@@ -15,7 +16,7 @@ C
 C Created 16-Oct-1989
 C
 	CHARACTER TRANSITION*(*),OUTSTR*(*)
-	REAL(10) LAMBDA,FLUX,EW
+	REAL(KIND=LDP) LAMBDA,FLUX,EW
 	LOGICAL SOBOLEV
 C
 	INTEGER L,TAB
@@ -63,6 +64,6 @@ C
 	L=LEN_TRIM(TRANSITION)
 	IF(L .GT. 133-TAB)L=133-TAB
 	OUTSTR(TAB:132)=TRIM(TRANSITION(1:L))
-C 
+C
 	RETURN
 	END

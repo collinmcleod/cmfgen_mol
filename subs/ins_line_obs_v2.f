@@ -3,6 +3,7 @@
 	1		NU_MAX,NU_MIN,VINF,
 	1               dV_OBS_PROF,dV_OBS_WING,dV_OBS_BIG,
 	1               OBS_PRO_EXT_RAT,ES_WING_EXT,V_DOP)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 25-May-1996 : MIN(LN_INDX,N_LINES) inserted in 2 IF staements because
@@ -19,47 +20,47 @@ C
 C Vecters returned by subroutine:
 C
 C Line+continuum frequencies
-	REAL(10) FREQ(NFREQ_MAX)			!New observers frequencies
+	REAL(KIND=LDP) FREQ(NFREQ_MAX)			!New observers frequencies
 C
 C Passed vectors.
 C
-	REAL(10) NU_LINE(N_LINES)		!Line frequencies
+	REAL(KIND=LDP) NU_LINE(N_LINES)		!Line frequencies
 C
 C Passed constants:
-	REAL(10) VINF		!Terminal velocity of wind.
-	REAL(10) dV_OBS_PROF
-	REAL(10) dV_OBS_WING
-	REAL(10) dV_OBS_BIG
-	REAL(10) NU_MIN
-	REAL(10) NU_MAX
-	REAL(10) OBS_PRO_EXT_RAT
-	REAL(10) ES_WING_EXT
-	REAL(10) V_DOP
+	REAL(KIND=LDP) VINF		!Terminal velocity of wind.
+	REAL(KIND=LDP) dV_OBS_PROF
+	REAL(KIND=LDP) dV_OBS_WING
+	REAL(KIND=LDP) dV_OBS_BIG
+	REAL(KIND=LDP) NU_MIN
+	REAL(KIND=LDP) NU_MAX
+	REAL(KIND=LDP) OBS_PRO_EXT_RAT
+	REAL(KIND=LDP) ES_WING_EXT
+	REAL(KIND=LDP) V_DOP
 C
 C Local variables.
 C
-	REAL(10) MAX_B_EXTENT
-	REAL(10) MAX_R_EXTENT
-	REAL(10) MAX_BW_EXTENT
-	REAL(10) MAX_RW_EXTENT
+	REAL(KIND=LDP) MAX_B_EXTENT
+	REAL(KIND=LDP) MAX_R_EXTENT
+	REAL(KIND=LDP) MAX_BW_EXTENT
+	REAL(KIND=LDP) MAX_RW_EXTENT
 C
-	REAL(10) PROF_SPACING
-	REAL(10) WING_SPACING
-	REAL(10) BIG_SPACING
-	REAL(10) T1
+	REAL(KIND=LDP) PROF_SPACING
+	REAL(KIND=LDP) WING_SPACING
+	REAL(KIND=LDP) BIG_SPACING
+	REAL(KIND=LDP) T1
 C
 	INTEGER INDX		!Current frequency index.
-	INTEGER LN_INDX	!Current line whose frequencies we are 
+	INTEGER LN_INDX	!Current line whose frequencies we are
 				!   installing.
 C
 	INTEGER I,J		!Micellaneous loop variables.
 	INTEGER LU_ER
-	REAL(10) C_KMS,MIN_FREQ
+	REAL(KIND=LDP) C_KMS,MIN_FREQ
 C
 C External functions
 C
 	INTEGER ERROR_LU
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 C
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()
@@ -86,9 +87,9 @@ C
 	MAX_B_EXTENT  = 1.0D0+(OBS_PRO_EXT_RAT*VINF+3.0D0*V_DOP)/C_KMS
 	MAX_R_EXTENT  = 1.0D0-(OBS_PRO_EXT_RAT*VINF+3.0D0*V_DOP)/C_KMS
 C
-C BW and RW refer to the extent of the electron scattering wings. They are 
+C BW and RW refer to the extent of the electron scattering wings. They are
 C defined from line center.
-C                               
+C
 C When Vinf is small, extent of red wing will be primarily determined by
 C thermal redistribution effects, and hence ES_WING_EXT is important. When
 C Vinf is large (>> Velec) the "coherent" scattering will dominate, and
@@ -104,8 +105,8 @@ C
 	PROF_SPACING = 1.0D0-dV_OBS_PROF/C_KMS
 	WING_SPACING = 1.0D0-dV_OBS_WING/C_KMS
 	BIG_SPACING  = 1.0D0-dV_OBS_BIG/C_KMS
-C                                                
-	INDX=1         
+C
+	INDX=1
 	FREQ(1)=NU_MAX
 	LN_INDX=1
 	DO WHILE( FREQ(INDX) .GT. NU_MIN/MAX_RW_EXTENT )
@@ -117,7 +118,7 @@ C
 	     FREQ(INDX)=FREQ(INDX-1)*BIG_SPACING
 	  ELSE
 	     IF(FREQ(INDX) .GT. NU_LINE(LN_INDX)*MAX_BW_EXTENT)THEN
-	       INDX=INDX+1             
+	       INDX=INDX+1
 	       IF(INDX .GT. NFREQ_MAX)GOTO 9999
 	       FREQ(INDX)=NU_LINE(LN_INDX)*MAX_BW_EXTENT
 	     END IF
@@ -137,7 +138,7 @@ C
 	     END IF
 C
 C Now do the spacing across the main line profile.
-C	 
+C	
 	     DO WHILE (FREQ(INDX)*PROF_SPACING
 	1         .GT. NU_LINE(LN_INDX)*MAX_R_EXTENT)
 	        INDX=INDX+1
@@ -158,9 +159,9 @@ C [NB. Inserting red wing frequencies will be equally useful as blue wing
 C   frequencies on the next line., hence compare with MAX_B_EXTENT]
 C
 	    DO WHILE (LN_INDX .LE. N_LINES .AND.
-	1                  FREQ(INDX)*WING_SPACING .LT. 
+	1                  FREQ(INDX)*WING_SPACING .LT.
 	1                  NU_LINE(MIN(LN_INDX,N_LINES))*MAX_B_EXTENT)
-	      DO WHILE (FREQ(INDX)*PROF_SPACING .GT. 
+	      DO WHILE (FREQ(INDX)*PROF_SPACING .GT.
 	1                   NU_LINE(LN_INDX)*MAX_R_EXTENT)
 	         INDX=INDX+1
 	         IF(INDX .GT. NFREQ_MAX)GOTO 9999

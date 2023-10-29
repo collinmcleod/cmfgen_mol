@@ -3,15 +3,16 @@
 ! depndence on I.  Assumes X(I) > X(I+1).
 !
 	SUBROUTINE HTRPWGT_V2(X,dX,W,N)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 12-Jun-2023 : Basesd oh HTRPWGT
 !                       Computes more accrate dX when X ~ 1
 !
 	INTEGER N
-	REAL(10) X(N),dX(N),W(N)
+	REAL(KIND=LDP) X(N),dX(N),W(N)
 !
-	REAL(10) T1,T2,SUM,XSUM
+	REAL(KIND=LDP) T1,T2,SUM,XSUM
 	INTEGER I
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -25,7 +26,7 @@
 	  W(I+1)=W(I+1) + dX(I)*(X(I)+2.0D0*X(I+1))/6.0D0
 	END DO
 !
-! Assumes that V(mu=0)=0 and mu.V'(mu)=0 at mu=0. 
+! Assumes that V(mu=0)=0 and mu.V'(mu)=0 at mu=0.
 !
 	IF(X(N) .NE. 0.0D0)THEN
 !
@@ -77,7 +78,7 @@
 	  END DO
 	  I=N; SUM=SUM+W(I)
 	  WRITE(6,'(F20.16,ES14.6,3ES22.14)')X(I),0.0D0,dX(I),W(I),SUM
-	END IF 
+	END IF
 !
 	RETURN
 	END

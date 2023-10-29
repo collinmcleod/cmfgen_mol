@@ -4,6 +4,7 @@
 ! contibution to emission lines.
 !
 	SUBROUTINE DRAW_EW_LINES(XPAR,YPAR,EXPCHAR,T_OUT)
+	USE SET_KIND_MODULE
 	USE LINE_ID_MOD
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
@@ -17,7 +18,7 @@
 	REAL*4 EXPCHAR
 	INTEGER T_OUT
 !
-	REAL(10), ALLOCATABLE :: DP_VEC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DP_VEC(:)
 	INTEGER, ALLOCATABLE :: INDX(:)
 !
 	INTEGER, PARAMETER :: IONE=1
@@ -92,7 +93,7 @@
 !
 ! This section is left over from DRAW_LINE_IDs. It not utilized,
 ! but could be easily used.
-! 
+!
 	  DO I=1,N_EW_IDS
 	    WR_ID(I)=.TRUE.
 	    DO J=1,N_OMIT_ID
@@ -147,13 +148,13 @@
 	  END DO
 	  DEALLOCATE(DP_VEC,INDX)
 !
-! Draw key to color code on right hand side of plot. 
+! Draw key to color code on right hand side of plot.
 !
 	  WRITE(6,*)BLUE_PEN
 	  WRITE(6,*)'If you cannot see the species labels, use N option'
 	  WRITE(6,*)' to change right handed extent of plot'
 	  WRITE(6,*)DEF_PEN
-! 
+!
 	  XSTART=XPAR(2)+0.05*(XPAR(2)-XPAR(1))
 	  XEND=XPAR(2)+0.1*(XPAR(2)-XPAR(1))
 	  XPOS=XPAR(2)+0.12*(XPAR(2)-XPAR(1))

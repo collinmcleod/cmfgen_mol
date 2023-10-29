@@ -1,5 +1,5 @@
 C
-C Routine to replace VMS TUNE routine for collecting tuning statistics for 
+C Routine to replace VMS TUNE routine for collecting tuning statistics for
 C a program section.
 C
 C Usage:
@@ -23,6 +23,7 @@ C NB: Total time for each code section is accumulated on successive calls.
 C i.e. TUNE(1,'Unique ID') does not initialize the counters.
 C
         SUBROUTINE TUNE(LRUN,IDENT)
+	USE SET_KIND_MODULE
         IMPLICIT NONE
 	INTEGER LRUN
 	CHARACTER*(*) IDENT
@@ -30,9 +31,9 @@ C
 	INTEGER, PARAMETER :: MAX_IDS=50
 	INTEGER, PARAMETER :: LUOUT=55
 !
-        REAL(10) T0,OVERHEAD
-        REAL(10) BEFORE(MAX_IDS),AFTER(MAX_IDS),CPUTOT(MAX_IDS)
-        REAL(10) RUNTOT(MAX_IDS)
+        REAL(KIND=LDP) T0,OVERHEAD
+        REAL(KIND=LDP) BEFORE(MAX_IDS),AFTER(MAX_IDS),CPUTOT(MAX_IDS)
+        REAL(KIND=LDP) RUNTOT(MAX_IDS)
         CHARACTER*30 IDLIST(MAX_IDS)
         INTEGER I
 C
@@ -60,7 +61,7 @@ C
         ENDIF
 !
 ! If LRUN =1, we are beginning the TIME bracket. Therefore we find the
-! correct storage location first. 
+! correct storage location first.
 !
 	IF (LRUN.EQ.1) THEN
 	  DO I=1,MAX_IDS
@@ -78,7 +79,7 @@ C
 	  RETURN
 	ELSE IF (LRUN.EQ.2) THEN
 !
-! If LRUN=2, we are ending the TIME bracket. Therefore we call the timing 
+! If LRUN=2, we are ending the TIME bracket. Therefore we call the timing
 ! routine first.
 !
           T0=1.0D-06*MCLOCK()
@@ -88,7 +89,7 @@ C
 	      CPUTOT(I)=CPUTOT(I)+(AFTER(I)-BEFORE(I)-OVERHEAD)
 	      RUNTOT(I)=T0
 	      RETURN
-	    END IF 
+	    END IF
 	    IF (IDLIST(I).EQ.' ')EXIT
 	  END DO
 	  WRITE (LUOUT,*)' ***** UNMATCHED TUNING POINT ',TRIM(IDENT)
@@ -106,6 +107,6 @@ C
 	  WRITE (LUOUT,'(A)')' ***** ILLEGAL VALUE OF LRUN IN CALL TO TUNE '
 	  STOP
 	ENDIF
-        
+
 	RETURN
 	END

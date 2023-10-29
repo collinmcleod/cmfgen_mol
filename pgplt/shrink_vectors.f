@@ -5,6 +5,7 @@
 ! The error section has not been tested.
 !
 	SUBROUTINE SHRINK_VECTORS(CUT_ACCURACY)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !

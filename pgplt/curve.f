@@ -2,6 +2,7 @@
 ! Program to initialize plotting arrays.
 !
 	SUBROUTINE CURVE(NUM,X,Y)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
@@ -50,8 +51,9 @@
 ! Program to initialize plotting arrays - Includes error option.
 !
 ! Created 06-Mar-1990 - Based on curve
-!                   
+!
 	SUBROUTINE CURVE_AND_ER(NUM,X,Y,SIGMA,OPT)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
@@ -117,18 +119,19 @@
 	ERR(NPLTS)=.TRUE.
 !
 	RETURN
-	END 
+	END
 !
 !
 !
 ! Program to initialize plotting arrays.
 !
 	SUBROUTINE DP_CURVE(NUM,X,Y)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
 	INTEGER NUM
-	REAL(10) X(NUM),Y(NUM)
+	REAL(KIND=LDP) X(NUM),Y(NUM)
 !
 	INTEGER J
 !
@@ -168,11 +171,12 @@
 ! Created 06-Mar-1990 - Based on curve
 !
 	SUBROUTINE DP_CURVE_AND_ER(NUM,X,Y,SIGMA,OPT)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
 	INTEGER NUM
-	REAL(10) X(NUM),Y(NUM),SIGMA(NUM)
+	REAL(KIND=LDP) X(NUM),Y(NUM),SIGMA(NUM)
 	CHARACTER*(*) OPT
 C
 	REAL T1

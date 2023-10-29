@@ -9,6 +9,7 @@
 	1            TAU_MAX,ES_DTAU,N_INS_OBS,INT_METHOD,
 	1            TAU_REF,WRITE_RTAU,
 	1            WRITE_IP,DO_REL_CORRECTIONS,PLANE_PARALLEL)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 04-May-2009 : Changed to handle a hollow core. This is important
@@ -43,68 +44,68 @@
 ! supplied by calling routine. At present it is assumed that these are
 ! on the same depth grid, and on the same frequency grid.
 !
-	REAL(10) ETA_CMF(ND,NCF)
-	REAL(10) CHI_CMF(ND,NCF)
-	REAL(10) FREQ_CMF(NCF)
+	REAL(KIND=LDP) ETA_CMF(ND,NCF)
+	REAL(KIND=LDP) CHI_CMF(ND,NCF)
+	REAL(KIND=LDP) FREQ_CMF(NCF)
 !
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-	REAL(10) T(ND)
-	REAL(10) ED(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) T(ND)
+	REAL(KIND=LDP) ED(ND)
 !
 ! Impact parameters: For rays not striking the core, P must be defined by
 ! the R grid. NP should be ND+NC
 !
 	INTEGER NC
 	INTEGER NP
-	REAL(10) P(NP)
-	REAL(10) MU_AT_RMAX(NP)
-	REAL(10) HQW_AT_RMAX(NP)
+	REAL(KIND=LDP) P(NP)
+	REAL(KIND=LDP) MU_AT_RMAX(NP)
+	REAL(KIND=LDP) HQW_AT_RMAX(NP)
 !
 ! Observer's frame frequencies in units of 10^15 Hz. Should be monotonically
 ! decreasing.
 !
 	INTEGER NOS
-	REAL(10) OBS_FREQ(NOS)
-	REAL(10) OBS_FLUX(NOS)
+	REAL(KIND=LDP) OBS_FREQ(NOS)
+	REAL(KIND=LDP) OBS_FLUX(NOS)
 !
 ! Maximum velocity spacing across consequitive grid points. Ideally this
 ! should be least than 0.25 of a Doppler width.
 !
-	REAL(10) MAX_DEL_V_RES_ZONE(ND)
+	REAL(KIND=LDP) MAX_DEL_V_RES_ZONE(ND)
 !
-	REAL(10) TAU_MAX
-	REAL(10) ES_DTAU
+	REAL(KIND=LDP) TAU_MAX
+	REAL(KIND=LDP) ES_DTAU
 	INTEGER N_INS_OBS
 	CHARACTER*(*) INT_METHOD
 !
 ! Local vectors and arrays.
 !
-	REAL(10) VMU(ND)		!Velocity*(Z/R) on R grid.
-	REAL(10) Z(ND)		!Distance along ray on R grid.
-	REAL(10) ESEC(ND)		!Electron scattering opacity
-	REAL(10) TAU_ES(ND)	!Rough TAU_ES along ray
-	REAL(10) DTAU_ES(ND)	!Rough DTAU_ES along ray
+	REAL(KIND=LDP) VMU(ND)		!Velocity*(Z/R) on R grid.
+	REAL(KIND=LDP) Z(ND)		!Distance along ray on R grid.
+	REAL(KIND=LDP) ESEC(ND)		!Electron scattering opacity
+	REAL(KIND=LDP) TAU_ES(ND)	!Rough TAU_ES along ray
+	REAL(KIND=LDP) DTAU_ES(ND)	!Rough DTAU_ES along ray
 !
 ! Emissivities and Opacities in the CMF frame. These are created in this
 ! routing from ETA_CMF and CHI_CMF, and are on the fine grid used to solve
 ! the transfer equation.
 !
-	REAL(10), ALLOCATABLE ::  ETA_CMF_RAY(:,:)
-	REAL(10), ALLOCATABLE ::  CHI_CMF_RAY(:,:)
-	REAL(10), ALLOCATABLE ::  SM_FREQ_CMF(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  ETA_CMF_RAY(:,:)
+	REAL(KIND=LDP), ALLOCATABLE ::  CHI_CMF_RAY(:,:)
+	REAL(KIND=LDP), ALLOCATABLE ::  SM_FREQ_CMF(:)
 !
 ! Intensity as a function of impact parameter and frequency in the observers
 ! frame. Need for interpreting observations of Eta Car, and for understanding
 ! interferometric observations.
 !
 	LOGICAL WRITE_IP
-	REAL(10), ALLOCATABLE ::  IP_OBS(:,:)
+	REAL(KIND=LDP), ALLOCATABLE ::  IP_OBS(:,:)
 
         LOGICAL WRITE_RTAU
-        REAL(10) TAU_REF
-        REAL(10), ALLOCATABLE ::  RTAU(:,:)
-        REAL(10), ALLOCATABLE ::  ZTAU(:,:)
+        REAL(KIND=LDP) TAU_REF
+        REAL(KIND=LDP), ALLOCATABLE ::  RTAU(:,:)
+        REAL(KIND=LDP), ALLOCATABLE ::  ZTAU(:,:)
 !
 	LOGICAL DO_REL_CORRECTIONS
 	LOGICAL PLANE_PARALLEL
@@ -112,35 +113,35 @@
 !       Vectors defined along a ray. HALF_DZ, DZSQ_ON_12, and RECIP_DEL_Z are used
 !       to minimize computations.
 !
-	REAL(10), ALLOCATABLE ::  ETA_VEC(:)
-	REAL(10), ALLOCATABLE ::  CHI_VEC(:)
-	REAL(10), ALLOCATABLE ::  R_RAY(:)
-	REAL(10), ALLOCATABLE ::  V_RAY(:)
-	REAL(10), ALLOCATABLE ::  VMU_RAY(:)
-	REAL(10), ALLOCATABLE ::  GAM_RAY(:)
-	REAL(10), ALLOCATABLE ::  NU_ON_NU0_RAY(:)
-	REAL(10), ALLOCATABLE ::  Z_RAY(:)
-	REAL(10), ALLOCATABLE ::  TAU(:)
-	REAL(10), ALLOCATABLE ::  dZ(:)
-	REAL(10), ALLOCATABLE ::  HALF_DZ(:)
-	REAL(10), ALLOCATABLE ::  DZSQ_ON_12(:)
-	REAL(10), ALLOCATABLE ::  RECIP_DEL_Z(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  ETA_VEC(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  CHI_VEC(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  R_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  V_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  VMU_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  GAM_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  NU_ON_NU0_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  Z_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  TAU(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  dZ(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  HALF_DZ(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  DZSQ_ON_12(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  RECIP_DEL_Z(:)
 !
-	REAL(10), ALLOCATABLE ::  A0(:)
-	REAL(10), ALLOCATABLE ::  A1(:)
-	REAL(10), ALLOCATABLE ::  A2(:)
-	REAL(10), ALLOCATABLE ::  A3(:)
-	REAL(10), ALLOCATABLE ::  A4(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  A0(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  A1(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  A2(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  A3(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  A4(:)
 !
-	REAL(10), ALLOCATABLE ::  EE(:)
-	REAL(10), ALLOCATABLE ::  E0(:)
-	REAL(10), ALLOCATABLE ::  E1(:)
-	REAL(10), ALLOCATABLE ::  E2(:)
-	REAL(10), ALLOCATABLE ::  E3(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  EE(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  E0(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  E1(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  E2(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  E3(:)
 !
-	REAL(10), ALLOCATABLE ::  DTAU(:)
-	REAL(10), ALLOCATABLE ::  S(:)
-	REAL(10), ALLOCATABLE ::  dS(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  DTAU(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  S(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  dS(:)
 !
 	INTEGER NOS_INC
 	INTEGER OUT_ML
@@ -175,19 +176,19 @@
 	INTEGER WORD_SIZE,N_PER_REC,ACCESS_F
 	INTEGER IST,IEND
 !
-	REAL(10) MAX_VMU
-	REAL(10) T1,T2,T3,T4
-	REAL(10) PSQ
-	REAL(10) C_KMS
-	REAL(10) PAR_FLUX
+	REAL(KIND=LDP) MAX_VMU
+	REAL(KIND=LDP) T1,T2,T3,T4
+	REAL(KIND=LDP) PSQ
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) PAR_FLUX
 !
 	LOGICAL BACK_SIDE
 	LOGICAL HOLLOW_CORE
 	INTEGER ERROR_LU
-	REAL(10) SPEED_OF_LIGHT,FUN_PI,PI
+	REAL(KIND=LDP) SPEED_OF_LIGHT,FUN_PI,PI
 	EXTERNAL SPEED_OF_LIGHT,FUN_PI,ERROR_LU
 !
-	REAL(10), PARAMETER :: ONE=1
+	REAL(KIND=LDP), PARAMETER :: ONE=1
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 !
@@ -1004,10 +1005,10 @@
 	  END IF
 	  IF(TAU(1) .GT. TAU_REF)THEN
 	    RTAU(LS,ML)=SQRT(Z_RAY(1)*Z_RAY(1)+P(LS)*P(LS))
-	    ZTAU(LS,ML) = Z_RAY(1) 
+	    ZTAU(LS,ML) = Z_RAY(1)
 	  ELSE IF(TAU(SM_NRAY) .LE. TAU_REF)THEN
 	    RTAU(LS,ML)=SQRT(Z_RAY(SM_NRAY)*Z_RAY(SM_NRAY)+P(LS)*P(LS))
-	    ZTAU(LS,ML) = Z_RAY(SM_NRAY) 
+	    ZTAU(LS,ML) = Z_RAY(SM_NRAY)
 	  ELSE
 	    T1=(TAU_REF-TAU(K))/(TAU(K+1)-TAU(K))
 	    T2=(1.0D0-T1)*Z_RAY(K)+T1*Z_RAY(K+1)

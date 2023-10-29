@@ -1,5 +1,6 @@
 !
 	FUNCTION MONINSIDE(X,XPAR)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 13-Feb-2001: Fixed to handle flipped axes.

@@ -1,12 +1,13 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
       SUBROUTINE CHARACTERISTICS_V2_GAM(R_GRID,P,V_GRID,VDOP_VEC,VDOP_FRAC,ND,NC,NP)
+	USE SET_KIND_MODULE
 !
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
-! This subroutine uses the Runge-Kutta method (solves sets of ordinary 
+! This subroutine uses the Runge-Kutta method (solves sets of ordinary
 ! differential equations) to determine the characteristic rays needed
-! to make the comoving frame radiative transfer equation a perfect 
+! to make the comoving frame radiative transfer equation a perfect
 ! differential. The "rk4" routine used below is from Numerical Recipes
 ! (92), chapter 16.
 !
@@ -34,11 +35,11 @@
 !
 ! Grid variables
 !
-      REAL(10), DIMENSION(ND) :: R_GRID
-      REAL(10), DIMENSION(NP) :: P
-      REAL(10), DIMENSION(ND) :: V_GRID
-      REAL(10), DIMENSION(ND) :: VDOP_VEC(ND)
-      REAL(10)  VDOP_FRAC
+      REAL(KIND=LDP), DIMENSION(ND) :: R_GRID
+      REAL(KIND=LDP), DIMENSION(NP) :: P
+      REAL(KIND=LDP), DIMENSION(ND) :: V_GRID
+      REAL(KIND=LDP), DIMENSION(ND) :: VDOP_VEC(ND)
+      REAL(KIND=LDP)  VDOP_FRAC
 !
 ! 'ns' is number of steps to take between each grid point when
 ! integrating wrt r.  'mu_step' is mu step to use when integrating wrt s.
@@ -47,7 +48,7 @@
       INTEGER, PARAMETER :: NS=20
       INTEGER, PARAMETER :: IONE=1
 !
-      REAL(10), PARAMETER ::  MU_STEP=0.005D0
+      REAL(KIND=LDP), PARAMETER ::  MU_STEP=0.005D0
 !
 ! Number of equations in Runge-Kutta solution
 !
@@ -65,28 +66,28 @@
 !
 ! Determine direction of characteristic ray (+1,-1)
 !
-      REAL(10) :: DIRECTION
+      REAL(KIND=LDP) :: DIRECTION
 !
 ! Radius variables
 !
-      REAL(10) dZ,dV,dR
-      REAL(10) :: RMIN,RMAX,DS,SS,RR,VEL,A_OLD,DR_OLD,DS_1,DR_1
-      REAL(10) :: MU_E,MU_H
+      REAL(KIND=LDP) dZ,dV,dR
+      REAL(KIND=LDP) :: RMIN,RMAX,DS,SS,RR,VEL,A_OLD,DR_OLD,DS_1,DR_1
+      REAL(KIND=LDP) :: MU_E,MU_H
 !
 ! Velocity variables
 !
-      REAL(10) :: BETAMAX,BETA,DBETADR,GAMMA
+      REAL(KIND=LDP) :: BETAMAX,BETA,DBETADR,GAMMA
 !
 ! Runge-Kutta variables
 !
-      REAL(10), DIMENSION(EQU) :: A,DADS,DADR
+      REAL(KIND=LDP), DIMENSION(EQU) :: A,DADS,DADR
 !
-	REAL(10), ALLOCATABLE :: Z(:)
-	REAL(10), ALLOCATABLE :: R(:)
-	REAL(10), ALLOCATABLE :: V(:)
-	REAL(10), ALLOCATABLE :: S(:)
-	REAL(10), ALLOCATABLE :: MU(:)
-	REAL(10), ALLOCATABLE :: B(:)
+	REAL(KIND=LDP), ALLOCATABLE :: Z(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R(:)
+	REAL(KIND=LDP), ALLOCATABLE :: V(:)
+	REAL(KIND=LDP), ALLOCATABLE :: S(:)
+	REAL(KIND=LDP), ALLOCATABLE :: MU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: B(:)
 !
 	INTEGER NINS
 	INTEGER NRAY

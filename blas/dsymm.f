@@ -1,11 +1,12 @@
       SUBROUTINE DSYMM ( SIDE, UPLO, M, N, ALPHA, A, LDA, B, LDB,
      $                   BETA, C, LDC )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       CHARACTER*1        SIDE, UPLO
       INTEGER            M, N, LDA, LDB, LDC
-      REAL(10)   ALPHA, BETA
+      REAL(KIND=LDP)   ALPHA, BETA
 *     .. Array Arguments ..
-      REAL(10)   A( LDA, * ), B( LDB, * ), C( LDC, * )
+      REAL(KIND=LDP)   A( LDA, * ), B( LDB, * ), C( LDC, * )
 *     ..
 *
 *  Purpose
@@ -58,11 +59,11 @@
 *           N  must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - REAL(10).
+*  ALPHA  - REAL(KIND=LDP).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
-*  A      - REAL(10) array of DIMENSION ( LDA, ka ), where ka is
+*  A      - REAL(KIND=LDP) array of DIMENSION ( LDA, ka ), where ka is
 *           m  when  SIDE = 'L' or 'l'  and is  n otherwise.
 *           Before entry  with  SIDE = 'L' or 'l',  the  m by m  part of
 *           the array  A  must contain the  symmetric matrix,  such that
@@ -93,7 +94,7 @@
 *           least  max( 1, n ).
 *           Unchanged on exit.
 *
-*  B      - REAL(10) array of DIMENSION ( LDB, n ).
+*  B      - REAL(KIND=LDP) array of DIMENSION ( LDB, n ).
 *           Before entry, the leading  m by n part of the array  B  must
 *           contain the matrix B.
 *           Unchanged on exit.
@@ -104,12 +105,12 @@
 *           max( 1, m ).
 *           Unchanged on exit.
 *
-*  BETA   - REAL(10).
+*  BETA   - REAL(KIND=LDP).
 *           On entry,  BETA  specifies the scalar  beta.  When  BETA  is
 *           supplied as zero then C need not be set on input.
 *           Unchanged on exit.
 *
-*  C      - REAL(10) array of DIMENSION ( LDC, n ).
+*  C      - REAL(KIND=LDP) array of DIMENSION ( LDC, n ).
 *           Before entry, the leading  m by n  part of the array  C must
 *           contain the matrix  C,  except when  beta  is zero, in which
 *           case C need not be set on entry.
@@ -142,9 +143,9 @@
 *     .. Local Scalars ..
       LOGICAL            UPPER
       INTEGER            I, INFO, J, K, NROWA
-      REAL(10)   TEMP1, TEMP2
+      REAL(KIND=LDP)   TEMP1, TEMP2
 *     .. Parameters ..
-      REAL(10)   ONE         , ZERO
+      REAL(KIND=LDP)   ONE         , ZERO
       PARAMETER        ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Executable Statements ..

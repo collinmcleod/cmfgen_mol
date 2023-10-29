@@ -1,6 +1,7 @@
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine k_weight(nw,angle,temp)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -26,12 +27,12 @@ c Local variables
 c
       integer :: j
 c
-      REAL(10) :: a1,a2,sum,check
-      REAL(10), dimension(nw) :: temp(nw)
+      REAL(KIND=LDP) :: a1,a2,sum,check
+      REAL(KIND=LDP), dimension(nw) :: temp(nw)
 c
 c Angles
 c
-      REAL(10), dimension(nw) :: angle
+      REAL(KIND=LDP), dimension(nw) :: angle
 c
 c--------------------------------------------------------------------
 c

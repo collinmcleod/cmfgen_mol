@@ -1,10 +1,10 @@
 !
-! Routine to generate frequencies for radiative transfer program given a set of 
-! bound-free edges, and maximum and minimum frequencies. The frequency spacing is 
+! Routine to generate frequencies for radiative transfer program given a set of
+! bound-free edges, and maximum and minimum frequencies. The frequency spacing is
 ! controlled by passable parameters.
 !
-! Every bound-free edged is defined by two frequencies, except where two bound-free 
-! edges coincide to 1 part in 10^11. Generally points are inserted so that Simpson's 
+! Every bound-free edged is defined by two frequencies, except where two bound-free
+! edges coincide to 1 part in 10^11. Generally points are inserted so that Simpson's
 ! rule can be used, although in some regions where the bound-free edges are close the
 ! trapezoidal rule will be used.
 !
@@ -12,14 +12,15 @@
 	1                        SMALL_RAT,BIG_AMP,DNU_MAX,MAX_FREQ,MIN_FREQ,
 	1                        dV_LEV,AMP_DIS,MIN_FREQ_LEV_DIS,
 	1                        DELV_CONT,DELV_XRAY,NU_END_XRAY,N,NCF,NCF_MAX,LUOUT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 18-Aug-2004 : Changed way we insert points after a bound-free edge.
 !                       Initial spacing is DNU_MAX. The spacing increases by
 !                         0.5*DNU_MAX on each additional quadrature point. This should
-!                         work since spacing is fine enough when hv/kT is small, and 
+!                         work since spacing is fine enough when hv/kT is small, and
 !                         integral is dominated by first quadrature point when hv/kT
-!                         is very large. There is no specific maximum set, but in 
+!                         is very large. There is no specific maximum set, but in
 !                         practice this will be set by DELV_CONT. The meaning of
 !                         BIG_AMP has changed --- typical value should be 0.5.
 !                         Spacing increases by BIG_AMP*DNU_MAX on successive nodes.
@@ -27,57 +28,57 @@
 !                       We no longer insert extra points to use Simpson's rule. We
 !                         no longer use Simpson's rule since ether are so many edges,
 !                         and we use the same quadrature weights FOR ALL integrals.
-!                         As a consequence spacing is now DNU_MAX near a bound-free 
+!                         As a consequence spacing is now DNU_MAX near a bound-free
 !                         edge, not DNU_MAX/2.
-!                         [Changed to V4 so that keep old routine] 
+!                         [Changed to V4 so that keep old routine]
 !
 ! Altered 26-May-1996 : ERROR_LU installed.
 ! Cleaned
 ! Created 29-Mar-1990 (Based on GEN_FREQ).
 !
 	INTEGER N,NCF,NCF_MAX,LUOUT,INDX(NCF_MAX)
-	REAL(10) FREQ(NCF_MAX),NEW_FREQ(NCF_MAX)
+	REAL(KIND=LDP) FREQ(NCF_MAX),NEW_FREQ(NCF_MAX)
 !
-	REAL(10) MAX_FREQ		!Maximum continuum frequency
-	REAL(10) MIN_FREQ		!Minimum continuum frequency
-	REAL(10) DNU_MAX		! Twice the maximum frequency spacing near/above
+	REAL(KIND=LDP) MAX_FREQ		!Maximum continuum frequency
+	REAL(KIND=LDP) MIN_FREQ		!Minimum continuum frequency
+	REAL(KIND=LDP) DNU_MAX		! Twice the maximum frequency spacing near/above
 				!  bound-free edge: i.e. dNU < 0.5* DNU_MAX
-	REAL(10) BIG_AMP  	!Amplification. dNU increases by a factor
+	REAL(KIND=LDP) BIG_AMP  	!Amplification. dNU increases by a factor
 				! BIG_AMP as we move away from the b.f. edge.
 				! for frequencies above SWITCH_FREQ.
-   	REAL(10) SMALL_RAT	!Used to define frequency spacing for
+   	REAL(KIND=LDP) SMALL_RAT	!Used to define frequency spacing for
 				! frequencies less than SWITCH_FREQ.
 				! dNU/NU=SMALL_RAT-1
 !
 ! Parameters for installing extra frequencies near bound-free edges
 ! (low frequency side) to allow for level dissolution.
 !
-	REAL(10) dV_LEV			!Spacing near b-f edge.
-	REAL(10) AMP_DIS			!Amplification factor for dNU as we
+	REAL(KIND=LDP) dV_LEV			!Spacing near b-f edge.
+	REAL(KIND=LDP) AMP_DIS			!Amplification factor for dNU as we
 					!  move to smaller frequencies.
-	REAL(10) MIN_FREQ_LEV_DIS		!Indicates that the extra frequencies
+	REAL(KIND=LDP) MIN_FREQ_LEV_DIS		!Indicates that the extra frequencies
 					! should only be installed for
 					! frequencies above MIN_FREQ_LEV_DIS.
 !
-	REAL(10) DELV_CONT
-	REAL(10) DELV_XRAY
-	REAL(10) NU_END_XRAY
+	REAL(KIND=LDP) DELV_CONT
+	REAL(KIND=LDP) DELV_XRAY
+	REAL(KIND=LDP) NU_END_XRAY
 !
-        REAL(10), PARAMETER :: RZERO=0.0D0
-        REAL(10), PARAMETER :: RHALF=0.5D0
-        REAL(10), PARAMETER :: RONE=1.0D0
-        REAL(10), PARAMETER :: RTWO=2.0D0
+        REAL(KIND=LDP), PARAMETER :: RZERO=0.0D0
+        REAL(KIND=LDP), PARAMETER :: RHALF=0.5D0
+        REAL(KIND=LDP), PARAMETER :: RONE=1.0D0
+        REAL(KIND=LDP), PARAMETER :: RTWO=2.0D0
 !
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 !
-	REAL(10) T1,T2,dV_NEW,dV
-	REAL(10) C_KMS
+	REAL(KIND=LDP) T1,T2,dV_NEW,dV
+	REAL(KIND=LDP) C_KMS
 !
 	INTEGER I,J,K,L,ML,NPTS,K_BEG
 	LOGICAL NUMER,EQUAL
-	REAL(10) FAC,EQUAL_FAC
-	REAL(10) UP,LOW,DELF,DIFF,RAT,SWITCH_FREQ
+	REAL(KIND=LDP) FAC,EQUAL_FAC
+	REAL(KIND=LDP) UP,LOW,DELF,DIFF,RAT,SWITCH_FREQ
 !
 	LUER=ERROR_LU()
 	C_KMS=2.998D+05			!Doesn't have to be accurate

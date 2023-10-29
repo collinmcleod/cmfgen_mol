@@ -1,29 +1,30 @@
 !
 ! Routine to adjust the radiative equilibrium equation for energy added to the
 ! gas by radiactive decay. At present routine simply assumes all the
-! energy is deposited locally. 
+! energy is deposited locally.
 !
 ! This routine will need to be modified as we use more sophisticated prescriptions
 ! for the energy deposition.
 !
 	SUBROUTINE EVAL_RAD_DECAY_V1(dE_RAD_DECAY,NT,ND)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
  	USE STEQ_DATA_MOD
 	USE NUC_ISO_MOD
  	IMPLICIT NONE
 !
 ! Altered 12-Jul-2019 -- STEQ_T_EHB is now included.
-! Created 13-Dec-2005 
+! Created 13-Dec-2005
 !
 	INTEGER NT
 	INTEGER ND
 !
 ! Output: STEQ_T in MOD_CMFGEN is modified.
 !
-	REAL(10) de_RAD_DECAY(ND)
+	REAL(KIND=LDP) de_RAD_DECAY(ND)
 !
-	REAL(10) SCALE
-	REAL(10) PI
+	REAL(KIND=LDP) SCALE
+	REAL(KIND=LDP) PI
 !
 ! For historical reasons STEQ contains Int[chi.J - eta]dv. Rather than multiply
 ! this term everywhere by 4pi, we divide the radiactive heating by 4pi.

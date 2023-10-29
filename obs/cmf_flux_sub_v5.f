@@ -8,6 +8,7 @@
 ! This routine is a heavily stripped down and modified version of CMFGEN.
 !
 	SUBROUTINE CMF_FLUX_SUB_V5(ND,NC,NP,NDMAX,NPMAX,NT,NLINE_MAX)
+	USE SET_KIND_MODULE
 	USE MOD_CMF_OBS
 	USE MOD_FREQ_OBS
 	USE CMF_FLUX_CNTRL_VAR_MOD
@@ -17,7 +18,7 @@
 !
 ! Altered: 28-Aug-2022 : Fixed bug - MAX_SIM now set for SOB computation with continuum calculation.
 ! Altered: 24-Aug-2022 : Added SOB_EW_LAM_BEG (and _END) to make Sobolev EW calculation more transparent
-! Altered: 05-Jul-2022 : MAX_SIM is now determined by model, and vectors using 
+! Altered: 05-Jul-2022 : MAX_SIM is now determined by model, and vectors using
 !                          this variable are now allocated.
 !                        Now use INIT_PROFILE_MODULE_V2, SET_PROF_V6,
 !                           and GET_PROFILE_STORAGE_LIMITS_V2.
@@ -45,13 +46,13 @@
 ! Altered:  1-Oct-2012 : Fixed bug: NC_OBS was not being set for the normal P-grid which caused
 !                           a problem with the observer's frame calculation.
 ! Altered:  3-Aug-2012 : Changed to allow the computation of a revised grid for shell models.
-! Altered: 17-Dec-2011 : Now call OPACITIES_V5.INC and EVAL_LTE_INC_V5.INC 
-!                          L_STAR_RATIO and U_STAR_RATIO now computed using XzVLTE_F_ON_S 
+! Altered: 17-Dec-2011 : Now call OPACITIES_V5.INC and EVAL_LTE_INC_V5.INC
+!                          L_STAR_RATIO and U_STAR_RATIO now computed using XzVLTE_F_ON_S
 !                          Done to allow lower wind temperatures.
 ! Altered: 20-Oct-2009 : Changed to call OBS_FRAME_SUB_V8 (WRITE_RTAU, TAU_REF added to call).
 ! Altered: 07-Jul-2008 : Substantial changes over a period of time to include
 !                          relativistic radiative transfer. Lots of changes to
-!                          COMP_JCONT.INC. NCEXT is now increased according to 
+!                          COMP_JCONT.INC. NCEXT is now increased according to
 !                          NPINS when ACCURATE option is used.
 ! Altered: 31-Jul-2007 : Call to MOM_JREL_V3 included in INCLUDE file.
 !                          Variabled and control variables for rel. trans. installed.
@@ -89,7 +90,7 @@
 	INTEGER NDMAX,NPMAX
 	INTEGER NT,NLINE_MAX
 !
-	REAL(10) POPS(NT,ND)
+	REAL(KIND=LDP) POPS(NT,ND)
 !
 ! Constants for opacity etc.
 !
@@ -98,15 +99,15 @@
 !
 ! Internally used variables
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) OPLIN,EMLIN
-	REAL(10) DTDR,BNUE,DBB,DDBBDT
-	REAL(10) MEAN_ATOMIC_WEIGHT
-	REAL(10) TSTAR,S1,IC,MAXCH
-	REAL(10) C_KMS
-	REAL(10) T1,T2,T3,T4
-	REAL(10) FL,FL_OLD
-	REAL(10) FG_COUNT
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) OPLIN,EMLIN
+	REAL(KIND=LDP) DTDR,BNUE,DBB,DDBBDT
+	REAL(KIND=LDP) MEAN_ATOMIC_WEIGHT
+	REAL(KIND=LDP) TSTAR,S1,IC,MAXCH
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) T1,T2,T3,T4
+	REAL(KIND=LDP) FL,FL_OLD
+	REAL(KIND=LDP) FG_COUNT
 !
 !
 ! REC_SIZE     is the (maximum) record length in bytes.
@@ -152,9 +153,9 @@
 ! Functions called
 !
 	INTEGER ICHRLEN,ERROR_LU
-	REAL(10) LAMVACAIR
-	REAL(10) ATOMIC_MASS_UNIT
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) LAMVACAIR
+	REAL(KIND=LDP) ATOMIC_MASS_UNIT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL JWEIGHT_V2,HWEIGHT_V2,KWEIGHT_V2,NWEIGHT_V2
 	EXTERNAL JTRPWGT_V2,HTRPWGT_V2,KTRPWGT_V2,NTRPWGT_V2
 	EXTERNAL ICHRLEN,ERROR_LU,SPEED_OF_LIGHT
@@ -170,50 +171,50 @@
 !
 ! Global vectors:
 !
-	REAL(10) AMASS_ALL(NT)
+	REAL(KIND=LDP) AMASS_ALL(NT)
 !
 ! Arrays and variables for treating lines simultaneously.
 !
-	REAL(10), ALLOCATABLE :: EINA(:)
-	REAL(10), ALLOCATABLE :: OSCIL(:)
-	REAL(10), ALLOCATABLE :: GLDGU(:)
-	REAL(10), ALLOCATABLE :: AMASS_SIM(:)
-	REAL(10), ALLOCATABLE :: FL_SIM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: EINA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OSCIL(:)
+	REAL(KIND=LDP), ALLOCATABLE :: GLDGU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: AMASS_SIM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: FL_SIM(:)
 	INTEGER, ALLOCATABLE :: SIM_NL(:)
 	INTEGER, ALLOCATABLE :: SIM_NUP(:)
 !
-	REAL(10), ALLOCATABLE :: CHIL_MAT(:,:)
-	REAL(10), ALLOCATABLE :: ETAL_MAT(:,:)
-	REAL(10), ALLOCATABLE :: BB_COR(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHIL_MAT(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETAL_MAT(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: BB_COR(:,:)
 !
 	INTEGER NUM_SIM_LINES
 	INTEGER SIM_INDX
 	INTEGER TMP_MAX_SIM
-	REAL(10) OVER_FREQ_DIF
-	REAL(10) EW,ABS_EW
-	REAL(10) CONT_INT
+	REAL(KIND=LDP) OVER_FREQ_DIF
+	REAL(KIND=LDP) EW,ABS_EW
+	REAL(KIND=LDP) CONT_INT
 	LOGICAL OVERLAP
 	LOGICAL SOBOLEV
 !
 ! L refers to the lower level, U to the upper level.
 !
-	REAL(10), ALLOCATABLE :: L_STAR_RATIO(:,:)   !ND,MAX_SIM)
-	REAL(10), ALLOCATABLE :: U_STAR_RATIO(:,:)   !ND,MAX_SIM)
+	REAL(KIND=LDP), ALLOCATABLE :: L_STAR_RATIO(:,:)   !ND,MAX_SIM)
+	REAL(KIND=LDP), ALLOCATABLE :: U_STAR_RATIO(:,:)   !ND,MAX_SIM)
 !
-	REAL(10), ALLOCATABLE :: ETA_CMF_ST(:,:)
-	REAL(10), ALLOCATABLE :: CHI_CMF_ST(:,:)
-	REAL(10), ALLOCATABLE :: RJ_CMF_ST(:,:)
-	REAL(10), ALLOCATABLE :: RAY_CMF_ST(:,:)			!Rayleigh scattering opacity
-	REAL(10), ALLOCATABLE :: ION_LINE_FORCE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETA_CMF_ST(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_CMF_ST(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_CMF_ST(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: RAY_CMF_ST(:,:)			!Rayleigh scattering opacity
+	REAL(KIND=LDP), ALLOCATABLE :: ION_LINE_FORCE(:,:)
 !
 ! Vectors for treating lines simultaneously with the continuum.
 !
-	REAL(10), ALLOCATABLE :: LINE_PROF_SIM(:,:)   !ND,MAX_SIM)
+	REAL(KIND=LDP), ALLOCATABLE :: LINE_PROF_SIM(:,:)   !ND,MAX_SIM)
 !
-	REAL(10) NU_MAX_OBS
-	REAL(10) NU_MIN_OBS
+	REAL(KIND=LDP) NU_MAX_OBS
+	REAL(KIND=LDP) NU_MIN_OBS
 !
-	REAL(10) CONT_FREQ
+	REAL(KIND=LDP) CONT_FREQ
 !
 	CHARACTER*50, ALLOCATABLE :: TRANS_NAME_SIM(:)
 !
@@ -229,89 +230,89 @@
 ! 
 !
 ! Opacity/emissivity
-	REAL(10) CHI(ND)			!Continuum opacity (all sources)
-	REAL(10) CHI_RAY(ND)
-	REAL(10) CHI_SCAT(ND)
-	REAL(10) ETA(ND)			!Continuum emissivity (all sources)
-	REAL(10) CHIL(ND)			!Line opacity (without prof.)
-	REAL(10) ETAL(ND)			!Line emissivity (without prof.)
-	REAL(10) ESEC(ND)			!Continuum electron scattering coef.
-	REAL(10) ZETA(ND)			!Source func. (all except elec. scat.)
-	REAL(10) THETA(ND)		!Elec. scat. source coef.
-	REAL(10) SOURCE(ND)		!Complete source function.
-	REAL(10) DTAU(NDMAX)		!Optical depth (used in error calcs)
+	REAL(KIND=LDP) CHI(ND)			!Continuum opacity (all sources)
+	REAL(KIND=LDP) CHI_RAY(ND)
+	REAL(KIND=LDP) CHI_SCAT(ND)
+	REAL(KIND=LDP) ETA(ND)			!Continuum emissivity (all sources)
+	REAL(KIND=LDP) CHIL(ND)			!Line opacity (without prof.)
+	REAL(KIND=LDP) ETAL(ND)			!Line emissivity (without prof.)
+	REAL(KIND=LDP) ESEC(ND)			!Continuum electron scattering coef.
+	REAL(KIND=LDP) ZETA(ND)			!Source func. (all except elec. scat.)
+	REAL(KIND=LDP) THETA(ND)		!Elec. scat. source coef.
+	REAL(KIND=LDP) SOURCE(ND)		!Complete source function.
+	REAL(KIND=LDP) DTAU(NDMAX)		!Optical depth (used in error calcs)
 !		DTAU(I)=0.5*(CHI(I)+CHI(I+1))*(Z(I)-Z(I+1))
-	REAL(10) dCHIdR(NDMAX) 		!Derivative of opacity.
+	REAL(KIND=LDP) dCHIdR(NDMAX) 		!Derivative of opacity.
 !
-	REAL(10) P(NP)
+	REAL(KIND=LDP) P(NP)
 !
-	REAL(10) CHI_CONT(ND)
-	REAL(10) ETA_CONT(ND)
+	REAL(KIND=LDP) CHI_CONT(ND)
+	REAL(KIND=LDP) ETA_CONT(ND)
 !
 ! These parameters are used when computing J and the variation of J.
 !
-	REAL(10) CHI_SCAT_CLUMP(ND)
-	REAL(10) CHI_RAY_CLUMP(ND)
-	REAL(10) CHI_CLUMP(ND)		!==CHI(I)*CLUMP_FAC(I)
-	REAL(10) ETA_CLUMP(ND)		!==ETA(I)*CLUMP_FAC(I)
-	REAL(10) ESEC_CLUMP(ND)		!==ESEC(I)*CLUMP_FAC(I)
+	REAL(KIND=LDP) CHI_SCAT_CLUMP(ND)
+	REAL(KIND=LDP) CHI_RAY_CLUMP(ND)
+	REAL(KIND=LDP) CHI_CLUMP(ND)		!==CHI(I)*CLUMP_FAC(I)
+	REAL(KIND=LDP) ETA_CLUMP(ND)		!==ETA(I)*CLUMP_FAC(I)
+	REAL(KIND=LDP) ESEC_CLUMP(ND)		!==ESEC(I)*CLUMP_FAC(I)
 !
-! Variables to limit the computation of the continuum opacities and 
-! emissivities. 
+! Variables to limit the computation of the continuum opacities and
+! emissivities.
 !
-	REAL(10) EMHNUKT_CONT(ND)
-	REAL(10) ETA_C_EVAL(ND)
-	REAL(10) CHI_C_EVAL(ND)
+	REAL(KIND=LDP) EMHNUKT_CONT(ND)
+	REAL(KIND=LDP) ETA_C_EVAL(ND)
+	REAL(KIND=LDP) CHI_C_EVAL(ND)
 !
 ! 
 !
-	REAL(10) Z_POP(NT)		!Ionic charge for each species
+	REAL(KIND=LDP) Z_POP(NT)		!Ionic charge for each species
 !
 ! Variables etc for computation of continuum in comoving frame.
 !
 	LOGICAL FIRST_FREQ
 	LOGICAL NEW_FREQ
-	REAL(10) dLOG_NU			!Step in frequency in Log plane
-	REAL(10) FEDD_PREV(NDMAX)
-	REAL(10) GEDD_PREV(NDMAX)
-	REAL(10) H_ON_J(NDMAX)
-	REAL(10) N_ON_J_NODE(NDMAX)
-	REAL(10) dlnJdlnR(NDMAX)
-	REAL(10) KMID_ON_J(NDMAX)
-	REAL(10) N_ON_J(NDMAX)
-	REAL(10) N_ON_J_PREV(NDMAX)
-	REAL(10) JNU_PREV(NDMAX)
-	REAL(10) RSQHNU_PREV(NDMAX)
-	REAL(10) GEDD(NDMAX)
-	REAL(10) RSQHNU(NDMAX)
-	REAL(10) CHI_PREV(ND)
-	REAL(10) ETA_PREV(ND)
-	REAL(10) HBC_CMF(3),HBC_PREV(3)
-	REAL(10) NBC_CMF(3),NBC_PREV(3),INBC_PREV
-	REAL(10) HFLUX_AT_IB,HFLUX_AT_OB
+	REAL(KIND=LDP) dLOG_NU			!Step in frequency in Log plane
+	REAL(KIND=LDP) FEDD_PREV(NDMAX)
+	REAL(KIND=LDP) GEDD_PREV(NDMAX)
+	REAL(KIND=LDP) H_ON_J(NDMAX)
+	REAL(KIND=LDP) N_ON_J_NODE(NDMAX)
+	REAL(KIND=LDP) dlnJdlnR(NDMAX)
+	REAL(KIND=LDP) KMID_ON_J(NDMAX)
+	REAL(KIND=LDP) N_ON_J(NDMAX)
+	REAL(KIND=LDP) N_ON_J_PREV(NDMAX)
+	REAL(KIND=LDP) JNU_PREV(NDMAX)
+	REAL(KIND=LDP) RSQHNU_PREV(NDMAX)
+	REAL(KIND=LDP) GEDD(NDMAX)
+	REAL(KIND=LDP) RSQHNU(NDMAX)
+	REAL(KIND=LDP) CHI_PREV(ND)
+	REAL(KIND=LDP) ETA_PREV(ND)
+	REAL(KIND=LDP) HBC_CMF(3),HBC_PREV(3)
+	REAL(KIND=LDP) NBC_CMF(3),NBC_PREV(3),INBC_PREV
+	REAL(KIND=LDP) HFLUX_AT_IB,HFLUX_AT_OB
 !
 ! Quadrature weights.
-	REAL(10) AQW(ND,NP)		!Angular quad. weights. (indep. of v)
-	REAL(10) HQW(ND,NP)		!Angular quad. weights. (indep. of v) for flux integration.
-	REAL(10) KQW(ND,NP)		!Angular quad. weights for K integration.
-	REAL(10) NQW(ND,NP)		!Angular quad. weights. (indep. of v) for N integration.
-	REAL(10) HMIDQW(ND,NP)		!Angular quad. weights. (indep. of v)
+	REAL(KIND=LDP) AQW(ND,NP)		!Angular quad. weights. (indep. of v)
+	REAL(KIND=LDP) HQW(ND,NP)		!Angular quad. weights. (indep. of v) for flux integration.
+	REAL(KIND=LDP) KQW(ND,NP)		!Angular quad. weights for K integration.
+	REAL(KIND=LDP) NQW(ND,NP)		!Angular quad. weights. (indep. of v) for N integration.
+	REAL(KIND=LDP) HMIDQW(ND,NP)		!Angular quad. weights. (indep. of v)
                                         !for flux integration. Defined at the
                                         !mid points of the radius mesh.
-	REAL(10) NMIDQW(ND,NP)		!Angular quad. weights. (indep. of v)
+	REAL(KIND=LDP) NMIDQW(ND,NP)		!Angular quad. weights. (indep. of v)
                                         !for N integration. Defined at the
                                         !mid points of the radius mesh.
 !
 ! Continuum matrices
-	REAL(10) WM(ND,ND)		!Coef. matrix of J & %J vector
-	REAL(10) FB(ND,ND)		!Coef. of J & %J vects in angular equ.
+	REAL(KIND=LDP) WM(ND,ND)		!Coef. matrix of J & %J vector
+	REAL(KIND=LDP) FB(ND,ND)		!Coef. of J & %J vects in angular equ.
 !
 ! Transfer equation vectors
-	REAL(10) TA(NDMAX)
-	REAL(10) TB(NDMAX)
-	REAL(10) TC(NDMAX)
-	REAL(10) XM(NDMAX)		!R.H.S. (SOURCE VECTOR)
-	REAL(10) TCHI(ND)
+	REAL(KIND=LDP) TA(NDMAX)
+	REAL(KIND=LDP) TB(NDMAX)
+	REAL(KIND=LDP) TC(NDMAX)
+	REAL(KIND=LDP) XM(NDMAX)		!R.H.S. (SOURCE VECTOR)
+	REAL(KIND=LDP) TCHI(ND)
 !
 ! 
 !
@@ -319,8 +320,8 @@
 ! using Eddington factors. This is separate to the "inclusion of
 ! additional points".
 !
-	REAL(10) FEDD(NDMAX)
-	REAL(10) QEDD(NDMAX)
+	REAL(KIND=LDP) FEDD(NDMAX)
+	REAL(KIND=LDP) QEDD(NDMAX)
 !
 	LOGICAL MID
 	LOGICAL FIRST
@@ -329,14 +330,14 @@
 	LOGICAL LAMBDA_ITERATION
 	LOGICAL LST_ITERATION
 	LOGICAL LST_DEPTH_ONLY
-! 
+!
 !
 !
 ! X-ray variables.
 !
-	REAL(10) FILL_VEC_SQ(ND)
-	REAL(10) XRAY_LUM(ND)
-	REAL(10) GFF,XCROSS_V2
+	REAL(KIND=LDP) FILL_VEC_SQ(ND)
+	REAL(KIND=LDP) XRAY_LUM(ND)
+	REAL(KIND=LDP) GFF,XCROSS_V2
 	EXTERNAL GFF,XCROSS_V2
 !
 !
@@ -348,63 +349,63 @@
 !
 	INTEGER NDEXT,NCEXT,NPEXT
 	INTEGER INDX(NDMAX),POS_IN_NEW_GRID(ND)
-	REAL(10) COEF(0:3,NDMAX)
-	REAL(10) INBC,HBC_J,HBC_S			!Bound. Cond. for JFEAU
+	REAL(KIND=LDP) COEF(0:3,NDMAX)
+	REAL(KIND=LDP) INBC,HBC_J,HBC_S			!Bound. Cond. for JFEAU
 !
-	REAL(10) REXT(NDMAX),PEXT(NPMAX),VEXT(NDMAX),LANG_COORDEXT(NDMAX)
-	REAL(10) TEXT(NDMAX),SIGMAEXT(NDMAX)
-	REAL(10) CHIEXT(NDMAX),ESECEXT(NDMAX),ETAEXT(NDMAX)
-	REAL(10) CHI_RAY_EXT(NDMAX),CHI_SCAT_EXT(NDMAX)
-	REAL(10) ZETAEXT(NDMAX),THETAEXT(NDMAX)
-	REAL(10) RJEXT(NDMAX),RJEXT_ES(NDMAX)
-	REAL(10) FOLD(NDMAX),FEXT(NDMAX),QEXT(NDMAX),SOURCEEXT(NDMAX)
-	REAL(10) VDOP_VEC_EXT(NDMAX)
+	REAL(KIND=LDP) REXT(NDMAX),PEXT(NPMAX),VEXT(NDMAX),LANG_COORDEXT(NDMAX)
+	REAL(KIND=LDP) TEXT(NDMAX),SIGMAEXT(NDMAX)
+	REAL(KIND=LDP) CHIEXT(NDMAX),ESECEXT(NDMAX),ETAEXT(NDMAX)
+	REAL(KIND=LDP) CHI_RAY_EXT(NDMAX),CHI_SCAT_EXT(NDMAX)
+	REAL(KIND=LDP) ZETAEXT(NDMAX),THETAEXT(NDMAX)
+	REAL(KIND=LDP) RJEXT(NDMAX),RJEXT_ES(NDMAX)
+	REAL(KIND=LDP) FOLD(NDMAX),FEXT(NDMAX),QEXT(NDMAX),SOURCEEXT(NDMAX)
+	REAL(KIND=LDP) VDOP_VEC_EXT(NDMAX)
 !
 !
-	REAL(10) F2DAEXT(NDMAX,NDMAX)     !These arrays don't need to be
+	REAL(KIND=LDP) F2DAEXT(NDMAX,NDMAX)     !These arrays don't need to be
 !
 ! If required, these arrays shoukd have size NDEXT*NPEXT
 !
-	REAL(10), ALLOCATABLE :: AQWEXT(:,:)	!Angular quad. weights. (indep. of v)
-	REAL(10), ALLOCATABLE :: HQWEXT(:,:)	!Angular quad. weights for flux integration.
-	REAL(10), ALLOCATABLE :: KQWEXT(:,:)	!Angular quad. weights for K integration.
-	REAL(10), ALLOCATABLE :: NQWEXT(:,:)	!Angular quad. weights for N integration.
-	REAL(10), ALLOCATABLE :: HMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
-	REAL(10), ALLOCATABLE :: NMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
+	REAL(KIND=LDP), ALLOCATABLE :: AQWEXT(:,:)	!Angular quad. weights. (indep. of v)
+	REAL(KIND=LDP), ALLOCATABLE :: HQWEXT(:,:)	!Angular quad. weights for flux integration.
+	REAL(KIND=LDP), ALLOCATABLE :: KQWEXT(:,:)	!Angular quad. weights for K integration.
+	REAL(KIND=LDP), ALLOCATABLE :: NQWEXT(:,:)	!Angular quad. weights for N integration.
+	REAL(KIND=LDP), ALLOCATABLE :: HMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
+	REAL(KIND=LDP), ALLOCATABLE :: NMIDQWEXT(:,:)	!Angular quad. weights for flux integration.
 !
 ! Arrays for calculating mean opacities.
 !
-	REAL(10) FLUXMEAN(ND) 		!Flux mean opacity
-	REAL(10) LINE_FLUXMEAN(ND) 	!Flux mean opacity due to lines.
-	REAL(10) ROSSMEAN(ND)  		!Rosseland mean opacity
-	REAL(10) PLANCKMEAN(ND)  	!Planck mean opacity
-	REAL(10) INT_dBdT(ND)  		!Integral of dB/dT over nu (to calculate ROSSMEAN)
-	REAL(10) FORCE_MULT(ND)
-	REAL(10) NU_FORCE
-	REAL(10) NU_FORCE_FAC
+	REAL(KIND=LDP) FLUXMEAN(ND) 		!Flux mean opacity
+	REAL(KIND=LDP) LINE_FLUXMEAN(ND) 	!Flux mean opacity due to lines.
+	REAL(KIND=LDP) ROSSMEAN(ND)  		!Rosseland mean opacity
+	REAL(KIND=LDP) PLANCKMEAN(ND)  	!Planck mean opacity
+	REAL(KIND=LDP) INT_dBdT(ND)  		!Integral of dB/dT over nu (to calculate ROSSMEAN)
+	REAL(KIND=LDP) FORCE_MULT(ND)
+	REAL(KIND=LDP) NU_FORCE
+	REAL(KIND=LDP) NU_FORCE_FAC
 	INTEGER N_FORCE
 	INTEGER ML_FORCE
 	LOGICAL TMP_LOG
 !
 ! Other arrays
-	REAL(10) Z(NDMAX)			!Z displacement along a given array
-	REAL(10) EMHNUKT(ND)		!EXP(-hv/kT)
-	REAL(10) RLUMST(ND)		!Luminosity as a function of depth
-	REAL(10) J_INT(ND)		!Frequency integrated J
-	REAL(10) K_INT(ND)		!Frequency integrated K
-	REAL(10) K_MOM(ND)		!Frequency dependent K moment
-	REAL(10) SOB(ND)   	    	!Used in computing continuum flux
-	REAL(10) RJ(ND)			!Mean intensity
-	REAL(10) RJ_ES(ND)		!Convolution of RJ with e.s. R(v'v')
+	REAL(KIND=LDP) Z(NDMAX)			!Z displacement along a given array
+	REAL(KIND=LDP) EMHNUKT(ND)		!EXP(-hv/kT)
+	REAL(KIND=LDP) RLUMST(ND)		!Luminosity as a function of depth
+	REAL(KIND=LDP) J_INT(ND)		!Frequency integrated J
+	REAL(KIND=LDP) K_INT(ND)		!Frequency integrated K
+	REAL(KIND=LDP) K_MOM(ND)		!Frequency dependent K moment
+	REAL(KIND=LDP) SOB(ND)   	    	!Used in computing continuum flux
+	REAL(KIND=LDP) RJ(ND)			!Mean intensity
+	REAL(KIND=LDP) RJ_ES(ND)		!Convolution of RJ with e.s. R(v'v')
 !
 ! Line variables.
 !
-	REAL(10) VAL_DO_NG
-	REAL(10) RP
-	REAL(10) VINF
-	REAL(10) VTURB_VEC(ND)
-	REAL(10) VDOP_VEC(ND)
-	REAL(10) MAX_DEL_V_RES_ZONE(ND)
+	REAL(KIND=LDP) VAL_DO_NG
+	REAL(KIND=LDP) RP
+	REAL(KIND=LDP) VINF
+	REAL(KIND=LDP) VTURB_VEC(ND)
+	REAL(KIND=LDP) VDOP_VEC(ND)
+	REAL(KIND=LDP) MAX_DEL_V_RES_ZONE(ND)
 !
 ! Parameters, vectors, and arrays for computing the observed flux.
 !
@@ -412,20 +413,20 @@
 	INTEGER NP_OBS_MAX
 	INTEGER NP_OBS
 	INTEGER NC_OBS
-	REAL(10)  NU_STORE(NST_CMF)
-	REAL(10) V_AT_RMAX		!Used if we extend the atmosphere.
-	REAL(10) RMAX_OBS
-	REAL(10) H_OUT,H_IN
+	REAL(KIND=LDP)  NU_STORE(NST_CMF)
+	REAL(KIND=LDP) V_AT_RMAX		!Used if we extend the atmosphere.
+	REAL(KIND=LDP) RMAX_OBS
+	REAL(KIND=LDP) H_OUT,H_IN
 !
 ! We allocate memory for the following vectors as we use them for the regular
 ! flux computation, and when extra depth points are inserted (ACCURATE=.TRUE.)
 !
-	REAL(10), ALLOCATABLE :: IPLUS_STORE(:,:)
-	REAL(10), ALLOCATABLE :: P_OBS(:)
-	REAL(10), ALLOCATABLE :: IPLUS(:)
-	REAL(10), ALLOCATABLE :: MU_AT_RMAX(:)
-	REAL(10), ALLOCATABLE :: dMU_AT_RMAX(:)
-	REAL(10), ALLOCATABLE :: HQW_AT_RMAX(:)
+	REAL(KIND=LDP), ALLOCATABLE :: IPLUS_STORE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: P_OBS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: IPLUS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: MU_AT_RMAX(:)
+	REAL(KIND=LDP), ALLOCATABLE :: dMU_AT_RMAX(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HQW_AT_RMAX(:)
 !
 ! Supercedes OBS
 !
@@ -438,14 +439,14 @@
 ! They are the He2 ege, NIII/CIII egde, HeI, HI, HI(N=2).
 !
 	INTEGER, PARAMETER :: N_TAU_EDGE=5
-	REAL(10) TAU_EDGE(N_TAU_EDGE)
+	REAL(KIND=LDP) TAU_EDGE(N_TAU_EDGE)
 	DATA TAU_EDGE/13.16D0,11.60D0,5.95D0,3.29D0,0.83D0/
 !
 !
 ! Check whether EQUATION LABELLING is consistent. ' I ' is used as the
-! number of the current equation. We also set the variable SPEC_PRES which 
+! number of the current equation. We also set the variable SPEC_PRES which
 ! indicates whether at least one ioization stage of a species is present.
-! It is used to determine, foe example,  whether a number conservation 
+! It is used to determine, foe example,  whether a number conservation
 ! equation is required.
 !
 !
@@ -489,12 +490,12 @@
 	TSTAR=T(ND)
 	C_KMS=SPEED_OF_LIGHT()/1.0D+05
 	DO_REL_IN_OBSFRAME=.FALSE.
-	DA_FILE_DATE='20-Aug-2003' 
+	DA_FILE_DATE='20-Aug-2003'
 !
 	CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
 !
 ! MAXCH and VAL_DO_NG are set so that they defined for the TEST in
-! COMP_JCONT_V?.INC whether to do an accurate flux calculation. An 
+! COMP_JCONT_V?.INC whether to do an accurate flux calculation. An
 ! accurate flux calculation can be avoided by doing a LAMBDA iteration.
 !
 	MAXCH=0.0D0
@@ -509,14 +510,14 @@
 	1                       ATM(ID)%NXzV, NT, ATM(ID)%XzV_PRES)
 	END DO
 !
-! Store atomic masses in vector of LENGTH NT for later use by line 
+! Store atomic masses in vector of LENGTH NT for later use by line
 ! calculations. G_ALL and LEVEL_ID  are no longer used due to the use
 ! of super levels.
 !
 	AMASS_ALL(1:NT)=0.0D0
 !
 ! We also set the mass of the ion corresponding to XzV to AT_MASS for each
-! species . Thus the range is EQXzV:EQXzV+NXzV, NOT EQXzV:EQXzV+NXzV-1. Note 
+! species . Thus the range is EQXzV:EQXzV+NXzV, NOT EQXzV:EQXzV+NXzV-1. Note
 ! that HeIII_PRES is always false, even when HeI and HeII are both present.
 !
 	DO ID=1,NUM_IONS
@@ -589,14 +590,14 @@
 ! corresponding to NUM_IONS contains only 1 level and is done with NUM_IONS-1
 !
 	  DO ID=NUM_IONS-1,1,-1
-	    CALL FULL_TO_SUP( 
+	    CALL FULL_TO_SUP(
 	1        ATM(ID)%XzV,        ATM(ID)%NXzV,   ATM(ID)%DXzV,
 	1        ATM(ID)%XzV_PRES,   ATM(ID)%XzV_F,
 	1        ATM(ID)%F_TO_S_XzV, ATM(ID)%NXzV_F, ATM(ID)%DXzV_F,
 	1        ATM(ID+1)%XzV,      ATM(ID+1)%NXzV, ATM(ID+1)%XzV_PRES, ND)
 	  END DO
 !
-! Store all quantities in POPS array. 
+! Store all quantities in POPS array.
 !
 	  DO ID=1,NUM_IONS
 	    CALL IONTOPOP(POPS, ATM(ID)%XzV,        ATM(ID)%DXzV,  ED,T,
@@ -658,7 +659,7 @@
 ! work array - okay since of length NCF_MAX, and zeroed in QUADSE.
 ! OBSF contains the bound-free edges - its contents are zero on
 ! subroutine exit. J is used as temporary variable for the number of
-! frequencies transmitted to SET_CONT_FREQ. NCF is returned as the number 
+! frequencies transmitted to SET_CONT_FREQ. NCF is returned as the number
 ! of frequency points. FQW is used a an integer array for the sorting ---
 ! we know it has the correct length since it is the same size as NU.
 ! LUIN --- Used as temporary LU (opened and closed).
@@ -676,9 +677,9 @@
 	1                        dV_LEV_DIS,AMP_DIS,MIN_FREQ_LEV_DIS,
 	1                        DELV_CONT,DELV_CONT,T1,
 	1                        J,NCF,NCF_MAX,LUIN)
-!                                             
-!                         
-! 
+!
+! 
+!
 ! Set up lines that will be treated with the continuum calculation.
 ! This section of code is also used by the code treating purely lines
 ! (either single transition Sobolev or CMF, or overlapping Sobolev).
@@ -717,9 +718,9 @@
 	          VEC_FREQ(ML)=ATM(ID)%EDGEXzV_F(MNL)-ATM(ID)%EDGEXzV_F(MNUP)
 	          VEC_SPEC(ML)=ION_ID(ID)
 	          VEC_NL(ML)=NL
-	          VEC_NUP(ML)=NUP     
+	          VEC_NUP(ML)=NUP
 	          VEC_MNL_F(ML)=MNL
-	          VEC_MNUP_F(ML)=MNUP     
+	          VEC_MNUP_F(ML)=MNUP
 	          VEC_OSCIL(ML)=ATM(ID)%AXzV_F(MNL,MNUP)
 	          VEC_EINA(ML)=ATM(ID)%AXzV_F(MNUP,MNL)
 	          VEC_ARAD(ML)= ATM(ID)%ARAD(MNL)+ATM(ID)%ARAD(MNUP)
@@ -784,7 +785,7 @@
 ! 1. Allows use of SOBOLEV approximation in IR where details of radiative
 !    transfer is unimportant. In this case FLUX_CAL_LAM_BEG should be set to zero.
 ! 2. Allows a full flux calculation to be done in a limited wavelength region
-!    as defined by FLUX_CAL_LAM_END and FLUX_CAL_LAM_BEG. 
+!    as defined by FLUX_CAL_LAM_END and FLUX_CAL_LAM_BEG.
 !
 	IF(SET_TRANS_TYPE_BY_LAM)THEN
 	  IF(FLUX_CAL_LAM_END .LT. FLUX_CAL_LAM_BEG)THEN
@@ -836,7 +837,7 @@
 	  CALL GEN_ASCI_OPEN(LUIN,'TRANS_INFO','UNKNOWN',' ','WRITE',I,IOS)
 	    WRITE(LUIN,*)
 	1     '     I    NL_F  NUP_F        Nu',
-	1     '       Lam(A)    /\V(km/s)    Transition' 
+	1     '       Lam(A)    /\V(km/s)    Transition'
 	    WRITE(LUIN,
 	1      '(1X,I6,2(1X,I6),2X,F10.6,2X,F10.3,16X,A)')
 	1         IONE,VEC_MNL_F(1),VEC_MNUP_F(1),
@@ -850,7 +851,7 @@
 	        WRITE(LUIN,'(1X,I6,2(1X,I6),2X,F10.6,2X,F10.3,2X,F10.2,4X,I7,2X,A12,3X,A)')
 	1           ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
 	1           VEC_FREQ(ML),T1,T2,PROF_LIST_LOCATION(ML),PROF_TYPE(ML),TRIM(VEC_TRANS_NAME(VEC_INDX(ML)))
-	      ELSE             
+	      ELSE
 	        WRITE(LUIN,'(1X,I6,2(1X,I6),2X,F10.6,2X,1P,E10.4,0P,2X,F10.2,4X,I7,2X,A12,3X,A)')
 	1           ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
 	1           VEC_FREQ(ML),T1,T2,PROF_LIST_LOCATION(ML),PROF_TYPE(ML),TRIM(VEC_TRANS_NAME(VEC_INDX(ML)))
@@ -862,7 +863,7 @@
 !
 ! Get lines and arrange in numerically decreasing frequency according to
 ! the START frequency of the line. This will allow us to consider line overlap,
-! and to include lines with continuum frequencies so that the can be handled 
+! and to include lines with continuum frequencies so that the can be handled
 ! automatically.
 !
 	CALL INDEXX(N_LINE_FREQ,VEC_STRT_FREQ,VEC_INDX,L_FALSE)
@@ -890,9 +891,9 @@
 ! line we insert them into the continuum frequency set, otherwise the
 ! line is not included.
 !
-	DO ML=1,NCF                                          
+	DO ML=1,NCF
 	  FQW(ML)=NU(ML)	!FQW has temporary storage of continuum freq.
-	END DO                    
+	END DO
 	V_DOP=MINVAL(VEC_VDOP_MIN)
 	CALL INS_LINE_V5(  NU,LINES_THIS_FREQ,I,NCF_MAX,
 	1		  VEC_FREQ,VEC_STRT_FREQ,VEC_VDOP_MIN,VEC_TRANS_TYPE,
@@ -917,13 +918,13 @@
 ! Redefine frequency quadrature weights.
 !
 	CALL SMPTRP(NU,FQW,NCF)
-	DO ML=1,NCF                                           
+	DO ML=1,NCF
 	  FQW(ML)=FQW(ML)*1.0D+15
 	END DO
 !
-! Set observers frequencies. The slight fiddling in setting NU_MAX and NU_MIN 
-! is done so that the CMF frequencies encompass all observers frame 
-! frequencies. This allows computation of all observers fluxes allowing for 
+! Set observers frequencies. The slight fiddling in setting NU_MAX and NU_MIN
+! is done so that the CMF frequencies encompass all observers frame
+! frequencies. This allows computation of all observers fluxes allowing for
 ! velocity effects.
 !
 ! We always insert lines into the observers frame frequencies. This allows
@@ -1053,7 +1054,7 @@
 	    WRITE(LUER,*)'STATUS=',IOS
 	    STOP
 	  END IF
-!	  
+!	
 ! Compute the turbulent velocity and MINIMUM Doppler velocity as a function of depth.
 ! For the later, the iron mass of 55.8amu is assumed.
 !
@@ -1141,7 +1142,7 @@
 	  ID_SAV=ID
 	  CALL SET_TWO_PHOT_V3(TRIM(ION_ID(ID)),ID_SAV,
 	1       ATM(ID)%XzVLTE,         ATM(ID)%NXzV,
-	1       ATM(ID)%XzVLTE_F_ON_S,  ATM(ID)%XzVLEVNAME_F, 
+	1       ATM(ID)%XzVLTE_F_ON_S,  ATM(ID)%XzVLEVNAME_F,
 	1       ATM(ID)%EDGEXzV_F,      ATM(ID)%GXzV_F,
 	1       ATM(ID)%F_TO_S_XzV,     ATM(ID)%NXzV_F,     ND,
 	1       ATM(ID)%ZXzV,           ATM(ID)%EQXzV,      ATM(ID)%XzV_PRES)
@@ -1150,7 +1151,7 @@
 	DTDR=(T(ND)-T(ND-1))/(R(ND-1)-R(ND))
 ! 
 !
-! Decide whether to use an file with old J values to provide an initial 
+! Decide whether to use an file with old J values to provide an initial
 ! estimate of J with incoherent electron scattering. The options
 !
 !             .NOT. RD_COHERENT_ES .AND. COHERENT_ES
@@ -1243,7 +1244,7 @@
 	NU_FORCE_FAC=(1.0D0-500.0D0/C_KMS)
 	ML_FORCE=1
 	FLUSH(LUER)
-!                                                                    
+!
 ! Enter loop for each continuum frequency.
 !
 	CALL TUNE(IONE,'MLCF')
@@ -1270,7 +1271,7 @@
 !
 !
 !  LINES_THIS_FREQ --- Logical vector [NCF] indicating whether this frequency
-!                        is part of the resonance zone (i.e. Doppler profile) of 
+!                        is part of the resonance zone (i.e. Doppler profile) of
 !                        one (or more) lines.
 !
 ! LINE_ST_INDX_IN_NU --- Integer vector [N_LINES] which specifies the starting
@@ -1286,7 +1287,7 @@
 ! LAST_LINE  ---- Integer specifying the index of the lowest frequency
 !                         line which we are taking into account in the
 !                         transfer.
-!                                        
+!
 ! LINE_LOC   ---- Integer array. Used to locate location of a particular line
 !                         in the SIM vectors/arrays.
 !
@@ -1311,7 +1312,7 @@
 	    IF(I .GT. MAX_SIM)THEN
 	      FIRST_LINE=N_LINE_FREQ
 	      DO SIM_INDX=1,MAX_SIM		!Not 0 as used!
-	        FIRST_LINE=MIN(FIRST_LINE,SIM_LINE_POINTER(SIM_INDX)) 
+	        FIRST_LINE=MIN(FIRST_LINE,SIM_LINE_POINTER(SIM_INDX))
 	      END DO
 	      IF( ML .GT. LINE_END_INDX_IN_NU(FIRST_LINE))THEN
 !
@@ -1354,7 +1355,7 @@
 !
 ! Compute U_STAR_RATIO and L_STAR_RATIO which are used to switch from
 ! the opacity/emissivity computed with a FULL_ATOM to an equivalent form
-! but written in terms of the SUPER-LEVELS. 
+! but written in terms of the SUPER-LEVELS.
 !
 ! L refers to the lower level of the transition.
 ! U refers to the upper level of the transition.
@@ -1414,14 +1415,14 @@
 	    END IF
 	  END DO
 !
-! Ensure that LAST_LINE points to the next LINE that is going to be handled 
+! Ensure that LAST_LINE points to the next LINE that is going to be handled
 ! in the BLANKETING portion of the code.
 !
 	  DO WHILE(LAST_LINE .LT. N_LINE_FREQ.AND.
 	1            VEC_TRANS_TYPE(MIN(LAST_LINE+1,N_LINE_FREQ))(1:4) .NE. 'BLAN')
 	       LAST_LINE=LAST_LINE+1
 	  END DO
-!	   
+!	
 	END DO	!Checking whether a  new line is being added.
 	CALL TUNE(ITWO,'ADD_LINE')
 !
@@ -1482,11 +1483,11 @@
 !
 ! Determine which method will be used to compute continuum intensity.
 !
-	  IF(ACCURATE .AND. ALL_FREQ)THEN       
+	  IF(ACCURATE .AND. ALL_FREQ)THEN
 	    THIS_FREQ_EXT=.TRUE.
 	  ELSE IF( ACCURATE .AND. FL .GT. ACC_FREQ_END )THEN
 	    THIS_FREQ_EXT=.TRUE.
-	  ELSE        
+	  ELSE
 	    THIS_FREQ_EXT=.FALSE.
 	  END IF
 !
@@ -1496,9 +1497,9 @@
 	  INCLUDE 'OPACITIES_V5.INC'
 	  CALL TUNE(ITWO,'C_OPAC')
 !
-! Since resonance zones included, we must add the line opacity and 
-! emissivity to the raw continuum values. We first save the pure continuum 
-! opacity and emissivity. These are used in carrying the variation of J from 
+! Since resonance zones included, we must add the line opacity and
+! emissivity to the raw continuum values. We first save the pure continuum
+! opacity and emissivity. These are used in carrying the variation of J from
 ! one frequency to the next.
 !
 	  DO I=1,ND
@@ -1517,7 +1518,7 @@
 	  END DO
 	  CALL TUNE(ITWO,'OP_TOT')
 !
-! CHECK for negative line opacities. We do not distinguish between lines.  
+! CHECK for negative line opacities. We do not distinguish between lines.
 !
 	  AT_LEAST_ONE_NEG_OPAC=.FALSE.
 	  NEG_OPACITY(1:ND)=.FALSE.
@@ -1671,7 +1672,7 @@
 	1           FIRST_OBS_COMP,NP_OBS)
 	   CALL TUNE(2,'COMP_OBS_CMF')
 !
-	ELSE                          
+	ELSE
 	  S1=(ETA(1)+RJ(1)*CHI_SCAT(1))/CHI(1)
 	  CALL MULTVEC(SOURCE,ZETA,THETA,RJ,ND)
 	  CALL NORDFLUX(TA,TB,TC,XM,DTAU,R,Z,P,SOURCE,CHI,THETA,HQW,SOB,
@@ -1700,7 +1701,7 @@
 	  NU_FORCE=NU_FORCE*NU_FORCE_FAC
 	END IF
 !
-! The L_TRUE indicate NEW_MOD and that we will open a new file. 
+! The L_TRUE indicate NEW_MOD and that we will open a new file.
 ! J is used for ACCESS_F.
 !
 	   IF(WRITE_FLUX .AND. ES_COUNTER .EQ. NUM_ES_ITERATIONS)THEN
@@ -1778,14 +1779,14 @@
 !
 ! The current opacities and emissivities are stored for the variation of the
 ! radiation field at the next frequency.
-!                                                  
+!
 	DO I=1,ND
 	  CHI_PREV(I)=CHI_CONT(I)
 	  ETA_PREV(I)=ETA_CONT(I)
 	END DO
 !
-! Store opacities and emissivities for use in observer's frame 
-! calculation. 
+! Store opacities and emissivities for use in observer's frame
+! calculation.
 !
 	IF(ES_COUNTER .EQ. 1)THEN
 	  IF(INCL_RAY_SCAT)RAY_CMF_ST(1:ND,ML)=CHI_RAY(1:ND)
@@ -1800,7 +1801,7 @@
 !
 ! NB: We use K here, rather than ACCESS_F, so that we don't corrupt EDDFACTOR if
 !      evaluate EW is set to TRUE.
-! 
+!
 	IF(WRITE_ETA_AND_CHI .AND. (ES_COUNTER .EQ. NUM_ES_ITERATIONS .OR. .NOT. COMPUTE_J))THEN
 	  CALL GET_LU(J,'ETA_DATA write')
 	  CALL OPEN_RW_EDDFACTOR(R,V,LANG_COORD,ND,
@@ -1913,7 +1914,7 @@
         I=1; CALL WRITE_J_CMF_ERR(I)
 !
 ! Compute ROSSELAND and FLUX mean opacities. Compute the respective
-! optical depth scales; TA for the FLUX mean optical depth scale, 
+! optical depth scales; TA for the FLUX mean optical depth scale,
 ! and TB for the ROSSELAND mean optical depth scale.
 !
 ! T1=4 * [STEFAN BOLTZMAN CONS] * 1.0D+16 / pi
@@ -2024,7 +2025,7 @@
 ! ***************************************************************************
 ! ***************************************************************************
 !
-! Determine the number of points inserted along each ray via 
+! Determine the number of points inserted along each ray via
 ! MAX_DEL_V_RES_ZONE.
 !
 	DO I=1,ND
@@ -2194,7 +2195,7 @@
 	END IF
 !
 ! Determine next line (or lines), and store line parameters (eg frequency,
-! Einstein A coefficient etc) in appropriate locations for the subsequent 
+! Einstein A coefficient etc) in appropriate locations for the subsequent
 ! treatment of line.
 !
 ! The temporary variable J [=MAX(N_LINE_FREQ,LINE_INDX+SIM_INDX) ] is used so that
@@ -2205,8 +2206,8 @@
 	J=LINE_INDX
 	SOBOLEV=.TRUE.
 	DO WHILE( LINE_INDX+SIM_INDX .LE. NUM_SOB_LINES .AND.
-	1      (VEC_FREQ(LINE_INDX)-VEC_FREQ(J))/VEC_FREQ(LINE_INDX) 
-	1          .LE. OVER_FREQ_DIF 
+	1      (VEC_FREQ(LINE_INDX)-VEC_FREQ(J))/VEC_FREQ(LINE_INDX)
+	1          .LE. OVER_FREQ_DIF
 	1          .AND. SIM_INDX .LT. TMP_MAX_SIM )
 	  SIM_INDX=SIM_INDX+1
 	  K=LINE_INDX+SIM_INDX-1
@@ -2246,7 +2247,7 @@
 ! 
 ! Compute U_STAR_RATIO and L_STAR_RATIO which are used to switch from
 ! the opacity/emissivity computed with a FULL_ATOM to an equivalent form
-! but written in terms of the SUPER-LEVELS. 
+! but written in terms of the SUPER-LEVELS.
 !
 ! L refers to the lower level of the transition.
 ! U refers to the upper level of the transition.
@@ -2285,7 +2286,7 @@
 	  END DO
 	END DO
 !
-! Compute line opacity and emissivity. 
+! Compute line opacity and emissivity.
 !
 	DO SIM_INDX=1,NUM_SIM_LINES
 	  T1=OSCIL(SIM_INDX)*OPLIN
@@ -2329,7 +2330,7 @@
 	END DO
 !
 ! AT present overlapping lines in the CMF frame is not installed. We still
-! use CHIL and ETAL --- not CHIL_MAT etc. 
+! use CHIL and ETAL --- not CHIL_MAT etc.
 !
 	IF(SOBOLEV .OR. NUM_SIM_LINES .EQ. 1)THEN
 	  DO I=1,ND

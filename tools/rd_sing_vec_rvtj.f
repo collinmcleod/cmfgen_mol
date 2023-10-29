@@ -1,15 +1,16 @@
 !
 ! Routine to read a single double precisions vector, of length ND, from RVTJ
 ! or a similarly formatted file. KEY is used to locate the required vector.
-! If the read fails, a non-zero value of IOS is returned. 
+! If the read fails, a non-zero value of IOS is returned.
 !
 	SUBROUTINE RD_SING_VEC_RVTJ(XV,ND,KEY,FILE_NAME,LU,IOS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER ND
 	INTEGER IOS
 	INTEGER LU
-	REAL(10) XV(ND)
+	REAL(KIND=LDP) XV(ND)
 	CHARACTER(LEN=*) FILE_NAME,KEY
 !
 	INTEGER I

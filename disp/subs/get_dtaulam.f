@@ -1,5 +1,5 @@
 C
-C Subroutine to compute the derivative of DTAU(I) with respect to 
+C Subroutine to compute the derivative of DTAU(I) with respect to
 C CHI(I) AND CHI(K). Routine is to be used only when computing the
 C diagonal LAMBDA operator, and is not a general linearization
 C routine. Only the required subset of the derivatives are computed.
@@ -12,6 +12,7 @@ C	            C(I)=d(dChIdr)/d[CHI(I+1)]  "  "
 C are contained in module MOD_TRAP_DERIVATIVES.
 C
 	SUBROUTINE GET_DTAULAM(WA,WB,R,Z,NI)
+	USE SET_KIND_MODULE
 	USE MOD_TRAP_DERIVATIVES
 	IMPLICIT NONE
 C
@@ -20,10 +21,10 @@ C                        TRAPDERIVATIVES. Same variable names (A, B and C).
 C Created 04-May-1989.
 C
 	INTEGER NI
-	REAL(10) WA(NI),WB(NI),Z(NI),R(NI)
+	REAL(KIND=LDP) WA(NI),WB(NI),Z(NI),R(NI)
 C
 	INTEGER I,K
-	REAL(10) ALPHA
+	REAL(KIND=LDP) ALPHA
 C
 	DO I=1,NI
 	  WA(I)=0.0D0

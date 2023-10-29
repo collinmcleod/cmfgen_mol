@@ -3,6 +3,7 @@
 ! Data vectors are also initialized.
 !
 	SUBROUTINE INIT_PROF_MODULE(ND,NLINES,NFREQ)
+	USE SET_KIND_MODULE
 	USE PROF_MOD
 	IMPLICIT NONE
 !
@@ -15,8 +16,8 @@
 !
 	INTEGER IOS
 	INTEGER ERROR_LU
-	REAL(10) SPEED_OF_LIGHT
-	REAL(10) FUN_PI
+	REAL(KIND=LDP) SPEED_OF_LIGHT
+	REAL(KIND=LDP) FUN_PI
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
 ! Memory allocation. This should not be a problem, unless no more

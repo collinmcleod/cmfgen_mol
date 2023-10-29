@@ -1,13 +1,14 @@
 	SUBROUTINE GET_RAD_DECAY_ENERGY(E_RAD_DECAY,ND)
+	USE SET_KIND_MODULE
 	USE NUC_ISO_MOD
-	USE SHOCK_POWER_MOD 
+	USE SHOCK_POWER_MOD
 	IMPLICIT NONE
 !
 ! Altered: 17-Nov-2022: Check that SHOCK_POWER is allocated.
 ! Altered: 14-Aug-2022: Include SHOCK_POWER -- based on LUC.
 !
 	INTEGER ND
-	REAL(10) E_RAD_DECAY(ND)
+	REAL(KIND=LDP) E_RAD_DECAY(ND)
 !
 ! No need for IF statement at present, since SHOCK_POWER will be zero
 !          if unimportant.

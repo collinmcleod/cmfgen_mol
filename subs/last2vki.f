@@ -3,14 +3,15 @@ C Subroutine to compute the variation in intensity with opacity
 C for rays with only one or two points.
 C
 	SUBROUTINE LAST2VKI(VK,SOURCE,CHI,DTAU,Z,TOR,NI)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 -EXP replaced bu EXP
 C Altered 13-Apr-1988 - Bug fix.
 C
 	INTEGER NI
-	REAL(10) VK(NI,NI),SOURCE(NI),CHI(NI),DTAU(NI),Z(NI)
-	REAL(10) E1,E2,E3,DE1,DE2,DE3,TOR,T1,U2
+	REAL(KIND=LDP) VK(NI,NI),SOURCE(NI),CHI(NI),DTAU(NI),Z(NI)
+	REAL(KIND=LDP) E1,E2,E3,DE1,DE2,DE3,TOR,T1,U2
 C
 C The incident intensity is assumed to be SOURCE(1)*(1.0-EXP(-TOR)).
 C

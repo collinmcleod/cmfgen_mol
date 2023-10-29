@@ -1,10 +1,11 @@
       SUBROUTINE GRIEM(PR,DWS,NWS,ED_IN,TEMP_IN,IL,IU,ZZ,AMASS,VDOP)
+	USE SET_KIND_MODULE
       IMPLICIT REAL(10) (A-H,O-Z)
-C 
+C
 C Create a profile table using the griem theory as used by A and M
 C in their AP J S24 paper.
-C 
-C NWS is the number of wvaelengths profile is to be computed at. 
+C
+C NWS is the number of wvaelengths profile is to be computed at.
 C
       DIMENSION DWS(NWS),PR(NWS)
       COMMON /GRIEM_COM/ SS(109),SX(109),AS,PS,ODOP,NS
@@ -68,7 +69,7 @@ C
 C Doppler width (A) (old expression was TCON*SRT). 10^10 arrises as we need
 C to convert VDOP from km/s to cm/s.
 C
-      DOP=WAVE*SQRT( 2.0E0*CBOLTZ*TT/(AMASS*AMU) + 
+      DOP=WAVE*SQRT( 2.0E0*CBOLTZ*TT/(AMASS*AMU) +
 	1               1.0D+10*VDOP*VDOP )/VLIGHT
       ODOP=1.0E0/DOP
 C
@@ -157,10 +158,11 @@ C
 C 
 C
       FUNCTION DCONV(DLAM)
+	USE SET_KIND_MODULE
       IMPLICIT REAL(10) (A-H,O-Z)
-C 
+C
 C Convolution of gaussian profile with S function  6 AUG 77
-C 
+C
       COMMON /GRIEM_COM/ SS(109),SX(109),AS,PS,ODOP,NS
       DIMENSION X(109),ERX(109),EX(109)
       DATA HALF/0.5E0/, ZERO/0.0E0/, SRTPI/5.6418958E-1/
@@ -207,6 +209,7 @@ C BY S SEGMENT
       RETURN
       END
       FUNCTION TBG(BET,GAM)
+	USE SET_KIND_MODULE
       IMPLICIT REAL(10) (A-H,O-Z)
       DATA PI/3.14159265358979  /
       IF(GAM.GT.1.E-2) GOTO 10
@@ -226,6 +229,7 @@ C
 C 
 C
       FUNCTION TG(BET,GAM)
+	USE SET_KIND_MODULE
       IMPLICIT REAL(10) (A-H,O-Z)
       DATA C4,C5,C6/1.5  ,3.4636008E1,-1.3253986E2/
       DATA PI2/1.57079632679489  /
@@ -288,6 +292,7 @@ C
 C 
 C
       FUNCTION TF(B,G)
+	USE SET_KIND_MODULE
       IMPLICIT REAL(10) (A-H,O-Z)
       DATA C0,C1,C2,C3/1.0007744E-1,4.93208719E-3,-7.09873526E-3,
      . 7.11559325E-4/
@@ -305,6 +310,7 @@ C
 C 
 C
       FUNCTION TH(X)
+	USE SET_KIND_MODULE
       IMPLICIT REAL(10) (A-H,O-Z)
 C GRIEM MICROFIELD FUDGE - NORMALIZED TO UNIT B INTEGRAL
       DATA C0,C1,C2,C3/1.0007744E-1,4.93208719E-3,-7.09873526E-3,
@@ -323,6 +329,7 @@ C
 C 
 C
       FUNCTION ASINT(X0,X1,DB)
+	USE SET_KIND_MODULE
       IMPLICIT REAL(10) (A-H,O-Z)
 C
 C Integral over asymtotic region by SIMPSONS rule.
@@ -351,6 +358,7 @@ C
 C 
 C
       FUNCTION DOPLER(X)
+	USE SET_KIND_MODULE
       IMPLICIT REAL(10) (A-H,O-Z)
       SQ=X*X
       IF(SQ.GT.64.) THEN
@@ -366,6 +374,7 @@ C
 C Error function.
 C
       FUNCTION ERR(X)
+	USE SET_KIND_MODULE
       IMPLICIT REAL(10) (A-H,O-Z)
       ONE=1.0D0
       T=ABS(X)

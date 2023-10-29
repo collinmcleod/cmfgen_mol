@@ -2,26 +2,27 @@
 ! This routine was developed to be self-contained with pgplot.
 ! It is based on $cmfdisp/spec_plt/subs/smear_v2.f and
 !                $cmfdisp/spec_plt/subs/uvabs_v2.fi .
-! that were originally developed by Jim Herald. Unnecessary 
+! that were originally developed by Jim Herald. Unnecessary
 ! routines were deleted, and FFT option was removed.
 ! Calls to tune were also deleted.
 !
 ! Created 22-MAr-2023
 !
 	MODULE MOD_SMEAR_PG
+	USE SET_KIND_MODULE
 	  PUBLIC SMEAR_V3_PG
 	  PRIVATE nonfftconvolve,fillresponse, fill_rot_response, linearize_v2,
 	1         nu_to_lambda, lambda_to_lnlambda, map, map2, gauss,
-	1         log2, larger_index , smaller_index 
+	1         log2, larger_index , smaller_index
 
 !       physical constants
 
-	REAL(10), parameter :: c_kms=2.99792458d5            !km/s
-	REAL(10), parameter :: jimpi=3.141592653589793d0
-	REAL(10), parameter :: zero=0d0
-	REAL(10), parameter :: one=1d0
-	REAL(10), parameter :: two=2d0
-	REAL(10), parameter :: onehalf=0.5d0
+	REAL(KIND=LDP), parameter :: c_kms=2.99792458d5            !km/s
+	REAL(KIND=LDP), parameter :: jimpi=3.141592653589793d0
+	REAL(KIND=LDP), parameter :: zero=0d0
+	REAL(KIND=LDP), parameter :: one=1d0
+	REAL(KIND=LDP), parameter :: two=2d0
+	REAL(KIND=LDP), parameter :: onehalf=0.5d0
 !
 	integer, parameter :: izero=0
 	integer, parameter :: ione=1
@@ -37,15 +38,15 @@
 ! Subroutine to convolve data down to a given resolution.
 ! Three main options are available?
 !
-! (1) Smooth to fixed resolution dLAM (=inst_res) over the indicated passband. 
+! (1) Smooth to fixed resolution dLAM (=inst_res) over the indicated passband.
 !        Smoothing is done in wavelength plane.
 ! (2) Smooth so that Lambda/dLam (=Resolution) is fixed over the indicated
 !       pasband. Smoothing is done in the log-wavelength plane, since smoothing
 !       function is then independent of wavelngth.
 ! (3) Perform a crude rotational broadening with 2 free parameters --- VSINI
 !       and a limb darkening parameter EPSILON. This is similar to (2) in that
-!       Lambda/dLam is fixed over the indicated pasband. Smoothing is done in 
-!       the log-wavelngth plane, since smoothing function is then independent 
+!       Lambda/dLam is fixed over the indicated pasband. Smoothing is done in
+!       the log-wavelngth plane, since smoothing function is then independent
 !       of wavelngth.
 !
 ! NB: dLAM is interpreted as the FWHM of the instrumental gaussian profile in
@@ -55,6 +56,7 @@
 	1                wave_max,wave_min,
 	1                inst_res,resolution,vsini,epsilon,
 	1                min_res_kms,num_res)
+	USE SET_KIND_MODULE
 !
 	implicit none
 !
@@ -64,32 +66,32 @@
 !               Rotation option installed.
 !
 	integer Norig
-	REAL(10) origwave(Norig),origflux(Norig)
-	REAL(10) wave_max,wave_min
-	REAL(10) inst_res     	! the instrumental resolution (dlambda)
-	REAL(10) Resolution   	! resolving power (R = lambda/dlambda)
-	REAL(10) min_res_kms  	! minimum resolution to work with
-	REAL(10) num_res      	! num resolution elements to consider beyond
+	REAL(KIND=LDP) origwave(Norig),origflux(Norig)
+	REAL(KIND=LDP) wave_max,wave_min
+	REAL(KIND=LDP) inst_res     	! the instrumental resolution (dlambda)
+	REAL(KIND=LDP) Resolution   	! resolving power (R = lambda/dlambda)
+	REAL(KIND=LDP) min_res_kms  	! minimum resolution to work with
+	REAL(KIND=LDP) num_res      	! num resolution elements to consider beyond
                             	! wavelength range.
-	REAL(10) vsini		! Projected rotational velocity in km/s
-	REAL(10) epsilon		! Limb darkenin parameter: 
+	REAL(KIND=LDP) vsini		! Projected rotational velocity in km/s
+	REAL(KIND=LDP) epsilon		! Limb darkenin parameter:
 	                        !         I/I(o)=1 - epsilon + epsilon mu
 !
-	REAL(10) origfreq(Norig)
-	REAL(10), allocatable :: modwave(:)
-	REAL(10), allocatable :: modflux(:)
-	REAL(10), allocatable :: tempwave(:)
-	REAL(10), allocatable :: tempflux(:)
+	REAL(KIND=LDP) origfreq(Norig)
+	REAL(KIND=LDP), allocatable :: modwave(:)
+	REAL(KIND=LDP), allocatable :: modflux(:)
+	REAL(KIND=LDP), allocatable :: tempwave(:)
+	REAL(KIND=LDP), allocatable :: tempflux(:)
 !
 	integer Nmod
 	integer Ntmp
-	REAL(10) cwave_max,cwave_min
-	REAL(10) model_res    ! the model resolution
-	REAL(10) min_dlam     ! the model resolution
-	REAL(10) kernal_sig   ! the corresponding sigma (fwhm = 2.354sig)
-	REAL(10) extend       ! wavelength extension to consider
+	REAL(KIND=LDP) cwave_max,cwave_min
+	REAL(KIND=LDP) model_res    ! the model resolution
+	REAL(KIND=LDP) min_dlam     ! the model resolution
+	REAL(KIND=LDP) kernal_sig   ! the corresponding sigma (fwhm = 2.354sig)
+	REAL(KIND=LDP) extend       ! wavelength extension to consider
                             ! in convolution
-	REAL(10) t1
+	REAL(KIND=LDP) t1
 !
 	integer alter_min ! min and max indices of original array to be
 	integer alter_max ! changed.
@@ -187,18 +189,18 @@
 	end if
 	write(6,*)' '
 	call nonfftconvolve(tempwave,tempflux,Ntmp,kernal_sig,vsini,epsilon)
-!                               
+!
 !	if (resolution .ne. zero) then
 !	 call lambda_to_lnlambda(tempwave,ntmp,backward)
 !	endif
-!                     
+!
 	call map(tempwave,tempflux,Ntmp,modwave,modflux,Nmod)
 !
 	i_min = alter_min-con_min+1
 	i_max = alter_max-con_min+1
 	origflux(alter_min:alter_max) = modflux(i_min:i_max)
 !
-	return 
+	return
 	end subroutine smear_v3_pg
 
 C-----------------------------------------------------------------------------
@@ -207,17 +209,18 @@ C It assumes that data is evenly spaced in wavelength.
 C
 
 	subroutine nonfftconvolve(wave,flux,Nmod,sigma,vsini,epsilon)
+	USE SET_KIND_MODULE
 	implicit none
 
 	integer Nmod
-	REAL(10) wave(Nmod)
-	REAL(10) flux(Nmod)
-	REAL(10) sigma
-	REAL(10) vsini
-	REAL(10) epsilon
+	REAL(KIND=LDP) wave(Nmod)
+	REAL(KIND=LDP) flux(Nmod)
+	REAL(KIND=LDP) sigma
+	REAL(KIND=LDP) vsini
+	REAL(KIND=LDP) epsilon
 !
-	REAL(10) answer(Nmod)
-	REAL(10) response(Nmod)
+	REAL(KIND=LDP) answer(Nmod)
+	REAL(KIND=LDP) response(Nmod)
 	integer Nresponse,nron2
 	integer i       ! index for convolution array
 	integer j       ! index for response array
@@ -241,7 +244,7 @@ C
 	do j=-nron2,nron2
 	 do i=1,nron2
 	    k=j+1+nron2
-	    l=i+j      
+	    l=i+j
 	    if(l .le. 0)l=2-l
 	    answer(i) = answer(i) + flux(l)*response(k)
 	  end do
@@ -263,15 +266,15 @@ C
 	do j=-nron2,nron2
 	  do i=nmod-nron2+1,nmod
 	    k=j+1+nron2
-	    l=i+j      
+	    l=i+j
 	    if(l .gt. nmod)l=2*Nmod-l
 	    answer(i) = answer(i) + flux(l)*response(k)
 	  end do
 	end do
 !
 	flux(1:Nmod)=Answer(1:Nmod)
-!	  
-	return 
+!	
+	return
 	end subroutine nonfftconvolve
 
 C 
@@ -281,20 +284,21 @@ C function fills response array with a gaussian of the given sigma
 C to NUM_SIGMA sigmas.  If wrap = 1, then store array in wrap-around order.
 C
 	subroutine fillresponse(wave,response,Nmod,Nresponse,sigma,wrap)
+	USE SET_KIND_MODULE
 
 	implicit none
 
 	integer Nmod           ! size of data array
-	REAL(10) wave(Nmod)        ! wavelength array
-	REAL(10) response(Nmod)    ! response array
-	REAL(10) sigma             ! sigma of gaussian 
+	REAL(KIND=LDP) wave(Nmod)        ! wavelength array
+	REAL(KIND=LDP) response(Nmod)    ! response array
+	REAL(KIND=LDP) sigma             ! sigma of gaussian
 	integer Nresponse      ! size of response array
 	integer wrap           ! fill in wrap-around order?
 !
 	integer, parameter :: num_sigmas=5
 	integer i
-	REAL(10) lambda,dlam,cutoff,mu
-	REAL(10) response_area
+	REAL(KIND=LDP) lambda,dlam,cutoff,mu
+	REAL(KIND=LDP) response_area
 
 	dlam = (wave(Nmod)-wave(1))/(Nmod-1)
 	response_area = zero
@@ -302,8 +306,8 @@ C
 	cutoff = wave(1) + NUM_SIGMAS*sigma   ! fill response array out to
 	                                      ! this wavelength
 	i = 1
-	do while (wave(i) .le. cutoff)        ! find out what index the 
-	   i = i+1                            ! cutoff wavelength 
+	do while (wave(i) .le. cutoff)        ! find out what index the
+	   i = i+1                            ! cutoff wavelength
 	end do                                ! corresponds to
 
 	Nresponse = 2*(i-1)+1                 ! the size of the response array
@@ -336,7 +340,7 @@ C
 	     response_area = response_area + response(i)
 	   end do
 	endif
-  
+
 C       now we must multiply the discrete elements of the response function
 C       so that their sum adds to one (Normalize the response function)
 
@@ -353,32 +357,33 @@ C to NUM_SIGMA sigmas.  If wrap = 1, then store array in wrap-around order.
 C
 	subroutine fill_rot_response(wave,response,Nmod,Nresponse,
 	1                              vsini,epsilon,wrap)
+	USE SET_KIND_MODULE
 
 	implicit none
 !
 	integer Nmod           ! size of data array
-	REAL(10) wave(Nmod)     	! wavelength array
-	REAL(10) response(Nmod) 	! response array
-	REAL(10) vsini
-	REAL(10) epsilon
+	REAL(KIND=LDP) wave(Nmod)     	! wavelength array
+	REAL(KIND=LDP) response(Nmod) 	! response array
+	REAL(KIND=LDP) vsini
+	REAL(KIND=LDP) epsilon
 	integer Nresponse      ! size of response array
 	integer wrap           ! fill in wrap-around order?
 
 	integer i
-	REAL(10) lambda,dlam,cutoff,mu
-	REAL(10) response_area
-	REAL(10) t1,dlam_rot,a1,a2
+	REAL(KIND=LDP) lambda,dlam,cutoff,mu
+	REAL(KIND=LDP) response_area
+	REAL(KIND=LDP) t1,dlam_rot,a1,a2
 !
 	dlam = (wave(Nmod)-wave(1))/(Nmod-1)
 	response_area = zero
 !
 	cutoff = wave(1) + vsini/c_kms        ! fill response array out to
 	                                      ! this wavelength
-	i = 1       
-	do while (wave(i) .lt. cutoff)        ! find out what index the 
-	   i = i+1                            ! cutoff wavelength 
+	i = 1
+	do while (wave(i) .lt. cutoff)        ! find out what index the
+	   i = i+1                            ! cutoff wavelength
 	end do                                ! corresponds to
-!                 
+!
 	Nresponse = 2*(i-1)+1                 ! the size of the response array
 	if (Nresponse .gt. Nmod) then
 	   write(*,*)'error: response array larger than data array'
@@ -445,11 +450,12 @@ C by sigma
 C
 
 	function gauss(x,mu,sigma)
+	USE SET_KIND_MODULE
 
 	implicit none
 
-	REAL(10) sigma,x,mu
-	REAL(10) gauss
+	REAL(KIND=LDP) sigma,x,mu
+	REAL(KIND=LDP) gauss
 
 	gauss = exp(-onehalf*(((x-mu)/sigma)**two))/(sigma*sqrt(two*jimPI))
 	return
@@ -459,6 +465,7 @@ C
 C function returns the log-base-2 of number, rounded down.
 C
 	function log2(n)
+	USE SET_KIND_MODULE
 
 	implicit none
 	integer n,log2,junk
@@ -480,27 +487,28 @@ C delta lambda via linear interpolation
 C
 
 	subroutine linearize_v2(wave,flux,n,nmax,dlam)
+	USE SET_KIND_MODULE
 	implicit none
 !
 	integer n
 	integer nmax
-	REAL(10) wave(NMAX),flux(NMAX)
-	REAL(10) dlam 				! even spacing in wavelength
+	REAL(KIND=LDP) wave(NMAX),flux(NMAX)
+	REAL(KIND=LDP) dlam 				! even spacing in wavelength
 !
-	REAL(10) tempwave(N),tempflux(N)
-	REAL(10) dlamover2
+	REAL(KIND=LDP) tempwave(N),tempflux(N)
+	REAL(KIND=LDP) dlamover2
 	integer nnew
 	integer i
 !
 	dlamover2 = 0.5d0*dlam
-	nnew = (wave(n)-wave(1))/dlam  ! this will shorten wavelength 
+	nnew = (wave(n)-wave(1))/dlam  ! this will shorten wavelength
                                           ! array by a fraction of dlam
 !
 	if (nnew .gt. NMAX) then
 	   write(*,*)'Error, NMAX = ',NMAX
 	   write(*,*)'too small for this resolution'
 	   write(*,*)'Try setting NMAX = ',nnew
-	   stop 
+	   stop
 	endif
 !
 	tempwave(1:n)=wave(1:n)
@@ -520,15 +528,16 @@ C
 C-----------------------------------------------------------------------------
 C subroutine to build wavelength array from frequency array (if forward=true)
 C or build frequency array from wavelength array (if forward=false)
-C 
+C
 C
 	subroutine nu_to_lambda(freq,wave,n,nutolambda)
+	USE SET_KIND_MODULE
 
 	implicit none
 
 	integer*4 n
-	REAL(10) freq(n)
-	REAL(10) wave(n)
+	REAL(KIND=LDP) freq(n)
+	REAL(KIND=LDP) wave(n)
 	logical nutolambda ! true=nu->lambda, false=lambda->nu
 
 	integer*4 i
@@ -557,11 +566,12 @@ C subroutine to convert lambda array to ln(lambda) array if forward=true
 C or convert ln(lambda) array to lambda array if forward=false
 C
 	subroutine lambda_to_lnlambda(wave,n,ltolnl)
+	USE SET_KIND_MODULE
 
 	implicit none
 
 	integer*4 n
-	REAL(10) wave(n)
+	REAL(KIND=LDP) wave(n)
 	logical ltolnl  ! if T, lambda->lnlambda, if F, nlambda->lambda.
 
 	integer*4 i
@@ -570,11 +580,11 @@ C
 	 do i=1,n
 	  wave(i) = log(wave(i))
 	 end do
-	else 
+	else
 	 do i=1,n
 	  wave(i) = exp(wave(i))
 	 end do
-	end if 
+	end if
 
 	return
 	end subroutine lambda_to_lnlambda
@@ -583,12 +593,13 @@ C-----------------------------------------------------------------------------
 C subroutine to map array A onto array B using linear interpolation
 
 	subroutine map(Awave,Aflux,AN,Bwave,Bflux,BN)
+	USE SET_KIND_MODULE
 
 	implicit none
 
 	integer*4 AN,BN
-	REAL(10) Awave(AN),Aflux(AN)
-	REAL(10) Bwave(BN),Bflux(BN)
+	REAL(KIND=LDP) Awave(AN),Aflux(AN)
+	REAL(KIND=LDP) Bwave(BN),Bflux(BN)
 
 	integer*4 i,j
 
@@ -607,7 +618,7 @@ C subroutine to map array A onto array B using linear interpolation
 	 j = j+1
 	end do
 
-	return 
+	return
 	end subroutine map
 
 
@@ -619,18 +630,19 @@ C range.  The fluxes are weighted by their wavelength distance (?) from
 C the considered point.
 
 	subroutine map2(Awave,Aflux,AN,Bwave,Bflux,BN,dlam)
+	USE SET_KIND_MODULE
 	implicit none
 
 	integer*4 AN,BN
-	REAL(10) Awave(AN),Aflux(AN)
-	REAL(10) Bwave(BN),Bflux(BN)
-	REAL(10) dlam,dlamover2
+	REAL(KIND=LDP) Awave(AN),Aflux(AN)
+	REAL(KIND=LDP) Bwave(BN),Bflux(BN)
+	REAL(KIND=LDP) dlam,dlamover2
 
 	integer*4 i,j,i_min,i_max
 
-	REAL(10) fluxsum
-	REAL(10) dlamsum
-	REAL(10) t1
+	REAL(KIND=LDP) fluxsum
+	REAL(KIND=LDP) dlamsum
+	REAL(KIND=LDP) t1
 
 	dlamover2=dlam/two
 	i = 1
@@ -684,7 +696,7 @@ C
 	 j = j+1
 	end do
 
-	return 
+	return
 	end subroutine map2
 
 C-----------------------------------------------------------------------------
@@ -692,11 +704,12 @@ C function which returns the index of the first array element *larger* than
 C or equal to the supplied number
 
 	function larger_index(list,n,value)
+	USE SET_KIND_MODULE
 
 	implicit none
 
 	integer*4 larger_index,n
-	REAL(10) list(n),value
+	REAL(KIND=LDP) list(n),value
 
 	integer*4 i
 
@@ -718,11 +731,12 @@ C function which returns the index of the last array element *smaller* or
 C equal to the supplied number
 
 	function smaller_index(list,n,value)
+	USE SET_KIND_MODULE
 
 	implicit none
 
 	integer*4 smaller_index,n
-	REAL(10) list(n),value
+	REAL(KIND=LDP) list(n),value
 
 	integer*4 i
 

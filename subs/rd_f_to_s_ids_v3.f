@@ -4,6 +4,7 @@ C to that in the model atom with super levels.
 C
 	SUBROUTINE RD_F_TO_S_IDS_V3(F_TO_S,INT_SEQ,LEVNAME_F,N_F,N_S,
 	1                LUIN,FILENAME,SL_OPTION,F_TO_S_RD_ERROR)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 21-Apr-2023 : Changed to V3. Added F_TO_S_RD_ERROR. Routine no longer stops
@@ -54,7 +55,7 @@ C
 	  CALL OPEN_F_TO_S_ERROR_FILE()
 	  WRITE(LUER,*)'Error opening ',FILENAME,' in RD_F_TO_S_IDS_V3'
 	  F_TO_S_RD_ERROR=.TRUE.; FLUSH(LUER)
-	  RETURN 
+	  RETURN
 	END IF
 C
 	STRING=' '
@@ -69,7 +70,7 @@ C
 	  WRITE(LUER,*)'Currently treating ',FILENAME
 	  WRITE(LUER,*)'Insufficient levels in file'
 	  F_TO_S_RD_ERROR=.TRUE.; FLUSH(LUER)
-	  CLOSE(LUIN); RETURN 
+	  CLOSE(LUIN); RETURN
 	END IF
 C
 	STRING=' '
@@ -84,7 +85,7 @@ C
 	  WRITE(LUER,*)'Currently treating ',FILENAME
 	  WRITE(LUER,*)'Bad entry number for level link'
 	  F_TO_S_RD_ERROR=.TRUE.; FLUSH(LUER)
-	  CLOSE(LUIN); RETURN 
+	  CLOSE(LUIN); RETURN
 	END IF
 C
 C NB: All entries must be separated by at LEAST 2 spaces.
@@ -106,7 +107,7 @@ C
 	    WRITE(LUER,'(A,I6,X,A)')'Level is ',I,TRIM(LEVNAME_F(I))
 	    WRITE(LUER,*)'F_TO_S string is',STRING(1:J)
 	    F_TO_S_RD_ERROR=.TRUE.; FLUSH(LUER)
-	    CLOSE(LUIN); RETURN 
+	    CLOSE(LUIN); RETURN
 	  END IF
 C
 C NB: ENTRY_NUM-2 as
@@ -145,7 +146,7 @@ C
 	  WRITE(LUER,'(1X,80A)')('*',I=1,80)
 	  WRITE(LUER,*)' '
 	  F_TO_S_RD_ERROR=.TRUE.; FLUSH(LUER)
-	  RETURN 
+	  RETURN
 	END IF
 !
 C Now check that:
@@ -160,7 +161,7 @@ C
 	    WRITE(LUER,*)'Currently treating ',FILENAME
 	    WRITE(LUER,*)'Incorrect super level ID for level ',LEVNAME_F(I)
 	    F_TO_S_RD_ERROR=.TRUE.; FLUSH(LUER)
-	    RETURN 
+	    RETURN
 	  END IF
 	END DO
 C
@@ -180,7 +181,7 @@ C
 	    WRITE(LUER,*)'Currently treating ',FILENAME
 	    WRITE(LUER,*)'Super level ',I,' has no components'
 	    F_TO_S_RD_ERROR=.TRUE.; FLUSH(LUER)
-	    RETURN 
+	    RETURN
 	  END IF
 	END DO
 C
@@ -216,6 +217,7 @@ C
 !
 	CONTAINS
 	SUBROUTINE OPEN_F_TO_S_ERROR_FILE()
+	USE SET_KIND_MODULE
 	IF(FIRST_TIME)THEN
 	  CALL GET_LU(LUER,'RD_F_TO_S_IDS_V3')
 	  OPEN(UNIT=LUER,FILE='F_TO_S_RD_ERRORS',STATUS='UNKNOWN',ACTION='WRITE')

@@ -1,5 +1,6 @@
 	MODULE CMF_FLUX_CNTRL_VAR_MOD
-! 
+	USE SET_KIND_MODULE
+!
 ! Set constants that are regularly used, and passed to subroutines.
 !
 !
@@ -16,9 +17,9 @@
 	INTEGER, PARAMETER :: ISEV=7
 	INTEGER, PARAMETER :: ITEN=10
 !
-	REAL(10), PARAMETER :: RZERO=0.0D0
-	REAL(10), PARAMETER :: RONE=1.0D0
-	REAL(10), PARAMETER :: RTWO=2.0D0
+	REAL(KIND=LDP), PARAMETER :: RZERO=0.0D0
+	REAL(KIND=LDP), PARAMETER :: RONE=1.0D0
+	REAL(KIND=LDP), PARAMETER :: RTWO=2.0D0
 !
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
@@ -30,40 +31,40 @@
 !
 ! Variables used to control the spacing in the comoving frequency grid.
 !
-	REAL(10) MIN_CONT_FREQ            !Minimum continuum frequency.
-	REAL(10) MAX_CONT_FREQ            !Maximum continuum frequency.
-	REAL(10) SMALL_FREQ_RAT           !Fractional spacing for small frequencies'
-	REAL(10) dFREQ_bf_MAX             !Maximum spacing close to bf edge.
-	REAL(10) BIG_FREQ_AMP             !Amplification factor
-	REAL(10) dV_LEV_DIS               !dV on low side of bound-free edge.
-	REAL(10) AMP_DIS                  !Amplification factor
-	REAL(10) MIN_FREQ_LEV_DIS         !Minimum frequency for lev d
+	REAL(KIND=LDP) MIN_CONT_FREQ            !Minimum continuum frequency.
+	REAL(KIND=LDP) MAX_CONT_FREQ            !Maximum continuum frequency.
+	REAL(KIND=LDP) SMALL_FREQ_RAT           !Fractional spacing for small frequencies'
+	REAL(KIND=LDP) dFREQ_bf_MAX             !Maximum spacing close to bf edge.
+	REAL(KIND=LDP) BIG_FREQ_AMP             !Amplification factor
+	REAL(KIND=LDP) dV_LEV_DIS               !dV on low side of bound-free edge.
+	REAL(KIND=LDP) AMP_DIS                  !Amplification factor
+	REAL(KIND=LDP) MIN_FREQ_LEV_DIS         !Minimum frequency for lev d
 !
 ! Variables for treating lines simultaneously with the continuum.
 !
-	REAL(10) V_DOP			!Variable
-	REAL(10) MAX_DOP			!Maximum half-width of resonance zone (in Doppler widths)
-	REAL(10) FRAC_DOP			!Spacing in resonance zone (in Doppler widths)
-	REAL(10) dV_CMF_PROF		!Spacing across cmf profile (in km/s)
-	REAL(10) dV_CMF_WING		!Spacing across e.s. wings of cmf profile (in km/s)
-	REAL(10) ES_WING_EXT		!Extent of BLUE e.s. wings from resonance core (in km/s)
-	REAL(10) R_CMF_WING_EXT		!Extent of RED e.s. wings from RESONANCE core (in Vinf)
+	REAL(KIND=LDP) V_DOP			!Variable
+	REAL(KIND=LDP) MAX_DOP			!Maximum half-width of resonance zone (in Doppler widths)
+	REAL(KIND=LDP) FRAC_DOP			!Spacing in resonance zone (in Doppler widths)
+	REAL(KIND=LDP) dV_CMF_PROF		!Spacing across cmf profile (in km/s)
+	REAL(KIND=LDP) dV_CMF_WING		!Spacing across e.s. wings of cmf profile (in km/s)
+	REAL(KIND=LDP) ES_WING_EXT		!Extent of BLUE e.s. wings from resonance core (in km/s)
+	REAL(KIND=LDP) R_CMF_WING_EXT		!Extent of RED e.s. wings from RESONANCE core (in Vinf)
 !
 ! FRAC_DOP_OBS is used to ensure a fine grid across intrinsic photospheric profile which are
 ! unaffected by the wind velocity field.
 !
-        REAL(10) OBS_PRO_EXT_RAT		!Used to set maximum extent of line profile (in units of Vinf).
-	REAL(10) FRAC_DOP_OBS		!Spacing to apply across intrinsic profile zone (in Doppler widths)
-	REAL(10) dV_OBS_PROF		!Spacing to apply across observed profile (in km/s)
-	REAL(10) dV_OBS_WING		!Spacing to apply across e.s. wings of observed profile(in km/s)
-	REAL(10) dV_OBS_BIG		!Frequency spacing to apply between lines (in km/s)
+        REAL(KIND=LDP) OBS_PRO_EXT_RAT		!Used to set maximum extent of line profile (in units of Vinf).
+	REAL(KIND=LDP) FRAC_DOP_OBS		!Spacing to apply across intrinsic profile zone (in Doppler widths)
+	REAL(KIND=LDP) dV_OBS_PROF		!Spacing to apply across observed profile (in km/s)
+	REAL(KIND=LDP) dV_OBS_WING		!Spacing to apply across e.s. wings of observed profile(in km/s)
+	REAL(KIND=LDP) dV_OBS_BIG		!Frequency spacing to apply between lines (in km/s)
 !
 ! Indicates whether lines treated in SOB and CMF mode are allowed for when
 ! constructing the observers frame grid.
 !
 	LOGICAL SOB_FREQ_IN_OBS
 !
-	REAL(10)    GF_CUT
+	REAL(KIND=LDP)    GF_CUT
 	INTEGER GF_LEV_CUT
 	INTEGER MIN_NUM_TRANS
 	LOGICAL ONLY_OBS_LINES
@@ -73,29 +74,29 @@
 ! Controls for dynamic smoothing of the photoionization cross-sections, and for
 ! treating dielectronic lines.
 !
-	REAL(10) SIG_GAU_KMS		!Sigma of Gaussian used to smooth photoionization data
-	REAL(10) FRAC_SIG_GAU		!Fractional spacing a across smoothing Gauusian (use 0.25)
-	REAL(10) CUT_ACCURACY		!Accuracy to retain data when omitting data points to save space (use 0.02)'
+	REAL(KIND=LDP) SIG_GAU_KMS		!Sigma of Gaussian used to smooth photoionization data
+	REAL(KIND=LDP) FRAC_SIG_GAU		!Fractional spacing a across smoothing Gauusian (use 0.25)
+	REAL(KIND=LDP) CUT_ACCURACY		!Accuracy to retain data when omitting data points to save space (use 0.02)'
 	LOGICAL ABOVE_EDGE		!Use only data above edge when smoothing?
-	REAL(10) VSM_DIE_KMS		!Sigma of Gaussian used for dielectronic lines that are read in.
-	LOGICAL DIE_AS_LINE		!Treats dielectronic lines as individual lines: not included in spectrum calc. 
+	REAL(KIND=LDP) VSM_DIE_KMS		!Sigma of Gaussian used for dielectronic lines that are read in.
+	LOGICAL DIE_AS_LINE		!Treats dielectronic lines as individual lines: not included in spectrum calc.
 !
 ! DELV_CONT indicates the minimum continuum spacing in km/s between evaluations of
-! the continuum opcities. It should be less than the smoothing applied to the 
+! the continuum opcities. It should be less than the smoothing applied to the
 ! photoionization and dielectronic line cross-sections.
 !
 ! When COMPUTE_ALL_CROSS is TRUE, new cros-sections are computed at every wavelength.
 !
-	REAL(10) DELV_CONT
+	REAL(KIND=LDP) DELV_CONT
 	LOGICAL COMPUTE_ALL_CROSS
 	LOGICAL COMPUTE_NEW_CROSS
 !
-	REAL(10) TDOP
-	REAL(10) AMASS_DOP
-	REAL(10) DOP_PROF_LIMIT
-	REAL(10) VOIGT_PROF_LIMIT
-	REAL(10) MAX_PROF_ED
-	REAL(10) V_PROF_LIMIT
+	REAL(KIND=LDP) TDOP
+	REAL(KIND=LDP) AMASS_DOP
+	REAL(KIND=LDP) DOP_PROF_LIMIT
+	REAL(KIND=LDP) VOIGT_PROF_LIMIT
+	REAL(KIND=LDP) MAX_PROF_ED
+	REAL(KIND=LDP) V_PROF_LIMIT
 	LOGICAL NORM_PROFILE
 	LOGICAL SET_PROF_LIMS_BY_OPACITY
 	LOGICAL RD_STARK_FILE
@@ -105,19 +106,19 @@
 ! The local species setting only takes precedence when it is set to NONE.
 !
 	CHARACTER*10 GLOBAL_LINE_SWITCH
-	REAL(10) FLUX_CAL_LAM_BEG
-	REAL(10) FLUX_CAL_LAM_END
-	REAL(10) SOB_EW_LAM_BEG
-	REAL(10) SOB_EW_LAM_END
+	REAL(KIND=LDP) FLUX_CAL_LAM_BEG
+	REAL(KIND=LDP) FLUX_CAL_LAM_END
+	REAL(KIND=LDP) SOB_EW_LAM_BEG
+	REAL(KIND=LDP) SOB_EW_LAM_END
 	INTEGER NUM_SOB_LINES
 	LOGICAL SET_TRANS_TYPE_BY_LAM
 	LOGICAL DO_SOBOLEV_LINES
 	LOGICAL DO_ALL_SOB_LINES
 	LOGICAL DO_CMF_EW
 !
-	REAL(10) VTURB_FIX		!Turbelent velocity used with fixed DOPPLER profile.
-	REAL(10) VTURB_MIN		!Minimum turbuleb velocity
-	REAL(10) VTURB_MAX		!Maximum turbulent velocity (VTURB = VTURB_MIN + (VTURB_MAX-VTURB_MIN)*V(r)/VInf
+	REAL(KIND=LDP) VTURB_FIX		!Turbelent velocity used with fixed DOPPLER profile.
+	REAL(KIND=LDP) VTURB_MIN		!Minimum turbuleb velocity
+	REAL(KIND=LDP) VTURB_MAX		!Maximum turbulent velocity (VTURB = VTURB_MIN + (VTURB_MAX-VTURB_MIN)*V(r)/VInf
 	CHARACTER(LEN=10) TURB_LAW	!LAW_V1 or LAW_TAU1
 !
 	INTEGER NUM_ES_ITERATIONS
@@ -153,9 +154,9 @@
 	LOGICAL WRITE_CMF_FORCE
 	LOGICAL WRITE_SOB_FORCE
 	LOGICAL WR_ION_LINE_FORCE
-	REAL(10) EW_CUT_OFF
-	REAL(10) TAU_REF
-	REAL(10) DJDt_RELAX_PARAM
+	REAL(KIND=LDP) EW_CUT_OFF
+	REAL(KIND=LDP) TAU_REF
+	REAL(KIND=LDP) DJDt_RELAX_PARAM
 !
 	LOGICAL DO_REL_IN_OBSFRAME
 	LOGICAL DO_CMF_REL_OBS
@@ -176,13 +177,13 @@
 	LOGICAL EDD_CONT
 	LOGICAL EDD_LINECONT
 !
-	REAL(10) ACC_EDD_FAC
+	REAL(KIND=LDP) ACC_EDD_FAC
 	LOGICAL COMPUTE_EDDFAC
 !
 ! General boundary condition options.
 !
-	REAL(10) REXT_FAC
-	REAL(10) IB_STAB_FACTOR
+	REAL(KIND=LDP) REXT_FAC
+	REAL(KIND=LDP) IB_STAB_FACTOR
 	LOGICAL RDTHK_CONT
 	LOGICAL DIF
 	LOGICAL THK_CONT
@@ -194,15 +195,15 @@
 ! These are used to insert extra points alonga  ray, and provide additional
 ! freedom to using the ACCURATE option.
 !
-	REAL(10) DELV_FRAC_FG
-	REAL(10) DELV_FRAC_MOM
+	REAL(KIND=LDP) DELV_FRAC_FG
+	REAL(KIND=LDP) DELV_FRAC_MOM
 !
 ! Used to control integration in Observer's frame.
 !
-	REAL(10) RD_NU_MAX_OBS			!To restrict the range of observer's frame integration
-	REAL(10) RD_NU_MIN_OBS
-	REAL(10) OBS_TAU_MAX			!Cut integration off when TAU > OBS_TAU_MAX
-	REAL(10) OBS_ES_DTAU			!Maximum grid spacing, in e.s. optical depth, along ray.
+	REAL(KIND=LDP) RD_NU_MAX_OBS			!To restrict the range of observer's frame integration
+	REAL(KIND=LDP) RD_NU_MIN_OBS
+	REAL(KIND=LDP) OBS_TAU_MAX			!Cut integration off when TAU > OBS_TAU_MAX
+	REAL(KIND=LDP) OBS_ES_DTAU			!Maximum grid spacing, in e.s. optical depth, along ray.
 	INTEGER N_INS_OBS               	!# of additional points inserted/per zone for observer's frame calculation.
 	LOGICAL REVISE_P_GRID			!Revise p grid for observer's fram calculation?
 	CHARACTER(LEN=10) OBS_INT_METHOD	!STAU (integrate over S) or ETAZ (integrate over eta)
@@ -242,16 +243,16 @@
 !
 ! These shocks are characterized by up to 2 temperatures.
 !
-	REAL(10) FILL_FAC_XRAYS_1,T_SHOCK_1,V_SHOCK_1
-	REAL(10) FILL_FAC_XRAYS_2,T_SHOCK_2,V_SHOCK_2
-	REAL(10) XRAY_EMISS_1,XRAY_EMISS_2
-	REAL(10) VSMOOTH_XRAYS
+	REAL(KIND=LDP) FILL_FAC_XRAYS_1,T_SHOCK_1,V_SHOCK_1
+	REAL(KIND=LDP) FILL_FAC_XRAYS_2,T_SHOCK_2,V_SHOCK_2
+	REAL(KIND=LDP) XRAY_EMISS_1,XRAY_EMISS_2
+	REAL(KIND=LDP) VSMOOTH_XRAYS
 !
-! Variables required to insert additional points into the depth grid. 
-! Allows an increase in program accuracy to overcome rapid ionization 
-! changes. 
+! Variables required to insert additional points into the depth grid.
+! Allows an increase in program accuracy to overcome rapid ionization
+! changes.
 !
-	REAL(10) ACC_FREQ_END
+	REAL(KIND=LDP) ACC_FREQ_END
 	LOGICAL ALL_FREQ
 	LOGICAL ACCURATE
 	LOGICAL INACCURATE

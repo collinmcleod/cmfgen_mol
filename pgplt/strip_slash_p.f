@@ -4,7 +4,7 @@
 ! are left justified (i.e., OFFSETs of 1, 4, and 7).
 !
 ! The color of the text is changed by \pn where n=1, to 99.
-! Assuming the default definitions, 
+! Assuming the default definitions,
 !            this is red \p2 this is blue \p3.
 ! The space before the \p is ignored.
 !
@@ -12,6 +12,7 @@
 ! is allowed.
 !
 	SUBROUTINE STRIP_SLASH_P(STRING,N)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 02-Feb-2015

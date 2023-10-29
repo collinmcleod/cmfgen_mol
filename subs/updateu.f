@@ -5,6 +5,7 @@ C (the tridiagonal matrix to be inverted) have already been
 C modified by a call to THOMAS2D.
 C
 	SUBROUTINE UPDATEU(TX,TVX,KI,U,VB,VC,TA,TB,TC,WHAT,NI,NM)
+	USE SET_KIND_MODULE
 C
 C ALTERED 28-MAY-1996 : IMPLICIT NONE installed.
 C                       Cleaned.
@@ -13,9 +14,9 @@ C
 	IMPLICIT NONE
 C
 	INTEGER NI,NM
-	REAL(10) TX(NI,NI,NM),TVX(NI-1,NI,NM)
-	REAL(10) KI(NI,3,NM),U(NI),VB(NI),VC(NI)
-	REAL(10) TA(NI),TB(NI),TC(NI)
+	REAL(KIND=LDP) TX(NI,NI,NM),TVX(NI-1,NI,NM)
+	REAL(KIND=LDP) KI(NI,3,NM),U(NI),VB(NI),VC(NI)
+	REAL(KIND=LDP) TA(NI),TB(NI),TC(NI)
 	LOGICAL WHAT
 C
 	INTEGER I,J,K

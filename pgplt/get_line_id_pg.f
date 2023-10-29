@@ -1,4 +1,5 @@
 	SUBROUTINE GET_LINE_ID_PG(TRANS_NAME,LINE_WAVE,EW,LINE_CENTER,FWHM_KMS)
+	USE SET_KIND_MODULE
 	USE LINE_ID_MOD
 	IMPLICIT NONE
 !
@@ -8,7 +9,7 @@
 	REAL*4 FWHM_KMS
 	REAL*4 LINE_WAVE
 !
-! Altered 02-Jul-2022: Now use TAU_VAL rather than 3 times, and use ABS value. 
+! Altered 02-Jul-2022: Now use TAU_VAL rather than 3 times, and use ABS value.
 ! Altered 23-Jul-2022: Added LINE_WAVE to call.
 ! Altered 22-Jul-2022: Better check if ID exits.
 !

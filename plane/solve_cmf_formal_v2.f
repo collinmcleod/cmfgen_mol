@@ -2,6 +2,7 @@
 !
       SUBROUTINE SOLVE_CMF_FORMAL_V2(CHI,ETA,IP,FREQ,NU_DNU,
      *                     INNER_BND_METH,B_NUE,dBDTAU,ND,NP,NC)
+	USE SET_KIND_MODULE
 !
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
@@ -28,7 +29,7 @@
 !                      CUR_LOC is noe set in calling routine. Since independent of ip, allows this routine to be
 !                        in parallel loop.
 ! Altered 07-Apr-2013: Source function is now interpolated using linear interpolation for last two intervals for
-!                        outgoing rays. Problems were arising because of rapidly varying source functon and very 
+!                        outgoing rays. Problems were arising because of rapidly varying source functon and very
 !                        unequal step sizes.
 ! Altered 02-Apr-2018: Changed from nc+1 : if(ip .gt. nc+1 .or. INNER_BND_METH .eq. 'ZERO_FLUX')then
 !--------------------------------------------------------------------
@@ -43,16 +44,16 @@
 !
 ! Opacity and emissivity variables
 !
-      REAL(10), dimension(nd) :: chi,eta
+      REAL(KIND=LDP), dimension(nd) :: chi,eta
 !
 ! Frequency variable
 !
-      REAL(10) :: freq
-      REAL(10) :: nu_dnu
+      REAL(KIND=LDP) :: freq
+      REAL(KIND=LDP) :: nu_dnu
 !
 ! Boundary conditions
 !
-      REAL(10) :: B_nue,dBdtau
+      REAL(KIND=LDP) :: B_nue,dBdtau
 !
       character(len=*) :: INNER_BND_METH
 !
@@ -61,13 +62,13 @@
       LOGICAL, PARAMETER :: L_TRUE=.TRUE.
       LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
-      REAL(10) ibound
-      REAL(10) ee,e0,e1,e2,alpha,beta,gamma,t1
-      REAL(10), dimension(nd) :: chi_tau
-      REAL(10), dimension(nd) :: source_prime
-      REAL(10), dimension(nd) :: tau_loc
-      REAL(10), dimension(nd) :: dtau_loc
-      REAL(10) new_freq
+      REAL(KIND=LDP) ibound
+      REAL(KIND=LDP) ee,e0,e1,e2,alpha,beta,gamma,t1
+      REAL(KIND=LDP), dimension(nd) :: chi_tau
+      REAL(KIND=LDP), dimension(nd) :: source_prime
+      REAL(KIND=LDP), dimension(nd) :: tau_loc
+      REAL(KIND=LDP), dimension(nd) :: dtau_loc
+      REAL(KIND=LDP) new_freq
 !
       integer ist,iend,imid
       integer k
@@ -170,7 +171,7 @@
 ! If we are using the holow boundary condition, we need to store the
 ! intensity at the inner boundary. This flux will be used to compute
 ! the incident intensity at another frequency. We can't directly use
-! the current flux, since the radiation will be redshifted by the 
+! the current flux, since the radiation will be redshifted by the
 ! expansion.
 !
       if(ip .le. nc .and. INNER_BND_METH .eq. 'HOLLOW')then

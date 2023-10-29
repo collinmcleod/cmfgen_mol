@@ -10,6 +10,7 @@
 	1             LOG_AXIS,OPTION,NORMAL_R_Y_AXIS,
 	1             XLAB_FILE,YLAB_FILE,
 	1             PEN_COL,PEN_OFFSET,REVERSE_PLOT_ORDER)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
 	USE GAUSS_FIT_DATA
 	USE GEN_IN_INTERFACE
@@ -18,7 +19,7 @@
 !
 ! Altered 30-Jun-2023 : Bug fix and impiorved error message.
 ! Altered 17-Jun-2023: Fixed some crash issues and some cleaning.
-! Altered 06-MAr-2023 : Fixed to use classical Gaussian with factor of 0.5 in 
+! Altered 06-MAr-2023 : Fixed to use classical Gaussian with factor of 0.5 in
 !                          argument of exponent. Parameters are:
 !                             Lambda, Sigma, Height, Exponent
 ! Altered 09-Aug-2022: New file. Based on do_gaus_fit.f
@@ -64,7 +65,7 @@
 	INTEGER, PARAMETER :: ISIX=6
 	INTEGER, PARAMETER :: NL_MAX=100
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
-	REAL(10) LINE_CENTER(NL_MAX)
+	REAL(KIND=LDP) LINE_CENTER(NL_MAX)
 !
 	REAL*4, SAVE :: FIND_LINE_TOLERANCE=0.002
 	INTEGER  GET_INDX_SP
@@ -72,21 +73,21 @@
 !
 	CHARACTER(LEN=200) STRING
 	CHARACTER(LEN=30) UC
-	REAL(10) TOLERANCE
-	REAL(10) GAUSS_FIT_FUNC
+	REAL(KIND=LDP) TOLERANCE
+	REAL(KIND=LDP) GAUSS_FIT_FUNC
 	EXTERNAL GAUSS_FIT_FUNC,UC
 !
 ! If wet these to zero, their values will be held fixed.
 !
-	REAL(10) WAVE_SCALE
-	REAL(10) EXPONENT_SCALE
+	REAL(KIND=LDP) WAVE_SCALE
+	REAL(KIND=LDP) EXPONENT_SCALE
 !
-	REAL(10) YST,YEND
+	REAL(KIND=LDP) YST,YEND
 !
-	REAL(10) TOL
-	REAL(10) T1,T2
-	REAL(10) FWHM
-	REAL(10) CONT_FLUX
+	REAL(KIND=LDP) TOL
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) FWHM
+	REAL(KIND=LDP) CONT_FLUX
 	INTEGER NO_LINES
 	INTEGER ITER
 !
@@ -105,8 +106,8 @@
         INTEGER CURSERR
 	CHARACTER(LEN=1) CURSVAL
 !
-	REAL(10), SAVE :: XST=0.0D0
-	REAL(10), SAVE :: XEND=1.0D0
+	REAL(KIND=LDP), SAVE :: XST=0.0D0
+	REAL(KIND=LDP), SAVE :: XEND=1.0D0
 	REAL*4 SP_XST,SP_XEND
 	INTEGER, SAVE :: IP=1
 	INTEGER, SAVE :: NG_PAR_OLD
@@ -142,6 +143,7 @@
 	CONTAINS
 !
 	SUBROUTINE CURSOR_GAUSS_FIT
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Open output files, and print headers.
@@ -191,7 +193,7 @@
 	    PAR(1)=YST
 	    IF( ABS( (XEND-XST)/(XPAR(2)-XPAR(1)) ) .LT. 1.0D-08)THEN
 	      WRITE(6,*)'Bad band selection -- do band selection again'
-	    ELSE   
+	    ELSE
 	      PAR(2)=(YEND-YST)/(XEND-XST)
 	    END IF
 !
@@ -386,6 +388,7 @@
 	END SUBROUTINE CURSOR_GAUSS_FIT
 !
 	SUBROUTINE FILE_GAUSS_FIT
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER I
 !
@@ -413,7 +416,7 @@
 	    RETURN
 	  END IF
 	  DO K=1,NUM_GAUSS
-	    I=3+(K-1)*4 
+	    I=3+(K-1)*4
 	    READ(LU_PARAMS,*)PAR(I),PAR(I+2),PAR(I+1),PAR(I+3)
 	  END DO
 	  SP_XST=XST; SP_XEND=XEND
@@ -440,6 +443,7 @@
 	END SUBROUTINE FILE_GAUSS_FIT
 !
 	SUBROUTINE DO_GAUSSIAN_FITS(PLT_NO)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER PLT_NO
 !
@@ -498,7 +502,7 @@
 	DO J=1,NG_PAR
 	  WRITE(6,'(20ES12.4)')(SIM(I,J),I=1,NG_PAR+1)
 	END DO
-! 
+!
         SUM_SQ(:)=0.0D0
         DO I=1,NG_PAR+1
           PAR(1:NG_PAR)=SIM(I,1:NG_PAR)
@@ -511,7 +515,7 @@
         CALL AMOEBA(SIM,SUM_SQ,I,NG_PAR,NG_PAR,TOL,GAUSS_FIT_FUNC,ITER)
 !
 ! Compute EW of profile. The order of passing the variables is LOCATION,
-! HEIGHT, SIGMA, EXPONENT. 
+! HEIGHT, SIGMA, EXPONENT.
 !
 	TOLERANCE=1.0D-05
 	DO I=1,NUM_GAUSS
@@ -541,6 +545,7 @@
 ! We don't actually perform the sort.
 !
 	SUBROUTINE WRITE_GAUSS_FIT
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	IF(FIRST_WRITE)THEN
@@ -627,6 +632,7 @@
 	END SUBROUTINE WRITE_GAUSS_FIT
 !
 	SUBROUTINE PRINT_CURSOR_DESC
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! We restrict options to lower case to avoid accidental use of
@@ -635,7 +641,7 @@
 	WRITE(6,'(A)')BLUE_PEN
 	WRITE(6,'(A)')' Program assumes X axis increases with X index '
 	WRITE(6,'(A)')' '
-	WRITE(6,'(A)')' If these measurements will be used as a basis for measurements' 
+	WRITE(6,'(A)')' If these measurements will be used as a basis for measurements'
 	WRITE(6,'(A)')'   of other theroetical spectra, it may be advisable to use'
 	WRITE(6,'(A)')'   the spectrum with the highest microturblent velocity'
 	WRITE(6,'(A)')' '
@@ -671,13 +677,14 @@
 ! betwene the data and the fitted curve.
 !
 	SUBROUTINE DRAW_GAUSS_V2(DIFF_ALSO)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	LOGICAL DIFF_ALSO
-	REAL(10) GAUSS_FIT_FUNC
+	REAL(KIND=LDP) GAUSS_FIT_FUNC
 	EXTERNAL GAUSS_FIT_FUNC
 	INTEGER I
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 !
 ! PAR must be set on entry.
 ! The Gaussians are drwan in black.

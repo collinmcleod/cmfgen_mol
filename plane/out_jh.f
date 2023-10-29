@@ -1,18 +1,19 @@
 	SUBROUTINE OUT_JH(RSQ_J,RSQ_H,H_INBC,H_OUTBC,NU,NCF,R,V,ND,INIT,OPTION)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
-! Altered: 04-May-2016.  R and V grid is now output at beginning when INIT is TRUE. 
-!                         This ensures that R and V are current. Old values may have 
-!                         been wrtten out with GREY option.  
+! Altered: 04-May-2016.  R and V grid is now output at beginning when INIT is TRUE.
+!                         This ensures that R and V are current. Old values may have
+!                         been wrtten out with GREY option.
 	INTEGER ND
 	INTEGER NCF
-	REAL(10) NU
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-        REAL(10) RSQ_J(ND)
-	REAL(10) RSQ_H(ND)
-	REAL(10) H_INBC
-	REAL(10) H_OUTBC
+	REAL(KIND=LDP) NU
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+        REAL(KIND=LDP) RSQ_J(ND)
+	REAL(KIND=LDP) RSQ_H(ND)
+	REAL(KIND=LDP) H_INBC
+	REAL(KIND=LDP) H_OUTBC
 !
 ! Used to indicate that we are passing the first frequency.
 !
@@ -21,7 +22,7 @@
 !
 ! Lcoal variables:
 !
-	REAL(10)  T1
+	REAL(KIND=LDP)  T1
 !
 ! REC_SIZE     is the (maximum) record length in bytes.
 ! UNIT_SIZE    is the number of bytes per unit that is used to specify
@@ -36,11 +37,11 @@
 !
 	INTEGER I		!Used as depth index
 	INTEGER IOS		!I/O error identifier
-	INTEGER REC_LENGTH 
+	INTEGER REC_LENGTH
 	INTEGER LU_ER,ERROR_LU,WARNING_LU,LU_WARN
 	EXTERNAL ERROR_LU,WARNING_LU
 !
-	REAL(10),  SAVE :: NU_STORE=0.0D0
+	REAL(KIND=LDP),  SAVE :: NU_STORE=0.0D0
 	INTEGER, SAVE :: ST_IREC=6
 	INTEGER, SAVE :: IREC=0
 	INTEGER, SAVE :: LU_OUT=0

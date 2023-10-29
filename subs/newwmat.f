@@ -2,6 +2,7 @@ C
 C Subroutine to compute the W matrix (see notes).
 C
 	SUBROUTINE NEWWMAT(W,DTAU,THETA,TOR,LS,NC,NI)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 - CALL to DP_ZERO removed.
@@ -9,7 +10,7 @@ C                       Calls to EXP replaced by generic calls.
 C Altered  9-Dec-1986 - Thick boundary condition installed.
 C
 	INTEGER LS,NC,NI,I
-	REAL(10) W(NI,NI),DTAU(NI),THETA(NI),TOR
+	REAL(KIND=LDP) W(NI,NI),DTAU(NI),THETA(NI),TOR
 C
 	W(:,:)=0.0D0
 C

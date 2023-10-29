@@ -8,12 +8,13 @@
 ! earlier versions. Its still possible that the grids may not be absolutely
 ! identical.
 !
-! If IOPT is 0, and anything else except 1, or 2 (only 1 is curently implmented), 
+! If IOPT is 0, and anything else except 1, or 2 (only 1 is curently implmented),
 ! the default frequncy grid will used.
 !
 	SUBROUTINE SET_FREQUENCY_GRID_V2(NU,FQW,LINES_THIS_FREQ,NU_EVAL_CONT,
 	1               NCF,NCF_MAX,N_LINE_FREQ,ND,
 	1               OBS_FREQ,OBS,N_OBS,LUIN,IMPURITY_CODE)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE CONTROL_VARIABLE_MOD
 	USE LINE_VEC_MOD
@@ -28,29 +29,29 @@
 	INTEGER ND
 	INTEGER LUIN
 !
-	REAL(10) NU(NCF_MAX)
-	REAL(10) FQW(NCF_MAX)
-	REAL(10) NU_EVAL_CONT(NCF_MAX)
+	REAL(KIND=LDP) NU(NCF_MAX)
+	REAL(KIND=LDP) FQW(NCF_MAX)
+	REAL(KIND=LDP) NU_EVAL_CONT(NCF_MAX)
 	INTEGER LINES_THIS_FREQ(NCF_MAX)
 !
-	REAL(10) OBS_FREQ(NCF_MAX)
-	REAL(10) OBS(NCF_MAX)
-	REAL(10) CHIL(ND)
-	REAL(10) LOC_ED(ND)
-	REAL(10) LOC_T(ND)
+	REAL(KIND=LDP) OBS_FREQ(NCF_MAX)
+	REAL(KIND=LDP) OBS(NCF_MAX)
+	REAL(KIND=LDP) CHIL(ND)
+	REAL(KIND=LDP) LOC_ED(ND)
+	REAL(KIND=LDP) LOC_T(ND)
 !
 	LOGICAL IMPURITY_CODE
 	LOGICAL GRID_EXISTS
 !
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
-	REAL(10) SPEED_OF_LIGHT
-	REAL(10) LAMVACAIR
+	REAL(KIND=LDP) SPEED_OF_LIGHT
+	REAL(KIND=LDP) LAMVACAIR
 !
-	REAL(10) NU_MAX_OBS
-	REAL(10) NU_MIN_OBS
-	REAL(10) T1,T2,T3
-	REAL(10) C_KMS
+	REAL(KIND=LDP) NU_MAX_OBS
+	REAL(KIND=LDP) NU_MIN_OBS
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) C_KMS
 !
 	INTEGER I,J,K
 	INTEGER ID
@@ -67,20 +68,20 @@
 !
         COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
         COMMON/LINE/ OPLIN,EMLIN
-        REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-        REAL(10) OPLIN,EMLIN
+        REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+        REAL(KIND=LDP) OPLIN,EMLIN
 !
 	LUER=ERROR_LU()
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()
 !
 !
-! 
+!
 ! Set up lines that will be treated with the continuum calculation.
 ! This section of code is also used by the code treating purely lines
 ! (either single transition Sobolev or CMF, or overlapping Sobolev).
 !
 ! To define the line transitions we need to operate on the FULL atom models.
-! We thus perform separate loops for each species. 
+! We thus perform separate loops for each species.
 !
 	ML=0			!Initialize line counter.
 	DO ID=1,NUM_IONS-1
@@ -97,7 +98,7 @@
 	N_LINE_FREQ=ML
 !
 ! Now that we have the number of lines, we can allocate the needed memory.
-! VEC_TRANS_NAME is allocated temporaruly so that we can output the full 
+! VEC_TRANS_NAME is allocated temporaruly so that we can output the full
 ! transitions name to TRANS_INFO.
 !
 	ALLOCATE (VEC_TRANS_NAME(N_LINE_FREQ),STAT=IOS)
@@ -158,9 +159,9 @@
 	          VEC_SPEC(ML)=ION_ID(ID)
 	          VEC_ID(ML)=ID
 	          VEC_NL(ML)=NL
-	          VEC_NUP(ML)=NUP     
+	          VEC_NUP(ML)=NUP
 	          VEC_MNL_F(ML)=MNL
-	          VEC_MNUP_F(ML)=MNUP     
+	          VEC_MNUP_F(ML)=MNUP
 	          VEC_OSCIL(ML)=ATM(ID)%AXzV_F(MNL,MNUP)
 	          VEC_EINA(ML)=ATM(ID)%AXzV_F(MNUP,MNL)
 	          VEC_ARAD(ML)= ATM(ID)%ARAD(MNL)+ATM(ID)%ARAD(MNUP)
@@ -234,7 +235,7 @@
 	    WRITE(LUIN,*)'!'
 	    WRITE(LUIN,*)
 	1     '     I    NL_F  NUP_F        Nu',
-	1     '       Lam(A)    /\V(km/s)    Transition' 
+	1     '       Lam(A)    /\V(km/s)    Transition'
 	    WRITE(LUIN,
 	1    '(1X,I6,2(1X,I6),2X,F10.6,2X,F10.3,16X,A)')
 	1         IONE,VEC_MNL_F(1),VEC_MNUP_F(1),
@@ -249,7 +250,7 @@
 	1        '(1X,I6,2(1X,I6),2X,F10.6,2X,F10.3,2X,F10.2,4X,A)')
 	1           ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
 	1           VEC_FREQ(ML),T1,T2,TRIM(VEC_TRANS_NAME(VEC_INDX(ML)))
-	      ELSE             
+	      ELSE
 	        WRITE(LUIN,
 	1         '(1X,I6,2(1X,I6),2X,F10.6,1X,1P,E11.4,0P,2X,F10.2,4X,A)')
 	1         ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
@@ -262,7 +263,7 @@
 !
 ! Get lines and arrange in numerically decreasing frequency according to
 ! the START frequency of the line. This will allow us to consider line overlap,
-! and to include lines with continuum frequencies so that the can be handled 
+! and to include lines with continuum frequencies so that the can be handled
 ! automatically.
 !
 	CALL INDEXX(N_LINE_FREQ,VEC_STRT_FREQ,VEC_INDX,L_FALSE)
@@ -311,7 +312,7 @@
 ! 1. Allows use of SOBOLEV approximation in IR where details of radiative
 !    transfer is unimportant. In this case FLUX_CAL_LAM_BEG should be set to zero.
 ! 2. Allows a full flux calculation to be done in a limited wavelength region
-!    as defined by FLUX_CAL_LAM_END and FLUX_CAL_LAM_BEG. 
+!    as defined by FLUX_CAL_LAM_END and FLUX_CAL_LAM_BEG.
 !
 	IF(SET_TRANS_TYPE_BY_LAM)THEN
 	  IF(FLUX_CAL_LAM_END .LT. FLUX_CAL_LAM_BEG)THEN
@@ -347,7 +348,7 @@
 	      STOP
 	    END IF
 	    TEMP_CHAR=' '
-	    DO WHILE(INDEX(TEMP_CHAR,'!Number of continuum frequencies') 
+	    DO WHILE(INDEX(TEMP_CHAR,'!Number of continuum frequencies')
 	1                                              .EQ. 0)
 	      READ(LUIN,'(A)',IOSTAT=IOS)TEMP_CHAR
 	      IF(IOS .NE. 0)THEN
@@ -388,7 +389,7 @@
 ! work array - okay since of length NCF_MAX, and zeroed in QUADSE.
 ! OBS contains the bound-free edges - its contents are zero on
 ! subroutine exit. J is used as temporary variable for the number of
-! frequencies transmitted to SET_CONT_FREQ. NCF is returned as the number 
+! frequencies transmitted to SET_CONT_FREQ. NCF is returned as the number
 ! of frequency points. FQW is used a an integer array for the sorting ---
 ! we know it has the correct length since it is the same size as NU.
 ! LUIN --- Used as temporary LU (opened and closed).
@@ -421,18 +422,18 @@
 	1                        DELV_CONT,DELV_XRAY,NU_XRAY_END,
 	1                        J,NCF,NCF_MAX,LUIN)
 	  END IF
-!                                             
+!
 	END IF              !End set continuum if
 !
-!                         
+! 
 !
 ! We have found all lines. If we are doing a blanketing calculation for this
 ! line we insert them into the continuum frequency set, otherwise the
 ! line is not included.
 !
-	DO ML=1,NCF                                          
+	DO ML=1,NCF
 	  FQW(ML)=NU(ML)	!FQW has temporary storage of continuum freq.
-	END DO                    
+	END DO
 	V_DOP=MINVAL(VEC_VDOP_MIN) !12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
 	CALL INS_LINE_V6(  NU,LINES_THIS_FREQ,I,NCF_MAX,
 	1		  VEC_FREQ,VEC_STRT_FREQ,VEC_VDOP_MIN,VEC_TRANS_TYPE,
@@ -469,7 +470,7 @@
 	ELSE
 	  CALL TRAPUNEQ(NU,FQW,NCF)
 	END IF
-	DO ML=1,NCF                                           
+	DO ML=1,NCF
 	  FQW(ML)=FQW(ML)*1.0D+15
 	END DO
 !
@@ -489,9 +490,9 @@
 	  WRITE(LUER,*)'Min(Nu_LINE)=',VEC_FREQ(I+N_LINE_FREQ)
 	END IF
 !
-! Set observers frequencies. The slight fiddling in setting NU_MAX and NU_MIN 
-! is done so that the CMF frequencies encompass all observers frame 
-! frequencies. This allows computation of all observers fluxes allowing for 
+! Set observers frequencies. The slight fiddling in setting NU_MAX and NU_MIN
+! is done so that the CMF frequencies encompass all observers frame
+! frequencies. This allows computation of all observers fluxes allowing for
 ! velocity effects.
 !
 ! We insert lines into the observers frame frequencies if they are being

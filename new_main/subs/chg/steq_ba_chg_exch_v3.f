@@ -5,6 +5,7 @@
 ! previously called for the present iteration.
 !
 	SUBROUTINE STEQ_BA_CHG_EXCH_V3(POPS,T,NT,ND,DIAG_INDX,UPDATE_BA)
+	USE SET_KIND_MODULE
 	USE CHG_EXCH_MOD_V3
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
@@ -20,8 +21,8 @@
 	INTEGER ND
 	INTEGER DIAG_INDX
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) T(ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) T(ND)
 	LOGICAL UPDATE_BA
 !
 	INTEGER LU_ER
@@ -40,26 +41,26 @@
 	INTEGER II
 	INTEGER ID,AID,BID
 !
-	REAL(10) ALPHA_REC
-	REAL(10) ALPHA_ION
-	REAL(10) ALPHA_1
-	REAL(10) ALPHA_2
-	REAL(10) ALPHA_3
-	REAL(10) ALPHA_4
-	REAL(10) dRATEdT
-	REAL(10) dlnALPHA_RECdlnT
-	REAL(10) dlnALPHA_IONdlnT
-	REAL(10) FRD_R
-	REAL(10) REV_R
-	REAL(10) T1
-	REAL(10) TVAL
+	REAL(KIND=LDP) ALPHA_REC
+	REAL(KIND=LDP) ALPHA_ION
+	REAL(KIND=LDP) ALPHA_1
+	REAL(KIND=LDP) ALPHA_2
+	REAL(KIND=LDP) ALPHA_3
+	REAL(KIND=LDP) ALPHA_4
+	REAL(KIND=LDP) dRATEdT
+	REAL(KIND=LDP) dlnALPHA_RECdlnT
+	REAL(KIND=LDP) dlnALPHA_IONdlnT
+	REAL(KIND=LDP) FRD_R
+	REAL(KIND=LDP) REV_R
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) TVAL
 !
 	IF(.NOT. DO_CHG_EXCH)RETURN
 !
 	DO J=1,N_CHG
 	  IF(CHG_REACTION_AVAILABLE(J))THEN
-!                                
-! Reaction has the form:             
+!
+! Reaction has the form:
 !                       Y(n+) + X([m-1]+)   <-->   Y([n-1)+) + X(m+)
 ! Thus species 2 and 3 are those which represent the recombined ion.
 !
@@ -75,7 +76,7 @@
 ! We use AID to refer to the ION state 2. AL1,...,AL4 then refer to
 ! to the variable identification in the SE equations associated with
 ! that ION state.
-! 
+!
 	    AID=ID_ION_CHG(J,2)
 	    AL1=SE(AID)%LNK_TO_IV(L1)
 	    AL2=SE(AID)%LNK_TO_IV(L2)
@@ -162,7 +163,7 @@
 	      SE(BID)%STEQ(E3,L)=SE(BID)%STEQ(E3,L) + T1
 !
 	      IF(UPDATE_BA)THEN
-	        dRATEdt=(FRD_R*dlnALPHA_RECdlnT - 
+	        dRATEdt=(FRD_R*dlnALPHA_RECdlnT -
 	1                   REV_R*dlnALPHA_IONdlnT)/T(L)
 	        ALPHA_1=ALPHA_REC*POPS(L1,L)
 	        ALPHA_2=ALPHA_REC*POPS(L2,L)
@@ -185,7 +186,7 @@
 	        IF(AL3 .NE. 0)SE(ID)%BA(E4,AL3,II,L)=SE(ID)%BA(E4,AL3,II,L) - ALPHA_4
 	        IF(AL4 .NE. 0)SE(ID)%BA(E4,AL4,II,L)=SE(ID)%BA(E4,AL4,II,L) - ALPHA_3
 	                      SE(ID)%BA(E4,NIV,II,L)=SE(ID)%BA(E4,NIV,II,L) + dRATEdT
-!	      
+!	
 	        ID=BID;        NIV=SE(ID)%N_IV
 	        IF(BL1 .NE. 0)SE(ID)%BA(E3,BL1,II,L)=SE(ID)%BA(E3,BL1,II,L) + ALPHA_2
 	        IF(BL2 .NE. 0)SE(ID)%BA(E3,BL2,II,L)=SE(ID)%BA(E3,BL2,II,L) + ALPHA_1

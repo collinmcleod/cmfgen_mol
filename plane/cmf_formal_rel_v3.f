@@ -1,21 +1,22 @@
 	MODULE EXT_REL_GRID_V3
-	  REAL(10), ALLOCATABLE :: R_EXT(:)
-	  REAL(10), ALLOCATABLE :: LOG_R_EXT(:)
-	  REAL(10), ALLOCATABLE :: Z_EXT(:)
-	  REAL(10), ALLOCATABLE :: V_EXT(:)
-	  REAL(10), ALLOCATABLE :: VDOP_VEC_EXT(:)
-	  REAL(10), ALLOCATABLE :: SIGMA_EXT(:)
-	  REAL(10), ALLOCATABLE :: ETA_EXT(:)
-	  REAL(10), ALLOCATABLE :: CHI_EXT(:)
-	  REAL(10), ALLOCATABLE :: LOG_ETA_EXT(:)
-	  REAL(10), ALLOCATABLE :: LOG_CHI_EXT(:)
-	  REAL(10), ALLOCATABLE :: TMP_VEC(:)
+	  USE SET_KIND_MODULE
+	  REAL(KIND=LDP), ALLOCATABLE :: R_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: LOG_R_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: Z_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: V_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: VDOP_VEC_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: SIGMA_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: ETA_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: CHI_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: LOG_ETA_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: LOG_CHI_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: TMP_VEC(:)
 !
-	  REAL(10), ALLOCATABLE :: CHI_COEF(:,:)
-	  REAL(10), ALLOCATABLE :: ETA_COEF(:,:)
+	  REAL(KIND=LDP), ALLOCATABLE :: CHI_COEF(:,:)
+	  REAL(KIND=LDP), ALLOCATABLE :: ETA_COEF(:,:)
 !
-	  REAL(10), ALLOCATABLE :: CHI_RAY(:)
-	  REAL(10), ALLOCATABLE :: ETA_RAY(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: CHI_RAY(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: ETA_RAY(:)
 !
 	  INTEGER ND_EXT
 	  INTEGER ND_ADD
@@ -33,6 +34,7 @@
 	1            INNER_BND_METH,THICK_OB,
 	1            VDOP_VEC,VDOP_FRAC,
 	1            METHOD,INITIALIZE,NEW_FREQ,NC,NP,ND)
+	USE SET_KIND_MODULE
         USE EXT_REL_GRID_V3
 	USE MOD_SPACE_GRID_V2
 	USE MOD_RAY_MOM_STORE
@@ -44,36 +46,36 @@
         INTEGER ND
         INTEGER NP
 !
-	REAL(10) R(ND)
-        REAL(10) V(ND)
-	REAL(10) SIGMA(ND)
-	REAL(10) P(NP)
-	REAL(10) ETA(ND)	
-	REAL(10) CHI(ND)
-	REAL(10) ESEC(ND)
-	REAL(10) VDOP_VEC(ND)
-	REAL(10) VDOP_FRAC
-	REAL(10) DELV_FRAC_FG
+	REAL(KIND=LDP) R(ND)
+        REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) SIGMA(ND)
+	REAL(KIND=LDP) P(NP)
+	REAL(KIND=LDP) ETA(ND)	
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) ESEC(ND)
+	REAL(KIND=LDP) VDOP_VEC(ND)
+	REAL(KIND=LDP) VDOP_FRAC
+	REAL(KIND=LDP) DELV_FRAC_FG
 !
-	REAL(10) RET_HNU_AT_IB
-	REAL(10) RET_HNU_AT_OB
+	REAL(KIND=LDP) RET_HNU_AT_IB
+	REAL(KIND=LDP) RET_HNU_AT_OB
 !
 ! NB: J,H,K,N refer to the first 4 moments of the radiation field.
 !
-        REAL(10) JNU(ND)
-	REAL(10) FEDD(ND)
-        REAL(10) IPLUS(NP)
+        REAL(KIND=LDP) JNU(ND)
+	REAL(KIND=LDP) FEDD(ND)
+        REAL(KIND=LDP) IPLUS(NP)
 !
-	REAL(10) B_PLANCK
-	REAL(10) DBB
-	REAL(10) FREQ
-	REAL(10) dLOG_NU
+	REAL(KIND=LDP) B_PLANCK
+	REAL(KIND=LDP) DBB
+	REAL(KIND=LDP) FREQ
+	REAL(KIND=LDP) dLOG_NU
 !
 	CHARACTER*6 METHOD
 !
 	CHARACTER(LEN=*) INNER_BND_METH
 !
-! Use "Thick" boundary condition. at outer boundary. Only noted when INITIALIZE 
+! Use "Thick" boundary condition. at outer boundary. Only noted when INITIALIZE
 ! is true. All subsequent frequencies will use the same boundary condition
 ! independent of the passed value (Until INITIALIZE is set to TRUE again).
 !
@@ -97,20 +99,20 @@
 	INTEGER, PARAMETER :: IONE=1
 	LOGICAL, PARAMETER :: LFALSE=.FALSE.
 	LOGICAL, PARAMETER :: LTRUE=.TRUE.
-!                
-	REAL(10) DBC
-	REAL(10) I_CORE
-	REAL(10) T1,T2
-	REAL(10) dBdTAU
-	REAL(10) ALPHA
-	REAL(10) ESEC_POW
-	REAL(10) BETA
-	REAL(10) VINF
-	REAL(10) RMAX
-	REAL(10) DEL_R_FAC
-	REAL(10) NU_ON_dNU
-	REAL(10) MU_AT_RMAX
-	REAL(10) HQW_AT_RMAX
+!
+	REAL(KIND=LDP) DBC
+	REAL(KIND=LDP) I_CORE
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) dBdTAU
+	REAL(KIND=LDP) ALPHA
+	REAL(KIND=LDP) ESEC_POW
+	REAL(KIND=LDP) BETA
+	REAL(KIND=LDP) VINF
+	REAL(KIND=LDP) RMAX
+	REAL(KIND=LDP) DEL_R_FAC
+	REAL(KIND=LDP) NU_ON_dNU
+	REAL(KIND=LDP) MU_AT_RMAX
+	REAL(KIND=LDP) HQW_AT_RMAX
 	CHARACTER(LEN=20) BOUNDARY
 !
 	INTEGER NDM1
@@ -118,8 +120,8 @@
 	INTEGER NP_LIMIT
 	INTEGER NRAY
 !
-	REAL(10) C_KMS
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	INTEGER LUER
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU, SPEED_OF_LIGHT
@@ -133,7 +135,7 @@
 	  NU_ON_dNU=1.0D0/dLOG_NU
 	END IF
 !
-! Allocate data for moments which will be used to construct the Eddington 
+! Allocate data for moments which will be used to construct the Eddington
 ! factors.
 !
 	IF(.NOT. ALLOCATED(JNU_STORE))THEN
@@ -233,7 +235,7 @@
 	    ELSE
 	      RMAX=MIN(10.0D0,SQRT(R(1)/R(ND)))*R(1)
 	    END IF
-	    ALPHA=R(1)+(R(1)-R(2))                               
+	    ALPHA=R(1)+(R(1)-R(2))
 	    DEL_R_FAC=EXP( LOG(RMAX/ALPHA)/(ND_ADD-4) )
 	    R_EXT(1)=RMAX
 	    R_EXT(5)=RMAX/DEL_R_FAC
@@ -299,7 +301,7 @@
 ! to stimulated emission. In such a case we simply assume an 1/r^2
 ! extrapolation.
 !
-! We also interpolate in ESEC, since ESEC (in the absence of negative 
+! We also interpolate in ESEC, since ESEC (in the absence of negative
 ! absorption) provides a lower bound to the opacity. NB: When CHI is much
 ! larger then ESEC its variation with r dominates, and it is possible to
 ! extrapolate CHI below ESEC.
@@ -402,7 +404,7 @@
 	      END DO
 	    END DO
 	  END IF
-	END IF 
+	END IF
 !
 	IF(RAY_POINTS_INSERTED)THEN
 	  LOG_CHI_EXT(1:ND_EXT)=LOG(CHI_EXT(1:ND_EXT))
@@ -429,7 +431,7 @@
 	  HNU_AT_IB_PREV=HNU_AT_IB; NNU_AT_IB_PREV=NNU_AT_IB
 	END IF
 !
-! If no points have been inserted on the rays, CHI and ETA are the same for 
+! If no points have been inserted on the rays, CHI and ETA are the same for
 ! all rays.
 !
 	IF(.NOT. RAY_POINTS_INSERTED)THEN
@@ -445,7 +447,7 @@
 	JMIN_OB=0.0D0;   HMIN_OB=0.0D0;  KMIN_OB=0.0D0
 !
 ! If using the HOLLOW core option, we need to determine location to
-! store inner boundary intensity. We do it here, since the storage 
+! store inner boundary intensity. We do it here, since the storage
 ! location hase the same pointer for all rays.
 !
 	IF(INNER_BND_METH .eq. 'HOLLOW')THEN
@@ -483,7 +485,7 @@
                   CHI_RAY(I)=EXP(T2)
                   T2=((ETA_COEF(K,1)*T1+ETA_COEF(K,2))*T1+ETA_COEF(K,3))*T1+ETA_COEF(K,4)
                   ETA_RAY(I)=EXP(T2)
-	        ELSE 
+	        ELSE
 	          K=K+1
                   GOTO 100
 	        END IF
@@ -496,7 +498,7 @@
 	  END DO
 !$OMP END PARALLEL DO
 !
-	ELSE 
+	ELSE
 !$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(NRAY)
 	  DO IP=1,NP_LIMIT
 	    NRAY=RAY(IP)%NZ

@@ -2,6 +2,7 @@ C
 C Function which returens a string in either upper or lower case.
 C
 	FUNCTION LC(STRING)
+	USE SET_KIND_MODULE
 !
 ! Altered 28-Mar-2003: END_STR now limited to 30 characteres.
 !
@@ -24,8 +25,9 @@ C
 	RETURN
 	END
 C	
-C  
+C 
 	FUNCTION UC(STRING)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	CHARACTER*30 UC
 	CHARACTER*(*) STRING

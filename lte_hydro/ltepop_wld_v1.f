@@ -4,28 +4,29 @@ C
 C       Compute the LTE populations of the levels in the FULL atom given
 C       ED (electron density), T (electron temperature) and the ion density
 C       DI C2. Level dissolution is taken into account.
-C              
+C
 	SUBROUTINE LTEPOP_WLD_V1(C2LTE,W_C2,EDGEC2,GC2,
 	1             ZC2,GION_C2,NC2,DIC2,ED,T,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 : ND_MAX removed (was unused).
 C Created 30-May-1995 : Based on LTEPOP.
-C             
+C
 	INTEGER ND
-	REAL(10) ED(ND)			!Electron density
-	REAL(10) T(ND)			!Temperature 10^4K
-	REAL(10) DIC2(ND)			!Ion density (Full model atom)
+	REAL(KIND=LDP) ED(ND)			!Electron density
+	REAL(KIND=LDP) T(ND)			!Temperature 10^4K
+	REAL(KIND=LDP) DIC2(ND)			!Ion density (Full model atom)
 C
 	INTEGER NC2
-	REAL(10) C2LTE(NC2,ND)
-	REAL(10) W_C2(NC2,ND)
-	REAL(10) EDGEC2(NC2)
-	REAL(10) GC2(NC2)
-	REAL(10) GION_C2			!Statistical weight of ion groun state.
-	REAL(10) ZC2			!Ion charge
+	REAL(KIND=LDP) C2LTE(NC2,ND)
+	REAL(KIND=LDP) W_C2(NC2,ND)
+	REAL(KIND=LDP) EDGEC2(NC2)
+	REAL(KIND=LDP) GC2(NC2)
+	REAL(KIND=LDP) GION_C2			!Statistical weight of ion groun state.
+	REAL(KIND=LDP) ZC2			!Ion charge
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 	INTEGER ERROR_LU
@@ -34,7 +35,7 @@ C
 C Local variables.
 C
 	INTEGER I,K
-	REAL(10) X,Y,RGU
+	REAL(KIND=LDP) X,Y,RGU
 C
 C Compute the occupation probabilities.
 C

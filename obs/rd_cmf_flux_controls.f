@@ -1,4 +1,5 @@
 	SUBROUTINE RD_CMF_FLUX_CONTROLS(ND,LUMOD,LUER)
+	USE SET_KIND_MODULE
 	USE MOD_CMF_OBS
 	USE CMF_FLUX_CNTRL_VAR_MOD
 	IMPLICIT NONE
@@ -8,7 +9,7 @@
 ! Altered 26-Apr-2019 : Added  J_CHK_OPTION (CHK_J)
 !                       Added  H_CHK_OPTION (CHK_H)
 ! Altered 26-Apr-2019 : Added RD_NU_MAX_OBS, RD_NU_MIN_OBS to restrict the range of observer's frame int.
-! 
+!
 	INTEGER ND
 	INTEGER LUMOD
 	INTEGER LUER
@@ -44,8 +45,8 @@
 	1            'Minimum wavelegth (A) for computing observed frequencies')
 	  CALL RD_STORE_DBLE(RD_NU_MIN_OBS,'OBS_LAM_MAX',L_FALSE,
 	1            'Maximum wavelegth (A) for computing observed frequencies')
-	  RD_NU_MAX_OBS=2.99794D+03/RD_NU_MAX_OBS 
-	  RD_NU_MIN_OBS=2.99794D+03/RD_NU_MIN_OBS 
+	  RD_NU_MAX_OBS=2.99794D+03/RD_NU_MAX_OBS
+	  RD_NU_MIN_OBS=2.99794D+03/RD_NU_MIN_OBS
 !
 	  CALL RD_STORE_LOG(DO_LEV_DISSOLUTION,'DO_DIS',L_TRUE,
 	1            'Allow for level dissolution of upper levels?')

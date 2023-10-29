@@ -1,12 +1,13 @@
 !
 ! This routine solves for the mean intensity as a function of depth for
-! a plane-parallel atmosphere using the Feautrier Technique. A Schuster 
-! or diffusion approaximation is used for the lower boundary condition. 
+! a plane-parallel atmosphere using the Feautrier Technique. A Schuster
+! or diffusion approaximation is used for the lower boundary condition.
 ! This routine may need to be in a loop so that the f values are iterated
 ! to convergence.
 !
 	SUBROUTINE FCOMP_PP_V2(R,NEWRJ,NEWRK,SOURCE,CHI,IPLUS,
 	1             HBC_J,HBC_S,INBCNEW,DBB,IC,THK,DIFF,ND,NP,METHOD)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 30-Mar-2003
@@ -14,31 +15,31 @@
 	INTEGER ND
 	INTEGER NP
 !
-	REAL(10) R(ND)
-	REAL(10) NEWRJ(ND)
-	REAL(10) NEWRK(ND)
-	REAL(10) SOURCE(ND)
-	REAL(10) CHI(ND)
-	REAL(10) IPLUS(NP)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) NEWRJ(ND)
+	REAL(KIND=LDP) NEWRK(ND)
+	REAL(KIND=LDP) SOURCE(ND)
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) IPLUS(NP)
 !
 ! Locally defined arrays.
 !
-	REAL(10) TA(ND),TB(ND),TC(ND),XM(ND)
-	REAL(10) DTAU(ND),DTAU_RAD(ND)
-	REAL(10) dCHIdR(ND)
+	REAL(KIND=LDP) TA(ND),TB(ND),TC(ND),XM(ND)
+	REAL(KIND=LDP) DTAU(ND),DTAU_RAD(ND)
+	REAL(KIND=LDP) dCHIdR(ND)
 !
-	REAL(10), SAVE, ALLOCATABLE :: MU(:)
-	REAL(10), SAVE, ALLOCATABLE :: JQW(:)
-	REAL(10), SAVE, ALLOCATABLE :: KQW(:)
+	REAL(KIND=LDP), SAVE, ALLOCATABLE :: MU(:)
+	REAL(KIND=LDP), SAVE, ALLOCATABLE :: JQW(:)
+	REAL(KIND=LDP), SAVE, ALLOCATABLE :: KQW(:)
 	INTEGER, SAVE :: NP_SAV=0
 	LOGICAL, SAVE :: FIRST_TIME
 !
-	REAL(10), PARAMETER :: RZERO=0.0D0
-	REAL(10), PARAMETER :: RONE=1.0D0
+	REAL(KIND=LDP), PARAMETER :: RZERO=0.0D0
+	REAL(KIND=LDP), PARAMETER :: RONE=1.0D0
 	INTEGER, PARAMETER :: IONE=1
 !
 	INTEGER I,LS,NP_LOC
-	REAL(10) DBB,DBC,IBOUND,TOR,HBC_J,HBC_S,INBCNEW,IC,E1,E2,E3
+	REAL(KIND=LDP) DBB,DBC,IBOUND,TOR,HBC_J,HBC_S,INBCNEW,IC,E1,E2,E3
 	LOGICAL DIFF,THK
 	CHARACTER*6 METHOD
 !

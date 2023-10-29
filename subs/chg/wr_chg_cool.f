@@ -1,16 +1,17 @@
 !
-! Routine to write out cooling/heating for charge exchange reactions. 
+! Routine to write out cooling/heating for charge exchange reactions.
 !
 	SUBROUTINE WR_CHG_COOL(NETCR,TOTCR,COUNTER,ND,LU)
+	USE SET_KIND_MODULE
 	USE CHG_EXCH_MOD
 	IMPLICIT NONE
-!                                            
+!
 ! Created 26-Aug-1998 : based on WR_AD_COOL
 !
 	INTEGER*4 COUNTER
 	INTEGER*4 ND,LU
-	REAL(10) NETCR(ND)	!Accumlated net cooling rate
-	REAL(10) TOTCR(ND)	!Accumulated sum of absoulte cooling rates.
+	REAL(KIND=LDP) NETCR(ND)	!Accumlated net cooling rate
+	REAL(KIND=LDP) TOTCR(ND)	!Accumulated sum of absoulte cooling rates.
 !
 	INTEGER*4 I,J
 	INTEGER*4 MS,MF

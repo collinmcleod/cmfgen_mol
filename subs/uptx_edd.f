@@ -11,6 +11,7 @@ C extra array TXOLD.
 C
 	SUBROUTINE UPTX_EDD(TX,TVX,KI,TA,TB,TC,U,VB,VC,
 	1                    ML_NE_ONE,NI,NM)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 28-May-1996 - Call to DP_ZERO removed.
@@ -18,11 +19,11 @@ C Created 06-Jun-1989 - Based on UPDATE_TX which was originally
 C                       based on UPDATEU.
 C
 	INTEGER NI,NM
-	REAL(10) TX(NI,NI,NM)
-	REAL(10) TVX(NI-1,NI,NM)
-	REAL(10) KI(NI,NI,NM)
-	REAL(10) TA(NI),TB(NI),TC(NI)
-	REAL(10) U(NI),VB(NI),VC(NI)
+	REAL(KIND=LDP) TX(NI,NI,NM)
+	REAL(KIND=LDP) TVX(NI-1,NI,NM)
+	REAL(KIND=LDP) KI(NI,NI,NM)
+	REAL(KIND=LDP) TA(NI),TB(NI),TC(NI)
+	REAL(KIND=LDP) U(NI),VB(NI),VC(NI)
 	LOGICAL ML_NE_ONE
 C
 C Local varables.

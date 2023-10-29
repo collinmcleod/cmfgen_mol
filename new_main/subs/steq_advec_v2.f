@@ -5,13 +5,14 @@
 !
 	SUBROUTINE STEQ_ADVEC_V2(ID,HN_S,DI_S,N_S,R,VEL,
 	1                 NUM_BNDS,ND,LAMBDA_ITERATION,COMPUTE_BA,LINEAR)
+	USE SET_KIND_MODULE
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
 ! Altered 12-May-2004 - Can now use linear differencing, which will have greater
 !                          convergence stability, although potentially not as accurate.
 !                          Changed V2,
-! Altered 05-May-2004 - Bug fix when updating BA for k=ND: MP1=M-1 not ND-1 
+! Altered 05-May-2004 - Bug fix when updating BA for k=ND: MP1=M-1 not ND-1
 ! Created 20-Jan-2003
 !
 	INTEGER ID
@@ -19,10 +20,10 @@
 	INTEGER NUM_BNDS
 	INTEGER ND
 !
-	REAL(10) HN_S(N_S,ND)
-	REAL(10) DI_S(ND)
-	REAL(10) R(ND)
-	REAL(10) VEL(ND)
+	REAL(KIND=LDP) HN_S(N_S,ND)
+	REAL(KIND=LDP) DI_S(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) VEL(ND)
 !
 	LOGICAL LAMBDA_ITERATION
 	LOGICAL COMPUTE_BA
@@ -35,9 +36,9 @@
 	INTEGER I			!Variable index
 	INTEGER EQION
 !
-	REAL(10) T1,T2
-	REAL(10) DERIV_CONST
-	REAL(10) LOG_DERIV
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) DERIV_CONST
+	REAL(KIND=LDP) LOG_DERIV
 !
         EQION=N_S+1			!Ion equation
 	M=(NUM_BNDS/2)+1

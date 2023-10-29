@@ -1,6 +1,7 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
 	MODULE MOD_SPACE_GRID_V2
+	USE SET_KIND_MODULE
 !
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
@@ -20,34 +21,34 @@
 !
 	TYPE RAY_DATA
 !
-	  REAL(10), ALLOCATABLE :: MU(:)
-	  REAL(10), ALLOCATABLE :: Z(:)
-	  REAL(10), ALLOCATABLE :: R_RAY(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: MU(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: Z(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: R_RAY(:)
 !
 ! Variables for characteristics
 !
-	  REAL(10), ALLOCATABLE :: S_P(:)                    !Path Length in positive direction
-	  REAL(10), ALLOCATABLE :: S_M(:)                    !Path Length in negative direction
-	  REAL(10), ALLOCATABLE :: MU_P(:)                   !Angle [cos(theta)] in positive direction
-	  REAL(10), ALLOCATABLE :: MU_M(:)                   !Angle [cos(theta)] in negative direction
+	  REAL(KIND=LDP), ALLOCATABLE :: S_P(:)                    !Path Length in positive direction
+	  REAL(KIND=LDP), ALLOCATABLE :: S_M(:)                    !Path Length in negative direction
+	  REAL(KIND=LDP), ALLOCATABLE :: MU_P(:)                   !Angle [cos(theta)] in positive direction
+	  REAL(KIND=LDP), ALLOCATABLE :: MU_M(:)                   !Angle [cos(theta)] in negative direction
 !
 ! Variables for frequency independent parts of advection and abberation terms
 !
-	  REAL(10), ALLOCATABLE :: B_P(:)                    !positive direction
-	  REAL(10), ALLOCATABLE :: B_M(:)                    !negative direction
+	  REAL(KIND=LDP), ALLOCATABLE :: B_P(:)                    !positive direction
+	  REAL(KIND=LDP), ALLOCATABLE :: B_M(:)                    !negative direction
 !
-	  REAL(10), ALLOCATABLE :: I_P(:)
-	  REAL(10), ALLOCATABLE :: I_P_PREV(:)
-	  REAL(10), ALLOCATABLE :: I_P_SAVE(:)
-	  REAL(10), ALLOCATABLE :: I_M(:)
-	  REAL(10), ALLOCATABLE :: I_M_PREV(:)
-	  REAL(10), ALLOCATABLE :: I_M_SAVE(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: I_P(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: I_P_PREV(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: I_P_SAVE(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: I_M(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: I_M_PREV(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: I_M_SAVE(:)
 !
 	  INTEGER, ALLOCATABLE :: LNK(:)		!Indicates link to original grid
 !
-	  REAL(10), ALLOCATABLE :: I_IN_BND_STORE(:) 
-	  REAL(10) P_RAY				      	!P for ray
-	  REAL(10) FREQ_CONV_FAC				!Frequency conversion factor for hollow core.
+	  REAL(KIND=LDP), ALLOCATABLE :: I_IN_BND_STORE(:)
+	  REAL(KIND=LDP) P_RAY				      	!P for ray
+	  REAL(KIND=LDP) FREQ_CONV_FAC				!Frequency conversion factor for hollow core.
 
 	  INTEGER  NZ	 	                    	!number of grid points along a p-ray
 !
@@ -57,29 +58,29 @@
 !
 ! Arrays for "optical depth"
 !
-	REAL(10), ALLOCATABLE :: TAU(:)
-	REAL(10), ALLOCATABLE :: DTAU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TAU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DTAU(:)
 !
 ! Defined along a ray and on the CMFGEN grid.
 !
-	REAL(10), ALLOCATABLE :: I_P_GRID(:)
-	REAL(10), ALLOCATABLE :: I_M_GRID(:)
+	REAL(KIND=LDP), ALLOCATABLE :: I_P_GRID(:)
+	REAL(KIND=LDP), ALLOCATABLE :: I_M_GRID(:)
 !
 ! Quadrature weights for characteristics. These are defined on the
 ! CMFGEN grid.
 !
-	REAL(10), ALLOCATABLE :: JQW_P(:,:)                  !Positive mu
-	REAL(10), ALLOCATABLE :: HQW_P(:,:)
-	REAL(10), ALLOCATABLE :: KQW_P(:,:)
-	REAL(10), ALLOCATABLE :: NQW_P(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: JQW_P(:,:)                  !Positive mu
+	REAL(KIND=LDP), ALLOCATABLE :: HQW_P(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: KQW_P(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: NQW_P(:,:)
 !
-	REAL(10), ALLOCATABLE :: JQW_M(:,:)                  !NEGATIVE MU
-	REAL(10), ALLOCATABLE :: HQW_M(:,:)
-	REAL(10), ALLOCATABLE :: KQW_M(:,:)
-	REAL(10), ALLOCATABLE :: NQW_M(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: JQW_M(:,:)                  !NEGATIVE MU
+	REAL(KIND=LDP), ALLOCATABLE :: HQW_M(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: KQW_M(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: NQW_M(:,:)
 !
-	REAL(10), ALLOCATABLE :: R_EXT_SAV(:)
-	REAL(10), ALLOCATABLE :: FREQ_STORE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_EXT_SAV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: FREQ_STORE(:)
 !
 	INTEGER CUR_LOC
 	INTEGER N_STORE

@@ -10,13 +10,14 @@
 	SUBROUTINE PAR_FUN_V4(U,PHI,ZPFN,HIGH_POP,
 	1             HE2,LOG_HE2LTE,W_HE2,DHE2,EDGE,GHE2,GION,ZION,
 	1             T,OLD_T,OLD_ED,N,ND,NSPEC,NSPEC_MAX,PRES,ION_ID,MODE)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 05-Apr-2011 - Update from PAR_FUN_V3.
 !                         LOG_HE2LTE insted of HE2LTE passed in call (18-Dec-2010).
 ! Altered 22-Feb-2010 - Altered computation of PHI to help problems with dynamic range.
 ! Altered 15-May-2009 - VERBOSE option installed.
-! Altered 03-Feb-2008 - Can now use excitation temperatures (MODE=TX), as well 
+! Altered 03-Feb-2008 - Can now use excitation temperatures (MODE=TX), as well
 !                         as departure coefficients (MODE=DC), to evaluate
 !                         partition functions.
 ! Altered 07-Mar-2006 - 2.07D-22 pulled into exponential.
@@ -30,31 +31,31 @@
 !                       in routine.
 !
 	INTEGER N,ND,NSPEC,NSPEC_MAX
-	REAL(10) HE2(N,ND)
-	REAL(10) LOG_HE2LTE(N,ND)
-	REAL(10) W_HE2(N,ND)
-	REAL(10) DHE2(ND)
-	REAL(10) EDGE(N)
-	REAL(10) GHE2(N)
-	REAL(10) GION,ZION
-	REAL(10) U(ND,NSPEC_MAX)
-	REAL(10) PHI(ND,NSPEC_MAX)
-	REAL(10) ZPFN(NSPEC_MAX)
-	REAL(10) T(ND)
-	REAL(10) OLD_T(ND)
-	REAL(10) OLD_ED(ND)
-	REAL(10) HIGH_POP(ND)
+	REAL(KIND=LDP) HE2(N,ND)
+	REAL(KIND=LDP) LOG_HE2LTE(N,ND)
+	REAL(KIND=LDP) W_HE2(N,ND)
+	REAL(KIND=LDP) DHE2(ND)
+	REAL(KIND=LDP) EDGE(N)
+	REAL(KIND=LDP) GHE2(N)
+	REAL(KIND=LDP) GION,ZION
+	REAL(KIND=LDP) U(ND,NSPEC_MAX)
+	REAL(KIND=LDP) PHI(ND,NSPEC_MAX)
+	REAL(KIND=LDP) ZPFN(NSPEC_MAX)
+	REAL(KIND=LDP) T(ND)
+	REAL(KIND=LDP) OLD_T(ND)
+	REAL(KIND=LDP) OLD_ED(ND)
+	REAL(KIND=LDP) HIGH_POP(ND)
 	CHARACTER(LEN=*) MODE
 	CHARACTER(LEN=*) ION_ID
 	LOGICAL PRES
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
-	REAL(10) T1,T2,T3,LOG_RGU
-	REAL(10) TEXCITE(N)
-	REAL(10) DELTA_T
-	REAL(10) CONST
+	REAL(KIND=LDP) T1,T2,T3,LOG_RGU
+	REAL(KIND=LDP) TEXCITE(N)
+	REAL(KIND=LDP) DELTA_T
+	REAL(KIND=LDP) CONST
 !
 	INTEGER I,J
 	INTEGER COUNT

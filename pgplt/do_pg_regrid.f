@@ -6,7 +6,7 @@
 	  USE MOD_CURVE_DATA
 	  IMPLICIT NONE
 !
-! Created 16-Nov-2020 
+! Created 16-Nov-2020
 !
 	  INTEGER IN1
 	  INTEGER OUT
@@ -20,7 +20,7 @@
 !
 	  INTEGER GET_INDX_SP
 	  EXTERNAL GET_INDX_SP
-!         
+!
 ! Local variables
 !
 	  REAL*4, ALLOCATABLE :: XV_OLD(:)
@@ -59,7 +59,7 @@
 	    WRITE(T_OUT,*)'Unrecoginized optio:',TRIM(REG_OPT)
 	    WRITE(T_OUT,*)'Available options are: DX, R(ES), N(NIS)'
 	    RETURN
-	  END IF 
+	  END IF
 !
 	  N1=NPTS(IN1)
 	  IF(XMIN .EQ. XMAX)THEN
@@ -82,7 +82,7 @@
 	  WRITE(T_OUT,'(/,A)')' Set old vectors'
 !
 !   [X*(1+t1)-X]/X=T1;   R=1/T1
-! 
+!
 ! R=Lam/dL  => dL=LAM/R =? LOG(dL)=Log(LAM)-LOG(R)
 !
 	  IF(REG_OPT(1:2) .EQ. 'DX')THEN
@@ -148,7 +148,7 @@
 	  ERR(OUT)=.FALSE.
 	  IF(OUT .GT. NPLTS)NPLTS=OUT
 !
- 	  CALL SP_MON_INTERP(YV_NEW,N2,IONE,XV_NEW,N2,YV_OLD,N1,XV_OLD,N1) 
+ 	  CALL SP_MON_INTERP(YV_NEW,N2,IONE,XV_NEW,N2,YV_OLD,N1,XV_OLD,N1)
 !
 	  IF(ALLOCATED(CD(OUT)%XVEC))THEN
 	    DEALLOCATE(CD(OUT)%DATA,CD(OUT)%XVEC)

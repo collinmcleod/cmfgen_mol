@@ -3,6 +3,7 @@
 ! be added. After each edit, the full Gaussian list is output for inspection.
 !
 	SUBROUTINE ED_GAUS_FIT
+	USE SET_KIND_MODULE
 	USE GAUS_FIT_DATA
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
@@ -10,7 +11,7 @@
 ! Altered: 01-Feb-2022          !Now allow a maximum of 20 new Gaussians to be added.
 ! Created:  -Sep-2007		!Author: D. J. Hillier
 !
-	REAL(10), ALLOCATABLE :: TMP_PAR(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TMP_PAR(:)
 	INTEGER K			!Array index
 	INTEGER IP			!# of Gaussian
 	LOGICAL SCRAP

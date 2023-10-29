@@ -73,7 +73,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       interface usr_option
-        module procedure rd_real, 
+        module procedure rd_real,
      *                   rd_real_dim,
      *                   rd_integer,
      *                   rd_integer_dim,
@@ -86,6 +86,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_real(input,var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -112,7 +113,7 @@ c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       implicit none
 c
-      REAL(10) :: input
+      REAL(KIND=LDP) :: input
 c
       character(len=*) :: var_name,description,default
       character(len=120) :: answer,sve_string,all_caps
@@ -148,7 +149,7 @@ c
       endif
       read(*,"(a)")answer
 c
-c If main option and 'sve=', 'box=', '.filename' or '#filename' 
+c If main option and 'sve=', 'box=', '.filename' or '#filename'
 c then take approiate action.
 c
       call post_sve_file(answer,all_caps,present)
@@ -181,6 +182,7 @@ c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_real_dim(input,dim,required,
      *     var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -211,8 +213,8 @@ c
       integer :: dim,required,found
       integer :: i,l,m,start,stop,step,count
 c
-      REAL(10), dimension(dim) :: input
-      REAL(10) t1
+      REAL(KIND=LDP), dimension(dim) :: input
+      REAL(KIND=LDP) t1
 c
       character(len=*) :: var_name,description,default
       character(len=120) :: answer,sve_string,number,all_caps
@@ -304,6 +306,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_integer(input,var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -374,6 +377,7 @@ c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_integer_dim(input,dim,required,
      *     var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -496,6 +500,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_logical(input,var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -565,6 +570,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_string(input,var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -585,7 +591,7 @@ c                          change to var_name, but VMS will not!).
 c
 c  altered  27/01/04  DJH  Changed to prevent .XXX option creating
 c                          an empty .sve file when it doesn't exist.
-c  
+c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       implicit none
@@ -626,7 +632,7 @@ c
 c If the conditions in the if statement are met, we are trying to read
 c in the options through a .sve file which does not exist.
 c
-      if(.not. present .and. answer(1:1) .eq. '.' .and. 
+      if(.not. present .and. answer(1:1) .eq. '.' .and.
      *    description .eq. ' ')then
           answer=' '
           return

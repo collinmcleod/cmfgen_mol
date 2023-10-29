@@ -1,5 +1,6 @@
 !
 	SUBROUTINE ADJUST_POPS(POPS,LUER,ND,NT)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE OLD_GRID_MODULE
 	USE CONTROL_VARIABLE_MOD
@@ -10,23 +11,23 @@
 ! Altered 04-Jan-2020: Changed LTEPOP_WLD and CNVT_FR_DC to V2.
 ! Altered 20-Jun-2008: Z_POP now set (was not set)a
 !                      Improved handling at boundaries.
-! Created 
+! Created
 !
 	INTEGER ND
 	INTEGER NT
 	INTEGER LUER				!Unit for error messages
 	INTEGER LU_GRID
 !
-	REAL(10) LOG_OLD_TAU(OLD_ND)
-	REAL(10) TB(OLD_ND)
+	REAL(KIND=LDP) LOG_OLD_TAU(OLD_ND)
+	REAL(KIND=LDP) TB(OLD_ND)
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) Z_POP(NT)			!Vector containing Z of atom/ion (not core)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) Z_POP(NT)			!Vector containing Z of atom/ion (not core)
 !
-	REAL(10) TAU(ND)
-	REAL(10) LOG_TAU(ND)
-	REAL(10) TA(ND)
-	REAL(10) T1
+	REAL(KIND=LDP) TAU(ND)
+	REAL(KIND=LDP) LOG_TAU(ND)
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) T1
 !
 	INTEGER NXST,NX
 	INTEGER I,J,L
@@ -55,7 +56,7 @@
 	IF(T1 .LT. 2.0)THEN
 	  IF(R(1) .GT. 4*R(ND))THEN
 	    TAU(1)=TA(1)*R(1)
-	  ELSE 
+	  ELSE
 	    TAU(1)=TA(1)*(R(1)-R(ND))/8.0D0
 	  END IF
 	ELSE
@@ -78,13 +79,13 @@
 	NXST=1
 	DO WHILE(TAU(NXST) .LT. OLD_TAU(1))
 	  NXST=NXST+1
-	END DO 
+	END DO
 	NX=ND
 	DO WHILE(TAU(NX) .GT. OLD_TAU(OLD_ND))
 	  NX=NX-1
 	END DO
 	LOG_TAU=LOG(TAU)
-	LOG_OLD_TAU=LOG(OLD_TAU) 
+	LOG_OLD_TAU=LOG(OLD_TAU)
 	N_INT=NX-NXST+1
 !
 	TB(1:OLD_ND)=LOG(OLD_T(1:OLD_ND))
@@ -282,5 +283,5 @@
 !
 	CALL EVAL_LTE_V5(DO_LEV_DISSOLUTION,ND)
 !
-	RETURN 
+	RETURN
 	END

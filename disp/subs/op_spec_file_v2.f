@@ -4,11 +4,12 @@ C are compatible. Return an error message depending on the error.
 C
 	SUBROUTINE OP_SPEC_FILE_V2(FILNAME,LU,ABUND_SPEC,POP_VEC,ND,
 	1            FORMAT_DATE,IOS,TIME,DESC)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 	INTEGER LU,IOS,ND
-	REAL(10) ABUND_SPEC
-	REAL(10) POP_VEC(ND)
+	REAL(KIND=LDP) ABUND_SPEC
+	REAL(KIND=LDP) POP_VEC(ND)
 	CHARACTER*(*) DESC,FILNAME,TIME,FORMAT_DATE
 C
 C Local variables
@@ -51,7 +52,7 @@ C
 	  IF( INDEX(STRING,'abundance:') .NE. 0)THEN
 	    READ(STRING,'(T30,BN,F16.0)')ABUND_SPEC
 C
-C Read in population 
+C Read in population
 C
 	    READ(LU,*)(POP_VEC(I),I=1,ND)
 	  ELSE

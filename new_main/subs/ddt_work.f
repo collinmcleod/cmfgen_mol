@@ -3,6 +3,7 @@
 ! Routine should be compatible with eval_temp_ddt_v2.
 !
 	SUBROUTINE DDT_WORK(WORK,POPS,T_FROM_J,OLD_T_RET,TIME_SEQ_NO,ND,NT)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -11,7 +12,7 @@
 !                          (POPS was added to call).
 ! Altered 19-Sep-2011: Bug fix in DDT_WORK_CHK output: ER (cur and old) were a
 !                          factor of 4 too large.
-! Altered 13-Nov-2009: Changed INT_EN interpolaton section. No longer use 
+! Altered 13-Nov-2009: Changed INT_EN interpolaton section. No longer use
 !                          OLD values when outside range, and we limit changes,
 !                          when extrapolating, to a factor of 2.
 ! Created 13-Dec-2005: Based on EVAL_ADIABATIC_V3
@@ -21,38 +22,38 @@
 !
 ! Output:
 !
-	REAL(10) WORK(ND)
-	REAL(10) T_FROM_J(ND)
-	REAL(10) OLD_T_RET(ND)
+	REAL(KIND=LDP) WORK(ND)
+	REAL(KIND=LDP) T_FROM_J(ND)
+	REAL(KIND=LDP) OLD_T_RET(ND)
 !
 ! Input:
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) TIME_SEQ_NO
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) TIME_SEQ_NO
 !
 ! Local vectors.
 !
-	REAL(10) TCUR(ND)
-	REAL(10) EK_VEC(ND)
-	REAL(10) EI_VEC(ND)
-	REAL(10) P_VEC(ND)
-	REAL(10) GAMMA(ND)
-	REAL(10) INT_EN(ND)
+	REAL(KIND=LDP) TCUR(ND)
+	REAL(KIND=LDP) EK_VEC(ND)
+	REAL(KIND=LDP) EI_VEC(ND)
+	REAL(KIND=LDP) P_VEC(ND)
+	REAL(KIND=LDP) GAMMA(ND)
+	REAL(KIND=LDP) INT_EN(ND)
 !
-	REAL(10) OLD_POPS(NT,ND)
-	REAL(10) OLD_R(ND)
-	REAL(10) OLD_T(ND)
-	REAL(10) OLD_ED(ND)
-	REAL(10) OLD_GAMMA(ND)
-	REAL(10) OLD_POP_ATOM(ND)
-	REAL(10) OLD_INT_EN(ND)
+	REAL(KIND=LDP) OLD_POPS(NT,ND)
+	REAL(KIND=LDP) OLD_R(ND)
+	REAL(KIND=LDP) OLD_T(ND)
+	REAL(KIND=LDP) OLD_ED(ND)
+	REAL(KIND=LDP) OLD_GAMMA(ND)
+	REAL(KIND=LDP) OLD_POP_ATOM(ND)
+	REAL(KIND=LDP) OLD_INT_EN(ND)
 !
-	REAL(10) ION_EN(NT)
-	REAL(10) TOT_ENERGY(NT)
-	REAL(10) AVE_ENERGY(NT)
+	REAL(KIND=LDP) ION_EN(NT)
+	REAL(KIND=LDP) TOT_ENERGY(NT)
+	REAL(KIND=LDP) AVE_ENERGY(NT)
 !
-	REAL(10), ALLOCATABLE, SAVE :: T_STORE(:,:)
-	REAL(10), ALLOCATABLE, SAVE :: INT_EN_STORE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE, SAVE :: T_STORE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE, SAVE :: INT_EN_STORE(:,:)
 	LOGICAL MATCH
 !
 ! Local variables.
@@ -60,12 +61,12 @@
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
 	INTEGER ERROR_LU
-	REAL(10) BOLTZMANN_CONSTANT,FUN_PI
+	REAL(KIND=LDP) BOLTZMANN_CONSTANT,FUN_PI
 	EXTERNAL BOLTZMANN_CONSTANT,FUN_PI,ERROR_LU
 !
-	REAL(10) SCALE
-	REAL(10) T1,T2,PI
-	REAL(10) DELTA_T_SECS
+	REAL(KIND=LDP) SCALE
+	REAL(KIND=LDP) T1,T2,PI
+	REAL(KIND=LDP) DELTA_T_SECS
 	INTEGER I,J,K,L
 	INTEGER LUER
 	INTEGER ISPEC
@@ -80,7 +81,7 @@
 ! Constants for opacity etc. These are set in CMFGEN.
 !
         COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-        REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+        REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	CALL GET_LU(LU)
 	CALL GET_VERBOSE_INFO(VERBOSE_OUTPUT)
@@ -284,7 +285,7 @@
 	        T1=(TCUR(I)-T_STORE(I,J-1))/(T_STORE(I,J)-T_STORE(I,J-1))
 	        INT_EN(I)=INT_EN_STORE(I,J)*T1+INT_EN_STORE(I,J-1)*(1.0D0-T1)
                 EXIT
-	      END IF   
+	      END IF
  	    END DO
 	  END IF
 	END DO
@@ -295,7 +296,7 @@
 ! For historical reasons STEQ contains Int[chi.J - eta]dv. Rather than multiply
 ! this term everywhere by 4pi, we divide the adiabatic cooling rate by 4pi.
 ! Also, since chi, and eta are a factor of 10^10 too large, we need to
-! scale by 10^10. We need to introduce another factor of 10^4 since T is 
+! scale by 10^10. We need to introduce another factor of 10^4 since T is
 ! in units of 10^4K.
 !
 	PI=FUN_PI()
@@ -314,7 +315,7 @@
 	DO I=1,ND
  	    WORK(I)=EK_VEC(I)*( (1.0D0+GAMMA(I))*TCUR(I)- (1.0D0+OLD_GAMMA(I))*OLD_T(I) ) +
 	1           EI_VEC(I)*(INT_EN(I)-OLD_INT_EN(I))      +
-	1           P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I)) 
+	1           P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I))
 	END DO
 	OLD_T_RET(1:ND)=OLD_T(1:ND)
 !

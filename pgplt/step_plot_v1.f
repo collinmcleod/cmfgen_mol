@@ -21,6 +21,7 @@
 	1             XLAB_FILE,YLAB_FILE,
 	1             LINE_STYLE,LINE_WGT,
 	1             PEN_COL,PEN_OFFSET,REVERSE_PLOT_ORDER)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
 	USE MOD_EW_VARIABLES
 	USE GEN_IN_INTERFACE
@@ -33,7 +34,7 @@
 ! Altered: 22-Jul-2022 - Correct FWHM now passed to GET_LINE_ID_PG.
 ! Altered: 08-Jul-2022 - Only lower case options allowed.
 ! Altered: 07-Jul-2022 - Call updated, and cleaned.
-!                          Plot can be shifted 
+!                          Plot can be shifted
 ! Altered: 30-Jun-2022 - Can no append transition name to EW file.
 ! Created: 27-FEb-2022
 !
@@ -111,7 +112,7 @@
 	LOGICAL, SAVE ::  RESET_DEFAULTS=.TRUE.
 !
 	CHARACTER(LEN=80) LOC_FILE_WITH_LINE_LIMS
-	CHARACTER(LEN=80) OUT_FILE 
+	CHARACTER(LEN=80) OUT_FILE
 	CHARACTER(LEN=80) STRING
 !
 ! XLOC, YLOC will define initial cursor location.
@@ -196,6 +197,7 @@
 !
 	CONTAINS
 	SUBROUTINE PRINT_CURSOR_DESC
+	USE SET_KIND_MODULE
 !
 ! We restrict options to lower case to avoid accidental use of
 ! the mouse which returns A.

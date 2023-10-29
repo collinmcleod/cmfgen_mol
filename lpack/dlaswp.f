@@ -1,4 +1,5 @@
       SUBROUTINE DLASWP( N, A, LDA, K1, K2, IPIV, INCX )
+	USE SET_KIND_MODULE
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -10,7 +11,7 @@
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * )
-      REAL(10)   A( LDA, * )
+      REAL(KIND=LDP)   A( LDA, * )
 *     ..
 *
 *  Purpose
@@ -25,7 +26,7 @@
 *  N       (input) INTEGER
 *          The number of columns of the matrix A.
 *
-*  A       (input/output) REAL(10) array, dimension (LDA,N)
+*  A       (input/output) REAL(KIND=LDP) array, dimension (LDA,N)
 *          On entry, the matrix of column dimension N to which the row
 *          interchanges will be applied.
 *          On exit, the permuted matrix.
@@ -60,7 +61,7 @@
 *
 *     .. Local Scalars ..
       INTEGER            I, I1, I2, INC, IP, IX, IX0, J, K, N32
-      REAL(10)   TEMP
+      REAL(KIND=LDP)   TEMP
 *     ..
 *     .. Executable Statements ..
 *

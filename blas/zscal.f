@@ -1,4 +1,5 @@
       subroutine  zscal(n,za,zx,incx)
+	USE SET_KIND_MODULE
 c
 c     scales a vector by a constant.
 c     jack dongarra, 3/11/78.

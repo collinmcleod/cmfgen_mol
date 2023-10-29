@@ -14,11 +14,12 @@
 ! contain:
 !                N            !Number of data points
 !
-!                X1   X2      !Data type 
+!                X1   X2      !Data type
 !   or
-!                X     Y      !Data type 
+!                X     Y      !Data type
 !
 	SUBROUTINE PG_DEF_CONTINUUM(CONT,IPLT,OPLT,INPUT_OPTION,CURVE_OPTION,RET_IOS)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
@@ -30,9 +31,9 @@
 	REAL*4 CONT(NPTS(IPLT))
 	CHARACTER(LEN=*) INPUT_OPTION
 	CHARACTER(LEN=*) CURVE_OPTION
-	CHARACTER(LEN=120) UPPER_CASE 
+	CHARACTER(LEN=120) UPPER_CASE
 	CHARACTER(LEN=120) LOCAL_OPTION
-	CHARACTER(LEN=120) STRING 
+	CHARACTER(LEN=120) STRING
 	CHARACTER(LEN=120) OUT_FILE
         CHARACTER(LEN=10) DATA_TYPE
 !
@@ -78,7 +79,7 @@
 	  WRITE(LUOUT,'(T40,A)')'Number of data points'
 	  WRITE(LUOUT,'(8X,A1,15X,A1,T40,A)')'X','Y','!Data type'
 	  XCUR(1)=1; YCUR(1)=1
-	  DO I=1,50 
+	  DO I=1,50
 	    IF(I .NE. 1)THEN
 	      XCUR(I)=XCUR(I-1)
 	      YCUR(I)=YCUR(I-1)
@@ -96,7 +97,7 @@
 ! Use cursors to define bands to define the continuum. In each band,
 ! the continuum is defined by averaging the data. BANDS are written
 ! to CONT_NODES and these can be reread in by the DC option. Top of
-! file will need to be updated with number of nodes. 
+! file will need to be updated with number of nodes.
 !
 	ELSE IF (LOCAL_OPTION .EQ. 'CURX')THEN
 	  J=1; CALL PGSCI(J)
@@ -106,7 +107,7 @@
 	  WRITE(LUOUT,'(A)')' '
 	  WRITE(LUOUT,'(A)')'Use cursors to define continuum bands'
 	  WRITE(LUOUT,'(A)')' '
-	  DO I=1,50 
+	  DO I=1,50
 	    CURSERR = PGCURS(X1,Y1,CURSVAL)
 	    IF(CURSVAL .EQ. 'E' .OR. CURSVAL .EQ. 'e')EXIT
 	    CALL PGPT(IONE,X1,Y1,IONE)
@@ -151,9 +152,9 @@
 	      RETURN
 	    END IF
 	    IF( INDEX(STRING,'!Data type') .NE. 0 )THEN
-	      IF( INDEX(STRING,' X ') .NE. 0 .AND. INDEX(STRING,' Y  ') .NE. 0)THEN 
+	      IF( INDEX(STRING,' X ') .NE. 0 .AND. INDEX(STRING,' Y  ') .NE. 0)THEN
 	        DATA_TYPE='NODES'
-	      ELSE IF( INDEX(STRING,' X1 ') .NE. 0 .AND. INDEX(STRING,' X2 ') .NE. 0)THEN 
+	      ELSE IF( INDEX(STRING,' X1 ') .NE. 0 .AND. INDEX(STRING,' X2 ') .NE. 0)THEN
 	        DATA_TYPE='BANDS'
 	      ELSE
 	        WRITE(6,*)'Data type not recognized'
@@ -214,7 +215,7 @@
 	  CALL MON_INTERP_SP(CONT(ILOW),J,IONE,CD(IPLT)%XVEC(ILOW),J,YCUR,N_NODES,XCUR,N_NODES)
 	END IF
 !
-! If IP is non-zero, we store plot in a regular data vector. 
+! If IP is non-zero, we store plot in a regular data vector.
 !
 	IF(OPLT .NE. 0)THEN
 	  I=NPTS(IPLT)

@@ -3,15 +3,16 @@ C This routine is used to compute the perturbations to
 C Jv (1 ... ND) as a function of the population levels and T .
 C Uses Schuster or diffusion approximation for lower boundary
 C condition. Subroutine may be used with or without a variable
-C temperature. 
+C temperature.
 C
 	SUBROUTINE NEWPERTJD(F2DA,FC,FA,FB,VK,WM,AQW,
 	1    DTAU,CHI,dCHIdR,R,Z,P,THETA,SOURCE,TA,TB,TC,XM,
 	1    DIFF,DBB,IC,ESEC,THK,NC,ND,NP,METHOD)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 08-Dec-04  Introduce CONTIG array. Thus F2DA , FC and FA no longer
-C                      have to be stored sequentially for the guassian 
+C                      have to be stored sequentially for the guassian
 C                      elimination routine.
 C Altered 28-Oct-96  Bug fix: COS converted back to ACOS in TOR expression.
 C Altered 24-May-96  DOUBLE PRECISION declarations removed.
@@ -38,17 +39,17 @@ C
 	INTEGER NC,ND,NP
 	CHARACTER*(*) METHOD
 C
-	REAL(10) F2DA(ND,ND),FC(ND,ND),FB(ND,ND),VK(ND,ND)
-	REAL(10) WM(ND,ND),AQW(ND,NP)
-	REAL(10) DTAU(ND),CHI(ND),dCHIdR(ND)
-	REAL(10) THETA(ND),SOURCE(ND),FA(ND),R(ND),Z(ND),P(NP)
-	REAL(10) TA(ND),TB(ND),TC(ND),XM(ND),ESEC(ND)
-	REAL(10) IC,DBB
+	REAL(KIND=LDP) F2DA(ND,ND),FC(ND,ND),FB(ND,ND),VK(ND,ND)
+	REAL(KIND=LDP) WM(ND,ND),AQW(ND,NP)
+	REAL(KIND=LDP) DTAU(ND),CHI(ND),dCHIdR(ND)
+	REAL(KIND=LDP) THETA(ND),SOURCE(ND),FA(ND),R(ND),Z(ND),P(NP)
+	REAL(KIND=LDP) TA(ND),TB(ND),TC(ND),XM(ND),ESEC(ND)
+	REAL(KIND=LDP) IC,DBB
 C
 	INTEGER, PARAMETER :: IONE=1
 C
-	REAL(10) CONTIG(ND,2*ND+1)
-	REAL(10) IBOUND,TOR,DBC
+	REAL(KIND=LDP) CONTIG(ND,2*ND+1)
+	REAL(KIND=LDP) IBOUND,TOR,DBC
 	INTEGER I,J,KS,NI,LS
 C
 C Zero F2DA and FC matrices and FA vector. NB: These matrices should

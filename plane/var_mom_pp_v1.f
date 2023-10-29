@@ -1,13 +1,14 @@
 !
 ! Subroutine to solve the plane-parallel moment equations
-! for the variation of J with CHI and ETA. This routine 
-! should be called in conjunction with: fcomp_pp.f & mom_j_pp_v1.f 
+! for the variation of J with CHI and ETA. This routine
+! should be called in conjunction with: fcomp_pp.f & mom_j_pp_v1.f
 !
 	SUBROUTINE VAR_MOM_PP_V1(R,ETA,CHI,ESEC,F,
 	1               TX,dJ_DIFF_dT,dJ_DIFF_ddTdR,DO_THIS_MATRIX,
 	1               HBC_J,HBC_S,IN_HBC,
 	1               DIFF,DBB,dDBBdT,dTdR,
 	1               IC,METHOD,COHERENT,ND,NM)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 4-Jan-2005
@@ -17,29 +18,29 @@
 !
 ! Atmospheric variables: these are supplied.
 !
-	REAL(10) R(ND)
-	REAL(10) ETA(ND)
-	REAL(10) CHI(ND)
-	REAL(10) ESEC(ND)
-	REAL(10) F(ND)		!F (=J/K) must be supplied.
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) ETA(ND)
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) ESEC(ND)
+	REAL(KIND=LDP) F(ND)		!F (=J/K) must be supplied.
 !
 ! Radiation field variables.These are computed.
 !
-	REAL(10) TX(ND,ND,NM)
-	REAL(10) dJ_DIFF_dT(ND)
-	REAL(10) dJ_DIFF_ddTdR(ND)
+	REAL(KIND=LDP) TX(ND,ND,NM)
+	REAL(KIND=LDP) dJ_DIFF_dT(ND)
+	REAL(KIND=LDP) dJ_DIFF_ddTdR(ND)
 	LOGICAL DO_THIS_MATRIX(NM)
 !
 ! Boundary conditions: required input.
 !
-	REAL(10) HBC_J		!H = HBC_J*J(1) + HBC_J*S(1) 
-	REAL(10) HBC_S
-	REAL(10) IN_HBC		!H = 0.25Ic - hJ -hIc/2 (inner boundary)
+	REAL(KIND=LDP) HBC_J		!H = HBC_J*J(1) + HBC_J*S(1)
+	REAL(KIND=LDP) HBC_S
+	REAL(KIND=LDP) IN_HBC		!H = 0.25Ic - hJ -hIc/2 (inner boundary)
 !
-	REAL(10) DBB		!|dB/dR| -- for diffusion approximation.
-	REAL(10) dDBBdT
-	REAL(10) dTdR
-	REAL(10) IC		!Intensity at inner boundary (used if DIFF=.FALSE.)
+	REAL(KIND=LDP) DBB		!|dB/dR| -- for diffusion approximation.
+	REAL(KIND=LDP) dDBBdT
+	REAL(KIND=LDP) dTdR
+	REAL(KIND=LDP) IC		!Intensity at inner boundary (used if DIFF=.FALSE.)
 !
 	LOGICAL DIFF		!Use diffusion approximation?
 	LOGICAL COHERENT	!Assume coherent scattering?
@@ -47,18 +48,18 @@
 !
 ! Local vectors.
 !
-	REAL(10) dJ_dDBB(ND)
-	REAL(10) JNU(ND)
+	REAL(KIND=LDP) dJ_dDBB(ND)
+	REAL(KIND=LDP) JNU(ND)
 !
-	REAL(10) TA(ND)
-	REAL(10) DD(ND)
-	REAL(10) TC(ND)
-	REAL(10) DTAU(ND)
-	REAL(10) RHS(ND)
-	REAL(10) dCHIdR(ND)
-	REAL(10) SOURCE(ND)
-	REAL(10) COH_VEC(ND)
-	REAL(10) TOR,E2TOR,EXPN
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) DD(ND)
+	REAL(KIND=LDP) TC(ND)
+	REAL(KIND=LDP) DTAU(ND)
+	REAL(KIND=LDP) RHS(ND)
+	REAL(KIND=LDP) dCHIdR(ND)
+	REAL(KIND=LDP) SOURCE(ND)
+	REAL(KIND=LDP) COH_VEC(ND)
+	REAL(KIND=LDP) TOR,E2TOR,EXPN
 	EXTERNAL EXPN
 !
 	INTEGER, PARAMETER :: IONE=1
@@ -74,7 +75,7 @@
         END DO
 	CALL TUNE(2,'ZER_TX')
 !
-! Compute optical depth scale. 
+! Compute optical depth scale.
 !
 	CALL DERIVCHI(dCHIdR,CHI,R,ND,METHOD)
 	CALL d_DERIVCHI_dCHI(dCHIdR,CHI,R,ND,METHOD)
@@ -138,7 +139,7 @@
 ! NB: As there in no velocity field, there is no coupling with
 ! earlier frequencies.
 !
-! After this call: 
+! After this call:
 !         TX(I,J,1)= dRHS(I)/dCHI(J)
 !
 ! Evaluate optical depth at the outer boundary. This expression should be the same as in

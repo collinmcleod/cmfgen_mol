@@ -3,6 +3,7 @@
 ! This subsequently allows to allocate the necessary storage for reading in the data.
 !
 	SUBROUTINE GET_ND_SEQ_MODEL_FILE(ND,LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 29-Aug-2012 :  Old LEV_POP_AVAIL was not being set for the ion when a new
@@ -35,9 +36,10 @@
 ! Read in sequential unformatted model file with old model data. The format of
 ! this file has been designed so that number of species, levels, and depths can be
 ! changed in a time sequence. There are still issues if we add a species.
-! 
+!
 	SUBROUTINE READ_SEQ_TIME_FILE_V1(OLD_R,OLD_V,OLD_SIGMA,OLD_POP_ATOM,OLD_DENSITY,
 	1              POPS,OLD_ION_STAGE_PRES,SN_AGE,ND,NT,LU)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -55,24 +57,24 @@
 	INTEGER ND
 	INTEGER LU
 !
-	REAL(10) OLD_R(ND)
-	REAL(10) OLD_V(ND)
-	REAL(10) OLD_SIGMA(ND)
-	REAL(10) OLD_POP_ATOM(ND)
-	REAL(10) OLD_DENSITY(ND)
-	REAL(10) POPS(NT,ND)
-	REAL(10) SN_AGE
+	REAL(KIND=LDP) OLD_R(ND)
+	REAL(KIND=LDP) OLD_V(ND)
+	REAL(KIND=LDP) OLD_SIGMA(ND)
+	REAL(KIND=LDP) OLD_POP_ATOM(ND)
+	REAL(KIND=LDP) OLD_DENSITY(ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) SN_AGE
 !
 	LOGICAL OLD_ION_STAGE_PRES(NUM_IONS)
 !
 ! Local variables.
 !
-	REAL(10), ALLOCATABLE :: OLD_XzV(:,:)
-	REAL(10), ALLOCATABLE :: TMP_XzV(:,:)
-	REAL(10), ALLOCATABLE :: TMP_DXzV(:)
-	REAL(10) HDKT
-	REAL(10) T1
-	REAL(10) ZXzV
+	REAL(KIND=LDP), ALLOCATABLE :: OLD_XzV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: TMP_XzV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: TMP_DXzV(:)
+	REAL(KIND=LDP) HDKT
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) ZXzV
 !
 	INTEGER ID
 	INTEGER LOOP_ID
@@ -149,7 +151,7 @@
 !
 ! NX is the number of levels in the old model atom.
 ! We use TMP_XzV for the populations in the old model as read from the file.
-! We use OLD_XzV for the old populations, with the number of levels adjusted for 
+! We use OLD_XzV for the old populations, with the number of levels adjusted for
 !                                         the new model.
 !
 	      DID_LAST_ID=.FALSE.
@@ -178,7 +180,7 @@
 !
 ! Even if we don't want this ioization stage, we must still read in
 ! the data.
-! 
+!
 	        ALLOCATE(TMP_XzV(NX,ND))
 	        READ(LU)TMP_XzV
 	        READ(LU)TMP_DXzV
@@ -219,7 +221,7 @@
 !
 ! In this section we correct for the possibility that the ground term has
 ! structure, and thus we need to sum its populations over several levels.
-! We simply do this by scaling by the ratio of statistical weights. 
+! We simply do this by scaling by the ratio of statistical weights.
 !
 	        ELSE IF(DID_LAST_ID)THEN
 !

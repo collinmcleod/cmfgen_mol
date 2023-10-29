@@ -3,7 +3,7 @@
 ! The RECL is not stored with the file on UNIX systems.
 !
 ! Modified 20-Aug-2000: Format date can be output. Alterations made to minimize
-!                         changes to other routines. Changes should make 
+!                         changes to other routines. Changes should make
 !                         the transfer of DIRECT access files between PENTIUM and
 !                         ALPHA systems transparent.
 ! Modified 18-Aug-2003: UNIT_SIZE and WORD_SIZE output to INFO file.
@@ -11,6 +11,7 @@
 !                         At present, no change to READ_DIRECT_INFO_V3 (except date modification).
 !
 	SUBROUTINE WRITE_DIRECT_INFO_V3(ND,RECL,FILE_DATE,FILENAME,LU_EDD)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 16-Jun-2000
@@ -62,10 +63,11 @@
 !                       Error occurred switching from PGF compiler (unit size=1)
 !                         to Intel compiler (unit size=4). 1/4 was giving 0
 !                         instead of 0.25
-! Modified 28-Oct-2001: IOS returned in call 
+! Modified 28-Oct-2001: IOS returned in call
 ! Modified 20-August-2000 so that a format date can be read.
 !
 	SUBROUTINE READ_DIRECT_INFO_V3(ND,RECL,FILE_DATE,FILENAME,LU_EDD,IOS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 24-Apr-2016 : Increaed allowed filename length to 127 (132 with _INFO).

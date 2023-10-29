@@ -1,4 +1,5 @@
 	SUBROUTINE WRITE_LINE_LAMBDAS(OPTION)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	CHARACTER(LEN=*) OPTION
 	LOGICAL DONE
@@ -26,12 +27,12 @@
 	  WRITE(6,*)'C II:    4268.2 4    268.5    6579.87     6584.70   7233.33     7238.41    7239.16'
 	  DONE=.TRUE.	
 	END IF
-! 
+!
 	IF(OPTION .EQ. ' ' .OR. OPTION .EQ. 'CIII' .OR. OPTION .EQ. 'CARB')THEN
 	  WRITE(6,*)'C III:   1174.933   1175.263   1174.933   1175.711   1175.987   1176.370'
           WRITE(6,*)'C III:   1247.383   1908.73    2297.58'
 	  WRITE(6,*)'C III:   4648.719   4651.548   4652.775   M4650.11'
-	  WRITE(6,*)'C III:   5697.50    8502.66' 
+	  WRITE(6,*)'C III:   5697.50    8502.66'
 	  WRITE(6,*)'C III:   6729.34    6732.90    6744.01    6746.04    6746.23    M6742.5'
 	  WRITE(6,*)'C III:   9703.76    9708.07    9709.10    9717.75    9720.42    M9713.3'
 	  DONE=.TRUE.	
@@ -44,7 +45,7 @@
 !
 	IF(OPTION .EQ. ' ' .OR. OPTION .EQ. 'NIII' .OR. OPTION .EQ. 'NIT')THEN
           WRITE(6,*)'N III:    1182.97   1183.03    1184.51    1184.57    1316.44    1318.41'
-          WRITE(6,*)'N III:    1746.82   1748.65    1751.22    1751.66    M1749.44' 
+          WRITE(6,*)'N III:    1746.82   1748.65    1751.22    1751.66    M1749.44'
 	  WRITE(6,*)'N III:    4098.51   4104.55    M4100.53'
           WRITE(6,*)'N III:    4635.42   4641.94    4643.15    M4639.9'
 	  DONE=.TRUE.	
@@ -110,12 +111,12 @@
 	  WRITE(6,*)'P V:     1117.977   1128.008'
 	  DONE=.TRUE.	
 	END IF
-!  
+!
 	IF(OPTION .EQ. ' ' .OR. OPTION .EQ. 'SK2' .OR. OPTION .EQ. 'SIL')THEN
 	  WRITE(6,*)'Si II:   1190.416   1193.290  1194.500    1197.394'
 	  WRITE(6,*)'Si II:   1230.749   1231.658'
 	  WRITE(6,*)'Si II:   1260.42    1260.738  1265.002    1304.360   1309.276'
-	  WRITE(6,*)'Si II:   1526.72    1533.45   1808.013    1816.928   1817.451'   
+	  WRITE(6,*)'Si II:   1526.72    1533.45   1808.013    1816.928   1817.451'
 	  WRITE(6,*)'Si II:   4129.23    4132.05   4132.06                                3s2_3d_2De-3s2_4f_2Do'
 	  WRITE(6,*)'Si II:   5042.44    5057.394  5057.726                               3s2_4p_2Po-3s2_4d_2De'
 	  WRITE(6,*)'Si II:   6348.85    6373.12                                          3s2_4s_2Se-3s2_4p_2Po'
@@ -129,7 +130,7 @@
 	END IF
 !
 	IF(OPTION .EQ. ' ' .OR. OPTION .EQ. 'SV' .OR. OPTION .EQ. 'SUL')THEN
-	  WRITE(6,*)'S V:     1122.031   1128.666   1128.779   1133.901   1133.97    1501.763'    
+	  WRITE(6,*)'S V:     1122.031   1128.666   1128.779   1133.901   1133.97    1501.763'
 	  DONE=.TRUE.	
 	END IF
 !
@@ -147,7 +148,7 @@
 	IF(.NOT. DONE)THEN
 	  WRITE(6,*)'Species not recognized'
 	  WRITE(6,*)'Current ionization stages are:'
-	  WRITE(6,*)'HI    HeI    He2    C2   CII    CIV' 
+	  WRITE(6,*)'HI    HeI    He2    C2   CII    CIV'
 	  WRITE(6,*)'NIV   OV'
 	  WRITE(6,*)'OIV   OV     OSIX'
 	  WRITE(6,*)'Sk2   SkIV'

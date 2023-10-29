@@ -1,4 +1,6 @@
-      REAL(10) function dzasum(n,zx,incx)
+      function dzasum(n,zx,incx)
+      USE SET_KIND_MODULE
+      REAL(KIND=LDP) dzasum
 c
 c     takes the sum of the absolute values.
 c     jack dongarra, 3/11/78.
@@ -6,7 +8,7 @@ c     modified 3/93 to return if incx .le. 0.
 c     modified 12/3/93, array(1) declarations changed to array(*)
 c
       double complex zx(*)
-      REAL(10) stemp,dcabs1
+      REAL(KIND=LDP) stemp,dcabs1
       integer i,incx,ix,n
 c
       dzasum = 0.0d0

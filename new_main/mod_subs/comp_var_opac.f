@@ -4,6 +4,7 @@
 !
 	SUBROUTINE COMP_VAR_OPAC(POPS,RJ,FL,CONT_FREQ,FREQ_INDX,
 	1                SECTION,ND,NT,LST_DEPTH_ONLY)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE CONTROL_VARIABLE_MOD
 	USE OPAC_MOD
@@ -15,10 +16,10 @@
 	INTEGER ND
 	INTEGER NT
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) RJ(ND)
-	REAL(10) FL
-	REAL(10) CONT_FREQ
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) RJ(ND)
+	REAL(KIND=LDP) FL
+	REAL(KIND=LDP) CONT_FREQ
 	INTEGER FREQ_INDX
 	CHARACTER*(*) SECTION
 	LOGICAL LST_DEPTH_ONLY
@@ -26,11 +27,11 @@
 ! Constants for opacity etc.
 !
         COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-        REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+        REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local variables.
 !
-	REAL(10) T1,T2,T3,T4
+	REAL(KIND=LDP) T1,T2,T3,T4
 	INTEGER J
 	INTEGER K
 	INTEGER L
@@ -187,9 +188,9 @@
 ! Need to correct VETA for the variation in T in the factor T4.
 ! Over correction at present because impurity species included.
 !
-	    VETA(NT,L)=VETA(NT,L) + 
+	    VETA(NT,L)=VETA(NT,L) +
 	1                ETA_C_EVAL(L)*T4*HDKT*(FL-CONT_FREQ)/T(L)/T(L)
-	    VETA_ALL(NT,L)=VETA_ALL(NT,L) + 
+	    VETA_ALL(NT,L)=VETA_ALL(NT,L) +
 	1                ETA_C_EVAL(L)*T4*HDKT*(FL-CONT_FREQ)/T(L)/T(L)
 !
 ! Can now correct the opacity.
@@ -209,7 +210,7 @@
               DO K=1,NT
                 VETA(K,L)=VETA_SAV(K,L)*T4
               END DO
-	      VETA(NT,L)=VETA(NT,L) + 
+	      VETA(NT,L)=VETA(NT,L) +
 	1                  ETA_C_EVAL(L)*T4*HDKT*(FL-CONT_FREQ)/T(L)/T(L)
 	    END DO
 !
@@ -219,7 +220,7 @@
               DO K=1,NT
                 VETA_ALL(K,L)=VETA_ALL_SAV(K,L)*T4
               END DO
-	      VETA_ALL(NT,L)=VETA_ALL(NT,L) + 
+	      VETA_ALL(NT,L)=VETA_ALL(NT,L) +
 	1                  ETA_C_EVAL(L)*T4*HDKT*(FL-CONT_FREQ)/T(L)/T(L)
 	    END DO
 !
@@ -232,14 +233,14 @@
 !
 !$OMP END PARALLEL WORKSHARE
 !
-	  END IF  
+	  END IF
 !
 	END IF			!Correct cross-section?
 !
 ! 
 !
 !
-! In the CONTINUUM code section (with blanketing) the variation of the opacity 
+! In the CONTINUUM code section (with blanketing) the variation of the opacity
 ! and emissivity due to the electron scattering term is handled separately.
 ! It is required in the DTDR section, DIELECTRONIC and LINE sections.
 ! In DTDR the cross-sections can also be held fixed. In order that our

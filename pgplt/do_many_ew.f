@@ -2,6 +2,7 @@
 ! Altered:  26-May-2015 : Include the EWG option. Measure the EW for a group of lines from a file.
 !
 	SUBROUTINE DO_MANY_EW(TYPE_CURVE,NPLTS,MAX_PLTS)
+	USE SET_KIND_MODULE
 	USE NEW_GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -18,7 +19,7 @@
 	REAL*4, ALLOCATABLE :: CENT(:)
 	REAL*4 LRANGE(2)
 	REAL*4 DOP_VEL
-	REAL(10) TAU_CUT
+	REAL(KIND=LDP) TAU_CUT
 !
         INTEGER N_LINE_IDS
         LOGICAL OBSERVED_WAVE(5000)
@@ -50,8 +51,8 @@
 !	
 ! EWG Option compute the EW for a group of lines from a file. Assuming cont=1 !!!!
 ! They are two options:
-! 	1) It's possible to generate the file using the LINE_IN (or other file with 
-!	   same format) from DISPGEN, the ion name (e.g. SkIII), the wavelength 
+! 	1) It's possible to generate the file using the LINE_IN (or other file with
+!	   same format) from DISPGEN, the ion name (e.g. SkIII), the wavelength
 !	   range, minimum optical depth at the center (intensity for plnid) and
 !	   a doppler width in km/s that define the spectral width taken account
 !	   to calculate the EW.
@@ -62,7 +63,7 @@
 !	   FeIII       2212    2232  2220
 !           ....        ...    ...   ...
 !	   where Wo is the initial wavelength to measure the EW, Wf is the final one
-!	   and Lambda is the central VACUUM wavelength of the line. 
+!	   and Lambda is the central VACUUM wavelength of the line.
 !
 !	Raul E. Puebla (27 - May - 2015)
 !
@@ -72,11 +73,11 @@
 	CALL NEW_GEN_IN(GEN_FILE,'Do you want to create a file from LINE_ID?')
 !	
 ! This section write the file that will be read below to calculate EWs for each line.
-! Doppler width (km/s) is an ad hoc value. Is better to explore the regions 
-! in order ensure that the whole line and wigns are taken account. 
+! Doppler width (km/s) is an ad hoc value. Is better to explore the regions
+! in order ensure that the whole line and wigns are taken account.
 ! THe file containing the lines id MUST have the same format of LINE_ID from dispgen.
 ! The number of ions must be in the same format used in CMFGEN (e.g. Nk2 for Ni II).
-! (Puebla 27-May-2015) 
+! (Puebla 27-May-2015)
 !
 	IF (GEN_FILE) THEN
 	  CALL NEW_GEN_IN(ID_FILNAME,'File with line IDs')
@@ -115,7 +116,7 @@
 	        IF ( TRIM(LINE_ID(J+1)) .EQ. TRIM(IONNAME(I)) .OR. TRIM(IONNAME(I)) .EQ. 'ALL') THEN
 	          J=J+1
 	        END IF
-	     END IF 
+	     END IF
 	    END DO
 	  END DO
 2500	  CONTINUE
@@ -177,7 +178,7 @@
 	    REWIND(UNIT=31)
 	ELSE
 !
-! This section open a file that already exists in the directory 
+! This section open a file that already exists in the directory
 ! with the information of the lines ranges and names.
 !
 	  FILNAME='ew_file1'
@@ -245,7 +246,7 @@
 ! Makes the vertical lines for the ranges around each lines
 !
 	TYPE_CURVE(NPLTS)='V'
-!	 
+!	
 ! Deallocate the used vectors
 !
 1000	CONTINUE

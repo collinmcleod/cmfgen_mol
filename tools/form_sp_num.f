@@ -5,9 +5,10 @@ C
 C (The double precision routine [FORM_DP_NUM] calls this routine).
 C
 	SUBROUTINE FORM_SP_NUM(VAL,FORM,LENGTH)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
-C Altered 29-Apr-1991 - Variable (i.e. <) formats removed for CRAY 
+C Altered 29-Apr-1991 - Variable (i.e. <) formats removed for CRAY
 C                       compatibility.
 C Created 10-Dec-1990
 C
@@ -89,13 +90,14 @@ C
 	END IF
 C
 	END
-	  
+	
 C
 C Routine to format single precision numbers to their most compact form.
 C Only NUM_SIG_DIG signicant digits are assumed.
 C
 C
 	SUBROUTINE FORM_DP_NUM(VAL,FORM,LENGTH)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 08-Jun-2013 - Made identical to FORM_SP_NUM except for VAL declaration.
@@ -103,7 +105,7 @@ C                         Can now handle very small numbers.
 C
 	INTEGER LENGTH,I,J,POW,NUM_SIG_DIG
 	PARAMETER (NUM_SIG_DIG=7)
-	REAL(10) VAL
+	REAL(KIND=LDP) VAL
 	CHARACTER(LEN=*) FORM
 	CHARACTER(LEN=80) STR
 C
@@ -179,5 +181,5 @@ C
 	END IF
 C
 	END
-	  
+	
 

@@ -1,11 +1,12 @@
 C
 C Subroutine to change the color indexes for the lines,
-C background, and labels. In GRAMON, color indexes 
+C background, and labels. In GRAMON, color indexes
 C are known as pens
 C
 C Created September 1996 by Gregson Vaux
 C
       SUBROUTINE CHANGE_PEN(PENCOL,MAXPEN,NPLTS)
+	USE SET_KIND_MODULE
       USE NEW_GEN_IN_INTERFACE
       IMPLICIT NONE
 C

@@ -1,5 +1,6 @@
       SUBROUTINE ZHEMV ( UPLO, N, ALPHA, A, LDA, X, INCX,
      $                   BETA, Y, INCY )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       COMPLEX*16         ALPHA, BETA
       INTEGER            INCX, INCY, LDA, N

@@ -6,11 +6,12 @@
 !
 	SUBROUTINE FIDDLE_POP_CORRECTIONS_V2(POPS,STEQ,T_MIN,CHANGE_LIM,MAX_dT_COR,
 	1              SCALE_OPT,LAMBDA_IT,LU_SUM,NT,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered: 14-Feb-2014 -- Changed to V2 -- added MAX_dT_COR to call.
 ! Altered: 01-Jan-2014 -- Modified to use standard read routines. Some cleaning and
-!                           meaning of POP_LIM altered.  
+!                           meaning of POP_LIM altered.
 ! Altered: 14-DEc-2013 -- Subroutine calls SET_DEPTH_CONSISTENCY if LAMBDA iteration.
 ! Altered: 30-Sep-2011 -- T LIMIT and POP LIMIT introduced -- Based on a similar modification
 !                            by Chendong. Some cleaning, and better error messages.
@@ -20,32 +21,32 @@
 	INTEGER NT
 	INTEGER ND
 	INTEGER LU_SUM
-	REAL(10) POPS(NT,ND)
-	REAL(10) STEQ(NT,ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) STEQ(NT,ND)
 !
-	REAL(10) T_MIN
-	REAL(10) CHANGE_LIM
-	REAL(10) MAX_dT_COR
+	REAL(KIND=LDP) T_MIN
+	REAL(KIND=LDP) CHANGE_LIM
+	REAL(KIND=LDP) MAX_dT_COR
 	LOGICAL LAMBDA_IT
 	CHARACTER(LEN=*) SCALE_OPT
 !
 ! Local variables
 !
-	REAL(10) RELAX_PARAM(ND)
-	REAL(10) POP_LIM(ND)
-	REAL(10) T_LIM(ND)
+	REAL(KIND=LDP) RELAX_PARAM(ND)
+	REAL(KIND=LDP) POP_LIM(ND)
+	REAL(KIND=LDP) T_LIM(ND)
 !
-	REAL(10) RELAX_VARIABLE
-	REAL(10) T_LIM_VARIABLE
-	REAL(10) POP_LIM_VARIABLE
+	REAL(KIND=LDP) RELAX_VARIABLE
+	REAL(KIND=LDP) T_LIM_VARIABLE
+	REAL(KIND=LDP) POP_LIM_VARIABLE
 !
-	REAL(10) LIT_LIM,BIG_LIM
-	REAL(10) DPTH_LIT_LIM,DPTH_BIG_LIM
-	REAL(10) T1,T2,T3
-	REAL(10) MIN_SCALE
-	REAL(10) SCALE
-	REAL(10) BAD_DECREASE_LIMIT
-	REAL(10) BAD_INCREASE_LIMIT
+	REAL(KIND=LDP) LIT_LIM,BIG_LIM
+	REAL(KIND=LDP) DPTH_LIT_LIM,DPTH_BIG_LIM
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) MIN_SCALE
+	REAL(KIND=LDP) SCALE
+	REAL(KIND=LDP) BAD_DECREASE_LIMIT
+	REAL(KIND=LDP) BAD_INCREASE_LIMIT
 !
 	INTEGER, PARAMETER :: LU_SCR=26
 	INTEGER, SAVE:: COUNTER=0
@@ -82,7 +83,7 @@
 !
 ! Valid ranges:
 !              0 < RELAX_PARAM < 2
-!              0 < T_LIM < 0.2 
+!              0 < T_LIM < 0.2
 !              POP_LIM > 1
 !
 ! The file, ADJUST_CORRECTIONS, need not be present.

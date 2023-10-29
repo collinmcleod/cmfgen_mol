@@ -9,6 +9,7 @@
 !
 	SUBROUTINE RD_CONT_J(FL,FREQ_INDX,FIRST_FREQ,LST_ITERATION,
 	1               ACCURATE,LUER,LU_EDD,ACCESS_F,ND,NP)
+	USE SET_KIND_MODULE
 !
         USE ANG_QW_MOD
         USE MOD_CMFGEN
@@ -18,7 +19,7 @@
 !
 ! Created 28-Jan-2005
 !
-	REAL(10) FL
+	REAL(KIND=LDP) FL
 !
 	INTEGER ACCESS_F
 	INTEGER FREQ_INDX
@@ -34,13 +35,13 @@
 !
 ! Local variables and arrays.
 !
-	REAL(10), SAVE :: LOW_FREQ, HIGH_FREQ
-	REAL(10), ALLOCATABLE :: RJ_LOW(:)
-	REAL(10), ALLOCATABLE :: RJ_HIGH(:)
+	REAL(KIND=LDP), SAVE :: LOW_FREQ, HIGH_FREQ
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_LOW(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_HIGH(:)
 	SAVE RJ_LOW
 	SAVE RJ_HIGH
 !
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER I
 !
 	IF(ACCURATE)THEN
@@ -60,7 +61,7 @@
 	IPLUS(1:NP)=1.0D-10		!Arbitrary value
 	HBC_CMF(1)=1.0D0
 !
-! Special treatment if first frequency. 
+! Special treatment if first frequency.
 !
 	IF(FIRST_FREQ)THEN
 	  IF( .NOT. ALLOCATED(RJ_LOW) )THEN
@@ -93,14 +94,14 @@
 	END DO
 !
 ! Do the interpolation: We use simple linear interpolation.
-! If frequency higher than value in file, we adopt the first 
+! If frequency higher than value in file, we adopt the first
 ! file value.
 !
         IF(FL .GE. HIGH_FREQ)THEN
 	   RJ(1:ND)=RJ_HIGH(1:ND)
         ELSE IF(FL .LE. LOW_FREQ)THEN
 	   RJ(1:ND)=RJ_LOW(1:ND)
-	ELSE 
+	ELSE
 	  T1=(FL-LOW_FREQ)/(HIGH_FREQ-LOW_FREQ)
 	  DO I=1,ND
 	    RJ(I)=(1.0D0-T1)*RJ_LOW(I)+T1*RJ_HIGH(I)

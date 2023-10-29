@@ -8,6 +8,7 @@
 ! If you need |# in string as a non-control, add a space before the  #.
 !
 	SUBROUTINE WR_COL_STR(STR_FOR_OUTPUT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created: 2-Nov-2011

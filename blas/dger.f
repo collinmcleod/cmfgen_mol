@@ -1,9 +1,10 @@
       SUBROUTINE DGER  ( M, N, ALPHA, X, INCX, Y, INCY, A, LDA )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
-      REAL(10)   ALPHA
+      REAL(KIND=LDP)   ALPHA
       INTEGER            INCX, INCY, LDA, M, N
 *     .. Array Arguments ..
-      REAL(10)   A( LDA, * ), X( * ), Y( * )
+      REAL(KIND=LDP)   A( LDA, * ), X( * ), Y( * )
 *     ..
 *
 *  Purpose
@@ -29,11 +30,11 @@
 *           N must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - REAL(10).
+*  ALPHA  - REAL(KIND=LDP).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
-*  X      - REAL(10) array of dimension at least
+*  X      - REAL(KIND=LDP) array of dimension at least
 *           ( 1 + ( m - 1 )*abs( INCX ) ).
 *           Before entry, the incremented array X must contain the m
 *           element vector x.
@@ -44,7 +45,7 @@
 *           X. INCX must not be zero.
 *           Unchanged on exit.
 *
-*  Y      - REAL(10) array of dimension at least
+*  Y      - REAL(KIND=LDP) array of dimension at least
 *           ( 1 + ( n - 1 )*abs( INCY ) ).
 *           Before entry, the incremented array Y must contain the n
 *           element vector y.
@@ -55,7 +56,7 @@
 *           Y. INCY must not be zero.
 *           Unchanged on exit.
 *
-*  A      - REAL(10) array of DIMENSION ( LDA, n ).
+*  A      - REAL(KIND=LDP) array of DIMENSION ( LDA, n ).
 *           Before entry, the leading m by n part of the array A must
 *           contain the matrix of coefficients. On exit, A is
 *           overwritten by the updated matrix.
@@ -77,10 +78,10 @@
 *
 *
 *     .. Parameters ..
-      REAL(10)   ZERO
+      REAL(KIND=LDP)   ZERO
       PARAMETER        ( ZERO = 0.0D+0 )
 *     .. Local Scalars ..
-      REAL(10)   TEMP
+      REAL(KIND=LDP)   TEMP
       INTEGER            I, INFO, IX, J, JY, KX
 *     .. External Subroutines ..
       EXTERNAL           XERBLA

@@ -1,7 +1,7 @@
 !
 ! Routine to adjust the radiative equilibrium equation for the exchange of
 ! energy with the gas, and the work done on the gas. This code is designed for
-! SN models, and assumes a Lagrangian formulation. V is the comoving variable. 
+! SN models, and assumes a Lagrangian formulation. V is the comoving variable.
 !
 !  (1) Increments STEQ if adiabatic cooling is to be allowed for
 !  (2) Increments the variation matrix [BA] if it is being computed, and
@@ -13,6 +13,7 @@
 	SUBROUTINE EVAL_TEMP_DDT_V1(AD_CR_V,AD_CR_DT,
 	1               POPS,AVE_ENERGY,HDKT,COMPUTE_BA,INCL_ADIABATIC,
 	1               TIME_SEQ_NO,DIAG_INDX,NUM_BNDS,NT,ND)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
  	USE STEQ_DATA_MOD
  	IMPLICIT NONE
@@ -32,36 +33,36 @@
 !
 ! Output:
 !
-	REAL(10) AD_CR_V(ND)
-	REAL(10) AD_CR_DT(ND)
+	REAL(KIND=LDP) AD_CR_V(ND)
+	REAL(KIND=LDP) AD_CR_DT(ND)
 !
 ! Input:
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) AVE_ENERGY(NT)
-	REAL(10) HDKT
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) AVE_ENERGY(NT)
+	REAL(KIND=LDP) HDKT
 !
 ! Local vectors.
 !
-	REAL(10) EK_VEC(ND)
-	REAL(10) EI_VEC(ND)
-	REAL(10) P_VEC(ND)
-	REAL(10) GAMMA(ND)
-	REAL(10) INT_EN(ND)
-	REAL(10) COL_EN(ND)
-	REAL(10) WORK(ND)
+	REAL(KIND=LDP) EK_VEC(ND)
+	REAL(KIND=LDP) EI_VEC(ND)
+	REAL(KIND=LDP) P_VEC(ND)
+	REAL(KIND=LDP) GAMMA(ND)
+	REAL(KIND=LDP) INT_EN(ND)
+	REAL(KIND=LDP) COL_EN(ND)
+	REAL(KIND=LDP) WORK(ND)
 !
-	REAL(10) OLD_POPS(NT,ND)
-	REAL(10) OLD_R(ND)
-	REAL(10) OLD_T(ND)
-	REAL(10) OLD_ED(ND)
-	REAL(10) OLD_GAMMA(ND)
-	REAL(10) OLD_POP_ATOM(ND)
-	REAL(10) OLD_INT_EN(ND)
-	REAL(10) OLD_COL_EN(ND)
+	REAL(KIND=LDP) OLD_POPS(NT,ND)
+	REAL(KIND=LDP) OLD_R(ND)
+	REAL(KIND=LDP) OLD_T(ND)
+	REAL(KIND=LDP) OLD_ED(ND)
+	REAL(KIND=LDP) OLD_GAMMA(ND)
+	REAL(KIND=LDP) OLD_POP_ATOM(ND)
+	REAL(KIND=LDP) OLD_INT_EN(ND)
+	REAL(KIND=LDP) OLD_COL_EN(ND)
 !
-	REAL(10) ION_EN(NT)
-	REAL(10) TOT_ENERGY(NT)
+	REAL(KIND=LDP) ION_EN(NT)
+	REAL(KIND=LDP) TOT_ENERGY(NT)
 !
 ! Local variables.
 !
@@ -69,12 +70,12 @@
 	LOGICAL COMPUTE_BA,INCL_ADIABATIC
 !
 	INTEGER ERROR_LU
-	REAL(10) BOLTZMANN_CONSTANT,FUN_PI
+	REAL(KIND=LDP) BOLTZMANN_CONSTANT,FUN_PI
 	EXTERNAL BOLTZMANN_CONSTANT,FUN_PI,ERROR_LU
 !
-	REAL(10) SCALE
-	REAL(10) T1,T2,T3,T4,PI
-	REAL(10) DELTA_T_SECS
+	REAL(KIND=LDP) SCALE
+	REAL(KIND=LDP) T1,T2,T3,T4,PI
+	REAL(KIND=LDP) DELTA_T_SECS
 	INTEGER I,J,K,L
 	INTEGER LUER
 	INTEGER ISPEC
@@ -182,7 +183,7 @@
 ! For historical reasons STEQ contains Int[chi.J - eta]dv. Rather than multiply
 ! this term everywhere by 4pi, we divide the adiabatic cooling rate by 4pi.
 ! Also, since chi, and eta are a factor of 10^10 too large, we need to
-! scale by 10^10. We need to introduce another factor of 10^4 since T is 
+! scale by 10^10. We need to introduce another factor of 10^4 since T is
 ! in units of 10^4K.
 !
 	PI=FUN_PI()
@@ -202,7 +203,7 @@
 	  DO I=1,ND
  	    WORK(I)=EK_VEC(I)*( (1.0D0+GAMMA(I))*T(I)- (1.0D0+OLD_GAMMA(I))*OLD_T(I) ) +
 	1           EI_VEC(I)*(INT_EN(I)-OLD_INT_EN(I))      +
-	1           P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I)) 
+	1           P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I))
 	  END DO
 	  DO I=1,ND
 	    STEQ_T(I)=STEQ_T(I)-WORK(I)
@@ -240,7 +241,7 @@
 !
 	T1=4.0D-10*PI
 	DO I=1,ND
-	  AD_CR_V(I) =P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I)) 
+	  AD_CR_V(I) =P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I))
 	  AD_CR_DT(I)=EK_VEC(I)*( (1.0D0+GAMMA(I))*T(I)- (1.0D0+OLD_GAMMA(I))*OLD_T(I) )
 !	1              + EI_VEC(I)*(COL_EN(I)-OLD_COL_EN(I))
 	END DO

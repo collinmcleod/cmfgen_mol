@@ -4,31 +4,32 @@
 ! section. Storage is allocated by a call to SET_CMF_SOB_MOD.
 !
 	MODULE CMF_SOB_MOD
+	USE SET_KIND_MODULE
 !
 ! Arrays for computation of JBAR using moment equations.
 !
-        REAL(10), ALLOCATABLE :: JNU(:,:)
-        REAL(10), ALLOCATABLE :: HNU(:,:)
-        REAL(10), ALLOCATABLE :: F_LINE(:,:)
-        REAL(10), ALLOCATABLE :: G_LINE(:,:)               !ND,NLF+1
-        REAL(10), ALLOCATABLE :: HBC_LINE(:,:)             !3,NLF+1
-        REAL(10), ALLOCATABLE :: NBC_LINE(:,:)             !3,NLF+1
-        REAL(10), ALLOCATABLE :: IN_HBC_LINE(:)            !NLF+1
+        REAL(KIND=LDP), ALLOCATABLE :: JNU(:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: HNU(:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: F_LINE(:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: G_LINE(:,:)               !ND,NLF+1
+        REAL(KIND=LDP), ALLOCATABLE :: HBC_LINE(:,:)             !3,NLF+1
+        REAL(KIND=LDP), ALLOCATABLE :: NBC_LINE(:,:)             !3,NLF+1
+        REAL(KIND=LDP), ALLOCATABLE :: IN_HBC_LINE(:)            !NLF+1
 !
 ! Variables and Vectors for EW's and LINE blanketing.
 !
-	REAL(10), ALLOCATABLE :: JBLANK(:)                !ND
-	REAL(10), ALLOCATABLE :: HBLANK(:)                !ND
-	REAL(10), ALLOCATABLE :: JEW(:)                   !ND : Used to compute line Ew's.
-	REAL(10), ALLOCATABLE :: JBAR(:)                  !ND : Mean line intensity.
-	REAL(10), ALLOCATABLE :: ZNET(:)                  !ND : Net radiative rate
+	REAL(KIND=LDP), ALLOCATABLE :: JBLANK(:)                !ND
+	REAL(KIND=LDP), ALLOCATABLE :: HBLANK(:)                !ND
+	REAL(KIND=LDP), ALLOCATABLE :: JEW(:)                   !ND : Used to compute line Ew's.
+	REAL(KIND=LDP), ALLOCATABLE :: JBAR(:)                  !ND : Mean line intensity.
+	REAL(KIND=LDP), ALLOCATABLE :: ZNET(:)                  !ND : Net radiative rate
 !
 ! Line profile arrays and variables.
 !
-	REAL(10), ALLOCATABLE :: PF(:)                    !NLF : Prof. freq. for line computations
-	REAL(10), ALLOCATABLE :: PROF(:)                  !NLF : Line profile
-	REAL(10), ALLOCATABLE :: LFQW(:)                  !NLF : Quad. weights assoc. with line prof
-	REAL(10), ALLOCATABLE :: ERF(:)
+	REAL(KIND=LDP), ALLOCATABLE :: PF(:)                    !NLF : Prof. freq. for line computations
+	REAL(KIND=LDP), ALLOCATABLE :: PROF(:)                  !NLF : Line profile
+	REAL(KIND=LDP), ALLOCATABLE :: LFQW(:)                  !NLF : Quad. weights assoc. with line prof
+	REAL(KIND=LDP), ALLOCATABLE :: ERF(:)
 !
 ! Used only in LINEGEN.INC
 !
@@ -36,15 +37,16 @@
 ! Variable,depth of variable,depth of J. If NUM_BNDS .ne. ND the
 ! the variable depth is given by [ VJ(I1,I2,I3) ] I3+I2-NDIAG.
 !
-	REAL(10), ALLOCATABLE :: VZNET(:,:,:)             !NT,NUM_BNDS,ND
-	REAL(10), ALLOCATABLE :: FQAF(:,:,:)              !ND,ND,NM_KI
-	REAL(10), ALLOCATABLE :: FQAFD(:)                 !ND
+	REAL(KIND=LDP), ALLOCATABLE :: VZNET(:,:,:)             !NT,NUM_BNDS,ND
+	REAL(KIND=LDP), ALLOCATABLE :: FQAF(:,:,:)              !ND,ND,NM_KI
+	REAL(KIND=LDP), ALLOCATABLE :: FQAFD(:)                 !ND
 !
-	END MODULE CMF_SOB_MOD 
+	END MODULE CMF_SOB_MOD
 !
 ! Allocate storage for Sobolev and CMF sections.
 !
 	SUBROUTINE SET_CMF_SOB_MOD(ND,NUM_BNDS,NT,NM_KI,NLF,LUER)
+	USE SET_KIND_MODULE
 	USE CMF_SOB_MOD
 	IMPLICIT NONE
 	INTEGER ND

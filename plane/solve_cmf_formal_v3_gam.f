@@ -2,6 +2,7 @@
 !
       SUBROUTINE SOLVE_CMF_FORMAL_V3_GAM(CHI,GAM_ETA,IP,FREQ,NU_DNU,
      *                     INNER_BNRAY_METH,B_NUE,dBDTAU,NRAY,ND,NP,NC,NA,NU_INDX,GAM_INT)
+	USE SET_KIND_MODULE
 !
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
@@ -28,7 +29,7 @@
 !                      CUR_LOC is noe set in calling routine. Since independent of ip, allows this routine to be
 !                        in parallel loop.
 ! Altered 07-Apr-2013: Source function is now interpolated using linear interpolation for last two intervals for
-!                        outgoing rays. Problems were arising because of rapidly varying source functon and very 
+!                        outgoing rays. Problems were arising because of rapidly varying source functon and very
 !                        unequal step sizes.
 !
 ! Altered 08-Jan-2014: Changed ND to NRAY and actually passed the variable ND as given by the MODEL_SPEC file
@@ -47,21 +48,21 @@
       INTEGER :: NA, ND
       INTEGER :: NRAY_SM
 !
-      REAL(10), DIMENSION(ND,NA) :: GAM_ETA
-      REAL(10), DIMENSION(ND,NA) :: GAM_INT
+      REAL(KIND=LDP), DIMENSION(ND,NA) :: GAM_ETA
+      REAL(KIND=LDP), DIMENSION(ND,NA) :: GAM_INT
 !
 ! Opacity and emissivity variables
 !
-      REAL(10), dimension(nray) :: chi
+      REAL(KIND=LDP), dimension(nray) :: chi
 !
 ! Frequency variable
 !
-      REAL(10) :: freq
-      REAL(10) :: nu_dnu
+      REAL(KIND=LDP) :: freq
+      REAL(KIND=LDP) :: nu_dnu
 !
 ! Boundary conditions
 !
-      REAL(10) :: B_nue,dBdtau
+      REAL(KIND=LDP) :: B_nue,dBdtau
 !
       character(len=*) :: INNER_BNRAY_METH
 !
@@ -70,13 +71,13 @@
       LOGICAL, PARAMETER :: L_TRUE=.TRUE.
       LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
-      REAL(10) ibound
-      REAL(10) ee,e0,e1,e2,alpha,beta,gamma,t1
-      REAL(10), dimension(nray) :: chi_tau
-      REAL(10), dimension(nray) :: source_prime
-      REAL(10), dimension(nray) :: tau_loc
-      REAL(10), dimension(nray) :: dtau_loc
-      REAL(10) new_freq
+      REAL(KIND=LDP) ibound
+      REAL(KIND=LDP) ee,e0,e1,e2,alpha,beta,gamma,t1
+      REAL(KIND=LDP), dimension(nray) :: chi_tau
+      REAL(KIND=LDP), dimension(nray) :: source_prime
+      REAL(KIND=LDP), dimension(nray) :: tau_loc
+      REAL(KIND=LDP), dimension(nray) :: dtau_loc
+      REAL(KIND=LDP) new_freq
 !
       integer ist,iend,imid
       integer k
@@ -91,12 +92,12 @@
       external error_lu
 	INTEGER :: IOS
 	INTEGER, PARAMETER :: IONE=1
-	REAL(10), PARAMETER :: PLANCK=4.135668D-21
+	REAL(KIND=LDP), PARAMETER :: PLANCK=4.135668D-21
 !
 !--------------------------------------------------------------------
 !
 ! Part needed for the gamma ray routines, since the emissivity is also
-! a function of angle and fequency 
+! a function of angle and fequency
 !
 	IF(IP .LE. NC)THEN
 	  I=ND
@@ -218,7 +219,7 @@
 ! If we are using the holow boundary condition, we need to store the
 ! intensity at the inner boundary. This flux will be used to compute
 ! the incident intensity at another frequency. We can't directly use
-! the current flux, since the radiation will be redshifted by the 
+! the current flux, since the radiation will be redshifted by the
 ! expansion.
 !
       if(ip .le. nc .and. INNER_BNRAY_METH .eq. 'HOLLOW')then

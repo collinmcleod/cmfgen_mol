@@ -1,6 +1,7 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
       SUBROUTINE VELOCITY_LAW(RVAL,ID,R,V,ND,VEL,BETA,DBETADR,GAMMA)
+	USE SET_KIND_MODULE
       IMPLICIT NONE
 !
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -14,17 +15,17 @@
       INTEGER ND
       INTEGER ID
 !
-      REAL(10) RVAL
-      REAL(10) R(ND)
-      REAL(10) V(ND)
+      REAL(KIND=LDP) RVAL
+      REAL(KIND=LDP) R(ND)
+      REAL(KIND=LDP) V(ND)
 !
-      REAL(10) VEL
-      REAL(10) BETA
-      REAL(10) DBETADR
-      REAL(10) GAMMA
+      REAL(KIND=LDP) VEL
+      REAL(KIND=LDP) BETA
+      REAL(KIND=LDP) DBETADR
+      REAL(KIND=LDP) GAMMA
 !
-      REAL(10), PARAMETER :: C_KMS=2.99792458D+05
-      REAL(10) T1
+      REAL(KIND=LDP), PARAMETER :: C_KMS=2.99792458D+05
+      REAL(KIND=LDP) T1
 !
 !--------------------------------------------------------------------
 !

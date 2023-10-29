@@ -1,10 +1,11 @@
       SUBROUTINE DSPMV ( UPLO, N, ALPHA, AP, X, INCX, BETA, Y, INCY )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
-      REAL(10)   ALPHA, BETA
+      REAL(KIND=LDP)   ALPHA, BETA
       INTEGER            INCX, INCY, N
       CHARACTER*1        UPLO
 *     .. Array Arguments ..
-      REAL(10)   AP( * ), X( * ), Y( * )
+      REAL(KIND=LDP)   AP( * ), X( * ), Y( * )
 *     ..
 *
 *  Purpose
@@ -38,11 +39,11 @@
 *           N must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - REAL(10).
+*  ALPHA  - REAL(KIND=LDP).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
-*  AP     - REAL(10) array of DIMENSION at least
+*  AP     - REAL(KIND=LDP) array of DIMENSION at least
 *           ( ( n*( n + 1 ) )/2 ).
 *           Before entry with UPLO = 'U' or 'u', the array AP must
 *           contain the upper triangular part of the symmetric matrix
@@ -56,7 +57,7 @@
 *           and a( 3, 1 ) respectively, and so on.
 *           Unchanged on exit.
 *
-*  X      - REAL(10) array of dimension at least
+*  X      - REAL(KIND=LDP) array of dimension at least
 *           ( 1 + ( n - 1 )*abs( INCX ) ).
 *           Before entry, the incremented array X must contain the n
 *           element vector x.
@@ -67,12 +68,12 @@
 *           X. INCX must not be zero.
 *           Unchanged on exit.
 *
-*  BETA   - REAL(10).
+*  BETA   - REAL(KIND=LDP).
 *           On entry, BETA specifies the scalar beta. When BETA is
 *           supplied as zero then Y need not be set on input.
 *           Unchanged on exit.
 *
-*  Y      - REAL(10) array of dimension at least
+*  Y      - REAL(KIND=LDP) array of dimension at least
 *           ( 1 + ( n - 1 )*abs( INCY ) ).
 *           Before entry, the incremented array Y must contain the n
 *           element vector y. On exit, Y is overwritten by the updated
@@ -94,10 +95,10 @@
 *
 *
 *     .. Parameters ..
-      REAL(10)   ONE         , ZERO
+      REAL(KIND=LDP)   ONE         , ZERO
       PARAMETER        ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     .. Local Scalars ..
-      REAL(10)   TEMP1, TEMP2
+      REAL(KIND=LDP)   TEMP1, TEMP2
       INTEGER            I, INFO, IX, IY, J, JX, JY, K, KK, KX, KY
 *     .. External Functions ..
       LOGICAL            LSAME

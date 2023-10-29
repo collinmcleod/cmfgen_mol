@@ -8,6 +8,7 @@ C If IFLAG is returned with zero, the NG acceleration was successful.
 C Otherwise an error condition occurred.
 C
 	SUBROUTINE GENACCEL(POPS,MAXINC,MAXDEC,IFLAG,NT,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 - NV removed.
@@ -26,9 +27,9 @@ C                       If more than 3 bad NG accelerations occur, NG
 C                       acceleration is cancelled.
 C
 	INTEGER IFLAG,NT,ND
-	REAL(10) POPS(NT*ND),MAXINC,MAXDEC
+	REAL(KIND=LDP) POPS(NT*ND),MAXINC,MAXDEC
 C
-	REAL(10) RDPOPS(ND*NT,4),TEMP(4,NT),NEWEST(NT)
+	REAL(KIND=LDP) RDPOPS(ND*NT,4),TEMP(4,NT),NEWEST(NT)
 C
 C Note that REC_SIZE is the size of the output record in bytes.
 C           REC_LEN  is the size of the output record in COMPUTER units.
@@ -39,7 +40,7 @@ C           WORD_SIZE is the size of the number to be output in bytes.
 C           UNIT_SIZE is the number of bytes per unit used to specify
 C           the size of a direct access file.
 C
-	REAL(10) T1,LOCINC,LOCDEC
+	REAL(KIND=LDP) T1,LOCINC,LOCDEC
 	INTEGER ARRAYSIZE,IST,IEND
 	INTEGER REC_SIZE,REC_LEN,NUM_RECS,N_PER_REC,NUM_TIME
 	INTEGER UNIT_SIZE,WORD_SIZE

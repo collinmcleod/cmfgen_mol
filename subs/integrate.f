@@ -4,6 +4,7 @@ C Based on NAG routin D01GAF which is in turn based on the work of
 C Gill and Miller.
 C
 	SUBROUTINE INTEGRATE(X,F,TA,IFAIL,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 - ERROR_LU installed.
@@ -13,8 +14,8 @@ C Altered 29-Jan-1987 - Error handling for non monotonic function inserted.
 C Created 29-APR-1985
 C
 	INTEGER ND,I,IFAIL
-	REAL(10) X(ND),F(ND),TA(ND)
-	REAL(10) H0,H1,H2,F01,F12,F23,F012,F123,F0123
+	REAL(KIND=LDP) X(ND),F(ND),TA(ND)
+	REAL(KIND=LDP) H0,H1,H2,F01,F12,F23,F012,F123,F0123
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU

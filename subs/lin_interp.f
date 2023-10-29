@@ -6,23 +6,24 @@ C
 C Improved error handling (5-OCT-1983)
 C
 C Altered 11-Apr-1989 - Implicit NONE INSTALLED. Main call changed to
-C                       LIN_INTERP, and LINPOP and LININT entry points 
+C                       LIN_INTERP, and LINPOP and LININT entry points
 C                       installed. All three routines are identical
 C                       and were all included so save editing a lot of
 C                       routines that call LINPOP and LINIT. LIN_INTERP
 C                       is the preferred call.
 C
 	SUBROUTINE LIN_INTERP(R,V,ND,U,W,NIN)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER NIN,ND
-	REAL(10) R(ND),V(ND),U(NIN),W(NIN)
+	REAL(KIND=LDP) R(ND),V(ND),U(NIN),W(NIN)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
 C Local varaibles.
 C
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER J,L
 C
 	ENTRY LININT(R,V,ND,U,W,NIN)

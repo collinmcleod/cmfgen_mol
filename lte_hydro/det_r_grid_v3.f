@@ -12,6 +12,7 @@
 	1           dLOG_TAU,V_SCL_FAC,R_SCL_FAC,
 	1           OUT_BND_OPT,OBND_PARS,NUM_OBND_PARAMS,
 	1           R,V,TAU,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 24-Jul-2015 : Changed to V3. R_SCL_FAC included in the CALL, and check on
@@ -20,45 +21,45 @@
 !                         These are now directly included in the final tau grid,
 !                         rather than the initial grid. This should give more control
 !                         over the spacing.
-! Altered 12-Feb-2007 : Modifications to allow more choice in the outer boundary 
+! Altered 12-Feb-2007 : Modifications to allow more choice in the outer boundary
 !                         condition. dLOG_TAU and V_SCL_FAC now passed in call.
 ! Created 12-Aug-2006
 !
 	INTEGER NEW_ND				!Requested number of grid points in new grid.
 	INTEGER ND_MAX				!Maximum number of grid points in grid.
 	INTEGER NUM_OBND_PARAMS
-	REAL(10) REV_TAU_GRID(NEW_ND)
-	REAL(10) OBND_PARS(NUM_OBND_PARAMS)
-	REAL(10) TAU_MAX				!Maximum optical depth for new grid.
-	REAL(10) R_SCL_FAC			!Maxium values for R(I+1)/V(I)
-	REAL(10) V_SCL_FAC			!Maxium values for V(I+1)/V(I)
-	REAL(10) dLOG_TAU				!Maximu value for /\Tau
+	REAL(KIND=LDP) REV_TAU_GRID(NEW_ND)
+	REAL(KIND=LDP) OBND_PARS(NUM_OBND_PARAMS)
+	REAL(KIND=LDP) TAU_MAX				!Maximum optical depth for new grid.
+	REAL(KIND=LDP) R_SCL_FAC			!Maxium values for R(I+1)/V(I)
+	REAL(KIND=LDP) V_SCL_FAC			!Maxium values for V(I+1)/V(I)
+	REAL(KIND=LDP) dLOG_TAU				!Maximu value for /\Tau
 	CHARACTER(LEN=*) OUT_BND_OPT
 !
 ! These describe the old grid.
 !
 	INTEGER ND
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-	REAL(10) TAU(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) TAU(ND)
 !
 	INTEGER N_BND_PNTS		!Number of extra points used at boundaries
 	INTEGER NS			!NEW_ND - N_BND_PNTS (initally)
 !
 ! Local arrays.
 !
-	REAL(10) REV_R(ND_MAX)
-	REAL(10) REV_V(ND_MAX)
-	REAL(10) REV_TAU(ND_MAX)
-	REAL(10) OLD_R(ND_MAX)
-	REAL(10) OLD_TAU(ND_MAX)
-	REAL(10) LOG_TAU(ND)
+	REAL(KIND=LDP) REV_R(ND_MAX)
+	REAL(KIND=LDP) REV_V(ND_MAX)
+	REAL(KIND=LDP) REV_TAU(ND_MAX)
+	REAL(KIND=LDP) OLD_R(ND_MAX)
+	REAL(KIND=LDP) OLD_TAU(ND_MAX)
+	REAL(KIND=LDP) LOG_TAU(ND)
 !
 ! Local variables.
 !
-	REAL(10) LOG_TAU_MAX
-	REAL(10) dTAU
-	REAL(10) T1,T2
+	REAL(KIND=LDP) LOG_TAU_MAX
+	REAL(KIND=LDP) dTAU
+	REAL(KIND=LDP) T1,T2
 	INTEGER ND_TMP
 	INTEGER I,J,K,JST
 	INTEGER LUER,ERROR_LU
@@ -100,7 +101,7 @@
 	  N_BND_PNTS=NUM_OBND_PARAMS
 	ELSE IF(OUT_BND_OPT .EQ. 'DEFAULT')THEN
 	  N_BND_PNTS=2
-	ELSE 
+	ELSE
 	  WRITE(LUER,*)'Unrecognized option in DET_R_GRID_V3'
 	  STOP
 	END IF
@@ -130,7 +131,7 @@
 	  REV_TAU(I)=REV_TAU(I-1)+dLOG_TAU
 !
 ! Check if we are at inner boundary. If so, we decrease spacing systematically
-! to give more accuracy for our first orer boundary conditions. We ignore the 
+! to give more accuracy for our first orer boundary conditions. We ignore the
 ! velocity check.
 !
 	  IF(REV_TAU(I) .GE. LOG_TAU_MAX-0.5*dLOG_TAU)THEN
@@ -149,7 +150,7 @@
 ! interpolation if fine since we are only constructing the grid, not actual values
 ! on the grid.
 !
-! We test agaianst V(I-1) [rather than V(I)] because in some case step size can be 
+! We test agaianst V(I-1) [rather than V(I)] because in some case step size can be
 !    very big. Changed Jul 31, 2011.
 !
 	    DO WHILE (REV_TAU(I) .GT. LOG_TAU(J))

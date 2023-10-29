@@ -1,18 +1,19 @@
       SUBROUTINE STRK_BS_HHE(PROF,FREQ,NF,
 	1             ED,T,VTURB,ND,
 	1             NU_ZERO,AMASS,TRAP_QUAD)
+	USE SET_KIND_MODULE
 C
 C
 C routine to obtain stark profile for a tabulated transition
 C         as a function of electron density, temperature and lambda.
 C input:
-C     ED(ND)      : electron density in cgs 
-C     T(ND)       : temperature in units of 1e4 K 
+C     ED(ND)      : electron density in cgs
+C     T(ND)       : temperature in units of 1e4 K
 C     DXLAM (NLAM): displacement in Angstroms from line center
-C                  
+C
 C output: loge of stark profile is returned in PROF(NLAM,ND)
 C
-C  Altered 5-Sep-03 : Calculation of DLAM_THERM is now correct.     
+C  Altered 5-Sep-03 : Calculation of DLAM_THERM is now correct.
 C  Altered Feb-99  LEMKE'S HYD PROFILES ALSO INCLUDED
 C  created Nov-95  Based in the interpolation loop of routine
 C                  utable from Keith. Changes have been introduced
@@ -20,8 +21,8 @@ C                  so that routine does not return PROF=0 when electron
 C                  density is below ranges in table (MID variable)
 C                  and extrapolation is performed. Before electron density
 C                  and temperature where forced to be within ranges of table.
-C                  
-C            
+C
+C
 C
 	USE STRK_MOD_HHE
 	IMPLICIT NONE
@@ -29,35 +30,35 @@ C
 	INTEGER ND
 	INTEGER NF
 !
-	REAL(10) PROF(ND,NF)
-	REAL(10) FREQ(NF)
-	REAL(10) ED(ND)
-	REAL(10) T(ND)
-	REAL(10) VTURB(ND)
+	REAL(KIND=LDP) PROF(ND,NF)
+	REAL(KIND=LDP) FREQ(NF)
+	REAL(KIND=LDP) ED(ND)
+	REAL(KIND=LDP) T(ND)
+	REAL(KIND=LDP) VTURB(ND)
 !
-	REAL(10) NU_ZERO
+	REAL(KIND=LDP) NU_ZERO
 	LOGICAL TRAP_QUAD
 !
-	REAL(10) WAVE
-	REAL(10) AMASS
+	REAL(KIND=LDP) WAVE
+	REAL(KIND=LDP) AMASS
 !
-	REAL(10) TLOG
-	REAL(10) ELOG
-	REAL(10) ST1,ST2
-	REAL(10) C_KMS
+	REAL(KIND=LDP) TLOG
+	REAL(KIND=LDP) ELOG
+	REAL(KIND=LDP) ST1,ST2
+	REAL(KIND=LDP) C_KMS
 !
-	REAL(10), ALLOCATABLE :: STARK(:)
-	REAL(10), ALLOCATABLE :: TMP_DWS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: STARK(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TMP_DWS(:)
 !
-	REAL(10) DLAM(NF)
-	REAL(10) LOC_PROF(NF)
+	REAL(KIND=LDP) DLAM(NF)
+	REAL(KIND=LDP) LOC_PROF(NF)
 !
-	REAL(10) T_WGT
-	REAL(10) ED_WGT
+	REAL(KIND=LDP) T_WGT
+	REAL(KIND=LDP) ED_WGT
 !
-	REAL(10) DLAM_THERM
-	REAL(10) DLAM_TURB
-!               
+	REAL(KIND=LDP) DLAM_THERM
+	REAL(KIND=LDP) DLAM_TURB
+!
 	INTEGER I,ID
 	INTEGER T_INDX
 	INTEGER ED_INDX
@@ -92,15 +93,15 @@ C
 !
 ! Find electron density interval
 !
-          ELOG = LOG10(ED(ID))                                    
+          ELOG = LOG10(ED(ID))
           ELOG = MAX(STKTA_ES(1),MIN(STKTA_ES(STKTA_NES),ELOG))
-          DO I = 2,STKTA_NES                                     
-            ED_INDX = I-1                                           
+          DO I = 2,STKTA_NES
+            ED_INDX = I-1
             IF (ELOG .LT. STKTA_ES(I))EXIT
 	  END DO
           ED_WGT = (ELOG-STKTA_ES(ED_INDX))/
 	1                 (STKTA_ES(ED_INDX+1)-STKTA_ES(ED_INDX))
-!                           
+!
 ! Obtain the interpolated profile. NB: The porifles aren't tabulated
 ! on a fine enough grid. Thus interpolated profiles can be inaccurate.
 ! As a result of the inaccuracy, profiles need to be normalized, by
@@ -123,7 +124,7 @@ C
 !
 ! The LEMKE profiles are not tabulated to 0 offset. We set the
 ! first frequency to zero, to allow the convolution.
-!                            
+!
 	  IF(STKTA_WSCA)THEN
 	   TMP_DWS=STKTA_DWS*1.25D-9*(10**(ELOG*2.0D0/3.0D0))
 	   IF(STKTA_QHALF .AND. TMP_DWS(1) .NE. 0)TMP_DWS(1)=0.0D0

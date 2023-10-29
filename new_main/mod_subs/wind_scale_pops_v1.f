@@ -6,6 +6,7 @@
 ! Boundary R values) have changed.
 !
 	SUBROUTINE WIND_SCALE_POPS_V1(POPS,R_OLD,Z_POP,DO_LEV_DISSOLUTION,ND,NT)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -13,21 +14,21 @@
 !
 	INTEGER ND
 	INTEGER NT
-	REAL(10) POPS(NT,ND)
-	REAL(10) R_OLD(ND)
-	REAL(10) Z_POP(NT)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) R_OLD(ND)
+	REAL(KIND=LDP) Z_POP(NT)
 	LOGICAL DO_LEV_DISSOLUTION
 !
 ! Local variables and vectors
 !
-	REAL(10) LOG_R(ND)
-	REAL(10) LOG_R_OLD(ND)
+	REAL(KIND=LDP) LOG_R(ND)
+	REAL(KIND=LDP) LOG_R_OLD(ND)
 !
-	REAL(10) TA(ND)
-	REAL(10) TB(ND)
-	REAL(10) GAM(ND)
-	REAL(10) OLD_POPATOM(ND)
-	REAL(10) T1
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) TB(ND)
+	REAL(KIND=LDP) GAM(ND)
+	REAL(KIND=LDP) OLD_POPATOM(ND)
+	REAL(KIND=LDP) T1
 !
 	INTEGER ID
 	INTEGER ISPEC
@@ -125,7 +126,7 @@
 	    IF(ATM(ID)%XzV_PRES)THEN
 	       CALL SCALE_POPS(ATM(ID)%XzV_F,ATM(ID)%DXzV_F,
 	1               POP_SPECIES(1,ISPEC),TA,ATM(ID)%NXzV_F,ND)
-	    END IF 
+	    END IF
 	  END DO
 	END DO
 !
@@ -136,7 +137,7 @@
 	1      ATM(ID+1)%XzV, ATM(ID+1)%NXzV,     ATM(ID+1)%XzV_PRES, ND)
         END DO
 !
-! Store all quantities in POPS array. This is done here as it enables POPION 
+! Store all quantities in POPS array. This is done here as it enables POPION
 ! to be readily computed. It also ensures that POPS is correct if we  don't
 ! iterate on T.
 !

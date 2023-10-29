@@ -1,5 +1,6 @@
 	SUBROUTINE WRITEDC_V2(HYD,HYDLTE,NHYD,DHYD,NION,R,T,ED,V,CLUMP_FAC,
 	1               LUM,ND,FILENAME,OPTION,FORM)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 04-Oct-2004 : Output space after depth index so easier to search for.
@@ -11,14 +12,14 @@ C                         of 7 decimal digits.
 C Altered 26-Jun-1996 : CALL GEN_ASCI_OPEN installed.
 C Altered 28-May-1996 : Removed for [jdh.disp]SETVEC routine
 C                       DOUBLE PRECISION declaration removed.
-C                       
+C
 C Altered  4-Aug-1988 : Write Departure coefficients out - not b-1.
 C
 	INTEGER NHYD,NION,ND,FORM,I,J,IOS
 	INTEGER, PARAMETER :: IZERO=0
-	REAL(10) HYD(NHYD,ND),HYDLTE(NHYD,ND),DHYD(NION,ND)
-	REAL(10) R(ND),T(ND),ED(ND),V(ND),CLUMP_FAC(ND)
-	REAL(10) LUM,T1,T2
+	REAL(KIND=LDP) HYD(NHYD,ND),HYDLTE(NHYD,ND),DHYD(NION,ND)
+	REAL(KIND=LDP) R(ND),T(ND),ED(ND),V(ND),CLUMP_FAC(ND)
+	REAL(KIND=LDP) LUM,T1,T2
 	CHARACTER*(*)FILENAME,OPTION
 	CHARACTER*30 NEWNAME
 	CHARACTER*90 FMT

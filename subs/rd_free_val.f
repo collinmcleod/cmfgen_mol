@@ -3,6 +3,7 @@ C Reads in a single double precision number from a string. Routine
 C can also be used to read in an integer value.
 C
 	FUNCTION RD_FREE_VAL(STRING,STR_ST,STR_END,NEXT,DESC)
+	USE SET_KIND_MODULE
 C
 C Altered 26-May-1996 - ERROR_LU installed.
 C Created 21-Aug-1991.
@@ -10,7 +11,7 @@ C
 	IMPLICIT NONE
 	INTEGER STR_ST,STR_END,NEXT
 	CHARACTER*(*) STRING,DESC
-	REAL(10) RD_FREE_VAL
+	REAL(KIND=LDP) RD_FREE_VAL
 C
 	CHARACTER*1 TAB,NUL,SPACE,COMMA
 	INTEGER I,SS,LEN_STR,IOS

@@ -7,6 +7,7 @@ C
 	SUBROUTINE X_RRR_COOL_V4(NET_X_RR,X_BFCR,WSE_X_A,WCR_X_A,
 	1                     HN_A,HNST_A,N_A,HN_B,HNST_B,N_B,
 	1                     JREC,JPHOT,JREC_CR,JPHOT_CR,ML,ND,FLAG)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 17-Sep-1997 : JREC,JPHOT now place RJ so that we can handle a
@@ -20,18 +21,18 @@ C                        _V2 append to name.
 C Created 18-Jul-1994 : Based on PRRRCOOL
 C
 	INTEGER N_A,N_B,ND,ML
-	REAL(10) NET_X_RR(ND),X_BFCR(ND)
-	REAL(10) HN_A(N_A,ND),HNST_A(N_A,ND)
-	REAL(10) HN_B(N_B,ND),HNST_B(N_B,ND)
-	REAL(10) WSE_X_A(N_A,ND)
-	REAL(10) WCR_X_A(N_A,ND)
-	REAL(10) JREC(ND)			!In (2hv^3/c^2 + J) EXP(-hv/kT)/v  dv
-	REAL(10) JPHOT(ND)		!In J/v dv
-	REAL(10) JREC_CR(ND)		!In (2hv^3/c^2 + J) EXP(-hv/kT)   dv
-	REAL(10) JPHOT_CR(ND)		!In J dv
+	REAL(KIND=LDP) NET_X_RR(ND),X_BFCR(ND)
+	REAL(KIND=LDP) HN_A(N_A,ND),HNST_A(N_A,ND)
+	REAL(KIND=LDP) HN_B(N_B,ND),HNST_B(N_B,ND)
+	REAL(KIND=LDP) WSE_X_A(N_A,ND)
+	REAL(KIND=LDP) WCR_X_A(N_A,ND)
+	REAL(KIND=LDP) JREC(ND)			!In (2hv^3/c^2 + J) EXP(-hv/kT)/v  dv
+	REAL(KIND=LDP) JPHOT(ND)		!In J/v dv
+	REAL(KIND=LDP) JREC_CR(ND)		!In (2hv^3/c^2 + J) EXP(-hv/kT)   dv
+	REAL(KIND=LDP) JPHOT_CR(ND)		!In J dv
 C
 	INTEGER I,J
-	REAL(10) A1
+	REAL(KIND=LDP) A1
 	LOGICAL FLAG
 C
 C If ML=1 and flag is set, then zero all arrays. FLAG should be
@@ -52,9 +53,9 @@ C
 	  IF(WSE_X_A(I,1) .NE. 0)THEN
 	    DO J=1,ND
 	      A1=HNST_A(I,J)*HNST_B(1,J)/HN_B(1,J)
-	      NET_X_RR(J)=NET_X_RR(J) + 
+	      NET_X_RR(J)=NET_X_RR(J) +
 	1       WSE_X_A(I,J)*( A1*JREC(J)-HN_A(I,J)*JPHOT(J) )
-	      X_BFCR(J)=X_BFCR(J)   +   
+	      X_BFCR(J)=X_BFCR(J)   +
 	1       A1*( WCR_X_A(I,J)*JREC_CR(J) + WSE_X_A(I,J)*JREC(J) ) -
 	1       HN_A(I,J)*( WCR_X_A(I,J)*JPHOT_CR(J) + WSE_X_A(I,J)*JPHOT(J) )
 	    END DO

@@ -8,6 +8,7 @@
 !
 	SUBROUTINE RD_CONT_J_OBS(RJ,FL,FREQ_INDX,FIRST_FREQ,
 	1           LST_ITERATION,LUER,LU_EDD,ACCESS_F,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 29-Jan-2010 : If frequency below minimum value, set J to J(last frequency).
@@ -19,25 +20,25 @@
 	INTEGER LU_EDD
 	INTEGER LUER
 !
-	REAL(10) RJ(ND)
-	REAL(10) FL
+	REAL(KIND=LDP) RJ(ND)
+	REAL(KIND=LDP) FL
 !
 	LOGICAL LST_ITERATION
 	LOGICAL FIRST_FREQ
 !
 ! Local variables and arrays.
 !
-	REAL(10), SAVE :: LOW_FREQ, HIGH_FREQ
-	REAL(10), ALLOCATABLE :: RJ_LOW(:)
-	REAL(10), ALLOCATABLE :: RJ_HIGH(:)
+	REAL(KIND=LDP), SAVE :: LOW_FREQ, HIGH_FREQ
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_LOW(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_HIGH(:)
 	SAVE RJ_LOW
 	SAVE RJ_HIGH
 !
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER I
 	INTEGER IOS
 !
-! Special treatment if first frequency. 
+! Special treatment if first frequency.
 !
 	IF(FIRST_FREQ)THEN
 	  IF( .NOT. ALLOCATED(RJ_LOW) )THEN
@@ -70,14 +71,14 @@
 	END DO
 !
 ! Do the interpolation: We use simple linear interpolation.
-! If frequency higher than value in file, we adopt the first 
+! If frequency higher than value in file, we adopt the first
 ! file value.
 !
         IF(FL .GE. HIGH_FREQ)THEN
 	  RJ(1:ND)=RJ_HIGH(1:ND)
         ELSE IF(LOW_FREQ .EQ. HIGH_FREQ)THEN
 	  RJ(1:ND)=RJ_LOW(1:ND)
-	ELSE 
+	ELSE
 	  T1=(FL-LOW_FREQ)/(HIGH_FREQ-LOW_FREQ)
 	  DO I=1,ND
 	    RJ(I)=(1.0D0-T1)*RJ_LOW(I)+T1*RJ_HIGH(I)

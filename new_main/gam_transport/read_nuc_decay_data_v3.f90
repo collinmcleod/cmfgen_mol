@@ -3,13 +3,14 @@
 !	It reads them in and stores them into vectors, so each line is linked
 !	to its species, atomic mass, and probability
 !
-!       CREATED JULY 2013                               
+!       CREATED JULY 2013
 !	Edited 8/28/13 to include storing into structure
 !	Edited July 15, 2014		Changed structure type so that it looks more
 !					similar to John Hillier's format for his structure
 !------------------------------------------------------------------------------------------
 !
 	SUBROUTINE GAM_NUC_DECAY_DATA_SUB_V3(VERBOSE_GAMMA)
+	USE SET_KIND_MODULE
 	USE GAMMA_NUC_DECAY_V2
 	IMPLICIT NONE
 !

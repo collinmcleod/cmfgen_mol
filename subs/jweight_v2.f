@@ -9,6 +9,7 @@
 ! D1, and R2 are work vectors.
 !
 	SUBROUTINE JWEIGHT_V2(X,dX,W,N)
+	USE SET_KIND_MODULE
 !
 ! Altered 18-Jun-2023 - Fixed typo.
 ! Created 14-Jun-2023 - Changed to V2. dX added to call.
@@ -19,11 +20,11 @@
 !
 	IMPLICIT NONE
 	INTEGER N
-	REAL(10) X(N),dX(N),W(N)
+	REAL(KIND=LDP) X(N),dX(N),W(N)
 !
 ! Local data
 !
-	REAL(10) H,HN,RE,RF,SUM
+	REAL(KIND=LDP) H,HN,RE,RF,SUM
 	INTEGER I,ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 !
@@ -86,7 +87,7 @@
 	  W(N)=W(N)+(X(N-1)**3)*2.0D0/RF/3.0D0
 	END IF
 !
-! Ensure that the weights have the correct normalization (shouldnt be 
+! Ensure that the weights have the correct normalization (shouldnt be
 ! necessary.
 !
 	SUM=0.0D0

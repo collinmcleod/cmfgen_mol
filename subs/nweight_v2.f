@@ -6,21 +6,22 @@
 ! other quantities other than 2nd moment of the intensity. The program assumes
 ! that the first point corresponds to mu=1.0 .
 !
-! The first derivatives are estimated by 
+! The first derivatives are estimated by
 !                               dv(i)= (V(I-1)-V(I))/(MU(I-1)-MU(I))
 !
 	SUBROUTINE NWEIGHT_V2(X,dX,W,N)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 14-Jun-2023 - Added dX to call. Changed to V2
 ! Altered 25-May-1996 - CALL to DP_ZERO deleted
-!                       ERROR_LU inserted.     
+!                       ERROR_LU inserted.
 ! Created 11-JAN-1988 - Based on KWEIGHT.
 !
 	INTEGER N
-	REAL(10) X(N),dX(N),W(N)
+	REAL(KIND=LDP) X(N),dX(N),W(N)
 !
-	REAL(10) H,R,RE,RF,T1,SUM
+	REAL(KIND=LDP) H,R,RE,RF,T1,SUM
 	INTEGER I,ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 !
@@ -79,7 +80,7 @@
 	  W(N)=W(N)+0.2D0*(X(N)**4)
 	END IF
 !
-! Ensure that the weights have the correct normalization (shouldnt be 
+! Ensure that the weights have the correct normalization (shouldnt be
 ! necessary. We assume v=mu for the normalization.
 !
 	SUM=0.0D0

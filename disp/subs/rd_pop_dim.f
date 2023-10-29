@@ -8,6 +8,7 @@ C
 C NB. CIII is used as the dummy species.
 C
 	SUBROUTINE RD_POP_DIM(NCIII,CIII_PRES,DESC,FORMAT_DATE,LUIN)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 19-Jun-2022 : Added 5001 to IOS end of file check because of issues with GFORTRAN.
@@ -97,4 +98,4 @@ C
 C
 	RETURN
 	END
- 
+

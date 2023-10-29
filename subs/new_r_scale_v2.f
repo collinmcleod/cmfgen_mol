@@ -1,48 +1,49 @@
 C
-C Routine to compute new radius grid on a given ray. Grid is equally spaced in 
+C Routine to compute new radius grid on a given ray. Grid is equally spaced in
 C LOG(TAU) where TAU is evaluated using the variable CHI (usually the opacity
 C or density). At the boudaries, a fine grid spacing can be adopted.
 C
 	SUBROUTINE NEW_R_SCALE_V2(R_NEW,ND,R,NI,CHI,P,RAMP_IN,RAMP_OUT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 10-Oct-2004 --- Changed SQRT to (R-P)*(R+P)
 C Altered 21-AUg-1997 --- Called V2, RAMP_IN and RAMP_OUT variables installed.
 C                           Done to fix numerical problems with CMF_FORM_SOL.
-C                           To evaluate TAU at outer boundary, CHI is now 
+C                           To evaluate TAU at outer boundary, CHI is now
 C                             assumed to vary as a powr law (rather than 1/r^2).
 C                             Based on NEW_R_SCALE_V1.
 C
 	INTEGER ND,NI
-	REAL(10) R_NEW(ND)	!New radius grid
-	REAL(10) R(NI)		!Old radius grid
-	REAL(10) CHI(NI)		!Opacity
-	REAL(10) P		!Impact parameter (scaler)
+	REAL(KIND=LDP) R_NEW(ND)	!New radius grid
+	REAL(KIND=LDP) R(NI)		!Old radius grid
+	REAL(KIND=LDP) CHI(NI)		!Opacity
+	REAL(KIND=LDP) P		!Impact parameter (scaler)
 	LOGICAL RAMP_IN		!Finer spacing at inner boundary?
 	LOGICAL RAMP_OUT	!Finer spacing at outer boundary?
 C
-	REAL(10) Z(NI)
-	REAL(10) TAU(NI)
+	REAL(KIND=LDP) Z(NI)
+	REAL(KIND=LDP) TAU(NI)
 C
-	REAL(10) TAU_NEW(ND)
-	REAL(10) Z_NEW(ND)
+	REAL(KIND=LDP) TAU_NEW(ND)
+	REAL(KIND=LDP) Z_NEW(ND)
 C
 C Variables to compute TAU at outer boundary.
 C
-	REAL(10) ALPHA,DELR
-	REAL(10) R_MAX,R_BIG,R_SMALL
-	REAL(10) Z_BIG,Z_SMALL
-	REAL(10) CHI_BIG,CHI_SMALL
+	REAL(KIND=LDP) ALPHA,DELR
+	REAL(KIND=LDP) R_MAX,R_BIG,R_SMALL
+	REAL(KIND=LDP) Z_BIG,Z_SMALL
+	REAL(KIND=LDP) CHI_BIG,CHI_SMALL
 	INTEGER IEND
 C
 C Variables to compute new TAU scale.
 C
 	INTEGER I,IST,ND_DIV,lU_ER
-	REAL(10) DTAU
+	REAL(KIND=LDP) DTAU
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
-C                             
+C
 C Compute path length variable Z.
 C
 	DO I=1,NI

@@ -1,4 +1,5 @@
 	MODULE MOD_DISP
+	USE SET_KIND_MODULE
 !
 ! Altered 20-Jan-2023 : Added ABS_MEAN
 ! Altered 15-Dec-2021 : Added ROM_ION_ID for plotting labels (osiris)
@@ -15,10 +16,10 @@
 	INTEGER, PARAMETER :: MAX_ION=NSPEC*NION_MAX
 	INTEGER  NUM_IONS			!Total number of ions present
 !
-	REAL(10) AT_MASS(NSPEC)
-	REAL(10) AT_NO(NSPEC)
-        REAL(10) SOL_MASS_FRAC(NSPEC)       	!Solar mass fraction
-        REAL(10) SOL_ABUND_HSCL(NSPEC)      	!Solar abundance with H=12.0
+	REAL(KIND=LDP) AT_MASS(NSPEC)
+	REAL(KIND=LDP) AT_NO(NSPEC)
+        REAL(KIND=LDP) SOL_MASS_FRAC(NSPEC)       	!Solar mass fraction
+        REAL(KIND=LDP) SOL_ABUND_HSCL(NSPEC)      	!Solar abundance with H=12.0
 !
 	CHARACTER(LEN=10)  SPECIES(NSPEC)
 	CHARACTER(LEN=12)  SPECIES_ABR(NSPEC)
@@ -29,25 +30,25 @@
 	INTEGER  SPECIES_LNK(MAX_ION)
 	INTEGER SPECIES_BEG_ID(NSPEC)
 	INTEGER SPECIES_END_ID(NSPEC)
-!                
+!
 	TYPE MODEL_ATOM_DATA
 !
-	  REAL(10), ALLOCATABLE :: XzV_F(:,:)		!Level populations in FULL atom (NF.ND)
-	  REAL(10), ALLOCATABLE :: XzVLTE_F(:,:)		!LTE level populations in FULL atom (NF.ND)
-	  REAL(10), ALLOCATABLE :: LOG_XzVLTE_F(:,:)	!Log LTE level populations in FULL atom (NF.ND)
-	  REAL(10), ALLOCATABLE :: W_XzV_F(:,:)           !Level dissolution factors (NF.ND)
-	  REAL(10), ALLOCATABLE :: DXzV_F(:)		!Ion population for full atom (ND)
-	  REAL(10), ALLOCATABLE :: DXzV(:)		!Ion population SL atom (ND)
-	  REAL(10), ALLOCATABLE :: AXzV_F(:,:)		!Oscillator strength (A(I,j), i<j) (NF,NF) Ein. A (i>j)
-	  REAL(10), ALLOCATABLE :: EDGEXzV_F(:)           !Ionization energy to g.s. (10^15 Hz) (NF)
-	  REAL(10), ALLOCATABLE :: GXzV_F(:) 		!Level statistical weights in full atom (NF)
-	  REAL(10), ALLOCATABLE :: ARAD(:)                !Inverse radiative lifetime of level (NF)
-	  REAL(10), ALLOCATABLE :: GAM2(:)                !Collisional profile parameter (NF).
-	  REAL(10), ALLOCATABLE :: GAM4(:)                !Collisional profile parameter (NF).
+	  REAL(KIND=LDP), ALLOCATABLE :: XzV_F(:,:)		!Level populations in FULL atom (NF.ND)
+	  REAL(KIND=LDP), ALLOCATABLE :: XzVLTE_F(:,:)		!LTE level populations in FULL atom (NF.ND)
+	  REAL(KIND=LDP), ALLOCATABLE :: LOG_XzVLTE_F(:,:)	!Log LTE level populations in FULL atom (NF.ND)
+	  REAL(KIND=LDP), ALLOCATABLE :: W_XzV_F(:,:)           !Level dissolution factors (NF.ND)
+	  REAL(KIND=LDP), ALLOCATABLE :: DXzV_F(:)		!Ion population for full atom (ND)
+	  REAL(KIND=LDP), ALLOCATABLE :: DXzV(:)		!Ion population SL atom (ND)
+	  REAL(KIND=LDP), ALLOCATABLE :: AXzV_F(:,:)		!Oscillator strength (A(I,j), i<j) (NF,NF) Ein. A (i>j)
+	  REAL(KIND=LDP), ALLOCATABLE :: EDGEXzV_F(:)           !Ionization energy to g.s. (10^15 Hz) (NF)
+	  REAL(KIND=LDP), ALLOCATABLE :: GXzV_F(:) 		!Level statistical weights in full atom (NF)
+	  REAL(KIND=LDP), ALLOCATABLE :: ARAD(:)                !Inverse radiative lifetime of level (NF)
+	  REAL(KIND=LDP), ALLOCATABLE :: GAM2(:)                !Collisional profile parameter (NF).
+	  REAL(KIND=LDP), ALLOCATABLE :: GAM4(:)                !Collisional profile parameter (NF).
 	  LOGICAL, ALLOCATABLE :: OBSERVED_LEVEL(:)     !Does level have a know energy (NF).
 !
-	  REAL(10) ZXzV					!Charge on ion (e.g. 1 for H)
-	  REAL(10) GIONXzV_F				!Statistical weight of gs. of ion
+	  REAL(KIND=LDP) ZXzV					!Charge on ion (e.g. 1 for H)
+	  REAL(KIND=LDP) GIONXzV_F				!Statistical weight of gs. of ion
 !
 	  INTEGER, ALLOCATABLE :: F_TO_S_XzV(:)		!Link of full levels to super levels
 !
@@ -66,31 +67,31 @@ C
 C Data arrays for full atom.
 C
 C
-	REAL(10), ALLOCATABLE :: R(:)
-	REAL(10), ALLOCATABLE :: V(:)
-	REAL(10), ALLOCATABLE :: SIGMA(:)
-	REAL(10), ALLOCATABLE :: T(:)
-	REAL(10), ALLOCATABLE :: ED(:)
-	REAL(10), ALLOCATABLE :: CMFGEN_TGREY(:)
-	REAL(10), ALLOCATABLE :: dE_RAD_DECAY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R(:)
+	REAL(KIND=LDP), ALLOCATABLE :: V(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: T(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ED(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CMFGEN_TGREY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: dE_RAD_DECAY(:)
 !
-	REAL(10) ABUND(NSPEC)
+	REAL(KIND=LDP) ABUND(NSPEC)
 !
-	REAL(10), ALLOCATABLE :: ROSS_MEAN(:)
-	REAL(10), ALLOCATABLE :: FLUX_MEAN(:)
-	REAL(10), ALLOCATABLE :: PLANCK_MEAN(:)
-	REAL(10), ALLOCATABLE :: ABS_MEAN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ROSS_MEAN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: FLUX_MEAN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: PLANCK_MEAN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ABS_MEAN(:)
 !
-	REAL(10), ALLOCATABLE :: J_INT(:)
-	REAL(10), ALLOCATABLE :: H_INT(:)
-	REAL(10), ALLOCATABLE :: K_INT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: J_INT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: H_INT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: K_INT(:)
 !
-	REAL(10), ALLOCATABLE :: POP_ATOM(:)
-	REAL(10), ALLOCATABLE :: MASS_DENSITY(:)
-	REAL(10), ALLOCATABLE :: CLUMP_FAC(:)
-	REAL(10), ALLOCATABLE :: POPION(:)
+	REAL(KIND=LDP), ALLOCATABLE :: POP_ATOM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: MASS_DENSITY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CLUMP_FAC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: POPION(:)
 !
-	REAL(10), ALLOCATABLE :: POPDUM(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: POPDUM(:,:)
 !
 ! This is the same ID used in CMFGEN, and used to read files etc.
 !

@@ -3,6 +3,7 @@
 ! TAU is based on the FLUX mean opacity.
 !
 	SUBROUTINE ADJUST_R_GRID_V4(POPS,ESEC,MAIN_COUNTER,DONE_R_REV,ND,NT)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE UPDATE_KEYWORD_INTERFACE
 	IMPLICIT NONE
@@ -12,7 +13,7 @@
 ! Altered 02-Dec-2012 : Changed calls to DO_TAU_REGRID and DO_VEL_REGRID.
 !                       Now open R_REGRIDDING_LOG in this routine.
 !                       Use monotonic interpolaton for V and SIGMA.
-!                  
+!
 ! Altered 09-Feb-2011 : Major rewrite of ADJUST_R_GRID_V3 which was  a version
 !                       still under development. This routine is controlled by
 !	                parameters read in from the file ADJUST_R_DEFAULTS. This
@@ -22,48 +23,48 @@
 	INTEGER ND,NT
 	INTEGER MAIN_COUNTER
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) ESEC(ND)			!Electron scattering opacity
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) ESEC(ND)			!Electron scattering opacity
 !
 	LOGICAL DONE_R_REV
 !
 ! For specifying grid.
 !
-	CHARACTER(LEN=10) REGRIDDING_METHOD 
+	CHARACTER(LEN=10) REGRIDDING_METHOD
 	CHARACTER(LEN=10) GRID_TYPE
 	CHARACTER(LEN=10) OUT_BND_OPT			!Outer boundary option
 	CHARACTER(LEN=10) IN_BND_OPT			!Inner boundary option
 !
 ! Local variables.
 !
-	REAL(10) R_OLD(ND)
-	REAL(10) V_OLD(ND)
-	REAL(10) SIGMA_OLD(ND)
+	REAL(KIND=LDP) R_OLD(ND)
+	REAL(KIND=LDP) V_OLD(ND)
+	REAL(KIND=LDP) SIGMA_OLD(ND)
 !
-	REAL(10) LOG_R_OLD(ND)
-	REAL(10) LOG_R(ND)
-	REAL(10) dTAU_OLD(ND)
-	REAL(10) TAU_OLD(ND)
-	REAL(10) TAU(ND)
+	REAL(KIND=LDP) LOG_R_OLD(ND)
+	REAL(KIND=LDP) LOG_R(ND)
+	REAL(KIND=LDP) dTAU_OLD(ND)
+	REAL(KIND=LDP) TAU_OLD(ND)
+	REAL(KIND=LDP) TAU(ND)
 !
-	REAL(10) TA(ND)			!Work vectors
-	REAL(10) TB(ND)
-	REAL(10) COEF(ND,4)
+	REAL(KIND=LDP) TA(ND)			!Work vectors
+	REAL(KIND=LDP) TB(ND)
+	REAL(KIND=LDP) COEF(ND,4)
 !
 ! The fine grid (FG) is chosen to cover the ionization front. The default values are
 ! -2.0 to 1.0D0 in log(TAU) space.
 !
-	REAL(10) FG_MIN			!Min Tau for FG
-	REAL(10) FG_MAX			!Max Tau for FG
-	REAL(10) FG_RANGE
+	REAL(KIND=LDP) FG_MIN			!Min Tau for FG
+	REAL(KIND=LDP) FG_MAX			!Max Tau for FG
+	REAL(KIND=LDP) FG_RANGE
 !
-	REAL(10) T1,T2
-	REAL(10) DTAU2_ON_DTAU1
-	REAL(10) LOG_TAU
-	REAL(10) STRETCH_POW		!Power law exponent to stretch tau scale about 1
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) DTAU2_ON_DTAU1
+	REAL(KIND=LDP) LOG_TAU
+	REAL(KIND=LDP) STRETCH_POW		!Power law exponent to stretch tau scale about 1
 !
-	REAL(10) OBND_PARAMS(5)		!Parameters specifying grid placement at outer boundary.
-	REAL(10) IBND_PARAMS(5)		!Parameters specifying grid placement at nner boundary.
+	REAL(KIND=LDP) OBND_PARAMS(5)		!Parameters specifying grid placement at outer boundary.
+	REAL(KIND=LDP) IBND_PARAMS(5)		!Parameters specifying grid placement at nner boundary.
 !
 	INTEGER NUM_IBND_PARAMS		!Number of points inserted near inner boundary.
 	INTEGER NUM_OBND_PARAMS		!Number of points inserted near outer boundary.
@@ -155,7 +156,7 @@
 	    WRITE(T_OUT,'(A)')' Skipping outer boundary adjustment'
 	  ELSE
 	    ONLY_OB_DONE=.TRUE.
-	  END IF 
+	  END IF
 	ELSE
 	  WRITE(T_OUT,'(A)')'Error- REGRIDDING_METHOD (GRID_METH option) not recognized in ADJUST_R_GRID_V4 '
 	  WRITE(T_OUT,'(A)')'REGRIDDING_METHOD =',TRIM(REGRIDDING_METHOD)
@@ -168,7 +169,7 @@
 !
 	T1=0.0D0
 	DO I=2,ND-1
-	  T1=MAX( T1,ABS(R(I)-R_OLD(I))/(R(I-1)-R(I+1)) ) 
+	  T1=MAX( T1,ABS(R(I)-R_OLD(I))/(R(I-1)-R(I+1)) )
 	END DO
 	T1=T1*2.0D0
 	IF(T1 .LT. 1.0D-03 .AND. .NOT. ONLY_OB_DONE)THEN
@@ -177,7 +178,7 @@
 	  RETURN
 	ELSE
 
-! We now need to regrid all the populations. All interpolations (except 
+! We now need to regrid all the populations. All interpolations (except
 ! sigma) are performed in the LOG-LOG plane. For SN this is ideal, since
 ! the density and velocity are power laws in r. For SIGMA, we do not take
 ! the log.

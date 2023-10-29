@@ -3,6 +3,7 @@ C Function to return the length of a string. Blanks at end of
 C string are not counted. The string is not modified.
 C
 	FUNCTION ICHRLEN(A)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER ICHRLEN,I,L
 	CHARACTER*(*) A

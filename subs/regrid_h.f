@@ -3,6 +3,7 @@ C Routine to compute H on the radius grid. As input, the routine uses RSQHNU
 C computed at the mid point of the radius grid.
 C
 	SUBROUTINE REGRID_H(HNU,R,RSQHNU,H_OUT,H_IN,ND,MIDR)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered  : 29-MAy-1996 : Bug fix. Incorrect dimension passed to MON_INTERP.
@@ -10,16 +11,16 @@ C                            No effect on computation.
 C Finalized 05-Jan-1995
 C
 	INTEGER ND
-	REAL(10) HNU(ND)		!Returned - Flux on nodes
+	REAL(KIND=LDP) HNU(ND)		!Returned - Flux on nodes
 C
-	REAL(10) R(ND)
-	REAL(10) RSQHNU(ND-1)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) RSQHNU(ND-1)
 C
-	REAL(10) H_OUT		!H flux at outer boundary (from boundary 
+	REAL(KIND=LDP) H_OUT		!H flux at outer boundary (from boundary
 	                        !                          conditions)
-	REAL(10) H_IN             !H flux at inner boundary.
+	REAL(KIND=LDP) H_IN             !H flux at inner boundary.
 C
-	REAL(10) MIDR(ND)		!Work array
+	REAL(KIND=LDP) MIDR(ND)		!Work array
 C
 C Local variables
 C
@@ -36,7 +37,7 @@ C
 C
 C Regrid RSQHNU from the midpoints onto the NODES of the RADIUS grid using
 C cubic interpolation but with forced monoticity.
-C                              
+C
 C The boundary fluxes are set outside the routine, since  R(1) and R(ND) are
 C not contained within MIDR.
 C

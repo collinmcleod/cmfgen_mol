@@ -2,6 +2,7 @@
 	1     R,V,LANG_COORD,ND,
 	1     R_EXT,V_EXT,LANG_COORD_EXT,ND_EXT,
 	1     ACCESS_F,NEWMOD,COMPUTE_EDDFAC,USE_FIXED_J,FILENAME,LU_EDD)
+	USE SET_KIND_MODULE
 	USE EDDFAC_REC_DEFS_MOD
 	IMPLICIT NONE
 !
@@ -17,15 +18,15 @@
 	LOGICAL USE_FIXED_J
 	CHARACTER(LEN=*) FILENAME
 !
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-	REAL(10) LANG_COORD(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) LANG_COORD(ND)
 !
-	REAL(10) R_EXT(ND)
-	REAL(10) V_EXT(ND)
-	REAL(10) LANG_COORD_EXT(ND)
+	REAL(KIND=LDP) R_EXT(ND)
+	REAL(KIND=LDP) V_EXT(ND)
+	REAL(KIND=LDP) LANG_COORD_EXT(ND)
 !
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 !
 ! REC_SIZE     is the (maximum) record length in bytes.
 ! UNIT_SIZE    is the number of bytes per unit that is used to specify
@@ -41,7 +42,7 @@
 !
 	INTEGER IOS
 	INTEGER I,K,J
-	INTEGER IREC 
+	INTEGER IREC
 	INTEGER LUER
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
@@ -136,7 +137,7 @@
 	RETURN
 	END
 !
-! We need to write out R, V and LANG_COORD at the end of each iteration since R may 
+! We need to write out R, V and LANG_COORD at the end of each iteration since R may
 ! have changed. This procedure will handle old format files, in which case R, V and
 ! the LANG_COORD will be writted at the end of the EDDFACTOR file.
 !
@@ -144,6 +145,7 @@
 	1     R,V,LANG_COORD,ND,
 	1     R_EXT,V_EXT,LANG_COORD_EXT,ND_EXT,
 	1     ACCESS_F,FILENAME,LU_EDD)
+	USE SET_KIND_MODULE
 	USE EDDFAC_REC_DEFS_MOD
 	IMPLICIT NONE
 !
@@ -152,13 +154,13 @@
 	INTEGER ACCESS_F
 	INTEGER LU_EDD
 !
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-	REAL(10) LANG_COORD(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) LANG_COORD(ND)
 !
-	REAL(10) R_EXT(ND)
-	REAL(10) V_EXT(ND)
-	REAL(10) LANG_COORD_EXT(ND)
+	REAL(KIND=LDP) R_EXT(ND)
+	REAL(KIND=LDP) V_EXT(ND)
+	REAL(KIND=LDP) LANG_COORD_EXT(ND)
 	CHARACTER(LEN=*) FILENAME
 !
 ! REC_SIZE     is the (maximum) record length in bytes.

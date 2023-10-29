@@ -10,6 +10,7 @@
 ! the data froma file.
 !
 	SUBROUTINE PG_MOD_CONT_NODES(IP)
+	USE SET_KIND_MODULE
 	USE MOD_COLOR_PEN_DEF
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
@@ -104,7 +105,7 @@
 	    ELSE IF(XVAL .GT. XVEC(ND))THEN
 	      XVEC(ND+1)=XVAL;  YVEC(ND+1)=YVAL
 	      ND=ND+1
-	    ELSE    
+	    ELSE
 	      DO I=1,ND-1
 	        IF( (XVEC(I)-XVAL)*(XVEC(I+1)-XVAL) .LT. 0 )THEN
 	          DO J=ND,I+1,-1

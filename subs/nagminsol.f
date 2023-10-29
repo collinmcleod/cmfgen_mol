@@ -6,6 +6,7 @@ C that the 'depth parameters' ocurr first in the system of
 C equations.
 C
 	SUBROUTINE NAGMINSOL(BA,STEQ,ABT,FQ,NV,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 - IMPLICIT NONE installed.
@@ -20,12 +21,12 @@ C                        equations. This routine assumes a paged enviroment.
 C Changed 22-JUL-82 -total number of variables passed
 C
 	INTEGER ND,NV
-	REAL(10) BA(NV,NV,ND,ND),STEQ(NV,ND)
-	REAL(10) ABT(NV*NV*ND),FQ(NV*ND)
+	REAL(KIND=LDP) BA(NV,NV,ND,ND),STEQ(NV,ND)
+	REAL(KIND=LDP) ABT(NV*NV*ND),FQ(NV*ND)
 C
 C Local variables.
 C
-	REAL(10) DP
+	REAL(KIND=LDP) DP
 C
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2

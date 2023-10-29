@@ -1,5 +1,5 @@
 !
-! Routine to compute the equivalent width of a line and the 
+! Routine to compute the equivalent width of a line and the
 ! radiative force of a line using the SOBOLEV approximation.
 ! The radiative force is expressed as a multiple of the
 ! force on a free electron.
@@ -8,6 +8,7 @@
 	1                 FORCE_MULT,RLUM,
 	1                 AQW,HAQW,LINE_FLUX,EW,CONT_FLUX,
 	1                 FL,INNER_BND_METH,DBB,IC,THICK,DIE,NC,NP,ND,METHOD)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 26-Oct-2014 : We now write ABS(dmuV/dz) so as to handle non-monotonic velocity laws.
@@ -16,32 +17,32 @@
 ! Created 24-Oct-2001: Based on SOBEW
 !
 	INTEGER NC,NP,ND
-	REAL(10) SOURCE(ND),CHI(ND),ESEC(ND),CHIL(ND),ETAL(ND)
-	REAL(10) FORCE_MULT(ND)
-	REAL(10) RLUM 
-	REAL(10) V(ND),SIGMA(ND),R(ND),P(NP),AQW(ND,NP),HAQW(ND,NP)
-	REAL(10) DBB,IC,FL,EW,CONT_FLUX,LINE_FLUX(ND)
+	REAL(KIND=LDP) SOURCE(ND),CHI(ND),ESEC(ND),CHIL(ND),ETAL(ND)
+	REAL(KIND=LDP) FORCE_MULT(ND)
+	REAL(KIND=LDP) RLUM
+	REAL(KIND=LDP) V(ND),SIGMA(ND),R(ND),P(NP),AQW(ND,NP),HAQW(ND,NP)
+	REAL(KIND=LDP) DBB,IC,FL,EW,CONT_FLUX,LINE_FLUX(ND)
 	CHARACTER*(*) METHOD
 	CHARACTER*(*) INNER_BND_METH
 	LOGICAL THICK,DIE
 !
 ! Use dynamic allocation for required vectors.
 !
-	REAL(10) TA(ND),TB(ND),TC(ND),AV(ND),DTAU(ND),Z(ND)
-	REAL(10) GAM(ND),GAMH(ND),dCHIdR(ND),NOES(ND)
-	REAL(10) GLINE(ND)
+	REAL(KIND=LDP) TA(ND),TB(ND),TC(ND),AV(ND),DTAU(ND),Z(ND)
+	REAL(KIND=LDP) GAM(ND),GAMH(ND),dCHIdR(ND),NOES(ND)
+	REAL(KIND=LDP) GLINE(ND)
 !
-	REAL(10) EXPONX
+	REAL(KIND=LDP) EXPONX
 !
 ! Local variables.
 !
 	INTEGER, PARAMETER :: IONE=1
 !
 	INTEGER I,LS,NI
-	REAL(10) T1,T2,T3,T4,TOR
-	REAL(10) E1,E2,E3
-	REAL(10) IBOUND
-	REAL(10) JFLUX
+	REAL(KIND=LDP) T1,T2,T3,T4,TOR
+	REAL(KIND=LDP) E1,E2,E3
+	REAL(KIND=LDP) IBOUND
+	REAL(KIND=LDP) JFLUX
 !
 	IF( INNER_BND_METH .NE. 'DIFFUSION' .AND.
 	1   INNER_BND_METH .NE. 'SCHUSTER' .AND.
@@ -96,7 +97,7 @@
 	      TOR=CHI(1)*R(1)
 	    END IF
 	    IBOUND=SOURCE(1)*(1.0D0-EXP(-TOR))
-	  ELSE 
+	  ELSE
 	    IBOUND=0
 	  END IF
 !

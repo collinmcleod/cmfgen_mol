@@ -1,8 +1,8 @@
 C
-C Subroutine to increment the statistical equilibrium equations for each 
+C Subroutine to increment the statistical equilibrium equations for each
 C depth point given the value of the mean intensity at each depth point.
 C
-C Subroutine also increments the QFV matrix that describe the  variation 
+C Subroutine also increments the QFV matrix that describe the  variation
 C of the SE quations with respect to RJ.
 C
 C Routine also increments the ionization equilibrium equations.
@@ -12,6 +12,7 @@ C
 	1                    DI,DIST,N_DI,GS_IONEQ,
 	1                    JREC,JPHOT,SPEC_EQ,NT,ND,
 	1                    STEQION,QFVION_R,QFVION_P,EQUAT,NION)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 03-Sep-1997: QFV replaced by QFV_R, QFV_P. Allows us to spped up
@@ -20,7 +21,7 @@ C                        cross-section is held fixed.
 C                        NB: QFV = QFV_R*EMHNUKT - QFV_P
 C
 C Altered 29-Sep-95 : Version V4 (based on V3)
-C                     Extensive changes to call (ordering AND number of 
+C                     Extensive changes to call (ordering AND number of
 C                       arguments)
 C                     Now handles ionizations to excited states directly.
 C                     Multiple states possible.
@@ -48,38 +49,38 @@ C
 C NB --- NION is the total number of ionic species i.e. for
 C HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and CV).
 C
-	REAL(10) STEQ(2-NST:NT-NST+1,ND),STEQION(NION,ND)
-	REAL(10) QFV_R(2-NST:NT-NST+1,ND),QFV_P(2-NST:NT-NST+1,ND)
-	REAL(10) QFVION_R(NION,ND),QFVION_P(NION,ND)
-	REAL(10) HN(NLEV,ND),HNST(NLEV,ND)
-	REAL(10) WSE(NLEV,ND)
-	REAL(10) DI(N_DI,ND),DIST(N_DI,ND)
-	REAL(10) JREC(ND)
-	REAL(10) JPHOT(ND)
+	REAL(KIND=LDP) STEQ(2-NST:NT-NST+1,ND),STEQION(NION,ND)
+	REAL(KIND=LDP) QFV_R(2-NST:NT-NST+1,ND),QFV_P(2-NST:NT-NST+1,ND)
+	REAL(KIND=LDP) QFVION_R(NION,ND),QFVION_P(NION,ND)
+	REAL(KIND=LDP) HN(NLEV,ND),HNST(NLEV,ND)
+	REAL(KIND=LDP) WSE(NLEV,ND)
+	REAL(KIND=LDP) DI(N_DI,ND),DIST(N_DI,ND)
+	REAL(KIND=LDP) JREC(ND)
+	REAL(KIND=LDP) JPHOT(ND)
 C
 C Constants for opacity etc.
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 C Local variables.
 C
 	INTEGER I,J
-	REAL(10) NETR
+	REAL(KIND=LDP) NETR
 C
 C REV_HNST referes to the LTE population  of the level defined with respect
 C to the actual destination (target) level.
 C
-	REAL(10) REV_HNST
+	REAL(KIND=LDP) REV_HNST
 C
-	REAL(10) SUM_SE,SUM_VJ_R,SUM_VJ_P
-	REAL(10) B_RAT
+	REAL(KIND=LDP) SUM_SE,SUM_VJ_R,SUM_VJ_P
+	REAL(KIND=LDP) B_RAT
 C
 	IF(ION_LEV .EQ. 0)RETURN
 C
 C The net ionization (collisional and radaitive) to the last ionization stage
 C must be zero from the sum of the previous equilibrum equations. Hence
-C there is no need for a rate equation for the final species - it is 
+C there is no need for a rate equation for the final species - it is
 C preserved for the abundance equation.
 C
 C If there only ionizations to the ground state, the net ionization
@@ -120,8 +121,8 @@ C NB: We do not increment the ionization equation for a species by
 C     ionizations/recombinations from/to the lower ionization state.
 C     This is satisfactory provided there are no transitions between
 C     states differing by a charge of 2 --- such as occurs with
-C     Auger ionization. In such cases the X-ray ionizations muyt be 
-C     incorporated in a special way. 
+C     Auger ionization. In such cases the X-ray ionizations muyt be
+C     incorporated in a special way.
 C
 	  IF(EQUAT .NE. 0)THEN
 	    STEQION(EQUAT,J)=STEQION(EQUAT,J)+SUM_SE

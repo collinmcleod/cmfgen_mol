@@ -1,10 +1,10 @@
 !
-! Routine to compute the the EW of a line using formal solution of the 
+! Routine to compute the the EW of a line using formal solution of the
 ! transfer equation using the differencing scheme of Mihalas, Kunasz, and Hummer 1975.
 !
 ! It also computes the FLUX_EW -- this is used to check whether a line
 ! has an ifluence on the spectrum. The EW is not, buy itself, always
-! useful since a P CYgni profile can have an EW of 0. 
+! useful since a P CYgni profile can have an EW of 0.
 !
 ! NB - ETA when passed to this routine SHOULD NOT include the electron scattering emissivity.
 !    - HQW contains the angular quadrature weights for the H computation at the MID points of the radial mesh.
@@ -21,12 +21,13 @@
 	1                  PF,PROF,LFQW,WERFC,FL,TRANS_NAME,
 	1                  DIF,DBB,IC,AMASS,
 	1                  THK_LINE,THK_CONT,NLF,NC,NP,ND,METHOD)
+	USE SET_KIND_MODULE
 !
 	IMPLICIT NONE
 !
 ! Altered 15-Nov-2021: Fixed call to WRITE_VEC to fix vector/scaler issue.
 ! Altered 12-Sep-2019: Check whether the total opacity < 0. If it is we adjust
-!                         TCHI to make it positive. As the routine integrates 
+!                         TCHI to make it positive. As the routine integrates
 !                         over the source function, it does not hadle lasing.
 ! Altered  6-Sep-2019: Now return FLUX_EW which if Int (ABS[F-F_c])/F_c dnu.
 !                        Emission xomponent to EW= (FLUX_EW+EW)/2
@@ -36,46 +37,46 @@
 ! when Vinf << 500 km [Vth(es)].
 !
 	INTEGER NLF,NC,NP,ND
-	REAL(10) ETA(ND),CHI(ND),ESEC(ND),CHIL(ND),ETAL(ND)
-	REAL(10) V(ND),SIGMA(ND),R(ND),P(NP)
-	REAL(10) JCONT(ND)
-	REAL(10) JQW(ND,NP)
-	REAL(10) HQW(ND,NP)
-	REAL(10) PF(NLF),PROF(NLF),LFQW(NLF),WERFC(NLF)
-	REAL(10) DBB,IC,AMASS,FL
-	REAL(10) EW		!Returned: in Angstroms
-	REAL(10) ABS_EW   	!Returned: in Anstroms
-	REAL(10) FLUX_EW		!Anstroms
-	REAL(10) EW_CUT		!EW only roughly computed (no ES iteration).
-	REAL(10) CONT_INT		!Returned: in Jy.
-! 
+	REAL(KIND=LDP) ETA(ND),CHI(ND),ESEC(ND),CHIL(ND),ETAL(ND)
+	REAL(KIND=LDP) V(ND),SIGMA(ND),R(ND),P(NP)
+	REAL(KIND=LDP) JCONT(ND)
+	REAL(KIND=LDP) JQW(ND,NP)
+	REAL(KIND=LDP) HQW(ND,NP)
+	REAL(KIND=LDP) PF(NLF),PROF(NLF),LFQW(NLF),WERFC(NLF)
+	REAL(KIND=LDP) DBB,IC,AMASS,FL
+	REAL(KIND=LDP) EW		!Returned: in Angstroms
+	REAL(KIND=LDP) ABS_EW   	!Returned: in Anstroms
+	REAL(KIND=LDP) FLUX_EW		!Anstroms
+	REAL(KIND=LDP) EW_CUT		!EW only roughly computed (no ES iteration).
+	REAL(KIND=LDP) CONT_INT		!Returned: in Jy.
+!
 	LOGICAL DIF,THK_CONT,THK_LINE
 	CHARACTER*(*) METHOD
 	CHARACTER*(*) TRANS_NAME
 !
-	REAL(10) TA(ND),TB(ND),TC(ND),AV(ND),CV(ND),DTAU(ND),Z(ND)
-	REAL(10) TCHI(ND),XM(ND),SOURCE(ND),U(ND),VB(ND),VC(ND)
-	REAL(10) GB(ND),H(ND),GAM(ND),GAMH(ND),Q(ND),QH(ND)
-	REAL(10) HCONT(ND)
-	REAL(10) CVCONT(ND)
-	REAL(10) dCHIdR(ND)
-	REAL(10) AVM1(ND),CVM1(ND)
-	REAL(10) WM(ND,ND),FB(ND,ND)
+	REAL(KIND=LDP) TA(ND),TB(ND),TC(ND),AV(ND),CV(ND),DTAU(ND),Z(ND)
+	REAL(KIND=LDP) TCHI(ND),XM(ND),SOURCE(ND),U(ND),VB(ND),VC(ND)
+	REAL(KIND=LDP) GB(ND),H(ND),GAM(ND),GAMH(ND),Q(ND),QH(ND)
+	REAL(KIND=LDP) HCONT(ND)
+	REAL(KIND=LDP) CVCONT(ND)
+	REAL(KIND=LDP) dCHIdR(ND)
+	REAL(KIND=LDP) AVM1(ND),CVM1(ND)
+	REAL(KIND=LDP) WM(ND,ND),FB(ND,ND)
 !
-	REAL(10) OLD_JCONT(ND)
-	REAL(10) JNU(ND,NLF)
-	REAL(10) HNU(NLF)
-	REAL(10) OLD_JNU(ND,NLF)
-	REAL(10) FLUX_PROF(NLF)
-	REAL(10) OLD_ABS_EW
+	REAL(KIND=LDP) OLD_JCONT(ND)
+	REAL(KIND=LDP) JNU(ND,NLF)
+	REAL(KIND=LDP) HNU(NLF)
+	REAL(KIND=LDP) OLD_JNU(ND,NLF)
+	REAL(KIND=LDP) FLUX_PROF(NLF)
+	REAL(KIND=LDP) OLD_ABS_EW
 	INTEGER NLF_PROF
 !
 ! Local variables.
 !
 	INTEGER I,LS,ML,NI,NIEXT,IT
-	REAL(10) OLDCHI,T1
-	REAL(10) DBC,TOR,IBOUND,WERF_EXP
-	REAL(10), PARAMETER :: EW_ACC=0.005            !i.e., 0.5%
+	REAL(KIND=LDP) OLDCHI,T1
+	REAL(KIND=LDP) DBC,TOR,IBOUND,WERF_EXP
+	REAL(KIND=LDP), PARAMETER :: EW_ACC=0.005            !i.e., 0.5%
 	LOGICAL, SAVE :: FIRST=.TRUE.
 	LOGICAL EQUAL
 	EXTERNAL EQUAL

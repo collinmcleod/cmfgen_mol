@@ -1,10 +1,11 @@
 C
-C Subroutine to read in the levale names and energies for use by 
+C Subroutine to read in the levale names and energies for use by
 C WR_F_TO_S.
 C
 	SUBROUTINE RD_ENERGY(LEVNAME,STAT_WT,ENERGY,FEDGE,N,NMAX,
 	1                   IONIZATION_EN,ZION,
 	1                   OSCDATE,FILNAME,LUIN,LUOUT,IOS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered: 06-Jul-2021: Code had a potential error when NMAX < N(levs in file), and
@@ -13,25 +14,25 @@ C                         Use RD_ENERGY_V2 to read in a smaller subset of levels
 C
 	INTEGER N,NMAX
 	INTEGER LUIN,LUOUT,IOS
-	REAL(10) STAT_WT(NMAX)
-	REAL(10) ENERGY(NMAX)
-	REAL(10) FEDGE(NMAX)
-	REAL(10) IONIZATION_EN,ZION
+	REAL(KIND=LDP) STAT_WT(NMAX)
+	REAL(KIND=LDP) ENERGY(NMAX)
+	REAL(KIND=LDP) FEDGE(NMAX)
+	REAL(KIND=LDP) IONIZATION_EN,ZION
 	CHARACTER*(*) LEVNAME(NMAX)
 	CHARACTER*(*) FILNAME,OSCDATE
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 C
 C External functions.
 C
 	EXTERNAL SPEED_OF_LIGHT,ICHRLEN,RD_FREE_VAL,ERROR_LU
-	REAL(10) SPEED_OF_LIGHT,RD_FREE_VAL
+	REAL(KIND=LDP) SPEED_OF_LIGHT,RD_FREE_VAL
 	INTEGER ICHRLEN,ERROR_LU
 C
 C Local variables
 C
 	INTEGER, PARAMETER :: IZERO=0
-	REAL(10) SPEED_LIGHT
+	REAL(KIND=LDP) SPEED_LIGHT
 	INTEGER I,J,N_LOC,L1,BIGLEN,MAXLEN,LUER
 	CHARACTER*132 STRING
 	CHARACTER*40 LOCNAME(NMAX)
@@ -111,7 +112,7 @@ C
 	  READ(LUIN,'(A)')STRING
 	  J=ICHRLEN(STRING)
 	  WRITE(LUOUT,'(A)')STRING(1:J)
-	  L1=INDEX(STRING,'!Ionization energy') 
+	  L1=INDEX(STRING,'!Ionization energy')
 	  IF(L1 .NE. 0)THEN
 	    L1=INDEX(STRING,'  ')
 	    DESC='Ionization energy read in RD_ENERGY-'//FILNAME
@@ -126,7 +127,7 @@ C
 	  READ(LUIN,'(A)')STRING
 	  J=ICHRLEN(STRING)
 	  WRITE(LUOUT,'(A)')STRING(1:J)
-	  L1=INDEX(STRING,'!Screened nuclear charge') 
+	  L1=INDEX(STRING,'!Screened nuclear charge')
 	  IF(L1 .NE. 0)THEN
 	    L1=INDEX(STRING,'  ')
 	    DESC='NW Read in RD_ENERGY-'//FILNAME
@@ -156,12 +157,12 @@ C
 	    WRITE(LUER,*)'Error reading blank(1) from '//FILNAME
 	    IOS=7
 	    RETURN
-	  END IF	    
+	  END IF	
 C
 C We first read the record into a character string so that we can do
 C an unformatted read on the real variables. LEVNAME name (or transition)
-C must be separated by at least 2 spaces from the real data. 
-C Level names need not be the same length. Note that FEDGE is initially 
+C must be separated by at least 2 spaces from the real data.
+C Level names need not be the same length. Note that FEDGE is initially
 C the excitation energy in cm^-1.
 C
 	  BIGLEN=0

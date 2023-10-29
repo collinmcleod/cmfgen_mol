@@ -2,6 +2,7 @@ C
 C Subroutine to compute the impact parameter values .
 C
 	SUBROUTINE IMPAR(P,R,RP,NC,ND,NP)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 05-Dec-1996 - END DO used to terminate DO loops.
@@ -9,8 +10,8 @@ C Altered 24-May-1996 - IONE inserted
 C Altered 17-Feb-1986 - Core rays distributed equally in mu rather than p.
 C
 	INTEGER NC,ND,NP,I
-	REAL(10) P(NP),R(ND),RP,DELMU
-	REAL(10), PARAMETER :: RONE=1.0D0
+	REAL(KIND=LDP) P(NP),R(ND),RP,DELMU
+	REAL(KIND=LDP), PARAMETER :: RONE=1.0D0
 C
 	DELMU=RONE/NC
 	P(1)=0.0D0

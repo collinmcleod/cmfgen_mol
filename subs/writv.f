@@ -1,4 +1,5 @@
 	SUBROUTINE WRITV(F,ND,A,LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 18-Nov-2022 : Now TRIM A before writing out.
@@ -6,7 +7,7 @@
 ! Altered 30-APR-1985 : Now writes 10 columns instead of five across a page.)
 !
 	INTEGER ND,LU
-	REAL(10) F(ND)
+	REAL(KIND=LDP) F(ND)
 !
 ! Local variables.
 !

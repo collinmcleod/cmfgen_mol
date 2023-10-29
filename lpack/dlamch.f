@@ -1,4 +1,6 @@
-      REAL(10) FUNCTION DLAMCH( CMACH )
+      FUNCTION DLAMCH( CMACH )
+      USE SET_KIND_MODULE
+      REAL(KIND=LDP) DLAMCH
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -46,13 +48,13 @@
 * =====================================================================
 *
 *     .. Parameters ..
-      REAL(10)   ONE, ZERO
+      REAL(KIND=LDP)   ONE, ZERO
       PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Local Scalars ..
       LOGICAL            FIRST, LRND
       INTEGER            BETA, IMAX, IMIN, IT
-      REAL(10)   BASE, EMAX, EMIN, EPS, PREC, RMACH, RMAX, RMIN,
+      REAL(KIND=LDP)   BASE, EMAX, EMIN, EPS, PREC, RMACH, RMAX, RMIN,
      $                   RND, SFMIN, SMALL, T
 *     ..
 *     .. External Functions ..
@@ -129,6 +131,7 @@
 ************************************************************************
 *
       SUBROUTINE DLAMC1( BETA, T, RND, IEEE1 )
+	USE SET_KIND_MODULE
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -183,10 +186,10 @@
 *     .. Local Scalars ..
       LOGICAL            FIRST, LIEEE1, LRND
       INTEGER            LBETA, LT
-      REAL(10)   A, B, C, F, ONE, QTR, SAVEC, T1, T2
+      REAL(KIND=LDP)   A, B, C, F, ONE, QTR, SAVEC, T1, T2
 *     ..
 *     .. External Functions ..
-      REAL(10)   DLAMC3
+      REAL(KIND=LDP)   DLAMC3
       EXTERNAL           DLAMC3
 *     ..
 *     .. Save statement ..
@@ -316,6 +319,7 @@
 ************************************************************************
 *
       SUBROUTINE DLAMC2( BETA, T, RND, EPS, EMIN, RMIN, EMAX, RMAX )
+	USE SET_KIND_MODULE
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -325,7 +329,7 @@
 *     .. Scalar Arguments ..
       LOGICAL            RND
       INTEGER            BETA, EMAX, EMIN, T
-      REAL(10)   EPS, RMAX, RMIN
+      REAL(KIND=LDP)   EPS, RMAX, RMIN
 *     ..
 *
 *  Purpose
@@ -349,7 +353,7 @@
 *          be a reliable guide to the way in which the machine performs
 *          its arithmetic.
 *
-*  EPS     (output) REAL(10)
+*  EPS     (output) REAL(KIND=LDP)
 *          The smallest positive number such that
 *
 *             fl( 1.0 - EPS ) .LT. 1.0,
@@ -359,7 +363,7 @@
 *  EMIN    (output) INTEGER
 *          The minimum exponent before (gradual) underflow occurs.
 *
-*  RMIN    (output) REAL(10)
+*  RMIN    (output) REAL(KIND=LDP)
 *          The smallest normalized number for the machine, given by
 *          BASE**( EMIN - 1 ), where  BASE  is the floating point value
 *          of BETA.
@@ -367,7 +371,7 @@
 *  EMAX    (output) INTEGER
 *          The maximum exponent before overflow occurs.
 *
-*  RMAX    (output) REAL(10)
+*  RMAX    (output) REAL(KIND=LDP)
 *          The largest positive number for the machine, given by
 *          BASE**EMAX * ( 1 - EPS ), where  BASE  is the floating point
 *          value of BETA.
@@ -384,11 +388,11 @@
       LOGICAL            FIRST, IEEE, IWARN, LIEEE1, LRND
       INTEGER            GNMIN, GPMIN, I, LBETA, LEMAX, LEMIN, LT,
      $                   NGNMIN, NGPMIN
-      REAL(10)   A, B, C, HALF, LEPS, LRMAX, LRMIN, ONE, RBASE,
+      REAL(KIND=LDP)   A, B, C, HALF, LEPS, LRMAX, LRMIN, ONE, RBASE,
      $                   SIXTH, SMALL, THIRD, TWO, ZERO
 *     ..
 *     .. External Functions ..
-      REAL(10)   DLAMC3
+      REAL(KIND=LDP)   DLAMC3
       EXTERNAL           DLAMC3
 *     ..
 *     .. External Subroutines ..
@@ -574,7 +578,9 @@
 *
 ************************************************************************
 *
-      REAL(10) FUNCTION DLAMC3( A, B )
+      FUNCTION DLAMC3( A, B )
+      USE SET_KIND_MODULE
+      REAL(KIND=LDP) DLAMC3
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -582,7 +588,7 @@
 *     October 31, 1992
 *
 *     .. Scalar Arguments ..
-      REAL(10)   A, B
+      REAL(KIND=LDP)   A, B
 *     ..
 *
 *  Purpose
@@ -595,7 +601,7 @@
 *  Arguments
 *  =========
 *
-*  A, B    (input) REAL(10)
+*  A, B    (input) REAL(KIND=LDP)
 *          The values A and B.
 *
 * =====================================================================
@@ -613,6 +619,7 @@
 ************************************************************************
 *
       SUBROUTINE DLAMC4( EMIN, START, BASE )
+	USE SET_KIND_MODULE
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -621,7 +628,7 @@
 *
 *     .. Scalar Arguments ..
       INTEGER            BASE, EMIN
-      REAL(10)   START
+      REAL(KIND=LDP)   START
 *     ..
 *
 *  Purpose
@@ -637,7 +644,7 @@
 *          setting A = START and dividing by BASE until the previous A
 *          can not be recovered.
 *
-*  START   (input) REAL(10)
+*  START   (input) REAL(KIND=LDP)
 *          The starting point for determining EMIN.
 *
 *  BASE    (input) INTEGER
@@ -647,10 +654,10 @@
 *
 *     .. Local Scalars ..
       INTEGER            I
-      REAL(10)   A, B1, B2, C1, C2, D1, D2, ONE, RBASE, ZERO
+      REAL(KIND=LDP)   A, B1, B2, C1, C2, D1, D2, ONE, RBASE, ZERO
 *     ..
 *     .. External Functions ..
-      REAL(10)   DLAMC3
+      REAL(KIND=LDP)   DLAMC3
       EXTERNAL           DLAMC3
 *     ..
 *     .. Executable Statements ..
@@ -697,6 +704,7 @@
 ************************************************************************
 *
       SUBROUTINE DLAMC5( BETA, P, EMIN, IEEE, EMAX, RMAX )
+	USE SET_KIND_MODULE
 *
 *  -- LAPACK auxiliary routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -706,7 +714,7 @@
 *     .. Scalar Arguments ..
       LOGICAL            IEEE
       INTEGER            BETA, EMAX, EMIN, P
-      REAL(10)   RMAX
+      REAL(KIND=LDP)   RMAX
 *     ..
 *
 *  Purpose
@@ -739,21 +747,21 @@
 *  EMAX    (output) INTEGER
 *          The largest exponent before overflow
 *
-*  RMAX    (output) REAL(10)
+*  RMAX    (output) REAL(KIND=LDP)
 *          The largest machine floating-point number.
 *
 * =====================================================================
 *
 *     .. Parameters ..
-      REAL(10)   ZERO, ONE
+      REAL(KIND=LDP)   ZERO, ONE
       PARAMETER          ( ZERO = 0.0D0, ONE = 1.0D0 )
 *     ..
 *     .. Local Scalars ..
       INTEGER            EXBITS, EXPSUM, I, LEXP, NBITS, TRY, UEXP
-      REAL(10)   OLDY, RECBAS, Y, Z
+      REAL(KIND=LDP)   OLDY, RECBAS, Y, Z
 *     ..
 *     .. External Functions ..
-      REAL(10)   DLAMC3
+      REAL(KIND=LDP)   DLAMC3
       EXTERNAL           DLAMC3
 *     ..
 *     .. Intrinsic Functions ..

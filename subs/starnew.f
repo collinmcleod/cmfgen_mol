@@ -1,17 +1,18 @@
-C                    
+C
 C Routine to compute radius points to be used in the comoving frame
 C integration. The radius points are chosen to be equally spaced in
 C LOG(Tau) where Tau is assumed to be dominated by free-free
 C processes and is consequently proportional to the integral of the
 C density squared. The velocity is computed from the velocity law
 C given by Mihalas with RN(=Radius at which V=0.5*Vinf), ALPHA
-C and BETA as parameters which describe the law. ALPHA and BETA 
+C and BETA as parameters which describe the law. ALPHA and BETA
 C are computed from using V=0.5*VINF at RN and V(RP)=VRP. The
 C subroutine also returns the Velocity and Sigma(=R/V*dlnV/dlnR-1.)
 C This version allows a two component velocity law.
 C
 	SUBROUTINE STARNEW(R,V,SIGMA,RMAX,RP1,RN1,VRP1,VINF1,
 	1            EPS1,GAM1,RP2,RN2,VRP2,VINF2,EPS2,GAM2,ND,TA,TB,TC)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 26-May-1996 : IMPLICIT NONE installed.
@@ -19,19 +20,19 @@ C                     : Generic calls for EXP and LOG installed.
 C Created 10-FEB-83
 C
 	INTEGER ND
-	REAL(10) R(ND),V(ND),SIGMA(ND)
-	REAL(10) TA(ND),TB(ND),TC(ND)
+	REAL(KIND=LDP) R(ND),V(ND),SIGMA(ND)
+	REAL(KIND=LDP) TA(ND),TB(ND),TC(ND)
 C
-	REAL(10) RMAX,RP1,RN1,VRP1,VINF1
-	REAL(10) EPS1,GAM1,RP2,RN2,VRP2,VINF2,EPS2,GAM2
+	REAL(KIND=LDP) RMAX,RP1,RN1,VRP1,VINF1
+	REAL(KIND=LDP) EPS1,GAM1,RP2,RN2,VRP2,VINF2,EPS2,GAM2
 C
 C Local variables.
 C
-	REAL(10) VF1,VF2
-	REAL(10) T1,T2,T3,T4
-	REAL(10) DLNR,DLT
-	REAL(10) ALPHA1,BETA1
-	REAL(10) ALPHA2,BETA2
+	REAL(KIND=LDP) VF1,VF2
+	REAL(KIND=LDP) T1,T2,T3,T4
+	REAL(KIND=LDP) DLNR,DLT
+	REAL(KIND=LDP) ALPHA1,BETA1
+	REAL(KIND=LDP) ALPHA2,BETA2
 C
 	INTEGER I,MND
 C

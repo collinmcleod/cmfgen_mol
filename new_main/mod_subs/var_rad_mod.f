@@ -3,47 +3,48 @@
 ! the code. Storage is allocated by a call to SET_VAR_RAD_MOD_V2.
 !
 	MODULE VAR_RAD_MOD
+	USE SET_KIND_MODULE
 !
-	REAL(10), ALLOCATABLE :: DIFFW(:)         !NT - Variation of diffusion approx. at inner boundary.
+	REAL(KIND=LDP), ALLOCATABLE :: DIFFW(:)         !NT - Variation of diffusion approx. at inner boundary.
 !
-	REAL(10), ALLOCATABLE :: VK(:,:)    	!ND,ND - Coef. matrix of %CHI vector
-	REAL(10), ALLOCATABLE :: FC(:,:)    	!ND,ND - Coef. of %EMIS vector in angular equ.
-	REAL(10), ALLOCATABLE :: F2DA(:,:)    	!ND,ND - Coef. of %CHi in angular equ.
-	REAL(10), ALLOCATABLE :: FA(:)    		!ND 
+	REAL(KIND=LDP), ALLOCATABLE :: VK(:,:)    	!ND,ND - Coef. matrix of %CHI vector
+	REAL(KIND=LDP), ALLOCATABLE :: FC(:,:)    	!ND,ND - Coef. of %EMIS vector in angular equ.
+	REAL(KIND=LDP), ALLOCATABLE :: F2DA(:,:)    	!ND,ND - Coef. of %CHi in angular equ.
+	REAL(KIND=LDP), ALLOCATABLE :: FA(:)    		!ND
 !
-	REAL(10), ALLOCATABLE :: F2DAEXT(:,:)    	!NDMAX,NDMAX 
-	REAL(10), ALLOCATABLE :: FCEXT(:,:)    	!NDMAX,NDMAX 
-	REAL(10), ALLOCATABLE :: FAEXT(:)    	!NDMAX- 
+	REAL(KIND=LDP), ALLOCATABLE :: F2DAEXT(:,:)    	!NDMAX,NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: FCEXT(:,:)    	!NDMAX,NDMAX
+	REAL(KIND=LDP), ALLOCATABLE :: FAEXT(:)    	!NDMAX-
 !
 ! Variation arrays
 ! Variable,depth of variable,depth of J. If NUM_BNDS .ne. ND the
 ! the variable depth is given by [ VJ(I1,I2,I3) ] I3+I2-NDIAG.
 !
-	REAL(10), ALLOCATABLE :: VJ(:,:,:)    	!NT,NUM_BNDS,ND - 
+	REAL(KIND=LDP), ALLOCATABLE :: VJ(:,:,:)    	!NT,NUM_BNDS,ND -
 !
 ! Variation line arrays
 !
-	REAL(10), ALLOCATABLE :: TX(:,:,:)    	!ND,ND,NM - 
-	REAL(10), ALLOCATABLE :: TVX(:,:,:)    	!ND-1,ND,NM - 
+	REAL(KIND=LDP), ALLOCATABLE :: TX(:,:,:)    	!ND,ND,NM -
+	REAL(KIND=LDP), ALLOCATABLE :: TVX(:,:,:)    	!ND-1,ND,NM -
 !
 ! We make TX_EXT and TVX_EXT allocatable as they are accessed directly
 ! in VARCONT and thus must have the correct dimensions.
 !
-	REAL(10), ALLOCATABLE :: TX_EXT(:,:,:)
-	REAL(10), ALLOCATABLE :: TVX_EXT(:,:,:)
-	REAL(10), ALLOCATABLE :: KI(:,:,:)    		  !NDMAX,ND,NM_KI - 
+	REAL(KIND=LDP), ALLOCATABLE :: TX_EXT(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: TVX_EXT(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: KI(:,:,:)    		  !NDMAX,ND,NM_KI -
 !
-        REAL(10), ALLOCATABLE :: dJ_LOC(:,:,:)              !NM,NUM_BNDS,ND
-        REAL(10), ALLOCATABLE :: dZ(:,:,:,:)                !NM,NUM_BNDS,ND,MAX_SIM
-        REAL(10), ALLOCATABLE :: dZ_POPS(:,:,:)             !NT,NUM_BNDS,ND
+        REAL(KIND=LDP), ALLOCATABLE :: dJ_LOC(:,:,:)              !NM,NUM_BNDS,ND
+        REAL(KIND=LDP), ALLOCATABLE :: dZ(:,:,:,:)                !NM,NUM_BNDS,ND,MAX_SIM
+        REAL(KIND=LDP), ALLOCATABLE :: dZ_POPS(:,:,:)             !NT,NUM_BNDS,ND
 !
-	REAL(10), ALLOCATABLE :: dJ_DIF_d_T_EXT(:)          !NDMAX -
-	REAL(10), ALLOCATABLE :: dJ_DIF_d_dTdR_EXT(:)       !NDMAX -
-	REAL(10), ALLOCATABLE :: dJ_DIF_d_T(:)              !NDMAX -
-	REAL(10), ALLOCATABLE :: dJ_DIF_d_dTdR(:)           !NDMAX -
-	REAL(10), ALLOCATABLE :: RHS_dHdCHI(:,:)            !NDMAX,ND -
-	REAL(10), ALLOCATABLE :: dRSQH_DIF_d_T(:)           !NDMAX -
-	REAL(10), ALLOCATABLE :: dRSQH_DIF_d_dTdR(:)        !NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: dJ_DIF_d_T_EXT(:)          !NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: dJ_DIF_d_dTdR_EXT(:)       !NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: dJ_DIF_d_T(:)              !NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: dJ_DIF_d_dTdR(:)           !NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: RHS_dHdCHI(:,:)            !NDMAX,ND -
+	REAL(KIND=LDP), ALLOCATABLE :: dRSQH_DIF_d_T(:)           !NDMAX -
+	REAL(KIND=LDP), ALLOCATABLE :: dRSQH_DIF_d_dTdR(:)        !NDMAX -
 !
 	END MODULE VAR_RAD_MOD
 !
@@ -52,6 +53,7 @@
 !
 	SUBROUTINE SET_VAR_RAD_MOD_V2(ND,NDEXT,NT,NUM_BNDS,NM,MAX_SIM,NM_KI,
 	1                ACCURATE,ALLOCATE_TX)
+	USE SET_KIND_MODULE
 	USE VAR_RAD_MOD
 	IMPLICIT NONE
 !

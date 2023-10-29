@@ -8,15 +8,16 @@ C The frequency should be given in units of 1.0E+15 Hz and the
 C temperature in units of 1.0E+04 K .
 C
 	FUNCTION GBF(RNU,N,ZHE)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 : IMPLICIT NONE installed.
-C                       A now declared REAL(10)
+C                       A now declared REAL(KIND=LDP)
 C
 	INTEGER N
-	REAL(10) GBF,RNU,ZHE
+	REAL(KIND=LDP) GBF,RNU,ZHE
 C
-	REAL(10) A(0:6,10),T1
+	REAL(KIND=LDP) A(0:6,10),T1
 	DATA A
 	1/  1.2302628D0,-2.9094219D-03,7.3993579D-06,-8.7356966D-09
 	1, -5.5759888D0,12.803223D0,0.0D0

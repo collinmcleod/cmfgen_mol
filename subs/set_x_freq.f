@@ -5,6 +5,7 @@ C section to be deleted (must be set to FALSE for H, and HeII.
 C
 	SUBROUTINE SET_X_FREQ(FREQ,NCF,NCF_MAX,ZCORE,ZION,
 	1                      NI_PRES,N2_PRES)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 16-Oct-2000 : Bug fix when cross-section is zero.
@@ -14,8 +15,8 @@ C                       Warning for non CNO species installed.
 C Created 18-Jul-1994
 C
 	INTEGER NCF,NCF_MAX,J
-	REAL(10) FREQ(NCF_MAX)
-	REAL(10) ZCORE,ZION,CON_FAC
+	REAL(KIND=LDP) FREQ(NCF_MAX)
+	REAL(KIND=LDP) ZCORE,ZION,CON_FAC
 	LOGICAL NI_PRES,N2_PRES
 C
 	INTEGER ERROR_LU,LUER
@@ -23,7 +24,7 @@ C
 C
 C Data variables. C, N, AND O
 C
-	REAL(10) EDGE_C(6),EDGE_N(7),EDGE_O(8)
+	REAL(KIND=LDP) EDGE_C(6),EDGE_N(7),EDGE_O(8)
 C
 	DATA EDGE_C/490,392,347,317,296,280/
 	DATA EDGE_N/666,552,496,459,432,412,395/

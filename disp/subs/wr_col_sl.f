@@ -4,27 +4,28 @@
 ! used to detrmine the file name.
 !
 	SUBROUTINE WR_COL_SL(OMEGA,XzV,XZVLTE,EDGE,LEV_NAME,N,DESC,LU,LEVEL,NL,DEPTH)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
-! Altered  24-May-2020 : When OPTION=NET_RATES we write out to XzV_TOTR_COL the net rate, 
+! Altered  24-May-2020 : When OPTION=NET_RATES we write out to XzV_TOTR_COL the net rate,
 !                          from all levels, into each leval
 ! Created  29-Jan-2004 : Based on WR_COL
 !
 	INTEGER N,NL,LU,DEPTH
-	REAL(10) XzV(N)
-	REAL(10) XzVLTE(N)
-	REAL(10) EDGE(N)
-	REAL(10) OMEGA(N,N)
+	REAL(KIND=LDP) XzV(N)
+	REAL(KIND=LDP) XzVLTE(N)
+	REAL(KIND=LDP) EDGE(N)
+	REAL(KIND=LDP) OMEGA(N,N)
 	CHARACTER*(*) LEV_NAME(N),DESC
 	INTEGER LEVEL(NL)
 !
 ! Internal variables.
 !
-	REAL(10) T1
-	REAL(10) SUM
-	REAL(10) RATE_IN,RATE_OUT
-	REAL(10) TOT_IN,TOT_OUT
-	REAL(10) NET_IN
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) SUM
+	REAL(KIND=LDP) RATE_IN,RATE_OUT
+	REAL(KIND=LDP) TOT_IN,TOT_OUT
+	REAL(KIND=LDP) NET_IN
 	INTEGER I,J,K,L,M,IOS
 	INTEGER N_PER_LINE,LMAX,LIM,ST_POS
 	INTEGER LEV
@@ -91,8 +92,8 @@
 	  T1=100.0D0*(TOT_IN-TOT_OUT)/(TOT_IN+TOT_OUT)
 	  WRITE(I,'(ES14.4,T20,A)')T1,'% Net col rate in (i.e, 100*NET/(TOT_IN+TOT_OUT)'
 	END DO
-	WRITE(6,'(/,2A)')' Collision rates written (appended) to: ',TRIM(FILENAME) 
+	WRITE(6,'(/,2A)')' Collision rates written (appended) to: ',TRIM(FILENAME)
 	CLOSE(LU)
 !
 	RETURN
-	END 
+	END

@@ -1,7 +1,7 @@
 !
 ! Routine to adjust the radiative equilibrium equation for the exchange of
 ! energy with the gas, and the work done on the gas. This code is designed for
-! SN models, and assumes a Lagrangian formulation. V is the comoving variable. 
+! SN models, and assumes a Lagrangian formulation. V is the comoving variable.
 !
 !  (1) Increments STEQ if adiabatic cooling is to be allowed for
 !  (2) Increments the variation matrix [BA] if it is being computed, and
@@ -13,6 +13,7 @@
 	SUBROUTINE EVAL_TEMP_DDT_V2(WORK,AD_CR_V,AD_CR_DT,
 	1               POPS,AVE_ENERGY,HDKT,COMPUTE_BA,INCL_ADIABATIC,
 	1               TIME_SEQ_NO,DIAG_INDX,NUM_BNDS,NT,ND)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
  	USE STEQ_DATA_MOD
 	USE NUC_ISO_MOD
@@ -23,7 +24,7 @@
 ! Altered 22-Nov-2011 : Changed call to GET_POPS_AT_PREV_TIME_STEP from V4 to V5
 !                          (POPS was added to call).
 ! Altered 11-Nov-2009 : Fixed bug in BA calculation --- was skipping depth ND.
-!                          No longer calculate ION_EN. 
+!                          No longer calculate ION_EN.
 ! Altered 12-Feb-2008 : VOL_EXP_FAC used. Now valid for all expansion laws.
 !                          Returned populations are corrected for decays and adiabatic expansion.
 ! Altered 22-Mar-2007 : Call GET_POPS_AT_PREV_TIME_STEP_V4
@@ -41,34 +42,34 @@
 !
 ! Output:
 !
-	REAL(10) AD_CR_V(ND)
-	REAL(10) AD_CR_DT(ND)
+	REAL(KIND=LDP) AD_CR_V(ND)
+	REAL(KIND=LDP) AD_CR_DT(ND)
 !
 ! Input:
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) AVE_ENERGY(NT)
-	REAL(10) WORK(ND)
-	REAL(10) HDKT
-	REAL(10) TIME_SEQ_NO
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) AVE_ENERGY(NT)
+	REAL(KIND=LDP) WORK(ND)
+	REAL(KIND=LDP) HDKT
+	REAL(KIND=LDP) TIME_SEQ_NO
 !
 ! Local vectors.
 !
-	REAL(10) EK_VEC(ND)
-	REAL(10) EI_VEC(ND)
-	REAL(10) P_VEC(ND)
-	REAL(10) GAMMA(ND)
-	REAL(10) INT_EN(ND)
+	REAL(KIND=LDP) EK_VEC(ND)
+	REAL(KIND=LDP) EI_VEC(ND)
+	REAL(KIND=LDP) P_VEC(ND)
+	REAL(KIND=LDP) GAMMA(ND)
+	REAL(KIND=LDP) INT_EN(ND)
 !
-	REAL(10) OLD_POPS(NT,ND)
-	REAL(10) OLD_R(ND)
-	REAL(10) OLD_T(ND)
-	REAL(10) OLD_ED(ND)
-	REAL(10) OLD_GAMMA(ND)
-	REAL(10) OLD_POP_ATOM(ND)
-	REAL(10) OLD_INT_EN(ND)
+	REAL(KIND=LDP) OLD_POPS(NT,ND)
+	REAL(KIND=LDP) OLD_R(ND)
+	REAL(KIND=LDP) OLD_T(ND)
+	REAL(KIND=LDP) OLD_ED(ND)
+	REAL(KIND=LDP) OLD_GAMMA(ND)
+	REAL(KIND=LDP) OLD_POP_ATOM(ND)
+	REAL(KIND=LDP) OLD_INT_EN(ND)
 !
-	REAL(10) TOT_ENERGY(NT)
+	REAL(KIND=LDP) TOT_ENERGY(NT)
 !
 ! Local variables.
 !
@@ -77,13 +78,13 @@
 	LOGICAL COMPUTE_BA,INCL_ADIABATIC
 !
 	INTEGER ERROR_LU
-	REAL(10) BOLTZMANN_CONSTANT,FUN_PI,STEFAN_BOLTZ,SPEED_OF_LIGHT
+	REAL(KIND=LDP) BOLTZMANN_CONSTANT,FUN_PI,STEFAN_BOLTZ,SPEED_OF_LIGHT
 	EXTERNAL BOLTZMANN_CONSTANT,FUN_PI,ERROR_LU,STEFAN_BOLTZ,SPEED_OF_LIGHT
 !
-	REAL(10) SCALE
-	REAL(10) EHB_CONSTANT
-	REAL(10) T1,T2,T3,T4,PI
-	REAL(10) DELTA_T_SECS
+	REAL(KIND=LDP) SCALE
+	REAL(KIND=LDP) EHB_CONSTANT
+	REAL(KIND=LDP) T1,T2,T3,T4,PI
+	REAL(KIND=LDP) DELTA_T_SECS
 	INTEGER I,J,K,L
 	INTEGER LUER
 	INTEGER ISPEC
@@ -122,7 +123,7 @@
 	END DO
 !
 ! Get the populations at the previous time step. These are put onto the same
-! V grid as the current model. The returned populations are CORRECTED for 
+! V grid as the current model. The returned populations are CORRECTED for
 ! advection, radioactive decays, and are normalized.
 !
 	LU=7
@@ -186,7 +187,7 @@
 ! For historical reasons STEQ contains Int[chi.J - eta]dv. Rather than multiply
 ! this term everywhere by 4pi, we divide the adiabatic cooling rate by 4pi.
 ! Also, since chi, and eta are a factor of 10^10 too large, we need to
-! scale by 10^10. We need to introduce another factor of 10^4 since T is 
+! scale by 10^10. We need to introduce another factor of 10^4 since T is
 ! in units of 10^4K.
 !
 	PI=FUN_PI()
@@ -298,7 +299,7 @@
 	      T3=T1*EI_VEC(I)*INT_EN(I)*DELTA_T_SECS
 	      T4=4.0D+16*STEFAN_BOLTZ()*(T(I)**4)/SPEED_OF_LIGHT()
 	      WRITE(7,'(I5,3ES15.5,6ES14.5)')I,R(I),V(I),T(I),0.5D+10*DENSITY(I)*(V(I)**2),T2,T3,T4,
-	1		RADIOACTIVE_DECAY_ENERGY(I),RADIOACTIVE_DECAY_ENERGY(I)*DELTA_T_SECS      
+	1		RADIOACTIVE_DECAY_ENERGY(I),RADIOACTIVE_DECAY_ENERGY(I)*DELTA_T_SECS
 	    END DO
 	  CLOSE(UNIT=7)
 	END IF

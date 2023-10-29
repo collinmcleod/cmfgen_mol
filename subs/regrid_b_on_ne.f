@@ -7,12 +7,13 @@
 !
 ! NB. The variables NST and NFIN are used so that this routine can also read
 !     in the HEI arrays. N specifies the first dimension of the population
-!     array. 
+!     array.
 !           e.g. for Hydrogen read, set NST=1, and NFIN=N.
 !           e.g. for HeI(Triplets) read, set NST=NSING+1, and NFIN=N.
 !
 	SUBROUTINE REGRID_B_ON_NE(DHEN,ED,ION,EDLOG,N,NST,NFIN,ND,
 	1                         LU,FILNAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 20-Feb-2005 : CHECK_DC installed (because of problems with X-rays).
@@ -26,25 +27,25 @@
 !                       now retruned.
 !
 	INTEGER N,NST,NFIN,ND,LU
-	REAL(10) DHEN(2-NST:N-NST+1,ND),ED(ND),ION(ND),EDLOG(ND)
+	REAL(KIND=LDP) DHEN(2-NST:N-NST+1,ND),ED(ND),ION(ND),EDLOG(ND)
 	CHARACTER*(*) FILNAME
 !
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 !
-	REAL(10), ALLOCATABLE :: HYD(:,:)
-	REAL(10), ALLOCATABLE :: OLDED(:)
-	REAL(10), ALLOCATABLE :: TA(:)
-	REAL(10), ALLOCATABLE :: TB(:)
-	REAL(10), ALLOCATABLE :: OLDION(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HYD(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDED(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDION(:)
 !
 ! NLEV is the number of levels whose departure coefficients will be set.
 !
 	INTEGER NLEV
 !
 	INTEGER I,J,NX,NXST,NX_END,NZ,NOLD,NDOLD,IOS
-	REAL(10) CONST,TSTAROLD,RPOLD
-	REAL(10) ION_FRAC,VEL,OLD_CLUMP_FAC
+	REAL(KIND=LDP) CONST,TSTAROLD,RPOLD
+	REAL(KIND=LDP) ION_FRAC,VEL,OLD_CLUMP_FAC
 	LOGICAL CLMP_PRES
 	LOGICAL CHECK_DC
 	CHARACTER*80 STRING

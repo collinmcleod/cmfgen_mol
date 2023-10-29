@@ -5,6 +5,7 @@
 	1		NU_MAX,NU_MIN,VINF,
 	1               FRAC_DOP_OBS,dV_OBS_PROF,dV_OBS_WING,dV_OBS_BIG,
 	1               OBS_PRO_EXT_RAT,ES_WING_EXT,V_DOP)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 13-Apr-2017 : Limit the maximum extent of the red wing to 10,000 km/s.
@@ -14,7 +15,7 @@
 !                       central frequency.
 ! Altered 23-Nov-1998 : Based on INS_LINE_OBS_V2.
 !                       Variable TRANS_TYPE and INC_ALL_LINES included in call.
-!                       If INC_ALL_LINES is FALSE, only LINES treated in BLANK mode 
+!                       If INC_ALL_LINES is FALSE, only LINES treated in BLANK mode
 !                       are used to define the observers frequency grid.
 ! Altered 25-May-1996 : MIN(LN_INDX,N_LINES) inserted in 2 IF staements because
 !                        of order in which CRAY executes the IF statements.
@@ -31,55 +32,55 @@
 !
 ! Line+continuum frequencies
 
-	REAL(10) FREQ(NFREQ_MAX)			!New observers frequencies
+	REAL(KIND=LDP) FREQ(NFREQ_MAX)			!New observers frequencies
 !
 ! Passed vectors.
 !
-	REAL(10) NU_LINE(N_LINES)		!Line frequencies
-	REAL(10) NU_STRT_LINE(N_LINES)	!Frequencies of start of res. zone.
-	REAL(10) VEC_VMIN_VDOP(N_LINES)	!Minium Doppler velocity in km/s.
+	REAL(KIND=LDP) NU_LINE(N_LINES)		!Line frequencies
+	REAL(KIND=LDP) NU_STRT_LINE(N_LINES)	!Frequencies of start of res. zone.
+	REAL(KIND=LDP) VEC_VMIN_VDOP(N_LINES)	!Minium Doppler velocity in km/s.
 !
 	CHARACTER*(*) TRANS_TYPE(N_LINES)
 	LOGICAL      INCL_ALL_LINES
 !
 ! Passed constants:
-	REAL(10) VINF		!Terminal velocity of wind.
-	REAL(10) dV_OBS_PROF
-	REAL(10) dV_OBS_WING
-	REAL(10) dV_OBS_BIG
-	REAL(10) NU_MIN
-	REAL(10) NU_MAX
-	REAL(10) OBS_PRO_EXT_RAT
-	REAL(10) ES_WING_EXT
-	REAL(10) V_DOP
-	REAL(10) FRAC_DOP_OBS
+	REAL(KIND=LDP) VINF		!Terminal velocity of wind.
+	REAL(KIND=LDP) dV_OBS_PROF
+	REAL(KIND=LDP) dV_OBS_WING
+	REAL(KIND=LDP) dV_OBS_BIG
+	REAL(KIND=LDP) NU_MIN
+	REAL(KIND=LDP) NU_MAX
+	REAL(KIND=LDP) OBS_PRO_EXT_RAT
+	REAL(KIND=LDP) ES_WING_EXT
+	REAL(KIND=LDP) V_DOP
+	REAL(KIND=LDP) FRAC_DOP_OBS
 !
 ! Local variables.
 !
-	REAL(10) MAX_B_EXTENT		!Maximum blueward extent of line profile
-	REAL(10) MAX_R_EXTENT		!Maximum  redward extent of line profile
-	REAL(10) MAX_BW_EXTENT		!Maximum blueward extent of e.s. wings
-	REAL(10) MAX_RW_EXTENT		!Maximum  redward extent of e.s. wings
+	REAL(KIND=LDP) MAX_B_EXTENT		!Maximum blueward extent of line profile
+	REAL(KIND=LDP) MAX_R_EXTENT		!Maximum  redward extent of line profile
+	REAL(KIND=LDP) MAX_BW_EXTENT		!Maximum blueward extent of e.s. wings
+	REAL(KIND=LDP) MAX_RW_EXTENT		!Maximum  redward extent of e.s. wings
 !
-	REAL(10) PROF_SPACING
-	REAL(10) WING_SPACING
-	REAL(10) BIG_SPACING
-	REAL(10) T1,T2,T3
-	REAL(10) dNU
-	REAL(10) NU_END_LINE
+	REAL(KIND=LDP) PROF_SPACING
+	REAL(KIND=LDP) WING_SPACING
+	REAL(KIND=LDP) BIG_SPACING
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) dNU
+	REAL(KIND=LDP) NU_END_LINE
 !
 	INTEGER INDX		!Current frequency index.
-	INTEGER LN_INDX	!Current line whose frequencies we are 
+	INTEGER LN_INDX	!Current line whose frequencies we are
 				!   installing.
 !
 	INTEGER I,J,K		!Micellaneous loop variables.
 	INTEGER LU_ER
-	REAL(10) C_KMS
+	REAL(KIND=LDP) C_KMS
 !
 ! External functions
 !
 	INTEGER ERROR_LU
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
 	CALL TUNE(1,'INS_OBS')
@@ -110,9 +111,9 @@
 	MAX_B_EXTENT  = 1.0D0+(OBS_PRO_EXT_RAT*VINF+3.0D0*V_DOP)/C_KMS
 	MAX_R_EXTENT  = 1.0D0-(OBS_PRO_EXT_RAT*VINF+3.0D0*V_DOP)/C_KMS
 !
-! BW and RW refer to the extent of the electron scattering wings. They are 
+! BW and RW refer to the extent of the electron scattering wings. They are
 ! defined from line center.
-!                               
+!
 ! When Vinf is small, extent of red wing will be primarily determined by
 ! thermal redistribution effects, and hence ES_WING_EXT is important. When
 ! Vinf is large (>> Velec) the "coherent" scattering will dominate, and
@@ -141,15 +142,15 @@
 	PROF_SPACING = dV_OBS_PROF/C_KMS	!For the main wind profile
 	WING_SPACING = dV_OBS_WING/C_KMS	!For the e.s. wings
 	BIG_SPACING  = dV_OBS_BIG/C_KMS    	!For the continuum
-!                                                
+!
 	LN_INDX=1
 	IF(.NOT. INCL_ALL_LINES)THEN
-	  DO WHILE(LN_INDX .LE. N_LINES .AND. 
+	  DO WHILE(LN_INDX .LE. N_LINES .AND.
 	1                       TRANS_TYPE(LN_INDX)(1:3) .NE. 'BLA')
 	    LN_INDX=LN_INDX+1
 	  END DO
 	END IF
-	INDX=1         
+	INDX=1
 	FREQ(1)=NU_MAX
 ! 
 ! We can determine the frequency grid. We always chose the smallest needed
@@ -173,7 +174,7 @@
 !	  CALL TUNE(1,'MAX_BW_EXT')
 	  K=LN_INDX
 	  DO WHILE( K .LE. N_LINES .AND.
-	1               FREQ(INDX)-dNU .LT. 
+	1               FREQ(INDX)-dNU .LT.
 	1               NU_STRT_LINE(MIN(K,N_LINES))*MAX_BW_EXTENT )
 	    IF(INCL_ALL_LINES .OR. TRANS_TYPE(K) .EQ. 'BLANK')THEN
 	      T1=FREQ(INDX)-dNU
@@ -225,7 +226,7 @@
 	      IF(INCL_ALL_LINES .OR. TRANS_TYPE(K) .EQ. 'BLANK')THEN
 	        T1=FREQ(INDX)-dNU
 	        NU_END_LINE=NU_LINE(K)-(NU_STRT_LINE(K)-NU_LINE(K))
-	        IF( (FREQ(INDX) .GT. NU_END_LINE .AND. 
+	        IF( (FREQ(INDX) .GT. NU_END_LINE .AND.
 	1            T1 .LE. NU_STRT_LINE(K)) )THEN
 	          T3=1.0D0 + C_KMS*ABS(T3-NU_LINE(K)/FREQ(INDX))/VEC_VMIN_VDOP(K)
 	          T2=FREQ(INDX)*FRAC_DOP_OBS*VEC_VMIN_VDOP(K)*SQRT(T3)/C_KMS

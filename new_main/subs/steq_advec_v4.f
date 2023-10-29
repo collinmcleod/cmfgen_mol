@@ -6,6 +6,7 @@
 	SUBROUTINE STEQ_ADVEC_V4(RELAXATION_PARAMETER,LINEAR,
 	1                 NUM_BNDS,ND,
 	1                 INCL_ADVECTION,LAMBDA_ITERATION,COMPUTE_BA)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
@@ -14,7 +15,7 @@
 !                          ion terms for ionizaton/recombination equations.
 ! Created 20-Jan-2003
 !
-	REAL(10) RELAXATION_PARAMETER
+	REAL(KIND=LDP) RELAXATION_PARAMETER
 !
 	INTEGER NUM_BNDS
 	INTEGER ND
@@ -22,14 +23,14 @@
 	LOGICAL LAMBDA_ITERATION
 	LOGICAL COMPUTE_BA
 	LOGICAL LINEAR
-	LOGICAL INCL_ADVECTION 
+	LOGICAL INCL_ADVECTION
 !
 ! Local variables.
 !
-	REAL(10) SUM(NUM_IONS,ND)
-	REAL(10) T1,T2
-	REAL(10) DERIV_CONST
-	REAL(10) UNIT_CONST
+	REAL(KIND=LDP) SUM(NUM_IONS,ND)
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) DERIV_CONST
+	REAL(KIND=LDP) UNIT_CONST
 !
 	INTEGER K,KP1			!Depth index
 	INTEGER M,MP1			!Band index
@@ -99,7 +100,7 @@
 ! We have this option since Sum[all j] Xj = X (X=species population).
 !
 ! Let Xi refer to the total population of ionization stage i. Then
-! 
+!
 !      Sum[j=1,i]      {vdXj/dr} = RRi  or
 !
 !      Sum[j=i+1,..]  {-vdXj/dr} = RRi

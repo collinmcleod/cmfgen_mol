@@ -4,9 +4,10 @@
 !       Compute the LTE populations of the levels in the FULL atom given
 !       ED (electron density), T (electron temperature) and the ion density
 !       DI C2. Level dissolution is taken into account.
-!              
+!
 	SUBROUTINE LTEPOP_WLD_V2(C2LTE,LOG_C2LTE,W_C2,EDGEC2,GC2,
 	1             ZC2,GION_C2,NC2,DIC2,ED,T,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered: 5-Apr-2011: MAX_LOG_LTE_POP parameter introduced.
@@ -18,22 +19,22 @@
 !                         version. Only necessary if something untoward crops up
 ! Altered 24-May-1996 : ND_MAX removed (was unused).
 ! Created 30-May-1995 : Based on LTEPOP.
-!             
+!
 	INTEGER ND
-	REAL(10) ED(ND)			!Electron density
-	REAL(10) T(ND)			!Temperature 10^4K
-	REAL(10) DIC2(ND)			!Ion density (Full model atom)
+	REAL(KIND=LDP) ED(ND)			!Electron density
+	REAL(KIND=LDP) T(ND)			!Temperature 10^4K
+	REAL(KIND=LDP) DIC2(ND)			!Ion density (Full model atom)
 !
 	INTEGER NC2
-	REAL(10) C2LTE(NC2,ND)
-	REAL(10) LOG_C2LTE(NC2,ND)
-	REAL(10) W_C2(NC2,ND)
-	REAL(10) EDGEC2(NC2)
-	REAL(10) GC2(NC2)
-	REAL(10) GION_C2			!Statistical weight of ion groun state.
-	REAL(10) ZC2			!Ion charge
+	REAL(KIND=LDP) C2LTE(NC2,ND)
+	REAL(KIND=LDP) LOG_C2LTE(NC2,ND)
+	REAL(KIND=LDP) W_C2(NC2,ND)
+	REAL(KIND=LDP) EDGEC2(NC2)
+	REAL(KIND=LDP) GC2(NC2)
+	REAL(KIND=LDP) GION_C2			!Statistical weight of ion groun state.
+	REAL(KIND=LDP) ZC2			!Ion charge
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER ERROR_LU
@@ -42,8 +43,8 @@
 ! Local variables.
 !
 	INTEGER I,K
-	REAL(10) X,Y,RGU
-	REAL(10), PARAMETER :: MAX_LOG_LTE_POP=3000.0D0
+	REAL(KIND=LDP) X,Y,RGU
+	REAL(KIND=LDP), PARAMETER :: MAX_LOG_LTE_POP=3000.0D0
 !
 ! Compute the occupation probabilities.
 !

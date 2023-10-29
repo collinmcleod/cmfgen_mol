@@ -1,11 +1,12 @@
 !
-!-----Isolated and multi component HeI and NIT line profiles  
+!-----Isolated and multi component HeI and NIT line profiles
 !     Data are input from file HEI_OTHERSTARK
 !     See below for required data.
 !
 	SUBROUTINE STRK_DS(PRO,FREQ,NF,ED,TE,VTURB,ND,NU_ZERO,    &
 	                         SPECIES,NL,NUP,AMASS,            &
 	                         FILENAME,LU_STRK)
+	USE SET_KIND_MODULE
 !
 ! Altered 09-Oct-2002 : Bug fixed (effect compiler dependent).
 !                         STKTB_PRES was not being initialized.
@@ -16,13 +17,13 @@
 	INTEGER*4 NF		!Number of frequencies
 	INTEGER*4 ND		!Number of depth points
 	INTEGER*4 LU_STRK	!Input logical unit
-	REAL(10) FREQ(NF)		!Frequncy in units of 10^15 Hz
-	REAL(10) PRO(ND,NF)	!Profile
-	REAL(10) TE(ND)		!Electron temperature (10^4 K)
-	REAL(10) ED(ND)		!Electron density (cgs units)
-	REAL(10) VTURB(ND)	!Turbulent velocity km/s
-	REAL(10) NU_ZERO		!Line frequency (10^15 Hz)
-	REAL(10) AMASS		!Species mass in AMU
+	REAL(KIND=LDP) FREQ(NF)		!Frequncy in units of 10^15 Hz
+	REAL(KIND=LDP) PRO(ND,NF)	!Profile
+	REAL(KIND=LDP) TE(ND)		!Electron temperature (10^4 K)
+	REAL(KIND=LDP) ED(ND)		!Electron density (cgs units)
+	REAL(KIND=LDP) VTURB(ND)	!Turbulent velocity km/s
+	REAL(KIND=LDP) NU_ZERO		!Line frequency (10^15 Hz)
+	REAL(KIND=LDP) AMASS		!Species mass in AMU
 !
 	INTEGER*4 NL			!Lower transition level
 	INTEGER*4 NUP			!Upper transition level
@@ -35,13 +36,13 @@
 	INTEGER*4 STKTB_NTS
 	INTEGER*4 STKTB_NL
 	INTEGER*4 STKTB_NU
-	REAL(10) STKTB_TS(MXS)
-	REAL(10) STKTB_WS(MXS)
-	REAL(10) STKTB_DS(MXS)
-	REAL(10) STKTB_AS(MXS)
+	REAL(KIND=LDP) STKTB_TS(MXS)
+	REAL(KIND=LDP) STKTB_WS(MXS)
+	REAL(KIND=LDP) STKTB_DS(MXS)
+	REAL(KIND=LDP) STKTB_AS(MXS)
 	LOGICAL STKTB_PRESS
-	REAL(10) STKTB_DLP
-	REAL(10) STKTB_ELE
+	REAL(KIND=LDP) STKTB_DLP
+	REAL(KIND=LDP) STKTB_ELE
 	INTEGER*4 NL_RD
 	INTEGER*4 NUP_RD
 	INTEGER*4 NLSTR
@@ -52,15 +53,15 @@
 ! Local variables:
 !
 	INTEGER*4 J,IB,IA,IDE,IOS
-	REAL(10) DLS,FOS,FT,RFT,WT,RWT,RBHZ,RBA,TT,EE,VMOT,WF,Y,PP
-	REAL(10) VM,RHOM,ALF,SIGMA,X,A,CON,DB,P,VA,VB,D,W
-	REAL(10) TMP
-	REAL(10) CLIGHT,SRT
+	REAL(KIND=LDP) DLS,FOS,FT,RFT,WT,RWT,RBHZ,RBA,TT,EE,VMOT,WF,Y,PP
+	REAL(KIND=LDP) VM,RHOM,ALF,SIGMA,X,A,CON,DB,P,VA,VB,D,W
+	REAL(KIND=LDP) TMP
+	REAL(KIND=LDP) CLIGHT,SRT
 	CHARACTER*80 STRING
 	DATA CLIGHT/2.997925D18/
 	DATA SRT/1.414213562D0/
 !
-	REAL(10) VOIGTN
+	REAL(KIND=LDP) VOIGTN
 	EXTERNAL VOIGTN
 !
 	FT=NU_ZERO*1.D15
@@ -99,7 +100,7 @@
 !
 ! Now compute the profile.
 !
-!-----Doppler quantities					 
+!-----Doppler quantities					
 !
 	WT=CLIGHT*RFT
 	RWT=FT/CLIGHT
@@ -109,10 +110,10 @@ DEPTH:	DO IDE=1,ND
 	  EE=ED(IDE)
 	  VMOT=12.85d0*SQRT(TE(IDE)/AMASS+(VTURB(IDE)/12.85)**2.)/2.997925D5
 	  VMOT=1./VMOT	! (CLIGHT/(Vth+Vtur)) with Amass
-	  RBHZ=VMOT*RFT							     
+	  RBHZ=VMOT*RFT							
 	  RBA=VMOT*RWT								
 !
-!-----Set up interpolation in T						    
+!-----Set up interpolation in T						
 !
 	  DO J=2,STKTB_NTS
 	   IA=J
@@ -158,10 +159,10 @@ DEPTH:	DO IDE=1,ND
 	  FOS=1.0
 !
 !-----Satellite components
-!							   
+!							
 	  X=FOS
 	  CON=6.268773E-2*RBHZ/X
-!              
+!
 !-----Compute profile
 !
 	  DO J=1,NF

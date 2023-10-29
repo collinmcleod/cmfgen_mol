@@ -1,13 +1,13 @@
-!                                                     
+!
 ! Main Subroutine to self consistently solve the equation of transfer and the
-! equations of statistical equilibrium for a spherically extended atmosphere 
+! equations of statistical equilibrium for a spherically extended atmosphere
 ! in the presence of outflows.
-!                                 
-! At present the atmosphere considered to consist of 
+!
+! At present the atmosphere considered to consist of
 !      H, He, plus other species such as C, N, O and Fe.
 ! Eithe H or He must be present.
 !
-! Abundances are un-normalized relative fractional abundances (i.e. specified 
+! Abundances are un-normalized relative fractional abundances (i.e. specified
 ! specified with respect to some arbitrary species X. Generally we have used
 ! He as X. If negative they are interpreted as mass-fractions.
 !
@@ -24,6 +24,7 @@
 	1                     NUM_BNDS,NION,DIAG_INDX,
 	1                     NDMAX,NPMAX,NCF_MAX,NLINE_MAX,
 	1                     TX_OFFSET,MAX_SIM,NM,NM_KI,NLF)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE ANG_QW_MOD
 	USE CMF_SOB_MOD
@@ -52,9 +53,9 @@
 ! Altered 24-Jul-2015 : Added HMI, Changed to COMP_OPAC_V2 (cur_hmi, 19-Aug-2015)
 ! Altered 27-Mar-2013 : dE_WORK and RAD_DECAY_LUM updated for clumping.
 !                       LUWARN inserted (done earlier)
-!                       LIN_PROF_SIM is now depth dependent -- code cannow handle depth dependent 
+!                       LIN_PROF_SIM is now depth dependent -- code cannow handle depth dependent
 !                          line profiles.
-!                       Calls to AUTO_CLUMP_REV and SPECIFY_IT_CYCLE added.       
+!                       Calls to AUTO_CLUMP_REV and SPECIFY_IT_CYCLE added.
 ! Altered  6-Dec-2013 : When removing lines from the variation set we assume a minimum terminal
 !                          velocity of 300 km/s. Important for plane-parallel models with Vinf=0.
 ! Altered 29-Nov-2011 : Call to STEQ_CO_MOV_DERIV changed to _V3. Done to facilitae
@@ -65,14 +66,14 @@
 ! Altered 19-Jan-2009 : SL otion inserted; rd_f_to_s_ids_v2.f now used.
 ! Altered 16-Feb-2006 : Changed and modified over 2 month period. Section solving for
 !                         populations and performing NG acceleration etc removed to
-!                         subroutine (SOLVE_FOR_POPS). Routines added to allow time 
-!                         variability of the statistical equilibrium equations. 
-!                         Currently these are only for a Hubble law flow. Relativistic 
+!                         subroutine (SOLVE_FOR_POPS). Routines added to allow time
+!                         variability of the statistical equilibrium equations.
+!                         Currently these are only for a Hubble law flow. Relativistic
 !                         terms added to COMP_OBS (now COMP_OBS_V2).
 ! Altered 20-Feb-2005 : Changed to use FLUX_MEAN & ROSS_MEAN which are defined in
 !                         MOD_CMFGEN. Previusly used FLUXMEAN & ROSSMEAN defined in
 !                         RADIATION_MOD.
-! 
+!
 	INTEGER ND,NC,NP,NT
 	INTEGER NUM_BNDS,NION,DIAG_INDX
 	INTEGER NDMAX,NPMAX
@@ -87,28 +88,28 @@
 !
 ! 
 !
-	REAL(10) SOL(NT,ND)		!Temp. stor. area for ST. EQ.
+	REAL(KIND=LDP) SOL(NT,ND)		!Temp. stor. area for ST. EQ.
 	INTEGER DST,DEND
 !
 ! Constants for opacity etc. These are set in CMFGEN.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) OPLIN,EMLIN
 !
 ! Internally used variables
 !
-	REAL(10) S1,REPA
-	REAL(10) MAXCH,MAXCH_SUM
-	REAL(10) T1,T2,T3,T4,SRAT
-	REAL(10) FL,AMASS,FL_OLD
-	REAL(10) FG_COUNT
-	REAL(10) SCL_FAC
-	REAL(10) SUM_BA
-	REAL(10) RLUMST_BND
-	REAL(10) LUM_FOR_TEFF
-	REAL(10) LUM_SCL_FAC
+	REAL(KIND=LDP) S1,REPA
+	REAL(KIND=LDP) MAXCH,MAXCH_SUM
+	REAL(KIND=LDP) T1,T2,T3,T4,SRAT
+	REAL(KIND=LDP) FL,AMASS,FL_OLD
+	REAL(KIND=LDP) FG_COUNT
+	REAL(KIND=LDP) SCL_FAC
+	REAL(KIND=LDP) SUM_BA
+	REAL(KIND=LDP) RLUMST_BND
+	REAL(KIND=LDP) LUM_FOR_TEFF
+	REAL(KIND=LDP) LUM_SCL_FAC
 !
 	LOGICAL LST_DEPTH_ONLY
 !
@@ -161,7 +162,7 @@
 ! Following is used output the BA matrix, and its associated
 ! pointer file.
 !
-	INTEGER, PARAMETER :: LU_BA=40 
+	INTEGER, PARAMETER :: LU_BA=40
 !
 ! For listing of transitions with TOTAL negative opacity values at some depths.
 !
@@ -196,15 +197,15 @@
 ! Functions called
 !
 	INTEGER ICHRLEN,ERROR_LU,WARNING_LU
-	REAL(10) DOP_PRO
-	REAL(10) S15ADF
-	REAL(10) LAMVACAIR
-	REAL(10) ATOMIC_MASS_UNIT
-	REAL(10) SPEED_OF_LIGHT
-	REAL(10) GRAVITATIONAL_CONSTANT
-	REAL(10) RAD_SUN
-	REAL(10) TEFF_SUN
-	REAL(10) MASS_SUN
+	REAL(KIND=LDP) DOP_PRO
+	REAL(KIND=LDP) S15ADF
+	REAL(KIND=LDP) LAMVACAIR
+	REAL(KIND=LDP) ATOMIC_MASS_UNIT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
+	REAL(KIND=LDP) GRAVITATIONAL_CONSTANT
+	REAL(KIND=LDP) RAD_SUN
+	REAL(KIND=LDP) TEFF_SUN
+	REAL(KIND=LDP) MASS_SUN
 	LOGICAL EQUAL
 	EXTERNAL ICHRLEN,ERROR_LU,WARNING_LU,SPEED_OF_LIGHT,GRAVITATIONAL_CONSTANT
 	EXTERNAL MASS_SUN,RAD_SUN,TEFF_SUN
@@ -222,31 +223,31 @@
 !
 ! Wind variablity arrays.
 !
-	REAL(10) POPS(NT,ND)		!Population for all species.
-	REAL(10) MEAN_ATOMIC_WEIGHT	!Mean atomic weight of atoms  (neutrals
+	REAL(KIND=LDP) POPS(NT,ND)		!Population for all species.
+	REAL(KIND=LDP) MEAN_ATOMIC_WEIGHT	!Mean atomic weight of atoms  (neutrals
 !                          		! and ions) in atomic mass units.
-	REAL(10) ABUND_SUM
+	REAL(KIND=LDP) ABUND_SUM
 !
 !
-! Arrays for improving on the initial T structure --- partition functions. 
+! Arrays for improving on the initial T structure --- partition functions.
 ! Need one for each atomic species.
 !
-	REAL(10), ALLOCATABLE :: U_PAR_FN(:,:)
-	REAL(10), ALLOCATABLE :: PHI_PAR_FN(:,:)
-	REAL(10), ALLOCATABLE :: Z_PAR_FN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: U_PAR_FN(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: PHI_PAR_FN(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: Z_PAR_FN(:)
 !
-	REAL(10) TGREY(ND)
-	REAL(10) T_SAVE(ND)
+	REAL(KIND=LDP) TGREY(ND)
+	REAL(KIND=LDP) T_SAVE(ND)
 !
 ! Variables for scaling the line cooling rates in oder that the radiative
-! equilibrium equation is more consistent with the electron heating/cooling 
+! equilibrium equation is more consistent with the electron heating/cooling
 ! equation. The scaling is done when the line frequency is with a fraction
-! of SCL_LINE_HT_FAC of the tmean frequency for the super-level under 
+! of SCL_LINE_HT_FAC of the tmean frequency for the super-level under
 ! consideration. 0.5 is presently the prefered value.
 !
-!	REAL(10) AVE_ENERGY(NT)		!Average energy of each super level
-	REAL(10) STEQ_T_SCL(ND)
-	REAL(10) STEQ_T_NO_SCL(ND)
+!	REAL(KIND=LDP) AVE_ENERGY(NT)		!Average energy of each super level
+	REAL(KIND=LDP) STEQ_T_SCL(ND)
+	REAL(KIND=LDP) STEQ_T_NO_SCL(ND)
 ! 
 !
 ! Dielectronic recombination variables and arrays.
@@ -254,9 +255,9 @@
 	INTEGER NMAXDIE
 	PARAMETER (NMAXDIE=500)
 !
-	REAL(10) EDGEDIE(NMAXDIE)		!Ionization frequency (negative)
-	REAL(10) EINADIE(NMAXDIE)		!Einstein A coefficient
-	REAL(10) GUPDIE(NMAXDIE)		!Stat. weight of autoionizing level.
+	REAL(KIND=LDP) EDGEDIE(NMAXDIE)		!Ionization frequency (negative)
+	REAL(KIND=LDP) EINADIE(NMAXDIE)		!Einstein A coefficient
+	REAL(KIND=LDP) GUPDIE(NMAXDIE)		!Stat. weight of autoionizing level.
 !
 	INTEGER LEVDIE(NMAXDIE)  	!Indicates MNL of low state
 	INTEGER INDXDIE(NMAXDIE)
@@ -273,35 +274,35 @@
 ! the implicit recombination.
 !
 	INTEGER EQION,EQSPEC
-	REAL(10) GLOW,GION
-	REAL(10) NUST(ND)			!LTE autoionizing population.
-	REAL(10) DION(ND)			!Ion population
-	REAL(10), ALLOCATABLE :: DIERECOM(:,:)   !Chk for all species.
-	REAL(10), ALLOCATABLE :: DIECOOL(:,:)    !Dielec. cooling check for all spec.
-	REAL(10), ALLOCATABLE :: ADDRECOM(:,:)     
+	REAL(KIND=LDP) GLOW,GION
+	REAL(KIND=LDP) NUST(ND)			!LTE autoionizing population.
+	REAL(KIND=LDP) DION(ND)			!Ion population
+	REAL(KIND=LDP), ALLOCATABLE :: DIERECOM(:,:)   !Chk for all species.
+	REAL(KIND=LDP), ALLOCATABLE :: DIECOOL(:,:)    !Dielec. cooling check for all spec.
+	REAL(KIND=LDP), ALLOCATABLE :: ADDRECOM(:,:)
 ! 
 !
 ! Opacity/emissivity
 !
-	REAL(10) CHIL(ND)                 !Line opacity (without prof.)
-	REAL(10) ETAL(ND)                 !Line emissivity (without prof.)
+	REAL(KIND=LDP) CHIL(ND)                 !Line opacity (without prof.)
+	REAL(KIND=LDP) ETAL(ND)                 !Line emissivity (without prof.)
 !
 ! Quadrature weights.
 !
-	REAL(10) FQW(NCF_MAX)		!Frequency weights
+	REAL(KIND=LDP) FQW(NCF_MAX)		!Frequency weights
 !
 ! Transfer equation vectors
-	REAL(10) R_OLD(NDMAX)		!Used to store previous R grid in SN models.
+	REAL(KIND=LDP) R_OLD(NDMAX)		!Used to store previous R grid in SN models.
 !
 ! Line vectors
-	REAL(10) AV(ND)
-	REAL(10) VB(NDMAX)		!Used for error calculations
-	REAL(10) VC(NDMAX)		!Used for error calculations
-	REAL(10) H(ND)
-	REAL(10) Q(ND)			!FREQ DEPENDENT.
-	REAL(10) QH(ND)			!  "      "
-	REAL(10) GAM(ND)			!FREQ INDEPENDENT
-	REAL(10) GAMH(ND)			!  "      "
+	REAL(KIND=LDP) AV(ND)
+	REAL(KIND=LDP) VB(NDMAX)		!Used for error calculations
+	REAL(KIND=LDP) VC(NDMAX)		!Used for error calculations
+	REAL(KIND=LDP) H(ND)
+	REAL(KIND=LDP) Q(ND)			!FREQ DEPENDENT.
+	REAL(KIND=LDP) QH(ND)			!  "      "
+	REAL(KIND=LDP) GAM(ND)			!FREQ INDEPENDENT
+	REAL(KIND=LDP) GAMH(ND)			!  "      "
 ! 
 !
 ! Arrays and variables for computation of the continuum intensity
@@ -312,7 +313,7 @@
 !
 ! Variables for EW's and LINE blanketing.
 !
-	REAL(10) CONT_INT,EW
+	REAL(KIND=LDP) CONT_INT,EW
 	INTEGER ACCESS_JEW
 	LOGICAL COMPUTE_EW,COMPUTE_JEW,COMPUTE_LAM,MID,FULL_ES
 !
@@ -321,27 +322,27 @@
 	INTEGER ACCESS_F
 	INTEGER NDEXT,NCEXT,NPEXT
 !
-	REAL(10) CNM(NDMAX,NDMAX)		!For collisions cross-section in
-	REAL(10) DCNM(NDMAX,NDMAX)	!STEQGEN
+	REAL(KIND=LDP) CNM(NDMAX,NDMAX)		!For collisions cross-section in
+	REAL(KIND=LDP) DCNM(NDMAX,NDMAX)	!STEQGEN
 !
 	INTEGER, PARAMETER :: N_FLUX_MEAN_BANDS=12
-	REAL(10)     LAM_FLUX_MEAN_BAND_END(N_FLUX_MEAN_BANDS)
-	REAL(10)     BAND_FLUX_MEAN(ND,N_FLUX_MEAN_BANDS)
-	REAL(10)     BAND_FLUX(ND,N_FLUX_MEAN_BANDS)
+	REAL(KIND=LDP)     LAM_FLUX_MEAN_BAND_END(N_FLUX_MEAN_BANDS)
+	REAL(KIND=LDP)     BAND_FLUX_MEAN(ND,N_FLUX_MEAN_BANDS)
+	REAL(KIND=LDP)     BAND_FLUX(ND,N_FLUX_MEAN_BANDS)
 	DATA LAM_FLUX_MEAN_BAND_END/100.0D0,150.0D0,200.0D0,227.83D0,258.90D0,300.0D0,504.25D0,911.75D0,
 	1                         1200.0D0,1500.0D0,2000.0D0,1.0D+08/
 !
 ! Continuum frequency variables and arrays.
 !
-	REAL(10) NU(NCF_MAX)		!Continuum and line frequencies
-	REAL(10) NU_EVAL_CONT(NCF_MAX)	!Frequencies to evaluate continuum
-	REAL(10) OBS(NCF_MAX)		!Observers spectrum
+	REAL(KIND=LDP) NU(NCF_MAX)		!Continuum and line frequencies
+	REAL(KIND=LDP) NU_EVAL_CONT(NCF_MAX)	!Frequencies to evaluate continuum
+	REAL(KIND=LDP) OBS(NCF_MAX)		!Observers spectrum
 !
 ! Vectors and arrays used for the observed flux.
 !
 	INTEGER N_OBS
-	REAL(10) OBS_FREQ(NCF_MAX)		!Since N_OBS < NCF =< NCF_MAX
-	REAL(10) OBS_FLUX(NCF_MAX)
+	REAL(KIND=LDP) OBS_FREQ(NCF_MAX)		!Since N_OBS < NCF =< NCF_MAX
+	REAL(KIND=LDP) OBS_FLUX(NCF_MAX)
 	LOGICAL FIRST_OBS_COMP
 !
 	CHARACTER TIME*20
@@ -354,14 +355,14 @@
 !
 ! Global vectors:
 !
-	REAL(10) AMASS_ALL(NT)
+	REAL(KIND=LDP) AMASS_ALL(NT)
 	INTEGER N_LINE_FREQ
 !
 	INTEGER LINES_THIS_FREQ(NCF_MAX)
 !
-	REAL(10) NU_DOP
-	REAL(10) NU_MAX_OBS
-	REAL(10) NU_MIN_OBS
+	REAL(KIND=LDP) NU_DOP
+	REAL(KIND=LDP) NU_MAX_OBS
+	REAL(KIND=LDP) NU_MIN_OBS
 !
 	INTEGER FREQ_INDX
 	INTEGER X_INDX
@@ -371,24 +372,24 @@
 ! Variables to limit the computation of the continuum opacities and
 ! emissivities.
 !
-	REAL(10) JREC(ND)
-	REAL(10) dJRECdT(ND)
-	REAL(10) JPHOT(ND)
-	REAL(10) JREC_CR(ND)
-	REAL(10) dJREC_CRdT(ND)
-	REAL(10) JPHOT_CR(ND)
-	REAL(10) BPHOT_CR(ND)
+	REAL(KIND=LDP) JREC(ND)
+	REAL(KIND=LDP) dJRECdT(ND)
+	REAL(KIND=LDP) JPHOT(ND)
+	REAL(KIND=LDP) JREC_CR(ND)
+	REAL(KIND=LDP) dJREC_CRdT(ND)
+	REAL(KIND=LDP) JPHOT_CR(ND)
+	REAL(KIND=LDP) BPHOT_CR(ND)
 !
-	REAL(10) CONT_FREQ
+	REAL(KIND=LDP) CONT_FREQ
 	LOGICAL FINAL_CONSTANT_CROSS
 !
 ! Indicates whether APRXzV, FFXzZ etc should be zeroed.
 !
-	LOGICAL ZERO_REC_COOL_ARRAYS 
+	LOGICAL ZERO_REC_COOL_ARRAYS
 !
 ! 
 !
-	REAL(10) Z_POP(NT)		!Ionic charge for each species
+	REAL(KIND=LDP) Z_POP(NT)		!Ionic charge for each species
 !
 ! Variables etc for computation of continuum in comoving frame.
 !
@@ -401,26 +402,26 @@
 ! X-ray variables.
 ! We dimension from 0 so that we can access a Null vector for the 1st included
 ! ioinization stage of each species.
-! 
-	REAL(10) X_RECOM(ND,0:NION)			!Next X-ray recombination rate
-	REAL(10) X_COOL(ND,0:NION)			!Next X-ray cooling
 !
-	REAL(10) OBS_XRAY_LUM_0P1
-	REAL(10) OBS_XRAY_LUM_1KEV
-	REAL(10) GFF,XCROSS_V2
+	REAL(KIND=LDP) X_RECOM(ND,0:NION)			!Next X-ray recombination rate
+	REAL(KIND=LDP) X_COOL(ND,0:NION)			!Next X-ray cooling
+!
+	REAL(KIND=LDP) OBS_XRAY_LUM_0P1
+	REAL(KIND=LDP) OBS_XRAY_LUM_1KEV
+	REAL(KIND=LDP) GFF,XCROSS_V2
 	EXTERNAL GFF,XCROSS_V2
 !
-	REAL(10) SPEC_DEN(ND,NUM_SPECIES)		!Used by ELEC_PREP
-	REAL(10) AT_NO_VEC(ND,NUM_SPECIES)
+	REAL(KIND=LDP) SPEC_DEN(ND,NUM_SPECIES)		!Used by ELEC_PREP
+	REAL(KIND=LDP) AT_NO_VEC(ND,NUM_SPECIES)
 !
-	REAL(10) AD_COOL_V(ND)
-	REAL(10) AD_COOL_DT(ND)
-	REAL(10) ARTIFICIAL_HEAT_TERM(ND)
-	REAL(10) dE_RAD_DECAY(ND)
-	REAL(10) RAD_DECAY_LUM(ND)
-	REAL(10) dE_WORK(ND)
-	REAL(10) dE_SHOCK_POWER(ND)
-	REAL(10) SHOCK_POWER_LUM(ND)
+	REAL(KIND=LDP) AD_COOL_V(ND)
+	REAL(KIND=LDP) AD_COOL_DT(ND)
+	REAL(KIND=LDP) ARTIFICIAL_HEAT_TERM(ND)
+	REAL(KIND=LDP) dE_RAD_DECAY(ND)
+	REAL(KIND=LDP) RAD_DECAY_LUM(ND)
+	REAL(KIND=LDP) dE_WORK(ND)
+	REAL(KIND=LDP) dE_SHOCK_POWER(ND)
+	REAL(KIND=LDP) SHOCK_POWER_LUM(ND)
 !
 	LOGICAL FIRST
 	LOGICAL CHK,SUCCESS
@@ -437,7 +438,7 @@
 ! They are the He2 ege, NIII/CIII egde, HeI, HI, HI(N=2).
 !
 	INTEGER, PARAMETER :: N_TAU_EDGE=5
-	REAL(10) TAU_EDGE(N_TAU_EDGE)
+	REAL(KIND=LDP) TAU_EDGE(N_TAU_EDGE)
 	DATA TAU_EDGE/13.16D0,11.60D0,5.95D0,3.29D0,0.83D0/
 !
 !***********************************************************************
@@ -462,7 +463,7 @@
 ! matrix since this refers to a variable beyond the outer atmosphere.
 !
 	BNDST(K)=MAX( (NUM_BNDS/ND)*(K-DIAG_INDX)+1+DIAG_INDX-K, 1 )
-	BNDEND(K)=MIN( (NUM_BNDS/ND)*(K-DIAG_INDX)+ND+DIAG_INDX-K, 
+	BNDEND(K)=MIN( (NUM_BNDS/ND)*(K-DIAG_INDX)+ND+DIAG_INDX-K,
 	1                 NUM_BNDS )
 ! 
 !
@@ -497,7 +498,7 @@
 	CALL GET_VERBOSE_INFO(VERBOSE)
 !
 ! When TRUE, FIXED_T indicated that T is to be heled fixed (at least at some
-! depths) in the linearization. This variable is set automatically by the 
+! depths) in the linearization. This variable is set automatically by the
 ! code depending on the magnitude of the corrections.
 !
 	FIXED_T=.FALSE.
@@ -515,7 +516,7 @@
 ! A value of 1000 is used to indicate that the last change was greater them
 ! VAL_DO_NG, or a NEW_MODEL.
 !
-! A value of 2000 indicates a continuing model. In this case LAST_NG 
+! A value of 2000 indicates a continuing model. In this case LAST_NG
 ! take precedence. NB: NEXT_NG is reset to 1000 for a new model in the
 ! new model section.
 !
@@ -543,7 +544,7 @@
 ! a LAMBDA iteration.
 !
 	  CALL GEN_ASCI_OPEN(LUIN,'IN_ITS','OLD',' ','READ',IZERO,IOS)
-	  IF(IOS .NE. 0)THEN  
+	  IF(IOS .NE. 0)THEN
 	     WRITE(LUER,*)'Error opening IN_ITS in CMFGEN, IOS=',IOS
 	     STOP
 	  END IF
@@ -664,7 +665,7 @@
 !
 	CALL RD_TWO_PHOT(LUIN,INCL_TWO_PHOT)
 !
-! Read in data for charge exchange reactions. 
+! Read in data for charge exchange reactions.
 !
 	CALL RD_CHG_EXCH_V3(LUIN,INCL_CHG_EXCH)
 !
@@ -704,7 +705,7 @@
 ! 
 !
 ! Read in oscillator strengths, the photoionization cross section data,
-! dielectronic data, and implicit recombination data for carbon. 
+! dielectronic data, and implicit recombination data for carbon.
 ! Individual species are grouped together (rather than grouping all the
 ! oscillator reads) so that the headers of the INPUT files are grouped
 ! in the MODEL output file.
@@ -736,7 +737,7 @@
 	        T2=GF_CUT
 	      END IF
 	      TMP_STRING=TRIM(ION_ID(ID))//'_F_OSCDAT'
-	      CALL GENOSC_V9( ATM(ID)%AXzV_F, ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,ATM(ID)%XzVLEVNAME_F, 
+	      CALL GENOSC_V9( ATM(ID)%AXzV_F, ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,ATM(ID)%XzVLEVNAME_F,
 	1                 ATM(ID)%ARAD,ATM(ID)%GAM2,ATM(ID)%GAM4,ATM(ID)%OBSERVED_LEVEL,
 	1                 T1, ATM(ID)%ZXzV,
 	1                 ATM(ID)%XzV_OSCDATE, ATM(ID)%NXzV_F,I,
@@ -744,7 +745,7 @@
 	1                 LUIN,LUSCR,TMP_STRING)
 	      TMP_STRING=TRIM(ION_ID(ID))//'_F_TO_S'
 	      CALL RD_F_TO_S_IDS_V3( ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
-	1           ATM(ID)%XzVLEVNAME_F, ATM(ID)%NXzV_F, ATM(ID)%NXzV, 
+	1           ATM(ID)%XzVLEVNAME_F, ATM(ID)%NXzV_F, ATM(ID)%NXzV,
 	1           LUIN,TMP_STRING,SL_OPTION,F_TO_S_RD_ERROR)
 	      CALL RDPHOT_GEN_V2( ATM(ID)%EDGEXzV_F, ATM(ID)%XzVLEVNAME_F,
 	1           ATM(ID)%GIONXzV_F,AT_NO(SPECIES_LNK(ID)),
@@ -753,7 +754,7 @@
 	1           ATM(ID+1)%XzV_PRES,     ATM(ID+1)%EDGEXzV_F, ATM(ID+1)%GXzV_F,
 	1           ATM(ID+1)%F_TO_S_XzV,   ATM(ID+1)%XzVLEVNAME_F, ATM(ID+1)%NXzV_F,
 	1           SIG_GAU_KMS,FRAC_SIG_GAU,CUT_ACCURACY,ABOVE_EDGE,
-	1           XRAYS,ID,ION_ID(ID),LUIN,LUSCR)   
+	1           XRAYS,ID,ION_ID(ID),LUIN,LUSCR)
               IF(ATM(ID+1)%XzV_PRES) ATM(ID)%GIONXzV_F= ATM(ID+1)%GXzV_F(1)
  	      IF(DIE_AS_LINE .AND. (ATM(ID)%DIE_AUTO_XzV .OR.  ATM(ID)%DIE_WI_XzV) )THEN
 	        TMP_STRING='DIE'//TRIM(ION_ID(ID))
@@ -827,14 +828,14 @@
 	  WRITE(LUMOD,FMT)NCF_MAX
 	  FMT='(5X,I8,5X,''!Number of bands'')'
 	  WRITE(LUMOD,FMT)NUM_BNDS
-!	  
+!	
 	  WRITE(LUMOD,'()')
 	  CALL RITE_ATMHD_V3(LUMOD)
 !
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      ISPEC=SPECIES_LNK(ID)
-	      CALL RITE_ATMDES_V3( ATM(ID)%XzV_PRES, ATM(ID)%NXzV, 
+	      CALL RITE_ATMDES_V3( ATM(ID)%XzV_PRES, ATM(ID)%NXzV,
 	1          ATM(ID)%ZXzV, ATM(ID)%EQXzV, ATM(ID)%XzVLEVNAME_F,
 	1          ATM(ID)%NXzV_F, ATM(ID)%GIONXzV_F, ATM(ID)%N_XzV_PHOT,
 	1          AT_NO(ISPEC),AT_MASS(ISPEC),LUMOD,ION_ID(ID))
@@ -874,7 +875,7 @@
 	1              ATM(ID)%NXzV, NT, ATM(ID)%XzV_PRES)
 	END DO
 !
-! Store atomic masses in vector of LENGTH NT for later use by line 
+! Store atomic masses in vector of LENGTH NT for later use by line
 ! calculations. G_ALL and LEVEL_ID  are no longer used due to the use
 ! of super levels.
 !
@@ -897,7 +898,7 @@
 	AVE_ENERGY(:)=0.0D0
 	DO ID=1,NUM_IONS-1
 	   CALL AVE_LEVEL_ENERGY(AVE_ENERGY, ATM(ID)%EDGEXzV_F,
-	1         ATM(ID)%GXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%EQXzV, 
+	1         ATM(ID)%GXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%EQXzV,
 	1         ATM(ID)%NXzV,   ATM(ID)%NXzV_F, NT, ATM(ID)%XzV_PRES)
 	END DO
 !
@@ -974,7 +975,7 @@
 ! This is done by the following include statement, which  is a sequence of
 ! calls to the routine SUP_TO_FULL.
 !
-! Compute the ion population at each depth.                          
+! Compute the ion population at each depth.
 ! These are required when evaluation the occupation probabilities, and hence
 ! the LTE populations. Not that Z_POP is effectivy integer, thus we
 ! use 0.01 as check.
@@ -1005,7 +1006,7 @@
 	    CALL STARPCYG_V3(R,V,SIGMA,RMAX,RP,
 	1             SCL_HT,VCORE,VPHOT,VINF1,V_BETA1,V_EPPS1,
 	1             VINF2,V_BETA2,V_EPPS2,
-	1             N_OB_INS,CONS_FOR_R_GRID,EXP_FOR_R_GRID, 
+	1             N_OB_INS,CONS_FOR_R_GRID,EXP_FOR_R_GRID,
 	1             ND,TA,TB,TC,RDINR,LUIN)
           ELSE IF(VELTYPE .EQ. 4)THEN
             CALL STARRAVE(R,V,SIGMA,ND,LUIN,RMAX,RP)
@@ -1071,8 +1072,8 @@
 	  CALL RD_STRK_LIST(LUIN)
 	END IF
 !
-! Compute the frequency grid for CMFGEN. Routine also allocates the vectors 
-! needed for the line data, sets the line data, and puts the line data into 
+! Compute the frequency grid for CMFGEN. Routine also allocates the vectors
+! needed for the line data, sets the line data, and puts the line data into
 ! numerical order.
 !
 	CALL SET_FREQUENCY_GRID_V2(NU,FQW,LINES_THIS_FREQ,NU_EVAL_CONT,
@@ -1142,7 +1143,7 @@
 !
 ! Set TSTAR which is required by TOTOPA_JILA. Its precise value is
 ! irrelevant (provided >0) as we always adopt the diffusion
-! approximation. 
+! approximation.
 !
 	TSTAR=T(ND)
 !
@@ -1157,7 +1158,7 @@
 	    CALL LOCSOLUT(POPS,SOL,TA,30,NT,ND)
 	    DO ID=1,NUM_IONS-1
 	      CALL POPTOION(POPS, ATM(ID)%XzV, ATM(ID)%DXzV, ED,T,
-	1            ATM(ID)%EQXzV, ATM(ID)%NXzV, NT,ND, 
+	1            ATM(ID)%EQXzV, ATM(ID)%NXzV, NT,ND,
 	1            ATM(ID)%XzV_PRES)
 	    END DO
 !
@@ -1243,7 +1244,7 @@
 !
 !************************************************************************************************
 !
-	INQUIRE(FILE='GAMRAY_ENERGY_DEP',EXIST=CHK)       
+	INQUIRE(FILE='GAMRAY_ENERGY_DEP',EXIST=CHK)
 	IF(GAMRAY_TRANS .EQ. 'RAD_TRANS' .AND. .NOT. CHK)THEN
 	  WRITE(6,'(/,A)')' Running the gamma-ray routine GAMRAY_SUB_V3'
 	  CALL TUNE(IONE,'FULL_GAMMA')
@@ -1322,7 +1323,7 @@
 	    STOP
 	  END IF
 	ELSE
-	  
+	
 	  IF(ACCURATE .OR. EDD_CONT .OR. EDD_LINECONT)THEN
 !
 ! NB: If not ACCURATE, NDEXT was set to ND. The +1 arises since we write
@@ -1457,7 +1458,7 @@
 	  FL=NU(1)
 	  DO ML=1,NCF
 	    FREQ_INDX=ML
-! 
+!
 	    FL_OLD=FL
 	    FL=NU(ML)
 	    IF(NU_EVAL_CONT(ML) .NE. CONT_FREQ)THEN
@@ -1508,7 +1509,7 @@
 	    END IF
 	  END DO
 !
-! Now do the line variation. This presently ignores the effect of a 
+! Now do the line variation. This presently ignores the effect of a
 ! temperature variation.
 !
 	    IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN
@@ -1586,7 +1587,7 @@
 	  SE(ID)%STEQ   =0.0D0
 	  SE(ID)%BA     =0.0D0
 	  SE(ID)%BA_PAR =0.0D0
-	END FORALL 
+	END FORALL
 !$OMP END PARALLEL WORKSHARE
 	CALL TUNE(ITWO,'ZBA')
 	STEQ_ED=0.0D0
@@ -1615,18 +1616,18 @@
 	FLUSH(UNIT=6)
 ! 
 !
-! Compute the value of the S.E. equations and compute the variation 
+! Compute the value of the S.E. equations and compute the variation
 ! matrix for terms that are independent of Jv .
 !
-! DST and DEND can be adjusted to that we can avoid reading in the entire 
+! DST and DEND can be adjusted to that we can avoid reading in the entire
 ! diagonal of the BA array for each call to STEQ_MULTI.
 !
 ! Assume all BA mtarix is in memory/
 	DO K=1,1
-	  DST=1       
+	  DST=1
 	  DEND=ND
 !
-! In this case, each depth is treated fully (i.e. for all species and 
+! In this case, each depth is treated fully (i.e. for all species and
 ! ionization stages) before we go onto the next depth.
 !
 !	DO K=1,ND
@@ -1642,7 +1643,7 @@
               CALL STEQ_MULTI_V10(CNM,DCNM,ED,T,
 	1         ATM(ID)%XzV,            ATM(ID)%XzVLTE,         ATM(ID)%dlnXzVLTE_dlnT,
 	1         AVE_ENERGY(ATM(ID)%EQXzV),
-	1         ATM(ID)%NXzV,           ATM(ID)%DXzV,           ATM(ID)%XzV_F, 
+	1         ATM(ID)%NXzV,           ATM(ID)%DXzV,           ATM(ID)%XzV_F,
 	1         ATM(ID)%XzVLTE_F_ON_S,  ATM(ID)%W_XzV_F,        ATM(ID)%AXzV_F,
 	1         ATM(ID)%EDGEXzV_F,      ATM(ID)%GXzV_F,         ATM(ID)%XzVLEVNAME_F,
 	1         ATM(ID)%NXzV_F,         ATM(ID)%F_TO_S_XzV,
@@ -1656,15 +1657,15 @@
 	      TMP_STRING=TRIM(ION_ID(ID))//'_AUTO_DATA'
               CALL STEQ_AUTO_V2(ED,T,
 	1         ATM(ID)%XzV,        ATM(ID)%NXzV,         ATM(ID)%DXzV,
-	1         ATM(ID)%XzV_F,      ATM(ID)%XzVLTE_F,     ATM(ID)%EDGEXzV_F, 
+	1         ATM(ID)%XzV_F,      ATM(ID)%XzVLTE_F,     ATM(ID)%EDGEXzV_F,
 	1         ATM(ID)%GXzV_F,     ATM(ID)%XzVLEVNAME_F, ATM(ID)%NXzV_F,
-	1         ATM(ID)%F_TO_S_XzV, LOC_ID,               
+	1         ATM(ID)%F_TO_S_XzV, LOC_ID,
 	1         DIERECOM(1,ATM(ID)%INDX_XzV),             DIECOOL(1,ATM(ID)%INDX_XzV),
 	1         TMP_STRING,         NUM_BNDS,ND,COMPUTE_BA,DST,DEND)
 	    END IF
 	  END DO
 	  CALL TUNE(ITWO,'STEQ')
-!        
+!
 ! Update charge equation. No longer done in STEQHEII
 !
           CALL STEQNE_V4(ED,NT,DIAG_INDX,ND,COMPUTE_BA,DST,DEND)
@@ -1694,7 +1695,7 @@
 	      TMP_STRING=TRIM(ION_ID(ID))//'_COL_DATA'
 	      CALL COLCOOL_SL_V5(
 	1        ATM(ID)%CPRXzV, ATM(ID)%CRRXzV,  ATM(ID)%COOLXzV,CNM,DCNM,
-	1        ATM(ID)%XzV,    ATM(ID)%XzVLTE,  ATM(ID)%dlnXzVLTE_dlnT, 
+	1        ATM(ID)%XzV,    ATM(ID)%XzVLTE,  ATM(ID)%dlnXzVLTE_dlnT,
 	1        ATM(ID)%NXzV,   ATM(ID)%XzV_F,   ATM(ID)%XzVLTE_F_ON_S,
 	1        ATM(ID)%AXzV_F, ATM(ID)%W_XzV_F, ATM(ID)%EDGEXzV_F,
 	1        ATM(ID)%GXzV_F, ATM(ID)%XzVLEVNAME_F,
@@ -1802,14 +1803,14 @@
 	1                              ND,NC,NP,NCF,NDEXT,NCEXT,NPEXT)
 	  END IF
 !
-! SOURCE is used by SOBJBAR and in VARCONT. Note that SOURCE is corrupted 
-! (i.e. set to line source function) in CMFJBAR. Also note that SOURCEEXT 
+! SOURCE is used by SOBJBAR and in VARCONT. Note that SOURCE is corrupted
+! (i.e. set to line source function) in CMFJBAR. Also note that SOURCEEXT
 ! has previously been computed (not for impurity species).
 !
 	  DO I=1,ND
 	    SOURCE(I)=ZETA(I)+RJ(I)*THETA(I)
 	  END DO
-!  
+! 
 !
 ! We define VC(I)=N* d(N* Z)/dN* and VB(I)=d(N* Z)/dNL.
 !
@@ -1822,8 +1823,8 @@
 	  END DO
 !
 ! Evaluate contribution to statistical equilibrium equation, and
-! and increment variation matrices. 
-! To convert cooling to ergs/cm**3/s, we use EDGEDIE(ML) and not FL for the 
+! and increment variation matrices.
+! To convert cooling to ergs/cm**3/s, we use EDGEDIE(ML) and not FL for the
 ! electron cooling component since this is the energy spent in exciting the
 ! autoionizing state. Can show from statistical equilibrium equations.
 ! Note that EDGEDIE(ML) is negative.
@@ -1986,7 +1987,7 @@
 	END IF
 	WRITE(6,*)EDDINGTON,ACCESS_F,COMPUTE_EDDFAC	
 !
-! Decide whether to use an file with old J values to provide an initial 
+! Decide whether to use an file with old J values to provide an initial
 ! estimate of J with incoherent electron scattering. The options
 !
 !             .NOT. RD_COHERENT_ES .AND. COHERENT_ES
@@ -2000,7 +2001,7 @@
 	  CALL COMP_J_CONV_V2(VJ,I,NU,TEXT,NDEXT,NCF,LUIN,'OLD_J_FILE',
 	1           EDD_CONT_REC,L_FALSE,L_TRUE,LU_ES,'ES_J_CONV')
 !
-! Now open the file so it can be read in the CONTINUUM loop (read in 
+! Now open the file so it can be read in the CONTINUUM loop (read in
 ! COMP_JCONT).
 !
 	  OPEN(UNIT=LU_ES,FILE='ES_J_CONV',FORM='UNFORMATTED',
@@ -2096,7 +2097,7 @@
 	1             COMPUTE_BA,FIXED_T,LST_ITERATION,
 	1             ION_ID(ID), ATM(ID)%ZXzV, PHOT_ID, ID)
 	      END DO
-	    END IF  
+	    END IF
 	  END DO
 !$OMP END PARALLEL DO
 	  CALL TUNE(ITWO,'QUAD')
@@ -2127,7 +2128,7 @@
 !
 ! 
 !
-! Include lines 
+! Include lines
 !
 	CALL TUNE(IONE,'SET_LINE_OPAC')
         CALL SET_LINE_OPAC(POPS,NU,ML,LAST_LINE,N_LINE_FREQ,
@@ -2138,11 +2139,11 @@
 !
 ! Determine which method will be used to compute continuum intensity.
 !
-	  IF(ACCURATE .AND. ALL_FREQ)THEN       
+	  IF(ACCURATE .AND. ALL_FREQ)THEN
 	    THIS_FREQ_EXT=.TRUE.
 	  ELSE IF( ACCURATE .AND. FL .GT. ACC_FREQ_END )THEN
 	    THIS_FREQ_EXT=.TRUE.
-	  ELSE        
+	  ELSE
 	    THIS_FREQ_EXT=.FALSE.
 	  END IF
 !
@@ -2162,9 +2163,9 @@
 !	    INCLUDE 'OPACITIES_V4.INC'
 	    CALL TUNE(ITWO,'C_OPAC')
 !
-! Since resonance zones included, we must add the line opacity and 
-! emissivity to the raw continuum values. We first save the pure continuum 
-! opacity and emissivity. These are used in carrying the variation of J from 
+! Since resonance zones included, we must add the line opacity and
+! emissivity to the raw continuum values. We first save the pure continuum
+! opacity and emissivity. These are used in carrying the variation of J from
 ! one frequency to the next.
 !
 	    CALL TUNE(IONE,'RS_ZONE')
@@ -2251,7 +2252,7 @@
 !
 	    IF(LST_ITERATION .AND. ML .NE. NCF)THEN
 	      DO I=1,N_TAU_EDGE
-	        IF(NU(ML) .GE. TAU_EDGE(I) .AND. 
+	        IF(NU(ML) .GE. TAU_EDGE(I) .AND.
 	1                       NU(ML+1) .LT. TAU_EDGE(I))THEN
 	          T1=LOG(CHI_CONT(5)/CHI_CONT(1))/LOG(R(1)/R(5))
 	          IF(I .EQ. 1)WRITE(LUER,'(A)')' '
@@ -2297,10 +2298,10 @@
 ! Increment the S.E. equations due to radiation field at this
 ! frequency.
 !
-! At the same time, we compute the quadrature weights associated with 
-! the intensity for each depth point and each equation. QFV must be zeroed 
-! before calling EVALSE_QWVJ. QFV is incremented - not set. Allows for 
-! bound-free processes to both the ground and excited states (necessary 
+! At the same time, we compute the quadrature weights associated with
+! the intensity for each depth point and each equation. QFV must be zeroed
+! before calling EVALSE_QWVJ. QFV is incremented - not set. Allows for
+! bound-free processes to both the ground and excited states (necessary
 ! for CIII).
 !
 	IF(FINAL_CONSTANT_CROSS)THEN
@@ -2322,12 +2323,12 @@
 	  DO ID=1,NUM_IONS-1
 	    ID_SAV=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
-	      DO J=1,ATM(ID)%N_XzV_PHOT 
+	      DO J=1,ATM(ID)%N_XzV_PHOT
 	        CALL EVALSE_QWVJ_V8(ID_SAV,
-	1         ATM(ID)%WSXzV(1,1,J), ATM(ID)%WCRXzV(1,1,J), 
+	1         ATM(ID)%WSXzV(1,1,J), ATM(ID)%WCRXzV(1,1,J),
 	1         ATM(ID)%XzV, ATM(ID)%XzVLTE,
 	1         ATM(ID)%NXzV, ATM(ID)%XzV_ION_LEV_ID(J),
-	1         ATM(ID+1)%XzV, ATM(ID+1)%LOG_XzVLTE, ATM(ID+1)%NXzV, 
+	1         ATM(ID+1)%XzV, ATM(ID+1)%LOG_XzVLTE, ATM(ID+1)%NXzV,
 	1         JREC,JPHOT,JREC_CR,JPHOT_CR,NT,ND)
 	      END DO
 	    END IF
@@ -2369,12 +2370,12 @@
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      DO J=1,ATM(ID)%N_XzV_PHOT
 	        CALL PRRR_SL_V6(
-	1          ATM(ID)%APRXzV,        ATM(ID)%ARRXzV, 
+	1          ATM(ID)%APRXzV,        ATM(ID)%ARRXzV,
 	1          ATM(ID)%BFCRXzV,      ATM(ID)%FFXzV,
 	1          ATM(ID)%WSXzV(1,1,J), ATM(ID)%WCRXzV(1,1,J),
-	1          ATM(ID)%XzV,          ATM(ID)%XzVLTE, 
+	1          ATM(ID)%XzV,          ATM(ID)%XzVLTE,
 	1          ATM(ID)%NXzV,         ATM(ID)%ZXzV,
-	1          ATM(ID+1)%XzV,        ATM(ID+1)%LOG_XzVLTE, 
+	1          ATM(ID+1)%XzV,        ATM(ID+1)%LOG_XzVLTE,
 	1          ATM(ID+1)%NXzV, J,    ATM(ID)%XzV_ION_LEV_ID(J),
 	1          ED,T,JREC,JPHOT,JREC_CR,JPHOT_CR,BPHOT_CR,
 	1          FL,CONT_FREQ,ZERO_REC_COOL_ARRAYS,ND)
@@ -2405,10 +2406,10 @@
 !
 ! 
 !
-! Update line net rates, and the S.E. Eq. IFF we have finished a line 
+! Update line net rates, and the S.E. Eq. IFF we have finished a line
 ! transition.
 !
-	CALL TUNE(IONE,'JBAR_SIM')                      
+	CALL TUNE(IONE,'JBAR_SIM')
 	DO SIM_INDX=1,MAX_SIM
 	  IF(RESONANCE_ZONE(SIM_INDX))THEN
 	    DO I=1,ND
@@ -2419,17 +2420,17 @@
 	    END DO
 	  END IF
 	END DO
-	CALL TUNE(ITWO,'JBAR_SIM')                      
+	CALL TUNE(ITWO,'JBAR_SIM')
 !
 ! Update the S.E. Eq. IFF we have finished a line transition (i.e. are at
-! the final point of the resonance zone.) 
+! the final point of the resonance zone.)
 !
-! NB: The line term in the RE equations is not needed since it is included 
+! NB: The line term in the RE equations is not needed since it is included
 ! directly with continuum integration.
 !
 	DO SIM_INDX=1,MAX_SIM
 	  IF( END_RES_ZONE(SIM_INDX) )THEN
-            T1=FL_SIM(SIM_INDX)*EMLIN 
+            T1=FL_SIM(SIM_INDX)*EMLIN
 	    NL=SIM_NL(SIM_INDX)
 	    NUP=SIM_NUP(SIM_INDX)
 	    I=SIM_LINE_POINTER(SIM_INDX)
@@ -2451,10 +2452,10 @@
 	      STEQ_T(K)=STEQ_T(K) - T3
 	    END DO
 	    T2=EINA(SIM_INDX)*ATM(ID)%XzV_F(MNUP_F,5)*ZNET_SIM(5,SIM_INDX)
-	  END IF    
+	  END IF
 	END DO
 !
-!                                                                    
+! 
 !
 ! Allow for the variation of the continuous radiation field.
 !
@@ -2462,8 +2463,8 @@
 	1                     .NOT. IMPURITY_CODE)THEN
 !
 ! Solve for the perturbations to J in terms of the perturbations
-! to CHI and ETA. 
-!            
+! to CHI and ETA.
+!
 	    CALL TUNE(IONE,'C_VARCONT')
 !	      INCLUDE 'VARCONT.INC'
               CALL DO_VAR_CONT(POPS,SECTION,EDDINGTON,
@@ -2506,11 +2507,11 @@
 !      lower than the last frequency in the lines resonance zone it can safely
 !      be removed.
 !
-! 2. Line is removed when the current frequency is lower by EXT_LINE_VAR*VINF 
+! 2. Line is removed when the current frequency is lower by EXT_LINE_VAR*VINF
 !      (converted to frequency units) than the last frequency in the resonance
 !       zone. This is a control parameter, and may be used to speed up the code.
 !       NB: EXT_LINE_VAR >= 0. Due to strong line overlap, it was found that
-!       this method of line removal can cause issues when Vinf ~ 0 (e.g., in a 
+!       this method of line removal can cause issues when Vinf ~ 0 (e.g., in a
 !       plane-parallel model). We thus put in a restriction of 300 km/s.
 !
 ! 3. To make way for another line. This is only done when necessary, and is
@@ -2533,7 +2534,7 @@
 	    END IF
 !
 ! Zero variation storage, if in use, and the storage location is not also
-! being used by some other line. 
+! being used by some other line.
 !
 	    IF(COMPUTE_BA .AND. .NOT. LAMBDA_ITERATION .AND.
 	1        NU(ML) .LT. NU(LINE_END_INDX_IN_NU(L))*T1 .AND.
@@ -2618,7 +2619,7 @@
 	1           V_AT_RMAX,RMAX_OBS,'IPLUS','LIN_INT',DO_FULL_REL_OBS,
 	1           FIRST_OBS_COMP,NP_OBS)
 !
-	ELSE                          
+	ELSE
 	  S1=(ETA(1)+RJ(1)*CHI_SCAT(1))/CHI(1)
 	  CALL MULTVEC(SOURCE,ZETA,THETA,RJ,ND)
 	  CALL NORDFLUX(TA,TB,TC,XM,DTAU,R,Z,P,SOURCE,CHI,THETA,HQW,SOB,
@@ -2696,7 +2697,7 @@
 !
 ! The current opacities and emissivities are stored for the variation of the
 ! radiation field at the next frequency.
-!                                                  
+!
 	DO I=1,ND
 	  CHI_PREV(I)=CHI_CONT(I)
 	  CHI_NOSCAT_PREV(I)=CHI_NOSCAT(I)
@@ -2743,7 +2744,7 @@
 	          STEQ_T_SCL(K)=STEQ_T_SCL(K) - T2*T3
 	          STEQ_T_NO_SCL(K)=STEQ_T_NO_SCL(K) - T2
 	        END DO
-	      ELSE 
+	      ELSE
 	        DO K=1,ND
 	          T2=ETAL_MAT(K,SIM_INDX)*ZNET_SIM(K,SIM_INDX)
 	          STEQ_T_SCL(K)=STEQ_T_SCL(K) - T2
@@ -2795,7 +2796,7 @@
 	1             JREC,dJRECdt,JPHOT,
 	1             JREC_CR,dJREC_CRdt,JPHOT_CR,
 	1             FIXED_T,ND,IONE,ND,NT)
-	     END DO 
+	     END DO
 	   END IF
 	  END DO
 !
@@ -2810,7 +2811,7 @@
 !
 	IF(LST_ITERATION .AND. VERBOSE_OUTPUT)THEN
 	  T1=FQW(ML)*(CHI_NOSCAT(DPTH_INDX)*RJ(DPTH_INDX) - ETA_NOSCAT(DPTH_INDX))
-	  IF(MOD(FREQ_INDX,N_PAR) .EQ. 0)THEN 
+	  IF(MOD(FREQ_INDX,N_PAR) .EQ. 0)THEN
 	    WRITE(199,'(I10,12ES18.8)')ML,FL,STEQ_T(DPTH_INDX),T1,FQW(ML)*ETA_NOSCAT(DPTH_INDX),
 	1                           STEQ_T_SCL(DPTH_INDX),STEQ_T_NO_SCL(DPTH_INDX),
 	1                           BA_T(VAR_INDX,DIAG_INDX,DPTH_INDX),BA_T(NT,DIAG_INDX,DPTH_INDX)
@@ -2849,8 +2850,8 @@
 	  IF(ATM(ID)%XzV_PRES)THEN
 	    CALL SET_CHG_EXCH_V4(ID_SAV, ATM(ID)%XzVLEVNAME_F,
 	1       ATM(ID)%EDGEXzV_F,  ATM(ID)%GXzV_F,
-	1       ATM(ID)%F_TO_S_XzV, ATM(ID)%GIONXzV_F, 
-	1       ATM(ID)%NXzV_F, ATM(ID)%NXzV, ND, 
+	1       ATM(ID)%F_TO_S_XzV, ATM(ID)%GIONXzV_F,
+	1       ATM(ID)%NXzV_F, ATM(ID)%NXzV, ND,
 	1       ATM(ID)%EQXzV, EQ_SPECIES(SPECIES_LNK(ID)), T)
 	  END IF
 	END DO
@@ -2871,11 +2872,11 @@
 ! Penning
 !
 !    HeI(1s_2s_3Se) + H(1s_2Se)  --->  HeI(1s2_1Se) +  H+
-!                                                                    
+!
 	IF(INCL_PENNING_ION)THEN
 	  CALL DO_PENNING_ION(HDKT,COMPUTE_BA,DIAG_INDX,ND)
 	END IF
-! 
+!
 ! 
 !
 ! Output errors that have occurred in MOM_J_CMF
@@ -2955,12 +2956,12 @@
 ! Store radiative equlibrium equation so we can check influence on radiation field.
 !
 	DEP_RAD_EQ(1:ND)=STEQ_T(1:ND)
-!               
+! 
 !
 ! Write out recombination, photoionization and cooling terms for digestion.
 !
-! Since X_RECOM (and X_COOL) were dimensioned (ND,0:NION), and since it was 
-! initialized, we can assume X_RECOM(1,0) is zero, and hence it can be used 
+! Since X_RECOM (and X_COOL) were dimensioned (ND,0:NION), and since it was
+! initialized, we can assume X_RECOM(1,0) is zero, and hence it can be used
 ! as a  dummy vector for the special case when ATM(ID-1)%INDX=0.
 !
 ! NB: For the first ionization stage of a species, ATM(ID-1)%INDX will
@@ -2991,7 +2992,7 @@
 ! We use TB for TOTCR (the sum[absolute cooling rates]).
 !
 	  DO ML=1,(ND+9)/10
-	    LS=ML                
+	    LS=ML
 	    CALL FSTCOOL_V3(R,V,T,ED,TA,TB,LS,ND,LU_REC_CHK)
 	    DO ID=1,NUM_IONS-1
 	      IF(ATM(ID)%XzV_PRES)THEN
@@ -3046,10 +3047,10 @@
 	END IF
 	WRITE(6,*)'Exited CHECK_SPEC_CONV';FLUSH(UNIT=6)
 !
-! Compute ROSSELAND and FLUX mean opacities. These MEAN opacities DO NOT 
-! include the effect of clumping. Compute the respective optical depth scales; 
-! TA is used for the FLUX mean optical depth scale, TB for the ROSSELAND mean 
-! optical depth scale, and DTAU for the electron scattering optical depth 
+! Compute ROSSELAND and FLUX mean opacities. These MEAN opacities DO NOT
+! include the effect of clumping. Compute the respective optical depth scales;
+! TA is used for the FLUX mean optical depth scale, TB for the ROSSELAND mean
+! optical depth scale, and DTAU for the electron scattering optical depth
 ! scale. The optical depth scale INCLDUES the effects of clumping. TCHI is used
 ! as a temporary work vector.
 !
@@ -3134,7 +3135,7 @@
 !
 	IF(LST_ITERATION .AND. .NOT. RD_FIX_T)THEN
 !
-! Compute the grey temperature distribution and the Rosseland optical 
+! Compute the grey temperature distribution and the Rosseland optical
 ! depth scale (returned in TA). When CHK is TRUE, the grey temperature
 ! distribution has been successfully computed.
 !
@@ -3144,7 +3145,7 @@
 	    CALL COMP_GREY_V4(POPS,TGREY,TA,CHI,TCHI,CHK,LUER,NC,ND,NP,NT)
 	    IF(CHK)THEN
 	      WRITE(LUER,'(/,1X,A,/)')'Grey solution was successfully computed'
-	    ELSE 
+	    ELSE
 	      WRITE(LUER,'(/,1X,A,/)')'Grey solution was NOT successfully computed'
 	    END IF
 	  END IF
@@ -3184,7 +3185,7 @@
 	IF(LST_ITERATION .AND. VERBOSE_OUTPUT)THEN
 	     CALL WR_ASCI_STEQ(NION,ND,'STEQ ARRAY- Continuum Terms',LU_DR)
 	END IF
-!                                   
+!
 ! 
 	CALL TUNE(IONE,'LINE LOOP')
 !
@@ -3240,7 +3241,7 @@
 	  END IF
 !
 ! Determine next line (or lines), and store line parameters (eg frequency,
-! Einstein A coefficient etc) in appropriate locations for the subsequent 
+! Einstein A coefficient etc) in appropriate locations for the subsequent
 ! treatment of line.
 !
 ! The temporary variable J [=MAX(N_LINE_FREQ,LINE_INDX+SIM_INDX) ] is used so that
@@ -3251,8 +3252,8 @@
 	  J=LINE_INDX
 	  SOBOLEV=.FALSE.
 	  DO WHILE(LINE_INDX+SIM_INDX .LE. N_LINE_FREQ .AND.
-	1      (VEC_FREQ(LINE_INDX)-VEC_FREQ(J))/VEC_FREQ(LINE_INDX) 
-	1          .LE. OVER_FREQ_DIF 
+	1      (VEC_FREQ(LINE_INDX)-VEC_FREQ(J))/VEC_FREQ(LINE_INDX)
+	1          .LE. OVER_FREQ_DIF
 	1          .AND. SIM_INDX .LT. TMP_MAX_SIM .AND.
 	1      (VEC_TRANS_TYPE(J)(1:3) .EQ. 'CMF' .OR.
 	1         VEC_TRANS_TYPE(J)(1:3) .EQ. 'SOB')    )
@@ -3335,7 +3336,7 @@
 ! whether the TOTAL opacity (LINE+CONTINUUM) becomes negative.
 ! The profile is assumed to be depth independent, We normalize the
 ! frequency quadrature weights so that integral over the profile is one.
-! 
+!
 	IF(.NOT. SOBOLEV)THEN
 	  CALL TRAPUNEQ(PF,LFQW,NLF)
 	  T1=0.0D0
@@ -3354,7 +3355,7 @@
 ! 
 ! Compute U_STAR_RATIO and L_STAR_RATIO which are used to switch from
 ! the opacity/emissivity computed with a FULL_ATOM to an equivalent form
-! but written in terms of the SUPER-LEVELS. 
+! but written in terms of the SUPER-LEVELS.
 !
 ! L refers to the lower level of the transition.
 ! U refers to the upper level of the transition.
@@ -3407,8 +3408,8 @@
 	  END DO
 	END DO
 !
-! Compute line opacity and emissivity. 
-!                     
+! Compute line opacity and emissivity.
+!
 	DO SIM_INDX=1,NUM_SIM_LINES
 	  T1=OSCIL(SIM_INDX)*OPLIN
 	  T2=FL_SIM(SIM_INDX)*EINA(SIM_INDX)*EMLIN
@@ -3448,8 +3449,8 @@
 !
 	  END IF
 !
-! SOURCE is used by SOBJBAR and in VARCONT. Note that SOURCE is corrupted 
-! (i.e. set to line source function) in CMFJBAR. Also note that SOURCEEXT 
+! SOURCE is used by SOBJBAR and in VARCONT. Note that SOURCE is corrupted
+! (i.e. set to line source function) in CMFJBAR. Also note that SOURCEEXT
 ! has previously been computed.
 !
 	  DO I=1,ND
@@ -3468,7 +3469,7 @@
 	END DO
 !
 ! At present overlapping lines in the CMF frame is not installed. We still
-! use CHIL and ETAL --- not CHIL_MAT etc. 
+! use CHIL and ETAL --- not CHIL_MAT etc.
 !
 	IF(SOBOLEV .OR. NUM_SIM_LINES .EQ. 1)THEN
 	  DO I=1,ND
@@ -3516,7 +3517,7 @@
 	ELSE IF(CHECK_LINE_OPAC)THEN
 	  FIRST_NEG=.TRUE.
 	  DO I=1,ND
-	    IF( (CHIL(I)*PROF(NLF/2+1)+CHI(I)) 
+	    IF( (CHIL(I)*PROF(NLF/2+1)+CHI(I))
 	1            .LT. 0.2D0*CHI(I) )THEN
 	      T2=CHIL(I)*PROF(NLF/2+1)+CHI(I)
 	      CHIL(I)=1.0D-04*ESEC(I)/PROF(NLF/2+1)
@@ -3545,7 +3546,7 @@
 !
 ! This routine sets the rates in the He2 resonance lines to Zero.
 ! As the He2 continuum is thick, the n=2 level of He2 will be collisionally
-! coupled to the n=1 level. 
+! coupled to the n=1 level.
 !
 	  DO I=1,ND
 	    ZNET(I)=0.0D0
@@ -3626,7 +3627,7 @@
 !
 	IF(COMPUTE_BA
 	1          .AND. WRBAMAT
-	1          .AND. .NOT. FLUX_CAL_ONLY 
+	1          .AND. .NOT. FLUX_CAL_ONLY
 	1          .AND. .NOT. LAMBDA_ITERATION)THEN
 	  CALL TUNE(IONE,'BAMAT_WR')
 	  CALL STORE_BA_DATA_V3(LU_BA,NION,NUM_BNDS,ND,COMPUTE_BA,FIXED_T,'BAMAT')
@@ -3639,7 +3640,7 @@
 	CALL TUNE(ITWO,'LINE LOOP')
 !
 !
-! Compute the the total line luminosity, and the total dielectronic line 
+! Compute the the total line luminosity, and the total dielectronic line
 ! emission emitted in each shell between i and i+1.
 ! Not all of this flux will be received by the observer due to continuum
 ! absorption. The factor of 0.5 arrises from the average of R*R*ZNET in the
@@ -3740,7 +3741,7 @@
 	  CALL WRITV(RLUMST,ND,'Total Radiative Luminosity',LU_FLUX)
 	  IF(SUM(XRAY_LUM_TOT) .NE. 0.0D0)CALL WRITV(XRAY_LUM_TOT,ND,'Total Shock Luminosity (Lsun)',LU_FLUX)
 !
-! Include the machanical luminosity imparted to the wind by the radiation 
+! Include the machanical luminosity imparted to the wind by the radiation
 ! field in the total luminosity, and subtract out radioactive energy deposition..
 !
 ! Altered: 28_Feb-2009: Changed J to  I in dE_RAD_DECAY.
@@ -3835,7 +3836,7 @@
 	END IF
 !
 ! Because of the use of SL's, it is possible that a error in Luminosity
-! can occur at depth, particulary in SN models where line escape is 
+! can occur at depth, particulary in SN models where line escape is
 ! enhanced because of the velocity field. TA provides an estimate of
 ! this error. This error is not relevant in the outer regions.
 !
@@ -3878,7 +3879,7 @@
 !
 ! Compute the convolution of J with the electron redistribution function.
 ! May need to compute a flux spectrum sveral times in order for e.s.
-! redistributon to be correctly allowed for. 
+! redistributon to be correctly allowed for.
 ! RD_NU and ALLOW_UNEQUAL_FREQ are both set to FALSE. Note that TEXT and NDEXT
 ! contain T and ND when ACCURATE is FALSE.
 !
@@ -3994,7 +3995,7 @@
 	CALL SUP_TO_FULL_V4(POPS,Z_POP,DO_LEV_DISSOLUTION,ND,NT)
 !	INCLUDE 'SUP_TO_FULL_V4.INC'
 !
-! Perform a revision to th hydrostatic structure of the atmosphere. If we have changed the 
+! Perform a revision to th hydrostatic structure of the atmosphere. If we have changed the
 ! R grid, we need to recomput the angular quadrature weitghts, and put the atom density etc
 ! on the new radius grid.
 !
@@ -4042,7 +4043,7 @@
 	1                LAST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
 	END IF
 !
-	IF(DO_CLUMP_MODEL .AND. MAXCH .LT. 50.0D0 .AND. .NOT. FIXED_T .AND. 
+	IF(DO_CLUMP_MODEL .AND. MAXCH .LT. 50.0D0 .AND. .NOT. FIXED_T .AND.
 	1         LAST_LAMBDA .NE. MAIN_COUNTER)THEN
 	  CALL AUTO_CLUMP_REV(POPS,CLUMP_LAW,CLUMP_PAR,N_CLUMP_PAR,CHK,ND,NT,LUIN)
 	  IF(CHK)THEN
@@ -4076,7 +4077,7 @@
 ! Compute the convolution of J with the electron redistribution function.
 ! Fist neeed to UPDATE TEXT because of the linearization. We need TEXT for
 ! convolving J with the electron scattering redistribution function.
-! VEXT and SIGMAEXT have already been computed. 
+! VEXT and SIGMAEXT have already been computed.
 !
 	TEXT(1:ND)=T(1:ND)
 	IF(ACCURATE)THEN
@@ -4088,7 +4089,7 @@
 	  I=SIZE(VJ)
 	  CALL COMP_J_CONV_V2(VJ,I,NU,TEXT,NDEXT,NCF,LU_EDD,'EDDFACTOR',
 	1             EDD_CONT_REC,L_FALSE,L_FALSE,LU_ES,'ES_J_CONV')
-	END IF          
+	END IF
 !
 ! 
 ! Output brief summary of the model. This is to facilate the creation
@@ -4366,7 +4367,7 @@
 	    WRITE(LU_POP,'(A)')' K moment of radiation field'
 	    WRITE(LU_POP,'(1X,1P8E16.7)')(K_INT(I)/LUM_SCL_FAC,I=1,ND); FLUSH(LU_POP)
 !
-! Compute the ion population at each depth.                          
+! Compute the ion population at each depth.
 ! These are required when evaluation the occupation probabilities.
 !
 	    DO J=1,ND
@@ -4463,13 +4464,13 @@
 	  END DO
 ! 
 !
-! Write out departure coefficients to ASCI file. 
+! Write out departure coefficients to ASCI file.
 ! NB - 1 refers to dimension of DHYD (i.e. DHYD(1,nd)
 !      1 refers to format for output.
 !      1,NHY - For use with HeI.
 !
 	CALL EVAL_LTE_V5(DO_LEV_DISSOLUTION,ND)
-!      
+!
 ! GAM_SPECIES refers to the number of electrons arising from each species (eg
 ! carbon).
 !
@@ -4629,9 +4630,9 @@
 	  END IF
 !
 ! If we have reached desired convergence, we do one final loop
-! so as to write out all relevant model data.  
+! so as to write out all relevant model data.
 !
-	  IF(DO_T_AUTO .AND. RD_FIX_T .AND. MAXCH .LT. 50.0D0 .AND. 
+	  IF(DO_T_AUTO .AND. RD_FIX_T .AND. MAXCH .LT. 50.0D0 .AND.
 	1                                 (LAST_LAMBDA .NE. MAIN_COUNTER) )THEN
 	       RD_FIX_T=.FALSE.
 	       FIXED_T=RD_FIX_T
@@ -4693,7 +4694,7 @@
 !
 	    CALL GEN_ASCI_OPEN(LUSCR,'MODEL_SCR','UNKNOWN',' ',' ',IZERO,IOS)
 	      IF(IOS .EQ. 0)CALL GEN_ASCI_OPEN(LUIN,'IN_ITS','OLD',' ','READ',IZERO,IOS)
-	      IF(IOS .NE. 0)THEN  
+	      IF(IOS .NE. 0)THEN
 	         WRITE(LUER,*)'Error opening IN_ITS or MODEL_SCR in CMFGEN, IOS=',IOS
 	         WRITE(LUER,*)'Error occurs at the end of CMFGEN_SUB.'
 	         WRITE(LUER,*)'Error will be ignored.'

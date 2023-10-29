@@ -3,42 +3,43 @@ C Data module for FG_J_CMF. Data placed in this module is automatically
 C saved between subroutine calls..
 C
 	MODULE FG_J_CMF_MOD_V7
+	USE SET_KIND_MODULE
 C
 C The *_STORE routines are used to store the radiation field, as computed
-C on the previous call to FG_J_CMF. 
+C on the previous call to FG_J_CMF.
 C The *_PREV routines are used to store the radiation field, as computed
 C for the previous frequency.
 C
 C The *_PREV routines are updated from the *_STORE routines when NEW_FREQ
 C is .TRUE.
 C
-	REAL(10), ALLOCATABLE :: OLDCHI(:)
-	REAL(10), ALLOCATABLE :: OLDCHI_STORE(:)
-	REAL(10), ALLOCATABLE :: AV_PREV(:,:)
-	REAL(10), ALLOCATABLE :: AV_STORE(:,:)
-	REAL(10), ALLOCATABLE :: CV_PREV(:,:)
-	REAL(10), ALLOCATABLE :: CV_STORE(:,:)
-	REAL(10), ALLOCATABLE :: R_RAY(:,:)
-	REAL(10), ALLOCATABLE :: Z(:,:)
-	REAL(10), ALLOCATABLE :: GAM(:,:)
-	REAL(10), ALLOCATABLE :: GAMH(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDCHI(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDCHI_STORE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: AV_PREV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: AV_STORE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CV_PREV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CV_STORE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_RAY(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: Z(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAM(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAMH(:,:)
 C
-	REAL(10), ALLOCATABLE :: R_INS(:,:)
-	REAL(10), ALLOCATABLE :: V_INS(:,:)
-	REAL(10), ALLOCATABLE :: SIGMA_INS(:,:)
-	REAL(10), ALLOCATABLE :: CHI_INS(:,:)
-	REAL(10), ALLOCATABLE :: dCHIdR_INS(:,:)
-	REAL(10), ALLOCATABLE :: SOURCE_INS(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_INS(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: V_INS(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA_INS(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_INS(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: dCHIdR_INS(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: SOURCE_INS(:,:)
 
-	REAL(10), ALLOCATABLE :: R_EXT(:)
-	REAL(10), ALLOCATABLE :: V_EXT(:)
-	REAL(10), ALLOCATABLE :: SIGMA_EXT(:)
-C                            
+	REAL(KIND=LDP), ALLOCATABLE :: R_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: V_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA_EXT(:)
+C
 C Used to compute the boundary iteration factors (HBC and NBC).
-C                             
-	REAL(10), ALLOCATABLE :: N_WGHTS(:)
-	REAL(10), ALLOCATABLE :: H_WGHTS(:)
-	REAL(10), ALLOCATABLE :: MU_VAL(:)
+C
+	REAL(KIND=LDP), ALLOCATABLE :: N_WGHTS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: H_WGHTS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: MU_VAL(:)
 	INTEGER, ALLOCATABLE :: NI_RAY(:)
 	INTEGER, ALLOCATABLE :: MAX_LS(:)
 C
@@ -55,8 +56,8 @@ C
 C
 C 
 C
-C Routine to compute the Eddington F, G and RSQN_ON_RSQJ Eddington factors 
-C for single frequency transfer in the comoving-frame. Based on FG_J_CMF. 
+C Routine to compute the Eddington F, G and RSQN_ON_RSQJ Eddington factors
+C for single frequency transfer in the comoving-frame. Based on FG_J_CMF.
 C First order differencing in frequency is used.
 C
 C The F, G, and RSQN_ON_RSQJ Eddington factors must be supplied.
@@ -74,9 +75,9 @@ C     avoids having to test what mode I am using for the Eddington factors.
 C
 C     IF N_TYPE='G_ONLY' G is defined at all depths, and
 c       RSQN_ON_RSQJ=0 at all depths.
-C     IF N_TYPE='N_ON_J' RSQN_ON_RSQJ is defined at all 
+C     IF N_TYPE='N_ON_J' RSQN_ON_RSQJ is defined at all
 C       depths, and G=0 at all depths.
-C     IF N_TYPE='MIXED' one of G or RSQN_ON_RSQJ is 
+C     IF N_TYPE='MIXED' one of G or RSQN_ON_RSQJ is
 C       non-zero, and is the value to be used in MOM_J_CMF
 C
 C Routine also returns I+, so that observers flux can be computed. Note because
@@ -95,6 +96,7 @@ C
 	1                  IN_HBC,HBC,NBC,
 	1                  IPLUS_P,FL,dLOG_NU,DIF,DBB,IC,METHOD,
 	1                  THK,INIT,NEW_FREQ,N_TYPE,NC,NP,ND)
+	USE SET_KIND_MODULE
 	USE FG_J_CMF_MOD_V7
 	IMPLICIT NONE
 C
@@ -110,7 +112,7 @@ C Altered: 19_Dec-1996   Euler-MauClaurin correction to DTAU is limited to
 C                           avoide negative DTAU's.
 C Altered: 10-Sep-1996   3.5 used as limit on ETA rather than 2.0 to avoid
 C                           excess outer envelope emission.
-C Altered: 16-Jun-1996   dCHIdR zeroed if METHOD='ZERO' (needed for 
+C Altered: 16-Jun-1996   dCHIdR zeroed if METHOD='ZERO' (needed for
 C                           interpolation section.
 C Altered: 03-Feb-1996   Treatment of negative AV values altered.
 C Altered: 25-Mar-1995   THK option reinstalled --- previously boundary was
@@ -118,7 +120,7 @@ C                          always assumed to be thick. TAU_BOUND deleted
 C                          call. Version changed to _V5.
 C                        HBC and NBC are now scalers.
 C
-C Altered: 21-Mar-1995   Factor of 2 missing from IPLUS definition. 
+C Altered: 21-Mar-1995   Factor of 2 missing from IPLUS definition.
 C                           Bug introduced when extended outer boundary.
 C Altered:  Mid Feb-1995  !Improved outer boundary condition installed.
 C     to    Mid Mar-1995     Boundary is now extended a factor of 10 in radius,
@@ -131,7 +133,7 @@ C                            (after Rybicki and Hummer). Several simple routines
 C                            replaced by direct insertion.
 C                         Optimization of code speed. Quantities such a Z
 C                            are now only computed once (when INIT is set).
-C                         Error reporting was inserted.via common block. 
+C                         Error reporting was inserted.via common block.
 C                            This allows reporting of those frequencies on which
 C                            error occur (eg -ve intensities, zero flux).
 C	                    (This comment inserted 21-Mar-95)
@@ -144,23 +146,23 @@ C Finalized 11-Nov-1994		!HTRPWGT included, and cleaned.
 C Created   12-Oct-1994
 C
 	INTEGER NC,NP,ND
-	REAL(10) ETA(ND),CHI(ND),ESEC(ND)
-	REAL(10) V(ND),SIGMA(ND),R(ND),P(NP)
+	REAL(KIND=LDP) ETA(ND),CHI(ND),ESEC(ND)
+	REAL(KIND=LDP) V(ND),SIGMA(ND),R(ND),P(NP)
 C
 C NB: J,H,K,N refer to the first 4 moments of the radiation field.
 C     QW denotes quadrature weight.
 C
-	REAL(10) JQW(ND,NP),HQW(ND,NP),KQW(ND,NP),NQW(ND,NP)
-	REAL(10) JNU(ND),HNU(ND),KNU(ND),NNU(ND),RSQN_ON_RSQJ(ND)
-	REAL(10) IN_HBC,HBC,NBC
-	REAL(10) IPLUS_P(NP)
+	REAL(KIND=LDP) JQW(ND,NP),HQW(ND,NP),KQW(ND,NP),NQW(ND,NP)
+	REAL(KIND=LDP) JNU(ND),HNU(ND),KNU(ND),NNU(ND),RSQN_ON_RSQJ(ND)
+	REAL(KIND=LDP) IN_HBC,HBC,NBC
+	REAL(KIND=LDP) IPLUS_P(NP)
 C
-	REAL(10) DBB,IC,FL,dLOG_NU
+	REAL(KIND=LDP) DBB,IC,FL,dLOG_NU
 	CHARACTER*6 METHOD
 	CHARACTER*6 N_TYPE
 	LOGICAL DIF		!Use diffusion approximation
 C
-C Use "Thick" boundary cond. at outer boundary. Only noted when INIT 
+C Use "Thick" boundary cond. at outer boundary. Only noted when INIT
 C is true. All subsequent frequencies will use the same boundary condition
 C independent of the passed value (Until INIT is set to TRUE again).
 C
@@ -182,42 +184,42 @@ C
 	INTEGER ND_ADD_MAX
 	PARAMETER (ND_ADD_MAX=24)
 C
-C The following arrays do not need to be stored, and hence can be crteated 
+C The following arrays do not need to be stored, and hence can be crteated
 C each time.
 C
-	REAL(10) TA(ND+ND_ADD_MAX+6,NP)
-	REAL(10) TB(ND+ND_ADD_MAX+6,NP)
-	REAL(10) TC(ND+ND_ADD_MAX+6,NP)
-	REAL(10) AV(ND+ND_ADD_MAX+6,NP)
-	REAL(10) CV(ND+ND_ADD_MAX+6,NP)
-	REAL(10) GB(ND+ND_ADD_MAX+6,NP)
-	REAL(10) H(ND+ND_ADD_MAX+6,NP)
+	REAL(KIND=LDP) TA(ND+ND_ADD_MAX+6,NP)
+	REAL(KIND=LDP) TB(ND+ND_ADD_MAX+6,NP)
+	REAL(KIND=LDP) TC(ND+ND_ADD_MAX+6,NP)
+	REAL(KIND=LDP) AV(ND+ND_ADD_MAX+6,NP)
+	REAL(KIND=LDP) CV(ND+ND_ADD_MAX+6,NP)
+	REAL(KIND=LDP) GB(ND+ND_ADD_MAX+6,NP)
+	REAL(KIND=LDP) H(ND+ND_ADD_MAX+6,NP)
 C
-	REAL(10) DTAU(ND+ND_ADD_MAX+6)
-	REAL(10) XM(ND+ND_ADD_MAX+6)
-	REAL(10) SOURCE(ND+ND_ADD_MAX+6)
-	REAL(10) U(ND+ND_ADD_MAX+6)
-	REAL(10) VB(ND+ND_ADD_MAX+6)
-	REAL(10) VC(ND+ND_ADD_MAX+6)
-	REAL(10) Q(ND+ND_ADD_MAX+6)
-	REAL(10) QH(ND+ND_ADD_MAX+6)
-	REAL(10) dCHIdR(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) DTAU(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) XM(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) SOURCE(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) U(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) VB(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) VC(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) Q(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) QH(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) dCHIdR(ND+ND_ADD_MAX+6)
 C
-	REAL(10) ETA_EXT(ND+ND_ADD_MAX+6)
-	REAL(10) CHI_EXT(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) ETA_EXT(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) CHI_EXT(ND+ND_ADD_MAX+6)
 C
-	REAL(10) V_RAY(ND+ND_ADD_MAX+6)
-	REAL(10) SIGMA_RAY(ND+ND_ADD_MAX+6)
-	REAL(10) SOURCE_RAY(ND+ND_ADD_MAX+6)
-	REAL(10) CHI_RAY(ND+ND_ADD_MAX+6)
-	REAL(10) dCHIdR_RAY(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) V_RAY(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) SIGMA_RAY(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) SOURCE_RAY(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) CHI_RAY(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) dCHIdR_RAY(ND+ND_ADD_MAX+6)
 C
-	REAL(10) DIV(ND+ND_ADD_MAX+6)
-	REAL(10) DTAU_BND(NP)
+	REAL(KIND=LDP) DIV(ND+ND_ADD_MAX+6)
+	REAL(KIND=LDP) DTAU_BND(NP)
 C
 	INTEGER N_ERR_MAX,FG_ERR_CNT
 	PARAMETER (N_ERR_MAX=1000)
-	REAL(10) FG_ERR_ON_FREQ
+	REAL(KIND=LDP) FG_ERR_ON_FREQ
 	INTEGER FG_ERR_TYPE
 	COMMON /FG_J_CMF_ERR/FG_ERR_ON_FREQ(N_ERR_MAX),
 	1                    FG_ERR_TYPE(N_ERR_MAX),FG_ERR_CNT
@@ -231,22 +233,22 @@ C
 	INTEGER, PARAMETER :: NINS=4
 	LOGICAL, PARAMETER :: LFALSE=.FALSE.
 	LOGICAL, PARAMETER :: LTRUE=.TRUE.
-C                 
+C
 	INTEGER NI_SMALL
 	INTEGER I,J,K,LS
 	INTEGER NI
-	REAL(10) DBC
-	REAL(10) IBOUND			!Incident intensity on outer boundary.
-	REAL(10) T1,T2
-	REAL(10) ALPHA
-	REAL(10) ESEC_POW
-	REAL(10) BETA
-	REAL(10) VINF
-	REAL(10) RMAX,DEL_R_FAC
-	REAL(10) CV_BOUND
-	REAL(10) MU,dZ,PSQ
+	REAL(KIND=LDP) DBC
+	REAL(KIND=LDP) IBOUND			!Incident intensity on outer boundary.
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) ALPHA
+	REAL(KIND=LDP) ESEC_POW
+	REAL(KIND=LDP) BETA
+	REAL(KIND=LDP) VINF
+	REAL(KIND=LDP) RMAX,DEL_R_FAC
+	REAL(KIND=LDP) CV_BOUND
+	REAL(KIND=LDP) MU,dZ,PSQ
 C
-	REAL(10) DEL_R
+	REAL(KIND=LDP) DEL_R
 C
 C Change the following statement to TRUE if running on a VECTOR machine.
 C
@@ -306,13 +308,13 @@ C
 	NEG_AV_VALUE=.FALSE.
 	NEG_NNU_VALUE=.FALSE.
 	BAD_NNU_VALUE=.FALSE.
-C         
-C Perform initializations. 
+C
+C Perform initializations.
 C
 	IF(INIT)THEN
 C
 C Insert extra points into radius grid. Not all points will be used along a ray.
-C We will only insert 2 additional points in the interval between Z=0 and 
+C We will only insert 2 additional points in the interval between Z=0 and
 C Z(1st) and 1 additional point in the next interval.
 C
 	  R_INS(:,:)=0.0D0
@@ -352,7 +354,7 @@ C
 	  END DO
 	  IF(THK)THEN
 	    RMAX=10.0D0*R(1)
-	    ALPHA=R(1)+(R(1)-R(2))                               
+	    ALPHA=R(1)+(R(1)-R(2))
 	    DEL_R_FAC=EXP( LOG(RMAX/ALPHA)/(ND_ADD-3) )
 	    R_EXT(1)=RMAX
 	    R_EXT(4)=RMAX/DEL_R_FAC
@@ -397,7 +399,7 @@ C
 	      NI_RAY(LS)=ND_EXT-(LS-NC-1)
 	      IF(NI_RAY(LS) .GT. ND_ADD+3)THEN
 C
-C In this case we insert 4 points between the last 2 points, and 2 points between 
+C In this case we insert 4 points between the last 2 points, and 2 points between
 C the second last pair.
 C
 	        J=NI_RAY(LS)
@@ -414,20 +416,20 @@ C Do the same thing for V and SIGMA
 C
                 V_RAY(J+6)=V_RAY(J)
                 V_RAY(J+1)=V_RAY(J-1)
-	        V_RAY(J-1)=V_INS(J-2-ND_ADD,1) 
-	        V_RAY(J)=V_INS(J-2-ND_ADD,2) 
-	        V_RAY(J+2)=V_INS(J-1-ND_ADD,1) 
-	        V_RAY(J+3)=V_INS(J-1-ND_ADD,2) 
-	        V_RAY(J+4)=V_INS(J-1-ND_ADD,3) 
+	        V_RAY(J-1)=V_INS(J-2-ND_ADD,1)
+	        V_RAY(J)=V_INS(J-2-ND_ADD,2)
+	        V_RAY(J+2)=V_INS(J-1-ND_ADD,1)
+	        V_RAY(J+3)=V_INS(J-1-ND_ADD,2)
+	        V_RAY(J+4)=V_INS(J-1-ND_ADD,3)
 	        V_RAY(J+5)=V_INS(J-1-ND_ADD,4)
 C
                 SIGMA_RAY(J+6)=SIGMA_RAY(J)
                 SIGMA_RAY(J+1)=SIGMA_RAY(J-1)
-	        SIGMA_RAY(J-1)=SIGMA_INS(J-2-ND_ADD,1) 
-	        SIGMA_RAY(J)=SIGMA_INS(J-2-ND_ADD,2) 
-	        SIGMA_RAY(J+2)=SIGMA_INS(J-1-ND_ADD,1) 
-	        SIGMA_RAY(J+3)=SIGMA_INS(J-1-ND_ADD,2) 
-	        SIGMA_RAY(J+4)=SIGMA_INS(J-1-ND_ADD,3) 
+	        SIGMA_RAY(J-1)=SIGMA_INS(J-2-ND_ADD,1)
+	        SIGMA_RAY(J)=SIGMA_INS(J-2-ND_ADD,2)
+	        SIGMA_RAY(J+2)=SIGMA_INS(J-1-ND_ADD,1)
+	        SIGMA_RAY(J+3)=SIGMA_INS(J-1-ND_ADD,2)
+	        SIGMA_RAY(J+4)=SIGMA_INS(J-1-ND_ADD,3)
 	        SIGMA_RAY(J+5)=SIGMA_INS(J-1-ND_ADD,4)
 C
 	        NI_RAY(LS)=NI_RAY(LS)+6
@@ -439,21 +441,21 @@ C together anyway.
 C
 	        J=NI_RAY(LS)
                 R_RAY(J+4,LS)=R_RAY(J,LS)
-	        R_RAY(J,LS)=R_INS(J-1-ND_ADD,1) 
-	        R_RAY(J+1,LS)=R_INS(J-1-ND_ADD,2) 
-	        R_RAY(J+2,LS)=R_INS(J-1-ND_ADD,3) 
+	        R_RAY(J,LS)=R_INS(J-1-ND_ADD,1)
+	        R_RAY(J+1,LS)=R_INS(J-1-ND_ADD,2)
+	        R_RAY(J+2,LS)=R_INS(J-1-ND_ADD,3)
 	        R_RAY(J+3,LS)=R_INS(J-1-ND_ADD,4)
 C
                 V_RAY(J+4)=V_RAY(J)
-	        V_RAY(J)=V_INS(J-1-ND_ADD,1) 
-	        V_RAY(J+1)=V_INS(J-1-ND_ADD,2) 
-	        V_RAY(J+2)=V_INS(J-1-ND_ADD,3) 
+	        V_RAY(J)=V_INS(J-1-ND_ADD,1)
+	        V_RAY(J+1)=V_INS(J-1-ND_ADD,2)
+	        V_RAY(J+2)=V_INS(J-1-ND_ADD,3)
 	        V_RAY(J+3)=V_INS(J-1-ND_ADD,4)
 C
                 SIGMA_RAY(J+4)=SIGMA_RAY(J)
-	        SIGMA_RAY(J)=SIGMA_INS(J-1-ND_ADD,1) 
-	        SIGMA_RAY(J+1)=SIGMA_INS(J-1-ND_ADD,2) 
-	        SIGMA_RAY(J+2)=SIGMA_INS(J-1-ND_ADD,3) 
+	        SIGMA_RAY(J)=SIGMA_INS(J-1-ND_ADD,1)
+	        SIGMA_RAY(J+1)=SIGMA_INS(J-1-ND_ADD,2)
+	        SIGMA_RAY(J+2)=SIGMA_INS(J-1-ND_ADD,3)
 	        SIGMA_RAY(J+3)=SIGMA_INS(J-1-ND_ADD,4)
 C
 	        NI_RAY(LS)=NI_RAY(LS)+4
@@ -531,7 +533,7 @@ C The first checks whether we may have negative line opacities due
 C to stimulated emission. In such a case we simply assume an 1/r^2
 C extrapolation.
 C
-C We also interpolate in ESEC, since ESEC (in the absence of negative 
+C We also interpolate in ESEC, since ESEC (in the absence of negative
 C absorption) provides a lower bound to the opacity. NB: When CHI is much
 C larger then ESEC its variation with r dominates, and it is possible to
 C extrapolate CHI below ESEC.
@@ -623,38 +625,38 @@ C Include additional points to accomodate large change in UV near z=0.
 C	
 	    IF(NI_RAY(LS) .GT. ND_ADD+9)THEN
 C
-C In this case we insert 4 points between the last 2 points, and 2 points between 
+C In this case we insert 4 points between the last 2 points, and 2 points between
 C the second last pair.
 C
 	      J=NI-6
 	      CHI_RAY(1:J)=CHI_EXT(1:J)
               CHI_RAY(J+6)=CHI_RAY(J)
               CHI_RAY(J+1)=CHI_RAY(J-1)
-	      CHI_RAY(J-1)=CHI_INS(J-2-ND_ADD,1) 
-	      CHI_RAY(J)=CHI_INS(J-2-ND_ADD,2) 
-	      CHI_RAY(J+2)=CHI_INS(J-1-ND_ADD,1) 
-	      CHI_RAY(J+3)=CHI_INS(J-1-ND_ADD,2) 
-	      CHI_RAY(J+4)=CHI_INS(J-1-ND_ADD,3) 
+	      CHI_RAY(J-1)=CHI_INS(J-2-ND_ADD,1)
+	      CHI_RAY(J)=CHI_INS(J-2-ND_ADD,2)
+	      CHI_RAY(J+2)=CHI_INS(J-1-ND_ADD,1)
+	      CHI_RAY(J+3)=CHI_INS(J-1-ND_ADD,2)
+	      CHI_RAY(J+4)=CHI_INS(J-1-ND_ADD,3)
 	      CHI_RAY(J+5)=CHI_INS(J-1-ND_ADD,4)
 C
 	      SOURCE_RAY(1:J)=SOURCE(1:J)		!Set  NI, and NI-1
               SOURCE_RAY(J+6)=SOURCE_RAY(J)
               SOURCE_RAY(J+1)=SOURCE_RAY(J-1)
-	      SOURCE_RAY(J-1)=SOURCE_INS(J-2-ND_ADD,1) 
-	      SOURCE_RAY(J)=SOURCE_INS(J-2-ND_ADD,2) 
-	      SOURCE_RAY(J+2)=SOURCE_INS(J-1-ND_ADD,1) 
-	      SOURCE_RAY(J+3)=SOURCE_INS(J-1-ND_ADD,2) 
-	      SOURCE_RAY(J+4)=SOURCE_INS(J-1-ND_ADD,3) 
+	      SOURCE_RAY(J-1)=SOURCE_INS(J-2-ND_ADD,1)
+	      SOURCE_RAY(J)=SOURCE_INS(J-2-ND_ADD,2)
+	      SOURCE_RAY(J+2)=SOURCE_INS(J-1-ND_ADD,1)
+	      SOURCE_RAY(J+3)=SOURCE_INS(J-1-ND_ADD,2)
+	      SOURCE_RAY(J+4)=SOURCE_INS(J-1-ND_ADD,3)
 	      SOURCE_RAY(J+5)=SOURCE_INS(J-1-ND_ADD,4)
 C
 	      dCHIdR_RAY(1:J)=dCHIdR(1:J)		!Set  NI, and NI-1
               dCHIdR_RAY(J+6)=dCHIdR_RAY(J)
               dCHIdR_RAY(J+1)=dCHIdR_RAY(J-1)
-	      dCHIdR_RAY(J-1)=dCHIdR_INS(J-2-ND_ADD,1) 
-	      dCHIdR_RAY(J)=dCHIdR_INS(J-2-ND_ADD,2) 
-	      dCHIdR_RAY(J+2)=dCHIdR_INS(J-1-ND_ADD,1) 
-	      dCHIdR_RAY(J+3)=dCHIdR_INS(J-1-ND_ADD,2) 
-	      dCHIdR_RAY(J+4)=dCHIdR_INS(J-1-ND_ADD,3) 
+	      dCHIdR_RAY(J-1)=dCHIdR_INS(J-2-ND_ADD,1)
+	      dCHIdR_RAY(J)=dCHIdR_INS(J-2-ND_ADD,2)
+	      dCHIdR_RAY(J+2)=dCHIdR_INS(J-1-ND_ADD,1)
+	      dCHIdR_RAY(J+3)=dCHIdR_INS(J-1-ND_ADD,2)
+	      dCHIdR_RAY(J+4)=dCHIdR_INS(J-1-ND_ADD,3)
 	      dCHIdR_RAY(J+5)=dCHIdR_INS(J-1-ND_ADD,4)
 C
 	    ELSE IF(NI_RAY(LS) .EQ. ND_ADD+7)THEN
@@ -664,23 +666,23 @@ C
 	      J=NI-4
 	      CHI_RAY(1:J)=CHI_EXT(1:J)
               CHI_RAY(J+4)=CHI_RAY(J)
-	      CHI_RAY(J)=CHI_INS(J-1-ND_ADD,1) 
-	      CHI_RAY(J+1)=CHI_INS(J-1-ND_ADD,2) 
-	      CHI_RAY(J+2)=CHI_INS(J-1-ND_ADD,3) 
+	      CHI_RAY(J)=CHI_INS(J-1-ND_ADD,1)
+	      CHI_RAY(J+1)=CHI_INS(J-1-ND_ADD,2)
+	      CHI_RAY(J+2)=CHI_INS(J-1-ND_ADD,3)
 	      CHI_RAY(J+3)=CHI_INS(J-1-ND_ADD,4)
 C
 	      SOURCE_RAY(1:J)=SOURCE(1:J)
               SOURCE_RAY(J+4)=SOURCE_RAY(J)
-	      SOURCE_RAY(J)=SOURCE_INS(J-1-ND_ADD,1) 
-	      SOURCE_RAY(J+1)=SOURCE_INS(J-1-ND_ADD,2) 
-	      SOURCE_RAY(J+2)=SOURCE_INS(J-1-ND_ADD,3) 
+	      SOURCE_RAY(J)=SOURCE_INS(J-1-ND_ADD,1)
+	      SOURCE_RAY(J+1)=SOURCE_INS(J-1-ND_ADD,2)
+	      SOURCE_RAY(J+2)=SOURCE_INS(J-1-ND_ADD,3)
 	      SOURCE_RAY(J+3)=SOURCE_INS(J-1-ND_ADD,4)
 C
 	      dCHIdR_RAY(1:J)=dCHIdR(1:J)
               dCHIdR_RAY(J+4)=dCHIdR_RAY(J)
-	      dCHIdR_RAY(J)=dCHIdR_INS(J-1-ND_ADD,1) 
-	      dCHIdR_RAY(J+1)=dCHIdR_INS(J-1-ND_ADD,2) 
-	      dCHIdR_RAY(J+2)=dCHIdR_INS(J-1-ND_ADD,3) 
+	      dCHIdR_RAY(J)=dCHIdR_INS(J-1-ND_ADD,1)
+	      dCHIdR_RAY(J+1)=dCHIdR_INS(J-1-ND_ADD,2)
+	      dCHIdR_RAY(J+2)=dCHIdR_INS(J-1-ND_ADD,3)
 	      dCHIdR_RAY(J+3)=dCHIdR_INS(J-1-ND_ADD,4)
 C
 	    END IF
@@ -695,14 +697,14 @@ C
 C
 C 
 C
-C By setting PF(1)=0 when evaluating SOURCE we ensure a pure continuum 
+C By setting PF(1)=0 when evaluating SOURCE we ensure a pure continuum
 C calculation for the first frequency.
 C
 	  IF(INIT)THEN
 	    DO I=1,NI
 	      Q(I)=0.0D0
 	      QH(I)=0.0D0
-	    END DO                
+	    END DO
 	    OLDCHI(LS)=CHI_RAY(NI)
 	  ELSE
 	    DO I=1,NI-1
@@ -766,7 +768,7 @@ C
 	END DO				!LS
 C
 C 
-C 
+C
 C Solve for the radiation field along ray for this frequency.
 C
 	IF(VECTOR_MACHINE)THEN
@@ -824,8 +826,8 @@ C
 C
 	DO LS=1,NP
 C
-C Verify validity of AV values. If these go negative, we set them +ve 
-C but a factor of 10 smaller. We also ensure that the AV are not 
+C Verify validity of AV values. If these go negative, we set them +ve
+C but a factor of 10 smaller. We also ensure that the AV are not
 C extremely close to zero by comparing with neigboring AV values.
 C The CV (fluxes) are computed using the revised values.
 C
@@ -846,7 +848,7 @@ C
 	    NI=NI_RAY(LS)
 	    NI_SMALL=ND-(LS-NC-1)
 	    IF(LS .LE. NC+1)NI_SMALL=ND
-C                          
+C
 	    DO I=1,NI_RAY(LS)-1
 	      CV(I,LS)=GB(I,LS)*(AV(I,LS)-AV(I+1,LS))+H(I,LS)*CV_PREV(I,LS)
 	    END DO
@@ -929,9 +931,9 @@ C
 	  END IF
 	  HBC=HBC+CV_BOUND*H_WGHTS(LS)
 	  NBC=NBC+CV_BOUND*N_WGHTS(LS)
-C          
+C
 	  IF(LS .LE. NC+1)THEN
-	    IN_HBC=IN_HBC + 
+	    IN_HBC=IN_HBC +
 	1        JQW(ND,LS)*( AV(NI,LS)-(AV(NI,LS)-AV(NI-1,LS))
 	1          /DTAU_BND(LS) )*Z(NI,LS)/R_RAY(NI,LS)
  	  END IF
@@ -941,7 +943,7 @@ C
 	   CV_STORE(I,LS)=CV(I,LS)
 	  END DO
 	  IPLUS_P(LS)=2.0D0*CV_BOUND          !To compute observed flux
-C 
+C
 	END DO			!End do LS
 C
 C
@@ -1036,7 +1038,7 @@ C Store frequencies at which errors occurred, and give an indication of the
 C error.
 C
 	J=1
-	DO WHILE (J .LE. N_ERR_MAX .AND. 
+	DO WHILE (J .LE. N_ERR_MAX .AND.
 	1            (NEG_AV_VALUE .OR. BAD_NNU_VALUE .OR. NEG_NNU_VALUE) )
 	  IF(FG_ERR_ON_FREQ(J) .EQ. FL)THEN
 	    FG_ERR_TYPE(J)=0
@@ -1072,4 +1074,4 @@ C
 C
 	RETURN
 	END
- 
+

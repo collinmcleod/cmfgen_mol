@@ -48,7 +48,7 @@ c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
 c written   3/4/97  DLM  Modeled after usr_option
 c
-c altered  3/17/97  DLM  Removed main_option from list of passed 
+c altered  3/17/97  DLM  Removed main_option from list of passed
 c                          variables.  Now store hidden options in
 c                          variable string.
 c                        Now read and write var_name as all capital
@@ -76,6 +76,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_hidden_real_4(input,var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -91,7 +92,7 @@ c options are not written in .sve files unless their values are changed
 c
 c written   3/4/96  DLM  Modified copy of usr_option
 c
-c altered  3/17/97  DLM  Removed main_option from list of passed 
+c altered  3/17/97  DLM  Removed main_option from list of passed
 c                          variables.  Now store hidden options in
 c                          variable string.
 c                        Now read and write var_name as all capital
@@ -186,6 +187,7 @@ c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_hidden_real_dim_4(input,dim,required,var_name,
      *     default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -195,13 +197,13 @@ c default value passed to this subroutine is always used unless the
 c hidden option is entered with the main option. For example:
 c   rd_obs (scales=1.1,1.2,1.3)
 c The value for the hidden sub-option "scales" is set to 1.1,1.2,1.3.
-c These value for the hidden option (in this case scale) are stored in 
+c These value for the hidden option (in this case scale) are stored in
 c the variable string by the routine pre_ and post_sve_file.  Hidden
 c options are not written in .sve files unless their values are changed
 c
 c written   3/4/96  DLM  Modified copy of usr_option
 c
-c altered  3/17/97  DLM  Removed main_option from list of passed 
+c altered  3/17/97  DLM  Removed main_option from list of passed
 c                          variables.  Now store hidden options in
 c                          variable string.
 c                        Now read and write var_name as all capital

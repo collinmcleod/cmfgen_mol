@@ -1,10 +1,11 @@
 !
 ! Program reads in population estimates from a file and uses
 ! linear interpolation in the log plane to lay these estimates
-! on the "new" radius grid. 
+! on the "new" radius grid.
 !
 	SUBROUTINE REGRID_LOG_DC_V1(DHEN,R,ED,T,DI,CLUMP_FAC,EDGE,F_TO_S,INT_SEQ,
 	1               POPATOM,N,ND,LU_IN,INTERP_OPTION,FILE_NAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 21-Aug-2023 - Fixed issue with TR option and rounding.
@@ -23,41 +24,41 @@
 ! Created: 18-Dec-2010: This routine replace REGRIDWSC_V3, REGRIDB_ON_NE, REGRID_TX_R.
 !                       Interplation options are 'R', 'ED', 'SPH_TAU', and 'RTX'.
 !                       Routine handled INPUT files with departure coefficients, or
-!                       with LOG(DCs). 
+!                       with LOG(DCs).
 !
 	INTEGER N,ND
 	INTEGER LU_IN
-	REAL(10) DHEN(N,ND)
-	REAL(10) R(ND)
-	REAL(10) T(ND)
-	REAL(10) ED(ND)
-	REAL(10) DI(ND)
-	REAL(10) EDGE(N)
-	REAL(10) POPATOM(ND)
-	REAL(10) CLUMP_FAC(ND)
+	REAL(KIND=LDP) DHEN(N,ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) T(ND)
+	REAL(KIND=LDP) ED(ND)
+	REAL(KIND=LDP) DI(ND)
+	REAL(KIND=LDP) EDGE(N)
+	REAL(KIND=LDP) POPATOM(ND)
+	REAL(KIND=LDP) CLUMP_FAC(ND)
 	INTEGER F_TO_S(N)
 	INTEGER INT_SEQ(N)
 	CHARACTER(LEN=*) INTERP_OPTION
 !
-	REAL(10) TAU(ND)
-	REAL(10) NEW_ED(ND)
-	REAL(10) NEW_X(ND)
-	REAL(10) NEW_T(ND)
-	REAL(10) LOG_TEN
+	REAL(KIND=LDP) TAU(ND)
+	REAL(KIND=LDP) NEW_ED(ND)
+	REAL(KIND=LDP) NEW_X(ND)
+	REAL(KIND=LDP) NEW_T(ND)
+	REAL(KIND=LDP) LOG_TEN
 !
-	REAL(10), ALLOCATABLE :: DPOP(:,:)
-	REAL(10), ALLOCATABLE :: OLD_CLUMP_FAC(:)
-	REAL(10), ALLOCATABLE :: OLD_DI(:)
-	REAL(10), ALLOCATABLE :: OLD_ED(:)
-	REAL(10), ALLOCATABLE :: OLD_R(:)
-	REAL(10), ALLOCATABLE :: OLD_T(:)
-	REAL(10), ALLOCATABLE :: OLD_TAU(:)
-	REAL(10), ALLOCATABLE :: TA(:)
-	REAL(10), ALLOCATABLE :: TB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DPOP(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLD_CLUMP_FAC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLD_DI(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLD_ED(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLD_R(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLD_T(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLD_TAU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)
 !
-	REAL(10), ALLOCATABLE :: OLD_X(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLD_X(:)
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER ERROR_LU,LUER,LUWARN,WARNING_LU
@@ -65,10 +66,10 @@
 !
 ! Local Variables.
 !
-	REAL(10) T_EXCITE,FX,DELTA_T
-	REAL(10) T1,T2
-	REAL(10) TMAX,TMIN
-	REAL(10) RTAU1,RTAU1_OLD
+	REAL(KIND=LDP) T_EXCITE,FX,DELTA_T
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) TMAX,TMIN
+	REAL(KIND=LDP) RTAU1,RTAU1_OLD
 !
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER JMIN,JINT
@@ -263,7 +264,7 @@
 !
 	ELSE IF(INTERP_OPTION .EQ. 'ED')THEN
 	  OLD_X=LOG(OLD_ED*OLD_CLUMP_FAC)
-	  NEW_X=LOG(ED) 
+	  NEW_X=LOG(ED)
 !	  CALL WRITV(NEW_X,ND,'ED new',6)
 !	  CALL WRITV(OLD_X,NDOLD,'ED old',6)
           DO WHILE (NEW_X(NX_ST) .LT. OLD_X(1))
@@ -289,7 +290,7 @@
 	       DHEN(1:NZ,I)=DPOP(1:NZ,JMIN)
 	       DI(I)=EXP(OLD_DI(JMIN))
 	    ELSE
-	      JINT=0	    
+	      JINT=0	
 	      DO J=1,NDOLD-1
 	        IF( (T(I)-OLD_T(J))*(OLD_T(J+1)-T(I)) .GE. -1.0D-10)THEN
 	          IF(JINT .EQ. 0)THEN
@@ -308,7 +309,7 @@
 	          END IF
 	          DHEN(1:NZ,I)=DPOP(1:NZ,NDOLD)
 	          DI(I)=EXP(OLD_DI(NDOLD))
-	      ELSE IF(JINT .EQ. 0 .AND. T(I) .LE. TMIN)THEN 
+	      ELSE IF(JINT .EQ. 0 .AND. T(I) .LE. TMIN)THEN
 	          IF(FIRST .AND. T(I) .LT. 0.9999*TMIN)THEN
 	            WRITE(6,'(/,A)')'Warning: T outside old model range in REGRID_LOG_DC_V1'
 	            WRITE(6,'(2A,3(10X,A))')'    I',' JINT','T(I)','TMIN','TMAX'
@@ -376,7 +377,7 @@
             TAU(I)=TAU(I-1)+6.65D-15*(NEW_ED(I-1)+NEW_ED(I))*(R(I-1)-R(I))*0.5D0
           END DO
 !
-! Determine radius at which optical depth is unity in old model. 
+! Determine radius at which optical depth is unity in old model.
 !
 	  OLD_ED=OLD_ED*OLD_CLUMP_FAC
           OLD_TAU(1)=6.65D-15*OLD_ED(1)*OLD_R(1)

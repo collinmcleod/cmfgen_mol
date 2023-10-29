@@ -1,5 +1,5 @@
 
-        HAS ISSUES BECAUSE NU_VEC has inconsistent length if using 
+        HAS ISSUES BECAUSE NU_VEC has inconsistent length if using
         ARRAY OPS
 
 
@@ -21,7 +21,7 @@
 !	v14 -- Added the SPLIT_FRAC option to set the location of
 !		spacing for the different parts of the tail.
 !	v15 -- Adding a piece to make sure hard/soft x-ray lines are
-!		sampled well. Previously velocity step sizes were too large to sample 
+!		sampled well. Previously velocity step sizes were too large to sample
 !		through back scattered frequency.
 !
 !       v16 -- Added ability to set NU_MIN and NU_MAX as parameter. If user inputs
@@ -29,6 +29,7 @@
 !-----------------------------------------------------------------------------------------------
 !
 	SUBROUTINE GAMMA_NU_GRID_V17(NU_VEC,NU_GRID_VEC,NF_GRID_PTS)
+	USE SET_KIND_MODULE
 	USE GAMMA_NUC_DECAY_V2
 	USE NUC_ISO_MOD
 	USE MOD_RD_GAMRAY_CNTRL_VARIABLES
@@ -38,43 +39,43 @@
 !                          Changed names of internal subroutines.
 !                          Added deeallocate statement.
 !
-	INTEGER :: I,J,K,L,S 
+	INTEGER :: I,J,K,L,S
 	INTEGER :: IJ,JK
 	INTEGER :: IGAM
 	INTEGER :: INU
         INTEGER :: IOS
 	INTEGER :: NF_GRID_PTS
 !
-	REAL(10) :: NU_VEC(N_GAMMA) ! input lines read in from NUC_DECAY_DATA
-	REAL(10) :: NU_GRID_VEC(NU_GRID_MAX)
-	REAL(10) :: NU_NEW
-	REAL(10) :: NU_MAX
-	REAL(10) :: NU_MIN
-	REAL(10) :: DNU
-	REAL(10) :: DNU_BLUE
-	REAL(10) :: DNU_LINE
-	REAL(10) :: DNU_RED
-	REAL(10) :: DNU_INF1
-	REAL(10) :: DNU_INF2
-	REAL(10) :: DNU_LINE_MIN
-	REAL(10) :: DNU_TAIL_MIN
-	REAL(10) :: BETA_LINE_MIN
-	REAL(10) :: BETA_TAIL_MIN
-	REAL(10) :: BETA_INF_MIN
-	REAL(10) :: BETA
-	REAL(10) :: VGAUSS,VINF
-        REAL(10) :: FWHM
-	REAL(10) :: EN_SUM
-	REAL(10) :: T1,T2,T3
-	REAL(10), DIMENSION(:), ALLOCATABLE :: WORK1
-        REAL(10), DIMENSION(:), ALLOCATABLE :: NU_BLUE
-        REAL(10), DIMENSION(:), ALLOCATABLE :: NU_RED
-        REAL(10), DIMENSION(:), ALLOCATABLE :: NU_RED_INF1
-        REAL(10), DIMENSION(:), ALLOCATABLE :: NU_RED_INF2
-	REAL(10), PARAMETER :: SOL = 299792 ! Units of km/s
-	REAL(10), PARAMETER :: PLANCK = 4.135668E-21 ! UNITS OF MeV*s SINCE PHOTON ENERGIES IN MeV
-	REAL(10), PARAMETER :: ERGS_TO_MEV = 624150.9
-	REAL(10), PARAMETER :: HoMC2 = 8.09330118D-21  ! HoMC2 = h/mc^2 in units of seconds
+	REAL(KIND=LDP) :: NU_VEC(N_GAMMA) ! input lines read in from NUC_DECAY_DATA
+	REAL(KIND=LDP) :: NU_GRID_VEC(NU_GRID_MAX)
+	REAL(KIND=LDP) :: NU_NEW
+	REAL(KIND=LDP) :: NU_MAX
+	REAL(KIND=LDP) :: NU_MIN
+	REAL(KIND=LDP) :: DNU
+	REAL(KIND=LDP) :: DNU_BLUE
+	REAL(KIND=LDP) :: DNU_LINE
+	REAL(KIND=LDP) :: DNU_RED
+	REAL(KIND=LDP) :: DNU_INF1
+	REAL(KIND=LDP) :: DNU_INF2
+	REAL(KIND=LDP) :: DNU_LINE_MIN
+	REAL(KIND=LDP) :: DNU_TAIL_MIN
+	REAL(KIND=LDP) :: BETA_LINE_MIN
+	REAL(KIND=LDP) :: BETA_TAIL_MIN
+	REAL(KIND=LDP) :: BETA_INF_MIN
+	REAL(KIND=LDP) :: BETA
+	REAL(KIND=LDP) :: VGAUSS,VINF
+        REAL(KIND=LDP) :: FWHM
+	REAL(KIND=LDP) :: EN_SUM
+	REAL(KIND=LDP) :: T1,T2,T3
+	REAL(KIND=LDP), DIMENSION(:), ALLOCATABLE :: WORK1
+        REAL(KIND=LDP), DIMENSION(:), ALLOCATABLE :: NU_BLUE
+        REAL(KIND=LDP), DIMENSION(:), ALLOCATABLE :: NU_RED
+        REAL(KIND=LDP), DIMENSION(:), ALLOCATABLE :: NU_RED_INF1
+        REAL(KIND=LDP), DIMENSION(:), ALLOCATABLE :: NU_RED_INF2
+	REAL(KIND=LDP), PARAMETER :: SOL = 299792 ! Units of km/s
+	REAL(KIND=LDP), PARAMETER :: PLANCK = 4.135668E-21 ! UNITS OF MeV*s SINCE PHOTON ENERGIES IN MeV
+	REAL(KIND=LDP), PARAMETER :: ERGS_TO_MEV = 624150.9
+	REAL(KIND=LDP), PARAMETER :: HoMC2 = 8.09330118D-21  ! HoMC2 = h/mc^2 in units of seconds
 !
 	INTEGER, DIMENSION(:), ALLOCATABLE :: MY_INDEX
 	INTEGER :: LUER
@@ -202,9 +203,9 @@
 	WRITE(LUER,*)"NU_RED_INF2(NGAM):",NU_RED_INF2(NGAM)
 	WRITE(LUER,*)"NU_RED_INF2(NGAM) (keV):",NU_RED_INF2(NGAM)*PLANCK*1.0D3
 !
-!--------------------------------------------------------------------- 
+!---------------------------------------------------------------------
 ! Establishing the starting value for our NU grid
-!--------------------------------------------------------------------- 
+!---------------------------------------------------------------------
 !
 	NU_GRID_VEC=0.0D0
 	NU_NEW=NU_MAX
@@ -261,7 +262,7 @@
 		NU_GRID_VEC(INU)=NU_NEW
 		CALL GAM_NU_GRID_ERR(INU,NU_GRID_VEC,NU_GRID_MAX,IGAM,NU_VEC,&
 		    NU_BLUE,NU_RED,NU_RED_INF1,NU_RED_INF2,NGAM,STRING,STRING2,LUER)
-	      END IF 
+	      END IF
 		! Got up to the blue edge of the line
 !
 	    ELSE IF (NU_NEW .LE. NU_BLUE(IGAM) .AND. &
@@ -462,9 +463,9 @@
 		EXIT
 	      END IF
 	    END IF ! finished going through ALL parts of the line NU .GT. NU_BLUE(P)
-	  END DO ! End of DO WHILE(NU_NEW .GT. NU_RED_INF2(IGAM)) loop 
+	  END DO ! End of DO WHILE(NU_NEW .GT. NU_RED_INF2(IGAM)) loop
 	END DO ! End of all lines. NE_GRID_VEC(IGAM)=NU_RED_INF2(IGAM)
-! 
+!
 ! What is left to do is go to the minimum frequency denoted at the top
 ! of the code
 !
@@ -523,6 +524,7 @@
         END SUBROUTINE
 !
 	SUBROUTINE GAM_NU_GRID_ERR(INU,NU,NMAX,IGAM,NU_LINES,NU_BLUE,NU_RED,&
+	USE SET_KIND_MODULE
 			NU_INF1,NU_INF2,NGAM,WARNING,STRING,LUER)
 	IMPLICIT NONE
 !
@@ -532,13 +534,13 @@
 	INTEGER :: NGAM
 	INTEGER :: LUER
 !
-	REAL(10) :: NU(NMAX)
-	REAL(10) :: NU_LINES(NGAM)
-	REAL(10) :: NU_BLUE(NGAM)
-	REAL(10) :: NU_RED(NGAM)
-	REAL(10) :: NU_INF1(NGAM)
-	REAL(10) :: NU_INF2(NGAM)
-	REAL(10), PARAMETER :: H = 4.135668E-21 ! MeV*s since NU is in Hz
+	REAL(KIND=LDP) :: NU(NMAX)
+	REAL(KIND=LDP) :: NU_LINES(NGAM)
+	REAL(KIND=LDP) :: NU_BLUE(NGAM)
+	REAL(KIND=LDP) :: NU_RED(NGAM)
+	REAL(KIND=LDP) :: NU_INF1(NGAM)
+	REAL(KIND=LDP) :: NU_INF2(NGAM)
+	REAL(KIND=LDP), PARAMETER :: H = 4.135668E-21 ! MeV*s since NU is in Hz
 !
 	CHARACTER(LEN=80) :: WARNING
 	CHARACTER(LEN=20) :: STRING
@@ -582,6 +584,7 @@
 	END
 !
 	SUBROUTINE GAM_TST_NU_GRID(IGAM,NGAM,INU,NMAX,STRING,LUER)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER :: IGAM

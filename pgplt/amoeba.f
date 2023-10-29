@@ -1,19 +1,20 @@
       SUBROUTINE AMOEBA(P,Y,MP,NP,NDIM,FTOL,FUNK,ITER)
+	USE SET_KIND_MODULE
       IMPLICIT NONE
       INTEGER ITER,MP,NDIM,NP
-      REAL(10) FTOL
-      REAL(10) P(MP,NP)
-      REAL(10) Y(MP)
-      REAL(10) FUNK
+      REAL(KIND=LDP) FTOL
+      REAL(KIND=LDP) P(MP,NP)
+      REAL(KIND=LDP) Y(MP)
+      REAL(KIND=LDP) FUNK
       INTEGER, PARAMETER :: ITMAX=20000
       EXTERNAL FUNK
 !
 ! Subroutine uses AMOTRY, FUNK
 !
       INTEGER I,IHI,ILO,INHI,J,M,N
-      REAL(10) RTOL,SUM,SWAP,YSAVE,YTRY
-      REAL(10) PSUM(NDIM)
-      REAL(10) AMOTRY
+      REAL(KIND=LDP) RTOL,SUM,SWAP,YSAVE,YTRY
+      REAL(KIND=LDP) PSUM(NDIM)
+      REAL(KIND=LDP) AMOTRY
 !
       ITER=0
 !
@@ -98,4 +99,4 @@
       endif
       goto 2
       END
-!  (C) Copr. 1986-92 Numerical Recipes Software 
+!  (C) Copr. 1986-92 Numerical Recipes Software

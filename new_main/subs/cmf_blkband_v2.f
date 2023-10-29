@@ -17,6 +17,7 @@
 !
 	SUBROUTINE CMF_BLKBAND_V2(STEQ,POPS,SOL_TYPE,FLAG,
 	1                           DIAG_INDX,N,NION,NUM_BNDS,ND,FIX_IMPURITY)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Created 23-Mar-2001: Based on BLKBAND (See BLKBAND for earlier alterations.
@@ -185,23 +186,23 @@ C******************************************************************************
 C
 	INTEGER N,NION,ND,NUM_BNDS,DIAG_INDX
 	CHARACTER*(*) SOL_TYPE
-	REAL(10) STEQ_STORE(N,ND)
-        REAL(10) STEQ(N,ND)
-        REAL(10) POPS(N,ND)
+	REAL(KIND=LDP) STEQ_STORE(N,ND)
+        REAL(KIND=LDP) STEQ(N,ND)
+        REAL(KIND=LDP) POPS(N,ND)
 	LOGICAL FLAG
 	LOGICAL FIX_IMPURITY
 !
 ! Local variables
 !
-        REAL(10), ALLOCATABLE :: B_MAT(:,:)
-        REAL(10), ALLOCATABLE :: C_MAT(:,:)
-        REAL(10), ALLOCATABLE :: D_MAT(:,:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: B_MAT(:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: C_MAT(:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: D_MAT(:,:,:)
 C
-        REAL(10) ROW_SF(N)
-        REAL(10) COL_SF(N)
-        REAL(10) VEC(N)
-        REAL(10) ROW_CND,COL_CND,MAX_VAL
-        REAL(10) RUB	      !Not accessed when passed.
+        REAL(KIND=LDP) ROW_SF(N)
+        REAL(KIND=LDP) COL_SF(N)
+        REAL(KIND=LDP) VEC(N)
+        REAL(KIND=LDP) ROW_CND,COL_CND,MAX_VAL
+        REAL(KIND=LDP) RUB	      !Not accessed when passed.
 !
 	INTEGER DEPTH_INDX
 	INTEGER BAND_INDX
@@ -218,8 +219,8 @@ C
 	INTEGER KD
 	LOGICAL SMALL_D_MAT
 C
-        REAL(10),      PARAMETER :: DP_NEG_ONE=-1.0D0
-        REAL(10),      PARAMETER :: DP_ONE=1.0D0
+        REAL(KIND=LDP),      PARAMETER :: DP_NEG_ONE=-1.0D0
+        REAL(KIND=LDP),      PARAMETER :: DP_ONE=1.0D0
         INTEGER,   PARAMETER :: INT_ONE=1
         INTEGER,   PARAMETER :: NSNG=1
         CHARACTER*1, PARAMETER :: NO_TRANS='N'
@@ -403,7 +404,7 @@ C
 C
 C 
 C
-C Now do the general case. 
+C Now do the general case.
 C
 	DO K=2,ND-1
 !

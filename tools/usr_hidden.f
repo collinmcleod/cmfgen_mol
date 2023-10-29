@@ -46,7 +46,7 @@ c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
 c written  3/4/97  DLM  Modeled after usr_option
 c
-c altered  3/17/97 DLM  Removed main_option from list of passed 
+c altered  3/17/97 DLM  Removed main_option from list of passed
 c                         variables.  Now store hidden options in
 c                         variable string.
 c
@@ -70,6 +70,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_hidden_real(input,var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -85,7 +86,7 @@ c options are not written in .sve files unless their values are changed
 c
 c written   3/4/96  DLM  Modified copy of usr_option
 c
-c altered  3/17/97  DLM  Removed main_option from list of passed 
+c altered  3/17/97  DLM  Removed main_option from list of passed
 c                          variables.  Now store hidden options in
 c                          variable string.
 c                        Now read and write var_name as all capital
@@ -104,7 +105,7 @@ c
 c
       integer :: l,o_start,o_end
 c
-      REAL(10) :: input
+      REAL(KIND=LDP) :: input
 c
       character(len=*) :: var_name,description,default
       character(len=120) :: answer,sve_string,option,all_caps
@@ -181,6 +182,7 @@ c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_hidden_real_dim(input,dim,required,var_name,
      *     default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -196,7 +198,7 @@ c options are not written in .sve files unless their values are changed
 c
 c written   3/4/96  DLM  Modified copy of usr_option
 c
-c altered  3/17/97  DLM  Removed main_option from list of passed 
+c altered  3/17/97  DLM  Removed main_option from list of passed
 c                          variables.  Now store hidden options in
 c                          variable string.
 c                        Now read and write var_name as all capital
@@ -218,8 +220,8 @@ c
       integer :: i,l,o_start,o_end,found
       integer :: m,start,stop,step,count
 c
-      REAL(10), dimension(dim) :: input
-      REAL(10) t1
+      REAL(KIND=LDP), dimension(dim) :: input
+      REAL(KIND=LDP) t1
 c
       character(len=*) :: var_name,description,default
       character(len=120) :: answer,sve_string,option,number,all_caps
@@ -327,6 +329,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_hidden_integer(input,var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -342,7 +345,7 @@ c options are not written in .sve files unless their values are changed
 c
 c written   3/4/96  DLM  Modified copy of usr_option
 c
-c altered  3/17/97  DLM  Removed main_option from list of passed 
+c altered  3/17/97  DLM  Removed main_option from list of passed
 c                          variables.  Now store hidden options in
 c                          variable string.
 c                        Now read and write var_name as all capital
@@ -438,6 +441,7 @@ c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_hidden_integer_dim(input,dim,required,var_name,
      *     default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -453,7 +457,7 @@ c options are not written in .sve files unless their values are changed
 c
 c written   3/4/96  DLM  Modified copy of usr_option
 c
-c altered  3/17/97  DLM  Removed main_option from list of passed 
+c altered  3/17/97  DLM  Removed main_option from list of passed
 c                          variables.  Now store hidden options in
 c                          variable string.
 c                        Now read and write var_name as all capital
@@ -587,6 +591,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_hidden_logical(input,var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -602,7 +607,7 @@ c options are not written in .sve files unless their values are changed
 c
 c  written  3/4/96  DLM  Modified copy of usr_option
 c
-c altered  3/17/97  DLM  Removed main_option from list of passed 
+c altered  3/17/97  DLM  Removed main_option from list of passed
 c                          variables.  Now store hidden options in
 c                          variable string.
 c                        Now read and write var_name as all capital
@@ -696,6 +701,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_hidden_string(input,var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -711,7 +717,7 @@ c options are not written in .sve files unless their values are changed
 c
 c written  3/4/96  DLM  Modified copy of usr_option
 c
-c altered  3/17/97  DLM  Removed main_option from list of passed 
+c altered  3/17/97  DLM  Removed main_option from list of passed
 c                          variables.  Now store hidden options in
 c                          variable string.
 c                        Now read and write var_name as all capital

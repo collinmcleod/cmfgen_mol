@@ -13,6 +13,7 @@ C
 	1                        SMALL_RAT,BIG_AMP,DNU_MAX,MAX_FREQ,MIN_FREQ,
 	1                        dV_LEV,AMP_DIS,MIN_FREQ_LEV_DIS,
 	1                        N,NCF,NCF_MAX,LUOUT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 26-May-1996 : ERROR_LU installed.
@@ -20,43 +21,43 @@ C Cleaned
 C Created 29-Mar-1990 (Based on GEN_FREQ).
 C
 	INTEGER N,NCF,NCF_MAX,LUOUT,INDX(NCF_MAX)
-	REAL(10) FREQ(NCF_MAX),NEW_FREQ(NCF_MAX)
+	REAL(KIND=LDP) FREQ(NCF_MAX),NEW_FREQ(NCF_MAX)
 C
-	REAL(10) MAX_FREQ		!Maximum continuum frequency
-	REAL(10) MIN_FREQ		!Minimum continuum frequency
-	REAL(10) DNU_MAX		! Twice the maximum frequency spacing near/above
+	REAL(KIND=LDP) MAX_FREQ		!Maximum continuum frequency
+	REAL(KIND=LDP) MIN_FREQ		!Minimum continuum frequency
+	REAL(KIND=LDP) DNU_MAX		! Twice the maximum frequency spacing near/above
 				!  bound-free edge: i.e. dNU < 0.5* DNU_MAX
-	REAL(10) BIG_AMP  	!Amplification. dNU increases by a factor
+	REAL(KIND=LDP) BIG_AMP  	!Amplification. dNU increases by a factor
 				! BIG_AMP as we move away from the b.f. edge.
 				! for frequencies above SWITCH_FREQ.
-   	REAL(10) SMALL_RAT	!Used to define frequency spacing for
+   	REAL(KIND=LDP) SMALL_RAT	!Used to define frequency spacing for
 				! frequencies less than SWITCH_FREQ.
 				! dNU/NU=SMALL_RAT-1
 C
 C Parameters for installing etra frequencies near bound-free edges
 C (low frequency side) to allow for level dissolution.
 C
-	REAL(10) dV_LEV			!Spacing near b-f edge.
-	REAL(10) AMP_DIS			!Amplification factor for dNU as we
+	REAL(KIND=LDP) dV_LEV			!Spacing near b-f edge.
+	REAL(KIND=LDP) AMP_DIS			!Amplification factor for dNU as we
 					!  move to smaller frequencies.
-	REAL(10) MIN_FREQ_LEV_DIS		!Indicates that the extra frequencies
+	REAL(KIND=LDP) MIN_FREQ_LEV_DIS		!Indicates that the extra frequencies
 					! should only be installed for
 					! frequencies above MIN_FREQ_LEV_DIS.
 C
-        REAL(10), PARAMETER :: RZERO=0.0D0
-        REAL(10), PARAMETER :: RHALF=0.5D0
-        REAL(10), PARAMETER :: RONE=1.0D0
-        REAL(10), PARAMETER :: RTWO=2.0D0
+        REAL(KIND=LDP), PARAMETER :: RZERO=0.0D0
+        REAL(KIND=LDP), PARAMETER :: RHALF=0.5D0
+        REAL(KIND=LDP), PARAMETER :: RONE=1.0D0
+        REAL(KIND=LDP), PARAMETER :: RTWO=2.0D0
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
-	REAL(10) T1,dV_NEW,dV
+	REAL(KIND=LDP) T1,dV_NEW,dV
 C
 	INTEGER I,J,K,L,NPTS,K_BEG
 	LOGICAL NUMER,EQUAL
-	REAL(10) FAC,EQUAL_FAC
-	REAL(10) UP,LOW,DELF,DIFF,RAT,SWITCH_FREQ
+	REAL(KIND=LDP) FAC,EQUAL_FAC
+	REAL(KIND=LDP) UP,LOW,DELF,DIFF,RAT,SWITCH_FREQ
 C
 	LUER=ERROR_LU()
 C

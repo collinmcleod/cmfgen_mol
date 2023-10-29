@@ -1,5 +1,5 @@
         PROGRAM TST_SEC
-        REAL(10) T1
+        REAL(KIND=LDP) T1
         INTEGER IC0,IC,IR,IM
         CALL SYSTEM_CLOCK(IC0,IR,IM)
 !

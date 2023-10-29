@@ -1,13 +1,13 @@
 !
-! Subroutine to increment the EHB variation matrix BA due to the variation 
+! Subroutine to increment the EHB variation matrix BA due to the variation
 ! of J associated with free-free radiation and level populations.
 !
 ! The variation equation is not updated for LAMBDA iterations.
 !
 ! BA_T_PAR_EHB is used for the diagonal variation only. It is updated on each call
 ! rather than BA to improve numerical stability. BA_PAR should contain terms
-! of similar size. BA_T_PAR_EHB will need to be added to BA_T_PAR after every 
-! every N frequencies. In this way the matrices should suffer less cancelation 
+! of similar size. BA_T_PAR_EHB will need to be added to BA_T_PAR after every
+! every N frequencies. In this way the matrices should suffer less cancelation
 ! effects due to the addition of large positive and negative ! terms.
 !
 ! Utilizesg the fact that consecutive frequency terms should be correlated, and
@@ -18,28 +18,29 @@
 	1              ETA_FF,CHI_FF,T,POPS,RJ,
 	1              FQW,NEW_CONT,FINAL_FREQ,DO_SRCE_VAR_ONLY,
 	1              NION,NT,NUM_BNDS,ND,DST,DEND)
-	USE STEQ_DATA_MOD 
+	USE SET_KIND_MODULE
+	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
 ! Created 14-Jul-2019
 !
-	REAL(10), SAVE, ALLOCATABLE ::  VJ_T(:,:,:)
+	REAL(KIND=LDP), SAVE, ALLOCATABLE ::  VJ_T(:,:,:)
 	INTEGER, SAVE :: CNT=0
 !
 	INTEGER NION
   	INTEGER NT,NUM_BNDS,ND,DST,DEND
-	REAL(10) VJ(NT,NUM_BNDS,ND)
-	REAL(10) POPS(NT,ND)
-	REAL(10) VCHI_FF(NT,ND)
-	REAL(10) VETA_FF(NT,ND)
-	REAL(10) RJ(ND)
+	REAL(KIND=LDP) VJ(NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) VCHI_FF(NT,ND)
+	REAL(KIND=LDP) VETA_FF(NT,ND)
+	REAL(KIND=LDP) RJ(ND)
 !
-	REAL(10) ETA_FF(ND)
-	REAL(10) CHI_FF(ND)
-	REAL(10) T(ND)
+	REAL(KIND=LDP) ETA_FF(ND)
+	REAL(KIND=LDP) CHI_FF(ND)
+	REAL(KIND=LDP) T(ND)
 !
-	REAL(10) NU
-	REAL(10) FQW
+	REAL(KIND=LDP) NU
+	REAL(KIND=LDP) FQW
 !
 ! NEW_CONT indicates that this is the first frequency of a new continuum band
 ! in which the continuum cross-sections are constant. FINAL_FREQ indicates
@@ -52,9 +53,9 @@
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 !
-	REAL(10) FOUR_PI
-	REAL(10) T1,T2,QFV_T
-	REAL(10) RJ_RAD(ND)
+	REAL(KIND=LDP) FOUR_PI
+	REAL(KIND=LDP) T1,T2,QFV_T
+	REAL(KIND=LDP) RJ_RAD(ND)
 	INTEGER I,J,K,L,LS,IOS,JJ,ID
 	INTEGER DIAG_INDX,BNDST,BNDEND
 !
@@ -86,7 +87,7 @@
 	END IF
 !
 ! Perform the frequency integral of dJ over. Procedure depends on whether
-! this is a new frequency of part of a band. 
+! this is a new frequency of part of a band.
 !
 	T1=1.0D-10*FOUR_PI*FQW
 	IF(NEW_CONT)THEN
@@ -107,7 +108,7 @@
 	    DO K=1,NUM_BNDS
 	      IF(K .EQ. DIAG_INDX)THEN
 	        DO I=1,NT
-	           VJ_T(I,K,L)= VJ_T(I,K,L) + 
+	           VJ_T(I,K,L)= VJ_T(I,K,L) +
 	1              T1*( RJ_RAD(L)*VCHI_FF(I,L) - VETA_FF(I,L)+ CHI_FF(L)*VJ(I,K,L) )
 	        END DO
 	      ELSE

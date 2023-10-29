@@ -1,9 +1,10 @@
 !
 ! Routine to alter the Statistical Equilibrium equations so that
-! a particular population is held fixed. 
+! a particular population is held fixed.
 !
 	SUBROUTINE FIXPOP_IN_BA_V2(BA,STEQ,NT,ND,NION,DIAG_BAND,DEPTH_INDX,
 	1             FIRST_MATRIX,LAST_MATRIX,FIX_IMPURITY)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -15,8 +16,8 @@
 	INTEGER ND
 	INTEGER NION
 	INTEGER DEPTH_INDX
-	REAL(10) BA(NT,NT)
-	REAL(10) STEQ(NT)
+	REAL(KIND=LDP) BA(NT,NT)
+	REAL(KIND=LDP) STEQ(NT)
 	LOGICAL FIRST_MATRIX
 	LOGICAL LAST_MATRIX
 	LOGICAL DIAG_BAND
@@ -35,7 +36,7 @@
 ! Variables to allow information to be output regarding the number
 ! of levels and depths where a population was held fixed.
 !
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER, SAVE, ALLOCATABLE :: CNT(:)
 !
 	LUER=ERROR_LU()
@@ -50,7 +51,7 @@
 	IF(FIRST_MATRIX .AND. DIAG_BAND)CNT(:)=0
 !
 ! FIX_NSPEC takes priority in determining the number of levels
-! to be fixed. 
+! to be fixed.
 !
 	DO ID=1,NUM_IONS
 	  ISPEC=SPECIES_LNK(ID)
@@ -68,7 +69,7 @@
 ! update depth counter.
 !
 	      IF(LOC_IMP)THEN
-	        T1=ATM(ID-1)%DXzV(DEPTH_INDX)/POP_SPECIES(DEPTH_INDX,SPECIES_LNK(ID)) 
+	        T1=ATM(ID-1)%DXzV(DEPTH_INDX)/POP_SPECIES(DEPTH_INDX,SPECIES_LNK(ID))
 	        IF(T1 .LT. 1.0D-15)THEN
 	          BA(LOC_EQ,:)=0.0D0
 	          BA(LOC_EQ,LOC_EQ)=1.0D0
@@ -104,7 +105,7 @@
 	      T1=0
 	      DO J=1,ATM(ID)%NXzV
 	        T1=T1+ATM(ID)%XzV(J,DEPTH_INDX)
-	      END DO        
+	      END DO
 	      IF( T1/POP_SPECIES(DEPTH_INDX,SPECIES_LNK(ID)) .GT. 1.0D-15 )FIX_N=-10
 	    END IF
 	    LOC_EQ=ATM(ID)%EQXzV

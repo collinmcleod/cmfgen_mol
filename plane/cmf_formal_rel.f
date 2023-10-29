@@ -1,29 +1,29 @@
 	MODULE EXT_REL_GRID
-	  REAL(10), ALLOCATABLE :: R_EXT(:)
-	  REAL(10), ALLOCATABLE :: LOG_R_EXT(:)
-	  REAL(10), ALLOCATABLE :: Z_EXT(:)
-	  REAL(10), ALLOCATABLE :: V_EXT(:)
-	  REAL(10), ALLOCATABLE :: VDOP_VEC_EXT(:)
-	  REAL(10), ALLOCATABLE :: SIGMA_EXT(:)
-	  REAL(10), ALLOCATABLE :: ETA_EXT(:)
-	  REAL(10), ALLOCATABLE :: CHI_EXT(:)
-	  REAL(10), ALLOCATABLE :: LOG_ETA_EXT(:)
-	  REAL(10), ALLOCATABLE :: LOG_CHI_EXT(:)
-	  REAL(10), ALLOCATABLE :: TMP_VEC(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: R_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: LOG_R_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: Z_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: V_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: VDOP_VEC_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: SIGMA_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: ETA_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: CHI_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: LOG_ETA_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: LOG_CHI_EXT(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: TMP_VEC(:)
 !
-	  REAL(10), ALLOCATABLE :: JNU_MID(:)
-	  REAL(10), ALLOCATABLE :: HNU_MID(:)
-	  REAL(10), ALLOCATABLE :: KNU_MID(:)
-	  REAL(10), ALLOCATABLE :: NNU_MID(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: JNU_MID(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: HNU_MID(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: KNU_MID(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: NNU_MID(:)
 !
-	  REAL(10), ALLOCATABLE :: MIDR(:)
-	  REAL(10), ALLOCATABLE :: GAM_REL(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: MIDR(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: GAM_REL(:)
 !
-	  REAL(10), ALLOCATABLE :: CHI_COEF(:,:)
-	  REAL(10), ALLOCATABLE :: ETA_COEF(:,:)
+	  REAL(KIND=LDP), ALLOCATABLE :: CHI_COEF(:,:)
+	  REAL(KIND=LDP), ALLOCATABLE :: ETA_COEF(:,:)
 !
-	  REAL(10), ALLOCATABLE :: CHI_RAY(:)
-	  REAL(10), ALLOCATABLE :: ETA_RAY(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: CHI_RAY(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: ETA_RAY(:)
 !
 	  INTEGER ND_EXT
 	  INTEGER ND_ADD
@@ -43,6 +43,7 @@
 	1                  FREQ,dLOG_NU,DIF,B_PLANCK,DBB,IC,THICK_OB,
 	1                  N_TYPE,VDOP_VEC,VDOP_FRAC,
 	1                  METHOD,INITIALIZE,NEW_FREQ,NC,NP,ND)
+	USE SET_KIND_MODULE
         USE EXT_REL_GRID
 	USE MOD_SPACE_GRID_V2
 	IMPLICIT NONE
@@ -51,48 +52,48 @@
         INTEGER ND
         INTEGER NP
 !
-	REAL(10) R(ND)
-        REAL(10) V(ND)
-	REAL(10) SIGMA(ND)
-	REAL(10) P(NP)
-	REAL(10) ETA(ND)	
-	REAL(10) CHI(ND)
-	REAL(10) ESEC(ND)
-	REAL(10) VDOP_VEC(ND)
-	REAL(10) VDOP_FRAC
-	REAL(10) DELV_FRAC_FG
+	REAL(KIND=LDP) R(ND)
+        REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) SIGMA(ND)
+	REAL(KIND=LDP) P(NP)
+	REAL(KIND=LDP) ETA(ND)	
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) ESEC(ND)
+	REAL(KIND=LDP) VDOP_VEC(ND)
+	REAL(KIND=LDP) VDOP_FRAC
+	REAL(KIND=LDP) DELV_FRAC_FG
 !
 ! NB: J,H,K,N refer to the first 4 moments of the radiation field.
 !
-        REAL(10) JNU(ND)
-	REAL(10) HNU(ND)
-	REAL(10) KNU(ND)
-	REAL(10) NNU(ND)
-	REAL(10) H_ON_J(ND)
-	REAL(10) K_ON_J(ND)
-	REAL(10) N_ON_J(ND)
+        REAL(KIND=LDP) JNU(ND)
+	REAL(KIND=LDP) HNU(ND)
+	REAL(KIND=LDP) KNU(ND)
+	REAL(KIND=LDP) NNU(ND)
+	REAL(KIND=LDP) H_ON_J(ND)
+	REAL(KIND=LDP) K_ON_J(ND)
+	REAL(KIND=LDP) N_ON_J(ND)
 !
-	REAL(10) K_ON_J_MID(ND)
-	REAL(10) N_ON_H_MID(ND)
-	REAL(10) RSQN_MID_ON_RSQJ(ND)
+	REAL(KIND=LDP) K_ON_J_MID(ND)
+	REAL(KIND=LDP) N_ON_H_MID(ND)
+	REAL(KIND=LDP) RSQN_MID_ON_RSQJ(ND)
 !
-        REAL(10) IPLUS(NP)
-        REAL(10) MU_AT_RMAX(NP)
-        REAL(10) HQW_AT_RMAX(NP)
-        REAL(10) IN_HBC
-	REAL(10) HBC
-	REAL(10) NBC
+        REAL(KIND=LDP) IPLUS(NP)
+        REAL(KIND=LDP) MU_AT_RMAX(NP)
+        REAL(KIND=LDP) HQW_AT_RMAX(NP)
+        REAL(KIND=LDP) IN_HBC
+	REAL(KIND=LDP) HBC
+	REAL(KIND=LDP) NBC
 !
-	REAL(10) B_PLANCK
-	REAL(10) DBB
-	REAL(10) IC
-	REAL(10) FREQ
-	REAL(10) dLOG_NU
+	REAL(KIND=LDP) B_PLANCK
+	REAL(KIND=LDP) DBB
+	REAL(KIND=LDP) IC
+	REAL(KIND=LDP) FREQ
+	REAL(KIND=LDP) dLOG_NU
 	CHARACTER*6 METHOD
 	CHARACTER*6 N_TYPE
 	LOGICAL DIF		!Use diffusion approximation
 !
-! Use "Thick" boundary condition. at outer boundary. Only noted when INITIALIZE 
+! Use "Thick" boundary condition. at outer boundary. Only noted when INITIALIZE
 ! is true. All subsequent frequencies will use the same boundary condition
 ! independent of the passed value (Until INITIALIZE is set to TRUE again).
 !
@@ -116,17 +117,17 @@
 	INTEGER, PARAMETER :: IONE=1
 	LOGICAL, PARAMETER :: LFALSE=.FALSE.
 	LOGICAL, PARAMETER :: LTRUE=.TRUE.
-!                
-	REAL(10) DBC
-	REAL(10) I_CORE
-	REAL(10) T1,T2
-	REAL(10) ALPHA
-	REAL(10) ESEC_POW
-	REAL(10) BETA
-	REAL(10) VINF
-	REAL(10) RMAX
-	REAL(10) DEL_R_FAC
-	REAL(10) NU_ON_dNU
+!
+	REAL(KIND=LDP) DBC
+	REAL(KIND=LDP) I_CORE
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) ALPHA
+	REAL(KIND=LDP) ESEC_POW
+	REAL(KIND=LDP) BETA
+	REAL(KIND=LDP) VINF
+	REAL(KIND=LDP) RMAX
+	REAL(KIND=LDP) DEL_R_FAC
+	REAL(KIND=LDP) NU_ON_dNU
 	CHARACTER(LEN=20) BOUNDARY
 !
 	INTEGER NDM1
@@ -134,8 +135,8 @@
 	INTEGER NP_LIMIT
 	INTEGER NRAY
 !
-	REAL(10) C_KMS
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	INTEGER LUER
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU, SPEED_OF_LIGHT
@@ -228,7 +229,7 @@
 	    ELSE
 	      RMAX=MIN(10.0D0,SQRT(R(1)/R(ND)))*R(1)
 	    END IF
-	    ALPHA=R(1)+(R(1)-R(2))                               
+	    ALPHA=R(1)+(R(1)-R(2))
 	    DEL_R_FAC=EXP( LOG(RMAX/ALPHA)/(ND_ADD-4) )
 	    R_EXT(1)=RMAX
 	    R_EXT(5)=RMAX/DEL_R_FAC
@@ -281,7 +282,7 @@
 ! to stimulated emission. In such a case we simply assume an 1/r^2
 ! extrapolation.
 !
-! We also interpolate in ESEC, since ESEC (in the absence of negative 
+! We also interpolate in ESEC, since ESEC (in the absence of negative
 ! absorption) provides a lower bound to the opacity. NB: When CHI is much
 ! larger then ESEC its variation with r dominates, and it is possible to
 ! extrapolate CHI below ESEC.
@@ -376,7 +377,7 @@
 	  END DO	
 	END IF
 !
-! If no points have been inserted on the rays, CHI and ETA are the same for 
+! If no points have been inserted on the rays, CHI and ETA are the same for
 ! all rays.
 !
 	IF(.NOT. RAY_POINTS_INSERTED)THEN
@@ -407,7 +408,7 @@
                 CHI_RAY(I)=EXP(T2)
                 T2=((ETA_COEF(K,1)*T1+ETA_COEF(K,2))*T1+ETA_COEF(K,3))*T1+ETA_COEF(K,4)
                 ETA_RAY(I)=EXP(T2)
-	      ELSE 
+	      ELSE
 	        K=K+1
                 GOTO 100
 	      END IF

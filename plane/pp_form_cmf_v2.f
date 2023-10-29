@@ -3,10 +3,11 @@
 ! saved between subroutine calls.
 !
 	MODULE PP_FORM_CMF_MOD_V2
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! The *_STORE locations are used to store the radiation field, as computed
-! on the previous call to PP_FORM. The *_PREV locations are used to store 
+! on the previous call to PP_FORM. The *_PREV locations are used to store
 ! the radiation field, as computed for the previous frequency. They are
 ! are updated from the *_STORE routines when NEW_FREQ is .TRUE.
 !
@@ -17,17 +18,17 @@
 !
 ! Dimensionded NRAY_MAX,NP
 !
-	REAL(10), ALLOCATABLE :: GAM(:,:)
-	REAL(10), ALLOCATABLE :: DTAU(:,:)
-	REAL(10), ALLOCATABLE :: AV(:,:)
-	REAL(10), ALLOCATABLE :: CV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAM(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: DTAU(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: AV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CV(:,:)
 !
 ! Dimensioned ND_EXT,4
 !
-	REAL(10), ALLOCATABLE :: V_COEF(:,:)
-	REAL(10), ALLOCATABLE :: SIGMA_COEF(:,:)
-	REAL(10), ALLOCATABLE :: CHI_COEF(:,:)
-	REAL(10), ALLOCATABLE :: ETA_COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: V_COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA_COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETA_COEF(:,:)
 !
 ! Dimensioned ND
 !
@@ -36,30 +37,30 @@
 !
 ! Dimensioned ND+ND_ADD=ND_EXT
 !
-	REAL(10), ALLOCATABLE :: R_EXT(:)
-	REAL(10), ALLOCATABLE :: LOG_R_EXT(:)
-	REAL(10), ALLOCATABLE :: V_EXT(:)
-	REAL(10), ALLOCATABLE :: SIGMA_EXT(:)
-	REAL(10), ALLOCATABLE :: ETA_EXT(:)
-	REAL(10), ALLOCATABLE :: CHI_EXT(:)
-	REAL(10), ALLOCATABLE :: LOG_ETA_EXT(:)
-	REAL(10), ALLOCATABLE :: LOG_CHI_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LOG_R_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: V_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETA_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LOG_ETA_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LOG_CHI_EXT(:)
 !
 ! Dimensioned NRAY_MAX
 !
 	INTEGER, ALLOCATABLE :: RAY_PNT(:)
-	REAL(10), ALLOCATABLE :: R_RAY(:)
-	REAL(10), ALLOCATABLE :: dCHIdR(:)
-	REAL(10), ALLOCATABLE :: Q(:)
-	REAL(10), ALLOCATABLE :: QH(:)
-	REAL(10), ALLOCATABLE :: V_RAY(:)
-	REAL(10), ALLOCATABLE :: TMPV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: dCHIdR(:)
+	REAL(KIND=LDP), ALLOCATABLE :: Q(:)
+	REAL(KIND=LDP), ALLOCATABLE :: QH(:)
+	REAL(KIND=LDP), ALLOCATABLE :: V_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TMPV(:)
 !
-	REAL(10), ALLOCATABLE :: SIGMA_RAY(:)
-	REAL(10), ALLOCATABLE :: ETA_RAY(:)
-	REAL(10), ALLOCATABLE :: CHI_RAY(:)
-	REAL(10), ALLOCATABLE :: dCHIdR_RAY(:)
-	REAL(10), ALLOCATABLE :: SOURCE_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETA_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: dCHIdR_RAY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SOURCE_RAY(:)
 !
 !***************************************************************************
 !***************************************************************************
@@ -67,27 +68,27 @@
 ! Variables specific to the DIFFERENCE equation approach for  solving the
 ! transfer equation.
 !	
-	REAL(10), ALLOCATABLE :: AV_PREV(:,:)
-	REAL(10), ALLOCATABLE :: AV_STORE(:,:)
-	REAL(10), ALLOCATABLE :: CV_PREV(:,:)
-	REAL(10), ALLOCATABLE :: CV_STORE(:,:)
-	REAL(10), ALLOCATABLE :: PAR_AV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: AV_PREV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: AV_STORE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CV_PREV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CV_STORE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: PAR_AV(:,:)
 !
-	REAL(10), ALLOCATABLE :: GAMH(:,:)
-	REAL(10), ALLOCATABLE :: TA(:,:)
-	REAL(10), ALLOCATABLE :: TB(:,:)
-	REAL(10), ALLOCATABLE :: TC(:,:)
-	REAL(10), ALLOCATABLE :: GB(:,:)
-	REAL(10), ALLOCATABLE :: H(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAMH(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: TC(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: GB(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: H(:,:)
 !
-	REAL(10), ALLOCATABLE :: XM(:)
-	REAL(10), ALLOCATABLE :: U(:)
-	REAL(10), ALLOCATABLE :: VB(:)
-	REAL(10), ALLOCATABLE :: VC(:)
-	REAL(10), ALLOCATABLE :: DIV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: XM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: U(:)
+	REAL(KIND=LDP), ALLOCATABLE :: VB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: VC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DIV(:)
 !
-	REAL(10), ALLOCATABLE :: OLDCHI(:)
-	REAL(10), ALLOCATABLE :: OLDCHI_STORE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDCHI(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDCHI_STORE(:)
 !
 !***************************************************************************
 !***************************************************************************
@@ -97,43 +98,43 @@
 !
 ! Dimensioned NRAY_MAX,NP
 !
-	REAL(10), ALLOCATABLE :: I_P_PREV(:,:)
-	REAL(10), ALLOCATABLE :: I_P_STORE(:,:)
-	REAL(10), ALLOCATABLE :: I_M_PREV(:,:)
-	REAL(10), ALLOCATABLE :: I_M_STORE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: I_P_PREV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: I_P_STORE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: I_M_PREV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: I_M_STORE(:,:)
 !
-	REAL(10), ALLOCATABLE :: A0(:,:)
-	REAL(10), ALLOCATABLE :: A1(:,:)
-	REAL(10), ALLOCATABLE :: A2(:,:)
-	REAL(10), ALLOCATABLE :: A3(:,:)
-	REAL(10), ALLOCATABLE :: A4(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: A0(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: A1(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: A2(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: A3(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: A4(:,:)
 !
-	REAL(10), ALLOCATABLE :: I_P(:,:)
-	REAL(10), ALLOCATABLE :: I_M(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: I_P(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: I_M(:,:)
 !
 ! Dimensioned NRAY_MAX
 !
-	REAL(10), ALLOCATABLE :: EE(:)
-	REAL(10), ALLOCATABLE :: E0(:)
-	REAL(10), ALLOCATABLE :: E1(:)
-	REAL(10), ALLOCATABLE :: E2(:)
-	REAL(10), ALLOCATABLE :: E3(:)
+	REAL(KIND=LDP), ALLOCATABLE :: EE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: E0(:)
+	REAL(KIND=LDP), ALLOCATABLE :: E1(:)
+	REAL(KIND=LDP), ALLOCATABLE :: E2(:)
+	REAL(KIND=LDP), ALLOCATABLE :: E3(:)
 !
-	REAL(10), ALLOCATABLE :: SOURCE_PRIME(:)
-	REAL(10), ALLOCATABLE :: S(:)
-	REAL(10), ALLOCATABLE :: dS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SOURCE_PRIME(:)
+	REAL(KIND=LDP), ALLOCATABLE :: S(:)
+	REAL(KIND=LDP), ALLOCATABLE :: dS(:)
 !
 ! NB: J,H,K,N refer to the first 4 moments of the radiation field.
 !     QW denotes quadrature weight.
 !
-	REAL(10), ALLOCATABLE :: MU(:)
-	REAL(10), ALLOCATABLE :: JQW(:)
-	REAL(10), ALLOCATABLE :: HQW(:)
-	REAL(10), ALLOCATABLE :: KQW(:)
-	REAL(10), ALLOCATABLE :: NQW(:)
+	REAL(KIND=LDP), ALLOCATABLE :: MU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: JQW(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HQW(:)
+	REAL(KIND=LDP), ALLOCATABLE :: KQW(:)
+	REAL(KIND=LDP), ALLOCATABLE :: NQW(:)
 !
-	REAL(10) PREVIOUS_FREQ
-	REAL(10) VDOP_FRAC_SAV
+	REAL(KIND=LDP) PREVIOUS_FREQ
+	REAL(KIND=LDP) VDOP_FRAC_SAV
 !
 	INTEGER ND_EXT
 	INTEGER ND_ADD
@@ -158,16 +159,16 @@
 !
 ! 
 !
-! Routine to compute the Eddington F, G and N_ON_J Eddington factors 
+! Routine to compute the Eddington F, G and N_ON_J Eddington factors
 ! for a single frequency. The transfer is done in the comoving-frame with
-! first order frequency differencing. A DIFFERENCE or INTEGRAL equation 
-! approach can be used. 
+! first order frequency differencing. A DIFFERENCE or INTEGRAL equation
+! approach can be used.
 !
 ! The DIFFERENCE equation approach is at least 30% faster. However,
 ! the INTEGRAL equation approach is more stable. Because monotonic cubic
 ! interpolation is used for the Source function in the INTEGRAL equation
 ! approach, the intensities are guaranteed positive (or zero).
-! 
+!
 ! The F, G, and N_ON_J Eddington factors are computed:
 !
 ! NB:
@@ -180,7 +181,7 @@
 !
 !     IF N_TYPE='G_ONLY' G is defined at all depths, and N_ON_J=0 at all depths.
 !     IF N_TYPE='N_ON_J' N_ON_J is defined at all depths, and G=0 at all depths.
-!     IF N_TYPE='MIXED' one of G or N_ON_J is 
+!     IF N_TYPE='MIXED' one of G or N_ON_J is
 !       non-zero, and is the value to be used in MOM_J_CMF
 !
 ! Routine also returns I+, so that observers flux can be computed. Note because
@@ -201,6 +202,7 @@
 	1               VDOP_VEC,VDOP_FRAC,
 	1               METHOD,SOLUTION_OPTIONS,THK,INCL_INCID_RAD,
 	1               INIT,NEW_FREQ,N_TYPE,NP,ND)
+	USE SET_KIND_MODULE
 	USE PP_FORM_CMF_MOD_V2
 	IMPLICIT NONE
 !
@@ -216,31 +218,31 @@
 !
 	INTEGER ND				!Number of depth points
 	INTEGER NP				!number of anlges
-	REAL(10) R(ND)
-	REAL(10) V(ND)				!In km/s
-	REAL(10) SIGMA(ND)			!dlnV/dlnR
-	REAL(10) ETA(ND)
-	REAL(10) CHI(ND)
-	REAL(10) ESEC(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)				!In km/s
+	REAL(KIND=LDP) SIGMA(ND)			!dlnV/dlnR
+	REAL(KIND=LDP) ETA(ND)
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) ESEC(ND)
 !
-	REAL(10) JNU(ND),HNU(ND),KNU(ND),NNU(ND),N_ON_J(ND)
-	REAL(10) IN_HBC,HBC,HBC_INCID,NBC,NBC_INCID
-	REAL(10) IPLUS_P(NP)
+	REAL(KIND=LDP) JNU(ND),HNU(ND),KNU(ND),NNU(ND),N_ON_J(ND)
+	REAL(KIND=LDP) IN_HBC,HBC,HBC_INCID,NBC,NBC_INCID
+	REAL(KIND=LDP) IPLUS_P(NP)
 !
 ! VDOP_VEC(I) is the minimum DOPPLER width for all species at depth I. It will include
-! both a turbulent, and and thermal contribution for the ionization species with the 
+! both a turbulent, and and thermal contribution for the ionization species with the
 ! highest mass. VDOP_FRAC is used to set the minimum velocity step size along a ray.
 !
-	REAL(10) VDOP_VEC(ND)
-	REAL(10) VDOP_FRAC
+	REAL(KIND=LDP) VDOP_VEC(ND)
+	REAL(KIND=LDP) VDOP_FRAC
 !
-	REAL(10) DBB,IC,FREQ,dLOG_NU
+	REAL(KIND=LDP) DBB,IC,FREQ,dLOG_NU
 	CHARACTER*(*) SOLUTION_OPTIONS
 	CHARACTER*6 METHOD
 	CHARACTER*6 N_TYPE
 	LOGICAL DIF		!Use diffusion approximation
 !
-! Use "Thick" boundary condition. at outer boundary. Only noted when INIT 
+! Use "Thick" boundary condition. at outer boundary. Only noted when INIT
 ! is true. All subsequent frequencies will use the same boundary condition
 ! independent of the passed value (Until INIT is set to TRUE again).
 !
@@ -268,16 +270,16 @@
 	INTEGER ACCESS_F
         INTEGER IOS,REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC
 !
-! The following arrays do not need to be stored, and hence can be created 
+! The following arrays do not need to be stored, and hence can be created
 ! each time.
 !
-	REAL(10) CV_BOUND(NP)		!Outer boundary V
-	REAL(10) I_M_IN_BND(NP)		!Inner boundary
-	REAL(10) IBOUND(NP)		!Incident intensity on outer boundary.
+	REAL(KIND=LDP) CV_BOUND(NP)		!Outer boundary V
+	REAL(KIND=LDP) I_M_IN_BND(NP)		!Inner boundary
+	REAL(KIND=LDP) IBOUND(NP)		!Incident intensity on outer boundary.
 !
 	INTEGER N_ERR_MAX,FG_ERR_CNT
 	PARAMETER (N_ERR_MAX=1000)
-	REAL(10) FG_ERR_ON_FREQ
+	REAL(KIND=LDP) FG_ERR_ON_FREQ
 	INTEGER FG_ERR_TYPE
 	COMMON /FG_J_CMF_ERR/FG_ERR_ON_FREQ(N_ERR_MAX),
 	1                    FG_ERR_TYPE(N_ERR_MAX),FG_ERR_CNT
@@ -288,25 +290,25 @@
 !
 ! Local variables.
 !
-	REAL(10), PARAMETER :: ZERO=0.0D0
-	REAL(10), PARAMETER :: ONE=1.0D0
+	REAL(KIND=LDP), PARAMETER :: ZERO=0.0D0
+	REAL(KIND=LDP), PARAMETER :: ONE=1.0D0
 	INTEGER, PARAMETER :: NINS=4
 !
 	LOGICAL, PARAMETER :: LFALSE=.FALSE.
 	LOGICAL, PARAMETER :: LTRUE=.TRUE.
-!                
+!
 	INTEGER I,J,K,LS
 !
-	REAL(10) DBC
-	REAL(10) I_CORE
-	REAL(10) T1,T2
-	REAL(10) ALPHA
-	REAL(10) ESEC_POW
-	REAL(10) BETA
-	REAL(10) VINF
-	REAL(10) RMAX,DEL_R_FAC
-	REAL(10) dR
-	REAL(10) DEL_R
+	REAL(KIND=LDP) DBC
+	REAL(KIND=LDP) I_CORE
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) ALPHA
+	REAL(KIND=LDP) ESEC_POW
+	REAL(KIND=LDP) BETA
+	REAL(KIND=LDP) VINF
+	REAL(KIND=LDP) RMAX,DEL_R_FAC
+	REAL(KIND=LDP) dR
+	REAL(KIND=LDP) DEL_R
 !
 ! Change the following statement to TRUE if running on a VECTOR machine.
 !
@@ -484,7 +486,7 @@
 	    ELSE
 	      RMAX=MIN(10.0D0,SQRT(R(1)/R(ND)))*R(1)
 	    END IF
-	    ALPHA=R(1)+(R(1)-R(2))                               
+	    ALPHA=R(1)+(R(1)-R(2))
 	    DEL_R_FAC=EXP( LOG(RMAX/ALPHA)/(ND_ADD-3) )
 	    R_EXT(1)=RMAX
 	    R_EXT(4)=RMAX/DEL_R_FAC
@@ -740,8 +742,8 @@
 	NEG_AV_VALUE=.FALSE.
 	NEG_NNU_VALUE=.FALSE.
 	BAD_NNU_VALUE=.FALSE.
-!         
-! Perform initializations. 
+!
+! Perform initializations.
 !
 	IF(INIT)THEN
 !
@@ -826,7 +828,7 @@
 ! to stimulated emission. In such a case we simply assume an 1/r^2
 ! extrapolation.
 !
-! We also interpolate in ESEC, since ESEC (in the absence of negative 
+! We also interpolate in ESEC, since ESEC (in the absence of negative
 ! absorption) provides a lower bound to the opacity. NB: When CHI is much
 ! larger then ESEC its variation with r dominates, and it is possible to
 ! extrapolate CHI below ESEC.
@@ -904,7 +906,7 @@
 	      dCHIdR_RAY(I)=T2*CHI_RAY(I)/R_RAY(I)
 	    END IF
 	  END DO
-	END IF 
+	END IF
 	SOURCE_RAY(1:NI)=ETA_RAY(1:NI)/CHI_RAY(1:NI)
 !
 	IF(NEW_FREQ)THEN
@@ -912,14 +914,14 @@
 ! Compute the optical depth increments. This code is from TAU, and NORDTAU. We
 ! check that the Euler-Mauclarin correction is not too large. This is mainly
 ! done to prevent negative optical depths. The check is not necessary when
-! we are using monotonic interpolation. 
+! we are using monotonic interpolation.
 !
 	  NI=NI_RAY
 	  IF(METHOD .EQ. 'ZERO')THEN
 	    DO I=1,NI-1
 	      dR=R_RAY(I)-R_RAY(I+1)
 	      TMPV(I)=0.5D0*(CHI_RAY(I)+CHI_RAY(I+1))*dR
-	    END DO  
+	    END DO
 	  ELSE IF(INSERT .OR. METHOD(4:6) .EQ. 'MON')THEN
 	    DO I=1,NI-1
 	      dR=R_RAY(I)-R_RAY(I+1)
@@ -984,14 +986,14 @@
 	  DO LS=1,NP
 	    NI=NI_RAY
 !
-! By setting PF(1)=0 when evaluating SOURCE we ensure a pure continuum 
+! By setting PF(1)=0 when evaluating SOURCE we ensure a pure continuum
 ! calculation for the first frequency.
 !
 	    IF(INIT)THEN
 	      DO I=1,NI
 	        Q(I)=0.0D0
 	        QH(I)=0.0D0
-	      END DO                
+	      END DO
 	      OLDCHI(LS)=CHI_RAY(NI)
 	    ELSE IF(NEW_FREQ)THEN
 	      DO I=1,NI-1
@@ -1028,7 +1030,7 @@
 	      PAR_AV(1,LS)=U(1)*AV_PREV(1,LS)
 	      DO I=2,NI-1
 	         PAR_AV(I,LS)=U(I)*AV_PREV(I,LS)-
-	1             (VB(I)*CV_PREV(I-1,LS)+VC(I)*CV_PREV(I,LS)) 
+	1             (VB(I)*CV_PREV(I-1,LS)+VC(I)*CV_PREV(I,LS))
 	      END DO
 	      PAR_AV(NI,LS)=U(NI)*AV_PREV(NI,LS)-VB(NI)*CV_PREV(NI-1,LS)
 !
@@ -1066,7 +1068,7 @@
 	  END DO				!LS
 !
 ! 
-! 
+!
 ! Solve for the radiation field along ray for this frequency.
 !
 	  IF(VECTOR_MACHINE)THEN
@@ -1123,8 +1125,8 @@ C
 !
 !
 !
-! Verify validity of AV values. If these go negative, we set them +ve 
-! but a factor of 10 smaller. We also ensure that the AV are not 
+! Verify validity of AV values. If these go negative, we set them +ve
+! but a factor of 10 smaller. We also ensure that the AV are not
 ! extremely close to zero by comparing with neighboring AV values.
 ! The CV (fluxes) are computed using the revised values.
 !
@@ -1144,7 +1146,7 @@ C
 	    END DO
 !
 ! Update C vector (i.e. flux variable).
-!                          
+!
 	    DO I=1,NI_RAY-1
 	      CV(I,LS)=GB(I,LS)*(AV(I,LS)-AV(I+1,LS))+H(I,LS)*CV_PREV(I,LS)
 	    END DO
@@ -1187,7 +1189,7 @@ C
 	      I_CORE=IC
 	    END IF
 !
-! By setting PF(1)=0 when evaluating SOURCE we ensure a pure continuum 
+! By setting PF(1)=0 when evaluating SOURCE we ensure a pure continuum
 ! calculation for the first frequency.
 !
 	    IF(INIT)THEN
@@ -1203,7 +1205,7 @@ C
 !
 !	    CALL TUNE(1,'FG_NEW_F')
 	    IF(NEW_FREQ)THEN
-!                       
+!
 ! Compute the functions used to evaluate the weighted integral over the
 ! polynomial fit to the source function.
 !
@@ -1259,7 +1261,7 @@ C
 	      S(I)=(SOURCE_PRIME(I+1)-SOURCE_PRIME(I))/DTAU(I,LS)
 	    END DO
 !
-! Now compute the derivatives node I. 
+! Now compute the derivatives node I.
 !
 	    dS(1)=S(1) +(S(1)-S(2))*DTAU(1,LS)/(DTAU(1,LS)+DTAU(2,LS))
 	    DO I=2,NI-1
@@ -1268,7 +1270,7 @@ C
 	    END DO
 	    dS(NI)=S(NI-1)+(S(NI-1)-S(NI-2))*DTAU(NI-1,LS)/
 	1                       (DTAU(NI-2,LS)+DTAU(NI-1,LS))
-!             
+!
 ! Adjust first derivatives so that function is monotonic  in each interval.
 !
 	    dS(1)=( SIGN(ONE,S(1))+SIGN(ONE,dS(1)) )*
@@ -1299,7 +1301,7 @@ C
 	      S(I)=(SOURCE_PRIME(I+1)-SOURCE_PRIME(I))/DTAU(I,LS)
 	    END DO
 !
-! Now compute the derivatives at node I. 
+! Now compute the derivatives at node I.
 !
 	    dS(1)=S(1) +(S(1)-S(2))*DTAU(1,LS)/(DTAU(1,LS)+DTAU(2,LS))
 	    DO I=2,NI-1
@@ -1308,7 +1310,7 @@ C
 	    END DO
 	    dS(NI)=S(NI-1)+(S(NI-1)-S(NI-2))*DTAU(NI-1,LS)/
 	1                  (DTAU(NI-2,LS)+DTAU(NI-1,LS))
-!             
+!
 ! Adjust the first derivatives so that function is monotonic in each interval.
 !
 	    dS(1)=( SIGN(ONE,S(1))+SIGN(ONE,dS(1)) )*
@@ -1410,7 +1412,7 @@ C
 !	    TMPV(I)=0.5D0*(Q(I)+Q(I+1))
 !	  END DO
 !	  DO LS=1,NP
-!	    S(1:NI_RAY)=CV(1:NI_RAY,LS); 
+!	    S(1:NI_RAY)=CV(1:NI_RAY,LS);
 !	    CALL MON_INTERP(dS,ND-1,1,TMPV,ND-1,S,1,Q,NI_RAY)
 !	    DO I=1,ND-1
 !	      HNU(I)=HNU(I)+HQW(LS)*dS(I)
@@ -1421,7 +1423,7 @@ C
 	     TMPV(I)=0.5D0*(R(I)+R(I+1))
 	  END DO
 	  DO LS=1,NP
-	    S(1:NI_RAY)=CV(1:NI_RAY,LS); 
+	    S(1:NI_RAY)=CV(1:NI_RAY,LS);
 	    CALL MON_INTERP(dS,ND-1,1,TMPV,ND-1,S,1,R_RAY,NI_RAY)
 	    DO I=1,ND-1
 	      HNU(I)=HNU(I)+HQW(LS)*dS(I)
@@ -1517,8 +1519,8 @@ C
 	  END DO
 	ELSE IF(N_TYPE .EQ. 'G_ONLY')THEN
 !
-! Compute G Eddington factor storing in N. We also check the validity of 
-! the Eddington factor in case strange values are occurring because H 
+! Compute G Eddington factor storing in N. We also check the validity of
+! the Eddington factor in case strange values are occurring because H
 ! is near zero (switching sign?).
 !
 	  DO I=1,ND-1
@@ -1550,7 +1552,7 @@ C
 ! error.
 !
 	J=1
-	DO WHILE (J .LE. N_ERR_MAX .AND. 
+	DO WHILE (J .LE. N_ERR_MAX .AND.
 	1            (NEG_AV_VALUE .OR. BAD_NNU_VALUE .OR. NEG_NNU_VALUE) )
 	  IF(FG_ERR_ON_FREQ(J) .EQ. FREQ)THEN
 	    FG_ERR_TYPE(J)=0

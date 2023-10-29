@@ -16,7 +16,7 @@
 	  INTEGER OUT
 	  LOGICAL LIN_INT
 	  CHARACTER(LEN=*) OPERATION
-!         
+!
 	  EXTERNAL SP_EQUAL
 	  LOGICAL SP_EQUAL
 !
@@ -118,9 +118,9 @@
 	        YV(I)=0.0
 	        UP_LIM=I-1
 	        EXIT
-	      ELSE 
+	      ELSE
 	        DO WHILE (SIGN*CD(IN1)%XVEC(I) .GT. SIGN*XV(L+1))
-	          L=L+1           
+	          L=L+1
 	        END DO
 	        T1=(CD(IN1)%XVEC(I)-XV(L+1))/(XV(L)-XV(L+1))
 	        YV(I)=(1.0D0-T1)*ZV(L+1)+T1*ZV(L)
@@ -145,7 +145,7 @@
 !
 C
 C We will use monotonic cubic interpolation. We first verify the range.
-C I & J are temporary variables for the callt o MON_INTERP. I denotes the 
+C I & J are temporary variables for the callt o MON_INTERP. I denotes the
 C first element. Initially J denotes the last element, then the numer of
 C elements that can be interpolated.
 C
@@ -176,7 +176,7 @@ C
 	  ELSE IF(OPERATION .EQ. '-')THEN
 	    YV(IL:IU)=CD(IN1)%DATA(IL:IU)-YV(IL:IU)
 !
-! Cross-correlate two spectra. This assumes that model 1 is on 
+! Cross-correlate two spectra. This assumes that model 1 is on
 ! a uniform gird. For spectra, it should also be in log space.
 !
 	  ELSE IF(OPERATION .EQ. 'CC')THEN
@@ -243,7 +243,7 @@ C
 	IF(ALLOCATED(ZV))DEALLOCATE(ZV)
 !
 	RETURN
-	END 
+	END
 !
 !
 C
@@ -253,6 +253,7 @@ C both are equal to zero in which case it is set true. Neither X, Y or
 C Z are altered.
 C
 	FUNCTION SP_EQUAL(X,Y,Z)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 - File now contains DP version only (i.e. not SP_EQUAL)
@@ -278,7 +279,7 @@ C
 	END
 C
 C!
-C Subroutine to interpolate an array onto a new grid. The grid vector must be 
+C Subroutine to interpolate an array onto a new grid. The grid vector must be
 C either a monotonically decreasing or increasing function. A modified cubic
 C polynomial is used to do the interpolation. Instead of using
 C the excact cubic estiamtes for the first derivative at the two nodes,
@@ -297,6 +298,7 @@ C
 C Ref: Steffen. M, 1990, A/&A, 239, 443-450
 C
 	SUBROUTINE SP_MON_INTERP(QZ,NQ,LIN_END,QZR,NX,VARRAY,NV,R,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 : ERROR_LU installed

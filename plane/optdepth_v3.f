@@ -1,6 +1,7 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
       SUBROUTINE OPTDEPTH_V3(TAU_LOC,DTAU_LOC,CHI,NZ,IP,DO_P_RAY)
+	USE SET_KIND_MODULE
       USE MOD_SPACE_GRID_V2
       IMPLICIT NONE
 !
@@ -24,15 +25,15 @@
 !
       integer nz
       integer ip
-      REAL(10) chi(nz)
-      REAL(10) tau_loc(nz)
-      REAL(10) dtau_loc(nz)
+      REAL(KIND=LDP) chi(nz)
+      REAL(KIND=LDP) tau_loc(nz)
+      REAL(KIND=LDP) dtau_loc(nz)
       logical do_p_ray
 !
 ! Local variables
 !
       integer iz
-      REAL(10) dchidz(nz)
+      REAL(KIND=LDP) dchidz(nz)
 !
 !--------------------------------------------------------------------
 !

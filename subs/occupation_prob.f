@@ -12,6 +12,7 @@ C NB: The vectors X_LEV_DIS, A_LEV_DIS and B_LEV_DIS must have been previously
 C        computed.
 C
 	SUBROUTINE OCCUPATION_PROB(W_C2,EDGE_C2,ZC2,NC2,ND)
+	USE SET_KIND_MODULE
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 C
@@ -20,21 +21,21 @@ C Altered 08-Sep-2015 - Limit NEFF to be less than 31. All levels we include
 C                         have n< 30. If neff> 30, mut have different core.
 C                         Temporary fix -- we need to provide core information.
 C Altered 03-Jul-2001 - Only computes NEFF for levels below the ionization
-C                          limit. We need to include a check on the core. 
+C                          limit. We need to include a check on the core.
 C Altered 15-Dec-1997 - MOD_LEV_DIS_BLK replaces include file. Level
 C                         dissolution can be switched off completely.
 C Altered 27-Aug-1995 - K was declared integer instead of REAL
 C Created 23-May-1995
 C
 	INTEGER NC2,ND
-	REAL(10) W_C2(NC2,ND)		!Occupation probability
-	REAL(10) EDGE_C2(NC2)		!Ionization frequency (10^15 Hz)
-	REAL(10) ZC2			!Charge in ion
+	REAL(KIND=LDP) W_C2(NC2,ND)		!Occupation probability
+	REAL(KIND=LDP) EDGE_C2(NC2)		!Ionization frequency (10^15 Hz)
+	REAL(KIND=LDP) ZC2			!Charge in ion
 C
 C Local variables.
 C
 	INTEGER I,LEV
-	REAL(10) NEFF,F,Y,BETA,REAL_K,T1
+	REAL(KIND=LDP) NEFF,F,Y,BETA,REAL_K,T1
 C
 	IF(MOD_DO_LEV_DIS)THEN
 	  DO LEV=1,NC2

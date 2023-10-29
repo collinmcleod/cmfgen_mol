@@ -5,13 +5,14 @@
 !
 ! This routine includes the zerth order correction to the transfer equations because
 ! of the velocity. It arises from the V dI/dv term in the transfer equation, which
-! is the only v term usually included for modelling stellar winds. Other terms, which 
+! is the only v term usually included for modelling stellar winds. Other terms, which
 ! were negelected, are also important to first order in V in the grey transfer equation.
 !
 	SUBROUTINE JGREY_WITH_FVT(RJ,RSQ_HFLUX,CHI,R,VEL,SIGMA,
 	1                  P,JQW,HQW,KQW,NQW,
 	1                  LUMINOSITY,METHOD,DIFF_APPROX,IC,
 	1                  ACCURACY,ND,NC,NP)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 !   Altered 06-Nov-2007: Aditional and improved diagnostics inserted.
@@ -21,67 +22,67 @@
 	INTEGER ND
 	INTEGER NP
 !
-	REAL(10) RJ(ND)			!Mean intensity (computed and returned)
-	REAL(10) RSQ_HFLUX(ND)            !r^2 . Flux
-	REAL(10) CHI(ND)			!Opacity
-	REAL(10) R(ND)			!Radius grid (in units of 10^10 cm)
-	REAL(10) VEL(ND)			!Velocity (in km/s)
-	REAL(10) SIGMA(ND)		!dlnv/dlnr -1
+	REAL(KIND=LDP) RJ(ND)			!Mean intensity (computed and returned)
+	REAL(KIND=LDP) RSQ_HFLUX(ND)            !r^2 . Flux
+	REAL(KIND=LDP) CHI(ND)			!Opacity
+	REAL(KIND=LDP) R(ND)			!Radius grid (in units of 10^10 cm)
+	REAL(KIND=LDP) VEL(ND)			!Velocity (in km/s)
+	REAL(KIND=LDP) SIGMA(ND)		!dlnv/dlnr -1
 !
-	REAL(10) P(NP)			!Impact parameters
-	REAL(10) JQW(ND,NP)		!Quadrature weight for J (on grid)
-	REAL(10) KQW(ND,NP) 		!Quadrature weight for K (on grid)
-	REAL(10) HQW(ND-1,NP)		!Quadrature weight for H (at midpoints)
-	REAL(10) NQW(ND-1,NP)		!Quadrature weight for N (at midpoints)
+	REAL(KIND=LDP) P(NP)			!Impact parameters
+	REAL(KIND=LDP) JQW(ND,NP)		!Quadrature weight for J (on grid)
+	REAL(KIND=LDP) KQW(ND,NP) 		!Quadrature weight for K (on grid)
+	REAL(KIND=LDP) HQW(ND-1,NP)		!Quadrature weight for H (at midpoints)
+	REAL(KIND=LDP) NQW(ND-1,NP)		!Quadrature weight for N (at midpoints)
 !
-	REAL(10) LUMINOSITY               !Luminosity at inner bounary in Lsun.
-	REAL(10) IC
-	REAL(10) ACCURACY			!Convergence accuracy for computing f.
+	REAL(KIND=LDP) LUMINOSITY               !Luminosity at inner bounary in Lsun.
+	REAL(KIND=LDP) IC
+	REAL(KIND=LDP) ACCURACY			!Convergence accuracy for computing f.
 	CHARACTER*6 METHOD
 	LOGICAL DIFF_APPROX		!Use a diffusion approximation (as opposed to a Schuster core)
 !
 ! Local vectors & arrays
 !
-	REAL(10) TA(ND),TB(ND),TC(ND)
-	REAL(10) HU(ND),HL(ND)
-	REAL(10) XM(ND)
-	REAL(10) Z(ND)
-	REAL(10) CHI_MOD(ND)
-	REAL(10) dCHIdR(ND)
-	REAL(10) dCHI_MODdR(ND)
-	REAL(10) Q(ND)
-	REAL(10) F(ND)
-	REAL(10) JFAC(ND)
-	REAL(10) N_ON_H(ND)
-	REAL(10) DTAU(ND)
-	REAL(10) BETA(ND)
-	REAL(10) VU(ND)
-	REAL(10) CV(ND)
-	REAL(10) AVE_DTAU(ND)
+	REAL(KIND=LDP) TA(ND),TB(ND),TC(ND)
+	REAL(KIND=LDP) HU(ND),HL(ND)
+	REAL(KIND=LDP) XM(ND)
+	REAL(KIND=LDP) Z(ND)
+	REAL(KIND=LDP) CHI_MOD(ND)
+	REAL(KIND=LDP) dCHIdR(ND)
+	REAL(KIND=LDP) dCHI_MODdR(ND)
+	REAL(KIND=LDP) Q(ND)
+	REAL(KIND=LDP) F(ND)
+	REAL(KIND=LDP) JFAC(ND)
+	REAL(KIND=LDP) N_ON_H(ND)
+	REAL(KIND=LDP) DTAU(ND)
+	REAL(KIND=LDP) BETA(ND)
+	REAL(KIND=LDP) VU(ND)
+	REAL(KIND=LDP) CV(ND)
+	REAL(KIND=LDP) AVE_DTAU(ND)
 !
 ! FS indcates the following quanties (J, H, K & N) have been computed using the
 ! formal soulution.
 !
-	REAL(10) FS_RSQJ(ND)
-	REAL(10) FS_RSQH(ND)
-	REAL(10) FS_RSQK(ND)
-	REAL(10) FS_RSQN(ND)
+	REAL(KIND=LDP) FS_RSQJ(ND)
+	REAL(KIND=LDP) FS_RSQH(ND)
+	REAL(KIND=LDP) FS_RSQK(ND)
+	REAL(KIND=LDP) FS_RSQN(ND)
 !
-	REAL(10) HBC		!Eddington factor for H at outer boundary.
-	REAL(10) IN_HBC		!Eddington factor for H at inner boundary.
-	REAL(10) HMOD
-	REAL(10) IBOUND
-	REAL(10) DBB
-	REAL(10) DBC
-	REAL(10) C_KMS
+	REAL(KIND=LDP) HBC		!Eddington factor for H at outer boundary.
+	REAL(KIND=LDP) IN_HBC		!Eddington factor for H at inner boundary.
+	REAL(KIND=LDP) HMOD
+	REAL(KIND=LDP) IBOUND
+	REAL(KIND=LDP) DBB
+	REAL(KIND=LDP) DBC
+	REAL(KIND=LDP) C_KMS
 !
 	INTEGER, PARAMETER :: IONE=1
-	REAL(10) PI
-	REAL(10) T1,T2
-	REAL(10) E1,E2,E3
+	REAL(KIND=LDP) PI
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) E1,E2,E3
 	INTEGER I,NI,LS
 	INTEGER LU_DIAG
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL SPEED_OF_LIGHT
 	LOGICAL VERBOSE
 !
@@ -232,7 +233,7 @@
 	    DO I=1,NI-1
 	      VU(I)=1.0D0/DTAU(I)
 	    END DO
-! 
+!
 	    XM(1)=-IBOUND
 	    TA(1)=0.0D0
 	    TC(1)=1.0D0/DTAU(1)
@@ -296,7 +297,7 @@ C
 	  END DO
 !
 	  HBC=HBC+JQW(1,LS)*(XM(1)-IBOUND)*Z(1)/R(1)
-!  
+!
 2000	CONTINUE
 !
 ! Compute the new Feautrier factors. These are stored in FS_RSQK so as not

@@ -5,10 +5,11 @@
 !		  (iii) Basic atmospheric structure.
 !
       MODULE STEQ_DATA_MOD
+      USE SET_KIND_MODULE
 !
 !Altered 12-Jul-2019: Added EHB matrices (added to IBIS 17-Aug-2019).
 !Altered 19-Aug-2015: BA_MAX_IONS_PER_SPECIES increaed to 21 (cur_hmi, 12-Jun-2015)
-!                            
+!
 ! Number of atomic species (e.g. H, C, N is 3 species).
 !
 	INTEGER, PARAMETER :: BA_NUM_SPECIES=26
@@ -27,15 +28,15 @@
 ! Storage locations for the Statistical euilibrium equations, and its
 ! variation.
 !
-	TYPE STAT_EQ_DATA 
-          REAL(10), POINTER :: STEQ(:,:)  		!Statistical equilibrium Eqns. for XzV
-          REAL(10), POINTER :: STEQ_ADV(:)  		!Statistical equilibrium ion eqns. for advection terms
-          REAL(10), POINTER :: QFV_P(:,:)  		!
-          REAL(10), POINTER :: QFV_R(:,:)  		!
-          REAL(10), POINTER :: QFV_P_EHB(:,:)  		!
-          REAL(10), POINTER :: QFV_R_EHB(:,:)  		!
-          REAL(10), POINTER :: BA(:,:,:,:)		!BA matrix for XzV
-          REAL(10), POINTER :: BA_PAR(:,:,:)		!BA matrix for XzV (diagonal terms)
+	TYPE STAT_EQ_DATA
+          REAL(KIND=LDP), POINTER :: STEQ(:,:)  		!Statistical equilibrium Eqns. for XzV
+          REAL(KIND=LDP), POINTER :: STEQ_ADV(:)  		!Statistical equilibrium ion eqns. for advection terms
+          REAL(KIND=LDP), POINTER :: QFV_P(:,:)  		!
+          REAL(KIND=LDP), POINTER :: QFV_R(:,:)  		!
+          REAL(KIND=LDP), POINTER :: QFV_P_EHB(:,:)  		!
+          REAL(KIND=LDP), POINTER :: QFV_R_EHB(:,:)  		!
+          REAL(KIND=LDP), POINTER :: BA(:,:,:,:)		!BA matrix for XzV
+          REAL(KIND=LDP), POINTER :: BA_PAR(:,:,:)		!BA matrix for XzV (diagonal terms)
 	  INTEGER, POINTER :: LNK_TO_IV(:)    	!
 	  INTEGER, POINTER :: LNK_TO_F(:)     	!
 	  INTEGER, POINTER :: EQ_IN_BA(:)     	!
@@ -51,16 +52,16 @@
           LOGICAL IMPURITY_SPECIES
 	END TYPE STAT_EQ_DATA
 !
-        REAL(10), ALLOCATABLE :: STEQ_T(:)
-        REAL(10), ALLOCATABLE :: STEQ_ED(:)
-        REAL(10), ALLOCATABLE :: BA_T(:,:,:)
-        REAL(10), ALLOCATABLE :: BA_ED(:,:,:)
-        REAL(10), ALLOCATABLE :: BA_ADV_TERM(:,:)
-        REAL(10), ALLOCATABLE :: BA_T_PAR(:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: STEQ_T(:)
+        REAL(KIND=LDP), ALLOCATABLE :: STEQ_ED(:)
+        REAL(KIND=LDP), ALLOCATABLE :: BA_T(:,:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: BA_ED(:,:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: BA_ADV_TERM(:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: BA_T_PAR(:,:)
 !
-        REAL(10), ALLOCATABLE :: STEQ_T_EHB(:)
-        REAL(10), ALLOCATABLE :: BA_T_EHB(:,:,:)
-        REAL(10), ALLOCATABLE :: BA_T_PAR_EHB(:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: STEQ_T_EHB(:)
+        REAL(KIND=LDP), ALLOCATABLE :: BA_T_EHB(:,:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: BA_T_PAR_EHB(:,:)
 !
         TYPE (STAT_EQ_DATA)  SE(BA_NUM_SPECIES*BA_MAX_IONS_PER_SPECIES)
 !

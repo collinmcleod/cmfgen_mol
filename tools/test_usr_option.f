@@ -12,9 +12,9 @@ c
 c      use mod_wr_string
       implicit none
 c
-      REAL(10) :: a,g
+      REAL(KIND=LDP) :: a,g
       integer, dimension(10) :: c,f
-      REAL(10), dimension(10) :: d,e
+      REAL(KIND=LDP), dimension(10) :: d,e
       integer :: b,h
       logical :: i,logic
 c

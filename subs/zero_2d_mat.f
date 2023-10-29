@@ -2,12 +2,13 @@
 ! Simple do loop to zero a 2D array, with paralleization over the outer loop.
 !
 	SUBROUTINE ZERO_2D_MAT(A,N,M)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 28-Oct-2102
 !
 	INTEGER N,M
-	REAL(10) A(N,M)
+	REAL(KIND=LDP) A(N,M)
 	INTEGER I,J
 !
 !$OMP PARALLEL DO

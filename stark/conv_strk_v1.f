@@ -8,6 +8,7 @@
 	1                 STARK,DWS,NWS,
 	1                 SYM_STARK,TRAP_QUAD,NORMALIZE_PROFILE,
 	1                 DLAM_THERM,DLAM_TURB,WAVE,DIAGNOSTICS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 24-Sep-2003:  For symmetric profiles, normalization was being done twice.
@@ -19,12 +20,12 @@
 !
 	INTEGER NF
 !
-	REAL(10) PRO(NF)		!Should contain LOG10 of the STARK profile. 
-	REAL(10) PROF_LAM(NF)	!Offset from line center in Angstroms.
+	REAL(KIND=LDP) PRO(NF)		!Should contain LOG10 of the STARK profile.
+	REAL(KIND=LDP) PROF_LAM(NF)	!Offset from line center in Angstroms.
 !
 	INTEGER NWS
-	REAL(10) STARK(NWS)
-	REAL(10) DWS(NWS)
+	REAL(KIND=LDP) STARK(NWS)
+	REAL(KIND=LDP) DWS(NWS)
 	LOGICAL SYM_STARK
 	LOGICAL TRAP_QUAD
 	LOGICAL NORMALIZE_PROFILE
@@ -36,28 +37,28 @@
 ! variation in the RAW STARK profile.
 !
 ! DLAM_TURB is the width due to pure TURBULENCE. If the RAW stark
-! profile has NOT already been convolved with a Doppler profile, 
+! profile has NOT already been convolved with a Doppler profile,
 ! the Doppler contributions should be included.
 !
-	REAL(10) DLAM_THERM		!Thermal velocity
-	REAL(10) DLAM_TURB		!Turbulent velocity
-	REAL(10) WAVE			!Central wavelength of line in Ang.
-!                
+	REAL(KIND=LDP) DLAM_THERM		!Thermal velocity
+	REAL(KIND=LDP) DLAM_TURB		!Turbulent velocity
+	REAL(KIND=LDP) WAVE			!Central wavelength of line in Ang.
+!
 ! Local variables
 !
-	REAL(10) MAX_DWS,MIN_DWS
-	REAL(10) DLAM
-	REAL(10) MAX_INT_LAM
-	REAL(10) MIN_INT_LAM
-	REAL(10) SLOPE_RHS,SLOPE_LHS
-	REAL(10) VAL_RHS,VAL_LHS
-	REAL(10) T1
-	REAL(10) SQRT_PI
-	REAL(10) LAM_VAL
-	REAL(10) STARK_VAL
+	REAL(KIND=LDP) MAX_DWS,MIN_DWS
+	REAL(KIND=LDP) DLAM
+	REAL(KIND=LDP) MAX_INT_LAM
+	REAL(KIND=LDP) MIN_INT_LAM
+	REAL(KIND=LDP) SLOPE_RHS,SLOPE_LHS
+	REAL(KIND=LDP) VAL_RHS,VAL_LHS
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) SQRT_PI
+	REAL(KIND=LDP) LAM_VAL
+	REAL(KIND=LDP) STARK_VAL
 !
-	REAL(10), ALLOCATABLE :: DLAM_INT(:)
-	REAL(10), ALLOCATABLE :: STARK_INT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DLAM_INT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: STARK_INT(:)
 	SAVE DLAM_INT,STARK_INT
 !
 	INTEGER NI,NG
@@ -142,7 +143,7 @@
 ! Generate values for extrapolation beyond tabulated profile limits.
 !
 	VAL_RHS=10.0D0**STARK(NWS)
-	SLOPE_RHS=(STARK(NWS)-STARK(NWS-1)) / LOG10(DWS(NWS)/DWS(NWS-1)) 
+	SLOPE_RHS=(STARK(NWS)-STARK(NWS-1)) / LOG10(DWS(NWS)/DWS(NWS-1))
 	IF(.NOT. SYM_STARK)THEN
 	  VAL_LHS=10.0D0**STARK(1)
 	  SLOPE_LHS=(STARK(1)-STARK(2)) / LOG10(DWS(1)/DWS(2))
@@ -153,12 +154,12 @@
 !
 	NG=5.0D0*DLAM_TURB/DLAM
 !
-! Can now perform the convolution. The method is dependent on whether the 
+! Can now perform the convolution. The method is dependent on whether the
 ! tabulated profile is symmetric. NB: Unfortunately the wavelengths
 ! at which the profile is to be determined are generally not symmetric
 ! about line center.
 !
-! The normalization of the profile is done after the full profile is 
+! The normalization of the profile is done after the full profile is
 ! computed.
 !
 	IF(SYM_STARK)THEN
@@ -187,7 +188,7 @@
 	ELSE 			!Not symmetric.
 !
 ! Can now perform the quadrature. We first find the location of the current
-! frequency in interpolation array. If 
+! frequency in interpolation array. If
 convolution bandpass extends beyond
 ! tabulated range, we extrapolate profile in log-log plane using a power
 ! law.

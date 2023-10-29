@@ -8,6 +8,7 @@ C store it in LINE_LUM(I). This is computed using the Euler-McLaurin summation
 C rule (i.e. the trapazoidal rule with a correction for the first derivatives).
 C
 	SUBROUTINE LUM_FROM_ETA(LINE_LUM,R,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 30-Mar-2000 : Bug fixed with derivative computation. Derivatives were
@@ -15,10 +16,10 @@ C                         offset.
 C Created 25-Jun-1998
 C
 	INTEGER ND
-	REAL(10) LINE_LUM(ND)
-	REAL(10) R(ND)
+	REAL(KIND=LDP) LINE_LUM(ND)
+	REAL(KIND=LDP) R(ND)
 C
-	REAL(10) DERIV(ND)
+	REAL(KIND=LDP) DERIV(ND)
 	INTEGER I
 C
 C We compute the amount of energy emitted between R(I) and R(I+1), and
@@ -32,7 +33,7 @@ C
 	DERIV(ND)=(LINE_LUM(ND-1)-LINE_LUM(ND))/(R(ND-1)-R(ND))
 C
 	DO I=1,ND-1
-	  LINE_LUM(I)=0.5D0*(R(I)-R(I+1))*( LINE_LUM(I)+LINE_LUM(I+1) 
+	  LINE_LUM(I)=0.5D0*(R(I)-R(I+1))*( LINE_LUM(I)+LINE_LUM(I+1)
 	1            +(R(I)-R(I+1))*(DERIV(I+1)-DERIV(I))/6.0D0 )
 	END DO
 	LINE_LUM(ND)=0.0D0

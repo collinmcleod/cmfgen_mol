@@ -7,6 +7,7 @@ C If the number of points is even, the use a trapazoidal rule (SIMPUNEQ)
 C of quadratic fit (SIMPEQ) to the last interval.
 C
 	SUBROUTINE WEIGHT(U,W,N)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 02-Jul-1998 - Missed LUER and ERROR_LU inserted.
@@ -20,12 +21,12 @@ C                       answers for a linear function (also quadratic and cubic)
 C Altered 28-SEP-1982 (6.9 in simuneq replaced by 6.0)
 C
 	INTEGER N,I
-	REAL(10) U(N),W(N)
-	REAL(10) T1,T2,TT
+	REAL(KIND=LDP) U(N),W(N)
+	REAL(KIND=LDP) T1,T2,TT
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
- 
+
 C
 C U is array of data points.
 C W is the array the weights are returned in.
@@ -130,5 +131,5 @@ C
 	    END IF
 	  END DO
 	RETURN
- 
+
 	END

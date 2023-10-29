@@ -1,4 +1,5 @@
 	PROGRAM TST_LINE
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
  	INTEGER NCF,NFREQ_MAX,N_LINES
@@ -10,40 +11,40 @@ C
 C Vecters returned by subroutine:
 C
 C Line+continuum frequencies
-	REAL(10) FREQ(NFREQ_MAX)			!Continuum frequencies
-	INTEGER LINES_THIS_FREQ(NFREQ_MAX) !Indicates that this 
-						!  frequency has line 
+	REAL(KIND=LDP) FREQ(NFREQ_MAX)			!Continuum frequencies
+	INTEGER LINES_THIS_FREQ(NFREQ_MAX) !Indicates that this
+						!  frequency has line
 						!  contriubutions,
 C
-	INTEGER LINE_ST_INDX(N_LINES)		!Start index for the line 
+	INTEGER LINE_ST_INDX(N_LINES)		!Start index for the line
 						!  in the NEW frequency array.
-	INTEGER LINE_END_INDX(N_LINES)	!End index for the line 
+	INTEGER LINE_END_INDX(N_LINES)	!End index for the line
 						! in the NEW frequency array.
-	CHARACTER*6 TRANS_TYPE(N_LINES)		!End index for the line 
+	CHARACTER*6 TRANS_TYPE(N_LINES)		!End index for the line
 C
 C Passed vectors.
 C
-	REAL(10) NU_CONT(NCF)		!Continuum frequencies
-	REAL(10) NU_LINE(N_LINES)		!Line frequencies
+	REAL(KIND=LDP) NU_CONT(NCF)		!Continuum frequencies
+	REAL(KIND=LDP) NU_LINE(N_LINES)		!Line frequencies
 C
 C Passed constants:
-	REAL(10) VINF		!Terminal velocity of wind.
-	REAL(10) V_DOP		!Doppler velocity (km/s).
-	REAL(10) FRAC_DOP		!Indicates dNU across line in Doppler widths.
-	REAL(10) MAX_DOP		!Half the extent of intrinsic profile
+	REAL(KIND=LDP) VINF		!Terminal velocity of wind.
+	REAL(KIND=LDP) V_DOP		!Doppler velocity (km/s).
+	REAL(KIND=LDP) FRAC_DOP		!Indicates dNU across line in Doppler widths.
+	REAL(KIND=LDP) MAX_DOP		!Half the extent of intrinsic profile
 				!  in Doppler widths,
 C
-	REAL(10) dV_CMF_PROF
-	REAL(10) dV_CMF_WING
-	REAL(10) ES_WING_ExT
-	REAL(10) R_CMF_WING_EXT
+	REAL(KIND=LDP) dV_CMF_PROF
+	REAL(KIND=LDP) dV_CMF_WING
+	REAL(KIND=LDP) ES_WING_ExT
+	REAL(KIND=LDP) R_CMF_WING_EXT
 	INTEGER NCF1,N_LINES1
 	INTEGER ML
-	REAL(10) C_KMS
+	REAL(KIND=LDP) C_KMS
 C
 C External functions
 C
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL SPEED_OF_LIGHT
 C
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()
@@ -90,7 +91,7 @@ C
 	1         NU_LINE(ML),LINE_ST_INDX(ML),LINE_END_INDX(ML),
 	1         C_KMS*(FREQ(LINE_ST_INDX(ML))-FREQ(LINE_END_INDX(ML)))/
 	1         NU_LINE(ML)
-	END DO                           
+	END DO
 C
 	STOP
 	END

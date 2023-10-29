@@ -1,11 +1,12 @@
 !
 ! This subroutine (which replaces EVAL_LTE_V4.INC) evaluates the LTE populations with respect to
-! the ground state for 
+! the ground state for
 !
 !  (a) The full atoms.
 !  (B) The Super-Level model atom.
 !
 	SUBROUTINE EVAL_LTE_V4(DO_LEV_DISSOLUTION,ND)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !

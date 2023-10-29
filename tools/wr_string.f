@@ -18,6 +18,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       function wr_real(input) result(default)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -36,7 +37,7 @@ c
       integer, parameter :: num_e_decimal=6
       integer, parameter :: num_f_decimal=6
 c
-      REAL(10) :: input,t1
+      REAL(KIND=LDP) :: input,t1
 c
       character(len=120) :: default
       character(len=20) :: fmt
@@ -91,7 +92,7 @@ c
           i=i-1
         end do
 c
-      endif      
+      endif
 c
       return
       end function wr_real
@@ -99,6 +100,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       function wr_real_dim(input,dim) result(default)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -117,8 +119,8 @@ c
       integer, parameter :: num_e_decimal=6
       integer, parameter :: num_f_decimal=6
 c
-      REAL(10), dimension(dim) :: input
-      REAL(10) :: t1
+      REAL(KIND=LDP), dimension(dim) :: input
+      REAL(KIND=LDP) :: t1
 c
       character(len=120) :: default
       character(len=20) :: fmt
@@ -195,6 +197,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       function wr_integer(input) result(default)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -211,7 +214,7 @@ c
 c
       integer :: input
 c
-      REAL(10) :: t1
+      REAL(KIND=LDP) :: t1
 c
       character(len=120) :: default
       character(len=20) :: fmt
@@ -242,6 +245,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       function wr_integer_dim(input,dim) result(default)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -258,7 +262,7 @@ c
 c
       integer, dimension(dim) :: input
 c
-      REAL(10) :: t1
+      REAL(KIND=LDP) :: t1
 c
       character(len=120) :: default
       character(len=20) :: fmt
@@ -303,6 +307,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       function wr_logical(input) result(default)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -333,6 +338,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       function wr_character(input) result(default)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c

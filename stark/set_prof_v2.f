@@ -2,7 +2,7 @@
 ! Routine to compute:
 !
 !          (1) Doppler line profiles for any species
-!          (2) Approximate STARK profiles for any Hydrogenic species of 
+!          (2) Approximate STARK profiles for any Hydrogenic species of
 !                charge Z. The theory is excellent for high Balmer lines, but
 !                  only approximate for Ha.
 !
@@ -14,7 +14,7 @@
 !                    (b) STARK profile convolved with a Doppler profile.
 !
 !                    The Doppler profile can have a turbulent contribution
-!                    given by VTURB. 
+!                    given by VTURB.
 ! Input:
 !        NU        - Velocity in units of C from line center [= (V-Vo)/Vo ].
 !        ED_IN     - Electron density (/cm^3) (Vector, length ND)
@@ -25,14 +25,15 @@
 !        NUP       - Upper level of transition.
 !        ND        - Nuber of (Ne,T) values profile is to be computed for.
 !        VTURB_IN   - Turbulent velocity in km/s (function of depth).
-! 
+!
 	SUBROUTINE SET_PROF_V2(PROF,NU,ML_CUR,ML_ST,ML_END,
 	1             ED_IN,TEMP_IN,VTURB_IN,ND,
 	1             PROF_TYPE,NU_ZERO,NL,NUP,AMASS_IN,Z_IN,
 	1             GAM_NAT,GAM_COL,VTURB_FIX,
 	1             END_RES_ZONE,NORM_PROFILE)
+	USE SET_KIND_MODULE
 !
-! Altered 07-Jan-1999: ML_CUR now passed in call. 
+! Altered 07-Jan-1999: ML_CUR now passed in call.
 !                      Profile is now recomputed whenever ML_CUR=ML_ST,
 !                      or when profile is unavailable.
 !
@@ -44,17 +45,17 @@
 	INTEGER ND
 	INTEGER NL
 	INTEGER NUP
-	REAL(10) PROF(ND)
-	REAL(10) NU(ML_END)  		!Can actually be larger
-	REAL(10) ED_IN(ND)
-	REAL(10) TEMP_IN(ND)
-	REAL(10) VTURB_IN(ND)
-	REAL(10) AMASS_IN
-	REAL(10) Z_IN
-	REAL(10) NU_ZERO
-	REAL(10) GAM_NAT
-	REAL(10) GAM_COL
-	REAL(10) VTURB_FIX		!Turbulent velocity (km/s): same at all depths
+	REAL(KIND=LDP) PROF(ND)
+	REAL(KIND=LDP) NU(ML_END)  		!Can actually be larger
+	REAL(KIND=LDP) ED_IN(ND)
+	REAL(KIND=LDP) TEMP_IN(ND)
+	REAL(KIND=LDP) VTURB_IN(ND)
+	REAL(KIND=LDP) AMASS_IN
+	REAL(KIND=LDP) Z_IN
+	REAL(KIND=LDP) NU_ZERO
+	REAL(KIND=LDP) GAM_NAT
+	REAL(KIND=LDP) GAM_COL
+	REAL(KIND=LDP) VTURB_FIX		!Turbulent velocity (km/s): same at all depths
 	CHARACTER*(*) PROF_TYPE
 	LOGICAL END_RES_ZONE
 	LOGICAL NORM_PROFILE
@@ -66,15 +67,15 @@
 	INTEGER I,J,ML
 	INTEGER LOC_INDX		!Indicates which storage
 	INTEGER NF_GR
-	REAL(10) T1,T2
-	REAL(10) TMP_ED,NU_DOP
-	REAL(10) TMP_VEC(ND)
-	REAL(10) A_VOIGT
-	REAL(10) V_VOIGT
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) TMP_ED,NU_DOP
+	REAL(KIND=LDP) TMP_VEC(ND)
+	REAL(KIND=LDP) A_VOIGT
+	REAL(KIND=LDP) V_VOIGT
 !
 ! External functions
 !
-	REAL(10) VOIGT
+	REAL(KIND=LDP) VOIGT
 !
 ! Doppler profile is the same for all species, and is the same at all depths.
 !
@@ -117,14 +118,14 @@
 !   subsequent calls.
 !
 	ELSE IF(PROF_TYPE .EQ. 'HZ_STARK')THEN
-!            
+!
 ! Check validity of passed parameters for HI and HeII lines.
 !
 	  IF(NUP .LE. NL)THEN
 	    WRITE(LUER,*)'Error in SET_PROF: NUP < NL'
 	    STOP
 	  END IF
-!                          
+!
 ! Check if we have already computed profile at the desired frequency set.
 ! If so we use the data already computed. If ML_CUR .EQ. ML_ST, we assume
 ! that the full STARK profile needs to be recompyted.
@@ -144,7 +145,7 @@
 	          GOTO 1000
 	        ELSE
 !
-! Check store correct, then set profile data                
+! Check store correct, then set profile data
 !
 	          LST_FREQ_LOC(LOC_INDX)=LST_FREQ_LOC(LOC_INDX)+1
 	          IF(NU_STORE(LST_FREQ_LOC(LOC_INDX), LOC_INDX) .NE. NU(ML_CUR))THEN

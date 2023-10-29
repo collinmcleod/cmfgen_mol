@@ -13,6 +13,7 @@
 	1			MU,FLUX_WGHTS,OBS_FREQ,OBS_FLUX,N_OBS,
 	1                       VINF,RMAX,IPLUS_OR_U,
 	1                       INTERP_PROC,DO_FULL_REL,FIRST_OBS_COMP,NP)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 03-Apr-2006 : Changed to handle plane parallel atmosphere where
@@ -24,29 +25,29 @@
 !                         accesd outside valid range (1 to NEXT_ST_LOC-1).
 !
 	INTEGER NP
-	REAL(10) NEW_IPLUS(NP)		!RAW CMF intensities as a function of
+	REAL(KIND=LDP) NEW_IPLUS(NP)		!RAW CMF intensities as a function of
 					!  impact parameter.
-	REAL(10) NEW_NU			!Current CMF frequency.
+	REAL(KIND=LDP) NEW_NU			!Current CMF frequency.
 !
-	REAL(10) MU(NP)
-	REAL(10) FLUX_WGHTS(NP)
+	REAL(KIND=LDP) MU(NP)
+	REAL(KIND=LDP) FLUX_WGHTS(NP)
 !
 	INTEGER N_OBS
-	REAL(10) OBS_FREQ(N_OBS)
-	REAL(10) OBS_FLUX(N_OBS)
+	REAL(KIND=LDP) OBS_FREQ(N_OBS)
+	REAL(KIND=LDP) OBS_FLUX(N_OBS)
 !
 ! Storage arrays
 !
 	INTEGER NST_CMF
-	REAL(10) IPLUS_STORE(NST_CMF,NP)
-	REAL(10) NU_STORE(NST_CMF)
+	REAL(KIND=LDP) IPLUS_STORE(NST_CMF,NP)
+	REAL(KIND=LDP) NU_STORE(NST_CMF)
 !
-	REAL(10), SAVE, ALLOCATABLE :: FREQ_CONV_FAC(:)
-	REAL(10), SAVE, ALLOCATABLE :: INTEN_CONV_FAC(:)
-	REAL(10), SAVE :: MIN_FREQ_CONV_FAC
+	REAL(KIND=LDP), SAVE, ALLOCATABLE :: FREQ_CONV_FAC(:)
+	REAL(KIND=LDP), SAVE, ALLOCATABLE :: INTEN_CONV_FAC(:)
+	REAL(KIND=LDP), SAVE :: MIN_FREQ_CONV_FAC
 !
-	REAL(10) VINF			!
-	REAL(10) RMAX			!Radius at outer boundary.
+	REAL(KIND=LDP) VINF			!
+	REAL(KIND=LDP) RMAX			!Radius at outer boundary.
 	LOGICAL DO_FULL_REL
 	LOGICAL FIRST_OBS_COMP
 	CHARACTER*(*) INTERP_PROC
@@ -54,8 +55,8 @@
 !
 ! Local variables passed from one call to the next.
 !
-	REAL(10) C_KMS
-	REAL(10) FLUX_CONST
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) FLUX_CONST
 	INTEGER NEXT_ST_LOC		!Keeps track of storage location.
 	INTEGER OBS_INDX		!Current observers frequency
 	INTEGER LUER
@@ -63,25 +64,25 @@
 !
 ! External functions.
 !
-	REAL(10) SPEED_OF_LIGHT,PARSEC,FUN_PI
+	REAL(KIND=LDP) SPEED_OF_LIGHT,PARSEC,FUN_PI
 	INTEGER ERROR_LU
 	EXTERNAL SPEED_OF_LIGHT,ERROR_LU,PARSEC,FUN_PI
 !
 ! Local variables
 !
-	REAL(10) NU_SM_CMF
+	REAL(KIND=LDP) NU_SM_CMF
 	INTEGER L,LS,ML,ML_ST,ML_END
 !
 ! Variables for interpolation.
 !
-	REAL(10) FLUX,T1
-	REAL(10) CMF_FREQ		!Observer's frequency transformed to comoving
+	REAL(KIND=LDP) FLUX,T1
+	REAL(KIND=LDP) CMF_FREQ		!Observer's frequency transformed to comoving
 				!  frame.
-	REAL(10) HIM1,HI,HIP1
-	REAL(10) SGN,SIM1,SI,SIP1
-	REAL(10) DYI,DYIP1
-	REAL(10) A,B,C,D
-	REAL(10) ONE
+	REAL(KIND=LDP) HIM1,HI,HIP1
+	REAL(KIND=LDP) SGN,SIM1,SI,SIP1
+	REAL(KIND=LDP) DYI,DYIP1
+	REAL(KIND=LDP) A,B,C,D
+	REAL(KIND=LDP) ONE
 	PARAMETER (ONE=1.0D0)
 !
 ! Initialize variables if we a beginning the Observer flux calculation.
@@ -126,13 +127,13 @@
 	  IF(DO_FULL_REL)THEN
             T1=1.0D0/SQRT(1.0D0-(VINF/C_KMS)**2)				!Gamma
 	    DO LS=1,NP
-	      FREQ_CONV_FAC(LS)=T1*(1.0D0-MU(LS)*VINF/C_KMS)		!Observer's to CMF 
+	      FREQ_CONV_FAC(LS)=T1*(1.0D0-MU(LS)*VINF/C_KMS)		!Observer's to CMF
               INTEN_CONV_FAC(LS)=1.0D0/(FREQ_CONV_FAC(LS)**3)
 	    END DO
 	  ELSE
             T1=1.0D0/SQRT(1.0D0-(VINF/C_KMS)**2)				!Gamma
 	    DO LS=1,NP
-	      FREQ_CONV_FAC(LS)=T1*(1.0D0-MU(LS)*VINF/C_KMS)			!Observer's to CMF 
+	      FREQ_CONV_FAC(LS)=T1*(1.0D0-MU(LS)*VINF/C_KMS)			!Observer's to CMF
               INTEN_CONV_FAC(LS)=1.0D0
 	    END DO
 	  END IF

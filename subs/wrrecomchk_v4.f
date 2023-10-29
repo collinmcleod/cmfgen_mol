@@ -8,11 +8,12 @@ C
 	1                 DIERECOM,ADDRECOM,X_RECOM_1,X_RECOM_2,NT_ION_RATE,
 	1                 R,T,ED,DHYD,NETRR,TOTRR,N,ND,LU,
 	1                 FILNAM,STRDESC)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 10-Dec-2021 : Added depth index to output
 C Altered 25-Sep-2011 : Based on WRRECOM_CHK_V3: NT_ION_RATE added to call.
-C                         Originally done: 4-Apr-2011  
+C                         Originally done: 4-Apr-2011
 C Altered 13-May-2004 : ADVEC_RR inserted into call, & changed to V3.
 C Altered 19-Mar-2000 : TRIM placed around STRDESC.
 C Altered 28-Jun-1998 : Charge Exchage ionization and recombination rates
@@ -27,23 +28,23 @@ C                         included.
 C Created  5-Oct-1987 (Based on WRPRRRGEN)
 C
 	INTEGER N,ND,LU,ML,MF,I,MS,J,IOS
-	REAL(10) PR(N,ND)			!Radiative photioization rate
-	REAL(10) RR(N,ND)			!Radiative recombination rate
-	REAL(10) CPR(ND)			!Collisional ioization rate
-	REAL(10) CRR(ND)			!Collisional recombination rate
-	REAL(10) CHG_PR(ND)		!Charge ionization rate
-	REAL(10) CHG_RR(ND)		!Charge recombination rate
-	REAL(10) ADVEC_RR(ND)		!Advection recombination rate
-	REAL(10) DIERECOM(ND)
-	REAL(10) ADDRECOM(ND)
-	REAL(10) X_RECOM_1(ND),X_RECOM_2(ND)
-	REAL(10) NT_ION_RATE(ND)
-	REAL(10) TOTRR(ND),NETRR(ND)
-	REAL(10) R(ND),T(ND),ED(ND),DHYD(ND)
+	REAL(KIND=LDP) PR(N,ND)			!Radiative photioization rate
+	REAL(KIND=LDP) RR(N,ND)			!Radiative recombination rate
+	REAL(KIND=LDP) CPR(ND)			!Collisional ioization rate
+	REAL(KIND=LDP) CRR(ND)			!Collisional recombination rate
+	REAL(KIND=LDP) CHG_PR(ND)		!Charge ionization rate
+	REAL(KIND=LDP) CHG_RR(ND)		!Charge recombination rate
+	REAL(KIND=LDP) ADVEC_RR(ND)		!Advection recombination rate
+	REAL(KIND=LDP) DIERECOM(ND)
+	REAL(KIND=LDP) ADDRECOM(ND)
+	REAL(KIND=LDP) X_RECOM_1(ND),X_RECOM_2(ND)
+	REAL(KIND=LDP) NT_ION_RATE(ND)
+	REAL(KIND=LDP) TOTRR(ND),NETRR(ND)
+	REAL(KIND=LDP) R(ND),T(ND),ED(ND),DHYD(ND)
 	CHARACTER*(*) FILNAM,STRDESC
-	REAL(10) ABS_SUM
-	REAL(10) ADVEC_SUM
-	REAL(10) T1
+	REAL(KIND=LDP) ABS_SUM
+	REAL(KIND=LDP) ADVEC_SUM
+	REAL(KIND=LDP) T1
 C
 	INTEGER ERROR_LU,LUER
 	INTEGER, PARAMETER :: IZERO=0

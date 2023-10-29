@@ -7,24 +7,25 @@ C
 C    A(i).X(i-1) - [H(i)+A(i)+C(i)].X(i) + C(i).X(i+1) = D(i)
 C
 	SUBROUTINE THOMAS_RH(A,H,C,D,N1,N2)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 29-Sep-1997 : Scaler loop code installed to improve speed on a
 C                         an Alphastation.
 C Altered 21-Jun-1996 : Bug Fix: H now set to DIV to allow SIMPTH entry
 C                         (Thus DIV does not need to be saved between calls.)
-C Altered 29-May-1996 : Loops reversed in forward elimination and the 
+C Altered 29-May-1996 : Loops reversed in forward elimination and the
 C                         backward substitution to allow CRAY vectorization.
 C Altered 17-May-1996 : DIV now dimension by N1 (using F90 advantages).
 C
 	INTEGER N1,N2
-	REAL(10) A(N1),H(N1),C(N1),D(N1,N2)
+	REAL(KIND=LDP) A(N1),H(N1),C(N1),D(N1,N2)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
 	INTEGER I,J
-	REAL(10) DIV(N1)
+	REAL(KIND=LDP) DIV(N1)
 C
 C Change the following statement to TRUE if running on a VECTOR machine.
 C
@@ -93,7 +94,7 @@ C
 	      D(I,J)=C(I)*D(I+1,J)-D(I,J)
 	    END DO
 	  END DO
-	ELSE 
+	ELSE
 C
 C This section of code is for a scaler machine where the dependence
 C on a previous computation does not matter. More efficient than previous

@@ -5,6 +5,7 @@
 ! Altered 13-Dec-1989 - Implicit none installed. I index written out.
 !
 	SUBROUTINE WR_ASCI_STEQ(NION,ND,MES,LU)
+	USE SET_KIND_MODULE
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 	INTEGER ND,NION,LU

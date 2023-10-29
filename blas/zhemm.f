@@ -1,5 +1,6 @@
       SUBROUTINE ZHEMM ( SIDE, UPLO, M, N, ALPHA, A, LDA, B, LDB,
      $                   BETA, C, LDC )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       CHARACTER*1        SIDE, UPLO
       INTEGER            M, N, LDA, LDB, LDC

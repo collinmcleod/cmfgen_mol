@@ -7,13 +7,14 @@ C
 C Results checked against table in Allen: Astrophysical quantities.
 C
 	FUNCTION LAM_VAC(LAM_AIR)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Created 11-Apr-1997 : Based on LAMVACAIR
 C
-	REAL(10) LAM_VAC			!Vacuum wavelength in Ang.
-	REAL(10) LAM_AIR			!Air wavelength in Ang.
-	REAL(10) T1
+	REAL(KIND=LDP) LAM_VAC			!Vacuum wavelength in Ang.
+	REAL(KIND=LDP) LAM_AIR			!Air wavelength in Ang.
+	REAL(KIND=LDP) T1
 	INTEGER I
 C
 	IF(LAM_AIR .LT. 1999.352D0)THEN
@@ -30,7 +31,7 @@ C
 	DO I=1,3
 	  T1=1.0D+08/(LAM_VAC*LAM_VAC)
 	  LAM_VAC=LAM_AIR*(  1.0D0+
-	1               1.0D-07*( 643.28D0+ 
+	1               1.0D-07*( 643.28D0+
 	1              294981.0D0/(146.0D0-T1)+2554.0D0/(41.0D0-T1) )  )
 	END DO
 C

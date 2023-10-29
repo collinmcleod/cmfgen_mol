@@ -1,6 +1,6 @@
 C
 C Route to return the gaunt factor for individual L states of hydrogen.
-C The gaunt factors (g) for all l sub-levels of level n are returned. 
+C The gaunt factors (g) for all l sub-levels of level n are returned.
 C KSQ is the scaled energy of the ejected electron in Rydbergs (==K*K)
 C (i.e E/z/z).
 C
@@ -9,28 +9,29 @@ C MNRAS, 153, 471-490).
 C
 
 	SUBROUTINE GNTHYDL(SIGMA,G,N,KSQ)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 - RONE etc inserted.
 C Created 29-Aug-1989 - Verified against tbales of Karzas and Latter.
 C
 	INTEGER N,I1,I2
-	REAL(10) SIGMA(0:N-1),KSQ
-	REAL(10) G(0:N-1,0:N+1)
+	REAL(KIND=LDP) SIGMA(0:N-1),KSQ
+	REAL(KIND=LDP) G(0:N-1,0:N+1)
 C
-	REAL(10) GAMRAT
+	REAL(KIND=LDP) GAMRAT
 C
 C Local variables
 C
 	INTEGER L
-	REAL(10) G0,NKSQ,MULT,K,ROOT3
+	REAL(KIND=LDP) G0,NKSQ,MULT,K,ROOT3
 C
-	REAL(10), PARAMETER :: PI=3.1415926535897932384D0
-	REAL(10), PARAMETER :: RHALF=0.5D0
-	REAL(10), PARAMETER :: RONE=1.0D0
-	REAL(10), PARAMETER :: RTWO=2.0D0
-	REAL(10), PARAMETER :: RTHREE=3.0D0
-	REAL(10), PARAMETER :: RFOUR=4.0D0
+	REAL(KIND=LDP), PARAMETER :: PI=3.1415926535897932384D0
+	REAL(KIND=LDP), PARAMETER :: RHALF=0.5D0
+	REAL(KIND=LDP), PARAMETER :: RONE=1.0D0
+	REAL(KIND=LDP), PARAMETER :: RTWO=2.0D0
+	REAL(KIND=LDP), PARAMETER :: RTHREE=3.0D0
+	REAL(KIND=LDP), PARAMETER :: RFOUR=4.0D0
 C
 	ROOT3=SQRT(RTHREE)
 C

@@ -10,6 +10,7 @@
 	1                 MOD_MDOT,MOD_VINF,MOD_BETA,
 	1                 MOD_VTURB,PLANE_PARALLEL,PLANE_PARALLEL_NO_V,
 	1                 MAIN_COUNTER,DONE_HYDRO,MOD_NC,MOD_ND,MOD_NP,NT)
+	USE SET_KIND_MODULE
 	USE CMF_HYDRO_MODULE
 	USE OLD_GRID_MODULE
 	USE UPDATE_KEYWORD_INTERFACE
@@ -22,17 +23,17 @@
 	INTEGER MOD_NP			!Model number of impact papramters
 	INTEGER NT			!Number of levels
 !
-	REAL(10) POPS(NT,MOD_ND)
+	REAL(KIND=LDP) POPS(NT,MOD_ND)
 !
-	REAL(10) MOD_MDOT			!Mass loss rate (N=MOD_MDOT/V(kms)/r(10^10cm)^^2)
-	REAL(10) MOD_LUM			!In Lsun
-	REAL(10) MOD_TEFF			!In unitos of 10^4 K
-	REAL(10) MOD_LOGG			!In cgs units
-	REAL(10) MOD_MASS			!Mass of star in Msun (returned and output to VADAT)
-	REAL(10) MOD_RMAX			!R(ND) on input
-	REAL(10) MOD_VINF			!km/s
-	REAL(10) MOD_BETA			!Classic velocity law exponent
-	REAL(10) MOD_VTURB
+	REAL(KIND=LDP) MOD_MDOT			!Mass loss rate (N=MOD_MDOT/V(kms)/r(10^10cm)^^2)
+	REAL(KIND=LDP) MOD_LUM			!In Lsun
+	REAL(KIND=LDP) MOD_TEFF			!In unitos of 10^4 K
+	REAL(KIND=LDP) MOD_LOGG			!In cgs units
+	REAL(KIND=LDP) MOD_MASS			!Mass of star in Msun (returned and output to VADAT)
+	REAL(KIND=LDP) MOD_RMAX			!R(ND) on input
+	REAL(KIND=LDP) MOD_VINF			!km/s
+	REAL(KIND=LDP) MOD_BETA			!Classic velocity law exponent
+	REAL(KIND=LDP) MOD_VTURB
 !
 	INTEGER MAIN_COUNTER
 	LOGICAL PLANE_PARALLEL
@@ -41,85 +42,85 @@
 !
 ! The following vectors are used for the atmospheric structure resulting
 ! from the solution of the hydrostatic and tau equations.
-! 
+!
 	INTEGER, PARAMETER :: ND_MAX=1000
-        REAL(10) R(ND_MAX)
-        REAL(10) V(ND_MAX)
-        REAL(10) SIGMA(ND_MAX)
-        REAL(10) T(ND_MAX)
-        REAL(10) ED(ND_MAX)
-        REAL(10) TAU(ND_MAX)
-        REAL(10) P(ND_MAX)
-        REAL(10) ED_ON_NA(ND_MAX)
-	REAL(10) dPdR_VEC(ND_MAX)
+        REAL(KIND=LDP) R(ND_MAX)
+        REAL(KIND=LDP) V(ND_MAX)
+        REAL(KIND=LDP) SIGMA(ND_MAX)
+        REAL(KIND=LDP) T(ND_MAX)
+        REAL(KIND=LDP) ED(ND_MAX)
+        REAL(KIND=LDP) TAU(ND_MAX)
+        REAL(KIND=LDP) P(ND_MAX)
+        REAL(KIND=LDP) ED_ON_NA(ND_MAX)
+	REAL(KIND=LDP) dPdR_VEC(ND_MAX)
 !
-        REAL(10) ROSS_MEAN(ND_MAX)
-        REAL(10) FLUX_MEAN(ND_MAX)
-        REAL(10) POP_ATOM(ND_MAX)
-        REAL(10) MASS_DENSITY(ND_MAX)
-        REAL(10) CLUMP_FAC(ND_MAX)
-        REAL(10) POPION(ND_MAX)
-        REAL(10) CHI_ROSS(ND_MAX)
-        REAL(10) GAMMA_FULL(ND_MAX)
+        REAL(KIND=LDP) ROSS_MEAN(ND_MAX)
+        REAL(KIND=LDP) FLUX_MEAN(ND_MAX)
+        REAL(KIND=LDP) POP_ATOM(ND_MAX)
+        REAL(KIND=LDP) MASS_DENSITY(ND_MAX)
+        REAL(KIND=LDP) CLUMP_FAC(ND_MAX)
+        REAL(KIND=LDP) POPION(ND_MAX)
+        REAL(KIND=LDP) CHI_ROSS(ND_MAX)
+        REAL(KIND=LDP) GAMMA_FULL(ND_MAX)
 !
-	REAL(10) TA(ND_MAX)
-	REAL(10) TB(ND_MAX)
-	REAL(10) TC(ND_MAX)
+	REAL(KIND=LDP) TA(ND_MAX)
+	REAL(KIND=LDP) TB(ND_MAX)
+	REAL(KIND=LDP) TC(ND_MAX)
 !
 ! These vectors are output, and contain the atmospheric structure to be used
 ! by CMFGEN.
 !
 	INTEGER NEW_ND
-	REAL(10), ALLOCATABLE :: REV_TAU(:)
-        REAL(10), ALLOCATABLE :: REV_R(:)
-        REAL(10), ALLOCATABLE :: REV_V(:)
-        REAL(10), ALLOCATABLE :: REV_SIGMA(:)
-        REAL(10), ALLOCATABLE :: REV_POP_ATOM(:)
-        REAL(10), ALLOCATABLE :: REV_ED(:)
-        REAL(10), ALLOCATABLE :: REV_T(:)
-        REAL(10), ALLOCATABLE :: REV_CHI_ROSS(:)
-        REAL(10), ALLOCATABLE :: REV_GAMMA_FULL(:)
-        REAL(10), ALLOCATABLE :: COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: REV_TAU(:)
+        REAL(KIND=LDP), ALLOCATABLE :: REV_R(:)
+        REAL(KIND=LDP), ALLOCATABLE :: REV_V(:)
+        REAL(KIND=LDP), ALLOCATABLE :: REV_SIGMA(:)
+        REAL(KIND=LDP), ALLOCATABLE :: REV_POP_ATOM(:)
+        REAL(KIND=LDP), ALLOCATABLE :: REV_ED(:)
+        REAL(KIND=LDP), ALLOCATABLE :: REV_T(:)
+        REAL(KIND=LDP), ALLOCATABLE :: REV_CHI_ROSS(:)
+        REAL(KIND=LDP), ALLOCATABLE :: REV_GAMMA_FULL(:)
+        REAL(KIND=LDP), ALLOCATABLE :: COEF(:,:)
 !
 ! Parameters for for cumputing the final R grid.
-!       
-	REAL(10) dLOG_TAU
-	REAL(10) V_SCL_FAC
-	REAL(10) OBND_PARS(20)
+!
+	REAL(KIND=LDP) dLOG_TAU
+	REAL(KIND=LDP) V_SCL_FAC
+	REAL(KIND=LDP) OBND_PARS(20)
 	INTEGER NUM_OBND_PARAMS
 	CHARACTER(LEN=16) OUT_BND_OPT
 	CHARACTER(LEN=80) STRING
 !
 ! Wind parameters:
 !
-	REAL(10) VINF
-	REAL(10) BETA
-	REAL(10) RMAX
-	REAL(10) CONNECTION_VEL
-	REAL(10) CONNECTION_RADIUS
+	REAL(KIND=LDP) VINF
+	REAL(KIND=LDP) BETA
+	REAL(KIND=LDP) RMAX
+	REAL(KIND=LDP) CONNECTION_VEL
+	REAL(KIND=LDP) CONNECTION_RADIUS
 	INTEGER CONNECTION_INDX
 !
 	INTEGER ND			!Number of points in RUnge-Kutta integration
 	INTEGER I,J,IOS
 !
-	REAL(10) PI			!
-	REAL(10) NI_ZERO			!Density at outer boundary
-	REAL(10) SCL_HT			!Atmopsheric scale height
-	REAL(10) H			!Step size for Runge-Kutta integration
-	REAL(10) PTURB_ON_NA		!Turbulent pressure due to turbulence/ (# of atoms)
-	REAL(10) MASS_LOSS_SCALE_FACTOR	!Factor to convert MOD_MDOt to Msun/yr
-	REAL(10) RBOUND
-	REAL(10) TAU_MAX
-	REAL(10) OLD_TAU_MAX
-	REAL(10) T1,T2,T3
-	REAL(10) GAM_LIM_STORE
+	REAL(KIND=LDP) PI			!
+	REAL(KIND=LDP) NI_ZERO			!Density at outer boundary
+	REAL(KIND=LDP) SCL_HT			!Atmopsheric scale height
+	REAL(KIND=LDP) H			!Step size for Runge-Kutta integration
+	REAL(KIND=LDP) PTURB_ON_NA		!Turbulent pressure due to turbulence/ (# of atoms)
+	REAL(KIND=LDP) MASS_LOSS_SCALE_FACTOR	!Factor to convert MOD_MDOt to Msun/yr
+	REAL(KIND=LDP) RBOUND
+	REAL(KIND=LDP) TAU_MAX
+	REAL(KIND=LDP) OLD_TAU_MAX
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) GAM_LIM_STORE
 !
 ! Runge-Kutta estimates
 !
-	REAL(10) dP1,dTAU1
-	REAL(10) dP2,dTAU2
-	REAL(10) dP3,dTAU3
-	REAL(10) dP4,dTAU4
+	REAL(KIND=LDP) dP1,dTAU1
+	REAL(KIND=LDP) dP2,dTAU2
+	REAL(KIND=LDP) dP3,dTAU3
+	REAL(KIND=LDP) dP4,dTAU4
 !
 	LOGICAL USE_OLD_VEL
 	LOGICAL L_TEMP
@@ -129,8 +130,8 @@
 !
 ! These have cgs units.
 !
-	REAL(10) ATOMIC_MASS_UNIT,BOLTZMANN_CONSTANT,STEFAN_BOLTZ
-	REAL(10) GRAVITATIONAL_CONSTANT,MASS_SUN,SPEED_OF_LIGHT,LUM_SUN
+	REAL(KIND=LDP) ATOMIC_MASS_UNIT,BOLTZMANN_CONSTANT,STEFAN_BOLTZ
+	REAL(KIND=LDP) GRAVITATIONAL_CONSTANT,MASS_SUN,SPEED_OF_LIGHT,LUM_SUN
 	INTEGER GET_INDX_DP,ERROR_LU
 	EXTERNAL ATOMIC_MASS_UNIT,BOLTZMANN_CONSTANT,STEFAN_BOLTZ,GET_INDX_DP
 	EXTERNAL GRAVITATIONAL_CONSTANT,MASS_SUN,SPEED_OF_LIGHT,ERROR_LU,LUM_SUN
@@ -233,7 +234,7 @@
 	CALL RD_STORE_LOG(UPDATE_GREY_SCL,'UP_GREY_SCL',L_FALSE,'Update GREY_SCL_FAC_IN')
 !
 ! Therse are the parameters used to define the new R grid to be output to RVSIG_COL.
-! 
+!
 	CALL RD_STORE_DBLE(dLOG_TAU,'dLOG_TAU',L_FALSE,'Lograritihmic spacing in Tau for new R grid')
 	CALL RD_STORE_DBLE(V_SCL_FAC,'VSCL_FAC',L_FALSE,'Maximum V(I-1)/V(I) for new R grid (<1)')
 	I=10
@@ -255,7 +256,7 @@
 	DONE_HYDRO=.FALSE.
 	IF(NO_HYDRO_ITS .EQ. 0)RETURN
 	IF(MAIN_COUNTER .LT. STRT_HYDRO_ITS)RETURN
-	IF( MOD( (MAIN_COUNTER-STRT_HYDRO_ITS),FREQ_HYDRO_ITS ) .NE. 0)RETURN 
+	IF( MOD( (MAIN_COUNTER-STRT_HYDRO_ITS),FREQ_HYDRO_ITS ) .NE. 0)RETURN
 !
 ! Begin Hydro computation.
 !
@@ -445,7 +446,7 @@
 !
 ! This option is for a pure spherical or plane-parallel model. The depth variation
 ! of gravity is taken into account.
-! 
+!
 	      POP_ATOM(1)=NI_ZERO
 	      T(1)=(TEFF/OLD_TEFF)*OLD_T(1)
 	      P(1)=(BC*T(1)*(1.0D0+OLD_ED(1)/OLD_POP_ATOM(1))+PTURB_ON_NA)*POP_ATOM(1)
@@ -579,7 +580,7 @@
 	        GAM_LIM=GAM_LIM-0.01D0
 	        IF(VERBOSE_OUTPUT)WRITE(LUV,*)'Resetting GAM_LIM due to -ve velocity gradient'
 	        GOTO 100
-	      END IF 
+	      END IF
 	    END IF
 	    GAM_LIM=GAM_LIM_STORE
 	    ND=I
@@ -705,7 +706,7 @@
 	  WRITE(LU_ERR,*)'Error --- TAU_MAX cannot be greater than calculated grid Tau'
 	  WRITE(LU_ERR,*)'Setting TAU to maximum value in DO_CMF_HYDRO'
 	  TAU_MAX=TAU(ND)
-	END IF 
+	END IF
 !
 	DO I=1,ND
 	  V(I)=MDOT/MU_ATOM/POP_ATOM(I)/R(I)/R(I)
@@ -722,7 +723,7 @@
 	1        R,V,TAU,ND)
 	END IF
 !
-! We now compute the revised R grid. We then interplate on Log (r^2.rho) which 
+! We now compute the revised R grid. We then interplate on Log (r^2.rho) which
 ! is equivalent to interpolating on log V. This guarentees monotocity of V.
 !
 	TAU(1:ND)=LOG(TAU(1:ND))
@@ -844,22 +845,23 @@
 	WRITE(LU_ERR,'(A)')'Updated RSTAR,RMAX and MASS'               !  & VINF in VADAT'
 !
 	RETURN
-	END 
+	END
 !	
 ! Subroutine to compute dPdR and dTAUdR for use with the
 ! Runge-Kutta integration.
 !
 	SUBROUTINE CMF_HYDRO_DERIVS(P,TAU,TEMP,ED_ON_NA,POP_ATOM)
+	USE SET_KIND_MODULE
 	USE CMF_HYDRO_MODULE
 	USE OLD_GRID_MODULE
 	IMPLICIT NONE
 !
-	REAL(10) P
-	REAL(10) TAU
-	REAL(10) TEMP
-	REAL(10) ED_ON_NA
-	REAL(10) POP_ATOM
-	REAL(10) T1,T2
+	REAL(KIND=LDP) P
+	REAL(KIND=LDP) TAU
+	REAL(KIND=LDP) TEMP
+	REAL(KIND=LDP) ED_ON_NA
+	REAL(KIND=LDP) POP_ATOM
+	REAL(KIND=LDP) T1,T2
 !
 	CALL CMF_HYDRO_NEW_EST(TAU,TEMP)
 !
@@ -888,28 +890,29 @@
 ! can choose pure LTE estimates, or scaled LTE estimates.
 !
 	SUBROUTINE CMF_HYDRO_NEW_EST(TAU,TEMP)
+	USE SET_KIND_MODULE
 	USE CMF_HYDRO_MODULE
 	USE OLD_GRID_MODULE
 	IMPLICIT NONE
 !
-	REAL(10) TEMP
-	REAL(10) TAU
+	REAL(KIND=LDP) TEMP
+	REAL(KIND=LDP) TAU
 !
-	REAL(10) T1
-	REAL(10) SF
-	REAL(10) FM
-	REAL(10) ES
-	REAL(10) RM
-	REAL(10) LTE_ED
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) SF
+	REAL(KIND=LDP) FM
+	REAL(KIND=LDP) ES
+	REAL(KIND=LDP) RM
+	REAL(KIND=LDP) LTE_ED
 !
-	REAL(10) ED_EST
-	REAL(10) OLD_ATOM
-	REAL(10) OLD_TEMP
-	REAL(10) KAP_ROSS_OLD
-	REAL(10) KAP_ROSS_LTE
-	REAL(10) KAP_ROSS_EST
-	REAL(10) KAP_ES_OLD
-	REAL(10) KAP_ES_LTE
+	REAL(KIND=LDP) ED_EST
+	REAL(KIND=LDP) OLD_ATOM
+	REAL(KIND=LDP) OLD_TEMP
+	REAL(KIND=LDP) KAP_ROSS_OLD
+	REAL(KIND=LDP) KAP_ROSS_LTE
+	REAL(KIND=LDP) KAP_ROSS_EST
+	REAL(KIND=LDP) KAP_ES_OLD
+	REAL(KIND=LDP) KAP_ES_LTE
 !
 	INTEGER, SAVE ::INDX=1
 !
@@ -991,6 +994,6 @@
 	  GAM_FULL=MIN(GAM_LIM,GAM_FULL)
 	  WRITE(75,'(ES16.9,8ES12.3)')R_EST,GAM_FULL,ED_ON_NA_EST*GAM_EDD*FM/ES,TAU,FM,RM,KAP_ROSS,KAP_ES,ED_ON_NA_EST
 	END IF
-!  
+!
 	RETURN
-	END 
+	END

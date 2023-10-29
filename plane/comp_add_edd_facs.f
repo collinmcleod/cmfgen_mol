@@ -7,38 +7,39 @@
 	1              H_ON_J,N_ON_J_NODE,KMID_ON_J,
 	1              RJ,HNU,FEDD,GEDD,N_ON_J,HBC_CMF,NBC_CMF,INBC,
 	1              IC,DBB,DIF,R,V,CHI,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER ND
-	REAL(10) H_ON_J(ND)		!H/J at note
-	REAL(10) N_ON_J_NODE(ND)		!N/J at node
-	REAL(10) KMID_ON_J(ND)		!K/J at center of interval
-	REAL(10) RJ(ND)			!Mean intensity (on node)
-	REAL(10) HNU(ND)			!Eddington flux
-	REAL(10) FEDD(ND)			!K/J at node
-	REAL(10) GEDD(ND)			!N/H at center of interval
-	REAL(10) N_ON_J(ND)		!Ni/(Ji+Jk)
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-	REAL(10) CHI(ND)
-	REAL(10) HBC_CMF			!H/J at outerboundar
-	REAL(10) NBC_CMF			!N/J at outer boundary
-	REAL(10) IC
-	REAL(10) DBB
-	REAL(10) INBC
+	REAL(KIND=LDP) H_ON_J(ND)		!H/J at note
+	REAL(KIND=LDP) N_ON_J_NODE(ND)		!N/J at node
+	REAL(KIND=LDP) KMID_ON_J(ND)		!K/J at center of interval
+	REAL(KIND=LDP) RJ(ND)			!Mean intensity (on node)
+	REAL(KIND=LDP) HNU(ND)			!Eddington flux
+	REAL(KIND=LDP) FEDD(ND)			!K/J at node
+	REAL(KIND=LDP) GEDD(ND)			!N/H at center of interval
+	REAL(KIND=LDP) N_ON_J(ND)		!Ni/(Ji+Jk)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) HBC_CMF			!H/J at outerboundar
+	REAL(KIND=LDP) NBC_CMF			!N/J at outer boundary
+	REAL(KIND=LDP) IC
+	REAL(KIND=LDP) DBB
+	REAL(KIND=LDP) INBC
 	LOGICAL DIF			!Use Diffusion approximation?
 !
 ! Local work arrays
 !
-	REAL(10) RN_MOM(ND)		!N moment at mid points
-	REAL(10) TA(ND)
-	REAL(10) TB(ND)
-	REAL(10) MIDR(ND)
-	REAL(10) GAM_REL(ND)
-	REAL(10) C_KMS
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) RN_MOM(ND)		!N moment at mid points
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) TB(ND)
+	REAL(KIND=LDP) MIDR(ND)
+	REAL(KIND=LDP) GAM_REL(ND)
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL SPEED_OF_LIGHT
-	REAL(10) T1,T2
+	REAL(KIND=LDP) T1,T2
 	INTEGER NDM1,NDM2
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER I,J
@@ -64,7 +65,7 @@
 	CALL REGRID_H(H_ON_J,R,TA,T1,T2,ND,TB)			!TB is work vector.
 	H_ON_J(1:ND)=H_ON_J(1:ND)/RJ(1:ND)/R(1:ND)/R(1:ND)
 !
-!Compute N on J at the nodes. We first get N at the mid-points. 
+!Compute N on J at the nodes. We first get N at the mid-points.
 !NB: RN_MOM will contain r^2 N.
 !
 	DO I=1,NDM1

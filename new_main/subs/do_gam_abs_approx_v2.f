@@ -5,6 +5,7 @@
 ! It will be replaced by a more sophisticated version.
 !
 	SUBROUTINE DO_GAM_ABS_APPROX_V2(LOCAL_ABS_ENERGY,TOTAL_DECAY_ENERGY,KINETIC_DECAY_ENERGY,ND)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -20,13 +21,13 @@
 	INTEGER ND
 	INTEGER ND_EXT,NC_EXT,NP_EXT
 !
-	REAL(10) LOCAL_ABS_ENERGY(ND)     	!Returned - energy absorbed locally
-	REAL(10) TOTAL_DECAY_ENERGY(ND)           !Passed   - total energey EMITTED locally
-	REAL(10) KINETIC_DECAY_ENERGY(ND)         !Passed   - energy local emitted as kinetic energy
-	REAL(10) TA(ND)
-	REAL(10) CHI(ND)
+	REAL(KIND=LDP) LOCAL_ABS_ENERGY(ND)     	!Returned - energy absorbed locally
+	REAL(KIND=LDP) TOTAL_DECAY_ENERGY(ND)           !Passed   - total energey EMITTED locally
+	REAL(KIND=LDP) KINETIC_DECAY_ENERGY(ND)         !Passed   - energy local emitted as kinetic energy
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) CHI(ND)
 !
-	REAL(10) R_EXT(3*ND-6)
+	REAL(KIND=LDP) R_EXT(3*ND-6)
 !
 	INTEGER I,J,ISPEC
 !
@@ -80,9 +81,10 @@
 !
 	RETURN
 	END
-! 
+!
 	SUBROUTINE SUB_GAM_ABS_APPROX_V2(R,ND,NC,NP,SM_R,SM_V,SM_CHI,SM_CLUMP_FAC,
 	1              LOCAL_ABS_ENERGY,TOTAL_DECAY_ENERGY,KINETIC_DECAY_ENERGY,SM_ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! ALtered 20-Nov-2022 : Fixed bug affecting the computation of the diagnostics for the energy
@@ -90,30 +92,30 @@
 !
 	INTEGER SM_ND
 	INTEGER ND,NC,NP
-	REAL(10) R(ND)
+	REAL(KIND=LDP) R(ND)
 !
-	REAL(10) SM_R(SM_ND)
-	REAL(10) SM_V(SM_ND)
-	REAL(10) SM_CHI(SM_ND)
-	REAL(10) SM_CLUMP_FAC(SM_ND)
-	REAL(10) LOCAL_ABS_ENERGY(SM_ND)
-	REAL(10) TOTAL_DECAY_ENERGY(SM_ND)
-	REAL(10) KINETIC_DECAY_ENERGY(SM_ND)
+	REAL(KIND=LDP) SM_R(SM_ND)
+	REAL(KIND=LDP) SM_V(SM_ND)
+	REAL(KIND=LDP) SM_CHI(SM_ND)
+	REAL(KIND=LDP) SM_CLUMP_FAC(SM_ND)
+	REAL(KIND=LDP) LOCAL_ABS_ENERGY(SM_ND)
+	REAL(KIND=LDP) TOTAL_DECAY_ENERGY(SM_ND)
+	REAL(KIND=LDP) KINETIC_DECAY_ENERGY(SM_ND)
 !
 	INTEGER, PARAMETER :: IONE=1
 !
-	REAL(10) P(NP)
-	REAL(10) V(ND)
+	REAL(KIND=LDP) P(NP)
+	REAL(KIND=LDP) V(ND)
 !
-	REAL(10) Z(ND),RJ(ND),Q(ND),F(ND)
-	REAL(10) DTAU(ND),XM(ND),ETA(ND)
-	REAL(10) TA(ND),TB(ND),TC(ND)
-	REAL(10) SOURCE(ND),CHI(ND),DCHIDR(ND),THETA(ND)
-	REAL(10) JQW(ND,NP),KQW(ND,NP)
-	REAL(10) WM(ND,ND),FB(ND,ND)
+	REAL(KIND=LDP) Z(ND),RJ(ND),Q(ND),F(ND)
+	REAL(KIND=LDP) DTAU(ND),XM(ND),ETA(ND)
+	REAL(KIND=LDP) TA(ND),TB(ND),TC(ND)
+	REAL(KIND=LDP) SOURCE(ND),CHI(ND),DCHIDR(ND),THETA(ND)
+	REAL(KIND=LDP) JQW(ND,NP),KQW(ND,NP)
+	REAL(KIND=LDP) WM(ND,ND),FB(ND,ND)
 !
-	REAL(10) ABS_OPT_DEPTH
-	REAL(10) IC,T1,T2,T3,CONV_FAC,DBB,HBC_J,HBC_S,INBC
+	REAL(KIND=LDP) ABS_OPT_DEPTH
+	REAL(KIND=LDP) IC,T1,T2,T3,CONV_FAC,DBB,HBC_J,HBC_S,INBC
 	LOGICAL THK_CONT
 	CHARACTER(LEN=6) METHOD
         CHARACTER(LEN=9) INNER_BND_METH
@@ -128,7 +130,7 @@
 ! essentially the same as using the HOLLOW_CORE option. The later
 ! will potentially be out because of the small velcoity shifts induced
 ! by the non-zero velocity of the inner boudary.
-! 
+!
 	METHOD='LOGLOG'
 	INNER_BND_METH='DIFFUSION'
 	THK_CONT=.FALSE.
@@ -197,7 +199,7 @@
 !   (b) The extra factor of 4 arises as ATAN(1.0D0) is pi/4.
 !   (c) /Lsun to convert to solar luminosities
 !
-! NB: TA etc are decarled to be of length ND, thus I need to explictly give the 
+! NB: TA etc are decarled to be of length ND, thus I need to explictly give the
 !       upper limit in the SUM.
 
 	CONV_FAC=16.0D0*ATAN(1.0D0)*1.0D+30/3.826D+33

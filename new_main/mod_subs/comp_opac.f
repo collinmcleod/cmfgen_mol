@@ -4,6 +4,7 @@
 	SUBROUTINE COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONLY)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE CONTROL_VARIABLE_MOD
 	USE OPAC_MOD
@@ -29,11 +30,11 @@
 	INTEGER NT
 	INTEGER NCF
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) NU_EVAL_CONT(NCF)
-	REAL(10) FQW(NCF)
-	REAL(10) FL
-	REAL(10) CONT_FREQ
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) NU_EVAL_CONT(NCF)
+	REAL(KIND=LDP) FQW(NCF)
+	REAL(KIND=LDP) FL
+	REAL(KIND=LDP) CONT_FREQ
 !
 	INTEGER FREQ_INDX
 	CHARACTER*(*) SECTION
@@ -45,14 +46,14 @@
 !
 ! Internally used variables
 !
-        REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+        REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
-	REAL(10) XCROSS_V2
-	REAL(10) GFF
+	REAL(KIND=LDP) XCROSS_V2
+	REAL(KIND=LDP) GFF
 	EXTERNAL XCROSS_V2,GFF
 !
-	REAL(10) TA(ND)
-	REAL(10) T1,T2,T3,T4
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) T1,T2,T3,T4
 	INTEGER I,J
 	INTEGER ID
 	INTEGER PHOT_ID
@@ -92,7 +93,7 @@
 	        CALL GENOPAETA_V10(ID,CHI,ETA,CONT_FREQ,
 	1           ATM(ID)%XzV_F,      ATM(ID)%XzVLTE_F,     ATM(ID)%LOG_XzVLTE_F,  ATM(ID)%EDGEXzV_F,
 	1           ATM(ID)%GIONXzV_F,  ATM(ID)%ZXzV,         ATM(ID)%NXzV_F,
-	1           ATM(ID+1)%XzV,      ATM(ID+1)%LOG_XzVLTE, ATM(ID+1)%NXzV, 
+	1           ATM(ID+1)%XzV,      ATM(ID+1)%LOG_XzVLTE, ATM(ID+1)%NXzV,
 	1           PHOT_ID,            ATM(ID)%XzV_ION_LEV_ID(J),
 	1           ED,T,EMHNUKT_CONT,L_TRUE,ND,LST_DEPTH_ONLY)
 	      END DO
@@ -192,7 +193,7 @@
 !
 ! 
 !
-! Evaluate EXP(-hv/kT) for current frequency. This is needed by routines 
+! Evaluate EXP(-hv/kT) for current frequency. This is needed by routines
 ! such as COMP_VAR_JREC etc.
 !
 	  DO J=1,ND
@@ -216,8 +217,8 @@
 ! LTE and is given by
 !                     ETA/(2hv^3/c^2)
 ! we can adjust CHI and ETA so that the condition of constant photoionization
-! cross-section is met. This adjustment automatically ensures that ETA/CHI 
-! gives the Planck function in LTE. 
+! cross-section is met. This adjustment automatically ensures that ETA/CHI
+! gives the Planck function in LTE.
 !
 	  T1=(FL/CONT_FREQ)**3
 	  T2=TWOHCSQ*(CONT_FREQ**3)
@@ -250,7 +251,7 @@
 !
 	  IF(FF_XRAYS)THEN
 !
-! Since T_SHOCK is depth indpendent, Z^2 * (the free-free Gaunt factors) 
+! Since T_SHOCK is depth indpendent, Z^2 * (the free-free Gaunt factors)
 ! are depth independent.
 !
 ! We use T3 for the Electron density. We asume H, He, and C are fully ionized

@@ -6,6 +6,7 @@
 ! Also computed net cooling/heating rate for each charge exchange reaction.
 !
 	SUBROUTINE EVAL_CHG_RATES(CHG_PR,CHG_RR,SPECIES,POPS,T,ND,NT)
+	USE SET_KIND_MODULE
 	USE CHG_EXCH_MOD
 	IMPLICIT NONE
 !
@@ -17,29 +18,29 @@
 !
 	INTEGER*4 NT
 	INTEGER*4 ND
-	REAL(10) CHG_PR(ND)
-	REAL(10) CHG_RR(ND)
+	REAL(KIND=LDP) CHG_PR(ND)
+	REAL(KIND=LDP) CHG_RR(ND)
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) T(ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) T(ND)
 	CHARACTER*(*) SPECIES
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
-	REAL(10), PARAMETER :: H=6.6261965D-27
+	REAL(KIND=LDP), PARAMETER :: H=6.6261965D-27
 !
 ! Local variables.
 !
 	INTEGER*4 J,L
 	INTEGER*4 L1,L2,L3,L4
 !
-	REAL(10) ALPHA_REC
-	REAL(10) ALPHA_ION
-	REAL(10) FRD_R
-	REAL(10) REV_R
-	REAL(10) T1
-	REAL(10) TVAL
+	REAL(KIND=LDP) ALPHA_REC
+	REAL(KIND=LDP) ALPHA_ION
+	REAL(KIND=LDP) FRD_R
+	REAL(KIND=LDP) REV_R
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) TVAL
 !
 ! We zero the charge exchange PR (ionization) and (RR) recombination vectors
 ! as more than 1 reaction might contribute to each species. They must also
@@ -56,7 +57,7 @@
 ! The way we have developed our ionization equtions, charge exchange
 ! reactions only effect the lowest ionization stage for each atomic species.
 !
-	    IF( SPECIES .EQ. SPEC_ID_CHG(J,3) .OR. 
+	    IF( SPECIES .EQ. SPEC_ID_CHG(J,3) .OR.
 	1       SPECIES .EQ. SPEC_ID_CHG(J,2) )THEN
 !
 ! Define variables to avoid complicated notation.

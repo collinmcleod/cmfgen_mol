@@ -27,6 +27,7 @@
 	SUBROUTINE COMP_J_BLANK(SECTION,EDDINGTON,FL,FREQ_INDX,FIRST_FREQ,LST_ITERATION,MAXCH,
 	1                              LUER,LU_ES,LU_JCOMP,LU_EDD,ACCESS_F,
 	1                              ND,NC,NP,NCF,NDEXT,NCEXT,NPEXT)
+	USE SET_KIND_MODULE
 !
 	USE ANG_QW_MOD
 	USE MOD_CMFGEN
@@ -35,7 +36,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
-! Altered : 09-Jun-2019 : Added POINT srce options - osiris (added to IBIS 17-Aug-2019) 
+! Altered : 09-Jun-2019 : Added POINT srce options - osiris (added to IBIS 17-Aug-2019)
 ! Altered : 30-Apr-2019 : Changed to MOM_JREL_V9 (add XM_CHK_OPTION and J_CHK_OPTION).
 ! Altered : 29-Apr-2019 : XM_CHK_OPTION added. Changed to MOM_J_DDT_V6.
 ! Altered : 20-Apr-2019 : J_CHK_OPTION added. Changed to MOM_J_DDT_V5.
@@ -48,16 +49,16 @@
 !                             CMF_FORM_SOL_V2 is not parallelized and slows down large clumped models.
 ! Altered : 16-Feb-2006 : CMF_FORM_SOL_V2 used for last iteration when MAXCH<100, and
 !                            not LAMBDA iteration. Sometimes it might be useful to
-!                            change so that CMF_FORM_SOL_V2 is also called when LMABDA 
+!                            change so that CMF_FORM_SOL_V2 is also called when LMABDA
 !                            iteration used. FG_COUNt was not being initialized.
 ! Finalized: 17-Dec-2004
 !
-	REAL(10) C_KMS
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL SPEED_OF_LIGHT
 !
-	REAL(10) FL
-	REAL(10) MAXCH
+	REAL(KIND=LDP) FL
+	REAL(KIND=LDP) MAXCH
 !
 	INTEGER ACCESS_F
 	INTEGER LU_EDD
@@ -79,12 +80,12 @@
 ! Constants for opacity etc.
 !
         COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-        REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+        REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
-	REAL(10), SAVE :: FL_OLD
-	REAL(10) BNUE
-	REAL(10) S1
-	REAL(10) T1,T2
+	REAL(KIND=LDP), SAVE :: FL_OLD
+	REAL(KIND=LDP) BNUE
+	REAL(KIND=LDP) S1
+	REAL(KIND=LDP) T1,T2
 !
 ! FG_COUNT is used to determine the average number of calls to FG_J_CMF_V10 per
 ! frequency.
@@ -147,7 +148,7 @@
 	  IC=TWOHCSQ*( FL**3 )*EXP(T1)/(1.0D0-EXP(T1))
 	END IF
 !
-! Switch to using CHI_CLUMP, ETA_CLUMP, and ESEC_CLUMP in case the model 
+! Switch to using CHI_CLUMP, ETA_CLUMP, and ESEC_CLUMP in case the model
 ! has clumping.
 !
 	CHI_CLUMP(1:ND)=CHI(1:ND)*CLUMP_FAC(1:ND)
@@ -156,7 +157,7 @@
 	CHI_SCAT_CLUMP(1:ND)=CHI_SCAT(1:ND)*CLUMP_FAC(1:ND)
 !
 ! 
-!                            
+!
 	IF(CONT_VEL .AND. USE_FIXED_J)THEN
 	  CALL RD_CONT_J(FL,FREQ_INDX,FIRST_FREQ,LST_ITERATION,
 	1          ACCURATE,LUER,LU_EDD,ACCESS_F,ND,NP)
@@ -165,7 +166,7 @@
 	ELSE IF(.NOT. CONT_VEL .AND. THIS_FREQ_EXT)THEN
 C
 C Solve for the mean intensity J . We can either solve for J with or without
-C Eddington factors. Generally use Eddington factors when there is many 
+C Eddington factors. Generally use Eddington factors when there is many
 C grid points.
 C
 	  CALL TUNE(IONE,'JFEAUEXT')
@@ -190,7 +191,7 @@ C
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
 	      WRITE(LUER,*)'You may need to delete EDDFACTOR'
-	      STOP                
+	      STOP
 	    END IF
 	  END IF
 C
@@ -229,7 +230,7 @@ C
 C
 	      IF(J_IT_COUNTER .GT. 15)THEN
 	         WRITE(LUER,*)'Possible error converging f - T1 is',T1
-	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION 
+	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION
 	      	 INACCURATE=.FALSE.
 	      END IF
 	
@@ -267,7 +268,7 @@ C
 	1              CHI_CLUMP,ETA_CLUMP,CHI_SCAT_CLUMP,ND)
 C
 C NB: CHI_PREV is used to refer to the continuum opacity at the previous
-C frequency. Is does not need to be multiplied by CLUMP_FAC, as it is 
+C frequency. Is does not need to be multiplied by CLUMP_FAC, as it is
 C compared directly to CHI_CONT. Since it is used for describing the
 C variation in chi from one frequency to the next, we also do not need to
 C use the extended vectors.
@@ -393,7 +394,7 @@ C
 	      IF(J_IT_COUNTER .LT. 20 .OR. COMPUTE_EDDFAC)THEN
 	        T1=0.0D0
 	        DO I=1,NDEXT
-	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)        
+	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)
 	          FOLD(I)=FEDD(I)
 	        END DO
 	        IF(T1 .GT. ACC_EDD_FAC)INACCURATE=.TRUE.
@@ -401,7 +402,7 @@ C
 C
 	      IF(J_IT_COUNTER .GT. 10)THEN
 	         WRITE(LUER,*)'Possible error converging f - T1 is',T1
-	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION 
+	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION
 	      	 INACCURATE=.FALSE.
 	      END IF
 	    END DO
@@ -441,7 +442,7 @@ C
 	    IF(T1 .NE. 0)T1=200.0D0*(RJ(1)-TC(1))/T1
 	    T2=ABS(RJ(ND))+ABS(TC(NDEXT))
 	    IF(T2 .NE. 0)T2=200.0D0*(RJ(ND)-TC(NDEXT))/T2
-	    IF(FIRST_FREQ)THEN                 
+	    IF(FIRST_FREQ)THEN
 	      OPEN(UNIT=LU_JCOMP,STATUS='UNKNOWN',FILE='J_COMP')
 	      WRITE(LU_JCOMP,'(A)')' '
 	      WRITE(LU_JCOMP,'(A)')'Comparison of J at Outer and Inner',
@@ -499,7 +500,7 @@ C
 	      ELSE
 	        TA(1:NDEXT)=ETAEXT(1:NDEXT)+ESECEXT(1:NDEXT)*RJEXT_ES(1:NDEXT)
 	      END IF
-C                             
+C
 C NB Using TA for ETA, U for P_OBS (temporay measure), I for NP_OBS.
 C
 	      CALL TUNE(IONE,'CMF_FORM_SOL')
@@ -637,7 +638,7 @@ C
 	1                  VDOP_VEC,DELV_FRAC_FG,REXT_FAC,
 	1                  METHOD,FIRST_FREQ,NEW_FREQ,NC,NP,ND)
 !
-	     ELSE 
+	     ELSE
 	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling FG_J_CMF_V13 in COMP_J_BLANK'
 	       CALL FG_J_CMF_V13(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
 	1                  TC,FEDD,AQW,HQW,KQW,NQW,HMIDQW,NMIDQW,
@@ -700,7 +701,7 @@ C
 	       IF(LST_ITERATION)THEN
 	         DO I=1,ND
 	           TA(I)=RJ(I)*R(I)*R(I)
-	         END DO 
+	         END DO
 	         T1=HFLUX_AT_IB*R(ND)*R(ND)
 	         T2=HFLUX_AT_OB/RJ(1)
 	         CALL OUT_JH(TA,RSQHNU,T1,T2,FL,NCF,R,V,ND,FIRST_FREQ,'NORMAL')
@@ -723,7 +724,7 @@ C
 	       IF(LST_ITERATION)THEN
 	         DO I=1,ND
 	           TA(I)=RJ(I)*R(I)*R(I)
-	         END DO 
+	         END DO
 	         T1=HFLUX_AT_IB*R(ND)*R(ND)
 	         T2=HFLUX_AT_OB/RJ(1)
 	         CALL OUT_JH(TA,RSQHNU,T1,T2,FL,NCF,R,V,ND,FIRST_FREQ,'NORMAL')
@@ -745,7 +746,7 @@ C
 	       ELSE IF(INNER_BND_METH(1:3) .EQ. 'DIF')THEN
 	       ELSE
 	          HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
-	       END IF 
+	       END IF
 !	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
                HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
 	       IF(LST_ITERATION .AND. WRITE_JH)THEN
@@ -775,7 +776,7 @@ C
 	      IF(J_IT_COUNTER .LT. 20 .OR. COMPUTE_EDDFAC)THEN
 	        T1=0.0D0
 	        DO I=1,ND
-	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)        
+	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)
 	          FOLD(I)=FEDD(I)
 	        END DO
 	        IF(T1 .GT. ACC_EDD_FAC)INACCURATE=.TRUE.
@@ -783,7 +784,7 @@ C
 C
 	      IF(J_IT_COUNTER .GT. 20)THEN
 	         WRITE(LUER,*)'Possible error converging f - T1 is',T1
-	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION 
+	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION
 	      	 INACCURATE=.FALSE.
 	      END IF
 	    END DO
@@ -815,11 +816,11 @@ C last iteration if non-coherent).
 C
 	    IF(PLANE_PARALLEL .OR. PLANE_PARALLEL_NO_V)THEN
 !
-! So as defined for normal OBSFLUX calculation. HQW_AT_RMAX is initially set 
+! So as defined for normal OBSFLUX calculation. HQW_AT_RMAX is initially set
 ! to JQW. Thus we need to multiply by MU to get the actual H weights at the
-! outer boundary. For a plane-parallel atmosphere, RMAX_OBS is only scaling 
-! constant. Setting its value to ND means that the observed luminosity should 
-! correspond to the luminosity in VADAT (in absence of significant velocity 
+! outer boundary. For a plane-parallel atmosphere, RMAX_OBS is only scaling
+! constant. Setting its value to ND means that the observed luminosity should
+! correspond to the luminosity in VADAT (in absence of significant velocity
 ! effects).
 !
 	      IF(FIRST_FREQ)THEN
@@ -837,7 +838,7 @@ C
 	      ELSE
      	        TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ_ES(1:ND)
 	      END IF
-C                             
+C
 C NB Using TA for ETA, U for P_OBS (temporay measure), I for NP_OBS.
 C
 	      CALL TUNE(IONE,'CMF_FORM_SOL')
@@ -852,7 +853,7 @@ C
 	      CALL TUNE(ITWO,'CMF_FORM_SOL')
 	    ELSE IF(FIRST_FREQ)THEN
 !
-! So as defined for normal OBSFLUX calculation. 
+! So as defined for normal OBSFLUX calculation.
 !
 	      NP_OBS=NP
 	      P_OBS(1:NP)=P(1:NP)
@@ -865,7 +866,7 @@ C
 	    IF(T1 .NE. 0)T1=200.0D0*(RJ(1)-TC(1))/T1
 	    T2=ABS(RJ(ND))+ABS(TC(ND))
 	    IF(T2 .NE. 0)T2=200.0D0*(RJ(ND)-TC(ND))/T2
-	    IF(FIRST_FREQ)THEN                 
+	    IF(FIRST_FREQ)THEN
 	      OPEN(UNIT=LU_JCOMP,STATUS='UNKNOWN',FILE='J_COMP')
 	      WRITE(LU_JCOMP,'(A)')' '
 	      WRITE(LU_JCOMP,'(A)')'Comparison of J at Outer and Inner',
@@ -918,7 +919,7 @@ C
 	    END DO
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJ(I),I=1,ND),T1
-	    IF(T1 .NE. FL)THEN        
+	    IF(T1 .NE. FL)THEN
 	      WRITE(LUER,'(/,A)')' Error - incorrect reading of EDDFACTOR in COMP_J_BLANK'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
@@ -957,11 +958,11 @@ C
 	          FOLD(I)=FEDD(I)
 	        END DO
 	        IF(T1 .GT. ACC_EDD_FAC)INACCURATE=.TRUE.
-	      END IF       
+	      END IF
 C
 	      IF(J_IT_COUNTER .GT. 15)THEN
 	         WRITE(LUER,*)'Possible error converging f - T1 is',T1
-	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION 
+	         WRITE(LUER,*)'Frequency is ',FL,' in section '//SECTION
 	      	 INACCURATE=.FALSE.
 	      END IF
 	

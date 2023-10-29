@@ -12,7 +12,7 @@
 	  REAL*4  XPAR(2),YPAR(2)
 	  INTEGER IN1,IN2
 	  LOGICAL LIN_INT
-!         
+!
 	  EXTERNAL SP_EQUAL
 	  LOGICAL SP_EQUAL
 !
@@ -128,9 +128,9 @@
 	        YV(I)=0.0
 	        UP_LIM=I-1
 	        EXIT
-	      ELSE 
+	      ELSE
 	        DO WHILE (SIGN*CD(IN1)%XVEC(I) .GT. SIGN*XV(L+1))
-	          L=L+1           
+	          L=L+1
 	        END DO
 	        T1=(CD(IN1)%XVEC(I)-XV(L+1))/(XV(L)-XV(L+1))
 	        YV(I)=(1.0D0-T1)*ZV(L+1)+T1*ZV(L)
@@ -155,7 +155,7 @@
 !
 C
 C We will use monotonic cubic interpolation. We first verify the range.
-C I & J are temporary variables for the callt o MON_INTERP. I denotes the 
+C I & J are temporary variables for the callt o MON_INTERP. I denotes the
 C first element. Initially J denotes the last element, then the numer of
 C elements that can be interpolated.
 C

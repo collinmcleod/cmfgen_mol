@@ -1,5 +1,5 @@
 C
-C Routine to replace VMS TUNE routine for collecting tuning statistics for 
+C Routine to replace VMS TUNE routine for collecting tuning statistics for
 C a program section.
 C
 C Usage:
@@ -22,6 +22,7 @@ C NB: Total time for each code section is accumulated on successive calls.
 C i.e. TUNE(1,'Unique ID') does not initialize the counters.
 C
         SUBROUTINE TUNE(LRUN,IDENT)
+	USE SET_KIND_MODULE
         IMPLICIT NONE
 !
 ! Altered 11-Nov-2000 : Call to F90 SYSTEM_CLOCK routine implemented.
@@ -34,17 +35,17 @@ C
 	INTEGER, PARAMETER :: MAX_IDS=50
 	INTEGER, PARAMETER :: LUOUT=55
 !
-        REAL(10) OVERHEAD, StartTime, StopTime
-        REAL(10) ST_CPU(MAX_IDS)
-	REAL(10) CPUTOT(MAX_IDS)
-        REAL(10) WALLTOT(MAX_IDS)
+        REAL(KIND=LDP) OVERHEAD, StartTime, StopTime
+        REAL(KIND=LDP) ST_CPU(MAX_IDS)
+	REAL(KIND=LDP) CPUTOT(MAX_IDS)
+        REAL(KIND=LDP) WALLTOT(MAX_IDS)
         CHARACTER*30 IDLIST(MAX_IDS)
         INTEGER I
 !
 	INTEGER IEND_WALL
 	INTEGER IC0,IR0,IM0,IT1
 	INTEGER IST_WALL(MAX_IDS)
-	REAL(10) CLK_PERIOD,RR0
+	REAL(KIND=LDP) CLK_PERIOD,RR0
 !
 !
 	LOGICAL FIRSTTIME
@@ -75,7 +76,7 @@ C
         ENDIF
 !
 ! If LRUN =1, we are beginning the TIME bracket. Therefore we find the
-! correct storage location first. 
+! correct storage location first.
 !
 	IF (LRUN .EQ. 1) THEN
 	  DO I=1,MAX_IDS
@@ -95,11 +96,11 @@ C
 	  END DO
 	  WRITE (LUOUT,'(A)')' ***** TOO MANY TUNING POINTS '
 	  RETURN
-	  
+	
 !
 	ELSE IF (LRUN .EQ. 2) THEN
 !
-! If LRUN=2, we are ending the TIME bracket. Therefore we call the timing 
+! If LRUN=2, we are ending the TIME bracket. Therefore we call the timing
 ! routine first.
 !
           CALL CPU_TIME(StopTime)
@@ -111,7 +112,7 @@ C
 	      IF(IT1 .LT. 0)IT1=IT1+IM0
 	      WALLTOT(I)=WALLTOT(I)+IT1/RR0
 	      RETURN
-	    END IF 
+	    END IF
 	    IF (IDLIST(I).EQ.' ')EXIT
 	  END DO
 	  WRITE(LUOUT,*)' ***** UNMATCHED TUNING POINT: ',TRIM(IDENT)
@@ -138,6 +139,6 @@ C
 	  WRITE(LUOUT,*)' LRUN=',LRUN
 	  STOP
 	ENDIF
-        
+
 	RETURN
 	END

@@ -7,6 +7,7 @@
 ! are important
 !
 	SUBROUTINE SET_IMP_VEC(IMP_VAR,NXzV,NIV_XzV,EQxZV,NT,XzV_PRES)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 17-Mar-2001
@@ -22,7 +23,7 @@
 	LOGICAL, SAVE :: FIRST=.TRUE.
 !
 ! Initialize IMP_VAR. We set it to FALSE for all variables except
-! ED and T. 
+! ED and T.
 !
 	IF(FIRST)THEN
 	  FIRST=.FALSE.

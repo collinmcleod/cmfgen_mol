@@ -3,21 +3,22 @@
 ! TAU is based on the FLUX mean opacity.
 !
 	SUBROUTINE DO_TAU_REGRID_V2(POPS,ESEC,DONE_R_REV,ND,NT,LU)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
 ! Altered 15-Nov-2021 : Bug fix -- STRETCH_POW was being read in as character.
 ! Altered 12-Jul-2013 : Modified so that grid size changes more uniformly near FG_MAX
 !                          when using the refine option. Also updated output to LOG file.
-!                          (most changes done 09-Jul or earlier). 
+!                          (most changes done 09-Jul or earlier).
 ! Altered 02-Dec-2012 : Changed to V2 (added LU to call and removed R_OLD).
 !                       Added REFINE option.
 !                       LOG file (attached yto unit LU) must be open on call.
 !
 	INTEGER ND,NT,LU
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) ESEC(ND)			!Electron scattering opacity
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) ESEC(ND)			!Electron scattering opacity
 	LOGICAL DONE_R_REV
 !
 ! For specifying grid.
@@ -28,31 +29,31 @@
 !
 ! Local variables.
 !
-	REAL(10) R_OLD(ND)
-	REAL(10) LOG_R(ND)
-	REAL(10) LOG_R_OLD(ND)
-	REAL(10) V_OLD(ND)
-	REAL(10) SIGMA_OLD(ND)
-	REAL(10) dTAU_OLD(ND)
-	REAL(10) TAU_OLD(ND)
-	REAL(10) TAU(ND)
+	REAL(KIND=LDP) R_OLD(ND)
+	REAL(KIND=LDP) LOG_R(ND)
+	REAL(KIND=LDP) LOG_R_OLD(ND)
+	REAL(KIND=LDP) V_OLD(ND)
+	REAL(KIND=LDP) SIGMA_OLD(ND)
+	REAL(KIND=LDP) dTAU_OLD(ND)
+	REAL(KIND=LDP) TAU_OLD(ND)
+	REAL(KIND=LDP) TAU(ND)
 !
-	REAL(10) TA(ND)			!Work vectors
-	REAL(10) TB(ND)
+	REAL(KIND=LDP) TA(ND)			!Work vectors
+	REAL(KIND=LDP) TB(ND)
 !
 ! The fine grid (FG) is chosen to cover the ionization front. The default values are
 ! -2.0 to 1.0D0 in log(TAU) space.
 !
-	REAL(10) FG_MIN			!Min Tau for FG
-	REAL(10) FG_MAX			!Max Tau for FG
-	REAL(10) FG_RANGE
+	REAL(KIND=LDP) FG_MIN			!Min Tau for FG
+	REAL(KIND=LDP) FG_MAX			!Max Tau for FG
+	REAL(KIND=LDP) FG_RANGE
 !
-	REAL(10) T1,T2
-	REAL(10) DLOG_TAU
-	REAL(10) STRETCH_POW		!Power law exponent to stretch tau scale about 1
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) DLOG_TAU
+	REAL(KIND=LDP) STRETCH_POW		!Power law exponent to stretch tau scale about 1
 !
-	REAL(10) OBND_PARAMS(5)		!Parameters specifying grid placement at outer boundary.
-	REAL(10) IBND_PARAMS(5)		!Parameters specifying grid placement at nner boundary.
+	REAL(KIND=LDP) OBND_PARAMS(5)		!Parameters specifying grid placement at outer boundary.
+	REAL(KIND=LDP) IBND_PARAMS(5)		!Parameters specifying grid placement at nner boundary.
 !
 	INTEGER NUM_IBND_PARAMS		!Number of points inserted near inner boundary.
 	INTEGER NUM_OBND_PARAMS		!Number of points inserted near outer boundary.
@@ -140,7 +141,7 @@
 	R_OLD(1:ND)=R(1:ND)
 	LOG_R_OLD=LOG10(R_OLD)
 !
-! Compute optical depth depth increments. We use the FLUX_MEAN optical depth 
+! Compute optical depth depth increments. We use the FLUX_MEAN optical depth
 ! scale, except if it has a problem and is less than ESEC.
 !
 	DO I=1,ND
@@ -148,7 +149,7 @@
 	  TA(I)=TA(I)*CLUMP_FAC(I)
 	END DO
 !
-! Compute optical depth scale. Note that we are given the optical depth 
+! Compute optical depth scale. Note that we are given the optical depth
 ! increments, not the optical depth scale. We assume a power law dependence
 ! for the opacity when evaluating the optical depth at the outer boundary.
 !
@@ -225,7 +226,7 @@
 !
 	ELSE IF(TRIM(GRID_TYPE) .EQ. 'FIX_NX')THEN
 !
-! This option allows us to specify a particular region in which extra points 
+! This option allows us to specify a particular region in which extra points
 ! are inserted. The grid could have slight jumps in spacing across the
 ! specied region.
 !
@@ -333,7 +334,7 @@
 	  WRITE(LU,'(A,ES12.4,A,I4)')'! Maximum optical depth is',FG_MAX,' at depth index',IEND
 	  WRITE(LU,'(A,ES12.4)')'! Range of optical depth is',FG_RANGE
 !
-! Compute the new grid. 
+! Compute the new grid.
 !
 	  TAU(1:ND)=TAU_OLD(1:ND)
 	  T1=(FG_MAX-FG_MIN)/(IEND-IST+1)
@@ -363,7 +364,7 @@
 	  WRITE(T_OUT,*)'Invalid GRID_TYPE in ADJUST_R_GRID'
 	  WRITE(T_OUT,*)'GRID_TYPE=',TRIM(GRID_TYPE)
 	  STOP
-	END IF 
+	END IF
 !
 ! Do grid at inner boundary. We set NUM_IBND_PARAMS extra points.
 !
@@ -384,7 +385,7 @@
 	  WRITE(LU,'(A)')'! Done inner boundary in DO_TAU_REGRID'
 	END IF
 !
-! Now do outer boundary. 
+! Now do outer boundary.
 !
 	IF(TRIM(GRID_TYPE) .NE. 'REFINE')THEN
 	  DLOG_TAU=TAU(NUM_OBND_PARAMS+2)-TAU(1)

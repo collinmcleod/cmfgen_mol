@@ -1,6 +1,7 @@
 	FUNCTION EXPN(N,X)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
-	REAL(10) EXPN,EXPI,X,Z
+	REAL(KIND=LDP) EXPN,EXPI,X,Z
 	EXTERNAL EXPI
 	INTEGER I,J,K,N,IFAIL
 C
@@ -12,7 +13,7 @@ C
 	  EXPN=(X*X + 4.03640*X + 1.15198)/(X*X + 5.03637*X + 4.1916)/X
 	  RETURN
 	END IF
-C	  
+C	
 	IF(X .LT. 5)THEN
 	  EXPN=EXP(X)*EXPI(X)
 	  DO I=2,N
@@ -20,7 +21,7 @@ C
 	  END DO
 	ELSE IF(N .GT. 0)THEN
 C
-C We use recurrence relation in forward direction. 
+C We use recurrence relation in forward direction.
 C
 	  EXPN=EXP(X)*EXPI(X)
 	  DO I=2,N

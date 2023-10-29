@@ -7,38 +7,39 @@
 	1             MU_AT_RMAX,HQW_AT_RMAX,TRAPFORJ,
 	1             FLUXMEAN,ESEC,GRID_TYPE,RG_PARS,N_PARS,
 	1             ND,NT,NC,NP)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
 ! Altered : 18-Mar-2004 FLUXMEAN passed insted of dTAU_OLD
 !                       ESEC passed in call.
-!                       As still developing, subroutine name NOT changed. 
+!                       As still developing, subroutine name NOT changed.
 ! Created : 25-Feb-2004
 !
 	INTEGER ND,NT,NC,NP
 !
-	REAL(10) POPS(NT,ND)
+	REAL(KIND=LDP) POPS(NT,ND)
 !
 ! NB: dTAU_OLD(I) = Optical depth increment between depth I & I+1.
 !                   It is NOT the optical depth scale.
 !                   Generally computed using the FLUX_MEAN opacity.
 !
 	LOGICAL TRAPFORJ
-	REAL(10) P(NP)
-	REAL(10) JQW(ND,NP)
-	REAL(10) HQW(ND,NP)
-	REAL(10) KQW(ND,NP)
-	REAL(10) HMIDQW(ND,NP)
-	REAL(10) NMIDQW(ND,NP)
-	REAL(10) MU_AT_RMAX(NP)
-	REAL(10) HQW_AT_RMAX(NP)
+	REAL(KIND=LDP) P(NP)
+	REAL(KIND=LDP) JQW(ND,NP)
+	REAL(KIND=LDP) HQW(ND,NP)
+	REAL(KIND=LDP) KQW(ND,NP)
+	REAL(KIND=LDP) HMIDQW(ND,NP)
+	REAL(KIND=LDP) NMIDQW(ND,NP)
+	REAL(KIND=LDP) MU_AT_RMAX(NP)
+	REAL(KIND=LDP) HQW_AT_RMAX(NP)
 !
-	REAL(10) FLUXMEAN(ND)
-	REAL(10) ESEC(ND)
+	REAL(KIND=LDP) FLUXMEAN(ND)
+	REAL(KIND=LDP) ESEC(ND)
 !
 	INTEGER N_PARS
 	CHARACTER(LEN=*) GRID_TYPE
-	REAL(10) RG_PARS(N_PARS)
+	REAL(KIND=LDP) RG_PARS(N_PARS)
 !
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -47,26 +48,26 @@
 !
 ! Local variables.
 !
-	REAL(10) dTAU_OLD(ND)
-	REAL(10) R_OLD(ND)
-	REAL(10) LOG_R_OLD(ND)
-	REAL(10) LOG_R(ND)
-	REAL(10) TAU_OLD(ND)
-	REAL(10) TAU(ND)
-	REAL(10) TA(ND)
-	REAL(10) TB(ND)
+	REAL(KIND=LDP) dTAU_OLD(ND)
+	REAL(KIND=LDP) R_OLD(ND)
+	REAL(KIND=LDP) LOG_R_OLD(ND)
+	REAL(KIND=LDP) LOG_R(ND)
+	REAL(KIND=LDP) TAU_OLD(ND)
+	REAL(KIND=LDP) TAU(ND)
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) TB(ND)
 !
 ! The fine grid (FG) is chosen to cover the ioization front. The default valuse are
 ! -3.0 to 1.5D0 in log(TAU) space.
 !
-	REAL(10) FG_MIN                   !Default=-3.0D0
-	REAL(10) FG_MAX			!Default=1.5D0
-	REAL(10) FG_RANGE			!Default=4.5D0
+	REAL(KIND=LDP) FG_MIN                   !Default=-3.0D0
+	REAL(KIND=LDP) FG_MAX			!Default=1.5D0
+	REAL(KIND=LDP) FG_RANGE			!Default=4.5D0
 !
-	REAL(10) W1(NP),W2(NP),W3(NP)
+	REAL(KIND=LDP) W1(NP),W2(NP),W3(NP)
 !
-	REAL(10) DTAU
-	REAL(10) T1
+	REAL(KIND=LDP) DTAU
+	REAL(KIND=LDP) T1
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER LS,I,I1,I2
 	INTEGER NX
@@ -89,7 +90,7 @@
 !
 	R_OLD(1:ND)=R(1:ND)
 !
-! Compute optical depth scale. Note that we are passed the optical detph 
+! Compute optical depth scale. Note that we are passed the optical detph
 ! increments, not the optical depth scale.
 !
 	TAU_OLD(1:ND)=0.0D0
@@ -128,7 +129,7 @@
 	  WRITE(LUER,*)'Invalid GRID_TYPE in ADJUST_R_GRID'
 	  WRITE(LUER,*)'GRID_TYPE=',TRIM(GRID_TYPE)
 	  STOP
-	END IF 
+	END IF
 !
 ! Compute the new grid. In the present version, NX points are
 ! inserted between log(TAU)=-3.0 and 1.5. We also have 2 special
@@ -170,7 +171,7 @@
 !
 	CALL LININT(TAU,R,ND,TAU_OLD,R_OLD,ND)
 !
-! We now need to regrid all the populations. All interpolations (except 
+! We now need to regrid all the populations. All interpolations (except
 ! sigma) are performed in the LOG-LOG plane. For SN this is ideal, since
 ! the density and velocity are power laws in r. For SIGMA, we do not take
 ! the log.

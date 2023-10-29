@@ -1,9 +1,10 @@
       SUBROUTINE DTBSV ( UPLO, TRANS, DIAG, N, K, A, LDA, X, INCX )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       INTEGER            INCX, K, LDA, N
       CHARACTER*1        DIAG, TRANS, UPLO
 *     .. Array Arguments ..
-      REAL(10)   A( LDA, * ), X( * )
+      REAL(KIND=LDP)   A( LDA, * ), X( * )
 *     ..
 *
 *  Purpose
@@ -69,7 +70,7 @@
 *           K must satisfy  0 .le. K.
 *           Unchanged on exit.
 *
-*  A      - REAL(10) array of DIMENSION ( LDA, n ).
+*  A      - REAL(KIND=LDP) array of DIMENSION ( LDA, n ).
 *           Before entry with UPLO = 'U' or 'u', the leading ( k + 1 )
 *           by n part of the array A must contain the upper triangular
 *           band part of the matrix of coefficients, supplied column by
@@ -117,7 +118,7 @@
 *           ( k + 1 ).
 *           Unchanged on exit.
 *
-*  X      - REAL(10) array of dimension at least
+*  X      - REAL(KIND=LDP) array of dimension at least
 *           ( 1 + ( n - 1 )*abs( INCX ) ).
 *           Before entry, the incremented array X must contain the n
 *           element right-hand side vector b. On exit, X is overwritten
@@ -139,10 +140,10 @@
 *
 *
 *     .. Parameters ..
-      REAL(10)   ZERO
+      REAL(KIND=LDP)   ZERO
       PARAMETER        ( ZERO = 0.0D+0 )
 *     .. Local Scalars ..
-      REAL(10)   TEMP
+      REAL(KIND=LDP)   TEMP
       INTEGER            I, INFO, IX, J, JX, KPLUS1, KX, L
       LOGICAL            NOUNIT
 *     .. External Functions ..

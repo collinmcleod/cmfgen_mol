@@ -1,8 +1,8 @@
 !
-! Subroutine to increment the statistical equilibrium equations for each 
+! Subroutine to increment the statistical equilibrium equations for each
 ! depth point given the value of the mean intensity at each depth point.
 !
-! Subroutine also increments the QFV matrix that describe the  variation 
+! Subroutine also increments the QFV matrix that describe the  variation
 ! of the SE quations with respect to RJ.
 !
 ! Routine also increments the ionization equilibrium equations.
@@ -11,6 +11,7 @@
 	1                    HN,HNST,NLEV,ION_LEV,
 	1                    DI,LOG_DIST,N_DI,
 	1                    JREC,JPHOT,JREC_CR,JPHOT_CR,NT,ND)
+	USE SET_KIND_MODULE
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
@@ -18,7 +19,7 @@
 !                         WCR, JREC_CR,JPHOT_CR added to call.
 !                         Update equation for Electron  Energy Balance
 !                            (Heating - Cooling).
-!                         
+!
 ! Altered 05-Apr-2011 - Changed to V7.
 !                         LOG_DIST rather than DIST passed in call.
 !                         Changes done to faciliate modifications allowing lower temperaturs.
@@ -31,7 +32,7 @@
 !                        NB: QFV = QFV_R*EMHNUKT - QFV_P
 !
 ! Altered 29-Sep-95 : Version V4 (based on V3)
-!                     Extensive changes to call (ordering AND number of 
+!                     Extensive changes to call (ordering AND number of
 !                       arguments)
 !                     Now handles ionizations to excited states directly.
 !                     Multiple states possible.
@@ -55,35 +56,35 @@
 ! NB --- NION is the total number of ionic species i.e. for
 ! HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and CV).
 !
-	REAL(10) HN(NLEV,ND),HNST(NLEV,ND)
-	REAL(10) WSE(NLEV,ND)
-	REAL(10) WCR(NLEV,ND)
-	REAL(10) DI(N_DI,ND)
-	REAL(10) LOG_DIST(N_DI,ND)
-	REAL(10) JREC(ND)
-	REAL(10) JPHOT(ND)
-	REAL(10) JREC_CR(ND)
-	REAL(10) JPHOT_CR(ND)
+	REAL(KIND=LDP) HN(NLEV,ND),HNST(NLEV,ND)
+	REAL(KIND=LDP) WSE(NLEV,ND)
+	REAL(KIND=LDP) WCR(NLEV,ND)
+	REAL(KIND=LDP) DI(N_DI,ND)
+	REAL(KIND=LDP) LOG_DIST(N_DI,ND)
+	REAL(KIND=LDP) JREC(ND)
+	REAL(KIND=LDP) JPHOT(ND)
+	REAL(KIND=LDP) JREC_CR(ND)
+	REAL(KIND=LDP) JPHOT_CR(ND)
 !
 ! Constants for opacity etc.
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local variables.
 !
 	INTEGER I,J
-	REAL(10) NETR
-	REAL(10) T1,T2
+	REAL(KIND=LDP) NETR
+	REAL(KIND=LDP) T1,T2
 !
 ! REV_HNST referes to the LTE population  of the level defined with respect
 ! to the actual destination (target) level.
 !
-	REAL(10) REV_HNST
+	REAL(KIND=LDP) REV_HNST
 !
-	REAL(10) SUM_SE,SUM_VJ_R,SUM_VJ_P
-	REAL(10) B_RAT
-	REAL(10) PLANCKS_CONSTANT,PC
+	REAL(KIND=LDP) SUM_SE,SUM_VJ_R,SUM_VJ_P
+	REAL(KIND=LDP) B_RAT
+	REAL(KIND=LDP) PLANCKS_CONSTANT,PC
 	EXTERNAL PLANCKS_CONSTANT
 !
 	PC=1.0D+15*PLANCKS_CONSTANT()            !1.0D+15 due to units of NU.
@@ -91,7 +92,7 @@
 !
 ! The net ionization (collisional and radaitive) to the last ionization stage
 ! must be zero from the sum of the previous equilibrum equations. Hence
-! there is no need for a rate equation for the final species - it is 
+! there is no need for a rate equation for the final species - it is
 ! preserved for the abundance equation.
 !
 ! If there only ionizations to the ground state, the net ionization

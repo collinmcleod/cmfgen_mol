@@ -2,13 +2,14 @@
 ! General purpose line plotting routiine.
 !
 	SUBROUTINE DRAW_EW_IDS(XPAR,YPAR,EXPCHAR,T_OUT)
+	USE SET_KIND_MODULE
 	USE LINE_ID_MOD
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
 ! Altered 22-Apr-2020 : Labeling algorithim altered to prevent overlap. Label loction may
 !                         not be optimal.
-! 
+!
 	REAL*4 XPAR(2)
 	REAL*4 YPAR(2)
 	REAL*4 XSTRPOS,YSTRPOS

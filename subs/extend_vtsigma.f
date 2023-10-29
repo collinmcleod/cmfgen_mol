@@ -3,13 +3,14 @@ C Routine to interpolate V, T and SIGMA onto a new radius
 C
 	SUBROUTINE EXTEND_VTSIGMA(VEXT,TEXT,SIGMAEXT,COEF,INDX,NX,
 	1                     V,T,SIGMA,ND)
+	USE SET_KIND_MODULE
 C
 	IMPLICIT NONE
 	INTEGER NX,ND,INDX(NX)
-	REAL(10) VEXT(NX),SIGMAEXT(NX),TEXT(NX),COEF(0:3,NX)
-	REAL(10) V(ND),SIGMA(ND),T(ND)
+	REAL(KIND=LDP) VEXT(NX),SIGMAEXT(NX),TEXT(NX),COEF(0:3,NX)
+	REAL(KIND=LDP) V(ND),SIGMA(ND),T(ND)
 C
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER I,J
 C
 C Do intepolation in the log plane - need to add 1 to Sigma as it can be

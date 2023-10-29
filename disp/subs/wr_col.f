@@ -4,12 +4,13 @@ C digits are output. OPTION is presently not utilized, while DESC is
 C used to detrmine the file name.
 C
 	SUBROUTINE WR_COL(OMEGA,LEV_NAME,N,DESC,LU,OPTION)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Created 11-Aug-1997
 C
 	INTEGER N,LU
-	REAL(10) OMEGA(N,N)
+	REAL(KIND=LDP) OMEGA(N,N)
 	CHARACTER*(*) LEV_NAME(N),OPTION,DESC
 C
 C Internal variables.
@@ -20,9 +21,9 @@ C
 	CHARACTER*132 STRING
 	CHARACTER*30 TMP_NAME
 C
-C Number of digits to output OMEGA. Must include spaces used to separate 
+C Number of digits to output OMEGA. Must include spaces used to separate
 C number from proceeding number. Must be the same as the number X in
-C EX.3                                 
+C EX.3
 c
 	INTEGER, PARAMETER :: DIG_PER_NUM=11
 	INTEGER, PARAMETER :: IZERO=0
@@ -42,7 +43,7 @@ C
 	DO M=1,(N+N_PER_LINE-1)/N_PER_LINE
 	  LIM=MIN(M*N_PER_LINE,N)
 C
-C Determine header string. Only the last DIG_PER_NUM-2 characters in the 
+C Determine header string. Only the last DIG_PER_NUM-2 characters in the
 C name are output.
 C
 	  ST_POS=LMAX+1

@@ -1,11 +1,12 @@
 	PROGRAM TST_TRI
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 	INTEGER N,NRHS,I,J
 	PARAMETER (N=60)
 	PARAMETER (NRHS=10000)
-	REAL(10) A(N),B(N),C(N),D(N),F(N)
-	REAL(10) X(N),W(N,NRHS),GAM(N),T1
+	REAL(KIND=LDP) A(N),B(N),C(N),D(N),F(N)
+	REAL(KIND=LDP) X(N),W(N,NRHS),GAM(N),T1
 !
 	INTEGER INFO,IPIV(N)
 !
@@ -86,7 +87,7 @@ C
 	STOP
 	END
 C
-C Routine to replace VMS TUNE routine for collecting tuning statistics for 
+C Routine to replace VMS TUNE routine for collecting tuning statistics for
 C a program section.
 C
 C Usage:
@@ -109,6 +110,7 @@ C NB: Total time for each code section is accumulated on successive calls.
 C i.e. TUNE(1,'Unique ID') does not initialize the counters.
 C
         SUBROUTINE TUNE(LRUN,IDENT)
+	USE SET_KIND_MODULE
         IMPLICIT NONE
 !
 ! Altered 11-Nov-2000 : Call to F90 SYSTEM_CLOCK routine implemented.
@@ -122,17 +124,17 @@ C
 !	INTEGER, PARAMETER :: LUOUT=55
 	INTEGER, PARAMETER :: LUOUT=6
 !
-        REAL(10) T0,OVERHEAD
-        REAL(10) ST_CPU(MAX_IDS)
-	REAL(10) CPUTOT(MAX_IDS)
-        REAL(10) WALLTOT(MAX_IDS)
+        REAL(KIND=LDP) T0,OVERHEAD
+        REAL(KIND=LDP) ST_CPU(MAX_IDS)
+	REAL(KIND=LDP) CPUTOT(MAX_IDS)
+        REAL(KIND=LDP) WALLTOT(MAX_IDS)
         CHARACTER*30 IDLIST(MAX_IDS)
         INTEGER I
 !
 	INTEGER*8 IEND_WALL
 	INTEGER*8 IC0,IR0,IM0,IT1
 	INTEGER*8 IST_WALL(MAX_IDS)
-	REAL(10) CLK_PERIOD,RR0
+	REAL(KIND=LDP) CLK_PERIOD,RR0
 !
 	REAL*4 ETIME,TARRY(2)
 !
@@ -162,7 +164,7 @@ C
         ENDIF
 !
 ! If LRUN =1, we are beginning the TIME bracket. Therefore we find the
-! correct storage location first. 
+! correct storage location first.
 !
 	IF (LRUN .EQ. 1) THEN
 	  DO I=1,MAX_IDS
@@ -183,7 +185,7 @@ C
 !
 	ELSE IF (LRUN .EQ. 2) THEN
 !
-! If LRUN=2, we are ending the TIME bracket. Therefore we call the timing 
+! If LRUN=2, we are ending the TIME bracket. Therefore we call the timing
 ! routine first.
 !
           T0=ETIME(TARRY)
@@ -195,7 +197,7 @@ C
 	      IF(IT1 .LT. 0)IT1=IT1+IM0
 	      WALLTOT(I)=WALLTOT(I)+IT1/RR0
 	      RETURN
-	    END IF 
+	    END IF
 	    IF (IDLIST(I).EQ.' ')EXIT
 	  END DO
 	  WRITE(LUOUT,*)' ***** UNMATCHED TUNING POINT '
@@ -222,7 +224,7 @@ C
 	  WRITE(LUOUT,*)' LRUN=',LRUN
 	  STOP
 	ENDIF
-        
+
 	RETURN
 	END
 C
@@ -239,16 +241,17 @@ C This routine should not be used for solving the transfer equation when
 C the optical depth steps are less than approximately 10^{-5}.
 C
 	SUBROUTINE THOMAS(A,B,C,D,N1,N2)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 29-Sep-1997 : Scaler loop code installed to improve speed on a
 C                         an Alphastation.
-C Altered 29-May-1996 : Loops reversed in forward elimination and the 
+C Altered 29-May-1996 : Loops reversed in forward elimination and the
 C                         backward substitution to allow CRAY vectorization.
 C Altered 21-Feb-1995 :  Cleaned
 C
 	INTEGER N1,N2
-	REAL(10) A(N1),B(N1),C(N1),D(N1,N2)
+	REAL(KIND=LDP) A(N1),B(N1),C(N1),D(N1,N2)
 C
 C Local variables
 C

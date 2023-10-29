@@ -1,9 +1,10 @@
 C
 C Subroutine to change the pens(color indeces) for the vectors
-C 
+C
 C Created December 1996 by Gregson Vaux
 C
       SUBROUTINE VECTORPEN(VECPEN,MAXVEC,FLAGLINE)
+	USE SET_KIND_MODULE
       USE GEN_IN_INTERFACE
       IMPLICIT NONE
 C

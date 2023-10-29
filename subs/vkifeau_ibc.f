@@ -6,11 +6,12 @@ C Uses Schuster of diffusion approximation at lower boundary.
 C
 	SUBROUTINE VKIFEAU_IBC(W,DTAU,CHI,RJ,TA,TB,TC,R,Q,F,
 	1                      ZETA,THETA,HBC_S,DIFF,DBB,ND)
+	USE SET_KIND_MODULE
 	USE MOD_TRAP_DERIVATIVES
 	IMPLICIT NONE
 C
 C Altered 02-Mar-1999 - Module MOD_TRAP_DERIVATIVES replaces COMMON block
-C                          TRAPDERIVATIVES. Variable names (A, B and C) remain 
+C                          TRAPDERIVATIVES. Variable names (A, B and C) remain
 C                          same.
 C Altered 28-MAy-1996 - Call to DP_ZERO removed.
 C Altered 12-Jun-1991 - HBC_S boundary condition inserted. Name changed
@@ -24,15 +25,15 @@ C Altered 26-Feb-1986 (Bug fixed)
 C Created 18-Feb-1986
 C
 	INTEGER ND
-	REAL(10) W(ND,ND),DTAU(ND),RJ(ND),R(ND),F(ND),Q(ND),CHI(ND)
-	REAL(10) ZETA(ND),THETA(ND),TA(ND),TB(ND),TC(ND)
-	REAL(10) HBC_S,DBB
+	REAL(KIND=LDP) W(ND,ND),DTAU(ND),RJ(ND),R(ND),F(ND),Q(ND),CHI(ND)
+	REAL(KIND=LDP) ZETA(ND),THETA(ND),TA(ND),TB(ND),TC(ND)
+	REAL(KIND=LDP) HBC_S,DBB
 	LOGICAL DIFF
 C
 C Local varaibles.
 C
 	INTEGER I,J,K
-	REAL(10) ALPHA,BETA,T1,UIJ,UIK
+	REAL(KIND=LDP) ALPHA,BETA,T1,UIJ,UIK
 C
 	W(:,:)=0.0D0
 C

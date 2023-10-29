@@ -1,5 +1,6 @@
       SUBROUTINE DGEEQU( M, N, A, LDA, R, C, ROWCND, COLCND, AMAX,
      $                   INFO )
+	USE SET_KIND_MODULE
 *
 *  -- LAPACK routine (version 3.0) --
 *     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -8,10 +9,10 @@
 *
 *     .. Scalar Arguments ..
       INTEGER            INFO, LDA, M, N
-      REAL(10)   AMAX, COLCND, ROWCND
+      REAL(KIND=LDP)   AMAX, COLCND, ROWCND
 *     ..
 *     .. Array Arguments ..
-      REAL(10)   A( LDA, * ), C( * ), R( * )
+      REAL(KIND=LDP)   A( LDA, * ), C( * ), R( * )
 *     ..
 *
 *  Purpose
@@ -37,32 +38,32 @@
 *  N       (input) INTEGER
 *          The number of columns of the matrix A.  N >= 0.
 *
-*  A       (input) REAL(10) array, dimension (LDA,N)
+*  A       (input) REAL(KIND=LDP) array, dimension (LDA,N)
 *          The M-by-N matrix whose equilibration factors are
 *          to be computed.
 *
 *  LDA     (input) INTEGER
 *          The leading dimension of the array A.  LDA >= max(1,M).
 *
-*  R       (output) REAL(10) array, dimension (M)
+*  R       (output) REAL(KIND=LDP) array, dimension (M)
 *          If INFO = 0 or INFO > M, R contains the row scale factors
 *          for A.
 *
-*  C       (output) REAL(10) array, dimension (N)
+*  C       (output) REAL(KIND=LDP) array, dimension (N)
 *          If INFO = 0,  C contains the column scale factors for A.
 *
-*  ROWCND  (output) REAL(10)
+*  ROWCND  (output) REAL(KIND=LDP)
 *          If INFO = 0 or INFO > M, ROWCND contains the ratio of the
 *          smallest R(i) to the largest R(i).  If ROWCND >= 0.1 and
 *          AMAX is neither too large nor too small, it is not worth
 *          scaling by R.
 *
-*  COLCND  (output) REAL(10)
+*  COLCND  (output) REAL(KIND=LDP)
 *          If INFO = 0, COLCND contains the ratio of the smallest
 *          C(i) to the largest C(i).  If COLCND >= 0.1, it is not
 *          worth scaling by C.
 *
-*  AMAX    (output) REAL(10)
+*  AMAX    (output) REAL(KIND=LDP)
 *          Absolute value of largest matrix element.  If AMAX is very
 *          close to overflow or very close to underflow, the matrix
 *          should be scaled.
@@ -77,15 +78,15 @@
 *  =====================================================================
 *
 *     .. Parameters ..
-      REAL(10)   ONE, ZERO
+      REAL(KIND=LDP)   ONE, ZERO
       PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Local Scalars ..
       INTEGER            I, J
-      REAL(10)   BIGNUM, RCMAX, RCMIN, SMLNUM
+      REAL(KIND=LDP)   BIGNUM, RCMAX, RCMIN, SMLNUM
 *     ..
 *     .. External Functions ..
-      REAL(10)   DLAMCH
+      REAL(KIND=LDP)   DLAMCH
       EXTERNAL           DLAMCH
 *     ..
 *     .. External Subroutines ..

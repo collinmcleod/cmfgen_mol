@@ -13,6 +13,7 @@ C to current directory the user need only input : ot ]. The directory
 C default will then be blank.
 C
 	SUBROUTINE GET_FILENAME(FILNAME,LUIN,LUOUT,DESC2,MARK,EXIST)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C 10-Nov-1990 --- Bug fix, cleaned.

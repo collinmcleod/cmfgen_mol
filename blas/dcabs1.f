@@ -1,6 +1,8 @@
-      REAL(10) function dcabs1(z)
+      function dcabs1(z)
+      USE SET_KIND_MODULE
+      REAL(KIND=LDP) dcabs1
       double complex z,zz
-      REAL(10) t(2)
+      REAL(KIND=LDP) t(2)
       equivalence (zz,t(1))
       zz = z
       dcabs1 = abs(t(1)) + abs(t(2))

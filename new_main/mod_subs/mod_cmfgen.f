@@ -5,6 +5,7 @@
 !		  (iii) Basic atmospheric structure.
 !
 	MODULE MOD_CMFGEN
+	USE SET_KIND_MODULE
 !
 ! Altered 20-Jan-2023 : Added ABS_MEAN opacity.
 ! Altered 17-Aug-2019 : Put on IBIS -- added dWCRXzVd 12-Jul-2019 (cur_cmf_eb)
@@ -16,7 +17,7 @@
 ! Altered 19-Jan-2009 : SL_OPTION inserted
 ! Altered 06-Aug-2008 : PLANCK_MEAN inserted.
 ! Altered 31-Jan-2002 : FIXEDT etc inserted.
-!                            
+!
 ! Number of atomic species (e.g. H, C, N is 3 species).
 !
 	INTEGER, PARAMETER :: NUM_SPECIES=26
@@ -36,20 +37,20 @@
 !
 	INTEGER NUM_IONS
 !
-	REAL(10) AT_MASS(NUM_SPECIES)		!Atomic mass in amu
-	REAL(10) AT_NO(NUM_SPECIES)		!Atomic number of species
-	REAL(10) AT_ABUND(NUM_SPECIES)		!Fractional species abundance
-	REAL(10) SOL_MASS_FRAC(NUM_SPECIES)	!Solar mass fraction
-	REAL(10) SOL_ABUND_HSCL(NUM_SPECIES)	!Solar abundance with H=12.0
+	REAL(KIND=LDP) AT_MASS(NUM_SPECIES)		!Atomic mass in amu
+	REAL(KIND=LDP) AT_NO(NUM_SPECIES)		!Atomic number of species
+	REAL(KIND=LDP) AT_ABUND(NUM_SPECIES)		!Fractional species abundance
+	REAL(KIND=LDP) SOL_MASS_FRAC(NUM_SPECIES)	!Solar mass fraction
+	REAL(KIND=LDP) SOL_ABUND_HSCL(NUM_SPECIES)	!Solar abundance with H=12.0
 !
 ! Total population density of each species (#/cm^3).
 !
-	REAL(10), ALLOCATABLE :: POP_SPECIES(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: POP_SPECIES(:,:)
 !
-! Used to refer to the number of electrons/[species atom] coming from each 
+! Used to refer to the number of electrons/[species atom] coming from each
 ! species (also used a temporary store).
 !
-	REAL(10), ALLOCATABLE :: GAM_SPECIES(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAM_SPECIES(:,:)
 !
 ! Conservation equation for each species.
 !
@@ -96,62 +97,62 @@
 !
 	TYPE MODEL_ATOM_DATA
 !
-	  REAL(10), ALLOCATABLE :: XzV_F(:,:)		!Level populations in FULL atom
-	  REAL(10), ALLOCATABLE :: XzVLTE_F(:,:)		!LTE level populations in FULL atom
-          REAL(10), ALLOCATABLE :: LOG_XzVLTE_F(:,:)  	!Log(LTE level populations in FULL atom)
-          REAL(10), ALLOCATABLE :: XzVLTE_F_ON_S(:,:) 	!Log(LTE level populations in FULL atom)
-	  REAL(10), ALLOCATABLE :: W_XzV_F(:,:)		!Level dissolution factors
-	  REAL(10), ALLOCATABLE :: DXzV_F(:)		!Ion population for full atom
-	  REAL(10), ALLOCATABLE :: AXzV_F(:,:)		!Oscillator strength (A(I,j), i<j)
-	  REAL(10), ALLOCATABLE :: EDGEXzV_F(:)		!Ionization energy to g.s. (10^15 Hz)
-	  REAL(10), ALLOCATABLE :: GXzV_F(:)		!Level statistical weights in full atom
-	  REAL(10), ALLOCATABLE :: ARAD(:)                !Inverse radiative lifetime of level
-	  REAL(10), ALLOCATABLE :: GAM2(:)                !Collisional profile parameter.
-	  REAL(10), ALLOCATABLE :: GAM4(:)                !Collisional profile parameter.
+	  REAL(KIND=LDP), ALLOCATABLE :: XzV_F(:,:)		!Level populations in FULL atom
+	  REAL(KIND=LDP), ALLOCATABLE :: XzVLTE_F(:,:)		!LTE level populations in FULL atom
+          REAL(KIND=LDP), ALLOCATABLE :: LOG_XzVLTE_F(:,:)  	!Log(LTE level populations in FULL atom)
+          REAL(KIND=LDP), ALLOCATABLE :: XzVLTE_F_ON_S(:,:) 	!Log(LTE level populations in FULL atom)
+	  REAL(KIND=LDP), ALLOCATABLE :: W_XzV_F(:,:)		!Level dissolution factors
+	  REAL(KIND=LDP), ALLOCATABLE :: DXzV_F(:)		!Ion population for full atom
+	  REAL(KIND=LDP), ALLOCATABLE :: AXzV_F(:,:)		!Oscillator strength (A(I,j), i<j)
+	  REAL(KIND=LDP), ALLOCATABLE :: EDGEXzV_F(:)		!Ionization energy to g.s. (10^15 Hz)
+	  REAL(KIND=LDP), ALLOCATABLE :: GXzV_F(:)		!Level statistical weights in full atom
+	  REAL(KIND=LDP), ALLOCATABLE :: ARAD(:)                !Inverse radiative lifetime of level
+	  REAL(KIND=LDP), ALLOCATABLE :: GAM2(:)                !Collisional profile parameter.
+	  REAL(KIND=LDP), ALLOCATABLE :: GAM4(:)                !Collisional profile parameter.
 	  INTEGER, ALLOCATABLE :: F_TO_S_XzV(:)		!Link of full levels to super levels
 	  INTEGER, ALLOCATABLE :: INT_SEQ_XzV(:)
 	  CHARACTER(LEN=40), ALLOCATABLE :: XzVLEVNAME_F(:)	!Level name
 !
-	  REAL(10), ALLOCATABLE :: DXzV(:)		!Ion population for super level
-	  REAL(10), ALLOCATABLE :: XzV(:,:)		!Level population in SL atom
-	  REAL(10), ALLOCATABLE :: XzVLTE(:,:)		!LTE populations in SL atom
-          REAL(10), ALLOCATABLE :: LOG_XzVLTE(:,:)    	!LOG(LTE populations in SL atom)
-	  REAL(10), ALLOCATABLE :: dlnXzVLTE_dlnT(:,:)
+	  REAL(KIND=LDP), ALLOCATABLE :: DXzV(:)		!Ion population for super level
+	  REAL(KIND=LDP), ALLOCATABLE :: XzV(:,:)		!Level population in SL atom
+	  REAL(KIND=LDP), ALLOCATABLE :: XzVLTE(:,:)		!LTE populations in SL atom
+          REAL(KIND=LDP), ALLOCATABLE :: LOG_XzVLTE(:,:)    	!LOG(LTE populations in SL atom)
+	  REAL(KIND=LDP), ALLOCATABLE :: dlnXzVLTE_dlnT(:,:)
 !
-	  REAL(10), ALLOCATABLE :: WSXzV(:,:,:)		!Weights assoc. with s.e. eval.
-	  REAL(10), ALLOCATABLE :: WCRXzV(:,:,:)		!Weights assoc. with cooling.
-	  REAL(10), ALLOCATABLE :: dWSXzVdT(:,:,:)	!Weights assoc. with d(S.E. Eqn)/dT
-	  REAL(10), ALLOCATABLE :: dWCRXzVdT(:,:,:)	!Weights assoc. with d(EHB)/dT
-	  REAL(10), ALLOCATABLE :: WSE_X_XzV(:,:)		!X-ray photoionization weights.
-	  REAL(10), ALLOCATABLE :: WCR_X_XzV(:,:)		!
+	  REAL(KIND=LDP), ALLOCATABLE :: WSXzV(:,:,:)		!Weights assoc. with s.e. eval.
+	  REAL(KIND=LDP), ALLOCATABLE :: WCRXzV(:,:,:)		!Weights assoc. with cooling.
+	  REAL(KIND=LDP), ALLOCATABLE :: dWSXzVdT(:,:,:)	!Weights assoc. with d(S.E. Eqn)/dT
+	  REAL(KIND=LDP), ALLOCATABLE :: dWCRXzVdT(:,:,:)	!Weights assoc. with d(EHB)/dT
+	  REAL(KIND=LDP), ALLOCATABLE :: WSE_X_XzV(:,:)		!X-ray photoionization weights.
+	  REAL(KIND=LDP), ALLOCATABLE :: WCR_X_XzV(:,:)		!
 !
-	  REAL(10), ALLOCATABLE :: APRXzV(:,:)		!Arrays for confirming the SE and RE
-	  REAL(10), ALLOCATABLE :: ARRXzV(:,:)		!equations are satisfied.
-	  REAL(10), ALLOCATABLE :: BFCRXzV(:,:)		
+	  REAL(KIND=LDP), ALLOCATABLE :: APRXzV(:,:)		!Arrays for confirming the SE and RE
+	  REAL(KIND=LDP), ALLOCATABLE :: ARRXzV(:,:)		!equations are satisfied.
+	  REAL(KIND=LDP), ALLOCATABLE :: BFCRXzV(:,:)		
 !
 ! Data vectors to check cooling rates.
 !
-	  REAL(10), ALLOCATABLE :: FFXzV(:)
-	  REAL(10), ALLOCATABLE :: CRRXzV(:)
-	  REAL(10), ALLOCATABLE :: CPRXzV(:)
-	  REAL(10), ALLOCATABLE :: COOLXzV(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: FFXzV(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: CRRXzV(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: CPRXzV(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: COOLXzV(:)
 !
-	  REAL(10), ALLOCATABLE :: NTCXzV(:)                   !Non-thermal cooling rate for species XzV
-	  REAL(10), ALLOCATABLE :: NTIXzV(:)                   !Non-thermal ionization rate
-	  REAL(10), ALLOCATABLE :: NT_ION_CXzV(:)              !Non thermal cooling rate (ionization)
-	  REAL(10), ALLOCATABLE :: NT_EXC_CXzV(:)              !Non thermal cooling rate (excitation)
-	  REAL(10), ALLOCATABLE :: NT_OMEGA(:,:)               !Non thermal collision strength
+	  REAL(KIND=LDP), ALLOCATABLE :: NTCXzV(:)                   !Non-thermal cooling rate for species XzV
+	  REAL(KIND=LDP), ALLOCATABLE :: NTIXzV(:)                   !Non-thermal ionization rate
+	  REAL(KIND=LDP), ALLOCATABLE :: NT_ION_CXzV(:)              !Non thermal cooling rate (ionization)
+	  REAL(KIND=LDP), ALLOCATABLE :: NT_EXC_CXzV(:)              !Non thermal cooling rate (excitation)
+	  REAL(KIND=LDP), ALLOCATABLE :: NT_OMEGA(:,:)               !Non thermal collision strength
 !
 ! Data vectors to check charge recombination rates.
 !
-	  REAL(10), ALLOCATABLE :: CHG_RRXzV(:)
-	  REAL(10), ALLOCATABLE :: CHG_PRXzV(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: CHG_RRXzV(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: CHG_PRXzV(:)
 !
-	  REAL(10) ZXzV			!Charge on ion (=1 for HI)
-	  REAL(10) GIONXzV_F		!Statistical weight of ion
+	  REAL(KIND=LDP) ZXzV			!Charge on ion (=1 for HI)
+	  REAL(KIND=LDP) GIONXzV_F		!Statistical weight of ion
 !
-	  REAL(10) CROSEC_NTFAC           !Factor to scale the non-thermal exictation cross-sections
-	  REAL(10) ION_CROSEC_NTFAC       !Factor to scale non-thermal ioinzation cross-sections
+	  REAL(KIND=LDP) CROSEC_NTFAC           !Factor to scale the non-thermal exictation cross-sections
+	  REAL(KIND=LDP) ION_CROSEC_NTFAC       !Factor to scale non-thermal ioinzation cross-sections
 !
 	  INTEGER NXzV_F		!Number of levels in full atom
 	  INTEGER NXzV			!Number of levels in SL atom
@@ -183,13 +184,13 @@
 ! as not present (e.g. HII_PRES is ALWAYS false, even though we treat H+ when
 ! we treat HI).
 !
-	  LOGICAL XzV_PRES		!indicates 
+	  LOGICAL XzV_PRES		!indicates
 !
 ! Dielectronic variables.
 !
 	  LOGICAL DIE_AUTO_XzV
 	  LOGICAL DIE_WI_XzV
-!  
+!
 	  CHARACTER*6  XzV_TRANS_TYPE	!Transition type (e.g. Blank, Sobolev etc)
 	  CHARACTER*10 XzV_PROF_TYPE	!Type of profile (e.g. Doppler, Stark)
 	  CHARACTER*11 XzV_OSCDATE
@@ -200,30 +201,30 @@
 !
 	INTEGER EQNE		!Electron conservation equation
 !
-	REAL(10), ALLOCATABLE :: R(:)		!Radius in units of 10^10 cm
-	REAL(10), ALLOCATABLE :: V(:)		!V in units of km/s
-	REAL(10), ALLOCATABLE :: SIGMA(:)		!dlnV/dlnR-1
-	REAL(10), ALLOCATABLE :: T(:)		!Temperature in units of 10^4 K
-	REAL(10), ALLOCATABLE :: ED(:)		!Electron density (#/cm^3)
-	REAL(10), ALLOCATABLE :: LANG_COORD(:)    !Lagrangian coordinate
+	REAL(KIND=LDP), ALLOCATABLE :: R(:)		!Radius in units of 10^10 cm
+	REAL(KIND=LDP), ALLOCATABLE :: V(:)		!V in units of km/s
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA(:)		!dlnV/dlnR-1
+	REAL(KIND=LDP), ALLOCATABLE :: T(:)		!Temperature in units of 10^4 K
+	REAL(KIND=LDP), ALLOCATABLE :: ED(:)		!Electron density (#/cm^3)
+	REAL(KIND=LDP), ALLOCATABLE :: LANG_COORD(:)    !Lagrangian coordinate
 !
-	REAL(10), ALLOCATABLE :: ROSS_MEAN(:)	!Rosseland mean opacity.
-	REAL(10), ALLOCATABLE :: PLANCK_MEAN(:)	!Planck mean opacity.
-	REAL(10), ALLOCATABLE :: ABS_MEAN(:)	!Absorption mean opacity.
-	REAL(10), ALLOCATABLE :: FLUX_MEAN(:)	!Flux mean opacity
-	REAL(10), ALLOCATABLE :: POP_ATOM(:)	!Total atom density (#/cm^3)
-	REAL(10), ALLOCATABLE :: DENSITY(:)	!Mass density (gm/cm^3)
-	REAL(10), ALLOCATABLE :: CLUMP_FAC(:)	!Volume filling factor for clumps
-	REAL(10), ALLOCATABLE :: POPION(:)	!Ion density
-	REAL(10), ALLOCATABLE :: VOL_EXP_FAC(:)	!Volume expansion factor (for time dependent SN models).
-	REAL(10), ALLOCATABLE :: VTURB_VEC(:)     !Depth dependent turbulent velocity
+	REAL(KIND=LDP), ALLOCATABLE :: ROSS_MEAN(:)	!Rosseland mean opacity.
+	REAL(KIND=LDP), ALLOCATABLE :: PLANCK_MEAN(:)	!Planck mean opacity.
+	REAL(KIND=LDP), ALLOCATABLE :: ABS_MEAN(:)	!Absorption mean opacity.
+	REAL(KIND=LDP), ALLOCATABLE :: FLUX_MEAN(:)	!Flux mean opacity
+	REAL(KIND=LDP), ALLOCATABLE :: POP_ATOM(:)	!Total atom density (#/cm^3)
+	REAL(KIND=LDP), ALLOCATABLE :: DENSITY(:)	!Mass density (gm/cm^3)
+	REAL(KIND=LDP), ALLOCATABLE :: CLUMP_FAC(:)	!Volume filling factor for clumps
+	REAL(KIND=LDP), ALLOCATABLE :: POPION(:)	!Ion density
+	REAL(KIND=LDP), ALLOCATABLE :: VOL_EXP_FAC(:)	!Volume expansion factor (for time dependent SN models).
+	REAL(KIND=LDP), ALLOCATABLE :: VTURB_VEC(:)     !Depth dependent turbulent velocity
 !
-	REAL(10) STARS_MASS			!In Msun
+	REAL(KIND=LDP) STARS_MASS			!In Msun
 !
 ! Variables for determining whether some populations are held fixed
 ! when the new populations are solved for.
 !
-	REAL(10) MOD_TAU_SCL_T
+	REAL(KIND=LDP) MOD_TAU_SCL_T
 	INTEGER MOD_FIX_T_D_ST
 	INTEGER MOD_FIX_T_D_END
 	LOGICAL MOD_FIXED_NE

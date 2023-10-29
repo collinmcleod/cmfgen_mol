@@ -6,6 +6,7 @@ C by zeroing the block immediately below the diagonal.
 C
 	SUBROUTINE NEWGSIT(BA,STEQ,TBA,FQ,PIVOT,NV,ND,
 	1                    MSOL,REPA,MATELIM)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 - DOUBLE PRECISION declaration removed.
@@ -17,13 +18,13 @@ C                         of sub-matrices below the diagonal to be eliminated.
 C Created  1/Dec/1987 - Based on NAGGSIT
 C
 	INTEGER NV,ND,MATELIM
-	REAL(10) BA(NV,NV,ND,ND),STEQ(NV,ND),PIVOT(NV,ND)
-	REAL(10) FQ(NV,ND),TBA(NV,NV,ND),REPA
+	REAL(KIND=LDP) BA(NV,NV,ND,ND),STEQ(NV,ND),PIVOT(NV,ND)
+	REAL(KIND=LDP) FQ(NV,ND),TBA(NV,NV,ND),REPA
 	LOGICAL MSOL,TEST
 C
 	INTEGER I,J,K,L,LIMIT,IT
-	REAL(10) RELAX
-	REAL(10) WXX(NV)
+	REAL(KIND=LDP) RELAX
+	REAL(KIND=LDP) WXX(NV)
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -50,7 +51,7 @@ C
 C
 C Main iteration loop    !!!!
 C
- 
+
 	LIMIT=NV*ND/3
 	IF(LIMIT .LT. 50)LIMIT=50
 	DO 1000 IT=1,LIMIT
@@ -88,7 +89,7 @@ C
 	    END DO
 C
 C Check if desired accuracy has been obtained or whether solution
- 
+
 	    IF(ABS(WXX(J)-FQ(J,I)) .GT. ABS(FQ(J,I)/1000.0D0)
 	1)    TEST=.FALSE.
 	    IF(ABS(FQ(J,I)) .GT. 1.0D+10)THEN

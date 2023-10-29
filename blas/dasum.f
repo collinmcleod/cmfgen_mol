@@ -1,11 +1,13 @@
-      REAL(10) function dasum(n,dx,incx)
+      function dasum(n,dx,incx)
+      USE SET_KIND_MODULE
+      REAL(KIND=LDP) dasum
 c
 c     takes the sum of the absolute values.
 c     jack dongarra, linpack, 3/11/78.
 c     modified 3/93 to return if incx .le. 0.
 c     modified 12/3/93, array(1) declarations changed to array(*)
 c
-      REAL(10) dx(*),dtemp
+      REAL(KIND=LDP) dx(*),dtemp
       integer i,incx,m,mp1,n,nincx
 c
       dasum = 0.0d0

@@ -2,9 +2,9 @@
 ! Routine to compute line opacity and emissivity. Routine can be
 ! called in dTdR section, T section, or in the continuum calculation section.
 ! After the call storage locations for line quantities (but not variation)
-! have been allocated. 
+! have been allocated.
 ! Returned:
-!         EINA etc 
+!         EINA etc
 !         CHIL_MAT, ETAL_MAT
 !         LINE_PROF_SIM, LINE_QW_SIM
 !	  LINE_OPAC_CON, LINE_EMIS_CON
@@ -12,6 +12,7 @@
 !
         SUBROUTINE SET_LINE_OPAC(POPS,NU,FREQ_INDX,LAST_LINE,N_LINE_FREQ,
 	1               LST_DEPTH_ONLY,LUER,ND,NT,NCF,MAX_SIM)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE OPAC_MOD
 	USE CONTROL_VARIABLE_MOD
@@ -19,7 +20,7 @@
 	USE LINE_MOD
         IMPLICIT NONE
 !
-! Altered 31-May-2023 : Some cleaning. This routines omits the line with the highest resonance 
+! Altered 31-May-2023 : Some cleaning. This routines omits the line with the highest resonance
 !                         zone end frequency when freeing up space. This primarily affects models using Voigt
 !                         profiles which have very wide lines. Improved error message.
 ! Altered  2-Jan-2014 : Incorporated changes for depth depndent line profiles.
@@ -32,27 +33,27 @@
 	INTEGER NT
 	INTEGER NCF
 	INTEGER MAX_SIM
-	INTEGER FIRST_LINE 
+	INTEGER FIRST_LINE
 	INTEGER LAST_LINE
 	INTEGER N_LINE_FREQ
 	INTEGER LUER
 !
-	REAL(10) NU(NCF)
-	REAL(10) POPS(NT,ND)
+	REAL(KIND=LDP) NU(NCF)
+	REAL(KIND=LDP) POPS(NT,ND)
 	LOGICAL LST_DEPTH_ONLY
 !
-	REAL(10) TA(ND),TB(ND),TC(ND),ED_MOD(ND)		!Work vectors
+	REAL(KIND=LDP) TA(ND),TB(ND),TC(ND),ED_MOD(ND)		!Work vectors
 !
 ! Constants for opacity etc. These are set in CMFGEN.
 !
         COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
         COMMON/LINE/ OPLIN,EMLIN
-        REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-        REAL(10) OPLIN,EMLIN
+        REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+        REAL(KIND=LDP) OPLIN,EMLIN
 !
-	REAL(10) T1,T2,T3
-	REAL(10) NU_DOP
-	REAL(10) FL
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) NU_DOP
+	REAL(KIND=LDP) FL
 !
 	INTEGER I,J,K,L
 	INTEGER ID
@@ -76,7 +77,7 @@
 !
 	NEW_LINE_STORAGE(:)=.FALSE.
 !
-! Ensure none of the storage locations for the line, for J, or for the 
+! Ensure none of the storage locations for the line, for J, or for the
 ! variation of J with CHIL etc are being pointed at.
 !
 ! WEAK_LINE is only accessed in the CONTINUUM section, and is reset. By setting it
@@ -100,7 +101,7 @@
 ! Description of main vectors:
 !
 ! LINES_THIS_FREQ --- Logical vector [NCF] indicating whether this frequency
-!                        is part of the resonance zone (i.e. Doppler profile) of 
+!                        is part of the resonance zone (i.e. Doppler profile) of
 !                        one (or more) lines.
 !
 ! LINE_ST_INDX_IN_NU --- Integer vector [N_LINES] which specifies the starting
@@ -115,7 +116,7 @@
 ! LAST_LINE  ---- Integer specifying the index of the lowest frequency
 !                         line which we are taking into account in the
 !                         transfer.
-!                                        
+!
 ! LINE_LOC   ---- Integer array. Used to locate location of a particular line
 !                         in the SIM vectors/arrays.
 !
@@ -213,7 +214,7 @@
 !
 ! Compute U_STAR_RATIO and L_STAR_RATIO which are used to switch from
 ! the opacity/emissivity computed with a FULL_ATOM to an equivalent form
-! but written in terms of the SUPER-LEVELS. 
+! but written in terms of the SUPER-LEVELS.
 !
 ! L refers to the lower level of the transition.
 ! U refers to the upper level of the transition.
@@ -350,7 +351,7 @@
 	    DO I=D_ST,ND-1
 	      LINE_PROF_SIM(I,SIM_INDX)=LINE_PROF_SIM(ND,SIM_INDX)
 	    END DO
-	  END DO                      
+	  END DO
 	ELSE
 !
 ! Because of storage issues, need to compute all ND profiles. Thus there is
@@ -423,13 +424,13 @@
 	  END DO
 	END IF
 !
-! Ensure that LAST_LINE points to the next LINE that is going to be handled 
+! Ensure that LAST_LINE points to the next LINE that is going to be handled
 ! in the BLANKETING portion of the code.
 !
 	DO WHILE(LAST_LINE .LT. N_LINE_FREQ.AND.
 	1            VEC_TRANS_TYPE(LAST_LINE+1)(1:4) .NE. 'BLAN')
 	       LAST_LINE=LAST_LINE+1
 	END DO
-!	   
+!	
 	RETURN
 	END

@@ -1,10 +1,11 @@
       SUBROUTINE DSPR  ( UPLO, N, ALPHA, X, INCX, AP )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
-      REAL(10)   ALPHA
+      REAL(KIND=LDP)   ALPHA
       INTEGER            INCX, N
       CHARACTER*1        UPLO
 *     .. Array Arguments ..
-      REAL(10)   AP( * ), X( * )
+      REAL(KIND=LDP)   AP( * ), X( * )
 *     ..
 *
 *  Purpose
@@ -38,11 +39,11 @@
 *           N must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - REAL(10).
+*  ALPHA  - REAL(KIND=LDP).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
-*  X      - REAL(10) array of dimension at least
+*  X      - REAL(KIND=LDP) array of dimension at least
 *           ( 1 + ( n - 1 )*abs( INCX ) ).
 *           Before entry, the incremented array X must contain the n
 *           element vector x.
@@ -53,7 +54,7 @@
 *           X. INCX must not be zero.
 *           Unchanged on exit.
 *
-*  AP     - REAL(10) array of DIMENSION at least
+*  AP     - REAL(KIND=LDP) array of DIMENSION at least
 *           ( ( n*( n + 1 ) )/2 ).
 *           Before entry with  UPLO = 'U' or 'u', the array AP must
 *           contain the upper triangular part of the symmetric matrix
@@ -81,10 +82,10 @@
 *
 *
 *     .. Parameters ..
-      REAL(10)   ZERO
+      REAL(KIND=LDP)   ZERO
       PARAMETER        ( ZERO = 0.0D+0 )
 *     .. Local Scalars ..
-      REAL(10)   TEMP
+      REAL(KIND=LDP)   TEMP
       INTEGER            I, INFO, IX, J, JX, K, KK, KX
 *     .. External Functions ..
       LOGICAL            LSAME

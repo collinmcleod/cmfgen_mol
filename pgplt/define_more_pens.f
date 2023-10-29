@@ -3,6 +3,7 @@
 ! between two curves using the FILL option if PGPLOT.
 !
 	SUBROUTINE DEFINE_MORE_PENS(MAXPEN)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 22-Apr-2015

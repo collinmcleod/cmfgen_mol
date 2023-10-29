@@ -1,6 +1,6 @@
 C
 C Subroutine to reduce the size of the extended two dimensional dCHI matrix
-C used in the computation of dJ. May also be used for dETA. 
+C used in the computation of dJ. May also be used for dETA.
 C The integer array GRID gives the positions of the old grid points in
 C the new grid. The use of GRID allows for different numbers of grid points
 C inserted between adjacet pixels. INDX is used to indicate which depths
@@ -8,6 +8,7 @@ C the interpolated opacity is dependant on.
 C
 	SUBROUTINE REGRID_dCHI(F2DA,CHI,ND,GRID,
 	1                          F2DAEXT,CHIEXT,NDEXT,COEF,INDX)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 26-May-1996 - DOUBLE PRECISION removed.
@@ -18,9 +19,9 @@ C Altered 26-Apr-1988 - Bug fix. F2DA now zeroed.
 C Created  5-Apr-1988
 C
 	INTEGER ND,NDEXT,INDX(NDEXT),GRID(ND)
-	REAL(10) F2DA(ND,ND),CHI(ND),T1
-	REAL(10) F2DAEXT(NDEXT,NDEXT)
-	REAL(10) CHIEXT(NDEXT),COEF(0:3,NDEXT)
+	REAL(KIND=LDP) F2DA(ND,ND),CHI(ND),T1
+	REAL(KIND=LDP) F2DAEXT(NDEXT,NDEXT)
+	REAL(KIND=LDP) CHIEXT(NDEXT),COEF(0:3,NDEXT)
 C
 	INTEGER I,J,K
 C

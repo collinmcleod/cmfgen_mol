@@ -8,19 +8,20 @@
 ! over the energy grid.
 !
     subroutine set_xkt_array(x0,x1,n,x,dx,method)
+	USE SET_KIND_MODULE
       implicit none
 !
 ! Created 13-Sep-2011 : Based on set_array (from Luc).
 !
       integer n              !Number of points in grid
-      real(10) x0 	     !Minimum energy in eV
-      real(10) x1              !Maximm energy in eV
-      real(10) x(n)            !Energy vector (returned)
-      real(10) dx(n)           !Quadrature weight
+      real(kind=LDP) x0 	     !Minimum energy in eV
+      real(kind=LDP) x1              !Maximm energy in eV
+      real(kind=LDP) x(n)            !Energy vector (returned)
+      real(kind=LDP) dx(n)           !Quadrature weight
       character*3 method     ! `lin' or 'log'
 !
       integer i
-      real(10) t1,x11
+      real(kind=LDP) t1,x11
 !
       if ((method.ne.'lin').and.(method.ne.'log')) then
          write(6,*) ' method in set array not properly set'

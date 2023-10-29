@@ -2,9 +2,9 @@
 !
 !          (1) Doppler line profiles for any species
 !          (2) Stark and Voigt profiles (of varrying accuracy) for individual lines.
-!          (3) Approximate STARK profiles for any Hydrogenic species of charge 
+!          (3) Approximate STARK profiles for any Hydrogenic species of charge
 !                Z. The theory is excellent for high Balmer lines, but only
-!                approximate for Ha. Uses the GRIEM theory as modified by Auer 
+!                approximate for Ha. Uses the GRIEM theory as modified by Auer
 !                and Mihalas AP J S 24 1972.
 !
 !
@@ -14,7 +14,7 @@
 !                    (b) STARK profile convolved with a Doppler profile.
 !
 !                    The Doppler profile can have a turbulent contribution
-!                    given by VTURB. 
+!                    given by VTURB.
 ! Input:
 !       NU         - Freqency (in units of 10^15 Hz)
 !       ED_IN      - Electron density (/cm^3) (Vector, length ND)
@@ -38,12 +38,13 @@
 	1             TEMP_IN,VTURB_IN,ND,NT,
 	1             TDOP,AMASS_DOP,VTURB,MAX_PROF_ED,
 	1             NORM_PROFILE,LU_STK)
+	USE SET_KIND_MODULE
 !
 ! Altered 05-Jul-2022: Revamped to help improve speed and reduce call overhead
 !                         OMP used for GRIEM profile computation.
 !                         Originally OMP NOT used for VOIGT section as it slowed the
-!                         code. However we now store the full Voigt profile, which 
-!                         allows better paraellization.LOOP of lines is now contained in 
+!                         code. However we now store the full Voigt profile, which
+!                         allows better paraellization.LOOP of lines is now contained in
 !                         this routine.
 !                         Based on SET_PROF_V5.
 !
@@ -54,7 +55,7 @@
 ! Altered 06-Jan-2014: VTURB_FIX replaced by TDOP,AMASS_DOP,VTURB in call (changed to V4).
 !                          (taken from cur_cm_25jun13 development version).
 ! Altered 03-Jan-2001: Check for unrecognized profile type.
-! Altered 07-Jan-1999: ML_CUR now passed in call. 
+! Altered 07-Jan-1999: ML_CUR now passed in call.
 !                      Profile is now recomputed whenever ML_CUR=ML_ST,
 !                      or when profile is unavailable.
 !
@@ -69,23 +70,23 @@
 	INTEGER NT
 	INTEGER LU_STK
 !
-	REAL(10) LINE_PROF_SIM(ND,MAX_SIM)
-	REAL(10) AMASS_SIM(MAX_SIM)
+	REAL(KIND=LDP) LINE_PROF_SIM(ND,MAX_SIM)
+	REAL(KIND=LDP) AMASS_SIM(MAX_SIM)
 	INTEGER SIM_LINE_POINTER(MAX_SIM)
 	LOGICAL RESONANCE_ZONE(MAX_SIM)
 	LOGICAL END_RESONANCE_ZONE(MAX_SIM)
 !
-	REAL(10) ED_IN(ND)
-	REAL(10) POP_PROTON(ND)
-	REAL(10) POP_HEPLUS(ND)
-	REAL(10) TEMP_IN(ND)
-	REAL(10) VTURB_IN(ND)
-	REAL(10) Z_POP(NT)
+	REAL(KIND=LDP) ED_IN(ND)
+	REAL(KIND=LDP) POP_PROTON(ND)
+	REAL(KIND=LDP) POP_HEPLUS(ND)
+	REAL(KIND=LDP) TEMP_IN(ND)
+	REAL(KIND=LDP) VTURB_IN(ND)
+	REAL(KIND=LDP) Z_POP(NT)
 !
-	REAL(10) VTURB		!Turbulent velocity (km/s): same at all depths
-	REAL(10) TDOP
-	REAL(10) AMASS_DOP	!Same for all species when used.
-	REAL(10) MAX_PROF_ED	!Limits witdt of Voigt/Stark profiles
+	REAL(KIND=LDP) VTURB		!Turbulent velocity (km/s): same at all depths
+	REAL(KIND=LDP) TDOP
+	REAL(KIND=LDP) AMASS_DOP	!Same for all species when used.
+	REAL(KIND=LDP) MAX_PROF_ED	!Limits witdt of Voigt/Stark profiles
 !
 	LOGICAL NORM_PROFILE
 !
@@ -104,29 +105,29 @@
 	INTEGER LN_PNT
 	INTEGER SIM_INDX
 !
-	REAL(10), ALLOCATABLE ::  XNU(:)
-	REAL(10) VTURB_SQ(ND)
-	REAL(10) ED_MOD(ND)
+	REAL(KIND=LDP), ALLOCATABLE ::  XNU(:)
+	REAL(KIND=LDP) VTURB_SQ(ND)
+	REAL(KIND=LDP) ED_MOD(ND)
 !
-	REAL(10) AMASS_IN
-	REAL(10) Z_IN
-	REAL(10) NU_ZERO
-	REAL(10) GAM_RAD
-	REAL(10) C4_INTER
+	REAL(KIND=LDP) AMASS_IN
+	REAL(KIND=LDP) Z_IN
+	REAL(KIND=LDP) NU_ZERO
+	REAL(KIND=LDP) GAM_RAD
+	REAL(KIND=LDP) C4_INTER
 !
-	REAL(10) T1,T2
-	REAL(10) TMP_ED,NU_DOP
-	REAL(10) A_VOIGT
-	REAL(10) V_VOIGT
-	REAL(10) LOC_GAM_RAD
-	REAL(10) LOC_GAM_COL
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) TMP_ED,NU_DOP
+	REAL(KIND=LDP) A_VOIGT
+	REAL(KIND=LDP) V_VOIGT
+	REAL(KIND=LDP) LOC_GAM_RAD
+	REAL(KIND=LDP) LOC_GAM_COL
 !
 	LOGICAL PROF_COMPUTED
 	LOGICAL VERBOSE
 !
 ! External functions
 !
-	REAL(10) VOIGT
+	REAL(KIND=LDP) VOIGT
 !
         VTURB_SQ(1:ND)=( VTURB_IN(1:ND)/12.85D0  )**2
 !
@@ -235,7 +236,7 @@
 !
 ! If we reach here we have two choices:
 !
-! (1) Profile has already been computed, hence we can use 
+! (1) Profile has already been computed, hence we can use
 !       the tabulated values.
 ! (2) We need to compute full profile, using a variety
 !       of different methods.
@@ -248,7 +249,7 @@
 	1             NUP .EQ. NUP_STORE(LOC_INDX)             )THEN
 !
 !
-! Check store correct, then set profile data                
+! Check store correct, then set profile data
 !
 	            LST_FREQ_LOC(LOC_INDX)=LST_FREQ_LOC(LOC_INDX)+1
 	            IF(NU_STORE(LST_FREQ_LOC(LOC_INDX), LOC_INDX) .NE. NU(ML_CUR))THEN
@@ -288,9 +289,9 @@
 ! 
 !
 ! In this section of the routine, we compute general STARK profiles
-! over the entire line profile, since it is generally computationally 
-! prohibitive to compute the STARK profile for each frequency. Rather 
-! we compute the STARK profile [f(Ne,T,Vturb) ] once, and save the data 
+! over the entire line profile, since it is generally computationally
+! prohibitive to compute the STARK profile for each frequency. Rather
+! we compute the STARK profile [f(Ne,T,Vturb) ] once, and save the data
 ! for subsequent calls.
 !
 ! Determine the location where the STARK (i.e. Line) profile can be stored.
@@ -383,7 +384,7 @@
 	1                AMASS_IN,PROF_TYPE(LN_PNT),LU_STK)
 
 	       ELSE IF(PROF_TYPE(LN_PNT) .EQ. 'HZ_STARK')THEN
-!            
+!
 ! Check validity of passed parameters for HI and HeII lines.
 !
 	         IF(NUP .LE. NL)THEN
@@ -392,7 +393,7 @@
 	         END IF
                  IF(VERBOSE)WRITE(LUER,900)'Using HZ_STARK: ',' ',0.01D0*C_KMS/NU_ZERO,
 	1              NL,NUP,ML_CUR,ML_ST,ML_END,Z_IN
-!                          
+!
 ! Convert from Frequency to Angstrom space, measured from line center.
 !
 	         DO ML=ML_ST,ML_END

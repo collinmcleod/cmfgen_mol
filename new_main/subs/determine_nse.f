@@ -1,8 +1,9 @@
 !
 ! Subroutine to determine the number of statistical equilibrium equations
-! for each species. 
+! for each species.
 !
       SUBROUTINE DETERMINE_NSE(NION,XRAYS)
+	USE SET_KIND_MODULE
       USE MOD_CMFGEN
       USE STEQ_DATA_MOD
       USE CHG_EXCH_MOD_V3
@@ -10,7 +11,7 @@
 !
 ! Altered 16-May-2003 : Small bug fix for so that charge exchange reactions that
 !                          are not available are corectly handled. Only important
-!                          if unvailable if species present but level name 
+!                          if unvailable if species present but level name
 !                          doesn't match.
 ! Created 17-Mar-2001
 !
@@ -47,7 +48,7 @@
 !             NXzV  (i.e. one for each level in the atom)
 !            +1     (number conservation equation)
 !            +NI    (number of states atom can ionize to).
-! NI requires some thought, since it is set by the 
+! NI requires some thought, since it is set by the
 ! number of photoionization routes, X-ray ionization,
 ! and charge exchange reactions.
 !
@@ -89,7 +90,7 @@
 ! For Xrays we want the ground state, 2 stages up.
 !
 	   IF(XRAYS .AND. ATM(ID+1)%XzV_PRES)THEN
-	      SE(ID)%N_SE=SE(ID)%N_SE+1 
+	      SE(ID)%N_SE=SE(ID)%N_SE+1
 	      SE(ID)%XRAY_EQ=SE(ID)%N_SE
 	      ION_LEV_PNT(SE(ID)%N_SE)=ATM(ID+1)%NXzV+1
 	   ELSE
@@ -99,7 +100,7 @@
 ! Finally add in the number conservation equation, which is always the
 ! last equation.
 !
-	   SE(ID)%N_SE=SE(ID)%N_SE+1 
+	   SE(ID)%N_SE=SE(ID)%N_SE+1
 !
 	   ALLOCATE (SE(ID)%EQ_TO_ION_LEV_PNT(SE(ID)%N_SE))
 	   SE(ID)%EQ_TO_ION_LEV_PNT(1:SE(ID)%N_SE)=ION_LEV_PNT(1:SE(ID)%N_SE)
@@ -116,4 +117,4 @@
       END DO		!loop over ID
 !
       RETURN
-      END    
+      END

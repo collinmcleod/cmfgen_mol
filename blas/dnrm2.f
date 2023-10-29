@@ -1,8 +1,12 @@
-      REAL(10) FUNCTION DNRM2 ( N, X, INCX )
+      FUNCTION DNRM2 ( N, X, INCX )
+      USE SET_KIND_MODULE
+      REAL(KIND=LDP) DNRM2
+*
 *     .. Scalar Arguments ..
+*
       INTEGER                           INCX, N
 *     .. Array Arguments ..
-      REAL(10)                  X( * )
+      REAL(KIND=LDP)                  X( * )
 *     ..
 *
 *  DNRM2 returns the euclidean norm of a vector via the function
@@ -18,11 +22,11 @@
 *
 *
 *     .. Parameters ..
-      REAL(10)      ONE         , ZERO
+      REAL(KIND=LDP)      ONE         , ZERO
       PARAMETER           ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     .. Local Scalars ..
       INTEGER               IX
-      REAL(10)      ABSXI, NORM, SCALE, SSQ
+      REAL(KIND=LDP)      ABSXI, NORM, SCALE, SSQ
 *     .. Intrinsic Functions ..
       INTRINSIC             ABS, SQRT
 *     ..

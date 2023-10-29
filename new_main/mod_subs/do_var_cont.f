@@ -28,10 +28,11 @@
 	1                    FL,CONT_FREQ,FREQ_INDX,FIRST_FREQ,TX_OFFSET,
 	1                    ND,NC,NP,NUM_BNDS,DIAG_INDX,NT,NM,
 	1                    NDEXT,NCEXT,NPEXT,MAX_SIM,NM_KI)
+	USE SET_KIND_MODULE
 	USE ANG_QW_MOD
 	USE MOD_CMFGEN
 	USE OPAC_MOD
-	USE LINE_MOD 
+	USE LINE_MOD
 	USE RADIATION_MOD
 	USE VAR_RAD_MOD
 	USE CONTROL_VARIABLE_MOD
@@ -63,9 +64,9 @@
 	INTEGER FREQ_INDX
 	INTEGER TX_OFFSET
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) FL				!Current frequency in units of 10^15 Hz
-	REAL(10) CONT_FREQ			!frequency at which opacity was evaluated.
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) FL				!Current frequency in units of 10^15 Hz
+	REAL(KIND=LDP) CONT_FREQ			!frequency at which opacity was evaluated.
 !
 	CHARACTER(LEN=*) SECTION
 	LOGICAL FIRST_FREQ
@@ -77,21 +78,21 @@
 !
 ! Local variables
 !
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER X_INDX
 	INTEGER I,J,L,K
 	INTEGER NL,NUP
 	INTEGER LOW,UP
 	LOGICAL RAT_TOO_BIG
 	LOGICAL LST_DEPTH_ONLY
-	REAL(10), SAVE :: FL_OLD
+	REAL(KIND=LDP), SAVE :: FL_OLD
 !
 ! Constants for opacity etc. These are set in CMFGEN.
 !
         COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
         COMMON/LINE/ OPLIN,EMLIN
-        REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-        REAL(10) OPLIN,EMLIN
+        REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+        REAL(KIND=LDP) OPLIN,EMLIN
 !
 ! These two functions compute the start and end indices when updating
 ! VJ. eg. we do not wish to update VJ( ,1, ) if we are using the banded
@@ -117,7 +118,7 @@
 ! the population values. For use with the Sobolev approximation,
 ! and the Dielectronic recombination section.
 !
-! Altered 17-Jun-2003 - RJEXT_ES (not RJ_ES) used for non-coherent electron 
+! Altered 17-Jun-2003 - RJEXT_ES (not RJ_ES) used for non-coherent electron
 !                         scattering when updating the emissivity in the ACCURATE
 !                         and CONT_VEL section.
 ! Altered 11-Dec-1997 - Section for computing J in CONT_VEL section  with
@@ -134,7 +135,7 @@
 !                     be odd. If NUM_BNDS=ND, the matrix is assumed
 !                     to represent the full Newton-Raphson Operator.
 !                     The index, DIAG_INDX must also be specified, but is
-!                     only used for the BANDED case. Note 
+!                     only used for the BANDED case. Note
 !                     DIAG_INDX=( NUM_BNDS/2+1 )
 ! Altered 6-May-86 -  PERTJFEAU installed. (now varcontfeau)
 ! Created 26-Jan-88 - (Final version).
@@ -258,7 +259,7 @@
 	      ES_COH_VEC(1:ND)=CHI_SCAT_CLUMP(1:ND)/CHI_CLUMP(1:ND)
 	    ELSE
 !
-! Two scenarios: 
+! Two scenarios:
 !    (i) We use a lambda iteration to allow for the variation of J in
 !           the electron scattering term. ES_COH_VEC (==THETA) is zero,
 !           and the electron scattering emissivity (related to RJ_ES)
@@ -312,7 +313,7 @@
 	1           DIF,DBB,dDBBdT,dTdR,IC,METHOD,COHERENT_ES,ND,NM)
 	   ELSE IF(PLANE_PARALLEL)THEN
 	     CALL PP_VAR_MOM_CMF_V1(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,
-	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR, 
+	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR,
 	1           dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR,FEDD,GEDD,N_ON_J,
 	1           INBC,HBC_CMF(1),HBC_CMF(2),NBC_CMF(1),NBC_CMF(2),
 	1           FIRST_FREQ,L_FALSE,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
@@ -341,8 +342,8 @@
 	   ELSE
 	    CALL VAR_MOM_J_CMF_V12(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
 	1           ES_COH_VEC,V,SIGMA,R,
-	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR, 
-	1           dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR, 
+	1           TX,TVX,dJ_DIF_d_T,dJ_DIF_d_dTdR,
+	1           dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR,
 	1           KI,WM,RHS_dHdCHI,
 	1           FIRST_FREQ,dLOG_NU,
 	1           INNER_BND_METH,dTdR,DBB,dDBBdT,IC,IB_STAB_FACTOR,
@@ -392,7 +393,7 @@
 !	   T1=CHI(K)-CHI_SCAT(K)
 !	   WRITE(221,'(12ES16.8)')FL,ETA(K),CHI(K),T1,RJ(K),ETA(K)/T1,
 !	1             TX(K,K,1),TX(K,K,3),TX(K,K,2),TX(K,K,4),
-!	1             1.0D0+(TX(K,K,1)+TX(K,K,3))*T1/RJ(K), 
+!	1             1.0D0+(TX(K,K,1)+TX(K,K,3))*T1/RJ(K),
 !	1             (TX(K,K,2)+TX(K,K,4))*T1-1.0D0
 !	   WRITE(224,'(12ES16.8)')FL,ETA_CONT(K),CHI_CONT(K),T1,RJ(K),TX(K,K,1:6)
 !
@@ -500,7 +501,7 @@
 	      END DO
 	    END IF
 !
-! Now zero dCHI and dETA storage locations. These refer to the TOTAL 
+! Now zero dCHI and dETA storage locations. These refer to the TOTAL
 ! opacity and emissivity.
 !
 	    TX(:,:,1:2)=0.0D0
@@ -563,7 +564,7 @@
 	1                  INDX,COEF,INTERP_TYPE,ND,
 	1                  TX_EXT,TVX_EXT,
 	1                  dJ_DIF_d_T_EXT,dJ_DIF_d_dTdR_EXT,
-	1                  dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR, 
+	1                  dRSQH_DIF_d_T,dRSQH_DIF_d_dTdR,
 	1                  KI,RHS_dHdCHI,
 	1                  FIRST_FREQ,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
 	1                  DO_THIS_TX_MATRIX,METHOD,COHERENT_ES,NDEXT,NM,NM_KI)
@@ -600,7 +601,7 @@
 	      DO K=1,NDEXT
 	        TX_EXT(K,J,3)=TX_EXT(K,J,3) + TX_EXT(K,J,1)
 	        TX_EXT(K,J,4)=TX_EXT(K,J,4) + TX_EXT(K,J,2)
-	        TX_EXT(K,J,5)=TX_EXT(K,J,5) + TX_EXT(K,J,1) + 
+	        TX_EXT(K,J,5)=TX_EXT(K,J,5) + TX_EXT(K,J,1) +
 	1                                         TX_EXT(K,J,2)*TB(J)
 	      END DO
 	    END DO
@@ -609,7 +610,7 @@
 	      DO K=1,NDEXT-1
 	        TVX_EXT(K,J,3)=TVX_EXT(K,J,3) + TVX_EXT(K,J,1)
 	        TVX_EXT(K,J,4)=TVX_EXT(K,J,4) + TVX_EXT(K,J,2)
-	        TVX_EXT(K,J,5)=TVX_EXT(K,J,5) + TVX_EXT(K,J,1) + 
+	        TVX_EXT(K,J,5)=TVX_EXT(K,J,5) + TVX_EXT(K,J,1) +
 	1                                        TVX_EXT(K,J,2)*TB(J)
 	      END DO
 	    END DO
@@ -740,7 +741,7 @@
 !
 ! Zero VJ array.
 !
-	CALL DP_ZERO(VJ,NT*NUM_BNDS*ND) 
+	CALL DP_ZERO(VJ,NT*NUM_BNDS*ND)
 !
 	IF(CONT_VEL)THEN
 !
@@ -748,10 +749,10 @@
 ! separately. this correction has now been specifically included in VAROPAC.
 !
 !
-! The matrix TX gives dJ ( J depth, X depth, X) where X represent some 
+! The matrix TX gives dJ ( J depth, X depth, X) where X represent some
 ! fundamental parameter such as CHI_C, ETA_C, ESEC, ETAL_ etc
 !
-! We now convert TX  to a smaller matrix, taking into account only the 
+! We now convert TX  to a smaller matrix, taking into account only the
 ! variation of X at Js depth, and neighbouring depths.
 !
 ! dJ_LOC( X , X depth [1=3:NUM_BNDS], J depth )
@@ -775,7 +776,7 @@
 	  END DO
 !
 ! Compute VJ which gives the variation of J with respect to the atomic
-! populations. NB: Electron scattering cross-section (6.65D-15) was replaced 
+! populations. NB: Electron scattering cross-section (6.65D-15) was replaced
 ! by ESEC(L)/ED(L) 24-Sep-1997.
 !
 ! NOPS= ND*NUM_BNDS*( 6NT + 2 + 7NUM_SIM )
@@ -795,11 +796,11 @@
 	      IF(SPECIES_PRES(1))THEN
 	        IF(ION_ID(1) .EQ. 'HMI')THEN
 	          VJ(2,J,K)=VJ(2,J,K) + CHI_RAY(L)*dj_LOC(5,J,K)/ATM(2)%XzV_F(1,L)
-	        ELSE 
+	        ELSE
 	          VJ(1,J,K)=VJ(1,J,K) + CHI_RAY(L)*dj_LOC(5,J,K)/ATM(1)%XzV_F(1,L)
 	        END IF
 	      END IF
-!                    
+!
 ! Now must do line terms.
 !
 	      DO I=TX_OFFSET+1,NM
@@ -835,7 +836,7 @@
 	      K=ND+DIAG_INDX-J
 	      DO I=1,NT-1
 	        VJ(I,J,K)=VJ(I,J,K) + dJ_DIF_d_dTdR(K)*DIFFW(I)
-	      END DO  
+	      END DO
 	      VJ(NT,J,K)=VJ(NT,J,K) +
 	1                       dJ_DIF_d_T(K)+dJ_DIF_d_dTdR(K)*DIFFW(NT)
 	    END DO
@@ -866,7 +867,7 @@
 	      DO I=1,NT-1
 	        VJ(I,NUM_BNDS,K)=VJ(I,NUM_BNDS,K)+FA(K)*T1*DIFFW(I)
 	      END DO
-	      VJ(NT,NUM_BNDS,K)=VJ(NT,NUM_BNDS,K)+ 
+	      VJ(NT,NUM_BNDS,K)=VJ(NT,NUM_BNDS,K)+
 	1                       FA(K)*(DDBBDT+T1*DIFFW(NT))
 	    END DO
 	  ELSE IF(DIF)THEN

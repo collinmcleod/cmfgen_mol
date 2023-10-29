@@ -1,6 +1,6 @@
 !
 ! Subroutine to output informatio about model atoms/ions used in a CMFGEN model.
-! Species, number for full levels, and number of super levels are output. 
+! Species, number for full levels, and number of super levels are output.
 !
 ! Routine also outputs the last level of each ion in LATEX format. Some
 ! levels will need to be revised.
@@ -9,6 +9,7 @@
 ! using, for example, visual mode in VIM.
 !
 	SUBROUTINE WR_ATOM_SUM(DO_LAST_ION,VERBOSE)
+	USE SET_KIND_MODULE
 	USE MOD_DISP
 	IMPLICIT NONE
 !
@@ -129,6 +130,7 @@
 ! vageries in the atomic data, some latex names will need to be modified.
 !
 	SUBROUTINE LATEX_NAME(MOD_NAME,VERBOSE,LU_DIAG)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER LU_DIAG
 	LOGICAL VERBOSE
@@ -184,7 +186,7 @@
 	              MOD_NAME(J:)=' '//MOD_NAME(J:)
 	              GOTO 20
 	           END IF
-	         END  DO                       
+	         END  DO
 	         MOD_NAME(J:)='$^'//MOD_NAME(J:J)//'$'//MOD_NAME(J+1:)
 	      END IF
 	    END IF

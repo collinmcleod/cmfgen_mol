@@ -4,6 +4,7 @@
 !    Error in STACK found using -g debug option with -Mchkstk.
 !
 	MODULE MOD_FREQ_OBS
+	USE SET_KIND_MODULE
 !
 ! Altered: 18-May-2015 : Added VEC_C4.
 ! Created: 22-Jan-2013
@@ -24,25 +25,25 @@
 !
 ! Continuum frequency variables and arrays.
 !
-	REAL(10) FQW(NCF_MAX)			!Frequency weights
-        REAL(10) NU(NCF_MAX)              	!Continuum and line frequencies
-        REAL(10) NU_EVAL_CONT(NCF_MAX)    	!Frequencies to evaluate continuum
-        REAL(10) OBS(NCF_MAX)             	!Observers spectrum
+	REAL(KIND=LDP) FQW(NCF_MAX)			!Frequency weights
+        REAL(KIND=LDP) NU(NCF_MAX)              	!Continuum and line frequencies
+        REAL(KIND=LDP) NU_EVAL_CONT(NCF_MAX)    	!Frequencies to evaluate continuum
+        REAL(KIND=LDP) OBS(NCF_MAX)             	!Observers spectrum
 !
-        REAL(10) OBS_FREQ(NCF_MAX)                !Since N_OBS < NCF =< NCF_MAX
-        REAL(10) OBS_FLUX(NCF_MAX)
+        REAL(KIND=LDP) OBS_FREQ(NCF_MAX)                !Since N_OBS < NCF =< NCF_MAX
+        REAL(KIND=LDP) OBS_FLUX(NCF_MAX)
 !
 ! Arrays for performing LINE frequencies in numerical order
 !
         INTEGER N_LINE_FREQ
-        REAL(10), ALLOCATABLE :: VEC_FREQ(:)
-        REAL(10), ALLOCATABLE :: VEC_STRT_FREQ(:)
-        REAL(10), ALLOCATABLE :: VEC_OSCIL(:)
-        REAL(10), ALLOCATABLE :: VEC_EINA(:)
-        REAL(10), ALLOCATABLE :: VEC_ARAD(:)
-        REAL(10), ALLOCATABLE :: VEC_C4(:)
-        REAL(10), ALLOCATABLE :: VEC_DP_WRK(:)
-        REAL(10), ALLOCATABLE :: VEC_VDOP_MIN(:)
+        REAL(KIND=LDP), ALLOCATABLE :: VEC_FREQ(:)
+        REAL(KIND=LDP), ALLOCATABLE :: VEC_STRT_FREQ(:)
+        REAL(KIND=LDP), ALLOCATABLE :: VEC_OSCIL(:)
+        REAL(KIND=LDP), ALLOCATABLE :: VEC_EINA(:)
+        REAL(KIND=LDP), ALLOCATABLE :: VEC_ARAD(:)
+        REAL(KIND=LDP), ALLOCATABLE :: VEC_C4(:)
+        REAL(KIND=LDP), ALLOCATABLE :: VEC_DP_WRK(:)
+        REAL(KIND=LDP), ALLOCATABLE :: VEC_VDOP_MIN(:)
 !
         INTEGER, ALLOCATABLE :: VEC_INDX(:)
         INTEGER, ALLOCATABLE :: VEC_NL(:)
@@ -61,6 +62,7 @@
 	END MODULE MOD_FREQ_OBS
 !
 	SUBROUTINE INIT_MOD_FREQ_OBS(NLINE_MAX)
+	USE SET_KIND_MODULE
 	USE MOD_FREQ_OBS
 	INTEGER NLINE_MAX
 	INTEGER IOS

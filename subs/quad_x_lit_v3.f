@@ -8,17 +8,18 @@ C
 C These cross section get ADDED directly to the normal (ie valence electron)
 C quadrature weights for the Lithium like ion.
 C
-C The factor of DEX(-10) in TP1 is due to the definition of PRGEN which 
-C is DEX(10) times the photoionization cross section so that CHI*R 
+C The factor of DEX(-10) in TP1 is due to the definition of PRGEN which
+C is DEX(10) times the photoionization cross section so that CHI*R
 C is constant.
 C
 	SUBROUTINE QUAD_X_LIT_V3(ZCORE,NUM_ELEC,WSE,NU_CONT,
 	1               N,ND,COMPUTE_NEW_CROSS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 17-Sep-1997 : Altered so that a constant continuum cross-section
 C                         across a band can be handled. WSE now must be
-C                         be effectively multiplied by FQW/NU_CONT when it 
+C                         be effectively multiplied by FQW/NU_CONT when it
 C                         is used.
 C Altered 26-May-1996 : FOUR_PI_ON_H constant fixed.
 C                       ERROR_LU installed.
@@ -27,18 +28,18 @@ C                         frequency.
 C Created 20-Jul-1993 : Based on QUADGEN
 C
 	INTEGER N,ND
-	REAL(10) ZCORE,NUM_ELEC
-	REAL(10) WSE(N,ND)
-	REAL(10) NU_CONT
+	REAL(KIND=LDP) ZCORE,NUM_ELEC
+	REAL(KIND=LDP) WSE(N,ND)
+	REAL(KIND=LDP) NU_CONT
 	LOGICAL COMPUTE_NEW_CROSS
 C
 	INTEGER ERROR_LU
-	REAL(10) XCROSS
+	REAL(KIND=LDP) XCROSS
 	EXTERNAL XCROSS,ERROR_LU
 C
 	INTEGER I,K,LUER
-	REAL(10) FOUR_PI_ON_H
-	REAL(10) WEIGHT
+	REAL(KIND=LDP) FOUR_PI_ON_H
+	REAL(KIND=LDP) WEIGHT
 C
 	IF(NUM_ELEC .NE. 3)THEN
 	  LUER=ERROR_LU()
@@ -55,9 +56,9 @@ C See comments in QUAD_X_GEN_V3.
 C
 	  FOUR_PI_ON_H=1.8965D+02		!4*PI/H*DEX(-10)/1.0D+15
 C
-C Now evaluate the quadrature weights. 
+C Now evaluate the quadrature weights.
 C
-C The cross section are the same for all levels. 
+C The cross section are the same for all levels.
 C
 	  WEIGHT=FOUR_PI_ON_H*XCROSS(NU_CONT,ZCORE,NUM_ELEC)
 C

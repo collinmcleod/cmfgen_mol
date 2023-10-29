@@ -1,4 +1,4 @@
-C                                               
+C
 C Vax routine to open a sequential and formatted file for output.
 C Allows
 C
@@ -8,11 +8,12 @@ C
 C All these asci files are opened as shared files, and with
 C CARRIAGECONTROL='LIST'. These two commands are VAX dependent.
 C
-C The SHARED option enables the file to be copied, typed etc while opened. 
+C The SHARED option enables the file to be copied, typed etc while opened.
 C Useful for examining OUTGEN whilst program is running.
 C
 	SUBROUTINE GEN_ASCI_OPEN(LU,FILE_NAME,
 	1            FILE_STATUS,FILE_POSIT,FILE_ACTION,FILE_RECL,IOS)
+	USE SET_KIND_MODULE
 	INTEGER LU,FILE_RECL,IOS
 	CHARACTER*(*) FILE_NAME,FILE_STATUS,FILE_POSIT,FILE_ACTION
 	CHARACTER*20  LOC_NAME,LOC_STATUS,LOC_POSIT,LOC_ACTION
@@ -26,8 +27,8 @@ C
 	LOC_POSIT=FILE_POSIT
 	IF(LOC_POSIT .EQ. ' ')LOC_POSIT='REWIND'
 	CALL SET_CASE_UP(LOC_POSIT,IZERO,IZERO)
-	IF(LOC_POSIT .NE. 'REWIND' .AND. 
-	1     LOC_POSIT .NE. 'APPEND' .AND. 
+	IF(LOC_POSIT .NE. 'REWIND' .AND.
+	1     LOC_POSIT .NE. 'APPEND' .AND.
 	1     LOC_POSIT .NE. 'ASIS')THEN
 	  WRITE(LUER,*)'Error in GEN_ASCI_OPEN - invald FILE_POSIT'
 	  WRITE(LUER,*)'File name is',FILE_NAME
@@ -38,8 +39,8 @@ C
 	LOC_STATUS=FILE_STATUS
 	IF(LOC_STATUS .EQ. ' ')LOC_STATUS='UNKNOWN'
 	CALL SET_CASE_UP(LOC_STATUS,IZERO,IZERO)
-	IF(LOC_STATUS .NE. 'UNKNOWN' .AND. 
-	1     LOC_STATUS .NE. 'REPLACE' .AND. 
+	IF(LOC_STATUS .NE. 'UNKNOWN' .AND.
+	1     LOC_STATUS .NE. 'REPLACE' .AND.
 	1     LOC_STATUS .NE. 'OLD' .AND.
 	1     LOC_STATUS .NE. 'NEW')THEN
 	  WRITE(LUER,*)'Error in GEN_ASCI_OPEN - invald FILE_STATUS'
@@ -51,8 +52,8 @@ C
 	LOC_ACTION=FILE_ACTION
 	IF(LOC_ACTION .EQ. ' ')LOC_ACTION='READWRITE'
 	CALL SET_CASE_UP(LOC_ACTION,IZERO,IZERO)
-	IF(LOC_ACTION .NE. 'READWRITE' .AND. 
-	1     LOC_ACTION .NE. 'READ' .AND. 
+	IF(LOC_ACTION .NE. 'READWRITE' .AND.
+	1     LOC_ACTION .NE. 'READ' .AND.
 	1     LOC_ACTION .NE. 'WRITE')THEN
 	  WRITE(LUER,*)'Error in GEN_ASCI_OPEN - invald FILE_ACTION'
 	  WRITE(LUER,*)'File name is',FILE_NAME

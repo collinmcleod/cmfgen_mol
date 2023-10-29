@@ -8,13 +8,14 @@ C
 C Basic method used is due to Rybcki and Hummer (A\&A,  ). This has
 C been modified so that electron scattering preserves the Planck-function at
 C depth. This scaling is necessary to recover LTE depth, and arises since
-C the RH formalism neglects both Compton scattering, and stimulated electron 
+C the RH formalism neglects both Compton scattering, and stimulated electron
 C scattering. The preservation of the Planck function is achieved by a
 C wavelength shift on the Wien side, and a scaling everywhere else.
 C
 	SUBROUTINE COMP_J_CONV_V2(J_STORE,J_SIZE,NU,TEMP,ND,NCF,
 	1             LU_IN,FILE_IN,CONT_REC,RD_NU,ALLOW_UNEQUAL_FREQ,
 	1             LU_OUT,FILE_OUT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 20-Oct-2003 : No scaling peformed when PLANCK_FN has zero''s.
@@ -30,7 +31,7 @@ C                      call.  To do this, FILE_OUT must contain
 C                                       'RETURN J VIA CALL'
 C
 C Altered 03-Dec-1998 : Call altered: Changed to version V2
-C                         NDEXT can now be passes as ND. 
+C                         NDEXT can now be passes as ND.
 C                         Better handling of dimensions of C_STORE.
 C                         ALLOW_UNEQ_FREQ inserted in call. This will
 C                           allow a smaller EDDFACTOR file to be used.
@@ -53,11 +54,11 @@ C
 	LOGICAL ALLOW_UNEQUAL_FREQ
 C
 C It is assumed that BA can be passed for J_STORE. J_SIZE is the maximum
-C size of the passed vector. 
+C size of the passed vector.
 C
-	REAL(10) J_STORE(ND,J_SIZE/ND)		!BA matrix in main program.
-	REAL(10) NU(NCF)				!Frequency (10^15 Hz)
-	REAL(10) TEMP(ND)				!Temperature (10^4 K)
+	REAL(KIND=LDP) J_STORE(ND,J_SIZE/ND)		!BA matrix in main program.
+	REAL(KIND=LDP) NU(NCF)				!Frequency (10^15 Hz)
+	REAL(KIND=LDP) TEMP(ND)				!Temperature (10^4 K)
 C
 	CHARACTER*(*) FILE_IN
 	CHARACTER*(*) FILE_OUT
@@ -66,23 +67,23 @@ C Simultaneous equations are assumed to have the form
 C
 C    A(i).X(i-1) - [H(i)+A(i)+C(i)].X(i) - C(i).X(i+1) = D(i)
 C
-	REAL(10) A(NCF)
-	REAL(10) H(NCF)
-	REAL(10) C(NCF)
-	REAL(10) D(NCF)
+	REAL(KIND=LDP) A(NCF)
+	REAL(KIND=LDP) H(NCF)
+	REAL(KIND=LDP) C(NCF)
+	REAL(KIND=LDP) D(NCF)
 C
-	REAL(10) A_STORE(NCF)
-	REAL(10) C_STORE(NCF)
-	REAL(10) J_ES(NCF)
+	REAL(KIND=LDP) A_STORE(NCF)
+	REAL(KIND=LDP) C_STORE(NCF)
+	REAL(KIND=LDP) J_ES(NCF)
 C
-	REAL(10) PLANCK_FN(NCF)
-	REAL(10) PLANCK_ES(NCF)
-	REAL(10) PLANCK_NU(NCF)
+	REAL(KIND=LDP) PLANCK_FN(NCF)
+	REAL(KIND=LDP) PLANCK_ES(NCF)
+	REAL(KIND=LDP) PLANCK_NU(NCF)
 C
 C Provide some extra storage in case J_STORE dimensions are not large
 C enough.
 C
-	REAL(10), ALLOCATABLE :: EXTRA_J_ST(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: EXTRA_J_ST(:,:)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
@@ -92,9 +93,9 @@ C
 	INTEGER IONE
 	PARAMETER (IONE=1)
 C
-	REAL(10) BETA
-	REAL(10) T1,T2,T3
-	REAL(10) D1,D2,DH
+	REAL(KIND=LDP) BETA
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) D1,D2,DH
 	INTEGER I,K,L,ML,INIT_REC,IOS
 	INTEGER IREC_LEN
 	INTEGER J_DIM
@@ -106,15 +107,15 @@ C Constants for opacity etc [Set in CMFGEN].
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) OPLIN,EMLIN
 C
 C Parameters for fit to Electrons Scattering redistribution function
 C (dipole form). From Rybicki and Hummer (A&A, 290,553)
 C
 	INTEGER NCOEF
 	PARAMETER (NCOEF=2)
-	REAL(10) ACOEF(2),BCOEF(2)
+	REAL(KIND=LDP) ACOEF(2),BCOEF(2)
 	DATA ACOEF/1.690703717290D0,-0.690703717290D0/
 	DATA BCOEF/1.614249968779D0,2.154326524957D0/
 C
@@ -147,7 +148,7 @@ C
 	IF(J_DIM .LT. NCF)THEN
 	  ALLOCATE (EXTRA_J_ST(ND,J_DIM+1:NCF),STAT=IOS)
 	  IF(IOS .NE. 0)THEN
-	    I=ERROR_LU() 
+	    I=ERROR_LU()
 	    WRITE(I,'(A)')'Error in COMP_J_CONV_V2'
 	    WRITE(I,'(A)')'Unable to allocate memeory'
 	    STOP
@@ -256,8 +257,8 @@ C
 	A_STORE(NCF)=-2.0D0/( LOG(NU(NCF-1)/NU(NCF)) )**2
 	C_STORE(NCF)=0.0D0
 C
-C Compute the triadiagonal quantities for performing the convolution, and 
-C perform the convolution. Due to the depth dependence of BETA, the vectors 
+C Compute the triadiagonal quantities for performing the convolution, and
+C perform the convolution. Due to the depth dependence of BETA, the vectors
 C are depth dependent. We convolve both J and the Planck Function.
 C
 !
@@ -325,7 +326,7 @@ C
 	      PLANCK_NU(ML)=1.0D0/( 1.0D0/NU(ML) - T1)
 	    END DO
 C
-C We now perform a simple linear interpolation of the electron scattered 
+C We now perform a simple linear interpolation of the electron scattered
 C Planck function back onto the old frequency grid. We apply the same
 C interpolation to J_ES also. We use "A" as a temporary store for J_ES,
 C and "C" as a temporary store for PLANCK_ES.
@@ -353,9 +354,9 @@ C
 	     J_ES(:)=EXP( J_ES(:)+ (PLANCK_FN(:)-PLANCK_ES(:)) )
 !
 	END IF
-C                       
-C Store the computed  J to be used to treat the electron scattering. We 
-C overwrite J_STORE since the mean intensity is no longer required in this 
+C
+C Store the computed  J to be used to treat the electron scattering. We
+C overwrite J_STORE since the mean intensity is no longer required in this
 C routine.
 C
 	  J_STORE(K,1:J_DIM)=J_ES(1:J_DIM)
@@ -391,6 +392,6 @@ C
 	  J_STORE(:,1:J_DIM)=0.0D0
 	  IF(J_DIM .NE. NCF)DEALLOCATE (EXTRA_J_ST)
 	END IF
-C 
+C
 	RETURN
 	END

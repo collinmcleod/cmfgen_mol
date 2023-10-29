@@ -6,6 +6,7 @@ C Uses a Schuster condition or the diffusion approximation
 C for the lower boundary condition.
 C
 	SUBROUTINE TCOMPD(TA,TB,TC,DTAU,DIFF,LS,NC,ND,NI)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 27-May-1996 : IMPLICIT NONE installed.
@@ -13,7 +14,7 @@ C Altered 07-Jan-91 - TA,TB,TC loop split so CRAY vectorizes loop.
 C Altered 28-JUL-82
 C
 	INTEGER LS,NC,ND,NI
-	REAL(10) TA(NI),TB(NI),TC(NI),DTAU(NI)
+	REAL(KIND=LDP) TA(NI),TB(NI),TC(NI),DTAU(NI)
 	LOGICAL DIFF
 C
 	INTEGER I

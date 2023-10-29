@@ -5,6 +5,7 @@ C                       Negative exponents now handled.
 C Altered 12-APR-1989 - MGO prefixed to MOMGHO calls.
 C
 	SUBROUTINE MON_NUM(X,Y,VAL,LOC,NDEC)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER NDEC,NCHAR,LOC
 	REAL*4 X,Y,VAL,T1,PGLOC

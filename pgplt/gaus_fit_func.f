@@ -4,7 +4,7 @@
 !
 ! The function has the form
 !
-!   Y =P1 + P2*(X-X(1))+ P5*EXP( -((X-P3)/P4)^P6) + ... 
+!   Y =P1 + P2*(X-X(1))+ P5*EXP( -((X-P3)/P4)^P6) + ...
 !
 ! The routine returns the fit (YFIT) and the SQUARED error.
 ! between the fit and data.
@@ -12,13 +12,13 @@
 ! Altered   -Sep-2007 : Use of alternative exponent to 2 installed.
 ! Created 21-Jul-2005
 !
-	REAL(10) FUNCTION GAUS_FIT_FUNC(PARAMS)
+	REAL(KIND=LDP) FUNCTION GAUS_FIT_FUNC(PARAMS)
 	USE GAUS_FIT_DATA
 	IMPLICIT NONE
-	REAL(10) PARAMS(NG_PAR)
+	REAL(KIND=LDP) PARAMS(NG_PAR)
 !
-	REAL(10) SUM
-	REAL(10) T1
+	REAL(KIND=LDP) SUM
+	REAL(KIND=LDP) T1
 	INTEGER I,J,K
 !
 	GAUS_FIT_FUNC=0.0D0

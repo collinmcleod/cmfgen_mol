@@ -1,14 +1,15 @@
         SUBROUTINE WRITE_ARRAY_V2(A,ND,N,B,FILENAME1,INDX,OPTION)
+	USE SET_KIND_MODULE
         USE GAM_MU_MOD
         IMPLICIT NONE
-!      
+!
         INTEGER :: ND
         INTEGER :: N
         INTEGER :: I,J,K
 	INTEGER :: INDX
 	INTEGER :: V
-        REAL(10) :: A(N,ND)
-        REAL(10) :: B(N)
+        REAL(KIND=LDP) :: A(N,ND)
+        REAL(KIND=LDP) :: B(N)
         CHARACTER(LEN=40) :: FILENAME1
         CHARACTER(LEN=40) :: FILENAME2
         CHARACTER(LEN=15) :: STRING

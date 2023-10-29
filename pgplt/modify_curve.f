@@ -1,9 +1,10 @@
 !
-! Simple routine to modify the shape of a curve using cursor input. 
+! Simple routine to modify the shape of a curve using cursor input.
 ! Points can be replaced, deleted, and added. I also possible to
 ! move a sectioon up/down or left/right.
 !
 	SUBROUTINE MODIFY_CURVE(IP_IN,IP_OUT)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
         USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
@@ -172,6 +173,7 @@
 !
 	CONTAINS
 	SUBROUTINE PRINT_CURSOR_DESC
+	USE SET_KIND_MODULE
           WRITE(6,'(A)')BLUE_PEN
           WRITE(6,*)'Use ''r'' to replace a data point'
           WRITE(6,*)'Use ''a'' to add a data point'
@@ -183,5 +185,5 @@
           WRITE(6,*)'             cursor = l(left), r(ight), a(all)'
           WRITE(6,'(A)')DEF_PEN
 	  RETURN
-	END SUBROUTINE PRINT_CURSOR_DESC 
+	END SUBROUTINE PRINT_CURSOR_DESC
 	END SUBROUTINE MODIFY_CURVE

@@ -1,9 +1,9 @@
 ! Subroutine that will calculate the intrinsic emissivity as a function of
 ! depth and frequency. Depth is the first index and frequency is the first.
-! 
+!
 !
 ! Created July 11, 2014
-! Edited 15 May 2017:	Now scales line energies to total energy per decay (accounting for 
+! Edited 15 May 2017:	Now scales line energies to total energy per decay (accounting for
 !			Kin. En. from leptons). Correct units should be compared.
 ! Edited 25 May 2017:   Doing testing to make sure no error with energy being created
 !
@@ -14,6 +14,7 @@
 	SUBROUTINE GAMMA_INT_EMISS_V9(ETA_EMISS,NU_GRID_VEC,NF_GRID_PTS,&
 			R,ND,V_GAUSS,DECAY_KIN_E,NORM_GAM_LINES,&
 			NORM_LINES_ONLY,INST_DECAY)
+	USE SET_KIND_MODULE
 	USE GAMMA_NUC_DECAY_V2
 	USE NUC_ISO_MOD
 !	USE CONTROL_VARIABLE_MOD
@@ -27,33 +28,33 @@
 	LOGICAL :: NORM_LINES_ONLY
 	LOGICAL :: INST_DECAY
 !
-	REAL(10) :: NU_GRID_VEC(NF_GRID_PTS)
-	REAL(10) :: ETA_EMISS(ND,NF_GRID_PTS)
-	REAL(10) :: R(ND)
-	REAL(10) :: DECAY_KIN_E(ND)
-	REAL(10) :: GAUSS_INT
-	REAL(10) :: V_GAUSS
-	REAL(10) :: T1,T2,T3,T4,T5,T6,T7
-	REAL(10) :: TOT_EGAM,DE
-	REAL(10) :: DELTA_T
-	REAL(10) :: PI
-	REAL(10) :: FOURPI
-	REAL(10) :: NORM_FAC
-	REAL(10) :: DEL_T
-	REAL(10), PARAMETER :: PLANCK = 4.135668D-021 ! UNITS OF MeV*s SINCE PHOTON ENERGIES IN MeV
-	REAL(10), PARAMETER :: MeV_ERG = 1.602177D-06 
-	REAL(10), PARAMETER :: ERGS_TO_MEV = 624150.9 
+	REAL(KIND=LDP) :: NU_GRID_VEC(NF_GRID_PTS)
+	REAL(KIND=LDP) :: ETA_EMISS(ND,NF_GRID_PTS)
+	REAL(KIND=LDP) :: R(ND)
+	REAL(KIND=LDP) :: DECAY_KIN_E(ND)
+	REAL(KIND=LDP) :: GAUSS_INT
+	REAL(KIND=LDP) :: V_GAUSS
+	REAL(KIND=LDP) :: T1,T2,T3,T4,T5,T6,T7
+	REAL(KIND=LDP) :: TOT_EGAM,DE
+	REAL(KIND=LDP) :: DELTA_T
+	REAL(KIND=LDP) :: PI
+	REAL(KIND=LDP) :: FOURPI
+	REAL(KIND=LDP) :: NORM_FAC
+	REAL(KIND=LDP) :: DEL_T
+	REAL(KIND=LDP), PARAMETER :: PLANCK = 4.135668D-021 ! UNITS OF MeV*s SINCE PHOTON ENERGIES IN MeV
+	REAL(KIND=LDP), PARAMETER :: MeV_ERG = 1.602177D-06
+	REAL(KIND=LDP), PARAMETER :: ERGS_TO_MEV = 624150.9
 	EXTERNAL GAUSS_INT
 !
 ! Testing variables
 !
-	REAL(10) :: WORK1_EN(ND)
-	REAL(10) :: DECAY_EN
-	REAL(10) :: WORK2_EN(ND)
-	REAL(10) :: DECAY_ETA_EN
-	REAL(10), ALLOCATABLE :: TA(:)
-	REAL(10), ALLOCATABLE :: TB(:)
-	REAL(10), ALLOCATABLE :: TC(:)
+	REAL(KIND=LDP) :: WORK1_EN(ND)
+	REAL(KIND=LDP) :: DECAY_EN
+	REAL(KIND=LDP) :: WORK2_EN(ND)
+	REAL(KIND=LDP) :: DECAY_ETA_EN
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TC(:)
 !
 !
 ! I will need to modify this to only use the lines with the species present which I can use with an IF
@@ -77,9 +78,9 @@
 !
 !
 ! There is a problem with line energies and Kin. En. not summing
-! to the total energy per decay. We account for the difference 
+! to the total energy per decay. We account for the difference
 ! below by scaling the line energies by the fractional difference
-! between the total energy as summed from lines and Kin. En. 
+! between the total energy as summed from lines and Kin. En.
 ! and the read in ENERGY_PER_DECAY (same units must be compared)
 !
 	IF(NORM_GAM_LINES)THEN
@@ -169,7 +170,7 @@
 	  END DO !depth loop
 	END DO !frequency loop
 !
-! Next piece is to compare the used isotopes and store the decay kinetic energy read in from 
+! Next piece is to compare the used isotopes and store the decay kinetic energy read in from
 ! GAM_NUC_DECAY_DATA_SUB_V3
 !
 	DO I=1,ND
@@ -292,19 +293,20 @@
 	RETURN
 	END SUBROUTINE GAMMA_INT_EMISS_V9
 !
-! Function is to ensure the emission preserves gaussian profiles with given 
+! Function is to ensure the emission preserves gaussian profiles with given
 ! spread based on velocity
 !
 	FUNCTION GAUSS_INT(X,XO,VAR)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
-	REAL(10) ::  GAUSS_INT
-	REAL(10) :: MU
-	REAL(10) :: X,XO
-	REAL(10), PARAMETER :: C=299792 !km/s
-	REAL(10) :: SIGMA,VAR ! VAR in km/s
-	REAL(10), PARAMETER :: ONE=1.0D0
-	REAL(10), PARAMETER :: TWO=2.0D0
-	REAL(10) :: PI
+	REAL(KIND=LDP) ::  GAUSS_INT
+	REAL(KIND=LDP) :: MU
+	REAL(KIND=LDP) :: X,XO
+	REAL(KIND=LDP), PARAMETER :: C=299792 !km/s
+	REAL(KIND=LDP) :: SIGMA,VAR ! VAR in km/s
+	REAL(KIND=LDP), PARAMETER :: ONE=1.0D0
+	REAL(KIND=LDP), PARAMETER :: TWO=2.0D0
+	REAL(KIND=LDP) :: PI
 !
 	PI=ACOS(-ONE)
 	SIGMA=VAR*XO/C

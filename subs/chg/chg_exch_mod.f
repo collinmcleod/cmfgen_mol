@@ -3,11 +3,12 @@
 ! is also located here.
 !
 	MODULE CHG_EXCH_MOD
+	USE SET_KIND_MODULE
 	  INTEGER*4 N_CHG
 	  INTEGER*4 LUER
 !
 ! Altered 10-Sep-2000 : Bug fix. THI_CHG was not beeing set is not read in.
-! Altered 01-Oct-1998 : Fitting range and FORMAT date is now read in. 
+! Altered 01-Oct-1998 : Fitting range and FORMAT date is now read in.
 !                       An alternative level name can also be specified
 !                       (via {}).
 ! Altered 20-Aug-1998
@@ -16,9 +17,9 @@
 ! Reaction data
 !
           INTEGER*4, ALLOCATABLE :: TYPE_CHG(:)
-          REAL(10), ALLOCATABLE :: COEF_CHG(:,:)
-          REAL(10), ALLOCATABLE :: TLO_CHG(:)
-          REAL(10), ALLOCATABLE :: THI_CHG(:)
+          REAL(KIND=LDP), ALLOCATABLE :: COEF_CHG(:,:)
+          REAL(KIND=LDP), ALLOCATABLE :: TLO_CHG(:)
+          REAL(KIND=LDP), ALLOCATABLE :: THI_CHG(:)
 	  CHARACTER*8, ALLOCATABLE :: SPEC_ID_CHG(:,:)
 	  CHARACTER*30, ALLOCATABLE :: LEV_NAME_CHG(:,:)
 	  CHARACTER*30, ALLOCATABLE :: ALT_LEV_NAME_CHG(:,:)
@@ -26,10 +27,10 @@
 ! Arrays required to update STEQ (statistical equilibrium) and BA (vartiation
 ! of STEQ) arrays.
 !
-          REAL(10), ALLOCATABLE :: Z_CHG(:,:)
-          REAL(10), ALLOCATABLE :: AI_AR_CHG(:,:)
-          REAL(10), ALLOCATABLE :: dlnAI_AR_CHG_dlnT(:,:)
-          REAL(10), ALLOCATABLE :: COOL_CHG(:,:)
+          REAL(KIND=LDP), ALLOCATABLE :: Z_CHG(:,:)
+          REAL(KIND=LDP), ALLOCATABLE :: AI_AR_CHG(:,:)
+          REAL(KIND=LDP), ALLOCATABLE :: dlnAI_AR_CHG_dlnT(:,:)
+          REAL(KIND=LDP), ALLOCATABLE :: COOL_CHG(:,:)
 	  INTEGER*4, ALLOCATABLE ::  LEV_CHG(:,:)
 	  INTEGER*4, ALLOCATABLE ::  EQ_CHG(:,:)
 	  INTEGER*4, ALLOCATABLE ::  EQION_CHG(:,:)
@@ -57,13 +58,14 @@
 !           X+  must be specfied before Y++
 !
 	SUBROUTINE RD_CHG_EXCH(LUIN,INCL_CHG_EXCH)
+	USE SET_KIND_MODULE
 	USE CHG_EXCH_MOD	
 	IMPLICIT NONE
 !
 ! Altered 04-Dec-200:  Bug fix: Could enter infinite loop when left adjusting
 !                      reaction string.
 !                      Now use / to allow the specification of one alternate
-!                      name (not {} since some names now contain these 
+!                      name (not {} since some names now contain these
 !                      brackets).
 	INTEGER*4 LUIN
 	LOGICAL INCL_CHG_EXCH
@@ -77,7 +79,7 @@
 	INTEGER*4 ERROR_LU
 	EXTERNAL ERROR_LU
 	CHARACTER*132 STRING,OLD_STRING
-	CHARACTER*11  FORMAT_DATE 
+	CHARACTER*11  FORMAT_DATE
 !
 	IF(INCL_CHG_EXCH)THEN
 	  DO_CHG_EXCH=.TRUE.
@@ -260,7 +262,7 @@
 	  END DO
 !
 	  L=1
-	  IF(SPEC_ID_CHG(I,1)(2:2) .GE. 'a' .AND. 
+	  IF(SPEC_ID_CHG(I,1)(2:2) .GE. 'a' .AND.
 	1             SPEC_ID_CHG(I,1)(2:2) .LE. 'z')L=2
 	  IF(SPEC_ID_CHG(I,1)(1:L) .NE. SPEC_ID_CHG(I,3)(1:L))THEN
 	    WRITE(LUER,*)'Error in RD_CHG_EXCH',
@@ -269,7 +271,7 @@
 	  END IF
 !
 	  L=1
-	  IF(SPEC_ID_CHG(I,2)(2:2) .GE. 'a' .AND. 
+	  IF(SPEC_ID_CHG(I,2)(2:2) .GE. 'a' .AND.
 	1              SPEC_ID_CHG(I,2)(2:2) .LE. 'z')L=2
 	  IF(SPEC_ID_CHG(I,2)(1:L) .NE. SPEC_ID_CHG(I,4)(1:L))THEN
 	    WRITE(LUER,*)'Error in RD_CHG_EXCH',

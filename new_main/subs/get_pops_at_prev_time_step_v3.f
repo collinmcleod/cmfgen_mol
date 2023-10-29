@@ -3,13 +3,14 @@
 ! previously converged model at an earlier time step. The new and current
 ! models must have an identical number of grid points, and super levels.
 ! Further, the velocity at the inner boundary must be identical. The older
-! model may extend to larger velocities. 
+! model may extend to larger velocities.
 !
 ! NB: TIME_SEQ_NO refers to the current model. This routine reads the populations
 ! corresponding to model TIME_SEQ_NO-1
 !
         SUBROUTINE GET_POPS_AT_PREV_TIME_STEP_V3(OLD_POPS,OLD_R,DO_ADVECT,DO_RAD_DECAYS,
 	1                      NORMALIZE_POPS,TIME_SEQ_NO,ND,NT,LU)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -26,18 +27,18 @@
 	LOGICAL DO_RAD_DECAYS
 	LOGICAL NORMALIZE_POPS
 !
-	REAL(10) OLD_R(ND)
-	REAL(10) OLD_POPS(NT,ND)
+	REAL(KIND=LDP) OLD_R(ND)
+	REAL(KIND=LDP) OLD_POPS(NT,ND)
 !
-	REAL(10) OLD_V(ND)
-	REAL(10) OLD_SIGMA(ND)
-	REAL(10) LOG_OLD_V(ND)
-	REAL(10) LOG_V(ND)
-	REAL(10) NEW_VEC(ND)
-	REAL(10) OLD_VEC(ND)
-	REAL(10) OLD_ED(ND)
+	REAL(KIND=LDP) OLD_V(ND)
+	REAL(KIND=LDP) OLD_SIGMA(ND)
+	REAL(KIND=LDP) LOG_OLD_V(ND)
+	REAL(KIND=LDP) LOG_V(ND)
+	REAL(KIND=LDP) NEW_VEC(ND)
+	REAL(KIND=LDP) OLD_VEC(ND)
+	REAL(KIND=LDP) OLD_ED(ND)
 !
-	REAL(10) T1,T2
+	REAL(KIND=LDP) T1,T2
 	INTEGER IREC_RD
 	INTEGER I,J,K,ISPEC,ID
 	INTEGER LUER,ERROR_LU
@@ -47,22 +48,22 @@
 	INTEGER, PARAMETER :: IONE=1
 	LOGICAL, PARAMETER :: RVSIG_WRITTEN=.TRUE.
 !
-! Get model from the last time step. TIME_SEQ_NO refers to the CURRENT 
+! Get model from the last time step. TIME_SEQ_NO refers to the CURRENT
 ! time model. Therefore we must subtract 1.
 !
 	IREC_RD=TIME_SEQ_NO-1
 	CALL  READ_TIME_MODEL_V1(OLD_R,OLD_V,OLD_SIGMA,OLD_POPS,
 	1             IREC_RD,RVSIG_WRITTEN,NT,ND,LU)
 !
-! As a Hubble law, we can use V to interpolate. Note that 
+! As a Hubble law, we can use V to interpolate. Note that
 ! V is a comoving variable.
 !
 	T1=1.0D-06
 	IF(EQUAL(OLD_V(ND),V(ND),T1))THEN
 	  OLD_V(ND)=V(ND)
-	ELSE 
+	ELSE
 	  LUER=ERROR_LU()
-	  WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V3' 
+	  WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V3'
 	  WRITE(LUER,*)'Velocities at inner boundary are unequal'
 	  WRITE(LUER,*)'V(ND)=',V(ND)
 	  WRITE(LUER,*)'OLD_V(ND)=',OLD_V(ND)
@@ -74,7 +75,7 @@
 	  OLD_V(1)=V(1)
 	ELSE IF(OLD_V(1) .LT. V(1))THEN
 	  LUER=ERROR_LU()
-	  WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V3' 
+	  WRITE(LUER,*)'Error in GET_POPS_AT_PREV_TIME_STEP_V3'
 	  WRITE(LUER,*)'Old velocity at outer boundary is too small'
 	  WRITE(LUER,*)'V(1)=',V(1)
 	  WRITE(LUER,*)'OLD_V(1)=',OLD_V(1)
@@ -94,8 +95,8 @@
 	  OLD_POPS(I,:)=EXP(NEW_VEC)
 	END DO
 !
-! Get the interpolated radius scale in the old model. This radius scale will 
-! have the same velocity coordinates as the current model. Since we have a 
+! Get the interpolated radius scale in the old model. This radius scale will
+! have the same velocity coordinates as the current model. Since we have a
 ! Hubble law, linear interpolation is accurate.
 !
 	CALL MON_INTERP(NEW_VEC,ND,IONE,V,ND,OLD_R,ND,OLD_V,ND)

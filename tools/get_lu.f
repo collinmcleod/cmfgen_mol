@@ -1,9 +1,10 @@
 !
 ! Simple subroutine to return a free logical unit.
 ! Only unit above 200 are returned. No track of
-! used units is kept.  
+! used units is kept.
 !
 	SUBROUTINE GET_LU(LU,ID)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER LU
 !

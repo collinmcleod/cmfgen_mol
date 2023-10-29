@@ -15,13 +15,14 @@ C hence similar in size. While some minor cancellation, should be much less
 C then adding to full BA matrix in which terms have arbitrary size.
 C
 	SUBROUTINE ADD_PAR_TO_FULL(BA,BA_PAR,NION,NT,NUM_BNDS,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Created:   28-Feb-1995
 C
 	INTEGER NION,NT,NUM_BNDS,ND
-	REAL(10) BA(NION,NT,NUM_BNDS,ND)
-	REAL(10) BA_PAR(NION,NT,ND)
+	REAL(KIND=LDP) BA(NION,NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) BA_PAR(NION,NT,ND)
 C
 	INTEGER I,J,L,K
 C

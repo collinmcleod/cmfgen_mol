@@ -8,12 +8,13 @@
 ! CMF_FLUX calling program is partially based on DISPGEN.
 !
 	PROGRAM CMF_FLUX_V5
+	USE SET_KIND_MODULE
 	USE CMF_FLUX_CNTRL_VAR_MOD
 	USE MOD_CMF_OBS
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
 !
-! Altered: 18-May-2015 : Changed GAM2, GAM4 to C4 and C6 (quadratic and Van der Waals 
+! Altered: 18-May-2015 : Changed GAM2, GAM4 to C4 and C6 (quadratic and Van der Waals
 !                          interacton constants)(09-Jun-2105).
 ! Altered: 17-Mar-2003: SCRAT & SCRATREC are now initialized.
 ! Altered: 03-Mar-2000: Variable type ATM installed to simplify handling
@@ -22,7 +23,7 @@
 ! Created:  5-Jan-1998=9 (Progran began late Dec, 1998)
 !
 	INTEGER ND		!Actula number of depth points in atmosphere
-	INTEGER NC		!Actual number of core rays 
+	INTEGER NC		!Actual number of core rays
 	INTEGER NP		!Total number of rays (ND+NC)
 !
 	INTEGER ND_MAX,NP_MAX,NC_MAX
@@ -42,12 +43,12 @@
 	INTEGER I,J,NT,SCRATREC
 	INTEGER LEN_DIR
 	INTEGER EQ_TEMP
-	REAL(10) T1,T2
-	REAL(10) RMDOT
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) RMDOT
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 !
 	INTEGER, PARAMETER :: T_IN=5		!Terminal IO
 	INTEGER, PARAMETER :: T_OUT=6		!Terminal IO
@@ -96,7 +97,7 @@
 !
 ! Set all atomic data. New species can be simple added by insertion.
 ! Try to add species in order of atomic number. Hydrogen should ALWAYS
-! be species 1, Helium should ALWAYS be species 2. 
+! be species 1, Helium should ALWAYS be species 2.
 !
 ! While this tabulation is Verbose, it is simple to change.
 ! Note that the Solar abundances are only used for reference in
@@ -199,7 +200,7 @@
 !
 	ID=ID+1
 	AT_NO(ID)=23.0D0;           AT_MASS(ID)=50.94D0         !Vandium
-	SPECIES(ID)='VAN';          SPECIES_ABR(ID)='V'         !Actual symbol is V 
+	SPECIES(ID)='VAN';          SPECIES_ABR(ID)='V'         !Actual symbol is V
 	SOL_ABUND_HSCL(ID)=4.00D0
 !
 	ID=ID+1
@@ -215,7 +216,7 @@
 	ID=ID+1
 	AT_NO(ID)=26.0D0;	    AT_MASS(ID)=55.8D0		!Iron
 	SPECIES(ID)='IRON';	    SPECIES_ABR(ID)='Fe'
-	SOL_ABUND_HSCL(ID)=7.54D0        
+	SOL_ABUND_HSCL(ID)=7.54D0
 !
 	ID=ID+1
 	AT_NO(ID)=27.0D0;	    AT_MASS(ID)=58.9D0		!Cobalt
@@ -400,7 +401,7 @@
 	CLOSE(LU)
 !
 ! Read in other parameters from batch file. These must be in order.
-! Using a STRIN to read ONLY_OBS_LINES allows me to preserve backward 
+! Using a STRIN to read ONLY_OBS_LINES allows me to preserve backward
 ! compatibility, while adding the new variable ONLY_UNOBS)_LINES.
 !
 	CALL RD_CHAR(STRING,'ONLY_OBS_LINES',T_IN,LUER,'Observed lines only?')
@@ -473,7 +474,7 @@
 !
 	      IF(ATM(ID)%XzV_PRES .OR. PREV_STAGE_PRES)THEN
 	        CALL RD_MODEL_SPEC_INFO( TRIM(ION_ID(ID)),
-	1          ATM(ID)%NXzV_F,       ATM(ID)%XzV_PRES,  ATM(ID)%NXzV,    
+	1          ATM(ID)%NXzV_F,       ATM(ID)%XzV_PRES,  ATM(ID)%NXzV,
 	1          ATM(ID)%DIE_AUTO_XzV, ATM(ID)%DIE_WI_XzV)
                 SPECIES_PRES(ISPEC)=.TRUE.
 	        IF(SPECIES_BEG_ID(ISPEC) .EQ. 0)SPECIES_BEG_ID(ISPEC)=ID
@@ -584,7 +585,7 @@
 	  IF(ATM(ID)%XzV_PRES)THEN
 	    FILENAME=TRIM(ION_ID(ID))//'_F_OSCDAT'
 	    CALL GENOSC_V9(ATM(ID)%AXzV_F,  ATM(ID)%EDGEXzV_F,
-	1          ATM(ID)%GXzV_F, ATM(ID)%XzVLEVNAME_F, 
+	1          ATM(ID)%GXzV_F, ATM(ID)%XzVLEVNAME_F,
 	1          ATM(ID)%ARAD,ATM(ID)%C4,ATM(ID)%C6,
 	1          ATM(ID)%OBSERVED_LEVEL,T1,ATM(ID)%ZXzV,
 	1          ATM(ID)%NEW_XzV_OSCDATE, ATM(ID)%NXzV_F, I,
@@ -610,7 +611,7 @@
 	1            ATM(ID)%XzV_ION_LEV_ID, ATM(ID)%N_XzV_PHOT, NPHOT_MAX,
 	1            ATM(ID+1)%XzV_PRES,     ATM(ID+1)%EDGEXzV_F,
 	1            ATM(ID+1)%GXzV_F,       ATM(ID+1)%F_TO_S_XzV,
-	1            ATM(ID+1)%XzVLEVNAME_F, ATM(ID)%NXzV_F, 
+	1            ATM(ID+1)%XzVLEVNAME_F, ATM(ID)%NXzV_F,
 	1            SIG_GAU_KMS,FRAC_SIG_GAU,CUT_ACCURACY,ABOVE_EDGE,
 	1            XRAYS,ID,ION_ID(ID),LUIN,LU_TMP)
             IF(ATM(ID+1)%XzV_PRES)ATM(ID)%GIONXzV_F=ATM(ID+1)%GXzV_F(1)

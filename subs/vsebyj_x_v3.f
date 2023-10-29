@@ -12,8 +12,9 @@ C
 	1             DI,ED,T,EMHNUKT,NU,ML,RJ,
 	1             EQ_A,ION_EQ,SPEC_EQ,NCF,NT,NUM_BNDS,ND,
 	1             BAION,EQ_A_BAL,EQ_B_BAL,NION,DST,DEND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
-C 
+C
 C Altered 27-OCt-1995 : Changed to be compatible with super levels.
 C                        Call chnaged --- Now _V3.
 C Altered 06-Mar-1995 : Dimensions of WSE_X changed to (N,ND) from (N,NCF).
@@ -27,7 +28,7 @@ C
 	INTEGER ION_EQ	!Eqn. # of target species [gs. of (i+2)th ]
 	INTEGER SPEC_EQ	!Eqn. # of abundance equation
 C
-	INTEGER NCF		!Number of freuencies in NU 
+	INTEGER NCF		!Number of freuencies in NU
 	INTEGER ML		!Inidcates current freqency in vector NU
 	INTEGER NT		!Total number of levels
 	INTEGER ND		!Number of depth points
@@ -40,41 +41,41 @@ C NB --- NION is the total number of ionic species i.e. for
 C HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and CV).
 C
 	INTEGER NUM_BNDS,DST,DEND
-	REAL(10) BA(NT,NT,NUM_BNDS,ND)
-	REAL(10) BAION(NION,NT,NUM_BNDS,ND)
-	REAL(10) WSE_X(N_A,ND)
+	REAL(KIND=LDP) BA(NT,NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) BAION(NION,NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) WSE_X(N_A,ND)
 C
 C _A refers to quantities associated with the atom WITH super levels.
 C
-	REAL(10) HN_A(N_A,ND)		!Pops. of ith ionzation stage
-	REAL(10) HNST_A(N_A,ND)		!LTE   "    "  "      "       "
-	REAL(10) dlnHNST_AdlnT(N_A,ND)	
+	REAL(KIND=LDP) HN_A(N_A,ND)		!Pops. of ith ionzation stage
+	REAL(KIND=LDP) HNST_A(N_A,ND)		!LTE   "    "  "      "       "
+	REAL(KIND=LDP) dlnHNST_AdlnT(N_A,ND)	
 C
-C _B refers to quantities assiciated with the FULL atom of the next 
+C _B refers to quantities assiciated with the FULL atom of the next
 C  ionization stage.
 C
-	REAL(10) HN_B(N_B,ND)		!Pops. of (i+1)th ionization stage
-	REAL(10) HNST_B(N_B,ND)		!LTE   "   "    "       "        "
-	REAL(10) EDGE_B(N_B)
+	REAL(KIND=LDP) HN_B(N_B,ND)		!Pops. of (i+1)th ionization stage
+	REAL(KIND=LDP) HNST_B(N_B,ND)		!LTE   "   "    "       "        "
+	REAL(KIND=LDP) EDGE_B(N_B)
 C
-	REAL(10) DI(ND)			!Ion densit for B levels.
-	REAL(10) ED(ND)			!Electron density
-	REAL(10) T(ND)			!Temperature in 10^4K.
-	REAL(10) EMHNUKT(ND)		!EXP(-hv/kT)
-	REAL(10) RJ(ND)			!Mean intensity
-	REAL(10) NU(NCF)			!frequency (10^15 Hz)
+	REAL(KIND=LDP) DI(ND)			!Ion densit for B levels.
+	REAL(KIND=LDP) ED(ND)			!Electron density
+	REAL(KIND=LDP) T(ND)			!Temperature in 10^4K.
+	REAL(KIND=LDP) EMHNUKT(ND)		!EXP(-hv/kT)
+	REAL(KIND=LDP) RJ(ND)			!Mean intensity
+	REAL(KIND=LDP) NU(NCF)			!frequency (10^15 Hz)
 C
 C Constants for opacity etc.
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 C Local variables
 C
 	INTEGER I,J,L,NJ
-	REAL(10) T1,T3,BSTIM
-	REAL(10) WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC
-C           
+	REAL(KIND=LDP) T1,T3,BSTIM
+	REAL(KIND=LDP) WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC
+C
 	T1=TWOHCSQ*( NU(ML)**3 )
 	L=(NUM_BNDS/2)+1
 	DO I=DST,DEND			!Which depth point.
@@ -86,12 +87,12 @@ C
 	      WSE_BY_RJ=WSE_X(J,I)*RJ(I)
 	      BA(NJ,NJ,L,I)=BA(NJ,NJ,L,I)-WSE_BY_RJ
 C
-C NB: In the following, the factor of 2.0 for ED_FAC arrises because 
-C the rate is prop. to 
+C NB: In the following, the factor of 2.0 for ED_FAC arrises because
+C the rate is prop. to
 C
 C        HNST_A(J,I)*HNST_B(1,I) .
 C
-C The variation with respect to HN_B(1,I) is intrinsically zero, since 
+C The variation with respect to HN_B(1,I) is intrinsically zero, since
 C HNST_A(J,I)/HN_B(1,I) is independent of HN_B(1,I)
 C
 	      T3=HNST_A(J,I)*WSE_X(J,I)*BSTIM
@@ -118,7 +119,7 @@ C
 C
 C Add in effect of X-rays to ionization/recombination balance equation.
 C X-rays ionize from level i to i+2. However, for numerical stability
-C we analytically cancel lower phot/recom. rates from rate equations. 
+C we analytically cancel lower phot/recom. rates from rate equations.
 C As a consequence X-ray rates are only included in consecutive ionization
 C stages.
 C

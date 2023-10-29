@@ -1,12 +1,12 @@
 C
-C Subroutine to reduce the size of the extended two dimensional dCHI 
+C Subroutine to reduce the size of the extended two dimensional dCHI
 C matrix used in the computation of dJ. It also used for dETA. The
 C integer array GRID gives the positions of the old grid points in the
 C new grid. The use of GRID allows for different numbers of grid points
 C inserted between adjacent pixels. INDX is used to indicate which depths
 C the interpolated opacity is dependant on.
 C
-C The interpolation may be in the dependent variable (INTERP_TYPE='LIN') or 
+C The interpolation may be in the dependent variable (INTERP_TYPE='LIN') or
 C in LOG of the dependent varaiable (INTERP_TYPE='LOG'). The  order of the
 C interpolation is assumed to be 3 or less (i.e. CHIEXT at any point depends
 C on CHIat 4 points [at most]).
@@ -17,6 +17,7 @@ C
 	SUBROUTINE FIX_dCHI(F2DA,RHS_dHdCHI,CHI,ETA,ND,
 	1                   F2DAEXT,RHS_dHdCHIEXT,CHIEXT,ETAEXT,NDEXT,
 	1                   COEF,INDX,INTERP_TYPE)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Created  15-May-1997
@@ -24,14 +25,14 @@ C
 	INTEGER ND,NDEXT
 	INTEGER INDX(NDEXT)
 C
-	REAL(10) F2DA(NDEXT,ND,2)
-	REAL(10) RHS_dHdCHI(NDEXT-1,ND)
-	REAL(10) CHI(ND),ETA(ND)
+	REAL(KIND=LDP) F2DA(NDEXT,ND,2)
+	REAL(KIND=LDP) RHS_dHdCHI(NDEXT-1,ND)
+	REAL(KIND=LDP) CHI(ND),ETA(ND)
 C
-	REAL(10) F2DAEXT(NDEXT,NDEXT,2)
-	REAL(10) RHS_dHdCHIEXT(NDEXT-1,NDEXT)
-	REAL(10) CHIEXT(NDEXT),ETAEXT(NDEXT)
-	REAL(10) COEF(0:3,NDEXT)
+	REAL(KIND=LDP) F2DAEXT(NDEXT,NDEXT,2)
+	REAL(KIND=LDP) RHS_dHdCHIEXT(NDEXT-1,NDEXT)
+	REAL(KIND=LDP) CHIEXT(NDEXT),ETAEXT(NDEXT)
+	REAL(KIND=LDP) COEF(0:3,NDEXT)
 	CHARACTER*(*) INTERP_TYPE
 C
 	INTEGER ERROR_LU
@@ -39,7 +40,7 @@ C
 C
 	INTEGER I,J,K,L
 	INTEGER, PARAMETER :: LRANGE=3
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 C
 	F2DA(:,:,:)=0.0D0			!NDEXT,ND,2
 	RHS_dHdCHI(:,:)=0.0D0			!NDEXT-1,ND

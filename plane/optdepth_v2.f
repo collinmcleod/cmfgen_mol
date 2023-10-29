@@ -1,6 +1,7 @@
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !
       SUBROUTINE OPTDEPTH_V2(CHI,NZ,IP,DO_P_RAY)
+	USE SET_KIND_MODULE
       USE MOD_SPACE_GRID_V2
       IMPLICIT NONE
 !
@@ -24,13 +25,13 @@
 !
       integer nz
       integer ip
-      REAL(10) chi(nz)
+      REAL(KIND=LDP) chi(nz)
       logical do_p_ray
 !
 ! Local variables
 !
       integer iz
-      REAL(10) dchidz(nz)
+      REAL(KIND=LDP) dchidz(nz)
 !
 !--------------------------------------------------------------------
 !

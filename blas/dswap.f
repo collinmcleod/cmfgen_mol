@@ -1,11 +1,12 @@
       subroutine  dswap (n,dx,incx,dy,incy)
+	USE SET_KIND_MODULE
 c
 c     interchanges two vectors.
 c     uses unrolled loops for increments equal one.
 c     jack dongarra, linpack, 3/11/78.
 c     modified 12/3/93, array(1) declarations changed to array(*)
 c
-      REAL(10) dx(*),dy(*),dtemp
+      REAL(KIND=LDP) dx(*),dy(*),dtemp
       integer i,incx,incy,ix,iy,m,mp1,n
 c
       if(n.le.0)return

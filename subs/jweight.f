@@ -9,6 +9,7 @@ C
 C D1, and R2 are work vectors.
 C
 	SUBROUTINE JWEIGHT(X,W,N)
+	USE SET_KIND_MODULE
 C
 C Altered 24-May-1996 - DP_ZERO deleted
 C                       ERROR_LU etc installed.
@@ -17,7 +18,7 @@ C Altered 25-Feb-1987 - Normalization implemented.
 C
 	IMPLICIT NONE
 	INTEGER N,I
-	REAL(10) X(N),W(N),H,HN,RE,RF,SUM
+	REAL(KIND=LDP) X(N),W(N),H,HN,RE,RF,SUM
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
@@ -79,7 +80,7 @@ C
 	  W(N)=W(N)+(X(N-1)**3)*2.0D0/RF/3.0D0
 	END IF
 C
-C Ensure that the weights have the correct normalization (shouldnt be 
+C Ensure that the weights have the correct normalization (shouldnt be
 C necessary.
 C
 	SUM=0.0D0

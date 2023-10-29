@@ -3,6 +3,7 @@
 ! gas by the magnetar. Routine taken from EVAL_RAD_DECAY_V1
 !
       SUBROUTINE EVAL_SHOCK_POWER(dE_SHOCK_POWER,ND,SHOCK_POWER_FAC)
+	USE SET_KIND_MODULE
       USE MOD_CMFGEN
       USE STEQ_DATA_MOD
       USE SHOCK_POWER_MOD
@@ -11,10 +12,10 @@
 ! Output: STEQ_T in MOD_CMFGEN is modified.
 !
       INTEGER ND
-      REAL(10) SCALE
-      REAL(10) PI
-      REAL(10) dE_SHOCK_POWER(ND)
-      REAL(10) SHOCK_POWER_FAC
+      REAL(KIND=LDP) SCALE
+      REAL(KIND=LDP) PI
+      REAL(KIND=LDP) dE_SHOCK_POWER(ND)
+      REAL(KIND=LDP) SHOCK_POWER_FAC
 !
 ! For historical reasons STEQ contains Int[chi.J - eta]dv. Rather than multiply
 ! this term everywhere by 4pi, we divide the radiactive heating by 4pi.

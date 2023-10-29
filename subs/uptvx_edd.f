@@ -9,20 +9,21 @@ C
 C Could used UPDATE_TVX if provided a zero TXOLD array.
 	SUBROUTINE UPTVX_EDD(TVX,TX,HU,HL,HS,
 	1                     RHS_dHdCHI,DEPTH_PHI,NI,NM)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 16-Sep-1994 - Bug Fix. I dimension if first DO block was going to ND
 C                       instead of ND-1. Bug will have no effect since the 3
 C                       H vectors at I=ND are (should be) zero.
-C                       
+C
 C Created  6-Jun-1989 - Based on UPDATE_TVX which in turn was based on UPVNOT.
 C
 	INTEGER NI,NM
-	REAL(10) TVX(NI-1,NI,NM)
-	REAL(10) TX(NI,NI,NM)
-	REAL(10) HU(NI),HL(NI),HS(NI)
-	REAL(10) RHS_dHdCHI(NI-1,NI)
-	REAL(10) DEPTH_PHI(NI)
+	REAL(KIND=LDP) TVX(NI-1,NI,NM)
+	REAL(KIND=LDP) TX(NI,NI,NM)
+	REAL(KIND=LDP) HU(NI),HL(NI),HS(NI)
+	REAL(KIND=LDP) RHS_dHdCHI(NI-1,NI)
+	REAL(KIND=LDP) DEPTH_PHI(NI)
 C
 C Local varaiables.
 C

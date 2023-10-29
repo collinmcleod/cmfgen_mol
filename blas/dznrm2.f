@@ -1,5 +1,9 @@
-      REAL(10) FUNCTION DZNRM2( N, X, INCX )
+      FUNCTION DZNRM2( N, X, INCX )
+      USE SET_KIND_MODULE
+      REAL(KIND=LDP) DZNRM2
+*
 *     .. Scalar Arguments ..
+*
       INTEGER                           INCX, N
 *     .. Array Arguments ..
       COMPLEX*16                        X( * )
@@ -18,11 +22,11 @@
 *
 *
 *     .. Parameters ..
-      REAL(10)      ONE         , ZERO
+      REAL(KIND=LDP)      ONE         , ZERO
       PARAMETER           ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     .. Local Scalars ..
       INTEGER               IX
-      REAL(10)      NORM, SCALE, SSQ, TEMP
+      REAL(KIND=LDP)      NORM, SCALE, SSQ, TEMP
 *     .. Intrinsic Functions ..
       INTRINSIC             ABS, DIMAG, DBLE, SQRT
 *     ..

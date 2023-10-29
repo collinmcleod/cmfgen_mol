@@ -1,5 +1,6 @@
 C
 	PROGRAM DISPGEN
+	USE SET_KIND_MODULE
 	USE MOD_DISP
 	USE MOD_USR_OPTION
 	USE GEN_IN_INTERFACE
@@ -13,7 +14,7 @@ C
 ! Altered 19-Aug-2015 : Changed to GENOSC_V9 (from _V8).
 ! Altered 13-May-2015 : Changed to GENOSC_V8 (from _V5). Updated MOD_DISP.
 ! Altered 07-Sep-2005 : XRAYS option set to TRUE. Lithium cross-sections will be set.
-! Altered 20-Apr-2004 : Use RDHOTGEN_V2 will allows for dynamic smoothing of 
+! Altered 20-Apr-2004 : Use RDHOTGEN_V2 will allows for dynamic smoothing of
 !                          photoioization cross-sections.
 !
 	INTEGER ND,NP,NC
@@ -38,15 +39,15 @@ C
 	INTEGER LEN_DIR
 	INTEGER GF_LEV_CUT
 	INTEGER MIN_NUM_TRANS
-	REAL(10) GF_CUT
-	REAL(10) T1,T2
-	REAL(10) RMDOT,RLUM
+	REAL(KIND=LDP) GF_CUT
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) RMDOT,RLUM
 !
 ! Variables for reading in photoioization data.
 !
-	REAL(10) SIG_GAU_KMS
-	REAL(10) FRAC_SIG_GAU
-	REAL(10) CUT_ACCURACY
+	REAL(KIND=LDP) SIG_GAU_KMS
+	REAL(KIND=LDP) FRAC_SIG_GAU
+	REAL(KIND=LDP) CUT_ACCURACY
 	LOGICAL ABOVE_EDGE
 !
 	CHARACTER*80 TMP_STRING
@@ -57,7 +58,7 @@ C
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 C
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
@@ -190,7 +191,7 @@ C
 !
 	ID=ID+1
 	AT_NO(ID)=23.0D0;           AT_MASS(ID)=50.94D0         !Vandium
-	SPECIES(ID)='VAN';          SPECIES_ABR(ID)='V'         !Actual symbol is V 
+	SPECIES(ID)='VAN';          SPECIES_ABR(ID)='V'         !Actual symbol is V
 	SOL_ABUND_HSCL(ID)=4.00D0
 !
 	ID=ID+1
@@ -206,7 +207,7 @@ C
 	ID=ID+1
 	AT_NO(ID)=26.0D0;	    AT_MASS(ID)=55.8D0		!Iron
 	SPECIES(ID)='IRON';	    SPECIES_ABR(ID)='Fe'
-	SOL_ABUND_HSCL(ID)=7.54D0        
+	SOL_ABUND_HSCL(ID)=7.54D0
 !
 	ID=ID+1
 	AT_NO(ID)=27.0D0;	    AT_MASS(ID)=58.9D0		!Cobalt
@@ -239,7 +240,7 @@ C
 	SPECIES_BEG_ID(1:NSPEC)=0
 	SPECIES_END_ID(1:NSPEC)=0
 !
-! Read in the gaunt factors for individual l states of hydrogen. 
+! Read in the gaunt factors for individual l states of hydrogen.
 !
 	CALL RD_HYD_BF_DATA(LUIN,LUMOD,T_OUT)
 !
@@ -357,7 +358,7 @@ C
 	  WRITE(T_OUT,*)'Don''t recognize naming convention in DISPGEN'
 	  WRITE(T_OUT,*)'NAME_CONVENTION= ',NAME_CONVENTION
 	  STOP
-	END IF 
+	END IF
 !
 	WRITE(T_OUT,3)TIME
 3	FORMAT(1X,'Model completed on ',A20)

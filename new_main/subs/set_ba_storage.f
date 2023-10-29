@@ -4,6 +4,7 @@
 ! CREATE_IV_LINKS_V2.
 !
       SUBROUTINE SET_BA_STORAGE(NT,NUM_BNDS,ND,NION)
+	USE SET_KIND_MODULE
       USE MOD_CMFGEN
       USE STEQ_DATA_MOD
       IMPLICIT NONE
@@ -25,7 +26,7 @@
       INTEGER LU_ER,ERROR_LU
       EXTERNAL ERROR_LU
 !
-      REAL(10) MEMORY
+      REAL(KIND=LDP) MEMORY
       INTEGER I,NX,NY
 !
       LU_ER=ERROR_LU()
@@ -90,7 +91,7 @@
         STOP
       END IF
 !
-! We try allocate the BA matrices separately, as this might 
+! We try allocate the BA matrices separately, as this might
 ! improve memory management.
 !
       DO ID=1,NION

@@ -5,6 +5,7 @@
 ! routine of the same name.
 !
 	SUBROUTINE SET_LINE_BUFFERING(LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER LU
@@ -57,7 +58,7 @@
 	END IF
 !
 ! Allocate the buffer.
-! 
+!
 	IOS=0
 	IOS=SETVBUF(LU,IONE,LEN_BUF,MY_BUFFER(IBUF))
 	IF(IOS .NE. 0)THEN

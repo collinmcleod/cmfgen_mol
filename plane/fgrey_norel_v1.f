@@ -3,12 +3,12 @@
 ! Feautrier Technique for a spherical gray atmosphere. A diffusion approximation
 ! is used for the lower boundary condition. Radiative equilibrium is assumed.
 !
-! The time dependent radiative transfer equation is solved including all terms 
-! to first order in v/c, and assumes a Hubble flow. Thus sigma=dlnv/dlnr-1 =0. 
-! A Langrangian description is used to handle the time dependence. The frequency 
+! The time dependent radiative transfer equation is solved including all terms
+! to first order in v/c, and assumes a Hubble flow. Thus sigma=dlnv/dlnr-1 =0.
+! A Langrangian description is used to handle the time dependence. The frequency
 ! integrated moments J and H (and the associated boundary conditions) at the previous
 ! time step need to be available, and are read in from the file JH_AT_PREV_TIME.
-! If desired, the full D/Dt term can be neglected, in which case the code should give 
+! If desired, the full D/Dt term can be neglected, in which case the code should give
 ! identical answers to JGREY_WITH_FVT.
 !
 ! Partially based on the routine ../subs/jgrey_with_fvt.f
@@ -16,6 +16,7 @@
 	SUBROUTINE FGREY_NOREL_V1(FEDD,H_ON_J,RJ,CHI,R,VEL,SIGMA,
 	1              P,JQW,HQW,KQW,LUMINOSITY,IC,METHOD,
 	1              H_OUTBC,H_INBC,DIFF_APPROX,ND,NC,NP)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 22-July-2006
@@ -24,61 +25,61 @@
 	INTEGER ND
 	INTEGER NP
 !
-	REAL(10) FEDD(ND)
-	REAL(10) H_ON_J(ND)
+	REAL(KIND=LDP) FEDD(ND)
+	REAL(KIND=LDP) H_ON_J(ND)
 !
-	REAL(10) R(ND)			!Radius grid (in units of 10^10 cm)
-	REAL(10) RJ(ND)			!Mean opacity
-	REAL(10) CHI(ND)			!Opacity
-	REAL(10) VEL(ND)			!Velocity (in km/s)
-	REAL(10) SIGMA(ND)		!dlnV/dlnr-1
+	REAL(KIND=LDP) R(ND)			!Radius grid (in units of 10^10 cm)
+	REAL(KIND=LDP) RJ(ND)			!Mean opacity
+	REAL(KIND=LDP) CHI(ND)			!Opacity
+	REAL(KIND=LDP) VEL(ND)			!Velocity (in km/s)
+	REAL(KIND=LDP) SIGMA(ND)		!dlnV/dlnr-1
 !
-	REAL(10) P(NP)			!Impact parameters
-	REAL(10) JQW(ND,NP)		!Quadrature weight for J (on grid)
-	REAL(10) KQW(ND,NP) 		!Quadrature weight for K (on grid)
-	REAL(10) HQW(ND,NP)		!Quadrature weight for H (at midpoints)
+	REAL(KIND=LDP) P(NP)			!Impact parameters
+	REAL(KIND=LDP) JQW(ND,NP)		!Quadrature weight for J (on grid)
+	REAL(KIND=LDP) KQW(ND,NP) 		!Quadrature weight for K (on grid)
+	REAL(KIND=LDP) HQW(ND,NP)		!Quadrature weight for H (at midpoints)
 !
-	REAL(10) LUMINOSITY               !Luminosity at inner boundary in Lsun.
-	REAL(10) IC                       !Not used
+	REAL(KIND=LDP) LUMINOSITY               !Luminosity at inner boundary in Lsun.
+	REAL(KIND=LDP) IC                       !Not used
 	LOGICAL DIFF_APPROX		!Use a diffusion approximation (as opposed to a Schuster core)
 	CHARACTER(LEN=6) METHOD
 !
-	REAL(10) H_OUTBC		!Eddington factor for H at outer boundary.
-	REAL(10) H_INBC
+	REAL(KIND=LDP) H_OUTBC		!Eddington factor for H at outer boundary.
+	REAL(KIND=LDP) H_INBC
 !
 ! Local vectors & arrays
 !
-	REAL(10) Z(ND)
-	REAL(10) TA(ND)
-	REAL(10) TB(ND)
-	REAL(10) TC(ND)
-	REAL(10) XM(ND)
-	REAL(10) CHI_MOD(ND)
-	REAL(10) dCHIdR(ND)
-	REAL(10) dCHI_MODdR(ND)
-	REAL(10) Q(ND)
-	REAL(10) F(ND)
-	REAL(10) DTAU(ND)
-	REAL(10) BETA(ND)
-	REAL(10) VU(ND)
-	REAL(10) CV(ND)
+	REAL(KIND=LDP) Z(ND)
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) TB(ND)
+	REAL(KIND=LDP) TC(ND)
+	REAL(KIND=LDP) XM(ND)
+	REAL(KIND=LDP) CHI_MOD(ND)
+	REAL(KIND=LDP) dCHIdR(ND)
+	REAL(KIND=LDP) dCHI_MODdR(ND)
+	REAL(KIND=LDP) Q(ND)
+	REAL(KIND=LDP) F(ND)
+	REAL(KIND=LDP) DTAU(ND)
+	REAL(KIND=LDP) BETA(ND)
+	REAL(KIND=LDP) VU(ND)
+	REAL(KIND=LDP) CV(ND)
 !
 ! FS indicates the following quantities (J, H, & K) have been computed using the
 ! formal solution.
 !
-	REAL(10) FS_J(ND)
-	REAL(10) FS_H(ND)
-	REAL(10) FS_K(ND)
+	REAL(KIND=LDP) FS_J(ND)
+	REAL(KIND=LDP) FS_H(ND)
+	REAL(KIND=LDP) FS_K(ND)
 !
-	REAL(10) IBOUND
-	REAL(10) DBB
-	REAL(10) DBC
-	REAL(10) C_KMS
+	REAL(KIND=LDP) IBOUND
+	REAL(KIND=LDP) DBB
+	REAL(KIND=LDP) DBC
+	REAL(KIND=LDP) C_KMS
 !
-	REAL(10) PI
-	REAL(10) T1,T2,T3
-	REAL(10) E1,E2,E3
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) PI
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) E1,E2,E3
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL SPEED_OF_LIGHT
 !
 	INTEGER I
@@ -157,7 +158,7 @@
 	    DO I=1,NI-1
 	      VU(I)=1.0D0/DTAU(I)
 	    END DO
-! 
+!
 	    XM(1)=-IBOUND
 	    TA(1)=0.0D0
 	    TC(1)=1.0D0/DTAU(1)
@@ -224,7 +225,7 @@ C
 !
 	  H_OUTBC=H_OUTBC+JQW(1,LS)*(XM(1)-IBOUND)*Z(1)/R(1)
 	  IF(.NOT. DIFF_APPROX)H_INBC=H_INBC+JQW(ND,LS)*(IC-XM(ND))*Z(ND)/R(ND)
-!  
+!
 2000	CONTINUE
 !
 ! Compute the new Feautrier factors.

@@ -3,6 +3,7 @@
 ! Simple HAN procedure is used.
 !
 	SUBROUTINE SMOOTH_PLT(SMOOTH_PLOT,BOX_FILTER,NHAN)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
 	IMPLICIT NONE
 !
@@ -14,9 +15,9 @@
 	INTEGER NHAN
 	INTEGER, PARAMETER :: NHAN_MAX=50
 !
-	REAL(10), ALLOCATABLE :: ZV(:)
-	REAL(10) WT(NHAN_MAX)
-	REAL(10) T1,T2
+	REAL(KIND=LDP), ALLOCATABLE :: ZV(:)
+	REAL(KIND=LDP) WT(NHAN_MAX)
+	REAL(KIND=LDP) T1,T2
 	INTEGER I,J,K,IP,ML
 	INTEGER NX
 	INTEGER IST,IEND
@@ -96,7 +97,7 @@
 	          DO ML=1,NHAN
                     J=I-1-NHAN/2+ML
 	            IF(J .LT. IST)J=IST             !To get correct weighting at ends
-	            IF(J .GT. IEND)J=IEND 
+	            IF(J .GT. IEND)J=IEND
 	            T1=T1+WT(ML)
 	            CD(IP)%DATA(I)=CD(IP)%DATA(I)+ZV(J)*WT(ML)
 	          END DO
@@ -105,7 +106,7 @@
 	        IST=IEND+1
 	      END DO
 !
-	    ELSE 
+	    ELSE
 	      DO I=1,NX
 	        ZV(I)=CD(IP)%DATA(I)
 	       END DO
@@ -115,12 +116,12 @@
 	         DO ML=1,NHAN
                    J=I-1-NHAN/2+ML
 	           IF(J .LT. IST)J=IST             !To get correct weighting at ends
-	           IF(J .GT. IEND)J=IEND 
+	           IF(J .GT. IEND)J=IEND
 	           T1=T1+WT(ML)
 	           CD(IP)%DATA(I)=CD(IP)%DATA(I)+ZV(J)*WT(ML)
 	         END DO
 	         CD(IP)%DATA(I)=CD(IP)%DATA(I)/T1
-	       END DO	    
+	       END DO	
 	    END IF
 	  END IF
 	END DO

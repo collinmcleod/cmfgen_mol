@@ -1,9 +1,10 @@
 C
-C Routine to draw and label the RH Y axis. Various parameters are used 
+C Routine to draw and label the RH Y axis. Various parameters are used
 C to provide (complete) control over numbering, tick marks, etc.
 C
 	SUBROUTINE DRAW_RIGHT_Y_AXIS(YPAR,YINC,YNUMST,IYTICK,IDY,
 	1                  TICK_FAC,EXPCHAR,YLABEL,AX_OPT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 	REAL*4 YPAR(2)		!User coordinates of box
@@ -66,7 +67,7 @@ C
 	  LOG_OFFSET(I)=LOG10( FLOAT(I) )
 	END DO
 C
-C Estimate appropriate tick sizes (Default is tick same size as 
+C Estimate appropriate tick sizes (Default is tick same size as
 C character with expand=1)
 C
  	CALL PGQTXT(RZERO,RZERO,RZERO,RZERO,'X',XBOX,YBOX)
@@ -89,8 +90,8 @@ C
 !
 C 
 C
-C Set parameters for drawing tick marks and putting on coordinates depending 
-C on the choice of Axes chosen. 
+C Set parameters for drawing tick marks and putting on coordinates depending
+C on the choice of Axes chosen.
 C
 	IF(AX_OPT .EQ. 'LOGY' .OR. AX_OPT .EQ. 'LOGXY')THEN
 	  YINC=1.0
@@ -101,7 +102,7 @@ C
 	  IYST=INT( (YNUMST-YPAR(1))*1.0001/ (YINC/IYTICK) )
 	END IF
 C
-C If we are switching to LOG axes with full numbers marked we strip Log from 
+C If we are switching to LOG axes with full numbers marked we strip Log from
 C the label.
 C
 	IF(INDEX(AX_OPT,'Y') .NE. 0)THEN

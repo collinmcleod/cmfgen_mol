@@ -4,7 +4,7 @@
 ! Altered 22-Jul-2022: Extra variables added.
 ! Altered 24-Jan-2013: Vectors in CURVE_DATA in no longer a pointer.
 !                      This required ASSOICATED test to be replaced by ALLOCATED
-!                         test in several routines. 
+!                         test in several routines.
 ! Altered 28-Mar-2003: LU_ER changed from 5 to 6.
 !
 	INTEGER, PARAMETER :: MAX_PLTS=50

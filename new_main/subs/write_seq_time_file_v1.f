@@ -3,6 +3,7 @@
 ! This data will be subsequently used for the next model in the time sequence.
 !
 	SUBROUTINE WRITE_SEQ_TIME_FILE_V1(SN_AGE,ND,LU)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -11,7 +12,7 @@
 !                           ion is now output.
 ! Created 14-Mar-2007 :  Based on READ_TIME_MODEL_V2
 !
-	REAL(10) SN_AGE
+	REAL(KIND=LDP) SN_AGE
 	INTEGER ND
 	INTEGER LU
 !
@@ -38,7 +39,7 @@
 	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	      WRITE(LU)ID,ATM(ID)%NXzV_F,ATM(ID)%ZXzV
 	      WRITE(LU)ATM(ID)%XzV_F
-	      WRITE(LU)ATM(ID)%DXzV		!Super level ion population. 
+	      WRITE(LU)ATM(ID)%DXzV		!Super level ion population.
 	    END DO
 	  END DO
 !

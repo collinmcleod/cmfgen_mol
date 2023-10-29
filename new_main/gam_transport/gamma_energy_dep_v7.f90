@@ -1,6 +1,6 @@
 ! This will be a subroutine that will be used to compute the normalization constants left out of the scattering redistribution.
 ! This code will find the normalization by conserving photons instead of energy, since energy is lost from compton scattering.
-! 
+!
 ! Version 2 is using a new method for calculating the deposition
 !
 ! Created Jan. 23, 2015
@@ -10,6 +10,7 @@
 !
 	SUBROUTINE GAMMA_ENERGY_DEP_V7(INTENSITY,ETA,CHI_SCAT,CHI_ABS,&
 			E_DEP,DECAY_KIN_E,NU_GRID,NF,V,R,NA,ND,GAMRAY_EMISS,SN_AGE_DAYS)
+	USE SET_KIND_MODULE
 	USE GAM_MU_MOD
 	IMPLICIT NONE
 !
@@ -21,36 +22,36 @@
 	INTEGER :: ND
 	INTEGER :: NA
 !
-	REAL(10) :: E_DEP(ND)
-	REAL(10) :: DECAY_KIN_E(ND)
-	REAL(10) :: V(ND)
-	REAL(10) :: R(ND)
-	REAL(10) :: NU_GRID(NF)
-	REAL(10) :: CHI_SCAT(NF,ND) 
-	REAL(10) :: CHI_ABS(NF,ND)
-	REAL(10) :: CHI_TOT(NF,ND)
-	REAL(10) :: GAMRAY_EMISS(ND)
+	REAL(KIND=LDP) :: E_DEP(ND)
+	REAL(KIND=LDP) :: DECAY_KIN_E(ND)
+	REAL(KIND=LDP) :: V(ND)
+	REAL(KIND=LDP) :: R(ND)
+	REAL(KIND=LDP) :: NU_GRID(NF)
+	REAL(KIND=LDP) :: CHI_SCAT(NF,ND)
+	REAL(KIND=LDP) :: CHI_ABS(NF,ND)
+	REAL(KIND=LDP) :: CHI_TOT(NF,ND)
+	REAL(KIND=LDP) :: GAMRAY_EMISS(ND)
 !
-	REAL(10) :: INTENSITY(NA,ND,NF)
-	REAL(10) :: ETA(NA,ND,NF)
+	REAL(KIND=LDP) :: INTENSITY(NA,ND,NF)
+	REAL(KIND=LDP) :: ETA(NA,ND,NF)
 !
-	REAL(10) :: TEMP_INT1(NF,ND)
-	REAL(10) :: TEMP_INT2(ND)
-	REAL(10) :: TEMP_INT3(ND)
-	REAL(10) :: TEMP_ETA1(NF,ND)
-	REAL(10) :: TEMP_ETA2(ND)
-	REAL(10) :: TEMP_FLUX(NF)
+	REAL(KIND=LDP) :: TEMP_INT1(NF,ND)
+	REAL(KIND=LDP) :: TEMP_INT2(ND)
+	REAL(KIND=LDP) :: TEMP_INT3(ND)
+	REAL(KIND=LDP) :: TEMP_ETA1(NF,ND)
+	REAL(KIND=LDP) :: TEMP_ETA2(ND)
+	REAL(KIND=LDP) :: TEMP_FLUX(NF)
 !
-	REAL(10), ALLOCATABLE :: TA(:)
-	REAL(10), ALLOCATABLE :: TB(:)
-	REAL(10), ALLOCATABLE :: TC(:)
-	REAL(10), ALLOCATABLE :: TD(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TD(:)
 !
-	REAL(10) :: FLUX
-	REAL(10) :: T1,T2,T3,T4
-	REAL(10) :: PI
-	REAL(10) :: FOURPI
-	REAL(10) :: SN_AGE_DAYS
+	REAL(KIND=LDP) :: FLUX
+	REAL(KIND=LDP) :: T1,T2,T3,T4
+	REAL(KIND=LDP) :: PI
+	REAL(KIND=LDP) :: FOURPI
+	REAL(KIND=LDP) :: SN_AGE_DAYS
 !
 	WRITE(6,*)'Using gamray_energy_deposit_v7.f90'
 	PI=ACOS(-1.0D0)

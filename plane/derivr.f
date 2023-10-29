@@ -1,6 +1,7 @@
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine derivr(x,j,djdr,beta,dbetadr,gamma)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -14,8 +15,8 @@ c--------------------------------------------------------------------
 c
       implicit none
 c
-      REAL(10), dimension(2) :: j,djdr
-      REAL(10) x,r,mu,beta,dbetadr,gamma
+      REAL(KIND=LDP), dimension(2) :: j,djdr
+      REAL(KIND=LDP) x,r,mu,beta,dbetadr,gamma
 c
       r=x
       mu=j(2)

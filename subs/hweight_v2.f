@@ -6,13 +6,14 @@
 ! quantities other than 1st moment of the intensity. The program assumes
 ! that the first point corresponds to mu=1.0 .
 !
-! Note that these weights should not be normalized in the usual fashion. 
+! Note that these weights should not be normalized in the usual fashion.
 ! Physically, we dont expect V (the flux) to be constant with respect to mu.
 ! For small mu, we expect a that V is proportional to mu.
 !
 ! D1, and R2 are work vectors.
 !
 	SUBROUTINE HWEIGHT_V2(X,dX,W,N)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 11-Jun-2023 - Based on HWEIGHT
@@ -21,12 +22,12 @@
 !                       Changed to V2 as dX added to call.
 !
 	INTEGER N
-	REAL(10) X(N)        !MU
-	REAL(10) dX(N)       !dMU
-	REAL(10) W(N)        !Quadrature weight
+	REAL(KIND=LDP) X(N)        !MU
+	REAL(KIND=LDP) dX(N)       !dMU
+	REAL(KIND=LDP) W(N)        !Quadrature weight
 !
-	REAL(10) H,HN,RF,RE,SUM
-	REAL(10) T1,T2
+	REAL(KIND=LDP) H,HN,RF,RE,SUM
+	REAL(KIND=LDP) T1,T2
 !
 	INTEGER I
 	INTEGER LS
@@ -57,7 +58,7 @@
 	  W(I+1)=W(I+1)-X(I)*H*H/12.0D0/RE
 	END DO
 !
-! Assumes that V(mu=0)=0 and mu.dV(mu)=0 at mu=0. 
+! Assumes that V(mu=0)=0 and mu.dV(mu)=0 at mu=0.
 ! Subtracting the X to get dX is fine for high N.
 !
 	IF(X(N) .EQ. 0.0D0)THEN
@@ -87,7 +88,7 @@
 	END IF
 !
 ! Ensure that the weights have the correct normalization (but dont
-! perform the normalization). 
+! perform the normalization).
 !
 	SUM=0.0D0
 	DO I=1,N

@@ -4,6 +4,7 @@ C to that in the model atom with super levels.
 C
 	SUBROUTINE RD_F_TO_S_IDS_V2(F_TO_S,INT_SEQ,LEVNAME_F,N_F,N_S,
 	1                LUIN,FILENAME,SL_OPTION)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 04-Feb-2010 : Handles extra blank lines/comments mixed with levels.

@@ -1,4 +1,5 @@
 	FUNCTION SAME_N(LEV1,LEV2)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	LOGICAL SAME_N
 	CHARACTER*(*) LEV1,LEV2
@@ -67,6 +68,7 @@ C                      of collision strengths to be `incorrect` by a factor of 3
 C                      for Fe these approximate strengths may be wrong anyway.
 C
 	SUBROUTINE POSN_SAME(LEV1,STN,ENDN)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	CHARACTER*(*) LEV1
 	INTEGER L1,J,STN,ENDN

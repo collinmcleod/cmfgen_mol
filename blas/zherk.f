@@ -1,8 +1,9 @@
       SUBROUTINE ZHERK( UPLO, TRANS, N, K, ALPHA, A, LDA, BETA, C, LDC )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       CHARACTER          TRANS, UPLO
       INTEGER            K, LDA, LDC, N
-      REAL(10)   ALPHA, BETA
+      REAL(KIND=LDP)   ALPHA, BETA
 *     ..
 *     .. Array Arguments ..
       COMPLEX*16         A( LDA, * ), C( LDC, * )
@@ -61,7 +62,7 @@
 *           matrix A.  K must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - REAL(10)            .
+*  ALPHA  - REAL(KIND=LDP)            .
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
@@ -80,7 +81,7 @@
 *           be at least  max( 1, k ).
 *           Unchanged on exit.
 *
-*  BETA   - REAL(10).
+*  BETA   - REAL(KIND=LDP).
 *           On entry, BETA specifies the scalar beta.
 *           Unchanged on exit.
 *
@@ -133,11 +134,11 @@
 *     .. Local Scalars ..
       LOGICAL            UPPER
       INTEGER            I, INFO, J, L, NROWA
-      REAL(10)   RTEMP
+      REAL(KIND=LDP)   RTEMP
       COMPLEX*16         TEMP
 *     ..
 *     .. Parameters ..
-      REAL(10)   ONE, ZERO
+      REAL(KIND=LDP)   ONE, ZERO
       PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Executable Statements ..

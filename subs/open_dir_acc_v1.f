@@ -1,10 +1,11 @@
 !
-! Simple routine designed to open a direct acces, unformatted, file. 
-! The file cannot exist --- if it does a _NEW file is created. 
+! Simple routine designed to open a direct acces, unformatted, file.
+! The file cannot exist --- if it does a _NEW file is created.
 ! The subroutine also creates the informational file with data on
 ! the record length.
 !
 	SUBROUTINE OPEN_DIR_ACC_V1(NV,IRECL,DATE,FILENAME,LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 08-MAr-2006

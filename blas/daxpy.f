@@ -1,11 +1,12 @@
       subroutine daxpy(n,da,dx,incx,dy,incy)
+	USE SET_KIND_MODULE
 c
 c     constant times a vector plus a vector.
 c     uses unrolled loops for increments equal to one.
 c     jack dongarra, linpack, 3/11/78.
 c     modified 12/3/93, array(1) declarations changed to array(*)
 c
-      REAL(10) dx(*),dy(*),da
+      REAL(KIND=LDP) dx(*),dy(*),da
       integer i,incx,incy,ix,iy,m,mp1,n
 c
       if(n.le.0)return

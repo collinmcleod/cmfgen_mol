@@ -17,6 +17,7 @@ C We adopt R as the radius at which Tau=1 (See Mihals, page 245).
 C
       SUBROUTINE INIT_TEMP_V2(R,ED,CLUMP_FAC,T,LUM,
      &                          TAU_SWITCH,ND,LU,FILNAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 08-Jun-2002 - Bug fix in where we switch T correction.
@@ -28,25 +29,25 @@ C Altered 24-May-1996 - Work arrays made allocateable.
 C Created 07-Apr-1989 - Based on TEMPDIST
 C
 	INTEGER ND,LU
-	REAL(10) LUM               !Luminosity of star in Lsun
-        REAL(10) R(ND)             !Radius Units 10^10 cm)
-        REAL(10) ED(ND)            !Electron density
-        REAL(10) CLUMP_FAC(ND)     !Volume filling factor
-        REAL(10) T(ND)             !Temperature in units od 10^4 K
+	REAL(KIND=LDP) LUM               !Luminosity of star in Lsun
+        REAL(KIND=LDP) R(ND)             !Radius Units 10^10 cm)
+        REAL(KIND=LDP) ED(ND)            !Electron density
+        REAL(KIND=LDP) CLUMP_FAC(ND)     !Volume filling factor
+        REAL(KIND=LDP) T(ND)             !Temperature in units od 10^4 K
 !
 ! Tau below which we (slowly) switch of the interpolation.
 !
-        REAL(10) TAU_SWITCH
+        REAL(KIND=LDP) TAU_SWITCH
 	CHARACTER*(*) FILNAME
 C
-	REAL(10), ALLOCATABLE :: NEWED(:)
-	REAL(10), ALLOCATABLE :: TAU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: NEWED(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TAU(:)
 C
-        REAL(10), ALLOCATABLE :: ROLD(:)
-	REAL(10), ALLOCATABLE :: EDOLD(:)
-	REAL(10), ALLOCATABLE :: TOLD(:)
-	REAL(10), ALLOCATABLE :: TAUOLD(:)
-	REAL(10), ALLOCATABLE :: CLUMP_FAC_OLD(:)
+        REAL(KIND=LDP), ALLOCATABLE :: ROLD(:)
+	REAL(KIND=LDP), ALLOCATABLE :: EDOLD(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TOLD(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TAUOLD(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CLUMP_FAC_OLD(:)
 !
 ! Local variables.
 !
@@ -54,11 +55,11 @@ C
 	EXTERNAL ERROR_LU
 !
         INTEGER I,K,NOLD,NDOLD,IOS
-        REAL(10) LUMOLD                  !Luminosity of old model in Lsun
-        REAL(10) LDL,MLDL                !Used for interpolation.
-        REAL(10) T1,DI,ION_FRAC,VEL      !Used when reading T_IN
-        REAL(10) RTAU1		       !Radius in new model where TAU(e.s.)=1.0
-        REAL(10) RTAU1_OLD               !Radius in old model where TAU(e.s.)=1.0
+        REAL(KIND=LDP) LUMOLD                  !Luminosity of old model in Lsun
+        REAL(KIND=LDP) LDL,MLDL                !Used for interpolation.
+        REAL(KIND=LDP) T1,DI,ION_FRAC,VEL      !Used when reading T_IN
+        REAL(KIND=LDP) RTAU1		       !Radius in new model where TAU(e.s.)=1.0
+        REAL(KIND=LDP) RTAU1_OLD               !Radius in old model where TAU(e.s.)=1.0
 	CHARACTER*132 STRING
 	LOGICAL CLMP_PRES
 C

@@ -5,12 +5,13 @@ C
 C Output atomic model information.
 C
 	SUBROUTINE WR_SL_INFO(STRING,NS,NF,ZION,DESC,LUOUT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 	INTEGER NF		!Number of level in full atom
 	INTEGER NS		!Number of super levels
 	INTEGER LUOUT		!Output unit for string if ``full''
-	REAL(10) ZION		!Charge on ion (or core)
+	REAL(KIND=LDP) ZION		!Charge on ion (or core)
 	CHARACTER*(*) STRING	!Output string
 	CHARACTER*(*) DESC	!Species description (i.e. C2)
 C
@@ -23,7 +24,7 @@ C
 	INTEGER NEXT_LOC
 	INTEGER J
 	INTEGER I_NF,I_NS
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	CHARACTER*15 FMT
 C
 	T1=NVAR_PER_LINE
@@ -47,6 +48,7 @@ C
 C Routine to output ND etc
 C
 	SUBROUTINE WR_INT_INFO(STRING,NEXT_LOC,DESC,IVAL)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER NEXT_LOC	!Next location for output (updated)
 	INTEGER IVAL		!Integer value to be output to string
@@ -79,9 +81,10 @@ C
 C Routine to output Rstar etc,
 C
 	SUBROUTINE WR_VAL_INFO(STRING,NEXT_LOC,DESC,VAL)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER NEXT_LOC	!Next location for output (updated)
-	REAL(10) VAL		!Real value to be output to string
+	REAL(KIND=LDP) VAL		!Real value to be output to string
 	CHARACTER*(*) STRING	!Output string
 	CHARACTER*(*) DESC	!Species description (i.e. C2)
 C
@@ -94,7 +97,7 @@ C
 	INTEGER I,J
 	CHARACTER*15 FMT
 C
-C Ouput of the form R*=100.002 of Mdot=1.0E-05 
+C Ouput of the form R*=100.002 of Mdot=1.0E-05
 C
 	J=LEN_TRIM(DESC)
 	STRING(NEXT_LOC:)=DESC(1:J)//'='
@@ -113,27 +116,28 @@ C
 	RETURN
 	END	
 C
-C Routine to output abundance information: Both the relative number 
+C Routine to output abundance information: Both the relative number
 C abundance and the mass fractions are printed.
 C
 	SUBROUTINE WR_ABUND_INFO_V3(SPECIES,MASS,ABUND,ABUND_SUM,
 	1           MEAN_ATOMIC_WEIGHT,SOL_MASS_FRAC,SOL_ABUND_REF_SET,LUOUT)
+	USE SET_KIND_MODULE
 C
 C Altered 19-Jun-2023: Changed to V3 -- SOL_ABUND_REF_SET added to call.
 C Altered 17-Dec-2007: Now output mean atomic mass.
 C
 	IMPLICIT NONE
-	REAL(10) ABUND			!Relative abundance by number
-	REAL(10) ABUND_SUM		!Sum of relative abundances
-	REAL(10) MASS			!Mass in atomic mass units
-	REAL(10) MEAN_ATOMIC_WEIGHT	!Mean ioic atomic weight (all)
-	REAL(10) SOL_MASS_FRAC
+	REAL(KIND=LDP) ABUND			!Relative abundance by number
+	REAL(KIND=LDP) ABUND_SUM		!Sum of relative abundances
+	REAL(KIND=LDP) MASS			!Mass in atomic mass units
+	REAL(KIND=LDP) MEAN_ATOMIC_WEIGHT	!Mean ioic atomic weight (all)
+	REAL(KIND=LDP) SOL_MASS_FRAC
 	INTEGER LUOUT
 	CHARACTER*(*) SPECIES		!e.g. HYD or CARB
-	CHARACTER*(*) SOL_ABUND_REF_SET 
+	CHARACTER*(*) SOL_ABUND_REF_SET
 C
-	REAL(10) T1
-	LOGICAL FIRST			!Indicate whether header should 
+	REAL(KIND=LDP) T1
+	LOGICAL FIRST			!Indicate whether header should
 	DATA FIRST/.TRUE./		!    be output.
 C
 	IF(FIRST)THEN
@@ -142,7 +146,7 @@ C
 	  WRITE(LUOUT,'(A)')' '
 	  WRITE(LUOUT,'(3X,A,5X,A,5X,A,4X,A,6X,A)')
 	1    'SPECIES','Rel. # Fraction','Mass Fraction','Z/Z(sun)','Z(sun)-'//TRIM(SOL_ABUND_REF_SET)
-	  FIRST=.FALSE.    
+	  FIRST=.FALSE.
 	END IF
 C
 	T1=ABUND*MASS/MEAN_ATOMIC_WEIGHT/ABUND_SUM

@@ -6,13 +6,14 @@ C flux at the boundary, and would need to be moified to obtain  other
 C quantities other than 1st moment of the intensity. The program assumes
 C that the first point corresponds to mu=1.0 .
 C
-C Note that these weights should not be normalized in the usual fashion. 
+C Note that these weights should not be normalized in the usual fashion.
 C Physically, we dont expect V (the flux) to be constant with respect to mu.
 C For small mu, we expect a that V is proportional to mu.
 C
 C D1, and R2 are work vectors.
 C
 	SUBROUTINE HWEIGHT(X,W,N)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 - Call to DP_ZERO deleted.
@@ -24,7 +25,7 @@ C                     accuracy.
 C Created 25-Nov-1986 (Based on KWEIGHT)
 C
 	INTEGER N,I
-	REAL(10) X(N),W(N),H,HN,RF,RE,SUM
+	REAL(KIND=LDP) X(N),W(N),H,HN,RF,RE,SUM
 C
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
@@ -54,7 +55,7 @@ C
 	  W(I+1)=W(I+1)-X(I)*H*H/12.0D0/RE
 	END DO
 C
-C Assumes that V(mu=0)=0 and mu.dV(mu)=0 at mu=0. 
+C Assumes that V(mu=0)=0 and mu.dV(mu)=0 at mu=0.
 C
 	IF(X(N) .EQ. 0.0D0)THEN
 	  H=X(N-1)
@@ -83,7 +84,7 @@ C
 	END IF
 C
 C Ensure that the weights have the correct normalization (but dont
-C perform the normalization). 
+C perform the normalization).
 C
 	SUM=0.0D0
 	DO I=1,N
@@ -100,7 +101,7 @@ C
 	    WRITE(6,'(F20.16,2ES14.6)')X(I),X(I)-X(I+1),W(I)
 	  END DO
 	  I=N;  WRITE(6,'(F20.16,3ES14.6)')X(I),0.0D0,W(I)
-	END IF 
+	END IF
 
 C
 	RETURN

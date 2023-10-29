@@ -3,13 +3,14 @@ C The function EXPONX is given by (1.0-EXP(-X))/X.
 C This functions is called to allow for cancellation when X is small.
 C
 	FUNCTION  EXPONX(X)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
-C ALtered 24-May-1996 :  DOUBLE PRECISION replaced by REAL(10)
+C ALtered 24-May-1996 :  DOUBLE PRECISION replaced by REAL(KIND=LDP)
 C Altered 26-May-1988 : Exponential no longer computed if X is greater than
 C                        40. Necessary to overcome a bug with Dec software.
 
-	REAL(10) EXPONX,X
+	REAL(KIND=LDP) EXPONX,X
 C
 	IF( ABS(X) .LT. 1.0D-03 )THEN
 	  EXPONX=1.0D0-X*(  0.5D0-X/6.0D0*( 1.0D0-X/4.0D0 )  )
@@ -31,6 +32,7 @@ C Altered 26-May-88 - Exponential no longer computed if X is greater than
 C                     40. Necessary to overcome a bug with Dec software.
 C
 	FUNCTION  d_EXPONX_dX(X)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	DOUBLE PRECISION d_EXPONX_dX,X,Y
 C

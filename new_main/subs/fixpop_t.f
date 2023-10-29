@@ -4,6 +4,7 @@ C a particular population is held fixed. DST AND DEND are used to
 C minimize the reading of the BA matrix.
 C
 	SUBROUTINE FIXPOP_T(NT,ND,DIAG_INDX,DST,DEND,DESC)
+	USE SET_KIND_MODULE
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 	!
@@ -17,7 +18,7 @@ C
 C Varaibles to allow information to be output regarding the number
 C of levels and depths where a population was held fixed.
 C
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER, SAVE, ALLOCATABLE :: CNT(:)
 !
 	INTEGER LUER

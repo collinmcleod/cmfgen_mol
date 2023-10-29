@@ -15,6 +15,7 @@
 	1                        dV_LEV,AMP_DIS,MIN_FREQ_LEV_DIS,
 	1                        dV_CONT,dV_DOP,
 	1                        N,NCF,NCF_MAX,LUOUT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 26-May-1996 : ERROR_LU installed.
@@ -22,35 +23,35 @@
 ! Created 29-Mar-1990 (Based on GEN_FREQ).
 !
 	INTEGER N,NCF,NCF_MAX,LUOUT,INDX(NCF_MAX)
-	REAL(10) EDGE(NCF_MAX)
-	REAL(10) NEW_FREQ(NCF_MAX)
+	REAL(KIND=LDP) EDGE(NCF_MAX)
+	REAL(KIND=LDP) NEW_FREQ(NCF_MAX)
 	CHARACTER*(*) TYPE(NCF)
 !
-	REAL(10) MAX_FREQ		!Maximum continuum frequency
-	REAL(10) MIN_FREQ		!Minimum continuum frequency
+	REAL(KIND=LDP) MAX_FREQ		!Maximum continuum frequency
+	REAL(KIND=LDP) MIN_FREQ		!Minimum continuum frequency
 !
-	REAL(10) DNU_MAX		!Maximum frequency spacing near/above
+	REAL(KIND=LDP) DNU_MAX		!Maximum frequency spacing near/above
 				!  bound-free edge: i.e. dNU <  DNU_MAX
-	REAL(10) BIG_AMP  	!Amplification. dNU increases by a factor
+	REAL(KIND=LDP) BIG_AMP  	!Amplification. dNU increases by a factor
 				! BIG_AMP as we move away from the b.f. edge.
 				! for frequencies above SWITCH_FREQ.
-   	REAL(10) SMALL_RAT	!Used to define frequency spacing for
+   	REAL(KIND=LDP) SMALL_RAT	!Used to define frequency spacing for
 				! frequencies less than SWITCH_FREQ.
 				! dNU/NU=SMALL_RAT-1
 !
 ! Parameters for installing etra frequencies near bound-free edges
 ! (low frequency side) to allow for level dissolution.
 !
-	REAL(10) dV_LEV			!Spacing near b-f edge.
-	REAL(10) AMP_DIS			!Amplification factor for dNU as we
+	REAL(KIND=LDP) dV_LEV			!Spacing near b-f edge.
+	REAL(KIND=LDP) AMP_DIS			!Amplification factor for dNU as we
 					!  move to smaller frequencies.
-	REAL(10) MIN_FREQ_LEV_DIS		!Indicates that the extra frequencies
+	REAL(KIND=LDP) MIN_FREQ_LEV_DIS		!Indicates that the extra frequencies
 					!  should only be installed for
 					!  frequencies above MIN_FREQ_LEV_DIS.
-	REAL(10) dV_DOP			!Minimum spacing in Doppler line profiles
+	REAL(KIND=LDP) dV_DOP			!Minimum spacing in Doppler line profiles
                                         !  (km/s). Used to set minimum frequecny
                                         !  spacing.
-	REAL(10) dV_CONT                  !Maximum spacing in arbitrary section of 
+	REAL(KIND=LDP) dV_CONT                  !Maximum spacing in arbitrary section of
                                         !  continuum (km/s)
 !
 	INTEGER, PARAMETER :: RZERO=0.0D0
@@ -60,23 +61,23 @@
 ! N+2 as we insert MAX_FREQ and MIN_FREQ into the array.
 !
 	CHARACTER*10   CHAR_WRK(N+2)
-! 
-	REAL(10) C_KMS
-	REAL(10) SPEED_OF_LIGHT
+!
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
-	REAL(10) T1,T2
-	REAL(10) RN
-	REAL(10) COINCIDENT_FRAC
-	REAL(10) DEL_NU
-	REAL(10) DEL_NU_TO_NEXT_EDGE
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) RN
+	REAL(KIND=LDP) COINCIDENT_FRAC
+	REAL(KIND=LDP) DEL_NU
+	REAL(KIND=LDP) DEL_NU_TO_NEXT_EDGE
 !
 	INTEGER INDX_DIS
 	INTEGER I,J,K
 	LOGICAL NUMER,EQUAL
-	REAL(10) FAC,EQUAL_FAC
-	REAL(10) SWITCH_FREQ
+	REAL(KIND=LDP) FAC,EQUAL_FAC
+	REAL(KIND=LDP) SWITCH_FREQ
 !
 	LUER=ERROR_LU()
 	COINCIDENT_FRAC=0.2D0
@@ -163,7 +164,7 @@
 	DO WHILE(I .LE. N)
 !
 ! Get next edge for which we will consider level dissolution.
-!  
+!
           IF(I .GT. INDX_DIS)THEN
 	    INDX_DIS=I
 	    DO WHILE( INDEX(TYPE(INDX_DIS),'D') .EQ. 0 .AND. INDX_DIS .LT. N)
@@ -184,7 +185,7 @@
 !
 ! dV_CONT is the minimum spacing (velocity space) at which we have to sample the
 ! photoioinization cross-sections.
-! 
+!
 	  T1=NEW_FREQ(K)*dV_CONT/C_KMS
 	  IF(T1 .LT. DEL_NU)THEN
 	     DEL_NU=T1
@@ -226,7 +227,7 @@
 	    IF(I .EQ .N)THEN
 	      K=K+1
 	      NEW_FREQ(K)=EDGE(N)
-	    ELSE 
+	    ELSE
 	      K=K+1
 	      NEW_FREQ(K)=EDGE(I)/FAC
 	      K=K+1
@@ -254,7 +255,7 @@
 !
 	NCF=K
 !
-! Now sort frequencies into numerical decreasing order. 
+! Now sort frequencies into numerical decreasing order.
 !
 	DO I=1,NCF/2
 	  T1=NEW_FREQ(I)

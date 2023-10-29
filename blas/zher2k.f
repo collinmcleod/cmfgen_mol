@@ -1,9 +1,10 @@
       SUBROUTINE ZHER2K( UPLO, TRANS, N, K, ALPHA, A, LDA, B, LDB, BETA,
      $                   C, LDC )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       CHARACTER          TRANS, UPLO
       INTEGER            K, LDA, LDB, LDC, N
-      REAL(10)   BETA
+      REAL(KIND=LDP)   BETA
       COMPLEX*16         ALPHA
 *     ..
 *     .. Array Arguments ..
@@ -101,7 +102,7 @@
 *           be at least  max( 1, k ).
 *           Unchanged on exit.
 *
-*  BETA   - REAL(10)            .
+*  BETA   - REAL(KIND=LDP)            .
 *           On entry, BETA specifies the scalar beta.
 *           Unchanged on exit.
 *
@@ -157,7 +158,7 @@
       COMPLEX*16         TEMP1, TEMP2
 *     ..
 *     .. Parameters ..
-      REAL(10)   ONE
+      REAL(KIND=LDP)   ONE
       PARAMETER          ( ONE = 1.0D+0 )
       COMPLEX*16         ZERO
       PARAMETER          ( ZERO = ( 0.0D+0, 0.0D+0 ) )

@@ -29,9 +29,10 @@
 	1   C2_S,C2LTE_S,NC2_S,DIC2_S,ZC2,C2_PRES,
 	1   EDGECIII_F,GCIII_F,F_TO_S_MAP_CIII,NCIII_F,
 	1   CIII_PRES,T,ED,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
-! Altered 20-Feb-2010 : Changed computation of LTE population to increase 
+! Altered 20-Feb-2010 : Changed computation of LTE population to increase
 !                        dynamic range.
 ! Altered 06-Nov-2009 : No longer gnerates error for truncated interp seq.
 ! Altered 27-may-1996 : Dynamic arrays installed for GION,EDGE_S, SUM and CNT.
@@ -45,34 +46,34 @@
 ! Altered 24-Oct-1995. GIONC2_S deleted from call.
 !
 	INTEGER ND
-	REAL(10) ED(ND)			!Electron density
-	REAL(10) T(ND)			!Temperature 10^4K
-	REAL(10) DIC2_S(ND)		!Ion density (Super levels)
-	REAL(10) DIC2_F(ND)		!Ion density (Full model atom)
-	REAL(10) ZC2			!Ion charge
+	REAL(KIND=LDP) ED(ND)			!Electron density
+	REAL(KIND=LDP) T(ND)			!Temperature 10^4K
+	REAL(KIND=LDP) DIC2_S(ND)		!Ion density (Super levels)
+	REAL(KIND=LDP) DIC2_F(ND)		!Ion density (Full model atom)
+	REAL(KIND=LDP) ZC2			!Ion charge
 !
 	INTEGER NC2_F
-	REAL(10) C2_F(NC2_F,ND)
-	REAL(10) C2LTE_F(NC2_F,ND)
-	REAL(10) W_C2_F(NC2_F,ND)
-	REAL(10) EDGEC2_F(NC2_F)
-	REAL(10) GC2_F(NC2_F)
+	REAL(KIND=LDP) C2_F(NC2_F,ND)
+	REAL(KIND=LDP) C2LTE_F(NC2_F,ND)
+	REAL(KIND=LDP) W_C2_F(NC2_F,ND)
+	REAL(KIND=LDP) EDGEC2_F(NC2_F)
+	REAL(KIND=LDP) GC2_F(NC2_F)
 	INTEGER F_TO_S_MAP_C2(NC2_F)
 	INTEGER INT_SEQ_C2(NC2_F)
-	REAL(10) GIONC2_F
+	REAL(KIND=LDP) GIONC2_F
 !
 	INTEGER NC2_S
-	REAL(10) C2_S(NC2_S,ND)
-	REAL(10) C2LTE_S(NC2_S,ND)
+	REAL(KIND=LDP) C2_S(NC2_S,ND)
+	REAL(KIND=LDP) C2LTE_S(NC2_S,ND)
 !
 	LOGICAL C2_PRES,CIII_PRES
 !
 	INTEGER NCIII_F
-	REAL(10) EDGECIII_F(NCIII_F)
-	REAL(10) GCIII_F(NCIII_F)
+	REAL(KIND=LDP) EDGECIII_F(NCIII_F)
+	REAL(KIND=LDP) GCIII_F(NCIII_F)
 	INTEGER F_TO_S_MAP_CIII(NCIII_F)
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER ERROR_LU
@@ -81,15 +82,15 @@
 ! Local variables.
 !
 	INTEGER I,K,L,M,LU_ER
-	REAL(10) B,B1,B2,T1
-	REAL(10) X,Y,RGU
+	REAL(KIND=LDP) B,B1,B2,T1
+	REAL(KIND=LDP) X,Y,RGU
 	INTEGER INT_SL
 !
 ! Dynamic arrays.
 !
-	REAL(10) GION(ND)
-	REAL(10) EDGE_S(NC2_S)
-	REAL(10) SUM(NC2_S)
+	REAL(KIND=LDP) GION(ND)
+	REAL(KIND=LDP) EDGE_S(NC2_S)
+	REAL(KIND=LDP) SUM(NC2_S)
 	INTEGER CNT(NC2_S)
 !
 	IF(.NOT. C2_PRES)RETURN

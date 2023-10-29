@@ -1,4 +1,5 @@
 	MODULE STRK_MOD_HHE
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER STKTA_NWS		!Number of frequencies prof. tabulated at.
@@ -6,10 +7,10 @@
 	INTEGER STKTA_NES		!Number of Ne densities prof. tabulated at.
 	INTEGER STKTA_NPS		!Number of Ne densities prof. tabulated at.
 !
-	REAL(10), ALLOCATABLE :: STKTA_DWS(:)	!Offset from line center (Ang)
-	REAL(10), ALLOCATABLE :: STKTA_TS(:)	!Temperature (Log T(K))
-	REAL(10), ALLOCATABLE :: STKTA_ES(:)	!Log Ne (cgs units) 
-	REAL(10), ALLOCATABLE :: STKTA_PS(:)	!Phi(v)
+	REAL(KIND=LDP), ALLOCATABLE :: STKTA_DWS(:)	!Offset from line center (Ang)
+	REAL(KIND=LDP), ALLOCATABLE :: STKTA_TS(:)	!Temperature (Log T(K))
+	REAL(KIND=LDP), ALLOCATABLE :: STKTA_ES(:)	!Log Ne (cgs units)
+	REAL(KIND=LDP), ALLOCATABLE :: STKTA_PS(:)	!Phi(v)
 !
 	INTEGER NL_STRK	!Lower levels
 	INTEGER NUP_STRK	!Upper level
@@ -22,10 +23,11 @@
 !
 !
 	SUBROUTINE RD_BS_STRK_TAB(SPECIES,NU_ZERO,NL,NUP,PROF_TYPE,PROF_ID,LUSTK)
+	USE SET_KIND_MODULE
 	USE STRK_MOD_HHE
 	IMPLICIT NONE
 !
-	REAL(10) NU_ZERO
+	REAL(KIND=LDP) NU_ZERO
 	CHARACTER*(*) SPECIES
 	CHARACTER*(*) PROF_TYPE
 	INTEGER NL,NUP

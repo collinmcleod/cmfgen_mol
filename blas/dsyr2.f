@@ -1,10 +1,11 @@
       SUBROUTINE DSYR2 ( UPLO, N, ALPHA, X, INCX, Y, INCY, A, LDA )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
-      REAL(10)   ALPHA
+      REAL(KIND=LDP)   ALPHA
       INTEGER            INCX, INCY, LDA, N
       CHARACTER*1        UPLO
 *     .. Array Arguments ..
-      REAL(10)   A( LDA, * ), X( * ), Y( * )
+      REAL(KIND=LDP)   A( LDA, * ), X( * ), Y( * )
 *     ..
 *
 *  Purpose
@@ -38,11 +39,11 @@
 *           N must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - REAL(10).
+*  ALPHA  - REAL(KIND=LDP).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
-*  X      - REAL(10) array of dimension at least
+*  X      - REAL(KIND=LDP) array of dimension at least
 *           ( 1 + ( n - 1 )*abs( INCX ) ).
 *           Before entry, the incremented array X must contain the n
 *           element vector x.
@@ -53,7 +54,7 @@
 *           X. INCX must not be zero.
 *           Unchanged on exit.
 *
-*  Y      - REAL(10) array of dimension at least
+*  Y      - REAL(KIND=LDP) array of dimension at least
 *           ( 1 + ( n - 1 )*abs( INCY ) ).
 *           Before entry, the incremented array Y must contain the n
 *           element vector y.
@@ -64,7 +65,7 @@
 *           Y. INCY must not be zero.
 *           Unchanged on exit.
 *
-*  A      - REAL(10) array of DIMENSION ( LDA, n ).
+*  A      - REAL(KIND=LDP) array of DIMENSION ( LDA, n ).
 *           Before entry with  UPLO = 'U' or 'u', the leading n by n
 *           upper triangular part of the array A must contain the upper
 *           triangular part of the symmetric matrix and the strictly
@@ -95,10 +96,10 @@
 *
 *
 *     .. Parameters ..
-      REAL(10)   ZERO
+      REAL(KIND=LDP)   ZERO
       PARAMETER        ( ZERO = 0.0D+0 )
 *     .. Local Scalars ..
-      REAL(10)   TEMP1, TEMP2
+      REAL(KIND=LDP)   TEMP1, TEMP2
       INTEGER            I, INFO, IX, IY, J, JX, JY, KX, KY
 *     .. External Functions ..
       LOGICAL            LSAME

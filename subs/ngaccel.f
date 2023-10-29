@@ -1,6 +1,6 @@
 C
 C Created Jan-9189
-C Revised 02-Feb-1989 - Variables A,B etc made REAL(10). Check for
+C Revised 02-Feb-1989 - Variables A,B etc made REAL(KIND=LDP). Check for
 C                       division by zero installed.
 C
 C Subroutine to perform an NG acceleration on estimates obtained
@@ -11,6 +11,7 @@ C IF the logical variable WEIGHT is true,  weighting inversely proportional
 C to the value is used.
 C
 	SUBROUTINE NGACCEL(RJ,PREVRJ,ND,WEIGHT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 10-Apr-2006 - Check if weight is zero (possible for sigma)
@@ -21,12 +22,12 @@ C                       DIVISOR was zero. Computation of D1 and D2 improved
 C                       to help preserve precsion.
 C
 	INTEGER ND
-	REAL(10) RJ(ND),PREVRJ(4,ND)
+	REAL(KIND=LDP) RJ(ND),PREVRJ(4,ND)
 	LOGICAL WEIGHT,EQUAL
 C
 	INTEGER I
-	REAL(10) A,B,A1,B1,B2,C1,C2,D0,D1,D2,W,DIVISOR
-	REAL(10) DIV1,DIV2,PRECIS,X02AJF
+	REAL(KIND=LDP) A,B,A1,B1,B2,C1,C2,D0,D1,D2,W,DIVISOR
+	REAL(KIND=LDP) DIV1,DIV2,PRECIS,X02AJF
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU

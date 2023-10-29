@@ -1,10 +1,11 @@
 !
-! Subroutine to increment the statistical equilibrium equations for each 
+! Subroutine to increment the statistical equilibrium equations for each
 ! depth point for recombinations. Routine designed only for the case
 ! when HNST is very high, and has been set to zero. That is, it is designed
 ! to handle species such as OVII when T is very low.
 !
 	SUBROUTINE EVALSE_LOWT_V1(RJ,NU,FQW,COMPUTE_BA,NT,ND)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
@@ -13,9 +14,9 @@
 !
 	INTEGER NT		!Total number of levels
 	INTEGER ND		!Number of depth points
-	REAL(10) RJ(ND)
-	REAL(10) NU
-	REAL(10) FQW
+	REAL(KIND=LDP) RJ(ND)
+	REAL(KIND=LDP) NU
+	REAL(KIND=LDP) FQW
 !
 	LOGICAL COMPUTE_BA
 !	
@@ -27,7 +28,7 @@
 !
 ! Constants for opacity etc.
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local variables.
@@ -40,17 +41,17 @@
 ! REV_HNST referes to the LTE population  of the level defined with respect
 ! to the actual destination (target) level.
 !
-	REAL(10) REV_HNST
-	REAL(10) LOG_B_RAT
-	REAL(10) DI_FAC
-	REAL(10) ED_FAC
-	REAL(10) T_FAC
-	REAL(10) JREC
-	REAL(10) dRR			!Increment to radiative recombinaton rate.
+	REAL(KIND=LDP) REV_HNST
+	REAL(KIND=LDP) LOG_B_RAT
+	REAL(KIND=LDP) DI_FAC
+	REAL(KIND=LDP) ED_FAC
+	REAL(KIND=LDP) T_FAC
+	REAL(KIND=LDP) JREC
+	REAL(KIND=LDP) dRR			!Increment to radiative recombinaton rate.
 !
-	REAL(10) SUM_SE
-	REAL(10) SUM_VK_R
-	REAL(10) T1,T2,T3,T4
+	REAL(KIND=LDP) SUM_SE
+	REAL(KIND=LDP) SUM_VK_R
+	REAL(KIND=LDP) T1,T2,T3,T4
 !
 ! REV_HNST= HNST * B(ION_LEV)/B(1) where b is the deparure coefficient.
 !
@@ -101,7 +102,7 @@
 	              SE(ID)%BA_PAR(J,NIV,K)   =SE(ID)%BA_PAR(J,NIV,K)     + T_FAC
 !
 ! Include ionizations/recombinations implicitly in the rate equation
-! of the target ion (eg He++(gs) for He+ ion/recoms ). 
+! of the target ion (eg He++(gs) for He+ ion/recoms ).
 !
 	              SE(ID)%BA_PAR(ION_EQ,ION_V,K) =SE(ID)%BA_PAR(ION_EQ,ION_V,K)  - DI_FAC
 	              SE(ID)%BA_PAR(ION_EQ,NIV-1,K) =SE(ID)%BA_PAR(ION_EQ,NIV-1,K)  - ED_FAC

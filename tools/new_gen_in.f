@@ -28,6 +28,7 @@
 	CONTAINS
 !
 	SUBROUTINE NEW_GEN_IN_OPTS(OPTION,FILENAME,LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER LU
 	INTEGER IOS
@@ -71,6 +72,7 @@ C General input routines ---generally read a single value from user only.
 C Default value is output to user.
 C
 	SUBROUTINE NEW_GEN_IN_LOG(VAL,DESC)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 	LOGICAL VAL
@@ -87,7 +89,7 @@ C
 	  READ(LF_IN,'(A)',IOSTAT=IOS)KEY_GSTRING
 	  IF(IOS .EQ. 0 .AND. TRIM(KEY_GSTRING(3:)) .EQ. TRIM(GSTRING))THEN
 	    READ(LF_IN,'(A)')GSTRING
-	  ELSE 
+	  ELSE
 	    IF(IOS .NE. 0)THEN
 	      WRITE(GT_OUT,*)'Error reading options from log file'
 	    ELSE
@@ -119,6 +121,7 @@ C
 C 
 C
 	SUBROUTINE NEW_GEN_IN_STR(STR,DESC)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 13-Oct-1997 : Ability to input single blank character.
@@ -165,7 +168,7 @@ C
 	  WRITE(6,*)'Input string may get truncated: string follows'
 	  WRITE(6,*)GSTRING
 	  WRITE(6,*)'Increases length of GSTRING'
-	END IF 
+	END IF
 C
 C The following statement allows a single blank character to be returned.
 C It assumed that the progammer will never have need to enter these
@@ -189,6 +192,7 @@ C
 C
 C 
 	SUBROUTINE NEW_GEN_IN_INT(VAL,STR)
+	USE SET_KIND_MODULE
 	INTEGER, PARAMETER :: GT_IN=5
 	INTEGER, PARAMETER :: GT_OUT=6
 C
@@ -236,7 +240,7 @@ C
 	  READ(GT_IN,'(A)')GSTRING
 	  IF(LOG_FILE)WRITE(LF_OUT,'(A)')TRIM(GSTRING)
 	END IF
-! 
+!
 	L=LEN_TRIM(GSTRING)
 	IF(L .EQ. 0)RETURN		!Take default value
 	READ(GSTRING(1:L),*,IOSTAT=IOS)VAL
@@ -248,12 +252,13 @@ C
 C 
 C
 	SUBROUTINE NEW_GEN_IN_DBLE(VAL,STR)
+	USE SET_KIND_MODULE
 	INTEGER, PARAMETER :: GT_IN=5
 	INTEGER, PARAMETER :: GT_OUT=6
 C
 C Altered 10-Dec-1990 --- FORM_SP_NUM routine installed.
 C
-	REAL(10) VAL
+	REAL(KIND=LDP) VAL
 	INTEGER L,IOS,LEN_FORM
 	CHARACTER STR*(*),FORM*20
 C
@@ -298,6 +303,7 @@ C
 C 
 C
 	SUBROUTINE NEW_GEN_IN_SP(VAL,STR)
+	USE SET_KIND_MODULE
 	INTEGER, PARAMETER :: GT_IN=5
 	INTEGER, PARAMETER :: GT_OUT=6
 C
@@ -348,6 +354,7 @@ C
 C 
 C
 	SUBROUTINE NEW_GEN_IN_MULT_DP(VAL,N,NMAX,STR)
+	USE SET_KIND_MODULE
 C
 C Altered 7-Jul-1997 : NMAX installed. Number of values input returned in N.
 C                      Previously all NMAX values had to be input.
@@ -356,7 +363,7 @@ C
 	INTEGER, PARAMETER :: GT_OUT=6
 C
 	INTEGER N,NMAX
-	REAL(10) VAL(NMAX)
+	REAL(KIND=LDP) VAL(NMAX)
 	CHARACTER STR*(*)
 C
 	INTEGER K,L,IOS,LEN_FORM,LEN_TOT
@@ -442,6 +449,7 @@ C
 C 
 C
 	SUBROUTINE NEW_GEN_IN_MULT_SP(VAL,N,NMAX,STR)
+	USE SET_KIND_MODULE
 C
 C Altered 7-Jul-1997 : NMAX installed. Number of values input returned in N.
 C                      Previously all NMAX values had to be input.
@@ -537,6 +545,7 @@ C
 C 
 C
 	SUBROUTINE NEW_GEN_IN_MULGT_INT(VAL,N,NMAX,STR)
+	USE SET_KIND_MODULE
 C
 C Altered 7-Jul-1997 : NMAX installed. Number of values input returned in N.
 C                      Previously all NMAX values had to be input.

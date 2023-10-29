@@ -9,10 +9,10 @@ C VJ_P = Int ( dJ/v)
 C VJ_C = Int ( dJ)
 C RJ_SUM = Int (J)
 C
-	REAL(10), ALLOCATABLE :: VJ_R(:,:,:)
-	REAL(10), ALLOCATABLE :: VJ_P(:,:,:)
-	REAL(10), ALLOCATABLE :: VJ_T(:,:,:)
-	REAL(10), ALLOCATABLE :: RJ_SUM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ_R(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ_P(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ_T(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_SUM(:)
 C
 	END MODULE BA_J_DATA_MOD_V4
 C
@@ -34,6 +34,7 @@ C
 	1              CHI_CONT,ESEC,T,POPS,RJ,
 	1              NU,FQW,NEW_CONT,FINAL_FREQ,
 	1              dJ_CHK_FAC,NT,NUM_BNDS,ND,DST,DEND)
+	USE SET_KIND_MODULE
 	USE BA_J_DATA_MOD_V4
 	IMPLICIT NONE
 C
@@ -60,23 +61,23 @@ C                         ABS changed to ABS.
 C Created: 28-Feb-1995
 C
   	INTEGER NT,NUM_BNDS,ND,DST,DEND
-	REAL(10) BA(NT,NT,NUM_BNDS,ND)
-	REAL(10) BA_PAR(NT,NT,ND)
-	REAL(10) QFV_R(NT,ND)
-	REAL(10) QFV_P(NT,ND)
-	REAL(10) VJ(NT,NUM_BNDS,ND)
-	REAL(10) POPS(NT,ND)
-	REAL(10) VCHI(NT,ND)
-	REAL(10) VETA(NT,ND)
-	REAL(10) RJ(ND)
-	REAL(10) dJ_CHK_FAC
+	REAL(KIND=LDP) BA(NT,NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) BA_PAR(NT,NT,ND)
+	REAL(KIND=LDP) QFV_R(NT,ND)
+	REAL(KIND=LDP) QFV_P(NT,ND)
+	REAL(KIND=LDP) VJ(NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) VCHI(NT,ND)
+	REAL(KIND=LDP) VETA(NT,ND)
+	REAL(KIND=LDP) RJ(ND)
+	REAL(KIND=LDP) dJ_CHK_FAC
 C
-	REAL(10) CHI_CONT(ND)
-	REAL(10) ESEC(ND)
-	REAL(10) T(ND)
+	REAL(KIND=LDP) CHI_CONT(ND)
+	REAL(KIND=LDP) ESEC(ND)
+	REAL(KIND=LDP) T(ND)
 C
-	REAL(10) NU
-	REAL(10) FQW
+	REAL(KIND=LDP) NU
+	REAL(KIND=LDP) FQW
 C
 C NEW_CONT indicates that this is the first frequency of a new continuum band
 C in which the continuum cross-sections are constant. FINAL_FREQ indicates
@@ -85,17 +86,17 @@ C
 	LOGICAL FINAL_FREQ
 	LOGICAL NEW_CONT
 C
-	REAL(10) COMP_VEC(NT)
+	REAL(KIND=LDP) COMP_VEC(NT)
 C
 C Constants for opacity etc.
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
-	REAL(10) T1,T2,QFV_T
+	REAL(KIND=LDP) T1,T2,QFV_T
 	INTEGER I,J,K,L,LS,IOS
 	INTEGER DIAG_INDX,BNDST,BNDEND
 C
@@ -118,7 +119,7 @@ C
 	  END IF
 	END IF
 C
-C dJ_CHK_FAC 
+C dJ_CHK_FAC
 C
 	IF(dJ_CHK_FAC .LT. 1.0D-10 .OR. dJ_CHK_FAC .GT. 0.1)THEN
 	  I=ERROR_LU()
@@ -143,7 +144,7 @@ C
 	  DO L=DST,DEND
 	    DO K=1,NUM_BNDS
 	      IF(K .EQ. DIAG_INDX)THEN
-	        VJ_T(:,K,L)=FQW*( RJ(L)*VCHI(:,L) - VETA(:,L) + 
+	        VJ_T(:,K,L)=FQW*( RJ(L)*VCHI(:,L) - VETA(:,L) +
 	1                         (CHI_CONT(L)-ESEC(L))*VJ(:,K,L) )
 	      ELSE
 	        VJ_T(:,K,L)=FQW*(CHI_CONT(L)-ESEC(L))*VJ(:,K,L)
@@ -169,10 +170,10 @@ C
 	    DO K=1,NUM_BNDS
 	      IF(K .EQ. DIAG_INDX)THEN
 	        VJ_T(:,K,L)= VJ_T(:,K,L) + FQW*(
-	1         RJ(L)*VCHI(:,L) - VETA(:,L)+ 
+	1         RJ(L)*VCHI(:,L) - VETA(:,L)+
 	1                      (CHI_CONT(L)-ESEC(L))*VJ(:,K,L) )
 	      ELSE
-	        VJ_T(:,K,L)= VJ_T(:,K,L) + 
+	        VJ_T(:,K,L)= VJ_T(:,K,L) +
 	1                       FQW*(CHI_CONT(L)-ESEC(L))*VJ(:,K,L)
 	      END IF
 	    END DO

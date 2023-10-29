@@ -1,10 +1,11 @@
 !
 ! Program reads in population estimates from a file and uses
 ! linear interpolation in the log plane to lay these estimates
-! on the "new" radius grid. 
+! on the "new" radius grid.
 !
 	SUBROUTINE REGRIDWSC_V3(DHEN,R,ED,T,DI,EDGE,F_TO_S,INT_SEQ,
 	1                             POPATOM,N,ND,FILNAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 16-Oct-2012 - Added BA_TX_CONV and NO_TX_CONV
@@ -12,8 +13,8 @@
 !                         ADD1 variable removed (correction done on spot).
 ! Altered 23-Nov-2007 - Procedure for extending populations to larger radii changes.
 !                         We now fiddle departure coefficient to try to ensure
-!                         constant ionization (actual alteration date 14-Nov-2007). 
-! Altered 20-Sep-2007 - Bug fix. T not being correctly sent when outer boundary 
+!                         constant ionization (actual alteration date 14-Nov-2007).
+! Altered 20-Sep-2007 - Bug fix. T not being correctly sent when outer boundary
 !                         extends beyond grid boundary.
 ! Altered 20-Sep-2006 - Changed so that Ne and DI are scaled by the atom
 !                         density when extrapolating at the outer boundary.
@@ -22,7 +23,7 @@
 ! Altered 20-Feb-2005 - CHECK_DC installed.
 ! Altered 04-Jul-2004 - Altered so that levels in the same super level
 !                          all have the same departure coefficient.
-! Altered 15-Feb-2002 - Altered so that we can input files where the 
+! Altered 15-Feb-2002 - Altered so that we can input files where the
 !                          outer radius is greater than the outer radius of
 !                          the new model.
 ! Altered 14-Jun-2000 - Error check when file opened.
@@ -37,7 +38,7 @@
 !                       ERROR_LU installed.
 !                       Generic call for LOG and EXP.
 !
-! Altered 02-Aug-1994 - PROGRDESC change from INTEGER to REAL(10). Corrects
+! Altered 02-Aug-1994 - PROGRDESC change from INTEGER to REAL(KIND=LDP). Corrects
 !                       alignment problem. PROGDESC is now check for
 !                       corruption, even if too many iterations occur.
 ! Altered 3-May-1989 - NV and check installed.
@@ -49,26 +50,26 @@
 ! Altered 08-Oct-1987 - Handles departure coefficients, OR b-1.
 ! Altered 11-Mar-1987 - Reading sequence split into two calls so that V and ION
 !                         may appear on the same line as R.
-! Created 28-SEP-1985 - (Based on REGRID - scratch block added so the 
+! Created 28-SEP-1985 - (Based on REGRID - scratch block added so the
 !                         NDOLD can be grater than ND)
 ! Altered 30-APR-1985 - (Bug fixed in error messages - import when ND .ne. NDOLD)
 ! Altered 28-FEB-1984
 !
 	INTEGER N,ND
-	REAL(10) DHEN(N,ND),R(ND),T(ND),ED(ND),DI(ND),EDGE(N)
-	REAL(10) POPATOM(ND)
+	REAL(KIND=LDP) DHEN(N,ND),R(ND),T(ND),ED(ND),DI(ND),EDGE(N)
+	REAL(KIND=LDP) POPATOM(ND)
 	INTEGER F_TO_S(N)
 	INTEGER INT_SEQ(N)
 !
-	REAL(10), ALLOCATABLE :: DPOP(:,:)
-	REAL(10), ALLOCATABLE :: OLDED(:)
-	REAL(10), ALLOCATABLE :: OLDDI(:)
-	REAL(10), ALLOCATABLE :: OLDT(:)
-	REAL(10), ALLOCATABLE :: RLOG(:)
-	REAL(10), ALLOCATABLE :: TA(:)
-	REAL(10), ALLOCATABLE :: OLDR(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DPOP(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDED(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDDI(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RLOG(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDR(:)
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER ERROR_LU,LUER
@@ -77,7 +78,7 @@
 ! Local Variables.
 !
 	INTEGER I,J,NOLD,NDOLD,COUNT,NX,NXST,NZ,IOS
-	REAL(10) RPOLD,TX,FX,DELTA_T,T1,T2
+	REAL(KIND=LDP) RPOLD,TX,FX,DELTA_T,T1,T2
 	LOGICAL BAD_TX_CONV
 	LOGICAL NO_TX_CONV(ND)
 	LOGICAL CHECK_DC

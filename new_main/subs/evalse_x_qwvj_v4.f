@@ -1,8 +1,8 @@
 !
-! Subroutine to increment the statistical equilibrium equations for each 
+! Subroutine to increment the statistical equilibrium equations for each
 ! depth point given the value of the mean intensity at each depth point.
 !
-! Subroutine also increments the QFV_R AND QFV_P matrices that describe the 
+! Subroutine also increments the QFV_R AND QFV_P matrices that describe the
 ! variation of the SE quations with respect to RJ.
 !
 ! Routine also increments the ionization equilibrium equations.
@@ -13,6 +13,7 @@
 	1                    HN_A,HNST_A,N_A,
 	1                    HN_B,HNST_B,N_B,ION_EQ_IN_BA,
 	1                    JREC,JPHOT,ND,NION)
+	USE SET_KIND_MODULE
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
@@ -38,27 +39,27 @@
 	INTEGER NION		!Total number of IONS
 	INTEGER ND		!Number of depth points
 !
-	REAL(10) HN_A(N_A,ND)		!    Pops. of ith ionzation stage
-	REAL(10) HNST_A(N_A,ND)		!LTE   "    "  "      "       "
-	REAL(10) HN_B(N_B,ND)		!    Pops. of (i+1)th ionization stage
-	REAL(10) HNST_B(N_B,ND)		!LTE   "   "    "       "        "
+	REAL(KIND=LDP) HN_A(N_A,ND)		!    Pops. of ith ionzation stage
+	REAL(KIND=LDP) HNST_A(N_A,ND)		!LTE   "    "  "      "       "
+	REAL(KIND=LDP) HN_B(N_B,ND)		!    Pops. of (i+1)th ionization stage
+	REAL(KIND=LDP) HNST_B(N_B,ND)		!LTE   "   "    "       "        "
 !
 ! WSE_X is the quadrature weight for X-ray ionization (with 2e ejected) for
 ! ionization state i [final product is (i+1)].
 !
-	REAL(10) WSE_X(N_A,ND)
-	REAL(10) JREC(ND)			! Int (2h/c2v^3+J)*EXP(-hv/kT)/v dv
-	REAL(10) JPHOT(ND)		! Int J/v dv
+	REAL(KIND=LDP) WSE_X(N_A,ND)
+	REAL(KIND=LDP) JREC(ND)			! Int (2h/c2v^3+J)*EXP(-hv/kT)/v dv
+	REAL(KIND=LDP) JPHOT(ND)		! Int J/v dv
 !
 ! Local variables.
 !
 	INTEGER ION_EQ		!Ion eqation in SE(ID)%BA matrix.
 	INTEGER ION_V                 !Location of ion variable in SE(ID)%BA.
 	INTEGER I,J
-	REAL(10) NETR
-	REAL(10) SUM_SE
-	REAL(10) SUM_VJ_R,SUM_VJ_P
-	REAL(10) J_B_ION,B_ION
+	REAL(KIND=LDP) NETR
+	REAL(KIND=LDP) SUM_SE
+	REAL(KIND=LDP) SUM_VJ_R,SUM_VJ_P
+	REAL(KIND=LDP) J_B_ION,B_ION
 !
 	ION_EQ=SE(ID)%XRAY_EQ
 	ION_V=SE(ID)%LNK_TO_IV(ION_EQ_IN_BA)
@@ -89,7 +90,7 @@
 	    SE(ID)%QFV_P(I,J)=SE(ID)%QFV_P(I,J) + WSE_X(I,J)*HN_A(I,J)
 	  END DO
 !
-! Include effects of X-rays on equation of target ion. For K shell 
+! Include effects of X-rays on equation of target ion. For K shell
 ! ionizations of species  with more than 3 electrons, as considered here,
 ! 2 electrons are given off. Thus ION_EQ should refer to the g.s. of the
 ! (i+2)th ionization stage.

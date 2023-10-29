@@ -1,4 +1,5 @@
-	MODULE BA_EHB_MOD_V1 
+	MODULE BA_EHB_MOD_V1
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Module which contains dJdN integrated over a small frequency band over
@@ -9,31 +10,32 @@
 ! VJ_C = Int ( dJ)
 ! RJ_SUM = Int (J)
 !
-	REAL(10), ALLOCATABLE :: VJ_R(:,:,:)
-	REAL(10), ALLOCATABLE :: VJ_P(:,:,:)
-	REAL(10), ALLOCATABLE :: VJ_R_EHB(:,:,:)
-	REAL(10), ALLOCATABLE :: VJ_P_EHB(:,:,:)
-	REAL(10), ALLOCATABLE :: RJ_SUM(:)
-	REAL(10), ALLOCATABLE :: RJ_SUM_EHB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ_R(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ_P(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ_R_EHB(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ_P_EHB(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_SUM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_SUM_EHB(:)
 	SAVE
 !
 	END MODULE BA_EHB_MOD_V1
 !
-! Subroutine to increment the variation matrix BA_T_EHB and BA_T_PAR_EHBR 
+! Subroutine to increment the variation matrix BA_T_EHB and BA_T_PAR_EHBR
 ! due to the variation of J in the bound-free heating terms..
 !
 ! BA_T_PAR_EHB is used for the diagonal variation only. It is updated on each call
 ! rather than BA_T_EHB to improve numerical stability. BA_PAR should contain terms
 ! of similar size. BA_T_PAR_EHB  will need to be added to BA_T_EHB after every approximately
-! every N frequencies. In this way the matrices should suffer less cancelation 
+! every N frequencies. In this way the matrices should suffer less cancelation
 ! effects due to the addition of large positive and negative terms.
 !
 !
 	SUBROUTINE BA_EHB_BF_UPDATE_V1(VJ,ETA_CONT,CHI_CONT,POPS,RJ,
 	1              NU,FQW,NEW_CONT,FINAL_FREQ,DO_SRCE_VAR_ONLY,
 	1              NION,NT,NUM_BNDS,ND,DST,DEND)
+	USE SET_KIND_MODULE
 	USE BA_EHB_MOD_V1
-	USE STEQ_DATA_MOD 
+	USE STEQ_DATA_MOD
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -41,19 +43,19 @@
 !
 	INTEGER NION
   	INTEGER NT,NUM_BNDS,ND,DST,DEND
-	REAL(10) VJ(NT,NUM_BNDS,ND)
-	REAL(10) POPS(NT,ND)
-	REAL(10) VCHI(NT,ND)
-	REAL(10) VETA(NT,ND)
-	REAL(10) RJ(ND)
+	REAL(KIND=LDP) VJ(NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) VCHI(NT,ND)
+	REAL(KIND=LDP) VETA(NT,ND)
+	REAL(KIND=LDP) RJ(ND)
 !
-	REAL(10) ETA_CONT(ND)
-	REAL(10) CHI_CONT(ND)
-	REAL(10) ESEC(ND)
+	REAL(KIND=LDP) ETA_CONT(ND)
+	REAL(KIND=LDP) CHI_CONT(ND)
+	REAL(KIND=LDP) ESEC(ND)
 !
-	REAL(10) NU
-	REAL(10) FQW
-	REAL(10) STORE(ND)
+	REAL(KIND=LDP) NU
+	REAL(KIND=LDP) FQW
+	REAL(KIND=LDP) STORE(ND)
 !
 ! NEW_CONT indicates that this is the first frequency of a new continuum band
 ! in which the continuum cross-sections are constant. FINAL_FREQ indicates
@@ -66,17 +68,17 @@
 ! Constants for opacity etc.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 !
-	REAL(10) PLANCKS_CONSTANT,PC
+	REAL(KIND=LDP) PLANCKS_CONSTANT,PC
 	EXTERNAL PLANCKS_CONSTANT
-	REAL(10) T1,T2
-	REAL(10) RJ_RAD(ND)
-	REAL(10) LOC_QFV_P,LOC_QFV_R
-	REAL(10) LOC_QFV_P_EHB,LOC_QFV_R_EHB
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) RJ_RAD(ND)
+	REAL(KIND=LDP) LOC_QFV_P,LOC_QFV_R
+	REAL(KIND=LDP) LOC_QFV_P_EHB,LOC_QFV_R_EHB
 	INTEGER I,J,K,L,LS,IOS,ID
 	INTEGER DIAG_INDX,BNDST,BNDEND
 !

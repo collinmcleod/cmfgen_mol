@@ -3,6 +3,7 @@
 ! to that in the model atom with super levels.
 !
 	SUBROUTINE FDG_F_TO_S_NS_V1(NF,NS,NV,FL_OPTION,SL_OPTION,IL_OPTION,LUIN,FILENAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 5-Feb-2009: Inserted FL_OPTION into call. (Still V1).
@@ -169,6 +170,7 @@
 	END
 !
 	SUBROUTINE DO_SL_ADJUSTEMENT(F_TO_S,INT_SEQ,NF,NS,SL_OPTION,FILENAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered  1-FEb-2010 : Added FILENAME to call to improve diagnostic output.

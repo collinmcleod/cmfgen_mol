@@ -1,4 +1,5 @@
 	SUBROUTINE DO_SL_LS_SPLIT(F_TO_S,INT_SEQ,NF,NS,LEVEL_NAMES,SL_OPTION)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 23-Feb-2018: Desing to split the lower N LS sates into individual

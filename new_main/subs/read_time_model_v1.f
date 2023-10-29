@@ -5,16 +5,17 @@
 !
 	SUBROUTINE READ_TIME_MODEL_V1(R,V,SIGMA,POPS,
 	1             IREC_RD,RVSIG_WRITTEN,NT,ND,LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 12-Dec-2005 : Based on READ_TIME_MODEL_V1_V2
 !
 	INTEGER ND
 	INTEGER NT
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-	REAL(10) SIGMA(ND)
-	REAL(10) POPS(NT*ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) SIGMA(ND)
+	REAL(KIND=LDP) POPS(NT*ND)
 !
 !  On input,  IREC_RD is the time step record to be read. If zero, the last
 !                time step is read.
@@ -60,7 +61,7 @@
 ! These are computer dependent, hence call to DIR_ACC_PARS. NB.
 ! REC_SIZE is not the same as REC_LEN --- it is REC_LEN which is
 ! passed to the OPEN statement.
- 
+
 	CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
 	IF(N_PER_REC .LT. 3*ND)THEN
 	  WRITE(LUER,*)'Record length was too small fro R,V and'//
@@ -116,7 +117,7 @@
 	          WRITE(LUER,*)'IREC & NITSF should match in TIME_PNT1'
 	          STOP
 	        END IF
-	      ELSE 
+	      ELSE
 	        WRITE(LUER,*)'Unrecognized formate date in TIME_PNT2'
 	        STOP
 	      END IF
@@ -138,7 +139,7 @@
 	END IF
 !
 ! Open the direct access file with the model data.
-! 
+!
 	INQUIRE(UNIT=LU,OPENED=FILE_OPEN)
 	IF(FILE_OPEN)CLOSE(UNIT=LU)
 	OPEN(UNIT=LU,FILE='MODELS_FN_TIME',FORM='UNFORMATTED',
@@ -227,19 +228,20 @@
 !
 	SUBROUTINE RITE_TIME_MODEL(R,V,SIGMA,POPS,IREC,NEW_FILE,WRITE_RVSIG,
 	1               NT,ND,LU,WRITFAIL)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 12-Dec-2005 : Based on SCR_RITE.
 !
 	INTEGER ND
 	INTEGER NT
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-	REAL(10) SIGMA(ND)
-	REAL(10) POPS(NT*ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) SIGMA(ND)
+	REAL(KIND=LDP) POPS(NT*ND)
 	INTEGER IREC
 	INTEGER LU
-	LOGICAL NEW_FILE 
+	LOGICAL NEW_FILE
 	LOGICAL WRITFAIL
 	LOGICAL WRITE_RVSIG
 !
@@ -303,7 +305,7 @@
 !
 	  FORMAT_DATE='28-Feb-2004'
 	  IREC=0
-	ELSE 
+	ELSE
 !
 ! Writing to existing SCRATCH file.
 !
@@ -364,7 +366,7 @@
 	      END IF
 	  END IF
 !
-! We can now write out R,V and SIGMA on every iteration. This is also 
+! We can now write out R,V and SIGMA on every iteration. This is also
 ! done for SN models where R can change with iteration. R read here will
 ! only be correct for the last iteration. Fixed with a later read.
 ! We preserve this format for consistency with SCRTEMP.

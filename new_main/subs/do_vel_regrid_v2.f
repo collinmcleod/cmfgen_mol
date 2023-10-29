@@ -1,4 +1,5 @@
 	SUBROUTINE DO_VEL_REGRID_V2(POPS,R,V,POP_ATOM,DONE_R_REV,ND,NT,LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered: 02-Nov-2012 LU is passed in call and changed to V2.
@@ -9,35 +10,35 @@
 	INTEGER ND
 	INTEGER NT
 	INTEGER LU
-	REAL(10) POPS(NT,ND)
-	REAL(10) POP_ATOM(ND)
-	REAL(10) R(ND)
-	REAL(10) V(ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) POP_ATOM(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
 !
 	LOGICAL DONE_R_REV
 !
-	REAL(10) CUR_LOG_POP(NT)
-	REAL(10) OLD_LOG_POP(NT)
-	REAL(10) LOG_ATOM_DEN
+	REAL(KIND=LDP) CUR_LOG_POP(NT)
+	REAL(KIND=LDP) OLD_LOG_POP(NT)
+	REAL(KIND=LDP) LOG_ATOM_DEN
 !
-	REAL(10) XNEW(NM*ND)
-	REAL(10) VNEW(NM*ND)
-	REAL(10) RNEW(NM*ND)
-	REAL(10) REVR(ND)
-	REAL(10) REVV(ND)
-	REAL(10) REVX(ND)
-	REAL(10) ROLD(ND)
+	REAL(KIND=LDP) XNEW(NM*ND)
+	REAL(KIND=LDP) VNEW(NM*ND)
+	REAL(KIND=LDP) RNEW(NM*ND)
+	REAL(KIND=LDP) REVR(ND)
+	REAL(KIND=LDP) REVV(ND)
+	REAL(KIND=LDP) REVX(ND)
+	REAL(KIND=LDP) ROLD(ND)
 !
-	REAL(10) TA(ND),RTA(NM*ND)
-	REAL(10) TB(ND),RTB(NM*ND)
+	REAL(KIND=LDP) TA(ND),RTA(NM*ND)
+	REAL(KIND=LDP) TB(ND),RTB(NM*ND)
 !
-	REAL(10) VLOW
-	REAL(10) VHIGH
-	REAL(10) dDEN
+	REAL(KIND=LDP) VLOW
+	REAL(KIND=LDP) VHIGH
+	REAL(KIND=LDP) dDEN
 !
-	REAL(10) dV
-	REAL(10) dV_MAX
-	REAL(10) T1,T2
+	REAL(KIND=LDP) dV
+	REAL(KIND=LDP) dV_MAX
+	REAL(KIND=LDP) T1,T2
 !
 	INTEGER, PARAMETER :: NVAR_MAX=20
 	INTEGER IVAR(NVAR_MAX)
@@ -45,10 +46,10 @@
 !
 	INTEGER NIB
 	INTEGER NOB
-	REAL(10) OBND_PARAMS(5)           !Parameters specifying grid placement at outer boundary.
-	REAL(10) IBND_PARAMS(5)           !Parameters specifying grid placement at nner boundary.
+	REAL(KIND=LDP) OBND_PARAMS(5)           !Parameters specifying grid placement at outer boundary.
+	REAL(KIND=LDP) IBND_PARAMS(5)           !Parameters specifying grid placement at nner boundary.
 	CHARACTER(LEN=10) OUT_BND_OPT   !Outer boundary option
-	CHARACTER(LEN=10) IN_BND_OPT                  
+	CHARACTER(LEN=10) IN_BND_OPT
 	CHARACTER(LEN=6)  KEY
 !
 	INTEGER NI
@@ -98,7 +99,7 @@
 	    END IF
 	    IF(I .EQ. 1)IV1=IVAR(1)
 	    IF(I .EQ. 2)IV2=IVAR(2)
-	  END DO 
+	  END DO
 	END IF
 !
 	I=10; CALL RD_STORE_NCHAR(OUT_BND_OPT,'OB_OPT',I,L_FALSE,'Outer boundary option: SPECIFY or DEFAULT')
@@ -191,7 +192,7 @@
 100	CONTINUE
 	WRITE(LUER,*)' Fractional change in Velocity (=dV) is',dV
 !
-! Define the new velocity grid. We limit the change in V to dV, or to a 
+! Define the new velocity grid. We limit the change in V to dV, or to a
 ! size such that the % change an important population is smaller than dDEN.
 !
 ! Set V(L) using only dV. We stop when close enough to the end of the
@@ -239,9 +240,9 @@
 	    END IF
 	  END DO
 !
-! We don't use simple ineterpolation to estimate a revised V, since the 
+! We don't use simple ineterpolation to estimate a revised V, since the
 ! increment in velocity may take us from an interval where the density
-! varies slowly to an interval where it varies rapidly. 
+! varies slowly to an interval where it varies rapidly.
 !
 	  IF(T2 .GT. dDEN)THEN
 	    VNEW(L)=VNEW(L-1)+0.95D0*(VNEW(L)-VNEW(L-1))
@@ -253,7 +254,7 @@
 ! were similar.
 !
 ! This section is only done for testing and verification purposes.
-! 
+!
 	WRITE(LUER,*)'Number of points in old interval inclusive was',JEND-JST+1
 	WRITE(LUER,*)' Number of points in new interval inclusive is ',L
 !
@@ -368,5 +369,5 @@
 	CLOSE(UNIT=LU_RGRID)
 	DONE_R_REV=.TRUE.
 !
-	RETURN 
+	RETURN
 	END

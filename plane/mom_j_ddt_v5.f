@@ -3,64 +3,65 @@
 ! saved between subroutine calls..
 !
 	MODULE MOD_MOM_J_DDT_V5
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Dimensioned ND_SM,4
 ! ND_SM is the depth dimension passed to the routine, and hence is the same
 ! as ND in CMFGEN.
 !
-	REAL(10), ALLOCATABLE :: V_COEF(:,:)
-	REAL(10), ALLOCATABLE :: ESEC_COEF(:,:)
-	REAL(10), ALLOCATABLE :: CHI_COEF(:,:)
-	REAL(10), ALLOCATABLE :: ETA_COEF(:,:)
-	REAL(10), ALLOCATABLE :: F_COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: V_COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: ESEC_COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETA_COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: F_COEF(:,:)
 !
 ! All the following rays have dimension ND, where ND >= ND_SM.
 ! Some of the data in the arrays is need in subsequent calls.
-! 
-	REAL(10), ALLOCATABLE :: R(:)
-	REAL(10), ALLOCATABLE :: V(:)
-	REAL(10), ALLOCATABLE :: ESEC(:)
-	REAL(10), ALLOCATABLE :: CHI(:)
-	REAL(10), ALLOCATABLE :: ETA(:)
 !
-	REAL(10), ALLOCATABLE :: RSQJNU(:)
-	REAL(10), ALLOCATABLE :: RSQHNU(:)
-	REAL(10), ALLOCATABLE :: RSQJNU_PREV(:)
-	REAL(10), ALLOCATABLE :: RSQHNU_PREV(:)
-	REAL(10), ALLOCATABLE :: RSQJNU_OLDT(:)
-	REAL(10), ALLOCATABLE :: RSQHNU_OLDT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R(:)
+	REAL(KIND=LDP), ALLOCATABLE :: V(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ESEC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETA(:)
 !
-	REAL(10), ALLOCATABLE :: F(:)
-	REAL(10), ALLOCATABLE :: F_SAV(:)
-	REAL(10), ALLOCATABLE :: F_PREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RSQJNU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RSQHNU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RSQJNU_PREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RSQHNU_PREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RSQJNU_OLDT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RSQHNU_OLDT(:)
 !
-	REAL(10), ALLOCATABLE :: CON_GAM(:)
-	REAL(10), ALLOCATABLE :: CON_GAMH(:)
+	REAL(KIND=LDP), ALLOCATABLE :: F(:)
+	REAL(KIND=LDP), ALLOCATABLE :: F_SAV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: F_PREV(:)
 !
-	REAL(10), ALLOCATABLE :: COH_VEC(:)
-	REAL(10), ALLOCATABLE :: DJDT(:)
-	REAL(10), ALLOCATABLE :: DTAU(:)
-	REAL(10), ALLOCATABLE :: DTAUONQ(:)
-	REAL(10), ALLOCATABLE :: GAM(:)
-	REAL(10), ALLOCATABLE :: GAMH(:)
-	REAL(10), ALLOCATABLE :: dH(:)
-	REAL(10), ALLOCATABLE :: dH_OLDT(:)
-	REAL(10), ALLOCATABLE :: HL(:)
-	REAL(10), ALLOCATABLE :: HU(:)
-	REAL(10), ALLOCATABLE :: HS(:)
-	REAL(10), ALLOCATABLE :: HT(:)
-	REAL(10), ALLOCATABLE :: PSI(:)
-	REAL(10), ALLOCATABLE :: PSIPREV(:)
-	REAL(10), ALLOCATABLE :: Q(:)
-	REAL(10), ALLOCATABLE :: SOURCE(:)
-	REAL(10), ALLOCATABLE :: TA(:)
-	REAL(10), ALLOCATABLE :: TB(:)
-	REAL(10), ALLOCATABLE :: TC(:)
-	REAL(10), ALLOCATABLE :: W(:)
-	REAL(10), ALLOCATABLE :: WPREV(:)
-	REAL(10), ALLOCATABLE :: XM(:)
-	REAL(10), ALLOCATABLE :: XM_SAV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CON_GAM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CON_GAMH(:)
+!
+	REAL(KIND=LDP), ALLOCATABLE :: COH_VEC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DJDT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DTAU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DTAUONQ(:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAMH(:)
+	REAL(KIND=LDP), ALLOCATABLE :: dH(:)
+	REAL(KIND=LDP), ALLOCATABLE :: dH_OLDT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HL(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: PSI(:)
+	REAL(KIND=LDP), ALLOCATABLE :: PSIPREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: Q(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SOURCE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: W(:)
+	REAL(KIND=LDP), ALLOCATABLE :: WPREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: XM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: XM_SAV(:)
 !
 ! Boundary conditions: INBC denotes the inner boundary.
 ! OUTBC denotes the outer boundary. _PREV refers to the
@@ -69,28 +70,28 @@
 ! become _PREV when NEW_FREW is TRUE), and _OLD refers to
 ! the boundary condition at the previous time step.
 !
-        REAL(10) HONJ_OUTBC_PREV
-	REAL(10) RSQH_AT_OB_PREV
-	REAL(10) RSQH_AT_OB_SAV
-	REAL(10) HONJ_OUTBC_SAV
+        REAL(KIND=LDP) HONJ_OUTBC_PREV
+	REAL(KIND=LDP) RSQH_AT_OB_PREV
+	REAL(KIND=LDP) RSQH_AT_OB_SAV
+	REAL(KIND=LDP) HONJ_OUTBC_SAV
 !
-	REAL(10) RSQH_AT_IB_PREV
-	REAL(10) RSQH_AT_IB_SAV
-	REAL(10) RSQH_AT_IB_OLDT
-	REAL(10) HONJ_OUTBC_OLDT
+	REAL(KIND=LDP) RSQH_AT_IB_PREV
+	REAL(KIND=LDP) RSQH_AT_IB_SAV
+	REAL(KIND=LDP) RSQH_AT_IB_OLDT
+	REAL(KIND=LDP) HONJ_OUTBC_OLDT
 !
-	REAL(10) DELTA_TIME_SECS
-	REAL(10) RECIP_CDELTAT
-	REAL(10) ROLD_ON_R
-	REAL(10) R_RAT_FOR_J
-	REAL(10) C_KMS
-	REAL(10) VDOP_FRAC_SAV
+	REAL(KIND=LDP) DELTA_TIME_SECS
+	REAL(KIND=LDP) RECIP_CDELTAT
+	REAL(KIND=LDP) ROLD_ON_R
+	REAL(KIND=LDP) R_RAT_FOR_J
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) VDOP_FRAC_SAV
 !
 ! To be dimensioned ND_SM where ND_SM is the size of the R grid
 ! as passed to MOM_J_CMF.
 !
-	REAL(10), ALLOCATABLE :: R_SM_SAV(:)
-	REAL(10), ALLOCATABLE :: LOG_R_SM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_SM_SAV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LOG_R_SM(:)
 !
 ! R_PNT(K) defines the interpolation for the variable at depth K.
 !
@@ -137,6 +138,7 @@
 	1            INNER_BND_METH,OUTER_BND_METH,
 	1            METHOD,COHERENT,INIT,NEW_FREQ,
 	1            DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,NC,NP,ND_SM,NCF)
+	USE SET_KIND_MODULE
 	USE MOD_MOM_J_DDT_V5
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
@@ -144,7 +146,7 @@
 ! Altered: 18-Apr-2018 : Added J_CHK_OPTION
 !                        Improved handling of J < 0.
 ! Altered: 16-Apr-2019 : Altered handling the case where XM(I) < 0.0.
-!                          Important for Type Ia nebula. 
+!                          Important for Type Ia nebula.
 ! Altered: 17-Oct-2016 : Changed to V4: H_CHK_OPTION inserted into call.
 !                          Will allow greater flexibility in testing etc.
 ! Altered: 21-Apr-2016 : Changed to V3: USE_DR4JDT option installed.
@@ -156,12 +158,12 @@
 !                         For ZERO_FLUX option we add an additional term containing
 !                         J computed by the ray-ray solution to improve stability.
 ! Altered 18-Jan-2010 : More flexible options installed in CALL to allow improved
-!                         boundary conditions. Routine now handles "HOLLOW" and 
+!                         boundary conditions. Routine now handles "HOLLOW" and
 !                         "ZERO_FLUX" option at inner boundary, and "HALF_MOMJ" at outer
 !                         boundary. Other options could also easily be installed.
 !                         Based on MOM_J_DDT_V1 (and a modified test routine).
-! Altered 31-July-2006: Routine now only deallocates/allocates arrays when 
-!                         absolutely necessary. 
+! Altered 31-July-2006: Routine now only deallocates/allocates arrays when
+!                         absolutely necessary.
 !
 	INTEGER NC
 	INTEGER NP
@@ -172,37 +174,37 @@
 ! This routine has the option of using a finer grid for calculating
 ! the radiation field (primarily for use with CMF_FLUX).
 !
-	REAL(10) ETA_SM(ND_SM)
-	REAL(10) CHI_SM(ND_SM)
-	REAL(10) ESEC_SM(ND_SM)
-	REAL(10) V_SM(ND_SM)
-	REAL(10) R_SM(ND_SM)
+	REAL(KIND=LDP) ETA_SM(ND_SM)
+	REAL(KIND=LDP) CHI_SM(ND_SM)
+	REAL(KIND=LDP) ESEC_SM(ND_SM)
+	REAL(KIND=LDP) V_SM(ND_SM)
+	REAL(KIND=LDP) R_SM(ND_SM)
 !
 ! Radiation field variables. F supplied. JNU_SM and RSQHNU_SM recomputed.
 !
-	REAL(10) F_SM(ND_SM)
-	REAL(10) JNU_SM(ND_SM)
-	REAL(10) RSQHNU_SM(ND_SM)
-	REAL(10) DJDt_TERM(ND_SM)
-	REAL(10) VDOP_VEC(ND_SM)
-	REAL(10) VDOP_FRAC
+	REAL(KIND=LDP) F_SM(ND_SM)
+	REAL(KIND=LDP) JNU_SM(ND_SM)
+	REAL(KIND=LDP) RSQHNU_SM(ND_SM)
+	REAL(KIND=LDP) DJDt_TERM(ND_SM)
+	REAL(KIND=LDP) VDOP_VEC(ND_SM)
+	REAL(KIND=LDP) VDOP_FRAC
 !
 	INTEGER N_ERR_MAX,MOM_ERR_CNT
 	PARAMETER (N_ERR_MAX=1000)
-	REAL(10) MOM_ERR_ON_FREQ
+	REAL(KIND=LDP) MOM_ERR_ON_FREQ
 	COMMON /MOM_J_CMF_ERR/MOM_ERR_ON_FREQ(N_ERR_MAX),MOM_ERR_CNT
 	LOGICAL RECORDED_ERROR
 	LOGICAL, PARAMETER :: VERBOSE=.FALSE.
 !
 ! Boundary conditions.
 !
-	REAL(10) HFLUX_AT_OB
-	REAL(10) HFLUX_AT_IB
+	REAL(KIND=LDP) HFLUX_AT_OB
+	REAL(KIND=LDP) HFLUX_AT_IB
 !
-	REAL(10) RELAX_PARAM
-	REAL(10) DBB
-	REAL(10) FREQ
-	REAL(10) dLOG_NU
+	REAL(KIND=LDP) RELAX_PARAM
+	REAL(KIND=LDP) DBB
+	REAL(KIND=LDP) FREQ
+	REAL(KIND=LDP) dLOG_NU
 	CHARACTER*6 METHOD
 !
 	CHARACTER(LEN=*) OUTER_BND_METH
@@ -233,21 +235,21 @@
 	LOGICAL DO_TIME_VAR
 	LOGICAL USE_DR4JDT
 !
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 	EXTERNAL SPEED_OF_LIGHT
 !
 ! Local variables.
 !
-	REAL(10) RSQH_AT_OB
-	REAL(10) RSQH_AT_IB
-	REAL(10) HONJ_OUTBC
-	REAL(10) HPLUS,HMIN
-	REAL(10) FMIN,FPLUS
-	REAL(10) T1,T2,T3,T4
-	REAL(10) MOD_DTAU
-	REAL(10) DELTA_R
+	REAL(KIND=LDP) RSQH_AT_OB
+	REAL(KIND=LDP) RSQH_AT_IB
+	REAL(KIND=LDP) HONJ_OUTBC
+	REAL(KIND=LDP) HPLUS,HMIN
+	REAL(KIND=LDP) FMIN,FPLUS
+	REAL(KIND=LDP) T1,T2,T3,T4
+	REAL(KIND=LDP) MOD_DTAU
+	REAL(KIND=LDP) DELTA_R
 	INTEGER IT1,I,J,K
 	INTEGER IOS
 	INTEGER ICNT
@@ -295,8 +297,8 @@
 	END IF
 !
 	IF(INIT)THEN
-	  WRITE(LU_MOM,'(4X,A,12X,A,5(9X,A),20X,A)')'I','FREQ','  XM',' ETA',' CHI','ESEC','   F','XM(I-2)-XM(I+2)' 
-	  WRITE(LU_MOM,'(53X,A)')'XM_SAV(I-2)-XM_SAV(I+2)' 
+	  WRITE(LU_MOM,'(4X,A,12X,A,5(9X,A),20X,A)')'I','FREQ','  XM',' ETA',' CHI','ESEC','   F','XM(I-2)-XM(I+2)'
+	  WRITE(LU_MOM,'(53X,A)')'XM_SAV(I-2)-XM_SAV(I+2)'
 	  WRITE(LU_MOM,'(A)')' '
 	  WRITE(LU_MOM,'(A)')'OR'
 	  WRITE(LU_MOM,'(A)')' '
@@ -690,7 +692,7 @@
 	  GAM(:)=CON_GAM(:)/CHI(:)/dLOG_NU
 	END IF
 !
-! Even if it is the first frequency, we still need to allow for the time 
+! Even if it is the first frequency, we still need to allow for the time
 ! variability terms.
 !
 	IF(INIT .AND. DO_TIME_VAR)THEN
@@ -736,9 +738,9 @@
 !	WRITE(402,'(ES14.7,2ES22.14,3ES14.7)')FREQ,HL(I),HU(I),DTAUONQ(I)*(1.0D0-COH_VEC(I)),PSI(I),DJDt(I)
 !
 	DO I=2,ND-1
-	  XM(I)=XM(I) + 
-	1        (HS(I)*RSQHNU_PREV(I) - HS(I-1)*RSQHNU_PREV(I-1)) + 
-	1        (HT(I)*RSQHNU_OLDT(I) - HT(I-1)*RSQHNU_OLDT(I-1)) + 
+	  XM(I)=XM(I) +
+	1        (HS(I)*RSQHNU_PREV(I) - HS(I-1)*RSQHNU_PREV(I-1)) +
+	1        (HT(I)*RSQHNU_OLDT(I) - HT(I-1)*RSQHNU_OLDT(I-1)) +
 	1        PSIPREV(I)*RSQJNU_PREV(I) + DJDt(I)*RSQJNU_OLDt(I)*R_RAT_FOR_J
 	END DO
 !
@@ -757,8 +759,8 @@
 	    T1=0.5D0*T1
 	    ICNT=ICNT+1
 	    XM(I)=DTAUONQ(I)*SOURCE(I)*R(I)*R(I) +
-	1        T1*(HS(I)*RSQHNU_PREV(I) - HS(I-1)*RSQHNU_PREV(I-1)) + 
-	1        (HT(I)*RSQHNU_OLDT(I) - HT(I-1)*RSQHNU_OLDT(I-1)) + 
+	1        T1*(HS(I)*RSQHNU_PREV(I) - HS(I-1)*RSQHNU_PREV(I-1)) +
+	1        (HT(I)*RSQHNU_OLDT(I) - HT(I-1)*RSQHNU_OLDT(I-1)) +
 	1        PSIPREV(I)*RSQJNU_PREV(I) + DJDt(I)*RSQJNU_OLDt(I)*R_RAT_FOR_J
 	  END DO
 	END DO
@@ -972,7 +974,7 @@
 !
 ! Re-grid derived J and RSQH values onto small grid. We divide RSQJ by R^2 so that
 ! we return J. We also compute DJDt on the small grid. This is returned to CMFGEN_SUB
-! so that we can allow for the DJDt term when doing the luminosity check for 
+! so that we can allow for the DJDt term when doing the luminosity check for
 ! OBSFLUX. Note that the term is Dr^3J/Dt . 1/rc .
 !
 	DO I=1,ND_SM

@@ -1,12 +1,13 @@
 C
 C Program reads in population estimates from a file and uses
 C linear interpolation in the log plane to lay these estimates
-C on the "new" radius grid. 
+C on the "new" radius grid.
 C
 	SUBROUTINE REGRIDWSC(DHEN,R,ED,T,DI,EDGE,N,ND,FILNAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
-C Altered 15-Feb-2002 - Altered so that we can input files where the 
+C Altered 15-Feb-2002 - Altered so that we can input files where the
 C                          outer radius ig reater than the outer radius of
 C                          the new model.
 C Altered 14-Jun-2000 - Error check when file opened.
@@ -21,7 +22,7 @@ C                         allocation used.
 C                       ERROR_LU installed.
 C                       Generic call for OOG and EXP.
 C
-C Altered 02-Aug-1994 - PROGRDESC change from INTEGER to REAL(10). Corrects
+C Altered 02-Aug-1994 - PROGRDESC change from INTEGER to REAL(KIND=LDP). Corrects
 C                       alignment problem. PROGDESC is now check for
 C                       corruption, even if too many iterations occur.
 C Altered 3-May-1989 - NV and check installed.
@@ -33,23 +34,23 @@ C                        NB - Call was changed. Implicit none installed.
 C Altered 08-Oct-1987 - Handles departure coefficients, OR b-1.
 C Altered 11-Mar-1987 - Reading sequence split into two calls so that V and ION
 C                         may appear on the same line as R.
-C Created 28-SEP-1985 - (Based on REGRID - scratch block added so the 
+C Created 28-SEP-1985 - (Based on REGRID - scratch block added so the
 C                         NDOLD can be grater than ND)
 C Altered 30-APR-1985 - (Bug fixed in error messages - import when ND .ne. NDOLD)
 C Altered 28-FEB-1984
 C
 	INTEGER N,ND
-	REAL(10) DHEN(N,ND),R(ND),T(ND),ED(ND),DI(ND),EDGE(N)
+	REAL(KIND=LDP) DHEN(N,ND),R(ND),T(ND),ED(ND),DI(ND),EDGE(N)
 C
-	REAL(10), ALLOCATABLE :: DPOP(:,:)
-	REAL(10), ALLOCATABLE :: OLDED(:)
-	REAL(10), ALLOCATABLE :: OLDDI(:)
-	REAL(10), ALLOCATABLE :: OLDT(:)
-	REAL(10), ALLOCATABLE :: RLOG(:)
-	REAL(10), ALLOCATABLE :: TA(:)
-	REAL(10), ALLOCATABLE :: OLDR(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DPOP(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDED(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDDI(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RLOG(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OLDR(:)
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 	INTEGER ERROR_LU,LUER
@@ -58,7 +59,7 @@ C
 C Local Variables.
 C
 	INTEGER I,J,NOLD,NDOLD,COUNT,NX,NXST,NZ,IOS
-	REAL(10) RPOLD,TX,DELTA_T,T1,ADD1
+	REAL(KIND=LDP) RPOLD,TX,DELTA_T,T1,ADD1
 	CHARACTER*80 STRING
 	CHARACTER*(*) FILNAME
 C

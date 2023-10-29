@@ -31,23 +31,24 @@
 !	LIMIT_SET_BY_OPACITY - Determines the STRT_FREQ of the intrinsic
 !                                 line absorption profile based on the
 !                                 ratio of line to electron scattering opacity.
-!       DOP_LIMIT  - Truncate the Doppler profile when the ratio of the LINE 
+!       DOP_LIMIT  - Truncate the Doppler profile when the ratio of the LINE
 !                      opacity to the Electron scattering opacity is DOP_LIMIT.
 !                      Should be of order 10^{-3} or less.
-!                      The profile CANNOT be truncated insiede 3.5 Doppler 
+!                      The profile CANNOT be truncated insiede 3.5 Doppler
 !                      widths from line center
-!       VOIGT_LIMIT  - Truncate the VOIGT profile when the ratio of the LINE 
+!       VOIGT_LIMIT  - Truncate the VOIGT profile when the ratio of the LINE
 !                      opacity to the Electron scattering opacity is DOP_LIMIT.
 !                      Should be of order 10^{-3} or less.
-!                      The profile CANNOT be truncated inside 3.5 Doppler 
+!                      The profile CANNOT be truncated inside 3.5 Doppler
 !                      widths from line center
-!                       
+!
 	SUBROUTINE SET_PROF_LIMITS_V1(VEC_STRT_FREQ,VEC_VDOP_MIN,
 	1             CHIL,ED_IN,TEMP_IN,VTURB_IN,ND,
 	1             PROF_TYPE,NU_ZERO,NL,NUP,AMASS_IN,Z_IN,
 	1             GAM_NAT,GAM_COL,VTURB_FIX,
 	1             DOP_LIMIT,VOIGT_LIMIT,
 	1             LIMIT_SET_BY_OPACITY)
+	USE SET_KIND_MODULE
 !
 ! Altered 06-Apr-2000 : LINE_TO_CONT_RATIO was zero at one depth, causing a divide
 !                         by zero.
@@ -57,21 +58,21 @@
 	INTEGER NL
 	INTEGER NUP
 !
-	REAL(10) VEC_STRT_FREQ
-	REAL(10) VEC_VDOP_MIN
-	REAL(10) DOP_LIMIT
-	REAL(10) VOIGT_LIMIT
+	REAL(KIND=LDP) VEC_STRT_FREQ
+	REAL(KIND=LDP) VEC_VDOP_MIN
+	REAL(KIND=LDP) DOP_LIMIT
+	REAL(KIND=LDP) VOIGT_LIMIT
 !
-	REAL(10) CHIL(ND) 
-	REAL(10) ED_IN(ND)
-	REAL(10) TEMP_IN(ND)
-	REAL(10) VTURB_IN(ND)
-	REAL(10) AMASS_IN
-	REAL(10) Z_IN
-	REAL(10) NU_ZERO
-	REAL(10) GAM_NAT
-	REAL(10) GAM_COL
-	REAL(10) VTURB_FIX
+	REAL(KIND=LDP) CHIL(ND)
+	REAL(KIND=LDP) ED_IN(ND)
+	REAL(KIND=LDP) TEMP_IN(ND)
+	REAL(KIND=LDP) VTURB_IN(ND)
+	REAL(KIND=LDP) AMASS_IN
+	REAL(KIND=LDP) Z_IN
+	REAL(KIND=LDP) NU_ZERO
+	REAL(KIND=LDP) GAM_NAT
+	REAL(KIND=LDP) GAM_COL
+	REAL(KIND=LDP) VTURB_FIX
 	CHARACTER*(*) PROF_TYPE
 !
 	LOGICAL LIMIT_SET_BY_OPACITY
@@ -80,21 +81,21 @@
 ! Local variables
 !
 	INTEGER I
-	REAL(10) ESEC(ND)
-	REAL(10) TMP_VEC(ND)
-	REAL(10) NU_DOP(ND)
-	REAL(10) LINE_TO_CONT_RATIO(ND)
-	REAL(10) dNU
-	REAL(10) T1
-	REAL(10) C_KMS
-	REAL(10) PROF_LINE_CENTER
+	REAL(KIND=LDP) ESEC(ND)
+	REAL(KIND=LDP) TMP_VEC(ND)
+	REAL(KIND=LDP) NU_DOP(ND)
+	REAL(KIND=LDP) LINE_TO_CONT_RATIO(ND)
+	REAL(KIND=LDP) dNU
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) PROF_LINE_CENTER
 !
 	INTEGER, PARAMETER :: NUM_DOP=6
 !
 	C_KMS=2.998D+05			!Doesn't need to be very accurate
 !
 ! The option assumes fixed width Doppler profiles, and recovers exactly the
-! same option as was installed in CMFGEN prior to the installations of variable 
+! same option as was installed in CMFGEN prior to the installations of variable
 ! Doppler widths.
 !
 	IF(PROF_TYPE .EQ. 'DOP_FIX')THEN
@@ -106,19 +107,19 @@
 !
 ! We assume all lines are dominated by the Doppler profile at line center.
 ! We ensure LINE_TO_CONT ratio is not zero, to prevent division by zero.
-!                    
+!
         TMP_VEC(1:ND)=( VTURB_IN(1:ND)/12.85D0  )**2
 	ESEC(1:ND)=6.65D-15*ED_IN(1:ND)
-!                       
+!
         T1=1.0D-15/1.77245385095516D0         !1.0D-15/SQRT(PI)
-	VEC_VDOP_MIN=1.0D+50			!Very large number 
+	VEC_VDOP_MIN=1.0D+50			!Very large number
         DO I=1,ND
           NU_DOP(I)=12.85D0*SQRT( TEMP_IN(I)/AMASS_IN + TMP_VEC(I) )	!kms
 	  VEC_VDOP_MIN=MIN(VEC_VDOP_MIN,NU_DOP(I))			!kms
           NU_DOP(I)=NU_DOP(I)*NU_ZERO/C_KMS				!unitless
           PROF_LINE_CENTER=T1/NU_DOP(I)
 	  LINE_TO_CONT_RATIO(I)=ABS(CHIL(I))*PROF_LINE_CENTER/ESEC(I)
-	  IF(LINE_TO_CONT_RATIO(I) .EQ. 0)LINE_TO_CONT_RATIO(I)=1.0D-50 
+	  IF(LINE_TO_CONT_RATIO(I) .EQ. 0)LINE_TO_CONT_RATIO(I)=1.0D-50
 	END DO
 !
 	VEC_STRT_FREQ=0.0D0

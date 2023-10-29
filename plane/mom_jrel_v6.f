@@ -1,23 +1,24 @@
 	MODULE MOD_JREL_V6
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER ND
 	INTEGER ND_SAV
 	INTEGER MOM_ERR_CNT
 	INTEGER, PARAMETER :: N_ERR_MAX=1000
-	REAL(10) MOM_ERR_ON_FREQ
+	REAL(KIND=LDP) MOM_ERR_ON_FREQ
 	COMMON /MOM_J_CMF_ERR/MOM_ERR_ON_FREQ(N_ERR_MAX),MOM_ERR_CNT
 	LOGICAL RECORDED_ERROR
 !
 ! These vectors must be supplied by the calling routine. We use these
 ! vectors to contain the data on a finer grid.
 !
-	REAL(10), ALLOCATABLE ::  ETA(:)
-	REAL(10), ALLOCATABLE ::  CHI(:)
-	REAL(10), ALLOCATABLE ::  ESEC(:)
-	REAL(10), ALLOCATABLE ::  V(:)			!in km/s
-	REAL(10), ALLOCATABLE ::  SIGMA(:)		!dlnV/dlnR
-	REAL(10), ALLOCATABLE ::  R(:)			!in units of 10^10 cm
+	REAL(KIND=LDP), ALLOCATABLE ::  ETA(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  CHI(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  ESEC(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  V(:)			!in km/s
+	REAL(KIND=LDP), ALLOCATABLE ::  SIGMA(:)		!dlnV/dlnR
+	REAL(KIND=LDP), ALLOCATABLE ::  R(:)			!in units of 10^10 cm
 !
 ! These values are computed, and returned.
 !
@@ -31,42 +32,42 @@
 !
 ! These vectors must be saved as they will be used on subsequent iterations.
 !
-	REAL(10), ALLOCATABLE :: AV_SIGMA(:)
-	REAL(10), ALLOCATABLE :: BETA(:)
-	REAL(10), ALLOCATABLE :: BETA_FREQ(:)
-	REAL(10), ALLOCATABLE :: GAM_REL(:)
-	REAL(10), ALLOCATABLE :: GAM_REL_SQ(:)
-	REAL(10), ALLOCATABLE :: CON_DELTA(:)
-	REAL(10), ALLOCATABLE :: CON_DELTAH(:)
-	REAL(10), ALLOCATABLE :: CON_dKdNUH(:)
-	REAL(10), ALLOCATABLE :: CON_dNdNUH(:)
-	REAL(10), ALLOCATABLE :: CON_dKdNU(:)
-	REAL(10), ALLOCATABLE :: CON_dHdNU(:)
-	REAL(10), ALLOCATABLE :: GAM_RSQJNU(:)
-	REAL(10), ALLOCATABLE :: GAM_RSQHNU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: AV_SIGMA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: BETA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: BETA_FREQ(:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAM_REL(:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAM_REL_SQ(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CON_DELTA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CON_DELTAH(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CON_dKdNUH(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CON_dNdNUH(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CON_dKdNU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CON_dHdNU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAM_RSQJNU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAM_RSQHNU(:)
 !
-        REAL(10), ALLOCATABLE :: GAM_RSQJNU_PREV(:)
-        REAL(10), ALLOCATABLE :: GAM_RSQHNU_PREV(:)
+        REAL(KIND=LDP), ALLOCATABLE :: GAM_RSQJNU_PREV(:)
+        REAL(KIND=LDP), ALLOCATABLE :: GAM_RSQHNU_PREV(:)
 !
-        REAL(10), ALLOCATABLE :: GAM_RSQJNU_SAVE(:)
-        REAL(10), ALLOCATABLE :: GAM_RSQHNU_SAVE(:)
-	REAL(10), ALLOCATABLE :: GAM_RSQJOLD(:)
+        REAL(KIND=LDP), ALLOCATABLE :: GAM_RSQJNU_SAVE(:)
+        REAL(KIND=LDP), ALLOCATABLE :: GAM_RSQHNU_SAVE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAM_RSQJOLD(:)
 !
-	REAL(10), ALLOCATABLE :: TA(:),TB(:),TC(:)
-	REAL(10), ALLOCATABLE :: CHI_H(:),CHI_J(:)
-	REAL(10), ALLOCATABLE :: DTAU_H(:),DTAU_J(:),DTAUONQ(:)
-	REAL(10), ALLOCATABLE :: Q(:),XM(:),SOURCE(:)
-	REAL(10), ALLOCATABLE :: VB(:),VC(:),COH_VEC(:)
-	REAL(10), ALLOCATABLE :: HU(:),HL(:),HS(:),HD(:)
-	REAL(10), ALLOCATABLE :: P_H(:),P_J(:)
-	REAL(10), ALLOCATABLE :: VdJdR_TERM(:),VdHdR_TERM(:)
-	REAL(10), ALLOCATABLE :: DELTA(:),DELTAH(:),W(:),WPREV(:)
-	REAL(10), ALLOCATABLE :: PSI(:),PSIPREV(:)
-	REAL(10), ALLOCATABLE :: EPS(:),EPS_PREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:),TB(:),TC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_H(:),CHI_J(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DTAU_H(:),DTAU_J(:),DTAUONQ(:)
+	REAL(KIND=LDP), ALLOCATABLE :: Q(:),XM(:),SOURCE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: VB(:),VC(:),COH_VEC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HU(:),HL(:),HS(:),HD(:)
+	REAL(KIND=LDP), ALLOCATABLE :: P_H(:),P_J(:)
+	REAL(KIND=LDP), ALLOCATABLE :: VdJdR_TERM(:),VdHdR_TERM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DELTA(:),DELTAH(:),W(:),WPREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: PSI(:),PSIPREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: EPS(:),EPS_PREV(:)
 !
-	REAL(10) FREQ_SAVE
-	REAL(10) IN_NBC_SAVE
-	REAL(10) IN_NBC_PREV
+	REAL(KIND=LDP) FREQ_SAVE
+	REAL(KIND=LDP) IN_NBC_SAVE
+	REAL(KIND=LDP) IN_NBC_PREV
 !
 	END MODULE MOD_JREL_V6
 !
@@ -74,6 +75,7 @@
 ! Subroutine to allocate the required vectors.
 !
 	SUBROUTINE ALLOC_MOD_JREL_V6()
+	USE SET_KIND_MODULE
 	USE MOD_JREL_V6
 	IMPLICIT NONE
 !
@@ -187,7 +189,7 @@
 !
 ! Routine to compute the mean intensity J at a single frequency in the
 ! Comoving-Frame for an EXPANDING atmosphere with a monotonic velocity law.
-! The computed intensity thus depends on the intensity computed for the 
+! The computed intensity thus depends on the intensity computed for the
 ! previous (bluer) frequency.
 !
 ! FULLY RELATIVISTIC SOLUTION:
@@ -230,6 +232,7 @@
 	1               VDOP_VEC,VDOP_FRAC,
 	1               FREQ,dLOG_NU,DBB,INNER_BND_METH,OUTER_BND_METH,METHOD,COHERENT,N_TYPE,
 	1               INCL_ADVEC_TERMS,INCL_REL_TERMS,INIT,ND_SM)
+	USE SET_KIND_MODULE
 	USE MOD_JREL_V6
 	USE MOD_RAY_MOM_STORE
 	IMPLICIT NONE
@@ -242,37 +245,37 @@
 ! Altered: 15-Nov-2009 : Bug fix: LOG(CHI_SM(1:ND))--> LOG(CHI_SM(1:ND_SM))
 !                          Also output warning when ND is different.
 ! Created: 31-Dec-2004 : Based on MOM_J_REL_V1
-!                        Removed all *PREV quantities from call and placed 
+!                        Removed all *PREV quantities from call and placed
 !                          in module.
 !
 	INTEGER ND_SM
 !
-	REAL(10) ETA_SM(ND_SM)
-	REAL(10) CHI_SM(ND_SM)
-	REAL(10) ESEC_SM(ND_SM)
-	REAL(10) V_SM(ND_SM)			!in km/s
-	REAL(10) SIGMA_SM(ND_SM)			!dlnV/dlnR
-	REAL(10) R_SM(ND_SM)			!in units of 10^10 cm
+	REAL(KIND=LDP) ETA_SM(ND_SM)
+	REAL(KIND=LDP) CHI_SM(ND_SM)
+	REAL(KIND=LDP) ESEC_SM(ND_SM)
+	REAL(KIND=LDP) V_SM(ND_SM)			!in km/s
+	REAL(KIND=LDP) SIGMA_SM(ND_SM)			!dlnV/dlnR
+	REAL(KIND=LDP) R_SM(ND_SM)			!in units of 10^10 cm
 !
 ! These values are computed, and returned.
 !
-	REAL(10) JNU_SM(ND_SM)
-	REAL(10) RSQHNU_SM(ND_SM)
-	REAL(10) VDOP_VEC(ND_SM)
-	REAL(10) VDOP_FRAC
+	REAL(KIND=LDP) JNU_SM(ND_SM)
+	REAL(KIND=LDP) RSQHNU_SM(ND_SM)
+	REAL(KIND=LDP) VDOP_VEC(ND_SM)
+	REAL(KIND=LDP) VDOP_FRAC
 !
 ! These are returned
 !
-	REAL(10) HFLUX_AT_OB
-	REAL(10) HFLUX_AT_IB
+	REAL(KIND=LDP) HFLUX_AT_OB
+	REAL(KIND=LDP) HFLUX_AT_IB
 !
 ! Boundary conditions: Must be supplied.
 !
-	REAL(10) DBB
+	REAL(KIND=LDP) DBB
 	CHARACTER(LEN=*) INNER_BND_METH
 	CHARACTER(LEN=*) OUTER_BND_METH
 !
-	REAL(10) FREQ,dLOG_NU
+	REAL(KIND=LDP) FREQ,dLOG_NU
 	CHARACTER*6 METHOD
 !
 ! INIT is used to indicate that there is no coupling to the previous frequency.
@@ -306,15 +309,15 @@
 !
 ! Local variables.
 !
-	REAL(10) DAMP_FAC 
-	REAL(10) T1,T2
-	REAL(10) DTAU
-	REAL(10) RSQ_JP,RSQ_HP,RSQ_NP
-	REAL(10) FMIN,FPLUS,HMIN,NMIN
-	REAL(10) MAX_ER
-	REAL(10) DELTA_R
-	REAL(10) VDOP_MIN
-	REAL(10) TA_SAV,TB_SAV,XM_SAV
+	REAL(KIND=LDP) DAMP_FAC
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) DTAU
+	REAL(KIND=LDP) RSQ_JP,RSQ_HP,RSQ_NP
+	REAL(KIND=LDP) FMIN,FPLUS,HMIN,NMIN
+	REAL(KIND=LDP) MAX_ER
+	REAL(KIND=LDP) DELTA_R
+	REAL(KIND=LDP) VDOP_MIN
+	REAL(KIND=LDP) TA_SAV,TB_SAV,XM_SAV
 !
 	INTEGER COUNT
 	INTEGER IFAIL
@@ -360,7 +363,7 @@
 !
 ! Allocate storage
 !
-	  CALL ALLOC_MOD_JREL_V6( ) 
+	  CALL ALLOC_MOD_JREL_V6( )
 !
 ! Define the revise R grid.
 !
@@ -446,7 +449,7 @@
 ! 	 (2)	Vd+1/2=0.5*( Vd + Vd+1 )
 ! Note that V is in km/s and SIGMA=(dlnV/dlnR-1.0)
 !
-	  
+	
 	  BETA_FREQ(1:ND)=V(1:ND)*3.33564D-06                  !/2.99794D+05
 	  IF(INCL_ADVEC_TERMS .OR. INCL_REL_TERMS)THEN
 	    BETA(1:ND)=BETA_FREQ(1:ND)
@@ -633,7 +636,7 @@
 !
 	IF(.NOT. INIT)THEN
 !
-! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+! We are integrating from blue to red. dLOG_NU is define as vd / dv which is
 ! the same as d / d ln v.
 !
 ! EPS is used if we define N in terms of J rather than H, This is sometimes
@@ -707,7 +710,7 @@
 	  DO I=2,ND-1
 	    TA(I)=-HL(I-1)-EPS(I-1)
 	    TC(I)=-HU(I)+EPS(I)
-	    TB(I)=DTAUONQ(I)*(P_J(I)-COH_VEC(I)) + PSI(I) + HL(I) + 
+	    TB(I)=DTAUONQ(I)*(P_J(I)-COH_VEC(I)) + PSI(I) + HL(I) +
 	1             HU(I-1)-EPS(I-1)+EPS(I)
 	    VB(I)=-HS(I-1)
 	    VC(I)=HS(I)
@@ -746,7 +749,7 @@
 	    XM(ND)=0.0D0
 !
 ! This first order inner boundary conditions assumes a hollow core, and that JPLUS_IB, HPLUS_IB,
-! KPLUS_IB, and HMIN_IB/JMIN_IB & KMIN_IB/JMIN_IB are known. These later quantities must be computed 
+! KPLUS_IB, and HMIN_IB/JMIN_IB & KMIN_IB/JMIN_IB are known. These later quantities must be computed
 ! by the ray-ray solution, and are supplied to this routine by the module MOD_RAY_MOM_STORE
 !
 ! This boundary condtion is only stable when JPLUS_IB etc are detemined by the radiation field at an
@@ -769,7 +772,7 @@
 	    ELSE
 !	      T2=GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)-1.0D0
 !	      TA(ND)=-(K_ON_J(ND-1)+VdHDR_TERM(ND-1))/DTAU
-!	      TB(ND)=(FMIN-BETA(ND)*HMIN)/DTAU + (1.0D0-FMIN)/R(ND)/CHI(ND) + 
+!	      TB(ND)=(FMIN-BETA(ND)*HMIN)/DTAU + (1.0D0-FMIN)/R(ND)/CHI(ND) +
 !	1              HMIN*(1.0D0+T1) + T1*T2*NMIN
 !	      XM(ND)=RSQ_HP+T1*(RSQ_HP-IN_HBC_PREV)-(FPLUS*RSQ_JP+BETA(ND)*RSQ_HP)/DTAU-
 !	1              (1.0D0-FPLUS)*RSQ_JP/R(ND)/CHI(ND)

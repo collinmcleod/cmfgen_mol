@@ -10,6 +10,7 @@
 	1             DI,LOG_DIST,dlnDIST_dlnT,N_DI,ION_LEV,
 	1             ED,T,JREC,dJRECdT,JPHOT,FIXED_T,
 	1             NUM_BNDS,ND,DST,DEND)
+	USE SET_KIND_MODULE
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
@@ -26,7 +27,7 @@
 !                       Extensive chnages in call (changed to V6).
 ! Altered : 08-Jun-1995 EDGE frequency delted from call.
 !                       Change from _V1 to _V2 as call changed.
-! Created - May 1995 
+! Created - May 1995
 !
 	INTEGER ID		!Number of ionization stage
 	INTEGER NLEV		!Numer of levls in HN
@@ -40,27 +41,27 @@
 !
 	INTEGER NUM_BNDS,DST,DEND
 !
-	REAL(10) WSE(NLEV,ND),dWSEdT(NLEV,ND)
+	REAL(KIND=LDP) WSE(NLEV,ND),dWSEdT(NLEV,ND)
 !
 ! Populations of species undergoing photoionization.
 !
-	REAL(10) HN(NLEV,ND),HNST(NLEV,ND),dlnHNST_dlnT(NLEV,ND)
+	REAL(KIND=LDP) HN(NLEV,ND),HNST(NLEV,ND),dlnHNST_dlnT(NLEV,ND)
 !
 ! Ion populations.
 !
-	REAL(10) DI(N_DI,ND)
-	REAL(10) LOG_DIST(N_DI,ND)
-	REAL(10) dlnDIST_dlnT(N_DI,ND)
+	REAL(KIND=LDP) DI(N_DI,ND)
+	REAL(KIND=LDP) LOG_DIST(N_DI,ND)
+	REAL(KIND=LDP) dlnDIST_dlnT(N_DI,ND)
 !
-	REAL(10) ED(ND),T(ND)
-	REAL(10) JREC(ND)
-	REAL(10) dJRECdT(ND)
-	REAL(10) JPHOT(ND)
+	REAL(KIND=LDP) ED(ND),T(ND)
+	REAL(KIND=LDP) JREC(ND)
+	REAL(KIND=LDP) dJRECdT(ND)
+	REAL(KIND=LDP) JPHOT(ND)
 	LOGICAL FIXED_T
 !
 ! Constants for opacity etc.
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local variables
@@ -69,15 +70,15 @@
 	INTEGER NT
 	INTEGER ION_V
 	INTEGER ION_EQ
-	REAL(10) T3
-	REAL(10) B_RAT
-	REAL(10) LOG_B_RAT
+	REAL(KIND=LDP) T3
+	REAL(KIND=LDP) B_RAT
+	REAL(KIND=LDP) LOG_B_RAT
 !
 ! REV_HNST referes to the LTE population  of the level defined with respect
 ! to the actual destination (target) level.
 !
-	REAL(10) REV_HNST
-	REAL(10) WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC
+	REAL(KIND=LDP) REV_HNST
+	REAL(KIND=LDP) WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC
 !
 !
 !
@@ -98,7 +99,7 @@
 	  ELSE
 	    B_RAT=1.0D0
 	    LOG_B_RAT=0.0D0
-	  END IF 
+	  END IF
 
 	  DO J=1,NLEV			!Which equation (for S.E. only)
 	    IF(WSE(J,K) .NE. 0)THEN
@@ -113,7 +114,7 @@
 	      SE(ID)%BA_PAR(J,NT-1,K) =SE(ID)%BA_PAR(J,NT-1,K)   + ED_FAC
 !
 ! Include ionizations/recombinations implicitly in the rate equation
-! of the target ion (eg He++(gs) for He+ ion/recoms ). 
+! of the target ion (eg He++(gs) for He+ ion/recoms ).
 !
 	      SE(ID)%BA_PAR(ION_EQ,J,K)    =SE(ID)%BA_PAR(ION_EQ,J,K)     + WSE_BY_RJ
 	      SE(ID)%BA_PAR(ION_EQ,ION_V,K)=SE(ID)%BA_PAR(ION_EQ,ION_V,K) - DI_FAC
@@ -122,10 +123,10 @@
 	      IF(.NOT. FIXED_T)THEN
 	        T_FAC=T3*( dlnHNST_dlnT(J,K) +
 	1             (dlnDIST_dlnT(1,K)-dlnDIST_dlnt(ION_LEV,K)) )/T(K) +
-	1             dWSEdT(J,K)*(REV_HNST*JREC(K)-HN(J,K)*JPHOT(K)) + 
+	1             dWSEdT(J,K)*(REV_HNST*JREC(K)-HN(J,K)*JPHOT(K)) +
 	1             REV_HNST*WSE(J,K)*dJRECdT(K)
 	        SE(ID)%BA_PAR(J,NT,K)   =SE(ID)%BA_PAR(J,NT,K)     + T_FAC
-	        SE(ID)%BA_PAR(ION_EQ,NT,K)   =SE(ID)%BA_PAR(ION_EQ,NT,K)    - T_FAC 
+	        SE(ID)%BA_PAR(ION_EQ,NT,K)   =SE(ID)%BA_PAR(ION_EQ,NT,K)    - T_FAC
 	      END IF
 !
 	    END IF		!WSE(J,K) .NE. 0

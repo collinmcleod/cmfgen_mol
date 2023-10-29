@@ -46,19 +46,20 @@ C                       IZERO, IONE, ITWO installed for calls.
 C                       0.2D0 replced bt T1 in call to MAX, MIN.
 C Altered 12-Dec-1997 - WM and PIVOT removed from call, and dynamic dimensioning
 !                          niw used for these variables.
-! Altered 16-Jun-2000 - Change to V2: LAMBDA_IT pased in call so that it can be 
+! Altered 16-Jun-2000 - Change to V2: LAMBDA_IT pased in call so that it can be
 !                       output with the change to OUTGEN.
 !
 	SUBROUTINE SOLVEBA_V3(BA,STEQ,TBA,POPS,
 	1   DIAG_IND,NT,NUM_BNDS,ND,
 	1   REPA,MATELIM,MAXCH,METH_SOL,
 	1   SUCCESS,SCALE_OPT,CHANGE_LIM,LAMBDA_IT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 	INTEGER NT,ND,MATELIM,DIAG_IND,NUM_BNDS
-	REAL(10) BA(NT,NT,NUM_BNDS,ND),STEQ(NT,ND)
-	REAL(10) TBA(NT,NT,ND)				!Working array
-	REAL(10) POPS(NT,ND),REPA,MAXCH,CHANGE_LIM
+	REAL(KIND=LDP) BA(NT,NT,NUM_BNDS,ND),STEQ(NT,ND)
+	REAL(KIND=LDP) TBA(NT,NT,ND)				!Working array
+	REAL(KIND=LDP) POPS(NT,ND),REPA,MAXCH,CHANGE_LIM
 	CHARACTER*(*) METH_SOL,SCALE_OPT
 	LOGICAL SUCCESS,LAMBDA_IT
 C
@@ -71,13 +72,13 @@ C
 C
 C Work arrays.
 C
-	REAL(10) WM(NT*ND)
-	REAL(10) PIVOT(NT*ND)	
+	REAL(KIND=LDP) WM(NT*ND)
+	REAL(KIND=LDP) PIVOT(NT*ND)	
 C
 C Local variables.
 C
-	REAL(10) SCALE,MINSCALE,T1,T2,T3,INCREASE,DECREASE
-	REAL(10) BIG_LIM,LIT_LIM
+	REAL(KIND=LDP) SCALE,MINSCALE,T1,T2,T3,INCREASE,DECREASE
+	REAL(KIND=LDP) BIG_LIM,LIT_LIM
 	INTEGER I,J,K,L,IST,IEND,NEWI,IINC,IDEC
 C
 	LUER=ERROR_LU()

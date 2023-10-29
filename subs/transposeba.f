@@ -6,15 +6,16 @@ C BA and NEWBA may refer to the same memory space, as can TBA and VJ.
 C TBA must be of size N*N or more, and VJ must be at least of size N*N*ND.
 C
 	SUBROUTINE TRANSPOSEBA(BA,NEWBA,TBA,VJ,N,ND)
+	USE SET_KIND_MODULE
 C
 	IMPLICIT NONE
 	INTEGER N,ND
 	INTEGER I,J,K,L,KP,LP
 C
-	REAL(10) BA(N,N,ND,ND)
-	REAL(10) NEWBA(N,ND,N,ND)
-	REAL(10) TBA(N,N)
-	REAL(10) VJ(N,ND,N)
+	REAL(KIND=LDP) BA(N,N,ND,ND)
+	REAL(KIND=LDP) NEWBA(N,ND,N,ND)
+	REAL(KIND=LDP) TBA(N,N)
+	REAL(KIND=LDP) VJ(N,ND,N)
 C
 C Interchange last two indices in BA array. At the same time we reorder
 C the eqations so that the deepest part of the atmosphere occurs first
@@ -36,7 +37,7 @@ C
 C
 C Now intechange second and third indices. In addition we now reverse
 C the order of the unknowns at a given depth.
-C 
+C
 C
 	DO K=1,ND
 C

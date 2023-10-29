@@ -8,6 +8,7 @@
 ! CMF_FLUX calling program is partially based on DISPGEN.
 !
 	PROGRAM CMFGEN
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
@@ -33,7 +34,7 @@
 ! Created:  5-Jan-1998=9 (Program began late Dec, 1998)
 !
 	INTEGER ND		!Actual number of depth points in atmosphere
-	INTEGER NC		!Actual number of core rays 
+	INTEGER NC		!Actual number of core rays
 	INTEGER NP		!Total number of rays (ND+NC)
 	INTEGER NUM_BNDS	!Number of bans in linearization matrix
 	INTEGER MAX_SIM	!Maximum number of lines that can be treated sim.
@@ -51,14 +52,14 @@
 !
 	CHARACTER*20 TEMP_KEY
 !
-	REAL(10) T1		!Temporary variable
+	REAL(KIND=LDP) T1		!Temporary variable
 	INTEGER I,J,IOS,NT
 	INTEGER EQ_TEMP
 	INTEGER LAST_ION_J
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
@@ -76,8 +77,8 @@
 !
 	INTEGER  LUER,LUWARN
 	INTEGER  ERROR_LU,WARNING_LU
-	REAL(10)   PLANCKS_CONSTANT, FUN_PI, SPEED_OF_LIGHT, BOLTZMANN_CONSTANT
-	REAL(10)   ELECTRON_MASS, ELECTRON_CHARGE
+	REAL(KIND=LDP)   PLANCKS_CONSTANT, FUN_PI, SPEED_OF_LIGHT, BOLTZMANN_CONSTANT
+	REAL(KIND=LDP)   ELECTRON_MASS, ELECTRON_CHARGE
 	EXTERNAL ERROR_LU,WARNING_LU, PLANCKS_CONSTANT, FUN_PI
 	EXTERNAL SPEED_OF_LIGHT, BOLTZMANN_CONSTANT, ELECTRON_CHARGE, ELECTRON_MASS
 !
@@ -132,7 +133,7 @@
 !
 ! Set all atomic data. New species can be simple added by insertion.
 ! Try to add species in order of atomic number. Hydrogen should ALWAYS
-! be species 1, Helium should ALWAYS be species 2. 
+! be species 1, Helium should ALWAYS be species 2.
 !
 ! While this tabulation is Verbose, it is simple to change.
 ! Note that the Solar abundances are only used for reference in
@@ -235,7 +236,7 @@
 !
 	ID=ID+1
 	AT_NO(ID)=23.0D0;	    AT_MASS(ID)=50.94D0		!Vandium
-	SPECIES(ID)='VAN';	    SPECIES_ABR(ID)='V'		!Actual symbol is V 
+	SPECIES(ID)='VAN';	    SPECIES_ABR(ID)='V'		!Actual symbol is V
 	SOL_ABUND_HSCL(ID)=4.00D0
 !
 	ID=ID+1
@@ -251,7 +252,7 @@
 	ID=ID+1
 	AT_NO(ID)=26.0D0;	    AT_MASS(ID)=55.8D0		!Iron
 	SPECIES(ID)='IRON';	    SPECIES_ABR(ID)='Fe'
-	SOL_ABUND_HSCL(ID)=7.54D0        
+	SOL_ABUND_HSCL(ID)=7.54D0
 !
 	ID=ID+1
 	AT_NO(ID)=27.0D0;	    AT_MASS(ID)=58.9D0		!Cobalt
@@ -338,7 +339,7 @@
 	1        'Option to automatically fudge number of ILs in all species')
 !
 ! We now get the number of atomic levels. Old MODEL_SPEC files, with NSF in the
-! keyword can be read. ISF take's precident over NSF, and there is no check that 
+! keyword can be read. ISF take's precident over NSF, and there is no check that
 ! there is not both an effectively identical NSF and ISF keyowrd. In this
 ! case, the number of important variables is assumed to be the same as NS.
 !
@@ -444,9 +445,9 @@
 	END IF
 !
 ! Check whether EQUATION LABELLING is consistent. ' I ' is used as the
-! number of the current equation. We also set the variable SPEC_PRES which 
+! number of the current equation. We also set the variable SPEC_PRES which
 ! indicates whether at least one ionization stage of a species is present.
-! It is used to determine, for example,  whether a number conservation 
+! It is used to determine, for example,  whether a number conservation
 ! equation is required.
 !
 	I=1
@@ -622,7 +623,7 @@
 ! The first 2 locations are for the current total opacity and emissivity.
 ! The next 3 locations are for the continuum opacity, emissivity, and
 ! electron scattering opacity.
-! levels can be used for 
+! levels can be used for
 !
 	TX_OFFSET=6
 !

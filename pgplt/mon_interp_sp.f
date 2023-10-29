@@ -1,5 +1,5 @@
 C
-C Subroutine to interpolate an array onto a new grid. The grid vector must be 
+C Subroutine to interpolate an array onto a new grid. The grid vector must be
 C either a monotonically decreasing or increasing function. A modified cubic
 C polynomial is used to do the interpolation. Instead of using
 C the excact cubic estiamtes for the first derivative at the two nodes,
@@ -18,6 +18,7 @@ C
 C Ref: Steffen. M, 1990, A/&A, 239, 443-450
 C
 	SUBROUTINE MON_INTERP_SP(QZ,NQ,LIN_END,QZR,NX,VARRAY,NV,R,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 : ERROR_LU installed

@@ -1,9 +1,10 @@
 !
-!-----Isolated and multi component HeI and NIT line profiles  
+!-----Isolated and multi component HeI and NIT line profiles
 !
 	SUBROUTINE STRK_HEI_IR(PRO,FREQ,NF,ED,TE,VTURB,                  &
 	                           POP_PROTON,POP_HEPLUS,ND,NU_ZERO,       &
 	                           SPECIES,NL,NUP,AMASS,FILENAME,LU_STRK)
+	USE SET_KIND_MODULE
 !
 ! Altered 21-MAr-2003 : Bug fixed - STKTB_PRESS was not being initilalized.
 ! Created 20-Sep-2000 : Based on STRK_HEINT and STRK_DIMITR from F. Najarro.
@@ -13,15 +14,15 @@
 	INTEGER*4 NF			!Number of frequencies
 	INTEGER*4 ND			!Number of depth points
 	INTEGER*4 LU_STRK		!Input logical unit
-	REAL(10) FREQ(NF)			!Frequncy in units of 10^15 Hz
-	REAL(10) PRO(ND,NF)		!Profile
-	REAL(10) TE(ND)			!Electron temperature (10^4 K)
-	REAL(10) ED(ND)			!Electron density (cgs units)
-	REAL(10) POP_PROTON(ND)		!Proton density (cgs units)
-	REAL(10) POP_HEPLUS(ND)		!He+ density (cgs units)
-	REAL(10) VTURB(ND)		!Turbulent velocity km/s
-	REAL(10) NU_ZERO			!Line frequency (10^15 Hz)
-	REAL(10) AMASS			!Species mass in AMU
+	REAL(KIND=LDP) FREQ(NF)			!Frequncy in units of 10^15 Hz
+	REAL(KIND=LDP) PRO(ND,NF)		!Profile
+	REAL(KIND=LDP) TE(ND)			!Electron temperature (10^4 K)
+	REAL(KIND=LDP) ED(ND)			!Electron density (cgs units)
+	REAL(KIND=LDP) POP_PROTON(ND)		!Proton density (cgs units)
+	REAL(KIND=LDP) POP_HEPLUS(ND)		!He+ density (cgs units)
+	REAL(KIND=LDP) VTURB(ND)		!Turbulent velocity km/s
+	REAL(KIND=LDP) NU_ZERO			!Line frequency (10^15 Hz)
+	REAL(KIND=LDP) AMASS			!Species mass in AMU
 	CHARACTER(LEN=*) FILENAME	!
 !
 	INTEGER*4 NL		!Lower transition level
@@ -34,16 +35,16 @@
 	INTEGER*4 STKTB_NTS
 	INTEGER*4 STKTB_NL
 	INTEGER*4 STKTB_NU
-	REAL(10) STKTB_TS(MXS)
-	REAL(10) STKTB_WS(MXS)
-	REAL(10) STKTB_DS(MXS)
-	REAL(10) STKTB_WPS(MXS)
-	REAL(10) STKTB_DPS(MXS)
-	REAL(10) STKTB_WIS(MXS)
-	REAL(10) STKTB_DIS(MXS)
+	REAL(KIND=LDP) STKTB_TS(MXS)
+	REAL(KIND=LDP) STKTB_WS(MXS)
+	REAL(KIND=LDP) STKTB_DS(MXS)
+	REAL(KIND=LDP) STKTB_WPS(MXS)
+	REAL(KIND=LDP) STKTB_DPS(MXS)
+	REAL(KIND=LDP) STKTB_WIS(MXS)
+	REAL(KIND=LDP) STKTB_DIS(MXS)
 	LOGICAL STKTB_PRESS
-	REAL(10) STKTB_DLP
-	REAL(10) STKTB_ELE
+	REAL(KIND=LDP) STKTB_DLP
+	REAL(KIND=LDP) STKTB_ELE
 	INTEGER*4 NL_RD
 	INTEGER*4 NUP_RD
 	INTEGER*4 NLSTR
@@ -54,15 +55,15 @@
 ! Local variables:
 !
 	INTEGER*4 J,IB,IA,IDE,IOS
-	REAL(10) DLS,FOS,FT,RFT,WT,RWT,RBHZ,RBA,TT,EE,VMOT,WF,Y
-	REAL(10) X,A,CON,DB,P,VA,D,W
-	REAL(10) TMP
-	REAL(10) CLIGHT,SRT
+	REAL(KIND=LDP) DLS,FOS,FT,RFT,WT,RWT,RBHZ,RBA,TT,EE,VMOT,WF,Y
+	REAL(KIND=LDP) X,A,CON,DB,P,VA,D,W
+	REAL(KIND=LDP) TMP
+	REAL(KIND=LDP) CLIGHT,SRT
 	CHARACTER*80 STRING
-	DATA CLIGHT/2.997925D18/                                         
-	DATA SRT/1.414213562D0/                                         
+	DATA CLIGHT/2.997925D18/
+	DATA SRT/1.414213562D0/
 !
-	REAL(10) VOIGTN
+	REAL(KIND=LDP) VOIGTN
 	EXTERNAL VOIGTN
 !
 	FT=NU_ZERO*1.D15
@@ -120,7 +121,7 @@
 	  RBA=VMOT*RWT
 !
 !-----Set up interpolation in T
-!						    
+!						
 	  DO J=2,STKTB_NTS
 	   IA=J
 	   IF(STKTB_TS(J).GE.TT)EXIT
@@ -172,22 +173,22 @@
 !
 ! -----Total width in doppler unit (factor /2) because table give 2W
 !
-	  A=W*RBA/2							   
+	  A=W*RBA/2							
 !
 !-----Total shift in doppler units
 !
-	  DLS=D*RBA					 
+	  DLS=D*RBA					
 	  FOS=1.0D0
 !
 !-----Satellite components
 !
 	  X=FOS
 	  CON=5.6418958D-1*RBHZ/X
-!							 
+!							
 ! -----Compute profile
 !
 	  DO J=1,NF
-	    DB=-(FREQ(J)-NU_ZERO)*VMOT/NU_ZERO 
+	    DB=-(FREQ(J)-NU_ZERO)*VMOT/NU_ZERO
 	    VA=DB-DLS
 	    P=FOS*VOIGTN(A,VA)
 	    PRO(IDE,J)=CON*P

@@ -24,6 +24,7 @@ C
 	1                       EPS_A,EPS_B,EPS_PREV_A,EPS_PREV_B,
 	1                       OLD_TX,ND,NM_TX,NM_KI,
 	1                       INIT,DO_THIS_TX_MATRIX)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 28-May-1996 : Calls to DP_ZERO removed.
@@ -36,24 +37,24 @@ C                        TX and TVX modified in the same routine, since
 C                          TVX may depend on TX at the previus frequency.
 C
 	INTEGER ND,NM_TX,NM_KI
-	REAL(10) TX(ND,ND,NM_TX)
-	REAL(10) TVX(ND-1,ND,NM_TX)
-	REAL(10) KI(ND,ND,NM_KI)
-	REAL(10) TA(ND),TB(ND),TC(ND)
-	REAL(10) PSIPREV_MOD(ND),VB(ND),VC(ND)
-	REAL(10) HU(ND),HL(ND),HS(ND)
-	REAL(10) RHS_dHdCHI(ND-1,ND)
+	REAL(KIND=LDP) TX(ND,ND,NM_TX)
+	REAL(KIND=LDP) TVX(ND-1,ND,NM_TX)
+	REAL(KIND=LDP) KI(ND,ND,NM_KI)
+	REAL(KIND=LDP) TA(ND),TB(ND),TC(ND)
+	REAL(KIND=LDP) PSIPREV_MOD(ND),VB(ND),VC(ND)
+	REAL(KIND=LDP) HU(ND),HL(ND),HS(ND)
+	REAL(KIND=LDP) RHS_dHdCHI(ND-1,ND)
 C
 C NB: _A denotes that EPS(I) multiples RJ(I)
 C     _B denotes that EPS(I) multiples RJ(I+1)
 C
-	REAL(10) EPS_A(ND),EPS_B(ND)
-	REAL(10) EPS_PREV_A(ND),EPS_PREV_B(ND)
+	REAL(KIND=LDP) EPS_A(ND),EPS_B(ND)
+	REAL(KIND=LDP) EPS_PREV_A(ND),EPS_PREV_B(ND)
 	LOGICAL INIT,DO_THIS_TX_MATRIX(NM_TX)
 C
 C Work Array.
 C
-	REAL(10) OLD_TX(ND,ND)
+	REAL(KIND=LDP) OLD_TX(ND,ND)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
@@ -168,6 +169,6 @@ C
 	  END IF	!DO_THIS_MATRIX
 	END DO		!K
 !$OMP END PARALLEL DO
- 
+
 	RETURN
 	END

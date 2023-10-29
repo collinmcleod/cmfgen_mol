@@ -11,13 +11,13 @@
 ! RJ_SUM = Int (J)
 !
 	TYPE dJ
-	  REAL(10), POINTER :: VJ_R(:,:,:)
-	  REAL(10), POINTER :: VJ_P(:,:,:)
-	  REAL(10), POINTER :: VJ_T(:,:,:)
+	  REAL(KIND=LDP), POINTER :: VJ_R(:,:,:)
+	  REAL(KIND=LDP), POINTER :: VJ_P(:,:,:)
+	  REAL(KIND=LDP), POINTER :: VJ_T(:,:,:)
 	END DO
 	TYPE dJ((BA_NUM_SPECIES*MAX_IONS_PER_SPECIES)
 !
-	REAL(10), ALLOCATABLE :: RJ_SUM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_SUM(:)
 !
 	END MODULE BA_J_DATA_MOD
 !
@@ -40,8 +40,9 @@
 	1              NU,FQW,NEW_CONT,FINAL_FREQ,
 	1              dJ_CHK_FAC,NION,
 	1              NT,NUM_BNDS,ND,DST,DEND)
+	USE SET_KIND_MODULE
 	USE BA_J_DATA_MOD
-	USE STEQ_DATA_MOD 
+	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
 ! Altered 05-Apr-2001 :: Change to V6
@@ -51,7 +52,7 @@
 !                        NIV and LNK_F_TO_IV inserted in call.
 !                        Altered to handle important variables. With
 !                        the LNK_F_TO_IV array appropriately set, the routine
-!                        will also recover the case with out important 
+!                        will also recover the case with out important
 !                        variableas.
 !
 ! Altered: 17-Sep-1997 :: QFV_R and QFV_P installed so that BA is not updated
@@ -78,19 +79,19 @@
 !
 	INTEGER NION
   	INTEGER NT,NUM_BNDS,ND,DST,DEND
-	REAL(10) VJ(NT,NUM_BNDS,ND)
-	REAL(10) POPS(NT,ND)
-	REAL(10) VCHI(NT,ND)
-	REAL(10) VETA(NT,ND)
-	REAL(10) RJ(ND)
-	REAL(10) dJ_CHK_FAC
+	REAL(KIND=LDP) VJ(NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) VCHI(NT,ND)
+	REAL(KIND=LDP) VETA(NT,ND)
+	REAL(KIND=LDP) RJ(ND)
+	REAL(KIND=LDP) dJ_CHK_FAC
 !
-	REAL(10) CHI_CONT(ND)
-	REAL(10) ESEC(ND)
-	REAL(10) T(ND)
+	REAL(KIND=LDP) CHI_CONT(ND)
+	REAL(KIND=LDP) ESEC(ND)
+	REAL(KIND=LDP) T(ND)
 !
-	REAL(10) NU
-	REAL(10) FQW
+	REAL(KIND=LDP) NU
+	REAL(KIND=LDP) FQW
 !
 	LOGICAL NON_ZERO_VJ(NT)
 !
@@ -101,17 +102,17 @@
 	LOGICAL FINAL_FREQ
 	LOGICAL NEW_CONT
 !
-	REAL(10) COMP_VEC(NT)
+	REAL(KIND=LDP) COMP_VEC(NT)
 !
 ! Constants for opacity etc.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 !
-	REAL(10) T1,T2,QFV_T
+	REAL(KIND=LDP) T1,T2,QFV_T
 	INTEGER I,J,K,L,LS,IOS,JJ,ID
 	INTEGER DIAG_INDX,BNDST,BNDEND
 !
@@ -127,7 +128,7 @@
 !	1    VJ(I,DIAG_INDX,ND/2) .EQ. 0 .AND.
 !	1    VJ(I,DIAG_INDX,ND) .EQ. 0)NON_ZERO_VJ(I)=.FALSE.
 !	END DO
-! 
+!
 	IF(.NOT. ALLOCATED(dJ(1)%VJ_R))THEN
 	  DO ID=1,NION
 	    IF(SE(ID)%XzV_PRES)THEN
@@ -149,7 +150,7 @@
 	  END IF
 	END IF
 !
-! dJ_CHK_FAC 
+! dJ_CHK_FAC
 !
 	IF(dJ_CHK_FAC .LT. 1.0D-10 .OR. dJ_CHK_FAC .GT. 0.1)THEN
 	  I=ERROR_LU()
@@ -185,7 +186,7 @@
 	      DO L=DST,DEND
 	        DO K=1,NUM_BNDS
 	          IF(K .EQ. DIAG_INDX)THEN
-	            dJ(ID)%VJ_T(:,K,L)=FQW*( RJ(L)*SE(ID)%VCHI(:,L) - SE(ID)%VETA(:,L) + 
+	            dJ(ID)%VJ_T(:,K,L)=FQW*( RJ(L)*SE(ID)%VCHI(:,L) - SE(ID)%VETA(:,L) +
 	1                       (CHI_CONT(L)-ESEC(L))*VJ(:,K,L) )
 	          ELSE
 	            dJ%VJ_T(:,K,L)=FQW*(CHI_CONT(L)-ESEC(L))*VJ(:,K,L)
@@ -230,8 +231,8 @@
 	    DO K=1,NUM_BNDS
 	      IF(K .EQ. DIAG_INDX)THEN
 	        DO I=1,NT
-	          IF(NON_ZERO_VJ(I))VJ_T(I,K,L)= VJ_T(I,K,L) + 
-	1              FQW*(RJ(L)*VCHI(I,L) - VETA(I,L)+ 
+	          IF(NON_ZERO_VJ(I))VJ_T(I,K,L)= VJ_T(I,K,L) +
+	1              FQW*(RJ(L)*VCHI(I,L) - VETA(I,L)+
 	1              T1*VJ(I,K,L) )
 	        END DO
 	      ELSE

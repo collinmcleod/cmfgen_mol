@@ -6,20 +6,21 @@ C  CPUTOT() : CPU time accumulated in each IDENT
 C  RUNTOT() : Total CPU elapsed time of the program at the point where
 C             IDENT has finished (LRUN=2)
 C
-C  
-C  we use unit LU=55 to write out data 
+C
+C  we use unit LU=55 to write out data
 C
         SUBROUTINE TUNE(LRUN,IDENT)
+	USE SET_KIND_MODULE
         IMPLICIT NONE
 	INTEGER LRUN
 	CHARACTER*(*) IDENT
 C
-        REAL(10) T0,OVERHEAD
+        REAL(KIND=LDP) T0,OVERHEAD
         INTEGER LCALL
         INTEGER MAX_IDS
         PARAMETER (MAX_IDS=50)
-        REAL(10) BEFORE(MAX_IDS),AFTER(MAX_IDS),CPUTOT(MAX_IDS)
-        REAL(10) RUNTOT(MAX_IDS)
+        REAL(KIND=LDP) BEFORE(MAX_IDS),AFTER(MAX_IDS),CPUTOT(MAX_IDS)
+        REAL(KIND=LDP) RUNTOT(MAX_IDS)
         CHARACTER*30 IDLIST(MAX_IDS)
         INTEGER I,J
 
@@ -87,6 +88,6 @@ C
 201		FORMAT(' ***** ILLEGAL VALUE OF LRUN IN CALL TO TUNE ')
 		STOP
 	ENDIF
-        
+
 	RETURN
 	END

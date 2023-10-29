@@ -3,6 +3,7 @@
 	1              ND,NT,NUM_BNDS,NION,DIAG_INDX,
 	1              TX_OFFSET,MAX_SIM,NM,NCF,NLF,
 	1              LUER,FINAL_CONSTANT_CROSS,LST_ITERATION)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE CONTROL_VARIABLE_MOD
 	USE VAR_RAD_MOD
@@ -32,13 +33,13 @@
 	LOGICAL LST_ITERATION
 	LOGICAL UPDATE_dZ
 !
-        REAL(10) FL
-	REAL(10) NU
-	REAL(10) FQW
-	REAL(10) POPS(NT,ND)
-	REAL(10) JREC(ND)
-	REAL(10) dJRECdT(ND)
-	REAL(10) JPHOT(ND)
+        REAL(KIND=LDP) FL
+	REAL(KIND=LDP) NU
+	REAL(KIND=LDP) FQW
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) JREC(ND)
+	REAL(KIND=LDP) dJRECdT(ND)
+	REAL(KIND=LDP) JPHOT(ND)
 !
         INTEGER NL,NUP
         INTEGER MNL,MNUP
@@ -47,11 +48,11 @@
         INTEGER VAR_INDX
         INTEGER INDX_BA_METH
 !
-	REAL(10) VB(ND),VC(ND)
-        REAL(10) T1,T2,T3,T4
-	REAL(10) SCL_FAC
-	REAL(10), SAVE :: SUM_BA
-	REAL(10), SAVE :: FL_OLD
+	REAL(KIND=LDP) VB(ND),VC(ND)
+        REAL(KIND=LDP) T1,T2,T3,T4
+	REAL(KIND=LDP) SCL_FAC
+	REAL(KIND=LDP), SAVE :: SUM_BA
+	REAL(KIND=LDP), SAVE :: FL_OLD
 !
 	INTEGER I,J,K,L
 	INTEGER JJ
@@ -63,8 +64,8 @@
 !
         COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
         COMMON/LINE/ OPLIN,EMLIN
-        REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-        REAL(10) OPLIN,EMLIN
+        REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+        REAL(KIND=LDP) OPLIN,EMLIN
 !
 !***********************************************************************
 !
@@ -118,7 +119,7 @@
 ! too long --- therefore try alternative method.
 !
 ! WE have replaced BA and BAION by BA_PAR and BAION_PAR in calls to
-! VSEBYJ. Since these are diagonal components, we have had to replace 
+! VSEBYJ. Since these are diagonal components, we have had to replace
 ! NUM_BANDS by IONE in the calls.
 !
 	IF(COMPUTE_BA)THEN
@@ -128,7 +129,7 @@
 !	    DST=K
 !	    DEND=K
 	  DO K=1,1
-	    DST=1       
+	    DST=1
 	    DEND=ND
 !
 ! NB: In this equation the matrices are NOT passed for WS, dWS and NU.
@@ -141,7 +142,7 @@
 	          DO J=1,ATM(ID)%N_XzV_PHOT
 	            CALL VSEBYJ_MULTI_V8(ID_SAV,
 	1             ATM(ID)%WSXzV(1,1,J), ATM(ID)%dWSXzVdT(1,1,J),
-	1             ATM(ID)%XzV, ATM(ID)%XzVLTE, ATM(ID)%dlnXzVLTE_dlnT, 
+	1             ATM(ID)%XzV, ATM(ID)%XzVLTE, ATM(ID)%dlnXzVLTE_dlnT,
 	1             ATM(ID)%NXzV,
 	1             ATM(ID+1)%XzV, ATM(ID+1)%LOG_XzVLTE,
 	1             ATM(ID+1)%dlnXzVLTE_dlnT, ATM(ID+1)%NXzV,
@@ -184,7 +185,7 @@
 ! (i.e BA(I,J,K,L) with L .NE. DIAG_INDX) are presently updated for
 ! every frequency.
 !
-! We now pass the continuum emissivity and opacity without any scattering 
+! We now pass the continuum emissivity and opacity without any scattering
 ! contribution. We use TA as a zeroed vec for ESEC, which was subtracted
 ! from CHI_CONT inside BA_UPDATE_V7.
 !
@@ -363,8 +364,8 @@
 	          OPAC_FAC=LINE_OPAC_CON(SIM_INDX)*dL_RAT_dT(K,SIM_INDX)*POPS(NL,K)
 	          EMIS_FAC=LINE_EMIS_CON(SIM_INDX)*dU_RAT_dT(K,SIM_INDX)*POPS(NUP,K)
 	          STIM_FAC=LINE_OPAC_CON(SIM_INDX)*dU_RAT_dT(K,SIM_INDX)*GLDGU(SIM_INDX)*POPS(NUP,K)
-	          dZ(6,J,K,SIM_INDX)=dZ(6,J,K,SIM_INDX)- 
-	1               MUL_FAC*( dJ_LOC(6,J,K) + RJ(K)*(OPAC_FAC-STIM_FAC)/CHIL_MAT(K,SIM_INDX) 
+	          dZ(6,J,K,SIM_INDX)=dZ(6,J,K,SIM_INDX)-
+	1               MUL_FAC*( dJ_LOC(6,J,K) + RJ(K)*(OPAC_FAC-STIM_FAC)/CHIL_MAT(K,SIM_INDX)
 	1              - RJ(K)*EMIS_FAC/ETAL_MAT(K,SIM_INDX) )
 	        END DO
 	      END IF
@@ -381,7 +382,7 @@
 	                dZ(L,J,K,SIM_INDX)=dZ(L,J,K,SIM_INDX) - MUL_FAC*dJ_LOC(L,J,K)
 	              END IF
 	            END DO
-	          ELSE 
+	          ELSE
 	            DO L=3,NM
 	              IF(DO_THIS_TX_MATRIX(L))THEN
 	                IF( L .EQ. LOW_POINTER(SIM_INDX) )THEN
@@ -401,22 +402,22 @@
 	          END IF
 	        END DO
 	      END DO
-	    END IF 
+	    END IF
 	  END DO
 !$OMP END PARALLEL DO
 	  CALL TUNE(ITWO,'dZ_LINE')
 !
 ! 
 !
-! Check whether any lines have been finalized. If so we can update the 
+! Check whether any lines have been finalized. If so we can update the
 ! variation matrices.
 !
 ! NB: Weak lines are handled in the LAMBDA ITERATION section.
 !
 ! We use ZENT_VAR_LIMIT to reduce the number of operations. When ZNET
 ! is approximatley unity, there is little point in linearizing ZNET.
-! NB: An ideal vale for ZNET_VAR_LIMIT is probably 0.01 or 0.001. If 
-! ZNET_VAR_LIMIT is zero, all depths will be included in the linearization, 
+! NB: An ideal vale for ZNET_VAR_LIMIT is probably 0.01 or 0.001. If
+! ZNET_VAR_LIMIT is zero, all depths will be included in the linearization,
 ! independent of ZNET. A very large value of ZNET (i.e. 10^4), will imply
 ! an interation on the NET_RATES, with no linearization.
 !
@@ -456,7 +457,7 @@
 	      TA(1:ND)=0.0D0
 	      IF(SPECIES_PRES(1))THEN			!If H present!
 	        DO L=1,ND
-	          TA(L)=CHI_RAY(L)/ATM(1)%XzV_F(1,L)	          
+	          TA(L)=CHI_RAY(L)/ATM(1)%XzV_F(1,L)	
 	        END DO
 	      END IF
 !
@@ -469,7 +470,7 @@
 	            DO JJ=1,SE(ID)%N_IV			!Bad notation
 	              I=SE(ID)%LNK_TO_F(JJ)
 	              dZ_POPS(I,J,K)=dZ_POPS(I,J,K) +
-	1                ( VCHI(I,L)*dZ(3,J,K,SIM_INDX) + 
+	1                ( VCHI(I,L)*dZ(3,J,K,SIM_INDX) +
 	1                    VETA(I,L)*dZ(4,J,K,SIM_INDX) )
 	            END DO
 	            dZ_POPS(NT-1,J,K)=dZ_POPS(NT-1,J,K) +
@@ -495,7 +496,7 @@
 ! Equilibrium equation, since this is automatically updated with the
 ! continuum.
 !
-! Note that there is no update of the NT equation since this is 
+! Note that there is no update of the NT equation since this is
 ! automatically included in the direct CHI*J-ETA term.
 !
 ! NOPS = 6*ND*NT*NUM_BNDS
@@ -511,7 +512,7 @@
 !
 ! NB: We compute T2 as U_STAR_RATIO may have been scaled, and this should
 ! not effect the rate equations.
-! 
+!
 	      OPAC_FAC=LINE_OPAC_CON(SIM_INDX)
 	      STIM_FAC=LINE_OPAC_CON(SIM_INDX)*GLDGU(SIM_INDX)
 !
@@ -560,7 +561,7 @@
 	          BA_T(NL,K,L)=BA_T(NL,K,L) + dRATE_dLOW
 	          T1=LINE_OPAC_CON(SIM_INDX)*(dL_RAT_dT(L,SIM_INDX)*POPS(NL,L)-GLDGU(SIM_INDX)*dU_RAT_dT(L,SIM_INDX)*POPS(NUP,L))
 	          T2=LINE_EMIS_CON(SIM_INDX)*dU_RAT_dT(L,SIM_INDX)*POPS(NUP,L)
-	          BA_T(NT,K,L)=BA_T(NT,K,L) + T3*(T1*JBAR_SIM(L,SIM_INDX) - T2*LINE_QW_SUM(L,SIM_INDX)) 
+	          BA_T(NT,K,L)=BA_T(NT,K,L) + T3*(T1*JBAR_SIM(L,SIM_INDX) - T2*LINE_QW_SUM(L,SIM_INDX))
 	        END DO
 	      END IF
 !

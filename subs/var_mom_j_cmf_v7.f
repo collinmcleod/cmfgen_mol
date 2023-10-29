@@ -14,9 +14,9 @@ C
 C NB TX(i,m, ) =dJ(i)/d(CHI(m),ETA(m),...)
 C NB TVX(i,m, ) =dRSQH(i)/d(CHI(m),ETA(m),...)
 C
-C NM_KI reflects the 3rd dimension of KI. For this routine only the first 2 
-C   are important and are used to compute the variation of J with respect to 
-C   the CURRENT opacity and the CURRENT emissivity. 
+C NM_KI reflects the 3rd dimension of KI. For this routine only the first 2
+C   are important and are used to compute the variation of J with respect to
+C   the CURRENT opacity and the CURRENT emissivity.
 C
 C TX_DIF_d_T and TX_DIFF_d_dTdR are used to describe the variations in J
 C caused by the DIFFUSION approximation at the inner boundary.
@@ -38,6 +38,7 @@ C
 	1                  HBC_PREV,IN_HBC_PREV,NBC_PREV,
 	1                  INIT,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
 	1                  DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered:   04-Feb-1997 : THETA now passed. Passed to allow coherent
@@ -46,7 +47,7 @@ C                            scattering at other depths. Only introduced
 C                            for the variation calculation. Logical variable
 C                            COHERENT no longer required.
 C Altered:   12-Dec-1996 : NM_KI installed. Changed to version V6.
-C Altered:   05-Dec-1996 : PROGDESC set to REAL(10) value, PROG_ID installed
+C Altered:   05-Dec-1996 : PROGDESC set to REAL(KIND=LDP) value, PROG_ID installed
 C                             ERROR_LU installed. TUNE installed.
 C Altered:   25-Jan-1996 : HBC, NBC (and HBC_PREV, NBC_PREV) are now
 C                            scalers. Other quantities were not needed
@@ -56,7 +57,7 @@ C                          Changed to V5
 C
 C Altered:   11-Jan-1996 : Bug in calculation of DT_DIF_d_dTDR when using
 C                             RSQN_ON_RSQJ. Initiliazation improved.
- 
+
 C Altered:   11-Mar-1995 : RSQN_ON_RSQJ installed so that N may be written in
 C                          terms of H (using G) or J.
 C                          Call modified, as were subroutines UP_TX_TVX and
@@ -69,27 +70,27 @@ C
 	INTEGER ND
 	INTEGER NM
 	INTEGER NM_KI
-	REAL(10) ETA(ND),CHI(ND),ESEC(ND),THETA(ND)
-	REAL(10) V(ND),SIGMA(ND),R(ND)
+	REAL(KIND=LDP) ETA(ND),CHI(ND),ESEC(ND),THETA(ND)
+	REAL(KIND=LDP) V(ND),SIGMA(ND),R(ND)
 C
 C Variation arrays and vectors.
 C
-	REAL(10) TX(ND,ND,NM),TVX(ND-1,ND,NM)
-	REAL(10) KI(ND,ND,NM_KI)
-	REAL(10) WORKMAT(ND,ND),RHS_dHdCHI(ND-1,ND)
-	REAL(10) TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
-	REAL(10) TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
+	REAL(KIND=LDP) TX(ND,ND,NM),TVX(ND-1,ND,NM)
+	REAL(KIND=LDP) KI(ND,ND,NM_KI)
+	REAL(KIND=LDP) WORKMAT(ND,ND),RHS_dHdCHI(ND-1,ND)
+	REAL(KIND=LDP) TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
+	REAL(KIND=LDP) TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
 C
 	LOGICAL DO_THIS_TX_MATRIX(NM)
 C
 C "Eddington factors"
 C
-	REAL(10) F(ND),G(ND),RSQN_ON_RSQJ(ND)
-	REAL(10) HBC,NBC,IN_HBC
-	REAL(10) F_PREV(ND),G_PREV(ND),RSQN_ON_RSQJ_PREV(ND)
-	REAL(10) HBC_PREV,NBC_PREV,IN_HBC_PREV
+	REAL(KIND=LDP) F(ND),G(ND),RSQN_ON_RSQJ(ND)
+	REAL(KIND=LDP) HBC,NBC,IN_HBC
+	REAL(KIND=LDP) F_PREV(ND),G_PREV(ND),RSQN_ON_RSQJ_PREV(ND)
+	REAL(KIND=LDP) HBC_PREV,NBC_PREV,IN_HBC_PREV
 C
-	REAL(10) dLOG_NU,dTdR,DBB,dDBBdT,IC
+	REAL(KIND=LDP) dLOG_NU,dTdR,DBB,dDBBdT,IC
 	CHARACTER*6 METHOD
 C
 C INIT is used to indicate that there is no coupling to the previous frequency.
@@ -102,7 +103,7 @@ C Vectors required by future calls to VAR_MOM_J_CMF.
 C
 	INTEGER NV
 	PARAMETER (NV=200)
-	REAL(10) JNUM1(NV),RSQ_HNUM1(NV)
+	REAL(KIND=LDP) JNUM1(NV),RSQ_HNUM1(NV)
 	SAVE JNUM1,RSQ_HNUM1
 C
 C Work vectors.
@@ -114,17 +115,17 @@ C
 	1                   TX_OLD_d_T,TX_OLD_d_dTdR,
 	1                   GAM,GAMH,W,WPREV,PSI,PSIPREV_MOD,PSIPREV
 C
-	REAL(10) TA(NV),TB(NV),TC(NV),DTAU(NV),RSQ_DTAUONQ(NV)
-	REAL(10) XM(NV),SOURCE(NV),Q(NV),JNU(NV),RSQ_HNU(NV)
-	REAL(10) VB(NV),VC(NV),HU(NV),HL(NV),HS(NV)
-	REAL(10) GAM(NV),GAMH(NV),W(NV),WPREV(NV)
-	REAL(10) PSI(NV),PSIPREV_MOD(NV),PSIPREV(NV)
-	REAL(10) EPS_A(NV),EPS_B(NV)
-	REAL(10) EPS_PREV_A(NV),EPS_PREV_B(NV)
-	REAL(10) TX_OLD_d_T(NV),TX_OLD_d_dTdR(NV)
+	REAL(KIND=LDP) TA(NV),TB(NV),TC(NV),DTAU(NV),RSQ_DTAUONQ(NV)
+	REAL(KIND=LDP) XM(NV),SOURCE(NV),Q(NV),JNU(NV),RSQ_HNU(NV)
+	REAL(KIND=LDP) VB(NV),VC(NV),HU(NV),HL(NV),HS(NV)
+	REAL(KIND=LDP) GAM(NV),GAMH(NV),W(NV),WPREV(NV)
+	REAL(KIND=LDP) PSI(NV),PSIPREV_MOD(NV),PSIPREV(NV)
+	REAL(KIND=LDP) EPS_A(NV),EPS_B(NV)
+	REAL(KIND=LDP) EPS_PREV_A(NV),EPS_PREV_B(NV)
+	REAL(KIND=LDP) TX_OLD_d_T(NV),TX_OLD_d_dTdR(NV)
 C
-	REAL(10) PROGDESC	
-	REAL(10), PARAMETER :: PROG_ID=2.2281463D+08  !Must be unique (VAR_MOM_)
+	REAL(KIND=LDP) PROGDESC	
+	REAL(KIND=LDP), PARAMETER :: PROG_ID=2.2281463D+08  !Must be unique (VAR_MOM_)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
@@ -132,7 +133,7 @@ C
 C Local variables.
 C
 	INTEGER I
-	REAL(10) AV_SIGMA
+	REAL(KIND=LDP) AV_SIGMA
 C
 C PROGDESC is a variable use to confirm that the scratch block is not
 C being used by some other routine.

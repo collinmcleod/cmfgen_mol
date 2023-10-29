@@ -8,40 +8,41 @@
 ! adjusted to the desired value.
 !
 	SUBROUTINE DET_R_GRID_V1(REV_TAU_GRID,NEW_ND,ND_MAX,TAU_MAX,DO_OUT_BOUND,R,V,TAU,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 12-Aug-2006
 !
 	INTEGER NEW_ND		!Requested number of grid points in new grid.
 	INTEGER ND_MAX		!Maximum number of grid points in grid.
-	REAL(10) REV_TAU_GRID(NEW_ND)
-	REAL(10) TAU_MAX		!Maximum optical depth for new grid.
+	REAL(KIND=LDP) REV_TAU_GRID(NEW_ND)
+	REAL(KIND=LDP) TAU_MAX		!Maximum optical depth for new grid.
 	LOGICAL DO_OUT_BOUND
 !
 ! These describe the old grid.
 !
 	INTEGER ND
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-	REAL(10) TAU(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) TAU(ND)
 !
 ! Local arrays.
 !
-	REAL(10) REV_R(ND_MAX)
-	REAL(10) REV_V(ND_MAX)
-	REAL(10) REV_TAU(ND_MAX)
-	REAL(10) OLD_R(ND_MAX)
-	REAL(10) OLD_TAU(ND_MAX)
-	REAL(10) LOG_TAU(ND)
+	REAL(KIND=LDP) REV_R(ND_MAX)
+	REAL(KIND=LDP) REV_V(ND_MAX)
+	REAL(KIND=LDP) REV_TAU(ND_MAX)
+	REAL(KIND=LDP) OLD_R(ND_MAX)
+	REAL(KIND=LDP) OLD_TAU(ND_MAX)
+	REAL(KIND=LDP) LOG_TAU(ND)
 !
 ! Local variables.
 !
-	REAL(10), PARAMETER :: V_SCL_FAC=0.67D0
-	REAL(10), PARAMETER :: dLOG_TAU=0.25D0
+	REAL(KIND=LDP), PARAMETER :: V_SCL_FAC=0.67D0
+	REAL(KIND=LDP), PARAMETER :: dLOG_TAU=0.25D0
 
-	REAL(10) LOG_TAU_MAX
-	REAL(10) dTAU
-	REAL(10) T1,T2
+	REAL(KIND=LDP) LOG_TAU_MAX
+	REAL(KIND=LDP) dTAU
+	REAL(KIND=LDP) T1,T2
 	INTEGER ND_TMP
 	INTEGER I,J,JST
 	INTEGER, PARAMETER :: IONE=1
@@ -92,7 +93,7 @@
 	  REV_TAU(I)=REV_TAU(I-1)+dLOG_TAU
 !
 ! Check if we are at inner boundary. If so, we decrease spacing systematically
-! to give more accuracy for our first orer boundary conditions. We ignore the 
+! to give more accuracy for our first orer boundary conditions. We ignore the
 ! velocity check.
 !
 	  IF(REV_TAU(I)+dLOG_TAU .GE. LOG_TAU_MAX)THEN

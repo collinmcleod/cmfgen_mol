@@ -1,10 +1,11 @@
 !
 ! Routine to alter the Statistical Equilibrium equations so that
-! a particular population is held fixed. 
+! a particular population is held fixed.
 !
 	SUBROUTINE FIXPOP_IN_BA_V3(BA,STEQ,ZERO_STEQ,
 	1             NT,ND,NION,DIAG_BAND,DEPTH_INDX,
 	1             FIRST_MATRIX,LAST_MATRIX)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -18,8 +19,8 @@
 	INTEGER ND
 	INTEGER NION
 	INTEGER DEPTH_INDX
-	REAL(10) BA(NT,NT)
-	REAL(10) STEQ(NT)
+	REAL(KIND=LDP) BA(NT,NT)
+	REAL(KIND=LDP) STEQ(NT)
 	LOGICAL ZERO_STEQ(NT)
 	LOGICAL FIRST_MATRIX
 	LOGICAL LAST_MATRIX
@@ -38,7 +39,7 @@
 ! Variables to allow information to be output regarding the number
 ! of levels and depths where a population was held fixed.
 !
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER, SAVE, ALLOCATABLE :: CNT(:)
 !
 	LUER=ERROR_LU()
@@ -111,11 +112,11 @@
 ! Determine whether this depth is to be held fixed, and if so
 ! update depth counter.
 !
-	  IF( EQ_SPECIES(ISPEC) .NE. 0 .AND. 
+	  IF( EQ_SPECIES(ISPEC) .NE. 0 .AND.
 	1              (FIX_SPECIES(ISPEC) .NE. 0 .OR. MOD_FIX_IMPURITY) )THEN
 	    LOC_EQ=EQ_SPECIES(ISPEC)
 	    ID=SPECIES_END_ID(ISPEC)
-	    T1=ATM(ID-1)%DXzV(DEPTH_INDX)/POP_SPECIES(DEPTH_INDX,SPECIES_LNK(ID)) 
+	    T1=ATM(ID-1)%DXzV(DEPTH_INDX)/POP_SPECIES(DEPTH_INDX,SPECIES_LNK(ID))
 	    IF( (FIX_SPECIES(ISPEC) .NE. 0) .OR. T1 .LT. 1.0D-15)THEN
 	      BA(LOC_EQ,:)=0.0D0
 	      IF(DIAG_BAND)THEN
@@ -131,7 +132,7 @@
 ! Handle those ionization stages with more than 1 level present.
 !
 	DO ID=1,NION
-	  IF( ATM(ID)%XzV_PRES .AND. 
+	  IF( ATM(ID)%XzV_PRES .AND.
 	1           (ATM(ID)%FIX_NXzV .NE. 0 .OR. MOD_FIX_IMPURITY) )THEN
 !
 	    IF(ATM(ID)%FIX_NXzV .NE. 0)THEN
@@ -152,7 +153,7 @@
 	      T1=0
 	      DO J=1,ATM(ID)%NXzV
 	        T1=T1+ATM(ID)%XzV(J,DEPTH_INDX)
-	      END DO        
+	      END DO
 	      IF( T1/POP_SPECIES(DEPTH_INDX,SPECIES_LNK(ID)) .GT. 1.0D-15 )FIX_N=-10
 	    END IF
 	    LOC_EQ=ATM(ID)%EQXzV
@@ -180,7 +181,7 @@
 	  END IF
 !
 	  IF(LAST_MATRIX .AND. CNT(ATM(ID)%EQXZV) .NE. 0)THEN
-	    IF( ATM(ID)%XzV_PRES)THEN 
+	    IF( ATM(ID)%XzV_PRES)THEN
 	      WRITE(LUER,100)FIX_N,ATM(ID)%NXzV,TRIM(ION_ID(ID)),CNT(ATM(ID)%EQXZV)
 100	      FORMAT(1X,I3,' levels of',I4,' fixed for ',A,' at',I4,' depths')
 	    ELSE

@@ -14,9 +14,9 @@
 ! NB TX(i,m, ) =dJ(i)/d(CHI(m),ETA(m),...)
 ! NB TVX(i,m, ) =dRSQH(i)/d(CHI(m),ETA(m),...)
 !
-! NM_KI reflects the 3rd dimension of KI. For this routine only the first 2 
-!   are important and are used to compute the variation of J with respect to 
-!   the CURRENT opacity and the CURRENT emissivity. 
+! NM_KI reflects the 3rd dimension of KI. For this routine only the first 2
+!   are important and are used to compute the variation of J with respect to
+!   the CURRENT opacity and the CURRENT emissivity.
 !
 ! TX_DIF_d_T and TX_DIFF_d_dTdR are used to describe the variations in J
 ! caused by the DIFFUSION approximation at the inner boundary.
@@ -36,6 +36,7 @@
 	1                  dTdR,DBB,dDBBdT,IC,
 	1	           INCL_ADVEC_TERMS,INCL_REL_TERMS,
 	1                  DO_THIS_TX_MATRIX,METHOD,ND,NM,NM_KI)
+	USE SET_KIND_MODULE
 	USE MOD_VAR_JREL_V2
 	USE MOD_RAY_MOM_STORE
 	USE MOD_TRAP_DERIVATIVES
@@ -44,38 +45,38 @@
 ! Altered: 17-Oct-2016 : Changed to V4: CHECK_H_ON J added to call.
 ! Altered: 17-Feb-2015 : Check that |r^2.H| < r^2.J
 !                         [OSPREY/cur_cmf_gam: 24-Jan-2015]
-! Altered: 14-Feb-2-14 : Changed to V3 -- Added INNER_BND_METH,OUTER_BND_METH to call. 
-!                         Removed DIF from call. 
-! Altered: 27-Dec-2008 : 
-! Created:  
+! Altered: 14-Feb-2-14 : Changed to V3 -- Added INNER_BND_METH,OUTER_BND_METH to call.
+!                         Removed DIF from call.
+! Altered: 27-Dec-2008 :
+! Created:
 !
 	INTEGER ND
 	INTEGER NM
 	INTEGER NM_KI
 !
-	REAL(10) ETA(ND)
-	REAL(10) CHI(ND)
-	REAL(10) ESEC(ND)
-	REAL(10) THETA(ND)
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-	REAL(10) SIGMA(ND)
+	REAL(KIND=LDP) ETA(ND)
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) ESEC(ND)
+	REAL(KIND=LDP) THETA(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) SIGMA(ND)
 !
 ! Variation arrays and vectors.
 !
-	REAL(10) TX(ND,ND,NM)
-	REAL(10) TVX(ND-1,ND,NM)
-	REAL(10) KI(ND,ND,NM_KI)
-	REAL(10) WORKMAT(ND,ND)
-	REAL(10) RHS_dHdCHI(ND-1,ND)
-	REAL(10) TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
-	REAL(10) TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
+	REAL(KIND=LDP) TX(ND,ND,NM)
+	REAL(KIND=LDP) TVX(ND-1,ND,NM)
+	REAL(KIND=LDP) KI(ND,ND,NM_KI)
+	REAL(KIND=LDP) WORKMAT(ND,ND)
+	REAL(KIND=LDP) RHS_dHdCHI(ND-1,ND)
+	REAL(KIND=LDP) TX_DIF_d_T(ND),TX_DIF_d_dTdR(ND)
+	REAL(KIND=LDP) TVX_DIF_d_T(ND),TVX_DIF_d_dTdR(ND)
 !
 	LOGICAL DO_THIS_TX_MATRIX(NM)
 !
-	REAL(10) IB_STAB_FACTOR
-	REAL(10) dLOG_NU,dTdR,DBB,dDBBdT,IC
-	REAL(10) dIBCHI_A,dIBCHI_B
+	REAL(KIND=LDP) IB_STAB_FACTOR
+	REAL(KIND=LDP) dLOG_NU,dTdR,DBB,dDBBdT,IC
+	REAL(KIND=LDP) dIBCHI_A,dIBCHI_B
 	CHARACTER(LEN=*) METHOD
 	CHARACTER(LEN=*) INNER_BND_METH
 	CHARACTER(LEN=*) OUTER_BND_METH
@@ -96,12 +97,12 @@
 !
 ! Local variables.
 !
-	REAL(10) T1
-	REAL(10) DTAU
-	REAL(10) FREQ
-        REAL(10) RSQ_JP,RSQ_HP,RSQ_NP
-        REAL(10) FMIN,FPLUS,HMIN,NMIN
-	REAL(10) RHS_JNU
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) DTAU
+	REAL(KIND=LDP) FREQ
+        REAL(KIND=LDP) RSQ_JP,RSQ_HP,RSQ_NP
+        REAL(KIND=LDP) FMIN,FPLUS,HMIN,NMIN
+	REAL(KIND=LDP) RHS_JNU
 !
 	INTEGER LUER,ERROR_LU
         EXTERNAL ERROR_LU
@@ -149,7 +150,7 @@
 ! 	 (2)	Vd+1/2=0.5*( Vd + Vd+1 )
 ! Note that V is in km/s and SIGMA=(dlnV/dlnR-1.0)
 !
-	  
+	
 	  BETA_FREQ(1:ND)=V(1:ND)*3.33564D-06       !/2.99794D+05
 	  IF(INCL_REL_TERMS)THEN
 	    BETA(1:ND)=BETA_FREQ(1:ND)
@@ -292,7 +293,7 @@
 !
 	IF(.NOT. INIT)THEN
 !
-! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+! We are integrating from blue to red. dLOG_NU is define as vd / dv which is
 ! the same as d / d ln v.
 !
 ! EPS is used if we define N in terms of J rather than H, This is sometimes
@@ -355,7 +356,7 @@
 	DO I=2,ND-1
 	  TA(I)=-HL(I-1)-EPS_A(I-1)
 	  TC(I)=-HU(I)+EPS_B(I)
-	  TB(I)=GAM_RSQ_DTAUONQ(I)*(P_J(I)-COH_VEC(I)) + PSI(I) + HL(I) + 
+	  TB(I)=GAM_RSQ_DTAUONQ(I)*(P_J(I)-COH_VEC(I)) + PSI(I) + HL(I) +
 	1             HU(I-1)-EPS_B(I-1)+EPS_A(I)
 	  VB(I)=-HS(I-1)
 	  VC(I)=HS(I)
@@ -373,7 +374,7 @@
 !
 	TA(1)=0.0D0
 	TC(1)= -GAM_RSQ(2)*( K_ON_J(2)+VdHdR_TERM(2) )*Q(2)/DTAU_H(1)
-	TB(1)=  GAM_RSQ(1)*( K_ON_J(1)+VdHdR_TERM(1) )*Q(1)/DTAU_H(1) + 
+	TB(1)=  GAM_RSQ(1)*( K_ON_J(1)+VdHdR_TERM(1) )*Q(1)/DTAU_H(1) +
 	1                    PSI(1) + HBC*GAM_RSQ(1)*P_H(1)
 	XM(1)=0.0D0
 	VB(1)=0.0D0
@@ -572,9 +573,9 @@
 !
 !	IF( ABS(FREQ-9.487047E-01) .LT. 1.0D-05)THEN
 !	  OPEN(UNIT=7,FILE='KI_TEST',STATUS='UNKNOWN')
-!	    CALL WR2D_V2(KI(1,1,1),ND,ND,'dCHI','*',.TRUE.,7) 
-!	    CALL WR2D_V2(KI(1,1,2),ND,ND,'dETA','#',.TRUE.,7) 
-!	    CALL WR2D_V2(RHS_dHdCHI,ND,ND,'dH','%',.TRUE.,7) 
+!	    CALL WR2D_V2(KI(1,1,1),ND,ND,'dCHI','*',.TRUE.,7)
+!	    CALL WR2D_V2(KI(1,1,2),ND,ND,'dETA','#',.TRUE.,7)
+!	    CALL WR2D_V2(RHS_dHdCHI,ND,ND,'dH','%',.TRUE.,7)
 !	  CLOSE(UNIT=7)
 !	END IF
 !

@@ -1,21 +1,22 @@
 
 C
-C Subroutine to compute the increment in optical depth along a ray with impact 
-C parameter P. The Euler-Mclaurian summation formula is used to provide an 
+C Subroutine to compute the increment in optical depth along a ray with impact
+C parameter P. The Euler-Mclaurian summation formula is used to provide an
 C approximate correction to the trapazoidal rule using the first derivatives
 C supplied in the call.
 C
-C NOTE: 
+C NOTE:
 C    [1] If the routine is call with dCHIdR=0, the trapazoidal integration
 C          rule is recovered.
-C                   
+C
 	SUBROUTINE  NORDTAU(DTAU,CHI,Z,R,dCHIdR,NI)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 25-NOV-1986 (Based on TAU)
 C
 	INTEGER NI,I
-	REAL(10) DTAU(NI),CHI(NI),Z(NI),R(NI),dCHIdR(NI)
+	REAL(KIND=LDP) DTAU(NI),CHI(NI),Z(NI),R(NI),dCHIdR(NI)
 C
 	DO I=1,NI-1
 	  DTAU(I)=0.5D0*(Z(I)-Z(I+1))*(CHI(I)+CHI(I+1)+(Z(I)-Z(I+1))
@@ -27,7 +28,7 @@ C
 C 
 C
 C Compute the first derivative of the opacity with radius. For use with NORDTAU
-C although they could also be used to define a cubic interpolation function. 
+C although they could also be used to define a cubic interpolation function.
 C
 C The first derivatives are obtained via several methods, as indicated by the
 C variable METHOD.
@@ -36,7 +37,7 @@ C METHOD =  LOGLOG: Derivative in LOG-LOG plane is obtained using the secant
 C                      connected to the 2 adjacent points (from Nordulund).
 C           LOGLIN: As for LOGLOG, but dependent variable (CHI) is in LOG Plane
 C                      while R is in the linear plane.
-C           LINEAR: As for LOGLOG, but both the dependent Variable (CHI) and 
+C           LINEAR: As for LOGLOG, but both the dependent Variable (CHI) and
 C                      the independent variable R are in the linear plane.
 C
 C           LOGMON: Derivatives at each node are derived by fitting a quadratic
@@ -50,17 +51,18 @@ C	    LINMON: Derivatives chosen so that fitting cure is monotonic.
 C                   The fitting is performed in the Linear-Linear plane.
 C
 C NOTE:
-C    [1] Originally, it was assumed that R(1)-R(2) << R(2)-R(3) and 
-C R(ND-1)-R(ND) << R(ND-1)-R(ND-2) when computing the derivative at the two 
-C positions closet to each boundary. Program now determines whether this is 
+C    [1] Originally, it was assumed that R(1)-R(2) << R(2)-R(3) and
+C R(ND-1)-R(ND) << R(ND-1)-R(ND-2) when computing the derivative at the two
+C positions closet to each boundary. Program now determines whether this is
 C the case.
 C
 	SUBROUTINE DERIVCHI(dCHIdr,CHI,R,ND,METHOD)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 02-Mar-1999 : In LOGMON the derivatives are now adjusted in the
 C                         linear-linear plane to ensure monotocity of the
-C                         fitting cubic. 
+C                         fitting cubic.
 C Altered 15-Aug-1996 : LINLOG and LINMOM installed in an effort to provided
 C                        an improved integration rule that would not produce
 C                        negative optical depth increments.
@@ -69,11 +71,11 @@ C ALtered 25-JAn-88 - Boundary condition checked.
 C Altered 20-Feb-1987 (Method option installed)
 C
 	INTEGER ND,I
-	REAL(10) CHI(ND),dCHIdR(ND),R(ND),LIM
+	REAL(KIND=LDP) CHI(ND),dCHIdR(ND),R(ND),LIM
 	CHARACTER*6 METHOD
-C                        
-	REAL(10) H(ND),SLOPE(ND)
-	REAL(10), PARAMETER :: ONE=1.0D0
+C
+	REAL(KIND=LDP) H(ND),SLOPE(ND)
+	REAL(KIND=LDP), PARAMETER :: ONE=1.0D0
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -123,10 +125,10 @@ C
 !
 	ELSE IF(METHOD .EQ. 'LINMON')THEN
 C
-C In this method a cubic is fitted between adjacent points. The first 
-C derivative at each node is estimated from the parabola passing through that 
-C node and the adjacent points. The derivatives are then adjusted to ensure 
-C that the curve in every interval is monotonic. 
+C In this method a cubic is fitted between adjacent points. The first
+C derivative at each node is estimated from the parabola passing through that
+C node and the adjacent points. The derivatives are then adjusted to ensure
+C that the curve in every interval is monotonic.
 C (After Steffen, 1990, A&A, 239, 443-450).
 C
 C Compute the interval between grid points, and the slope in each interval
@@ -155,10 +157,10 @@ C
 	ELSE IF(METHOD .EQ. 'LOGMON')THEN
 !
 ! In this method a cubic is fitted between adjacent points (in the log-log
-! plane). The first derivative at each node is estimated from the parabola 
-! passing through that node and the adjacent points. The derivatives are then 
-! converted to the linear-linear plane, and adjusted to ensure that the curve 
-! in every interval within this plane is monotonic. This ensures that 
+! plane). The first derivative at each node is estimated from the parabola
+! passing through that node and the adjacent points. The derivatives are then
+! converted to the linear-linear plane, and adjusted to ensure that the curve
+! in every interval within this plane is monotonic. This ensures that
 ! integrals computed using these derivatives remain positive.
 ! (After Steffen, 1990, A&A, 239, 443-450).
 !
@@ -220,6 +222,7 @@ C
 C 
 C
 	SUBROUTINE d_DERIVCHI_dCHI(dCHIdr,CHI,R,ND,METHOD)
+	USE SET_KIND_MODULE
 	USE MOD_TRAP_DERIVATIVES
 	IMPLICIT NONE
 C
@@ -227,20 +230,20 @@ C Altered 02-Mar-1999 : Module MOD_TRAP_DERIVATIVES replaces COMMON
 C                         BLOCK TRAPDERIVATIVES.
 C                         In LOGMON the derivatives are now adjusted in the
 C                         linear-linear plane to ensure monotocity of the
-C                         fitting cubic. 
+C                         fitting cubic.
 C ALtered 24-May-1996 ; ERROR_LU installed.
 C
 	INTEGER ND,I
-	REAL(10) CHI(ND),dCHIdR(ND),R(ND),LIM
+	REAL(KIND=LDP) CHI(ND),dCHIdR(ND),R(ND),LIM
 	CHARACTER*6 METHOD
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
-	REAL(10) SLOPE(ND),H(ND)
-	REAL(10) LIN_SLOPE(ND),LIN_H(ND)
-	REAL(10) T1,T2,ORIG_dCHIdR
-	REAL(10), PARAMETER :: ONE=1.0D0
+	REAL(KIND=LDP) SLOPE(ND),H(ND)
+	REAL(KIND=LDP) LIN_SLOPE(ND),LIN_H(ND)
+	REAL(KIND=LDP) T1,T2,ORIG_dCHIdR
+	REAL(KIND=LDP), PARAMETER :: ONE=1.0D0
 C
 	LIM=3.0D0
 	LUER=ERROR_LU()
@@ -333,10 +336,10 @@ C
 	ELSE IF(METHOD .EQ. 'LOGMON')THEN
 !
 ! In this method a cubic is fitted between adjacent points (in the log-log
-! plane). The first derivative at each node is estimated from the parabola 
-! passing through that node and the adjacent points. The derivatives are then 
-! converted to the linear-linear plane, and adjusted to ensure that the curve 
-! in every interval within this plane is monotonic. This ensures that 
+! plane). The first derivative at each node is estimated from the parabola
+! passing through that node and the adjacent points. The derivatives are then
+! converted to the linear-linear plane, and adjusted to ensure that the curve
+! in every interval within this plane is monotonic. This ensures that
 ! integrals computed using these derivatives remain positive.
 ! (After Steffen, 1990, A&A, 239, 443-450).
 !
@@ -432,10 +435,10 @@ C
 !
 	ELSE IF(METHOD .EQ. 'LINMON')THEN
 C
-C In this method a cubic is fitted between adjacent points. The first 
-C derivative at each node is estimated from the parabola passing through that 
-C node and the adjacent points. The derivatives are then adjusted to ensure 
-C that the curve in every interval is monotonic. 
+C In this method a cubic is fitted between adjacent points. The first
+C derivative at each node is estimated from the parabola passing through that
+C node and the adjacent points. The derivatives are then adjusted to ensure
+C that the curve in every interval is monotonic.
 C (After Steffen, 1990, A&A, 239, 443-450).
 C
 C Compute the interval between grid points, and the slope in each interval
@@ -496,7 +499,7 @@ C
 	    A(ND)=-B(ND)
 	  ELSE IF( T1 .NE. 0)THEN
 	    B(ND)=1.0D0/H(ND-1)
-	    A(ND)=-B(ND)     
+	    A(ND)=-B(ND)
 	  END IF
 C
 	ELSE IF(METHOD(1:4) .EQ. 'ZERO')THEN

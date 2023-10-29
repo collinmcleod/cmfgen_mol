@@ -6,6 +6,7 @@
 !
 	SUBROUTINE SOLVE_FOR_POPS(POPS,NT,NION,ND,NC,NP,NUM_BNDS,DIAG_INDX,
 	1            MAXCH,MAIN_COUNTER,IREC,LU_SE,LUSCR,LST_ITERATION)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
         USE ANG_QW_MOD
 	USE CONTROL_VARIABLE_MOD
@@ -33,8 +34,8 @@
 	INTEGER NUM_BNDS
 	INTEGER DIAG_INDX
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) MAXCH
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) MAXCH
 !
 	INTEGER MAIN_COUNTER
 	INTEGER IREC
@@ -44,13 +45,13 @@
 !
 ! Local data
 !
-	REAL(10) SOL(NT,ND)
-	REAL(10) R_OLD(ND)
-	REAL(10) TA(ND)
-	REAL(10) TB(ND)
-	REAL(10) ESEC(ND)
-	REAL(10) T1,T2
-	REAL(10), SAVE :: MAXCH_SUM=0.0D0
+	REAL(KIND=LDP) SOL(NT,ND)
+	REAL(KIND=LDP) R_OLD(ND)
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) TB(ND)
+	REAL(KIND=LDP) ESEC(ND)
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP), SAVE :: MAXCH_SUM=0.0D0
 	INTEGER, SAVE :: COUNT_FULL_LAM_BA=1
 !
 	INTEGER I,J
@@ -66,7 +67,7 @@
 	LUER=ERROR_LU()	
 !
 ! We can adjust the BA/STEQ equations so that certain species are
-! held fixed. For all species, this now done using FIXPOP_IN_BA_V2 
+! held fixed. For all species, this now done using FIXPOP_IN_BA_V2
 ! called by GENERATE_FULL_MATRIX.
 !
 	MOD_FIXED_NE=FIXED_NE
@@ -74,10 +75,10 @@
 	MOD_FIXED_T=.FALSE.
 !
 ! Determine those depths where the temperature is to be held fixed.
-! If either FIXED_T of RD_FIX_T is true, the temperature is fixed independent 
-! of VARFIXT. We zero all elements of the R.E. Eq. except the local variation 
-! with respect to T. For a LAMBDA iteration this element is zero, and hence 
-! must be set. 
+! If either FIXED_T of RD_FIX_T is true, the temperature is fixed independent
+! of VARFIXT. We zero all elements of the R.E. Eq. except the local variation
+! with respect to T. For a LAMBDA iteration this element is zero, and hence
+! must be set.
 !
 	MOD_TAU_SCL_T=TAU_SCL_T
 	MOD_FIX_T_D_ST=0
@@ -161,14 +162,14 @@
 	  IF(CNT_FIX_BA .GT. N_ITS_TO_FIX_BA .AND. MAXCH .GT. VAL_FIX_BA)THEN
 	    COMPUTE_BA=L_TRUE
 	    WRBAMAT=WRBAMAT_RDIN
-	  ELSE 
+	  ELSE
 	    IF(WRBAMAT_RDIN)COMPUTE_BA=L_FALSE
 	  END IF
 	  IF(CNT_FIX_BA .GT. N_ITS_TO_FIX_BA .AND. MAXCH_SUM .GT. 3.0D0*VAL_FIX_BA)THEN
 	    MAXCH_SUM=0.0D0
 	    COMPUTE_BA=L_TRUE
 	    WRBAMAT=WRBAMAT_RDIN
-	  END IF 
+	  END IF
 !
 ! This will force BA to be recomuted again, after N_ITS_TO_FIX_BA, because T was variable
 ! at some depths.
@@ -183,16 +184,16 @@
 ! iteration, and if T was not partially held fixed at some depths.
 !
 ! We now only right out the BA matrix if we are nearing the correct solution,
-! and assuming that it is a full solution matrix (i.e. not from a 
+! and assuming that it is a full solution matrix (i.e. not from a
 ! LAMBDA iteration and CON_SCL_T was not set).
 !
 	  COMPUTE_BA=L_TRUE
-	  IF( MAXCH .LT. VAL_FIX_BA .AND. WRBAMAT 
+	  IF( MAXCH .LT. VAL_FIX_BA .AND. WRBAMAT
 	1          .AND. .NOT. LAMBDA_ITERATION
 	1          .AND. CON_SCL_T .EQ. 0.0D0)THEN
 	    COMPUTE_BA=COMPUTE_BARDIN
 	  END IF
-	  IF(WRBAMAT_RDIN .AND. MAXCH .LT. 2.0D0*VAL_FIX_BA 
+	  IF(WRBAMAT_RDIN .AND. MAXCH .LT. 2.0D0*VAL_FIX_BA
 	1         .AND. .NOT. LAMBDA_ITERATION
 	1          .AND. CON_SCL_T .EQ. 0.0D0)THEN
 	    WRBAMAT=.TRUE.
@@ -257,7 +258,7 @@
 ! NEXT_NG=2000 indicates a CONTINUING model.
 !
 ! A NG acceleration can be forced after 1 iteration if LAST_NG is set to
-! some vale .LE. MAIN_COUNTER-ITE_PER_NG in the POINT1 file, and provide the 
+! some vale .LE. MAIN_COUNTER-ITE_PER_NG in the POINT1 file, and provide the
 ! change on that iteration is less than VAL_DO_NG.
 !
 	IF(MAIN_COUNTER .LT. IT_TO_BEG_NG-3)THEN
@@ -275,7 +276,7 @@
 !
 ! We switch between LINEARIZATION and LAMBDA iterations until the
 ! maximum percentage change is less  than VAL_DO_LAM. RD_CNT_LAM iterations
-! are performed per full linearization. RD_LAMBDA overrides this section if 
+! are performed per full linearization. RD_LAMBDA overrides this section if
 ! TRUE. We only do a LAMBDA iteration with T fixed. NB --- FIX_IMPURITY
 ! is a soft option --- is removed when convergence nearly obtained.
 !
@@ -308,7 +309,7 @@
 	  END IF
 	END IF
 !
-! Automatically adjust R grid, so that grid is uniformally spaced on the 
+! Automatically adjust R grid, so that grid is uniformally spaced on the
 ! FLUX optical depth scale. Used for SN models with very sharp ioinization
 ! fronts. By doing it before the output to SCRTEMP, we ensure that
 ! a continuuing model starts with the revised R grid.
@@ -347,9 +348,9 @@
 ! > 20%. In this case, the BA matrix will also be recaluated on
 ! the next full iteration.
 !
-!	WRITE(6,*)MAIN_COUNTER,NEXT_AV,LAST_LAMBDA+NUM_OSC_AV+2  
+!	WRITE(6,*)MAIN_COUNTER,NEXT_AV,LAST_LAMBDA+NUM_OSC_AV+2
 !	WRITE(6,*)NEXT_NG-4,LAST_AV+ITS_PER_AV
-!	WRITE(6,*)AVERAGE_DO,LST_ITERATION 
+!	WRITE(6,*)AVERAGE_DO,LST_ITERATION
 !
 	AVERAGE_DONE=.FALSE.
 	IF(MAIN_COUNTER .NE. LAST_LAMBDA .AND. UNDO_LAST_IT)THEN
@@ -364,7 +365,7 @@
 !
 	IF(AVERAGE_DO .AND. MAIN_COUNTER .GE. NEXT_AV
 	1             .AND. MAIN_COUNTER .GT. LAST_NG+NUM_OSC_AV
-	1             .AND. MAIN_COUNTER .GT. LAST_LAMBDA+NUM_OSC_AV+2 
+	1             .AND. MAIN_COUNTER .GT. LAST_LAMBDA+NUM_OSC_AV+2
 	1             .AND. (MAIN_COUNTER .LT. NEXT_NG-4 .OR. .NOT. NG_DO)
 	1             .AND. MAIN_COUNTER .GE. LAST_AV+ITS_PER_AV
 	1             .AND. .NOT. LST_ITERATION)THEN

@@ -1,5 +1,6 @@
       SUBROUTINE ZSYRK ( UPLO, TRANS, N, K, ALPHA, A, LDA,
      $                   BETA, C, LDC )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       CHARACTER*1        UPLO, TRANS
       INTEGER            N, K, LDA, LDC

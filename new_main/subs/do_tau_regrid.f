@@ -3,14 +3,15 @@
 ! TAU is based on the FLUX mean opacity.
 !
 	SUBROUTINE DO_TAU_REGRID(POPS,ESEC,R_OLD,DONE_R_REV,ND,NT)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
 	INTEGER ND,NT
 
-	REAL(10) POPS(NT,ND)
-	REAL(10) ESEC(ND)			!Electron scattering opacity
-	REAL(10) R_OLD(ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) ESEC(ND)			!Electron scattering opacity
+	REAL(KIND=LDP) R_OLD(ND)
 	LOGICAL DONE_R_REV
 !
 ! For specifying grid.
@@ -21,29 +22,29 @@
 !
 ! Local variables.
 !
-	REAL(10) LOG_R(ND)
-	REAL(10) LOG_R_OLD(ND)
-	REAL(10) NEW_V(ND)
-	REAL(10) dTAU_OLD(ND)
-	REAL(10) TAU_OLD(ND)
-	REAL(10) TAU(ND)
+	REAL(KIND=LDP) LOG_R(ND)
+	REAL(KIND=LDP) LOG_R_OLD(ND)
+	REAL(KIND=LDP) NEW_V(ND)
+	REAL(KIND=LDP) dTAU_OLD(ND)
+	REAL(KIND=LDP) TAU_OLD(ND)
+	REAL(KIND=LDP) TAU(ND)
 !
-	REAL(10) TA(ND)			!Work vectors
-	REAL(10) TB(ND)
+	REAL(KIND=LDP) TA(ND)			!Work vectors
+	REAL(KIND=LDP) TB(ND)
 !
 ! The fine grid (FG) is chosen to cover the ionization front. The default values are
 ! -2.0 to 1.0D0 in log(TAU) space.
 !
-	REAL(10) FG_MIN			!Min Tau for FG
-	REAL(10) FG_MAX			!Max Tau for FG
-	REAL(10) FG_RANGE
+	REAL(KIND=LDP) FG_MIN			!Min Tau for FG
+	REAL(KIND=LDP) FG_MAX			!Max Tau for FG
+	REAL(KIND=LDP) FG_RANGE
 !
-	REAL(10) T1
-	REAL(10) LOG_TAU
-	REAL(10) STRETCH_POW		!Power law exponent to stretch tau scale about 1
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) LOG_TAU
+	REAL(KIND=LDP) STRETCH_POW		!Power law exponent to stretch tau scale about 1
 !
-	REAL(10) OBND_PARAMS(5)		!Parameters specifying grid placement at outer boundary.
-	REAL(10) IBND_PARAMS(5)		!Parameters specifying grid placement at nner boundary.
+	REAL(KIND=LDP) OBND_PARAMS(5)		!Parameters specifying grid placement at outer boundary.
+	REAL(KIND=LDP) IBND_PARAMS(5)		!Parameters specifying grid placement at nner boundary.
 !
 	INTEGER NUM_IBND_PARAMS		!Number of points inserted near inner boundary.
 	INTEGER NUM_OBND_PARAMS		!Number of points inserted near outer boundary.
@@ -123,7 +124,7 @@
 	  END DO
 	END IF
 !
-! Compute optical depth depth increments. We use the FLUX_MEAN optical depth 
+! Compute optical depth depth increments. We use the FLUX_MEAN optical depth
 ! scale, except if it has a problem and is less than ESEC.
 !
 	DO I=1,ND
@@ -133,7 +134,7 @@
         TB(1:ND)=0.0D0                              !Used for dCHIdR
         CALL NORDTAU(dTAU_OLD,TA,R,R,TB,ND)
 !
-! Compute optical depth scale. Note that we are given the optical depth 
+! Compute optical depth scale. Note that we are given the optical depth
 ! increments, not the optical depth scale. We assume a power law dependence
 ! for the opacity when evaluating the optical depth at the outer boundary.
 !
@@ -190,7 +191,7 @@
 !
 	ELSE IF(TRIM(GRID_TYPE) .EQ. 'FIX_NX')THEN
 !
-! This option allows us to specify a particular region in which extra points 
+! This option allows us to specify a particular region in which extra points
 ! are inserted. The grid could have slight jumps in spacing across the
 ! specied region.
 !
@@ -262,7 +263,7 @@
 	  WRITE(T_OUT,*)'Invalid GRID_TYPE in ADJUST_R_GRID'
 	  WRITE(T_OUT,*)'GRID_TYPE=',TRIM(GRID_TYPE)
 	  STOP
-	END IF 
+	END IF
 !
 ! Do grid at inner boundary. We set NUM_IBND_PARAMS extra points.
 !
@@ -281,7 +282,7 @@
 	END IF
 	WRITE(LU,'(A)')'! Done inner boundary in DO_TAU_REGRID'
 !
-! Now do outer boundary. 
+! Now do outer boundary.
 !
 	dLOG_TAU=TAU(NUM_OBND_PARAMS+2)-TAU(1)
 	IF(OUT_BND_OPT .EQ. 'DEFAULT')THEN

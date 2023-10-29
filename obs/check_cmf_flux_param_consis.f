@@ -2,6 +2,7 @@
 ! File to check the consistency of parameters for CMF_FLUX.
 !
 	SUBROUTINE CHECK_CMF_FLUX_PARAM_CONSIS()
+	USE SET_KIND_MODULE
 	USE CMF_FLUX_CNTRL_VAR_MOD
 	IMPLICIT NONE
 !

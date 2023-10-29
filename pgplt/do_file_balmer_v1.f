@@ -5,6 +5,7 @@
 ! Routine is designed to be called in GRAMON_PGPLOT.
 !
 	SUBROUTINE DO_FILE_BALMER_V1(FILE_WITH_LINE_LIMS,IP_OBS)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
@@ -28,10 +29,10 @@
 	INTEGER NPIX
 	INTEGER IST,IEND		!Line limits in pixel space
 	REAL*4 LAM_ST,LAM_END           !Line limits in lambda space
-	REAL(10) LAM_CENT			!Line centroid
-	REAL(10) MEAN 			!Used computing line centroid
-	REAL(10) EW_MOD,EW_OBS
-        REAL(10) EW_OBS_OMIT,EW_MOD_OMIT
+	REAL(KIND=LDP) LAM_CENT			!Line centroid
+	REAL(KIND=LDP) MEAN 			!Used computing line centroid
+	REAL(KIND=LDP) EW_MOD,EW_OBS
+        REAL(KIND=LDP) EW_OBS_OMIT,EW_MOD_OMIT
 !
 ! Work variables
 !
@@ -44,11 +45,11 @@
 !
 ! Work variable used to compute slope of line that yields the lowest chi^2.
 !
-	REAL(10) SUM_OSQ, SUM_LOSQ, SUM_LSQ_OSQ
-	REAL(10) SUM_MO, SUM_LMO
-	REAL(10) A, B
-	REAL(10) DET, DA, DB
-	REAL(10) CHISQ,RAW_CHISQ,RED_CHISQ
+	REAL(KIND=LDP) SUM_OSQ, SUM_LOSQ, SUM_LSQ_OSQ
+	REAL(KIND=LDP) SUM_MO, SUM_LMO
+	REAL(KIND=LDP) A, B
+	REAL(KIND=LDP) DET, DA, DB
+	REAL(KIND=LDP) CHISQ,RAW_CHISQ,RED_CHISQ
 !
 ! Mask is to omit regions containg weak lines in the Balmer wings.
 !
@@ -76,7 +77,7 @@
 	LOGICAL END_FILE
 	LOGICAL FILE_PRES
 !
-	CHARACTER(LEN=80) OUT_FILE 
+	CHARACTER(LEN=80) OUT_FILE
 	CHARACTER(LEN=80) STRING
 	CHARACTER(LEN=80) TRANS_NAME
 !
@@ -148,7 +149,7 @@
 	        END DO
 	      END DO
 !
-	      SUM_OSQ=0.0D0;    SUM_LOSQ=0.0D0;   SUM_LSQ_OSQ=0.0D0 
+	      SUM_OSQ=0.0D0;    SUM_LOSQ=0.0D0;   SUM_LSQ_OSQ=0.0D0
 	      SUM_MO=0.0D0;     SUM_LMO=0.0D0;    NPIX=0.0D0
 	      DO I=IST,IEND
 	        NPIX=NPIX+NINT(MASK(I)*1.0D0)
@@ -165,7 +166,7 @@
 	      DET=SUM_OSQ*SUM_LSQ_OSQ-SUM_LOSQ*SUM_LOSQ
 	      DA=SUM_MO*SUM_LSQ_OSQ-SUM_LMO*SUM_LOSQ
 	      DB=SUM_OSQ*SUM_LMO-SUM_LOSQ*SUM_MO
-	      A=DA/DET; B=DB/DET 
+	      A=DA/DET; B=DB/DET
 !
 ! Compute CHI^2
 !
@@ -190,9 +191,9 @@
 	     END DO
 	     T1=T1/3; T2=T2/3
 	     SLOPE=(T2-T1)/(CD(IP_OBS)%XVEC(IEND-1)-CD(IP_OBS)%XVEC(IST+1))
-	     INTER=T1 
+	     INTER=T1
 	    WRITE(6,*)'B'
-! 
+!
 ! Since the obersevations have been "normalized" we assume that the
 ! continuum is the same for the observations.
 !
@@ -205,9 +206,9 @@
 	       EW_MOD=EW_MOD+(1.0D0-MOD_DATA(I)/CONT)*ABS(T2)
 	     END DO
 	    WRITE(6,*)'C'
-!       
+!
 ! Simple trapzoidal rule integration. These EWs exclude the omitted regions.
-!       
+!
 	     EW_OBS_OMIT=0.0D0; EW_MOD_OMIT=0.0D0
 	     DO I=IST,IEND
 	       CONT=INTER+SLOPE*(CD(IP_OBS)%XVEC(I)-CD(IP_OBS)%XVEC(IST+1))
@@ -253,6 +254,7 @@
 	CONTAINS
 !
 	SUBROUTINE WRITE_BALMER_HEADER(LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER LU,IP
 !

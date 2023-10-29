@@ -2,6 +2,7 @@
 ! General purpose line plotting routine to label lines is a spectrum.
 !
 	SUBROUTINE DRAW_LINE_IDS_V2(XPAR,YPAR,EXPCHAR,IP,T_OUT)
+	USE SET_KIND_MODULE
 	USE MOD_CURVE_DATA
 	USE LINE_ID_MOD
 	USE MOD_COLOR_PEN_DEF
@@ -13,7 +14,7 @@
 ! Altered 05-Sep-2022 : Changed labeling algorithm slightly. Works better but not efficient/perfect.
 ! Altered 22-Apr-2020 : Labeling algorithim altered to prevent overlap. Label loction may
 !                         not be optimal.
-! 
+!
 	REAL*4 XPAR(2)
 	REAL*4 YPAR(2)
 	REAL*4 XSTRPOS,YSTRPOS
@@ -79,7 +80,7 @@
 	        EXIT
 	      END IF
 	    END DO
-! 
+!
 ! We only check lines that lie in the FULL spectral window.
 ! This is necessary forobserved data.
 !
@@ -98,7 +99,7 @@
 	        END IF
 	      END IF
 	    END DO
-	  END IF 
+	  END IF
 !
 ! Set the pen and character size.
 !
@@ -108,7 +109,7 @@
 	  CALL PGQCS(IFOUR,XCHAR_SIZE,YCHAR_SIZE)
 	  IF(TRACE)WRITE(T_OUT,*)'XCHAR_SIZE=',XCHAR_SIZE
 !
-! Determine maximum number of label slots. 
+! Determine maximum number of label slots.
 !
 	  LAB_SIZE=1.1D0*XCHAR_SIZE
 	  LAB_START=XPAR(1)+2*LAB_SIZE

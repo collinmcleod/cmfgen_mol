@@ -1,6 +1,7 @@
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       function condit_string(answer,nchar) result(string)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -33,7 +34,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       string=adjustl(answer)
-c     
+c
       nchar=len_trim(string)
 c
 c Remove all double spaces between parameters

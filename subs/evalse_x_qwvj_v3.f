@@ -1,8 +1,8 @@
 C
-C Subroutine to increment the statistical equilibrium equations for each 
+C Subroutine to increment the statistical equilibrium equations for each
 C depth point given the value of the mean intensity at each depth point.
 C
-C Subroutine also increments the QFV_R AND QFV_P matrices that describe the 
+C Subroutine also increments the QFV_R AND QFV_P matrices that describe the
 C variation of the SE quations with respect to RJ.
 C
 C Routine also increments the ionization equilibrium equations.
@@ -13,6 +13,7 @@ C
 	1                    HN_A,HNST_A,N_A,HN_B,HNST_B,N_B,
 	1                    JREC,JPHOT,EQ_A,ION_EQ,SPEC_EQ,NT,ND,
 	1                    STEQION,QFVION_R,QFVION_P,EQ_A_BAL,EQ_B_BAL,NION)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 17-Sep-1997 : QFV matix split into QFV_R and QFV_B so that a
@@ -38,44 +39,44 @@ C
         INTEGER NION		!Numer of Eqns. in ionization matrix.
 C
 C NB --- NION is the total number of ionic species i.e. for
-C HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and 
+C HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and
 C CV [if no CVI]).
 C
-	REAL(10) STEQ(NT,ND)
-	REAL(10) STEQION(NION,ND)
-	REAL(10) QFV_R(NT,ND)			!Recombination weight
-	REAL(10) QFVION_R(NION,ND)
-	REAL(10) QFV_P(NT,ND)			!Photoiozation weight
-	REAL(10) QFVION_P(NION,ND)
+	REAL(KIND=LDP) STEQ(NT,ND)
+	REAL(KIND=LDP) STEQION(NION,ND)
+	REAL(KIND=LDP) QFV_R(NT,ND)			!Recombination weight
+	REAL(KIND=LDP) QFVION_R(NION,ND)
+	REAL(KIND=LDP) QFV_P(NT,ND)			!Photoiozation weight
+	REAL(KIND=LDP) QFVION_P(NION,ND)
 C
-	REAL(10) HN_A(N_A,ND)		!    Pops. of ith ionzation stage
-	REAL(10) HNST_A(N_A,ND)		!LTE   "    "  "      "       "
-	REAL(10) HN_B(N_B,ND)		!    Pops. of (i+1)th ionization stage
-	REAL(10) HNST_B(N_B,ND)		!LTE   "   "    "       "        "
+	REAL(KIND=LDP) HN_A(N_A,ND)		!    Pops. of ith ionzation stage
+	REAL(KIND=LDP) HNST_A(N_A,ND)		!LTE   "    "  "      "       "
+	REAL(KIND=LDP) HN_B(N_B,ND)		!    Pops. of (i+1)th ionization stage
+	REAL(KIND=LDP) HNST_B(N_B,ND)		!LTE   "   "    "       "        "
 C
 C WSE_X is the quadrature weight for X-ray ionization (with 2e ejected) for
 C ionization state i [final product is (i+1)].
 C
-	REAL(10) WSE_X(N_A,ND)
-	REAL(10) JREC(ND)			! Int (2h/c2v^3+J)*EXP(-hv/kT)/v dv
-	REAL(10) JPHOT(ND)		! Int J/v dv
+	REAL(KIND=LDP) WSE_X(N_A,ND)
+	REAL(KIND=LDP) JREC(ND)			! Int (2h/c2v^3+J)*EXP(-hv/kT)/v dv
+	REAL(KIND=LDP) JPHOT(ND)		! Int J/v dv
 C
 C Constants for opacity etc.
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 C Local variables.
 C
 	INTEGER I,J
-	REAL(10) NETR
-	REAL(10) SUM_SE
-	REAL(10) SUM_VJ_R,SUM_VJ_P
-	REAL(10) J_B_ION,B_ION
+	REAL(KIND=LDP) NETR
+	REAL(KIND=LDP) SUM_SE
+	REAL(KIND=LDP) SUM_VJ_R,SUM_VJ_P
+	REAL(KIND=LDP) J_B_ION,B_ION
 C
 C The net ionization (collisional and radaitive) to the last ionization stage
 C must be zero from the sum of the previous equilibrum equations. Hence
-C there is no need for a rate equation for the final species - it is 
+C there is no need for a rate equation for the final species - it is
 C preserved for the abundance equation.
 C
 C Note that the product HNST_A(j, )*HNST_B(1, )/HN_B(1, ) is effectively the
@@ -98,7 +99,7 @@ C
 	    SUM_VJ_P=SUM_VJ_P + WSE_X(I,J)*HN_A(I,J)
 	  END DO
 C
-C Include effects of X-rays on equation of target ion. For K shell 
+C Include effects of X-rays on equation of target ion. For K shell
 C ionizations of species  with more than 3 electrons, as considered here,
 C 2 electrons are given off. Thus ION_EQ should refer to the g.s. of the
 C (i+2)th ionization stage.
@@ -111,7 +112,7 @@ C
 C
 C Add in effect of X-rays to ionization/recombination balance equation.
 C X-rays ionize from level i to i+2. However, for numerical stability
-C we analytically cancel lower phot/recom. rates from rate equations. 
+C we analytically cancel lower phot/recom. rates from rate equations.
 C As a consequence X-ray rates are only included consecutive ionization
 C stages.
 C

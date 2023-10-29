@@ -3,6 +3,7 @@ C Program to output BA and STEQ matrices to scratch file so program
 C can be retsarted in event of a crash.
 C
 	SUBROUTINE STOREBA(BA,STEQ,LU,NT,NS,NL,COMPUTE_BA,DESC)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 18-Oct-2000 - LU1 was not being set on ENTRY call to INIT_BA_PNT
@@ -28,7 +29,7 @@ C included since it changes during program execution, and hence is not
 C the same as in VADAT file.
 C
 	LOGICAL COMPUTE_BA
-	REAL(10) BA(NT),STEQ(NS)
+	REAL(KIND=LDP) BA(NT),STEQ(NS)
 	CHARACTER DESC*(*)		!File name for BA &STEQ output.
 C
 	LOGICAL FILE_OPEN

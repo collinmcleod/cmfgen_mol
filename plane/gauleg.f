@@ -1,26 +1,27 @@
 !
 ! Given the lower and upper limits of integration X1 and X2, and given N, this
-! routine returns X and W of LENGTH N containing the abscissas and weights of 
+! routine returns X and W of LENGTH N containing the abscissas and weights of
 ! the Gauss-Legendre N-point quadrature formulae.
 !
 ! Adapted from Numerical recipes.
 !
 	SUBROUTINE GAULEG(X1,X2,X,W,N)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 10-Apr-1995
 !
 	INTEGER N
-	REAL(10) X1,X2,X(N),W(N)
+	REAL(KIND=LDP) X1,X2,X(N),W(N)
 !
 ! Local variables.
 !
-	REAL(10), PARAMETER :: EPS=3.0D-14
+	REAL(KIND=LDP), PARAMETER :: EPS=3.0D-14
 !
-	REAL(10) XM,XL
-	REAL(10) P1,P2,P3,dP
-	REAL(10) Z,Z1
-	REAL(10) ANS,SUM
+	REAL(KIND=LDP) XM,XL
+	REAL(KIND=LDP) P1,P2,P3,dP
+	REAL(KIND=LDP) Z,Z1
+	REAL(KIND=LDP) ANS,SUM
 	INTEGER I,J,M
 !
 ! Check sensible limits.
@@ -31,7 +32,7 @@
 	  WRITE(5,*)'X1=',X1
 	END IF
 !
-! XM and XL are used to convert the abscissa and weights to the desired 
+! XM and XL are used to convert the abscissa and weights to the desired
 ! integration interval.
 !
 	XM=0.5D0*(X2+X1)
@@ -79,7 +80,7 @@
 ! We compare the error to the absolute largest term in the formulae for ANS,
 ! since it is possible for the integration to be identically zero. We use P1
 ! as a temporary variable.
-! 
+!
 	DO J=0,2*N-1
 	  SUM=0.0D0
 	  DO I=1,N

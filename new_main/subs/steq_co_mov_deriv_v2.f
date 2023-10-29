@@ -7,6 +7,7 @@
 	SUBROUTINE STEQ_CO_MOV_DERIV_V2(RELAXATION_PARAMETER,LINEAR,
 	1             INCL_DT_TERM,LAMBDA_ITERATION,COMPUTE_BA,
 	1             TIME_SEQ_NO,NUM_BNDS,ND,NT)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
@@ -18,7 +19,7 @@
 !                         passed by module MOD_CMFGEN.
 ! Created 12-Dec-2005: Based on STEQ_ADVEC_V4
 !
-	REAL(10) RELAXATION_PARAMETER
+	REAL(KIND=LDP) RELAXATION_PARAMETER
 !
 	INTEGER NUM_BNDS
 	INTEGER ND
@@ -28,23 +29,23 @@
 	LOGICAL LAMBDA_ITERATION
 	LOGICAL COMPUTE_BA
 	LOGICAL LINEAR
-	LOGICAL INCL_DT_TERM 
+	LOGICAL INCL_DT_TERM
 !
 ! Local variables.
 !
-	REAL(10) OLD_POPS(NT,ND)
-	REAL(10) OLD_R(ND)
+	REAL(KIND=LDP) OLD_POPS(NT,ND)
+	REAL(KIND=LDP) OLD_R(ND)
 !
-	REAL(10) SUM(NUM_IONS,ND)
-	REAL(10) T1,T2
-	REAL(10) DERIV_CONST
-	REAL(10) DELTA_TIME_SECS			!Time step
+	REAL(KIND=LDP) SUM(NUM_IONS,ND)
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) DERIV_CONST
+	REAL(KIND=LDP) DELTA_TIME_SECS			!Time step
 !
 	INTEGER K			!Depth index
 	INTEGER M			!Band index
 	INTEGER I			!Variable index
 	INTEGER J			!Variable index
-	INTEGER LU 
+	INTEGER LU
 	INTEGER ION_IVAR
 	INTEGER IVAR
 	INTEGER ID
@@ -118,7 +119,7 @@
 ! We have this option since Sum[all j] Xj = X (X=species population).
 !
 ! Let Xi refer to the total population of ionization stage i. Then
-! 
+!
 !      Sum[j=1,i]      {vdXj/dr} = RRi  or
 !
 !      Sum[j=i+1,..]  {-vdXj/dr} = RRi

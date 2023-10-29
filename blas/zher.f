@@ -1,6 +1,7 @@
       SUBROUTINE ZHER  ( UPLO, N, ALPHA, X, INCX, A, LDA )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
-      REAL(10)   ALPHA
+      REAL(KIND=LDP)   ALPHA
       INTEGER            INCX, LDA, N
       CHARACTER*1        UPLO
 *     .. Array Arguments ..
@@ -38,7 +39,7 @@
 *           N must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - REAL(10).
+*  ALPHA  - REAL(KIND=LDP).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *

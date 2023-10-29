@@ -3,28 +3,29 @@ C Data module for CMF_FORM_SOL. Data placed in this module is automatically
 C saved between subroutine calls..
 C
 	MODULE CMF_FORM_MOD_V2
+	USE SET_KIND_MODULE
 C
-	REAL(10), ALLOCATABLE :: R_EXT(:)
-	REAL(10), ALLOCATABLE :: P_EXT(:)
-	REAL(10), ALLOCATABLE :: ROH_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: P_EXT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ROH_EXT(:)
 !
-	REAL(10), ALLOCATABLE :: AV_PREV(:,:)
-	REAL(10), ALLOCATABLE :: CV_PREV(:,:)
-	REAL(10), ALLOCATABLE :: I_P_PREV(:,:)
-	REAL(10), ALLOCATABLE :: I_M_PREV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: AV_PREV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CV_PREV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: I_P_PREV(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: I_M_PREV(:,:)
 !
-	REAL(10), ALLOCATABLE :: R_RAY(:,:)
-	REAL(10), ALLOCATABLE :: Z(:,:)
-	REAL(10), ALLOCATABLE :: GAM(:,:)
-	REAL(10), ALLOCATABLE :: GAMH(:,:)
-	REAL(10), ALLOCATABLE :: dGAMdR(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_RAY(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: Z(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAM(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAMH(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: dGAMdR(:,:)
 C
-	REAL(10), ALLOCATABLE :: CHI_COEF(:,:)
-	REAL(10), ALLOCATABLE :: ETA_COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETA_COEF(:,:)
 C
-	REAL(10), ALLOCATABLE :: ESEC_OLD(:)
-	REAL(10), ALLOCATABLE :: ETA_OLD(:)
-	REAL(10), ALLOCATABLE :: CHI_OLD(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ESEC_OLD(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETA_OLD(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_OLD(:)
 C
 C Used to compute the boundary iteration factors (HBC and NBC).
 C
@@ -35,10 +36,10 @@ C monotonic cubic polynomials. To save time, interpolations in CHI and ETA
 C are done onto a fine grid --- once for each frequency. Values of CHI and
 C ETA on a RAY are then obtained from the fine grid using linear interpolation.
 C
-	REAL(10), ALLOCATABLE :: R_FINE(:)
-	REAL(10), ALLOCATABLE :: CHI_FINE(:)
-	REAL(10), ALLOCATABLE :: ETA_FINE(:)
-	REAL(10), ALLOCATABLE :: dCHIdR_FINE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_FINE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHI_FINE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ETA_FINE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: dCHIdR_FINE(:)
 	INTEGER, ALLOCATABLE :: INDX_FINE(:,:)
 C
 C INDX(I) gives the location of R_RAY(I,...) in R. It is also used to give the
@@ -46,11 +47,11 @@ C location of R_FINE(I) in R.
 C
 	INTEGER, ALLOCATABLE :: INDX(:)
 C
-	REAL(10) BETA
-	REAL(10) VINF
-	REAL(10) C_KMS
-	REAL(10) FL_PREV
-	REAL(10) OLD_CHI_AT_IN_BND
+	REAL(KIND=LDP) BETA
+	REAL(KIND=LDP) VINF
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) FL_PREV
+	REAL(KIND=LDP) OLD_CHI_AT_IN_BND
 	INTEGER I_START
 C
 	LOGICAL FIRST_TIME
@@ -103,6 +104,7 @@ C
 	1                  EXTEND,INSERT_ADD_FREQ,SOLUTION_OPTION,
 	1                  FRAC_DOP,V_DOP,dV_CMF_PROF,dV_CMF_WING,
 	1                  INIT,NC,NP,ND)
+	USE SET_KIND_MODULE
 	USE CMF_FORM_MOD_V2
 	IMPLICIT NONE
 C
@@ -117,18 +119,18 @@ C                         qually spaced in z, rather than R.
 C Altered 10-Oct-2004 : Adjusted SQRT in computation oz to use (R-P)*(R+P).
 C Altered 22-Jun-2000 : Changed to V2. SOLUTION_OPTION inserted in call. Can
 C                           now use INTEGRAL method to get IPLUS_P. Method
-C                           adapted from FG_J_CMF_V9.  
-C Altered 21-Aug-1997 : New version (V2) on NEW_R_SCALE called. This has a 
+C                           adapted from FG_J_CMF_V9.
+C Altered 21-Aug-1997 : New version (V2) on NEW_R_SCALE called. This has a
 C                         finer grid spacing a the outer boundary which
 C                         overcomes numerical difficulties with P Cygni models.
-C                       PNT_FAC was installed which allows a the number of 
+C                       PNT_FAC was installed which allows a the number of
 C                         points allong all rays to be altered.
 C                       NFINE_INF for fine grid was increased from 4 to 10.
 C                         Probably not necessary, but timing should be less
 C                         than LS loop.
 C                       Minor bug fixed with computation of DCHIDR in extended
 C                         part of atmosphere.
-C                       CV now computed directly from AV if AV has been 
+C                       CV now computed directly from AV if AV has been
 C                         adjusted because a neagtive intensity was obtained.
 C Altered Nov-06-1996 : Correction to computation of DTAU installed to prevent
 C                        NEGATIVE dTAU's caused by the derivative correction.
@@ -151,40 +153,40 @@ C _NEW refer to the opacities/emissivities at the frequency passed in the
 C call. They are to be distinguished from the opacities/emissivities on the
 C previous call [ _OLD], and those at intermediate frequencies (no appendage).
 C
-	REAL(10) ETA_NEW(ND)	!Emissivity --- contains e.s. term.
-	REAL(10) CHI_NEW(ND)
-	REAL(10) ESEC_NEW(ND)
+	REAL(KIND=LDP) ETA_NEW(ND)	!Emissivity --- contains e.s. term.
+	REAL(KIND=LDP) CHI_NEW(ND)
+	REAL(KIND=LDP) ESEC_NEW(ND)
 C
 C We use the density to determine  the grid spacing along a ray. This should
 C always be well behaved.
 C
-	REAL(10) ROH(ND)
-	REAL(10) V(ND)
-	REAL(10) SIGMA(ND)
-	REAL(10) R(ND)
-	REAL(10) P(NP)
+	REAL(KIND=LDP) ROH(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) SIGMA(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) P(NP)
 C
-	REAL(10) P_OBS(NP_OBS_MAX)
-	REAL(10) IPLUS_P(NP_OBS_MAX)
-	REAL(10) MU_AT_RMAX(NP_OBS_MAX)
-	REAL(10) HQW_AT_RMAX(NP_OBS_MAX)
-	REAL(10) RMAX_OBS,V_AT_RMAX
+	REAL(KIND=LDP) P_OBS(NP_OBS_MAX)
+	REAL(KIND=LDP) IPLUS_P(NP_OBS_MAX)
+	REAL(KIND=LDP) MU_AT_RMAX(NP_OBS_MAX)
+	REAL(KIND=LDP) HQW_AT_RMAX(NP_OBS_MAX)
+	REAL(KIND=LDP) RMAX_OBS,V_AT_RMAX
 C
 C These parameters are use to estimate how many extra points will be inserted
 C for the frequency integration.
 C
-	REAL(10) FRAC_DOP,V_DOP,dV_CMF_PROF,dV_CMF_WING
+	REAL(KIND=LDP) FRAC_DOP,V_DOP,dV_CMF_PROF,dV_CMF_WING
 C
-	REAL(10) DBB,IC,FL,dLOG_NU
+	REAL(KIND=LDP) DBB,IC,FL,dLOG_NU
 	CHARACTER*6 METHOD
 	CHARACTER*(*) SOLUTION_OPTION
 	LOGICAL DIF		!Use diffusion approximation
 C
 C First frequency -- no frequency coupling.
- 
+
 	LOGICAL INIT
 C
-	REAL(10),  PARAMETER :: ONE=1.0D0
+	REAL(KIND=LDP),  PARAMETER :: ONE=1.0D0
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 C
@@ -194,16 +196,16 @@ C
 	LOGICAL EXTEND
 	LOGICAL INSERT_ADD_FREQ
 C
-	REAL(10),    PARAMETER :: EXT_FAC=10.0D0
+	REAL(KIND=LDP),    PARAMETER :: EXT_FAC=10.0D0
 	INTEGER, PARAMETER :: ND_ADD_MAX=10		!10*LOG10(EXT_FAC))
 	INTEGER NP_EXT
 C
 C Intermediate opacities/emissivities. They are obtained by linear
 C extrapolation in frequency from .._NEW and ..._OLD.
 C
-	REAL(10) CHI(ND)
-	REAL(10) ETA(ND)
-	REAL(10) ESEC(ND)
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) ETA(ND)
+	REAL(KIND=LDP) ESEC(ND)
 C
 C The following arrays do not need to be stored, and hence can be created
 C dynamically on each call. They must have a MINIMUM length NRAY where
@@ -212,59 +214,59 @@ C PNT_FAC can be adjusted to different integer values so that more points
 C can be inserted along a ray.
 C
 	INTEGER, PARAMETER :: PNT_FAC=3
-	REAL(10) TA(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) TB(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) TC(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) AV(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) CV(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) DTAU(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) XM(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) SOURCE(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) U(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) VB(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) VC(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) GB(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) H(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) Q(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) QH(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) TA(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) TB(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) TC(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) AV(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) CV(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) DTAU(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) XM(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) SOURCE(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) U(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) VB(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) VC(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) GB(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) H(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) Q(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) QH(PNT_FAC*(ND+ND_ADD_MAX))
 C
 C Ray quantities. V_RAY and SIGMA ray are only used to compute GAM and GAMH
 C in the initialization. CHI_RAY, ETA_RAY and dCHIdR are needed in the
 C formal solution loop.
 C
-	REAL(10) V_RAY(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) SIGMA_RAY(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) CHI_RAY(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) ETA_RAY(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10) dCHIdR(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) V_RAY(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) SIGMA_RAY(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) CHI_RAY(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) ETA_RAY(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) dCHIdR(PNT_FAC*(ND+ND_ADD_MAX))
 !
 ! Vectors required when using INTEGERAL solution method.
 !
-	REAL(10)           I_P(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10)           I_M(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           I_P(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           I_M(PNT_FAC*(ND+ND_ADD_MAX))
 !
-	REAL(10)           EE(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10)           E0(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10)           E1(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10)           E2(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10)           E3(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           EE(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           E0(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           E1(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           E2(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           E3(PNT_FAC*(ND+ND_ADD_MAX))
 !
-	REAL(10)           A0(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10)           A1(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10)           A2(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10)           A3(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10)           A4(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           A0(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           A1(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           A2(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           A3(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           A4(PNT_FAC*(ND+ND_ADD_MAX))
 !
-	REAL(10) SOURCE_PRIME(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10)            S(PNT_FAC*(ND+ND_ADD_MAX))
-	REAL(10)           dS(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP) SOURCE_PRIME(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)            S(PNT_FAC*(ND+ND_ADD_MAX))
+	REAL(KIND=LDP)           dS(PNT_FAC*(ND+ND_ADD_MAX))
 !
 ! Used to perform interpolation of CHI and ETA onto the FINE radius grid.
 !
-	REAL(10) LOG_R(ND)
-	REAL(10) LOG_V(ND)
-	REAL(10) LOG_CHI(ND)
-	REAL(10) LOG_ETA(ND)
+	REAL(KIND=LDP) LOG_R(ND)
+	REAL(KIND=LDP) LOG_V(ND)
+	REAL(KIND=LDP) LOG_CHI(ND)
+	REAL(KIND=LDP) LOG_ETA(ND)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
@@ -277,27 +279,27 @@ C
 	INTEGER I,J,K,L,ML,LS
 	INTEGER N_FREQ
 	INTEGER TMP_PNT_FAC
-	REAL(10) DBC
-	REAL(10) IBOUND			!Incident intensity on outer boundary.
-	REAL(10) T1,T2
-	REAL(10) DELR
-	REAL(10) DELZ
-	REAL(10) I_CORE
+	REAL(KIND=LDP) DBC
+	REAL(KIND=LDP) IBOUND			!Incident intensity on outer boundary.
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) DELR
+	REAL(KIND=LDP) DELZ
+	REAL(KIND=LDP) I_CORE
 C
-	REAL(10) NEW_dLOG_NU		!dv
-	REAL(10) RMAX
-	REAL(10) CV_BOUND
-	REAL(10) MU,dZ
+	REAL(KIND=LDP) NEW_dLOG_NU		!dv
+	REAL(KIND=LDP) RMAX
+	REAL(KIND=LDP) CV_BOUND
+	REAL(KIND=LDP) MU,dZ
 C
 C Power law exponents for the extrapolations.
 C
-	REAL(10) ROH_ALPHA
-	REAL(10) ESEC_ALPHA
-	REAL(10) CHI_ALPHA
-	REAL(10) ETA_ALPHA
+	REAL(KIND=LDP) ROH_ALPHA
+	REAL(KIND=LDP) ESEC_ALPHA
+	REAL(KIND=LDP) CHI_ALPHA
+	REAL(KIND=LDP) ETA_ALPHA
  !
 	EXTERNAL SPEED_OF_LIGHT
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 !
 	IF(FIRST_TIME)THEN
 !
@@ -922,7 +924,7 @@ C
 C
 C Enter loop to perform integration along each ray.
 !
-!$OMP PARALLEL DO SCHEDULE(DYNAMIC) 
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC)
 !$OMP1 PRIVATE(SOURCE_PRIME,SOURCE,DTAU,CHI_RAY,ETA_RAY,dCHIdR,Q,I_M,I_P,
 !$OMP1 EE,E0,E1,E2,E3,A0,A1,A2,A3,A4,S,dS,T1,T2,I_CORE,dZ,NI,I,K,L)
 !
@@ -1025,13 +1027,13 @@ C
 !
 ! Compute the Source function for inward directed rays, and find the
 ! monotonic interpolating polynomial.
-!                   
+!
 	      SOURCE_PRIME(1:NI)=SOURCE(1:NI)+Q(1:NI)*I_M_PREV(1:NI,LS)
 	      DO I=1,NI-1
 	        S(I)=(SOURCE_PRIME(I+1)-SOURCE_PRIME(I))/DTAU(I)
 	      END DO
 !
-! Now compute the derivatives node I. 
+! Now compute the derivatives node I.
 !
 	      dS(1)=S(1) +(S(1)-S(2))*DTAU(1)/(DTAU(1)+DTAU(2))
 	      DO I=2,NI-1
@@ -1040,7 +1042,7 @@ C
 	      END DO
 	      dS(NI)=S(NI-1)+(S(NI-1)-S(NI-2))*DTAU(NI-1)/
 	1                       (DTAU(NI-2)+DTAU(NI-1))
-!             
+!
 ! Adjust first derivatives so that function is monotonic  in each interval.
 !
 	      dS(1)=( SIGN(ONE,S(1))+SIGN(ONE,dS(1)) )*
@@ -1071,7 +1073,7 @@ C
 	        S(I)=(SOURCE_PRIME(I+1)-SOURCE_PRIME(I))/DTAU(I)
 	      END DO
 !
-! Now compute the derivatives at node I. 
+! Now compute the derivatives at node I.
 !
 	      dS(1)=S(1) +(S(1)-S(2))*DTAU(1)/(DTAU(1)+DTAU(2))
 	      DO I=2,NI-1
@@ -1080,7 +1082,7 @@ C
 	      END DO
 	      dS(NI)=S(NI-1)+(S(NI-1)-S(NI-2))*DTAU(NI-1)/
 	1                  (DTAU(NI-2)+DTAU(NI-1))
-!             
+!
 ! Adjust the first derivatives so that function is monotonic in each interval.
 !
 	      dS(1)=( SIGN(ONE,S(1))+SIGN(ONE,dS(1)) )*

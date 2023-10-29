@@ -1,8 +1,8 @@
 !
 ! Subroutine to determine correspondence between SPECIES in the CHARGE exchange
-! reactions, and the corresponding program variables. It is advised 
+! reactions, and the corresponding program variables. It is advised
 ! (and program checks) that levels involved in charge exchange reactions should
-! be distinct super-levels. 
+! be distinct super-levels.
 !
 ! Program assumes (and checks) that each charge reaction involves full terms.
 !
@@ -11,6 +11,7 @@
 !     Y(n+) + X([m-1]+)  <--> Y([n-1]+) + X(M+)
 !
 	SUBROUTINE SET_CHG_LEV_ID_V4(ND,LUOUT)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE CHG_EXCH_MOD_V3
 	IMPLICIT NONE
@@ -33,15 +34,15 @@
 	INTEGER, ALLOCATABLE :: ID_POINTER(:,:)
 	INTEGER, ALLOCATABLE :: LEV_CNT(:,:)
 	INTEGER, ALLOCATABLE :: CHG_ID(:,:)
-	REAL(10), ALLOCATABLE :: G_SUM(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: G_SUM(:,:)
 !
 	INTEGER, ALLOCATABLE :: TMP_ID_ION(:,:)
 	INTEGER, ALLOCATABLE :: TMP_LEV_IN_POPS(:,:)
 	INTEGER, ALLOCATABLE :: TMP_LEV_IN_ION(:,:)
-	REAL(10),  ALLOCATABLE :: TMP_G(:,:)
-	REAL(10),  ALLOCATABLE :: TMP_Z(:,:)
+	REAL(KIND=LDP),  ALLOCATABLE :: TMP_G(:,:)
+	REAL(KIND=LDP),  ALLOCATABLE :: TMP_Z(:,:)
 !
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER NOUT
 	INTEGER NIN
 	INTEGER I,J,K,L
@@ -88,7 +89,7 @@
 !
 ! We first check if species 1 or 4 corresponds to the final ionization state.
 !
-	          IF( (K .EQ. 2 .OR. K .EQ. 3) .AND. 
+	          IF( (K .EQ. 2 .OR. K .EQ. 3) .AND.
 	1           ATM(ID)%EQXzV+ATM(ID)%NXzV .EQ. EQ_SPECIES(SPECIES_LNK(ID)) )THEN
 	            IF(K .EQ. 3)THEN
 	              LEV_CNT(J,1)=1
@@ -100,7 +101,7 @@
 	          END IF
 !
 ! We now check against regular levels.
-! 
+!
 	          I_S=0
 	          DO I_F=1,ATM(ID)%NXzV_F
 	            LOC_NAME=ATM(ID)%XzVLEVNAME_F(I_F)
@@ -166,7 +167,7 @@
 	    N_CHG_OMITTED=N_CHG_OMITTED+1
 	    CHG_INCLUDED_RD(J)=.FALSE.
           ELSE
-	    N_CHG=N_CHG + K 
+	    N_CHG=N_CHG + K
 	  END IF
 	END DO
 	WRITE(LUER,*)'Number of charge transitions read in is',N_CHG_RD
@@ -227,8 +228,8 @@
 	  STOP
 	END IF
 !
-! Determine ionization stage and levels for species involved in charge 
-! exchange reactions. Now determine whether the present species is in 
+! Determine ionization stage and levels for species involved in charge
+! exchange reactions. Now determine whether the present species is in
 ! the CHARGE exchange reaction list.
 !
 	LST=0
@@ -282,7 +283,7 @@
 	          ML=ICNT
 	        END IF
 !
-	        TMP_ID_ION(ML,K)=ID     
+	        TMP_ID_ION(ML,K)=ID
 	        TMP_LEV_IN_ION(ML,K)=I_S
 	        TMP_LEV_IN_POPS(ML,K)=ATM(ID)%EQXzV+I_S-1
 	        TMP_Z(ML,K)=ATM(ID)%ZXzV-1.0D0
@@ -314,7 +315,7 @@
 	      END DO
 	    END DO
 	  END DO
-!	         
+!	
 ! Save the reaction rates for each of the new reactions.
 !
 	    DO K=LST+1,L
@@ -326,7 +327,7 @@
 	      COEF_CHG(K,1)=COEF_CHG(K,1)*G_CHG(K,3)*G_CHG(K,4)/G_SUM(J,3)/G_SUM(J,4)
 	    END DO
 	    LST=L
-!	    
+!	
         END IF                    !Is reaction available
 	END DO                    !Loop over J (reactions read in)
 !

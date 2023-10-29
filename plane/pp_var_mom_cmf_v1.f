@@ -1,29 +1,30 @@
 	MODULE PP_VAR_MOM_CMF_MOD_V1
+	USE SET_KIND_MODULE
 !
-	REAL(10), ALLOCATABLE :: F_PREV(:)
-	REAL(10), ALLOCATABLE :: G_PREV(:)
-	REAL(10), ALLOCATABLE :: N_ON_J_PREV(:)
-	REAL(10), ALLOCATABLE :: JNU(:)
-	REAL(10), ALLOCATABLE :: HNU(:)
-	REAL(10), ALLOCATABLE :: JNUM1(:)
-	REAL(10), ALLOCATABLE :: HNUM1(:)
+	REAL(KIND=LDP), ALLOCATABLE :: F_PREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: G_PREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: N_ON_J_PREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: JNU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HNU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: JNUM1(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HNUM1(:)
 !
-	REAL(10), ALLOCATABLE :: KI(:,:,:)
-	REAL(10), ALLOCATABLE :: WORKMAT(:,:)
-	REAL(10), ALLOCATABLE :: RHS_dHdCHI(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: KI(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: WORKMAT(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: RHS_dHdCHI(:,:)
 !
-	REAL(10), ALLOCATABLE :: TA(:),TB(:),TC(:),DTAU(:),MID_DTAU(:)
-	REAL(10), ALLOCATABLE :: XM(:),SOURCE(:),THETA(:)
-	REAL(10), ALLOCATABLE :: VB(:),VC(:),HU(:),HL(:),HS(:)
-	REAL(10), ALLOCATABLE :: GAM(:),GAMH(:),W(:),WPREV(:)
-	REAL(10), ALLOCATABLE :: PSI(:),PSIPREV_MOD(:),PSIPREV(:)
-	REAL(10), ALLOCATABLE :: EPS(:),EPS_PREV(:)
-	REAL(10), ALLOCATABLE :: TX_OLD_d_T(:),TX_OLD_d_dTdR(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:),TB(:),TC(:),DTAU(:),MID_DTAU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: XM(:),SOURCE(:),THETA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: VB(:),VC(:),HU(:),HL(:),HS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: GAM(:),GAMH(:),W(:),WPREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: PSI(:),PSIPREV_MOD(:),PSIPREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: EPS(:),EPS_PREV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TX_OLD_d_T(:),TX_OLD_d_dTdR(:)
 !
-	REAL(10) HBC_PREV
-	REAL(10) IN_HBC_PREV
-	REAL(10) NBC_PREV
-	REAL(10) NBC_INCID_PREV
+	REAL(KIND=LDP) HBC_PREV
+	REAL(KIND=LDP) IN_HBC_PREV
+	REAL(KIND=LDP) NBC_PREV
+	REAL(KIND=LDP) NBC_INCID_PREV
 !
 	INTEGER, PARAMETER :: NM_KI=2
 !
@@ -47,9 +48,9 @@
 ! NB TX(i,m, ) =dJ(i)/d(CHI(m),ETA(m),...)
 ! NB TVX(i,m, ) =dRSQH(i)/d(CHI(m),ETA(m),...)
 !
-! NM_KI reflects the 3rd dimension of KI. For this routine only the first 2 
-!   are important and are used to compute the variation of J with respect to 
-!   the CURRENT opacity and the CURRENT emissivity. 
+! NM_KI reflects the 3rd dimension of KI. For this routine only the first 2
+!   are important and are used to compute the variation of J with respect to
+!   the CURRENT opacity and the CURRENT emissivity.
 !
 ! TX_DIF_d_T and TX_DIFF_d_dTdR are used to describe the variations in J
 ! caused by the DIFFUSION approximation at the inner boundary.
@@ -65,6 +66,7 @@
 	1              INIT,REALLOCATE_ARRAYS,
 	1              dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
 	1              DO_THIS_TX_MATRIX,METHOD,COHERENT,ND,NM)
+	USE SET_KIND_MODULE
 	USE PP_VAR_MOM_CMF_MOD_V1
 	IMPLICIT NONE
 !
@@ -72,36 +74,36 @@
 !
 	INTEGER ND
 	INTEGER NM
-	REAL(10) ETA(ND)
-	REAL(10) CHI(ND)
-	REAL(10) ESEC(ND)
-	REAL(10) V(ND)
-	REAL(10) SIGMA(ND)
-	REAL(10) R(ND)
+	REAL(KIND=LDP) ETA(ND)
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) ESEC(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) SIGMA(ND)
+	REAL(KIND=LDP) R(ND)
 !
 ! Variation arrays and vectors.
 !
-	REAL(10) TX(ND,ND,NM)
-	REAL(10) TVX(ND-1,ND,NM)
-	REAL(10) TX_DIF_d_T(ND)
-	REAL(10) TX_DIF_d_dTdR(ND)
-	REAL(10) TVX_DIF_d_T(ND)
-	REAL(10) TVX_DIF_d_dTdR(ND)
+	REAL(KIND=LDP) TX(ND,ND,NM)
+	REAL(KIND=LDP) TVX(ND-1,ND,NM)
+	REAL(KIND=LDP) TX_DIF_d_T(ND)
+	REAL(KIND=LDP) TX_DIF_d_dTdR(ND)
+	REAL(KIND=LDP) TVX_DIF_d_T(ND)
+	REAL(KIND=LDP) TVX_DIF_d_dTdR(ND)
 !
 	LOGICAL DO_THIS_TX_MATRIX(NM)
 !
 ! "Eddington factors"
 !
-	REAL(10) F(ND),G(ND),N_ON_J(ND)
-	REAL(10) HBC,HBC_INCID
-	REAL(10) NBC,NBC_INCID
-	REAL(10) IN_HBC
+	REAL(KIND=LDP) F(ND),G(ND),N_ON_J(ND)
+	REAL(KIND=LDP) HBC,HBC_INCID
+	REAL(KIND=LDP) NBC,NBC_INCID
+	REAL(KIND=LDP) IN_HBC
 !
-	REAL(10) dLOG_NU
-	REAL(10) dTdR
-	REAL(10) DBB
-	REAL(10) dDBBdT
-	REAL(10) IC
+	REAL(KIND=LDP) dLOG_NU
+	REAL(KIND=LDP) dTdR
+	REAL(KIND=LDP) DBB
+	REAL(KIND=LDP) dDBBdT
+	REAL(KIND=LDP) IC
 	CHARACTER*6 METHOD
 	LOGICAL COHERENT
 !
@@ -121,8 +123,8 @@
 	INTEGER I
 	INTEGER IOS
 	INTEGER LUER
-	REAL(10) dN_INCID
-	REAL(10) AV_SIGMA
+	REAL(KIND=LDP) dN_INCID
+	REAL(KIND=LDP) AV_SIGMA
 !
 ! Deallocate arrays if requested. This might be done because we are testing
 ! with a new number of depth points, for example.
@@ -183,7 +185,7 @@
 	IF(COHERENT)THETA=ESEC/CHI
 !
 ! Compute dCHIdZ and then compute the optical depth scale.
-! We also need to call d_DERIVCHI_dCHI to set the TRAP derivatives 
+! We also need to call d_DERIVCHI_dCHI to set the TRAP derivatives
 ! which are use in PP_EDD_VAR_CMF_V1.
 !
 	CALL DERIVCHI(TB,CHI,R,ND,METHOD)

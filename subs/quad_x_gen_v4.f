@@ -1,21 +1,22 @@
 C
 C Subroutine to compute the quadrature weights for the statistical
-C equilibrium equations for K shell ionization (by X-rays) of ions 
+C equilibrium equations for K shell ionization (by X-rays) of ions
 C with MORE than 3 electrons.
 C
-C The factor of DEX(-10) in TP1 is due to the definition of PRGEN which is 
+C The factor of DEX(-10) in TP1 is due to the definition of PRGEN which is
 C DEX(10) times the photoionization cross section so that CHI*R is constant.
 C
 	SUBROUTINE QUAD_X_GEN_V4(ZCORE,NUM_ELEC,WSE,WCR,NU_CONT,
 	1             HNST_S,N_S,
 	1             HNST_F,EDGE_F,F_TO_S,N_F,
 	1             EDGE_B,N_B,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C
 C Altered 17-Sep-1997 : Altered so that a constant continuum cross-section
 C                         across a band can be handled. WSE now must be
-C                         be effectively multiplied by FQW/NU_CONT when it 
+C                         be effectively multiplied by FQW/NU_CONT when it
 C                         is used.
 C Altered 30-Jan-1995 : Buf fix. WSE was a factor of 10^{15} too large.
 C Altered 27-Oct-1995 : Adapted to allow for the presence of super levels.
@@ -26,31 +27,31 @@ C                         frequency.
 C Created 20-Jul-1993 : Based on QUADGEN
 C
 	INTEGER N_S,N_B,N_F,ND
-	REAL(10) ZCORE,NUM_ELEC
+	REAL(KIND=LDP) ZCORE,NUM_ELEC
 C
 C N_S refers to the model atom with SUPER levels.
 C
-	REAL(10) WSE(N_S,ND)
-	REAL(10) WCR(N_S,ND)
-	REAL(10) HNST_S(N_S,ND)
+	REAL(KIND=LDP) WSE(N_S,ND)
+	REAL(KIND=LDP) WCR(N_S,ND)
+	REAL(KIND=LDP) HNST_S(N_S,ND)
 C
 C _F refers to populations in the full atom.
 C
-	REAL(10) HNST_F(N_F,ND)
-	REAL(10) EDGE_F(N_F)
+	REAL(KIND=LDP) HNST_F(N_F,ND)
+	REAL(KIND=LDP) EDGE_F(N_F)
 	INTEGER F_TO_S(N_F)
 C
 C _B Refers to FULL atom in nest ionization stage.
 C
-	REAL(10) EDGE_B(N_B)
-	REAL(10) NU_CONT
+	REAL(KIND=LDP) EDGE_B(N_B)
+	REAL(KIND=LDP) NU_CONT
 C
 	EXTERNAL XCROSS_V2
-	REAL(10) XCROSS_V2
+	REAL(KIND=LDP) XCROSS_V2
 C
 	INTEGER I_F,I_S,K
-	REAL(10) WEIGHT
-	REAL(10) FOUR_PI_ON_H
+	REAL(KIND=LDP) WEIGHT
+	REAL(KIND=LDP) FOUR_PI_ON_H
 	INTEGER, PARAMETER :: IZERO=0
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 C

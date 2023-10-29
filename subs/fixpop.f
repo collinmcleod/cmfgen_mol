@@ -6,6 +6,7 @@ C
 	SUBROUTINE FIXPOP(BA,STEQ,NT,NUM_BNDS,ND,DST,DEND,
 	1                     EQSPEC,NSPEC,FIX_NSPEC,DESC,
 	1                     POP,POPVEC,SPEC_PRES,FIX_IMPURITY)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 --- CNT is now dynamically allocated.
@@ -17,8 +18,8 @@ C
 	LOGICAL FIX_IMPURITY,SPEC_PRES
 	INTEGER NT,ND,NUM_BNDS,DST,DEND
 	INTEGER EQSPEC,NSPEC,FIX_NSPEC
-	REAL(10) BA(NT,NT,NUM_BNDS,ND),STEQ(NT,ND)
-	REAL(10) POP(NSPEC,ND),POPVEC(ND)
+	REAL(KIND=LDP) BA(NT,NT,NUM_BNDS,ND),STEQ(NT,ND)
+	REAL(KIND=LDP) POP(NSPEC,ND),POPVEC(ND)
 	CHARACTER*(*) DESC	
 C
 C Local variables.
@@ -30,9 +31,9 @@ C
 C Varaibles to allow information to be output regarding the number
 C of levels and depths where a population was held fixed.
 C
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER, SAVE, ALLOCATABLE :: CNT(:)
- 
+
 C FIX_NSPEC takes priority in determining the number of levels
 C to be fixed. This is necessary to fix T, for example. For this
 C case, FIX_IMPURITY should be false (as no POPVEC).

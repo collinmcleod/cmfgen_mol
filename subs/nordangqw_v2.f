@@ -4,6 +4,7 @@
 ! the technique illustrated by Nordulund.
 !
 	SUBROUTINE NORDANGQW_V2(QW,R,P,NC,ND,NP,MOMWEIGHT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 14-Jun-2023 - Based on NORDANGQW
@@ -11,17 +12,17 @@
 !                       allocation.
 !
 	INTEGER NC,ND,NP
-	REAL(10) QW(ND,NP),R(ND),P(NP)
+	REAL(KIND=LDP) QW(ND,NP),R(ND),P(NP)
 !
-	REAL(10) MU(NP)
-	REAL(10) dMU(NP)
-	REAL(10) WEIGHT(NP)
-	REAL(10) PSQ(NP)
+	REAL(KIND=LDP) MU(NP)
+	REAL(KIND=LDP) dMU(NP)
+	REAL(KIND=LDP) WEIGHT(NP)
+	REAL(KIND=LDP) PSQ(NP)
 !
 ! Local variables
 !
 	INTEGER I,J,NW
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 !
 	DO I=1,NP
 	  PSQ(I)=P(I)*P(I)

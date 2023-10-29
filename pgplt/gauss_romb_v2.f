@@ -15,37 +15,38 @@
 ! EXPONENT > 0.5
 !
 	SUBROUTINE GAUSS_ROMB_V2(ANSWER,A,B,X0,POS,HEIGHT,SCALE,EXPONENT,TOLERANCE)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 06-MAr-2023 : Fixed to use classical Gaussian with factor of 0.5 in argument of exponent.
 ! Altered 09-Aug-2022 : To get consistency inthe different routines changed to use Gauss.
-! Altered 05-AUg-2022 : Now use rigorous definition of EW (not based on Ic at line 
+! Altered 05-AUg-2022 : Now use rigorous definition of EW (not based on Ic at line
 !                          center only). Call changed because need add.
-!                          parameters. 
+!                          parameters.
 ! Altered 02-Apr-2008 : Use convention that EWs are +ve for absorption lines
 ! Created 28-Sep-2007
 !
-	REAL(10) ANSWER		!Returned EW
-	REAL(10) A		!Continuum is defoned by A+B(X-X0)
-	REAL(10) B
-	REAL(10) X0
-	REAL(10) POS		!Line center	
-	REAL(10) HEIGHT		!
-	REAL(10) SCALE		!Scale factor descibing eponential -- similar to sigma
-	REAL(10) EXPONENT
-	REAL(10) TOLERANCE	!Tolerence for final answer.
+	REAL(KIND=LDP) ANSWER		!Returned EW
+	REAL(KIND=LDP) A		!Continuum is defoned by A+B(X-X0)
+	REAL(KIND=LDP) B
+	REAL(KIND=LDP) X0
+	REAL(KIND=LDP) POS		!Line center	
+	REAL(KIND=LDP) HEIGHT		!
+	REAL(KIND=LDP) SCALE		!Scale factor descibing eponential -- similar to sigma
+	REAL(KIND=LDP) EXPONENT
+	REAL(KIND=LDP) TOLERANCE	!Tolerence for final answer.
 !
-	REAL(10) X 		!X coordinate (as in original data)
-	REAL(10) W		!Scaled and offset coodrinate: w=(X-POS)/SIGMA
+	REAL(KIND=LDP) X 		!X coordinate (as in original data)
+	REAL(KIND=LDP) W		!Scaled and offset coodrinate: w=(X-POS)/SIGMA
 !
 ! R(I,1) stores the ith trapazoidal integration.
 !
 	INTEGER, PARAMETER :: M=8
-	REAL(10) R(M,M)
+	REAL(KIND=LDP) R(M,M)
 !
-	REAL(10) H		!Step size
-	REAL(10) HMAX		!Maximumstep size adopted
-	REAL(10) RANGE		!Range of integration
+	REAL(KIND=LDP) H		!Step size
+	REAL(KIND=LDP) HMAX		!Maximumstep size adopted
+	REAL(KIND=LDP) RANGE		!Range of integration
 !
 	INTEGER J,K,L		!Loop indices
 	INTEGER N		!Number of steps

@@ -1,8 +1,9 @@
 !
 ! Subroutine to designed to create a NEW R grid given an old R grid, and optical depth scale on this
-! grid. The routine places points places points logaritmically in R and TAU. 
+! grid. The routine places points places points logaritmically in R and TAU.
 !
 	SUBROUTINE SET_SN_R_GRID(R,OLD_R,OLD_TAU,IB_RAT,OB_RAT,N_IB_INS,N_OB_INS,ND,NS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered: 16-Jul-2013
@@ -10,34 +11,34 @@
 	INTEGER NS
 	INTEGER ND
 !
-	REAL(10) R(ND)			!Returned
-	REAL(10) OLD_R(NS)		!Input
-	REAL(10) OLD_TAU(NS)		!Input
+	REAL(KIND=LDP) R(ND)			!Returned
+	REAL(KIND=LDP) OLD_R(NS)		!Input
+	REAL(KIND=LDP) OLD_TAU(NS)		!Input
 !
-	REAL(10) LOG_OLD_R(NS)
-	REAL(10) LOG_OLD_TAU(NS)
+	REAL(KIND=LDP) LOG_OLD_R(NS)
+	REAL(KIND=LDP) LOG_OLD_TAU(NS)
 !
-	REAL(10) XN(ND)                   !Used as integer grid
-	REAL(10) ZN(2*ND)			!Used as integer grid.
-	REAL(10) LOG_R(2*ND)
-	REAL(10) TAU(2*ND)
-	REAL(10) LOG_TAU(2*ND)
+	REAL(KIND=LDP) XN(ND)                   !Used as integer grid
+	REAL(KIND=LDP) ZN(2*ND)			!Used as integer grid.
+	REAL(KIND=LDP) LOG_R(2*ND)
+	REAL(KIND=LDP) TAU(2*ND)
+	REAL(KIND=LDP) LOG_TAU(2*ND)
 !
-	REAL(10) IB_RAT
-	REAL(10) OB_RAT
+	REAL(KIND=LDP) IB_RAT
+	REAL(KIND=LDP) OB_RAT
 !
 	INTEGER N_IB_INS
 	INTEGER N_OB_INS
 !
-	REAL(10) dTAU
-	REAL(10) dTAU_OLD
-	REAL(10) dLOGR
-	REAL(10) LOG_TAU_MIN
-	REAL(10) LOG_R_MAX
-	REAL(10) TAU_BEG,TAU_END
-	REAL(10) T1,T2
-	REAL(10) NEXT_R
-	REAL(10) OB_RAT_LOC
+	REAL(KIND=LDP) dTAU
+	REAL(KIND=LDP) dTAU_OLD
+	REAL(KIND=LDP) dLOGR
+	REAL(KIND=LDP) LOG_TAU_MIN
+	REAL(KIND=LDP) LOG_R_MAX
+	REAL(KIND=LDP) TAU_BEG,TAU_END
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) NEXT_R
+	REAL(KIND=LDP) OB_RAT_LOC
 !
 	INTEGER LU
 	INTEGER, PARAMETER :: IONE=1

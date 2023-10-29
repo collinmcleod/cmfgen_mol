@@ -12,11 +12,12 @@ C
 	1             FRST_EQ,GS_ION_EQ,SPEC_EQ,
 	1             NT,NUM_BNDS,ND,
 	1             BAION,EQUAT,NION,DST,DEND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered : 08-Jun-1995 EDGE frequency delted from call.
 C                       Change from _V1 to _V2 as call changed.
-C Created - May 1995 
+C Created - May 1995
 C
 	INTEGER NLEV		!Numer of levls in HN
         INTEGER N_DI		!Number of levels in target ion
@@ -34,39 +35,39 @@ C HI,HII,CI,CII,CIII,CIV,CV would have NION=5 (dont count HII and CV).
 C
 	INTEGER NUM_BNDS,DST,DEND
 C
-	REAL(10) BA(NT,NT,NUM_BNDS,ND),BAION(NION,NT,NUM_BNDS,ND)
-	REAL(10) WSE(NLEV,ND),dWSEdT(NLEV,ND)
+	REAL(KIND=LDP) BA(NT,NT,NUM_BNDS,ND),BAION(NION,NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) WSE(NLEV,ND),dWSEdT(NLEV,ND)
 C
 C Populations of species undergoing photoionization.
 C
-	REAL(10) HN(NLEV,ND),HNST(NLEV,ND),dlnHNST_dlnT(NLEV,ND)
+	REAL(KIND=LDP) HN(NLEV,ND),HNST(NLEV,ND),dlnHNST_dlnT(NLEV,ND)
 C
 C Ion populations.
 C
-	REAL(10) DI(N_DI,ND),DIST(N_DI,ND)
-	REAL(10) dlnDIST_dlnT(N_DI,ND)
+	REAL(KIND=LDP) DI(N_DI,ND),DIST(N_DI,ND)
+	REAL(KIND=LDP) dlnDIST_dlnT(N_DI,ND)
 C
-	REAL(10) ED(ND),T(ND)
-	REAL(10) JREC(ND)
-	REAL(10) dJRECdT(ND)
-	REAL(10) JPHOT(ND)
+	REAL(KIND=LDP) ED(ND),T(ND)
+	REAL(KIND=LDP) JREC(ND)
+	REAL(KIND=LDP) dJRECdT(ND)
+	REAL(KIND=LDP) JPHOT(ND)
 C
 C Constants for opacity etc.
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
 C Local variables
 C
 	INTEGER J,K,L,NJ,ION_EQ
-	REAL(10) T3
-	REAL(10) B_RAT
+	REAL(KIND=LDP) T3
+	REAL(KIND=LDP) B_RAT
 C
 C REV_HNST referes to the LTE population  of the level defined with respect
 C to the actual destination (target) level.
 C
-	REAL(10) REV_HNST
-	REAL(10) WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC
+	REAL(KIND=LDP) REV_HNST
+	REAL(KIND=LDP) WSE_BY_RJ,DI_FAC,ED_FAC,T_FAC
 C
 	IF(ION_LEV .EQ. 0)RETURN
 C
@@ -85,7 +86,7 @@ C
 	      ED_FAC=T3/ED(K)
 	      T_FAC=T3*( dlnHNST_dlnT(J,K) +
 	1             (dlnDIST_dlnT(1,K)-dlnDIST_dlnt(ION_LEV,K)) )/T(K) +
-	1             dWSEdT(J,K)*(REV_HNST*JREC(K)-HN(J,K)*JPHOT(K)) + 
+	1             dWSEdT(J,K)*(REV_HNST*JREC(K)-HN(J,K)*JPHOT(K)) +
 	1             REV_HNST*WSE(J,K)*dJRECdT(K)
 C
 	      ION_EQ=GS_ION_EQ+(ION_LEV-1)
@@ -102,15 +103,15 @@ C
 	        BA(ION_EQ,NJ,L,K)=BA(ION_EQ,NJ,L,K) + WSE_BY_RJ
 	        BA(ION_EQ,ION_EQ,L,K)=BA(ION_EQ,ION_EQ,L,K) - DI_FAC
 	        BA(ION_EQ,NT-1,L,K)=BA(ION_EQ,NT-1,L,K) - ED_FAC
-	        BA(ION_EQ,NT,L,K)=BA(ION_EQ,NT,L,K) - T_FAC 
+	        BA(ION_EQ,NT,L,K)=BA(ION_EQ,NT,L,K) - T_FAC
 	      END IF		!ION_EQ .NE. 0
 C
 C NB: We do not increment the ionization equation for a species by
 C     ionizations/recombinations from/to the lower ionization state.
 C     This is satisfactory provided there are no transitions between
 C     states differing by a charge of 2 --- such as occurs with
-C     Auger ionization. In such cases the X-ray ionizations must be 
-C     incorporated in a special way. 
+C     Auger ionization. In such cases the X-ray ionizations must be
+C     incorporated in a special way.
 C
 	      IF(EQUAT .NE. 0)THEN
 	        BAION(EQUAT,NJ,L,K)=BAION(EQUAT,NJ,L,K) - WSE_BY_RJ

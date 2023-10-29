@@ -3,18 +3,19 @@
 ! dependent SN sequence.
 !
 	SUBROUTINE OUT_SN_POPS_V3(FILENAME,SN_AGE_DAYS,USE_OLD_MF_OUTPUT,ND,LU)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
 ! Altered: 27-Mar-2023 : Changed unit labeling for SN_HYDRO_DATA and fixed typo.
 !                           Should not effect reading as only first word crucial.
-! Altered: 21-Mar-2018 : Now output CLUMP_FAC to SN_HYDRO_FOR_NEXT_MODEL. 
+! Altered: 21-Mar-2018 : Now output CLUMP_FAC to SN_HYDRO_FOR_NEXT_MODEL.
 ! Altered: 06-Sep-2016 : Increased output precision in R and V to 10 digits.
 ! Altered: 01-Mar-2016 : Changed to allow handling of a standard NUC_DECAY_DATA file.
 !                         Code checks availability of decay route. This is important
 !                         when a species but not isotopes are included [17-Feb-2016].
-! Altered 20-Feb-2016 : Changed to allow correct treatment of species and isotopic data when 
+! Altered 20-Feb-2016 : Changed to allow correct treatment of species and isotopic data when
 !                         a full NUC_DECAY_DATA file (with all species/isotopes) are read in.
 ! Altered 08-May-2013 : Now write isotope data, when zero, in brief format.
 ! Altered 11-Feb-2009 : Use isotope data, when available, to compute mass fractions.
@@ -22,7 +23,7 @@
 !                         models.
 ! Created 21-Oct-2007
 !
-	REAL(10) SN_AGE_DAYS
+	REAL(KIND=LDP) SN_AGE_DAYS
 	LOGICAL USE_OLD_MF_OUTPUT
 	INTEGER ND
 	INTEGER LU
@@ -30,7 +31,7 @@
 !
 ! Local variables
 !
-	REAL(10) TMP_VEC(ND)
+	REAL(KIND=LDP) TMP_VEC(ND)
 	INTEGER I,IS
 	INTEGER ICOUNT
 	INTEGER NISO
@@ -114,9 +115,10 @@
 !^L
 !
 	SUBROUTINE OUT_SN_VEC(X,ND,HEADER,LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER ND,LU
-	REAL(10) X(ND)
+	REAL(KIND=LDP) X(ND)
 	CHARACTER(LEN=*) HEADER
 	INTEGER I
 !

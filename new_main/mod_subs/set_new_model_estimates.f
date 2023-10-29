@@ -10,7 +10,7 @@
 !            Model assumed to be same as current model.
 !
 !       GRID=.FALSE.
-!            Used for a completely new model. Ne is estimated and the 
+!            Used for a completely new model. Ne is estimated and the
 !            departure coefficients are assumed to be the same on the
 !            electron density scale. T is also estimated on the electron
 !            density scale. For TAU < TAU_INIT_TAU, T is not changed
@@ -25,6 +25,7 @@
 !
 	SUBROUTINE SET_NEW_MODEL_ESTIMATES(POPS,Z_POP,NU,NU_EVAL_CONT,FQW,
 	1            LUER,LUIN,NC,ND,NP,NT,NCF,N_LINE_FREQ,MAX_SIM)
+	USE SET_KIND_MODULE
 	USE ANG_QW_MOD
 	USE MOD_CMFGEN
 	USE OPAC_MOD
@@ -37,7 +38,7 @@
 ! Altered 18-Aug-2019 : Added option 'TR for DC_INTERP_METHOD (initially done on ESTRAVEN).
 !                          Added option validity check for DC_INTERP_METHOD.
 ! Altered 26-Apr-2019 : Added "CALL AUTO_ADD_ION" (done earlier on OSIRIS).
-!                       Added RSP as a DC_INTERP_METHOD 
+!                       Added RSP as a DC_INTERP_METHOD
 ! Altered 31-Jan-2016 : Added SAVED_TWO_PHOT_METHOD.
 ! Altered 07-Apr-2015 : Changed to SET_TWO_PHOT_V3.
 ! Altered 05-Apr-2011 : Many changes done in order to facilitate the USE of LTE populations
@@ -61,56 +62,56 @@
 	INTEGER LUIN				!Unit for input
 	INTEGER MAX_SIM				!Maximum number of lines that can be treated simultaneously.
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) Z_POP(NT)			!Vector containing Z of atom/ion (not core)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) Z_POP(NT)			!Vector containing Z of atom/ion (not core)
 !
-	REAL(10) FQW(NCF)
-	REAL(10) NU_EVAL_CONT(NCF)
-	REAL(10) NU(NCF)
+	REAL(KIND=LDP) FQW(NCF)
+	REAL(KIND=LDP) NU_EVAL_CONT(NCF)
+	REAL(KIND=LDP) NU(NCF)
 !
 ! These are set in CMFGEN.
 !
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL(10) OPLIN,EMLIN
+	REAL(KIND=LDP) OPLIN,EMLIN
 !
 ! Arrays for improving on the initial T structure --- partition functions.
 ! Need one for each atomic species.
 !
-        REAL(10), ALLOCATABLE :: U_PAR_FN(:,:)
-        REAL(10), ALLOCATABLE :: PHI_PAR_FN(:,:)
-        REAL(10), ALLOCATABLE :: Z_PAR_FN(:)
-        REAL(10) SPEC_DEN(ND,NUM_SPECIES)         !Used by ELEC_PREP
-	REAL(10) AT_NO_VEC(ND,NUM_SPECIES)
+        REAL(KIND=LDP), ALLOCATABLE :: U_PAR_FN(:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: PHI_PAR_FN(:,:)
+        REAL(KIND=LDP), ALLOCATABLE :: Z_PAR_FN(:)
+        REAL(KIND=LDP) SPEC_DEN(ND,NUM_SPECIES)         !Used by ELEC_PREP
+	REAL(KIND=LDP) AT_NO_VEC(ND,NUM_SPECIES)
 !
-	REAL(10) TGREY(ND)			!Grey temperature structure
-	REAL(10) T_SAVE(ND)
-	REAL(10) ROSSMEAN(ND)			!Rosseland mean opacity
-	REAL(10) PLANCKMEAN(ND)			!Planck mean opacity
+	REAL(KIND=LDP) TGREY(ND)			!Grey temperature structure
+	REAL(KIND=LDP) T_SAVE(ND)
+	REAL(KIND=LDP) ROSSMEAN(ND)			!Rosseland mean opacity
+	REAL(KIND=LDP) PLANCKMEAN(ND)			!Planck mean opacity
 !
 ! These are all work vectors.
 !
-	REAL(10) RJ(ND)
-	REAL(10) DTAU(ND)
-	REAL(10) Z(ND)
-	REAL(10) dCHIdR(ND)
+	REAL(KIND=LDP) RJ(ND)
+	REAL(KIND=LDP) DTAU(ND)
+	REAL(KIND=LDP) Z(ND)
+	REAL(KIND=LDP) dCHIdR(ND)
 !
-	REAL(10) TA(ND)
-	REAL(10) TB(ND)
-	REAL(10) TC(ND)
-	REAL(10) QH(ND)
-	REAL(10) Q(ND)
-	REAL(10) GAM(ND)
-	REAL(10) GAMH(ND)
-	REAL(10) H(ND)
-	REAL(10) SOB(ND)
-	REAL(10) XM(ND)
-	REAL(10) FEDD(ND)
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) TB(ND)
+	REAL(KIND=LDP) TC(ND)
+	REAL(KIND=LDP) QH(ND)
+	REAL(KIND=LDP) Q(ND)
+	REAL(KIND=LDP) GAM(ND)
+	REAL(KIND=LDP) GAMH(ND)
+	REAL(KIND=LDP) H(ND)
+	REAL(KIND=LDP) SOB(ND)
+	REAL(KIND=LDP) XM(ND)
+	REAL(KIND=LDP) FEDD(ND)
 !
-	REAL(10) T1,T2,T3
-	REAL(10) HBC_J
-	REAL(10) NU_DOP
-	REAL(10) FL		!Current frequency
-	REAL(10) CONT_FREQ	!Frequency at which current ETA/CHI was evaluated
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) HBC_J
+	REAL(KIND=LDP) NU_DOP
+	REAL(KIND=LDP) FL		!Current frequency
+	REAL(KIND=LDP) CONT_FREQ	!Frequency at which current ETA/CHI was evaluated
 !
 	INTEGER FREQ_INDX 	!Index of current frequency in NU
 	INTEGER ML		!Same as FREQ_INDX
@@ -137,7 +138,7 @@
 ! Constants for opacity etc.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	LST_DEPTH_ONLY=.FALSE.
 	SECTION='CONTINUUM'
@@ -150,14 +151,14 @@
 ! The first call to REGRIDWS is effectively used to compute DHeI only.
 !
 	WRITE(6,*)'Calling AUTO_ADD_ION';  FLUSH(UNIT=6)
-	CALL AUTO_ADD_ION() 
+	CALL AUTO_ADD_ION()
 	IF(GRID) THEN
 	  WRITE(LUER,'(/,A,/)')' Using direct interpolation option (i.e. GRID) for new model.'
 !
 ! Regrid the temperature and the electron density. By using this call the
-! last species can be taken from a different model to the H, He populations 
+! last species can be taken from a different model to the H, He populations
 ! etc. Normally T_IN can be the same as He2_IN (i.e. any input departure
-! coefficient file). 
+! coefficient file).
 !
 	  CALL REGRID_T_ED_V3(R,ED,T,POP_ATOM,ND,DC_INTERP_METHOD,'T_IN')
 	  DO ID=1,NUM_IONS-1
@@ -241,8 +242,8 @@
 !
 	        CALL REGRID_T_ED(R,TA,T,POP_ATOM,ND,'T_IN')
 	      ELSE
-!                         
-! The INIT_TEMP routine assumes that the T can interpolated using 
+!
+! The INIT_TEMP routine assumes that the T can interpolated using
 ! a Spherical TAU scale computed using the electron scattering opacity.
 !
 	        CALL INIT_TEMP_V2(R,ED,CLUMP_FAC,T,LUM,T_INIT_TAU,ND,LUIN,'T_IN')
@@ -378,7 +379,7 @@
 ! Now scale the population for EACH species to ensure that the species
 ! conservation equation is satisfied.
 !
-! This option should always be set if new model with T iteration 
+! This option should always be set if new model with T iteration
 ! and correction. With the GRID=T option it may provide a convenient
 ! method for reducing the populations temporarily (in conjunction with
 ! DISPGEN) in the outer layers to overcome a large jump in optical
@@ -391,7 +392,7 @@
 	    END DO
 	  END IF
 	END DO			!ISPEC
-!                     
+!
 ! We now need to compute the populations for the model atom with Super-levels.
 ! We do this in reverse order (i.e. highest ionization stage first) in order
 ! that we the ion density for the lower ionization stage is available for
@@ -406,7 +407,7 @@
 	1      ATM(ID+1)%XzV, ATM(ID+1)%NXzV,     ATM(ID+1)%XzV_PRES,  ND)
 	END DO
 !
-! Store all quantities in POPS array. This is done here as it enables POPION 
+! Store all quantities in POPS array. This is done here as it enables POPION
 ! to be readily computed. It also ensures that POS is correct if we don't
 ! iterate on T.
 !
@@ -430,7 +431,7 @@
 	CALL EVAL_LTE_V5(DO_LEV_DISSOLUTION,ND)
 !
 ! 
-! 
+!
 ! Iterate on the initial temperature distribution so that the
 ! temperature distribution at depth corresponds to the GREY solution.
 ! We use the Rosseland mean opacities to evaluate the GREY temperature
@@ -438,7 +439,7 @@
 !
 ! This page computes the Rosseland mean opacity from the temperature
 ! distribution and the population levels. TA is a working vector. The
-! Rosseland opacity is given in ROSSMEAN. 
+! Rosseland opacity is given in ROSSMEAN.
 !
 	CALL TUNE(1,'T_ITERATE')
 	MAIN_COUNTER=1
@@ -460,7 +461,7 @@
 !
 	    DO ID=1,NUM_IONS-1
 	       ID_SAV=ID
-	       CALL SET_TWO_PHOT_V3(ION_ID(ID), ID_SAV, 
+	       CALL SET_TWO_PHOT_V3(ION_ID(ID), ID_SAV,
 	1          ATM(ID)%XzVLTE,          ATM(ID)%NXzV,
 	1          ATM(ID)%XzVLTE_F_ON_S,   ATM(ID)%XzVLEVNAME_F,
 	1          ATM(ID)%EDGEXzV_F,       ATM(ID)%GXzV_F,
@@ -479,7 +480,7 @@
 	            LAST_LINE=LAST_LINE+1
 	    END DO
 !
-! ROSSMEAN is initially used to accumulate the integral of 1/chi (weighted 
+! ROSSMEAN is initially used to accumulate the integral of 1/chi (weighted
 ! by dB/DT). After the frequency loop it is corrected so that it contains
 ! Rosseland mean opacity.
 !
@@ -522,7 +523,7 @@
 	        END IF
 	      END DO
 !
-! CHECK for negative line opacities. 
+! CHECK for negative line opacities.
 !
 	      DO I=1,ND
 	        CHI_NOSCAT(I)=MAX(0.0D0,CHI(I)-ESEC(I))
@@ -545,7 +546,7 @@
 ! of 10^15 larger than in MAINGEN as FQW has already been multiplied by
 ! 10^15 for dv integrations.
 !
-! If clumping is important, we need to correct the Rosseland mean opacity 
+! If clumping is important, we need to correct the Rosseland mean opacity
 ! for clumping. Since it is a simple scale factor at each depth, we can do
 ! it here, rather than adjust CHI for each frequency.
 !
@@ -608,9 +609,9 @@
 	     CALL SCALE_GREY(TGREY,TA,GREY_IOS,LUIN,ND)
 	   END IF
 !
-! Now correct T distribution towards grey value. As we don't require the 
+! Now correct T distribution towards grey value. As we don't require the
 ! old T, we can overwrite it straight away. If we multiplied T1 by a number
-! less than  unity, this would be equivalent to only a partial correction 
+! less than  unity, this would be equivalent to only a partial correction
 ! of T towards TGREY:
 !          GREY_PAR=0 set T=TGREY
 !          GREY_PAR=INFINITY leaves T=T.
@@ -662,7 +663,7 @@
 	1          ATM(ID)%XzV_F,     ATM(ID)%LOG_XzVLTE_F,  ATM(ID)%W_XzV_F,
 	1          ATM(ID)%DXzV_F,    ATM(ID)%EDGEXzV_F, ATM(ID)%GXzV_F,
 	1          ATM(ID)%GIONXzV_F, ATM(ID)%ZXzV,T, TC, ED,
-	1          ATM(ID)%NXzV_F, ND,J,NUM_IONS, 
+	1          ATM(ID)%NXzV_F, ND,J,NUM_IONS,
 	1          ATM(ID)%XzV_PRES,ION_ID(ID),TMP_STRING)
 	   END DO
 !
@@ -711,8 +712,8 @@
 ! 
 !
 ! Now need to compute LTE populations, and populations.
-! Since T and Ne have altered, we revise the vectors for evaluating the 
-! level dissolution. These constants are the same for all species. These are 
+! Since T and Ne have altered, we revise the vectors for evaluating the
+! level dissolution. These constants are the same for all species. These are
 ! stored in a common block, and are required by SUP_TO_FULL and LTE_POP_WLD.
 !
 ! NB: POPION will also alter but in W-R and LBV's all species will be ionized,
@@ -724,7 +725,7 @@
 ! We do low ionization species second, as first need DION.
 !
 	    DO ISPEC=1,NUM_SPECIES
-	      FIRST=.TRUE.   
+	      FIRST=.TRUE.
 	      DO ID=SPECIES_END_ID(ISPEC),SPECIES_BEG_ID(ISPEC),-1
 	        IF(ATM(ID)%XzV_PRES)THEN
 	          CALL LTEPOP_WLD_V2(ATM(ID)%XzVLTE_F, ATM(ID)%LOG_XzVLTE_F,  ATM(ID)%W_XzV_F,
@@ -778,7 +779,7 @@
 !
 	    DO J=1,ND
 	      POPION(J)=0.0D0
-	      DO I=1,NT        
+	      DO I=1,NT
 	        IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
 	      END DO
 	    END DO
@@ -800,7 +801,7 @@
 	  DEALLOCATE (U_PAR_FN,STAT=IOS)
 	  DEALLOCATE (PHI_PAR_FN,STAT=IOS)
 	  DEALLOCATE (Z_PAR_FN,STAT=IOS)
-	END IF 
+	END IF
 !
 ! Restore two photon method option.
 !

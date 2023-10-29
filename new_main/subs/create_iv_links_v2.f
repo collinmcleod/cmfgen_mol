@@ -8,6 +8,7 @@
 ! been allocated for any equation (including earlier allocations).
 !
       SUBROUTINE CREATE_IV_LINKS_V2(NT,NION)
+	USE SET_KIND_MODULE
       USE MOD_CMFGEN
       USE STEQ_DATA_MOD
       IMPLICIT NONE
@@ -102,4 +103,4 @@
       END DO
 !
       RETURN
-      END    
+      END

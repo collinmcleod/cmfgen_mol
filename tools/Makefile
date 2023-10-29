@@ -30,6 +30,7 @@ OBJ = $(LIB)(usr_option.o)\
       $(LIB)(rd_rvtj_v4.o)\
       $(LIB)(rd_rvtj_v5.o)\
       $(LIB)(read_chi_data_file.o)\
+      $(LIB)(set_kind_module.o)\
       $(LIB)(set_case_fn.o)\
       $(LIB)(sm_phot_v3.o)\
       $(LIB)(sve_file.o)\
@@ -49,7 +50,7 @@ $(LIB) : $(OBJ)
 
 # General rules to make obects in a library and object files
 
-$(LIB)(%.o) : %.f 
+$(LIB)(%.o) : %.f  $(LIB)(set_kind_module.o)
 	$(F90) -c $(FG)  $<
 	ar $(AR_OPTION) $(LIB) $*.o
 

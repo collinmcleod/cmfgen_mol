@@ -1,13 +1,14 @@
         SUBROUTINE WRITE_ARRAY_ISO(A,ND,N,B,FILENAME1)
+	USE SET_KIND_MODULE
         IMPLICIT NONE
-!      
+!
         INTEGER :: ND
         INTEGER :: N
         INTEGER :: I,J,K
 	INTEGER :: INDX
 	INTEGER :: V
-        REAL(10) :: A(ND,N)
-        REAL(10) :: B(N)
+        REAL(KIND=LDP) :: A(ND,N)
+        REAL(KIND=LDP) :: B(N)
         CHARACTER(LEN=40) :: FILENAME1
         CHARACTER(LEN=40) :: FILENAME2
         CHARACTER(LEN=15) :: STRING

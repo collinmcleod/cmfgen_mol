@@ -8,7 +8,7 @@ C is mononotonic in the interpolating interval.
 C
 C A special format is used for the points at which the interpolations are
 C made. Specifcally design for FG_J_CMF_V7. Use MON_INTERP for other
-C formats. The first derivatives can also be computed and returned, at 
+C formats. The first derivatives can also be computed and returned, at
 C both the nodes, ans the inserted points.
 C
 C Both the interpolated function and its first derivatives are continuous.
@@ -20,6 +20,7 @@ C Ref: Steffen. M, 1990, A/&A, 239, 443-450
 C
 	SUBROUTINE MON_INT_INS_V1(CHI_INS,R_INS,NINS,CHI,R,ND,
 	1                   LOGX,LOGY,dCHIdR,dCHIdR_INS,DERIV)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Created 26-Sep-1997 - Based on MON_INTERP
@@ -30,28 +31,28 @@ C NB: These arrays are dimensioned ND-1 since there are ONLY ND-1
 C intervals. By doing this we can use MATRIX operations, and operate
 C on the whole array.
 C
-	REAL(10) CHI_INS(ND-1,NINS)
-	REAL(10) R_INS(ND-1,NINS)
-	REAL(10) dCHIdR_INS(ND-1,NINS)
+	REAL(KIND=LDP) CHI_INS(ND-1,NINS)
+	REAL(KIND=LDP) R_INS(ND-1,NINS)
+	REAL(KIND=LDP) dCHIdR_INS(ND-1,NINS)
 
-	REAL(10) R(ND)
-	REAL(10) CHI(ND)
-	REAL(10) dCHIdR(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) dCHIdR(ND)
 C
 	LOGICAL LOGX			!Indicates interpolation in LOG(R)
 	LOGICAL LOGY			!Indicate interpolation in LOG(Y)
 	LOGICAL DERIV			!Indicates to compute derivatives.
 C
-	REAL(10) X(ND)			!Revised R array
-	REAL(10) Y(ND)			!Revised CHI array
+	REAL(KIND=LDP) X(ND)			!Revised R array
+	REAL(KIND=LDP) Y(ND)			!Revised CHI array
 C
-	REAL(10) H(ND)			!Delta R [ R(I+1)-R(I) ]
-	REAL(10) S(ND)			!Slope in interval (I to I+1)
-	REAL(10) D(ND)			!First derivative at node I
-	REAL(10) COEF(ND,4)
+	REAL(KIND=LDP) H(ND)			!Delta R [ R(I+1)-R(I) ]
+	REAL(KIND=LDP) S(ND)			!Slope in interval (I to I+1)
+	REAL(KIND=LDP) D(ND)			!First derivative at node I
+	REAL(KIND=LDP) COEF(ND,4)
 C
-	REAL(10) ONE
-	REAL(10) DELR
+	REAL(KIND=LDP) ONE
+	REAL(KIND=LDP) DELR
 	PARAMETER (ONE=1.0D0)
 	INTEGER I,K
 C
@@ -135,7 +136,7 @@ C
 	  END DO
 C
 C Now need to interpolated quantities if we did not perform the interpolations
-C in a LINEAR-LINEAR plane. The instructions invloving INS variables are 2D 
+C in a LINEAR-LINEAR plane. The instructions invloving INS variables are 2D
 C ARRRAY operations. The other instructions are 1D operations.
 C
 	  IF(LOGX .AND. LOGY)THEN

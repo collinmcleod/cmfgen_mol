@@ -1,9 +1,10 @@
 !
 ! Subroutine to compute the coefficient matrix (dimension ND*ND) for
-! the variation in opacity for a plane-parallel atmosphere. The 
+! the variation in opacity for a plane-parallel atmosphere. The
 ! matrix is tridiagonal.  No velocity filed is present.
 !
 	SUBROUTINE dRHSdCHI_PP(W,SOURCE,CHI,DTAU,COH_VEC,RJ,F,R,DIFF,DBB,ND)
+	USE SET_KIND_MODULE
 	USE MOD_TRAP_DERIVATIVES
 	IMPLICIT NONE
 !
@@ -12,25 +13,25 @@
 !                      Q and R^2 terms have been omitted.
 !
 	INTEGER ND
-	REAL(10) SOURCE(ND)
-	REAL(10) CHI(ND)
-	REAL(10) DTAU(ND)
-	REAL(10) COH_VEC(ND)
-	REAL(10) RJ(ND)
-	REAL(10) R(ND)
-	REAL(10) F(ND)
-	REAL(10) DBB
+	REAL(KIND=LDP) SOURCE(ND)
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) DTAU(ND)
+	REAL(KIND=LDP) COH_VEC(ND)
+	REAL(KIND=LDP) RJ(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) F(ND)
+	REAL(KIND=LDP) DBB
 	LOGICAL DIFF
 !
 ! Output:
 !
-	REAL(10) W(ND,ND)
+	REAL(KIND=LDP) W(ND,ND)
 !
 ! Local varaibles.
 !
-	REAL(10) dTAU_dCHI(ND,ND)
-	REAL(10) ALPHA,BETA,T1
-	REAL(10) UIJ,UII
+	REAL(KIND=LDP) dTAU_dCHI(ND,ND)
+	REAL(KIND=LDP) ALPHA,BETA,T1
+	REAL(KIND=LDP) UIJ,UII
 	INTEGER I,J,K
 !
 ! Compute dDTAU(I)/dCHI

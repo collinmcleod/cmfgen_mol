@@ -1,11 +1,12 @@
       SUBROUTINE DTRSM ( SIDE, UPLO, TRANSA, DIAG, M, N, ALPHA, A, LDA,
      $                   B, LDB )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       CHARACTER*1        SIDE, UPLO, TRANSA, DIAG
       INTEGER            M, N, LDA, LDB
-      REAL(10)   ALPHA
+      REAL(KIND=LDP)   ALPHA
 *     .. Array Arguments ..
-      REAL(10)   A( LDA, * ), B( LDB, * )
+      REAL(KIND=LDP)   A( LDA, * ), B( LDB, * )
 *     ..
 *
 *  Purpose
@@ -78,13 +79,13 @@
 *           at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - REAL(10).
+*  ALPHA  - REAL(KIND=LDP).
 *           On entry,  ALPHA specifies the scalar  alpha. When  alpha is
 *           zero then  A is not referenced and  B need not be set before
 *           entry.
 *           Unchanged on exit.
 *
-*  A      - REAL(10) array of DIMENSION ( LDA, k ), where k is m
+*  A      - REAL(KIND=LDP) array of DIMENSION ( LDA, k ), where k is m
 *           when  SIDE = 'L' or 'l'  and is  n  when  SIDE = 'R' or 'r'.
 *           Before entry  with  UPLO = 'U' or 'u',  the  leading  k by k
 *           upper triangular part of the array  A must contain the upper
@@ -105,7 +106,7 @@
 *           then LDA must be at least max( 1, n ).
 *           Unchanged on exit.
 *
-*  B      - REAL(10) array of DIMENSION ( LDB, n ).
+*  B      - REAL(KIND=LDP) array of DIMENSION ( LDB, n ).
 *           Before entry,  the leading  m by n part of the array  B must
 *           contain  the  right-hand  side  matrix  B,  and  on exit  is
 *           overwritten by the solution matrix  X.
@@ -137,9 +138,9 @@
 *     .. Local Scalars ..
       LOGICAL            LSIDE, NOUNIT, UPPER
       INTEGER            I, INFO, J, K, NROWA
-      REAL(10)   TEMP
+      REAL(KIND=LDP)   TEMP
 *     .. Parameters ..
-      REAL(10)   ONE         , ZERO
+      REAL(KIND=LDP)   ONE         , ZERO
       PARAMETER        ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     ..
 *     .. Executable Statements ..

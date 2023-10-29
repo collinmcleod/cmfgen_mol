@@ -6,18 +6,19 @@ C mean intensity at the boundary, and would need to be moified to obtain
 C other quantities other than 2nd moment of the intensity. The program assumes
 C that the first point corresponds to mu=1.0 .
 C
-C The first derivatives are estimated by 
+C The first derivatives are estimated by
 C                               dv(i)= (V(I-1)-V(I))/(MU(I-1)-MU(I))
 C
 	SUBROUTINE NWEIGHT(X,W,N)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 25-May-1996 - CALL to DP_ZERO deleted
-C                       ERROR_LU inserted.     
+C                       ERROR_LU inserted.
 C Created 11-JAN-1988 - Based on KWEIGHT.
 C
 	INTEGER N,I
-	REAL(10) X(N),W(N),H,R,RE,RF,T1,SUM
+	REAL(KIND=LDP) X(N),W(N),H,R,RE,RF,T1,SUM
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -74,7 +75,7 @@ C
 	  W(N)=W(N)+0.2D0*(X(N)**4)
 	END IF
 C
-C Ensure that the weights have the correct normalization (shouldnt be 
+C Ensure that the weights have the correct normalization (shouldnt be
 C necessary. We assume v=mu for the normalization.
 C
 	SUM=0.0D0

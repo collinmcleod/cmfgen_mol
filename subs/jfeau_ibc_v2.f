@@ -7,9 +7,10 @@
 	SUBROUTINE JFEAU_IBC_V2(TA,TB,TC,DTAU,R,RJ,Q,F,
 	1            ZETA,THETA,CHI,DBB,IC,HBC_J,HBC_S,
 	1            INBC,THK,INNER_BND_METH,ND,METHOD)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
-! Altered 15-Jan-2015 - Added check for -ve intensities. 
+! Altered 15-Jan-2015 - Added check for -ve intensities.
 ! Altered 07-Jun-2010 - Changed to V2. Changed DIF to INNER_BND_METH.
 ! Altered 24-May-1996 - Call to DP_ZERO deleted; IONE isnatlled in THOMAS call.
 ! Created 12-JUN-1991 - Based on JFEAUNEW. HBC replaced by HBC_J and HBC_S.
@@ -35,10 +36,10 @@
 ! Created 17-FEB-1986
 !
 	INTEGER ND,I
-	REAL(10) TA(ND),TB(ND),TC(ND),R(ND),ZETA(ND)
-	REAL(10) RJ(ND),DTAU(ND),Q(ND),F(ND)
-	REAL(10) THETA(ND),CHI(ND)
-	REAL(10) DBB,HBC_J,HBC_S,INBC,IC,T1
+	REAL(KIND=LDP) TA(ND),TB(ND),TC(ND),R(ND),ZETA(ND)
+	REAL(KIND=LDP) RJ(ND),DTAU(ND),Q(ND),F(ND)
+	REAL(KIND=LDP) THETA(ND),CHI(ND)
+	REAL(KIND=LDP) DBB,HBC_J,HBC_S,INBC,IC,T1
 	CHARACTER(LEN=6) METHOD
 	CHARACTER(LEN=*) INNER_BND_METH
 	LOGICAL THK

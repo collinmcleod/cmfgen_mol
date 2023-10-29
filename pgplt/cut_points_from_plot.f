@@ -2,6 +2,7 @@
 !
 	SUBROUTINE CUT_POINTS_FROM_PLOT(NU_CUT,CROSS_CUT,NUM_CUT,
 	1    NU_SM,CROSS_SM,NUM_SM,CUT_ACCURACY)
+	USE SET_KIND_MODULE
 !
 ! Created 7-Mar-2015
 !
@@ -11,7 +12,7 @@
 !
 ! This routine cuts points from the given smoothed cross section such that
 ! linear interpolation can be used to recover intermediate data points to
-! a fractional accuracy of CUT_ACCURACY. All local maximum and minimum points 
+! a fractional accuracy of CUT_ACCURACY. All local maximum and minimum points
 ! are retained.
 !
 ! Altered  11/Jun/1999 Criterion for cutting points modified.
@@ -72,8 +73,8 @@
       ENDIF
 !
 ! Can now begin point selection in earnest. All maxima are retained.
-! Points are retained such that a linear interpolation gives an accuracy of 
-! ACCURACY, when the corss-section is > 1.0D-06. Outside this range at 
+! Points are retained such that a linear interpolation gives an accuracy of
+! ACCURACY, when the corss-section is > 1.0D-06. Outside this range at
 ! least 20 points per decade are retained.
 !
 ! Find next maximum or minimum point (dy/dx=0).
@@ -103,7 +104,7 @@
 !
 ! Determine the distance from each exact point (i=low,high)
 ! to the straight line interpolation between LOW and HIGH.
-! 
+!
         M=(CROSS_SM(HIGH)-CROSS_SM(LOW))/(NU_SM(HIGH)-NU_SM(LOW))
         DO I=LOW+1,HIGH-1
 	  Y=CROSS_SM(LOW)+M*(NU_SM(I)-NU_SM(LOW))

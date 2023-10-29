@@ -4,32 +4,33 @@
 ! used to detrmine the file name.
 !
 	SUBROUTINE WR_COL_RATES(OMEGA,XzV,XZVLTE,EDGE,LEV_NAME,N,DESC,LU,OPTION)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
-! Altered  24-May-2020 : When OPTION=NET_RATES we write out to XzV_TOTR_COL the net rate, 
+! Altered  24-May-2020 : When OPTION=NET_RATES we write out to XzV_TOTR_COL the net rate,
 !                          from all levels, into each leval
 ! Created  29-Jan-2004 : Based on WR_COL
 !
 	INTEGER N,LU
-	REAL(10) XzV(N)
-	REAL(10) XzVLTE(N)
-	REAL(10) EDGE(N)
-	REAL(10) OMEGA(N,N)
+	REAL(KIND=LDP) XzV(N)
+	REAL(KIND=LDP) XzVLTE(N)
+	REAL(KIND=LDP) EDGE(N)
+	REAL(KIND=LDP) OMEGA(N,N)
 	CHARACTER*(*) LEV_NAME(N),OPTION,DESC
 !
 ! Internal variables.
 !
-	REAL(10) T1
-	REAL(10) SUM
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) SUM
 	INTEGER I,J,K,L,M,IOS
 	INTEGER N_PER_LINE,LMAX,LIM,ST_POS
 	CHARACTER*80 FORM
 	CHARACTER*132 STRING
 	CHARACTER*30 TMP_NAME
 !
-! Number of digits to output OMEGA. Must include spaces used to separate 
+! Number of digits to output OMEGA. Must include spaces used to separate
 ! number from proceeding number. Must be the same as the number X in
-! EX.3                                 
+! EX.3
 !
 	INTEGER, PARAMETER :: DIG_PER_NUM=11
 	INTEGER, PARAMETER :: IZERO=0
@@ -66,7 +67,7 @@
 	DO M=1,(N+N_PER_LINE-1)/N_PER_LINE
 	  LIM=MIN(M*N_PER_LINE,N)
 !
-! Determine header string. Only the last DIG_PER_NUM-2 characters in the 
+! Determine header string. Only the last DIG_PER_NUM-2 characters in the
 ! name are output.
 !
 	  ST_POS=LMAX+1
@@ -109,7 +110,7 @@
 	1                J=MAX((N_PER_LINE*(M-1)+1),I),LIM )
 	      END IF
 	    END DO
-!	       
+!	
 	  ELSE IF( TRIM(OPTION) .EQ. 'COOL_RATES')THEN
 	    T1=6.626D-12
 	    DO I=1,MIN(N_PER_LINE*M,N)

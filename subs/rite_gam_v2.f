@@ -2,6 +2,7 @@ C
 C Auixlary routine to evauate, and write out, the mean ionic charge
 C
 	SUBROUTINE RITE_GAM_HEAD(R,ED,T,ND,LU,FILNAME)
+	USE SET_KIND_MODULE
 C
 C Altered 31-Dec-2013 : ND now output as I4 rather than I3
 C Created 11-Jun-1996 : based on RITE_GAM. This routine rites out
@@ -12,7 +13,7 @@ C
 	IMPLICIT NONE
 	INTEGER ND,LU
 C
-	REAL(10) R(ND),ED(ND),T(ND)
+	REAL(KIND=LDP) R(ND),ED(ND),T(ND)
 	CHARACTER*(*) FILNAME
 C
 C Local variables.
@@ -53,12 +54,13 @@ C
 C 
 C
 	SUBROUTINE RITE_GAM_V2(POP,GAM,AT_NO,DESC,ND,LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 	INTEGER LU,ND
-	REAL(10) POP(ND)
-	REAL(10) GAM(ND)
-	REAL(10) AT_NO
+	REAL(KIND=LDP) POP(ND)
+	REAL(KIND=LDP) GAM(ND)
+	REAL(KIND=LDP) AT_NO
 	CHARACTER*(*) DESC
 C
 	INTEGER I,LUER,ERROR_LU
@@ -78,7 +80,7 @@ C
 	    STOP
 	  END IF
 	END DO
-C	    
+C	
 	WRITE(LU,500)(GAM(I),I=1,ND)
 500	FORMAT(1P,1X,10E12.3)
 C

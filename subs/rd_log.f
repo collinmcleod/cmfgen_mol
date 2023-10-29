@@ -10,6 +10,7 @@ C               In future versions, by using a buffer, it may be possible
 C               to read in only necessary keywords.
 C
 	SUBROUTINE RD_LOG(VALUE,KEY,LUI,LUO,A)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	LOGICAL VALUE
 	INTEGER LUI,LUO
@@ -42,6 +43,7 @@ C
 C
 C
 	SUBROUTINE RD_2LOG(VALUE1,VALUE2,KEY,LUI,LUO,A)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	LOGICAL VALUE1,VALUE2
 	INTEGER LUI,LUO
@@ -73,6 +75,7 @@ C
 C
 C
 	SUBROUTINE RD_INT(VALUE,KEY,LUI,LUO,A)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER VALUE,LUI,LUO
 	CHARACTER*(*) KEY,A
@@ -103,8 +106,9 @@ C
 C
 C
 	SUBROUTINE RD_DBLE(VALUE,KEY,LUI,LUO,A)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
-	REAL(10) VALUE
+	REAL(KIND=LDP) VALUE
 	INTEGER LUI,LUO
 	CHARACTER*(*) KEY,A
 	CHARACTER*80 STRING
@@ -135,6 +139,7 @@ C
 C  Now ignores blank lines in input file.
 C
 	SUBROUTINE RD_CHAR(VALUE,KEY,LUI,LUO,A)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER LUI,LUO
 	CHARACTER*(*) KEY,A
@@ -168,6 +173,7 @@ C To replace RDCHAR. The number of characters to be read in is
 C now secified in the call. Now skips blank strings.
 C
 	SUBROUTINE RD_NCHAR(VALUE,KEY,NCHAR,LUI,LUO,A)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE!
 !
 ! Altered 03-Aug-2017: Fixed bug with long string write.
@@ -185,7 +191,7 @@ C
 C
 C Check if KEY matches
 C
-	KEY_LOC=INDEX(STRING,'['//KEY//']') 
+	KEY_LOC=INDEX(STRING,'['//KEY//']')
 	IF(KEY_LOC .EQ. 0)THEN	
 	  WRITE(LUO,*)'Error in RD_NCHAR - KEY deos not match'
 	  WRITE(LUO,*)'KEY=',KEY

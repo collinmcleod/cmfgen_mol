@@ -1,10 +1,12 @@
-	REAL(10) FUNCTION INTSIGC(ENR,XION_POT,EMIN,EMAX)
+	FUNCTION INTSIGC(ENR,XION_POT,EMIN,EMAX)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
+	REAL(KIND=LDP) INTSIGC 
 !
-	REAL(10) ENR              ! Energy at which we compute the integral of the cross section
-	REAL(10) XION_POT         ! (first) ionization potential of species under consideration
-	REAL(10) EMIN,EMAX        ! Bounds of integration
-	REAL(10) XJ,ONEOVERJ
+	REAL(KIND=LDP) ENR              ! Energy at which we compute the integral of the cross section
+	REAL(KIND=LDP) XION_POT         ! (first) ionization potential of species under consideration
+	REAL(KIND=LDP) EMIN,EMAX        ! Bounds of integration
+	REAL(KIND=LDP) XJ,ONEOVERJ
 !
 	INTSIGC = 0.0D0
 	IF (EMIN.GE.EMAX) THEN

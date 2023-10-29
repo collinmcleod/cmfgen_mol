@@ -58,6 +58,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_real_4(input,var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -156,6 +157,7 @@ c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine rd_real_dim_4(input,dim,required,
      *     var_name,default,description)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c

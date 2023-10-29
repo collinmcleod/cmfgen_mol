@@ -1,14 +1,15 @@
 !
-! Subroutine to read in the NON_THERM_DEGRADATION_SPEC 
+! Subroutine to read in the NON_THERM_DEGRADATION_SPEC
 !
 	SUBROUTINE RD_NON_THERM_ELEC_SPEC_V1(ND,LU)
+	USE SET_KIND_MODULE
 	USE MOD_NON_THERM
 !
 ! Created 30-Oct-2021
 !
 	INTEGER ND  		!Number of depth points
 	INTEGER LU
-	REAL(10) LOC_XKT(NKT)
+	REAL(KIND=LDP) LOC_XKT(NKT)
 	CHARACTER(LEN=132) STRING
 !
 ! Local variables.

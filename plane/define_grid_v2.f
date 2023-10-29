@@ -1,5 +1,6 @@
 !
       SUBROUTINE DEFINE_GRID_V2(R_EXT,V_EXT,VDOP_VEC,VDOP_FRAC,ND_EXT,R,P,ND,NC,NP)
+	USE SET_KIND_MODULE
       USE MOD_SPACE_GRID_V2
       IMPLICIT NONE
 !
@@ -20,21 +21,21 @@
       INTEGER NC
 !
       INTEGER ND_EXT
-      REAL(10) R_EXT(ND_EXT)
-      REAL(10) V_EXT(ND_EXT)
-      REAL(10) VDOP_VEC(ND_EXT)
-      REAL(10) VDOP_FRAC
+      REAL(KIND=LDP) R_EXT(ND_EXT)
+      REAL(KIND=LDP) V_EXT(ND_EXT)
+      REAL(KIND=LDP) VDOP_VEC(ND_EXT)
+      REAL(KIND=LDP) VDOP_FRAC
 !
 ! Grid variables
 !
-      REAL(10) R(ND)
-      REAL(10) V(ND)
-      REAL(10) P(NP)
+      REAL(KIND=LDP) R(ND)
+      REAL(KIND=LDP) V(ND)
+      REAL(KIND=LDP) P(NP)
 !
 ! Local variables
 !
-      REAL(10) MU(NP)
-      REAL(10) TEMP_VEC(NP)
+      REAL(KIND=LDP) MU(NP)
+      REAL(KIND=LDP) TEMP_VEC(NP)
 !
       INTEGER ID,IP
       INTEGER I,J
@@ -59,7 +60,7 @@
 	    EXIT
 	  END IF
 	END DO
-      ELSE 
+      ELSE
 	NEW_GRID=.TRUE.
       END IF
 !

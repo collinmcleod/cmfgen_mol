@@ -1,5 +1,5 @@
 !
-! Routine to solve the frequency integrated, fully relativistic 
+! Routine to solve the frequency integrated, fully relativistic
 ! transfer equations for a GREY atmosphere.
 !
 ! Ref: Mihalas, ApJ, 237, 574
@@ -30,54 +30,55 @@
 	1                  JNU,RSQHNU,HBC,IN_HBC,
 	1                  DIF,DBB,IC,METHOD,COHERENT,
 	1                  INCL_ADVEC_TERMS,INIT,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
-! Created:   
+! Created:
 !
 	INTEGER ND
 !
-	REAL(10) R(ND)
-	REAL(10) ETA(ND)
-	REAL(10) CHI(ND)
-	REAL(10) ESEC(ND)
-	REAL(10) V(ND)
-	REAL(10) SIGMA(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) ETA(ND)
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) ESEC(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) SIGMA(ND)
 !
 ! Moment ratio variables. All must be supplied.
 !
-	REAL(10) H_ON_J(ND)
-	REAL(10) F(ND)
+	REAL(KIND=LDP) H_ON_J(ND)
+	REAL(KIND=LDP) F(ND)
 !
 ! If INIT is true, the initial vector values are irrelevant, and
 ! the variable is returned. If false, vector must be
 ! supplied, but it will be updated inside this routine.
 !
-	REAL(10) dlnJdlnR(ND)
+	REAL(KIND=LDP) dlnJdlnR(ND)
 !
 ! These values are computed, and returned.
 !
-	REAL(10) JNU(ND)
-	REAL(10) RSQHNU(ND)
+	REAL(KIND=LDP) JNU(ND)
+	REAL(KIND=LDP) RSQHNU(ND)
 !
 ! Boundary conditions: Must be supplied.
 !
-	REAL(10) HBC			!H/J at outer boundary
-	REAL(10) IN_HBC			!H/J at inner boundary
+	REAL(KIND=LDP) HBC			!H/J at outer boundary
+	REAL(KIND=LDP) IN_HBC			!H/J at inner boundary
 !
-	REAL(10) DBB
-	REAL(10) IC
+	REAL(KIND=LDP) DBB
+	REAL(KIND=LDP) IC
 	CHARACTER*6 METHOD
 !
 ! COHERENT indicates whether the scattering is coherent. If it is, we
 ! explicitly take it into account. If COHERENT is FALSE, any electron
-! scattering (or Rayleight scattering) term should be included directly 
+! scattering (or Rayleight scattering) term should be included directly
 ! in the ETA that is passed to the routine.
 !
 	LOGICAL COHERENT
 	LOGICAL DIF			!Diffusion approximation?
 !
 ! If INCL_ADVEC_TERMS is true, the advection terms (dJ/dr and dH/dr)
-!   are included. For supernova models, the ADVECTION terms are often 
+!   are included. For supernova models, the ADVECTION terms are often
 !   neglected.
 !
 	LOGICAL INCL_ADVEC_TERMS
@@ -89,22 +90,22 @@
 !
 ! Local vectors
 !
-	REAL(10) TA(ND),TB(ND),TC(ND)
-	REAL(10) CHI_H(ND),CHI_J(ND)
-	REAL(10) DTAU_H(ND),DTAU_J(ND),DTAUONQ(ND)
-	REAL(10) Q(ND),XM(ND),SOURCE(ND)
-	REAL(10) HU(ND),HL(ND)
-	REAL(10) BETA(ND),H_ADV_FAC(ND),GAM_REL(ND)
-	REAL(10) GAM_REL_SQ(ND),CON_DELTA(ND)
-	REAL(10) JOLD(ND),P_H(ND),P_J(ND)
-	REAL(10) COH_VEC(ND)
+	REAL(KIND=LDP) TA(ND),TB(ND),TC(ND)
+	REAL(KIND=LDP) CHI_H(ND),CHI_J(ND)
+	REAL(KIND=LDP) DTAU_H(ND),DTAU_J(ND),DTAUONQ(ND)
+	REAL(KIND=LDP) Q(ND),XM(ND),SOURCE(ND)
+	REAL(KIND=LDP) HU(ND),HL(ND)
+	REAL(KIND=LDP) BETA(ND),H_ADV_FAC(ND),GAM_REL(ND)
+	REAL(KIND=LDP) GAM_REL_SQ(ND),CON_DELTA(ND)
+	REAL(KIND=LDP) JOLD(ND),P_H(ND),P_J(ND)
+	REAL(KIND=LDP) COH_VEC(ND)
 !
 ! Local variables.
 !
-	REAL(10) T1,T2
-	REAL(10) DAMP_FAC
-	REAL(10) MAX_ER
-	REAL(10) MAX_ER_LST_IT
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) DAMP_FAC
+	REAL(KIND=LDP) MAX_ER
+	REAL(KIND=LDP) MAX_ER_LST_IT
 	INTEGER LUER,ERROR_LU
 	INTEGER I,J,IFAIL
 	INTEGER IT_COUNT
@@ -153,7 +154,7 @@
 ! moment equation. We evaluate it at the grid points, and then use the
 ! averaging procedure used in the non-relativistic case.
 !
-! We divide CHI_H by an aditional GAM_REL since we substitute 
+! We divide CHI_H by an aditional GAM_REL since we substitute
 ! gamma^2. r^2. H into the zero moment equation.
 !
 ! CHI_J refers the the modified CHI term that multiplies J in the 0th
@@ -257,8 +258,8 @@
 	  XM(1)=0.0D0
 	  TA(1)=0.0D0
 !
-! NB: The expression for the flux is multiplied by GAM_REL_SQ since 
-!     the first moment equation is written in terms of 
+! NB: The expression for the flux is multiplied by GAM_REL_SQ since
+!     the first moment equation is written in terms of
 !     GAM_REL_SQ r^2 H which is required by the zero moment equation.
 !
 	  TA(ND)=-Q(ND-1)*(F(ND-1)+H_ADV_FAC(ND-1))/DTAU_H(ND-1)
@@ -351,7 +352,7 @@
 	DO I=1,ND
 !	  TA(I)=CON_DELTA(I)*( GAM_REL_SQ(I)*(SIGMA(I)+1.0D0)*
 !	1                 (XM(I)+F(I)*XM(I)+BETA(I)*TB(I)) -
-!	1                                  (SIGMA(I)+F(I))*XM(I) 
+!	1                                  (SIGMA(I)+F(I))*XM(I)
 !	1                    )
 	  TA(I)=CON_DELTA(I)*( XM(I)*(1.0D0-F(I)) +
 	1           GAM_REL_SQ(I)*(SIGMA(I)+1.0D0)*(F(I)*XM(I)+BETA(I)*TB(I))

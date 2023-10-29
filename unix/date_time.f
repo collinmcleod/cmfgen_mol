@@ -3,6 +3,7 @@ C F90, Computer independent routined to return a 20 character string
 C containg a formatted date and time.
 C
 	SUBROUTINE DATE_TIME(D_T_STRING)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	CHARACTER*(*) D_T_STRING
 C

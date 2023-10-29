@@ -1,4 +1,5 @@
       subroutine  dscal(n,da,dx,incx)
+	USE SET_KIND_MODULE
 c
 c     scales a vector by a constant.
 c     uses unrolled loops for increment equal to one.
@@ -6,7 +7,7 @@ c     jack dongarra, linpack, 3/11/78.
 c     modified 3/93 to return if incx .le. 0.
 c     modified 12/3/93, array(1) declarations changed to array(*)
 c
-      REAL(10) da,dx(*)
+      REAL(KIND=LDP) da,dx(*)
       integer i,incx,m,mp1,n,nincx
 c
       if( n.le.0 .or. incx.le.0 )return

@@ -1,4 +1,5 @@
 	PROGRAM TST_ADD
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -7,13 +8,13 @@
 	INTEGER NT,NUM_BNDS,ND,NVEC
 	INTEGER I,J,K,L
 !
-	REAL(10), ALLOCATABLE :: VJ_R(:,:,:)
-	REAL(10), ALLOCATABLE :: VJ_P(:,:,:)
-	REAL(10), ALLOCATABLE :: VJ(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ_R(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ_P(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ(:,:,:)
 !
 	LOGICAL, ALLOCATABLE :: NON_ZERO_VJ(:)
 !
-	REAL(10) T1,T2
+	REAL(KIND=LDP) T1,T2
 !
 	NT=1000; ND=60; NUM_BNDS=3
 	CALL GEN_IN(NT,'NT')	
@@ -174,7 +175,7 @@
 	STOP
 	END
 C
-C Routine to replace VMS TUNE routine for collecting tuning statistics for 
+C Routine to replace VMS TUNE routine for collecting tuning statistics for
 C a program section.
 C
 C Usage:
@@ -197,6 +198,7 @@ C NB: Total time for each code section is accumulated on successive calls.
 C i.e. TUNE(1,'Unique ID') does not initialize the counters.
 C
         SUBROUTINE TUNE(LRUN,IDENT)
+	USE SET_KIND_MODULE
         IMPLICIT NONE
 !
 ! Altered 11-Nov-2000 : Call to F90 SYSTEM_CLOCK routine implemented.
@@ -210,17 +212,17 @@ C
 !	INTEGER, PARAMETER :: LUOUT=55
 	INTEGER, PARAMETER :: LUOUT=6
 !
-        REAL(10) T0,OVERHEAD
-        REAL(10) ST_CPU(MAX_IDS)
-	REAL(10) CPUTOT(MAX_IDS)
-        REAL(10) WALLTOT(MAX_IDS)
+        REAL(KIND=LDP) T0,OVERHEAD
+        REAL(KIND=LDP) ST_CPU(MAX_IDS)
+	REAL(KIND=LDP) CPUTOT(MAX_IDS)
+        REAL(KIND=LDP) WALLTOT(MAX_IDS)
         CHARACTER*30 IDLIST(MAX_IDS)
         INTEGER I
 !
 	INTEGER*8 IEND_WALL
 	INTEGER*8 IC0,IR0,IM0,IT1
 	INTEGER*8 IST_WALL(MAX_IDS)
-	REAL(10) CLK_PERIOD,RR0
+	REAL(KIND=LDP) CLK_PERIOD,RR0
 !
 	REAL*4 ETIME,TARRY(2)
 !
@@ -250,7 +252,7 @@ C
         ENDIF
 !
 ! If LRUN =1, we are beginning the TIME bracket. Therefore we find the
-! correct storage location first. 
+! correct storage location first.
 !
 	IF (LRUN .EQ. 1) THEN
 	  DO I=1,MAX_IDS
@@ -271,7 +273,7 @@ C
 !
 	ELSE IF (LRUN .EQ. 2) THEN
 !
-! If LRUN=2, we are ending the TIME bracket. Therefore we call the timing 
+! If LRUN=2, we are ending the TIME bracket. Therefore we call the timing
 ! routine first.
 !
           T0=ETIME(TARRY)
@@ -283,7 +285,7 @@ C
 	      IF(IT1 .LT. 0)IT1=IT1+IM0
 	      WALLTOT(I)=WALLTOT(I)+IT1/RR0
 	      RETURN
-	    END IF 
+	    END IF
 	    IF (IDLIST(I).EQ.' ')EXIT
 	  END DO
 	  WRITE(LUOUT,*)' ***** UNMATCHED TUNING POINT '
@@ -312,6 +314,6 @@ C
 	  WRITE(LUOUT,*)' LRUN=',LRUN
 	  STOP
 	ENDIF
-        
+
 	RETURN
 	END

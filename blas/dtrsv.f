@@ -1,9 +1,10 @@
       SUBROUTINE DTRSV ( UPLO, TRANS, DIAG, N, A, LDA, X, INCX )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       INTEGER            INCX, LDA, N
       CHARACTER*1        DIAG, TRANS, UPLO
 *     .. Array Arguments ..
-      REAL(10)   A( LDA, * ), X( * )
+      REAL(KIND=LDP)   A( LDA, * ), X( * )
 *     ..
 *
 *  Purpose
@@ -60,7 +61,7 @@
 *           N must be at least zero.
 *           Unchanged on exit.
 *
-*  A      - REAL(10) array of DIMENSION ( LDA, n ).
+*  A      - REAL(KIND=LDP) array of DIMENSION ( LDA, n ).
 *           Before entry with  UPLO = 'U' or 'u', the leading n by n
 *           upper triangular part of the array A must contain the upper
 *           triangular matrix and the strictly lower triangular part of
@@ -79,7 +80,7 @@
 *           max( 1, n ).
 *           Unchanged on exit.
 *
-*  X      - REAL(10) array of dimension at least
+*  X      - REAL(KIND=LDP) array of dimension at least
 *           ( 1 + ( n - 1 )*abs( INCX ) ).
 *           Before entry, the incremented array X must contain the n
 *           element right-hand side vector b. On exit, X is overwritten
@@ -101,10 +102,10 @@
 *
 *
 *     .. Parameters ..
-      REAL(10)   ZERO
+      REAL(KIND=LDP)   ZERO
       PARAMETER        ( ZERO = 0.0D+0 )
 *     .. Local Scalars ..
-      REAL(10)   TEMP
+      REAL(KIND=LDP)   TEMP
       INTEGER            I, INFO, IX, J, JX, KX
       LOGICAL            NOUNIT
 *     .. External Functions ..

@@ -1,8 +1,8 @@
 !
 ! Subroutine to determine correspondence between SPECIES in the CHARGE exchange
-! reactions, and the corresponding program variables. It is advised 
+! reactions, and the corresponding program variables. It is advised
 ! (and program checks) that levels involved in charge exchange reactions should
-! be distinct super-levels. 
+! be distinct super-levels.
 !
 ! Program assumes (and checks) that each charge reaction involves full terms.
 !
@@ -13,6 +13,7 @@
 	SUBROUTINE SET_CHG_LEV_ID_V3(
 	1            ID,SPECIES,LEVEL_NAMES,F_TO_S,N_F,N_S,ND,
 	1            ZION,EQSPEC,EQION,EQHYD)
+	USE SET_KIND_MODULE
 	USE CHG_EXCH_MOD_V3
 	IMPLICIT NONE
 !
@@ -33,7 +34,7 @@
 	CHARACTER*(*) SPECIES
 	CHARACTER*(*) LEVEL_NAMES(N_F)
 !
-	REAL(10) ZION
+	REAL(KIND=LDP) ZION
 !
 	INTEGER I,J,K,L
 	INTEGER I_S,I_F
@@ -80,8 +81,8 @@
 	  END DO
 	END DO
 !
-! Determine ionization stage and levels for species involved in charge 
-! exchange reactions. Now determine whether the present species is in 
+! Determine ionization stage and levels for species involved in charge
+! exchange reactions. Now determine whether the present species is in
 ! the CHARGE exchange reaction list.
 !
 	DO J=1,N_CHG
@@ -96,13 +97,13 @@
 	        IF(LOC_NAME .EQ. LEV_NAME_CHG(J,K) .OR.
 	1               LOC_NAME .EQ. ALT_LEV_NAME_CHG(J,K))THEN
 	          IF(I_S .EQ. 0)THEN
-	            ID_ION_CHG(J,K)=ID     
+	            ID_ION_CHG(J,K)=ID
 	            I_S=F_TO_S(I_F)
 	            LEV_IN_ION_CHG(J,K)=I_S
 	            LEV_IN_POPS_CHG(J,K)=EQSPEC+I_S-1		!In POPS
 	            Z_CHG(J,K)=ZION-1.0D0
 	            LEVEL_SET=.TRUE.
-	          END IF              
+	          END IF
 	          IF(I_S .NE. F_TO_S(I_F))THEN
 	            WRITE(LUER,*)'Inconsistent level IDs in SET_CHG_EXCH'
 		    WRITE(LUER,*)' Charge exchange reaction:',J

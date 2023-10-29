@@ -1,4 +1,5 @@
 	MODULE BA_J_DATA_MOD_V7
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Module which contains dJdN integrated over a small frequency band over
@@ -9,10 +10,10 @@
 ! VJ_C = Int ( dJ)
 ! RJ_SUM = Int (J)
 !
-	REAL(10), ALLOCATABLE :: VJ_R(:,:,:)
-	REAL(10), ALLOCATABLE :: VJ_P(:,:,:)
-	REAL(10), ALLOCATABLE :: VJ_T(:,:,:)
-	REAL(10), ALLOCATABLE :: RJ_SUM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ_R(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ_P(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: VJ_T(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_SUM(:)
 !
 	END MODULE BA_J_DATA_MOD_V7
 !
@@ -35,8 +36,9 @@
 	1              NU,FQW,NEW_CONT,FINAL_FREQ,DO_SRCE_VAR_ONLY,
 	1              dJ_CHK_FAC,NION,
 	1              NT,NUM_BNDS,ND,DST,DEND)
+	USE SET_KIND_MODULE
 	USE BA_J_DATA_MOD_V7
-	USE STEQ_DATA_MOD 
+	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
 ! Incorporated 02-Jun-2013 : Changed to allow depth dependent profiles (from cur_cmf_25jun13).
@@ -46,7 +48,7 @@
 !                           large arrays.
 ! Altered 04-Apr-2004 :: Changed to V7
 !                        ETA_CONT and DO_SRCE_VAR_ONLY inserted into call.
-!                        It is now possible to vary the SOURCE function, and not the 
+!                        It is now possible to vary the SOURCE function, and not the
 !                           opacity.
 ! Altered 05-Apr-2001 :: Changed to V6
 !                        Now STEQ_DATA_MOD. STurcture BA data array.
@@ -55,7 +57,7 @@
 !                        NIV and LNK_F_TO_IV inserted in call.
 !                        Altered to handle important variables. With
 !                        the LNK_F_TO_IV array appropriately set, the routine
-!                        will also recover the case with out important 
+!                        will also recover the case with out important
 !                        variableas.
 !
 ! Altered: 17-Sep-1997 :: QFV_R and QFV_P installed so that BA is not updated
@@ -82,20 +84,20 @@
 !
 	INTEGER NION
   	INTEGER NT,NUM_BNDS,ND,DST,DEND
-	REAL(10) VJ(NT,NUM_BNDS,ND)
-	REAL(10) POPS(NT,ND)
-	REAL(10) VCHI(NT,ND)
-	REAL(10) VETA(NT,ND)
-	REAL(10) RJ(ND)
-	REAL(10) dJ_CHK_FAC
+	REAL(KIND=LDP) VJ(NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) VCHI(NT,ND)
+	REAL(KIND=LDP) VETA(NT,ND)
+	REAL(KIND=LDP) RJ(ND)
+	REAL(KIND=LDP) dJ_CHK_FAC
 !
-	REAL(10) ETA_CONT(ND)
-	REAL(10) CHI_CONT(ND)
-	REAL(10) ESEC(ND)
-	REAL(10) T(ND)
+	REAL(KIND=LDP) ETA_CONT(ND)
+	REAL(KIND=LDP) CHI_CONT(ND)
+	REAL(KIND=LDP) ESEC(ND)
+	REAL(KIND=LDP) T(ND)
 !
-	REAL(10) NU
-	REAL(10) FQW
+	REAL(KIND=LDP) NU
+	REAL(KIND=LDP) FQW
 !
 ! NEW_CONT indicates that this is the first frequency of a new continuum band
 ! in which the continuum cross-sections are constant. FINAL_FREQ indicates
@@ -105,18 +107,18 @@
 	LOGICAL NEW_CONT
 	LOGICAL DO_SRCE_VAR_ONLY
 !
-	REAL(10) COMP_VEC(NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) COMP_VEC(NT,NUM_BNDS,ND)
 !
 ! Constants for opacity etc.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 !
-	REAL(10) T1,T2,QFV_T
-	REAL(10) RJ_RAD(ND)
+	REAL(KIND=LDP) T1,T2,QFV_T
+	REAL(KIND=LDP) RJ_RAD(ND)
 	INTEGER I,J,K,L,LS,IOS,JJ,ID
 	INTEGER DIAG_INDX,BNDST,BNDEND
 !
@@ -139,7 +141,7 @@
 	  END IF
 	END IF
 !
-! dJ_CHK_FAC 
+! dJ_CHK_FAC
 !
 	IF(dJ_CHK_FAC .LT. 1.0D-10 .OR. dJ_CHK_FAC .GT. 0.1D0)THEN
 	  I=ERROR_LU()
@@ -180,7 +182,7 @@
 	  DO L=DST,DEND
 	    DO K=1,NUM_BNDS
 	      IF(K .EQ. DIAG_INDX)THEN
-	        VJ_T(:,K,L)=FQW*( RJ_RAD(L)*VCHI(:,L) - VETA(:,L) + 
+	        VJ_T(:,K,L)=FQW*( RJ_RAD(L)*VCHI(:,L) - VETA(:,L) +
 	1                         (CHI_CONT(L)-ESEC(L))*VJ(:,K,L) )
 	      ELSE
 	        VJ_T(:,K,L)=FQW*(CHI_CONT(L)-ESEC(L))*VJ(:,K,L)
@@ -245,8 +247,8 @@ CC!$OMP END PARALLEL
 	    DO K=1,NUM_BNDS
 	      IF(K .EQ. DIAG_INDX)THEN
 	        DO I=1,NT
-	           VJ_T(I,K,L)= VJ_T(I,K,L) + 
-	1              FQW*(RJ_RAD(L)*VCHI(I,L) - VETA(I,L)+ 
+	           VJ_T(I,K,L)= VJ_T(I,K,L) +
+	1              FQW*(RJ_RAD(L)*VCHI(I,L) - VETA(I,L)+
 	1              T1*VJ(I,K,L) )
 	        END DO
 	      ELSE
@@ -330,7 +332,7 @@ CC!$OMP END PARALLEL
 	                END DO
 	              END IF
 	            END DO
-	          ELSE 
+	          ELSE
    	            DO JJ=1,SE(ID)%N_IV	  	  	  !Variable
   	              J=SE(ID)%LNK_TO_F(JJ)
 	              IF( COMP_VEC(J,K,L) .GE. 0.0D0 )THEN

@@ -2,6 +2,7 @@
 ! General purpose line plotting routiine.
 !
 	SUBROUTINE GRAMON_PGPLOT(XLAB,YLAB,TITL,PASSED_OPT)
+	USE SET_KIND_MODULE
 	USE NEW_GEN_IN_INTERFACE
 	USE MOD_CURVE_DATA
 	USE MOD_COLOR_PEN_DEF
@@ -14,7 +15,7 @@
 !                           SP -- step plot option installed.
 !                           Better handling of line IDs
 !                           Option installed to do Gauss smoothing.
-! Altered:  09-Aug-2022 : Improvements to GF option 
+! Altered:  09-Aug-2022 : Improvements to GF option
 !                           (options to draw GF not yet working).
 !                           Most old options now part of CGF.
 ! Altered:  30-Jun-2022 : Changed to allow transition name to be added to EW measurements.
@@ -40,14 +41,14 @@
 ! Altered:  22-Jan-2015 : Bug fix. SC option for scrolling changed to SCR.
 !                         SC is reserved for entering strings by cursor
 ! Altered:  14-Jan-2014 : Revised LG option
-! Altered:  22-Nov-2013 : Added LG option for curve type. This plots the log of the absolute 
+! Altered:  22-Nov-2013 : Added LG option for curve type. This plots the log of the absolute
 !                           value of the data but indicates where the data is -ve.
 ! Altered:  04-Sep-2013 : Increased MAXPEN (=MAX_PLOTS). Minor cleaning.
 ! Altered:  31-Aug-2013 : Added long-plot option.
 ! Altered:  26-Nov-2011 : Curves cycle over pen-colors 2 to 13.
 !                         Dashed curve for plots > 13
 !                         Marker style ignored when MARK is off (use I for invisible curve).
-! Altered:  08-Apr-2006 : In NM option, normalization now correctly handles unequeally 
+! Altered:  08-Apr-2006 : In NM option, normalization now correctly handles unequeally
 !                            spaced data.
 ! Altered:  23-Aug-2005 : Grey pen option installed.
 ! Altered:  26-Jan-2005 : Change default margins to give more room on borders.
@@ -73,7 +74,7 @@
 ! Altered:  07-Jul-1997 : Revised calls to NEW_GEN_IN_MULT_? installed.
 ! Altered:  06-May-1997 : Corrections made so that not all curves need
 !                            markers.
-! Altered:  04-Mar-1997 : Bug fixed in output file name procdure due to 
+! Altered:  04-Mar-1997 : Bug fixed in output file name procdure due to
 !                            directory conflicts.
 ! Finalized 07-Mar-1997 : PGPLOT version.
 !                            Based on GRAMON (Mongo)
@@ -87,7 +88,7 @@
 	REAL*4 SPACING
 !
 	CHARACTER(LEN=2) TYPE_CURVE(MAX_PLTS)
-	REAL(10) VB_BASE(MAX_PLTS)
+	REAL(KIND=LDP) VB_BASE(MAX_PLTS)
 !
 	LOGICAL DONE_NORMALIZATION
 	LOGICAL DO_ERROR
@@ -100,7 +101,7 @@
 	REAL*4 XPAR(2),YPAR(2),XT(2),YT(2)
 	REAL*4 XMIN,XMAX,YMIN,YMAX
 	REAL*4 XPAR_SAV(2),YPAR_SAV(2)
-	REAL(10) YMIN_SAV,YMAX_SAV
+	REAL(KIND=LDP) YMIN_SAV,YMAX_SAV
 !
 	REAL*4 YPAR_R_AX(2)
 	REAL*4 YNUMST_R_AX
@@ -151,8 +152,8 @@
 	LOGICAL AIR_WAVELENGTHS
 	LOGICAL DRAW_GAUSS_HARD
 	EXTERNAL LAM_AIR
-	REAL(10) LAM_AIR
-	REAL(10) DP_T1
+	REAL(KIND=LDP) LAM_AIR
+	REAL(KIND=LDP) DP_T1
 !
 ! String arrays (not labels or titles)
 !
@@ -205,16 +206,16 @@
 !
 	LOGICAL END_CURS
 	INTEGER PGBEG, PGCURS
-	REAL(10) SPEED_OF_LIGHT
-	REAL(10) LAM_VAC
-	REAL(10) LAM_ST,LAM_END
+	REAL(KIND=LDP) SPEED_OF_LIGHT
+	REAL(KIND=LDP) LAM_VAC
+	REAL(KIND=LDP) LAM_ST,LAM_END
 !
-	REAL(10) DP_CUT_ACC
-	REAL(10) SIG_GAU_KMS
-	REAL(10) FRAC_SIG_GAU
+	REAL(KIND=LDP) DP_CUT_ACC
+	REAL(KIND=LDP) SIG_GAU_KMS
+	REAL(KIND=LDP) FRAC_SIG_GAU
 	INTEGER NPTS_PER_SIGMA
-	REAL(10), ALLOCATABLE :: WRK1(:)
-	REAL(10), ALLOCATABLE :: WRK2(:)
+	REAL(KIND=LDP), ALLOCATABLE :: WRK1(:)
+	REAL(KIND=LDP), ALLOCATABLE :: WRK2(:)
 !
 	REAL*4,  PARAMETER :: RONE=1.0
 	INTEGER, PARAMETER :: IZERO=0
@@ -227,12 +228,12 @@
 !
 	REAL*4 XCM,ASR,TEMPASR,DASR
 !
-! CENTRAL_LAM must be REAL(10) as LAM_VAC is REAL*8 function.
+! CENTRAL_LAM must be REAL(KIND=LDP) as LAM_VAC is REAL*8 function.
 !
-	REAL(10) CENTRAL_LAM
-	REAL(10) OLD_CENTRAL_LAM
-	REAL(10) C_KMS
-	REAL(10) C_VAL
+	REAL(KIND=LDP) CENTRAL_LAM
+	REAL(KIND=LDP) OLD_CENTRAL_LAM
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) C_VAL
 	LOGICAL AIR_LAM
 	CHARACTER(LEN=5), SAVE :: VEL_UNIT='km/s'
 	CHARACTER(LEN=10) GF_OPTION
@@ -322,7 +323,7 @@
 	SAVE FSTOPEN,PEN_COL,DASH
 	SAVE MARGINX,MARGINY
 	SAVE PLT_LINE_WGT
-	SAVE LINE_WGT 
+	SAVE LINE_WGT
 	DATA FSTOPEN,DASH/.TRUE.,.FALSE./
 	DATA PLT_LINE_WGT/1/
 	DATA HARD_CNT/1/
@@ -379,7 +380,7 @@
 	VAR_OPERATION='*'; VAR_PLT1=1;  VAR_PLT2=1
 !
 ! Set the Aspect ratio of the plot to the default value. No longer ask
-! for a new value, since can be set with N option. 
+! for a new value, since can be set with N option.
 !
 	IF(FSTOPEN)THEN
 	  ASR=0.0			!Leave as is
@@ -505,7 +506,7 @@
 !
 ! Get absica and ordinate limits.
 !
-	CALL GET_GRAMON_MIN_MAX(XMIN,XMAX,YMIN,YMAX,TYPE_CURVE,T_OUT) 
+	CALL GET_GRAMON_MIN_MAX(XMIN,XMAX,YMIN,YMAX,TYPE_CURVE,T_OUT)
 !
 	XPAR(1)=XMIN
 	XPAR(2)=XMAX
@@ -529,7 +530,7 @@
 	  WRITE(T_OUT,*)'    while /XTERM allows auto-switching of the cursor'
 	  BEG = PGBEG(IZERO,'?',IONE,IONE)
 	  CALL PGQID(ID)
-! 
+!
 ! Initialize viewport.
 !
 	  CALL PGASK(.FALSE.)                      !TURNS OFF PAGE PROMPT
@@ -659,7 +660,7 @@
 	  WRITE(T_OUT,*)'FEW  - Measure the EW of a line using locations read in from file set by CEW'
 	  WRITE(T_OUT,*)'EW   - Measure the EW of a single line'
 	  WRITE(T_OUT,*)'EWG  - Measure the EW of many lines use Gaussian fiting usig data from a file'
-	  WRITE(T_OUT,*)'CGF  - Fit a (modfied) gaussian to an absorption or emission line'  
+	  WRITE(T_OUT,*)'CGF  - Fit a (modfied) gaussian to an absorption or emission line'
 	  WRITE(T_OUT,*)'FGF  - Fit multiple spctral regions using params read in fro GAUSS_PARAMS'
 	  WRITE(T_OUT,*)'CBAL - Measure Chi^2 of model fit to observations and line EW (mainly for broad lines)'
 	  WRITE(T_OUT,*)'FBAL - Use the results of CBAL to model fit to observatuobs and line EW'
@@ -697,7 +698,7 @@
           GOTO 1000
 !
 ! Exit from Ploting package, saving STRING and VECTOR information.
-! If the NOI option has been issued, the plots will still be 
+! If the NOI option has been issued, the plots will still be
 ! retained. ROutine checks that CONTINUUM defition saved is it has been set.
 !
 	ELSE IF(ANS .EQ. 'E')THEN
@@ -810,12 +811,12 @@ C
 !
 ! Get absica and ordinate limits.
 !
-	  CALL GET_GRAMON_MIN_MAX(XMIN,XMAX,YMIN,YMAX,TYPE_CURVE,T_OUT) 
+	  CALL GET_GRAMON_MIN_MAX(XMIN,XMAX,YMIN,YMAX,TYPE_CURVE,T_OUT)
 !
 	  WRITE(T_OUT,4) XMIN,XMAX
 	  CALL NEW_GEN_IN(XPAR,I,ITWO,'XST,XEND')
 C
-C Look for ordinate limits in X range. This will now generate a plot with 
+C Look for ordinate limits in X range. This will now generate a plot with
 C roughly the correct scaling even though the oridinates values may be vastly
 C different outside the plot window. We only use those plots that will be
 C displayed.
@@ -921,7 +922,7 @@ C
 C
 C This section is for additional axis fiddling. Can change number
 C of digits after decimal point, and numbers at which axis labeling
-C begins. These parameters are restored to their original values 
+C begins. These parameters are restored to their original values
 C everytime 'A' option is called.
 C
 	  CALL NEW_GEN_IN(IXTICK,'X minor divisions')
@@ -950,7 +951,7 @@ C
 	    CALL SET_CASE_UP(WHICH_Y_AX(IP),1,1)
 	    IF(WHICH_Y_AX(IP) .EQ. 'R')NORMAL_R_Y_AXIS=.FALSE.
 	  END DO
-C 
+C
 	  T1=1.0D+30
 	  T2=-1.0D+30
 	  DO IP=1,NPLTS
@@ -1187,11 +1188,11 @@ C
 	  IF((MARGINY(1) .GT. 1.0) .OR. (MARGINY(1) .LT. 0)) THEN
 	    WRITE(T_OUT,*)'Bottom-Margin is incorrect, try again.'
 	    GOTO 710
-	  END IF 
+	  END IF
 	  IF((MARGINY(2) .GT. 1.0) .OR. (MARGINY(2) .LT. 0)) THEN
 	    WRITE(T_OUT,*)'Top-Margin is incorrect, try again.'
 	    GOTO 710
-	  END IF 
+	  END IF
 	  GOTO 1000
 !
 	ELSE IF( ANS .EQ. 'W')THEN
@@ -1249,7 +1250,7 @@ C
 	    WRITE(6,*)'Order of ploting will be reversed'
 	  ELSE
 	    WRITE(6,*)'Normal order of ploting will be resumed'
-	  END IF	    
+	  END IF	
  	ELSE IF( ANS .EQ. 'D')THEN
 	  IF(DASH)THEN
             WRITE(T_OUT,*)'Now all solid line plots '
@@ -1397,7 +1398,7 @@ C
 	  END DO
 !
 ! Allow online editing of strings. NEW_GEN_IN is used so user can
-! see current value. 
+! see current value.
 !
 	  DO WHILE (0 .EQ. 0)
 	    ISTR=0			!Default terminates input
@@ -1896,8 +1897,8 @@ C
 	1             REVERSE_PLOTTING_ORDER)
 !
 ! This option is designed to use cursors to measure the EW of a broad line (e.g. H-gamma)
-! in a model and its  corresponding observation. The observations are normalized to the 
-! model using a straight line fit, and done to minimize the chi^2 difference between the 
+! in a model and its  corresponding observation. The observations are normalized to the
+! model using a straight line fit, and done to minimize the chi^2 difference between the
 ! model and observations.
 !
 	ELSE IF(ANS .EQ. 'CBAL')THEN
@@ -1965,7 +1966,7 @@ C
 	        T1=-0.5D0
 	      END IF
 	      DO I=L_CHAN(1),L_CHAN(2)-1
-	        EW=EW+T1*( (CD(IP)%DATA(I)-CONT(I))/CONT(I) + 
+	        EW=EW+T1*( (CD(IP)%DATA(I)-CONT(I))/CONT(I) +
 	1               (CD(IP)%DATA(I+1)-CONT(I+1))/CONT(I+1) )*
 	1               (CD(IP)%XVEC(I+1)-CD(IP)%XVEC(I))
 	        CENTROID=CENTROID+T1*( CD(IP)%XVEC(I)*(CD(IP)%DATA(I)-CONT(I))/CONT(I)
@@ -2158,7 +2159,7 @@ C
 !
 	  HARD=.TRUE.
 !
-1200	  CALL NEW_GEN_IN(PLT_LINE_WGT,'line weight') 
+1200	  CALL NEW_GEN_IN(PLT_LINE_WGT,'line weight')
 	  IF (PLT_LINE_WGT .GT. 201) THEN
 	    WRITE(T_OUT,*)'value too large'
 	    GOTO 1200
@@ -2459,7 +2460,7 @@ C
 	      WRITE(30,'(20X,I10)',ADVANCE=ADVANCE_OPT)CNT
 	    END DO
 !
-	    DO L=1,NX_MAX 
+	    DO L=1,NX_MAX
 	      OUTPUT_STRING=' ';  CNT=0
 	      DO I=1,NP_OUT
 	        J=IPST(I)+L-1
@@ -2600,7 +2601,7 @@ C
 	ELSE IF (ANS .EQ. 'XAR')THEN
 	  CALL NEW_GEN_IN(XAR_OPERATION,'Operation: *,+,-,/,LG,ALG[=10^x],R[=1/x],XN')
 	  CALL SET_CASE_UP(XAR_OPERATION,IZERO,IZERO)
-	  IF(XAR_OPERATION .NE. 'LG' .AND. XAR_OPERATION .NE. 'ALG' .AND. 
+	  IF(XAR_OPERATION .NE. 'LG' .AND. XAR_OPERATION .NE. 'ALG' .AND.
 	1           XAR_OPERATION .NE. 'XN' .AND. XAR_OPERATION .NE. 'R')THEN
 	    CALL NEW_GEN_IN(XAR_VAL,'Value')
 	  END IF
@@ -2722,9 +2723,9 @@ C
 	  IF(YAR_OPERATION .EQ. '*X' .OR. YAR_OPERATION .EQ. '/X')THEN
 	    YAR_VAL=0.5D0*(XPAR(1)+XPAR(2))
 	    CALL NEW_GEN_IN(YAR_VAL,'X normalization')
-	  ELSE IF( YAR_OPERATION .NE. 'LG' .AND. 
-	1          YAR_OPERATION .NE. 'ABS' .AND. 
-	1          YAR_OPERATION .NE. 'ALG' .AND. 
+	  ELSE IF( YAR_OPERATION .NE. 'LG' .AND.
+	1          YAR_OPERATION .NE. 'ABS' .AND.
+	1          YAR_OPERATION .NE. 'ALG' .AND.
 	1          YAR_OPERATION(1:1) .NE. 'R')THEN
 	    CALL NEW_GEN_IN(YAR_VAL,'Value')
 	  END IF
@@ -2811,7 +2812,7 @@ C
 !
 	ELSE IF (ANS .EQ. 'CAX')THEN
 	  CALL NEW_GEN_IN(VAR_PLT1,'Plot that is to be altered')
-	  CALL NEW_GEN_IN(VAR_OPERATION,'Operation: RX, RY, RXY, RYX, SXY') 
+	  CALL NEW_GEN_IN(VAR_OPERATION,'Operation: RX, RY, RXY, RYX, SXY')
 	  CALL SET_CASE_UP(VAR_OPERATION,IZERO,IZERO)
 	  VAR_PLT2=VAR_PLT1
 	  IF(VAR_OPERATION .NE. 'SXY')CALL NEW_GEN_IN(VAR_PLT2,'Plot with new data')
@@ -2860,7 +2861,7 @@ C
 	    CD(VAR_PLT3)%CURVE_ID=CD(VAR_PLT1)%CURVE_ID
 	  END IF
 	  CALL PG_ADD_NOISE(VAR_PLT1,VAR_PLT3,XMIN,XMAX,T1,T2)
-!	  
+!	
 	ELSE IF (ANS .EQ. 'VAR')THEN
 	  CALL NEW_GEN_IN(VAR_PLT1,'Input plot 1?')
 	  CALL NEW_GEN_IN(VAR_OPERATION,'Operation: *,+,-,/,c(opy),cc')
@@ -3294,7 +3295,7 @@ C
 	    SCALEFAC=SCALEFAC*T1
 	    SCALEFACY=SCALEFACY*T1
 	  END IF
-	ELSE 
+	ELSE
 	  SCALEFAC=TEMPASR/DASR
 	  SCALEFACY=1
           IF(DASR .GT. TEMPASR)THEN
@@ -3303,7 +3304,7 @@ C
 	    SCALEFACY=SCALEFACY*T1
 	  END IF
 	ENDIF
-! 
+!
 	PRINTX1=MARGINX(1)
 	PRINTX2=MARGINX(1)+(MARGINX(2)-MARGINX(1))*SCALEFAC
 	PRINTY1=MARGINY(1)
@@ -3378,7 +3379,7 @@ C
 !
 	  IF(TYPE_CURVE(IP) .EQ. 'L' .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    CALL PGLINE(NPTS(IP),CD(IP)%XVEC,CD(IP)%DATA)
-	  ELSE IF( (TYPE_CURVE(IP) .EQ. 'E' .OR. TYPE_CURVE(IP) .EQ. 'EC') 
+	  ELSE IF( (TYPE_CURVE(IP) .EQ. 'E' .OR. TYPE_CURVE(IP) .EQ. 'EC')
 	1              .AND. (MARKER_STYLE(IP) .GE. 0 .OR. .NOT. MARK))THEN
 	    IST=1
 	    IEND=2
@@ -3386,7 +3387,7 @@ C
 	    Q=PEN_COL(IP+PEN_OFFSET)-1
 	    DO WHILE(IEND .LT. NPTS(IP))
 	      DO WHILE(IEND .LT. NPTS(IP))
-	         IF( (CD(IP)%XVEC(IEND+1)-CD(IP)%XVEC(IEND))/T1 
+	         IF( (CD(IP)%XVEC(IEND+1)-CD(IP)%XVEC(IEND))/T1
 	1                                                   .GE. 0)THEN
 	           IEND=IEND+1
 	         ELSE
@@ -3406,7 +3407,7 @@ C
 	        WRITE(6,*)'Zero spacing in GRAMON-PGPLOT ', IST,IEND,IP
 	        IEND=IEND+1
 	        T1=CD(IP)%XVEC(NPTS(IEND))-CD(IP)%XVEC(IST)
-	      END IF  
+	      END IF
 	    END DO
 !
 	  ELSE IF(TYPE_CURVE(IP) .EQ. 'LG')THEN
@@ -3519,7 +3520,7 @@ C
 !
 ! Don't draw if invisible curve.
 !
-	    IF(L .NE. 0 .AND. TYPE_CURVE(IP) .NE. 'I' .AND. 
+	    IF(L .NE. 0 .AND. TYPE_CURVE(IP) .NE. 'I' .AND.
 	1                     TYPE_CURVE(IP) .NE. 'LG')THEN
 !	      CALL PGSLS(LINE_STYLE(IP))
 	      Q=PEN_COL(IP+1)
@@ -3555,7 +3556,7 @@ C
 	  IF(.NOT. NORMAL_R_Y_AXIS)THEN
 	    CALL DRAW_RIGHT_Y_AXIS(YPAR_R_AX,YINC_R_AX,YNUMST_R_AX,
 	1          IYTICK_R_AX,IDY_R_AX,TICK_FAC,
-	1          EXPCHAR,YLABEL_R_AX,LOG_AXIS) 
+	1          EXPCHAR,YLABEL_R_AX,LOG_AXIS)
 	  END IF
 	END IF
 !

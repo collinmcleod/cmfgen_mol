@@ -1,9 +1,10 @@
 !
 	SUBROUTINE WRITV_V2(F,ND,NDEC,A,LU)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 18-Nov-2022 : Now TRIM A before writing out.
-! Altered 28-Apr-2000 : Bug fix: Length of FORM (at 15) was one character 
+! Altered 28-Apr-2000 : Bug fix: Length of FORM (at 15) was one character
 !                                too short.
 ! Altered 28-May-1996 : IMPLICIT NONE installed.
 ! Altered 30-APR-1985 : Now writes 10 columns instead of five across a page.)
@@ -11,7 +12,7 @@
 	INTEGER ND
 	INTEGER LU
 	INTEGER NDEC		!Number of decimal digits.
-	REAL(10) F(ND)
+	REAL(KIND=LDP) F(ND)
 	CHARACTER*(*) A
 !
 ! Local variables.

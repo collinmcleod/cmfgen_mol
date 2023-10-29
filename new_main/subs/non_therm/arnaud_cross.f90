@@ -1,11 +1,12 @@
 	SUBROUTINE ARNAUD_CROSS()
+	USE SET_KIND_MODULE
 	USE MOD_NON_THERM
 	IMPLICIT NONE
 !
 	INTEGER IT
 	INTEGER IKT
-	REAL(10) U1
-	REAL(10) T1,T2,T3
+	REAL(KIND=LDP) U1
+	REAL(KIND=LDP) T1,T2,T3
 !
 ! Fitting formula from Arnaud & Rothenflug 1985:
 ! http://adsabs.harvard.edu/abs/1985A%26AS...60..425A

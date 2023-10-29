@@ -1,10 +1,11 @@
 !
 ! Routine to increment the Emissivity and Opacity for 2-photon processes.
-! 
+!
 ! This routine should be the same at TWO_PHOT_DISP_V2 except it works directly on the
 ! atom rather than pops, and ION_ID is included in the call.
 !
 	SUBROUTINE TWO_PHOT_OPAC_DISP_V3(ETA,CHI,POPS,T,FREQ,TWO_PHOTON_METHOD,ION_ID,ND,NT)
+	USE SET_KIND_MODULE
 	USE TWO_PHOT_MOD
 	IMPLICIT NONE
 !
@@ -15,35 +16,35 @@
 ! Created 26-Jun-1998
 !
 	INTEGER NT,ND,ION_ID
-	REAL(10) ETA(ND)		!Emisivity 
-	REAL(10) CHI(ND)		!Opacity [in (10^10 cm)^-1]
-	REAL(10) POPS(NT,ND)	!Atomic populations
-	REAL(10) T(ND)		!in 10^4 K
-	REAL(10) FREQ		!Current frequency (10^15 Hz)
+	REAL(KIND=LDP) ETA(ND)		!Emisivity
+	REAL(KIND=LDP) CHI(ND)		!Opacity [in (10^10 cm)^-1]
+	REAL(KIND=LDP) POPS(NT,ND)	!Atomic populations
+	REAL(KIND=LDP) T(ND)		!in 10^4 K
+	REAL(KIND=LDP) FREQ		!Current frequency (10^15 Hz)
 !
 	CHARACTER(LEN=*) TWO_PHOTON_METHOD
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local vectors and constants.
 !
-	REAL(10) TA(ND)
-	REAL(10) TB(ND)
-	REAL(10) PLANKS_CONSTANT	!cgs units
-	REAL(10) PI
-	REAL(10) CONST
-	REAL(10) ETA_CONST	!Used to evaluate ETA
-	REAL(10) CHI_CONST	!Used to evaluate CHI
-	REAL(10) FREQ_B		!Frequency of other photon
-	REAL(10) T1,T2
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) TB(ND)
+	REAL(KIND=LDP) PLANKS_CONSTANT	!cgs units
+	REAL(KIND=LDP) PI
+	REAL(KIND=LDP) CONST
+	REAL(KIND=LDP) ETA_CONST	!Used to evaluate ETA
+	REAL(KIND=LDP) CHI_CONST	!Used to evaluate CHI
+	REAL(KIND=LDP) FREQ_B		!Frequency of other photon
+	REAL(KIND=LDP) T1,T2
 !
 ! The 2-photon distribution functions, AY, are usually in wrtten in terms
 ! of the variable y=FREQ/MAX_FREQ, and which extends from 0 to 1.
-! As the distribution, AY, is symmetric about y/2 we have defined the 
+! As the distribution, AY, is symmetric about y/2 we have defined the
 ! variables  U=Y(1-Y) and FU=4*U
 !
-	REAL(10) AY,Y,U,FU
+	REAL(KIND=LDP) AY,Y,U,FU
 !
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
@@ -92,12 +93,12 @@
 ! Chi=  (c^2/2hv^3) (hv/4pi) (nu/nu_o) A(v) .
 !	    [ N_l (g_u/g_l) Y(nu_B) - N_u {1+Y(nu_B)} ]
 ! where
-!       Y(v)=J(v)/[2hv^3/c^2]	   
+!       Y(v)=J(v)/[2hv^3/c^2]	
 !
 	    IF(TWO_METHOD .EQ. 'USE_RAD')THEN
 	      CALL GET_J_FOR_TWO_PHOT(PHOT_OC_TWO(1,J),FREQ_B,LST_FREQ_INDX_TWO(J),ND)
 	      T1=TWOHCSQ*(FREQ_B**3)
-	      PHOT_OC_TWO(:,J)=PHOT_OC_TWO(:,J)/T1 
+	      PHOT_OC_TWO(:,J)=PHOT_OC_TWO(:,J)/T1
 	    ELSE IF(TWO_METHOD .EQ. 'LTE')THEN
 	      DO L=1,ND
 	        T1=EXP(-HDKT*FREQ_B/T(L))
@@ -124,8 +125,8 @@
 !
 	      DO L=1,ND
 	        ETA(L)=ETA(L) + ETA_CONST*AY*POPS(NUP,L)*FS_RAT_UP(L,J)
-	        T1=EXP(-HDKT*FREQ_B/T(L))      
-	        CHI(L)=CHI(L) + CHI_CONST*AY*( 
+	        T1=EXP(-HDKT*FREQ_B/T(L))
+	        CHI(L)=CHI(L) + CHI_CONST*AY*(
 	1                 POPS(NL,L)*FS_RAT_LOW(L,J)*T1/G_LOW_TWO(J)-
 	1                 POPS(NUP,L)*FS_RAT_UP(L,J)/G_UP_TWO(J) )
 	      END DO
@@ -136,7 +137,7 @@
 !
 	      DO L=1,ND
 	        ETA(L)=ETA(L) + ETA_CONST*AY*POPS(NUP,L)*FS_RAT_UP(L,J)*(1.0D0+PHOT_OC_TWO(L,J))
-	        CHI(L)=CHI(L) + CHI_CONST*AY*( 
+	        CHI(L)=CHI(L) + CHI_CONST*AY*(
 	1                 POPS(NL,L)*FS_RAT_LOW(L,J)*PHOT_OC_TWO(L,J)/G_LOW_TWO(J)-
 	1                 POPS(NUP,L)*FS_RAT_UP(L,J)/G_UP_TWO(J)*(1.0D0+PHOT_OC_TWO(L,J)) )
 	      END DO

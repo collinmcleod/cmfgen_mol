@@ -1,5 +1,6 @@
       SUBROUTINE ZGBMV ( TRANS, M, N, KL, KU, ALPHA, A, LDA, X, INCX,
      $                   BETA, Y, INCY )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       COMPLEX*16         ALPHA, BETA
       INTEGER            INCX, INCY, KL, KU, LDA, M, N

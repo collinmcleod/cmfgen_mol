@@ -1,11 +1,12 @@
 !
 ! This subroutine (which replaces EVAL_LTE_V4.INC) evaluates the LTE populations with respect to
-! the ground state for 
+! the ground state for
 !
 !  (a) The full atoms.
 !  (B) The Super-Level model atom.
 !
 	SUBROUTINE EVAL_LTE_V5(DO_LEV_DISSOLUTION,ND)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -13,7 +14,7 @@
 !                       V4 reverts to old routine.
 ! Altered 05-Apr-2011 : Now call LTEPOP_WLD_V2 (instead of V1) and
 !                                LTE_POP_SL_V2 (instead of V1) (28-Nov-2010).
-!                         Changes done to give a wider dynamic rangs in LTE populations. 
+!                         Changes done to give a wider dynamic rangs in LTE populations.
 ! Created 19-Dec-2004
 !
 	INTEGER ND

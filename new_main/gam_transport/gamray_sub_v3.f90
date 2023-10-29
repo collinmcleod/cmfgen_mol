@@ -4,6 +4,7 @@
 !
 	SUBROUTINE GAMRAY_SUB_V3(ND,NC,NP,P,R,V,SIGMA,VDOP_VEC,CLUMP_FAC,    &
 		MU_AT_RMAX,HQW_AT_RMAX,DELV_FRAC_FG,REXT_FAC,METHOD,INST_DECAY,SN_AGE_DAYS)
+	USE SET_KIND_MODULE
 	USE MOD_GAMMA_V3
         USE GAMMA_NUC_DECAY_V2
         USE GAM_MU_MOD
@@ -30,26 +31,26 @@
 	INTEGER, PARAMETER :: IFOUR =4
 	INTEGER, PARAMETER :: IFIVE =5
 	INTEGER, PARAMETER :: ISIX  =6
-	REAL(10) :: T1,T2,T3,T4,T5
-	REAL(10) :: P(NP)
-	REAL(10) :: R(ND)
-	REAL(10) :: V(ND)
-	REAL(10) :: SIGMA(ND)
-	REAL(10) :: VDOP_VEC(ND)
-	REAL(10) :: CLUMP_FAC(ND)
-	REAL(10) :: MU_AT_RMAX(NP)
-	REAL(10) :: HQW_AT_RMAX(NP)
+	REAL(KIND=LDP) :: T1,T2,T3,T4,T5
+	REAL(KIND=LDP) :: P(NP)
+	REAL(KIND=LDP) :: R(ND)
+	REAL(KIND=LDP) :: V(ND)
+	REAL(KIND=LDP) :: SIGMA(ND)
+	REAL(KIND=LDP) :: VDOP_VEC(ND)
+	REAL(KIND=LDP) :: CLUMP_FAC(ND)
+	REAL(KIND=LDP) :: MU_AT_RMAX(NP)
+	REAL(KIND=LDP) :: HQW_AT_RMAX(NP)
 !
-	REAL(10) :: SN_AGE_DAYS
-	REAL(10) :: DELV_FRAC_FG
-	REAL(10) :: REXT_FAC
-	REAL(10) :: CHI_SCAT_CLUMP(ND)
-	REAL(10) :: PI
-	REAL(10) :: FOURPI
+	REAL(KIND=LDP) :: SN_AGE_DAYS
+	REAL(KIND=LDP) :: DELV_FRAC_FG
+	REAL(KIND=LDP) :: REXT_FAC
+	REAL(KIND=LDP) :: CHI_SCAT_CLUMP(ND)
+	REAL(KIND=LDP) :: PI
+	REAL(KIND=LDP) :: FOURPI
 !
-	REAL(10), ALLOCATABLE :: TA_WRK(:)
-	REAL(10), ALLOCATABLE :: TB_WRK(:)
-	REAL(10), ALLOCATABLE :: TC_WRK(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA_WRK(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TB_WRK(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TC_WRK(:)
 !
 	LOGICAL :: INST_DECAY
 	LOGICAL :: THK_CONT=.FALSE.
@@ -58,22 +59,22 @@
 	CHARACTER(LEN=30) :: OPTION
 	CHARACTER(LEN=80) :: STRING
 !
-!	REAL(10), PARAMETER :: PLANCK = 4.135668E-18 	! keV*s
-	REAL(10) :: H_PL 	! keV*s
-	REAL(10), PARAMETER :: SOL = 299792 		! Units of km/s
-	REAL(10), PARAMETER :: ERGS_TO_MEV = 624150.9	 
-	REAL(10), PARAMETER :: HoMC2 = 8.09330118D-21  	! HoMC2 = h/mc^2 in units of seconds
+!	REAL(KIND=LDP), PARAMETER :: PLANCK = 4.135668E-18 	! keV*s
+	REAL(KIND=LDP) :: H_PL 	! keV*s
+	REAL(KIND=LDP), PARAMETER :: SOL = 299792 		! Units of km/s
+	REAL(KIND=LDP), PARAMETER :: ERGS_TO_MEV = 624150.9	
+	REAL(KIND=LDP), PARAMETER :: HoMC2 = 8.09330118D-21  	! HoMC2 = h/mc^2 in units of seconds
 !
 ! Transfer routine variables
 !
-	REAL(10) :: dLOG_NU
-	REAL(10) :: BNUE
-	REAL(10) :: DBB
-	REAL(10) :: FL
-	REAL(10) :: HFLUX_AT_IB
-	REAL(10) :: HFLUX_AT_OB
-	REAL(10) :: IPLUS(NP)
-	REAL(10) :: FEDD(NP)
+	REAL(KIND=LDP) :: dLOG_NU
+	REAL(KIND=LDP) :: BNUE
+	REAL(KIND=LDP) :: DBB
+	REAL(KIND=LDP) :: FL
+	REAL(KIND=LDP) :: HFLUX_AT_IB
+	REAL(KIND=LDP) :: HFLUX_AT_OB
+	REAL(KIND=LDP) :: IPLUS(NP)
+	REAL(KIND=LDP) :: FEDD(NP)
 !^
 	INTEGER :: LUER
 	INTEGER :: ERROR_LU
@@ -370,7 +371,7 @@
 !
 ! Using the array GAM_ETA to be the 2D array to pass to the subroutines
 ! along with GAM_INT (for gamma intensity). Initialized the total
-! emissivity as the scattered plus always the isotropic emission. 
+! emissivity as the scattered plus always the isotropic emission.
 !
 	  DO J=1,NA ! NA=2*NP-1
 	    DO I=1,ND
@@ -384,7 +385,7 @@
 ! photon energy.
 !
 	  CALL TUNE(IONE,'CMF_FORMAL SOLVER')
-	  CALL CMF_FORMAL_REL_V4_GAM( & 
+	  CALL CMF_FORMAL_REL_V4_GAM( &
 		GAM_OPAC_COPY,GAM_OPAC_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P, &
 		GAM_OPAC_COPY,FEDD,HFLUX_AT_IB,HFLUX_AT_OB,IPLUS, &
 		FL,dLOG_NU,BNUE,DBB, &
@@ -440,7 +441,7 @@
 !
 ! Later, I will try add an option in plt_spec and like files to change the units to
 ! photons/cm^2/s/keV when using rd_mod in plt_spec. For now use
-! cnvrt_gamflux.exe 
+! cnvrt_gamflux.exe
 !
 	CALL GEN_ASCI_OPEN(LU_GAMOBS,'GAMFLUX','UNKNOWN',' ',' ',IZERO,IOS)
 	WRITE(STRING,'(I10)')NF_GRID_PTS
@@ -458,7 +459,7 @@
 ! Now I write some variables to check the outputs
 !------------------------------------------------------------------------------
 !
-! Checking the optical depth to both x-rays and gamma-rays 
+! Checking the optical depth to both x-rays and gamma-rays
 !
 	GAMMA_TAU=0.0D0
 	XRAY_TAU=0.0D0

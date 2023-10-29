@@ -1,4 +1,5 @@
       SUBROUTINE ZTBSV ( UPLO, TRANS, DIAG, N, K, A, LDA, X, INCX )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
       INTEGER            INCX, K, LDA, N
       CHARACTER*1        DIAG, TRANS, UPLO

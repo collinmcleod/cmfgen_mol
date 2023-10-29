@@ -1,4 +1,5 @@
       subroutine  zcopy(n,zx,incx,zy,incy)
+	USE SET_KIND_MODULE
 c
 c     copies a vector, x, to a vector, y.
 c     jack dongarra, linpack, 4/11/78.

@@ -5,19 +5,20 @@
 !                current_nonlocal_decay_energy.dat
 !
 	SUBROUTINE GET_NON_LOCAL_GAMMA_ENERGY(V,ND,LU)
+	USE SET_KIND_MODULE
 	USE CONTROL_VARIABLE_MOD
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
 !
 	INTEGER ND
 	INTEGER LU
-	REAL(10) V(ND)
+	REAL(KIND=LDP) V(ND)
 !
 ! Variables for reading in the non-local energy deposition from outside file
 !
 	INTEGER NDTMP
-	REAL(10), ALLOCATABLE :: VTMP(:),EDEPTMP(:),EDEPNEW(:)
-	REAL(10) T1
+	REAL(KIND=LDP), ALLOCATABLE :: VTMP(:),EDEPTMP(:),EDEPNEW(:)
+	REAL(KIND=LDP) T1
 	INTEGER LUER
 	INTEGER I
 	INTEGER ERROR_LU

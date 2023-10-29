@@ -15,6 +15,7 @@ C
 	SUBROUTINE BAION_UPDATE_V4(BAION,BAION_PAR,QFVION_R,QFVION_P,
 	1               VJ,T,POPS,RJ,NU,FQW,NEW_CONT,FINAL_FREQ,
 	1               dJ_CHK_FAC,NION,NT,NUM_BNDS,ND,DST,DEND)
+	USE SET_KIND_MODULE
 	USE BA_J_DATA_MOD_V4
 	IMPLICIT NONE
 C
@@ -25,7 +26,7 @@ C                           computation of the BAION matrix.
 C                           dj_CHK_FAC is normally around 1.0D-04.
 C                           Larger values give less accuracy for BAION,
 C                           but allow faster computation.
-C                         
+C
 C Altered: 16-Aug-1996 :: COMP_VEC installed to improve vectorization.
 C                           Improvement will depend on how many times
 C                           innermost loop is executed.
@@ -35,17 +36,17 @@ C Altered:   2-May-1995  -- DST,DEND installed (Now V2)
 C Created:  28-Feb-1995
 C
 	INTEGER NION,NT,NUM_BNDS,ND,DST,DEND
-	REAL(10) BAION(NION,NT,NUM_BNDS,ND)
-	REAL(10) BAION_PAR(NION,NT,ND)
-	REAL(10) QFVION_R(NION,ND)
-	REAL(10) QFVION_P(NION,ND)
-	REAL(10) VJ(NT,NUM_BNDS,ND)
-	REAL(10) POPS(NT,ND)
-	REAL(10) RJ(ND)
-	REAL(10) T(ND)
-	REAL(10) NU
-	REAL(10) FQW
-	REAL(10) dJ_CHK_FAC
+	REAL(KIND=LDP) BAION(NION,NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) BAION_PAR(NION,NT,ND)
+	REAL(KIND=LDP) QFVION_R(NION,ND)
+	REAL(KIND=LDP) QFVION_P(NION,ND)
+	REAL(KIND=LDP) VJ(NT,NUM_BNDS,ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) RJ(ND)
+	REAL(KIND=LDP) T(ND)
+	REAL(KIND=LDP) NU
+	REAL(KIND=LDP) FQW
+	REAL(KIND=LDP) dJ_CHK_FAC
 C
 	LOGICAL NEW_CONT
 	LOGICAL FINAL_FREQ
@@ -53,11 +54,11 @@ C
 C Constants for opacity etc.
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 
-	REAL(10) COMP_VEC(NT)
+	REAL(KIND=LDP) COMP_VEC(NT)
 C
-	REAL(10) T1,T2
+	REAL(KIND=LDP) T1,T2
 	INTEGER I,J,K,L,LS
 	INTEGER DIAG_INDX,BNDST,BNDEND
 C

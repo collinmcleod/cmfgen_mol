@@ -1,8 +1,8 @@
 C
 C Subroutine to compute the oscillator strengths and Einstein A coefficients
-C for an arbitrary species. Two auxilary arrays are returned. One of 
-C these indicates if the transition is allowed and contains a transition 
-C number. The second array is used to indicate the transitions of secondary 
+C for an arbitrary species. Two auxilary arrays are returned. One of
+C these indicates if the transition is allowed and contains a transition
+C number. The second array is used to indicate the transitions of secondary
 C importance.
 C
 	SUBROUTINE GENOSC_V6(EINA,FEDGE,STAT_WT,LEVNAME,
@@ -10,6 +10,7 @@ C
 	1              OSCDATE,N,NTRET,
 	1              GF_ACTION,GF_CUT,LEV_CUT,MIN_NUM_TRANS,
 	1              LUIN,LUOUT,FILNAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 21-Dec-2004 - Check on ENERGY level ordering, and name matching when
@@ -17,34 +18,34 @@ C                          reading in transitions included.
 C Created 02-Feb-1998 - GF_ACTION and MIN_NUM_TRANS installed. Renamed from V5.
 C
 	INTEGER N,NTRET,LUIN,LUOUT
-	REAL(10) EINA(N,N),FEDGE(N),STAT_WT(N)
-	REAL(10) IONIZATION_EN,ZION
+	REAL(KIND=LDP) EINA(N,N),FEDGE(N),STAT_WT(N)
+	REAL(KIND=LDP) IONIZATION_EN,ZION
 	CHARACTER*(*) LEVNAME(N)
 	CHARACTER*(*) FILNAME,OSCDATE
 C
 C The following allows us to ignore transitions with gf < GF_CUT and whose
-C lower level is > LEV_CUT. A minimum of MIN_NUM_TRANS downward transitions is 
-C kept for each level, independent of there gf value. GF_ACTION indicates 
+C lower level is > LEV_CUT. A minimum of MIN_NUM_TRANS downward transitions is
+C kept for each level, independent of there gf value. GF_ACTION indicates
 C whether to set the f values of the weak transitions to zero, or negative.
 C
 	CHARACTER*(*) GF_ACTION
-	REAL(10) GF_CUT
+	REAL(KIND=LDP) GF_CUT
 	INTEGER LEV_CUT
 	INTEGER MIN_NUM_TRANS
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 C
 C External functions.
 C
 	EXTERNAL SPEED_OF_LIGHT,ICHRLEN,RD_FREE_VAL,ERROR_LU
-	REAL(10) SPEED_OF_LIGHT,RD_FREE_VAL
+	REAL(KIND=LDP) SPEED_OF_LIGHT,RD_FREE_VAL
 	INTEGER ICHRLEN,ERROR_LU
 C
 C Local variables
 C
 	CHARACTER*40 LOCNAME(N)
 	CHARACTER*40 LOW_NAME,UP_NAME
-	REAL(10) T1,SPEED_LIGHT
+	REAL(KIND=LDP) T1,SPEED_LIGHT
 	INTEGER I,J,K,NW,L1,L2,IOS,BIGLEN,MAXLEN,LUER,CUT_CNT
 	CHARACTER*132 STRING
 	INTEGER, PARAMETER :: IZERO=0
@@ -53,7 +54,7 @@ C
 ! Variables for deleteing weak transitions.
 !
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
-	REAL(10) DOWN(N)
+	REAL(KIND=LDP) DOWN(N)
 	INTEGER INDX(N)
 C
 C Variables for free-format internal reads.
@@ -128,7 +129,7 @@ C
 	  READ(LUIN,'(A)')STRING
 	  J=ICHRLEN(STRING)
 	  WRITE(LUOUT,'(A)')STRING(1:J)
-	  L1=INDEX(STRING,'!Ionization energy') 
+	  L1=INDEX(STRING,'!Ionization energy')
 	  IF(L1 .NE. 0)THEN
 	    L1=INDEX(STRING,'  ')
 	    DESC='IOnization energy read in GENOSCIL-'//FILNAME
@@ -142,7 +143,7 @@ C
 	  READ(LUIN,'(A)')STRING
 	  J=ICHRLEN(STRING)
 	  WRITE(LUOUT,'(A)')STRING(1:J)
-	  L1=INDEX(STRING,'!Screened nuclear charge') 
+	  L1=INDEX(STRING,'!Screened nuclear charge')
 	  IF(L1 .NE. 0)THEN
 	    L1=INDEX(STRING,'  ')
 	    DESC='NW Read in GENOSCIL-'//FILNAME
@@ -173,12 +174,12 @@ C
 	  IF(STRING .NE. ' ')THEN
 	    WRITE(LUER,*)'Error reading blank(1) from '//FILNAME
 	    STOP
-	  END IF	    
+	  END IF	
 C
 C We first read the record into a character string so that we can do
 C an unformatted read on the real variables. LEVNAME name (or transition)
-C must be separated by at least 2 spaces from the real data. 
-C Level names need not be the same length. Note that FEDGE is initially 
+C must be separated by at least 2 spaces from the real data.
+C Level names need not be the same length. Note that FEDGE is initially
 C the excitation energy in cm^-1.
 C
 	  BIGLEN=0
@@ -287,7 +288,7 @@ C
 	  READ(STRING(L1+1:),*)J
 	  IF(I .LE. N .AND. J .LE. N)THEN
 	    EINA(I,J)=T1
-	    IF(LOW_NAME .NE. LEVNAME(I) .OR. 
+	    IF(LOW_NAME .NE. LEVNAME(I) .OR.
 	1       UP_NAME .NE. LEVNAME(J) .OR. I .GE. J)THEN
 	      WRITE(LUER,*)'Invalid transition format in '//FILNAME
 	      WRITE(LUER,*)'Indices and level names don''t match'
@@ -311,7 +312,7 @@ C Compute the Einstein A coefficients.
 C
 	T1=OPLIN/EMLIN*TWOHCSQ
 	DO I=1,N-1
-	  DO J=I+1,N                
+	  DO J=I+1,N
 	    EINA(J,I)=T1*EINA(I,J)*STAT_WT(I)/STAT_WT(J)
 	1     *( (FEDGE(I)-FEDGE(J))**2 )
 	  END DO
@@ -335,7 +336,7 @@ C
 	    DOWN(1:J-1)=EINA(J,1:J-1)		!Einstein A values for level J
 	    I=J-1
 	    CALL INDEXX(I,DOWN,INDX,L_FALSE)	!Sort into reverse numerical order
-	    T1=DOWN(INDX(MIN_NUM_TRANS))	! 
+	    T1=DOWN(INDX(MIN_NUM_TRANS))	!
 	    DO I=1,J-1				!Lower index
 	      IF( STAT_WT(I)*EINA(I,J) .LT. GF_CUT .AND.
 	1              I .GT. LEV_CUT .AND. EINA(J,I) .LT. T1)THEN

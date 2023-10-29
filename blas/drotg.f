@@ -1,9 +1,10 @@
       subroutine drotg(da,db,c,s)
+	USE SET_KIND_MODULE
 c
 c     construct givens plane rotation.
 c     jack dongarra, linpack, 3/11/78.
 c
-      REAL(10) da,db,c,s,roe,scale,r,z
+      REAL(KIND=LDP) da,db,c,s,roe,scale,r,z
 c
       roe = db
       if( abs(da) .gt. abs(db) ) roe = da

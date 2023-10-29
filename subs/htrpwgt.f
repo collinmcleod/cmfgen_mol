@@ -3,6 +3,7 @@
 ! depndence on I.  Assumes X(I) > X(I+1).
 !
 	SUBROUTINE HTRPWGT(X,W,N)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 24-May-1996 - Call to DP_ZERO removed.
@@ -14,7 +15,7 @@ C                     accuracy.
 C Created 25-Nov-1986 (Based on KWEIGHT)
 C
 	INTEGER N,I
-	REAL(10) X(N),W(N),T1,T2,SUM
+	REAL(KIND=LDP) X(N),W(N),T1,T2,SUM
 C
 	INTEGER ERROR_LU,LUER
 	LOGICAL, SAVE :: CHECK = .FALSE.
@@ -28,7 +29,7 @@ C
 	  W(I+1)=W(I+1)-T2+T1*X(I)
 	END DO
 C
-C Assumes that V(mu=0)=0 and mu.V'(mu)=0 at mu=0. 
+C Assumes that V(mu=0)=0 and mu.V'(mu)=0 at mu=0.
 C
 	IF(X(N) .NE. 0.0D0)THEN
 C

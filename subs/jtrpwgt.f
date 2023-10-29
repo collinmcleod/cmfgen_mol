@@ -3,6 +3,7 @@ C Subroutine to compute the quadrature weights for the J integration.
 C A trapazoidal rule is used.
 C
 	SUBROUTINE JTRPWGT(X,W,N)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Aletered 24-May-1996 - Call to DP_ZERO removed
@@ -10,7 +11,7 @@ C                        EROR_LU etc installed.
 C Created  17-May-1989 - Based on HWEIGHT
 C
 	INTEGER N,I
-	REAL(10) X(N),W(N),H,T1,SUM
+	REAL(KIND=LDP) X(N),W(N),H,T1,SUM
 C
 	INTEGER ERROR_LU,LUER
 	LOGICAL, SAVE :: CHECK=.FALSE.

@@ -10,6 +10,7 @@
 !       and include the effect of the first order Doppler shift.
 !
 	SUBROUTINE COMP_GREY_V3(POPS,TGREY,TAU_ROSS,ROSSMEAN,PLANCKMEAN,LUER,NC,ND,NP,NT)
+	USE SET_KIND_MODULE
 	USE ANG_QW_MOD
 	USE MOD_CMFGEN
 	USE CONTROL_VARIABLE_MOD
@@ -18,10 +19,10 @@
 ! Altered 03-Apr-2009 : Inserted OUT_JH call in REL section.
 ! Altered 20-Jan-2008 : POPS & NT inserted into call. Changed to V2.
 !                       Now call JGREY_HUB_DDT_V2
-! 
+!
 ! Altered 30_Aug-2007 : Bug fix. Invalid lower boundary condition flux for
-!                         MOM_JREL and for FCOMP_PP_V2i. Forgot factor of CHI. 
-!                         
+!                         MOM_JREL and for FCOMP_PP_V2i. Forgot factor of CHI.
+!
 ! Created 21-Dec-2004
 !
 	INTEGER NC
@@ -30,41 +31,41 @@
 	INTEGER NT
 	INTEGER LUER
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) TGREY(ND)
-	REAL(10) TAU_ROSS(ND)
-	REAL(10) ROSSMEAN(ND)
-	REAL(10) PLANCKMEAN(ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) TGREY(ND)
+	REAL(KIND=LDP) TAU_ROSS(ND)
+	REAL(KIND=LDP) ROSSMEAN(ND)
+	REAL(KIND=LDP) PLANCKMEAN(ND)
 !
-	REAL(10) RJ(ND)
-	REAL(10) DTAU(ND)
-	REAL(10) Z(ND)
-	REAL(10) CHI(ND)
-	REAL(10) dCHIdR(ND)
+	REAL(KIND=LDP) RJ(ND)
+	REAL(KIND=LDP) DTAU(ND)
+	REAL(KIND=LDP) Z(ND)
+	REAL(KIND=LDP) CHI(ND)
+	REAL(KIND=LDP) dCHIdR(ND)
 !
-	REAL(10) TA(ND)
-	REAL(10) TB(ND)
-	REAL(10) TC(ND)
-	REAL(10) Q(ND)
-	REAL(10) GAM(ND)
-	REAL(10) GAMH(ND)
-	REAL(10) SOB(ND)
-	REAL(10) XM(ND)
-	REAL(10) SOURCE(ND)
-	REAL(10) FEDD(ND)
-	REAL(10) H_ON_J(ND)
-	REAL(10) RSQHNU(ND)
-	REAL(10) dlnJdlnR(ND)
+	REAL(KIND=LDP) TA(ND)
+	REAL(KIND=LDP) TB(ND)
+	REAL(KIND=LDP) TC(ND)
+	REAL(KIND=LDP) Q(ND)
+	REAL(KIND=LDP) GAM(ND)
+	REAL(KIND=LDP) GAMH(ND)
+	REAL(KIND=LDP) SOB(ND)
+	REAL(KIND=LDP) XM(ND)
+	REAL(KIND=LDP) SOURCE(ND)
+	REAL(KIND=LDP) FEDD(ND)
+	REAL(KIND=LDP) H_ON_J(ND)
+	REAL(KIND=LDP) RSQHNU(ND)
+	REAL(KIND=LDP) dlnJdlnR(ND)
 !
-	REAL(10) T1,T2
-	REAL(10) HBC_J
-	REAL(10) HBC_CMF
-	REAL(10) NBC_CMF
-	REAL(10) INBC
-	REAL(10) DBB
-	REAL(10) FL
-	REAL(10) PI
-	REAL(10) HFLUX
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) HBC_J
+	REAL(KIND=LDP) HBC_CMF
+	REAL(KIND=LDP) NBC_CMF
+	REAL(KIND=LDP) INBC
+	REAL(KIND=LDP) DBB
+	REAL(KIND=LDP) FL
+	REAL(KIND=LDP) PI
+	REAL(KIND=LDP) HFLUX
 !
 	INTEGER I,J,K,L
 !
@@ -75,7 +76,7 @@
 ! Constants for opacity etc.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	WRITE(6,*)'BEGIN COMP_GREY_V2',ND,NC,NP
 	PI=4.0D0*ATAN(1.0D0)
@@ -161,8 +162,8 @@
 !
 ! Note
 !   HFLUX=LUM*Lsun/16/(PI*PI)/10**2/R**2 (10**2 for 1/R**2).
-!   DBB = dBdR = 3.Chi.L/16(piR)**2 
-!   DBB is used for the lower boundary diffusion approximation. 
+!   DBB = dBdR = 3.Chi.L/16(piR)**2
+!   DBB is used for the lower boundary diffusion approximation.
 !
 	  HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
           DBB=3.0D0*HFLUX*CHI(ND)
@@ -234,11 +235,11 @@
 	END IF
 !
 ! Compute the temperature distribution, and the Rosseland optical depth scale.
-! NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert T from units of 
+! NB sigma=5.67E-05 and the factor of 1.0E-04 is to convert T from units of
 ! K to units of 10^4 K. The ' ' in TORSCL indicates TYPE of atmosphere,
 ! and here is set to ' ' so as TORSCL assumes a 1/r^2 density dependence
 ! at boundary.
-! 
+!
 	DO I=1,ND
 	  TGREY(I)=((PI/5.67D-05*RJ(I))**0.25D0)*1.0D-04
 	END DO

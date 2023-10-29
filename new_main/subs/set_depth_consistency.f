@@ -4,6 +4,7 @@
 !
 	SUBROUTINE SET_DEPTH_CONSISTENCY(STEQ_VALS,POPS,ND,NT,
 	1              BAD_DECREASE_LIMIT,BAD_INCREASE_LIMIT,OPTION)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -12,19 +13,19 @@
 	INTEGER ND		!Number of depth points
 	INTEGER NT		!Number of equations
 !
-	REAL(10) STEQ_VALS(NT,ND)         !Suggested corrections to current populations
-	REAL(10) POPS(NT,ND)
-	REAL(10) BAD_INCREASE_LIMIT	!Should be large and neagtive.
-	REAL(10) BAD_DECREASE_LIMIT	!Should be negative (typically just less than 1).
+	REAL(KIND=LDP) STEQ_VALS(NT,ND)         !Suggested corrections to current populations
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) BAD_INCREASE_LIMIT	!Should be large and neagtive.
+	REAL(KIND=LDP) BAD_DECREASE_LIMIT	!Should be negative (typically just less than 1).
 	CHARACTER(LEN=*) OPTION		!Not used currently (installed for later changes)
 !
 ! Local variables.
 !
-	REAL(10) MAX_COR_VEC(ND)
-	REAL(10) MIN_COR_VEC(ND)
-	REAL(10) MAX_COR
-	REAL(10) MIN_COR
-	REAL(10) T1
+	REAL(KIND=LDP) MAX_COR_VEC(ND)
+	REAL(KIND=LDP) MIN_COR_VEC(ND)
+	REAL(KIND=LDP) MAX_COR
+	REAL(KIND=LDP) MIN_COR
+	REAL(KIND=LDP) T1
 !
 	INTEGER ID
 	INTEGER ISPEC
@@ -56,9 +57,9 @@
 !
 	DO K=1,ND
 	  BAD_SOLUTION_VEC(K)=.FALSE.
-	  MAX_COR_VEC(K)=MAXVAL(STEQ_VALS(1:NT,K)) 
+	  MAX_COR_VEC(K)=MAXVAL(STEQ_VALS(1:NT,K))
 	  MIN_COR_VEC(K)=MINVAL(STEQ_VALS(1:NT,K))
-	  IF(MAX_COR_VEC(K) .EQ. 0.0D0 .AND. MIN_COR_VEC(K) .EQ. 0.0D0)BAD_SOLUTION_VEC(K)=.TRUE. 
+	  IF(MAX_COR_VEC(K) .EQ. 0.0D0 .AND. MIN_COR_VEC(K) .EQ. 0.0D0)BAD_SOLUTION_VEC(K)=.TRUE.
 	  WRITE(6,*)K,MIN_COR_VEC(K),MAX_COR_VEC(K),BAD_SOLUTION_VEC(K)
 	END DO
 !
@@ -85,8 +86,8 @@
 	        LOW_LEV=ATM(ID)%EQXzV
 	        ID=SPECIES_END_ID(ISPEC)-1
 	        HIGH_LEV=ATM(ID)%EQXzV+ATM(ID)%NXzV          !Points to last ion.
-	        MAX_COR=MAXVAL(STEQ_VALS(LOW_LEV:HIGH_LEV,K)) 
-	        MIN_COR=MINVAL(STEQ_VALS(LOW_LEV:HIGH_LEV,K)) 
+	        MAX_COR=MAXVAL(STEQ_VALS(LOW_LEV:HIGH_LEV,K))
+	        MIN_COR=MINVAL(STEQ_VALS(LOW_LEV:HIGH_LEV,K))
 	        IF(MAX_COR .LT. 0.5 .AND. MIN_COR .GT. -2.0D0 .AND.
 	1              .NOT. BAD_SOLUTION_VEC(K))THEN
 	          PREV_DEPTH_OKAY(ISPEC)=.TRUE.
@@ -98,19 +99,19 @@
 !
 	          IF(PREV_DEPTH_OKAY(ISPEC))THEN
 	             DO L=LOW_LEV,HIGH_LEV
-	               IF(STEQ_VALS(L,K) .LT. BAD_INCREASE_LIMIT .OR. 
+	               IF(STEQ_VALS(L,K) .LT. BAD_INCREASE_LIMIT .OR.
 	1                   STEQ_VALS(L,K) .GT. BAD_DECREASE_LIMIT .OR. BAD_SOLUTION_VEC(K))THEN
 	                  POPS(L,K)=POPS(L,K+1)*(POP_SPECIES(K,ISPEC)/POP_SPECIES(K+1,ISPEC))
 	                  CORRECTION_CNT=CORRECTION_CNT+1
 	               END IF
 	             END DO
 	          ELSE IF(K .GT. 1)THEN
-	            MAX_COR=MAXVAL(STEQ_VALS(LOW_LEV:HIGH_LEV,K-1)) 
-	            MIN_COR=MINVAL(STEQ_VALS(LOW_LEV:HIGH_LEV,K-1)) 
+	            MAX_COR=MAXVAL(STEQ_VALS(LOW_LEV:HIGH_LEV,K-1))
+	            MIN_COR=MINVAL(STEQ_VALS(LOW_LEV:HIGH_LEV,K-1))
 	            IF(MAX_COR .LT. 0.5 .AND. MIN_COR .GT. -2.0D0 .AND. .NOT.
 	1               BAD_SOLUTION_VEC(K-1))THEN
 	              DO L=LOW_LEV,HIGH_LEV
-	                IF(STEQ_VALS(L,K) .LT. BAD_INCREASE_LIMIT .OR. 
+	                IF(STEQ_VALS(L,K) .LT. BAD_INCREASE_LIMIT .OR.
 	1                   STEQ_VALS(L,K) .GT. BAD_DECREASE_LIMIT .OR. BAD_SOLUTION_VEC(K))THEN
 	                  POPS(L,K)=POPS(L,K-1)*(POP_SPECIES(K,ISPEC)/POP_SPECIES(K-1,ISPEC))
 	                  CORRECTION_CNT=CORRECTION_CNT+1

@@ -1,12 +1,13 @@
 	SUBROUTINE SOLVEBA_V11(STEQ,POPS,POP_ATOM,DIAG_INDX,NT,NION,NUM_BNDS,ND,
 	1              MAXCH,METH_SOL,SUCCESS,SCALE_OPT,LAM_SCALE_OPT,CHANGE_LIM,T_MIN,
 	1              BA_COMPUTED,WR_BA_INV,WR_PRT_INV,LAMBDA_IT,SET_POPS_D2_EQ_D1)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 26-Mar-2012 : Changed to V11 and added POP_ATOM to call.
-! Altered 12-MAr-2013 : We can now set the populations at depth 2 equal to those at depth 1 for 
+! Altered 12-MAr-2013 : We can now set the populations at depth 2 equal to those at depth 1 for
 !                          a FULL iteration (i.e., non=LAMBDA). This is designed to overcome a convergence
-!                          issue with SN models. This should only be done when depth 2 is very close to 
+!                          issue with SN models. This should only be done when depth 2 is very close to
 !                          depth 1.
 ! Altered 08-Nov-2011 : Updated maximum correction output with info on whether BA was computed.
 ! Altered 15-Nov-2010 : FIDDLE_POP_CORRECTIONS added to assist convergence. This allows
@@ -18,7 +19,7 @@
 !                       LAM_SCALE_OPT inserted in call.
 ! Altered 23-May-2006 : Extra column output to CORRECTION_SUM.
 ! Altered 19-May-2005 : T_MIN inserted into call.
-! Altered 11-Feb-2004 : Bug fixed with calculation of SCALE in 'GLOBAL' scale option.  
+! Altered 11-Feb-2004 : Bug fixed with calculation of SCALE in 'GLOBAL' scale option.
 ! Altered 30-Mar-2003 : Output to CORRECTION_SUM file included.
 ! Altered 28-Jan-2002 : Changed to V& as BA_COMPUTED and WR_BA_INV now passed in the CALL.
 !                       CMF_BLKBAND_V3 now used.
@@ -29,17 +30,17 @@
 	INTEGER ND
 	INTEGER DIAG_INDX
 !
-	REAL(10) STEQ(NT,ND)
-	REAL(10) POPS(NT,ND)
-	REAL(10) POP_ATOM(ND)
-	REAL(10) MAXCH
-	REAL(10) CHANGE_LIM
-	REAL(10) T_MIN
+	REAL(KIND=LDP) STEQ(NT,ND)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) POP_ATOM(ND)
+	REAL(KIND=LDP) MAXCH
+	REAL(KIND=LDP) CHANGE_LIM
+	REAL(KIND=LDP) T_MIN
 	CHARACTER*(*) METH_SOL
 	CHARACTER*(*) SCALE_OPT
 	CHARACTER*(*) LAM_SCALE_OPT
 	LOGICAL SUCCESS
-	LOGICAL BA_COMPUTED 
+	LOGICAL BA_COMPUTED
 	LOGICAL WR_BA_INV
 	LOGICAL WR_PRT_INV
 	LOGICAL LAMBDA_IT
@@ -56,12 +57,12 @@
 ! Local variables.
 !
 	INTEGER, PARAMETER :: NV=10
-	REAL(10) MAX_INC_VEC(NV)
-	REAL(10) MAX_DEC_VEC(NV)
+	REAL(KIND=LDP) MAX_INC_VEC(NV)
+	REAL(KIND=LDP) MAX_DEC_VEC(NV)
 !
-	REAL(10) SCALE,MINSCALE,T1,T2,T3
-	REAL(10) INCREASE,DECREASE
-	REAL(10) BIG_LIM,LIT_LIM
+	REAL(KIND=LDP) SCALE,MINSCALE,T1,T2,T3
+	REAL(KIND=LDP) INCREASE,DECREASE
+	REAL(KIND=LDP) BIG_LIM,LIT_LIM
 	INTEGER I,J,K,IINC,IDEC,IOS,LU_SUM
 	INTEGER COUNT(7)
 	LOGICAL LOC_WR_BA_INV
@@ -116,7 +117,7 @@
 ! Lambda iterations (for Ne fixed) should generally have corrections < unity.
 ! Due to instabilities, large -ve corrections can sometimes arrise. This
 ! limits these corrections, and potentilly wil help facilitate convergence.
-! 
+!
 	IF(LAMBDA_IT .AND. LAM_SCALE_OPT(1:5) .EQ. 'LIMIT')THEN
 	  COUNT(1)=0
 	  DO I=1,ND

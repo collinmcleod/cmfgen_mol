@@ -3,7 +3,7 @@ c       **** SUBROUTINE SVE_FILE ****
 c
 c This subroutine is used by the USR_OPTION routines to read and write
 c .sve files.  There are 6 subroutine, 4 that are called only by the
-c usr_option routine and 2 (sve_file and wr_box_file) which are 
+c usr_option routine and 2 (sve_file and wr_box_file) which are
 c called by the routine that calls usr_option.
 c
 c This set of subroutines was written to be as self contained as possible.
@@ -19,13 +19,13 @@ c                      dc_feiv.  The main option is written as
 c                      the first entry on a new line in the .sve
 c                      file without any flags.  Each main
 c                      option may or may not have sub options.
-c    
+c
 c        Sub option => These are options that query for specific
 c                      information about the given main option.
 c                      They are written in the .sve files on the
 c                      same line as its main option, deliminted with
 c                      [var_name=sub option]
-c    
+c
 c     Hidden option => These are options where the default value passed
 c                      to usr_hidden is always used unless the user
 c                      indicates otherwise by including the hidden option
@@ -68,18 +68,18 @@ c  POST_SVE_FILE: This subroutine is called after the user inputs an
 c                 answer.  It only acts if a main option is being
 c                 input and if a .sve or .box file is to be read.
 c                 It also handles changes to .sve files.
-c  
+c
 c   PRE_SVE_FILE: This subroutine acts before the user inputs an answer
 c                 If a .sve file is being read, the current option (main or sub)
 c                 is read from the .sve file and the user is not prompted.  If the
-c                 option is not found, the user is then prompted for an 
+c                 option is not found, the user is then prompted for an
 c                 answer.
-c  
+c
 c    WR_SVE_FILE: If a .sve file is being written, this routine writes the
 c                 last answer to the current .sve file.  It determines if
 c                 the option is main or sub and writes it in the correct
 c                 format.
-c  
+c
 c       SVE_FILE: This subroutine is called to set several flags.  The only
 c                 passed string currently used is 'RESET'.  This resets
 c                 several flags and if a .box file is being read, the next
@@ -134,11 +134,11 @@ c------------------------------------------------------------------------------
 c
 c To use USR_OPTION, a call to SVE_FILE('reset') is required before each main
 c option.  Then next call to USR_OPTION is then the main option and all
-c subsequent calls to USR_OPTION and USR_HIDDEN are sup-options, until a call to 
-c SVE_FILE('reset'). This way all sub-options are written in the same save file.  
+c subsequent calls to USR_OPTION and USR_HIDDEN are sup-options, until a call to
+c SVE_FILE('reset'). This way all sub-options are written in the same save file.
 c If .box files are to be written, an IF branch to call WR_SVE_FILE(MAIN) must be
 c created.
-c 
+c
 c------------------------------------------------------------------------------
 c
 c General coding to use .sve  and .box files
@@ -149,13 +149,13 @@ c c       main option
 c      call usr_option(main,'var_name','default','description')
 c      ....
 c      if(main.eq.option)then
-c c         sub options     
+c c         sub options
 c        call usr_option(variable,'var_name','default','description')
 c        call usr_option(variable,'var_name','default','description')
 c        call usr_hidden(variable,'var_name',main_option,'default','description')
 c        ...
 c      elseif(main.eq.???)then
-c c         sub options     
+c c         sub options
 c      ...
 c      elseif(main.eq.'box=')then
 c c         write .box file
@@ -199,6 +199,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine pre_sve_file(answer,var_name,present)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -206,10 +207,10 @@ c This subroutine checks to see if a .sve file is being read.  It is
 c the first action taken in the usr_option subroutines and check to
 c see if the current option should be read from file or if the usr
 c should be prompted.
-c 
-c 1) If a .sve file is being read, then the next option, main or sub, 
+c
+c 1) If a .sve file is being read, then the next option, main or sub,
 c    is read and passed back to usr_option in answer and present
-c    is set to .TRUE.  
+c    is set to .TRUE.
 c
 c 2) If a .sve file is not being read or the option described by "var_name"
 c    is not found, present is set to .FALSE. and usr_option prompts the user
@@ -298,6 +299,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine post_sve_file(answer,var_name,present)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -323,7 +325,7 @@ c    into "answer".  The sub-options are read into "answer" by subsequent
 c    call to usr_option via the subroutine pre_sve_file.
 c
 c 5) If sve=filename is found in "answer" then .sve file is opened with the name
-c    of the option passed in "answer" (ie "filename.sve").  Options are written 
+c    of the option passed in "answer" (ie "filename.sve").  Options are written
 c    to the .sve file by the subroutine wr_sve_file called by usr_option.
 c
 c 6) If box=filename is found in "answer" then return to usr_option.  Create of
@@ -348,7 +350,7 @@ c                        Use upper_case instead of condit_sting to create
 c                          all capital letter strings.
 c                        Changed .sve files to have one option per line.
 c                          Required all lines to be read in and concatinated
-c                          into variable string.  String is still checked 
+c                          into variable string.  String is still checked
 c                          elsewhere for sub-options and hidden options.
 c                        Hidden options included with a main options are now
 c                          written to variable string.  Previously the main option
@@ -413,7 +415,7 @@ c
             if(o_start.le.k)then
 c
 c    No more hidden options or changes
-c                         
+c
               num_hidden=i-1
               exit
 c
@@ -686,7 +688,7 @@ c
               string(l:)="{"//upper_case(answer(o_start:o_end))
               l=len_trim(string)+1
               o_start=o_end+1
-              o_end=o_start+index(answer(o_start:),')')-2  
+              o_end=o_start+index(answer(o_start:),')')-2
               if(o_end .lt. o_start)then			!le to lt jdh
                 print*,' apparent error in option format'
                 print*,' could not find `)` in box string'
@@ -717,6 +719,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine sve_file(answer)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -882,6 +885,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine wr_sve_file(answer,var_name)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -938,7 +942,7 @@ C      elseif(.not.sve_read)then
         fmt_string=wr_fmt_string(o_end)
         write(unit_sve,fmt_string)
      *       option(:o_end)
-      endif        
+      endif
       main_option=.FALSE.
 c
       return
@@ -947,6 +951,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine open_sve_file(answer,present)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
@@ -965,7 +970,7 @@ c
 c altered 27/01/04  DJH  Installed FILE_SHOULD_EXIT variable so that routine
 c                        does not create a sve file when using the .option.
 c                        Designed to prevent the creation of empty .sve files.
-c 
+c
 c altered 08/06/15  DJH  .box file no longer created if it does not exist.
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1065,6 +1070,7 @@ c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c
       subroutine wr_box_file(filename)
+	USE SET_KIND_MODULE
 c
 c+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 c

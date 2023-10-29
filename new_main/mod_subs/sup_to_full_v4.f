@@ -1,19 +1,20 @@
 !
-! Subroutine to store the populations back into their individual storage 
+! Subroutine to store the populations back into their individual storage
 ! locations. Replaces SUP_TO_FULL_V4.INC.
 !
 	SUBROUTINE SUP_TO_FULL_V4(POPS,Z_POP,DO_LEV_DISSOLUTION,ND,NT)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
 ! Altered 05-Apr-2011 : Now call SUP_TO_FULL_V3b (28-Nov-2010).
-!                         Changes done to give a wider dynamic rangs in pops. 
+!                         Changes done to give a wider dynamic rangs in pops.
 !
 	INTEGER ND
 	INTEGER NT
 !
-	REAL(10) POPS(NT,ND)
-	REAL(10) Z_POP(NT)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) Z_POP(NT)
 	LOGICAL DO_LEV_DISSOLUTION
 !
 	INTEGER I

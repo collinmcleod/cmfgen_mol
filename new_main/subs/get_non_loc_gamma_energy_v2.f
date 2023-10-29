@@ -5,6 +5,7 @@
 !                current_nonlocal_decay_energy.dat
 !
 	SUBROUTINE GET_NON_LOCAL_GAMMA_ENERGY_V2(R,V,ND,LU)
+	USE SET_KIND_MODULE
 	USE CONTROL_VARIABLE_MOD
 	USE NUC_ISO_MOD
 	IMPLICIT NONE
@@ -20,16 +21,16 @@
 !
 	INTEGER ND
 	INTEGER LU
-	REAL(10) R(ND)
-	REAL(10) V(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
 !
 ! Variables for reading in the non-local energy deposition from outside file
 !
 	INTEGER NDTMP
-	REAL(10), ALLOCATABLE :: VTMP(:),EDEPTMP(:),EDEPNEW(:)
-	REAL(10) T1,T2
-	REAL(10) CONV_CONST
-	REAL(10) WRK(ND)
+	REAL(KIND=LDP), ALLOCATABLE :: VTMP(:),EDEPTMP(:),EDEPNEW(:)
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) CONV_CONST
+	REAL(KIND=LDP) WRK(ND)
 	INTEGER LUER
 	INTEGER I
 	INTEGER ERROR_LU
@@ -44,7 +45,7 @@
 !
 ! Before the call, WRK must contain the locally EMITTED energy. After the call,
 ! RADIOACTIVE_DECAY_ENERGY will contain the locally ABSORBED energy.
-! 
+!
 	   WRK=RADIOACTIVE_DECAY_ENERGY
 	   CALL DO_GAM_ABS_APPROX_V2(RADIOACTIVE_DECAY_ENERGY,WRK,KINETIC_DECAY_ENERGY,ND)
 !
@@ -179,7 +180,7 @@
 ! Skip additional header info.
 !
 	    STRING='!'
-	    DO WHILE(STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ') 
+	    DO WHILE(STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ')
 	      READ(LU,'(A)',IOSTAT=IOS)STRING
 	    END DO
 	    BACKSPACE(LU)
@@ -198,7 +199,7 @@
 	    CLOSE(LU)
 	  ELSE
 	    RADIOACTIVE_DECAY_ENERGY=0.0D0
-	  END IF 
+	  END IF
 !
 	ELSE
 	   WRITE(LUER,*)'Error in GET_NON_LOCAL_GAMMA_ENERGY'

@@ -1,11 +1,12 @@
       SUBROUTINE DGEMV ( TRANS, M, N, ALPHA, A, LDA, X, INCX,
      $                   BETA, Y, INCY )
+	USE SET_KIND_MODULE
 *     .. Scalar Arguments ..
-      REAL(10)   ALPHA, BETA
+      REAL(KIND=LDP)   ALPHA, BETA
       INTEGER            INCX, INCY, LDA, M, N
       CHARACTER*1        TRANS
 *     .. Array Arguments ..
-      REAL(10)   A( LDA, * ), X( * ), Y( * )
+      REAL(KIND=LDP)   A( LDA, * ), X( * ), Y( * )
 *     ..
 *
 *  Purpose
@@ -43,11 +44,11 @@
 *           N must be at least zero.
 *           Unchanged on exit.
 *
-*  ALPHA  - REAL(10).
+*  ALPHA  - REAL(KIND=LDP).
 *           On entry, ALPHA specifies the scalar alpha.
 *           Unchanged on exit.
 *
-*  A      - REAL(10) array of DIMENSION ( LDA, n ).
+*  A      - REAL(KIND=LDP) array of DIMENSION ( LDA, n ).
 *           Before entry, the leading m by n part of the array A must
 *           contain the matrix of coefficients.
 *           Unchanged on exit.
@@ -58,7 +59,7 @@
 *           max( 1, m ).
 *           Unchanged on exit.
 *
-*  X      - REAL(10) array of DIMENSION at least
+*  X      - REAL(KIND=LDP) array of DIMENSION at least
 *           ( 1 + ( n - 1 )*abs( INCX ) ) when TRANS = 'N' or 'n'
 *           and at least
 *           ( 1 + ( m - 1 )*abs( INCX ) ) otherwise.
@@ -71,12 +72,12 @@
 *           X. INCX must not be zero.
 *           Unchanged on exit.
 *
-*  BETA   - REAL(10).
+*  BETA   - REAL(KIND=LDP).
 *           On entry, BETA specifies the scalar beta. When BETA is
 *           supplied as zero then Y need not be set on input.
 *           Unchanged on exit.
 *
-*  Y      - REAL(10) array of DIMENSION at least
+*  Y      - REAL(KIND=LDP) array of DIMENSION at least
 *           ( 1 + ( m - 1 )*abs( INCY ) ) when TRANS = 'N' or 'n'
 *           and at least
 *           ( 1 + ( n - 1 )*abs( INCY ) ) otherwise.
@@ -100,10 +101,10 @@
 *
 *
 *     .. Parameters ..
-      REAL(10)   ONE         , ZERO
+      REAL(KIND=LDP)   ONE         , ZERO
       PARAMETER        ( ONE = 1.0D+0, ZERO = 0.0D+0 )
 *     .. Local Scalars ..
-      REAL(10)   TEMP
+      REAL(KIND=LDP)   TEMP
       INTEGER            I, INFO, IX, IY, J, JX, JY, KX, KY, LENX, LENY
 *     .. External Functions ..
       LOGICAL            LSAME

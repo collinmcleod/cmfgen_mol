@@ -1,7 +1,8 @@
       subroutine zrotg(ca,cb,c,s)
+	USE SET_KIND_MODULE
       double complex ca,cb,s
-      REAL(10) c
-      REAL(10) norm,scale
+      REAL(KIND=LDP) c
+      REAL(KIND=LDP) norm,scale
       double complex alpha
       if (cdabs(ca) .ne. 0.0d0) go to 10
          c = 0.0d0

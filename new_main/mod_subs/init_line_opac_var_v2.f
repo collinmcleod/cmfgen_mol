@@ -8,6 +8,7 @@
 !
         SUBROUTINE INIT_LINE_OPAC_VAR_V2(LAST_LINE,LUER,ND,TX_OFFSET,MAX_SIM,NM)
 	USE MOD_CMFGEN
+	USE SET_KIND_MODULE
  	USE OPAC_MOD
 	USE CONTROL_VARIABLE_MOD
 	USE LINE_MOD
@@ -26,9 +27,9 @@
 	INTEGER LAST_LINE
 	INTEGER LUER
 !
-	REAL(10) FL
-	REAL(10) T1,T2
-	REAL(10) NU_DOP
+	REAL(KIND=LDP) FL
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) NU_DOP
 !
 	INTEGER NUM_BNDS
 	INTEGER NDEXT
@@ -89,7 +90,7 @@
 ! 
 !
 ! Now need to determine the storage location for the 2 variation parameters.
-! NB: Because of our coding, SIM_NL(SIM_INDX) must be set before we can 
+! NB: Because of our coding, SIM_NL(SIM_INDX) must be set before we can
 !     do this.
 !
 ! NB: TX_OFFSET refers to the number or arrays used (=5 if chi,eta, chi_old,
@@ -225,9 +226,10 @@
 	END
 !
 	SUBROUTINE ZERO_dZ(dZ,J,NM,NX,M)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	INTEGER J,NM,NX,M
-	REAL(10) dZ(NM,NX,M)
+	REAL(KIND=LDP) dZ(NM,NX,M)
 !
 	INTEGER L,K
 !

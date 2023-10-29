@@ -1,19 +1,20 @@
 !
-! Returns linear interpolated value for R^2 J. R must be a monotonically increasing or 
+! Returns linear interpolated value for R^2 J. R must be a monotonically increasing or
 ! decreasing function. Code does no check on whether range is valid.
 !
 	FUNCTION GET_RSQJ_FROM_J(RVAL,JNU,R,NW)
+	USE SET_KIND_MODULE
 !
 	IMPLICIT NONE
 	INTEGER NW
-	REAL(10) JNU(NW)  	!
-	REAL(10) R(NW)		!Independent variable
-	REAL(10) RVAL		!Value at which function is to be interp. to.
-	REAL(10) GET_RSQJ_FROM_J
+	REAL(KIND=LDP) JNU(NW)  	!
+	REAL(KIND=LDP) R(NW)		!Independent variable
+	REAL(KIND=LDP) RVAL		!Value at which function is to be interp. to.
+	REAL(KIND=LDP) GET_RSQJ_FROM_J
 !
 	INTEGER J,ILOW,IHIGH,ILOW_SAV
-	REAL(10) FRAC
-	REAL(10) T1,T2
+	REAL(KIND=LDP) FRAC
+	REAL(KIND=LDP) T1,T2
 	SAVE ILOW_SAV
 	DATA ILOW_SAV/1/
 !
@@ -28,9 +29,9 @@
 	IF(R(1) .GT. R(NW))THEN
 !
 ! Need to compare RVAL with R array (and not RSAV) in case value is
-! same, but array is different. 
+! same, but array is different.
 !
-	  IF( (RVAL .GE.  R(ILOW_SAV+1)) .AND. 
+	  IF( (RVAL .GE.  R(ILOW_SAV+1)) .AND.
 	1       (RVAL .LE. R(ILOW_SAV)) )THEN
             ILOW=ILOW_SAV
 	    IHIGH=ILOW+1
@@ -58,7 +59,7 @@
 	  END IF
 !
 	ELSE
-	  IF( (RVAL .LE.  R(ILOW_SAV+1)) .AND. 
+	  IF( (RVAL .LE.  R(ILOW_SAV+1)) .AND.
 	1       (RVAL .GE. R(ILOW_SAV)) )THEN
             ILOW=ILOW_SAV
 	    IHIGH=ILOW+1

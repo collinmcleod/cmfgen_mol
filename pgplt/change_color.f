@@ -2,6 +2,7 @@ C
 C Subroutine to change the color settings of the various color indexes
 C
       SUBROUTINE CHANGE_COLOR(RED,BLUE,GREEN)
+	USE SET_KIND_MODULE
       USE GEN_IN_INTERFACE
 C
 C Altered 15-Nov-2021 : Cleaned up real variables in calls.

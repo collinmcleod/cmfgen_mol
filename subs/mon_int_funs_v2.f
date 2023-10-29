@@ -1,6 +1,6 @@
 C
-C Subroutine to define the cubic interpolation coefficent to interpolate a 
-C vecto onto a new grid. The grid vector must be 
+C Subroutine to define the cubic interpolation coefficent to interpolate a
+C vecto onto a new grid. The grid vector must be
 C either a monotonically decreasing or increasing function. A modified cubic
 C polynomial is used to do the interpolation. Instead of using
 C the excact cubic estiamtes for the first derivative at the two nodes,
@@ -21,6 +21,7 @@ C
 C Ref: Steffen. M, 1990, A/&A, 239, 443-450
 C
 	SUBROUTINE MON_INT_FUNS_V2(COEF,CHI,R,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 16-Jan-2005 - COEF(ND,1:4) was previously zero. For ease of use
@@ -34,17 +35,17 @@ C Altered 25-Sep-1997 - Rewritten for speed and to vectorize efficiently.
 C Created 25-Mar-1996 - Based on MON_INTERP
 C
 	INTEGER ND
-	REAL(10) COEF(ND,4)
-	REAL(10) R(ND)
-	REAL(10) CHI(ND)
+	REAL(KIND=LDP) COEF(ND,4)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) CHI(ND)
 C
-	REAL(10) ONE
+	REAL(KIND=LDP) ONE
 	PARAMETER (ONE=1.0D0)
 	INTEGER I
 C
-	REAL(10) H(ND)			!Delta R [ R(I+1)-R(I) ]
-	REAL(10) S(ND)			!Slope in interval (I to I+1)
-	REAL(10) D(ND)			!First derivative at node I
+	REAL(KIND=LDP) H(ND)			!Delta R [ R(I+1)-R(I) ]
+	REAL(KIND=LDP) S(ND)			!Slope in interval (I to I+1)
+	REAL(KIND=LDP) D(ND)			!First derivative at node I
 C
 C The array R may be either monotonically increasing, or decreasing.
 C
