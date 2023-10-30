@@ -129,7 +129,12 @@
 	WRITE(LUER,'(30X,A,ES16.8)')'     OPLIN=',OPLIN
 	WRITE(LUER,'(30X,A,ES16.8)')'     EMLIN=',EMLIN
 	WRITE(LUER,*)' '
-	
+	WRITE(LUER,*)'The KIND of the selected floating'//
+	1    ' point format is:',KIND(HDKT)
+	WRITE(LUER,*)'The number of storage bits in the selected floating'//
+	1    ' point format is:',STORAGE_SIZE(HDKT)
+	WRITE(LUER,*)' '
+!
 !
 ! Set all atomic data. New species can be simple added by insertion.
 ! Try to add species in order of atomic number. Hydrogen should ALWAYS

@@ -54,7 +54,7 @@ $(LIB) : $(OBJ)
 
 # General rules to make obects in a library and object files
 
-$(LIB)(%.o) : %.f 
+$(LIB)(%.o) : %.f $(LIB)(set_kind_module.o)
 	$(F90) -c $(FG)  $<
 	ar $(AR_OPTION) $(LIB) $*.o
 

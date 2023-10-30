@@ -5,7 +5,7 @@ include ../Makefile_definitions
 LIB=$(LIB_DIR)libsubs.a
 LIB_MOD=$(LIB_DIR)libmod.a
 
-OPTION=$(FD)
+OPTION=$(FG)
 
 #
 # Entries for library
@@ -296,7 +296,7 @@ $(LIB) : $(OBJ)
 
 # General rules to make obects in a library and object files
 
-$(LIB)(%.o) : %.f 
+$(LIB)(%.o) : %.f  $(LIB)(set_kind_module.o)
 	$(F90) -c $(OPTION)  $<
 	ar $(AR_OPTION) $(LIB) $*.o
 
@@ -306,11 +306,11 @@ $(LIB)(%.o) : %.f
 #
 DIS=$(LIB_MOD)(mod_lev_dis_blk.o)
 
-$(LIB)(dspheredchi.o) : dspheredchi.f $(LIB)(mod_trap_derivatives.o) 
+$(LIB)(dspheredchi.o) : dspheredchi.f $(LIB)(mod_trap_derivatives.o) $(LIB)(set_kind_module.o) 
 	$(F90) -c $(OPTION) dspheredchi.f
 	ar $(AR_OPTION) $(LIB) dspheredchi.o
 
-$(LIB)(occupation_prob.o) : occupation_prob.f $(DIS)
+$(LIB)(occupation_prob.o) : occupation_prob.f $(DIS) $(LIB)(set_kind_module.o)
 	$(F90) -c $(OPTION) occupation_prob.f
 	ar $(AR_OPTION) $(LIB) occupation_prob.o
 
