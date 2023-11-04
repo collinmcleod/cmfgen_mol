@@ -11,13 +11,14 @@
 	SUBROUTINE OMEGA_GEN_V3(OMEGA,dln_OMEGA_dlnT,EDGE,EIN_A,STAT_WT,
 	1                       LEVELNAME,ZION,NLEV,TEMP,
 	1                       ID,FILE_NAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 15-Jan-2023 : Now set Omega=0.1 when f < 1.0E-05. This will primarily affect
 !                         low lying forbidden and semi-forbidden transiotions without atomic data.
 !                         Higher levels will have lots of other collional processes occuring.
 ! Altered 04-Oct-2016 : Efectively we now only compute the threshold photoionzation cross sections
-!                         on the first entry (change was done in test routine earlier). 
+!                         on the first entry (change was done in test routine earlier).
 ! Altered 12-Oct-2012 : MAX_TRANS increased to 50,000
 ! Altered 23-Nov-2007 : MAX_TVALS adjusted upwards from 21 to 40 (20-Nov-2007).
 ! Altered 23-Feb-1999 : Access of collison table increased to improve speed
@@ -37,15 +38,15 @@
 ! Created 13-Sep-1995
 !
 	INTEGER NLEV
-	REAL(10) OMEGA(NLEV,NLEV),dln_OMEGA_dlnT(NLEV,NLEV)
+	REAL(KIND=LDP) OMEGA(NLEV,NLEV),dln_OMEGA_dlnT(NLEV,NLEV)
 !
-	REAL(10) EIN_A(NLEV,NLEV)		!Einstein A coefficient
-	REAL(10) EDGE(NLEV)		!Ionization frequency (10^15 Hz)
-	REAL(10) STAT_WT(NLEV)		!Statistical weight.
-	REAL(10) ZION
+	REAL(KIND=LDP) EIN_A(NLEV,NLEV)		!Einstein A coefficient
+	REAL(KIND=LDP) EDGE(NLEV)		!Ionization frequency (10^15 Hz)
+	REAL(KIND=LDP) STAT_WT(NLEV)		!Statistical weight.
+	REAL(KIND=LDP) ZION
 	CHARACTER*(*) LEVELNAME(NLEV)
 !
-	REAL(10) TEMP	       		!Temperature (10^4 K)
+	REAL(KIND=LDP) TEMP	       		!Temperature (10^4 K)
 	CHARACTER*(*) FILE_NAME
 	INTEGER ID                    !Indicates species for photoiozation data
 !
@@ -53,9 +54,9 @@
 	LOGICAL SAME_N
 	EXTERNAL ERROR_LU
 !
-	REAL(10), PARAMETER :: THREE=3.0D0
+	REAL(KIND=LDP), PARAMETER :: THREE=3.0D0
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	INTEGER MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE
@@ -65,11 +66,11 @@
 	INTEGER, SAVE :: ID_LOW(MAX_TRANS)
 	INTEGER, SAVE :: ID_UP(MAX_TRANS)
 	INTEGER, SAVE :: ID_INDX(MAX_TRANS)
-	REAL(10), SAVE :: T_TABLE(MAX_TVALS)
-	REAL(10), SAVE :: OMEGA_TABLE(MAX_TAB_SIZE)
-	REAL(10), SAVE :: OMEGA_SET,OMEGA_SCALE
+	REAL(KIND=LDP), SAVE :: T_TABLE(MAX_TVALS)
+	REAL(KIND=LDP), SAVE :: OMEGA_TABLE(MAX_TAB_SIZE)
+	REAL(KIND=LDP), SAVE :: OMEGA_SET,OMEGA_SCALE
 	INTEGER, SAVE :: NUM_TRANS,NUM_TVALS
- 
+
 	CHARACTER*80 LAST_RD_FILE
 	DATA LAST_RD_FILE/' '/
 	SAVE LAST_RD_FILE
@@ -81,13 +82,13 @@
 	INTEGER PHOT_ID
 	INTEGER L,K,LUER,IFAIL
 !
-	REAL(10) EX_E1X,EX_E1X_FUN
-	REAL(10) X,FL,G1,G2,GBAR,dln_GBAR_dlnT,PHOT_CONST
-	REAL(10) ALPHA
-	REAL(10) T1
+	REAL(KIND=LDP) EX_E1X,EX_E1X_FUN
+	REAL(KIND=LDP) X,FL,G1,G2,GBAR,dln_GBAR_dlnT,PHOT_CONST
+	REAL(KIND=LDP) ALPHA
+	REAL(KIND=LDP) T1
 !
-	REAL(10), PARAMETER :: ZERO=0.0D0
-	REAL(10), SAVE, ALLOCATABLE :: PHOT_CROSS(:)
+	REAL(KIND=LDP), PARAMETER :: ZERO=0.0D0
+	REAL(KIND=LDP), SAVE, ALLOCATABLE :: PHOT_CROSS(:)
 	LOGICAL RET_EDGE_CROSS
 !
 ! Read in the atomic data. The data is not read in if the filename matches
@@ -147,7 +148,7 @@
 	END IF
 1000	CONTINUE
 !
-! Use approximate formula (only for bound-bound collisions) for 
+! Use approximate formula (only for bound-bound collisions) for
 ! non-tabulated collisions.
 !
 ! For ZION > 1 we use the approximate expression given by Mihalas on

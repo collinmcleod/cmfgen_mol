@@ -1,10 +1,11 @@
 !
 ! Subroutine to  read the output model data to a sequential, unformatted, file
 !      OLD_MODEL_DATA
-! written as 8-byte floating point, and output a new file  NEW_OLD_MODEL_DATA 
+! written as 8-byte floating point, and output a new file  NEW_OLD_MODEL_DATA
 ! written as 10-byte floating point.
 !
 	PROGRAM REWRITE_OLD_MODEL_DATA
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created 24-Oct-2023
@@ -20,10 +21,10 @@
 	REAL*8, ALLOCATABLE :: OLD_XzV_F(:,:)
 	REAL*8, ALLOCATABLE :: OLD_VEC(:)
 !
-	REAL(10) NEW_SN_AGE
-	REAL(10) NEW_ZXzV
-	REAL(10), ALLOCATABLE :: NEW_VEC(:)
-	REAL(10), ALLOCATABLE :: NEW_XzV_F(:,:)
+	REAL(KIND=LDP) NEW_SN_AGE
+	REAL(KIND=LDP) NEW_ZXzV
+	REAL(KIND=LDP), ALLOCATABLE :: NEW_VEC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: NEW_XzV_F(:,:)
 !
 	INTEGER SPECIES_BEG_ID,SPECIES_END_ID
 	INTEGER ISPEC
@@ -92,7 +93,7 @@
 	    READ(LU_IN)OLD_XzV_F
 	    NEW_XzV_F=OLD_XzV_F
 	    WRITE(LU_OUT)NEW_XzV_F
-	    READ(LU_IN)OLD_VEC                   !ATM(ID)%DXzV		!Super level ion population. 
+	    READ(LU_IN)OLD_VEC                   !ATM(ID)%DXzV		!Super level ion population.
 	    NEW_VEC=OLD_VEC
 	    WRITE(LU_OUT)NEW_VEC
 	    DEALLOCATE(NEW_XzV_F,OLD_XZV_F)

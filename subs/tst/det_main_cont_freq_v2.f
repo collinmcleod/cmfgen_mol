@@ -1,9 +1,10 @@
 !
-! Subroutine to determine those frequencies at which the continuum opacity 
+! Subroutine to determine those frequencies at which the continuum opacity
 ! will be evaluated. At other frequenecies it can be held fixed.
 !
 	SUBROUTINE DET_MAIN_CONT_FREQ_V2(NU,NCF,NU_CONT,NCF_CONT,
 	1                NU_EVAL,MID_POINT_EVAL,COMPUTE_ALL_CROSS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! NCF represents the toal number of frequencies at which we solve the radiative
@@ -11,21 +12,21 @@
 ! has been chosen to sample all lines and continuum edges adequately.
 !
 	INTEGER*4 NCF
-	REAL(10) NU(NCF)
+	REAL(KIND=LDP) NU(NCF)
 !
 ! For each frequncy NU(I), the continuum cross-section will be evaluated at
 ! freqency NU_EVAL(I).
 !
-	REAL(10) NU_EVAL(NCF)
-	REAL(10) NU_EVAL_SAV(NCF)
+	REAL(KIND=LDP) NU_EVAL(NCF)
+	REAL(KIND=LDP) NU_EVAL_SAV(NCF)
 !
-! NCF_CONT represents the number of continuum frequencies before line 
-! insertion. NU_CONT contains these frequencies, and has been chosen to 
-! sample continuum cross-sections (with allowance for level dissolution and 
-! important bound-free edges) adequately. 
+! NCF_CONT represents the number of continuum frequencies before line
+! insertion. NU_CONT contains these frequencies, and has been chosen to
+! sample continuum cross-sections (with allowance for level dissolution and
+! important bound-free edges) adequately.
 !
 	INTEGER*4 NCF_CONT
-	REAL(10) NU_CONT(NCF_CONT)
+	REAL(KIND=LDP) NU_CONT(NCF_CONT)
 !
 	LOGICAL COMPUTE_ALL_CROSS
 	LOGICAL MID_POINT_EVAL
@@ -36,7 +37,7 @@
 ! Local variables:
 !
 	INTEGER*4 LU_OUT,L,K,ML,ML_ST,ML_END,LST_COMP
-	REAL(10) T1,T2,DOP_RAT,VRAT,C_KMS
+	REAL(KIND=LDP) T1,T2,DOP_RAT,VRAT,C_KMS
 !
 	LU_OUT=ERROR_LU()
 	IF(COMPUTE_ALL_CROSS)THEN
@@ -70,7 +71,7 @@
 	NU_EVAL_SAV(1:NCF)=NU_EVAL(1:NCF)
 !
 ! Continuum will be evaluated at the mid point of each frequency band.
-! The highest frequecny in the band is not adjusted. 
+! The highest frequecny in the band is not adjusted.
 !
 	IF(MID_POINT_EVAL)THEN
           ML_ST=1
@@ -88,7 +89,7 @@
 	    ELSE
 	      ML_ST=ML_ST+1
 	    END IF
-	  END DO 
+	  END DO
 	ELSE
 !
 ! Continuum is evaluated at highest frequency in band. This is used
@@ -96,7 +97,7 @@
 !
 	  DO ML=1,NCF
 	    IF(NU_EVAL(ML) .EQ. 0)NU_EVAL(ML)=NU_EVAL(ML-1)
-	  END DO 
+	  END DO
 	END IF
 !
 	K=1

@@ -7,9 +7,10 @@
 ! References:
 !         Gavrila (Phys Rev., 1967, 163, p147)i
 !         Hee-Won Lee and Hee Il Kim, 2004, MNRAS, 347, 802
-!         Nussbaumer, H., Schmid, H. M., Vogel, M., 1989, A&A, 211, L27 
+!         Nussbaumer, H., Schmid, H. M., Vogel, M., 1989, A&A, 211, L27
 !
 	SUBROUTINE RAYLEIGH_SCAT(RKI,HYD,AHYD,EDGE_HYD,NHYD,FREQ,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 11-Apr-2005 : Major bug fix.
@@ -18,24 +19,24 @@
 	INTEGER NHYD
 	INTEGER ND
 !
-	REAL(10) AHYD(NHYD,NHYD)		!No longer used
-	REAL(10) HYD(NHYD,ND)
-	REAL(10) EDGE_HYD(NHYD)		!Ground state value used only.
-	REAL(10) RKI(ND)
-	REAL(10) FREQ
+	REAL(KIND=LDP) AHYD(NHYD,NHYD)		!No longer used
+	REAL(KIND=LDP) HYD(NHYD,ND)
+	REAL(KIND=LDP) EDGE_HYD(NHYD)		!Ground state value used only.
+	REAL(KIND=LDP) RKI(ND)
+	REAL(KIND=LDP) FREQ
 !
 ! We include the oscillator strength in the file. That way we don't
 ! have to worry about whether the l states are split.
 !
-	REAL(10), SAVE ::  FOSC(20)
+	REAL(KIND=LDP), SAVE ::  FOSC(20)
 	DATA FOSC(2:20)/4.162D-01,7.910D-02,2.899D-02,1.394D-02,7.799D-03,
 	1         4.814D-03,3.183D-03,2.216D-03,1.605D-03,1.201D-03,
 	1         9.214D-04,7.227D-04,5.774D-04,4.686D-04,3.856D-04,
 	1         3.211D-04,2.702D-04,2.296D-04,1.967D-04/
 !
-	REAL(10) EDGE_FREQ
-	REAL(10) T1,T2
-	REAL(10) DELF
+	REAL(KIND=LDP) EDGE_FREQ
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) DELF
 	INTEGER I,IRES
 !
 ! Use the results of Gavrila (Phys Rev., 1967, 163, p147) below
@@ -55,7 +56,7 @@
 	END IF
 !
 ! Now sum up over all the resonances.
-! See: Nussbaumer, H., Schmid, H. M., Vogel, M., 1989, A&A, 211, L27 
+! See: Nussbaumer, H., Schmid, H. M., Vogel, M., 1989, A&A, 211, L27
 !
 	T1=0.0D0
 	IRES=1

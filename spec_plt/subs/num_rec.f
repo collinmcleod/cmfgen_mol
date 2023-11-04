@@ -4,17 +4,18 @@ C The following routines are taken from Numerical Recipes
 C---------------------------------------------------------------------------
 
       SUBROUTINE CONVLV(DATA,N,RESPNS,M,ISIGN,ANS)
-      
+	USE SET_KIND_MODULE
+
       implicit none
       include 'constants.inc'
       include 'parameters.inc'
 
       integer*4 n,m,isign,i,no2
 C      PARAMETER(NMAX=131072)
-      REAL(10) data(NMAX), respns(NMAX)
-      REAL(10) :: HALF=0.5D0
+      REAL(KIND=LDP) data(NMAX), respns(NMAX)
+      REAL(KIND=LDP) :: HALF=0.5D0
       complex*16 FFT(NMAX),ANS(NMAX)
-      
+
 
       DO 11 I=1,(M-1)/2
         RESPNS(N+1-I)=RESPNS(M+1-I)
@@ -44,13 +45,14 @@ C      PARAMETER(NMAX=131072)
       END
 
       SUBROUTINE TWOFFT(DATA1,DATA2,FFT1,FFT2,N)
+	USE SET_KIND_MODULE
 
       implicit none
       include 'parameters.inc'
       include 'constants.inc'
 
       integer*4 n
-      REAL(10) DATA1(NMAX),DATA2(NMAX)
+      REAL(KIND=LDP) DATA1(NMAX),DATA2(NMAX)
       COMPLEX*16 FFT1(NMAX),FFT2(NMAX),H1,H2,C1,C2
       integer*4 j,n2,i
 
@@ -78,17 +80,18 @@ C      PARAMETER(NMAX=131072)
       END
 
       SUBROUTINE REALFT(DATA,N,ISIGN)
+	USE SET_KIND_MODULE
 
       implicit none
       include 'constants.inc'
       include 'parameters.inc'
 
-      REAL(10) WR,WI,WPR,WPI,WTEMP,THETA
-      REAL(10) DATA(NMAX)
+      REAL(KIND=LDP) WR,WI,WPR,WPI,WTEMP,THETA
+      REAL(KIND=LDP) DATA(NMAX)
       integer*4 n,isign,i,i1,i2,i3,i4,n2p3
-      REAL(10) wis,wrs
-      REAL(10) c1,c2,h1r,h1i,h2r,h2i
-      REAL(10) :: HALF=0.5D0
+      REAL(KIND=LDP) wis,wrs
+      REAL(KIND=LDP) c1,c2,h1r,h1i,h2r,h2i
+      REAL(KIND=LDP) :: HALF=0.5D0
 
       write(*,*)'realft'
 
@@ -142,19 +145,20 @@ C        WIS=SNGL(WI)
       END
 
       SUBROUTINE FOUR1(DATA,NN,ISIGN)
+	USE SET_KIND_MODULE
 
       implicit none
       include 'constants.inc'
       include 'parameters.inc'
 
-      REAL(10) WR,WI,WPR,WPI,WTEMP,THETA
+      REAL(KIND=LDP) WR,WI,WPR,WPI,WTEMP,THETA
       integer*4 N,NN,I,J,M,mmax,istep,isign
-      REAL(10) data(NMAX)
-      REAL(10) tempi,tempr
-      REAL(10) :: HALF=0.5D0	
+      REAL(KIND=LDP) data(NMAX)
+      REAL(KIND=LDP) tempi,tempr
+      REAL(KIND=LDP) :: HALF=0.5D0	
       write(*,*)'four1'
 
-      
+
       N=2*NN
 
       J=1

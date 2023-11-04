@@ -6,11 +6,11 @@
 ! Altered: 11-Mar-2008:  For output changed T35 to T40
 !           3-Mar-2000:  Created - Based on routines in RD_LOG.
 !	                 All calls now RD_STORE_...
-!                        Data is first read in from a file and stored.  
+!                        Data is first read in from a file and stored.
 !                        Options are then read from store in ANY order.
 !                        Only those options requested are checked.
 !                        KEYS are checked for uniqueness (7-Jun-2000)
-!             
+!
 !             Option access should begin with:
 !	          CALL RD_OPTIONS_INTO_STORE(LU_IN,LU_OUT)
 !             and end with
@@ -34,6 +34,7 @@
 	END MODULE RD_VAR_MOD
 !
 	SUBROUTINE RD_OPTIONS_INTO_STORE(LU_IN,LU_OUT)
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
 !
@@ -59,7 +60,7 @@
 	  WRITE(LUER,*)'Unable to allocate memory'
 	  WRITE(LUER,*)'File is ',TRIM(FILE_NAME)
 	  WRITE(LUER,*)'IOS=',IOS
-	  STOP                                                      
+	  STOP
 	END IF
 	KEY_ST(:)=0
 	KEY_END(:)=0
@@ -108,8 +109,8 @@
 	1             STORE(J)(KEY_ST(J):KEY_END(J))    )THEN
 	      WRITE(LUER,*)'Error in RD_OPTIONS_INTO_STORE. File is ',TRIM(FILE_NAME)
 	      WRITE(LUER,*)'The following key is not unique'
-	      WRITE(LUER,*)'Record=',I,'  KEY=',STORE(I)(KEY_ST(I):KEY_END(I)) 
-	      WRITE(LUER,*)'Record=',J,'  KEY=',STORE(J)(KEY_ST(J):KEY_END(J)) 
+	      WRITE(LUER,*)'Record=',I,'  KEY=',STORE(I)(KEY_ST(I):KEY_END(I))
+	      WRITE(LUER,*)'Record=',J,'  KEY=',STORE(J)(KEY_ST(J):KEY_END(J))
 	      STOP
 	    END IF
 	  END DO
@@ -119,6 +120,7 @@
 	END
 !
 	SUBROUTINE CLEAN_RD_STORE
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
 !
@@ -136,6 +138,7 @@
 	END
 !
 	SUBROUTINE GET_KEY_STRING(STRING,KEY,MUST_BE_PRES,KEY_FOUND)
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
 !
@@ -184,6 +187,7 @@
 	END
 !
 	SUBROUTINE RD_STORE_LOG(VALUE,KEY,MUST_BE_PRES,A)
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
 	LOGICAL VALUE
@@ -219,6 +223,7 @@
 !
 !
 	SUBROUTINE RD_STORE_2LOG(VALUE1,VALUE2,KEY,MUST_BE_PRES,A)
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
 	LOGICAL VALUE1,VALUE2
@@ -245,6 +250,7 @@
 !
 !
 	SUBROUTINE RD_STORE_INT(VALUE,KEY,MUST_BE_PRES,A)
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
 	INTEGER VALUE
@@ -272,6 +278,7 @@
 !
 !
 	SUBROUTINE RD_STORE_2INT(VALUE1,VALUE2,KEY,MUST_BE_PRES,A)
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
 	INTEGER VALUE1,VALUE2
@@ -308,9 +315,10 @@
 !
 !
 	SUBROUTINE RD_STORE_DBLE(VALUE,KEY,MUST_BE_PRES,A)
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
-	REAL(10) VALUE
+	REAL(KIND=LDP) VALUE
 	LOGICAL MUST_BE_PRES
 	LOGICAL KEY_FOUND
 	CHARACTER(LEN=*) KEY,A
@@ -333,9 +341,10 @@
 !
 !
 	SUBROUTINE RD_STORE_2DBLE(VALUE1,VALUE2,KEY,MUST_BE_PRES,A)
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
-	REAL(10) VALUE1,VALUE2
+	REAL(KIND=LDP) VALUE1,VALUE2
 	LOGICAL MUST_BE_PRES
 	LOGICAL KEY_FOUND
 	INTEGER I
@@ -376,6 +385,7 @@
 !  Now ignores blank lines in input file.
 !
 	SUBROUTINE RD_STORE_CHAR(VALUE,KEY,MUST_BE_PRES,A)
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 !
 ! Altered 17-Feb-2009 : VALUE can now be of "arbitratry" length.
@@ -427,6 +437,7 @@
 ! now secified in the call. Now skips blank strings.
 !
 	SUBROUTINE RD_STORE_NCHAR(VALUE,KEY,NCHAR,MUST_BE_PRES,A)
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
 	INTEGER NCHAR
@@ -453,13 +464,14 @@
 !
 !
 ! Routine designed to count the numer of strings of a ceartain key type.
-! For example, this routine can be used to count the total nubmer of ionization 
+! For example, this routine can be used to count the total nubmer of ionization
 ! stages in the MODEL_SPEC file. To do this, pass SUB_KEY as "_NSF]"
 !
 ! NB: We include the ] in the search string, as it provides a more definitive
 !     search.
 !
 	SUBROUTINE CNT_NUM_KEYS(CNT,SUB_KEY)
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
 !
@@ -472,7 +484,7 @@
 !
 	INTEGER I,BEG_CNT,END_CNT
 !
-! Note that the sub-string defined by KEY_ST, KEY_END do not incorporate 
+! Note that the sub-string defined by KEY_ST, KEY_END do not incorporate
 ! the []'s.
 !
 	CNT=0
@@ -507,6 +519,7 @@
 !
 !
 	SUBROUTINE RD_STORE_3INT(VALUE1,VALUE2,VALUE3,KEY,MUST_BE_PRES,A)
+	USE SET_KIND_MODULE
 	USE RD_VAR_MOD
 	IMPLICIT NONE
 	INTEGER VALUE1,VALUE2,VALUE3

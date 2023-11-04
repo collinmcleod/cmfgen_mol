@@ -1,6 +1,6 @@
 !
 ! Routine to perform an NG accleration for a Comoving-Frame Model. Progam
-! uses the last 4 iterations which are stored in the last "4 records" 
+! uses the last 4 iterations which are stored in the last "4 records"
 ! (effectively) of SCRTEMP.
 !
 ! The NG acceleration is perfomed separately on each depth, or over a band
@@ -18,6 +18,7 @@
 !                    SCRTEMP(.DAT)
 !
 	PROGRAM DO_NG_V2
+	USE SET_KIND_MODULE
 	USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
@@ -31,33 +32,33 @@
 ! Altered 19-May-2004 : Bug fix: NG_DONE set to true, even when no NG done.
 ! Altered 28-Mar-2004 : Changed to handle new format SCRTEMP files.
 !                       Now choice of 3 options: NG, AV and SOR.
-! Altered 01-Jul-2003 : IT_STEP inserted as option.  
+! Altered 01-Jul-2003 : IT_STEP inserted as option.
 ! Altered 15-Apr-2003 : IFLAG in RD_4_ITS initialized.
 !                       NUM_BAD_NG in NG_MIT_OPST initialized.
 ! Altered 18-Feb-2001 : Extensive rewrite.
 !                       NBAND option installed.
 !
 ! Altered 04-Jan-1998 : Cleaned. ND, NT now read from MODEL file.
-!                       Based on a very old version in [JDH.BASOL] and 
+!                       Based on a very old version in [JDH.BASOL] and
 !                        REWRITE_SCR.
 !
-	REAL(10), ALLOCATABLE :: RDPOPS(:,:,:)		!NT+3,ND
-	REAL(10), ALLOCATABLE :: BIG_POPS(:,:)		!NT+3,ND
-	REAL(10), ALLOCATABLE :: POPS(:,:)		!NT,ND
-	REAL(10), ALLOCATABLE :: R(:)			!ND
-	REAL(10), ALLOCATABLE :: V(:)			!ND
-	REAL(10), ALLOCATABLE :: SIGMA(:)			!ND
-	REAL(10) TA(2000)
-	REAL(10) TB(2000)
+	REAL(KIND=LDP), ALLOCATABLE :: RDPOPS(:,:,:)		!NT+3,ND
+	REAL(KIND=LDP), ALLOCATABLE :: BIG_POPS(:,:)		!NT+3,ND
+	REAL(KIND=LDP), ALLOCATABLE :: POPS(:,:)		!NT,ND
+	REAL(KIND=LDP), ALLOCATABLE :: R(:)			!ND
+	REAL(KIND=LDP), ALLOCATABLE :: V(:)			!ND
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA(:)			!ND
+	REAL(KIND=LDP) TA(2000)
+	REAL(KIND=LDP) TB(2000)
 !
 ! Local variables which are adjusted to match the particular model under
 ! consideration.
 !
-	REAL(10) T1,T2,T3
-	REAL(10) SCALE_FAC
-	REAL(10) BIG_FAC
-	REAL(10) SF1,SF2
-	REAL(10) REAL_LIMIT
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) SCALE_FAC
+	REAL(KIND=LDP) BIG_FAC
+	REAL(KIND=LDP) SF1,SF2
+	REAL(KIND=LDP) REAL_LIMIT
 !
 	INTEGER ND,NT
 	INTEGER NBAND
@@ -122,7 +123,7 @@
 	  WRITE(T_OUT,*)'Unable to read MODEL file'
 	  CALL GEN_IN(NT,'Total number of levels')
 	  CALL GEN_IN(ND,'Number of depth points')
-	END IF 
+	END IF
 	CLOSE(UNIT=12)
 !
 	ALLOCATE (BIG_POPS(NT+3,ND))
@@ -228,7 +229,7 @@
 !
 ! Read POPULATIONS that were output on last iteration. This is primarily
 ! done to get NITSF etc.
-! 
+!
 	NEWMOD=.FALSE.
 	IREC=0			!Get last iteration
 	CALL SCR_READ_V2(R,V,SIGMA,POPS,IREC,NITSF,RITE_N_TIMES,LST_NG,
@@ -359,8 +360,8 @@
 	    J=ND_ST
 	    CALL GEN_IN(IT1,'Highest iteration')
 	    CALL GEN_IN(IT2,'Lowest iteration')
-	    CALL GEN_IN(SF1,'SE equation IT1') 
-	    CALL GEN_IN(SF2,'SE equation IT2') 
+	    CALL GEN_IN(SF1,'SE equation IT1')
+	    CALL GEN_IN(SF2,'SE equation IT2')
 	    IVAR=NT
 	    CALL GEN_IN(IVAR,'Variable?')
 	    WRITE(6,*)RDPOPS(IVAR,J,IT1),RDPOPS(IVAR,J,IT2)
@@ -480,6 +481,7 @@
 ! Otherwise an error condition occurred.
 !
 	SUBROUTINE GENACCEL_V3(NEWPOP,RDPOPS,ITS_PER_NG,LST,LEND,NT,ND,NS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER LST,LEND
@@ -487,14 +489,14 @@
 	INTEGER ND
 	INTEGER NS
         INTEGER ITS_PER_NG
-	REAL(10) NEWPOP(NS)
-	REAL(10) RDPOPS(NT,ND,ITS_PER_NG)
+	REAL(KIND=LDP) NEWPOP(NS)
+	REAL(KIND=LDP) RDPOPS(NT,ND,ITS_PER_NG)
 !
-	REAL(10) TEMP(ITS_PER_NG,NS)
+	REAL(KIND=LDP) TEMP(ITS_PER_NG,NS)
 	INTEGER I,J,K,L
 	LOGICAL WEIGHT
 !
-! Use the NG acceleration method to improve the population estimates. 
+! Use the NG acceleration method to improve the population estimates.
 ! We can perform the NG acceleration at each depth individually, or
 ! over a range of depths. Weight is used to indicate that we
 ! are to minimize the percentage errors - not the absolute magnitudec
@@ -524,6 +526,7 @@
 !
 	SUBROUTINE NG_MIT_OPTS_V3(POPS,RDPOPS,ND,NT,NBAND,ND_ST,ND_END,T_INDEX,
 	1                           ITS_PER_NG,DO_REGARDLESS,SCALE_INDIVIDUALLY,NG_DONE,LUER)
+	USE SET_KIND_MODULE
 	USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
@@ -539,26 +542,26 @@
 	INTEGER ND_END
 	INTEGER T_INDEX
 	INTEGER LUER
-	REAL(10) POPS(NT,ND)
-	REAL(10) RDPOPS(NT,ND,ITS_PER_NG)
+	REAL(KIND=LDP) POPS(NT,ND)
+	REAL(KIND=LDP) RDPOPS(NT,ND,ITS_PER_NG)
 	LOGICAL DO_REGARDLESS
 	LOGICAL SCALE_INDIVIDUALLY
 	LOGICAL NG_DONE
 !
-	REAL(10) NEWPOP(NT,ND)
-	REAL(10) VEC_INC(ND)
-	REAL(10) VEC_DEC(ND)
-	REAL(10) INT_ARRAY(ND)
+	REAL(KIND=LDP) NEWPOP(NT,ND)
+	REAL(KIND=LDP) VEC_INC(ND)
+	REAL(KIND=LDP) VEC_DEC(ND)
+	REAL(KIND=LDP) INT_ARRAY(ND)
 !
-	REAL(10) RINDX(NT)
-	REAL(10) RAT(NT)
-	REAL(10) TA(MAX(NT,ND))
-	REAL(10) TB(MAX(NT,ND))
-	REAL(10) TC(MAX(NT,ND))
+	REAL(KIND=LDP) RINDX(NT)
+	REAL(KIND=LDP) RAT(NT)
+	REAL(KIND=LDP) TA(MAX(NT,ND))
+	REAL(KIND=LDP) TB(MAX(NT,ND))
+	REAL(KIND=LDP) TC(MAX(NT,ND))
 !
-	REAL(10) T1
-	REAL(10) LOCINC,LOCDEC
-	REAL(10) MAXINC,MAXDEC
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) LOCINC,LOCDEC
+	REAL(KIND=LDP) MAXINC,MAXDEC
 !
 	INTEGER NS
 	INTEGER NUM_BAD_NG
@@ -663,7 +666,7 @@
 !
 	MAXINC=-1000.0
 	MAXDEC=1000.0
-	DO L=1,ND 
+	DO L=1,ND
 	  LOCINC=-1000.0
 	  LOCDEC=1000.0	
 	  T1=LOCDEC
@@ -743,7 +746,7 @@
 	IF(NUM_BAD_NG .GT. 3)THEN
 	  WRITE(LUER,*)'Too many bad NG accelerations - '//
 	1              'NG acceleration cancelled'
-	  NG_DONE=.FALSE. 
+	  NG_DONE=.FALSE.
 !
 ! Restore old population estimates for all depths.
 !

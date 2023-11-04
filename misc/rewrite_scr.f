@@ -2,10 +2,11 @@
 ! Subroutine to rewrite the free-format SCRTEMP file. The user
 ! input how many of the final iterations are to be output.
 ! NEW_SCRTEMP, NEW_POINT1, and NEW_POINT1 are created. These need
-! to be renamed. This allos space to be saved, and at the same time 
+! to be renamed. This allos space to be saved, and at the same time
 ! allows a new model to be run with exactly the same input populations.
 !
 	PROGRAM REWRITE_SCR
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -16,10 +17,10 @@
 !
 	INTEGER ND,NT,NIT
 !
-	REAL(10), ALLOCATABLE :: POPS(:,:)		!NT,ND
-	REAL(10), ALLOCATABLE :: R(:)			!ND
-	REAL(10), ALLOCATABLE :: V(:)			!ND
-	REAL(10), ALLOCATABLE :: SIGMA(:)			!ND
+	REAL(KIND=LDP), ALLOCATABLE :: POPS(:,:)		!NT,ND
+	REAL(KIND=LDP), ALLOCATABLE :: R(:)			!ND
+	REAL(KIND=LDP), ALLOCATABLE :: V(:)			!ND
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA(:)			!ND
 !
 	INTEGER, PARAMETER :: T_OUT=6
 !
@@ -73,7 +74,7 @@
 	    WRITE(T_OUT,*)'Unable to read MODEL file'
 	    CALL GEN_IN(NT,'Total number of levels')
 	    CALL GEN_IN(ND,'Number of depth points')
-	  END IF 
+	  END IF
 	CLOSE(UNIT=12)
 !
 ! Read record information from SCRTEMP information file POINT1.

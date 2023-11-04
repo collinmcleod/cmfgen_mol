@@ -1,25 +1,26 @@
 !
-! Read in collsion strengths from a file. The values are tabulated as a 
+! Read in collsion strengths from a file. The values are tabulated as a
 ! function of temperature.
 !
 ! OMEGA_SCALE is used by SUBCOL_MULTI to scale all collsion strengths by a
 ! constant value.
 !
 	PROGRAM SCALE_OMEGA_V1
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
 ! Created 25-Mar-2011 : Based on gen_omega_rd_v2.f
 !
-	REAL(10) OMEGA_SCALE
-	REAL(10) OMEGA_SET
-	REAL(10) SCALE_FACTOR
+	REAL(KIND=LDP) OMEGA_SCALE
+	REAL(KIND=LDP) OMEGA_SET
+	REAL(KIND=LDP) SCALE_FACTOR
 !
 ! T_TABLE: Tempearure values (10^4 K) at which collsion strengths tabulated.
 !
 	INTEGER, PARAMETER :: MAX_TVALS=100
-	REAL(10) T_TABLE(MAX_TVALS)
-	REAL(10) OMEGA(MAX_TVALS)
+	REAL(KIND=LDP) T_TABLE(MAX_TVALS)
+	REAL(KIND=LDP) OMEGA(MAX_TVALS)
 !
 	INTEGER NUM_TRANS
 	INTEGER NUM_TVALS
@@ -78,7 +79,7 @@
 	READ(STRING,*)NUM_TRANS
 !
 	STRING=' '
-	DO WHILE( INDEX(STRING,'!Number of T values OMEGA tabulated at')  
+	DO WHILE( INDEX(STRING,'!Number of T values OMEGA tabulated at')
 	1               .EQ. 0 )
 	  READ(LUIN,'(A)',IOSTAT=IOS)STRING
 	  IF(IOS .NE. 0)THEN
@@ -95,7 +96,7 @@
 	  WRITE(LUER,*)'NU_TVALS too small'
 	  STOP
 	END IF
-!         
+!
 ! OMEGA_SCALE provides a means of scaling the OMEGA that have not been read in.
 !
 	STRING=' '
@@ -110,7 +111,7 @@
 	  WRITE(LUOUT,'(A)')TRIM(STRING)
 	END DO
 	READ(STRING,*)OMEGA_SCALE
-!         
+!
 ! OMEGA_SET provides a means to set OMEGA for transition for which
 ! no atomic data is availaable, and for which the oscilator strength
 ! is zero.
@@ -153,10 +154,10 @@
 	DO WHILE(STRING .EQ. ' ')
 	  READ(LUIN,'(A)')STRING
 	  IF(STRING .EQ. ' ')WRITE(LUOUT,'(A)')TRIM(STRING)
-	END DO             
+	END DO
 	BACKSPACE(LUIN)
 !
-! TRANS_CNT is the index used to read in all collisional data. 
+! TRANS_CNT is the index used to read in all collisional data.
 !
 	DO TRANS_CNT=1,NUM_TRANS
 !

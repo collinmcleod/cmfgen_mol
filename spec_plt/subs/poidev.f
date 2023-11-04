@@ -6,6 +6,7 @@
 ! Routine is from Numerical Recipes.
 !
       FUNCTION POIDEV(XM,IDUM)
+	USE SET_KIND_MODULE
       IMPLICIT NONE
 !
 ! Altered: 16-Apr-2022 : Error - ALXM was not being correctly saved.
@@ -13,20 +14,20 @@
 !                           values distinct.
 ! Altered: 10-Apr-2015 : RAN2_DP accessed (there was a precision issue)
 !                        SAVE variables fixed.
-! 
-      REAL(10) XM
-      REAL(10) POIDEV
+!
+      REAL(KIND=LDP) XM
+      REAL(KIND=LDP) POIDEV
       INTEGER IDUM
 !
-      REAL(10) T
-      REAL(10) Y
-      REAL(10) GAMMLN
-      REAL(10) EM
+      REAL(KIND=LDP) T
+      REAL(KIND=LDP) Y
+      REAL(KIND=LDP) GAMMLN
+      REAL(KIND=LDP) EM
 !
-      REAL(10) RAN2_DP
-      REAL(10), SAVE :: G,SQ,ALXM
-      REAL(10), SAVE :: OLDM=-1
-      REAL(10), PARAMETER :: PI=3.141592654D0
+      REAL(KIND=LDP) RAN2_DP
+      REAL(KIND=LDP), SAVE :: G,SQ,ALXM
+      REAL(KIND=LDP), SAVE :: OLDM=-1
+      REAL(KIND=LDP), PARAMETER :: PI=3.141592654D0
 !
       IF (XM .LT. 12.0D0)THEN
         IF (XM.NE.OLDM) THEN
@@ -58,10 +59,11 @@
       END
 !
       FUNCTION GAMMLN(XX)
+	USE SET_KIND_MODULE
       IMPLICIT NONE
-      REAL(10) XX
-      REAL(10) COF(6),STP,HALF,ONE,FPF,X,TMP,SER
-      REAL(10) GAMMLN
+      REAL(KIND=LDP) XX
+      REAL(KIND=LDP) COF(6),STP,HALF,ONE,FPF,X,TMP,SER
+      REAL(KIND=LDP) GAMMLN
       INTEGER J
 !
       DATA COF,STP/76.18009173D0,-86.50532033D0,24.01409822D0,

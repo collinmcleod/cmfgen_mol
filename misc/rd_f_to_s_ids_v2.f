@@ -4,9 +4,10 @@ C to that in the model atom with super levels.
 C
 	SUBROUTINE RD_F_TO_S_IDS_V2(F_TO_S,INT_SEQ,
 	1               LEVNAME_F,N_F,N_S,LUIN,SORT_LEVELS,FILENAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
-C Altered 31-Jan-2003 : Bug fixed for SORT_LEVELS=F 
+C Altered 31-Jan-2003 : Bug fixed for SORT_LEVELS=F
 C Altered 25-Oct-2002 : Error reporting and action altered.
 C Altered 29-Dec-1996 : Dynamic allocation used for CNT, PAR
 C Altered 29-May-1996 : String increased to 132 to accomodate longer names.

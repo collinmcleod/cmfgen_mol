@@ -7,17 +7,18 @@
 !
 ! Required: NEW oscilator file
 !
-! The number of levels for the OLD case is  determined by the number of 
+! The number of levels for the OLD case is  determined by the number of
 ! levels in the DC file.
 !
 ! The number of levels for the NEW case is  determined by the last level
 ! corresponding to the HIGHEST level in the OLD data set.
 !
-! The name of any new levels can be individually reset if there is a 
-! known mismatch. For example, 4z2Z renamed to 4f2Fo 
+! The name of any new levels can be individually reset if there is a
+! known mismatch. For example, 4z2Z renamed to 4f2Fo
 ! (provided not last level).
 !
 	PROGRAM REWRITE_DC_V2
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -32,9 +33,9 @@
 ! A_O is needed for the call, but is not used in the main routine.
 !
 	INTEGER N_O
-	REAL(10), ALLOCATABLE :: A_O(:,:)
-	REAL(10), ALLOCATABLE :: EDGE_O(:)
-	REAL(10), ALLOCATABLE :: G_O(:)
+	REAL(KIND=LDP), ALLOCATABLE :: A_O(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: EDGE_O(:)
+	REAL(KIND=LDP), ALLOCATABLE :: G_O(:)
 	CHARACTER*50, ALLOCATABLE ::LEVNAME_O(:)
 	CHARACTER*132 OLD_OSC_FILE
 !
@@ -42,9 +43,9 @@
 !
 	INTEGER N_N
 	INTEGER, ALLOCATABLE :: INDX(:)
-	REAL(10), ALLOCATABLE :: A_N(:,:)
-	REAL(10), ALLOCATABLE :: EDGE_N(:)
-	REAL(10), ALLOCATABLE :: G_N(:)
+	REAL(KIND=LDP), ALLOCATABLE :: A_N(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: EDGE_N(:)
+	REAL(KIND=LDP), ALLOCATABLE :: G_N(:)
 	CHARACTER*50, ALLOCATABLE ::LEVNAME_N(:)
 	CHARACTER*132 NEW_OSC_FILE
 !
@@ -55,18 +56,18 @@
 	INTEGER, PARAMETER :: DCIN=15
 	INTEGER, PARAMETER :: DCOUT=16
 !
-	REAL(10), ALLOCATABLE :: DC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DC(:)
 !
 	INTEGER ND
-	REAL(10) LSTAR
-	REAL(10) RSTAR
+	REAL(KIND=LDP) LSTAR
+	REAL(KIND=LDP) RSTAR
 	CHARACTER*132 DC_FILE
 	CHARACTER*30 TMP_NAME
 !
-	REAL(10) GF_LEV_CUT
-	REAL(10) EN_LEV_CUT
-	REAL(10) Z
-	REAL(10) T1
+	REAL(KIND=LDP) GF_LEV_CUT
+	REAL(KIND=LDP) EN_LEV_CUT
+	REAL(KIND=LDP) Z
+	REAL(KIND=LDP) T1
 	CHARACTER*30 OSCDATE
 	CHARACTER*132 STRING,STRING_N
 	CHARACTER*132 LNK_FILE
@@ -78,8 +79,8 @@
 !
 ! Constants for opacity etc.
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) OPLIN,EMLIN
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 !
@@ -96,11 +97,11 @@
 	  CALL GEN_IN(DC_FILE,'Name of file with old depart. coef.')
 	  CALL GEN_ASCI_OPEN(DCIN,DC_FILE,'OLD',' ','READ',IZERO,IOS)
 	  IF(IOS .NE. 0)WRITE(T_OUT,*)' Error opening DC file: Try again'
-	END DO                                                    
+	END DO
 !
 ! Check whether the file has a record containing 'Format date'. Its presence
 ! effects the way we read the file. If it has, we save it to output. Note that
-! the header to each depth (i.e. that contianing R, Ne, etc) output to the 
+! the header to each depth (i.e. that contianing R, Ne, etc) output to the
 ! final file has EXACTLY the same format as the main input file.
 !
 	I=0
@@ -137,7 +138,7 @@
 	DO I=1,N_O
 	  LEVNAME_O(I)=ADJUSTL(LEVNAME_O(I))
 	END DO
-!                                        
+!
 200	WRITE(T_OUT,'(A)',ADVANCE='NO')
 	IOS=1
 	NEW_OSC_FILE=' '
@@ -228,7 +229,7 @@
 !
 ! Check whether the file has a record containing 'Format date'. Its presence
 ! effects the way we read the file. If it has, we save it to output. Note that
-! the header to each depth (i.e. that contianing R, Ne, etc) output to the 
+! the header to each depth (i.e. that contianing R, Ne, etc) output to the
 ! final file has EXACTLY the same format as the main input file.
 !
 	IF(STRING_N .NE. ' ')THEN

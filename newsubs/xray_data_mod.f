@@ -1,8 +1,8 @@
 !
 ! Routine to read in analytical fits to partial photoionization
-! cross-sections. Data is primarily need to handle ionizations by 
-! X-rays, although all fits are included. 
-! 
+! cross-sections. Data is primarily need to handle ionizations by
+! X-rays, although all fits are included.
+!
 ! As a consequnce, need to be carefull that photoionization routes
 ! are not doble counted.
 !
@@ -13,6 +13,7 @@
 !     Analytic fits for partial photoinization cross-sections.
 !
 	MODULE XRAY_DATA_MOD
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER, PARAMETER :: ATNO_MAX_X=28
@@ -22,12 +23,12 @@
 ! We have added _X to make the names more unique. The notation is that
 ! of Verney and Yakovlev.
 !
-	REAL(10) E_THRESH_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
-	REAL(10) E_0_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
-	REAL(10) SIG_0_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
-	REAL(10) y_a_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
-	REAL(10) y_w_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
-	REAL(10) P_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
+	REAL(KIND=LDP) E_THRESH_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
+	REAL(KIND=LDP) E_0_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
+	REAL(KIND=LDP) SIG_0_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
+	REAL(KIND=LDP) y_a_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
+	REAL(KIND=LDP) y_w_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
+	REAL(KIND=LDP) P_X(ATNO_MAX_X,ATNO_MAX_X,PQN_MAX_X,0:ANG_MAX_X)
 !
 ! Gives the number of electrons ultimately ejected by the photoionization.
 ! At present we assume this is 1, or 2.
@@ -43,6 +44,7 @@
 ! Subroutine read in all available data from the file XRAY_PHOT_FITS.
 !
 	SUBROUTINE RD_XRAY_FITS(LU)
+	USE SET_KIND_MODULE
 	USE XRAY_DATA_MOD
 	IMPLICIT NONE
 !
@@ -108,7 +110,7 @@
 	1                          SIG_0_X(IZ,INE,PQN,ANG),
 	1                          Y_A_X(IZ,INE,PQN,ANG),
 	1                          P_X(IZ,INE,PQN,ANG),
-	1                          Y_W_X(IZ,INE,PQN,ANG) 
+	1                          Y_W_X(IZ,INE,PQN,ANG)
 	       IF(IOS .NE. 0)THEN
 	         WRITE(LU_ER,*)'Error reading photoionization data from XRAY_PHOT_FITS'
 	         WRITE(LU_ER,*)'IOSTAT=',IOS

@@ -6,9 +6,10 @@
 !
 ! Some changes may be need to the number of super and full levels in MODEL_SPEC
 !    if the new model atoms differ from the old model atom.
-!    The F_TO_S link file may also need to be changed 
+!    The F_TO_S link file may also need to be changed
 !
 	PROGRAM CREATE_BATCH_INS
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
@@ -37,7 +38,7 @@
 	CHARACTER(LEN=30) LNK_NAME(NDATA)
 	CHARACTER(LEN=50) F_TO_S_FILE
 !
-	CHARACTER(LEN=80) LATEST_DIR 
+	CHARACTER(LEN=80) LATEST_DIR
 	CHARACTER(LEN=80) PATH
 	CHARACTER(LEN=80) SHRT_PATH
 	CHARACTER(LEN=80) ATOMIC_DIRECTORY
@@ -47,7 +48,7 @@
 	CHARACTER(LEN=200) BATCH_FILE
 !
 	LOGICAL FILE_EXISTS
-	LOGICAL LNK_WRITTEN 
+	LOGICAL LNK_WRITTEN
 	INTEGER, PARAMETER :: LU_DIAG=10
 	INTEGER, PARAMETER :: LU_BAT=12
 !
@@ -146,8 +147,8 @@
 	  END IF
 	  WRITE(LU_DIAG,*)'Doing ',TRIM(SPECIES(IS))
 !
-! Loop over ionization state. We use the latest directory in each ionization 
-! state for the atomic data. The date data directories must have the form 
+! Loop over ionization state. We use the latest directory in each ionization
+! state for the atomic data. The date data directories must have the form
 ! 1jan23 or 12jan23 etc.
 !
 	  DO ID=1,NROM
@@ -216,6 +217,7 @@
 	END
 !
 	SUBROUTINE GET_LAST_DATA_SET(FILENAME,LATEST_DIR)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	CHARACTER(LEN=*) FILENAME,LATEST_DIR
 !
@@ -223,7 +225,7 @@
 	INTEGER YEAR,DAY
 	INTEGER YEAR_SAVE,DAY_SAVE
 	LOGICAL FILE_EXISTS
-	CHARACTER(LEN=200) DIR_FILE 
+	CHARACTER(LEN=200) DIR_FILE
 	CHARACTER(LEN=200) STRING
 !
 	YEAR_SAVE=0; MONTH_SAVE=' '; DAY_SAVE=0
@@ -274,9 +276,10 @@
 	CALL SYSTEM('rm -f DIRECTORY_LISTING')
 !
 	RETURN
-	END 
+	END
 
 	SUBROUTINE GET_FS_FILE_FROM_BATCH(LNK_ID,F_TO_S_FILE,DIR_DELIM,BATCH_FILE)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	CHARACTER(LEN=*) LNK_ID
 	CHARACTER(LEN=*) F_TO_S_FILE
@@ -343,6 +346,7 @@
 ! chosen is the first one obtained when doing the data listing.
 !
 	SUBROUTINE GET_F_TO_S_FILE(PATH,F_TO_S_FILE,LU_DIAG)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 	CHARACTER(LEN=*) PATH,F_TO_S_FILE
 	INTEGER LU_DIAG

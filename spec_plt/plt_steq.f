@@ -1,28 +1,29 @@
 !
 ! Simple program to plot data from the STEQ_VALS file. This can be used to check
-!   convergence of RATE equations etc. It can also plot the corrections (which 
+!   convergence of RATE equations etc. It can also plot the corrections (which
 !   could also be plotted using PLT_SCR).
 !
 	PROGRAM PLT_STEQ
+	USE SET_KIND_MODULE
 	USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
-! Altered 02-Jul-2014 - Bug fix -- last iteration was read was not being counted as an 
+! Altered 02-Jul-2014 - Bug fix -- last iteration was read was not being counted as an
 !                        iteration even though it was successfully read in.
 ! Created 14-Jan-2014
 !
 	TYPE STEQ_DATA
-	  REAL(10), ALLOCATABLE :: STEQ(:,:)
-	  REAL(10), ALLOCATABLE :: SOL(:,:)
-	  REAL(10), ALLOCATABLE :: RE(:)
+	  REAL(KIND=LDP), ALLOCATABLE :: STEQ(:,:)
+	  REAL(KIND=LDP), ALLOCATABLE :: SOL(:,:)
+	  REAL(KIND=LDP), ALLOCATABLE :: RE(:)
 	END TYPE STEQ_DATA
 !
 	TYPE (STEQ_DATA) ST(200)
 !
-	REAL(10), ALLOCATABLE :: XV(:)
-	REAL(10), ALLOCATABLE :: YV(:)
-	REAL(10), ALLOCATABLE :: ZV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: XV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: YV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ZV(:)
 !
 	INTEGER, PARAMETER :: T_OUT=6
 !
@@ -40,7 +41,7 @@
 	CHARACTER*80 YLABEL
 	CHARACTER(LEN=132) STRING
 !
-	REAL(10) T1,T2,T3
+	REAL(KIND=LDP) T1,T2,T3
 !
 	XLABEL=' '
 	YLABEL=' '
@@ -69,7 +70,7 @@ C
 	  WRITE(T_OUT,*)'Unable to read MODEL file'
 	  CALL GEN_IN(NT,'Total number of levels')
 	  CALL GEN_IN(ND,'Number of depth points')
-	END IF 
+	END IF
 	CLOSE(UNIT=12)
 !
 	OPEN(UNIT=12,FILE='STEQ_VALS',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
@@ -179,7 +180,7 @@ C
 	  DO I=1,ND
 	    XV(I)=I
 	  END DO
-	  CALL DP_CURVE(ND,XV,YV) 
+	  CALL DP_CURVE(ND,XV,YV)
 	  GOTO 200
 !
 	ELSE IF(PLT_OPT(1:5) .EQ. 'RIV_D')THEN
@@ -189,7 +190,7 @@ C
 	  DO I=1,ND
 	    XV(I)=I
 	  END DO
-	  CALL DP_CURVE(ND,XV,YV) 
+	  CALL DP_CURVE(ND,XV,YV)
 	  XLABEL='Depth index'
 	  YLABEL='dN/dt\u1/4\d'
 	  GOTO 200
@@ -225,7 +226,7 @@ C
 	    XV(I)=I
 	  END DO
 	  XLABEL='Iteration'
-	  CALL DP_CURVE(NIT,XV,YV) 
+	  CALL DP_CURVE(NIT,XV,YV)
 	  GOTO 200
 !
 	ELSE IF(PLT_OPT(1:5) .EQ. 'RDI_V')THEN
@@ -236,7 +237,7 @@ C
 	  DO I=1,NT
 	    XV(I)=I
 	  END DO
-	  CALL DP_CURVE(NT,XV,YV) 
+	  CALL DP_CURVE(NT,XV,YV)
 	  XLABEL='Variable'
 	  YLABEL='dN/dt\u1/4\d'
 	  GOTO 200
@@ -258,7 +259,7 @@ C
 	  DO I=1,NT
 	    XV(I)=I
 	  END DO
-	  CALL DP_CURVE(NT,XV,YV) 
+	  CALL DP_CURVE(NT,XV,YV)
 	  XLABEL='Variable'
 	  YLABEL='Rate equation ratio'
 	  GOTO 200
@@ -285,7 +286,7 @@ C
 	  DO I=1,ND
 	    XV(I)=I
 	  END DO
-	  CALL DP_CURVE(ND,XV,YV) 
+	  CALL DP_CURVE(ND,XV,YV)
 	  XLABEL='Depth index'
 	  YLABEL='Rate equation ratio'
 	  GOTO 200

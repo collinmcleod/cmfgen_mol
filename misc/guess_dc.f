@@ -9,12 +9,13 @@
 !
 ! These can come from a similar model but the frequency range must be sufficient.
 ! For high ionization species, the model should be identical, since the departure
-! coefficients are very sensitive to the electron temperature.  Program estimates 
+! coefficients are very sensitive to the electron temperature.  Program estimates
 ! the ground state departure coefficient, and use the same excitation temperature
 ! for all other levels. If adding a whole new species, start with lowest ioization
 ! species.
 !
 	PROGRAM GUESS_DC
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -22,8 +23,8 @@
 !                         is potentially a problem with the simple iteration
 !                         for low iozaton stages with high temperatures.
 ! Altered 19-Sep-2007 : Species length increased from 5 to 6 (handle ArVIII).
-! Altered 14-May-2006 : For a high ionization species, ground state population is 
-!                       read in from file. This allows estimate of ion population 
+! Altered 14-May-2006 : For a high ionization species, ground state population is
+!                       read in from file. This allows estimate of ion population
 !                       to be made.
 !
 	INTEGER NCF
@@ -36,57 +37,57 @@
 	INTEGER NUM_FILES
 	INTEGER ID
 !
-	REAL(10), ALLOCATABLE :: TA(:)
-	REAL(10), ALLOCATABLE :: TB(:)
-	REAL(10), ALLOCATABLE :: TC(:)
-	REAL(10), ALLOCATABLE :: TAU_ROSS(:)
-	REAL(10), ALLOCATABLE :: TAU_ES(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TAU_ROSS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TAU_ES(:)
 !
-	REAL(10), ALLOCATABLE :: PHOT_SUM(:)
-	REAL(10), ALLOCATABLE :: RECOM_SUM(:)
-	REAL(10), ALLOCATABLE :: GS_DC(:)
-	REAL(10), ALLOCATABLE :: DC(:,:)
-	REAL(10), ALLOCATABLE :: T_EXC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: PHOT_SUM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RECOM_SUM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: GS_DC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DC(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: T_EXC(:)
 !
-	REAL(10), ALLOCATABLE :: GS_ION_POP(:)
-	REAL(10), ALLOCATABLE :: DC_RUB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: GS_ION_POP(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DC_RUB(:)
 !
 ! Needed when reading EDDFACTOR
 !
-	REAL(10), POINTER :: RJ(:,:)
-	REAL(10), POINTER :: NU(:)
+	REAL(KIND=LDP), POINTER :: RJ(:,:)
+	REAL(KIND=LDP), POINTER :: NU(:)
 !
 ! Needed when reading RVTJ.
 !
-	REAL(10) RMDOT
-	REAL(10) RLUM
-	REAL(10) ABUND_HYD
+	REAL(KIND=LDP) RMDOT
+	REAL(KIND=LDP) RLUM
+	REAL(KIND=LDP) ABUND_HYD
 	INTEGER ND_ATM,NC_ATM,NP_ATM
 	CHARACTER*21 TIME
-	REAL(10), ALLOCATABLE :: R(:)
-	REAL(10), ALLOCATABLE :: V(:)
-	REAL(10), ALLOCATABLE :: SIGMA(:)
-	REAL(10), ALLOCATABLE :: T(:)
-	REAL(10), ALLOCATABLE :: ION_POP(:)
-	REAL(10), ALLOCATABLE :: ED(:)
-	REAL(10), ALLOCATABLE :: ROSS_MEAN(:)
-	REAL(10), ALLOCATABLE :: FLUX_MEAN(:)
-	REAL(10), ALLOCATABLE :: POP_ATOM(:)
-	REAL(10), ALLOCATABLE :: MASS_DENSITY(:)
-	REAL(10), ALLOCATABLE :: POPION(:)
-	REAL(10), ALLOCATABLE :: CLUMP_FAC(:)
-	REAL(10), ALLOCATABLE :: WORK(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R(:)
+	REAL(KIND=LDP), ALLOCATABLE :: V(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: T(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ION_POP(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ED(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ROSS_MEAN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: FLUX_MEAN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: POP_ATOM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: MASS_DENSITY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: POPION(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CLUMP_FAC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: WORK(:)
 !
 ! Used when reading file containing energy levels, oscillator strengths, etc
 ! (e.g. CV_F_OSCDAT)
 !
 	INTEGER, PARAMETER :: N_MAX=5000
 	CHARACTER*30 NAME(N_MAX)
-	REAL(10) FEDGE(N_MAX)
-	REAL(10) ENERGY(N_MAX)
-	REAL(10) G(N_MAX)
-	REAL(10) ION_EN
-	REAL(10) ZION
+	REAL(KIND=LDP) FEDGE(N_MAX)
+	REAL(KIND=LDP) ENERGY(N_MAX)
+	REAL(KIND=LDP) G(N_MAX)
+	REAL(KIND=LDP) ION_EN
+	REAL(KIND=LDP) ZION
 	CHARACTER*30 EN_DATE
 	INTEGER NLEV
 !
@@ -117,13 +118,13 @@
 	INTEGER REC_LENGTH
 	INTEGER ND_RD,NLEV_RD
 	INTEGER GION_LOW,GION_UP
-	REAL(10) NU1,NU2
-	REAL(10) RJ1,RJ2
-	REAL(10) T1,T2,T3,T4
+	REAL(KIND=LDP) NU1,NU2
+	REAL(KIND=LDP) RJ1,RJ2
+	REAL(KIND=LDP) T1,T2,T3,T4
 !
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
-	INTEGER, PARAMETER :: T_IN=5		!For terminal input 
+	INTEGER, PARAMETER :: T_IN=5		!For terminal input
 	INTEGER, PARAMETER :: T_OUT=6           !For terminal output
 	INTEGER, PARAMETER :: LU_IN=10		!For file I/O
 	INTEGER, PARAMETER :: LU_OUT=11
@@ -133,15 +134,15 @@
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	COMMON/LINE/ OPLIN,EMLIN               
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	COMMON/LINE/ OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 !
 	INTEGER GET_INDX_DP
 !
 	CHARACTER*80 RVTJ_FILE_NAME
 	CHARACTER*6 SPECIES
 !
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	CHARACTER*30 UC
 	EXTERNAL SPEED_OF_LIGHT,UC
 !

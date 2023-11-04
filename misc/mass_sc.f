@@ -1,4 +1,5 @@
 	PROGRAM MASS_SC
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -15,15 +16,15 @@
 	INTEGER, PARAMETER :: MAX_EL=92
 	INTEGER, PARAMETER :: MAX_ABUND=5
 !
-	REAL(10) AT_NO(MAX_EL)			!Atomic number
-	REAL(10) AT_MASS(MAX_EL)			!Atomic mass(amu)
-	REAL(10) ABUND(MAX_EL,MAX_ABUND)		!Fractional abundace (relative)
-	REAL(10) MASS_FRAC(MAX_EL,MAX_ABUND)	!Mass fractional abundace.
+	REAL(KIND=LDP) AT_NO(MAX_EL)			!Atomic number
+	REAL(KIND=LDP) AT_MASS(MAX_EL)			!Atomic mass(amu)
+	REAL(KIND=LDP) ABUND(MAX_EL,MAX_ABUND)		!Fractional abundace (relative)
+	REAL(KIND=LDP) MASS_FRAC(MAX_EL,MAX_ABUND)	!Mass fractional abundace.
 	CHARACTER*2 SYMB(MAX_EL)		!Element symbol
 	CHARACTER*20 NAME(MAX_EL)		!Element name
 !
-	REAL(10) NEW_ABUND(MAX_EL,MAX_ABUND)
-	REAL(10) NEW_MASS_FRAC(MAX_EL,MAX_ABUND)
+	REAL(KIND=LDP) NEW_ABUND(MAX_EL,MAX_ABUND)
+	REAL(KIND=LDP) NEW_MASS_FRAC(MAX_EL,MAX_ABUND)
 	LOGICAL*1 ALTERED_ABUND(MAX_EL,MAX_ABUND)		!Indicates revised abundace
 !
 	CHARACTER*2 SPEC			!Used for IO
@@ -32,10 +33,10 @@
 	CHARACTER*80 FILENAME
 	REAL*4 VAL
 !
-	REAL(10) MASS
-	REAL(10) OLD_MASS_SUM
-	REAL(10) NEW_MASS_SUM
-	REAL(10) NHE
+	REAL(KIND=LDP) MASS
+	REAL(KIND=LDP) OLD_MASS_SUM
+	REAL(KIND=LDP) NEW_MASS_SUM
+	REAL(KIND=LDP) NHE
 	INTEGER I,J,N
 	INTEGER IOS
 	INTEGER N_ABUND
@@ -141,8 +142,8 @@
 	    END DO
 	  END DO
 !
-! Bow adjust the new abundances so that their combined mass fraction is the 
-! same as C in the solar data. As a consequence all other species will have 
+! Bow adjust the new abundances so that their combined mass fraction is the
+! same as C in the solar data. As a consequence all other species will have
 ! the same-mass fraction.
 !
 ! Compute the scale factors.
@@ -167,7 +168,7 @@
 	    IF(ALTERED_ABUND(I,J))THEN
 	      NEW_MASS_FRAC(I,J)=NEW_MASS_FRAC(I,J)*OLD_MASS_SUM/NEW_MASS_SUM
 	    ELSE
-	      NEW_MASS_FRAC(I,J)=MASS_FRAC(I,J)              
+	      NEW_MASS_FRAC(I,J)=MASS_FRAC(I,J)
 	    END IF
 	    MASS=MASS+NEW_MASS_FRAC(I,J)
 	  END DO
@@ -186,7 +187,7 @@
 !
 	NEW_ABUND(1:N,J)=NEW_ABUND(1:N,J)/NHE
 !
-! With the new fractional abundace we compute the revised mass-fractions. 
+! With the new fractional abundace we compute the revised mass-fractions.
 ! Acts as a check.
 !
 	  MASS=0.0D0

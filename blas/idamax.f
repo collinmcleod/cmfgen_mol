@@ -1,11 +1,12 @@
       integer function idamax(n,dx,incx)
+      use set_kind_module
 c
 c     finds the index of element having max. absolute value.
 c     jack dongarra, linpack, 3/11/78.
 c     modified 3/93 to return if incx .le. 0.
 c     modified 12/3/93, array(1) declarations changed to array(*)
 c
-      REAL(10) dx(*),dmax
+      REAL(KIND=LDP) dx(*),dmax
       integer i,incx,ix,n
 c
       idamax = 0

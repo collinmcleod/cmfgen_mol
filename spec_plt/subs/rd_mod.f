@@ -1,4 +1,5 @@
 	SUBROUTINE RD_MOD(OBS_FREQ,OBS_FLUX,NCF_MAX,NCF,FILENAME,IOS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 09-Aug-2022: Changed to detect possible problem with type of input file.
@@ -9,8 +10,8 @@ C Altered 02-Aug-1995: Bug fix --- OBS_FREQ needed to be zeroed for correct
 C                         input operations.
 C
 	INTEGER NCF,NCF_MAX
-	REAL(10) OBS_FREQ(NCF_MAX)
-	REAL(10) OBS_FLUX(NCF_MAX)
+	REAL(KIND=LDP) OBS_FREQ(NCF_MAX)
+	REAL(KIND=LDP) OBS_FLUX(NCF_MAX)
 	CHARACTER*(*) FILENAME
 C
 	INTEGER IOS
@@ -74,6 +75,6 @@ C
 	CLOSE(UNIT=10)
 C
 	WRITE(T_OUT,*)NCF,' Data values read in'
-C                          
+C
 	RETURN
 	END

@@ -6,6 +6,7 @@ C        For Y axis:  Jv, vF(v), Flam (and Log0
 C
 	SUBROUTINE CNVRT_J_V2(XV,YV,NBB,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1                    DATA_TYPE,LAMC,X_LAB,Y_LAB,X_ONLY)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 26-Mar-2002: Data_TYPE inserted into call.
@@ -19,14 +20,14 @@ C
 	CHARACTER*(*) DATA_TYPE
 C
 	INTEGER I
-	REAL(10) LAMC
-	REAL(10) T1
-C              
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) LAMC
+	REAL(KIND=LDP) T1
+C
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL SPEED_OF_LIGHT
 C
-	REAL(10) C_CMS
-	REAL(10) KEV_TO_HZ,ANG_TO_HZ
+	REAL(KIND=LDP) C_CMS
+	REAL(KIND=LDP) KEV_TO_HZ,ANG_TO_HZ
 C
 	C_CMS=SPEED_OF_LIGHT()
 C
@@ -43,12 +44,12 @@ C
 	      YV(I)=T1*XV(I)*YV(I)
 	    END DO
 	    IF(DATA_TYPE .EQ. 'J')THEN
-	      Y_LAB='\gnJ\d\gn\u(erg\d cm\u-2 \ds\u-1\d)' 
-	      IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)' 
+	      Y_LAB='\gnJ\d\gn\u(erg\d cm\u-2 \ds\u-1\d)'
+	      IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)'
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
-	      Y_LAB='\gnH\d\gn\u(erg\d cm\u-2 \ds\u-1\d)' 
-	      IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)' 
-	    ELSE 
+	      Y_LAB='\gnH\d\gn\u(erg\d cm\u-2 \ds\u-1\d)'
+	      IF(LOG_Y)Y_LAB='Log \gnJ\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)'
+	    ELSE
 	      WRITE(6,*)'Unrecognized DATA_TYPE for NU_FNU'
 	    ELSE
 	  ELSE IF(Y_PLT_OPT .EQ. 'FLAM')THEN
@@ -57,12 +58,12 @@ C
 	      YV(I)=T1*YV(I)*XV(I)*XV(I)
 	    END DO
 	    IF(DATA_TYPE .EQ. 'J')THEN
-	      Y_LAB='J\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)' 
-	      IF(LOG_Y)Y_LAB='Log J\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)' 
+	      Y_LAB='J\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)'
+	      IF(LOG_Y)Y_LAB='Log J\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)'
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
-	      Y_LAB='H\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)' 
-	      IF(LOG_Y)Y_LAB='Log H\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)' 
-	    ELSE 
+	      Y_LAB='H\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)'
+	      IF(LOG_Y)Y_LAB='Log H\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)'
+	    ELSE
 	      WRITE(6,*)'Unrecognized DATA_TYPE for FLAM'
 	    ELSE
 	  ELSE IF(Y_PLT_OPT .EQ. 'FNU')THEN
@@ -70,10 +71,10 @@ C
 ! Plots the data units as read in.
 !
 	    IF(DATA_TYPE .EQ. 'J')THEN
-	      Y_LAB='J\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)' 
+	      Y_LAB='J\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
 	      IF(LOG_Y)Y_LAB='Log J\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
-	      Y_LAB='H\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)' 
+	      Y_LAB='H\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
 	      IF(LOG_Y)Y_LAB='Log H\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
 	    ELSE IF(DATA_TYPE .EQ. 'M(t)')THEN
 	      Y_LAB='M(t)'
@@ -84,7 +85,7 @@ C
 	    ELSE IF(DATA_TYPE .EQ. 'CHI')THEN
 	      Y_LAB='\gx(cm\u-1\d)'
 	      IF(LOG_Y)Y_LAB='Log \gx(cm\u-1\d)'
-	    ELSE 
+	    ELSE
 	      WRITE(6,*)'Unrecognized DATA_TYPE for FNU'
 	    ELSE
 	  END IF

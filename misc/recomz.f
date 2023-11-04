@@ -4,12 +4,13 @@
 ! rate to levels n (input) and above. n must be > 1.
 !
 	PROGRAM RECOMZ
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 07-Jul-2008: changed input LU from 6 to 5.
 !
 	INTEGER I
-	REAL(10) Z,A,GAMMA,T,N,E,ALPHA
+	REAL(KIND=LDP) Z,A,GAMMA,T,N,E,ALPHA
 !
 	GAMMA=0.5772
 !

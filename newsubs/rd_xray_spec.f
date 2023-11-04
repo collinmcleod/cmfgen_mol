@@ -1,23 +1,24 @@
 	MODULE MOD_XRAY_FLUXES
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
-	REAL(10), ALLOCATABLE :: X_NU(:)
-	REAL(10), ALLOCATABLE :: LOG_X_TEMP(:)
-	REAL(10), ALLOCATABLE :: LOG_X_ED(:)
-	REAL(10), ALLOCATABLE :: XRAY_FLUXES(:,:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: X_NU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LOG_X_TEMP(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LOG_X_ED(:)
+	REAL(KIND=LDP), ALLOCATABLE :: XRAY_FLUXES(:,:,:)
 !
-	REAL(10), ALLOCATABLE :: X_EMISS1(:)
-	REAL(10), ALLOCATABLE :: X_EMISS2(:)
-!               
-	REAL(10) BIN_MIN
-	REAL(10) BIN_SIZE
-	REAL(10) LOG_T_MIN
-	REAL(10) DEL_LOG_T
-	REAL(10) LOG_ED_MIN
-	REAL(10) DEL_LOG_ED
+	REAL(KIND=LDP), ALLOCATABLE :: X_EMISS1(:)
+	REAL(KIND=LDP), ALLOCATABLE :: X_EMISS2(:)
 !
-	REAL(10) T_SHOCK1_SAV
-	REAL(10) T_SHOCK2_SAV
+	REAL(KIND=LDP) BIN_MIN
+	REAL(KIND=LDP) BIN_SIZE
+	REAL(KIND=LDP) LOG_T_MIN
+	REAL(KIND=LDP) DEL_LOG_T
+	REAL(KIND=LDP) LOG_ED_MIN
+	REAL(KIND=LDP) DEL_LOG_ED
+!
+	REAL(KIND=LDP) T_SHOCK1_SAV
+	REAL(KIND=LDP) T_SHOCK2_SAV
 !
 	INTEGER N_BINS
 	INTEGER N_TEMP
@@ -31,24 +32,25 @@
 ! The returned emissivities have units ergs/cm^3/s/Hz/steradian.
 ! At present, we assume that the X-ray emissivity is independent of density.
 !
-! On the first call the tabulated RS data is read in from a file 
+! On the first call the tabulated RS data is read in from a file
 ! RS_XRAY_FLUXES. FREQ may be monotonically increasing, or decreasing.
 !
 	SUBROUTINE RD_XRAY_SPEC(T_SHOCK1,T_SHOCK2,LU_IN)
+	USE SET_KIND_MODULE
 	USE MOD_XRAY_FLUXES
 	IMPLICIT NONE
 !
 	INTEGER LU_IN
-	REAL(10) T_SHOCK1		!In units of 10^4 K
-	REAL(10) T_SHOCK2
+	REAL(KIND=LDP) T_SHOCK1		!In units of 10^4 K
+	REAL(KIND=LDP) T_SHOCK2
 !
 ! Local variables:
 !
-	REAL(10), PARAMETER :: EV_TO_HZ=0.241838D0
-	REAL(10) T1
+	REAL(KIND=LDP), PARAMETER :: EV_TO_HZ=0.241838D0
+	REAL(KIND=LDP) T1
 !
-	REAL(10) LOG_T_SHOCK1
-	REAL(10) LOG_T_SHOCK2
+	REAL(KIND=LDP) LOG_T_SHOCK1
+	REAL(KIND=LDP) LOG_T_SHOCK2
 !
 	INTEGER I,J
 	INTEGER IOS
@@ -57,7 +59,7 @@
 !
 	CHARACTER*132 STRING
 !
-	REAL(10) FUN_PI,PI
+	REAL(KIND=LDP) FUN_PI,PI
 	INTEGER ERROR_LU,LU_ER
 	EXTERNAL ERROR_LU,FUN_PI
 !
@@ -90,14 +92,14 @@
 	  CALL RD_DBLE(BIN_SIZE,'BIN_SIZE',LU_IN,LU_ER,' ')
 	  BIN_MIN=BIN_MIN*EV_TO_HZ	!Convert to units of 10^15 HZ
 	  BIN_SIZE=BIN_SIZE*EV_TO_HZ
-! 
+!
 ! Temperature tabulated in equal increments of Log T.
 !
 	  CALL RD_INT(N_TEMP,'N_TEMP',LU_IN,LU_ER,'# freq bins')
 	  CALL RD_DBLE(LOG_T_MIN,'LOG_T_MIN',LU_IN,LU_ER,' ')
 	  CALL RD_DBLE(DEL_LOG_T,'DEL_LOG_T',LU_IN,LU_ER,' ')
 	  LOG_T_MIN=LOG_T_MIN-4.0D0		!Convert from K to units of 10^4 K
-! 
+!
 ! Temperature tabulated in equal increments of Log Ne.
 !
 	  CALL RD_INT(N_ED,'N_ED',LU_IN,LU_ER,'# freq bins')
@@ -105,7 +107,7 @@
 	  CALL RD_DBLE(DEL_LOG_ED,'DEL_LOG_ED',LU_IN,LU_ER,' ')
 	  WRITE(LU_ER,'(A)')' '
 !
-! Now that we have the vector sizes, we cab allocate memory for the X-ray 
+! Now that we have the vector sizes, we cab allocate memory for the X-ray
 ! table and vectors.
 !
 	  ALLOCATE (X_NU(N_BINS),STAT=IOS)
@@ -148,7 +150,7 @@
 	    END DO
 !
 ! Convert fluxes from units of 10^{-23} ergs/cm^3/s/bin to units of
-! ergs/cm^3/s/steradian/Hz. NB: Because of the corrections earlier, BIN_SIZE 
+! ergs/cm^3/s/steradian/Hz. NB: Because of the corrections earlier, BIN_SIZE
 ! is in units of 10^15 Hz.
 !
 ! To put into pogram units, we multiply by an additional factor of 10^10.
@@ -161,7 +163,7 @@
 !
 	  CLOSE(LU_IN)
 	END IF
-!            
+!
 	ED_INDX=1
 	IF(N_ED .NE. 1)THEN
 	  WRITE(LU_ER,'(70A)')('*',I=1,70)
@@ -173,7 +175,7 @@
 	END IF
 !
 ! Compute the X-ray emissivities at the two shock temperatures of interest.
-! These emissivities are computed on the X-ray frequency grid. The data is 
+! These emissivities are computed on the X-ray frequency grid. The data is
 ! stored for subsequent calls.
 !
 	IF(T_SHOCK1 .EQ. 0.0D0)THEN
@@ -185,7 +187,7 @@
 	    WRITE(LU_ER,*)'Error: T_SHOCK outside range'
 	    WRITE(LU_ER,*)'T_SHOCK=',T_SHOCK1
 	    WRITE(LU_ER,*)'Error occurred in RD_XRAY_SPEC'
-	    STOP             
+	    STOP
 	  END IF
 	  T1=(LOG_T_SHOCK1-LOG_X_TEMP(T_INDX))/
 	1            (LOG_X_TEMP(T_INDX+1)-LOG_X_TEMP(T_INDX))

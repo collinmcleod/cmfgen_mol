@@ -1,5 +1,5 @@
 C
-C Subroutine to interpolate an array onto a new grid. The grid vector must be 
+C Subroutine to interpolate an array onto a new grid. The grid vector must be
 C either a monotonically decreasing or increasing function. A modified cubic
 C polynomial is used to do the interpolation. Instead of using
 C the exact cubic estimates for the first derivative at the two nodes,
@@ -16,32 +16,33 @@ C
 C Ref: Steffen. M, 1990, A/&A, 239, 443-450
 C
 	SUBROUTINE MON_INTERP_FAST(QZ,NQ,LIN_END,QZR,NX,VARRAY,NV,R,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Created 09-Dec-1998 : Based on MON_INTERP.
-C                       Design to be fast when from creating a large 
+C                       Design to be fast when from creating a large
 C                           array from a much smaller array.
 C
 	INTEGER*4 NQ,LIN_END,NX,NV,ND
-	REAL(10) QZ(NQ,LIN_END),QZR(NX)
-	REAL(10) VARRAY(NV,LIN_END),R(ND)
+	REAL(KIND=LDP) QZ(NQ,LIN_END),QZR(NX)
+	REAL(KIND=LDP) VARRAY(NV,LIN_END),R(ND)
 C
-	REAL(10) S(ND)		!Slopes
-	REAL(10) H(ND)
+	REAL(KIND=LDP) S(ND)		!Slopes
+	REAL(KIND=LDP) H(ND)
 	INTEGER*4 LST_INTERVAL
 	INTEGER*4 ND_SM
 	INTEGER*4 IVEC(NX)
 C
-	REAL(10) ONE
+	REAL(KIND=LDP) ONE
 	PARAMETER (ONE=1.0D0)
 	INTEGER*4 I,J,ML
-	REAL(10) T1
-	REAL(10) A(ND)
-	REAL(10) B(ND)
-	REAL(10) C(ND)
-	REAL(10) D(ND)		!Used for derivative at I.
-	REAL(10) E(ND)
-	REAL(10) SGN
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) A(ND)
+	REAL(KIND=LDP) B(ND)
+	REAL(KIND=LDP) C(ND)
+	REAL(KIND=LDP) D(ND)		!Used for derivative at I.
+	REAL(KIND=LDP) E(ND)
+	REAL(KIND=LDP) SGN
 C
 	INTEGER*4 ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -103,13 +104,13 @@ C
 	    S(I)=(VARRAY(I+1,ML)-VARRAY(I,ML))/H(I)
 	  END DO
 C
-C Compute the first derivatives at node I. 
+C Compute the first derivatives at node I.
 C
           D(1)=S(1) +(S(1)-S(2))*H(1)/(H(1)+H(2))
 	  DO I=2,MIN(ND-1,ND_SM)
             D(I)=(S(I-1)*H(I)+S(I)*H(I-1))/(H(I-1)+H(I))
 	  END DO
-C             
+C
 C Adjust first derivatives so that function is monotonic  in each interval.
 C
 	  D(1)=( SIGN(ONE,S(1))+SIGN(ONE,D(1)) )*MIN(ABS(S(1)),0.5*ABS(D(1)))

@@ -1,9 +1,10 @@
 !
 ! Subroutine to designed to create a NEW R grid given an old R grid, and optical depth scale on this
-! grid. The routine places points places points logaritmically in R and TAU. 
+! grid. The routine places points places points logaritmically in R and TAU.
 !
 	SUBROUTINE ADJUST_SN_R_GRID(R,OLD_R,OLD_T,OLD_TAU,R_SCALE_FAC,dLOGT_MAX,
 	1           IB_RAT,OB_RAT,DTAU2_ON_DTAU1,N_IB_INS,N_OB_INS,ND,NS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered: 07-Jan-2014 -- Changes to call, and extensive improvements made.
@@ -12,42 +13,42 @@
 	INTEGER NS			!For old grid
 	INTEGER ND			!For final grid.
 !
-	REAL(10) R(ND)			!Returned
-	REAL(10) OLD_R(NS)		!Input
-	REAL(10) OLD_T(NS)		!Input
-	REAL(10) OLD_TAU(NS)		!Input
+	REAL(KIND=LDP) R(ND)			!Returned
+	REAL(KIND=LDP) OLD_R(NS)		!Input
+	REAL(KIND=LDP) OLD_T(NS)		!Input
+	REAL(KIND=LDP) OLD_TAU(NS)		!Input
 !
-	REAL(10) LOG_OLD_R(NS)
-	REAL(10) LOG_OLD_T(NS)
-	REAL(10) LOG_OLD_TAU(NS)
+	REAL(KIND=LDP) LOG_OLD_R(NS)
+	REAL(KIND=LDP) LOG_OLD_T(NS)
+	REAL(KIND=LDP) LOG_OLD_TAU(NS)
 !
 	INTEGER, PARAMETER :: IND=2
-	REAL(10) XN(ND)                   !Used as integer grid
-	REAL(10) ZN(IND*ND)		!Used as integer grid.
-	REAL(10) LOG_R(IND*ND)
-	REAL(10) TAU(IND*ND)
-	REAL(10) LOG_T(IND*ND)
-	REAL(10) LOG_TAU(IND*ND)
+	REAL(KIND=LDP) XN(ND)                   !Used as integer grid
+	REAL(KIND=LDP) ZN(IND*ND)		!Used as integer grid.
+	REAL(KIND=LDP) LOG_R(IND*ND)
+	REAL(KIND=LDP) TAU(IND*ND)
+	REAL(KIND=LDP) LOG_T(IND*ND)
+	REAL(KIND=LDP) LOG_TAU(IND*ND)
 !
-	REAL(10) IB_RAT			!dTAU(I+1)/dTAU(I) near inner boudary.
-	REAL(10) OB_RAT			!dTAU(I+1)/dRAU(I) near outer bunary
-	REAL(10) R_SCALE_FAC		!Factor to increase dLOGR by so that TAU scale has higher importance.
-	REAL(10) DTAU2_ON_DTAU1		!DTAU(2)/DTAU(1) at outer boundary.
-	REAL(10) dLOGT_MAX
+	REAL(KIND=LDP) IB_RAT			!dTAU(I+1)/dTAU(I) near inner boudary.
+	REAL(KIND=LDP) OB_RAT			!dTAU(I+1)/dRAU(I) near outer bunary
+	REAL(KIND=LDP) R_SCALE_FAC		!Factor to increase dLOGR by so that TAU scale has higher importance.
+	REAL(KIND=LDP) DTAU2_ON_DTAU1		!DTAU(2)/DTAU(1) at outer boundary.
+	REAL(KIND=LDP) dLOGT_MAX
 !
 	INTEGER N_IB_INS
 	INTEGER N_OB_INS
 !
-	REAL(10) dTAU			!d(LOG(TAU))
-	REAL(10) dTAU_OLD
-	REAL(10) dLOGR
-	REAL(10) dLOGT
-	REAL(10) LOG_TAU_MIN
-	REAL(10) LOG_R_MAX
-	REAL(10) TAU_BEG,TAU_END
-	REAL(10) T1,T2,T3
-	REAL(10) NEXT_R
-	REAL(10) OB_RAT_LOC
+	REAL(KIND=LDP) dTAU			!d(LOG(TAU))
+	REAL(KIND=LDP) dTAU_OLD
+	REAL(KIND=LDP) dLOGR
+	REAL(KIND=LDP) dLOGT
+	REAL(KIND=LDP) LOG_TAU_MIN
+	REAL(KIND=LDP) LOG_R_MAX
+	REAL(KIND=LDP) TAU_BEG,TAU_END
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) NEXT_R
+	REAL(KIND=LDP) OB_RAT_LOC
 !
 	INTEGER LU
 	INTEGER, PARAMETER :: IONE=1
@@ -266,7 +267,7 @@
 	  ND_TMP=I+3
 	ELSE
 	  T1=EXP(LOG_TAU(ND_TMP))
-	  T2=EXP(LOG_TAU(ND_TMP))-EXP(LOG_TAU(ND_TMP-1)) 
+	  T2=EXP(LOG_TAU(ND_TMP))-EXP(LOG_TAU(ND_TMP-1))
 	  T3=T2*(IB_RAT-1)/(IB_RAT**(N_IB_INS+1)-1)
 	  DO J=1,N_IB_INS
 	    T1=T1-T3
@@ -276,7 +277,7 @@
 	  END DO
 !
 	  T1=EXP(LOG_R(ND_TMP))
-	  T2=EXP(LOG_R(ND_TMP))-EXP(LOG_R(ND_TMP-1)) 
+	  T2=EXP(LOG_R(ND_TMP))-EXP(LOG_R(ND_TMP-1))
 	  T3=T2*(IB_RAT-1)/(IB_RAT**(N_IB_INS+1)-1)
 	  DO J=1,N_IB_INS
 	    T1=T1-T3
@@ -302,7 +303,7 @@
 	K=0
 	IF(DTAU2_ON_DTAU1 .LT. 2.0D0)K=1
 	T1=EXP(LOG_TAU(1))
-	T2=EXP(LOG_TAU(1))-EXP(LOG_TAU(2)) 
+	T2=EXP(LOG_TAU(1))-EXP(LOG_TAU(2))
 	T3=T2*(OB_RAT-1)/(OB_RAT**(N_OB_INS+K)-1)
 	DO I=ND_TMP,1,-1
 	    LOG_TAU(I+N_OB_INS)=LOG_TAU(I)
@@ -318,7 +319,7 @@
 	END DO
 !
 	T1=EXP(LOG_R(1))
-	T2=EXP(LOG_R(1))-EXP(LOG_R(2)) 
+	T2=EXP(LOG_R(1))-EXP(LOG_R(2))
 	T3=T2*(OB_RAT-1)/(OB_RAT**(N_OB_INS+K)-1)
 	DO I=ND_TMP,1,-1
 	  LOG_R(I+N_OB_INS)=LOG_R(I)

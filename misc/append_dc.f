@@ -12,6 +12,7 @@ C              output. This file is from some othe model in which an
 C              extended atom was used.
 C
 	PROGRAM APPEND_DC
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 C
@@ -29,31 +30,31 @@ C
 	INTEGER, PARAMETER :: DCOUT=17
 	INTEGER, PARAMETER :: IONE=1
 C
-	REAL(10), ALLOCATABLE :: R_N(:)
-	REAL(10), ALLOCATABLE :: DI_N(:)
-	REAL(10), ALLOCATABLE :: ED_N(:)
-	REAL(10), ALLOCATABLE :: DC_N(:,:)
-	REAL(10), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_N(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DI_N(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ED_N(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DC_N(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
 C
-	REAL(10), ALLOCATABLE :: R_O(:)
-	REAL(10), ALLOCATABLE :: DI_O(:)
-	REAL(10), ALLOCATABLE :: ED_O(:)
-	REAL(10), ALLOCATABLE :: DC_O(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_O(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DI_O(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ED_O(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DC_O(:,:)
 	CHARACTER*132, ALLOCATABLE :: HEAD(:)
 C
 	INTEGER N_N
 	INTEGER ND_N
-	REAL(10) LSTAR_N
-	REAL(10) RSTAR_N
+	REAL(KIND=LDP) LSTAR_N
+	REAL(KIND=LDP) RSTAR_N
 C
 	INTEGER N_O
 	INTEGER ND_O
-	REAL(10) LSTAR_O
-	REAL(10) RSTAR_O
+	REAL(KIND=LDP) LSTAR_O
+	REAL(KIND=LDP) RSTAR_O
 C
 	CHARACTER*80 DC_FILE
 C
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	CHARACTER*132 STRING_O,STRING_N
 	CHARACTER*80 DCOUT_FILE
 C
@@ -71,7 +72,7 @@ C
 C
 C Check whether the file has a record containing 'Format date'. Its presence
 C effects the way we read the file. If it has, we save it to output. Note that
-C the header to each depth (i.e. that contianing R, Ne, etc) output to the 
+C the header to each depth (i.e. that contianing R, Ne, etc) output to the
 C final file has EXACTLY the same format as the main input file.
 C
 	I=0
@@ -108,9 +109,9 @@ C
 	  IF(IOS .NE. 0)WRITE(T_OUT,*)
 	1      ' Error opening old DC file: Try again'
 	END DO
-C                                                  
+C
 C Check whether the file has a record containing 'Format date'. Its presence
-C effects the way we read the file. 
+C effects the way we read the file.
 C
 	I=0
 	STRING_O=' '
@@ -135,7 +136,7 @@ C
 	  WRITE(6,'(80A)')('*',I=1,80)
 	  WRITE(6,*)' '
 	END IF
-        
+
 C
 	ALLOCATE (DC_O(N_O,ND_N))
 	ALLOCATE (TA(ND_N))

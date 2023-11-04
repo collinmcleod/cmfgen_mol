@@ -16,7 +16,7 @@ include Makefile_definitions
 # We will access the makefile in each local directory tp create the
 # libraries and executables.
 #
-all : info d_blas d_lpack d_tools d_stark d_unix d_subs d_plane d_newsubs d_pgplt \
+all : info d_tools d_blas d_lpack d_nm_subs d_stark d_unix d_subs d_plane d_newsubs d_pgplt \
          d_lte d_new_main d_disp d_spec_plt d_obs d_misc
 
 # We now MAKE the required libraries and executables.
@@ -28,10 +28,12 @@ d_blas:
 	(cd blas; make)
 d_lpack:
 	(cd lpack; make)
-d_plane:
-	(cd plane; make )
 d_tools:
 	(cd tools; make )
+d_nm_subs:
+	(cd new_main/subs; make )
+d_plane:
+	(cd plane; make )
 d_stark:
 	(cd stark; make )
 d_subs:

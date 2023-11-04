@@ -12,6 +12,7 @@
 	1             XzSIX_LEVNAME_F,NXzSIX_F,
 	1             SIG_GAU_KMS,FRAC_SIG_GAU,CUT_ACCURACY,ABOVE,
 	1             X_RAYS,ID,DESC,LUIN,LUOUT)
+	USE SET_KIND_MODULE
 !
 !  Data modules required.
 !
@@ -50,28 +51,28 @@
 	INTEGER NXzV
 	INTEGER N_PHOT
 	INTEGER MAX_N_PHOT
-	REAL(10) EDGE(NXzV)
+	REAL(KIND=LDP) EDGE(NXzV)
 	CHARACTER(LEN=40) XzV_LEVELNAME(NXzV)
 !
 ! Statistical weight of resulting ion for PHOT_ID=1. Used only if
 ! ion is not present.
 !
-	REAL(10) GION_GS
-	REAL(10) ZXzV
-	REAL(10) AT_NO_DUM
+	REAL(KIND=LDP) GION_GS
+	REAL(KIND=LDP) ZXzV
+	REAL(KIND=LDP) AT_NO_DUM
 	INTEGER XzV_ION_LEV_ID(MAX_N_PHOT)
 	INTEGER ID
 	CHARACTER(LEN=*) DESC
 !
-	REAL(10) SIG_GAU_KMS		!V[FWHM]=2.34 SIG_AU_KMS
-	REAL(10) FRAC_SIG_GAU             !Spacing in smoothed cross section
-	REAL(10) CUT_ACCURACY		!Accuracy to delete superflous data points
+	REAL(KIND=LDP) SIG_GAU_KMS		!V[FWHM]=2.34 SIG_AU_KMS
+	REAL(KIND=LDP) FRAC_SIG_GAU             !Spacing in smoothed cross section
+	REAL(KIND=LDP) CUT_ACCURACY		!Accuracy to delete superflous data points
 	LOGICAL ABOVE                  !Smooth use data only above ionization edge.
 !
 	LOGICAL XzSIX_PRES
 	INTEGER NXzSIX_F
-	REAL(10) EDGEXzSIX_F(NXzSIX_F)
-	REAL(10) GXzSIX_F(NXzSIX_F)
+	REAL(KIND=LDP) EDGEXzSIX_F(NXzSIX_F)
+	REAL(KIND=LDP) GXzSIX_F(NXzSIX_F)
 	INTEGER F_TO_S_XzSIX(NXzSIX_F)
 	CHARACTER*(*) XzSIX_LEVNAME_F(NXzSIX_F)
 !
@@ -80,13 +81,13 @@
 !
 ! Common block with opacity/emissivity constants.
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 !
 ! External Functions.
 !
-	REAL(10) RD_FREE_VAL,SPEED_OF_LIGHT
+	REAL(KIND=LDP) RD_FREE_VAL,SPEED_OF_LIGHT
 	INTEGER ICHRLEN,ERROR_LU
 	EXTERNAL RD_FREE_VAL,ERROR_LU,ICHRLEN,SPEED_OF_LIGHT
 !
@@ -98,10 +99,10 @@
 	INTEGER N_DP(MAX_N_PHOT)
 	CHARACTER(LEN=40), ALLOCATABLE :: LOC_TERM_NAME(:)
 !
-	REAL(10) LOC_EXC_FREQ_ION,TOTAL_WT
-	REAL(10) T1,NU_INF
-	REAL(10) SIG_REV_KMS
-	REAL(10) SIG_SM
+	REAL(KIND=LDP) LOC_EXC_FREQ_ION,TOTAL_WT
+	REAL(KIND=LDP) T1,NU_INF
+	REAL(KIND=LDP) SIG_REV_KMS
+	REAL(KIND=LDP) SIG_SM
 	INTEGER PHOT_ID,IOS
 	INTEGER I,J,K,L
 	INTEGER N_HD,L1,L2,LN
@@ -129,8 +130,8 @@
 	INTEGER NPNTS_TOT
 	INTEGER N_CROSS
 	INTEGER, PARAMETER :: N_CROSS_MAX=1000000
-	REAL(10) TMP_NU(N_CROSS_MAX)
-	REAL(10) TMP_CROSS(N_CROSS_MAX)
+	REAL(KIND=LDP) TMP_NU(N_CROSS_MAX)
+	REAL(KIND=LDP) TMP_CROSS(N_CROSS_MAX)
 !
 	LUER=ERROR_LU()
 	FINAL_STATE(:,:)=' '
@@ -294,7 +295,7 @@
 ! include the X-RAY opacity with the regular photoionization cross-section.
 ! We also include the K-shell cross-section for lithium ions, since
 ! only one electron is ejected. Strictly speaking, should have 1s2.nl going
-! to 1s nl state (rather than 1s^2) state of the HeI-like ion. 
+! to 1s nl state (rather than 1s^2) state of the HeI-like ion.
 !
 	IF(X_RAYS .AND. .NOT. XzSIX_PRES)THEN
 	  PD(ID)%DO_KSHELL_W_GS=.TRUE.
@@ -335,7 +336,7 @@
 	    READ(LUIN,'(A)',IOSTAT=IOS)STRING
 	    L1=INDEX(STRING,'!Date')
 	    IF(IOS .NE. 0)THEN
- 
+
 	      WRITE(LUER,*)'Error reading date from ',FILENAME
 	      WRITE(LUER,*)'PHOT_ID=',PHOT_ID,'IOSTAT=',IOS
 	      STOP
@@ -470,20 +471,20 @@
 !
 	    HEAD_STR(J)(L1:)=' '
 	    DO WHILE(INDEX(HEAD_STR(J),CHAR(9)) .NE. 0)
-	      K=INDEX(HEAD_STR(J),CHAR(9))	!Remove tabs 
+	      K=INDEX(HEAD_STR(J),CHAR(9))	!Remove tabs
 	      HEAD_STR(J)(K:K)=' '
 	    END DO
 !
 	    L1=LEN_TRIM(HEAD_STR(J))
 	    K=INDEX(HEAD_STR(J)(1:L1),' ')	!Remove blanks
-	    DO WHILE(K .NE. 0) 
+	    DO WHILE(K .NE. 0)
 	      HEAD_STR(J)(K:)=HEAD_STR(J)(K+1:)
 	      L1=L1-1
 	      K=INDEX(HEAD_STR(J)(1:L1),' ')
 	    END DO
 !
 ! Can now get final level name
-!	        
+!	
 	    L2=INDEX(HEAD_STR(J),'  ')
 	    L1=0
 	    DO WHILE(L1 .LT. N_FIN_MAX)

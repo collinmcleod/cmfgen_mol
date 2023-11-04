@@ -1,23 +1,24 @@
-C This program will calculate an absorption profile by computing an optical 
-C depth at line center t0, with viogt profile.  It needs as input a 
+C This program will calculate an absorption profile by computing an optical
+C depth at line center t0, with viogt profile.  It needs as input a
 C micro-turbulent parameter b(km/sec), a central wavelength lam0(ang),
-C an ossillator (sp) strength f(dimensionless), and a line width (rather a 
+C an ossillator (sp) strength f(dimensionless), and a line width (rather a
 C damping parameter) gam(sec^-1).  The temperature is also input but has little
 C effect.  The voigt profile in IDL has a problem with
-C negative independent variables so we do a onesided calculation and assume 
+C negative independent variables so we do a onesided calculation and assume
 C symmetry.
 C Started on 1-9-92 by SRM
-C                      
+C
 C This program is a modification of absprof.pro.  This will calculate a
-C set of optical depths as a function of wavelength for the Lyman series of 
-C hydrogen.  When the optical depths get too large I truncate them at a 
-C particular maximum finite value so that when I exponentiate and 
+C set of optical depths as a function of wavelength for the Lyman series of
+C hydrogen.  When the optical depths get too large I truncate them at a
+C particular maximum finite value so that when I exponentiate and
 C convolve with the point spread function of the telescope I will (hopefully)
 C get a well behaved transmission function which can be divided out of the
 C EZ CMa spectrum to revel the ``true'' spectrum.  This modification started
 C on 4-30-92 by SRM.
 C
 	SUBROUTINE HIABS(WAVE,FLUX,NLAM,V_TURB,LOG_NTOT,T_IN_K)
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 C
@@ -25,34 +26,34 @@ C Altered 16-Apr-2008: PAUSE used if cannot find file with line list.
 C Altered 21-Dec-2001: Error in VTURB (**2 insetad of *2) fixed
 C
 	INTEGER NLAM
-	REAL(10) WAVE(NLAM)
-	REAL(10) FLUX(NLAM)
-	REAL(10) V_TURB		!km/s
-	REAL(10) LOG_NTOT
-	REAL(10) T_IN_K
+	REAL(KIND=LDP) WAVE(NLAM)
+	REAL(KIND=LDP) FLUX(NLAM)
+	REAL(KIND=LDP) V_TURB		!km/s
+	REAL(KIND=LDP) LOG_NTOT
+	REAL(KIND=LDP) T_IN_K
 C
 C Local variables
 C
 	INTEGER NHYD
 	PARAMETER (NHYD=49)
-	REAL(10) HYD_LAM(NHYD)
-	REAL(10) HYD_FREQ(NHYD)
-	REAL(10) HYD_OSC(NHYD)
-	REAL(10) HYD_GAM(NHYD)
-	REAL(10) HYD_G(NHYD)
-	REAL(10) NU_DOP(NHYD)
+	REAL(KIND=LDP) HYD_LAM(NHYD)
+	REAL(KIND=LDP) HYD_FREQ(NHYD)
+	REAL(KIND=LDP) HYD_OSC(NHYD)
+	REAL(KIND=LDP) HYD_GAM(NHYD)
+	REAL(KIND=LDP) HYD_G(NHYD)
+	REAL(KIND=LDP) NU_DOP(NHYD)
 C
-	REAL(10) CHIL(NHYD)
+	REAL(KIND=LDP) CHIL(NHYD)
 C
-	REAL(10) C_KMS,PI
-	REAL(10) OPLIN
-	REAL(10) TAU
-	REAL(10) NTOT
-	REAL(10) FREQ
-	REAL(10) PHI
-	REAL(10) a
-	REAL(10) v
-	REAL(10) T1
+	REAL(KIND=LDP) C_KMS,PI
+	REAL(KIND=LDP) OPLIN
+	REAL(KIND=LDP) TAU
+	REAL(KIND=LDP) NTOT
+	REAL(KIND=LDP) FREQ
+	REAL(KIND=LDP) PHI
+	REAL(KIND=LDP) a
+	REAL(KIND=LDP) v
+	REAL(KIND=LDP) T1
 C
 	INTEGER I,J,IOS
 	LOGICAL DO_SYS
@@ -60,9 +61,9 @@ C
 C
 C Functions
 C
-	REAL(10) SPEED_OF_LIGHT
-	REAL(10) FUN_PI
-	REAL(10) VOIGT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
+	REAL(KIND=LDP) FUN_PI
+	REAL(KIND=LDP) VOIGT
 	EXTERNAL SPEED_OF_LIGHT,FUN_PI,VOIGT
 	CHARACTER(LEN=1) TMP_STR
 C
@@ -89,7 +90,7 @@ C
 	    IF(DO_SYS)CALL SYSTEM(STRING)
 	    IF(.NOT. DO_SYS .OR. IOS .NE. 0)THEN
 	      WRITE(6,*)'Use astxt to assign file, then hit any character and return/enter'
-	      READ(5,'(A)')TMP_STR 
+	      READ(5,'(A)')TMP_STR
 	    END IF
 	    GOTO 100
 	  END IF
@@ -117,7 +118,7 @@ C
 	    DO I=1,NHYD
 	      a=1.0D-15*HYD_GAM(I)/4/PI/NU_DOP(I)
 	      v=(FREQ-HYD_FREQ(I))/NU_DOP(I)
-	      PHI=VOIGT(a,v)    
+	      PHI=VOIGT(a,v)
 	      TAU=TAU+CHIL(I)*PHI
 	    END DO
 	    FLUX(J)=FLUX(J)*EXP(-TAU)

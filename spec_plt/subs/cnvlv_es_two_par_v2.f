@@ -4,37 +4,38 @@
 ! with a TWO parameter fit.
 !
 	SUBROUTINE CNVLV_ES_TWO_PAR_V2(NU,RJ,J_ES,T_ELEC,T_OUT,NCF)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER NCF
-	REAL(10) NU(NCF)
-	REAL(10) RJ(NCF)
-	REAL(10) J_ES(NCF)
-	REAL(10) T_ELEC
+	REAL(KIND=LDP) NU(NCF)
+	REAL(KIND=LDP) RJ(NCF)
+	REAL(KIND=LDP) J_ES(NCF)
+	REAL(KIND=LDP) T_ELEC
 	INTEGER T_OUT
 !
-	REAL(10) A(NCF)
-	REAL(10) H(NCF)
-	REAL(10) C(NCF)
-	REAL(10) D(NCF)
-	REAL(10) A_STORE(NCF)
-	REAL(10) C_STORE(NCF)
-	REAL(10) BETA
-	REAL(10) T1
-	REAL(10) D1,D2,DH
+	REAL(KIND=LDP) A(NCF)
+	REAL(KIND=LDP) H(NCF)
+	REAL(KIND=LDP) C(NCF)
+	REAL(KIND=LDP) D(NCF)
+	REAL(KIND=LDP) A_STORE(NCF)
+	REAL(KIND=LDP) C_STORE(NCF)
+	REAL(KIND=LDP) BETA
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) D1,D2,DH
 	INTEGER ML,L
 	INTEGER, PARAMETER :: IONE=1
 !
-	REAL(10) OLD_FLUX
-	REAL(10) NEW_FLUX
-	REAL(10) OLD_N_PHOT
-	REAL(10) NEW_N_PHOT
+	REAL(KIND=LDP) OLD_FLUX
+	REAL(KIND=LDP) NEW_FLUX
+	REAL(KIND=LDP) OLD_N_PHOT
+	REAL(KIND=LDP) NEW_N_PHOT
 !
 ! Parameters for fit to Electrons Scattering redistribution function
 ! (dipole form). From Rybicki and Hummer (A&A, 290,553)
 !
 	INTEGER, PARAMETER :: NCOEF=2
-	REAL(10) ACOEF(2),BCOEF(2)
+	REAL(KIND=LDP) ACOEF(2),BCOEF(2)
 	DATA ACOEF/1.690703717290D0,-0.690703717290D0/
 	DATA BCOEF/1.614249968779D0,2.154326524957D0/
 !
@@ -53,8 +54,8 @@
 	A_STORE(NCF)=-2.0D0/( LOG(NU(NCF-1)/NU(NCF)) )**2
 	C_STORE(NCF)=0.0D0
 !
-! Compute the triadiagonal quantities for performing the convolution, and 
-! perform the convolution. Due to the depth dependence of BETA, the vectors 
+! Compute the triadiagonal quantities for performing the convolution, and
+! perform the convolution. Due to the depth dependence of BETA, the vectors
 ! are depth dependent. We convolve both J and the Planck Function.
 !
 	BETA=1.84E-03*SQRT(T_ELEC)

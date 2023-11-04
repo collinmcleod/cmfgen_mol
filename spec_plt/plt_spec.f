@@ -1,11 +1,12 @@
 C
-C General routine for plotting and comparing observational and model 
+C General routine for plotting and comparing observational and model
 C spectra. Model input spectra are read from OBSLFLUX.
 C
-C Various options are available to redden and normalize the model spectra. 
+C Various options are available to redden and normalize the model spectra.
 C Several different units can be used for the X and Y axes.
 C
 	PROGRAM PLT_SPEC
+	USE SET_KIND_MODULE
 C
 	USE FILT_PASS_BAND
 C
@@ -33,7 +34,7 @@ C                         data implemented with rd_obs option.
 C                       Fixed comvolution option to make more transparent.
 C Altered 17-Jun-1996 : Bug fixed with Wavelength normalization for BB option.
 C Altered 16-mar-1997 : Cleaned: USR_OPTION installation finalized.
-C Altered 26-Nov-1996 : Norm option fixed so that entire MOD spectrum is 
+C Altered 26-Nov-1996 : Norm option fixed so that entire MOD spectrum is
 C                        plotted.
 C
 C
@@ -48,21 +49,21 @@ C
 	INTEGER NCF		!Number of data points in default data
 	INTEGER NCF_MOD		!Used when plotting another model data set
 c
-	REAL(10), ALLOCATABLE :: NU(:)
-	REAL(10), ALLOCATABLE :: OBSF(:)
-	REAL(10), ALLOCATABLE :: FQW(:)
-	REAL(10), ALLOCATABLE :: AL_D_EBmV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: NU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OBSF(:)
+	REAL(KIND=LDP), ALLOCATABLE :: FQW(:)
+	REAL(KIND=LDP), ALLOCATABLE :: AL_D_EBmV(:)
 C
 	INTEGER NCF_CONT
-	REAL(10), ALLOCATABLE :: NU_CONT(:)
-	REAL(10), ALLOCATABLE :: OBSF_CONT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: NU_CONT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: OBSF_CONT(:)
 !
 	INTEGER NOBS
-	REAL(10), ALLOCATABLE ::  NU_OBS(:)
-	REAL(10), ALLOCATABLE ::  OBSF_OBS(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  NU_OBS(:)
+	REAL(KIND=LDP), ALLOCATABLE ::  OBSF_OBS(:)
 !
-	REAL(10), ALLOCATABLE :: XVEC(:)
-	REAL(10), ALLOCATABLE :: YVEC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: XVEC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: YVEC(:)
 C
 C Indicates which columns the observatoinal data is in.
 C
@@ -80,26 +81,26 @@ C
 	CHARACTER*80 YAXIS		!Label for Ordinate
 	CHARACTER*80 TITLE
 C
-	REAL(10) LUM
-	REAL(10) TOT_LUM
-	REAL(10) N_PHOT
-	REAL(10) ZAN_FREQ(10)
+	REAL(KIND=LDP) LUM
+	REAL(KIND=LDP) TOT_LUM
+	REAL(KIND=LDP) N_PHOT
+	REAL(KIND=LDP) ZAN_FREQ(10)
 C
-	REAL(10) ANG_TO_HZ
-	REAL(10) KEV_TO_HZ
-	REAL(10) NORM_WAVE
-	REAL(10) NORM_FREQ
-	REAL(10) NORM_FLUX
-	REAL(10) DNU
-	REAL(10) BB_FLUX
-	REAL(10) SCALE_FAC
-	REAL(10) XFAC
-	REAL(10) ADD_FAC
-	REAL(10) LAMC
-	REAL(10) RAD_VEL			!Radial velcity in km/s
-	REAL(10) C_CMS
-	REAL(10) WT(30)			!Used when smoothing observational data.
-	REAL(10) LAM_RANGE(2)
+	REAL(KIND=LDP) ANG_TO_HZ
+	REAL(KIND=LDP) KEV_TO_HZ
+	REAL(KIND=LDP) NORM_WAVE
+	REAL(KIND=LDP) NORM_FREQ
+	REAL(KIND=LDP) NORM_FLUX
+	REAL(KIND=LDP) DNU
+	REAL(KIND=LDP) BB_FLUX
+	REAL(KIND=LDP) SCALE_FAC
+	REAL(KIND=LDP) XFAC
+	REAL(KIND=LDP) ADD_FAC
+	REAL(KIND=LDP) LAMC
+	REAL(KIND=LDP) RAD_VEL			!Radial velcity in km/s
+	REAL(KIND=LDP) C_CMS
+	REAL(KIND=LDP) WT(30)			!Used when smoothing observational data.
+	REAL(KIND=LDP) LAM_RANGE(2)
 C
 	LOGICAL NON_MONOTONIC
 	LOGICAL SMOOTH			!Smooth observational data?
@@ -119,7 +120,7 @@ C
 	LOGICAL LOG_X,LOG_Y
 	CHARACTER*10 Y_PLT_OPT,X_UNIT
 	CHARACTER*80 IS_FILE
-	CHARACTER*80 DIRECTORY 
+	CHARACTER*80 DIRECTORY
 	CHARACTER*80 XKEY,YKEY
 	CHARACTER*200 FILENAME
 !
@@ -127,20 +128,20 @@ C
 !
 	LOGICAL HI_ABS                   ! correct for HI absorption
 	LOGICAL H2_ABS                   ! correct for H2 absorption
-	REAL(10) T_IN_K                    ! temp in K of intersteallar H&HII
-	REAL(10) V_TURB                    ! turbulent velocity of "     "
-	REAL(10) V_R                       ! radial v of star w.r.t. ISM
-	REAL(10) LOG_NTOT                  ! log of H column density
-	REAL(10) LOG_H2_NTOT               ! log of H2 column density
+	REAL(KIND=LDP) T_IN_K                    ! temp in K of intersteallar H&HII
+	REAL(KIND=LDP) V_TURB                    ! turbulent velocity of "     "
+	REAL(KIND=LDP) V_R                       ! radial v of star w.r.t. ISM
+	REAL(KIND=LDP) LOG_NTOT                  ! log of H column density
+	REAL(KIND=LDP) LOG_H2_NTOT               ! log of H2 column density
 	LOGICAL FFT_CONVOLVE             ! use FFT method to convolve data
-	REAL(10) INST_RES                  ! desired instrument resolution (dl) 
-	REAL(10) MIN_RES_KMS               ! minimum resolution for model data
-	REAL(10) NUM_RES                   ! number of res. elements to cons.
-	REAL(10) RESOLUTION                ! desired resolution (R=l/dl)
-	REAL(10) WAVE_MAX                  ! max wavelength to convolve over
-	REAL(10) WAVE_MIN                  ! min wavelength to convolve over
-	REAL(10) VSINI
-	REAL(10) EPSILON
+	REAL(KIND=LDP) INST_RES                  ! desired instrument resolution (dl)
+	REAL(KIND=LDP) MIN_RES_KMS               ! minimum resolution for model data
+	REAL(KIND=LDP) NUM_RES                   ! number of res. elements to cons.
+	REAL(KIND=LDP) RESOLUTION                ! desired resolution (R=l/dl)
+	REAL(KIND=LDP) WAVE_MAX                  ! max wavelength to convolve over
+	REAL(KIND=LDP) WAVE_MIN                  ! min wavelength to convolve over
+	REAL(KIND=LDP) VSINI
+	REAL(KIND=LDP) EPSILON
 C
 C Miscellaneous variables.
 C
@@ -150,14 +151,14 @@ C
 	INTEGER CNT
 	INTEGER NHAN
 !
-	REAL(10) LAM_CENT
-	REAL(10) HEIGHT
-	REAL(10) SIGMA
+	REAL(KIND=LDP) LAM_CENT
+	REAL(KIND=LDP) HEIGHT
+	REAL(KIND=LDP) SIGMA
 !
-	REAL(10) T1,T2,T3
-	REAL(10) SUM
-	REAL(10) TEMP
-	REAL(10) TMP_FREQ
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) SUM
+	REAL(KIND=LDP) TEMP
+	REAL(KIND=LDP) TMP_FREQ
 C
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
@@ -166,22 +167,22 @@ C
 	INTEGER, PARAMETER :: LU_IN=10	!For file I/O
 	INTEGER, PARAMETER :: LU_OUT=11
 C
-	REAL(10), PARAMETER :: EDGE_HYD=3.28808662499619D0
-	REAL(10), PARAMETER :: EDGE_HEI=5.94520701882481D0
-	REAL(10), PARAMETER :: EDGE_HE2=13.1581564178623D0
+	REAL(KIND=LDP), PARAMETER :: EDGE_HYD=3.28808662499619D0
+	REAL(KIND=LDP), PARAMETER :: EDGE_HEI=5.94520701882481D0
+	REAL(KIND=LDP), PARAMETER :: EDGE_HE2=13.1581564178623D0
 C
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	COMMON/LINE/ OPLIN,EMLIN               
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	COMMON/LINE/ OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 C
 	LOGICAL ADD_NOISE
 	INTEGER IRAN
-	REAL(10) R_SEED
-	REAL(10) COUNTS
-	REAL(10) POIDEV
+	REAL(KIND=LDP) R_SEED
+	REAL(KIND=LDP) COUNTS
+	REAL(KIND=LDP) POIDEV
 C
 C USR_OPTION variables
 C
@@ -191,33 +192,33 @@ C
 	CHARACTER*120 DEFAULT
 	CHARACTER*120 DESCRIPTION
 C
-	REAL(10) SPEED_OF_LIGHT,FAC,LAM_VAC
+	REAL(KIND=LDP) SPEED_OF_LIGHT,FAC,LAM_VAC
 	INTEGER GET_INDX_SP
 	LOGICAL EQUAL
 	CHARACTER*30 UC
-	CHARACTER*30 FILTER_SET 
+	CHARACTER*30 FILTER_SET
 	EXTERNAL SPEED_OF_LIGHT,EQUAL,FAC,UC,LAM_VAC,GET_INDX_DP
 C
 C 
 C Filter and extinction data:
 C
-	REAL(10) NORM_LUM
-	REAL(10) DIST
-	REAL(10) R_EXT
-	REAL(10) EBMV_GAL
-	REAL(10) EBMV_LMC
-	REAL(10) EBMV_CCM
-	REAL(10) EBMV_SMC         !KN - SMC law
-	REAL(10) RAX,RBX
-	REAL(10) FILTLAM(8),FILTZP(8),FLAM(24),ZERO_POINT
+	REAL(KIND=LDP) NORM_LUM
+	REAL(KIND=LDP) DIST
+	REAL(KIND=LDP) R_EXT
+	REAL(KIND=LDP) EBMV_GAL
+	REAL(KIND=LDP) EBMV_LMC
+	REAL(KIND=LDP) EBMV_CCM
+	REAL(KIND=LDP) EBMV_SMC         !KN - SMC law
+	REAL(KIND=LDP) RAX,RBX
+	REAL(KIND=LDP) FILTLAM(8),FILTZP(8),FLAM(24),ZERO_POINT
 	CHARACTER*1 FILT(8)
-	REAL(10) C1,C2,C3,C4,D,F  !KN For SMC
+	REAL(KIND=LDP) C1,C2,C3,C4,D,F  !KN For SMC
 !
-	REAL(10) RESPONSE1
-	REAL(10) RESPONSE2
-	REAL(10) FILT_INT_BEG
+	REAL(KIND=LDP) RESPONSE1
+	REAL(KIND=LDP) RESPONSE2
+	REAL(KIND=LDP) FILT_INT_BEG
 	INTEGER IF
-	INTEGER ML_ST 
+	INTEGER ML_ST
 	INTEGER ML_END
 
 C
@@ -310,7 +311,7 @@ C
 C
 C This call resets the .sve algorithm.  Specifically it sets the next
 C input answer to be a main option, and all subsequent inputs to be
-C sub-options.  
+C sub-options.
 C
  3	CALL SVE_FILE('RESET')
 C
@@ -345,10 +346,10 @@ C
 C
 	IF(X(1:3) .EQ. 'TIT')THEN
 	  CALL USR_OPTION(NAME,'Title',' ',' ')
-C                    
+C
 C Set X-Ais plotting options.
 C
-	ELSE IF(X(1:2) .EQ.'LX' .OR. X(1:4) .EQ. 'LOGX' .OR. 
+	ELSE IF(X(1:2) .EQ.'LX' .OR. X(1:4) .EQ. 'LOGX' .OR.
 	1                            X(1:4) .EQ. 'LINX')THEN
 	  LOG_X=.NOT. LOG_X
 	  IF(LOG_X)WRITE(T_OUT,*)'Now using Logarithmic X axis'
@@ -391,7 +392,7 @@ C
 C
 C Set Y axis plotting options.
 C
-	ELSE IF(X(1:2) .EQ. 'LY' .OR. X(1:4) .EQ. 'LOGY' .OR. 
+	ELSE IF(X(1:2) .EQ. 'LY' .OR. X(1:4) .EQ. 'LOGY' .OR.
 	1                             X(1:4) .EQ. 'LINY')THEN
 	  LOG_Y=.NOT. LOG_Y
 	  IF(LOG_Y)WRITE(T_OUT,*)'Now using Logarithmic Y axis'
@@ -442,13 +443,13 @@ C
 	    ELSE
 	      WRITE(T_OUT,*)'No scaling done with new model data'
 	    END IF
-! 
+!
 	    WRITE(T_OUT,*)'New model data replaces old data'
 	    WRITE(T_OUT,*)'No plots done with new model data'
 	  ELSE
 C
 C This option is now similar to RD_CONT
-C 
+C
 	    CALL RD_MOD(NU_CONT,OBSF_CONT,NCF_MAX,NCF_MOD,FILENAME,IOS)
 	    IF(IOS .NE. 0)THEN
 	       WRITE(T_OUT,*)'Error reading model data -- no data read'
@@ -551,7 +552,7 @@ C
 	  ELSE IF(IOS .EQ. 0)THEN
 	    T1=MAXVAL(OBSF_CONT(1:NCF_CONT))
 	    IF(T1 .GT. 1.0D+38)THEN
-	      WRITE(6,*)'Data exceeds single precision range: Maximum=',T1 
+	      WRITE(6,*)'Data exceeds single precision range: Maximum=',T1
 	      WRITE(6,*)'Necessary to scale data for plotting'
 	      T1=1.0D0
 	      CALL USR_OPTION(T1,'SCL_FAC','1.0D+40','Factor to divide data by')
@@ -559,18 +560,18 @@ C
 	    END IF
 	    IF(LOG_Y .AND. ABS_VALUE)THEN
 	      OBSF_CONT(1:NCF_CONT)=LOG10(ABS(OBSF_CONT(1:NCF_CONT)))
-	    ELSE IF(LOG_Y)THEN 
+	    ELSE IF(LOG_Y)THEN
 	      FIRST=.TRUE.
 	      DO I=1,NCF_CONT
-	        IF(OBSF_CONT(I) .GT. 0)THEN 
-	          OBSF_CONT(I)=LOG10(OBSF_CONT(I)) 
+	        IF(OBSF_CONT(I) .GT. 0)THEN
+	          OBSF_CONT(I)=LOG10(OBSF_CONT(I))
 	        ELSE
 	          OBSF_CONT(I)=-200
 	          IF(FIRST)THEN
 	             FIRST=.FALSE.
 	             WRITE(6,*)'Warning -- zero or neagtive values encountered'
 	 	     WRITE(6,*)'Log set to -200'
-	          END IF 
+	          END IF
 	        END IF
 	      END DO
 	    END IF
@@ -600,7 +601,7 @@ C
 	    CALL USR_HIDDEN(OBS_COLS,2,2,'COLS','1,2','Columns with data')
 	    CALL RD_OBS_DATA_V2(XV,YV,NCF_MAX,J,FILENAME,OBS_COLS,IOS)
 	    IF(IOS .NE. 0)GOTO 1		!Get another option
-	    DO I=1,J 
+	    DO I=1,J
 	      NU_CONT(I)=ANG_TO_HZ/XV(I)
 	      OBSF_CONT(I)=YV(I)
 	    END DO
@@ -632,9 +633,9 @@ C
 	        YV(I)=0.0
 	      ELSE IF(NU(I) .LT. NU_CONT(NCF_CONT))THEN
 	        YV(I)=0.0
-	      ELSE 
+	      ELSE
 	        DO WHILE (NU(I) .LT. NU_CONT(L+1))
-	          L=L+1           
+	          L=L+1
 	        END DO
 	        T1=(NU(I)-NU_CONT(L+1))/(NU_CONT(L)-NU_CONT(L+1))
 	        T2=(1.0D0-T1)*OBSF_CONT(L+1)+T1*OBSF_CONT(L)
@@ -648,7 +649,7 @@ C
 	  ELSE IF(UNEQUAL)THEN
 C
 C We will use monotonic cubic interpolation. We first verify the range.
-C I & J are temporary variables for the callt o MON_INTERP. I denotes the 
+C I & J are temporary variables for the callt o MON_INTERP. I denotes the
 C first element. Initially J denotes the last element, then the numer of
 C elements that can be interpolated.
 C
@@ -701,7 +702,7 @@ C
 	    IRAN=-R_SEED*1234567
 	    DO I=1,NCF
 	      T1=YV(I)*COUNTS
-	      IF(T1 .GE. 1 .AND. XV(I) .GT. LAM_RANGE(1) .AND. XV(I) 
+	      IF(T1 .GE. 1 .AND. XV(I) .GT. LAM_RANGE(1) .AND. XV(I)
 	1                                       .LT. LAM_RANGE(2))
 	1           YV(I)=POIDEV(T1,IRAN)/COUNTS
 	    END DO
@@ -730,7 +731,7 @@ C
 C 
 C
 	ELSE IF(X(1:6) .EQ. 'RD_OBS')THEN
-	  FILENAME=' '  
+	  FILENAME=' '
 	  CALL USR_OPTION(FILENAME,'File',' ',' ')
 C
 	  SCALE_FAC=1.0D0
@@ -764,7 +765,7 @@ C
 	  IF(SMOOTH)THEN
 	    NHAN=5
 	    CALL USR_OPTION(NHAN,'HAN','5','Number of points for HAN [ODD]')
-	    NHAN=2*(NHAN/2)+1	!Ensures odd. 
+	    NHAN=2*(NHAN/2)+1	!Ensures odd.
 	  END IF
 C
 	  CALL USR_HIDDEN(OBS_COLS,2,2,'COLS','1,2','Columns with data')
@@ -828,7 +829,7 @@ C
 	           K=I
 	           EXIT
 	         END IF
-	      END DO 
+	      END DO
 	      T1=0.0D0; T2=0.0D0; CNT=0
 	      DO I=MAX(1,K-10),MIN(K+10,J)
 	        IF(I .LT. K-1 .OR. I .GT. K+1)THEN
@@ -853,10 +854,10 @@ C
 	      IF(YV(K) .GT. T1+4.0*T2)THEN
 	        YV(K)=YV(K-1)
 	        IF(YV(K-1) .GT. T1+4.0*T2)YV(K)=YV(K-2)
-		T3=YV(K+1) 
+		T3=YV(K+1)
 	        IF(T3 .GT. T1+4.0*T2)T3=YV(K+2)
 	        YV(K)=0.5D0*(YV(K)+T3)
-	      END IF 
+	      END IF
 	    END DO
 	  END IF
 C
@@ -921,7 +922,7 @@ C
 	        YV(I)=YV(I)+ZV(L)*WT(ML)
 	      END DO
 	      YV(I)=YV(I)/T1
-	    END DO	    
+	    END DO	
 	  END IF
 
 C
@@ -951,7 +952,7 @@ C
 ! 
 !
 	ELSE IF(X(1:8) .EQ. 'RD_MONTE')THEN
-	  FILENAME=' '  
+	  FILENAME=' '
 	  CALL USR_OPTION(FILENAME,'File',' ',' ')
 	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
@@ -983,13 +984,13 @@ C
 	    ELSE
 	      WRITE(T_OUT,*)'No scaling done with new model data'
 	    END IF
-! 
+!
 	    WRITE(T_OUT,*)'New model data replaces old data'
 	    WRITE(T_OUT,*)'No plots done with new model data'
 	  ELSE
 !
 ! This option is now similar to RD_CONT
-! 
+!
 	    CALL RD_MONTE_LINE(NU_CONT,OBSF_CONT,NCF_MAX,NCF_MOD,FILENAME,IOS)
 	    IF(IOS .NE. 0)THEN
 	       WRITE(T_OUT,*)'Error reading model data -- no data read'
@@ -1058,7 +1059,7 @@ C
 	   WRITE(T_OUT,*)'Only one INST_RES and RES can be non-zero'
 	   GOTO 100
 	 END IF
-! 
+!
 ! Defaults are those of HUT.
 !
 	 CALL USR_OPTION(WAVE_MIN,'WAVE_MIN','900d0','Minimum Wavelength')
@@ -1075,7 +1076,7 @@ C
 	 EPSILON=0.0D0
 	 CALL SMEAR_V2(NU,OBSF,NCF,
 	1	      WAVE_MAX,WAVE_MIN,
-	1             INST_RES,RESOLUTION,VSINI,EPSILON, 
+	1             INST_RES,RESOLUTION,VSINI,EPSILON,
 	1             MIN_RES_KMS,NUM_RES,FFT_CONVOLVE)
 !
 	ELSE IF(X(1:3) .EQ. 'ROT') THEN
@@ -1112,7 +1113,7 @@ C
 	 FFT_CONVOLVE=.FALSE.
 	 CALL SMEAR_V2(NU,OBSF,NCF,
 	1	         WAVE_MAX,WAVE_MIN,
-	1                INST_RES,RESOLUTION,VSINI,EPSILON, 
+	1                INST_RES,RESOLUTION,VSINI,EPSILON,
 	1                MIN_RES_KMS,NUM_RES,FFT_CONVOLVE)
 !
 	ELSE IF(X(1:3) .EQ. 'EXT') THEN
@@ -1185,7 +1186,7 @@ C
 	  FFT_CONVOLVE=.FALSE.
 	  CALL SMEAR_V2(NU,OBSF,NCF,
 	1	         WAVE_MAX,WAVE_MIN,
-	1                INST_RES,RESOLUTION,VSINI,EPSILON, 
+	1                INST_RES,RESOLUTION,VSINI,EPSILON,
 	1                MIN_RES_KMS,NUM_RES,FFT_CONVOLVE)
 !
 	  WRITE(T_OUT,*)' '
@@ -1242,9 +1243,9 @@ C
 	        YV(I)=0.0
 	      ELSE IF(NU(I) .LT. NU_CONT(NCF_CONT))THEN
 	        YV(I)=0.0
-	      ELSE 
+	      ELSE
 	        DO WHILE (NU(I) .LT. NU_CONT(L+1))
-	          L=L+1           
+	          L=L+1
 	        END DO
 	        T1=(NU(I)-NU_CONT(L+1))/(NU_CONT(L)-NU_CONT(L+1))
 	        T2=(1.0D0-T1)*OBSF_CONT(L+1)+T1*OBSF_CONT(L)
@@ -1258,7 +1259,7 @@ C
 	  ELSE IF(UNEQUAL)THEN
 C
 C We will use monotonic cubic interpolation. We first verify the range.
-C I & J are temporary variables for the callt o MON_INTERP. I denotes the 
+C I & J are temporary variables for the callt o MON_INTERP. I denotes the
 C first element. Initially J denotes the last element, then the numer of
 C elements that can be interpolated.
 C
@@ -1318,8 +1319,8 @@ C
 	    T1=2.5; T2=5.5
 	    CALL DETERM_REDDENING(OBSF_OBS,NU_OBS,NOBS,OBSF,NU,NCF,T1,T2)
 	  END IF
-! 
-	ELSE IF(X(1:4) .EQ. 'FLAM' .OR. 
+!
+	ELSE IF(X(1:4) .EQ. 'FLAM' .OR.
 	1     X(1:4) .EQ. 'WRFL' .OR.  X(1:3) .EQ. 'FNU' .OR.
 	1                X(1:4) .EQ. 'EBMV') THEN
 !
@@ -1342,7 +1343,7 @@ C
 	    CALL USR_OPTION(r_ext,'R_EXT','3.1D0',
 	1         'R_EXT for Cardelli, Clayton, Mathis extinction law')
 	  END IF
-!                                                                          
+!
 	  CALL USR_OPTION(EBMV_GAL,'EBMV_GAL','0.0',
 	1             'Galactic E(B-V) to correct for I.S. extinction')
 	  CALL USR_OPTION(EBMV_LMC,'EBMV_LMC','0.0',
@@ -1386,8 +1387,8 @@ C
 	      ELSE IF(T1 .LT. 10)THEN
 	        T2=T1-8
 	        RAX=-1.073-T2*(0.628-T2*(0.137-0.070*T2))
-	        RBX=13.670+T2*(4.257-T2*(0.420-0.374*T2))               
-	      ELSE 
+	        RBX=13.670+T2*(4.257-T2*(0.420-0.374*T2))
+	      ELSE
 	        T1=10
 	        T2=T1-8
 	        RAX=-1.073-T2*(0.628-T2*(0.137-0.070*T2))
@@ -1425,7 +1426,7 @@ C
 	        AL_D_EBmV(I)=(R_EXT-1.64)+1.048*T1+1.01/( (T1-4.60)**2+0.28 )
 	      ELSE IF( T1 .LT. 7.14)THEN
 	        AL_D_EBmV(I)=(R_EXT-0.91)+0.848*T1+1.01/( (T1-4.60)**2+0.28 )
-	      ELSE IF( T1 .LT. 11)THEN                                      
+	      ELSE IF( T1 .LT. 11)THEN
                 AL_D_EBmV(I)=(R_EXT+12.97)-3.20*T1+0.2975*T1*T1
 	      ELSE
 	        T1=11.0
@@ -1501,7 +1502,7 @@ C
 	          RBX=T2*(1.41338+T2*(2.28305+T2*(1.07233-T2*(5.38434
 	1                 +T2*(0.62251-T2*(5.30260-2.09002*T2))))))
 	          AL_D_EBmV(I)=R_EXT*(RAX+RBX/R_EXT)
-	        ELSE 
+	        ELSE
 	          C1=-4.959
 	          C2=2.264*T1
 	          D=(T1**2)/(((T1**2-4.6**2)**2)+(T1**2))
@@ -1542,7 +1543,7 @@ C
 	    END DO
 	  ELSE IF(OVER)THEN
 	    OBSF(1:NCF)=YV(1:NCF)
-	  ELSE 
+	  ELSE
 	    CALL CURVE_LAB(NCF,XV,YV,TITLE)
 	  END IF
 	ELSE IF(X(1:2) .EQ.'RV')THEN
@@ -1551,7 +1552,7 @@ C
 	  RAD_VEL=1.0D+05*RAD_VEL
 	  DO I=1,NCF
 	    NU(I)=NU(I)*(1.0D0-RAD_VEL/C_CMS)
-	  END DO 
+	  END DO
 C
 C The follwing option cumputes the luminosity below the 3 main H/He edges,
 C and the number of photons emitted.
@@ -1671,7 +1672,7 @@ C
 	      FILT_INT_BEG =FILT_ST_LAM(IF)+(I-1)*FILT_DEL_LAM(IF)
 	      RESPONSE1=RESPONSE2
 	      T1=(XV(ML+1)-FILT_INT_BEG)/FILT_DEL_LAM(IF)
-	      RESPONSE2=(1.0D0-T1)*NORM_PASS(I,IF)+T1*NORM_PASS(I+1,IF) 
+	      RESPONSE2=(1.0D0-T1)*NORM_PASS(I,IF)+T1*NORM_PASS(I+1,IF)
 	      IF(ABS(T1) .GT. 1)RESPONSE2=0.0D0
 	      ZV(IF)=ZV(IF)+0.5D0*(RESPONSE1*YV(ML)+RESPONSE2*YV(ML+1))*(XV(ML+1)-XV(ML))
 	      SUM=SUM+0.5D0*(RESPONSE1+RESPONSE2)*(XV(ML+1)-XV(ML))
@@ -1703,9 +1704,9 @@ C
 	    CALL GET_MAG(NU,OBSF,NCF,DIST,FILTER_SET,LU_OUT)
 	  ELSE
 	    CALL GET_MAG(NU,OBSF,NCF,DIST,FILTER_SET,LU_OUT)
-	  END IF 
+	  END IF
 !
-!	  WRITE(LU_OUT,104)DIST	  
+!	  WRITE(LU_OUT,104)DIST	
 !	  DO L=1,8
 !	    MLST=1
 !	    DO ML=MLST,NCF
@@ -1713,11 +1714,11 @@ C
 !	        T1=LOG10(OBSF(ML-1))-LOG10(NU(ML-1)*FILTLAM(L)/0.2998)
 !	1       *(LOG10(OBSF(ML)/OBSF(ML-1))/(LOG10(NU(ML)/NU(ML-1))))
 !	        T1=5.0*LOG10(DIST)-2.5*T1+2.5*LOG10(FILTZP(L))
-!	        MLST=ML         
+!	        MLST=ML
 !	        GOTO 102
 !	       END IF
 !	    END DO
-!102	  CONTINUE         
+!102	  CONTINUE
 !	    WRITE(LU_OUT,103)FILTLAM(L),FILTZP(L),FILT(L),T1
 !103	    FORMAT(2X,F7.4,5X,F7.1,8X,A1,5X,F6.2)
 !104	    FORMAT(2X,' Assumed Distance is',F5.1,' kpc',/
@@ -1744,7 +1745,7 @@ C
 !
 C
 	ELSE IF(X .EQ. 'BB')THEN
-	  
+	
 	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model data')
 	  CALL USR_OPTION(TEMP,'TEMP','3.0',' ')
 !
@@ -1783,7 +1784,7 @@ C
 	         YV(I)=TWOHCSQ*(T1**3)/(EXP(T3)-1.0D0)
 	       END IF
 	      XV(I)=T1
-	    END DO         
+	    END DO
 	    IF(NORM_WAVE .EQ. 0.0D0)THEN
 	      T1=4.0D0*ATAN(1.0D0)    !PI
 	      DO I=1,NBB
@@ -1841,7 +1842,7 @@ C
 	  K=20.0D0*SIGMA/T1
 	  IF(ALLOCATED(XVEC))DEALLOCATE(XVEC,YVEC)
 	  ALLOCATE (XVEC(K),YVEC(K))
-	  CALL CREATE_GAUSS(XVEC,YVEC,LAM_CENT,SIGMA,HEIGHT,T1,K) 
+	  CALL CREATE_GAUSS(XVEC,YVEC,LAM_CENT,SIGMA,HEIGHT,T1,K)
 	  CALL DP_CURVE(K,XVEC,YVEC)
 !
 	ELSE IF(X(1:5) .EQ. 'AV_EN')THEN
@@ -1867,8 +1868,8 @@ C
 C
 C 
 C
-	ELSE IF(X(1:2) .EQ. 'LI' .OR. X(1:4) .EQ. 'LIST' .OR. 
-	1                             X(1:2) .EQ. 'HE' 
+	ELSE IF(X(1:2) .EQ. 'LI' .OR. X(1:4) .EQ. 'LIST' .OR.
+	1                             X(1:2) .EQ. 'HE'
 	1          .OR. X(1:4) .EQ. 'HELP')THEN
 	  WRITE(T_OUT,*)' '
 	  WRITE(T_OUT,*)'Please see the HTML web pages in $CMFDIST/txt_files for help'
@@ -1888,7 +1889,8 @@ C
 C 
 C
 	FUNCTION FAC(N)
-	REAL(10) FAC
+	USE SET_KIND_MODULE
+	REAL(KIND=LDP) FAC
 	INTEGER N
 	INTEGER, PARAMETER :: T_OUT=5
 C

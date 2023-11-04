@@ -12,6 +12,7 @@
 	SUBROUTINE RD_PHOT_DIE_V1(ID,EDGE,LEVELNAME,NXzV,GION_GS,
 	1            VSMOOTH_KMS,DO_AUTO,DO_WI,
 	1            DESC,LUIN,LUOUT,FILENAME)
+	USE SET_KIND_MODULE
 !
 ! Photoionization data module.
 !
@@ -37,8 +38,8 @@
 !
 	INTEGER ID			!Species identifier (integer key)
 	INTEGER NXzV			!Number of levels in FULL atom
-	REAL(10) EDGE(NXzV)		!Ionization frequency (10^15 Hz)
-	REAL(10) GION_GS			!St. Weight of g.s. of ion (eg CIII).
+	REAL(KIND=LDP) EDGE(NXzV)		!Ionization frequency (10^15 Hz)
+	REAL(KIND=LDP) GION_GS			!St. Weight of g.s. of ion (eg CIII).
 	INTEGER LUIN,LUOUT
 	LOGICAL DO_AUTO
 	LOGICAL DO_WI
@@ -48,44 +49,44 @@
 ! profile to ensure that it is not undersampled. In principal it should
 ! be a function of T and VTURB.
 !
-	REAL(10) VSMOOTH_KMS
+	REAL(KIND=LDP) VSMOOTH_KMS
 	CHARACTER*(*) DESC
 	CHARACTER*(*) FILENAME
 !
 ! External functions.
 !
-	REAL(10) FUN_PI,SPEED_OF_LIGHT
+	REAL(KIND=LDP) FUN_PI,SPEED_OF_LIGHT
 	INTEGER ERROR_LU,ICHRLEN
 	EXTERNAL ERROR_LU,FUN_PI,ICHRLEN,SPEED_OF_LIGHT
 !
 ! Common block with opacity/emissivity constants.
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 !
 ! Local variables
 !
-	REAL(10), PARAMETER :: IZERO=0
+	REAL(KIND=LDP), PARAMETER :: IZERO=0
 !
-	REAL(10) EDGEDIE
-	REAL(10) EINA
-	REAL(10) GUPDIE
-	REAL(10) C_KMS
-	REAL(10) IONIZATION_ENERGY
+	REAL(KIND=LDP) EDGEDIE
+	REAL(KIND=LDP) EINA
+	REAL(KIND=LDP) GUPDIE
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) IONIZATION_ENERGY
 	CHARACTER(LEN=80) TRANSDIE
 	CHARACTER(LEN=30) LS_NAME
 !
 ! NB: DIELEV is double precision so that it can be passed directly to
 ! INDEXX.
 !
-	REAL(10), ALLOCATABLE :: DIELEV(:)
-	REAL(10), ALLOCATABLE :: VEC_DP_WRK(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DIELEV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: VEC_DP_WRK(:)
 	INTEGER, ALLOCATABLE :: VEC_INDX(:)
 !
-	REAL(10), ALLOCATABLE :: DIE_LEV_G(:)
-	REAL(10), ALLOCATABLE :: DIE_LEV_ENERGY(:)
-	REAL(10), ALLOCATABLE :: DIE_LEV_AUTO(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DIE_LEV_G(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DIE_LEV_ENERGY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DIE_LEV_AUTO(:)
 	CHARACTER(LEN=30), ALLOCATABLE :: DIE_LEV_NAME(:)
 !
 	INTEGER NUM_D_RD
@@ -98,20 +99,20 @@
 !
 	INTEGER NUM_OF_MATCHES
 	INTEGER LOW_PNT
-	INTEGER UP_PNT 
+	INTEGER UP_PNT
 	CHARACTER(LEN=30) LOW_NAME
 	CHARACTER(LEN=30) UP_NAME
 	LOGICAL NEW_FILE_FORMAT
 !
-	REAL(10) GSUM
-	REAL(10) T1
-	REAL(10) DEL_NU,NU_DOP
+	REAL(KIND=LDP) GSUM
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) DEL_NU,NU_DOP
 	CHARACTER*132 STRING
 	LOGICAL SPLIT_J
 !
-	REAL(10) A10,A20,A30
-	REAL(10) A1,A2,A3,M1,M2,M3		!Effective recombination rate.
-	REAL(10) WIA1,WIA2,WIA3,WIM1,WIM2,WIM3    !(included and missing).
+	REAL(KIND=LDP) A10,A20,A30
+	REAL(KIND=LDP) A1,A2,A3,M1,M2,M3		!Effective recombination rate.
+	REAL(KIND=LDP) WIA1,WIA2,WIA3,WIM1,WIM2,WIM3    !(included and missing).
 !
 	LUER=ERROR_LU()
 !
@@ -189,7 +190,7 @@
 	  IONIZATION_ENERGY=-1000
 	  SPLIT_J=.FALSE.
 !
-! Read in all keywords. We continue reading until we come across 
+! Read in all keywords. We continue reading until we come across
 ! a blank line. The data after 'Format date' (or 'Date') must be
 ! contiguous.
 !
@@ -255,7 +256,7 @@
 !
 ! NB: We set NDIE_MAX=3*NUM_D_RD to allow for the extra dielectronic
 !     transitions introudced when the data is NOT split into individual J
-!     states, but the lower levels in the model atom might be. 
+!     states, but the lower levels in the model atom might be.
 !     This is not very satisfactory.
 !
 	IF(SPLIT_J)THEN
@@ -346,7 +347,7 @@
 	  END DO
 !
 ! Finally we can read in the dielectronic transition data. The first
-! data set is for transition to BOUND levels. Blank lines and comments 
+! data set is for transition to BOUND levels. Blank lines and comments
 ! (i.e., lines beginning with a !) can be inserted between the energy levels.
 !
 	  NUM_OF_MATCHES=0
@@ -434,10 +435,10 @@
 	       PD(ID)%NU_ZERO(J)=1.0D-10*C_KMS*
 	1             (DIE_LEV_ENERGY(UP_PNT)-IONIZATION_ENERGY)+EDGE(NINT(DIELEV(J)))
 	       WRITE(LUER,*) PD(ID)%OSC(J),PD(ID)%GAMMA(J),PD(ID)%NU_ZERO(J),DIELEV(J)
-	     END DO      
-	  END DO 
+	     END DO
+	  END DO
 !
-	  WRITE(LUER,*)'Number of transitions read in is',NUM_OF_MATCHES,CNT     
+	  WRITE(LUER,*)'Number of transitions read in is',NUM_OF_MATCHES,CNT
 !
 ! Now read in the free-free tranistions. These are always included in the
 ! CMFGEN calculation, if present.
@@ -449,7 +450,7 @@
 	     END DO
 	     STRING=ADJUSTL(STRING)
 !
-! Get level names involved in this transition. We allow for gaps between 
+! Get level names involved in this transition. We allow for gaps between
 ! first level name and '-', and extra spaces.
 !
 	    L1=INDEX(STRING,'-'); LOW_NAME=STRING(1:L1-1)

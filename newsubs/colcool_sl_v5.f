@@ -7,11 +7,12 @@
 	1             HN_F,HNST_F_ON_S,A_F,W_F,EDGE_F,G_F,LEVNAME_F,
 	1             F_TO_S_MAP,N_F,
 	1             ZION,ID,COL_FILE,OMEGA_COL,ED,T,ND)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 20-Sec-2023 : Updated to use standard value for Planck's constant (LONG -- 15-Oct-2023).
 ! Altered 04-Oct-2016 : SUBCOL_MULTI updated to V6.
-! Altered 05-Apr-2011 : Updated from V4 
+! Altered 05-Apr-2011 : Updated from V4
 !                          Most changes 02-Dec-10.
 !                          HNST replaced in call by HNST_F_ON_S.
 !	                   Call to SUBCOL_MULTI_V5 updated (from V4)
@@ -23,46 +24,46 @@
 !                          Changed to _V3 for consistency with SUBCOL.
 ! Created 07-JUn-1995 :Based on COLGENCOOL
 !
-	REAL(10) PLANCKS_CONSTANT
+	REAL(KIND=LDP) PLANCKS_CONSTANT
 	EXTERNAL OMEGA_COL, PLANCKS_CONSTANT
 	EXTERNAL ERROR_LU
 	INTEGER ERROR_LU	
 !
 	INTEGER ID
 	INTEGER N_S,N_F,ND
-	REAL(10) COOL(ND),CRR(ND),CPR(ND)
-	REAL(10) CNM(N_S,N_S),DCNM(N_S,N_S)
-	REAL(10) ZION,T(ND),ED(ND)
+	REAL(KIND=LDP) COOL(ND),CRR(ND),CPR(ND)
+	REAL(KIND=LDP) CNM(N_S,N_S),DCNM(N_S,N_S)
+	REAL(KIND=LDP) ZION,T(ND),ED(ND)
 !
-	REAL(10) HN_S(N_S,ND),HNST_S(N_S,ND)
-	REAL(10) dlnHNST_S_dlnT(N_S,ND)
+	REAL(KIND=LDP) HN_S(N_S,ND),HNST_S(N_S,ND)
+	REAL(KIND=LDP) dlnHNST_S_dlnT(N_S,ND)
 !
-	REAL(10) HN_F(N_F,ND)
-	REAL(10) HNST_F_ON_S(N_F,ND)	
-	REAL(10) W_F(N_F,ND)
-	REAL(10) A_F(N_F,N_F),EDGE_F(N_F),G_F(N_F)
+	REAL(KIND=LDP) HN_F(N_F,ND)
+	REAL(KIND=LDP) HNST_F_ON_S(N_F,ND)	
+	REAL(KIND=LDP) W_F(N_F,ND)
+	REAL(KIND=LDP) A_F(N_F,N_F),EDGE_F(N_F),G_F(N_F)
 	INTEGER F_TO_S_MAP(N_F)
 	CHARACTER*(*) COL_FILE,LEVNAME_F(N_F)
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Local variables.
 !
-	REAL(10) H,TMP_ED
+	REAL(KIND=LDP) H,TMP_ED
 	INTEGER I,J
 	INTEGER, PARAMETER :: IONE=1
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 !
-	REAL(10) OMEGA_F(N_F,N_F)
-	REAL(10) dln_OMEGA_F_dlnT(N_F,N_F)
+	REAL(KIND=LDP) OMEGA_F(N_F,N_F)
+	REAL(KIND=LDP) dln_OMEGA_F_dlnT(N_F,N_F)
 !
 	H=PLANCKS_CONSTANT()*1.0D+15             !ergs/s (*1.0E+15 due to *nu)
 	TMP_ED=1.0D0
 !
 	DO I=1,ND			!Which depth
-!                            
+!
 ! Compute collisional cross-sections (and their T derivatives)
 ! The last line is COMPUTE_BA, FIXED_T, LST_ITERATION.
 ! With the adopted settings we do not compute dln_OMEGA_F_dlNT.
@@ -76,7 +77,7 @@
 	1          ZION,ID,COL_FILE,OMEGA_COL,
 	1          F_TO_S_MAP,COOL(I),T(I),TMP_ED,IONE,
 	1          L_FALSE,L_TRUE,L_TRUE)
-!                        
+!
 	  CPR(I)=0.0D0
 	  CRR(I)=0.0D0
 	  COOL(I)=COOL(I)*ED(I)*H

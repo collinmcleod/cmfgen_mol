@@ -1,50 +1,51 @@
 !
 ! Subroutine to designed to create a NEW R grid given an old R grid, and optical depth scale on this
-! grid. The routine places points places points logarithmically in R and TAU. 
+! grid. The routine places points places points logarithmically in R and TAU.
 !
 	SUBROUTINE ADJUST_ATM_R_GRID(R,OLD_R,OLD_V,OLD_TAU,
 	1           V_CON,V_RAT_MAX,
 	1           IB_RAT,OB_RAT,DTAU2_ON_DTAU1,N_IB_INS,N_OB_INS,ND,NS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER NS			!For old grid
 	INTEGER ND			!For final grid.
 !
-	REAL(10) R(ND)			!Returned
-	REAL(10) OLD_R(NS)		!Input
-	REAL(10) OLD_V(NS)		!Input
-	REAL(10) OLD_TAU(NS)		!Input
+	REAL(KIND=LDP) R(ND)			!Returned
+	REAL(KIND=LDP) OLD_R(NS)		!Input
+	REAL(KIND=LDP) OLD_V(NS)		!Input
+	REAL(KIND=LDP) OLD_TAU(NS)		!Input
 !
-	REAL(10) LOG_OLD_R(NS)
-	REAL(10) LOG_OLD_V(NS)
-	REAL(10) LOG_OLD_TAU(NS)
+	REAL(KIND=LDP) LOG_OLD_R(NS)
+	REAL(KIND=LDP) LOG_OLD_V(NS)
+	REAL(KIND=LDP) LOG_OLD_TAU(NS)
 !
-	REAL(10) LOG_R(ND)
-	REAL(10) V(ND)
-	REAL(10) LOG_V(ND)
-	REAL(10) TAU(ND)
-	REAL(10) LOG_TAU(ND)
+	REAL(KIND=LDP) LOG_R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) LOG_V(ND)
+	REAL(KIND=LDP) TAU(ND)
+	REAL(KIND=LDP) LOG_TAU(ND)
 !
-	REAL(10) V_CON
-	REAL(10) V_RAT_MAX
-	REAL(10) IB_RAT			!dTAU(I+1)/dTAU(I) near inner boudary.
-	REAL(10) OB_RAT			!dTAU(I+1)/dRAU(I) near outer bunary
-	REAL(10) DTAU2_ON_DTAU1		!DTAU(2)/DTAU(1) at outer boundary.
+	REAL(KIND=LDP) V_CON
+	REAL(KIND=LDP) V_RAT_MAX
+	REAL(KIND=LDP) IB_RAT			!dTAU(I+1)/dTAU(I) near inner boudary.
+	REAL(KIND=LDP) OB_RAT			!dTAU(I+1)/dRAU(I) near outer bunary
+	REAL(KIND=LDP) DTAU2_ON_DTAU1		!DTAU(2)/DTAU(1) at outer boundary.
 !
 	INTEGER N_IB_INS
 	INTEGER N_OB_INS
 !
-	REAL(10) LOG_V_CON
-	REAL(10) R_CON, LOG_R_CON
-	REAL(10) TAU_CON, LOG_TAU_CON
+	REAL(KIND=LDP) LOG_V_CON
+	REAL(KIND=LDP) R_CON, LOG_R_CON
+	REAL(KIND=LDP) TAU_CON, LOG_TAU_CON
 	INTEGER I_CON
 !
-	REAL(10) dTAU
-	REAL(10) dLOG_TAU			!d(LOG(TAU))
-	REAL(10) dLOG_TAU_SAVE
-	REAL(10) dLOG_TAU1
-	REAL(10) dLOG_TAU2
-	REAL(10) T1,T2,T3
+	REAL(KIND=LDP) dTAU
+	REAL(KIND=LDP) dLOG_TAU			!d(LOG(TAU))
+	REAL(KIND=LDP) dLOG_TAU_SAVE
+	REAL(KIND=LDP) dLOG_TAU1
+	REAL(KIND=LDP) dLOG_TAU2
+	REAL(KIND=LDP) T1,T2,T3
 !
 	INTEGER LU
 	INTEGER, PARAMETER :: IONE=1

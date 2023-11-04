@@ -9,6 +9,7 @@ C
 	1             CIVLEV,ARAD,GAM2,GAM4,KNOWN_LEVEL_ENERGY,
 	1             IONCIV,ZSCR,LU,NCIV,
 	1             BND_LEV,BRIEF,CIVOSC_DATE,DESCRIPTOR,FILENAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered  17-Mar-1997 : Cleaned. FIlename inserted in CALL.
@@ -31,20 +32,20 @@ C Constants for opacity etc.
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 C
 C Species arrays
 C
-	REAL(10) FEDGECIV(NCIV)			!Photoionization frequency
-	REAL(10) ACIV(NCIV,NCIV)			!Oscilator strengths
-	REAL(10) GCIV(NCIV)			!Statistical weights
-	REAL(10) ARAD(NCIV)			!
-	REAL(10) GAM2(NCIV)			!
-	REAL(10) GAM4(NCIV)			!
-	REAL(10) IONCIV,ZSCR
+	REAL(KIND=LDP) FEDGECIV(NCIV)			!Photoionization frequency
+	REAL(KIND=LDP) ACIV(NCIV,NCIV)			!Oscilator strengths
+	REAL(KIND=LDP) GCIV(NCIV)			!Statistical weights
+	REAL(KIND=LDP) ARAD(NCIV)			!
+	REAL(KIND=LDP) GAM2(NCIV)			!
+	REAL(KIND=LDP) GAM4(NCIV)			!
+	REAL(KIND=LDP) IONCIV,ZSCR
 !
 	LOGICAL KNOWN_LEVEL_ENERGY(NCIV)
-C            
+C
 C On output, TRANS is an integer array containg the tranistion number
 C numbered with all low i tranistions done first.
 C
@@ -64,7 +65,7 @@ C
 	LOGICAL BND_LEV
 C
 C If BRIEF is false, the oscialtor strengths are not output in reverse
-C order (i.e. listing of all transitions downward from level 2, downward 
+C order (i.e. listing of all transitions downward from level 2, downward
 C from level 3 etc.
 C
 	LOGICAL BRIEF
@@ -72,14 +73,14 @@ C
 C External functions called.
 C
 	EXTERNAL SPEED_OF_LIGHT,LAMVACAIR
-	REAL(10) SPEED_OF_LIGHT,LAMVACAIR
+	REAL(KIND=LDP) SPEED_OF_LIGHT,LAMVACAIR
 !
-	REAL(10) NEW_ARAD(NCIV)			!
+	REAL(KIND=LDP) NEW_ARAD(NCIV)			!
 C
 C Local Variables
 C
-	REAL(10) C_LIGHT,T1,T2
-	REAL(10) NU_TO_EV
+	REAL(KIND=LDP) C_LIGHT,T1,T2
+	REAL(KIND=LDP) NU_TO_EV
 	INTEGER LNGTH,I,J,IOS
 	INTEGER FMTGAP,NUM_TRAN,NMAX
 	CHARACTER*1   FORMFEED
@@ -92,7 +93,7 @@ C
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: T_OUT=6
 C
-	FORMFEED=CHAR(12)                                
+	FORMFEED=CHAR(12)
 	C_LIGHT=SPEED_OF_LIGHT()		!cm s^-1
 	NU_TO_EV=1.0D0/0.241798836		!Conversion factor from 10^15 Hz to eV
 !
@@ -105,7 +106,7 @@ C
 	T1=OPLIN/EMLIN*TWOHCSQ
 	NEW_ARAD(:)=0.0D0
 	DO I=1,NCIV-1
-	  DO J=I+1,NCIV                
+	  DO J=I+1,NCIV
 	    ACIV(J,I)=T1*ABS(ACIV(I,J))*GCIV(I)/GCIV(J)
 	1     *( (FEDGECIV(I)-FEDGECIV(J))**2 )
 	    NEW_ARAD(J)=NEW_ARAD(J)+ACIV(J,I)
@@ -122,7 +123,7 @@ C
 	CLOSE(UNIT=LU)
 C
 C If desired, only states which lie below the ground state
-C ionization state will be considered. 
+C ionization state will be considered.
 C
 	NMAX=NCIV
 	IF(BND_LEV)THEN
@@ -223,7 +224,7 @@ C
 	  WRITE(LU,120)CIVLEV(I)(1:LNGTH),GCIV(I)
 	1,  ( IONCIV-FEDGECIV(I)*1.0D+15/C_LIGHT )
 	1,   FEDGECIV(I),FEDGECIV(I)*NU_TO_EV
-	1,   ( 1.0D-07*C_LIGHT/FEDGECIV(I)),J 
+	1,   ( 1.0D-07*C_LIGHT/FEDGECIV(I)),J
 	1,    NEW_ARAD(I),GAM2(I),GAM4(I)
 	END DO
 120	FORMAT(A,2X,F8.1,3X,F12.4,3X,F9.5,2X,F7.3,3X,

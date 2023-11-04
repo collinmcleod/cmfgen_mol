@@ -1,5 +1,5 @@
 C
-C Subroutine to compute the CMF line frequencies. The spacing of the line 
+C Subroutine to compute the CMF line frequencies. The spacing of the line
 C frequencies is determined by passed parameters which specify the
 C the resonance zone extent, spacing in Doppler widths etc.
 C
@@ -17,6 +17,7 @@ c
 	1		NU_CONT,NCF,FRAC_DOP,VINF,dV_CMF_PROF,
 	1               dV_CMF_WING,ES_WING_EXT,R_CMF_WING_EXT,
 	1               INCLUDE_LINE_CENTERS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Created: 22-Dec-1998: Complete rewrite of INS_LINE_V4.
@@ -29,29 +30,29 @@ C
 C Vectors returned by subroutine:
 C
 C Line+continuum frequencies
-	REAL(10) FREQ(NFREQ_MAX)			!Continuum frequencies
-	INTEGER*4 LINES_THIS_FREQ(NFREQ_MAX)	!Indicates that this frequency 
+	REAL(KIND=LDP) FREQ(NFREQ_MAX)			!Continuum frequencies
+	INTEGER*4 LINES_THIS_FREQ(NFREQ_MAX)	!Indicates that this frequency
 						!  has line contributions,
 C
-	INTEGER*4 LINE_ST_INDX(N_LINES)		!Start index for the line 
+	INTEGER*4 LINE_ST_INDX(N_LINES)		!Start index for the line
 						!  in the NEW frequency array.
-	INTEGER*4 LINE_END_INDX(N_LINES)	!End index for the line 
+	INTEGER*4 LINE_END_INDX(N_LINES)	!End index for the line
 						! in the NEW frequency array.
 C
 C Passed vectors.
 C
-	REAL(10) NU_CONT(NCF)		!Continuum frequencies
-	REAL(10) NU_LINE(N_LINES)		!Line frequencies
-	REAL(10) NU_STRT_LINE(N_LINES)	!Start frequency of resoance zone.
-	REAL(10) VEC_MIN_VDOP(N_LINES)	!Minimum doppler velocity for line.
+	REAL(KIND=LDP) NU_CONT(NCF)		!Continuum frequencies
+	REAL(KIND=LDP) NU_LINE(N_LINES)		!Line frequencies
+	REAL(KIND=LDP) NU_STRT_LINE(N_LINES)	!Start frequency of resoance zone.
+	REAL(KIND=LDP) VEC_MIN_VDOP(N_LINES)	!Minimum doppler velocity for line.
 	CHARACTER*(*) TRANS_TYPE(N_LINES)
 C
 C Passed constants:
-	REAL(10) VINF		!Terminal velocity of wind.
-	REAL(10) FRAC_DOP		!Indicates dNU across line in Doppler widths.
-	REAL(10) dV_CMF_PROF	!Indicate spacing in profile but outside
+	REAL(KIND=LDP) VINF		!Terminal velocity of wind.
+	REAL(KIND=LDP) FRAC_DOP		!Indicates dNU across line in Doppler widths.
+	REAL(KIND=LDP) dV_CMF_PROF	!Indicate spacing in profile but outside
                                 !  resonance zone (in km/s).
-	REAL(10) dV_CMF_WING	!Indicate spacing in wings (i.e. outside 
+	REAL(KIND=LDP) dV_CMF_WING	!Indicate spacing in wings (i.e. outside
 				!  intrinsic profile) (in km/s).
 C
 C R_CMF_WING_EXT indicates how far profile should extend beyond red edge
@@ -62,27 +63,27 @@ C
 C ES_WING_EXT is useful when have non-coherent electron scattering.
 C Used for both blue and red sides of the line profile.
 C
-	REAL(10) ES_WING_EXT
-	REAL(10) R_CMF_WING_EXT
+	REAL(KIND=LDP) ES_WING_EXT
+	REAL(KIND=LDP) R_CMF_WING_EXT
 C
 	LOGICAL INCLUDE_LINE_CENTERS
 C
 C 
-	REAL(10) NU_END_LINE(N_LINES)
+	REAL(KIND=LDP) NU_END_LINE(N_LINES)
 C
 C Local variables.
 C
-	REAL(10) dNU_on_NU	!Actual spacing used across intrinsic line 
+	REAL(KIND=LDP) dNU_on_NU	!Actual spacing used across intrinsic line
 				!  profile given by dNU =NU*dNU_on_NU
 C
-	REAL(10) ES_BLUE_WING_EXT		!In km/s
-	REAL(10) ES_RED_WING_EXT
-	REAL(10) CUR_RED_PROF_EXT		!10^15 Hz
-	REAL(10) EDGE_SEP_FAC
-	REAL(10) MIN_FREQ_RAT
+	REAL(KIND=LDP) ES_BLUE_WING_EXT		!In km/s
+	REAL(KIND=LDP) ES_RED_WING_EXT
+	REAL(KIND=LDP) CUR_RED_PROF_EXT		!10^15 Hz
+	REAL(KIND=LDP) EDGE_SEP_FAC
+	REAL(KIND=LDP) MIN_FREQ_RAT
 C
 	INTEGER*4 INDX		!Current frequency index.
-	INTEGER*4 LN_INDX	!Current line whose frequencies we are 
+	INTEGER*4 LN_INDX	!Current line whose frequencies we are
 				!   installing.
 	INTEGER*4 NUM_RES_LINES
 	INTEGER*4 LOCAL_N_LINES
@@ -90,17 +91,17 @@ C
 	INTEGER*4 ML		!Continuum frequency index
 	INTEGER*4 I,K		!Miscellaneous loop variables.
 	INTEGER*4 LU_ER
-	REAL(10) C_KMS
-	REAL(10) dNU
-	REAL(10) dNU_NEXT
-	REAL(10) T1
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) dNU
+	REAL(KIND=LDP) dNU_NEXT
+	REAL(KIND=LDP) T1
 C
 	LOGICAL EDGE_FREQ(NCF)
 C
 C External functions
 C
 	INTEGER*4 ERROR_LU
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 C
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()
@@ -172,9 +173,9 @@ C lowest frequencies.
 C
 	dNU_on_NU=FRAC_DOP*MINVAL(VEC_MIN_VDOP)/C_KMS
 C
-c To avoid numerical instabilities in the iteration procedure when solving 
-C for the corrections we ensure that the frequencies bracketing a bound-free 
-C edge are EDGE_SEP_FAC*FRAC_DOP Doppler widths appart. We adjust the lower 
+c To avoid numerical instabilities in the iteration procedure when solving
+C for the corrections we ensure that the frequencies bracketing a bound-free
+C edge are EDGE_SEP_FAC*FRAC_DOP Doppler widths appart. We adjust the lower
 C frequency to ensure this. MIN_FREQ_RAT is the minimum ratio allowed between
 C successive frequencies.
 C
@@ -217,7 +218,7 @@ C
 C Find the first line that is to be included as a blanketed line.
 C
 	LN_INDX=1
-	DO WHILE(LN_INDX .LE. N_LINES .AND. 
+	DO WHILE(LN_INDX .LE. N_LINES .AND.
 	1          TRANS_TYPE(LN_INDX)(1:3) .NE. 'BLA')
 	  LN_INDX=LN_INDX+1
 	END DO
@@ -236,8 +237,8 @@ C
 C
 C Compute the frequency grid. We use a combination of CONTINUUM and LINE
 C frequencies. Continuum frequencies are inserted simultaneously with the
-C line frequencies (rather than after the line grid is created) to avoid 
-C the need for extra temporary storage for LINES_THIS_FREQ, and to avoid 
+C line frequencies (rather than after the line grid is created) to avoid
+C the need for extra temporary storage for LINES_THIS_FREQ, and to avoid
 C having to alter LINE_ST_INDX etc.
 C
 C All edge frequencies are included.
@@ -260,11 +261,11 @@ C
           IF( NU_CONT(ML) .GE. FREQ(INDX) )THEN
 	     ML=ML+1			!Ignore as past this freq.
 C
-C If continuum frequency is within 0.2*FRAC_DOP doppler widths of the last set 
-C frequency, C there is no need to use it, unless it is a bound-free edge 
+C If continuum frequency is within 0.2*FRAC_DOP doppler widths of the last set
+C frequency, C there is no need to use it, unless it is a bound-free edge
 C frequency.
 C
-          ELSE IF( NU_CONT(ML) .GE. FREQ(INDX)/(1.0D0+0.2D0*dNU_on_NU) 
+          ELSE IF( NU_CONT(ML) .GE. FREQ(INDX)/(1.0D0+0.2D0*dNU_on_NU)
 	1                       .AND. .NOT. EDGE_FREQ(ML) )THEN
 	     ML=ML+1			!Use current set frequency.
 C
@@ -345,9 +346,9 @@ C different widths, we do it in the following statements.
 C
 	    DO K=LN_INDX,LN_INDX+NUM_RES_LINES-1
 	      IF( TRANS_TYPE(K)(1:3) .EQ. 'BLA')THEN
-	        IF( FREQ(INDX) .LE. NU_END_LINE(K) .AND. 
+	        IF( FREQ(INDX) .LE. NU_END_LINE(K) .AND.
 	1             LINE_END_INDX(K) .EQ. 0)LINE_END_INDX(K)=INDX
-		IF( FREQ(INDX) .LE. NU_STRT_LINE(K) .AND. 
+		IF( FREQ(INDX) .LE. NU_STRT_LINE(K) .AND.
 	1               LINE_ST_INDX(K) .EQ. 0)LINE_ST_INDX(K)=INDX
 	      END IF
 	   END DO
@@ -356,7 +357,7 @@ C Increase the line index (LN_INDX) if we have gone outside the resonance zone,
 C and determine the current extent of the red edge of the profile,
 C allowing for velocity shifts.
 C
-	    DO WHILE( LN_INDX .LE. N_LINES .AND. FREQ(INDX) .LE. 
+	    DO WHILE( LN_INDX .LE. N_LINES .AND. FREQ(INDX) .LE.
 	1         NU_END_LINE(LN_INDX) )
 	      IF(TRANS_TYPE(LN_INDX)(1:3) .EQ. 'BLA')THEN
 	        T1=NU_END_LINE(LN_INDX)*(1.0D0-2.0D0*VINF/C_KMS)
@@ -367,11 +368,11 @@ C
 C
 C Find the next line that is to be included as a blanketed line.
 C
-	    DO WHILE(LN_INDX .LE. N_LINES .AND. 
+	    DO WHILE(LN_INDX .LE. N_LINES .AND.
 	1          TRANS_TYPE(LN_INDX)(1:3) .NE. 'BLA')
 	       LN_INDX=LN_INDX+1
 	    END DO
-C	 
+C	
 	  END IF
 	END DO
 C

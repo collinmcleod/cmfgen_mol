@@ -1,4 +1,5 @@
       integer function izamax(n,zx,incx)
+      use set_kind_module
 c
 c     finds the index of element having max. absolute value.
 c     jack dongarra, 1/15/85.
@@ -6,9 +7,9 @@ c     modified 3/93 to return if incx .le. 0.
 c     modified 12/3/93, array(1) declarations changed to array(*)
 c
       double complex zx(*)
-      REAL(10) smax
+      REAL(KIND=LDP) smax
       integer i,incx,ix,n
-      REAL(10) dcabs1
+      REAL(KIND=LDP) dcabs1
 c
       izamax = 0
       if( n.lt.1 .or. incx.le.0 )return

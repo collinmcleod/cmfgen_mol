@@ -1,5 +1,5 @@
 !
-! Routine to merge N COLOR PGPLOTS onto a single page. The plots should be 
+! Routine to merge N COLOR PGPLOTS onto a single page. The plots should be
 ! done in LANDSCAPE MODE with CPS as printer: The final plot is in
 ! Portrait mode.
 !
@@ -7,6 +7,7 @@
 !      For N=3: EXPAND_CHAR=3.0; EXPAND_TICK=3.0; ASR=0.25; Plot Size=20 cm
 !
 	PROGRAM LAND_COL_MERGE
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -20,7 +21,7 @@
 	CHARACTER*80 OUTF
 	CHARACTER*10 TMP_STR
 !
-	INTEGER, PARAMETER :: IZERO=0 
+	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: LU_IN=11
 	INTEGER, PARAMETER :: LU_OUT=30
 	INTEGER, PARAMETER :: LU_TERM=6

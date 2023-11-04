@@ -8,6 +8,7 @@
 ! CMF_FLUX calling program is partially based on DISPGEN.
 !
 	PROGRAM PAR_OPAC
+	USE SET_KIND_MODULE
 	USE MOD_PAR_OPAC
 	USE MOD_USR_OPTION
 	IMPLICIT NONE
@@ -18,14 +19,14 @@
 ! Created:  5-Jan-1998=9 (Progran began late Dec, 1998)
 !
 	INTEGER*4 ND		!Actula number of depth points in atmosphere
-	INTEGER*4 NC		!Actual number of core rays 
+	INTEGER*4 NC		!Actual number of core rays
 	INTEGER*4 NP		!Total number of rays (ND+NC)
 !
 	INTEGER*4 ND_MAX,NP_MAX,NC_MAX
 	INTEGER*4 N_MAX
 	INTEGER*4 N_LINE_MAX
 !
-	REAL(10)    GF_CUT
+	REAL(KIND=LDP)    GF_CUT
 	INTEGER*4 GF_LEV_CUT
 	INTEGER*4 MIN_NUM_TRANS
 	LOGICAL   ONLY_OBS_LINES
@@ -45,13 +46,13 @@
 	INTEGER*4 I,J,IOS,NT,SCRATREC
 	INTEGER*4 LEN_DIR
 	INTEGER*4 EQ_TEMP
-	REAL(10) T1,T2
-	REAL(10) RMDOT
-	REAL(10) VSM_DIE_KMS
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) RMDOT
+	REAL(KIND=LDP) VSM_DIE_KMS
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 !
 	INTEGER*4, PARAMETER :: IZERO=0
 	INTEGER*4, PARAMETER :: T_IN=5		!Terminal IO
@@ -92,7 +93,7 @@
 !
 ! Set all atomic data. New species can be simple added by insertion.
 ! Try to add species in order of atomic number. Hydrogen should ALWAYS
-! be species 1, Helium should ALWAYS be species 2. 
+! be species 1, Helium should ALWAYS be species 2.
 !
 ! While this tabulation is Verbose, it is simple to change.
 ! Note that the Solar abundances are only used for reference in
@@ -196,7 +197,7 @@
 	ID=ID+1
 	AT_NO(ID)=26.0D0;	    AT_MASS(ID)=55.8D0		!Iron
 	SPECIES(ID)='IRON';	    SPECIES_ABR(ID)='Fe'
-	SOL_ABUND_HSCL(ID)=7.54D0        
+	SOL_ABUND_HSCL(ID)=7.54D0
 !
 	ID=ID+1
 	AT_NO(ID)=27.0D0;	    AT_MASS(ID)=58.9D0		!Cobalt
@@ -413,7 +414,7 @@
 !
 	      IF(ATM(ID)%XzV_PRES .OR. PREV_STAGE_PRES)THEN
 	        CALL RD_MODEL_SPEC_INFO( TRIM(ION_ID(ID)),
-	1          ATM(ID)%NXzV_F,       ATM(ID)%XzV_PRES,  ATM(ID)%NXzV,    
+	1          ATM(ID)%NXzV_F,       ATM(ID)%XzV_PRES,  ATM(ID)%NXzV,
 	1          ATM(ID)%DIE_AUTO_XzV, ATM(ID)%DIE_WI_XzV)
                 SPECIES_PRES(ISPEC)=.TRUE.
 	        IF(SPECIES_BEG_ID(ISPEC) .EQ. 0)SPECIES_BEG_ID(ISPEC)=ID
@@ -492,7 +493,7 @@
 	  IF(ATM(ID)%XzV_PRES)THEN
 	    FILENAME=TRIM(ION_ID(ID))//'_F_OSCDAT'
 	    CALL GENOSC_V8(ATM(ID)%AXzV_F,  ATM(ID)%EDGEXzV_F,
-	1          ATM(ID)%GXzV_F, ATM(ID)%XzVLEVNAME_F, 
+	1          ATM(ID)%GXzV_F, ATM(ID)%XzVLEVNAME_F,
 	1          ATM(ID)%ARAD,ATM(ID)%GAM2,ATM(ID)%GAM4,
 	1          ATM(ID)%OBSERVED_LEVEL,T1,ATM(ID)%ZXzV,
 	1          ATM(ID)%NEW_XzV_OSCDATE, ATM(ID)%NXzV_F, I,
@@ -513,7 +514,7 @@
 	1            ATM(ID)%XzV_ION_LEV_ID, ATM(ID)%N_XzV_PHOT, NPHOT_MAX,
 	1            ATM(ID+1)%XzV_PRES,     ATM(ID+1)%EDGEXzV_F,
 	1            ATM(ID+1)%GXzV_F,       ATM(ID+1)%F_TO_S_XzV,
-	1            ATM(ID+1)%XzVLEVNAME_F, ATM(ID)%NXzV_F, 
+	1            ATM(ID+1)%XzVLEVNAME_F, ATM(ID)%NXzV_F,
 	1            XRAYS,ID,ION_ID(ID),LUIN,LU_TMP)
             IF(ATM(ID+1)%XzV_PRES)ATM(ID)%GIONXzV_F=ATM(ID+1)%GXzV_F(1)
  	    IF(.NOT. DIE_AS_LINE .AND. (ATM(ID)%DIE_AUTO_XzV .OR. ATM(ID)%DIE_WI_XzV) )THEN

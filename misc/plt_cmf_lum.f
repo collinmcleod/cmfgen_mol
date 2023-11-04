@@ -2,9 +2,9 @@
 ! Subroutine to plot the Luminosity and auxiliary quanties from the file OBSFLUX.
 ! Routine is primarily designed to assist in diagnosing SN models.
 !
-! The final plot shows the "Corrected Luminosity" (not OBSERVED) which should be 
+! The final plot shows the "Corrected Luminosity" (not OBSERVED) which should be
 ! constant as a function of depth. Also shown is the difference between this curve,
-! and the original "observed" luminosity (CMF). 
+! and the original "observed" luminosity (CMF).
 !
 ! Unlike OBSFLUX, we intgerate inwards rather than outwards. This allows a more
 ! realistic examination of the errors relative to the observed flux.
@@ -15,6 +15,7 @@
 !                                              MODEL
 !
 	PROGRAM PLT_CMF_LUM
+	USE SET_KIND_MODULE
         USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
@@ -29,27 +30,27 @@
 ! Altered: 19-Mar-2014 -- Inserted HJ_LUM to handle static relativistic models.
 ! Cleaned: 06-Nov-2011
 !
-	REAL(10), ALLOCATABLE :: R(:)
-	REAL(10), ALLOCATABLE :: T(:)
-	REAL(10), ALLOCATABLE :: V(:)
-	REAL(10), ALLOCATABLE :: SIGMA(:)
-	REAL(10), ALLOCATABLE :: POPS(:,:)
-	REAL(10), ALLOCATABLE :: XAXIS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R(:)
+	REAL(KIND=LDP), ALLOCATABLE :: T(:)
+	REAL(KIND=LDP), ALLOCATABLE :: V(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: POPS(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: XAXIS(:)
 !
-	REAL(10), ALLOCATABLE :: LUM(:)
-	REAL(10), ALLOCATABLE :: HJ_LUM(:)
-	REAL(10), ALLOCATABLE :: MECH(:)
-	REAL(10), ALLOCATABLE :: LOC_SHOCK(:)
-	REAL(10), ALLOCATABLE :: ADI(:)
-	REAL(10), ALLOCATABLE :: DJDT(:)
-	REAL(10), ALLOCATABLE :: dT_ON_T(:)
-	REAL(10), ALLOCATABLE :: RAD_DECAY(:)
-	REAL(10), ALLOCATABLE :: TOTAL(:)
-	REAL(10), ALLOCATABLE :: CHANGE(:)
-	REAL(10), ALLOCATABLE :: WRK_VEC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LUM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HJ_LUM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: MECH(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LOC_SHOCK(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ADI(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DJDT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: dT_ON_T(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RAD_DECAY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TOTAL(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CHANGE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: WRK_VEC(:)
 !
-	REAL(10) SPEED_OF_LIGHT
-	REAL(10) T1
+	REAL(KIND=LDP) SPEED_OF_LIGHT
+	REAL(KIND=LDP) T1
 !
 	EXTERNAL SPEED_OF_LIGHT
 	CHARACTER(LEN=132) STRING

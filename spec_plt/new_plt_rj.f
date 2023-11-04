@@ -1,15 +1,16 @@
 C
-C Routine to plot J from EDDFACTOR file. This J is convolved with the 
-C electron redistribution function using the 1 or 2-parameter formulation of 
-C Hummer and Rybicki. For comparison, RJ_ES from the ES_J_CONV file, 
-C may also be plotted. B may also be convolved with the electron 
+C Routine to plot J from EDDFACTOR file. This J is convolved with the
+C electron redistribution function using the 1 or 2-parameter formulation of
+C Hummer and Rybicki. For comparison, RJ_ES from the ES_J_CONV file,
+C may also be plotted. B may also be convolved with the electron
 C redistribution function.
 C
 	PROGRAM PLT_RJ
+	USE SET_KIND_MODULE
 !
 ! Altered 16-Jun-2000 : Now use DIRECT_INFO files to get file record lengths.
 !                       Using V2 of CNVLV routines/
-!                       
+!
 ! Interface routines for IO routines.
 !
 	USE MOD_USR_OPTION
@@ -19,22 +20,22 @@ C
 !
 	IMPLICIT NONE
 C
-	REAL(10), ALLOCATABLE :: NU(:)
-	REAL(10), ALLOCATABLE :: RJ(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: NU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ(:,:)
 C
-	REAL(10), ALLOCATABLE :: RJ_ES_RD(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_ES_RD(:,:)
 C
-	REAL(10), ALLOCATABLE :: FLUX_RJ(:)
-	REAL(10), ALLOCATABLE :: FLUX_ES(:)
+	REAL(KIND=LDP), ALLOCATABLE :: FLUX_RJ(:)
+	REAL(KIND=LDP), ALLOCATABLE :: FLUX_ES(:)
 C
-	REAL(10), ALLOCATABLE :: PLANCK_FN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: PLANCK_FN(:)
 C
-	REAL(10), ALLOCATABLE :: A(:)
-	REAL(10), ALLOCATABLE :: B(:)
-	REAL(10), ALLOCATABLE :: C(:)
-	REAL(10), ALLOCATABLE :: D(:)
-	REAL(10), ALLOCATABLE :: J_ES(:)
-	REAL(10), ALLOCATABLE :: RJ_TMP(:)
+	REAL(KIND=LDP), ALLOCATABLE :: A(:)
+	REAL(KIND=LDP), ALLOCATABLE :: B(:)
+	REAL(KIND=LDP), ALLOCATABLE :: C(:)
+	REAL(KIND=LDP), ALLOCATABLE :: D(:)
+	REAL(KIND=LDP), ALLOCATABLE :: J_ES(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_TMP(:)
 C
 	REAL*4, ALLOCATABLE :: XV(:)
 	REAL*4, ALLOCATABLE :: YV(:)
@@ -42,11 +43,11 @@ C
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: T_OUT=6
 C
-	REAL(10) RJ_FLUX,ES_FLUX,ES2_FLUX
+	REAL(KIND=LDP) RJ_FLUX,ES_FLUX,ES2_FLUX
 C
-	REAL(10) T_ELEC
-	REAL(10) T1
-	REAL(10) C_KMS,NU_0
+	REAL(KIND=LDP) T_ELEC
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) C_KMS,NU_0
 	LOGICAL ONE_PAR
 	LOGICAL SET_CONST
 C
@@ -70,14 +71,14 @@ C
 	CHARACTER*120 DESCRIPTION
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	COMMON/LINE/ OPLIN,EMLIN               
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	COMMON/LINE/ OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 !
-	REAL(10) FUN_PI,SPEED_OF_LIGHT
+	REAL(KIND=LDP) FUN_PI,SPEED_OF_LIGHT
 	LOGICAL EQUAL
 	CHARACTER*30 UC
 	EXTERNAL FUN_PI,SPEED_OF_LIGHT,EQUAL,UC
-C                       
+C
 	CHARACTER*80 FILENAME
 	CHARACTER*80 FILE_DATE
 C
@@ -214,7 +215,7 @@ C
 C
 C This call resets the .sve algorithm.  Specifically it sets the next
 C input answer to be a main option, and all subsequent inputs to be
-C sub-options.  
+C sub-options.
 C
  3	CALL SVE_FILE('RESET')
 C
@@ -558,16 +559,17 @@ C
 C    A(i).X(i-1) - [H(i)+A(i)+B(i)].X(i+1) - C(i).X(i+1)
 C
 	SUBROUTINE THOMAS_RH(A,H,C,D,N1,N2)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 	INTEGER N1,N2
-	REAL(10) A(N1),H(N1),C(N1),D(N1,N2)
+	REAL(KIND=LDP) A(N1),H(N1),C(N1),D(N1,N2)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
 C
 	INTEGER I,J
-	REAL(10) DIV(N1)
+	REAL(KIND=LDP) DIV(N1)
 C
 C
 C Compute quantities that will be used repeatedly if the same tridiagonal

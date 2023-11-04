@@ -6,13 +6,14 @@ C Names and energy levels are read from a file with the same format as
 C the oscillator file (hence the oscillator file can be used).
 C
 	PROGRAM WR_F_TO_S
+	USE SET_KIND_MODULE
 	USE MOD_USR_OPTION
 	USE MOD_USR_HIDDEN
 	IMPLICIT NONE
 C
 C Altered 08-MAy-2023 : Improved header of F_TO_S file.
 C Altered 25-Sec-2011 : NAME AND LS_NAME SET TO *40
-C Altered 13-Dec-2009 : LOWN option installed (comments added 13-Jan-2010). 
+C Altered 13-Dec-2009 : LOWN option installed (comments added 13-Jan-2010).
 C Altered 21-Apr-2008 : SEQ_WR installed; Improved handling of INT_SEQ.
 C Altered 23-Jun-2005 : FIX_DI option installed for WR_DC
 C Altered 25-Oct-2002 : CL option changed.
@@ -36,15 +37,15 @@ C
 C
 	INTEGER F_TO_S(N_MAX)
 	INTEGER INT_SEQ(N_MAX)
-	REAL(10) FEDGE(N_MAX)
-	REAL(10) ENERGY(N_MAX)
-	REAL(10) G(N_MAX)
-	REAL(10) LAM_EDGE(N_MAX)
-	REAL(10) E_STRT(N_MAX)
+	REAL(KIND=LDP) FEDGE(N_MAX)
+	REAL(KIND=LDP) ENERGY(N_MAX)
+	REAL(KIND=LDP) G(N_MAX)
+	REAL(KIND=LDP) LAM_EDGE(N_MAX)
+	REAL(KIND=LDP) E_STRT(N_MAX)
 	LOGICAL DONE_LEV(N_MAX)
 C
-	REAL(10) EDGE_SUM(N_MAX)
-	REAL(10) G_SUM(N_MAX)
+	REAL(KIND=LDP) EDGE_SUM(N_MAX)
+	REAL(KIND=LDP) G_SUM(N_MAX)
 C
 	CHARACTER(LEN=40) TERM_NAME(N_MAX)
 	INTEGER TERM_F_TO_S(N_MAX)
@@ -53,31 +54,31 @@ C
 C
 C For SUPER-LEVEL atom.
 C
-	REAL(10) LS_EMIN(N_MAX)
-	REAL(10) LS_EMAX(N_MAX)
-	REAL(10) LS_EMID(N_MAX)
+	REAL(KIND=LDP) LS_EMIN(N_MAX)
+	REAL(KIND=LDP) LS_EMAX(N_MAX)
+	REAL(KIND=LDP) LS_EMID(N_MAX)
 	LOGICAL LS_DONE(N_MAX)
 	CHARACTER*1 LS_SPIN(N_MAX)
 	CHARACTER*1 LS_PARITY(N_MAX)
 	LOGICAL CHANGE_FS(N_MAX)
 	LOGICAL DO_CHANGE
-	REAL(10) ACC
+	REAL(KIND=LDP) ACC
 	INTEGER FS_SAV
 C
-	REAL(10) DC(N_MAX,3),ED(3),TEMP(3)
-	REAL(10) DI,RVAL,RSTAR,RLUM
-	REAL(10) T_EXCITE,G_GS,G_ION
+	REAL(KIND=LDP) DC(N_MAX,3),ED(3),TEMP(3)
+	REAL(KIND=LDP) DI,RVAL,RSTAR,RLUM
+	REAL(KIND=LDP) T_EXCITE,G_GS,G_ION
 	INTEGER NLEV_RD,ND_RD
 	LOGICAL WRITE_DC
 C
-	REAL(10) ION_EN
-	REAL(10) ZION
+	REAL(KIND=LDP) ION_EN
+	REAL(KIND=LDP) ZION
 	CHARACTER*20 EN_DATE
 	INTEGER NLEV
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	COMMON/LINE/ OPLIN,EMLIN               
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	COMMON/LINE/ OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 C
 	CHARACTER*80 FILENAME
 	LOGICAL FILE_OPEN
@@ -90,12 +91,12 @@ C
 	INTEGER CNT,NEW_CNT,N_LS_TERMS
 	INTEGER I1,K1
 	INTEGER MAX_NAME_LNGTH
-	REAL(10) T1,T2
-	REAL(10) DEL_E_CM
-	REAL(10) DEL_E_CUR
-	REAL(10) FRAC_DEL_E
-	REAL(10) OLD_F_TO_S
-	REAL(10) R_IR,V1,CL_FAC
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) DEL_E_CM
+	REAL(KIND=LDP) DEL_E_CUR
+	REAL(KIND=LDP) FRAC_DEL_E
+	REAL(KIND=LDP) OLD_F_TO_S
+	REAL(KIND=LDP) R_IR,V1,CL_FAC
 C
 	LOGICAL CHK_PARITY
 	LOGICAL CHK_SPIN
@@ -128,7 +129,7 @@ C
 	EXTERNAL ICHRLEN,PARITY
 C
 	INTEGER, PARAMETER :: T_IN=5
-	INTEGER, PARAMETER :: T_OUT=6		!For terminal IO              
+	INTEGER, PARAMETER :: T_OUT=6		!For terminal IO
 C
 	INTEGER, PARAMETER :: LUIN=30			!File IO
 	INTEGER, PARAMETER :: LUOUT=40
@@ -148,11 +149,11 @@ C
 	EMLIN=5.27296E-03
 	INT_SEQ(:)=0
 C
-C  
+C 
 C Read in Level Names and Energies from file containing oscillator
 C strengths.
 C
-C Header information is read and stored in the file HEAD_INFO. This can be 
+C Header information is read and stored in the file HEAD_INFO. This can be
 C output to the F_TO_S link file.
 C
 	IOS=100
@@ -215,7 +216,7 @@ C
 C
 C This call resets the .sve algorithm.  Specifically it sets the next
 C input answer to be a main option, and all subsequent inputs to be
-C sub-options.  
+C sub-options.
 C
 3	CONTINUE
 	CALL SVE_FILE('RESET')
@@ -252,7 +253,7 @@ C
         END IF
 !
 ! Remove possile file names etc.
-!          
+!
         I=INDEX(X,' ')
         IF(I .EQ. 0)THEN
           X=UC(TRIM(X))
@@ -260,9 +261,9 @@ C
           X=UC(X(1:I-1))        !Remove file names
         END IF
 C
-C                           
+C
 C Group all terms belonging to the same LS multiplet.
-C               
+C
 	IF(X(1:2) .EQ. 'LS')THEN	!LS coupling
 	  F_TO_S(:)=0
 	  F_TO_S(1)=1
@@ -292,7 +293,7 @@ C
 	  WRITE(T_OUT,*)'Number of levels in SUPER atom is   ',CNT
 C
 C Group all terms belonging to the same LS multiplet.
-C               
+C
 	ELSE IF(X(1:3) .EQ. 'TLS')THEN	!LS coupling
 !
 	  F_TO_S(:)=0
@@ -328,7 +329,7 @@ C
 	         IF(NAME(J)(K-4:K) .EQ. NAME(I)(L-4:L))THEN
 	           IF(PRES)THEN
 	             ID=I
-	             INT_SEQ(I)=ID 
+	             INT_SEQ(I)=ID
 	             INT_SEQ(J)=ID
 	             PRES=.FALSE.
 	             CNT=J
@@ -364,9 +365,9 @@ C
 	 END DO
 C
 C Group all terms belonging to the same LS multiplet. Additional grouping
-C is done by combining terms that are within DEL_E_CM in energy of the 
-C lowest term of the SUPER level. The defaults is to group together 
-C only terms that have the same parity and spin, although this can be 
+C is done by combining terms that are within DEL_E_CM in energy of the
+C lowest term of the SUPER level. The defaults is to group together
+C only terms that have the same parity and spin, although this can be
 C changed using HIDDEN options.
 C
 C NB: In this option all levels belonging to the same multiplet are
@@ -433,7 +434,7 @@ C
 	      DEL_E_CUR=LS_EMID(I)*FRAC_DEL_E
 	    END IF
 	    IF(.NOT. LS_DONE(I))THEN
-	      J=I+1     
+	      J=I+1
 	      DO WHILE(LS_EMIN(J) .LT. LS_EMIN(I)+DEL_E_CUR)
 	        OKAY_TO_COMBINE=.TRUE.
 	        IF(CHK_PARITY .AND. LS_PARITY(I) .NE. LS_PARITY(J))THEN
@@ -482,7 +483,7 @@ C
 	  WRITE(T_OUT,*)'Number of LS terms in full atom is  ',N_LS_TERMS
 	  WRITE(T_OUT,*)'Number of levels in SUPER atom is   ',ID
 !
-! This option allows the N lowest SL's to be automatically spit into 
+! This option allows the N lowest SL's to be automatically spit into
 ! individual levels. This option allows a direct comparision with a similar option
 ! in CMFGEN specified in the MODEL_SPEC file. Usefule for identifying levels
 ! with those in CMFGEN.
@@ -547,7 +548,7 @@ C Group terms according to their separation in energy. A level is
 C linked to a super level provided that the energy separation is less
 C than DEL_E_CM from the lowest level of the SUPER LEVEL. By default
 C it is assumed that all levels belonging to a SUPER LEVEL must have
-C the same PARITY and SPIN, although this can be changed USING 
+C the same PARITY and SPIN, although this can be changed USING
 C hidden options.
 C
 C This option is similar to ELS, except not all terms of a multiplet
@@ -574,7 +575,7 @@ C
 	      IF (LEV_SPIN(I) .NE. LEV_SPIN(J))THEN
 	        OKAY_TO_COMBINE=.FALSE.
 	      END IF
-	      IF(OKAY_TO_COMBINE .AND. 
+	      IF(OKAY_TO_COMBINE .AND.
 	1       ABS(E_STRT(F_TO_S(J))-ENERGY(I)) .LT. DEL_E_CM )THEN
                 F_TO_S(I)=F_TO_S(J)
 	      ELSE
@@ -594,7 +595,7 @@ C
 !
 C
 C The following option allows levels belonging to a single SUPER level
-C to be output together as a group. The level departure coefficients can 
+C to be output together as a group. The level departure coefficients can
 C also be C output.
 C
 	ELSE IF(X(1:5) .EQ. 'SL_WR')THEN
@@ -630,7 +631,7 @@ C
 	  CLOSE(LUOUT)
 !
 ! The following option allows levels belonging to a single seqence
-! to be output together as a group. The level departure coefficients can 
+! to be output together as a group. The level departure coefficients can
 ! also be output.
 !
 	ELSE IF(X(1:7) .EQ. 'TERM_WR')THEN
@@ -670,7 +671,7 @@ C
 	    END DO
 	  END DO
 	  CLOSE(LUOUT)
-C                           
+C
 	ELSE IF(X(1:6) .EQ. 'SEQ_WR')THEN
 	  CALL USR_OPTION(FILENAME,'File','SEQ_LNKS','Link check file')
 	  CALL USR_HIDDEN(WRITE_DC,'DC','F',' ')
@@ -701,9 +702,9 @@ C
 	    END DO
 	  END DO
 	  CLOSE(LUOUT)
-C                           
+C
 C Group all terms belonging to the same LS multiplet.
-C               
+C
 	ELSE IF(X(1:6) .EQ. 'WR_NOJ')THEN	!LS coupling
 !
 	  OPEN(UNIT=16,FILE='NOJ_NAMES',STATUS='UNKNOWN')
@@ -731,7 +732,7 @@ C
 	  CALL GEN_ASCI_OPEN(LUHEAD,'HEAD_INFO','OLD',' ','READ',IZERO,IOS)
 !
 	  IOS=0
-	  DO WHILE(IOS .EQ. 0)  
+	  DO WHILE(IOS .EQ. 0)
 	    READ(LUHEAD,'(A)',IOSTAT=IOS)STRING
 	    IF(INDEX(STRING,'and statistical weights for') .NE. 0)THEN
 	      K=INDEX(STRING,'for')+3
@@ -790,7 +791,7 @@ C
 	      IF(WRITE_DC)THEN
 	        WRITE(T_OUT,120)NAME(I)(1:J),G(I),ENERGY(I),F_TO_S(I),
 	1                 I,DC(I,1)
-	      ELSE  
+	      ELSE
 	        WRITE(T_OUT,120)NAME(I)(1:J),G(I),ENERGY(I),F_TO_S(I),I
 	      END IF
 	      I=I+1
@@ -835,7 +836,7 @@ C
 	      WRITE(6,*)INT_SEQ(I)
 !	      INT_SEQ(I)=F_TO_S(INT_SEQ(I))
 	    END IF
-	  END DO 
+	  END DO
 	  WRITE(T_OUT,*)'Cleaning level links '
 	  WRITE(T_OUT,'(A,1X,I5)')' Number of super levels is:',ID
 !
@@ -867,7 +868,7 @@ C
 	ELSE IF(X(1:6) .EQ. 'RD_LNK')THEN
 C
 C Read in a previously existing link file. If this file has been edited,
-C and the links numbering is all mixed up, the 'CL' option should be 
+C and the links numbering is all mixed up, the 'CL' option should be
 C issued.
 C
 	  FILE_PRES=.FALSE.
@@ -917,7 +918,7 @@ C
 	    END DO
 	  END DO
 C
-C Read in departure coefficients for a model computed with this atomic 
+C Read in departure coefficients for a model computed with this atomic
 C model. If model was run with N_S=N_F the DC can be output with the
 C levels names in order to assist in deciding super level assignments.
 C The departure coefficent at 3 distinct depths is read in.
@@ -937,7 +938,7 @@ C
 	  END IF
 C
 C Check whether the file has a record containing 'Format date'. Its presence
-C effects the way we read the file. 
+C effects the way we read the file.
 C
 	  I=0
 	  STRING=' '
@@ -964,11 +965,11 @@ C
 ! 
 ! Routine to create a Departure Coefficient file for INPUT to CMFGEN.
 ! The routine reads a file containing EXCTATION temperatures (created using
-! DISPGEN) for the next lowest ionization stage. The excitation temperature 
-! of the ground state is then used to comute the ION population, and the 
+! DISPGEN) for the next lowest ionization stage. The excitation temperature
+! of the ground state is then used to comute the ION population, and the
 ! departure coefficients for all other levels. Routine is useful when including
 ! an additional ionization stage.
-! 
+!
 	ELSE IF(X(1:5) .EQ. 'WR_DC')THEN
 !
 	  CALL USR_OPTION(FILENAME,'File',' ','File containing excitation temperatures')
@@ -987,7 +988,7 @@ C
 	1                               'WRITE',IZERO,IOS)
 C
 C Check whether the file has a record containing 'Format date'. Its presence
-C effects the way we read the file. 
+C effects the way we read the file.
 C
 	  I=0
 	  STRING=' '
@@ -1095,6 +1096,7 @@ C
 	END
 
 	FUNCTION PARITY(NAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 	CHARACTER*(*) NAME
@@ -1118,6 +1120,7 @@ C
 !
 !
 	FUNCTION SPIN(NAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 31-Jan-2003: T_OUT set to 6 (instead of 5)

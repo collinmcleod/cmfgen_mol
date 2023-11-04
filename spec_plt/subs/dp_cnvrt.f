@@ -6,23 +6,24 @@ C        For Y axis:  Jy, vF(v), Flam (and Log0
 C
 	SUBROUTINE DP_CNVRT(XV,YV,NBB,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1                    LAMC,X_LAB,Y_LAB,X_ONLY)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 	INTEGER NBB
-	REAL(10) XV(NBB),YV(NBB)
+	REAL(KIND=LDP) XV(NBB),YV(NBB)
 	LOGICAL LOG_X,LOG_Y,X_ONLY
 	CHARACTER*(*) X_UNIT,Y_PLT_OPT
 	CHARACTER*(*) X_LAB,Y_LAB
 C
 	INTEGER I
-	REAL(10) LAMC
-	REAL(10) T1
-C              
-	REAL(10) SPEED_OF_LIGHT,LAM_AIR
+	REAL(KIND=LDP) LAMC
+	REAL(KIND=LDP) T1
+C
+	REAL(KIND=LDP) SPEED_OF_LIGHT,LAM_AIR
 	EXTERNAL SPEED_OF_LIGHT,LAM_AIR
 C
-	REAL(10) C_CMS
-	REAL(10) KEV_TO_HZ,ANG_TO_HZ
+	REAL(KIND=LDP) C_CMS
+	REAL(KIND=LDP) KEV_TO_HZ,ANG_TO_HZ
 C
 	C_CMS=SPEED_OF_LIGHT()
 C
@@ -38,14 +39,14 @@ C
 	      T1=1.0D-08			!*1.0E-23*1.0E+15
 	      YV(I)=T1*XV(I)*YV(I)
 	    END DO
-	    Y_LAB='\gnF\d\gn\u(erg\d cm\u-2 \ds\u-1\d)' 
-	    IF(LOG_Y)Y_LAB='Log \gnF\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)' 
+	    Y_LAB='\gnF\d\gn\u(erg\d cm\u-2 \ds\u-1\d)'
+	    IF(LOG_Y)Y_LAB='Log \gnF\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)'
 	  ELSE IF(Y_PLT_OPT .EQ. 'FLAM')THEN
 	    T1=1.0E-01/C_CMS	  	!1.0E-23*1.0E+30*1.0E-08
 	    DO I=1,NBB
 	      YV(I)=T1*YV(I)*XV(I)*XV(I)
 	    END DO
-	    Y_LAB='F\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A\u-1\d)' 
+	    Y_LAB='F\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A\u-1\d)'
 	    IF(LOG_Y)Y_LAB='Log F\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A\u-1\d)'
 	  ELSE IF(Y_PLT_OPT .EQ. 'LAM_FLAM')THEN
 	    T1=1.0E-08		  	!1.0E-23*1.0E+15

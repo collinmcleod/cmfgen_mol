@@ -1,21 +1,22 @@
 	SUBROUTINE DIVIDE_BY_CONT(YV,NU,OBSF,NCF,NU_CONT,OBSF_CONT,NCF_CONT,LIN_INT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER NCF
-	REAL(10) NU(NCF)
-	REAL(10) OBSF(NCF)
-	REAL(10) YV(NCF)
+	REAL(KIND=LDP) NU(NCF)
+	REAL(KIND=LDP) OBSF(NCF)
+	REAL(KIND=LDP) YV(NCF)
 !
 	INTEGER NCF_CONT
-	REAL(10) NU_CONT(NCF_CONT)
-	REAL(10) OBSF_CONT(NCF_CONT)
+	REAL(KIND=LDP) NU_CONT(NCF_CONT)
+	REAL(KIND=LDP) OBSF_CONT(NCF_CONT)
 !
 	LOGICAL LIN_INT
 	LOGICAL UNEQUAL
 	LOGICAL EQUAL
 	EXTERNAL EQUAL
 !
-	REAL(10) T1,T2
+	REAL(KIND=LDP) T1,T2
 	INTEGER I,J,L
 !
 	INTEGER, PARAMETER :: IONE=1
@@ -39,9 +40,9 @@
 	      YV(I)=0.0
 	    ELSE IF(NU(I) .LT. NU_CONT(NCF_CONT))THEN
 	      YV(I)=0.0
-	    ELSE 
+	    ELSE
 	      DO WHILE (NU(I) .LT. NU_CONT(L+1))
-	        L=L+1           
+	        L=L+1
 	      END DO
 	      T1=(NU(I)-NU_CONT(L+1))/(NU_CONT(L)-NU_CONT(L+1))
 	      T2=(1.0D0-T1)*OBSF_CONT(L+1)+T1*OBSF_CONT(L)
@@ -55,7 +56,7 @@
 	ELSE IF(UNEQUAL)THEN
 !
 ! We will use monotonic cubic interpolation. We first verify the range.
-! I & J are temporary variables for the callt o MON_INTERP. I denotes the 
+! I & J are temporary variables for the callt o MON_INTERP. I denotes the
 ! first element. Initially J denotes the last element, then the numer of
 ! elements that can be interpolated.
 !

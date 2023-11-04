@@ -1,4 +1,5 @@
 	SUBROUTINE GET_ND_NT_NIT(FILE_NAME,ND,NT,NIT,LUIN,IOS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER ND
@@ -43,7 +44,7 @@
 	  WRITE(T_OUT,*)'Unable to read MODEL file'
 	  CLOSE(UNIT=LUIN)
 	  RETURN
-	END IF 
+	END IF
 !
 ! We can now READ the pointer file to get the number of iterations that
 ! have been completed.

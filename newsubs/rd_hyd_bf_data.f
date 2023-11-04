@@ -1,24 +1,26 @@
 C
-C Routine to read in the logarithmic (base) 10 photoionization cross 
+C Routine to read in the logarithmic (base) 10 photoionization cross
 C sections for (n,l) and merged n states of hydrogen.
 C
 	MODULE HYD_BF_PHOT_DATA
+	USE SET_KIND_MODULE
 	  INTEGER MAX_L_PQN
 	  INTEGER N_PER_L
-	  REAL(10) L_ST_U
-	  REAL(10) L_DEL_U
-	  REAL(10),    ALLOCATABLE ::  BF_L_CROSS(:)
+	  REAL(KIND=LDP) L_ST_U
+	  REAL(KIND=LDP) L_DEL_U
+	  REAL(KIND=LDP),    ALLOCATABLE ::  BF_L_CROSS(:)
 	  INTEGER, ALLOCATABLE :: BF_L_INDX(:,:)
 C
 	  INTEGER MAX_N_PQN
 	  INTEGER N_PER_N
-	  REAL(10) N_ST_U
-	  REAL(10) N_DEL_U
-	  REAL(10),    ALLOCATABLE ::  BF_N_GAUNT(:)
+	  REAL(KIND=LDP) N_ST_U
+	  REAL(KIND=LDP) N_DEL_U
+	  REAL(KIND=LDP),    ALLOCATABLE ::  BF_N_GAUNT(:)
 	  INTEGER, ALLOCATABLE :: BF_N_INDX(:)
 	END MODULE HYD_BF_PHOT_DATA
 C
 	SUBROUTINE RD_HYD_BF_DATA(LUIN,LUOUT,LUER)
+	USE SET_KIND_MODULE
 	USE HYD_BF_PHOT_DATA
 	IMPLICIT NONE
 !
@@ -68,7 +70,7 @@ C
 	  READ(LUIN,'(A)')STRING
 	  IF(INDEX(STRING,'L_DEL_U') .EQ. 0)THEN
 	    WRITE(LUER,*)'Error --- L_DEL_U not found in RD_HYD_BF_DATA'
-	    STOP                               
+	    STOP
 	  ELSE
 	    READ(STRING,*)L_DEL_U
 	  END IF
@@ -135,7 +137,7 @@ C
 	  READ(LUIN,'(A)')STRING
 	  IF(INDEX(STRING,'N_DEL_U') .EQ. 0)THEN
 	    WRITE(LUER,*)'Error --- N_DEL_U not found in RD_HYD_BF_DATA'
-	    STOP                               
+	    STOP
 	  ELSE
 	    READ(STRING,*)N_DEL_U
 	  END IF

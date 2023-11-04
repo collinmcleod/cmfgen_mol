@@ -10,6 +10,7 @@
 	1                       F_TO_S_HI,NHI_S,NPHOT,
 	1                       NUM_IMP_LEVELS,DO_ALL_EDGES,
 	1                       INDICATE_SECONDARY_LEVELS,DO_LEVEL_DISSOLUTION)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 18-Jun-2003 : Changed to V4
@@ -42,11 +43,11 @@
 	INTEGER NPHOT			!Number of photoionization routes.
 	INTEGER NUM_IMP_LEVELS	!Number of level which must have a continuum edge.
 !
-	REAL(10) EDGEHI_F(NHI_F)
+	REAL(KIND=LDP) EDGEHI_F(NHI_F)
 	INTEGER F_TO_S_HI(NHI_F)
 	LOGICAL HI_PRES
 !
-	REAL(10) EDGE_FREQ(NCF_MAX)
+	REAL(KIND=LDP) EDGE_FREQ(NCF_MAX)
 !
 ! EDGE_TYPE(1:1)=
 !                 I : Important level ---
@@ -64,7 +65,7 @@
 !
 ! If TRUE, 2nd and higher levels belong to a SL are returned with 'S' in their
 ! EDGE_TYPE.
-! 
+!
 	LOGICAL INDICATE_SECONDARY_LEVELS
 !
 ! Tells SET_EDGE_FREQ whether Level Dissolution is on (only for PHOT_ID=1).
@@ -75,7 +76,7 @@
 !
 ! Local variables.
 !
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER NEW_ID
 	INTEGER PHOT_ID
 	INTEGER J
@@ -83,13 +84,13 @@
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 !
-	REAL(10), PARAMETER :: ZERO=0.0D0
+	REAL(KIND=LDP), PARAMETER :: ZERO=0.0D0
 	LOGICAL, PARAMETER :: RET_EDGE_CROSS=.TRUE.
 !
 ! Used to get photoionization cross-sections.
 !
-	REAL(10) PHOT_CROSS(NHI_F)
-	REAL(10) LOC_EDGE_FREQ(NHI_F)
+	REAL(KIND=LDP) PHOT_CROSS(NHI_F)
+	REAL(KIND=LDP) LOC_EDGE_FREQ(NHI_F)
 	LOGICAL DONE(NHI_S)
 !
 	WRITE(167,*)ID

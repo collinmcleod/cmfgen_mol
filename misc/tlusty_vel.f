@@ -22,8 +22,9 @@
 ! for two choices since BETA_MIN=0.7 gives a connection radius around
 ! 7 km/s, where as higher BETA gives a connection radii where the
 ! connection velocity is significantly smaller.
-! 
+!
 	PROGRAM TLUSTY_VEL
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
@@ -37,35 +38,35 @@
 	INTEGER ND				!Number of TLUSTY depths input
 	INTEGER ND_MAX			!Maximum number of TLUSTY depths in file
 	INTEGER, ALLOCATABLE :: INDX(:)
-	REAL(10), ALLOCATABLE :: DM(:)		!Column mass density
-	REAL(10), ALLOCATABLE :: TAUR(:)		!Rosseland optical depth
-	REAL(10), ALLOCATABLE :: AROSS(:)		!Absorption Rosseland optical depth scale
-	REAL(10), ALLOCATABLE :: T(:)		!Temperature
-	REAL(10), ALLOCATABLE :: ED(:)		!Electron density (/cm^3)
-	REAL(10), ALLOCATABLE :: DSH(:)		!Density (gm/cm^3)
+	REAL(KIND=LDP), ALLOCATABLE :: DM(:)		!Column mass density
+	REAL(KIND=LDP), ALLOCATABLE :: TAUR(:)		!Rosseland optical depth
+	REAL(KIND=LDP), ALLOCATABLE :: AROSS(:)		!Absorption Rosseland optical depth scale
+	REAL(KIND=LDP), ALLOCATABLE :: T(:)		!Temperature
+	REAL(KIND=LDP), ALLOCATABLE :: ED(:)		!Electron density (/cm^3)
+	REAL(KIND=LDP), ALLOCATABLE :: DSH(:)		!Density (gm/cm^3)
 !
 ! Calculated directly from TLUSTY data. Same grid.
 !
-	REAL(10), ALLOCATABLE :: RD(:)		!Radius
-	REAL(10), ALLOCATABLE :: RD_NORM(:)	!Radius normalized by core radius
-	REAL(10), ALLOCATABLE :: ZZ(:)            !Height above core
-	REAL(10), ALLOCATABLE :: VPH(:)		!Velocity deduced from density structure (assuming Mdot)
-	REAL(10), ALLOCATABLE :: dVdR_PH(:)	!dVdR deduced from density structure
-	REAL(10), ALLOCATABLE :: KAPPA(:)		!Mass absorption coefficient
+	REAL(KIND=LDP), ALLOCATABLE :: RD(:)		!Radius
+	REAL(KIND=LDP), ALLOCATABLE :: RD_NORM(:)	!Radius normalized by core radius
+	REAL(KIND=LDP), ALLOCATABLE :: ZZ(:)            !Height above core
+	REAL(KIND=LDP), ALLOCATABLE :: VPH(:)		!Velocity deduced from density structure (assuming Mdot)
+	REAL(KIND=LDP), ALLOCATABLE :: dVdR_PH(:)	!dVdR deduced from density structure
+	REAL(KIND=LDP), ALLOCATABLE :: KAPPA(:)		!Mass absorption coefficient
 !
 ! Arrays used to generate a FINE grid of the TLUSTY hydrostatic data data.
 !
 	INTEGER, PARAMETER :: NBIG=2500
 
-	REAL(10), ALLOCATABLE :: RA(:)
-	REAL(10), ALLOCATABLE :: TA(:)
-	REAL(10), ALLOCATABLE :: TB(:)
-	REAL(10), ALLOCATABLE :: RA_NORM(:)
-	REAL(10), ALLOCATABLE :: VPA(:)		!Velocity deduced from density structure
-	REAL(10), ALLOCATABLE :: VW(:)		!Beta-wind velocity
-	REAL(10), ALLOCATABLE :: DSHA(:)		!Density
-	REAL(10), ALLOCATABLE :: TAUR_A(:)
-	REAL(10), ALLOCATABLE :: KAPPA_A(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RA_NORM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: VPA(:)		!Velocity deduced from density structure
+	REAL(KIND=LDP), ALLOCATABLE :: VW(:)		!Beta-wind velocity
+	REAL(KIND=LDP), ALLOCATABLE :: DSHA(:)		!Density
+	REAL(KIND=LDP), ALLOCATABLE :: TAUR_A(:)
+	REAL(KIND=LDP), ALLOCATABLE :: KAPPA_A(:)
 !
 ! Arrays for grid containing TLUSTY hydrostatic structure merged with
 ! the Beta-Velocity. Below the connection point TLUSTY structure is used.
@@ -73,46 +74,46 @@
 !
 	INTEGER, PARAMETER :: NEXT=1000	!Number of points used to extend R-grid
 	INTEGER NF				!Number of points in merged model
-	REAL(10), ALLOCATABLE :: R_F(:)
-	REAL(10), ALLOCATABLE :: T_F(:)
-	REAL(10), ALLOCATABLE :: VW_F(:)
-	REAL(10), ALLOCATABLE :: DSH_F(:)
-	REAL(10), ALLOCATABLE ::dVdR_F(:)
-	REAL(10), ALLOCATABLE :: TAUR_F(:)
-	REAL(10), ALLOCATABLE :: TEMP_F(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_F(:)
+	REAL(KIND=LDP), ALLOCATABLE :: T_F(:)
+	REAL(KIND=LDP), ALLOCATABLE :: VW_F(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DSH_F(:)
+	REAL(KIND=LDP), ALLOCATABLE ::dVdR_F(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TAUR_F(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TEMP_F(:)
 !
 ! Grid for CMFGEN
 !
 	INTEGER ND_CMF
 	INTEGER ND_SM
 	INTEGER ND_BEL
-	REAL(10), ALLOCATABLE :: R_CMF(:)
-	REAL(10), ALLOCATABLE :: DENS_CMF(:)
-	REAL(10), ALLOCATABLE :: V_CMF(:)
-	REAL(10), ALLOCATABLE :: T_CMF(:)
-	REAL(10), ALLOCATABLE :: dVdR_CMF(:)
-	REAL(10), ALLOCATABLE :: TAUR_CMF(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R_CMF(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DENS_CMF(:)
+	REAL(KIND=LDP), ALLOCATABLE :: V_CMF(:)
+	REAL(KIND=LDP), ALLOCATABLE :: T_CMF(:)
+	REAL(KIND=LDP), ALLOCATABLE :: dVdR_CMF(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TAUR_CMF(:)
 !
-	REAL(10) RSTAR			!Radius of Rstar in Rsun
-	REAL(10) RMAX			!Outer radius of star
-	REAL(10) MDOT			!Mass-loss in Msun/yr
-	REAL(10) VINF			!Velocity (km/s)
-	REAL(10) BETA			!Exponent for Beta-velocity law in outer wind.
-	REAL(10) BETA_MIN			!Exponent for Beta-velocity law in inner wind.
-	REAL(10) BETA_SCL			!Exponent for Beta-velocity law.
-	REAL(10) VW_BEG                   !Velocity at wind/photosphere interface when defining CMFGEN grid.
+	REAL(KIND=LDP) RSTAR			!Radius of Rstar in Rsun
+	REAL(KIND=LDP) RMAX			!Outer radius of star
+	REAL(KIND=LDP) MDOT			!Mass-loss in Msun/yr
+	REAL(KIND=LDP) VINF			!Velocity (km/s)
+	REAL(KIND=LDP) BETA			!Exponent for Beta-velocity law in outer wind.
+	REAL(KIND=LDP) BETA_MIN			!Exponent for Beta-velocity law in inner wind.
+	REAL(KIND=LDP) BETA_SCL			!Exponent for Beta-velocity law.
+	REAL(KIND=LDP) VW_BEG                   !Velocity at wind/photosphere interface when defining CMFGEN grid.
 !
-	REAL(10) AMDOT
-	REAL(10) RCORE
+	REAL(KIND=LDP) AMDOT
+	REAL(KIND=LDP) RCORE
 !
-	REAL(10) MIN_VAL
-	REAL(10) T1
-	REAL(10) CONS,EPS
-	REAL(10) DELR
-	REAL(10) R0
+	REAL(KIND=LDP) MIN_VAL
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) CONS,EPS
+	REAL(KIND=LDP) DELR
+	REAL(KIND=LDP) R0
 	INTEGER IND0
 	INTEGER C_INDX
-	INTEGER NV_WIND 		!Index in *_F arrays at wind/photosphere interface 
+	INTEGER NV_WIND 		!Index in *_F arrays at wind/photosphere interface
 !                                                  when defining CMFGEN grid.
 !
 	CHARACTER*80 FILENAME
@@ -134,7 +135,7 @@
 	INTEGER, PARAMETER :: LU_PHOT=11
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 !
-	REAL(10) FUN_PI,PI
+	REAL(KIND=LDP) FUN_PI,PI
 	EXTERNAL FUN_PI
 !
 	INTEGER I,ID,K,IOS
@@ -207,7 +208,7 @@
 	CALL GEN_IN(RSTAR,'RSTAR')
 	IF(PP_NOV)THEN
 	  MDOT=1.0D-22
-	ELSE 
+	ELSE
 	  CALL GEN_IN(RMAX,'RMAX')
 	  CALL GEN_IN(MDOT,'MDOT')
 	  CALL GEN_IN(VINF,'VINF')
@@ -429,17 +430,17 @@
 !
 ! Search connecting point with beta-law wind. To find the connection point we
 ! adopt a velocity law of the form:
-! 
+!
 !                                  v(r)=vinf(1-R0/r)^beta
 !
-! For R0  equally RCORE v(r) will be greater than VPA (V from TLUSTY) in the 
+! For R0  equally RCORE v(r) will be greater than VPA (V from TLUSTY) in the
 ! inner regions. We then vary R0 until we v(r) is always less the VPA (just).
 ! This defines R0. The connection point is defined by VPA-V(r)=0 (
 ! we take it to be a minimum).
 !
 	DO I=NBIG-1,1,-1
 	  R0=RA(I)
-	  FLAG=.FALSE.  
+	  FLAG=.FALSE.
 	  DO K=I-1,1,-1
 	    VW(K)=VINF*(1.0D0-R0/RA(K))**(BETA+(BETA_MIN-BETA)*
 	1          EXP( (1.0D0-RA(K)/RCORE)/BETA_SCL ))
@@ -447,7 +448,7 @@
 	  END DO
 	  IF(.NOT. FLAG)EXIT
 	END DO
-	IND0=I  
+	IND0=I
 !
 ! We have found R0, now need to find the connection radius.
 !

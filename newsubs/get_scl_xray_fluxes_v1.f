@@ -7,34 +7,35 @@
 	SUBROUTINE GET_SCL_XRAY_FLUXES_V1(CUR_CONT_FREQ,EMISS1,EMISS2,
 	1              CONT_FREQ,NFREQ,ML,
 	1              VSMOOTH,SECTION)
+	USE SET_KIND_MODULE
 	USE MOD_XRAY_FLUXES
 	IMPLICIT NONE
 !
 	INTEGER NFREQ		!Number of frequencies
 	INTEGER ML
-	REAL(10) VSMOOTH
+	REAL(KIND=LDP) VSMOOTH
 !
 ! NB: CONT_FREQ, NFREQ, and ML are ignored if SECTION =/ 'CONTINUUM'
 !
-	REAL(10) CUR_CONT_FREQ
-	REAL(10) CONT_FREQ(NFREQ)
+	REAL(KIND=LDP) CUR_CONT_FREQ
+	REAL(KIND=LDP) CONT_FREQ(NFREQ)
 !
 !The X-ray emissivity has units of ergs/cm^3/s/steradian/Hz, multiplied
 ! by a factor of 10^10 so as in program units.
 !
-	REAL(10) EMISS1
-	REAL(10) EMISS2
+	REAL(KIND=LDP) EMISS1
+	REAL(KIND=LDP) EMISS2
 	CHARACTER*(*) SECTION
 !
 ! Local variables:
 !
-	REAL(10) PREV_CONT_FREQ
-	REAL(10) NEXT_CONT_FREQ
+	REAL(KIND=LDP) PREV_CONT_FREQ
+	REAL(KIND=LDP) NEXT_CONT_FREQ
 !
-	REAL(10) NU_LF_BIN,NU_HF_BIN
-	REAL(10) HIGH_F
-	REAL(10) LOW_F
-	REAL(10) T1
+	REAL(KIND=LDP) NU_LF_BIN,NU_HF_BIN
+	REAL(KIND=LDP) HIGH_F
+	REAL(KIND=LDP) LOW_F
+	REAL(KIND=LDP) T1
 	INTEGER J
 	INTEGER LOC_LF,LOC_HF
 !
@@ -43,8 +44,8 @@
 !
 !       Rebin the data onto the new frequency grid.
 !
-! For the continuum calculation, we bin the data such that the integral of 
-! the fluxes on the new frequency grid agrees with that of the original data 
+! For the continuum calculation, we bin the data such that the integral of
+! the fluxes on the new frequency grid agrees with that of the original data
 ! on its grid. We assume the intgeral is done by the trapazoidal rule.
 !
 	IF(SECTION .EQ. 'CONTINUUM')THEN
@@ -66,7 +67,7 @@
 	    J=J+1
 	  END DO
 	  NEXT_CONT_FREQ=CONT_FREQ(J)
-!	  
+!	
 	  HIGH_F=0.5D0*(PREV_CONT_FREQ+CUR_CONT_FREQ)
 	  LOW_F=0.5D0*(NEXT_CONT_FREQ+CUR_CONT_FREQ)
 	  IF(HIGH_F .LT. LOW_F)THEN
@@ -74,7 +75,7 @@
 	  END IF
 	ELSE
 !
-! For the fluxes at a single frequency, as required by the Sobolev 
+! For the fluxes at a single frequency, as required by the Sobolev
 ! approximation (for example) we simply average the fluxes over a
 ! bin VSMOOTH km/s broad.
 !
@@ -95,7 +96,7 @@
 	  ELSE
 !
 ! We integrate the fluxes over the half interval centered on the
-! current frequency. We then normalize this integral by the half 
+! current frequency. We then normalize this integral by the half
 ! interval.
 !
 	    NU_LF_BIN=BIN_MIN+(LOC_LF-1)*BIN_SIZE

@@ -319,23 +319,8 @@
 	  ALLOCATE (T_EXC(1:ND))
 	END IF
 	GS_DC(1:ND)=RECOM_SUM(1:ND)/PHOT_SUM(1:ND)
-	T1=5.0D0
-	DO I=1,ND
-	  IF(GS_DC(I) .LT. 1.0D-250)THEN
-	    GS_DC(I)=1.0D-250
-	  ELSE IF(ABS(GS_DC(I)-1.0D0) .LT. 0.1D0)THEN
-	    T1=T(I)
-	  ELSE
-	    DO J=1,10
-	      T1=LOG( GS_DC(I)*(T1/T(I))**1.5 )/HDKT/FEDGE(1)+1.0/T(I)
-	      T1=1.0/T1
-	    END DO
-	  END IF
-	  T_EXC(I)=T1
-!	  IF(I .EQ. 1 .OR. I .EQ. ND)THEN
-!	    WRITE(T_OUT,'(I4,2X,A,F8.3,3X,A,ES10.3,3X,A,ES8.2)')I,'T=',T(I),'T_EXC=',T_EXC(I),'RR/PR=',GS_DC(I)
-!	  END IF
-	END DO	
+	T1=1.0D-02      !Accuracy parameter
+	CALL GET_EXCITE_TEMP(T,T_EXC,GS_DC,FEDGE,HDKT,T1,ND)
 !
 ! Compute departure coefficients of all levels. We assume that they have the same
 ! excitation temeprature as the ground state. In many cases, this will

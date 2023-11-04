@@ -4,6 +4,7 @@
 ! contribution is added directly to the opacity CHI and emissivity ETA.
 !
 	SUBROUTINE COMP_FREE_FREE_V1(CHI_FF,ETA_FF,VCHI_FF,VETA_FF,CONT_FREQ,FREQ,DO_VAR,ND,NT)
+	USE SET_KIND_MODULE
 	USE MOD_CMFGEN
 	IMPLICIT NONE
 !
@@ -12,24 +13,24 @@
 !
 	INTEGER ND
 	INTEGER NT
-	REAL(10) FREQ
-	REAL(10) CONT_FREQ
-	REAL(10) CHI_FF(ND)			!Opacity
-	REAL(10) ETA_FF(ND)			!Emissivity
-	REAL(10) VCHI_FF(NT,ND)			!Opacity
-	REAL(10) VETA_FF(NT,ND)			!Emissivity
+	REAL(KIND=LDP) FREQ
+	REAL(KIND=LDP) CONT_FREQ
+	REAL(KIND=LDP) CHI_FF(ND)			!Opacity
+	REAL(KIND=LDP) ETA_FF(ND)			!Emissivity
+	REAL(KIND=LDP) VCHI_FF(NT,ND)			!Opacity
+	REAL(KIND=LDP) VETA_FF(NT,ND)			!Emissivity
 	LOGICAL DO_VAR
 !
 ! Constants for opacity etc.
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 ! Vectors to save computational effort.
 !
-	REAL(10) EMHNUKT(ND)		!EXP(-hv/kT)
-	REAL(10) GFF_VAL(ND)		!g(ff) as a function of depth
-	REAL(10) POP_SUM(ND)		!Factor to convert HNST for ION_LEV
+	REAL(KIND=LDP) EMHNUKT(ND)		!EXP(-hv/kT)
+	REAL(KIND=LDP) GFF_VAL(ND)		!g(ff) as a function of depth
+	REAL(KIND=LDP) POP_SUM(ND)		!Factor to convert HNST for ION_LEV
 !
 ! Local constants.
 !
@@ -37,11 +38,11 @@
 	INTEGER EQION
 	INTEGER I,K,L
 !
-	REAL(10) T1
-	REAL(10) NU
-	REAL(10) ALPHA,TCHI1,TETA1
-	REAL(10) EMIS
-	REAL(10) HNUONKT
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) NU
+	REAL(KIND=LDP) ALPHA,TCHI1,TETA1
+	REAL(KIND=LDP) EMIS
+	REAL(KIND=LDP) HNUONKT
 !
 	NU=FREQ
         T1=-HDKT*NU

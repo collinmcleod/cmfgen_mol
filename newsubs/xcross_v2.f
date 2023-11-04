@@ -1,5 +1,5 @@
 !
-! Routine returns "core" photoionization cross section for a wide range 
+! Routine returns "core" photoionization cross section for a wide range
 ! of ions. Data is from Verner and Yakovlev 1995(?).
 !
 ! XCROSS   : Returned cross section in units of 10^{-10} cm^2
@@ -8,7 +8,7 @@
 ! NUM_ELEC : Number of electrons in system that is being photoionized.
 !
 ! PQN      : Principal quantum number of state. If zero, it (and ANG) are
-!              ignored, and the cross-section returned is a sum over several 
+!              ignored, and the cross-section returned is a sum over several
 !              initial states.
 ! ANG      : Angular momentum principal quantum number.
 ! DO_ALL   : If true, the total photoionization cross section, for the
@@ -20,7 +20,7 @@
 !            Non-valence electrons are defined as:
 !              If(Ne < 3), there are no valence electrons. This would apply
 !                 to H, and HeI like atomic systems.
-!              If(Ne = 3), then electrons in (n:l)=(1:0) are treated as 
+!              If(Ne = 3), then electrons in (n:l)=(1:0) are treated as
 !                valence electrons provided D_LIT is true.
 !              If(Ne < 12), (n:l)=(1:0)
 !              If(Ne < 20), (n:l)=(1,2 : 0,1)
@@ -30,13 +30,14 @@
 ! DO_LIT   : Returns the cross-section for the K-shell of Lithium like ions.
 !
 	FUNCTION XCROSS_V2(FREQ,ZCORE,NUM_ELEC,PQN,ANG,DO_ALL,DO_LIT)
+	USE SET_KIND_MODULE
 	USE XRAY_DATA_MOD
 	IMPLICIT NONE
 !
-	REAL(10) XCROSS_V2
-	REAL(10) FREQ
-	REAL(10) ZCORE
-	REAL(10) NUM_ELEC
+	REAL(KIND=LDP) XCROSS_V2
+	REAL(KIND=LDP) FREQ
+	REAL(KIND=LDP) ZCORE
+	REAL(KIND=LDP) NUM_ELEC
 	INTEGER PQN
 	INTEGER ANG
 !
@@ -52,10 +53,10 @@
 	INTEGER IZ
 	INTEGER NE
 	INTEGER LOOP_PQN_MAX
-	REAL(10) CON_FAC
-	REAL(10) NU_EV
-	REAL(10) Y
-	REAL(10) Q
+	REAL(KIND=LDP) CON_FAC
+	REAL(KIND=LDP) NU_EV
+	REAL(KIND=LDP) Y
+	REAL(KIND=LDP) Q
 	LOGICAL, SAVE :: FIRST=.TRUE.
 !
 	XCROSS_V2=0.0D0
@@ -106,9 +107,9 @@
 	  END IF
 	  IF(I .GT. PQN_MAX_X)RETURN
 	  IF(J .GT. ANG_MAX_X)RETURN
-	  IF( SIG_0_X(IZ,NE,I,J) .NE. 0 .AND. 
+	  IF( SIG_0_X(IZ,NE,I,J) .NE. 0 .AND.
 	1         NU_EV .GE. E_THRESH_X(IZ,NE,I,J) )THEN
-	    Y=NU_EV/E_0_X(IZ,NE,I,J) 
+	    Y=NU_EV/E_0_X(IZ,NE,I,J)
 	    Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)
 	    XCROSS_V2=XCROSS_V2+
 	1   SIG_0_X(IZ,NE,I,J) *
@@ -122,9 +123,9 @@
 	ELSE IF(DO_ALL)THEN
 	  DO J=0,ANG_MAX_X
 	    DO I=1,PQN_MAX_X
-	      IF( SIG_0_X(IZ,NE,I,J) .NE. 0 .AND. 
+	      IF( SIG_0_X(IZ,NE,I,J) .NE. 0 .AND.
 	1         NU_EV .GE. E_THRESH_X(IZ,NE,I,J) )THEN
-	        Y=NU_EV/E_0_X(IZ,NE,I,J) 
+	        Y=NU_EV/E_0_X(IZ,NE,I,J)
 	        Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)
 	        XCROSS_V2=XCROSS_V2+
 	1       SIG_0_X(IZ,NE,I,J) *
@@ -136,17 +137,17 @@
 	ELSE
 ! 
 ! We only wish to return photoionization cross-sections for the core
-! (i.e., non-valence) electrons. We do not treat H, HeI and He2 isoelectronic 
-! sequence ions. If DO_LIT is false, return 0 for Li I isoelectronic sequence 
+! (i.e., non-valence) electrons. We do not treat H, HeI and He2 isoelectronic
+! sequence ions. If DO_LIT is false, return 0 for Li I isoelectronic sequence
 ! ions.
 !
-! For ions with 3s2 3p6 3dn electron configurations, we DO NOT include 
-! ionizations from the 3s and 3p states. The following code may need to be 
+! For ions with 3s2 3p6 3dn electron configurations, we DO NOT include
+! ionizations from the 3s and 3p states. The following code may need to be
 ! changed when elements with z > 10 are included.
 !
 ! We only include ionizations from the 2p shell if there is 3 or more
 ! electrons in the n=3 shell.
-!                        
+!
 	  IF( NE .LE. 2 .OR. (.NOT. DO_LIT .AND. NE .EQ. 3) )RETURN
 !
 	  DO J=0,ANG_MAX_X
@@ -154,10 +155,10 @@
 	    IF(NE .LE. 19)LOOP_PQN_MAX=MIN(2,PQN_MAX_X)
 	    IF(NE .LE. 11)LOOP_PQN_MAX=1
 	    DO I=1,LOOP_PQN_MAX
-	      IF( SIG_0_X(IZ,NE,I,J) .NE. 0 .AND. 
+	      IF( SIG_0_X(IZ,NE,I,J) .NE. 0 .AND.
 	1         N_ED_EJ(IZ,NE,I,J) .GT. 1 .AND.
 	1         NU_EV .GE. E_THRESH_X(IZ,NE,I,J) )THEN
-	        Y=NU_EV/E_0_X(IZ,NE,I,J) 
+	        Y=NU_EV/E_0_X(IZ,NE,I,J)
 	        Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)
 	        XCROSS_V2=XCROSS_V2+
 	1       SIG_0_X(IZ,NE,I,J) *

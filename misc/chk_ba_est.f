@@ -1,25 +1,26 @@
 !
-! Small program to read in two BA_ASI_N_D? files from successive iterations. 
+! Small program to read in two BA_ASI_N_D? files from successive iterations.
 ! Ideally the populations for the iterations should be identical, except for one
 ! value. This code allows a comparision between the actual changes, and those predicted
 ! from solution of the linearized equations. Useful for testing.
 !
 	PROGRAM CHK_BA_EST
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
 ! Created: 18-Nov-2009
 !
-	REAL(10), ALLOCATABLE :: CMAT_A(:,:)
-	REAL(10), ALLOCATABLE :: POPS_A(:)
-	REAL(10), ALLOCATABLE :: STEQ_A(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CMAT_A(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: POPS_A(:)
+	REAL(KIND=LDP), ALLOCATABLE :: STEQ_A(:)
 !
-	REAL(10), ALLOCATABLE :: CMAT_B(:,:)
-	REAL(10), ALLOCATABLE :: POPS_B(:)
-	REAL(10), ALLOCATABLE :: STEQ_B(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CMAT_B(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: POPS_B(:)
+	REAL(KIND=LDP), ALLOCATABLE :: STEQ_B(:)
 !
-	REAL(10), ALLOCATABLE :: dSTEQ(:)
-	REAL(10) T1
+	REAL(KIND=LDP), ALLOCATABLE :: dSTEQ(:)
+	REAL(KIND=LDP) T1
 !
 	INTEGER NT
 	INTEGER I

@@ -1,8 +1,9 @@
         PROGRAM NEW_SN_MOD
-        USE GEN_IN_INTERFACE
+        USE SET_KIND_MODULE
+	USE GEN_IN_INTERFACE
         IMPLICIT NONE
-! 
-! Altered: 29-Jan-2014 : Extensive improvements 
+!
+! Altered: 29-Jan-2014 : Extensive improvements
 !
 ! Simple program to modify the VADAT for a new MODEL at an
 ! advanced time step.
@@ -18,9 +19,9 @@
 ! Some othe common parameters which often vary for a promted for, or, in
 ! the case of parameters associated with NG aceleration, set to default values.
 !
-	REAL(10) FRAC_TIME_STEP
-	REAL(10) AGE
-	REAL(10) T1
+	REAL(KIND=LDP) FRAC_TIME_STEP
+	REAL(KIND=LDP) AGE
+	REAL(KIND=LDP) T1
 !
         INTEGER, PARAMETER :: NMAX=2000
         INTEGER I,J

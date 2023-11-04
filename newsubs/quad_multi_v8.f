@@ -23,6 +23,7 @@
 	1                       HNST_F_ON_S,EDGE_F,N_F,
 	1                       F_TO_S_MAPPING,NU_CONT,T,ND,
 	1                       DESC,ZION,PHOT_ID,ID)
+	USE SET_KIND_MODULE
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 	EXTERNAL SUB_PHOT_GEN
@@ -31,7 +32,7 @@
 !                       HNST_F_ON_S (rather than HNST_F) is passed in call.
 !                       HNST_F/HNST_S replaced by HNST_F_ON_S - done to faciliate
 !                         modifications allowing lower temperaturs.
-!                       Most of editing done early 2011 
+!                       Most of editing done early 2011
 ! Altered 15-Dec-1997 - MOD_LEV_DIS_BLK replaces include file. Level
 !                         dissolution can be switched off completely.
 ! Altered 05-Sep-1997 - Option to assume that continuum cross-sections have
@@ -41,7 +42,7 @@
 !                         changing:
 !                                   EVALSE
 !                         As call changed, now V5.
-!                  
+!
 ! Altered 20-Sep-1996 - Extensive changes to allow SUB_PHOT to be called.
 !                       Changes designed to improve speed and vectorization.
 !                       Level dissolution effects directy incorporated.
@@ -52,31 +53,31 @@
 !
 	INTEGER ID
 	INTEGER N_S,N_F,ND
-	REAL(10) WSE_S(N_S,ND)
-	REAL(10) dWSE_SdT(N_S,ND)
-	REAL(10) WSE_CR_S(N_S,ND)
-	REAL(10) HNST_S(N_S,ND)
-	REAL(10) dlnHNST_S_dlnT(N_S,ND)
+	REAL(KIND=LDP) WSE_S(N_S,ND)
+	REAL(KIND=LDP) dWSE_SdT(N_S,ND)
+	REAL(KIND=LDP) WSE_CR_S(N_S,ND)
+	REAL(KIND=LDP) HNST_S(N_S,ND)
+	REAL(KIND=LDP) dlnHNST_S_dlnT(N_S,ND)
 !
-	REAL(10) HNST_F_ON_S(N_F,ND)
-	REAL(10) EDGE_F(N_F)			!In 10^15 Hz
+	REAL(KIND=LDP) HNST_F_ON_S(N_F,ND)
+	REAL(KIND=LDP) EDGE_F(N_F)			!In 10^15 Hz
 	INTEGER F_TO_S_MAPPING(N_F)
-	REAL(10) T(ND)
+	REAL(KIND=LDP) T(ND)
 !
-	REAL(10) NU_CONT
-	REAL(10) ZION
+	REAL(KIND=LDP) NU_CONT
+	REAL(KIND=LDP) ZION
 	CHARACTER*(*) DESC
 	INTEGER PHOT_ID
 !
-	REAL(10) YDIS(ND)		!Constant for computing level dissolution/
-	REAL(10) XDIS(ND)		!Constant for computing level dissolution/
-	REAL(10) DIS_CONST(N_F)	!Constant appearing in dissolution formula.
-	REAL(10) ALPHA_VEC(N_F)
+	REAL(KIND=LDP) YDIS(ND)		!Constant for computing level dissolution/
+	REAL(KIND=LDP) XDIS(ND)		!Constant for computing level dissolution/
+	REAL(KIND=LDP) DIS_CONST(N_F)	!Constant appearing in dissolution formula.
+	REAL(KIND=LDP) ALPHA_VEC(N_F)
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) OPLIN,EMLIN
 !
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
@@ -84,7 +85,7 @@
 ! Local Variables,
 !
 	INTEGER I_S,I_F,J
-	REAL(10) T1,T2,T3,ZION_CUBED,NEFF,FOUR_PI_D_H
+	REAL(KIND=LDP) T1,T2,T3,ZION_CUBED,NEFF,FOUR_PI_D_H
 !
 ! NB: WSE_OLD=WSE*FQW/NU
 !     dWSEdT_OLD=dWSEdT*FQW/NU
@@ -169,6 +170,6 @@
 	    END DO
 	  END IF
 	END DO
-	    
+	
 	RETURN
 	END

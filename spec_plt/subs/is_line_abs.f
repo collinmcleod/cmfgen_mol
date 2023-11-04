@@ -1,58 +1,59 @@
-C This program will calculate an absorption profile by computing an optical 
-C depth at line center t0, with viogt profile.  It needs as input a 
+C This program will calculate an absorption profile by computing an optical
+C depth at line center t0, with viogt profile.  It needs as input a
 C micro-turbulent parameter b(km/sec), a central wavelength lam0(ang),
-C an ossillator (sp) strength f(dimensionless), and a line width (rather a 
+C an ossillator (sp) strength f(dimensionless), and a line width (rather a
 C damping parameter) gam(sec^-1).  The temperature is also input but has little
 C effect.  The voigt profile in IDL has a problem with
-C negative independent variables so we do a onesided calculation and assume 
+C negative independent variables so we do a onesided calculation and assume
 C symmetry.
 C Started on 1-9-92 by SRM
-C                      
+C
 C This program is a modification of absprof.pro.  This will calculate a
-C set of optical depths as a function of wavelength for the Lyman series of 
-C hydrogen.  When the optical depths get too large I truncate them at a 
-C particular maximum finite value so that when I exponentiate and 
+C set of optical depths as a function of wavelength for the Lyman series of
+C hydrogen.  When the optical depths get too large I truncate them at a
+C particular maximum finite value so that when I exponentiate and
 C convolve with the point spread function of the telescope I will (hopefully)
 C get a well behaved transmission function which can be divided out of the
 C EZ CMa spectrum to revel the ``true'' spectrum.  This modification started
 C on 4-30-92 by SRM.
 C
 	SUBROUTINE IS_LINE_ABS(WAVE,FLUX,NLAM,V_TURB,LOG_NTOT,T_IN_K)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 	INTEGER NLAM
-	REAL(10) WAVE(NLAM)
-	REAL(10) FLUX(NLAM)
-	REAL(10) V_TURB		!km/s
-	REAL(10) LOG_NTOT
-	REAL(10) T_IN_K
+	REAL(KIND=LDP) WAVE(NLAM)
+	REAL(KIND=LDP) FLUX(NLAM)
+	REAL(KIND=LDP) V_TURB		!km/s
+	REAL(KIND=LDP) LOG_NTOT
+	REAL(KIND=LDP) T_IN_K
 C
 C Local variables
 C
 	INTEGER NLINES_MAX
 	PARAMETER (NLINES_MAX=200)
-	REAL(10) LAM_ZERO(NLINES_MAX)
-	REAL(10) NU_ZERO(NLINES_MAX)
-	REAL(10) OSC(NLINES_MAX)
-	REAL(10) GAM(NLINES_MAX)
-	REAL(10) GL(NLINES_MAX)
-	REAL(10) GUP(NLINES_MAX)
-	REAL(10) VDOP(NLINES_MAX)
-	REAL(10) VRAD(NLINES_MAX)
-	REAL(10) NCOL(NLINES_MAX)
-	REAL(10) NU_DOP(NLINES_MAX)
+	REAL(KIND=LDP) LAM_ZERO(NLINES_MAX)
+	REAL(KIND=LDP) NU_ZERO(NLINES_MAX)
+	REAL(KIND=LDP) OSC(NLINES_MAX)
+	REAL(KIND=LDP) GAM(NLINES_MAX)
+	REAL(KIND=LDP) GL(NLINES_MAX)
+	REAL(KIND=LDP) GUP(NLINES_MAX)
+	REAL(KIND=LDP) VDOP(NLINES_MAX)
+	REAL(KIND=LDP) VRAD(NLINES_MAX)
+	REAL(KIND=LDP) NCOL(NLINES_MAX)
+	REAL(KIND=LDP) NU_DOP(NLINES_MAX)
 C
-	REAL(10) CHIL(NLINES_MAX)
+	REAL(KIND=LDP) CHIL(NLINES_MAX)
 C
-	REAL(10) C_KMS,PI
-	REAL(10) OPLIN
-	REAL(10) TAU
-	REAL(10) NTOT
-	REAL(10) PHI
-	REAL(10) FREQ
-	REAL(10) a
-	REAL(10) v
-	REAL(10) T1
+	REAL(KIND=LDP) C_KMS,PI
+	REAL(KIND=LDP) OPLIN
+	REAL(KIND=LDP) TAU
+	REAL(KIND=LDP) NTOT
+	REAL(KIND=LDP) PHI
+	REAL(KIND=LDP) FREQ
+	REAL(KIND=LDP) a
+	REAL(KIND=LDP) v
+	REAL(KIND=LDP) T1
 C
 	INTEGER I,J,IOS
 	INTEGER NLINES
@@ -60,9 +61,9 @@ C
 C
 C Functions
 C
-	REAL(10) SPEED_OF_LIGHT
-	REAL(10) FUN_PI
-	REAL(10) VOIGT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
+	REAL(KIND=LDP) FUN_PI
+	REAL(KIND=LDP) VOIGT
 	EXTERNAL SPEED_OF_LIGHT,FUN_PI,VOIGT
 C
 C First read in the atomic data, kindly provided by Chuck Bowers (CWB).
@@ -125,7 +126,7 @@ C
 	      v=(FREQ-NU_ZERO(I))/NU_DOP(I)
 	      IF(ABS(V) .LE. 100.0)THEN                  !Was 10
 	        a=1.0D-15*GAM(I)/4/PI/NU_DOP(I)
-	        PHI=VOIGT(a,v)    
+	        PHI=VOIGT(a,v)
 	        TAU=TAU+CHIL(I)*PHI
 	        FLUX(J)=FLUX(J)*EXP(-TAU)
 	      END IF

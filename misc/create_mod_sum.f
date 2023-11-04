@@ -4,12 +4,13 @@
 ! file (MODEL_SUMMARY).
 !
 	PROGRAM CREATE_MOD_SUM
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
 ! Altered 06-Sep-2022 : Added Teff and Rcore at inner boudary to the output.
 !
-	REAL(10) T1,T2,T3
+	REAL(KIND=LDP) T1,T2,T3
 	INTEGER K,IOS
 	INTEGER LDIR
 	INTEGER I,J
@@ -172,7 +173,7 @@
 	       READ(STRING,*)T1
 	       WRITE(TCORE,'(ES8.2)')T1
 	       WRITE(6,*)'TCORE=',TCORE
-	    END IF 
+	    END IF
 	  END DO
 !
 	  K=INDEX(STRING,'Rsun')
@@ -299,7 +300,7 @@
 	  IF(USE_MF)THEN
 	    WRITE(XOXY,'(F6.3)')T2
 	    IF(T3 .LT. 0.05)WRITE(XOXY,'(F6.4)')T2
-	  ELSE 
+	  ELSE
 	    WRITE(XOXY,'(F6.3)')T1
 	  END IF
 !
@@ -355,11 +356,11 @@
 	      ELSE IF(INDEX(STRING,'ITS_DONE') .NE. 0)THEN
 	        READ(STRING,*)I
 	        IF(I .NE. 0)BETA=BOTH_BETA
-	      END IF   
+	      END IF
             END DO
 	  END IF
 2000      CONTINUE
-	   
+	
 	  TEFF=ADJUSTR(TEFF)
 	  LOGG=ADJUSTR(LOGG)
 	  LSTAR=ADJUSTR(LSTAR)

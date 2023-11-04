@@ -28,6 +28,7 @@
 !******************************************************************************
 !
 	SUBROUTINE SUB_PHOT_GEN(ID,PHOT,FREQ,GS_EDGE,NLEVS,PHOT_ID,SET_TO_EDGE)
+	USE SET_KIND_MODULE
 !
 ! IF SET_TO_EDGE is TRUE, the routine will return the
 ! bound-free cross-section at threshold for those levels which have
@@ -48,7 +49,7 @@
 !
 	IMPLICIT NONE
 !
-! Altered 25-Oct-2023 : Added error messages concerning MAX_N_PQN and MAX_L_PQN (20-Aug-2023) 
+! Altered 25-Oct-2023 : Added error messages concerning MAX_N_PQN and MAX_L_PQN (20-Aug-2023)
 ! Altered 15-Nov-2021 : Fixed call to XCROSS_V2 for type 31. Added STOP type 30.
 ! Altered 09-Oct-2018 : Now set the b-f gaunt factor to unity for n>30  (previously crashed).
 ! Altered 07-Oct-2015 : Bug fix for Type 7 (modified Seaton formula).
@@ -82,27 +83,27 @@
 	INTEGER ID
 	INTEGER NLEVS			!Number of levels
 	INTEGER PHOT_ID		!Which photoionization route.
-	REAL(10) PHOT(NLEVS)		!Cross-section
-	REAL(10) GS_EDGE(NLEVS)		!Energy for ionization to Ground State!
-	REAL(10) FREQ
+	REAL(KIND=LDP) PHOT(NLEVS)		!Cross-section
+	REAL(KIND=LDP) GS_EDGE(NLEVS)		!Energy for ionization to Ground State!
+	REAL(KIND=LDP) FREQ
 	LOGICAL SET_TO_EDGE
 !
 ! External functions.
 !
 	INTEGER ERROR_LU
-	REAL(10) VOIGT,HYDCROSSL,XCROSS_V2,GBF
+	REAL(KIND=LDP) VOIGT,HYDCROSSL,XCROSS_V2,GBF
 	EXTERNAL VOIGT,HYDCROSSL,XCROSS_V2,GBF,ERROR_LU
 !
 ! Common block with opacity/emissivity constants.
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 !
 ! Local vectors
 !
-	REAL(10) FREQ_VEC(NLEVS)
-	REAL(10) INDX(NLEVS)
+	REAL(KIND=LDP) FREQ_VEC(NLEVS)
+	REAL(KIND=LDP) INDX(NLEVS)
 !
 ! Local variables.
 !
@@ -112,20 +113,20 @@
 	INTEGER INC,INC_SAV
 	INTEGER LST,LEND
 !
-	REAL(10) U			!Defined as FREQ/EDGE
-	REAL(10) RU			!Defined as EDGE/FREQ
+	REAL(KIND=LDP) U			!Defined as FREQ/EDGE
+	REAL(KIND=LDP) RU			!Defined as EDGE/FREQ
 !
-	REAL(10) T1,T2,T3
-	REAL(10) DOP_NU
-	REAL(10) EDGE			!Ionization energy
-	REAL(10) A_VOIGT
-	REAL(10) V_VOIGT
-	REAL(10) X
-	REAL(10) RJ
-	REAL(10) SUM
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) DOP_NU
+	REAL(KIND=LDP) EDGE			!Ionization energy
+	REAL(KIND=LDP) A_VOIGT
+	REAL(KIND=LDP) V_VOIGT
+	REAL(KIND=LDP) X
+	REAL(KIND=LDP) RJ
+	REAL(KIND=LDP) SUM
 !
-	REAL(10), PARAMETER :: EV_TO_HZ=0.241798840766D0
-	REAL(10), PARAMETER :: EQUAL_COR_FAC=1.0D0+1.0D-14
+	REAL(KIND=LDP), PARAMETER :: EV_TO_HZ=0.241798840766D0
+	REAL(KIND=LDP), PARAMETER :: EQUAL_COR_FAC=1.0D0+1.0D-14
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2
@@ -150,7 +151,7 @@
 !	        END DO
 !	        STOP
 !	      END IF
-!	    END DO	        
+!	    END DO	
 !	    DO I=1,NLEVS
 !	      IF(PHOT(I) .LT. 0.004D0)PHOT(I)=0.004D0
 !	    END DO
@@ -207,7 +208,7 @@
 ! when their destination level in the ion is unavailable.
 !
 	DO K=1,PD(ID)%NUM_PHOT_ROUTES
-	  IF( PD(ID)%DO_PHOT(PHOT_ID,K) .OR. 
+	  IF( PD(ID)%DO_PHOT(PHOT_ID,K) .OR.
 	1            (DO_PURE_EDGE .AND. K .EQ.PHOT_ID) )THEN
 C
 C First do those parts not readily vectorized.
@@ -322,7 +323,7 @@ C
 	            LEND=NINT( PD(ID)%CROSS_A(LMIN+2) )
 !
 	            IF(N .GT. MAX_N_PQN)THEN
-	              WRITE(6,*)'Error in SUB_PHOT_GEN -- invalid N value for cross-section type 8' 
+	              WRITE(6,*)'Error in SUB_PHOT_GEN -- invalid N value for cross-section type 8'
 	              WRITE(6,*)'Maximum N value is ',MAX_N_PQN
 	              WRITE(6,*)'N,LST,LEND=',N,LST,LEND
 	              WRITE(6,*)'ID=',ID,'NLEVS=',NLEVS
@@ -333,7 +334,7 @@ C
 	            END IF
 !
 	            IF(LST .GT. MAX_L_PQN .OR. LEND .GT. MAX_L_PQN)THEN
-	              WRITE(6,*)'Error in SUB_PHOT_GEN -- invalid L value for cross-section type 8' 
+	              WRITE(6,*)'Error in SUB_PHOT_GEN -- invalid L value for cross-section type 8'
 	              WRITE(6,*)'Maximum L value is ',MAX_L_PQN
 	              WRITE(6,*)'N,LST,LEND=',N,LST,LEND
 	              WRITE(6,*)'ID=',ID,'NLEVS=',NLEVS
@@ -532,7 +533,7 @@ C
                     END IF
 	          END DO
 !
-!                                   
+!
 !
 	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 30)THEN
 	          T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION	!# of elec. in species.
@@ -580,7 +581,7 @@ C
 	  END DO
 	END IF
 !
-! Include X-rays opacity with regular cross-sections if requested. This is 
+! Include X-rays opacity with regular cross-sections if requested. This is
 ! usually done when only the ground state of the next ioization stage is
 ! included.
 !

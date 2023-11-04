@@ -1,23 +1,24 @@
-C This program will calculate an absorption profile by computing an optical 
-C depth at line center t0, with viogt profile.  It needs as input a 
+C This program will calculate an absorption profile by computing an optical
+C depth at line center t0, with viogt profile.  It needs as input a
 C micro-turbulent parameter b(km/sec), a central wavelength lam0(ang),
-C an ossillator (sp) strength f(dimensionless), and a line width (rather a 
+C an ossillator (sp) strength f(dimensionless), and a line width (rather a
 C damping parameter) gam(sec^-1).  The temperature is also input but has little
 C effect.  The voigt profile in IDL has a problem with
-C negative independent variables so we do a onesided calculation and assume 
+C negative independent variables so we do a onesided calculation and assume
 C symmetry.
 C Started on 1-9-92 by SRM
-C                      
+C
 C This program is a modification of absprof.pro.  This will calculate a
-C set of optical depths as a function of wavelength for the Lyman series of 
-C hydrogen.  When the optical depths get too large I truncate them at a 
-C particular maximum finite value so that when I exponentiate and 
+C set of optical depths as a function of wavelength for the Lyman series of
+C hydrogen.  When the optical depths get too large I truncate them at a
+C particular maximum finite value so that when I exponentiate and
 C convolve with the point spread function of the telescope I will (hopefully)
 C get a well behaved transmission function which can be divided out of the
 C EZ CMa spectrum to revel the ``true'' spectrum.  This modification started
 C on 4-30-92 by SRM.
 C
 	SUBROUTINE H2ABS(WAVE,FLUX,NLAM,V_TURB,LOG_NTOT,T_IN_K)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 16-Apr-2008: PAUSE used if cannot find file with line list.
@@ -25,50 +26,50 @@ C Altered 21-Dec-2001: Error in VTURB (**2 insetad of *2) fixed
 C Altered 21-Apr-2000: H2_L_J made INTEGER.
 C
 	INTEGER NLAM
-	REAL(10) WAVE(NLAM)
-	REAL(10) FLUX(NLAM)
-	REAL(10) V_TURB		!km/s
-	REAL(10) LOG_NTOT
-	REAL(10) T_IN_K
+	REAL(KIND=LDP) WAVE(NLAM)
+	REAL(KIND=LDP) FLUX(NLAM)
+	REAL(KIND=LDP) V_TURB		!km/s
+	REAL(KIND=LDP) LOG_NTOT
+	REAL(KIND=LDP) T_IN_K
 C
 C Local variables
 C
 	INTEGER NH2
 	PARAMETER (NH2=420)
-	REAL(10) H2_LAM(NH2)
-	REAL(10) H2_FREQ(NH2)
-	REAL(10) H2_OSC(NH2)
-	REAL(10) H2_GAM(NH2)
-	REAL(10) H2_G(NH2)
-	REAL(10) NU_DOP(NH2)
+	REAL(KIND=LDP) H2_LAM(NH2)
+	REAL(KIND=LDP) H2_FREQ(NH2)
+	REAL(KIND=LDP) H2_OSC(NH2)
+	REAL(KIND=LDP) H2_GAM(NH2)
+	REAL(KIND=LDP) H2_G(NH2)
+	REAL(KIND=LDP) NU_DOP(NH2)
 C
 	INTEGER H2_L_J(NH2)
 C
-	REAL(10) G_J(0:7)
-	REAL(10) N_J(0:7)
+	REAL(KIND=LDP) G_J(0:7)
+	REAL(KIND=LDP) N_J(0:7)
 C
-	REAL(10) CHIL(NH2)
+	REAL(KIND=LDP) CHIL(NH2)
 C
-	REAL(10) C_KMS,PI
-	REAL(10) OPLIN
-	REAL(10) TAU
-	REAL(10) NTOT
-	REAL(10) FREQ
-	REAL(10) PHI
-	REAL(10) a
-	REAL(10) v
-	REAL(10) T1
-	REAL(10) HC_ON_K
-	REAL(10) B
-	REAL(10) POP_SUM
+	REAL(KIND=LDP) C_KMS,PI
+	REAL(KIND=LDP) OPLIN
+	REAL(KIND=LDP) TAU
+	REAL(KIND=LDP) NTOT
+	REAL(KIND=LDP) FREQ
+	REAL(KIND=LDP) PHI
+	REAL(KIND=LDP) a
+	REAL(KIND=LDP) v
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) HC_ON_K
+	REAL(KIND=LDP) B
+	REAL(KIND=LDP) POP_SUM
 C
 	INTEGER I,J,IOS
 C
 C Functions
 C
-	REAL(10) SPEED_OF_LIGHT
-	REAL(10) FUN_PI
-	REAL(10) VOIGT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
+	REAL(KIND=LDP) FUN_PI
+	REAL(KIND=LDP) VOIGT
 	EXTERNAL SPEED_OF_LIGHT,FUN_PI,VOIGT
 !
 	CHARACTER(LEN=1) TMP_STR
@@ -87,7 +88,7 @@ C
 	  IF(IOS .NE. 0)THEN
 	    WRITE(6,*)'H2_IS_LINE_LIST file not found'
 	    WRITE(6,*)'Use astxt to assign file, then hit any character and return/enter'
-	    READ(6,'(A)')TMP_STR 
+	    READ(6,'(A)')TMP_STR
 	    GOTO 100
 	  END IF
 	  DO I=1,NH2
@@ -109,7 +110,7 @@ C
         g_J(6)=13
         g_J(7)=45
 	POP_SUM=0.D0
-        DO I=0,7 
+        DO I=0,7
           N_J(I)=G_J(I)*EXP(-B*(I*(I+1))*HC_ON_K/T_IN_K)
 	  POP_SUM=POP_SUM+N_J(I)
         END DO
@@ -136,7 +137,7 @@ C
 	    DO I=1,NH2
 	      a=1.0D-15*H2_GAM(I)/4/PI/NU_DOP(I)
 	      v=(FREQ-H2_FREQ(I))/NU_DOP(I)
-	      PHI=VOIGT(a,v)    
+	      PHI=VOIGT(a,v)
 	      TAU=TAU+CHIL(I)*PHI
 	    END DO
 	    FLUX(J)=FLUX(J)*EXP(-TAU)

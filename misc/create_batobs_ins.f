@@ -1,7 +1,7 @@
 !
 ! To avoid possible conflicts, the keys
-!       [TRANS_XzV] 
-! and 
+!       [TRANS_XzV]
+! and
 !       [SCL_DUM_ABUND]
 ! should not exist in CMF_FLUX_PARAM_INIT.
 !
@@ -14,8 +14,9 @@
 !
 !  RUNID   (ID)
 !    etc
-!    
+!
 	PROGRAM CREATE_BATOBS_INS
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
 !
@@ -42,7 +43,7 @@
 	CHARACTER(LEN=30), EXTERNAL :: LC
 	CHARACTER(LEN=30) NAME_MOD
 	CHARACTER(LEN=80) STRING
-	CHARACTER(LEN=80) FILE_NAME 
+	CHARACTER(LEN=80) FILE_NAME
 	CHARACTER(LEN=80) ADD_STORE(30)
 	CHARACTER(LEN=20) CMF_KEYS(NUM_KEYS_MAX)
 !
@@ -116,7 +117,7 @@
 !
 	WRITE(LUOUT,'(/,A)')
 	1     '# Ensure CMF_FLUX_PARAM is not in the directory, since it will stop the editing.'
-	WRITE(LUOUT,'(/,A,/)')'rm -f CMF_FLUX_PARAM' 
+	WRITE(LUOUT,'(/,A,/)')'rm -f CMF_FLUX_PARAM'
 !
 ! Read in required model runs.
 !	

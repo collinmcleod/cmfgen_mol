@@ -4,12 +4,12 @@
 !
 	INTEGER FUNCTION GET_INDX_DP(RVAL,R,NW)
 	IMPLICIT NONE
-!                              
+!
 ! Altered 02-May-1990 - Bug fix: If on two consecutive calls, RVAL was the
 !                       same but the R array different, the returned index
 !                       was incorrect (referring to the first array). No
 !                       longer use RVAL_SAV, but directly check R array.
-!                       Routine now correctly returns 1 or NW-1 if RVAL is 
+!                       Routine now correctly returns 1 or NW-1 if RVAL is
 !                       outside R range. Previously only J and not GET_INDX_DP
 !                       was being set. (Minor correction on 8/May/91).
 !
@@ -19,7 +19,7 @@
 ! Created 11-Apr-1990
 !
 	INTEGER NW
-	REAL(10) R(NW),RVAL
+	REAL(KIND=LDP) R(NW),RVAL
 !
 	INTEGER J,ILOW,IHIGH,ILOW_SAV
 	SAVE ILOW_SAV
@@ -39,7 +39,7 @@
 ! Need t compare RVAl with R array (and not RSAV) in case value is
 ! same, but array is different.
 !
-	  IF( (RVAL .GE.  R(ILOW_SAV+1)) .AND. 
+	  IF( (RVAL .GE.  R(ILOW_SAV+1)) .AND.
 	1       (RVAL .LE. R(ILOW_SAV)) )THEN
             GET_INDX_DP=ILOW_SAV
 	    RETURN
@@ -81,7 +81,7 @@
 ! Need t compare RVAl with R array (and not RSAV) in case value is
 ! same, but array is different.
 !
-	  IF( (RVAL .LE.  R(ILOW_SAV+1)) .AND. 
+	  IF( (RVAL .LE.  R(ILOW_SAV+1)) .AND.
 	1       (RVAL .GE. R(ILOW_SAV)) )THEN
             GET_INDX_DP=ILOW_SAV
 	    RETURN

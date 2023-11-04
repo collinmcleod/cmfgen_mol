@@ -1,15 +1,16 @@
 !
 ! General routine for plotting and comparing I(p,nu) obtained from IP_DATA.
 !
-! Various options are available to redden and normalize the model spectra. 
+! Various options are available to redden and normalize the model spectra.
 ! Several different units can be used for the X and Y axes.
 !
 	PROGRAM PLT_IP
+	USE SET_KIND_MODULE
 !
-! Altered 05-Feb-2021 : XV, YV etc now REAL(10) 
-!                         Tyring to make all non-PGPLOT routines REAL(10).
+! Altered 05-Feb-2021 : XV, YV etc now REAL(KIND=LDP)
+!                         Tyring to make all non-PGPLOT routines REAL(KIND=LDP).
 ! Altered 20-Aug-2019 : Updated RD_RVTJ to V4 routines.
-!                         TGREY,dE_RAD_DECAY,PLANCK_MEAN, and FORMAT_DATE added. 
+!                         TGREY,dE_RAD_DECAY,PLANCK_MEAN, and FORMAT_DATE added.
 ! Altered 01-Mar-2016 : Updated to better handle plane-parallel models [5-Feb-2016].
 ! Altered 24-Jun-2009 : Use INU and INU2 instead of JNU,JNU2
 ! Altered 18-Aug-2003 : IOS added to DIRECT_INFO call
@@ -29,62 +30,62 @@
 	INTEGER ND
 	INTEGER NC
 	INTEGER NP
-	REAL(10), ALLOCATABLE :: IP(:,:)
-	REAL(10), ALLOCATABLE :: NU(:)
-	REAL(10), ALLOCATABLE :: LAM(:)
-	REAL(10), ALLOCATABLE :: P(:)
-	REAL(10), ALLOCATABLE :: MU(:)
-	REAL(10), ALLOCATABLE :: TMP_MU(:)
-	REAL(10), ALLOCATABLE :: IP_NEW(:)
-	REAL(10), ALLOCATABLE :: P_NEW(:)
-	REAL(10), ALLOCATABLE :: HQW_AT_RMAX(:)
+	REAL(KIND=LDP), ALLOCATABLE :: IP(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: NU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LAM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: P(:)
+	REAL(KIND=LDP), ALLOCATABLE :: MU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TMP_MU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: IP_NEW(:)
+	REAL(KIND=LDP), ALLOCATABLE :: P_NEW(:)
+	REAL(KIND=LDP), ALLOCATABLE :: HQW_AT_RMAX(:)
 !
-	REAL(10), ALLOCATABLE :: TA(:)
-	REAL(10), ALLOCATABLE :: TB(:)
-	REAL(10), ALLOCATABLE :: TC(:)
-	REAL(10), ALLOCATABLE :: TAU_ROSS(:)
-	REAL(10), ALLOCATABLE :: TAU_ES(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TAU_ROSS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TAU_ES(:)
 !
-	REAL(10), ALLOCATABLE :: TEMP_P(:)
-	REAL(10), ALLOCATABLE :: TEMP_IP(:)
-	REAL(10), ALLOCATABLE :: COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: TEMP_P(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TEMP_IP(:)
+	REAL(KIND=LDP), ALLOCATABLE :: COEF(:,:)
 !
-	REAL(10) RMDOT
-	REAL(10) RLUM
-	REAL(10) ABUND_HYD
-	REAL(10) LAMBDA
+	REAL(KIND=LDP) RMDOT
+	REAL(KIND=LDP) RLUM
+	REAL(KIND=LDP) ABUND_HYD
+	REAL(KIND=LDP) LAMBDA
 	INTEGER NC2,NP2
 	CHARACTER*21 TIME
-	REAL(10), ALLOCATABLE :: R(:)
-	REAL(10), ALLOCATABLE :: V(:)
-	REAL(10), ALLOCATABLE :: SIGMA(:)
-	REAL(10), ALLOCATABLE :: T(:)
-	REAL(10), ALLOCATABLE :: ED(:)
-	REAL(10), ALLOCATABLE :: TGREY(:)
-	REAL(10), ALLOCATABLE :: dE_RAD_DECAY(:)
-	REAL(10), ALLOCATABLE :: ROSS_MEAN(:)
-	REAL(10), ALLOCATABLE :: FLUX_MEAN(:)
-	REAL(10), ALLOCATABLE :: PLANCK_MEAN(:)
-	REAL(10), ALLOCATABLE :: POPTOM(:)
-	REAL(10), ALLOCATABLE :: MASS_DENSITY(:)
-	REAL(10), ALLOCATABLE :: POPION(:)
-	REAL(10), ALLOCATABLE :: CLUMP_FAC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R(:)
+	REAL(KIND=LDP), ALLOCATABLE :: V(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: T(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ED(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TGREY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: dE_RAD_DECAY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ROSS_MEAN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: FLUX_MEAN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: PLANCK_MEAN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: POPTOM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: MASS_DENSITY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: POPION(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CLUMP_FAC(:)
 !
 ! Vectors for passing data to plot package via calls to CURVE.
 !
-	REAL(10), ALLOCATABLE :: XV(:)
-	REAL(10), ALLOCATABLE :: YV(:)
-	REAL(10), ALLOCATABLE :: WV(:)
-	REAL(10), ALLOCATABLE :: ZV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: XV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: YV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: WV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ZV(:)
 !
 	CHARACTER*80 NAME		!Default title for plot
 	CHARACTER*80 XAXIS,XAXSAV	!Label for Absisca
 	CHARACTER*80 YAXIS		!Label for Ordinate
 !
-	REAL(10) SCALE_FAC
-	REAL(10) RAD_VEL
-	REAL(10) ADD_FAC
-	REAL(10) WT(30)
+	REAL(KIND=LDP) SCALE_FAC
+	REAL(KIND=LDP) RAD_VEL
+	REAL(KIND=LDP) ADD_FAC
+	REAL(KIND=LDP) WT(30)
 	INTEGER NCF_MAX
 	INTEGER IST,IEND
 	INTEGER OBS_COLS(2)
@@ -92,10 +93,10 @@
 	LOGICAL CLEAN
 	LOGICAL NON_MONOTONIC
 !
-	REAL(10) ANG_TO_HZ
-	REAL(10) KEV_TO_HZ
-	REAL(10) C_CMS
-	REAL(10) C_KMS
+	REAL(KIND=LDP) ANG_TO_HZ
+	REAL(KIND=LDP) KEV_TO_HZ
+	REAL(KIND=LDP) C_CMS
+	REAL(KIND=LDP) C_KMS
 !
 	LOGICAL LOG_X,LOG_Y
 	CHARACTER*10 Y_PLT_OPT,X_UNIT
@@ -106,17 +107,17 @@
 	CHARACTER*6 METHOD,TYPETM
 	CHARACTER*10 NAME_CONVENTION
 !
-	REAL(10) DISTANCE			!kpc
-	REAL(10) SLIT_WIDTH		!arcseconds
-	REAL(10) PIXEL_LENGTH		!arcseconds
+	REAL(KIND=LDP) DISTANCE			!kpc
+	REAL(KIND=LDP) SLIT_WIDTH		!arcseconds
+	REAL(KIND=LDP) PIXEL_LENGTH		!arcseconds
 !
-	REAL(10) X_CENT
-	REAL(10) Y_CENT
-	REAL(10) S_WIDTH
-	REAL(10) S_LNGTH
-	REAL(10) APP_SIZE
-	REAL(10) TEL_FWHM
-	REAL(10) MOD_RES
+	REAL(KIND=LDP) X_CENT
+	REAL(KIND=LDP) Y_CENT
+	REAL(KIND=LDP) S_WIDTH
+	REAL(KIND=LDP) S_LNGTH
+	REAL(KIND=LDP) APP_SIZE
+	REAL(KIND=LDP) TEL_FWHM
+	REAL(KIND=LDP) MOD_RES
 !
 ! Miscellaneous variables.
 !
@@ -129,12 +130,12 @@
 	INTEGER NINS
 	INTEGER NTMP
 	INTEGER K_ST,K_END
-	REAL(10) T1,T2
-	REAL(10) LAMC
-	REAL(10) DELV
-	REAL(10) FRAC
-	REAL(10) PI
-	REAL(10) T_ELEC
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) LAMC
+	REAL(KIND=LDP) DELV
+	REAL(KIND=LDP) FRAC
+	REAL(KIND=LDP) PI
+	REAL(KIND=LDP) T_ELEC
 	LOGICAL AIR_LAM
 	LOGICAL COMPUTE_P
 	LOGICAL USE_ARCSEC
@@ -142,8 +143,8 @@
 	LOGICAL MULT_BY_P
 	LOGICAL PLANE_PARALLEL_MOD
 !
-	REAL(10),  PARAMETER :: RZERO=0.0D0
-	REAL(10),  PARAMETER :: RONE=1.0D0
+	REAL(KIND=LDP),  PARAMETER :: RZERO=0.0D0
+	REAL(KIND=LDP),  PARAMETER :: RONE=1.0D0
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: T_IN=5		!For file I/O
@@ -155,8 +156,8 @@
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	COMMON/LINE/ OPLIN,EMLIN               
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	COMMON/LINE/ OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 !
 	INTEGER GET_INDX_DP
 !
@@ -170,7 +171,7 @@
 	CHARACTER(LEN=20) TMP_STR
 	CHARACTER(LEN=11) FORMAT_DATE
 !
-	REAL(10) SPEED_OF_LIGHT,FAC,LAM_VAC,PARSEC
+	REAL(KIND=LDP) SPEED_OF_LIGHT,FAC,LAM_VAC,PARSEC
 	LOGICAL EQUAL
 	CHARACTER*30 UC
 	EXTERNAL SPEED_OF_LIGHT,EQUAL,FAC,UC,LAM_VAC,GET_INDX_DP,PARSEC
@@ -245,7 +246,7 @@
 	  ELSE IF( INDEX(FILE_DATE,'Unavailable') .NE. 0)THEN
 	    COMPUTE_P=.TRUE.
 	  ELSE
-	    WRITE(T_OUT,*)'Unrecognized date when reading IP_DATA' 
+	    WRITE(T_OUT,*)'Unrecognized date when reading IP_DATA'
 	    WRITE(T_OUT,*)'Date=',FILE_DATE
 	    STOP
 	  END IF
@@ -359,7 +360,7 @@
 !
 ! This call resets the .sve algorithm.  Specifically it sets the next
 ! input answer to be a main option, and all subsequent inputs to be
-! sub-options.  
+! sub-options.
 !
  3	CALL SVE_FILE('RESET')
 !
@@ -393,10 +394,10 @@
 !
 	IF(X(1:3) .EQ. 'TIT')THEN
 	  CALL USR_OPTION(NAME,'Title',' ',' ')
-!                    
+!
 ! Set X-Ais plotting options.
 !
-	ELSE IF(X(1:2) .EQ.'LX' .OR. X(1:4) .EQ. 'LOGX' .OR. 
+	ELSE IF(X(1:2) .EQ.'LX' .OR. X(1:4) .EQ. 'LOGX' .OR.
 	1                            X(1:4) .EQ. 'LINX')THEN
 	  LOG_X=.NOT. LOG_X
 	  IF(LOG_X)WRITE(T_OUT,*)'Now using Logarithmic X axis'
@@ -437,7 +438,7 @@
 !
 ! Set Y axis plotting options.
 !
-	ELSE IF(X(1:2) .EQ. 'LY' .OR. X(1:4) .EQ. 'LOGY' .OR. 
+	ELSE IF(X(1:2) .EQ. 'LY' .OR. X(1:4) .EQ. 'LOGY' .OR.
 	1                             X(1:4) .EQ. 'LINY')THEN
 	  LOG_Y=.NOT. LOG_Y
 	  IF(LOG_Y)WRITE(T_OUT,*)'Now using Logarithmic Y axis'
@@ -692,7 +693,7 @@
 	         EXIT
 	      END IF
 	    END DO
-	  END DO 
+	  END DO
           WRITE(6,*)'Found radii'
 !
 	  CALL USR_OPTION(YUNIT,'YUNIT','AU','Arc(secs), P, PONR, V, AU')
@@ -821,7 +822,7 @@
 ! units of P) as it keep the numbers closer to 1.
 !
 	    YV(1:NP-1)=YV(1:NP-1)*P(1:NP-1)
-	    YAXIS='10\u-10 \dpI\d\gn\u(ergs cm\u-1\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	    YAXIS='10\u-10 \dpI\d\gn\u(ergs cm\u-1\d s\u-1\d Hz\u-1\d steradian\u-1\d)'
 	    CALL DP_CURVE(NP-1,XV,YV)
 !
 	  ELSE
@@ -849,9 +850,9 @@
 	        DO I=1,NP-2
 	          YV(I)=YV(I)+2.0D0*LOG10(P(I+1))+20.0D0
 	        END DO
-	        YAXIS='Log p\u2\dI\gn\u(ergs s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	        YAXIS='Log p\u2\dI\gn\u(ergs s\u-1\d Hz\u-1\d steradian\u-1\d)'
 	      ELSE
-	        YAXIS='Log I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	        YAXIS='Log I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)'
 	      END IF
 	      CALL DP_CURVE(NP-2,XV,YV)
 	    END IF
@@ -882,7 +883,7 @@
 	    XV(1:NP)=MU(1:NP)
 	  END IF
 	  T1=MAXVAL(YV(1:NP))
-	  YAXIS='I(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	  YAXIS='I(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)'
 	  IF(T1 .LT. 1.0D-03 .OR. T1 .GT. 1.0D+04)THEN
 	    J=-LOG10(T1)
 	    YV(1:NP)=YV(1:NP)*(10**J)
@@ -911,13 +912,13 @@
 	  END IF
 	  IF(MULT_BY_PSQ)THEN
 	    YV(1:NP-1)=1.0D+20*P(1:NP-1)*P(1:NP-1)*IP(1:NP-1,I)
-	    YAXIS='p\u2\d.I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	    YAXIS='p\u2\d.I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)'
 	  ELSE IF(MULT_BY_P)THEN
 	    YV(1:NP-1)=1.0D+10*P(1:NP-1)*IP(1:NP-1,I)
-	    YAXIS='p.I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	    YAXIS='p.I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)'
 	  ELSE
 	    YV(1:NP-1)=IP(1:NP-1,I)
-	    YAXIS='I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	    YAXIS='I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)'
 	  END IF
 	  CALL DP_CURVE(NP-1,XV,YV)
 !
@@ -942,7 +943,7 @@
 	      OPEN(FILE=TRIM(TMP_STR),UNIT=12,STATUS='UNKNOWN',ACTION='WRITE')
 	        DO I=1,NP
 	          WRITE(12,'(F12.7)')YV(I)
-	        END DO 
+	        END DO
 	      CLOSE(UNIT=12)
 	  END DO
 !
@@ -981,14 +982,14 @@
 !	  CALL DP_CNVRT_J(XV,YV,ND,LOG_X,LOG_Y,' ',Y_PLT_OPT,
 !	1         LAMC,XAXIS,YAXIS,L_FALSE)
 !
-	  YAXIS='I(ergs cm\u-2\d s\u-1\d steradian\u-1\d)' 
+	  YAXIS='I(ergs cm\u-2\d s\u-1\d steradian\u-1\d)'
 	  CALL DP_CURVE(ND,XV,YV)
 ! 
 !
 ! Read in observation data as done in PLT_SPEC
 !
 	ELSE IF(X(1:6) .EQ. 'RD_OBS')THEN
-	  FILENAME=' ' 
+	  FILENAME=' '
 	  CALL USR_OPTION(FILENAME,'File',' ',' ')
 !
 	  SCALE_FAC=1.0D0
@@ -1272,13 +1273,13 @@
 !
 ! 
 !
-	ELSE IF(X(1:2) .EQ. 'LI' .OR. X(1:4) .EQ. 'LIST' .OR. 
-	1                             X(1:2) .EQ. 'HE' 
+	ELSE IF(X(1:2) .EQ. 'LI' .OR. X(1:4) .EQ. 'LIST' .OR.
+	1                             X(1:2) .EQ. 'HE'
 	1          .OR. X(1:4) .EQ. 'HELP')THEN
 	  IF(X(1:2) .EQ. 'LI')THEN
 	    CALL GEN_ASCI_OPEN(LU_IN,'PLT_IP_OPT_DESC','OLD',' ','READ',
 	1                  IZERO,IOS)
-	  ELSE 
+	  ELSE
 	    CALL GEN_ASCI_OPEN(LU_IN,'PLT_IP_OPTIONS','OLD',' ','READ',
 	1                  IZERO,IOS)
 	  END IF
@@ -1347,7 +1348,8 @@
 !
 !
 	FUNCTION FAC(N)
-	REAL(10) FAC
+	USE SET_KIND_MODULE
+	REAL(KIND=LDP) FAC
 	INTEGER N
 	INTEGER, PARAMETER :: T_OUT=5
 !

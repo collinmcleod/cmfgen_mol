@@ -1,5 +1,5 @@
 !
-! Subroutine to compute the CMF line frequencies. The spacing of the line 
+! Subroutine to compute the CMF line frequencies. The spacing of the line
 C frequencies is determined by passed parameters which specify the
 C the resonance zone extent, spacing in Doppler widths etc.
 C
@@ -14,11 +14,12 @@ C
 	1		NU_CONT,NCF,
 	1		V_DOP,FRAC_DOP,MAX_DOP,VINF,dV_CMF_PROF,
 	1               dV_CMF_WING,ES_WING_EXT,R_CMF_WING_EXT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 12-Dec-1997 : If no lines are to be inserted, FREQ is set to
 C                         NU_CONT, and there is an immediate return.
-C                         All edge frequencies [defined by 
+C                         All edge frequencies [defined by
 C                             ABS( NU(ML)/MU(M+1)-1 ) < 0.000001 ]
 C                         are now retained in the list.
 C                         Changes based/requested by PACO.
@@ -32,10 +33,10 @@ C                         installed.
 C Altered 15-May-1996 : ES_WING_EXT introduced (Now V4). May be zero if
 C                         coherent scattering (in km/s).
 C                       Some cleaning done to minimize frequencies which are
-C                         unnecessarily close. 
+C                         unnecessarily close.
 C                       R_CMF_WING_EXT now refers only to the wing caused by
 C                         coherent scattering.
-C                        
+C
 C Altered 28-Feb-1995 : dv_CMF_WING,CMF_WING_EXT inserted (_V2)
 C Altered 02-Feb-1995 : Not correctly inserting all continuum points.
 C
@@ -45,30 +46,30 @@ C
 C Vectors returned by subroutine:
 C
 C Line+continuum frequencies
-	REAL(10) FREQ(NFREQ_MAX)			!Continuum frequencies
-	INTEGER*4 LINES_THIS_FREQ(NFREQ_MAX)	!Indicates that this frequency 
+	REAL(KIND=LDP) FREQ(NFREQ_MAX)			!Continuum frequencies
+	INTEGER*4 LINES_THIS_FREQ(NFREQ_MAX)	!Indicates that this frequency
 						!  has line contributions,
 C
-	INTEGER*4 LINE_ST_INDX(N_LINES)		!Start index for the line 
+	INTEGER*4 LINE_ST_INDX(N_LINES)		!Start index for the line
 						!  in the NEW frequency array.
-	INTEGER*4 LINE_END_INDX(N_LINES)	!End index for the line 
+	INTEGER*4 LINE_END_INDX(N_LINES)	!End index for the line
 						! in the NEW frequency array.
 C
 C Passed vectors.
 C
-	REAL(10) NU_CONT(NCF)		!Continuum frequencies
-	REAL(10) NU_LINE(N_LINES)		!Line frequencies
+	REAL(KIND=LDP) NU_CONT(NCF)		!Continuum frequencies
+	REAL(KIND=LDP) NU_LINE(N_LINES)		!Line frequencies
 	CHARACTER*(*) TRANS_TYPE(N_LINES)
 C
 C Passed constants:
-	REAL(10) VINF		!Terminal velocity of wind.
-	REAL(10) V_DOP		!Doppler velocity (km/s).
-	REAL(10) FRAC_DOP		!Indicates dNU across line in Doppler widths.
-	REAL(10) MAX_DOP		!Half the extent of intrinsic profile
+	REAL(KIND=LDP) VINF		!Terminal velocity of wind.
+	REAL(KIND=LDP) V_DOP		!Doppler velocity (km/s).
+	REAL(KIND=LDP) FRAC_DOP		!Indicates dNU across line in Doppler widths.
+	REAL(KIND=LDP) MAX_DOP		!Half the extent of intrinsic profile
 				!  in Doppler widths,
-	REAL(10) dV_CMF_PROF	!Indicate spacing in profile but outside
+	REAL(KIND=LDP) dV_CMF_PROF	!Indicate spacing in profile but outside
                                 !  resonance zone (in km/s).
-	REAL(10) dV_CMF_WING	!Indicate spacing in wings (i.e. outside 
+	REAL(KIND=LDP) dV_CMF_WING	!Indicate spacing in wings (i.e. outside
 				!  intrinsic profile) (in km/s).
 C
 C R_CMF_WING_EXT indicates how far profile should extend beyond red edge
@@ -79,46 +80,46 @@ C
 C ES_WING_EXT is useful when have non-coherent electron scattering.
 C Used for both blue and red sides of the line profile.
 C
-	REAL(10) ES_WING_EXT
-	REAL(10) R_CMF_WING_EXT
+	REAL(KIND=LDP) ES_WING_EXT
+	REAL(KIND=LDP) R_CMF_WING_EXT
 C
 C Local variables.
 C
-	REAL(10) dNU_on_NU	!Actual spacing used across intrinsic line 
+	REAL(KIND=LDP) dNU_on_NU	!Actual spacing used across intrinsic line
 				!  profile given by dNU =NU*dNU_on_NU
-	INTEGER*4 NDOP		!Number of frequencies across intrinsic 
+	INTEGER*4 NDOP		!Number of frequencies across intrinsic
 				!  profile.
-	REAL(10) RES_EXTENT	!Maximum frequency in line is NU*RES_EXTENT
+	REAL(KIND=LDP) RES_EXTENT	!Maximum frequency in line is NU*RES_EXTENT
 C
-	REAL(10) BLUE_WING_EXT	!In km/s
-	REAL(10) RED_WING_EXT
-	REAL(10) APP_RES_EXT	!No units.
-	REAL(10) APP_ESBW_EXT
-	REAL(10) EDGE_SEP_FAC
-	REAL(10) MIN_FREQ_RAT
+	REAL(KIND=LDP) BLUE_WING_EXT	!In km/s
+	REAL(KIND=LDP) RED_WING_EXT
+	REAL(KIND=LDP) APP_RES_EXT	!No units.
+	REAL(KIND=LDP) APP_ESBW_EXT
+	REAL(KIND=LDP) EDGE_SEP_FAC
+	REAL(KIND=LDP) MIN_FREQ_RAT
 C
 	INTEGER*4 INDX		!Current frequency index.
-	INTEGER*4 LN_INDX	!Current line whose frequencies we are 
+	INTEGER*4 LN_INDX	!Current line whose frequencies we are
 				!   installing.
-	INTEGER*4 LST_LN_INDX	!Last line whose frequencies we 
+	INTEGER*4 LST_LN_INDX	!Last line whose frequencies we
 				!   installed.
 C
 	INTEGER*4 ML		!Continuum frequency index
 	INTEGER*4 I,J,K		!Miscellaneous loop variables.
 	INTEGER*4 LU_ER
-	REAL(10) C_KMS
-	REAL(10) DELF
-	REAL(10) MIN_FREQ
-	REAL(10) SWITCH_FREQ
-	REAL(10) TEMP_FREQ
-	REAL(10) T1
+	REAL(KIND=LDP) C_KMS
+	REAL(KIND=LDP) DELF
+	REAL(KIND=LDP) MIN_FREQ
+	REAL(KIND=LDP) SWITCH_FREQ
+	REAL(KIND=LDP) TEMP_FREQ
+	REAL(KIND=LDP) T1
 C
 	LOGICAL EDGE_FREQ(NCF)
 C
 C External functions
 C
 	INTEGER*4 ERROR_LU
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 C
 	C_KMS=1.0D-05*SPEED_OF_LIGHT()
@@ -172,9 +173,9 @@ C
 	NDOP=NINT(MAX_DOP/FRAC_DOP)
 	RES_EXTENT=(1.0D0+dNU_on_NU)**NDOP
 C
-c To avoid numerical instabilities in the iteration procedure when solving 
-C for the corrections we ensure that the frequencies bracketing a bound-free 
-C edge are EDGE_SEP_FAC*FRAC_DOP Doppler widths appart. We adjust the lower 
+c To avoid numerical instabilities in the iteration procedure when solving
+C for the corrections we ensure that the frequencies bracketing a bound-free
+C edge are EDGE_SEP_FAC*FRAC_DOP Doppler widths appart. We adjust the lower
 C frequency to ensure this. MIN_FREQ_RAT is the minimum ratio allowed between
 C successive frequencies.
 C
@@ -186,7 +187,7 @@ C These limit getting frequencies unnecessarily close.
 C
 	BLUE_WING_EXT=ES_WING_EXT+(NDOP+2)*V_DOP*FRAC_DOP	!In km/s
 	RED_WING_EXT=ES_WING_EXT+R_CMF_WING_EXT*VINF
-C                                                  
+C
 	APP_RES_EXT=RES_EXTENT*(1+0.5D0*dNU_on_NU)	!No units
 	APP_ESBW_EXT=1.0D0+(BLUE_WING_EXT+0.2D0*dV_CMF_WING)/C_KMS
 C
@@ -221,7 +222,7 @@ C
 C Find the first line that is to be included as a blanketed line.
 C
 	LN_INDX=1
-	DO WHILE(LN_INDX .LE. N_LINES .AND. 
+	DO WHILE(LN_INDX .LE. N_LINES .AND.
 	1          TRANS_TYPE(LN_INDX)(1:3) .NE. 'BLA')
 	  LN_INDX=LN_INDX+1
 	END DO
@@ -240,8 +241,8 @@ C
 C
 C Compute the frequency grid. We use a combination of CONTINUUM and LINE
 C frequencies. Continuum frequencies are inserted simultaneously with the
-C line frequencies (rather than after the line grid is created) to avoid 
-C the need for extra temporary storage for LINE_THIS_FREQ, and to avoid 
+C line frequencies (rather than after the line grid is created) to avoid
+C the need for extra temporary storage for LINE_THIS_FREQ, and to avoid
 C having to alter LINE_ST_INDX etc.
 C
 C All edge frequencies are included.
@@ -258,11 +259,11 @@ C
 C If continuum frequency is within 0.2 doppler widths of last set frequency,
 C there is no need to use it, unless it is a bound-free edge frequency.
 C
-          ELSE IF( NU_CONT(ML) .GE. FREQ(INDX)/(1.0D0+0.2D0*dNU_on_NU) 
+          ELSE IF( NU_CONT(ML) .GE. FREQ(INDX)/(1.0D0+0.2D0*dNU_on_NU)
 	1                       .AND. .NOT. EDGE_FREQ(ML) )THEN
 	     ML=ML+1			!Use current set frequency.
 C
-	  ELSE IF( LN_INDX .GT. N_LINES .OR. NU_CONT(ML) .GT. 
+	  ELSE IF( LN_INDX .GT. N_LINES .OR. NU_CONT(ML) .GT.
 	1          NU_LINE(LN_INDX)*MAX(APP_RES_EXT,APP_ESBW_EXT) )THEN
 C
 C No nearby line, so continuum point becomes next frequency point.
@@ -286,7 +287,7 @@ C
 	    IF(FREQ(INDX) .GT. NU_LINE(LN_INDX)*APP_ESBW_EXT)THEN
 	      T1=NU_LINE(LN_INDX)*(1+BLUE_WING_EXT/C_KMS)
 	      DO WHILE(ML .LT. NCF .AND. NU_CONT(ML) .GT. T1)
-	        IF(EDGE_FREQ(ML) .AND. 
+	        IF(EDGE_FREQ(ML) .AND.
 	1              NU_CONT(ML) .LT. FREQ(INDX)/MIN_FREQ_RAT)THEN
 	          INDX=INDX+1
 	          IF(INDX .GT. NFREQ_MAX)GOTO 9999
@@ -320,10 +321,10 @@ C
 !	        ML=ML+1
 !	      END DO
 C
-	    T1=FREQ(INDX)/(1.0D0+1.1*dV_CMF_WING/C_KMS) 
+	    T1=FREQ(INDX)/(1.0D0+1.1*dV_CMF_WING/C_KMS)
 	    IF(T1 .GT. NU_LINE(LN_INDX)*RES_EXTENT)THEN
 	      DO WHILE(ML .LT. NCF .AND. NU_CONT(ML) .GT. T1)
-	        IF(EDGE_FREQ(ML) .AND. 
+	        IF(EDGE_FREQ(ML) .AND.
 	1              NU_CONT(ML) .LT. FREQ(INDX)/MIN_FREQ_RAT)THEN
 	          INDX=INDX+1
 	          IF(INDX .GT. NFREQ_MAX)GOTO 9999
@@ -347,7 +348,7 @@ C
 	      DO J=1,I
 	        T1=FREQ(INDX)-DELF
 	        DO WHILE(ML .LT. NCF .AND. NU_CONT(ML) .GT. T1)
-	        IF(EDGE_FREQ(ML) .AND. 
+	        IF(EDGE_FREQ(ML) .AND.
 	1              NU_CONT(ML) .LT. FREQ(INDX)/MIN_FREQ_RAT)THEN
 	            INDX=INDX+1
 	            IF(INDX .GT. NFREQ_MAX)GOTO 9999
@@ -371,7 +372,7 @@ C
 	    DO I=-NDOP,NDOP
 	      T1=NU_LINE(LN_INDX)*(1.0D0+dNU_on_NU)**(-I)
 	      DO WHILE(ML .LT. NCF .AND. NU_CONT(ML) .GT. T1)
-	        IF(EDGE_FREQ(ML) .AND. 
+	        IF(EDGE_FREQ(ML) .AND.
 	1              NU_CONT(ML) .LT. FREQ(INDX)/MIN_FREQ_RAT)THEN
 	          INDX=INDX+1
 	          IF(INDX .GT. NFREQ_MAX)GOTO 9999
@@ -393,7 +394,7 @@ C Ready for next line or continuum point.
 C
 	    LST_LN_INDX=LN_INDX
 	    LN_INDX=LN_INDX+1
-	    DO WHILE(LN_INDX .LE. N_LINES .AND. 
+	    DO WHILE(LN_INDX .LE. N_LINES .AND.
 	1                           TRANS_TYPE(LN_INDX)(1:3) .NE. 'BLA')
 	      LN_INDX=LN_INDX+1
 	    END DO
@@ -416,7 +417,7 @@ C
 	        DO WHILE(FREQ(INDX) .GT. NU_LINE(LN_INDX)/RES_EXTENT)
 	          T1=FREQ(INDX)/(1.0D0+dNU_on_NU)
 	          DO WHILE(ML .LT. NCF .AND. NU_CONT(ML) .GT. T1)
-	          IF(EDGE_FREQ(ML) .AND. 
+	          IF(EDGE_FREQ(ML) .AND.
 	1                NU_CONT(ML) .LT. FREQ(INDX)/MIN_FREQ_RAT)THEN
 	              INDX=INDX+1
 	              IF(INDX .GT. NFREQ_MAX)GOTO 9999
@@ -436,7 +437,7 @@ C
 	        LINE_END_INDX(LN_INDX)=INDX
 	        LST_LN_INDX=LN_INDX
 	        LN_INDX=LN_INDX+1
-	        DO WHILE(LN_INDX .LE. N_LINES .AND. 
+	        DO WHILE(LN_INDX .LE. N_LINES .AND.
 	1                           TRANS_TYPE(LN_INDX)(1:3) .NE. 'BLA')
 	          LN_INDX=LN_INDX+1
 	        END DO
@@ -482,7 +483,7 @@ C We need to check again, since we didn't know the frequency step size.
 C
 	      IF(TEMP_FREQ .GT. MIN_FREQ)THEN
 	        DO WHILE(ML .LT. NCF .AND. NU_CONT(ML) .GT. TEMP_FREQ)
-	        IF(EDGE_FREQ(ML) .AND. 
+	        IF(EDGE_FREQ(ML) .AND.
 	1              NU_CONT(ML) .LT. FREQ(INDX)/MIN_FREQ_RAT)THEN
 	            INDX=INDX+1
 	            IF(INDX .GT. NFREQ_MAX)GOTO 9999

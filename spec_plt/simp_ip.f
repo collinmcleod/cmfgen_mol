@@ -10,23 +10,24 @@
 !       SPECTRUM (obtained by integrating I(p) over p).
 !
 	PROGRAM SIMP_IP
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 	INTEGER NCF
 	INTEGER ND
 	INTEGER NC
 	INTEGER NP
-	REAL(10), ALLOCATABLE :: IP(:,:)
-	REAL(10), ALLOCATABLE :: NU(:)
-	REAL(10), ALLOCATABLE :: P(:)
+	REAL(KIND=LDP), ALLOCATABLE :: IP(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: NU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: P(:)
 !
 ! Vectors for passing data to plot package via calls to CURVE.
 !
-	REAL(10), ALLOCATABLE :: XV(:)
-	REAL(10), ALLOCATABLE :: YV(:)
-	REAL(10), ALLOCATABLE :: ZV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: XV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: YV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ZV(:)
 !
-	REAL(10) ANG_TO_HZ
+	REAL(KIND=LDP) ANG_TO_HZ
 	CHARACTER*80 FILENAME
 	CHARACTER*80 FILE_DATE
 !
@@ -36,9 +37,9 @@
 	INTEGER I,J,K,L,ML,LS,NX
 	INTEGER ST_REC
 	INTEGER REC_LENGTH
-	REAL(10) T1,T2
-	REAL(10) DISTANCE,PI,PARSEC
-	REAL(10) LAM_ST,LAM_END
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) DISTANCE,PI,PARSEC
+	REAL(KIND=LDP) LAM_ST,LAM_END
 	INTEGER INDX_ST,INDX_END
 !
 	INTEGER, PARAMETER :: T_IN=5		!For file I/O
@@ -75,7 +76,7 @@
 	    READ(LU_IN,REC=ST_REC)(P(I),I=1,NP)
 	    ST_REC=ST_REC+1
 	  ELSE
-	    WRITE(T_OUT,*)'Unrecognized date when reading IP_DATA' 
+	    WRITE(T_OUT,*)'Unrecognized date when reading IP_DATA'
 	    WRITE(T_OUT,*)'Date=',FILE_DATE
 	    STOP
 	  END IF
@@ -141,7 +142,7 @@
 	  WRITE(12,*)'Lambda end:',LAM_END
 	  WRITE(12,*)'Number of data values:',NP
 	  WRITE(12,*)'Units of p are cm'
-	  WRITE(12,*)'Units of I(p) are I(ergs cm\u-1\d s\u-1\d Hz\u-1\d steradian\u-1\d)' 
+	  WRITE(12,*)'Units of I(p) are I(ergs cm\u-1\d s\u-1\d Hz\u-1\d steradian\u-1\d)'
 	  DO I=1,NP
 	    WRITE(12,*)I,P(I),YV(I)
 	  END DO

@@ -1,16 +1,17 @@
 	MODULE VEL_LAW_PARAMS
+	USE SET_KIND_MODULE
 	INTEGER VEL_TYPE
 	INTEGER TRANS_I
-	REAL(10) R_TRANS,V_TRANS
-	REAL(10) dVdR_TRANS
-	REAL(10) VINF,BETA
-	REAL(10) BETA2
-	REAL(10) VEXT
-	REAL(10) RP2
-	REAL(10) SCALE_HEIGHT
-	REAL(10) RO
-	REAL(10) dVdR
-	REAL(10) ALPHA
+	REAL(KIND=LDP) R_TRANS,V_TRANS
+	REAL(KIND=LDP) dVdR_TRANS
+	REAL(KIND=LDP) VINF,BETA
+	REAL(KIND=LDP) BETA2
+	REAL(KIND=LDP) VEXT
+	REAL(KIND=LDP) RP2
+	REAL(KIND=LDP) SCALE_HEIGHT
+	REAL(KIND=LDP) RO
+	REAL(KIND=LDP) dVdR
+	REAL(KIND=LDP) ALPHA
 	END MODULE VEL_LAW_PARAMS
 !
 CONTAINS
@@ -19,6 +20,7 @@ CONTAINS
 ! Ideal for revising grid etc.
 !
 	PROGRAM REVISE_RVSIG
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
 	USE VEL_LAW_PARAMS
@@ -33,9 +35,9 @@ CONTAINS
 ! Altered 02-Jan-2020: Improved CUR option (R is normalized), added SIG option.
 ! Altered 19-Aug-2019: Added VEL_LAW_PARAMS, and the two subroutines.
 !                        Done to make velocity law calculation for SCLR
-!                        and MDOT full consistent. 
-! Altered 10-Jun-2019: Changed to allow reding of density and clumping fator (necessary, for variable MDOT, 
-!                        and point source models. 
+!                        and MDOT full consistent.
+! Altered 10-Jun-2019: Changed to allow reding of density and clumping fator (necessary, for variable MDOT,
+!                        and point source models.
 ! Altered 05-Mar-2018: Added option to make a plane-parallel models out of an RVSIG_COL
 !                        file that was used for a spherical model. Option is 'STOP'
 !                        i.e., Spherical To Parallel.
@@ -45,61 +47,61 @@ CONTAINS
 ! Altered 14-Mar-2011: Improved header output to RVSIG_COL.
 ! Altered 15-Oct-2010: Fixed bug with SIGMA computation for the extra
 !                        points added with the EXTR option.
-! Altered 27-Aug-2007: Revised file read so as all ! (1st character) 
+! Altered 27-Aug-2007: Revised file read so as all ! (1st character)
 ! comments are ignored.
 !
 	INTEGER, PARAMETER :: NMAX=5000
 	INTEGER, PARAMETER :: IONE=1
 !
-	REAL(10) OLD_R(NMAX)
-	REAL(10) OLD_V(NMAX)
-	REAL(10) OLD_SIGMA(NMAX)
-	REAL(10) OLD_DENSITY(NMAX)
-	REAL(10) OLD_CLUMP_FAC(NMAX)
-	REAL(10) OLD_LOG_R(NMAX)
+	REAL(KIND=LDP) OLD_R(NMAX)
+	REAL(KIND=LDP) OLD_V(NMAX)
+	REAL(KIND=LDP) OLD_SIGMA(NMAX)
+	REAL(KIND=LDP) OLD_DENSITY(NMAX)
+	REAL(KIND=LDP) OLD_CLUMP_FAC(NMAX)
+	REAL(KIND=LDP) OLD_LOG_R(NMAX)
 !
-	REAL(10) R_PLT(NMAX)
-	REAL(10) V_PLT(NMAX)
+	REAL(KIND=LDP) R_PLT(NMAX)
+	REAL(KIND=LDP) V_PLT(NMAX)
 !
-	REAL(10) R(NMAX)
-	REAL(10) V(NMAX)
-	REAL(10) SIGMA(NMAX)
-	REAL(10) DENSITY(NMAX)
-	REAL(10) CLUMP_FAC(NMAX)
-	REAL(10) LOG_R(NMAX)
+	REAL(KIND=LDP) R(NMAX)
+	REAL(KIND=LDP) V(NMAX)
+	REAL(KIND=LDP) SIGMA(NMAX)
+	REAL(KIND=LDP) DENSITY(NMAX)
+	REAL(KIND=LDP) CLUMP_FAC(NMAX)
+	REAL(KIND=LDP) LOG_R(NMAX)
 !
-	REAL(10) RTMP(NMAX)
-	REAL(10) OLD_TAU(NMAX)
-	REAL(10) TAU_SAV(NMAX)
-	REAL(10) TAU(NMAX)
-	REAL(10) CHI_ROSS(NMAX)
+	REAL(KIND=LDP) RTMP(NMAX)
+	REAL(KIND=LDP) OLD_TAU(NMAX)
+	REAL(KIND=LDP) TAU_SAV(NMAX)
+	REAL(KIND=LDP) TAU(NMAX)
+	REAL(KIND=LDP) CHI_ROSS(NMAX)
 !
-	REAL(10) TMP_R(NMAX)
-	REAL(10) X1(NMAX)
-	REAL(10) X2(NMAX)	
-	REAL(10) WRK_VEC(NMAX)	
+	REAL(KIND=LDP) TMP_R(NMAX)
+	REAL(KIND=LDP) X1(NMAX)
+	REAL(KIND=LDP) X2(NMAX)	
+	REAL(KIND=LDP) WRK_VEC(NMAX)	
 !
-	REAL(10), ALLOCATABLE :: COEF(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: COEF(:,:)
 !
 	INTEGER ND_OLD
 	INTEGER ND
 !
-	REAL(10) RX
-	REAL(10) NEW_RSTAR
-	REAL(10) T1,T2,T3
-	REAL(10) FAC
-	REAL(10) V_MAX
-	REAL(10) V_MIN 
+	REAL(KIND=LDP) RX
+	REAL(KIND=LDP) NEW_RSTAR
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) FAC
+	REAL(KIND=LDP) V_MAX
+	REAL(KIND=LDP) V_MIN
 !
 	REAL*4 XVAL,YVAL,SYMB_EXP_FAC
-	REAL(10) MDOT
-	REAL(10) OLD_MDOT
-	REAL(10) LSTAR
-	REAL(10) OLD_LSTAR
-	REAL(10) TOP,BOT 
-	REAL(10) dTOPdR,dBOTdR 
+	REAL(KIND=LDP) MDOT
+	REAL(KIND=LDP) OLD_MDOT
+	REAL(KIND=LDP) LSTAR
+	REAL(KIND=LDP) OLD_LSTAR
+	REAL(KIND=LDP) TOP,BOT
+	REAL(KIND=LDP) dTOPdR,dBOTdR
 !
-	REAL(10) V_CON,V_RAT_MAX,IB_RAT,OB_RAT,DTAU2_ON_DTAU1
+	REAL(KIND=LDP) V_CON,V_RAT_MAX,IB_RAT,OB_RAT,DTAU2_ON_DTAU1
 	INTEGER N_IB_INS,N_OB_INS
 !
 	INTEGER NN
@@ -328,7 +330,7 @@ CONTAINS
 	    END IF
 	  END DO
 	  DEALLOCATE (COEF)
- 
+
 	ELSE IF(OPTION .EQ. 'NEW_ND')THEN
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')'This option allows a new R grid to be output'
@@ -345,7 +347,7 @@ CONTAINS
 	  END DO
 	  X2(1)=X1(1)
 	  X2(ND)=X1(ND_OLD)
-	  
+	
 	  CALL MON_INTERP(R,ND,IONE,X2,ND,OLD_R,ND_OLD,X1,ND_OLD)
 	  ALLOCATE (COEF(ND_OLD,4))
 	  CALL MON_INT_FUNS_V2(COEF,OLD_V,OLD_R,ND_OLD)
@@ -369,7 +371,7 @@ CONTAINS
 	  WRITE(6,'(A)')'This option allows grid to be increaed by iserting points in old grid'
 	  WRITE(6,'(A)')'The old grid points are retained'
 	  WRITE(6,'(A)')' '
-	  NINS=1 
+	  NINS=1
 	  CALL GEN_IN(NINS,'Number of points to insert')
 	  CALL GEN_IN(I_ST,'Miminum index for grid reginement')
 	  CALL GEN_IN(I_END,'Maximumindex for grid reginement')
@@ -659,7 +661,7 @@ CONTAINS
 	    END IF
 	  END DO
 	  DEALLOCATE (COEF)
-	  
+	
 	ELSE IF(OPTION .EQ. 'FGOB')THEN
 	  WRITE(6,'(A)')' '
 	  WRITE(6,'(A)')'This option allows the grid to be redefined at the outer boundary'
@@ -688,7 +690,7 @@ CONTAINS
 	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
 	  END DO
 	  DEALLOCATE (COEF)
-	  
+	
 	ELSE IF(OPTION .EQ. 'EXTR')THEN
 	  FAC=2.0D0
 	  CALL GEN_IN(FAC,'Factor to extend RMAX by')
@@ -715,7 +717,7 @@ CONTAINS
 ! in log density.
 !
 	  TMP_R(1)=FAC*OLD_R(1)
-	  NX=20 
+	  NX=20
 	  T1=EXP(LOG(FAC)/NX)
 	  TMP_R(1)=FAC*OLD_R(1)
 	  DO I=2,NX
@@ -969,14 +971,14 @@ CONTAINS
 	    J=ND_OLD-ND
 	    R(1:ND)=OLD_R(J+1:ND)
 	    V(1:ND)=OLD_V(J+1:ND)
-	  ELSE 
+	  ELSE
 	    J=ND-ND_OLD
 	    R(J+1:ND)=OLD_R(1:ND)
 	    V(J+1:ND)=OLD_V(1:ND)
 	    DO I=J,1,-1
 	      V(I)=V(I+1)*1.01D0		!Value irrelevant
 	    END DO
-	  END IF 
+	  END IF
 	  TRANS_I=GET_INDX_DP(V_TRANS,V,ND)
 	  SCALE_HEIGHT=(R(TRANS_I)-R(TRANS_I+1))/LOG(V(TRANS_I)/V(TRANS_I+1))
 !
@@ -1054,8 +1056,8 @@ CONTAINS
           WRITE(6,'(A)')DEF_PEN
 !
 	  LOG_X=.FALSE.; LOG_Y=.FALSE.
-	  CALL GEN_IN(LOG_X,'Are we using LOG axes for R')	  
-	  CALL GEN_IN(LOG_Y,'Are we using LOG axes for V')	  
+	  CALL GEN_IN(LOG_X,'Are we using LOG axes for R')	
+	  CALL GEN_IN(LOG_Y,'Are we using LOG axes for V')	
 	  ND=ND_OLD;    T1=OLD_R(ND)
 	  IF(LOG_X)THEN
 	    R_PLT(1:ND)=LOG10(OLD_R(1:ND)/T1)
@@ -1186,7 +1188,7 @@ CONTAINS
 	  DEALLOCATE (COEF)
 !
 	ELSE IF(OPTION .EQ. 'PLOT')THEN
-	  ND=ND_OLD 
+	  ND=ND_OLD
 	  DO I=1,ND
 	    R(I)=OLD_R(I)
 	    V(I)=OLD_V(I)
@@ -1204,7 +1206,7 @@ CONTAINS
 	    WRITE(10,'(A)')'!'
 	    IF(OPTION .EQ. 'MDOT')THEN
 	      WRITE(10,'(A,ES14.6)')'! Old mass-loss rate in Msun/yr=',OLD_MDOT
-	      WRITE(10,'(A,ES14.6)')'! New mass-loss rate in Msun/yr=',MDOT 
+	      WRITE(10,'(A,ES14.6)')'! New mass-loss rate in Msun/yr=',MDOT
 	      WRITE(10,'(A,ES14.6)')'! Velocity at infinity in km/s =',VINF
 	      WRITE(10,'(A,ES14.6)')'! Beta for velocity law        =',BETA
 	      WRITE(10,'(A,I3)'    )'! Velocity law (type)          =',VEL_TYPE
@@ -1297,6 +1299,7 @@ CONTAINS
 !
 CONTAINS
 	SUBROUTINE DESCRIBE_VEL_LAWS()	
+	USE SET_KIND_MODULE
 	USE MOD_COLOR_PEN_DEF
 !
 	WRITE(6,'(A)')RED_PEN
@@ -1330,18 +1333,19 @@ CONTAINS
 	END
 
 	SUBROUTINE CALCULATE_VEL(R,V,SIGMA,ND)
+	USE SET_KIND_MODULE
 	USE VEL_LAW_PARAMS
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !
 	INTEGER ND
-	REAL(10) R(ND)
-	REAL(10) V(ND)
-	REAL(10) SIGMA(ND)
+	REAL(KIND=LDP) R(ND)
+	REAL(KIND=LDP) V(ND)
+	REAL(KIND=LDP) SIGMA(ND)
 !
-	REAL(10) T1,T2,T3
-	REAL(10) TOP,BOT
-	REAL(10) dTOPdR,dBOTdR
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) TOP,BOT
+	REAL(KIND=LDP) dTOPdR,dBOTdR
 !
 	INTEGER I
 	INTEGER V_TYPE
@@ -1350,7 +1354,7 @@ CONTAINS
 	  RO = R_TRANS * (1.0D0 - (2.0D0*V_TRANS/VINF)**(1.0D0/BETA) )
 	  T1= R_TRANS * dVdR_TRANS / V_TRANS
 	  SCALE_HEIGHT =  0.5D0*R_TRANS / (T1 - BETA*RO/(R_TRANS-RO) )
-! 
+!
 	  WRITE(6,*)'  Transition radius is',R_TRANS
 	  WRITE(6,*)'Transition velocity is',V_TRANS
 	  WRITE(6,*)'                 R0 is',RO
@@ -1362,9 +1366,9 @@ CONTAINS
             TOP = VINF* (T2**BETA)
             BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
             V(I) = TOP/BOT
-                                                                                
+
 !NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
-                                                                                
+
             dTOPdR = VINF * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
             dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT )  / SCALE_HEIGHT
             dVdR = dTOPdR / BOT  + V(I)*dBOTdR/BOT
@@ -1382,9 +1386,9 @@ CONTAINS
 	    TOP = 2.0D0*V_TRANS + (VINF-2.0D0*V_TRANS) * T2**BETA
 	    BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
 	    V(I) = TOP/BOT
-                                                                                
+
 !NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
-                                                                                
+
 	    dTOPdR = (VINF - 2.0D0*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
 	    dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
 	    dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT

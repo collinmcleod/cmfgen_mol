@@ -1,4 +1,5 @@
 	SUBROUTINE RD_EW(LAM,EW,NL_MAX,NL,FILENAME,IOS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 02-May-1995: IOS installed in call.
@@ -44,6 +45,6 @@ C
 	END DO
 C
 100	CONTINUE
-C                          
+C
 	RETURN
 	END

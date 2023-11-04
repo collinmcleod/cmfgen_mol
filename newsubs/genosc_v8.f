@@ -4,9 +4,9 @@
 ! computed from the oscillator strengths.
 !
 ! Oscillator strengths (and A values) are returned only for transitions which
-! meet certain criteria [GF_ACTION='SET_ZERO']. Alternatively, the transitions 
-! which don't meet the selection criteria, can have their f values returned 
-! as negative values [GF_ACTION='SET_NEG']. 
+! meet certain criteria [GF_ACTION='SET_ZERO']. Alternatively, the transitions
+! which don't meet the selection criteria, can have their f values returned
+! as negative values [GF_ACTION='SET_NEG'].
 !
 ! Selection criteria.
 !
@@ -28,9 +28,10 @@
 	1              OSCDATE,N,NTRET,
 	1              GF_ACTION,GF_CUT,LEV_CUT,MIN_NUM_TRANS,ONLY_OBS_LINES,
 	1              LUIN,LUOUT,FILNAME)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
-! Altered 19-May-2015 - Added '17-Jun-2014' as a valid format date (9-Jun-2015). 
+! Altered 19-May-2015 - Added '17-Jun-2014' as a valid format date (9-Jun-2015).
 ! Altered 23-Dec-2004 - Check on ENERGY level ordering, and name matching when
 !                          reading in transitions included.
 ! Altered 21-Nov-2000 - Changed to V8
@@ -46,27 +47,27 @@
 ! The following data values are returned.
 !
 	INTEGER NTRET			!Number of transitions returned
-	REAL(10) EINA(N,N)		!f(i,j)/A(j,i) values (i < j)
-	REAL(10) FEDGE(N)			!Level ionization energy (10^15 Hz)
-	REAL(10) STAT_WT(N)		!Statistical weight of level
-	REAL(10) ARAD(N)			!Inverse radiative lifetime of upper level.
-	REAL(10) GAM2(N)			!Collisional broadening parameter
-	REAL(10) GAM4(N)			!Collisional broadening parameter
+	REAL(KIND=LDP) EINA(N,N)		!f(i,j)/A(j,i) values (i < j)
+	REAL(KIND=LDP) FEDGE(N)			!Level ionization energy (10^15 Hz)
+	REAL(KIND=LDP) STAT_WT(N)		!Statistical weight of level
+	REAL(KIND=LDP) ARAD(N)			!Inverse radiative lifetime of upper level.
+	REAL(KIND=LDP) GAM2(N)			!Collisional broadening parameter
+	REAL(KIND=LDP) GAM4(N)			!Collisional broadening parameter
 	LOGICAL OBSERVED_LEVEL(N)	!If true, level energy is known.
 !
-	REAL(10) IONIZATION_EN		!Ionization energy of ion (cm^-1}
-	REAL(10) ZION			!Charge on core (i.e. ion charge +1)
+	REAL(KIND=LDP) IONIZATION_EN		!Ionization energy of ion (cm^-1}
+	REAL(KIND=LDP) ZION			!Charge on core (i.e. ion charge +1)
 	CHARACTER*(*) OSCDATE		!Date oscillator file was written.
 !
 	CHARACTER*(*) LEVNAME(N)	!
 	CHARACTER*(*) FILNAME		!
 !
 ! The following allows us to ignore transitions with gf < GF_CUT and whose
-! lower level is > LEV_CUT. A minimum of MIN_NUM_TRANS downward transitions is 
-! kept for each level, independent of there gf value. GF_ACTION indicates 
+! lower level is > LEV_CUT. A minimum of MIN_NUM_TRANS downward transitions is
+! kept for each level, independent of there gf value. GF_ACTION indicates
 ! whether to set the f values of the weak transitions to zero, or negative.
 !
-	REAL(10)    GF_CUT
+	REAL(KIND=LDP)    GF_CUT
 	INTEGER LEV_CUT
 	INTEGER MIN_NUM_TRANS
 	CHARACTER*(*) GF_ACTION
@@ -75,7 +76,7 @@
 ! External functions.
 !
 	EXTERNAL SPEED_OF_LIGHT,ICHRLEN,RD_FREE_VAL,ERROR_LU,WARNING_LU
-	REAL(10) SPEED_OF_LIGHT,RD_FREE_VAL
+	REAL(KIND=LDP) SPEED_OF_LIGHT,RD_FREE_VAL
 	INTEGER ICHRLEN,ERROR_LU,WARNING_LU
 !
 ! Local variables
@@ -83,7 +84,7 @@
 	CHARACTER*40 LOCNAME(N)
 	CHARACTER*40 LOW_NAME,UP_NAME
 	CHARACTER*11 FORMAT_DATE
-	REAL(10) T1,T2,T3,SPEED_LIGHT
+	REAL(KIND=LDP) T1,T2,T3,SPEED_LIGHT
 	INTEGER I,J,K,NW,L1,L2,IOS,LEV_ID
 	INTEGER MAXLEN,CUT_CNT
 	INTEGER LUER,LUWARN
@@ -94,7 +95,7 @@
 ! Variables for deleting weak transitions.
 !
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
-	REAL(10) DOWN(N)
+	REAL(KIND=LDP) DOWN(N)
 	INTEGER INDX(N)
 !
 ! Variables for free-format internal reads.
@@ -103,10 +104,10 @@
 	CHARACTER*80 DESC
 	DATA STR_LEN/80/
 !
-! Constants for opacity etc. These must be set in the calling program. 
+! Constants for opacity etc. These must be set in the calling program.
 ! They are used to keep absolute consistency between the f and A values.
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 !
@@ -134,8 +135,8 @@
 	END IF
 !
 ! We keep reading the file until we come upon the format date or
-! date (old format). From then on the file has to have a fixed 
-! format. All file header information is written to unit LUOUT. 
+! date (old format). From then on the file has to have a fixed
+! format. All file header information is written to unit LUOUT.
 ! This can be the MODEL file, and hence will contain descriptions
 ! of the atomic model data used.
 !
@@ -199,7 +200,7 @@
 	  READ(LUIN,'(A)')STRING
 	  J=ICHRLEN(STRING)
 	  WRITE(LUOUT,'(A)')STRING(1:J)
-	  L1=INDEX(STRING,'!Ionization energy') 
+	  L1=INDEX(STRING,'!Ionization energy')
 	  IF(L1 .NE. 0)THEN
 	    L1=INDEX(STRING,'  ')
 	    DESC='Ionization energy read in GENOSCIL-'//FILNAME
@@ -213,7 +214,7 @@
 	  READ(LUIN,'(A)')STRING
 	  J=ICHRLEN(STRING)
 	  WRITE(LUOUT,'(A)')STRING(1:J)
-	  L1=INDEX(STRING,'!Screened nuclear charge') 
+	  L1=INDEX(STRING,'!Screened nuclear charge')
 	  IF(L1 .NE. 0)THEN
 	    L1=INDEX(STRING,'  ')
 	    DESC='NW Read in GENOSCIL-'//FILNAME
@@ -244,12 +245,12 @@
 	  IF(STRING .NE. ' ')THEN
 	    WRITE(LUER,*)'Error reading blank(1) from '//FILNAME
 	    STOP
-	  END IF	    
+	  END IF	
 !
 ! We first read the record into a character string so that we can do
 ! an unformatted read on the real variables. LEVNAME name (or transition)
-! must be separated by at least 2 spaces from the real data. 
-! Level names need not be the same length. Note that FEDGE is initially 
+! must be separated by at least 2 spaces from the real data.
+! Level names need not be the same length. Note that FEDGE is initially
 ! the excitation energy in cm^-1.
 !
 	  MAXLEN=MIN( LEN(LEVNAME(1)),LEN(LOCNAME(1)) )
@@ -387,7 +388,7 @@
 !
 	T1=OPLIN/EMLIN*TWOHCSQ
 	DO I=1,N-1
-	  DO J=I+1,N                
+	  DO J=I+1,N
 	    EINA(J,I)=T1*EINA(I,J)*STAT_WT(I)/STAT_WT(J)
 	1     *( (FEDGE(I)-FEDGE(J))**2 )
 	  END DO
@@ -403,7 +404,7 @@
 	    END DO
 	  END DO
 	END IF
-!	  
+!	
 !
 ! Delete very weak transitions from the line list. We first ensure that all
 ! parameters are reasonable.
@@ -423,7 +424,7 @@
 	    DOWN(1:J-1)=EINA(J,1:J-1)		!Einstein A values for level J
 	    I=J-1
 	    CALL INDEXX(I,DOWN,INDX,L_FALSE)	!Sort into reverse numerical order
-	    T1=DOWN(INDX(MIN_NUM_TRANS))	! 
+	    T1=DOWN(INDX(MIN_NUM_TRANS))	!
 	    DO I=1,J-1				!Lower index
 	      IF( STAT_WT(I)*EINA(I,J) .LT. GF_CUT .AND.
 	1              I .GT. LEV_CUT .AND. EINA(J,I) .LT. T1)THEN

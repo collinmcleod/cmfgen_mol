@@ -9,6 +9,7 @@ C
 	1              DI,DIST,N_DI,PHOT_ID,ION_LEV,
 	1              ED,T,EMHNUKT,
 	1              IONFF,ND,LST_DEPTH_ONLY)
+	USE SET_KIND_MODULE
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 C
@@ -48,41 +49,41 @@ C
 C
 C Constants for opacity etc.
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
-	REAL(10) CHI(ND)			!Opacity
-	REAL(10) ETA(ND)			!Emissivity
+	REAL(KIND=LDP) CHI(ND)			!Opacity
+	REAL(KIND=LDP) ETA(ND)			!Emissivity
 C
 C Large Model Atom Populations.
 C
-	REAL(10) HN(N,ND),HNST(N,ND)
-	REAL(10) EDGE(N)
+	REAL(KIND=LDP) HN(N,ND),HNST(N,ND)
+	REAL(KIND=LDP) EDGE(N)
 C
 C Ion populations. These populations should refer to the small model atoms.
 C (i.e. the model atom with super levels_
 C
-	REAL(10) DI(N_DI,ND),DIST(N_DI,ND)
+	REAL(KIND=LDP) DI(N_DI,ND),DIST(N_DI,ND)
 C
-	REAL(10) T(ND)			!Temperature (K)
-	REAL(10) ED(ND)			!Electron density
-	REAL(10) EMHNUKT(ND)		!EXP(-hv/kT)
-	REAL(10) NU			!Frequency (10^15 Hz)
-	REAL(10) ZION			!Charge on resultiong ion.
+	REAL(KIND=LDP) T(ND)			!Temperature (K)
+	REAL(KIND=LDP) ED(ND)			!Electron density
+	REAL(KIND=LDP) EMHNUKT(ND)		!EXP(-hv/kT)
+	REAL(KIND=LDP) NU			!Frequency (10^15 Hz)
+	REAL(KIND=LDP) ZION			!Charge on resultiong ion.
 C
 	INTEGER PHOT_ID		!Photoionization ID (path)
 	INTEGER ION_LEV		!Target level for ionizations in ion.
 C
 C Vectors to save computational effort.
 C
-	REAL(10) GFF_VAL(ND)		!g(ff) as a function of depth
-	REAL(10) COR_FAC(ND)		!Factor to convert HNST for ION_LEV
-	REAL(10) YDIS(ND)			!Constant for computing level dissolution/
-	REAL(10) XDIS(ND)			!Constant for computing level dissolution/
-	REAL(10) DIS_CONST(N)		!Constant appearing in dissolution formula.
-	REAL(10) ALPHA_VEC(N)		!Photionization cross-section
-	REAL(10) TMP_CHI(N)		!Photionization cross-section
-	REAL(10) TMP_ETA(N)		!Photionization cross-section
+	REAL(KIND=LDP) GFF_VAL(ND)		!g(ff) as a function of depth
+	REAL(KIND=LDP) COR_FAC(ND)		!Factor to convert HNST for ION_LEV
+	REAL(KIND=LDP) YDIS(ND)			!Constant for computing level dissolution/
+	REAL(KIND=LDP) XDIS(ND)			!Constant for computing level dissolution/
+	REAL(KIND=LDP) DIS_CONST(N)		!Constant appearing in dissolution formula.
+	REAL(KIND=LDP) ALPHA_VEC(N)		!Photionization cross-section
+	REAL(KIND=LDP) TMP_CHI(N)		!Photionization cross-section
+	REAL(KIND=LDP) TMP_ETA(N)		!Photionization cross-section
 C
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
@@ -90,8 +91,8 @@ C
 C Local constants.
 C
 	INTEGER I,K,K_ST,ND_LOC,NO_NON_ZERO_PHOT
-	REAL(10) ALPHA,TCHI1,TETA1,TETA2
-	REAL(10) T1,T2,ZION_CUBED,NEFF
+	REAL(KIND=LDP) ALPHA,TCHI1,TETA1,TETA2
+	REAL(KIND=LDP) T1,T2,ZION_CUBED,NEFF
 C
 	CALL TUNE(1,'GENOPA')
 C

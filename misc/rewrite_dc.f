@@ -7,17 +7,18 @@ C Required: OLD oscilator file
 C
 C Required: NEW oscilator file
 C
-C The number of levels for the OLD case is  determined by the number of 
+C The number of levels for the OLD case is  determined by the number of
 C levels in the DC file.
 C
 C The number of levels for the NEW case is  determined by the last level
 C corresponding to the HIGHEST level in the OLD data set.
 C
-C The name of any new levels can be individually reset if there is a 
-C known mismatch. For example, 4z2Z renamed to 4f2Fo 
+C The name of any new levels can be individually reset if there is a
+C known mismatch. For example, 4z2Z renamed to 4f2Fo
 C (provided not last level).
 C
 	PROGRAM REWRITE_DC
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 C
@@ -32,9 +33,9 @@ C Storage for oscilators etc from old oscilator file.
 C A_O is needed for the call, but is not used in the main routine.
 C
 	INTEGER N_O
-	REAL(10), ALLOCATABLE :: A_O(:,:)
-	REAL(10), ALLOCATABLE :: EDGE_O(:)
-	REAL(10), ALLOCATABLE :: G_O(:)
+	REAL(KIND=LDP), ALLOCATABLE :: A_O(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: EDGE_O(:)
+	REAL(KIND=LDP), ALLOCATABLE :: G_O(:)
 	CHARACTER*30, ALLOCATABLE ::LEVNAME_O(:)
 	CHARACTER*132 OLD_OSC_FILE
 C
@@ -42,9 +43,9 @@ C Storage for oscilators etc from new oscilator file.
 C
 	INTEGER N_N
 	INTEGER, ALLOCATABLE :: INDX(:)
-	REAL(10), ALLOCATABLE :: A_N(:,:)
-	REAL(10), ALLOCATABLE :: EDGE_N(:)
-	REAL(10), ALLOCATABLE :: G_N(:)
+	REAL(KIND=LDP), ALLOCATABLE :: A_N(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: EDGE_N(:)
+	REAL(KIND=LDP), ALLOCATABLE :: G_N(:)
 	CHARACTER*30, ALLOCATABLE ::LEVNAME_N(:)
 	CHARACTER*132 NEW_OSC_FILE
 C
@@ -55,18 +56,18 @@ C
 	INTEGER, PARAMETER :: DCIN=15
 	INTEGER, PARAMETER :: DCOUT=16
 C
-	REAL(10), ALLOCATABLE :: DC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: DC(:)
 C
 	INTEGER ND
-	REAL(10) LSTAR
-	REAL(10) RSTAR
+	REAL(KIND=LDP) LSTAR
+	REAL(KIND=LDP) RSTAR
 	CHARACTER*132 DC_FILE
 	CHARACTER*30 TMP_NAME
 C
-	REAL(10) GF_LEV_CUT
-	REAL(10) EN_LEV_CUT
-	REAL(10) Z
-	REAL(10) T1
+	REAL(KIND=LDP) GF_LEV_CUT
+	REAL(KIND=LDP) EN_LEV_CUT
+	REAL(KIND=LDP) Z
+	REAL(KIND=LDP) T1
 	CHARACTER*30 OSCDATE
 	CHARACTER*132 STRING,STRING_N
 	CHARACTER*132 LNK_FILE
@@ -78,8 +79,8 @@ C
 C
 C Constants for opacity etc.
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) OPLIN,EMLIN
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
 C
@@ -96,11 +97,11 @@ C
 	  CALL GEN_IN(DC_FILE,'Name of file with old depart. coef.')
 	  CALL GEN_ASCI_OPEN(DCIN,DC_FILE,'OLD',' ','READ',IZERO,IOS)
 	  IF(IOS .NE. 0)WRITE(T_OUT,*)' Error opening DC file: Try again'
-	END DO                                                    
+	END DO
 C
 C Check whether the file has a record containing 'Format date'. Its presence
 C effects the way we read the file. If it has, we save it to output. Note that
-C the header to each depth (i.e. that contianing R, Ne, etc) output to the 
+C the header to each depth (i.e. that contianing R, Ne, etc) output to the
 C final file has EXACTLY the same format as the main input file.
 C
 	I=0
@@ -139,7 +140,7 @@ C
 	    LEVNAME_O(I)(1:)=LEVNAME_O(I)(2:)
 	  END DO
 	END DO
-C                                        
+C
 200	WRITE(T_OUT,'(A)',ADVANCE='NO')
 	IOS=1
 	NEW_OSC_FILE=' '
@@ -204,7 +205,7 @@ C
 	ELSE
 	  J=N_N
 	  DO WHILE(LEVNAME_N(J) .NE. LEVNAME_O(N_O))
-	    J=J-1           
+	    J=J-1
 	    IF(J .LT. 1)THEN
 	      WRITE(T_OUT,*)' No final state match'
 	      WRITE(T_OUT,*)' This may be due to a level-name change'
@@ -233,7 +234,7 @@ C
 	        WRITE(T_OUT,*)' Current old level name is ',LEVNAME_O(J)
 	        WRITE(T_OUT,*)' Previous match was ',LEVNAME_O(INDX(I))
 	        STOP
-	      ELSE 
+	      ELSE
 	        INDX(I)=J
 	        IF(G_N(I) .NE. G_O(J))THEN
 	          WRITE(T_OUT,*)' Error: inconsistent statistical weights'
@@ -260,13 +261,13 @@ C
 	    K=K-1		!don't want [ included.
 	    DO J=1,N_O
 	      IF(LEVNAME_N(I)(1:K) .EQ. LEVNAME_O(J))THEN
-	        IF(INDX(I) .NE. 0)THEN   
+	        IF(INDX(I) .NE. 0)THEN
 	          WRITE(T_OUT,*)' Error: More than 1 level match'
 	          WRITE(T_OUT,*)' New level name is ',LEVNAME_N(I)
 	          WRITE(T_OUT,*)' Current old level name is ',LEVNAME_N(J)
 	          WRITE(T_OUT,*)' Previous match was ',LEVNAME_N(INDX(I))
 	          STOP
-	        ELSE 
+	        ELSE
 	          INDX(I)=J
 	        END IF
 	      END IF
@@ -293,7 +294,7 @@ C
 C
 C Check whether the file has a record containing 'Format date'. Its presence
 C effects the way we read the file. If it has, we save it to output. Note that
-C the header to each depth (i.e. that contianing R, Ne, etc) output to the 
+C the header to each depth (i.e. that contianing R, Ne, etc) output to the
 C final file has EXACTLY the same format as the main input file.
 C
 	IF(STRING_N .NE. ' ')THEN

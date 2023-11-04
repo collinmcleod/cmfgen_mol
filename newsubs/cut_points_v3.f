@@ -2,12 +2,13 @@
 !
 	SUBROUTINE CUT_POINTS_V3(NU_CUT,CROSS_CUT,NUM_CUT,
 	1    NU_SM,CROSS_SM,NUM_SM,CUT_ACCURACY)
+	USE SET_KIND_MODULE
 !
 !===================================================================
 !
 ! This routine cuts points from the given smoothed cross section such that
 ! linear interpolation can be used to recover intermediate data points to
-! a fractional accuracy of CUT_ACCURACY. All local maximum and minimum points 
+! a fractional accuracy of CUT_ACCURACY. All local maximum and minimum points
 ! are retained.
 !
 ! Altered 20-Apr-2004 : Work arrays passed in call
@@ -27,17 +28,17 @@
 ! Both the *_cut and *_sm arrays are assumed to have a maximum length of NUM_SM.
 !
       INTEGER NUM_SM
-      REAL(10) NU_SM(NUM_SM),CROSS_SM(NUM_SM)
-      REAL(10) CUT_ACCURACY
+      REAL(KIND=LDP) NU_SM(NUM_SM),CROSS_SM(NUM_SM)
+      REAL(KIND=LDP) CUT_ACCURACY
 !
-      REAL(10) NU_CUT(NUM_SM)
-      REAL(10) CROSS_CUT(NUM_SM)
-      REAL(10) DERIV(NUM_SM)
-      REAL(10) DIST(NUM_SM)
+      REAL(KIND=LDP) NU_CUT(NUM_SM)
+      REAL(KIND=LDP) CROSS_CUT(NUM_SM)
+      REAL(KIND=LDP) DERIV(NUM_SM)
+      REAL(KIND=LDP) DIST(NUM_SM)
 !
       INTEGER I,LOW,HIGH,MID,NUM_CUT,NUM_AREA
-      REAL(10) X,Y,M
-      REAL(10) COMP_VAL
+      REAL(KIND=LDP) X,Y,M
+      REAL(KIND=LDP) COMP_VAL
 !
 ! Find derivatives
 !
@@ -71,8 +72,8 @@
       ENDIF
 !
 ! Can now begin point selection in earnest. All maxima are retained.
-! Points are retained such that a linear interpolation gives an accuracy of 
-! ACCURACY, when the corss-section is > 1.0D-06. Outside this range at 
+! Points are retained such that a linear interpolation gives an accuracy of
+! ACCURACY, when the corss-section is > 1.0D-06. Outside this range at
 ! least 20 points per decade are retained.
 !
 ! Find next maximum or minimum point (dy/dx=0).
@@ -102,7 +103,7 @@
 !
 ! Determine the distance from each exact point (i=low,high)
 ! to the straight line interpolation between LOW and HIGH.
-! 
+!
         M=(CROSS_SM(HIGH)-CROSS_SM(LOW))/(NU_SM(HIGH)-NU_SM(LOW))
         DO I=LOW+1,HIGH-1
 	  Y=CROSS_SM(LOW)+M*(NU_SM(I)-NU_SM(LOW))
@@ -129,7 +130,7 @@
         IF( (DIST(MID)/COMP_VAL) .GT. CUT_ACCURACY)THEN
           HIGH=MID
           GOTO 320		!RESTART TESTING PROCEDURE
-        ELSE IF( NU_SM(HIGH)/NU_SM(LOW) .GT. 1.1D0 
+        ELSE IF( NU_SM(HIGH)/NU_SM(LOW) .GT. 1.1D0
      *                         .AND. COMP_VAL .EQ. 1.0d-06)THEN
           HIGH=MID
           GOTO 320		!RESTART TESTING PROCEDURE

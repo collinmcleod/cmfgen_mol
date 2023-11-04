@@ -9,6 +9,8 @@
       REAL(KIND=LDP)   A( LDA, * ), B( LDB, * )
 *     ..
 *
+* Altered: 30-Oct-2023 - Parallelized first two loop overs J (SIDE='L') -- Hillier
+*
 *  Purpose
 *  =======
 *
@@ -208,6 +210,7 @@
 *           Form  B := alpha*inv( A )*B.
 *
             IF( UPPER )THEN
+!$OMP PARALLEL DO IF(N > 4) PRIVATE(I,J,K)
                DO 60, J = 1, N
                   IF( ALPHA.NE.ONE )THEN
                      DO 30, I = 1, M
@@ -225,6 +228,7 @@
    50             CONTINUE
    60          CONTINUE
             ELSE
+!$OMP PARALLEL DO IF(N > 4) PRIVATE(I,J,K)
                DO 100, J = 1, N
                   IF( ALPHA.NE.ONE )THEN
                      DO 70, I = 1, M

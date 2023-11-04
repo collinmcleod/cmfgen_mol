@@ -1,11 +1,12 @@
 !
-! General routine for plotting and comparing J (or H) obtained from the 
+! General routine for plotting and comparing J (or H) obtained from the
 ! EDDFACTOR (or similar) data file.
 !
-! Various options are available to redden and normalize the model spectra. 
+! Various options are available to redden and normalize the model spectra.
 ! Several different units can be used for the X and Y axes.
 !
 	PROGRAM PLT_JH
+	USE SET_KIND_MODULE
 !
 ! Altered 05-Apr-2020 : Added RTAU option.
 ! Altered 15-Nov-2019 : TAU_ES and TAU_ROSS were not being corrected for clumping.
@@ -32,15 +33,15 @@
 	TYPE MODEL_INTENSITY
 	  INTEGER NCF
 	  INTEGER ND
-	  REAL(10), POINTER :: RJ(:,:)
-	  REAL(10), POINTER :: NU(:)
-	  REAL(10), POINTER :: R(:)
-	  REAL(10), POINTER :: V(:)
-	  REAL(10), POINTER :: ED(:)
-	  REAL(10), POINTER :: T(:)
-	  REAL(10), POINTER :: TAU_ES(:)
-	  REAL(10), POINTER :: LANG_COORD(:)
-	  REAL(10), POINTER :: XV(:)
+	  REAL(KIND=LDP), POINTER :: RJ(:,:)
+	  REAL(KIND=LDP), POINTER :: NU(:)
+	  REAL(KIND=LDP), POINTER :: R(:)
+	  REAL(KIND=LDP), POINTER :: V(:)
+	  REAL(KIND=LDP), POINTER :: ED(:)
+	  REAL(KIND=LDP), POINTER :: T(:)
+	  REAL(KIND=LDP), POINTER :: TAU_ES(:)
+	  REAL(KIND=LDP), POINTER :: LANG_COORD(:)
+	  REAL(KIND=LDP), POINTER :: XV(:)
 	  LOGICAL RV_PRES
 	  LOGICAL :: XV_SET=.FALSE.
 	  CHARACTER*10 DATA_TYPE
@@ -55,51 +56,51 @@
 !
 	INTEGER NCF_B
 	INTEGER ND_B
-	REAL(10), ALLOCATABLE :: RJ_B(:,:)
-	REAL(10), ALLOCATABLE :: NU_B(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RJ_B(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: NU_B(:)
 !
-	REAL(10), ALLOCATABLE :: TA(:)
-	REAL(10), ALLOCATABLE :: TB(:)
-	REAL(10), ALLOCATABLE :: TC(:)
-	REAL(10), ALLOCATABLE :: TAU_ROSS(:)
-	REAL(10), ALLOCATABLE :: TAU_ES(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TAU_ROSS(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TAU_ES(:)
 !
-	REAL(10) RMDOT
-	REAL(10) RLUM
-	REAL(10) ABUND_HYD
+	REAL(KIND=LDP) RMDOT
+	REAL(KIND=LDP) RLUM
+	REAL(KIND=LDP) ABUND_HYD
 	INTEGER ND_ATM,NC_ATM,NP_ATM,NT_ATM
 	CHARACTER*21 TIME
-	REAL(10), ALLOCATABLE :: R(:)
-	REAL(10), ALLOCATABLE :: V(:)
-	REAL(10), ALLOCATABLE :: SIGMA(:)
-	REAL(10), ALLOCATABLE :: T(:)
-	REAL(10), ALLOCATABLE :: ED(:)
-	REAL(10), ALLOCATABLE :: TGREY(:)
-	REAL(10), ALLOCATABLE :: dE_RAD_DECAY(:)
-	REAL(10), ALLOCATABLE :: ROSS_MEAN(:)
-	REAL(10), ALLOCATABLE :: FLUX_MEAN(:)
-	REAL(10), ALLOCATABLE :: PLANCK_MEAN(:)
-	REAL(10), ALLOCATABLE :: POP_ATOM(:)
-	REAL(10), ALLOCATABLE :: MASS_DENSITY(:)
-	REAL(10), ALLOCATABLE :: POPION(:)
-	REAL(10), ALLOCATABLE :: CLUMP_FAC(:)
-	REAL(10), ALLOCATABLE :: POPS(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: R(:)
+	REAL(KIND=LDP), ALLOCATABLE :: V(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: T(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ED(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TGREY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: dE_RAD_DECAY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ROSS_MEAN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: FLUX_MEAN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: PLANCK_MEAN(:)
+	REAL(KIND=LDP), ALLOCATABLE :: POP_ATOM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: MASS_DENSITY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: POPION(:)
+	REAL(KIND=LDP), ALLOCATABLE :: CLUMP_FAC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: POPS(:,:)
 !
 ! Vectors for passing data to plot package via calls to CURVE.
 !
-	REAL(10), ALLOCATABLE :: XV(:)
-	REAL(10), ALLOCATABLE :: YV(:)
-	REAL(10), ALLOCATABLE :: ZV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: XV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: YV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ZV(:)
 !
 	CHARACTER*80 NAME		!Default title for plot
 	CHARACTER*80 XAXIS,XAXSAV	!Label for Abscissa
 	CHARACTER*80 YAXIS		!Label for Ordinate
 	CHARACTER*80 XDEPTH_LAB
 !
-	REAL(10) ANG_TO_HZ
-	REAL(10) KEV_TO_HZ
-	REAL(10) C_CMS
-	REAL(10) C_KMS
+	REAL(KIND=LDP) ANG_TO_HZ
+	REAL(KIND=LDP) KEV_TO_HZ
+	REAL(KIND=LDP) C_CMS
+	REAL(KIND=LDP) C_KMS
 !
 	LOGICAL LOG_X,LOG_Y
 	CHARACTER*10 Y_PLT_OPT,X_UNIT
@@ -129,22 +130,22 @@
 	INTEGER ST_REC
 	INTEGER REC_LENGTH
 	INTEGER NEW_ND
-	REAL(10) SCALE_FAC
-	REAL(10) TEMP
-	REAL(10) DTDR
-	REAL(10) RADIUS
-	REAL(10) T1,T2,T3
-	REAL(10) RVAL
-	REAL(10) DELR
-	REAL(10) LAMC
-	REAL(10) VMIN
-	REAL(10) dV_DOP
-	REAL(10) LAM_ST,LAM_END
-	REAL(10) FREQ_VAL
-	REAL(10) EDGE_FREQ
-	REAL(10) T_ELEC
-	REAL(10) SN_AGE
-	REAL(10), ALLOCATABLE :: NEW_R(:)
+	REAL(KIND=LDP) SCALE_FAC
+	REAL(KIND=LDP) TEMP
+	REAL(KIND=LDP) DTDR
+	REAL(KIND=LDP) RADIUS
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) RVAL
+	REAL(KIND=LDP) DELR
+	REAL(KIND=LDP) LAMC
+	REAL(KIND=LDP) VMIN
+	REAL(KIND=LDP) dV_DOP
+	REAL(KIND=LDP) LAM_ST,LAM_END
+	REAL(KIND=LDP) FREQ_VAL
+	REAL(KIND=LDP) EDGE_FREQ
+	REAL(KIND=LDP) T_ELEC
+	REAL(KIND=LDP) SN_AGE
+	REAL(KIND=LDP), ALLOCATABLE :: NEW_R(:)
 	LOGICAL AIR_LAM
 	LOGICAL USE_V
 	LOGICAL PLOT_RSQJ
@@ -173,8 +174,8 @@
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
-	COMMON/LINE/ OPLIN,EMLIN               
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	COMMON/LINE/ OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 !
 	INTEGER GET_INDX_DP
 !
@@ -188,7 +189,7 @@
 	CHARACTER*80 RVTJ_FILE_NAME
 	CHARACTER*11 FORMAT_DATE
 !
-	REAL(10) SPEED_OF_LIGHT,FAC,LAM_VAC
+	REAL(KIND=LDP) SPEED_OF_LIGHT,FAC,LAM_VAC
 	LOGICAL EQUAL
 	CHARACTER*30 UC
 	EXTERNAL SPEED_OF_LIGHT,EQUAL,FAC,UC,LAM_VAC,GET_INDX_DP
@@ -421,9 +422,9 @@
 	  WRITE(6,*)'Warning -- set R grid to RVTJ file with interpolation'
 	  WRITE(6,*)'Use interp option to set other values.'
 	ELSE
-	  WRITE(6,*)' ' 
-	  WRITE(6,*)' WARNING -- ND in RVTJ differs from that assoicated with main input file ' 
-	  WRITE(6,*)' ' 
+	  WRITE(6,*)' '
+	  WRITE(6,*)' WARNING -- ND in RVTJ differs from that assoicated with main input file '
+	  WRITE(6,*)' '
 	END IF
 !
 ! Now compute the important optical depth scales.
@@ -473,7 +474,7 @@
 !
 ! This call resets the .sve algorithm.  Specifically it sets the next
 ! input answer to be a main option, and all subsequent inputs to be
-! sub-options.  
+! sub-options.
 !
  3	CALL SVE_FILE('RESET')
 !
@@ -507,10 +508,10 @@
 !
 	IF(X(1:3) .EQ. 'TIT')THEN
 	  CALL USR_OPTION(NAME,'Title',' ',' ')
-!                    
+!
 ! Set X-Axis plotting options.
 !
-	ELSE IF(X(1:2) .EQ.'LX' .OR. X(1:4) .EQ. 'LOGX' .OR. 
+	ELSE IF(X(1:2) .EQ.'LX' .OR. X(1:4) .EQ. 'LOGX' .OR.
 	1                            X(1:4) .EQ. 'LINX')THEN
 	  LOG_X=.NOT. LOG_X
 	  IF(LOG_X)WRITE(T_OUT,*)'Now using Logarithmic X axis'
@@ -662,7 +663,7 @@
 !
 ! Set Y axis plotting options.
 !
-	ELSE IF(X(1:2) .EQ. 'LY' .OR. X(1:4) .EQ. 'LOGY' .OR. 
+	ELSE IF(X(1:2) .EQ. 'LY' .OR. X(1:4) .EQ. 'LOGY' .OR.
 	1                             X(1:4) .EQ. 'LINY')THEN
 	  LOG_Y=.NOT. LOG_Y
 	  IF(LOG_Y)WRITE(T_OUT,*)'Now using Logarithmic Y axis'
@@ -1074,7 +1075,7 @@
 	    CALL COMPUTE_TAU_RADIAL(YV,ZM(ID)%RJ(1,I),ZM(ID)%V,ZM(ID)%R,ZM(ID)%NU(I),dV_DOP,VMIN,ND,K)
 	    CALL DP_CURVE(K,XV(I),YV)
 	  END DO
-! 
+!
 	ELSE IF(X(1:2) .EQ. 'JD' .OR. X(1:5) .EQ. 'RSQJD')THEN
 !
 	  CALL USR_OPTION(I,'Depth',' ','Depth index in model 1')
@@ -1102,7 +1103,7 @@
 	      YV(1:NCF)=ZM(ID)%RJ(1,1:NCF)*SCALE_FAC
             ELSE IF(ZM(ID)%R(ND) .GT. RVAL)THEN
 	      YV(1:NCF)=ZM(ID)%RJ(ND,1:NCF)*SCALE_FAC
-	    ELSE   
+	    ELSE
 	      I=ISAV
 	      IF(ID .NE. 1)I=GET_INDX_DP(RVAL,ZM(ID)%R,ND)
 	      J=MIN(I+1,ND)
@@ -1123,7 +1124,7 @@
 	          ELSE
 	            YV(ML)=0.0D0
 	          END IF
-	        END DO    
+	        END DO
 	      END IF
 	    END IF
 !
@@ -1141,7 +1142,7 @@
 	    XV(1:NCF)=ZM(ID)%NU(1:NCF)
 	    IF(PLOT_RSQJ)YV(1:NCF)=YV(1:NCF)*ZM(ID)%R(I)*ZM(ID)%R(I)
 	    IF(ZEROV)THEN
-	      T1=(1.0D0+ZM(ID)%V(I)/C_KMS)/(1.0-ZM(ID)%V(I)/C_KMS) 
+	      T1=(1.0D0+ZM(ID)%V(I)/C_KMS)/(1.0-ZM(ID)%V(I)/C_KMS)
 	      XV(1:NCF)=XV(1:NCF)*SQRT(T1)
 	      YV(1:NCF)=YV(1:NCF)*T1
 	    END IF
@@ -1316,14 +1317,14 @@
 	    IF( ZM(ID)%DATA_TYPE .EQ. 'H')THEN
 	      IF(ND .EQ. ND_ATM)THEN
 	        WRITE(T_OUT,'(/,A,ES11.4)')' Luminosity is:',R(I)*R(I)*TA(NCF)*4.1274D+03
-	      ElSE 
+	      ElSE
 	        WRITE(T_OUT,'(/,A,ES11.4)')' Luminosity/R(10^10cm)^2 is:',TA(NCF)*4.1274D+03
 	      END IF
 	    ELSE
 	      IF(ND .EQ. ND_ATM)THEN
 	        STRING=' 16 pi^2 r^2 '//TRIM(ZM(ID)%DATA_TYPE)//'/Lsun is:'
 	        WRITE(T_OUT,'(/,A,ES11.4)')TRIM(STRING),R(I)*R(I)*TA(NCF)*4.1274D+03
-	      ElSE 
+	      ElSE
 	        STRING=' 1.6D+21 pi^2 '//TRIM(ZM(ID)%DATA_TYPE)//'/Lsun is:'
 	        WRITE(T_OUT,'(/,A,ES11.4)')TRIM(STRING),TA(NCF)*4.1274D+03
 	      END IF
@@ -1540,8 +1541,8 @@
 !
 ! 
 !
-	ELSE IF(X(1:2) .EQ. 'LI' .OR. X(1:4) .EQ. 'LIST' .OR. 
-	1                             X(1:2) .EQ. 'HE' 
+	ELSE IF(X(1:2) .EQ. 'LI' .OR. X(1:4) .EQ. 'LIST' .OR.
+	1                             X(1:2) .EQ. 'HE'
 	1          .OR. X(1:4) .EQ. 'HELP')THEN
 	  CALL PLT_JH_OPT_DESC
 !
@@ -1561,7 +1562,8 @@
 !
 !
 	FUNCTION FAC(N)
-	REAL(10) FAC
+	USE SET_KIND_MODULE
+	REAL(KIND=LDP) FAC
 	INTEGER N
 	INTEGER, PARAMETER :: T_OUT=5
 !

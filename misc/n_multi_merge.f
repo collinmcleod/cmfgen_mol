@@ -1,5 +1,5 @@
 !
-! Routine to merge 6 color PGPLOTS onto a single 
+! Routine to merge 6 color PGPLOTS onto a single
 ! page. The plots should be done with:
 !      EXPAND_CHAR=1.2; EXPAND_TICK=1.2; ASR=0.89; Plot Size=10.0 cm
 ! The plots are located in 2 columns, 2 per row.
@@ -7,6 +7,7 @@
 ! Landscape format, with CPS as printer.
 !
 	PROGRAM N_MULT_MERGE
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
 !

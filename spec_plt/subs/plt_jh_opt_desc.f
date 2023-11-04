@@ -1,4 +1,5 @@
 	SUBROUTINE PLT_JH_OPT_DESC
+	USE SET_KIND_MODULE
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
 !
@@ -9,12 +10,12 @@
 	WRITE(6,'(X,A)')'General listing of options in PLT_JH. Warning: Code originally developed'
 	WRITE(6,'(X,A)')'to plot J but later extended to plot H, Eta, and Chi. Be carefull with'
 	WRITE(6,'(X,A)')'labeling and units. Another possible trap is that EDDFACTOR is ouput'
-	WRITE(6,'(X,A)')'on the FINE grid, where as H, Eta and Chi are ouput on the regular grid.' 
+	WRITE(6,'(X,A)')'on the FINE grid, where as H, Eta and Chi are ouput on the regular grid.'
 	WRITE(6,'(X,A)')'If comparing J, H etc, it may be better to use the EDDFACTOR file from the'
 	WRITE(6,'(X,A)')'CMFGEN computation, or alternatively, do not add extra points in the CMF_FLUX'
 	WRITE(6,'(X,A)')'computation.'
 
-	WRITE(6,'(X,A)')'Options are ordered under subject. Associated with each option are requested' 
+	WRITE(6,'(X,A)')'Options are ordered under subject. Associated with each option are requested'
 	WRITE(6,'(X,A)')'inputs. Some inputs are not prompted for, and can only be changed from their'
 	WRITE(6,'(X,A)')'default values by specifying them in the call. eg.'
 	WRITE(6,'(X,A)')' '

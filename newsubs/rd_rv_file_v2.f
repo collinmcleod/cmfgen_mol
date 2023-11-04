@@ -1,5 +1,5 @@
 !
-! Routine to read in the Radius grid to be utilized. The velocity and 
+! Routine to read in the Radius grid to be utilized. The velocity and
 ! and sigma (dlnv/dlnr-1) must also be given.
 !
 ! At present grid in must have the same number of data points as in CMFGEN,
@@ -8,6 +8,7 @@
 ! decide on how a new R grid will be created.
 !
 	SUBROUTINE RD_RV_FILE_V2(R,V,SIGMA,RMAX,RP,VINF,LUIN,ND,OPTIONS,N_OPT)
+	USE SET_KIND_MODULE
 !
 ! Altered  19-Aug-2015: Added check that SIMGMA < -1.0D0 (cur_hmi,21-Jun-2015).
 ! Altered  31-Mar-2008: Check on VINF is now set to 10% accuracy. Done as V(1) is normally
@@ -22,12 +23,12 @@
 	IMPLICIT NONE
 !
 	INTEGER ND
-	REAL(10) R(ND)			!Radial grin in 10^10 cm
-	REAL(10) V(ND)			!V in km/s
-	REAL(10) SIGMA(ND)		!dlnV/dlnr-1
-	REAL(10) RMAX			!Maximum radius  (in 10^10 cm)
-	REAL(10) RP			!Core radius  (in 10^10 cm)
-	REAL(10) VINF                     !Terminal velocity
+	REAL(KIND=LDP) R(ND)			!Radial grin in 10^10 cm
+	REAL(KIND=LDP) V(ND)			!V in km/s
+	REAL(KIND=LDP) SIGMA(ND)		!dlnV/dlnr-1
+	REAL(KIND=LDP) RMAX			!Maximum radius  (in 10^10 cm)
+	REAL(KIND=LDP) RP			!Core radius  (in 10^10 cm)
+	REAL(KIND=LDP) VINF                     !Terminal velocity
 !
 ! Only OPTIONS(1) is presently utilized. This indicates the format
 ! of the data in the file.
@@ -37,13 +38,13 @@
 !
 ! Local vectors.
 !
-	REAL(10) HT(ND-1)	
-	REAL(10) VEL(ND-1)
-	REAL(10) dVdR(ND-1)
+	REAL(KIND=LDP) HT(ND-1)	
+	REAL(KIND=LDP) VEL(ND-1)
+	REAL(KIND=LDP) dVdR(ND-1)
 !
 ! Local variables.
 !
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	INTEGER LUIN
 	INTEGER LUER
 	INTEGER I
@@ -134,7 +135,7 @@ C
 	  STRING=' '
 	  DO WHILE( INDEX(STRING,'STRUCTURE, GRID SIZE') .EQ. 0)
 	    READ(LUIN,'(A)')STRING
-	  END DO  
+	  END DO
 	  READ(LUIN,'(A)')STRING
 	  READ(LUIN,'(A)')STRING
 	  READ(LUIN,'(A)')STRING
@@ -146,7 +147,7 @@ C
 	    WRITE(LUER,*)'ND in file should be 1 less than in CMFGEN'
 	    STOP
 	  END IF
-!             
+!
 	  STRING=' '
 	  DO WHILE( INDEX(STRING,'[RCORE]') .EQ. 0)
 	    READ(LUIN,'(A)')STRING

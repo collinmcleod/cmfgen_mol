@@ -4,7 +4,7 @@
 !       MODEL
 !       MODEL_SPEC
 !       RVTJ
-!       XzVPRRR         (XzV is the species being investigated)  
+!       XzVPRRR         (XzV is the species being investigated)
 !	NON_TH_RATES    (in SN model)
 !       XzV_IND_COL     (collision rates for species XzV)
 !
@@ -18,6 +18,7 @@
 !                grep XzV NETRATE >> SMALL_FILE
 !
 	PROGRAM PLT_RATES
+	USE SET_KIND_MODULE
 	USE GEN_IN_INTERFACE
 	USE MOD_COLOR_PEN_DEF
 	IMPLICIT NONE
@@ -33,74 +34,74 @@
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
-	REAL(10), ALLOCATABLE :: NU(:)
-	REAL(10), ALLOCATABLE :: LAM(:)
+	REAL(KIND=LDP), ALLOCATABLE :: NU(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LAM(:)
 !
-	REAL(10), ALLOCATABLE :: XV(:)
-	REAL(10), ALLOCATABLE :: YV(:)
-	REAL(10), ALLOCATABLE :: ZV(:)
-	REAL(10), ALLOCATABLE :: LONG_XV(:)
-	REAL(10), ALLOCATABLE :: LONG_YV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: XV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: YV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ZV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LONG_XV(:)
+	REAL(KIND=LDP), ALLOCATABLE :: LONG_YV(:)
 !
 	CHARACTER(LEN=60), ALLOCATABLE :: TRANS_NAME(:)
 	CHARACTER(LEN=60), ALLOCATABLE :: NT_TRANS_NAME(:)
 	CHARACTER(LEN=60), ALLOCATABLE :: COL_TRANS_NAME(:)
 	CHARACTER(LEN=60), ALLOCATABLE :: AUTO_LEV_NAME(:)
 !
-	REAL(10), ALLOCATABLE :: R(:)
-	REAL(10), ALLOCATABLE :: T(:)
-	REAL(10), ALLOCATABLE :: V(:)
-	REAL(10), ALLOCATABLE :: SIGMA(:)
-	REAL(10), ALLOCATABLE :: ED(:)
+	REAL(KIND=LDP), ALLOCATABLE :: R(:)
+	REAL(KIND=LDP), ALLOCATABLE :: T(:)
+	REAL(KIND=LDP), ALLOCATABLE :: V(:)
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ED(:)
 !
 	CHARACTER(LEN=10) PR_SPECIES
 	CHARACTER(LEN=10) SPECIES
 	CHARACTER(LEN=30) LEVEL
 !
 	CHARACTER(LEN=40), ALLOCATABLE :: LEVEL_NAME(:)
-	REAL(10), ALLOCATABLE :: STAT_WT(:)
-	REAL(10), ALLOCATABLE :: ENERGY(:)
-	REAL(10), ALLOCATABLE :: FEDGE(:)
+	REAL(KIND=LDP), ALLOCATABLE :: STAT_WT(:)
+	REAL(KIND=LDP), ALLOCATABLE :: ENERGY(:)
+	REAL(KIND=LDP), ALLOCATABLE :: FEDGE(:)
 	INTEGER, ALLOCATABLE :: F_TO_S(:)
 	INTEGER, ALLOCATABLE :: INT_SEQ(:)
-	REAL(10) IONIZATION_ENERGY,ZION
+	REAL(KIND=LDP) IONIZATION_ENERGY,ZION
 	CHARACTER(LEN=20) OSCDATE
-	CHARACTER(LEN=20) SL_OPTION 
-	CHARACTER(LEN=20) FL_OPTION 
-	CHARACTER(LEN=20) IL_OPTION 
+	CHARACTER(LEN=20) SL_OPTION
+	CHARACTER(LEN=20) FL_OPTION
+	CHARACTER(LEN=20) IL_OPTION
 !
 	INTEGER, ALLOCATABLE ::  LINK(:)
-	REAL(10), ALLOCATABLE :: RATES(:,:)
-	REAL(10), ALLOCATABLE :: NEW_RATES(:,:)
-	REAL(10), ALLOCATABLE :: SUM_RATES(:)
+	REAL(KIND=LDP), ALLOCATABLE :: RATES(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: NEW_RATES(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: SUM_RATES(:)
 !
 	INTEGER, ALLOCATABLE :: NT_LINK(:)
-	REAL(10),  ALLOCATABLE :: NT_RATES(:,:)
-	REAL(10),  ALLOCATABLE :: NEW_NT_RATES(:,:)
+	REAL(KIND=LDP),  ALLOCATABLE :: NT_RATES(:,:)
+	REAL(KIND=LDP),  ALLOCATABLE :: NEW_NT_RATES(:,:)
 !
 	INTEGER, ALLOCATABLE :: COL_LINK(:)
-	REAL(10),  ALLOCATABLE :: COL_RATES(:,:)
-	REAL(10),  ALLOCATABLE :: NEW_COL_RATES(:,:)
+	REAL(KIND=LDP),  ALLOCATABLE :: COL_RATES(:,:)
+	REAL(KIND=LDP),  ALLOCATABLE :: NEW_COL_RATES(:,:)
 !
-	REAL(10), ALLOCATABLE :: PHOT_RATE(:,:)
-	REAL(10), ALLOCATABLE :: REC_RATE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: PHOT_RATE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: REC_RATE(:,:)
 !
-	REAL(10), ALLOCATABLE :: AUTO_RATE(:,:)
-	REAL(10), ALLOCATABLE :: AUTO_REC_RATE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: AUTO_RATE(:,:)
+	REAL(KIND=LDP), ALLOCATABLE :: AUTO_REC_RATE(:,:)
 !
-	REAL(10),  ALLOCATABLE :: DPTH_VEC(:)
-	REAL(10),  ALLOCATABLE :: NORM_VEC(:)
-	REAL(10),  ALLOCATABLE :: WRK_VEC(:)
+	REAL(KIND=LDP),  ALLOCATABLE :: DPTH_VEC(:)
+	REAL(KIND=LDP),  ALLOCATABLE :: NORM_VEC(:)
+	REAL(KIND=LDP),  ALLOCATABLE :: WRK_VEC(:)
 	INTEGER, ALLOCATABLE :: INDX(:)
 !
-	REAL(10) T1,T2
-	REAL(10) RATE_THRESHOLD
-	REAL(10) SUM_TO,SUM_FROM
-	REAL(10) NT_SUM_TO,NT_SUM_FROM
-	REAL(10) COL_SUM_TO,COL_SUM_FROM
-	REAL(10) NET_AUTO
-	REAL(10) MAX_RATE
-	REAL(10) CUR_SUM
+	REAL(KIND=LDP) T1,T2
+	REAL(KIND=LDP) RATE_THRESHOLD
+	REAL(KIND=LDP) SUM_TO,SUM_FROM
+	REAL(KIND=LDP) NT_SUM_TO,NT_SUM_FROM
+	REAL(KIND=LDP) COL_SUM_TO,COL_SUM_FROM
+	REAL(KIND=LDP) NET_AUTO
+	REAL(KIND=LDP) MAX_RATE
+	REAL(KIND=LDP) CUR_SUM
 	INTEGER ND
 	INTEGER CURVE_TITLE_LENGTH
 	INTEGER N_LINES
@@ -197,7 +198,7 @@
 !
 ! These are used when studing a single level. LINK is used
 ! to access the data in th eoriginal arrays.
-! 
+!
 	ALLOCATE (NEW_RATES(N_LINES,ND))
 	ALLOCATE (LINK(N_LINES))
 	ALLOCATE (SUM_RATES(N_LINES))
@@ -219,7 +220,7 @@
 !
 ! These are used when studing a single level. LINK is used
 ! to access the data in th eoriginal arrays.
-! 
+!
 	  ALLOCATE (NEW_NT_RATES(N_LINES,ND))
 	  ALLOCATE (NT_LINK(N_LINES))
 	ELSE
@@ -234,7 +235,7 @@
 !
 ! These are used when studing a single level. LINK is used
 ! to access the data in th eoriginal arrays.
-! 
+!
 	ALLOCATE (NEW_COL_RATES(N_LINES,ND))
 	ALLOCATE (COL_LINK(N_LINES))
 !
@@ -272,7 +273,7 @@
 	   STOP
 	  ELSE
 	    TRANS_NAME(ML)=STRING(1:K)
-	  END IF  
+	  END IF
 	  READ(STRING(K+1:),*)NU(ML)
 	  RD_COUNT=ML
 	  READ(LUIN,*)(RATES(ML,I),I=1,ND)
@@ -284,7 +285,7 @@
 
 	N_LINES=RD_COUNT
 	WRITE(6,'(A)')BLUE_PEN
-	WRITE(6,*)'Number of lines read is',N_LINES 
+	WRITE(6,*)'Number of lines read is',N_LINES
 	WRITE(6,'(A)')DEF_PEN
 !
         LAM(1:N_LINES)=2.99792458D+03/NU(1:N_LINES)
@@ -320,7 +321,7 @@
 	  N_NT_LINES=RD_COUNT
 	  CALL TUNE(2,'READ_NT')
 	  WRITE(6,'(A)')BLUE_PEN
-	  WRITE(6,*)'Number of number of nonthermal lines read is',N_NT_LINES 
+	  WRITE(6,*)'Number of number of nonthermal lines read is',N_NT_LINES
 	  WRITE(6,'(A)')DEF_PEN
 	ELSE
 	  N_NT_LINES=0
@@ -426,7 +427,7 @@
 	      END DO
 	    END DO
 	    CLOSE(UNIT=LUIN)
-	    PR_SPECIES=SPECIES 
+	    PR_SPECIES=SPECIES
 	    WRITE(6,'(A)')' Read PRRR file'
 !
 	    IF(DOING_NETRATE)THEN
@@ -486,7 +487,7 @@
 	        DO WHILE(STRING .EQ. ' ' .OR. STRING(1:2) .EQ. '--')
 	          READ(LUIN,'(A)',END=6200)STRING
 	        END DO
-	     	RD_COUNT=RD_COUNT+1   
+	     	RD_COUNT=RD_COUNT+1
 	        STRING=ADJUSTL(STRING)
 	        K=INDEX(STRING,'  ')
 	        COL_TRANS_NAME(RD_COUNT)=STRING(1:K)
@@ -506,7 +507,7 @@
 	      N_COL_LINES=RD_COUNT
 	      CALL TUNE(2,'READ_COL')
 	      WRITE(6,'(A)')BLUE_PEN
-	      WRITE(6,*)'Number of number of collsional transitions read is',N_COL_LINES 
+	      WRITE(6,*)'Number of number of collsional transitions read is',N_COL_LINES
 	      WRITE(6,'(A)')DEF_PEN
 	      DO I=1,N_COL_LINES
 	        WRITE(35,'(A)')TRIM(COL_TRANS_NAME(I))
@@ -532,7 +533,7 @@
 	      WRITE(6,*)'Got energy levels'
 	    END IF
 	    CLOSE(LUIN)
-! 
+!
 	    WRITE(6,*)'Setting SL assignent'
 	    IF(ALLOCATED(F_TO_S))DEALLOCATE(F_TO_S,INT_SEQ)
 	    ALLOCATE (F_TO_S(NF),INT_SEQ(NF))
@@ -629,17 +630,17 @@
 	  DO I=1,NF
 	    IF(INDEX(LEVEL_NAME(I),TRIM(LEVEL)) .NE. 0)THEN
 	      SL_INDX=F_TO_S(I)
-	      EXIT 
+	      EXIT
 	    END IF
 	  END DO
-! 
+!
 	  WRITE(6,*)' '
 	  WRITE(6,*)' The following levels have the same super level assignment'
 	  DO I=1,NF
 	    IF(F_TO_S(I) .EQ. SL_INDX)THEN
 	      WRITE(6,'(4X,A,T50,A)')TRIM(LEVEL_NAME(I)),TRIM(LEVEL)
 	    END IF
-	  END DO  
+	  END DO
 !
 ! Plot the normalized rates at each depth
 !
@@ -986,7 +987,7 @@
 	      END DO
 	    END IF
 !
-! Compute the total rates. 
+! Compute the total rates.
 !    Note: SUM_FROM is the net rate where the level if interest is the UPPER level.
 !    Note: SUM_TO   is the net rate where the level if interest is the LOWER level.
 !
@@ -1043,9 +1044,9 @@
 	        IF(INDEX(AUTO_LEV_NAME(J),TRIM(LEVEL)) .NE. 0)THEN
 	          WRITE(6,'(A)')' '
 	          WRITE(6,'(A,T42,AES14.4,F11.5,5X,A)')' Autoionizaton rate ','=',
-	1                AUTO_RATE(J,DPTH_INDX), AUTO_RATE(J,DPTH_INDX)/MAX_RATE, AUTO_LEV_NAME(J) 
+	1                AUTO_RATE(J,DPTH_INDX), AUTO_RATE(J,DPTH_INDX)/MAX_RATE, AUTO_LEV_NAME(J)
 	          WRITE(6,'(A,T42,ES14.4,F11.5)')' Rec. autoionization rate ','=',
-	1                AUTO_REC_RATE(J,DPTH_INDX), AUTO_REC_RATE(J,DPTH_INDX)/MAX_RATE 
+	1                AUTO_REC_RATE(J,DPTH_INDX), AUTO_REC_RATE(J,DPTH_INDX)/MAX_RATE
 	          NET_AUTO=NET_AUTO+(AUTO_REC_RATE(J,DPTH_INDX)-AUTO_RATE(J,DPTH_INDX))
 	          WRITE(6,'(A,T42,ES14.4,F11.5)')' Net recom. autoionization rate ','=',NET_AUTO,NET_AUTO/MAX_RATE
 	        END IF

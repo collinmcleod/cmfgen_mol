@@ -4,34 +4,35 @@
 ! gaunt factor for the species under consideration.
 !
 	SUBROUTINE FF_RES_GAUNT(GFF,FREQ,T,ID,GION,ZION,ND)
+	USE SET_KIND_MODULE
 	USE PHOT_DATA_MOD
 	IMPLICIT NONE
 !
 	INTEGER ID		!Species identifier
 	INTEGER ND		!Number of depth points
-	REAL(10) FREQ		!Frequency in units of 10^15 Hz
-	REAL(10) GION		!Ion statistical weight
-	REAL(10) ZION		!Charge on ion.
-	REAL(10) GFF(ND)		!Free-free Gaunt factor
-	REAL(10) T(ND)		!Temperature in unitsof 10^4 K
+	REAL(KIND=LDP) FREQ		!Frequency in units of 10^15 Hz
+	REAL(KIND=LDP) GION		!Ion statistical weight
+	REAL(KIND=LDP) ZION		!Charge on ion.
+	REAL(KIND=LDP) GFF(ND)		!Free-free Gaunt factor
+	REAL(KIND=LDP) T(ND)		!Temperature in unitsof 10^4 K
 !
-	REAL(10) VOIGT
+	REAL(KIND=LDP) VOIGT
 	EXTERNAL VOIGT
 !
 ! Common block with opacity/emissivity constants.
 !
-        REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+        REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
         COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
         COMMON/LINE/ OPLIN,EMLIN
 !
 ! Local variables
 !
-	REAL(10) DOP_NU
-	REAL(10) A_VOIGT
-	REAL(10) V_VOIGT
-	REAL(10) PHI_VOIGT 
-	REAL(10) CONST
-	REAL(10) T1
+	REAL(KIND=LDP) DOP_NU
+	REAL(KIND=LDP) A_VOIGT
+	REAL(KIND=LDP) V_VOIGT
+	REAL(KIND=LDP) PHI_VOIGT
+	REAL(KIND=LDP) CONST
+	REAL(KIND=LDP) T1
 !
 	INTEGER I,K
 !
@@ -42,7 +43,7 @@
 ! Compute resonance contribution. At present a fixed Doppler width is
 ! assumed. The Doppler width should be chosen to avoid undersampling of
 ! the intrinsic line profile with the adopted frequency grid. The intrinsic
-! width of the line, set by the autoionization probabilities of the lower and 
+! width of the line, set by the autoionization probabilities of the lower and
 ! upper levels, is taken into account.
 !
 	DO I=1,PD(ID)%NUM_FF

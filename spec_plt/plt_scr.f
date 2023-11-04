@@ -4,6 +4,7 @@
 !   Convergence as a function of depth etc.
 !
 	PROGRAM PLT_SCR
+	USE SET_KIND_MODULE
 	USE MOD_COLOR_PEN_DEF
 	USE GEN_IN_INTERFACE
 	IMPLICIT NONE
@@ -18,7 +19,7 @@
 ! Altered 13-Sep-2018: Added options SM and NINT
 ! Altered 06-Dec-2017: Made compatible with osiris version
 !                        For multiple fudges, only one new record is now written.
-!                        REP and RAT options inserted                  
+!                        REP and RAT options inserted
 ! Altered 26-Feb-2015: Fixed error with FDG ouput if called multiple times.
 ! Altered 30-Mar-2014: Altered FDG option so as to print out adjacent values.
 ! Altered 11-Mar-2014: Installed INT option.
@@ -26,24 +27,24 @@
 ! Altered 12-Dec-2013: Installed LY option so that we can plot very small populations on
 !                        a logarithmic scale.
 !
-	REAL(10), ALLOCATABLE :: POPS(:,:,:)		!NT,ND,NIT
-	REAL(10), ALLOCATABLE :: R_MAT(:,:)		!ND,NIT
-	REAL(10), ALLOCATABLE :: V_MAT(:,:)		!ND,NIT
-	REAL(10), ALLOCATABLE :: RAT(:,:)			!NT,ND
-	REAL(10), ALLOCATABLE :: CORRECTIONS(:,:)			!NT,ND
+	REAL(KIND=LDP), ALLOCATABLE :: POPS(:,:,:)		!NT,ND,NIT
+	REAL(KIND=LDP), ALLOCATABLE :: R_MAT(:,:)		!ND,NIT
+	REAL(KIND=LDP), ALLOCATABLE :: V_MAT(:,:)		!ND,NIT
+	REAL(KIND=LDP), ALLOCATABLE :: RAT(:,:)			!NT,ND
+	REAL(KIND=LDP), ALLOCATABLE :: CORRECTIONS(:,:)			!NT,ND
 !
-	REAL(10), ALLOCATABLE :: R(:)			!ND
-	REAL(10), ALLOCATABLE :: V(:)			!ND
-	REAL(10), ALLOCATABLE :: SIGMA(:)			!ND
+	REAL(KIND=LDP), ALLOCATABLE :: R(:)			!ND
+	REAL(KIND=LDP), ALLOCATABLE :: V(:)			!ND
+	REAL(KIND=LDP), ALLOCATABLE :: SIGMA(:)			!ND
 C
-	REAL(10), ALLOCATABLE :: X(:)			!NIT
-	REAL(10), ALLOCATABLE :: Y(:)			!NIT
-	REAL(10), ALLOCATABLE :: Z(:)			!NIT
-	REAL(10), ALLOCATABLE :: TA(:)			!
-	REAL(10), ALLOCATABLE :: TB(:)			!
+	REAL(KIND=LDP), ALLOCATABLE :: X(:)			!NIT
+	REAL(KIND=LDP), ALLOCATABLE :: Y(:)			!NIT
+	REAL(KIND=LDP), ALLOCATABLE :: Z(:)			!NIT
+	REAL(KIND=LDP), ALLOCATABLE :: TA(:)			!
+	REAL(KIND=LDP), ALLOCATABLE :: TB(:)			!
 !
 	INTEGER, ALLOCATABLE :: I_BIG(:)		!NT
-	REAL(10), ALLOCATABLE :: Z_BIG(:)			!NT
+	REAL(KIND=LDP), ALLOCATABLE :: Z_BIG(:)			!NT
 C
 	INTEGER, PARAMETER :: NUM_IONS_MAX=500
 	INTEGER ION_INDEX(NUM_IONS_MAX)
@@ -98,11 +99,11 @@ C
 	CHARACTER*200 STRING
 C
 	INTEGER IMAX,IMIN
-	REAL(10) RMAX,RMIN
-	REAL(10) T1,T2,T3
-	REAL(10) MAX_CHANGE
-	REAL(10) AVE_NEG_CHANGE, MIN_NEG_CHANGE
-	REAL(10) AVE_POS_CHANGE, MAX_POS_CHANGE
+	REAL(KIND=LDP) RMAX,RMIN
+	REAL(KIND=LDP) T1,T2,T3
+	REAL(KIND=LDP) MAX_CHANGE
+	REAL(KIND=LDP) AVE_NEG_CHANGE, MIN_NEG_CHANGE
+	REAL(KIND=LDP) AVE_POS_CHANGE, MAX_POS_CHANGE
 	LOGICAL COR_READ
 	LOGICAL READ_IN_STEQ
 	LOGICAL READ_AGAIN
@@ -143,7 +144,7 @@ C
 	ELSE
 	  CLOSE(UNIT=12)
 	  CALL RD_ION_LOCATIONS(ION_ID,NION,ION_INDEX,NUM_IONS,NUM_IONS_MAX,LU_IN)
-	END IF 
+	END IF
 C
 	OPEN(UNIT=12,FILE='POINT1',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	  IF(IOS .EQ. 0)READ(12,'(A)',IOSTAT=IOS)STRING
@@ -188,8 +189,8 @@ C
 	  CALL SCR_READ_V2(R,V,SIGMA,POPS(1,1,IREC),IREC,NITSF,
 	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
 	1              NT,ND,LUSCR,NEWMOD)
-	  R_MAT(:,IREC)=R(:) 
-	  V_MAT(:,IREC)=V(:) 
+	  R_MAT(:,IREC)=R(:)
+	  V_MAT(:,IREC)=V(:)
 	END DO
 !
 	NANS_PRESENT=.FALSE.
@@ -222,7 +223,7 @@ C
 	  WRITE(6,'(A)',ADVANCE='NO')'Input any character to continue'
 	  READ(5,'(A)')STRING
 	  WRITE(6,'(A)')DEF_PEN
-	END IF 
+	END IF
 C
 200	CONTINUE
 	WRITE(T_OUT,*)' '
@@ -263,7 +264,7 @@ C
 	WRITE(T_OUT,*)'REP      :: Replace populations on one iteration with those of another'
 	WRITE(T_OUT,*)'FDG_OSC  ::'
 	WRITE(T_OUT,*)'UNDO     :: Undo corrections over a range of depths'
-	WRITE(T_OUT,*)' ' 
+	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'LY  :: Switch to/from Log(Y) for options where appropriate (not full implemented)'
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'E   :: EXIT'
@@ -878,7 +879,7 @@ C
 	  END DO
 	  CLOSE(UNIT=LU_OUT)
 !
-! We only update NITSF for the first correction. 
+! We only update NITSF for the first correction.
 !
 	  IREC=NIT			!IREC is updated on write
           IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
@@ -930,7 +931,7 @@ C
 ! This option intepolates new populations between two deths (not
 ! inclusive). Interpolation is only peformed for those population where
 ! very the large corrections were made.
-! 
+!
 ! Preferred option is to read in STEQ_VALS.
 !
 	ELSE IF(PLT_OPT(1:4) .EQ. 'NINT')THEN
@@ -1046,7 +1047,7 @@ C
 	   WRITE(6,*)'This option assumes you have created plots using the PR option'
 	   WRITE(6,*)'It also assumes that you used the NOI option so that the plots were not initialized'
 	   WRITE(6,*)DEF_PEN
-! 
+!
 	   I=MIN(3*ND,SIZE(TA))
 	   CALL CHANGE_XAXIS_GRIDDING(TA,K,I)
 !
@@ -1092,7 +1093,7 @@ C
           FDG_COUNTER=FDG_COUNTER+1
 	  IT=NIT; ID=ND
 	  CALL GEN_IN(IT,'Iteration to be replaced')
-	  IF(IT .GT. NIT)THEN 
+	  IF(IT .GT. NIT)THEN
 	    WRITE(6,*)'Invalid iteration -- maximum is ',NIT
 	    GOTO 200
 	  END IF
@@ -1130,7 +1131,7 @@ C
           FDG_COUNTER=FDG_COUNTER+1
 	  IT=NIT; ID=ND
 	  CALL GEN_IN(IT,'Iteration to be replaced')
-	  IF(IT .GT. NIT)THEN 
+	  IF(IT .GT. NIT)THEN
 	    WRITE(6,*)'Invalid iteration -- maximum is ',NIT
 	    GOTO 200
 	  END IF
@@ -1210,7 +1211,7 @@ C
   	        ELSE
 	          YLABEL='\gDY/Y(%)'
 	        END IF
-!	      
+!	
 	      ELSE IF(PLT_OPT .EQ. 'R')THEN
 	        DO K=1,NIT-2
 	          T1=Y(K+2)-Y(K+1)

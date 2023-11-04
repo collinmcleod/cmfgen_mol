@@ -2,6 +2,7 @@
 !
       SUBROUTINE RECOM_OPAC_V2(SIGMA,NU,EDGE,FREQ_SCL_FAC,STAT_WT,GION,NPHOT,
      *        np_max,TOT_REC,TEMP)
+	USE SET_KIND_MODULE
 !
 !===================================================================
 !
@@ -37,7 +38,7 @@
 !                        the same ste of control statements could be used for
 !                        all frequency values.
 !
-! Altered   2-Nov-2009 DJH: Call changed. 
+! Altered   2-Nov-2009 DJH: Call changed.
 !                           Adjusted to have alternative frequenct scaling.
 !                           Done because of photoiozation of states above ionization limit.
 !
@@ -47,20 +48,20 @@
         parameter(scratch=100000)
 !
 	INTEGER NPHOT,np_max
-	REAL(10) SIGMA(np_max),NU(np_max),STAT_WT,GION,TEMP
+	REAL(KIND=LDP) SIGMA(np_max),NU(np_max),STAT_WT,GION,TEMP
 !
-	REAL(10) REC(scratch),CROSS(scratch),TOT_REC
+	REAL(KIND=LDP) REC(scratch),CROSS(scratch),TOT_REC
 !
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 !
 	INTEGER I,J,NJ,IST
-	REAL(10) T1,TP1,CONST,T2
-	REAL(10) NU_STEP,DEL_NU,DEL_NU_2,DEL_REC
-	REAL(10) FRAC_DIFF,MIN_SPACING,X,SIG
-	REAL(10) EDGE,SIG_THRESH
-	REAL(10) FREQ_SCL_FAC
-	REAL(10) LST_NU
-	REAL(10) LST_CROSS
+	REAL(KIND=LDP) T1,TP1,CONST,T2
+	REAL(KIND=LDP) NU_STEP,DEL_NU,DEL_NU_2,DEL_REC
+	REAL(KIND=LDP) FRAC_DIFF,MIN_SPACING,X,SIG
+	REAL(KIND=LDP) EDGE,SIG_THRESH
+	REAL(KIND=LDP) FREQ_SCL_FAC
+	REAL(KIND=LDP) LST_NU
+	REAL(KIND=LDP) LST_CROSS
 	LOGICAL EQUAL
 	EXTERNAL EQUAL
 !

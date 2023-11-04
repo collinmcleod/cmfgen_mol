@@ -7,11 +7,12 @@ C
 	SUBROUTINE SET_EDGE_FREQ_V3(ID,FREQ,NCF,NCF_MAX,
 	1                       EDGEHI_F,NHI_F,HI_PRES,
 	1                       F_TO_S_HI,NHI_S,NPHOT)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 ! Altered 03-Mar-2000 : ID inserted in call. SUB_PHOT removed and replaced
 !                          by SUB_PHOT_GEN.
-!                       
+!
 C Altered 19-Dec-1997 : Double call to SUB_PHOT. This allows edge frequencies
 C                         and then cross-sections to be roeturned. NEW_PHOT
 C                         is altered on each call.
@@ -26,21 +27,21 @@ C
 	INTEGER ID,NCF,NCF_MAX,J
 	INTEGER NHI_F,NHI_S
 	INTEGER NPHOT
-	REAL(10) FREQ(NCF_MAX)
-	REAL(10) EDGEHI_F(NHI_F)
+	REAL(KIND=LDP) FREQ(NCF_MAX)
+	REAL(KIND=LDP) EDGEHI_F(NHI_F)
 	INTEGER F_TO_S_HI(NHI_F)
 	LOGICAL HI_PRES
 C
 	INTEGER PHOT_ID,NEW_ID
 	INTEGER IS,ERROR_LU,LUER
-	REAL(10) T1
+	REAL(KIND=LDP) T1
 	EXTERNAL ERROR_LU
 C
-	REAL(10), PARAMETER :: ZERO=0.0D0
+	REAL(KIND=LDP), PARAMETER :: ZERO=0.0D0
 	LOGICAL, PARAMETER :: RET_EDGE_CROSS=.TRUE.
 C
-	REAL(10) PHOT_CROSS(NHI_F)
-	REAL(10) EDGE_FREQ(NHI_F)
+	REAL(KIND=LDP) PHOT_CROSS(NHI_F)
+	REAL(KIND=LDP) EDGE_FREQ(NHI_F)
 	LOGICAL DONE(NHI_S)
 C
 	IF( .NOT. HI_PRES )RETURN

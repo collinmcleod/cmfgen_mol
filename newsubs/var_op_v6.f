@@ -23,6 +23,7 @@ C
 	1             PHOT_ID,ION_LEV,
 	1             ED,T,EMHNUKT,NU,Z,ID,IONFF,
 	1             EQHN,GS_ION_EQ,NT,ND,LST_DEPTH_ONLY)
+	USE SET_KIND_MODULE
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 C
@@ -63,54 +64,54 @@ C
 C
 C Constants for opacity etc.
 C
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 C
-	REAL(10) VCHI(NT,ND)		!VCHI(I,K)=dCHI(K)/dN(I,K)
-	REAL(10) VETA(NT,ND)		!VETA(I,K)=dETA(K)/dN(I,K)
+	REAL(KIND=LDP) VCHI(NT,ND)		!VCHI(I,K)=dCHI(K)/dN(I,K)
+	REAL(KIND=LDP) VETA(NT,ND)		!VETA(I,K)=dETA(K)/dN(I,K)
 C
-	REAL(10) HN_S(N_S,ND)
-	REAL(10) HNST_S(N_S,ND)
-	REAL(10) dlnHNST_S_dlnT(N_S,ND)
+	REAL(KIND=LDP) HN_S(N_S,ND)
+	REAL(KIND=LDP) HNST_S(N_S,ND)
+	REAL(KIND=LDP) dlnHNST_S_dlnT(N_S,ND)
 C
-	REAL(10) HNST_F(N_F,ND)
-	REAL(10) EDGE_F(N_F)
+	REAL(KIND=LDP) HNST_F(N_F,ND)
+	REAL(KIND=LDP) EDGE_F(N_F)
 	INTEGER F_TO_S_MAPPING(N_F)
 C
 C Ion population information.
 C
-	REAL(10) DI_S(N_DI,ND)
-	REAL(10) DIST_S(N_DI,ND)
-	REAL(10) dlnDIST_S_dlnT(N_DI,ND)
+	REAL(KIND=LDP) DI_S(N_DI,ND)
+	REAL(KIND=LDP) DIST_S(N_DI,ND)
+	REAL(KIND=LDP) dlnDIST_S_dlnT(N_DI,ND)
 C
 	INTEGER PHOT_ID		!Photoionization ID
 	INTEGER ION_LEV		!target level in ION for ionizations.
 C
-	REAL(10) NU			!Frequency (10^15 Hz)
-	REAL(10) Z			!Charge on ion
-	REAL(10) ED(ND)			!Electron density
-	REAL(10) T(ND)			!Temperatuure (10^4 K)
-	REAL(10) EMHNUKT(ND)		!exp(-hv/kT)
+	REAL(KIND=LDP) NU			!Frequency (10^15 Hz)
+	REAL(KIND=LDP) Z			!Charge on ion
+	REAL(KIND=LDP) ED(ND)			!Electron density
+	REAL(KIND=LDP) T(ND)			!Temperatuure (10^4 K)
+	REAL(KIND=LDP) EMHNUKT(ND)		!exp(-hv/kT)
 C
 C Local variables.
 C
-	REAL(10) GFF_VAL(ND)		!Used as work vector
-	REAL(10) DI_RAT(ND)		!Used as work vector
-	REAL(10) DT_TERM(ND)		!Used as work vector
-	REAL(10) HDKT_ON_T(ND)		!Used as work vector
+	REAL(KIND=LDP) GFF_VAL(ND)		!Used as work vector
+	REAL(KIND=LDP) DI_RAT(ND)		!Used as work vector
+	REAL(KIND=LDP) DT_TERM(ND)		!Used as work vector
+	REAL(KIND=LDP) HDKT_ON_T(ND)		!Used as work vector
 C
-	REAL(10) YDIS(ND)			!Constant for computing level dissolution/
-	REAL(10) XDIS(ND)			!Constant for computing level dissolution/
-	REAL(10) DIS_CONST(N_F)		!Constant appearing in dissolution formula.
-	REAL(10) ALPHA_VEC(N_F)		!Photionization cross-section
-	REAL(10) VCHI_ION(N_F)
-	REAL(10) VCHI_T1(N_F)
-	REAL(10) VCHI_T2(N_F)
-	REAL(10) VCHI_TMP(N_F,ND)
-	REAL(10) SUM_ION
-	REAL(10) SUM_T1
-	REAL(10) SUM_T2
-	REAL(10) NEFF,ZION_CUBED,T1,T2
+	REAL(KIND=LDP) YDIS(ND)			!Constant for computing level dissolution/
+	REAL(KIND=LDP) XDIS(ND)			!Constant for computing level dissolution/
+	REAL(KIND=LDP) DIS_CONST(N_F)		!Constant appearing in dissolution formula.
+	REAL(KIND=LDP) ALPHA_VEC(N_F)		!Photionization cross-section
+	REAL(KIND=LDP) VCHI_ION(N_F)
+	REAL(KIND=LDP) VCHI_T1(N_F)
+	REAL(KIND=LDP) VCHI_T2(N_F)
+	REAL(KIND=LDP) VCHI_TMP(N_F,ND)
+	REAL(KIND=LDP) SUM_ION
+	REAL(KIND=LDP) SUM_T1
+	REAL(KIND=LDP) SUM_T2
+	REAL(KIND=LDP) NEFF,ZION_CUBED,T1,T2
 C
 	INTEGER ND_LOC
 	INTEGER I                     !Used as level index (same) in atom.
@@ -120,15 +121,15 @@ C
 	INTEGER EQION			!Ion variable in VCHI,VETA
 	INTEGER NO_NON_ZERO_PHOT
 C
-	REAL(10) TCHI1,TCHI2,TETA1,TETA2,TETA3
-	REAL(10) HNUONK,ALPHA
+	REAL(KIND=LDP) TCHI1,TCHI2,TETA1,TETA2,TETA3
+	REAL(KIND=LDP) HNUONK,ALPHA
 C
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 C
 C HNST as defined by the actual population of the destination (target) level.
 C
-	REAL(10) REV_HNST
+	REAL(KIND=LDP) REV_HNST
 C
 C ND_LOC indicates the number of depth points we are going to compute the
 C opacity at.
@@ -182,7 +183,7 @@ C Now add in BOUND-FREE contributions. We first compute, via a subroutine call,
 C a vector containing the cross-section for each level; This will decrease
 C the compuation time.
 C
-C If PHOT_ID=1 and DISSOLUTION is switched ON, ALPHA_VEC contians the 
+C If PHOT_ID=1 and DISSOLUTION is switched ON, ALPHA_VEC contians the
 C threshold cross-section when NU < EDGE.
 C
 	IF(MOD_DO_LEV_DIS .AND. PHOT_ID .EQ. 1)THEN

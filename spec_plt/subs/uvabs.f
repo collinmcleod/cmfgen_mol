@@ -3,6 +3,7 @@ C Subroutine to correct for HI and HII absorption in the UV
 C Is called by PLT_SPEC as an option, and in turn calls HIABS and HIIABS
 C
 	subroutine uvabs(origfreq,origflux,Norig,Norig_max,
+	USE SET_KIND_MODULE
      1                   t_in_k,v_turb,log_ntot,log_h2_ntot,
      1                   v_r,min_res_kms,wave_max,wave_min,
      1                   hi_abs,h2_abs)
@@ -25,33 +26,33 @@ C
 C
 	integer*4 Norig_new
 C
-	REAL(10) origwave(Norig_max)
-	REAL(10) origflux(Norig_max)
-	REAL(10) origfreq(Norig_max)
+	REAL(KIND=LDP) origwave(Norig_max)
+	REAL(KIND=LDP) origflux(Norig_max)
+	REAL(KIND=LDP) origfreq(Norig_max)
 !
-	REAL(10), allocatable ::  modwave(:)
-	REAL(10), allocatable ::  modflux(:)
-	REAL(10), allocatable ::  tempwave(:)
-	REAL(10), allocatable ::  tempflux(:)
-	REAL(10), allocatable ::  Hwave(:)
-	REAL(10), allocatable ::  Hflux(:)
-	REAL(10), allocatable ::  Hfreq(:)
+	REAL(KIND=LDP), allocatable ::  modwave(:)
+	REAL(KIND=LDP), allocatable ::  modflux(:)
+	REAL(KIND=LDP), allocatable ::  tempwave(:)
+	REAL(KIND=LDP), allocatable ::  tempflux(:)
+	REAL(KIND=LDP), allocatable ::  Hwave(:)
+	REAL(KIND=LDP), allocatable ::  Hflux(:)
+	REAL(KIND=LDP), allocatable ::  Hfreq(:)
 !
-	REAL(10) t1
+	REAL(KIND=LDP) t1
 C
 C       HIABS variables
 C
-	REAL(10) v_turb        ! turbulent velocity in km/s
-	REAL(10) v_r           ! radial velocity of star w.r.t. ISM
-	REAL(10) log_ntot      ! log base 10 of H column density
-	REAL(10) log_h2_ntot   ! log base 10 of HII column density
-	REAL(10) t_in_k        ! temperature in K
-	REAL(10) wave_max      ! maximum wavelength
-	REAL(10) wave_min      ! minimum wavelength
-	REAL(10) hut_res       ! resolution of H.U.T. in angstroms
-	REAL(10) model_res     ! model resolution in angstroms
-	REAL(10) kernal_res    ! kernal to convolve model spectrm with res.
-	REAL(10) min_res_kms   ! minimum resolution to work with
+	REAL(KIND=LDP) v_turb        ! turbulent velocity in km/s
+	REAL(KIND=LDP) v_r           ! radial velocity of star w.r.t. ISM
+	REAL(KIND=LDP) log_ntot      ! log base 10 of H column density
+	REAL(KIND=LDP) log_h2_ntot   ! log base 10 of HII column density
+	REAL(KIND=LDP) t_in_k        ! temperature in K
+	REAL(KIND=LDP) wave_max      ! maximum wavelength
+	REAL(KIND=LDP) wave_min      ! minimum wavelength
+	REAL(KIND=LDP) hut_res       ! resolution of H.U.T. in angstroms
+	REAL(KIND=LDP) model_res     ! model resolution in angstroms
+	REAL(KIND=LDP) kernal_res    ! kernal to convolve model spectrm with res.
+	REAL(KIND=LDP) min_res_kms   ! minimum resolution to work with
 	logical fft          ! 1 = convolve via fft, 0 = straight convolution
 	integer*4 alter_min  ! min and max indices of original array to be
         integer*4 alter_max  ! changed.
@@ -65,7 +66,7 @@ C
 
 	allocate (modwave(Nmod))
 	allocate (modflux(Nmod))
-	modwave(1:Nmod) = origwave(alter_min:alter_max) ! preserve original 
+	modwave(1:Nmod) = origwave(alter_min:alter_max) ! preserve original
 	modflux(1:Nmod) = origflux(alter_min:alter_max) ! arrays for later
 
 C       Here we look at the model data to determine the minimum spacing (in
@@ -91,8 +92,8 @@ C       to use to keep the array from getting too large.
          tempwave(1:Ntmp) = (one + v_r/c_kms)*tempwave(1:Ntmp)
 	end if
 
-C       set up original H absorption arrays and calculate HI and HII 
-C       absorption fluxes.  Here we constrain the H array to have the 
+C       set up original H absorption arrays and calculate HI and HII
+C       absorption fluxes.  Here we constrain the H array to have the
 C       same spacing in lambda as the model data.
 
 	allocate (Hwave(Ntmp))
@@ -115,7 +116,7 @@ C       multiply fluxes
 
 ! store in original model array
 
-	if (v_r .ne. zero) then       ! doppler shift back 
+	if (v_r .ne. zero) then       ! doppler shift back
          tempwave(1:Ntmp) = tempwave(1:Ntmp)/(one + v_r/c_kms)
 	end if
 
@@ -160,12 +161,13 @@ C subroutine determines the minimum delta lambda found in the model spectra
 C
 
 	subroutine get_model_res(wave,n,model_res)
+	USE SET_KIND_MODULE
 
 	implicit none
 
 	integer*4 n
-	REAL(10) wave(n)
-	REAL(10) model_res
+	REAL(KIND=LDP) wave(n)
+	REAL(KIND=LDP) model_res
 
 	integer*4 i
 
@@ -188,32 +190,33 @@ C
 
 	subroutine linearize(new_wave,new_flux,n_new,
 	1                    old_wave,old_flux,n_old,dlam)
+	USE SET_KIND_MODULE
 
 	implicit none
 
 	integer*4 n_new
-	REAL(10) new_wave(n_new)
-	REAL(10) New_flux(n_new)
+	REAL(KIND=LDP) new_wave(n_new)
+	REAL(KIND=LDP) New_flux(n_new)
 !
 	integer*4 n_old
-	REAL(10) old_wave(n_old)
-	REAL(10) old_flux(n_old)
+	REAL(KIND=LDP) old_wave(n_old)
+	REAL(KIND=LDP) old_flux(n_old)
 !
-	REAL(10) dlam 	! even spacing in wavelength
+	REAL(KIND=LDP) dlam 	! even spacing in wavelength
 
 	integer*4 nnew
 	integer*4 i
-	REAL(10) dlamover2
+	REAL(KIND=LDP) dlamover2
 
 	dlamover2 = dlam/2.0d0
 
-	nnew = (old_wave(n_old)-old_wave(1))/dlam  ! this will shorten wavelength 
+	nnew = (old_wave(n_old)-old_wave(1))/dlam  ! this will shorten wavelength
                                           ! array by a fraction of dlam
 
 	if (nnew .gt. n_new) then
 	   write(*,*)'Error in linearize, n_newX = ',n_new
 	   write(*,*)'too small for this resolution'
-	   stop 
+	   stop
 	endif
 	n_new=nnew	
 !
@@ -231,16 +234,17 @@ C
 C-----------------------------------------------------------------------------
 C subroutine to build wavelength array from frequency array (if forward=true)
 C or build frequency array from wavelength array (if forward=false)
-C 
+C
 C
 	subroutine nu_to_lambda(freq,wave,n,nutolambda)
+	USE SET_KIND_MODULE
 
 	implicit none
 	include 'constants.inc'
 
 	integer*4 n
-	REAL(10) freq(n)
-	REAL(10) wave(n)
+	REAL(KIND=LDP) freq(n)
+	REAL(KIND=LDP) wave(n)
 	logical nutolambda ! true=nu->lambda, false=lambda->nu
 
 	integer*4 i
@@ -269,12 +273,13 @@ C subroutine to convert lambda array to ln(lambda) array if forward=true
 C or convert ln(lambda) array to lambda array if forward=false
 C
 	subroutine lambda_to_lnlambda(wave,n,ltolnl)
+	USE SET_KIND_MODULE
 
 	implicit none
 	include 'constants.inc'
 
 	integer*4 n
-	REAL(10) wave(n)
+	REAL(KIND=LDP) wave(n)
 	logical ltolnl  ! if T, lambda->lnlambda, if F, nlambda->lambda.
 
 	integer*4 i
@@ -283,11 +288,11 @@ C
 	 do i=1,n
 	  wave(i) = log(wave(i))
 	 end do
-	else 
+	else
 	 do i=1,n
 	  wave(i) = exp(wave(i))
 	 end do
-	end if 
+	end if
 
 	return
 	end
@@ -296,17 +301,18 @@ C-----------------------------------------------------------------------------
 C subroutine to remove duplicate data points (poinst with same frequency
 C
 	subroutine remove_dups(freq,flux,n)
+	USE SET_KIND_MODULE
 
 	implicit none
 	include 'constants.inc'
 	include 'parameters.inc'
 
 	integer*4 n
-	REAL(10) freq(n)
-	REAL(10) flux(n)
+	REAL(KIND=LDP) freq(n)
+	REAL(KIND=LDP) flux(n)
 
 	integer*4 i,j
-	REAL(10) prev
+	REAL(KIND=LDP) prev
 
 	prev = zero
 	j=0
@@ -330,13 +336,14 @@ C
 C subroutine to initialize the H absorption array
 C
 	subroutine Habsinit(wave,flux,freq,modwave,n)
+	USE SET_KIND_MODULE
 
 	implicit none
 	include 'constants.inc'
 
 	integer*4 n
-	REAL(10) modwave(n)
-	REAL(10) wave(n),flux(n),freq(n)
+	REAL(KIND=LDP) modwave(n)
+	REAL(KIND=LDP) wave(n),flux(n),freq(n)
 
 	integer*4 i
 
@@ -351,13 +358,14 @@ C-----------------------------------------------------------------------------
 C subroutine to map array A onto array B using linear interpolation
 
 	subroutine map(Awave,Aflux,AN,Bwave,Bflux,BN)
+	USE SET_KIND_MODULE
 
 	implicit none
 	include 'constants.inc'
 
 	integer*4 AN,BN
-	REAL(10) Awave(AN),Aflux(AN)
-	REAL(10) Bwave(BN),Bflux(BN)
+	REAL(KIND=LDP) Awave(AN),Aflux(AN)
+	REAL(KIND=LDP) Bwave(BN),Bflux(BN)
 
 	integer*4 i,j
 
@@ -376,7 +384,7 @@ C subroutine to map array A onto array B using linear interpolation
 	 j = j+1
 	end do
 
-	return 
+	return
 	end
 
 
@@ -388,20 +396,21 @@ C range.  The fluxes are weighted by their wavelength distance (?) from
 C the considered point.
 
 	subroutine map2(Awave,Aflux,AN,Bwave,Bflux,BN,dlam)
+	USE SET_KIND_MODULE
 
 	implicit none
 	include 'constants.inc'
 
 	integer*4 AN,BN
-	REAL(10) Awave(AN),Aflux(AN)
-	REAL(10) Bwave(BN),Bflux(BN)
-	REAL(10) dlam,dlamover2
+	REAL(KIND=LDP) Awave(AN),Aflux(AN)
+	REAL(KIND=LDP) Bwave(BN),Bflux(BN)
+	REAL(KIND=LDP) dlam,dlamover2
 
 	integer*4 i,j,i_min,i_max
 	integer*4 smaller_index,larger_index
 
-	REAL(10) fluxsum
-	REAL(10) dlamsum
+	REAL(KIND=LDP) fluxsum
+	REAL(KIND=LDP) dlamsum
 
 	dlamover2=dlam/two
 	i = 1
@@ -446,7 +455,7 @@ C
 	 j = j+1
 	end do
 
-	return 
+	return
 	end
 
 C-----------------------------------------------------------------------------
@@ -454,11 +463,12 @@ C function which returns the index of the first array element *larger* than
 C or equal to the supplied number
 
 	function larger_index(list,n,value)
+	USE SET_KIND_MODULE
 
 	implicit none
 
 	integer*4 larger_index,n
-	REAL(10) list(n),value
+	REAL(KIND=LDP) list(n),value
 
 	integer*4 i
 
@@ -480,11 +490,12 @@ C function which returns the index of the last array element *smaller* or
 C equal to the supplied number
 
 	function smaller_index(list,n,value)
+	USE SET_KIND_MODULE
 
 	implicit none
 
 	integer*4 smaller_index,n
-	REAL(10) list(n),value
+	REAL(KIND=LDP) list(n),value
 
 	integer*4 i
 

@@ -1,5 +1,5 @@
 C
-C Routine reads in a SIT (or other observational) data from a file 
+C Routine reads in a SIT (or other observational) data from a file
 C which has the format:
 C
 C **********************************
@@ -25,11 +25,11 @@ C WAVE_UNIT, AIR_LAM, and SCAKE_FACTOR can occur in any order, but must
 C occur (if present) after FLUX_UNIT. No blank lines are allowed between
 c specifiers.
 C
-C And the a list of wavelenghts (in Angstroms) and Fluxes (in Jy or 
+C And the a list of wavelenghts (in Angstroms) and Fluxes (in Jy or
 C ergs/cm^2/s/Ang). One pair of data is assumed to be on each
 C line.
-C 
-C The routine returns the wavelngth (in Angstroms) and the flux in 
+C
+C The routine returns the wavelngth (in Angstroms) and the flux in
 C Jansky's. NORM is treated like Janskies, and the flux is not altered.
 C
 C More than one data set can be include in the file. Such a data set is
@@ -39,6 +39,7 @@ C The column format must be identical.
 C
 	SUBROUTINE DP_RD_OBS_DATA_V2(LAM,FLUX,NMAX,NPTS,
 	1                         FILENAME,COLS,IOS)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 C
 C Altered 07-Jul-2011 : Improved error message when reading bad data.
@@ -58,19 +59,19 @@ C
 C
 C COLS(1) indicates which column the wavelength information is in.
 C COLS(2) indicates which column the flux information is in.
-C 
+C
 	INTEGER COLS(2)
-	REAL(10) LAM(NMAX),FLUX(NMAX)
+	REAL(KIND=LDP) LAM(NMAX),FLUX(NMAX)
 	CHARACTER*(*) FILENAME
 !
 ! Local variables and arrays.
 !
-	REAL(10) TEMP_STORE( MAX(COLS(1),COLS(2)) )
-	REAL(10) TO_JANSKY
-	REAL(10) LAM_ST
-	REAL(10) DEL_LAM
-	REAL(10) T1
-	REAL(10) OMIT_VAL
+	REAL(KIND=LDP) TEMP_STORE( MAX(COLS(1),COLS(2)) )
+	REAL(KIND=LDP) TO_JANSKY
+	REAL(KIND=LDP) LAM_ST
+	REAL(KIND=LDP) DEL_LAM
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) OMIT_VAL
 	INTEGER I,J,K
 	INTEGER CONFUSE_CNT
 	INTEGER N_STR
@@ -87,8 +88,8 @@ C
 	INTEGER, PARAMETER :: T_OUT=6
 	INTEGER, PARAMETER :: IZERO=0
 C
-	REAL(10) VAL_SCALE_FAC
-	REAL(10) LAM_VAC
+	REAL(KIND=LDP) VAL_SCALE_FAC
+	REAL(KIND=LDP) LAM_VAC
 	EXTERNAL LAM_VAC
 C
 	IOS=0

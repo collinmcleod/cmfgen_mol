@@ -23,6 +23,7 @@ C
 	1                       HNST_F,EDGE_F,N_F,
 	1                       F_TO_S_MAPPING,NU_CONT,T,ND,
 	1                       DESC,ZION,PHOT_ID,ID)
+	USE SET_KIND_MODULE
 	USE MOD_LEV_DIS_BLK
 	IMPLICIT NONE
 	EXTERNAL SUB_PHOT_GEN
@@ -36,7 +37,7 @@ C                         which means that the following routines also need
 C                         changing:
 C                                   EVALSE
 C                         As call changed, now V5.
-C                  
+C
 C Altered 20-Sep-1996 - Extensive changes to allow SUB_PHOT to be called.
 C                       Changes designed to improve speed and vectorization.
 C                       Level dissolution effects directy incorporated.
@@ -47,31 +48,31 @@ C Created 15-May-1995 - Based on QUADGEN_V4
 C
 	INTEGER ID
 	INTEGER N_S,N_F,ND
-	REAL(10) WSE_S(N_S,ND)
-	REAL(10) dWSE_SdT(N_S,ND)
-	REAL(10) WSE_CR_S(N_S,ND)
-	REAL(10) HNST_S(N_S,ND)
-	REAL(10) dlnHNST_S_dlnT(N_S,ND)
+	REAL(KIND=LDP) WSE_S(N_S,ND)
+	REAL(KIND=LDP) dWSE_SdT(N_S,ND)
+	REAL(KIND=LDP) WSE_CR_S(N_S,ND)
+	REAL(KIND=LDP) HNST_S(N_S,ND)
+	REAL(KIND=LDP) dlnHNST_S_dlnT(N_S,ND)
 C
-	REAL(10) HNST_F(N_F,ND)
-	REAL(10) EDGE_F(N_F)			!In 10^15 Hz
+	REAL(KIND=LDP) HNST_F(N_F,ND)
+	REAL(KIND=LDP) EDGE_F(N_F)			!In 10^15 Hz
 	INTEGER F_TO_S_MAPPING(N_F)
-	REAL(10) T(ND)
+	REAL(KIND=LDP) T(ND)
 C
-	REAL(10) NU_CONT
-	REAL(10) ZION
+	REAL(KIND=LDP) NU_CONT
+	REAL(KIND=LDP) ZION
 	CHARACTER*(*) DESC
 	INTEGER PHOT_ID
 C
-	REAL(10) YDIS(ND)		!Constant for computing level dissolution/
-	REAL(10) XDIS(ND)		!Constant for computing level dissolution/
-	REAL(10) DIS_CONST(N_F)	!Constant appearing in dissolution formula.
-	REAL(10) ALPHA_VEC(N_F)
+	REAL(KIND=LDP) YDIS(ND)		!Constant for computing level dissolution/
+	REAL(KIND=LDP) XDIS(ND)		!Constant for computing level dissolution/
+	REAL(KIND=LDP) DIS_CONST(N_F)	!Constant appearing in dissolution formula.
+	REAL(KIND=LDP) ALPHA_VEC(N_F)
 C
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	REAL(10) CHIBF,CHIFF,HDKT,TWOHCSQ
-	REAL(10) OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
+	REAL(KIND=LDP) OPLIN,EMLIN
 C
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
@@ -79,7 +80,7 @@ C
 C Local Variables,
 C
 	INTEGER I_S,I_F,J
-	REAL(10) T1,T2,T3,ZION_CUBED,NEFF,FOUR_PI_D_H
+	REAL(KIND=LDP) T1,T2,T3,ZION_CUBED,NEFF,FOUR_PI_D_H
 C
 C NB: WSE_OLD=WSE*FQW/NU
 C     dWSEdT_OLD=dWSEdT*FQW/NU
@@ -170,6 +171,6 @@ C
 	    END DO
 	  END IF
 	END DO
-	    
+	
 	RETURN
 	END

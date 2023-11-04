@@ -6,6 +6,7 @@
 !
 	SUBROUTINE DP_CNVRT_J_V2(XV,YV,NBB,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1                    DATA_TYPE,LAMC,X_LAB,Y_LAB,X_ONLY)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Altered 08-Oct-2011: Inserted RSQ? DATA_TYPE into call.
@@ -13,21 +14,21 @@
 !                      Changed to version V2
 !
 	INTEGER NBB
-	REAL(10) XV(NBB),YV(NBB)
+	REAL(KIND=LDP) XV(NBB),YV(NBB)
 	LOGICAL LOG_X,LOG_Y,X_ONLY
 	CHARACTER*(*) DATA_TYPE
 	CHARACTER*(*) X_UNIT,Y_PLT_OPT
 	CHARACTER*(*) X_LAB,Y_LAB
 C
 	INTEGER I
-	REAL(10) LAMC
-	REAL(10) T1
-C              
-	REAL(10) SPEED_OF_LIGHT
+	REAL(KIND=LDP) LAMC
+	REAL(KIND=LDP) T1
+C
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL SPEED_OF_LIGHT
 C
-	REAL(10) C_CMS
-	REAL(10) KEV_TO_HZ,ANG_TO_HZ
+	REAL(KIND=LDP) C_CMS
+	REAL(KIND=LDP) KEV_TO_HZ,ANG_TO_HZ
 C
 	C_CMS=SPEED_OF_LIGHT()
 C
@@ -46,14 +47,14 @@ C
 	      YV(I)=T1*XV(I)*YV(I)
 	    END DO
 	    IF(DATA_TYPE .EQ. 'J')THEN
-	      Y_LAB='\gnJ\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)' 
+	      Y_LAB='\gnJ\d\gn\u(erg\d \ucm\u-2 \ds\u-1\d)'
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
-	      Y_LAB='\gnH\d\gn\u(erg\d cm\u-2 \ds\u-1\d)' 
+	      Y_LAB='\gnH\d\gn\u(erg\d cm\u-2 \ds\u-1\d)'
 	    ELSE IF(DATA_TYPE .EQ. 'RSQJ')THEN
-	      Y_LAB='r\u2\d\gnJ\d\gn\u(erg\d \us\u-1\d)/10\u20\d' 
+	      Y_LAB='r\u2\d\gnJ\d\gn\u(erg\d \us\u-1\d)/10\u20\d'
 	    ELSE IF(DATA_TYPE .EQ. 'RSQH')THEN
-	      Y_LAB='r\u2\d\gnH\d\gn\u(erg\d \us\u-1\d)/10\u20\d' 
-	    ELSE 
+	      Y_LAB='r\u2\d\gnH\d\gn\u(erg\d \us\u-1\d)/10\u20\d'
+	    ELSE
 	      WRITE(6,*)'Unrecognized DATA_TYPE for NU_FNU'
 	    END IF
 	    IF(LOG_Y)Y_LAB='Log '//Y_LAB
@@ -63,14 +64,14 @@ C
 	      YV(I)=T1*YV(I)*XV(I)*XV(I)
 	    END DO
 	    IF(DATA_TYPE .EQ. 'J')THEN
-	      Y_LAB='J\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)' 
+	      Y_LAB='J\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)'
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
-	      Y_LAB='H\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)' 
+	      Y_LAB='H\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)'
 	    ELSE IF(DATA_TYPE .EQ. 'RSQJ')THEN
-	      Y_LAB='r\u2\dJ\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)\10\u20\d' 
+	      Y_LAB='r\u2\dJ\d\gl\u(erg\d \ucm\u-2 \ds\u-1 \d\A)\10\u20\d'
 	    ELSE IF(DATA_TYPE .EQ. 'RSQH')THEN
-	      Y_LAB='r\u2\dH\d\gl\u(erg\d \ucm\u-2 \d\A)/10\u20\d' 
-	    ELSE 
+	      Y_LAB='r\u2\dH\d\gl\u(erg\d \ucm\u-2 \d\A)/10\u20\d'
+	    ELSE
 	      WRITE(6,*)'Unrecognized DATA_TYPE for FLAM'
 	    END IF
 	    IF(LOG_Y)Y_LAB='Log '//Y_LAB
@@ -79,16 +80,16 @@ C
 ! Plots the data units as read in.
 !
 	    IF(DATA_TYPE .EQ. 'J')THEN
-	      Y_LAB='J\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)' 
+	      Y_LAB='J\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
 	      IF(LOG_Y)Y_LAB='Log J\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
 	    ELSE IF(DATA_TYPE .EQ. 'H')THEN
-	      Y_LAB='H\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)' 
+	      Y_LAB='H\d\gn\u(erg\d \ucm\u-2 \ds\u-1 \dHz\u-1\d)'
 	      IF(LOG_Y)Y_LAB='Log '//Y_LAB
 	    ELSE IF(DATA_TYPE .EQ. 'RSQJ')THEN
-	      Y_LAB='r\u2\dJ\d\gn\u(erg\d \us\u-1 \dHz\u-1\d)/10\u20\d' 
+	      Y_LAB='r\u2\dJ\d\gn\u(erg\d \us\u-1 \dHz\u-1\d)/10\u20\d'
 	      IF(LOG_Y)Y_LAB='Log '//Y_LAB
 	    ELSE IF(DATA_TYPE .EQ. 'RSQH')THEN
-	      Y_LAB='r\u2\dH\d\gn\u(erg\d \us\u-1 \dHz\u-1\d)/10\u20\d' 
+	      Y_LAB='r\u2\dH\d\gn\u(erg\d \us\u-1 \dHz\u-1\d)/10\u20\d'
 	      IF(LOG_Y)Y_LAB='Log '//Y_LAB
 	    ELSE IF(DATA_TYPE .EQ. 'M(t)')THEN
 	      Y_LAB='M(t)'
@@ -99,7 +100,7 @@ C
 	    ELSE IF(DATA_TYPE .EQ. 'CHI')THEN
 	      Y_LAB='10\u10\d.\gx(cm\u-1\d)'
 	      IF(LOG_Y)Y_LAB='10 + Log \gx(cm\u-1\d)'
-	    ELSE 
+	    ELSE
 	      WRITE(6,*)'Unrecognized DATA_TYPE for FNU & NAT'
 	    END IF
 	  END IF

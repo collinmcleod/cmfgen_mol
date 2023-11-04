@@ -4,33 +4,34 @@
 ! returned.
 !
 	SUBROUTINE COMPUTE_TAU_RADIAL(TAU, CHI, VEL, R, NU, dV, VMIN, ND, NF)
+	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
 ! Created: 05-Apr-2020
 !
 	INTEGER NF		!Number of frequency points
 	INTEGER ND		!Numer of depth points
-	REAL(10) dV		!Spacing in velcity space -- set to V(DOP)/2
-	REAL(10) VMIN		!Lower limit for integration
+	REAL(KIND=LDP) dV		!Spacing in velcity space -- set to V(DOP)/2
+	REAL(KIND=LDP) VMIN		!Lower limit for integration
 !
-	REAL(10) NU(NF)		!Freuqency (10^15 Hz)
-	REAL(10) TAU(NF)
-	REAL(10) CHI(ND,NF)	!Opacity (scaled by 10^10) in comoving frame
-	REAL(10) VEL(ND)		!Velocity (km/s)
-	REAL(10) R(ND)		!Radius (in units of 10^10 cm).
+	REAL(KIND=LDP) NU(NF)		!Freuqency (10^15 Hz)
+	REAL(KIND=LDP) TAU(NF)
+	REAL(KIND=LDP) CHI(ND,NF)	!Opacity (scaled by 10^10) in comoving frame
+	REAL(KIND=LDP) VEL(ND)		!Velocity (km/s)
+	REAL(KIND=LDP) R(ND)		!Radius (in units of 10^10 cm).
 !
-	REAL(10), ALLOCATABLE :: NEW_CHI(:,:)		!New opacity (interpolated in space and frequency).
-	REAL(10), ALLOCATABLE :: NEW_VEL(:)
-	REAL(10), ALLOCATABLE :: NEW_R(:)
+	REAL(KIND=LDP), ALLOCATABLE :: NEW_CHI(:,:)		!New opacity (interpolated in space and frequency).
+	REAL(KIND=LDP), ALLOCATABLE :: NEW_VEL(:)
+	REAL(KIND=LDP), ALLOCATABLE :: NEW_R(:)
 !
 ! Work vectors
 !
-	REAL(10), ALLOCATABLE :: TMP_CHI(:)
-	REAL(10), ALLOCATABLE :: TMP_FREQ(:)
-	REAL(10), ALLOCATABLE :: WRK_VEC(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TMP_CHI(:)
+	REAL(KIND=LDP), ALLOCATABLE :: TMP_FREQ(:)
+	REAL(KIND=LDP), ALLOCATABLE :: WRK_VEC(:)
 !
-	REAL(10) T1
-	REAL(10) T2
+	REAL(KIND=LDP) T1
+	REAL(KIND=LDP) T2
 !
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER NF_INT
@@ -42,7 +43,7 @@
 	INTEGER N_THREAD
 	INTEGER N_THREAD_MAX
 !
-	REAL(10) SPEED_OF_LIGHT,C_KMS
+	REAL(KIND=LDP) SPEED_OF_LIGHT,C_KMS
 	EXTERNAL SPEED_OF_LIGHT
 !
 ! Determine new grid size.
@@ -107,7 +108,7 @@
 	     ML_END=ML
 	     EXIT
 	   END IF
-	  END DO 
+	  END DO
 	  NF_INT=ML_END
 !	  WRITE(6,'(3I12,4ES14.4)')I,NF_INT,NF,T1,NEW_VEL(I),TMP_FREQ(NF),NU(NF_INT)
 	  TMP_CHI(1:NF)=NEW_CHI(I,1:NF)
@@ -139,7 +140,7 @@
 	ELSE
 	  WRITE(6,'(A,ES14.4,A)')'Computed optical depth down to a velcoity of ',T1,' kms'
 	END IF
-! 
+!
 	DEALLOCATE (NEW_R,NEW_CHI,NEW_VEL)
 	DEALLOCATE (TMP_FREQ,TMP_CHI,WRK_VEC)
 !

@@ -228,7 +228,7 @@
 *
 *           Form  C := alpha*A*B + beta*C.
 *
-!$OMP PARALLEL DO IF(N > 4)
+!$OMP PARALLEL DO IF(N > 4) PRIVATE(I,J,L,TEMP)
             DO 90, J = 1, N
                IF( BETA.EQ.ZERO )THEN
                   DO 50, I = 1, M
