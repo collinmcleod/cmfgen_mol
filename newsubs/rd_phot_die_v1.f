@@ -67,7 +67,8 @@
 !
 ! Local variables
 !
-	REAL(KIND=LDP), PARAMETER :: IZERO=0
+	INTEGER, PARAMETER :: IZERO=0
+	REAL(KIND=LDP), PARAMETER :: RZERO=0.0
 !
 	REAL(KIND=LDP) EDGEDIE
 	REAL(KIND=LDP) EINA
@@ -120,7 +121,7 @@
 ! RD_PHOT_XzV/
 !
 	PD(ID)%VSM_KMS=VSMOOTH_KMS
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
         NEW_FILE_FORMAT=.FALSE.
 !
 ! Check whether we might be including permitted dielectronic transitions twice.
@@ -394,7 +395,7 @@
 ! Now match-lower level name: If the dielectronic levels are split,
 ! and the model atom is not, we can get more than one match.
 !
-	    CNT_BEG=CNT+1; GSUM=0.0D0
+	    CNT_BEG=CNT+1; GSUM=RZERO
 	    DO I=1,NXzV
 	      J=INDEX(LEVELNAME(I),'[')-1
 	      IF(J .EQ. 0)J=LEN_TRIM(LEVELNAME(I))
@@ -431,8 +432,8 @@
 ! are identical.
 !
 	     DO J=CNT_BEG,CNT
-	       PD(ID)%GAMMA(J)=DIE_LEV_AUTO(UP_PNT)/4.0D0/FUN_PI()
-	       PD(ID)%NU_ZERO(J)=1.0D-10*C_KMS*
+	       PD(ID)%GAMMA(J)=DIE_LEV_AUTO(UP_PNT)/4.0_LDP/FUN_PI()
+	       PD(ID)%NU_ZERO(J)=1.0E-10_LDP*C_KMS*
 	1             (DIE_LEV_ENERGY(UP_PNT)-IONIZATION_ENERGY)+EDGE(NINT(DIELEV(J)))
 	       WRITE(LUER,*) PD(ID)%OSC(J),PD(ID)%GAMMA(J),PD(ID)%NU_ZERO(J),DIELEV(J)
 	     END DO
@@ -499,11 +500,11 @@
 	    END IF
 !
 	    WRITE(LUER,*)'LOW_PNT=',LOW_PNT
-	    PD(ID)%FF_NU_ZERO(LOOP)=1.0D-10*C_KMS*(DIE_LEV_ENERGY(UP_PNT)-DIE_LEV_ENERGY(LOW_PNT))
-	    PD(ID)%FF_NU_EXCITE(LOOP)=1.0D-10*C_KMS*(DIE_LEV_ENERGY(LOW_PNT)-IONIZATION_ENERGY)
+	    PD(ID)%FF_NU_ZERO(LOOP)=1.0E-10_LDP*C_KMS*(DIE_LEV_ENERGY(UP_PNT)-DIE_LEV_ENERGY(LOW_PNT))
+	    PD(ID)%FF_NU_EXCITE(LOOP)=1.0E-10_LDP*C_KMS*(DIE_LEV_ENERGY(LOW_PNT)-IONIZATION_ENERGY)
 	    READ(STRING,*)PD(ID)%FF_GF(LOOP)
 	    PD(ID)%FF_GF(LOOP)=PD(ID)%FF_GF(LOOP)*DIE_LEV_G(LOW_PNT)
-	    PD(ID)%FF_GAMMA(LOOP)=(DIE_LEV_AUTO(LOW_PNT)+DIE_LEV_AUTO(UP_PNT))/4.0D0/FUN_PI()
+	    PD(ID)%FF_GAMMA(LOOP)=(DIE_LEV_AUTO(LOW_PNT)+DIE_LEV_AUTO(UP_PNT))/4.0_LDP/FUN_PI()
 	    WRITE(LUER,*)'UP_PNT=',UP_PNT
 !
 	  END DO
@@ -528,18 +529,18 @@
 !
 ! Zero summation scalers for computing recombination rates.
 !
-	  A1=0.0D0
-	  A2=0.0D0
-	  A3=0.0D0
-	  M1=0.0D0
-	  M2=0.0D0
-	  M3=0.0D0
-	  WIA1=0.0D0
-	  WIA2=0.0D0
-	  WIA3=0.0D0
-	  WIM1=0.0D0
-	  WIM2=0.0D0
-	  WIM3=0.0D0
+	  A1=RZERO
+	  A2=RZERO
+	  A3=RZERO
+	  M1=RZERO
+	  M2=RZERO
+	  M3=RZERO
+	  WIA1=RZERO
+	  WIA2=RZERO
+	  WIA3=RZERO
+	  WIM1=RZERO
+	  WIM2=RZERO
+	  WIM3=RZERO
 	  INC=0				!LTDR counters.
 	  WIINC=0
 	  MIS=0
@@ -598,9 +599,9 @@
 ! 10^{-12} for 10^4, 2 x 10^4, and 3 x 10^4 K.
 !
 	    T1=HDKT*EDGEDIE
-	    A10=2.07D-10*GUPDIE*EINA/GION_GS
-	    A20=A10*EXP(0.5D0*T1)/(2.0D0**1.5D0)
-	    A30=A10*EXP(T1/3.0D0)/(3.0D0**1.5D0)
+	    A10=2.07E-10_LDP*GUPDIE*EINA/GION_GS
+	    A20=A10*EXP(0.5_LDP*T1)/(2.0_LDP**1.5_LDP)
+	    A30=A10*EXP(T1/3.0_LDP)/(3.0_LDP**1.5_LDP)
 	    A10=A10*EXP(T1)
 !
 ! Is this lower level in model atom ?
@@ -670,9 +671,9 @@
 ! width depending on whether it is forbidden or allowed in pure LS coupling.
 !
 	           IF(INDX_HASH .EQ. 0)THEN
-	             PD(ID)%GAMMA(CNT)=1.0D+13/4.0D0/FUN_PI()
+	             PD(ID)%GAMMA(CNT)=1.0E+13_LDP/4.0_LDP/FUN_PI()
 	           ELSE IF(INDX_HASH .NE. 0)THEN
-	             PD(ID)%GAMMA(CNT)=1.0D+12/4.0D0/FUN_PI()
+	             PD(ID)%GAMMA(CNT)=1.0E+12_LDP/4.0_LDP/FUN_PI()
 	           END IF
 	        END IF
 	      END DO
@@ -728,9 +729,9 @@
 	1                  'included (LS : WI) ',/,
 	1 '[Units 10^-12] ( ) denotes percentage of LTDR NOT included')
 	  IF( (A1+M1) .NE. 0)THEN
-	    M1=100.0D0*M1/(A1+M1)
-	    M2=100.0D0*M2/(A2+M2)
-	    M3=100.0D0*M3/(A3+M3)
+	    M1=100.0_LDP*M1/(A1+M1)
+	    M2=100.0_LDP*M2/(A2+M2)
+	    M3=100.0_LDP*M3/(A3+M3)
 	    WRITE(LUOUT,1000)INC,(INC+MIS),A1,M1,A2,M2,A3,M3
 1000	    FORMAT( X,I4,'(',I4,')',3( 2X,1PE10.3,'(',0PF6.2,')' )  )
 	  END IF
@@ -786,18 +787,18 @@
 ! put GAMMA in the same units.
 !
 	DO I=1,PD(ID)%NUM_DIE
-	  PD(ID)%GAMMA(I)=1.0D-15*PD(ID)%GAMMA(I)
+	  PD(ID)%GAMMA(I)=1.0E-15_LDP*PD(ID)%GAMMA(I)
 	END DO
 !
 ! Compute the frequency range associated with each transition. This
 ! range is chosen to give 0.1% accuracy in the integral across the full
 ! VOIGT profile.
 !
-	T1=VSMOOTH_KMS/2.998D+05
+	T1=VSMOOTH_KMS/2.998E+05_LDP
 	DO I=1,PD(ID)%NUM_DIE
 	  NU_DOP=PD(ID)%NU_ZERO(I)*T1
-	  DEL_NU=64.0D0*PD(ID)%GAMMA(I)
-	  IF(DEL_NU .LT. 6.0D0*NU_DOP)DEL_NU=6.0D0*NU_DOP
+	  DEL_NU=64.0_LDP*PD(ID)%GAMMA(I)
+	  IF(DEL_NU .LT. 6.0_LDP*NU_DOP)DEL_NU=6.0_LDP*NU_DOP
 	  PD(ID)%NU_MIN(I)=PD(ID)%NU_ZERO(I)-DEL_NU
 	  PD(ID)%NU_MIN(I)=MAX(PD(ID)%NU_MIN(I),EDGE( NINT(DIELEV(I)) ))
 	  PD(ID)%NU_MAX(I)=PD(ID)%NU_ZERO(I)+DEL_NU
@@ -809,7 +810,7 @@
 ! put GAMMA in the same units.
 !
 	  DO I=1,PD(ID)%NUM_FF
-	    PD(ID)%FF_GAMMA(I)=1.0D-15*PD(ID)%FF_GAMMA(I)
+	    PD(ID)%FF_GAMMA(I)=1.0E-15_LDP*PD(ID)%FF_GAMMA(I)
 	  END DO
 	  WRITE(LUER,*)'Done FF units for ',TRIM(DESC)
 !
@@ -817,11 +818,11 @@
 ! range is chosen to give 1.0% accuracy in the integral across the full
 ! (pure) VOIGT profile.
 !
-	  T1=VSMOOTH_KMS/2.998D+05
+	  T1=VSMOOTH_KMS/2.998E+05_LDP
 	  DO I=1,PD(ID)%NUM_FF
 	    NU_DOP=PD(ID)%FF_NU_ZERO(I)*T1
-	    DEL_NU=64.0D0*PD(ID)%FF_GAMMA(I)
-	    IF(DEL_NU .LT. 6*NU_DOP)DEL_NU=6.0D0*NU_DOP
+	    DEL_NU=64.0_LDP*PD(ID)%FF_GAMMA(I)
+	    IF(DEL_NU .LT. 6*NU_DOP)DEL_NU=6.0_LDP*NU_DOP
 	    PD(ID)%FF_NU_MIN(I)=PD(ID)%FF_NU_ZERO(I)-DEL_NU
 	    PD(ID)%FF_NU_MAX(I)=PD(ID)%FF_NU_ZERO(I)+DEL_NU
 !	    WRITE(LUER,*)PD(ID)%FF_GF(I),PD(ID)%FF_NU_ZERO(I),PD(ID)%FF_NU_EXCITE(I)

@@ -191,6 +191,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(rite_asc.o)\
       $(LIB)(rite_atmdes_v2.o)\
       $(LIB)(rite_atmdes_v3.o)\
+      $(LIB)(rite_atmdes_v4.o)\
       $(LIB)(rite_gam_v2.o)\
       $(LIB)(rv_sn_model_v2.o)\
       $(LIB)(s15adf.o)\

@@ -129,7 +129,7 @@
 !
 	REAL(KIND=LDP) VOIGT
 !
-        VTURB_SQ(1:ND)=( VTURB_IN(1:ND)/12.85D0  )**2
+        VTURB_SQ(1:ND)=( VTURB_IN(1:ND)/12.85_LDP  )**2
 !
 	DO SIM_INDX=1,MAX_SIM
 	  IF(RESONANCE_ZONE(SIM_INDX))THEN
@@ -137,7 +137,7 @@
 	    AMASS_IN=AMASS_SIM(SIM_INDX)
 	    LN_PNT=SIM_LINE_POINTER(SIM_INDX)
 !
-	    Z_IN=Z_POP(VEC_NL(LN_PNT))+1.0D0
+	    Z_IN=Z_POP(VEC_NL(LN_PNT))+1.0_LDP
 	    NU_ZERO=VEC_FREQ(LN_PNT)
 	    GAM_RAD=VEC_ARAD(LN_PNT)
 	    C4_INTER=VEC_C4(LN_PNT)
@@ -150,8 +150,8 @@
 ! Doppler profile is the same for all species, and is the same at all depths.
 !
 	    IF(PROF_TYPE(LN_PNT) .EQ. 'DOP_FIX')THEN
-              T1=1.0D-15/1.77245385095516D0         !1.0D-15/SQRT(PI)
-	      T2=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
+              T1=1.0E-15_LDP/1.77245385095516_LDP         !1.0D-15/SQRT(PI)
+	      T2=12.85_LDP*SQRT( TDOP/AMASS_DOP + (VTURB/12.85_LDP)**2 )
               NU_DOP=NU_ZERO*T2/C_KMS
               DO I=1,ND
                 LINE_PROF_SIM(I,SIM_INDX)=EXP( -( (NU(ML_CUR)-NU_ZERO)/NU_DOP )**2 )*T1/NU_DOP
@@ -162,8 +162,8 @@
 ! A reasonable choice for T_DOP is Teff.
 !
 	    ELSE IF(PROF_TYPE(LN_PNT) .EQ. 'DOP_SPEC')THEN
-              T1=1.0D-15/1.77245385095516D0         !1.0D-15/SQRT(PI)
-	      T2=12.85D0*SQRT( TDOP/AMASS_IN + (VTURB/12.85D0)**2 )
+              T1=1.0E-15_LDP/1.77245385095516_LDP         !1.0D-15/SQRT(PI)
+	      T2=12.85_LDP*SQRT( TDOP/AMASS_IN + (VTURB/12.85_LDP)**2 )
               NU_DOP=NU_ZERO*T2/C_KMS
               DO I=1,ND
                 LINE_PROF_SIM(I,SIM_INDX)=EXP( -( (NU(ML_CUR)-NU_ZERO)/NU_DOP )**2 )*T1/NU_DOP
@@ -173,8 +173,8 @@
 ! Doppler profile varies with species and depth.
 !
 	    ELSE IF(PROF_TYPE(LN_PNT) .EQ. 'DOPPLER')THEN
-              T1=1.0D-15/1.77245385095516D0         !1.0D-15/SQRT(PI)
-              T2=NU_ZERO*12.85D0/C_KMS
+              T1=1.0E-15_LDP/1.77245385095516_LDP         !1.0D-15/SQRT(PI)
+              T2=NU_ZERO*12.85_LDP/C_KMS
               DO I=1,ND
                 NU_DOP=T2*SQRT( TEMP_IN(I)/AMASS_IN + VTURB_SQ(I) )
                 LINE_PROF_SIM(I,SIM_INDX)=EXP( -( (NU(ML_CUR)-NU_ZERO)/NU_DOP )**2 )*T1/NU_DOP
@@ -191,9 +191,9 @@
 	            VGT_POINTER(SIM_INDX)=IS
 !	            WRITE(6,*)IS,SIM_INDX,ML_END-ML_ST+1; FLUSH(UNIT=6)
 !
-	            T2=NU_ZERO*12.85D0/C_KMS
+	            T2=NU_ZERO*12.85_LDP/C_KMS
 	            LOC_GAM_RAD=GAM_RAD
-	            LOC_GAM_COL=1.55D+04*(ABS(C4_INTER)**0.667D0)
+	            LOC_GAM_COL=1.55E+04_LDP*(ABS(C4_INTER)**0.667_LDP)
 	            ID=PROF_LIST_LOCATION(LN_PNT)
 	            IF(ID .NE. 0)THEN
 	              LOC_GAM_RAD=LST_GAM_RAD(ID)
@@ -206,9 +206,9 @@
 	              DO I=1,ND
 	                TMP_ED=MIN(ED_IN(I),MAX_PROF_ED)
                         NU_DOP=T2*SQRT( TEMP_IN(I)/AMASS_SIM(SIM_INDX) + VTURB_SQ(I) )
-	                A_VOIGT=0.25D-15*(LOC_GAM_RAD+LOC_GAM_COL*TMP_ED)/PI/NU_DOP
+	                A_VOIGT=0.25E-15_LDP*(LOC_GAM_RAD+LOC_GAM_COL*TMP_ED)/PI/NU_DOP
 	                V_VOIGT=(NU(ML)-NU_ZERO)/NU_DOP
-	                VGT(IS)%VGT_PROF(I,ML-ML_ST+1)=1.0D-15*VOIGT(A_VOIGT,V_VOIGT)/NU_DOP
+	                VGT(IS)%VGT_PROF(I,ML-ML_ST+1)=1.0E-15_LDP*VOIGT(A_VOIGT,V_VOIGT)/NU_DOP
 	              END DO
 	            END DO
 !$OMP END PARALLEL DO
@@ -316,7 +316,7 @@
 	        STOP
 	      END IF
 	      STORE_AVAIL(LOC_INDX)=.FALSE.
-	      PROF_STORE(:,:,LOC_INDX)=0.0D0
+	      PROF_STORE(:,:,LOC_INDX)=0.0_LDP
 !
 ! Determine how many frequencies we need to compute profile at, and check
 ! we have sufficent storage.
@@ -391,19 +391,19 @@
 	           WRITE(LUER,*)'Error in SET_PROF: NUP < NL'
 	           STOP
 	         END IF
-                 IF(VERBOSE)WRITE(LUER,900)'Using HZ_STARK: ',' ',0.01D0*C_KMS/NU_ZERO,
+                 IF(VERBOSE)WRITE(LUER,900)'Using HZ_STARK: ',' ',0.01_LDP*C_KMS/NU_ZERO,
 	1              NL,NUP,ML_CUR,ML_ST,ML_END,Z_IN
 !
 ! Convert from Frequency to Angstrom space, measured from line center.
 !
 	         DO ML=ML_ST,ML_END
-	           DWS_GRIEM(ML-ML_ST+1)=0.01D0*C_KMS*(1.0D0/NU(ML)-1.0D0/NU_ZERO)
+	           DWS_GRIEM(ML-ML_ST+1)=0.01_LDP*C_KMS*(1.0_LDP/NU(ML)-1.0_LDP/NU_ZERO)
 	         END DO
 !
 ! Now compute, and store the Doppler broadened Stark profile for each
 ! depth. We assume that the profile is zero outside the computational range.
 !
-	         PROF_STORE(1:ND,1:NF,LOC_INDX)=0.0D0
+	         PROF_STORE(1:ND,1:NF,LOC_INDX)=0.0_LDP
 !$OMP PARALLEL DO PRIVATE(I,PR_GRIEM,TMP_ED)
 	         DO I=1,ND
 	           TMP_ED=MIN(ED_IN(I),MAX_PROF_ED)
@@ -430,14 +430,14 @@
 	        NF=ML_END-ML_ST+1
 !$OMP PARALLEL DO PRIVATE (I,T1,ML)
 	        DO I=1,ND
-	          PROF_STORE(I,1,LOC_INDX)=0.0D0
-	          PROF_STORE(I,NF,LOC_INDX)=0.0D0
-	          T1=0.0D0
+	          PROF_STORE(I,1,LOC_INDX)=0.0_LDP
+	          PROF_STORE(I,NF,LOC_INDX)=0.0_LDP
+	          T1=0.0_LDP
 	          DO ML=1,NF-1
-	              T1=T1+0.5D0*(NU(ML_ST+ML-1)-NU(ML_ST+ML))*
+	              T1=T1+0.5_LDP*(NU(ML_ST+ML-1)-NU(ML_ST+ML))*
 	1                (PROF_STORE(I,ML,LOC_INDX)+PROF_STORE(I,ML+1,LOC_INDX))
 	          END DO
-	          T1=ABS(T1)*1.0D+15
+	          T1=ABS(T1)*1.0E+15_LDP
 	          PROF_STORE(I,1:NF,LOC_INDX)=PROF_STORE(I,1:NF,LOC_INDX)/T1
 	        END DO
 !$OMP END PARALLEL DO
@@ -460,7 +460,7 @@
 !
 	    END IF
 	  ELSE
-	    LINE_PROF_SIM(1:ND,SIM_INDX)=0.0D0
+	    LINE_PROF_SIM(1:ND,SIM_INDX)=0.0_LDP
 	  END IF
 	END DO
 !

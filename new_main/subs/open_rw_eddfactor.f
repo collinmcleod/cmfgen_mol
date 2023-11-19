@@ -104,7 +104,8 @@
 	    WRITE(LUER,*)'Program will compute new values but this is'//
 	1                      ' incompatable with US_FIXED_J=T'
 	    WRITE(LUER,*)'Currently trying to read ',TRIM(FILENAME)
-	    WRITE(LUER,'(A,//)')'Stopping program'
+	    WRITE(LUER,*)'You need to set USE_J_FIXED=F or copy over a valid EDDFAC file.'
+	    WRITE(LUER,'(A,//)')' Stopping program'
 	    STOP
 	  END IF
 !

@@ -22,6 +22,7 @@ OBJ= $(LIB)(ave_level_energy.o)\
      $(LIB)(genopaeta_v10.o)\
      $(LIB)(genosc_v8.o)\
      $(LIB)(genosc_v9.o)\
+     $(LIB)(get_num_phot_routes_v1.o)\
      $(LIB)(get_scl_xray_fluxes_v1.o)\
      $(LIB)(newpertjd.o)\
      $(LIB)(omega_gen_v3.o)\

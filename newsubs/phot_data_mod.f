@@ -11,31 +11,39 @@
 ! Altered Sep-18-1996 : Dimension of LST_U, LST_CROSS, LST_LOC changed.
 !                       (LST_U renamed to LST_FREQ).
 !
- 	   INTEGER MAX_TERMS		!# of cross sections/term.
+	   INTEGER MAX_TERMS		!# of terms (cross-sections).
 	   INTEGER MAX_CROSS		!# of cross sections/term.
-	   INTEGER NUM_PHOT_ROUTES	!# of photioization routes
+	   INTEGER N_FILES		!Number of files read in
+	   INTEGER NUM_PHOT_ROUTES	!# of photoionization routes
 !
 ! For clarity define NLOC as the maximum number of levels in ion.
-!                    NS ar the numer of photoionization paths (NUM_PHOT_ROUTES).
+!                    NT as the number tables read in.
+!                    NS as the numer of photoionization paths (NUM_PHOT_ROUTES).
 !
 ! Data block for photoionization cross section data. The arrays are allocated
 ! as the photoionization data is read in.
 !
 	  REAL(KIND=LDP), POINTER :: NU_NORM(:)		!MAX_CROSS
-	  REAL(KIND=LDP), POINTER :: CROSS_A(:)               !MAX_CROSS
-          REAL(KIND=LDP), POINTER :: NEF(:,:)                 !NLOC,NS
-	  REAL(KIND=LDP), POINTER :: EXC_FREQ(:)              !NS
-	  REAL(KIND=LDP), POINTER :: GION(:)              	!NS
+	  REAL(KIND=LDP), POINTER :: CROSS_A(:)         !MAX_CROSS
+	  REAL(KIND=LDP), POINTER :: EXC_FREQ(:)        !NT
+	  REAL(KIND=LDP), POINTER :: GION(:)           	!NT
+!
 	  INTEGER, POINTER :: A_ID(:,:)    		!NLOC,NS
-	  INTEGER, POINTER :: ST_LOC(:,:)    	!MAX_TERMS,NS
-	  INTEGER, POINTER :: END_LOC(:,:)    	!MAX_TERMS,NS
-	  INTEGER, POINTER :: CROSS_TYPE(:,:)    	!MAX_TERMS,NS
-	  LOGICAL*4, POINTER :: DO_PHOT(:,:)    	!NS,NS
+          REAL(KIND=LDP), POINTER :: NEF(:,:)           !NLOC,NS
 !
-	  REAL(KIND=LDP), POINTER :: LST_CROSS(:,:)		!NLOC,NS
-	  REAL(KIND=LDP), POINTER :: LST_FREQ(:,:)		!NLOC,NS
-	  REAL(KIND=LDP), POINTER :: LST_LOC(:,:)		!NLOC,NS
+	  INTEGER, POINTER :: ST_LOC(:,:)    		!MAX_TERMS,NT
+	  INTEGER, POINTER :: END_LOC(:,:)    		!MAX_TERMS,NT
+	  INTEGER, POINTER :: CROSS_TYPE(:,:)    	!MAX_TERMS,NT
+	  LOGICAL*4, POINTER :: DO_PHOT(:,:)    	!NT,NT
 !
+	  REAL(KIND=LDP), POINTER :: LST_CROSS(:,:)	!NLOC,NS
+	  REAL(KIND=LDP), POINTER :: LST_FREQ(:,:)	!NLOC,NS
+	  REAL(KIND=LDP), POINTER :: LST_LOC(:,:)	!NLOC,NS
+	  REAL(KIND=LDP), POINTER :: SCALE_FAC(:)      	!NT
+!
+	  INTEGER, POINTER :: PHOT_GRID(:)		!NT
+	  INTEGER, POINTER :: ION_LEV_ID(:)		!NT
+
 	  REAL(KIND=LDP) AT_NO
 	  REAL(KIND=LDP) ZION
 	  REAL(KIND=LDP) ALPHA_BF
@@ -92,6 +100,8 @@
 	  REAL(KIND=LDP), POINTER :: FF_NU_EXCITE(:)
 	  REAL(KIND=LDP), POINTER :: FF_NU_MAX(:)
 	  REAL(KIND=LDP), POINTER :: FF_NU_MIN(:)
+!
+	  CHARACTER(LEN=20), ALLOCATABLE :: FINAL_ION_NAME(:)
 !
 	END TYPE PHOTO_DATA
 !

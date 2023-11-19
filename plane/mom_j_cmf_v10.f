@@ -420,7 +420,7 @@
 ! Get Eddingto values on the revised grid.
 !
 	CALL GET_MOMS_NON_REL(R, V, FREQ, N_TYPE, ND)
-	DO I=1,ND
+	DO I=1,ND-1
 	  IF(NMID_ON_HMID(I) .GT. 1.0D0)NMID_ON_HMID(I)=1.0D0
 	END DO
 !

@@ -33,7 +33,7 @@ OBJ = $(LIB)(betanew.o)\
       $(LIB)(modify_density.o)\
       $(LIB)(map_plot.o)\
       $(LIB)(momham.o)\
-      $(LIB)(new_writedc_v5.o)\
+      $(LIB)(new_writedc_v6.o)\
       $(LIB)(op_spec_file_v2.o)\
       $(LIB)(pallet.o)\
       $(LIB)(plt_arn.o)\

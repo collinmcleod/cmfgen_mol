@@ -20,7 +20,8 @@
 	USE LINE_VEC_MOD
 	IMPLICIT NONE
 !
-! Created 8-Jun-2004
+! Altered 12-Nov-2023: Updated constants to use LDP notation
+! Created  8-Jun-2004
 !
 	INTEGER NCF_MAX
 	INTEGER NCF				!Total number of continuum points.
@@ -72,7 +73,7 @@
         REAL(KIND=LDP) OPLIN,EMLIN
 !
 	LUER=ERROR_LU()
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 !
 !
 !
@@ -170,7 +171,7 @@
 	1           '('//TRIM(ATM(ID)%XzVLEVNAME_F(MNUP))//'-'//
 	1           TRIM( ATM(ID)%XzVLEVNAME_F(MNL))//')'
 !
-	          T1=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
+	          T1=12.85_LDP*SQRT( TDOP/AMASS_DOP + (VTURB/12.85_LDP)**2 )
 	          VDOP_FIX=T1
 !
 	          T1=VEC_OSCIL(ML)*OPLIN
@@ -181,7 +182,7 @@
 	          PROF_TYPE(ML)=ATM(ID)%XzV_PROF_TYPE
 	          IF(GLOBAL_LINE_PROF .NE. 'NONE')PROF_TYPE(ML)=GLOBAL_LINE_PROF
 !
-	          T2=0.0D0
+	          T2=0.0_LDP
 	          CALL SET_PROF_LIMITS_V4(VEC_STRT_FREQ(ML),VEC_VDOP_MIN(ML),
 	1             CHIL,LOC_ED,LOC_T,VTURB_VEC,ND,PROF_TYPE(ML),PROF_LIST_LOCATION(ML),
 	1             VEC_FREQ(ML),MNL,MNUP,
@@ -190,7 +191,7 @@
 	1             DOP_PROF_LIMIT,VOIGT_PROF_LIMIT,
 	1             V_PROF_LIMIT,MAX_PROF_ED,SET_PROF_LIMS_BY_OPACITY)
 !
-	          T1=0.01D0*C_KMS/VEC_FREQ(ML)
+	          T1=0.01_LDP*C_KMS/VEC_FREQ(ML)
 !	          WRITE(134,'(A,T10,A,T25,2I5,2F20.8,2ES15.4)')VEC_SPEC(ML),PROF_TYPE(ML),MNL,MNUP,
 !	1                  T1,LAMVACAIR(VEC_FREQ(ML)),VEC_VDOP_MIN(ML),
 !	1                  C_KMS*(VEC_STRT_FREQ(ML)/VEC_FREQ(ML)-1.0D0)
@@ -243,9 +244,9 @@
 	1         TRIM(VEC_TRANS_NAME(VEC_INDX(1)))
 	    DO ML=2,N_LINE_FREQ
 	      T1=LAMVACAIR(VEC_FREQ(ML))
-	      T2=2.998D+05*(VEC_FREQ(ML-1)-VEC_FREQ(ML))/VEC_FREQ(ML)
-	      IF(T2 .GT. 2.998D+05)T2=2.998D+05
-	      IF(T1 .LT. 1.0D+04)THEN
+	      T2=2.998E+05_LDP*(VEC_FREQ(ML-1)-VEC_FREQ(ML))/VEC_FREQ(ML)
+	      IF(T2 .GT. 2.998E+05_LDP)T2=2.998E+05_LDP
+	      IF(T1 .LT. 1.0E+04_LDP)THEN
 	        WRITE(LUIN,
 	1        '(1X,I6,2(1X,I6),2X,F10.6,2X,F10.3,2X,F10.2,4X,A)')
 	1           ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
@@ -327,7 +328,7 @@
 	    WRITE(LUER,*)'calculations:'
 	  END IF
 	  GLOBAL_LINE_SWITCH='NONE'
-	  T1=SPEED_OF_LIGHT()*1.0D-07
+	  T1=SPEED_OF_LIGHT()*1.0E-07_LDP
 	  DO I=1,N_LINE_FREQ
 	    IF(T1/VEC_FREQ(I) .GE. FLUX_CAL_LAM_END)THEN
 	      VEC_TRANS_TYPE(I)='SOB'
@@ -412,8 +413,8 @@
 !
 ! Checks if BIG_FREQ_AMP was set to old definition.
 !
-	    IF(BIG_FREQ_AMP .LT. 0.0D0 .OR. BIG_FREQ_AMP .GT. 1.0D0)THEN
-	      BIG_FREQ_AMP=0.5D0
+	    IF(BIG_FREQ_AMP .LT. 0.0_LDP .OR. BIG_FREQ_AMP .GT. 1.0_LDP)THEN
+	      BIG_FREQ_AMP=0.5_LDP
 	    END IF
 	    CALL SET_CONT_FREQ_V4(NU,OBS,FQW,
 	1                        SMALL_FREQ_RAT,BIG_FREQ_AMP,dFREQ_BF_MAX,
@@ -471,7 +472,7 @@
 	  CALL TRAPUNEQ(NU,FQW,NCF)
 	END IF
 	DO ML=1,NCF
-	  FQW(ML)=FQW(ML)*1.0D+15
+	  FQW(ML)=FQW(ML)*1.0E+15_LDP
 	END DO
 !
 ! Revise number of lines so only those in frequency grid are included.
@@ -479,7 +480,7 @@
 	I=N_LINE_FREQ
 	DO ML=I,1,-1
 	  N_LINE_FREQ=ML
-	  IF(VEC_FREQ(ML) .GT. MIN_CONT_FREQ*(1.0D0+1.1D0*VINF/2.998D+05))EXIT
+	  IF(VEC_FREQ(ML) .GT. MIN_CONT_FREQ*(1.0_LDP+1.1_LDP*VINF/2.998E+05_LDP))EXIT
 	END DO
 	I=I-N_LINE_FREQ
 	IF(I .NE. 0)THEN
@@ -499,9 +500,9 @@
 ! treated in blanketed mode, or if SOBN_FREQ_IN_OBS is set to TRUE.
 !
 	NU_MAX_OBS=NU(3)		!3 Ensures OBS_FREQ contained inside CMF band.
-	T1=NU(NCF)*(1.0D0+2.0D0*VINF/2.998D+05)
+	T1=NU(NCF)*(1.0_LDP+2.0_LDP*VINF/2.998E+05_LDP)
 	T2=MAXVAL(VTURB_VEC)
-	T3=1.0D0
+	T3=1.0_LDP
 	NU_MIN_OBS=MAX(NU(NCF-3),T1)
 	CALL INS_LINE_OBS_V5(OBS_FREQ,N_OBS,NCF_MAX,
 	1               VEC_FREQ,VEC_STRT_FREQ,VEC_VDOP_MIN,VEC_TRANS_TYPE,

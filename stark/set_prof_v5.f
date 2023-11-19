@@ -39,6 +39,7 @@
 	1             END_RES_ZONE,NORM_PROFILE,LU_STK)
 	USE SET_KIND_MODULE
 !
+! Aleteed 12-Nov-2023: Fixed bug when computing STARK profiles when ND=1
 ! Altered 05-Jul-2022: Call to GRIEM_V2 now in parallel loop. This paralleization
 !                        required some changes to GRIEM_STARK_MOD.
 ! Altered 18-May-2015: LOC_GAM_COL is set to C4 unless specifically set in STRK_LIST.
@@ -281,28 +282,50 @@
 	  ITR=LST_PID(ID)		!Location in file.
 	  CALL RD_BS_STRK_TAB(LST_SPECIES(ID),NU_ZERO,
 	1               LST_NL(ID),LST_NUP(ID),PROF_TYPE,ITR,LU_STK)
-	  CALL STRK_BS_HHE(PROF_STORE(1,1,LOC_INDX),XNU,NF,
+	  IF(ND .EQ. 1)THEN
+	    CALL STRK_BS_HHE(PR_GRIEM,XNU,NF,
 	1               ED_MOD,TEMP_IN,VTURB_IN,ND,
 	1               NU_ZERO,AMASS_IN,L_FALSE)
+	    PROF_STORE(1,1:NF,LOC_INDX)=PR_GRIEM(1:NF)
+	  ELSE
+	    CALL STRK_BS_HHE(PROF_STORE(1,1,LOC_INDX),XNU,NF,
+	1               ED_MOD,TEMP_IN,VTURB_IN,ND,
+	1               NU_ZERO,AMASS_IN,L_FALSE)
+	  END IF
 !
 	ELSE IF(PROF_TYPE .EQ. 'HeI_IR_STRK')THEN
           IF(VERBOSE)WRITE(LUER,900)'Using HeI_IR_STRK: ',LST_SPECIES(ID),LST_WAVE(ID),
 	1              LST_NL(ID),LST_NUP(ID),ML_CUR,ML_ST,ML_END
-	  CALL STRK_HEI_IR(PROF_STORE(1,1,LOC_INDX),XNU,NF,
+	  IF(ND .EQ. 1)THEN
+	    CALL STRK_HEI_IR(PR_GRIEM,XNU,NF,
 	1                   ED_MOD,TEMP_IN,VTURB_IN,
 	1                   POP_PROTON,POP_HEPLUS,ND,NU_ZERO,
 	1                   LST_SPECIES(ID),LST_NL(ID),LST_NUP(ID),
 	1                   AMASS_IN,PROF_TYPE,LU_STK)
+	    PROF_STORE(1,1:NF,LOC_INDX)=PR_GRIEM(1:NF)
+	  ELSE
+	    CALL STRK_HEI_IR(PROF_STORE(1,1,LOC_INDX),XNU,NF,
+	1                   ED_MOD,TEMP_IN,VTURB_IN,
+	1                   POP_PROTON,POP_HEPLUS,ND,NU_ZERO,
+	1                   LST_SPECIES(ID),LST_NL(ID),LST_NUP(ID),
+	1                   AMASS_IN,PROF_TYPE,LU_STK)
+	   END IF
 !
 	ELSE IF(PROF_TYPE .EQ. 'DS_STRK')THEN
           IF(VERBOSE)WRITE(LUER,900)'Using DS_STRK: ',LST_SPECIES(ID),LST_WAVE(ID),
 	1              LST_NL(ID),LST_NUP(ID),ML_CUR,ML_ST,ML_END
-	  CALL STRK_DS(PROF_STORE(1,1,LOC_INDX),XNU,NF,
-	1	         ED_MOD,TEMP_IN,VTURB_IN,
-	1                ND,NU_ZERO,
+	  IF(ND .EQ. 1)THEN
+	    CALL STRK_DS(PR_GRIEM,XNU,NF,
+	1	         ED_MOD,TEMP_IN,VTURB_IN,ND,NU_ZERO,
 	1                LST_SPECIES(ID),LST_NL(ID),LST_NUP(ID),
 	1                AMASS_IN,PROF_TYPE,LU_STK)
-
+	    PROF_STORE(1,1:NF,LOC_INDX)=PR_GRIEM(1:NF)
+	  ELSE
+	    CALL STRK_DS(PROF_STORE(1,1,LOC_INDX),XNU,NF,
+	1	         ED_MOD,TEMP_IN,VTURB_IN,ND,NU_ZERO,
+	1                LST_SPECIES(ID),LST_NL(ID),LST_NUP(ID),
+	1                AMASS_IN,PROF_TYPE,LU_STK)
+	  END IF
 	ELSE IF(PROF_TYPE .EQ. 'HZ_STARK')THEN
 !
 ! Check validity of passed parameters for HI and HeII lines.
@@ -348,7 +371,7 @@
 !	NORM_PROFILE=.FALSE.
 	IF(NORM_PROFILE)THEN
 	  NF=ML_END-ML_ST+1
-!$OMP PARALLEL DO PRIVATE (I,T1,ML)
+!$OMP PARALLEL DO IF(ND > 4) PRIVATE (I,T1,ML)
 	  DO I=1,ND
 	    PROF_STORE(I,1,LOC_INDX)=0.0D0
 	    PROF_STORE(I,NF,LOC_INDX)=0.0D0

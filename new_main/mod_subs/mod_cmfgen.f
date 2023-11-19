@@ -29,9 +29,10 @@
 	INTEGER, PARAMETER :: MAX_IONS_PER_SPECIES=21
 	INTEGER, PARAMETER :: MAX_NUM_IONS=NUM_SPECIES*MAX_IONS_PER_SPECIES
 !
-! Maximum number of photoionization routes for each species.
+! Maximum number of photoionization routes for each species. This only
+! dimensions a vector.
 !
-	INTEGER, PARAMETER :: NPHOT_MAX=4
+	INTEGER, PARAMETER :: NPHOT_MAX=10
 !
 ! Actual number of ions in calculation. Stored sequentially.
 !

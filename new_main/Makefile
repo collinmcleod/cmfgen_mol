@@ -30,7 +30,7 @@ UPDATE=$(LIB_DIR)libsubs.a(update_keyword.o)
 $(EXE_DIR)cmfgen_dev.exe : cmfgen.o cmfgen_sub.o  $(FN1) $(FN2) $(FN3) 
 	$(F90) cmfgen.o cmfgen_sub.o \
               -L$(LIB_DIR) -l$(LN1) -l$(LN2) -l$(LN3) \
-               $(LOCLIB) $(LAPACK) $(BLAS) \
+               $(LAPACK) $(BLAS) $(LOCLIB) \
               -o $(EXE_DIR)cmfgen_dev.exe
 
 USR=$(LIB_DIR)libsubs.a(usr_option.o)

@@ -64,13 +64,14 @@
 	REAL(KIND=LDP) DELV_XRAY
 	REAL(KIND=LDP) NU_END_XRAY
 !
-        REAL(KIND=LDP), PARAMETER :: RZERO=0.0D0
-        REAL(KIND=LDP), PARAMETER :: RHALF=0.5D0
-        REAL(KIND=LDP), PARAMETER :: RONE=1.0D0
-        REAL(KIND=LDP), PARAMETER :: RTWO=2.0D0
+        REAL(KIND=LDP), PARAMETER :: RZERO=0.0_LDP
+        REAL(KIND=LDP), PARAMETER :: RHALF=0.5_LDP
+        REAL(KIND=LDP), PARAMETER :: RONE=1.0_LDP
+        REAL(KIND=LDP), PARAMETER :: RTWO=2.0_LDP
 !
+	REAL(KIND=LDP) SPEED_OF_LIGHT
 	INTEGER ERROR_LU,LUER
-	EXTERNAL ERROR_LU
+	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
 	REAL(KIND=LDP) T1,T2,dV_NEW,dV
 	REAL(KIND=LDP) C_KMS
@@ -81,7 +82,7 @@
 	REAL(KIND=LDP) UP,LOW,DELF,DIFF,RAT,SWITCH_FREQ
 !
 	LUER=ERROR_LU()
-	C_KMS=2.998D+05			!Doesn't have to be accurate
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()  			!Doesn't have to be accurate
 !
 ! Sort frequencies into numerical order. New freq is used as a
 ! work array.
@@ -193,7 +194,7 @@
 	    ELSE IF(DIFF .GT. DNU_MAX)THEN
 	      T1=BIG_AMP*DNU_MAX
 	      T2=2*DNU_MAX-T1
-	      NPTS=0.5D0*(-T2+SQRT(T2*T2+8.0D0*T1*DIFF))/T1
+	      NPTS=0.5_LDP*(-T2+SQRT(T2*T2+8.0_LDP*T1*DIFF))/T1
 	      DELF=DNU_MAX
 	      DO J=1,NPTS-1
 	        K=K+1
@@ -217,12 +218,12 @@
 	  IF(NEW_FREQ(K) .GT. MIN_FREQ_LEV_DIS)THEN
 	    K_BEG=K-1
 500	    CONTINUE
-	    dV=2.998D+05*(NEW_FREQ(K)-NEW_FREQ(K_BEG))/NEW_FREQ(K)
+	    dV=C_KMS*(NEW_FREQ(K)-NEW_FREQ(K_BEG))/NEW_FREQ(K)
 	    IF(dV .GT. dV_LEV .AND. I .LT . N-1)THEN
 	      T1= LOG( dV/dV_LEV*(AMP_DIS-RONE) + RONE) / LOG(AMP_DIS)
 	      J=NINT(T1)-1
 	      IF(K_BEG .NE. 1)THEN
-	        IF( dV_LEV*AMP_DIS**(J+1) .LT. 2.998D+05*
+	        IF( dV_LEV*AMP_DIS**(J+1) .LT. C_KMS*
 	1               (NEW_FREQ(K_BEG)-NEW_FREQ(K_BEG-1))/NEW_FREQ(K))THEN
 	          K_BEG=K_BEG-1
 	          GOTO 500
@@ -231,9 +232,9 @@
 	      dV_NEW=dV*(AMP_DIS-RONE)/(AMP_DIS**(J+1) -RONE)
 	      UP=NEW_FREQ(K)
 	      NEW_FREQ(K_BEG+J+1)=UP
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO L=J,1,-1
-	        T1=T1+dV_NEW*(AMP_DIS**(J-L))/2.998D+05
+	        T1=T1+dV_NEW*(AMP_DIS**(J-L))/C_KMS
 	        NEW_FREQ(K_BEG+L)=UP*(RONE-T1)
 	      END DO
 	      K=K_BEG+J+1
@@ -271,19 +272,19 @@
         K=1
         DO ML=2,NCF
           T1=C_KMS*(FREQ(ML-1)-FREQ(ML))/FREQ(ML)
-          IF(T1 .GT. 1.25D0*DELV_XRAY .AND. FREQ(ML) .GT. NU_END_XRAY)THEN
-            J=T1/DELV_XRAY/1.2D0
+          IF(T1 .GT. 1.25_LDP*DELV_XRAY .AND. FREQ(ML) .GT. NU_END_XRAY)THEN
+            J=T1/DELV_XRAY/1.2_LDP
             DO L=1,J
               K=K+1
               IF(K .GT. NCF_MAX)EXIT
-              NEW_FREQ(K)=FREQ(ML-1)-L*(FREQ(ML-1)-FREQ(ML))/(J+1.0D0)
+              NEW_FREQ(K)=FREQ(ML-1)-L*(FREQ(ML-1)-FREQ(ML))/(J+1.0_LDP)
             END DO
-          ELSE IF(T1 .GT. 1.25D0*DELV_CONT .AND. FREQ(ML) .LE. NU_END_XRAY)THEN
-            J=T1/DELV_CONT/1.2D0
+          ELSE IF(T1 .GT. 1.25_LDP*DELV_CONT .AND. FREQ(ML) .LE. NU_END_XRAY)THEN
+            J=T1/DELV_CONT/1.2_LDP
             DO L=1,J
               K=K+1
               IF(K .GT. NCF_MAX)EXIT
-              NEW_FREQ(K)=FREQ(ML-1)-L*(FREQ(ML-1)-FREQ(ML))/(J+1.0D0)
+              NEW_FREQ(K)=FREQ(ML-1)-L*(FREQ(ML-1)-FREQ(ML))/(J+1.0_LDP)
             END DO
           END IF
           K=K+1
@@ -298,7 +299,7 @@
 !
 	OPEN(UNIT=LUOUT,FILE='CFDAT_OUT',STATUS='UNKNOWN')
 	  DO I=2,NCF
-	    WRITE(LUOUT,100)NEW_FREQ(I),2.998D+05*(NEW_FREQ(I+1)/NEW_FREQ(I)-1.0D0)
+	    WRITE(LUOUT,100)NEW_FREQ(I),C_KMS*(NEW_FREQ(I+1)/NEW_FREQ(I)-1.0_LDP)
 	  END DO
 100	  FORMAT(1X,F22.16,2X,ES14.4)
 	CLOSE(LUOUT)
@@ -314,7 +315,7 @@
 ! Ensure FREQ array is zeroed (as probably will use OBSF).
 !
 	DO I=1,NCF
-	  FREQ(I)=0.0D0
+	  FREQ(I)=0.0_LDP
 	END DO
 !
 	RETURN

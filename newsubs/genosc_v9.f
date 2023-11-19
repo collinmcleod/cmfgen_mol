@@ -124,10 +124,10 @@
 !
 ! Initialize arrays.
 !
-	EINA(1:N,1:N)=0.0D0
-	GAM2(1:N)=0.0D0
-	GAM4(1:N)=0.0D0
-	ARAD(1:N)=0.0D0
+	EINA(1:N,1:N)=0.0_LDP
+	GAM2(1:N)=0.0_LDP
+	GAM4(1:N)=0.0_LDP
+	ARAD(1:N)=0.0_LDP
 	OBSERVED_LEVEL(1:N)=.TRUE.
 !
 ! CUT_CNT is used to determine the number of transitions cut from the
@@ -288,7 +288,7 @@
 	    ELSE
 	      READ(STRING(L1+1:),*)STAT_WT(I),FEDGE(I)
 	    END IF
-	    FEDGE(I)=(IONIZATION_EN-FEDGE(I))*SPEED_LIGHT*1.0D-15
+	    FEDGE(I)=(IONIZATION_EN-FEDGE(I))*SPEED_LIGHT*1.0E-15_LDP
 	  END DO
 !
 ! Read in(i.e. skip) additional level names.
@@ -319,7 +319,7 @@
 !
 ! If GF_CUT is large, we assume we just want the ENERGY levels.
 !
-	IF(GF_CUT .GT. 1000.0D0 .OR. NTRET .EQ. 0)THEN
+	IF(GF_CUT .GT. 1000.0_LDP .OR. NTRET .EQ. 0)THEN
 	  CLOSE(LUIN)
 	  NTRET=0
 	  RETURN
@@ -395,7 +395,7 @@
 	  DO J=I+1,N
 	    EINA(J,I)=T1*EINA(I,J)*STAT_WT(I)/STAT_WT(J)
 	1     *( (FEDGE(I)-FEDGE(J))**2 )
-	    IF(EINA(I,J) .NE. 0.0D0)THEN
+	    IF(EINA(I,J) .NE. 0.0_LDP)THEN
 	      IF(FEDGE(I) .EQ. FEDGE(J))THEN
 	        WRITE(LUER,*)'Error -- transition has a frequency of zero'
 	        WRITE(LUER,*)'To fix, make a slight adjustment to one energy'
@@ -409,9 +409,9 @@
 	END DO
 !
 	IF(FORMAT_DATE .EQ. 'OLD')THEN
-	  GAM2(1:N)=0.0D0
-	  GAM4(1:N)=0.0D0
-	  ARAD(1:N)=0.0D0
+	  GAM2(1:N)=0.0_LDP
+	  GAM4(1:N)=0.0_LDP
+	  ARAD(1:N)=0.0_LDP
 	  DO I=1,N-1
 	    DO J=I+1,N
 	      ARAD(J)=ARAD(J)+EINA(J,I)
@@ -446,8 +446,8 @@
 	        IF(GF_ACTION .EQ. 'SET_NEG')THEN
 	          EINA(I,J)=-EINA(I,J)
 	        ELSE
-	          EINA(I,J)=0.0D0
-	          EINA(J,I)=0.0D0
+	          EINA(I,J)=0.0_LDP
+	          EINA(J,I)=0.0_LDP
 	        END IF
 	      END IF
 	    END DO
@@ -464,9 +464,9 @@
 	  DO I=1,N
 	    DO J=I+1,N
 	      IF(.NOT. OBSERVED_LEVEL(I) .OR. .NOT. OBSERVED_LEVEL(J))THEN
-	        IF(EINA(I,J) .NE. 0)THEN
-	          EINA(I,J)=0
-	          EINA(J,I)=0
+	        IF(EINA(I,J) .NE. 0.0_LDP)THEN
+	          EINA(I,J)=0.0_LDP
+	          EINA(J,I)=0.0_LDP
 	          CUT_CNT=CUT_CNT+1
 	        END IF
 	      END IF
@@ -481,8 +481,8 @@
 	    DO J=I+1,N
 	      IF(OBSERVED_LEVEL(I) .AND. OBSERVED_LEVEL(J))THEN
 	        IF(EINA(I,J) .NE. 0)THEN
-	          EINA(I,J)=0
-	          EINA(J,I)=0
+	          EINA(I,J)=0.0_LDP
+	          EINA(J,I)=0.0_LDP
 	          CUT_CNT=CUT_CNT+1
 	        END IF
 	      END IF
@@ -495,17 +495,17 @@
 	END IF
 !
 !
-	NTRET=0.0D0			!Number of principal transitions
+	NTRET=0			!Number of principal transitions
 	DO J=2,N
 	  DO I=1,J-1
-	    IF(EINA(I,J) .GT. 0)NTRET=NTRET+1
+	    IF(EINA(I,J) .GT. 0.0_LDP)NTRET=NTRET+1
 	  END DO
 	END DO
 	WRITE(LUOUT,'('' Final number of transitions found is: '',I6)')NTRET
 !
 	DO J=2,N
 	  DO I=1,J-1
-	    IF(EINA(I,J) .GT. 10.0D0)THEN
+	    IF(EINA(I,J) .GT. 10.0_LDP)THEN
 	      IF(FIRST_ERROR)THEN
 	         WRITE(LUER,'(/,A)')' Warning in GENOSC_V9 -- bad oscillator strengths?'
 	         WRITE(LUER,*)'Reading data from file '//TRIM(FILNAME)

@@ -111,6 +111,7 @@
 	INTEGER IZ,INE
 	INTEGER LMIN,LMAX,LMID
 	INTEGER INC,INC_SAV
+	INTEGER GRID_ID
 	INTEGER LST,LEND
 !
 	REAL(KIND=LDP) U			!Defined as FREQ/EDGE
@@ -143,18 +144,6 @@
 	IF(PHOT_ID .LT. 0)THEN
 	  IF(SET_TO_EDGE .AND. FREQ .EQ. 0.0D0)THEN
 	    PHOT(1:NLEVS)=GS_EDGE(1:NLEVS)+PD(ID)%EXC_FREQ(ABS(PHOT_ID))
-!	    DO I=1,NLEVS
-!	      IF(PHOT(I) .LE. 0.0D0)THEN
-!	        WRITE(6,*)'Error -- bound-free edge at less than zero freq'
-!	        DO J=1,NLEVS
-!	          WRITE(6,*)PHOT(J)
-!	        END DO
-!	        STOP
-!	      END IF
-!	    END DO	
-!	    DO I=1,NLEVS
-!	      IF(PHOT(I) .LT. 0.004D0)PHOT(I)=0.004D0
-!	    END DO
 	  ELSE
 	    WRITE(ERROR_LU(),*)'Invalid option list in SUB_PHOT_XzV[1]'
 	    STOP
@@ -183,7 +172,6 @@
 	DO I=1,NLEVS
 	  EDGE=GS_EDGE(I)+PD(ID)%EXC_FREQ(PHOT_ID)
 	  IF(FREQ .LT. EDGE .AND. SET_TO_EDGE)FREQ_VEC(I)=EDGE
-!	  IF(EDGE .LT. 0.004D0 .AND. SET_TO_EDGE)FREQ_VEC(I)=0.004D0
 	END DO
 !
 ! Check if cross-sections were just computed. If so, we use those value.
@@ -208,15 +196,16 @@
 ! when their destination level in the ion is unavailable.
 !
 	DO K=1,PD(ID)%NUM_PHOT_ROUTES
+	  GRID_ID=PD(ID)%PHOT_GRID(K)
 	  IF( PD(ID)%DO_PHOT(PHOT_ID,K) .OR.
-	1            (DO_PURE_EDGE .AND. K .EQ.PHOT_ID) )THEN
+	1            (DO_PURE_EDGE .AND. K .EQ. PHOT_ID) )THEN
 C
 C First do those parts not readily vectorized.
 C
 	    DO I=1,NLEVS
 	      EDGE = (GS_EDGE(I) + PD(ID)%EXC_FREQ(K))/EQUAL_COR_FAC
 	      IF(FREQ_VEC(I) .GE. EDGE)THEN
-	        TERM=PD(ID)%A_ID(I,K)
+	        TERM=PD(ID)%A_ID(I,GRID_ID)
 !
 ! Determine cross-section formulation, and do appropriate fitting procedure.
 ! We check whether tabulated format first, as this will become the usual
@@ -228,14 +217,14 @@ C
 ! level under consideration.
 !
 	        U=FREQ_VEC(I)/EDGE
-	        LMIN=PD(ID)%ST_LOC(TERM,K)
-	        IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 20 .OR.
-	1              PD(ID)%CROSS_TYPE(TERM,K) .EQ. 21)THEN
+	        LMIN=PD(ID)%ST_LOC(TERM,GRID_ID)
+	        IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 20 .OR.
+	1              PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 21)THEN
 !
 ! Check if in range of tabulation. If not, we extrapolate according to
 ! 1/nu^3.
 !
-	          N=PD(ID)%END_LOC(TERM,K)
+	          N=PD(ID)%END_LOC(TERM,GRID_ID)
 	          IF(U .LT. PD(ID)%NU_NORM(N))THEN
 !
 ! Most cross-sections are computed sequentially. Therefore we start from
@@ -245,17 +234,17 @@ C
 !
 	            INC=1
 	            INC_SAV=0	  		!Some value other than inc
-	            LMIN=PD(ID)%LST_LOC(I,K)
+	            LMIN=PD(ID)%LST_LOC(I,GRID_ID)
 	            LMAX=LMIN+1
 	            DO WHILE(INC .NE. INC_SAV)
 	              INC_SAV=INC
 	              IF(U .LT. PD(ID)%NU_NORM(LMIN))THEN
 	                LMIN=LMIN-INC
-	                LMIN=MAX(LMIN,PD(ID)%ST_LOC(TERM,K))
+	                LMIN=MAX(LMIN,PD(ID)%ST_LOC(TERM,GRID_ID))
 	                INC=INC+INC
 	              ELSE IF(U .GT. PD(ID)%NU_NORM(LMAX))THEN
 	                LMAX=LMAX+INC
-	                LMAX=MIN(LMAX,PD(ID)%END_LOC(TERM,K))
+	                LMAX=MIN(LMAX,PD(ID)%END_LOC(TERM,GRID_ID))
 	                INC=INC+INC
 	              END IF
 	            END DO
@@ -275,7 +264,7 @@ C
 !
 ! Hydrogenic transitions.
 !
-	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 2)THEN
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 2)THEN
 !
 ! N, LST and LEND must be integer - all other values are double precision.
 ! If it wasn't for the loop over l, this could be done in the main loop.
@@ -285,6 +274,12 @@ C
 	          N=NINT( PD(ID)%CROSS_A(LMIN) )
 	          LST=NINT( PD(ID)%CROSS_A(LMIN+1) )
 	          LEND=NINT( PD(ID)%CROSS_A(LMIN+2) )
+	          IF(LEND+1 .GT. N)THEN
+	            WRITE(6,*)'Error in SUB_PHOT_GEN -- invalid PHOT_PARAMS for TYPE 2'
+	            WRITE(6,*)'ID=',ID
+	            WRITE(6,*)'N,LST,LEND=',N,LST,LEND
+	            STOP
+	          END IF
 !
 	          X=LOG10(U)
 	          RJ=X/L_DEL_U
@@ -304,12 +299,12 @@ C
 	            SUM=SUM+(2*L+1)*(10.0D0**T2)
 		    J=RJ+1 		!Restore as corrupted	
 	          END DO
-	          SUM=SUM*( PD(ID)%NEF(I,K)/(N*PD(ID)%ZION) )**2
+	          SUM=SUM*( PD(ID)%NEF(I,GRID_ID)/(N*PD(ID)%ZION) )**2
 	          PHOT(I)=PHOT(I) + SUM/( (LEND-LST+1)*(LEND+LST+1) )
 !
 ! Hydrogenic transitions.
 !
-	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 8)THEN
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 8)THEN
 !
 ! N, LST and LEND must be integer - all other values are double precision.
 ! If it wasn't for the loop over l, this could be done in the main loop.
@@ -328,7 +323,7 @@ C
 	              WRITE(6,*)'N,LST,LEND=',N,LST,LEND
 	              WRITE(6,*)'ID=',ID,'NLEVS=',NLEVS
 	              WRITE(6,*)'PHOT_ID=',PHOT_ID,'SET_TO_EDGE=',SET_TO_EDGE
-	              WRITE(6,*)'TERM=',TERM,K,PD(ID)%CROSS_TYPE(TERM,K)
+	              WRITE(6,*)'TERM=',TERM,K,PD(ID)%CROSS_TYPE(TERM,GRID_ID)
 	              FLUSH(UNIT=6)
 	              STOP
 	            END IF
@@ -339,7 +334,7 @@ C
 	              WRITE(6,*)'N,LST,LEND=',N,LST,LEND
 	              WRITE(6,*)'ID=',ID,'NLEVS=',NLEVS
 	              WRITE(6,*)'PHOT_ID=',PHOT_ID,'SET_TO_EDGE=',SET_TO_EDGE
-	              WRITE(6,*)'TERM=',TERM,K,PD(ID)%CROSS_TYPE(TERM,K)
+	              WRITE(6,*)'TERM=',TERM,K,PD(ID)%CROSS_TYPE(TERM,GRID_ID)
 	              FLUSH(UNIT=6)
 	              STOP
 	            END IF
@@ -362,7 +357,7 @@ C
 	              SUM=SUM+(2*L+1)*(10.0D0**T2)
 		      J=RJ+1 		!Restore as corrupted	
 	            END DO
-	            SUM=SUM/PD(ID)%ZION/PD(ID)%ZION	!Ignore neff correction :( PD(ID)%NEF(I,K)/(N*PD(ID)%ZION) )**2
+	            SUM=SUM/PD(ID)%ZION/PD(ID)%ZION	!Ignore neff correction :( PD(ID)%NEF(I,GRID_ID)/(N*PD(ID)%ZION) )**2
 	            PHOT(I)=PHOT(I) + SUM/( (LEND-LST+1)*(LEND+LST+1) )
 	          END IF	!Above threshold
 !
@@ -376,8 +371,8 @@ C
 !
 	    DO I=1,NLEVS
 	      EDGE = (GS_EDGE(I) + PD(ID)%EXC_FREQ(K))/EQUAL_COR_FAC
-	      TERM=PD(ID)%A_ID(I,K)
-	      LMIN=PD(ID)%ST_LOC(TERM,K)
+	      TERM=PD(ID)%A_ID(I,GRID_ID)
+	      LMIN=PD(ID)%ST_LOC(TERM,GRID_ID)
 	      IF(FREQ_VEC(I) .GE. EDGE)THEN
 !
 ! Cross-sections are tabulated in terms of v/v_o
@@ -388,16 +383,16 @@ C
 ! We check whether tabulated format first, as this will become the usual
 ! fitting procedure.
 !
-	        IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 20 .OR.
-	1                   PD(ID)%CROSS_TYPE(TERM,K) .EQ. 21)THEN
+	        IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 20 .OR.
+	1                   PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 21)THEN
 !
 ! Check if in range of tabulation. If not, we extrapolate according to
 ! 1/nu^3.
 !
-	          N=PD(ID)%END_LOC(TERM,K)
+	          N=PD(ID)%END_LOC(TERM,GRID_ID)
 	          IF(U .GE. PD(ID)%NU_NORM(N))THEN
 	            PHOT(I)=PHOT(I)+CONV_FAC*PD(ID)%CROSS_A(N)*(PD(ID)%NU_NORM(N)/U)**3
-	            PD(ID)%LST_LOC(I,K)=N-1
+	            PD(ID)%LST_LOC(I,GRID_ID)=N-1
 	          ELSE
 !
 ! Do linear interpolation.
@@ -407,13 +402,13 @@ C
 	            T1=(PD(ID)%NU_NORM(LMAX)-U)/(PD(ID)%NU_NORM(LMAX)-PD(ID)%NU_NORM(LMIN))
 	            PHOT(I)=PHOT(I)+ CONV_FAC*(
 	1              (1.0D0-T1)*PD(ID)%CROSS_A(LMAX)+T1*PD(ID)%CROSS_A(LMIN)  )
-	            PD(ID)%LST_LOC(I,K)=LMIN
+	            PD(ID)%LST_LOC(I,GRID_ID)=LMIN
 	          END IF		!Outside table range?
 !
 !
 !
 ! Seaton fit.
-	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 1 .AND.
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 1 .AND.
 	1                             PD(ID)%CROSS_A(LMIN) .NE. 0)THEN
 	          RU=EDGE/FREQ_VEC(I)
 	          PHOT(I)=PHOT(I) + CONV_FAC*
@@ -422,7 +417,7 @@ C
 !
 !
 !
-	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 3)THEN
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 3)THEN
 !
 ! HYD_N_DATA contains the Bound-free gaunt factor.
 !
@@ -451,14 +446,14 @@ C
 ! NB: ZION is already include in ALPHA_BF
 !
 	          PHOT(I)=PHOT(I) + PD(ID)%ALPHA_BF*T1*PD(ID)%CROSS_A(LMIN)/
-	1                PD(ID)%NEF(I,K)/N/
-	1                ( (FREQ_VEC(I)*PD(ID)%NEF(I,K))**3 )
+	1                PD(ID)%NEF(I,GRID_ID)/N/
+	1                ( (FREQ_VEC(I)*PD(ID)%NEF(I,GRID_ID))**3 )
 !
 !
 ! Used for CIV recombination rates for s and p states.
 !(ref -Leibowitz J.Q.S.R.T 1972,12,299)
 !
-	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 4)THEN
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 4)THEN
 	          RU=EDGE/FREQ_VEC(I)
 	          T1=CONV_FAC*(  PD(ID)%CROSS_A(LMIN)+RU*( PD(ID)%CROSS_A(LMIN+1) +
 	1                   RU*(PD(ID)%CROSS_A(LMIN+2) + RU*(PD(ID)%CROSS_A(LMIN+3)+
@@ -466,7 +461,7 @@ C
 	          IF(T1 .GT. 0.0D0)PHOT(I)=PHOT(I)+T1
 !
 !
-	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 5)THEN
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 5)THEN
 !
 ! These fits are fits to the opacity cross section. Data taken from opacity
 ! project - Peach, Saraph, and Seaton (1988, C J. Phys. B: 21, 3669-3683)
@@ -483,7 +478,7 @@ C
 	          PHOT(I)=PHOT(I)+T1
 !
 !
-	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 6)THEN
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 6)THEN
 !
 ! This type is for the Hummer fits to the Opacity cross sections of HeI.
 ! See HEI_PHOT_OPAC.
@@ -506,7 +501,7 @@ C
 !
 ! Modified seaton fit.
 !
-	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 7 .AND.
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 7 .AND.
 	1                             PD(ID)%CROSS_A(LMIN) .NE. 0)THEN
 !	          RU=EDGE/(FREQ_VEC(I)+PD(ID)%CROSS_A(LMIN+3))
 	          RU=(EDGE+PD(ID)%CROSS_A(LMIN+3))/FREQ_VEC(I)
@@ -519,9 +514,9 @@ C
 ! We assume all ionizations are to the ground state. Previously we read in
 ! an additional offset, but this has now been superceded.
 !
-	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 9)THEN
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 9)THEN
 	          LMIN=LMIN-8
-	          DO J=1,(PD(ID)%END_LOC(TERM,K)-PD(ID)%ST_LOC(TERM,K)+1)/8
+	          DO J=1,(PD(ID)%END_LOC(TERM,GRID_ID)-PD(ID)%ST_LOC(TERM,GRID_ID)+1)/8
 	            LMIN=LMIN+8
 	            IF(J .NE. 1)EDGE=0.241798840766D0*PD(ID)%CROSS_A(LMIN+2)
 	            IF(FREQ_VEC(I) .GE. EDGE)THEN
@@ -535,7 +530,7 @@ C
 !
 !
 !
-	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 30)THEN
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 30)THEN
 	          T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION	!# of elec. in species.
 	          T1=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,IZERO,IZERO,L_FALSE,L_TRUE)
 	          IF(T1 .GT. 0)PHOT(I)=PHOT(I)+T1
@@ -544,7 +539,7 @@ C
 	          WRITE(6,*)GS_EDGE,NLEVS,PHOT_ID
 	          STOP
 !
-	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,K) .EQ. 31)THEN
+	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 31)THEN
 	          T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION	!# of elec. in species.
 	          N=NINT(PD(ID)%CROSS_A(LMIN))
 	          L=NINT(PD(ID)%CROSS_A(LMIN))
@@ -625,6 +620,8 @@ C
 	    PHOT(1:NLEVS)=PHOT(1:NLEVS)+T2
 	  END IF
 	END IF
+!
+	PHOT(1:NLEVS)=PHOT(1:NLEVS)*PD(ID)%SCALE_FAC(PHOT_ID)
 !
 ! Store values in case they required again. This will speed up the computation.
 !

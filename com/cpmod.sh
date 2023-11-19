@@ -50,41 +50,49 @@ cp $1/GAMMAS             $2/GAMMAS_IN
 cp $1/MODEL_SPEC         $2/
 
 echo " "
-echo " Copyed startup files"
+echo " Copied startup files"
 
 if(-e $1/batch_ins.sh)then
   cp $1/batch_ins.sh          $2/
   echo " "
-  echo " Copyed batch_ins.sh"
+  echo " Copied batch_ins.sh"
 endif
 
 if(-e $1/RVSIG_COL)then
   cp $1/RVSIG_COL          $2/
   echo " "
-  echo " Copyed RVSIG_COL: This file may need to be edited for a new model"
+  echo " Copied RVSIG_COL: This file may need to be edited for a new model"
 endif
 
 if(-e $1/HYDRO_DEFAULTS)then
   cp $1/HYDRO_DEFAULTS     $2/
   echo " "
-  echo " Copyed HYDRO_DEFAULTS: needed for calculations of the hydro structure"
+  echo " Copied HYDRO_DEFAULTS: needed for calculations of the hydro structure"
   echo " Remember to edit the number of iterations"
 endif
 
 if(-e $1/ROSSELAND_LTE_TAB)then
   cp $1/ROSSELAND_LTE_TAB  $2/
   echo " "
-  echo " Copyed ROSSELAND_LTE_TAB: needed for calculations of the hydro structure"
+  echo " Copied ROSSELAND_LTE_TAB: needed for calculations of the hydro structure"
 endif
 
 if(-e $1/RDINR)then
   cp $1/RDINR $2/
-  echo "    Copyed RDINR"
+  echo " "
+  echo "    Copied RDINR"
 endif
 
 if(-e $1/ADJUST_R_DEFAULTS)then
   cp $1/ADJUST_R_DEFAULTS $2/
-  echo "    Copyed ADJUST_R_DEFAULTS"
+  echo " "
+  echo "    Copied ADJUST_R_DEFAULTS"
+endif
+
+if(-e $1/IT_SPECIFIER)then
+  cp $1/IT_SPECIFIER  $2/
+  echo " "
+  echo " Copied IT_SPECIFIER"
 endif
 
 #If not a supernovae model, we exit.
@@ -106,35 +114,35 @@ endif
 if(-e $1/NUC_DECAY_DATA)then
   cp $1/NUC_DECAY_DATA $2/
   echo " Copying SN data"
-  echo "    Copyed NU_DECAY_DATA"
+  echo "    Copied NU_DECAY_DATA"
 else
   echo "    *** Unable to copy NU_DECAY DATA"
 endif
 
 if(-e $1/JH_AT_OLD_TIME)then
   cp $1/JH_AT_OLD_TIME $2/
-  echo "    Copyed JH_AT_OLD_TIME"
+  echo "    Copied JH_AT_OLD_TIME"
 else
   echo "    *** Unable to copy JH_AT_OLD_TIME"
 endif
 
 if(-e $1/JH_AT_OLD_TIME_INFO)then
   cp $1/JH_AT_OLD_TIME_INFO $2/
-  echo "    Copyed JH_AT_OLD_TIME_INFO"
+  echo "    Copied JH_AT_OLD_TIME_INFO"
 else
   echo "    *** Unable to copy JH_AT_OLD_TIME_INFO"
 endif
 
 if(-e $1/OLD_MODEL_DATA)then
   cp $1/OLD_MODEL_DATA $2/
-  echo "    Copyed OLD_MODEL_DATA"
+  echo "    Copied OLD_MODEL_DATA"
 else
   echo "    *** Unable to copy OLD_MODEL_DATA"
 endif
 
 if(-e $1/SN_HYDRO_DATA)then
   cp $1/SN_HYDRO_DATA $2/SN_HYDRO_DATA
-  echo "    Copyed SN_HYDRO_DATA"
+  echo "    Copied SN_HYDRO_DATA"
 else
   echo "    *** Unable to copy SN_HYDRO_DATA"
 endif
@@ -142,13 +150,13 @@ endif
 if(-e $1/arnaud_rothenflug.dat)then
   cp $1/arnaud_rothenflug.dat  $2/
   echo " "
-  echo " Copyed arnaud_rothenflug.dat"
+  echo " Copied arnaud_rothenflug.dat"
 endif
 
-if(-e $1/IT_SPECIFIER)then
-  cp $1/IT_SPECIFIER  $2/
+if(-e $1/current_nonlocal_decay_energy.dat)then
+  cp $1/current_nonlocal_decay_energy.dat  $2/
   echo " "
-  echo " Copyed IT_SPECIFIER"
+  echo " Copied current_nonlocal_decay_energy.dat"
 endif
 
 SKIPSN:
@@ -158,6 +166,7 @@ cd $2
 # Now rename the *OUT files to *IN
 
 out2in
+
 echo " "
 echo " Renamed *OUT files to *_IN"
 echo " "

@@ -10,6 +10,7 @@
 	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
+! Altered: 8-Nov-2023: Use fortran RANGE function, and changed MAX_LOG_LTE_POP to MAX_LN_LTE_POP.
 ! Altered: 5-Apr-2011: MAX_LOG_LTE_POP parameter introduced.
 !                      Based on LTEPOP_SL_V1 (original coding early 2011)
 !                      Call changed as LOG_C2LTE variable introduced.
@@ -44,7 +45,14 @@
 !
 	INTEGER I,K
 	REAL(KIND=LDP) X,Y,RGU
-	REAL(KIND=LDP), PARAMETER :: MAX_LOG_LTE_POP=3000.0D0
+	REAL(KIND=LDP) MAX_LN_LTE_POP
+!
+! RANGE retruns the maximum exponet range for the FLOATING POINT variable. We 
+!   multipley by 10 as we compare with natural logarithms. We subtract
+!   10 as an extra precaution.
+!
+	X=10.0_LDP
+	MAX_LN_LTE_POP=RANGE(X)*LOG(X)-10
 !
 ! Compute the occupation probabilities.
 !
@@ -60,7 +68,7 @@
 	 RGU=LOG(RGU)
 	 DO I=1,NC2
 	   LOG_C2LTE(I,K)=LOG(W_C2(I,K)*GC2(I))+EDGEC2(I)*X+RGU
-	   IF(LOG_C2LTE(I,K) .LE. MAX_LOG_LTE_POP)C2LTE(I,K)=EXP(LOG_C2LTE(I,K))
+	   IF(LOG_C2LTE(I,K) .LE. MAX_LN_LTE_POP)C2LTE(I,K)=EXP(LOG_C2LTE(I,K))
 	 END DO
 	END DO
 !

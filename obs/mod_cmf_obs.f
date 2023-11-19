@@ -27,7 +27,7 @@
 !
 ! Maximum number of photoionization routes for each species.
 !
-	INTEGER, PARAMETER :: NPHOT_MAX=4
+	INTEGER, PARAMETER :: NPHOT_MAX=5
 !
 ! Actual number of ions in calculation. Stored sequentially.
 !
@@ -164,7 +164,7 @@
 !
 ! Indicates generic ionization names.
 !
-	DATA GEN_ION_ID /'MI','I','2','III','IV','V',
+	DATA GEN_ION_ID /'0','I','2','III','IV','V',
 	1                'SIX','SEV','VIII','IX','X','XI','XII',
 	1                'XIII','XIV','XV','XSIX','XSEV','X8','X9','XX'/
 !

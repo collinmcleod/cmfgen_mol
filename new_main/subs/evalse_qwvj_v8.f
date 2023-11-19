@@ -15,6 +15,7 @@
 	USE STEQ_DATA_MOD
 	IMPLICIT NONE
 !
+! Altered 08-Nov-2023 - Replaced STEQ_T_EHB by SE(ID)%T_EHB to allow  parallelization.
 ! Altered 13-Jul-2019 - Changed to V8
 !                         WCR, JREC_CR,JPHOT_CR added to call.
 !                         Update equation for Electron  Energy Balance
@@ -124,7 +125,7 @@
 !
 	      T1=WSE(I,J)*(HN(I,J)*JPHOT_CR(J)-REV_HNST*JREC_CR(J))
 	      T2=WCR(I,J)*(HN(I,J)*JPHOT(J)-REV_HNST*JREC(J))
-	      STEQ_T_EHB(J)=STEQ_T_EHB(J)+PC*(T1+T2)
+	      SE(ID)%T_EHB(J)=SE(ID)%T_EHB(J)+PC*(T1+T2)
 	      SE(ID)%QFV_R_EHB(I,J)=SE(ID)%QFV_R_EHB(I,J)+WCR(I,J)*REV_HNST
 	      SE(ID)%QFV_P_EHB(I,J)=SE(ID)%QFV_P_EHB(I,J)+WCR(I,J)*HN(I,J)
 	    END IF

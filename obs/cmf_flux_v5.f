@@ -86,7 +86,7 @@
 !
 ! Open output file for all errors and comments.
 !
-        LUER=ERROR_LU()
+        LUER=ERROR_LU(); IOS=0
         CALL GEN_ASCI_OPEN(LUER,'OUT_FLUX','UNKNOWN','APPEND',' ',IZERO,IOS)
         IF(IOS .NE. 0)THEN
           WRITE(LUER,*)'Error opening OUT_FLUX in CMF_FLUX_V5, IOS=',IOS

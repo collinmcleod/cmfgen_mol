@@ -84,7 +84,7 @@
 	INTEGER NCF
 	LOGICAL, PARAMETER :: IMPURITY_CODE=.FALSE.
 !
-	CHARACTER(LEN=12), PARAMETER :: PRODATE='16-June-2023'		!Must be changed after alterations
+	CHARACTER(LEN=12), PARAMETER :: PRODATE='10-Nov-2023'		!Must be changed after alterations
 !
 ! 
 !
@@ -789,6 +789,8 @@
 	  STOP
 	END IF
 !
+	CALL ALLOCATE_WSE_ARRAYS(ND)
+!
 ! Read in data for treating non-thermal ionization.
 !
 	IF(TREAT_NON_THERMAL_ELECTRONS)THEN
@@ -830,15 +832,15 @@
 	  WRITE(LUMOD,FMT)NUM_BNDS
 !	
 	  WRITE(LUMOD,'()')
-	  CALL RITE_ATMHD_V3(LUMOD)
+	  CALL RITE_ATMHD_V4(LUMOD)
 !
 	  DO ID=1,NUM_IONS-1
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      ISPEC=SPECIES_LNK(ID)
-	      CALL RITE_ATMDES_V3( ATM(ID)%XzV_PRES, ATM(ID)%NXzV,
+	      CALL RITE_ATMDES_V4( ATM(ID)%XzV_PRES, ATM(ID)%NXzV,
 	1          ATM(ID)%ZXzV, ATM(ID)%EQXzV, ATM(ID)%XzVLEVNAME_F,
 	1          ATM(ID)%NXzV_F, ATM(ID)%GIONXzV_F, ATM(ID)%N_XzV_PHOT,
-	1          AT_NO(ISPEC),AT_MASS(ISPEC),LUMOD,ION_ID(ID))
+	1          AT_NO(ISPEC),AT_MASS(ISPEC),ID,ISPEC,LUMOD,ION_ID(ID))
 	    END IF
 	  END DO
 !
@@ -1193,6 +1195,7 @@
 !
 	CALL DETERMINE_NSE(NION,XRAYS)
         CALL CREATE_IV_LINKS_V2(NT,NION)
+	CALL WR_LEVEL_LINKS
 !
 ! Allocate memory for STEQ and BA arrays.
 !
@@ -1587,6 +1590,7 @@
 	  SE(ID)%STEQ   =0.0D0
 	  SE(ID)%BA     =0.0D0
 	  SE(ID)%BA_PAR =0.0D0
+	  SE(ID)%T_EHB =0.0D0
 	END FORALL
 !$OMP END PARALLEL WORKSHARE
 	CALL TUNE(ITWO,'ZBA')
@@ -1790,10 +1794,9 @@
 !
 ! Compute continuum opacity and emissivity at the line frequency.
 !
-	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
+	     CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONLY)
-!	    INCLUDE 'OPACITIES_V4.INC'
 !
 ! Solve for the continuous radiation field.
 !
@@ -2048,6 +2051,11 @@
 	  END IF
 	END DO
 !
+	ETA(1:ND)=1.0E-10_LDP; CHI(1:ND)=1.0E-10_LDP; ESEC(1:ND)=1.0E-11_LDP
+	ETA_CONT(1:ND)=1.0E-10_LDP; CHI_CONT(1:ND)=1.0E-10_LDP
+	ZETA(1:ND)=1.0E-10_LDP; THETA(1:ND)=0.1E0_LDP; CHI_SCAT(1:ND)=1.0E-10_LDP
+	SOURCE(1:ND)=1.0E-10_LDP; ETA_NOSCAT(1:ND)=1.0E-10_LDP; CHI_NOSCAT(1:ND)=1.0E-10_LDP
+!
 ! Enter loop for each continuum frequency.
 !
 	SUM_BA=0.0D0
@@ -2156,12 +2164,20 @@
 !
 ! Compute opacity and emissivity.
 !
-	    CALL TUNE(IONE,'C_OPAC')
+	    IF(USE_FIXED_J)THEN
+	      IF(COMPUTE_NEW_CROSS)THEN
+                T1=-HDKT*CONT_FREQ
+                EMHNUKT_CONT(1:ND)=EXP(T1/T(1:ND))
+                T1=-HDKT*FL
+                EMHNUKT(1:ND)=EXP(T1/T(1:ND))
+	      END IF
+	    ELSE
+	      CALL TUNE(IONE,'C_OPAC')
 	      CALL COMP_OPAC(POPS,NU_EVAL_CONT,FQW,
 	1                FL,CONT_FREQ,FREQ_INDX,NCF,
 	1                SECTION,ND,NT,LST_DEPTH_ONlY)
-!	    INCLUDE 'OPACITIES_V4.INC'
-	    CALL TUNE(ITWO,'C_OPAC')
+	      CALL TUNE(ITWO,'C_OPAC')
+	    END IF
 !
 ! Since resonance zones included, we must add the line opacity and
 ! emissivity to the raw continuum values. We first save the pure continuum
@@ -2319,7 +2335,7 @@
 !
 	IF(FINAL_CONSTANT_CROSS)THEN
 	  CALL TUNE(IONE,'EVALSE')
-!!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(ID_SAV)
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(ID_SAV)
 	  DO ID=1,NUM_IONS-1
 	    ID_SAV=ID
 	    IF(ATM(ID)%XzV_PRES)THEN
@@ -2333,7 +2349,7 @@
 	      END DO
 	    END IF
 	  END DO
-!!$OMP END PARALLEL DO
+!$OMP END PARALLEL DO
 	  CALL TUNE(ITWO,'EVALSE')
 	END IF
 !
@@ -2760,9 +2776,7 @@
 ! Needs revising.
 !
 !
-! Needs revising.
-!
-	IF(USE_ELEC_HEAT_BAL .OR. COMP_STEQ_T_EHB)THEN
+	IF( .NOT. USE_FIXED_J .AND. (USE_ELEC_HEAT_BAL .OR. COMP_STEQ_T_EHB) )THEN
 	  CALL TUNE(IONE,'FF_EB_COR')
 	  IF(ML .EQ. 1)WRITE(6,*)'Free-free correction may need revising'
 	  CALL  COMP_FREE_FREE_V2(CHI,ETA,VCHI,VETA,CONT_FREQ,FL,
@@ -2774,7 +2788,7 @@
 	  CALL TUNE(ITWO,'FF_EB_COR')
 	END IF
 !
-	IF(USE_ELEC_HEAT_BAL .AND. COMPUTE_BA .AND. .NOT. LAMBDA_ITERATION)THEN
+	IF(.NOT. USE_FIXED_J .AND. USE_ELEC_HEAT_BAL .AND. COMPUTE_BA .AND. .NOT. LAMBDA_ITERATION)THEN
 	  CALL BA_EHB_FF_UPDATE_V1(VJ,VCHI,VETA,
 	1              ETA,CHI,T,POPS,RJ,
 	1              FQW(ML),COMPUTE_NEW_CROSS,FINAL_CONSTANT_CROSS,DO_SRCE_VAR_ONLY,
@@ -3042,10 +3056,11 @@
 	  CALL WRITV(RLUMST,ND,'Luminosity',LU_FLUX)
 	CLOSE(UNIT=LU_FLUX)
 	CALL TUNE(ITWO,'MLCF')
-	IF(.NOT. LAMBDA_ITERATION .AND. .NOT. LST_ITERATION)THEN
+!	IF(.NOT. LAMBDA_ITERATION .AND. .NOT. LST_ITERATION .AND. .NOT. USE_FIXED_J)THEN
+	IF(.NOT. LAMBDA_ITERATION .AND. .NOT. USE_FIXED_J)THEN
 	  CALL CHECK_SPEC_CONV(OBS_FLUX,OBS_FREQ,T1,T2,CHK,N_OBS)
+	  WRITE(6,*)'Exited CHECK_SPEC_CONV';FLUSH(UNIT=6)
 	END IF
-	WRITE(6,*)'Exited CHECK_SPEC_CONV';FLUSH(UNIT=6)
 !
 ! Compute ROSSELAND and FLUX mean opacities. These MEAN opacities DO NOT
 ! include the effect of clumping. Compute the respective optical depth scales;
@@ -3122,7 +3137,7 @@
 	1      ROSS_MEAN(I),INT_dBdT(I),FLUX_MEAN(I),ESEC(I),
 	1      T2,T3,TC(2),TC(3),1.0D-10*ROSS_MEAN(I)/DENSITY(I),V(I)
 	  END DO
-	  IF(T1 .LT. 30.0D0 .AND. .NOT. SN_MODEL)THEN
+	  IF(T1 .LT. 30.0D0 .AND. .NOT. SN_MODEL .AND. .NOT. USE_FIXED_J)THEN
 	    WRITE(6,*)'This model does not extend sufficiently deeply to guarantee the accuracy of'
 	    WRITE(6,*)' the inner boundary condition. You need to adjust you model so that the'
 	    WRITE(6,*)' minimum optical depth is 50, and preferably 100'
@@ -3150,7 +3165,7 @@
 	    END IF
 	  END IF
 !
-	  IF(CHK .AND. COMP_GREY_LST_IT)THEN
+	  IF(CHK .AND. COMP_GREY_LST_IT .AND. .NOT. USE_FIXED_J)THEN
 	    OPEN(UNIT=LUIN,FILE='GREY_SCL_FACOUT',STATUS='UNKNOWN')
 	      WRITE(LUIN,'(A)')'!'
 	      WRITE(LUIN,'(A,8X,A,7X,A,7X,A,6X,A)')'!','Log(Tau)','T/T(grey)','T(10^4 K)','L'
@@ -3872,7 +3887,7 @@
 ! or the BA matrix. We also do not output th populations. This can be done
 ! quickly by setting FLUX_CAL_ONLY=.FALSE. and putting N_ITS=0.
 !
-	 IF(FLUX_CAL_ONLY .AND. RD_COHERENT_ES)THEN
+	IF(FLUX_CAL_ONLY .AND. RD_COHERENT_ES)THEN
 	   WRITE(LUER,*)'Stopping CMFGEN as finished FLUX calculation.'
 	   WRITE(LUER,*)'For a FLUX calculation we do 1 iteration only'
 	   STOP
@@ -3906,6 +3921,9 @@
 !
 	CALL WR2D_V2(STEQ_T,IONE,ND,'Radiative Equlibrium Equation','&',L_TRUE,LU_SE)
 	IF(USE_ELEC_HEAT_BAL .OR. COMP_STEQ_T_EHB)THEN
+	  DO ID=1,NION
+	    STEQ_T_EHB=STEQ_T_EHB+SE(ID)%T_EHB
+	  END DO
 	  CALL WR2D_V2(STEQ_T_EHB,IONE,ND,'Electron Energy Balance Equation','%',L_TRUE,LU_SE)
 	ELSE
 	  STEQ_T_EHB=0.0D0

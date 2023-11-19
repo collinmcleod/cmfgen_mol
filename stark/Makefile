@@ -27,7 +27,7 @@ $(LIB2) : $(LIB2)($(NEWF))
 # General rules to make obects in a library and object files
 
 $(LIB)(%.o) : %.f
-	$(F90) -c $(FG)  $<
+	$(F90) -c $(FD)  $<
 	ar $(AR_OPTION) $(LIB) $*.o
                            
 $(LIB2)(%.o) : %.f90

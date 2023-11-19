@@ -2,7 +2,7 @@
 
 include ../../Makefile_definitions
 
-OPTION=$(FD)
+OPTION=$(FG)
 
 # Library where object files will/are stored
 
@@ -15,6 +15,7 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(adjust_cmat_to_lte.o)\
       $(LIB)(adjust_sn_r_grid.o)\
       $(LIB)(adjust_pops.o)\
+      $(LIB)(allocate_wse_arrays.o)\
       $(LIB)(auto_clump_rev.o)\
       $(LIB)(auto_add_ion.o)\
       $(LIB)(ba_update_v7.o)\
@@ -90,7 +91,8 @@ OBJ = $(LIB)(add_par_to_full_v2.o)\
       $(LIB)(write_cmat.o)\
       $(LIB)(write_seq_time_file_v1.o)\
       $(LIB)(update_ba_for_line.o)\
-      $(LIB)(wr_asci_steq.o)
+      $(LIB)(wr_asci_steq.o)\
+      $(LIB)(wr_level_links.o)
 
 all : $(LIB) XNUC XAUTO XCHG XTWO XNON
 	cp -f $(INSTALL_DIR)perm_mod_file jnk.mod

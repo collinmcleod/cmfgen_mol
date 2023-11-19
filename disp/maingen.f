@@ -89,7 +89,7 @@
 !
 	COMMON/CONSTANTS/ CHIBF,CHIFF,HDKT,TWOHCSQ
 	COMMON/LINE/ OPLIN,EMLIN
-	DOUBLE PRECISION CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
+	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ,OPLIN,EMLIN
 !
 ! 
 !
@@ -420,10 +420,10 @@
 	INTEGER, PARAMETER :: ITEN=10
 	INTEGER, PARAMETER :: ITHREE=3
 !
-	REAL(KIND=LDP), PARAMETER :: RZERO=0.0D0
-	REAL(KIND=LDP), PARAMETER :: RONE=1.0D0
-	REAL(KIND=LDP), PARAMETER :: RTWO=2.0D0
-	REAL(KIND=LDP), PARAMETER :: RTHREE=3.0D0
+	REAL(KIND=LDP), PARAMETER :: RZERO=0.0_LDP
+	REAL(KIND=LDP), PARAMETER :: RONE=1.0_LDP
+	REAL(KIND=LDP), PARAMETER :: RTWO=2.0_LDP
+	REAL(KIND=LDP), PARAMETER :: RTHREE=3.0_LDP
 !
 ! 
 !
@@ -436,7 +436,7 @@
 	DPTH_INDX=ND/2
 	COL_OPT='CL'
 	FILE_FORMAT='OLD'
-	IC=0.0D0
+	IC=RZERO
 !
 ! NB: ZERO_FLUX condition is equivalent to DIF=.TRUE. and DBB=0.
 !     Thus, for routine compatibility, we set DBB=0 when DIF is false.
@@ -482,7 +482,7 @@
 ! GREY option) compute it.
 !
 	GREY_COMP=.FALSE.
-	IF(CMFGEN_TGREY(ND) .EQ. 0.0D0)THEN
+	IF(CMFGEN_TGREY(ND) .EQ. RZERO)THEN
 	  GREY_COMP=.FALSE.
 	ELSE
 	  GREY_COMP=.TRUE.
@@ -494,22 +494,22 @@
 	FILL_FAC_XRAYS=1.0D-100
 	T_SHOCK=300.0D0
 	V_SHOCK=200.0D0
-	FILL_VEC_SQ(:)=0.0D0
+	FILL_VEC_SQ(:)=RZERO
 !
 	LEVEL_DISSOLUTION=.TRUE.
 	PI=FUN_PI()
-	DIST_KPC=1.0D0
+	DIST_KPC=RONE
 	VSM_DIE_KMS=3000.0D0
 	REXT_COMPUTED=.FALSE.
 !
 	LST_DEPTH_ONLY=.FALSE.
 !
-	LAM_ST=0.0D0
+	LAM_ST=RZERO
 	LAM_EN=1.0D+06
 	TAUSOB_DEF='1000'
 !
-	ZERO_VEC(:)=0.0D0
-	UNIT_VEC(:)=1.0D0
+	ZERO_VEC(:)=RZERO
+	UNIT_VEC(:)=RONE
 !
 ! Conversion factor from Kev to units of 10^15 Hz.
 ! Conversion factor from Angstroms to units of 10^15 Hz.
@@ -1021,9 +1021,9 @@
 ! and DDBBDT= dB/dTR .
 !
 	  T1=HDKT*FL/T(ND)
-	  T2=1.0D0-EMHNUKT(ND)
+	  T2=RONE-EMHNUKT(ND)
 	  DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
-	  IF(.NOT. DIF)DBB=0.0D0
+	  IF(.NOT. DIF)DBB=RZERO
 !
 ! Solve for the continuum radiation field at the line frequency.
 !
@@ -1185,7 +1185,7 @@
 	      SOURCE(I)=ZETA(I)
 	    END DO
 	    INACCURATE=.TRUE.
-	    HBC=0.99D0; HBC_S=0.0D0
+	    HBC=0.99D0; HBC_S=RZERO
 	    THK_CONT=.FALSE.
 	    DO WHILE(INACCURATE)
 	      CALL FQCOMP_IBC_V2(TA,TB,TC,XM,DTAU,R,Z,P,Q,FEXT,
@@ -1196,7 +1196,7 @@
 	1            INBC,THK_CONT,INNER_BND_METH,ND,METHOD)
 	      S1=ZETA(1)+THETA(1)*RJ(1)
 	      INACCURATE=.FALSE.
-	      T1=0.0D0
+	      T1=RZERO
 	      DO I=1,ND
 	       T1=MAX(ABS(FOLD(I)-FEXT(I)),T1)
 	       FOLD(I)=FEXT(I)
@@ -1256,7 +1256,7 @@
 !
 	ELSE IF(XOPT .EQ. 'XLOGRM1')THEN
 	  DO I=1,ND-1
-	    XV(I)=LOG10(R(I)/R(ND)-1.0D0)
+	    XV(I)=LOG10(R(I)/R(ND)-RONE)
 	  END DO
 	  XV(ND)=XV(ND-1)-1
 	  XAXIS='Log(r/R\d*\u)-1'
@@ -1270,7 +1270,7 @@
 	    END DO
 	    XAXIS='r/R\d*\u'
 	  ELSE
-	    T1=1.0D0
+	    T1=RONE
 	    XAXIS='r(10\u10 \dcm)'
 	    IF(R(ND) .GT. 1.0D+04)THEN
 	      T1=1.0D+04
@@ -1429,7 +1429,7 @@
 	ELSE IF(XOPT .EQ. 'XCAKT')THEN
 	  CALL USR_HIDDEN(T1,'VTH','10.0','Thermal doppler velocity (km/s)')
 	  DO I=1,ND
-	    T2=(SIGMA(I)+1.0D0)*V(I)/R(I)
+	    T2=(SIGMA(I)+RONE)*V(I)/R(I)
 !	    XV(I)=LOG10(6.65D-15*T1/T2)
 	    XV(I)=LOG10(6.65D-15*ED(I)*CLUMP_FAC(I)*T1/T2)
 	  END DO
@@ -1604,7 +1604,7 @@
 !
 	ELSE IF(XOPT .EQ. 'DIE')THEN
 	  DO I=1,ND
-	    ZNET(I)=1.0D0-RJ(I)*CHIL(I)/ETAL(I)
+	    ZNET(I)=RONE-RJ(I)*CHIL(I)/ETAL(I)
 	  END DO
 	  WRITE(LU_NET,40001)'Znet for DIELECTRONIC transition'
 	  WRITE(LU_NET,40002)LEV(1)
@@ -1653,7 +1653,7 @@
 	1                LUM,PLT_J,PLT_H,PLT_LF,PLT_FM,
 	1                LEV,10,NLF,NC,NP,ND)
 	        DO I=1,ND
-	          ZNET(I)=1.0D0-JBAR(I)*CHIL(I)/ETAL(I)
+	          ZNET(I)=RONE-JBAR(I)*CHIL(I)/ETAL(I)
 	        END DO
 	      YAXIS=' '
 	      IF(PLT_J)YAXIS='R\u2\dJ'
@@ -1686,7 +1686,7 @@
 	1                  EW,CONT_INT,LINE_BL,FULL_ES,
 	1                  JQW,HMIDQW,
 	1                  PF,LINE_PRO,LFQW,ERF,FL,DIF,DBB,IC,
-	1                  1.0D0,THK_LINE,THK_CONT,NLF,NC,NP,ND,METHOD)
+	1                  RONE,THK_LINE,THK_CONT,NLF,NC,NP,ND,METHOD)
 	      ELSE
 	        CALL FORMSOL(ETA_WITH_ES,CHI,CHI_SCAT,CHIL,ETAL,V,SIGMA,R,P,
 	1                  JBAR,ZNET,TA,TB,TC,.FALSE.,
@@ -1694,7 +1694,7 @@
 	1                  EW,CONT_INT,LINE_BL,FULL_ES,
 	1                  JQW,HMIDQW,
 	1                  PF,LINE_PRO,LFQW,ERF,FL,DIF,DBB,IC,
-	1                  1.0D0,THK_LINE,THK_CONT,NLF,NC,NP,ND,METHOD)
+	1                  RONE,THK_LINE,THK_CONT,NLF,NC,NP,ND,METHOD)
 	      END IF
 	      WRITE(T_OUT,180)EW,CONT_INT,LAMVACAIR(FL)
 180	      FORMAT(1X,'EW=',1PE14.6,3X,'Ic=',E14.6,3X,'Lam=',E14.6)
@@ -1895,13 +1895,15 @@
 	  INCLUDE 'EVAL_LTE_FULL.INC'
 !
 	ELSE IF(XOPT .EQ. 'WRDC' .OR. XOPT .EQ. 'WRPOP' .OR.
-	1       XOPT .EQ. 'WRLTE' .OR. XOPT .EQ. 'WRTX')THEN
+	1       XOPT .EQ. 'WRLTE' .OR. XOPT .EQ. 'WRTX' .OR. XOPT .EQ. 'WRREC')THEN
 	  IF(XOPT .EQ. 'WRDC')THEN
 	    TYPE='DC'
 	  ELSE IF(XOPT .EQ. 'WRLTE')THEN
 	    TYPE='LTE'
 	  ELSE IF(XOPT .EQ. 'WRTX')THEN
 	    TYPE='TX'
+	  ELSE IF(XOPT .EQ. 'WRREC')THEN
+	    TYPE='REC'
 	  ELSE
 	    TYPE='POP'
 	  END IF
@@ -1920,7 +1922,7 @@
 	      DO_DPTH(LEV(I):LEV(I+1))=.FALSE.
 	    END IF
 	  END DO
-	  T2=0.0D0
+	  T2=RZERO
 	  CALL USR_HIDDEN(T2,'ROFFSET','0.0D0','Value to subtract from R')
 !
 ! Write out departure coefficients to ASCI file.
@@ -1933,8 +1935,8 @@
 	    DO ID=1,NUM_IONS
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        FILENAME=TRIM(ION_ID(ID))//TRIM(STRING)
-	        CALL NEW_WRITEDC_V5(ATM(ID)%XzVLTE_F,ATM(ID)%LOG_XzVLTE_F,ATM(ID)%W_XzV_F,
-	1             ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%NXzV_F,
+	        CALL NEW_WRITEDC_V6(ATM(ID)%XzVLTE_F,ATM(ID)%LOG_XzVLTE_F,ATM(ID)%W_XzV_F,
+	1             ATM(ID)%AXzV_F,ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%NXzV_F,
 	1             ATM(ID)%DXzV_F,ATM(ID)%GIONXzV_F,IONE,TA,T,ED,V,CLUMP_FAC,
 	1             DO_DPTH,LUM,ND,FILENAME,TYPE,IONE)
 	      END IF
@@ -1943,8 +1945,8 @@
 	    DO ID=1,NUM_IONS
 	      IF(ATM(ID)%XzV_PRES)THEN
 	        FILENAME=TRIM(ION_ID(ID))//TRIM(STRING)
-	        CALL NEW_WRITEDC_V5(ATM(ID)%XzV_F,ATM(ID)%LOG_XzVLTE_F,ATM(ID)%W_XzV_F,
-	1             ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%NXzV_F,
+	        CALL NEW_WRITEDC_V6(ATM(ID)%XzV_F,ATM(ID)%LOG_XzVLTE_F,ATM(ID)%W_XzV_F,
+	1             ATM(ID)%AXzV_F,ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%NXzV_F,
 	1             ATM(ID)%DXzV_F,ATM(ID)%GIONXzV_F,IONE,TA,T,ED,V,CLUMP_FAC,
 	1             DO_DPTH,LUM,ND,FILENAME,TYPE,IONE)
 	      END IF
@@ -2020,7 +2022,7 @@
 	    END IF
 	    CALL USR_HIDDEN(GREY_WITH_V_TERMS,'VT','F','File appendage')
 	    CALL USR_HIDDEN(ELEC,'LOGT','F','Log of T?')
-	    IF(R(1)/R(ND) .LT. 2.0 .AND. V(1) .LT. 1.0D0)THEN
+	    IF(R(1)/R(ND) .LT. RTWO .AND. V(1) .LT. RONE)THEN
 	      CALL USR_OPTION(PLANE_PARALLEL_NOV,'PPNOV','T','Plane parallel model no V?')
 	    ELSE
 	      CALL USR_HIDDEN(PLANE_PARALLEL_NOV,'PPNOV','F','Plane parallel model no V?')
@@ -2034,10 +2036,10 @@
 	    IF(GREY_REL)THEN
 !
 	      TA(1:ND)=0.3D0              !FEDD: Initial guess
-	      TB(1:ND)=0.0D0              !H_ON_J: Initial guess
-	      TC(1:ND)=0.0D0              !dlnJdlnR=0.0D0
-	      GAMH(1:ND)=0.0D0            !Old FEDD
-	      XM(1:ND)=0.0D0              !As grey solution, not needed (ETA)
+	      TB(1:ND)=RZERO              !H_ON_J: Initial guess
+	      TC(1:ND)=RZERO              !dlnJdlnR=0.0D0
+	      GAMH(1:ND)=RZERO            !Old FEDD
+	      XM(1:ND)=RZERO              !As grey solution, not needed (ETA)
 	      NEW_FREQ=.TRUE.
 	      HBC=0.7D0; INBC=0.1D0
 	      WRITE(T_OUT,*)'Using MOM_JREL_GREY_V1 for grey solution'
@@ -2049,8 +2051,8 @@
 !
 	      HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
 	      DBB=3.0D0*HFLUX*CHIROSS(ND)
-	      IF(.NOT. DIF)DBB=0.0D0
-	      T1=1.0D0
+	      IF(.NOT. DIF)DBB=RZERO
+	      T1=RONE
 	      DO WHILE(T1 .GT. 1.0D-05)
 	        CALL MOM_JREL_GREY_V1(XM,CHIROSS,CHIROSS,V,SIGMA,R,
 	1              TB,TA,TC,RJ,HNU,HBC,INBC,
@@ -2060,7 +2062,7 @@
 	        CALL FGREY_NOREL_V1(TA,TB,RJ,CHIROSS,R,V,SIGMA,
 	1              P,JQW,HMIDQW,KQW,LUM,IC,METHOD,
 	1              HBC,INBC,DIF,ND,NC,NP)
-	        T1=0.0D0
+	        T1=RZERO
 	        DO I=1,ND
 	          T1=MAX(ABS(TA(I)-GAMH(I)),T1)
 	          GAMH(I)=TA(I)
@@ -2107,7 +2109,7 @@
 	      XAXSAV=XAXIS
 	    ELSE IF(PLANE_PARALLEL_NOV)THEN
 	      FOLD=0.3333D0
-	      HBC=0.7D0; NBC=0.0D0; FL=1.0D0; INBC=0.1D0
+	      HBC=0.7D0; NBC=RZERO; FL=RONE; INBC=0.1D0
 !
 ! Note HFLUX=LUM*Lsun/16/(PI*PI)/10**2 (10**2 for 1/R**2).
 ! DBB - dBdR = 3. Chi. L/16(piR)**2 and is used for the lower boundary
@@ -2116,7 +2118,7 @@
 !
               HFLUX=3.826D+13*LUM/16.0D0/PI**2/R(ND)/R(ND)
               DBB=3.0D0*CHIROSS(ND)*HFLUX
-              IF(.NOT. DIF)DBB=0.0D0
+              IF(.NOT. DIF)DBB=RZERO
 	      T1=1000.0D0
 !
 ! Compute radial (vertical) optical depth increments.
@@ -2140,7 +2142,7 @@
 	        SOURCE(1:ND)=RJ
 	        CALL FCOMP_PP_V2(R,TC,GAMH,SOURCE,CHIROSS,TA,HBC,
 	1               NBC,INBC,DBB,IC,THK_CONT,DIF,ND,NC,METHOD)
-	        T1=0.0D0
+	        T1=RZERO
                 DO I=1,ND
                   T1=MAX(ABS(FOLD(I)-GAMH(I)),T1)
                   FOLD(I)=GAMH(I)
@@ -2164,7 +2166,7 @@
 ! Interpolate CHIROSS onto a finer grid.
 !
 	      DO I=1,NDX
-	        CHI(I)=0.0D0
+	        CHI(I)=RZERO
 	        DO J=0,3
 	          CHI(I)=CHI(I)+COEF(J,I)*LOG( CHIROSS(J+INDX(I)) )
 	        END DO
@@ -2172,15 +2174,15 @@
 	      END DO
 !
 	      DO I=1,NDX
-	        FA(I)=1.0D0/3.0D0
+	        FA(I)=RONE/RTHREE
 	      END DO
-	      HBC=1.0D0
+	      HBC=RONE
 	      T1=1000.0
 	      DO WHILE(T1 .GT. 1.0D-05)
 	        CALL JGREY(TA,TB,TC,XM,DTAU,REXT,Z,PEXT,RJ,
 	1          GAM,GAMH,Q,FA,CHI,dCHIdR,
 	1          JQWEXT,KQWEXT,LUM,HBC,HBCNEW,NCX,NDX,NPX,METHOD)
-	        T1=0.0D0
+	        T1=RZERO
 	        DO I=1,NDX
 	          T1=MAX(ABS(FA(I)-GAMH(I)),T1)
 	          FA(I)=GAMH(I)
@@ -2259,7 +2261,7 @@
 	      IF(TB(I) .GT. 0)THEN
 	        YV(I)=LOG10(TB(I))
 	      ELSE
-	        YV(I)=0.0D0
+	        YV(I)=RZERO
 	      END IF
 	    END DO
 	    YAXIS='Log \gt(Flux)'
@@ -2473,7 +2475,7 @@
 	        IMAX=J+1; IMIN=J
 	        YV(J)=(TA(IMAX)-TA(IMIN))*(TA(IMAX)-TA(IMIN))/(ZV(IMAX)-ZV(IMIN))/(XM(IMAX)-XM(IMIN))
 	      END DO
-	      YV(ND)=1.0D0
+	      YV(ND)=RONE
 	      EXIT
 	    END IF
 	  END DO
@@ -2486,7 +2488,7 @@
 !	    END DO
 !	    YV(I)=(TA(J)-TA(I))*(TA(J)-TA(I))/(ZV(J)-ZV(I))/(XM(J)-XM(I))
 !	  END DO
-!	  YV(ND)=1.0D0
+!	  YV(ND)=RONE
 !
 	  YAXIS='Clumping factor'
 	  CALL DP_CURVE(ND,XV,YV)
@@ -2502,7 +2504,7 @@
 !
 	  CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
 	  IF(TMP_LOGICAL)THEN
-	    TA(ND)=0.0D0
+	    TA(ND)=RZERO
 	    DO I=ND-1,1,-1
 	      TA(I)=TA(I+1)+TB(I)
 	    END DO
@@ -2523,7 +2525,7 @@
 	      END DO
 	      CALL TORSCL(TA,ZETA,R,TB,TC,ND,METHOD,TYPE_ATM)
 	      IF(TMP_LOGICAL)THEN
-	        TA(ND)=0.0D0
+	        TA(ND)=RZERO
 	        DO I=ND-1,1,-1
 	          TA(I)=TA(I+1)+TB(I)
 	        END DO
@@ -2697,11 +2699,11 @@
 !
 	ELSE IF(XOPT .EQ. 'EI')THEN
 	  CALL USR_OPTION(ELEC,'INTEG','T','Integrate intenal energy?')
-          YV(1:ND)=0.0D0
+          YV(1:ND)=RZERO
 !
 	  DO ISPEC=1,NSPEC
-	    T1=0.0D0			!Total energy of state
-	    T2=0.0D0                    !Running ioization energy
+	    T1=RZERO			!Total energy of state
+	    T2=RZERO                    !Running ioization energy
 !
 	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	      DO I=1,ATM(ID)%NXzV_F
@@ -2755,7 +2757,7 @@
 	  TC(1)=TC(2); TC(ND)=TC(ND-1)
 	  DO I=1,ND
 	    TB(I)=1.0D-03*SQRT(BOLTZMANN_CONSTANT()*(POP_ATOM(I)+ED(I))*T(I)/MASS_DENSITY(I))
-	    TB(I)=TB(I)*TB(I)*(SIGMA(I)+1.0D0)/R(I)
+	    TB(I)=TB(I)*TB(I)*(SIGMA(I)+RONE)/R(I)
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  CALL DP_CURVE(ND,XV,TB)
@@ -2812,9 +2814,9 @@
 	  CALL USR_OPTION(T2,'dAGE','0.1','Fractional change in SN age')
 	  T2=1.0D-05*T1*24.0D0*3600.0D0*T2
 	  DO I=1,ND
-	    TA(I)=(1.0D0+V(I)*T2/R(I))**2
-	    TA(I)=TA(I)*(1.0D0+V(I)*T2/R(I)*(SIGMA(I)+1.0D0))
-	    TA(I)=TA(I)**(1.0D0/3.0D0)
+	    TA(I)=(RONE+V(I)*T2/R(I))**2
+	    TA(I)=TA(I)*(RONE+V(I)*T2/R(I)*(SIGMA(I)+RONE))
+	    TA(I)=TA(I)**(RONE/RTHREE)
 	  END DO
 	  CALL DP_CURVE(ND,XV,TA)
 	  YAXIS='Vf/Vi**0.33'
@@ -2856,7 +2858,7 @@
 	  ELSE IF(XAXIS .EQ. 'Log(r/R\d*\u)-1')THEN
 	    XAXIS='Log(r/R\d*\u)-1'
 	    Z(1:ND-1)=LOG10(Z(1:ND-1)/R(ND)-1)
-	    Z(ND)=Z(ND-1)-1.0D0
+	    Z(ND)=Z(ND-1)-RONE
 	  ELSE
 	    Z(1:ND)=Z(1:ND)/R(ND)
 	  END IF
@@ -2865,10 +2867,10 @@
 	    CALL LOGVEC(DTAU,YV,ND)
 	    YAXIS='Log(V(kms\u-1\d))'
 	  ELSE IF(TYPE .EQ. 'SIG')THEN
-	    YV(1:ND)=ZV(1:ND)+1.0D0
+	    YV(1:ND)=ZV(1:ND)+RONE
 	    YAXIS='\gs+1'
 	  ELSE IF(TYPE .EQ. 'LOGS')THEN
-	    YV(1:ND)=LOG10(ZV(1:ND)+1.0D0)
+	    YV(1:ND)=LOG10(ZV(1:ND)+RONE)
 	    YAXIS='LOG(\gs+1)'
 	  ELSE
 	    YV(1:ND)=DTAU(1:ND)
@@ -2935,7 +2937,7 @@
 	ELSE IF(XOPT .EQ. 'CAKT')THEN
 	  CALL USR_HIDDEN(T1,'VTH','10.0','Thermal doppler velocity (km/s)')
 	  DO I=1,ND
-	    T2=(SIGMA(I)+1.0D0)*V(I)/R(I)
+	    T2=(SIGMA(I)+RONE)*V(I)/R(I)
 	    YV(I)=LOG10(6.65D-15*ED(I)*CLUMP_FAC(I)*T1/T2)
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
@@ -2949,7 +2951,7 @@
 	  T1=1.0D-30*LUM_SUN()*LUM/4.0D0/PI/C_CMS
 	  T2=T1*6.65D-15
 	  DO I=1,ND
-	    YV(I)=FLUX_MEAN(I)/ED(I)/6.65D-15 - 1.0D0
+	    YV(I)=FLUX_MEAN(I)/ED(I)/6.65D-15 - RONE
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
 	  YAXIS='M(t)'
@@ -2997,7 +2999,7 @@
 	    DO I=1,ND
 	      T1=3.0D-10*OPLIN*TA(I)*R(I)/V(I)/FL
 	      YV(I)=LOG10(T1)
-	      ZV(I)=LOG10(T1/(1.0D0+SIGMA(I)))
+	      ZV(I)=LOG10(T1/(RONE+SIGMA(I)))
 	    END DO
 	    CALL DP_CURVE(ND,XV,ZV)
 	    YAXIS='Log(\gt\dSob\u/fX)'
@@ -3086,7 +3088,7 @@
 	
 	  CALL USR_HIDDEN(ELEC,'RECIP','F','Plot 1 / fillingfactor')
 	  IF(ELEC)THEN
-	    YV(1:ND)=1.0D0/CLUMP_FAC(1:ND)
+	    YV(1:ND)=RONE/CLUMP_FAC(1:ND)
 	    YAXIS='Recipricoal Filling Factor'
 	  ELSE
 	    YV(1:ND)=CLUMP_FAC(1:ND)
@@ -3189,7 +3191,7 @@
 !
 	    IF(ANG_TO_HZ/FL .GT. LAM_ST .AND. ANG_TO_HZ/FL .LT. LAM_EN)THEN
 	      DO ID=1,NUM_IONS
-	        TAU_SOB=0.0D0
+	        TAU_SOB=RZERO
 	        IF(VEC_SPEC(LINE_INDX) .EQ. ION_ID(ID) .AND.
 	1           (XSPEC .EQ. ' ' .OR. XSPEC .EQ. UC(ION_ID(ID))) )THEN
 	          DO I=1,DPTH_INDX
@@ -3207,7 +3209,7 @@
 ! is propotional to tau.lambda
 !
                   CALL TORSCL_V2(TA,CHIL,R,TB,TC,DPTH_INDX,'ZERO',TYPE_ATM,L_FALSE)
-	          TAU_SOB=T4*TA(DPTH_INDX)+(1.0D0-T4)*TA(DPTH_INDX-1)
+	          TAU_SOB=T4*TA(DPTH_INDX)+(RONE-T4)*TA(DPTH_INDX-1)
 	          T5=(10.0**T2)*EXP(-T3/2.75D0)/(TAU_SOB*T1)
 !
 	          STRING=' ';  IF(FLAG)STRING=VEC_TRANS_NAME(LINE_INDX)
@@ -3274,7 +3276,7 @@
 	  WRITE(6,*)' '
 	  WRITE(6,*)'Number of line transitions in the interval is',NUP-NL+1
 !
-	  FL_SAVE=0.0D0
+	  FL_SAVE=RZERO
 	  DO LINE_INDX=NL,NUP
 	    MNL_F=VEC_MNL_F(LINE_INDX)
 	    MNUP_F=VEC_MNUP_F(LINE_INDX)
@@ -3292,9 +3294,9 @@
 ! and DDBBDT= dB/dTR .
 !
 	      T1=HDKT*FL/T(ND)
-	      T2=1.0D0-EMHNUKT(ND)
+	      T2=RONE-EMHNUKT(ND)
 	      DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
-	      IF(.NOT. DIF)DBB=0.0D0
+	      IF(.NOT. DIF)DBB=RZERO
 !
 ! Adjust the opacities and emissivities for the influence of clumping.
 !
@@ -3359,7 +3361,7 @@
 ! Used to count the number lines as a function of optical depth over the entire
 ! wavelngth interval.
 !
-	  TAU_GRT_LOGX(:)=0.0D0
+	  TAU_GRT_LOGX(:)=RZERO
 !
 	  IF(DPTH_INDX .LT. 1 .OR. DPTH_INDX .GT. ND)DPTH_INDX=ND/2
 	  DEFAULT=WR_STRING(DPTH_INDX)
@@ -3412,14 +3414,14 @@
 	    T1=SIGMA(DPTH_INDX)
 	    T2=SQRT(ABS(T1))
 	    IF(T2 .LT. 0.01)THEN
-	      TAU_CONSTANT=TAU_CONSTANT*(1.0D0-T1/3.0D0+T1*T1/5.0D0)
+	      TAU_CONSTANT=TAU_CONSTANT*(RONE-T1/3.0D0+T1*T1/5.0D0)
 	    ELSE IF(T1 .LT. 0)THEN
-	      TAU_CONSTANT=0.5D0*TAU_CONSTANT*LOG( (1.0D0+T2)/(1.0D0-T2) )/T2
+	      TAU_CONSTANT=0.5D0*TAU_CONSTANT*LOG( (RONE+T2)/(RONE-T2) )/T2
 	    ELSE
 	      TAU_CONSTANT=TAU_CONSTANT*ATAN(T2)/T2
 	    END IF
 	  ELSE
-	    TAU_CONSTANT=TAU_CONSTANT/(1.0D0+SIGMA(I))
+	    TAU_CONSTANT=TAU_CONSTANT/(RONE+SIGMA(I))
 	  END IF
 !
 ! NB: DELTA_TAU is the spacing in LOG10(Tau)
@@ -3431,14 +3433,14 @@
 	    DO I=1,NBINS
  	      ZV(I)=TAU_BEG+(I-1)*DELTA_TAU
 	    END DO
-	    YV(:)=0.0D0
+	    YV(:)=RZERO
 	  ELSE IF(XOPT .EQ. 'NV')THEN
 	    DELTA_TAU=V(DPTH_INDX)/C_KMS
-	    NBINS=LOG(LAM_EN/LAM_ST)/LOG(1.0D0+DELTA_TAU)+1
+	    NBINS=LOG(LAM_EN/LAM_ST)/LOG(RONE+DELTA_TAU)+1
 	    DO I=1,NBINS
-	      ZV(I)=LAM_ST*(1.0D0+DELTA_TAU)**(I-1)
+	      ZV(I)=LAM_ST*(RONE+DELTA_TAU)**(I-1)
 	    END DO
-	    YV(:)=0.0D0
+	    YV(:)=RZERO
 	    CALL USR_OPTION(TAU_MIN,'TAU_MIN','1.0D0','Minimum Tau')
 	    WRITE(T_OUT,'(1X,A,1P,E11.4)')'Velocity is:',V(DPTH_INDX),' km/s'
 	  END IF
@@ -3553,9 +3555,9 @@
 	        ELSE IF(XOPT .EQ. 'NV')THEN
 	          IF(TAU_SOB .GT. TAU_MIN)THEN
 	            T1=C_KMS/FL/100.0D0			!Angstroms
-	            T2=LAM_ST*(1.0D0-0.5D0*DELTA_TAU)
-	             I=LOG(T1/T2)/LOG(1.0D0+DELTA_TAU)+1
-	            T1=0.0D0; T1=MAX(T1,TAU_SOB)
+	            T2=LAM_ST*(RONE-0.5D0*DELTA_TAU)
+	             I=LOG(T1/T2)/LOG(RONE+DELTA_TAU)+1
+	            T1=RZERO; T1=MAX(T1,TAU_SOB)
 	            IF(WEIGHT_NV)THEN
 	              YV(I)=YV(I)+(1.0-EXP(-T1))
 	            ELSE
@@ -3701,7 +3703,7 @@
 	  ELSE
 	    DO I=1,ND
 	      YV(I)=LOG10( RJ(I)*
-	1          ( EXP(HDKT*FREQ/T(I))-1.0D0 )/TWOHCSQ/(FREQ**3)  )
+	1          ( EXP(HDKT*FREQ/T(I))-RONE )/TWOHCSQ/(FREQ**3)  )
 	    END DO
 	    YAXIS='J\dc\u/B(T\de\u)'
 	  END IF
@@ -3772,7 +3774,7 @@
 	    ZETAEXT(I)=ETAEXT(I)/CHIEXT(I)
 	    THETAEXT(I)=ESECEXT(I)/CHIEXT(I)
 	    SOURCEEXT(I)=ZETAEXT(I)+THETAEXT(I)*RJEXT(I)
-	    FOLD(I)=1.0D0/3.0D0
+	    FOLD(I)=RONE/RTHREE
 	  END DO
 	  S1=SOURCE(1)
 !
@@ -3789,7 +3791,7 @@
 	1          INBC,THICK,INNER_BND_METH,NDX,METHOD)
 	    S1=ZETAEXT(1)+THETAEXT(1)*RJEXT(1)
 	    INACCURATE=.FALSE.
-	    T1=0.0D0
+	    T1=RZERO
 	    DO I=1,NDX
 	     T1=MAX(ABS(FOLD(I)-FEXT(I)),T1)
 	     FOLD(I)=FEXT(I)
@@ -3893,7 +3895,7 @@
 	      YV(I)=-30
 	    ELSE
 	      YV(I)=LOG10(  ETAL(I)/CHIL(I)*
-	1          ( EXP(HDKT*FREQ/T(I))-1.0D0 )/TWOHCSQ/(FREQ**3)  )
+	1          ( EXP(HDKT*FREQ/T(I))-RONE )/TWOHCSQ/(FREQ**3)  )
 	    END IF
 	  END DO
 	  CALL DP_CURVE(ND,XV,YV)
@@ -3965,7 +3967,7 @@
 	    DO I=1,K
 	      IF(I .NE. 1)XV(I)=XV(I-1)/T2
 	      T3=EXP(-HDKT*XV(I)/TEMP)
-	      YV(I)=TWOHCSQ*(XV(I)**3)*T3/(1.0D0-T3)
+	      YV(I)=TWOHCSQ*(XV(I)**3)*T3/(RONE-T3)
 	    END DO
 	    YAXIS='B\d\gn\u(\gn)(ergs/cm\u2\d/Hz/str)'
 	    IF(ELEC)THEN
@@ -3977,7 +3979,7 @@
 	      IF(I .NE. 1)XV(I)=XV(I-1)/T2
 	      T4=HDKT*XV(I)/TEMP
 	      T3=EXP(-T4)
-	      YV(I)=1.0D-04*TWOHCSQ*T4*(XV(I)**3)*T3/((1.0D0-T3)**2)/TEMP
+	      YV(I)=1.0D-04*TWOHCSQ*T4*(XV(I)**3)*T3/((RONE-T3)**2)/TEMP
 	    END DO
 	    YAXIS='dB\d\gn\u(\gn)/dT(Mergs/cm\u2\d/\gHZ/str/K)'
 	    IF(ELEC)THEN
@@ -4096,12 +4098,12 @@
 !
 	    DO I=1,ND
 	      IF(T1 .LE. 0)THEN
-	        T1=1.0D0
+	        T1=RONE
 	      ELSE
 	        T1=TAUROSS(I)/T1
-	        T1=1.0D0-EXP(-T1)
+	        T1=RONE-EXP(-T1)
 	      END IF
-	      T(I)=T1*TGREY(I)+(1.0-T1)*T(I)
+	      T(I)=T1*TGREY(I)+(RONE-T1)*T(I)
 	    END DO
 !
 
@@ -4239,7 +4241,7 @@
 	    TAU_CONSTANT=OPLIN*1.6914D-11		!Assumes Vdop=10 km/s
 	  ELSE
 	    TAU_CONSTANT=OPLIN*R(I)*2.998E-10/V(I)
-	    IF(RADIAL_TAU)TAU_CONSTANT=TAU_CONSTANT/(1.0D0+SIGMA(I))
+	    IF(RADIAL_TAU)TAU_CONSTANT=TAU_CONSTANT/(RONE+SIGMA(I))
 	  END IF
 !
 ! Compute line opacity and emissivity.
@@ -4268,7 +4270,7 @@
 	            WRITE(25,*)J,XV(J),T2
 	            IF(T2 .NE. 0 .AND. FREQ .LE. FREQ_ST .AND. FREQ .GE.  FREQ_EN)THEN
 	              IF(V(I) .LE. 20.0D0 .AND. .NOT. LINE_STRENGTH)THEN
-	                YV(J)=0.0D0
+	                YV(J)=RZERO
 	                T3=T2
 	                DO K=I,2,-1
 	                  T2=T3
@@ -4349,11 +4351,11 @@
 	              T1=ATM(ID)%W_XzV_F(NUP,I)/ATM(ID)%W_XzV_F(NL,I)
 	              T2=ATM(ID)%AXzV_F(NL,NUP)*(T1*ATM(ID)%XzV_F(NL,I)-GLDGU*ATM(ID)%XzV_F(NUP,I))
 	              T2=T2*TA(I)/FREQ
-	              IF(ELEC .AND. T2 .LT. 1.0D0)THEN
+	              IF(ELEC .AND. T2 .LT. RONE)THEN
 	                ZV(J)=(YV(J)-V(I))/2
 	                YV(J)=(YV(J)+V(I))/2
 	                EXIT
-	              ELSE IF(T2 .GT. 1.0D0 .AND. .NOT. ELEC)THEN
+	              ELSE IF(T2 .GT. RONE .AND. .NOT. ELEC)THEN
 	                ELEC=.TRUE.
 	                YV(J)=V(I)
 	              ELSE IF(ELEC .AND. I .EQ. ND)THEN
@@ -4398,7 +4400,7 @@
 	  IF(ELEC)THEN
 	    CALL ESOPAC(CHI,ED,ND)
 	  ELSE
-	    CHI(1:ND)=0.0D0
+	    CHI(1:ND)=RZERO
 	  END IF
 !
 	  DO ID=1,NUM_IONS
@@ -4495,14 +4497,14 @@
 	  IF(LOC_ION_ID .NE. ' ')THEN
 	    ALLOCATE (CHI_LAM(NLAM,ND))
 	    ALLOCATE (ETA_LAM(NLAM,ND))
-	    ALLOCATE (LAM_VEC(NLAM));     LAM_VEC(:)=0.0D0
+	    ALLOCATE (LAM_VEC(NLAM));     LAM_VEC(:)=RZERO
 	  ELSE IF(DO_KAP)THEN
 	    ALLOCATE (CHI_LAM(NLAM,NUM_IONS))
 	    ALLOCATE (ETA_LAM(NLAM,NUM_IONS))
-	    ALLOCATE (LAM_VEC(NLAM));     LAM_VEC(:)=0.0D0
+	    ALLOCATE (LAM_VEC(NLAM));     LAM_VEC(:)=RZERO
 	  ELSE
-	    ALLOCATE (CHI_TOT_LAM(NUM_IONS)); CHI_TOT_LAM(:)=0.0D0
-	    ALLOCATE (LAM_VEC(NUM_IONS));     LAM_VEC(:)=0.0D0
+	    ALLOCATE (CHI_TOT_LAM(NUM_IONS)); CHI_TOT_LAM(:)=RZERO
+	    ALLOCATE (LAM_VEC(NUM_IONS));     LAM_VEC(:)=RZERO
 	  END IF
 !
 	  LAST_NON_ZERO=.FALSE.
@@ -4516,9 +4518,9 @@
 	    IF(ELEC)THEN
 	      CALL ESOPAC(CHI,ED,ND)
 	    ELSE
-	      CHI(1:ND)=0.0D0
+	      CHI(1:ND)=RZERO
 	    END IF
-	    ETA(1:ND)=0.0D0
+	    ETA(1:ND)=RZERO
 !
 	    DO ID=1,NUM_IONS
 	      CHI(1:ND)=CHI(1:ND)+CHI_PAR(1:ND,ID)
@@ -4575,7 +4577,7 @@
 	      CHI_LAM(:,ID)=1.0D-10*CHI_LAM(:,ID)/MASS_DENSITY(DPTH_INDX)
 	    END DO
 	    DO ISPEC=1,NSPEC
-	      YV(1:NLAM)=0.0D0
+	      YV(1:NLAM)=RZERO
 	      ELEC=.FALSE.
 	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	        YV(1:NLAM)=YV(1:NLAM)+CHI_LAM(1:NLAM,ID)
@@ -4640,10 +4642,10 @@
 	  ALLOCATE (LAM_VEC(NLAM))
 	  DEL_NU=EXP(LOG(NU_EN/NU_ST)/(NLAM-1))
 !
-	  ETA_LAM(:,:)=0.0D0
-	  CHI_LAM(:,:)=0.0D0
-	  CHI_TOT_LAM(:)=0.0D0
-	  ETA_TOT_LAM(:)=0.0D0
+	  ETA_LAM(:,:)=RZERO
+	  CHI_LAM(:,:)=RZERO
+	  CHI_TOT_LAM(:)=RZERO
+	  ETA_TOT_LAM(:)=RZERO
 	  WRITE(6,'(A3)',ADVANCE='NO')'ML='
 	  DO ML=1,NLAM
 	    IF(MOD(ML,200) .EQ. 0)THEN
@@ -4674,8 +4676,8 @@
 	        END IF
 	      ELSE IF(LAST_NON_ZERO)THEN
 	        J=J+1
-                CHI_LAM(ML,J)=0.0D0
-                ETA_LAM(ML,J)=0.0D0
+                CHI_LAM(ML,J)=RZERO
+                ETA_LAM(ML,J)=RZERO
 	        LAST_NON_ZERO=.FALSE.
 	      ELSE
 	      END IF
@@ -4910,7 +4912,7 @@
 	          CALL SET_DC_OR_POP_OR_TX_V2(YV,LEV(I),ATM(ID)%XzV_F,ATM(ID)%LOG_XzVLTE_F,
 	1            ATM(ID)%EDGEXzV_F,ATM(ID)%NXzV_F,ND,T,X,UC(ION_ID(ID)),FLAG)
 	          IF(.NOT. ATM(ID+1)%XzV_PRES)THEN
-	            T1=0.0D0
+	            T1=RZERO
 	            CALL SET_DC_OR_POP_OR_TX(YV,LEV(I),ATM(ID)%DXzV_F,ATM(ID)%DXzV_F,
 	1                   T1,IONE,ND,T,X,'D'//TRIM(UC(ION_ID(ID))),FLAG)
 	          END IF
@@ -5009,7 +5011,7 @@
 	  IF(XOPT .EQ. 'TPOP' .AND. FOUND)THEN
 	    WRITE(6,*)'Wavelength set to 5000 Angstroms'
 	    FL=ANG_TO_HZ/5000.0D0
-	    T1=LOG10( 3.0D-10*OPLIN*R(K)/V(K)/(1.0D0+SIGMA(K))/FL )
+	    T1=LOG10( 3.0D-10*OPLIN*R(K)/V(K)/(RONE+SIGMA(K))/FL )
 	    DO I=1,L
 	      YV(I)=YV(I)+T1
 	    END DO
@@ -5057,12 +5059,12 @@
 	ELSE IF(XOPT .EQ. 'QF') THEN
 	  DO ISPEC=1,NSPEC
 	    IF(XSPEC .EQ. SPECIES(ISPEC))THEN
-	      ZV(ND)=0.0D0
+	      ZV(ND)=RZERO
 	      YAXIS='q'
 	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
 	        IF(ATM(ID)%XzV_PRES)THEN
 	          DO I=1,ND
-	            T2=0.0D0
+	            T2=RZERO
 	            DO J=1,ATM(ID)%NXzV_F
 	              T2=T2+ATM(ID)%XzV_F(J,I)
 	            END DO
@@ -5115,7 +5117,7 @@
 	        IF(ATM(ID)%XzV_PRES)THEN
 	          CNT=CNT+1
 	          DO I=1,ND
-	            T1=0.0D0			!Using T1 avoids underflow
+	            T1=RZERO			!Using T1 avoids underflow
 	            DO J=1,ATM(ID)%NXzV_F
 	              T1=T1+ATM(ID)%XzV_F(J,I)
 	            END DO
@@ -5150,7 +5152,7 @@
 	  TCHI(1:ND)=ROSS_MEAN(1:ND)*CLUMP_FAC(1:ND)
 	  CALL DERIVCHI(dCHIdR,TCHI,R,ND,METHOD)
           CALL NORDTAU(DTAU,TCHI,R,R,dCHIdR,ND)
-	  TA(1:ND)=0.0D0 ; DO I=2,ND ; TA(I) = TA(I-1)+DTAU(I-1) ; END DO
+	  TA(1:ND)=RZERO ; DO I=2,ND ; TA(I) = TA(I-1)+DTAU(I-1) ; END DO
 	  TB(1)=2.0D0/3.0D0  ; TB(2)=10.0D0
 	  CALL MON_INTERP(TC,ITWO,IONE,TB,ITWO,R,ND,TA,ND)
 	  CALL MON_INTERP(AV,ITWO,IONE,TB,ITWO,V,ND,TA,ND)
@@ -5218,7 +5220,7 @@
 	  TCHI(1:ND)=ESEC(1:ND)*CLUMP_FAC(1:ND)
 	  CALL DERIVCHI(dCHIdR,TCHI,R,ND,METHOD)
           CALL NORDTAU(DTAU,TCHI,R,R,dCHIdR,ND)
-	  TA(ND)=0.0D0; TB(ND)=0.0D0; DTAU(ND)=0.0D0
+	  TA(ND)=RZERO; TB(ND)=RZERO; DTAU(ND)=RZERO
 !
 	  CALL GEN_ASCI_OPEN(LU_OUT,'MEANOPAC','UNKNOWN',' ',' ',IZERO,IOS)
 	    WRITE(LU_OUT,
@@ -5234,10 +5236,10 @@
 	    END IF
 	    DO I=1,ND
 	      IF(I .EQ. 1)THEN
-	        T1=0.0D0		!Rosseland optical depth scale
-	        T2=0.0D0		!Flux optical depth scale
-	        T3=0.0D0		!Elec. scattering optical depth scale.
-	        TC(1:3)=0.0D0
+	        T1=RZERO		!Rosseland optical depth scale
+	        T2=RZERO		!Flux optical depth scale
+	        T3=RZERO		!Elec. scattering optical depth scale.
+	        TC(1:3)=RZERO
 	      ELSE
 	        T1=T1+TA(I-1)
 	        T2=T2+TB(I-1)
@@ -5416,7 +5418,7 @@
 !
 	      IF(COL_OPT .EQ. 'TOTAL_RATE')THEN
 	        STRING=TRIM(ION_ID(ID))//'('//TRIM(ATM(ID)%XzVLEVNAME_F(NL))//')'
-	        TC=0.0D0
+	        TC=RZERO
 	        DO K=1,ATM(ID)%NXzV_F
 	          TA(1:ND)=COL(K,NL,1:ND)*ATM(ID)%XzV_F(K,1:ND)			!Col rates into NL
 	          TB(1:ND)=COL(NL,K,1:ND)*ATM(ID)%XzV_F(NL,1:ND)		!Col rates out of NL
@@ -5426,7 +5428,7 @@
 !
 	      ELSE IF(COL_OPT .EQ. 'NET_RATE')THEN
 	        CALL  USR_OPTION(L,'Depth','30','Depth to order rates')
-	        TA=0.0D0; TB=0.0D0; K=ATM(ID)%NXzV_F
+	        TA=RZERO; TB=RZERO; K=ATM(ID)%NXzV_F
 	        TA(1:K)=COL(:,NL,L)*ATM(ID)%XzV_F(:,L)		!Col rates into NL
 	        TA(NL)=COL(NL,NL,L)*ATM(ID)%XzVLTE_F(NL,L)	!Col rates into NL
 	        TB(1:K)=COL(NL,:,L)*ATM(ID)%XzV_F(NL,L)		!Col rates out of NL
@@ -5438,13 +5440,13 @@
 	          TC(1:ND)=COL(K,NL,1:ND)*ATM(ID)%XzV_F(K,1:ND)	-
 	1                  COL(NL,K,1:ND)*ATM(ID)%XzV_F(NL,1:ND)		!Col rates out of NL
 	          CALL WRITE_VEC(TC,ND,STRING,LU_COL)
-	          TA(K)=0.0D0
+	          TA(K)=RZERO
 	        END DO
 !
 	      ELSE
 !
 	        CALL  USR_OPTION(L,'Depth','30','Depth to order rates')
-	        TA=0.0D0; TB=0.0D0; K=ATM(ID)%NXzV_F
+	        TA=RZERO; TB=RZERO; K=ATM(ID)%NXzV_F
 	        TA(1:K)=COL(:,NL,L)*ATM(ID)%XzV_F(:,L)		!Col rates into NL
 	        TA(NL)=COL(NL,NL,L)*ATM(ID)%XzVLTE_F(NL,L)	!Col rates into NL
 	        TB(1:K)=COL(NL,:,L)*ATM(ID)%XzV_F(NL,L)		!Col rates out of NL
@@ -5460,7 +5462,7 @@
 	            TC(1:ND)=COL(K,NL,1:ND)*ATM(ID)%XzV_F(K,1:ND)		!Col rates into NL
 	          END IF
 	          CALL WRITE_VEC(TC,ND,STRING,LU_COL)
-	          TA(K)=0.0D0
+	          TA(K)=RZERO
 	        END DO
 !
 	        DO ISPEC=1,MIN(30,ATM(ID)%NXzV_F)
@@ -5473,7 +5475,7 @@
 	    	  END IF
 	          TC(1:ND)=COL(NL,K,1:ND)*ATM(ID)%XzV_F(NL,1:ND)
 	          CALL WRITE_VEC(TC,ND,STRING,LU_COL)
-	          TB(K)=0.0D0
+	          TB(K)=RZERO
 	        END DO
 	      END IF
 	      CLOSE(LU_COL)
@@ -5489,7 +5491,7 @@
 !	  END DO
 !
 	ELSE IF(XOPT .EQ. 'CSUM')THEN
-	  TMP_ED=1.0D0
+	  TMP_ED=RONE
 	  CALL USR_OPTION(TEMP,'T','1.0','Input T')
 	  DO ID=1,NUM_IONS
 	    IF(XSPEC .EQ. UC(ION_ID(ID)) .OR. (XSPEC .EQ. 'ALL' .AND.  ATM(ID)%XzV_PRES))THEN
@@ -5501,7 +5503,7 @@
 	   END DO
 !
 	ELSE IF(XOPT .EQ. 'COL' .OR. XOPT .EQ. 'CRIT')THEN
-	  TMP_ED=1.0D0
+	  TMP_ED=RONE
 	  CALL USR_OPTION(T1,'T','1.0','Input T')
 	  DO ID=1,NUM_IONS
 	    IF(XSPEC .EQ. UC(ION_ID(ID)))THEN
@@ -5549,7 +5551,7 @@
 	  I=1
 !
 	  K=0
-	  OMEGA_F(:,:)=0.0D0
+	  OMEGA_F(:,:)=RZERO
 	  DO ID=1,NUM_IONS
 	    IF(XSPEC .EQ. UC(ION_ID(ID)))THEN
 	      K=ATM(ID)%NXzV_F
@@ -5607,7 +5609,7 @@ c
 	  CALL USR_OPTION(T1,'T','1.0','Input T (in 10^4 K)')
 	  CALL USR_HIDDEN(PHOT_ID,'PHOT_ID','1',
 	1      'Photoionization route')
-	  EXC_EN=0.0D0
+	  EXC_EN=RZERO
 	  IF(PHOT_ID .NE. 1)THEN
 	    CALL USR_OPTION(EXC_EN,'EXC_EN',' ',
 	1     'Excitation Energy (cm^-1) of final state')
@@ -5638,7 +5640,7 @@ c
 	    WRITE(LU_REC,'(1X,A,1X,I3)')'Photoionization route number is',PHOT_ID
 	    WRITE(T_OUT,*)' '
 	    WRITE(LU_REC,*)' '
-	    T1=0.0D0
+	    T1=RZERO
 	    DO I=1,J
 	      WRITE(T_OUT, '(I4,ES12.4,2X,A)')I,TA(I),TRIM(ATM(ID)%XzVLEVNAME_F(I))
 	      WRITE(LU_REC,'(I4,ES12.4,2X,A)')I,TA(I),TRIM(ATM(ID)%XzVLEVNAME_F(I))
@@ -5694,7 +5696,7 @@ c
 	       IF(LEV(2) .EQ. 1)THEN
 	         CALL SETREC(TA,ATM(ID)%DXzV,ATM(ID+1)%XzV_F,ATM(ID+1)%NXzV_F,ND)
 	       ELSE
-	         TA=0.0D0
+	         TA=RZERO
 	         DO J=1,ND
 	           DO I=LEV(1),LEV(2)
 	             TA(J)=TA(J)+ATM(ID+1)%XzV_F(I,J)
@@ -5765,7 +5767,7 @@ c
 	      FREQ=ANG_TO_HZ/FREQ
 	  END IF
           IF(ATM(1)%XzV_PRES)THEN
-	    CHI_RAY(1:ND)=0.0D0
+	    CHI_RAY(1:ND)=RZERO
             CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
 	1             ATM(1)%NXzV_F,FREQ,ND)
 	    CHI_RAY(1:ND)=1.0D-10*CHI_RAY(1:ND)*CLUMP_FAC(1:ND)
@@ -5789,7 +5791,7 @@ c
 	    FREQ=ANG_TO_HZ/T1
 	    WV(I)=T1
             IF(ATM(1)%XzV_PRES)THEN
-	      YV(I)=0.0D0
+	      YV(I)=RZERO
               CALL RAYLEIGH_SCAT(YV(I),ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
 	1             ATM(1)%NXzV_F,FREQ,IONE)
 	    ELSE
@@ -5828,11 +5830,11 @@ c
 	  CALL TORSCL(TAUROSS,CHIROSS,R,TB,TC,ND,METHOD,TYPE_ATM)
 	  WRITE(T_OUT,*)'Rossland optical depth is : ',TAUROSS(ND)
 	  DO I=1,ND-1
-	    YV(I)=(1.0D0+TAUROSS(I+1)-TAUROSS(I))*(R(I)-R(I+1))*1.0D+05/C_KMS/24.0D0/3600.0D0
+	    YV(I)=(RONE+TAUROSS(I+1)-TAUROSS(I))*(R(I)-R(I+1))*1.0D+05/C_KMS/24.0D0/3600.0D0
 	  END DO
 	  J=ND-1
 	  IF(ELEC)THEN
-	    ZV(1)=0.0D0
+	    ZV(1)=RZERO
 	    DO I=2,ND
 	      ZV(I)=ZV(I-1)+YV(I-1)
 	    END DO
@@ -5925,7 +5927,7 @@ c
 	  XAXSAV=XAXIS
 	  CALL USR_OPTION(ELEC,'OPAC','F','Plot opacity instead of emissivity?')
 	  DO ML=1,NFREQ
-	    ETA(1:ND)=0.0D0; CHI(1:ND)=0.0D0
+	    ETA(1:ND)=RZERO; CHI(1:ND)=RZERO
 	    CALL TWO_PHOT_OPAC_DISP_V3(ETA,CHI,ATM(ID)%XzV_F,T,XNU(ML),TWO_PHOT_OPTION,ID,ND,ATM(ID)%NXzV_F)
 	    IF(ELEC)THEN
 	      YV(ML)=CHI(1)
@@ -5965,7 +5967,7 @@ c
 	  TA(1:ND)=0.5D0			!Number of electrons per baryon
 	  DO ISPEC=1,NSPEC
 	    IF('HYD' .EQ. SPECIES(ISPEC))THEN
-	      TA(1:ND)=0.5D0*(1.0D0+POPDUM(1:ND,ISPEC)/POP_ATOM(1:ND))
+	      TA(1:ND)=0.5D0*(RONE+POPDUM(1:ND,ISPEC)/POP_ATOM(1:ND))
 	    END IF
 	  END DO
 	  XM(1:ND)=0.06D0*TA(1:ND)*MASS_DENSITY(1:ND)*1.0D+10
@@ -6238,7 +6240,7 @@ c
 ! Do the interpolation - Based on INTERPTHREE.
 !
 	  DO I=1,NDX
-	    TB(I)=0.0D0
+	    TB(I)=RZERO
 	    DO J=0,3
 	      TB(I)=TB(I)+COEF(J,I)*TA(J+INDX(I))
 	    END DO
@@ -6328,7 +6330,7 @@ c
 ! TA is used for the line flux. Integral of TA log(r) is
 ! the line EW.
 !
-	  FORCE_MULT(1:ND)=0.0D0
+	  FORCE_MULT(1:ND)=RZERO
 	  CALL SOBEW_GRAD_V2(SOURCE,CHI,CHI_SCAT,CHIL,ETAL,
 	1             V,SIGMA,R,P,FORCE_MULT,LUM,
 	1             JQW,HQW,TA,T1,S1,
@@ -6373,7 +6375,7 @@ c
 	      END IF
 	    END DO
 	    CALL MON_INT_FUNS_V2(JNU,XV,R,ND)
-	    T4=1.0D0; IF(XV(1) .LT. XV(4))T4=-1.0D0
+	    T4=RONE; IF(XV(1) .LT. XV(4))T4=-RONE
 	    DO I=1,ND
 	      YV(I)=T4*TA(I)/R(I)/JNU(I,3)/T1
 	    END DO
@@ -6458,7 +6460,7 @@ c
 	    ZV(I)=LOG10(R(I)/R(ND))
 	    YV(I)=R(I)*R(I)*R(I)*ETAL(I)
 	  END DO
-	  WV=0.0D0
+	  WV=RZERO
 	  WV(1)=YV(1)
 	  DO I=2,ND
 	    WV(I)=WV(I-1)+0.5D0*(YV(I-1)+YV(I))*(ZV(I-1)-ZV(I))
@@ -6515,14 +6517,14 @@ c
 	      ZV(I)=SQRT(R(I)*R(I)-T1)
 	      T2=ZV(I)/R(I)
 	      YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
-	      YV(I)=YV(I)/(1.0D0+T2*T2*SIGMA(I))
+	      YV(I)=YV(I)/(RONE+T2*T2*SIGMA(I))
 	    END DO
 	    DEFAULT=TRIM(TRANS_NAME)
 	    CALL DP_CURVE_LAB(K,ZV,YV,DEFAULT)
 	  ELSE
 	    DO I=1,ND
 	      YV(I)=CHIL(I)*R(I)*2.998E-10/FREQ/V(I)
-	      IF(RADIAL)YV(I)=YV(I)/(1.0D0+SIGMA(I))
+	      IF(RADIAL)YV(I)=YV(I)/(RONE+SIGMA(I))
 	    END DO
 	    IF(MINVAL(YV(1:ND)) .LE. 0)THEN
 	      WRITE(6,*)'Use C option in PGPLT with LG to plot on log scale'
@@ -6592,7 +6594,7 @@ c
 	    CALL DP_CURVE(ND,XV,YV)
 	  ELSE
 	    VALID_VALUE=.TRUE.
-	    ZV(1:ND)=0.0D0; YV(1:ND)=0.0D0
+	    ZV(1:ND)=RZERO; YV(1:ND)=RZERO
 	    T1=LOG10(1.6914D-11/FREQ)-10.0D0
 	    DO I=1,ND
 	      IF(CHIL(I) .GT. 0)THEN
@@ -6618,7 +6620,7 @@ c
 ! the polarization codes, or profile codes.
 !
 	ELSE IF(XOPT .EQ. 'WRC' .OR. XOPT .EQ. 'WRL')THEN
-	  CONT_INT=TWOHCSQ*(FREQ**3)/( EXP(HDKT*FREQ/T(ND))-1.0D0 )
+	  CONT_INT=TWOHCSQ*(FREQ**3)/( EXP(HDKT*FREQ/T(ND))-RONE )
 	  CALL USR_OPTION(FILE_FORMAT,'FORMAT',FILE_FORMAT,'Format: OLD, NEW, MULTI')
 !
 	  NEW_FILE=.TRUE.

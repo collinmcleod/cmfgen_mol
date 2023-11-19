@@ -23,7 +23,7 @@
 !
 ! Maximum number of photoionization routes for each species.
 !
-	INTEGER, PARAMETER :: BA_NPHOT_MAX=4
+	INTEGER, PARAMETER :: BA_NPHOT_MAX=10
 !
 ! Storage locations for the Statistical euilibrium equations, and its
 ! variation.
@@ -37,6 +37,7 @@
           REAL(KIND=LDP), POINTER :: QFV_R_EHB(:,:)  		!
           REAL(KIND=LDP), POINTER :: BA(:,:,:,:)		!BA matrix for XzV
           REAL(KIND=LDP), POINTER :: BA_PAR(:,:,:)		!BA matrix for XzV (diagonal terms)
+          REAL(KIND=LDP), POINTER :: T_EHB(:) 	 		!
 	  INTEGER, POINTER :: LNK_TO_IV(:)    	!
 	  INTEGER, POINTER :: LNK_TO_F(:)     	!
 	  INTEGER, POINTER :: EQ_IN_BA(:)     	!

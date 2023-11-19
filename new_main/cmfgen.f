@@ -121,7 +121,7 @@
 	EMLIN=1.0D+25*PLANCKS_CONSTANT()/4.0D0/FUN_PI()                                       !Old value: EMLIN=5.27296D-03
 !
 	WRITE(LUER,*)' '
-	WRITE(LUER,*)' Opacity/excitaion parameters adopted in CMFGEN are:'
+	WRITE(LUER,'(1X,A)')'Opacity/excitaion parameters adopted in CMFGEN are:'
 	WRITE(LUER,'(30X,A,ES16.8)')'     CHIBF=',CHIBF
 	WRITE(LUER,'(30X,A,ES16.8)')'     CHIFF=',CHIFF
 	WRITE(LUER,'(30X,A,ES16.8)')'      HDKT=',HDKT
@@ -552,10 +552,13 @@
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%DXzV_F(ND),STAT=IOS)       ; ATM(ID)%DXzV_F(:)=0.0D0
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%DXzV(ND),STAT=IOS)         ; ATM(ID)%DXzV(:)=0.0D0
 !
-	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%WSXzV(NS,ND,NPHOT_MAX),STAT=IOS)
-	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%WCRXzV(NS,ND,NPHOT_MAX),STAT=IOS)
-	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%dWSXzVdT(NS,ND,NPHOT_MAX),STAT=IOS)
-	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%dWCRXzVdT(NS,ND,NPHOT_MAX),STAT=IOS)
+! These 4 arrays are now allocated by a sparate call after the
+! photoioizations cross-sections have been read in.
+!
+!	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%WSXzV(NS,ND,NPHOT_MAX),STAT=IOS)
+!	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%WCRXzV(NS,ND,NPHOT_MAX),STAT=IOS)
+!	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%dWSXzVdT(NS,ND,NPHOT_MAX),STAT=IOS)
+!	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%dWCRXzVdT(NS,ND,NPHOT_MAX),STAT=IOS)
 !
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%WSE_X_XzV(NS,ND),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%WCR_X_XzV(NS,ND),STAT=IOS)

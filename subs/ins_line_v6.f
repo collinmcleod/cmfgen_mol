@@ -20,6 +20,7 @@
 	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
+! Altered 12-Nov-2023: Updated constants to use LDP notation.
 ! Altered 06-Jul-2015: dNU was not being compared to dV_CMF_PRO (GT instead of LT).
 ! Altered 23-Jan-2014: Cleaned and fixed issues with frequencies at bound-free edges.
 ! Created 03-Jan-2014: Essentially the same as INS_LINE_V5 except specing in resonance zone
@@ -107,37 +108,37 @@
 	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 	LU_ER=ERROR_LU()
 	CALL GET_VERBOSE_INFO(VERBOSE)
 !
 ! Check validity of some of the parameters.
 !
-	IF(R_CMF_WING_EXT .LT. 2.0D0 .OR. R_CMF_WING_EXT .GT. 20.0D0)THEN
+	IF(R_CMF_WING_EXT .LT. 2.0_LDP .OR. R_CMF_WING_EXT .GT. 20.0_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for R_CMF_WING_EXT in INS_LINE_V6'
 	  WRITE(LU_ER,*)'R_CMF_WING_EXT=',R_CMF_WING_EXT
 	  STOP
 	END IF
-	IF(ES_WING_EXT .LT. 0.0D0 .OR. ES_WING_EXT .GT. 20000.0D0)THEN
+	IF(ES_WING_EXT .LT. 0.0_LDP .OR. ES_WING_EXT .GT. 20000.0_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for ES_WING_EXT in INS_LINE_V6'
 	  WRITE(LU_ER,*)'ES_WING_EXT=',ES_WING_EXT
 	  STOP
 	END IF
-	IF(dV_CMF_PROF .LT. 1.0D0 .OR. dV_CMF_PROF .GT. 1.0D+05)THEN
+	IF(dV_CMF_PROF .LT. 1.0_LDP .OR. dV_CMF_PROF .GT. 1.0E+05_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for dV_CMF_PROF in INS_LINE_V6'
 	  WRITE(LU_ER,*)'dV_CMF_PROF=',dV_CMF_PROF
 	  STOP
      	END IF
-	IF(dV_CMF_WING .LT. 1.0D0 .OR. dV_CMF_WING .GT. 1.0D+05)THEN
+	IF(dV_CMF_WING .LT. 1.0_LDP .OR. dV_CMF_WING .GT. 1.0E+05_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for dV_CMF_WING in INS_LINE_V6'
 	  WRITE(LU_ER,*)'dV_CMF_WING=',dV_CMF_WING
 	  STOP
 	END IF
 !
-	T1=1.0D0-(6.0D0*MAXVAL(VEC_MIN_VDOP)+3.0D0*VINF)/C_KMS
-	T1=1.0D0/(1.0D0+(6.0D0*MAXVAL(VEC_MIN_VDOP)+3.0D0*VINF)/C_KMS)
-	T1=1.0D0/(1.0D0+(6.0D0*MAXVAL(VEC_MIN_VDOP)+3.0D0*MAX(VINF,3000.0D0))/C_KMS)
-	IF(T1 .LT. 0.5D0)T1=0.5D0
+	T1=1.0_LDP-(6.0_LDP*MAXVAL(VEC_MIN_VDOP)+3.0_LDP*VINF)/C_KMS
+	T1=1.0_LDP/(1.0_LDP+(6.0_LDP*MAXVAL(VEC_MIN_VDOP)+3.0_LDP*VINF)/C_KMS)
+	T1=1.0_LDP/(1.0_LDP+(6.0_LDP*MAXVAL(VEC_MIN_VDOP)+3.0_LDP*MAX(VINF,3000.0_LDP))/C_KMS)
+	IF(T1 .LT. 0.5_LDP)T1=0.5_LDP
 	LOCAL_N_LINES=N_LINES
 	DO WHILE(NU_CONT(NCF) .GT. NU_LINE(LOCAL_N_LINES)*T1)
 	  LOCAL_N_LINES=LOCAL_N_LINES-1
@@ -199,14 +200,14 @@
 ! frequency to ensure this. MIN_FREQ_RAT is the minimum ratio allowed between
 ! successive frequencies.
 !
-	EDGE_SEP_FAC=0.1D0
-	MIN_FREQ_RAT=1.0D0+EDGE_SEP_FAC*dNU_on_NU
+	EDGE_SEP_FAC=0.1_LDP
+	MIN_FREQ_RAT=1.0_LDP+EDGE_SEP_FAC*dNU_on_NU
 !
 ! Define edges of the e.s blue and red wings. The form of ES_RED_WING_EXTENT
 ! ensures that it is always positive, even when VINF is clse to c.
 !
-	ES_BLUE_WING_EXT=1.0D0+ES_WING_EXT/C_KMS		!v/v(o)
-	ES_RED_WING_EXT=1.0D0/( 1.0D0+(ES_WING_EXT+R_CMF_WING_EXT*VINF)/C_KMS)
+	ES_BLUE_WING_EXT=1.0_LDP+ES_WING_EXT/C_KMS		!v/v(o)
+	ES_RED_WING_EXT=1.0_LDP/( 1.0_LDP+(ES_WING_EXT+R_CMF_WING_EXT*VINF)/C_KMS)
 !
 ! Determine continuum frequencies bracketing bound-free edges. We keep
 ! these in our final continuum list. To avoid numerical instabilities
@@ -217,7 +218,7 @@
 	EDGE_FREQ(1:NCF)=.FALSE.
 	I=2
 	DO WHILE (I .LT. NCF)
-	  IF( ABS(NU_CONT(I-1)/NU_CONT(I)-1.0D0) .LT. 1.0D-08)THEN
+	  IF( ABS(NU_CONT(I-1)/NU_CONT(I)-1.0_LDP) .LT. 1.0E-08_LDP)THEN
 	    EDGE_FREQ(I-1)=.TRUE.
 	      EDGE_FREQ(I)=.TRUE.
 	    I=I+2
@@ -241,7 +242,7 @@
 	  CALL GET_LU(LU,'LU in INS_LINE_V6')
 	  OPEN(UNIT=LU,FILE='FREQUENCY_CONT_SEP',STATUS='UNKNOWN')
             DO ML=2,NCF
-              WRITE(LU,'(X,I6,3X,3ES15.6,3X,L1)')ML,NU_CONT(ML),0.01D0*C_KMS/NU_CONT(ML),
+              WRITE(LU,'(X,I6,3X,3ES15.6,3X,L1)')ML,NU_CONT(ML),0.01_LDP*C_KMS/NU_CONT(ML),
 	1             C_KMS*(NU_CONT(ML)-NU_CONT(ML-1))/NU_CONT(ML),EDGE_FREQ(ML)
 	    END DO
 	  CLOSE(LU)
@@ -265,7 +266,7 @@
 	ML=1
 	INDX=1
 	FREQ(1)=NU_CONT(1)
-	CUR_RED_PROF_EXT=10.0D0*NU_CONT(1)
+	CUR_RED_PROF_EXT=10.0_LDP*NU_CONT(1)
 !
 	LINES_THIS_FREQ(:)=0
 	LINE_ST_INDX(:)=0
@@ -280,7 +281,7 @@
 !
           IF( NU_CONT(ML) .GE. FREQ(INDX))THEN
 	     IF(NU_CONT(ML)-dNU_ON_NU .LE. FREQ(INDX) .AND. EDGE_FREQ(ML))THEN
-	       dNU_NEXT=FREQ(INDX)*(1.0D0-1.0D0/MIN_FREQ_RAT)
+	       dNU_NEXT=FREQ(INDX)*(1.0_LDP-1.0_LDP/MIN_FREQ_RAT)
 	       INDX=INDX+1
 	       FREQ(INDX)=FREQ(INDX-1)-dNU_NEXT
 	     ELSE
@@ -291,12 +292,12 @@
 ! frequency, C there is no need to use it, unless it is a bound-free edge
 ! frequency.
 !
-          ELSE IF( NU_CONT(ML) .GE. FREQ(INDX)*(1.0D0-dNU_ON_NU)
+          ELSE IF( NU_CONT(ML) .GE. FREQ(INDX)*(1.0_LDP-dNU_ON_NU)
 	1                       .AND. .NOT. EDGE_FREQ(ML) )THEN
 	     ML=ML+1			!Use current set frequency.
 !
           ELSE IF( NU_CONT(ML)*MIN_FREQ_RAT .GE. FREQ(INDX) .AND. EDGE_FREQ(ML))THEN
-	     dNU_NEXT=FREQ(INDX)*(1.0D0-1.0D0/MIN_FREQ_RAT)
+	     dNU_NEXT=FREQ(INDX)*(1.0_LDP-1.0_LDP/MIN_FREQ_RAT)
 	     ML=ML+1
 	    INDX=INDX+1
 	    FREQ(INDX)=FREQ(INDX-1)-dNU_NEXT
@@ -305,14 +306,14 @@
 !
 	    dNU_NEXT=FREQ(INDX)-NU_CONT(ML)
 	    IF(INDX .GT. 1)THEN
-	      T1=2.0D0*(FREQ(INDX-1)-FREQ(INDX))
+	      T1=2.0_LDP*(FREQ(INDX-1)-FREQ(INDX))
 	      dNU_NEXT=MIN(dNU_NEXT,T1)
 	    END IF
 	    IF(NU_CONT(ML) .GT. CUR_RED_PROF_EXT)THEN
 	      T1=FREQ(INDX)*dV_CMF_PROF/C_KMS
 	      dNU_NEXT=MIN(dNU_NEXT,T1)
 	    ELSE IF(NU_CONT(ML) .GT. CUR_RED_PROF_EXT*ES_RED_WING_EXT*
-	1                    (1.0D0+2.0D0*VINF/C_KMS) )THEN
+	1                    (1.0_LDP+2.0_LDP*VINF/C_KMS) )THEN
 	      T1=FREQ(INDX)*dV_CMF_WING/C_KMS
 	      dNU_NEXT=MIN(dNU_NEXT,T1)
 	    END IF
@@ -365,7 +366,7 @@
 	      DO K=LN_INDX,LN_INDX+NUM_RES_LINES-1
 	         IF(TRANS_TYPE(K)(1:3) .EQ. 'BLA')THEN
 	           dNU=FREQ(INDX)-NU_LINE(K)
-	           IF(dNU .GT. FRAC_DOP*VEC_MIN_VDOP(K)*FREQ(INDX)*0.1D0)THEN
+	           IF(dNU .GT. FRAC_DOP*VEC_MIN_VDOP(K)*FREQ(INDX)*0.1_LDP)THEN
 	             dNU_NEXT=MIN(dNU_NEXT,dNU)
 	           END IF
 	         END IF
@@ -394,7 +395,7 @@
 	    DO WHILE( LN_INDX .LE. N_LINES .AND. FREQ(INDX) .LE.
 	1         NU_END_LINE(LN_INDX) )
 	      IF(TRANS_TYPE(LN_INDX)(1:3) .EQ. 'BLA')THEN
-	        T1=NU_END_LINE(LN_INDX)/(1.0D0+2.0D0*VINF/C_KMS)
+	        T1=NU_END_LINE(LN_INDX)/(1.0_LDP+2.0_LDP*VINF/C_KMS)
 	        CUR_RED_PROF_EXT=MIN(CUR_RED_PROF_EXT,T1)
 	      END IF
 	      LN_INDX=LN_INDX+1
@@ -417,7 +418,7 @@
 ! Test for monotocity of frequencies, and determine MINIMUM frequency
 ! spacing in velocity space.
 !
-	T1=10000.0D0
+	T1=10000.0_LDP
 	DO ML=1,NFREQ-1
 	  T1=MIN( T1 , C_KMS*(FREQ(ML)-FREQ(ML+1))/FREQ(ML) )
 	  IF(FREQ(ML) .LE. FREQ(ML+1))THEN
@@ -460,7 +461,7 @@
 	IF(VERBOSE)THEN
 	  OPEN(UNIT=LU,FILE='FREQUENCY_GRID',STATUS='UNKNOWN')
 	  DO I=2,NFREQ
-	    WRITE(63,'(1X,I6,1P,2E12.4)')I,FREQ(I),3.0D+05*(FREQ(I-1)-FREQ(I))/FREQ(I-1)
+	    WRITE(63,'(1X,I6,1P,2E12.4)')I,FREQ(I),3.0E+05_LDP*(FREQ(I-1)-FREQ(I))/FREQ(I-1)
 	  END DO
 	  CLOSE(UNIT=LU)
 	END IF
@@ -471,7 +472,7 @@
 	      IF(TRANS_TYPE(I) .EQ. 'BLANK')THEN
 	        WRITE(77,'(3I8,1P,4E15.5)')
 	1          I,LINE_ST_INDX(I),LINE_END_INDX(I),
-	1          NU_LINE(I),0.01D0*C_KMS/NU_LINE(I),
+	1          NU_LINE(I),0.01_LDP*C_KMS/NU_LINE(I),
 	1          C_KMS*( FREQ(LINE_ST_INDX(I))-NU_LINE(I))/NU_LINE(I),
 	1          C_KMS*( NU_LINE(I)-FREQ(LINE_END_INDX(I)) )/NU_LINE(I)
 	      END IF
