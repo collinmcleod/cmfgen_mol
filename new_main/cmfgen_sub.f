@@ -744,9 +744,9 @@
 	1                 'SET_ZERO',T2,GF_LEV_CUT,MIN_NUM_TRANS,L_FALSE,L_FALSE,
 	1                 LUIN,LUSCR,TMP_STRING)
 	      TMP_STRING=TRIM(ION_ID(ID))//'_F_TO_S'
-	      CALL RD_F_TO_S_IDS_V3( ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
+	      CALL RD_F_TO_S_IDS_V4( ATM(ID)%F_TO_S_XzV, ATM(ID)%INT_SEQ_XzV,
 	1           ATM(ID)%XzVLEVNAME_F, ATM(ID)%NXzV_F, ATM(ID)%NXzV,
-	1           LUIN,TMP_STRING,SL_OPTION,F_TO_S_RD_ERROR)
+	1           LUIN,TMP_STRING,SL_OPTION,dE_OPTION,F_TO_S_RD_ERROR)
 	      CALL RDPHOT_GEN_V2( ATM(ID)%EDGEXzV_F, ATM(ID)%XzVLEVNAME_F,
 	1           ATM(ID)%GIONXzV_F,AT_NO(SPECIES_LNK(ID)),
 	1           ATM(ID)%ZXzV, ATM(ID)%NXzV_F,
@@ -1535,7 +1535,7 @@
 !
 	    T1=HDKT*NU(ML)/T(ND)
 	    T3=FQW(ML)*TWOHCSQ*( NU(ML)**3 )*T1*EMHNUKT(ND)/
-	1         CHI(ND)/T(ND)/(1.0_DP-EMHNUKT(ND))**2
+	1         CHI(ND)/T(ND)/(1.0_LDP-EMHNUKT(ND))**2
 	    DTDR=DTDR+T3
 !
 ! Set TA = to the variation vector at the inner boundary.
@@ -1547,13 +1547,13 @@
 !
 	      T1=HDKT*NU(ML)/T(ND)
 	      T3=FQW(ML)*TWOHCSQ*( NU(ML)**3 )*T1*EMHNUKT(ND)/
-	1           CHI(ND)/T(ND)/(1.0_DP-EMHNUKT(ND))**2
+	1           CHI(ND)/T(ND)/(1.0_LDP-EMHNUKT(ND))**2
 	      TA(1:NT)=VCHI(1:NT,ND)
 	      DO I=1,NT-1
 	        DIFFW(I)=DIFFW(I)+T3*TA(I)/CHI(ND)
 	      END DO
-	      DIFFW(NT)=DIFFW(NT)+T3*(TA(NT)/CHI(ND)-(T1*(1.0_DP+EMHNUKT(ND))
-	1           /(1.0_DP-EMHNUKT(ND))-2.0_DP)/T(ND))
+	      DIFFW(NT)=DIFFW(NT)+T3*(TA(NT)/CHI(ND)-(T1*(1.0_LDP+EMHNUKT(ND))
+	1           /(1.0_LDP-EMHNUKT(ND))-2.0_LDP)/T(ND))
 	    END IF
 	    CALL TUNE(ITWO,'DTDR_VEC')
 !

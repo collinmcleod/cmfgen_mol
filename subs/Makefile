@@ -30,6 +30,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(comp_var_jrec_v2.o)\
       $(LIB)(det_main_cont_freq.o)\
       $(LIB)(dop_pro.o)\
+      $(LIB)(do_de_split.o)\
       $(LIB)(do_sl_ls_split.o)\
       $(LIB)(dp_zero.o)\
       $(LIB)(dspheredchi.o)\
@@ -52,6 +53,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(extend_opac.o)\
       $(LIB)(extend_vtsigma.o)\
       $(LIB)(fdg_f_to_s_ns_v1.o)\
+      $(LIB)(fdg_f_to_s_ns_v2.o)\
       $(LIB)(fg_comp.o)\
       $(LIB)(fg_j_cmf_v9.o)\
       $(LIB)(fg_j_cmf_v10.o)\
@@ -172,6 +174,7 @@ OBJ = $(LIB)(add_par_to_full.o)\
       $(LIB)(rd_f_to_s_ids.o)\
       $(LIB)(rd_f_to_s_ids_v2.o)\
       $(LIB)(rd_f_to_s_ids_v3.o)\
+      $(LIB)(rd_f_to_s_ids_v4.o)\
       $(LIB)(rd_free_val.o)\
       $(LIB)(rd_log.o)\
       $(LIB)(rd_sol_abund_scale.o)\

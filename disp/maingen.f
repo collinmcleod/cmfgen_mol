@@ -172,6 +172,7 @@
 	LOGICAL GREY_REL
 	LOGICAL PLANE_PARALLEL_NOV
 	LOGICAL FLUSH_FILE
+	LOGICAL OVERWRITE
 !
 	REAL(KIND=LDP) XV(N_PLT_MAX),XV_SAV(N_PLT_MAX),XNU(N_PLT_MAX)
 	REAL(KIND=LDP) YV(N_PLT_MAX),ZV(N_PLT_MAX),WV(N_PLT_MAX)
@@ -1907,8 +1908,10 @@
 	  ELSE
 	    TYPE='POP'
 	  END IF
+	  CALL USR_OPTION(OVERWRITE,'OVER','F','Overwrite existing files?')
 	  CALL USR_HIDDEN(STRING,'EXT',TYPE,'File appendage')
-	  WRITE(T_OUT,*)STRING
+	  IF(STRING .EQ. 'POP')STRING='POPS'
+	  WRITE(T_OUT,*)'File names will have the form XzV'//TRIM(STRING)
 !
 ! Set depth vector. The default allows will write all depths. We
 ! can omit ceartain depths using the OWIN option.
@@ -1938,8 +1941,9 @@
 	        CALL NEW_WRITEDC_V6(ATM(ID)%XzVLTE_F,ATM(ID)%LOG_XzVLTE_F,ATM(ID)%W_XzV_F,
 	1             ATM(ID)%AXzV_F,ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%NXzV_F,
 	1             ATM(ID)%DXzV_F,ATM(ID)%GIONXzV_F,IONE,TA,T,ED,V,CLUMP_FAC,
-	1             DO_DPTH,LUM,ND,FILENAME,TYPE,IONE)
+	1             DO_DPTH,LUM,ND,FILENAME,TYPE,IONE,OVERWRITE,IOS)
 	      END IF
+	      IF(IOS .NE. 0)EXIT
 	    END DO
 	  ELSE
 	    DO ID=1,NUM_IONS
@@ -1948,8 +1952,9 @@
 	        CALL NEW_WRITEDC_V6(ATM(ID)%XzV_F,ATM(ID)%LOG_XzVLTE_F,ATM(ID)%W_XzV_F,
 	1             ATM(ID)%AXzV_F,ATM(ID)%EDGEXzV_F,ATM(ID)%GXzV_F,ATM(ID)%NXzV_F,
 	1             ATM(ID)%DXzV_F,ATM(ID)%GIONXzV_F,IONE,TA,T,ED,V,CLUMP_FAC,
-	1             DO_DPTH,LUM,ND,FILENAME,TYPE,IONE)
+	1             DO_DPTH,LUM,ND,FILENAME,TYPE,IONE,OVERWRITE,IOS)
 	      END IF
+	      IF(IOS .NE. 0)EXIT
 	    END DO
 	  END IF
 !
