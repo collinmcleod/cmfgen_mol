@@ -16,6 +16,7 @@
 	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
+! Altered 01-Dec-2023 : Added OMP paralleization.
 ! Altered 24-Sep-2023 : Adjusted constants for consistency. Some data ouput for checking between
 !                            RE and EHB equations (LONG ver -- 15-Oct-2023).
 ! Altered 04-May-2022 : Changed HMI to H0
@@ -106,6 +107,7 @@
 ! Since BFCR = Int (nu-edge)/nu, J?_CR is associated with WSE in the expression
 ! for BFCR.
 !
+!$OMP PARALLEL DO PRIVATE(I,J,JB_RAT,JC_RAT)
 	DO J=1,ND
 	  IF(JREC(J) .GT. 0.0D0)THEN
 	    JB_RAT=LOG(DI(ION_LEV,J)/DI(1,J))-LOG_DIST(ION_LEV,J)+LOG_DIST(1,J)

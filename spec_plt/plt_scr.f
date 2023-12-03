@@ -10,6 +10,7 @@
 	IMPLICIT NONE
 	INTEGER ND,NT,NIT
 !
+! Altered 03-Dec-2023: Added AFDG option.
 ! Altered 24-Sep-2023: Added SFDG option (needs work) - 7sep23.
 !                      Added DREP option -- allows one depth to replace other depths.
 !                      Added (modified) DNRG option -- designed to allow testing of subroutine.
@@ -31,6 +32,7 @@
 	REAL(KIND=LDP), ALLOCATABLE :: R_MAT(:,:)		!ND,NIT
 	REAL(KIND=LDP), ALLOCATABLE :: V_MAT(:,:)		!ND,NIT
 	REAL(KIND=LDP), ALLOCATABLE :: RAT(:,:)			!NT,ND
+	REAL(KIND=LDP), ALLOCATABLE :: SOLS(:,:)		!NT,ND
 	REAL(KIND=LDP), ALLOCATABLE :: CORRECTIONS(:,:)			!NT,ND
 !
 	REAL(KIND=LDP), ALLOCATABLE :: R(:)			!ND
@@ -43,7 +45,8 @@ C
 	REAL(KIND=LDP), ALLOCATABLE :: TA(:)			!
 	REAL(KIND=LDP), ALLOCATABLE :: TB(:)			!
 !
-	INTEGER, ALLOCATABLE :: I_BIG(:)		!NT
+	INTEGER, ALLOCATABLE :: I_BIG(:) 			!NT
+	INTEGER, ALLOCATABLE :: MATCHING_ION_LEV(:)		!NT
 	REAL(KIND=LDP), ALLOCATABLE :: Z_BIG(:)			!NT
 C
 	INTEGER, PARAMETER :: NUM_IONS_MAX=500
@@ -83,6 +86,9 @@ C
 	INTEGER RITE_N_TIMES
 	INTEGER LUSCR
 	INTEGER IOS
+	INTEGER LST_DPTH
+	INTEGER ION_POP
+	INTEGER CNT_MIN,CNT_MAX
 !
 	INTEGER, PARAMETER :: NLEV_MAX=10
 	INTEGER LEVELS(NLEV_MAX)
@@ -91,6 +97,7 @@ C
 	LOGICAL NEWMOD
 	LOGICAL WRITE_RVSIG
 	LOGICAL DO_ABS
+	LOGICAL DO_FIX
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	CHARACTER*10 TMP_STR
 	CHARACTER*10 PLT_OPT
@@ -166,6 +173,7 @@ C
 	ALLOCATE (V_MAT(ND,NIT))
 	ALLOCATE (CORRECTIONS(NT,ND))
 	ALLOCATE (RAT(NT,ND))
+	ALLOCATE (SOLS(NT,ND))
 !
 	ALLOCATE (R(ND))
 	ALLOCATE (V(ND))
@@ -256,13 +264,13 @@ C
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'FDG      :: Fudge individual values at a single depth and output to SCRTEMP'
 	WRITE(T_OUT,*)'FDGV     :: Fudge values over a ranges of depths (% change) and output to SCRTEMP'
+	WRITE(T_OUT,*)'AFDG     :: Replace values with large alternating STEQ corrections.'
 	WRITE(T_OUT,*)'SM       :: Fudge values over a ranges of depths using values at higher/adjacent depth'
 	WRITE(T_OUT,*)'INT      :: Interpolate values using adjacent depths whose',
 	1                             ' corrections are above a certain % limit'
 	WRITE(T_OUT,*)'NINT     :: Interpolate values whose corrections are above a certain % limit'
 	WRITE(T_OUT,*)'RAT      :: Compare populations at adjacent depths'
 	WRITE(T_OUT,*)'REP      :: Replace populations on one iteration with those of another'
-	WRITE(T_OUT,*)'FDG_OSC  ::'
 	WRITE(T_OUT,*)'UNDO     :: Undo corrections over a range of depths'
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'LY  :: Switch to/from Log(Y) for options where appropriate (not full implemented)'
@@ -473,9 +481,9 @@ C
 	  IT=NIT; ID=ND
 	  DO WHILE(1 .EQ. 1)
 	    CALL GEN_IN(IT,'Iteration # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NIT)
-	    IF(IT .EQ. 0)EXIT
-	    CALL GEN_IN(ID,'Depths',LOW_LIM=IONE,UP_LIM=ND)
-	    IF(ID .EQ. 0)EXIT
+	    IF(IT .LE. 0 .OR. IT .GT. NIT)EXIT
+	    CALL GEN_IN(ID,'Depths',LOW_LIM=IZERO,UP_LIM=ND)
+	    IF(ID .LE. 0 .OR. ID .GT. ND)EXIT
 	    DO IVAR=1,NT
 	      Y(IVAR)=POPS(IVAR,ID,IT)
 	      Z(IVAR)=LOG10(POPS(IVAR,ID,IT))
@@ -496,16 +504,17 @@ C
 	ELSE IF(PLT_OPT(1:2) .EQ. 'PD')THEN
 	  IT=NIT; ID=ND
 	  DO WHILE(1 .EQ. 1)
-	    CALL GEN_IN(IT,'Iteration # (zero to exit)')
-	    IF(IT .EQ. 0)EXIT
+	    CALL GEN_IN(IT,'Iteration # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NIT)
+	    IF(IT .LE. 0 .OR. IT .GT. NIT)EXIT
 	    IVAR=NT
-	    CALL GEN_IN(IVAR,'Variable # (zero to exit)')
-	    IF(IVAR .EQ. 0)EXIT
+	    CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
+	    IF(IVAR .LE. 0 .OR. IVAR .GT. NT)EXIT
 	    DO ID=1,ND
 	      Y(ID)=100.0D0*(POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1))/POPS(IVAR,ID,IT)
 	      X(ID)=ID
 	    END DO
-	    CALL DP_CURVE(ND,X,Y)
+	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	    
+	    CALL DP_CURVE(ND,X,Y,STRING)
 	  END DO
 	  YLABEL='[Y(I-1)-Y(I)]/Y(I) [%]'
 	  CALL GRAMON_PGPLOT('Depth',Ylabel,' ',' ')
@@ -515,20 +524,22 @@ C
 	  IT=NIT; ID=ND
 	  DO WHILE(1 .EQ. 1)
 	    CALL GEN_IN(IT,'Iteration # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NIT)
-	    IF(IT .EQ. 0)EXIT
+	    IF(IT .LE. 0 .OR. IT .GT. NIT)EXIT
 	    IVAR=NT
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
-	    IF(IVAR .EQ. 0)EXIT
+	    IF(IVAR .LE. 0 .OR. IVAR .GT. NT)EXIT
 	    DO ID=1,ND
 	      Y(ID)=POPS(IVAR,ID,IT)
 	      Z(ID)=LOG10(POPS(IVAR,ID,IT))
 	      X(ID)=ID
 	    END DO
+!
+	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	    
 	    IF(LOG_Y_AXIS)THEN
-	      CALL DP_CURVE(ND,X,Z)
+	      CALL DP_CURVE_LAB(ND,X,Z,STRING)
 	      Ylabel='Log'
 	    ELSE
-	      CALL DP_CURVE(ND,X,Y)
+	      CALL DP_CURVE_LAB(ND,X,Y,STRING)
 	      Ylabel=''
 	    END IF
 	  END DO
@@ -539,10 +550,10 @@ C
 	  IT=NIT; ID=ND
 	  DO WHILE(1 .EQ. 1)
 	    CALL GEN_IN(IT,'Iteration # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NIT)
-	    IF(IT .EQ. 0)EXIT
+	    IF(IT .LE. 0 .OR. IT .GT. NIT)EXIT
 	    IVAR=NT
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
-	    IF(IVAR .EQ. 0)EXIT
+	    IF(IVAR .LE. 0 .OR. IVAR .GT. NT)EXIT
 	    T1=1.0D0
 	    IF(V(1) .GT. 10000.0D0)T1=1.0D-03
 	    DO ID=1,ND
@@ -550,11 +561,13 @@ C
 	      Z(ID)=LOG10(POPS(IVAR,ID,IT))
 	      X(ID)=T1*V_MAT(ID,IT)
 	    END DO
+!
+	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	    
 	    IF(LOG_Y_AXIS)THEN
-	      CALL DP_CURVE(ND,X,Z)
+	      CALL DP_CURVE_LAB(ND,X,Z,STRING)
 	      Ylabel='Log'
 	    ELSE
-	      CALL DP_CURVE(ND,X,Y)
+	      CALL DP_CURVE_LAB(ND,X,Y,STRING)
 	      Ylabel=''
 	    END IF
 	  END DO
@@ -569,20 +582,21 @@ C
           IT=NIT; ID=ND
           DO WHILE(1 .EQ. 1)
             CALL GEN_IN(IT,'Iteration # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NIT)
-            IF(IT .EQ. 0)EXIT
+	    IF(IT .LE. 0 .OR. IT .GT. NIT)EXIT
             IVAR=NT
             CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
-            IF(IVAR .EQ. 0)EXIT
+	    IF(IVAR .LE. 0 .OR. IVAR .GT. NT)EXIT
             DO ID=1,ND
               Y(ID)=POPS(IVAR,ID,IT)
               Z(ID)=LOG10(POPS(IVAR,ID,IT))
               X(ID)=POPS(NT,ID,IT)
             END DO
+	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	    
             IF(LOG_Y_AXIS)THEN
-              CALL DP_CURVE(ND,X,Z)
+              CALL DP_CURVE_LAB(ND,X,Z,STRING)
               Ylabel='Log'
             ELSE
-              CALL DP_CURVE(ND,X,Y)
+              CALL DP_CURVE_LAB(ND,X,Y,STRING)
               Ylabel=''
             END IF
           END DO
@@ -593,10 +607,10 @@ C
 	  IT=NIT; ID=ND
 	  DO WHILE(1 .EQ. 1)
 	    CALL GEN_IN(IT,'Iteration # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NIT)
-	    IF(IT .EQ. 0)EXIT
+	    IF(IT .LE. 0 .OR. IT .GT. NIT)EXIT
 	    IVAR=NT
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
-	    IF(IVAR .EQ. 0)EXIT
+	    IF(IVAR .LE. 0 .OR. IVAR .GT. NT)EXIT
 	    T1=1.0D0
 	    IF(R(1) .GT. 1.0D+04)T1=1.0D-04
 	    DO ID=1,ND
@@ -604,11 +618,12 @@ C
 	      Z(ID)=LOG10(POPS(IVAR,ID,IT))
 	      X(ID)=1.0D-04*R_MAT(ID,IT)
 	    END DO
+	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	    
 	    IF(LOG_Y_AXIS)THEN
-	      CALL DP_CURVE(ND,X,Z)
+	      CALL DP_CURVE_LAB(ND,X,STRING)
 	      Ylabel='Log'
 	    ELSE
-	      CALL DP_CURVE(ND,X,Y)
+	      CALL DP_CURVE_LAB(ND,X,Y,STRING)
 	      Ylabel=''
 	    END IF
 	  END DO
@@ -778,6 +793,67 @@ C
 	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
 	1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
 	1              NT,ND,LUSCR,NEWMOD)
+	  WRITE(6,*)'Corrections written to SCRTEMP as new (and last) iteration.'
+	  WRITE(6,*)'A new record is writted every time FDG or FDGV is called'
+	  WRITE(6,*)'Restart program if you wish to compare to with pops from last iteration.'
+	  WRITE(6,*)'Populations can be compared with older iterations.'
+	  GOTO 200
+!
+	ELSE IF(PLT_OPT(1:4) .EQ. 'AFDG')THEN
+	  FDG_COUNTER=FDG_COUNTER+1
+	  IT=NIT; ID=ND; IVAR=NT
+	  CALL GEN_IN(IT,'Iteration # (zero to exit) - default is last iteration',LOW_LIM=IZERO,UP_LIM=NIT)
+	  IF(IT .EQ. 0)GOTO 200
+!
+	  OPEN(UNIT=20,FILE='STEQ_CORS',STATUS='OLD',ACTION='READ')
+	     DO WHILE(INDEX(STRING,'STEQ SOLUTION ARRAY') .EQ. 0)
+	       READ(20,'(A)')STRING
+	     END DO
+	     DO K=1,ND-9,10
+	       READ(20,'(A)')STRING
+	       DO I=1,NT
+	         READ(20,'(A)')STRING
+	         J=INDEX(STRING,'#')
+	         READ(STRING(J+1:),*)(SOLS(I,J),J=K,MIN(K+9,ND))
+	       END DO
+	     END DO
+	  CLOSE(UNIT=20)
+	  IF(.NOT.  ALLOCATED(MATCHING_ION_LEV))ALLOCATE(MATCHING_ION_LEV(NT))
+	  CALL GET_ASSOC_ION(MATCHING_ION_LEV,NT)
+	  DO I=1,NT
+	    WRITE(170,*)I,MATCHING_ION_LEV(I)
+	  END DO
+	  FLUSH(UNIT=170)
+!
+	  ION_POP=1; LST_DPTH=ND
+	  I=1
+	  DO WHILE(I .LT. NT-2)
+	    T1=MINVAL(SOLS(I,:))
+	    IF(T1 .LT. 1.0E+10)THEN
+	      CNT_MIN=0; CNT_MAX=0
+	      DO K=1,ND
+	        IF(SOLS(I,K) .LT. -1.0E+10)THEN
+	           CNT_MIN=CNT_MIN+1
+	           LST_DPTH=K
+	        END IF
+	        IF(SOLS(I,K) .GE.  0.998)CNT_MAX=CNT_MAX+1
+	      END DO
+	    END IF
+	    ION_POP=MATCHING_ION_LEV(I)
+	    IF(CNT_MIN .GT. 0 .AND. (CNT_MAX .GT. 0 .OR. CNT_MIN .GT. 10))THEN
+	      DO K=1,LST_DPTH
+	         POPS(I,K,IT)=1.0D-22*POPS(ION_POP,K,IT)*POPS(NT-1,K,IT)
+	      END DO
+	    END IF
+	    I=I+1
+	  END DO
+!
+	  IREC=NIT			!IREC is updated on write
+          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
+	  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
+	1           RITE_N_TIMES,LST_NG,WRITE_RVSIG,NT,ND,LUSCR,NEWMOD)
+!
+	  WRITE(6,*)' '
 	  WRITE(6,*)'Corrections written to SCRTEMP as new (and last) iteration.'
 	  WRITE(6,*)'A new record is writted every time FDG or FDGV is called'
 	  WRITE(6,*)'Restart program if you wish to compare to with pops from last iteration.'

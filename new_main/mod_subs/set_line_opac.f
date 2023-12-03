@@ -20,6 +20,7 @@
 	USE LINE_MOD
         IMPLICIT NONE
 !
+! Altered 03-Dec-2023 : Improved rror message when the line opacity is zero.
 ! Altered 26-Apr-2021 : Stark profile section now explictly allows for the case when LST_DEPTH_ONLY is true.
 !                          MOD_ED removed (was not being used). Upper ED
 !                          was already being controlled by MAX_PROF_ED.
@@ -61,6 +62,8 @@
 	INTEGER ID
 	INTEGER FREQ_INDX
 	INTEGER D_ST
+	INTEGER ZERO_CNT
+	INTEGER LST_DEPTH
 !
 	INTEGER NL,NUP
 	INTEGER MNL,MNL_F
@@ -302,18 +305,27 @@
 !
 	  NL=SIM_NL(SIM_INDX)
 	  NUP=SIM_NUP(SIM_INDX)
+	  ZERO_CNT=0
 	  DO I=D_ST,ND
 	    CHIL_MAT(I,SIM_INDX)=T1*(L_STAR_RATIO(I,SIM_INDX)*POPS(NL,I)-
 	1            GLDGU(SIM_INDX)*U_STAR_RATIO(I,SIM_INDX)*POPS(NUP,I))
 	    ETAL_MAT(I,SIM_INDX)=T2*POPS(NUP,I)*U_STAR_RATIO(I,SIM_INDX)
 	    IF(CHIL_MAT(I,SIM_INDX) .EQ. 0)THEN
 	      CHIL_MAT(I,SIM_INDX)=0.01D0*T1*POPS(NL,I)*L_STAR_RATIO(I,SIM_INDX)
-	      WRITE(LUER,*)'Zero line opacity in CMFGEN_SUB'
-	      WRITE(LUER,*)'This needs to be fixed'
-	      J=LEN_TRIM(TRANS_NAME_SIM(SIM_INDX))
-	      WRITE(LUER,'(1X,A)')TRANS_NAME_SIM(SIM_INDX)(1:J)
+	      LST_DEPTH=I
+	      ZERO_CNT=ZERO_CNT+1
 	    END IF
 	  END DO
+	  IF(ZERO_CNT .GT. 0)THEN
+	    WRITE(LUER,*)'Zero line opacity in CMFGEN_SUB - this needs to be fixed'
+	    J=LEN_TRIM(TRANS_NAME_SIM(SIM_INDX))
+	    WRITE(LUER,'(1X,A,4(3X,A,I5))')TRANS_NAME_SIM(SIM_INDX)(1:J),
+	1                       'NL=',NL,'NUP=',NUP,'# depths=',ZERO_CNT,'Last depth=',LST_DEPTH
+	    WRITE(LUER,'(1X,2(A,ES14.4,3X))')'OSCIL=',OSCIL(SIM_INDX),'Scale factor',T3
+	    TA(1:ND)=POPS(NL,1:ND); I=4
+	    CALL WRITV_V2(TA,ND,I,'POPS vector',LUER)
+	    CALL WRITV_V2(L_STAR_RATIO(1,SIM_INDX),ND,I,'L_STAR vector',LUER)
+	  END IF
 !
 	END DO	!Checking whether a new line is being added.
 !

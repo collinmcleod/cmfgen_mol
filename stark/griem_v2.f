@@ -1,9 +1,11 @@
 !
       SUBROUTINE GRIEM_V2(PR,DWS,NWS,ED_IN,TEMP_IN,VDOP,
-     *                               IL,IU,ZZ,AMASS,RET_LOG)
-	USE SET_KIND_MODULE
+     1                               IL,IU,ZZ,AMASS,RET_LOG)
+      USE SET_KIND_MODULE
       USE GRIEM_STARK_MOD
       IMPLICIT NONE
+!
+! Altered : 03-Dec-2023 - change continuation character to 1
 !
 ! Create a profile table using the griem theory as used by A and M
 ! in their AP J S24 paper.
@@ -278,7 +280,7 @@ C BY S SEGMENT
 !     NORMAL CASE
    10 IF(BET/GAM.GT.1.E2) GOTO 20
       TBG_STRK=GAM*(TF_STRK(BET,GAM)+TF_STRK(-BET,GAM)+
-     .            TG_STRK(BET,GAM)+TG_STRK(-BET,GAM))/PI
+     1            TG_STRK(BET,GAM)+TG_STRK(-BET,GAM))/PI
       RETURN
    20 TBG_STRK=TH_STRK(BET)+GAM/PI/BET**2
 !
@@ -389,7 +391,7 @@ C
       X1=B+4.
 !
       TF_STRK=4.0  *D2+4.0  *D3*(B+2.0  )+0.5*(D1-G2*D3)*LOG((X1*X1+G2)/
-     . (B*B+G2)) +(D -G2*D2)*( ATAN(X1/G)- ATAN(B/G))/G
+     1 (B*B+G2)) +(D -G2*D2)*( ATAN(X1/G)- ATAN(B/G))/G
 !
       RETURN
       END
@@ -510,7 +512,7 @@ C
       ELSE
         T=1./(1.+0.3275911*T)
         ERR_STRK=((((1.061405429  *T-1.453152027  )*T +1.421413741  )*T-
-     . 0.284496736  )*T +0.254829592  )*T
+     1 0.284496736  )*T +0.254829592  )*T
         EX=DOPLER_STRK(X)
         ERR_STRK=SIGN(ONE-EX*ERR_STRK,X)
       END IF
