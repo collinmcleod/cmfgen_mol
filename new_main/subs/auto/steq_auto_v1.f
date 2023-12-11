@@ -123,9 +123,9 @@
 	      SE(ID)%BA(EQION,VED,M,I) =SE(ID)%BA(EQION,VED,M,I)  -AUTO(K)*HNST_F(K,I)/ED(I)
 !
 	      SE(ID)%BA(J,VT,M,I)      =SE(ID)%BA(J,VT,M,I)       -AUTO(J)*HNST_F(J,I)*
-	1                                                               (1.5D0+HDKT*FEDGE_F(K)/T(I))/T(I)
+	1                                                               (1.5_LDP+HDKT*FEDGE_F(K)/T(I))/T(I)
 	      SE(ID)%BA(EQION,VT,M,I)  =SE(ID)%BA(EQION,VT,M,I)   +AUTO(J)*HNST_F(J,I)*
-	1                                                               (1.5D0+HDKT*FEDGE_F(K)/T(I))/T(I)
+	1                                                               (1.5_LDP+HDKT*FEDGE_F(K)/T(I))/T(I)
 !
 	     END DO          		!Over level variable
 	  END IF

@@ -30,13 +30,13 @@
 	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	      DO I=1,ATM(ID)%NXzV
 	        EQ=SE(ID)%EQ_IN_BA(I)
-	        C_MAT(EQ,1:NT)=0.0D0
+	        C_MAT(EQ,1:NT)=0.0_LDP
 	      END DO
 	    END DO
 	  END DO
-	  STEQ_VEC(1:NT-1)=0.0D0                !As forcing LTE and number conservation.
+	  STEQ_VEC(1:NT-1)=0.0_LDP                !As forcing LTE and number conservation.
 	ELSE
-	  C_MAT(1:NT-1,1:NT)=0.0D0
+	  C_MAT(1:NT-1,1:NT)=0.0_LDP
 	END IF
 !
 	IF(DIAG_MAT)THEN
@@ -45,7 +45,7 @@
 	      ION_EQ=SE(ID)%EQ_IN_BA(1)+ATM(ID)%NXzV
 	      DO I=1,ATM(ID)%NXzV
 	        EQ=SE(ID)%EQ_IN_BA(I)
-	        C_MAT(EQ,EQ)=1.0D0
+	        C_MAT(EQ,EQ)=1.0_LDP
 	        C_MAT(EQ,ION_EQ)=-ATM(ID)%XzVLTE(I,DEPTH_INDX)/ATM(ID)%DXzV(DEPTH_INDX)
 	        C_MAT(EQ,NT-1)=-ATM(ID)%XzVLTE(I,DEPTH_INDX)/ED(DEPTH_INDX)
 	        C_MAT(EQ,NT)=-ATM(ID)%XzVLTE(I,DEPTH_INDX)*ATM(ID)%dlnXzVLTE_dlnT(I,DEPTH_INDX)/T(DEPTH_INDX)

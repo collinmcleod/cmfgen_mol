@@ -69,14 +69,14 @@
 !
 	IF( (NINT(AMASS_IN) .EQ. 1 .OR.
 	1          (NINT(AMASS_IN) .EQ. 4 .AND. NINT(Z_IN) .EQ. 2)) .AND.
-	1     NL .LT. 3.1*Z_IN )THEN
+	1     NL .LT. 3.1_LDP*Z_IN )THEN
 !
 ! We do HI and HeII later.
 !
 	ELSE
-          T1=1.0D-15/1.77245385095516D0         !1.0D-15/SQRT(PI)
-          TMP_VEC(1:ND)=( VTURB_IN(1:ND)/12.85D0  )**2
-          T2=NU_ZERO*12.85D0/C_KMS
+          T1=1.0E-15_LDP/1.77245385095516_LDP         !1.0D-15/SQRT(PI)
+          TMP_VEC(1:ND)=( VTURB_IN(1:ND)/12.85_LDP  )**2
+          T2=NU_ZERO*12.85_LDP/C_KMS
           DO I=1,ND
             NU_DOP=T2*SQRT( TEMP_IN(I)/AMASS_IN + TMP_VEC(I) )
             PROF(I)=EXP( -( (NU(ML_CUR)-NU_ZERO)/NU_DOP )**2 )*T1/NU_DOP
@@ -139,7 +139,7 @@
 	  STOP
 	END IF
 	STORE_AVAIL(LOC_INDX)=.FALSE.
-	PROF_STORE(:,:,LOC_INDX)=0.0D0
+	PROF_STORE(:,:,LOC_INDX)=0.0_LDP
 !
 ! Determine how many frequencies we need to compute profile for, and check
 ! we have sufficent storage.
@@ -154,7 +154,7 @@
 ! Convert from Frequency to Angstrom space, measured from line center.
 !
 	DO ML=ML_ST,ML_END
-	  DWS_GRIEM(ML-ML_ST+1)=0.01D0*C_KMS*(1.0D0/NU(ML)-1.0D0/NU_ZERO)
+	  DWS_GRIEM(ML-ML_ST+1)=0.01_LDP*C_KMS*(1.0_LDP/NU(ML)-1.0_LDP/NU_ZERO)
 	END DO
 !
 ! Now compute, and store the Doppler broadened Stark profile for each
@@ -167,9 +167,9 @@
 	  WRITE(LUER,*)'# of storage locatins requires is:',NF_GR
 	  STOP
 	END IF
-	PROF_STORE(1:ND,1:NF_GR,LOC_INDX)=0.0D0
+	PROF_STORE(1:ND,1:NF_GR,LOC_INDX)=0.0_LDP
 	DO I=1,ND
-	  TMP_ED=1.0D+16
+	  TMP_ED=1.0E+16_LDP
 	  TMP_ED=MIN(ED_IN(I),TMP_ED)
           CALL GRIEM_V2(PR_GRIEM,DWS_GRIEM,NF_GR,
 	1        TMP_ED,TEMP_IN(I),VTURB_IN(I),
@@ -180,12 +180,12 @@
 ! 10^15 before scaling.
 !
 	  IF(NORM_PROFILE)THEN
-	    T1=0.0D0
+	    T1=0.0_LDP
 	    DO ML=1,NF_GR-1
-	      T1=T1+0.5D0*(NU(ML_ST+ML-1)-NU(ML_ST+ML))*
+	      T1=T1+0.5_LDP*(NU(ML_ST+ML-1)-NU(ML_ST+ML))*
 	1                       (PR_GRIEM(ML)+PR_GRIEM(ML+1))
 	    END DO
-	    T1=ABS(T1)*1.0D+15
+	    T1=ABS(T1)*1.0E+15_LDP
 	    PROF_STORE(I,1:NF_GR,LOC_INDX)=PR_GRIEM(1:NF_GR)/T1
 	  ELSE
 	    PROF_STORE(I,1:NF_GR,LOC_INDX)=PR_GRIEM(1:NF_GR)

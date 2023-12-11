@@ -59,8 +59,8 @@
 	INTEGER LMIN
 	INTEGER LST,LEND
 !
-	REAL(KIND=LDP), PARAMETER :: CONV_FAC=1.0D-08
-	REAL(KIND=LDP), PARAMETER :: LG10_CONV_FAC=-8.0D0
+	REAL(KIND=LDP), PARAMETER :: CONV_FAC=1.0E-08_LDP
+	REAL(KIND=LDP), PARAMETER :: LG10_CONV_FAC=-8.0_LDP
 !
 	REAL(KIND=LDP) U			!Defined as FREQ/EDGE
 	REAL(KIND=LDP) RU			!Defined as EDGE/FREQ
@@ -81,38 +81,38 @@
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 !
-	ALPHA_BF=2.815D-06*(ZION**4)
+	ALPHA_BF=2.815E-06_LDP*(ZION**4)
 	EDGE = GS_EDGE + EXC_FREQ
-	DELF=LOG(MAX(100.0D0,10.0D0*EDGE))/(NCF-1)
-	PHOT(1:NCF)=0.0D0
+	DELF=LOG(MAX(100.0_LDP,10.0_LDP*EDGE))/(NCF-1)
+	PHOT(1:NCF)=0.0_LDP
 !
 	IF(CROSS_TYPE .EQ. 8)THEN
 	   T1=EDGE+CROSS_A(4)
 	ELSE IF(EDGE .LE. 0)THEN
-	   T1=1.0D0
+	   T1=1.0_LDP
 	ELSE
 	   T1=EDGE
 	END IF
 	DO ML=1,NCF
 	  FREQ(ML)=T1*EXP((ML-1)*DELF)
 	END DO
-	RYD_HZ=109737.31534D0*2.99792458D+10/(1.0D0+1.0D0/1840.0D0/AMASS)/1.0D+15
+	RYD_HZ=109737.31534_LDP*2.99792458E+10_LDP/(1.0_LDP+1.0_LDP/1840.0_LDP/AMASS)/1.0E+15_LDP
 	IF(EDGE .GT. 0)THEN
 	   NEF=ZION*SQRT(RYD_HZ/EDGE)
 	ELSE
-	   NEF=20.0D0
+	   NEF=20.0_LDP
 	END IF
 !
 ! Seaton fit.
 !
 	IF(CROSS_TYPE .EQ. 1)THEN
-	  IF(CROSS_A(1) .EQ. 0.0D0)THEN
-	    PHOT(1:NCF)=0.0D0
+	  IF(CROSS_A(1) .EQ. 0.0_LDP)THEN
+	    PHOT(1:NCF)=0.0_LDP
 	  ELSE
 	    DO ML=1,NCF
 	      RU=EDGE/FREQ(ML)
 	      PHOT(ML)=CONV_FAC*
-	1        CROSS_A(1)*( CROSS_A(2) + (1.0D0-CROSS_A(2))*RU )*( RU**CROSS_A(3) )
+	1        CROSS_A(1)*( CROSS_A(2) + (1.0_LDP-CROSS_A(2))*RU )*( RU**CROSS_A(3) )
 	    END DO
 	  END IF
 !
@@ -135,17 +135,17 @@
 	    J=RJ
 	    T1=RJ-J
 	    J=J+1
-	    SUM=0.0D0
+	    SUM=0.0_LDP
 	    DO L=LST,LEND
 	      IF(J .LT. N_PER_L)THEN
 	        J=J+BF_L_INDX(N,L)-1
-	        T2=T1*BF_L_CROSS(J+1)+(1.0D0-T1)*BF_L_CROSS(J)
+	        T2=T1*BF_L_CROSS(J+1)+(1.0_LDP-T1)*BF_L_CROSS(J)
 	      ELSE
 	        J=BF_L_INDX(N,L)+N_PER_L-1
 	        T2=(BF_L_CROSS(J)-BF_L_CROSS(J-1))*
 	1                   (RJ-N_PER_L)+BF_L_CROSS(J)
 	      END IF
-	      SUM=SUM+(2*L+1)*(10.0D0**T2)
+	      SUM=SUM+(2*L+1)*(10.0_LDP**T2)
 	      J=RJ+1 		!Restore as corrupted	
 	    END DO
 	    WRITE(6,*)'NEF,N,ZION',NEF,N,ZION
@@ -168,14 +168,14 @@
 	    J=J+1
 	    IF(J .LT. N_PER_N)THEN
 	      J=J+BF_N_INDX(N)-1
-	      T1=T1*BF_N_GAUNT(J+1)+(1.0D0-T1)*BF_N_GAUNT(J)
+	      T1=T1*BF_N_GAUNT(J+1)+(1.0_LDP-T1)*BF_N_GAUNT(J)
 	    ELSE
 !
 ! Power law extrapolation.
 !
 	      J=BF_N_INDX(N)+N_PER_N-1
 	      T1=LOG10(BF_N_GAUNT(J-1)/BF_N_GAUNT(J))
-1             T1=BF_N_GAUNT(J)*( 10.0D0**(T1*(N_PER_N-RJ)) )
+1             T1=BF_N_GAUNT(J)*( 10.0_LDP**(T1*(N_PER_N-RJ)) )
 	    END IF
 !
 ! NB: ZION is already include in ALPHA_BF
@@ -226,7 +226,7 @@
 	  LMIN=1
 	  DO ML=1,NCF
 	    U=FREQ(ML)/EDGE
-	    X=LOG10(U+3.0D0*SPACING(U))
+	    X=LOG10(U+3.0_LDP*SPACING(U))
 	    IF(X .GE. 0)THEN
               IF(X .LT. CROSS_A(LMIN+4))THEN
 	        T1=((CROSS_A(LMIN+3)*X+CROSS_A(LMIN+2))*X +
@@ -234,7 +234,7 @@
 	      ELSE
                 T1=CROSS_A(LMIN+5)+CROSS_A(LMIN+6)*X
 	      END IF
-	      PHOT(ML)=10.0D0**(T1+LG10_CONV_FAC)
+	      PHOT(ML)=10.0_LDP**(T1+LG10_CONV_FAC)
 	    END IF
 	  END DO
 !
@@ -244,9 +244,9 @@
 	    LMIN=1
 	    DO ML=1,NCF
 	      RU=EDGE/(FREQ(ML)+CROSS_A(LMIN+3))
-	      IF(RU .LE. 1.0D0)THEN
+	      IF(RU .LE. 1.0_LDP)THEN
 	        PHOT(ML)=CONV_FAC*CROSS_A(LMIN)*( CROSS_A(LMIN+1) +
-	1               (1.0D0-CROSS_A(LMIN+1))*RU )*( RU**CROSS_A(LMIN+2) )
+	1               (1.0_LDP-CROSS_A(LMIN+1))*RU )*( RU**CROSS_A(LMIN+2) )
 	      END IF
 	    END DO
 	ELSE IF(CROSS_TYPE .EQ. 8)THEN
@@ -269,17 +269,17 @@
 	       J=RJ
 	       T1=RJ-J
 	       J=J+1
-	       SUM=0.0D0
+	       SUM=0.0_LDP
 	       DO L=LST,LEND
 	         IF(J .LT. N_PER_L)THEN
 	           J=J+BF_L_INDX(N,L)-1
-	           T2=T1*BF_L_CROSS(J+1)+(1.0D0-T1)*BF_L_CROSS(J)
+	           T2=T1*BF_L_CROSS(J+1)+(1.0_LDP-T1)*BF_L_CROSS(J)
 	         ELSE
 	           J=BF_L_INDX(N,L)+N_PER_L-1
 	           T2=(BF_L_CROSS(J)-BF_L_CROSS(J-1))*
 	1                   (RJ-N_PER_L)+BF_L_CROSS(J)
 	         END IF
-	         SUM=SUM+(2*L+1)*(10.0D0**T2)
+	         SUM=SUM+(2*L+1)*(10.0_LDP**T2)
 		 J=RJ+1 		!Restore as corrupted	
 	       END DO
 	       SUM=SUM/ZION/ZION	!Ignore neff correction :( NEF(I,K)/(N*ZION) )**2
@@ -288,7 +288,7 @@
 	  END DO
 	ELSE IF(CROSS_TYPE .EQ. 9)THEN
 !
-	   EV_TO_HZ=0.241798840766D0
+	   EV_TO_HZ=0.241798840766_LDP
 	   WRITE(6,*)NCROSS
 	   WRITE(6,*)GS_EDGE,EV_TO_HZ*CROSS_A(4)
 	   WRITE(6,*)CROSS_A(1:9)
@@ -298,10 +298,10 @@
 	     DO ML=1,NCF
 	      IF(FREQ(ML) .GE. EDGE)THEN
 	        U=FREQ(ML)/CROSS_A(K+3)/EV_TO_HZ
-	        T1=(U-1.0D0)**2 + CROSS_A(K+7)**2
-	        T2=U**( 5.5D0+CROSS_A(K+1)-0.5D0*CROSS_A(K+6) )
-	        T3=( 1.0D0+SQRT(U/CROSS_A(K+5)) )**CROSS_A(K+6)
-	        PHOT(ML)=PHOT(ML)+1.0D-08*T1*CROSS_A(K+4)/T2/T3
+	        T1=(U-1.0_LDP)**2 + CROSS_A(K+7)**2
+	        T2=U**( 5.5_LDP+CROSS_A(K+1)-0.5_LDP*CROSS_A(K+6) )
+	        T3=( 1.0_LDP+SQRT(U/CROSS_A(K+5)) )**CROSS_A(K+6)
+	        PHOT(ML)=PHOT(ML)+1.0E-08_LDP*T1*CROSS_A(K+4)/T2/T3
 	      END IF
 	    END DO
 	    K=K+8
@@ -317,7 +317,7 @@
 !
 ! Convert from CMFGEN units to MB.
 !
-	PHOT(1:NCF)=1.0D+08*PHOT(1:NCF)
+	PHOT(1:NCF)=1.0E+08_LDP*PHOT(1:NCF)
 !
 	RETURN
 	END

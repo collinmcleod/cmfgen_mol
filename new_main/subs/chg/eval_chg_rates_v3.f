@@ -50,9 +50,9 @@
 ! be zero even if no charge reactions are included since they are tested in
 ! WRRECOMCHKB.
 !
-	H=1.0D+15*PLANCKS_CONSTANT()
-	CHG_PR(:)=0.0D0
-	CHG_RR(:)=0.0D0
+	H=1.0E+15_LDP*PLANCKS_CONSTANT()
+	CHG_PR(:)=0.0_LDP
+	CHG_RR(:)=0.0_LDP
 	IF(.NOT. DO_CHG_EXCH)RETURN
 !
 	DO J=1,N_CHG
@@ -83,7 +83,7 @@
 	           ALPHA_REC=COEF_CHG(J,1)*(TVAL**COEF_CHG(J,2))
 	        ELSE IF(TYPE_CHG(J) .EQ. 2)THEN
 	           T1=COEF_CHG(J,3)*EXP(COEF_CHG(J,4)*TVAL)
-	           ALPHA_REC=COEF_CHG(J,1)*(TVAL**COEF_CHG(J,2))*(1.0D0+T1)
+	           ALPHA_REC=COEF_CHG(J,1)*(TVAL**COEF_CHG(J,2))*(1.0_LDP+T1)
 	        ELSE IF(TYPE_CHG(J) .EQ. 3)THEN
 	           T1=EXP(COEF_CHG(J,3)*TVAL)
 	           ALPHA_REC=COEF_CHG(J,1)*(TVAL**COEF_CHG(J,2))*T1

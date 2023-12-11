@@ -79,7 +79,7 @@ C
 	REAL(KIND=LDP) PSI(NV),PSIPREV(NV)
 C
 	REAL(KIND=LDP) PROGDESC	
-	REAL(KIND=LDP), PARAMETER :: PROG_ID=2.22814021D+08 !Must be unique (VAR_MJBA)
+	REAL(KIND=LDP), PARAMETER :: PROG_ID=2.22814021E+08_LDP !Must be unique (VAR_MJBA)
 C
 	INTEGER LUER,ERROR_LU
 	EXTERNAL ERROR_LU
@@ -104,8 +104,8 @@ C
 C Zero common block. There are currently 29 vectors in the common block.
 C TA must be the first vector, and PSIPREV the last.
 C
-	PSIPREV(NV-1)=1.0D0
-	PSIPREV(NV)=1.0D0
+	PSIPREV(NV-1)=1.0_LDP
+	PSIPREV(NV)=1.0_LDP
 	I=(NV*29)-1
 	CALL DP_ZERO(TA,I)
 	IF(PSIPREV(NV-1) .NE. 0 .OR. PSIPREV(NV) .NE. 1)THEN
@@ -113,7 +113,7 @@ C
 	  WRITE(LUER,*)'Error in zeroing SCRATCH block in VAR_MOMJBAR'
 	  STOP
 	ELSE
-	  PSIPREV(NV)=0.0D0
+	  PSIPREV(NV)=0.0_LDP
 	END IF
 C
 C 
@@ -121,12 +121,12 @@ C
 C Zero relevant vectors and matrices.
 C
 	DO I=1,ND
-	  JNU(I)=0.0D0
-	  HNU(I)=0.0D0
-	  JNUM1(I)=0.0D0
-	  HNUM1(I)=0.0D0
-	  TXD(I)=0.0D0
-	  TVXD(I)=0.0D0
+	  JNU(I)=0.0_LDP
+	  HNU(I)=0.0_LDP
+	  JNUM1(I)=0.0_LDP
+	  HNUM1(I)=0.0_LDP
+	  TXD(I)=0.0_LDP
+	  TVXD(I)=0.0_LDP
 	END DO
 C
 	CALL DP_ZERO(FQAF, ND*ND*NM )
@@ -152,7 +152,7 @@ C                 *************************
 C
 	  IF(ML .EQ. 1)THEN
 	    DO I=1,ND
-	      DEPTH_PRO(I)=0.0D0
+	      DEPTH_PRO(I)=0.0_LDP
 	      TCHI(I)=CHI(I)
 	      SOURCE(I)=ETA(I)/TCHI(I)
 	    END DO
@@ -189,16 +189,16 @@ C
 C NB - By definition, G is defined at the mesh midpoints.
 C
 	    DO I=1,ND-1
-	      GAMH(I)=2.0D0*3.33564D-06*(V(I)+V(I+1))/(R(I)+R(I+1))
+	      GAMH(I)=2.0_LDP*3.33564E-06_LDP*(V(I)+V(I+1))/(R(I)+R(I+1))
 	1         /DNU/( TCHI(I)+TCHI(I+1) )
-	      W(I)=GAMH(I)*( 1.0D0+
-	1                 0.5D0*(SIGMA(I)+SIGMA(I+1))*G(I,ML) )
-	      WPREV(I)=GAMH(I)*( 1.0D0+
-	1                 0.5D0*(SIGMA(I)+SIGMA(I+1))*G(I,ML-1) )
+	      W(I)=GAMH(I)*( 1.0_LDP+
+	1                 0.5_LDP*(SIGMA(I)+SIGMA(I+1))*G(I,ML) )
+	      WPREV(I)=GAMH(I)*( 1.0_LDP+
+	1                 0.5_LDP*(SIGMA(I)+SIGMA(I+1))*G(I,ML-1) )
 	    END DO
 C
 	    DO I=1,ND
-	      GAM(I)=3.33564D-06*V(I)/R(I)/TCHI(I)/DNU
+	      GAM(I)=3.33564E-06_LDP*V(I)/R(I)/TCHI(I)/DNU
 	    END DO
 C
 C PSIPREV is equivalent to the U vector of FORMSOL.
@@ -208,34 +208,34 @@ C
 	    SRCEBND=GAM(1)*( HBC(2,ML)+NBC(2,ML)*SIGMA(1)
 	1                   -HBC(2,ML-1)-NBC(2,ML-1)*SIGMA(1) )
 	    DO I=2,ND
-	      DTAUONQ(I)=0.5D0*(DTAU(I)+DTAU(I-1))/Q(I)
-	      PSI(I)=DTAUONQ(I)*GAM(I)*( 1.0D0+SIGMA(I)*F(I,ML) )
+	      DTAUONQ(I)=0.5_LDP*(DTAU(I)+DTAU(I-1))/Q(I)
+	      PSI(I)=DTAUONQ(I)*GAM(I)*( 1.0_LDP+SIGMA(I)*F(I,ML) )
 	      PSIPREV(I)=DTAUONQ(I)*GAM(I)*
-	1                   ( 1.0D0+SIGMA(I)*F(I,ML-1) )
+	1                   ( 1.0_LDP+SIGMA(I)*F(I,ML-1) )
 	    END DO
 C
 	  ELSE
 	    DO I=2,ND
-	      DTAUONQ(I)=0.5D0*(DTAU(I)+DTAU(I-1))/Q(I)
+	      DTAUONQ(I)=0.5_LDP*(DTAU(I)+DTAU(I-1))/Q(I)
 	    END DO
 	    DO I=1,ND
-	      GAMH(I)=0.0D0
-	      W(I)=0.0D0
-	      WPREV(I)=0.0D0
-	      GAM(I)=0.0D0
-	      PSI(I)=0.0D0
-	      PSIPREV(I)=0.0D0
+	      GAMH(I)=0.0_LDP
+	      W(I)=0.0_LDP
+	      WPREV(I)=0.0_LDP
+	      GAM(I)=0.0_LDP
+	      PSI(I)=0.0_LDP
+	      PSIPREV(I)=0.0_LDP
 	    END DO
-	    SRCEBND=0.0D0
+	    SRCEBND=0.0_LDP
 	  END IF
 C 
 C
 C Compute vectors used to compute the flux vector H.
 C
 	  DO I=1,ND-1
-	    HU(I)=F(I+1,ML)*Q(I+1)/(1.0D0+W(I))/DTAU(I)
-	    HL(I)=F(I,ML)*Q(I)/(1.0D0+W(I))/DTAU(I)
-	    HS(I)=WPREV(I)/(1.0D0+W(I))
+	    HU(I)=F(I+1,ML)*Q(I+1)/(1.0_LDP+W(I))/DTAU(I)
+	    HL(I)=F(I,ML)*Q(I)/(1.0_LDP+W(I))/DTAU(I)
+	    HS(I)=WPREV(I)/(1.0_LDP+W(I))
 	  END DO
 C
 C
@@ -255,22 +255,22 @@ C
 	  TC(1)=-F(2,ML)*Q(2)/DTAU(1)
 	  TB(1)=F(1,ML)*Q(1)/DTAU(1) + HBC(1,ML) + PSI(1)
 	  XM(1)=R(1)*R(1)*(HBC(2,ML)+SRCEBND)
-	  TA(1)=0.0D0
-	  VB(1)=0.0D0
-	  VC(1)=0.0D0
+	  TA(1)=0.0_LDP
+	  VB(1)=0.0_LDP
+	  VC(1)=0.0_LDP
 C
 	  TA(ND)=-F(ND-1,ML)*Q(ND-1)/DTAU(ND-1)
 	  IF(DIF)THEN
 	    TB(ND)=F(ND,ML)/DTAU(ND-1)
-	    XM(ND)=DBB*R(ND)*R(ND)/3.0D0/TCHI(ND)
+	    XM(ND)=DBB*R(ND)*R(ND)/3.0_LDP/TCHI(ND)
 	  ELSE
 	    TB(ND)=F(ND,ML)/DTAU(ND-1)+IN_HBC(ML)
-	    XM(ND)=R(ND)*R(ND)*IC*(0.25D0+0.5D0*IN_HBC(ML))
+	    XM(ND)=R(ND)*R(ND)*IC*(0.25_LDP+0.5_LDP*IN_HBC(ML))
 	  END IF
-	  TC(ND)=0.0D0
-	  VB(ND)=0.0D0
-	  VC(ND)=0.0D0
-	  PSIPREV(ND)=0.0D0
+	  TC(ND)=0.0_LDP
+	  VB(ND)=0.0_LDP
+	  VC(ND)=0.0_LDP
+	  PSIPREV(ND)=0.0_LDP
 C
 	  IF(ML .NE. 1)THEN
 	    XM(1)=XM(1) + PSIPREV(1)*JNUM1(1)
@@ -350,7 +350,7 @@ C
 	      TXD(I)= PSIPREV(I)*TXD(I)
 	1             + VB(I)*TVXD(I-1) + VC(I)*TVXD(I)
 	    END DO
-	    TXD(ND)=R(ND)*R(ND)/3.0D0/TCHI(ND)+PSIPREV(ND)*TXD(ND)
+	    TXD(ND)=R(ND)*R(ND)/3.0_LDP/TCHI(ND)+PSIPREV(ND)*TXD(ND)
 C
 C Solve for the radiation field along ray for this frequency.
 C

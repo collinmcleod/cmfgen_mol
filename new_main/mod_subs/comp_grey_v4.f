@@ -16,6 +16,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered 06-Dec-2023 : Fixed REL option to handle zero flux and or hollow core inner boundary options.
 ! Altered 21-Mar-2018 : Now call JGREY_HUB_DDT_V5
 ! Altered 27-Jan-2014 : Now use TORSCL_V3.
 ! Altered 03-Apr-2009 : Inserted OUT_JH call in REL section.
@@ -77,6 +78,7 @@
 	LOGICAL LST_DEPTH_ONLY
 	LOGICAL FIRST_FREQ
 	LOGICAL NEW_FREQ
+	LOGICAL LOCAL_DIF
 !
 ! Constants for opacity etc.
 !
@@ -87,7 +89,7 @@
 	LUWARN=WARNING_LU()
 	WRITE(LUWARN,'(/,A,3I6)')' Begin COMP_GREY_V4',ND,NC,NP
 	WRITE(LUER,'(/,A,3I6)')' Begin COMP_GREY_V4',ND,NC,NP
-	PI=4.0D0*ATAN(1.0D0)
+	PI=4.0_LDP*ATAN(1.0_LDP)
 	CHI(1:ND)=ROSSMEAN(1:ND)
 !
 ! Compute the Rosseland optical depth scale. J is used to indicate the second
@@ -95,7 +97,7 @@
 !
 	J=5
 	DO K=5,10
-	  IF(CHI(J)/CHI(1) .GT. 5.0D0)EXIT
+	  IF(CHI(J)/CHI(1) .GT. 5.0_LDP)EXIT
 	  J=K
 	END DO
 	IF(PLANE_PARALLEL_NO_V)THEN
@@ -105,8 +107,8 @@
 	END IF
 !
 	IF(PLANE_PARALLEL_NO_V)THEN
-           FEDD=0.3333D0
-	   HBC_CMF=0.7D0; NBC_CMF=0.0D0; FL=1.0D0; INBC=0.1D0
+           FEDD=0.3333_LDP
+	   HBC_CMF=0.7_LDP; NBC_CMF=0.0_LDP; FL=1.0_LDP; INBC=0.1_LDP
 	   NEW_FREQ=.TRUE.; FIRST_FREQ=.TRUE.
 !
 ! Note HFLUX=LUM*Lsun/16/(PI*PI)/10**2 (10**2 for 1/R**2).
@@ -114,9 +116,9 @@
 ! diffusion approximation. Since we are dealing with a plane-parallel
 ! atmopshere, we divide HFLUX by R*^2.
 !
-	   HFLUX=3.826D+13*LUM/16.0D0/PI**2/R(ND)/R(ND)
-           DBB=3.0D0*CHI(ND)*HFLUX
-	   T1=1000.0D0
+	   HFLUX=3.826E+13_LDP*LUM/16.0_LDP/PI**2/R(ND)/R(ND)
+           DBB=3.0_LDP*CHI(ND)*HFLUX
+	   T1=1000.0_LDP
 !
 ! Compute radial (vertical) optical depth increments.
 !
@@ -127,7 +129,7 @@
 ! Compute the solution vector. Note that the units need to be
 ! eventually included. The following follows direcly from d2K/d2Tau=0.
 !
-	   DO WHILE(T1 .GT. 1.0D-08)
+	   DO WHILE(T1 .GT. 1.0E-08_LDP)
 	     T2=FEDD(1)/HBC_CMF
 	     RJ(1)=HFLUX/HBC_CMF
 	     DO I=2,ND
@@ -138,7 +140,7 @@
 	     SOURCE(1:ND)=RJ
 	     CALL FCOMP_PP_V2(R,TC,GAMH,SOURCE,CHI,IPLUS,HBC_CMF,
 	1               NBC_CMF,INBC,DBB,IC,THK_CONT,DIF,ND,NC,METHOD)
-	     T1=0.0D0
+	     T1=0.0_LDP
 	     DO I=1,ND
 	       T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
 	       FEDD(I)=GAMH(I)
@@ -161,41 +163,52 @@
 ! This routine will supersede the one above, and included to zero
 ! order the effect of the velocity field.
 !
-	   T2=1.0D-05		!Accuracy to converge f
+	   T2=1.0E-05_LDP		!Accuracy to converge f
 	   CALL JGREY_WITH_FVT(RJ,SOB,CHI,R,V,SIGMA,
 	1           P,AQW,HMIDQW,KQW,NMIDQW,
 	1           LUM,METHOD,DIF,IC,T2,ND,NC,NP)
 !
 	ELSE IF(USE_J_REL)THEN
 !
-	  FEDD(1:ND)=0.3D0		!Initial guess
-	  H_ON_J(1:ND)=0.0D0		!Initial guess
-	  GAMH(1:ND)=0.0D0		!Old FEDD
-	  XM(1:ND)=0.0D0		!As grey solution, not needed (ETA)
-	  dlnJdlnR=0.0D0
+	  FEDD(1:ND)=0.3_LDP		!Initial guess
+	  H_ON_J(1:ND)=0.0_LDP		!Initial guess
+	  GAMH(1:ND)=0.0_LDP		!Old FEDD
+	  XM(1:ND)=0.0_LDP		!As grey solution, not needed (ETA)
+	  dlnJdlnR=0.0_LDP
 	  NEW_FREQ=.TRUE.
 	  WRITE(LUER,*)'Using MOM_JREL_GREY_V2 for grey solution'
+	  FLUSH(LUER)
 !
 ! Note
 !   HFLUX=LUM*Lsun/16/(PI*PI)/10**2/R**2 (10**2 for 1/R**2).
 !   DBB = dBdR = 3.Chi.L/16(piR)**2
 !   DBB is used for the lower boundary diffusion approximation.
 !
-	  HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
-          DBB=3.0D0*HFLUX*CHI(ND)
-	  T1=1.0D0
-	  DO WHILE(T1 .GT. 1.0D-05)
+	  IF(INNER_BND_METH .EQ. 'DIFFUSION')THEN
+	    LOCAL_DIF=.TRUE.
+	    HFLUX=3.826E+13_LDP*LUM/(4.0_LDP*PI*R(ND))**2
+            DBB=3.0_LDP*HFLUX*CHI(ND)
+	  ELSE IF(INNER_BND_METH .EQ. 'ZERO_FLUX' .OR. INNER_BND_METH .EQ. 'HOLLOW')THEN
+	    LOCAL_DIF=.TRUE.
+	    DBB=0.0_LDP
+	  ELSE
+	    WRITE(6,*)'Error in COMP_GEY_V2 -- inner boundary condition not recognized'
+	    WRITE(6,*)'INNER_BND_METH=',TRIM(INNER_BND_METH)
+	    STOP
+	  END IF
+	  T1=1.0_LDP; HBC_CMF=0.0_LDP; INBC=0.0D0
+	  DO WHILE(T1 .GT. 1.0E-05_LDP)
             CALL MOM_JREL_GREY_V2(XM,CHI,CHI,V,SIGMA,R,
 	1              H_ON_J,FEDD,dlnJdlnR,
 	1              RJ,RSQHNU,HBC_CMF,INBC,
-	1              DIF,DBB,IC,METHOD,
+	1              LOCAL_DIF,DBB,IC,METHOD,
 	1              L_TRUE,L_TRUE,NEW_FREQ,COMPUTED,ND)
 	    IF(.NOT. COMPUTED)RETURN
 !
 	    CALL FGREY_NOREL_V1(FEDD,H_ON_J,RJ,CHI,R,V,SIGMA,
 	1              P,AQW,HMIDQW,KQW,LUM,IC,METHOD,
-	1              HBC_CMF,INBC,DIF,ND,NC,NP)
-	    T1=0.0D0
+	1              HBC_CMF,INBC,LOCAL_DIF,ND,NC,NP)
+	    T1=0.0_LDP
 	    DO I=1,ND
 	      T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
 	      GAMH(I)=FEDD(I)
@@ -221,7 +234,7 @@
 !
 	   WRITE(LUER,*)'Calling JGREY_HUB_DDT_V5'
 	   WRITE(LUWARN,*)'Calling JGREY_HUB_DDT_V5'
-	   T2=1.0D-06		!Accuracy to converge f
+	   T2=1.0E-06_LDP		!Accuracy to converge f
 	   CALL JGREY_HUB_DDT_V5(RJ,SOB,CHI,PLANCKMEAN,R,CLUMP_FAC,V,SIGMA,POPS,
 	1              P,AQW,HMIDQW,KQW,LUM,METHOD,DIF,IC,
 	1              T2,INCL_DJDT_TERMS,TIME_SEQ_NO,COMPUTED,ND,NC,NP,NT)
@@ -234,15 +247,15 @@
 ! will always be optically thin.
 !
 	    DO I=1,ND
-	      FEDD(I)=1.0D0/3.0D0
+	      FEDD(I)=1.0_LDP/3.0_LDP
 	    END DO
-	    HBC_J=1.0D0
-	    T1=1000.0D0
-	    DO WHILE(T1 .GT. 1.0D-06)
+	    HBC_J=1.0_LDP
+	    T1=1000.0_LDP
+	    DO WHILE(T1 .GT. 1.0E-06_LDP)
 	      CALL JGREY(TA,TB,TC,XM,DTAU,R,Z,P,RJ,
 	1        GAM,GAMH,Q,FEDD,CHI,dCHIdR,
 	1        AQW,KQW,LUM,HBC_J,T2,NC,ND,NP,METHOD)
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO I=1,ND
 	        T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
 	        FEDD(I)=GAMH(I)
@@ -261,7 +274,7 @@
 ! at boundary.
 !
 	DO I=1,ND
-	  TGREY(I)=((PI/5.67D-05*RJ(I))**0.25D0)*1.0D-04
+	  TGREY(I)=((PI/5.67E-05_LDP*RJ(I))**0.25_LDP)*1.0E-04_LDP
 	END DO
 !
 	RETURN

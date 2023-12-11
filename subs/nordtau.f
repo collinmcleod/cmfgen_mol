@@ -19,8 +19,8 @@ C
 	REAL(KIND=LDP) DTAU(NI),CHI(NI),Z(NI),R(NI),dCHIdR(NI)
 C
 	DO I=1,NI-1
-	  DTAU(I)=0.5D0*(Z(I)-Z(I+1))*(CHI(I)+CHI(I+1)+(Z(I)-Z(I+1))
-	1   *( dCHIdR(I+1)*Z(I+1)/R(I+1)-dCHIdR(I)*Z(I)/R(I) )/6.0D0)
+	  DTAU(I)=0.5_LDP*(Z(I)-Z(I+1))*(CHI(I)+CHI(I+1)+(Z(I)-Z(I+1))
+	1   *( dCHIdR(I+1)*Z(I+1)/R(I+1)-dCHIdR(I)*Z(I)/R(I) )/6.0_LDP)
 	END DO
 C
 	RETURN
@@ -75,12 +75,12 @@ C
 	CHARACTER*6 METHOD
 C
 	REAL(KIND=LDP) H(ND),SLOPE(ND)
-	REAL(KIND=LDP), PARAMETER :: ONE=1.0D0
+	REAL(KIND=LDP), PARAMETER :: ONE=1.0_LDP
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
-	LIM=3.0D0
+	LIM=3.0_LDP
 C
 	IF(METHOD .EQ. 'LOGLOG')THEN
 	  DO I=2,ND-1
@@ -142,16 +142,16 @@ C
 C
           dCHIdR(1)=SLOPE(1) +(SLOPE(1)-SLOPE(2))*H(1)/(H(1)+H(2))
 	  dCHIdR(1)=( SIGN(ONE,SLOPE(1))+SIGN(ONE,dCHIdR(1)) )*
-	1            MIN(ABS(SLOPE(1)),0.5D0*ABS(dCHIdR(1)))
+	1            MIN(ABS(SLOPE(1)),0.5_LDP*ABS(dCHIdR(1)))
 	  DO I=2,ND-1
             dCHIdR(I)=(SLOPE(I-1)*H(I)+SLOPE(I)*H(I-1))/(H(I-1)+H(I))
 	    dCHIdR(I)=( SIGN(ONE,SLOPE(I-1))+SIGN(ONE,SLOPE(I)) )*
-	1            MIN(ABS(SLOPE(I-1)),ABS(SLOPE(I)),0.5D0*ABS(dCHIdR(I)))
+	1            MIN(ABS(SLOPE(I-1)),ABS(SLOPE(I)),0.5_LDP*ABS(dCHIdR(I)))
 	  END DO
 	  dCHIdR(ND)=SLOPE(ND-1) +
 	1             (SLOPE(ND-1)-SLOPE(ND-2))*H(ND-1)/(H(ND-2)+H(ND-1))
 	  dCHIdR(ND)=( SIGN(ONE,SLOPE(ND-1))+SIGN(ONE,dCHIdR(ND)) )*
-	1            MIN(ABS(SLOPE(ND-1)),0.5D0*ABS(dCHIdR(ND)))
+	1            MIN(ABS(SLOPE(ND-1)),0.5_LDP*ABS(dCHIdR(ND)))
 !
 !
 	ELSE IF(METHOD .EQ. 'LOGMON')THEN
@@ -198,17 +198,17 @@ C
 ! Now adjust the derivatives so that curve is monotonic in each interval.
 !
 	  dCHIdR(1)=( SIGN(ONE,SLOPE(1))+SIGN(ONE,dCHIdR(1)) )*
-	1            MIN(ABS(SLOPE(1)),0.5D0*ABS(dCHIdR(1)))
+	1            MIN(ABS(SLOPE(1)),0.5_LDP*ABS(dCHIdR(1)))
 	  DO I=2,ND-1
 	    dCHIdR(I)=( SIGN(ONE,SLOPE(I-1))+SIGN(ONE,SLOPE(I)) )*
-	1            MIN(ABS(SLOPE(I-1)),ABS(SLOPE(I)),0.5D0*ABS(dCHIdR(I)))
+	1            MIN(ABS(SLOPE(I-1)),ABS(SLOPE(I)),0.5_LDP*ABS(dCHIdR(I)))
 	  END DO
 	  dCHIdR(ND)=( SIGN(ONE,SLOPE(ND-1))+SIGN(ONE,dCHIdR(ND)) )*
-	1            MIN(ABS(SLOPE(ND-1)),0.5D0*ABS(dCHIdR(ND)))
+	1            MIN(ABS(SLOPE(ND-1)),0.5_LDP*ABS(dCHIdR(ND)))
 C	
 	ELSE IF(METHOD(1:4) .EQ. 'ZERO')THEN
 	  DO I=1,ND
-	    DCHIDR(I)=0.0D0
+	    DCHIDR(I)=0.0_LDP
 	  END DO
 	ELSE
 	  LUER=ERROR_LU()
@@ -243,9 +243,9 @@ C
 	REAL(KIND=LDP) SLOPE(ND),H(ND)
 	REAL(KIND=LDP) LIN_SLOPE(ND),LIN_H(ND)
 	REAL(KIND=LDP) T1,T2,ORIG_dCHIdR
-	REAL(KIND=LDP), PARAMETER :: ONE=1.0D0
+	REAL(KIND=LDP), PARAMETER :: ONE=1.0_LDP
 C
-	LIM=3.0D0
+	LIM=3.0_LDP
 	LUER=ERROR_LU()
 	IF(ND_TRAP .LT. ND)THEN
 	  IF(ALLOCATED(A))THEN
@@ -263,26 +263,26 @@ C
 	    B(I)=dCHIdR(I)/CHI(I)
 	    C(I)=-CHI(I)/CHI(I+1)/R(I)/( LOG(R(I-1))-LOG(R(I+1)) )
 	  END DO
-	  A(1)=0.0D0
-	  B(1)=dCHIdR(1)/CHI(1)+1.0D0/R(1)/( LOG(R(1))-LOG(R(2)) )
+	  A(1)=0.0_LDP
+	  B(1)=dCHIdR(1)/CHI(1)+1.0_LDP/R(1)/( LOG(R(1))-LOG(R(2)) )
 	  C(1)=-CHI(1)/CHI(2)/R(1)/( LOG(R(1))-LOG(R(2)) )
 	  IF( (R(1)-R(3))/(R(1)-R(2)) .GT. LIM )THEN
 	    A(2)=CHI(2)/CHI(1)/R(2)/( LOG(R(1))-LOG(R(2)) )
-	    B(2)=dCHIdR(2)/CHI(2)-1.0D0/R(2)/( LOG(R(1))-LOG(R(2)) )
-	    C(2)=0.0D0
+	    B(2)=dCHIdR(2)/CHI(2)-1.0_LDP/R(2)/( LOG(R(1))-LOG(R(2)) )
+	    C(2)=0.0_LDP
 	  END IF
 	  IF( (R(ND-2)-R(ND))/(R(ND-1)-R(ND)) .GT. LIM )THEN
-	    A(ND-1)=0.0D0
-	    B(ND-1)=dCHIdR(ND-1)/CHI(ND-1)+1.0D0/R(ND-1)/
+	    A(ND-1)=0.0_LDP
+	    B(ND-1)=dCHIdR(ND-1)/CHI(ND-1)+1.0_LDP/R(ND-1)/
 	1                   ( LOG(R(ND-1))-LOG(R(ND)) )
 	    C(ND-1)=-CHI(ND-1)/CHI(ND)/R(ND-1)/
 	1                   ( LOG(R(ND-1))-LOG(R(ND)) )
 	  END IF
 	  A(ND)=CHI(ND)/CHI(ND-1)/R(ND)/
 	1                   ( LOG(R(ND-1))-LOG(R(ND)) )
-	  B(ND)=dCHIdR(ND)/CHI(ND) - 1.0D0/R(ND)/
+	  B(ND)=dCHIdR(ND)/CHI(ND) - 1.0_LDP/R(ND)/
 	1                   ( LOG(R(ND-1))-LOG(R(ND)) )
-	  C(ND)=0.0D0
+	  C(ND)=0.0_LDP
 !
 !
 	ELSE IF(METHOD .EQ. 'LOGLIN')THEN
@@ -291,46 +291,46 @@ C
 	    B(I)=dCHIdR(I)/CHI(I)
 	    C(I)=-CHI(I)/CHI(I+1)/(R(I-1)-R(I+1))
 	  END DO
-	  A(1)=0.0D0
-	  B(1)=dCHIdR(1)/CHI(1)+1.0D0/(R(1)-R(2))
+	  A(1)=0.0_LDP
+	  B(1)=dCHIdR(1)/CHI(1)+1.0_LDP/(R(1)-R(2))
 	  C(1)=-CHI(1)/CHI(2)/(R(1)-R(2))
 	  IF( (R(1)-R(3))/(R(1)-R(2)) .GT. LIM )THEN
 	    A(2)=CHI(2)/CHI(1)/(R(1)-R(2))
-	    B(2)=dCHIdR(2)/CHI(2)-1.0D0/(R(1)-R(2))
-	    C(2)=0.0D0
+	    B(2)=dCHIdR(2)/CHI(2)-1.0_LDP/(R(1)-R(2))
+	    C(2)=0.0_LDP
 	  END IF
 	  IF( (R(ND-2)-R(ND))/(R(ND-1)-R(ND)) .GT. LIM )THEN
-	    A(ND-1)=0.0D0
-	    B(ND-1)=dCHIdR(ND-1)/CHI(ND-1)+1.0D0/(R(ND-1)-R(ND))
+	    A(ND-1)=0.0_LDP
+	    B(ND-1)=dCHIdR(ND-1)/CHI(ND-1)+1.0_LDP/(R(ND-1)-R(ND))
 	    C(ND-1)=-CHI(ND-1)/CHI(ND)/(R(ND-1)-R(ND))
 	  END IF
 	  A(ND)=CHI(ND)/CHI(ND-1)/(R(ND-1)-R(ND))
-	  B(ND)=dCHIdR(ND)/CHI(ND) - 1.0D0/(R(ND-1)-R(ND))
-	  C(ND)=0.0D0
+	  B(ND)=dCHIdR(ND)/CHI(ND) - 1.0_LDP/(R(ND-1)-R(ND))
+	  C(ND)=0.0_LDP
 !
 !
 	ELSE IF(METHOD .EQ. 'LINEAR')THEN
 	  DO I=2,ND-1
-	    A(I)=1.0D0/(R(I-1)-R(I+1))
-	    B(I)=0.0D0
-	    C(I)=-1.0D0/(R(I-1)-R(I+1))
+	    A(I)=1.0_LDP/(R(I-1)-R(I+1))
+	    B(I)=0.0_LDP
+	    C(I)=-1.0_LDP/(R(I-1)-R(I+1))
 	  END DO
-	  A(1)=0.0D0
-	  B(1)=1.0D0/(R(1)-R(2))
+	  A(1)=0.0_LDP
+	  B(1)=1.0_LDP/(R(1)-R(2))
 	  C(1)=-B(1)
 	  IF( (R(1)-R(3))/(R(1)-R(2)) .GT. LIM )THEN
 	    A(2)=B(1)
 	    B(2)=C(1)
-	    C(2)=0.0D0
+	    C(2)=0.0_LDP
 	  END IF
 	  IF( (R(ND-2)-R(ND))/(R(ND-1)-R(ND)) .GT. LIM )THEN
-	    A(ND-1)=0.0D0
-	    B(ND-1)=1.0D0/(R(ND-1)-R(ND))
+	    A(ND-1)=0.0_LDP
+	    B(ND-1)=1.0_LDP/(R(ND-1)-R(ND))
 	    C(ND-1)=-B(ND-1)
 	  END IF
-	  A(ND)=1.0D0/(R(ND-1)-R(ND))
+	  A(ND)=1.0_LDP/(R(ND-1)-R(ND))
 	  B(ND)=-A(ND)
-	  C(ND)=0.0D0
+	  C(ND)=0.0_LDP
 !
 !
 	ELSE IF(METHOD .EQ. 'LOGMON')THEN
@@ -355,9 +355,9 @@ C
 	    LIN_H(I)=R(I+1)-R(I)
 	    LIN_SLOPE(I)=(CHI(I+1)-CHI(I))/LIN_H(I)
 	  END DO
-	  A(1:ND)=0.0D0
-	  B(1:ND)=0.0D0
-	  C(1:ND)=0.0D0
+	  A(1:ND)=0.0_LDP
+	  B(1:ND)=0.0_LDP
+	  C(1:ND)=0.0_LDP
 !
 ! At the boundary, the interval close to the boundary is generally much
 ! smaller than the subsequent interval. Thus at the boundary the slope will
@@ -372,13 +372,13 @@ C
 	  C(1)=ONE/H(1)/CHI(2)
 	  B(1)=-ONE/H(1)/CHI(1)
 	  DO I=2,ND-1
-	    T1=1.0D0/(H(I-1)+H(I))
+	    T1=1.0_LDP/(H(I-1)+H(I))
 	    A(I)=-T1*H(I)/H(I-1)/CHI(I-1)
 	    C(I)=T1*H(I-1)/H(I)/CHI(I+1)
 	    B(I)=T1*(H(I)/H(I-1)-H(I-1)/H(I))/CHI(I)
 	  END DO
-	  B(ND)=1.0D0/H(ND-1)/CHI(ND)
-	  A(ND)=-1.0D0/H(ND-1)/CHI(ND-1)
+	  B(ND)=1.0_LDP/H(ND-1)/CHI(ND)
+	  A(ND)=-1.0_LDP/H(ND-1)/CHI(ND-1)
 !
 ! Convert for LOG-LOG to LINEAR-LINEAR plane (i.e. We multiply dCHIdR[i]
 ! by CHI[i]/R[i] )
@@ -392,44 +392,44 @@ C
 ! Now modify the A,B and C if we have modified dCHIdR to ensure monotocity.
 !
           ORIG_dCHIdR=SLOPE(1) +(SLOPE(1)-SLOPE(2))*H(1)/(H(1)+H(2))
-	  IF(dCHIdR(1) .EQ. 0.0D0)THEN
-	    B(1)=0.0D0
-	    C(1)=0.0D0
-	  ELSE IF(ABS(SLOPE(1)) .LT. 0.5D0*ABS(ORIG_dCHIdR))THEN
-	    B(1)=-2.0D0/LIN_H(1)
-	    C(1)=2.0D0/LIN_H(1)
+	  IF(dCHIdR(1) .EQ. 0.0_LDP)THEN
+	    B(1)=0.0_LDP
+	    C(1)=0.0_LDP
+	  ELSE IF(ABS(SLOPE(1)) .LT. 0.5_LDP*ABS(ORIG_dCHIdR))THEN
+	    B(1)=-2.0_LDP/LIN_H(1)
+	    C(1)=2.0_LDP/LIN_H(1)
 	  END IF
 C
 	  DO I=2,ND-1
             ORIG_dCHIdR=
 	1       (SLOPE(I-1)*H(I)+SLOPE(I)*H(I-1))/(H(I-1)+H(I))
 	1      * CHI(I)/R(I)
-	    IF(dCHIdR(I) .EQ. 0.0D0)THEN
-	      A(I)=0.0D0
-	      B(I)=0.0D0
-	      C(I)=0.0D0
+	    IF(dCHIdR(I) .EQ. 0.0_LDP)THEN
+	      A(I)=0.0_LDP
+	      B(I)=0.0_LDP
+	      C(I)=0.0_LDP
 	    ELSE IF( MIN(ABS(LIN_SLOPE(I-1)),ABS(LIN_ SLOPE(I)))
-	1                             .LT. 0.5D0*ABS(ORIG_dCHIdR) )THEN
+	1                             .LT. 0.5_LDP*ABS(ORIG_dCHIdR) )THEN
 	      IF( ABS(LIN_SLOPE(I-1)) .LT. ABS(LIN_SLOPE(I)) )THEN
-	        A(I)=-2.0D0/LIN_H(I-1)
-	        B(I)=2.0D0/LIN_H(I-1)
-	        C(I)=0.0D0
+	        A(I)=-2.0_LDP/LIN_H(I-1)
+	        B(I)=2.0_LDP/LIN_H(I-1)
+	        C(I)=0.0_LDP
 	      ELSE
-	        A(I)=0.0D0
-	        B(I)=-2.0D0/LIN_H(I)
-	        C(I)=2.0D0/LIN_H(I)
+	        A(I)=0.0_LDP
+	        B(I)=-2.0_LDP/LIN_H(I)
+	        C(I)=2.0_LDP/LIN_H(I)
  	      END IF
 	    END IF
 	  END DO
 !
 	  ORIG_dCHIdR=SLOPE(ND-1) +
 	1              (SLOPE(ND-1)-SLOPE(ND-2))*H(ND-1)/(H(ND-2)+H(ND-1))
-	  IF(dCHIdR(ND) .EQ. 0.0D0)THEN
-	    A(ND)=0.0D0
-	    B(ND)=0.0D0
-	  ELSE IF(ABS(SLOPE(ND-1)) .LT. 0.5D0*ABS(ORIG_dCHIdR))THEN
-	    A(ND)=-2.0D0/LIN_H(ND-1)
-	    B(ND)=2.0D0/LIN_H(ND-1)
+	  IF(dCHIdR(ND) .EQ. 0.0_LDP)THEN
+	    A(ND)=0.0_LDP
+	    B(ND)=0.0_LDP
+	  ELSE IF(ABS(SLOPE(ND-1)) .LT. 0.5_LDP*ABS(ORIG_dCHIdR))THEN
+	    A(ND)=-2.0_LDP/LIN_H(ND-1)
+	    B(ND)=2.0_LDP/LIN_H(ND-1)
 	  END IF
 !
 !
@@ -449,9 +449,9 @@ C
 	    H(I)=R(I+1)-R(I)
 	    SLOPE(I)=(CHI(I+1)-CHI(I))/H(I)
 	  END DO
-	  A(1:ND)=0.0D0
-	  B(1:ND)=0.0D0
-	  C(1:ND)=0.0D0
+	  A(1:ND)=0.0_LDP
+	  B(1:ND)=0.0_LDP
+	  C(1:ND)=0.0_LDP
 C
 C At the boundary, the interval close to the boundary is generally much
 C smaller than the subsequent interval. Thus at the boundary the slope will
@@ -462,10 +462,10 @@ C would necessitate an extra vector.
 C
           ORIG_dCHIdR=SLOPE(1) +(SLOPE(1)-SLOPE(2))*H(1)/(H(1)+H(2))
 	  T1=SIGN(ONE,SLOPE(1))+SIGN(ONE,ORIG_dCHIdR)
-	  IF( ABS(SLOPE(1)) .LT. 0.5D0*ABS(ORIG_dCHIdR) )THEN
-	    C(1)=2.0D0/H(1)
+	  IF( ABS(SLOPE(1)) .LT. 0.5_LDP*ABS(ORIG_dCHIdR) )THEN
+	    C(1)=2.0_LDP/H(1)
 	    B(1)=-C(1)
-	  ELSE IF(T1 .NE. 0.0D0)THEN
+	  ELSE IF(T1 .NE. 0.0_LDP)THEN
 	    C(1)=ONE/H(1)
 	    B(1)=-C(1)
 	  END IF
@@ -473,8 +473,8 @@ C
 	  DO I=2,ND-1
             ORIG_dCHIdR=(SLOPE(I-1)*H(I)+SLOPE(I)*H(I-1))/(H(I-1)+H(I))
 	    T1=SIGN(ONE,SLOPE(I-1))+SIGN(ONE,SLOPE(I))
-	    IF( ABS(SLOPE(I-1)) .LT. 0.5D0*ABS(ORIG_dCHIdR) .OR.
-	1	ABS(SLOPE(I)) .LT. 0.5D0*ABS(ORIG_dCHIdR) )THEN
+	    IF( ABS(SLOPE(I-1)) .LT. 0.5_LDP*ABS(ORIG_dCHIdR) .OR.
+	1	ABS(SLOPE(I)) .LT. 0.5_LDP*ABS(ORIG_dCHIdR) )THEN
 	      IF( ABS(SLOPE(I-1)) .LT. ABS(SLOPE(I)) )THEN
 	        A(I)=-T1/H(I-1)*SIGN(ONE,SLOPE(I-1))
 	        B(I)=T1/H(I-1)*SIGN(ONE,SLOPE(I-1))
@@ -483,7 +483,7 @@ C
 	        C(I)=T1/H(I)*SIGN(ONE,SLOPE(I))
  	      END IF
 	    ELSE
-	      T2=0.5D0
+	      T2=0.5_LDP
 	      T1=T1*SIGN(T2,ORIG_dCHIdR)/(H(I-1)+H(I))
 	      A(I)=-T1*H(I)/H(I-1)
 	      C(I)=T1*H(I-1)/H(I)
@@ -494,19 +494,19 @@ C
 	  ORIG_dCHIdR=SLOPE(ND-1) +
 	1               (SLOPE(ND-1)-SLOPE(ND-2))*H(ND-1)/(H(ND-2)+H(ND-1))
 	  T1=SIGN(ONE,SLOPE(ND-1))+SIGN(ONE,ORIG_dCHIdR)
-	  IF( ABS(SLOPE(ND-1)) .LT. 0.5D0*ABS(ORIG_dCHIdR) )THEN
-	    B(ND)=2.0D0/H(ND-1)
+	  IF( ABS(SLOPE(ND-1)) .LT. 0.5_LDP*ABS(ORIG_dCHIdR) )THEN
+	    B(ND)=2.0_LDP/H(ND-1)
 	    A(ND)=-B(ND)
 	  ELSE IF( T1 .NE. 0)THEN
-	    B(ND)=1.0D0/H(ND-1)
+	    B(ND)=1.0_LDP/H(ND-1)
 	    A(ND)=-B(ND)
 	  END IF
 C
 	ELSE IF(METHOD(1:4) .EQ. 'ZERO')THEN
 	  DO I=1,ND
-	   A(I)=0.0D0
-	   B(I)=0.0D0
-	   C(I)=0.0D0
+	   A(I)=0.0_LDP
+	   B(I)=0.0_LDP
+	   C(I)=0.0_LDP
 	  END DO
 	ELSE
 	  WRITE(LUER,*)'Error in d_DERRIVCHI_dCHI - invalid method'

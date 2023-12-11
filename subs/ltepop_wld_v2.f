@@ -47,12 +47,12 @@
 	REAL(KIND=LDP) X,Y,RGU
 	REAL(KIND=LDP) MAX_LN_LTE_POP
 !
-! RANGE retruns the maximum exponet range for the FLOATING POINT variable. We 
-!   multipley by 10 as we compare with natural logarithms. We subtract
+! RANGE retruns the maximum exponent range for the FLOATING POINT variable. We
+!   multiply by Log 10 as we compare with natural logarithms. We subtract
 !   10 as an extra precaution.
 !
 	X=10.0_LDP
-	MAX_LN_LTE_POP=RANGE(X)*LOG(X)-10
+	MAX_LN_LTE_POP=0.9*RANGE(X)*LOG(X)
 !
 ! Compute the occupation probabilities.
 !
@@ -61,10 +61,10 @@
 ! Compute the LTE populations of the levels in the full atom, taking level
 ! dissolution into account.
 !
-	C2LTE=0.0D0
+	C2LTE=0.0_LDP
 	DO K=1,ND
 	 X=HDKT/T(K)
-	 RGU=2.07078D-22*ED(K)*DIC2(K)*( T(K)**(-1.5D0) )/GION_C2
+	 RGU=2.07078E-22_LDP*ED(K)*DIC2(K)*( T(K)**(-1.5_LDP) )/GION_C2
 	 RGU=LOG(RGU)
 	 DO I=1,NC2
 	   LOG_C2LTE(I,K)=LOG(W_C2(I,K)*GC2(I))+EDGEC2(I)*X+RGU

@@ -24,7 +24,7 @@
       REAL(KIND=LDP) DBETADR
       REAL(KIND=LDP) GAMMA
 !
-      REAL(KIND=LDP), PARAMETER :: C_KMS=2.99792458D+05
+      REAL(KIND=LDP), PARAMETER :: C_KMS=2.99792458E+05_LDP
       REAL(KIND=LDP) T1
 !
 !--------------------------------------------------------------------
@@ -33,10 +33,10 @@
 ! any velocity law --- not just a hubble expansion.
 !
       T1=(RVAL-R(ID+1))/(R(ID)-R(ID+1))
-      VEL=T1*V(ID)+(1.0D0-T1)*V(ID+1)
+      VEL=T1*V(ID)+(1.0_LDP-T1)*V(ID+1)
       BETA=VEL/C_KMS
       dBETAdR=(V(ID)-V(ID+1))/(R(ID)-R(ID+1))/C_KMS
-      GAMMA=1.0D0/SQRT(1.0D0-BETA*BETA)
+      GAMMA=1.0_LDP/SQRT(1.0_LDP-BETA*BETA)
 !
       RETURN
       END

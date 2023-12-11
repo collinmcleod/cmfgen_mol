@@ -32,7 +32,7 @@
 	REAL(KIND=LDP) R(ND)
 !
 	REAL(KIND=LDP) ONE
-	PARAMETER (ONE=1.0D0)
+	PARAMETER (ONE=1.0_LDP)
 	INTEGER I
 !
 	REAL(KIND=LDP) H(ND)			!Delta R [ R(I+1)-R(I) ]
@@ -56,19 +56,19 @@
 !
 ! Adjust first derivatives so that function is monotonic  in each interval.
 !
-	D(1)=( SIGN(ONE,S(1))+SIGN(ONE,D(1)) )*MIN(ABS(S(1)),0.5D0*ABS(D(1)))
+	D(1)=( SIGN(ONE,S(1))+SIGN(ONE,D(1)) )*MIN(ABS(S(1)),0.5_LDP*ABS(D(1)))
 	DO I=2,ND-1
 	  D(I)=( SIGN(ONE,S(I-1))+SIGN(ONE,S(I)) )*
-	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5D0*ABS(D(I)))
+	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5_LDP*ABS(D(I)))
 	END DO
 	D(ND)=( SIGN(ONE,S(ND-1))+SIGN(ONE,D(ND)) )*
-	1        MIN(ABS(S(ND-1)),0.5D0*ABS(D(ND)))
+	1        MIN(ABS(S(ND-1)),0.5_LDP*ABS(D(ND)))
 !
 ! Now do the integration.
 !
-	INTEGRAL(1)=0.5D0*H(1)*( CHI(1)+CHI(2)+H(1)*(D(1)-D(2))/6.0D0 )
+	INTEGRAL(1)=0.5_LDP*H(1)*( CHI(1)+CHI(2)+H(1)*(D(1)-D(2))/6.0_LDP )
 	DO I=2,ND-1
-	  INTEGRAL(I)=INTEGRAL(I-1)+0.5D0*H(I)*( CHI(I)+CHI(I+1)+H(I)*(D(I)-D(I+1))/6.0D0 )
+	  INTEGRAL(I)=INTEGRAL(I-1)+0.5_LDP*H(I)*( CHI(I)+CHI(I+1)+H(I)*(D(I)-D(I+1))/6.0_LDP )
 	END DO
 !
 	RETURN

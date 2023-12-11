@@ -45,7 +45,7 @@
 ! If MUST_GET_SET is FALSE, we assume that SOL_ABUND_HSCL must have
 ! already been set.
 !
-	IF(MUST_GET_SET)SOL_ABUND_HSCL=0.0D0
+	IF(MUST_GET_SET)SOL_ABUND_HSCL=0.0_LDP
 !
 	CALL GET_LU(LUIN,'In rd_sol_abund_scale')
 	OPEN(UNIT=LUIN,FILE='SOL_ABUNDANCE',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
@@ -129,7 +129,7 @@
 	END DO
         BACKSPACE(LUIN)
 !
-	ABUND=0.0D0
+	ABUND=0.0_LDP
 	WRITE(6,*)COL
 	WRITE(6,*)INDX
 	DO WHILE(1 .EQ. 1)
@@ -148,7 +148,7 @@
 	ERROR=.FALSE.
 	IF(MUST_GET_SET)THEN
 	  DO I=1,NSPEC
-	    IF(SOL_ABUND_HSCL(I) .EQ. 0.0D0 .AND. AT_NO(I) .LE. 92)THEN
+	    IF(SOL_ABUND_HSCL(I) .EQ. 0.0_LDP .AND. AT_NO(I) .LE. 92)THEN
 	      WRITE(6,*)'Solar abundance has not been set for atomic no',AT_NO(I)
 	      ERROR=.TRUE.
 	    END IF
@@ -159,9 +159,9 @@
 ! Convert from the abundance on a logarithmic scale with H=12.0 dex, to
 ! mass-fractions.
 !
-	T1=0.0D0
+	T1=0.0_LDP
 	DO I=1,NSPEC
-	  SOL_MASS_FRAC(I)=10.0D0**(SOL_ABUND_HSCL(I)-12.0D0)
+	  SOL_MASS_FRAC(I)=10.0_LDP**(SOL_ABUND_HSCL(I)-12.0_LDP)
 	  SOL_MASS_FRAC(I)=AT_MASS(I)*SOL_MASS_FRAC(I)
 	  T1=T1+SOL_MASS_FRAC(I)
 	END DO

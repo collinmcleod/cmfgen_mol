@@ -47,13 +47,13 @@
 	INTEGER, PARAMETER :: LU_TH=8
 	INTEGER, PARAMETER :: LU_ER=6
 	REAL(KIND=LDP) DEC_NRG_SCL_FAC
-	REAL(KIND=LDP), PARAMETER :: Hz_to_eV=13.60D0/3.2897D0
-	REAL(KIND=LDP), PARAMETER :: Hz_to_erg=6.6261965D-12
+	REAL(KIND=LDP), PARAMETER :: Hz_to_eV=13.60_LDP/3.2897_LDP
+	REAL(KIND=LDP), PARAMETER :: Hz_to_erg=6.6261965E-12_LDP
 !
 	CHARACTER(LEN=50) ION_NAME
 !
-        PI=ACOS(-1.0D0)
-        SCALE=1.0D+10/4.0D0/PI
+        PI=ACOS(-1.0_LDP)
+        SCALE=1.0E+10_LDP/4.0_LDP/PI
         dE_RAD_DECAY=RADIOACTIVE_DECAY_ENERGY
 	RADIOACTIVE_DECAY_ENERGY_eV=DEC_NRG_SCL_FAC*RADIOACTIVE_DECAY_ENERGY/ELECTRON_VOLT()
 !
@@ -79,7 +79,7 @@
 !
 ! Get the total excitation route. We ignore slight differences in IP.
 !
-	      RATE = 0.0D0
+	      RATE = 0.0_LDP
 	      DO IKT=IKT_ST,NKT
 	        RATE = RATE + YE(IKT,DPTH_INDX)*dXKT(IKT)*THD(IT)%CROSS_SEC(IKT)
 	      END DO
@@ -89,13 +89,13 @@
 	        IF(ID .EQ. SPECIES_END_ID(ISPEC)-1)THEN
                   SE_ION_LEV=ATM(ID)%NXzV+1
 	          GUPPER=THD(IT)%SUM_GION
-	          ION_EXC_EN=0.0D0
+	          ION_EXC_EN=0.0_LDP
 	        ELSE
 	          NUP_F=THD(IT)%ION_LEV(J); NUP=ATM(ID+1)%F_TO_S_XzV(NUP_F)
 !                  SE_ION_LEV=SE(ID)%ION_LEV_TO_EQ_PNT(NUP)
 	          GUPPER=ATM(ID+1)%GXzV_F(NUP_F)
                   SE_ION_LEV=ATM(ID)%NXzV+1               !NUP -- assume all to ground state at  present.
-	          ION_EXC_EN=0.0D0                        !=ATM(ID+1)%EDGEXzV_F(1)-ATM(ID+1)%EDGEXzV_F(NUP_F)
+	          ION_EXC_EN=0.0_LDP                        !=ATM(ID+1)%EDGEXzV_F(1)-ATM(ID+1)%EDGEXzV_F(NUP_F)
 	        END IF
 	        DO I=1,THD(IT)%N_STATES
 	          NL_F=THD(IT)%ATOM_STATES(I); NL=ATM(ID)%F_TO_S_XzV(NL_F)

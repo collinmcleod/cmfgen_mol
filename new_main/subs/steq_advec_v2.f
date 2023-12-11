@@ -52,7 +52,7 @@
 	  DO K=1,ND
 	    KP1=K+1
 	    IF(K .EQ. ND)KP1=ND-1
-	    DERIV_CONST=1.0D-05/R(K)/R(K)
+	    DERIV_CONST=1.0E-05_LDP/R(K)/R(K)
 	    DO I=1,N_S			!Which S.E. equationa
 	      T1=R(K)*R(K)*VEL(K)*HN_S(I,K)
 	      T2=R(KP1)*R(KP1)*VEL(KP1)*HN_S(I,KP1)
@@ -72,7 +72,7 @@
 	        MP1=M-1
 	      END IF
 !
-	      DERIV_CONST=1.0D-05/(R(K)-R(KP1))
+	      DERIV_CONST=1.0E-05_LDP/(R(K)-R(KP1))
 	      T1= DERIV_CONST*VEL(K)
 	      T2= DERIV_CONST*R(KP1)*R(KP1)*VEL(KP1)/R(K)/R(K)
 	      DO I=1,N_S			!Which S.E. equation
@@ -99,7 +99,7 @@
 	  DO K=1,ND
 	    KP1=K+1
 	    IF(K .EQ. ND)KP1=ND-1
-	    DERIV_CONST=1.0D-05*VEL(K)/R(K)
+	    DERIV_CONST=1.0E-05_LDP*VEL(K)/R(K)
 	    DO I=1,N_S			!Which S.E. equation
 	      LOG_DERIV=LOG( (R(K)/R(KP1))**2 * (VEL(K)/VEL(KP1)) * (HN_S(I,K)/HN_S(I,KP1)) ) / LOG(R(K)/R(KP1))
 	      SE(ID)%STEQ(I,K)=SE(ID)%STEQ(I,K)-DERIV_CONST*LOG_DERIV*HN_S(I,K)
@@ -117,7 +117,7 @@
 	        MP1=M-1
 	      END IF
 !
-	      DERIV_CONST=1.0D-05*VEL(K)/R(K)
+	      DERIV_CONST=1.0E-05_LDP*VEL(K)/R(K)
 	      DO I=1,N_S			!Which S.E. equation
 	        T1= (R(K)/R(KP1))**2 * (VEL(K)/VEL(KP1)) * (HN_S(I,K)/HN_S(I,KP1))
 	        T2=LOG(R(K)/R(KP1))

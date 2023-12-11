@@ -73,7 +73,7 @@ C
 	REAL(KIND=LDP) DYI,DYIP1
 	REAL(KIND=LDP) A,B,C,D
 	REAL(KIND=LDP) ONE
-	PARAMETER (ONE=1.0D0)
+	PARAMETER (ONE=1.0_LDP)
 C
 C Initialize variables if we a beginning the Observer flux calculation.
 C
@@ -89,13 +89,13 @@ C
 	IF(FIRST_OBS_COMP)THEN
 	  NEXT_ST_LOC=1
 	  OBS_INDX=1
-	  C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	  C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 	  LUER=ERROR_LU()
 	  FIRST_OBS_COMP=.FALSE.
 	  IF(IPLUS_OR_U .EQ. 'IPLUS')THEN
-	    FLUX_CONST=2.0D+01*FUN_PI()*(1.0D+18*RMAX/PARSEC())**2
+	    FLUX_CONST=2.0E+01_LDP*FUN_PI()*(1.0E+18_LDP*RMAX/PARSEC())**2
 	  ELSE IF(IPLUS_OR_U .EQ. 'U')THEN
-	    FLUX_CONST=4.0D+01*FUN_PI()*(1.0D+18*RMAX/PARSEC())**2
+	    FLUX_CONST=4.0E+01_LDP*FUN_PI()*(1.0E+18_LDP*RMAX/PARSEC())**2
 	  ELSE
 	    WRITE(LUER,*)'Error in COMP_OBS --- invalid IPLUS_OR_U'
 	    WRITE(LUER,*)'IPLUS_OR_U = ',IPLUS_OR_U
@@ -175,9 +175,9 @@ C
 C We can successfully perform the interpolation, and evaluate the flux
 C for this observer's frame frequency.
 C
-	  OBS_FLUX(OBS_INDX)=0.0D0	!Initialize for integrations over p.
+	  OBS_FLUX(OBS_INDX)=0.0_LDP	!Initialize for integrations over p.
 	  DO LS=1,NP
-	    CMF_FREQ=OBS_FREQ(OBS_INDX)/(1.0D0+MU(LS)*VINF/C_KMS)
+	    CMF_FREQ=OBS_FREQ(OBS_INDX)/(1.0_LDP+MU(LS)*VINF/C_KMS)
 C
 C Find location of frequency in vector.
 C
@@ -193,7 +193,7 @@ C Now ready for interpolation.
 C
 	    IF(INTERP_PROC .EQ. 'LIN_INT' .OR. ML_ST .EQ. 1)THEN
 	      T1=(CMF_FREQ-NU_STORE(ML_END))/(NU_STORE(ML_ST)-NU_STORE(ML_END))
-	      FLUX=T1*IPLUS_STORE(ML_ST,LS)+(1.0D0-T1)*IPLUS_STORE(ML_END,LS)
+	      FLUX=T1*IPLUS_STORE(ML_ST,LS)+(1.0_LDP-T1)*IPLUS_STORE(ML_END,LS)
 	    ELSE IF(INTERP_PROC .EQ. 'MON_INT')THEN
 C
 C The following procedure is from MON_INTERP, and was for a X vector
@@ -215,12 +215,12 @@ C
 	      DYI=(SIM1*HI+SI*HIM1)/(HIM1+HI)
 	      DYIP1=(SI*HIP1+SIP1*HI)/(HI+HIP1)
 	      DYI=( SIGN(ONE,SIM1)+SIGN(ONE,SI) )*
-	1            MIN(ABS(SIM1),ABS(SI),0.5*ABS(DYI))
+	1            MIN(ABS(SIM1),ABS(SI),0.5_LDP*ABS(DYI))
 	      DYIP1=( SIGN(ONE,SI)+SIGN(ONE,SIP1) )*
-	1            MIN(ABS(SI),ABS(SIP1),0.5*ABS(DYIP1))
+	1            MIN(ABS(SI),ABS(SIP1),0.5_LDP*ABS(DYIP1))
 	      T1=(CMF_FREQ-NU_STORE(ML_ST))
-              A=(DYI+DYIP1-2.0*SI)/HI/HI
-	      B=(3.0*SI-2.0*DYI-DYIP1)/HI
+              A=(DYI+DYIP1-2.0_LDP*SI)/HI/HI
+	      B=(3.0_LDP*SI-2.0_LDP*DYI-DYIP1)/HI
 	      C=DYI
 	      D=IPLUS_STORE(ML_ST,LS)
               FLUX=((A*T1+B)*T1+C)*T1+D

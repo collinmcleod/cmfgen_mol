@@ -304,7 +304,7 @@
 	        END IF
 	      END DO
 	      IF(JINT .EQ. 0 .AND. T(I) .GE. TMAX)THEN
-	          IF(FIRST .AND. T(I) .GT. 1.0001*TMAX)THEN
+	          IF(FIRST .AND. T(I) .GT. 1.0001_LDP*TMAX)THEN
 	            WRITE(6,'(/,A)')'Warning: T at inner boundary outside old model range in REGRID_LOG_DC_V1'
 	            WRITE(6,'(2A,3(10X,A))')'    I',' JINT','T(I)','TMIN','TMAX'
 	            WRITE(6,'(2I5,3E16.6)')I,JINT,T(I),TMIN,TMAX
@@ -313,7 +313,7 @@
 	          DHEN(1:NZ,I)=DPOP(1:NZ,NDOLD)
 	          DI(I)=EXP(OLD_DI(NDOLD))
 	      ELSE IF(JINT .EQ. 0 .AND. T(I) .LE. TMIN)THEN
-	          IF(FIRST .AND. T(I) .LT. 0.9999*TMIN)THEN
+	          IF(FIRST .AND. T(I) .LT. 0.9999_LDP*TMIN)THEN
 	            WRITE(6,'(/,A)')'Warning: T outside old model range in REGRID_LOG_DC_V1'
 	            WRITE(6,'(2A,3(10X,A))')'    I',' JINT','T(I)','TMIN','TMAX'
 	            WRITE(6,'(2I5,3E16.6)')I,JINT,T(I),TMIN,TMAX
@@ -459,7 +459,7 @@
 	    T_EXCITE=OLD_T(NDOLD)
 	    DO J=NDOLD,1,-1
 	      DELTA_T=100
-	      DO WHILE(ABS(DELTA_T/T_EXCITE) .GT. 1.0D-08)
+	      DO WHILE(ABS(DELTA_T/T_EXCITE) .GT. 1.0E-08_LDP)
 	        FX=DPOP(I,J)*EXP(HDKT*EDGE(I)*(RONE/OLD_T(J)-RONE/T_EXCITE))*
 	1          (T_EXCITE/OLD_T(J))**1.5_LDP
 	        DELTA_T=(FX-RONE)*T_EXCITE/FX/(1.5_LDP+HDKT*EDGE(I)/T_EXCITE)
@@ -549,7 +549,7 @@
 	    DELTA_T=100.0_LDP
 	    COUNT=0
 !	    DO WHILE(ABS(DELTA_T) .GT. 1.0D-08 .AND. COUNT .LT. 100)
-	    DO WHILE(ABS(DELTA_T/T_EXCITE) .GT. 1.0D-04 .AND. COUNT .LT. 100)
+	    DO WHILE(ABS(DELTA_T/T_EXCITE) .GT. 1.0E-04_LDP .AND. COUNT .LT. 100)
 	      FX=EXP(DHEN(NZ,I)+HDKT*EDGE(NZ)*(RONE/T(I)-RONE/T_EXCITE))*(T_EXCITE/T(I))**1.5_LDP
 	      DELTA_T=(FX-RONE)*T_EXCITE/FX/(1.5_LDP+HDKT*EDGE(NZ)/T_EXCITE)
 	      IF(DELTA_T .GT.  0.8_LDP*T_EXCITE)DELTA_T=0.8_LDP*T_EXCITE

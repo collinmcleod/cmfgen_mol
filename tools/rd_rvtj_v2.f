@@ -113,8 +113,8 @@ C
 	  CALL CHK_STRING(STRING,LUIN,'Heating: radioactive decay','RD_RVTJ')
 	  READ(LUIN,*)(dE_RAD_DECAY(I),I=1,ND)
 	ELSE
-	  TGREY(1:ND)=0.0D0
-	  dE_RAD_DECAY(1:ND)=0.0D0
+	  TGREY(1:ND)=0.0_LDP
+	  dE_RAD_DECAY(1:ND)=0.0_LDP
 	END IF	
 C
 C In this routine, we skip over the continuum data.

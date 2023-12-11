@@ -23,7 +23,7 @@
 	USE SET_KIND_MODULE
 	IMPLICIT NONE
 !
-! Altered: 5-Apr-2011: MAX_LOG_LTE_POP parameter introduced.
+! Altered: 5-Apr-2011: MAX_LN_LTE_POP parameter introduced.
 !                      HNST_F set to zero if HNST_S=0
 !                      Based on LTE_POP_SL_V1 (original coding early 2011).
 !                      Call changed as LOG_HNST_S/F variables introduced.
@@ -49,38 +49,45 @@
 !
 ! Local variables.
 !
-	REAL(KIND=LDP), PARAMETER :: MAX_LOG_LTE_POP=600.0D0
+	REAL(KIND=LDP) MAX_LN_LTE_POP
 	REAL(KIND=LDP) SCALE_FAC(N_S)
 	REAL(KIND=LDP) T1
 	INTEGER I,L,K
 !
 	IF(.NOT. SPEC_PRES)RETURN
 !
+! RANGE retruns the maximum exponent range for the FLOATING POINT
+! variable. We multiply by Log 10 as we compare with natural logarithms. We
+!   subtract 10 as an extra precaution.
+!
+        T1=10.0_LDP
+        MAX_LN_LTE_POP=0.9*RANGE(T1)*LOG(T1)
+!
 ! The LTE population is simply a linear sum over the combined levels.
 ! Because of floating overflow, we operate in LOG space. Note that
 ! HSNT_F/HNST_S should always be well defined, since the F levels are always
-! realtively close in energy to the supler level S.
+! relatively close in energy to the supler level S.
 !
 	DO K=1,ND
 !
 	  DO L=1,N_S
-	    HNST_S(L,K)=0.0D0
-	    dlnHNST_S_dlnT(L,K)=0.0D0
-	    SCALE_FAC(L)=0.0D0
+	    HNST_S(L,K)=0.0_LDP
+	    dlnHNST_S_dlnT(L,K)=0.0_LDP
+	    SCALE_FAC(L)=0.0_LDP
 	  END DO
 !
 	  DO I=1,N_F
 	    L=F_TO_S_MAPPING(I)
-	    IF(SCALE_FAC(L) .EQ. 0.0D0)SCALE_FAC(L)=LOG_HNST_F(I,K)
+	    IF(SCALE_FAC(L) .EQ. 0.0_LDP)SCALE_FAC(L)=LOG_HNST_F(I,K)
 	    HNST_S(L,K)=HNST_S(L,K)+EXP(LOG_HNST_F(I,K)-SCALE_FAC(L))
 	  END DO
 !
 	  DO L=1,N_S
 	    LOG_HNST_S(L,K)=LOG(HNST_S(L,K))+SCALE_FAC(L)
-	    IF(LOG_HNST_S(L,K) .LT. MAX_LOG_LTE_POP)THEN
+	    IF(LOG_HNST_S(L,K) .LT. MAX_LN_LTE_POP)THEN
 	      HNST_S(L,K)=EXP(LOG_HNST_S(L,K))
 	    ELSE
-	      HNST_S(L,K)=0.0D0
+	      HNST_S(L,K)=0.0_LDP
 	    END IF
 	  END DO
 !
@@ -88,7 +95,7 @@
 !
 	  DO I=1,N_F
 	    L=F_TO_S_MAPPING(I)
-	    IF(HNST_S(L,K) .EQ. 0.0D0)HNST_F(I,K)=0.0D0
+	    IF(HNST_S(L,K) .EQ. 0.0_LDP)HNST_F(I,K)=0.0_LDP
 	  END DO
 !
 	  DO I=1,N_F
@@ -99,7 +106,7 @@
 	  END DO
 !
 	  DO L=1,N_S
-	    dlnHNST_S_dlnT(L,K) = -1.5D0 - HDKT*dlnHNST_S_dlnT(L,K)/T(K)
+	    dlnHNST_S_dlnT(L,K) = -1.5_LDP - HDKT*dlnHNST_S_dlnT(L,K)/T(K)
 	  END DO
 	END DO
 !

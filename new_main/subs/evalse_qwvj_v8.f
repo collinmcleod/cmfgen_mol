@@ -88,7 +88,7 @@
 	REAL(KIND=LDP) PLANCKS_CONSTANT,PC
 	EXTERNAL PLANCKS_CONSTANT
 !
-	PC=1.0D+15*PLANCKS_CONSTANT()            !1.0D+15 due to units of NU.
+	PC=1.0E+15_LDP*PLANCKS_CONSTANT()            !1.0D+15 due to units of NU.
 	IF(ION_LEV .EQ. 0)RETURN
 !
 ! The net ionization (collisional and radaitive) to the last ionization stage
@@ -105,13 +105,16 @@
 ! REV_HNST= HNST * B(ION_LEV)/B(1) where b is the deparure coefficient.
 !
 	DO J=1,ND
-	  SUM_SE=0.0D0
-	  SUM_VJ_R=0.0D0
-	  SUM_VJ_P=0.0D0
+	  SUM_SE=0.0_LDP
+	  SUM_VJ_R=0.0_LDP
+	  SUM_VJ_P=0.0_LDP
 	  B_RAT=EXP(LOG_DIST(1,J)-LOG_DIST(ION_LEV,J))*(DI(ION_LEV,J)/DI(1,J))
 	  DO I=1,NLEV
-	    IF(WSE(I,J) .NE. 0.0D0)THEN
+	    IF(WSE(I,J) .NE. 0.0_LDP)THEN
 	      REV_HNST=HNST(I,J)*B_RAT
+!	      WRITE(6,*)I,J,REV_HNST,HNST(I,J),B_RAT; FLUSH(UNIT=6)
+!	      WRITE(6,*)HN(I,J),JREC(J),JPHOT(J); FLUSH(UNIT=6)
+!	      WRITE(6,*)WSE(I,J); FLUSH(UNIT=6)
 	      NETR=WSE(I,J)*( REV_HNST*JREC(J)-HN(I,J)*JPHOT(J) )
 	      SE(ID)%STEQ(I,J)=SE(ID)%STEQ(I,J)+NETR
 	      SUM_SE=SUM_SE+NETR

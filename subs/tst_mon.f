@@ -15,7 +15,7 @@ C
 	DO I=1, 100 ; CHI(1)=RAN(ISEED); END DO
 C
 	DO I=1,ND
-	  R(I)=1.0+0.1D0*(I**2)
+	  R(I)=1.0_LDP+0.1_LDP*(I**2)
 	  CHI(I)=RAN(ISEED)
 	END DO
 C
@@ -30,8 +30,8 @@ C
 	WRITE(12,*)' '
 	DO I=1,ND
 	  WRITE(12,*)
-	1   (200.0D0*(COEF1(I,K)-COEF2(I,K))/
-	1   (ABS(COEF1(I,K))+ABS(COEF2(I,K))+1.0D-100), K=1,4)
+	1   (200.0_LDP*(COEF1(I,K)-COEF2(I,K))/
+	1   (ABS(COEF1(I,K))+ABS(COEF2(I,K))+1.0E-100_LDP), K=1,4)
 	END DO
 C
 	STOP

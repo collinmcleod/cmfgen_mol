@@ -86,8 +86,8 @@
 	REAL(KIND=LDP) MAX_DEL
 	REAL(KIND=LDP) PTS_PER_SIG
 !
-	PTS_PER_SIG=4.0D0			!Used for the convolution.
-	SIG_GAU=SIG_GAU_KMS/2.998D+05		!C does not need to be accurate
+	PTS_PER_SIG=4.0_LDP			!Used for the convolution.
+	SIG_GAU=SIG_GAU_KMS/2.998E+05_LDP		!C does not need to be accurate
 	DNU=FRAC_SIG_GAU*SIG_GAU
 !
 ! Check grid is mononotnic.
@@ -122,14 +122,14 @@
 	  NU_FINE(1)=NU(1)
 	  CROSS_FINE(1)=CROSS(1)
 	  DO I=2,NCROSS
-	    T1=(NU(I)-NU(I-1))/0.05D0
+	    T1=(NU(I)-NU(I-1))/0.05_LDP
 	    IF(K+1+T1 .GT. NLOC)THEN
 	      WRITE(6,*)'Error in SM_PHOT_V3'
 	      WRITE(6,*)'NLOC is too small'
 	      WRITE(6,'(1X,A,I7,6X,A,I7)')'NLOC-',NLOC,'NCROSS=',NCROSS
 	    STOP
 	    END IF
-	    IF(T1 .GT. 1.0D0 .AND. NU_FINE(MAX(1,K-1)) .LT. 2.0D0)THEN
+	    IF(T1 .GT. 1.0_LDP .AND. NU_FINE(MAX(1,K-1)) .LT. 2.0_LDP)THEN
 	      J=T1
 	      T1=(NU(I)-NU(I-1))/(J+1)
 	      dCROSS=(CROSS(I)-CROSS(I-1))/(J+1)
@@ -149,32 +149,32 @@
 ! How we proceed depends on whether NU=1 is present.
 !
 	  I=1
-	  DO WHILE(NU_FINE(I) .LT. 1.0D0)
+	  DO WHILE(NU_FINE(I) .LT. 1.0_LDP)
 	    I=I+1
 	  END DO
 	  IBEG=I
 	  IF(IBEG .NE. 1)THEN
 	    K=IBEG-1
-	    IF(ABS(NU_FINE(K)-1.0D0) .LT. 1.0D-07)THEN
-	      NU_FINE(K)=1.0D0
+	    IF(ABS(NU_FINE(K)-1.0_LDP) .LT. 1.0E-07_LDP)THEN
+	      NU_FINE(K)=1.0_LDP
 	      IBEG=K
 	    END IF
 	  END IF
-	  IF(ABS(NU_FINE(IBEG)-1.0D0) .LT. 1.0D-07)NU_FINE(IBEG)=1.0D0
+	  IF(ABS(NU_FINE(IBEG)-1.0_LDP) .LT. 1.0E-07_LDP)NU_FINE(IBEG)=1.0_LDP
 !
 ! Find range of Gaussian.
 !
-	  DO WHILE(NU_FINE(I) .LT. 1.0D0+6.0D0*SIG_GAU)
+	  DO WHILE(NU_FINE(I) .LT. 1.0_LDP+6.0_LDP*SIG_GAU)
 	    I=I+1
 	  END DO
 	  N_INS=I-IBEG+1
 !
-	  IF(NU_FINE(IBEG) .NE. 1.0D0)THEN
+	  IF(NU_FINE(IBEG) .NE. 1.0_LDP)THEN
 	    IF(IBEG .EQ. 1)THEN
-	      T2=0.0D0
+	      T2=0.0_LDP
 	    ELSE
-	      T1=(NU_FINE(IBEG-1)-1.0D0)/(NU_FINE(IBEG-1)-NU_FINE(IBEG))
-	      T2=(1.0D0-T1)*CROSS_FINE(IBEG-1)+T1*CROSS_FINE(IBEG)
+	      T1=(NU_FINE(IBEG-1)-1.0_LDP)/(NU_FINE(IBEG-1)-NU_FINE(IBEG))
+	      T2=(1.0_LDP-T1)*CROSS_FINE(IBEG-1)+T1*CROSS_FINE(IBEG)
 	    END IF
 	    N_INS=N_INS+1
 	    DO J=NCROSS,IBEG,-1
@@ -182,11 +182,11 @@
 	      NU(K)=NU_FINE(J)
 	      CROSS(K)=CROSS_FINE(J)
 	    END DO
-	    NU(N_INS)=1.0D0
+	    NU(N_INS)=1.0_LDP
 	    CROSS(N_INS)=T2
 	    DO J=N_INS-1,1,-1
 	      K=IBEG+(N_INS-1-J)
-	      NU(J)=2.0D0-NU_FINE(K)
+	      NU(J)=2.0_LDP-NU_FINE(K)
 	      CROSS(J)=CROSS_FINE(K)
 	    END DO
 	    NCROSS=NCROSS-IBEG+1+N_INS
@@ -199,7 +199,7 @@
 	    END DO
 	    DO J=1,N_INS
 	      K=IBEG+(N_INS+1-J)
-	      NU(J)=2.0D0-NU_FINE(K)
+	      NU(J)=2.0_LDP-NU_FINE(K)
 	      CROSS(J)=CROSS_FINE(K)
 	    END DO
 	    NCROSS=NCROSS-IBEG+1+ N_INS
@@ -209,13 +209,13 @@
 ! Usually we will have enough points below threshold. For simplicty,
 ! we assume a constant cross-section below these points.
 !
-	 IF(NU(1) .GT. 1.0D0-6.0D0*SIG_GAU)THEN
+	 IF(NU(1) .GT. 1.0_LDP-6.0_LDP*SIG_GAU)THEN
 	   DO J=NCROSS,1,-1
 	     K=J+1
 	     NU(K)=NU(J)
 	     CROSS(K)=CROSS(J)
 	   END DO
-	   NU(1)=1.0D0-6.0D0*SIG_GAU
+	   NU(1)=1.0_LDP-6.0_LDP*SIG_GAU
 	   CROSS(1)=CROSS(2)
 	   NCROSS=NCROSS+1
 	  END IF
@@ -231,10 +231,10 @@
 ! falls off as least as 1/nu.
 !
 	NCROSS=NCROSS+1
-	NU(NCROSS)=NU(NCROSS-1)*(1.0D0+6.0D0*SIG_GAU)
+	NU(NCROSS)=NU(NCROSS-1)*(1.0_LDP+6.0_LDP*SIG_GAU)
 	T1=LOG(NU(NCROSS-1)/NU(NCROSS-2))
 	T2=LOG(CROSS(NCROSS-1)/CROSS(NCROSS-2))/T1
-	IF(T2 .GT. -1.0D0)T2=-1.0D0
+	IF(T2 .GT. -1.0_LDP)T2=-1.0_LDP
 	CROSS(NCROSS)=CROSS(NCROSS-1)*(NU(NCROSS)/NU(NCROSS-1))**T2
 !
 ! Check grid is mononotnic.
@@ -273,7 +273,7 @@
 	CROSS_FINE(1)=CROSS(1)
 	DO ML=2,NCROSS
 	  MAX_DEL=SIG_GAU*NU(ML)/PTS_PER_SIG
-	  IF(NU(ML) .LE. 1.0D0)MAX_DEL=SIG_GAU/PTS_PER_SIG
+	  IF(NU(ML) .LE. 1.0_LDP)MAX_DEL=SIG_GAU/PTS_PER_SIG
 	  DIFF=NU(ML)-NU(ML-1)
 	  IF( DIFF .GT. MAX_DEL)THEN
             J=DIFF/MAX_DEL+1
@@ -282,7 +282,7 @@
 	      IF(I+K .GT. NLOC)GOTO 999
 	      NU_FINE(I+K)=NU_FINE(I)+K*T2
 	      T1=(NU_FINE(I+K)-NU(ML-1))/(NU(ML)-NU(ML-1))
-	      CROSS_FINE(I+K)=(1.0D0-T1)*CROSS(ML-1)+T1*CROSS(ML)
+	      CROSS_FINE(I+K)=(1.0_LDP-T1)*CROSS(ML-1)+T1*CROSS(ML)
 	    END DO
 	    I=I+J-1
 	  END IF
@@ -300,7 +300,7 @@
 !
 	FLAG=.TRUE.
 	NSM=1
-	NU_SM(1)=1.0D0
+	NU_SM(1)=1.0_LDP
 	LAST_FREQ=NU(NCROSS)
 	DO WHILE(FLAG)
 	  IF(NSM+1 .GT. NSM_MAX)THEN
@@ -309,7 +309,7 @@
 	    WRITE(6,*)'DNU=',DNU
 	    STOP
 	  END IF
-	  NU_SM(NSM+1)=NU_SM(1)*(1.0D0+DNU)**NSM
+	  NU_SM(NSM+1)=NU_SM(1)*(1.0_LDP+DNU)**NSM
 	  IF(NU_SM(NSM+1) .GT. LAST_FREQ)EXIT
 	  NSM=NSM+1
 	END DO
@@ -326,10 +326,10 @@ C
 	IEND=2
 	DO ML=1,NSM
 	  SIG_NEW=SIG_GAU*NU_SM(ML)
-	  DO WHILE (NU_FINE(IST) .LT. NU_SM(ML)-5.0D0*SIG_NEW)
+	  DO WHILE (NU_FINE(IST) .LT. NU_SM(ML)-5.0_LDP*SIG_NEW)
 	    IST=IST+1
 	  END DO
-	  DO WHILE ( (NU_FINE(IEND)-NU_SM(ML)) .LT. 5.0D0*SIG_NEW)
+	  DO WHILE ( (NU_FINE(IEND)-NU_SM(ML)) .LT. 5.0_LDP*SIG_NEW)
 	    IF(IEND .EQ. NFINE)GOTO 100
 	    IEND=IEND+1
 	  END DO
@@ -355,20 +355,20 @@ C
 	  END IF
 	  DO I=IST,IEND
 	    J=I-IST+1
-            Z(J)=EXP( -0.5D0*( (NU_SM(ML)-NU_FINE(I))/SIG_NEW )**2 )
+            Z(J)=EXP( -0.5_LDP*( (NU_SM(ML)-NU_FINE(I))/SIG_NEW )**2 )
 	  END DO
 !
 ! Perform the integration for the current frequency.
 !
-	  CROSS_SM(ML)=0.0D0
-	  SUM=0.0D0
+	  CROSS_SM(ML)=0.0_LDP
+	  SUM=0.0_LDP
 	  DO I=IST,IEND-1
 	    J=I-IST+1
 	    CROSS_SM(ML)=CROSS_SM(ML)+ (NU_FINE(I+1)-NU_FINE(I))*
 	1         (CROSS_FINE(I)*Z(J)+CROSS_FINE(I+1)*Z(J+1))
 	    SUM=SUM + (NU_FINE(I+1)-NU_FINE(I))*(Z(J)+Z(J+1))
 	  END DO
-	  IF(SUM .NE. 0.0D0)THEN
+	  IF(SUM .NE. 0.0_LDP)THEN
 	    CROSS_SM(ML)=CROSS_SM(ML)/SUM
 	  ELSE
 	    WRITE(6,*)'Zero SUM in SM_PHOT_V3'

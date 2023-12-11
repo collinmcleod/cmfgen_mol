@@ -47,7 +47,7 @@ C
 C
 C Initialize solution vector
 C
-	FQ(:,:)=0.0D0
+	FQ(:,:)=0.0_LDP
 C
 C Main iteration loop    !!!!
 C
@@ -56,7 +56,7 @@ C
 	IF(LIMIT .LT. 50)LIMIT=50
 	DO 1000 IT=1,LIMIT
 	  RELAX=REPA
-	  IF(IT .EQ. 1)RELAX=1.0D0
+	  IF(IT .EQ. 1)RELAX=1.0_LDP
 	  TEST=.TRUE.			!CONVERGENCE TEST PARAMETER
 C
 	  DO 900 I=ND,1,-1		!EQUATION DEPTH
@@ -90,9 +90,9 @@ C
 C
 C Check if desired accuracy has been obtained or whether solution
 
-	    IF(ABS(WXX(J)-FQ(J,I)) .GT. ABS(FQ(J,I)/1000.0D0)
+	    IF(ABS(WXX(J)-FQ(J,I)) .GT. ABS(FQ(J,I)/1000.0_LDP)
 	1)    TEST=.FALSE.
-	    IF(ABS(FQ(J,I)) .GT. 1.0D+10)THEN
+	    IF(ABS(FQ(J,I)) .GT. 1.0E+10_LDP)THEN
 	      MSOL=.FALSE.
 	      WRITE(LUER,*)'NEWGSIT iteration blowing up.'
 	      CALL WR2D(FQ,NV,ND,

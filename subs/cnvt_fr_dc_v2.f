@@ -24,7 +24,7 @@
 !
 	IF(FIRST)THEN
 	  DO J=1,ND
-	    SUM(J)=0.0D0
+	    SUM(J)=0.0_LDP
 	  END DO
 	END IF
 !

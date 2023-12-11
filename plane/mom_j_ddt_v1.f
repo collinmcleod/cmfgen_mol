@@ -103,7 +103,7 @@
 	INTEGER, SAVE :: ND_SM_SAV=0
 !
 	LOGICAL, SAVE::  FIRST_TIME=.TRUE.
-	DATA VDOP_FRAC_SAV/-10001.1D0/    !Absurd value
+	DATA VDOP_FRAC_SAV/-10001.1_LDP/    !Absurd value
 !
 	END MODULE MOD_MOM_J_DDT_V1
 !
@@ -408,15 +408,15 @@
 	  ALLOCATE ( ESEC(ND) )
 	  ALLOCATE ( CHI(ND) )
 !
-	  ALLOCATE ( RSQJNU(ND) )             ; RSQJNU(1:ND)=0.0D0
-	  ALLOCATE ( RSQHNU(ND) )             ; RSQHNU(1:ND)=0.0D0
-	  ALLOCATE ( RSQJNU_PREV(ND) )        ; RSQJNU_PREV(1:ND)=0.0D0
-	  ALLOCATE ( RSQHNU_PREV(ND) )        ; RSQHNU_PREV(1:ND)=0.0D0
-	  ALLOCATE ( RSQJNU_OLDt(ND) )        ; RSQJNU_OLDt(1:ND)=0.0D0
-	  ALLOCATE ( RSQHNU_OLDt(ND) )        ; RSQHNU_OLDt(1:ND)=0.0D0
+	  ALLOCATE ( RSQJNU(ND) )             ; RSQJNU(1:ND)=0.0_LDP
+	  ALLOCATE ( RSQHNU(ND) )             ; RSQHNU(1:ND)=0.0_LDP
+	  ALLOCATE ( RSQJNU_PREV(ND) )        ; RSQJNU_PREV(1:ND)=0.0_LDP
+	  ALLOCATE ( RSQHNU_PREV(ND) )        ; RSQHNU_PREV(1:ND)=0.0_LDP
+	  ALLOCATE ( RSQJNU_OLDt(ND) )        ; RSQJNU_OLDt(1:ND)=0.0_LDP
+	  ALLOCATE ( RSQHNU_OLDt(ND) )        ; RSQHNU_OLDt(1:ND)=0.0_LDP
 !
 	  ALLOCATE ( F(ND) )
-	  ALLOCATE ( F_SAV(ND) )              ; F_SAV(1:ND)=0.0D0
+	  ALLOCATE ( F_SAV(ND) )              ; F_SAV(1:ND)=0.0_LDP
 	  ALLOCATE ( F_PREV(ND) )
 !
 	  ALLOCATE ( CON_GAM(ND) )
@@ -475,7 +475,7 @@
 !
 	  K=1
 	  DO I=1,ND_SM-1
-	    T1=0.5D0*(R_SM(I)+R_SM(I+1))
+	    T1=0.5_LDP*(R_SM(I)+R_SM(I+1))
 	    DO WHILE(H_INDX(I) .EQ. 0)
 	      IF(T1 .LT. R(K) .AND. T1 .GT. R(K+1))THEN
 	        H_INDX(I)=K
@@ -488,9 +488,9 @@
 ! Note that V is in km/s. The factor of 2 in CON_GAMH is an allowance
 ! for a division by 0.5(CHI(I)+CHI(J)).
 !
-	  C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	  C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 	  DO I=1,ND-1
-	    CON_GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/C_KMS
+	    CON_GAMH(I)=2.0_LDP*(V(I)+V(I+1))/(R(I)+R(I+1))/C_KMS
 	    CON_GAM(I)=V(I)/R(I)/C_KMS
 	  END DO
 	  CON_GAM(ND)=V(ND)/R(ND)/C_KMS
@@ -499,7 +499,7 @@
 !
 	IF(INIT)THEN
 	  DO I=1,N_ERR_MAX
-	    MOM_ERR_ON_FREQ(I)=0.0D0
+	    MOM_ERR_ON_FREQ(I)=0.0_LDP
 	  END DO
 	  MOM_ERR_CNT=0
 	END IF
@@ -547,7 +547,7 @@
 	IF(COHERENT)THEN
 	  COH_VEC(:)=ESEC(:)/CHI(:)
 	ELSE
-	  COH_VEC(:)=0.0D0
+	  COH_VEC(:)=0.0_LDP
 	END IF
 !
 ! NB: We actually solve for r^2 J, not J.
@@ -582,32 +582,32 @@
 !
 	IF(INIT)THEN
 	  IF(DO_TIME_VAR)THEN
-	    RECIP_CDELTAT=1.0D+10*RELAX_PARAM/SPEED_OF_LIGHT()/DELTA_TIME_SECS
-	    ROLD_ON_R=1.0D0-1.0D-05*V(ND)*DELTA_TIME_SECS/R(ND)
+	    RECIP_CDELTAT=1.0E+10_LDP*RELAX_PARAM/SPEED_OF_LIGHT()/DELTA_TIME_SECS
+	    ROLD_ON_R=1.0_LDP-1.0E-05_LDP*V(ND)*DELTA_TIME_SECS/R(ND)
 	    WRITE(6,'(A,ES12.4)')'RECIP_CDELTAT=',RECIP_CDELTAT
 	    WRITE(6,'(A,ES12.4)')'    ROLD_ON_R=',ROLD_ON_R
 	  ELSE
-	    RECIP_CDELTAT=0.0D0
-	    ROLD_ON_R=0.0D0
+	    RECIP_CDELTAT=0.0_LDP
+	    ROLD_ON_R=0.0_LDP
 	  END IF
 	END IF
 !
 !
 	IF(INIT)THEN
 	  DO I=1,ND
-	    GAMH(I)=0.0D0
-	    GAM(I)=0.0D0
-	    W(I)=0.0D0
-	    WPREV(I)=0.0D0
-	    PSI(I)=0.0D0
-	    PSIPREV(I)=0.0D0
-	    RSQJNU_PREV(I)=0.0D0
-	    RSQHNU_PREV(I)=0.0D0
-	    dH(I)=0.0D0
-	    dH_OLDT(I)=0.0D0
-	    DJDt(I)=0.0D0
+	    GAMH(I)=0.0_LDP
+	    GAM(I)=0.0_LDP
+	    W(I)=0.0_LDP
+	    WPREV(I)=0.0_LDP
+	    PSI(I)=0.0_LDP
+	    PSIPREV(I)=0.0_LDP
+	    RSQJNU_PREV(I)=0.0_LDP
+	    RSQHNU_PREV(I)=0.0_LDP
+	    dH(I)=0.0_LDP
+	    dH_OLDT(I)=0.0_LDP
+	    DJDt(I)=0.0_LDP
 	  END DO
-	  HONJ_OUTBC_PREV=0.0D0;  HFLUX_AT_INB_PREV=0.0D0
+	  HONJ_OUTBC_PREV=0.0_LDP;  HFLUX_AT_INB_PREV=0.0_LDP
 	ELSE
 !
 !
@@ -616,7 +616,7 @@
 !
 	  DO I=1,ND-1
 	    GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
-	    dH(I)=2.0D0*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
+	    dH(I)=2.0_LDP*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
 	    dH_OLDT(I)=dH(I)*ROLD_ON_R
 	    W(I)=GAMH(I)+dH(I)
 	  END DO
@@ -628,7 +628,7 @@
 !
 	IF(INIT .AND. DO_TIME_VAR)THEN
 	  DO I=1,ND-1
-	    dH(I)=2.0D0*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
+	    dH(I)=2.0_LDP*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
 	    dH_OLDT(I)=dH(I)*ROLD_ON_R
 	    W(I)=dH(I)
 	  END DO
@@ -637,7 +637,7 @@
 ! 
 !
 	DO I=2,ND-1
-	  DTAUONQ(I)=0.5D0*(DTAU(I)+DTAU(I-1))/Q(I)
+	  DTAUONQ(I)=0.5_LDP*(DTAU(I)+DTAU(I-1))/Q(I)
 !	  DTAUONQ(I)=0.5D0*(R(I-1)-R(I+1))*CHI(I)
 	  PSI(I)=DTAUONQ(I)*GAM(I)
 	  PSIPREV(I)=DTAUONQ(I)*GAM(I)
@@ -649,10 +649,10 @@
 ! with older versions, and with the compatible VAR_MOM routine.
 !
 	DO I=1,ND-1
-	  HU(I)=F(I+1)*Q(I+1)/(1.0D0+W(I))/DTAU(I)
-	  HL(I)=F(I)*Q(I)/(1.0D0+W(I))/DTAU(I)
-	  HS(I)=GAMH(I)/(1.0D0+W(I))
-	  HT(I)=dH_OLDT(I)/(1.0D0+W(I))
+	  HU(I)=F(I+1)*Q(I+1)/(1.0_LDP+W(I))/DTAU(I)
+	  HL(I)=F(I)*Q(I)/(1.0_LDP+W(I))/DTAU(I)
+	  HS(I)=GAMH(I)/(1.0_LDP+W(I))
+	  HT(I)=dH_OLDT(I)/(1.0_LDP+W(I))
 	END DO
 !
 ! Compute the TRIDIAGONAL operators, and the RHS source vector.
@@ -660,7 +660,7 @@
 	DO I=2,ND-1
 	  TA(I)=-HL(I-1)
 	  TC(I)=-HU(I)
-	  TB(I)=DTAUONQ(I)*(1.0D0-COH_VEC(I)) + PSI(I) + DJDt(I) + HL(I) + HU(I-1)
+	  TB(I)=DTAUONQ(I)*(1.0_LDP-COH_VEC(I)) + PSI(I) + DJDt(I) + HL(I) + HU(I-1)
 	  XM(I)=DTAUONQ(I)*SOURCE(I)*R(I)*R(I)
 	END DO
 !
@@ -679,17 +679,17 @@
 	PSIPREV(1)=GAM(1)*HONJ_OUTBC_PREV
 	DJDT(1)=RECIP_CDELTAT/CHI(1)
 	TC(1)=-F(2)*Q(2)/DTAU(1)
-	TB(1)=F(1)*Q(1)/DTAU(1) + HONJ_OUTBC*(1.0D0+GAM(1)+DJDt(1))
+	TB(1)=F(1)*Q(1)/DTAU(1) + HONJ_OUTBC*(1.0_LDP+GAM(1)+DJDt(1))
 	XM(1)=PSIPREV(1)*RSQJNU_PREV(1) +
 	1         DJDt(1)*RSQJNU_OLDt(1)*ROLD_ON_R*HONJ_OUTBC_OLDT
-	TA(1)=0.0D0
+	TA(1)=0.0_LDP
 !
-	PSI(ND)=0.0D0
-	PSIPREV(ND)=0.0D0
+	PSI(ND)=0.0_LDP
+	PSIPREV(ND)=0.0_LDP
 	DJDt(ND)=RECIP_CDELTAT/CHI(ND)
 	TA(ND)=-F(ND-1)*Q(ND-1)/DTAU(ND-1)
 	IF(DIF)THEN
-	  HFLUX_AT_INB=DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
+	  HFLUX_AT_INB=DBB*R(ND)*R(ND)/3.0_LDP/CHI(ND)
 	  TB(ND)=F(ND)/DTAU(ND-1)
 	  XM(ND)=HFLUX_AT_INB+DJDt(ND)*(HFLUX_AT_INB-ROLD_ON_R*HFLUX_AT_INB_OLDt)
 !	1              +GAM(ND)*(HFLUX_AT_INB-HFLUX_AT_INB_PREV)
@@ -698,7 +698,7 @@
 	  WRITE(LUER,*)'Error: only the diffusion approximation is implemented in MOM_J_DDT_V1'
 	  STOP
 	END IF
-	TC(ND)=0.0D0
+	TC(ND)=0.0_LDP
 !
 	IF(INIT .AND. .NOT. FIRST_TIME)THEN
 	  REWIND(170)
@@ -717,7 +717,7 @@
 !
 ! Check that no negative mean intensities have been computed.
 !
-	IF(MINVAL(XM(1:ND)) .LE. 0.0D0)THEN
+	IF(MINVAL(XM(1:ND)) .LE. 0.0_LDP)THEN
 	   WRITE(47,*)'Freq=',FREQ
 	   TA(1:ND)=XM(1:ND)/R(1:ND)/R(1:ND)
 	   CALL WRITE_VEC(TA,ND,'XM Vec',47)
@@ -728,8 +728,8 @@
 	END IF
 !
 	DO I=1,ND
-	  IF(XM(I) .LT. 0.0D0)THEN
-	    XM(I)=ABS(XM(I))/10.0D0
+	  IF(XM(I) .LT. 0.0_LDP)THEN
+	    XM(I)=ABS(XM(I))/10.0_LDP
 	    RECORDED_ERROR=.FALSE.
 	    J=1
 	    DO WHILE (J .LE. MOM_ERR_CNT .AND. .NOT. RECORDED_ERROR)

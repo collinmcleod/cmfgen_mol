@@ -97,13 +97,13 @@ OANDF = $(OBJ1) $(FN1) $(FN2) $(FN3)
 $(EXE_DIR)%.exe : %.o $(OANDF) 
 	$(F90) -g $*.o \
               $(OBJ1) -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) -l$(LN4) -l$(LN1) \
-              $(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \
+              $(PGLIB) $(LAPACK) $(BLAS) $(LOCLIB) $(X11LIB) $(G2CLIB) \
               -g -o $(EXE_DIR)$*.exe
 
 $(EXE_DIR)plt_rates.exe : plt_rates.o 
 	$(F90) -g plt_rates.o \
               -L$(LIB_DIR) -l$(LN3) -l$(LN2) -l$(LN1) -l$(LN4) -l$(LN1) \
-              $(LOCLIB) $(PGLIB) $(LAPACK) $(BLAS) $(X11LIB) $(G2CLIB) \
+              $(PGLIB) $(LAPACK) $(BLAS) $(LOCLIB) $(X11LIB) $(G2CLIB) \
               -g -o $(EXE_DIR)plt_rates.exe
 
 $(EXE_DIR)chk_phot.exe : chk_phot.o recom_chk_v2.o get_exc_freq.o $(OANDF)

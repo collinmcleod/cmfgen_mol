@@ -84,7 +84,7 @@
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
 	CALL TUNE(1,'INS_OBS')
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 !
 ! Check parameters.
 !
@@ -108,8 +108,8 @@
 	WRITE(6,*)V_DOP
 	WRITE(6,*)OBS_PRO_EXT_RAT
 	WRITE(6,*)VINF
-	MAX_B_EXTENT  = 1.0D0+(OBS_PRO_EXT_RAT*VINF+3.0D0*V_DOP)/C_KMS
-	MAX_R_EXTENT  = 1.0D0-(OBS_PRO_EXT_RAT*VINF+3.0D0*V_DOP)/C_KMS
+	MAX_B_EXTENT  = 1.0_LDP+(OBS_PRO_EXT_RAT*VINF+3.0_LDP*V_DOP)/C_KMS
+	MAX_R_EXTENT  = 1.0_LDP-(OBS_PRO_EXT_RAT*VINF+3.0_LDP*V_DOP)/C_KMS
 !
 ! BW and RW refer to the extent of the electron scattering wings. They are
 ! defined from line center.
@@ -122,19 +122,19 @@
 ! For SN models using VINF sets the red wing to cover essentially the whole spectrum.
 ! We now set a limit of 10000 km/s on the extent of the red wing.
 !
-	T1=10000.0D0
-	T1=MIN(T1,4.0D0*VINF)
-	MAX_RW_EXTENT = 1.0D0-(ES_WING_EXT+T1)/C_KMS
-	MAX_BW_EXTENT = 1.0D0+(ES_WING_EXT+VINF)/C_KMS
+	T1=10000.0_LDP
+	T1=MIN(T1,4.0_LDP*VINF)
+	MAX_RW_EXTENT = 1.0_LDP-(ES_WING_EXT+T1)/C_KMS
+	MAX_BW_EXTENT = 1.0_LDP+(ES_WING_EXT+VINF)/C_KMS
 !
 ! Ensures BW extent is bigger than profile extent.
 !
-	MAX_BW_EXTENT = MAX(MAX_BW_EXTENT,MAX_B_EXTENT+2.0D0*dV_OBS_BIG/C_KMS)
+	MAX_BW_EXTENT = MAX(MAX_BW_EXTENT,MAX_B_EXTENT+2.0_LDP*dV_OBS_BIG/C_KMS)
 !
-	WRITE(6,'(A,2ES10.3,A)')' Maximum red  profile extent is ',MAX_R_EXTENT,(1.0D0-MAX_R_EXTENT)*C_KMS,' km/s'
-	WRITE(6,'(A,2ES10.3,A)')' Maximum red  wing    extent is ',MAX_RW_EXTENT,(1.0D0-MAX_RW_EXTENT)*C_KMS,' km/s'
-	WRITE(6,'(A,2ES10.3,A)')' Maximum blue profile extent is ',MAX_B_EXTENT,(MAX_B_EXTENT-1.0D0)*C_KMS,' km/s'
-	WRITE(6,'(A,2ES10.3,A)')' Maximum blue wing    extent is ',MAX_BW_EXTENT,(MAX_BW_EXTENT-1.0D0)*C_KMS,' km/s'
+	WRITE(6,'(A,2ES10.3,A)')' Maximum red  profile extent is ',MAX_R_EXTENT,(1.0_LDP-MAX_R_EXTENT)*C_KMS,' km/s'
+	WRITE(6,'(A,2ES10.3,A)')' Maximum red  wing    extent is ',MAX_RW_EXTENT,(1.0_LDP-MAX_RW_EXTENT)*C_KMS,' km/s'
+	WRITE(6,'(A,2ES10.3,A)')' Maximum blue profile extent is ',MAX_B_EXTENT,(MAX_B_EXTENT-1.0_LDP)*C_KMS,' km/s'
+	WRITE(6,'(A,2ES10.3,A)')' Maximum blue wing    extent is ',MAX_BW_EXTENT,(MAX_BW_EXTENT-1.0_LDP)*C_KMS,' km/s'
 !
 ! Spacing in km/s across various parts of the frequency spectrum. NB: These
 ! meanings have changed from version V3.
@@ -161,7 +161,7 @@
 !
 !	DO WHILE( FREQ(INDX) .GT. NU_MIN/MAX_RW_EXTENT )
 !	CALL TUNE(1,'DO_WHILE')
-	DO WHILE( FREQ(INDX) .GT. 1.1D0*NU_MIN )
+	DO WHILE( FREQ(INDX) .GT. 1.1_LDP*NU_MIN )
 !
 ! Continuum
 !
@@ -219,7 +219,7 @@
 !               photospheric lines (e.g. as for an O star).
 !
 !	  CALL TUNE(1,'MAX_O_EXT')
-	  T3=1.0D0
+	  T3=1.0_LDP
 	  K=LN_INDX
 	  IF(K .LE. N_LINES)THEN
 	    DO WHILE(FREQ(INDX)-dNU .LT. NU_STRT_LINE(MIN(K,N_LINES)))
@@ -228,7 +228,7 @@
 	        NU_END_LINE=NU_LINE(K)-(NU_STRT_LINE(K)-NU_LINE(K))
 	        IF( (FREQ(INDX) .GT. NU_END_LINE .AND.
 	1            T1 .LE. NU_STRT_LINE(K)) )THEN
-	          T3=1.0D0 + C_KMS*ABS(T3-NU_LINE(K)/FREQ(INDX))/VEC_VMIN_VDOP(K)
+	          T3=1.0_LDP + C_KMS*ABS(T3-NU_LINE(K)/FREQ(INDX))/VEC_VMIN_VDOP(K)
 	          T2=FREQ(INDX)*FRAC_DOP_OBS*VEC_VMIN_VDOP(K)*SQRT(T3)/C_KMS
 	          dNU=MIN(dNU,T2)
 	        END IF
@@ -303,7 +303,7 @@
 	OPEN(UNIT=77,FILE='OBS_FREQ')
 	  DO I=1,NFREQ-1
 	    WRITE(77,'(1X,ES12.6,3X,F12.3)')
-	1              FREQ(I),C_KMS*(1.0D0-FREQ(I+1)/FREQ(I))
+	1              FREQ(I),C_KMS*(1.0_LDP-FREQ(I+1)/FREQ(I))
 	  END DO
 	CLOSE(UNIT=77)
 	CALL TUNE(2,'INS_OBS')

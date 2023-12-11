@@ -136,18 +136,18 @@ C
 C
 C Zero summation scalers for computing recombination rates.
 C
-	  A1=0.0D0
-	  A2=0.0D0
-	  A3=0.0D0
-	  M1=0.0D0
-	  M2=0.0D0
-	  M3=0.0D0
-	  WIA1=0.0D0
-	  WIA2=0.0D0
-	  WIA3=0.0D0
-	  WIM1=0.0D0
-	  WIM2=0.0D0
-	  WIM3=0.0D0
+	  A1=0.0_LDP
+	  A2=0.0_LDP
+	  A3=0.0_LDP
+	  M1=0.0_LDP
+	  M2=0.0_LDP
+	  M3=0.0_LDP
+	  WIA1=0.0_LDP
+	  WIA2=0.0_LDP
+	  WIA3=0.0_LDP
+	  WIM1=0.0_LDP
+	  WIM2=0.0_LDP
+	  WIM3=0.0_LDP
 	  INC=0				!LTDR counters.
 	  WIINC=0
 	  MIS=0
@@ -206,9 +206,9 @@ C Now compute the effective recombination coefficient (units of
 C 10^{-12} for 10^4, 2 x 10^4, and 3 x 10^4 K.
 C
 	    T1=HDKT*EDGEDIE(ML)
-	    A10=2.07D-10*GUPDIE(ML)*EINADIE(ML)/GION
-	    A20=A10*EXP(0.5D0*T1)/(2.0D0**1.5)
-	    A30=A10*EXP(T1/3.0D0)/(3.0D0**1.5)
+	    A10=2.07E-10_LDP*GUPDIE(ML)*EINADIE(ML)/GION
+	    A20=A10*EXP(0.5_LDP*T1)/(2.0_LDP**1.5_LDP)
+	    A30=A10*EXP(T1/3.0_LDP)/(3.0_LDP**1.5_LDP)
 	    A10=A10*EXP(T1)
 C
 C Is this lower level in model atom ?
@@ -279,17 +279,17 @@ C
 	1                  'included (LS : WI) ',/,
 	1 '[Units 10^-12] ( ) denotes percentage of LTDR NOT included')
 	  IF( (A1+M1) .NE. 0)THEN
-	    M1=100.0*M1/(A1+M1)
-	    M2=100.0*M2/(A2+M2)
-	    M3=100.0*M3/(A3+M3)
+	    M1=100.0_LDP*M1/(A1+M1)
+	    M2=100.0_LDP*M2/(A2+M2)
+	    M3=100.0_LDP*M3/(A3+M3)
 	    WRITE(LUOUT,1000)INC,(INC+MIS),A1,M1,A2,M2,A3,M3
 1000	    FORMAT( 1X,I4,'(',I4,')',3( 2X,1PE10.3,'(',0PF6.2,')' )  )
 	  END IF
 C
 	  IF( (WIA1+WIM1) .NE. 0)THEN
-	    WIM1=100.0*WIM1/(WIA1+WIM1)
-	    WIM2=100.0*WIM2/(WIA2+WIM2)
-	    WIM3=100.0*WIM3/(WIA3+WIM3)
+	    WIM1=100.0_LDP*WIM1/(WIA1+WIM1)
+	    WIM2=100.0_LDP*WIM2/(WIA2+WIM2)
+	    WIM3=100.0_LDP*WIM3/(WIA3+WIM3)
 	    WRITE(LUOUT,1000)WIINC,(WIINC+WIMIS),WIA1,WIM1,WIA2,WIM2,
 	1                  WIA3,WIM3
 	  END IF

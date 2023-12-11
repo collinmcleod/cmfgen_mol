@@ -81,23 +81,23 @@ C
 C Zero vecters. These were originally zerroed in a common block. There is
 C currently 21 vectors.
 C
-	TA(:)=0.0D0;        TB(:)=0.0D0;      TC(:)=0.0D0
-	DTAU(:)=0.0D0;      TCHI(:)=0.0D0;    DTAUONQ(:)=0.0D0
-	Q(:)=0.0D0;         XM(:)=0.0D0;      SOURCE(:)=0.0D0
-        JEX_SCAT(:)=0.0D0;  VB(:)=0.0D0;      VC(:)=0.0D0
-        HU(:)=0.0D0;        HL(:)=0.0D0;      HS(:)=0.0D0
-	GAM(:)=0.0D0;       GAMH(:)=0.0D0;    W(:)=0.0D0;
-	WPREV(:)=0.0D0;     PSI(:)=0.0D0;     PSIPREV(:)=0.0D0
+	TA(:)=0.0_LDP;        TB(:)=0.0_LDP;      TC(:)=0.0_LDP
+	DTAU(:)=0.0_LDP;      TCHI(:)=0.0_LDP;    DTAUONQ(:)=0.0_LDP
+	Q(:)=0.0_LDP;         XM(:)=0.0_LDP;      SOURCE(:)=0.0_LDP
+        JEX_SCAT(:)=0.0_LDP;  VB(:)=0.0_LDP;      VC(:)=0.0_LDP
+        HU(:)=0.0_LDP;        HL(:)=0.0_LDP;      HS(:)=0.0_LDP
+	GAM(:)=0.0_LDP;       GAMH(:)=0.0_LDP;    W(:)=0.0_LDP;
+	WPREV(:)=0.0_LDP;     PSI(:)=0.0_LDP;     PSIPREV(:)=0.0_LDP
 C
 C 
 C
 C Zero relevant vectors and matrices.
 C
-	JBAR(:)=0.0D0
-	HBLANK(:)=0.0D0
-	JBLANK(:)=0.0D0
-	JNU(:,:)=0.0D0			!ND*(NLF+1)
-	RSQHNU(:,:)=0.0D0		!ND*(NLF+1) )
+	JBAR(:)=0.0_LDP
+	HBLANK(:)=0.0_LDP
+	JBLANK(:)=0.0_LDP
+	JNU(:,:)=0.0_LDP			!ND*(NLF+1)
+	RSQHNU(:,:)=0.0_LDP		!ND*(NLF+1) )
 C
 C*****************************************************************************
 C
@@ -145,15 +145,15 @@ C
 C NB - By definition, G is defined at the mesh midpoints.
 C
 	    DO I=1,ND-1
-	      GAMH(I)=2.0D0*3.33564D-06*(V(I)+V(I+1))/(R(I)+R(I+1))
+	      GAMH(I)=2.0_LDP*3.33564E-06_LDP*(V(I)+V(I+1))/(R(I)+R(I+1))
 	1         /DNU/( TCHI(I)+TCHI(I+1) )
-	      W(I)=GAMH(I)*( 1.0D0+0.5D0*(SIGMA(I)+SIGMA(I+1))*G(I,ML) )
-	      WPREV(I)=GAMH(I)*( 1.0D0+
-	1                0.5D0*(SIGMA(I)+SIGMA(I+1))*G(I,ML-1) )
+	      W(I)=GAMH(I)*( 1.0_LDP+0.5_LDP*(SIGMA(I)+SIGMA(I+1))*G(I,ML) )
+	      WPREV(I)=GAMH(I)*( 1.0_LDP+
+	1                0.5_LDP*(SIGMA(I)+SIGMA(I+1))*G(I,ML-1) )
 	    END DO
 C
 	    DO I=1,ND
-	      GAM(I)=3.33564D-06*V(I)/R(I)/TCHI(I)/DNU
+	      GAM(I)=3.33564E-06_LDP*V(I)/R(I)/TCHI(I)/DNU
 	    END DO
 C
 C PSIPREV is equivalent to the U vector of FORMSOL.
@@ -163,33 +163,33 @@ C
 	    SRCEBND=GAM(1)*( HBC(2,ML)+NBC(2,ML)*SIGMA(1)
 	1                   -HBC(2,ML-1)-NBC(2,ML-1)*SIGMA(1) )
 	    DO I=2,ND
-	      DTAUONQ(I)=0.5D0*(DTAU(I)+DTAU(I-1))/Q(I)
-	      PSI(I)=DTAUONQ(I)*GAM(I)*( 1.0D0+SIGMA(I)*F(I,ML) )
-	      PSIPREV(I)=DTAUONQ(I)*GAM(I)*(  1.0D0+SIGMA(I)*F(I,ML-1) )
+	      DTAUONQ(I)=0.5_LDP*(DTAU(I)+DTAU(I-1))/Q(I)
+	      PSI(I)=DTAUONQ(I)*GAM(I)*( 1.0_LDP+SIGMA(I)*F(I,ML) )
+	      PSIPREV(I)=DTAUONQ(I)*GAM(I)*(  1.0_LDP+SIGMA(I)*F(I,ML-1) )
 	    END DO
 C
 	  ELSE
 	    DO I=2,ND
-	      DTAUONQ(I)=0.5D0*(DTAU(I)+DTAU(I-1))/Q(I)
+	      DTAUONQ(I)=0.5_LDP*(DTAU(I)+DTAU(I-1))/Q(I)
 	    END DO
 	    DO I=1,ND
-	      GAMH(I)=0.0D0
-	      W(I)=0.0D0
-	      WPREV(I)=0.0D0
-	      GAM(I)=0.0D0
-	      PSI(I)=0.0D0
-	      PSIPREV(I)=0.0D0
+	      GAMH(I)=0.0_LDP
+	      W(I)=0.0_LDP
+	      WPREV(I)=0.0_LDP
+	      GAM(I)=0.0_LDP
+	      PSI(I)=0.0_LDP
+	      PSIPREV(I)=0.0_LDP
 	    END DO
-	    SRCEBND=0.0D0
+	    SRCEBND=0.0_LDP
 	  END IF
 C 
 C
 C Compute vectors used to compute the flux vector H.
 C
 	  DO I=1,ND-1
-	    HU(I)=F(I+1,ML)*Q(I+1)/(1.0D0+W(I))/DTAU(I)
-	    HL(I)=F(I,ML)*Q(I)/(1.0D0+W(I))/DTAU(I)
-	    HS(I)=WPREV(I)/(1.0D0+W(I))
+	    HU(I)=F(I+1,ML)*Q(I+1)/(1.0_LDP+W(I))/DTAU(I)
+	    HL(I)=F(I,ML)*Q(I)/(1.0_LDP+W(I))/DTAU(I)
+	    HS(I)=WPREV(I)/(1.0_LDP+W(I))
 	  END DO
 C
 C Compute the TRIDIAGONAL operators, and the RHS source vector.
@@ -208,22 +208,22 @@ C
 	  TC(1)=-F(2,ML)*Q(2)/DTAU(1)
 	  TB(1)=F(1,ML)*Q(1)/DTAU(1) + HBC(1,ML) + PSI(1)
 	  XM(1)=R(1)*R(1)*(HBC(2,ML)+SRCEBND)
-	  TA(1)=0.0D0
-	  VB(1)=0.0D0
-	  VC(1)=0.0D0
+	  TA(1)=0.0_LDP
+	  VB(1)=0.0_LDP
+	  VC(1)=0.0_LDP
 C
 	  TA(ND)=-F(ND-1,ML)*Q(ND-1)/DTAU(ND-1)
 	  IF(DIF)THEN
 	    TB(ND)=F(ND,ML)/DTAU(ND-1)
-	    XM(ND)=DBB*R(ND)*R(ND)/3.0D0/TCHI(ND)
+	    XM(ND)=DBB*R(ND)*R(ND)/3.0_LDP/TCHI(ND)
 	  ELSE
 	    TB(ND)=F(ND,ML)/DTAU(ND-1)+IN_HBC(ML)
-	    XM(ND)=R(ND)*R(ND)*IC*(0.25D0+0.5D0*IN_HBC(ML))
+	    XM(ND)=R(ND)*R(ND)*IC*(0.25_LDP+0.5_LDP*IN_HBC(ML))
 	  END IF
-	  TC(ND)=0.0D0
-	  VB(ND)=0.0D0
-	  VC(ND)=0.0D0
-	  PSIPREV(ND)=0.0D0
+	  TC(ND)=0.0_LDP
+	  VB(ND)=0.0_LDP
+	  VC(ND)=0.0_LDP
+	  PSIPREV(ND)=0.0_LDP
 C
 	  IF(ML .NE. 1)THEN
 	    XM(1)=XM(1) + PSIPREV(1)*JNU(1,ML-1)
@@ -277,11 +277,11 @@ C Scale JBLANK and HBLANK to allow for the fact that the
 C LFQW dont necessarily add to v*(PF(1)-PF(NLF)) (since LFQW is
 C normalized so that integral over the line profile is unity).
 C
-	SCALE=0.0D0
+	SCALE=0.0_LDP
 	DO ML=1,NLF
 	  SCALE=SCALE+LFQW(ML)
 	END DO
-	SCALE=1.0D+15*FL*(PF(1)-PF(NLF))/SCALE
+	SCALE=1.0E+15_LDP*FL*(PF(1)-PF(NLF))/SCALE
 C
 C Note that the matrice JNU and RSQHNU contain r^2.J and r^2.H respectively.
 C Also put both the HBLANK and JBLANK in the correct units - need to multiply
@@ -293,20 +293,20 @@ C
 	  JBAR(I)=JBAR(I)/T1
 	  JBLANK(I)=JBLANK(I)*(SCALE/T1)
 	  HBLANK(I)=HBLANK(I)*SCALE
-	  ZNET(I)=1.0D0-JBAR(I)*CHIL(I)/ETAL(I)
+	  ZNET(I)=1.0_LDP-JBAR(I)*CHIL(I)/ETAL(I)
 	  DO ML=1,NLF
 	    JNU(I,ML)=JNU(I,ML)/T1
 	  END DO
 	END DO
 C
 	IF(FULL_ES)THEN
-	  T1=1.0D-15/FL
+	  T1=1.0E-15_LDP/FL
 	  T2=PF(1)-PF(NLF)
 	  DO I=1,ND
 	    JEX_SCAT(I)=JBLANK(I)*T1-JCONT(I)*T2
 	  END DO
 	ELSE
-	  JEX_SCAT(:)=0.0D0
+	  JEX_SCAT(:)=0.0_LDP
 	END IF
 C
 C 
@@ -330,7 +330,7 @@ C JINT and is determined by the maximum expansion velocity of the
 C atmosphere. We define DNU with out the factor FL. The bandwidth
 C must be identical to that in FGCOMP.
 C
-	  DNU=3.33564D-06*V(1)*2.0D0
+	  DNU=3.33564E-06_LDP*V(1)*2.0_LDP
 C
 C Compute the total opacity. Store opacity from previous frequency.
 C Compute the total source function. We will assume that for the
@@ -359,14 +359,14 @@ C 	 (2)	Vd+1/2=0.5*( Vd + Vd+1 )
 C Note that V is in km/s and SIGMA=(dlnV/dlnR-1.0)
 C
 	  DO I=1,ND-1
-	    GAMH(I)=2.0D0*3.33564D-06*(V(I)+V(I+1))/(R(I)+R(I+1))
+	    GAMH(I)=2.0_LDP*3.33564E-06_LDP*(V(I)+V(I+1))/(R(I)+R(I+1))
 	1         /( CHI(I)+CHI(I+1) )
-	    W(I)=1.0D0+0.5D0*( SIGMA(I)+SIGMA(I+1) )*G(I,NLF)
-	    WPREV(I)=1.0D0+0.5D0*( SIGMA(I)+SIGMA(I+1) )*G(I,1)
+	    W(I)=1.0_LDP+0.5_LDP*( SIGMA(I)+SIGMA(I+1) )*G(I,NLF)
+	    WPREV(I)=1.0_LDP+0.5_LDP*( SIGMA(I)+SIGMA(I+1) )*G(I,1)
 	  END DO
 C
 	  DO I=1,ND
-	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)
+	    GAM(I)=3.33564E-06_LDP*V(I)/R(I)/CHI(I)
 	  END DO
 C
 C Compute RHS of tridiagonal system of equations. Note that the
@@ -380,20 +380,20 @@ C
 	1                         +(HBC(2,NLF)+SIGMA(1)*NBC(2,NLF)) )
 	  DO I=2,ND-1
 	    XM(I)=R(I)*R(I)*(  SOURCE(I)
-	1        +GAM(I)*( (1.0D0+SIGMA(I)*F(I,NLF))*JNU(I,NLF)
-	1        -(1.0D0+SIGMA(I)*F(I,1))*JNU(I,1) )  )/Q(I)
+	1        +GAM(I)*( (1.0_LDP+SIGMA(I)*F(I,NLF))*JNU(I,NLF)
+	1        -(1.0_LDP+SIGMA(I)*F(I,1))*JNU(I,1) )  )/Q(I)
 	1        +(  GAMH(I)*( W(I)*RSQHNU(I,NLF)-WPREV(I)*RSQHNU(I,1) )
 	1        -GAMH(I-1)*( W(I-1)*RSQHNU(I-1,NLF)
 	1        -WPREV(I-1)*RSQHNU(I-1,1) )  )
-	1        *2.0D0/(DTAU(I)+DTAU(I-1))
+	1        *2.0_LDP/(DTAU(I)+DTAU(I-1))
 	  END DO
 C
 C Note well - DBB =dB/dR (and Q(ND)=1.0 by definition)
 C
 	  IF(DIF)THEN
-	    XM(ND)=DNU*R(ND)*R(ND)*DBB/CHI(ND)/3.0D0
+	    XM(ND)=DNU*R(ND)*R(ND)*DBB/CHI(ND)/3.0_LDP
 	  ELSE
-	    XM(ND)=DNU*R(ND)*R(ND)*IC*( 0.25D0+0.5D0*IN_HBC(NLF+1) )
+	    XM(ND)=DNU*R(ND)*R(ND)*IC*( 0.25_LDP+0.5_LDP*IN_HBC(NLF+1) )
 	  END IF
 C
 C Compute T ( a tridiagonal matrix) and store it as three vectors
@@ -425,7 +425,7 @@ C HBLANK is similarly defined. Note that JBLANK and HBLANK have already
 C been scaled. The frequency factor of 10^15 is included in the JBLANK
 C (and HBLANK) definition.
 C
-	  T1=1.0D+15*FL
+	  T1=1.0E+15_LDP*FL
 	  DO I=1,ND
 	    JBLANK(I)=JBLANK(I)+JNU(I,NLF+1)*T1
 	    HBLANK(I)=HBLANK(I)+RSQHNU(I,NLF+1)*T1
@@ -435,10 +435,10 @@ C Evaluate the line EW. The units are Angstroms. Also evaluate
 C the continuum intensity ( Jys/kpc/kpc ). Note that H is
 C defined midway between R(1) and R(2).
 C
-	  T1=( (PF(1)-PF(NLF))+DNU )*FL*1.0D+15
-	  EW=2.99794D-12*( HBLANK(1)-RSQHNU(1,1)*T1 )/
+	  T1=( (PF(1)-PF(NLF))+DNU )*FL*1.0E+15_LDP
+	  EW=2.99794E-12_LDP*( HBLANK(1)-RSQHNU(1,1)*T1 )/
 	1                 RSQHNU(1,1)/FL/FL
-	  CONT_INT=13.19868D0*RSQHNU(1,1)
+	  CONT_INT=13.19868_LDP*RSQHNU(1,1)
 C
 C Change HBLANK and JBLANK to be the int{across line -Jc} (i.e
 C integral of J or H above the continuum). Thus, for a weak line,

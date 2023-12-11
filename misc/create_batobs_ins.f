@@ -185,10 +185,10 @@
 !
 	      IF(.NOT. VALID_KEY)THEN
 	      ELSE IF(DONE_SED)THEN
-	        STRING='    -e "/\'//STRING(K1:K2-1)//'\]/s/.*/'//TRIM(STRING)//'/" \'
+	        STRING='    -e "/\'//STRING(K1:K2-1)//'\]/s/._LDP*/'//TRIM(STRING)//'/" \'
 	        WRITE(LUOUT,'(A)')TRIM(STRING)
 	      ELSE
-	        STRING='sed -e "/\'//STRING(K1:K2-1)//'\]/s/.*/'//TRIM(STRING)//'/" \'
+	        STRING='sed -e "/\'//STRING(K1:K2-1)//'\]/s/._LDP*/'//TRIM(STRING)//'/" \'
 	        DONE_SED=.TRUE.
 	        WRITE(LUOUT,'(A)')TRIM(STRING)
 	      END IF

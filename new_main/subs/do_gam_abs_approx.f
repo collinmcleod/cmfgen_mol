@@ -28,32 +28,32 @@
 !
 ! Determine number of electron per baryon.
 !
-	TA(1:ND)=0.5D0                        !Number of electrons per baryon
+	TA(1:ND)=0.5_LDP                        !Number of electrons per baryon
 	DO ISPEC=1,NUM_SPECIES
 	  IF('HYD' .EQ. SPECIES(ISPEC))THEN
-	   TA(1:ND)=0.5D0*(1.0D0+POP_SPECIES(1:ND,ISPEC)/POP_ATOM(1:ND))
+	   TA(1:ND)=0.5_LDP*(1.0_LDP+POP_SPECIES(1:ND,ISPEC)/POP_ATOM(1:ND))
 	  END IF
 	END DO
 !
 ! Compute the absorbative opacity.
 !
-	CHI(1:ND)=0.06D0*TA(1:ND)*DENSITY(1:ND)*1.0D+10
+	CHI(1:ND)=0.06_LDP*TA(1:ND)*DENSITY(1:ND)*1.0E+10_LDP
 !
 ! Calculate a larger R grid. We attempt to keep the outer grid spacing small.
 !
 	R_EXT(1)=R(1)
-	R_EXT(2)=R(1)+(R(2)-R(1))/3.0D0
-	R_EXT(3)=R(1)+(R(3)-R(1))/3.0D0
-	R_EXT(4)=R(1)+(R(3)-R(1))/1.5D0
+	R_EXT(2)=R(1)+(R(2)-R(1))/3.0_LDP
+	R_EXT(3)=R(1)+(R(3)-R(1))/3.0_LDP
+	R_EXT(4)=R(1)+(R(3)-R(1))/1.5_LDP
 	I=3
 	J=5
 	DO I=3,ND-2
 	  R_EXT(J)=R(I)
-	  R_EXT(J+1)=R(I)+(R(I+1)-R(I))/3.0D0
-	  R_EXT(J+2)=R(I)+(R(I+1)-R(I))/1.5D0
+	  R_EXT(J+1)=R(I)+(R(I+1)-R(I))/3.0_LDP
+	  R_EXT(J+2)=R(I)+(R(I+1)-R(I))/1.5_LDP
 	  J=J+3
 	END DO
-	R_EXT(ND_EXT-1)=R(ND)+(R(ND-1)-R(ND))/3.0D0
+	R_EXT(ND_EXT-1)=R(ND)+(R(ND-1)-R(ND))/3.0_LDP
 	R_EXT(ND_EXT)=R(ND)
 !
 	DO I=1,ND_EXT-1
@@ -110,7 +110,7 @@
 	METHOD='LOGLOG'
 	INNER_BND_METH='DIFFUSION'
 	THK_CONT=.FALSE.
-	DBB=0.0D0
+	DBB=0.0_LDP
 !
 	CALL MON_INTERP(  V,ND,IONE,R,ND,SM_V,        SM_ND,SM_R,SM_ND)
 	CALL MON_INTERP(CHI,ND,IONE,R,ND,SM_CHI,      SM_ND,SM_R,SM_ND)
@@ -136,7 +136,7 @@
 	END DO
 	CALL LUM_FROM_ETA(TA,R,ND)
 	CALL LUM_FROM_ETA(TB,R,ND)
-	T1=16.0D0*ATAN(1.0D0)*1.0D+30/3.826D+33
+	T1=16.0_LDP*ATAN(1.0_LDP)*1.0E+30_LDP/3.826E+33_LDP
 	OPEN(UNIT=10,FILE='check_edep.dat',STATUS='UNKNOWN',ACTION='WRITE')
 	  WRITE(10,'(A,ES13.5,A)')'!Radiactive energy emitted is :',SUM(TA)/T1,' Lsun'
 	  WRITE(10,'(A,ES13.5,A)')'!Radiactive energy absorbed is:',SUM(TB)/T1,' Lsun'

@@ -30,7 +30,7 @@ C
 C Compute points of radius grid. RSQHNU is defined on this grid.
 C
 	DO I=1,ND-1
-	  MIDR(I)=0.5D0*(R(I)+R(I+1))
+	  MIDR(I)=0.5_LDP*(R(I)+R(I+1))
 	END DO
 	ND_M1=ND-1
 	ND_M2=ND-2

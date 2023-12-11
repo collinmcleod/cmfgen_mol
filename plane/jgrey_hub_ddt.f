@@ -104,19 +104,19 @@
 !
 ! Set initial values.
 !
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
-	PI=ACOS(-1.0D0)
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
+	PI=ACOS(-1.0_LDP)
 	LUER=ERROR_LU()
 	DO I=1,ND
-	  F(I)=0.33333D0
+	  F(I)=0.33333_LDP
 	  BETA(I)=VEL(I)/C_KMS
 	END DO
-	H_OUTBC=1.0D0
-	H_INBC=0.2D0
-	IBOUND=0.0D0
+	H_OUTBC=1.0_LDP
+	H_INBC=0.2_LDP
+	IBOUND=0.0_LDP
 !
 	CALL GET_RAD_DECAY_ENERGY(E_RAD_DECAY,ND)
-	T1=1.0D+10/4.0D0/PI
+	T1=1.0E+10_LDP/4.0_LDP/PI
 	E_RAD_DECAY=T1*E_RAD_DECAY
 !
 ! When DO_TIME_VAR=.FALSE., this routine should give the same answers as
@@ -130,17 +130,17 @@
 !      R is in units of 10^10cm..
 !
 	IF(DO_TIME_VAR)THEN
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  CALL GET_JH_AT_PREV_TIME_STEP(RSQ_J_OLDt,RSQ_H_OLDt,
 	1        H_INBC_OLDT,H_OUTBC_OLDT,DELTA_TIME_SECS,
 	1        T1,R,VEL,ND,L_TRUE,'GREY')
-	  RECIP_CDELTAT=1.0D+10/SPEED_OF_LIGHT()/DELTA_TIME_SECS
-	  ROLD_ON_R=1.0D0-1.0D-05*VEL(ND)*DELTA_TIME_SECS/R(ND)
+	  RECIP_CDELTAT=1.0E+10_LDP/SPEED_OF_LIGHT()/DELTA_TIME_SECS
+	  ROLD_ON_R=1.0_LDP-1.0E-05_LDP*VEL(ND)*DELTA_TIME_SECS/R(ND)
 	ELSE
-	  RECIP_CDELTAT=0.0D0
-	  ROLD_ON_R=0.0D0
-	  RSQ_J_OLDt=0.0D0
-	  RSQ_H_OLDt=0.0D0
+	  RECIP_CDELTAT=0.0_LDP
+	  ROLD_ON_R=0.0_LDP
+	  RSQ_J_OLDt=0.0_LDP
+	  RSQ_H_OLDt=0.0_LDP
 	END IF
 !
 ! Loop to converge Eddington factors.
@@ -164,9 +164,9 @@
 !
 ! Compute the optical depth step on the nodes.
 !
-	AVE_DTAU_ON_Q(1)=0.0D0; AVE_DTAU_ON_Q(ND)=0.0D0
+	AVE_DTAU_ON_Q(1)=0.0_LDP; AVE_DTAU_ON_Q(ND)=0.0_LDP
         DO I=2,ND-1
-          AVE_DTAU_ON_Q(I)=0.5D0*(DTAU(I)+DTAU(I-1))/Q(I)
+          AVE_DTAU_ON_Q(I)=0.5_LDP*(DTAU(I)+DTAU(I-1))/Q(I)
         END DO
 !
 ! HU,HL and HT are used to compute r^2.h. The equation for r^2.H is
@@ -174,16 +174,16 @@
 ! r^2.H(K+0.5) = HU(K).J(K+1) - HL(K).J(K) + HT(K)
 !
 	DO I=1,ND-1
-	  T1=2.0D0*RECIP_CDELTAT/(CHI(I)+CHI(I+1))
+	  T1=2.0_LDP*RECIP_CDELTAT/(CHI(I)+CHI(I+1))
 	  T2=(BETA(I)+BETA(I+1))*(SIGMA(I)+SIGMA(I+1))/(R(I)+R(I+1))/(CHI(I)+CHI(I+1))
-	  WMID(I)=1.0D0+T1+2.0D0*T2
+	  WMID(I)=1.0_LDP+T1+2.0_LDP*T2
 	  HU(I)=F(I+1)*Q(I+1)/DTAU(I)/WMID(I)
 	  HL(I)=F(I)*Q(I)/DTAU(I)/WMID(I)
 	  HT(I)=T1*ROLD_ON_R*ROLD_ON_R*RSQ_H_OLDT(I)/WMID(I)
 	END DO
 !
 	DO I=1,ND
-	  JFAC(I)=AVE_DTAU_ON_Q(I)*(BETA(I)*SIGMA(I)*(1.0D0+F(I))/R(I)+RECIP_CDELTAT)/CHI(I)
+	  JFAC(I)=AVE_DTAU_ON_Q(I)*(BETA(I)*SIGMA(I)*(1.0_LDP+F(I))/R(I)+RECIP_CDELTAT)/CHI(I)
 	  JT(I)=AVE_DTAU_ON_Q(I)*ROLD_ON_R*ROLD_ON_R*RECIP_CDELTAT/CHI(I)
 	  RAD_DECAY_TERM(I)=AVE_DTAU_ON_Q(I)*R(I)*R(I)*E_RAD_DECAY(I)/CHI(I)
 	END DO
@@ -203,17 +203,17 @@
 ! Outer boundary. NB. Since T1 (=W in earlier notation) multiplies H,
 ! we don't need it elsewhere in the equations.
 !
-	T1=1.0D0+RECIP_CDELTAT/CHI(1)
+	T1=1.0_LDP+RECIP_CDELTAT/CHI(1)
         TC(1)=-F(2)*Q(2)/DTAU(1)
         TB(1)= F(1)*Q(1)/DTAU(1) + H_OUTBC*T1
         XM(1)=RECIP_CDELTAT*ROLD_ON_R*ROLD_ON_R*H_OUTBC_OLDT*RSQ_J_OLDT(1)/CHI(1)
-        TA(1)=0.0D0
+        TA(1)=0.0_LDP
 !
 ! NB: H_INBC is actually R^2 . H
 !
-	H_INBC=3.826D+13*LUMINOSITY/16.0D0/PI/PI
+	H_INBC=3.826E+13_LDP*LUMINOSITY/16.0_LDP/PI/PI
         IF(DIFF_APPROX)THEN
-	  T1=1.0D0+RECIP_CDELTAT/CHI(ND)
+	  T1=1.0_LDP+RECIP_CDELTAT/CHI(ND)
           TA(ND)=-Q(ND-1)*F(ND-1)/DTAU(ND-1)
           TB(ND)=F(ND)/DTAU(ND-1)
           XM(ND)=H_INBC*T1 - ROLD_ON_R*ROLD_ON_R*RECIP_CDELTAT*H_INBC_OLDT/CHI(ND)
@@ -221,7 +221,7 @@
 	  WRITE(LUER,*)'Error --- only diffusion approximation defined in '
 	  STOP
         END IF
-        TC(ND)=0.0D0
+        TC(ND)=0.0_LDP
 !
 	WRITE(121,'(2ES16.6)')RECIP_CDELTAT,ROLD_ON_R
 	WRITE(121,'(2ES16.6)')H_INBC,H_INBC_OLDT
@@ -243,7 +243,7 @@
 	1                      '   HTERM','  MHTERM','   RSQdE','     SUM'
 	  DO I=2,ND-1
 	    T1=RECIP_CDELTAT*(XM(I)-ROLD_ON_R*ROLD_ON_R*RSQ_J_OLDT(I))
-	    T2=-2.0D0*Q(I)*CHI(I)*(RSQ_HFLUX(I)-RSQ_HFLUX(I-1))/(DTAU(I-1)+DTAU(I))
+	    T2=-2.0_LDP*Q(I)*CHI(I)*(RSQ_HFLUX(I)-RSQ_HFLUX(I-1))/(DTAU(I-1)+DTAU(I))
 	    T3=R(I)*R(I)*E_RAD_DECAY(I)
 	    WRITE(LU,'(10ES12.4)')R(I),CHI(I),XM(I),ROLD_ON_R*ROLD_ON_R*RSQ_J_OLDt(I),RSQ_HFLUX(I),
 	1         T1,T2,2.0D0*(RSQ_HFLUX(I-1)-RSQ_HFLUX(I))/(R(I-1)-R(I+1)),T3,(T1+T2-T3)
@@ -271,15 +271,15 @@
 ! Solve for the Eddington factors using a ray by ray solution. The D/Dt terms
 ! are presently ignored.
 !
-	FS_RSQJ(:)=0.0D0
-	FS_RSQH(:)=0.0D0
-	FS_RSQK(:)=0.0D0
-	H_OUTBC=0.0D0
+	FS_RSQJ(:)=0.0_LDP
+	FS_RSQH(:)=0.0_LDP
+	FS_RSQK(:)=0.0_LDP
+	H_OUTBC=0.0_LDP
 !
 ! DBB =3L/16(piR)**2 and is used for the lower boundary diffusion approximation.
 !
-	T1=3.826D+13*LUMINOSITY/16.0D0/PI/PI
-	DBB=3.0D0*T1/R(ND)/R(ND)
+	T1=3.826E+13_LDP*LUMINOSITY/16.0_LDP/PI/PI
+	DBB=3.0_LDP*T1/R(ND)/R(ND)
 !
 	CALL DERIVCHI(dCHIdr,CHI,R,ND,METHOD)
 !
@@ -302,7 +302,7 @@
 	      CHI_MOD(I)=CHI(I)+TA(I)
 	    END DO
 	    IF(NI .EQ. 2)THEN
-	      TB(1)=0.0D0         !Cancel so values unimportant
+	      TB(1)=0.0_LDP         !Cancel so values unimportant
 	      TB(2)=TB(1)
 	    ELSE
 	      CALL DERIVCHI(TB,TA,R,NI,METHOD)
@@ -316,8 +316,8 @@
 !
 	  IF(NI .GT. 2)THEN
 	    DO I=1,NI-1
-	      DTAU(I)=0.5D0*(Z(I)-Z(I+1))*(CHI_MOD(I)+CHI_MOD(I+1)+(Z(I)-Z(I+1))
-	1       *(dCHI_MODdR(I+1)*Z(I+1)/R(I+1)-dCHI_MODdR(I)*Z(I)/R(I))/6.0D0)
+	      DTAU(I)=0.5_LDP*(Z(I)-Z(I+1))*(CHI_MOD(I)+CHI_MOD(I+1)+(Z(I)-Z(I+1))
+	1       *(dCHI_MODdR(I+1)*Z(I+1)/R(I+1)-dCHI_MODdR(I)*Z(I)/R(I))/6.0_LDP)
 	    END DO
 	  END IF
 !
@@ -327,18 +327,18 @@
 	  IF(NI .GT. 2)THEN
 !
 	    DO I=1,NI-1
-	      VU(I)=1.0D0/DTAU(I)
+	      VU(I)=1.0_LDP/DTAU(I)
 	    END DO
 !
 	    XM(1)=-IBOUND
-	    TA(1)=0.0D0
-	    TC(1)=1.0D0/DTAU(1)
-	    TB(1)=-1.0D0-TC(1)
+	    TA(1)=0.0_LDP
+	    TC(1)=1.0_LDP/DTAU(1)
+	    TB(1)=-1.0_LDP-TC(1)
 	    DO I=2,NI-1
 	      TA(I)=VU(I-1)
 	      TC(I)=VU(I)
-	      TB(I)=-0.5D0*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
-	      XM(I)=-(RJ(I)*CHI(I)+E_RAD_DECAY(I))*(DTAU(I-1)+DTAU(I))*0.5D0/CHI_MOD(I)
+	      TB(I)=-0.5_LDP*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
+	      XM(I)=-(RJ(I)*CHI(I)+E_RAD_DECAY(I))*(DTAU(I-1)+DTAU(I))*0.5_LDP/CHI_MOD(I)
 	    END DO
 !
 	    IF(LS .LE. NC .AND. DIFF_APPROX)THEN
@@ -347,34 +347,34 @@
 	      XM(NI)=DBC
 	    ELSE IF(LS .GT. NC)THEN
 	      TA(NI)=-TC(NI-1)
-	      TB(NI)=-TA(NI)+DTAU(NI-1)/2.0D0
-	      XM(NI)=0.5D0*DTAU(NI-1)*RJ(NI)*CHI(NI)/CHI_MOD(NI)
+	      TB(NI)=-TA(NI)+DTAU(NI-1)/2.0_LDP
+	      XM(NI)=0.5_LDP*DTAU(NI-1)*RJ(NI)*CHI(NI)/CHI_MOD(NI)
 	    ELSE
 	      TA(NI)=-VU(NI-1)
-	      TB(NI)=1.0D0+VU(NI-1)
+	      TB(NI)=1.0_LDP+VU(NI-1)
 	      XM(NI)=IC
 	    END IF
-	    TC(NI)=0.0D0
+	    TC(NI)=0.0_LDP
 !
 ! Solve the tridiagonal system of equations.
 !
 	    CALL THOMAS(TA,TB,TC,XM,NI,IONE)
 C
 	  ELSE IF(NI .EQ. 1)THEN
-	    XM(1)=0.0D0
+	    XM(1)=0.0_LDP
 	  ELSE IF(NI .EQ. 2)THEN
 	    Z(1)=SQRT(R(1)*R(1)-P(LS)*P(LS))
-	    DTAU(1)=0.5D0*Z(1)*(CHI_MOD(1)+CHI_MOD(2))		!Z(2)=0.0
+	    DTAU(1)=0.5_LDP*Z(1)*(CHI_MOD(1)+CHI_MOD(2))		!Z(2)=0.0
 	    E1=EXP(-DTAU(1))
-	    E2=1.0D0-(1.0D0-E1)/DTAU(1)
-	    E3=(1.0D0-E1)/DTAU(1)-E1
-	    IF(DTAU(1) .LT. 1.0D-03)THEN
-	      E2=DTAU(1)*0.5D0+DTAU(1)*DTAU(1)/6.0D0
-	      E3=DTAU(1)*0.5D0-DTAU(1)*DTAU(1)/3.0D0
+	    E2=1.0_LDP-(1.0_LDP-E1)/DTAU(1)
+	    E3=(1.0_LDP-E1)/DTAU(1)-E1
+	    IF(DTAU(1) .LT. 1.0E-03_LDP)THEN
+	      E2=DTAU(1)*0.5_LDP+DTAU(1)*DTAU(1)/6.0_LDP
+	      E3=DTAU(1)*0.5_LDP-DTAU(1)*DTAU(1)/3.0_LDP
 	    END IF
 C
 	    XM(2)=TA(2)*E2+TA(1)*E3
-            XM(1)=0.5D0*(XM(2)*E1+TA(1)*E2+TA(2)*E3)
+            XM(1)=0.5_LDP*(XM(2)*E1+TA(1)*E2+TA(2)*E3)
 	  END IF
 !
 ! Update J, H, K, & N for this angle.
@@ -417,9 +417,9 @@ C
 	WRITE(LU,'(A,13X,A,12X,A,10X,A,9(1X,A))')'    I','R','V','CHI','        V/cR',
 	1           '   RSQE(rad)','        RSQJ','RSQ(J+E/CHI)','   RSQJ(old)',
 	1           '        RSQH','   RSQH(old)','           T','       T(old)'
-	T1=1.0D-04*(3.14159265D0/5.67D-05)**0.25
+	T1=1.0E-04_LDP*(3.14159265_LDP/5.67E-05_LDP)**0.25_LDP
 	DO I=1,ND
-	  T2=R(I)-1.0D-05*DELTA_TIME_SECS*VEL(I)
+	  T2=R(I)-1.0E-05_LDP*DELTA_TIME_SECS*VEL(I)
 	  T2=RSQ_J_OLDt(I)/T2/T2
 	  WRITE(LU,'(I5,ES14.5,11ES13.4)')I,R(I),VEL(I),CHI(I),BETA(I)/R(I),
 	1       R(I)*R(I)*E_RAD_DECAY(I),R(I)*R(I)*RJ(I),
@@ -430,7 +430,7 @@ C
 	1           '   RSQE(rad)','        RSQJ','RSQ(J+E/CHI)','   RSQJ(old)',
 	1           '        RSQH','   RSQH(old)','           T','       T(old)'
         IF(DIFF_APPROX)THEN
-	  T1=1.0D0+RECIP_CDELTAT/CHI(ND)
+	  T1=1.0_LDP+RECIP_CDELTAT/CHI(ND)
           TA(ND)=-Q(ND-1)*F(ND-1)/DTAU_INB_SAVE
           TB(ND)=F(ND)/DTAU_INB_SAVE
           XM(ND)=H_INBC*T1 - ROLD_ON_R*ROLD_ON_R*RECIP_CDELTAT*H_INBC_OLDT/CHI(ND)

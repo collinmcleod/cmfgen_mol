@@ -35,15 +35,15 @@ C
 C Conversion factor from Kev to units of 10^15 Hz.
 C Conversion factor from Angstroms to units of 10^15 Hz.
 C
-	KEV_TO_HZ=0.241838E+03
-	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07  	!10^8/10^15
+	KEV_TO_HZ=0.241838E+03_LDP
+	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0E-07_LDP  	!10^8/10^15
 	X_LAB=' '
 	Y_LAB=' '
 C
 	IF(.NOT. X_ONLY)THEN
 	  IF(Y_PLT_OPT .EQ. 'NU_FNU')THEN
 	    DO I=1,NBB
-	      T1=1.0D+15
+	      T1=1.0E+15_LDP
 	      YV(I)=T1*XV(I)*YV(I)
 	    END DO
 	    IF(DATA_TYPE .EQ. 'J')THEN
@@ -59,7 +59,7 @@ C
 	    END IF
 	    IF(LOG_Y)Y_LAB='Log '//Y_LAB
 	  ELSE IF(Y_PLT_OPT .EQ. 'FLAM')THEN
-	    T1=1.0E+22/C_CMS	  	!1.0E+30*1.0E-08
+	    T1=1.0E+22_LDP/C_CMS	  	!1.0E+30*1.0E-08
 	    DO I=1,NBB
 	      YV(I)=T1*YV(I)*XV(I)*XV(I)
 	    END DO
@@ -114,7 +114,7 @@ C
 	  IF(LOG_X)X_LAB='Log \gl(\A)'
 	ELSE IF(X_UNIT .EQ. 'UM')THEN
 	  DO I=1,NBB
-	    XV(I)=1.0D-04*ANG_TO_HZ/XV(I)
+	    XV(I)=1.0E-04_LDP*ANG_TO_HZ/XV(I)
 	  END DO
 	  X_LAB='\gl(\gmm)'
 	  IF(LOG_X)X_LAB='Log \gl(\gmm)'
@@ -126,7 +126,7 @@ C
 	  IF(LOG_X)X_LAB='Log \gn(keV)'
 	ELSE IF(X_UNIT .EQ. 'EV')THEN
 	  DO I=1,NBB
-	    XV(I)=1.0D+03*XV(I)/KEV_TO_HZ
+	    XV(I)=1.0E+03_LDP*XV(I)/KEV_TO_HZ
 	  END DO
 	  X_LAB='\gn(eV)'
 	  IF(LOG_X)X_LAB='Log \gn(eV)'
@@ -135,13 +135,13 @@ C
 	  IF(LOG_X)X_LAB='Log \gn(1-\u15 \dHz)'
 	ELSE IF(X_UNIT .EQ. 'MM/S')THEN
 	  DO I=1,NBB
-	    XV(I)=1.0D-08*C_CMS*(ANG_TO_HZ/XV(I)-LAMC)/LAMC
+	    XV(I)=1.0E-08_LDP*C_CMS*(ANG_TO_HZ/XV(I)-LAMC)/LAMC
 	  END DO
 	  X_LAB='V(Mm\u \ds\u-1\d)'
 	  IF(LOG_X)X_LAB='Log V(Mm\u \ds\u-1\d)'
 	ELSE IF(X_UNIT .EQ. 'KM/S')THEN
 	  DO I=1,NBB
-	    XV(I)=1.0D-05*C_CMS*(ANG_TO_HZ/XV(I)-LAMC)/LAMC
+	    XV(I)=1.0E-05_LDP*C_CMS*(ANG_TO_HZ/XV(I)-LAMC)/LAMC
 	  END DO
 	  X_LAB='V(km\u \ds\u-1\d)'
 	  IF(LOG_X)X_LAB='Log V(km\u \ds\u-1\d)'

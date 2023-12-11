@@ -46,7 +46,7 @@
 ! We only sum to NT-2 as NT-1 is Ne and NT is T.
 !
 	DO I=1,ND
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  DO J=1,NT-2
 	    T1=T1+POPS(J,I)
 	  END DO
@@ -68,9 +68,9 @@
 ! constant.
 !
 	DO J=1,ND
-	  TA(J)=0.0D0
+	  TA(J)=0.0_LDP
 	  DO I=1,NT-2
-	    IF(Z_POP(I) .GT. 0.01D0)TA(J)=TA(J)+POPS(I,J)
+	    IF(Z_POP(I) .GT. 0.01_LDP)TA(J)=TA(J)+POPS(I,J)
 	  END DO
 	END DO
         DO I=1,ND
@@ -150,9 +150,9 @@
 ! These are required when evaluation the occupation probabilities.
 !
 	DO J=1,ND
-	  POPION(J)=0.0D0
+	  POPION(J)=0.0_LDP
 	  DO I=1,NT
-	    IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
+	    IF(Z_POP(I) .GT. 0.01_LDP)POPION(J)=POPION(J)+POPS(I,J)
 	  END DO
 	END DO
 !

@@ -21,10 +21,10 @@
 	REAL(KIND=LDP) REL_LUM
 	REAL(KIND=LDP) DILUTION_FACTOR
 !
-	REAL(KIND=LDP), PARAMETER :: HDKT=4.7994145D0
-	REAL(KIND=LDP), PARAMETER :: TWOHCSQ=0.0147452575D0
-	REAL(KIND=LDP), PARAMETER :: NU_MAX=100.0D0
-	REAL(KIND=LDP), PARAMETER :: NU_MIN=0.0001D0
+	REAL(KIND=LDP), PARAMETER :: HDKT=4.7994145_LDP
+	REAL(KIND=LDP), PARAMETER :: TWOHCSQ=0.0147452575_LDP
+	REAL(KIND=LDP), PARAMETER :: NU_MAX=100.0_LDP
+	REAL(KIND=LDP), PARAMETER :: NU_MIN=0.0001_LDP
 !
 	REAL(KIND=LDP) T1
 	REAL(KIND=LDP) FLUX
@@ -39,7 +39,7 @@
 !
 	CHARACTER*132 FILENAME
 !
-	NANG=11; NPTS_PER_DECADE=20; REL_LUM=0.1D0
+	NANG=11; NPTS_PER_DECADE=20; REL_LUM=0.1_LDP
 	CALL GEN_IN(TEFF_STAR,'Teff for star (in 10^4K)')
 	CALL GEN_IN(TEFF_INCID,'Teff describing incident radiation (in 10^4 K)')
 	CALL GEN_IN(REL_LUM,'Relative fluxes (incident/stellar)')
@@ -51,26 +51,26 @@
 !
 ! Set angles used to describe the incident radiation field.
 !
-	MU(1)=0.0D0
-	MU(NANG)=1.0D0
+	MU(1)=0.0_LDP
+	MU(NANG)=1.0_LDP
 	DO I=2,NANG-1
-	  MU(I)=(I-1.0D0)/(NANG-1.0D0)
+	  MU(I)=(I-1.0_LDP)/(NANG-1.0_LDP)
 	END DO
 !
 ! Set the distribution of flux as a function of angle.
 !
 	DO I=1,NANG
-	  DIST(I)=1.0D0-4.0D0*(MU(I)-0.5D0)**2
+	  DIST(I)=1.0_LDP-4.0_LDP*(MU(I)-0.5_LDP)**2
 	END DO
 !
 ! Estimate the integral I(mu).mu dmu. For isotropic radiation, the integral
 ! is 0.5. We thus normalize the integral by 0.5.
 !
-	T1=0.0D0
+	T1=0.0_LDP
 	DO I=1,NANG-1
-	  T1=T1+0.5D0*(MU(I+1)-MU(I))*(MU(I)*DIST(I)+MU(I+1)*DIST(I+1))
+	  T1=T1+0.5_LDP*(MU(I+1)-MU(I))*(MU(I)*DIST(I)+MU(I+1)*DIST(I+1))
 	END DO
-	NORMALIZED_ANGLE_INTEGRAL=2.0D0*T1
+	NORMALIZED_ANGLE_INTEGRAL=2.0_LDP*T1
         WRITE(6,*)'Normalized angle weighting integral is',NORMALIZED_ANGLE_INTEGRAL
 !
 ! Determine the dilution factor to give the requested relative luminosity fir
@@ -122,18 +122,18 @@
 	WRITE(15,*)(DIST(I),I=1,NANG)
 !
 	WRITE(15,*)' '
-	T1=EXP(LOG(10.0D0)/NPTS_PER_DECADE)
+	T1=EXP(LOG(10.0_LDP)/NPTS_PER_DECADE)
 	NU=NU_MAX*T1
-	FLUX=0.0D0
+	FLUX=0.0_LDP
 	DO I=1,NCF
 	  NU=NU/T1
 	  X=EXP(-HDKT*NU/TEFF_INCID)
-	  BNU=TWOHCSQ*NU*NU*NU*X/(1.0D0-X)
-	  FLUX=FLUX+BNU*(NU*T1-NU/T1)/2.0D0
+	  BNU=TWOHCSQ*NU*NU*NU*X/(1.0_LDP-X)
+	  FLUX=FLUX+BNU*(NU*T1-NU/T1)/2.0_LDP
 	  WRITE(15,'(X,2ES14.6)')NU,BNU
 	END DO
-	PI=4.0D0*ATAN(1.0D0)
-	T1=(FLUX*PI*1.0D+15/5.6705D-05)**(0.25D0)
+	PI=4.0_LDP*ATAN(1.0_LDP)
+	T1=(FLUX*PI*1.0E+15_LDP/5.6705E-05_LDP)**(0.25_LDP)
 	WRITE(6,'(A,ES14.6,A)')'Equivalent effective temperature is',T1,' K'
 !
 	STOP

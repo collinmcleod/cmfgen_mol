@@ -57,10 +57,10 @@
 ! Fix the electron density, if requested.
 !
 	IF(MOD_FIXED_NE)THEN
-	  BA(NT-1,:)=0.0D0
+	  BA(NT-1,:)=0.0_LDP
 	  IF(DIAG_BAND)THEN
-	    BA(NT-1,NT-1)=1.0D0
-	    STEQ(NT-1)=0.0D0
+	    BA(NT-1,NT-1)=1.0_LDP
+	    STEQ(NT-1)=0.0_LDP
 	    ZERO_STEQ(NT-1)=.TRUE.
 	  END IF
 	  IF(LAST_MATRIX)THEN
@@ -72,10 +72,10 @@
 !
 	IF(MOD_FIXED_T .AND. DEPTH_INDX .GE. MOD_FIX_T_D_ST .AND.
 	1                    DEPTH_INDX .LE. MOD_FIX_T_D_END)THEN
-	  BA(NT,:)=0.0D0
+	  BA(NT,:)=0.0_LDP
 	  IF(DIAG_BAND)THEN
-	    BA(NT,NT)=1.0D0
-	    STEQ(NT)=0.0D0
+	    BA(NT,NT)=1.0_LDP
+	    STEQ(NT)=0.0_LDP
 	    ZERO_STEQ(NT)=.TRUE.
 	  END IF
 	END IF
@@ -93,14 +93,14 @@
 ! We only write the information mesage out if STEQ has not been zeroed already.
 !
 	IF( FIX_IN_BOUND_T .AND. DEPTH_INDX .GE. (ND+1-FIX_LST_X_DPTHS) )THEN
-	  BA(NT,:)=0.0D0
+	  BA(NT,:)=0.0_LDP
 	  IF(DIAG_BAND)THEN
 	    IF(DEPTH_INDX .EQ. ND .AND. .NOT. ZERO_STEQ(NT))THEN
               WRITE(LUER,'(A,I4,A)')' Temperature held fixed at',
 	1                 FIX_LST_X_DPTHS,'depths at inner boundary'
 	    END IF
-	    BA(NT,NT)=1.0D0
-	    STEQ(NT)=0.0D0
+	    BA(NT,NT)=1.0_LDP
+	    STEQ(NT)=0.0_LDP
 	    ZERO_STEQ(NT)=.TRUE.
 	  END IF
 	END IF
@@ -117,11 +117,11 @@
 	    LOC_EQ=EQ_SPECIES(ISPEC)
 	    ID=SPECIES_END_ID(ISPEC)
 	    T1=ATM(ID-1)%DXzV(DEPTH_INDX)/POP_SPECIES(DEPTH_INDX,SPECIES_LNK(ID))
-	    IF( (FIX_SPECIES(ISPEC) .NE. 0) .OR. T1 .LT. 1.0D-15)THEN
-	      BA(LOC_EQ,:)=0.0D0
+	    IF( (FIX_SPECIES(ISPEC) .NE. 0) .OR. T1 .LT. 1.0E-15_LDP)THEN
+	      BA(LOC_EQ,:)=0.0_LDP
 	      IF(DIAG_BAND)THEN
-	        BA(LOC_EQ,LOC_EQ)=1.0D0
-	        STEQ(LOC_EQ)=0.0D0
+	        BA(LOC_EQ,LOC_EQ)=1.0_LDP
+	        STEQ(LOC_EQ)=0.0_LDP
 	        ZERO_STEQ(LOC_EQ)=.TRUE.
 	        CNT(LOC_EQ)=CNT(LOC_EQ)+1
 	      END IF
@@ -154,7 +154,7 @@
 	      DO J=1,ATM(ID)%NXzV
 	        T1=T1+ATM(ID)%XzV(J,DEPTH_INDX)
 	      END DO
-	      IF( T1/POP_SPECIES(DEPTH_INDX,SPECIES_LNK(ID)) .GT. 1.0D-15 )FIX_N=-10
+	      IF( T1/POP_SPECIES(DEPTH_INDX,SPECIES_LNK(ID)) .GT. 1.0E-15_LDP )FIX_N=-10
 	    END IF
 	    LOC_EQ=ATM(ID)%EQXzV
 	    IF(FIRST_MATRIX .AND. DIAG_BAND)CNT(LOC_EQ)=0
@@ -165,14 +165,14 @@
 	    IF(FIX_N .GT. 0)THEN
 	      DO J=1,NT
 	        DO I=ATM(ID)%EQXZV,ATM(ID)%EQXZV+FIX_N-1
-	          BA(I,J)=0.0D0
+	          BA(I,J)=0.0_LDP
 	        END DO
 	      END DO
 !
 	      IF(DIAG_BAND)THEN
 	        DO I=ATM(ID)%EQXZV,ATM(ID)%EQXZV+FIX_N-1
-	          BA(I,I)=1.0D0
-	          STEQ(I)=0.0D0
+	          BA(I,I)=1.0_LDP
+	          STEQ(I)=0.0_LDP
 	          ZERO_STEQ(I)=.TRUE.
  	        END DO
 	      END IF

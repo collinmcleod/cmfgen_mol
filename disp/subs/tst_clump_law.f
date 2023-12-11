@@ -55,8 +55,8 @@
 ! CLUMP_PAR(2) is a velocity, and determines how fast the clumping factor
 ! approach CLUMP_PAR(1).
 !
-	  CLUMP_PAR=0.0D0
-	  CLUMP_PAR(4)=1.0D0
+	  CLUMP_PAR=0.0_LDP
+	  CLUMP_PAR(4)=1.0_LDP
 	  CALL USR_OPTION(CLUMP_PAR(1),'CLP1','0.1','Clumping factor at infinity')
 	  CALL USR_OPTION(CLUMP_PAR(2),'CLP2','500','Velocity scale factor')
 	  IF(NPAR .GT. 2)THEN
@@ -70,8 +70,8 @@
 	  T2=CLUMP_PAR(6)
 	  DO K=1,ND
 	    T1=VEL(K)
-	    IF(NPAR .EQ. 6)T1=LOG(1.0D0+EXP(T2*(VEL(K)-CLUMP_PAR(5))))/T2
-	    CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1)-CLUMP_PAR(3))*
+	    IF(NPAR .EQ. 6)T1=LOG(1.0_LDP+EXP(T2*(VEL(K)-CLUMP_PAR(5))))/T2
+	    CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0_LDP-CLUMP_PAR(1)-CLUMP_PAR(3))*
 	1                   EXP(-T1/CLUMP_PAR(2))+
 	1                   CLUMP_PAR(3)*EXP(-T1/CLUMP_PAR(4))
 	  END DO
@@ -84,9 +84,9 @@
 	  CALL USR_OPTION(CLUMP_PAR(4),'CLP4','0.5','Radius scale (< 1.0')
 	  CALL USR_OPTION(CLUMP_PAR(5),'CLP5','0.5','Exponent ')
 	  DO K=1,ND
-	    T1=1.0D0-(MAX(1.0D0,CLUMP_PAR(4)*R(1)/R(K)))**CLUMP_PAR(5)
-	    CLUMP_FAC(K)=(CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*EXP(-VEL(K)/CLUMP_PAR(2)))/
-	1                     (1.0D0+CLUMP_PAR(3)*EXP(T1))
+	    T1=1.0_LDP-(MAX(1.0_LDP,CLUMP_PAR(4)*R(1)/R(K)))**CLUMP_PAR(5)
+	    CLUMP_FAC(K)=(CLUMP_PAR(1)+(1.0_LDP-CLUMP_PAR(1))*EXP(-VEL(K)/CLUMP_PAR(2)))/
+	1                     (1.0_LDP+CLUMP_PAR(3)*EXP(T1))
 	  END DO
 !
 	ELSE IF(CLUMP_LAW(1:4) .EQ. 'REXP')THEN
@@ -97,10 +97,10 @@
 	  CALL USR_OPTION(CLUMP_PAR(5),'CLP5','0.2','Smoothing param')
 	  T2=CLUMP_PAR(5)
 	  DO K=1,ND
-	    T1=LOG(1.0D0+EXP(T2*(VEL(K)-CLUMP_PAR(4))))/T2
-	    CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
+	    T1=LOG(1.0_LDP+EXP(T2*(VEL(K)-CLUMP_PAR(4))))/T2
+	    CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0_LDP-CLUMP_PAR(1))*
 	1         EXP(-T1/CLUMP_PAR(2))+
-	1        (1.0D0-CLUMP_PAR(1))*EXP( (VEL(K)-VEL(1))/CLUMP_PAR(3))
+	1        (1.0_LDP-CLUMP_PAR(1))*EXP( (VEL(K)-VEL(1))/CLUMP_PAR(3))
 	  END DO
 !
 	ELSE IF(CLUMP_LAW(1:3) .EQ. 'POW')THEN
@@ -112,13 +112,13 @@
 	  CALL USR_OPTION(CLUMP_PAR(1),'CLP1','0.1','Clumping factor at infinity')
 	  CALL USR_OPTION(CLUMP_PAR(2),'CLP2','1.0D0','Power law exponent (+ve)')
 	  DO K=1,ND
-	    CLUMP_FAC(K)=1.0D0-(1.0D0-CLUMP_PAR(1))*(VEL(K)/VEL(1))**CLUMP_PAR(2)
+	    CLUMP_FAC(K)=1.0_LDP-(1.0_LDP-CLUMP_PAR(1))*(VEL(K)/VEL(1))**CLUMP_PAR(2)
 	  END DO
         ELSE IF(CLUMP_LAW(1:4) .EQ. 'RPOW')THEN
 	  IF(NPAR .EQ. 2 .OR. NPAR .EQ. 4)THEN
 	    CALL USR_OPTION(CLUMP_PAR(1),'CLP1','0.1','Clumping factor at infinity')
 	    CALL USR_OPTION(CLUMP_PAR(2),'CLP2','1.0D0','Power law exponent (+ve)')
-	    CLUMP_PAR(3)=0.0D0; CLUMP_PAR(4)=1.0D0
+	    CLUMP_PAR(3)=0.0_LDP; CLUMP_PAR(4)=1.0_LDP
 	  END IF
 	  IF(NPAR .EQ. 4)THEN
 	    CALL USR_OPTION(CLUMP_PAR(3),'CLP3','0.0','Clumping factor at infinity')
@@ -130,9 +130,9 @@
 	    STOP
 	  END IF
 	  DO K=1,ND
-	    T1=1.0D0/CLUMP_PAR(1)-1.0D0
-	    CLUMP_FAC(K)=1.0D0/(1.0D0+T1*(VEL(K)/VEL(1))**CLUMP_PAR(2))/
-	1         (1.0D0+CLUMP_PAR(3)*(VEL(K)/VEL(1))**CLUMP_PAR(4))
+	    T1=1.0_LDP/CLUMP_PAR(1)-1.0_LDP
+	    CLUMP_FAC(K)=1.0_LDP/(1.0_LDP+T1*(VEL(K)/VEL(1))**CLUMP_PAR(2))/
+	1         (1.0_LDP+CLUMP_PAR(3)*(VEL(K)/VEL(1))**CLUMP_PAR(4))
 	  END DO
 !
         ELSE IF(CLUMP_LAW(1:6) .EQ. 'SPLINE')THEN
@@ -168,7 +168,7 @@
 	  WRITE(LUER,*)'Invalid law for computing clumping factor'
 	  WRITE(LUER,*)'Set it to 1'
 	  DO K=1,ND
-	    CLUMP_FAC(K)=1.0D0
+	    CLUMP_FAC(K)=1.0_LDP
 	  END DO
 	END IF
 !

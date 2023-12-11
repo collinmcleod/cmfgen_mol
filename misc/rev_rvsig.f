@@ -216,7 +216,7 @@ CONTAINS
 	     READ(20,*)RTMP(I),J,OLD_TAU(I),TAU_SAV(I),T1,CHI_ROSS(I)
 	      J=MAX(I,2)
 	      T1=OLD_R(J-1)-OLD_R(J)
-	      IF( ABS(RTMP(I)-R(I))/T1 .GT. 2.0D-03 .AND. .NOT. ROUND_ERROR)THEN
+	      IF( ABS(RTMP(I)-R(I))/T1 .GT. 2.0E-03_LDP .AND. .NOT. ROUND_ERROR)THEN
 	        WRITE(6,*)' '
 	        WRITE(6,*)'Possible eror with MEANOPAC -- inconsistent R grid'
 	        WRITE(6,*)'Error could simply be a lack of sig. digits in MEANOPAC'
@@ -256,8 +256,8 @@ CONTAINS
 	IF(OPTION .EQ. 'TAU')THEN
 !
 	  ND=ND_OLD
-	  V_TRANS=30.0D0; V_RAT_MAX=1.5
-	  IB_RAT=2.0; OB_RAT=4.0D0; DTAU2_ON_DTAU1=100.0D0
+	  V_TRANS=30.0_LDP; V_RAT_MAX=1.5
+	  IB_RAT=2.0_LDP; OB_RAT=4.0_LDP; DTAU2_ON_DTAU1=100.0_LDP
 	  N_IB_INS=2; N_OB_INS=1
 !
 	  CALL GEN_IN(ND,'Number of depth points')
@@ -282,8 +282,8 @@ CONTAINS
 	    IF(R(I) .GE. OLD_R(J+1))THEN
 	      T1=R(I)-OLD_R(J)
 	      V(I)=COEF(J,4)+T1*(COEF(J,3)+T1*(COEF(J,2)+T1*COEF(J,1)))
-	      SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0*T1*COEF(J,1))
-	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	      SIGMA(I)=COEF(J,3)+T1*(2.0_LDP*COEF(J,2)+3.0_LDP*T1*COEF(J,1))
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	      I=I+1
 	    ELSE
 	      J=J+1
@@ -322,8 +322,8 @@ CONTAINS
 	    IF(R(I) .GE. OLD_R(J+1))THEN
 	      T1=R(I)-OLD_R(J)
 	      V(I)=COEF(J,4)+T1*(COEF(J,3)+T1*(COEF(J,2)+T1*COEF(J,1)))
-	      SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0*T1*COEF(J,1))
-	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	      SIGMA(I)=COEF(J,3)+T1*(2.0_LDP*COEF(J,2)+3.0_LDP*T1*COEF(J,1))
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	      I=I+1
 	    ELSE
 	      J=J+1
@@ -358,8 +358,8 @@ CONTAINS
 	    IF(R(I) .GE. OLD_R(J+1))THEN
 	      T1=R(I)-OLD_R(J)
 	      V(I)=COEF(J,4)+T1*(COEF(J,3)+T1*(COEF(J,2)+T1*COEF(J,1)))
-	      SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0*T1*COEF(J,1))
-	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	      SIGMA(I)=COEF(J,3)+T1*(2.0_LDP*COEF(J,2)+3.0_LDP*T1*COEF(J,1))
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	      I=I+1
 	    ELSE
 	      J=J+1
@@ -401,8 +401,8 @@ CONTAINS
 	    IF(R(I) .GE. OLD_R(J+1))THEN
 	      T1=R(I)-OLD_R(J)
 	      V(I)=COEF(J,4)+T1*(COEF(J,3)+T1*(COEF(J,2)+T1*COEF(J,1)))
-	      SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0*T1*COEF(J,1))
-	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	      SIGMA(I)=COEF(J,3)+T1*(2.0_LDP*COEF(J,2)+3.0_LDP*T1*COEF(J,1))
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	      I=I+1
 	    ELSE
 	      J=J+1
@@ -415,10 +415,10 @@ CONTAINS
 	  WRITE(6,'(A)')'This option simply scales V'
 	  WRITE(6,'(A)')'Sigma will not be changed by this operation.'
 	  WRITE(6,'(A)')' '
-	  T1=1.1D0
+	  T1=1.1_LDP
 	  ND=ND_OLD
 	  CALL GEN_IN(T1,'Factor to sclae velocity')
-	  T2=0.0D0
+	  T2=0.0_LDP
 	  CALL GEN_IN(T2,'Velocity below which scaling is skipped')
 	  DO I=1,ND
 	    IF(OLD_V(I) .GT. T2)THEN
@@ -443,7 +443,7 @@ CONTAINS
             DO I=1,I_ST
               X2(I)=I
             END DO
-            T1=(I_END-I_ST)/(NX+1.0D0)
+            T1=(I_END-I_ST)/(NX+1.0_LDP)
             DO I=1,NX
               X2(I_ST+I)=I_ST+I*T1
             END DO
@@ -457,7 +457,7 @@ CONTAINS
             DO I=1,I_ST
               X2(I)=OLD_TAU(I)
             END DO
-            T1=EXP(LOG(OLD_TAU(I_END)/OLD_TAU(I_ST))/(NX+1.0D0))
+            T1=EXP(LOG(OLD_TAU(I_END)/OLD_TAU(I_ST))/(NX+1.0_LDP))
             DO I=1,NX
               X2(I_ST+I)=X2(I_ST+I-1)*T1
 	      WRITE(6,*)X2(I_ST+I),X2(I_ST+I-1)
@@ -489,8 +489,8 @@ CONTAINS
 	    IF(R(I) .GE. OLD_R(J+1))THEN
 	      T1=R(I)-OLD_R(J)
 	      V(I)=COEF(J,4)+T1*(COEF(J,3)+T1*(COEF(J,2)+T1*COEF(J,1)))
-	      SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0*T1*COEF(J,1))
-	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	      SIGMA(I)=COEF(J,3)+T1*(2.0_LDP*COEF(J,2)+3.0_LDP*T1*COEF(J,1))
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	      I=I+1
 	    ELSE
 	      J=J+1
@@ -570,8 +570,8 @@ CONTAINS
 	    IF(R(I) .GE. OLD_R(J+1))THEN
 	      T1=R(I)-OLD_R(J)
 	      V(I)=COEF(J,4)+T1*(COEF(J,3)+T1*(COEF(J,2)+T1*COEF(J,1)))
-	      SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0*T1*COEF(J,1))
-	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	      SIGMA(I)=COEF(J,3)+T1*(2.0_LDP*COEF(J,2)+3.0_LDP*T1*COEF(J,1))
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	      I=I+1
 	    ELSE
 	      J=J+1
@@ -588,12 +588,12 @@ CONTAINS
 !
 	  CALL GEN_IN(V_MAX,'Maximum velocity for grid refinement (-ve for depth index)')
 	  CALL GEN_IN(V_MIN,'Initial velocity for grid refinement (-ve for depth index)')
-	  IF(V_MAX*V_MIN .LT. 0.0D0)THEN
+	  IF(V_MAX*V_MIN .LT. 0.0_LDP)THEN
 	    WRITE(6,*)'Error: either velocities of depth index but not mixture'
 	    STOP
 	  END IF
 !
-	  IF(V_MAX .LT. 0.0D0)THEN
+	  IF(V_MAX .LT. 0.0_LDP)THEN
 	    V_MAX=ABS(V_MAX); V_MIN=ABS(V_MIN)
 	    I_ST=NINT(MIN(V_MIN,V_MAX))
 	    I_END=NINT(MAX(V_MIN,V_MAX))
@@ -653,8 +653,8 @@ CONTAINS
 	    IF(R(I) .GE. OLD_R(J+1))THEN
 	      T1=R(I)-OLD_R(J)
 	      V(I)=COEF(J,4)+T1*(COEF(J,3)+T1*(COEF(J,2)+T1*COEF(J,1)))
-	      SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0*T1*COEF(J,1))
-	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	      SIGMA(I)=COEF(J,3)+T1*(2.0_LDP*COEF(J,2)+3.0_LDP*T1*COEF(J,1))
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	      I=I+1
 	    ELSE
 	      J=J+1
@@ -673,7 +673,7 @@ CONTAINS
 	  R(N_ADD+2:ND)=OLD_R(2:ND_OLD)
 	  R(1)=OLD_R(1)
 	  DO I=N_ADD,1,-1
-	    R(I+1)=R(1)-0.3333D0*(R(1)-R(I+2))
+	    R(I+1)=R(1)-0.3333_LDP*(R(1)-R(I+2))
 	    WRITE(6,*)I,R(1),R(I+1)
 	  END DO
 !
@@ -686,18 +686,18 @@ CONTAINS
 	  DO I=2,N_ADD+1
 	    T1=R(I)-OLD_R(1)
 	    V(I)=COEF(1,4)+T1*(COEF(1,3)+T1*(COEF(1,2)+T1*COEF(1,1)))
-	    SIGMA(I)=COEF(1,3)+T1*(2.0D0*COEF(1,2)+3.0*T1*COEF(1,1))
-	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	    SIGMA(I)=COEF(1,3)+T1*(2.0_LDP*COEF(1,2)+3.0_LDP*T1*COEF(1,1))
+	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	  END DO
 	  DEALLOCATE (COEF)
 	
 	ELSE IF(OPTION .EQ. 'EXTR')THEN
-	  FAC=2.0D0
+	  FAC=2.0_LDP
 	  CALL GEN_IN(FAC,'Factor to extend RMAX by')
           NX_OUT=2
-	  VINF=1000.0D0
+	  VINF=1000.0_LDP
 	  CALL GEN_IN(VINF,'Velocity at infinity in km/s')
-	  BETA=1.0D0
+	  BETA=1.0_LDP
 	  CALL GEN_IN(BETA,'Beta for velocity law')
 !
 	  WRITE(6,*)' '
@@ -710,7 +710,7 @@ CONTAINS
 	  NX_OUT=2
 	  CALL GEN_IN(NX_OUT,'Number of points used at outer boundary to refine grid')
 !
-	  RX=OLD_R(1)*(1.0D0-(OLD_V(1)/VINF)**(1.0D0/BETA))
+	  RX=OLD_R(1)*(1.0_LDP-(OLD_V(1)/VINF)**(1.0_LDP/BETA))
 	  WRITE(6,*)'RX=',RX
 !
 ! Set up a rough grid so we can define a better grid, equally spaced
@@ -725,7 +725,7 @@ CONTAINS
 	  END DO
 	  TMP_R(NX+1)=OLD_R(1)
 	  DO I=1,NX+1
-	    V(I)=VINF*(1.0D0-RX/TMP_R(I))**BETA
+	    V(I)=VINF*(1.0_LDP-RX/TMP_R(I))**BETA
 	    X1(I)=TMP_R(I)*TMP_R(I)*V(I)
 	  END DO
 	  NX=NX+1
@@ -754,24 +754,24 @@ CONTAINS
 	    R(I+NX_OUT)=R(I)
 	  END DO
 	  IF(NX_OUT .EQ. 1)THEN
-	    R(2)=R(1)-0.2*(R(1)-R(3))
+	    R(2)=R(1)-0.2_LDP*(R(1)-R(3))
 	  ELSE IF(NX_OUT .EQ. 2)THEN
-	    R(2)=R(1)-0.1*(R(1)-R(4))
-	    R(3)=R(1)-0.4*(R(1)-R(4))
+	    R(2)=R(1)-0.1_LDP*(R(1)-R(4))
+	    R(3)=R(1)-0.4_LDP*(R(1)-R(4))
 	  ELSE IF(NX_OUT .EQ. 3)THEN
-	    R(2)=R(1)-0.05*(R(1)-R(5))
-	    R(3)=R(1)-0.15*(R(1)-R(5))
-	    R(4)=R(1)-0.40*(R(1)-R(5))
+	    R(2)=R(1)-0.05_LDP*(R(1)-R(5))
+	    R(3)=R(1)-0.15_LDP*(R(1)-R(5))
+	    R(4)=R(1)-0.40_LDP*(R(1)-R(5))
 	  ELSE IF(NX_OUT .EQ. 3)THEN
-	    R(2)=R(1)-0.015*(R(1)-R(6))
-	    R(3)=R(1)-0.05*(R(1)-R(6))
-	    R(4)=R(1)-0.15*(R(1)-R(6))
-	    R(5)=R(1)-0.40*(R(1)-R(6))
+	    R(2)=R(1)-0.015_LDP*(R(1)-R(6))
+	    R(3)=R(1)-0.05_LDP*(R(1)-R(6))
+	    R(4)=R(1)-0.15_LDP*(R(1)-R(6))
+	    R(5)=R(1)-0.40_LDP*(R(1)-R(6))
 	  END IF
 !
 	  DO I=1,NN+NX_OUT
-	    V(I)=VINF*(1.0D0-RX/R(I))**BETA
-	    SIGMA(I)=BETA*RX/R(I)/(1.0D0-RX/R(I))-1.0D0
+	    V(I)=VINF*(1.0_LDP-RX/R(I))**BETA
+	    SIGMA(I)=BETA*RX/R(I)/(1.0_LDP-RX/R(I))-1.0_LDP
 	  END DO
 !
 ! We remove the fine grid in the old model.
@@ -802,7 +802,7 @@ CONTAINS
 !
 	  ND=ND_OLD
 	  NEW_RSTAR=OLD_R(ND_OLD)
-	  V_TRANS=4.0D0
+	  V_TRANS=4.0_LDP
 	  CALL GEN_IN(NEW_RSTAR,'New radius')
 	  CALL GEN_IN(V_TRANS,'Connection velocity in km/s')
 	  CALL GEN_IN(OLD_MDOT,'Old mass-loss rate in Msun/yr')
@@ -811,7 +811,7 @@ CONTAINS
 	  WRITE(6,*)RED_PEN
 	  WRITE(6,*)'The defaut mass assume Mdot/R^1.5 is to be preserved'
 	  WRITE(6,*)DEF_PEN
-	  MDOT=OLD_MDOT*(NEW_RSTAR/OLD_R(ND_OLD))**1.5D0
+	  MDOT=OLD_MDOT*(NEW_RSTAR/OLD_R(ND_OLD))**1.5_LDP
 	  CALL GEN_IN(MDOT,'New mass-loss rate in Msun/yr')
 !
 	  CALL GEN_IN(OLD_LSTAR,'Old stellar luminosity in Lsun')
@@ -825,9 +825,9 @@ CONTAINS
 	  VEL_TYPE=1
 	  CALL GEN_IN(VEL_TYPE,'Velocity law to be used: 1 or 2')
 	  IF(VEL_TYPE .NE. 6)THEN
-	    VINF=1000.0D0
+	    VINF=1000.0_LDP
 	    CALL GEN_IN(VINF,'Velocity at infinity in km/s')
-	    BETA=1.0D0
+	    BETA=1.0_LDP
 	    CALL GEN_IN(BETA,'Beta for velocity law')
 	  END IF
 !
@@ -857,13 +857,13 @@ CONTAINS
 	    DO I=1,ND
 	      T3=(OLD_R(I)/R(I))**2
 	      T2=(OLD_V(I)/V_TRANS)**2
-	      V(I)=T3*OLD_V(I)*(T1+(1.0D0-T1)*T2/(1.0D0+T2))
+	      V(I)=T3*OLD_V(I)*(T1+(1.0_LDP-T1)*T2/(1.0_LDP+T2))
 	    END DO
 	    ALLOCATE (COEF(ND,4))
 	    CALL MON_INT_FUNS_V2(COEF,V,R,ND)
 	    DO I=1,ND
 	      SIGMA(I)=COEF(I,3)
-	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	    END DO
 	    DEALLOCATE (COEF)
 	  ELSE
@@ -874,7 +874,7 @@ CONTAINS
 	  T1=R(ND)/OLD_R(ND_OLD)
 	  DO I=TRANS_I,ND
 	    V(I)=MDOT*OLD_V(I)/T1/T1/OLD_MDOT
-	    SIGMA(I)=(OLD_SIGMA(I)+1.0D0)*R(I)/OLD_R(I)-1.0D0
+	    SIGMA(I)=(OLD_SIGMA(I)+1.0_LDP)*R(I)/OLD_R(I)-1.0_LDP
 	  END DO
 	  V_TRANS=V(TRANS_I)
 !
@@ -883,14 +883,14 @@ CONTAINS
 ! Now compute the velocity law beyond the sonic point.
 !
 	  R_TRANS=R(TRANS_I)
-	  dVdR_TRANS=(SIGMA(TRANS_I)+1.0D0)*V_TRANS/R_TRANS
+	  dVdR_TRANS=(SIGMA(TRANS_I)+1.0_LDP)*V_TRANS/R_TRANS
 	  CALL CALCULATE_VEL(R,V,SIGMA,ND)
 	  END IF
 !
 	ELSE IF(OPTION .EQ. 'MDOT')THEN
 !
 	  ND=ND_OLD
-	  OLD_MDOT=0.0D0; VINF=0.0D0; BETA=1.0D0; V_TRANS=10.0D0
+	  OLD_MDOT=0.0_LDP; VINF=0.0_LDP; BETA=1.0_LDP; V_TRANS=10.0_LDP
 	  CALL GEN_IN(OLD_MDOT,'Old mass-loss rate in Msun/yr')
 	  MDOT=OLD_MDOT
 	  CALL GEN_IN(MDOT,'New mass-loss rate in Msun/yr')
@@ -933,13 +933,13 @@ CONTAINS
 	    T1=MDOT/OLD_MDOT
 	    DO I=1,ND
 	      T2=(OLD_V(I)/V_TRANS)**2
-	      V(I)=OLD_V(I)*(T1+(1.0D0-T1)*T2/(1.0D0+T2))
+	      V(I)=OLD_V(I)*(T1+(1.0_LDP-T1)*T2/(1.0_LDP+T2))
 	    END DO
 	    ALLOCATE (COEF(ND,4))
 	    CALL MON_INT_FUNS_V2(COEF,V,R,ND)
 	    DO I=1,ND
 	      SIGMA(I)=COEF(I,3)
-	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	      SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	    END DO
 	    DEALLOCATE (COEF)
 !
@@ -952,7 +952,7 @@ CONTAINS
 !
 	    R_TRANS=R(TRANS_I)
 	    V_TRANS=MDOT*V_TRANS/OLD_MDOT
-	    dVdR_TRANS=(SIGMA(TRANS_I)+1.0D0)*V_TRANS/R_TRANS
+	    dVdR_TRANS=(SIGMA(TRANS_I)+1.0_LDP)*V_TRANS/R_TRANS
 	    CALL CALCULATE_VEL(R,V,SIGMA,ND)
 	  END IF
 !
@@ -976,7 +976,7 @@ CONTAINS
 	    R(J+1:ND)=OLD_R(1:ND)
 	    V(J+1:ND)=OLD_V(1:ND)
 	    DO I=J,1,-1
-	      V(I)=V(I+1)*1.01D0		!Value irrelevant
+	      V(I)=V(I+1)*1.01_LDP		!Value irrelevant
 	    END DO
 	  END IF
 	  TRANS_I=GET_INDX_DP(V_TRANS,V,ND)
@@ -987,20 +987,20 @@ CONTAINS
 	  WRITE(6,*)'  V(TRANS_I)=',V(TRANS_I)
 	  WRITE(6,*)'SCALE_HEIGHT=',SCALE_HEIGHT
 !
-	  T1=3.0D0; CALL GEN_IN(T1,'Number of depth points per scale height')
-	  IF(T1 .GT. 1)T1=1.0D0/T1
+	  T1=3.0_LDP; CALL GEN_IN(T1,'Number of depth points per scale height')
+	  IF(T1 .GT. 1)T1=1.0_LDP/T1
 	  DO I=TRANS_I-1,1,-1
 	    R(I)=R(I+1)+T1*SCALE_HEIGHT
 	    V(I)=V(TRANS_I)*EXP( (R(I)-R(TRANS_I))/SCALE_HEIGHT)
 	  END DO
-	  V(1:ND)=1.0D-15*V(1:ND)
+	  V(1:ND)=1.0E-15_LDP*V(1:ND)
 	  WRITE(6,*)'Decrease the mass-loss rate in the VADAT file by 10^15'
 !
 	  ALLOCATE (COEF(ND,4))
 	  CALL MON_INT_FUNS_V2(COEF,V,R,ND)
 	  DO I=1,ND
 	    SIGMA(I)=COEF(I,3)
-	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	  END DO
 	  DEALLOCATE (COEF)
 !
@@ -1027,7 +1027,7 @@ CONTAINS
 	  CALL MON_INT_FUNS_V2(COEF,V,R,ND)
 	  DO I=1,ND
 	    SIGMA(I)=COEF(I,3)
-	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	  END DO
 	  DEALLOCATE (COEF)
 !
@@ -1042,7 +1042,7 @@ CONTAINS
 	  CALL MON_INT_FUNS_V2(COEF,V,R,ND)
 	  DO I=1,ND
 	    SIGMA(I)=COEF(I,3)
-	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	  END DO
 	  DEALLOCATE (COEF)
 !
@@ -1093,7 +1093,7 @@ CONTAINS
 	    WRITE(6,*)'Use ''e'' to exit'
 	    WRITE(6,'(A)')DEF_PEN
 !
-	    XVAL=5.0; CALL PGSCH(XVAL)
+	    XVAL=5.0_LDP; CALL PGSCH(XVAL)
 	    DO WHILE(1 .EQ. 1)				!Multiple cursor entries
 	      CURSERR = PGCURS(XVAL,YVAL,CURSVAL)
 	      WRITE(6,*)'Cursor values are:',XVAL,YVAL
@@ -1165,12 +1165,12 @@ CONTAINS
  	      CALL GRAMON_PGPLOT(XLAB,YLAB,' ',' ')
 	    ELSE
 	      IF(LOG_X)THEN
-	        R(1:ND)=(10.0D0**R(1:ND))*OLD_R(ND_OLD)
+	        R(1:ND)=(10.0_LDP**R(1:ND))*OLD_R(ND_OLD)
 	      ELSE
 	        R(1:ND)=R(1:ND)*OLD_R(ND_OLD)
 	      END IF
 	      IF(LOG_Y)THEN
-	        V(1:ND)=(10.0D0**V(1:ND))
+	        V(1:ND)=(10.0_LDP**V(1:ND))
 	      END IF
 	      R(1)=OLD_R(1); R(ND)=OLD_R(ND_OLD)
 	      EXIT
@@ -1183,7 +1183,7 @@ CONTAINS
 	  CALL MON_INT_FUNS_V2(COEF,V,R,ND)
 	  DO I=1,ND
 	    SIGMA(I)=COEF(I,3)
-	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0D0
+	    SIGMA(I)=R(I)*SIGMA(I)/V(I)-1.0_LDP
 	  END DO
 	  DEALLOCATE (COEF)
 !
@@ -1267,7 +1267,7 @@ CONTAINS
 	    WRITE(30,'(3X,A,6X,A,T28,A,T40,A,T53,A,T66,A,T78,A,T93,A,T101,A)')
 	1           'I','R','V','SIGMA','TAU','dTAU','dTRAT','dV(I)','V(I)/V(I+1)'
 	    FLUSH(UNIT=30)
-	    T2=0.00
+	    T2=0.00_LDP
 	    WRITE(30,'(1X,I3,F16.9,7ES13.4)')I,R(I),V(I),SIGMA(I),TAU(I),TAU(I+1)-TAU(I),T2,V(I)-V(I+1),V(I)/V(I+1)
 	    DO I=2,ND-1
 	      T1=TAU(I+1)-TAU(I)
@@ -1351,9 +1351,9 @@ CONTAINS
 	INTEGER V_TYPE
 !
 	IF(VEL_TYPE .EQ. 1)THEN
-	  RO = R_TRANS * (1.0D0 - (2.0D0*V_TRANS/VINF)**(1.0D0/BETA) )
+	  RO = R_TRANS * (1.0_LDP - (2.0_LDP*V_TRANS/VINF)**(1.0_LDP/BETA) )
 	  T1= R_TRANS * dVdR_TRANS / V_TRANS
-	  SCALE_HEIGHT =  0.5D0*R_TRANS / (T1 - BETA*RO/(R_TRANS-RO) )
+	  SCALE_HEIGHT =  0.5_LDP*R_TRANS / (T1 - BETA*RO/(R_TRANS-RO) )
 !
 	  WRITE(6,*)'  Transition radius is',R_TRANS
 	  WRITE(6,*)'Transition velocity is',V_TRANS
@@ -1362,73 +1362,73 @@ CONTAINS
 !
 	  DO I=1,TRANS_I-1
             T1=RO/R(I)
-            T2=1.0D0-T1
+            T2=1.0_LDP-T1
             TOP = VINF* (T2**BETA)
-            BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
+            BOT = 1.0_LDP + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
             V(I) = TOP/BOT
 
 !NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
 
-            dTOPdR = VINF * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
+            dTOPdR = VINF * BETA * T1 / R(I) * T2**(BETA - 1.0_LDP)
             dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT )  / SCALE_HEIGHT
             dVdR = dTOPdR / BOT  + V(I)*dBOTdR/BOT
-            SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
+            SIGMA(I)=R(I)*dVdR/V(I)-1.0_LDP
 	  END DO
 !
 	ELSE IF(VEL_TYPE .EQ. 2)THEN
-	  SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
+	  SCALE_HEIGHT = V_TRANS / (2.0_LDP * DVDR_TRANS)
 	  WRITE(6,*)'  Transition radius is',R_TRANS
 	  WRITE(6,*)'Transition velocity is',V_TRANS
 	  WRITE(6,*)'       Scale height is',SCALE_HEIGHT
 	  DO I=1,TRANS_I-1
 	    T1=R_TRANS/R(I)
-	    T2=1.0D0-T1
-	    TOP = 2.0D0*V_TRANS + (VINF-2.0D0*V_TRANS) * T2**BETA
-	    BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
+	    T2=1.0_LDP-T1
+	    TOP = 2.0_LDP*V_TRANS + (VINF-2.0_LDP*V_TRANS) * T2**BETA
+	    BOT = 1.0_LDP + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
 	    V(I) = TOP/BOT
 
 !NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
 
-	    dTOPdR = (VINF - 2.0D0*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
+	    dTOPdR = (VINF - 2.0_LDP*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0_LDP)
 	    dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
 	    dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
-            SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
+            SIGMA(I)=R(I)*dVdR/V(I)-1.0_LDP
 	  END DO
 !
 	ELSE IF(VEL_TYPE .EQ. 3 .OR. VEL_TYPE .EQ. 4)THEN
-	  SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
+	  SCALE_HEIGHT = V_TRANS / (2.0_LDP * DVDR_TRANS)
 	  WRITE(6,*)'  Transition radius is',R_TRANS
 	  WRITE(6,*)'Transition velocity is',V_TRANS
 	  WRITE(6,*)'       Scale height is',SCALE_HEIGHT
-	  ALPHA=2.0D0
-	  IF(VEL_TYPE .EQ. 4)ALPHA=3.0D0
+	  ALPHA=2.0_LDP
+	  IF(VEL_TYPE .EQ. 4)ALPHA=3.0_LDP
 	  CALL GEN_IN(BETA2,'Beta2 for velocity law')
 	  DO I=1,TRANS_I-1
 	    T1=R_TRANS/R(I)
-	    T2=1.0D0-T1
+	    T2=1.0_LDP-T1
 	    T3=BETA+(BETA2-BETA)*T2
 	    TOP = (VINF-ALPHA*V_TRANS) * T2**T3
-	    BOT = 1.0D0 + (ALPHA-1.0D0)*exp( (R_TRANS-R(I))/SCALE_HEIGHT )
+	    BOT = 1.0_LDP + (ALPHA-1.0_LDP)*exp( (R_TRANS-R(I))/SCALE_HEIGHT )
 
 !NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
 
-	    dTOPdR = (VINF - ALPHA*V_TRANS) * BETA * T1 / R(I) * T2**(T3-1.0D0) +
-	1                  T1*TOP*(BETA2-BETA)*(1.0D0+LOG(T2))/R(I)
-	    dBOTdR=  (ALPHA-1.0D0)*exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
+	    dTOPdR = (VINF - ALPHA*V_TRANS) * BETA * T1 / R(I) * T2**(T3-1.0_LDP) +
+	1                  T1*TOP*(BETA2-BETA)*(1.0_LDP+LOG(T2))/R(I)
+	    dBOTdR=  (ALPHA-1.0_LDP)*exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
 !
 	    TOP = ALPHA*V_TRANS + TOP
 	    dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
 	    V(I) = TOP/BOT
-            SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
+            SIGMA(I)=R(I)*dVdR/V(I)-1.0_LDP
 	  END DO
 !
 	ELSE IF(VEL_TYPE .EQ. 5)THEN
-	  BETA2=BETA; VEXT=0.1D0*VINF; RP2=2.0D0
+	  BETA2=BETA; VEXT=0.1_LDP*VINF; RP2=2.0_LDP
 	  CALL GEN_IN(VEXT,'Additonal V component (add to VINF)- VEXT')
 	  CALL GEN_IN(BETA2,'Beta2 for velocity law')
 	  CALL GEN_IN(RP2,'RP2 for velocity law (in terms of R(ND)')
 	  RP2=RP2*R(ND)
-	  SCALE_HEIGHT = V_TRANS / (2.0D0 * DVDR_TRANS)
+	  SCALE_HEIGHT = V_TRANS / (2.0_LDP * DVDR_TRANS)
 	  WRITE(6,*)'  '
 	  WRITE(6,*)'  Transition radius is',R_TRANS
 	  WRITE(6,*)'Transition velocity is',V_TRANS
@@ -1436,23 +1436,23 @@ CONTAINS
 	  WRITE(6,*)'  '
 	  DO I=1,TRANS_I-1
 	    T1=R_TRANS/R(I)
-	    T2=1.0D0-T1
-	    TOP = 2.0D0*V_TRANS + (VINF-2.0D0*V_TRANS) * T2**BETA
-	    BOT = 1.0D0 + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
-            IF(RP2/R(I) .LT. 1.0D0)THEN
-               TOP=TOP+ VEXT*(1.0D0-RP2/R(I))**BETA2
-               dTOPdR=(RP2/R(I)/R(I))*BETA2*VEXT*(1.0D0-RP2/R(I))**(BETA2-1)
+	    T2=1.0_LDP-T1
+	    TOP = 2.0_LDP*V_TRANS + (VINF-2.0_LDP*V_TRANS) * T2**BETA
+	    BOT = 1.0_LDP + exp( (R_TRANS-R(I))/SCALE_HEIGHT )
+            IF(RP2/R(I) .LT. 1.0_LDP)THEN
+               TOP=TOP+ VEXT*(1.0_LDP-RP2/R(I))**BETA2
+               dTOPdR=(RP2/R(I)/R(I))*BETA2*VEXT*(1.0_LDP-RP2/R(I))**(BETA2-1)
             ELSE
-               dTOPdR=0.0D0
+               dTOPdR=0.0_LDP
 	    END IF
 	    V(I) = TOP/BOT
 !
 !NB: We drop a minus sign in dBOTdR, which is fixed in the next line.
 !
-	    dTOPdR = dTOPdR + (VINF - 2.0D0*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0D0)
+	    dTOPdR = dTOPdR + (VINF - 2.0_LDP*V_TRANS) * BETA * T1 / R(I) * T2**(BETA - 1.0_LDP)
 	    dBOTdR=  exp( (R_TRANS-R(I))/SCALE_HEIGHT ) / SCALE_HEIGHT
 	    dVdR = dTOPdR / BOT  + TOP*dBOTdR/BOT/BOT
-            SIGMA(I)=R(I)*dVdR/V(I)-1.0D0
+            SIGMA(I)=R(I)*dVdR/V(I)-1.0_LDP
 	  END DO
 	ELSE
 	  WRITE(6,*)'Unrecognized veloity type: your type is',VEL_TYPE

@@ -41,7 +41,7 @@
 !
 ! Check whether the passed parameters are valid.
 !
-	IF(BETA1 .LT. 0.0D0)THEN
+	IF(BETA1 .LT. 0.0_LDP)THEN
 	  LUER=ERROR_LU()
           WRITE(LUER,*)'Error in RV_SN_MODEL --- Invalid BETA'
 	  STOP
@@ -105,7 +105,7 @@
 !
 	  DO I=1,ND
 	    V(I)=VCORE*(R(I)/R(ND))**BETA1
-	    SIGMA(I)=BETA1-1.0D0
+	    SIGMA(I)=BETA1-1.0_LDP
 	  END DO
 	  R(ND)=RP
 	  CLOSE(UNIT=LU)
@@ -131,30 +131,30 @@
 	R(ND)=TA(MND)
 	IF(NBND_INS .EQ. 1)THEN
 	  R(2)=TA(1)-(TA(1)-TA(2))/20.0
-	  R(ND-1)=R(ND)+(TA(MND-1)-TA(MND))/20.0D0
+	  R(ND-1)=R(ND)+(TA(MND-1)-TA(MND))/20.0_LDP
 	ELSE IF(NBND_INS .EQ. 2)THEN
 !	  R(2)=TA(1)-(TA(1)-TA(2))/10.0D0
 !	  R(ND-1)=R(ND)+(TA(MND-1)-TA(MND))/10.0D0
 !	  R(3)=TA(1)-(TA(1)-TA(2))/3.0D0
 !	  R(ND-2)=R(ND)+(TA(MND-1)-TA(MND))/3.0D0
-	  R(2)=TA(1)-(TA(1)-TA(2))/50.0D0
-	  R(ND-1)=R(ND)+(TA(MND-1)-TA(MND))/10.0D0
-	  R(3)=TA(1)-(TA(1)-TA(2))/5.0D0
-	  R(ND-2)=R(ND)+(TA(MND-1)-TA(MND))/3.0D0
+	  R(2)=TA(1)-(TA(1)-TA(2))/50.0_LDP
+	  R(ND-1)=R(ND)+(TA(MND-1)-TA(MND))/10.0_LDP
+	  R(3)=TA(1)-(TA(1)-TA(2))/5.0_LDP
+	  R(ND-2)=R(ND)+(TA(MND-1)-TA(MND))/3.0_LDP
 	ELSE IF(NBND_INS .EQ. 3)THEN
-	  R(2)=TA(1)-(TA(1)-TA(2))/20.0D0
-	  R(ND-1)=R(ND)+(TA(MND-1)-TA(MND))/20.0D0
-	  R(3)=TA(1)-(TA(1)-TA(2))/8.0D0
-	  R(ND-2)=R(ND)+(TA(MND-1)-TA(MND))/8.0D0
-	  R(4)=TA(1)-(TA(1)-TA(2))/3.0D0
-	  R(ND-3)=R(ND)+(TA(MND-1)-TA(MND))/3.0D0
+	  R(2)=TA(1)-(TA(1)-TA(2))/20.0_LDP
+	  R(ND-1)=R(ND)+(TA(MND-1)-TA(MND))/20.0_LDP
+	  R(3)=TA(1)-(TA(1)-TA(2))/8.0_LDP
+	  R(ND-2)=R(ND)+(TA(MND-1)-TA(MND))/8.0_LDP
+	  R(4)=TA(1)-(TA(1)-TA(2))/3.0_LDP
+	  R(ND-3)=R(ND)+(TA(MND-1)-TA(MND))/3.0_LDP
 	END IF
 !
 ! Compute Velocity and SIGMA
 !
 	DO I=1,ND
 	  V(I)=VCORE*(R(I)/R(ND))**BETA1
-	  SIGMA(I)=BETA1-1.0D0
+	  SIGMA(I)=BETA1-1.0_LDP
 	END DO
 !
 	WRITE(127,*)RP,RMAX,VCORE,BETA1

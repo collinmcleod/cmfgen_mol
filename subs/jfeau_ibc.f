@@ -43,7 +43,7 @@ C
 C
 	INTEGER, PARAMETER :: IONE=1
 C
-	RJ(:)=0.0D0
+	RJ(:)=0.0_LDP
 C
 C Compute the Q factors from F.
 C
@@ -73,9 +73,9 @@ C
 C Note well - DBB =dB/dR (and Q(ND)=1.0 by definition)
 C
 	IF(DIFF)THEN
-	  RJ(ND)=R(ND)*R(ND)*DBB/CHI(ND)/3.0D0
+	  RJ(ND)=R(ND)*R(ND)*DBB/CHI(ND)/3.0_LDP
 	ELSE
-	  RJ(ND)=R(ND)*R(ND)*IC*(0.25D0+0.5D0*INBC)
+	  RJ(ND)=R(ND)*R(ND)*IC*(0.25_LDP+0.5_LDP*INBC)
 	END IF
 C
 C Find the solution

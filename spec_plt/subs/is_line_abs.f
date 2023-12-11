@@ -95,7 +95,7 @@ C
 	      WRITE(6,*)TRIM(STRING)
 	      GOTO 10
 	    END IF
-	    NCOL(I)=10.0**NCOL(I)
+	    NCOL(I)=10.0_LDP**NCOL(I)
 	    NLINES=I
         END DO
 10	CONTINUE
@@ -107,25 +107,25 @@ C
 	  WRITE(6,*)'Number of lines read in is',NLINES
 	END IF
 C
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 	PI=FUN_PI()
 C
-	OPLIN=2.6540081E-02		!pi*e*e/m/c
+	OPLIN=2.6540081E-02_LDP		!pi*e*e/m/c
 	DO I=1,NLINES
-	  NU_ZERO(I)=0.01*C_KMS*(1.0D0-VRAD(I)/C_KMS)/LAM_ZERO(I)   		!10^15 Hz
+	  NU_ZERO(I)=0.01_LDP*C_KMS*(1.0_LDP-VRAD(I)/C_KMS)/LAM_ZERO(I)   		!10^15 Hz
 !	  NU_DOP(I)=12.85*NU_ZERO(I)*
 !	1             SQRT( (T_IN_K/1.0D+04)+ (V_TURB/12.85)*2 )/C_KMS
 	  NU_DOP(I)=NU_ZERO(I)*VDOP(I)/C_KMS
-	  CHIL(I)=1.0D-15*OPLIN*OSC(I)*NCOL(I)/SQRT(PI)/NU_DOP(I)
+	  CHIL(I)=1.0E-15_LDP*OPLIN*OSC(I)*NCOL(I)/SQRT(PI)/NU_DOP(I)
 	END DO
 C
 	DO J=1,NLAM
-	  TAU=0.0D0
-	  FREQ=0.01*C_KMS/WAVE(J)
+	  TAU=0.0_LDP
+	  FREQ=0.01_LDP*C_KMS/WAVE(J)
 	  DO I=1,NlINES
 	      v=(FREQ-NU_ZERO(I))/NU_DOP(I)
-	      IF(ABS(V) .LE. 100.0)THEN                  !Was 10
-	        a=1.0D-15*GAM(I)/4/PI/NU_DOP(I)
+	      IF(ABS(V) .LE. 100.0_LDP)THEN                  !Was 10
+	        a=1.0E-15_LDP*GAM(I)/4/PI/NU_DOP(I)
 	        PHI=VOIGT(a,v)
 	        TAU=TAU+CHIL(I)*PHI
 	        FLUX(J)=FLUX(J)*EXP(-TAU)

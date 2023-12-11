@@ -303,8 +303,8 @@
 	REAL(KIND=LDP)     LAM_FLUX_MEAN_BAND_END(N_FLUX_MEAN_BANDS)
 	REAL(KIND=LDP)     BAND_FLUX_MEAN(ND,N_FLUX_MEAN_BANDS)
 	REAL(KIND=LDP)     BAND_FLUX(ND,N_FLUX_MEAN_BANDS)
-	DATA LAM_FLUX_MEAN_BAND_END/100.0D0,150.0D0,200.0D0,227.83D0,258.90D0,300.0D0,504.25D0,911.75D0,
-	1                         1200.0D0,1500.0D0,2000.0D0,1.0D+08/
+	DATA LAM_FLUX_MEAN_BAND_END/100.0_LDP,150.0_LDP,200.0_LDP,227.83_LDP,258.90_LDP,300.0_LDP,504.25_LDP,911.75_LDP,
+	1                         1200.0_LDP,1500.0_LDP,2000.0_LDP,1.0E+08_LDP/
 !
 !
 ! Continuum frequency variables and arrays.
@@ -406,7 +406,7 @@
 !
 	INTEGER, PARAMETER :: N_TAU_EDGE=5
 	REAL(KIND=LDP) TAU_EDGE(N_TAU_EDGE)
-	DATA TAU_EDGE/13.16D0,11.60D0,5.95D0,3.29D0,0.83D0/
+	DATA TAU_EDGE/13.16_LDP,11.60_LDP,5.95_LDP,3.29_LDP,0.83_LDP/
 !
 ! 
 !
@@ -424,7 +424,7 @@
 	I=12
 	FORMFEED=' '//CHAR(I)
 	CNT_FIX_BA=0
-	MAXCH_SUM=0.0D0
+	MAXCH_SUM=0.0_LDP
 	LST_ITERATION=.TRUE.		!.FALSE.
 !
 !
@@ -442,7 +442,7 @@
 ! Set so that it is defined for the TEST whether to do an accurate flux
 ! calculation.
 !
-	MAXCH=100.D0
+	MAXCH=100._LDP
 !
 ! A value of 1000 is used to indicate that the last change was greater them
 ! VAL_DO_NG, or a NEW_MODEL.
@@ -482,7 +482,7 @@
 !
 ! RMDOT is the density at R=10dex10 cm and V=1km/s (atomic mass units)
 !
-	RMDOT=RMDOT*3.02286E+23
+	RMDOT=RMDOT*3.02286E+23_LDP
 !
 ! 
 !
@@ -520,9 +520,9 @@
 !       CALL SET_VAR_RAD_MOD_V2(ND,NDEXT,
 !	1        NT,NUM_BNDS,NM,MAX_SIM,NM_KI,ACCURATE,L_FALSE)
 !
-	T1=10.0/(NLF-1)
+	T1=10.0_LDP/(NLF-1)
 	DO ML=1,NLF
-	  PF(ML)=5.0D0-T1*(ML-1)
+	  PF(ML)=5.0_LDP-T1*(ML-1)
 	END DO
 ! 
 !
@@ -583,7 +583,7 @@
 	  DO ID=SPECIES_END_ID(ISPEC),SPECIES_BEG_ID(ISPEC),-1
 	    IF( ATM(ID)%XzV_PRES)THEN
 	      IF( NINT(AT_NO(SPECIES_LNK(ID))) .LT. NINT(AT_NO_GF_CUT) )THEN
-	        T2=0.0D0
+	        T2=0.0_LDP
 	      ELSE
 	        T2=GF_CUT
 	      END IF
@@ -697,7 +697,7 @@
 ! Set the vector Z_POP to contain the ionic charge for each species.
 !
 	DO I=1,NT
-	  Z_POP(I)=0.0D0
+	  Z_POP(I)=0.0_LDP
 	END DO
 !
 	DO ID=1,NUM_IONS-1
@@ -709,7 +709,7 @@
 ! calculations. G_ALL and LEVEL_ID  are no longer used due to the use
 ! of super levels.
 !
-	AMASS_ALL(1:NT)=0.0D0
+	AMASS_ALL(1:NT)=0.0_LDP
 	DO ID=1,NUM_IONS-1
 	  IF(ATM(ID)%XzV_PRES)AMASS_ALL( ATM(ID)%EQXzV: ATM(ID)%EQXzV+ATM(ID)%NXzV-1)=
 	1         AT_MASS(SPECIES_LNK(ID))
@@ -719,9 +719,9 @@
 ! (for consitenct with CMFGEN).
 !
 	DO I=1,ND
-	  R(ND-I+1)=1.0D0+(I-1)*0.01D0
-	  V(I)=1.0D0
-	  SIGMA(I)=0.0D0
+	  R(ND-I+1)=1.0_LDP+(I-1)*0.01_LDP
+	  V(I)=1.0_LDP
+	  SIGMA(I)=0.0_LDP
 	END DO
 !
 ! 
@@ -740,13 +740,13 @@
 ! The incident Sobolev intensity is S[ 1.0-exp(tau(sob)*ERF) ]
 ! NB -from the definition, -1<erf<0 .
 !
-	T1=4.286299D-05*SQRT( TDOP/AMASS_DOP + (VTURB/12.85)**2 )
+	T1=4.286299E-05_LDP*SQRT( TDOP/AMASS_DOP + (VTURB/12.85_LDP)**2 )
 	J=0
 	DO I=1,NLF
-	  ERF(I)=-0.5D0*S15ADF(PF(I),J)
+	  ERF(I)=-0.5_LDP*S15ADF(PF(I),J)
 	  PF(I)=PF(I)*T1
 	END DO
-        VDOP_VEC(1:ND)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
+        VDOP_VEC(1:ND)=12.85_LDP*SQRT( TDOP/AMASS_DOP + (VTURB/12.85_LDP)**2 )
         VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*V(1:ND)/V(1)
 !
         IF(GLOBAL_LINE_PROF(1:4) .EQ. 'LIST')THEN
@@ -772,7 +772,7 @@
 ! arises when levels within a super level have a 'relatively large'
 ! energy separation, and the dominat rates are scattering.
 !
-	AVE_ENERGY(:)=0.0D0
+	AVE_ENERGY(:)=0.0_LDP
 	DO ID=1,NUM_IONS-1
 	   CALL AVE_LEVEL_ENERGY(AVE_ENERGY, ATM(ID)%EDGEXzV_F,
 	1         ATM(ID)%GXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%EQXzV,
@@ -800,11 +800,11 @@
 	  END IF
 	  CALL REXT_COEF_V2(REXT,COEF,INDX,NDEXT,R,POS_IN_NEW_GRID,
 	1         ND,NPINS,L_TRUE,I,ST_INTERP_INDX,END_INTERP_INDX)
-	  TA(1:ND)=1.0D0	!TEXT not required, T currently zero
+	  TA(1:ND)=1.0_LDP	!TEXT not required, T currently zero
 	  CALL EXTEND_VTSIGMA(VEXT,TEXT,SIGMAEXT,COEF,INDX,NDEXT,
 	1        V,TA,SIGMA,ND)
 !
-          VDOP_VEC_EXT(1:NDEXT)=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
+          VDOP_VEC_EXT(1:NDEXT)=12.85_LDP*SQRT( TDOP/AMASS_DOP + (VTURB/12.85_LDP)**2 )
 !
 	END IF
 !
@@ -897,7 +897,7 @@
 ! These are required when evaluation the occupation probabilities.
 !
 	 DO J=1,ND
-	    POPION(J)=0.0D0
+	    POPION(J)=0.0_LDP
 	    DO I=1,NT
 	      IF(Z_POP(I) .GT. 0)POPION(J)=POPION(J)+POPS(I,J)
 	    END DO
@@ -953,7 +953,7 @@
 	END DO
 !
 	CALL TUNE(1,'FULL_OPAC')
-	DTDR=0.0D0
+	DTDR=0.0_LDP
 	SECTION='DTDR'
 	IF(IONE .EQ. IONE)THEN
 !
@@ -970,11 +970,11 @@
 ! we only want the variation of CHI, so we initialize its value to zero.
 ! This prevents a floating point exception.
 !
-	  RJ(1:ND)=0.0D0
-	  INT_dBdT=0.0D0
-	  ROSS_MEAN=0.0D0
+	  RJ(1:ND)=0.0_LDP
+	  INT_dBdT=0.0_LDP
+	  ROSS_MEAN=0.0_LDP
 !
-	  CONT_FREQ=0.0D0
+	  CONT_FREQ=0.0_LDP
 !
 	  WRITE(6,'(/,A)')' Beginning loop over frequencies for all grid points.'
 	  WRITE(6,'(A,I7,/)')' Number of frequencies is',NCF
@@ -1077,7 +1077,7 @@
 !
 	    T1=TWOHCSQ*HDKT*FQW(ML)*(NU(ML)**4)
 	    DO L=1,ND
-	      T2=T1*EMHNUKT(L)/(  ( (1.0D0-EMHNUKT(L))*T(L) )**2  )
+	      T2=T1*EMHNUKT(L)/(  ( (1.0_LDP-EMHNUKT(L))*T(L) )**2  )
 	      INT_dBdT(L)=INT_dBdT(L)+T2
 	      ROSS_MEAN(L)=ROSS_MEAN(L)+T2/CHI(L)
 	    END DO
@@ -1093,7 +1093,7 @@
 ! Output the Rosseland mean data, first determining the number
 ! of uniques temperatures.
 !
-	  T1=1.0D-12
+	  T1=1.0E-12_LDP
 	  I=1
 	  DO L=2,ND
 	    IF(EQUAL(T(1),T(L),T1))THEN
@@ -1112,7 +1112,7 @@
 	1    '       Ne','Chi(Ross)','  Chi(es)','Kap(Ross)','  Kap(es)'
 	    DO L=1,ND
 	      ROSS_MEAN(L)=INT_dBdT(L)/ROSS_MEAN(L)
-	      IF(ROSS_MEAN(L) .NE.  ROSS_MEAN(L))ROSS_MEAN(L)=6.65D-15*ED(L)
+	      IF(ROSS_MEAN(L) .NE.  ROSS_MEAN(L))ROSS_MEAN(L)=6.65E-15_LDP*ED(L)
 	      WRITE(150,'(8ES14.4)')T(L),DENSITY(L),POP_ATOM(L),ED(L),
 	1                   ROSS_MEAN(L),6.65D-15*ED(L),1.0D-10*ROSS_MEAN(L)/DENSITY(L),
 	1                   6.65D-25*ED(L)/DENSITY(L)
@@ -1139,7 +1139,7 @@
 ! These are required when evaluation the occupation probabilities.
 !
 	DO J=1,ND
-	  POPION(J)=0.0D0
+	  POPION(J)=0.0_LDP
 	  DO I=1,NT
 	    IF(Z_POP(I) .GT. 0)POPION(J)=POPION(J)+POPS(I,J)
 	  END DO
@@ -1203,7 +1203,7 @@
 	  STRING=' '
 	  NEXT_LOC=1
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'L*',LUM)
-	  T1=RMDOT/3.02286D+23
+	  T1=RMDOT/3.02286E+23_LDP
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'Mdot',T1)
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'R*  ',RP)
 	  T1=RMAX/RP   ; CALL WR_VAL_INFO(STRING,NEXT_LOC,'RMAX/R*',T1)
@@ -1214,9 +1214,9 @@
 	  TCHI(1:ND)=ROSS_MEAN(1:ND)*CLUMP_FAC(1:ND)
 	  CALL DERIVCHI(dCHIdR,TCHI,R,ND,METHOD)
           CALL NORDTAU(DTAU,TCHI,R,R,dCHIdR,ND)
-	  TA(1:ND)=0.0D0 ; DO I=2,ND ; TA(I) = TA(I-1)+DTAU(I-1) ; END DO
-	  TB(1)=MIN(2.0D0/3.0D0,TA(ND))  ; TB(2)=MIN(10.0D0,TA(ND))
-	  TB(3)=MIN(20.0D0,TA(ND))
+	  TA(1:ND)=0.0_LDP ; DO I=2,ND ; TA(I) = TA(I-1)+DTAU(I-1) ; END DO
+	  TB(1)=MIN(2.0_LDP/3.0_LDP,TA(ND))  ; TB(2)=MIN(10.0_LDP,TA(ND))
+	  TB(3)=MIN(20.0_LDP,TA(ND))
 	  CALL MON_INTERP(TC,ITHREE,IONE,TB,ITHREE,R,ND,TA,ND)
 	  CALL MON_INTERP(AV,ITHREE,IONE,TB,ITHREE,V,ND,TA,ND)
 !
@@ -1224,40 +1224,40 @@
 !
 	  NEXT_LOC=1  ;   STRING=' '
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TA(ND))
-	  T1=1.0D+10*RP/RAD_SUN(); CALL WR_VAL_INFO(STRING,NEXT_LOC,'R*/Rsun',T1)
-	  T1=TEFF_SUN()*(LUM/T1**2)**0.25
+	  T1=1.0E+10_LDP*RP/RAD_SUN(); CALL WR_VAL_INFO(STRING,NEXT_LOC,'R*/Rsun',T1)
+	  T1=TEFF_SUN()*(LUM/T1**2)**0.25_LDP
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'T*  ',T1)
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',V(ND))
 	  WRITE(LUMOD,'(A)')TRIM(STRING)
 !
-	  IF(TA(ND) .GT. 20.0D0)THEN
+	  IF(TA(ND) .GT. 20.0_LDP)THEN
 	    NEXT_LOC=1  ;   STRING=' '
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(3))		!20.0D0
-	    T1=1.0D+10*TC(3)/RAD_SUN()
+	    T1=1.0E+10_LDP*TC(3)/RAD_SUN()
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'R /Rsun',T1)
-	    T1=TEFF_SUN()*(LUM/T1**2)**0.25
+	    T1=TEFF_SUN()*(LUM/T1**2)**0.25_LDP
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff',T1)
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(3))
 	    WRITE(LUMOD,'(A)')TRIM(STRING)
 	  END IF
 !
-	  IF(TA(ND) .GT. 10.0D0)THEN
+	  IF(TA(ND) .GT. 10.0_LDP)THEN
 	    NEXT_LOC=1  ;   STRING=' '
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(2))		!10.0D0
-	    T1=1.0D+10*TC(2)/RAD_SUN()
+	    T1=1.0E+10_LDP*TC(2)/RAD_SUN()
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'R /Rsun',T1)
-	    T1=TEFF_SUN()*(LUM/T1**2)**0.25
+	    T1=TEFF_SUN()*(LUM/T1**2)**0.25_LDP
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff',T1)
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(2))
 	    WRITE(LUMOD,'(A)')TRIM(STRING)
 	  END IF
 !
-	  IF(TA(ND) .GT. 0.67D0)THEN
+	  IF(TA(ND) .GT. 0.67_LDP)THEN
 	    NEXT_LOC=1  ;   STRING=' '
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Tau',TB(1))		!0.67D0
-	    T1=1.0D+10*TC(1)/RAD_SUN()
+	    T1=1.0E+10_LDP*TC(1)/RAD_SUN()
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'R /Rsun',T1)
-	    T1=TEFF_SUN()*(LUM/T1**2)**0.25
+	    T1=TEFF_SUN()*(LUM/T1**2)**0.25_LDP
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'Teff',T1)
 	    CALL WR_VAL_INFO(STRING,NEXT_LOC,'V(km/s)',AV(1))
 	    WRITE(LUMOD,'(A)')TRIM(STRING)
@@ -1265,8 +1265,8 @@
 !
 	  STRING=' '
 	  NEXT_LOC=1
-	  T1=4.9376D+07*(RMDOT/3.02286D+23)*V(1)/LUM
-	  T2=8.235D+03*(RMDOT/3.02286D+23)*V(1)*V(1)/LUM
+	  T1=4.9376E+07_LDP*(RMDOT/3.02286E+23_LDP)*V(1)/LUM
+	  T2=8.235E+03_LDP*(RMDOT/3.02286E+23_LDP)*V(1)*V(1)/LUM
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'Eta',T1)
 	  CALL WR_VAL_INFO(STRING,NEXT_LOC,'Ek/L(%)',T2)
 	  WRITE(LUMOD,'(A)')TRIM(STRING)
@@ -1392,7 +1392,7 @@
 ! These are required when evaluation the occupation probabilities.
 !
 	    DO J=1,ND
-	      POPION(J)=0.0D0
+	      POPION(J)=0.0_LDP
 	      DO I=1,NT
 	        IF(Z_POP(I) .GT. 0)POPION(J)=POPION(J)+POPS(I,J)
 	      END DO
@@ -1475,7 +1475,7 @@
 ! carbon).
 !
 	DO ISPEC=1,NUM_SPECIES
-	  GAM_SPECIES(1:ND,ISPEC)=0.0D0
+	  GAM_SPECIES(1:ND,ISPEC)=0.0_LDP
 	  FIRST=.TRUE.
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)
 	    IF( ATM(ID)%XzV_PRES)THEN

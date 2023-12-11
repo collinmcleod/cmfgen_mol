@@ -25,7 +25,7 @@ C
 C
 	INTEGER I,J,K
 C
-	F2DA(:,:)=0.0D0
+	F2DA(:,:)=0.0_LDP
 	DO J=1,NDEXT
 	  K=INDX(J)
 	  DO I=1,ND

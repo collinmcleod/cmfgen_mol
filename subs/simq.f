@@ -73,7 +73,7 @@ C
       DO J=1,N
         JY=J+1
         JJ=JJ+N+1
-        BIGA=0.0D0
+        BIGA=0.0_LDP
         IT=JJ-J
         DO I=J,N
 C

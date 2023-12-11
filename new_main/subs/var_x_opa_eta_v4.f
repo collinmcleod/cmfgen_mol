@@ -77,7 +77,7 @@
 !
 	IF( .NOT. IMP_VAR(EQION) )RETURN
 	ALPHA=XCROSS_V2(NU,AT_NO,NO_ELEC,IZERO,IZERO,L_FALSE,L_FALSE)
-	IF(ALPHA .LE. 0.0D0)RETURN
+	IF(ALPHA .LE. 0.0_LDP)RETURN
 	TETA2=ALPHA*TWOHCSQ*(NU**3)
 !
 ! Set initial depth location, in case we are just computing for the
@@ -91,8 +91,8 @@
 ! LTE_POP_SUM is the sum over all levels.
 ! dLTE_SUM_VE is the of dHNST_AdlnT.
 !
-	  LTE_POP_SUM(1:ND)=0.0D0
-	  dLTE_SUM_VEC(1:ND)=0.0D0
+	  LTE_POP_SUM(1:ND)=0.0_LDP
+	  dLTE_SUM_VEC(1:ND)=0.0_LDP
 !
 !!$OMP PARALLEL DO PRIVATE(I,LEV,J)
 !	  DO I=1,N_A
@@ -145,20 +145,20 @@
 ! Convert to dlnHNST_AdlnT. The factor LTE_POP_SUM in inclued
 ! in LTE_POP later.
 !
-	    IF(LTE_POP_SUM(J) .LT. 1.0D-200)THEN
-	      dLTE_SUM=0.0D0
+	    IF(LTE_POP_SUM(J) .LT. 1.0E-200_LDP)THEN
+	      dLTE_SUM=0.0_LDP
 	    ELSE
 	      dLTE_SUM=dLTE_SUM_VEC(J)/LTE_POP_SUM(J)
 	    END IF
 !
 	    TCHI1=ALPHA*LTE_POP
 	    VCHI(EQION,J)=VCHI(EQION,J)-TCHI1/DI(J)
-	    VCHI(NT-1,J)=VCHI(NT-1,J)-2.0D0*TCHI1/ED(J)
+	    VCHI(NT-1,J)=VCHI(NT-1,J)-2.0_LDP*TCHI1/ED(J)
 	    VCHI(NT,J)=VCHI(NT,J)-TCHI1*(HDKT*NU/T(J)+dLTE_SUM+dlnHNST_BdlnT(1,J))/T(J)
 !
 	    TETA3=TETA2*LTE_POP
 	    VETA(EQION,J)=VETA(EQION,J)+TETA3/DI(J)
-	    VETA(NT-1,J)=VETA(NT-1,J)+2.0D0*TETA3/ED(J)
+	    VETA(NT-1,J)=VETA(NT-1,J)+2.0_LDP*TETA3/ED(J)
 	    VETA(NT,J)=VETA(NT,J)+TETA3*(HDKT*NU/T(J)+dLTE_SUM+dlnHNST_BdlnT(1,J))/T(J)
 	  END DO
 	ELSE		!Variation for K shell ionization of Li ions.

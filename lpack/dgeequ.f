@@ -79,7 +79,7 @@
 *
 *     .. Parameters ..
       REAL(KIND=LDP)   ONE, ZERO
-      PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
+      PARAMETER          ( ONE = 1.0_LDP, ZERO = 0.0_LDP )
 *     ..
 *     .. Local Scalars ..
       INTEGER            I, J

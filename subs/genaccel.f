@@ -52,8 +52,8 @@ C
 	EXTERNAL ERROR_LU
 C
 	NUM_BAD_NG=0
-	MAXINC=-100.0D0
-	MAXDEC=100.0D0
+	MAXINC=-100.0_LDP
+	MAXDEC=100.0_LDP
         LUER=ERROR_LU()
 C
 C Determine the record size, and the number of records that
@@ -140,8 +140,8 @@ C of the errors. The absolute maximum percentage change is also
 C determined.
 C
 	DO L=1,ND
-	  LOCINC=-100.0D0
-	  LOCDEC=100.0D0
+	  LOCINC=-100.0_LDP
+	  LOCDEC=100.0_LDP
 	  INDEXST=(L-1)*NT+1
 	  DO J=1,4
 	    DO K=1,NT
@@ -165,7 +165,7 @@ C
 C Before storing the NG acceleration at this depth, we check to
 C see whether the predicted corrections are "reasonable".
 C
-	  IF(LOCINC .GT. 10.1D0 .OR. LOCDEC .LT. 0.09D0)THEN
+	  IF(LOCINC .GT. 10.1_LDP .OR. LOCDEC .LT. 0.09_LDP)THEN
 	    NUM_BAD_NG=NUM_BAD_NG+1
 	    WRITE(LUER,*)'NUM_BAD_NG=',NUM_BAD_NG
 	    DO K=1,NT
@@ -211,8 +211,8 @@ C By definition MAXINC and MININC are both positive. These are only
 C defined for successful NG accelerations (does not include any depths
 C at which NG acceleration did not work).
 C
-	MAXINC=100.0D0*(MAXINC-1.0D0)
-	MAXDEC=100.0D0*(1.0D0/MAXDEC-1.0D0)
+	MAXINC=100.0_LDP*(MAXINC-1.0_LDP)
+	MAXDEC=100.0_LDP*(1.0_LDP/MAXDEC-1.0_LDP)
 	WRITE(LUER,9800)IINC,MAXINC
 9800	FORMAT(1X,'Max NG % increase at depth ',I3,' is',1P,E10.2)
 	WRITE(LUER,9900)IDEC,MAXDEC

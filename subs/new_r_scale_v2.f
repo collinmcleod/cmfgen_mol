@@ -60,10 +60,10 @@ C
 C
 C Gives nominally a few % accuracy for a power law.
 C
-	R_MAX=R(1)*100.0D0**(1.0D0/(ALPHA-1.0D0))
-	DELR=EXP( LOG(R_MAX/R(1))/50.0D0 )
+	R_MAX=R(1)*100.0_LDP**(1.0_LDP/(ALPHA-1.0_LDP))
+	DELR=EXP( LOG(R_MAX/R(1))/50.0_LDP )
 C
-	TAU(1)=0.0D0
+	TAU(1)=0.0_LDP
 	R_BIG=R(1)
 	Z_BIG=Z(1)
 	DO WHILE(R_BIG .LT. R_MAX)
@@ -73,13 +73,13 @@ C
 	  CHI_BIG=CHI(1)*(R(1)/R_BIG)**ALPHA
 	  Z_SMALL=Z_BIG
 	  Z_BIG=SQRT( (R_BIG-P)*(R_BIG+P) )
-	  TAU(1)=TAU(1)+0.5D0*(Z_BIG-Z_SMALL)*(CHI_BIG+CHI_SMALL)
+	  TAU(1)=TAU(1)+0.5_LDP*(Z_BIG-Z_SMALL)*(CHI_BIG+CHI_SMALL)
 	END DO
 C
 C Now compute the optical depth.
 C
 	DO I=2,NI
-	  TAU(I)=TAU(I-1)+(CHI(I)+CHI(I-1))*(Z(I-1)-Z(I))*0.5D0
+	  TAU(I)=TAU(I-1)+(CHI(I)+CHI(I-1))*(Z(I-1)-Z(I))*0.5_LDP
 	END DO
 C
 C Compute new tau scale equally spaced in LOG TAU. We can ramp the step size
@@ -99,9 +99,9 @@ C
 	DTAU=(TAU(NI)-TAU(1))/ND_DIV
 	TAU_NEW(1)=TAU(1)
 	IF(RAMP_OUT)THEN
-	  TAU_NEW(2)=TAU(1)+DTAU/64.0D0
-	  TAU_NEW(3)=TAU(1)+DTAU/16.0D0
-	  TAU_NEW(4)=TAU(1)+DTAU/4.0D0
+	  TAU_NEW(2)=TAU(1)+DTAU/64.0_LDP
+	  TAU_NEW(3)=TAU(1)+DTAU/16.0_LDP
+	  TAU_NEW(4)=TAU(1)+DTAU/4.0_LDP
 	  IST=5
 	ELSE
 	  IST=2
@@ -116,9 +116,9 @@ C
 C
 	TAU_NEW(ND)=TAU(NI)
 	IF(RAMP_IN)THEN
-	  TAU_NEW(ND-1)=TAU(NI)-DTAU/64.0D0
-	  TAU_NEW(ND-2)=TAU(NI)-DTAU/16.0D0
-	  TAU_NEW(ND-3)=TAU(NI)-DTAU/4.0D0
+	  TAU_NEW(ND-1)=TAU(NI)-DTAU/64.0_LDP
+	  TAU_NEW(ND-2)=TAU(NI)-DTAU/16.0_LDP
+	  TAU_NEW(ND-3)=TAU(NI)-DTAU/4.0_LDP
 	END IF
 C
 C Compute new Z scale.

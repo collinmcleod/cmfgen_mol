@@ -60,12 +60,12 @@
 	  RETURN
 	END IF
 !
-	C_KMS=SPEED_OF_LIGHT()/1.0D+05
+	C_KMS=SPEED_OF_LIGHT()/1.0E+05_LDP
 !
 ! We set NU_EVAL to zero. Subsequently a NU_EVAL value of zero for any index
 ! indicates that NU_EVAL still needs to be set.
 !
-	NU_EVAL(:)=0.0D0
+	NU_EVAL(:)=0.0_LDP
 !
 ! We first ensure that the continuum opacity is evaluated at all important
 ! bound_free edges etc. These are located in NU_CONT. We use DOPV to do this
@@ -98,13 +98,13 @@
 ! Detmine interval (ML_ST, ML_ST_1, ..., ML_END_1) for which evaluation frequency
 ! needs to be set.
 !
-	  DO WHILE(NU_EVAL(ML_ST) .NE. 0.0D0)
+	  DO WHILE(NU_EVAL(ML_ST) .NE. 0.0_LDP)
 	    LST_COMP=ML_ST
 	    ML_ST=ML_ST+1
 	    IF(ML_ST .EQ. NCF)GOTO 100
 	  END DO
 	  ML_END=ML_ST+1
-	  DO WHILE(NU_EVAL(ML_END) .EQ. 0.0D0)
+	  DO WHILE(NU_EVAL(ML_END) .EQ. 0.0_LDP)
 	    ML_END=ML_END+1
 	  END DO
 !
@@ -113,7 +113,7 @@
 	  DO L=ML_ST,ML_END-1
 	    T1=(NU(LST_COMP)-NU(L))/NU(L)
 	    T2=(NU(L)-NU(ML_END))/NU(L)
-	    IF(T1+T2 .GT. 1.25D0*VRAT .AND. T1 .GT. 0.75D0*VRAT)THEN
+	    IF(T1+T2 .GT. 1.25_LDP*VRAT .AND. T1 .GT. 0.75_LDP*VRAT)THEN
 	      NU_EVAL(L)=NU(L)
 	      LST_COMP=L
 	    ELSE IF(T1 .LT. T2)THEN
@@ -169,7 +169,7 @@
 	   WRITE(17,'(A)')' Check on continuum evaluations relative to bound-free edges'
 	   WRITE(17,'(A)')' '
 	   L=1
-	   T1=0.0D0; T2=0.0D0; T3=0.0D0; T4=0.0D0;
+	   T1=0.0_LDP; T2=0.0_LDP; T3=0.0_LDP; T4=0.0_LDP;
 	   DO ML=2,NCF_CONT-1
 	     DO WHILE(NU(L) .GT. NU_CONT(ML))
 	       L=L+1

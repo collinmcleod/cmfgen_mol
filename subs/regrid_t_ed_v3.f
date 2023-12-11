@@ -76,7 +76,7 @@
 	CLOSE(UNIT=8)
 !
 	IF(OPTION .NE. 'RNS')THEN
-	  IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
+	  IF(ABS(OLDR(NDOLD)/R(ND)-1.0_LDP) .GT. 0.0001_LDP)THEN
 	    WRITE(LUER,*)'Warning - core radius not identical in REGRIDWSC'
 	    WRITE(LUER,*)'Rescaling to make Rcore identical'
 	    DO I=1,NDOLD

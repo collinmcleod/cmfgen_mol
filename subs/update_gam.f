@@ -18,7 +18,7 @@ C
 C
 	IF(FIRST)THEN
 	  DO J=1,ND
-	    GAM(J)=0.0D0
+	    GAM(J)=0.0_LDP
 	  END DO
 	END IF
 C

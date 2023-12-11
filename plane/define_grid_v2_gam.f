@@ -222,7 +222,7 @@
 	  J=2*(NP-ID)+1
 	  ALLOCATE(R_MU(ID)%MU_VECTOR(J))
 	  R_MU(ID)%MU_PTS=J
-	  R_MU(ID)%MU_VECTOR=0.0D0
+	  R_MU(ID)%MU_VECTOR=0.0_LDP
 	  J=NP-ID+1
 	  DO IP=1,J
 	    R_MU(ID)%MU_VECTOR(IP)=RAY(IP)%MU_P(ID)
@@ -256,12 +256,12 @@
 	    R_MU(ID)%MON_MU_PTS=R_MU(ID)%MU_PTS*ANG_MULT
 	    NA=R_MU(ID)%MON_MU_PTS
 	    ALLOCATE(R_MU(ID)%MON_MU(NA))
-	    R_MU(ID)%dMU=2.0D0/(NA-1)
-	    R_MU(ID)%MON_MU(1)=1.0D0
+	    R_MU(ID)%dMU=2.0_LDP/(NA-1)
+	    R_MU(ID)%MON_MU(1)=1.0_LDP
 	    DO I=2,NA-1
-	      R_MU(ID)%MON_MU(I)=1.0D0-(I-1)*R_MU(ID)%dMU
+	      R_MU(ID)%MON_MU(I)=1.0_LDP-(I-1)*R_MU(ID)%dMU
 	    END DO
-	    R_MU(ID)%MON_MU(NA)=-1.0D0
+	    R_MU(ID)%MON_MU(NA)=-1.0_LDP
 	  END IF
 	END DO
 !

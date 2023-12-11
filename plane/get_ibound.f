@@ -14,7 +14,7 @@
 	REAL(KIND=LDP), SAVE, ALLOCATABLE :: ANG_VARIATION(:)
 	REAL(KIND=LDP), SAVE, ALLOCATABLE :: DIST(:)
 !
-	REAL(KIND=LDP), SAVE:: FREQ_SAV=0.0D0           !Previous frequency
+	REAL(KIND=LDP), SAVE:: FREQ_SAV=0.0_LDP           !Previous frequency
 	INTEGER, SAVE :: NCF			!Number of incident frequencies
 	INTEGER, SAVE :: NANG			!Number of incident angles
 	INTEGER, SAVE :: NP_SAV=0		!Number of angles in model
@@ -109,7 +109,7 @@
 !
 	IF(INIT)THEN
 	  CUR_NU_INDX=1
-	  FREQ_SAV=1.0D+30			!Big value
+	  FREQ_SAV=1.0E+30_LDP			!Big value
 	END IF
 	IF(FREQ .GT. FREQ_SAV)THEN
 	  LUER=ERROR_LU()
@@ -125,7 +125,7 @@
 	  ALLOCATE (DIST(NP))
 	  DO LS=1,NP
 	    J=1
-	    DO WHILE ( (MU(LS)-ANG_GRID(J))*(ANG_GRID(J+1)-MU(LS)) .LT. 0.0D0 )
+	    DO WHILE ( (MU(LS)-ANG_GRID(J))*(ANG_GRID(J+1)-MU(LS)) .LT. 0.0_LDP )
 	      J=J+1
 	      IF(J .GE. NANG)THEN
 	        LUER=ERROR_LU()
@@ -137,7 +137,7 @@
 	      END IF
             END DO
 	    T2=(ANG_GRID(J)-MU(LS))/(ANG_GRID(J)-ANG_GRID(J+1))
-	    DIST(LS)=(1.0D0-T2)*ANG_VARIATION(J)+T2*ANG_VARIATION(J+1)
+	    DIST(LS)=(1.0_LDP-T2)*ANG_VARIATION(J)+T2*ANG_VARIATION(J+1)
 	  END DO
 	END IF
 !
@@ -146,14 +146,14 @@
 ! we always search from last frequency index, unless starting again.
 !
 	IF(FREQ .GT. NU_GRID(1) .OR. FREQ .LT. NU_GRID(NCF))THEN
-	  IBOUND=0.0D0
+	  IBOUND=0.0_LDP
 	ELSE
 	  DO WHILE(FREQ .LT. NU_GRID(CUR_NU_INDX+1))
 	    CUR_NU_INDX=CUR_NU_INDX+1
 	  END DO
 	  ML=CUR_NU_INDX
 	  T1=(NU_GRID(ML)-FREQ)/(NU_GRID(ML)-NU_GRID(ML+1))
-	  T2=(1.0D0-T1)*INTENSITY(ML)+T1*INTENSITY(ML+1)
+	  T2=(1.0_LDP-T1)*INTENSITY(ML)+T1*INTENSITY(ML+1)
 	  DO LS=1,NP	
 	    IBOUND(LS)=T2*DIST(LS)
 	  END DO

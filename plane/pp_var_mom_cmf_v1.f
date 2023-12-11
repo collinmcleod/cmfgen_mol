@@ -166,22 +166,22 @@
 !
 ! Zero relevant vectors and matrices.
 !
-	JNU=0.0D0; HNU=0.0D0
+	JNU=0.0_LDP; HNU=0.0_LDP
 	IF(INIT)THEN
-	  TX=0.0D0; TVX=0.0D0
-	  JNUM1=0.0D0; HNUM1=0.0D0
-	  GAM=0.0D0; GAMH=0.0D0
-	  W=0.0D0; WPREV=0.0D0
-	  PSI=0.0D0; PSIPREV=0.0D0
-	  TX_DIF_d_T=0.0D0; TX_DIF_d_dTdR=0.0D0
-	  EPS=0.0D0; EPS_PREV=0.0D0
-	  dN_INCID=0.0D0
+	  TX=0.0_LDP; TVX=0.0_LDP
+	  JNUM1=0.0_LDP; HNUM1=0.0_LDP
+	  GAM=0.0_LDP; GAMH=0.0_LDP
+	  W=0.0_LDP; WPREV=0.0_LDP
+	  PSI=0.0_LDP; PSIPREV=0.0_LDP
+	  TX_DIF_d_T=0.0_LDP; TX_DIF_d_dTdR=0.0_LDP
+	  EPS=0.0_LDP; EPS_PREV=0.0_LDP
+	  dN_INCID=0.0_LDP
 	END IF
 !
 	DO I=1,ND
 	  SOURCE(I)=ETA(I)/CHI(I)
 	END DO
-	THETA=0.0D0
+	THETA=0.0_LDP
 	IF(COHERENT)THETA=ESEC/CHI
 !
 ! Compute dCHIdZ and then compute the optical depth scale.
@@ -191,7 +191,7 @@
 	CALL DERIVCHI(TB,CHI,R,ND,METHOD)
 	CALL NORDTAU(DTAU,CHI,R,R,TB,ND)
 	DO I=2,ND-1
-	  MID_DTAU(I)=0.5D0*(DTAU(I-1)+DTAU(I))
+	  MID_DTAU(I)=0.5_LDP*(DTAU(I-1)+DTAU(I))
 	END DO
 	CALL d_DERIVCHI_dCHI(TB,CHI,R,ND,METHOD)
 !
@@ -209,26 +209,26 @@
 !
 	IF(.NOT. INIT)THEN
 	  DO I=1,ND-1
-	    AV_SIGMA=0.5D0*(SIGMA(I)+SIGMA(I+1))
-	    GAMH(I)=2.0D0*3.33564D-06*(V(I)+V(I+1))/(R(I)+R(I+1))
+	    AV_SIGMA=0.5_LDP*(SIGMA(I)+SIGMA(I+1))
+	    GAMH(I)=2.0_LDP*3.33564E-06_LDP*(V(I)+V(I+1))/(R(I)+R(I+1))
 	1         /dLOG_NU/(CHI(I)+CHI(I+1))
-	    W(I)=GAMH(I)*(1.0D0+AV_SIGMA)*G(I)
-	    WPREV(I)=GAMH(I)*(1.0D0+AV_SIGMA)*G_PREV(I)
-	    EPS(I)=GAMH(I)*(1.0D0+AV_SIGMA)*N_ON_J(I)/(1.0D0+W(I))
-	    EPS_PREV(I)=GAMH(I)*(1.0D0+AV_SIGMA)*N_ON_J_PREV(I)/(1.0D0+W(I))
+	    W(I)=GAMH(I)*(1.0_LDP+AV_SIGMA)*G(I)
+	    WPREV(I)=GAMH(I)*(1.0_LDP+AV_SIGMA)*G_PREV(I)
+	    EPS(I)=GAMH(I)*(1.0_LDP+AV_SIGMA)*N_ON_J(I)/(1.0_LDP+W(I))
+	    EPS_PREV(I)=GAMH(I)*(1.0_LDP+AV_SIGMA)*N_ON_J_PREV(I)/(1.0_LDP+W(I))
 	  END DO
 	  DO I=1,ND
-	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/dLOG_NU
+	    GAM(I)=3.33564E-06_LDP*V(I)/R(I)/CHI(I)/dLOG_NU
 	  END DO
 !
 ! PSIPREV is equivalent to the U vector of FORMSOL.
 !
-	  PSI(1)=GAM(1)*NBC*(1.0D0+SIGMA(1))
-	  PSIPREV(1)=GAM(1)*NBC_PREV*(1.0D0+SIGMA(1))
-	  dN_INCID=GAM(1)*(1.0D0+SIGMA(1))*(NBC_INCID-NBC_INCID_PREV)
+	  PSI(1)=GAM(1)*NBC*(1.0_LDP+SIGMA(1))
+	  PSIPREV(1)=GAM(1)*NBC_PREV*(1.0_LDP+SIGMA(1))
+	  dN_INCID=GAM(1)*(1.0_LDP+SIGMA(1))*(NBC_INCID-NBC_INCID_PREV)
 	  DO I=2,ND
-	    PSI(I)=MID_DTAU(I)*GAM(I)*(1.0D0+SIGMA(I))*F(I)
-	    PSIPREV(I)=MID_DTAU(I)*GAM(I)*(1.0D0+SIGMA(I))*F_PREV(I)
+	    PSI(I)=MID_DTAU(I)*GAM(I)*(1.0_LDP+SIGMA(I))*F(I)
+	    PSIPREV(I)=MID_DTAU(I)*GAM(I)*(1.0_LDP+SIGMA(I))*F_PREV(I)
 	  END DO
 	END IF
 !
@@ -237,9 +237,9 @@
 ! Compute vectors used to compute the flux vector H.
 !
 	DO I=1,ND-1
-	  HU(I)=F(I+1)/(1.0D0+W(I))/DTAU(I)
-	  HL(I)=F(I)/(1.0D0+W(I))/DTAU(I)
-	  HS(I)=WPREV(I)/(1.0D0+W(I))
+	  HU(I)=F(I+1)/(1.0_LDP+W(I))/DTAU(I)
+	  HL(I)=F(I)/(1.0_LDP+W(I))/DTAU(I)
+	  HS(I)=WPREV(I)/(1.0_LDP+W(I))
 	END DO
 !
 ! Compute the TRIDIAGONAL operators, and the RHS source vector.
@@ -247,7 +247,7 @@
 	DO I=2,ND-1
 	  TA(I)=-HL(I-1)-EPS(I-1)
 	  TC(I)=-HU(I)+EPS(I)
-	  TB(I)=MID_DTAU(I)*(1.0D0-THETA(I)) + PSI(I) +HU(I-1) +HL(I)
+	  TB(I)=MID_DTAU(I)*(1.0_LDP-THETA(I)) + PSI(I) +HU(I-1) +HL(I)
 	1             -EPS(I-1)+EPS(I)
 	  VB(I)=-HS(I-1)
 	  VC(I)=HS(I)
@@ -259,22 +259,22 @@
 	TC(1)=-F(2)/DTAU(1)
 	TB(1)=F(1)/DTAU(1) + HBC + PSI(1)
 	XM(1)=HBC_INCID + dN_INCID
-	TA(1)=0.0D0
-	VB(1)=0.0D0
-	VC(1)=0.0D0
+	TA(1)=0.0_LDP
+	VB(1)=0.0_LDP
+	VC(1)=0.0_LDP
 !
 	TA(ND)=-F(ND-1)/DTAU(ND-1)
 	IF(DIF)THEN
 	  TB(ND)=F(ND)/DTAU(ND-1)
-	  XM(ND)=DBB/3.0D0/CHI(ND)
+	  XM(ND)=DBB/3.0_LDP/CHI(ND)
 	ELSE
 	  TB(ND)=F(ND)/DTAU(ND-1)+IN_HBC
-	  XM(ND)=IC*(0.25D0+0.5D0*IN_HBC)
+	  XM(ND)=IC*(0.25_LDP+0.5_LDP*IN_HBC)
 	END IF
-	TC(ND)=0.0D0
-	VB(ND)=0.0D0
-	VC(ND)=0.0D0
-	PSIPREV(ND)=0.0D0
+	TC(ND)=0.0_LDP
+	VB(ND)=0.0_LDP
+	VC(ND)=0.0_LDP
+	PSIPREV(ND)=0.0_LDP
 !
 ! We create PSIPREV_MOD to save multiplications in the UP_TX_TVX routine/
 ! It is only different from PSIPREV when N_ON_J is non zero.
@@ -358,9 +358,9 @@
 	1          + ( EPS_PREV(I)*TX_OLD_d_dTdR(I+1)
 	1               - EPS_PREV(I-1)*TX_OLD_d_dTdR(I-1) )
 	  END DO
-	  TX_DIF_d_T(ND)=dDBBdT/3.0D0/CHI(ND) +
+	  TX_DIF_d_T(ND)=dDBBdT/3.0_LDP/CHI(ND) +
 	1                    PSIPREV(ND)*TX_DIF_d_T(ND)
-	  TX_DIF_d_dTdR(ND)=DBB/dTdR/3.0D0/CHI(ND) +
+	  TX_DIF_d_dTdR(ND)=DBB/dTdR/3.0_LDP/CHI(ND) +
 	1                    PSIPREV(ND)*TX_DIF_d_dTdR(ND)
 !
 ! Solve for the radiation field along ray for this frequency.

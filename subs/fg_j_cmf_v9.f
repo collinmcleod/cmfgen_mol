@@ -56,7 +56,7 @@
 	LOGICAL INSERT
 	LOGICAL FIRST_TIME
 	DATA FIRST_TIME/.TRUE./
-	DATA PREVIOUS_FREQ/0.0D0/
+	DATA PREVIOUS_FREQ/0.0_LDP/
 !
 !
 !***************************************************************************
@@ -432,13 +432,13 @@ C
 ! and between Z(NI-1) and  Z(NI-2).
 !
 	  IF(INSERT)THEN
-	    R_INS(:,:)=0.0D0
+	    R_INS(:,:)=0.0_LDP
 	    DO I=1,ND-1
 	      DEL_R=R(I)-R(I+1)
-	      R_INS(I,1)= R(I+1)+DEL_R/1.5D0
-	      R_INS(I,2)= R(I+1)+DEL_R/3.0D0
-	      R_INS(I,3)= R(I+1)+0.16D0*DEL_R		!4/25
-	      R_INS(I,4)= R(I+1)+0.04D0*DEL_R		!1/25
+	      R_INS(I,1)= R(I+1)+DEL_R/1.5_LDP
+	      R_INS(I,2)= R(I+1)+DEL_R/3.0_LDP
+	      R_INS(I,3)= R(I+1)+0.16_LDP*DEL_R		!4/25
+	      R_INS(I,4)= R(I+1)+0.04_LDP*DEL_R		!1/25
 	    END DO
 !
 ! Perform monotonic interpolations in V and SIGMA. the dCHIR... arrays are
@@ -450,20 +450,20 @@ C
 	1                   LFALSE,LFALSE,dCHIdR,dCHIdR_INS,LFALSE)
 	  END IF
 !
-	  FG_ERR_ON_FREQ(:)=0.0D0
+	  FG_ERR_ON_FREQ(:)=0.0_LDP
 	  FG_ERR_TYPE(:)=0
 	  FG _ERR_CNT=0
 	  IF(SOLUTION_METHOD .EQ. 'DIFFERENCE')THEN
-	    AV_PREV(:,:)=0.0D0
-	    CV_PREV(:,:)=0.0D0
+	    AV_PREV(:,:)=0.0_LDP
+	    CV_PREV(:,:)=0.0_LDP
           ELSE IF(SOLUTION_METHOD .EQ. 'INTEGRAL')THEN
-	    I_P_PREV(:,:)=0.0D0
-	    I_M_PREV(:,:)=0.0D0
+	    I_P_PREV(:,:)=0.0_LDP
+	    I_M_PREV(:,:)=0.0_LDP
 	  END IF
 !
 	  DO LS=1,NP
 	    MU_VAL(LS)=SQRT(R(1)*R(1)-P(LS)*P(LS))/R(1)
-	    IPLUS_P(LS)=0.0D0
+	    IPLUS_P(LS)=0.0_LDP
 	  END DO
 	  CALL HTRPWGT(MU_VAL,H_WGHTS,NP)
 	  CALL NTRPWGT(MU_VAL,N_WGHTS,NP)
@@ -474,13 +474,13 @@ C
 	    R_EXT(ND_ADD+I)=R(I)
 	  END DO
 	  IF(THK)THEN
-	    RMAX=10.0D0*R(1)
+	    RMAX=10.0_LDP*R(1)
 	    ALPHA=R(1)+(R(1)-R(2))
 	    DEL_R_FAC=EXP( LOG(RMAX/ALPHA)/(ND_ADD-3) )
 	    R_EXT(1)=RMAX
 	    R_EXT(4)=RMAX/DEL_R_FAC
-	    R_EXT(2)=R_EXT(1)-0.1*(R_EXT(1)-R_EXT(4))
-	    R_EXT(3)=R_EXT(1)-0.4*(R_EXT(1)-R_EXT(4))
+	    R_EXT(2)=R_EXT(1)-0.1_LDP*(R_EXT(1)-R_EXT(4))
+	    R_EXT(3)=R_EXT(1)-0.4_LDP*(R_EXT(1)-R_EXT(4))
 	    DO I=5,ND_ADD-1
 	      R_EXT(I)=R_EXT(I-1)/DEL_R_FAC
 	    END DO
@@ -492,11 +492,11 @@ C
 	  V_EXT(ND_ADD+1:ND_EXT)=V(1:ND)
 	  SIGMA_EXT(ND_ADD+1:ND_EXT)=SIGMA(1:ND)
 	  IF(THK)THEN
-	    BETA=(SIGMA(1)+1.0D0)*(R(1)/R(ND)-1.0D0)
+	    BETA=(SIGMA(1)+1.0_LDP)*(R(1)/R(ND)-1.0_LDP)
             VINF=V(1)/(1-R(ND)/R(1))**BETA
 	    DO I=1,ND_ADD
 	      V_EXT(I)=VINF*(1-R_EXT(ND_EXT)/R_EXT(I))**BETA
-	      SIGMA_EXT(I)=BETA/(R_EXT(I)/R_EXT(ND_EXT)-1.0D0)-1.0D0
+	      SIGMA_EXT(I)=BETA/(R_EXT(I)/R_EXT(ND_EXT)-1.0_LDP)-1.0_LDP
 	    END DO
 	  END IF
 !
@@ -604,14 +604,14 @@ C
 	    NI=NI_RAY(LS)
 	    DO I=1,NI_RAY(LS)
 	      MU=Z(I,LS)/R_RAY(I,LS)
-	      T1=3.33564D-06*V_RAY(I)/R_RAY(I,LS)
-	      GAM(I,LS)=T1*( 1.0D0+SIGMA_RAY(I)*(MU**2) )
+	      T1=3.33564E-06_LDP*V_RAY(I)/R_RAY(I,LS)
+	      GAM(I,LS)=T1*( 1.0_LDP+SIGMA_RAY(I)*(MU**2) )
 	    END DO
 !
 	    IF(SOLUTION_METHOD .EQ. 'INTEGRAL')THEN
 	      DO I=1,NI_RAY(LS)
 	        MU=Z(I,LS)/R_RAY(I,LS)
-	        T1=3.33564D-06*V_RAY(I)/R_RAY(I,LS)
+	        T1=3.33564E-06_LDP*V_RAY(I)/R_RAY(I,LS)
 	        dGAMdR(I,LS)=GAM(I,LS)*SIGMA_RAY(I)/R_RAY(I,LS)
 	        J=MAX(I-1,1); K=MIN(NI,I+1)
 	        dGAMdR(I,LS)=dGAMdR(I,LS)+T1*(MU**2)*
@@ -620,8 +620,8 @@ C
 	    ELSE IF(SOLUTION_METHOD .EQ. 'DIFFERENCE')THEN
 	      DO I=1,NI_RAY(LS)-1
 	        MU=(Z(I,LS)+Z(I+1,LS))/(R_RAY(I,LS)+R_RAY(I+1,LS))
-	        GAMH(I,LS)=(V_RAY(I+1)+V_RAY(I))*3.33564D-06*
-	1                   (  1.0D0+0.5D0*(MU**2)*
+	        GAMH(I,LS)=(V_RAY(I+1)+V_RAY(I))*3.33564E-06_LDP*
+	1                   (  1.0_LDP+0.5_LDP*(MU**2)*
 	1                   (SIGMA_RAY(I)+SIGMA_RAY(I+1))  )/
 	1                   (R_RAY(I,LS)+R_RAY(I+1,LS))
 	     END DO
@@ -680,7 +680,7 @@ C
 	IF(ND_ADD .NE. 0)THEN
 	  IF(CHI(1) .LE. ESEC(1) .OR. CHI(4) .LE. ESEC(4))THEN
 	    ESEC_POW=LOG(ESEC(4)/ESEC(1))/LOG(R(1)/R(4))
-	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
+	    IF(ESEC_POW .LT. 2._LDP)ESEC_POW=2
 	    DO I=1,ND_ADD
 	      CHI_EXT(I)=CHI(1)*(R(1)/R_EXT(I))**ESEC_POW
 	      dCHIdR(I)= -ESEC_POW*CHI_EXT(I)/R_EXT(I)
@@ -688,9 +688,9 @@ C
 	  ELSE
 	    ALPHA=LOG( (CHI(4)-ESEC(4)) / (CHI(1)-ESEC(1)) )
 	1          /LOG(R(1)/R(4))
-	    IF(ALPHA .LT. 2.)ALPHA=2.0
+	    IF(ALPHA .LT. 2._LDP)ALPHA=2.0
 	    ESEC_POW=LOG(ESEC(4)/ESEC(1))/LOG(R(1)/R(4))
-	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
+	    IF(ESEC_POW .LT. 2._LDP)ESEC_POW=2
    	    DO I=1,ND_ADD
 	      T1=(CHI(1)-ESEC(1))*(R(1)/R_EXT(I))**ALPHA
 	      T2=ESEC(1)*(R(1)/R_EXT(I))**ESEC_POW
@@ -706,7 +706,7 @@ C
 ! 3 we would get a logarithmic flux divergence as we increase the volume.
 !
 	  ALPHA=LOG(ETA(4)/ETA(1))/LOG(R(1)/R(4))
-	  IF(ALPHA .LT. 3.5)ALPHA=3.5
+	  IF(ALPHA .LT. 3.5_LDP)ALPHA=3.5
 	  DO I=1,ND_ADD
 	    ETA_EXT(I)=ETA(1)*(R(1)/R_EXT(I))**ALPHA
 	  END DO
@@ -738,8 +738,8 @@ C
 	1                   LFALSE,LFALSE,dCHIdR(ND_ADD+1),dCHIdR_INS,LTRUE)
 	  END IF
 	  IF(METHOD .EQ. 'ZERO')THEN
-	    dCHIdR(:)=0.0D0
-	    dCHIdR_INS(:,:)=0.0D0
+	    dCHIdR(:)=0.0_LDP
+	    dCHIdR_INS(:,:)=0.0_LDP
 	  END IF
 	ELSE
 	  CALL DERIVCHI(dCHIdR,CHI_EXT,R_EXT,ND_EXT,METHOD)
@@ -752,8 +752,8 @@ C
 !
 ! Zero AV and CV matrices.
 !
-	  AV(:,:)=0.0D0
-	  CV(:,:)=0.0D0
+	  AV(:,:)=0.0_LDP
+	  CV(:,:)=0.0_LDP
 !
 !	  CALL TUNE(1,'LS_LOOP')
 !
@@ -837,7 +837,7 @@ C
 ! equal zero at the model atmosphere boundary as a consequence of the
 ! extension.
 !
-	    IBOUND(LS)=0.0D0
+	    IBOUND(LS)=0.0_LDP
 !
 ! 
 ! By setting PF(1)=0 when evaluating SOURCE we ensure a pure continuum
@@ -845,24 +845,24 @@ C
 !
 	    IF(INIT)THEN
 	      DO I=1,NI
-	        Q(I)=0.0D0
-	        QH(I)=0.0D0
+	        Q(I)=0.0_LDP
+	        QH(I)=0.0_LDP
 	      END DO
 	      OLDCHI(LS)=CHI_RAY(NI)
 	    ELSE IF(NEW_FREQ)THEN
 	      DO I=1,NI-1
-	        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*dLOG_NU)
+	        QH(I)=GAMH(I,LS)*2.0_LDP/((CHI_RAY(I)+CHI_RAY(I+1))*dLOG_NU)
 	        Q(I)=GAM(I,LS)/(CHI_RAY(I)*dLOG_NU)
 	      END DO
-	      QH(NI)=0.0D0
+	      QH(NI)=0.0_LDP
 	      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)
 	    END IF
 !
 	    IF(DIF .AND. LS .LE. NC)THEN
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)	     !Q(NI)
 	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI_RAY(NI)
-	1            *(1.0D0+T1*(1.0D0-CHI_RAY(NI)/OLDCHI(LS)))
+	1            *(1.0_LDP+T1*(1.0_LDP-CHI_RAY(NI)/OLDCHI(LS)))
 	    END IF
 	    OLDCHI_STORE(LS)=CHI_RAY(NI)
 !
@@ -876,21 +876,21 @@ C
 	      IF(METHOD .EQ. 'ZERO')THEN
 	        DO I=1,NI-1
 	          dZ=Z(I,LS)-Z(I+1,LS)
-	          DTAU(I,LS)=0.5D0*(CHI_RAY(I)+CHI_RAY(I+1))*dZ
+	          DTAU(I,LS)=0.5_LDP*(CHI_RAY(I)+CHI_RAY(I+1))*dZ
 	        END DO
 	      ELSE IF(INSERT .OR. METHOD(4:6) .EQ. 'MON')THEN
 	        DO I=1,NI-1
 	          dZ=Z(I,LS)-Z(I+1,LS)
-	          DTAU(I,LS)=0.5D0*dZ*( CHI_RAY(I)+CHI_RAY(I+1) +
+	          DTAU(I,LS)=0.5_LDP*dZ*( CHI_RAY(I)+CHI_RAY(I+1) +
 	1            dZ*( dCHIdR_RAY(I+1)*Z(I+1,LS)/R_RAY(I+1,LS) -
-	1            dCHIdR_RAY(I)*Z(I,LS)/R_RAY(I,LS) )/6.0D0 )
+	1            dCHIdR_RAY(I)*Z(I,LS)/R_RAY(I,LS) )/6.0_LDP )
 	        END DO
 	      ELSE
 	        DO I=1,NI-1
 	          dZ=Z(I,LS)-Z(I+1,LS)
-	          DTAU(I,LS)=0.5D0*dZ*( CHI_RAY(I)+CHI_RAY(I+1) +
+	          DTAU(I,LS)=0.5_LDP*dZ*( CHI_RAY(I)+CHI_RAY(I+1) +
 	1            dZ*( dCHIdR_RAY(I+1)*Z(I+1,LS)/R_RAY(I+1,LS) -
-	1            dCHIdR_RAY(I)*Z(I,LS)/R_RAY(I,LS) )/6.0D0 )
+	1            dCHIdR_RAY(I)*Z(I,LS)/R_RAY(I,LS) )/6.0_LDP )
 	          IF( CHI_RAY(I) .LT. CHI_RAY(I+1) )THEN
 	            DTAU(I,LS)=MAX(CHI_RAY(I)*dZ,DTAU(I,LS))
 	            DTAU(I,LS)=MIN(CHI_RAY(I+1)*dZ,DTAU(I,LS))
@@ -918,24 +918,24 @@ C
 	      PAR_AV(NI,LS)=U(NI)*AV_PREV(NI,LS)-VB(NI)*CV_PREV(NI-1,LS)
 !
 	      TC(NI,LS)=0				!As used.
-	      DIV(1)=1.0/(TC(1,LS)+TB(1,LS))
+	      DIV(1)=1.0_LDP/(TC(1,LS)+TB(1,LS))
 	      TC(1,LS)=TC(1,LS)*DIV(1)
 	      TB(1,LS)=TB(1,LS)*DIV(1)
 	      DO I=2,NI
-	        DIV(I)=1.0D0/(TA(I,LS)*TB(I-1,LS)+TB(I,LS)+TC(I,LS))
+	        DIV(I)=1.0_LDP/(TA(I,LS)*TB(I-1,LS)+TB(I,LS)+TC(I,LS))
 	        TB(I,LS)=(TA(I,LS)*TB(I-1,LS)+TB(I,LS))*DIV(I)
 	        TC(I,LS)=TC(I,LS)*DIV(I)
 	      END DO
 	      TB(1:NI,LS)=DIV(1:NI)
 	    ELSE
 !
-	      XM(1)=0.0D0
+	      XM(1)=0.0_LDP
 	      DO I=2,NI-1
-	        XM(I)=-0.5D0*SOURCE_RAY(I)*(DTAU(I-1,LS)+DTAU(I,LS))
+	        XM(I)=-0.5_LDP*SOURCE_RAY(I)*(DTAU(I-1,LS)+DTAU(I,LS))
 	      END DO
 !
 	      IF(LS .GT. NC)THEN
-	        XM(NI)=0.5*DTAU(NI-1,LS)*SOURCE_RAY(NI)
+	        XM(NI)=0.5_LDP*DTAU(NI-1,LS)*SOURCE_RAY(NI)
 	      ELSE IF(DIF)THEN
 	        XM(NI)=DBC
 	      ELSE
@@ -1022,9 +1022,9 @@ C
 !
 	    K=2
 	    DO I=1,NI
-	      T1=1.0D-08*ABS(AV(K,LS))
+	      T1=1.0E-08_LDP*ABS(AV(K,LS))
 	      IF(AV(I,LS) .LE. T1)THEN
-	        AV(I,LS)=MAX(0.01D0*ABS(AV(I,LS)),T1)
+	        AV(I,LS)=MAX(0.01_LDP*ABS(AV(I,LS)),T1)
 	        NEG_AV_VALUE=.TRUE.
 	      ELSE
 	        K=K+1
@@ -1043,9 +1043,9 @@ C
 	    IF(ND_ADD .EQ. 0)THEN
 	      CV_BOUND(LS)=AV(1,LS)-IBOUND(LS)
 	    ELSE IF(NI .EQ. ND_ADD+1)THEN
-	      CV_BOUND(LS)=0.0D0
+	      CV_BOUND(LS)=0.0_LDP
 	    ELSE
-	      CV_BOUND(LS)=0.5D0*(CV(ND_ADD+1,LS)+CV(ND_ADD,LS))
+	      CV_BOUND(LS)=0.5_LDP*(CV(ND_ADD+1,LS)+CV(ND_ADD,LS))
 	    END IF
 	    I_M_IN_BND(LS)=AV(NI,LS)-(AV(NI,LS)-AV(NI-1,LS))/DTAU(NI-1,LS)
 	  END DO
@@ -1146,7 +1146,7 @@ C
 ! calculation for the first frequency.
 !
 	    IF(INIT)THEN
-	      Q(1:NI)=0.0D0
+	      Q(1:NI)=0.0_LDP
 	      SOURCE_RAY(1:NI)=ETA_RAY(1:NI)/CHI_RAY(1:NI)
 	    ELSE
 	      Q(1:NI)=GAM(1:NI,LS)/dLOG_NU
@@ -1170,14 +1170,14 @@ C
 	      IF(METHOD .EQ. 'ZERO')THEN
 	        DO I=1,NI-1
 	          dZ=Z(I,LS)-Z(I+1,LS)
-	          DTAU(I,LS)=0.5D0*(CHI_RAY(I)+CHI_RAY(I+1))*dZ
+	          DTAU(I,LS)=0.5_LDP*(CHI_RAY(I)+CHI_RAY(I+1))*dZ
 	        END DO
 	      ELSE
 	        DO I=1,NI-1
 	          dZ=Z(I,LS)-Z(I+1,LS)
-	          DTAU(I,LS)=0.5D0*dZ*( CHI_RAY(I)+CHI_RAY(I+1) +
+	          DTAU(I,LS)=0.5_LDP*dZ*( CHI_RAY(I)+CHI_RAY(I+1) +
 	1            dZ*( dCHIdR_RAY(I+1)*Z(I+1,LS)/R_RAY(I+1,LS) -
-	1            dCHIdR_RAY(I)*Z(I,LS)/R_RAY(I,LS) )/6.0D0 )
+	1            dCHIdR_RAY(I)*Z(I,LS)/R_RAY(I,LS) )/6.0_LDP )
 	          IF( CHI_RAY(I) .LT. CHI_RAY(I+1) )THEN
 	            DTAU(I,LS)=MAX(CHI_RAY(I)*dZ,DTAU(I,LS))
 	            DTAU(I,LS)=MIN(CHI_RAY(I+1)*dZ,DTAU(I,LS))
@@ -1196,35 +1196,35 @@ C
 	      DO I=1,NI-1
 	        T1=DTAU(I,LS)
 	        EE(I)=EXP(-T1)
-	        IF(T1 .GT. 0.5)THEN
-	          E0(I)=1.0D0-EE(I)
-	          E1(I)=1.0D0-E0(I)/T1
-	          E2(I)=1.0D0-2.0D0*E1(I)/T1
-	          E3(I)=1.0D0-3.0D0*E2(I)/T1
-	        ELSE IF(T1 .GT. 0.1)THEN
-	          E3(I)=0.25D0*T1*( 1.0D0-0.20*T1*
-	1               (1.0D0-T1/6.0D0*(1.0D0-T1/7.0D0*
-	1               (1.0D0-T1/8.0D0*(1.0D0-T1/9.0D0*
-	1               (1.0D0-T1/10.0D0*(1.0D0-T1/11.0D0*
-	1               (1.0D0-T1/12.0D0*(1.0D0-T1/13.0D0)))))))) )
-	          E2(I)=T1*( 1.0D0-E3(I) )/3.0D0
-	          E1(I)=T1*( 1.0D0-E2(I) )/2.0D0
-	          E0(I)=T1*( 1.0D0-E1(I) )
+	        IF(T1 .GT. 0.5_LDP)THEN
+	          E0(I)=1.0_LDP-EE(I)
+	          E1(I)=1.0_LDP-E0(I)/T1
+	          E2(I)=1.0_LDP-2.0_LDP*E1(I)/T1
+	          E3(I)=1.0_LDP-3.0_LDP*E2(I)/T1
+	        ELSE IF(T1 .GT. 0.1_LDP)THEN
+	          E3(I)=0.25_LDP*T1*( 1.0_LDP-0.20_LDP*T1*
+	1               (1.0_LDP-T1/6.0_LDP*(1.0_LDP-T1/7.0_LDP*
+	1               (1.0_LDP-T1/8.0_LDP*(1.0_LDP-T1/9.0_LDP*
+	1               (1.0_LDP-T1/10.0_LDP*(1.0_LDP-T1/11.0_LDP*
+	1               (1.0_LDP-T1/12.0_LDP*(1.0_LDP-T1/13.0_LDP)))))))) )
+	          E2(I)=T1*( 1.0_LDP-E3(I) )/3.0_LDP
+	          E1(I)=T1*( 1.0_LDP-E2(I) )/2.0_LDP
+	          E0(I)=T1*( 1.0_LDP-E1(I) )
 	        ELSE
-	          E3(I)=0.25D0*T1*( 1.0D0-0.20*T1*
-	1               (1.0D0-T1/6.0D0*(1.0D0-T1/7.0D0*
-	1               (1.0D0-T1/8.0D0*(1.0D0-T1/9.0D0) ))))
-	          E2(I)=T1*( 1.0D0-E3(I) )/3.0D0
-	          E1(I)=T1*( 1.0D0-E2(I) )/2.0d0
-	          E0(I)=T1*( 1.0D0-E1(I) )
+	          E3(I)=0.25_LDP*T1*( 1.0_LDP-0.20_LDP*T1*
+	1               (1.0_LDP-T1/6.0_LDP*(1.0_LDP-T1/7.0_LDP*
+	1               (1.0_LDP-T1/8.0_LDP*(1.0_LDP-T1/9.0_LDP) ))))
+	          E2(I)=T1*( 1.0_LDP-E3(I) )/3.0_LDP
+	          E1(I)=T1*( 1.0_LDP-E2(I) )/2.0_LDP
+	          E0(I)=T1*( 1.0_LDP-E1(I) )
 	        END IF
 	      END DO
 !
               DO I=1,NI-1
 	        A0(I,LS)=EE(I)
-	        A1(I,LS)=E0(I)-3.0D0*E2(I)+2.0D0*E3(I)
-	        A2(I,LS)=3.0D0*E2(I)-2.0D0*E3(I)
-	        A3(I,LS)=DTAU(I,LS)*(E1(I)-2.0D0*E2(I)+E3(I))
+	        A1(I,LS)=E0(I)-3.0_LDP*E2(I)+2.0_LDP*E3(I)
+	        A2(I,LS)=3.0_LDP*E2(I)-2.0_LDP*E3(I)
+	        A3(I,LS)=DTAU(I,LS)*(E1(I)-2.0_LDP*E2(I)+E3(I))
 	        A4(I,LS)=DTAU(I,LS)*(E3(I)-E2(I))
 	      END DO
 	    END IF
@@ -1252,15 +1252,15 @@ C
 ! Adjust first derivatives so that function is monotonic  in each interval.
 !
 	    dS(1)=( SIGN(ONE,S(1))+SIGN(ONE,dS(1)) )*
-	1                      MIN(ABS(S(1)),0.5*ABS(dS(1)))
+	1                      MIN(ABS(S(1)),0.5_LDP*ABS(dS(1)))
 	    DO I=2,NI-1
 	      dS(I)=( SIGN(ONE,S(I-1))+SIGN(ONE,S(I)) )*
-	1               MIN(ABS(S(I-1)),ABS(S(I)),0.5*ABS(dS(I)))
+	1               MIN(ABS(S(I-1)),ABS(S(I)),0.5_LDP*ABS(dS(I)))
 	    END DO
 	    dS(NI)=( SIGN(ONE,S(NI-1))+SIGN(ONE,dS(NI)) )*
-	1               MIN(ABS(S(NI-1)),0.5*ABS(dS(NI)))
+	1               MIN(ABS(S(NI-1)),0.5_LDP*ABS(dS(NI)))
 !
-            I_M(1,LS)=0.0D0
+            I_M(1,LS)=0.0_LDP
 	    DO I=1,NI-1
 	      I_M(I+1,LS)=I_M(I,LS)*A0(I,LS)+ (
 	1             SOURCE_PRIME(I)*A1(I,LS)
@@ -1292,13 +1292,13 @@ C
 ! Adjust the first derivatives so that function is monotonic in each interval.
 !
 	    dS(1)=( SIGN(ONE,S(1))+SIGN(ONE,dS(1)) )*
-	1                      MIN(ABS(S(1)),0.5*ABS(dS(1)))
+	1                      MIN(ABS(S(1)),0.5_LDP*ABS(dS(1)))
 	    DO I=2,NI-1
 	      dS(I)=( SIGN(ONE,S(I-1))+SIGN(ONE,S(I)) )*
-	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5*ABS(dS(I)))
+	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5_LDP*ABS(dS(I)))
 	    END DO
 	    dS(NI)=( SIGN(ONE,S(NI-1))+SIGN(ONE,dS(NI)) )*
-	1            MIN(ABS(S(NI-1)),0.5*ABS(dS(NI)))
+	1            MIN(ABS(S(NI-1)),0.5_LDP*ABS(dS(NI)))
 !
 	    IF(LS .LE. NC)THEN
 	      I_P(NI,LS)=I_CORE
@@ -1316,11 +1316,11 @@ C
 C Note that V=AV(1)-IBOUND.
 C
 	    IF(ND_ADD .EQ. 0)THEN
-	       CV_BOUND(LS)=0.5D0*(I_P(1,LS)-I_M(1,LS))
+	       CV_BOUND(LS)=0.5_LDP*(I_P(1,LS)-I_M(1,LS))
 	    ELSE IF(NI .EQ. ND_ADD+1)THEN
-	       CV_BOUND(LS)=0.0D0
+	       CV_BOUND(LS)=0.0_LDP
 	    ELSE
-	       CV_BOUND(LS)=0.5D0*(I_P(ND_ADD+1,LS)-I_M(ND_ADD+1,LS))
+	       CV_BOUND(LS)=0.5_LDP*(I_P(ND_ADD+1,LS)-I_M(ND_ADD+1,LS))
 	    END IF
 	    I_M_IN_BND(LS)=I_M(NI,LS)
 	  END DO			!LS
@@ -1330,7 +1330,7 @@ C
 !
 	  DO LS=1,NP
 	    DO I=1,NI_RAY(LS)
-	      AV(I,LS)=0.5D0*( I_P(I,LS)+I_M(I,LS) )
+	      AV(I,LS)=0.5_LDP*( I_P(I,LS)+I_M(I,LS) )
 	    END DO
 	  END DO
 !
@@ -1338,7 +1338,7 @@ C
 !
 	  DO LS=1,NP
 	    DO I=1,NI_RAY(LS)-1
-	      CV(I,LS)= 0.25D0*(  (I_P(I+1,LS)-I_M(I+1,LS)) +
+	      CV(I,LS)= 0.25_LDP*(  (I_P(I+1,LS)-I_M(I+1,LS)) +
 	1                         (I_P(I,LS)-I_M(I,LS))  )
 	    END DO
 	  END DO
@@ -1355,17 +1355,17 @@ C
 !
 ! Zero boundary conditions.
 !
-	HBC=0.0D0			!H/J at model outer boundary.
-	NBC=0.0D0			!N/J at model outer boundary.
-	IN_HBC=0.0D0
+	HBC=0.0_LDP			!H/J at model outer boundary.
+	NBC=0.0_LDP			!N/J at model outer boundary.
+	IN_HBC=0.0_LDP
 !
 ! Initialize intensity matrices.
 !
-	JNU(:)=0.0D0			!1:ND
-	HNU(:)=0.0D0
-	KNU(:)=0.0D0
-	NNU(:)=0.0D0
-	RSQN_ON_RSQJ(:)=0.0D0
+	JNU(:)=0.0_LDP			!1:ND
+	HNU(:)=0.0_LDP
+	KNU(:)=0.0_LDP
+	NNU(:)=0.0_LDP
+	RSQN_ON_RSQJ(:)=0.0_LDP
 !
 !	CALL TUNE(1,'J_LOOP')
 	DO LS=1,NP
@@ -1444,7 +1444,7 @@ C
 !
 	  HBC=HBC+CV_BOUND(LS)*H_WGHTS(LS)
 	  NBC=NBC+CV_BOUND(LS)*N_WGHTS(LS)
-	  IPLUS_P(LS)=2.0D0*CV_BOUND(LS)          !To compute observed flux
+	  IPLUS_P(LS)=2.0_LDP*CV_BOUND(LS)          !To compute observed flux
 !
 	  IF(LS .LE. NC+1)THEN
 	    IN_HBC=IN_HBC + JQW(ND,LS)*I_M_IN_BND(LS)*Z(NI,LS)/R_RAY(NI,LS)
@@ -1459,7 +1459,7 @@ C
 !
 	HBC=HBC/JNU(1)
 	NBC=NBC/JNU(1)
-	IN_HBC=IN_HBC/(2.0D0*JNU(ND)-IC)
+	IN_HBC=IN_HBC/(2.0_LDP*JNU(ND)-IC)
 !
 ! Compute the Eddington F and G factors, which are defined by
 ! F=K/J and G=N/H. The F and G factors are returned in KNU and NNU
@@ -1475,10 +1475,10 @@ C
 !
 	IF(N_TYPE .EQ. 'N_ON_J')THEN
 	  DO I=1,ND-1
-	    ALPHA=0.25D0*(R(I)+R(I+1))*(R(I)+R(I+1))
+	    ALPHA=0.25_LDP*(R(I)+R(I+1))*(R(I)+R(I+1))
 	    RSQN_ON_RSQJ(I)=ALPHA*NNU(I)/
 	1                  (R(I)*R(I)*JNU(I)+R(I+1)*R(I+1)*JNU(I+1))
-	    NNU(I)=0.0D0
+	    NNU(I)=0.0_LDP
 	  END DO
 	ELSE IF(N_TYPE .EQ. 'MIXED')THEN
 !	  NNU(1)=NNU(1)/HNU(1)
@@ -1486,13 +1486,13 @@ C
 	    IF(HNU(I) .NE. 0)THEN
 	      T1=NNU(I)/HNU(I)
 	    ELSE
-	      T1=100.0D0
+	      T1=100.0_LDP
 	    END IF
-	    IF(T1 .GT. 1.1 .OR. T1 .LT. 0.05)THEN
-	      ALPHA=0.25D0*(R(I)+R(I+1))*(R(I)+R(I+1))
+	    IF(T1 .GT. 1.1_LDP .OR. T1 .LT. 0.05_LDP)THEN
+	      ALPHA=0.25_LDP*(R(I)+R(I+1))*(R(I)+R(I+1))
 	      RSQN_ON_RSQJ(I)=ALPHA*NNU(I)/
 	1                  (R(I)*R(I)*JNU(I)+R(I+1)*R(I+1)*JNU(I+1))
-	      NNU(I)=0.0D0
+	      NNU(I)=0.0_LDP
 	    ELSE
 	      NNU(I)=T1
 	    END IF
@@ -1505,7 +1505,7 @@ C
 	    IF(HNU(I) .NE. 0)THEN
 	      NNU(I)=NNU(I)/HNU(I)
 	    ELSE
-	      NNU(I)=0.0D0		!Later replaced by average.
+	      NNU(I)=0.0_LDP		!Later replaced by average.
 	      J=ERROR_LU()
 	      WRITE(J,'(1X,A,1PE16.8)')'HNU zero for frequency:',FREQ
 	      WRITE(J,'(1X,A,I4)')'Error occurred at depth:',I
@@ -1516,12 +1516,12 @@ C
 ! occurring because H is near zero (switching sign?).
 !
 	  DO I=1,ND-1
-	    IF(NNU(I) .GT. 1.0D0)THEN
+	    IF(NNU(I) .GT. 1.0_LDP)THEN
               BAD_NNU_VALUE=.TRUE.
-	      NNU(I)=1.0D0
-	    ELSE IF( NNU(I) .LT. 0.01) THEN
+	      NNU(I)=1.0_LDP
+	    ELSE IF( NNU(I) .LT. 0.01_LDP) THEN
 	      NEG_NNU_VALUE=.TRUE.
-	      NNU(I)=0.01
+	      NNU(I)=0.01_LDP
 	    END IF
 	  END DO
 	ELSE

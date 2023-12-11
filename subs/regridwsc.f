@@ -114,10 +114,10 @@ C
 C
 C Using the highest level read in, decide whether b, or b-1 have been read in.
 C
-	ADD1=0.0D0
-	IF( ABS( TA(NOLD) ) .LT. 0.2 )ADD1=1.0D0
+	ADD1=0.0_LDP
+	IF( ABS( TA(NOLD) ) .LT. 0.2_LDP )ADD1=1.0_LDP
 C
-	IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN
+	IF(ABS(OLDR(NDOLD)/R(ND)-1.0_LDP) .GT. 0.0001_LDP)THEN
 	  WRITE(LUER,*)'Warning - core radius not identical in REGRIDWSC'
 	  WRITE(LUER,*)'Rescaling to make Rcore identical'
 	  DO I=1,NDOLD
@@ -186,13 +186,13 @@ C
 C We first compute the excitation temperature on level NZ.
 C
 	    TX=T(I)
-	    DELTA_T=10.0D0
+	    DELTA_T=10.0_LDP
 	    COUNT=0
-	    DO WHILE( ABS(DELTA_T) .GT. 1.0E-06 .AND. COUNT .LT. 100 )
-	      T1=( (T(I)/TX)**(1.5) )*EXP(HDKT*EDGE(NZ)*(T(I)-TX)/T(I)/TX)
+	    DO WHILE( ABS(DELTA_T) .GT. 1.0E-06_LDP .AND. COUNT .LT. 100 )
+	      T1=( (T(I)/TX)**(1.5_LDP) )*EXP(HDKT*EDGE(NZ)*(T(I)-TX)/T(I)/TX)
 	      COUNT=COUNT+1
-	      DELTA_T= (DHEN(NZ,I)-T1)*TX/T1/(1.0D0+HDKT*EDGE(NZ)/TX)
-	      IF(ABS(DELTA_T) .GT. 0.8*TX)DELTA_T=0.5D0*DELTA_T
+	      DELTA_T= (DHEN(NZ,I)-T1)*TX/T1/(1.0_LDP+HDKT*EDGE(NZ)/TX)
+	      IF(ABS(DELTA_T) .GT. 0.8_LDP*TX)DELTA_T=0.5_LDP*DELTA_T
 	      TX=TX-DELTA_T
 	    END DO
 	    IF(COUNT .EQ. 100)THEN

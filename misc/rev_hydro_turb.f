@@ -83,7 +83,7 @@
 	LOGICAL OLD_FORMAT
 	LOGICAL PLANE_PARALLEL
 !
-	GRAV_CON=1.0D-20*GRAVITATIONAL_CONSTANT()*MASS_SUN()
+	GRAV_CON=1.0E-20_LDP*GRAVITATIONAL_CONSTANT()*MASS_SUN()
 !
 	ND=0
 	FILENAME='MODEL_SPEC'
@@ -129,7 +129,7 @@
 	1                   '    g_RAD',
 	1                    '   g_ELEC','Gamma','M(t)','E/G_RAD'
 !
-	MASS_OLD=0.0D0
+	MASS_OLD=0.0_LDP
 	DO I=ND+1,NSTR
 	  IF(INDEX(STRING(I),'urface gravity is:') .NE. 0)THEN
 	    J=INDEX(STRING(I),':')
@@ -153,13 +153,13 @@
 	CALL GEN_IN(MASS_NEW,'New mass in solar units')
 	GSUR_NEW=GSUR_OLD*MASS_NEW/MASS_OLD
 !
-        VTURB=0.0D0; CALL GEN_IN(VTURB,'Turbulent velcity in km/s)')
+        VTURB=0.0_LDP; CALL GEN_IN(VTURB,'Turbulent velcity in km/s)')
         LOW_LIM=1; CALL GEN_IN(LOW_LIM,'Depth to begin revised mass estimate')
         HIGH_LIM=ND; CALL GEN_IN(HIGH_LIM,'Depth to end revised mass estimate')
 !
 	READ(STRING(2),*)T1
 	PLANE_PARALLEL=.FALSE.
-	IF(T1/RND .LT. 1.5D0)PLANE_PARALLEL=.TRUE.
+	IF(T1/RND .LT. 1.5_LDP)PLANE_PARALLEL=.TRUE.
 	CALL GEN_IN(PLANE_PARALLEL,'Plane paraellel model?')
 !
         SUM_ERROR=0
@@ -168,7 +168,7 @@
 	IF(INDEX(STRING(1),'dTPdR/ROH') .NE. 0)OLD_FORMAT=.FALSE.
 	DO I=1,ND
 	  IF(OLD_FORMAT)THEN
-	    dTPdR=0.0D0
+	    dTPdR=0.0_LDP
 	    READ(STRING(I+1),*)R,V,E,VdVdR,dPdR,g_TOT,g_RAD,g_ELEC,Gamma
 	  ELSE
 	    READ(STRING(I+1),*)R,V,E,VdVdR,dPdR,dTPdR,g_TOT,g_RAD,g_ELEC,Gamma
@@ -178,28 +178,28 @@
 	  P_GRAV(I)=MASS_NEW*GRAV_CON/RSQ
 	  g_TOT=g_RAD-P_GRAV(I)
 	  Gamma=g_RAD/P_GRAV(I)
-	  IF(VTURB .NE. 0.0D0)THEN
-	    dTPdR=-0.5D0*VTURB*VTURB*(2.0D0/R+VdVdR/V/V)
+	  IF(VTURB .NE. 0.0_LDP)THEN
+	    dTPdR=-0.5_LDP*VTURB*VTURB*(2.0_LDP/R+VdVdR/V/V)
 	  END IF
           DENOM=ABS(VdVdR)+ ABS(dPdR)+ ABS(dTPdR)+ABS(P_GRAV(I))+ABS(G_RAD) !ABS(g_TOT))
-          E=200.0D0*(VdVdR+dPdR+dTPdR-g_TOT)/DENOM
-          E_ON_GRAD=100.0D0*(VdVdR+dPdR+dTPdR-g_TOT)/G_RAD
-          MT=g_rad/g_elec-1.0D0
+          E=200.0_LDP*(VdVdR+dPdR+dTPdR-g_TOT)/DENOM
+          E_ON_GRAD=100.0_LDP*(VdVdR+dPdR+dTPdR-g_TOT)/G_RAD
+          MT=g_rad/g_elec-1.0_LDP
           IF(I .GE. LOW_LIM .AND. I .LE. HIGH_LIM)THEN
-            SUM_ERROR=SUM_ERROR+0.005*E/R**2/DENOM
+            SUM_ERROR=SUM_ERROR+0.005_LDP*E/R**2/DENOM
             SUM_R=SUM_R+GRAV_CON/R**4/DENOM**2
           END IF
 !
 	  P_R(I)=R
 	  P_VEL(I)=V
 	  P_dPdR(I)=dPdR
-	  P_dVdR(I)=1.0D-05*VdVdR/V
+	  P_dVdR(I)=1.0E-05_LDP*VdVdR/V
 	  P_REQ(I)=VdVdR+dPdR+dTPdR+P_GRAV(I)              !GSUR_NEW*(RND/R)**2
 	  P_GRAD(I)=g_RAD
 	  P_GELEC(I)=g_ELEC
 	  P_GTOT(I)=g_TOT
 !
-	  IF(R .GT. 9.99E+04)THEN
+	  IF(R .GT. 9.99E+04_LDP)THEN
 	    FMT='(1X,ES12.6,ES13.4,F9.2,6(ES14.4),2F11.2)'
 	  ELSE
 	    FMT='(1X,F12.6,ES13.4,F9.2,6(ES14.4),3F11.3)'
@@ -269,7 +269,7 @@ C
 	  XLAB='V(km/s)'
 !
 	ELSE IF(XOPT .EQ. 'XDVDR')THEN
-	  XVEC(1:ND)=1000.0D0*P_dVdR(1:ND)
+	  XVEC(1:ND)=1000.0_LDP*P_dVdR(1:ND)
 	  XLAB='dVdR(ks\u-1\d)'
 !
 	ELSE IF(XOPT .EQ. 'XT')THEN
@@ -287,7 +287,7 @@ C
 	  END DO
 	  READ(LU_IN,*)(ED(I),I=1,ND)
           CLOSE(LU_IN)
-	  XVEC(1:ND)=ED(1:ND)*6.65D-25*10.0D+05/P_dVdR(1:ND)
+	  XVEC(1:ND)=ED(1:ND)*6.65E-25_LDP*10.0E+05_LDP/P_dVdR(1:ND)
 	  XLAB='t'
 !
 	ELSE IF(XOPT .EQ. 'XR')THEN
@@ -302,29 +302,29 @@ C
 !
 	ELSE IF(XOPT .EQ. 'INT')THEN
 	  I=0
-	  T1=0.0D0
-	  DO WHILE(P_VEL(I+1) .GT. 30.0D0)
+	  T1=0.0_LDP
+	  DO WHILE(P_VEL(I+1) .GT. 30.0_LDP)
 	    I=I+1
 	    XVEC(I)=P_R(I)
-	    YVEC(I)=(2.00*P_GRAD(I)+(1.0D0-T1)*P_GRAD(I))/P_VEL(I)/3.0D0
-	    ZVEC(I)=(P_GRAV(I)-T1*P_GRAD(I)/3.0D0)/P_VEL(I)
+	    YVEC(I)=(2.00_LDP*P_GRAD(I)+(1.0_LDP-T1)*P_GRAD(I))/P_VEL(I)/3.0_LDP
+	    ZVEC(I)=(P_GRAV(I)-T1*P_GRAD(I)/3.0_LDP)/P_VEL(I)
 	    WRITE(6,'(I5,4ES14.6)')I,P_GRAV(I),P_GRAD(I),YVEC(I),ZVEC(I)
 	  END DO
 !
-	  T1=0.0D0; T2=0.0D0
+	  T1=0.0_LDP; T2=0.0_LDP
 	  DO J=1,I-1
 	    T1=T1+(XVEC(J)-XVEC(J+1))*(YVEC(J)+YVEC(J+1)) 	
 	    T2=T2+(XVEC(J)-XVEC(J+1))*(ZVEC(J)+ZVEC(J+1)) 	
 	  END DO
-	  T1=0.5D0*T1; T2=0.5D0*T2
+	  T1=0.5_LDP*T1; T2=0.5_LDP*T2
 	  WRITE(6,*)T1,T2
 	  T2=T2+(P_VEL(1)-P_VEL(I))
 	  T1=T1/T2
 	  WRITE(6,*)'Factor to revise mass loss rate us',T1
 	  WRITE(6,*)'Vinf factor is',T2
 	  DO J=1,I
-	    YVEC(J)=2.3205D0*YVEC(J)*P_R(J)/P_VEL(1)
-	    ZVEC(J)=2.3205D0*ZVEC(J)*P_R(J)/P_VEL(1)
+	    YVEC(J)=2.3205_LDP*YVEC(J)*P_R(J)/P_VEL(1)
+	    ZVEC(J)=2.3205_LDP*ZVEC(J)*P_R(J)/P_VEL(1)
 	    XVEC(J)=LOG10(P_R(J)/P_R(I))
 	  END DO
 	  WRITE(6,*)'Scaling radius for X-axis is: ',P_VEL(I)

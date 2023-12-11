@@ -29,12 +29,12 @@ C
 	INTEGER I,K
 	REAL(KIND=LDP) ALPHA,BETA
 C
-	W(:,:)=0.0D0
+	W(:,:)=0.0_LDP
 C
 	DO I=1,ND-1
 	  K=I+1
-	  ALPHA=0.5D0*(R(I)-R(K))
-	  BETA=ALPHA*(R(I)-R(K))/6.0D0
+	  ALPHA=0.5_LDP*(R(I)-R(K))
+	  BETA=ALPHA*(R(I)-R(K))/6.0_LDP
 	  IF(I .NE. 1)W(I,I-1)=-Q(I-1)*BETA*A(I)
 	  W(I,I)=Q(I)*( ALPHA + BETA*(A(K)-B(I)) )
 	  W(I,K)=Q(K)*( ALPHA + BETA*(B(K)-C(I)) )

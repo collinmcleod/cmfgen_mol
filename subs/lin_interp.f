@@ -29,7 +29,7 @@ C
 	ENTRY LININT(R,V,ND,U,W,NIN)
 	ENTRY LINPOP(R,V,ND,U,W,NIN)
 C
-	IF((R(2)-R(1)) .GT. 0.0D0 )THEN
+	IF((R(2)-R(1)) .GT. 0.0_LDP )THEN
 	  IF(R(ND) .GT. U(NIN) .OR. R(1) .LT. U(1))THEN
 	    J=ERROR_LU()
 	    WRITE(J,*)'Error in LIN_INTERP/LINPOP - values outside range'
@@ -42,7 +42,7 @@ C
 	  DO J=1,ND
 50	    IF(R(J) .LE. U(L))THEN
 	      T1=(U(L)-R(J))/(U(L)-U(L-1))
-	      V(J)=T1*W(L-1)+(1.0D0-T1)*W(L)
+	      V(J)=T1*W(L-1)+(1.0_LDP-T1)*W(L)
 	    ELSE
 	      L=L+1
 	      GOTO 50
@@ -65,7 +65,7 @@ C
 	  DO J=ND,1,-1
 500	    IF(R(J) .LE. U(L))THEN
 	      T1=(U(L+1)-R(J))/(U(L+1)-U(L))
-	      V(J)=T1*W(L)+(1.0D0-T1)*W(L+1)
+	      V(J)=T1*W(L)+(1.0_LDP-T1)*W(L+1)
 	    ELSE
 	      L=L-1
 	      GOTO 500

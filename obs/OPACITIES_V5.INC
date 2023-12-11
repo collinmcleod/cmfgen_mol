@@ -17,15 +17,15 @@
 	  T1=-HDKT*CONT_FREQ
 	  DO I=1,ND
 	    EMHNUKT(I)=EXP(T1/T(I))
-	    CHI(I)=0.0D0
-	    ETA(I)=0.0D0
+	    CHI(I)=0.0_LDP
+	    ETA(I)=0.0_LDP
 	  END DO
 !
 ! Compute continuum intensity incident from the core assuming a TSTAR
 ! blackbody.
 !
 	  T1=EXP(-HDKT*CONT_FREQ/TSTAR)
-	  IC=TWOHCSQ*T1*(CONT_FREQ**3)/(1.0D0-T1)
+	  IC=TWOHCSQ*T1*(CONT_FREQ**3)/(1.0_LDP-T1)
 !
 ! Compute opacity and emissivity. ESOPAC must be call first since
 ! CHI is effectively zeroed in that routine.
@@ -35,7 +35,7 @@
 ! Add in Rayleigh scattering contribution. We set the Rayleigh vector to a negligble,
 ! but non-zero value, since it can then be interpolated in the LOG plane.
 !
-	  T1=1.0D+06/HUGE(T1)
+	  T1=1.0E+06_LDP/HUGE(T1)
           CHI_RAY(1:ND)=T1
           IF(ATM(1)%XzV_PRES .AND. INCL_RAY_SCAT)THEN
 	    CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
@@ -99,7 +99,7 @@
 ! blackbody.
 !
 	  T1=EXP(-HDKT*FL/TSTAR)
-	  IC=TWOHCSQ*T1*(FL**3)/(1.0D0-T1)
+	  IC=TWOHCSQ*T1*(FL**3)/(1.0_LDP-T1)
 !
 ! We assume that the photoionization cross-section has not changed since the
 ! last iteration. Using the result that the stimulated emission occurs in
@@ -141,33 +141,33 @@
 ! in the X-ray emitting plasma. All other species are assumed to have Z=6.0
 !
 	    DO I=1,ND
-	      ZETA(I)=0.D0	 !Zeta is temporary
+	      ZETA(I)=0._LDP	 !Zeta is temporary
 	    END DO
-	    IF((T_SHOCK_1.GT.0.0D0).AND.(FILL_FAC_XRAYS_1.GT.0.D0))THEN
+	    IF((T_SHOCK_1.GT.0.0_LDP).AND.(FILL_FAC_XRAYS_1.GT.0._LDP))THEN
 	      T1=CHIFF*TWOHCSQ*(FILL_FAC_XRAYS_1**2)*
 	1                    EXP(-HDKT*CONT_FREQ/T_SHOCK_1)/SQRT(T_SHOCK_1)
-	      T2=1.0D0 ; TA(1)=GFF(CONT_FREQ,T_SHOCK_1,T2)
-	      T2=2.0D0 ; TA(2)=4.0D0*GFF(CONT_FREQ,T_SHOCK_1,T2)
-	      T2=6.0D0 ; TA(3)=36.0D0*GFF(CONT_FREQ,T_SHOCK_1,T2)
+	      T2=1.0_LDP ; TA(1)=GFF(CONT_FREQ,T_SHOCK_1,T2)
+	      T2=2.0_LDP ; TA(2)=4.0_LDP*GFF(CONT_FREQ,T_SHOCK_1,T2)
+	      T2=6.0_LDP ; TA(3)=36.0_LDP*GFF(CONT_FREQ,T_SHOCK_1,T2)
 	      DO I=1,ND
 	        T2=TA(1)*POP_SPECIES(I,1)+TA(2)*POP_SPECIES(I,2) +
 	1         TA(3)*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
 	        T3=POP_SPECIES(I,1)+POP_SPECIES(I,2) +
-	1          6.0D0*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
+	1          6.0_LDP*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
 	        ZETA(I)=ZETA(I)+T1*T2*T3*EXP(-V_SHOCK_1/V(I))	 !Zeta is temporary
               END DO
 	    END IF
-	    IF((T_SHOCK_2 .GT. 0.0D0).AND.(FILL_FAC_XRAYS_2.GT.0.D0))THEN
+	    IF((T_SHOCK_2 .GT. 0.0_LDP).AND.(FILL_FAC_XRAYS_2.GT.0._LDP))THEN
 	      T1=CHIFF*TWOHCSQ*(FILL_FAC_XRAYS_2**2)*
 	1                    EXP(-HDKT*CONT_FREQ/T_SHOCK_2)/SQRT(T_SHOCK_2)
-	      T2=1.0D0 ; TA(1)=GFF(CONT_FREQ,T_SHOCK_2,T2)
-	      T2=2.0D0 ; TA(2)=4.0D0*GFF(CONT_FREQ,T_SHOCK_2,T2)
-	      T2=6.0D0 ; TA(3)=36.0D0*GFF(CONT_FREQ,T_SHOCK_2,T2)
+	      T2=1.0_LDP ; TA(1)=GFF(CONT_FREQ,T_SHOCK_2,T2)
+	      T2=2.0_LDP ; TA(2)=4.0_LDP*GFF(CONT_FREQ,T_SHOCK_2,T2)
+	      T2=6.0_LDP ; TA(3)=36.0_LDP*GFF(CONT_FREQ,T_SHOCK_2,T2)
 	      DO I=1,ND
 	        T2=TA(1)*POP_SPECIES(I,1)+TA(2)*POP_SPECIES(I,2) +
 	1       TA(3)*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
 	        T3=POP_SPECIES(I,1)+POP_SPECIES(I,2) +
-	1          6.0D0*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
+	1          6.0_LDP*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
 	        ZETA(I)=ZETA(I)+T1*T2*T3*EXP(-V_SHOCK_2/V(I))	 !Zeta is temporary
             END DO
 	    END IF
@@ -186,13 +186,13 @@
 ! We use T3 for the Electron density. We asume H, He, and C are fully ionized
 ! in the X-ray emitting plasma. All other species are assumed have Z=6.0
 	    DO I=1,ND
-	    T1=0.D0
-	    T2=0.D0
-	    ZETA(I)=0.D0
-	    IF(FILL_FAC_XRAYS_1.GT.0.D0) T1=EXP(-V_SHOCK_1/V(I))*(FILL_FAC_XRAYS_1)**2
-	    IF(FILL_FAC_XRAYS_2.GT.0.D0) T2=EXP(-V_SHOCK_2/V(I))*(FILL_FAC_XRAYS_2)**2
-	    T3=POP_SPECIES(I,1)+2.0D0*POP_SPECIES(I,2)+
-	1            6.0D0*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
+	    T1=0._LDP
+	    T2=0._LDP
+	    ZETA(I)=0._LDP
+	    IF(FILL_FAC_XRAYS_1.GT.0._LDP) T1=EXP(-V_SHOCK_1/V(I))*(FILL_FAC_XRAYS_1)**2
+	    IF(FILL_FAC_XRAYS_2.GT.0._LDP) T2=EXP(-V_SHOCK_2/V(I))*(FILL_FAC_XRAYS_2)**2
+	    T3=POP_SPECIES(I,1)+2.0_LDP*POP_SPECIES(I,2)+
+	1            6.0_LDP*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
 	    ZETA(I)=(T1*XRAY_EMISS_1+T2*XRAY_EMISS_2)*T3*POP_ATOM(I)
 	    END DO
 
@@ -202,7 +202,7 @@
 	  ETA(1:ND)=ETA(1:ND)+ZETA(1:ND)
 
 	  IF(SECTION .EQ. 'CONTINUUM')THEN
-	    IF(ML .EQ. 1)XRAY_LUM(1:ND)=0.0D0
+	    IF(ML .EQ. 1)XRAY_LUM(1:ND)=0.0_LDP
 	    TA(1:ND)=ZETA(1:ND)*CLUMP_FAC(1:ND)*FQW(FREQ_INDX)
 	    XRAY_LUM(1:ND)=XRAY_LUM(1:ND)+TA(1:ND)
 	  END IF
@@ -212,7 +212,7 @@
 ! Mainly important when X-rays not present.
 !
           DO I=1,ND
-            IF(ETA(I) .LT. 1.0D-280)ETA(I)=1.0D-280
+            IF(ETA(I) .LT. 1.0E-280_LDP)ETA(I)=1.0E-280_LDP
           END DO
 !
 ! The continuum source function is defined by:

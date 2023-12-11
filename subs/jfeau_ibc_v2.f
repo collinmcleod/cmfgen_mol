@@ -46,7 +46,7 @@
 !
 	INTEGER, PARAMETER :: IONE=1
 !
-	RJ(:)=0.0D0
+	RJ(:)=0.0_LDP
 !
 ! Compute the Q factors from F.
 !
@@ -64,16 +64,16 @@
 ! TA,TB and TC .
 !
 	T1=HBC_J-HBC_S*THETA(1)
-	TA(1)=0.0D0
+	TA(1)=0.0_LDP
 	TC(1)=F(2)*Q(2)*R(2)*R(2)/DTAU(1)
 	TB(1)=-R(1)*R(1)*(F(1)*Q(1)/DTAU(1)+T1)
 !
 	DO I=2,ND-1
-	  T1=0.5D0*(DTAU(I-1)+DTAU(I))
+	  T1=0.5_LDP*(DTAU(I-1)+DTAU(I))
 	  TA(I)=-F(I-1)*Q(I-1)*R(I-1)*R(I-1)/DTAU(I-1)/T1
 	  TC(I)=-F(I+1)*Q(I+1)*R(I+1)*R(I+1)/DTAU(I)/T1
-	  TB(I)=R(I)*R(I)*((1.0D0-THETA(I))/Q(I)
-	1        +F(I)*Q(I)*(1.0D0/DTAU(I)+1.0D0/DTAU(I-1))/T1)
+	  TB(I)=R(I)*R(I)*((1.0_LDP-THETA(I))/Q(I)
+	1        +F(I)*Q(I)*(1.0_LDP/DTAU(I)+1.0_LDP/DTAU(I-1))/T1)
 	END DO
 !
 ! Note that Q(ND)=1.0d0 by definition.
@@ -81,15 +81,15 @@
         IF(INNER_BND_METH .EQ. 'DIFUSION')THEN
           TA(ND)=-F(ND-1)*Q(ND-1)*R(ND-1)*R(ND-1)/DTAU(ND-1)
           TB(ND)=F(ND)*R(ND)*R(ND)/DTAU(ND-1)
-          TC(ND)=0.0D0
+          TC(ND)=0.0_LDP
         ELSE IF(INNER_BND_METH .EQ. 'SCHUSTER')THEN
           TA(ND)=-F(ND-1)*Q(ND-1)*R(ND-1)*R(ND-1)/DTAU(ND-1)
           TB(ND)=R(ND)*R(ND)*(F(ND)/DTAU(ND-1)+INBC)
-          TC(ND)=0.0D0
+          TC(ND)=0.0_LDP
 	ELSE
           TA(ND)=-F(ND-1)*Q(ND-1)*R(ND-1)*R(ND-1)/DTAU(ND-1)
           TB(ND)=F(ND)*R(ND)*R(ND)/DTAU(ND-1)
-          TC(ND)=0.0D0
+          TC(ND)=0.0_LDP
         END IF
 !
 ! Form the SOURCE vector (section replaces call to XVECFEAU).
@@ -103,11 +103,11 @@
 ! Final B.C. is hollow core / zero flux.
 !
 	IF(INNER_BND_METH .EQ. 'DIFFUSION')THEN
-	  RJ(ND)=R(ND)*R(ND)*DBB/CHI(ND)/3.0D0
+	  RJ(ND)=R(ND)*R(ND)*DBB/CHI(ND)/3.0_LDP
 	ELSE IF(INNER_BND_METH .EQ. 'SCHUSTER')THEN
-	  RJ(ND)=R(ND)*R(ND)*IC*(0.25D0+0.5D0*INBC)
+	  RJ(ND)=R(ND)*R(ND)*IC*(0.25_LDP+0.5_LDP*INBC)
 	ELSE
-	  RJ(ND)=0.0D0
+	  RJ(ND)=0.0_LDP
 	END IF
 !
 ! Find the solution

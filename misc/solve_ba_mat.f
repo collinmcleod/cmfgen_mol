@@ -75,7 +75,7 @@
 	INTEGER I,J,K,L
 	LOGICAL ITERATE
 !
-	HDKT=4.7994145D0
+	HDKT=4.7994145_LDP
 	ITERATE=.TRUE.
 !
 	OPEN(UNIT=10, FILE=FILENAME,STATUS='OLD',ACTION='READ')
@@ -132,16 +132,16 @@
 !
 	IF(USE_DC)THEN
 	  WRITE(6,*)'Using departure coefficients'
-	  IONIZATION_ENERGY=109678.7640D0
+	  IONIZATION_ENERGY=109678.7640_LDP
 	  DO I=1,10
-	    EDGE(I)=IONIZATION_ENERGY*SPEED_OF_LIGHT()*1.0D-15/I/I
-	    STAT_WT(I)=2.0D0*I*I
+	    EDGE(I)=IONIZATION_ENERGY*SPEED_OF_LIGHT()*1.0E-15_LDP/I/I
+	    STAT_WT(I)=2.0_LDP*I*I
 	  END DO
-	  GION=1.0D0
+	  GION=1.0_LDP
 !
-	  RGU=LOG(2.07078D-22)
+	  RGU=LOG(2.07078E-22_LDP)
           X=HDKT/POPS(N)
-	  Y=POPS(N-1)*POPS(N-2)*( POPS(N)**(-1.5D0) )/GION
+	  Y=POPS(N-1)*POPS(N-2)*( POPS(N)**(-1.5_LDP) )/GION
           WRITE(6,*)RGU,X,Y
           DO I=1,N-3
             PLTE(I)=STAT_WT(I)*Y*EXP(EDGE(I)*X+RGU)
@@ -152,7 +152,7 @@
 	    DO J=1,10
 	      CMAT(I,N-2)=CMAT(I,N-2)+CMAT(I,J)
 	      CMAT(I,N-1)=CMAT(I,N-1)+CMAT(I,J)
-	      CMAT(I,N)=CMAT(I,N)-(1.5D0+HDKT*EDGE(J)/POPS(N))*CMAT(I,J)
+	      CMAT(I,N)=CMAT(I,N)-(1.5_LDP+HDKT*EDGE(J)/POPS(N))*CMAT(I,J)
 	    END DO
 	  END DO
 	  SAV_CMAT=CMAT
@@ -204,7 +204,7 @@
           STEQ(J)=STEQ(J)*COL_SF(J)
         END DO
 !
-	RHS=0.0D0
+	RHS=0.0_LDP
 	DO J=1,N
 	  DO I=1,N
 	    RHS(I)=RHS(I)+SAV_CMAT(I,J)*STEQ(J)
@@ -226,25 +226,25 @@
 	  WRITE(6,*)'Writing solution and iterated solution to UNIT 49'
 	  WRITE(49,'(5X,A,6X,A,15X,A,12X,A)')'I','% Change','Old solution','New Solution'
 	  DO I=1,N
-	    T1=0.0D0
-	    IF(NEW_SOL(I) .NE. 0)T1=100.0D0*(NEW_SOL(I)-STEQ(I))/NEW_SOL(I)
+	    T1=0.0_LDP
+	    IF(NEW_SOL(I) .NE. 0)T1=100.0_LDP*(NEW_SOL(I)-STEQ(I))/NEW_SOL(I)
 	    WRITE(49,'(1X,I5,2X,ES12.4,3X,2ES24.14)')I,T1,STEQ(I),NEW_SOL(I)
 	  END DO
 	  STEQ=NEW_SOL
 	END IF
 !
 	IF(USE_DC)THEN
-	  DI_NEW=POPS(N-2)*(1.0D0-STEQ(N-2))
-	  ED_NEW=POPS(N-1)*(1.0D0-STEQ(N-1))
-	  T_NEW=POPS(N)*(1.0D0-STEQ(N))
-	  RGU=LOG(2.07078D-22)
+	  DI_NEW=POPS(N-2)*(1.0_LDP-STEQ(N-2))
+	  ED_NEW=POPS(N-1)*(1.0_LDP-STEQ(N-1))
+	  T_NEW=POPS(N)*(1.0_LDP-STEQ(N))
+	  RGU=LOG(2.07078E-22_LDP)
           X=HDKT/T_NEW
-	  Y=ED_NEW*DI_NEW*( T_NEW**(-1.5D0) )/GION
+	  Y=ED_NEW*DI_NEW*( T_NEW**(-1.5_LDP) )/GION
           DO I=1,N-3
             NEW_LTE(I)=STAT_WT(I)*Y*EXP(EDGE(I)*X+RGU)
 	  END DO
 	  DO I=1,N-3
-	    NEW_POPS(I)=(POPS(I)/PLTE(I))*(1.0-STEQ(I))*NEW_LTE(I)
+	    NEW_POPS(I)=(POPS(I)/PLTE(I))*(1.0_LDP-STEQ(I))*NEW_LTE(I)
 	  END DO
 	  NEW_POPS(N-2)=DI_NEW
 	  NEW_POPS(N-1)=ED_NEW
@@ -263,7 +263,7 @@
 	  CALL WR2D_MA(CMAT,N,N,'C_MAT_D61',50)
 	  WRITE(6,*)'CMAT x solution vector written to unit 50'
 !
-	  RHS=0.0D0
+	  RHS=0.0_LDP
 	  DO J=1,N
 	    DO I=1,N
 	      RHS(I)=RHS(I)+SAV_CMAT(I,J)*STEQ(J)

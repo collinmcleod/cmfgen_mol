@@ -44,17 +44,17 @@ C Evaluate the SOBOLEV optical depth without angle factor (GAMH).
 C Evaluate the thermal opacity.
 C
 	DO I=1,ND
-	  LINE_FLUX(I)=0.0D0
+	  LINE_FLUX(I)=0.0_LDP
 	  NOES(I)=CHI(I)-ESEC(I)
-	  GAMH(I)=CHIL(I)*3.0D-10*R(I)/V(I)/FL    	!C/dex(15)/dex(5)
+	  GAMH(I)=CHIL(I)*3.0E-10_LDP*R(I)/V(I)/FL    	!C/dex(15)/dex(5)
 	END DO
-	EW=0.0D0
-	CONT_FLUX=0.0D0
-	GLINE(1:ND)=0.0D0
+	EW=0.0_LDP
+	CONT_FLUX=0.0_LDP
+	GLINE(1:ND)=0.0_LDP
 C
 	IF(DIE)THEN
 	  DO I=1,ND
-	    GAMH(I)=0.0D0
+	    GAMH(I)=0.0_LDP
 	  END DO
 	END IF
 C
@@ -77,31 +77,31 @@ C           at sufficiently large radii that it makes no difference.
 C
 	  IF(THICK)THEN
 	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF
-	    IBOUND=SOURCE(1)*(1.0D0-EXP(-TOR))
+	    IBOUND=SOURCE(1)*(1.0_LDP-EXP(-TOR))
 	  ELSE
 	    IBOUND=0
 	  END IF
 C
 	  IF(NI .EQ. 1)THEN
 	    AV(1)=IBOUND
-	    TB(1)=0.0D0			!Flux at grid point.
+	    TB(1)=0.0_LDP			!Flux at grid point.
 	  ELSE IF(NI .EQ. 2)THEN
 	    CALL ZALONGP(R,Z,P(LS),NI)
 	    CALL NORDTAU(DTAU,CHI,Z,R,dCHIdR,NI)
 	    E1=EXP(-DTAU(1))
-	    E2=1.0D0-(1.0D0-E1)/DTAU(1)
-	    E3=(1.0D0-E1)/DTAU(1)-E1
-	    IF(DTAU(1) .LT. 1.0D-03)THEN
-	      E2=DTAU(1)*0.5+DTAU(1)*DTAU(1)/6.0D0
-	      E3=DTAU(1)*0.5-DTAU(1)*DTAU(1)/3.0D0
+	    E2=1.0_LDP-(1.0_LDP-E1)/DTAU(1)
+	    E3=(1.0_LDP-E1)/DTAU(1)-E1
+	    IF(DTAU(1) .LT. 1.0E-03_LDP)THEN
+	      E2=DTAU(1)*0.5_LDP+DTAU(1)*DTAU(1)/6.0_LDP
+	      E3=DTAU(1)*0.5_LDP-DTAU(1)*DTAU(1)/3.0_LDP
 	    END IF
 	    AV(2)=IBOUND*E1+SOURCE(2)*E2+SOURCE(1)*E3
-            AV(1)=0.5*(IBOUND+AV(2)*E1+SOURCE(1)*E2+SOURCE(2)*E3)
-            TB(2)=0.0D0
+            AV(1)=0.5_LDP*(IBOUND+AV(2)*E1+SOURCE(1)*E2+SOURCE(2)*E3)
+            TB(2)=0.0_LDP
 	    TB(1)=AV(1)-IBOUND
 	  ELSE
 C
@@ -110,7 +110,7 @@ C
 C NB: GAM is the angle dependent SOBOLEV optical depth.
 C
 	    DO I=1,NI
-	      GAM(I)=GAMH(I)/(1.0D0+Z(I)*Z(I)/R(I)/R(I)*SIGMA(I))
+	      GAM(I)=GAMH(I)/(1.0_LDP+Z(I)*Z(I)/R(I)/R(I)*SIGMA(I))
 	    END DO
 C
 	    IF(DIF .AND. LS .LE. NC)THEN
@@ -140,7 +140,7 @@ C
 	1           /(DTAU(I-1)+DTAU(I))
 	    END DO
 	    TB(1)=AV(1)-IBOUND
-	    TB(NI)=0.0D0		     !Symmetry
+	    TB(NI)=0.0_LDP		     !Symmetry
 	    IF(LS .LE. NC .AND. DIF)THEN
 	      TB(NI)=DBC
 	    ELSE IF(LS .LE. NC)THEN
@@ -157,7 +157,7 @@ C this is not required anymore.
 C
 	  DTAU(1)=NOES(1)*R(1)
 	  DO I=2,NI
-	    DTAU(I)=DTAU(I-1)+0.5D0*(NOES(I-1)+NOES(I))*(Z(I-1)-Z(I))
+	    DTAU(I)=DTAU(I-1)+0.5_LDP*(NOES(I-1)+NOES(I))*(Z(I-1)-Z(I))
 	  END DO
 C
 C The function EXPONX is given by (1.0-EXP(-X))/X.
@@ -177,7 +177,7 @@ C NB: T3 is the optical depth from the oberver to the point I on the NEAR side.
 C        of the atmosphere.
 C
 	    IF(DTAU(I) .GT. 50)THEN
-	      T3=0.0D0
+	      T3=0.0_LDP
 	    ELSE
 	      T3=EXP(-DTAU(I))
 	    END IF
@@ -187,13 +187,13 @@ C        of the atmosphere.
 C
 	    T4=DTAU(NI)+DTAU(NI)-DTAU(I)
 	    IF(LS .LE. NC .OR. T4 .GT. 50)THEN
-	      T4=0.0D0
+	      T4=0.0_LDP
 	    ELSE
 	      T4=EXP(-T4)
 	    END IF
 C
 	    LINE_FLUX(I)=LINE_FLUX(I)
-	1         +0.5D0*T2*AQW(I,LS)
+	1         +0.5_LDP*T2*AQW(I,LS)
 	1         *(  (T3+T4)-( (AV(I)+TB(I))*T3+(AV(I)-TB(I))*T4 )
 	1         *CHIL(I)/ETAL(I)  )
 C
@@ -205,8 +205,8 @@ C Evaluate the continuum intensity (Jy (d=1kpc)) and compute line
 C emission function such that integral gives the equivalent width
 C in Angstroms.
 C
-	CONT_FLUX=CONT_FLUX*R(1)*R(1)*13.19868
-	T1=13.19868*(2.997924D-12/FL/FL)/CONT_FLUX
+	CONT_FLUX=CONT_FLUX*R(1)*R(1)*13.19868_LDP
+	T1=13.19868_LDP*(2.997924E-12_LDP/FL/FL)/CONT_FLUX
 	DO I=1,ND
 	  LINE_FLUX(I)=T1*LINE_FLUX(I)*ETAL(I)*( R(I)**3 )
 	END DO
@@ -214,22 +214,22 @@ C
 C Compute the line flux, and then evaluate the continuum intensity
 C (Jy (d=1kpc)) and the line equivalent width (Angstroms).
 C
-	EW=0.0D0
+	EW=0.0_LDP
 	T2=(LINE_FLUX(1)-LINE_FLUX(2))/LOG(R(1)/R(2))
 	DO I=1,ND-2
 	  T1=T2
 	  T2=(LINE_FLUX(I)-LINE_FLUX(I+2))/LOG(R(I)/R(I+2))
 	  EW=EW+LOG(R(I)/R(I+1))*( LINE_FLUX(I)+LINE_FLUX(I+1)
-	1      +LOG(R(I)/R(I+1))*(T2-T1)/6.0 )
+	1      +LOG(R(I)/R(I+1))*(T2-T1)/6.0_LDP )
 	END DO
 	T1=T2
 	T2=(LINE_FLUX(ND-1)-LINE_FLUX(ND))/LOG(R(ND-1)/R(ND))
 	EW=EW+LOG(R(ND-1)/R(ND))*( LINE_FLUX(ND-1)+LINE_FLUX(ND)
-	1            +LOG(R(ND-1)/R(ND))*(T2-T1)/6.0 )
+	1            +LOG(R(ND-1)/R(ND))*(T2-T1)/6.0_LDP )
 C
-	EW=EW*0.5D0
+	EW=EW*0.5_LDP
 !
-	T1=16.0D+20*(3.14159)**2/RLUM/3.845D+33
+	T1=16.0E+20_LDP*(3.14159_LDP)**2/RLUM/3.845E+33_LDP
 	DO I=1,ND
 	  FORCE_MULT(I)=FORCE_MULT(I)+GLINE(I)*T1*R(I)*R(I)*CHIL(I)/ESEC(I)
 	END DO

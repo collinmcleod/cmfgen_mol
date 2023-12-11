@@ -32,16 +32,16 @@
 	        IF(INDEX(ATM(ID)%XzVLEVNAME_F(I),'e') .NE. 0)THEN
 	          DO J=I+1,ATM(ID)%NXzV_F
 	            IF(INDEX(ATM(ID)%XzVLEVNAME_F(J),'e') .NE. 0)THEN
-	              ATM(ID)%AXzV_F(I,J)=0.0D0
-	              ATM(ID)%AXzV_F(J,I)=0.0D0
+	              ATM(ID)%AXzV_F(I,J)=0.0_LDP
+	              ATM(ID)%AXzV_F(J,I)=0.0_LDP
 	            END IF
 	          END DO
 	        END IF
 	        IF(INDEX(ATM(ID)%XzVLEVNAME_F(I),'o') .NE. 0)THEN
 	          DO J=I+1,ATM(ID)%NXzV_F
 	            IF(INDEX(ATM(ID)%XzVLEVNAME_F(J),'o') .NE. 0)THEN
-	              ATM(ID)%AXzV_F(I,J)=0.0D0
-	              ATM(ID)%AXzV_F(J,I)=0.0D0
+	              ATM(ID)%AXzV_F(I,J)=0.0_LDP
+	              ATM(ID)%AXzV_F(J,I)=0.0_LDP
 	            END IF
 	          END DO
 	        END IF

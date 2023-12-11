@@ -34,7 +34,7 @@
 	                         MAX_TRANS,MAX_TVALS,MAX_TAB_SIZE)
 	    NF=ATM(ID)%NXzV_F
 	    IF(.NOT. ALLOCATED(ATM(ID)%NT_OMEGA))ALLOCATE(ATM(ID)%NT_OMEGA(NF,NF))
-	    ATM(ID)%NT_OMEGA=0.0D0
+	    ATM(ID)%NT_OMEGA=0.0_LDP
 	    DO K=1,NUM_TRANS
 	      I=ID_LOW(K)
 	      J=ID_UP(K)

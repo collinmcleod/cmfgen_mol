@@ -35,7 +35,7 @@ C
 C
 	MND=ND-2
 	SCLHT=RP*SCLHT
-	BETA=(VPHOT/VCORE-1.0D0)
+	BETA=(VPHOT/VCORE-1.0_LDP)
 C
 	IF(RDINR)THEN
 	  OPEN(UNIT=LU,STATUS='OLD',FILE='RDINR')
@@ -67,17 +67,17 @@ C TA is used for everything but R which is all we want.
 	  R(1)=RMAX
 C Compute Velocity and SIGMA
 	  DO I=1,ND-1
-	    TA(I)=VPHOT+(VINF-VPHOT)*(1.0D0-RP/R(I))**GAMMA
-	    TB(I)=1.0D0+BETA*EXP((RP-R(I))/SCLHT)
+	    TA(I)=VPHOT+(VINF-VPHOT)*(1.0_LDP-RP/R(I))**GAMMA
+	    TB(I)=1.0_LDP+BETA*EXP((RP-R(I))/SCLHT)
 	    V(I)=TA(I)/TB(I)
-	    SIGMA(I)=GAMMA*(VINF-VPHOT)*(1.0D0-RP/R(I))**(GAMMA-1)
+	    SIGMA(I)=GAMMA*(VINF-VPHOT)*(1.0_LDP-RP/R(I))**(GAMMA-1)
 	1                            *(RP/R(I))/TA(I)
-	1          +BETA*EXP((RP-R(I))/SCLHT)*(R(I)/SCLHT/TB(I))-1.0D0
+	1          +BETA*EXP((RP-R(I))/SCLHT)*(R(I)/SCLHT/TB(I))-1.0_LDP
 	  END DO
 	  R(ND)=RP
 	  V(ND)=VCORE
-	  SIGMA(ND)=GAMMA*(VINF/VPHOT-1.0D0) +
-	1                BETA*RP/SCLHT/(1.0D0+BETA)-1.0D0
+	  SIGMA(ND)=GAMMA*(VINF/VPHOT-1.0_LDP) +
+	1                BETA*RP/SCLHT/(1.0_LDP+BETA)-1.0_LDP
 	  CLOSE(UNIT=LU)
 	  RETURN
 	END IF
@@ -110,8 +110,8 @@ C
 C Now compute the velocity, and density structure.
 C
 	DO I=1,ND-1
-	  V(I)=VPHOT+(VINF-VPHOT)*(1.0D0-RP/TA(I))**GAMMA
-	  V(I)=V(I)/(1.0D0+BETA*EXP((RP-TA(I))/SCLHT))
+	  V(I)=VPHOT+(VINF-VPHOT)*(1.0_LDP-RP/TA(I))**GAMMA
+	  V(I)=V(I)/(1.0_LDP+BETA*EXP((RP-TA(I))/SCLHT))
 	  TB(I)=(1E+10/(TA(I)*TA(I)*V(I)))**2	  !Opacity
 	END DO
 C
@@ -129,7 +129,7 @@ C
 C
 C Compute optical depth scale.
 C
-	  T1=TB(1)*TA(1)/3.0D0
+	  T1=TB(1)*TA(1)/3.0_LDP
 	  TC(1)=LOG(T1)
 	  DO I=2,ND
 	    T1=T1+(TB(I)+TB(I-1))*(TA(I-1)-TA(I))
@@ -154,27 +154,27 @@ C
 	    TA(I+1)=R(I)
 	  END DO
 	  TA(ND)=R(MND)
-	  TA(ND-1)=TA(ND)+(R(MND-1)-R(MND))/20.0D0
+	  TA(ND-1)=TA(ND)+(R(MND-1)-R(MND))/20.0_LDP
 C
 	  DO I=1,ND-1
 	    R(I)=TA(I)
-	    TA(I)=VPHOT+(VINF-VPHOT)*(1.0D0-RP/R(I))**GAMMA
-	    TB(I)=1.0D0+BETA*EXP((RP-R(I))/SCLHT)
+	    TA(I)=VPHOT+(VINF-VPHOT)*(1.0_LDP-RP/R(I))**GAMMA
+	    TB(I)=1.0_LDP+BETA*EXP((RP-R(I))/SCLHT)
 	    V(I)=TA(I)/TB(I)
-	    SIGMA(I)=GAMMA*(VINF-VPHOT)*(1.0D0-RP/R(I))**(GAMMA-1)
+	    SIGMA(I)=GAMMA*(VINF-VPHOT)*(1.0_LDP-RP/R(I))**(GAMMA-1)
 	1                            *(RP/R(I))/TA(I)
-	1          +BETA*EXP((RP-R(I))/SCLHT)*(R(I)/SCLHT/TB(I))-1.0D0
+	1          +BETA*EXP((RP-R(I))/SCLHT)*(R(I)/SCLHT/TB(I))-1.0_LDP
 	  END DO
 	  R(ND)=RP
 	  V(ND)=VCORE
-	  SIGMA(ND)=GAMMA*(VINF/VPHOT-1.0D0) +
-	1                BETA*RP/SCLHT/(1.0D0+BETA)-1.0D0
+	  SIGMA(ND)=GAMMA*(VINF/VPHOT-1.0_LDP) +
+	1                BETA*RP/SCLHT/(1.0_LDP+BETA)-1.0_LDP
 C
 	  IF(LOOP .EQ. 2)RETURN
 C
 	  DO I=1,ND
 	    TA(I)=R(I)
-	    TB(I)=(1E+10/(TA(I)*TA(I)*V(I)))**2.0	    !Opacity
+	    TB(I)=(1E+10/(TA(I)*TA(I)*V(I)))**2	    !Opacity
 	  END DO
 	END DO
 C

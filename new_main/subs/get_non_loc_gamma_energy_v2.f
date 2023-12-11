@@ -82,7 +82,7 @@
 ! Allow for rounding error at the outer boundary.
 !
 	   IF(V(1) .GT. VTMP(1))THEN
-	     VTMP(1)=VTMP(1)+0.01D0*(VTMP(1)-VTMP(2))
+	     VTMP(1)=VTMP(1)+0.01_LDP*(VTMP(1)-VTMP(2))
 	     IF(V(1) .GT. VTMP(1))THEN
 	       WRITE(6,*)'Error in interpolating energy deposition in get_non_local_gamma_energy_v2'
 	       WRITE(6,*)'VTMP(1) in file is to small: VTMP(1)=',VTMP(1)
@@ -102,7 +102,7 @@
 !   (b) The extra factor of 4 arises as ATAN(1.0D0) is pi/4.
 !   (c) /Lsun to convert to solar luminosities.
 !
-	   CONV_CONST=16.0D0*ATAN(1.0D0)*1.0D+30/3.826D+33
+	   CONV_CONST=16.0_LDP*ATAN(1.0_LDP)*1.0E+30_LDP/3.826E+33_LDP
 	   DO I=1,ND
 	     WRK(I)=RADIOACTIVE_DECAY_ENERGY(I)*R(I)*R(I)
 	   END DO
@@ -150,7 +150,7 @@
 	  INQUIRE(FILE='GAMRAY_ENERGY_DEP',EXIST=FILE_EXISTS)	
 	  IF(FILE_EXISTS)THEN
 	    OPEN(UNIT=LU,FILE='GAMRAY_ENERGY_DEP',STATUS='OLD',ACTION='READ')
-	    T1=-1.0; NDTMP=-1
+	    T1=-1.0_LDP; NDTMP=-1
 	    DO WHILE(1 .EQ. 1)
 	      READ(LU,'(A)',IOSTAT=IOS)STRING
 	      IF(IOS .NE. 0)THEN
@@ -170,7 +170,7 @@
 	      STOP
 	    END IF
 !
-	    IF (ABS( (T1-SN_AGE_DAYS)/(T1+SN_AGE_DAYS) ) .GT. 1.0D-07) THEN
+	    IF (ABS( (T1-SN_AGE_DAYS)/(T1+SN_AGE_DAYS) ) .GT. 1.0E-07_LDP) THEN
 	      WRITE(LUER,'(A)') 'New time for Gamma-ray transport calculation is incompatible'
 	      WRITE(LUER,'(A,ES14.8)')'Monte Carlo new time [days]',T1
 	      WRITE(LUER,'(A,ES14.8)')'CMFGEN new time [days]',SN_AGE_DAYS
@@ -192,13 +192,13 @@
 	    DO I=1,NDTMP
 	       READ(LU,*)T1,VTMP(I),EDEPTMP(I)
 	    ENDDO
-	    IF( (VTMP(1)-V(1))/V(1) .LT. 1.0D-06)VTMP(1)=V(1)
-	    IF( (V(ND)-VTMP(NDTMP))/V(ND) .LT. 1.0D-06)VTMP(NDTMP)=V(ND)
+	    IF( (VTMP(1)-V(1))/V(1) .LT. 1.0E-06_LDP)VTMP(1)=V(1)
+	    IF( (V(ND)-VTMP(NDTMP))/V(ND) .LT. 1.0E-06_LDP)VTMP(NDTMP)=V(ND)
 	    CALL LIN_INTERP(V,RADIOACTIVE_DECAY_ENERGY,ND,VTMP,EDEPTMP,NDTMP)
 	    DEALLOCATE (VTMP,EDEPTMP,EDEPNEW)
 	    CLOSE(LU)
 	  ELSE
-	    RADIOACTIVE_DECAY_ENERGY=0.0D0
+	    RADIOACTIVE_DECAY_ENERGY=0.0_LDP
 	  END IF
 !
 	ELSE

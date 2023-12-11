@@ -39,17 +39,17 @@
 	WRITE(6,*)'Old age of SN is',OLD_SN_AGE
 !
 	DO I=1,ND
-	  WRITE(40,'(I3,5ES10.3)')I,R(I)/OLD_R(I)-1.0D0,
-	1            V(I)/OLD_V(I)-1.0D0,
+	  WRITE(40,'(I3,5ES10.3)')I,R(I)/OLD_R(I)-1.0_LDP,
+	1            V(I)/OLD_V(I)-1.0_LDP,
 	1            OLD_SIGMA(I),
-	1            POP_ATOM(I)/OLD_POP_ATOM(I)-1.0D0,
-	1            DENSITY(I)/OLD_DENSITY(I)-1.0D0
+	1            POP_ATOM(I)/OLD_POP_ATOM(I)-1.0_LDP,
+	1            DENSITY(I)/OLD_DENSITY(I)-1.0_LDP
 	END DO
 !
-	T1=0.0D0
+	T1=0.0_LDP
 	DO L=1,ND
 	  DO I=1,NT
-	    IF(OLD_POPS(I,L) .EQ. 0.0D0)THEN
+	    IF(OLD_POPS(I,L) .EQ. 0.0_LDP)THEN
 	      WRITE(6,*)'Stopping for zero pops in TST_RD_SEQ'
 	      WRITE(6,*)'Depth=',L
 	      WRITE(6,*)'Level=',I

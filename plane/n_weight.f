@@ -36,46 +36,46 @@ c
 c
 c--------------------------------------------------------------------
 c
-      temp(:)=0.0d0
+      temp(:)=0.0_LDP
 c
       do j=1,nw-1
         a1=(angle(j)*angle(j)*angle(j)+
      *      angle(j)*angle(j)*angle(j+1)+
      *      angle(j)*angle(j+1)*angle(j+1)+
-     *      angle(j+1)*angle(j+1)*angle(j+1))/8.0d0
+     *      angle(j+1)*angle(j+1)*angle(j+1))/8.0_LDP
         a2=(angle(j)*angle(j)*angle(j)*angle(j)+
      *      angle(j)*angle(j)*angle(j)*angle(j+1)+
      *      angle(j)*angle(j)*angle(j+1)*angle(j+1)+
      *      angle(j)*angle(j+1)*angle(j+1)*angle(j+1)+
-     *      angle(j+1)*angle(j+1)*angle(j+1)*angle(j+1))/10.0d0
+     *      angle(j+1)*angle(j+1)*angle(j+1)*angle(j+1))/10.0_LDP
         temp(j)=temp(j)-angle(j+1)*a1+a2
         temp(j+1)=temp(j+1)+angle(j)*a1-a2
       enddo
 c
 c Check that 1/2*int[mu^3*dmu]=[mu_max^4-mu+min^4]/8
 c
-      sum=0.0d0
+      sum=0.0_LDP
       do j=1,nw
         sum=sum+temp(j)
       enddo
 c
-      check=(angle(1)**4-angle(nw)**4)/8.0d0
+      check=(angle(1)**4-angle(nw)**4)/8.0_LDP
 c
-      if(abs(check-sum).gt.1.0d-12)then
+      if(abs(check-sum).gt.1.0E-12_LDP)then
         print*,' N integration weights need to be normalized (1)'
         print*,' error=',abs(check-sum)
       endif
 c
 c Check that 1/2*int[mu^4*dmu]=[mu_max^5-mu_min^5]/10
 c
-      sum=0.0d0
+      sum=0.0_LDP
       do j=1,nw
         sum=sum+temp(j)*angle(j)
       enddo
 c
-      check=(angle(1)**5-angle(nw)**5)/10.0d0
+      check=(angle(1)**5-angle(nw)**5)/10.0_LDP
 c
-      if(abs(check-sum).gt.1.0d-12)then
+      if(abs(check-sum).gt.1.0E-12_LDP)then
         print*,' N integration weights need to be normalized (2)'
         print*,' error=',abs(check-sum)
       endif

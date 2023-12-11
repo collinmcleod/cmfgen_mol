@@ -21,9 +21,9 @@ C
 C Note well - DBB =dB/dR (and Q(ND)=1.0 by definition)
 C
 	IF(DIFF)THEN
-	  X(ND)=R(ND)*R(ND)*DBB/CHI/3.0D0
+	  X(ND)=R(ND)*R(ND)*DBB/CHI/3.0_LDP
 	ELSE
-	  X(ND)=R(ND)*R(ND)*IC*(0.25D0+0.5D0*INBC)
+	  X(ND)=R(ND)*R(ND)*IC*(0.25_LDP+0.5_LDP*INBC)
 	END IF
 C
 	RETURN

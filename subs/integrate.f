@@ -65,8 +65,8 @@ C
 C
 C Compute integral for first step.
 C
-	TA(1)=H0*(F(1)+0.5D0*H0*(F01-H0*(F012/3.0D0-(H0*0.5D0
-	1             +(H1-H0)/3.0D0)*F0123)))
+	TA(1)=H0*(F(1)+0.5_LDP*H0*(F01-H0*(F012/3.0_LDP-(H0*0.5_LDP
+	1             +(H1-H0)/3.0_LDP)*F0123)))
 C
 C Compute integral for all subsequent steps. We first evaluate DINT
 C (but store in TA) so that loop is vectorizable. The total integrand
@@ -87,7 +87,7 @@ C
 	  F123=(F23-F12)/(X(I+2)-X(I))
 	  F0123=(F123-F012)/(X(I+2)-X(I-1))
 C
-	  TA(I)=0.5D0*H1*(F(I)+F(I+1)-H1*H1/6.0D0*
+	  TA(I)=0.5_LDP*H1*(F(I)+F(I+1)-H1*H1/6.0_LDP*
 	1            (F012+F123+(H0-H2)*F0123))
 C
 	END DO
@@ -98,8 +98,8 @@ C
 C
 C Compute integral for last step.
 C
-	TA(ND-1)=TA(ND-2)+H2*(F(ND)-H2*(0.5D0*F23+H2*(F123/6.0D0
-	1          +F0123*(0.25D0*H2+(H1-H2)/6.0D0))))
+	TA(ND-1)=TA(ND-2)+H2*(F(ND)-H2*(0.5_LDP*F23+H2*(F123/6.0_LDP
+	1          +F0123*(0.25_LDP*H2+(H1-H2)/6.0_LDP))))
 C
 	IFAIL=0
 C

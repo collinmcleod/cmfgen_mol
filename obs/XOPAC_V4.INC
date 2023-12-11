@@ -14,10 +14,10 @@ C
 	      T2=AT_NO(SPECIES_LNK(ID))+1-ATM(ID)%ZXzV
 !	      T1=XCROSS(Fl,AT_NO(SPECIES_LNK(ID)),T2)
 	      T1=XCROSS_V2(Fl,AT_NO(SPECIES_LNK(ID)),T2,IZERO,IZERO,L_FALSE,L_FALSE)
-	      IF(T1 .NE. 0.0D0)THEN
+	      IF(T1 .NE. 0.0_LDP)THEN
 	        DO I=1,ND
-	          T2=0.0D0			!Temporary CHI
-	          T3=0.0D0			!Temporary ETA
+	          T2=0.0_LDP			!Temporary CHI
+	          T3=0.0_LDP			!Temporary ETA
 	          T4=ATM(ID+1)%XzVLTE_F(1,I)/ATM(ID+1)%XzV_F(1,I)*EMHNUKT(I)
 	          DO J=1,ATM(ID)%NXzV_F
 		    T2=T2+(ATM(ID)%XzV_F(J,I)-ATM(ID)%XzVLTE_F(J,I)*T4)

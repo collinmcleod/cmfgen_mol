@@ -35,7 +35,7 @@
 	EXTERNAL ERROR_LU
 !
 	NEWNAME=FILENAME
-	LOG_TEN=LOG(10.0D0)
+	LOG_TEN=LOG(10.0_LDP)
 	LU=9
 !
 ! Most of these formats are no longer in use.
@@ -51,7 +51,7 @@
 	IF(FORM .EQ. 3)FMT='(1X,1P,2E15.5,:/,1X,3E15.5,:/,(1X,4E15.5))'
 	IF(FORM .EQ. 4)FMT='(1X,1P,1E15.5,:/,1X,2E15.5,:/,1X,3E15.5,:/,(1X,6E15.5))'
 	IF(FORM .EQ. 5)FMT='(1X,1P,1E15.5,:/,1X,2E15.5,:/,1X,2E15.5,:/,1X,
-	1                           3E15.5,:/,1X,3E15.5,/:,(1X,6E15.5))'
+	1                           3E15.5_LDP,:/,1X,3E15.5_LDP,/:,(1X,6E15.5_LDP))'
 !
 !
 	IF(DHYD(1,ND) .NE. 0)THEN
@@ -64,7 +64,7 @@
 	    RETURN
 	  END IF
 !
-	  T1=1.0D0
+	  T1=1.0_LDP
 	  DO I=1,ND
 	    DO J=1,NHYD
 	      T2=LOG(HYD(J,I))-LOG_HYDLTE(J,I)
@@ -72,7 +72,7 @@
 	    END DO
 	  END DO
 	  T1=T1/LOG_TEN
-	  IF(T1 .LT. -290.0D0)THEN
+	  IF(T1 .LT. -290.0_LDP)THEN
 	    LOG_OUTPUT=.TRUE.
 	    WRITE(LU,'(/,1X,A,T40,A)')'10-Dec-2010','!Format date'
 	  ELSE
@@ -83,8 +83,8 @@
 	  WRITE(LU,2120)R(ND),LUM,NHYD,ND
 	  IF(OPTION(1:2) .EQ. 'DC' .AND. LOG_OUTPUT)THEN
 	    DO I=1,ND
-	      T1=0.0D0
-	      T2=0.0D0
+	      T1=0.0_LDP
+	      T2=0.0_LDP
 	      DO J=1,NHYD
 	        T1=T1+HYD(J,I)
 	      END DO
@@ -97,8 +97,8 @@
 	    END DO
 	  ELSE IF(OPTION(1:2) .EQ. 'DC')THEN
 	    DO I=1,ND
-	      T1=0.0D0
-	      T2=0.0D0
+	      T1=0.0_LDP
+	      T2=0.0_LDP
 	      DO J=1,NHYD
 	        T1=T1+HYD(J,I)
 	      END DO
@@ -111,8 +111,8 @@
 	    END DO
 	  ELSE
 	    DO I=1,ND
-	      T1=0.0D0
-	      T2=0.0D0
+	      T1=0.0_LDP
+	      T2=0.0_LDP
 	      DO J=1,NHYD
 	        T1=T1+HYD(J,I)
 	      END DO

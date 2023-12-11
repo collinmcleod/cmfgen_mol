@@ -72,16 +72,16 @@
 	  T1=-HDKT*CONT_FREQ
 	  DO I=1,ND
 	    EMHNUKT_CONT(I)=EXP(T1/T(I))
-	    CHI(I)=0.0D0
-	    ESEC(I)=0.0D0
-	    ETA(I)=0.0D0
+	    CHI(I)=0.0_LDP
+	    ESEC(I)=0.0_LDP
+	    ETA(I)=0.0_LDP
 	  END DO
 !
 ! Compute continuum intensity incident from the core assuming a TSTAR
 ! blackbody.
 !
           T1=EXP(-HDKT*CONT_FREQ/TSTAR)
-	  IC=TWOHCSQ*T1*(CONT_FREQ**3)/(1.0D0-T1)
+	  IC=TWOHCSQ*T1*(CONT_FREQ**3)/(1.0_LDP-T1)
 !
 ! Free-free and bound-free opacities.
 !
@@ -103,9 +103,9 @@
 !
 	  IF(ADD_ADDITIONAL_OPACITY)THEN
 	     DO I=1,ND
-	       T1=ADD_OPAC_SCL_FAC*6.65D-15*POP_ATOM(I)
+	       T1=ADD_OPAC_SCL_FAC*6.65E-15_LDP*POP_ATOM(I)
 	       CHI(I)=CHI(I)+T1
-	       ETA(I)=ETA(I)+T1*TWOHCSQ*(CONT_FREQ**3)*EMHNUKT_CONT(I)/(1.0D0-EMHNUKT_CONT(I))
+	       ETA(I)=ETA(I)+T1*TWOHCSQ*(CONT_FREQ**3)*EMHNUKT_CONT(I)/(1.0_LDP-EMHNUKT_CONT(I))
 	     END DO
 	     IF(FREQ_INDX .EQ. 1)THEN
 	       LUER=ERROR_LU()
@@ -143,12 +143,12 @@
 	      IF(ATM(ID)%XzV_PRES .AND. ATM(ID+1)%XzV_PRES)THEN
 	        T2=AT_NO(SPECIES_LNK(ID))+1-ATM(ID)%ZXzV
 	        T1=XCROSS_V2(CONT_FREQ,AT_NO(SPECIES_LNK(ID)),T2,IZERO,IZERO,L_FALSE,L_FALSE)
-	        IF(T1 .NE. 0.0D0)THEN
+	        IF(T1 .NE. 0.0_LDP)THEN
 	          J=1
 	          IF(LST_DEPTH_ONLY)J=ND
 	          DO I=J,ND
-	            T2=0.0D0			!Temporary CHI
-	            T3=0.0D0			!Temporary ETA
+	            T2=0.0_LDP			!Temporary CHI
+	            T3=0.0_LDP			!Temporary ETA
 	            T4=(ATM(ID+1)%XzVLTE_F(1,I)*EMHNUKT_CONT(I))/ATM(ID+1)%XzV_F(1,I)
 	            DO J=1,ATM(ID)%NXzV_F
 		      T2=T2+ATM(ID)%XzV_F(J,I)
@@ -172,7 +172,7 @@
 !
 ! Add in Rayleigh scattering contribution.
 !
-	  CHI_RAY(1:ND)=0.0D0
+	  CHI_RAY(1:ND)=0.0_LDP
 	  ID=1; IF(ION_ID(1) .EQ. 'HMI')ID=2
 	  IF(SPECIES_PRES(1) .AND. INCL_RAY_SCAT)THEN
 	    CALL RAYLEIGH_SCAT(CHI_RAY,ATM(ID)%XzV_F,ATM(ID)%AXzV_F,ATM(ID)%EDGEXZV_F,
@@ -210,7 +210,7 @@
 ! blackbody.
 !
           T1=EXP(-HDKT*FL/TSTAR)
-	  IC=TWOHCSQ*T1*(FL**3)/(1.0D0-T1)
+	  IC=TWOHCSQ*T1*(FL**3)/(1.0_LDP-T1)
 !
 ! We assume that the photoionization cross-section has not changed since the
 ! last iteration. Using the result that the stimulated emission occurs in
@@ -257,31 +257,31 @@
 ! We use T3 for the Electron density. We asume H, He, and C are fully ionized
 ! in the X-ray emitting plasma. All other species are assumed to have Z=6.0
 !
-	    IF(T_SHOCK_1 .NE. 0.0D0)THEN
+	    IF(T_SHOCK_1 .NE. 0.0_LDP)THEN
 	      T1=CHIFF*TWOHCSQ*(FILL_FAC_XRAYS_1**2)*
 	1                    EXP(-HDKT*CONT_FREQ/T_SHOCK_1)/SQRT(T_SHOCK_1)
-	      T2=1.0D0 ; TA(1)=GFF(CONT_FREQ,T_SHOCK_1,T2)
-	      T2=2.0D0 ; TA(2)=4.0D0*GFF(CONT_FREQ,T_SHOCK_1,T2)
-	      T2=6.0D0 ; TA(3)=36.0D0*GFF(CONT_FREQ,T_SHOCK_1,T2)
+	      T2=1.0_LDP ; TA(1)=GFF(CONT_FREQ,T_SHOCK_1,T2)
+	      T2=2.0_LDP ; TA(2)=4.0_LDP*GFF(CONT_FREQ,T_SHOCK_1,T2)
+	      T2=6.0_LDP ; TA(3)=36.0_LDP*GFF(CONT_FREQ,T_SHOCK_1,T2)
 	      DO I=1,ND
 	        T2=TA(1)*POP_SPECIES(I,1)+TA(2)*POP_SPECIES(I,2) +
 	1         TA(3)*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
 	        T3=POP_SPECIES(I,1)+POP_SPECIES(I,2) +
-	1          6.0D0*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
+	1          6.0_LDP*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
 	        ZETA(I)=T1*T2*T3*EXP(-V_SHOCK_1/V(I))	 !Zeta is temporary
               END DO
 	    END IF
-	    IF(T_SHOCK_2 .NE. 0.0D0)THEN
+	    IF(T_SHOCK_2 .NE. 0.0_LDP)THEN
 	      T1=CHIFF*TWOHCSQ*(FILL_FAC_XRAYS_2**2)*
 	1                    EXP(-HDKT*CONT_FREQ/T_SHOCK_2)/SQRT(T_SHOCK_2)
-	      T2=1.0D0 ; TA(1)=GFF(CONT_FREQ,T_SHOCK_2,T2)
-	      T2=2.0D0 ; TA(2)=4.0D0*GFF(CONT_FREQ,T_SHOCK_2,T2)
-	      T2=6.0D0 ; TA(3)=36.0D0*GFF(CONT_FREQ,T_SHOCK_2,T2)
+	      T2=1.0_LDP ; TA(1)=GFF(CONT_FREQ,T_SHOCK_2,T2)
+	      T2=2.0_LDP ; TA(2)=4.0_LDP*GFF(CONT_FREQ,T_SHOCK_2,T2)
+	      T2=6.0_LDP ; TA(3)=36.0_LDP*GFF(CONT_FREQ,T_SHOCK_2,T2)
 	      DO I=1,ND
 	        T2=TA(1)*POP_SPECIES(I,1)+TA(2)*POP_SPECIES(I,2) +
 	1       TA(3)*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
 	        T3=POP_SPECIES(I,1)+POP_SPECIES(I,2) +
-	1          6.0D0*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
+	1          6.0_LDP*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
 	        ZETA(I)=T1*T2*T3*EXP(-V_SHOCK_2/V(I))	 !Zeta is temporary
               END DO
 	    END IF
@@ -301,8 +301,8 @@
 	    DO I=1,ND
 	      T1=EXP(-V_SHOCK_1/V(I))*(FILL_FAC_XRAYS_1)**2
 	      T2=EXP(-V_SHOCK_2/V(I))*(FILL_FAC_XRAYS_2)**2
-	      T3=POP_SPECIES(I,1)+2.0D0*POP_SPECIES(I,2)+
-	1              6.0D0*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
+	      T3=POP_SPECIES(I,1)+2.0_LDP*POP_SPECIES(I,2)+
+	1              6.0_LDP*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
 	      ZETA(I)=(T1*XRAY_EMISS_1+T2*XRAY_EMISS_2)*T3*POP_ATOM(I)
 	    END DO
 	  END IF
@@ -314,28 +314,28 @@
 ! Changed 06-Aug-2003: Clumping was not beeing allowed for when computing
 ! the shock luminosity.
 !
-	  T1=0.241838D0		!eV to 10^15Hz
+	  T1=0.241838_LDP		!eV to 10^15Hz
 	  IF(SECTION .EQ. 'CONTINUUM')THEN
 	    IF(FREQ_INDX .EQ. 1)THEN
-	       XRAY_LUM_TOT(1:ND)=0.0D0
-	       XRAY_LUM_0P1(1:ND)=0.0D0
-	       XRAY_LUM_1KEV(1:ND)=0.0D0
+	       XRAY_LUM_TOT(1:ND)=0.0_LDP
+	       XRAY_LUM_0P1(1:ND)=0.0_LDP
+	       XRAY_LUM_1KEV(1:ND)=0.0_LDP
 	    END IF
 	    TA(1:ND)=ZETA(1:ND)*CLUMP_FAC(1:ND)*FQW(FREQ_INDX)
 	    XRAY_LUM_TOT(1:ND)=XRAY_LUM_TOT(1:ND)+TA(1:ND)
-	    IF(FL .GE. 100.0D0*T1)XRAY_LUM_0P1(1:ND)=XRAY_LUM_0P1(1:ND)+TA(1:ND)
-	    IF(FL .GE. 1000.0D0*T1)XRAY_LUM_1KEV(1:ND)=XRAY_LUM_1KEV(1:ND)+TA(1:ND)
+	    IF(FL .GE. 100.0_LDP*T1)XRAY_LUM_0P1(1:ND)=XRAY_LUM_0P1(1:ND)+TA(1:ND)
+	    IF(FL .GE. 1000.0_LDP*T1)XRAY_LUM_1KEV(1:ND)=XRAY_LUM_1KEV(1:ND)+TA(1:ND)
 	  END IF
 	ELSE
-	  ETA_MECH(1:ND)=0.0D0
+	  ETA_MECH(1:ND)=0.0_LDP
 	END IF
 !
 ! Set a minimum emissivity. Mainly important when X-rays are not present.
 !
 	DO I=1,ND
-	  IF(ETA(I) .LT. 1.0D-280)THEN
-	    ETA(I)=1.0D-280
-	    ETA_NOSCAT(I)=1.0D-280
+	  IF(ETA(I) .LT. 1.0E-280_LDP)THEN
+	    ETA(I)=1.0E-280_LDP
+	    ETA_NOSCAT(I)=1.0E-280_LDP
 	  END IF
 	END DO
 !

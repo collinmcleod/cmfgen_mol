@@ -64,7 +64,7 @@
 	REAL(KIND=LDP), ALLOCATABLE :: DLAM_INT(:)
 	REAL(KIND=LDP), ALLOCATABLE :: STARK_INT(:)
 	SAVE DLAM_INT,STARK_INT
-	REAL(KIND=LDP), SAVE :: WAVE_SAVE=0.0D0
+	REAL(KIND=LDP), SAVE :: WAVE_SAVE=0.0_LDP
 !
 	INTEGER NI,NG
 	INTEGER I,J,K,L,IOS
@@ -99,20 +99,20 @@
 !
 ! We choose the minimum so as to resolve both profiles accurately.
 !
-	DLAM=MIN(DLAM_THERM,DLAM_TURB)/5.0D0
+	DLAM=MIN(DLAM_THERM,DLAM_TURB)/5.0_LDP
 !
-	PRO(1:NF)=0.0D0
-	SQRT_PI=1.772453851D0
+	PRO(1:NF)=0.0_LDP
+	SQRT_PI=1.772453851_LDP
 !
 ! Determine profile limits over which we perform the interpolation. These
 ! are set by the smaller of the tabulated range, and the range required
 ! to determine the requested Stark profile.
 !
-	MAX_INT_LAM=MIN( MAX_DWS, PROF_LAM(NF)+5.2*DLAM_TURB )
+	MAX_INT_LAM=MIN( MAX_DWS, PROF_LAM(NF)+5.2_LDP*DLAM_TURB )
 	IF(SYM_STARK)THEN
-	  MIN_INT_LAM=0.0D0
+	  MIN_INT_LAM=0.0_LDP
 	ELSE
-	  MIN_INT_LAM=MAX( MIN_DWS, PROF_LAM(1)-5.2*DLAM_TURB )
+	  MIN_INT_LAM=MAX( MIN_DWS, PROF_LAM(1)-5.2_LDP*DLAM_TURB )
 	END IF
 	NI=(MAX_INT_LAM-MIN_INT_LAM)/DLAM+1
 !
@@ -148,17 +148,17 @@
 !
 ! Generate values for extrapolation beyond tabulated profile limits.
 !
-	VAL_RHS=10.0D0**STARK(NWS)
+	VAL_RHS=10.0_LDP**STARK(NWS)
 	SLOPE_RHS=(STARK(NWS)-STARK(NWS-1)) / LOG10(DWS(NWS)/DWS(NWS-1))
 	IF(.NOT. SYM_STARK)THEN
-	  VAL_LHS=10.0D0**STARK(1)
+	  VAL_LHS=10.0_LDP**STARK(1)
 	  SLOPE_LHS=(STARK(1)-STARK(2)) / LOG10(DWS(1)/DWS(2))
 	END IF
 !
 ! NG is the number of points (on each side) used to evaluate the
 ! Gaussian profile for the convolution.
 !
-	NG=5.0D0*DLAM_TURB/DLAM
+	NG=5.0_LDP*DLAM_TURB/DLAM
 !
 ! Can now perform the convolution. The method is dependent on whether the
 ! tabulated profile is symmetric. NB: Unfortunately the wavelengths
@@ -186,7 +186,7 @@
 	      ELSE
 	        STARK_VAL=VAL_RHS*(LAM_VAL/DWS(NWS))**SLOPE_RHS
 	      END IF
-	      IF(SIMP_QUAD .AND. MOD(I-K,2) .EQ. 0)STARK_VAL=STARK_VAL*2.0D0
+	      IF(SIMP_QUAD .AND. MOD(I-K,2) .EQ. 0)STARK_VAL=STARK_VAL*2.0_LDP
 	      PRO(J)=PRO(J)+STARK_VAL*EXP( -( (LAM_VAL-ABS(PROF_LAM(J)))/DLAM_TURB )**2 )
 	    END DO
 	  END DO
@@ -209,7 +209,7 @@
 	      ELSE
 	        STARK_VAL=STARK_INT(I)
 	      END IF
-	      IF(SIMP_QUAD .AND. MOD(I-K,2) .EQ. 0)STARK_VAL=STARK_VAL*2.0D0
+	      IF(SIMP_QUAD .AND. MOD(I-K,2) .EQ. 0)STARK_VAL=STARK_VAL*2.0_LDP
 	      PRO(J)=PRO(J)+STARK_VAL*EXP( -( (LAM_VAL-PROF_LAM(J))/DLAM_TURB )**2 )
 	    END DO
 	  END DO
@@ -218,20 +218,20 @@
 ! Perform the quadrature normalization.
 !
 	T1=DLAM/SQRT_PI/DLAM_TURB
-	IF(SIMP_QUAD)T1=T1/1.5D0
+	IF(SIMP_QUAD)T1=T1/1.5_LDP
 	PRO(1:NF)=PRO(1:NF)*T1
 !
 ! Normalize the profile to have unit area if desired.
 !
 	IF(NORMALIZE_PROFILE)THEN
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  DO I=1,NF-1
-	    T1=T1+( 1.0D0/(PROF_LAM(I)+WAVE)-1.0D0/(PROF_LAM(I+1)+WAVE) )*
+	    T1=T1+( 1.0_LDP/(PROF_LAM(I)+WAVE)-1.0_LDP/(PROF_LAM(I+1)+WAVE) )*
 	1         (PRO(I+1)+PRO(I))
 	  END DO
-	  T1=T1*0.5D0*2.99794D+18
+	  T1=T1*0.5_LDP*2.99794E+18_LDP
 	  PRO(1:NF)=PRO(1:NF)/T1
-	  IF(ABS(T1-1.0D0) .GT. 0.3)THEN
+	  IF(ABS(T1-1.0_LDP) .GT. 0.3_LDP)THEN
             LUER=ERROR_LU()
 	    IF(WAVE .NE. WAVE_SAVE)THEN
 	      BACKSPACE(LUER,IOSTAT=IOS)
@@ -242,7 +242,7 @@
 	      END IF
 	      WRITE(LUER,*)'Possible error in CONV_STRK_V2'
 	      WRITE(LUER,*)'Profile normalization constant differs from 1 by more than 30%'
-	      IF(WAVE .GT. 100.0D0 .AND. WAVE .LT. 1.0D+05)THEN
+	      IF(WAVE .GT. 100.0_LDP .AND. WAVE .LT. 1.0E+05_LDP)THEN
 	        WRITE(LUER,'(3(A,F15.8,A,3X))')' Wave=',WAVE,'A','Lam_ST(1)=',PROF_LAM(1),'A',
 	1                      'Lam_END(NF)=',PROF_LAM(NF),'A'
 	      ELSE
@@ -259,14 +259,14 @@
 !
 	IF(DIAGNOSTICS)THEN
 	  DLAM_INT(1:NI)=DLAM_INT(1:NI)+WAVE
-	  DLAM_INT(1:NI)=2.998D+18/DLAM_INT(1:NI)
-	  T1=0.0D0
+	  DLAM_INT(1:NI)=2.998E+18_LDP/DLAM_INT(1:NI)
+	  T1=0.0_LDP
 	  DO I=1,NI-1
-	    T1=T1+0.5D0*(DLAM_INT(I)-DLAM_INT(I+1))*(STARK_INT(I+1)+STARK_INT(I))
+	    T1=T1+0.5_LDP*(DLAM_INT(I)-DLAM_INT(I+1))*(STARK_INT(I+1)+STARK_INT(I))
 	  END DO
-	  IF(SYM_STARK)T1=T1*2.0D0
+	  IF(SYM_STARK)T1=T1*2.0_LDP
 	  WRITE(6,*)'The area under the INTERP profile is',T1
-	  DLAM_INT(1:NI)=2.998D+18/DLAM_INT(1:NI)
+	  DLAM_INT(1:NI)=2.998E+18_LDP/DLAM_INT(1:NI)
 	  DLAM_INT(1:NI)=DLAM_INT(1:NI)-WAVE
 	  STARK_INT(1:NI)=LOG10(STARK_INT(1:NI))
 	  CALL DP_CURVE(NI,DLAM_INT,STARK_INT)

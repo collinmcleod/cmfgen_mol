@@ -61,9 +61,9 @@
 ! We exclude couplings between levels in the SL.
 !
 	WRITE(LU,'(8X,A,3X,A,2(6X,A),T60,A)')'Net in','% in',' Rate in','Rate out','Level'
-	TOT_IN=0.0D0; TOT_OUT=0.0D0
+	TOT_IN=0.0_LDP; TOT_OUT=0.0_LDP
 	DO I=1,N
-	  RATE_IN=0.0D0; RATE_OUT=0.0D0
+	  RATE_IN=0.0_LDP; RATE_OUT=0.0_LDP
 	  DO J=1,NL
 	    LEV=LEVEL(J)
 	    IF(LEV .LE. 0)EXIT
@@ -78,7 +78,7 @@
 	  NET_IN=RATE_IN-RATE_OUT
 	  TOT_IN=TOT_IN+RATE_IN
 	  TOT_OUT=TOT_OUT+RATE_OUT
-	  T1=(RATE_IN+RATE_OUT)/100.0D0
+	  T1=(RATE_IN+RATE_OUT)/100.0_LDP
 !	  WRITE(LU,'(ES14.4,F8.3,2ES14.4,T60,A)')NET_IN,NET_IN/T1,RATE_IN,RATE_OUT,TRIM(LEV_NAME(I))
 	  WRITE(LU,'(ES14.4,F8.3,2ES14.4,T60,A)')NET_IN,T1,RATE_IN,RATE_OUT,TRIM(LEV_NAME(I))
 	END DO
@@ -89,7 +89,7 @@
 	  WRITE(I,'(ES14.4,T20,A)')TOT_IN,'Total col rate  in'
 	  WRITE(I,'(ES14.4,T20,A)')TOT_OUT,'Total col rate out'
 	  WRITE(I,'(ES14.4,T20,A)')TOT_IN-TOT_OUT,'Net col rate in'
-	  T1=100.0D0*(TOT_IN-TOT_OUT)/(TOT_IN+TOT_OUT)
+	  T1=100.0_LDP*(TOT_IN-TOT_OUT)/(TOT_IN+TOT_OUT)
 	  WRITE(I,'(ES14.4,T20,A)')T1,'% Net col rate in (i.e, 100*NET/(TOT_IN+TOT_OUT)'
 	END DO
 	WRITE(6,'(/,2A)')' Collision rates written (appended) to: ',TRIM(FILENAME)

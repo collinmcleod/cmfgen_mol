@@ -252,14 +252,14 @@
 ! Perform default initializations.
 !
 	PD(ID)%DO_PHOT(:,:)=.FALSE.
-	PD(ID)%EXC_FREQ(:)=0.0D0
+	PD(ID)%EXC_FREQ(:)=0.0_LDP
 	XzV_ION_LEV_ID(:)=0
 	PD(ID)%A_ID(:,:)=0
 !
 ! Set values for ionizations to the XzSIX ground state.
 !
 	PD(ID)%DO_PHOT(1,1)=.TRUE.
-	PD(ID)%EXC_FREQ(1)=0.0D0
+	PD(ID)%EXC_FREQ(1)=0.0_LDP
 	XzV_ION_LEV_ID(1)=1
 	PD(ID)%AT_NO=AT_NO_DUM
 	PD(ID)%ZION=ZXzV
@@ -462,7 +462,7 @@
 	    L2=INDEX(HEAD_STR(J),'  ')
 	    LOC_EXC_FREQ_ION=RD_FREE_VAL(HEAD_STR(J),1,L2-1,NEXT,
 	1                     ' EXC_FREQ RDPHOT_GEN_V1')
-	    LOC_EXC_FREQ_ION=1.0D-15*LOC_EXC_FREQ_ION*SPEED_OF_LIGHT()
+	    LOC_EXC_FREQ_ION=1.0E-15_LDP*LOC_EXC_FREQ_ION*SPEED_OF_LIGHT()
 	  END IF
 !
 	  J=0
@@ -515,8 +515,8 @@
 ! Determine the correspondence of the B_level with the super levels.
 ! It is assumed that PHOT_ID corresponds to the fround state.
 !
-	    PD(ID)%EXC_FREQ(PHOT_ID)=0.0D0
-	    TOTAL_WT=0.0D0
+	    PD(ID)%EXC_FREQ(PHOT_ID)=0.0_LDP
+	    TOTAL_WT=0.0_LDP
 	    IF(XzSIX_PRES .AND. NXzSIX_F .GE. 2)THEN
 	      DO I=1,NXzSIX_F
 	        LN=INDEX(XzSIX_LEVNAME_F(I),'[')-1
@@ -628,11 +628,11 @@
 ! To get the Rydberg constant we assume that the atomic mass in AMU is just
 ! twice the atomic number. Only exeption is H.
 !
-	  NU_INF=1.0D-15*109737.31*SPEED_OF_LIGHT()
+	  NU_INF=1.0E-15_LDP*109737.31_LDP*SPEED_OF_LIGHT()
 	  IF(PD(ID)%AT_NO .EQ. 1)THEN
-	    NU_INF=NU_INF/(1+5.48597D-04)
+	    NU_INF=NU_INF/(1+5.48597E-04_LDP)
 	  ELSE
-	    NU_INF=NU_INF/(1+5.48597D-04/(2*PD(ID)%AT_NO))
+	    NU_INF=NU_INF/(1+5.48597E-04_LDP/(2*PD(ID)%AT_NO))
 	  END IF
 	  DO I=1,NXzV
 	    IF(SPLIT_J)THEN
@@ -662,7 +662,7 @@
 	      STOP
 	    END IF
 	    T1=NU_INF/(EDGE(I)+PD(ID)%EXC_FREQ(PHOT_ID))
-	    PD(ID)%NEF(I,PHOT_ID)=0.0D0
+	    PD(ID)%NEF(I,PHOT_ID)=0.0_LDP
 	    IF(T1 .GT. 0)PD(ID)%NEF(I,PHOT_ID)=ZXzV*SQRT(T1)
 	  END DO
 !
@@ -673,7 +673,7 @@
 ! for a hydrogenic ion. It is in the correct units for R in units of
 ! 10^10 cm, and CHI.R dimensionless.
 !
-	PD(ID)%ALPHA_BF=2.815D-06*(PD(ID)%ZION)**4
+	PD(ID)%ALPHA_BF=2.815E-06_LDP*(PD(ID)%ZION)**4
 !
 ! Output summary of photoionization routes.
 !
@@ -704,8 +704,8 @@
 ! Initialize storage locations for use by PHOT_XzV. These are used to store
 ! photoionization cross-sections to speed up computation.
 !
-	PD(ID)%LST_CROSS(:,:)=0.D0
-	PD(ID)%LST_FREQ(:,:)=0.D0
+	PD(ID)%LST_CROSS(:,:)=0._LDP
+	PD(ID)%LST_FREQ(:,:)=0._LDP
 	DO J=1,PD(ID)%NUM_PHOT_ROUTES		!
 	  DO I=1,NXzV			!Loop over levels
 	    K=PD(ID)%A_ID(I,J)			!Get pointer to cross-section

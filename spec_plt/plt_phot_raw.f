@@ -92,7 +92,7 @@
 	REAL(KIND=LDP) STAT_WEIGHT,GION,EDGE
 	REAL(KIND=LDP) LEVEL_REC,TOTAL_REC,TEMP
 	REAL(KIND=LDP) ANG_TO_HZ,SPEED_OF_LIGHT
-	REAL(KIND=LDP), PARAMETER :: RONE=1.0D0
+	REAL(KIND=LDP), PARAMETER :: RONE=1.0_LDP
 	LOGICAL DO_WAVE_PLT
         LOGICAL PLOT_UNNORMALIZED
         LOGICAL PLOT_REL_TO_GS_EDGE
@@ -118,14 +118,14 @@
 !
 ! Set constants.
 !
-        CHIBF=2.815D-06
-        CHIFF=3.69D-29
-        HDKT=4.7994145D0
-        TWOHCSQ=0.0147452575D0
-        OPLIN=2.6540081D+08
-        EMLIN=5.27296D-03
-	ANG_TO_HZ=1.0D-07*SPEED_OF_LIGHT()
-	AMASS=40.0D0
+        CHIBF=2.815E-06_LDP
+        CHIFF=3.69E-29_LDP
+        HDKT=4.7994145_LDP
+        TWOHCSQ=0.0147452575_LDP
+        OPLIN=2.6540081E+08_LDP
+        EMLIN=5.27296E-03_LDP
+	ANG_TO_HZ=1.0E-07_LDP*SPEED_OF_LIGHT()
+	AMASS=40.0_LDP
 !
 ! Read in bound-free gaunt factors for individual n states of hydrogen,
 ! and hydrogenic cross-sections for individual l states (n =0 to 30,
@@ -165,7 +165,7 @@
 	      READ(STRING,*)SPLITJ_1
 	    ELSE IF( INDEX(STRING,'!Excitation energy of final state') .NE. 0)THEN
 	      READ(STRING,*)EXC_EN_1
-	      EXC_EN_1=1.0D-15*EXC_EN_1*SPEED_OF_LIGHT()
+	      EXC_EN_1=1.0E-15_LDP*EXC_EN_1*SPEED_OF_LIGHT()
 	    ELSE IF( INDEX(STRING,'!Number of energy levels') .NE. 0)THEN
 	      READ(STRING,*)NLEV_1
 	      ALLOCATE (TYPE_1(NLEV_1),NUM_VALS_1(NLEV_1),LOC_1(NLEV_1),
@@ -254,7 +254,7 @@
 !	  CALL GEN_IN(NELEV,'Number of energy levels')
 	  ALLOCATE(G(NELEV),E_NAME(NELEV),ENERGY(NELEV))
 !
-	  G(:)=0.0D0;ENERGY(:)=0.0D0
+	  G(:)=0.0_LDP;ENERGY(:)=0.0_LDP
 	  DO I=1,NELEV
 	    READ(10,'(A)')STRING
 	    K=INDEX(STRING,'  ')
@@ -272,7 +272,7 @@
 ! Now need to match names. We assume photoionization files do not
 ! have [].
 !
-	  ENERGY_1(1:NLEV_1)=0.0D0; STAT_WT_1(1:NLEV_1)=0.0D0
+	  ENERGY_1(1:NLEV_1)=0.0_LDP; STAT_WT_1(1:NLEV_1)=0.0_LDP
 	  WRITE(6,*)BLUE_PEN
 	  WRITE(6,*)'Entering name comparison loop'
 	  DO I=1,NLEV_1
@@ -288,7 +288,7 @@
 	    ELSE
 	      ENERGY_1(I)=ENERGY_1(I)/STAT_WT_1(I)
 	      WRITE(126,'(I5,ES15.6,4X,A)')I,ENERGY_1(I),TRIM(NAME_1(I))
-	      IF(STAT_WT_1(I) .NE. 0.0D0)ENERGY_1(I)=1.0D-15*SPEED_OF_LIGHT()*
+	      IF(STAT_WT_1(I) .NE. 0.0_LDP)ENERGY_1(I)=1.0E-15_LDP*SPEED_OF_LIGHT()*
 	1        (IONIZATION_ENERGY-ENERGY_1(I))
 	      WRITE(126,'(I5,ES15.6,4X,A)')I,ENERGY_1(I),TRIM(NAME_1(I))
 	    END IF
@@ -297,7 +297,7 @@
 	  WRITE(6,*)'Number of levels in oscillator file is',NELEV
 	  WRITE(6,*)DEF_PEN
 	ELSE
-	  ENERGY_1(1:NLEV_1)=0.0D0; STAT_WT_1(1:NLEV_1)=0.0D0
+	  ENERGY_1(1:NLEV_1)=0.0_LDP; STAT_WT_1(1:NLEV_1)=0.0_LDP
 	  OSCILLATOR_FILE_AVAIL=.FALSE.
 	END IF
 !
@@ -330,7 +330,7 @@
 	      READ(STRING,*)GION_2
 	    ELSE IF( INDEX(STRING,'!Excitation energy of final state') .NE. 0)THEN
 	      READ(STRING,*)EXC_EN_2
-	      EXC_EN_2=1.0D-15*EXC_EN_2*SPEED_OF_LIGHT()
+	      EXC_EN_2=1.0E-15_LDP*EXC_EN_2*SPEED_OF_LIGHT()
 	    ELSE IF( INDEX(STRING,'!Split J levels') .NE. 0)THEN
 	      READ(STRING,*)SPLITJ_2
 	    ELSE IF( INDEX(STRING,'!Number of energy levels') .NE. 0)THEN
@@ -407,8 +407,8 @@
 	  WRITE(6,*)BLUE_PEN
 	  WRITE(6,*)'Data will be written to RECOM_SUM'
 	  OPEN(UNIT=LUOUT,FILE='RECOM_SUM',STATUS='UNKNOWN',ACTION='WRITE')
-	  TEMP_VEC(1)=0.5D0; TEMP_VEC(2)=1.0D0; TEMP_VEC(3)=2.0; TEMP_VEC(4)=5.0D0; TEMP_VEC(5)=10.0D0
-	  TOTAL_REC_VEC(:)=0.0D0
+	  TEMP_VEC(1)=0.5_LDP; TEMP_VEC(2)=1.0_LDP; TEMP_VEC(3)=2.0_LDP; TEMP_VEC(4)=5.0_LDP; TEMP_VEC(5)=10.0_LDP
+	  TOTAL_REC_VEC(:)=0.0_LDP
 	  CALL GEN_IN(TEMP_VEC,NT,NREC_MAX,'Temperature in 10^4K (5 values max)')
 	  WRITE(6,*)GREEN_PEN
 	  WRITE(6,'(A,T30,5(5X,F6.2))')' Temperature (10^4 K)=',(TEMP_VEC(I),I=1,NT)
@@ -434,7 +434,7 @@
 	      NV=NUM_VALS_1(INDX_1)-1
 	      XV(1:NV)=NU_1(LOC_1(INDX_1+1):LOC_1(INDX_1)+NV)
 	      YV(1:NV)=CROSS_1(LOC_1(INDX_1+1):LOC_1(INDX_1)+NV)
-	      FREQ_SCL_FAC=1.0D0
+	      FREQ_SCL_FAC=1.0_LDP
 	    ELSE
 	      NV=1000
 	      CALL RAW_SUBPHOT_V2(YV,XV,CROSS_1(LOC_1(INDX_1)),TYPE_1(INDX_1),NUM_VALS_1(INDX_1),
@@ -445,13 +445,13 @@
 	    IF(OUT_PHOT)THEN
 	       WRITE(70,'(A,T50,A)')NAME_1(INDX_1),'!Configuration name'
 	       WRITE(70,'(I2,T50,A)')21,'!Type of cross-section'
-	       IF(FREQ_SCL_FAC .GT. 1.0001D0*EDGE)THEN
+	       IF(FREQ_SCL_FAC .GT. 1.0001_LDP*EDGE)THEN
 	         WRITE(STRING,*)NV+2
 	       ELSE
 	         WRITE(STRING,*)NV
 	       END IF
 	       WRITE(70,'(A,T50,A)')TRIM(STRING),'!Number of cross-section points'
-	       IF(FREQ_SCL_FAC .GT. 1.0001D0*EDGE)THEN
+	       IF(FREQ_SCL_FAC .GT. 1.0001_LDP*EDGE)THEN
 	         WRITE(70,'(2ES12.4)')1.0D0,0.0D0
 	         WRITE(70,'(2ES12.4)')FREQ_SCL_FAC/EDGE/1.0001D0,0.0D0
 	       END IF
@@ -488,7 +488,7 @@
 	  END IF
 !
 	  WRITE(6,*)DEF_PEN
-	  XV(1:NLEV_1)=1.0D+08/(IONIZATION_ENERGY-ENERGY(1:NLEV_1))
+	  XV(1:NLEV_1)=1.0E+08_LDP/(IONIZATION_ENERGY-ENERGY(1:NLEV_1))
 	  DO I=1,NT
 	    WRITE(LABEL,'(F7.2)')TEMP_VEC(I)
 	    YV(1:NLEV_1)=RECOM(1:NLEV_1,I)
@@ -501,14 +501,14 @@
 	    CALL GRAMON_PGPLOT('\gl(\A)','Recombination rate',' ',' ')
 	  END IF
 !
-	  IF(EXC_EN_1 .NE. 0.0D0)THEN
+	  IF(EXC_EN_1 .NE. 0.0_LDP)THEN
 	    WRITE(6,*)' '
 	    WRITE(6,*)'These give the total recombination rate / ground state ion'
 	    WRITE(6,*)' '
 	    WRITE(LUOUT,*)' '
 	    WRITE(LUOUT,*)'These give the total recombination rate / ground state ion'
 	    WRITE(LUOUT,*)' '
-	    T1=1.0D0
+	    T1=1.0_LDP
 	    CALL GEN_IN(T1,'Statistical weight for ion ground level')
 	    T1=GION_1/T1
 	    T2=-HDKT*EXC_EN_1
@@ -647,7 +647,7 @@
 	    NV=NUM_VALS_1(INDX_1)-1
 	    XV(1:NV)=NU_1(LOC_1(INDX_1)+1:LOC_1(INDX_1)+NV)
 	    YV(1:NV)=CROSS_1(LOC_1(INDX_1)+1:LOC_1(INDX_1)+NV)
-	    FREQ_SCL_FAC=1.0D0
+	    FREQ_SCL_FAC=1.0_LDP
 	  ELSE
 	    NV=1000
 	    CALL RAW_SUBPHOT_V2(YV,XV,CROSS_1(LOC_1(INDX_1)),TYPE_1(INDX_1),NUM_VALS_1(INDX_1),
@@ -666,7 +666,7 @@
 !
 	  STAT_WEIGHT=MAX(RONE,STAT_WT_1(INDX_1))
 	  GION=1
-	  IF(EDGE .EQ. 0.0D0)THEN
+	  IF(EDGE .EQ. 0.0_LDP)THEN
 	    WRITE(6,'(A)')' '
 	    WRITE(6,'(A)')'A non-zero ionization energy is only required to compute'
 	    WRITE(6,'(A)')'the recombination rate.'
@@ -676,7 +676,7 @@
 	    IF(EDGE .EQ. 0)DO_RECOM=.FALSE.
 	  END IF
 	  IF(DO_RECOM .AND. EDGE .NE. 0)THEN
-	    TEMP=1.0D0
+	    TEMP=1.0_LDP
 	    CALL GEN_IN(TEMP,'Temperature in 10^4K')
 	    IF(TEMP .NE. 0)THEN
 	      WRITE(6,'(A,ES10.4,3X,A,F5.1,3X,A,F4.1,3X,A,I6,3X,A,F6.2)')

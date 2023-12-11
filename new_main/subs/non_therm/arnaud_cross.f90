@@ -14,13 +14,13 @@
 !
 	DO IT=1,NUM_THD
 	  IF(THD(IT)%PRES)THEN
-	    THD(IT)%CROSS_SEC=0.0D0
+	    THD(IT)%CROSS_SEC=0.0_LDP
 	    DO IKT=1,NKT
 	      U1 = XKT(IKT) / THD(IT)%ION_POT
-	      IF (U1 .GT. 1.0D0) THEN
-	        T1=(1.0D0-1.0D0/U1)
+	      IF (U1 .GT. 1.0_LDP) THEN
+	        T1=(1.0_LDP-1.0_LDP/U1)
 	        T2=LOG(U1)
-	        T3 = 1.0D-14 * ( THD(IT)%A_COL*T1 + THD(IT)%B_COL*T1*T1 + &
+	        T3 = 1.0E-14_LDP * ( THD(IT)%A_COL*T1 + THD(IT)%B_COL*T1*T1 + &
 	              THD(IT)%C_COL*T2 + THD(IT)%D_COL*T2/U1  ) / U1 / THD(IT)%ION_POT**2
 	        THD(IT)%CROSS_SEC(IKT)=T3
 	      END IF

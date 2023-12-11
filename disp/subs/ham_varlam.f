@@ -59,15 +59,15 @@ C    All other d..dCHI variables are total derivatives.
 C
 	DO I=1,NI-1
 	 dGBdTAU(I)=-GB(I)/DTAU(I)
-	 T1=(0.5D0+QH(I))*(TCHI(I)+TCHI(I+1))
+	 T1=(0.5_LDP+QH(I))*(TCHI(I)+TCHI(I+1))
 	 dGBdCHI(I)=GB(I)*QH(I)/T1
-	 dHdCHI(I)= -QH(I)/(QH(I)+0.5D0)/T1
+	 dHdCHI(I)= -QH(I)/(QH(I)+0.5_LDP)/T1
 	END DO
 C
 C Note that the d=1 equation contains no emission term.
 C
 	
-	T1=0.5D0/DTAU(1)/DTAU(1)
+	T1=0.5_LDP/DTAU(1)/DTAU(1)
         KI(1)= Q(1)*(UKM1(1)-UK(1))/TCHI(1)
 	1           + T1*( UK(2)+UKM1(2)-UK(1)-UKM1(1) ) * WB(1)
 C
@@ -82,13 +82,13 @@ C
 	  dTAdCHI=dGBdCHI(J)+WA(I)*dGBdTAU(J)
 	  dTCdCHI=dGBdCHI(I)+WB(I)*dGBdTAU(I)
 	  dTBdCHI=Q(I)*(DTAU(J)+DTAU(I))/TCHI(I)
-	1              - (0.5D0+Q(I))*(WA(I)+WB(I))
+	1              - (0.5_LDP+Q(I))*(WA(I)+WB(I))
 	1              -  dTAdCHI - dTBdCHI
 	  dVBdCHI=dHdCHI(J)
 	  dVCdCHI=-dHdCHI(I)
 C
-	  KI(I)= 2.0D0*UKM1(I)*Q(I)*(DTAU(I)+DTAU(J))/TCHI(I)
-	1        - (SOURCE(I)+2.0D0*Q(I)*UKM1(I))*(WA(I)+WB(I))
+	  KI(I)= 2.0_LDP*UKM1(I)*Q(I)*(DTAU(I)+DTAU(J))/TCHI(I)
+	1        - (SOURCE(I)+2.0_LDP*Q(I)*UKM1(I))*(WA(I)+WB(I))
 	1        - dTAdCHI*(UK(J)+UKM1(J))
 	1        - dTBdCHI*(UK(I)+UKM1(I))
 	1        - dTCdCHI*(UK(K)+UKM1(K))
@@ -102,28 +102,28 @@ C
 C
 	J=NI-1
 	IF(LS .GT. NC)THEN
-	  dTAdCHI=2.0D0*( dGBdCHI(NI-1)+dGBdTAU(NI-1)*WA(NI) )
-	  dTBdCHI=2.0D0*Q(NI)*( DTAU(NI-1)/TCHI(NI) - WA(NI) )-dTAdCHI
-	  dVBdCHI=2.0D0*dHdCHI(NI-1)
-	  KI(NI)= 4.0D0*UKM1(NI)*Q(NI)*DTAU(NI)/TCHI(NI)
-	1        - (SOURCE(NI)+2.0D0*Q(NI)*UKM1(NI))*WA(NI)*2.0D0
+	  dTAdCHI=2.0_LDP*( dGBdCHI(NI-1)+dGBdTAU(NI-1)*WA(NI) )
+	  dTBdCHI=2.0_LDP*Q(NI)*( DTAU(NI-1)/TCHI(NI) - WA(NI) )-dTAdCHI
+	  dVBdCHI=2.0_LDP*dHdCHI(NI-1)
+	  KI(NI)= 4.0_LDP*UKM1(NI)*Q(NI)*DTAU(NI)/TCHI(NI)
+	1        - (SOURCE(NI)+2.0_LDP*Q(NI)*UKM1(NI))*WA(NI)*2.0_LDP
 	1        - dTAdCHI*(UK(J)+UKM1(J))
 	1        - dTBdCHI*(UK(NI)+UKM1(NI))
 	1        + dVBdCHI*VKM1(J)
 	ELSE IF(DIF)THEN
-	  dTAdCHI=0.5D0/DTAU(NI-1)/DTAU(NI-1)
+	  dTAdCHI=0.5_LDP/DTAU(NI-1)/DTAU(NI-1)
 	  dTBdCHI=-dTAdCHI
 	  KI(NI)= -DBC/TCHI(NI)
 	1            - dTAdCHI*(UK(J)+UKM1(J))
 	1            - dTBdCHI*(UK(NI)+UKM1(NI))
 	ELSE
-	  dTAdCHI=0.5D0/DTAU(NI-1)/DTAU(NI-1)
+	  dTAdCHI=0.5_LDP/DTAU(NI-1)/DTAU(NI-1)
 	  dTBdCHI=-Q(NI)/TCHI(NI)-dTAdCHI
-	  KI(NI)= -2.0D0*Q(NI)*UKM1(NI)/TCHI(NI)
+	  KI(NI)= -2.0_LDP*Q(NI)*UKM1(NI)/TCHI(NI)
 	1            - dTAdCHI*(UK(J)+UKM1(J))
 	1            - dTBdCHI*(UK(NI)+UKM1(NI))
 	END IF
-	RKB(NI)=0.0D0
+	RKB(NI)=0.0_LDP
 C
 C 
 C
@@ -163,7 +163,7 @@ C of the SOURCE function. Only for rays not striking the core do we
 C need to worry about the source function dependance.
 C
 	 IF(LS .GT. NC)THEN
-	   VSRCE(NI)=-2.0D0*DTAU(NI-1)
+	   VSRCE(NI)=-2.0_LDP*DTAU(NI-1)
 	 END IF
 C
 C Correct SOURCE function variation for continuum terms in
@@ -179,7 +179,7 @@ C aprroximation. Note that the outer boundary condition is
 C directly proportional to the line SOURCE function.
 C
 	IF(THK_LINE)THEN
-	  VSRCE(1)=VSRCE(1)+( CHI(1)/TCHI(1)*EXP(TERF*CHIL(1))-1.0D0 )
+	  VSRCE(1)=VSRCE(1)+( CHI(1)/TCHI(1)*EXP(TERF*CHIL(1))-1.0_LDP )
 	END IF
 C
 	RETURN

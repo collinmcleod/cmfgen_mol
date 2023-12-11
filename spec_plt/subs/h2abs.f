@@ -96,11 +96,11 @@ C
 	  END DO
 	CLOSE(UNIT=10)
 C
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 	PI=FUN_PI()
 C
-        B=59.313        !molec. cnst. B [/cm]
-        HC_ON_K=1.493        !hc/k [cm K]
+        B=59.313_LDP        !molec. cnst. B [/cm]
+        HC_ON_K=1.493_LDP        !hc/k [cm K]
         g_J(0)=1	!degeneracy (J" and I) of each level
         g_J(1)=9
         g_J(2)=5
@@ -109,7 +109,7 @@ C
         g_J(5)=33
         g_J(6)=13
         g_J(7)=45
-	POP_SUM=0.D0
+	POP_SUM=0._LDP
         DO I=0,7
           N_J(I)=G_J(I)*EXP(-B*(I*(I+1))*HC_ON_K/T_IN_K)
 	  POP_SUM=POP_SUM+N_J(I)
@@ -117,32 +117,32 @@ C
 C
 C Normalize to the total population.
 C
-	NTOT=10.0D00**LOG_NTOT
+	NTOT=10.0E00_LDP**LOG_NTOT
 	DO I=0,7
 	  N_J(I)=NTOT*N_J(I)/POP_SUM
 	END DO
 C
-	OPLIN=2.6540081E-02		!pi*e*e/m/c
+	OPLIN=2.6540081E-02_LDP		!pi*e*e/m/c
 	DO I=1,NH2
-	  H2_FREQ(I)=0.01*C_KMS/H2_LAM(I)   		!10^15 Hz
-	  NU_DOP(I)=12.85*H2_FREQ(I)*
-	1             SQRT( (T_IN_K/1.0D+04)+ (V_TURB/12.85)**2 )/C_KMS
-	  CHIL(I)=1.0D-15*OPLIN*H2_OSC(I)*N_J(H2_L_J(I))/SQRT(PI)/NU_DOP(I)
+	  H2_FREQ(I)=0.01_LDP*C_KMS/H2_LAM(I)   		!10^15 Hz
+	  NU_DOP(I)=12.85_LDP*H2_FREQ(I)*
+	1             SQRT( (T_IN_K/1.0E+04_LDP)+ (V_TURB/12.85_LDP)**2 )/C_KMS
+	  CHIL(I)=1.0E-15_LDP*OPLIN*H2_OSC(I)*N_J(H2_L_J(I))/SQRT(PI)/NU_DOP(I)
 	END DO
 C
 	DO J=1,NLAM
-	  TAU=0.0D0
-	  FREQ=0.01*C_KMS/WAVE(J)
+	  TAU=0.0_LDP
+	  FREQ=0.01_LDP*C_KMS/WAVE(J)
 	  IF(WAVE(J) .GT. H2_LAM(NH2) .AND. WAVE(J) .LT. 1300)THEN
 	    DO I=1,NH2
-	      a=1.0D-15*H2_GAM(I)/4/PI/NU_DOP(I)
+	      a=1.0E-15_LDP*H2_GAM(I)/4/PI/NU_DOP(I)
 	      v=(FREQ-H2_FREQ(I))/NU_DOP(I)
 	      PHI=VOIGT(a,v)
 	      TAU=TAU+CHIL(I)*PHI
 	    END DO
 	    FLUX(J)=FLUX(J)*EXP(-TAU)
 	  ELSE IF(WAVE(J) .LT. H2_LAM(NH2))THEN
-	    FLUX(J)=0.0D0
+	    FLUX(J)=0.0_LDP
 	  END IF
 	END DO
 C

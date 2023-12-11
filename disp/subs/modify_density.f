@@ -45,12 +45,12 @@
 	CALL USR_OPTION(NSHELL,'NSHELL','20','Nuber of shells')
 	CALL USR_OPTION(UP_STR_AVERAGING,'UP_AV','F','Only averae of 0.5*SM_LEN inwards')
 !
-	PI=ACOS(-1.0D0)
+	PI=ACOS(-1.0_LDP)
 	XV=LOG10(R/R(ND))	
 	IF(DEN_OPTION .EQ. 'SIN')THEN
           DO I=1,ND
             T1=MOD(NSHELL*LOG(R(I)/R(ND)),LOG(R(1)/R(ND)))/LOG(R(1)/R(ND))
-            T2=V(I)*(SIN(2*PI*T1)-0.4)/V(1)
+            T2=V(I)*(SIN(2*PI*T1)-0.4_LDP)/V(1)
             TA(I)=10**T2
           END DO
 	  NEW_DENSITY=MASS_DENSITY*TA
@@ -63,20 +63,20 @@
 !
 	  TA=NEW_DENSITY*R*R
 	  CALL TORSCL(MASS,TA,R,TB,TC,ND,'ZERO',TYPE_ATM)
-          TA=1.0D0/V
+          TA=1.0_LDP/V
 	  CALL TORSCL(TIME,TA,R,TB,TC,ND,'ZERO',TYPE_ATM)
 !
 	  IST=1
 	  DO I=1,ND
 	    DO K=IST,I
-	      IF(LOG10(R(K)/R(I)) .LT. 0.5*SM_LEN)THEN
+	      IF(LOG10(R(K)/R(I)) .LT. 0.5_LDP*SM_LEN)THEN
 	         IST=K
 	         EXIT
 	      END IF
 	    END DO
 !
 	    DO K=IST,ND
-	      IF(LOG10(R(K)/R(I)) .LT. -0.5*SM_LEN)THEN
+	      IF(LOG10(R(K)/R(I)) .LT. -0.5_LDP*SM_LEN)THEN
 	        IEND=K
 	        EXIT
 	      END IF

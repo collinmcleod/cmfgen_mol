@@ -51,7 +51,7 @@ C
 C
 C As we multiply by hv
 C
-        H=6.6261965D-12
+        H=6.6261965E-12_LDP
 C
 C If INIT_ARRAYS and FLAG is set, then zero all arrays. FLAG should be
 C false for incrementing rates due to ionizations/recombinations to
@@ -59,8 +59,8 @@ C the 2p level.
 C
 	IF(INIT_ARRAYS .AND. FLAG)THEN
 	  DO J=1,ND
-	    NET_X_RR(J)=0.0D0
-	    X_BFCR(J)=0.0D0
+	    NET_X_RR(J)=0.0_LDP
+	    X_BFCR(J)=0.0_LDP
 	  END DO
 	END IF
 C
@@ -72,7 +72,7 @@ C
 	DO I=1,N_A
 	  IF(WSE_X_A(I,1) .NE. 0)THEN
 	    DO J=1,ND
-	      A1=0.0D0
+	      A1=0.0_LDP
 	      IF(JREC(J) .NE. 0)A1=HNST_A(I,J)*HNST_B(1,J)/HN_B(1,J)
 	      NET_X_RR(J)=NET_X_RR(J) +
 	1       WSE_X_A(I,J)*( A1*JREC(J)-HN_A(I,J)*JPHOT(J) )

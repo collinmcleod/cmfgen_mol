@@ -52,7 +52,7 @@
 	 END IF
 !
 	 DO I=1,ND-1
-	   RMID(I)=0.5D0*(R(I)+R(I+1))
+	   RMID(I)=0.5_LDP*(R(I)+R(I+1))
 	 END DO
 !
 ! The following behaviour depends on whether H & N are defined at the nodes,

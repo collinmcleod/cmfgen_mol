@@ -60,7 +60,7 @@ C
 C Fac is the value by which dN1 is to exceed dNION before the
 C equation is replaced. The optimal value is unknown.
 C
-	FAC=1.0D+05
+	FAC=1.0E+05_LDP
 C
 	DIAG=(NUM_BNDS+1)/2
 	LIM=0
@@ -78,7 +78,7 @@ C
 C In all cases, we replce the ground state equation.
 C
 	DO K=1,LIM
- 	  T1=0.0D0
+ 	  T1=0.0_LDP
 	  DO I=1,NC2
 	     T1=T1+STEQ(EQC2+I-1,K)
 	  END DO

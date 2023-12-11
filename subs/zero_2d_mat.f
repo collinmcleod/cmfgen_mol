@@ -14,7 +14,7 @@
 !$OMP PARALLEL DO
 	DO J=1,M
 	  DO I=1,N
-	    A(I,J)=0.0D0
+	    A(I,J)=0.0_LDP
 	  END DO
 	END DO
 !

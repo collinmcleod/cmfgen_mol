@@ -440,7 +440,7 @@
 !
 	INTEGER, PARAMETER :: N_TAU_EDGE=5
 	REAL(KIND=LDP) TAU_EDGE(N_TAU_EDGE)
-	DATA TAU_EDGE/13.16D0,11.60D0,5.95D0,3.29D0,0.83D0/
+	DATA TAU_EDGE/13.16_LDP,11.60_LDP,5.95_LDP,3.29_LDP,0.83_LDP/
 !
 !
 ! Check whether EQUATION LABELLING is consistent. ' I ' is used as the
@@ -488,7 +488,7 @@
 	RP=R(ND)
 	VINF=V(1)
 	TSTAR=T(ND)
-	C_KMS=SPEED_OF_LIGHT()/1.0D+05
+	C_KMS=SPEED_OF_LIGHT()/1.0E+05_LDP
 	DO_REL_IN_OBSFRAME=.FALSE.
 	DA_FILE_DATE='20-Aug-2003'
 !
@@ -498,12 +498,12 @@
 ! COMP_JCONT_V?.INC whether to do an accurate flux calculation. An
 ! accurate flux calculation can be avoided by doing a LAMBDA iteration.
 !
-	MAXCH=0.0D0
-	VAL_DO_NG=5.0D0
+	MAXCH=0.0_LDP
+	VAL_DO_NG=5.0_LDP
 !
 ! Set the vector Z_POP to contain the ionic charge for each species.
 !
-	Z_POP(1:NT)=0.0D0
+	Z_POP(1:NT)=0.0_LDP
 !
 	DO ID=1,NUM_IONS
 	  CALL SET_Z_POP(Z_POP, ATM(ID)%ZXzV, ATM(ID)%EQXzV,
@@ -514,7 +514,7 @@
 ! calculations. G_ALL and LEVEL_ID  are no longer used due to the use
 ! of super levels.
 !
-	AMASS_ALL(1:NT)=0.0D0
+	AMASS_ALL(1:NT)=0.0_LDP
 !
 ! We also set the mass of the ion corresponding to XzV to AT_MASS for each
 ! species . Thus the range is EQXzV:EQXzV+NXzV, NOT EQXzV:EQXzV+NXzV-1. Note
@@ -538,7 +538,7 @@
 !
 	  K=0
 	  DO ISPEC=1,NUM_SPECIES
-	    IF(SPECIES_PRES(ISPEC) .AND. ABUND_SCALE_FAC(ISPEC) .NE. 1.0D0)THEN
+	    IF(SPECIES_PRES(ISPEC) .AND. ABUND_SCALE_FAC(ISPEC) .NE. 1.0_LDP)THEN
 	      IF(K .EQ. 0)THEN
 	        WRITE(LUER,'(A)')' '
 	        WRITE(LUER,'(A)')'******************Warning**********************'
@@ -615,23 +615,23 @@
 	IF(TURB_LAW .EQ. 'LAW_V1')THEN
 	  VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*V(1:ND)/V(1)
 	ELSE IF(TURB_LAW .EQ. 'LAW_TAU1')THEN
-	  ESEC(1:ND)=6.65D-15*ED(1:ND)*CLUMP_FAC(1:ND)
-	  TA(1)=1.0D0
+	  ESEC(1:ND)=6.65E-15_LDP*ED(1:ND)*CLUMP_FAC(1:ND)
+	  TA(1)=1.0_LDP
 	  DO I=1,ND
-	    TA(I)=TA(1)+0.5D0*(R(I)-R(I+1))*(ESEC(I)+ESEC(I+1))
+	    TA(I)=TA(1)+0.5_LDP*(R(I)-R(I+1))*(ESEC(I)+ESEC(I+1))
 	  END DO
-	  VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)/(1.0D0+TA(1:ND))
+	  VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)/(1.0_LDP+TA(1:ND))
 	ELSE
 	  WRITE(LUER,'(A)')' Error --- TURBULENT velocity law not recognized'
 	  WRITE(LUER,'(A)')TRIM(TURB_LAW)
 	  STOP
 	END IF
-	VDOP_VEC(1:ND)=SQRT( VTURB_VEC(1:ND)**2 + 2.96*T(1:ND) )
+	VDOP_VEC(1:ND)=SQRT( VTURB_VEC(1:ND)**2 + 2.96_LDP*T(1:ND) )
 !
-	TA(1:ND)=ABS( CLUMP_FAC(1:ND)-1.0D0 )
+	TA(1:ND)=ABS( CLUMP_FAC(1:ND)-1.0_LDP )
 	T1=MAXVAL(TA)
 	DO_CLUMP_MODEL=.FALSE.
-	IF(T1 .GT. 1.0D-05)DO_CLUMP_MODEL=.TRUE.
+	IF(T1 .GT. 1.0E-05_LDP)DO_CLUMP_MODEL=.TRUE.
 !
 !
 ! Compute profile frequencies such that for the adopted doppler
@@ -670,7 +670,7 @@
 !	1                        MAX_CONT_FREQ,MIN_CONT_FREQ,
 !	1                        dV_LEV_DIS,AMP_DIS,MIN_FREQ_LEV_DIS,
 !	1                        J,NCF,NCF_MAX,LUIN)
-	T1=5000.0D0
+	T1=5000.0_LDP
 	  CALL SET_CONT_FREQ_V4(NU,OBS,FQW,
 	1                        SMALL_FREQ_RAT,BIG_FREQ_AMP,dFREQ_BF_MAX,
 	1                        MAX_CONT_FREQ,MIN_CONT_FREQ,
@@ -698,7 +698,7 @@
 	  STOP
 	END IF
 !
-	ESEC(1:ND)=6.65D-15*ED(1:ND)
+	ESEC(1:ND)=6.65E-15_LDP*ED(1:ND)
 !
 ! The onlye species not present is the ion corresponding
 ! to the last ioization stage considered.
@@ -736,7 +736,7 @@
 	          END DO
 	          PROF_TYPE(ML)=ATM(ID)%XzV_PROF_TYPE
 	          IF(GLOBAL_LINE_PROF .NE. 'NONE')PROF_TYPE(ML)=GLOBAL_LINE_PROF
-	          T2=0.0D0
+	          T2=0.0_LDP
 	          CALL SET_PROF_LIMITS_V4(VEC_STRT_FREQ(ML),VEC_VDOP_MIN(ML),
 	1             CHIL,ED,T,VTURB_VEC,ND,PROF_TYPE(ML),PROF_LIST_LOCATION(ML),
 	1             VEC_FREQ(ML),MNL,MNUP,
@@ -794,7 +794,7 @@
 	    STOP
 	  END IF
 	  GLOBAL_LINE_SWITCH='NONE'
-	  T1=SPEED_OF_LIGHT()*1.0D-07
+	  T1=SPEED_OF_LIGHT()*1.0E-07_LDP
 	  DO I=1,N_LINE_FREQ
 	    IF(T1/VEC_FREQ(I) .GE. FLUX_CAL_LAM_END)THEN
 	      VEC_TRANS_TYPE(I)='SOB'
@@ -847,7 +847,7 @@
 	      T1=LAMVACAIR(VEC_FREQ(ML))
 	      T2=C_KMS*(VEC_FREQ(ML-1)-VEC_FREQ(ML))/VEC_FREQ(ML)
 	      IF(T2 .GT. C_KMS)T2=C_KMS
-	      IF(T1 .LT. 1.0D+04)THEN
+	      IF(T1 .LT. 1.0E+04_LDP)THEN
 	        WRITE(LUIN,'(1X,I6,2(1X,I6),2X,F10.6,2X,F10.3,2X,F10.2,4X,I7,2X,A12,3X,A)')
 	1           ML,VEC_MNL_F(ML),VEC_MNUP_F(ML),
 	1           VEC_FREQ(ML),T1,T2,PROF_LIST_LOCATION(ML),PROF_TYPE(ML),TRIM(VEC_TRANS_NAME(VEC_INDX(ML)))
@@ -919,7 +919,7 @@
 !
 	CALL SMPTRP(NU,FQW,NCF)
 	DO ML=1,NCF
-	  FQW(ML)=FQW(ML)*1.0D+15
+	  FQW(ML)=FQW(ML)*1.0E+15_LDP
 	END DO
 !
 ! Set observers frequencies. The slight fiddling in setting NU_MAX and NU_MIN
@@ -933,12 +933,12 @@
 !
 	CALL TUNE(1,'INS_LINE_OBS')
 	  WRITE(LUER,*)'Calling INS_LINE_OBS_V4'
-	  T1=NU(1)/(1.0D0+2.0D0*VINF/C_KMS)
+	  T1=NU(1)/(1.0_LDP+2.0_LDP*VINF/C_KMS)
 	  NU_MAX_OBS=MIN(T1,NU(3))
-	  IF(RD_NU_MAX_OBS .GT. 0.0D0)NU_MAX_OBS=RD_NU_MAX_OBS
-	  T1=NU(NCF)*(1.0D0+2.0D0*VINF/C_KMS)
+	  IF(RD_NU_MAX_OBS .GT. 0.0_LDP)NU_MAX_OBS=RD_NU_MAX_OBS
+	  T1=NU(NCF)*(1.0_LDP+2.0_LDP*VINF/C_KMS)
 	  NU_MIN_OBS=MAX(NU(NCF-3),T1)
-	  IF(RD_NU_MIN_OBS .GT. 0.0D0)NU_MIN_OBS=RD_NU_MIN_OBS
+	  IF(RD_NU_MIN_OBS .GT. 0.0_LDP)NU_MIN_OBS=RD_NU_MIN_OBS
 	  CALL INS_LINE_OBS_V4(OBS_FREQ,N_OBS,NCF_MAX,
 	1               VEC_FREQ,VEC_STRT_FREQ,VEC_VDOP_MIN,VEC_TRANS_TYPE,
 	1               N_LINE_FREQ,SOB_FREQ_IN_OBS,
@@ -1040,7 +1040,7 @@
 	  CALL EXTEND_VTSIGMA(VEXT,TEXT,SIGMAEXT,COEF,INDX,NDEXT,
 	1         V,T,SIGMA,ND)
 	  CALL IMPAR(PEXT,REXT,RP,NCEXT,NDEXT,NPEXT)
-	  LANG_COORDEXT=0.0D0
+	  LANG_COORDEXT=0.0_LDP
 !
 	  ALLOCATE (AQWEXT(NDEXT,NPEXT),STAT=IOS)
 	  IF(IOS .EQ. 0)ALLOCATE (HQWEXT(NDEXT,NPEXT),STAT=IOS)
@@ -1059,7 +1059,7 @@
 ! For the later, the iron mass of 55.8amu is assumed.
 !
 	  TA(1:NDEXT)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*VEXT(1:NDEXT)/VEXT(1)
-	  VDOP_VEC_EXT(1:NDEXT)=SQRT( TA(1:NDEXT)**2 + 2.96*TEXT(1:NDEXT) )
+	  VDOP_VEC_EXT(1:NDEXT)=SQRT( TA(1:NDEXT)**2 + 2.96_LDP*TEXT(1:NDEXT) )
 !
 ! Note that the F2DAEXT vectors (here used as dummy variables) must be at least
 ! NPEXT long.
@@ -1112,16 +1112,16 @@
 !
 	IF(ACCURATE)THEN
 	  DO LS=1,NPEXT
-	    MU_AT_RMAX(LS)=SQRT( 1.0D0 -(PEXT(LS)/REXT(1))**2 )
+	    MU_AT_RMAX(LS)=SQRT( 1.0_LDP -(PEXT(LS)/REXT(1))**2 )
 	    HQW_AT_RMAX(LS)=HQWEXT(1,LS)
 	  END DO
-	  IF(PEXT(NPEXT) .EQ. REXT(1))MU_AT_RMAX(NPEXT)=0.0D0
+	  IF(PEXT(NPEXT) .EQ. REXT(1))MU_AT_RMAX(NPEXT)=0.0_LDP
 	ELSE
 	  DO LS=1,NP
-	    MU_AT_RMAX(LS)=SQRT( 1.0D0 -(P(LS)/R(1))**2 )
+	    MU_AT_RMAX(LS)=SQRT( 1.0_LDP -(P(LS)/R(1))**2 )
 	    HQW_AT_RMAX(LS)=HQW(1,LS)
 	  END DO
-	  IF(P(NP) .EQ. R(1))MU_AT_RMAX(NP)=0.0D0
+	  IF(P(NP) .EQ. R(1))MU_AT_RMAX(NP)=0.0_LDP
 	END IF
 !
 	ALLOCATE (ETA_CMF_ST(ND,NCF),STAT=IOS)
@@ -1234,14 +1234,14 @@
 	  LINE_STORAGE_USED(SIM_INDX)=.FALSE.
 	END DO
 !
-	CONT_FREQ=0.0D0
+	CONT_FREQ=0.0_LDP
 !
 ! Define parameters to allow the Cummulative force multipler to be output at
 ! a function of frequency. We presently output the force multiplier every 500km/s.
 !
-	N_FORCE=LOG(NU(NCF)/NU(1))/LOG(1.0D0-500.0D0/C_KMS)
+	N_FORCE=LOG(NU(NCF)/NU(1))/LOG(1.0_LDP-500.0_LDP/C_KMS)
 	NU_FORCE=NU(1)
-	NU_FORCE_FAC=(1.0D0-500.0D0/C_KMS)
+	NU_FORCE_FAC=(1.0_LDP-500.0_LDP/C_KMS)
 	ML_FORCE=1
 	FLUSH(LUER)
 !
@@ -1369,8 +1369,8 @@
 	MNL_F=VEC_MNL_F(LAST_LINE)
 	MNUP_F=VEC_MNUP_F(LAST_LINE)
 	DO K=1,ND
-	  L_STAR_RATIO(K,SIM_INDX)=1.0D0
-	  U_STAR_RATIO(K,SIM_INDX)=1.0D0
+	  L_STAR_RATIO(K,SIM_INDX)=1.0_LDP
+	  U_STAR_RATIO(K,SIM_INDX)=1.0_LDP
 	END DO
 !
 ! T1 is used to represent b(level)/b(super level). If no interpolation of
@@ -1406,8 +1406,8 @@
 	    CHIL_MAT(I,SIM_INDX)=T1*(L_STAR_RATIO(I,SIM_INDX)*POPS(NL,I)-
 	1            GLDGU(SIM_INDX)*U_STAR_RATIO(I,SIM_INDX)*POPS(NUP,I))
 	    ETAL_MAT(I,SIM_INDX)=T2*POPS(NUP,I)*U_STAR_RATIO(I,SIM_INDX)
-	    IF(CHIL_MAT(I,SIM_INDX) .EQ. 0.0D0)THEN
-	      CHIL_MAT(I,SIM_INDX)=0.01D0*T1*POPS(NL,I)*L_STAR_RATIO(I,SIM_INDX)
+	    IF(CHIL_MAT(I,SIM_INDX) .EQ. 0.0_LDP)THEN
+	      CHIL_MAT(I,SIM_INDX)=0.01_LDP*T1*POPS(NL,I)*L_STAR_RATIO(I,SIM_INDX)
 	      WRITE(LUER,*)'Zero line opacity in CMFGEN_SUB'
 	      WRITE(LUER,*)'This needs to be fixed'
 	      J=ICHRLEN(TRANS_NAME_SIM(SIM_INDX))
@@ -1461,7 +1461,7 @@
 ! TC is the He+ density.
 !
 	  CALL TUNE(IONE,'SET_PROF')
-	  TB(1:ND)=0.0D0; TC(1:ND)=0.0D0
+	  TB(1:ND)=0.0_LDP; TC(1:ND)=0.0_LDP
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES .AND. ION_ID(ID) .EQ. 'HI')THEN
 	      TB(1:ND)=ATM(ID)%DxzV(1:ND)
@@ -1525,28 +1525,28 @@
 	  IF(NEG_OPAC_OPTION .EQ. 'SRCE_CHK')THEN
 	    DO I=1,ND
 	      IF(CHI(I) .LT. CHI_CONT(I) .AND.
-	1            CHI(I) .LT. 0.1D0*ETA(I)*(CHI_CONT(I)-ESEC(I))/ETA_CONT(I) )THEN
-	        CHI(I)=0.1D0*ETA(I)*(CHI_CONT(I)-ESEC(I))/ETA_CONT(I)
+	1            CHI(I) .LT. 0.1_LDP*ETA(I)*(CHI_CONT(I)-ESEC(I))/ETA_CONT(I) )THEN
+	        CHI(I)=0.1_LDP*ETA(I)*(CHI_CONT(I)-ESEC(I))/ETA_CONT(I)
 	        NEG_OPACITY(I)=.TRUE.
 	        AT_LEAST_ONE_NEG_OPAC=.TRUE.
-	        IF(CHI(I) .LE. 0.0D0)THEN
+	        IF(CHI(I) .LE. 0.0_LDP)THEN
 	          WRITE(6,*)'Possible error -- CHI still negative after correction'
 	          WRITE(6,'(A,I4,5X,A,ES16.10)')'Depth=',I,'Freq=',FL
 	          WRITE(6,'(5(8X,A))')'   ETA','ETA_CONT','    CHI','CHI_CONT','   ESEC'
 	          WRITE(6,'(5ES16.10)')ETA(I),ETA_CONT(I),CHI(I),CHI_CONT(I),ESEC(I)
-	          CHI(I)=0.1D0*ESEC(I)
+	          CHI(I)=0.1_LDP*ESEC(I)
 	         END IF
-	      ELSE IF(CHI(I) .LT. 0.1D0*ESEC(I))THEN
-	        CHI(I)=0.1D0*ESEC(I)
+	      ELSE IF(CHI(I) .LT. 0.1_LDP*ESEC(I))THEN
+	        CHI(I)=0.1_LDP*ESEC(I)
 	        NEG_OPACITY(I)=.TRUE.
 	        AT_LEAST_ONE_NEG_OPAC=.TRUE.
 	      END IF
 	    END DO
 	  ELSE IF(NEG_OPAC_OPTION .EQ. 'ESEC_CHK')THEN
 	    DO I=1,ND
-	      IF(CHI(I) .LT. 0.1D0*ESEC(I))THEN
+	      IF(CHI(I) .LT. 0.1_LDP*ESEC(I))THEN
 	        T1=CHI(I)
-	        CHI(I)=0.1D0*ESEC(I)
+	        CHI(I)=0.1_LDP*ESEC(I)
 	        NEG_OPACITY(I)=.TRUE.
 	        AT_LEAST_ONE_NEG_OPAC=.TRUE.
 	      END IF
@@ -1577,7 +1577,7 @@
 	  END DO
 !
 	  IF(LST_ITERATION .AND. ML .NE. NCF)THEN
-	    T1=MAX( LOG(DENSITY(5)/DENSITY(1))/LOG(R(1)/R(5))-1.0D0,1.0D0 )
+	    T1=MAX( LOG(DENSITY(5)/DENSITY(1))/LOG(R(1)/R(5))-1.0_LDP,1.0_LDP )
 	    DO I=1,N_TAU_EDGE
 	      IF(NU(ML) .GE. TAU_EDGE(I) .AND. NU(ML+1) .LT. TAU_EDGE(I))THEN
 	        IF(I .EQ. 1)WRITE(LUER,'(A)')' '
@@ -1631,7 +1631,7 @@
 ! Compute observed flux in Janskys for an object at 1 kpc .
 !	(const=dex(23)*2*pi*dex(20)/(3.0856dex(21))**2 )
 !
-	  OBS_FLUX(ML)=6.599341D0*SOB(1)*2.0D0		!2 DUE TO 0.5U
+	  OBS_FLUX(ML)=6.599341_LDP*SOB(1)*2.0_LDP		!2 DUE TO 0.5U
 	ELSE IF(CONT_VEL)THEN
 !
 ! TA is a work vector. TB initially used for extended SOB.
@@ -1659,7 +1659,7 @@
 	1              REXT,VEXT,LANG_COORDEXT,ND,
 	1              J,L_TRUE,L_TRUE,L_FALSE,'FLUX_FILE',LU_FLUX)
 	     END IF
-	     TA(1:ND)=13.1986D0*SOB(1:ND)
+	     TA(1:ND)=13.1986_LDP*SOB(1:ND)
 	     WRITE(LU_FLUX,REC=EDD_CONT_REC)INITIAL_ACCESS_REC,NCF,ND
 	     WRITE(LU_FLUX,REC=INITIAL_ACCESS_REC+ML-1)(SOB(I),I=1,ND),FL
 	   END IF
@@ -1681,7 +1681,7 @@
 ! Compute observed flux in Janskys for an object at 1 kpc .
 !	(const=dex(23)*2*pi*dex(20)/(3.0856dex(21))**2 )
 !
-	  OBS_FLUX(ML)=6.599341D0*SOB(1)*2.0D0		!2 DUE TO 0.5U
+	  OBS_FLUX(ML)=6.599341_LDP*SOB(1)*2.0_LDP		!2 DUE TO 0.5U
 	END IF
 !
 ! The quantity output is the LINE FORCE multiplier M(t).
@@ -1711,7 +1711,7 @@
 	1              REXT,VEXT,LANG_COORDEXT,ND,
 	1              J,L_TRUE,L_TRUE,L_FALSE,'FLUX_FILE',LU_FLUX)
 	     END IF
-	     TA(1:ND)=13.1986D0*SOB(1:ND)
+	     TA(1:ND)=13.1986_LDP*SOB(1:ND)
 	     WRITE(LU_FLUX,REC=EDD_CONT_REC)INITIAL_ACCESS_REC,NCF,ND
 	     WRITE(LU_FLUX,REC=INITIAL_ACCESS_REC+ML-1)(SOB(I),I=1,ND),FL
 	     CALL TUNE(2,'WR_FLUX')
@@ -1722,27 +1722,27 @@
 !
 	IF(ML .EQ. 1)THEN		!Need to move to main loop imit.
 	  DO I=1,ND
-	    RLUMST(I)=0.0D0
-	    J_INT(I)=0.0D0
-	    K_INT(I)=0.0D0
-	    FLUXMEAN(I)=0.0D0
-	    LINE_FLUXMEAN(I)=0.0D0
-	    ROSSMEAN(I)=0.0D0
-	    PLANCKMEAN(I)=0.0D0
-	    INT_dBdT(I)=0.0d0
+	    RLUMST(I)=0.0_LDP
+	    J_INT(I)=0.0_LDP
+	    K_INT(I)=0.0_LDP
+	    FLUXMEAN(I)=0.0_LDP
+	    LINE_FLUXMEAN(I)=0.0_LDP
+	    ROSSMEAN(I)=0.0_LDP
+	    PLANCKMEAN(I)=0.0_LDP
+	    INT_dBdT(I)=0.0_LDP
 	  END DO
 	END IF
 !
 	IF(COMPUTE_J)THEN
 	  T1=TWOHCSQ*HDKT*FQW(ML)*(NU(ML)**4)
 	  DO I=1,ND		              !(4*PI)**2*Dex(+20)/L(sun)
-	    T2=SOB(I)*FQW(ML)*4.1274D-12
+	    T2=SOB(I)*FQW(ML)*4.1274E-12_LDP
 	    RLUMST(I)=RLUMST(I)+T2
-	    J_INT(I)=J_INT(I)+RJ(I)*FQW(ML)*4.1274D-12
-	    K_INT(I)=K_INT(I)+K_MOM(I)*FQW(ML)*4.1274D-12
+	    J_INT(I)=J_INT(I)+RJ(I)*FQW(ML)*4.1274E-12_LDP
+	    K_INT(I)=K_INT(I)+K_MOM(I)*FQW(ML)*4.1274E-12_LDP
 	    FLUXMEAN(I)=FLUXMEAN(I)+T2*CHI(I)
 	    LINE_FLUXMEAN(I)=LINE_FLUXMEAN(I)+T2*(CHI(I)-CHI_CONT(I))
-	    T2=T1*EMHNUKT(I)/(  ( (1.0D0-EMHNUKT(I))*T(I) )**2  )
+	    T2=T1*EMHNUKT(I)/(  ( (1.0_LDP-EMHNUKT(I))*T(I) )**2  )
 	    INT_dBdT(I)=INT_dBdT(I)+T2
 	    ROSSMEAN(I)=ROSSMEAN(I)+T2/CHI(I)
 	  END DO
@@ -1750,7 +1750,7 @@
 !
 	T1=TWOHCSQ*FQW(ML)*(NU(ML)**3)
 	DO I=1,ND
-	  T2=T1*EMHNUKT(I)/(1.0D0-EMHNUKT(I))
+	  T2=T1*EMHNUKT(I)/(1.0_LDP-EMHNUKT(I))
 	  PLANCKMEAN(I)=PLANCKMEAN(I)+T2*CHI(I)
 	END DO
 !
@@ -1760,14 +1760,14 @@
 !
 	IF(WR_ION_LINE_FORCE)THEN
 	  IF(.NOT. ALLOCATED(ION_LINE_FORCE))ALLOCATE (ION_LINE_FORCE(ND,NUM_IONS))
-	  IF(ML .EQ. 1)ION_LINE_FORCE=0.0D0
+	  IF(ML .EQ. 1)ION_LINE_FORCE=0.0_LDP
 	  DO SIM_INDX=1,MAX_SIM
 	    IF(RESONANCE_ZONE(SIM_INDX))THEN
 	      K=SIM_LINE_POINTER(SIM_INDX)
 	      DO ID=1,NUM_IONS
 	        IF(VEC_SPEC(K) .EQ. ION_ID(ID))THEN
 	          DO I=1,ND
-	            ION_LINE_FORCE(I,ID)=ION_LINE_FORCE(I,ID)+4.1274D-12*FQW(ML)*SOB(I)*
+	            ION_LINE_FORCE(I,ID)=ION_LINE_FORCE(I,ID)+4.1274E-12_LDP*FQW(ML)*SOB(I)*
 	1                CHIL_MAT(I,SIM_INDX)*LINE_PROF_SIM(I,SIM_INDX)
 	          END DO
 	          EXIT
@@ -1854,9 +1854,9 @@
 !
 	IF(.NOT. COMPUTE_J)THEN
 	  I=3; CALL TUNE(I,' ')
-	  T1=7.218771D+11          ! T1=4 * [STEFAN BOLTZMAN CONS] * 1.0D+16 / pi
+	  T1=7.218771E+11_LDP          ! T1=4 * [STEFAN BOLTZMAN CONS] * 1.0D+16 / pi
 	  DO I=1,ND
-	    PLANCKMEAN(I)=4.0D0*PLANCKMEAN(I)/T1/( T(I)**4 )
+	    PLANCKMEAN(I)=4.0_LDP*PLANCKMEAN(I)/T1/( T(I)**4 )
 	  END DO
 	  OPEN(UNIT=11,STATUS='UNKNOWN',FILE='PLANCK_KAPPA_MEAN')
 	    WRITE(11,'(I5,2ES18.8,ES14.4)')(I,R(I),V(I),1.0D-10*PLANCKMEAN(I)/DENSITY(I),I=1,ND)
@@ -1919,13 +1919,13 @@
 !
 ! T1=4 * [STEFAN BOLTZMAN CONS] * 1.0D+16 / pi
 !
-	T1=7.218771D+11
+	T1=7.218771E+11_LDP
 	DO I=1,ND
-	  IF(ABS(RLUMST(I)) .LE. 1.0D-20)RLUMST(I)=1.0D-20
+	  IF(ABS(RLUMST(I)) .LE. 1.0E-20_LDP)RLUMST(I)=1.0E-20_LDP
 	  FLUXMEAN(I)=FLUXMEAN(I)/RLUMST(I)
 	  INT_dBdT(I)=INT_dBdT(I)/ROSSMEAN(I)		!Program rosseland opac.
 	  ROSSMEAN(I)=T1*( T(I)**3 )/ROSSMEAN(I)
-	  PLANCKMEAN(I)=4.0D0*PLANCKMEAN(I)/T1/( T(I)**4 )
+	  PLANCKMEAN(I)=4.0_LDP*PLANCKMEAN(I)/T1/( T(I)**4 )
 	END DO
 !
 	IF(WR_ION_LINE_FORCE)THEN
@@ -1938,20 +1938,20 @@
 ! results may be in error, and need to be checked.
 !
 	TCHI(1:ND)=ROSSMEAN(1:ND)*CLUMP_FAC(1:ND)
-	IF(MINVAL(TCHI) .GT. 0.0D0)THEN
+	IF(MINVAL(TCHI) .GT. 0.0_LDP)THEN
 	  CALL DERIVCHI(dCHIdR,TCHI,R,ND,METHOD)
         ELSE
-	  dCHIDR(1:ND)=0.0D0
+	  dCHIDR(1:ND)=0.0_LDP
 	  WRITE(LUER,*)'Error in CMF_FLUX_SUB: Check MEANOPAC'
 	  WRITE(LUER,*)'Rosseland mean opacity has negative values'
 	END IF
 	CALL NORDTAU(TA,TCHI,R,R,dCHIdR,ND)
 !
 	TCHI(1:ND)=FLUXMEAN(1:ND)*CLUMP_FAC(1:ND)
-	IF(MINVAL(TCHI) .GT. 0.0D0)THEN
+	IF(MINVAL(TCHI) .GT. 0.0_LDP)THEN
 	  CALL DERIVCHI(dCHIdR,FLUXMEAN,R,ND,METHOD)
         ELSE
-	  dCHIDR(1:ND)=0.0D0
+	  dCHIDR(1:ND)=0.0_LDP
 	  WRITE(LUER,*)'Warning from CMF_FLUX_SUB: Check MEANOPAC'
 	  WRITE(LUER,*)'Flux mean opacity has zero or negative values'
 	END IF
@@ -1961,23 +1961,23 @@
 	CALL DERIVCHI(dCHIdR,TCHI,R,ND,METHOD)
         CALL NORDTAU(DTAU,TCHI,R,R,dCHIdR,ND)
 !
-	TA(ND)=0.0D0; TB(ND)=0.0D0; TC(ND)=0.0D0; DTAU(ND)=0.0D0
+	TA(ND)=0.0_LDP; TB(ND)=0.0_LDP; TC(ND)=0.0_LDP; DTAU(ND)=0.0_LDP
 	CALL GEN_ASCI_OPEN(LU_OPAC,'MEANOPAC','UNKNOWN',' ',' ',IZERO,IOS)
 	  WRITE(LU_OPAC,
 	1  '( ''         R          I   Tau(Ross)   /\Tau  Rat(Ross)'//
 	1  ' Chi(Ross)  Chi(ross)  Chi(Flux)   Chi(es) '//
 	1  '  Tau(Flux)  Tau(es)  Rat(Flux)  Rat(es)   Kappa(R) V(km/s)'' )' )
-	IF(R(1) .GE. 1.0D+05)THEN
+	IF(R(1) .GE. 1.0E+05_LDP)THEN
 	  FMT='(ES17.10,I4,2ES10.3,ES10.2,4ES11.3,4ES10.2,2ES11.3)'
 	ELSE
 	  FMT='( F17.10,I4,2ES10.3,ES10.2,4ES11.3,4ES10.2,2ES11.3)'
 	END IF
 	  DO I=1,ND
 	    IF(I .EQ. 1)THEN
-	      T1=0.0D0		!Rosseland optical depth scale
-	      T2=0.0D0		!Flux optical depth scale
-	      T3=0.0D0		!Electron scattering optical depth scale.
-	      TC(1:3)=0.0D0
+	      T1=0.0_LDP		!Rosseland optical depth scale
+	      T2=0.0_LDP		!Flux optical depth scale
+	      T3=0.0_LDP		!Electron scattering optical depth scale.
+	      TC(1:3)=0.0_LDP
 	    ELSE
 	      T1=T1+TA(I-1)
 	      T2=T2+TB(I-1)
@@ -2014,7 +2014,7 @@
 	1         K,'RETURN J VIA CALL')
 	END IF
 !
-	ESEC(1:ND)=6.65D-15*ED(1:ND)
+	ESEC(1:ND)=6.65E-15_LDP*ED(1:ND)
 	DO ML=1,NCF
 	  ETA_CMF_ST(1:ND,ML)=ETA_CMF_ST(1:ND,ML) +
 	1                        RJ_CMF_ST(1:ND,ML)*ESEC(1:ND)
@@ -2029,7 +2029,7 @@
 ! MAX_DEL_V_RES_ZONE.
 !
 	DO I=1,ND
-	  MAX_DEL_V_RES_ZONE(I)=VTURB_VEC(I)*FRAC_DOP*0.5D0
+	  MAX_DEL_V_RES_ZONE(I)=VTURB_VEC(I)*FRAC_DOP*0.5_LDP
 	END DO
 !
 	IF(DO_CLUMP_MODEL)THEN
@@ -2047,11 +2047,11 @@
 ! For a plane-parallel model, we only have NC integration angles.
 !
 	IF(PLANE_PARALLEL_NO_V .OR. PLANE_PARALLEL)THEN
-	  HQW_AT_RMAX(:)=0.0D0
+	  HQW_AT_RMAX(:)=0.0_LDP
 	  CALL GAULEG(RZERO,RONE,MU_AT_RMAX,HQW_AT_RMAX,NC)
 	  HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*MU_AT_RMAX(1:NC)
 	  HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*R(ND)*R(ND)/R(1)/R(1)
-	  P(1:NC)=R(ND)*SQRT( (1.0D0-MU_AT_RMAX(1:NC))*(1.0D0+MU_AT_RMAX(1:NC)) )
+	  P(1:NC)=R(ND)*SQRT( (1.0_LDP-MU_AT_RMAX(1:NC))*(1.0_LDP+MU_AT_RMAX(1:NC)) )
 	  NC_OBS=NC; NP_OBS=NP
 	  P_OBS(1:NP_OBS)=P(1:NP_OBS)
 	ELSE IF(REVISE_P_GRID)THEN
@@ -2105,7 +2105,7 @@
 	TMP_LOG=.FALSE.
 	IF(PLANE_PARALLEL_NO_V .OR. PLANE_PARALLEL)TMP_LOG=.TRUE.
 	IF(PLANE_PARALLEL_NO_V)THEN
-	   TA(1:ND)=0.0D0
+	   TA(1:ND)=0.0_LDP
 	ELSE
 	   TA(1:ND)=V(1:ND)
 	END IF
@@ -2161,10 +2161,10 @@
 ! Zero the vector that will be used to store the force-multiplier computed
 ! for all lines using the SOBOLEV approximation.
 !
-	FORCE_MULT(1:ND)=0.0D0
-	N_FORCE=LOG(NU(NCF)/NU(1))/LOG(1.0D0- 500.0D0/C_KMS)
+	FORCE_MULT(1:ND)=0.0_LDP
+	N_FORCE=LOG(NU(NCF)/NU(1))/LOG(1.0_LDP- 500.0_LDP/C_KMS)
 	NU_FORCE=NU(1)
-	NU_FORCE_FAC=(1.0D0-500.0D0/C_KMS)
+	NU_FORCE_FAC=(1.0_LDP-500.0_LDP/C_KMS)
 	ML_FORCE=1
 !
 ! Enter line loop.
@@ -2172,7 +2172,7 @@
 	LINE_INDX=1
 	NUM_SOB_LINES=N_LINE_FREQ
 	IF(.NOT. DO_ALL_SOB_LINES)THEN
-	  T1=SPEED_OF_LIGHT()*1.0D-07
+	  T1=SPEED_OF_LIGHT()*1.0E-07_LDP
 	  DO I=1,N_LINE_FREQ
 	    IF(T1/VEC_FREQ(I) .GE. SOB_EW_LAM_BEG)EXIT
 	    LINE_INDX=I
@@ -2191,7 +2191,7 @@
 	  TMP_MAX_SIM=MAX_SIM
 	ELSE
 	  TMP_MAX_SIM=1
-	  OVER_FREQ_DIF=0.0D0
+	  OVER_FREQ_DIF=0.0_LDP
 	END IF
 !
 ! Determine next line (or lines), and store line parameters (eg frequency,
@@ -2226,7 +2226,7 @@
 !
 ! Determine center of blend. Used as continuum wavelength.
 !
-	FL=0.0D0
+	FL=0.0_LDP
 	DO SIM_INDX=1,NUM_SIM_LINES
 	  FL=FL+FL_SIM(SIM_INDX)
 	END DO
@@ -2259,8 +2259,8 @@
 	  I=SIM_LINE_POINTER(SIM_INDX)
 	  MNL_F=VEC_MNL_F(I)
 	  MNUP_F=VEC_MNUP_F(I)
-	  L_STAR_RATIO(1:ND,SIM_INDX)=0.0D0
-	  U_STAR_RATIO(1:ND,SIM_INDX)=0.0D0
+	  L_STAR_RATIO(1:ND,SIM_INDX)=0.0_LDP
+	  U_STAR_RATIO(1:ND,SIM_INDX)=0.0_LDP
 !
 	  DO ID=1,NUM_IONS
 	    IF(VEC_SPEC(I) .EQ. ION_ID(ID))THEN
@@ -2323,8 +2323,8 @@
 !
 	DO SIM_INDX=1,NUM_SIM_LINES
 	  DO I=1,ND
-	    T1=FL**3/(EXP(HDKT*FL/T(I))-1.0D0)
-	    T2=FL_SIM(SIM_INDX)**3/(EXP(HDKT*FL_SIM(SIM_INDX)/T(I))-1.0D0)
+	    T1=FL**3/(EXP(HDKT*FL/T(I))-1.0_LDP)
+	    T2=FL_SIM(SIM_INDX)**3/(EXP(HDKT*FL_SIM(SIM_INDX)/T(I))-1.0_LDP)
 	    BB_COR(I,SIM_INDX)=T1/T2
 	  END DO
 	END DO
@@ -2334,8 +2334,8 @@
 !
 	IF(SOBOLEV .OR. NUM_SIM_LINES .EQ. 1)THEN
 	  DO I=1,ND
-	    CHIL(I)=0.0D0
-	    ETAL(I)=0.0D0
+	    CHIL(I)=0.0_LDP
+	    ETAL(I)=0.0_LDP
 	    DO SIM_INDX=1,NUM_SIM_LINES
 	      CHIL(I)=CHIL(I)+CHIL_MAT(I,SIM_INDX)
 	      ETAL(I)=ETAL(I)+ETAL_MAT(I,SIM_INDX)*BB_COR(I,SIM_INDX)
@@ -2344,11 +2344,11 @@
 	END IF
 !
         IF(CHECK_LINE_OPAC .AND. SOBOLEV)THEN
-	  T1=3.0D-10/FL
+	  T1=3.0E-10_LDP/FL
 	  FIRST_NEG=.TRUE.
 	  DO I=1,ND
 	    T2=CHIL(I)*T1*R(I)/V(I)		!Tau(Sobolev) for dlnV/dlnr=1
-	    IF(T2 .LT. -0.5)THEN
+	    IF(T2 .LT. -0.5_LDP)THEN
 	      NEG_OPACITY(I)=.TRUE.
 	      IF(LST_ITERATION)THEN
 	        IF(FIRST_NEG)THEN
@@ -2360,7 +2360,7 @@
 2290	        FORMAT(1X,'I= ',I3,'  : TAU(Sob)= ',1P,E9.2,'  : Ne=',E8.2)
 	        WRITE(LU_NEG,*)CHIL(I),POPS(NL,I),R(I),V(I),T1
 	      END IF
-	      CHIL(I)=1.0D0	!Reset after we output its value.
+	      CHIL(I)=1.0_LDP	!Reset after we output its value.
 	    END IF
 	  END DO
 !
@@ -2371,7 +2371,7 @@
 !
 	  DO SIM_INDX=1,NUM_SIM_LINES
 	    DO I=1,ND
-              IF(NEG_OPACITY(I))CHIL_MAT(I,SIM_INDX)=1.0D0/NUM_SIM_LINES
+              IF(NEG_OPACITY(I))CHIL_MAT(I,SIM_INDX)=1.0_LDP/NUM_SIM_LINES
 	    END DO
 	  END DO
 !
@@ -2416,7 +2416,7 @@
 	END IF
 !
 	IF(ABS(ABS_EW) .GE. EW_CUT_OFF)THEN
-	  T1=0.01D0*C_KMS/FL_SIM(1) 		!Wavelength(Angstroms)
+	  T1=0.01_LDP*C_KMS/FL_SIM(1) 		!Wavelength(Angstroms)
 	  DO SIM_INDX=1,NUM_SIM_LINES
 	    J=SIM_LINE_POINTER(SIM_INDX)
 	    MNL=VEC_MNL_F(J)

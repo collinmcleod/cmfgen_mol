@@ -71,7 +71,7 @@
 !
 !	REAL(KIND=LDP), PARAMETER :: FAC=1.0D+05
 !	REAL(KIND=LDP), PARAMETER :: FAC=1.0D+02
-	REAL(KIND=LDP), SAVE ::  FAC=1.0D+02
+	REAL(KIND=LDP), SAVE ::  FAC=1.0E+02_LDP
 !
 	LOGICAL DIAG_BAND
 !
@@ -119,14 +119,14 @@
 	  CLOSE(UNIT=I)
 	END IF
 !
-	C_MAT(:,:)=0.0D0
-	C_ION(:,:)=0.0D0
-	C_NC(:,:)=0.0D0
+	C_MAT(:,:)=0.0_LDP
+	C_ION(:,:)=0.0_LDP
+	C_NC(:,:)=0.0_LDP
 !
 	IF(DIAG_BAND)THEN
-	  STEQ_VEC(:)=0.0D0
-	  STEQ_ION(:)=0.0D0
-	  STEQ_NC(:)=0.0D0
+	  STEQ_VEC(:)=0.0_LDP
+	  STEQ_ION(:)=0.0_LDP
+	  STEQ_NC(:)=0.0_LDP
 !
 !	  IF(FIRST_MATRIX)THEN
 !            I=SE(4)%LNK_TO_IV(1101)
@@ -285,8 +285,8 @@
 	    IF(SPECIES_PRES(ISPEC))THEN
 	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	        NS=ATM(ID)%NXzV
-                G_SUM(1:NS)=0.0D0
-                EDGE_SUM(1:NS)=0.0D0
+                G_SUM(1:NS)=0.0_LDP
+                EDGE_SUM(1:NS)=0.0_LDP
                 DO J=1,ATM(ID)%NXzV_F
                   I=ATM(ID)%F_TO_S_XzV(J)
                   G_SUM(I)=G_SUM(I)+ATM(ID)%GXzV_F(J)
@@ -294,21 +294,21 @@
                 END DO
 !
 	        IF(DIAG_BAND)THEN
-	          SUM=0.0D0
+	          SUM=0.0_LDP
                   DO I=1,ATM(ID)%NXzV
                     T1=EDGE_SUM(I)/G_SUM(I)
 	            EQ=SE(ID)%EQ_IN_BA(I)
-	            SUM=SUM+5.27296D-03*T1*STEQ_VEC(EQ)
+	            SUM=SUM+5.27296E-03_LDP*T1*STEQ_VEC(EQ)
 	          END DO
 	          STEQ_VEC(NT)=STEQ_VEC(NT)+SUM
 	        END IF
 !
 	        DO J=1,NT
-	          SUM=0.0D0
+	          SUM=0.0_LDP
                   DO I=1,ATM(ID)%NXzV
                     T1=EDGE_SUM(I)/G_SUM(I)
 	            EQ=SE(ID)%EQ_IN_BA(I)
-	            SUM=SUM+5.27296D-03*T1*C_MAT(EQ,J)
+	            SUM=SUM+5.27296E-03_LDP*T1*C_MAT(EQ,J)
 	          END DO
 	          C_MAT(NT,J)=C_MAT(NT,J)+SUM
 	        END DO
@@ -378,7 +378,7 @@
 !
 	IF(USE_PASSED_REP)THEN
 	  DO I=1,NT
-	     IF(ZERO_STEQ(I))STEQ_VEC(I)=0.0D0
+	     IF(ZERO_STEQ(I))STEQ_VEC(I)=0.0_LDP
 	  END DO
 	ELSE
 	  CALL FIXPOP_IN_BA_V3(C_MAT,STEQ_VEC,ZERO_STEQ,

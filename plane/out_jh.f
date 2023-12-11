@@ -41,7 +41,7 @@
 	INTEGER LU_ER,ERROR_LU,WARNING_LU,LU_WARN
 	EXTERNAL ERROR_LU,WARNING_LU
 !
-	REAL(KIND=LDP),  SAVE :: NU_STORE=0.0D0
+	REAL(KIND=LDP),  SAVE :: NU_STORE=0.0_LDP
 	INTEGER, SAVE :: ST_IREC=6
 	INTEGER, SAVE :: IREC=0
 	INTEGER, SAVE :: LU_OUT=0
@@ -99,7 +99,7 @@
 	  WRITE(LU_OUT,REC=3)ST_IREC,NCF,ND
 	  WRITE(LU_OUT,REC=ST_IREC)(R(I),I=1,ND),(V(I),I=1,ND)
 	  IREC=ST_IREC+2   	!R,V, and frequency integrated J, H.
-	  NU_STORE=0.0D0
+	  NU_STORE=0.0_LDP
 	END IF
 !
 ! Becasue we iterate, we may write the same frequency several times.

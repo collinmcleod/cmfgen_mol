@@ -17,10 +17,10 @@ C
 	LOGICAL, SAVE :: CHECK=.FALSE.
 	EXTERNAL ERROR_LU
 C
-	W(:)=0.0D0
+	W(:)=0.0_LDP
 C
 	DO I=1,N-1
-	  H=0.5D0*(X(I)-X(I+1))
+	  H=0.5_LDP*(X(I)-X(I+1))
 	  W(I)=W(I)+H
 	  W(I+1)=W(I+1)+H
 	END DO
@@ -32,8 +32,8 @@ C
 C Integral from X(N) to 0
 C
 	  T1=X(N)/( X(N-1)*X(N-1)-X(N)*X(N) )
-	  W(N-1)=W(N-1)-2.0D0*T1*X(N)*X(N)/3.0D0
-	  W(N)=W(N)+T1*(X(N-1)*X(N-1)-X(N)*X(N)/3.0D0)
+	  W(N-1)=W(N-1)-2.0_LDP*T1*X(N)*X(N)/3.0_LDP
+	  W(N)=W(N)+T1*(X(N-1)*X(N-1)-X(N)*X(N)/3.0_LDP)
 C
 	END IF
 C
@@ -42,30 +42,30 @@ C perform the normalization). Two checks are done to insure that
 C the correct answer is given for a linear varaition. Because of the
 C assumption that du/dmu(mu=0)=0, we have to fiddle with the last check.
 C
-	SUM=0.0D0
+	SUM=0.0_LDP
 	DO I=1,N
 	  SUM=SUM+W(I)
 	END DO
-	IF(ABS(SUM-1.0D0) .GT. 1.0D-12)THEN
+	IF(ABS(SUM-1.0_LDP) .GT. 1.0E-12_LDP)THEN
 	  LUER=ERROR_LU()
 	  WRITE(LUER,*)'Warning - weights require normalization in JWEIGHT'
 	  WRITE(LUER,*)'Scale=',SUM
 	END IF
 C
-	SUM=0.0D0
+	SUM=0.0_LDP
 	DO I=1,N
 	  SUM=SUM+W(I)*X(I)
 	END DO
 	IF(X(N) .EQ. 0)THEN
-	  T1=0.5D0
+	  T1=0.5_LDP
 	ELSE
 	  T1=X(N)/( X(N-1)*X(N-1)-X(N)*X(N) )
-	  T1=T1*( X(N)*(X(N-1)*X(N-1)-X(N)*X(N)/3.0D0)
-	1        -2.0D0*X(N)*X(N)*X(N-1)/3.0D0 )
-	  T1=0.5D0*(1.0D0-X(N)*X(N))+T1
+	  T1=T1*( X(N)*(X(N-1)*X(N-1)-X(N)*X(N)/3.0_LDP)
+	1        -2.0_LDP*X(N)*X(N)*X(N-1)/3.0_LDP )
+	  T1=0.5_LDP*(1.0_LDP-X(N)*X(N))+T1
 	END IF
 	SUM=T1/SUM
-	IF(ABS(SUM-1.0D0) .GT. 1.0D-12)THEN
+	IF(ABS(SUM-1.0_LDP) .GT. 1.0E-12_LDP)THEN
 	   LUER=ERROR_LU()
 	   WRITE(LUER,*)' Warning - weights require normalization in JWEIGHT'
 	END IF

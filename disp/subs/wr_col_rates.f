@@ -112,7 +112,7 @@
 	    END DO
 !	
 	  ELSE IF( TRIM(OPTION) .EQ. 'COOL_RATES')THEN
-	    T1=6.626D-12
+	    T1=6.626E-12_LDP
 	    DO I=1,MIN(N_PER_LINE*M,N)
 	      IF(N_PER_LINE*M-I .LT. N_PER_LINE-1)THEN
                 K=K+DIG_PER_NUM
@@ -145,8 +145,8 @@
 	END DO
 !
 	IF(TRIM(OPTION) .EQ. 'COOL_RATES')THEN
-	  T1=6.626D-12
-	  SUM=0.0D0
+	  T1=6.626E-12_LDP
+	  SUM=0.0_LDP
 	  DO I=1,N
 	    SUM=SUM+OMEGA(I,I)*(XzV(I)-XzVLTE(I))*EDGE(I)*T1
 	    DO J=I+1,N
@@ -157,7 +157,7 @@
 	 WRITE(LU,'(A,ES14.4)')'Total colissional cooling rate is:',SUM
 !
 	ELSE IF(TRIM(OPTION) .EQ. 'NET_RATES')THEN
-	  SUM=0.0D0
+	  SUM=0.0_LDP
 	  DO I=1,N
 	    SUM=SUM+OMEGA(I,I)*(XzV(I)-XzVLTE(I))
 	   END DO

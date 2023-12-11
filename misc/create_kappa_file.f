@@ -100,7 +100,7 @@
 	1                'SIX','SEV','VIII','IX','X','XI','XII',
 	1                'XIII','XIV','XV','XSIX','XSEV','X8','X9','XX'/
 !
-	TS(:)%SN_AGE=0.0D0
+	TS(:)%SN_AGE=0.0_LDP
 	TS(:)%ND=0
 	BIGGEST_ID=0
 	TIME=' '
@@ -171,15 +171,15 @@
 	  CALL RD_SING_VEC_RVTJ(TS(L)%ROSS_MEAN,TS(L)%ND,'Rosseland Mean Opacity',FILE_NAME,LU,IOS)
 	  CALL RD_SING_VEC_RVTJ(TS(L)%PLANCK_MEAN,TS(L)%ND,'Planck Mean Opacity',FILE_NAME,LU,IOS)
 	  CALL RD_SING_VEC_RVTJ(TS(L)%DENSITY,TS(L)%ND,'Mass Density',FILE_NAME,LU,IOS)
-	  TS(L)%T=1.0D+04*TS(L)%T
+	  TS(L)%T=1.0E+04_LDP*TS(L)%T
 !
 ! Convert to mass-absorption coefficient.
 !
-	  TS(L)%ROSS_MEAN=1.0D-10*TS(L)%ROSS_MEAN/TS(L)%DENSITY
-	  TS(L)%FLUX_MEAN=1.0D-10*TS(L)%FLUX_MEAN/TS(L)%DENSITY
-	  TS(L)%PLANCK_MEAN=1.0D-10*TS(L)%PLANCK_MEAN/TS(L)%DENSITY
+	  TS(L)%ROSS_MEAN=1.0E-10_LDP*TS(L)%ROSS_MEAN/TS(L)%DENSITY
+	  TS(L)%FLUX_MEAN=1.0E-10_LDP*TS(L)%FLUX_MEAN/TS(L)%DENSITY
+	  TS(L)%PLANCK_MEAN=1.0E-10_LDP*TS(L)%PLANCK_MEAN/TS(L)%DENSITY
 !
-	  IF(TS(L)%PLANCK_MEAN(1) .EQ. 0.0D0)THEN
+	  IF(TS(L)%PLANCK_MEAN(1) .EQ. 0.0_LDP)THEN
 	    FILE_NAME=TRIM(DIR_NAME(L))//'obs_planck/'//'PLANCK_KAPPA_MEAN'
 	    OPEN(UNIT=LU,FILE=FILE_NAME,STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	      IF(IOS .EQ. 0)THEN
@@ -194,7 +194,7 @@
 	      ELSE
 	        WRITE(6,*)'Error opening file: IOSTAT=',IOS
 	        WRITE(6,*)'File is ',TRIM(FILE_NAME)
-	        TS(L)%PLANCK_MEAN(I)=1.0D-99
+	        TS(L)%PLANCK_MEAN(I)=1.0E-99_LDP
 !               STOP
 	      END IF
 	      INQUIRE(UNIT=LU,OPENED=FILE_OPEN)
@@ -234,9 +234,9 @@
 	1            (HNU(I,ML),I=2,NX),HNU(NX+1,ML),HNU(1,ML),NU(ML)    !H_INBC,H_OUTBC,NU(ML)
 	     HNU(1,ML)=HNU(1,ML)*JNU(1,ML)
 	  END DO
-	  TS(L)%JCMF=0.0D0; HTMP=0.0D0
+	  TS(L)%JCMF=0.0_LDP; HTMP=0.0_LDP
 	  DO ML=1,NCF-1
-	    T1=0.5D+15*(NU(ML)-NU(ML+1))
+	    T1=0.5E+15_LDP*(NU(ML)-NU(ML+1))
 	    DO I=1,TS(L)%ND
 	      TS(L)%JCMF(I)=TS(L)%JCMF(I)+T1*(JNU(I,ML)+JNU(I,ML+1))
 	    END DO
@@ -245,7 +245,7 @@
 	    END DO
 	  END DO
 	  DO I=2,TS(L)%ND
-	    RMID(I)=0.5D0*(TS(L)%R(I)+TS(L)%R(I-1))
+	    RMID(I)=0.5_LDP*(TS(L)%R(I)+TS(L)%R(I-1))
 	  END DO
 	  RMID(1)=TS(L)%R(1); RMID(NX+1)=TS(L)%R(NX)
 	  K=NX+1

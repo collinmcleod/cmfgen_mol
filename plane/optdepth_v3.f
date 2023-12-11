@@ -48,16 +48,16 @@
           dchidz(iz)=(chi(iz-1)-chi(iz+1))/(ray(ip)%s_p(iz-1)-ray(ip)%s_p(iz+1))
         enddo
         dchidz(nz)=(chi(nz-1)-chi(nz))/(ray(ip)%s_p(nz-1)-ray(ip)%s_p(nz))
-	dchidz(1:nz)=0.0d0
+	dchidz(1:nz)=0.0_LDP
 !
 ! Determine dtau
 !
-        tau_loc(1)=0.0D0
+        tau_loc(1)=0.0_LDP
         do iz=1,nz-1
-          dtau_loc(iz)=0.5d0*(ray(ip)%s_p(iz)-ray(ip)%s_p(iz+1))
+          dtau_loc(iz)=0.5_LDP*(ray(ip)%s_p(iz)-ray(ip)%s_p(iz+1))
      *         *( chi(iz)+chi(iz+1)
      *         +(ray(ip)%s_p(iz)-ray(ip)%s_p(iz+1))
-     *         *(dchidz(iz+1)-dchidz(iz))/6.0d0 )
+     *         *(dchidz(iz+1)-dchidz(iz))/6.0_LDP )
           tau_loc(iz+1)=tau_loc(iz)+dtau_loc(iz)
         enddo
 !
@@ -70,16 +70,16 @@
           dchidz(iz)=(chi(iz+1)-chi(iz-1))/(ray(ip)%s_m(iz+1)-ray(ip)%s_m(iz-1))
         enddo
         dchidz(nz)=(chi(nz)-chi(nz-1))/(ray(ip)%s_m(nz)-ray(ip)%s_m(nz-1))
-	dchidz(1:nz)=0.0d0
+	dchidz(1:nz)=0.0_LDP
 !
 ! Determine dtau
 !
-        tau_loc(1)=0.0D0
+        tau_loc(1)=0.0_LDP
         do iz=1,nz-1
-          dtau_loc(iz)=0.5d0*(ray(ip)%s_m(iz+1)-ray(ip)%s_m(iz))
+          dtau_loc(iz)=0.5_LDP*(ray(ip)%s_m(iz+1)-ray(ip)%s_m(iz))
      *         *(chi(iz+1)+chi(iz)
      *         +(ray(ip)%s_m(iz+1)-ray(ip)%s_m(iz))
-     *         *(dchidz(iz)-dchidz(iz+1))/6.0d0)
+     *         *(dchidz(iz)-dchidz(iz+1))/6.0_LDP)
           tau_loc(iz+1)=tau_loc(iz)+dtau_loc(iz)
         enddo
 !

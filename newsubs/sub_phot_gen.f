@@ -126,8 +126,8 @@
 	REAL(KIND=LDP) RJ
 	REAL(KIND=LDP) SUM
 !
-	REAL(KIND=LDP), PARAMETER :: EV_TO_HZ=0.241798840766D0
-	REAL(KIND=LDP), PARAMETER :: EQUAL_COR_FAC=1.0D0+1.0D-14
+	REAL(KIND=LDP), PARAMETER :: EV_TO_HZ=0.241798840766_LDP
+	REAL(KIND=LDP), PARAMETER :: EQUAL_COR_FAC=1.0_LDP+1.0E-14_LDP
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: ITWO=2
@@ -142,7 +142,7 @@
 ! photoionization cross-sections are computed. For use with SET_TO_EDGE.
 !
 	IF(PHOT_ID .LT. 0)THEN
-	  IF(SET_TO_EDGE .AND. FREQ .EQ. 0.0D0)THEN
+	  IF(SET_TO_EDGE .AND. FREQ .EQ. 0.0_LDP)THEN
 	    PHOT(1:NLEVS)=GS_EDGE(1:NLEVS)+PD(ID)%EXC_FREQ(ABS(PHOT_ID))
 	  ELSE
 	    WRITE(ERROR_LU(),*)'Invalid option list in SUB_PHOT_XzV[1]'
@@ -167,7 +167,7 @@
 	  DO_PURE_EDGE=.FALSE.
 	END IF	
 !
-	PHOT(1:NLEVS)=0.0D0
+	PHOT(1:NLEVS)=0.0_LDP
 	FREQ_VEC(1:NLEVS)=FREQ
 	DO I=1,NLEVS
 	  EDGE=GS_EDGE(I)+PD(ID)%EXC_FREQ(PHOT_ID)
@@ -286,17 +286,17 @@ C
 	          J=RJ
 	          T1=RJ-J
 	          J=J+1
-	          SUM=0.0D0
+	          SUM=0.0_LDP
 	          DO L=LST,LEND
 	            IF(J .LT. N_PER_L)THEN
 	              J=J+BF_L_INDX(N,L)-1
-	              T2=T1*BF_L_CROSS(J+1)+(1.0D0-T1)*BF_L_CROSS(J)
+	              T2=T1*BF_L_CROSS(J+1)+(1.0_LDP-T1)*BF_L_CROSS(J)
 	            ELSE
 	              J=BF_L_INDX(N,L)+N_PER_L-1
 	              T2=(BF_L_CROSS(J)-BF_L_CROSS(J-1))*
 	1                   (RJ-N_PER_L)+BF_L_CROSS(J)
 	            END IF
-	            SUM=SUM+(2*L+1)*(10.0D0**T2)
+	            SUM=SUM+(2*L+1)*(10.0_LDP**T2)
 		    J=RJ+1 		!Restore as corrupted	
 	          END DO
 	          SUM=SUM*( PD(ID)%NEF(I,GRID_ID)/(N*PD(ID)%ZION) )**2
@@ -344,17 +344,17 @@ C
 	            J=RJ
 	            T1=RJ-J
 	            J=J+1
-	            SUM=0.0D0
+	            SUM=0.0_LDP
 	            DO L=LST,LEND
 	              IF(J .LT. N_PER_L)THEN
 	                J=J+BF_L_INDX(N,L)-1
-	                T2=T1*BF_L_CROSS(J+1)+(1.0D0-T1)*BF_L_CROSS(J)
+	                T2=T1*BF_L_CROSS(J+1)+(1.0_LDP-T1)*BF_L_CROSS(J)
 	              ELSE
 	                J=BF_L_INDX(N,L)+N_PER_L-1
 	                T2=(BF_L_CROSS(J)-BF_L_CROSS(J-1))*
 	1                   (RJ-N_PER_L)+BF_L_CROSS(J)
 	              END IF
-	              SUM=SUM+(2*L+1)*(10.0D0**T2)
+	              SUM=SUM+(2*L+1)*(10.0_LDP**T2)
 		      J=RJ+1 		!Restore as corrupted	
 	            END DO
 	            SUM=SUM/PD(ID)%ZION/PD(ID)%ZION	!Ignore neff correction :( PD(ID)%NEF(I,GRID_ID)/(N*PD(ID)%ZION) )**2
@@ -401,7 +401,7 @@ C
 	            LMAX=LMIN+1
 	            T1=(PD(ID)%NU_NORM(LMAX)-U)/(PD(ID)%NU_NORM(LMAX)-PD(ID)%NU_NORM(LMIN))
 	            PHOT(I)=PHOT(I)+ CONV_FAC*(
-	1              (1.0D0-T1)*PD(ID)%CROSS_A(LMAX)+T1*PD(ID)%CROSS_A(LMIN)  )
+	1              (1.0_LDP-T1)*PD(ID)%CROSS_A(LMAX)+T1*PD(ID)%CROSS_A(LMIN)  )
 	            PD(ID)%LST_LOC(I,GRID_ID)=LMIN
 	          END IF		!Outside table range?
 !
@@ -413,7 +413,7 @@ C
 	          RU=EDGE/FREQ_VEC(I)
 	          PHOT(I)=PHOT(I) + CONV_FAC*
 	1            PD(ID)%CROSS_A(LMIN)*( PD(ID)%CROSS_A(LMIN+1) +
-	1             (1.0D0-PD(ID)%CROSS_A(LMIN+1))*RU )*( RU**PD(ID)%CROSS_A(LMIN+2) )
+	1             (1.0_LDP-PD(ID)%CROSS_A(LMIN+1))*RU )*( RU**PD(ID)%CROSS_A(LMIN+2) )
 !
 !
 !
@@ -423,7 +423,7 @@ C
 !
 	          N=PD(ID)%CROSS_A(LMIN+1)
 	          IF(N .GT. 30)THEN
-	            T1=1.0D0
+	            T1=1.0_LDP
 	          ELSE
 	            X=LOG10(U)
 	            RJ=X/N_DEL_U
@@ -432,14 +432,14 @@ C
 	            J=J+1
 	            IF(J .LT. N_PER_N)THEN
 	              J=J+BF_N_INDX(N)-1
-	              T1=T1*BF_N_GAUNT(J+1)+(1.0D0-T1)*BF_N_GAUNT(J)
+	              T1=T1*BF_N_GAUNT(J+1)+(1.0_LDP-T1)*BF_N_GAUNT(J)
 	            ELSE
 !
 ! Power law extrapolation.
 !
 	              J=BF_N_INDX(N)+N_PER_N-1
 	              T1=LOG10(BF_N_GAUNT(J-1)/BF_N_GAUNT(J))
-1                     T1=BF_N_GAUNT(J)*( 10.0D0**(T1*(N_PER_N-RJ)) )
+1                     T1=BF_N_GAUNT(J)*( 10.0_LDP**(T1*(N_PER_N-RJ)) )
 	            END IF
 	          END IF
 !
@@ -458,7 +458,7 @@ C
 	          T1=CONV_FAC*(  PD(ID)%CROSS_A(LMIN)+RU*( PD(ID)%CROSS_A(LMIN+1) +
 	1                   RU*(PD(ID)%CROSS_A(LMIN+2) + RU*(PD(ID)%CROSS_A(LMIN+3)+
 	1                   RU*(PD(ID)%CROSS_A(LMIN+4)+RU*PD(ID)%CROSS_A(LMIN+5)))) )  )
-	          IF(T1 .GT. 0.0D0)PHOT(I)=PHOT(I)+T1
+	          IF(T1 .GT. 0.0_LDP)PHOT(I)=PHOT(I)+T1
 !
 !
 	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 5)THEN
@@ -488,15 +488,15 @@ C
 !
 ! U+SPACING(U) is the smallest number different from U (and lager).
 !
-	          X=LOG10(U+3.0D0*SPACING(U))
-	          IF(X .GE. 0.0D0)THEN
+	          X=LOG10(U+3.0_LDP*SPACING(U))
+	          IF(X .GE. 0.0_LDP)THEN
                     IF(X .LT. PD(ID)%CROSS_A(LMIN+4))THEN
 	              T1=((PD(ID)%CROSS_A(LMIN+3)*X+PD(ID)%CROSS_A(LMIN+2))*X +
 	1                  PD(ID)%CROSS_A(LMIN+1))*X+PD(ID)%CROSS_A(LMIN)
 	            ELSE
                       T1=PD(ID)%CROSS_A(LMIN+5)+PD(ID)%CROSS_A(LMIN+6)*X
 	            END IF
-	            PHOT(I)=PHOT(I)+10.0D0**(T1+LG10_CONV_FAC)
+	            PHOT(I)=PHOT(I)+10.0_LDP**(T1+LG10_CONV_FAC)
 	          END IF
 !
 ! Modified seaton fit.
@@ -505,10 +505,10 @@ C
 	1                             PD(ID)%CROSS_A(LMIN) .NE. 0)THEN
 !	          RU=EDGE/(FREQ_VEC(I)+PD(ID)%CROSS_A(LMIN+3))
 	          RU=(EDGE+PD(ID)%CROSS_A(LMIN+3))/FREQ_VEC(I)
-	          IF(RU .LE. 1.0D0)THEN
+	          IF(RU .LE. 1.0_LDP)THEN
 	            PHOT(I)=PHOT(I) + CONV_FAC*
 	1              PD(ID)%CROSS_A(LMIN)*( PD(ID)%CROSS_A(LMIN+1) +
-	1               (1.0D0-PD(ID)%CROSS_A(LMIN+1))*RU )*( RU**PD(ID)%CROSS_A(LMIN+2) )
+	1               (1.0_LDP-PD(ID)%CROSS_A(LMIN+1))*RU )*( RU**PD(ID)%CROSS_A(LMIN+2) )
 	          END IF
 !
 ! We assume all ionizations are to the ground state. Previously we read in
@@ -518,20 +518,20 @@ C
 	          LMIN=LMIN-8
 	          DO J=1,(PD(ID)%END_LOC(TERM,GRID_ID)-PD(ID)%ST_LOC(TERM,GRID_ID)+1)/8
 	            LMIN=LMIN+8
-	            IF(J .NE. 1)EDGE=0.241798840766D0*PD(ID)%CROSS_A(LMIN+2)
+	            IF(J .NE. 1)EDGE=0.241798840766_LDP*PD(ID)%CROSS_A(LMIN+2)
 	            IF(FREQ_VEC(I) .GE. EDGE)THEN
                       U=FREQ_VEC(I)/PD(ID)%CROSS_A(LMIN+3)/EV_TO_HZ
-                      T1=(U-1.0D0)**2 + PD(ID)%CROSS_A(LMIN+7)**2
-                      T2=U**( 5.5D0+PD(ID)%CROSS_A(LMIN+1)-0.5D0*PD(ID)%CROSS_A(LMIN+6) )
-                      T3=( 1.0D0+SQRT(U/PD(ID)%CROSS_A(LMIN+5)) )**PD(ID)%CROSS_A(LMIN+6)
-                      PHOT(I)=PHOT(I)+1.0D-08*T1*PD(ID)%CROSS_A(LMIN+4)/T2/T3
+                      T1=(U-1.0_LDP)**2 + PD(ID)%CROSS_A(LMIN+7)**2
+                      T2=U**( 5.5_LDP+PD(ID)%CROSS_A(LMIN+1)-0.5_LDP*PD(ID)%CROSS_A(LMIN+6) )
+                      T3=( 1.0_LDP+SQRT(U/PD(ID)%CROSS_A(LMIN+5)) )**PD(ID)%CROSS_A(LMIN+6)
+                      PHOT(I)=PHOT(I)+1.0E-08_LDP*T1*PD(ID)%CROSS_A(LMIN+4)/T2/T3
                     END IF
 	          END DO
 !
 !
 !
 	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 30)THEN
-	          T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION	!# of elec. in species.
+	          T1=PD(ID)%AT_NO+1.0_LDP-PD(ID)%ZION	!# of elec. in species.
 	          T1=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,IZERO,IZERO,L_FALSE,L_TRUE)
 	          IF(T1 .GT. 0)PHOT(I)=PHOT(I)+T1
 	          WRITE(6,*)'Error in SUB_PHOT_GEN -- calling CROSS TYPE 30 - 31'
@@ -540,7 +540,7 @@ C
 	          STOP
 !
 	        ELSE IF(PD(ID)%CROSS_TYPE(TERM,GRID_ID) .EQ. 31)THEN
-	          T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION	!# of elec. in species.
+	          T1=PD(ID)%AT_NO+1.0_LDP-PD(ID)%ZION	!# of elec. in species.
 	          N=NINT(PD(ID)%CROSS_A(LMIN))
 	          L=NINT(PD(ID)%CROSS_A(LMIN))
 	          T1=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,N,L,L_FALSE,L_FALSE)
@@ -566,11 +566,11 @@ C
 	    DO J=PD(ID)%ST_INDEX(I),PD(ID)%END_INDEX(I)
 	      IF( FREQ_VEC(I) .GE. PD(ID)%NU_MIN(J) .AND.
 	1                           FREQ_VEC(I) .LE. PD(ID)%NU_MAX(J) )THEN
-	        DOP_NU=PD(ID)%NU_ZERO(J)*PD(ID)%VSM_KMS/2.998D+05
+	        DOP_NU=PD(ID)%NU_ZERO(J)*PD(ID)%VSM_KMS/2.998E+05_LDP
 	        A_VOIGT=PD(ID)%GAMMA(J)/DOP_NU
 	        V_VOIGT=(FREQ-PD(ID)%NU_ZERO(J))/DOP_NU
 	        PHOT(I)=PHOT(I)+
-	1             1.0D-15*OPLIN*PD(ID)%OSC(J)*VOIGT(A_VOIGT,V_VOIGT)/DOP_NU
+	1             1.0E-15_LDP*OPLIN*PD(ID)%OSC(J)*VOIGT(A_VOIGT,V_VOIGT)/DOP_NU
 	      END IF
 	    END DO
 	  END DO
@@ -581,7 +581,7 @@ C
 ! included.
 !
 	IF(PD(ID)%DO_KSHELL_W_GS .AND. PHOT_ID .EQ. 1 .AND. FREQ .GT. 0)THEN
-	  T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION			!Number of electrons in species.
+	  T1=PD(ID)%AT_NO+1.0_LDP-PD(ID)%ZION			!Number of electrons in species.
 	  T2=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,IZERO,IZERO,L_FALSE,L_TRUE)
 	  IF(NINT(T1) .EQ. 3)T2=T2+XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,IONE,IZERO,L_FALSE,L_TRUE)
 	  IF(T2 .GT. 0)THEN
@@ -592,31 +592,31 @@ C
 ! Add in L-shell X-ray absorption for species such as SiIV, PV. We assume that only
 ! one electron is ejected.
 !
-	T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION			!Number of electrons in species.
+	T1=PD(ID)%AT_NO+1.0_LDP-PD(ID)%ZION			!Number of electrons in species.
 	IZ=NINT(PD(ID)%AT_NO)
         INE=NINT(T1)
 	IF(INE .EQ. 11 .AND. PHOT_ID .EQ. 1 .AND. FREQ .GT. 0)THEN
 	  T2=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,ITWO,IZERO,L_FALSE,L_TRUE)
 	  T2=T2+XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,ITWO,IONE,L_FALSE,L_TRUE)
-	  IF(T2 .GT. 0.0D0)THEN
+	  IF(T2 .GT. 0.0_LDP)THEN
 	    PHOT(1:NLEVS)=PHOT(1:NLEVS)+T2
 	  END IF
 	END IF
 !
 ! Add in 3s, 3p X-ray absorption for species in which only 1 electron is ejected.
 !
-	T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION			!Number of electrons in species.
+	T1=PD(ID)%AT_NO+1.0_LDP-PD(ID)%ZION			!Number of electrons in species.
 	IZ=NINT(PD(ID)%AT_NO)
         INE=NINT(T1)
 	IF(INE .GE. 19 .AND. PHOT_ID .EQ. 1 .AND. FREQ .GT. 0)THEN
-	  T2=0.0D0
+	  T2=0.0_LDP
 	  IF(N_ED_EJ(IZ,INE,ITHREE,IZERO) .EQ. 1)THEN
 	    T2=XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,ITHREE,IZERO,L_FALSE,L_TRUE)
 	  END IF
 	  IF(N_ED_EJ(IZ,INE,ITHREE,IONE) .EQ. 1)THEN
 	    T2=T2+XCROSS_V2(FREQ,PD(ID)%AT_NO,T1,ITHREE,IONE,L_FALSE,L_TRUE)
 	  END IF
-	  IF(T2 .GT. 0.0D0)THEN
+	  IF(T2 .GT. 0.0_LDP)THEN
 	    PHOT(1:NLEVS)=PHOT(1:NLEVS)+T2
 	  END IF
 	END IF

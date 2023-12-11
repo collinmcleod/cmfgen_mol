@@ -60,12 +60,12 @@ C
 	LOGICAL EQUAL
 	EXTERNAL EQUAL
 c
-	CHIBF=2.815E-06
-	CHIFF=3.69E-29
-	HDKT=4.7994145
-	TWOHCSQ=0.0147452575
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
+	CHIBF=2.815E-06_LDP
+	CHIFF=3.69E-29_LDP
+	HDKT=4.7994145_LDP
+	TWOHCSQ=0.0147452575_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
 c
         if(scratch.lt.np_max)then
           print*,' parameter scratch .lt. np_max'
@@ -77,14 +77,14 @@ C
 C FRAC_DIFF is the accuracy to which adjacent step sizes must be equal
 C is SImpson rule is to be used.
 C
-	FRAC_DIFF=1.0D-06
+	FRAC_DIFF=1.0E-06_LDP
 C
 C MIN_SPACING determines the maximum spacing, before extra points are
 C inserted to resolve the exponential function. Defined so that 0.2
 C is the maximum step in the exponent of the exponential between adjacent
 C grid points. (i.e. exp(0), exp(-0.2), exp(-0.4)  etc.).
 C
-	MIN_SPACING=0.2*TEMP/HDKT/EDGE
+	MIN_SPACING=0.2_LDP*TEMP/HDKT/EDGE
 C
         if(nphot.gt.np_max)then
           print*,' increase np_max to .gt. nphot,',nphot
@@ -92,7 +92,7 @@ C
         endif
 c
 	DO I=1,NPHOT
-	  REC(I)=0.0D0
+	  REC(I)=0.0_LDP
 	END DO
 C
 C Determine index of first frequency above (or equal to) threshold.
@@ -100,23 +100,23 @@ C Determine cross-section at threshold.
 C
 	IST=1
 	DO I=1,NPHOT
-	  IF(NU(I) .LT. 1.0D0)IST=IST+1
+	  IF(NU(I) .LT. 1.0_LDP)IST=IST+1
 	END DO
 	IF(IST .NE. 1)THEN
-	  T1=(NU(IST)-1.0D0)/(NU(IST)-NU(IST-1))
-	  SIG_THRESH=(1.0D0-T1)*SIGMA(IST)+T1*SIGMA(IST-1)
+	  T1=(NU(IST)-1.0_LDP)/(NU(IST)-NU(IST-1))
+	  SIG_THRESH=(1.0_LDP-T1)*SIGMA(IST)+T1*SIGMA(IST-1)
 	ELSE
 	  SIG_THRESH=SIGMA(1)
 	END IF
 C
-	TP1=1.8965D+17		!4*PI/H*DEX(-10)
-	TP1=TP1*1.0D-08         !As sigma in megabarns.
+	TP1=1.8965E+17_LDP		!4*PI/H*DEX(-10)
+	TP1=TP1*1.0E-08_LDP         !As sigma in megabarns.
 C
 C The factor EDGE**3 appears in the CONST definition as NU is in units
 C of EDGE (**2 from nu^2 and additional factor from dnu).
 C
 	T2=HDKT*EDGE/TEMP
-	CONST=TP1*TWOHCSQ*(EDGE**3)*2.07D-22*STAT_WT/GION
+	CONST=TP1*TWOHCSQ*(EDGE**3)*2.07E-22_LDP*STAT_WT/GION
 C
 C We can now compute recombination rate. We first allow for the
 C recombination near threshold.
@@ -128,7 +128,7 @@ C
 C NB: NU=1 at threshold, and thus [NU^2 Exponential term] is unity.
 C
 	LST_CROSS=SIG_THRESH*CONST
-	LST_NU=1.0D0
+	LST_NU=1.0_LDP
 	I=IST
 	IF(IST .GT. 1)I=I-1		!To get bit between 1 and NU(IST)
 	DO WHILE (I .LT. NPHOT)
@@ -137,7 +137,7 @@ c If exponent is -500 then can quit calculating recombination coefficient.
 c This was installed to fix "floating point operation error" caused by taking the
 c exponatial of a number of order -500.
 c
-          if(-t2*(nu(i+1)-1.0D0) .lt.-500.)then
+          if(-t2*(nu(i+1)-1.0_LDP) .lt.-500._LDP)then
             rec(nphot)=rec(i)
             goto 100
           endif
@@ -147,7 +147,7 @@ c
 	    IF(I .LT. NPHOT-1)THEN
 	      DEL_NU_2=NU(I+2)-NU(I+1)
 	    ELSE
-	      DEL_NU_2=0.0D0
+	      DEL_NU_2=0.0_LDP
 	    END IF
 	    IF( EQUAL(DEL_NU,DEL_NU_2,FRAC_DIFF) )THEN
 C
@@ -155,12 +155,12 @@ C Use Simpsons rule.
 C
 	      CROSS(1)=LST_CROSS
 	      CROSS(2)=CONST*( NU(I+1)**2 )*
-     *             EXP( -T2*(NU(I+1)-1.0D0) )*SIGMA(I+1)
+     *             EXP( -T2*(NU(I+1)-1.0_LDP) )*SIGMA(I+1)
 	      CROSS(3)=CONST*( NU(I+2)**2 )*
-     *             EXP( -T2*(NU(I+2)-1.0D0) )*SIGMA(I+2)
-	      DEL_REC=DEL_NU*(CROSS(1)+4.0D0*CROSS(2)+CROSS(3))/3.0D0
+     *             EXP( -T2*(NU(I+2)-1.0_LDP) )*SIGMA(I+2)
+	      DEL_REC=DEL_NU*(CROSS(1)+4.0_LDP*CROSS(2)+CROSS(3))/3.0_LDP
 	      REC(I+2)=REC(I)+DEL_REC
-	      REC(I+1)=REC(I)+0.5D0*DEL_REC		!Estimate only.
+	      REC(I+1)=REC(I)+0.5_LDP*DEL_REC		!Estimate only.
 	      LST_CROSS=CROSS(3)
 	      LST_NU=NU(I+2)
 	      I=I+2
@@ -170,8 +170,8 @@ C Use Trapazoidal rule.
 C
 	      CROSS(1)=LST_CROSS
 	      CROSS(2)=CONST*( NU(I+1)**2 )*
-     *             EXP( -T2*(NU(I+1)-1.0D0) )*SIGMA(I+1)
-	      DEL_REC=DEL_NU*(CROSS(1) + CROSS(2))/2.0D0
+     *             EXP( -T2*(NU(I+1)-1.0_LDP) )*SIGMA(I+1)
+	      DEL_REC=DEL_NU*(CROSS(1) + CROSS(2))/2.0_LDP
 	      REC(I+1)=REC(I)+DEL_REC
 	      LST_CROSS=CROSS(2)
 	      LST_NU=NU(I+1)
@@ -199,8 +199,8 @@ C
 	    DO J=1,NJ+1
 	      X=LST_NU+NU_STEP*J
 	      T1=J*NU_STEP/DEL_NU
-	      SIG=T1*SIGMA(I+1)+(1.0D0-T1)*SIGMA(I)
-	      CROSS(J+1)=CONST*( X**2 )*EXP( -T2*(X-1.0D0) )*SIG
+	      SIG=T1*SIGMA(I+1)+(1.0_LDP-T1)*SIGMA(I)
+	      CROSS(J+1)=CONST*( X**2 )*EXP( -T2*(X-1.0_LDP) )*SIG
 	    END DO
 C
 C Can now perform integration.
@@ -208,7 +208,7 @@ C
 	    DEL_REC=0
 	    DO J=1,NJ,2
 	      DEL_REC=DEL_REC +
-     *            NU_STEP*(CROSS(J)+4.0D0*CROSS(J+1)+CROSS(J+2))/3.0D0
+     *            NU_STEP*(CROSS(J)+4.0_LDP*CROSS(J+1)+CROSS(J+2))/3.0_LDP
 	    END DO
 	    REC(I+1)=REC(I)+DEL_REC
 	    LST_CROSS=CROSS(NJ+2)
@@ -218,7 +218,7 @@ C
 	END DO
 C
  100    TOT_REC=REC(NPHOT)
-	IF(TOT_REC .NE. 0.0D0)THEN
+	IF(TOT_REC .NE. 0.0_LDP)THEN
 	  DO I=IST,NPHOT
 	    REC(I)=REC(I)/TOT_REC
 	  END DO
@@ -226,7 +226,7 @@ C
 C
 C Correct TOT_REC for frequency independent temperature dependance.
 C
-	TOT_REC=TOT_REC/(TEMP**1.5)
+	TOT_REC=TOT_REC/(TEMP**1.5_LDP)
 C
 	RETURN
 	END

@@ -54,7 +54,7 @@ C
 	INTEGER NION(NUM_IONS_MAX)
 	INTEGER NUM_IONS
 	INTEGER CNT,CNT_NEG,CNT_POS
-	INTEGER NAN_CNT
+	INTEGER NAN_CNT,COUNT_DONE
 	LOGICAL NANS_PRESENT
 	LOGICAL NORM_R
 	CHARACTER(LEN=10) ION_ID(NUM_IONS_MAX)
@@ -207,7 +207,7 @@ C
 	    CNT=0
 	    NAN_CNT=0
 	    DO IVAR=1,NT
-	      IF(POPS(IVAR,ID,K) .LE. 0.0D0 .AND. CNT .LE.4)THEN
+	      IF(POPS(IVAR,ID,K) .LE. 0.0_LDP .AND. CNT .LE.4)THEN
 	         WRITE(6,*)'Invalid population at depth ',IVAR,ID,NT
 	         CNT=CNT+1
 	      END IF
@@ -235,47 +235,11 @@ C
 C
 200	CONTINUE
 	WRITE(T_OUT,*)' '
-	WRITE(T_OUT,*)'ND  :: ',ND
-	WRITE(T_OUT,*)'NT  :: ',NT
-	WRITE(T_OUT,*)'NIT :: ',NIT
+	WRITE(T_OUT,*)'Use H or HE to get list op options'
 	WRITE(T_OUT,*)' '
-	WRITE(T_OUT,*)' For the next 4 options, we plot versus iteration number '
-	WRITE(T_OUT,*)' '
-	WRITE(T_OUT,*)'F   :: Z(K)=100.0D0*(Y(K+1)-Y(K))/Y(K+1)'
-	WRITE(T_OUT,*)'R   :: [Y(K+2)-Y(K+1)]/[Y(K+1)-Y(K)]'
-	WRITE(T_OUT,*)'D   :: Z(K)=100.0D0*(Y(K)-Y(NIT))/Y(NIT)'
-	WRITE(T_OUT,*)'Y   :: Z(K)=Y(K)'
-	WRITE(T_OUT,*)' '
-        WRITE(T_OUT,*)'PD  :: Plot 100.0D0*(Y(K)-Y(K-1))/Y(K) as a function of depth index.'
-	WRITE(T_OUT,*)'PF  :: Plot 100.0D0*(Y(K+1)-Y(K))/Y(K+1) for all variables at a given depth.'
-	WRITE(T_OUT,*)' '
-        WRITE(T_OUT,*)'PN  :: Plot a variable as a function of depth index.'
-        WRITE(T_OUT,*)'PV  :: Plot a variable as a function of velocity.'
-        WRITE(T_OUT,*)'PYD :: Plot all variables at a given depth -- change to log space before using'
-        WRITE(T_OUT,*)'VR  :: Plot velocity as a function of radius.'
-	WRITE(T_OUT,*)' '
-	WRITE(T_OUT,*)'MED_R  :: Median corection as a function of depth'
-	WRITE(T_OUT,*)'MR     :: Z(K)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
-	WRITE(T_OUT,*)'IR     :: Z(ID)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
-	WRITE(T_OUT,*)'WRST   :: Writes fractional corections to file (FRAC_COR -- same format as STEQ_VALS'
-	WRITE(T_OUT,*)' '
-	WRITE(T_OUT,*)' '
-	WRITE(T_OUT,*)' The next set of options allow corections to the populations to be made.'
-	WRITE(T_OUT,*)' '
-	WRITE(T_OUT,*)'FDG      :: Fudge individual values at a single depth and output to SCRTEMP'
-	WRITE(T_OUT,*)'FDGV     :: Fudge values over a ranges of depths (% change) and output to SCRTEMP'
-	WRITE(T_OUT,*)'AFDG     :: Replace values with large alternating STEQ corrections.'
-	WRITE(T_OUT,*)'SM       :: Fudge values over a ranges of depths using values at higher/adjacent depth'
-	WRITE(T_OUT,*)'INT      :: Interpolate values using adjacent depths whose',
-	1                             ' corrections are above a certain % limit'
-	WRITE(T_OUT,*)'NINT     :: Interpolate values whose corrections are above a certain % limit'
-	WRITE(T_OUT,*)'RAT      :: Compare populations at adjacent depths'
-	WRITE(T_OUT,*)'REP      :: Replace populations on one iteration with those of another'
-	WRITE(T_OUT,*)'UNDO     :: Undo corrections over a range of depths'
-	WRITE(T_OUT,*)' '
-	WRITE(T_OUT,*)'LY  :: Switch to/from Log(Y) for options where appropriate (not full implemented)'
-	WRITE(T_OUT,*)' '
-	WRITE(T_OUT,*)'E   :: EXIT'
+	WRITE(T_OUT,*)'ND  ::',ND
+	WRITE(T_OUT,*)'NT  ::',NT
+	WRITE(T_OUT,*)'NIT ::',NIT
 	WRITE(T_OUT,*)' '
 	PLT_OPT='R'
 	CALL GEN_IN(PLT_OPT,'Plot option: R(atio), F(rac) or D(elta), Y, IR, MR or E(xit)')
@@ -323,7 +287,7 @@ C
 	    X(IVAR)=IVAR
 	    T2=POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1)
 	    T1=POPS(IVAR,ID,NIT)-POPS(IVAR,ID,IT-1)
-	    IF(ABS(T2). GT. 1.0D-50*ABS(T1))THEN
+	    IF(ABS(T2). GT. 1.0E-50_LDP*ABS(T1))THEN
 	     Y(IVAR)=T1/T2
 	    ELSE
 	     Y(IVAR)=20000
@@ -338,12 +302,12 @@ C
 	    IT=NIT; CALL GEN_IN(IT,'Iteraton #')
 	  END DO
 	  DO ID=1,ND
-	    Y(ID)=0.0D0
+	    Y(ID)=0.0_LDP
 	    K=0
 	    DO IVAR=1,NT
 	      T2=POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1)
 	      T1=POPS(IVAR,ID,IT-1)-POPS(IVAR,ID,IT-2)
-	      IF(ABS(T2). GT. 1.0D-50*ABS(T1))THEN
+	      IF(ABS(T2). GT. 1.0E-50_LDP*ABS(T1))THEN
 	        Z_BIG(IVAR)=T1/T2
 	      ELSE
 	        Z_BIG(IVAR)=20000
@@ -354,7 +318,7 @@ C
 !
 	    CALL INDEXX(NT,Z_BIG,I_BIG,.TRUE.)
 	    J=(NT+1)/2
-	    Y(ID)=100.0D0*(Z_BIG(I_BIG(J))-1.0D0)
+	    Y(ID)=100.0_LDP*(Z_BIG(I_BIG(J))-1.0_LDP)
 	    X(ID)=FLOAT(ID)
 	    Ylabel='100(r\dmed\u-1)'
 !	    IF(ID .EQ. 30)THEN
@@ -377,7 +341,7 @@ C
 	  END DO
 	  DO_ABS=.TRUE.; CALL GEN_IN(DO_ABS,'Use absolute value')
 	  DO ID=1,ND
-	    Y(ID)=0.0D0
+	    Y(ID)=0.0_LDP
 	    K=0
 	    DO IVAR=1,NT
 	      T2=POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1)
@@ -391,7 +355,7 @@ C
 	        WRITE(6,*)'Problem with variable:',IVAR
 	      END IF
 	    END DO
-	    Y(ID)=100.0D0*(Y(ID)/K-1.0D0)
+	    Y(ID)=100.0_LDP*(Y(ID)/K-1.0_LDP)
 	    X(ID)=FLOAT(ID)
 	    Ylabel='100(AVE[r]-1)'
 	  END DO
@@ -409,20 +373,20 @@ C
 	  DO WHILE(ID .LT. 1 .OR. ID .GT. ND)
 	    ID=ND/2; CALL GEN_IN(ID,'Depth index')
 	  END DO
-	  Y(ID)=0.0D0
+	  Y(ID)=0.0_LDP
 !
 	  K=MIN(201,NT)
-	  T3=200.0D0/(K-1)
+	  T3=200.0_LDP/(K-1)
 	  DO J=1,K
-	    X(J)=-50.0D0+(J-1)*T3
+	    X(J)=-50.0_LDP+(J-1)*T3
 	  END DO
-	  Y(1:K)=0.0D0
+	  Y(1:K)=0.0_LDP
 !
 	  DO IVAR=1,NT
 	    T2=POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1)
 	    T1=POPS(IVAR,ID,IT-1)-POPS(IVAR,ID,IT-2)
 	    IF(T2 .NE. 0)THEN
-	      T1=(100*(T1/T2-1.0D0)+51)/T3
+	      T1=(100*(T1/T2-1.0_LDP)+51)/T3
 	      IF(T1 .LT. 1)T1=1
 	      IF(T1 .GT. K)T1=K
 	      Y(NINT(T1))=Y(NINT(T1))+1
@@ -441,7 +405,7 @@ C
 	    ID=ND; CALL GEN_IN(ID,'Depth index')
 	  END DO
 	  DO IT=3,NIT
-	    Y(IT)=0.0D0
+	    Y(IT)=0.0_LDP
 	    DO IVAR=1,NT
 	      T2=POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1)
 	      T1=POPS(IVAR,ID,IT-1)-POPS(IVAR,ID,IT-2)
@@ -452,7 +416,7 @@ C
 	        WRITE(6,*)'Problem with variable:',IVAR,'for iteration',IT
 	      END IF
 	    END DO
-	    Y(IT)=100.0D0*(Y(IT)/NT-1.0D0)
+	    Y(IT)=100.0_LDP*(Y(IT)/NT-1.0_LDP)
 	    X(IT)=FLOAT(IT)
 	    Ylabel='100(AVE[r]-1)'
 	  END DO
@@ -468,7 +432,7 @@ C
 	    CALL GEN_IN(ID,'Depth (zero to exit)')
 	    IF(ID .EQ. 0)EXIT
 	    DO IVAR=1,NT
-	      Y(IVAR)=100.0D0*(POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1))/POPS(IVAR,ID,IT)
+	      Y(IVAR)=100.0_LDP*(POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1))/POPS(IVAR,ID,IT)
 	      X(IVAR)=IVAR
 	    END DO
 	    CALL DP_CURVE(NT,X,Y)
@@ -510,10 +474,10 @@ C
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
 	    IF(IVAR .LE. 0 .OR. IVAR .GT. NT)EXIT
 	    DO ID=1,ND
-	      Y(ID)=100.0D0*(POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1))/POPS(IVAR,ID,IT)
+	      Y(ID)=100.0_LDP*(POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1))/POPS(IVAR,ID,IT)
 	      X(ID)=ID
 	    END DO
-	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	    
+	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	
 	    CALL DP_CURVE(ND,X,Y,STRING)
 	  END DO
 	  YLABEL='[Y(I-1)-Y(I)]/Y(I) [%]'
@@ -534,7 +498,7 @@ C
 	      X(ID)=ID
 	    END DO
 !
-	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	    
+	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	
 	    IF(LOG_Y_AXIS)THEN
 	      CALL DP_CURVE_LAB(ND,X,Z,STRING)
 	      Ylabel='Log'
@@ -554,15 +518,15 @@ C
 	    IVAR=NT
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
 	    IF(IVAR .LE. 0 .OR. IVAR .GT. NT)EXIT
-	    T1=1.0D0
-	    IF(V(1) .GT. 10000.0D0)T1=1.0D-03
+	    T1=1.0_LDP
+	    IF(V(1) .GT. 10000.0_LDP)T1=1.0E-03_LDP
 	    DO ID=1,ND
 	      Y(ID)=POPS(IVAR,ID,IT)
 	      Z(ID)=LOG10(POPS(IVAR,ID,IT))
 	      X(ID)=T1*V_MAT(ID,IT)
 	    END DO
 !
-	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	    
+	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	
 	    IF(LOG_Y_AXIS)THEN
 	      CALL DP_CURVE_LAB(ND,X,Z,STRING)
 	      Ylabel='Log'
@@ -571,7 +535,7 @@ C
 	      Ylabel=''
 	    END IF
 	  END DO
-	  IF(V(1) .GT. 10000.0D0)THEN
+	  IF(V(1) .GT. 10000.0_LDP)THEN
 	    CALL GRAMON_PGPLOT('V(Mm/s)',Ylabel,' ',' ')
 	  ELSE
 	    CALL GRAMON_PGPLOT('V(km/s)',Ylabel,' ',' ')
@@ -591,7 +555,7 @@ C
               Z(ID)=LOG10(POPS(IVAR,ID,IT))
               X(ID)=POPS(NT,ID,IT)
             END DO
-	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	    
+	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	
             IF(LOG_Y_AXIS)THEN
               CALL DP_CURVE_LAB(ND,X,Z,STRING)
               Ylabel='Log'
@@ -611,14 +575,14 @@ C
 	    IVAR=NT
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
 	    IF(IVAR .LE. 0 .OR. IVAR .GT. NT)EXIT
-	    T1=1.0D0
-	    IF(R(1) .GT. 1.0D+04)T1=1.0D-04
+	    T1=1.0_LDP
+	    IF(R(1) .GT. 1.0E+04_LDP)T1=1.0E-04_LDP
 	    DO ID=1,ND
 	      Y(ID)=POPS(IVAR,ID,IT)
 	      Z(ID)=LOG10(POPS(IVAR,ID,IT))
-	      X(ID)=1.0D-04*R_MAT(ID,IT)
+	      X(ID)=1.0E-04_LDP*R_MAT(ID,IT)
 	    END DO
-	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	    
+	    WRITE(STRING,*)IVAR; STRING=ADJUSTL(STRING)	
 	    IF(LOG_Y_AXIS)THEN
 	      CALL DP_CURVE_LAB(ND,X,STRING)
 	      Ylabel='Log'
@@ -627,7 +591,7 @@ C
 	      Ylabel=''
 	    END IF
 	  END DO
-	  IF(R(1) .GT. 1.0D+04)THEN
+	  IF(R(1) .GT. 1.0E+04_LDP)THEN
 	    CALL GRAMON_PGPLOT('R(10\u14 \dcm)',Ylabel,' ',' ')
 	  ELSE
 	    CALL GRAMON_PGPLOT('R(10\u10 \dcm)',Ylabel,' ',' ')
@@ -640,20 +604,20 @@ C
 	  CALL GEN_IN(NORM_R,'Normlize R by R(ND)?')
 	  DO WHILE(1 .EQ. 1)
 	    CALL GEN_IN(IT,'Iteration # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NIT)
-	    T1=1.0D0; T2=1.0D0
+	    T1=1.0_LDP; T2=1.0_LDP
 	    IF(IT .EQ. 0)EXIT
 	    IF(NORM_R)THEN
-	      T1=1.0D0/R_MAT(ND,IT)
+	      T1=1.0_LDP/R_MAT(ND,IT)
 	      XLABEL='R/R(ND)'
 	    ELSE
-	      IF(R(1) .GT. 1.0D+04)THEN
-	        T1=1.0D-04
+	      IF(R(1) .GT. 1.0E+04_LDP)THEN
+	        T1=1.0E-04_LDP
 	        XLABEL='R(10\u14 \dcm)'
 	      ELSE
 	        XLABEL='R(10\u10 \dcm)'
 	      END IF
 	    END IF
-	    IF(V(1) .GT. 1.0D+04)T2=1.0D-04
+	    IF(V(1) .GT. 1.0E+04_LDP)T2=1.0E-04_LDP
 	    DO ID=1,ND
 	      X(ID)=T1*R_MAT(ID,IT)
 	      Y(ID)=T2*V_MAT(ID,IT)
@@ -661,7 +625,7 @@ C
 	    CALL DP_CURVE(ND,X,Y)
 	  END DO
 	  Ylabel='V(km/s)'
-	  IF(V(1) .GT. 1.0D+04)Ylabel='V(Mm/s)'
+	  IF(V(1) .GT. 1.0E+04_LDP)Ylabel='V(Mm/s)'
 	  CALL GRAMON_PGPLOT(XLABEL,Ylabel,' ',' ')
 	  GOTO 200
 !
@@ -699,18 +663,18 @@ C
 	  CALL GEN_IN(IT,'Iteration # (zero to exit) - default is last iteration',
 	1                   LOW_LIM=IZERO,UP_LIM=NIT)
 	  IF(IT .EQ. 0)GOTO 200
-	  T1=0.0D0; T2=0.0D0
+	  T1=0.0_LDP; T2=0.0_LDP
 	  DO WHILE(1 .EQ. 1)
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
 	    IF(IVAR .EQ. 0)EXIT
 	    CALL GEN_IN(T1,'% change in variable')
-	    IF(T1 .EQ. 0.0D0)CALL GEN_IN(T2,'Change in variable')
+	    IF(T1 .EQ. 0.0_LDP)CALL GEN_IN(T2,'Change in variable')
 	    CALL GEN_IN(LIMITS,J,NLIM_MAX,'Depths (L1 to L2, L3 to L4 etc)')
 	    DO I=1,J,2
 	      IF(LIMITS(I) .EQ. 0)EXIT
 	      DO ID=LIMITS(I),LIMITS(I+1)
 	        T3=POPS(IVAR,ID,IT)
-	        POPS(IVAR,ID,IT)=T3*(1.0D0+T1/100.0D0)+T2
+	        POPS(IVAR,ID,IT)=T3*(1.0_LDP+T1/100.0_LDP)+T2
 	      END DO
 	    END DO
 	    IVAR=0
@@ -734,7 +698,7 @@ C
 	  DO K=1,16
 	    DO J=1,26
 	       POPS(27,K,IT)=POPS(27,K,IT)+POPS(J,K,IT)
-	       POPS(J,K,IT)=POPS(J,K,IT)/100.0D0
+	       POPS(J,K,IT)=POPS(J,K,IT)/100.0_LDP
 	    END DO
 	  END DO
 	  IREC=NIT			!IREC is updated on write
@@ -770,10 +734,12 @@ C
 	1                   LOW_LIM=IZERO,UP_LIM=NIT)
 	  IF(IT .EQ. 0)GOTO 200
 	  DO WHILE(1 .EQ. 1)
+!
 	    CALL GEN_IN(IVAR,'Variable # (zero to exit)',LOW_LIM=IZERO,UP_LIM=NT)
 	    IF(IVAR .EQ. 0)EXIT
-	    CALL GEN_IN(ID,'Depth of variable')
+	    CALL GEN_IN(ID,'Depth of variable',LOW_LIM=IZERO,UP_LIM=ND)
 	    IF(ID.EQ. 0)EXIT
+!
 	    WRITE(6,'(7(9X,I5))')(I,I=MAX(ID-3,1),MIN(ID+3,ND))
 	    WRITE(6,'(7ES14.4E3)')(POPS(IVAR,I,IT),I=MAX(ID-3,1),MIN(ID+3,ND))
 	    STRING=' '
@@ -799,7 +765,7 @@ C
 	  WRITE(6,*)'Populations can be compared with older iterations.'
 	  GOTO 200
 !
-	ELSE IF(PLT_OPT(1:4) .EQ. 'AFDG')THEN
+	ELSE IF(PLT_OPT(1:4) .EQ. 'AFDG' .OR. PLT_OPT(1:4) .EQ. 'MFDG')THEN
 	  FDG_COUNTER=FDG_COUNTER+1
 	  IT=NIT; ID=ND; IVAR=NT
 	  CALL GEN_IN(IT,'Iteration # (zero to exit) - default is last iteration',LOW_LIM=IZERO,UP_LIM=NIT)
@@ -820,33 +786,57 @@ C
 	  CLOSE(UNIT=20)
 	  IF(.NOT.  ALLOCATED(MATCHING_ION_LEV))ALLOCATE(MATCHING_ION_LEV(NT))
 	  CALL GET_ASSOC_ION(MATCHING_ION_LEV,NT)
-	  DO I=1,NT
-	    WRITE(170,*)I,MATCHING_ION_LEV(I)
-	  END DO
-	  FLUSH(UNIT=170)
 !
-	  ION_POP=1; LST_DPTH=ND
-	  I=1
-	  DO WHILE(I .LT. NT-2)
-	    T1=MINVAL(SOLS(I,:))
-	    IF(T1 .LT. 1.0E+10)THEN
-	      CNT_MIN=0; CNT_MAX=0
-	      DO K=1,ND
-	        IF(SOLS(I,K) .LT. -1.0E+10)THEN
-	           CNT_MIN=CNT_MIN+1
-	           LST_DPTH=K
+	  COUNT_DONE=COUNT_DONE+1
+	  WRITE(6,*)'Variables updated by AFDG'
+	  IF(PLT_OPT(1:4) .EQ. 'AFDG')THEN
+	    ION_POP=1; LST_DPTH=ND
+	    I=1
+	    DO WHILE(I .LT. NT-2)
+	      T1=MINVAL(SOLS(I,:))
+	      IF(T1 .LT. 1.0E+10_LDP)THEN
+	        CNT_MIN=0; CNT_MAX=0
+	        DO K=1,ND
+	          IF(SOLS(I,K) .LT. -1.0E+10_LDP)THEN
+	            CNT_MIN=CNT_MIN+1
+	            LST_DPTH=K
+	          END IF
+	          IF(SOLS(I,K) .GE.  0.998_LDP)THEN
+	            CNT_MAX=CNT_MAX+1
+	            LST_DPTH=K
+	          END IF
+	        END DO
+	      END IF
+	      ION_POP=MATCHING_ION_LEV(I)
+	      IF(CNT_MIN .GT. 0 .AND. (CNT_MAX .GT. 0 .OR. CNT_MIN .GT. 10))THEN
+	        WRITE(6,'(I6)',ADVANCE='NO')I
+	        COUNT_DONE=COUNT_DONE+1
+	        IF(COUNT_DONE .EQ. 10)THEN
+	          COUNT_DONE=0; WRITE(6,*)' '
 	        END IF
-	        IF(SOLS(I,K) .GE.  0.998)CNT_MAX=CNT_MAX+1
-	      END DO
-	    END IF
-	    ION_POP=MATCHING_ION_LEV(I)
-	    IF(CNT_MIN .GT. 0 .AND. (CNT_MAX .GT. 0 .OR. CNT_MIN .GT. 10))THEN
-	      DO K=1,LST_DPTH
-	         POPS(I,K,IT)=1.0D-22*POPS(ION_POP,K,IT)*POPS(NT-1,K,IT)
-	      END DO
-	    END IF
-	    I=I+1
-	  END DO
+	        DO K=1,LST_DPTH
+	           POPS(I,K,IT)=1.0E-22_LDP*POPS(ION_POP,K,IT)*POPS(NT-1,K,IT)
+	        END DO
+	      END IF
+	      I=I+1
+	    END DO
+	    WRITE(6,*)' '
+	  ELSE
+	    DO WHILE(1 .EQ. 1)
+	      CALL GEN_IN(IVAR,'Variable to be replaced',LOW_LIM=IZERO,UP_LIM=NT)
+	      IF(IVAR .GT. 0 .AND. IVAR .LT. NT-1)THEN
+	        IVAR=+I
+	        ION_POP=MATCHING_ION_LEV(I)
+	        DO K=1,ND
+	          IF(SOLS(I,K) .LT. -1.0E+08_LDP .OR. SOLS(I,K) .GT.  0.998_LDP)THEN 
+	            POPS(I,K,IT)=1.0E-22_LDP*POPS(ION_POP,K,IT)*POPS(NT-1,K,IT)
+	          END IF
+	        END DO
+	      ELSE
+	        EXIT
+	      END IF
+	    END DO
+	  END IF
 !
 	  IREC=NIT			!IREC is updated on write
           IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
@@ -910,7 +900,7 @@ C
 	  DO ID=MAX(ID1,ID2),MIN(ID1,ID2),-1
 	    WRITE(6,*)'ID=',ID
 	    DO I=1,NUM_IONS
-	      CNT=0; T1=0.0D0
+	      CNT=0; T1=0.0_LDP
 	      DO IVAR=ION_INDEX(I),ION_INDEX(I)+NION(I)-1
 	        T2=LOG10(POPS(IVAR,ID,IT)/POPS(IVAR,ID+1,IT))
 !	        IF(ABS(T2) .LT. 5)THEN
@@ -930,11 +920,11 @@ C
 !	      WRITE(6,*)IVAR,T1,T2
 !	      T1=SIGN(MIN(0.175D0,T1),T1)
 !
-	      T2=0.7D0
-	      IF(T1 .LE. 0.0D0)T1=MIN(-T2,T1)
-	      IF(T1 .GE. 0.0D0)T1=MAX(T2,T1)
+	      T2=0.7_LDP
+	      IF(T1 .LE. 0.0_LDP)T1=MIN(-T2,T1)
+	      IF(T1 .GE. 0.0_LDP)T1=MAX(T2,T1)
 	      WRITE(6,*)IVAR,T1,T2
-	      T1=SIGN(MIN(0.7D0,ABS(T1)),T1)
+	      T1=SIGN(MIN(0.7_LDP,ABS(T1)),T1)
 !
 ! If shift, for any pop, is 4 times large than average shift, replace
 ! the population.
@@ -972,12 +962,12 @@ C
 !
 	ELSE IF(PLT_OPT(1:3) .EQ. 'INT')THEN
           FDG_COUNTER=FDG_COUNTER+1
-	  IT=NIT; ID=ND; T2=100.0D0
+	  IT=NIT; ID=ND; T2=100.0_LDP
 	  CALL GEN_IN(IT,'Iteration # (zero to exit)')
 	  CALL GEN_IN(ID,'Depth of variable')
 	  CALL GEN_IN(T2,'Interpolate values with correction > >%')
 	  DO IVAR=1,NT-1
-	    T1=100.0D0*ABS(POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1))/POPS(IVAR,ID,IT)
+	    T1=100.0_LDP*ABS(POPS(IVAR,ID,IT)-POPS(IVAR,ID,IT-1))/POPS(IVAR,ID,IT)
 	    IF(T1 .GT. T2)THEN
 	      WRITE(6,*)'Replacing population for variable',IVAR
 	      IF(ID .EQ. 2 .OR. ID .EQ. ND)THEN
@@ -987,7 +977,7 @@ C
 	      ELSE
 	        T1=LOG(R(ID)/R(ID-1))/LOG(R(ID+1)/R(ID-1))
 	        POPS(IVAR,ID,IT)=EXP( T1*LOG(POPS(IVAR,ID+1,IT)) +
-	1                     (1.0D0-T1)*LOG(POPS(IVAR,ID-1,1)) )
+	1                     (1.0_LDP-T1)*LOG(POPS(IVAR,ID-1,1)) )
 	      END IF
 	    END IF
 	  END DO
@@ -1012,7 +1002,7 @@ C
 !
 	ELSE IF(PLT_OPT(1:4) .EQ. 'NINT')THEN
           FDG_COUNTER=FDG_COUNTER+1
-	  IT=NIT; ID1=2; ID2=ND/2-1; MAX_CHANGE=1000.0D0
+	  IT=NIT; ID1=2; ID2=ND/2-1; MAX_CHANGE=1000.0_LDP
 	  CALL GEN_IN(IT,'Iteration # (zero to exit)')
 	  CALL GEN_IN(ID1,'Start of interpolating rangir (exclusive)')
 	  CALL GEN_IN(ID2,'End of interpolating range (exclusive)')
@@ -1024,12 +1014,12 @@ C
 	  WRITE(LU_OUT,'(A,4X,A,2X,A,6X,A,2(2X,A),4(8X,A))')' Depth','Ion','Ion','N(levs)',
 	1                 'Neg.','Pos.','Ave(-ve)','Min(-ve)','Ave(+ve)','Max(+ve)'
 	  WRITE(LU_OUT,'(34X,A,3X,A)')'Cnt','Cnt'
-	  T2=(1.0D0-1.0D0/MAX_CHANGE)
+	  T2=(1.0_LDP-1.0_LDP/MAX_CHANGE)
 	  DO ID=MIN(ID1+1,ID2+1),MAX(ID1-1,ID2-1)
 	    DO I=1,NUM_IONS
 	      CNT_NEG=0; CNT_POS=0
-	      AVE_NEG_CHANGE=0.0D0; MIN_NEG_CHANGE=0.0D0
-	      AVE_POS_CHANGE=0.0D0; MAX_POS_CHANGE=0.0D0
+	      AVE_NEG_CHANGE=0.0_LDP; MIN_NEG_CHANGE=0.0_LDP
+	      AVE_POS_CHANGE=0.0_LDP; MAX_POS_CHANGE=0.0_LDP
 	      DO IVAR=ION_INDEX(I),ION_INDEX(I)+NION(I)-1
 	        IF(CORRECTIONS(IVAR,ID) .LT. -MAX_CHANGE)THEN
 	          AVE_NEG_CHANGE=AVE_NEG_CHANGE+CORRECTIONS(IVAR,ID)
@@ -1047,14 +1037,14 @@ C
 	1                  NION(I),CNT_NEG,CNT_POS,
 	1                  AVE_NEG_CHANGE,MIN_NEG_CHANGE,AVE_POS_CHANGE,MAX_POS_CHANGE	
 !
-	      T1=(1.0D0-1.0D0/MAX_CHANGE)
+	      T1=(1.0_LDP-1.0_LDP/MAX_CHANGE)
 	      IF(CNT_NEG .GT. NION(I)/3 .OR. CNT_POS .GT. NION(I)/3)THEN
 	        WRITE(6,'(A,A10,A,I5,A,I3)')'Replacing populations for ion ',ION_ID(I),'-',
 	1             ION_INDEX(I),' at depth ',ID
 	        DO IVAR=ION_INDEX(I),ION_INDEX(I)+NION(I)-1
 	          T1=LOG(R(ID)/R(ID1))/LOG(R(ID2)/R(ID1))
 	          POPS(IVAR,ID,IT)=EXP( T1*LOG(POPS(IVAR,ID2,IT)) +
-	1                     (1.0D0-T1)*LOG(POPS(IVAR,ID1,IT)) )
+	1                     (1.0_LDP-T1)*LOG(POPS(IVAR,ID1,IT)) )
 	        END DO
 	      END IF
 	    END DO
@@ -1090,7 +1080,7 @@ C
 	  GOTO 200
 !
 	ELSE IF(PLT_OPT(1:4) .EQ. 'DNRG')THEN
-	  LEVELS=0; T1=1.2D0; T2=0.0D0; T3=0.0D0
+	  LEVELS=0; T1=1.2_LDP; T2=0.0_LDP; T3=0.0_LDP
 	  CALL GEN_IN(LEVELS,I,NLEV_MAX,'Levels for defining new r grid')
 	  CALL GEN_IN(T1,'Max ratio of level populations between cons. grid points')
 	  CALL DEF_NEW_RG_V1(Y,R,POPS(1,1,NIT),LEVELS,T1,T2,T3,TMP_LOG,I,NT,ND)
@@ -1130,7 +1120,7 @@ C
 ! For SN models, we sometimes plot in uts of 10^14 cm.
 ! We also ensure boundary vales are absolutely correct.
 !
-	   IF(R(1) .GT. 1.0D+04)TA(1:K)=1.0D+04*TA(1:K)
+	   IF(R(1) .GT. 1.0E+04_LDP)TA(1:K)=1.0E+04_LDP*TA(1:K)
 	   TA(1)=R(1); TA(K)=R(ND)
 	   OPEN(UNIT=LU_OUT,FILE='NEW_RDINR',STATUS='UNKNOWN',ACTION='WRITE')
 	   WRITE(LU_OUT,'(/,2X,A,10X,A,/)')'24-FEB-2004','!Format date'
@@ -1144,12 +1134,12 @@ C
 !
 	ELSE IF(PLT_OPT(1:3) .EQ. 'RAT')THEN
 	  WRITE(6,*)' '
-	  IT=NIT; ID=ND; T2=100.0D0
+	  IT=NIT; ID=ND; T2=100.0_LDP
 	  CALL GEN_IN(IT,'Iteration # (zero to exit)')
 	  CALL GEN_IN(K,'Maximum depth to consider')
 !	  CALL GEN_IN(T2,'Interpolate values with correction > >%')
 	  DO ID=2,K
-	    RMAX=0.0D0; RMIN=100.0D0
+	    RMAX=0.0_LDP; RMIN=100.0_LDP
 	    DO IVAR=1,NT-1
 	      T3=POPS(IVAR,ID-1,IT)/POPS(IVAR,ID+1,IT)
 	      IF(T3 .GT. RMAX)THEN
@@ -1275,13 +1265,13 @@ C
 C
   	      IF(PLT_OPT .EQ. 'F')THEN
   	        DO K=1,NIT-1
-  	          Z(K)=100.0D0*(Y(K+1)-Y(K))/Y(K+1)
+  	          Z(K)=100.0_LDP*(Y(K+1)-Y(K))/Y(K+1)
   	          X(K)=FLOAT(K)
   	        END DO
   	        NY=NIT-1
   	        T1=MAXVAL(ABS(Z(1:NY)))
-  	        IF(T1 .LT. 1.0D-02)THEN
-  	          Z(1:NY)=Z(1:NY)*1.0D+03
+  	        IF(T1 .LT. 1.0E-02_LDP)THEN
+  	          Z(1:NY)=Z(1:NY)*1.0E+03_LDP
   	          YLABEL='\gDY/Y(%)\d \ux10\u3\d'
   	          WRITE(T_OUT,*)'Correction scaled by factor of 10^3'
   	        ELSE
@@ -1303,13 +1293,13 @@ C
 	        YLABEL='\gDY(K+1)/\gDY(K)'
 	      ELSE IF(PLT_OPT .EQ. 'D')THEN
 	        DO K=1,NIT
-	          Z(K)=100.0D0*(Y(K)-Y(NIT))/Y(NIT)
+	          Z(K)=100.0_LDP*(Y(K)-Y(NIT))/Y(NIT)
 	          X(K)=FLOAT(K)
 	        END DO
 	        NY=NIT-1
 	        T1=MAXVAL(ABS(Z(1:NY)))
-	        IF(T1 .LT. 1.0D-02)THEN
-	          Z(1:NY)=Z(1:NY)*1.0D+03
+	        IF(T1 .LT. 1.0E-02_LDP)THEN
+	          Z(1:NY)=Z(1:NY)*1.0E+03_LDP
 	          YLABEL='[Y(K)-Y(NIT)]/Y(NIT) [%]\d \ux10\u3\d'
 	          WRITE(T_OUT,*)'Correction scaled by factor of 10^3'
 	        ELSE
@@ -1334,6 +1324,49 @@ C
 	    END IF
 	    GOTO 200
 	  END DO
+!
+	ELSE IF(PLT_OPT .EQ. 'H' .OR. PLT_OPT .EQ. 'HE')THEN
+!
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)' For the next 4 options, we plot versus iteration number '
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'F   :: Z(K)=100.0D0*(Y(K+1)-Y(K))/Y(K+1)'
+	  WRITE(T_OUT,*)'R   :: [Y(K+2)-Y(K+1)]/[Y(K+1)-Y(K)]'
+	  WRITE(T_OUT,*)'D   :: Z(K)=100.0D0*(Y(K)-Y(NIT))/Y(NIT)'
+	  WRITE(T_OUT,*)'Y   :: Z(K)=Y(K)'
+	  WRITE(T_OUT,*)' '
+          WRITE(T_OUT,*)'PD  :: Plot 100.0D0*(Y(K)-Y(K-1))/Y(K) as a function of depth index.'
+	  WRITE(T_OUT,*)'PF  :: Plot 100.0D0*(Y(K+1)-Y(K))/Y(K+1) for all variables at a given depth.'
+	  WRITE(T_OUT,*)' '
+          WRITE(T_OUT,*)'PN  :: Plot a variable as a function of depth index.'
+          WRITE(T_OUT,*)'PV  :: Plot a variable as a function of velocity.'
+          WRITE(T_OUT,*)'PYD :: Plot all variables at a given depth -- change to log space before using'
+          WRITE(T_OUT,*)'VR  :: Plot velocity as a function of radius.'
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'MED_R  :: Median corection as a function of depth'
+	  WRITE(T_OUT,*)'MR     :: Z(K)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
+	  WRITE(T_OUT,*)'IR     :: Z(ID)=100.0D0*(MEAN[Y(K-1)-Y(K-2)]/[Y(K)-Y(K-1)] - 1.0)'
+	  WRITE(T_OUT,*)'WRST   :: Writes fractional corections to file (FRAC_COR -- same format as STEQ_VALS'
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)' The next set of options allow corections to the populations to be made.'
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'FDG      :: Fudge individual values at a single depth and output to SCRTEMP'
+	  WRITE(T_OUT,*)'FDGV     :: Fudge values over a ranges of depths (% change) and output to SCRTEMP'
+	  WRITE(T_OUT,*)'AFDG     :: Replace values with large alternating STEQ corrections.'
+	  WRITE(T_OUT,*)'SM       :: Fudge values over a ranges of depths using values at higher/adjacent depth'
+	  WRITE(T_OUT,*)'INT      :: Interpolate values using adjacent depths whose',
+	1                             ' corrections are above a certain % limit'
+	  WRITE(T_OUT,*)'NINT     :: Interpolate values whose corrections are above a certain % limit'
+	  WRITE(T_OUT,*)'RAT      :: Compare populations at adjacent depths'
+	  WRITE(T_OUT,*)'REP      :: Replace populations on one iteration with those of another'
+	  WRITE(T_OUT,*)'UNDO     :: Undo corrections over a range of depths'
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'LY  :: Switch to/from Log(Y) for options where appropriate (not full implemented)'
+	  WRITE(T_OUT,*)' '
+	  WRITE(T_OUT,*)'E   :: EXIT'
+	  WRITE(T_OUT,*)' '
+
 	ELSE
 	  WRITE(6,*)RED_PEN
 	  WRITE(6,*)'Unrecognized command'

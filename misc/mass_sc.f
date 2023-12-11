@@ -89,9 +89,9 @@
 ! Decide on format for the abundances.
 !
 	DO J=1,N_ABUND
-	  IF(ABS(ABUND(1,J)-12.0D0) .LT. 0.1)THEN
+	  IF(ABS(ABUND(1,J)-12.0_LDP) .LT. 0.1_LDP)THEN
 	    DO I=1,N
-	      ABUND(I,J)=10.0D0**(ABUND(I,J)-12.0D0)
+	      ABUND(I,J)=10.0_LDP**(ABUND(I,J)-12.0_LDP)
 	    END DO
 	  END IF
 	END DO
@@ -99,7 +99,7 @@
 ! Compute the mass fractions of all species.
 !
 	DO J=1,N_ABUND
-	  MASS=0.0D0
+	  MASS=0.0_LDP
 	  DO I=1,N
 	    MASS_FRAC(I,J)=AT_MASS(I)*ABUND(I,J)
 	    MASS=MASS+MASS_FRAC(I,J)
@@ -121,7 +121,7 @@
 ! We now begin the section to allow individual abundances to be varied.
 ! Each species can be separately changed by using it chenical abbreviation.
 !
-	NEW_ABUND(:,:)=0.0D0
+	NEW_ABUND(:,:)=0.0_LDP
 	SPEC=' '
 	DO WHILE(SPEC(1:1) .NE. 'E')
 	  SPEC='E'
@@ -149,8 +149,8 @@
 ! Compute the scale factors.
 !
 	DO J=1,N_ABUND
-	  OLD_MASS_SUM=0.0D0
-	  NEW_MASS_SUM=0.0D0
+	  OLD_MASS_SUM=0.0_LDP
+	  NEW_MASS_SUM=0.0_LDP
 	  DO I=1,N
 	    IF(ALTERED_ABUND(I,J))THEN
 	      OLD_MASS_SUM=OLD_MASS_SUM+MASS_FRAC(I,J)
@@ -163,7 +163,7 @@
 ! Do the actual scaling.
 !
 	DO J=1,N_ABUND
-	  MASS=0.0D0
+	  MASS=0.0_LDP
 	  DO I=1,N
 	    IF(ALTERED_ABUND(I,J))THEN
 	      NEW_MASS_FRAC(I,J)=NEW_MASS_FRAC(I,J)*OLD_MASS_SUM/NEW_MASS_SUM
@@ -176,12 +176,12 @@
 !
 ! Copute the relative fractional populations.
 !
-	  NHE=0.0D0
+	  NHE=0.0_LDP
 	  DO I=1,N
 	    NEW_ABUND(I,J)=NEW_MASS_FRAC(I,J)*MASS/AT_MASS(I)
 	    IF(SYMB(I) .EQ. 'He')NHE=NEW_ABUND(I,J)
 	  END DO
-	  IF(NHE .EQ. 0.0D0)NHE=MAXVAL(NEW_ABUND)
+	  IF(NHE .EQ. 0.0_LDP)NHE=MAXVAL(NEW_ABUND)
 !
 ! Normalize the abundances so the the He abundace is 1.0
 !
@@ -190,7 +190,7 @@
 ! With the new fractional abundace we compute the revised mass-fractions.
 ! Acts as a check.
 !
-	  MASS=0.0D0
+	  MASS=0.0_LDP
 	  DO I=1,N
 	    NEW_MASS_FRAC(I,J)=AT_MASS(I)*NEW_ABUND(I,J)
 	    MASS=MASS+NEW_MASS_FRAC(I,J)

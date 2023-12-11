@@ -83,11 +83,11 @@
 !
 ! Compute the total excitation energy of each level.
 !
-	TOT_ENERGY(1:NT)=0.0D0
-	ION_EN(1:NT)=0.0D0
+	TOT_ENERGY(1:NT)=0.0_LDP
+	ION_EN(1:NT)=0.0_LDP
 	DO ISPEC=1,NUM_SPECIES
-	  T1=0.0D0
-	  T2=0.0D0
+	  T1=0.0_LDP
+	  T2=0.0_LDP
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	    T2=T2+AVE_ENERGY(ATM(ID)%EQXzV)
 	    DO I=1,ATM(ID)%NXzV
@@ -108,8 +108,8 @@
 !
 ! Compute the mean energy per atom. At first it is units of 10^15Hz.
 !
-	INT_EN(:)=0.0D0
-	COL_EN(:)=0.0D0
+	INT_EN(:)=0.0_LDP
+	COL_EN(:)=0.0_LDP
 	DO I=1,ND
 	  DO J=1,NT-2
 	     INT_EN(I)=INT_EN(I)+POPS(J,I)*TOT_ENERGY(J)
@@ -128,16 +128,16 @@
 ! The 10^9 arises since T is in units of 10^4K, and V in units of 10^5 km/s.
 !
 	PI=FUN_PI()
-	SCALE=1.0D+09*BOLTZMANN_CONSTANT()/4.0D0/PI
+	SCALE=1.0E+09_LDP*BOLTZMANN_CONSTANT()/4.0_LDP/PI
 	DO I=1,ND
 	  IF(I .EQ. ND)THEN
 	    T1=R(ND-1)-R(ND)
 	  ELSE
 	    T1=R(I)-R(I+1)
 	  END IF
-	  A(I)=1.5D0*SCALE*(POP_ATOM(I)+ED(I))*V(I)/T1
-	  B(I)=SCALE*(POP_ATOM(I)+ED(I))*V(I)*(3.0D0+SIGMA(I))/R(I)
-	  C(I)=1.5D0*SCALE*POP_ATOM(I)*V(I)/T1
+	  A(I)=1.5_LDP*SCALE*(POP_ATOM(I)+ED(I))*V(I)/T1
+	  B(I)=SCALE*(POP_ATOM(I)+ED(I))*V(I)*(3.0_LDP+SIGMA(I))/R(I)
+	  C(I)=1.5_LDP*SCALE*POP_ATOM(I)*V(I)/T1
 	  D(I)=SCALE*POP_ATOM(I)*V(I)/T1
 	  GAMMA(I)=ED(I)/POP_ATOM(I)
 	END DO
@@ -215,7 +215,12 @@
 ! dTdR (internal energy) term. This split was useful for diagnostic purposes,
 ! but has now been kept for simplicity so that GENCOOL does not need to be changed.
 !
-	T1=4.0D-10*PI
+	DO I=1,ND
+	  WRITE(277,'(10ES14.4)')A(I),B(I),C(I),D(I),T(I),GAMMA(I),COL_EN(I)
+	  FLUSH(UNIT=277)
+	END DO
+!
+	T1=4.0E-10_LDP*PI
 	DO I=1,ND-1
 	  AD_CR_V(I)= B(I)*T(I)
 	  AD_CR_DT(I)=A(I)*(T(I)-T(I+1))+

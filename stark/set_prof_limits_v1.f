@@ -92,7 +92,7 @@
 !
 	INTEGER, PARAMETER :: NUM_DOP=6
 !
-	C_KMS=2.998D+05			!Doesn't need to be very accurate
+	C_KMS=2.998E+05_LDP			!Doesn't need to be very accurate
 !
 ! The option assumes fixed width Doppler profiles, and recovers exactly the
 ! same option as was installed in CMFGEN prior to the installations of variable
@@ -108,27 +108,27 @@
 ! We assume all lines are dominated by the Doppler profile at line center.
 ! We ensure LINE_TO_CONT ratio is not zero, to prevent division by zero.
 !
-        TMP_VEC(1:ND)=( VTURB_IN(1:ND)/12.85D0  )**2
-	ESEC(1:ND)=6.65D-15*ED_IN(1:ND)
+        TMP_VEC(1:ND)=( VTURB_IN(1:ND)/12.85_LDP  )**2
+	ESEC(1:ND)=6.65E-15_LDP*ED_IN(1:ND)
 !
-        T1=1.0D-15/1.77245385095516D0         !1.0D-15/SQRT(PI)
-	VEC_VDOP_MIN=1.0D+50			!Very large number
+        T1=1.0E-15_LDP/1.77245385095516_LDP         !1.0D-15/SQRT(PI)
+	VEC_VDOP_MIN=1.0E+50_LDP			!Very large number
         DO I=1,ND
-          NU_DOP(I)=12.85D0*SQRT( TEMP_IN(I)/AMASS_IN + TMP_VEC(I) )	!kms
+          NU_DOP(I)=12.85_LDP*SQRT( TEMP_IN(I)/AMASS_IN + TMP_VEC(I) )	!kms
 	  VEC_VDOP_MIN=MIN(VEC_VDOP_MIN,NU_DOP(I))			!kms
           NU_DOP(I)=NU_DOP(I)*NU_ZERO/C_KMS				!unitless
           PROF_LINE_CENTER=T1/NU_DOP(I)
 	  LINE_TO_CONT_RATIO(I)=ABS(CHIL(I))*PROF_LINE_CENTER/ESEC(I)
-	  IF(LINE_TO_CONT_RATIO(I) .EQ. 0)LINE_TO_CONT_RATIO(I)=1.0D-50
+	  IF(LINE_TO_CONT_RATIO(I) .EQ. 0)LINE_TO_CONT_RATIO(I)=1.0E-50_LDP
 	END DO
 !
-	VEC_STRT_FREQ=0.0D0
+	VEC_STRT_FREQ=0.0_LDP
 	IF(PROF_TYPE .EQ. 'DOPPLER' .OR. PROF_TYPE .EQ. 'VOIGT')THEN
 	  IF(LIMIT_SET_BY_OPACITY)THEN
 	    DO I=1,ND
               T1=-LOG(DOP_LIMIT/LINE_TO_CONT_RATIO(I))
 	      IF(T1 .GT. 0)T1=SQRT(T1)
-	      T1=MAX(3.5D0,T1)
+	      T1=MAX(3.5_LDP,T1)
               VEC_STRT_FREQ=MAX(VEC_STRT_FREQ,NU_ZERO+T1*NU_DOP(I))
 	    END DO
 	  ELSE
@@ -145,15 +145,15 @@
 	  IF(LIMIT_SET_BY_OPACITY)THEN
 	    dNU=0
 	    DO I=1,ND
-              T1=0.159155D-15*SQRT(GAM_NAT*LINE_TO_CONT_RATIO(I)/VOIGT_LIMIT)
+              T1=0.159155E-15_LDP*SQRT(GAM_NAT*LINE_TO_CONT_RATIO(I)/VOIGT_LIMIT)
 	      dNU=MAX(T1,dNU)
 	    END DO
-	    dNU=MIN(dNU,NU_ZERO*5.0D+05/C_KMS)
+	    dNU=MIN(dNU,NU_ZERO*5.0E+05_LDP/C_KMS)
 	    VEC_STRT_FREQ=MAX(VEC_STRT_FREQ,NU_ZERO+dNU)
 	  ELSE
 	    dNU=0
 	    DO I=1,ND
-              T1=SQRT(1.0D+15*GAM_NAT*NU_DOP(I))
+              T1=SQRT(1.0E+15_LDP*GAM_NAT*NU_DOP(I))
 	      dNU=MAX(T1,dNU)
 	    END DO
 !
@@ -162,15 +162,15 @@
 ! The last factor trancates the profile when the profiles is down by
 ! a factor of 10^4 from line center.
 !
-	    dNU=0.21189D-15*dNU*100
-	    dNU=MIN(dNU,NU_ZERO*5.0D+05/C_KMS)
+	    dNU=0.21189E-15_LDP*dNU*100
+	    dNU=MIN(dNU,NU_ZERO*5.0E+05_LDP/C_KMS)
 	    VEC_STRT_FREQ=MAX(VEC_STRT_FREQ,NU_ZERO+dNU)
 	  END IF
 !	  RETURN
 	END IF
 !
 	IF(PROF_TYPE .EQ. 'HZ_STARK')THEN
-	  VEC_STRT_FREQ=NU_ZERO*(1.0D0+3000.0D0/C_KMS)
+	  VEC_STRT_FREQ=NU_ZERO*(1.0_LDP+3000.0_LDP/C_KMS)
 !	  RETURN
 	END IF
 !

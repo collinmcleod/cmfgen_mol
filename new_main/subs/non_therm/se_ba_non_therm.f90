@@ -48,22 +48,22 @@
 !
 	INTEGER, PARAMETER :: LU_TH=8
 	INTEGER, PARAMETER :: LU_ER=6
-	REAL(KIND=LDP), SAVE :: SCALE_FACTOR=1.0D0
-	REAL(KIND=LDP), PARAMETER :: Hz_to_eV=13.60D0/3.2897D0
+	REAL(KIND=LDP), SAVE :: SCALE_FACTOR=1.0_LDP
+	REAL(KIND=LDP), PARAMETER :: Hz_to_eV=13.60_LDP/3.2897_LDP
 !
         OPEN(UNIT=LU_TH,FILE='NON_THERM_SPEC_INFO',STATUS='UNKNOWN',POSITION='APPEND')
         CALL SET_LINE_BUFFERING(LU_TH)
 !
-	LOCAL_ION_HEATING=0.0D0
-	LOCAL_EXC_HEATING=0.0D0
+	LOCAL_ION_HEATING=0.0_LDP
+	LOCAL_EXC_HEATING=0.0_LDP
 !
 ! For historical reasons STEQ contains Int[chi.J - eta]dv. Rather than multiply
 ! this term everywhere by 4pi, we divide the radiactive heating by 4pi.
 ! Also, since chi, and eta are a factor of 10^10 too large, we need to
 ! scale by 10^10. The BA matrix does not need to be altered.
 !
-        PI=ACOS(-1.0D0)
-        SCALE=1.0D+10/4.0D0/PI
+        PI=ACOS(-1.0_LDP)
+        SCALE=1.0E+10_LDP/4.0_LDP/PI
         STEQ_T=STEQ_T+SCALE*RADIOACTIVE_DECAY_ENERGY                                      !*FRAC_ELEC_HEATING
         dE_RAD_DECAY=RADIOACTIVE_DECAY_ENERGY
 	RADIOACTIVE_DECAY_ENERGY_eV=SCALE_FACTOR*RADIOACTIVE_DECAY_ENERGY/ELECTRON_VOLT()
@@ -72,11 +72,11 @@
 !
 ! Estimate number of non-thermal electrons.
 !
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  DO IKT=1,NKT
 	    T1=T1+YE(IKT,DPTH_INDX)*dXKT(IKT)/SQRT(XKT(IKT))
 	  END DO
-	  T1=T1*SQRT(0.5D0*9.109389D-28/1.602177D-12)*RADIOACTIVE_DECAY_ENERGY_eV(DPTH_INDX)
+	  T1=T1*SQRT(0.5_LDP*9.109389E-28_LDP/1.602177E-12_LDP)*RADIOACTIVE_DECAY_ENERGY_eV(DPTH_INDX)
 	  WRITE(LU_TH,'(A,I3,A,2ES12.4)')' Non-thermal and thermal electron densities at depth',  &
 	          DPTH_INDX,' are:',T1,ED(DPTH_INDX)
 !
@@ -93,7 +93,7 @@
 	      ID=THD(IT)%LNK_TO_ION
 	      ISPEC=THD(IT)%LNK_TO_SPECIES
 	      IKT_ST=GET_INDX_DP(THD(IT)%ION_POT,XKT,NKT)
-	      RATE = 0.0D0
+	      RATE = 0.0_LDP
 	      DO IKT=IKT_ST,NKT
 	        RATE = RATE + YE(IKT,DPTH_INDX)*dXKT(IKT)*THD(IT)%CROSS_SEC(IKT)
 	      END DO
@@ -103,13 +103,13 @@
 	         IF(ID .EQ. SPECIES_END_ID(ISPEC)-1)THEN
                    SE_ION_LEV=ATM(ID)%NXzV+1
 	           GUPPER=THD(IT)%SUM_GION
-	           ION_EXC_EN=0.0D0
+	           ION_EXC_EN=0.0_LDP
 	         ELSE
 	           NUP_F=THD(IT)%ION_LEV(J); NUP=ATM(ID+1)%F_TO_S_XzV(NUP_F)
                    SE_ION_LEV=SE(ID)%ION_LEV_TO_EQ_PNT(NUP)
 	           GUPPER=ATM(ID+1)%GXzV_F(NUP_F)
                    SE_ION_LEV=ATM(ID)%NXzV+1               !NUP -- assume all to ground state at  present.
-	           ION_EXC_EN=0.0D0                        !=ATM(ID+1)%EDGEXzV_F(1)-ATM(ID+1)%EDGEXzV_F(NUP_F)
+	           ION_EXC_EN=0.0_LDP                        !=ATM(ID+1)%EDGEXzV_F(1)-ATM(ID+1)%EDGEXzV_F(NUP_F)
 	         END IF
 	         DO I=1,THD(IT)%N_STATES
 	           NL_F=THD(IT)%ATOM_STATES(I); NL=ATM(ID)%F_TO_S_XzV(NL_F)
@@ -183,7 +183,7 @@
 	DO I=1,ND
 	  T2=Hz_TO_eV*LOCAL_ION_HEATING(I)/RADIOACTIVE_DECAY_ENERGY_eV(I)
 	  T3=Hz_TO_eV*LOCAL_EXC_HEATING(I)/RADIOACTIVE_DECAY_ENERGY_eV(I)
-	  T1=(1.0D0-T2-T3)
+	  T1=(1.0_LDP-T2-T3)
 	  WRITE(LU_TH,'(ES12.4,6(ES12.4))')RADIOACTIVE_DECAY_ENERGY_eV(I),        &
 	               FRAC_ELEC_HEATING(I),T1,         &
 	               FRAC_ION_HEATING(I),T2,          &
@@ -191,7 +191,7 @@
 	END DO
 	CLOSE(LU_TH)
 !
-	SCALE_FACTOR=MIN(SCALE_FACTOR*10.0D0, 1.0D0)
+	SCALE_FACTOR=MIN(SCALE_FACTOR*10.0_LDP, 1.0_LDP)
 	WRITE(6,*)'New scale factor is',SCALE_FACTOR
 !
 	RETURN

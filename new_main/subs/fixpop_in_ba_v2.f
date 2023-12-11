@@ -70,16 +70,16 @@
 !
 	      IF(LOC_IMP)THEN
 	        T1=ATM(ID-1)%DXzV(DEPTH_INDX)/POP_SPECIES(DEPTH_INDX,SPECIES_LNK(ID))
-	        IF(T1 .LT. 1.0D-15)THEN
-	          BA(LOC_EQ,:)=0.0D0
-	          BA(LOC_EQ,LOC_EQ)=1.0D0
-	          STEQ(LOC_EQ)=0.0D0
+	        IF(T1 .LT. 1.0E-15_LDP)THEN
+	          BA(LOC_EQ,:)=0.0_LDP
+	          BA(LOC_EQ,LOC_EQ)=1.0_LDP
+	          STEQ(LOC_EQ)=0.0_LDP
 	          IF(DIAG_BAND)CNT(LOC_EQ)=CNT(LOC_EQ)+1
 	        END IF
 	      ELSE
-	        BA(LOC_EQ,:)=0.0D0
-	        BA(LOC_EQ,LOC_EQ)=1.0D0
-	        STEQ(LOC_EQ)=0.0D0
+	        BA(LOC_EQ,:)=0.0_LDP
+	        BA(LOC_EQ,LOC_EQ)=1.0_LDP
+	        STEQ(LOC_EQ)=0.0_LDP
 	        IF(DIAG_BAND)CNT(LOC_EQ)=CNT(LOC_EQ)+1
 	      END IF
 	    END IF
@@ -106,20 +106,20 @@
 	      DO J=1,ATM(ID)%NXzV
 	        T1=T1+ATM(ID)%XzV(J,DEPTH_INDX)
 	      END DO
-	      IF( T1/POP_SPECIES(DEPTH_INDX,SPECIES_LNK(ID)) .GT. 1.0D-15 )FIX_N=-10
+	      IF( T1/POP_SPECIES(DEPTH_INDX,SPECIES_LNK(ID)) .GT. 1.0E-15_LDP )FIX_N=-10
 	    END IF
 	    LOC_EQ=ATM(ID)%EQXzV
 	    IF(DIAG_BAND .AND. FIX_N .GT. 0)CNT(LOC_EQ)=CNT(LOC_EQ)+1
 !
 	    DO J=1,NT
 	      DO I=ATM(ID)%EQXZV,ATM(ID)%EQXZV+FIX_N-1
-	        BA(I,J)=0.0D0
+	        BA(I,J)=0.0_LDP
 	      END DO
 	    END DO
 !
 	    DO I=ATM(ID)%EQXZV,ATM(ID)%EQXZV+FIX_N-1
-	      BA(I,I)=1.0D0
-	      STEQ(I)=0.0D0
+	      BA(I,I)=1.0_LDP
+	      STEQ(I)=0.0_LDP
 	    END DO
 	  END IF
 !

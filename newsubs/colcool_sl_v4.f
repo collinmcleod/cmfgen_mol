@@ -49,14 +49,14 @@ C
 	REAL(KIND=LDP) OMEGA_F(N_F,N_F)
 	REAL(KIND=LDP) dln_OMEGA_F_dlnT(N_F,N_F)
 C
-	H=6.6261965D-12		!H*1.0E+15  (1.0E+15 due to times frequency)
-	TMP_ED=1.0D0
+	H=6.6261965E-12_LDP		!H*1.0E+15  (1.0E+15 due to times frequency)
+	TMP_ED=1.0_LDP
 C
 	DO I=1,ND			!Which depth
 C
 C Compute collisional cross-sections (and their T derivatives)
 C
-	  COOL(I)=0.0D0
+	  COOL(I)=0.0_LDP
 	  CALL SUBCOL_MULTI_V4(OMEGA_F,dln_OMEGA_F_dlNT,
 	1          CNM,DCNM,
 	1          HN_S(1,I),HNST_S(1,I),dlnHNST_S_dlnT(1,I),N_S,
@@ -65,8 +65,8 @@ C
 	1          ZION,ID,COL_FILE,OMEGA_COL,
 	1          F_TO_S_MAP,COOL(I),T(I),TMP_ED,IONE)
 C
-	  CPR(I)=0.0D0
-	  CRR(I)=0.0D0
+	  CPR(I)=0.0_LDP
+	  CRR(I)=0.0_LDP
 	  COOL(I)=COOL(I)*ED(I)*H
 C
 	  DO J=1,N_S				!Level

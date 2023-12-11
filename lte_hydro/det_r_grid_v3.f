@@ -83,7 +83,7 @@
 	    WRITE(LUER,*)'Error in DET_R_GRID_V3 for OUT_BND_OPT=POW'
 	    WRITE(LUER,*)'OBND_PARS(1) must be >=1 and <10'
 	    STOP
-	  ELSE IF(OBND_PARS(2) .LE. 1.0)THEN
+	  ELSE IF(OBND_PARS(2) .LE. 1.0_LDP)THEN
 	    WRITE(LUER,*)'Error in DET_R_GRID_V3 for OUT_BND_OPT=POW'
 	    WRITE(LUER,*)'OBND_PARS(2) must be >1'
 	    STOP
@@ -92,7 +92,7 @@
 	  N_BND_PNTS=J
 	ELSE IF(OUT_BND_OPT .EQ. 'SPECIFY')THEN
 	  DO K=1,NUM_OBND_PARAMS-1
-	    IF(OBND_PARS(K) .LT. 1.0 .OR. OBND_PARS(K) .LE. OBND_PARS(K+1))THEN
+	    IF(OBND_PARS(K) .LT. 1.0_LDP .OR. OBND_PARS(K) .LE. OBND_PARS(K+1))THEN
 	      WRITE(LUER,*)'Error in DET_R_GRID_V3'
 	      WRITE(LUER,*)'OB parameters must be >1 and monotonically decreasing'
 	      STOP
@@ -134,7 +134,7 @@
 ! to give more accuracy for our first orer boundary conditions. We ignore the
 ! velocity check.
 !
-	  IF(REV_TAU(I) .GE. LOG_TAU_MAX-0.5*dLOG_TAU)THEN
+	  IF(REV_TAU(I) .GE. LOG_TAU_MAX-0.5_LDP*dLOG_TAU)THEN
 	    T1=LOG_TAU_MAX-REV_TAU(I-1)
 	    REV_TAU(I)=REV_TAU(I-1)+T1/2
 	    I=I+1
@@ -158,15 +158,15 @@
 	      J=J+1
 	    END DO
 	    T1=(REV_TAU(I)-LOG_TAU(J-1))/(LOG_TAU(J)-LOG_TAU(J-1))
-	    REV_V(I)=(1.0D0-T1)*V(J-1)+T1*V(J)
-	    IF(REV_V(I-1) .GT. 0.1D0 .AND. REV_V(I) .LT. V_SCL_FAC*REV_V(I-1))THEN
+	    REV_V(I)=(1.0_LDP-T1)*V(J-1)+T1*V(J)
+	    IF(REV_V(I-1) .GT. 0.1_LDP .AND. REV_V(I) .LT. V_SCL_FAC*REV_V(I-1))THEN
 	      J=JST
 	      DO WHILE (V_SCL_FAC*REV_V(I-1) .LT. V(J))
 	        IF(J .EQ. ND)EXIT
 	        J=J+1
 	       END DO
 	      T1=(V_SCL_FAC*REV_V(I-1)-V(J-1))/(V(J)-V(J-1))
-	      REV_TAU(I)=(1.0D0-T1)*LOG_TAU(J-1)+T1*LOG_TAU(J)
+	      REV_TAU(I)=(1.0_LDP-T1)*LOG_TAU(J-1)+T1*LOG_TAU(J)
 	      REV_V(I)=V_SCL_FAC*REV_V(I-1)
 	    END IF
  	    J=JST
@@ -176,15 +176,15 @@
 	      J=J+1
 	    END DO
 	    T1=(REV_TAU(I)-LOG_TAU(J-1))/(LOG_TAU(J)-LOG_TAU(J-1))
-	    REV_R(I)=(1.0D0-T1)*R(J-1)+T1*R(J)
-	    IF(REV_R(I-1) .GT. 0.1D0 .AND. REV_R(I) .LT. R_SCL_FAC*REV_R(I-1))THEN
+	    REV_R(I)=(1.0_LDP-T1)*R(J-1)+T1*R(J)
+	    IF(REV_R(I-1) .GT. 0.1_LDP .AND. REV_R(I) .LT. R_SCL_FAC*REV_R(I-1))THEN
 	      J=JST
 	      DO WHILE (R_SCL_FAC*REV_R(I-1) .LT. R(J))
 	        IF(J .EQ. ND)EXIT
 	        J=J+1
 	       END DO
 	      T1=(R_SCL_FAC*REV_R(I-1)-R(J-1))/(R(J)-R(J-1))
-	      REV_TAU(I)=(1.0D0-T1)*LOG_TAU(J-1)+T1*LOG_TAU(J)
+	      REV_TAU(I)=(1.0_LDP-T1)*LOG_TAU(J-1)+T1*LOG_TAU(J)
 	      REV_R(I)=R_SCL_FAC*REV_R(I-1)
 	    END IF
  	    J=JST
@@ -197,7 +197,7 @@
 !
 	WRITE(80,'(/,A,/)')' Estimate R grid as determined by DET_R_GRID_V3'
 	WRITE(80,'(A,4(9X,A))')'Index','   V',' Tau','dTau'
-	T1=10.0D0; T1=LOG(10.0D0)
+	T1=10.0_LDP; T1=LOG(10.0_LDP)
 	DO I=1,ND_TMP-1
 	  WRITE(80,'(I5,5ES14.4)')I,REV_V(I),REV_TAU(I)/T1,(REV_TAU(I+1)-REV_TAU(I))/T1
 	END DO
@@ -213,7 +213,7 @@
 	DO I=1,ND_TMP; OLD_R(I)=I; END DO
 	NS=NEW_ND-N_BND_PNTS
 	DO I=1,NS
-	  REV_R(I)=1+((I-1.0D0)*(ND_TMP-1.0D0) )/(NS-1.0D0)
+	  REV_R(I)=1+((I-1.0_LDP)*(ND_TMP-1.0_LDP) )/(NS-1.0_LDP)
 	END DO
 	CALL MON_INTERP(REV_TAU,NS,IONE,REV_R,NS,OLD_TAU,ND_TMP,OLD_R,ND_TMP)
 !
@@ -237,8 +237,8 @@
 	ELSE IF(OUT_BND_OPT .EQ. 'DEFAULT')THEN
 	  J=2
 	  REV_TAU(J+2:NS+J)=REV_TAU(2:NS)
-	  REV_TAU(2)=REV_TAU(1)+dLOG_TAU/9.0D0
-	  REV_TAU(3)=REV_TAU(1)+dLOG_TAU/3.0D0
+	  REV_TAU(2)=REV_TAU(1)+dLOG_TAU/9.0_LDP
+	  REV_TAU(3)=REV_TAU(1)+dLOG_TAU/3.0_LDP
 	  NS=NS+J
 	END IF
 !
@@ -246,8 +246,8 @@
 !
 	REV_TAU(NS+2)=REV_TAU(NS)
 	dLOG_TAU=REV_TAU(NS)-REV_TAU(NS-1)
-	REV_TAU(NS)=REV_TAU(NS-1)+0.6D0*dLOG_TAU
-	REV_TAU(NS+1)=REV_TAU(NS-1)+0.9D0*dLOG_TAU
+	REV_TAU(NS)=REV_TAU(NS-1)+0.6_LDP*dLOG_TAU
+	REV_TAU(NS+1)=REV_TAU(NS-1)+0.9_LDP*dLOG_TAU
 	NS=NS+2
 	IF(NS .NE. NEW_ND)THEN
 	  WRITE(6,*)'Error in DET_R_GRID_V3: Inconsistent NS and NEW_ND'
@@ -259,7 +259,7 @@
 !
 	WRITE(80,'(/,/,1X,A)')'Final Tau Grid'
 	WRITE(80,'(A,4(9X,A))')'Index',' Tau','dTau'
-	T1=10.0D0; T1=LOG(10.0D0)
+	T1=10.0_LDP; T1=LOG(10.0_LDP)
 	DO I=1,ND_TMP-1
 	  WRITE(80,'(I5,5ES14.4)')I,REV_TAU(I)/T1,(REV_TAU(I+1)-REV_TAU(I))/T1
 	END DO

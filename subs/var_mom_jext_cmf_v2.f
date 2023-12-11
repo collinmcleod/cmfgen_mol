@@ -147,7 +147,7 @@ C
 	REAL(KIND=LDP) TX_OLD_d_T(NV),TX_OLD_d_dTdR(NV)
 C
 	REAL(KIND=LDP) PROGDESC	
-	REAL(KIND=LDP), PARAMETER :: PROG_ID=3.4281463D+08  !Must be unique (VAR_MOM_)
+	REAL(KIND=LDP), PARAMETER :: PROG_ID=3.4281463E+08_LDP  !Must be unique (VAR_MOM_)
 C
 	INTEGER ERROR_LU
 	EXTERNAL ERROR_LU
@@ -171,8 +171,8 @@ C
 C Zero common block. There are currently 29 vectors in the common block.
 C TA must be the first vector, and PSIPREV the last.
 C
-	PSIPREV(NV-1)=1.0D0
-	PSIPREV(NV)=1.0D0
+	PSIPREV(NV-1)=1.0_LDP
+	PSIPREV(NV)=1.0_LDP
 	I=(NV*29)-1
 	CALL DP_ZERO(TA,I)
 	IF(PSIPREV(NV-1) .NE. 0 .OR. PSIPREV(NV) .NE. 1)THEN
@@ -180,15 +180,15 @@ C
 	  WRITE(I,*)'Error in zeroing SCRATCH block in VAR_MOM_J_CMF'
 	  STOP
 	ELSE
-	  PSIPREV(NV)=0.0D0
+	  PSIPREV(NV)=0.0_LDP
 	END IF
 C
 C 
 C
 C Zero relevant vectors and matrices.
 C
-	JNU(1:ND)=0.0D0
-	RSQ_HNU(1:ND)=0.0D0
+	JNU(1:ND)=0.0_LDP
+	RSQ_HNU(1:ND)=0.0_LDP
 C
 C Allows us to indicate whether the electron scattering is assumed to
 C to be COHERENT. If it is not coherent, we assume the ETA has already
@@ -200,27 +200,27 @@ C
 	    THETA(I)=ESEC(I)/CHI(I)
 	  END DO
 	ELSE
-	  THETA(1:ND)=0.0D0
+	  THETA(1:ND)=0.0_LDP
 	END IF
 C
 	IF(INIT)THEN
-	  TX(:,:,:)=0.0D0			!ND*ND_SM*NM
-	  TVX(:,:,:)=0.0D0			!(ND-1)*ND_SM*NM
+	  TX(:,:,:)=0.0_LDP			!ND*ND_SM*NM
+	  TVX(:,:,:)=0.0_LDP			!(ND-1)*ND_SM*NM
 	  DO I=1,ND
-	    JNUM1(I)=0.0D0
-	    RSQ_HNUM1(I)=0.0D0
-	    GAMH(I)=0.0D0
-	    GAM(I)=0.0D0
-	    W(I)=0.0D0
-	    WPREV(I)=0.0D0
-	    PSI(I)=0.0D0
-	    PSIPREV(I)=0.0D0
-	    TX_DIF_d_T(I)=0.0D0
-	    TX_DIF_d_dTdR(I)=0.0D0
-	    EPS_A(I)=0.0D0
-	    EPS_B(I)=0.0D0
-	    EPS_PREV_A(I)=0.0D0
-	    EPS_PREV_B(I)=0.0D0
+	    JNUM1(I)=0.0_LDP
+	    RSQ_HNUM1(I)=0.0_LDP
+	    GAMH(I)=0.0_LDP
+	    GAM(I)=0.0_LDP
+	    W(I)=0.0_LDP
+	    WPREV(I)=0.0_LDP
+	    PSI(I)=0.0_LDP
+	    PSIPREV(I)=0.0_LDP
+	    TX_DIF_d_T(I)=0.0_LDP
+	    TX_DIF_d_dTdR(I)=0.0_LDP
+	    EPS_A(I)=0.0_LDP
+	    EPS_B(I)=0.0_LDP
+	    EPS_PREV_A(I)=0.0_LDP
+	    EPS_PREV_B(I)=0.0_LDP
  	  END DO
 	END IF
 C
@@ -239,7 +239,7 @@ C
 	CALL d_DERIVCHI_dCHI(TB,TA,R,ND,METHOD)
 	CALL NORDTAU(DTAU,TA,R,R,TB,ND)
 	DO I=2,ND
-	  RSQ_DTAUONQ(I)=0.5D0*R(I)*R(I)*(DTAU(I)+DTAU(I-1))/Q(I)
+	  RSQ_DTAUONQ(I)=0.5_LDP*R(I)*R(I)*(DTAU(I)+DTAU(I-1))/Q(I)
 	END DO
 C
 C 
@@ -256,20 +256,20 @@ C proportional to NM*ND*ND.
 C
 	IF(.NOT. INIT)THEN
 	  DO I=1,ND-1
-	    AV_SIGMA=0.5D0*(SIGMA(I)+SIGMA(I+1))
-	    GAMH(I)=2.0D0*3.33564D-06*(V(I)+V(I+1))/(R(I)+R(I+1))
+	    AV_SIGMA=0.5_LDP*(SIGMA(I)+SIGMA(I+1))
+	    GAMH(I)=2.0_LDP*3.33564E-06_LDP*(V(I)+V(I+1))/(R(I)+R(I+1))
 	1         /dLOG_NU/( CHI(I)+CHI(I+1) )
-	    W(I)=GAMH(I)*( 1.0D0+AV_SIGMA*G(I) )
-	    WPREV(I)=GAMH(I)*( 1.0D0+AV_SIGMA*G_PREV(I) )
-	    EPS_A(I)=GAMH(I)*AV_SIGMA*RSQN_ON_RSQJ(I)/(1.0D0+W(I))
+	    W(I)=GAMH(I)*( 1.0_LDP+AV_SIGMA*G(I) )
+	    WPREV(I)=GAMH(I)*( 1.0_LDP+AV_SIGMA*G_PREV(I) )
+	    EPS_A(I)=GAMH(I)*AV_SIGMA*RSQN_ON_RSQJ(I)/(1.0_LDP+W(I))
 	    EPS_B(I)=EPS_A(I)*R(I+1)*R(I+1)
 	    EPS_A(I)=EPS_A(I)*R(I)*R(I)
-	    EPS_PREV_A(I)=GAMH(I)*AV_SIGMA*RSQN_ON_RSQJ_PREV(I)/(1.0D0+W(I))
+	    EPS_PREV_A(I)=GAMH(I)*AV_SIGMA*RSQN_ON_RSQJ_PREV(I)/(1.0_LDP+W(I))
 	    EPS_PREV_B(I)=EPS_PREV_A(I)*R(I+1)*R(I+1)
 	    EPS_PREV_A(I)=EPS_PREV_A(I)*R(I)*R(I)
 	  END DO
 	  DO I=1,ND
-	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/dLOG_NU
+	    GAM(I)=3.33564E-06_LDP*V(I)/R(I)/CHI(I)/dLOG_NU
 	  END DO
 C
 C PSIPREV is equivalent to the U vector of FORMSOL.
@@ -277,9 +277,9 @@ C
 	  PSI(1)=R(1)*R(1)*GAM(1)*( HBC+NBC*SIGMA(1) )
 	  PSIPREV(1)=R(1)*R(1)*GAM(1)*( HBC_PREV+NBC_PREV*SIGMA(1) )
 	  DO I=2,ND
-	    PSI(I)=RSQ_DTAUONQ(I)*GAM(I)*( 1.0D0+SIGMA(I)*F(I) )
+	    PSI(I)=RSQ_DTAUONQ(I)*GAM(I)*( 1.0_LDP+SIGMA(I)*F(I) )
 	    PSIPREV(I)=RSQ_DTAUONQ(I)*GAM(I)*
-	1                   ( 1.0D0+SIGMA(I)*F_PREV(I) )
+	1                   ( 1.0_LDP+SIGMA(I)*F_PREV(I) )
 	  END DO
 	END IF
 C
@@ -288,9 +288,9 @@ C
 C Compute vectors used to compute the flux vector H.
 C
 	DO I=1,ND-1
-	  HU(I)=R(I+1)*R(I+1)*F(I+1)*Q(I+1)/(1.0D0+W(I))/DTAU(I)
-	  HL(I)=R(I)*R(I)*F(I)*Q(I)/(1.0D0+W(I))/DTAU(I)
-	  HS(I)=WPREV(I)/(1.0D0+W(I))
+	  HU(I)=R(I+1)*R(I+1)*F(I+1)*Q(I+1)/(1.0_LDP+W(I))/DTAU(I)
+	  HL(I)=R(I)*R(I)*F(I)*Q(I)/(1.0_LDP+W(I))/DTAU(I)
+	  HS(I)=WPREV(I)/(1.0_LDP+W(I))
 	END DO
 C
 C Compute the TRIDIAGONAL operators, and the RHS source vector.
@@ -298,7 +298,7 @@ C
 	DO I=2,ND-1
 	  TA(I)=-HL(I-1)-EPS_A(I-1)
 	  TC(I)=-HU(I)+EPS_B(I)
-	  TB(I)=RSQ_DTAUONQ(I)*(1.0D0-THETA(I)) + PSI(I) +HU(I-1) +HL(I)
+	  TB(I)=RSQ_DTAUONQ(I)*(1.0_LDP-THETA(I)) + PSI(I) +HU(I-1) +HL(I)
 	1             -EPS_B(I-1)+EPS_A(I)
 	  VB(I)=-HS(I-1)
 	  VC(I)=HS(I)
@@ -309,23 +309,23 @@ C Evaluate TA,TB,TC for boudary conditions
 C
 	TC(1)=-R(2)*R(2)*F(2)*Q(2)/DTAU(1)
 	TB(1)=R(1)*R(1)*( F(1)*Q(1)/DTAU(1) + HBC ) + PSI(1)
-	XM(1)=0.0D0
-	TA(1)=0.0D0
-	VB(1)=0.0D0
-	VC(1)=0.0D0
+	XM(1)=0.0_LDP
+	TA(1)=0.0_LDP
+	VB(1)=0.0_LDP
+	VC(1)=0.0_LDP
 C
 	TA(ND)=-R(ND-1)*R(ND-1)*F(ND-1)*Q(ND-1)/DTAU(ND-1)
 	IF(DIF)THEN
 	  TB(ND)=R(ND)*R(ND)*F(ND)/DTAU(ND-1)
-	  XM(ND)=DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
+	  XM(ND)=DBB*R(ND)*R(ND)/3.0_LDP/CHI(ND)
 	ELSE
 	  TB(ND)=R(ND)*R(ND)*F(ND)/DTAU(ND-1)+IN_HBC
-	  XM(ND)=R(ND)*R(ND)*IC*(0.25D0+0.5D0*IN_HBC)
+	  XM(ND)=R(ND)*R(ND)*IC*(0.25_LDP+0.5_LDP*IN_HBC)
 	END IF
-	TC(ND)=0.0D0
-	VB(ND)=0.0D0
-	VC(ND)=0.0D0
-	PSIPREV(ND)=0.0D0
+	TC(ND)=0.0_LDP
+	VB(ND)=0.0_LDP
+	VC(ND)=0.0_LDP
+	PSIPREV(ND)=0.0_LDP
 C
 C We create PSIPREV_MOD to save multiplications in the UP_TX_TVX routine/
 C It is only different from PSIPREV when N_ON_J is non zero.
@@ -420,9 +420,9 @@ C
 	1          + ( EPS_PREV_B(I)*TX_OLD_d_dTdR(I+1)
 	1               - EPS_PREV_A(I-1)*TX_OLD_d_dTdR(I-1) )
 	  END DO
-	  TX_DIF_d_T(ND)=dDBBdT*R(ND)*R(ND)/3.0D0/CHI(ND) +
+	  TX_DIF_d_T(ND)=dDBBdT*R(ND)*R(ND)/3.0_LDP/CHI(ND) +
 	1                       PSIPREV(ND)*TX_DIF_d_T(ND)
-	  TX_DIF_d_dTdR(ND)=DBB/dTdR*R(ND)*R(ND)/3.0D0/CHI(ND) +
+	  TX_DIF_d_dTdR(ND)=DBB/dTdR*R(ND)*R(ND)/3.0_LDP/CHI(ND) +
 	1                       PSIPREV(ND)*TX_DIF_d_dTdR(ND)
 C
 C Solve for the radiation field along ray for this frequency.

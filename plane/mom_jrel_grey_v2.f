@@ -131,25 +131,25 @@
 	END IF
 !
 	LUER=ERROR_LU()
-	DAMP_FAC=0.1D0
-	MAX_ER_LST_IT=1.0D+10
+	DAMP_FAC=0.1_LDP
+	MAX_ER_LST_IT=1.0E+10_LDP
 !
 ! Note that V is in km/s and SIGMA=(dlnV/dlnR-1.0)
 !
-	BETA(1:ND)=V(1:ND)/2.99794D+05
+	BETA(1:ND)=V(1:ND)/2.99794E+05_LDP
 	H_ADV_FAC(1:ND)=BETA(1:ND)*H_ON_J(1:ND)
-	GAM_REL_SQ(1:ND)=1.0D0/(1.0D0-BETA(1:ND)*BETA(1:ND))
+	GAM_REL_SQ(1:ND)=1.0_LDP/(1.0_LDP-BETA(1:ND)*BETA(1:ND))
 	GAM_REL(1:ND)=SQRT(GAM_REL_SQ(1:ND))
 	CON_DELTA(1:ND)=BETA(1:ND)/R(1:ND)
 !
-	IF(.NOT. INCL_ADVEC_TERMS)H_ADV_FAC(1:ND)=0.0D0
+	IF(.NOT. INCL_ADVEC_TERMS)H_ADV_FAC(1:ND)=0.0_LDP
 !
 ! 
 !
 ! Zero relevant vectors and matrices.
 !
-	JNU(:)=0.0D0
-	JOLD(:)=0.0D0
+	JNU(:)=0.0_LDP
+	JOLD(:)=0.0_LDP
 !
 !*****************************************************************************
 !
@@ -164,19 +164,19 @@
 ! moment equation.
 !
 	DO I=1,ND
-	  CHI_H(I)=( CHI(I)/GAM_REL(I)+2.0D0*CON_DELTA(I)*(
-	1       1.0D0+GAM_REL_SQ(I)*(SIGMA(I)+1) )  )/GAM_REL(I)
-	  P_H(I)=1.0D0
+	  CHI_H(I)=( CHI(I)/GAM_REL(I)+2.0_LDP*CON_DELTA(I)*(
+	1       1.0_LDP+GAM_REL_SQ(I)*(SIGMA(I)+1) )  )/GAM_REL(I)
+	  P_H(I)=1.0_LDP
 	  CHI_J(I)=CHI(I)+GAM_REL(I)*CON_DELTA(I)*(
-	1       3.0D0-F(I)+GAM_REL_SQ(I)*(1.0D0+SIGMA(I))*
-	1                       (1.0D0+F(I)) )
+	1       3.0_LDP-F(I)+GAM_REL_SQ(I)*(1.0_LDP+SIGMA(I))*
+	1                       (1.0_LDP+F(I)) )
 	END DO
 !
 	SOURCE(1:ND)=ETA(1:ND)/CHI_J(1:ND)
 	IF(COHERENT)THEN
 	  COH_VEC(1:ND)=ESEC(1:ND)/CHI_J(1:ND)
 	ELSE
-	  COH_VEC(1:ND)=0.0D0
+	  COH_VEC(1:ND)=0.0_LDP
 	END IF
 !
 ! NB: We actually solve for gamma.r^2.J, not J.
@@ -188,9 +188,9 @@
 ! value of unity at the core.
 !
 	DO I=1,ND
-	  TA(ND-I+1)=( 3.0D0*F(I)-1.0D0-H_ADV_FAC(I)*(SIGMA(I)+1.0D0)+
-	1      GAM_REL_SQ(I)*BETA(I)*BETA(I)*(SIGMA(I)+1.0D0)*
-	1              (1.0D0-H_ADV_FAC(I)) )/(F(I)+H_ADV_FAC(I))/R(I)
+	  TA(ND-I+1)=( 3.0_LDP*F(I)-1.0_LDP-H_ADV_FAC(I)*(SIGMA(I)+1.0_LDP)+
+	1      GAM_REL_SQ(I)*BETA(I)*BETA(I)*(SIGMA(I)+1.0_LDP)*
+	1              (1.0_LDP-H_ADV_FAC(I)) )/(F(I)+H_ADV_FAC(I))/R(I)
 	  TB(I)=R(ND-I+1)
 	END DO
 	CALL INTEGRATE(TB,TA,Q,IFAIL,ND)
@@ -204,7 +204,7 @@
 	DO I=1,ND-1
 	  Q(I)=TB(I)/(R(I)/R(ND))**2
 	END DO
-	Q(ND)=1.0D0
+	Q(ND)=1.0_LDP
 !
 ! Compute optical depth scales.
 !
@@ -217,7 +217,7 @@
 	CALL NORDTAU(DTAU_J,TA,R,R,TB,ND)
 !
 	DO I=2,ND
-	  DTAUONQ(I)=0.5D0*(DTAU_J(I)+DTAU_J(I-1))/Q(I)
+	  DTAUONQ(I)=0.5_LDP*(DTAU_J(I)+DTAU_J(I-1))/Q(I)
 	END DO
 !
 ! Compute vectors used to compute the flux vector H.
@@ -237,10 +237,10 @@
 	DO IT_COUNT=1,MAX_IT_COUNT
 !
 	  IF(INCL_ADVEC_TERMS)THEN
-	    P_J(1:ND)=1.0D0+CON_DELTA(1:ND)*
+	    P_J(1:ND)=1.0_LDP+CON_DELTA(1:ND)*
 	1                  GAM_REL(1:ND)*dlnJdlnR(1:ND)/CHI_J(1:ND)
 	  ELSE
-	    P_J(1:ND)=1.0D0
+	    P_J(1:ND)=1.0_LDP
 	  END IF
 !
 ! Compute the TRIDIAGONAL operators, and the RHS source vector. These
@@ -258,8 +258,8 @@
 !
 	  TC(1)=-( F(2)+H_ADV_FAC(2))*Q(2)/DTAU_H(1)
 	  TB(1)= ( F(1)+H_ADV_FAC(1))*Q(1)/DTAU_H(1) + HBC*P_H(1)*GAM_REL(1)
-	  XM(1)=0.0D0
-	  TA(1)=0.0D0
+	  XM(1)=0.0_LDP
+	  TA(1)=0.0_LDP
 !
 ! NB: The expression for the flux is multiplied by GAM_REL_SQ since
 !     the first moment equation is written in terms of
@@ -268,12 +268,12 @@
 	  TA(ND)=-Q(ND-1)*(F(ND-1)+H_ADV_FAC(ND-1))/DTAU_H(ND-1)
 	  IF(DIF)THEN
 	    TB(ND)=(F(ND)+H_ADV_FAC(ND))/DTAU_H(ND-1)
-	    XM(ND)=GAM_REL_SQ(ND)*DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
+	    XM(ND)=GAM_REL_SQ(ND)*DBB*R(ND)*R(ND)/3.0_LDP/CHI(ND)
 	  ELSE
 	    TB(ND)=(F(ND)+H_ADV_FAC(ND))/DTAU_H(ND-1)+IN_HBC*GAM_REL_SQ(ND)
-	    XM(ND)=R(ND)*R(ND)*IC*(0.25D0+0.5D0*IN_HBC)*GAM_REL_SQ(ND)
+	    XM(ND)=R(ND)*R(ND)*IC*(0.25_LDP+0.5_LDP*IN_HBC)*GAM_REL_SQ(ND)
 	  END IF
-	  TC(ND)=0.0D0
+	  TC(ND)=0.0_LDP
 !
 ! Solve for the radiation field along ray for this frequency.
 !
@@ -283,29 +283,31 @@
 !
 	  J=0
 	  DO I=1,ND
-	    IF(XM(I) .LT. 0)THEN
+	    IF(XM(I) .LE. 0.0_LDP)THEN
 	      J=J+1
-	      XM(I)=ABS(XM(I))/10.0D0
+	      XM(I)=ABS(XM(I))/10.0_LDP
+	      IF(XM(I) .EQ. 0)XM(I)=MAX( XM(MAX(1,I-1)), XM(MIN(ND,I+1)) )
 	    END IF
 	  END DO
 	  IF(J .NE. 0)THEN
 	    WRITE(LU_DIAG,*)'Error in MOM_JREL_GREY on iteration ',IT_COUNT
-	    WRITE(LU_DIAG,*)'Zero intensity at ',J,'depths'
+	    WRITE(LU_DIAG,*)'Zero intensity at ',J,'depths'; FLUSH(UNIT=LU_DIAG)
 	   END IF
 !
 ! Store J, correcting for the fact that we actually compute gamma r^2 J
 !
 	  DO I=1,ND
+	    WRITE(LU_DIAG,*)I,SOURCE(I),DTAU_J(I),XM(I),JOLD(I),GAM_REL(I); FLUSH(LU_DIAG)
 	    JNU(I)=XM(I)/R(I)/R(I)/GAM_REL(I)
 	  END DO
 !
 ! NB: RSQHNU contains r^2 H
 !
 	  DO I=1,ND-1
-	    T1=0.5D0*(BETA(I)+BETA(I+1))
-	    RSQHNU(I)=(HU(I)*XM(I+1)-HL(I)*XM(I))*(1.0D0-T1*T1)
+	    T1=0.5_LDP*(BETA(I)+BETA(I+1))
+	    RSQHNU(I)=(HU(I)*XM(I+1)-HL(I)*XM(I))*(1.0_LDP-T1*T1)
 	  END DO
-	  RSQHNU(ND)=0.0D0
+	  RSQHNU(ND)=0.0_LDP
 !
 ! Determine if J has converged. Not known if have included advections terms
 ! and are thus iterating on dlnJdlnR.
@@ -317,14 +319,14 @@
 	  IF(.NOT. INCL_ADVEC_TERMS)THEN
 	     ACCURATE=.TRUE.
 	  ELSE
-	    MAX_ER=0.0D0
+	    MAX_ER=0.0_LDP
 	    DO I=1,ND
 	      MAX_ER=MAX(MAX_ER,ABS((JOLD(I)-JNU(I))/JNU(I)))
 	    END DO
 	    WRITE(LU_DIAG,'(X,A,I3,A,ES14.6)')
 	1                  'Maximum error in MOM_JREL_GREY_V2 on iteration ',
 	1                  IT_COUNT,' is: ',MAX_ER
-	    IF(MAX_ER .LT. 1.0D-06)ACCURATE=.TRUE.
+	    IF(MAX_ER .LT. 1.0E-06_LDP)ACCURATE=.TRUE.
 	    JOLD(1:ND)=JNU(1:ND)
 	    CALL DERIVCHI(TB,JNU,R,ND,'LINMON')
 	    TB(1:ND)=R(1:ND)*TB(1:ND)/JNU(1:ND)
@@ -333,8 +335,8 @@
 !	    ELSE IF(MAX_ER_LST_IT .LT. MAX_ER)THEN          ! .AND. MAX_ER .GT. 0.05)THEN
 !	      DAMP_FAC=MAX(0.1D0,DAMP_FAC-0.1D0)
 !	    END IF
-	    DAMP_FAC=0.2D0
-	    dlnJdlnR(1:ND)=(1.0D0-DAMP_FAC)*dlnJdlnR(1:ND)+DAMP_FAC*TB(1:ND)
+	    DAMP_FAC=0.2_LDP
+	    dlnJdlnR(1:ND)=(1.0_LDP-DAMP_FAC)*dlnJdlnR(1:ND)+DAMP_FAC*TB(1:ND)
 	    MAX_ER_LST_IT=MAX_ER
 	  END IF
 	  IF(ACCURATE)EXIT
@@ -350,7 +352,7 @@
 ! Check that "Radiative Equilibrium is being achived"'
 !
 	T1=HBC*GAM_REL(1)*XM(1)/R(1)/R(1)
-	T2=GAM_REL_SQ(ND)*DBB/3.0D0/CHI(ND)
+	T2=GAM_REL_SQ(ND)*DBB/3.0_LDP/CHI(ND)
 	CALL REGRID_H(TB,R,RSQHNU,T1,T2,ND,TC)
 	TB=TB/GAM_REL					!g.r^2.H
 	DO I=1,ND
@@ -358,13 +360,13 @@
 !	1                 (XM(I)+F(I)*XM(I)+BETA(I)*TB(I)) -
 !	1                                  (SIGMA(I)+F(I))*XM(I)
 !	1                    )
-	  TA(I)=CON_DELTA(I)*( XM(I)*(1.0D0-F(I)) +
-	1           GAM_REL_SQ(I)*(SIGMA(I)+1.0D0)*(F(I)*XM(I)+BETA(I)*TB(I))
+	  TA(I)=CON_DELTA(I)*( XM(I)*(1.0_LDP-F(I)) +
+	1           GAM_REL_SQ(I)*(SIGMA(I)+1.0_LDP)*(F(I)*XM(I)+BETA(I)*TB(I))
 	1                    )
 	  TC(I)=TB(I)+BETA(I)*XM(I)
 	END DO
 	CALL LUM_FROM_ETA(TA,R,ND)
-	Q(1:ND)=0.0D0
+	Q(1:ND)=0.0_LDP
 	DO I=ND-1,1,-1
 	  Q(I)=Q(I+1)+TA(I)
 	END DO
@@ -379,10 +381,10 @@
 	    WRITE(LU_DIAG,'(I5,2X,ES12.5,8ES12.3)')I,R(I),BETA(I),XM(I),RSQHNU(I),
 	1                            TB(I),TC(I),TA(I),Q(I),TC(I)+Q(I)
 	  END DO
-	  T1=4.1274D-12*( TB(1)/GAM_REL(1) + GAM_REL(1)*BETA(1)*XM(1)*(1.0D0+F(1)) )
+	  T1=4.1274E-12_LDP*( TB(1)/GAM_REL(1) + GAM_REL(1)*BETA(1)*XM(1)*(1.0_LDP+F(1)) )
 	  WRITE(LU_DIAG,'(A)')' '
 	  WRITE(LU_DIAG,'(A,ES14.5)')'Observed flux computed by JREL_GREY_MOM_V2',T1
-	  T1=4.1274D-12*TB(1)/GAM_REL(1)
+	  T1=4.1274E-12_LDP*TB(1)/GAM_REL(1)
 	  WRITE(LU_DIAG,'(A,ES14.5)')'Comoving-frame flux computed by JREL_GREY_MOM_V2',T1
 	  WRITE(LU_DIAG,'(A)')' '
 	CLOSE(UNIT=LU_DIAG)

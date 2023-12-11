@@ -29,10 +29,10 @@ C
 	INTEGER, PARAMETER :: IONE=1
 C
 	DIFF=.TRUE.
-	RJ(:)=0.0D0
-	NEWRJ(:)=0.0D0
-	NEWRK(:)=0.0D0
-	HBCNEW=0.0D0
+	RJ(:)=0.0_LDP
+	NEWRJ(:)=0.0_LDP
+	NEWRK(:)=0.0_LDP
+	HBCNEW=0.0_LDP
 C
 C Form the sphericity factor Q from F
 C
@@ -49,7 +49,7 @@ C
 C Compute the solution vector. Note that the units need to be
 C eventually included. Note T1=Lsun/16/(PI*PI)/10**2 (10**2 for 1/R**2).
 C
-	T1=3.826D+13*LUM/16.0D0/(3.141592654D0)**2.0
+	T1=3.826E+13_LDP*LUM/16.0_LDP/(3.141592654_LDP)**2.0
 	T2=F(1)*Q(1)/HBC
 	RJ(1)=T1/HBC/R(1)/R(1)
 	DO I=2,ND
@@ -59,7 +59,7 @@ C
 C
 C DBB =3L/16(piR)**2 and is used for the lower boundary diffusion approximation.
 C
-	DBB=3.0D0*T1/R(ND)/R(ND)
+	DBB=3.0_LDP*T1/R(ND)/R(ND)
 C
 	CALL DERIVCHI(dCHIdr,CHI,R,ND,METHOD)
 C
@@ -98,20 +98,20 @@ C
 	    CALL THOMAS(TA,TB,TC,XM,NI,IONE)
 C
 	ELSE IF(NI .EQ. 1)THEN
-	  XM(1)=0.0D0
+	  XM(1)=0.0_LDP
 	ELSE IF(NI .EQ. 2)THEN
 	  Z(1)=SQRT( (R(1)-P(LS))*(R(1)+P(LS)) )
-	  DTAU(1)=0.5D0*Z(1)*(CHI(1)+CHI(2))		!Z(2)=0.0
+	  DTAU(1)=0.5_LDP*Z(1)*(CHI(1)+CHI(2))		!Z(2)=0.0
 	  E1=EXP(-DTAU(1))
-	  E2=1.0D0-(1.0D0-E1)/DTAU(1)
-	  E3=(1.0D0-E1)/DTAU(1)-E1
-	  IF(DTAU(1) .LT. 1.0D-03)THEN
-	    E2=DTAU(1)*0.5D0+DTAU(1)*DTAU(1)/6.0D0
-	    E3=DTAU(1)*0.5D0-DTAU(1)*DTAU(1)/3.0D0
+	  E2=1.0_LDP-(1.0_LDP-E1)/DTAU(1)
+	  E3=(1.0_LDP-E1)/DTAU(1)-E1
+	  IF(DTAU(1) .LT. 1.0E-03_LDP)THEN
+	    E2=DTAU(1)*0.5_LDP+DTAU(1)*DTAU(1)/6.0_LDP
+	    E3=DTAU(1)*0.5_LDP-DTAU(1)*DTAU(1)/3.0_LDP
 	  END IF
 C
 	  XM(2)=TA(2)*E2+TA(1)*E3
-          XM(1)=0.5D0*(XM(2)*E1+TA(1)*E2+TA(2)*E3)
+          XM(1)=0.5_LDP*(XM(2)*E1+TA(1)*E2+TA(2)*E3)
 	END IF
 C
 C Update the ANGLE integrations.

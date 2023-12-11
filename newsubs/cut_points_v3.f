@@ -56,9 +56,9 @@
 ! Some cross sections start above threshold so smoothed cross section will have
 ! cross_sm=0.  Must find first cross_sm.ne.0 and start calculation there
 !
-      IF(CROSS_SM(2) .EQ. 0.0D0)THEN
+      IF(CROSS_SM(2) .EQ. 0.0_LDP)THEN
         DO I=3,NUM_SM
-          IF(CROSS_SM(I) .NE. 0.0D0)GOTO 400
+          IF(CROSS_SM(I) .NE. 0.0_LDP)GOTO 400
         ENDDO
         STOP ' ALL CROSS SECTIONS = 0'
  400    LOW=I-1
@@ -80,13 +80,13 @@
 ! Inflection points (d2y/d2x=0) are now omitted.
 !
  330  IF(LOW .EQ. 1)THEN
-        IF((DERIV(1)*DERIV(2)) .LT. 0.0D0)GOTO 300
+        IF((DERIV(1)*DERIV(2)) .LT. 0.0_LDP)GOTO 300
         DO I=LOW+2,NUM_SM-1
-          IF((DERIV(I-1)*DERIV(I)) .LE. 0.0D0)GOTO 300
+          IF((DERIV(I-1)*DERIV(I)) .LE. 0.0_LDP)GOTO 300
         END DO
       ELSE
         DO I=LOW+1,NUM_SM-1
-          IF((DERIV(I-1)*DERIV(I)) .LE. 0.0D0)GOTO 300
+          IF((DERIV(I-1)*DERIV(I)) .LE. 0.0_LDP)GOTO 300
         END DO
       ENDIF
       HIGH=NUM_SM
@@ -122,7 +122,7 @@
 ! The use of comp_val avoids problems when the cross-sections are zero,
 !
         COMP_VAL=MIN(CROSS_SM(LOW),CROSS_SM(HIGH))
-	IF(COMP_VAL .EQ. 0.0D0)COMP_VAL=1.0d-06
+	IF(COMP_VAL .EQ. 0.0_LDP)COMP_VAL=1.0E-06_LDP
 !
 ! We ensure that there is at least 20 points per decade of frequency space,
 ! when the cross-section (which is Mbarns) is less than 1.0D-06.
@@ -130,8 +130,8 @@
         IF( (DIST(MID)/COMP_VAL) .GT. CUT_ACCURACY)THEN
           HIGH=MID
           GOTO 320		!RESTART TESTING PROCEDURE
-        ELSE IF( NU_SM(HIGH)/NU_SM(LOW) .GT. 1.1D0
-     *                         .AND. COMP_VAL .EQ. 1.0d-06)THEN
+        ELSE IF( NU_SM(HIGH)/NU_SM(LOW) .GT. 1.1_LDP
+     *                         .AND. COMP_VAL .EQ. 1.0E-06_LDP)THEN
           HIGH=MID
           GOTO 320		!RESTART TESTING PROCEDURE
         ELSE

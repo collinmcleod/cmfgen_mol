@@ -62,7 +62,7 @@
 	    IF(ATM(ID)%XzV_PRES)THEN
 	       XzVLTE_MIN(ID)=MINVAL(ATM(ID)%XzVLTE)
 	    ELSE
-	       XzVLTE_MIN(ID)=0.0D0
+	       XzVLTE_MIN(ID)=0.0_LDP
 	    END IF
 	  END DO
 	END IF
@@ -74,7 +74,7 @@
 !$OMP1          JREC,SUM_SE,LOG_B_RAT,dRR,ED_FAC,DI_FAC,T_FAC)
 !
 	DO ID=1,NUM_IONS
-	  IF(ATM(ID)%XzV_PRES .AND. XzVLTE_MIN(ID) .EQ. 0.0D0)THEN
+	  IF(ATM(ID)%XzV_PRES .AND. XzVLTE_MIN(ID) .EQ. 0.0_LDP)THEN
 	    NIV=SE(ID)%N_IV
             DO IPR=1,ATM(ID)%N_XzV_PHOT
 	      ION_LEV=ATM(ID)%XzV_ION_LEV_ID(IPR)
@@ -85,11 +85,11 @@
 	      T1=TWOHCSQ*(NU**3)
 	      DO K=1,ND
 	        JREC=(T1+RJ(K))*FQW/NU
-	        SUM_SE=0.0D0
+	        SUM_SE=0.0_LDP
 	        LOG_B_RAT=(ATM(ID+1)%LOG_XzVLTE(1,K)-ATM(ID+1)%LOG_XzVLTE(ION_LEV,K)) +
 	1                    LOG(ATM(ID+1)%XzV(ION_LEV,K)/ATM(ID+1)%XzV(1,K))
 	        DO J=1,ATM(ID)%NXzV
-	          IF(ATM(ID)%XzVLTE(J,K) .EQ. 0.0D0 .AND. ATM(ID)%WSXzV(J,K,IPR) .GT. 0.0D0)THEN
+	          IF(ATM(ID)%XzVLTE(J,K) .EQ. 0.0_LDP .AND. ATM(ID)%WSXzV(J,K,IPR) .GT. 0.0_LDP)THEN
 	            dRR=JREC*ATM(ID)%WSXzV(J,K,IPR)*EXP( ATM(ID)%LOG_XzVLTE(J,K)+LOG_B_RAT-HDKT*NU/T(K) )
 	            SE(ID)%STEQ(J,K)=SE(ID)%STEQ(J,K)+dRR
 	            SUM_SE=SUM_SE+dRR
@@ -105,7 +105,7 @@
 	          LOG_B_RAT=(ATM(ID+1)%LOG_XzVLTE(1,K)-ATM(ID+1)%LOG_XzVLTE(ION_LEV,K)) +
 	1                       LOG(ATM(ID+1)%XzV(ION_LEV,K)/ATM(ID+1)%XzV(1,K))
 	          DO J=1,ATM(ID)%NXzV
-	            IF(ATM(ID)%XzVLTE(J,K) .EQ. 0.0D0 .AND. ATM(ID)%WSXzV(J,K,IPR) .GT. 0.0D0)THEN
+	            IF(ATM(ID)%XzVLTE(J,K) .EQ. 0.0_LDP .AND. ATM(ID)%WSXzV(J,K,IPR) .GT. 0.0_LDP)THEN
 	              T3=JREC*EXP( ATM(ID)%LOG_XzVLTE(J,K)+LOG_B_RAT-HDKT*NU/T(K) )
 	              T4=T3*ATM(ID)%dWSXzVdT(J,K,IPR)
 	              T3=T3*ATM(ID)%WSXzV(J,K,IPR)

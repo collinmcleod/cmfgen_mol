@@ -167,9 +167,9 @@ C
 	INTEGER, PARAMETER :: LU_IN=10	!For file I/O
 	INTEGER, PARAMETER :: LU_OUT=11
 C
-	REAL(KIND=LDP), PARAMETER :: EDGE_HYD=3.28808662499619D0
-	REAL(KIND=LDP), PARAMETER :: EDGE_HEI=5.94520701882481D0
-	REAL(KIND=LDP), PARAMETER :: EDGE_HE2=13.1581564178623D0
+	REAL(KIND=LDP), PARAMETER :: EDGE_HYD=3.28808662499619_LDP
+	REAL(KIND=LDP), PARAMETER :: EDGE_HEI=5.94520701882481_LDP
+	REAL(KIND=LDP), PARAMETER :: EDGE_HE2=13.1581564178623_LDP
 C
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
@@ -223,15 +223,15 @@ C
 
 C
 	DATA FILT/' ','u','b','v','r','J','H','K'/
-	DATA FILTLAM/0.3644,0.3650,0.427,0.5160,0.60,1.25,1.65,2.20/
-	DATA FLAM/0.1,.125,0.15,0.175,0.20,0.225,0.25,0.275,0.300,0.325
-	1, 0.350,0.4,0.5,0.6,0.7,0.8,0.9,1.25,1.65,2.2,3.6,4.8,10.0,20.0/
+	DATA FILTLAM/0.3644_LDP,0.3650_LDP,0.427_LDP,0.5160_LDP,0.60_LDP,1.25_LDP,1.65_LDP,2.20_LDP/
+	DATA FLAM/0.1_LDP,.125_LDP,0.15_LDP,0.175_LDP,0.20_LDP,0.225_LDP,0.25_LDP,0.275_LDP,0.300_LDP,0.325_LDP
+	1, 0.350_LDP,0.4_LDP,0.5_LDP,0.6_LDP,0.7_LDP,0.8_LDP,0.9_LDP,1.25_LDP,1.65_LDP,2.2_LDP,3.6_LDP,4.8_LDP,10.0_LDP,20.0_LDP/
 C
 C Zero point is Based on Flagstaff calibration which gives F_nu(Alpha Lyrae)=3560Jy. Note the
 C V magnitude of (Alpha Lyrae) is 0.03.
 C
 	DATA ZERO_POINT/3560/
-	DATA FILTZP/3560.0,3560.0,3560.0,3560.0,3560.0,1564.0,1008.0,628.0/
+	DATA FILTZP/3560.0_LDP,3560.0_LDP,3560.0_LDP,3560.0_LDP,3560.0_LDP,1564.0_LDP,1008.0_LDP,628.0_LDP/
 C
 C 
 C
@@ -255,12 +255,12 @@ C
 C
 C Set constants.
 C
-	CHIBF=2.815D-06
-	CHIFF=3.69D-29
-	HDKT=4.7994145D0
-	TWOHCSQ=0.0147452575D0
-	OPLIN=2.6540081D+08
-	EMLIN=5.27296D-03
+	CHIBF=2.815E-06_LDP
+	CHIFF=3.69E-29_LDP
+	HDKT=4.7994145_LDP
+	TWOHCSQ=0.0147452575_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
 C
 	C_CMS=SPEED_OF_LIGHT()
 C
@@ -284,8 +284,8 @@ C
 C Conversion factor from Kev to units of 10^15 Hz.
 C Conversion factor from Angstroms to units of 10^15 Hz.
 C
-	KEV_TO_HZ=0.241838E+03
-	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07  	!10^8/10^15
+	KEV_TO_HZ=0.241838E+03_LDP
+	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0E-07_LDP  	!10^8/10^15
 C
 C  Read in default model.
 C
@@ -378,7 +378,7 @@ C
 	     CALL USR_OPTION(LAMC,'LAMC','0.0',
 	1             'Central Lambda(Ang) [-ve for frequency (10^15 Hz)]')
 	     IF(LAMC .LT. 0)THEN
-	       LAMC=1.0D-07*C_CMS/ABS(LAMC)
+	       LAMC=1.0E-07_LDP*C_CMS/ABS(LAMC)
 	     ELSE
 	       IF(LAMC .GT. 2000)THEN
                  CALL USR_OPTION(AIR_LAM,'AIR','T',
@@ -418,11 +418,11 @@ C
 	  CALL USR_HIDDEN(XFAC,'XFAC','1.0D0',' ')
 	  CALL USR_HIDDEN(TITLE,'TIT',' ',' ')
 	  CALL USR_HIDDEN(RAD_VEL,'RAD_VEL','0.0D0','Radial velocity(km/s) of star')
-	  IF(XFAC .NE. 1.0D0 .AND. RAD_VEL .NE. 0.0D0)THEN
+	  IF(XFAC .NE. 1.0_LDP .AND. RAD_VEL .NE. 0.0_LDP)THEN
 	    WRITE(6,*)'Only one of XFAC and RAD_VEL can be changed from their default values of 1 and 0'
 	    GOTO 1
-	  ELSE IF(RAD_VEL .NE. 0.0D0)THEN
-	    XFAC=(1.0D0+1.0D+05*RAD_VEL/C_CMS)
+	  ELSE IF(RAD_VEL .NE. 0.0_LDP)THEN
+	    XFAC=(1.0_LDP+1.0E+05_LDP*RAD_VEL/C_CMS)
 	  END IF
 	  IF(OVER)THEN
 C
@@ -436,7 +436,7 @@ C
 	    END IF
 	    OVER=.FALSE.
 !
-	    IF(SCALE_FAC .NE. 1.0D0 .OR. XFAC .NE. 1.0D0)THEN
+	    IF(SCALE_FAC .NE. 1.0_LDP .OR. XFAC .NE. 1.0_LDP)THEN
 	      OBSF(1:NCF)=OBSF(1:NCF)*SCALE_FAC
 	      NU(1:NCF)=NU(1:NCF)*XFAC
 	      WRITE(T_OUT,*)'Model has been scaled!'
@@ -473,7 +473,7 @@ C
 	  CALL USR_HIDDEN(OVER,'OVER','F','Overwrite existing model (buffer) data')
 	  CALL USR_HIDDEN(TITLE,'TIT',' ',' ')
 	  IF(IOS .NE. 0)GOTO 1		!Get another option
-	  SCALE_FAC=1.0D0
+	  SCALE_FAC=1.0_LDP
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
 	  IF(CLIP_FEATURES)THEN
 	    WRITE(6,*)'Clipping fetaures from spectrum'
@@ -551,10 +551,10 @@ C
 	    WRITE(6,*)'As read in to PLT_SPEC buffer, X will assumed to be NU'
 	  ELSE IF(IOS .EQ. 0)THEN
 	    T1=MAXVAL(OBSF_CONT(1:NCF_CONT))
-	    IF(T1 .GT. 1.0D+38)THEN
+	    IF(T1 .GT. 1.0E+38_LDP)THEN
 	      WRITE(6,*)'Data exceeds single precision range: Maximum=',T1
 	      WRITE(6,*)'Necessary to scale data for plotting'
-	      T1=1.0D0
+	      T1=1.0_LDP
 	      CALL USR_OPTION(T1,'SCL_FAC','1.0D+40','Factor to divide data by')
 	      OBSF_CONT(1:NCF_CONT)=OBSF_CONT(1:NCF_CONT)/T1
 	    END IF
@@ -611,7 +611,7 @@ C
 	    IF(IOS .NE. 0)GOTO 1		!Get another option
 	  END IF
 C
-	  T1=1.0D-08
+	  T1=1.0E-08_LDP
 	  I=1
 	  UNEQUAL=.FALSE.
 	  IF(NCF_CONT .NE. NCF)UNEQUAL=.TRUE.
@@ -638,11 +638,11 @@ C
 	          L=L+1
 	        END DO
 	        T1=(NU(I)-NU_CONT(L+1))/(NU_CONT(L)-NU_CONT(L+1))
-	        T2=(1.0D0-T1)*OBSF_CONT(L+1)+T1*OBSF_CONT(L)
+	        T2=(1.0_LDP-T1)*OBSF_CONT(L+1)+T1*OBSF_CONT(L)
 	        YV(I)=0.0
 	        IF(T2 .NE. 0)THEN
 	          T2=OBSF(I)/T2
-	          IF(T2 .LT. 1.0E+020)YV(I)=T2
+	          IF(T2 .LT. 1.0E+020_LDP)YV(I)=T2
 	        END IF
 	      END IF
 	    END DO
@@ -663,14 +663,14 @@ C
 	    END DO
 	    J=J-I+1
 C
-	    FQW(1:NCF)=0.0D0				!Temporary usage
+	    FQW(1:NCF)=0.0_LDP				!Temporary usage
 	    CALL MON_INTERP(FQW(I),J,IONE,NU(I),J,
 	1            OBSF_CONT,NCF_CONT,NU_CONT,NCF_CONT)
   	    XV(1:NCF)=NU(1:NCF)
 	    DO I=1,NCF
 	      IF(FQW(I) .GT. 0)THEN
 	         T2=OBSF(I)/FQW(I)
-	         IF(T2 .LT. 1.0E+20)YV(I)=T2
+	         IF(T2 .LT. 1.0E+20_LDP)YV(I)=T2
 	      ELSE
 	        YV(I)=0
 	      END IF
@@ -680,7 +680,7 @@ C
 	      YV(I)=0
 	      IF(OBSF_CONT(I) .GT. 0)THEN
 	         T2=OBSF(I)/OBSF_CONT(I)
-	         IF(T2 .LT. 1.0E+20)YV(I)=T2
+	         IF(T2 .LT. 1.0E+20_LDP)YV(I)=T2
 	      ELSE
 	        YV(I)=0
 	      END IF
@@ -734,13 +734,13 @@ C
 	  FILENAME=' '
 	  CALL USR_OPTION(FILENAME,'File',' ',' ')
 C
-	  SCALE_FAC=1.0D0
+	  SCALE_FAC=1.0_LDP
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
-	  ADD_FAC=0.0D0
+	  ADD_FAC=0.0_LDP
 	  CALL USR_HIDDEN(ADD_FAC,'ADD','0.0D0',' ')
 	  CALL USR_HIDDEN(TITLE,'TIT',' ',' ')
 C
-	  RAD_VEL=0.0D0
+	  RAD_VEL=0.0_LDP
 	  CALL USR_HIDDEN(RAD_VEL,'RAD_VEL','0.0D0','Radial velocity of star (+ve if away)')
 C
 	  CLEAN=.FALSE.
@@ -781,7 +781,7 @@ C
 C
 	  IF(RAD_VEL .NE. 0)THEN
 	    DO I=1,J
-	     XV(I)=XV(I)*(1.0D0+1.0D+05*RAD_VEL/C_CMS)
+	     XV(I)=XV(I)*(1.0_LDP+1.0E+05_LDP*RAD_VEL/C_CMS)
 	    END DO
 	  END IF
 C
@@ -793,16 +793,16 @@ C
 	    END DO
 	    DO I=2,J-1
 	      IF(YV(I) .EQ. 0)THEN
-	        YV(I)=0.5D0*(ZV(I-1)+ZV(I+1))
-	      ELSE IF(YV(I) .LT. -1.0D+10)THEN
-	        YV(I)=0.0D0
+	        YV(I)=0.5_LDP*(ZV(I-1)+ZV(I+1))
+	      ELSE IF(YV(I) .LT. -1.0E+10_LDP)THEN
+	        YV(I)=0.0_LDP
 	      END IF
 	    END DO
 	  END IF
 !
 	  IF(REMOVE_BAD_PIX)THEN
 	    DO L=3,J-50,90
-	      T1=0.0D0; T2=0.0D0; T3=0.0D0
+	      T1=0.0_LDP; T2=0.0_LDP; T3=0.0_LDP
 	      DO K=L,MIN(L+99,J)
 	        T1=T1+YV(K)
 	        T2=T2+YV(K)*YV(K)
@@ -811,10 +811,10 @@ C
 	      T1=T1/T3
 	      T2=SQRT( (T2-T3*T1*T1)/(T3-1) )
 	      DO K=L+1,MIN(L+98,J-1)
-	        IF( ABS(YV(K)-T1) .GT. 5.0*T2 .AND.
-	1           ABS(YV(K-1)-T1) .LT. 3.0*T2 .AND.
-	1           ABS(YV(K+1)-T1) .LT. 3.0*T2)THEN
-	           YV(K)=0.5D0*(YV(K-1)+YV(K+1))
+	        IF( ABS(YV(K)-T1) .GT. 5.0_LDP*T2 .AND.
+	1           ABS(YV(K-1)-T1) .LT. 3.0_LDP*T2 .AND.
+	1           ABS(YV(K+1)-T1) .LT. 3.0_LDP*T2)THEN
+	           YV(K)=0.5_LDP*(YV(K-1)+YV(K+1))
 	        END IF
 	      END DO
 	    END DO
@@ -830,7 +830,7 @@ C
 	           EXIT
 	         END IF
 	      END DO
-	      T1=0.0D0; T2=0.0D0; CNT=0
+	      T1=0.0_LDP; T2=0.0_LDP; CNT=0
 	      DO I=MAX(1,K-10),MIN(K+10,J)
 	        IF(I .LT. K-1 .OR. I .GT. K+1)THEN
 	          T1=T1+YV(I)
@@ -841,22 +841,22 @@ C
 	      IF(CNT .GE. 4)THEN
 	        T1=T1/CNT
 	        T2=T2-T1*T1*CNT
-	        IF(T2 .GT. 0.0D0)THEN
-	          T2=SQRT(T2/(CNT-1.0D0))
+	        IF(T2 .GT. 0.0_LDP)THEN
+	          T2=SQRT(T2/(CNT-1.0_LDP))
 	        ELSE
 	          T1=YV(K)
-	          T2=1.0D+20
+	          T2=1.0E+20_LDP
 	        END IF
 	      ELSE
 	        T1=YV(K)
-	        T2=1.0D+20
+	        T2=1.0E+20_LDP
 	      END IF
-	      IF(YV(K) .GT. T1+4.0*T2)THEN
+	      IF(YV(K) .GT. T1+4.0_LDP*T2)THEN
 	        YV(K)=YV(K-1)
-	        IF(YV(K-1) .GT. T1+4.0*T2)YV(K)=YV(K-2)
+	        IF(YV(K-1) .GT. T1+4.0_LDP*T2)YV(K)=YV(K-2)
 		T3=YV(K+1)
-	        IF(T3 .GT. T1+4.0*T2)T3=YV(K+2)
-	        YV(K)=0.5D0*(YV(K)+T3)
+	        IF(T3 .GT. T1+4.0_LDP*T2)T3=YV(K+2)
+	        YV(K)=0.5_LDP*(YV(K)+T3)
 	      END IF
 	    END DO
 	  END IF
@@ -894,8 +894,8 @@ C
 	      END DO
 	      WRITE(6,*)IST,IEND
 	      DO I=IST,IEND
-	        T1=0.0D0
-	        YV(I)=0.0D0
+	        T1=0.0_LDP
+	        YV(I)=0.0_LDP
 	        DO L=MAX(IST,I-K/2),MIN(IEND,I+k/2)
                   ML=L-I+K/2+1
 	          T1=T1+WT(ML)
@@ -914,8 +914,8 @@ C
 	      WT(I)=FAC(K-1)/FAC(I-1)/FAC(K-I)
 	    END DO
 	    DO I=1,J
-	      T1=0.0D0
-	      YV(I)=0.0D0
+	      T1=0.0_LDP
+	      YV(I)=0.0_LDP
 	      DO L=MAX(1,I-K/2),MIN(J,I+k/2)
                 ML=L-I+K/2+1
 	        T1=T1+WT(ML)
@@ -958,11 +958,11 @@ C
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
 	  CALL USR_HIDDEN(XFAC,'XFAC','1.0D0',' ')
 	  CALL USR_HIDDEN(RAD_VEL,'RAD_VEL','0.0D0','Radial velocity(km/s) of star')
-	  IF(XFAC .NE. 1.0D0 .AND. RAD_VEL .NE. 0.0D0)THEN
+	  IF(XFAC .NE. 1.0_LDP .AND. RAD_VEL .NE. 0.0_LDP)THEN
 	    WRITE(6,*)'Only one of XFAC and RAD_VEL can be changed from their default values of 1 and 0'
 	    GOTO 1
-	  ELSE IF(RAD_VEL .NE. 0.0D0)THEN
-	    XFAC=(1.0D0+1.0D+05*RAD_VEL/C_CMS)
+	  ELSE IF(RAD_VEL .NE. 0.0_LDP)THEN
+	    XFAC=(1.0_LDP+1.0E+05_LDP*RAD_VEL/C_CMS)
 	  END IF
 !
 	 IF(OVER)THEN
@@ -977,7 +977,7 @@ C
 	    END IF
 	    OVER=.FALSE.
 !
-	    IF(SCALE_FAC .NE. 1.0D0 .OR. XFAC .NE. 1.0D0)THEN
+	    IF(SCALE_FAC .NE. 1.0_LDP .OR. XFAC .NE. 1.0_LDP)THEN
 	      OBSF(1:NCF)=OBSF(1:NCF)*SCALE_FAC
 	      NU(1:NCF)=NU(1:NCF)*XFAC
 	      WRITE(T_OUT,*)'Model has been scaled!'
@@ -1050,12 +1050,12 @@ C
 !
 100	 CALL USR_OPTION(INST_RES,'INST_RES','0.0D0','Instrumental Resolution in Angstroms [dLam - FWHM]')
 	 CALL USR_OPTION(RESOLUTION,'RES','0.0D0','Resolution [Lam/dLam(FWHM)] (km/s if -ve)')
-	 IF(RESOLUTION .LT. 0.0D0)THEN
-	   RESOLUTION=1.0D-05*C_CMS/ABS(RESOLUTION)
-	 ELSE IF(RESOLUTION .EQ. 0.0D0 .AND. INST_RES .EQ. 0.0D0)THEN
+	 IF(RESOLUTION .LT. 0.0_LDP)THEN
+	   RESOLUTION=1.0E-05_LDP*C_CMS/ABS(RESOLUTION)
+	 ELSE IF(RESOLUTION .EQ. 0.0_LDP .AND. INST_RES .EQ. 0.0_LDP)THEN
 	   WRITE(T_OUT,*)'Only one INST_RES and RES can be zero'
 	   GOTO 100
-	 ELSE IF(RESOLUTION .NE. 0.0D0 .AND. INST_RES .NE. 0.0D0)THEN
+	 ELSE IF(RESOLUTION .NE. 0.0_LDP .AND. INST_RES .NE. 0.0_LDP)THEN
 	   WRITE(T_OUT,*)'Only one INST_RES and RES can be non-zero'
 	   GOTO 100
 	 END IF
@@ -1072,8 +1072,8 @@ C
 !	 CALL USR_HIDDEN(FFT_CONVOLVE,'FFT','F',
 !     1              'Use FFT methods for convolution')
 !
-	 VSINI=0.0D0		!For rotational broadening, so set to zero
-	 EPSILON=0.0D0
+	 VSINI=0.0_LDP		!For rotational broadening, so set to zero
+	 EPSILON=0.0_LDP
 	 CALL SMEAR_V2(NU,OBSF,NCF,
 	1	      WAVE_MAX,WAVE_MIN,
 	1             INST_RES,RESOLUTION,VSINI,EPSILON,
@@ -1129,9 +1129,9 @@ C
 	      ML=ML+1
 	    END DO
 	    T2=(T1-NU(ML))/(NU(ML+1)-NU(ML))
-	    YV(I)=(1.0D0-T2)*OBSF(ML)+T2*OBSF(ML+1)
+	    YV(I)=(1.0_LDP-T2)*OBSF(ML)+T2*OBSF(ML+1)
 	    XV(I)=T1
-	    T1=T1*RESOLUTION/(1.0D0+RESOLUTION)
+	    T1=T1*RESOLUTION/(1.0_LDP+RESOLUTION)
 	    I=I+1
 	  END DO
 	  NCF=I-1
@@ -1221,7 +1221,7 @@ C
 	  CALL RD_MOD(NU_CONT,OBSF_CONT,NCF_MAX,NCF_CONT,FILENAME,IOS)
 	  IF(IOS .NE. 0)GOTO 1		!Get another option
 !
-	  T1=1.0D-08
+	  T1=1.0E-08_LDP
 	  I=1
 	  UNEQUAL=.FALSE.
 	  IF(NCF_CONT .NE. NCF)UNEQUAL=.TRUE.
@@ -1248,11 +1248,11 @@ C
 	          L=L+1
 	        END DO
 	        T1=(NU(I)-NU_CONT(L+1))/(NU_CONT(L)-NU_CONT(L+1))
-	        T2=(1.0D0-T1)*OBSF_CONT(L+1)+T1*OBSF_CONT(L)
+	        T2=(1.0_LDP-T1)*OBSF_CONT(L+1)+T1*OBSF_CONT(L)
 	        YV(I)=0.0
 	        IF(T2 .NE. 0)THEN
 	          T2=OBSF(I)/T2
-	          IF(T2 .LT. 1.0E+020)YV(I)=T2
+	          IF(T2 .LT. 1.0E+020_LDP)YV(I)=T2
 	        END IF
 	      END IF
 	    END DO
@@ -1273,14 +1273,14 @@ C
 	    END DO
 	    J=J-I+1
 C
-	    FQW(1:NCF)=0.0D0				!Temporary usage
+	    FQW(1:NCF)=0.0_LDP				!Temporary usage
 	    CALL MON_INTERP(FQW(I),J,IONE,NU(I),J,
 	1            OBSF_CONT,NCF_CONT,NU_CONT,NCF_CONT)
   	    XV(1:NCF)=NU(1:NCF)
 	    DO I=1,NCF
 	      IF(FQW(I) .GT. 0)THEN
 	         T2=OBSF(I)/FQW(I)
-	         IF(T2 .LT. 1.0E+20)YV(I)=T2
+	         IF(T2 .LT. 1.0E+20_LDP)YV(I)=T2
 	      ELSE
 	        YV(I)=0
 	      END IF
@@ -1290,7 +1290,7 @@ C
 	      YV(I)=0
 	      IF(OBSF_CONT(I) .GT. 0)THEN
 	         T2=OBSF(I)/OBSF_CONT(I)
-	         IF(T2 .LT. 1.0E+20)YV(I)=T2
+	         IF(T2 .LT. 1.0E+20_LDP)YV(I)=T2
 	      ELSE
 	        YV(I)=0
 	      END IF
@@ -1316,7 +1316,7 @@ C
 	  ELSE IF(NCF .EQ. 0)THEN
 	    WRITE(6,*)'Error -- model data has not been strored in the buffer'
 	  ELSE
-	    T1=2.5; T2=5.5
+	    T1=2.5_LDP; T2=5.5
 	    CALL DETERM_REDDENING(OBSF_OBS,NU_OBS,NOBS,OBSF,NU,NCF,T1,T2)
 	  END IF
 !
@@ -1328,7 +1328,7 @@ C
 ! Otherwise, we define the grid.
 !
 	  IF(X(1:4) .EQ. 'EBMV' .AND. NCF .EQ. 0)THEN
-	    T1=ANG_TO_HZ/900.0D0; T2=ANG_TO_HZ/5.0E+04
+	    T1=ANG_TO_HZ/900.0_LDP; T2=ANG_TO_HZ/5.0E+04_LDP
 	    NCF=1000
 	    T2=EXP(LOG(T1/T2)/(NCF-1))
 	    NU(1)=T1
@@ -1351,7 +1351,7 @@ C
 	  CALL USR_OPTION(EBMV_SMC,'EBMV_SMC','0.0',
 	1      'SMC E(B-V) to correct for I.S. extinction') !KN SMC
 !
-	  DIST=1.0D0
+	  DIST=1.0_LDP
 	  CALL USR_OPTION(DIST,'DIST','1.0D0',' (in kpc) ')
 !
 	  OVER=.FALSE.
@@ -1362,37 +1362,37 @@ C
 	    YV(I)=OBSF(I)/DIST/DIST
 	  END DO
 C
-	  IF(EBMV_CCM .NE. 0.0D0)THEN
+	  IF(EBMV_CCM .NE. 0.0_LDP)THEN
 	    DO I=1,NCF
 	      T1=ANG_TO_HZ/NU(I)
-	      T1=(10000.0/T1)				!1/Lambda(um)
-	      IF(T1 .LT. 1.1)THEN
-	        RAX=0.574*(T1**1.61)
-	        RBX=-0.527*(T1**1.61)
-	      ELSE IF(T1. LT. 3.3)THEN
-	        T2=T1-1.82
-	        RAX=1+T2*(0.17699-T2*(0.50447+T2*(0.02427-T2*(0.72085
-	1                +T2*(0.01979-T2*(0.77530-0.32999*T2))))))
-	        RBX=T2*(1.41338+T2*(2.28305+T2*(1.07233-T2*(5.38434
-	1                +T2*(0.62251-T2*(5.30260-2.09002*T2))))))
-	      ELSE IF(T1 .lT. 5.9)THEN
-	        RAX=1.752-0.316*T1-0.104/((T1-4.67)**2+0.341)
-	        RBX=-3.090+1.825*T1+1.206/((T1-4.62)**2+0.263)
-	      ELSE IF(T1 .LT. 8.0)THEN
+	      T1=(10000.0_LDP/T1)				!1/Lambda(um)
+	      IF(T1 .LT. 1.1_LDP)THEN
+	        RAX=0.574_LDP*(T1**1.61_LDP)
+	        RBX=-0.527_LDP*(T1**1.61_LDP)
+	      ELSE IF(T1. LT. 3.3_LDP)THEN
+	        T2=T1-1.82_LDP
+	        RAX=1+T2*(0.17699_LDP-T2*(0.50447_LDP+T2*(0.02427_LDP-T2*(0.72085_LDP
+	1                +T2*(0.01979_LDP-T2*(0.77530_LDP-0.32999_LDP*T2))))))
+	        RBX=T2*(1.41338_LDP+T2*(2.28305_LDP+T2*(1.07233_LDP-T2*(5.38434_LDP
+	1                +T2*(0.62251_LDP-T2*(5.30260_LDP-2.09002_LDP*T2))))))
+	      ELSE IF(T1 .lT. 5.9_LDP)THEN
+	        RAX=1.752_LDP-0.316_LDP*T1-0.104_LDP/((T1-4.67_LDP)**2+0.341_LDP)
+	        RBX=-3.090_LDP+1.825_LDP*T1+1.206_LDP/((T1-4.62_LDP)**2+0.263_LDP)
+	      ELSE IF(T1 .LT. 8.0_LDP)THEN
   	        T2=T1-5.9
-	        RAX=1.752-0.316*T1-0.104/((T1-4.67)**2+0.341) -
-	1                       T2*T2*(0.04773+0.009779*T2)
-	        RBX=-3.090+1.825*T1+1.206/((T1-4.62)**2+0.263)+
-	1                       T2*T2*(0.2130+0.1207*T2)
+	        RAX=1.752_LDP-0.316_LDP*T1-0.104_LDP/((T1-4.67_LDP)**2+0.341_LDP) -
+	1                       T2*T2*(0.04773_LDP+0.009779_LDP*T2)
+	        RBX=-3.090_LDP+1.825_LDP*T1+1.206_LDP/((T1-4.62_LDP)**2+0.263_LDP)+
+	1                       T2*T2*(0.2130_LDP+0.1207_LDP*T2)
 	      ELSE IF(T1 .LT. 10)THEN
 	        T2=T1-8
-	        RAX=-1.073-T2*(0.628-T2*(0.137-0.070*T2))
-	        RBX=13.670+T2*(4.257-T2*(0.420-0.374*T2))
+	        RAX=-1.073_LDP-T2*(0.628_LDP-T2*(0.137_LDP-0.070_LDP*T2))
+	        RBX=13.670_LDP+T2*(4.257_LDP-T2*(0.420_LDP-0.374_LDP*T2))
 	      ELSE
 	        T1=10
 	        T2=T1-8
-	        RAX=-1.073-T2*(0.628-T2*(0.137-0.070*T2))
-	        RBX=13.670+T2*(4.257-T2*(0.420-0.374*T2))
+	        RAX=-1.073_LDP-T2*(0.628_LDP-T2*(0.137_LDP-0.070_LDP*T2))
+	        RBX=13.670_LDP+T2*(4.257_LDP-T2*(0.420_LDP-0.374_LDP*T2))
 	      END IF
               AL_D_EBmV(I)=R_EXT*(RAX+RBX/R_EXT)
 	    END DO
@@ -1405,7 +1405,7 @@ C
 	      YAXIS='A\d\gl\u'
 	    ELSE
 	      DO I=1,NCF
-	        YV(I)=YV(I)*( 10.0**(-0.4D0*EBMV_CCM*AL_D_EBmV(I)) )
+	        YV(I)=YV(I)*( 10.0_LDP**(-0.4_LDP*EBMV_CCM*AL_D_EBmV(I)) )
 	      END DO
 	    END IF
 	  END IF
@@ -1417,20 +1417,20 @@ C
 	    R_EXT=3.1
 	    DO I=1,NCF
 	      T1=ANG_TO_HZ/NU(I)
-	      T1=(10000.0/T1)				!1/Lambda(um)
-	      IF( T1 .LT. 1.83)THEN
-	        AL_D_EBmV(I)=((1.86-0.48*T1)*T1-0.1)*T1
-	      ELSE IF( T1 .LT. 2.75)THEN
-	        AL_D_EBmV(I)=R_EXT+2.56*(T1-1.83)-0.993*(T1-1.83)**2
-	      ELSE IF( T1 .LT. 3.65)THEN
-	        AL_D_EBmV(I)=(R_EXT-1.64)+1.048*T1+1.01/( (T1-4.60)**2+0.28 )
-	      ELSE IF( T1 .LT. 7.14)THEN
-	        AL_D_EBmV(I)=(R_EXT-0.91)+0.848*T1+1.01/( (T1-4.60)**2+0.28 )
+	      T1=(10000.0_LDP/T1)				!1/Lambda(um)
+	      IF( T1 .LT. 1.83_LDP)THEN
+	        AL_D_EBmV(I)=((1.86_LDP-0.48_LDP*T1)*T1-0.1_LDP)*T1
+	      ELSE IF( T1 .LT. 2.75_LDP)THEN
+	        AL_D_EBmV(I)=R_EXT+2.56_LDP*(T1-1.83_LDP)-0.993_LDP*(T1-1.83_LDP)**2
+	      ELSE IF( T1 .LT. 3.65_LDP)THEN
+	        AL_D_EBmV(I)=(R_EXT-1.64_LDP)+1.048_LDP*T1+1.01_LDP/( (T1-4.60_LDP)**2+0.28_LDP )
+	      ELSE IF( T1 .LT. 7.14_LDP)THEN
+	        AL_D_EBmV(I)=(R_EXT-0.91_LDP)+0.848_LDP*T1+1.01_LDP/( (T1-4.60_LDP)**2+0.28_LDP )
 	      ELSE IF( T1 .LT. 11)THEN
-                AL_D_EBmV(I)=(R_EXT+12.97)-3.20*T1+0.2975*T1*T1
+                AL_D_EBmV(I)=(R_EXT+12.97_LDP)-3.20_LDP*T1+0.2975_LDP*T1*T1
 	      ELSE
 	        T1=11.0
-                AL_D_EBmV(I)=(R_EXT+12.97)-3.20*T1+0.2975*T1*T1
+                AL_D_EBmV(I)=(R_EXT+12.97_LDP)-3.20_LDP*T1+0.2975_LDP*T1*T1
 	      END IF
 	    END DO
 	  END IF
@@ -1443,7 +1443,7 @@ C
 	    YAXIS='A\d\gl\u'
 	  ELSE IF(X(1:4) .NE. 'EBMV' .AND. EBMV_GAL .NE. 0)THEN
 	    DO I=1,NCF
-	      YV(I)=YV(I)*( 10.0**(-0.4D0*EBMV_GAL*AL_D_EBmV(I)) )
+	      YV(I)=YV(I)*( 10.0_LDP**(-0.4_LDP*EBMV_GAL*AL_D_EBmV(I)) )
 	    END DO
 	  END IF
 C
@@ -1454,18 +1454,18 @@ C
 	    R_EXT=3.1
 	    DO I=1,NCF
 	      T1=ANG_TO_HZ/NU(I)
-	      T1=(10000.0/T1)				!1/Lambda(um)
-	      IF( T1 .LT. 1.83)THEN
-    	        AL_D_EBmV(I)=((1.86-0.48*T1)*T1-0.1)*T1
-	      ELSE IF( T1 .LT. 2.75)THEN
-	        AL_D_EBmV(I)=R_EXT+2.04*(T1-1.83)+0.094*(T1-1.83)**2
-	      ELSE IF( T1 .LT. 11.0)THEN	!Strictly only below 9
-	        AL_D_EBmV(I)=(R_EXT-0.236)+0.462*T1+0.105*T1*T1+
-	1                       0.454/( (T1-4.557)**2+0.293 )
+	      T1=(10000.0_LDP/T1)				!1/Lambda(um)
+	      IF( T1 .LT. 1.83_LDP)THEN
+    	        AL_D_EBmV(I)=((1.86_LDP-0.48_LDP*T1)*T1-0.1_LDP)*T1
+	      ELSE IF( T1 .LT. 2.75_LDP)THEN
+	        AL_D_EBmV(I)=R_EXT+2.04_LDP*(T1-1.83_LDP)+0.094_LDP*(T1-1.83_LDP)**2
+	      ELSE IF( T1 .LT. 11.0_LDP)THEN	!Strictly only below 9
+	        AL_D_EBmV(I)=(R_EXT-0.236_LDP)+0.462_LDP*T1+0.105_LDP*T1*T1+
+	1                       0.454_LDP/( (T1-4.557_LDP)**2+0.293_LDP )
 	      ELSE
 	        T1=11.0
-	        AL_D_EBmV(I)=(R_EXT-0.236)+0.462*T1+0.105*T1*T1+
-	1                       0.454/( (T1-4.557)**2+0.293 )
+	        AL_D_EBmV(I)=(R_EXT-0.236_LDP)+0.462_LDP*T1+0.105_LDP*T1*T1+
+	1                       0.454_LDP/( (T1-4.557_LDP)**2+0.293_LDP )
 	      END IF
 	    END DO
 	  END IF
@@ -1480,39 +1480,39 @@ C
 	    YAXIS='A\d\gl\u'
 	  ELSE IF(X(1:4) .NE. 'EBMV' .AND. EBMV_LMC .NE. 0)THEN
 	    DO I=1,NCF
-	      YV(I)=YV(I)*( 10.0**(-0.4D0*EBMV_LMC*AL_D_EBmV(I)) )
+	      YV(I)=YV(I)*( 10.0_LDP**(-0.4_LDP*EBMV_LMC*AL_D_EBmV(I)) )
 	    END DO
 	  END IF
 C
 C       KN: Set SMC interstellar extinction curve.
 C
 	  IF(EBMV_SMC .NE. 0)THEN
-	     R_EXT=2.74
+	     R_EXT=2.74_LDP
 	     DO I=1,NCF
 	        T1=ANG_TO_HZ/NU(I)
-	        T1=(10000.0/T1) !1/Lambda(um)
-	        IF(T1 .LT. 1.1)THEN
-	          RAX=0.574*(T1**1.61)
-	          RBX=-0.527*(T1**1.61)
+	        T1=(10000.0_LDP/T1) !1/Lambda(um)
+	        IF(T1 .LT. 1.1_LDP)THEN
+	          RAX=0.574_LDP*(T1**1.61_LDP)
+	          RBX=-0.527_LDP*(T1**1.61_LDP)
 	          AL_D_EBmV(I)=R_EXT*(RAX+RBX/R_EXT)
-	        ELSE IF(T1. LT. 3.39)THEN
-	          T2=T1-1.82
-	          RAX=1+T2*(0.17699-T2*(0.50447+T2*(0.02427-T2*(0.72085
-	1                +T2*(0.01979-T2*(0.77530-0.32999*T2))))))
-	          RBX=T2*(1.41338+T2*(2.28305+T2*(1.07233-T2*(5.38434
-	1                 +T2*(0.62251-T2*(5.30260-2.09002*T2))))))
+	        ELSE IF(T1. LT. 3.39_LDP)THEN
+	          T2=T1-1.82_LDP
+	          RAX=1+T2*(0.17699_LDP-T2*(0.50447_LDP+T2*(0.02427_LDP-T2*(0.72085_LDP
+	1                +T2*(0.01979_LDP-T2*(0.77530_LDP-0.32999_LDP*T2))))))
+	          RBX=T2*(1.41338_LDP+T2*(2.28305_LDP+T2*(1.07233_LDP-T2*(5.38434_LDP
+	1                 +T2*(0.62251_LDP-T2*(5.30260_LDP-2.09002_LDP*T2))))))
 	          AL_D_EBmV(I)=R_EXT*(RAX+RBX/R_EXT)
 	        ELSE
-	          C1=-4.959
-	          C2=2.264*T1
-	          D=(T1**2)/(((T1**2-4.6**2)**2)+(T1**2))
-	          C3=0.389*D
-	          IF(T1 .LT. 5.9)THEN
+	          C1=-4.959_LDP
+	          C2=2.264_LDP*T1
+	          D=(T1**2)/(((T1**2-4.6_LDP**2)**2)+(T1**2))
+	          C3=0.389_LDP*D
+	          IF(T1 .LT. 5.9_LDP)THEN
 	             F=0
 	          ELSE
-	             F=0.5392*((T1-5.9)**2)+0.05644*((T1-5.9)**3)
+	             F=0.5392_LDP*((T1-5.9_LDP)**2)+0.05644_LDP*((T1-5.9_LDP)**3)
 	          END IF
-	          C4=0.461*F
+	          C4=0.461_LDP*F
                   AL_D_EBmV(I)=C1+C2+C3+C4+R_EXT
                END IF
 	     END DO
@@ -1526,7 +1526,7 @@ C
 	     YAXIS='A\d\gl\u'
 	  ELSE IF(X(1:4) .NE. 'EBMV' .AND. EBMV_SMC .NE. 0)THEN
 	     DO I=1,NCF
-	        YV(I)=YV(I)*( 10.0**(-0.4D0*EBMV_SMC*AL_D_EBmV(I)) )
+	        YV(I)=YV(I)*( 10.0_LDP**(-0.4_LDP*EBMV_SMC*AL_D_EBmV(I)) )
 	     END DO
 	  END IF
 C
@@ -1547,11 +1547,11 @@ C
 	    CALL CURVE_LAB(NCF,XV,YV,TITLE)
 	  END IF
 	ELSE IF(X(1:2) .EQ.'RV')THEN
-	  RAD_VEL=0.0D0
+	  RAD_VEL=0.0_LDP
 	  CALL USR_OPTION(RAD_VEL,'RAD_VEL','0.0D0','Radial velcoity (+ve if away)(km/s)')
-	  RAD_VEL=1.0D+05*RAD_VEL
+	  RAD_VEL=1.0E+05_LDP*RAD_VEL
 	  DO I=1,NCF
-	    NU(I)=NU(I)*(1.0D0-RAD_VEL/C_CMS)
+	    NU(I)=NU(I)*(1.0_LDP-RAD_VEL/C_CMS)
 	  END DO
 C
 C The follwing option cumputes the luminosity below the 3 main H/He edges,
@@ -1567,19 +1567,19 @@ C
 	  ZAN_FREQ(2)=EDGE_HEI
 	  ZAN_FREQ(3)=EDGE_HE2
 C
-	  TOT_LUM=0.0D0
+	  TOT_LUM=0.0_LDP
 	  DO I=1,NCF
 	    TOT_LUM=TOT_LUM+OBSF(I)*FQW(I)
 	  END DO
-	  TOT_LUM=TOT_LUM*312.7			!4pi*(1kpc)**2*(1E+15)*(1D-23)/Lsun
+	  TOT_LUM=TOT_LUM*312.7_LDP			!4pi*(1kpc)**2*(1E+15)*(1D-23)/Lsun
 	  WRITE(T_OUT,*)' '
 	  WRITE(T_OUT,*)'Total luminosity is:               ',TOT_LUM
 C
 	  ML=1
-	  DO WHILE(ZAN_FREQ(ML) .GT. 0.0D0)
+	  DO WHILE(ZAN_FREQ(ML) .GT. 0.0_LDP)
 	    TMP_FREQ=ZAN_FREQ(ML)
-	    N_PHOT=0.0D0
-	    LUM=0.0D0
+	    N_PHOT=0.0_LDP
+	    LUM=0.0_LDP
 	    J=1
 	    DO WHILE(NU(J+1) .GT. TMP_FREQ)
 	      J=J+1
@@ -1589,8 +1589,8 @@ C
               N_PHOT=N_PHOT+FQW(I)*OBSF(I)/NU(I)
 	      LUM=LUM+FQW(I)*OBSF(I)
 	    END DO
-	    LUM=LUM*312.7			!4pi*(1kpc)**2*(1E+15)*(1D-23)/Lsun
-	    N_PHOT=47.2566+LOG10(N_PHOT) !LOG10(4pi*(1kpc)**2*(1D-23)/h)
+	    LUM=LUM*312.7_LDP			!4pi*(1kpc)**2*(1E+15)*(1D-23)/Lsun
+	    N_PHOT=47.2566_LDP+LOG10(N_PHOT) !LOG10(4pi*(1kpc)**2*(1D-23)/h)
 	    T1=ANG_TO_HZ/TMP_FREQ
 	    WRITE(T_OUT,*)' '
 	    WRITE(T_OUT,'(1X,A,F4.0,A,1PE11.4)')
@@ -1607,14 +1607,14 @@ C
 	ELSE IF(X(1:4) .EQ. 'PZAN')THEN
 C
 	  XV(1:NCF)=NU(1:NCF)
-	  YV(1)=0.0D0
+	  YV(1)=0.0_LDP
 	  DO ML=2,NCF
-	    YV(ML)=YV(ML-1)+ 0.5D0*(NU(ML-1)-NU(ML))*
+	    YV(ML)=YV(ML-1)+ 0.5_LDP*(NU(ML-1)-NU(ML))*
 	1              (OBSF(ML-1)/NU(ML-1)+OBSF(ML)/NU(ML))
 	  END DO
 	  DO ML=2,NCF
-	    IF(YV(ML) .LT. 1.0D-30)YV(ML)=1.0D-30
-	    YV(ML)=47.2566D0+LOG10(YV(ML)) 		!LOG10(4pi*(1kpc)**2*(1E-23)/h)
+	    IF(YV(ML) .LT. 1.0E-30_LDP)YV(ML)=1.0E-30_LDP
+	    YV(ML)=47.2566_LDP+LOG10(YV(ML)) 		!LOG10(4pi*(1kpc)**2*(1E-23)/h)
 	  END DO
 C
 	  I=NCF-1
@@ -1624,17 +1624,17 @@ C
 	  YAXIS='Log(N)'
 C
 	ELSE IF(X(1:3) .EQ.'CUM')THEN
-	  NORM_LUM=0.0D0
+	  NORM_LUM=0.0_LDP
 	  CALL USR_OPTION(NORM_LUM,'NORM_LUM',' ',' (in Lsun) ')
-	  YV(1)=0.0D0
+	  YV(1)=0.0_LDP
 	  DO I=2,NCF
-	    YV(I)=YV(I-1)+(OBSF(I)+OBSF(I-1))*(NU(I-1)-NU(I))*0.5D0
+	    YV(I)=YV(I-1)+(OBSF(I)+OBSF(I-1))*(NU(I-1)-NU(I))*0.5_LDP
 	  END DO
-	  T2=YV(NCF)*312.7D0		!4pi*(1kpc)**2*(1D+15)*(1D-23)/Lsun
-	  IF(NORM_LUM .EQ. 0.0D0)THEN
+	  T2=YV(NCF)*312.7_LDP		!4pi*(1kpc)**2*(1D+15)*(1D-23)/Lsun
+	  IF(NORM_LUM .EQ. 0.0_LDP)THEN
 	    NORM_LUM=YV(NCF)
 	  ELSE
-	    NORM_LUM=NORM_LUM/312.7D0
+	    NORM_LUM=NORM_LUM/312.7_LDP
 	  END IF
 	  DO I=1,NCF
 	    XV(I)=NU(I)
@@ -1653,32 +1653,32 @@ C
 	  DO IF=1,NF
 !
 	    SP_VAL=FILT_ST_LAM(IF); ML_ST=GET_INDX_SP(SP_VAL,XV,NCF)-1
-	    SP_VAL=FILT_ST_LAM(IF)+24.0D0*FILT_DEL_LAM(IF)
+	    SP_VAL=FILT_ST_LAM(IF)+24.0_LDP*FILT_DEL_LAM(IF)
 	    ML_END=GET_INDX_SP(SP_VAL,XV,NCF)+1
 !
 	    WRITE(T_OUT,*)'Filter ',IF
 	    WRITE(T_OUT,*)FILT_ST_LAM(IF),XV(ML_ST),XV(ML_END),YV(ML_ST),YV(ML_END)
 	    WRITE(T_OUT,*)ML_ST,ML_END
 !
-	    ZV(IF)=0.0D0
-	    SUM=0.0D0
-	    RESPONSE2=0.0D0
+	    ZV(IF)=0.0_LDP
+	    SUM=0.0_LDP
+	    RESPONSE2=0.0_LDP
 	    I=1
 	    DO ML=ML_ST,ML_END
-	      IF(XV(ML) .GE. FILT_ST_LAM(IF)+24.0D0*FILT_DEL_LAM(IF))EXIT
+	      IF(XV(ML) .GE. FILT_ST_LAM(IF)+24.0_LDP*FILT_DEL_LAM(IF))EXIT
 	      DO WHILE(XV(ML) .GT. FILT_ST_LAM(IF)+I*FILT_DEL_LAM(IF))
 	        I=I+1
 	      END DO
 	      FILT_INT_BEG =FILT_ST_LAM(IF)+(I-1)*FILT_DEL_LAM(IF)
 	      RESPONSE1=RESPONSE2
 	      T1=(XV(ML+1)-FILT_INT_BEG)/FILT_DEL_LAM(IF)
-	      RESPONSE2=(1.0D0-T1)*NORM_PASS(I,IF)+T1*NORM_PASS(I+1,IF)
-	      IF(ABS(T1) .GT. 1)RESPONSE2=0.0D0
-	      ZV(IF)=ZV(IF)+0.5D0*(RESPONSE1*YV(ML)+RESPONSE2*YV(ML+1))*(XV(ML+1)-XV(ML))
-	      SUM=SUM+0.5D0*(RESPONSE1+RESPONSE2)*(XV(ML+1)-XV(ML))
+	      RESPONSE2=(1.0_LDP-T1)*NORM_PASS(I,IF)+T1*NORM_PASS(I+1,IF)
+	      IF(ABS(T1) .GT. 1)RESPONSE2=0.0_LDP
+	      ZV(IF)=ZV(IF)+0.5_LDP*(RESPONSE1*YV(ML)+RESPONSE2*YV(ML+1))*(XV(ML+1)-XV(ML))
+	      SUM=SUM+0.5_LDP*(RESPONSE1+RESPONSE2)*(XV(ML+1)-XV(ML))
 	    END DO
 	    WRITE(T_OUT,*)ZV(IF),SUM,ZV(IF)/SUM
-	    ZV(IF)=-FILT_ZP(IF)-2.5D0*LOG10(ZV(IF)/SUM)
+	    ZV(IF)=-FILT_ZP(IF)-2.5_LDP*LOG10(ZV(IF)/SUM)
 	    WRITE(T_OUT,'(A,1PE10.3)')TRIM(FILT_NAME(IF)),ZV(IF)
 	  END DO
 	  DO IF=1,NF
@@ -1750,16 +1750,16 @@ C
 	  CALL USR_OPTION(TEMP,'TEMP','3.0',' ')
 !
 	  IF(NCF .EQ. 0)THEN
-	     T2=EXP(LOG(1.0D+4)/(NBB-1))
-	     T1=3.289D0*912.0D0/10.0D0
+	     T2=EXP(LOG(1.0E+4_LDP)/(NBB-1))
+	     T1=3.289_LDP*912.0_LDP/10.0_LDP
 	     CALL USR_HIDDEN(LIN_INT,'NORM','T','Normalize peak to unity?')
 	     DO I=1,NBB
 	       NU(I)=T1/(T2**I)
 	       T3=HDKT*NU(I)/TEMP
-	       IF(T3 .GT. 1.0D0)THEN
-	         YV(I)=TWOHCSQ*(NU(I)**3)*EXP(-T3)/(1.0D0-EXP(-T3))
+	       IF(T3 .GT. 1.0_LDP)THEN
+	         YV(I)=TWOHCSQ*(NU(I)**3)*EXP(-T3)/(1.0_LDP-EXP(-T3))
 	       ELSE
-	         YV(I)=TWOHCSQ*(NU(I)**3)/(EXP(T3)-1.0D0)
+	         YV(I)=TWOHCSQ*(NU(I)**3)/(EXP(T3)-1.0_LDP)
 	       END IF
 	       XV(I)=NU(I)
 	     END DO
@@ -1776,34 +1776,34 @@ C NU_MAX to NU_MIN but with a larger spacing.
 C
 	    DNU=LOG10(NU(NCF)/NU(1))/(NBB-1)
 	    DO I=1,NBB
-	      T1=NU(1)*10.0D0**(DNU*(I-1))
+	      T1=NU(1)*10.0_LDP**(DNU*(I-1))
 	       T3=HDKT*T1/TEMP
-	       IF(T3 .GT. 1.0D0)THEN
-	         YV(I)=TWOHCSQ*(T1**3)*EXP(-T3)/(1.0D0-EXP(-T3))
+	       IF(T3 .GT. 1.0_LDP)THEN
+	         YV(I)=TWOHCSQ*(T1**3)*EXP(-T3)/(1.0_LDP-EXP(-T3))
 	       ELSE
-	         YV(I)=TWOHCSQ*(T1**3)/(EXP(T3)-1.0D0)
+	         YV(I)=TWOHCSQ*(T1**3)/(EXP(T3)-1.0_LDP)
 	       END IF
 	      XV(I)=T1
 	    END DO
-	    IF(NORM_WAVE .EQ. 0.0D0)THEN
-	      T1=4.0D0*ATAN(1.0D0)    !PI
+	    IF(NORM_WAVE .EQ. 0.0_LDP)THEN
+	      T1=4.0_LDP*ATAN(1.0_LDP)    !PI
 	      DO I=1,NBB
 	        YV(I)=YV(I)*T1
 	      END DO
-	    ELSE IF(NORM_WAVE .GT. 0.0D0)THEN
-	      NORM_FREQ=2.998D+03/NORM_WAVE
+	    ELSE IF(NORM_WAVE .GT. 0.0_LDP)THEN
+	      NORM_FREQ=2.998E+03_LDP/NORM_WAVE
 	      DO I=2,NCF
 	        IF(NORM_FREQ .LE. NU(I-1) .AND. NORM_FREQ .GT. NU(I))K=I
 	      END DO
 	      T1=LOG(NU(K-1)/NORM_FREQ)/LOG(NU(K-1)/NU(K))
-	      NORM_FLUX=EXP( (1.0D0-T1)*LOG(OBSF(K-1))+T1*LOG(OBSF(K)) )
-	      BB_FLUX=TWOHCSQ*(NORM_FREQ**3)/(EXP(HDKT*NORM_FREQ/TEMP)-1.0D0)
+	      NORM_FLUX=EXP( (1.0_LDP-T1)*LOG(OBSF(K-1))+T1*LOG(OBSF(K)) )
+	      BB_FLUX=TWOHCSQ*(NORM_FREQ**3)/(EXP(HDKT*NORM_FREQ/TEMP)-1.0_LDP)
 	      SCALE_FAC=NORM_FLUX/BB_FLUX
 	      DO I=1,NBB
 	        YV(I)=YV(I)*SCALE_FAC
 	      END DO
 	    ELSE
-	      SCALE_FAC=NORM_WAVE*NORM_WAVE*159.8413D0     	 !1E+23*pi*(Rsun/1kpc)**2
+	      SCALE_FAC=NORM_WAVE*NORM_WAVE*159.8413_LDP     	 !1E+23*pi*(Rsun/1kpc)**2
 	      DO I=1,NBB
 	        YV(I)=YV(I)*SCALE_FAC
 	      END DO
@@ -1833,24 +1833,24 @@ C
 	  WRITE(6,*)' '
 	  CALL USR_OPTION(LAM_CENT,'LAMC','6562','Central wavelngth')
 	  CALL USR_OPTION(SIGMA,'SIGMA','1.0','Sigma (-ve for km/s)')
-	  IF(SIGMA .LE. 0.0D0)THEN
-	     SIGMA=LAM_CENT*ABS(SIGMA)/(1.0D-05*C_CMS)
+	  IF(SIGMA .LE. 0.0_LDP)THEN
+	     SIGMA=LAM_CENT*ABS(SIGMA)/(1.0E-05_LDP*C_CMS)
 	  END IF
 	  CALL USR_OPTION(HEIGHT,'HEIGHT','1.0','Height (-ve for absorption line)')
 	  WRITE(DEFAULT,'(ES10.4)')0.2D0*SIGMA
 	  CALL USR_OPTION(T1,'dLAM',DEFAULT,'Spacing (def=SIGMA/5.0)')
-	  K=20.0D0*SIGMA/T1
+	  K=20.0_LDP*SIGMA/T1
 	  IF(ALLOCATED(XVEC))DEALLOCATE(XVEC,YVEC)
 	  ALLOCATE (XVEC(K),YVEC(K))
 	  CALL CREATE_GAUSS(XVEC,YVEC,LAM_CENT,SIGMA,HEIGHT,T1,K)
 	  CALL DP_CURVE(K,XVEC,YVEC)
 !
 	ELSE IF(X(1:5) .EQ. 'AV_EN')THEN
-	  T1=0.0D0
-	  T2=0.0D0
+	  T1=0.0_LDP
+	  T2=0.0_LDP
 	  DO I=1,NCF-1
-	    T1=T1+0.5D0*(NU(I)-NU(I+1))*(OBSF(I)+OBSF(I+1))
-	    T2=T2+0.5D0*(NU(I)-NU(I+1))*(OBSF(I)/NU(I)+OBSF(I+1)/NU(I+1))
+	    T1=T1+0.5_LDP*(NU(I)-NU(I+1))*(OBSF(I)+OBSF(I+1))
+	    T2=T2+0.5_LDP*(NU(I)-NU(I+1))*(OBSF(I)/NU(I)+OBSF(I+1)/NU(I+1))
 	  END DO
 	  WRITE(6,*)'Average photon frequency is (in 10^15 Hz)',T1/T2
 	  WRITE(6,*)'Effective photon energy is',6.626075D-12*T1/T2/2.7D0/1.380658D-16,'K'

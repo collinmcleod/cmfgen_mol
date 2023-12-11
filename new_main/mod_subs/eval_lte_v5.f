@@ -52,7 +52,7 @@
 	        ATM(ID+1)%XzV(1,I)=ATM(ID)%DXzV_F(I)			!True if not present.
 	        ATM(ID+1)%XzVLTE(1,I)=ATM(ID)%DXzV_F(I)			!True if not present.
 	        ATM(ID+1)%LOG_XzVLTE(1,I)=LOG(ATM(ID)%DXzV_F(I))	!True if not present.
-	        ATM(ID+1)%dlnXzVLTE_dlnT(1,I)=0.0D0
+	        ATM(ID+1)%dlnXzVLTE_dlnT(1,I)=0.0_LDP
 	      END DO
 	    END IF
 	  END IF

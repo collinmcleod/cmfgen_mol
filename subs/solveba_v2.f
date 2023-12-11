@@ -169,9 +169,9 @@ C whose population is significantly less then the Electron density. In case IV
 C (GLOBAL), the biggest change at any depth is used to scale all changes.
 C This option is probaly obsolete.
 C
-	BIG_LIM=(CHANGE_LIM-1.0D0)/CHANGE_LIM
+	BIG_LIM=(CHANGE_LIM-1.0_LDP)/CHANGE_LIM
 	LIT_LIM=-CHANGE_LIM
-	MINSCALE=1.0D0
+	MINSCALE=1.0_LDP
 	IF(SCALE_OPT(1:5) .EQ. 'LOCAL')THEN
 	  DO I=1,ND
 	    T1=BIG_LIM			!Prevents division by zero and insures
@@ -184,12 +184,12 @@ C
 C
 C Limit the change in T to a maximum of 20%.
 C
-	    T1=0.2D0
+	    T1=0.2_LDP
 	    T3=MAX( T1,ABS(STEQ(NT,I)) )
 	    SCALE=MIN( T1/T3,SCALE )
 C
 	    DO J=1,NT
-	      POPS(J,I)=POPS(J,I)*(1.0D0-STEQ(J,I)*SCALE)
+	      POPS(J,I)=POPS(J,I)*(1.0_LDP-STEQ(J,I)*SCALE)
 	    END DO
 	    MINSCALE=MIN(SCALE,MINSCALE)
 	  END DO
@@ -199,20 +199,20 @@ C
 	  DO I=1,ND
 	    DO J=1,NT-1
 	      IF(STEQ(J,I) .GT. BIG_LIM)THEN
-	        POPS(J,I)=POPS(J,I)*(1.0D0-BIG_LIM)
+	        POPS(J,I)=POPS(J,I)*(1.0_LDP-BIG_LIM)
 	        MINSCALE=MIN( BIG_LIM/STEQ(J,I),MINSCALE )
 	      ELSE IF(STEQ(J,I) .LT. LIT_LIM)THEN
-	        POPS(J,I)=POPS(J,I)*(1.0D0-LIT_LIM)
+	        POPS(J,I)=POPS(J,I)*(1.0_LDP-LIT_LIM)
 	        MINSCALE=MIN( LIT_LIM/STEQ(J,I),MINSCALE )
 	      ELSE
-	        POPS(J,I)=POPS(J,I)*(1.0D0-STEQ(J,I))
+	        POPS(J,I)=POPS(J,I)*(1.0_LDP-STEQ(J,I))
 	      END IF
 	    END DO
 C
 C Limit T to a 20% change if it is a variable.
 C
-	    SCALE=0.2D0/MAX( 0.2D0,ABS(STEQ(NT,I)) )
-	    POPS(NT,I)=POPS(NT,I)*(1.0D0-STEQ(NT,I)*SCALE)
+	    SCALE=0.2_LDP/MAX( 0.2_LDP,ABS(STEQ(NT,I)) )
+	    POPS(NT,I)=POPS(NT,I)*(1.0_LDP-STEQ(NT,I)*SCALE)
 	    MINSCALE=MIN(SCALE,MINSCALE)
 	  END DO
 C
@@ -223,7 +223,7 @@ C
 	    T1=BIG_LIM			!Prevents division by zero and insures
 	    T2=LIT_LIM 			!SCALE=1 if small changes.
 	    DO J=1,NT-1
-	      IF(POPS(J,I) .GT. 1.0E-10*POPS(NT-1,I))THEN
+	      IF(POPS(J,I) .GT. 1.0E-10_LDP*POPS(NT-1,I))THEN
 	        T1=MAX(T1,STEQ(J,I))   		!Note + means decrease
 	        T2=MIN(T2,STEQ(J,I))            !Note - means increase
 	      END IF
@@ -232,15 +232,15 @@ C
 C
 C Limit the change in T to a maximum of 20%.
 C
-	    T3=MAX( 0.2D0,ABS(STEQ(NT,I)) )
-	    SCALE=MIN( 0.2D0/T3,SCALE )
+	    T3=MAX( 0.2_LDP,ABS(STEQ(NT,I)) )
+	    SCALE=MIN( 0.2_LDP/T3,SCALE )
 	    MINSCALE=MIN(SCALE,MINSCALE)
 C
 	    DO J=1,NT
 	      T1=STEQ(J,I)*SCALE
 	      IF(T1 .GT. BIG_LIM)T1=BIG_LIM
 	      IF(T1 .LT. LIT_LIM)T1=LIT_LIM
-	      POPS(J,I)=POPS(J,I)*(1.0D0-T1)
+	      POPS(J,I)=POPS(J,I)*(1.0_LDP-T1)
 	    END DO
 	  END DO
 	  WRITE(LUER,'(A,1PE12.4)')
@@ -259,15 +259,15 @@ C
 C
 C Limit the change in T to a maximum of 20%.
 C
-	  T3=MAX( 0.2D0,ABS(STEQ(NT,I)) )
-	  SCALE=MIN( 0.2D0/T3,SCALE )
+	  T3=MAX( 0.2_LDP,ABS(STEQ(NT,I)) )
+	  SCALE=MIN( 0.2_LDP/T3,SCALE )
 	  WRITE(LUER,'(A,1PE12.4)')' The value of scale is:',SCALE
 C
 C Update the population levels (and the temperature) .
 C
 	  DO I=1,ND
 	    DO J=1,NT
-	      POPS(J,I)=POPS(J,I)*(1.0D0-STEQ(J,I)*SCALE)
+	      POPS(J,I)=POPS(J,I)*(1.0_LDP-STEQ(J,I)*SCALE)
 	    END DO
 	  END DO
 	END IF
@@ -278,9 +278,9 @@ C
 C   STEQ is +ve when the populations are to decrease.
 C   STEQ is -ve when the populations are to increase.
 C
-	DECREASE=0.0D0
+	DECREASE=0.0_LDP
 	IDEC=0
-	INCREASE=0.0D0
+	INCREASE=0.0_LDP
 	IINC=0
 	DO I=1,ND
 	  DO J=1,NT
@@ -294,8 +294,8 @@ C
 	  END DO
 	END DO
 C
-	DECREASE=100.0D0*DECREASE
-	INCREASE=100.0D0*INCREASE
+	DECREASE=100.0_LDP*DECREASE
+	INCREASE=100.0_LDP*INCREASE
 	WRITE(LUER,9000)IINC,ABS(INCREASE)
 9000	FORMAT(1X,'Maximum % increase at depth ',I3,' is',1PE10.2)
 	WRITE(LUER,9200)IDEC,DECREASE
@@ -308,10 +308,10 @@ C 100(old-new)/old [same as INCREASE]. We allow for big decreases -
 C limit MAXCH to 1.0D+07 - This value does not halt program execution.
 C
 	MAXCH=-INCREASE
-	IF(DECREASE .LT. 99.999D0)THEN
-	  DECREASE=100.0D0*DECREASE/(100.0D0-DECREASE)
+	IF(DECREASE .LT. 99.999_LDP)THEN
+	  DECREASE=100.0_LDP*DECREASE/(100.0_LDP-DECREASE)
 	ELSE
-	  DECREASE=1.0D+07
+	  DECREASE=1.0E+07_LDP
 	END IF
 	MAXCH=MAX(MAXCH,DECREASE)
 C

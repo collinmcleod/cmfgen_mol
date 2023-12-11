@@ -272,7 +272,7 @@ c
         input(:)=0.0
         read(answer(:l),*,end=100,err=300)(input(i),i=1,dim)
  100    do i=dim,1,-1
-          if(input(i).ne.0.0)exit
+          if(input(i).ne.0.0_LDP)exit
         enddo
         found=i
         if(found.lt.required)then

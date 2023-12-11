@@ -73,9 +73,9 @@
 	call tune(1,'mainc')
         call nu_to_lambda(origfreq,origwave,Norig,forward)
 !
-	if(vsini .ne. 0.0d0)then
-	  extend=2*(wave_max+wave_min)*vsini/3.0e+05
-	else if(resolution .ne. 0.0d0)then
+	if(vsini .ne. 0.0_LDP)then
+	  extend=2*(wave_max+wave_min)*vsini/3.0E+05_LDP
+	else if(resolution .ne. 0.0_LDP)then
 	  extend=num_res * (wave_max+wave_min)/resolution
 	else
 	  extend = num_res * inst_res
@@ -125,11 +125,11 @@
 	write(*,*)'working model_res = ',model_res
 !
 	if(vsini .ne. 0)then
-	  model_res=min(0.2d0*vsini/c_kms,model_res)
+	  model_res=min(0.2_LDP*vsini/c_kms,model_res)
 	else if(resolution .ne. 0)then
-	  model_res=min(0.2d0*inst_res,model_res)
+	  model_res=min(0.2_LDP*inst_res,model_res)
 	else
-	  model_res=min(0.2d0*inst_res,model_res)
+	  model_res=min(0.2_LDP*inst_res,model_res)
 	end if
 !
 	call tune(1,'linear')
@@ -152,8 +152,8 @@
 ! to sigma of the Gaussian profile ( EXP[-0.5 {(x-mu)/sig}^2]) as indicated
 ! below.
 !
-	kernal_sig = inst_res/2.35482
-	t1=0.5D0*(wave_min+wave_max)
+	kernal_sig = inst_res/2.35482_LDP
+	t1=0.5_LDP*(wave_min+wave_max)
 	write(6,'(A,F7.2,A)')' Sigma of smoothing Gausian is',kernal_sig*c_kms/t1,'km/s'
 	call tune(1,'cnvlv')
 	call convolve(tempwave,tempflux,Ntmp,kernal_sig,vsini,epsilon,fft)
@@ -234,7 +234,7 @@ C
 	end if
 	nron2=Nresponse/2
 !
-	answer(1:Nmod)=0.0d0
+	answer(1:Nmod)=0.0_LDP
 !
 ! Three cases: At the boudaries we assume symmetry about the boundary.
 !
@@ -455,10 +455,10 @@ C
 !
 	if(epsilon .eq. 1)then
 	  a1=0
-	  a2=1.0d0
+	  a2=1.0_LDP
 	else
-	  a1=2.0D0/jimpi
-	  a2=0.5D0*epsilon/(1.0D0-epsilon)
+	  a1=2.0_LDP/jimpi
+	  a2=0.5_LDP*epsilon/(1.0_LDP-epsilon)
 	end if
 	dlam_rot=vsini/c_kms
 !
@@ -472,7 +472,7 @@ C
 	  do i=2, (Nresponse-1)/2+1               ! in wrap-around order, ie. if
 	    t1=1-(lambda/dlam_rot)**2
 	    if(t1 .le. 0)then
-	      response(i)=0.0d0
+	      response(i)=0.0_LDP
 	    else
 	      response(i)=a1*sqrt(t1)+a2*t1         ! resp = ___/\___ it would
 	    end if
@@ -484,11 +484,11 @@ C
 !
 	if (wrap .eq. 0) then
 	  mu = (Nresponse-1)/2 * dlam         ! fill in response array with
-	  lambda = 0.0D0                      ! a gaussian centered about
+	  lambda = 0.0_LDP                      ! a gaussian centered about
 	  do i=1,Nresponse                    ! mu characterized by sigma,
-	    t1=1.0d0-((lambda-mu)/dlam_rot)**2
-	    IF(t1 .le. 0.0D0)then
-	      response(i)=0.0d0
+	    t1=1.0_LDP-((lambda-mu)/dlam_rot)**2
+	    IF(t1 .le. 0.0_LDP)then
+	      response(i)=0.0_LDP
 	    else
               response(i)=a1*sqrt(t1)+a2*t1       ! resp = __/\__
 	    end if
@@ -565,7 +565,7 @@ C
 	integer nnew
 	integer i
 !
-	dlamover2 = 0.5d0*dlam
+	dlamover2 = 0.5_LDP*dlam
 	nnew = (wave(n)-wave(1))/dlam  ! this will shorten wavelength
                                           ! array by a fraction of dlam
 !

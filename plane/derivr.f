@@ -21,8 +21,8 @@ c
       r=x
       mu=j(2)
 c
-      djdr(1)=1.0d0/gamma/(mu+beta)
-      djdr(2)=(1.0d0-mu*mu)/(mu+beta)*((1.0d0+beta*mu)/r-
+      djdr(1)=1.0_LDP/gamma/(mu+beta)
+      djdr(2)=(1.0_LDP-mu*mu)/(mu+beta)*((1.0_LDP+beta*mu)/r-
      *     gamma*gamma*(mu+beta)*dbetadr)
 c
       return

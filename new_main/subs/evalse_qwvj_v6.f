@@ -87,9 +87,9 @@
 ! REV_HNST= HNST * B(ION_LEV)/B(1) where b is the deparure coefficient.
 !
 	DO J=1,ND
-	  SUM_SE=0.0D0
-	  SUM_VJ_R=0.0D0
-	  SUM_VJ_P=0.0D0
+	  SUM_SE=0.0_LDP
+	  SUM_VJ_R=0.0_LDP
+	  SUM_VJ_P=0.0_LDP
 	  B_RAT=(DIST(1,J)/DIST(ION_LEV,J))*(DI(ION_LEV,J)/DI(1,J))
 !	  B_RAT=(DI(ION_LEV,J)/DIST(ION_LEV,J))*(DIST(1,J)/DI(1,J))
 	  DO I=1,NLEV

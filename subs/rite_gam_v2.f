@@ -66,7 +66,7 @@ C
 	INTEGER I,LUER,ERROR_LU
 	EXTERNAL ERROR_LU
 C
-	IF(GAM(ND) .EQ. 0.0D0 .AND. GAM(1) .EQ. 0.0D0)RETURN
+	IF(GAM(ND) .EQ. 0.0_LDP .AND. GAM(1) .EQ. 0.0_LDP)RETURN
 	WRITE(LU,'(A)')' '
 	WRITE(LU,'(1X,F4.0,5X,A,20X,A)')AT_NO,DESC(1:LEN(DESC)),
 	1         '!Atomic Number and descriptor.'

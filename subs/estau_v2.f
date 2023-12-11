@@ -16,17 +16,17 @@
 	REAL(KIND=LDP) T1,TAU_BND
 !
 	DO I=1,ND
-	  OPT_DEP(I)=0.0D0
+	  OPT_DEP(I)=0.0_LDP
 	  DTAU(I)=ED(I)*CLUMP_FAC(I)        !Temporary work variable
 	END DO
 	CALL ESOPAC(OPT_DEP,DTAU,ND)        !OPT_DEP contain ESEC
 !
 	T1=LOG(OPT_DEP(1)/OPT_DEP(4))/LOG(R(4)/R(2))
-	T1=MAX(T1,2.0D0)
-	TAU_BND=OPT_DEP(1)*R(1)/(T1-1.0D0)
+	T1=MAX(T1,2.0_LDP)
+	TAU_BND=OPT_DEP(1)*R(1)/(T1-1.0_LDP)
 !
 	DO I=1,ND-1
-	  DTAU(I)=0.5D0*( OPT_DEP(I)+OPT_DEP(I+1) )*( R(I)-R(I+1) )
+	  DTAU(I)=0.5_LDP*( OPT_DEP(I)+OPT_DEP(I+1) )*( R(I)-R(I+1) )
 	END DO
 !
 	OPT_DEP(1)=TAU_BND

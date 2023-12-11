@@ -24,7 +24,7 @@
 	INTEGER ML,I
 !
 	PLANCK_FN(1:NCF)=TWOHCSQ*(NU(1:NCF)**3)/
-	1                    (EXP(HDKT*NU(1:NCF)/T_ELEC)-1.0D0)
+	1                    (EXP(HDKT*NU(1:NCF)/T_ELEC)-1.0_LDP)
 	IF(ONE_PAR)THEN
 	  CALL CNVLV_ES_ONE_PAR(NU,PLANCK_FN,PLANCK_ES,NCF,T_elec)
 	ELSE
@@ -38,7 +38,7 @@
 	PLANCK_NU(1)=NU(1)
 	I=2
 	ML=1
-	DO WHILE(NU(I) .GT. 1.5D0*T_ELEC)
+	DO WHILE(NU(I) .GT. 1.5_LDP*T_ELEC)
 	  DO WHILE(PLANCK_ES(I) .GT. PLANCK_FN(ML))
 	    ML=ML+1
 	  END DO
@@ -46,13 +46,13 @@
 	    ML=ML+1
 	  END DO
 	  T1=(PLANCK_ES(I)-PLANCK_FN(ML))/(PLANCK_FN(ML-1)-PLANCK_FN(ML))
-          PLANCK_NU(I)=T1*NU(ML-1)+(1.0D0-T1)*NU(ML)
+          PLANCK_NU(I)=T1*NU(ML-1)+(1.0_LDP-T1)*NU(ML)
 	  I=I+1
 	END DO
 C
 	T1=1/NU(I-1)-1/PLANCK_NU(I-1)		!Wavelength shift
 	DO ML=I,NCF
-	  PLANCK_NU(ML)=1.0D0/( 1.0D0/NU(ML) - T1)
+	  PLANCK_NU(ML)=1.0_LDP/( 1.0_LDP/NU(ML) - T1)
 	END DO
 C
 C Perform a simple linear interpolation back onto the old frequency grid.
@@ -66,8 +66,8 @@ C
 	    I=I+1
 	  END DO
 	  T1=(NU(ML)-PLANCK_NU(I))/(PLANCK_NU(I+1)-PLANCK_NU(I))
-	  PLANCK_ES(ML)=T1*D(I+1)+(1.0D0-T1)*D(I)
-	  J_ES(ML)=T1*LOG_J_ES(I+1)+(1.0D0-T1)*LOG_J_ES(I)
+	  PLANCK_ES(ML)=T1*D(I+1)+(1.0_LDP-T1)*D(I)
+	  J_ES(ML)=T1*LOG_J_ES(I+1)+(1.0_LDP-T1)*LOG_J_ES(I)
 	END DO
 C
 	J_ES(:)=EXP( J_ES(:)+PLANCK_FN(:)-PLANCK_ES(:) )

@@ -84,9 +84,9 @@ C LTE population  of the state j with respect to the g.s. of the (I+2)th
 C ionization stage.
 C
 	DO J=1,ND
-	  SUM_SE=0.0D0
-	  SUM_VJ_R=0.0D0
-	  SUM_VJ_P=0.0D0
+	  SUM_SE=0.0_LDP
+	  SUM_VJ_R=0.0_LDP
+	  SUM_VJ_P=0.0_LDP
 	  B_ION=HNST_B(1,J)/HN_B(1,J)		!1/b
 	  J_B_ION=JREC(J)*B_ION
 	  DO I=1,N_A

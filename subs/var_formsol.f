@@ -51,8 +51,8 @@ C
 	INTEGER I,LS,ML,NI
 	REAL(KIND=LDP) OLDCHI,T1,T2,DBC,DBC_ON_DBB,TOR,IBOUND,WERF_EXP
 C
-	FQAF(:,:,:)=0.0D0               !NM,ND,ND
-	FQAFD(:)=0.0D0         		!ND
+	FQAF(:,:,:)=0.0_LDP               !NM,ND,ND
+	FQAFD(:)=0.0_LDP         		!ND
 C
 C 
 C
@@ -68,20 +68,20 @@ C Determine boundary condition for continuum intensity.
 C
 	  IF(THK_CONT)THEN
 	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF
-	    IBOUND=ETA(1)*(1.0D0-EXP(-TOR))/CHI(1)
+	    IBOUND=ETA(1)*(1.0_LDP-EXP(-TOR))/CHI(1)
 	  ELSE
-	    TOR=0.0D0
-	    IBOUND=0.0D0
+	    TOR=0.0_LDP
+	    IBOUND=0.0_LDP
 	  END IF
 C
 C Zero AV and CV vectors.
 C
-	  AV(1:NI)=0.0D0
-	  CV(1:NI)=0.0D0
+	  AV(1:NI)=0.0_LDP
+	  CV(1:NI)=0.0_LDP
 C
 C set MLNE1 to false for first frequency.
 	  MLNE1=.FALSE.
@@ -109,7 +109,7 @@ C
 	    CALL QKIM(Q,QH,GAM,GAMH,TCHI,PF,ML,NI,NLF)
 	    IF(DIF .AND. LS .LE. NC)THEN
 	      DBC_ON_DBB=SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
-	1                   *(1.0D0+Q(NI)*(1.0D0-TCHI(NI)/OLDCHI))
+	1                   *(1.0_LDP+Q(NI)*(1.0_LDP-TCHI(NI)/OLDCHI))
 	      DBC=DBB*DBC_ON_DBB
 	    END IF
 	    CALL TAU(DTAU,TCHI,Z,NI)
@@ -128,8 +128,8 @@ C
 C	I(incident)=ETAL(1)/CHIL(1)*(1.0D0-WERF_EXP)+IBOUND*WERF_EXP
 C
 	    IF(THK_LINE)THEN
-	      WERF_EXP=EXP(1.0D-15*CHIL(1)/FL/GAM(1)*WERFC(ML))
-	      XM(1)=(CHI(1)/TCHI(1)*WERF_EXP-1.0D0)*ETAL(1)/CHIL(1)
+	      WERF_EXP=EXP(1.0E-15_LDP*CHIL(1)/FL/GAM(1)*WERFC(ML))
+	      XM(1)=(CHI(1)/TCHI(1)*WERF_EXP-1.0_LDP)*ETAL(1)/CHIL(1)
 	1              -IBOUND*CHI(1)/TCHI(1)*WERF_EXP
 	    ELSE
 	      XM(1)=-IBOUND
@@ -160,7 +160,7 @@ C begin the variation computation.
 C
 C Compute d{non-radiation field}/dchi matrix.
 C
-	    T1=1.0D-15/FL/GAM(1)*WERFC(ML)
+	    T1=1.0E-15_LDP/FL/GAM(1)*WERFC(ML)
 	    CALL KIVARNM(KI,RKB,RKC,DEPTH_PRO,DTAU,Z,Q,QH,
 	1                AV,AVM1,CVM1,TCHI,
 	1                SOURCE,ETAL,CHIL,CHI,T1,LS,NC,NI,NM)
@@ -178,16 +178,16 @@ C
 	    IF(DIF .AND. LS .LE. NC)THEN
 	      T1=0
 	      IF(MLNE1)T1=PROF(ML-1)
-	      T2=0.5D0*(Z(ND-1)-Z(ND))*(AV(ND)-AV(ND-1))/DTAU(ND-1)/DTAU(ND-1)
+	      T2=0.5_LDP*(Z(ND-1)-Z(ND))*(AV(ND)-AV(ND-1))/DTAU(ND-1)/DTAU(ND-1)
 C
 C We note that KI(ND,1,1) and KI(ND,1,3) are unaltered.
 C
 	      IF(NM .EQ. 4)THEN
-	        KI(ND,2,3)=T2+DBC*( (Q(ND)*TCHI(ND)-1.0D0)/TCHI(ND)
+	        KI(ND,2,3)=T2+DBC*( (Q(ND)*TCHI(ND)-1.0_LDP)/TCHI(ND)
 	1        +Q(ND)/(OLDCHI**2) )
 	      END IF
 	      KI(ND,2,1)=T2*DEPTH_PRO(ND) +
-	1         DBC*( (Q(ND)*TCHI(ND)-1.0D0)/TCHI(ND) *
+	1         DBC*( (Q(ND)*TCHI(ND)-1.0_LDP)/TCHI(ND) *
 	1         DEPTH_PRO(ND)+Q(ND)*T1/(OLDCHI**2) )
 	    END IF
 C
@@ -209,8 +209,8 @@ C Evaluate Diffusion variation.
 C
 	    IF(DIF .AND. LS .LE. NC)THEN
 	      IF(ML .EQ. 1)THEN
-	        TXD(1:NI)=0.0D0
-	        TVXD(1:NI)=0.0D0
+	        TXD(1:NI)=0.0_LDP
+	        TVXD(1:NI)=0.0_LDP
 	      END IF
 	      DO I=2,NI-1
 	        TXD(I)=U(I)*TXD(I)-VB(I)*TVXD(I-1)-VC(I)*TVXD(I)

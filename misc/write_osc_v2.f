@@ -95,7 +95,7 @@ C
 C
 	FORMFEED=CHAR(12)
 	C_LIGHT=SPEED_OF_LIGHT()		!cm s^-1
-	NU_TO_EV=1.0D0/0.241798836		!Conversion factor from 10^15 Hz to eV
+	NU_TO_EV=1.0_LDP/0.241798836_LDP		!Conversion factor from 10^15 Hz to eV
 !
 	DO I=1,LEN(STARS)
 	  STARS(I:I)='*'
@@ -104,7 +104,7 @@ C
 C Compute the Einstein A coefficients, and the level lifetimes.
 C
 	T1=OPLIN/EMLIN*TWOHCSQ
-	NEW_ARAD(:)=0.0D0
+	NEW_ARAD(:)=0.0_LDP
 	DO I=1,NCIV-1
 	  DO J=I+1,NCIV
 	    ACIV(J,I)=T1*ABS(ACIV(I,J))*GCIV(I)/GCIV(J)
@@ -116,7 +116,7 @@ C
 	CALL GEN_ASCI_OPEN(LU,'CHK_ARAD_','UNKNOWN',' ',' ',IZERO,IOS)
 	  DO I=1,NCIV
 	    IF(NEW_ARAD(I) .NE. 0)THEN
-	      T1=100.0D0*(ARAD(I)/NEW_ARAD(I)-1.0D0)
+	      T1=100.0_LDP*(ARAD(I)/NEW_ARAD(I)-1.0_LDP)
 	      WRITE(LU,'(2X,I5,3X,ES12.3,3X,ES12.3,F14.4)')I,NEW_ARAD(I),ARAD(I),T1
 	    END IF
 	  END DO
@@ -149,7 +149,7 @@ C
 	NUM_TRAN=0
 	DO I=1,NMAX-1
 	  DO J=I+1,NMAX
-	    IF(ACIV(I,J) .NE. 0.0D0)THEN
+	    IF(ACIV(I,J) .NE. 0.0_LDP)THEN
 	      NUM_TRAN=NUM_TRAN+1
 	      TRANS(I,J)=NUM_TRAN
 	    END IF
@@ -244,14 +244,14 @@ C
 C
 	DO I=1,NMAX-1
 	  DO J=I+1,NMAX
-	    IF(ACIV(I,J) .NE. 0.0D0)THEN
+	    IF(ACIV(I,J) .NE. 0.0_LDP)THEN
 	      T1=FEDGECIV(I)-FEDGECIV(J)		!Frequency (10^{15} Hz)
 	      T1=LAMVACAIR(T1)				!Lam (Angstroms)
 	      IF(.NOT. KNOWN_LEVEL_ENERGY(I) .OR.
 	1          .NOT. KNOWN_LEVEL_ENERGY(J))T1=-T1
 	      T2=ACIV(I,J)
 	      IF(SECND(I,J))T2=-T2
-              IF(ABS(T1) .LT. 100000.0)THEN
+              IF(ABS(T1) .LT. 100000.0_LDP)THEN
 	        WRITE(LU,140)CIVLEV(I)(1:LNGTH),CIVLEV(J)(1:LNGTH),
 	1         T2,ABS(ACIV(J,I)),T1,I,J,TRANS(I,J)
               ELSE
@@ -279,14 +279,14 @@ C
 C
 	DO I=2,NMAX
 	  DO J=1,I-1
-	    IF(ACIV(J,I) .NE. 0.0D0)THEN
+	    IF(ACIV(J,I) .NE. 0.0_LDP)THEN
 	      T1=FEDGECIV(J)-FEDGECIV(I)		!Frequency (10^{15} Hz)
 	      T1=LAMVACAIR(T1)				!Lam (Angstroms)
 	      IF(.NOT. KNOWN_LEVEL_ENERGY(I) .OR.
 	1          .NOT. KNOWN_LEVEL_ENERGY(J))T1=-T1
 	      T2=ACIV(J,I)
 	      IF( SECND(J,I) )T2=-T2
-              IF(ABS(T1) .LT. 100000.0)THEN
+              IF(ABS(T1) .LT. 100000.0_LDP)THEN
 	        WRITE(LU,140)CIVLEV(J)(1:LNGTH),CIVLEV(I)(1:LNGTH),
 	1         T2,ABS(ACIV(I,J)),T1,J,I,TRANS(J,I)
               ELSE

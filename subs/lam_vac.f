@@ -17,7 +17,7 @@ C
 	REAL(KIND=LDP) T1
 	INTEGER I
 C
-	IF(LAM_AIR .LT. 1999.352D0)THEN
+	IF(LAM_AIR .LT. 1999.352_LDP)THEN
 	  WRITE(6,*)' ERROR --- in LAM_VAC'
 	  WRITE(6,*)' Formulae for conversion of air to vacuum wavelenths',
 	1                ' invalid below 2000Ang'
@@ -29,10 +29,10 @@ C between LAM_VAC and LAM_AIR is small, convergence is VERY rapid.
 C
 	LAM_VAC=LAM_AIR
 	DO I=1,3
-	  T1=1.0D+08/(LAM_VAC*LAM_VAC)
-	  LAM_VAC=LAM_AIR*(  1.0D0+
-	1               1.0D-07*( 643.28D0+
-	1              294981.0D0/(146.0D0-T1)+2554.0D0/(41.0D0-T1) )  )
+	  T1=1.0E+08_LDP/(LAM_VAC*LAM_VAC)
+	  LAM_VAC=LAM_AIR*(  1.0_LDP+
+	1               1.0E-07_LDP*( 643.28_LDP+
+	1              294981.0_LDP/(146.0_LDP-T1)+2554.0_LDP/(41.0_LDP-T1) )  )
 	END DO
 C
 	RETURN

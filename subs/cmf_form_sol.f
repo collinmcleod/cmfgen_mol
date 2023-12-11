@@ -180,7 +180,7 @@ C
 C
 	REAL(KIND=LDP) EXT_FAC
 	INTEGER ND_ADD_MAX
-	PARAMETER (EXT_FAC=10.0D0)
+	PARAMETER (EXT_FAC=10.0_LDP)
 	PARAMETER (ND_ADD_MAX=10)		!10*LOG10(EXT_FAC))
 	INTEGER NP_EXT
 C
@@ -271,7 +271,7 @@ C
 	  NP_SAV=NP
 	  EXTEND_SAV=EXTEND
 C
-	  C_KMS=1.0D-05*SPEED_OF_LIGHT( )
+	  C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT( )
 	  IF(EXTEND)THEN
 	    ND_ADD=10*LOG10(EXT_FAC)
 	  ELSE
@@ -300,7 +300,7 @@ C
 	    P_EXT(NC+1:NP_EXT)=R_EXT(ND_EXT:1:-1)
 C
 	    ROH_ALPHA=LOG(ROH(4)/ROH(1)) / LOG(R(1)/R(4))
-	    IF(ROH_ALPHA .LT. 2.)ROH_ALPHA=2.0
+	    IF(ROH_ALPHA .LT. 2._LDP)ROH_ALPHA=2.0
 	    DO I=1,ND_ADD
 	      ROH_EXT(I)=ROH(1)*(R(1)/R_EXT(I))**ROH_ALPHA
 	    END DO
@@ -365,14 +365,14 @@ C in the INITIALIZATION section we save space by using CHI_COEF for V
 C and ETA_COEF for SIGMA.
 C
 	  LOG_V(1:ND)=LOG(V(1:ND))
-	  LOG_SIGMA(1:ND)=LOG( (SIGMA(1:ND)+1.0D0) )
+	  LOG_SIGMA(1:ND)=LOG( (SIGMA(1:ND)+1.0_LDP) )
 	  LOG_R(1:ND)=LOG(R(1:ND))
 	  CALL MON_INT_FUNS_V2(CHI_COEF,LOG_V,LOG_R,ND)
 	  CALL MON_INT_FUNS_V2(ETA_COEF,LOG_SIGMA,LOG_R,ND)
 C
 C Define parameters for extrapolating the velocity law.
 C
-	  BETA=(SIGMA(1)+1.0D0)*(R(1)/R(ND)-1.0D0)
+	  BETA=(SIGMA(1)+1.0_LDP)*(R(1)/R(ND)-1.0_LDP)
           VINF=V(1)/(1-R(ND)/R(1))**BETA
 C
 C Define the fine radius grid in which linear interpolations will be used.
@@ -433,16 +433,16 @@ C Only use V and SIGMA to compute GAMMA. Thus don't need to save there values
 C
 	      IF(R_RAY(NI,LS) .GT. R(1))THEN
 	        DO I=1,NI					!Additional rays.
-	          V_RAY(I)=VINF*(1.0D0-R(ND)/R_RAY(I,LS))**BETA
-	          SIGMA_RAY(I)=BETA/(R_RAY(I,LS)/R(ND)-1.0D0)-1.0D0
+	          V_RAY(I)=VINF*(1.0_LDP-R(ND)/R_RAY(I,LS))**BETA
+	          SIGMA_RAY(I)=BETA/(R_RAY(I,LS)/R(ND)-1.0_LDP)-1.0_LDP
 	        END DO
 	        I_START=NI+1
 	      ELSE
 	        I=0
 	        DO WHILE(R_RAY(I+1,LS) .GT. R(1))
 	          I=I+1
-	          V_RAY(I)=VINF*(1.0D0-R(ND)/R_RAY(I,LS))**BETA
-	          SIGMA_RAY(I)=BETA/(R_RAY(I,LS)/R(ND)-1.0D0)-1.0D0
+	          V_RAY(I)=VINF*(1.0_LDP-R(ND)/R_RAY(I,LS))**BETA
+	          SIGMA_RAY(I)=BETA/(R_RAY(I,LS)/R(ND)-1.0_LDP)-1.0_LDP
 	        END DO
 	        I_START=I+1
 	     END IF
@@ -474,7 +474,7 @@ C
 	1         CHI_COEF(L,3))*T1+CHI_COEF(L,4) )
 	      SIGMA_RAY(I)=EXP(
 	1         ((ETA_COEF(L,1)*T1+ETA_COEF(L,2))*T1+
-	1         ETA_COEF(L,3))*T1+ETA_COEF(L,4) )-1.0D0
+	1         ETA_COEF(L,3))*T1+ETA_COEF(L,4) )-1.0_LDP
 	    END DO
 C
 C Compute GAMMA. This section is straight from the subroutine GAMMA, except
@@ -486,18 +486,18 @@ C Note that V is in km/s and SIGMA=(dlnV/dlnR-1.0)
 C
 	    DO I=1,NI_RAY(LS)-1
 	      MU=Z(I,LS)/R_RAY(I,LS)
-	      GAM(I,LS)=3.33564D-06*V_RAY(I)/R_RAY(I,LS)*
-	1                   (  1.0D0+SIGMA_RAY(I)*(MU**2)  )
+	      GAM(I,LS)=3.33564E-06_LDP*V_RAY(I)/R_RAY(I,LS)*
+	1                   (  1.0_LDP+SIGMA_RAY(I)*(MU**2)  )
 	      MU=(Z(I,LS)+Z(I+1,LS))/(R_RAY(I,LS)+R_RAY(I+1,LS))
-	      GAMH(I,LS)=(V_RAY(I+1)+V_RAY(I))*3.33564D-06*
-	1                   (  1.0D0+0.5D0*(MU**2)*
+	      GAMH(I,LS)=(V_RAY(I+1)+V_RAY(I))*3.33564E-06_LDP*
+	1                   (  1.0_LDP+0.5_LDP*(MU**2)*
 	1                   (SIGMA_RAY(I)+SIGMA_RAY(I+1))  )/
 	1                   (R_RAY(I,LS)+R_RAY(I+1,LS))
 	    END DO
 	    GAMH(NI,LS)=0.0
 	    MU=Z(NI,LS)/R_RAY(NI,LS)
-	    GAM(NI,LS)=3.33564D-06*V_RAY(NI)*
-	1              ( 1.0D0+SIGMA_RAY(NI)*(MU**2) )/R_RAY(NI,LS)
+	    GAM(NI,LS)=3.33564E-06_LDP*V_RAY(NI)*
+	1              ( 1.0_LDP+SIGMA_RAY(NI)*(MU**2) )/R_RAY(NI,LS)
 C
 C Find location of R_RAY on the fine grid. This will be used a lot, and hence
 C is done in the initialization.
@@ -521,9 +521,9 @@ C
 C
 	  RMAX_OBS=R_EXT(1)
 	  DO LS=1,NP_EXT
-	    MU_AT_RMAX(LS)=SQRT(1.0D0-(P_EXT(LS)/R_EXT(1))**2)
+	    MU_AT_RMAX(LS)=SQRT(1.0_LDP-(P_EXT(LS)/R_EXT(1))**2)
 	  END DO
-	  IF(P_EXT(NP_EXT) .EQ. R_EXT(1))MU_AT_RMAX(NP_EXT)=0.0D0
+	  IF(P_EXT(NP_EXT) .EQ. R_EXT(1))MU_AT_RMAX(NP_EXT)=0.0_LDP
 	  CALL HTRPWGT(MU_AT_RMAX,HQW_AT_RMAX,NP_EXT)
 C
 	  FIRST_TIME=.FALSE.
@@ -570,8 +570,8 @@ C
 	END IF			!First.
 C
 	IF(INIT)THEN
-	  AV_PREV(:,:)=0.0D0
-	  CV_PREV(:,:)=0.0D0
+	  AV_PREV(:,:)=0.0_LDP
+	  CV_PREV(:,:)=0.0_LDP
 C
 C Required for the diffusion approximation.
 C
@@ -587,7 +587,7 @@ C
 C
 C 
 C
-	IPLUS_P(1:NP_OBS_MAX)=0.0D0
+	IPLUS_P(1:NP_OBS_MAX)=0.0_LDP
 C
 C Determine how many intermediate frequencies will be inserted. These
 C extra frequencies are mainly inserted to assist in the propagation of the
@@ -600,8 +600,8 @@ C
 	N_FREQ=1
 	IF(INSERT_ADD_FREQ .AND. .NOT. INIT)THEN
        	  T1=C_KMS*(FL_PREV-FL)/FL
-	  IF( T1 .GT. 1.05*FRAC_DOP*V_DOP .AND. T1 .LT. 1.05*dV_CMF_PROF)THEN
-	     N_FREQ=NINT(C_KMS*(FL_PREV-FL)/(V_DOP*FRAC_DOP)/FL+0.7)
+	  IF( T1 .GT. 1.05_LDP*FRAC_DOP*V_DOP .AND. T1 .LT. 1.05_LDP*dV_CMF_PROF)THEN
+	     N_FREQ=NINT(C_KMS*(FL_PREV-FL)/(V_DOP*FRAC_DOP)/FL+0.7_LDP)
 	  END IF
 	END IF
 	IF(.NOT. INIT)NEW_dLOG_NU=dLOG_NU/N_FREQ
@@ -633,13 +633,13 @@ C
 	  IF(EXTEND)THEN
 	    ESEC_ALPHA=LOG(ESEC(4)/ESEC(1)) / LOG(R(1)/R(4))
 	    ETA_ALPHA=LOG(ETA(4)/ETA(1))/LOG(R(1)/R(4))
-	    IF(ETA_ALPHA .LT. 3.5)ETA_ALPHA=3.5
+	    IF(ETA_ALPHA .LT. 3.5_LDP)ETA_ALPHA=3.5
 	    IF(CHI(1) .LE. ESEC(1) .OR. CHI(4) .LE. ESEC(4))THEN
 	      CHI_ALPHA=ESEC_ALPHA
 	    ELSE
 	      CHI_ALPHA=LOG( (CHI(4)-ESEC(4)) / (CHI(1)-ESEC(1)) )
 	1          / LOG(R(1)/R(4))
-	      IF(CHI_ALPHA .LT. 2.)CHI_ALPHA=2.0
+	      IF(CHI_ALPHA .LT. 2._LDP)CHI_ALPHA=2.0
 	    END IF
 	    DO I=1,I_START-1
 	      T1=(CHI(1)-ESEC(1))*(R(1)/R_FINE(I))**CHI_ALPHA
@@ -671,7 +671,7 @@ C
 	1         ((ETA_COEF(L,1)*T1+ETA_COEF(L,2))*T1+
 	1         ETA_COEF(L,3))*T1+ETA_COEF(L,4) )
 	    dCHIDR_FINE(I)=CHI_FINE(I)/R_FINE(I)*
-	1         ( (3.0D0*CHI_COEF(L,1)*T1+2.0D0*CHI_COEF(L,2))*T1+
+	1         ( (3.0_LDP*CHI_COEF(L,1)*T1+2.0_LDP*CHI_COEF(L,2))*T1+
 	1         CHI_COEF(L,3) )
 	  END DO
 C
@@ -688,7 +688,7 @@ C
 	    DO I=1,NI
 	      L=INDX_FINE(I,LS)
 	      T1=(R_RAY(I,LS)-R_FINE(L))/(R_FINE(L+1)-R_FINE(L))
-	      T2=1.0D0-T1
+	      T2=1.0_LDP-T1
 	      CHI_RAY(I)=T2*CHI_FINE(L)+T1*CHI_FINE(L+1)
 	      ETA_RAY(I)=T2*ETA_FINE(L)+T1*ETA_FINE(L+1)
 	      dCHIdR(I)=T2*dCHIdR_FINE(L)+T1*dCHIdR_FINE(L+1)
@@ -699,12 +699,12 @@ C	    CALL TUNE(2,'FRM_EXP')
 C
 C Zero AV and CV vectors.
 C
-	    AV(:)=0.0D0
-	    CV(:)=0.0D0
+	    AV(:)=0.0_LDP
+	    CV(:)=0.0_LDP
 C
 C Incident intensity at outer boundary is assumed to be zero.
 C
-	    IBOUND=0.0D0
+	    IBOUND=0.0_LDP
 C
 C 
 C
@@ -716,31 +716,31 @@ C
 	      QH(:)=0.0
 	    ELSE
 	      DO I=1,NI-1
-	        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*NEW_dLOG_NU)
+	        QH(I)=GAMH(I,LS)*2.0_LDP/((CHI_RAY(I)+CHI_RAY(I+1))*NEW_dLOG_NU)
 	        Q(I)=GAM(I,LS)/(CHI_RAY(I)*NEW_dLOG_NU)
 	      END DO
-	      QH(NI)=0.0D0
+	      QH(NI)=0.0_LDP
 	      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*NEW_dLOG_NU)
 	    END IF
 	    IF(DIF .AND. LS .LE. NC)THEN
 	      DBC=DBB*SQRT(R(ND)*R(ND)-P_EXT(LS)*P_EXT(LS))/
 	1        R(ND)/CHI_RAY(NI)
-	1        *(1.0D0+Q(NI)*(1.0D0-CHI_RAY(NI)/OLD_CHI_AT_IN_BND))
+	1        *(1.0_LDP+Q(NI)*(1.0_LDP-CHI_RAY(NI)/OLD_CHI_AT_IN_BND))
 	    END IF
 C
 C Compute the optical depth increments. This code is from TAU, and NORDTAU.
 C
 	    IF(METHOD .EQ. 'ZERO')THEN
 	      DO I=1,NI-1
-	        DTAU(I)=0.5D0*(CHI_RAY(I)+CHI_RAY(I+1))*(Z(I,LS)-Z(I+1,LS))
+	        DTAU(I)=0.5_LDP*(CHI_RAY(I)+CHI_RAY(I+1))*(Z(I,LS)-Z(I+1,LS))
 	      END DO
 	    ELSE
 	       DO I=1,NI-1
 	          dZ=Z(I,LS)-Z(I+1,LS)
-	          DTAU(I)=0.5D0*dZ*(CHI_RAY(I)+CHI_RAY(I+1))
+	          DTAU(I)=0.5_LDP*dZ*(CHI_RAY(I)+CHI_RAY(I+1))
 	          T1=dZ*dZ*( dCHIdR(I+1)*Z(I+1,LS)/R_RAY(I+1,LS)-
-	1              dCHIdR(I)*Z(I,LS)/R_RAY(I,LS) )/12.0D0
-	          T1=SIGN( MIN(0.8D0*DTAU(I),ABS(T1)),T1 )
+	1              dCHIdR(I)*Z(I,LS)/R_RAY(I,LS) )/12.0_LDP
+	          T1=SIGN( MIN(0.8_LDP*DTAU(I),ABS(T1)),T1 )
 	          DTAU(I)=DTAU(I)+T1
 	       END DO
 	    END IF
@@ -769,7 +769,7 @@ C (as in FG_J_CMF_V7).
 C
 	    DO I=1,NI
 	      IF(AV(I) .LE. 0)THEN
-	        AV(I)=0.1*ABS(AV(I))
+	        AV(I)=0.1_LDP*ABS(AV(I))
 	      END IF
 	    END DO
 C
@@ -790,7 +790,7 @@ C
 C Because of the frequency insertions, IPLUS_P will be continually overwritten
 C until we get to the final frequency.
 C
-	    IPLUS_P(LS)=2.0D0*CV_BOUND          !To compute observed flux
+	    IPLUS_P(LS)=2.0_LDP*CV_BOUND          !To compute observed flux
 C
 	  END DO			!End do LS
 C	  CALL TUNE(2,'FRM_LS')

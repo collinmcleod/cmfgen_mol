@@ -58,8 +58,8 @@
 	  RMAX_OBS=R(1)
 	  V_AT_RMAX=V(1)
 	END IF
-	IPLUS(1:NP)=1.0D-10		!Arbitrary value
-	HBC_CMF(1)=1.0D0
+	IPLUS(1:NP)=1.0E-10_LDP		!Arbitrary value
+	HBC_CMF(1)=1.0_LDP
 !
 ! Special treatment if first frequency.
 !
@@ -104,12 +104,12 @@
 	ELSE
 	  T1=(FL-LOW_FREQ)/(HIGH_FREQ-LOW_FREQ)
 	  DO I=1,ND
-	    RJ(I)=(1.0D0-T1)*RJ_LOW(I)+T1*RJ_HIGH(I)
+	    RJ(I)=(1.0_LDP-T1)*RJ_LOW(I)+T1*RJ_HIGH(I)
 	  END DO
 	END IF
-	K_MOM(1:ND)=RJ(1:ND)/3.0D0
-	RSQHNU(1:ND)=1.0D-20
-	HBC_CMF(:)=1.0D0
+	K_MOM(1:ND)=RJ(1:ND)/3.0_LDP
+	RSQHNU(1:ND)=1.0E-20_LDP
+	HBC_CMF(:)=1.0_LDP
 !
 ! Update the source function.
 !

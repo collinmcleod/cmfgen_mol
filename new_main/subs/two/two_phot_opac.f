@@ -43,8 +43,8 @@
 	INTEGER J,L
 	INTEGER NL,NUP
 	
-	PLANKS_CONSTANT=6.626D-27			!cgs units
-	PI=4.0D0*ATAN(1.0D0)
+	PLANKS_CONSTANT=6.626E-27_LDP			!cgs units
+	PI=4.0_LDP*ATAN(1.0_LDP)
 !
 ! The factor 10^10 arises since R is units of 10^10cm, and we
 ! scale CHI (and ETA) so that R.CHI is dimensionless, and
@@ -52,7 +52,7 @@
 ! We don't have to worry about the frequency units, as it multilplied
 ! by a ratio of 2 frequencies.
 !
-	CONST=1.0D+10*PLANKS_CONSTANT/4.0D0/PI
+	CONST=1.0E+10_LDP*PLANKS_CONSTANT/4.0_LDP/PI
 !
 	DO J=1,N_TWO
 	  IF(TWO_PHOT_AVAILABLE(J) .AND. FREQ .LT. FREQ_TWO(J))THEN
@@ -63,10 +63,10 @@
 !
 	    IF(TYPE_TWO(J) .EQ. 1)THEN
 	      Y=FREQ/FREQ_TWO(J)
-	      U=Y*(1.0D0-Y)
-	      FU=4.0D0*U
-	      AY=24.56D0*COEF_TWO(J,1)*( U*(1.0D0-FU**0.8D0) +
-	1                 0.88D0*(U**1.53D0)*(FU**0.8D0) )
+	      U=Y*(1.0_LDP-Y)
+	      FU=4.0_LDP*U
+	      AY=24.56_LDP*COEF_TWO(J,1)*( U*(1.0_LDP-FU**0.8_LDP) +
+	1                 0.88_LDP*(U**1.53_LDP)*(FU**0.8_LDP) )
 	    ELSE
 	      LUER=ERROR_LU()
 	      WRITE(LUER,*)'Error in TWO_PHOT_OPAC'

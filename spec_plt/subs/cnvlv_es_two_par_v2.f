@@ -36,34 +36,34 @@
 !
 	INTEGER, PARAMETER :: NCOEF=2
 	REAL(KIND=LDP) ACOEF(2),BCOEF(2)
-	DATA ACOEF/1.690703717290D0,-0.690703717290D0/
-	DATA BCOEF/1.614249968779D0,2.154326524957D0/
+	DATA ACOEF/1.690703717290_LDP,-0.690703717290_LDP/
+	DATA BCOEF/1.614249968779_LDP,2.154326524957_LDP/
 !
 ! Compute those parts of the TRIDIAGONAL vectors which are independent of
 ! depth, and the fitting parameters.
 !
 	A_STORE(1)=0
-	C_STORE(1)=-2.0D0/( LOG(NU(1)/NU(2)) )**2
+	C_STORE(1)=-2.0_LDP/( LOG(NU(1)/NU(2)) )**2
 	DO ML=2,NCF-1
 	  D1=LOG(NU(ML-1)/NU(ML))
 	  D2=LOG(NU(ML)/NU(ML+1))
-	  DH=0.5*(D1+D2)
-	  A_STORE(ML)=-1.0D0/D1/DH
-	  C_STORE(ML)=-1.0D0/D2/DH
+	  DH=0.5_LDP*(D1+D2)
+	  A_STORE(ML)=-1.0_LDP/D1/DH
+	  C_STORE(ML)=-1.0_LDP/D2/DH
 	END DO
-	A_STORE(NCF)=-2.0D0/( LOG(NU(NCF-1)/NU(NCF)) )**2
-	C_STORE(NCF)=0.0D0
+	A_STORE(NCF)=-2.0_LDP/( LOG(NU(NCF-1)/NU(NCF)) )**2
+	C_STORE(NCF)=0.0_LDP
 !
 ! Compute the triadiagonal quantities for performing the convolution, and
 ! perform the convolution. Due to the depth dependence of BETA, the vectors
 ! are depth dependent. We convolve both J and the Planck Function.
 !
-	BETA=1.84E-03*SQRT(T_ELEC)
-	J_ES(:)=0.0D0
+	BETA=1.84E-03_LDP*SQRT(T_ELEC)
+	J_ES(:)=0.0_LDP
 	DO L=1,NCOEF
 	  T1=BETA*BETA/BCOEF(L)/BCOEF(L)
 	  A(:)=T1*A_STORE(:)			!Over frequency
-	  H(:)=-1.0D0
+	  H(:)=-1.0_LDP
 	  C(:)=T1*C_STORE(:)
 	  D(:)=RJ(:)
 	  CALL THOMAS_RH(A,H,C,D,NCF,IONE)
@@ -72,25 +72,25 @@
 !
 ! Compute integrals as a function of depth to check flux conservation.
 !
-	OLD_FLUX=0.0D0
-	NEW_FLUX=0.0D0
+	OLD_FLUX=0.0_LDP
+	NEW_FLUX=0.0_LDP
 	DO ML=2,NCF-1
 	  OLD_FLUX=OLD_FLUX+(NU(ML)-NU(ML+1))*(RJ(ML)+RJ(ML+1))
 	  NEW_FLUX=NEW_FLUX+(NU(ML)-NU(ML+1))*(J_ES(ML)+J_ES(ML+1))
 	END DO
-	T1=200.0D0*(OLD_FLUX-NEW_FLUX)/(OLD_FLUX+NEW_FLUX)
+	T1=200.0_LDP*(OLD_FLUX-NEW_FLUX)/(OLD_FLUX+NEW_FLUX)
 	WRITE(T_OUT,'(A,1X,1P,E13.5)')'  %Flux error:',T1
 !
 ! Now check photon number conservation
 !
-	OLD_N_PHOT=0.0D0
-	NEW_N_PHOT=0.0D0
+	OLD_N_PHOT=0.0_LDP
+	NEW_N_PHOT=0.0_LDP
 	DO ML=2,NCF-1
 	  T1=LOG(NU(ML)/NU(ML+1))
 	  OLD_N_PHOT=OLD_N_PHOT+T1*(RJ(ML)+RJ(ML+1))
 	  NEW_N_PHOT=NEW_N_PHOT+T1*(J_ES(ML)+J_ES(ML+1))
 	END DO
-	T1=200.0D0*(OLD_N_PHOT-NEW_N_PHOT)/(OLD_N_PHOT+NEW_N_PHOT)
+	T1=200.0_LDP*(OLD_N_PHOT-NEW_N_PHOT)/(OLD_N_PHOT+NEW_N_PHOT)
 	WRITE(T_OUT,'(A,1X,1P,E13.5)')'  %Photon error:',T1
 !
 	RETURN

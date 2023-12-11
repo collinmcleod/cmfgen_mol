@@ -47,15 +47,15 @@
 ! We should also divide the rate by 4Pi, but we just want a term
 ! similar in magnitude to what appears in the RE Eqn.
 !
-	HEAT(1:ND)=0.0D0
+	HEAT(1:ND)=0.0_LDP
 	T_MIN_EXTRAP=.FALSE.
-	EHB_CONSTANT=1.25663706D-09		!4P x E-10 (for electron heating equation).
+	EHB_CONSTANT=1.25663706E-09_LDP		!4P x E-10 (for electron heating equation).
 !
-	IF(T_MIN .GT. 0.0D0)THEN
+	IF(T_MIN .GT. 0.0_LDP)THEN
 !
 	  DO K=1,ND
-	    TA(K) = 1.0D-10*ED(K)*POPION(K)
-	    HEAT(K)= TA(K)*EXP(1000.0D0*(T_MIN-T(K)))
+	    TA(K) = 1.0E-10_LDP*ED(K)*POPION(K)
+	    HEAT(K)= TA(K)*EXP(1000.0_LDP*(T_MIN-T(K)))
 	  END DO
 !
 ! If the added heating term is much greater than what is needed, we
@@ -66,17 +66,17 @@
 	     DO K=1,ND
 	       WRITE(133,*)TA(K),HEAT(K),STEQ_T(K)
 	       L=GET_DIAG(K)
-	       IF(HEAT(K) .GT. -100.0D0*STEQ_T(K) .AND. STEQ_T(K) .LT. 0.0D0)THEN
-	         T1=T_MIN-T(K)-LOG(ABS(STEQ_T(K))/TA(K))/1000.0D0
+	       IF(HEAT(K) .GT. -100.0_LDP*STEQ_T(K) .AND. STEQ_T(K) .LT. 0.0_LDP)THEN
+	         T1=T_MIN-T(K)-LOG(ABS(STEQ_T(K))/TA(K))/1000.0_LDP
 	         BA_T(NT,L,K)=BA_T(NT,L,K) - (HEAT(K)-STEQ_T(K))/T1
 	         BA_T_EHB(NT,L,K)=BA_T_EHB(NT,L,K) - (EHB_CONSTANT*HEAT(K)-STEQ_T_EHB(K))/T1
 	         T_MIN_EXTRAP=.TRUE.
 	       ELSE
-	         BA_T(NT,L,K)=BA_T(NT,L,K) - 1000.0D0*HEAT(K)
-	         BA_T_EHB(NT,L,K)=BA_T_EHB(NT,L,K) - 1000.0D0*EHB_CONSTANT*HEAT(K)
+	         BA_T(NT,L,K)=BA_T(NT,L,K) - 1000.0_LDP*HEAT(K)
+	         BA_T_EHB(NT,L,K)=BA_T_EHB(NT,L,K) - 1000.0_LDP*EHB_CONSTANT*HEAT(K)
 	       END IF
-	       BA_T(NT-1,L,K)=BA_T(NT-1,L,K) + 2.0D0*HEAT(K)/ED(K)
-	       BA_T_EHB(NT-1,L,K)=BA_T_EHB(NT-1,L,K) + 2.0D0*EHB_CONSTANT*HEAT(K)/ED(K)
+	       BA_T(NT-1,L,K)=BA_T(NT-1,L,K) + 2.0_LDP*HEAT(K)/ED(K)
+	       BA_T_EHB(NT-1,L,K)=BA_T_EHB(NT-1,L,K) + 2.0_LDP*EHB_CONSTANT*HEAT(K)/ED(K)
 	     END DO
 	  END IF
 !

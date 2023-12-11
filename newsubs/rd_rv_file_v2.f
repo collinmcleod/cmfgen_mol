@@ -96,8 +96,8 @@
 	  CLOSE(LUIN)
 !
 	  DO I=1,ND-1
-	    IF(V(I) .LE. V(I+1) .AND. V(I) .LT. 0.1D0)THEN
-	      SIGMA(I)=-0.999D0
+	    IF(V(I) .LE. V(I+1) .AND. V(I) .LT. 0.1_LDP)THEN
+	      SIGMA(I)=-0.999_LDP
 	      WRITE(6,*)'Warning from RD_RV_FILE_V2'
 	      WRITE(6,*)'Adjusting SIGMA in hydrostatic zone to be monotonic'
 	    ELSE IF(V(I) .LE. V(I+1))THEN
@@ -113,7 +113,7 @@
 !
 	  T1=R(ND)
 	  R(1:ND)=R(1:ND)*(RP/T1)
-	  IF(ABS(R(1)-RMAX) .GT. 0.1D0*(R(1)-R(2)))THEN
+	  IF(ABS(R(1)-RMAX) .GT. 0.1_LDP*(R(1)-R(2)))THEN
 	    WRITE(LUER,*)'Error in RD_RV_FILE_V2'
 	    WRITE(LUER,*)'R(1)/R(ND) must match RMAX/RP'
 	    WRITE(LUER,*)'R(1)/R(ND)=',R(1)/R(ND)
@@ -162,12 +162,12 @@ C
 	  END DO
 	  CLOSE(LUIN)
 C
-	  R(1)=(HT(1)+1.0D0)*RP
-	  SIGMA(1)=dVDR(1)*(HT(1)+1.0D0)/VEL(1)-1.0D0
+	  R(1)=(HT(1)+1.0_LDP)*RP
+	  SIGMA(1)=dVDR(1)*(HT(1)+1.0_LDP)/VEL(1)-1.0_LDP
 	  V(1)=VEL(1)
 	  DO I=3,ND
-	    R(I)=(HT(I-1)+1.0D0)*RP
-	    SIGMA(I)=dVDR(I-1)*(HT(I-1)+1.0D0)/VEL(I-1)-1.0D0
+	    R(I)=(HT(I-1)+1.0_LDP)*RP
+	    SIGMA(I)=dVDR(I-1)*(HT(I-1)+1.0_LDP)/VEL(I-1)-1.0_LDP
 	    V(I)=VEL(I-1)
 	  END DO
 !
@@ -175,16 +175,16 @@ C
 ! Insert extra point near outer boundary, as use first order
 ! boundary condition.
 !
-	  R(2)=R(1)-0.1*(R(1)-R(3))
-	  V(2)=V(1)+0.1*(V(1)-V(3))
-	  SIGMA(2)=SIGMA(1)+0.1*(SIGMA(1)-SIGMA(3))
+	  R(2)=R(1)-0.1_LDP*(R(1)-R(3))
+	  V(2)=V(1)+0.1_LDP*(V(1)-V(3))
+	  SIGMA(2)=SIGMA(1)+0.1_LDP*(SIGMA(1)-SIGMA(3))
 	ELSE
 	  WRITE(LUER,*)'Error in RD_RV_FILE_V2 -- OPTION not recognized'
 	  WRITE(LUER,*)OPTIONS(1)
 	  STOP
 	END IF
 !
-	IF( ABS(V(1)-VINF)/V(1) .GT. 0.1 .AND. VINF .GT. 0.1D0)THEN
+	IF( ABS(V(1)-VINF)/V(1) .GT. 0.1_LDP .AND. VINF .GT. 0.1_LDP)THEN
 	  WRITE(LUER,*)'VINF in VADAT file and velocity file are inconsistent'
 	  WRITE(LUER,*)'V(1)=',V(1)
 	  WRITE(LUER,*)'VINF',VINF

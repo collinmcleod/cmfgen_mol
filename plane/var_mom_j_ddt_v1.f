@@ -153,7 +153,7 @@
 !
 	INTEGER I
 !
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 !
 	IF(FIRST_TIME)THEN
 	  ALLOCATE ( JNU(ND) )
@@ -199,8 +199,8 @@
 ! Zero relevant vectors and matrices.
 !
 	DO I=1,ND
-	  JNU(I)=0.0D0
-	  RSQ_HNU(I)=0.0D0
+	  JNU(I)=0.0_LDP
+	  RSQ_HNU(I)=0.0_LDP
 	END DO
 !
 	DO I=1,ND
@@ -213,11 +213,11 @@
 	  CALL GET_JH_AT_PREV_TIME_STEP(JNU_OLDt,RSQ_HNU_OLDt,
 	1        HFLUX_AT_INB_OLDT,HONJ_OUTBC_OLDT,
 	1        DELTA_TIME_SECS,FREQ,R,V,ND,INIT,'NORMAL')
-	  TA(1:ND)=R(1:ND)-1.0D-05*V(1:ND)*DELTA_TIME_SECS
+	  TA(1:ND)=R(1:ND)-1.0E-05_LDP*V(1:ND)*DELTA_TIME_SECS
 	  JNU_OLDT(1:ND)=JNU_OLDT(1:ND)/TA(1:ND)/TA(1:ND)
 	ELSE
-	  JNU_OLDT=0.0D0; RSQ_HNU_OLDt=0.0D0
-	  HFLUX_AT_INB_OLDT=0.0D0; HONJ_OUTBC_OLDT=0.0D0
+	  JNU_OLDT=0.0_LDP; RSQ_HNU_OLDt=0.0_LDP
+	  HFLUX_AT_INB_OLDT=0.0_LDP; HONJ_OUTBC_OLDT=0.0_LDP
 	END IF
 !
 ! NB: The factor of 10^10 occurs because c. /\t is a length, and R in
@@ -229,11 +229,11 @@
 !
 	IF(INIT)THEN
 	  IF(DO_TIME_VAR)THEN
-	    RECIP_CDELTAT=1.0D+10*RELAX_PARAM/SPEED_OF_LIGHT()/DELTA_TIME_SECS
-	    ROLD_ON_R=1.0D0-1.0D-05*V(ND)*DELTA_TIME_SECS/R(ND)
+	    RECIP_CDELTAT=1.0E+10_LDP*RELAX_PARAM/SPEED_OF_LIGHT()/DELTA_TIME_SECS
+	    ROLD_ON_R=1.0_LDP-1.0E-05_LDP*V(ND)*DELTA_TIME_SECS/R(ND)
 	  ELSE
-	    RECIP_CDELTAT=0.0D0
-	    ROLD_ON_R=0.0D0
+	    RECIP_CDELTAT=0.0_LDP
+	    ROLD_ON_R=0.0_LDP
 	  END IF
 	END IF
 !
@@ -250,7 +250,7 @@
 	CALL d_DERIVCHI_dCHI(TB,TA,R,ND,METHOD)
 	CALL NORDTAU(DTAU,TA,R,R,TB,ND)
 	DO I=2,ND-1
-	  RSQ_DTAUONQ(I)=0.5D0*R(I)*R(I)*(DTAU(I)+DTAU(I-1))/Q(I)
+	  RSQ_DTAUONQ(I)=0.5_LDP*R(I)*R(I)*(DTAU(I)+DTAU(I-1))/Q(I)
 	END DO
 !
 ! 
@@ -263,27 +263,27 @@
 ! proportional to NM*ND*ND.
 !
 	IF(INIT)THEN
-	  TX=0.0D0		! ND:ND:NM
-	  TVX=0.0D0		! ND-1:ND:NM
+	  TX=0.0_LDP		! ND:ND:NM
+	  TVX=0.0_LDP		! ND-1:ND:NM
 	  DO I=1,ND
-	    JNUM1(I)=0.0D0
-	    RSQ_HNUM1(I)=0.0D0
-	    GAMH(I)=0.0D0
-	    GAM(I)=0.0D0
-	    W(I)=0.0D0
-	    WPREV(I)=0.0D0
-	    PSI(I)=0.0D0
-	    PSIPREV(I)=0.0D0
-	    TX_DIF_d_T(I)=0.0D0
-	    TX_DIF_d_dTdR(I)=0.0D0
-	    DJDT(I)=0.0D0
-	    DJDT_OLDT(I)=0.0D0
+	    JNUM1(I)=0.0_LDP
+	    RSQ_HNUM1(I)=0.0_LDP
+	    GAMH(I)=0.0_LDP
+	    GAM(I)=0.0_LDP
+	    W(I)=0.0_LDP
+	    WPREV(I)=0.0_LDP
+	    PSI(I)=0.0_LDP
+	    PSIPREV(I)=0.0_LDP
+	    TX_DIF_d_T(I)=0.0_LDP
+	    TX_DIF_d_dTdR(I)=0.0_LDP
+	    DJDT(I)=0.0_LDP
+	    DJDT_OLDT(I)=0.0_LDP
  	  END DO
-	  CHI_AT_INB_PREV=1.0D0
+	  CHI_AT_INB_PREV=1.0_LDP
 	ELSE
 	  DO I=1,ND-1
-	    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/dLOG_NU/( CHI(I)+CHI(I+1) )/C_KMS
-	    dH(I)=2.0D0*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
+	    GAMH(I)=2.0_LDP*(V(I)+V(I+1))/(R(I)+R(I+1))/dLOG_NU/( CHI(I)+CHI(I+1) )/C_KMS
+	    dH(I)=2.0_LDP*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
 	    dH_OLDT(I)=dH(I)*ROLD_ON_R
 	    W(I)=GAMH(I)+dH(I)
 	    WPREV(I)=GAMH(I)
@@ -305,7 +305,7 @@
 !
 	IF(INIT .AND. DO_TIME_VAR)THEN
 	  DO I=1,ND-1
-	    dH(I)=2.0D0*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
+	    dH(I)=2.0_LDP*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
 	    dH_OLDT(I)=dH(I)*ROLD_ON_R
 	    W(I)=dH(I)
 	  END DO
@@ -321,10 +321,10 @@
 ! Compute vectors used to compute the flux vector H.
 !
 	DO I=1,ND-1
-	  HU(I)=R(I+1)*R(I+1)*F(I+1)*Q(I+1)/(1.0D0+W(I))/DTAU(I)
-	  HL(I)=R(I)*R(I)*F(I)*Q(I)/(1.0D0+W(I))/DTAU(I)
-	  HS(I)=WPREV(I)/(1.0D0+W(I))
-	  HT(I)=dH_OLDT(I)/(1.0D0+W(I))
+	  HU(I)=R(I+1)*R(I+1)*F(I+1)*Q(I+1)/(1.0_LDP+W(I))/DTAU(I)
+	  HL(I)=R(I)*R(I)*F(I)*Q(I)/(1.0_LDP+W(I))/DTAU(I)
+	  HS(I)=WPREV(I)/(1.0_LDP+W(I))
+	  HT(I)=dH_OLDT(I)/(1.0_LDP+W(I))
 	END DO
 !
 ! Compute the TRIDIAGONAL operators, and the RHS source vector.
@@ -332,7 +332,7 @@
 	DO I=2,ND-1
 	  TA(I)=-HL(I-1)
 	  TC(I)=-HU(I)
-	  TB(I)=RSQ_DTAUONQ(I)*(1.0D0-THETA(I)) + PSI(I) + DJDT(I) +HU(I-1) +HL(I)
+	  TB(I)=RSQ_DTAUONQ(I)*(1.0_LDP-THETA(I)) + PSI(I) + DJDT(I) +HU(I-1) +HL(I)
 	  VB(I)=-HS(I-1)
 	  VC(I)=HS(I)
 	  XM(I)=RSQ_DTAUONQ(I)*SOURCE(I)
@@ -359,15 +359,15 @@
 	TC(1)=-R(2)*R(2)*F(2)*Q(2)/DTAU(1)
 	TB(1)=R(1)*R(1)*( F(1)*Q(1)/DTAU(1) + HONJ_OUTBC ) + PSI(1) + DJDt(1)
 	XM(1)=PSIPREV(1)*JNUM1(1) + DJDT_OLDT(1)*JNU_OLDt(1)
-	TA(1)=0.0D0
-	VB(1)=0.0D0
-	VC(1)=0.0D0
+	TA(1)=0.0_LDP
+	VB(1)=0.0_LDP
+	VC(1)=0.0_LDP
 !
-	HFLUX_AT_INB=DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
-	PSI(ND)=0.0D0
-	PSIPREV(ND)=0.0D0
+	HFLUX_AT_INB=DBB*R(ND)*R(ND)/3.0_LDP/CHI(ND)
+	PSI(ND)=0.0_LDP
+	PSIPREV(ND)=0.0_LDP
 	IF(.NOT. INIT)THEN
-	  dNU_TERM_DIF_BC=0.0D0
+	  dNU_TERM_DIF_BC=0.0_LDP
 !	  dNU_TERM_DIF_BC=GAM(ND)*(HFLUX_AT_INB-HFLUX_AT_INB_PREV)
 	END IF
 	IF(DO_TIME_VAR)THEN
@@ -379,16 +379,16 @@
 	  TB(ND)=R(ND)*R(ND)*F(ND)/DTAU(ND-1)
 	  XM(ND)=HFLUX_AT_INB+DJDt_OLDT(ND)+dNU_TERM_DIF_BC
 	  dRHSdCHI_DIF_BC=-(HFLUX_AT_INB+DJDt_OLDT(ND)+
-	1         2.0D0*dNU_TERM_DIF_BC+DJDT(ND)*HFLUX_AT_INB)/CHI(ND)
+	1         2.0_LDP*dNU_TERM_DIF_BC+DJDT(ND)*HFLUX_AT_INB)/CHI(ND)
 	ELSE
 	  I=ERROR_LU()
 	  WRITE(I,*)'Only diffusion approximation currently implemented'
 	  WRITE(I,*)'Routine is VAR_MOM_J_DDT_V1'
 	  STOP
 	END IF
-	TC(ND)=0.0D0
-	VB(ND)=0.0D0
-	VC(ND)=0.0D0
+	TC(ND)=0.0_LDP
+	VB(ND)=0.0_LDP
+	VC(ND)=0.0_LDP
 !
 ! Solve for the radiation field along ray for this frequency.
 !
@@ -448,7 +448,7 @@
 ! not vary in the linearization.
 !
 	CALL TUNE(1,'UP_TX')
-	DUMMY_VEC=0.0D0
+	DUMMY_VEC=0.0_LDP
 	CALL UP_TX_TVX(TX,TVX,KI,TA,TB,TC,PSIPREV,
 	1                       VB,VC,HU,HL,HS,RHS_dHdCHI,
 	1                       DUMMY_VEC,DUMMY_VEC,DUMMY_VEC,DUMMY_VEC,
@@ -474,11 +474,11 @@
 	    TX_DIF_d_dTdR(I)= PSIPREV(I)*TX_DIF_d_dTdR(I)
 	1             + VB(I)*TVX_DIF_d_dTdR(I-1) + VC(I)*TVX_DIF_d_dTdR(I)
 	  END DO
-	  T1=R(ND)*R(ND)/3.0D0/CHI(ND)
-	  TX_DIF_d_T(ND)=T1*dDBBdT*(1.0D0+DJDT(ND)) +
+	  T1=R(ND)*R(ND)/3.0_LDP/CHI(ND)
+	  TX_DIF_d_T(ND)=T1*dDBBdT*(1.0_LDP+DJDT(ND)) +
 	1          T1*GAM(ND)*(dDBBdT-dDBBdT_PREV*CHI(ND)/CHI_AT_INB_PREV)
 	  T1=T1/dTdR
-	  TX_DIF_d_dTdR(ND)=T1*DBB*(1.0D0+DJDT(ND)) +
+	  TX_DIF_d_dTdR(ND)=T1*DBB*(1.0_LDP+DJDT(ND)) +
 	1          T1*GAM(ND)*(DBB-DBB_PREV*CHI(ND)/CHI_AT_INB_PREV)
 !
 ! Solve for the radiation field along ray for this frequency.

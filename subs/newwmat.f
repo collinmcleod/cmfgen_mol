@@ -12,22 +12,22 @@ C
 	INTEGER LS,NC,NI,I
 	REAL(KIND=LDP) W(NI,NI),DTAU(NI),THETA(NI),TOR
 C
-	W(:,:)=0.0D0
+	W(:,:)=0.0_LDP
 C
 C Note the general non thick case, TOR is 0, hence W(1,1)=0 . The thick
 C case ocurrs when TOR is non zero.
 C
-	 IF(TOR .GT. 0.01D0)THEN
-	  W(1,1)=THETA(1)*(1.0D0-EXP(-TOR))
+	 IF(TOR .GT. 0.01_LDP)THEN
+	  W(1,1)=THETA(1)*(1.0_LDP-EXP(-TOR))
 	ELSE
 	  W(1,1)=THETA(1)*
-	1   (1.0D0-TOR/2.0D0*(1.0D0-TOR/3.0D0*(1.0D0-TOR/4.0D0)))*TOR
+	1   (1.0_LDP-TOR/2.0_LDP*(1.0_LDP-TOR/3.0_LDP*(1.0_LDP-TOR/4.0_LDP)))*TOR
 	END IF
 C
 	DO 20 I=2,NI-1
-	  W(I,I)=THETA(I)*(DTAU(I-1)+DTAU(I))*0.5D0
+	  W(I,I)=THETA(I)*(DTAU(I-1)+DTAU(I))*0.5_LDP
 20	CONTINUE
-	IF(LS .GT. NC)W(NI,NI)=-0.5D0*DTAU(NI-1)*THETA(NI)
+	IF(LS .GT. NC)W(NI,NI)=-0.5_LDP*DTAU(NI-1)*THETA(NI)
 C
 	RETURN
 	END

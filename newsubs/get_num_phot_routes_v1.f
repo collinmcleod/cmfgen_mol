@@ -42,7 +42,7 @@
 	INTEGER, PARAMETER :: MAX_NUM_ROUTES=40
 
 !
-! Many of these will be transferred to the PHOTIOINZATION module one the actual number 
+! Many of these will be transferred to the PHOTIOINZATION module one the actual number
 ! of photoionization routs are known.
 !
 	REAL(KIND=LDP) EXCITE_FREQ(MAX_NUM_ROUTES)              !Exictation energy of final level above ground state
@@ -104,7 +104,7 @@
 
 ! Only one alternate should match.
 !
-	  GSUM(PHOT_ID)=0.0D0
+	  GSUM(PHOT_ID)=0.0_LDP
           IF(XzSIX_PRES)THEN
             FOUND_FINAL_STATE=.FALSE.
 	    F_TO_S_SAVE=0
@@ -139,7 +139,7 @@
 	          END IF
                 END IF
 	      END DO
-	      IF(FOUND_FINAL_STATE)EXIT 
+	      IF(FOUND_FINAL_STATE)EXIT
             END DO
 	    IF(.NOT. FOUND_FINAL_STATE)THEN
 	      WRITE(6,*)'Final state not found ','  ',TRIM(DESC); FLUSH(UNIT=6)
@@ -299,7 +299,7 @@
 !
 	    L2=INDEX(STRING,'  ')
 	    T1=RD_FREE_VAL(STRING,1,L2-1,NEXT,' EXC_FREQ RDPHOT_GEN_V1')
-	    EION=1.0D-15*T1*SPEED_OF_LIGHT()
+	    EION=1.0E-15_LDP*T1*SPEED_OF_LIGHT()
 !
 	  ELSE IF(INDEX(STRING,'!Statistical weight of ion') .NE.  0)THEN
 !

@@ -12,7 +12,7 @@
 	INTEGER I
 	REAL(KIND=LDP) Z,A,GAMMA,T,N,E,ALPHA
 !
-	GAMMA=0.5772
+	GAMMA=0.5772_LDP
 !
 100	WRITE(6,*)'Input Z,T and N '
 	READ(5,*)Z,T,I
@@ -24,11 +24,11 @@
 	N=I
 C
 	N=I-1
-	A=15.7892*Z*Z/N/N/T
-	E=log( 1.0D0+EXP(-GAMMA/(1.0+2.0*A))/A )
+	A=15.7892_LDP*Z*Z/N/N/T
+	E=log( 1.0_LDP+EXP(-GAMMA/(1.0_LDP+2.0_LDP*A))/A )
 C
-	ALPHA=1.032D-13*Z*Z/SQRT(T)*(  E+log(A)+GAMMA -
-	1          A/N*( 1.0D0/3/N+(1.0-1.0/N-A/3/N)*E )  )
+	ALPHA=1.032E-13_LDP*Z*Z/SQRT(T)*(  E+log(A)+GAMMA -
+	1          A/N*( 1.0_LDP/3/N+(1.0_LDP-1.0_LDP/N-A/3/N)*E )  )
 C
 	WRITE(6,200)ALPHA
 200	FORMAT(3X,'ALPHA=',1PE9.3)

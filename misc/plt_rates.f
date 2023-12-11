@@ -149,7 +149,7 @@
 	SL_OPTION=' '
 	FL_OPTION=' '
 	IL_OPTION='NOCHANGE'
-	RATE_THRESHOLD=0.05
+	RATE_THRESHOLD=0.05_LDP
 	CURVE_TITLE_LENGTH=120
 !
 	WRITE(6,'(A)')' '
@@ -288,7 +288,7 @@
 	WRITE(6,*)'Number of lines read is',N_LINES
 	WRITE(6,'(A)')DEF_PEN
 !
-        LAM(1:N_LINES)=2.99792458D+03/NU(1:N_LINES)
+        LAM(1:N_LINES)=2.99792458E+03_LDP/NU(1:N_LINES)
 	LU=10
 	FILENAME='RVTJ'
 	ALLOCATE (R(ND),V(ND),ED(ND),T(ND),SIGMA(ND))
@@ -669,7 +669,7 @@
 	    WRITE(6,*)' '
 !
 	    DO I=1,ND
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO ML=1,N_TRANS
 	         T1=MAX(T1,ABS(NEW_RATES(ML,I)))
 	      END DO
@@ -697,7 +697,7 @@
 	    END IF
 	    CALL INDEXX(K,WRK_VEC,INDX,L_FALSE)
 !
-	    YV=0.0D0
+	    YV=0.0_LDP
 	    DO ML=1,N_TRANS_LIM
 	      L=INDX(ML)
 	      IF(L .LE. N_TRANS)THEN
@@ -776,7 +776,7 @@
 	      NEW_RATES(1:N_TRANS,I)=NEW_RATES(1:N_TRANS,I)*R(I)*R(I)/XV(I)
 	      IF(DO_NT_RATES)NEW_NT_RATES(:,I)=NEW_NT_RATES(:,I)*R(I)*R(I)/XV(I)
 	    END DO
-	    SUM_RATES=0.0D0
+	    SUM_RATES=0.0_LDP
 	    DO I=1,ND
 	      DO ML=1,N_TRANS
 	        SUM_RATES(ML)=SUM_RATES(ML)+ABS(NEW_RATES(ML,I))
@@ -793,13 +793,13 @@
               IF( INDEX(TRANS_NAME(LINK(J)),TRIM(LEVEL)) .GT.  K )DPTH_VEC=-DPTH_VEC
 	      CALL DP_CURVE(ND,XV,DPTH_VEC)
               WRITE(6,'(1X,A)')TRIM(TRANS_NAME(LINK(J)))
-	      SUM_RATES(J)=0.0D0
+	      SUM_RATES(J)=0.0_LDP
 	    END DO
 	    WRITE(6,*)'Done line curves'
 !
 	    IF(DO_AUTO_RATES)THEN
-	      T1=0.0D0
-	      YV=0.0D0; ZV=0.0D0
+	      T1=0.0_LDP
+	      YV=0.0_LDP; ZV=0.0_LDP
 	      DO J=1,N_AUTO
 	         IF(INDEX(AUTO_LEV_NAME(J),TRIM(LEVEL)) .NE. 0)THEN
 	           YV=YV+AUTO_REC_RATE(J,:)
@@ -854,9 +854,9 @@
 !
 ! We first deduce the maximum rate to each level.
 !
-	    MAX_RATE=0.0D0
+	    MAX_RATE=0.0_LDP
 	    IF(DO_AUTO_RATES)THEN
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO J=1,N_AUTO
 	         IF(INDEX(AUTO_LEV_NAME(J),TRIM(LEVEL)) .NE. 0)THEN
 	           T1=MAX(T1,AUTO_REC_RATE(J,DPTH_INDX))
@@ -888,7 +888,7 @@
 	    END IF
 !
 	    IF(N_COL_TRANS .NE. 0)THEN
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO ML=1,N_COL_TRANS
 	        T1=MAX(T1,ABS(NEW_COL_RATES(ML,I)))
 	      END DO
@@ -921,7 +921,7 @@
 	    TMP_FMT='(1X,A,T'//TMP_STR(1:2)//',26X,F9.5)'
 	    TMP_STR='(1X,A,T'//TMP_STR(1:2)//',ES15.4E5,3X,ES15.4E5,3X,F9.5)'
 !
-	    T1=0.0D0; I=DPTH_INDX; CNT=0
+	    T1=0.0_LDP; I=DPTH_INDX; CNT=0
 	    DO ML=N_TRANS,1,-1
 	      L=INDX(ML)
 	      IF( (INDEX(TRANS_NAME(LINK(L)),'('//TRIM(LEVEL)) .NE.  0 .AND. NEW_RATES(L,I) .GT. 0) .OR.
@@ -929,7 +929,7 @@
 	        T1=T1+ABS(NEW_RATES(L,I))
 	        CNT=CNT+1
 	        T2=NEW_RATES(L,I)/MAX_RATE
-	        IF(CNT .LE. N_TRANS_LIM .AND. ABS(T2) .GT.  0.00001)THEN
+	        IF(CNT .LE. N_TRANS_LIM .AND. ABS(T2) .GT.  0.00001_LDP)THEN
                   WRITE(6,TMP_STR)TRIM(TRANS_NAME(LINK(L))),T2,LAM(LINK(L)),T1/MAX_RATE
 	        END IF
 	      END IF
@@ -939,7 +939,7 @@
 	    WRITE(6,*)' '
 	    WRITE(6,*)'Transitions populating ',TRIM(LEVEL)
 	    WRITE(6,*)' '
-	    T1=0.0D0; CNT=0.0D0
+	    T1=0.0_LDP; CNT=0.0_LDP
 	    DO ML=N_TRANS,1,-1
 	      L=INDX(ML)
 	      IF( (INDEX(TRANS_NAME(LINK(L)),'('//TRIM(LEVEL)) .EQ.  0 .AND. NEW_RATES(L,I) .GT. 0) .OR.
@@ -947,7 +947,7 @@
 	        T1=T1+ABS(NEW_RATES(L,I))
 	        CNT=CNT+1
 	        T2=NEW_RATES(L,I)/MAX_RATE
-	        IF(CNT .LE. N_TRANS_LIM .AND. ABS(T2) .GT. 0.00001)THEN
+	        IF(CNT .LE. N_TRANS_LIM .AND. ABS(T2) .GT. 0.00001_LDP)THEN
                   WRITE(6,TMP_STR)TRIM(TRANS_NAME(LINK(L))),T2,LAM(LINK(L)),T1/MAX_RATE
 	        END IF
 	      END IF
@@ -959,7 +959,7 @@
 	      WRITE(6,*)'Non thermal transitions'
 	      DO ML=1,N_NT_TRANS
 	        T1=NEW_NT_RATES(ML,I)/MAX_RATE
-	        IF(ABS(T1) .GT. 0.00001)THEN
+	        IF(ABS(T1) .GT. 0.00001_LDP)THEN
 	          WRITE(6,TMP_STR)TRIM(NT_TRANS_NAME(NT_LINK(ML))),T1
 	        END IF
 	      END DO
@@ -981,7 +981,7 @@
 	        ELSE
 	          T1=NEW_COL_RATES(ML,I)/MAX_RATE
 	        END IF
-	        IF(ABS(T1) .GT. 0.00001)THEN
+	        IF(ABS(T1) .GT. 0.00001_LDP)THEN
 	          WRITE(6,TMP_STR)TRIM(COL_TRANS_NAME(COL_LINK(ML))),T1
 	        END IF
 	      END DO
@@ -992,8 +992,8 @@
 !    Note: SUM_TO   is the net rate where the level if interest is the LOWER level.
 !
 	    I=DPTH_INDX
-	    SUM_TO=0.0D0
-	    SUM_FROM=0.0D0
+	    SUM_TO=0.0_LDP
+	    SUM_FROM=0.0_LDP
 	    DO ML=1,N_TRANS
 	      IF(INDEX(TRANS_NAME(LINK(ML)),'('//TRIM(LEVEL)) .NE.  0)THEN
 	        SUM_FROM=SUM_FROM+NEW_RATES(ML,I)
@@ -1002,8 +1002,8 @@
 	      END IF
 	    END DO
 !
-	    NT_SUM_TO=0.0D0
-	    NT_SUM_FROM=0.0D0
+	    NT_SUM_TO=0.0_LDP
+	    NT_SUM_FROM=0.0_LDP
 	    DO ML=1,N_NT_TRANS
 	      IF(INDEX(NT_TRANS_NAME(NT_LINK(ML)),'('//TRIM(LEVEL)) .NE.  0)THEN
 	        NT_SUM_FROM=NT_SUM_FROM+NEW_NT_RATES(ML,I)
@@ -1012,8 +1012,8 @@
 	      END IF
 	    END DO
 !
-	    COL_SUM_TO=0.0D0
-	    COL_SUM_FROM=0.0D0
+	    COL_SUM_TO=0.0_LDP
+	    COL_SUM_FROM=0.0_LDP
 	    DO ML=1,N_COL_TRANS
 	      IF(INDEX(COL_TRANS_NAME(COL_LINK(ML)),'('//TRIM(LEVEL)) .NE.  0)THEN
 	        COL_SUM_FROM=COL_SUM_FROM+NEW_COL_RATES(ML,I)
@@ -1039,7 +1039,7 @@
 	    END IF
 !
 	    IF(DO_AUTO_RATES)THEN
-	      NET_AUTO=0.0D0
+	      NET_AUTO=0.0_LDP
 	      DO J=1,N_AUTO
 	        IF(INDEX(AUTO_LEV_NAME(J),TRIM(LEVEL)) .NE. 0)THEN
 	          WRITE(6,'(A)')' '

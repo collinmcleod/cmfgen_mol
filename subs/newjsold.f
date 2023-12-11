@@ -41,11 +41,11 @@ C
 C Zero RJ vector and set FB matrix equal to a unit matrix of dimension
 C (ND*ND) . Compute derivative of the opacity.
 C
-	FB(:,:)=0.0D0
+	FB(:,:)=0.0_LDP
 	DO 40 I=1,ND
-	  FB(I,I)=1.0D0
+	  FB(I,I)=1.0_LDP
 40	CONTINUE
-	RJ(:)=0.0D0
+	RJ(:)=0.0_LDP
 	CALL DERIVCHI(dCHIdr,CHI,R,ND,METHOD)
 C
 C ENTER LOOP FOR EACH IMPACT PARAMETER P
@@ -60,14 +60,14 @@ C
 C
 	IF(THK)THEN
 	  IF(P(LS) .GT. 0)THEN
-	    TOR=CHI(1)*R(1)*R(1)*(1.570796D0-ACOS(P(LS)/R(1)))/P(LS)
+	    TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	  ELSE
 	    TOR=CHI(1)*R(1)
 	  END IF
-	  IBOUND=ZETA(1)*(1.0D0-EXP(-TOR))
+	  IBOUND=ZETA(1)*(1.0_LDP-EXP(-TOR))
 	ELSE
-	  TOR=0.0D0
-	  IBOUND=0.0D0
+	  TOR=0.0_LDP
+	  IBOUND=0.0_LDP
 	END IF
 C
 C Compute Z and optical depth scale for this imapct parameter.

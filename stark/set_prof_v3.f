@@ -96,7 +96,7 @@
 ! Doppler profile is the same for all species, and is the same at all depths.
 !
 	IF(PROF_TYPE .EQ. 'DOP_FIX')THEN
-          T1=1.0D-15/1.77245385095516D0         !1.0D-15/SQRT(PI)
+          T1=1.0E-15_LDP/1.77245385095516_LDP         !1.0D-15/SQRT(PI)
           NU_DOP=NU_ZERO*VTURB_FIX/C_KMS
           DO I=1,ND
             PROF(I)=EXP( -( (NU(ML_CUR)-NU_ZERO)/NU_DOP )**2 )*T1/NU_DOP
@@ -106,9 +106,9 @@
 ! Doppler profile varies with species and depth.
 !
 	ELSE IF(PROF_TYPE .EQ. 'DOPPLER')THEN
-          T1=1.0D-15/1.77245385095516D0         !1.0D-15/SQRT(PI)
-          TMP_VEC(1:ND)=( VTURB_IN(1:ND)/12.85D0  )**2
-          T2=NU_ZERO*12.85D0/C_KMS
+          T1=1.0E-15_LDP/1.77245385095516_LDP         !1.0D-15/SQRT(PI)
+          TMP_VEC(1:ND)=( VTURB_IN(1:ND)/12.85_LDP  )**2
+          T2=NU_ZERO*12.85_LDP/C_KMS
           DO I=1,ND
             NU_DOP=T2*SQRT( TEMP_IN(I)/AMASS_IN + TMP_VEC(I) )
             PROF(I)=EXP( -( (NU(ML_CUR)-NU_ZERO)/NU_DOP )**2 )*T1/NU_DOP
@@ -116,8 +116,8 @@
 	  RETURN
 !
 	ELSE IF(PROF_TYPE .EQ. 'VOIGT')THEN
-          TMP_VEC(1:ND)=( VTURB_IN(1:ND)/12.85D0  )**2
-          T2=NU_ZERO*12.85D0/C_KMS
+          TMP_VEC(1:ND)=( VTURB_IN(1:ND)/12.85_LDP  )**2
+          T2=NU_ZERO*12.85_LDP/C_KMS
 	  LOC_GAM_RAD=GAM_RAD
 	  LOC_GAM_COL=GAM_COL
 	  ID=PROF_LIST_LOCATION
@@ -127,9 +127,9 @@
 	  END IF
 	  DO I=1,ND
             NU_DOP=T2*SQRT( TEMP_IN(I)/AMASS_IN + TMP_VEC(I) )
-	    A_VOIGT=0.25D-15*(LOC_GAM_RAD+LOC_GAM_COL*ED_IN(I))/PI/NU_DOP
+	    A_VOIGT=0.25E-15_LDP*(LOC_GAM_RAD+LOC_GAM_COL*ED_IN(I))/PI/NU_DOP
 	    V_VOIGT=(NU(ML_CUR)-NU_ZERO)/NU_DOP
-	    PROF(I)=1.0D-15*VOIGT(A_VOIGT,V_VOIGT)/NU_DOP
+	    PROF(I)=1.0E-15_LDP*VOIGT(A_VOIGT,V_VOIGT)/NU_DOP
 	  END DO
 	  RETURN
 !
@@ -213,7 +213,7 @@
 	    STOP
 	  END IF
 	  STORE_AVAIL(LOC_INDX)=.FALSE.
-	  PROF_STORE(:,:,LOC_INDX)=0.0D0
+	  PROF_STORE(:,:,LOC_INDX)=0.0_LDP
 !
 ! Determine how many frequencies we need to compute profile at, and check
 ! we have sufficent storage.
@@ -272,7 +272,7 @@
 ! Convert from Frequency to Angstrom space, measured from line center.
 !
 	  DO ML=ML_ST,ML_END
-	    DWS_GRIEM(ML-ML_ST+1)=0.01D0*C_KMS*(1.0D0/NU(ML)-1.0D0/NU_ZERO)
+	    DWS_GRIEM(ML-ML_ST+1)=0.01_LDP*C_KMS*(1.0_LDP/NU(ML)-1.0_LDP/NU_ZERO)
 	  END DO
 !
 ! Now compute, and store the Doppler broadened Stark profile for each
@@ -285,9 +285,9 @@
 	    WRITE(LUER,*)'# of storage locatins requires is:',NF
 	    STOP
 	  END IF
-	  PROF_STORE(1:ND,1:NF,LOC_INDX)=0.0D0
+	  PROF_STORE(1:ND,1:NF,LOC_INDX)=0.0_LDP
 	  DO I=1,ND
-	    TMP_ED=1.0D+16
+	    TMP_ED=1.0E+16_LDP
 	    TMP_ED=MIN(ED_IN(I),TMP_ED)
             CALL GRIEM_V2(PR_GRIEM,DWS_GRIEM,NF,
 	1        TMP_ED,TEMP_IN(I),VTURB_IN(I),
@@ -298,12 +298,12 @@
 ! 10^15 before scaling.
 !
 	    IF(NORM_PROFILE)THEN
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO ML=1,NF-1
-	        T1=T1+0.5D0*(NU(ML_ST+ML-1)-NU(ML_ST+ML))*
+	        T1=T1+0.5_LDP*(NU(ML_ST+ML-1)-NU(ML_ST+ML))*
 	1                       (PR_GRIEM(ML)+PR_GRIEM(ML+1))
 	      END DO
-	      T1=ABS(T1)*1.0D+15
+	      T1=ABS(T1)*1.0E+15_LDP
 	      PROF_STORE(I,1:NF,LOC_INDX)=PR_GRIEM(1:NF)/T1
 	    ELSE
 	      PROF_STORE(I,1:NF,LOC_INDX)=PR_GRIEM(1:NF)

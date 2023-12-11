@@ -72,12 +72,12 @@
 	REAL(KIND=LDP) CHIBF,CHIFF,HDKT,TWOHCSQ
 !
 	WRITE(6,*)'BEGIN COMP_GREY',ND,NC,NP
-	PI=4.0D0*ATAN(1.0D0)
+	PI=4.0_LDP*ATAN(1.0_LDP)
 	CHI(1:ND)=ROSSMEAN(1:ND)
 !
 	IF(PLANE_PARALLEL_NO_V)THEN
-           FEDD=0.3333D0
-	   HBC_CMF=0.7D0; NBC_CMF=0.0D0; FL=1.0D0; INBC=0.1D0
+           FEDD=0.3333_LDP
+	   HBC_CMF=0.7_LDP; NBC_CMF=0.0_LDP; FL=1.0_LDP; INBC=0.1_LDP
 	   NEW_FREQ=.TRUE.; FIRST_FREQ=.TRUE.
 !
 ! Note HFLUX=LUM*Lsun/16/(PI*PI)/10**2 (10**2 for 1/R**2).
@@ -85,9 +85,9 @@
 ! diffusion approximation. Since we are dealing with a plane-parallel
 ! atmopshere, we divide HFLUX by R*^2.
 !
-	   HFLUX=3.826D+13*LUM/16.0D0/PI**2/R(ND)/R(ND)
-           DBB=3.0D0*CHI(ND)*HFLUX
-	   T1=1000.0D0
+	   HFLUX=3.826E+13_LDP*LUM/16.0_LDP/PI**2/R(ND)/R(ND)
+           DBB=3.0_LDP*CHI(ND)*HFLUX
+	   T1=1000.0_LDP
 !
 ! Compute radial (vertical) optical depth increments.
 !
@@ -98,7 +98,7 @@
 ! Compute the solution vector. Note that the units need to be
 ! eventually included. The following follows direcly from d2K/d2Tau=0.
 !
-	   DO WHILE(T1 .GT. 1.0D-08)
+	   DO WHILE(T1 .GT. 1.0E-08_LDP)
 	     T2=FEDD(1)/HBC_CMF
 	     RJ(1)=HFLUX/HBC_CMF
 	     DO I=2,ND
@@ -109,7 +109,7 @@
 	     SOURCE(1:ND)=RJ
 	     CALL FCOMP_PP_V2(R,TC,GAMH,SOURCE,CHI,IPLUS,HBC_CMF,
 	1               NBC_CMF,INBC,DBB,IC,THK_CONT,DIF,ND,NC,METHOD)
-	     T1=0.0D0
+	     T1=0.0_LDP
 	     DO I=1,ND
 	       T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
 	       FEDD(I)=GAMH(I)
@@ -132,18 +132,18 @@
 ! This routine will supersede the one above, and included to zero
 ! order the effect of the velocity field.
 !
-	   T2=1.0D-05		!Accuracy to converge f
+	   T2=1.0E-05_LDP		!Accuracy to converge f
 	   CALL JGREY_WITH_FVT(RJ,SOB,CHI,R,V,SIGMA,
 	1           P,AQW,HMIDQW,KQW,NMIDQW,
 	1           LUM,METHOD,DIF,IC,T2,ND,NC,NP)
 !
 	ELSE IF(USE_J_REL)THEN
 !
-	  FEDD(1:ND)=0.3D0		!Initial guess
-	  H_ON_J(1:ND)=0.0D0		!Initial guess
-	  GAMH(1:ND)=0.0D0		!Old FEDD
-	  XM(1:ND)=0.0D0		!As grey solution, not needed (ETA)
-	  dlnJdlnR=0.0D0
+	  FEDD(1:ND)=0.3_LDP		!Initial guess
+	  H_ON_J(1:ND)=0.0_LDP		!Initial guess
+	  GAMH(1:ND)=0.0_LDP		!Old FEDD
+	  XM(1:ND)=0.0_LDP		!As grey solution, not needed (ETA)
+	  dlnJdlnR=0.0_LDP
 	  NEW_FREQ=.TRUE.
 	  WRITE(LUER,*)'Using MOM_JREL_GREY_V1 for grey solution'
 !
@@ -152,10 +152,10 @@
 !   DBB = dBdR = 3.Chi.L/16(piR)**2
 !   DBB is used for the lower boundary diffusion approximation.
 !
-	  HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
-          DBB=3.0D0*HFLUX*CHI(ND)
-	  T1=1.0D0
-	  DO WHILE(T1 .GT. 1.0D-05)
+	  HFLUX=3.826E+13_LDP*LUM/(4.0_LDP*PI*R(ND))**2
+          DBB=3.0_LDP*HFLUX*CHI(ND)
+	  T1=1.0_LDP
+	  DO WHILE(T1 .GT. 1.0E-05_LDP)
             CALL MOM_JREL_GREY_V1(XM,CHI,CHI,V,SIGMA,R,
 	1              H_ON_J,FEDD,dlnJdlnR,
 	1              RJ,RSQHNU,HBC_CMF,INBC,
@@ -165,7 +165,7 @@
 	    CALL FGREY_NOREL_V1(FEDD,H_ON_J,RJ,CHI,R,V,SIGMA,
 	1              P,AQW,HMIDQW,KQW,LUM,IC,METHOD,
 	1              HBC_CMF,INBC,DIF,ND,NC,NP)
-	    T1=0.0D0
+	    T1=0.0_LDP
 	    DO I=1,ND
 	      T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
 	      GAMH(I)=FEDD(I)
@@ -176,7 +176,7 @@
 !
 	ELSE IF(USE_DJDT_RTE)THEN
 !
-	   T2=1.0D-06		!Accuracy to converge f
+	   T2=1.0E-06_LDP		!Accuracy to converge f
 	   WRITE(6,*)'BEF',ND,NC,NP
 	   CALL JGREY_HUB_DDT_V1(RJ,SOB,CHI,R,V,SIGMA,
 	1              P,AQW,HMIDQW,KQW,LUM,METHOD,DIF,IC,
@@ -188,15 +188,15 @@
 ! will always be optically thin.
 !
 	    DO I=1,ND
-	      FEDD(I)=1.0D0/3.0D0
+	      FEDD(I)=1.0_LDP/3.0_LDP
 	    END DO
-	    HBC_J=1.0D0
-	    T1=1000.0D0
-	    DO WHILE(T1 .GT. 1.0D-06)
+	    HBC_J=1.0_LDP
+	    T1=1000.0_LDP
+	    DO WHILE(T1 .GT. 1.0E-06_LDP)
 	      CALL JGREY(TA,TB,TC,XM,DTAU,R,Z,P,RJ,
 	1        GAM,GAMH,Q,FEDD,CHI,dCHIdR,
 	1        AQW,KQW,LUM,HBC_J,T2,NC,ND,NP,METHOD)
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO I=1,ND
 	        T1=MAX(ABS(FEDD(I)-GAMH(I)),T1)
 	        FEDD(I)=GAMH(I)
@@ -214,7 +214,7 @@
 ! at boundary.
 !
 	DO I=1,ND
-	  TGREY(I)=((PI/5.67D-05*RJ(I))**0.25D0)*1.0D-04
+	  TGREY(I)=((PI/5.67E-05_LDP*RJ(I))**0.25_LDP)*1.0E-04_LDP
 	END DO
 !
 ! Compute the Rosseland optical depth scale. The ' ' in TORSCL indicates TYPE of atmosphere,

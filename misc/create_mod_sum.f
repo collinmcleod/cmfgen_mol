@@ -162,7 +162,7 @@
 	       K=INDEX(STRING,'R*')
 	       RCORE=STRING(K+8:)
 	       READ(RCORE,*)T1
-	       IF(T1 .LT. 1.0 .AND. T1 .GT. 0.1)THEN
+	       IF(T1 .LT. 1.0_LDP .AND. T1 .GT. 0.1_LDP)THEN
 	         WRITE(RCORE,'(F5.3)')T1
 	       END IF
 	       WRITE(6,*)'RCORE=',RCORE
@@ -181,7 +181,7 @@
 	  K=INDEX(STRING,' ')
 	  RSTAR=STRING(1:K)
 	  READ(RSTAR,*)T1
-	  IF(T1 .LT. 1.0 .AND. T1 .GT. 0.1)THEN
+	  IF(T1 .LT. 1.0_LDP .AND. T1 .GT. 0.1_LDP)THEN
 	    WRITE(RSTAR,'(F5.3)')T1
 	  END IF
 !

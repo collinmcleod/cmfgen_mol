@@ -45,13 +45,13 @@
 	  IF(CHI(1) .GT. 0 .AND. CHI(INDX) .GT. CHI(1))THEN
 	   TOR(1)=CHI(1)*(R(1)-R(INDX))/LOG(CHI(INDX)/CHI(1))
 	  ELSE
-	    TOR(1)=0.00001
+	    TOR(1)=0.00001_LDP
 	    WRITE(LUER,*)'Warning - optical depth at boundary set to 10^{-5} in TORSCL'
 	  END IF
 	ELSE IF (CHI(1) .GT. 0 .AND. CHI(INDX) .GT. CHI(1))THEN
 	  T1=LOG(CHI(1)/CHI(INDX))/LOG(R(INDX)/R(1))
-	  IF(T1 .GT. 1.5D0)THEN
-	   TOR(1)=CHI(1)*R(1)/(T1-1.0D0)
+	  IF(T1 .GT. 1.5_LDP)THEN
+	   TOR(1)=CHI(1)*R(1)/(T1-1.0_LDP)
 	  ELSE
 	    TOR(1)=CHI(1)*R(1)
 	    IF(WR_ASSUMED_ATM)WRITE(LUER,*)'Warning - opacity assumed to be r**(-2) in TORSCL'

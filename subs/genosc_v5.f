@@ -81,7 +81,7 @@ C Initialize arrays.
 C
 	DO I=1,N
 	  DO J=1,N
-	     EINA(J,I)=0.0D0
+	     EINA(J,I)=0.0_LDP
 	  END DO
 	END DO
 C
@@ -212,7 +212,7 @@ C
 	    STAT_WT(I)=RD_FREE_VAL(STRING,L1+1,STR_LEN,NEXT,DESC)
 	    DESC='FEDGE read in GENOSCIL-'//FILNAME
 	    FEDGE(I)=RD_FREE_VAL(STRING,NEXT,STR_LEN,NEXT,DESC)
-	    FEDGE(I)=(IONIZATION_EN-FEDGE(I))*SPEED_LIGHT*1.0D-15
+	    FEDGE(I)=(IONIZATION_EN-FEDGE(I))*SPEED_LIGHT*1.0E-15_LDP
 	    BIGLEN=MAX(BIGLEN,L1)
 	  END DO
 C
@@ -276,7 +276,7 @@ C
 	  READ(STRING(L1+1:),*)J
 	  IF(I .LE. N .AND. J .LE. N)THEN
 	    IF(STAT_WT(I)*ABS(T1) .LT. GF_CUT .AND. I .GT. LEV_CUT)THEN
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      CUT_CNT=CUT_CNT+1
 	    END IF
 	    EINA(I,J)=T1
@@ -291,7 +291,7 @@ C
 C
 C Check for transitions of secondary importance.
 C
-	NTRET=0.0D0			!Actual number of transitions
+	NTRET=0.0_LDP			!Actual number of transitions
 	DO I=2,N
 	  DO J=1,I
 	    IF(EINA(J,I) .LT. 0)EINA(J,I)=-EINA(J,I)

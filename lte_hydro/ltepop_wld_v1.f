@@ -44,16 +44,16 @@ C
 C Compute the LTE populations of the levels in the full atom, taking level
 C dissolution into account.
 C
-	RGU=LOG(2.07078D-22)
+	RGU=LOG(2.07078E-22_LDP)
 	DO K=1,ND
 	  X=HDKT/T(K)
-	  Y=ED(K)*DIC2(K)*( T(K)**(-1.5) )/GION_C2
+	  Y=ED(K)*DIC2(K)*( T(K)**(-1.5_LDP) )/GION_C2
 	  IF(Y .GT. 0)THEN
 	    DO I=1,NC2
 	      C2LTE(I,K)=W_C2(I,K)*GC2(I)*Y*EXP(EDGEC2(I)*X+RGU)
 	    END DO
 	  ELSE
-	    C2LTE(:,K)=0.0D0
+	    C2LTE(:,K)=0.0_LDP
 	  END IF
 	END DO
 C

@@ -83,7 +83,7 @@
 	WRITE(45,'(/,A,5(5X,A))')'     I','   STEQ_A','   STEQ_B','STEQ(A-B)','PRED(A-B)','  % Diff.'
 	DO I=1,NT
 	  T1=STEQ_A(I)-STEQ_B(I)
-	  IF(T1 .NE. 0)T1=100.0D0*(dSTEQ(I)/T1-1.0D0)
+	  IF(T1 .NE. 0)T1=100.0_LDP*(dSTEQ(I)/T1-1.0_LDP)
 	  IF(ABS(T1) .LT. 100000)THEN
 	     WRITE(45,'(2X,I4,4ES14.4,F14.4)')I,STEQ_A(I),STEQ_B(I),STEQ_A(I)-STEQ_B(I),
 	1            dSTEQ(I),T1

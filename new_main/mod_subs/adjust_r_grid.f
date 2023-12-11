@@ -80,10 +80,10 @@
 !
 	DO I=1,ND
 	  TA(I)=FLUXMEAN(I)
-	  IF(TA(I) .LE. 0.0D0)TA(I)=ESEC(I)
+	  IF(TA(I) .LE. 0.0_LDP)TA(I)=ESEC(I)
 	  TA(I)=TA(I)*CLUMP_FAC(I)
 	END DO
-        TB(1:ND)=0.0D0                              !Used for dCHIdR
+        TB(1:ND)=0.0_LDP                              !Used for dCHIdR
         CALL NORDTAU(dTAU_OLD,TA,R,R,TB,ND)
 !
 ! Save existing grid, which will be used for the interplations.
@@ -93,7 +93,7 @@
 ! Compute optical depth scale. Note that we are passed the optical detph
 ! increments, not the optical depth scale.
 !
-	TAU_OLD(1:ND)=0.0D0
+	TAU_OLD(1:ND)=0.0_LDP
 	DO I=2,ND
 	  TAU_OLD(I)=TAU_OLD(I-1)+dTAU_OLD(I-1)
 	END DO
@@ -105,8 +105,8 @@
 	TAU_OLD(2)=TAU_OLD(3)*R_OLD(2)/R_OLD(1)
 	TAU_OLD(1:ND)=LOG10(TAU_OLD(1:ND))
 !
-	FG_MIN=-3.0D0
-	FG_MAX=1.50D0
+	FG_MIN=-3.0_LDP
+	FG_MAX=1.50_LDP
 	FG_RANGE=FG_MAX-FG_MIN
 !
 	IF( TRIM(GRID_TYPE) .EQ. 'UNIFORM')THEN
@@ -116,7 +116,7 @@
 	    FG_MAX=RG_PARS(2)
 	    FG_RANGE=FG_MAX-FG_MIN
 	  END IF
-	  NX=(FG_RANGE+0.7D0*DTAU)/DTAU
+	  NX=(FG_RANGE+0.7_LDP*DTAU)/DTAU
 	ELSE IF( TRIM(GRID_TYPE) .EQ. 'FIX_NX')THEN
 	  NX=RG_PARS(1)
 	  IF(N_PARS .EQ. 3)THEN
@@ -144,12 +144,12 @@
 	DO I=4,I1
 	  TAU(I)=TAU_OLD(1)+DTAU*(I-3)
 	END DO
-        TAU(2)=MIN(TAU_OLD(2),TAU(1)+0.1D0*DTAU)
-        TAU(3)=MIN(TAU_OLD(3),TAU(1)+0.3D0*DTAU)
+        TAU(2)=MIN(TAU_OLD(2),TAU(1)+0.1_LDP*DTAU)
+        TAU(3)=MIN(TAU_OLD(3),TAU(1)+0.3_LDP*DTAU)
 !
 ! Do the insertion in the crtical section.
 !
-	DTAU=4.5D0/(NX-1)
+	DTAU=4.5_LDP/(NX-1)
 	DO I=I1+1,I1+NX
 	  TAU(I)=FG_MIN+DTAU*(I-I1-1)
 	END DO
@@ -163,8 +163,8 @@
 	  TAU(I)=TAU(I-1)+DTAU
 	END DO
 	TAU(ND)=TAU_OLD(ND)
-	TAU(ND-1)=MAX(TAU_OLD(ND-1),TAU(ND)-0.1D00*DTAU)
-	TAU(ND-2)=TAU(ND)-0.5D00*DTAU
+	TAU(ND-1)=MAX(TAU_OLD(ND-1),TAU(ND)-0.1E00_LDP*DTAU)
+	TAU(ND-2)=TAU(ND)-0.5E00_LDP*DTAU
 !
 ! Compute the new radius grid. Linear interpolation is
 ! more than adequate, since we're just defining a new grid.
@@ -211,7 +211,7 @@
 	DENSITY(1:ND)=EXP(DENSITY(1:ND))
 !
 	DO ISPEC=1,NUM_SPECIES
-	  IF(POP_SPECIES(1,ISPEC) .NE. 0.0D0)THEN
+	  IF(POP_SPECIES(1,ISPEC) .NE. 0.0_LDP)THEN
 	    TA=LOG(POP_SPECIES(:,ISPEC))
 	    CALL MON_INTERP(TB,ND,IONE,LOG_R,ND,TA,ND,LOG_R_OLD,ND)
 	    POP_SPECIES(:,ISPEC)=EXP(TB)
@@ -243,7 +243,7 @@
 	END IF
 !
 	DO LS=1,NP
-	  MU_AT_RMAX(LS)=SQRT( 1.0D0 -(P(LS)/R(1))**2 )
+	  MU_AT_RMAX(LS)=SQRT( 1.0_LDP -(P(LS)/R(1))**2 )
 	  HQW_AT_RMAX(LS)=HQW(1,LS)
 	END DO
 !

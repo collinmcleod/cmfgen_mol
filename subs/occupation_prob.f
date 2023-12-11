@@ -39,28 +39,28 @@ C
 C
 	IF(MOD_DO_LEV_DIS)THEN
 	  DO LEV=1,NC2
-	    T1=3.289395D0*ZC2*ZC2/EDGE_C2(LEV)
-	    NEFF=0.0D0
-	    IF(T1 .GT. 0.0D0 .AND. T1 .LT. 961.0D0)NEFF=SQRT(T1)
-	    IF(NEFF .LE. 2.01D0*ZC2)THEN			!0.01 allows for atomic mass
+	    T1=3.289395_LDP*ZC2*ZC2/EDGE_C2(LEV)
+	    NEFF=0.0_LDP
+	    IF(T1 .GT. 0.0_LDP .AND. T1 .LT. 961.0_LDP)NEFF=SQRT(T1)
+	    IF(NEFF .LE. 2.01_LDP*ZC2)THEN			!0.01 allows for atomic mass
 	      DO I=1,ND
-	        W_C2(LEV,I)=1.0D0
+	        W_C2(LEV,I)=1.0_LDP
 	      END DO
 	    ELSE
-	      REAL_K=16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3 .0D0
-	      IF(NEFF .LE. 3.0D0)REAL_K=1.0D0
-	      REAL_K=( REAL_K/ZC2*(ZC2/NEFF)**4 )**1.5D0
+	      REAL_K=16.0_LDP*NEFF/(1+NEFF)/(1+NEFF)/3 .0_LDP
+	      IF(NEFF .LE. 3.0_LDP)REAL_K=1.0_LDP
+	      REAL_K=( REAL_K/ZC2*(ZC2/NEFF)**4 )**1.5_LDP
 	      DO I=1,ND
-	        Y=1.091D0*(X_LEV_DIS(I)+4.0D0*(ZC2-1.0D0)*A_LEV_DIS(I))
+	        Y=1.091_LDP*(X_LEV_DIS(I)+4.0_LDP*(ZC2-1.0_LDP)*A_LEV_DIS(I))
 	        BETA=REAL_K*B_LEV_DIS(I)
-	        F=Y*BETA*BETA/(7.782D0+X_LEV_DIS(I)*BETA)
-	        W_C2(LEV,I)=F/(1.0D0+F)
-	        IF(W_C2(LEV,I) .GT. 0.99999999D0)W_C2(LEV,I)=1.0D0
+	        F=Y*BETA*BETA/(7.782_LDP+X_LEV_DIS(I)*BETA)
+	        W_C2(LEV,I)=F/(1.0_LDP+F)
+	        IF(W_C2(LEV,I) .GT. 0.99999999_LDP)W_C2(LEV,I)=1.0_LDP
 	      END DO
 	    END IF
 	  END DO
 	ELSE
-	  W_C2(:,:)=1.0D0
+	  W_C2(:,:)=1.0_LDP
 	END IF
 C
 	RETURN

@@ -14,7 +14,7 @@ C
 	  END DO
 	ELSE
 	  DO I=1,ND
-	    X(I)=0.0D0
+	    X(I)=0.0_LDP
 	  END DO
 	END IF
 C

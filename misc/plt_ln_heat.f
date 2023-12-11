@@ -161,9 +161,9 @@
 	WRITE(6,'(A)')DEF_PEN
 !
         IF(SOB_MODEL)THEN
-          NU(1:N_LINES)=2.99792458D+03/LAM(1:N_LINES)
+          NU(1:N_LINES)=2.99792458E+03_LDP/LAM(1:N_LINES)
         ELSE
-          LAM(1:N_LINES)=2.99792458D+03/NU(1:N_LINES)
+          LAM(1:N_LINES)=2.99792458E+03_LDP/NU(1:N_LINES)
 	END IF
 !
 ! Set def axis.
@@ -231,11 +231,11 @@
 !
 	    IDEPTH=ND
 	    CALL GEN_IN(IDEPTH,'Depth for plotting')
-	    SUMD=0.0D0; SPEC(1:NS_MAX)=' '
+	    SUMD=0.0_LDP; SPEC(1:NS_MAX)=' '
 !
 	    NSPEC=0
 	    DO ML=1,N_LINES
-	      Y(ML)=LH(IDEPTH,ML)*(1.0D0-SCALE_FAC(ML))
+	      Y(ML)=LH(IDEPTH,ML)*(1.0_LDP-SCALE_FAC(ML))
 	      I=INDEX(NAME(ML),'(')
 	      DO J=1,200
 	        IF(SPEC(J) .EQ. ' ')THEN
@@ -277,10 +277,10 @@
 	        WRITE(27,'(1X,A,T71,A,2X,A,6X,A,4X,A)')'Transition','Lam(A)','Frac. Contr.','Cur. Sum','Scale Fac.'
 	        WRITE(27,'(A)')' '
 	        T1=SUM(SUMD)
-	        CUR_SUM=0.0D0
+	        CUR_SUM=0.0_LDP
 	        DO I=N_LINES,N_LINES-29,-1
 	          J=INDX(I)
-	          T2=LH(IDEPTH,J)*(1.0D0-SCALE_FAC(J))/T1
+	          T2=LH(IDEPTH,J)*(1.0_LDP-SCALE_FAC(J))/T1
 	          CUR_SUM=CUR_SUM+T2
 	          WRITE(27,'(1X,A60,ES16.6,2ES14.3,ES14.5)')NAME(J),LAM(J), LH(IDEPTH,J)*(1.0D0-SCALE_FAC(J))/T1,CUR_SUM,SCALE_FAC(J)
 	        END DO
@@ -289,7 +289,7 @@
 !
 	  ELSE IF(UC(PLT_OPT) .EQ. 'SF')THEN
 	    CALL GEN_IN(K,'Depth for plotting')
-	    Y(1:N_LINES)=SCALE_FAC(1:N_LINES)-1.0D0
+	    Y(1:N_LINES)=SCALE_FAC(1:N_LINES)-1.0_LDP
 	    CALL DP_CURVE(N_LINES,XV,Y)
 	    YLABEL='SF-1.0'
 !

@@ -58,14 +58,14 @@
 	REAL(KIND=LDP) TMP
 	REAL(KIND=LDP) CLIGHT,SRT
 	CHARACTER*80 STRING
-	DATA CLIGHT/2.997925D18/
-	DATA SRT/1.414213562D0/
+	DATA CLIGHT/2.997925E18_LDP/
+	DATA SRT/1.414213562_LDP/
 !
 	REAL(KIND=LDP) VOIGTN
 	EXTERNAL VOIGTN
 !
-	FT=NU_ZERO*1.D15
-	RFT=1./FT
+	FT=NU_ZERO*1.E15_LDP
+	RFT=1._LDP/FT
 !
 ! Obtain profile information: At present this is slow, since it may
 ! necessitate reading the entire file. We skipe over comments, indicated
@@ -106,10 +106,10 @@
 	RWT=FT/CLIGHT
 !
 DEPTH:	DO IDE=1,ND
-	  TT=TE(IDE)*1.D4
+	  TT=TE(IDE)*1.E4_LDP
 	  EE=ED(IDE)
-	  VMOT=12.85d0*SQRT(TE(IDE)/AMASS+(VTURB(IDE)/12.85)**2.)/2.997925D5
-	  VMOT=1./VMOT	! (CLIGHT/(Vth+Vtur)) with Amass
+	  VMOT=12.85_LDP*SQRT(TE(IDE)/AMASS+(VTURB(IDE)/12.85_LDP)**2._LDP)/2.997925E5_LDP
+	  VMOT=1._LDP/VMOT	! (CLIGHT/(Vth+Vtur)) with Amass
 	  RBHZ=VMOT*RFT							
 	  RBA=VMOT*RWT								
 !
@@ -132,8 +132,8 @@ DEPTH:	DO IDE=1,ND
 !
 	  Y=EE/STKTB_ELE
 	  PP=EE
-	  VM=8.78*(2.0*EE-PP)/(EE*SRT)
-	  RHOM=0.62029/EE**0.333333
+	  VM=8.78_LDP*(2.0_LDP*EE-PP)/(EE*SRT)
+	  RHOM=0.62029_LDP/EE**0.333333_LDP
 !
 !-----Impact width width (A)
 !
@@ -145,23 +145,23 @@ DEPTH:	DO IDE=1,ND
 !
 !-----Ion broadening parameters
 !
-	  ALF=(WF*(STKTB_AS(IA)-STKTB_AS(IB))+STKTB_AS(IB)) *Y**0.25
-	  SIGMA=1.885E14*W*RHOM*VM*RWT*RWT
-	  X=ALF*0.888889/SIGMA**0.666667
+	  ALF=(WF*(STKTB_AS(IA)-STKTB_AS(IB))+STKTB_AS(IB)) *Y**0.25_LDP
+	  SIGMA=1.885E14_LDP*W*RHOM*VM*RWT*RWT
+	  X=ALF*0.888889_LDP/SIGMA**0.666667_LDP
 !
 !-----Total width in Doppler units
 !
-	  A=W*(1.0+1.36*X)*RBA
+	  A=W*(1.0_LDP+1.36_LDP*X)*RBA
 !
 !-----Total shift in Doppler units
 !
-	  DLS=W*D*(1.0+2.36*X/ABS(D))*RBA
+	  DLS=W*D*(1.0_LDP+2.36_LDP*X/ABS(D))*RBA
 	  FOS=1.0
 !
 !-----Satellite components
 !							
 	  X=FOS
-	  CON=6.268773E-2*RBHZ/X
+	  CON=6.268773E-2_LDP*RBHZ/X
 !
 !-----Compute profile
 !
@@ -169,7 +169,7 @@ DEPTH:	DO IDE=1,ND
 	    DB=-(FREQ(J)-NU_ZERO)*VMOT/NU_ZERO
 	    VA=DB-DLS
 	    VB=VA-STKTB_DLP
-	    P=FOS*(8.0*VOIGTN(A,VA)+VOIGTN(A,VB))
+	    P=FOS*(8.0_LDP*VOIGTN(A,VA)+VOIGTN(A,VB))
 	    PRO(IDE,J)=CON*P
 	  END DO
   	END DO DEPTH

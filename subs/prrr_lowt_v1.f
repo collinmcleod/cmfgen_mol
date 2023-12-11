@@ -33,7 +33,7 @@
 	REAL(KIND=LDP) CHIBF,CHIFF
 	REAL(KIND=LDP) HDKT,TWOHCSQ
 !
-        H=6.6261965D-12                                 !ergs/s (*1.0E+15 due to *nu)
+        H=6.6261965E-12_LDP                                 !ergs/s (*1.0E+15 due to *nu)
 !
 ! Note that JREC     = Int [ (2hv^3/c^2 +J) exp(-hv/kT)/v dv ]
 !           JREC_CR  = Int [ (2hv^3/c^2 +J) exp(-hv/kT)   dv ]
@@ -43,7 +43,7 @@
             DO IPR=1,ATM(ID)%N_XzV_PHOT
 	      ION_LEV=ATM(ID)%XzV_ION_LEV_ID(IPR)
 !
-	      LOG_JB_RAT=0.0D0
+	      LOG_JB_RAT=0.0_LDP
 	      DO J=1,ND
 	        T1=( TWOHCSQ*(NU**3)+RJ(J) )*FQW/NU
 	        IF(ION_LEV .NE. 1)THEN
@@ -51,7 +51,7 @@
 	1          (ATM(ID+1)%LOG_XzVLTE(1,J)-ATM(ID+1)%LOG_XzVLTE(ION_LEV,J))
 	        END IF
 	        DO I=1,ATM(ID)%NXzV
-	          IF(ATM(ID)%WSXzV(I,J,IPR) .NE. 0 .AND. ATM(ID)%XzVLTE(I,J) .EQ. 0.0D0)THEN
+	          IF(ATM(ID)%WSXzV(I,J,IPR) .NE. 0 .AND. ATM(ID)%XzVLTE(I,J) .EQ. 0.0_LDP)THEN
 	            T2=T1*EXP(LOG_JB_RAT+ATM(ID)%LOG_XzVLTE(I,J)-HDKT*NU/T(J))
 	            ATM(ID)%ARRXzV(I,J)=ATM(ID)%ARRXzV(I,J)+ATM(ID)%WSXzV(I,J,IPR)*T2
 	            ATM(ID)%BFCRXzV(I,J)=ATM(ID)%BFCRXzV(I,J) +

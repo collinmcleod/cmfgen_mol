@@ -80,7 +80,7 @@ C       to use to keep the array from getting too large.
 	call get_model_res(modwave,nmod,model_res)
 	t1=wave_min*min_res_kms/c_kms
 	if (model_res .lt. t1)model_res = t1
-	t1=0.25D0*wave_min*v_turb/c_kms
+	t1=0.25_LDP*wave_min*v_turb/c_kms
 	if (model_res .gt. t1)model_res = t1
 
 	Ntmp=(modwave(Nmod)-modwave(1))/model_res+1
@@ -136,7 +136,7 @@ C      Remap modified array back onto original wavelength array
 	  origflux(alter_min+Ntmp:Norig_new)=origflux(alter_max+1:Norig)
 	  origfreq(alter_min+Ntmp:Norig_new)=origfreq(alter_max+1:Norig)
 	END IF
-	tempwave(1:Ntmp)=1.0D-02*C_KMS/tempwave(1:Ntmp)
+	tempwave(1:Ntmp)=1.0E-02_LDP*C_KMS/tempwave(1:Ntmp)
 	origflux(alter_min:alter_min+Ntmp-1)=tempflux(1:Ntmp)
 	origfreq(alter_min:alter_min+Ntmp-1)=tempwave(1:Ntmp)
 	Norig=Norig_new
@@ -211,7 +211,7 @@ C
 	integer*4 i
 	REAL(KIND=LDP) dlamover2
 
-	dlamover2 = dlam/2.0d0
+	dlamover2 = dlam/2.0_LDP
 
 	nnew = (old_wave(n_old)-old_wave(1))/dlam  ! this will shorten wavelength
                                           ! array by a fraction of dlam

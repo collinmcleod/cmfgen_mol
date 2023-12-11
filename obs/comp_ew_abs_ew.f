@@ -76,7 +76,7 @@
 	INTEGER I,LS,ML,NI,NIEXT,IT
 	REAL(KIND=LDP) OLDCHI,T1
 	REAL(KIND=LDP) DBC,TOR,IBOUND,WERF_EXP
-	REAL(KIND=LDP), PARAMETER :: EW_ACC=0.005            !i.e., 0.5%
+	REAL(KIND=LDP), PARAMETER :: EW_ACC=0.005_LDP            !i.e., 0.5%
 	LOGICAL, SAVE :: FIRST=.TRUE.
 	LOGICAL EQUAL
 	EXTERNAL EQUAL
@@ -116,8 +116,8 @@
 	DO IT=1,20
 !	  WRITE(118,'(A2,3X,2ES14.4,ES18.8)')'J',JCONT(1),JCONT(ND),FL
 	  OLD_JCONT=JCONT
-	  JCONT=0.0D0
-	  HCONT=0.0D0
+	  JCONT=0.0_LDP
+	  HCONT=0.0_LDP
 	  DO I=1,ND
 	    SOURCE(I)=(ETA(I)+ESEC(I)*OLD_JCONT(I))/CHI(I)
 	  END DO
@@ -131,15 +131,15 @@
 ! Determine boundary condition for continuum intensity.
 !
 	    IF(THK_CONT)THEN
-	      IF(P(LS) .GT. 0.0D0)THEN
-	        TOR=CHI(1)*R(1)*R(1)*(1.570796D0-ACOS(P(LS)/R(1)))/P(LS)
+	      IF(P(LS) .GT. 0.0_LDP)THEN
+	        TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	      ELSE
 	        TOR=CHI(1)*R(1)
 	      END IF
-	      IBOUND=ETA(1)*(1.0D0-EXP(-TOR))/CHI(1)
+	      IBOUND=ETA(1)*(1.0_LDP-EXP(-TOR))/CHI(1)
 	    ELSE
-	      TOR=0.0D0
-	      IBOUND=0.0D0
+	      TOR=0.0_LDP
+	      IBOUND=0.0_LDP
 	    END IF
 !
 	    IF(DIF .AND. LS .LE. NC)THEN
@@ -166,11 +166,11 @@
 	    CVCONT(1)=CV(1)
 	  END DO  		!LS
 !
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  DO I=1,ND
-	    T1=MAX(T1, ABS(1.0D0-JCONT(I)/OLD_JCONT(I)))
+	    T1=MAX(T1, ABS(1.0_LDP-JCONT(I)/OLD_JCONT(I)))
 	  END DO
-	  IF(T1 .LT. 1.0D-06)EXIT
+	  IF(T1 .LT. 1.0E-06_LDP)EXIT
 !	  WRITE(118,*)ETA(1),JCONT(1),HCONT(1)
 	END DO			!IT
 !
@@ -185,15 +185,15 @@
 !
 	DO ML=2,NLF
 	  NLF_PROF=ML
-	  IF(PROF(ML-1) .NE. 0.0D0 .AND. PROF(ML) .EQ. 0.0D0)EXIT
+	  IF(PROF(ML-1) .NE. 0.0_LDP .AND. PROF(ML) .EQ. 0.0_LDP)EXIT
 	END DO
 !
-	OLD_ABS_EW=0.0D0
+	OLD_ABS_EW=0.0_LDP
 	DO IT=1,10
 	  OLD_JNU=JNU
-	  JNU=0.0D0
-	  HNU=0.0D0
-	  EW=0.0D0; ABS_EW=0.0D0; FLUX_PROF=0.0D0
+	  JNU=0.0_LDP
+	  HNU=0.0_LDP
+	  EW=0.0_LDP; ABS_EW=0.0_LDP; FLUX_PROF=0.0_LDP
 
 	  DO LS=1,MIN(NP,ND+NC-2)
 	    NI=ND-(LS-NC-1)
@@ -207,8 +207,8 @@
 !
 ! Zero AV, CV, dUd... and dVd... vectors.
 !
-	    AV(1:NI)=0.0D0
-	    CV(1:NI)=0.0D0
+	    AV(1:NI)=0.0_LDP
+	    CV(1:NI)=0.0_LDP
 !
 	    CALL ZALONGP(R,Z,P(LS),NI)
 	    CALL GAMMA(GAM,GAMH,SIGMA,Z,R,V,ND,NI)
@@ -217,15 +217,15 @@
 ! Determine boundary condition for continuum intensity.
 !
 	    IF(THK_CONT)THEN
-	      IF(P(LS) .GT. 0.0D0)THEN
-	        TOR=CHI(1)*R(1)*R(1)*(1.570796D0-ACOS(P(LS)/R(1)))/P(LS)
+	      IF(P(LS) .GT. 0.0_LDP)THEN
+	        TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	      ELSE
 	        TOR=CHI(1)*R(1)
 	      END IF
-	      IBOUND=ETA(1)*(1.0D0-EXP(-TOR))/CHI(1)
+	      IBOUND=ETA(1)*(1.0_LDP-EXP(-TOR))/CHI(1)
 	    ELSE
-	      TOR=0.0D0
-	      IBOUND=0.0D0
+	      TOR=0.0_LDP
+	      IBOUND=0.0_LDP
 	    END IF
 !
 !*********
@@ -239,13 +239,13 @@
 	      T1=PROF(ML)
 	      DO I=1,NIEXT
 	        TCHI(I)=CHI(I)+CHIL(I)*T1
-	        IF(TCHI(I) .LT. 1.0D-10*CHI(I))TCHI(I)=0.001D0*CHI(I)
+	        IF(TCHI(I) .LT. 1.0E-10_LDP*CHI(I))TCHI(I)=0.001_LDP*CHI(I)
 	        SOURCE(I)=(ETA(I)+ETAL(I)*T1+ESEC(I)*OLD_JNU(I,ML))/TCHI(I)
 	      END DO
 	      CALL QKIM(Q,QH,GAM,GAMH,TCHI,PF,ML,NI,NLF)
 	      IF(DIF .AND. LS .LE. NC)THEN
 	        DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
-	1            *(1.0D0+Q(NI)*(1.0D0-TCHI(NI)/OLDCHI))
+	1            *(1.0_LDP+Q(NI)*(1.0_LDP-TCHI(NI)/OLDCHI))
 	      END IF
 	      IF(METHOD .EQ. 'ZERO')THEN
 	        CALL TAU(DTAU,TCHI,Z,NI)
@@ -259,8 +259,8 @@
 !	I(incident)=ETAL(1)/CHIL(1)*(1.0D0-WERF_EXP)+IBOUND*WERF_EXP
 !
 	      IF(THK_LINE)THEN
-	        WERF_EXP=EXP(1.0D-15*CHIL(1)/FL/GAM(1)*WERFC(ML))
-	        XM(1)=(CHI(1)/TCHI(1)*WERF_EXP-1.0D0)*ETAL(1)/CHIL(1)
+	        WERF_EXP=EXP(1.0E-15_LDP*CHIL(1)/FL/GAM(1)*WERFC(ML))
+	        XM(1)=(CHI(1)/TCHI(1)*WERF_EXP-1.0_LDP)*ETAL(1)/CHIL(1)
 	1              -IBOUND*CHI(1)/TCHI(1)*WERF_EXP
 	      ELSE
 	        XM(1)=-IBOUND
@@ -314,7 +314,7 @@
 	    ML=NLF_PROF+1
 	    CALL QKIM(Q,QH,GAM,GAMH,CHI,PF,ML,NI,NLF)
 	    CALL TUVGHD(TA,TB,TC,U,VB,VC,GB,H,Q,QH,DTAU,DIF,LS,NC,NI)
-	    SOURCE=1.0D0  !Dummy values
+	    SOURCE=1.0_LDP  !Dummy values
 	    CALL THOMAS(TA,TB,TC,SOURCE,NI,1)
 !
 	    OLDCHI=CHI(NI)
@@ -333,8 +333,8 @@
 !	I(incident)=ETAL(1)/CHIL(1)*(1.0D0-WERF_EXP)+IBOUND*WERF_EXP
 !
 	      IF(THK_LINE)THEN
-	        WERF_EXP=EXP(1.0D-15*CHIL(1)/FL/GAM(1)*WERFC(ML))
-	        XM(1)=(CHI(1)/TCHI(1)*WERF_EXP-1.0D0)*ETAL(1)/CHIL(1)
+	        WERF_EXP=EXP(1.0E-15_LDP*CHIL(1)/FL/GAM(1)*WERFC(ML))
+	        XM(1)=(CHI(1)/TCHI(1)*WERF_EXP-1.0_LDP)*ETAL(1)/CHIL(1)
 	1              -IBOUND*CHI(1)/TCHI(1)*WERF_EXP
 	      ELSE
 	        XM(1)=-IBOUND
@@ -379,23 +379,23 @@
 ! the continuum intensity ( Jys/kpc/kpc ). Note that H is
 ! defined midway between R(1) and R(2).
 !
-          EW=2.99792458D-12*EW/HCONT(1)/FL/FL
-          ABS_EW=2.99792458D-12*ABS_EW/HCONT(1)/FL/FL
-          CONT_INT=13.19868D0*HCONT(1)*( (R(1)+R(2))**2 )/4.0D0
+          EW=2.99792458E-12_LDP*EW/HCONT(1)/FL/FL
+          ABS_EW=2.99792458E-12_LDP*ABS_EW/HCONT(1)/FL/FL
+          CONT_INT=13.19868_LDP*HCONT(1)*( (R(1)+R(2))**2 )/4.0_LDP
 	  IF(ABS_EW .LT. EW_CUT)EXIT
 	  IF( EQUAL(ABS_EW,OLD_ABS_EW,EW_ACC) )EXIT
 !
 	END DO			!IT
 !
-	FLUX_EW=0.0D0
+	FLUX_EW=0.0_LDP
 	DO ML=1,NLF
 	  FLUX_EW=FLUX_EW+ABS(FLUX_PROF(ML))*LFQW(ML)
 	END DO
-        FLUX_EW=2.99792458D-12*FLUX_EW/HCONT(1)/FL/FL
+        FLUX_EW=2.99792458E-12_LDP*FLUX_EW/HCONT(1)/FL/FL
 !	
         WRITE(119,'(4ES14.6,F14.4,T75,A)')CONT_INT,EW,FLUX_EW,ABS_EW,2.99792458D+03/FL,TRIM(TRANS_NAME)
         FLUSH(UNIT=119)
-	IF( ABS(2.99792458D+03/FL-7774.0827D0) .LT. 0.0001)THEN
+	IF( ABS(2.99792458E+03_LDP/FL-7774.0827_LDP) .LT. 0.0001_LDP)THEN
 	  DO ML=1,NLF
 	    WRITE(143,'(ES14.4,F14.4,2ES14.4)')PF(ML),2.99792458D+03/PF(ML),13.19868D0*HNU(ML)*( (R(1)+R(2))**2 )/4.0D0,PROF(ML)
 	  END DO

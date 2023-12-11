@@ -137,15 +137,15 @@
 ! and DDBBDT= dB/dTR .
 !
 	T1=HDKT*FL/T(ND)
-	T2=1.0D0-EMHNUKT(ND)
+	T2=1.0_LDP-EMHNUKT(ND)
 	BNUE=TWOHCSQ*( FL**3 )*EMHNUKT(ND)/T2
 	DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
-	DDBBDT=DBB*(T1*(1.0D0+EMHNUKT(ND))/T2-2.0D0)/T(ND)
-	HFLUX_AT_IB=DBB/CHI(ND)/3.0D0
+	DDBBDT=DBB*(T1*(1.0_LDP+EMHNUKT(ND))/T2-2.0_LDP)/T(ND)
+	HFLUX_AT_IB=DBB/CHI(ND)/3.0_LDP
 !
 	IF(PNT_SRCE_MOD)THEN
 	  T1=-HDKT*FL/TEFF_PNT_SRCE
-	  IC=TWOHCSQ*( FL**3 )*EXP(T1)/(1.0D0-EXP(T1))
+	  IC=TWOHCSQ*( FL**3 )*EXP(T1)/(1.0_LDP-EXP(T1))
 	END IF
 !
 ! Switch to using CHI_CLUMP, ETA_CLUMP, and ESEC_CLUMP in case the model
@@ -161,7 +161,7 @@
 	IF(CONT_VEL .AND. USE_FIXED_J)THEN
 	  CALL RD_CONT_J(FL,FREQ_INDX,FIRST_FREQ,LST_ITERATION,
 	1          ACCURATE,LUER,LU_EDD,ACCESS_F,ND,NP)
-	  RSQHNU=1.0D0; HFLUX_AT_OB=0.001D0; HFLUX_AT_IB=0.0D0
+	  RSQHNU=1.0_LDP; HFLUX_AT_OB=0.001_LDP; HFLUX_AT_IB=0.0_LDP
 !
 	ELSE IF(.NOT. CONT_VEL .AND. THIS_FREQ_EXT)THEN
 C
@@ -178,15 +178,15 @@ C
 	    THETAEXT(I)=ESECEXT(I)/CHIEXT(I)
 	  END DO
 C
-	  IF(SECTION .EQ. 'CONTINUUM' .AND. FREQ_INDX .EQ. 1)FEDD=0.0D0
+	  IF(SECTION .EQ. 'CONTINUUM' .AND. FREQ_INDX .EQ. 1)FEDD=0.0_LDP
 	  IF(COMPUTE_EDDFAC)THEN
 	    DO I=1,NDEXT
-	      RJEXT(I)=0.0D0
-	      FOLD(I)=0.0D0
+	      RJEXT(I)=0.0_LDP
+	      FOLD(I)=0.0_LDP
 	    END DO
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJEXT(I),I=1,NDEXT),T1
-	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
+	    IF(ABS(T1/FL-1.0_LDP) .GT. 1.0E-10_LDP)THEN
 	      WRITE(LUER,*)'Error - incorrect reading of EDDFACTOR in COMP_J_BLANK'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
@@ -220,7 +220,7 @@ C Check if F has converged.
 C
 	      INACCURATE=.FALSE.
 	      IF(J_IT_COUNTER .LT. 3 .OR. COMPUTE_EDDFAC)THEN	!Changed 8-Feb-95
-	        T1=0.0D0
+	        T1=0.0_LDP
 	        DO I=1,NDEXT
 	          T1=MAX(ABS(FOLD(I)-FEXT(I)),T1)
 	          FOLD(I)=FEXT(I)
@@ -281,16 +281,16 @@ C
 	    CHI_PREV(1:ND)=CHI(1:ND)
 	    ETA_PREV(1:ND)=ETA(1:ND)
 C
-	    FEDD_PREV(1:NDEXT)=0.0D0		!Not required.
-	    GEDD_PREV(1:NDEXT)=0.0D0
-	    JNU_PREV(1:NDEXT)=0.0D0
-	    N_ON_J_PREV(1:NDEXT)=0.0D0
-	    RSQHNU_PREV(1:NDEXT)=0.0D0
+	    FEDD_PREV(1:NDEXT)=0.0_LDP		!Not required.
+	    GEDD_PREV(1:NDEXT)=0.0_LDP
+	    JNU_PREV(1:NDEXT)=0.0_LDP
+	    N_ON_J_PREV(1:NDEXT)=0.0_LDP
+	    RSQHNU_PREV(1:NDEXT)=0.0_LDP
 C
-	    HBC_PREV(:)=0.0D0		!1:3
-	    NBC_PREV(:)=0.0D0		!1:3
-	    HBC_CMF(:)=0.0D0		!1:3
-	    NBC_CMF(:)=0.0D0		!1:3
+	    HBC_PREV(:)=0.0_LDP		!1:3
+	    NBC_PREV(:)=0.0_LDP		!1:3
+	    HBC_CMF(:)=0.0_LDP		!1:3
+	    NBC_CMF(:)=0.0_LDP		!1:3
 	    FG_COUNT=0
 	  ELSE
 	    dLOG_NU=LOG(FL_OLD/FL)
@@ -306,13 +306,13 @@ C
 C
 	  IF(COMPUTE_EDDFAC)THEN
 	    IF(FIRST_FREQ)THEN
-	      RJEXT(1:NDEXT)=0.0D0
-	      RJEXT_ES(1:NDEXT)=0.0D0
-	      FOLD(1:NDEXT)=0.0D0
+	      RJEXT(1:NDEXT)=0.0_LDP
+	      RJEXT_ES(1:NDEXT)=0.0_LDP
+	      FOLD(1:NDEXT)=0.0_LDP
 	    END IF
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJEXT(I),I=1,NDEXT),T1
-	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
+	    IF(ABS(T1/FL-1.0_LDP) .GT. 1.0E-10_LDP)THEN
 	      WRITE(LUER,*)'Error - incorrect reading of EDDFACTOR in COMP_J_BLANK'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
@@ -325,7 +325,7 @@ C If we are using incoherent electron scattering, RJEXT_ES must be available.
 C
 	  IF(.NOT. COHERENT_ES)THEN
 	    READ(LU_ES,REC=ACCESS_F)(RJEXT_ES(I),I=1,NDEXT),T1
-	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
+	    IF(ABS(T1/FL-1.0_LDP) .GT. 1.0E-10_LDP)THEN
 	      WRITE(LUER,*)'Error - incorrect reading of ES_J_CONV in COMO_J_BLANK'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
@@ -375,7 +375,7 @@ C
 	1              N_TYPE,H_CHK_OPTION,METHOD,COHERENT_ES,OUT_BC_TYPE,
 	1              FIRST_FREQ,NEW_FREQ,NCEXT,NPEXT,NDEXT)
 	     CALL TUNE(ITWO,'MOM_J_CMF_ACC')
-             IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJEXT(NDEXT)
+             IF(.NOT. DIF)HFLUX_AT_IB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJEXT(NDEXT)
              HFLUX_AT_OB=HBC_CMF(1)*RJEXT(1)
 C
 C We set NEW_FREQ to false so that FG_J_CMF continues to use the same
@@ -392,7 +392,7 @@ C Check if F has converged.
 C
 	      INACCURATE=.FALSE.
 	      IF(J_IT_COUNTER .LT. 20 .OR. COMPUTE_EDDFAC)THEN
-	        T1=0.0D0
+	        T1=0.0_LDP
 	        DO I=1,NDEXT
 	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)
 	          FOLD(I)=FEDD(I)
@@ -439,9 +439,9 @@ C
 !
 	  IF(LST_ITERATION)THEN
 	    T1=ABS(RJ(1))+ABS(TC(1))
-	    IF(T1 .NE. 0)T1=200.0D0*(RJ(1)-TC(1))/T1
+	    IF(T1 .NE. 0)T1=200.0_LDP*(RJ(1)-TC(1))/T1
 	    T2=ABS(RJ(ND))+ABS(TC(NDEXT))
-	    IF(T2 .NE. 0)T2=200.0D0*(RJ(ND)-TC(NDEXT))/T2
+	    IF(T2 .NE. 0)T2=200.0_LDP*(RJ(ND)-TC(NDEXT))/T2
 	    IF(FIRST_FREQ)THEN
 	      OPEN(UNIT=LU_JCOMP,STATUS='UNKNOWN',FILE='J_COMP')
 	      WRITE(LU_JCOMP,'(A)')' '
@@ -462,18 +462,18 @@ C
 	  IF(FREQ_INDX .EQ. NCF)THEN
 	    WRITE(LUER,*)'Average number of calls to FG_J_CMF is',FLOAT(FG_COUNT)/FLOAT(NCF)
 	    T1=ABS(RJ(1))+ABS(TC(1))
-	    IF(T1 .NE. 0)T1=ABS(200.0D0*(RJ(1)-TC(1))/T1)
-	    IF(T1 .GT. 100.0D0)THEN
+	    IF(T1 .NE. 0)T1=ABS(200.0_LDP*(RJ(1)-TC(1))/T1)
+	    IF(T1 .GT. 100.0_LDP)THEN
 	      WRITE(LUER,'(A)')'***************************************************************************'
 	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 100% for last frequency'
 	      WRITE(LUER,'(A)')' It is STRONGLY suggested that you use a finer grid at the outer boundary'
 	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error and/or use plt_jh'
 	      WRITE(LUER,'(A)')'***************************************************************************'
-	    ELSE IF(T1 .GT. 50.0D0)THEN
+	    ELSE IF(T1 .GT. 50.0_LDP)THEN
 	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 50% for last frequency'
 	      WRITE(LUER,'(A)')' It is strongly suggested that you use a finer grid at the outer boundary'
 	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error'
-	    ELSE IF(T1 .GT. 20.0D0)THEN
+	    ELSE IF(T1 .GT. 20.0_LDP)THEN
 	      WRITE(LUER,'(A)')' Error --- J(mom) and J(ray) differ by more than 20% for last frequency'
 	      WRITE(LUER,'(A)')' Although this is nlikely to effect the colution, it is suggested that'
 	      WRITE(LUER,'(A)')' you use a finer grid at the outer boundary'
@@ -487,7 +487,7 @@ C TRUE if FLUX_CAL_ONLY is true (single iteration with coherent,
 C last iteration if non-coherent).
 C
 	    IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
-	1         MAXCH .LT. 100.0D0 .AND. .NOT. SN_MODEL) )THEN
+	1         MAXCH .LT. 100.0_LDP .AND. .NOT. SN_MODEL) )THEN
 C
 C Quick and dirty method to ge an extended DENSITY vector. Will use TB in
 C the call to CMF_FORM_SOL.
@@ -542,16 +542,16 @@ C
 	    DO I=1,ND
 	      CHI_PREV(I)=CHI(I)
 	      ETA_PREV(I)=ETA(I)
-	      FEDD_PREV(I)=0.0D0		!Not required.
-	      GEDD_PREV(I)=0.0D0
-	      JNU_PREV(I)=0.0D0
-	      N_ON_J_PREV(I)=0.0D0
-	      RSQHNU_PREV(I)=0.0D0
+	      FEDD_PREV(I)=0.0_LDP		!Not required.
+	      GEDD_PREV(I)=0.0_LDP
+	      JNU_PREV(I)=0.0_LDP
+	      N_ON_J_PREV(I)=0.0_LDP
+	      RSQHNU_PREV(I)=0.0_LDP
 	    END DO
-	    HBC_PREV(:)=0.0D0		!1:3
-	    NBC_PREV(:)=0.0D0		!1:3
-	    HBC_CMF(:)=0.0D0		!1:3
-	    NBC_CMF(:)=0.0D0		!1:3
+	    HBC_PREV(:)=0.0_LDP		!1:3
+	    NBC_PREV(:)=0.0_LDP		!1:3
+	    HBC_CMF(:)=0.0_LDP		!1:3
+	    NBC_CMF(:)=0.0_LDP		!1:3
 	    FG_COUNT=0
 	  ELSE
 	    dLOG_NU=LOG(FL_OLD/FL)
@@ -569,14 +569,14 @@ C
 	  IF(COMPUTE_EDDFAC)THEN
 	    IF(FIRST_FREQ)THEN
 	      DO I=1,ND
-	        RJ(I)=0.0D0
-	        RJ_ES(I)=0.0D0
-	        FOLD(I)=0.0D0
+	        RJ(I)=0.0_LDP
+	        RJ_ES(I)=0.0_LDP
+	        FOLD(I)=0.0_LDP
 	      END DO
 	    END IF
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJ(I),I=1,ND),T1
-	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
+	    IF(ABS(T1/FL-1.0_LDP) .GT. 1.0E-10_LDP)THEN
 	      WRITE(LUER,*)'Error - incorrect reading of EDDFACTOR in COMP_J_BLANK'
 	      WRITE(LUER,*)'Frequency is ',FL,'Old Frequency is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
@@ -665,7 +665,7 @@ C
 	1                  FL,DIF,DBB,IC,METHOD,COHERENT_ES,
 	1                  IZERO,FIRST_FREQ,NEW_FREQ,ND)
 	       HFLUX_AT_OB=HBC_CMF(1)*RJ(1)-HBC_CMF(2)
-	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+	       IF(.NOT. DIF)HFLUX_AT_IB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
 	       IF(LST_ITERATION)THEN
 	         DO I=1,ND
 	           TA(I)=RJ(I)*R(I)*R(I)
@@ -684,7 +684,7 @@ C
 	1                  N_TYPE,METHOD,COHERENT_ES,
 	1                  FIRST_FREQ,NEW_FREQ,ND)
 	       HFLUX_AT_OB=HBC_CMF(1)*RJ(1)-HBC_CMF(2)
-	       IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+	       IF(.NOT. DIF)HFLUX_AT_OB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
 	     ELSE IF(USE_DJDT_RTE)THEN
 	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Calling MOM_J_DDT_V6'
 	       CALL MOM_J_DDT_V6(TA,CHI_CLUMP,CHI_SCAT_CLUMP,
@@ -718,14 +718,14 @@ C
 	       IF(FIRST_FREQ .AND. J_IT_COUNTER .EQ. 0)WRITE(LUER,*)'Using USE_LAM_ES instead of solving moment equatons'
 	       RJ(1:ND)=TC(1:ND)
 	       IF(INNER_BND_METH .EQ. 'PNT_SRCE')THEN
-	          HFLUX_AT_IB=0.0D0
+	          HFLUX_AT_IB=0.0_LDP
 	          DO I=1,NC_PNT_SRCE
-	            HFLUX_AT_IB=HFLUX_AT_IB+0.5D0*HQW(ND,I)*IC
+	            HFLUX_AT_IB=HFLUX_AT_IB+0.5_LDP*HQW(ND,I)*IC
 	          END DO
 	       ELSE IF(INNER_BND_METH .EQ. 'ZERO FLUX')THEN
-	          HFLUX_AT_IB=0.0D0
+	          HFLUX_AT_IB=0.0_LDP
 	       ELSE IF(.NOT. USE_FORMAL_REL)THEN
-	         IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+	         IF(.NOT. DIF)HFLUX_AT_IB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
                  HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
 	       END IF
 	       CALL GET_RSQH_REL(RSQHNU,R,V,FL,ND)
@@ -745,15 +745,15 @@ C
 	1              N_TYPE,H_CHK_OPTION,METHOD,COHERENT_ES,OUT_BC_TYPE,
 	1              FIRST_FREQ,NEW_FREQ,NC,NP,ND)
 	       IF(INNER_BND_METH .EQ. 'PNT_SRCE')THEN
-	          HFLUX_AT_IB=0.0D0
+	          HFLUX_AT_IB=0.0_LDP
 	          DO I=1,NC_PNT_SRCE
-	            HFLUX_AT_IB=HFLUX_AT_IB+0.5D0*HQW(ND,I)*IC
+	            HFLUX_AT_IB=HFLUX_AT_IB+0.5_LDP*HQW(ND,I)*IC
 	          END DO
 	       ELSE IF(INNER_BND_METH .EQ. 'ZERO FLUX')THEN
-	          HFLUX_AT_IB=0.0D0
+	          HFLUX_AT_IB=0.0_LDP
 	       ELSE IF(INNER_BND_METH(1:3) .EQ. 'DIF')THEN
 	       ELSE
-	          HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+	          HFLUX_AT_IB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
 	       END IF
 !	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
                HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
@@ -782,7 +782,7 @@ C Check if F has converged.
 C
 	      INACCURATE=.FALSE.
 	      IF(J_IT_COUNTER .LT. 20 .OR. COMPUTE_EDDFAC)THEN
-	        T1=0.0D0
+	        T1=0.0_LDP
 	        DO I=1,ND
 	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)
 	          FOLD(I)=FEDD(I)
@@ -837,10 +837,10 @@ C
 	        HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*MU_AT_RMAX(1:NC)
 	        RMAX_OBS=R(ND)
 	        V_AT_RMAX=V(1)
-	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0D0
+	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0_LDP
 	      END IF
 	    ELSE IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
-	1         MAXCH .LT.  100.0D0 .AND. .NOT. SN_MODEL .AND. ND .LT. 200) )THEN
+	1         MAXCH .LT.  100.0_LDP .AND. .NOT. SN_MODEL .AND. ND .LT. 200) )THEN
 	      IF(COHERENT_ES)THEN
      	        TA(1:ND)=ETA_CLUMP(1:ND)+CHI_SCAT_CLUMP(1:ND)*RJ(1:ND)
 	      ELSE
@@ -871,9 +871,9 @@ C
 C
 	  IF(LST_ITERATION)THEN
 	    T1=ABS(RJ(1))+ABS(TC(1))
-	    IF(T1 .NE. 0)T1=200.0D0*(RJ(1)-TC(1))/T1
+	    IF(T1 .NE. 0)T1=200.0_LDP*(RJ(1)-TC(1))/T1
 	    T2=ABS(RJ(ND))+ABS(TC(ND))
-	    IF(T2 .NE. 0)T2=200.0D0*(RJ(ND)-TC(ND))/T2
+	    IF(T2 .NE. 0)T2=200.0_LDP*(RJ(ND)-TC(ND))/T2
 	    IF(FIRST_FREQ)THEN
 	      OPEN(UNIT=LU_JCOMP,STATUS='UNKNOWN',FILE='J_COMP')
 	      WRITE(LU_JCOMP,'(A)')' '
@@ -894,16 +894,16 @@ C
 	  IF(FREQ_INDX .EQ. NCF)THEN
 	    WRITE(LUER,*)'Average number of calls to FG_J_CMF is',FLOAT(FG_COUNT)/FLOAT(NCF)
 	    T1=ABS(RJ(1))+ABS(TC(1))
-	    IF(T1 .NE. 0)T1=ABS(200.0D0*(RJ(1)-TC(1))/T1)
-	    IF(T1 .GT. 100.0D0)THEN
+	    IF(T1 .NE. 0)T1=ABS(200.0_LDP*(RJ(1)-TC(1))/T1)
+	    IF(T1 .GT. 100.0_LDP)THEN
 	      WRITE(LUER,'(/,A)')' Error --- J(mom) and J(ray) differ by more than 1000% for last frequency'
 	      WRITE(LUER,'(A)')' It is STRONGLY suggested that you use a finer grid at the outer boundary'
 	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error and/or use plt_jh'
-	    ELSE IF(T1 .GT. 50.0D0)THEN
+	    ELSE IF(T1 .GT. 50.0_LDP)THEN
 	      WRITE(LUER,'(/,A)')' Error --- J(mom) and J(ray) differ by more than 50% for last frequency'
 	      WRITE(LUER,'(A)')' It is strongly suggested that you use a finer grid at the outer boundary'
 	      WRITE(LUER,'(A)')' Tail J__COMP to see bundary error'
-	    ELSE IF(T1 .GT. 20.0D0)THEN
+	    ELSE IF(T1 .GT. 20.0_LDP)THEN
 	      WRITE(LUER,'(/,A)')' Error --- J(mom) and J(ray) differ by more than 20% for last frequency'
 	      WRITE(LUER,'(A)')' Although this is ulikely to effect the colution, it is suggested that'
 	      WRITE(LUER,'(A)')' you use a finer grid at the outer boundary'
@@ -919,10 +919,10 @@ C
 C Calculation of "static" J in the continuum using Edington factors.
 C
 	  CALL TUNE(IONE,'JFEAU')
-	  IF(SECTION .EQ. 'CONTINUUM' .AND. FREQ_INDX .EQ. 1)FEDD=0.0D0
+	  IF(SECTION .EQ. 'CONTINUUM' .AND. FREQ_INDX .EQ. 1)FEDD=0.0_LDP
 	  IF(COMPUTE_EDDFAC)THEN
 	    DO I=1,ND
-	      RJ(I)=0.0D0
+	      RJ(I)=0.0_LDP
               FOLD(I)=FEDD(I)
 	    END DO
 	  ELSE
@@ -960,7 +960,7 @@ C Check if F has converged.
 C
 	      INACCURATE=.FALSE.
 	      IF(J_IT_COUNTER .LT. 3 .OR. COMPUTE_EDDFAC)THEN
-	        T1=0.0D0
+	        T1=0.0_LDP
 	        DO I=1,ND
 	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)
 	          FOLD(I)=FEDD(I)
@@ -1012,7 +1012,7 @@ C
 	  END DO
 	END IF
 !
-	IF(ABS(RJ(1)) .GT. 1.0D+30)THEN
+	IF(ABS(RJ(1)) .GT. 1.0E+30_LDP)THEN
 	  WRITE(LUER,*)' '
 	  WRITE(LUER,*)' '
 	  WRITE(LUER,*)'Error in comp_j_blank.f'

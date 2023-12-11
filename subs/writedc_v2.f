@@ -40,12 +40,12 @@ C 5 = HeI (Singlets and Triplets)
 C
 	    IF(FORM .EQ. 1)FMT='(5ES16.7)'
 	    IF(FORM .EQ. 2)FMT='(1X,1P,1E15.5,:/,1X,2E15.5,:/,1X,3E15.5,
-	1                        :/,(1X,4E15.5))'
+	1                        :/,(1X,4E15.5_LDP))'
 	    IF(FORM .EQ. 3)FMT='(1X,1P,2E15.5,:/,1X,3E15.5,:/,(1X,4E15.5))'
 	    IF(FORM .EQ. 4)FMT='(1X,1P,1E15.5,:/,1X,2E15.5,:/,1X,3E15.5,
-	1                        :/,(1X,6E15.5))'
+	1                        :/,(1X,6E15.5_LDP))'
 	    IF(FORM .EQ. 5)FMT='(1X,1P,1E15.5,:/,1X,2E15.5,:/,1X,2E15.5,:/,1X,
-	1            3E15.5,:/,1X,3E15.5,/:,(1X,6E15.5))'
+	1            3E15.5_LDP,:/,1X,3E15.5_LDP,/:,(1X,6E15.5_LDP))'
 C
 	    I=9
 	    CALL GEN_ASCI_OPEN(I,NEWNAME,'REPLACE',' ',' ',IZERO,IOS)
@@ -60,8 +60,8 @@ C
 	    WRITE(9,2120)R(ND),LUM,NHYD,ND
 	    IF(OPTION(1:2) .EQ. 'DC')THEN
 	      DO I=1,ND
-	        T1=0.0D0
-	        T2=0.0D0
+	        T1=0.0_LDP
+	        T2=0.0_LDP
 	        DO J=1,NHYD
 	          T1=T1+HYD(J,I)
 	        END DO
@@ -74,8 +74,8 @@ C
 	      END DO
 	    ELSE
 	      DO I=1,ND
-	        T1=0.0D0
-	        T2=0.0D0
+	        T1=0.0_LDP
+	        T2=0.0_LDP
 	        DO J=1,NHYD
 	          T1=T1+HYD(J,I)
 	        END DO

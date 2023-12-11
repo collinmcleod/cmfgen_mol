@@ -70,15 +70,15 @@
 ! ionization stage.
 !
 	DO J=1,ND
-	  SUM_SE=0.0D0
-	  SUM_VJ_R=0.0D0
-	  SUM_VJ_P=0.0D0
-	  IF(JREC(J) .NE. 0.0D0)THEN
+	  SUM_SE=0.0_LDP
+	  SUM_VJ_R=0.0_LDP
+	  SUM_VJ_P=0.0_LDP
+	  IF(JREC(J) .NE. 0.0_LDP)THEN
 	    B_ION=HNST_B(1,J)/HN_B(1,J)		!1/b
 	    J_B_ION=JREC(J)*B_ION
 	  ELSE
-	    B_ION=0.0D0
-	    J_B_ION=0.0D0
+	    B_ION=0.0_LDP
+	    J_B_ION=0.0_LDP
 	  END IF
 	  DO I=1,N_A
 	    NETR=WSE_X(I,J)*( HNST_A(I,J)*J_B_ION-HN_A(I,J)*JPHOT(J) )

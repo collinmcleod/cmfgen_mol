@@ -36,38 +36,38 @@ c
 c
 c--------------------------------------------------------------------
 c
-      temp(:)=0.0d0
+      temp(:)=0.0_LDP
 c
       do j=1,nw-1
-        a=(angle(j)-angle(j+1))/4.0d0
+        a=(angle(j)-angle(j+1))/4.0_LDP
         temp(j)=temp(j)+a
         temp(j+1)=temp(j+1)+a
       enddo
 c
 c Check that 1/2*int[dmu]=[mu_max-mu+min]/2
 c
-      sum=0.0d0
+      sum=0.0_LDP
       do j=1,nw
         sum=sum+temp(j)
       enddo
 c
-      check=(angle(1)-angle(nw))/2.0d0
+      check=(angle(1)-angle(nw))/2.0_LDP
 c
-      if(abs(check-sum).gt.1.0d-12)then
+      if(abs(check-sum).gt.1.0E-12_LDP)then
         print*,' J integration weights need to be normalized (1)'
         print*,' error=',abs(check-sum)
       endif
 c
 c Check that 1/2*int[mu*dmu]=[mu_max^2-mu_min^2]/4
 c
-      sum=0.0d0
+      sum=0.0_LDP
       do j=1,nw
         sum=sum+temp(j)*angle(j)
       enddo
 c
-      check=(angle(1)**2-angle(nw)**2)/4.0d0
+      check=(angle(1)**2-angle(nw)**2)/4.0_LDP
 c
-      if(abs(check-sum).gt.1.0d-12)then
+      if(abs(check-sum).gt.1.0E-12_LDP)then
         print*,' J integration weights need to be normalized (2)'
         print*,' error=',abs(check-sum)
       endif

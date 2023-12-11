@@ -51,8 +51,8 @@ C
 C
 C 
 C
-	VK(:,:,:)=0.0D0 	!Dimension ND,ND,NM
-	RHS_dHdCHI(:,:)=0.0D0	!Dimensiond ND-1,ND
+	VK(:,:,:)=0.0_LDP 	!Dimension ND,ND,NM
+	RHS_dHdCHI(:,:)=0.0_LDP	!Dimensiond ND-1,ND
 C
 C Compute the dTAUdCHI matrix.
 C
@@ -61,7 +61,7 @@ C
 C The following derivatives are valid for all ML.
 C
 	DO I=1,ND-1
-	  T1=(1.0D0+W(I))*(TCHI(I)+TCHI(I+1))
+	  T1=(1.0_LDP+W(I))*(TCHI(I)+TCHI(I+1))
 	  dHUdCHI(I)=HU(I)*W(I)/T1
 	  dHUdTAU(I)=-HU(I)/DTAU(I)
 	  dHLdCHI(I)=HL(I)*W(I)/T1
@@ -85,9 +85,9 @@ C
 	    K=I+1
 	    dTAdCHI_J=-dHLdTAU(J)
 	    dTCdCHI_I=-dHUdTAU(I)
-	    dTBdCHI_I=dHLdTAU(I)+0.5D0/Q(I)
-	    dTBdCHI_J=dHUdTAU(J)+0.5D0/Q(I)
-	    T1=0.5D0*R(I)*R(I)/Q(I)
+	    dTBdCHI_I=dHLdTAU(I)+0.5_LDP/Q(I)
+	    dTBdCHI_J=dHUdTAU(J)+0.5_LDP/Q(I)
+	    T1=0.5_LDP*R(I)*R(I)/Q(I)
 C
 	    dRHSdJ= T1*SOURCE(I) - dTAdCHI_J*AV(J) - dTBdCHI_J*AV(I)
 	    dRHSdI= T1*SOURCE(I) - dTCdCHI_I*AV(K) - dTBdCHI_I*AV(I)
@@ -118,7 +118,7 @@ C
 	      VK(ND,L,3)=VK(ND,L,3)+T1*dTAUdCHI(ND-1,L)
 	    END DO
 	    VK(ND,ND,3)=VK(ND,ND,3)-
-	1                 DBB*R(ND)*R(ND)/3.0D0/TCHI(ND)/TCHI(ND)
+	1                 DBB*R(ND)*R(ND)/3.0_LDP/TCHI(ND)/TCHI(ND)
 	  ELSE
 	    T1=  ( MIDF(ND)*AV(ND) - MIDF(ND-1)*Q(ND-1)*AV(ND-1) )
 	1            /DTAU(ND-1)/DTAU(ND-1)
@@ -151,9 +151,9 @@ C
 	 K=I+1
 	 dTAdCHI_J=-dHLdTAU(J)
 	 dTCdCHI_I=-dHUdTAU(I)
-	 dTBdCHI_I=dHLdTAU(I)+PSI(I)/(DTAU(J)+DTAU(I))+0.5D0/Q(I)
-	 dTBdCHI_J=dHUdTAU(J)+PSI(I)/(DTAU(J)+DTAU(I))+0.5D0/Q(I)
-	 T1=0.5D0*R(I)*R(I)/Q(I)
+	 dTBdCHI_I=dHLdTAU(I)+PSI(I)/(DTAU(J)+DTAU(I))+0.5_LDP/Q(I)
+	 dTBdCHI_J=dHUdTAU(J)+PSI(I)/(DTAU(J)+DTAU(I))+0.5_LDP/Q(I)
+	 T1=0.5_LDP*R(I)*R(I)/Q(I)
 C
 C dDELUB is use as correction because UB(I)=-TB(I)-PSI(I)-PSIPREV(I)
 C
@@ -228,7 +228,7 @@ C
 	    VK(ND,L,1)=VK(ND,L,1)+T1*dTAUdCHI(ND-1,L)
 	  END DO
 	  VK(ND,ND,1)=VK(ND,ND,1)-
-	1               DBB*R(ND)*R(ND)/3.0D0/TCHI(ND)/TCHI(ND)
+	1               DBB*R(ND)*R(ND)/3.0_LDP/TCHI(ND)/TCHI(ND)
 	ELSE
 	  T1= ( MIDF(ND)*AV(ND) - MIDF(ND-1)*Q(ND-1)*AV(ND-1) )
 	1           / DTAU(ND-1)/DTAU(ND-1)

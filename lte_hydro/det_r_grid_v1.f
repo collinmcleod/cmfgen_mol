@@ -37,8 +37,8 @@
 !
 ! Local variables.
 !
-	REAL(KIND=LDP), PARAMETER :: V_SCL_FAC=0.67D0
-	REAL(KIND=LDP), PARAMETER :: dLOG_TAU=0.25D0
+	REAL(KIND=LDP), PARAMETER :: V_SCL_FAC=0.67_LDP
+	REAL(KIND=LDP), PARAMETER :: dLOG_TAU=0.25_LDP
 
 	REAL(KIND=LDP) LOG_TAU_MAX
 	REAL(KIND=LDP) dTAU
@@ -56,8 +56,8 @@
 	REV_TAU(1)=LOG_TAU(1)
 !
 	IF(DO_OUT_BOUND)THEN
-	  REV_TAU(2)=REV_TAU(1)+dLOG_TAU/9.0D0
-	  REV_TAU(3)=REV_TAU(1)+dLOG_TAU/3.0D0
+	  REV_TAU(2)=REV_TAU(1)+dLOG_TAU/9.0_LDP
+	  REV_TAU(3)=REV_TAU(1)+dLOG_TAU/3.0_LDP
 	  REV_TAU(4)=REV_TAU(1)+dLOG_TAU
 !
 !Estimate V: accuracy at outer boundary not important.	
@@ -68,13 +68,13 @@
 	  END DO
 	  I=2
 	  T1=(REV_TAU(I)-LOG_TAU(1))/(LOG_TAU(J)-LOG_TAU(1))
-	  REV_V(I)=(1.0D0-T1)*V(1)+T1*V(J)
+	  REV_V(I)=(1.0_LDP-T1)*V(1)+T1*V(J)
 	  I=3
 	  T1=(REV_TAU(I)-LOG_TAU(1))/(LOG_TAU(J)-LOG_TAU(1))
-	  REV_V(I)=(1.0D0-T1)*V(1)+T1*V(J)
+	  REV_V(I)=(1.0_LDP-T1)*V(1)+T1*V(J)
 	  I=4
 	  T1=(REV_TAU(I)-LOG_TAU(1))/(LOG_TAU(J)-LOG_TAU(1))
-	  REV_V(I)=(1.0D0-T1)*V(1)+T1*V(J)
+	  REV_V(I)=(1.0_LDP-T1)*V(1)+T1*V(J)
 	END IF
 !
 	J=2
@@ -98,9 +98,9 @@
 !
 	  IF(REV_TAU(I)+dLOG_TAU .GE. LOG_TAU_MAX)THEN
 	    T1=LOG_TAU_MAX-REV_TAU(I-1)
-	    REV_TAU(I)=REV_TAU(I-1)+0.6*T1
+	    REV_TAU(I)=REV_TAU(I-1)+0.6_LDP*T1
 	    I=I+1
-	    REV_TAU(I)=REV_TAU(I-2)+0.9*T1
+	    REV_TAU(I)=REV_TAU(I-2)+0.9_LDP*T1
 	    I=I+1
 	    REV_TAU(I)=LOG_TAU_MAX
 	  ELSE
@@ -114,16 +114,16 @@
 	      J=J+1
 	    END DO
 	    T1=(REV_TAU(I)-LOG_TAU(J-1))/(LOG_TAU(J)-LOG_TAU(J-1))
-	    REV_V(I)=(1.0D0-T1)*V(J-1)+T1*V(J)
-	    IF(REV_V(I) .GT. 0.1D0 .AND. REV_V(I) .LT. 0.67D0*REV_V(I-1))THEN
+	    REV_V(I)=(1.0_LDP-T1)*V(J-1)+T1*V(J)
+	    IF(REV_V(I) .GT. 0.1_LDP .AND. REV_V(I) .LT. 0.67_LDP*REV_V(I-1))THEN
 	      J=JST
-	      DO WHILE (0.67D0*REV_V(I-1) .LT. V(J))
+	      DO WHILE (0.67_LDP*REV_V(I-1) .LT. V(J))
 	        IF(J .EQ. ND)EXIT
 	        J=J+1
 	       END DO
-	      T1=(0.67D0*REV_V(I-1)-V(J-1))/(V(J)-V(J-1))
-	      REV_TAU(I)=(1.0D0-T1)*LOG_TAU(J-1)+T1*LOG_TAU(J)
-	      REV_V(I)=0.67D0*REV_V(I-1)
+	      T1=(0.67_LDP*REV_V(I-1)-V(J-1))/(V(J)-V(J-1))
+	      REV_TAU(I)=(1.0_LDP-T1)*LOG_TAU(J-1)+T1*LOG_TAU(J)
+	      REV_V(I)=0.67_LDP*REV_V(I-1)
 	    END IF
  	    J=JST
 	  END IF
@@ -147,7 +147,7 @@
 	OLD_TAU(1:ND_TMP)=REV_TAU(1:ND_TMP)
 	DO I=1,ND_TMP; OLD_R(I)=I; END DO
 	DO I=1,NEW_ND
-	  REV_R(I)=1+((I-1.0D0)*(ND_TMP-1.0D0) )/(NEW_ND-1.0D0)
+	  REV_R(I)=1+((I-1.0_LDP)*(ND_TMP-1.0_LDP) )/(NEW_ND-1.0_LDP)
 	END DO
 	CALL MON_INTERP(REV_TAU,NEW_ND,IONE,REV_R,NEW_ND,
 	1                 OLD_TAU,ND_TMP,OLD_R,ND_TMP)

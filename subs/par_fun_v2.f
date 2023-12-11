@@ -58,7 +58,7 @@ C
 	    HE2(J,I)=HE2(J,I)/HE2LTE(J,I)
 	  END DO
 	  HIGH_POP(I)=DHE2(I)
-	  IF(W_HE2(1,I) .NE. 1.0)THEN
+	  IF(W_HE2(1,I) .NE. 1.0_LDP)THEN
 	    WRITE(LUER,*)'Error in PAR_FUN --- occupation probability for ',
 	1               'ground state must be zero.'
 	    WRITE(LUER,*)'N=',N
@@ -68,13 +68,13 @@ C
 C
 	ZPFN(NSPEC)=ZION-1
 	ZPFN(NSPEC+1)=ZION
-	RGU=2.07078D-22
+	RGU=2.07078E-22_LDP
 	RGU=LOG(RGU)
 	T1=HDKT*EDGE(1)
 	DO I=1,ND
 	  U(I,NSPEC)=GHE2(1)
 	  U(I,NSPEC+1)=GION
-	  PHI(I,NSPEC+1)=0.0D0
+	  PHI(I,NSPEC+1)=0.0_LDP
 	  PHI(I,NSPEC)=HE2(1,I)*EXP( RGU+T1/T(I) )/T(I)/SQRT(T(I))
 	  DO J=2,N
 	    T2=HDKT*(EDGE(J)-EDGE(1))

@@ -54,7 +54,7 @@ C
 C Divide by 10^15 as FQW now in Hz.
 C See comments in QUAD_X_GEN_V3.
 C
-	  FOUR_PI_ON_H=1.8965D+02		!4*PI/H*DEX(-10)/1.0D+15
+	  FOUR_PI_ON_H=1.8965E+02_LDP		!4*PI/H*DEX(-10)/1.0D+15
 C
 C Now evaluate the quadrature weights.
 C

@@ -47,13 +47,13 @@
 	DO_OFF_DIAG=.FALSE.
 	IF(NUM_BNDS .GE. 3 .AND. .NOT. LAMBDA_ITERATION)DO_OFF_DIAG=.TRUE.
 !
-	SUM(:,:)=0.0D0
+	SUM(:,:)=0.0_LDP
 	DO ID=1,NUM_IONS
-	  SE(ID)%STEQ_ADV(:)=0.0D0
-	  SE(ID)%STRT_ADV_ID(:)=0.0D0
-	  SE(ID)%END_ADV_ID(:)=0.0D0
+	  SE(ID)%STEQ_ADV(:)=0.0_LDP
+	  SE(ID)%STRT_ADV_ID(:)=0.0_LDP
+	  SE(ID)%END_ADV_ID(:)=0.0_LDP
 	END DO
-	BA_ADV_TERM(:,:)=0.0D0
+	BA_ADV_TERM(:,:)=0.0_LDP
 	IF(.NOT. INCL_ADVECTION)RETURN
 !
 	IF(.NOT. LINEAR)THEN
@@ -69,7 +69,7 @@
 !
 ! NB: The factor of 1.0D-05 arises from V/R.
 !
-	UNIT_CONST=1.0D-05*RELAXATION_PARAMETER
+	UNIT_CONST=1.0E-05_LDP*RELAXATION_PARAMETER
 !
 ! We use backward linear differencing. This should be more stable than linear
 ! differencing in the log-log plane.
@@ -113,13 +113,13 @@
 	  ID_END=SPECIES_END_ID(ISPEC)
 	  DO K=1,ND
 	    DO ID=ID_STRT,ID_END-1
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO I=ID_STRT,ID
 	        DO J=1,ATM(I)%NXzV
 	          T1=T1+ATM(I)%XzV(J,K)
 	        END DO
 	      END DO
-	      T2=0.0D0
+	      T2=0.0_LDP
 	      DO I=ID+1,ID_END-1
 	        DO J=1,ATM(I)%NXzV
 	          T2=T2+ATM(I)%XzV(J,K)

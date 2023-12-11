@@ -78,7 +78,7 @@
 	  END IF
 !
           IF(INDEX(LINE(L),'[SN_AGE]') .NE. 0)THEN
-            FRAC_TIME_STEP=1.1D0
+            FRAC_TIME_STEP=1.1_LDP
             CALL GEN_IN(FRAC_TIME_STEP,'Fractional time increment -- e.g. 1.10 for a 10% increase')
             READ(LINE(L),*)AGE
             AGE=AGE*FRAC_TIME_STEP

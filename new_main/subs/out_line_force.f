@@ -35,7 +35,7 @@
 	  WRITE(LU,'(3X,A,500(A8))')'d',' V(km/s)',' M(t)',(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
 	  DO I=1,ND
 	    WRITE(LU,'(I4,1X,F8.3,500(F8.2))')I,V(I),TA(I),
-	1         (100.0D0*ION_LINE_FORCE(I,ID)/TA(I),ID=1,NUM_IONS)
+	1         (100.0_LDP*ION_LINE_FORCE(I,ID)/TA(I),ID=1,NUM_IONS)
 	  END DO
 	  WRITE(LU,'(3X,A,500(A8))')'d',' V(km/s)',' M(t)',(TRIM(ION_ID(ID)),ID=1,NUM_IONS)
         CLOSE(LU)

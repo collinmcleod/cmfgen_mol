@@ -74,9 +74,9 @@
 ! locations, even those not in use.
 !
 	IF(INIT)THEN
-	  TX(:,:,:)=0.0D0       !ND,ND,NM_TX
-	  TVX(:,:,:)=0.0D0      !(ND-1),ND*NM_TX
-	  OLD_TX(:,:)=0.0D0     !ND,ND
+	  TX(:,:,:)=0.0_LDP       !ND,ND,NM_TX
+	  TVX(:,:,:)=0.0_LDP      !(ND-1),ND*NM_TX
+	  OLD_TX(:,:)=0.0_LDP     !ND,ND
 	END IF
 !
 ! Now modify the matrices, operating on each matrix (labeled by K) separately.

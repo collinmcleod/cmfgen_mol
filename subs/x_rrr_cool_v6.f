@@ -57,7 +57,7 @@ C
 C
 C As we multiply by hv
 C
-        H=PLANCKS_CONSTANT()*1.0D+15
+        H=PLANCKS_CONSTANT()*1.0E+15_LDP
 C
 C If INIT_ARRAYS and FLAG is set, then zero all arrays. FLAG should be
 C false for incrementing rates due to ionizations/recombinations to
@@ -65,8 +65,8 @@ C the 2p level.
 C
 	IF(INIT_ARRAYS .AND. FLAG)THEN
 	  DO J=1,ND
-	    NET_X_RR(J)=0.0D0
-	    X_BFCR(J)=0.0D0
+	    NET_X_RR(J)=0.0_LDP
+	    X_BFCR(J)=0.0_LDP
 	  END DO
 	END IF
 C
@@ -79,10 +79,10 @@ C
 	  IF(WSE_X_A(I,1) .NE. 0)THEN
 	    DO J=1,ND
 	      A1=LOG_HNST_A(I,J)+LOG_HNST_B(1,J)-LOG(HN_B(1,J))
-	      IF(JREC(J) .GT. 0 .AND. A1 .LE. 280.0D0)THEN
+	      IF(JREC(J) .GT. 0 .AND. A1 .LE. 280.0_LDP)THEN
 	         A1=EXP(A1)
 	      ELSE
-	         A1=0.0D0
+	         A1=0.0_LDP
 	      END IF
 	      NET_X_RR(J)=NET_X_RR(J) +
 	1       WSE_X_A(I,J)*( A1*JREC(J)-HN_A(I,J)*JPHOT(J) )

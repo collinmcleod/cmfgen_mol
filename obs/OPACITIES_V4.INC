@@ -14,15 +14,15 @@ C
 	  T1=-HDKT*CONT_FREQ
 	  DO I=1,ND
 	    EMHNUKT(I)=EXP(T1/T(I))
-	    CHI(I)=0.0D0
-	    ETA(I)=0.0D0
+	    CHI(I)=0.0_LDP
+	    ETA(I)=0.0_LDP
 	  END DO
 C
 C Compute continuum intensity incident from the core assuming a TSTAR
 C blackbody.
 C
 	  T1=EXP(-HDKT*CONT_FREQ/TSTAR)
-	  IC=TWOHCSQ*T1*(CONT_FREQ**3)/(1.0D0-T1)
+	  IC=TWOHCSQ*T1*(CONT_FREQ**3)/(1.0_LDP-T1)
 C
 C Compute opacity and emissivity. ESOPAC must be call first since
 C CHI is effectively zeroed in that routine.
@@ -32,7 +32,7 @@ C
 ! Add in Rayleigh scattering contribution. We set the Rayleigh vector to a negligble,
 ! but non-zero value, since it can then be interpolated in the LOG plane.
 !
-	  T1=1.0D+06/HUGE(T1)
+	  T1=1.0E+06_LDP/HUGE(T1)
           CHI_RAY(1:ND)=T1
           IF(ATM(1)%XzV_PRES .AND. INCL_RAY_SCAT)THEN
 	    CALL RAYLEIGH_SCAT(CHI_RAY,ATM(1)%XzV_F,ATM(1)%AXzV_F,ATM(1)%EDGEXZV_F,
@@ -91,15 +91,15 @@ C
 C Compute continuum intensity incident from the core assuming a TSTAR
 C blackbody.
 C
-	  IC=TWOHCSQ*(FL**3)/(EXP(HDKT*FL/TSTAR)-1.0D0)
+	  IC=TWOHCSQ*(FL**3)/(EXP(HDKT*FL/TSTAR)-1.0_LDP)
 C
 C We assume that the photoionization cross-section has not changed since the
 C last iteration. Using the result that the stimulated emission occurs in
 C LTE and is given by
 C                     ETA/(2hv^3/c^2)
 C we can adjust CHI and ETA so that the condition of constant photoionization
-C cross-section is met. This adjustment automatically ensures that ETA/CHI 
-C gives the Planck function in LTE. 
+C cross-section is met. This adjustment automatically ensures that ETA/CHI
+C gives the Planck function in LTE.
 C
 	  T1=(FL/CONT_FREQ)**3
 	  T2=TWOHCSQ*(CONT_FREQ**3)
@@ -125,7 +125,7 @@ C
 	IF(XRAYS)THEN
 !	  IF(FILL_VEC_SQ(1) .EQ. 0)THEN
 	    DO I=1,ND
-	      FILL_VEC_SQ(I)=4.0*FILL_FAC_XRAYS*FILL_FAC_XRAYS*
+	      FILL_VEC_SQ(I)=4.0_LDP*FILL_FAC_XRAYS*FILL_FAC_XRAYS*
 	1                   EXP(-V_SHOCK/V(I))
 	    END DO
 !	  END IF
@@ -137,13 +137,13 @@ C ####
 C
 	  DO I=1,ND
 	    T2=I
-	    IF(I .GT. 6.0D0)T2=6.0D0
+	    IF(I .GT. 6.0_LDP)T2=6.0_LDP
 	    TA(I)=GFF(CONT_FREQ,T_SHOCK,T2)
 	  END DO
 C
 	  T1=CHIFF*TWOHCSQ*EXP(-HDKT*CONT_FREQ/T_SHOCK)/SQRT(T_SHOCK)
 	  DO I=1,ND
-	    T2=0.0D0
+	    T2=0.0_LDP
 	    DO ID=1,NUM_IONS
 	      IF(ATM(ID)%XzV_PRES)T2=T2+ATM(ID)%ZXzV*ATM(ID)%ZXzV*
 	1                ATM(ID)%DXzV(I)*TA(NINT(ATM(ID)%ZXzV))
@@ -153,7 +153,7 @@ C
           END DO
 !
 	  IF(SECTION .EQ. 'CONTINUUM')THEN
-	    IF(ML .EQ. 1)XRAY_LUM(1:ND)=0.0D0
+	    IF(ML .EQ. 1)XRAY_LUM(1:ND)=0.0_LDP
 	    XRAY_LUM(1:ND)=XRAY_LUM(1:ND)+ZETA(1:ND)*FQW(ML)
 	  END IF
 	END IF
@@ -162,8 +162,8 @@ C
 ! Mainly important when X-rays not present.
 !
           DO I=1,ND
-            IF(ETA(I) .LT. 1.0D-280)ETA(I)=1.0D-280
-          END DO                                   
+            IF(ETA(I) .LT. 1.0E-280_LDP)ETA(I)=1.0E-280_LDP
+          END DO
 C
 C The continuum source function is defined by:
 C                                              S= ZETA + THETA.J

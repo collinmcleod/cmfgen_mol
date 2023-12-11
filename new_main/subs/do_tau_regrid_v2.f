@@ -90,19 +90,19 @@
 !
 	I=10; CALL RD_STORE_NCHAR(GRID_TYPE,'GRID_TYPE',I,L_TRUE,'Regridding method: MODUN, UNIFORM, FIX_NX, REFINE')
 	IF(GRID_TYPE .EQ. 'MODUN')THEN
-	  STRETCH_POW=1.5D0
+	  STRETCH_POW=1.5_LDP
 	  CALL RD_STORE_DBLE(STRETCH_POW,'STRETCH',L_FALSE,'Exponent to stretch optical depth scale')
 	ELSE IF(GRID_TYPE .EQ. 'VTAU')THEN
-	  STRETCH_POW=1.0D0
+	  STRETCH_POW=1.0_LDP
 	ELSE IF(GRID_TYPE .EQ. 'UNIFORM')THEN
-	  STRETCH_POW=1.0D0
+	  STRETCH_POW=1.0_LDP
 	ELSE IF(GRID_TYPE .EQ. 'REFINE')THEN
-	  FG_MIN=-2.0D0; FG_MAX=1.0D0
+	  FG_MIN=-2.0_LDP; FG_MAX=1.0_LDP
 	  CALL RD_STORE_DBLE(FG_MIN,'FG_MIN',L_FALSE,'Minimum tau to start the FINE GRID')
 	  CALL RD_STORE_DBLE(FG_MAX,'FG_MAX',L_FALSE,'Maximum tau to start the FINE GRID')
 	ELSE IF(GRID_TYPE .EQ. 'FIX_NX')THEN
 	  CALL RD_STORE_INT(NX,'NX',L_TRUE,'Number of grid points in FINE GRID region')
-	  FG_MIN=-2.0D0; FG_MAX=1.0D0
+	  FG_MIN=-2.0_LDP; FG_MAX=1.0_LDP
 	  CALL RD_STORE_DBLE(FG_MIN,'FG_MIN',L_FALSE,'Minimum tau to start the FINE GRID')
 	  CALL RD_STORE_DBLE(FG_MAX,'FG_MAX',L_FALSE,'Maximum tau to start the FINE GRID')
 	ELSE
@@ -153,16 +153,16 @@
 ! increments, not the optical depth scale. We assume a power law dependence
 ! for the opacity when evaluating the optical depth at the outer boundary.
 !
-        TB(1:ND)=0.0D0                              !Used for dCHIdR
+        TB(1:ND)=0.0_LDP                              !Used for dCHIdR
         CALL NORDTAU(dTAU_OLD,TA,R,R,TB,ND)
 	T1=TA(1)/TA(5)			!TA takes clumping into account
-	IF(T1 .GT. 0.0D0)THEN
+	IF(T1 .GT. 0.0_LDP)THEN
 	  T1=LOG10(T1)/LOG10(R(5)/R(1))
 	ELSE
-	  T1=8.0D0
+	  T1=8.0_LDP
 	END IF
-	IF(T1 .LT. 2.0D0)T1=2.0D0
-	TAU_OLD(1)=FLUX_MEAN(1)*R(1)/(T1-1.0D0)
+	IF(T1 .LT. 2.0_LDP)T1=2.0_LDP
+	TAU_OLD(1)=FLUX_MEAN(1)*R(1)/(T1-1.0_LDP)
 	DO I=2,ND
 	  TAU_OLD(I)=TAU_OLD(I-1)+dTAU_OLD(I-1)
 	END DO
@@ -174,22 +174,22 @@
 !	  DO I=1,ND
 !	    TA(I)=TA(I)/(0.1D0+V(I))
 !	  END DO
-          TB(1:ND)=0.0D0                              !Used for dCHIdR
+          TB(1:ND)=0.0_LDP                              !Used for dCHIdR
           CALL NORDTAU(dTAU_OLD,TA,R,R,TB,ND)
 	  T1=TA(1)/TA(5)			!TA takes clumping into account
-	  IF(T1 .GT. 0.0D0)THEN
+	  IF(T1 .GT. 0.0_LDP)THEN
 	    T1=LOG10(T1)/LOG10(R(5)/R(1))
 	  ELSE
-	    T1=8.0D0
+	    T1=8.0_LDP
 	  END IF
-	  IF(T1 .LT. 2.0D0)T1=2.0D0
-	  TAU_OLD(1)=TA(1)*R(1)/(T1-1.0D0)
+	  IF(T1 .LT. 2.0_LDP)T1=2.0_LDP
+	  TAU_OLD(1)=TA(1)*R(1)/(T1-1.0_LDP)
 	  DO I=2,ND
 	    TAU_OLD(I)=TAU_OLD(I-1)+dTAU_OLD(I-1)
 	  END DO
 !	  TAU_OLD(1:ND)=LOG10( TAU_OLD(1:ND)/(0.1D0+V(1:ND)) )
-	  TAU_OLD(1:ND)=LOG10( TAU_OLD(1:ND)/(1.0D0 + MIN(20.0D0,V(1:ND))) )   !(0.1D0+MIN(V(1)/2,V(1:ND)))**2 )
-	  TAU_OLD(1:ND)=TAU_OLD(1:ND)/(1.0+0.5D0*MIN(ABS(TAU_OLD(1:ND)),2.0D0))
+	  TAU_OLD(1:ND)=LOG10( TAU_OLD(1:ND)/(1.0_LDP + MIN(20.0_LDP,V(1:ND))) )   !(0.1D0+MIN(V(1)/2,V(1:ND)))**2 )
+	  TAU_OLD(1:ND)=TAU_OLD(1:ND)/(1.0_LDP+0.5_LDP*MIN(ABS(TAU_OLD(1:ND)),2.0_LDP))
 	END IF
 !
 ! We modify the tau scale so that extra points are inserted around
@@ -197,7 +197,7 @@
 ! scale, exept at the outer boundaries.
 !
 	IF( TRIM(GRID_TYPE) .EQ. 'MODUN')THEN
-	  IF(STRETCH_POW .LT. 1 .OR. STRETCH_POW .GT. 5.0D0)THEN
+	  IF(STRETCH_POW .LT. 1 .OR. STRETCH_POW .GT. 5.0_LDP)THEN
 	    WRITE(T_OUT,*)'Error in DO_TAU_GRID_V2'
 	    WRITE(T_OUT,*)'Error --- STRETCH_POW outside expected range'
 	    WRITE(T_OUT,*)'STRETCH_POW read=',STRETCH_POW
@@ -345,14 +345,14 @@
 ! The following steps should reduces discrepancies in the step size near the boudaries of the
 ! region in which the grid was refined.
 !
-	  TAU(IST)=0.5D0*(TAU(IST-1)+TAU(IST+1))
-	  TAU(IEND)=0.5D0*(TAU(IEND-1)+TAU(IEND+1))
+	  TAU(IST)=0.5_LDP*(TAU(IST-1)+TAU(IST+1))
+	  TAU(IEND)=0.5_LDP*(TAU(IEND-1)+TAU(IEND+1))
 !
 	  IF(IEND .LT. ND-5 .AND. IEND .GT. 10)THEN
-	    T1=(EXP(TAU(IEND)-TAU(IEND-1))-1.0D0)/(1.0D0-EXP(TAU(IEND-2)-TAU(IEND-1)))
-	    T2=(EXP(TAU(IEND+1)-TAU(IEND))-1.0D0)/(1.0D0-EXP(TAU(IEND-1)-TAU(IEND)))
-	    IF(T2 .LT. 1.0D0)T2=1.0D0/T2
-	    IF(T2 .GT. 1.4D0 .AND. T2 .GT. T1)THEN
+	    T1=(EXP(TAU(IEND)-TAU(IEND-1))-1.0_LDP)/(1.0_LDP-EXP(TAU(IEND-2)-TAU(IEND-1)))
+	    T2=(EXP(TAU(IEND+1)-TAU(IEND))-1.0_LDP)/(1.0_LDP-EXP(TAU(IEND-1)-TAU(IEND)))
+	    IF(T2 .LT. 1.0_LDP)T2=1.0_LDP/T2
+	    IF(T2 .GT. 1.4_LDP .AND. T2 .GT. T1)THEN
 	      T1=(LOG(TAU(IEND+1)/TAU(IEND-4)))/5
 	      DO I=IEND-3,IEND
 	        TAU(I)=EXP(LOG(TAU(IEND-4))+(I+4-IEND)*T1)
@@ -371,8 +371,8 @@
 	IF(TRIM(GRID_TYPE) .NE. 'REFINE')THEN
 	  DLOG_TAU=TAU(ND)-TAU(ND-NUM_IBND_PARAMS-1)
 	  IF(IN_BND_OPT .EQ. 'DEFAULT')THEN
-	    TAU(ND-1)=TAU(ND)-0.1D0*DLOG_TAU
-	    TAU(ND-2)=TAU(ND)-0.35D0*DLOG_TAU
+	    TAU(ND-1)=TAU(ND)-0.1_LDP*DLOG_TAU
+	    TAU(ND-2)=TAU(ND)-0.35_LDP*DLOG_TAU
 	  ELSE IF(IN_BND_OPT .EQ. 'SPECIFY')THEN
 	    DO J=1,NUM_IBND_PARAMS
 	      TAU(ND-J)=TAU(ND)-DLOG_TAU/IBND_PARAMS(J)
@@ -390,8 +390,8 @@
 	IF(TRIM(GRID_TYPE) .NE. 'REFINE')THEN
 	  DLOG_TAU=TAU(NUM_OBND_PARAMS+2)-TAU(1)
 	  IF(OUT_BND_OPT .EQ. 'DEFAULT')THEN
-	    TAU(2)=TAU(1)+0.02D0*DLOG_TAU
-	    TAU(3)=TAU(1)+0.2D0*DLOG_TAU
+	    TAU(2)=TAU(1)+0.02_LDP*DLOG_TAU
+	    TAU(3)=TAU(1)+0.2_LDP*DLOG_TAU
 	  ELSE IF(OUT_BND_OPT .EQ. 'SPECIFY')THEN
 	    WRITE(LU,'(A)')'!'
 	    WRITE(LU,'(A,A,3(7X,A))')'! ','  J',' TAU(1)','dLOGTAU','OBND(1)'
@@ -421,14 +421,14 @@
 	1                               '        V(old)'
 	WRITE(LU,'(A)')'!'
 	DO I=1,ND
-	  T1=0.0D0
-	  IF(I .NE. 1 .AND. I .NE. ND)T1=(EXP(TAU(I+1)-TAU(I))-1.0D0)/(1.0D0-EXP(TAU(I-1)-TAU(I)))
+	  T1=0.0_LDP
+	  IF(I .NE. 1 .AND. I .NE. ND)T1=(EXP(TAU(I+1)-TAU(I))-1.0_LDP)/(1.0_LDP-EXP(TAU(I-1)-TAU(I)))
 	  WRITE(LU,'(I6,7ES16.5)')I,TAU(I),TAU(MIN(I+1,ND))-TAU(I),T1,
 	1               TAU_OLD(I),TAU_OLD(MIN(I+1,ND))-TAU_OLD(I),LOG_R_OLD(I),V(I)
 	END DO
 !
 	CALL MON_INTERP(LOG_R,ND,IONE,TAU,ND,LOG_R_OLD,ND,TAU_OLD,ND)
-	R=10.0D0**(LOG_R)
+	R=10.0_LDP**(LOG_R)
 	R(1)=R_OLD(1)
 	R(ND)=R_OLD(ND)
 !

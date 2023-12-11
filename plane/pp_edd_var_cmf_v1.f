@@ -61,24 +61,24 @@
 	  WRITE(I,*)'NM_KI='
 	  STOP
 	END IF
-	VK(:,:,:)=0.0D0
-	RHS_dHdCHI(:,:)=0.0D0
+	VK(:,:,:)=0.0_LDP
+	RHS_dHdCHI(:,:)=0.0_LDP
 !
 ! Compute the dTAUdCHI matrix.
 !
-	Q(1:ND)=1.0D0
+	Q(1:ND)=1.0_LDP
 	CALL dSPHEREdCHI(dTAUdCHI,DTAU,R,Q,ND)
 !
 ! The following derivatives are valid for all ML.
 !
 	DO I=1,ND-1
-	  T1=(1.0D0+W(I))*(CHI(I)+CHI(I+1))
+	  T1=(1.0_LDP+W(I))*(CHI(I)+CHI(I+1))
 	  dHUdCHI(I)=HU(I)*W(I)/T1
 	  dHUdTAU(I)=-HU(I)/DTAU(I)
 	  dHLdCHI(I)=HL(I)*W(I)/T1
 	  dHLdTAU(I)=-HL(I)/DTAU(I)
 	  dHSdCHI(I)=-HS(I)/T1
-	  EPS_FAC(I)=-1.0D0/T1
+	  EPS_FAC(I)=-1.0_LDP/T1
 	END DO
 !
 ! 
@@ -97,18 +97,18 @@
 	  dTCdCHI_I=-dHUdTAU(I)
 	  dTBdCHI_I=dHLdTAU(I)
 	  dTBdCHI_J=dHUdTAU(J)
-	  dTBdCHI=PSI(I)/(DTAU(J)+DTAU(I))+0.5D0*(1.0D0-ES_COH_VEC(I))
+	  dTBdCHI=PSI(I)/(DTAU(J)+DTAU(I))+0.5_LDP*(1.0_LDP-ES_COH_VEC(I))
 !
 ! dDELUB is use as correction because UB(I)=-TB(I)-PSI(I)-PSIPREV(I)
 !
 	  dUdCHI=PSIPREV(I)/(DTAU(J)+DTAU(I))
 !
-	  dRHSdJ(I)=  0.5D0*SOURCE(I)
+	  dRHSdJ(I)=  0.5_LDP*SOURCE(I)
 	1         - (dTAdCHI_J*JNU(J)+dTBdCHI_J*JNU(I))
 	1         - dTBdCHI*JNU(I)
 	1         + dUdCHI*JNUM1(I)
 !
-	  dRHSdI(I)= 0.5D0*SOURCE(I)
+	  dRHSdI(I)= 0.5_LDP*SOURCE(I)
 	1         - (dTCdCHI_I*JNU(K)+dTBdCHI_I*JNU(I))
 	1         + (dUdCHI*JNUM1(I)-dTBdCHI*JNU(I))
 !
@@ -162,7 +162,7 @@
 	1             + dHSDCHI(I)*HNUM1(I)
 	1             + dXM_EPS_K
 !
-	  T1=0.5D0*(DTAU(J)+DTAU(I))/CHI(I)
+	  T1=0.5_LDP*(DTAU(J)+DTAU(I))/CHI(I)
 	  VK(I,I,1)=VK(I,I,1)
 	1             - (dTAdCHI_I*JNU(J)+dTCdCHI_I*JNU(K)+dTBdCHI_I*JNU(I))
 	1             + (dUdCHI*JNUM1(I)-dTBdCHI*JNU(I))
@@ -186,7 +186,7 @@
 	  DO L=1,ND
 	    VK(ND,L,1)=VK(ND,L,1)+T1*dTAUdCHI(ND-1,L)
 	  END DO
-	  VK(ND,ND,1)=VK(ND,ND,1)-DBB/3.0D0/CHI(ND)/CHI(ND)
+	  VK(ND,ND,1)=VK(ND,ND,1)-DBB/3.0_LDP/CHI(ND)/CHI(ND)
 	ELSE
 	  T1= (MIDF(ND)*JNU(ND)-MIDF(ND-1)*JNU(ND-1))/DTAU(ND-1)/DTAU(ND-1)
 	  DO L=1,ND

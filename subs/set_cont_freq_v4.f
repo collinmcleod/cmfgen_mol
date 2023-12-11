@@ -109,7 +109,7 @@
 	  STOP
 	END IF
 !
-	EQUAL_FAC=1.0D-11
+	EQUAL_FAC=1.0E-11_LDP
 	FAC = RONE + EQUAL_FAC
 !
 ! SMAL_FAC is the ratio used to set the frequency spacing for

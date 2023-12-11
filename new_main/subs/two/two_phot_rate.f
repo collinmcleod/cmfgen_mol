@@ -47,10 +47,10 @@
 	    ALPHA_A=TWOHCSQ*(FREQ**3)
 	    IF(TYPE_TWO(J) .EQ. 1)THEN
 	      Y=FREQ/FREQ_TWO(J)
-	      U=Y*(1.0D0-Y)
-	      FU=4.0D0*U
-	      AY=24.56D0*COEF_TWO(J,1)*( U*(1.0D0-FU**0.8D0) +
-	1                 0.88D0*(U**1.53D0)*(FU**0.8D0) )
+	      U=Y*(1.0_LDP-Y)
+	      FU=4.0_LDP*U
+	      AY=24.56_LDP*COEF_TWO(J,1)*( U*(1.0_LDP-FU**0.8_LDP) +
+	1                 0.88_LDP*(U**1.53_LDP)*(FU**0.8_LDP) )
 	    ELSE
 	      LUER=ERROR_LU()
 	      WRITE(LUER,*)'Error in TWO_PHOT_OPAC'
@@ -63,13 +63,13 @@
 ! arrises since FREQ_TWO is in units of 10^15Hz, while FQW is in units
 ! of Hz.
 !
-	    DOWN_CONST=0.5D-15*AY/FREQ_TWO(J)
+	    DOWN_CONST=0.5E-15_LDP*AY/FREQ_TWO(J)
 	    UP_CONST=DOWN_CONST*G_UP_TWO(J)/G_LOW_TWO(J)
 	    IF(TWO_METHOD .EQ. 'OLD_DEFAULT')THEN
 	      UP_CONST=UP_CONST/ALPHA_A
 	      DO L=1,ND
 	        DOWN_RATE_TWO(L,J)=DOWN_RATE_TWO(L,J) +
-	1          DOWN_CONST*FS_RAT_UP(L,J)*(1.0D0+RJ(L)/ALPHA_A)*FQW
+	1          DOWN_CONST*FS_RAT_UP(L,J)*(1.0_LDP+RJ(L)/ALPHA_A)*FQW
 	        T1=EXP(-HDKT*FREQ_B/T(L))
 	        UP_RATE_TWO(L,J)=UP_RATE_TWO(L,J) +
 	1          UP_CONST*FS_RAT_LOW(L,J)*T1*RJ(L)*FQW
@@ -78,7 +78,7 @@
 	      DO L=1,ND
 	        T1=RJ(L)/ALPHA_A
 	        DOWN_RATE_TWO(L,J)=DOWN_RATE_TWO(L,J) +
-	1          DOWN_CONST*FS_RAT_UP(L,J)*(1.0D0+T1+PHOT_OC_TWO(L,J)+T1*PHOT_OC_TWO(L,J))*FQW
+	1          DOWN_CONST*FS_RAT_UP(L,J)*(1.0_LDP+T1+PHOT_OC_TWO(L,J)+T1*PHOT_OC_TWO(L,J))*FQW
 	        UP_RATE_TWO(L,J)=UP_RATE_TWO(L,J) +
 	1          UP_CONST*FS_RAT_LOW(L,J)*T1*PHOT_OC_TWO(L,J)*FQW
 	      END DO

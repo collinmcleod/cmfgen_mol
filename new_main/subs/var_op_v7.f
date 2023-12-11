@@ -173,16 +173,16 @@ C
 	    ALPHA=GFF_VAL(K)/SQRT(T(K))
 C
 	    TCHI2=TCHI1*ALPHA
-	    VCHI(EQION,K)=VCHI(EQION,K)+ED(K)*TCHI2*(1.0D0-EMHNUKT(K))
-	    VCHI(NT-1,K)=VCHI(NT-1,K)+DI_S(ION_LEV,K)*TCHI2*(1.0D0-EMHNUKT(K))
+	    VCHI(EQION,K)=VCHI(EQION,K)+ED(K)*TCHI2*(1.0_LDP-EMHNUKT(K))
+	    VCHI(NT-1,K)=VCHI(NT-1,K)+DI_S(ION_LEV,K)*TCHI2*(1.0_LDP-EMHNUKT(K))
 	    VCHI(NT,K)=VCHI(NT,K)+ED(K)*DI_S(ION_LEV,K)*TCHI2/T(K)*
-	1        ( -0.5D0+(0.5D0-HNUONK/T(K))*EMHNUKT(K) )
+	1        ( -0.5_LDP+(0.5_LDP-HNUONK/T(K))*EMHNUKT(K) )
 C
 	    TETA2=TETA1*ALPHA*EMHNUKT(K)
 	    VETA(EQION,K)=VETA(EQION,K)+TETA2*ED(K)
 	    VETA(NT-1,K)=VETA(NT-1,K)+TETA2*DI_S(ION_LEV,K)
 	    VETA(NT,K)=VETA(NT,K)-TETA2*ED(K)*DI_S(ION_LEV,K)*
-	1        ( 0.5D0-HNUONK/T(K) )/T(K)
+	1        ( 0.5_LDP-HNUONK/T(K) )/T(K)
 	  END DO
 	END IF
 C 
@@ -218,17 +218,17 @@ C**** NB: If NU < EDGE but there is no dissolution, we MUST set ALPHA_VEC to
 C         zero, as in the loops to evaluate VCHI we only check ALPHA_VEC
 C         and DIS_CONST.
 C
-	DIS_CONST(1:N_F)=-1.0D0
+	DIS_CONST(1:N_F)=-1.0_LDP
 	IF(MOD_DO_LEV_DIS .AND. PHOT_ID .EQ. 1)THEN
 	  ZION_CUBED=Z*Z*Z
 	  DO I=1,N_F
 	    IF(NU .LT. EDGE_F(I) .AND. ALPHA_VEC(I) .NE. 0)THEN
-	      NEFF=SQRT(3.289395*Z*Z/(EDGE_F(I)-NU))
+	      NEFF=SQRT(3.289395_LDP*Z*Z/(EDGE_F(I)-NU))
 	      IF(NEFF .GT. 2*Z)THEN
-	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
-	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
+	        T1=MIN(1.0_LDP,16.0_LDP*NEFF/(1+NEFF)/(1+NEFF)/3.0_LDP)
+	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5_LDP
 	      ELSE
-	        ALPHA_VEC(I)=0.0D0
+	        ALPHA_VEC(I)=0.0_LDP
 	      END IF
 	    END IF
 	  END DO
@@ -238,7 +238,7 @@ C Compute dissolution vectors that are independent of level.
 C
 	IF(MOD_DO_LEV_DIS)THEN
 	  DO K=K_ST,ND
-	    YDIS(K)=1.091*(X_LEV_DIS(K)+4.0D0*(Z-1)*A_LEV_DIS(K))*
+	    YDIS(K)=1.091_LDP*(X_LEV_DIS(K)+4.0_LDP*(Z-1)*A_LEV_DIS(K))*
 	1                 B_LEV_DIS(K)*B_LEV_DIS(K)
 	    XDIS(K)=B_LEV_DIS(K)*X_LEV_DIS(K)
 	  END DO
@@ -252,7 +252,7 @@ C
 	DO K=K_ST,ND
 	  DI_RAT(K)=(DI_S(ION_LEV,K)/DIST_S(ION_LEV,K))
 	1                    *(DIST_S(1,K)/DI_S(1,K))
-	  DT_TERM(K)=( 1.5D0 +
+	  DT_TERM(K)=( 1.5_LDP +
 	1     (dlnDIST_S_dlnT(ION_LEV,K)-dlnDIST_S_dlNT(1,K)) )/T(K)
 	  HDKT_ON_T(K)=HDKT/T(K)
 	END DO
@@ -274,7 +274,7 @@ C
 	      DO K=K_ST,ND
 	        ALPHA=ALPHA_VEC(I)*(HNST_F(I,K)/HNST_S(L,K))
 	        IF(DIS_CONST(I) .GE. 0)THEN
-	          T1=7.782+XDIS(K)*DIS_CONST(I)
+	          T1=7.782_LDP+XDIS(K)*DIS_CONST(I)
 	          T2=T1/(T1+YDIS(K)*DIS_CONST(I)*DIS_CONST(I))
 	          ALPHA=ALPHA*T2
 	        END IF
@@ -285,7 +285,7 @@ C
 	        VCHI(EQION,K)=VCHI(EQION,K)-TCHI1/DI_S(ION_LEV,K)
 	        VCHI(NT-1,K)=VCHI(NT-1,K)-TCHI1/ED(K)
 	        VCHI(NT,K)=VCHI(NT,K) + TCHI1*TCHI2 - HN_S(L,K)*ALPHA*
-	1           (1.5D0+HDKT_ON_T(K)*EDGE_F(I)+dlnHNST_S_dlnT(L,K))/T(K)
+	1           (1.5_LDP+HDKT_ON_T(K)*EDGE_F(I)+dlnHNST_S_dlnT(L,K))/T(K)
 C
 C NB. The cross-section ALPHA is contained in TCHI1.
 C
@@ -300,17 +300,17 @@ C
 C 
 C
 	ELSE
-	  VCHI_TMP(:,:)=0.0D0
+	  VCHI_TMP(:,:)=0.0_LDP
 	  DO K=K_ST,ND
-	    VCHI_ION(:)=0.0D0
-	    VCHI_T1(:)=0.0D0
-	    VCHI_T2(:)=0.0D0
+	    VCHI_ION(:)=0.0_LDP
+	    VCHI_T1(:)=0.0_LDP
+	    VCHI_T2(:)=0.0_LDP
 	    DO I=1,N_F
 	      L=F_TO_S_MAPPING(I)
 	      IF(ALPHA_VEC(I) .GT. 0)THEN
 	        ALPHA=ALPHA_VEC(I)*(HNST_F(I,K)/HNST_S(L,K))
 	        IF(DIS_CONST(I) .GE. 0)THEN
-	          T1=7.782+XDIS(K)*DIS_CONST(I)
+	          T1=7.782_LDP+XDIS(K)*DIS_CONST(I)
 	          T2=T1/(T1+YDIS(K)*DIS_CONST(I)*DIS_CONST(I))
 	          ALPHA=ALPHA*T2
 	        END IF
@@ -321,7 +321,7 @@ C
 	        VCHI_ION(I)=TCHI1
 	        VCHI_T1(I)=TCHI1*TCHI2
 	        VCHI_T2(I)=HN_S(L,K)*ALPHA*
-	1           (1.5D0+HDKT_ON_T(K)*EDGE_F(I)+dlnHNST_S_dlnT(L,K))
+	1           (1.5_LDP+HDKT_ON_T(K)*EDGE_F(I)+dlnHNST_S_dlnT(L,K))
 	      END IF
 	    END DO
 C

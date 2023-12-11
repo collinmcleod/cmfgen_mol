@@ -54,7 +54,7 @@
 ! As a Hubble law, we can use V to interpolate. Note that
 ! V is a comoving variable.
 !
-	T1=1.0D-12
+	T1=1.0E-12_LDP
 	IF(EQUAL(OLD_V(ND),V(ND),T1))THEN
 	  OLD_V(ND)=V(ND)
 	ELSE
@@ -91,7 +91,7 @@
 !
 	DO ISPEC=1,NUM_SPECIES
 	  DO J=1,ND
-	    T2=0.0D0
+	    T2=0.0_LDP
 	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	      DO I=1,ATM(ID)%NXzV
 	        K=ATM(ID)%EQXzV+I-1
@@ -122,13 +122,13 @@
 ! Now determine the electron density. Since we determine Ne from the scaled
 ! populations, no scaling is necessary.
 !
-	OLD_ED=0.0D0
+	OLD_ED=0.0_LDP
 	DO ISPEC=1,NUM_SPECIES
 	  DO J=1,ND
 	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	      DO I=1,ATM(ID)%NXzV
 	        K=ATM(ID)%EQXzV+I-1
-	        OLD_ED(J)=OLD_ED(J)+(ATM(ID)%ZXzV-1.0D0)*OLD_POPS(K,J)
+	        OLD_ED(J)=OLD_ED(J)+(ATM(ID)%ZXzV-1.0_LDP)*OLD_POPS(K,J)
 	      END DO
 	    END DO
 	    IF(SPECIES_BEG_ID(ISPEC) .GT. 0)THEN

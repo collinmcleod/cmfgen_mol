@@ -59,29 +59,29 @@ C
 	MND=ND-2
 	SCLHT=RP*SCLHT*EPS1
 	VEXT=VINF2-VINF1
-	IF(VEXT .LT. 1.0D-06*VINF1)VEXT=0.0D0
+	IF(VEXT .LT. 1.0E-06_LDP*VINF1)VEXT=0.0_LDP
 	RP1=RP*EPS1
 	RP2=RP*EPS2
 C
-	IF(BETA1 .LT. 1.0D0 .AND. EPS1 .GE. 1.0D0)THEN
+	IF(BETA1 .LT. 1.0_LDP .AND. EPS1 .GE. 1.0_LDP)THEN
 	  LUER=ERROR_LU()
           WRITE(LUER,*)'Error in STARPCYG_V2 --- Invalid EPS1'
           WRITE(LUER,*)'EPS1 should be approximately 0.999 for BETA1<1'
 	  STOP
 	END IF
-	IF(BETA2 .LT. 1.0D0 .AND. EPS2 .GE. 1.0D0)THEN
+	IF(BETA2 .LT. 1.0_LDP .AND. EPS2 .GE. 1.0_LDP)THEN
 	  LUER=ERROR_LU()
           WRITE(LUER,*)'Error in STARPCYG_V2 --- Invalid EPS2'
           WRITE(LUER,*)'EPS2 should be approximately 0.999 for BETA2<1'
 	  STOP
 	END IF
-	IF(EPS1 .LT. 0.5)THEN
+	IF(EPS1 .LT. 0.5_LDP)THEN
 	  LUER=ERROR_LU()
           WRITE(LUER,*)'Error in STARPCYG_V2 --- Invalid EPS1/BETA1'
           WRITE(LUER,*)'EPS1 should lie between 0.5 and 1.0'
 	  STOP
 	END IF
-	IF(EPS2 .LT. 0.5)THEN
+	IF(EPS2 .LT. 0.5_LDP)THEN
 	  LUER=ERROR_LU()
           WRITE(LUER,*)'Error in STARPCYG_V2 --- Invalid EPS2'
           WRITE(LUER,*)'EPS2 should lie between 0.5 and 1.0'
@@ -89,10 +89,10 @@ C
 	END IF
 
 C
-	IF(EPS2 .EQ. 1.0D0)THEN
-	  V_RAT=VPHOT/VCORE - 1.0D0
+	IF(EPS2 .EQ. 1.0_LDP)THEN
+	  V_RAT=VPHOT/VCORE - 1.0_LDP
 	ELSE
-	  V_RAT= ( VPHOT+ VEXT*(1-EPS2)**BETA2 )/VCORE -1.0D0
+	  V_RAT= ( VPHOT+ VEXT*(1-EPS2)**BETA2 )/VCORE -1.0_LDP
 	END IF
 C
 	IF(RDINR)THEN
@@ -128,37 +128,37 @@ C Compute Velocity and SIGMA
 C
 	  DO I=1,ND
 	    IF(R(I) .EQ. RP1)THEN
-	      IF(BETA1 .EQ. 1.0D0)THEN
+	      IF(BETA1 .EQ. 1.0_LDP)THEN
 	        TA(I)=VPHOT
 	        dAdlnR=(VINF1-VPHOT)*RP1/R(I)
 	      ELSE
 	        TA(I)=VPHOT
-	        dAdlnR=0.0D0
+	        dAdlnR=0.0_LDP
 	      END IF
-	      TB(I)=1.0D0+V_RAT
+	      TB(I)=1.0_LDP+V_RAT
 	      dBdlnR=V_RAT*R(I)/SCLHT
 	    ELSE IF(R(I) .LT. RP1)THEN
 	      TA(I)=VPHOT
-	      TB(I)=1.0D0+V_RAT*EXP( (RP1-R(I))/SCLHT )
-	      dAdlnR=0.0D0
+	      TB(I)=1.0_LDP+V_RAT*EXP( (RP1-R(I))/SCLHT )
+	      dAdlnR=0.0_LDP
 	      dBdlnR=V_RAT*EXP( (RP1-R(I))/SCLHT )*R(I)/SCLHT
 	    ELSE
-	      TA(I)=VPHOT+(VINF1-VPHOT)*(1.0D0-RP1/R(I))**BETA1
-	      TB(I)=1.0D0+V_RAT*EXP((RP1-R(I))/SCLHT)
-	      dAdlnR=(RP1/R(I))*BETA1*(VINF1-VPHOT)*(1.0D0-RP1/R(I))**(BETA1-1)
+	      TA(I)=VPHOT+(VINF1-VPHOT)*(1.0_LDP-RP1/R(I))**BETA1
+	      TB(I)=1.0_LDP+V_RAT*EXP((RP1-R(I))/SCLHT)
+	      dAdlnR=(RP1/R(I))*BETA1*(VINF1-VPHOT)*(1.0_LDP-RP1/R(I))**(BETA1-1)
 	      dBdlNR=V_RAT*EXP((RP1-R(I))/SCLHT)*(R(I)/SCLHT)
 	    END IF
 	    IF(R(I) .EQ. RP2)THEN
-	      IF(BETA2 .EQ. 1.0D0)THEN
+	      IF(BETA2 .EQ. 1.0_LDP)THEN
 	        dAdlnR=dAdlnR+VEXT*RP2/R(I)
 	      END IF
 	    ELSE IF(R(I) .LT. RP2)THEN
 	    ELSE
-	      TA(I)=TA(I)+VEXT*(1.0D0-RP2/R(I))**BETA2
-	      dAdlnR=dAdlnR+(RP2/R(I))*BETA2*VEXT*(1.0D0-RP2/R(I))**(BETA2-1)
+	      TA(I)=TA(I)+VEXT*(1.0_LDP-RP2/R(I))**BETA2
+	      dAdlnR=dAdlnR+(RP2/R(I))*BETA2*VEXT*(1.0_LDP-RP2/R(I))**(BETA2-1)
 	    END IF
 	    V(I)=TA(I)/TB(I)
-	    SIGMA(I)=dAdlnR/TA(I)+dBdlnR/TB(I)-1.0D0
+	    SIGMA(I)=dAdlnR/TA(I)+dBdlnR/TB(I)-1.0_LDP
 	  END DO
 	  R(ND)=RP
 	  CLOSE(UNIT=LU)
@@ -202,13 +202,13 @@ C
 	    AV=VPHOT
 	  ELSE IF(TA(I) .LT. RP1)THEN
 	    AV=VPHOT
-	    BV=1.0D0+V_RAT*EXP( (RP1-TA(I))/SCLHT )
+	    BV=1.0_LDP+V_RAT*EXP( (RP1-TA(I))/SCLHT )
 	  ELSE
-	    AV=VPHOT+(VINF1-VPHOT)*(1.0D0-RP1/TA(I))**BETA1
-	    BV=1.0D0+V_RAT*EXP((RP1-TA(I))/SCLHT)
+	    AV=VPHOT+(VINF1-VPHOT)*(1.0_LDP-RP1/TA(I))**BETA1
+	    BV=1.0_LDP+V_RAT*EXP((RP1-TA(I))/SCLHT)
 	  END IF
 	  IF(TA(I) .GT. RP2)THEN
-	    AV=AV+VEXT*(1.0D0-RP2/TA(I))**BETA2
+	    AV=AV+VEXT*(1.0_LDP-RP2/TA(I))**BETA2
 	  END IF
 	  V(I)=AV/BV
 	  TB(I)=(1E+10/(TA(I)*TA(I)*V(I)))**2	  !Opacity
@@ -222,7 +222,7 @@ C
 C
 C Compute optical depth scale.
 C
-	  T1=TB(1)*TA(1)/3.0D0
+	  T1=TB(1)*TA(1)/3.0_LDP
 	  TC(1)=LOG(T1)
 	  DO I=2,ND
 	    T1=T1+(TB(I)+TB(I-1))*(TA(I-1)-TA(I))
@@ -247,42 +247,42 @@ C
 	    TA(I+1)=R(I)
 	  END DO
 	  TA(ND)=R(MND)
-	  TA(ND-1)=TA(ND)+(R(MND-1)-R(MND))/20.0D0
+	  TA(ND-1)=TA(ND)+(R(MND-1)-R(MND))/20.0_LDP
 C
 	  DO I=1,ND
 	    R(I)=TA(I)
 	    IF(R(I) .EQ. RP1)THEN
-	      IF(BETA1 .EQ. 1.0D0)THEN
+	      IF(BETA1 .EQ. 1.0_LDP)THEN
 	        TA(I)=VPHOT
 	        dAdlnR=(VINF1-VPHOT)*RP1/R(I)
 	      ELSE
 	        TA(I)=VPHOT
-	        dAdlnR=0.0D0
+	        dAdlnR=0.0_LDP
 	      END IF
 	      dBdlnR=V_RAT*R(I)/SCLHT
-	      TB(I)=1.0D0+V_RAT
+	      TB(I)=1.0_LDP+V_RAT
 	    ELSE IF(R(I) .LT. RP1)THEN
 	      TA(I)=VPHOT
-	      TB(I)=1.0D0+V_RAT*EXP( (RP1-R(I))/SCLHT )
-	      dAdlnR=0.0D0
+	      TB(I)=1.0_LDP+V_RAT*EXP( (RP1-R(I))/SCLHT )
+	      dAdlnR=0.0_LDP
 	      dBdlnR=V_RAT*EXP( (RP1-R(I))/SCLHT )*R(I)/SCLHT
 	    ELSE
-	      TA(I)=VPHOT+(VINF1-VPHOT)*(1.0D0-RP1/R(I))**BETA1
-	      TB(I)=1.0D0+V_RAT*EXP((RP1-R(I))/SCLHT)
-	      dAdlnR=(RP1/R(I))*BETA1*(VINF1-VPHOT)*(1.0D0-RP1/R(I))**(BETA1-1)
+	      TA(I)=VPHOT+(VINF1-VPHOT)*(1.0_LDP-RP1/R(I))**BETA1
+	      TB(I)=1.0_LDP+V_RAT*EXP((RP1-R(I))/SCLHT)
+	      dAdlnR=(RP1/R(I))*BETA1*(VINF1-VPHOT)*(1.0_LDP-RP1/R(I))**(BETA1-1)
 	      dBdlNR=V_RAT*EXP((RP1-R(I))/SCLHT)*(R(I)/SCLHT)
 	    END IF
 	    IF(R(I) .EQ. RP2)THEN
-	      IF(BETA2 .EQ. 1.0D0)THEN
+	      IF(BETA2 .EQ. 1.0_LDP)THEN
 	        dAdlnR=dAdlnR+VEXT*RP2/R(I)
 	      END IF
 	    ELSE IF(R(I) .LT. RP2)THEN
 	    ELSE
-	      TA(I)=TA(I)+VEXT*(1.0D0-RP2/R(I))**BETA2
-	      dAdlnR=dAdlnR+(RP2/R(I))*BETA2*VEXT*(1.0D0-RP2/R(I))**(BETA2-1)
+	      TA(I)=TA(I)+VEXT*(1.0_LDP-RP2/R(I))**BETA2
+	      dAdlnR=dAdlnR+(RP2/R(I))*BETA2*VEXT*(1.0_LDP-RP2/R(I))**(BETA2-1)
 	    END IF
 	    V(I)=TA(I)/TB(I)
-	    SIGMA(I)=dAdlnR/TA(I)+dBdlnR/TB(I)-1.0D0
+	    SIGMA(I)=dAdlnR/TA(I)+dBdlnR/TB(I)-1.0_LDP
 	  END DO
 	  R(ND)=RP
 C
@@ -290,7 +290,7 @@ C
 C
 	  DO I=1,ND
 	    TA(I)=R(I)
-	    TB(I)=(1E+10/(TA(I)*TA(I)*V(I)))**2.0	    !Opacity
+	    TB(I)=(1E+10/(TA(I)*TA(I)*V(I)))**2	    !Opacity
 	  END DO
 	END DO
 C

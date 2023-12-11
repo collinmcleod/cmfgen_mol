@@ -140,9 +140,9 @@
 !
 ! Using the highest level read in, decide whether b, or b-1 have been read in.
 !
-	IF( ABS( TA(NOLD) ) .LT. 0.2D0 .AND. CHECK_DC)DPOP=DPOP+1.0D0
+	IF( ABS( TA(NOLD) ) .LT. 0.2_LDP .AND. CHECK_DC)DPOP=DPOP+1.0_LDP
 !
-	IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
+	IF(ABS(OLDR(NDOLD)/R(ND)-1.0_LDP) .GT. 0.0001_LDP)THEN
 	  WRITE(LUER,*)'Warning - core radius not identical in REGRIDWSC_V3'
 	  WRITE(LUER,*)'Rescaling to make Rcore identical'
 	  DO I=1,NDOLD
@@ -215,7 +215,7 @@
 	  END DO
 	  DO I=1,NXST-1
 	    T1=POPATOM(NXST)/POPATOM(I)
-	    T2=MIN(1.0D0, ABS(LOG(DPOP(J,1)))/ABS(LOG(DPOP(1,1))) )
+	    T2=MIN(1.0_LDP, ABS(LOG(DPOP(J,1)))/ABS(LOG(DPOP(1,1))) )
 	    DHEN(J,I)=DPOP(J,1)*(T1**T2)
 	  END DO
 	END DO
@@ -233,12 +233,12 @@
 !
 	    DELTA_T=100
 	    COUNT=0
-	    DO WHILE(ABS(DELTA_T) .GT. 1.0D-08 .AND. COUNT .LT. 100)
-	      FX=DHEN(NZ,I)*EXP(HDKT*EDGE(NZ)*(1.0D0/T(I)-1.0D0/TX))*
-	1           (TX/T(I))**1.5D0
-	      DELTA_T=(FX-1.0D0)*TX/FX/(1.5D0+HDKT*EDGE(NZ)/TX)
-	      IF(DELTA_T .GT.  0.8D0*TX)DELTA_T=0.8D0*TX
-	      IF(DELTA_T .LT. -0.8D0*TX)DELTA_T=-0.8D0*TX
+	    DO WHILE(ABS(DELTA_T) .GT. 1.0E-08_LDP .AND. COUNT .LT. 100)
+	      FX=DHEN(NZ,I)*EXP(HDKT*EDGE(NZ)*(1.0_LDP/T(I)-1.0_LDP/TX))*
+	1           (TX/T(I))**1.5_LDP
+	      DELTA_T=(FX-1.0_LDP)*TX/FX/(1.5_LDP+HDKT*EDGE(NZ)/TX)
+	      IF(DELTA_T .GT.  0.8_LDP*TX)DELTA_T=0.8_LDP*TX
+	      IF(DELTA_T .LT. -0.8_LDP*TX)DELTA_T=-0.8_LDP*TX
 	      TX=TX-DELTA_T
 	      COUNT=COUNT+1
 	    END DO
@@ -253,7 +253,7 @@
 	      END DO
 	    ELSE
 	      DO J=NZ+1,N
-	        DHEN(J,I)=EXP(HDKT*EDGE(J)*(1.0D0/TX-1.0D0/T(I)))*(T(I)/TX)**1.5D0
+	        DHEN(J,I)=EXP(HDKT*EDGE(J)*(1.0_LDP/TX-1.0_LDP/T(I)))*(T(I)/TX)**1.5_LDP
 	      END DO
 	    END IF
 	  END DO
@@ -274,11 +274,11 @@
 ! Ensure that all levels belonging to the same level have the
 ! same DC. We take the DC of the lowest state.
 !
-	IF(SUM(INT_SEQ) .EQ. 0.0D0)THEN
+	IF(SUM(INT_SEQ) .EQ. 0.0_LDP)THEN
 	  DO I=1,ND
-	    TA(:)=0.0D0
+	    TA(:)=0.0_LDP
 	    DO J=1,N
-	      IF(TA(F_TO_S(J)) .EQ. 0.0D0)TA(F_TO_S(J))=DHEN(J,I)
+	      IF(TA(F_TO_S(J)) .EQ. 0.0_LDP)TA(F_TO_S(J))=DHEN(J,I)
 	    END DO
 	    DO J=1,N
 	      DHEN(J,I)=TA(F_TO_S(J))

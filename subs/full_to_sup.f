@@ -57,7 +57,7 @@ C
 C
 	DO K=1,ND
 	  DO I=1,NC2_S
-	    C2_S(I,K)=0.0D0
+	    C2_S(I,K)=0.0_LDP
 	  END DO
 	END DO
 C

@@ -63,7 +63,7 @@ C
 	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 C
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 C
 C Check parameters.
 C
@@ -84,8 +84,8 @@ C
 C We assume that both lines and continuum are ordered from highest to
 C lowest frequencies.
 C
-	MAX_B_EXTENT  = 1.0D0+(OBS_PRO_EXT_RAT*VINF+3.0D0*V_DOP)/C_KMS
-	MAX_R_EXTENT  = 1.0D0-(OBS_PRO_EXT_RAT*VINF+3.0D0*V_DOP)/C_KMS
+	MAX_B_EXTENT  = 1.0_LDP+(OBS_PRO_EXT_RAT*VINF+3.0_LDP*V_DOP)/C_KMS
+	MAX_R_EXTENT  = 1.0_LDP-(OBS_PRO_EXT_RAT*VINF+3.0_LDP*V_DOP)/C_KMS
 C
 C BW and RW refer to the extent of the electron scattering wings. They are
 C defined from line center.
@@ -95,16 +95,16 @@ C thermal redistribution effects, and hence ES_WING_EXT is important. When
 C Vinf is large (>> Velec) the "coherent" scattering will dominate, and
 C the extent of the red wing will be determined by Vinf.
 C
-	MAX_RW_EXTENT = 1.0D0-(ES_WING_EXT+4.0D0*VINF)/C_KMS
-	MAX_BW_EXTENT = 1.0D0+(ES_WING_EXT+VINF)/C_KMS
+	MAX_RW_EXTENT = 1.0_LDP-(ES_WING_EXT+4.0_LDP*VINF)/C_KMS
+	MAX_BW_EXTENT = 1.0_LDP+(ES_WING_EXT+VINF)/C_KMS
 C
 C Ensures BW extent is bigger than profile extent.
 C
-	MAX_BW_EXTENT = MAX(MAX_BW_EXTENT,MAX_B_EXTENT+2.0D0*dV_OBS_BIG)
+	MAX_BW_EXTENT = MAX(MAX_BW_EXTENT,MAX_B_EXTENT+2.0_LDP*dV_OBS_BIG)
 C
-	PROF_SPACING = 1.0D0-dV_OBS_PROF/C_KMS
-	WING_SPACING = 1.0D0-dV_OBS_WING/C_KMS
-	BIG_SPACING  = 1.0D0-dV_OBS_BIG/C_KMS
+	PROF_SPACING = 1.0_LDP-dV_OBS_PROF/C_KMS
+	WING_SPACING = 1.0_LDP-dV_OBS_WING/C_KMS
+	BIG_SPACING  = 1.0_LDP-dV_OBS_BIG/C_KMS
 C
 	INDX=1
 	FREQ(1)=NU_MAX
@@ -112,7 +112,7 @@ C
 	DO WHILE( FREQ(INDX) .GT. NU_MIN/MAX_RW_EXTENT )
 	  IF(LN_INDX .GT. N_LINES .OR.
 	1      FREQ(INDX)*BIG_SPACING .GT. NU_LINE(MIN(LN_INDX,N_LINES))*
-	1         MAX_BW_EXTENT*(1.0D0+0.1D0*dV_OBS_WING/C_KMS) )THEN
+	1         MAX_BW_EXTENT*(1.0_LDP+0.1_LDP*dV_OBS_WING/C_KMS) )THEN
 	     INDX=INDX+1
 	     IF(INDX .GT. NFREQ_MAX)GOTO 9999
 	     FREQ(INDX)=FREQ(INDX-1)*BIG_SPACING
@@ -125,7 +125,7 @@ C
 C
 	     IF(FREQ(INDX) .GT. NU_LINE(LN_INDX)*MAX_B_EXTENT)THEN
 	       T1=FREQ(INDX)-NU_LINE(LN_INDX)*MAX_B_EXTENT
-	       I=C_KMS*T1/(FREQ(INDX)+0.5*T1)/dV_OBS_WING
+	       I=C_KMS*T1/(FREQ(INDX)+0.5_LDP*T1)/dV_OBS_WING
 	       T1=T1/(I+1)
 	       DO J=1,I
 	         INDX=INDX+1

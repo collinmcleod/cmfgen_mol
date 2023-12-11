@@ -18,19 +18,19 @@
 !
 ! Compute the coeficients in the binomial expansion of 1-sqrt(1-x^2)
 !
-	A(1)=0.5D0
-	A(2)=1.0D0/8.0D0
-	A(3)=1.0D0/16.0D0
-	A(4)=5.0D0/128.0D0
-	A(5)=7.0D0/256.0D0
-	A(6)=21.0D0/1024.0D0
+	A(1)=0.5_LDP
+	A(2)=1.0_LDP/8.0_LDP
+	A(3)=1.0_LDP/16.0_LDP
+	A(4)=5.0_LDP/128.0_LDP
+	A(5)=7.0_LDP/256.0_LDP
+	A(6)=21.0_LDP/1024.0_LDP
 !
 ! Compute dMU. We check the size of X(I+1) since it has the larger P/RVAL,
 ! and hence is more influenced by the accuracy Taylor series expansion.
 !
-	dX(N)=0.0D0
+	dX(N)=0.0_LDP
 	DO I=1,N-1
-          IF(X(I+1) .LT. 0.999D0)THEN
+          IF(X(I+1) .LT. 0.999_LDP)THEN
 	    dX(I)=X(I)-X(I+1)
 	  ELSE
 	    T1=(P(I)/RVAL)**2	

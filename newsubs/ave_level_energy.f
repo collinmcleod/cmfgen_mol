@@ -26,8 +26,8 @@
 	INTEGER I,J
 !
 	IF(HYD_PRES)THEN
-	  G_SUM(:)=0.0D0
-	  EDGE_SUM(:)=0.0D0
+	  G_SUM(:)=0.0_LDP
+	  EDGE_SUM(:)=0.0_LDP
 	  DO J=1,N_F
 	    I=F_TO_S(J)
             G_SUM(I)=G_SUM(I)+STAT_WT(J)

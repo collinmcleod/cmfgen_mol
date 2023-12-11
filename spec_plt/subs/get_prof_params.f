@@ -23,11 +23,11 @@
 	INTEGER I,J,K
 	INTEGER IMIN,IMAX
 !
-	C_MMS=1.0D-08*SPEED_OF_LIGHT()
+	C_MMS=1.0E-08_LDP*SPEED_OF_LIGHT()
 !
-	MAXIMUM=-1000.0D0; MINIMUM=10000.0D0
+	MAXIMUM=-1000.0_LDP; MINIMUM=10000.0_LDP
 	DO J=1,NCF
-	  IF(XV(J) .GT. 0.96D0*LINE_WAVE .AND. XV(J) .LT. 0.997D0*LINE_WAVE)THEN
+	  IF(XV(J) .GT. 0.96_LDP*LINE_WAVE .AND. XV(J) .LT. 0.997_LDP*LINE_WAVE)THEN
 	    IF(YV(J) .LT. MINIMUM)THEN
 	      MINIMUM=YV(J)
 	      IMIN=J
@@ -35,7 +35,7 @@
 	  END IF
 	END DO
 	DO J=IMIN,NCF
-	  IF(XV(J) .LT. 1.1D0*LINE_WAVE)THEN
+	  IF(XV(J) .LT. 1.1_LDP*LINE_WAVE)THEN
 	    IF(YV(J) .GT. MAXIMUM)THEN
 	      MAXIMUM=YV(J)
 	      IMAX=J
@@ -45,13 +45,13 @@
 !
 ! Find centroid, integrating between the limits set by Y=0
 !
-	DATA=YV-1.0D0
-	IF(MINIMUM .GT. 1.0D0 .AND. SN_AGE .GT. 30.0)DATA=DATA-MINIMUM
-	T1=0.0D0; T2=0.0D0
+	DATA=YV-1.0_LDP
+	IF(MINIMUM .GT. 1.0_LDP .AND. SN_AGE .GT. 30.0_LDP)DATA=DATA-MINIMUM
+	T1=0.0_LDP; T2=0.0_LDP
 	DO J=IMIN,1,-1
-	  IF(DATA(J) .GT. 0.0D0)THEN
+	  IF(DATA(J) .GT. 0.0_LDP)THEN
 	    DO K=J,IMIN-1
-	      QW=0.5D0*(XV(K+1)-XV(K))
+	      QW=0.5_LDP*(XV(K+1)-XV(K))
 	      T1=T1+QW*(XV(K)*DATA(K)+XV(K+1)*DATA(K+1))
 	      T2=T2+QW*(DATA(K)+DATA(K+1))
 	    END DO
@@ -59,9 +59,9 @@
 	  END IF
 	END DO
 	DO J=IMIN,IMAX
-	  IF(DATA(J) .GT. 0.0D0)THEN
+	  IF(DATA(J) .GT. 0.0_LDP)THEN
 	    DO K=IMIN,J-1
-	      QW=0.5D0*(XV(K+1)-XV(K))
+	      QW=0.5_LDP*(XV(K+1)-XV(K))
 	      T1=T1+QW*(XV(K)*DATA(K)+XV(K+1)*DATA(K+1))
 	      T2=T2+QW*(DATA(K)+DATA(K+1))
 	    END DO
@@ -72,18 +72,18 @@
 	  T1=T1/T2
 	ELSE
 	  WRITE(6,*)'Normalization for absorption is zero'
-	  T1=0.0D0
+	  T1=0.0_LDP
 	END IF
 !
 !
 ! Find emission centroid, integreating between the limits set by Y=0.75D*PEAK
 !
 	IF(DO_EMISS)THEN
-	  XEMIS_MEAN=0.0D0; T2=0.0D0
+	  XEMIS_MEAN=0.0_LDP; T2=0.0_LDP
 	  DO J=IMAX,IMIN,-1
-	    IF(DATA(J) .LT. 0.75D0*DATA(IMAX))THEN
+	    IF(DATA(J) .LT. 0.75_LDP*DATA(IMAX))THEN
 	      DO K=J,IMAX-1
-	        QW=0.5D0*(XV(K+1)-XV(K))
+	        QW=0.5_LDP*(XV(K+1)-XV(K))
 	        XEMIS_MEAN=XEMIS_MEAN+QW*(XV(K)*DATA(K)+XV(K+1)*DATA(K+1))
 	        T2=T2+QW*(DATA(K)+DATA(K+1))
 	      END DO
@@ -91,9 +91,9 @@
 	    END IF
 	  END DO
 	  DO J=IMAX,NCF
-	    IF(DATA(J) .LT. 0.75D0*DATA(IMAX))THEN
+	    IF(DATA(J) .LT. 0.75_LDP*DATA(IMAX))THEN
 	      DO K=IMAX,J-1
-	        QW=0.5D0*(XV(K+1)-XV(K))
+	        QW=0.5_LDP*(XV(K+1)-XV(K))
 	        XEMIS_MEAN=XEMIS_MEAN+QW*(XV(K)*DATA(K)+XV(K+1)*DATA(K+1))
 	        T2=T2+QW*(DATA(K)+DATA(K+1))
 	      END DO
@@ -104,7 +104,7 @@
 	    XEMIS_MEAN=XEMIS_MEAN/T2
 	  ELSE
 	    WRITE(6,*)'Normalization for emission is zero'
-	    XEMIS_MEAN=0.0D0
+	    XEMIS_MEAN=0.0_LDP
 	  END IF
 	END IF
 !

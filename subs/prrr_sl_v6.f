@@ -87,16 +87,16 @@
 ! 4PI*1.0E-10 (R scaling) Note that ordering is important or get underflow.
 ! FQW is approximately 10^15.
 !
-	H=PLANCKS_CONSTANT()*1.0D+15   		 !ergs/s (*1.0E+15 due to *nu)
+	H=PLANCKS_CONSTANT()*1.0E+15_LDP   		 !ergs/s (*1.0E+15 due to *nu)
 !
 ! If ML=1 and and PHOT_ID .EQ. 1 then initialize all arrays. This routine
 ! should be called first for ionizations to the ground state.
 !
 	IF(INIT_ARRAYS .AND. PHOT_ID .EQ. 1)THEN
-	  PR(:,:)=0.0D0				!NLEV,ND
-	  RR(:,:)=0.0D0				!NLEV,ND
-	  BFCR(:,:)=0.0D0			!NLEV,ND
-	  FF(:)=0.0D0				!ND
+	  PR(:,:)=0.0_LDP				!NLEV,ND
+	  RR(:,:)=0.0_LDP				!NLEV,ND
+	  BFCR(:,:)=0.0_LDP			!NLEV,ND
+	  FF(:)=0.0_LDP				!ND
 	END IF
 !
 ! Note that JREC     = Int [ (2hv^3/c^2 +J) exp(-hv/kT)/v dv ]
@@ -109,17 +109,17 @@
 !
 !$OMP PARALLEL DO PRIVATE(I,J,JB_RAT,JC_RAT)
 	DO J=1,ND
-	  IF(JREC(J) .GT. 0.0D0)THEN
+	  IF(JREC(J) .GT. 0.0_LDP)THEN
 	    JB_RAT=LOG(DI(ION_LEV,J)/DI(1,J))-LOG_DIST(ION_LEV,J)+LOG_DIST(1,J)
 	    JB_RAT=EXP(LOG(JREC(J))+JB_RAT)
 	  ELSE
-	    JB_RAT=0.0D0
+	    JB_RAT=0.0_LDP
 	  END IF
-	  IF(JREC_CR(J) .GT. 0.0D0)THEN
+	  IF(JREC_CR(J) .GT. 0.0_LDP)THEN
 	    JC_RAT=LOG(DI(ION_LEV,J)/DI(1,J))-LOG_DIST(ION_LEV,J)+LOG_DIST(1,J)
 	    JC_RAT=EXP(LOG(JREC_CR(J))+JC_RAT)
 	  ELSE
-	    JC_RAT=0.0D0
+	    JC_RAT=0.0_LDP
 	  END IF
 	  DO I=1,NLEV
 	    IF(WSE(I,J) .NE. 0)THEN
@@ -134,7 +134,7 @@
 !
 ! Compute Free-Free cooling.
 !
-	IF(ZHYD .EQ. 0.0D0)THEN
+	IF(ZHYD .EQ. 0.0_LDP)THEN
 !
 ! This is for H-. We use GFF_VAL as a temporary storage for the ground state
 ! population of neutral hydrogen.
@@ -153,11 +153,11 @@
 !
 ! The constant in T2 is 4PI x 1.0E-10.
 !
-	  T2=1.256637061D-09*ZHYD*ZHYD*CHIFF/(NU_CONT**3)
+	  T2=1.256637061E-09_LDP*ZHYD*ZHYD*CHIFF/(NU_CONT**3)
 	  DO J=1,ND
 	    POP_SUM=SUM(DI(:,J))
 	    A1=EXP(-HDKT*NU/T(J))
-	    FF(J) =FF(J)+T2*ED(J)*POP_SUM/SQRT(T(J))*(1.0D0-A1)
+	    FF(J) =FF(J)+T2*ED(J)*POP_SUM/SQRT(T(J))*(1.0_LDP-A1)
 	1           *GFF_VAL(J)*( BPHOT_CR(J)-JPHOT_CR(J) )
 	  END DO
 	END IF

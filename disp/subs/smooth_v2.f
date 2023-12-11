@@ -22,9 +22,9 @@
 	  DO J=DEPTH_LIM-1,1,-1
 	    DO I=1,N
 	      IF(SPEC(I,J) .GT. SPEC(I,J+1)*VAL)THEN
-                SPEC(I,J)=MAX(SPEC(I,J)*0.01D0,SPEC(I,J+1)*VAL)
+                SPEC(I,J)=MAX(SPEC(I,J)*0.01_LDP,SPEC(I,J+1)*VAL)
 	      ELSE IF(SPEC(I,J) .LT. SPEC(I,J+1)/VAL)THEN
-                SPEC(I,J)=MIN(SPEC(I,J)*100.0D0,SPEC(I,J+1)/VAL)
+                SPEC(I,J)=MIN(SPEC(I,J)*100.0_LDP,SPEC(I,J+1)/VAL)
 	      END IF
 	    END DO
 	  END DO

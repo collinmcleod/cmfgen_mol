@@ -35,11 +35,11 @@ C Compute quantities that will be used repeatedly if the same tridiagonal
 C system is used for many R.H. Sides.
 C
 	C(N1)=0				!As used.
-	DIV(1)=1.0/(C(1)+H(1))
+	DIV(1)=1.0_LDP/(C(1)+H(1))
 	C(1)=C(1)*DIV(1)
 	H(1)=H(1)*DIV(1)
 	DO I=2,N1
-	  DIV(I)=1.0D0/(A(I)*H(I-1)+H(I)+C(I))
+	  DIV(I)=1.0_LDP/(A(I)*H(I-1)+H(I)+C(I))
 	  H(I)=(A(I)*H(I-1)+H(I))*DIV(I)
 	  C(I)=C(I)*DIV(I)
 	END DO

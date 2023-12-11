@@ -136,16 +136,16 @@
 	    END IF
 	  END IF
 	  DO I=1,ND
-	    JNUM1(I)=0.0D0
-	    RSQ_HNUM1(I)=0.0D0
+	    JNUM1(I)=0.0_LDP
+	    RSQ_HNUM1(I)=0.0_LDP
  	  END DO
 	END IF
 !
 ! Zero relevant vectors and matrices.
 !
 	DO I=1,ND
-	  JNU(I)=0.0D0
-	  RSQ_HNU(I)=0.0D0
+	  JNU(I)=0.0_LDP
+	  RSQ_HNU(I)=0.0_LDP
 	END DO
 !
 	DO I=1,ND
@@ -165,7 +165,7 @@
 	CALL d_DERIVCHI_dCHI(TB,TA,R,ND,METHOD)
 	CALL NORDTAU(DTAU,TA,R,R,TB,ND)
 	DO I=2,ND
-	  RSQ_DTAUONQ(I)=0.5D0*R(I)*R(I)*(DTAU(I)+DTAU(I-1))/Q(I)
+	  RSQ_DTAUONQ(I)=0.5_LDP*R(I)*R(I)*(DTAU(I)+DTAU(I-1))/Q(I)
 	END DO
 !
 ! 
@@ -182,27 +182,27 @@
 !
 	IF(.NOT. INIT)THEN
 	  DO I=1,ND-1
-	    AV_SIGMA=0.5D0*(SIGMA(I)+SIGMA(I+1))
-	    GAMH(I)=2.0D0*3.33564D-06*(V(I)+V(I+1))/(R(I)+R(I+1))
+	    AV_SIGMA=0.5_LDP*(SIGMA(I)+SIGMA(I+1))
+	    GAMH(I)=2.0_LDP*3.33564E-06_LDP*(V(I)+V(I+1))/(R(I)+R(I+1))
 	1         /dLOG_NU/( CHI(I)+CHI(I+1) )
-	    W(I)=GAMH(I)*( 1.0D0+AV_SIGMA*NMID_ON_HMID(I) )
-	    WPREV(I)=GAMH(I)*( 1.0D0+AV_SIGMA*NMID_ON_HMID_PREV(I) )
-	    EPS_A(I)=GAMH(I)*AV_SIGMA*NMID_ON_J(I)/(1.0D0+W(I))
+	    W(I)=GAMH(I)*( 1.0_LDP+AV_SIGMA*NMID_ON_HMID(I) )
+	    WPREV(I)=GAMH(I)*( 1.0_LDP+AV_SIGMA*NMID_ON_HMID_PREV(I) )
+	    EPS_A(I)=GAMH(I)*AV_SIGMA*NMID_ON_J(I)/(1.0_LDP+W(I))
 	    EPS_B(I)=EPS_A(I)*R(I+1)*R(I+1)
 	    EPS_A(I)=EPS_A(I)*R(I)*R(I)
-	    EPS_PREV_A(I)=GAMH(I)*AV_SIGMA*NMID_ON_J_PREV(I)/(1.0D0+W(I))
+	    EPS_PREV_A(I)=GAMH(I)*AV_SIGMA*NMID_ON_J_PREV(I)/(1.0_LDP+W(I))
 	    EPS_PREV_B(I)=EPS_PREV_A(I)*R(I+1)*R(I+1)
 	    EPS_PREV_A(I)=EPS_PREV_A(I)*R(I)*R(I)
 	  END DO
 	  DO I=1,ND
-	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/dLOG_NU
+	    GAM(I)=3.33564E-06_LDP*V(I)/R(I)/CHI(I)/dLOG_NU
 	  END DO
 !
 ! PSIPREV is equivalent to the U vector of FORMSOL.
 !
 	  DO I=2,ND
-	    PSI(I)=RSQ_DTAUONQ(I)*GAM(I)*( 1.0D0+SIGMA(I)*K_ON_J(I) )
-	    PSIPREV(I)=RSQ_DTAUONQ(I)*GAM(I)*( 1.0D0+SIGMA(I)*K_ON_J_PREV(I) )
+	    PSI(I)=RSQ_DTAUONQ(I)*GAM(I)*( 1.0_LDP+SIGMA(I)*K_ON_J(I) )
+	    PSIPREV(I)=RSQ_DTAUONQ(I)*GAM(I)*( 1.0_LDP+SIGMA(I)*K_ON_J_PREV(I) )
 	  END DO
 	END IF
 !
@@ -211,9 +211,9 @@
 ! Compute vectors used to compute the flux vector H.
 !
 	DO I=1,ND-1
-	  HU(I)=R(I+1)*R(I+1)*K_ON_J(I+1)*Q(I+1)/(1.0D0+W(I))/DTAU(I)
-	  HL(I)=R(I)*R(I)*K_ON_J(I)*Q(I)/(1.0D0+W(I))/DTAU(I)
-	  HS(I)=WPREV(I)/(1.0D0+W(I))
+	  HU(I)=R(I+1)*R(I+1)*K_ON_J(I+1)*Q(I+1)/(1.0_LDP+W(I))/DTAU(I)
+	  HL(I)=R(I)*R(I)*K_ON_J(I)*Q(I)/(1.0_LDP+W(I))/DTAU(I)
+	  HS(I)=WPREV(I)/(1.0_LDP+W(I))
 	END DO
 !
 ! Compute the TRIDIAGONAL operators, and the RHS source vector.
@@ -221,7 +221,7 @@
 	DO I=2,ND-1
 	  TA(I)=-HL(I-1)-EPS_A(I-1)
 	  TC(I)=-HU(I)+EPS_B(I)
-	  TB(I)=RSQ_DTAUONQ(I)*(1.0D0-THETA(I)) + PSI(I) +HU(I-1) +HL(I)
+	  TB(I)=RSQ_DTAUONQ(I)*(1.0_LDP-THETA(I)) + PSI(I) +HU(I-1) +HL(I)
 	1             -EPS_B(I-1)+EPS_A(I)
 	  VB(I)=-HS(I-1)
 	  VC(I)=HS(I)
@@ -236,16 +236,16 @@
 	  TC(1)=-R(2)*R(2)*K_ON_J(2)*Q(2)/DTAU(1)
 	  TB(1)=R(1)*R(1)*( K_ON_J(1)*Q(1)/DTAU(1) + HBC ) + PSI(1)
 	  XM(1)=XM(1) + PSIPREV(1)*JNUM1(1)
-	  TA(1)=0.0D0
-	  VB(1)=0.0D0
-	  VC(1)=0.0D0
+	  TA(1)=0.0_LDP
+	  VB(1)=0.0_LDP
+	  VC(1)=0.0_LDP
 	ELSE
-	  PSI(1)=R(1)*R(1)*GAM(1)*(1.0D0+SIGMA(1)*K_ON_J(1))
-	  PSIPREV(1)=R(1)*R(1)*GAM(1)*(1.0D0+SIGMA(1)*K_ON_J_PREV(1))
-	  T1=0.25D0*(CHI(2)+CHI(1))*(R(2)-R(1))
+	  PSI(1)=R(1)*R(1)*GAM(1)*(1.0_LDP+SIGMA(1)*K_ON_J(1))
+	  PSIPREV(1)=R(1)*R(1)*GAM(1)*(1.0_LDP+SIGMA(1)*K_ON_J_PREV(1))
+	  T1=0.25_LDP*(CHI(2)+CHI(1))*(R(2)-R(1))
 	  DTAU_BND=T1
 	  TC(1)=(HU(1)-EPS_B(1))/T1
-	  TB(1)=-(HL(1)+R(1)*R(1)*HBC+EPS_A(1))/T1-PSI(1)-R(1)*R(1)*(1.0D0-THETA(1))
+	  TB(1)=-(HL(1)+R(1)*R(1)*HBC+EPS_A(1))/T1-PSI(1)-R(1)*R(1)*(1.0_LDP-THETA(1))
 	  XM(1)=-SOURCE(1)*R(1)*R(1)- HS(1)*RSQ_HNUM1(1)/T1- PSIPREV(1)*JNUM1(1)
 	  XM(1)=XM(1)-(EPS_PREV_A(1)*JNUM1(1)+EPS_PREV_B(1)*JNUM1(2))/T1
 	END IF
@@ -253,24 +253,24 @@
 	TA(ND)=-R(ND-1)*R(ND-1)*K_ON_J(ND-1)*Q(ND-1)/DTAU(ND-1)
 	IF(INNER_BND_METH .EQ. 'DIFFUSION')THEN
 	  TB(ND)=R(ND)*R(ND)*K_ON_J(ND)/DTAU(ND-1)
-	  XM(ND)=DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
+	  XM(ND)=DBB*R(ND)*R(ND)/3.0_LDP/CHI(ND)
 	  LOCAL_DBB=DBB
 	  DIF_OR_ZF=.TRUE.
 	ELSE IF(INNER_BND_METH .EQ. 'ZERO_FLUX')THEN
 	  TB(ND)=R(ND)*R(ND)*K_ON_J(ND)/DTAU(ND-1)
 	  XM(ND)=IB_STAB_FACTOR*TB(ND)*R(ND)*R(ND)*(JPLUS_IB+JMIN_IB)
-	  TB(ND)=(1.0D0+IB_STAB_FACTOR)*TB(ND)
-	  LOCAL_DBB=0.0D0
+	  TB(ND)=(1.0_LDP+IB_STAB_FACTOR)*TB(ND)
+	  LOCAL_DBB=0.0_LDP
 	  DIF_OR_ZF=.TRUE.
 	ELSE IF(INNER_BND_METH .EQ. 'SCHUSTER')THEN
 	  TB(ND)=R(ND)*R(ND)*K_ON_J(ND)/DTAU(ND-1)+IN_HBC
-	  XM(ND)=R(ND)*R(ND)*IC*(0.25D0+0.5D0*IN_HBC)
+	  XM(ND)=R(ND)*R(ND)*IC*(0.25_LDP+0.5_LDP*IN_HBC)
 	  DIF_OR_ZF=.FALSE.
 	END IF
-	TC(ND)=0.0D0
-	VB(ND)=0.0D0
-	VC(ND)=0.0D0
-	PSIPREV(ND)=0.0D0
+	TC(ND)=0.0_LDP
+	VB(ND)=0.0_LDP
+	VC(ND)=0.0_LDP
+	PSIPREV(ND)=0.0_LDP
 !
 ! We create PSIPREV_MOD to save multiplications in the UP_TX_TVX routine/
 ! It is only different from PSIPREV when N_ON_J is non zero.
@@ -308,9 +308,9 @@
 	  DO I=1,ND-1
 	    T1=MAX(R(I)*R(I)*XM(I),R(I+1)*R(I+1)*XM(I+1))
 	    IF(RSQ_HNU(I) .GT. T1)THEN
-	      RSQ_HNU(I)=0.99999D0*T1
+	      RSQ_HNU(I)=0.99999_LDP*T1
 	    ELSE IF(RSQ_HNU(I) .LT. -T1)THEN
-	      RSQ_HNU(I)=-0.99999D0*T1
+	      RSQ_HNU(I)=-0.99999_LDP*T1
 	    END IF
 	  END DO
 	END IF
@@ -371,9 +371,9 @@
 	1          + ( EPS_PREV_B(I)*TX_OLD_d_dTdR(I+1)
 	1               - EPS_PREV_A(I-1)*TX_OLD_d_dTdR(I-1) )
 	  END DO
-	  TX_DIF_d_T(ND)=dDBBdT*R(ND)*R(ND)/3.0D0/CHI(ND) +
+	  TX_DIF_d_T(ND)=dDBBdT*R(ND)*R(ND)/3.0_LDP/CHI(ND) +
 	1                       PSIPREV(ND)*TX_DIF_d_T(ND)
-	  TX_DIF_d_dTdR(ND)=DBB/dTdR*R(ND)*R(ND)/3.0D0/CHI(ND) +
+	  TX_DIF_d_dTdR(ND)=DBB/dTdR*R(ND)*R(ND)/3.0_LDP/CHI(ND) +
 	1                       PSIPREV(ND)*TX_DIF_d_dTdR(ND)
 !
 ! Solve for the radiation field along ray for this frequency.

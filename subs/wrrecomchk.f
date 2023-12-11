@@ -30,8 +30,8 @@ C
 	INTEGER, PARAMETER :: IZERO=0
 	EXTERNAL ERROR_LU
 C
-	NETRR(:)=0.0D0                 !ND
-	TOTRR(:)=0.0D0                 !ND
+	NETRR(:)=0.0_LDP                 !ND
+	TOTRR(:)=0.0_LDP                 !ND
 C
 	CALL GEN_ASCI_OPEN(LU,FILNAM,'UNKNOWN',' ',' ',IZERO,IOS)
 	IF(IOS .NE. 0)THEN
@@ -102,7 +102,7 @@ C
 	  END IF
 C
 	  DO J=MS,MF
-	    ABS_SUM=0.0D0
+	    ABS_SUM=0.0_LDP
 	    DO I=1,N
 	      NETRR(J)=NETRR(J)-PR(I,J)+RR(I,J)
 	      TOTRR(J)=TOTRR(J)+RR(I,J)
@@ -110,7 +110,7 @@ C
 	    END DO
 	    ABS_SUM=ABS_SUM+CRR(J)+CPR(J)+ABS(DIERECOM(J))+ABS(ADDRECOM(J))+
 	1             ABS(X_RECOM_1(J))+ABS(X_RECOM_2(J))
-	    NETRR(J)=200.0D0*(NETRR(J)+(CRR(J)-CPR(J))+DIERECOM(J)+ADDRECOM(J)
+	    NETRR(J)=200.0_LDP*(NETRR(J)+(CRR(J)-CPR(J))+DIERECOM(J)+ADDRECOM(J)
 	1                    +X_RECOM_1(J)+X_RECOM_2(J))/ABS_SUM
 	    DIERECOM(J)=DIERECOM(J)/(TOTRR(J)+ADDRECOM(J))
 	    ADDRECOM(J)=ADDRECOM(J)/ED(J)/DHYD(J)

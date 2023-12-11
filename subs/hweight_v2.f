@@ -35,35 +35,35 @@
 	EXTERNAL ERROR_LU
 	LOGICAL, PARAMETER :: CHECK=.FALSE.
 !
-	W(:)=0.0D0
+	W(:)=0.0_LDP
 !
 	H=dX(1)
 	HN=dX(2)
 	RF=dX(1)+dX(2)
-	W(1)=0.5D0*H*(X(1)-H/6.0D0)
-	1       -H*H/RF/12.0D0*((2.0D0+HN/H)*X(1)-X(2))
-	W(2)=0.5D0*H*(X(2)+H/6.0D0)
-	1       +H*H/RF/12.0D0*(2.0D0+H/HN+HN/H)*X(1)
-	W(3)=-H*H/RF/12.0D0*(X(2)+H/HN*X(1))
+	W(1)=0.5_LDP*H*(X(1)-H/6.0_LDP)
+	1       -H*H/RF/12.0_LDP*((2.0_LDP+HN/H)*X(1)-X(2))
+	W(2)=0.5_LDP*H*(X(2)+H/6.0_LDP)
+	1       +H*H/RF/12.0_LDP*(2.0_LDP+H/HN+HN/H)*X(1)
+	W(3)=-H*H/RF/12.0_LDP*(X(2)+H/HN*X(1))
 !
 	DO I=3,N-1
 	  H=dX(I-1)
 	  RF=dX(I-2)+dX(I-1)
 	  RE=dX(I-1)+dX(I)
-	  W(I-2)=W(I-2)-X(I-1)*H*H/12.0D0/RF
-	  W(I-1)=W(I-1)+0.5D0*H*(X(I-1)-H/6.0D0)
-	1              +X(I)*H*H/12.0D0/RE
-	  W(I)=W(I)+0.5D0*H*(X(I)+H/6.0D0)
-	1              +X(I-1)*H*H/12.0D0/RF
-	  W(I+1)=W(I+1)-X(I)*H*H/12.0D0/RE
+	  W(I-2)=W(I-2)-X(I-1)*H*H/12.0_LDP/RF
+	  W(I-1)=W(I-1)+0.5_LDP*H*(X(I-1)-H/6.0_LDP)
+	1              +X(I)*H*H/12.0_LDP/RE
+	  W(I)=W(I)+0.5_LDP*H*(X(I)+H/6.0_LDP)
+	1              +X(I-1)*H*H/12.0_LDP/RF
+	  W(I+1)=W(I+1)-X(I)*H*H/12.0_LDP/RE
 	END DO
 !
 ! Assumes that V(mu=0)=0 and mu.dV(mu)=0 at mu=0.
 ! Subtracting the X to get dX is fine for high N.
 !
-	IF(X(N) .EQ. 0.0D0)THEN
+	IF(X(N) .EQ. 0.0_LDP)THEN
 	  H=dX(N-1)
-	  W(N-1)=W(N-1)+H*H/3.0D0
+	  W(N-1)=W(N-1)+H*H/3.0_LDP
 	ELSE
 !
 ! Since V(mu=0) is zero, we dont actually need a ray with mu=0 since the weight
@@ -74,28 +74,28 @@
           H=X(N-1)-X(N)
           RF=X(N-2)-X(N)
           RE=X(N-1)                             !As X(N+1)=0
-	  W(N-2)=W(N-2)-X(N-1)*H*H/12.0D0/RF
-	  W(N-1)=W(N-1)+0.5D0*H*(X(N-1)-H/6.0D0)
-	1              +X(N)*H*H/12.0D0/RE
-	  W(N)=W(N)+0.5D0*H*(X(N)+H/6.0D0)
-	1              +X(I-1)*H*H/12.0D0/RF
+	  W(N-2)=W(N-2)-X(N-1)*H*H/12.0_LDP/RF
+	  W(N-1)=W(N-1)+0.5_LDP*H*(X(N-1)-H/6.0_LDP)
+	1              +X(N)*H*H/12.0_LDP/RE
+	  W(N)=W(N)+0.5_LDP*H*(X(N)+H/6.0_LDP)
+	1              +X(I-1)*H*H/12.0_LDP/RF
 !
 ! Integral from X(N) to X(N+1)
 !
 	  H=X(N)
-	  W(N)=W(N)+H*H/3.0D0
+	  W(N)=W(N)+H*H/3.0_LDP
 	  WRITE(lUER,*)'Warning - Extrapolation to zero required in HWEIGHT_V2'
 	END IF
 !
 ! Ensure that the weights have the correct normalization (but dont
 ! perform the normalization).
 !
-	SUM=0.0D0
+	SUM=0.0_LDP
 	DO I=1,N
 	  SUM=SUM+W(I)*X(I)
 	END DO
-	SUM=1.0D0/SUM/3.0D0
-	IF(ABS(SUM-1.0D0) .GT. 1.0D-12)THEN
+	SUM=1.0_LDP/SUM/3.0_LDP
+	IF(ABS(SUM-1.0_LDP) .GT. 1.0E-12_LDP)THEN
 	  LUER=ERROR_LU()
 	  WRITE(LUER,*)' Warning - weights require normalization in HWEIGHT_V2'
 	  WRITE(LUER,*)' Expected SUM is 1: SUM=',SUM
@@ -108,7 +108,7 @@
 	    T1=X(LS)-X(LS+1)
 	    WRITE(6,'(F20.16,3ES14.6)')X(LS),T1,dX(LS),W(LS)
 	  END DO
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  WRITE(6,'(F20.16,3ES14.6)')X(LS),T1,dX(LS),W(LS)
 	  FLUSH(UNIT=6)
 	END IF

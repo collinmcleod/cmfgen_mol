@@ -51,7 +51,7 @@
 ! equilibrium equation is replaced by the ionization equation.
 !
 !	REAL(KIND=LDP), PARAMETER :: FAC=1.0D+05
-	REAL(KIND=LDP), PARAMETER :: FAC=1.0D+02
+	REAL(KIND=LDP), PARAMETER :: FAC=1.0E+02_LDP
 !
 	LOGICAL DIAG_BAND
 !
@@ -89,14 +89,14 @@
 	  END IF
 	END IF
 !
-	C_MAT(:,:)=0.0D0
-	C_ION(:,:)=0.0D0
-	C_NC(:,:)=0.0D0
+	C_MAT(:,:)=0.0_LDP
+	C_ION(:,:)=0.0_LDP
+	C_NC(:,:)=0.0_LDP
 !
 	IF(DIAG_BAND)THEN
-	  STEQ_VEC(:)=0.0D0
-	  STEQ_ION(:)=0.0D0
-	  STEQ_NC(:)=0.0D0
+	  STEQ_VEC(:)=0.0_LDP
+	  STEQ_ION(:)=0.0_LDP
+	  STEQ_NC(:)=0.0_LDP
 !
 	  IF(FIRST_MATRIX)THEN
             I=SE(4)%LNK_TO_IV(1101)

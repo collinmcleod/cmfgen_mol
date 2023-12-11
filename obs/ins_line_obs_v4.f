@@ -83,7 +83,7 @@
 	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 !
 ! Check parameters.
 !
@@ -104,8 +104,8 @@
 ! We assume that both lines and continuum are ordered from highest to
 ! lowest frequencies.
 !
-	MAX_B_EXTENT  = 1.0D0+(OBS_PRO_EXT_RAT*VINF+3.0D0*V_DOP)/C_KMS
-	MAX_R_EXTENT  = 1.0D0-(OBS_PRO_EXT_RAT*VINF+3.0D0*V_DOP)/C_KMS
+	MAX_B_EXTENT  = 1.0_LDP+(OBS_PRO_EXT_RAT*VINF+3.0_LDP*V_DOP)/C_KMS
+	MAX_R_EXTENT  = 1.0_LDP-(OBS_PRO_EXT_RAT*VINF+3.0_LDP*V_DOP)/C_KMS
 !
 ! BW and RW refer to the extent of the electron scattering wings. They are
 ! defined from line center.
@@ -118,14 +118,14 @@
 ! For SN models using VINF sets the red wing to cover essentially the whole spectrum.
 ! We now set a limit of 10000 km/s on the extent of the red wing.
 !
-	T1=10000.0D0
-	T1=MIN(T1,4.0D0*VINF)
-	MAX_RW_EXTENT = 1.0D0-(ES_WING_EXT+T1)/C_KMS
-	MAX_BW_EXTENT = 1.0D0+(ES_WING_EXT+VINF)/C_KMS
+	T1=10000.0_LDP
+	T1=MIN(T1,4.0_LDP*VINF)
+	MAX_RW_EXTENT = 1.0_LDP-(ES_WING_EXT+T1)/C_KMS
+	MAX_BW_EXTENT = 1.0_LDP+(ES_WING_EXT+VINF)/C_KMS
 !
 ! Ensures BW extent is bigger than profile extent.
 !
-	MAX_BW_EXTENT = MAX(MAX_BW_EXTENT,MAX_B_EXTENT+2.0D0*dV_OBS_BIG/C_KMS)
+	MAX_BW_EXTENT = MAX(MAX_BW_EXTENT,MAX_B_EXTENT+2.0_LDP*dV_OBS_BIG/C_KMS)
 !
 ! Spacing in km/s across various parts of the frequency spectrum. NB: These
 ! meanings have changed from version V3.
@@ -151,7 +151,7 @@
 ! can have an extremely large VINF (19-June-2009).
 !
 !	DO WHILE( FREQ(INDX) .GT. NU_MIN/MAX_RW_EXTENT )
-	DO WHILE( FREQ(INDX) .GT. 1.1D0*NU_MIN )
+	DO WHILE( FREQ(INDX) .GT. 1.1_LDP*NU_MIN )
 !
 ! Continuum
 !
@@ -207,8 +207,8 @@
 	      NU_END_LINE=NU_LINE(K)-(NU_STRT_LINE(K)-NU_LINE(K))
 	      IF( (FREQ(INDX) .GT. NU_END_LINE .AND.
 	1          T1 .LE. NU_STRT_LINE(K)) )THEN
-	        T2=0.5D0*FREQ(INDX)*FRAC_DOP_OBS*VEC_VMIN_VDOP(K)*
-	1             SQRT( 1.0D0+ C_KMS*ABS(1.0D0-NU_LINE(K)/FREQ(INDX))/
+	        T2=0.5_LDP*FREQ(INDX)*FRAC_DOP_OBS*VEC_VMIN_VDOP(K)*
+	1             SQRT( 1.0_LDP+ C_KMS*ABS(1.0_LDP-NU_LINE(K)/FREQ(INDX))/
 	1                   VEC_VMIN_VDOP(K) )/C_KMS
 	        dNU=MIN(dNU,T2)
 	      END IF

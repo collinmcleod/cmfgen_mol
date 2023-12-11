@@ -19,10 +19,10 @@
 	LOGICAL, SAVE :: CHECK=.FALSE.
 	EXTERNAL ERROR_LU
 !
-	W(:)=0.0D0
+	W(:)=0.0_LDP
 	DO I=1,N-1
-	  W(I)=W(I)+0.5D0*dX(I)
-	  W(I+1)=W(I+1)+0.5D0*dX(I)
+	  W(I)=W(I)+0.5_LDP*dX(I)
+	  W(I+1)=W(I+1)+0.5_LDP*dX(I)
 	END DO
 !
 ! Assumes that j'=0
@@ -32,8 +32,8 @@
 ! Integral from X(N) to 0
 !
 	  T1=X(N)/( X(N-1)*X(N-1)-X(N)*X(N) )
-	  W(N-1)=W(N-1)-2.0D0*T1*X(N)*X(N)/3.0D0
-	  W(N)=W(N)+T1*(X(N-1)*X(N-1)-X(N)*X(N)/3.0D0)
+	  W(N-1)=W(N-1)-2.0_LDP*T1*X(N)*X(N)/3.0_LDP
+	  W(N)=W(N)+T1*(X(N-1)*X(N-1)-X(N)*X(N)/3.0_LDP)
 !
 	END IF
 !
@@ -42,25 +42,25 @@
 ! the correct answer is given for a linear varaition. Because of the
 ! assumption that du/dmu(mu=0)=0, we have to fiddle with the last check.
 !
-	SUM=0.0D0
+	SUM=0.0_LDP
 	DO I=1,N
 	  SUM=SUM+W(I)
 	END DO
 !
-	XSUM=0.0D0
+	XSUM=0.0_LDP
 	DO I=1,N
 	  XSUM=XSUM+W(I)*X(I)
 	END DO
 	IF(X(N) .EQ. 0)THEN
-	  T1=0.5D0
+	  T1=0.5_LDP
 	ELSE
 	  T1=X(N)/( X(N-1)*X(N-1)-X(N)*X(N) )
-	  T1=T1*( X(N)*(X(N-1)*X(N-1)-X(N)*X(N)/3.0D0)
-	1        -2.0D0*X(N)*X(N)*X(N-1)/3.0D0 )
-	  T1=0.5D0*(1.0D0-X(N)*X(N))+T1
+	  T1=T1*( X(N)*(X(N-1)*X(N-1)-X(N)*X(N)/3.0_LDP)
+	1        -2.0_LDP*X(N)*X(N)*X(N-1)/3.0_LDP )
+	  T1=0.5_LDP*(1.0_LDP-X(N)*X(N))+T1
 	END IF
 	XSUM=XSUM/T1
-	IF(ABS(XSUM-1.0D0) .GT. 1.0D-12)THEN
+	IF(ABS(XSUM-1.0_LDP) .GT. 1.0E-12_LDP)THEN
 	   LUER=ERROR_LU()
 	   WRITE(LUER,*)' Warning - weights require normalization in JTRPWGT_V2'
 	   WRITE(LUER,*)' Expected normalized  Sum(W) is 1:  Sum(w)-1 =',SUM-1.0D0
@@ -72,7 +72,7 @@
 	IF(CHECK)THEN
 	  WRITE(6,*)'Check of J weights in JTRPWGT_V2'
 	  WRITE(6,'(18X,A,11X,A,14X,A,21X,A,18X,A)')'MU','dMU','dMU(acc)','W','Wsum'
-	  SUM=0.0D0
+	  SUM=0.0_LDP
 	  DO I=1,N-1
 	    T1=X(I)-X(I+1)
 	    SUM=SUM+W(I)

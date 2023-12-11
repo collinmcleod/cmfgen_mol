@@ -15,19 +15,19 @@
 	INTEGER I,J
 	REAL(KIND=LDP) DELR
 !	
-        DO I=1, ND ; CHI(I)= ( (I+1.0D0)**2 )/ND; END DO
+        DO I=1, ND ; CHI(I)= ( (I+1.0_LDP)**2 )/ND; END DO
         DO I=1,ND
-          R(I)=1.0+0.1D0*(I**2)
+          R(I)=1.0_LDP+0.1_LDP*(I**2)
         END DO
 C
 	J=1
         DO I=1,ND-1
 	  DELR=R(I+1)-R(I)
           QZR(J)=R(I)
-          QZR(J+1)=R(I)+0.04*DELR
-          QZR(J+2)=R(I)+0.16*DELR
-          QZR(J+3)=R(I)+0.40*DELR
-          QZR(J+4)=R(I)+0.70*DELR
+          QZR(J+1)=R(I)+0.04_LDP*DELR
+          QZR(J+2)=R(I)+0.16_LDP*DELR
+          QZR(J+3)=R(I)+0.40_LDP*DELR
+          QZR(J+4)=R(I)+0.70_LDP*DELR
 	  J=J+5
         END DO
 	QZR(NQ)=R(ND)

@@ -141,7 +141,7 @@
 !
 ! dJ_CHK_FAC
 !
-	IF(dJ_CHK_FAC .LT. 1.0D-10 .OR. dJ_CHK_FAC .GT. 0.1)THEN
+	IF(dJ_CHK_FAC .LT. 1.0E-10_LDP .OR. dJ_CHK_FAC .GT. 0.1_LDP)THEN
 	  I=ERROR_LU()
 	  WRITE(I,*)'Error in BA_UPDATE_V4'
 	  WRITE(I,*)'Invalid value for dJ_CHK_FAC: dJ_CHK_FAC=',dJ_CHK_FAC
@@ -255,7 +255,7 @@
 	          IF(K .EQ. DIAG_INDX)THEN
    	            DO  JJ=1,SE(ID)%N_IV	  	  	  !Variable
   	              J=SE(ID)%LNK_TO_F(JJ)
-	              IF( COMP_VEC(J) .GE. 0.0D0 )THEN
+	              IF( COMP_VEC(J) .GE. 0.0_LDP )THEN
 	                DO  I=1,SE(ID)%N_SE	  	  !Which S.E.
 	                  SE(ID)%BA_PAR(I,JJ,L)=SE(ID)%BA_PAR(I,JJ,L) +
 	1                             SE(ID)%QFV_R(I,L)*VJ(J,K,L)
@@ -265,7 +265,7 @@
 	          ELSE IF(SE(ID)%XzV_PRES)THEN
    	            DO JJ=1,SE(ID)%N_IV	  	  	  !Variable
   	              J=SE(ID)%LNK_TO_F(JJ)
-	              IF( COMP_VEC(J) .GE. 0.0D0 )THEN
+	              IF( COMP_VEC(J) .GE. 0.0_LDP )THEN
 	                DO I=1,SE(ID)%N_SE	  	  !Which S.E.
 	                   SE(ID)%BA(I,JJ,K,L)=SE(ID)%BA(I,JJ,K,L) +
 	1                          SE(ID)%QFV_R(I,L)*VJ(J,K,L)
@@ -314,7 +314,7 @@ C
 	          IF(K .EQ. DIAG_INDX)THEN
    	            DO JJ=1,SE(ID)%N_IV	  	  	  !Variable
   	              J=SE(ID)%LNK_TO_F(JJ)
-                      IF( COMP_VEC(J) .GE. 0.0D0 )THEN
+                      IF( COMP_VEC(J) .GE. 0.0_LDP )THEN
 	                DO  I=1,SE(ID)%N_SE	  	  !Which S.E.
 	                  SE(ID)%BA_PAR(I,JJ,L)=SE(ID)%BA_PAR(I,JJ,L)+
 	1                   ( SE(ID)%QFV_R(I,L)*VJ_R(J,K,L) - SE(ID)%QFV_P(I,L)*VJ_P(J,K,L) )
@@ -324,7 +324,7 @@ C
 	          ELSE IF(SE(ID)%XzV_PRES)THEN
    	            DO JJ=1,SE(ID)%N_IV	  	  	  !Variable
   	              J=SE(ID)%LNK_TO_F(JJ)
-                      IF( COMP_VEC(J) .GE. 0.0D0)THEN
+                      IF( COMP_VEC(J) .GE. 0.0_LDP)THEN
 	                DO  I=1,SE(ID)%N_SE	  	  !Which S.E.
 	                  SE(ID)%BA(I,JJ,K,L)=SE(ID)%BA(I,JJ,K,L)+
 	1                 ( SE(ID)%QFV_R(I,L)*VJ_R(J,K,L) - SE(ID)%QFV_P(I,L)*VJ_P(J,K,L) )

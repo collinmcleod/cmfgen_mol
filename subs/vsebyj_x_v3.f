@@ -97,8 +97,8 @@ C HNST_A(J,I)/HN_B(1,I) is independent of HN_B(1,I)
 C
 	      T3=HNST_A(J,I)*WSE_X(J,I)*BSTIM
 	      DI_FAC=T3/DI(I)
-	      ED_FAC=2.0D0*T3/ED(I)
-	      T_FAC=T3*( HDKT*(NU(ML)-EDGE_B(1)-1.5D0)/T(I) +
+	      ED_FAC=2.0_LDP*T3/ED(I)
+	      T_FAC=T3*( HDKT*(NU(ML)-EDGE_B(1)-1.5_LDP)/T(I) +
 	1             dlnHNST_AdlnT(J,I) )/T(I)
 C
 	      BA(NJ,ION_EQ,L,I)=BA(NJ,ION_EQ,L,I) +DI_FAC

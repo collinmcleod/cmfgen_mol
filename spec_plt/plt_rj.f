@@ -49,7 +49,7 @@ C
 	CHARACTER*80 FILENAME
 	CHARACTER*80 FILE_DATE
 C
-	C_KMS=SPEED_OF_LIGHT()/1.0D+05
+	C_KMS=SPEED_OF_LIGHT()/1.0E+05_LDP
 C
 	WRITE(T_OUT,*)
 	1  ' Routine to plot J from EDDFACTOR file. This J is convolved'
@@ -64,7 +64,7 @@ C
 !	CALL GEN_IN(NCF,'Number of model frequency points')
 !
 	LU_IN=35
-	T_elec=1.0D0		!10^4 K
+	T_elec=1.0_LDP		!10^4 K
 C
 C Open EDDFACTOR file.
 C
@@ -122,8 +122,8 @@ C
 C
 C Compute integrals as a function of depth to check flux conservation.
 C
-	FLUX_RJ(1:ND)=+0.0D0
-	FLUX_ES(1:ND)=+0.0D0
+	FLUX_RJ(1:ND)=+0.0_LDP
+	FLUX_ES(1:ND)=+0.0_LDP
 	DO ML=2,NCF-1
 	  DO I=1,ND
 	    FLUX_RJ(I)=FLUX_RJ(I)+(NU(ML)-NU(ML+1))*(RJ(I,ML)+
@@ -136,8 +136,8 @@ C
 	WRITE(9,'(1P5E12.5)')200.0D0*(FLUX_RJ(1:ND)-FLUX_ES(1:ND))/
 	1                    (FLUX_RJ(1:ND)+FLUX_ES(1:ND))
 C
-	FLUX_RJ(1:ND)=+0.0D0
-	FLUX_ES(1:ND)=+0.0D0
+	FLUX_RJ(1:ND)=+0.0_LDP
+	FLUX_ES(1:ND)=+0.0_LDP
 	DO ML=2,NCF-1
 	  DO I=1,ND
 	    T1=LOG(NU(ML)/NU(ML+1))
@@ -175,24 +175,24 @@ C
 C Convolve RJ with electron-scattering redistribution function.
 C
 	CALL GEN_IN(T_elec,'Electron temperature (in units 10^4 K)')
-	BETA=1.84D-03*SQRT(T_elec)
-	T1=0.5D0*BETA*BETA
-	C(1)=0.0D0
-	A(1)=0.0D0
-	B(1)=-1.0D0
+	BETA=1.84E-03_LDP*SQRT(T_elec)
+	T1=0.5_LDP*BETA*BETA
+	C(1)=0.0_LDP
+	A(1)=0.0_LDP
+	B(1)=-1.0_LDP
 	D(1)=RJ(K,1)
 	DO ML=2,NCF-1
 	  D1=LOG(NU(ML-1)/NU(ML))
 	  D2=LOG(NU(ML)/NU(ML+1))
-	  DH=0.5D0*(D1+D2)
+	  DH=0.5_LDP*(D1+D2)
 	  A(ML)=-T1/D1/DH
-	  B(ML)=-1.0D0
+	  B(ML)=-1.0_LDP
 	  C(ML)=-T1/D2/DH
 	  D(ML)=RJ(K,ML)
 	END DO
 	A(NCF)=0.0
 	C(NCF)=0.0
-	B(NCF)=-1.0D0
+	B(NCF)=-1.0_LDP
 	D(NCF)=RJ(K,NCF)
 C
 	CALL THOMAS_RH(A,B,C,D,NCF,IONE)
@@ -203,21 +203,21 @@ C
 !
 ! Compute integrals as a function of depth to check flux conservation.
 !
-	RJ_FLUX=+0.0D0
-	ES_FLUX=+0.0D0
-	ES2_FLUX=+0.0D0
+	RJ_FLUX=+0.0_LDP
+	ES_FLUX=+0.0_LDP
+	ES2_FLUX=+0.0_LDP
 	DO ML=2,NCF-1
 	    RJ_FLUX=RJ_FLUX+(NU(ML)-NU(ML+1))*(RJ(K,ML)+RJ(K,ML+1))
 	    ES_FLUX=ES_FLUX+(NU(ML)-NU(ML+1))*(RJ_ES_RD(K,ML)+RJ_ES_RD(K,ML+1))
 	    ES2_FLUX=ES2_FLUX+(NU(ML)-NU(ML+1))*(D(ML)+D(ML+1))
 	END DO
-	ES_FLUX=200.0D0*(RJ_FLUX-ES_FLUX)/(RJ_FLUX+ES_FLUX)
-	ES2_FLUX=200.0D0*(RJ_FLUX-ES2_FLUX)/(RJ_FLUX+ES2_FLUX)
+	ES_FLUX=200.0_LDP*(RJ_FLUX-ES_FLUX)/(RJ_FLUX+ES_FLUX)
+	ES2_FLUX=200.0_LDP*(RJ_FLUX-ES2_FLUX)/(RJ_FLUX+ES2_FLUX)
 	WRITE(5,'(A,1X,1P,2E13.5)')'  %Flux errors:  ',ES_FLUX,ES2_FLUX
 C
-	RJ_FLUX=+0.0D0
-	ES_FLUX=+0.0D0
-	ES2_FLUX=+0.0D0
+	RJ_FLUX=+0.0_LDP
+	ES_FLUX=+0.0_LDP
+	ES2_FLUX=+0.0_LDP
 	DO ML=2,NCF-1
 	  DO I=1,ND
 	    T1=LOG(NU(ML)/NU(ML+1))
@@ -226,8 +226,8 @@ C
 	    ES2_FLUX=ES2_FLUX+T1*(D(ML)+D(ML+1))
 	  END DO
 	END DO
-	ES_FLUX=200.0D0*(RJ_FLUX-ES_FLUX)/(RJ_FLUX+ES_FLUX)
-	ES2_FLUX=200.0D0*(RJ_FLUX-ES2_FLUX)/(RJ_FLUX+ES2_FLUX)
+	ES_FLUX=200.0_LDP*(RJ_FLUX-ES_FLUX)/(RJ_FLUX+ES_FLUX)
+	ES2_FLUX=200.0_LDP*(RJ_FLUX-ES2_FLUX)/(RJ_FLUX+ES2_FLUX)
 	WRITE(5,'(A,1X,1P,2E13.5)')'  %Photon errors:',ES_FLUX,ES2_FLUX
 !
 	WRITE(T_OUT,*)' '
@@ -238,32 +238,32 @@ C
 	WRITE(T_OUT,*)' '
 	WRITE(T_OUT,*)'Plotting normalized % difference between J_RD, Jes_RD'
 	DO ML=1,NCF
-	  YV(ML)=100.0D0*(RJ(K,ML)-RJ_ES_RD(K,ML))/RJ(K,ML)
+	  YV(ML)=100.0_LDP*(RJ(K,ML)-RJ_ES_RD(K,ML))/RJ(K,ML)
 	END DO
 	CALL CURVE(NCF,XV,YV)
 	CALL GRAMON_PGPLOT('\gn(10\u15 \dHz)','%Difference',' ',' ')
 !
 ! Covolve Planck function and plot
 !
-	BETA=1.84D-03*SQRT(T_elec)
-	T1=0.5D0*BETA*BETA
-	C(1)=0.0D0
-	A(1)=0.0D0
-	B(1)=-1.0D0
-	D(1)=NU(1)**3/(EXP(4.7994D0*NU(1)/T_ELEC)-1)
+	BETA=1.84E-03_LDP*SQRT(T_elec)
+	T1=0.5_LDP*BETA*BETA
+	C(1)=0.0_LDP
+	A(1)=0.0_LDP
+	B(1)=-1.0_LDP
+	D(1)=NU(1)**3/(EXP(4.7994_LDP*NU(1)/T_ELEC)-1)
 	DO ML=2,NCF-1
 	  D1=LOG(NU(ML-1)/NU(ML))
 	  D2=LOG(NU(ML)/NU(ML+1))
-	  DH=0.5D0*(D1+D2)
+	  DH=0.5_LDP*(D1+D2)
 	  A(ML)=-T1/D1/DH
-	  B(ML)=-1.0D0
+	  B(ML)=-1.0_LDP
 	  C(ML)=-T1/D2/DH
-	  D(ML)=NU(ML)**3/(EXP(4.7994D0*NU(ML)/T_ELEC)-1)
+	  D(ML)=NU(ML)**3/(EXP(4.7994_LDP*NU(ML)/T_ELEC)-1)
 	END DO
 	A(NCF)=0.0
 	C(NCF)=0.0
-	B(NCF)=-1.0D0
-	D(NCF)=NU(NCF)**3/(EXP(4.7994D0*NU(NCF)/T_ELEC)-1)
+	B(NCF)=-1.0_LDP
+	D(NCF)=NU(NCF)**3/(EXP(4.7994_LDP*NU(NCF)/T_ELEC)-1)
 	PLANCK_FN(1:NCF)=D(1:NCF)
 C
 	CALL THOMAS_RH(A,B,C,D,NCF,IONE)
@@ -286,7 +286,7 @@ C
 	A(1)=NU(1)
 	I=2
 	ML=1
-	DO WHILE(NU(I) .GT. 1.5D0*T_ELEC)
+	DO WHILE(NU(I) .GT. 1.5_LDP*T_ELEC)
 	  DO WHILE(D(I) .GT. PLANCK_FN(ML))
 	    ML=ML+1
 	  END DO
@@ -294,13 +294,13 @@ C
 	    ML=ML+1
 	  END DO
 	  T1=(D(I)-PLANCK_FN(ML))/(PLANCK_FN(ML-1)-PLANCK_FN(ML))
-          A(I)=T1*NU(ML-1)+(1.0D0-T1)*NU(ML)
+          A(I)=T1*NU(ML-1)+(1.0_LDP-T1)*NU(ML)
 	  I=I+1
 	END DO
 C
 	T1=1/NU(I-1)-1/A(I-1)		!Wavelength shift
 	DO J=I,NCF
-	  A(J)=1.0D0/( 1.0D0/NU(J) - T1)
+	  A(J)=1.0_LDP/( 1.0_LDP/NU(J) - T1)
 	END DO
 C
 C Perfrom a simple linear interpolation back onto the old frequency grid.
@@ -312,7 +312,7 @@ C
 	     I=I+1
 	  END DO
 	  T1=(NU(ML)-A(I))/(A(I+1)-A(I))
-	  B(ML)=T1*D(I+1)+(1.0D0-T1)*D(I)
+	  B(ML)=T1*D(I+1)+(1.0_LDP-T1)*D(I)
 	END DO
 	B(NCF-1:NCF)=D(NCF-1:NCF)
 C
@@ -353,11 +353,11 @@ C Compute quantities that will be used repeatedly if the same tridiagonal
 C system is used for many R.H. Sides.
 C
 	C(N1)=0				!As used.
-	DIV(1)=1.0/(C(1)+H(1))
+	DIV(1)=1.0_LDP/(C(1)+H(1))
 	C(1)=C(1)*DIV(1)
 	H(1)=H(1)*DIV(1)
 	DO I=2,N1
-	  DIV(I)=1.0D0/(A(I)*H(I-1)+H(I)+C(I))
+	  DIV(I)=1.0_LDP/(A(I)*H(I-1)+H(I)+C(I))
 	  H(I)=(A(I)*H(I-1)+H(I))*DIV(I)
 	  C(I)=C(I)*DIV(I)
 	END DO

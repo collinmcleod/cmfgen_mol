@@ -122,34 +122,34 @@
 ! have b=1.
 !
 	IF(.NOT. CHECK_DC)THEN
-	  CONST=0.0D0
-	ELSE IF( ABS((HYD(NZ,NDOLD)-1.0D0)) .LT. 0.1)THEN
-	  CONST=0.0D0
-	ELSE IF( ABS(HYD(NZ,NDOLD)) .LT. 0.1) THEN
-	  CONST=1.0D0
+	  CONST=0.0_LDP
+	ELSE IF( ABS((HYD(NZ,NDOLD)-1.0_LDP)) .LT. 0.1_LDP)THEN
+	  CONST=0.0_LDP
+	ELSE IF( ABS(HYD(NZ,NDOLD)) .LT. 0.1_LDP) THEN
+	  CONST=1.0_LDP
 	ELSE
 	  LUER=ERROR_LU()
 	  WRITE(LUER,*)'Possible error on REGRID_B_ON_NE - b(n) not equal'
 	  WRITE(LUER,*)'to 1.0/pm0.1 or 0.0/pm0.1 at depth'
 	END IF
-	CONST=0.0D0
+	CONST=0.0_LDP
 !
 ! Determine radius at which optical depth is unity. We use NEW_ED as a
 ! temporary vector for ED*CLUMP_FAC.
 !
         NEW_ED(1:ND)=ED(1:ND)*CLUMP_FAC(1:ND)
-        TAU(1)=6.65D-15*NEW_ED(1)*R(1)
+        TAU(1)=6.65E-15_LDP*NEW_ED(1)*R(1)
         K=1
 	DO I=2,ND
-          TAU(I)=TAU(I-1)+6.65D-15*(NEW_ED(I-1)+NEW_ED(I))*(R(I-1)-R(I))*0.5D0
-          IF(TAU(I) .LE. 1.0D0)K=I
+          TAU(I)=TAU(I-1)+6.65E-15_LDP*(NEW_ED(I-1)+NEW_ED(I))*(R(I-1)-R(I))*0.5_LDP
+          IF(TAU(I) .LE. 1.0_LDP)K=I
         END DO
 	IF(K .EQ. 1 .OR. K .EQ. ND)THEN
 	  LUER=ERROR_LU()
           WRITE(LUER,*)'Error computing RTAU1 in REGRID_B_ON_SPH_TAU'
         END IF
-	T1=(1.0D0-TAU(K))/(TAU(K+1)-TAU(K))
-        RTAU1=T1*R(K+1)+(1.0D0-T1)*R(K)
+	T1=(1.0_LDP-TAU(K))/(TAU(K+1)-TAU(K))
+        RTAU1=T1*R(K+1)+(1.0_LDP-T1)*R(K)
 !
 ! Compute the spherical optical depth scale. Assume atmosphere has constant
 ! V at outer boundary.
@@ -157,35 +157,35 @@
         DO I=1,ND
           NEW_ED(I)=NEW_ED(I)*RTAU1*RTAU1/R(I)/R(I)
         END DO
-        TAU(1)=6.65D-15*NEW_ED(1)*R(1)/3.0D0
+        TAU(1)=6.65E-15_LDP*NEW_ED(1)*R(1)/3.0_LDP
         DO I=2,ND
-          TAU(I)=TAU(I-1)+6.65D-15*(NEW_ED(I-1)+NEW_ED(I))*(R(I-1)-R(I))*0.5D0
+          TAU(I)=TAU(I-1)+6.65E-15_LDP*(NEW_ED(I-1)+NEW_ED(I))*(R(I-1)-R(I))*0.5_LDP
         END DO
 !
 ! Determine radius at which optical depth is unity in old model. OLDED has already
 ! been modified by the clumping factor.
 !
-        OLDTAU(1)=6.65D-15*OLDED(1)*ROLD(1)
+        OLDTAU(1)=6.65E-15_LDP*OLDED(1)*ROLD(1)
         K=1
 	DO I=2,NDOLD
-          OLDTAU(I)=OLDTAU(I-1)+6.65D-15*(OLDED(I-1)+OLDED(I))*(ROLD(I-1)-ROLD(I))*0.5D0
-          IF(OLDTAU(I) .LE. 1.0D0)K=I
+          OLDTAU(I)=OLDTAU(I-1)+6.65E-15_LDP*(OLDED(I-1)+OLDED(I))*(ROLD(I-1)-ROLD(I))*0.5_LDP
+          IF(OLDTAU(I) .LE. 1.0_LDP)K=I
         END DO
 	IF(K .EQ. 1 .OR. K .EQ. ND)THEN
 	  LUER=ERROR_LU()
           WRITE(LUER,*)'Error computing RTAU1_OLD in REGRID_B_ON_SPH_TAU'
         END IF
-        T1=(1.0D0-OLDTAU(K))/(OLDTAU(K+1)-OLDTAU(K))
-        RTAU1_OLD=T1*ROLD(K+1)+(1.0D0-T1)*ROLD(K)
+        T1=(1.0_LDP-OLDTAU(K))/(OLDTAU(K+1)-OLDTAU(K))
+        RTAU1_OLD=T1*ROLD(K+1)+(1.0_LDP-T1)*ROLD(K)
 !
 ! Compute the spherical optical depth scale.
 !
         DO I=1,NDOLD
           OLDED(I)=OLDED(I)*(RTAU1_OLD/ROLD(I))**2
         END DO
-        OLDTAU(1)=6.65D-15*OLDED(1)*ROLD(1)/3.0D0
+        OLDTAU(1)=6.65E-15_LDP*OLDED(1)*ROLD(1)/3.0_LDP
         DO I=2,NDOLD
-          OLDTAU(I)=OLDTAU(I-1)+6.65D-15*(OLDED(I-1)+OLDED(I))*(ROLD(I-1)-ROLD(I))*0.5D0
+          OLDTAU(I)=OLDTAU(I-1)+6.65E-15_LDP*(OLDED(I-1)+OLDED(I))*(ROLD(I-1)-ROLD(I))*0.5_LDP
         END DO
 !
 ! Detrmine whether new mesh extends beyond oldmesh.

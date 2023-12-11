@@ -52,17 +52,17 @@
 	IF(NEW_METHOD)THEN
 	  DO K=1,ND
 	    X=HDKT/T(K)
-	    RGU=2.07078D-22*ED(K)*DIC2(K)*( T(K)**(-1.5D0) )/GION_C2
+	    RGU=2.07078E-22_LDP*ED(K)*DIC2(K)*( T(K)**(-1.5_LDP) )/GION_C2
 	    RGU=LOG(RGU)
 	    DO I=1,NC2
 	      C2LTE(I,K)=W_C2(I,K)*GC2(I)*EXP(EDGEC2(I)*X+RGU)
 	    END DO
 	  END DO
 	ELSE
-	  RGU=LOG(2.07078D-22)
+	  RGU=LOG(2.07078E-22_LDP)
 	  DO K=1,ND
 	    X=HDKT/T(K)
-	    Y=ED(K)*DIC2(K)*( T(K)**(-1.5D0) )/GION_C2
+	    Y=ED(K)*DIC2(K)*( T(K)**(-1.5_LDP) )/GION_C2
 	    DO I=1,NC2
 	      C2LTE(I,K)=W_C2(I,K)*GC2(I)*Y*EXP(EDGEC2(I)*X+RGU)
 	    END DO

@@ -56,7 +56,7 @@
 !
 	DO I=1,NCLIP
 	  READ(LU,*)FREQ(1:4,I)
-	  FREQ(1:4,I)=1.0D-07*SPEED_OF_LIGHT()/FREQ(1:4,I)
+	  FREQ(1:4,I)=1.0E-07_LDP*SPEED_OF_LIGHT()/FREQ(1:4,I)
 	END DO
 	CLOSE(LU)
 	WRITE(6,*)'Successfully read CLIP data'
@@ -95,7 +95,7 @@
 !
 ! We use X0 so that the line intercept is defined at X0, rather than 0
 !
-	  X_SUM=0.0D0; XSQ_SUM=0.0D0; Y_SUM=0.0D0;; XY_SUM=0.0D0
+	  X_SUM=0.0_LDP; XSQ_SUM=0.0_LDP; Y_SUM=0.0_LDP;; XY_SUM=0.0_LDP
 	  X0=XV(I1)
 	  DO I=I1,I2
 	    X_SUM=X_SUM+(XV(I)-X0)

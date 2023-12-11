@@ -53,7 +53,7 @@ C
 C
 	REAL(KIND=LDP) ONE
 	REAL(KIND=LDP) DELR
-	PARAMETER (ONE=1.0D0)
+	PARAMETER (ONE=1.0_LDP)
 	INTEGER I,K
 C
 C Choose the correct plane for the interpolations.
@@ -86,13 +86,13 @@ C
 C
 C Adjust first derivatives so that function is monotonic  in each interval.
 C
-	D(1)=( SIGN(ONE,S(1))+SIGN(ONE,D(1)) )*MIN(ABS(S(1)),0.5*ABS(D(1)))
+	D(1)=( SIGN(ONE,S(1))+SIGN(ONE,D(1)) )*MIN(ABS(S(1)),0.5_LDP*ABS(D(1)))
 	DO I=2,ND-1
 	  D(I)=( SIGN(ONE,S(I-1))+SIGN(ONE,S(I)) )*
-	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5*ABS(D(I)))
+	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5_LDP*ABS(D(I)))
 	END DO
 	D(ND)=( SIGN(ONE,S(ND-1))+SIGN(ONE,D(ND)) )*
-	1        MIN(ABS(S(ND-1)),0.5*ABS(D(ND)))
+	1        MIN(ABS(S(ND-1)),0.5_LDP*ABS(D(ND)))
 C
 C Determine the coeffients of the monotonic cubic polynmial.
 C
@@ -100,8 +100,8 @@ C If T1=X-X(I) then
 C             Y=COEF(I,1)*T1^4 + COEF(I,2)*T1^3 +COEF(I,3)*T1^2 +COEF(I,4)
 C
 	DO I=1,ND-1
-          COEF(I,1)=(D(I)+D(I+1)-2.0*S(I))/H(I)/H(I)
-	  COEF(I,2)=(3.0*S(I)-2.0*D(I)-D(I+1))/H(I)
+          COEF(I,1)=(D(I)+D(I+1)-2.0_LDP*S(I))/H(I)/H(I)
+	  COEF(I,2)=(3.0_LDP*S(I)-2.0_LDP*D(I)-D(I+1))/H(I)
 	  COEF(I,3)=D(I)
 	  COEF(I,4)=Y(I)
 	END DO
@@ -130,7 +130,7 @@ C
 	      ELSE
 	        DELR=R_INS(I,K)-X(I)
 	      END IF
-	      dCHIdR_INS(I,K)=((3.0D0*COEF(I,1)*DELR+2.0D0*COEF(I,2))*DELR+
+	      dCHIdR_INS(I,K)=((3.0_LDP*COEF(I,1)*DELR+2.0_LDP*COEF(I,2))*DELR+
 	1                   COEF(I,3))
 	    END DO
 	  END DO

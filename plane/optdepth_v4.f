@@ -45,9 +45,9 @@
       IF(DO_P_RAY)THEN
 !
 	IF(METHOD .EQ. 'ZERO')THEN
-	  DCHIDZ(1:NZ)=0.0D0
+	  DCHIDZ(1:NZ)=0.0_LDP
           DO IZ=1,NZ-1
-            DTAU_LOC(IZ)=0.5D0*(RAY(IP)%S_P(IZ)-RAY(IP)%S_P(IZ+1))*(CHI(IZ)+CHI(IZ+1))
+            DTAU_LOC(IZ)=0.5_LDP*(RAY(IP)%S_P(IZ)-RAY(IP)%S_P(IZ+1))*(CHI(IZ)+CHI(IZ+1))
           END DO
 	ELSE
 !
@@ -62,21 +62,21 @@
 ! Determine dtau
 !
           DO IZ=1,NZ-1
-            DTAU_LOC(IZ)=0.5D0*(RAY(IP)%S_P(IZ)-RAY(IP)%S_P(IZ+1))*(CHI(IZ)+CHI(IZ+1))
-	    T1=( (RAY(IP)%S_P(IZ)-RAY(IP)%S_P(IZ+1))**2 )*(DCHIDZ(IZ+1)-DCHIDZ(IZ))/12.0D0
-            IF(T1 .LT. 0.0D0)THEN
-	      DTAU_LOC(IZ)=MAX(0.5D0*DTAU_LOC(IZ),DTAU_LOC(IZ)+T1)
+            DTAU_LOC(IZ)=0.5_LDP*(RAY(IP)%S_P(IZ)-RAY(IP)%S_P(IZ+1))*(CHI(IZ)+CHI(IZ+1))
+	    T1=( (RAY(IP)%S_P(IZ)-RAY(IP)%S_P(IZ+1))**2 )*(DCHIDZ(IZ+1)-DCHIDZ(IZ))/12.0_LDP
+            IF(T1 .LT. 0.0_LDP)THEN
+	      DTAU_LOC(IZ)=MAX(0.5_LDP*DTAU_LOC(IZ),DTAU_LOC(IZ)+T1)
 	    ELSE
-	      DTAU_LOC(IZ)=MIN(1.5D0*DTAU_LOC(IZ),DTAU_LOC(IZ)+T1)
+	      DTAU_LOC(IZ)=MIN(1.5_LDP*DTAU_LOC(IZ),DTAU_LOC(IZ)+T1)
 	    END IF
 	  END DO
 	END IF
 !
       ELSE
 	IF(METHOD .EQ. 'ZERO')THEN
-	  DCHIDZ(1:NZ)=0.0D0
+	  DCHIDZ(1:NZ)=0.0_LDP
           DO IZ=1,NZ-1
-            DTAU_LOC(IZ)=0.5D0*(RAY(IP)%S_M(IZ+1)-RAY(IP)%S_M(IZ))*(CHI(IZ+1)+CHI(IZ))
+            DTAU_LOC(IZ)=0.5_LDP*(RAY(IP)%S_M(IZ+1)-RAY(IP)%S_M(IZ))*(CHI(IZ+1)+CHI(IZ))
           END DO
 	ELSE
 !
@@ -91,12 +91,12 @@
 ! Determine dtau
 !
           DO IZ=1,NZ-1
-            DTAU_LOC(IZ)=0.5D0*(RAY(IP)%S_M(IZ+1)-RAY(IP)%S_M(IZ))*(CHI(IZ+1)+CHI(IZ))
-     	    T1=((RAY(IP)%S_M(IZ+1)-RAY(IP)%S_M(IZ))**2)*(DCHIDZ(IZ)-DCHIDZ(IZ+1))/12.0D0
-            IF(T1 .LT. 0.0D0)THEN
-	      DTAU_LOC(IZ)=MAX(0.5D0*DTAU_LOC(IZ),DTAU_LOC(IZ)+T1)
+            DTAU_LOC(IZ)=0.5_LDP*(RAY(IP)%S_M(IZ+1)-RAY(IP)%S_M(IZ))*(CHI(IZ+1)+CHI(IZ))
+     	    T1=((RAY(IP)%S_M(IZ+1)-RAY(IP)%S_M(IZ))**2)*(DCHIDZ(IZ)-DCHIDZ(IZ+1))/12.0_LDP
+            IF(T1 .LT. 0.0_LDP)THEN
+	      DTAU_LOC(IZ)=MAX(0.5_LDP*DTAU_LOC(IZ),DTAU_LOC(IZ)+T1)
 	    ELSE
-	      DTAU_LOC(IZ)=MIN(1.5D0*DTAU_LOC(IZ),DTAU_LOC(IZ)+T1)
+	      DTAU_LOC(IZ)=MIN(1.5_LDP*DTAU_LOC(IZ),DTAU_LOC(IZ)+T1)
 	    END IF
           END DO
 	END IF

@@ -100,9 +100,9 @@ C
 	      T3=HNST_A(J,I)*WSE_X(J,I)*BSTIM
 	      T4=HNST_A(J,I)*WSE_X(J,I)*RECIP_B_ION
 	      DI_FAC=T3/DI(I)
-	      ED_FAC=2.0D0*T3/ED(I)
+	      ED_FAC=2.0_LDP*T3/ED(I)
 	      T_FAC=T3*( dlnHNST_AdlnT(J,I) -
-	1             HDKT*(EDGE_B(1)+1.5D0)/T(I) )/T(I)+T4*dJRECdT(I)
+	1             HDKT*(EDGE_B(1)+1.5_LDP)/T(I) )/T(I)+T4*dJRECdT(I)
 C
 	      BA(NJ,ION_EQ,L,I)=BA(NJ,ION_EQ,L,I) +DI_FAC
 	      BA(NJ,NT-1,L,I)  =BA(NJ,NT-1,L,I)   +ED_FAC

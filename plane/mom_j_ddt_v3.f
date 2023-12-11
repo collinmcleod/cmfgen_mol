@@ -107,7 +107,7 @@
 	INTEGER, SAVE :: ND_SM_SAV=0
 !
 	LOGICAL, SAVE::  FIRST_TIME=.TRUE.
-	DATA VDOP_FRAC_SAV/-10001.1D0/    !Absurd value
+	DATA VDOP_FRAC_SAV/-10001.1_LDP/    !Absurd value
 !
 	END MODULE MOD_MOM_J_DDT_V3
 !
@@ -438,15 +438,15 @@
 	  ALLOCATE ( ESEC(ND) )
 	  ALLOCATE ( CHI(ND) )
 !
-	  ALLOCATE ( RSQJNU(ND) )             ; RSQJNU(1:ND)=0.0D0
-	  ALLOCATE ( RSQHNU(ND) )             ; RSQHNU(1:ND)=0.0D0
-	  ALLOCATE ( RSQJNU_PREV(ND) )        ; RSQJNU_PREV(1:ND)=0.0D0
-	  ALLOCATE ( RSQHNU_PREV(ND) )        ; RSQHNU_PREV(1:ND)=0.0D0
-	  ALLOCATE ( RSQJNU_OLDt(ND) )        ; RSQJNU_OLDt(1:ND)=0.0D0
-	  ALLOCATE ( RSQHNU_OLDt(ND) )        ; RSQHNU_OLDt(1:ND)=0.0D0
+	  ALLOCATE ( RSQJNU(ND) )             ; RSQJNU(1:ND)=0.0_LDP
+	  ALLOCATE ( RSQHNU(ND) )             ; RSQHNU(1:ND)=0.0_LDP
+	  ALLOCATE ( RSQJNU_PREV(ND) )        ; RSQJNU_PREV(1:ND)=0.0_LDP
+	  ALLOCATE ( RSQHNU_PREV(ND) )        ; RSQHNU_PREV(1:ND)=0.0_LDP
+	  ALLOCATE ( RSQJNU_OLDt(ND) )        ; RSQJNU_OLDt(1:ND)=0.0_LDP
+	  ALLOCATE ( RSQHNU_OLDt(ND) )        ; RSQHNU_OLDt(1:ND)=0.0_LDP
 !
 	  ALLOCATE ( F(ND) )
-	  ALLOCATE ( F_SAV(ND) )              ; F_SAV(1:ND)=0.0D0
+	  ALLOCATE ( F_SAV(ND) )              ; F_SAV(1:ND)=0.0_LDP
 	  ALLOCATE ( F_PREV(ND) )
 !
 	  ALLOCATE ( CON_GAM(ND) )
@@ -505,7 +505,7 @@
 !
 	  K=1
 	  DO I=1,ND_SM-1
-	    T1=0.5D0*(R_SM(I)+R_SM(I+1))
+	    T1=0.5_LDP*(R_SM(I)+R_SM(I+1))
 	    DO WHILE(H_INDX(I) .EQ. 0)
 	      IF(T1 .LT. R(K) .AND. T1 .GT. R(K+1))THEN
 	        H_INDX(I)=K
@@ -518,9 +518,9 @@
 ! Note that V is in km/s. The factor of 2 in CON_GAMH is an allowance
 ! for a division by 0.5(CHI(I)+CHI(J)).
 !
-	  C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	  C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 	  DO I=1,ND-1
-	    CON_GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/C_KMS
+	    CON_GAMH(I)=2.0_LDP*(V(I)+V(I+1))/(R(I)+R(I+1))/C_KMS
 	    CON_GAM(I)=V(I)/R(I)/C_KMS
 	  END DO
 	  CON_GAM(ND)=V(ND)/R(ND)/C_KMS
@@ -529,7 +529,7 @@
 !
 	IF(INIT)THEN
 	  DO I=1,N_ERR_MAX
-	    MOM_ERR_ON_FREQ(I)=0.0D0
+	    MOM_ERR_ON_FREQ(I)=0.0_LDP
 	  END DO
 	  MOM_ERR_CNT=0
 	END IF
@@ -581,7 +581,7 @@
 	ELSE IF(USE_DR4JDT)THEN
 	  COH_VEC(:)=V(:)/R(:)/C_KMS/CHI(:)
 	ELSE
-	  COH_VEC(:)=0.0D0
+	  COH_VEC(:)=0.0_LDP
 	END IF
 !
 ! NB: We actually solve for r^2 J, not J.
@@ -599,7 +599,7 @@
 ! ******** FUDGE ****
 !*************************************************
 !
-	IF(DTAU(ND-1) .LT. 1.0D-05)DTAU(ND-1)=1.0D-05
+	IF(DTAU(ND-1) .LT. 1.0E-05_LDP)DTAU(ND-1)=1.0E-05_LDP
 !
 	IF(NEW_FREQ)THEN
 	  F_PREV(1:ND)=F_SAV(1:ND)
@@ -624,15 +624,15 @@
 !
 	IF(INIT)THEN
 	  IF(DO_TIME_VAR)THEN
-	    RECIP_CDELTAT=1.0D+10*RELAX_PARAM/SPEED_OF_LIGHT()/DELTA_TIME_SECS
-	    ROLD_ON_R=1.0D0-1.0D-05*V(ND)*DELTA_TIME_SECS/R(ND)
+	    RECIP_CDELTAT=1.0E+10_LDP*RELAX_PARAM/SPEED_OF_LIGHT()/DELTA_TIME_SECS
+	    ROLD_ON_R=1.0_LDP-1.0E-05_LDP*V(ND)*DELTA_TIME_SECS/R(ND)
 	    IF(FIRST_TIME)THEN
 	       WRITE(LUER,'(4X,A,ES12.4)')' RECIP_CDELTAT=',RECIP_CDELTAT
 	       WRITE(LUER,'(4X,A,ES12.4)')'     ROLD_ON_R=',ROLD_ON_R
 	    END IF
 	  ELSE
-	    RECIP_CDELTAT=0.0D0
-	    ROLD_ON_R=0.0D0
+	    RECIP_CDELTAT=0.0_LDP
+	    ROLD_ON_R=0.0_LDP
 	  END IF
 	END IF
 	R_RAT_FOR_J=ROLD_ON_R
@@ -641,19 +641,19 @@
 !
 	IF(INIT)THEN
 	  DO I=1,ND
-	    GAMH(I)=0.0D0
-	    GAM(I)=0.0D0
-	    W(I)=0.0D0
-	    WPREV(I)=0.0D0
-	    PSI(I)=0.0D0
-	    PSIPREV(I)=0.0D0
-	    RSQJNU_PREV(I)=0.0D0
-	    RSQHNU_PREV(I)=0.0D0
-	    dH(I)=0.0D0
-	    dH_OLDT(I)=0.0D0
-	    DJDt(I)=0.0D0
+	    GAMH(I)=0.0_LDP
+	    GAM(I)=0.0_LDP
+	    W(I)=0.0_LDP
+	    WPREV(I)=0.0_LDP
+	    PSI(I)=0.0_LDP
+	    PSIPREV(I)=0.0_LDP
+	    RSQJNU_PREV(I)=0.0_LDP
+	    RSQHNU_PREV(I)=0.0_LDP
+	    dH(I)=0.0_LDP
+	    dH_OLDT(I)=0.0_LDP
+	    DJDt(I)=0.0_LDP
 	  END DO
-	  HONJ_OUTBC_PREV=0.0D0;  RSQH_AT_IB_PREV=0.0D0; RSQH_AT_OB_PREV=0.0D0
+	  HONJ_OUTBC_PREV=0.0_LDP;  RSQH_AT_IB_PREV=0.0_LDP; RSQH_AT_OB_PREV=0.0_LDP
 	ELSE
 !
 !
@@ -662,7 +662,7 @@
 !
 	  DO I=1,ND-1
 	    GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
-	    dH(I)=2.0D0*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
+	    dH(I)=2.0_LDP*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
 	    dH_OLDT(I)=dH(I)*ROLD_ON_R
 	    W(I)=GAMH(I)+dH(I)
 	  END DO
@@ -674,7 +674,7 @@
 !
 	IF(INIT .AND. DO_TIME_VAR)THEN
 	  DO I=1,ND-1
-	    dH(I)=2.0D0*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
+	    dH(I)=2.0_LDP*RECIP_CDELTAT/( CHI(I)+CHI(I+1) )
 	    dH_OLDT(I)=dH(I)*ROLD_ON_R
 	    W(I)=dH(I)
 	  END DO
@@ -683,7 +683,7 @@
 ! 
 !
 	DO I=2,ND-1
-	  DTAUONQ(I)=0.5D0*(DTAU(I)+DTAU(I-1))/Q(I)
+	  DTAUONQ(I)=0.5_LDP*(DTAU(I)+DTAU(I-1))/Q(I)
 !	  DTAUONQ(I)=0.5D0*(R(I-1)-R(I+1))*CHI(I)
 	  PSI(I)=DTAUONQ(I)*GAM(I)
 	  PSIPREV(I)=DTAUONQ(I)*GAM(I)
@@ -695,10 +695,10 @@
 ! with older versions, and with the compatible VAR_MOM routine.
 !
 	DO I=1,ND-1
-	  HU(I)=F(I+1)*Q(I+1)/(1.0D0+W(I))/DTAU(I)
-	  HL(I)=F(I)*Q(I)/(1.0D0+W(I))/DTAU(I)
-	  HS(I)=GAMH(I)/(1.0D0+W(I))
-	  HT(I)=dH_OLDT(I)/(1.0D0+W(I))
+	  HU(I)=F(I+1)*Q(I+1)/(1.0_LDP+W(I))/DTAU(I)
+	  HL(I)=F(I)*Q(I)/(1.0_LDP+W(I))/DTAU(I)
+	  HS(I)=GAMH(I)/(1.0_LDP+W(I))
+	  HT(I)=dH_OLDT(I)/(1.0_LDP+W(I))
 	END DO
 !
 ! Compute the TRIDIAGONAL operators, and the RHS source vector.
@@ -706,7 +706,7 @@
 	DO I=2,ND-1
 	  TA(I)=-HL(I-1)
 	  TC(I)=-HU(I)
-	  TB(I)=DTAUONQ(I)*(1.0D0-COH_VEC(I)) + PSI(I) + DJDt(I) + HL(I) + HU(I-1)
+	  TB(I)=DTAUONQ(I)*(1.0_LDP-COH_VEC(I)) + PSI(I) + DJDt(I) + HL(I) + HU(I-1)
 	  XM(I)=DTAUONQ(I)*SOURCE(I)*R(I)*R(I)
 	END DO
 !	I=2
@@ -725,26 +725,26 @@
 ! handle INIT=.TRUE. (since GAM=0) and DO_TIME_VR=.FALSE. (since
 ! RECIP_DELTA=0)
 !
-	TA(1)=0.0D0
+	TA(1)=0.0_LDP
 	DJDt(1)=RECIP_CDELTAT/CHI(1)
-	IF(INIT)DJDt(1)=0.0D0
+	IF(INIT)DJDt(1)=0.0_LDP
 	IF(OUTER_BND_METH .EQ. 'HONJ')THEN
 	  HONJ_OUTBC=(HPLUS_OB-HMIN_OB)/(JPLUS_OB+JMIN_OB)
 	  PSI(1)=GAM(1)*HONJ_OUTBC
 	  PSIPREV(1)=GAM(1)*HONJ_OUTBC_PREV
 	  TC(1)=-F(2)*Q(2)/DTAU(1)
-	  TB(1)=F(1)*Q(1)/DTAU(1) + HONJ_OUTBC*(1.0D0+GAM(1)+DJDt(1))
+	  TB(1)=F(1)*Q(1)/DTAU(1) + HONJ_OUTBC*(1.0_LDP+GAM(1)+DJDt(1))
 	  XM(1)=PSIPREV(1)*RSQJNU_PREV(1) + DJDt(1)*RSQJNU_OLDt(1)*ROLD_ON_R*HONJ_OUTBC_OLDT
 !
 !	  WRITE(156,'(5ES14.5,2E30.16)')FREQ,HONJ_OUTBC,GAM(1),DJDt(1),(TB(1)+TC(1))/TB(1),TB(1),TC(1)
 !
 	ELSE IF(OUTER_BND_METH .EQ. 'HALF_MOM')THEN
-	  MOD_DTAU=0.5D0*(CHI(1)+CHI(2))*(R(1)-R(2))
+	  MOD_DTAU=0.5_LDP*(CHI(1)+CHI(2))*(R(1)-R(2))
 	  T1=R(1)*R(1)
 	  HPLUS=HPLUS_OB/JPLUS_OB
 	  FPLUS=KPLUS_OB/JPLUS_OB
 	  TC(1)=-F(2)/MOD_DTAU
-	  TB(1)=FPLUS/MOD_DTAU -  (1.0D0-FPLUS)/R(1)/CHI(1) + HPLUS*(1.0D0+GAM(1)+DJDT(1))
+	  TB(1)=FPLUS/MOD_DTAU -  (1.0_LDP-FPLUS)/R(1)/CHI(1) + HPLUS*(1.0_LDP+GAM(1)+DJDT(1))
 	  XM(1)=T1*( HMIN_OB - KMIN_OB/MOD_DTAU+(JMIN_OB-KMIN_OB)/R(1)/CHI(1) ) +
 	1       GAM(1)*(T1*HMIN_OB+RSQH_AT_OB_PREV) +
 	1       DJDT(1)*(T1*HMIN_OB+RSQJNU_OLDt(1)*ROLD_ON_R*HONJ_OUTBC_OLDT)
@@ -758,12 +758,12 @@
 !
 ! ***  INNER BOUNDARY CONDITION ****
 !
-	PSI(ND)=0.0D0
-	PSIPREV(ND)=0.0D0
-	DJDt(ND)=0.0D0
+	PSI(ND)=0.0_LDP
+	PSIPREV(ND)=0.0_LDP
+	DJDt(ND)=0.0_LDP
 !
 	IF(INNER_BND_METH .EQ. 'DIFFUSION')THEN
-	  RSQH_AT_IB=DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
+	  RSQH_AT_IB=DBB*R(ND)*R(ND)/3.0_LDP/CHI(ND)
 	  TB(ND)=F(ND)/DTAU(ND-1)
 	  TA(ND)=-F(ND-1)*Q(ND-1)/DTAU(ND-1)
 	  XM(ND)=RSQH_AT_IB+RECIP_CDELTAt*(RSQH_AT_IB-ROLD_ON_R*RSQH_AT_IB_OLDt)/CHI(ND)
@@ -775,12 +775,12 @@
 ! with DBB=0.0D0
 !
 	ELSE IF(INNER_BND_METH .EQ. 'ZERO_FLUX')THEN
-	  RSQH_AT_IB=0.0D0
+	  RSQH_AT_IB=0.0_LDP
 	  TA(ND)=-F(ND-1)*Q(ND-1)/DTAU(ND-1)
 	  TB(ND)=F(ND)/DTAU(ND-1)
 	  XM(ND)=RSQH_AT_IB+RECIP_CDELTAt*(RSQH_AT_IB-ROLD_ON_R*RSQH_AT_IB_OLDt)/CHI(ND)
-	  XM(ND)=XM(ND)+0.10D0*F(ND)*R(ND)*R(ND)*(JPLUS_IB+JMIN_IB)/DTAU(ND-1)
-	  TB(ND)=TB(ND)+0.10D0*F(ND)/DTAU(ND-1)
+	  XM(ND)=XM(ND)+0.10_LDP*F(ND)*R(ND)*R(ND)*(JPLUS_IB+JMIN_IB)/DTAU(ND-1)
+	  TB(ND)=TB(ND)+0.10_LDP*F(ND)/DTAU(ND-1)
 !
 ! With this boundary condition we specify JPLUS, HPLUS, and KPLUS at the
 ! inner boundary. These, in general, will be dependent on the radiation
@@ -794,16 +794,16 @@
 	  FPLUS=KPLUS_IB/JPLUS_IB
 	  FMIN=KMIN_IB/JMIN_IB
 	  TA(ND)=-F(ND-1)/DTAU(ND-1)
-	  TB(ND)=FMIN/DTAU(ND-1) + (1.0D0-FMIN)/R(ND)/CHI(ND) + HMIN*(1.0D0+DjdT(ND)+GAM(ND))
-	  XM(ND)=T1*( HPLUS_IB-FPLUS*JPLUS_IB/DTAU(ND-1)-(1.0D0-FPLUS)/R(ND)/CHI(ND)*JPLUS_IB )
+	  TB(ND)=FMIN/DTAU(ND-1) + (1.0_LDP-FMIN)/R(ND)/CHI(ND) + HMIN*(1.0_LDP+DjdT(ND)+GAM(ND))
+	  XM(ND)=T1*( HPLUS_IB-FPLUS*JPLUS_IB/DTAU(ND-1)-(1.0_LDP-FPLUS)/R(ND)/CHI(ND)*JPLUS_IB )
 	1              +GAM(ND)*(T1*HPLUS_IB-RSQH_AT_IB_PREV)
 	1              +RECIP_CDELTAt*(T1*HPLUS_IB-ROLD_ON_R*RSQH_AT_IB_OLDt)/CHI(ND)
 	  XM(ND-1)=XM(ND-1)-T1*JPLUS_IB*TC(ND-1)
 !
 ! Modification designed to improve stability.
 !
-          TB(ND)=TB(ND)+0.1D0*FMIN/DTAU(ND-1)
-          XM(ND)=XM(ND)+0.1D0*FMIN*R(ND)*R(ND)*JMIN_IB/DTAU(ND-1)
+          TB(ND)=TB(ND)+0.1_LDP*FMIN/DTAU(ND-1)
+          XM(ND)=XM(ND)+0.1_LDP*FMIN*R(ND)*R(ND)*JMIN_IB/DTAU(ND-1)
 !
 	ELSE
           I=ERROR_LU()
@@ -811,7 +811,7 @@
           WRITE(I,*)'Routine is MOM_J_DDT_V2'
           STOP
 	END IF
-	TC(ND)=0.0D0
+	TC(ND)=0.0_LDP
 !
 ! Solve for the radiation field along ray for this frequency.
 !
@@ -832,7 +832,7 @@
 !
 ! Check that no negative mean intensities have been computed.
 !
-	IF(MINVAL(XM(1:ND)) .LE. 0.0D0)THEN
+	IF(MINVAL(XM(1:ND)) .LE. 0.0_LDP)THEN
 	  IF(VERBOSE)THEN
 	    WRITE(47,*)'Freq=',FREQ
 	    TA(1:ND)=XM(1:ND)/R(1:ND)/R(1:ND)
@@ -843,7 +843,7 @@
 	    CALL WRITE_VEC(CHI,ND,'CHI Vec',47)
 	  ELSE
 	    DO I=1,ND
-	     IF(XM(I) .LE. 0.0D0)THEN
+	     IF(XM(I) .LE. 0.0_LDP)THEN
 	       WRITE(47,'(I5,ES16.8,10ES13.4)')I,FREQ,XM(I),ETA(I),CHI(I),ESEC(I),F(I),XM(MAX(1,I-2):MIN(I+2,ND))
 	     END IF
 	    END DO
@@ -852,8 +852,8 @@
 !
 	RECORDED_ERROR=.FALSE.
 	DO I=1,ND
-	  IF(XM(I) .LT. 0.0D0)THEN
-	    XM(I)=ABS(XM(I))/10.0D0
+	  IF(XM(I) .LT. 0.0_LDP)THEN
+	    XM(I)=ABS(XM(I))/10.0_LDP
 	    IF(.NOT. RECORDED_ERROR)THEN
 	      IF(MOM_ERR_CNT .GT. N_ERR_MAX)THEN
 	        MOM_ERR_CNT=MOM_ERR_CNT+1
@@ -876,11 +876,11 @@
 ! Make sure H satisfies the basic requirement that it is less than J.
 !
 	DO I=1,ND-1
-	  T1=(XM(I)+XM(I+1))/2.0D0
+	  T1=(XM(I)+XM(I+1))/2.0_LDP
 	  IF(RSQHNU(I) .GT. T1)THEN
-	    RSQHNU(I)=0.99D0*T1
+	    RSQHNU(I)=0.99_LDP*T1
 	  ELSE IF(RSQHNU(I) .LT. -T1)THEN
-	    RSQHNU(I)=-0.99D0*T1
+	    RSQHNU(I)=-0.99_LDP*T1
 	  END IF
 	END DO
 !

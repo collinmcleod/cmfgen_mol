@@ -31,7 +31,7 @@ C
 	  DO J=1,NT
 	    DO I=1,NION
 	      BA(I,J,K,L)=BA(I,J,K,L)+BA_PAR(I,J,L)
-	      BA_PAR(I,J,L)=0.0D0
+	      BA_PAR(I,J,L)=0.0_LDP
 	    END DO
 	  END DO
 	END DO

@@ -233,8 +233,8 @@
 	LOGICAL FIRST_MATRIX,LAST_MATRIX
 	LOGICAL WR_D_MAT
 !
-        REAL(KIND=LDP),      PARAMETER :: DP_NEG_ONE=-1.0D0
-        REAL(KIND=LDP),      PARAMETER :: DP_ONE=1.0D0
+        REAL(KIND=LDP),      PARAMETER :: DP_NEG_ONE=-1.0_LDP
+        REAL(KIND=LDP),      PARAMETER :: DP_ONE=1.0_LDP
         INTEGER,   PARAMETER :: INT_ONE=1
         INTEGER,   PARAMETER :: NSNG=1
         CHARACTER*1, PARAMETER :: NO_TRANS='N'
@@ -264,7 +264,7 @@
             WRITE(LUER,*)'STAT=',IOS
             STOP
           END IF
-	  C_MAT=0.0D0; D_MAT=0.0D0; ORIG_POPS=0.0D0
+	  C_MAT=0.0_LDP; D_MAT=0.0_LDP; ORIG_POPS=0.0_LDP
 !
 	  DO K=1,ND
 !
@@ -337,7 +337,7 @@
             WRITE(LUER,*)'STAT=',IOS
             STOP
 	  END IF
-	  C_MAT=0.0D0
+	  C_MAT=0.0_LDP
 !
           DO K=1,ND
 !
@@ -380,7 +380,7 @@
 	      WRITE(LUER,*)'Unable to get solution at depth',K
 	      WRITE(LUER,*)'Setting fractional corrections to zero'
 	      WRITE(LUER,*)'IFAIL=',IFAIL
-	      STEQ(:,K)=0.0D0
+	      STEQ(:,K)=0.0_LDP
 	      GOTO 500			!9999
 	    END IF
 	    IF(WR_BA_INV)THEN
@@ -400,7 +400,7 @@
 	      WRITE(LUER,*)'Unable to get solution at depth',K
 	      WRITE(LUER,*)'Setting fractional corrections to zero'
 	      WRITE(LUER,*)'IFAIL=',IFAIL
-	      STEQ(:,K)=0.0D0
+	      STEQ(:,K)=0.0_LDP
 	    END IF
 500	    CONTINUE
 	  END DO
@@ -445,7 +445,7 @@
             WRITE(LUER,*)'STAT=',IOS
             STOP
           END IF
-	  B_MAT=0.0D0; C_MAT=0.0D0; D_MAT=0.0D0; ORIG_POPS=0.0D0
+	  B_MAT=0.0_LDP; C_MAT=0.0_LDP; D_MAT=0.0_LDP; ORIG_POPS=0.0_LDP
 !
 ! Needed for MAT5PEN and GENERATE_FULL_MATRIX.
 !
@@ -564,7 +564,7 @@
           WRITE(LUER,*)'STAT=',IOS
           STOP
         END IF
-	B_MAT=0.0D0; C_MAT=0.0D0; D_MAT=0.0D0; PREV_D_MAT=0.0D0
+	B_MAT=0.0_LDP; C_MAT=0.0_LDP; D_MAT=0.0_LDP; PREV_D_MAT=0.0_LDP
 !
 ! WR_BA_INV is false, we perform the LU decomosition using dynamic memory
 ! allocation only. If insufficent storage can be allocated to store D_MAT

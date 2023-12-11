@@ -82,19 +82,19 @@ C
 C
 	IF(INITIALIZE_TWO)THEN
 	  INITIALIZE_TWO=.FALSE.
-	  FREQ_TWO(:)=0.0D0
-	  G_LOW_TWO(:)=0.0D0
-	  G_UP_TWO(:)=0.0D0
-	  LOW_LEV_TWO(:)=0.0D0
-	  UP_LEV_TWO(:)=0.0D0
-	  ION_LOW_LEV_TWO(:)=0.0D0
-	  ION_UP_LEV_TWO(:)=0.0D0
-	  ION_ID_TWO(:)=0.0D0
-	  Z_TWO(:)=0.0D0
-	  FS_RAT_LOW(:,:)=0.0D0
-	  FS_RAT_UP(:,:)=0.0D0
-	  DOWN_RATE_TWO(:,:)=0.0D0
-	  UP_RATE_TWO(:,:)=0.0D0
+	  FREQ_TWO(:)=0.0_LDP
+	  G_LOW_TWO(:)=0.0_LDP
+	  G_UP_TWO(:)=0.0_LDP
+	  LOW_LEV_TWO(:)=0.0_LDP
+	  UP_LEV_TWO(:)=0.0_LDP
+	  ION_LOW_LEV_TWO(:)=0.0_LDP
+	  ION_UP_LEV_TWO(:)=0.0_LDP
+	  ION_ID_TWO(:)=0.0_LDP
+	  Z_TWO(:)=0.0_LDP
+	  FS_RAT_LOW(:,:)=0.0_LDP
+	  FS_RAT_UP(:,:)=0.0_LDP
+	  DOWN_RATE_TWO(:,:)=0.0_LDP
+	  UP_RATE_TWO(:,:)=0.0_LDP
 	  LST_FREQ_INDX_TWO=0
 	  TWO_PHOT_AVAILABLE(:)=.FALSE.
 	END IF
@@ -117,7 +117,7 @@ C
 	          LOW_LEV_TWO(J)=I_S             !EQSPEC+I_S-1
 	          FREQ_TWO(J)=EDGE_F(I_F)
 	          G_LOW_TWO(J)=G_F(I_F)
-	          FS_RAT_LOW(1:ND,J)=1.0D0             !HNST_F_ON_S(I_F,1:ND)
+	          FS_RAT_LOW(1:ND,J)=1.0_LDP             !HNST_F_ON_S(I_F,1:ND)
 	       END IF
 	    END DO
 !
@@ -132,7 +132,7 @@ C
 	          UP_LEV_TWO(J)=I_S                     ! EQSPEC+I_S-1
 	          G_UP_TWO(J)=G_F(I_F)
 	          FREQ_TWO(J)=FREQ_TWO(J)-EDGE_F(I_F)
-	          FS_RAT_UP(1:ND,J)=1.0D0               !HNST_F_ON_S(I_F,1:ND)
+	          FS_RAT_UP(1:ND,J)=1.0_LDP               !HNST_F_ON_S(I_F,1:ND)
 !
 ! The following treats the case when the 2s and 2p state are treated as a single level.
 !

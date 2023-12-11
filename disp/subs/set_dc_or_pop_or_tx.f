@@ -64,13 +64,13 @@
 	    WRITE(T_OUT,*)'NSPEC=',NHE2
 	    RETURN
 	  END IF
-	  T1=1.0D-03   !Accuracy
+	  T1=1.0E-03_LDP   !Accuracy
 	  CALL GET_EXCITE_TEMP(T,YV,DC,EDGEHE2(LEV),HDKT,T1,ND)
 	  LOCAL=.TRUE.
 	ELSE IF(X(1:3) .EQ. 'RAT' .AND. LEV .GT. NHE2
 	1      .AND. XSPEC .EQ. DESC)THEN
 	  DO J=1,ND
-	    T1=0.0		!By using T1 advoids log(ZERO).
+	    T1=0.0_LDP		!By using T1 advoids log(ZERO).
 	    DO I=1,NHE2
 	      T1=T1+HE2(I,J)
 	    END DO

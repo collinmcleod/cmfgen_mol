@@ -103,34 +103,34 @@
 !
 ! Zero relevant vectors and matrices.
 !
-	JNU=0.0D0			!1:ND
-	GAM_RSQHNU=0.0D0		!1:ND
+	JNU=0.0_LDP			!1:ND
+	GAM_RSQHNU=0.0_LDP		!1:ND
 !
 	IF(INIT)THEN
-	  TX(:,:,:)=0.0D0		!ND*ND*NM
-	  TVX(:,:,:)=0.0D0		!(ND-1)*ND*NM )
-	  JNU_PREV=0.0D0
-	  GAM_RSQHNU_PREV=0.0D0
-	  W=0.0D0
-	  WPREV=0.0D0
-	  PSI=0.0D0
-	  PSIPREV=0.0D0
-	  TX_DIF_d_T=0.0D0
-	  TX_DIF_d_dTdR=0.0D0
-	  EPS_A=0.0D0
-	  EPS_B=0.0D0
-	  EPS_PREV_A=0.0D0
-	  EPS_PREV_B=0.0D0
-	  DELTAH(:)=0.0D0
-	  DELTA(:)=0.0D0
-	  PSIPREV(:)=0.0D0
+	  TX(:,:,:)=0.0_LDP		!ND*ND*NM
+	  TVX(:,:,:)=0.0_LDP		!(ND-1)*ND*NM )
+	  JNU_PREV=0.0_LDP
+	  GAM_RSQHNU_PREV=0.0_LDP
+	  W=0.0_LDP
+	  WPREV=0.0_LDP
+	  PSI=0.0_LDP
+	  PSIPREV=0.0_LDP
+	  TX_DIF_d_T=0.0_LDP
+	  TX_DIF_d_dTdR=0.0_LDP
+	  EPS_A=0.0_LDP
+	  EPS_B=0.0_LDP
+	  EPS_PREV_A=0.0_LDP
+	  EPS_PREV_B=0.0_LDP
+	  DELTAH(:)=0.0_LDP
+	  DELTA(:)=0.0_LDP
+	  PSIPREV(:)=0.0_LDP
 !
-	  H_ON_J_PREV(:)=0.0D0
-	  FEDD_PREV(:)=0.0D0
-	  N_ON_J_PREV(:)=0.0D0
-	  GEDD_PREV(:)=0.0D0
-	  RSQN_ON_RSQJ_PREV(:)=0.0D0
-	  KMID_ON_J_PREV(:)=0.0D0
+	  H_ON_J_PREV(:)=0.0_LDP
+	  FEDD_PREV(:)=0.0_LDP
+	  N_ON_J_PREV(:)=0.0_LDP
+	  GEDD_PREV(:)=0.0_LDP
+	  RSQN_ON_RSQJ_PREV(:)=0.0_LDP
+	  KMID_ON_J_PREV(:)=0.0_LDP
 	END IF
 !
 	IF(INIT)THEN
@@ -140,31 +140,31 @@
 ! Note that V is in km/s and SIGMA=(dlnV/dlnR-1.0)
 !
 	
-	  BETA_FREQ(1:ND)=V(1:ND)*3.33564D-06       !/2.99794D+05
+	  BETA_FREQ(1:ND)=V(1:ND)*3.33564E-06_LDP       !/2.99794D+05
 	  IF(INCL_REL_TERMS)THEN
 	    BETA(1:ND)=BETA_FREQ(1:ND)
 	  ELSE
-	    BETA(1:ND)=0.0D0
+	    BETA(1:ND)=0.0_LDP
 	  END IF
 !
 	  IF(INCL_REL_TERMS)THEN
-	    GAM_REL_SQ(1:ND)=1.0D0/(1.0D0-BETA(1:ND)*BETA(1:ND))
+	    GAM_REL_SQ(1:ND)=1.0_LDP/(1.0_LDP-BETA(1:ND)*BETA(1:ND))
 	    GAM_REL(1:ND)=SQRT(GAM_REL_SQ(1:ND))
 	  ELSE
-	    GAM_REL_SQ(1:ND)=1.0D0
-	    GAM_REL(1:ND)=1.0D0
+	    GAM_REL_SQ(1:ND)=1.0_LDP
+	    GAM_REL(1:ND)=1.0_LDP
 	  END IF
 	  GAM_RSQ(1:ND)=GAM_REL(1:ND)*R(1:ND)*R(1:ND)
 	  CON_DELTA(1:ND)=BETA_FREQ(1:ND)/R(1:ND)
-	  CON_dKdNU(1:ND)=GAM_REL_SQ(1:ND)*(SIGMA(1:ND)+1.0D0)-1.0D0
-	  CON_dHdNU(1:ND)=BETA(1:ND)*GAM_REL_SQ(1:ND)*(SIGMA(1:ND)+1.0D0)
+	  CON_dKdNU(1:ND)=GAM_REL_SQ(1:ND)*(SIGMA(1:ND)+1.0_LDP)-1.0_LDP
+	  CON_dHdNU(1:ND)=BETA(1:ND)*GAM_REL_SQ(1:ND)*(SIGMA(1:ND)+1.0_LDP)
 !
 	  DO I=1,ND-1
-	    T1=0.5D0*(BETA(I)+BETA(I+1))
-	    AV_SIGMA(I)=0.5D0*(SIGMA(I)+SIGMA(I+1))
-	    CON_DELTAH(I)=2.0D0*(BETA_FREQ(I)+BETA_FREQ(I+1))/(R(I)+R(I+1))
-	    CON_dKdNUH(I)=T1*(AV_SIGMA(I)+1.0D0)/(1.0D0-T1*T1)
-	    CON_dNdNUH(I)=(AV_SIGMA(I)+1.0D0)/(1.0D0-T1*T1) -1.0D0
+	    T1=0.5_LDP*(BETA(I)+BETA(I+1))
+	    AV_SIGMA(I)=0.5_LDP*(SIGMA(I)+SIGMA(I+1))
+	    CON_DELTAH(I)=2.0_LDP*(BETA_FREQ(I)+BETA_FREQ(I+1))/(R(I)+R(I+1))
+	    CON_dKdNUH(I)=T1*(AV_SIGMA(I)+1.0_LDP)/(1.0_LDP-T1*T1)
+	    CON_dNdNUH(I)=(AV_SIGMA(I)+1.0_LDP)/(1.0_LDP-T1*T1) -1.0_LDP
 	  END DO
 !
 ! These are set to zero to insure all velocity terms are neglected.
@@ -186,22 +186,22 @@
 	  WRITE(171,*)'RN/RJ',RSQN_ON_RSQJ(1),RSQN_ON_RSQJ(ND)
 	  CLOSE(UNIT=171)
 !
-	  H_ON_J(1:ND)=0.0D0
-	  N_ON_J(1:ND)=0.0D0
-	  KMID_ON_J(1:ND)=0.0D0
-          RSQN_ON_RSQJ(1:ND)=0.0D0
+	  H_ON_J(1:ND)=0.0_LDP
+	  N_ON_J(1:ND)=0.0_LDP
+	  KMID_ON_J(1:ND)=0.0_LDP
+          RSQN_ON_RSQJ(1:ND)=0.0_LDP
 !
 	END IF
 !
 ! Zero relevant vectors and matrices.
 !
-	JNU(:)=0.0D0
-	GAM_RSQHNU(:)=0.0D0
+	JNU(:)=0.0_LDP
+	GAM_RSQHNU(:)=0.0_LDP
 !
 	IF(INCL_ADVEC_TERMS)THEN
 	  VdHdR_TERM(1:ND)=H_ON_J(1:ND)*BETA(1:ND)
 	ELSE
-	  VdHdR_TERM(1:ND)=0.0D0
+	  VdHdR_TERM(1:ND)=0.0_LDP
 	END IF
 !
 !*****************************************************************************
@@ -216,23 +216,23 @@
 	IF(INCL_REL_TERMS)THEN
 	  DO I=1,ND
 	    CHI_H(I)=CHI(I)/GAM_REL(I)+CON_DELTA(I)*(
-	1       1.0D0+2.0D0*GAM_REL_SQ(I)*(SIGMA(I)+1.0D0) )
-	    P_H(I)=1.0D0
+	1       1.0_LDP+2.0_LDP*GAM_REL_SQ(I)*(SIGMA(I)+1.0_LDP) )
+	    P_H(I)=1.0_LDP
 	  END DO
 	  IF(INCL_ADVEC_TERMS)THEN
 	    DO I=1,ND
-	      CHI_J(I)=CHI(I)/GAM_REL(I)+CON_DELTA(I)*(1.0D0+SIGMA(I))
+	      CHI_J(I)=CHI(I)/GAM_REL(I)+CON_DELTA(I)*(1.0_LDP+SIGMA(I))
 	    END DO
 	  ELSE
 	    DO I=1,ND
 	      CHI_J(I)=CHI(I)/GAM_REL(I)+CON_DELTA(I)*(
-	1                   2.0D0+GAM_REL_SQ(I)*(1.0D0+SIGMA(I)) )
+	1                   2.0_LDP+GAM_REL_SQ(I)*(1.0_LDP+SIGMA(I)) )
 	    END DO
 	  END IF
 	ELSE
 	  DO I=1,ND
 	    CHI_H(I)=CHI(I)
-	    P_H(I)=1.0D0
+	    P_H(I)=1.0_LDP
 	    CHI_J(I)=CHI(I)
 	  END DO
 	END IF
@@ -246,10 +246,10 @@
 ! value of unity at the core.
 !
 	DO I=1,ND
-	  TA(ND-I+1)=( 3.0D0*FEDD(I)-1.0D0+
-	1           BETA(I)*N_ON_J(I)-(SIGMA(I)+1.0D0)*VdHdR_TERM(I)+
-	1      GAM_REL_SQ(I)*BETA(I)*(SIGMA(I)+1.0D0)*
-	1       (BETA(I)*(1.0D0-FEDD(I)-VdHdR_TERM(I))-N_ON_J(I))
+	  TA(ND-I+1)=( 3.0_LDP*FEDD(I)-1.0_LDP+
+	1           BETA(I)*N_ON_J(I)-(SIGMA(I)+1.0_LDP)*VdHdR_TERM(I)+
+	1      GAM_REL_SQ(I)*BETA(I)*(SIGMA(I)+1.0_LDP)*
+	1       (BETA(I)*(1.0_LDP-FEDD(I)-VdHdR_TERM(I))-N_ON_J(I))
 	1            )/(FEDD(I)+VdHdR_TERM(I))/R(I)
 	  TB(I)=R(ND-I+1)
 	END DO
@@ -264,7 +264,7 @@
 	DO I=1,ND-1
 	  Q(I)=TB(I)/(R(I)/R(ND))**2
 	END DO
-	Q(ND)=1.0D0
+	Q(ND)=1.0_LDP
 !
 ! Compute optical depth scales. We also compute the dTAUdCHI matrices
 ! for use in EDD_JREL_VAR.
@@ -291,8 +291,8 @@
 !
 	  DO I=1,ND-1
 	    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
-	    W(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*GEDD(I))
-	    WPREV(I)=DELTAH(I)*(1.0D0+CON_dNdNUH(I)*GEDD_PREV(I))
+	    W(I)=DELTAH(I)*(1.0_LDP+CON_dNdNUH(I)*GEDD(I))
+	    WPREV(I)=DELTAH(I)*(1.0_LDP+CON_dNdNUH(I)*GEDD_PREV(I))
 	    EPS_A(I)=DELTAH(I)*(CON_dNdNUH(I)*RSQN_ON_RSQJ(I)+
 	1            CON_dKdNUH(I)*KMID_ON_J(I))/(P_H(I)+W(I))
 	    EPS_B(I)=EPS_A(I)*GAM_RSQ(I+1)
@@ -310,11 +310,11 @@
 	END IF
 !
 	DO I=2,ND-1
-	  GAM_RSQ_DTAUONQ(I)=0.5D0*GAM_RSQ(I)*(DTAU_J(I)+DTAU_J(I-1))/Q(I)
+	  GAM_RSQ_DTAUONQ(I)=0.5_LDP*GAM_RSQ(I)*(DTAU_J(I)+DTAU_J(I-1))/Q(I)
 	  PSI(I)=GAM_RSQ_DTAUONQ(I)*DELTA(I)*
-	1            (1.0D0+CON_dKdNU(I)*FEDD(I)+CON_dHdNU(I)*H_ON_J(I) )
+	1            (1.0_LDP+CON_dKdNU(I)*FEDD(I)+CON_dHdNU(I)*H_ON_J(I) )
 	  PSIPREV(I)=GAM_RSQ_DTAUONQ(I)*DELTA(I)*
-	1            (1.0D0+CON_dKdNU(I)*FEDD_PREV(I)+
+	1            (1.0_LDP+CON_dKdNU(I)*FEDD_PREV(I)+
 	1                       CON_dHdNU(I)*H_ON_J_PREV(I) )
 	END DO
 !
@@ -333,10 +333,10 @@
 	IF(INCL_ADVEC_TERMS)THEN
 !	  VdJdR_TERM(1:ND)=GAM_RSQ(1:ND)*CON_DELTA(1:ND)*dlnGRSQJdlnR(1:ND)/CHI_J(1:ND)
 	  VdJdR_TERM(1:ND)=CON_DELTA(1:ND)*dlnGRSQJdlnR(1:ND)/CHI_J(1:ND)
-	  P_J(1:ND)=1.0D0+VdJdR_TERM(1:ND)
+	  P_J(1:ND)=1.0_LDP+VdJdR_TERM(1:ND)
 	ELSE
-	  VdJdR_TERM(1:ND)=0.0D0
-	  P_J(1:ND)=1.0D0
+	  VdJdR_TERM(1:ND)=0.0_LDP
+	  P_J(1:ND)=1.0_LDP
 	END IF
 !
 ! Compute the TRIDIAGONAL operators, and the RHS source vector. These
@@ -352,45 +352,45 @@
 	  VC(I)=HS(I)
 	  XM(I)=GAM_RSQ_DTAUONQ(I)*SOURCE(I)/GAM_REL(I)
 	END DO
-	XM(1)=0.0D0; XM(ND)=0.0D0
+	XM(1)=0.0_LDP; XM(ND)=0.0_LDP
 !
 ! Evaluate TA,TB,TC for boundary conditions
 ! PSIPREV is equivalent to the U vector of FORMSOL.
 !
 	PSI(1)=GAM_RSQ(1)*DELTA(1)*( HBC-NBC+(NBC+BETA(1)*FEDD(1))*
-	1             GAM_REL_SQ(1)*(SIGMA(1)+1.0D0) )
+	1             GAM_REL_SQ(1)*(SIGMA(1)+1.0_LDP) )
 	PSIPREV(1)=GAM_RSQ(1)*DELTA(1)*( HBC_PREV-NBC_PREV+(NBC_PREV+
-	1             BETA(1)*FEDD_PREV(1))*GAM_REL_SQ(1)*(SIGMA(1)+1.0D0) )
+	1             BETA(1)*FEDD_PREV(1))*GAM_REL_SQ(1)*(SIGMA(1)+1.0_LDP) )
 !
-	TA(1)=0.0D0
+	TA(1)=0.0_LDP
 	TC(1)= -GAM_RSQ(2)*( FEDD(2)+VdHdR_TERM(2) )*Q(2)/DTAU_H(1)
 	TB(1)=  GAM_RSQ(1)*( FEDD(1)+VdHdR_TERM(1) )*Q(1)/DTAU_H(1) +
 	1                    PSI(1) + HBC*GAM_RSQ(1)*P_H(1)
-	XM(1)=0.0D0
-	VB(1)=0.0D0
-	VC(1)=0.0D0
+	XM(1)=0.0_LDP
+	VB(1)=0.0_LDP
+	VC(1)=0.0_LDP
 !
 ! Need to include relativistic terms.
 !
 ! CHECK INHBC TERM.
 !
 	IF(J_AT_INB_EQ_B)THEN
-	  TA(ND)=0.0D0; TC(ND)=0.0D0;
-	  TB(ND)=1.0D0
+	  TA(ND)=0.0_LDP; TC(ND)=0.0_LDP;
+	  TB(ND)=1.0_LDP
 	  XM(ND)=IC
 	ELSE IF(DIF)THEN
 	  TA(ND)=-GAM_RSQ(ND-1)*Q(ND-1)*(FEDD(ND-1)+VdHdR_TERM(ND-1))/DTAU_H(ND-1)
 	  TB(ND)=GAM_RSQ(ND)*(FEDD(ND)+VdHdR_TERM(ND))/DTAU_H(ND-1)
-	  XM(ND)=GAM_RSQ(ND)*DBB/3.0D0/CHI(ND)
+	  XM(ND)=GAM_RSQ(ND)*DBB/3.0_LDP/CHI(ND)
 	ELSE
 	  TA(ND)=-GAM_RSQ(ND-1)*Q(ND-1)*(FEDD(ND-1)+VdHdR_TERM(ND-1))/DTAU_H(ND-1)
 	  TB(ND)=GAM_RSQ(ND)*(FEDD(ND)+VdHdR_TERM(ND))/DTAU_H(ND-1)+IN_HBC*GAM_RSQ(ND)
-	  XM(ND)=GAM_RSQ(ND)*IC*(0.25D0+0.5D0*IN_HBC)
+	  XM(ND)=GAM_RSQ(ND)*IC*(0.25_LDP+0.5_LDP*IN_HBC)
 	END IF
-	TC(ND)=0.0D0
-	VB(ND)=0.0D0
-	VC(ND)=0.0D0
-	PSIPREV(ND)=0.0D0
+	TC(ND)=0.0_LDP
+	VB(ND)=0.0_LDP
+	VC(ND)=0.0_LDP
+	PSIPREV(ND)=0.0_LDP
 !
 ! We create PSIPREV_MOD to save multiplications in the UP_TX_TVX routine/
 ! It is only different from PSIPREV when N_ON_J is non zero.
@@ -410,7 +410,7 @@
 	XM(ND)=XM(ND)
 !
 !	IF(INIT)THEN
-	IF(ABS(FREQ-49.8654D0) .LT. 0.001)THEN
+	IF(ABS(FREQ-49.8654_LDP) .LT. 0.001_LDP)THEN
 	  WRITE(172,*)'TA'
 	  WRITE(172,*)TA
 	  WRITE(172,*)'TB'
@@ -437,7 +437,7 @@
 !
 	DO I=1,ND
 	  IF(XM(I) .LT. 0)THEN
-	    XM(I)=ABS(XM(I))/10.0D0
+	    XM(I)=ABS(XM(I))/10.0_LDP
 	  END IF
 	END DO
 !
@@ -524,9 +524,9 @@
 	1          + ( EPS_PREV_B(I)*TX_OLD_d_dTdR(I+1)
 	1               - EPS_PREV_A(I-1)*TX_OLD_d_dTdR(I-1) )
 	  END DO
-	  TX_DIF_d_T(ND)=GAM_RSQ(ND)*dDBBdT/3.0D0/CHI(ND) +
+	  TX_DIF_d_T(ND)=GAM_RSQ(ND)*dDBBdT/3.0_LDP/CHI(ND) +
 	1                       PSIPREV(ND)*TX_DIF_d_T(ND)
-	  TX_DIF_d_dTdR(ND)=GAM_RSQ(ND)*DBB/dTdR/3.0D0/CHI(ND) +
+	  TX_DIF_d_dTdR(ND)=GAM_RSQ(ND)*DBB/dTdR/3.0_LDP/CHI(ND) +
 	1                       PSIPREV(ND)*TX_DIF_d_dTdR(ND)
 !
 ! Solve for the radiation field along ray for this frequency.

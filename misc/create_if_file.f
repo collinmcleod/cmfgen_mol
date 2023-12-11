@@ -92,7 +92,7 @@
 	1                'SIX','SEV','VIII','IX','X','XI','XII',
 	1                'XIII','XIV','XV','XSIX','XSEV','X8','X9','XX'/
 !
-	TS(:)%SN_AGE=0.0D0
+	TS(:)%SN_AGE=0.0_LDP
 	TS(:)%ND=0
 	BIGGEST_ID=0
 	TIME=' '
@@ -152,7 +152,7 @@
 	  CALL RD_SING_VEC_RVTJ(TS(L)%V,TS(L)%ND,'Velocity',FILE_NAME,LU,IOS)
 	  CALL RD_SING_VEC_RVTJ(TS(L)%T,TS(L)%ND,'Temperature',FILE_NAME,LU,IOS)
 	  CALL RD_SING_VEC_RVTJ(TS(L)%ED,TS(L)%ND,'Electron',FILE_NAME,LU,IOS)
-	  TS(L)%T=1.0D+04*TS(L)%T
+	  TS(L)%T=1.0E+04_LDP*TS(L)%T
 !
 	  FILE_NAME=TRIM(DIR_NAME(L))//'POP'//TRIM(SPECIES)
 	  ALLOCATE (TS(L)%POP_SPEC(TS(L)%ND))

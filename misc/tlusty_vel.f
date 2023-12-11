@@ -161,13 +161,13 @@
 !
 	FILENAME=' '
 	PP_NOV=.FALSE.
-	RSTAR=18.48D0
-	RMAX=50.0D0
-	MDOT=1.0D-06
-	VINF=800.D0
-	BETA=1.0D0
+	RSTAR=18.48_LDP
+	RMAX=50.0_LDP
+	MDOT=1.0E-06_LDP
+	VINF=800._LDP
+	BETA=1.0_LDP
 	BETA_MIN=BETA
-	BETA_SCL=0.2D0
+	BETA_SCL=0.2_LDP
 	ND_CMF=50
 !
 ! Read in revised defaults if available.
@@ -181,7 +181,7 @@
 	    CALL RD_STORE_LOG(PP_NOV,'PP_NOV',L_TRUE,'Plane parallel model (no wind)?')
 	    CALL RD_STORE_DBLE(RSTAR,'RSTAR',L_TRUE,'Radius of star')
 	    IF(PP_NOV)THEN
-	      MDOT=1.0D-22
+	      MDOT=1.0E-22_LDP
 	    ELSE
 	      CALL RD_STORE_DBLE(RMAX,'RMAX',L_TRUE,'Radius of star')
 	      CALL RD_STORE_DBLE(MDOT,'MDOT',L_TRUE,'Mass loss in Msun/yr')
@@ -207,7 +207,7 @@
 	CALL GEN_IN(PP_NOV,'Plane parallel model (no wind)?')
 	CALL GEN_IN(RSTAR,'RSTAR')
 	IF(PP_NOV)THEN
-	  MDOT=1.0D-22
+	  MDOT=1.0E-22_LDP
 	ELSE
 	  CALL GEN_IN(RMAX,'RMAX')
 	  CALL GEN_IN(MDOT,'MDOT')
@@ -233,8 +233,8 @@
 !
 ! Will use program units of 10^10 cm, V in km/s
 !
-	RCORE=RSTAR*6.9599D0
-	AMDOT=MDOT*6.3029D0
+	RCORE=RSTAR*6.9599_LDP
+	AMDOT=MDOT*6.3029_LDP
 	RMAX=RMAX*RCORE
 	PI=FUN_PI()
 !
@@ -284,7 +284,7 @@
 	WRITE(6,*)'Tau(ND)=',TAUR(ND)
 	REMOVE=.TRUE.; CALL GEN_IN(REMOVE,'Remove last tau depth')
 	IF(REMOVE)ND=ND-1
-	T(1:ND)=1.0D-04*T(1:ND)
+	T(1:ND)=1.0E-04_LDP*T(1:ND)
 !
 	KAPPA(1)=TAUR(1)/DM(1)
 	DO I=2,ND
@@ -301,9 +301,9 @@
 !
 ! Radial scale and photospheric velocity. NB. ZZ will be in units of 10^10 cm.
 !
-	ZZ(ND)=0.0D0
+	ZZ(ND)=0.0_LDP
 	DO ID=ND-1,1,-1
-	  ZZ(ID)=ZZ(ID+1)+2.0D-10*(DM(ID+1)-DM(ID))/(DSH(ID+1)+DSH(ID))
+	  ZZ(ID)=ZZ(ID+1)+2.0E-10_LDP*(DM(ID+1)-DM(ID))/(DSH(ID+1)+DSH(ID))
 	END DO
 !
 	RD(1:ND)=ZZ(1:ND)+RCORE
@@ -364,9 +364,9 @@
 	    TB(I)=I
 	  END DO
 	  DO I=1,ND_CMF
-	    TA(I)=1.0D0+ND*(I-1.0D0)/ND_CMF
+	    TA(I)=1.0_LDP+ND*(I-1.0_LDP)/ND_CMF
 	  END DO
-	  TA(1)=1.0D0; TA(ND_CMF)=ND
+	  TA(1)=1.0_LDP; TA(ND_CMF)=ND
 !
 	  CALL MON_INTERP(R_CMF,ND_CMF,IONE,TA,ND_CMF,RD,ND,TB,ND)
 	  VPH(1:ND)=LOG(VPH(1:ND))
@@ -442,8 +442,8 @@
 	  R0=RA(I)
 	  FLAG=.FALSE.
 	  DO K=I-1,1,-1
-	    VW(K)=VINF*(1.0D0-R0/RA(K))**(BETA+(BETA_MIN-BETA)*
-	1          EXP( (1.0D0-RA(K)/RCORE)/BETA_SCL ))
+	    VW(K)=VINF*(1.0_LDP-R0/RA(K))**(BETA+(BETA_MIN-BETA)*
+	1          EXP( (1.0_LDP-RA(K)/RCORE)/BETA_SCL ))
 	    IF(VW(K) .GT. VPA(K))FLAG=.TRUE.
 	  END DO
 	  IF(.NOT. FLAG)EXIT
@@ -452,7 +452,7 @@
 !
 ! We have found R0, now need to find the connection radius.
 !
-	MIN_VAL=1.0E+37
+	MIN_VAL=1.0E+37_LDP
 	C_INDX=0
 	DO K=IND0-1,1,-1
 	  T1=VPA(K)-VW(K)
@@ -488,8 +488,8 @@
 ! Extend velocity law on hydrostatic grid to illustrate the connection.
 !
 	DO K=C_INDX,1,-1
-	  VW(K)=VINF*(1.0D0-R0/RA(K))**(BETA+(BETA_MIN-BETA)*
-	1          EXP( (1.0D0-RA(K)/RCORE)/BETA_SCL ))
+	  VW(K)=VINF*(1.0_LDP-R0/RA(K))**(BETA+(BETA_MIN-BETA)*
+	1          EXP( (1.0_LDP-RA(K)/RCORE)/BETA_SCL ))
 	END DO
 	VW(C_INDX+1:NBIG)=VPA(C_INDX+1:NBIG)
 	CALL DP_CURVE(NBIG,RA_NORM,VW)
@@ -515,8 +515,8 @@
 	  R_F(NEXT+1:NF)=RA(C_INDX+1:NBIG)
 !
 	  DO K=1,NEXT
-	    VW_F(K)=VINF*(1.0D0-R0/R_F(K))**(BETA+(BETA_MIN-BETA)*
-	1          EXP( (1.0D0-R_F(K)/RCORE)/BETA_SCL ))
+	    VW_F(K)=VINF*(1.0_LDP-R0/R_F(K))**(BETA+(BETA_MIN-BETA)*
+	1          EXP( (1.0_LDP-R_F(K)/RCORE)/BETA_SCL ))
 	    DSH_F(K)=AMDOT/4/PI/R_F(K)/R_F(K)/VW_F(K)
 	  END DO
 	  VW_F(NEXT+1:NF)=VPA(C_INDX+1:NBIG)
@@ -527,9 +527,9 @@
 !
 	  WRITE(6,*)'KAPPA(1)=',KAPPA_A(1)
 	  WRITE(6,*)'KAPPA(C_INDX)=',KAPPA_A(C_INDX)
-	  TAUR_F(1)=KAPPA_A(1)*R_F(1)*1.0D+10*DSH_F(1)
+	  TAUR_F(1)=KAPPA_A(1)*R_F(1)*1.0E+10_LDP*DSH_F(1)
 	  DO I=2,NEXT
-	    TAUR_F(I)=TAUR_F(I-1)+0.5D+10*(R_F(I-1)-R_F(I))*
+	    TAUR_F(I)=TAUR_F(I-1)+0.5E+10_LDP*(R_F(I-1)-R_F(I))*
 	1              (DSH_F(I)+DSH_F(I+1))*KAPPA_A(1)
 	  END DO
 	  T1=TAUR_F(NEXT)-TAUR_A(C_INDX)
@@ -579,7 +579,7 @@
 	IF(NEW_DEF_OPT)THEN
 	  ND_SM=ND_CMF/2
 	  CALL GEN_IN(ND_SM,'Number of depth points above connection point?')
-	  VW_BEG=MIN(1.0D0,VPA(C_INDX))
+	  VW_BEG=MIN(1.0_LDP,VPA(C_INDX))
 	  CALL GEN_IN(VW_BEG,'Velocity at photosphere/wind interface')
 !
 ! Find the wind/photosphere interface.
@@ -602,8 +602,8 @@
 	    TAUR_CMF(I)=TEMP_F(NV_WIND)+(I-ND_SM)*T1
 	  END DO
 	  TAUR_CMF(ND_CMF)=TEMP_F(NF)
-	  TAUR_CMF(ND_CMF-1)=TEMP_F(NF)-0.1*T1
-	  TAUR_CMF(ND_CMF-2)=TEMP_F(NF)-0.3*T1
+	  TAUR_CMF(ND_CMF-1)=TEMP_F(NF)-0.1_LDP*T1
+	  TAUR_CMF(ND_CMF-2)=TEMP_F(NF)-0.3_LDP*T1
 !
 	  DO I=ND_SM+1,ND_CMF
 	    WRITE(45,*)I,TAUR_CMF(I)
@@ -622,8 +622,8 @@
 	  WRITE(6,*)'Now choosing points in wind region'
 	  T1=(DSH_F(NV_WIND)-DSH_F(1))/(ND_SM-3)
 	  DENS_CMF(1)=DSH_F(1)
-	  DENS_CMF(2)=DSH_F(1)+0.1*T1
-	  DENS_CMF(3)=DSH_F(1)+0.3*T1
+	  DENS_CMF(2)=DSH_F(1)+0.1_LDP*T1
+	  DENS_CMF(3)=DSH_F(1)+0.3_LDP*T1
 	  DO I=4,ND_SM
 	    DENS_CMF(I)=DENS_CMF(1)+(I-3)*T1
 	  END DO
@@ -645,35 +645,35 @@
 	    WRITE(6,*)'           i.e., Tau(Mod)=Tau/ (C+V)**EPS'
 	    WRITE(6,*)' You need to check that the chosen r grid is satsifactory.'
 	    WRITE(6,*)' '
-	    CONS=0.1D0
-	    EPS=0.75D00
+	    CONS=0.1_LDP
+	    EPS=0.75E00_LDP
 	    CALL GEN_IN(CONS,'Constant for Velocity scaling of Tau (>0) ')
 	    CALL GEN_IN(EPS,'Exponent for Velocity scaling of Tau')
 	    TEMP_F(1:NF)=LOG( TAUR_F(1:NF)/(CONS+VW_F(1:NF))**EPS )
 	    T1=(TEMP_F(NF)-TEMP_F(1))/(ND_CMF-5)
 	    TAUR_CMF(1)=TEMP_F(1)
-	    TAUR_CMF(2)=TEMP_F(1)+0.1*T1
-	    TAUR_CMF(3)=TEMP_F(1)+0.3*T1
+	    TAUR_CMF(2)=TEMP_F(1)+0.1_LDP*T1
+	    TAUR_CMF(3)=TEMP_F(1)+0.3_LDP*T1
 	    DO I=4,ND_CMF-3
 	      TAUR_CMF(I)=TAUR_CMF(1)+(I-3)*T1
 	    END DO
 	    TAUR_CMF(ND_CMF)=TEMP_F(NF)
-	    TAUR_CMF(ND_CMF-1)=TEMP_F(NF)-0.1*T1
-	    TAUR_CMF(ND_CMF-2)=TEMP_F(NF)-0.3*T1
+	    TAUR_CMF(ND_CMF-1)=TEMP_F(NF)-0.1_LDP*T1
+	    TAUR_CMF(ND_CMF-2)=TEMP_F(NF)-0.3_LDP*T1
 	    CALL MON_INTERP(DENS_CMF,ND_CMF,IONE,TAUR_CMF,ND_CMF,
 	1                  DSH_F,NF,TEMP_F,NF)
 	    TAUR_CMF(1:ND_CMF)=EXP(TAUR_CMF(1:ND_CMF))
 	  ELSE
 	    T1=(DSH_F(NF)-DSH_F(1))/(ND_CMF-5)
 	    DENS_CMF(1)=DSH_F(1)
-	    DENS_CMF(2)=DSH_F(1)+0.1*T1
-	    DENS_CMF(3)=DSH_F(1)+0.3*T1
+	    DENS_CMF(2)=DSH_F(1)+0.1_LDP*T1
+	    DENS_CMF(3)=DSH_F(1)+0.3_LDP*T1
 	    DO I=4,ND_CMF-3
 	      DENS_CMF(I)=DENS_CMF(1)+(I-3)*T1
 	    END DO
 	    DENS_CMF(ND_CMF)=DSH_F(NF)
-	    DENS_CMF(ND_CMF-1)=DSH_F(NF)-0.1*T1
-	    DENS_CMF(ND_CMF-2)=DSH_F(NF)-0.3*T1
+	    DENS_CMF(ND_CMF-1)=DSH_F(NF)-0.1_LDP*T1
+	    DENS_CMF(ND_CMF-2)=DSH_F(NF)-0.3_LDP*T1
 	    CALL MON_INTERP(TAUR_CMF,ND_CMF,IONE,DENS_CMF,ND_CMF,TAUR_F,NF,DSH_F,NF)
 	  END IF
 	END IF
@@ -753,7 +753,7 @@
 	WRITE(6,*)' Plotting V as a function of R on the final grid'
 	WRITE(6,*)' '
 	R_CMF(1:ND_CMF)=R_CMF(1:ND_CMF)/RCORE
-	V_CMF(1:ND_CMF)=V_CMF(1:ND_CMF)/1.0D+05
+	V_CMF(1:ND_CMF)=V_CMF(1:ND_CMF)/1.0E+05_LDP
 	CALL DP_CURVE(ND_CMF,R_CMF,V_CMF)
 	CALL GRAMON_PGPLOT(' ',' ',' ',' ')
 !

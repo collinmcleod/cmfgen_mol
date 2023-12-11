@@ -215,12 +215,12 @@
 ! 
 ! Set constants.
 !
-	CHIBF=2.815D-06
-	CHIFF=3.69D-29
-	HDKT=4.7994145D0
-	TWOHCSQ=0.0147452575D0
-	OPLIN=2.6540081D+08
-	EMLIN=5.27296D-03
+	CHIBF=2.815E-06_LDP
+	CHIFF=3.69E-29_LDP
+	HDKT=4.7994145_LDP
+	TWOHCSQ=0.0147452575_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
 	FORMFEED=''
 !
 	LUER=2      					!ERROR_LU()
@@ -229,7 +229,7 @@
 !
 ! Read in all the atomic data. Some of these are superfluous.
 !
-	GF_CUT=0.0D0			!These ensure we get all transitions.
+	GF_CUT=0.0_LDP			!These ensure we get all transitions.
 	GF_LEV_CUT=NLEV+1
 	MIN_NUM_TRANS=NLEV*NLEV
 	EN_DATE=' '
@@ -358,7 +358,7 @@
 !
 	PACK=.TRUE.
 	PACK_LJ_STATES=.TRUE.
-	EMIN_PACK=-1.0D0			!i.e. pack all states
+	EMIN_PACK=-1.0_LDP			!i.e. pack all states
 	INCLUDE_F_DEP_ON_E=.TRUE.
 	CALL GEN_IN(PACK,'Pack states?')
 	CALL GEN_IN(EMIN_PACK,'Pack when states above this energy (in cm^{-1})')
@@ -459,7 +459,7 @@
 	  ALLOCATE (G_PACK(CNT))
 	  ALLOCATE (PACK_SPIN(CNT))
 	  ALLOCATE (FOSC_PACK(CNT,CNT))
-	  EDGE_PACK(:)=0.0D0; G_PACK(:)=0.0D0; FOSC_PACK(:,:)=0.0D0
+	  EDGE_PACK(:)=0.0_LDP; G_PACK(:)=0.0_LDP; FOSC_PACK(:,:)=0.0_LDP
 	  DO I=1,NLEV
 	    J=F_TO_S(I)
 	    G_PACK(J)=G_PACK(J)+G(I)
@@ -499,7 +499,7 @@
 	      DO I=1,J
 	        IS=MIN(F_TO_S(I),F_TO_S(J))
 	        JS=MAX(F_TO_S(I),F_TO_S(J))
-	        IF(FOSC(I,J) .EQ. 0.0D0)THEN
+	        IF(FOSC(I,J) .EQ. 0.0_LDP)THEN
 	        ELSE IF(FEDGE(I) .NE. FEDGE(J))THEN
 	          FOSC_PACK(IS,JS)=FOSC_PACK(IS,JS)+G(I)*FOSC(I,J)/ABS(FEDGE(I)-FEDGE(J))
 	        ELSE
@@ -564,7 +564,7 @@
 	  ALLOCATE (GAM4(CNT))
 	  ALLOCATE (TRANS(CNT,CNT))
 	  ALLOCATE (SECND(CNT,CNT))
-	  ARAD=0.0D0; GAM2=0.0D0; GAM4=0.0D0
+	  ARAD=0.0_LDP; GAM2=0.0_LDP; GAM4=0.0_LDP
 	  KNOWN_ENERGY_LEVEL=.TRUE.
 	  FILENAME=TRIM(ION_ID)//'_PACK'
 	  CALL WRITE_OSC_V2(FOSC_PACK,TRANS,SECND,EDGE_PACK,G_PACK,
@@ -684,7 +684,7 @@ C
 	    IF(NAME(I)(K:K) .EQ. 'W' .OR. NAME(I)(K:K) .EQ. 'Z')THEN
 	      LEV_ANG(I)=NAME(I)(K:K)
 	    ELSE
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO J=1,NANG
 	        IF(NAME(I)(K:K) .EQ. ANG_STR(J))THEN
 	          LEV_ANG(I)=ANG_STR(J)

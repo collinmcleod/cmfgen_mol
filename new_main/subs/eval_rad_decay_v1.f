@@ -31,8 +31,8 @@
 ! Also, since chi, and eta are a factor of 10^10 too large, we need to
 ! scale by 10^10. The BA matrix does not need to be altered.
 !
-	PI=ACOS(-1.0D0)
-	SCALE=1.0D+10/4.0D0/PI
+	PI=ACOS(-1.0_LDP)
+	SCALE=1.0E+10_LDP/4.0_LDP/PI
 	STEQ_T=STEQ_T+SCALE*RADIOACTIVE_DECAY_ENERGY
 	STEQ_T_EHB=STEQ_T_EHB+RADIOACTIVE_DECAY_ENERGY
 	de_RAD_DECAY=RADIOACTIVE_DECAY_ENERGY

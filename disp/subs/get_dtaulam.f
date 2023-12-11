@@ -27,8 +27,8 @@ C
 	REAL(KIND=LDP) ALPHA
 C
 	DO I=1,NI
-	  WA(I)=0.0D0
-	  WB(I)=0.0D0
+	  WA(I)=0.0_LDP
+	  WB(I)=0.0_LDP
 	END DO
 C
 C NB - WB(I) = dDTAU(I)/dCHI(I)
@@ -36,11 +36,11 @@ C    - WA(I) = dDTAU(I-1)/dCHI(I)
 C
 	DO I=1,NI-1
 	  K=I+1
-	  ALPHA=0.5D0*(Z(I)-Z(K))
-	  WB(I)=ALPHA*(  1.0D0+(Z(I)-Z(K))*
-	1            ( A(K)*Z(K)/R(K) - B(I)*Z(I)/R(I) )/6.0D0  )
-	  WA(K)=ALPHA*(  1.0D0+(Z(I)-Z(K))*
-	1            ( B(K)*Z(K)/R(K) - C(I)*Z(I)/R(I) )/6.0D0  )
+	  ALPHA=0.5_LDP*(Z(I)-Z(K))
+	  WB(I)=ALPHA*(  1.0_LDP+(Z(I)-Z(K))*
+	1            ( A(K)*Z(K)/R(K) - B(I)*Z(I)/R(I) )/6.0_LDP  )
+	  WA(K)=ALPHA*(  1.0_LDP+(Z(I)-Z(K))*
+	1            ( B(K)*Z(K)/R(K) - C(I)*Z(I)/R(I) )/6.0_LDP  )
 	END DO
 C
 	RETURN

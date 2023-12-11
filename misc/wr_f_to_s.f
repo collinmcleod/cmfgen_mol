@@ -139,14 +139,14 @@ C
 C
 C Set constants.
 C
-	CHIBF=2.815E-06
-	CHIFF=3.69E-29
-	HDKT=4.7994145
-	TWOHCSQ=0.0147452575
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
+	CHIBF=2.815E-06_LDP
+	CHIFF=3.69E-29_LDP
+	HDKT=4.7994145_LDP
+	TWOHCSQ=0.0147452575_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
 	INT_SEQ(:)=0
 C
 C 
@@ -345,8 +345,8 @@ C
 	  WRITE(6,*)'Now do a clean'
 C
 	ELSE IF(X(1:3) .EQ. 'AVE')THEN
-          G_SUM(:)=0.0D0
-          EDGE_SUM(:)=0.0D0
+          G_SUM(:)=0.0_LDP
+          EDGE_SUM(:)=0.0_LDP
           DO J=1,NLEV
             I=F_TO_S(J)
             G_SUM(I)=G_SUM(I)+G(J)
@@ -357,10 +357,10 @@ C
 	  EDGE_SUM(2:I)=EDGE_SUM(2:I)-EDGE_SUM(1)
 	  DO J=1,NLEV
 	    I=F_TO_S(J)
-	    IF(EDGE_SUM(I) .NE. -999999.0D0)THEN
+	    IF(EDGE_SUM(I) .NE. -999999.0_LDP)THEN
 	      WRITE(31,'(A,T20,F4.0,3X,F12.3)')
 	1                TRIM(LS_NAME(J)),G_SUM(I),EDGE_SUM(I)
-	      EDGE_SUM(I)=-999999.0D0
+	      EDGE_SUM(I)=-999999.0_LDP
 	    END IF
 	 END DO
 C
@@ -401,8 +401,8 @@ C
 	  END DO
 C
 	  LS_DONE(:)=.FALSE.
-	  LS_EMIN(:)=1.0E+36
-	  LS_EMAX(:)=-1.0E+36
+	  LS_EMIN(:)=1.0E+36_LDP
+	  LS_EMAX(:)=-1.0E+36_LDP
 	  DO I=1,NLEV
 	    LS_EMIN(F_TO_S(I))=MIN(LS_EMIN(F_TO_S(I)),ENERGY(I))
 	    LS_EMAX(F_TO_S(I))=MAX(LS_EMAX(F_TO_S(I)),ENERGY(I))
@@ -410,7 +410,7 @@ C
 	    LS_PARITY(F_TO_S(I))=LEV_PARITY(I)
 	  END DO
 	  DO I=1,NLEV
-	    LS_EMID(I)=0.5D0*(LS_EMIN(I)+LS_EMAX(I))
+	    LS_EMID(I)=0.5_LDP*(LS_EMIN(I)+LS_EMAX(I))
 	  END DO
 C
 	  IF(X(1:3) .EQ. 'ELS')THEN
@@ -420,7 +420,7 @@ C
 	    CALL USR_OPTION(FRAC_DEL_E,'%E','10.0D0',
 	1         'Percentage difference in excitation energy')
 	  END IF
-	  FRAC_DEL_E=0.01D0*FRAC_DEL_E
+	  FRAC_DEL_E=0.01_LDP*FRAC_DEL_E
 	  CALL USR_HIDDEN(CHK_PARITY,'CHK_P','T','Check parity?')
 	  CALL USR_HIDDEN(CHK_SPIN,'CHK_S','T','Check spin?')
 C
@@ -518,12 +518,12 @@ C
 	    IF(CHANGE_FS(I))F_TO_S(I)=NLEV*F_TO_S(I)+I
 	    DO J=I+1,NLEV
 	      IF(.NOT. LS_DONE(J) .AND. FS_SAV .EQ. F_TO_S(J))THEN
-	        T1=0.5D0*(DC(J,1)+DC(I,1))
+	        T1=0.5_LDP*(DC(J,1)+DC(I,1))
 	        IF(T1 .EQ. 0)T1=1
 	        DO_CHANGE=.FALSE.
 	        IF(CHANGE_FS(I) .AND. CHANGE_FS(J))DO_CHANGE=.TRUE.
 	        IF(.NOT. CHANGE_FS(I) .AND. .NOT. CHANGE_FS(J))DO_CHANGE=.TRUE.
-	        IF( ABS(DC(J,1)-DC(I,1))/T1 .LT. 0.01*ACC .AND.
+	        IF( ABS(DC(J,1)-DC(I,1))/T1 .LT. 0.01_LDP*ACC .AND.
 	1              ENERGY(J)-ENERGY(I) .LT. DEL_E_CM .AND. DO_CHANGE)THEN
 	          F_TO_S(J)=F_TO_S(I)
 	          CHANGE_FS(J)=.FALSE.
@@ -615,7 +615,7 @@ C
 	  DO K=1,L
 	    DO I=1,NLEV
 	      IF(F_TO_S(I) .EQ. K)THEN
-	        LAM_EDGE(I)=1.0D+08/(ION_EN-ENERGY(I))
+	        LAM_EDGE(I)=1.0E+08_LDP/(ION_EN-ENERGY(I))
 	        IF(WRITE_DC)THEN
 	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
 	1                      LAM_EDGE(I),F_TO_S(I)+CNT,INT_SEQ(I),I,DC(I,1),
@@ -658,7 +658,7 @@ C
 	      I1=LEN_TRIM(TERM_NAME(I))
 	      IF(TERM_NAME(K)(K1-4:K1) .EQ. TERM_NAME(I)(I1-4:I1) .AND. .NOT. DONE_LEV(I))THEN
 	        DONE_LEV(I)=.TRUE.
-	        LAM_EDGE(I)=1.0D+08/(ION_EN-ENERGY(I))
+	        LAM_EDGE(I)=1.0E+08_LDP/(ION_EN-ENERGY(I))
 	        IF(WRITE_DC)THEN
 	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
 	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I,DC(I,1),
@@ -689,7 +689,7 @@ C
 	    DO I=K,NLEV
 	      IF(INT_SEQ(I) .EQ. INT_SEQ(K) .AND. .NOT. DONE_LEV(I))THEN
 	        DONE_LEV(I)=.TRUE.
-	        LAM_EDGE(I)=1.0D+08/(ION_EN-ENERGY(I))
+	        LAM_EDGE(I)=1.0E+08_LDP/(ION_EN-ENERGY(I))
 	        IF(WRITE_DC)THEN
 	          WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
 	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I,DC(I,1),
@@ -762,7 +762,7 @@ C
 	  WRITE(LUOUT,*)' '
 	  J=MAX_NAME_LNGTH
 	  DO I=1,NLEV
-	    LAM_EDGE(I)=1.0D+08/(ION_EN-ENERGY(I))
+	    LAM_EDGE(I)=1.0E+08_LDP/(ION_EN-ENERGY(I))
 	    IF(WRITE_DC)THEN
 	      WRITE(LUOUT,100)NAME(I)(1:J),G(I),ENERGY(I),FEDGE(I),
 	1                      LAM_EDGE(I),F_TO_S(I),INT_SEQ(I),I,DC(I,1),
@@ -787,7 +787,7 @@ C
 	    I=K
 	    J=MAX_NAME_LNGTH
 	    DO WHILE((I-K) .LE. 14 .AND. I .LE. NLEV)
-	      LAM_EDGE(I)=1.0D+08/(ION_EN-ENERGY(I))
+	      LAM_EDGE(I)=1.0E+08_LDP/(ION_EN-ENERGY(I))
 	      IF(WRITE_DC)THEN
 	        WRITE(T_OUT,120)NAME(I)(1:J),G(I),ENERGY(I),F_TO_S(I),
 	1                 I,DC(I,1)
@@ -1025,7 +1025,7 @@ C
 !
 	    T_EXCITE=DC(1,1)
 	    IF(.NOT. FIX_DI)THEN
-	      T1=2.07078D-22*ED(1)*(G_GS/G_ION)*EXP(HDKT*FEDGE(1)/T_EXCITE)/(T_EXCITE**1.50)
+	      T1=2.07078E-22_LDP*ED(1)*(G_GS/G_ION)*EXP(HDKT*FEDGE(1)/T_EXCITE)/(T_EXCITE**1.50_LDP)
 	      DI=DI/T1
 	    END IF
 !
@@ -1034,8 +1034,8 @@ C
 	    WRITE(LUOUT+1,'(A)')' '
 	    WRITE(LUOUT+1,'(ES16.7,6ES15.4)')RVAL,DI,ED(1),TEMP(1),0.0D0,V1,CL_FAC
 	    DO I=1,NLEV
-	      T1=EXP( HDKT*FEDGE(I)*(1.0D0/T_EXCITE-1.0D0/TEMP(1)) )
-	      T2=(TEMP(1)/T_EXCITE)**1.5D0
+	      T1=EXP( HDKT*FEDGE(I)*(1.0_LDP/T_EXCITE-1.0_LDP/TEMP(1)) )
+	      T2=(TEMP(1)/T_EXCITE)**1.5_LDP
 	      DC(I,1)=T1*T2
 	    END DO
 	    WRITE(LUOUT,'(3X,5ES14.4)')(DC(I,1),I=1,NLEV)

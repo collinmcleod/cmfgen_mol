@@ -190,7 +190,7 @@
 	  CALL GEN_IN(N_ITS_TO_RD,'Number of iterations to read')
 	ELSE IF(OPTION(1:2) .EQ. 'TG')THEN
 	  N_ITS_TO_RD=3
-	  SCALE_FAC=2.0D0
+	  SCALE_FAC=2.0_LDP
 	  IT_STEP=1
 	  N_ITS_TO_AV=1
 	  CALL GEN_IN(N_ITS_TO_RD,'Number of iterations to read')
@@ -201,14 +201,14 @@
 	  N_ITS_TO_RD=3*N_ITS_TO_AV
 	ELSE IF(OPTION(1:3) .EQ. 'NSR')THEN
 	  N_ITS_TO_RD=2
-	  SCALE_FAC=2.0D0
+	  SCALE_FAC=2.0_LDP
 	  CALL GEN_IN(SCALE_FAC,'Exponent (N) to power scale (i.e., (1+T1)**N last correction')
 	  CALL GEN_IN(ND_ST,'Only do NG acceleration for the depth in .GE. ND_ST')
 	  CALL GEN_IN(ND_END,'Only do NG acceleration for the depth in .LE. ND_END')
 	ELSE IF(OPTION(1:3) .EQ. 'SOR')THEN
 	  N_ITS_TO_RD=2
-	  SCALE_FAC=2.0D0
-	  BIG_FAC=5.0D0
+	  SCALE_FAC=2.0_LDP
+	  BIG_FAC=5.0_LDP
 	  CALL GEN_IN(SCALE_FAC,'Factor to scale last correction by')
           CALL GEN_IN(BIG_FAC,'Maximum correction to any depth')
 	  CALL GEN_IN(ND_ST,'Only do NG acceleration for the depth in .GE. ND_ST')
@@ -241,7 +241,7 @@
 	BIG_POPS(1:NT,:)=POPS(1:NT,:)
 	BIG_POPS(NT+1,:)=R(:)
 	BIG_POPS(NT+2,:)=V(:)
-	BIG_POPS(NT+3,:)=SIGMA(:)+1.0D0
+	BIG_POPS(NT+3,:)=SIGMA(:)+1.0_LDP
 	WRITE(6,*)'Read in last iteration'
 !
 ! Read in the last N_ITS_TO_RD estimates of the populations, as output to SCRTEMP.
@@ -255,7 +255,7 @@
 	  RDPOPS(1:NT,:,I)=POPS(1:NT,1:ND)
 	  RDPOPS(NT+1,:,I)=R(:)
 	  RDPOPS(NT+2,:,I)=V(:)
-	  RDPOPS(NT+3,:,I)=SIGMA(:)+1.0D0
+	  RDPOPS(NT+3,:,I)=SIGMA(:)+1.0_LDP
 	  IF(NEWMOD)THEN
 	    WRITE(T_OUT,*)'Unable to read scratch file'
 	    STOP
@@ -279,14 +279,14 @@
 	  BIG_POPS=RDPOPS(:,:,1)
 	  DO J=ND_ST,ND_END
 	    DO I=1,NT+3
-	      BIG_POPS(I,J)=0.5D0*(RDPOPS(I,J,IT1)+RDPOPS(I,J,IT2))
+	      BIG_POPS(I,J)=0.5_LDP*(RDPOPS(I,J,IT1)+RDPOPS(I,J,IT2))
 	    END DO
 	  END DO
 	  NG_DONE=.TRUE.
 !
 	ELSE IF(OPTION(1:2) .EQ. 'SM')THEN
 	  BIG_POPS=RDPOPS(:,:,1)
-	  REAL_LIMIT=1.0D-08
+	  REAL_LIMIT=1.0E-08_LDP
 	  CALL GEN_IN(REAL_LIMIT,'Replace value when ratio is larger than this value.')
 	  DO I=1,NT
 	    TA(1:ND)=BIG_POPS(I,1:ND)
@@ -319,7 +319,7 @@
 	  DO J=ND_ST,ND_END
 	    IF(N_ITS_TO_AV .NE. 1)THEN
 	      DO K=1,N_ITS_TO_RD/N_ITS_TO_AV
-	        RDPOPS(:,J,K)=0.5D0*(RDPOPS(:,J,2*K-1)+RDPOPS(:,J,2*K))
+	        RDPOPS(:,J,K)=0.5_LDP*(RDPOPS(:,J,2*K-1)+RDPOPS(:,J,2*K))
 	      END DO
 	    END IF
 	    T1=(RDPOPS(IVAR,J,2)-RDPOPS(IVAR,J,3))/(RDPOPS(IVAR,J,1)-RDPOPS(IVAR,J,2))
@@ -328,26 +328,26 @@
 	  CALL GEN_IN(SCALE_FAC,'Exponent (N) to power scale (i.e., (1+T1)**N last correction if r<1')
 	  DO J=ND_ST,ND_END
 	    T1=(RDPOPS(IVAR,J,2)-RDPOPS(IVAR,J,3))/(RDPOPS(IVAR,J,1)-RDPOPS(IVAR,J,2))
-	    IF(T1 .LT. -1.0)THEN
+	    IF(T1 .LT. -1.0_LDP)THEN
 	      DO I=1,NT
-	        T2=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/(T1-1.0D0)
+	        T2=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/(T1-1.0_LDP)
 	        IF(T2 .GT. RDPOPS(I,J,1))T2=RDPOPS(I,J,1)
-	        IF(T2 .LT. -0.5D0*RDPOPS(I,J,1))T2=-0.5D0*RDPOPS(I,J,1)
+	        IF(T2 .LT. -0.5_LDP*RDPOPS(I,J,1))T2=-0.5_LDP*RDPOPS(I,J,1)
 	        BIG_POPS(I,J)=RDPOPS(I,J,1)+T2
 	      END DO
-	    ELSE IF(T1 .GT. 1.0)THEN
-	      IF(T1 .LT. 1.010D0)T1=1.010D0
+	    ELSE IF(T1 .GT. 1.0_LDP)THEN
+	      IF(T1 .LT. 1.010_LDP)T1=1.010_LDP
 	      DO I=1,NT
-	        T2=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/(T1-1.0D0)
+	        T2=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/(T1-1.0_LDP)
 	        IF(T2 .GT. RDPOPS(I,J,1))T2=RDPOPS(I,J,1)
-	        IF(T2 .LT. -0.5D0*RDPOPS(I,J,1))T2=-0.5D0*RDPOPS(I,J,1)
+	        IF(T2 .LT. -0.5_LDP*RDPOPS(I,J,1))T2=-0.5_LDP*RDPOPS(I,J,1)
 	        BIG_POPS(I,J)=RDPOPS(I,J,1)+T2
 	      END DO
 	    ELSE
 	      K=NINT(SCALE_FAC)
 	      DO I=1,NT
 	        T1=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/RDPOPS(I,J,2)
-	        BIG_POPS(I,J)=RDPOPS(I,J,1)*(1.0D0+T1)**K
+	        BIG_POPS(I,J)=RDPOPS(I,J,1)*(1.0_LDP+T1)**K
 	      END DO
 	    END IF
 	  END DO
@@ -400,14 +400,14 @@
 	  DO J=ND_ST,ND_END
 	    DO I=1,NT+3
 	      T1=(RDPOPS(I,J,1)-RDPOPS(I,J,2))/RDPOPS(I,J,2)
-	      BIG_POPS(I,J)=RDPOPS(I,J,1)*(1.0D0+T1)**K
+	      BIG_POPS(I,J)=RDPOPS(I,J,1)*(1.0_LDP+T1)**K
 	    END DO
 	  END DO
 	  NG_DONE=.TRUE.
 	ELSE IF(OPTION(1:3) .EQ. 'SOR')THEN
 	  DO J=ND_ST,ND_END
-	    T1=-1000.0D0
-	    T2=1000.0D0
+	    T1=-1000.0_LDP
+	    T2=1000.0_LDP
 	    DO I=1,NT+3
 	      T1=MAX(T1,(RDPOPS(I,J,1)-RDPOPS(I,J,2))/RDPOPS(I,J,1))
 	      T2=MIN(T2,(RDPOPS(I,J,1)-RDPOPS(I,J,2))/RDPOPS(I,J,1))
@@ -415,7 +415,7 @@
 	    T2=ABS(T2)
 	    T3=SCALE_FAC
 	    IF(T3*T1 .GT. BIG_FAC)T3=BIG_FAC/T1
-	    IF(T3*T2 .GT. (1.0D0-1.0D0/BIG_FAC))T3=(1.0D0-1.0D0/BIG_FAC)/T2
+	    IF(T3*T2 .GT. (1.0_LDP-1.0_LDP/BIG_FAC))T3=(1.0_LDP-1.0_LDP/BIG_FAC)/T2
 	    WRITE(6,'(I4,3ES14.4)')J,T1,T2,T3
 	    DO I=1,NT+3
 	      BIG_POPS(I,J)=RDPOPS(I,J,1)+T3*(RDPOPS(I,J,1)-RDPOPS(I,J,2))
@@ -427,9 +427,9 @@
 	  DO J=ND_ST,ND_END
 	    DO I=1,NT+3
 	      T1=(RDPOPS(I,J,1)-RDPOPS(I,J,N_ITS_TO_RD))/BIG_POPS(I,J)
-	      IF(T1 .LT. -0.9)T1=-0.9
-	      IF(T1 .GT. 10.0)T1=10.0
-	      BIG_POPS(I,J)=BIG_POPS(I,J)*(1.0D0+T1)
+	      IF(T1 .LT. -0.9_LDP)T1=-0.9
+	      IF(T1 .GT. 10.0_LDP)T1=10.0
+	      BIG_POPS(I,J)=BIG_POPS(I,J)*(1.0_LDP+T1)
 	    END DO
 	  END DO
 	  NG_DONE=.TRUE.
@@ -446,7 +446,7 @@
 	POPS(1:NT,:)=BIG_POPS(1:NT,:)
 	R(2:ND-1)=BIG_POPS(NT+1,2:ND-1)
 	V(2:ND-1)=BIG_POPS(NT+2,2:ND-1)
-	SIGMA(2:ND-1)=BIG_POPS(NT+3,2:ND-1)-1.0D0
+	SIGMA(2:ND-1)=BIG_POPS(NT+3,2:ND-1)-1.0_LDP
 !
 	IF(NG_DONE)THEN
 	  NITSF=NITSF+1
@@ -575,8 +575,8 @@
 	CHARACTER(LEN=80) STRING
 !
 	NUM_BAD_NG=0
-	VEC_INC(1:ND)=0.0D0
-	VEC_DEC(1:ND)=0.0D0
+	VEC_INC(1:ND)=0.0_LDP
+	VEC_DEC(1:ND)=0.0_LDP
 	IF(NBAND .GE. ND .AND. ND_ST .EQ. 1 .AND. ND_END .EQ. ND)THEN
 	  NS=NT*ND
 	  CALL GENACCEL_V3(NEWPOP,RDPOPS,ITS_PER_NG,IONE,ND,NT,ND,NS)
@@ -602,15 +602,15 @@
 	WRITE(6,'(1X,90A)')('*',I=1,90)
 	WRITE(6,*)' '//DEF_PEN
 !
-	T1=0.0D0
+	T1=0.0_LDP
 	DO L=1,ND
 	  INT_ARRAY(L)=L
-	  TA(L)=100.0D0*(1.0D0-RDPOPS(T_INDEX,L,1)/NEWPOP(T_INDEX,L))
-	  TB(L)=100.0D0*(1.0D0-RDPOPS(T_INDEX,L,2)/RDPOPS(T_INDEX,L,1))
-	  TC(L)=100.0D0*(1.0D0-RDPOPS(T_INDEX,L,3)/RDPOPS(T_INDEX,L,2))
+	  TA(L)=100.0_LDP*(1.0_LDP-RDPOPS(T_INDEX,L,1)/NEWPOP(T_INDEX,L))
+	  TB(L)=100.0_LDP*(1.0_LDP-RDPOPS(T_INDEX,L,2)/RDPOPS(T_INDEX,L,1))
+	  TC(L)=100.0_LDP*(1.0_LDP-RDPOPS(T_INDEX,L,3)/RDPOPS(T_INDEX,L,2))
 	  T1=MAX(ABS(TA(L)),T1);  T1=MAX(ABS(TB(L)),T1)
 	END DO
-	IF(T1 .EQ. 0.0D0)THEN
+	IF(T1 .EQ. 0.0_LDP)THEN
 	  OPEN(UNIT=12,FILE='CORRECTION_LINK',STATUS='OLD',ACTION='READ',IOSTAT=IOS)
 	    K=1
 	    IF(IOS .NE. 0)THEN
@@ -622,8 +622,8 @@
 	    END IF
 	  CALL GEN_IN(K,'Input new variable to be plotted as T correction is zero')
 	  DO L=1,ND
-	    TA(L)=100.0D0*(1.0D0-RDPOPS(K,L,1)/NEWPOP(K,L))
-	    TB(L)=100.0D0*(1.0D0-RDPOPS(K,L,2)/RDPOPS(K,L,1))
+	    TA(L)=100.0_LDP*(1.0_LDP-RDPOPS(K,L,1)/NEWPOP(K,L))
+	    TB(L)=100.0_LDP*(1.0_LDP-RDPOPS(K,L,2)/RDPOPS(K,L,1))
 	  END DO
 	  CALL DP_CURVE(ND,INT_ARRAY,TA)
 	  CALL DP_CURVE(ND,INT_ARRAY,TB)
@@ -668,35 +668,35 @@
 	MAXDEC=1000.0
 	DO L=1,ND
 	  LOCINC=-1000.0
-	  LOCDEC=1000.0	
+	  LOCDEC=1000.0_LDP	
 	  T1=LOCDEC
 	  DO K=1,NT
-	    IF(POPS(K,L) .NE. 0.0D0)T1=NEWPOP(K,L)/POPS(K,L)
+	    IF(POPS(K,L) .NE. 0.0_LDP)T1=NEWPOP(K,L)/POPS(K,L)
 	    LOCINC=MAX(LOCINC,T1)
 	    LOCDEC=MIN(LOCDEC,T1)
 	  END DO
-	  VEC_INC(L)=100.0D0*(LOCINC-1.0D0)
-	  VEC_DEC(L)=100.0D0*(LOCDEC-1.0D0)
+	  VEC_INC(L)=100.0_LDP*(LOCINC-1.0_LDP)
+	  VEC_DEC(L)=100.0_LDP*(LOCDEC-1.0_LDP)
 !
 	  IF(DO_REGARDLESS)THEN
 	    IF(SCALE_INDIVIDUALLY)THEN
 	      DO K=1,NT
-	        IF(NEWPOP(K,L) .LT. 0.1D0*POPS(K,L))THEN
-	          POPS(K,L)=0.1D0*POPS(K,L)
-	        ELSE IF(NEWPOP(K,L) .GT. 10.0D0*POPS(K,L))THEN
-	          POPS(K,L)=10.0D0*POPS(K,L)
+	        IF(NEWPOP(K,L) .LT. 0.1_LDP*POPS(K,L))THEN
+	          POPS(K,L)=0.1_LDP*POPS(K,L)
+	        ELSE IF(NEWPOP(K,L) .GT. 10.0_LDP*POPS(K,L))THEN
+	          POPS(K,L)=10.0_LDP*POPS(K,L)
 	        ELSE
 	          POPS(K,L)=NEWPOP(K,L)
 	        END IF
 	      END DO
 	    ELSE
-	      T1=1.0D0
+	      T1=1.0_LDP
 	      DO K=1,NT
                 IF(POPS(K,L) .EQ. NEWPOP(K,L))THEN
-                ELSE IF(NEWPOP(K,L) .LT. 0.1D0*POPS(K,L))THEN
-                  T1=MIN( T1, 0.9D0*POPS(K,L)/(POPS(K,L)-NEWPOP(K,L)) )
-                ELSE IF(NEWPOP(K,L) .GT. 10.0D0*POPS(K,L))THEN
-                  T1=MIN( T1, 9.0D0*POPS(K,L)/(NEWPOP(K,L)-POPS(K,L)) )
+                ELSE IF(NEWPOP(K,L) .LT. 0.1_LDP*POPS(K,L))THEN
+                  T1=MIN( T1, 0.9_LDP*POPS(K,L)/(POPS(K,L)-NEWPOP(K,L)) )
+                ELSE IF(NEWPOP(K,L) .GT. 10.0_LDP*POPS(K,L))THEN
+                  T1=MIN( T1, 9.0_LDP*POPS(K,L)/(NEWPOP(K,L)-POPS(K,L)) )
                 END IF
 	      END DO
 	      DO K=1,NT
@@ -719,7 +719,7 @@
 ! Before storing the NG acceleration at this depth, we check to
 ! see whether the predicted corrections are "reasonable".
 !
-	  ELSE IF(LOCINC .GT. 10.1D0 .OR. LOCDEC .LT. 0.09D0)THEN
+	  ELSE IF(LOCINC .GT. 10.1_LDP .OR. LOCDEC .LT. 0.09_LDP)THEN
 	    NUM_BAD_NG=NUM_BAD_NG+1
 	    WRITE(LUER,*)'NUM_BAD_NG=',NUM_BAD_NG
 	    WRITE(LUER,9000)L,LOCINC,LOCDEC
@@ -773,8 +773,8 @@
 ! defined for successful NG accelerations (does not include any depths
 ! at which NG acceleration did not work).
 !
-	MAXINC=100.0D0*(MAXINC-1.0D0)
-	MAXDEC=100.0D0*(1.0D0/MAXDEC-1.0D0)
+	MAXINC=100.0_LDP*(MAXINC-1.0_LDP)
+	MAXDEC=100.0_LDP*(1.0_LDP/MAXDEC-1.0_LDP)
 	WRITE(LUER,9800)INC_LOC,MAXINC
 9800	FORMAT(1X,'Max NG % increase at depth ',I4,' is',1PE10.2)
 	WRITE(LUER,9900)DEC_LOC,MAXDEC

@@ -46,10 +46,11 @@
 	     WRITE(LUER,*)'Error allocating memory in GET_MOMS_NON_REL: IOS=',IOS
 	     STOP
 	   END IF
-	   K_ON_J_SAVE(:)=0.0D0;  NMID_ON_HMID_SAVE(1:ND)=0.0D0; NMID_ON_J_SAVE(1:ND)=0.0D0
+	   NMID_ON_HMID=0.0_LDP; NMID_ON_J=0.0_LDP; NMID_ON_HMID_PREV=0.0_LDP; NMID_ON_J_PREV=0.0_LDP
+	   K_ON_J_SAVE(:)=0.0_LDP;  NMID_ON_HMID_SAVE(1:ND)=0.0_LDP; NMID_ON_J_SAVE(1:ND)=0.0_LDP
 	 END IF
 	 DO I=1,ND-1
-	   RMID(I)=0.5D0*(R(I)+R(I+1))
+	   RMID(I)=0.5_LDP*(R(I)+R(I+1))
 	 END DO
 !
 ! Compute FEDD=K/J. Since J & K are always computed at the nodes,
@@ -126,21 +127,21 @@
 !
 	NDM1=ND-1
 	IF(N_TYPE .EQ. 'N_ON_J')THEN
-	  NMID_ON_HMID(1:NDM1)=0.0D0
+	  NMID_ON_HMID(1:NDM1)=0.0_LDP
 	  DO I=1,NDM1
 	    NMID_ON_J(I)=RSQ_NNU_MID(I)/(RSQ_JNU(I)+RSQ_JNU(I+1))
 	  END DO
 	ELSE IF(N_TYPE .EQ. 'MIXED')THEN
-	  NMID_ON_J(1:NDM1)=0.0D0
+	  NMID_ON_J(1:NDM1)=0.0_LDP
 	  DO I=1,NDM1
 	    IF(RSQ_HNU_MID(I) .NE. 0)THEN
 	      T1=RSQ_NNU_MID(I)/RSQ_HNU_MID(I)
 	    ELSE
-	      T1=100.0D0
+	      T1=100.0_LDP
 	    END IF
-	    IF(T1 .GT. 1.1 .OR. T1 .LT. 0.05)THEN
+	    IF(T1 .GT. 1.1_LDP .OR. T1 .LT. 0.05_LDP)THEN
 	      NMID_ON_J(I)=RSQ_NNU_MID(I)/(RSQ_JNU(I)+RSQ_JNU(I+1))
-	      NMID_ON_HMID(I)=0.0D0
+	      NMID_ON_HMID(I)=0.0_LDP
 	    ELSE
 	      NMID_ON_HMID(I)=T1
 	    END IF
@@ -151,17 +152,17 @@
 ! the Eddington factor in case strange values are occurring because H
 ! is near zero (switching sign?).
 !
-	  NMID_ON_J(1:NDM1)=0.0D0
+	  NMID_ON_J(1:NDM1)=0.0_LDP
 	  DO I=1,NDM1
 	    IF(RSQ_HNU_MID(I) .NE. 0)THEN
 	       NMID_ON_HMID(I)=RSQ_NNU_MID(I)/RSQ_HNU_MID(I)
-	       IF(NMID_ON_HMID(I) .GT. 1.0D0)THEN
-	         NMID_ON_HMID(I)=1.0D0
-	       ELSE IF(NMID_ON_HMID(I) .LT. 0.01D0)THEN
-	         NMID_ON_HMID(I)=0.01D0
+	       IF(NMID_ON_HMID(I) .GT. 1.0_LDP)THEN
+	         NMID_ON_HMID(I)=1.0_LDP
+	       ELSE IF(NMID_ON_HMID(I) .LT. 0.01_LDP)THEN
+	         NMID_ON_HMID(I)=0.01_LDP
 	       END IF
 	    ELSE
-	      NMID_ON_HMID(I)=0.0D0              !Later replaced by average.
+	      NMID_ON_HMID(I)=0.0_LDP              !Later replaced by average.
 	      LUER=ERROR_LU()
 	      WRITE(LUER,'(1X,A,1PE16.8)')'HNU zero for frequency:',FREQ
 	      WRITE(LUER,'(1X,A,I4)')'Error occurred at depth:',I

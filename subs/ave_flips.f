@@ -73,19 +73,19 @@
 ! series to get the best estimate, or simple average the result.
 !
 	NEW_POPS=POPS
-	R=1.0D0
+	R=1.0_LDP
 	ICOUNT=0
 	DO I=1,NT*ND
 	  DO J=2,NUM_OSC
 	    T1=OLD_POPS(I,J)-OLD_POPS(I,J+1)
 	    T2=OLD_POPS(I,J+1)-OLD_POPS(I,J+2)
-	    IF(T1*T2 .GE. 0.0D0)GOTO 100
+	    IF(T1*T2 .GE. 0.0_LDP)GOTO 100
 	  END DO
 	  T1=OLD_POPS(I,1)-OLD_POPS(I,2)
 	  T2=OLD_POPS(I,2)-OLD_POPS(I,3)
-	  IF(T1*T2 .GE. 0.0D0 .AND. ABS(T1) .LT. ABS(T2) )GOTO 100
+	  IF(T1*T2 .GE. 0.0_LDP .AND. ABS(T1) .LT. ABS(T2) )GOTO 100
 	  IF(.NOT. SIMPLE)R=ABS(T1/T2)
-	  NEW_POPS(I)=POPS(I)-T1*R/(1.0D0+R)
+	  NEW_POPS(I)=POPS(I)-T1*R/(1.0_LDP+R)
 	  ICOUNT=ICOUNT+1
 100	  CONTINUE
 	END DO

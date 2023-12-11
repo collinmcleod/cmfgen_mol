@@ -92,9 +92,9 @@ C TMP_HST is the LTE population relative to the target level in the ion.
 C REV_HNST= HNST * B(ION_LEV)/B(1) where b is the deparure coefficient.
 C
 	DO J=1,ND
-	  SUM_SE=0.0D0
-	  SUM_VJ_R=0.0D0
-	  SUM_VJ_P=0.0D0
+	  SUM_SE=0.0_LDP
+	  SUM_VJ_R=0.0_LDP
+	  SUM_VJ_P=0.0_LDP
 	  B_RAT=(DI(ION_LEV,J)/DIST(ION_LEV,J))*(DIST(1,J)/DI(1,J))
 	  DO I=1,NLEV
 	    REV_HNST=HNST(I,J)*B_RAT

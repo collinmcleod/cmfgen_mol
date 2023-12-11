@@ -41,8 +41,8 @@ C the 2p level.
 C
 	IF(ML .EQ. 1 .AND. FLAG)THEN
 	  DO J=1,ND
-	    NET_X_RR(J)=0.0D0
-	    X_BFCR(J)=0.0D0
+	    NET_X_RR(J)=0.0_LDP
+	    X_BFCR(J)=0.0_LDP
 	  END DO
 	END IF
 C

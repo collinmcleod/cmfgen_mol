@@ -71,7 +71,7 @@
 !
 	CALL TUNE(1,'ZER_TX')
 	DO I=1,NM
-	  IF(DO_THIS_MATRIX(I))TX(:,:,I)=0.0D0
+	  IF(DO_THIS_MATRIX(I))TX(:,:,I)=0.0_LDP
         END DO
 	CALL TUNE(2,'ZER_TX')
 !
@@ -93,7 +93,7 @@
 	  END DO
 	ELSE
 	  DO I=1,ND
-	    COH_VEC(I)=0.0D0
+	    COH_VEC(I)=0.0_LDP
 	  END DO
 	END IF
 !
@@ -105,28 +105,28 @@
 	DO I=2,ND-1
 	  TA(I)=-F(I-1)/DTAU(I-1)
 	  TC(I)=-F(I+1)/DTAU(I)
-	  DD(I)=-0.5D0*(DTAU(I-1)+DTAU(I))*(1.0D0-COH_VEC(I)) -
+	  DD(I)=-0.5_LDP*(DTAU(I-1)+DTAU(I))*(1.0_LDP-COH_VEC(I)) -
 	1          (F(I)-F(I-1))/DTAU(I-1) - (F(I)-F(I+1))/DTAU(I)
-	  RHS(I)=0.5D0*(DTAU(I-1)+DTAU(I))*SOURCE(I)
+	  RHS(I)=0.5_LDP*(DTAU(I-1)+DTAU(I))*SOURCE(I)
 	END DO
 !
 ! Evaluate TA,TB,TC for boundary conditions. These are second order.
 !
 	TC(1)=-F(2)/DTAU(1)
-	DD(1)= -0.5D0*DTAU(1)*(1.0D0-COH_VEC(1))-HBC_J-(F(1)-F(2))/DTAU(1)
+	DD(1)= -0.5_LDP*DTAU(1)*(1.0_LDP-COH_VEC(1))-HBC_J-(F(1)-F(2))/DTAU(1)
 	1             +HBC_S*COH_VEC(1)
-	RHS(1)=0.5D0*DTAU(1)*SOURCE(1)+HBC_S*SOURCE(1)
-	TA(1)=0.0D0
+	RHS(1)=0.5_LDP*DTAU(1)*SOURCE(1)+HBC_S*SOURCE(1)
+	TA(1)=0.0_LDP
 !
 	TA(ND)=-F(ND-1)/DTAU(ND-1)
 	IF(DIFF)THEN
-	  DD(ND)=-(F(ND)-F(ND-1))/DTAU(ND-1)-0.5D0*DTAU(ND-1)*(1.0D0-COH_VEC(ND))
-	  RHS(ND)=DBB/3.0D0/CHI(ND)+0.5D0*DTAU(ND-1)*SOURCE(ND)
+	  DD(ND)=-(F(ND)-F(ND-1))/DTAU(ND-1)-0.5_LDP*DTAU(ND-1)*(1.0_LDP-COH_VEC(ND))
+	  RHS(ND)=DBB/3.0_LDP/CHI(ND)+0.5_LDP*DTAU(ND-1)*SOURCE(ND)
 	ELSE
-	  DD(ND)=-(F(ND)-F(ND-1))/DTAU(ND-1)-0.5D0*DTAU(ND-1)*(1.0D0-COH_VEC(ND))-IN_HBC(1)
-	  RHS(ND)=IC*(0.25D0+0.5D0*IN_HBC(1))+0.5D0*DTAU(ND-1)*SOURCE(ND)
+	  DD(ND)=-(F(ND)-F(ND-1))/DTAU(ND-1)-0.5_LDP*DTAU(ND-1)*(1.0_LDP-COH_VEC(ND))-IN_HBC(1)
+	  RHS(ND)=IC*(0.25_LDP+0.5_LDP*IN_HBC(1))+0.5_LDP*DTAU(ND-1)*SOURCE(ND)
 	END IF
-	TC(ND)=0.0D0
+	TC(ND)=0.0_LDP
 !
 ! Solve for the radiation field along ray for this frequency.
 !
@@ -148,7 +148,7 @@
 ! onthe source function.
 !
 	TOR=CHI(1)*(R(1)-R(3))/LOG(CHI(3)/CHI(1))
-        IF(TOR .LT. 0.0D0 .OR. HBC_S .LE. 0.0D0)TOR=0.0D0
+        IF(TOR .LT. 0.0_LDP .OR. HBC_S .LE. 0.0_LDP)TOR=0.0_LDP
 	E2TOR=TOR*EXPN(ITWO,TOR)
 !
 	CALL TUNE(1,'SOL_TX')
@@ -160,12 +160,12 @@
 ! Compute dJ/dETA matrix (=TX(:,:,2); variation of eta).
 !
 	CALL TUNE(1,'ETA_TX')
-        TX(:,:,2)=0.0D0
-        TX(1,1,2)=0.5D0*DTAU(1)/CHI(1)+HBC_S/CHI(1)
+        TX(:,:,2)=0.0_LDP
+        TX(1,1,2)=0.5_LDP*DTAU(1)/CHI(1)+HBC_S/CHI(1)
         DO I=2,ND-1
-          TX(I,I,2)=0.5D0*(DTAU(I-1)+DTAU(I))/CHI(I)
+          TX(I,I,2)=0.5_LDP*(DTAU(I-1)+DTAU(I))/CHI(I)
         END DO
-        TX(ND,ND,2)=0.5D0*DTAU(ND-1)/CHI(ND)		!Diff and non diff
+        TX(ND,ND,2)=0.5_LDP*DTAU(ND-1)/CHI(ND)		!Diff and non diff
 	CALL SIMPTH_RH(TA,DD,TC,TX(1,1,2),ND,ND)
 	CALL TUNE(2,'ETA_TX')
 !
@@ -173,9 +173,9 @@
 ! because their is no frequency coupling, we only need one vector. Both
 ! dJ__DIF_ddTdR and dJ_DIF_dT can be computed from this vector.
 !
-	dJ_dDBB(1:ND)=0.0D0
+	dJ_dDBB(1:ND)=0.0_LDP
 	IF(DIFF)THEN
-	  dJ_dDBB(ND)=1.0D0/3.0D0/CHI(ND)
+	  dJ_dDBB(ND)=1.0_LDP/3.0_LDP/CHI(ND)
 	  CALL SIMPTH_RH(TA,DD,TC,dJ_dDBB,ND,IONE)
 	  dJ_DIFF_dT(1:ND)=dJ_dDBB(1:ND)*dDBBdT
 	  dJ_DIFF_ddTDR(1:ND)=dJ_dDBB(1:ND)*DBB/dTdR

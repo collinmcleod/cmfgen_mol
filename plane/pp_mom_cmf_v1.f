@@ -100,7 +100,7 @@
 !
 	LOGICAL FIRST_TIME
 	DATA FIRST_TIME/.TRUE./
-	DATA VDOP_FRAC_SAV/-10001.1D0/    !Absurd value
+	DATA VDOP_FRAC_SAV/-10001.1_LDP/    !Absurd value
 !
 	END MODULE PP_MOM_CMF_MOD
 !
@@ -363,7 +363,7 @@
 !
 	  K=1
 	  DO I=1,ND_SM-1
-	    T1=0.5D0*(R_SM(I)+R_SM(I+1))
+	    T1=0.5_LDP*(R_SM(I)+R_SM(I+1))
 	    DO WHILE(H_INDX(I) .EQ. 0)
 	      IF(T1 .LT. R(K) .AND. T1 .GT. R(K+1))THEN
 	        H_INDX(I)=K
@@ -428,12 +428,12 @@
 
 	IF(INIT)THEN
 	  DO I=1,N_ERR_MAX
-	    MOM_ERR_ON_FREQ(I)=0.0D0
+	    MOM_ERR_ON_FREQ(I)=0.0_LDP
 	  END DO
 	  MOM_ERR_CNT=0
-          JNU=0.0D0; HNU=0.0D0
-	  JNU_PREV=0.0D0; HNU_PREV=0.0D0
-	  N_ON_J_SAV=0.0D0; G_SAV=0.0D0; F_SAV=0.0D0
+          JNU=0.0_LDP; HNU=0.0_LDP
+	  JNU_PREV=0.0_LDP; HNU_PREV=0.0_LDP
+	  N_ON_J_SAV=0.0_LDP; G_SAV=0.0_LDP; F_SAV=0.0_LDP
 	END IF
 !
 !*****************************************************************************
@@ -447,13 +447,13 @@
 	  END DO
 	ELSE
 	  DO I=1,ND
-	    COH_VEC(I)=0.0D0
+	    COH_VEC(I)=0.0_LDP
 	  END DO
 	END IF
 !
 	DO I=1,ND
-	  IF(G(I) .GT. 1.0D0)G(I)=1.0D0
-	  IF(G(I) .LT. -1.0D0)G(I)=-1.0D0
+	  IF(G(I) .GT. 1.0_LDP)G(I)=1.0_LDP
+	  IF(G(I) .LT. -1.0_LDP)G(I)=-1.0_LDP
 	END DO
 !
 ! NB: We solve for J.
@@ -476,19 +476,19 @@
 !
 	IF(INIT)THEN
 	  DO I=1,ND
-	    GAMH(I)=0.0D0
-	    GAM(I)=0.0D0
-	    W(I)=0.0D0
-	    WPREV(I)=0.0D0
-	    PSI(I)=0.0D0
-	    PSIPREV(I)=0.0D0
-	    JNU_PREV(I)=0.0D0
-	    HNU_PREV(I)=0.0D0
-	    EPS(I)=0.0D0
-	    EPS_PREV(I)=0.0D0
+	    GAMH(I)=0.0_LDP
+	    GAM(I)=0.0_LDP
+	    W(I)=0.0_LDP
+	    WPREV(I)=0.0_LDP
+	    PSI(I)=0.0_LDP
+	    PSIPREV(I)=0.0_LDP
+	    JNU_PREV(I)=0.0_LDP
+	    HNU_PREV(I)=0.0_LDP
+	    EPS(I)=0.0_LDP
+	    EPS_PREV(I)=0.0_LDP
 	  END DO
-	  HBC_PREV=0.0D0;  IN_HBC_PREV=0.0D0; NBC_PREV=0.0D0
-	  dNBC_INCID=0.0D0
+	  HBC_PREV=0.0_LDP;  IN_HBC_PREV=0.0_LDP; NBC_PREV=0.0_LDP
+	  dNBC_INCID=0.0_LDP
 	ELSE
 !
 ! Assume (1)	SIGMAd+1/2 = 0.5*( SIGMAd+1+SIGMAd )
@@ -496,11 +496,11 @@
 ! Note that V is in km/s and SIGMA=(dlnV/dlnR-1.0)
 !
 	  DO I=1,ND-1
-	    CON_GAMH(I)=2.0D0*3.33564D-06*(V(I)+V(I+1))/(R(I)+R(I+1))
-	    AV_SIGMA(I)=0.5D0*(SIGMA(I)+SIGMA(I+1))
-	    CON_GAM(I)=3.33564D-06*V(I)/R(I)
+	    CON_GAMH(I)=2.0_LDP*3.33564E-06_LDP*(V(I)+V(I+1))/(R(I)+R(I+1))
+	    AV_SIGMA(I)=0.5_LDP*(SIGMA(I)+SIGMA(I+1))
+	    CON_GAM(I)=3.33564E-06_LDP*V(I)/R(I)
 	  END DO
-	  CON_GAM(ND)=3.33564D-06*V(ND)/R(ND)
+	  CON_GAM(ND)=3.33564E-06_LDP*V(ND)/R(ND)
 !
 ! Since we are intgerating from blue to red, FL_PREV is always larger than
 ! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
@@ -511,16 +511,16 @@
 	  IF(N_TYPE .EQ. 'G_ONLY')THEN
 	    DO I=1,ND-1
 	      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
-	      W(I)=GAMH(I)*(1.0D0+AV_SIGMA(I))*G(I)
-	      WPREV(I)=GAMH(I)*(1.0D0+AV_SIGMA(I))*G_PREV(I)
+	      W(I)=GAMH(I)*(1.0_LDP+AV_SIGMA(I))*G(I)
+	      WPREV(I)=GAMH(I)*(1.0_LDP+AV_SIGMA(I))*G_PREV(I)
 	    END DO
 	  ELSE
 	    DO I=1,ND-1
 	      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
-	      W(I)=GAMH(I)*(1.0D0+AV_SIGMA(I))*G(I)
-	      WPREV(I)=GAMH(I)*(1.0D0+AV_SIGMA(I))*G_PREV(I)
-	      EPS(I)=GAMH(I)*(1.0D0+AV_SIGMA(I))*N_ON_J(I)/(1.0D0+W(I))
-	      EPS_PREV(I)=GAMH(I)*(1.0D0+AV_SIGMA(I))*N_ON_J_PREV(I)/(1.0D0+W(I))
+	      W(I)=GAMH(I)*(1.0_LDP+AV_SIGMA(I))*G(I)
+	      WPREV(I)=GAMH(I)*(1.0_LDP+AV_SIGMA(I))*G_PREV(I)
+	      EPS(I)=GAMH(I)*(1.0_LDP+AV_SIGMA(I))*N_ON_J(I)/(1.0_LDP+W(I))
+	      EPS_PREV(I)=GAMH(I)*(1.0_LDP+AV_SIGMA(I))*N_ON_J_PREV(I)/(1.0_LDP+W(I))
 	    END DO
 	  END IF
 !
@@ -530,25 +530,25 @@
 !
 ! PSIPREV is equivalent to the U vector of FORMSOL.
 !
-	  PSI(1)=GAM(1)*NBC*(1.0D0+SIGMA(1))
-	  PSIPREV(1)=GAM(1)*NBC_PREV*(1.0D0+SIGMA(1))
-	  dNBC_INCID=GAM(1)*(1.0D0+SIGMA(1))*(NBC_INCID-NBC_INCID_PREV)
+	  PSI(1)=GAM(1)*NBC*(1.0_LDP+SIGMA(1))
+	  PSIPREV(1)=GAM(1)*NBC_PREV*(1.0_LDP+SIGMA(1))
+	  dNBC_INCID=GAM(1)*(1.0_LDP+SIGMA(1))*(NBC_INCID-NBC_INCID_PREV)
 	END IF
 !
 ! 
 !
 	DO I=2,ND-1
-	  DTAU_MID(I)=0.5D0*(DTAU(I)+DTAU(I-1))
-	  PSI(I)=DTAU_MID(I)*GAM(I)*(1.0D0+SIGMA(I))*F(I)
-	  PSIPREV(I)=DTAU_MID(I)*GAM(I)*(1.0D0+SIGMA(I))*F_PREV(I)
+	  DTAU_MID(I)=0.5_LDP*(DTAU(I)+DTAU(I-1))
+	  PSI(I)=DTAU_MID(I)*GAM(I)*(1.0_LDP+SIGMA(I))*F(I)
+	  PSIPREV(I)=DTAU_MID(I)*GAM(I)*(1.0_LDP+SIGMA(I))*F_PREV(I)
 	END DO
 !
 ! Compute vectors used to compute the flux vector H.
 !
 	DO I=1,ND-1
-	  HU(I)=F(I+1)/(1.0D0+W(I))/DTAU(I)
-	  HL(I)=F(I)/(1.0D0+W(I))/DTAU(I)
-	  HS(I)=WPREV(I)/(1.0D0+W(I))
+	  HU(I)=F(I+1)/(1.0_LDP+W(I))/DTAU(I)
+	  HL(I)=F(I)/(1.0_LDP+W(I))/DTAU(I)
+	  HS(I)=WPREV(I)/(1.0_LDP+W(I))
 	END DO
 !
 ! Compute the TRIDIAGONAL operators, and the RHS source vector.
@@ -557,7 +557,7 @@
 	  DO I=2,ND-1
 	    TA(I)=-HL(I-1)
 	    TC(I)=-HU(I)
-	    TB(I)=DTAU_MID(I)*(1.0D0-COH_VEC(I)) + PSI(I) + HL(I) + HU(I-1)
+	    TB(I)=DTAU_MID(I)*(1.0_LDP-COH_VEC(I)) + PSI(I) + HL(I) + HU(I-1)
 	    VB(I)=-HS(I-1)
 	    VC(I)=HS(I)
 	    XM(I)=DTAU_MID(I)*SOURCE(I)
@@ -566,7 +566,7 @@
 	  DO I=2,ND-1
 	    TA(I)=-HL(I-1)-EPS(I-1)
 	    TC(I)=-HU(I)+EPS(I)
-	    TB(I)=DTAU_MID(I)*(1.0D0-COH_VEC(I)) + PSI(I) + HL(I) + HU(I-1)
+	    TB(I)=DTAU_MID(I)*(1.0_LDP-COH_VEC(I)) + PSI(I) + HL(I) + HU(I-1)
 	1               -EPS(I-1)+EPS(I)
 	    VB(I)=-HS(I-1)
 	    VC(I)=HS(I)
@@ -579,22 +579,22 @@
 	TC(1)=-F(2)/DTAU(1)
 	TB(1)=F(1)/DTAU(1) + PSI(1) + HBC
 	XM(1)=HBC_INCID+dNBC_INCID
-	TA(1)=0.0D0
-	VB(1)=0.0D0
-	VC(1)=0.0D0
+	TA(1)=0.0_LDP
+	VB(1)=0.0_LDP
+	VC(1)=0.0_LDP
 !
 	TA(ND)=-F(ND-1)/DTAU(ND-1)
 	IF(DIF)THEN
 	  TB(ND)=F(ND)/DTAU(ND-1)
-	  XM(ND)=DBB/3.0D0/CHI(ND)
+	  XM(ND)=DBB/3.0_LDP/CHI(ND)
 	ELSE
 	  TB(ND)=F(ND)/DTAU(ND-1)+IN_HBC
-	  XM(ND)=IC*(0.25D0+0.5D0*IN_HBC)
+	  XM(ND)=IC*(0.25_LDP+0.5_LDP*IN_HBC)
 	END IF
-	TC(ND)=0.0D0
-	VB(ND)=0.0D0
-	VC(ND)=0.0D0
-	PSIPREV(ND)=0.0D0
+	TC(ND)=0.0_LDP
+	VB(ND)=0.0_LDP
+	VC(ND)=0.0_LDP
+	PSIPREV(ND)=0.0_LDP
 !
 ! Note that EPS and EPS_PREV will be identically zero hence when N_TYPE is
 ! G_ONLY.
@@ -623,7 +623,7 @@
 !
 ! Check that no negative mean intensities have been computed.
 !
-	IF(MINVAL(XM(1:ND)) .LE. 0.0D0)THEN
+	IF(MINVAL(XM(1:ND)) .LE. 0.0_LDP)THEN
 	   WRITE(47,*)'Freq=',FREQ
 	   TA(1:ND)=XM(1:ND)/R(1:ND)/R(1:ND)
 	   CALL WRITV(TA,ND,'XM Vec',47)
@@ -636,8 +636,8 @@
 !
 	RECORDED_ERROR=.FALSE.
 	DO I=1,ND
-	  IF(XM(I) .LT. 0.0D0)THEN
-	    XM(I)=ABS(XM(I))/10.0D0
+	  IF(XM(I) .LT. 0.0_LDP)THEN
+	    XM(I)=ABS(XM(I))/10.0_LDP
 	  END IF
 	  IF(.NOT. RECORDED_ERROR)THEN
 	    IF(MOM_ERR_CNT .GT. N_ERR_MAX)THEN

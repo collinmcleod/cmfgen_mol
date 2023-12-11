@@ -28,23 +28,23 @@
 	INTEGER I,J,N,IP
 	EXTERNAL SPEED_OF_LIGHT
 !
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
-	R(1)=20.0D0
-	R(ND)=2.0D0
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
+	R(1)=20.0_LDP
+	R(ND)=2.0_LDP
 	T1=EXP( LOG(R(1)/R(ND))/(ND-1) )
 	DO I=2,ND
 	  R(I)=R(ND)*(T1**(ND-I))
 	END DO
-	VDOP_VEC(1:ND)=100.0D0
+	VDOP_VEC(1:ND)=100.0_LDP
 	WRITE(6,*)'Evaluated R'
 !
-	VMIN=10000.0D0
+	VMIN=10000.0_LDP
 	CALL GEN_IN(VMIN,'Minimum velocity at core in km/s')
 	VDOP_FRAC=0.5
 	CALL GEN_IN(VDOP_FRAC,'Minimum Fracton Doppler spacing')
 	DO I=1,ND
 	  V(I)=VMIN*(R(I)/R(ND))
-	  SIGMA(I)=0.0D0
+	  SIGMA(I)=0.0_LDP
 	END DO
 	WRITE(6,*)'Evaluated V,SIGMA'
 !
@@ -71,7 +71,7 @@
         DO IP=1,NP
             J=MAX(J,RAY(IP)%NZ)
             MU_AT_RMAX(IP)=RAY(IP)%MU_P(RAY(IP)%LNK(1))
-            HQW_AT_RMAX(IP)=2.0D0*HQW_P(1,IP)
+            HQW_AT_RMAX(IP)=2.0_LDP*HQW_P(1,IP)
             T1=T1+MU_AT_RMAX(IP)*HQW_AT_RMAX(IP)
             WRITE(7,'(I4,4ES16.6)')IP,MU_AT_RMAX(IP),HQW_AT_RMAX(IP),
 	1                 (MU_AT_RMAX(IP)+V(1)/C_KMS)/(1.0D0+MU_AT_RMAX(IP)*V(1)/C_KMS),
@@ -85,9 +85,9 @@
 	    STOP
 	  END IF
 	  X(1:N)=RAY(I)%R_RAY(1:N)*RAY(I)%MU_M(1:N)
-	  Y(1:N)=RAY(I)%R_RAY(1:N)*SQRT(1.0D0-RAY(I)%MU_M(1:N)*RAY(I)%MU_M(1:N))
+	  Y(1:N)=RAY(I)%R_RAY(1:N)*SQRT(1.0_LDP-RAY(I)%MU_M(1:N)*RAY(I)%MU_M(1:N))
 	  X(N+1:2*N)=RAY(I)%R_RAY(N:1:-1)*RAY(I)%MU_P(N:1:-1)
-	  Y(N+1:2*N)=RAY(I)%R_RAY(N:1:-1)*SQRT(1.0D0-RAY(I)%MU_P(N:1:-1)*RAY(I)%MU_P(N:1:-1))
+	  Y(N+1:2*N)=RAY(I)%R_RAY(N:1:-1)*SQRT(1.0_LDP-RAY(I)%MU_P(N:1:-1)*RAY(I)%MU_P(N:1:-1))
 	  N=2*N;  CALL DP_CURVE(N,X,Y)
 !	  IF(I .GT. NP-3)THEN
 	  IF(I .EQ. 3)THEN

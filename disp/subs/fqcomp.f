@@ -33,8 +33,8 @@ C Zero all parameters.
 C
 	CALL DP_ZERO(NEWRJ,ND)
 	CALL DP_ZERO(NEWRK,ND)
-	HBCNEW=0.0D0
-	INBCNEW=0.0D0
+	HBCNEW=0.0_LDP
+	INBCNEW=0.0_LDP
 C
 C ENTER LOOP FOR EACH IMPACT PARAMETER P
 C
@@ -48,13 +48,13 @@ C
 C
 	  IF(THK)THEN
 	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF
-	    IBOUND=S1*(1.0D0-EXP(-TOR))
+	    IBOUND=S1*(1.0_LDP-EXP(-TOR))
 	  ELSE
-	    IBOUND=0.0D0
+	    IBOUND=0.0_LDP
 	  END IF
 C
 C Compute Z and the optical depth scale DTAU for this imapct parameter.
@@ -66,8 +66,8 @@ C	    CALL NORDTAU(DTAU,CHI,Z,R,dCHIdr,NI)
 	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
 	    END DO
 	    DO I=1,NI-1
-	      DTAU(I)=0.5*(Z(I)-Z(I+1))*(CHI(I)+CHI(I+1)+(Z(I)-Z(I+1))
-	1     *(dCHIdR(I+1)*Z(I+1)/R(I+1)-dCHIdR(I)*Z(I)/R(I))/6.0D0)
+	      DTAU(I)=0.5_LDP*(Z(I)-Z(I+1))*(CHI(I)+CHI(I+1)+(Z(I)-Z(I+1))
+	1     *(dCHIdR(I+1)*Z(I+1)/R(I+1)-dCHIdR(I)*Z(I)/R(I))/6.0_LDP)
 	    END DO
 	  END IF
 C
@@ -81,12 +81,12 @@ C
 	  IF(NI .GT. 2)THEN
 	    XM(1)=-IBOUND
 	    TA(1)=0.0
-	    TC(1)=1./DTAU(1)
-	    TB(1)=-1.0-TC(1)
+	    TC(1)=1._LDP/DTAU(1)
+	    TB(1)=-1.0_LDP-TC(1)
 	    DO I=2,NI-1
 	      TA(I)=TC(I-1)
-	      TC(I)=1.0/DTAU(I)
-	      TB(I)=-0.5*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
+	      TC(I)=1.0_LDP/DTAU(I)
+	      TB(I)=-0.5_LDP*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
 	      XM(I)=-SOURCE(I)*(DTAU(I-1)+DTAU(I))*0.5
 	    END DO
 C
@@ -97,7 +97,7 @@ C
 	    ELSE IF(LS .GT. NC)THEN
 	      TA(NI)=-TC(NI-1)
 	      TB(NI)=-TA(NI)+DTAU(NI-1)/2.
-	      XM(NI)=0.5*DTAU(NI-1)*SOURCE(NI)
+	      XM(NI)=0.5_LDP*DTAU(NI-1)*SOURCE(NI)
 	    ELSE
 	      TA(NI)=-TC(NI-1)
 	      TB(NI)=1-TA(NI)
@@ -113,15 +113,15 @@ C
 	    XM(1)=IBOUND
 	  ELSE IF(NI .EQ. 2)THEN
 	    E1=EXP(-DTAU(1))
-	    E2=1.0D0-(1.0D0-E1)/DTAU(1)
-	    E3=(1.0D0-E1)/DTAU(1)-E1
-	    IF(DTAU(1) .LT. 1.0D-03)THEN
-	      E2=DTAU(1)*0.5+DTAU(1)*DTAU(1)/6.0D0
-	      E3=DTAU(1)*0.5-DTAU(1)*DTAU(1)/3.0D0
+	    E2=1.0_LDP-(1.0_LDP-E1)/DTAU(1)
+	    E3=(1.0_LDP-E1)/DTAU(1)-E1
+	    IF(DTAU(1) .LT. 1.0E-03_LDP)THEN
+	      E2=DTAU(1)*0.5_LDP+DTAU(1)*DTAU(1)/6.0_LDP
+	      E3=DTAU(1)*0.5_LDP-DTAU(1)*DTAU(1)/3.0_LDP
 	    END IF
 C
 	    XM(2)=IBOUND*E1+SOURCE(2)*E2+SOURCE(1)*E3
-            XM(1)=0.5*(IBOUND+XM(2)*E1+SOURCE(1)*E2+SOURCE(2)*E3)
+            XM(1)=0.5_LDP*(IBOUND+XM(2)*E1+SOURCE(1)*E2+SOURCE(2)*E3)
 	  END IF
 C
 C UPDATE THE FA AND FB MATRICES . (SEE NOTES)
@@ -142,7 +142,7 @@ C
 C Compute the factor for the outer boundary condition.
 C
 	HBCNEW=HBCNEW/NEWRJ(1)
-	INBCNEW=INBCNEW/(2.0D0*NEWRJ(ND)-IC)
+	INBCNEW=INBCNEW/(2.0_LDP*NEWRJ(ND)-IC)
 C
 C Compute the new Feautrier factors.
 C

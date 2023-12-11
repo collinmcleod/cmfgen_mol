@@ -88,7 +88,7 @@
 !
 ! Local variables.
 !
-	REAL(KIND=LDP), PARAMETER :: MAX_LOG_LTE_POP=600.0D0
+	REAL(KIND=LDP), PARAMETER :: MAX_LOG_LTE_POP=600.0_LDP
 	REAL(KIND=LDP) B,B1,B2,T1
 	REAL(KIND=LDP) X,Y,RGU
 	INTEGER I,K,L,M,LU_ER
@@ -109,7 +109,7 @@
 !
 	IF(CIII_PRES)THEN
 	  DO K=1,ND
-	    GION(K)=0.0D0
+	    GION(K)=0.0_LDP
 	    DO I=1,NCIII_F
 	      IF(F_TO_S_MAP_CIII(I) .EQ. 1)THEN
 	        GION(K)=GION(K)+GCIII_F(I)*EXP( HDKT*(EDGECIII_F(I)-
@@ -137,10 +137,10 @@
 ! Since no the effective statistical weight, can now compute the LTE
 ! populations of the levels in the full atom.
 !
-	C2LTE_F=0.0D0
+	C2LTE_F=0.0_LDP
 	DO K=1,ND
 	  X=HDKT/T(K)
-	  RGU=2.07078D-22*ED(K)*DIC2_S(K)*( T(K)**(-1.5) )/GION(K)
+	  RGU=2.07078E-22_LDP*ED(K)*DIC2_S(K)*( T(K)**(-1.5_LDP) )/GION(K)
 	  RGU=LOG(RGU)
 	  DO I=1,NC2_F
 	    LOG_C2LTE_F(I,K)=LOG(W_C2_F(I,K)*GC2_F(I)) + EDGEC2_F(I)*X + RGU
@@ -152,13 +152,13 @@
 !
 	DO K=1,ND
 	  DO I=1,NC2_S
-	    C2LTE_S(I,K)=0.0D0
-	    SCALE_FAC(I)=0.0D0
+	    C2LTE_S(I,K)=0.0_LDP
+	    SCALE_FAC(I)=0.0_LDP
 	  END DO
 !
 	  DO I=1,NC2_F
 	    L=F_TO_S_MAP_C2(I)
-	    IF(SCALE_FAC(L) .EQ. 0.0D0)SCALE_FAC(L)=LOG_C2LTE_F(I,K)
+	    IF(SCALE_FAC(L) .EQ. 0.0_LDP)SCALE_FAC(L)=LOG_C2LTE_F(I,K)
 	    C2LTE_S(L,K)=C2LTE_S(L,K)+EXP(LOG_C2LTE_F(I,K)-SCALE_FAC(L))
 	  END DO
 !
@@ -167,13 +167,13 @@
             IF(LOG_C2LTE_S(L,K) .LT. MAX_LOG_LTE_POP)THEN                 !Changed 24-Feb-2010
 	      C2LTE_S(L,K)=EXP(LOG_C2LTE_S(L,K))
 	    ELSE
-	      C2LTE_S(L,K)=0.0D0
+	      C2LTE_S(L,K)=0.0_LDP
 	    END IF
 	  END DO
 !
 	  DO I=1,NC2_F
 	    L=F_TO_S_MAP_C2(I)
-	    IF(C2LTE_S(L,K) .EQ. 0.0D0)C2LTE_F(I,K)=0.0D0
+	    IF(C2LTE_S(L,K) .EQ. 0.0_LDP)C2LTE_F(I,K)=0.0_LDP
 	    C2LTE_F_ON_S(I,K)=EXP(LOG_C2LTE_F(I,K)-LOG_C2LTE_S(L,K))
 	  END DO
 !
@@ -185,7 +185,7 @@
 !
 	  DO L=1,NC2_S
 	    CNT(L)=0
-	    EDGE_S(L)=0.0D0
+	    EDGE_S(L)=0.0_LDP
 	  END DO
 	  DO I=1,NC2_F
 	    L=F_TO_S_MAP_C2(I)
@@ -237,12 +237,12 @@
 	        T1=LOG(EDGE_S(L)/EDGEC2_F(I)) / LOG(EDGE_S(L)/EDGE_S(INT_SL))
 	        B1=C2_S(INT_SL,K)/C2LTE_S(INT_SL,K)
 	        B2=C2_S(L,K)/C2LTE_S(L,K)
-                B=T1*B1 + (1.0D0-T1)*B2
+                B=T1*B1 + (1.0_LDP-T1)*B2
 !
 ! Constrain the interpolation. Hopefully this is not necessary.
 !
-	        IF(B1 .LE. 1. .AND. B2 .LE. 1 .AND. B .GT. 1)B=1.0
-	        IF(B1 .GE. 1. .AND. B2 .GE. 1 .AND. B .LT. 1)B=1.0
+	        IF(B1 .LE. 1._LDP .AND. B2 .LE. 1 .AND. B .GT. 1)B=1.0
+	        IF(B1 .GE. 1._LDP .AND. B2 .GE. 1 .AND. B .LT. 1)B=1.0
 	        IF(B .LT. 0)B=B1
 	        C2_F(I,K)=C2LTE_F(I,K)*B
 	      END IF
@@ -254,7 +254,7 @@
 ! super level. This correction will generally be small.
 !
 	  DO L=1,NC2_S
-	    SUM(L)=0.0D0
+	    SUM(L)=0.0_LDP
 	  END DO
 	  DO I=1,NC2_F
 	    L=F_TO_S_MAP_C2(I)

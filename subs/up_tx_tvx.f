@@ -73,7 +73,7 @@ C RSQN_ON_RSQJ. NO need to check _B, since differ by constant (factor) only.
 C
 	USE_EPS=.FALSE.			!G Eddington factor only
 	DO I=1,ND
-	  IF(EPS_A(I) .NE. 0.0D0 .OR. EPS_PREV_A(I) .NE. 0.0D0)USE_EPS=.TRUE.
+	  IF(EPS_A(I) .NE. 0.0_LDP .OR. EPS_PREV_A(I) .NE. 0.0_LDP)USE_EPS=.TRUE.
 	END DO
 C
 	IF(NM_TX .LT. 2 .OR. NM_KI .LT. 2)THEN
@@ -88,9 +88,9 @@ C INIT will be true for the very first frequency. We initialize all storage
 C locations, even those not in use.
 C
 	IF(INIT)THEN
-	  TX(:,:,:)=0.0D0       !ND,ND,NM_TX
-	  TVX(:,:,:)=0.0D0      !(ND-1),ND*NM_TX
-	  OLD_TX(:,:)=0.0D0     !ND,ND
+	  TX(:,:,:)=0.0_LDP       !ND,ND,NM_TX
+	  TVX(:,:,:)=0.0_LDP      !(ND-1),ND*NM_TX
+	  OLD_TX(:,:)=0.0_LDP     !ND,ND
 	END IF
 C
 C Now modify the matrices, operating on each matrix (labeled by K) separately.

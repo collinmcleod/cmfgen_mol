@@ -20,7 +20,7 @@
 !
 ! This determines the maximum number of overlapping resonance zones at any frequency.
 !
-	RES_ZONE=0.0D0
+	RES_ZONE=0.0_LDP
 	DO ML=1,N_LINES
 	  IF(VEC_TRANS_TYPE(ML) .EQ. 'BLANK')THEN
 	    DO I=LINE_ST_INDX(ML),LINE_END_INDX(ML)
@@ -35,7 +35,7 @@
 ! frequencies are not in the resonance zone.
 !
 	IF(DO_LINE_OVERLAP)THEN
-	  RES_ZONE=0.0D0
+	  RES_ZONE=0.0_LDP
 	  DO ML=1,N_LINES
 	    IF(VEC_TRANS_TYPE(ML) .EQ. 'BLANK')THEN
 	      DO J=ML-1,1,-1

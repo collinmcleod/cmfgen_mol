@@ -71,7 +71,7 @@ C
 C PROGDESC is a variable use to confirm that the scratch block is not
 C being used by some other routine.
 C
-	PROGDESC=1246719.0D0		!Must be unique
+	PROGDESC=1246719.0_LDP		!Must be unique
 C
 	IF(ND .GT. NV)THEN
 	  WRITE(6,*)'Error in FG_HAM - NV not large enough'
@@ -81,15 +81,15 @@ C
 C Zero common block. There is currently 27 vectors in the common block.
 C TA must be the first vector, and dCHIdR the last.
 C
-	dCHIdR(NV-1)=1.0D0
-	dCHIdR(NV)=1.0D0
+	dCHIdR(NV-1)=1.0_LDP
+	dCHIdR(NV)=1.0_LDP
 	I=(NV*27)-1
 	CALL DP_ZERO(TA,I)
 	IF(dCHIdR(NV-1) .NE. 0 .AND. dCHIdR(NV) .NE. 1)THEN
 	  WRITE(6,*)'Error in zeroing SCRATCH block in FG_HAM'
 	  STOP
 	ELSE
-	  dCHIdR(NV)=0.0D0
+	  dCHIdR(NV)=0.0_LDP
 	END IF
 C
 C
@@ -98,7 +98,7 @@ C DNU is the frequency bandwidth over which we integrate to obtain
 C JINT and is determined by the maximum expansion velocity of the
 C atmosphere. We define DNU with out the factor FL.
 C
-	DNU=3.33564D-06*V(1)*2.0D0
+	DNU=3.33564E-06_LDP*V(1)*2.0_LDP
 C
 C Save the line intensity in the large frequency band so that it can be
 C used when we correct for electron scattering. If JNU has not been determined
@@ -125,9 +125,9 @@ C
 C Zero boundary condition vectors.
 C
 	DO ML=1,NLF+1
-	  HBC(ML)=0.0D0
-	  NBC(ML)=0.0D0
-	  IN_HBC(ML)=0.0D0
+	  HBC(ML)=0.0_LDP
+	  NBC(ML)=0.0_LDP
+	  IN_HBC(ML)=0.0_LDP
 	END DO
 C
 C
@@ -158,14 +158,14 @@ C Determine boundary condition for continuum intensity.
 C
 	  IF(THK_CONT)THEN
 	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF
-	    IBOUND=ETA(1)*(1.0D0-EXP(-TOR))/CHI(1)
+	    IBOUND=ETA(1)*(1.0_LDP-EXP(-TOR))/CHI(1)
 	  ELSE
-	    TOR=0.0D0
-	    IBOUND=0.0D0
+	    TOR=0.0_LDP
+	    IBOUND=0.0_LDP
 	  END IF
 C
 C
@@ -175,9 +175,9 @@ C
 	  OLDCHI=CHI(NI)
 	  DO ML=1,NLF
 	    IF(ML .EQ. 1)THEN
-	      MID_PRO=0.0D0
+	      MID_PRO=0.0_LDP
 	    ELSE
-	      MID_PRO=0.50D0*( PROF(ML)+PROF(ML-1) )
+	      MID_PRO=0.50_LDP*( PROF(ML)+PROF(ML-1) )
 	    END IF
 	    DO I=1,NIEXT
 	      TCHI(I)=CHI(I)+CHIL(I)*MID_PRO
@@ -187,7 +187,7 @@ C
 	    IF(DIF .AND. LS .LE. NC)THEN
 	      T1=CHI(ND)+CHIL(ND)*PROF(ML)
 	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
-	1            *( 1.0D0+Q(ND)*TCHI(ND)*(1.0D0/T1-1.0D0/OLDCHI) )
+	1            *( 1.0_LDP+Q(ND)*TCHI(ND)*(1.0_LDP/T1-1.0_LDP/OLDCHI) )
 	      OLDCHI=T1
 	    END IF
 	    IF(METHOD .EQ. 'ZERO')THEN
@@ -210,11 +210,11 @@ C
 C  IMIN=I(incident)=ETAL(1)/CHIL(1)*(1.0D0-WERF_EXP)+IBOUND*WERF_EXP
 C
 	    IF(THK_LINE .AND. ML .NE. 1)THEN
-	      WERF_EXP=EXP( 1.0D-15*CHIL(1)/FL/GAM(1)*
-	1                      0.5D0*(WERFC(ML)+WERFC(ML-1)) )
-	      XM(1)=(CHI(1)/TCHI(1)*WERF_EXP-1.0D0)*ETAL(1)/CHIL(1)
+	      WERF_EXP=EXP( 1.0E-15_LDP*CHIL(1)/FL/GAM(1)*
+	1                      0.5_LDP*(WERFC(ML)+WERFC(ML-1)) )
+	      XM(1)=(CHI(1)/TCHI(1)*WERF_EXP-1.0_LDP)*ETAL(1)/CHIL(1)
 	1              -IBOUND*CHI(1)/TCHI(1)*WERF_EXP
-	      IMIN=IBOUND*WERF_EXP + ETAL(1)/CHIL(1)*(1.0D0-WERF_EXP)
+	      IMIN=IBOUND*WERF_EXP + ETAL(1)/CHIL(1)*(1.0_LDP-WERF_EXP)
 	    ELSE
 	      XM(1)=-IBOUND
 	      IMIN=IBOUND
@@ -320,7 +320,7 @@ C
 C
 	    DO I=1,NI-1
 	      Q(I)=GAM(I)*( AV(I)-AVCONT(I) )/CHI(I)
-	      QH(I)=2.0D0*GAMH(I)*( CV(I)-CVCONT(I) )/(CHI(I)+CHI(I+1))
+	      QH(I)=2.0_LDP*GAMH(I)*( CV(I)-CVCONT(I) )/(CHI(I)+CHI(I+1))
 	    END DO
 	    Q(NI)=GAM(NI)*( AV(NI)-AVCONT(NI) )/CHI(NI)
 C
@@ -332,18 +332,18 @@ C Note that WERF_EXP must be evaluate at NLF - not NLF-0.5 .
 C
 	    XM(1)=-Q(1)-IBOUND*DNU
 	    IF(THK_LINE)THEN
-	      WERF_EXP=EXP( 1.0D-15*CHIL(1)/FL/GAM(1)*WERFC(NLF) )
+	      WERF_EXP=EXP( 1.0E-15_LDP*CHIL(1)/FL/GAM(1)*WERFC(NLF) )
 	      XM(1)=XM(1)+GAM(1)*
-	1                 (ETAL(1)/CHIL(1)-IBOUND)*(1.0D0-WERF_EXP)
+	1                 (ETAL(1)/CHIL(1)-IBOUND)*(1.0_LDP-WERF_EXP)
 	    END IF
-	    TA(1)=0.0D0
-	    TC(1)=1./DTAU(1)
-	    TB(1)=-1.0D0-TC(1)
+	    TA(1)=0.0_LDP
+	    TC(1)=1._LDP/DTAU(1)
+	    TB(1)=-1.0_LDP-TC(1)
 	    DO I=2,NI-1
 	      TA(I)=TC(I-1)
-	      TC(I)=1.0D0/DTAU(I)
-	      TB(I)=-0.5D0*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
-	      XM(I)=-0.5D0*( SOURCE(I)+Q(I) )*( DTAU(I-1)+DTAU(I) )
+	      TC(I)=1.0_LDP/DTAU(I)
+	      TB(I)=-0.5_LDP*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
+	      XM(I)=-0.5_LDP*( SOURCE(I)+Q(I) )*( DTAU(I-1)+DTAU(I) )
 	1               -QH(I)+QH(I-1)
 	    END DO
 C
@@ -353,8 +353,8 @@ C
 	      XM(NI)=DBC			!DNU include in definition of DBC.
 	    ELSE IF(LS .GT. NC)THEN
 	      TA(NI)=-TC(NI-1)
-	      TB(NI)=-TA(NI)+DTAU(NI-1)*0.5D0
-	      XM(NI)=0.5D0*DTAU(NI-1)*(SOURCE(NI)+Q(NI))-QH(NI-1)
+	      TB(NI)=-TA(NI)+DTAU(NI-1)*0.5_LDP
+	      XM(NI)=0.5_LDP*DTAU(NI-1)*(SOURCE(NI)+Q(NI))-QH(NI-1)
 	    ELSE
 	      TA(NI)=-TC(NI-1)
 	      TB(NI)=1-TA(NI)
@@ -417,9 +417,9 @@ C
 	  HBC(ML)=HBC(ML)/JNU(1,ML)
 	  NBC(ML)=NBC(ML)/JNU(1,ML)
 	  IF(ML .EQ. NLF+1)THEN
-	    IN_HBC(ML)=IN_HBC(ML)/(2.0D0*JNU(ND,ML)-IC*DNU)
+	    IN_HBC(ML)=IN_HBC(ML)/(2.0_LDP*JNU(ND,ML)-IC*DNU)
 	  ELSE
-	    IN_HBC(ML)=IN_HBC(ML)/(2.0D0*JNU(ND,ML)-IC)
+	    IN_HBC(ML)=IN_HBC(ML)/(2.0_LDP*JNU(ND,ML)-IC)
 	  END IF
 	END DO
 C
@@ -430,13 +430,13 @@ C Evaluate HBLANK. Scale HBLANK to allow for the fact that the LFQW
 C dont necessarily add to v*(PF(1)-PF(NLF)) (since LFQW is normalized so
 C that integral over the line profile is unity).
 C
-	  HBLANK=0.0D0
-	  SCALE=0.0D0
+	  HBLANK=0.0_LDP
+	  SCALE=0.0_LDP
 	  DO ML=1,NLF
 	    HBLANK=HBLANK+LFQW(ML)*HNU(1,ML)
 	    SCALE=SCALE+LFQW(ML)
 	  END DO
-	  SCALE=1.0D+15*FL*(PF(1)-PF(NLF))/SCALE
+	  SCALE=1.0E+15_LDP*FL*(PF(1)-PF(NLF))/SCALE
 	  HBLANK=HBLANK*SCALE
 C
 C Evaluate HBLANK which is deined by Int{Jv dv} over the WHOLE line.
@@ -444,21 +444,21 @@ C Note that we need to keep JINT since this is used in the electron
 C scattering integral. The frequency factor of 10^15 is included in the
 C HBLANK definition.
 C
-	  T1=1.0D+15*FL
+	  T1=1.0E+15_LDP*FL
 	  HBLANK=HBLANK+HNU(1,NLF+1)*T1
 C
 C Evaluate the line EW. The units are Angstroms. Also evaluate
 C the continuum intensity ( Jys/kpc/kpc ). Note that H is
 C defined midway between R(1) and R(2).
 C
-	  T1=( (PF(1)-PF(NLF))+DNU )*FL*1.0D+15
-	  EW=2.99794D-12*( HBLANK-HNU(1,1)*T1 )/HNU(1,1)/FL/FL
-	  CONT_INT=13.19868*HNU(1,1)*( (R(1)+R(2))**2 )/4.0D0
+	  T1=( (PF(1)-PF(NLF))+DNU )*FL*1.0E+15_LDP
+	  EW=2.99794E-12_LDP*( HBLANK-HNU(1,1)*T1 )/HNU(1,1)/FL/FL
+	  CONT_INT=13.19868_LDP*HNU(1,1)*( (R(1)+R(2))**2 )/4.0_LDP
 	END IF
 C
 C
 C
-	IF(PROGDESC .NE. 1246719.0D0)THEN
+	IF(PROGDESC .NE. 1246719.0_LDP)THEN
 	  WRITE(6,*)'Error - Scratch Block Corrupted in FG_HAM'
 	  STOP
 	END IF

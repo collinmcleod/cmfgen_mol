@@ -76,10 +76,10 @@ C
 !
 	  IF(ST_INDX .EQ. 1)THEN
 	    T1=(R(1)-R(2))/(R(2)-R(3))
-	    IF(T1 .LT. 0.1D0)THEN
-	      REXT(2)=(REXT(1)+T1*REXT(3))/(1.0D0+T1)
+	    IF(T1 .LT. 0.1_LDP)THEN
+	      REXT(2)=(REXT(1)+T1*REXT(3))/(1.0_LDP+T1)
 	    ELSE
-	      REXT(2)=REXT(1)-0.1D0*(REXT(1)-REXT(2))
+	      REXT(2)=REXT(1)-0.1_LDP*(REXT(1)-REXT(2))
 	    END IF
 	    WRITE(6,*)' Information about insertion of extra grid points at outer boundary (INC_GRID option)'
 	    WRITE(6,*)'   R ratio:',T1,(R(2)-R(3))/(R(3)-R(4))
@@ -94,8 +94,8 @@ C
 C
 	  IF(END_INDX .EQ. ND)THEN
 	    T1=(R(ND-1)-R(ND))/(R(ND-2)-R(ND-1))
-	    T1=MIN(T1,0.1D0)
-	    REXT(NX-1)=(REXT(NX)+T1*REXT(NX-2))/(1.0D0+T1)
+	    T1=MIN(T1,0.1_LDP)
+	    REXT(NX-1)=(REXT(NX)+T1*REXT(NX-2))/(1.0_LDP+T1)
 !	    WRITE(6,*)' Information about insertion of extra grid points at inner boundary (INC_GRID option)'
 !	    WRITE(6,*)'   R ratio:',T1,(R(ND-1)-R(ND))/(R(ND-2)-R(ND-1))
 !	    WRITE(6,*)'REXT ratio:',(REXT(NX-1)-REXT(NX))/(REXT(NX-2)-REXT(NX-1)),
@@ -118,10 +118,10 @@ C
 C
 C Now compute the INDX vector, and the COEF matrix.
 C
-	COEF(:,:)=0.D0      	!4:NX
+	COEF(:,:)=0._LDP      	!4:NX
 C
 	INDX(1)=1
-	COEF(1,1)=1.0D0
+	COEF(1,1)=1.0_LDP
 	INDX(NX)=ND-3
 	COEF(4,NX)=1.0
 C	
@@ -131,7 +131,7 @@ C
 	    IF(M .EQ. 2)THEN
 	      T1=(LOG(REXT(I))-LOG(R(1)))/(LOG(R(2))-LOG(R(1)))
 	      INDX(I)=1
-	      COEF(1,I)=1.0D0-T1
+	      COEF(1,I)=1.0_LDP-T1
 	      COEF(2,I)=T1
 	    ELSE IF(M .EQ. ND)THEN
 	      A1=LOG(R(M-3))
@@ -158,10 +158,10 @@ C
 	    ELSE
 	      T1=LOG(REXT(I))-LOG(R(M-1))
 	      T2=T1/(LOG(R(M))-LOG(R(M-1)))
-	      A2=T2*T2*(3.0-2*T2)
-	      A1=1.0-A2
-	      A3=T1*(1.0-T2*(2.0-T2))/(LOG(R(M))-LOG(R(M-2)))
-	      A4=T1*T2*(T2-1.0)/(LOG(R(M+1))-LOG(R(M-1)))
+	      A2=T2*T2*(3.0_LDP-2*T2)
+	      A1=1.0_LDP-A2
+	      A3=T1*(1.0_LDP-T2*(2.0_LDP-T2))/(LOG(R(M))-LOG(R(M-2)))
+	      A4=T1*T2*(T2-1.0_LDP)/(LOG(R(M+1))-LOG(R(M-1)))
 	      INDX(I)=M-2
 	      COEF(1,I)=-A3
 	      COEF(2,I)=A1-A4

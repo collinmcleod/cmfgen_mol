@@ -61,9 +61,9 @@
 ! temperature.
 !
 	IF(INITIALIZE_ARRAYS)THEN
-	  AI_AR_CHG(:,:)=1.0D0
-	  dlnAI_AR_CHG_dlnT(:,:)=0.0D0
-	  COOL_CHG(:,:)=0.0D0
+	  AI_AR_CHG(:,:)=1.0_LDP
+	  dlnAI_AR_CHG_dlnT(:,:)=0.0_LDP
+	  COOL_CHG(:,:)=0.0_LDP
 	  INITIALIZE_ARRAYS=.FALSE.
 	END IF
 !
@@ -74,8 +74,8 @@
 	DO J=1,N_CHG
 	  IF(CHG_REACTION_AVAILABLE(J))THEN
 	    LEVEL_SET=.FALSE.
-	    G_CHG_VEC(1:ND)=0.0D0
-	    dG_CHG_VEC(1:ND)=0.0D0
+	    G_CHG_VEC(1:ND)=0.0_LDP
+	    dG_CHG_VEC(1:ND)=0.0_LDP
 	    DO K=1,4
 	      IF(ID .EQ. ID_ION_CHG(J,K))THEN
 	        I_S=0

@@ -54,13 +54,13 @@
 	EXTERNAL ERROR_LU
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 !
-	SUM(:,:)=0.0D0
+	SUM(:,:)=0.0_LDP
 	DO ID=1,NUM_IONS
-	  SE(ID)%STEQ_ADV(:)=0.0D0
-	  SE(ID)%STRT_ADV_ID(:)=0.0D0
-	  SE(ID)%END_ADV_ID(:)=0.0D0
+	  SE(ID)%STEQ_ADV(:)=0.0_LDP
+	  SE(ID)%STRT_ADV_ID(:)=0.0_LDP
+	  SE(ID)%END_ADV_ID(:)=0.0_LDP
 	END DO
-	BA_ADV_TERM(:,:)=0.0D0
+	BA_ADV_TERM(:,:)=0.0_LDP
 	IF(.NOT. INCL_DT_TERM)RETURN
 !
 	IF(.NOT. LINEAR)THEN
@@ -82,7 +82,7 @@
 ! advection terms. It should be 1 for the final model. It should only be used to
 ! help converge a model in which advection terms are very important.
 !
-	DELTA_TIME_SECS=1.0D+05*(R(ND)-OLD_R(ND))/V(ND)
+	DELTA_TIME_SECS=1.0E+05_LDP*(R(ND)-OLD_R(ND))/V(ND)
 	DERIV_CONST=RELAXATION_PARAMETER/DELTA_TIME_SECS
 !
 ! We use backward linear differencing. At present we assume a Hubble
@@ -130,13 +130,13 @@
 	  ID_END=SPECIES_END_ID(ISPEC)
 	  DO K=1,ND
 	    DO ID=ID_STRT,ID_END-1
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO I=ID_STRT,ID
 	        DO J=1,ATM(I)%NXzV
 	          T1=T1+ATM(I)%XzV(J,K)
 	        END DO
 	      END DO
-	      T2=0.0D0
+	      T2=0.0_LDP
 	      DO I=ID+1,ID_END-1
 	        DO J=1,ATM(I)%NXzV
 	          T2=T2+ATM(I)%XzV(J,K)

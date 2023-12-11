@@ -51,7 +51,7 @@
 ! is assumed to be independent of the level of the valence electron.
 !
 	ALPHA=XCROSS_V2(NU,AT_NO,NO_ELEC,IZERO,IZERO,L_FALSE,L_FALSE)
-	IF(ALPHA .LE. 0.0D0)RETURN
+	IF(ALPHA .LE. 0.0_LDP)RETURN
 	TETA2=ALPHA*TWOHCSQ*(NU**3)
 	IF(NO_ELEC .GT. 3)THEN
 	  DO I=1,N_A
@@ -61,13 +61,13 @@
 	      VCHI(LEV,J)=VCHI(LEV,J)+ALPHA
 	      TCHI1=ALPHA*LTE_POP*EMHNUKT(J)
 	      VCHI(EQION,J)=VCHI(EQION,J)-TCHI1/DI(J)
-	      VCHI(NT-1,J)=VCHI(NT-1,J)-2.0*TCHI1/ED(J)
+	      VCHI(NT-1,J)=VCHI(NT-1,J)-2.0_LDP*TCHI1/ED(J)
 	      VCHI(NT,J)=VCHI(NT,J)-TCHI1*
 	1        (HDKT*NU/T(J)+dlnHNST_AdlnT(I,J)+dlnHNST_BdlnT(1,J))/T(J)
 !
 	      TETA3=TETA2*LTE_POP*EMHNUKT(J)
 	      VETA(EQION,J)=VETA(EQION,J)+TETA3/DI(J)
-	      VETA(NT-1,J)=VETA(NT-1,J)+2.0*TETA3/ED(J)
+	      VETA(NT-1,J)=VETA(NT-1,J)+2.0_LDP*TETA3/ED(J)
 	      VETA(NT,J)=VETA(NT,J)+TETA3*
 	1        (HDKT*NU/T(J)+dlnHNST_AdlnT(I,J)+dlnHNST_BdlnT(1,J))/T(J)
 	    END DO

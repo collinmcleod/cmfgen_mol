@@ -55,9 +55,9 @@ C
 C Zero F2DA and FC matrices and FA vector. NB: These matrices should
 C be stored sequentially,
 C
-	F2DA(:,:)=0.0D0
-	FC(:,:)=0.0D0
-	FA(:)=0.0D0
+	F2DA(:,:)=0.0_LDP
+	FC(:,:)=0.0_LDP
+	FA(:)=0.0_LDP
 C
 C Compute dCHI/dR for use in computation of optical depth scale.
 C Compute d[dCHI/dR]/dCHI for use in linearization.
@@ -75,20 +75,20 @@ C
 	  END IF
 C
 	  IF(THK)THEN
-	    IF(P(LS) .GT. 0.0D0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796D0-ACOS(P(LS)/R(1)))/P(LS)
+	    IF(P(LS) .GT. 0.0_LDP)THEN
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF
 	  ELSE
-	    TOR=0.0D0
+	    TOR=0.0_LDP
 	  END IF
 C
-	  IF(TOR .GT. 0.01D0)THEN
-	    IBOUND=SOURCE(1)*(1.0D0-EXP(-TOR))
+	  IF(TOR .GT. 0.01_LDP)THEN
+	    IBOUND=SOURCE(1)*(1.0_LDP-EXP(-TOR))
 	  ELSE
 	    IBOUND=SOURCE(1)*TOR*
-	1             (1.0D0-TOR/2.0D0*(1.0D0-TOR/3.0D0*(1.0D0-TOR/4.0D0)))
+	1             (1.0_LDP-TOR/2.0_LDP*(1.0_LDP-TOR/3.0_LDP*(1.0_LDP-TOR/4.0_LDP)))
 	  END IF
 C
 	  IF(NI .GT. 2)THEN
@@ -128,7 +128,7 @@ C Compute perturbation for THICK ! boundary condition. Note that
 C VK(1,2) is not altered.
 C
 	    IF(THK)THEN
-	      VK(1,1)=SOURCE(1)*(1.0D0-EXP(-TOR))/CHI(1)
+	      VK(1,1)=SOURCE(1)*(1.0_LDP-EXP(-TOR))/CHI(1)
 	1   -   SOURCE(1)*TOR*EXP(-TOR)/CHI(1)+VK(1,1)
 	    END IF
 C
@@ -138,7 +138,7 @@ C Compute &W vector if diffusion approximation.
 C
 	    IF(LS .LE. NC .AND. DIFF)THEN
 	      DO I=1,ND
-	        XM(I)=0.0D0
+	        XM(I)=0.0_LDP
 	      END DO
 	      XM(ND)=SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI(ND)
 	      CALL SIMPTH(TA,TB,TC,XM,NI,1)
@@ -169,7 +169,7 @@ C
 	    FB(J,I)=FC(J,I)
 	    FC(J,I)=-FC(J,I)/ESEC(I)
 	  END DO
-	  FB(I,I)=FB(I,I)+1.0D0
+	  FB(I,I)=FB(I,I)+1.0_LDP
 	END DO
 C
 C Solve for mean intensity J as a function of depth.

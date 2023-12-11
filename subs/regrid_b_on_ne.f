@@ -120,17 +120,17 @@
 ! have b=1.
 !
 	IF(.NOT. CHECK_DC)THEN
-	  CONST=0.0D0
-	ELSE IF( ABS((HYD(NZ,NDOLD)-1.0D0)) .LT. 0.1)THEN
-	  CONST=0.0D0
-	ELSE IF( ABS(HYD(NZ,NDOLD)) .LT. 0.1) THEN
-	  CONST=1.0D0
+	  CONST=0.0_LDP
+	ELSE IF( ABS((HYD(NZ,NDOLD)-1.0_LDP)) .LT. 0.1_LDP)THEN
+	  CONST=0.0_LDP
+	ELSE IF( ABS(HYD(NZ,NDOLD)) .LT. 0.1_LDP) THEN
+	  CONST=1.0_LDP
 	ELSE
 	  LUER=ERROR_LU()
 	  WRITE(LUER,*)'Possible error on REGRID_B_ON_NE - b(n) not equal'
 	  WRITE(LUER,*)'to 1.0/pm0.1 or 0.0/pm0.1 at depth'
 	END IF
-	CONST=0.0D0
+	CONST=0.0_LDP
 !
 ! Interpolations are performed in the log plane.
 !

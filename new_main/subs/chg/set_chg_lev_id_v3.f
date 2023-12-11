@@ -60,10 +60,10 @@
 !
 ! Real variables
 !
-	  Z_CHG(:,:)=0.0D0
-          AI_AR_CHG(:,:)=0.0D0
-          dlnAI_AR_CHG_dlnT(:,:)=0.0D0
-          COOL_CHG(:,:)=0.0D0
+	  Z_CHG(:,:)=0.0_LDP
+          AI_AR_CHG(:,:)=0.0_LDP
+          dlnAI_AR_CHG_dlnT(:,:)=0.0_LDP
+          COOL_CHG(:,:)=0.0_LDP
 	END IF
 	INITIALIZE_ARRAYS=.TRUE.
 !
@@ -101,7 +101,7 @@
 	            I_S=F_TO_S(I_F)
 	            LEV_IN_ION_CHG(J,K)=I_S
 	            LEV_IN_POPS_CHG(J,K)=EQSPEC+I_S-1		!In POPS
-	            Z_CHG(J,K)=ZION-1.0D0
+	            Z_CHG(J,K)=ZION-1.0_LDP
 	            LEVEL_SET=.TRUE.
 	          END IF
 	          IF(I_S .NE. F_TO_S(I_F))THEN

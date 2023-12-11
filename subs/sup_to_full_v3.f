@@ -100,7 +100,7 @@
 !
 	IF(CIII_PRES)THEN
 	  DO K=1,ND
-	    GION(K)=0.0D0
+	    GION(K)=0.0_LDP
 	    DO I=1,NCIII_F
 	      IF(F_TO_S_MAP_CIII(I) .EQ. 1)THEN
 	        GION(K)=GION(K)+GCIII_F(I)*EXP( HDKT*(EDGECIII_F(I)-
@@ -130,7 +130,7 @@
 !
 	DO K=1,ND
 	  X=HDKT/T(K)
-	  RGU=2.07078D-22*ED(K)*DIC2_S(K)*( T(K)**(-1.5D0) )/GION(K)
+	  RGU=2.07078E-22_LDP*ED(K)*DIC2_S(K)*( T(K)**(-1.5_LDP) )/GION(K)
 	  RGU=LOG(RGU)
 	  DO I=1,NC2_F
 	    C2LTE_F(I,K)=W_C2_F(I,K)*GC2_F(I)*EXP(EDGEC2_F(I)*X+RGU)
@@ -141,7 +141,7 @@
 !
 	DO K=1,ND
 	  DO I=1,NC2_S
-	    C2LTE_S(I,K)=0.0D0
+	    C2LTE_S(I,K)=0.0_LDP
 	  END DO
 	END DO
 !
@@ -158,7 +158,7 @@
 !
 	  DO L=1,NC2_S
 	    CNT(L)=0
-	    EDGE_S(L)=0.0D0
+	    EDGE_S(L)=0.0_LDP
 	  END DO
 	  DO I=1,NC2_F
 	    L=F_TO_S_MAP_C2(I)
@@ -221,12 +221,12 @@
 	1                    LOG(EDGE_S(L)/EDGE_S(INT_SL))
 	        B1=C2_S(INT_SL,K)/C2LTE_S(INT_SL,K)
 	        B2=C2_S(L,K)/C2LTE_S(L,K)
-                B=T1*B1 + (1.0D0-T1)*B2
+                B=T1*B1 + (1.0_LDP-T1)*B2
 !
 ! Constrain the interpolation. Hopefully this is not necessary.
 !
-	        IF(B1 .LE. 1. .AND. B2 .LE. 1 .AND. B .GT. 1)B=1.0
-	        IF(B1 .GE. 1. .AND. B2 .GE. 1 .AND. B .LT. 1)B=1.0
+	        IF(B1 .LE. 1._LDP .AND. B2 .LE. 1 .AND. B .GT. 1)B=1.0
+	        IF(B1 .GE. 1._LDP .AND. B2 .GE. 1 .AND. B .LT. 1)B=1.0
 	        IF(B .LT. 0)B=B1
 	        C2_F(I,K)=C2LTE_F(I,K)*B
 	      END IF
@@ -238,7 +238,7 @@
 ! super level. This correction will generally be small.
 !
 	  DO L=1,NC2_S
-	    SUM(L)=0.0D0
+	    SUM(L)=0.0_LDP
 	  END DO
 	  DO I=1,NC2_F
 	    L=F_TO_S_MAP_C2(I)

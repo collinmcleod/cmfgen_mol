@@ -10,8 +10,8 @@
 	INTEGER I,J
 !
 	DO I=1,NMAX
-	  A(I)=5.0D0*I/FLOAT(NMAX)
-	  B(I)=2.0D0*I/FLOAT(NMAX)
+	  A(I)=5.0_LDP*I/FLOAT(NMAX)
+	  B(I)=2.0_LDP*I/FLOAT(NMAX)
 	END DO
 !
 	CALL TUNE(1,'OUTER')
@@ -29,7 +29,7 @@
 	READ(5,*)J
 !
         CALL TUNE(1,'SEC')
-        SUM=0.0D0
+        SUM=0.0_LDP
         DO J=1,10
           DO I=1,NMAX
             A(I)=SQRT(A(I))

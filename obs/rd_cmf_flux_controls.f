@@ -40,13 +40,13 @@
 	  CALL RD_STORE_DBLE(dFREQ_bf_MAX,'MAX_BF',L_TRUE,
 	1            'Maximum frequency spacing close to bf edge')
 !
-	  RD_NU_MAX_OBS=-1.0D0; RD_NU_MIN_OBS=-1.0D0
+	  RD_NU_MAX_OBS=-1.0_LDP; RD_NU_MIN_OBS=-1.0_LDP
 	  CALL RD_STORE_DBLE(RD_NU_MAX_OBS,'OBS_LAM_MIN',L_FALSE,
 	1            'Minimum wavelegth (A) for computing observed frequencies')
 	  CALL RD_STORE_DBLE(RD_NU_MIN_OBS,'OBS_LAM_MAX',L_FALSE,
 	1            'Maximum wavelegth (A) for computing observed frequencies')
-	  RD_NU_MAX_OBS=2.99794D+03/RD_NU_MAX_OBS
-	  RD_NU_MIN_OBS=2.99794D+03/RD_NU_MIN_OBS
+	  RD_NU_MAX_OBS=2.99794E+03_LDP/RD_NU_MAX_OBS
+	  RD_NU_MIN_OBS=2.99794E+03_LDP/RD_NU_MIN_OBS
 !
 	  CALL RD_STORE_LOG(DO_LEV_DISSOLUTION,'DO_DIS',L_TRUE,
 	1            'Allow for level dissolution of upper levels?')
@@ -80,8 +80,8 @@
 	    CALL RD_STORE_CHAR(INNER_BND_METH,'IB_METH',L_TRUE,
 	1           'Inner boundary method (DIFUSION, HOLLOW, or ZERO_FLUX)')
 	  END IF
-	  IB_STAB_FACTOR=0.1D0
-	  IF(INNER_BND_METH .EQ. 'DIFFUSION')IB_STAB_FACTOR=0.0D0
+	  IB_STAB_FACTOR=0.1_LDP
+	  IF(INNER_BND_METH .EQ. 'DIFFUSION')IB_STAB_FACTOR=0.0_LDP
 	  CALL RD_STORE_DBLE(IB_STAB_FACTOR,'IB_STAB',L_FALSE,'Inner boundary stabilization factor')
 	  OUTER_BND_METH='HONJ'
 	  CALL RD_STORE_CHAR(OUTER_BND_METH,'OB_METH',L_FALSE,
@@ -112,7 +112,7 @@
 	  CALL RD_STORE_NCHAR(FG_SOL_OPTIONS,'FG_OPT',ITEN,L_TRUE,
 	1           'Solution options for FG_J_CMF: DIFF/INS and INT/INS')
 	  CALL RD_STORE_LOG(RDTHK_CONT,'THK_CONT',L_TRUE,'Use thick boundary condition for continuum ? ')
-	  REXT_FAC=0.0D0
+	  REXT_FAC=0.0_LDP
 	  CALL RD_STORE_DBLE(REXT_FAC,'REXT_FAC',L_FALSE,'Factor to extend R by for thick continuum solution')
 	  CALL RD_STORE_LOG(TRAPFORJ,'TRAP_J',L_TRUE,
 	1           'Use trapazoidal weights to compute J? ')
@@ -197,7 +197,7 @@
 	  CALL RD_STORE_LOG(SOB_FREQ_IN_OBS,'SOB_FREQ_IN_OBS',L_TRUE,
 	1        ' Allow for SOB & CMF lines in defining observers'//
 	1        ' frequencies?')
-	  SOB_EW_LAM_BEG=900.0D0; SOB_EW_LAM_END=5.0E+04
+	  SOB_EW_LAM_BEG=900.0_LDP; SOB_EW_LAM_END=5.0E+04_LDP
 	  CALL RD_STORE_DBLE(SOB_EW_LAM_BEG,'SOB_EW_LAM_BEG',L_FALSE,
 	1         'Inital wavelength (A) for calculating Sobolev EWs')
 	  CALL RD_STORE_DBLE(SOB_EW_LAM_END,'SOB_EW_LAM_END',L_FALSE,
@@ -276,11 +276,11 @@
 	  CALL RD_STORE_LOG(FF_XRAYS,'FF_XRAYS',XRAYS,'Use free-free processes to compute X-ray emission')
 	  CALL RD_STORE_LOG(XRAY_SMOOTH_WIND,'X_SM_WIND',XRAYS,'Ignore clumping when computing X-ray emission')
 !
-	  VSMOOTH_XRAYS=3000.0D0
+	  VSMOOTH_XRAYS=3000.0_LDP
 	  CALL RD_STORE_DBLE(VSMOOTH_XRAYS,'VS_XRAYS',XRAYS,'X-ray smoothing width for SOB/CMF options')
 !
-	  FILL_FAC_XRAYS_1=0.D0
-	  FILL_FAC_XRAYS_2=0.D0
+	  FILL_FAC_XRAYS_1=0._LDP
+	  FILL_FAC_XRAYS_2=0._LDP
 	  CALL RD_STORE_DBLE(FILL_FAC_XRAYS_1,'FIL_FAC_1',XRAYS,
 	1           'Filling factor for X-ray emission [1]')
 	  CALL RD_STORE_DBLE(T_SHOCK_1,'T_SHOCK_1',XRAYS,
@@ -346,7 +346,7 @@
             CALL RD_STORE_DBLE(TDOP,'TDOP',L_TRUE,'Temperature to be used in Doppler profile (10^4K)')
             CALL RD_STORE_DBLE(AMASS_DOP,'AMASS_DOP',L_TRUE,'Atomic mass to be used in Doppler profile (amu''s)')
 	  ELSE
-	    TDOP=2.0D0; AMASS_DOP=1.0D+06
+	    TDOP=2.0_LDP; AMASS_DOP=1.0E+06_LDP
 	  END IF
 	  CALL RD_STORE_LOG(SET_PROF_LIMS_BY_OPACITY,'OPAC_LIMS',L_TRUE,
 	1           'Set prof limits by line to cont. ratio?')
@@ -355,9 +355,9 @@
 	  CALL RD_STORE_DBLE(VOIGT_PROF_LIMIT,'VOIGT_LIM',L_TRUE,
 	1           'Edge limits for Voigt line profile')
 !
-	  MAX_PROF_ED=1.0D+16
+	  MAX_PROF_ED=1.0E+16_LDP
 	  NORM_PROFILE=.FALSE.
-	  V_PROF_LIMIT=5000.0D0
+	  V_PROF_LIMIT=5000.0_LDP
 	  CALL RD_STORE_DBLE(MAX_PROF_ED,'MAX_PROF_ED',L_FALSE,
 	1           'Maximum electron density for Stark profile computation')
 	  CALL RD_STORE_DBLE(V_PROF_LIMIT,'V_PROF_LIM',L_FALSE,
@@ -427,7 +427,7 @@
 	    CALL RD_STORE_LOG(USE_DJDT_RTE,'USE_DJDT_RTE',L_FALSE,
 	1     'Use solver which has DJDt terms in transfer equaton for SN models?')
 	  END IF
-	  DJDT_RELAX_PARAM=1.0D0
+	  DJDT_RELAX_PARAM=1.0_LDP
 	  CALL RD_STORE_DBLE(DJDT_RELAX_PARAM,'DJDT_RELAX',L_FALSE,
 	1          'Factor to scale DJDT terms to assist initial convergence')
 	  IF(USE_DJDT_RTE .OR. USE_J_REL)USE_FORMAL_REL=.TRUE.

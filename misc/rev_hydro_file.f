@@ -41,7 +41,7 @@
 	CHARACTER*132 FMT
 	CHARACTER*132 FILENAME
 !
-	GRAV_CON=1.0D-20*GRAVITATIONAL_CONSTANT()*MASS_SUN()
+	GRAV_CON=1.0E-20_LDP*GRAVITATIONAL_CONSTANT()*MASS_SUN()
 !
 	FILENAME='HYDRO'
 	CALL GEN_IN(FILENAME,'Input hydro file')
@@ -85,11 +85,11 @@
 	DO I=1,ND
 	  READ(STRING(I+1),*)R,V,E,VdVdR,dPdR,g_TOT,g_RAD,g_ELEC,Gamma
 	  Gamma=Gamma*MASS_OLD/MASS_NEW
-	  g_tot=(Gamma-1.0D0)*g_rad/Gamma
-	  E=200.0D0*(VdVdR+dPdR-g_TOT)/(ABS(VdVdR)+ ABS(dPdR)+ ABS(g_TOT))
-	  MT=g_rad/g_elec-1.0D0
+	  g_tot=(Gamma-1.0_LDP)*g_rad/Gamma
+	  E=200.0_LDP*(VdVdR+dPdR-g_TOT)/(ABS(VdVdR)+ ABS(dPdR)+ ABS(g_TOT))
+	  MT=g_rad/g_elec-1.0_LDP
 !
-	  IF(R .GT. 9.99E+04)THEN
+	  IF(R .GT. 9.99E+04_LDP)THEN
 	    FMT='(1X,1PE10.4,0PF12.2,F9.2,1P,5(E14.4),0P,2F11.2)'
 	  ELSE
 	    FMT='(1X,F10.4,F12.2,F9.2,1P,5(E14.4),0P,2F11.3)'

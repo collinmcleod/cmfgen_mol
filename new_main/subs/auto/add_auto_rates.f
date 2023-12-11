@@ -43,7 +43,7 @@
 	  DO I=1,N_F
 	    ARAD(I)=ARAD(I)+AUTO(I)
 	  END DO
-        ELSE IF(FEDGE_F(N_F) .LT. 0.0D0)THEN
+        ELSE IF(FEDGE_F(N_F) .LT. 0.0_LDP)THEN
           LUER=ERROR_LU()
           WRITE(LUER,*)' '
           WRITE(LUER,*)'Warning: possible error in ADD_AUTO_RATES'

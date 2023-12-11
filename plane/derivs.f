@@ -22,7 +22,7 @@ c
       mu=j(2)
 c
       djds(1)=gamma*(mu+beta)
-      djds(2)=gamma*(1.0d0-mu*mu)*((1.0d0+beta*mu)/r-
+      djds(2)=gamma*(1.0_LDP-mu*mu)*((1.0_LDP+beta*mu)/r-
      *     gamma*gamma*(mu+beta)*dbetadr)
 c
       return

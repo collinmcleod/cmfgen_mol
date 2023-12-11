@@ -99,14 +99,14 @@
 ! (GLOBAL), the biggest change at any depth is used to scale all changes.
 ! This option is probaly obsolete.
 !
-	IF(CHANGE_LIM .LE. 1.0D0)THEN
+	IF(CHANGE_LIM .LE. 1.0_LDP)THEN
           WRITE(LUER,'(A,1PE12.4)')' Error in SOLVE_BA_V7'
           WRITE(LUER,'(A,1PE12.4)')' Maximum change for normal iteration must be > 1.'
 	  STOP
 	END IF
-	BIG_LIM=(CHANGE_LIM-1.0D0)/CHANGE_LIM
+	BIG_LIM=(CHANGE_LIM-1.0_LDP)/CHANGE_LIM
 	LIT_LIM=-CHANGE_LIM
-	MINSCALE=1.0D0
+	MINSCALE=1.0_LDP
 	IF(SCALE_OPT(1:5) .EQ. 'LOCAL')THEN
 	  DO I=1,ND
 	    T1=BIG_LIM			!Prevents division by zero and insures
@@ -119,16 +119,16 @@
 !
 ! Limit the change in T to a maximum of 20%, and ensure T > T_MIN.
 !
-	    T1=0.2D0
+	    T1=0.2_LDP
 	    T3=MAX( T1,ABS(STEQ(NT,I)) )
 	    SCALE=MIN( T1/T3,SCALE )
 	    IF(STEQ(NT,I) .NE. 0 .AND. POPS(NT,I) .GT. T_MIN .AND.
-	1                      POPS(NT,I)*(1.0D0-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
-	      SCALE=(1.0D0-T_MIN/POPS(NT,I))/STEQ(NT,I)
+	1                      POPS(NT,I)*(1.0_LDP-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
+	      SCALE=(1.0_LDP-T_MIN/POPS(NT,I))/STEQ(NT,I)
 	    END IF
 !
 	    DO J=1,NT
-	      POPS(J,I)=POPS(J,I)*(1.0D0-STEQ(J,I)*SCALE)
+	      POPS(J,I)=POPS(J,I)*(1.0_LDP-STEQ(J,I)*SCALE)
 	    END DO
 	    MINSCALE=MIN(SCALE,MINSCALE)
 	  END DO
@@ -138,21 +138,21 @@
 	  DO I=1,ND
 	    DO J=1,NT-1
 	      IF(STEQ(J,I) .GT. BIG_LIM)THEN
-	        POPS(J,I)=POPS(J,I)*(1.0D0-BIG_LIM)
+	        POPS(J,I)=POPS(J,I)*(1.0_LDP-BIG_LIM)
 	        MINSCALE=MIN( BIG_LIM/STEQ(J,I),MINSCALE )
 	      ELSE IF(STEQ(J,I) .LT. LIT_LIM)THEN
-	        POPS(J,I)=POPS(J,I)*(1.0D0-LIT_LIM)
+	        POPS(J,I)=POPS(J,I)*(1.0_LDP-LIT_LIM)
 	        MINSCALE=MIN( LIT_LIM/STEQ(J,I),MINSCALE )
 	      ELSE
-	        POPS(J,I)=POPS(J,I)*(1.0D0-STEQ(J,I))
+	        POPS(J,I)=POPS(J,I)*(1.0_LDP-STEQ(J,I))
 	      END IF
 	    END DO
 	    IF(POPS(NT,I) .LT. T_MIN)POPS(NT,I)=T_MIN
 !
 ! Limit T to a 20% change if it is a variable.
 !
-	    SCALE=0.2D0/MAX( 0.2D0,ABS(STEQ(NT,I)) )
-	    POPS(NT,I)=POPS(NT,I)*(1.0D0-STEQ(NT,I)*SCALE)
+	    SCALE=0.2_LDP/MAX( 0.2_LDP,ABS(STEQ(NT,I)) )
+	    POPS(NT,I)=POPS(NT,I)*(1.0_LDP-STEQ(NT,I)*SCALE)
 	    MINSCALE=MIN(SCALE,MINSCALE)
 	  END DO
 !
@@ -163,7 +163,7 @@
 	    T1=BIG_LIM			!Prevents division by zero and insures
 	    T2=LIT_LIM 			!SCALE=1 if small changes.
 	    DO J=1,NT-1
-	      IF(POPS(J,I) .GT. 1.0E-10*POPS(NT-1,I))THEN
+	      IF(POPS(J,I) .GT. 1.0E-10_LDP*POPS(NT-1,I))THEN
 	        T1=MAX(T1,STEQ(J,I))   		!Note + means decrease
 	        T2=MIN(T2,STEQ(J,I))            !Note - means increase
 	      END IF
@@ -172,20 +172,20 @@
 !
 ! Limit the change in T to a maximum of 20%, and ensure T > T_MIN.
 !
-	    T3=MAX( 0.2D0,ABS(STEQ(NT,I)) )
-	    SCALE=MIN( 0.2D0/T3,SCALE )
+	    T3=MAX( 0.2_LDP,ABS(STEQ(NT,I)) )
+	    SCALE=MIN( 0.2_LDP/T3,SCALE )
 	    MINSCALE=MIN(SCALE,MINSCALE)
 	    IF(STEQ(NT,I) .NE. 0 .AND. POPS(NT,I) .GT. T_MIN .AND.
-	1                      POPS(NT,I)*(1.0D0-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
-	        SCALE=(1.0D0-T_MIN/POPS(NT,I))/STEQ(NT,I)
+	1                      POPS(NT,I)*(1.0_LDP-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
+	        SCALE=(1.0_LDP-T_MIN/POPS(NT,I))/STEQ(NT,I)
 	    END IF
-	    IF(SCALE .GT. 1.0D0)SCALE=1.0D0		!i.e. will not force T to T_MIN
+	    IF(SCALE .GT. 1.0_LDP)SCALE=1.0_LDP		!i.e. will not force T to T_MIN
 !
 	    DO J=1,NT
 	      T1=STEQ(J,I)*SCALE
 	      IF(T1 .GT. BIG_LIM)T1=BIG_LIM
 	      IF(T1 .LT. LIT_LIM)T1=LIT_LIM
-	      POPS(J,I)=POPS(J,I)*(1.0D0-T1)
+	      POPS(J,I)=POPS(J,I)*(1.0_LDP-T1)
 	    END DO
 	  END DO
 	  WRITE(LUER,'(A,1PE12.4)')
@@ -203,24 +203,24 @@
 	  SCALE=MIN( BIG_LIM/T1, LIT_LIM/T2)
 	  DO I=1,ND
 	    IF(STEQ(NT,I) .NE. 0 .AND. POPS(NT,I) .GT. T_MIN .AND.
-	1                      POPS(NT,I)*(1.0D0-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
-	        SCALE=(1.0D0-T_MIN/POPS(NT,I))/STEQ(NT,I)
+	1                      POPS(NT,I)*(1.0_LDP-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
+	        SCALE=(1.0_LDP-T_MIN/POPS(NT,I))/STEQ(NT,I)
 	    END IF
 	  END DO
 !
 ! Limit the change in T to a maximum of 20%.
 !
 	  DO I=1,ND
-	    T3=MAX( 0.2D0,ABS(STEQ(NT,I)) )
+	    T3=MAX( 0.2_LDP,ABS(STEQ(NT,I)) )
 	  END DO
-	  SCALE=MIN( 0.2D0/T3,SCALE )
+	  SCALE=MIN( 0.2_LDP/T3,SCALE )
 	  WRITE(LUER,'(A,1PE12.4)')' The value of scale is:',SCALE
 !
 ! Update the population levels (and the temperature) .
 !
 	  DO I=1,ND
 	    DO J=1,NT
-	      POPS(J,I)=POPS(J,I)*(1.0D0-STEQ(J,I)*SCALE)
+	      POPS(J,I)=POPS(J,I)*(1.0_LDP-STEQ(J,I)*SCALE)
 	    END DO
 	  END DO
 	END IF
@@ -240,9 +240,9 @@
 !   STEQ is +ve when the populations are to decrease.
 !   STEQ is -ve when the populations are to increase.
 !
-	DECREASE=0.0D0
+	DECREASE=0.0_LDP
 	IDEC=0
-	INCREASE=0.0D0
+	INCREASE=0.0_LDP
 	IINC=0
 	DO I=1,ND
 	  COUNT(:)=0
@@ -254,7 +254,7 @@
 	      INCREASE=STEQ(J,I)
 	      IINC=I
 	    END IF
-	    T1=1.0D+06*ABS(STEQ(J,I))+1.0D-31		!to ensure non-zero.
+	    T1=1.0E+06_LDP*ABS(STEQ(J,I))+1.0E-31_LDP		!to ensure non-zero.
 	    K=LOG10(T1)+1; K=MIN(7,K)
 	    IF(K > 0)COUNT(1:K)=COUNT(1:K)+1
 	  END DO
@@ -262,8 +262,8 @@
 	END DO
 	CLOSE(LU_SUM)
 !
-	DECREASE=100.0D0*DECREASE
-	INCREASE=100.0D0*INCREASE
+	DECREASE=100.0_LDP*DECREASE
+	INCREASE=100.0_LDP*INCREASE
 	IF(LAMBDA_IT)THEN
  	  WRITE(LUER,9000)IINC,ABS(INCREASE),'  (LAMBDA)'
 	  WRITE(LUER,9200)IDEC,DECREASE,'  (LAMBDA)'
@@ -281,10 +281,10 @@
 ! limit MAXCH to 1.0D+07 - This value does not halt program execution.
 !
 	MAXCH=-INCREASE
-	IF(DECREASE .LT. 99.999D0)THEN
-	  DECREASE=100.0D0*DECREASE/(100.0D0-DECREASE)
+	IF(DECREASE .LT. 99.999_LDP)THEN
+	  DECREASE=100.0_LDP*DECREASE/(100.0_LDP-DECREASE)
 	ELSE
-	  DECREASE=1.0D+07
+	  DECREASE=1.0E+07_LDP
 	END IF
 	MAXCH=MAX(MAXCH,DECREASE)
 !

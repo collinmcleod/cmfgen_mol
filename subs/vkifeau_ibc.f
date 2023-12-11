@@ -35,16 +35,16 @@ C
 	INTEGER I,J,K
 	REAL(KIND=LDP) ALPHA,BETA,T1,UIJ,UIK
 C
-	W(:,:)=0.0D0
+	W(:,:)=0.0_LDP
 C
 C NB. It is plus HBC_S*... as XVEC (i.e. RHS) is -HBC_S*S*R(1)*R(1)
 C
 	UIK=(RJ(2)*F(2)*Q(2)*R(2)*R(2)-RJ(1)*F(1)*Q(1)*R(1)*R(1))/DTAU(1)
-	ALPHA=0.5D0*(R(1)-R(2))*UIK/DTAU(1)
-	W(1,1)=ALPHA*Q(1)*(  1.0D0+(R(1)-R(2))/6.0D0*(A(2)-B(1))  )
+	ALPHA=0.5_LDP*(R(1)-R(2))*UIK/DTAU(1)
+	W(1,1)=ALPHA*Q(1)*(  1.0_LDP+(R(1)-R(2))/6.0_LDP*(A(2)-B(1))  )
 	1       +HBC_S*R(1)*R(1)*(ZETA(1)+THETA(1)*RJ(1))/CHI(1)
-	W(1,2)=ALPHA*Q(2)*(  1.0D0+(R(1)-R(2))/6.0D0*(B(2)-C(1))  )
-	W(1,3)=ALPHA*Q(3)*(R(1)-R(2))*C(2)/6.0D0
+	W(1,2)=ALPHA*Q(2)*(  1.0_LDP+(R(1)-R(2))/6.0_LDP*(B(2)-C(1))  )
+	W(1,3)=ALPHA*Q(3)*(R(1)-R(2))*C(2)/6.0_LDP
 C
 	DO I=2,ND-1
 	  K=I+1
@@ -60,36 +60,36 @@ C We use UIK for the sum of RHS terms containing 1/DTAU(I)
 C We use UIJ for the sum of RHS terms containing 1/DTAU(I)
 C Note that UIK+UIJ is the sum of the RHS terms containin 1/T1.
 C
-	  UIJ=2.0D0*RJ(I)*R(I)*R(I)*F(I)*Q(I)/T1
+	  UIJ=2.0_LDP*RJ(I)*R(I)*R(I)*F(I)*Q(I)/T1
 	  UIK=UIJ/DTAU(I)+TC(I)*RJ(K)
 	  UIJ=UIJ/DTAU(J)+TA(I)*RJ(J)
 C
 C Here ALPHA=d(-RHS)/dDTAU(J) and ALPHA=d(-RHS)/dDTAU(I)
 C
-	  ALPHA=( UIJ/DTAU(J)+(UIJ+UIK)/T1 )*(R(J)-R(I))*0.5D0
-	  BETA= ( UIK/DTAU(I)+(UIJ+UIK)/T1 )*(R(I)-R(K))*0.5D0
+	  ALPHA=( UIJ/DTAU(J)+(UIJ+UIK)/T1 )*(R(J)-R(I))*0.5_LDP
+	  BETA= ( UIK/DTAU(I)+(UIJ+UIK)/T1 )*(R(I)-R(K))*0.5_LDP
 C
-	  IF(J .NE. 1)W(I,J-1)=-ALPHA*A(J)*(R(J)-R(I))*Q(J-1)/6.0D0
-	  W(I,J)=(  ALPHA*( 1.0D0+(R(J)-R(I))/6.0D0*(A(I)-B(J)) )
-	1            -BETA/6.0D0* (R(I)-R(K))*A(I)  )*Q(J)
-	  W(I,K)=(  BETA*( 1.0D0+(R(I)-R(K))/6.0D0*(B(K)-C(I)) )
-	1            +ALPHA/6.0D0*(R(J)-R(I))*C(I)  )*Q(K)
-	  W(I,I)=(  ALPHA*( 1.0D0+(R(J)-R(I))/6.0D0*(B(I)-C(J)) )
-	1       +BETA*( 1.0D0+(R(I)-R(K))/6.0D0*(A(K)-B(I)) )  )*Q(I)
+	  IF(J .NE. 1)W(I,J-1)=-ALPHA*A(J)*(R(J)-R(I))*Q(J-1)/6.0_LDP
+	  W(I,J)=(  ALPHA*( 1.0_LDP+(R(J)-R(I))/6.0_LDP*(A(I)-B(J)) )
+	1            -BETA/6.0_LDP* (R(I)-R(K))*A(I)  )*Q(J)
+	  W(I,K)=(  BETA*( 1.0_LDP+(R(I)-R(K))/6.0_LDP*(B(K)-C(I)) )
+	1            +ALPHA/6.0_LDP*(R(J)-R(I))*C(I)  )*Q(K)
+	  W(I,I)=(  ALPHA*( 1.0_LDP+(R(J)-R(I))/6.0_LDP*(B(I)-C(J)) )
+	1       +BETA*( 1.0_LDP+(R(I)-R(K))/6.0_LDP*(A(K)-B(I)) )  )*Q(I)
 	1       -R(I)*R(I)*(ZETA(I)+THETA(I)*RJ(I))/CHI(I)/Q(I)
-	  IF(K .NE. ND)W(I,K+1)=BETA*C(K)*(R(I)-R(K))*Q(K+1)/6.0D0
+	  IF(K .NE. ND)W(I,K+1)=BETA*C(K)*(R(I)-R(K))*Q(K+1)/6.0_LDP
 	END DO
 C
 	UIJ=F(ND)*R(ND)*R(ND)*RJ(ND)/DTAU(ND-1)+TA(ND)*RJ(ND-1)
-	ALPHA=0.5D0*(R(ND-1)-R(ND))*UIJ/DTAU(ND-1)
-	W(ND,ND-2)=-ALPHA*Q(ND-2)*(R(ND-1)-R(ND))*A(ND-1)/6.0D0
+	ALPHA=0.5_LDP*(R(ND-1)-R(ND))*UIJ/DTAU(ND-1)
+	W(ND,ND-2)=-ALPHA*Q(ND-2)*(R(ND-1)-R(ND))*A(ND-1)/6.0_LDP
 	W(ND,ND-1)=ALPHA*Q(ND-1)*
-	1            ( 1.0D0 + (R(ND-1)-R(ND))*(A(ND)-B(ND-1))/6.0D0 )
+	1            ( 1.0_LDP + (R(ND-1)-R(ND))*(A(ND)-B(ND-1))/6.0_LDP )
 	W(ND,ND)=ALPHA*Q(ND)*
-	1            ( 1.0D0 + (R(ND-1)-R(ND))*(B(ND)-C(ND-1))/6.0D0 )
+	1            ( 1.0_LDP + (R(ND-1)-R(ND))*(B(ND)-C(ND-1))/6.0_LDP )
 C
 	IF(DIFF)THEN
-	  W(ND,ND)=W(ND,ND)-R(ND)*R(ND)*DBB/CHI(ND)/CHI(ND)/3.0D0
+	  W(ND,ND)=W(ND,ND)-R(ND)*R(ND)*DBB/CHI(ND)/CHI(ND)/3.0_LDP
 	END IF
 C
 	RETURN

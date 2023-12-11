@@ -74,7 +74,7 @@
 	  END DO
 	CLOSE(UNIT=8)
 !
-	IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
+	IF(ABS(OLDR(NDOLD)/R(ND)-1.0_LDP) .GT. 0.0001_LDP)THEN
 	  WRITE(LUER,*)'Warning - core radius not identical in REGRIDWSC'
 	  WRITE(LUER,*)'Rescaling to make Rcore identical'
 	  DO I=1,NDOLD
@@ -84,7 +84,7 @@
 	ELSE
 	  OLDR(NDOLD)=R(ND)
 	END IF
-	IF( ABS(1.0D0-OLDR(1)/R(1)) .LE. 1.0D-10 )OLDR(1)=R(1)
+	IF( ABS(1.0_LDP-OLDR(1)/R(1)) .LE. 1.0E-10_LDP )OLDR(1)=R(1)
 	IF(OLDR(2) .GE. OLDR(1))THEN
 	  WRITE(LUER,*)'Reset OLDR(1) in REGRID_T_ED but now OLDR(2) .GE. OLDR(1))'
 	  STOP

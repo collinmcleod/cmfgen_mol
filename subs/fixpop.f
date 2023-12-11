@@ -72,14 +72,14 @@ C
 	    DO J=1,NSPEC
 	      T1=T1+POP(J,L)
 	    END DO
-	    IF( T1/POPVEC(L) .GT. 1.0D-15 )GOTO 500
+	    IF( T1/POPVEC(L) .GT. 1.0E-15_LDP )GOTO 500
 	  END IF
 	  CNT(EQSPEC)=CNT(EQSPEC)+1
 C	
 	  DO K=1,NUM_BNDS
 	    DO J=1,NT
 	      DO I=EQSPEC,EQSPEC+FIX_N-1
-	        BA(I,J,K,L)=0.0D0
+	        BA(I,J,K,L)=0.0_LDP
 	      END DO
 	    END DO
 	  END DO
@@ -90,8 +90,8 @@ C
 	    K=NDIAG
 	  END IF
 	  DO I=EQSPEC,EQSPEC+FIX_N-1
-	    BA(I,I,K,L)=1.0D0
-	    STEQ(I,L)=0.0D0
+	    BA(I,I,K,L)=1.0_LDP
+	    STEQ(I,L)=0.0_LDP
 	  END DO
 C
 500	  CONTINUE

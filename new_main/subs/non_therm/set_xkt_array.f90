@@ -41,18 +41,18 @@
           x(i) = x0 +(I-1)*t1
         enddo
         dx(2:n-1) = t1
-        dx(1) = t1/2.0D0
-        dx(n) = t1/2.0D0
+        dx(1) = t1/2.0_LDP
+        dx(n) = t1/2.0_LDP
 !
 ! Logarithmic spacing and trapazoidal rule.
 ! A smaller step size is used near the maximum energy.
 !
       else
-        if (x0.eq.0.0D0) then
+        if (x0.eq.0.0_LDP) then
           write(6,*) 'x0 is zero = logarithmic grid not possible'
           stop
         endif
-        x11 = 0.99999D0*x1
+        x11 = 0.99999_LDP*x1
         t1 = log(x11/x0) / dble(n-2)
         x(n) = x1
         dx(n) = x1-x11
@@ -61,9 +61,9 @@
           x(i) = x(i+1) * exp(-t1)
         enddo
 	x(1)=x0
-        dx(1) = 0.5D0*(x(2)-x(1))
+        dx(1) = 0.5_LDP*(x(2)-x(1))
         do i=2,n-1
-          dx(i) = 0.5D0*(x(i+1)- x(i-1))
+          dx(i) = 0.5_LDP*(x(i+1)- x(i-1))
         enddo
       endif
 !

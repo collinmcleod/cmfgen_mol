@@ -82,9 +82,9 @@
 ! temperature.
 !
 	IF(INITIALIZE_ARRAYS)THEN
-	  AI_AR_CHG(:,:)=1.0D0
-	  dlnAI_AR_CHG_dlnT(:,:)=0.0D0
-	  COOL_CHG(:,:)=0.0D0
+	  AI_AR_CHG(:,:)=1.0_LDP
+	  dlnAI_AR_CHG_dlnT(:,:)=0.0_LDP
+	  COOL_CHG(:,:)=0.0_LDP
 	  INITIALIZE_ARRAYS=.FALSE.
 	  WRITE(LU,*)' '
 	  WRITE(LU,'(1X,A,ES14.4)')'Temperature/10^4 K=',T(1)
@@ -97,8 +97,8 @@
 !
 	DO J=1,N_CHG
 	  LEVEL_SET=.FALSE.
-	  G_CHG_VEC(1:ND)=0.0D0
-	  dG_CHG_VEC(1:ND)=0.0D0
+	  G_CHG_VEC(1:ND)=0.0_LDP
+	  dG_CHG_VEC(1:ND)=0.0_LDP
 	  LEVEL_SET=.FALSE.
 	  DO K=1,4
 	    IF(ID .EQ. ID_ION_CHG(J,K))THEN

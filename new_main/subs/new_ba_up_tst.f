@@ -152,7 +152,7 @@
 !
 ! dJ_CHK_FAC
 !
-	IF(dJ_CHK_FAC .LT. 1.0D-10 .OR. dJ_CHK_FAC .GT. 0.1)THEN
+	IF(dJ_CHK_FAC .LT. 1.0E-10_LDP .OR. dJ_CHK_FAC .GT. 0.1_LDP)THEN
 	  I=ERROR_LU()
 	  WRITE(I,*)'Error in BA_UPDATE_V4'
 	  WRITE(I,*)'Invalid value for dJ_CHK_FAC: dJ_CHK_FAC=',dJ_CHK_FAC
@@ -287,7 +287,7 @@ C
 	            IF(.NOT. SE(ID)$IMPURITY_SPECIES .OR. VID .EQ. ID)THEN
                       DO J=1,SE(VID)%N_SE	  	  	  !Variable
   	                JJ=SE(ID)%LNKF_TO_IV(SE(VID)%LNK_TO_F(JJ))
-	                IF( COMP_VEC(J) .GE. 0.0D0 )THEN
+	                IF( COMP_VEC(J) .GE. 0.0_LDP )THEN
 	                DO  I=1,SE(ID)%N_SE	  	  !Which S.E.
 	                  SE(ID)%BA_PAR(I,JJ,L)=SE(ID)%BA_PAR(I,JJ,L) +
 	1                           SE(ID)%QFV_R(I,L)*VJ(J,K,L)
@@ -298,7 +298,7 @@ C
 	        ELSE IF(SE(ID)%XzV_PRES)THEN
    	          DO JJ=1,SE(ID)%N_IV	  	  	  !Variable
   	            J=SE(ID)%LNK_TO_F(JJ)
-	            IF( COMP_VEC(J) .GE. 0.0D0 )THEN
+	            IF( COMP_VEC(J) .GE. 0.0_LDP )THEN
 	              DO I=1,SE(ID)%N_SE	  	  !Which S.E.
 	                 SE(ID)%BA(I,JJ,K,L)=SE(ID)%BA(I,JJ,K,L) +
 	1                          SE(ID)%QFV_R(I,L)*VJ(J,K,L)
@@ -349,7 +349,7 @@ C
 	        DO VID=ID_BEG,ID_MAX
 	          IF(K .EQ. DIAG_INDX .AND. SE(ID)%XzV_PRES)THEN
    	            DO JJ=1,SE(ID)%N_SE+2	  	  	  !Variable
-	              IF( COMP_VEC(JJ) .GE. 0.0D0 )THEN
+	              IF( COMP_VEC(JJ) .GE. 0.0_LDP )THEN
   	                J=SE(ID)%LNKTO_IV(SE(VID)%LNK_TO_F(JJ))
 	                DO  I=1,SE(ID)%N_SE	  	  !Which S.E.
 	                  SE(ID)%BA_PAR(I,JJ,L)=SE(ID)%BA_PAR(I,JJ,L)+
@@ -360,7 +360,7 @@ C
 !
 	          ELSE IF(SE(ID)%XzV_PRES)THEN
    	            DO JJ=1,SE(ID)%N_SE+2	  	  	  !Variable
-	              IF( COMP_VEC(JJ) .GE. 0.0D0 )THEN
+	              IF( COMP_VEC(JJ) .GE. 0.0_LDP )THEN
   	                J=SE(ID)%LNKTO_IV(SE(VID)%LNK_TO_F(JJ))
 	                DO  I=1,SE(ID)%N_SE	  	  !Which S.E.
 	                  SE(ID)%BA(I,JJ,K,L)=SE(ID)%BA(I,JJ,K,L)+

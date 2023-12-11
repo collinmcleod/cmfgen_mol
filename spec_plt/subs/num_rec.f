@@ -13,7 +13,7 @@ C---------------------------------------------------------------------------
       integer*4 n,m,isign,i,no2
 C      PARAMETER(NMAX=131072)
       REAL(KIND=LDP) data(NMAX), respns(NMAX)
-      REAL(KIND=LDP) :: HALF=0.5D0
+      REAL(KIND=LDP) :: HALF=0.5_LDP
       complex*16 FFT(NMAX),ANS(NMAX)
 
 
@@ -58,8 +58,8 @@ C      PARAMETER(NMAX=131072)
 
       write(*,*)'twofft'
 
-      C1=CMPLX(0.5d0,0.0d0,kind(0d0))
-      C2=CMPLX(0.0d0,-0.5d0,kind(0d0))
+      C1=CMPLX(0.5_LDP,0.0_LDP,kind(0d0))
+      C2=CMPLX(0.0_LDP,-0.5_LDP,kind(0d0))
       DO 11 J=1,N
         FFT1(J)=CMPLX(DATA1(J),DATA2(J),kind(0d0))
 11    CONTINUE
@@ -91,22 +91,22 @@ C      PARAMETER(NMAX=131072)
       integer*4 n,isign,i,i1,i2,i3,i4,n2p3
       REAL(KIND=LDP) wis,wrs
       REAL(KIND=LDP) c1,c2,h1r,h1i,h2r,h2i
-      REAL(KIND=LDP) :: HALF=0.5D0
+      REAL(KIND=LDP) :: HALF=0.5_LDP
 
       write(*,*)'realft'
 
-      THETA=6.28318530717959D0/2.0D0/DBLE(N)
-      C1=0.5d0
+      THETA=6.28318530717959_LDP/2.0_LDP/DBLE(N)
+      C1=0.5_LDP
       IF (ISIGN.EQ.1) THEN
-        C2=-0.5d0
+        C2=-0.5_LDP
         CALL FOUR1(DATA,N,+1)
       ELSE
-        C2=0.5d0
+        C2=0.5_LDP
         THETA=-THETA
       ENDIF
-      WPR=-2.0D0*SIN(HALF*THETA)**2d0
+      WPR=-2.0_LDP*SIN(HALF*THETA)**2d0
       WPI=SIN(THETA)
-      WR=1.0D0+WPR
+      WR=1.0_LDP+WPR
       WI=WPI
       N2P3=2*N+3
 
@@ -155,7 +155,7 @@ C        WIS=SNGL(WI)
       integer*4 N,NN,I,J,M,mmax,istep,isign
       REAL(KIND=LDP) data(NMAX)
       REAL(KIND=LDP) tempi,tempr
-      REAL(KIND=LDP) :: HALF=0.5D0	
+      REAL(KIND=LDP) :: HALF=0.5_LDP	
       write(*,*)'four1'
 
 
@@ -182,8 +182,8 @@ C        WIS=SNGL(WI)
       MMAX=2
 2     IF (N.GT.MMAX) THEN
         ISTEP=2*MMAX
-        THETA=6.28318530717959D0/dble(ISIGN*MMAX)
-        WPR=-2.D0*SIN(HALF*THETA)**2d0
+        THETA=6.28318530717959_LDP/dble(ISIGN*MMAX)
+        WPR=-2._LDP*SIN(HALF*THETA)**2d0
         WPI=SIN(THETA)
         WR=one
         WI=zero

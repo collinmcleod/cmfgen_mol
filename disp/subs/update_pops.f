@@ -13,7 +13,7 @@ C
 C
 	DO I=1,ND
 	  T1=(TOLD(I)/TNEW(I) )**1.5
-	  T2=HDKT*(1.0D0/TNEW(I)-1.0D0/TOLD(I))
+	  T2=HDKT*(1.0_LDP/TNEW(I)-1.0_LDP/TOLD(I))
 	  DO J=1,N
 	    T3=T1*EXP(T2*EDGE(J))
 	    HE2(J,I)=HE2(J,I)*T3

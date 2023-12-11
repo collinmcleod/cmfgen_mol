@@ -109,7 +109,7 @@
 !
 ! Calculate transfer in inward direction, I- (mu=-1)
 !
-      RAY(IP)%I_m(1)=0.0d0
+      RAY(IP)%I_m(1)=0.0_LDP
 !
 !---------------------------------------------------------------
 !
@@ -121,24 +121,24 @@
       do iz=2,ray(ip)%nz-1
 !
         t1=dtau_loc(iz-1)
-        if(t1 .gt. 0.01D0)then
+        if(t1 .gt. 0.01_LDP)then
           ee=exp(-dtau_loc(iz-1))
-          e0=1.0d0-ee
+          e0=1.0_LDP-ee
           e1=dtau_loc(iz-1)-e0
-          e2=dtau_loc(iz-1)*dtau_loc(iz-1)-2.0d0*e1
+          e2=dtau_loc(iz-1)*dtau_loc(iz-1)-2.0_LDP*e1
         else
-          e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1.0d0-0.2D0*t1*(1.0D0-t1/6.0D0*
-     1              (1.0D0-t1/7.0D0))))/3.0D0
-          e1=0.5d0*(t1*t1-e2)
+          e2=t1*t1*t1*(1.0_LDP-0.25_LDP*t1*(1.0_LDP-0.2_LDP*t1*(1.0_LDP-t1/6.0_LDP*
+     1              (1.0_LDP-t1/7.0_LDP))))/3.0_LDP
+          e1=0.5_LDP*(t1*t1-e2)
           e0=t1-e1
-          ee=1.0d0-e0
+          ee=1.0_LDP-e0
         end if
 !
-        alpha=e0+(e2-(dtau_loc(iz)+2.0d0*dtau_loc(iz-1))*e1)/(dtau_loc(iz-1)*(dtau_loc(iz)+dtau_loc(iz-1)))
+        alpha=e0+(e2-(dtau_loc(iz)+2.0_LDP*dtau_loc(iz-1))*e1)/(dtau_loc(iz-1)*(dtau_loc(iz)+dtau_loc(iz-1)))
         beta=((dtau_loc(iz)+dtau_loc(iz-1))*e1-e2)/(dtau_loc(iz-1)*dtau_loc(iz))
         gamma=(e2-dtau_loc(iz-1)*e1)/(dtau_loc(iz)*(dtau_loc(iz)+dtau_loc(iz-1)))
      	t1=alpha*source_prime(iz-1)+beta*source_prime(iz)+gamma*source_prime(iz+1)
-        if(t1 .lt. 0.0d0)then
+        if(t1 .lt. 0.0_LDP)then
 	  t1=source_prime(iz)+dtau_loc(iz)*(source_prime(iz)-source_prime(iz-1))/dtau_loc(iz-1)
      	  t1=alpha*source_prime(iz-1)+beta*source_prime(iz)+gamma*t1
 	end if
@@ -150,17 +150,17 @@
 ! source function
 !
       t1=dtau_loc(nzz-1)
-      if(t1 .gt. 0.01d0)then
+      if(t1 .gt. 0.01_LDP)then
         ee=exp(-dtau_loc(nzz-1))
-        e0=1.0d0-ee
+        e0=1.0_LDP-ee
         e1=dtau_loc(nzz-1)-e0
-        e2=dtau_loc(nzz-1)*dtau_loc(nzz-1)-2.0d0*e1
+        e2=dtau_loc(nzz-1)*dtau_loc(nzz-1)-2.0_LDP*e1
       else
-        e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1.0D0-0.2D0*t1*(1.0D0-t1/6.0D0*
-     1              (1.0D0-t1/7.0D0))))/3.0D0
-        e1=0.5d0*(t1*t1-e2)
+        e2=t1*t1*t1*(1.0_LDP-0.25_LDP*t1*(1.0_LDP-0.2_LDP*t1*(1.0_LDP-t1/6.0_LDP*
+     1              (1.0_LDP-t1/7.0_LDP))))/3.0_LDP
+        e1=0.5_LDP*(t1*t1-e2)
         e0=t1-e1
-        ee=1.0d0-e0
+        ee=1.0_LDP-e0
       end if
 !
       alpha=e0-e1/dtau_loc(nzz-1)
@@ -181,12 +181,12 @@
 !
 	ist=cur_loc+1
         iend=cur_loc+n_store
-        if(freq_store(n_store-1) .EQ. 0.0D0)THEN
+        if(freq_store(n_store-1) .EQ. 0.0_LDP)THEN
           ist=0; iend=cur_loc
         end if
         k=mod(ist,n_store)
         new_freq=freq*ray(ip)%freq_conv_fac
-	if(new_freq .ge. freq_store(k) .and. freq_store(n_store-1) .eq. 0.0D0)THEN
+	if(new_freq .ge. freq_store(k) .and. freq_store(n_store-1) .eq. 0.0_LDP)THEN
           ibound=ray(ip)%i_in_bnd_store(0)
 	else if(new_freq .GT. freq_store(k))then
           write(6,*)'Error in solve_cmf_formal_v2: invalid frequency range'
@@ -205,7 +205,7 @@
           end do
           iend=mod(iend,n_store); ist=mod(ist,n_store)
           t1=(new_freq-freq_store(iend))/(freq_store(ist)-freq_store(iend))
-          ibound=t1*ray(ip)%i_in_bnd_store(ist)+(1.0d0-t1)*ray(ip)%i_in_bnd_store(iend)
+          ibound=t1*ray(ip)%i_in_bnd_store(ist)+(1.0_LDP-t1)*ray(ip)%i_in_bnd_store(iend)
         end if
       end if
 !
@@ -246,25 +246,25 @@
       do iz=nzz-1,3,-1
 !
         t1=dtau_loc(iz)
-        if(t1 .gt. 0.01d0)then
+        if(t1 .gt. 0.01_LDP)then
           ee=exp(-dtau_loc(iz))
-          e0=1.0d0-ee
+          e0=1.0_LDP-ee
           e1=dtau_loc(iz)-e0
-          e2=dtau_loc(iz)*dtau_loc(iz)-2.0d0*e1
+          e2=dtau_loc(iz)*dtau_loc(iz)-2.0_LDP*e1
         else
-           e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1.0D0-0.2D0*t1*(1.0D0-t1/6.0D0*
-     1              (1.0D0-t1/7.0D0))))/3.0D0
-           e1=0.5d0*(t1*t1-e2)
+           e2=t1*t1*t1*(1.0_LDP-0.25_LDP*t1*(1.0_LDP-0.2_LDP*t1*(1.0_LDP-t1/6.0_LDP*
+     1              (1.0_LDP-t1/7.0_LDP))))/3.0_LDP
+           e1=0.5_LDP*(t1*t1-e2)
            e0=t1-e1
-           ee=1.0d0-e0
+           ee=1.0_LDP-e0
          end if
 !
         alpha=(e2-dtau_loc(iz)*e1)/
      *       (dtau_loc(iz-1)*(dtau_loc(iz)+dtau_loc(iz-1)))
         beta=((dtau_loc(iz)+dtau_loc(iz-1))*e1-e2)/(dtau_loc(iz-1)*dtau_loc(iz))
-        gamma=e0+(e2-(dtau_loc(iz-1)+2.0d0*dtau_loc(iz))*e1)/(dtau_loc(iz)*(dtau_loc(iz)+dtau_loc(iz-1)))
+        gamma=e0+(e2-(dtau_loc(iz-1)+2.0_LDP*dtau_loc(iz))*e1)/(dtau_loc(iz)*(dtau_loc(iz)+dtau_loc(iz-1)))
         t1=alpha*source_prime(iz-1)+beta*source_prime(iz)+gamma*source_prime(iz+1)
-        if(t1 .lt. 0.0d0)then
+        if(t1 .lt. 0.0_LDP)then
 	  t1=source_prime(iz)+dtau_loc(iz-1)*(source_prime(iz)-source_prime(iz+1))/dtau_loc(iz)
      	  t1=alpha*t1+beta*source_prime(iz)+gamma*source_prime(iz+1)
 	end if
@@ -277,17 +277,17 @@
 !
       do iz=min(nzz-1,2),1,-1
         t1=dtau_loc(iz)
-        if(t1 .gt. 0.01d0)then
+        if(t1 .gt. 0.01_LDP)then
           ee=exp(-dtau_loc(iz))
-          e0=1.0d0-ee
+          e0=1.0_LDP-ee
           e1=dtau_loc(iz)-e0
-          e2=dtau_loc(iz)*dtau_loc(iz)-2.0d0*e1
+          e2=dtau_loc(iz)*dtau_loc(iz)-2.0_LDP*e1
         else
-          e2=t1*t1*t1*(1.0D0-0.25D0*t1*(1.0d0-0.2D0*t1*(1.0D0-t1/6.0D0*
-     1                (1.0D0-t1/7.0D0))))/3.0D0
-          e1=0.5d0*(t1*t1-e2)
+          e2=t1*t1*t1*(1.0_LDP-0.25_LDP*t1*(1.0_LDP-0.2_LDP*t1*(1.0_LDP-t1/6.0_LDP*
+     1                (1.0_LDP-t1/7.0_LDP))))/3.0_LDP
+          e1=0.5_LDP*(t1*t1-e2)
           e0=t1-e1
-          ee=1.0d0-e0
+          ee=1.0_LDP-e0
         end if
 !
         beta=e1/dtau_loc(iz)

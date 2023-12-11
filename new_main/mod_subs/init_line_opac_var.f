@@ -39,10 +39,10 @@
 ! for each line (JBAR_SIM).
 !
 	  DO I=1,ND
-	    ZNET_SIM(I,SIM_INDX)=0.0D0
-	    JBAR_SIM(I,SIM_INDX)=0.0D0
+	    ZNET_SIM(I,SIM_INDX)=0.0_LDP
+	    JBAR_SIM(I,SIM_INDX)=0.0_LDP
 	  END DO
-	  LINE_QW_SUM(SIM_INDX)=0.0D0
+	  LINE_QW_SUM(SIM_INDX)=0.0_LDP
 !
 ! Decide if line is weak, and hence whether we can iterate on the net rates
 ! rather than use a full linearization.
@@ -51,9 +51,9 @@
 !
 ! Compute optical depth at line center.
 !
-	    T1=1.0D-15/1.77245385095516D0		!1.0D-15/SQRT(PI)
-	    NU_DOP=FL_SIM(SIM_INDX)*12.85D0*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
-	1                        (VTURB/12.85D0)**2 )/2.998D+05
+	    T1=1.0E-15_LDP/1.77245385095516_LDP		!1.0D-15/SQRT(PI)
+	    NU_DOP=FL_SIM(SIM_INDX)*12.85_LDP*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
+	1                        (VTURB/12.85_LDP)**2 )/2.998E+05_LDP
 	    T2=T1/NU_DOP
 	    WEAK_LINE(SIM_INDX)=.TRUE.
 	    DO I=1,ND
@@ -147,17 +147,17 @@ C not already in use by another line.
 C
 	    J=LOW_POINTER(SIM_INDX)
 	    IF(VAR_IN_USE_CNT(J) .EQ. 1)THEN	  !Just this line using store.
-	      TX(:,:,J)=0.0D0
-	      TVX(:,:,J)=0.0D0
-	      IF(ACCURATE)TX_EXT(:,:,J)=0.0D0
-	      IF(ACCURATE)TVX_EXT(:,:,J)=0.0D0
+	      TX(:,:,J)=0.0_LDP
+	      TVX(:,:,J)=0.0_LDP
+	      IF(ACCURATE)TX_EXT(:,:,J)=0.0_LDP
+	      IF(ACCURATE)TVX_EXT(:,:,J)=0.0_LDP
 	    END IF
 	    J=UP_POINTER(SIM_INDX)
 	    IF(VAR_IN_USE_CNT(J) .EQ. 1)THEN	  !Just this line using store.
-	      TX(:,:,J)=0.0D0
-	      TVX(:,:,J)=0.0D0
-	      IF(ACCURATE)TX_EXT(:,:,J)=0.0D0
-	      IF(ACCURATE)TVX_EXT(:,:,J)=0.0D0
+	      TX(:,:,J)=0.0_LDP
+	      TVX(:,:,J)=0.0_LDP
+	      IF(ACCURATE)TX_EXT(:,:,J)=0.0_LDP
+	      IF(ACCURATE)TVX_EXT(:,:,J)=0.0_LDP
 	    END IF
 C
 C Zero the appropriate dCHIL and dETAL matrices in dZ, since we will no
@@ -165,16 +165,16 @@ C longer be including the variation of the deleted line.
 C
 	    J=LOW_POINTER(SIM_INDX)
 	    IF(VAR_IN_USE_CNT(J) .EQ. 1)THEN	  !Just this line using store.
-	      dZ(J,:,:,:)=0.0D0		!NM,NUM_BANDS,ND,MAX_SIM
+	      dZ(J,:,:,:)=0.0_LDP		!NM,NUM_BANDS,ND,MAX_SIM
 	    END IF
 	    J=UP_POINTER(SIM_INDX)
 	    IF(VAR_IN_USE_CNT(J) .EQ. 1)THEN	  !Just this line using store.
-	      dZ(J,:,:,:)=0.0D0		!NM,NUM_BANDS,ND,MAX_SIM
+	      dZ(J,:,:,:)=0.0_LDP		!NM,NUM_BANDS,ND,MAX_SIM
 	    END IF
 C
 C Ensure dZ for this line is zeroed.
 C
-	    dZ(:,:,:,SIM_INDX)=0.0D0	!NM,NUM_BANDS,ND,MAX_SIM	
+	    dZ(:,:,:,SIM_INDX)=0.0_LDP	!NM,NUM_BANDS,ND,MAX_SIM	
 	    CALL TUNE(ITWO,'VLSETUP')
 C
 	  END IF			!Weak line

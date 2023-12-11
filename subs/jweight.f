@@ -22,23 +22,23 @@ C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
 C
-	W(:)=0.0D0
+	W(:)=0.0_LDP
 C
 	H=X(1)-X(2)
 	HN=X(2)-X(3)
 	RF=X(1)-X(3)
-	W(1)=0.5D0*H-H*H/12.0D0/RF-HN*H/RF/12.0D0
-	W(2)=0.5D0*H+H*H/RF/6.0D0*(1.0D0+0.5D0*H/HN)+HN*H/RF/12.0D0
-	W(3)=H*H/RF/12.0*(-1.0-H/HN)
+	W(1)=0.5_LDP*H-H*H/12.0_LDP/RF-HN*H/RF/12.0_LDP
+	W(2)=0.5_LDP*H+H*H/RF/6.0_LDP*(1.0_LDP+0.5_LDP*H/HN)+HN*H/RF/12.0_LDP
+	W(3)=H*H/RF/12.0_LDP*(-1.0_LDP-H/HN)
 C
 	DO I=3,N-2
 	  H=X(I-1)-X(I)
 	  RF=X(I-2)-X(I)
 	  RE=X(I-1)-X(I+1)
-	  W(I-2)=W(I-2)-H*H/12.0D0/RF	
-	  W(I-1)=W(I-1)+0.5D0*H+H*H/12.0D0/RE
-	  W(I)=W(I)+0.5D0*H+H*H/12.0D0/RF	
-	  W(I+1)=W(I+1)-H*H/12.0D0/RE
+	  W(I-2)=W(I-2)-H*H/12.0_LDP/RF	
+	  W(I-1)=W(I-1)+0.5_LDP*H+H*H/12.0_LDP/RE
+	  W(I)=W(I)+0.5_LDP*H+H*H/12.0_LDP/RF	
+	  W(I+1)=W(I+1)-H*H/12.0_LDP/RE
 	END DO
 C
 	IF(X(N) .EQ. 0)THEN
@@ -48,10 +48,10 @@ C
 	  RF=X(N-3)-X(N-1)
 	  H=X(N-2)-X(N-1)
 	  HN=X(N-1)-X(N)
-	  W(N-3)=W(N-3)-H*H/RF/12.0D0
-	  W(N-2)=W(N-2)+0.5D0*H
-	  W(N-1)=W(N-1)+0.5D0*(H+2.0D0*HN/3.0D0)+H*H/HN/6.0D0+H*H/12.0D0/RF
-	  W(N)=W(N)+2.0D0*HN/3.0D0-H*H/HN/6.0D0
+	  W(N-3)=W(N-3)-H*H/RF/12.0_LDP
+	  W(N-2)=W(N-2)+0.5_LDP*H
+	  W(N-1)=W(N-1)+0.5_LDP*(H+2.0_LDP*HN/3.0_LDP)+H*H/HN/6.0_LDP+H*H/12.0_LDP/RF
+	  W(N)=W(N)+2.0_LDP*HN/3.0_LDP-H*H/HN/6.0_LDP
 	ELSE
 C
 C For outer boundary. Extrapolate to zero assuming a quadratic
@@ -68,27 +68,27 @@ C
 	  H=X(N-2)-X(N-1)
 	  RF=X(N-3)-X(N-1)
 	  RE=X(N-2)-X(N)
-	  W(N-3)=W(N-3)-H*H/12.0D0/RF	
-	  W(N-2)=W(N-2)+0.5D0*H+H*H/12.0D0/RE
-	  W(N-1)=W(N-1)+0.5D0*H+H*H/12.0D0/RF	
-	  W(N)=W(N)-H*H/12.0D0/RE
+	  W(N-3)=W(N-3)-H*H/12.0_LDP/RF	
+	  W(N-2)=W(N-2)+0.5_LDP*H+H*H/12.0_LDP/RE
+	  W(N-1)=W(N-1)+0.5_LDP*H+H*H/12.0_LDP/RF	
+	  W(N)=W(N)-H*H/12.0_LDP/RE
 C
 C Integral from X(N-1) to zero.
 C
 	  RF=(X(N-1)-X(N))*(X(N-1)+X(N))
-	  W(N-1)=W(N-1)-X(N-1)*(X(N)*X(N)-X(N-1)*X(N-1)/3.0D0)/RF
-	  W(N)=W(N)+(X(N-1)**3)*2.0D0/RF/3.0D0
+	  W(N-1)=W(N-1)-X(N-1)*(X(N)*X(N)-X(N-1)*X(N-1)/3.0_LDP)/RF
+	  W(N)=W(N)+(X(N-1)**3)*2.0_LDP/RF/3.0_LDP
 	END IF
 C
 C Ensure that the weights have the correct normalization (shouldnt be
 C necessary.
 C
-	SUM=0.0D0
+	SUM=0.0_LDP
 	DO I=1,N
 	  SUM=SUM+W(I)
 	END DO
-	SUM=1.0D0/SUM
-	IF(ABS(SUM-1.0D0) .GT. 1.0D-12)THEN
+	SUM=1.0_LDP/SUM
+	IF(ABS(SUM-1.0_LDP) .GT. 1.0E-12_LDP)THEN
 	   LUER=ERROR_LU()
 	   WRITE(LUER,*)' Warning - weights were normalized in JWEIGHT'
 	END IF

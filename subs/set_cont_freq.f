@@ -44,10 +44,10 @@ C
 					! should only be installed for
 					! frequencies above MIN_FREQ_LEV_DIS.
 C
-        REAL(KIND=LDP), PARAMETER :: RZERO=0.0D0
-        REAL(KIND=LDP), PARAMETER :: RHALF=0.5D0
-        REAL(KIND=LDP), PARAMETER :: RONE=1.0D0
-        REAL(KIND=LDP), PARAMETER :: RTWO=2.0D0
+        REAL(KIND=LDP), PARAMETER :: RZERO=0.0_LDP
+        REAL(KIND=LDP), PARAMETER :: RHALF=0.5_LDP
+        REAL(KIND=LDP), PARAMETER :: RONE=1.0_LDP
+        REAL(KIND=LDP), PARAMETER :: RTWO=2.0_LDP
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -86,7 +86,7 @@ C
 	  STOP
 	END IF
 C
-	EQUAL_FAC=1.0D-11
+	EQUAL_FAC=1.0E-11_LDP
 	FAC = RONE + EQUAL_FAC
 C
 C SMAL_FAC is the ratio used to set the frequency spacing for
@@ -194,12 +194,12 @@ C
 	  IF(NEW_FREQ(K) .GT. MIN_FREQ_LEV_DIS)THEN
 	    K_BEG=K-1
 500	    CONTINUE
-	    dV=2.998D+05*(NEW_FREQ(K)-NEW_FREQ(K_BEG))/NEW_FREQ(K)
+	    dV=2.998E+05_LDP*(NEW_FREQ(K)-NEW_FREQ(K_BEG))/NEW_FREQ(K)
 	    IF(dV .GT. dV_LEV .AND. I .LT . N-1)THEN
 	      T1= LOG( dV/dV_LEV*(AMP_DIS-RONE) + RONE) / LOG(AMP_DIS)
 	      J=NINT(T1)-1
 	      IF(K_BEG .NE. 1)THEN
-	        IF( dV_LEV*AMP_DIS**(J+1) .LT. 2.998D+05*
+	        IF( dV_LEV*AMP_DIS**(J+1) .LT. 2.998E+05_LDP*
 	1               (NEW_FREQ(K_BEG)-NEW_FREQ(K_BEG-1))/NEW_FREQ(K))THEN
 	          K_BEG=K_BEG-1
 	          GOTO 500
@@ -208,9 +208,9 @@ C
 	      dV_NEW=dV*(AMP_DIS-RONE)/(AMP_DIS**(J+1) -RONE)
 	      UP=NEW_FREQ(K)
 	      NEW_FREQ(K_BEG+J+1)=UP
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO L=J,1,-1
-	        T1=T1+dV_NEW*(AMP_DIS**(J-L))/2.998D+05
+	        T1=T1+dV_NEW*(AMP_DIS**(J-L))/2.998E+05_LDP
 	        NEW_FREQ(K_BEG+L)=UP*(RONE-T1)
 	      END DO
 	      K=K_BEG+J+1
@@ -239,7 +239,7 @@ C
 	 FREQ(I)=NEW_FREQ(I)	
 	END DO
 	K=1
-	T1=1.0D-04
+	T1=1.0E-04_LDP
 	DO I=2,NCF
 	  IF( EQUAL(FREQ(I),FREQ(I-1), T1) )THEN
 	    K=K+1
@@ -280,7 +280,7 @@ C
 C Ensure FREQ array is zeroed (as probably will use OBSF).
 C
 	DO I=1,NCF
-	  FREQ(I)=0.0D0
+	  FREQ(I)=0.0_LDP
 	END DO
 C
 	RETURN

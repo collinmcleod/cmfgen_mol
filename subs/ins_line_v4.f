@@ -129,32 +129,32 @@
 	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 !
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 	LU_ER=ERROR_LU()
 !
 ! Check validity of some of the parameters.
 !
-	IF(R_CMF_WING_EXT .LT. 2.0D0 .OR. R_CMF_WING_EXT .GT. 20.0D0)THEN
+	IF(R_CMF_WING_EXT .LT. 2.0_LDP .OR. R_CMF_WING_EXT .GT. 20.0_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for R_CMF_WING_EXT in INS_LINE'
 	  WRITE(LU_ER,*)'R_CMF_WING_EXT=',R_CMF_WING_EXT
 	  STOP
 	END IF
-	IF(ES_WING_EXT .LT. 0.0D0 .OR. ES_WING_EXT .GT. 20000.0D0)THEN
+	IF(ES_WING_EXT .LT. 0.0_LDP .OR. ES_WING_EXT .GT. 20000.0_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for ES_WING_EXT in INS_LINE'
 	  WRITE(LU_ER,*)'ES_WING_EXT=',ES_WING_EXT
 	  STOP
 	END IF
-	IF(MAX_DOP .LT. 2.0D0 .OR. MAX_DOP .GT. 20.0D0)THEN
+	IF(MAX_DOP .LT. 2.0_LDP .OR. MAX_DOP .GT. 20.0_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for MAX_DOP in INS_LINE'
 	  WRITE(LU_ER,*)'MAX_DOP=',MAX_DOP
 	  STOP
 	END IF
-	IF(dV_CMF_PROF .LT. 1.0D0 .OR. dV_CMF_PROF .GT. 1.0D+05)THEN
+	IF(dV_CMF_PROF .LT. 1.0_LDP .OR. dV_CMF_PROF .GT. 1.0E+05_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for dV_CMF_PROF in INS_LINE'
 	  WRITE(LU_ER,*)'dV_CMF_PROF=',dV_CMF_PROF
 	  STOP
      	END IF
-	IF(dV_CMF_WING .LT. 1.0D0 .OR. dV_CMF_WING .GT. 1.0D+05)THEN
+	IF(dV_CMF_WING .LT. 1.0_LDP .OR. dV_CMF_WING .GT. 1.0E+05_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for dV_CMF_WING in INS_LINE'
 	  WRITE(LU_ER,*)'dV_CMF_WING=',dV_CMF_WING
 	  STOP
@@ -178,7 +178,7 @@
 !
 	dNU_on_NU=FRAC_DOP*V_DOP/C_KMS
 	NDOP=NINT(MAX_DOP/FRAC_DOP)
-	RES_EXTENT=(1.0D0+dNU_on_NU)**NDOP
+	RES_EXTENT=(1.0_LDP+dNU_on_NU)**NDOP
 !
 ! To avoid numerical instabilities in the iteration procedure when solving
 ! for the corrections we ensure that the frequencies bracketing a bound-free
@@ -186,8 +186,8 @@
 ! frequency to ensure this. MIN_FREQ_RAT is the minimum ratio allowed between
 ! successive frequencies.
 !
-	EDGE_SEP_FAC=0.1D0
-	MIN_FREQ_RAT=1.0D0+EDGE_SEP_FAC*dNU_on_NU
+	EDGE_SEP_FAC=0.1_LDP
+	MIN_FREQ_RAT=1.0_LDP+EDGE_SEP_FAC*dNU_on_NU
 !
 ! Define approximate edges of the resonance zone and the e.s blue wing.
 ! These limit getting frequencies unnecessarily close.
@@ -195,8 +195,8 @@
 	BLUE_WING_EXT=ES_WING_EXT+(NDOP+2)*V_DOP*FRAC_DOP	!In km/s
 	RED_WING_EXT=ES_WING_EXT+R_CMF_WING_EXT*VINF
 !
-	APP_RES_EXT=RES_EXTENT*(1.0D0+0.5D0*dNU_on_NU)	!No units
-	APP_ESBW_EXT=1.0D0+(BLUE_WING_EXT+0.2D0*dV_CMF_WING)/C_KMS
+	APP_RES_EXT=RES_EXTENT*(1.0_LDP+0.5_LDP*dNU_on_NU)	!No units
+	APP_ESBW_EXT=1.0_LDP+(BLUE_WING_EXT+0.2_LDP*dV_CMF_WING)/C_KMS
 !
 ! Determine continuum frequencies bracketing bound-free edges. We keep
 ! these in our final continuum list. To avoid numerical instabilities
@@ -207,7 +207,7 @@
 	EDGE_FREQ(1:NCF)=.FALSE.
 	I=2
 	DO WHILE (I .LT. NCF)
-	  IF( ABS(NU_CONT(I-1)/NU_CONT(I)-1.0D0) .LT. 1.0D-08)THEN
+	  IF( ABS(NU_CONT(I-1)/NU_CONT(I)-1.0_LDP) .LT. 1.0E-08_LDP)THEN
 	    IF(NU_CONT(I)/MIN_FREQ_RAT .GT. MIN_FREQ_RAT*NU_CONT(I+1))THEN
 	      EDGE_FREQ(I-1)=.TRUE.
 	      EDGE_FREQ(I)=.TRUE.
@@ -267,7 +267,7 @@
 ! If continuum frequency is within 0.2 Doppler widths of last set frequency,
 ! there is no need to use it, unless it is a bound-free edge frequency.
 !
-          ELSE IF( NU_CONT(ML) .GE. FREQ(INDX)/(1.0D0+0.2D0*dNU_on_NU)
+          ELSE IF( NU_CONT(ML) .GE. FREQ(INDX)/(1.0_LDP+0.2_LDP*dNU_on_NU)
 	1                       .AND. .NOT. EDGE_FREQ(ML) )THEN
 	     ML=ML+1			!Use current set frequency.
 !
@@ -316,7 +316,7 @@
 ! zone.
 !
 !
-	    T1=FREQ(INDX)/(1.0D0+1.1D0*dV_CMF_WING/C_KMS)
+	    T1=FREQ(INDX)/(1.0_LDP+1.1_LDP*dV_CMF_WING/C_KMS)
 	    IF(T1 .GT. NU_LINE(LN_INDX)*RES_EXTENT)THEN
 	      DO WHILE(ML .LT. NCF .AND. NU_CONT(ML) .GT. T1)
 	        IF(EDGE_FREQ(ML) .AND.
@@ -338,7 +338,7 @@
 ! Only add in extra points if resonance zone is 1.2dV_CMF_WING away.
 !
 	      I=INT( (FREQ(INDX)-NU_LINE(LN_INDX)*RES_EXTENT)/
-	1               FREQ(INDX)*C_KMS/dV_CMF_WING - 0.1D0)
+	1               FREQ(INDX)*C_KMS/dV_CMF_WING - 0.1_LDP)
 	      DELF=(FREQ(INDX)-NU_LINE(LN_INDX)*RES_EXTENT)/(I+1)
 	      DO J=1,I
 	        T1=FREQ(INDX)-DELF
@@ -365,7 +365,7 @@
 !
 	    LINE_ST_INDX(LN_INDX)=INDX+1
 	    DO I=-NDOP,NDOP
-	      T1=NU_LINE(LN_INDX)*(1.0D0+dNU_on_NU)**(-I)
+	      T1=NU_LINE(LN_INDX)*(1.0_LDP+dNU_on_NU)**(-I)
 	      DO WHILE(ML .LT. NCF .AND. NU_CONT(ML) .GT. T1)
 	        IF(EDGE_FREQ(ML) .AND.
 	1              NU_CONT(ML) .LT. FREQ(INDX)/MIN_FREQ_RAT)THEN
@@ -410,7 +410,7 @@
 	        LINE_ST_INDX(LN_INDX)=J+1
 !
 	        DO WHILE(FREQ(INDX) .GT. NU_LINE(LN_INDX)/RES_EXTENT)
-	          T1=FREQ(INDX)/(1.0D0+dNU_on_NU)
+	          T1=FREQ(INDX)/(1.0_LDP+dNU_on_NU)
 	          DO WHILE(ML .LT. NCF .AND. NU_CONT(ML) .GT. T1)
 	          IF(EDGE_FREQ(ML) .AND.
 	1                NU_CONT(ML) .LT. FREQ(INDX)/MIN_FREQ_RAT)THEN
@@ -451,27 +451,27 @@
 ! SWITCH_FREQ) we use until dV_VMF_WING, which is the spacing in the e.s. wings.
 !
 	    MIN_FREQ=NU_LINE(LST_LN_INDX)/RES_EXTENT/
-	1              (1.0D0+RED_WING_EXT/C_KMS)
+	1              (1.0_LDP+RED_WING_EXT/C_KMS)
 !
 ! The V_CMF_PROF is added to allow for some bleeding.
 !
 	    SWITCH_FREQ=NU_LINE(LST_LN_INDX)/RES_EXTENT/
-	1              (1.0D0+(2.0D0*VINF+dV_CMF_PROF)/C_KMS)
+	1              (1.0_LDP+(2.0_LDP*VINF+dV_CMF_PROF)/C_KMS)
 !
 ! We check that the minimum frequency does not extend beyond the
 ! resonance zone of the next line. As we will put a frequency at
 ! the beginning of the resonance zone, we back of a little bit.
 !
-	    T1=RES_EXTENT*(1.0D0+0.3D0*MIN(dV_CMF_PROF,dV_CMF_WING)/C_KMS)
+	    T1=RES_EXTENT*(1.0_LDP+0.3_LDP*MIN(dV_CMF_PROF,dV_CMF_WING)/C_KMS)
 	    IF(LN_INDX .GT. N_LINES)THEN
 	    ELSE IF(MIN_FREQ .LT. NU_LINE(LN_INDX)*T1)THEN
 	      MIN_FREQ=NU_LINE(LN_INDX)*T1
 	    END IF
 	    DO WHILE(FREQ(INDX) .GT. MIN_FREQ)
 	      IF( FREQ(INDX) .GT. SWITCH_FREQ)THEN
-	        TEMP_FREQ=FREQ(INDX)/(1.0D0+dV_CMF_PROF/C_KMS)
+	        TEMP_FREQ=FREQ(INDX)/(1.0_LDP+dV_CMF_PROF/C_KMS)
 	      ELSE
-	        TEMP_FREQ=FREQ(INDX)/(1.0D0+dV_CMF_WING/C_KMS)
+	        TEMP_FREQ=FREQ(INDX)/(1.0_LDP+dV_CMF_WING/C_KMS)
 	      END IF
 !
 ! We need to check again, since we didn't know the frequency step size.
@@ -509,7 +509,7 @@
 ! Test for monotocity of frequencies, and determine MINIMUM frequency
 ! spacing in velocity space.
 !
-	T1=10000.0D0
+	T1=10000.0_LDP
 	DO ML=1,NFREQ-1
 	  T1=MIN( T1 , C_KMS*(FREQ(ML)-FREQ(ML+1))/FREQ(ML) )
 	  IF(FREQ(ML) .LE. FREQ(ML+1))THEN
@@ -526,7 +526,7 @@
 !
 	DO I=2,NFREQ
 	  WRITE(63,'(1X,I6,1P,2E12.4)')I,FREQ(I),
-	1            3.0D+05*(FREQ(I-1)-FREQ(I))/FREQ(I-1)
+	1            3.0E+05_LDP*(FREQ(I-1)-FREQ(I))/FREQ(I-1)
 	END DO
 !
 !	DO I=1,N_LINES

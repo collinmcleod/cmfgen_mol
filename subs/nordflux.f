@@ -37,7 +37,7 @@ C
 C
 C Compute flux distribution and luminosity (in L(sun)) of star.
 C
-	SOB(:)=0.0D0
+	SOB(:)=0.0_LDP
 	DO 8000 LS=1,NP
 	  NI=ND-(LS-NC-1)
 	  IF(LS .LE. NC)THEN
@@ -47,14 +47,14 @@ C
 	  IF(NI .LT. 2)GOTO 8000
 C
 	IF(THICK)THEN
-	  IF(P(LS) .GT. 0.0D0)THEN
-	    TOR=CHI(1)*R(1)*R(1)*(1.570796D0-ACOS(P(LS)/R(1)))/P(LS)
+	  IF(P(LS) .GT. 0.0_LDP)THEN
+	    TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	  ELSE
 	    TOR=CHI(1)*R(1)
 	  END IF
-	  IBOUND=S1*(1.0D0-EXP(-TOR))
+	  IBOUND=S1*(1.0_LDP-EXP(-TOR))
 	ELSE
-	  IBOUND=0.0D0
+	  IBOUND=0.0_LDP
 	END IF
 C
 C
@@ -68,8 +68,8 @@ C	    CALL NORDTAU(DTAU,CHI,Z,R,dCHIdr,NI)
 	      Z(I)=SQRT(R(I)*R(I)-PP)
 	    END DO
 	    DO I=1,NI-1
-	      DTAU(I)=0.5D0*(Z(I)-Z(I+1))*(CHI(I)+CHI(I+1)+(Z(I)-Z(I+1))
-	1     *(dCHIdR(I+1)*Z(I+1)/R(I+1)-dCHIdR(I)*Z(I)/R(I))/6.0D0)
+	      DTAU(I)=0.5_LDP*(Z(I)-Z(I+1))*(CHI(I)+CHI(I+1)+(Z(I)-Z(I+1))
+	1     *(dCHIdR(I+1)*Z(I+1)/R(I+1)-dCHIdR(I)*Z(I)/R(I))/6.0_LDP)
 	    END DO
 	  END IF
 C
@@ -81,18 +81,18 @@ C	    IF(THICK)XM(1)=-IBOUND
 C	    CALL TCOMPD(TA,TB,TC,DTAU,DIF,LS,NC,ND,NI)
 C
 	  IF(NI .GT. 2)THEN
-	    XM(1)=0.0D0
+	    XM(1)=0.0_LDP
 	    IF(THICK)XM(1)=-IBOUND
-	    TA(1)=0.0D0
-	    TC(1)=1.0D0/DTAU(1)
-	    TB(1)=-1.0D0-TC(1)
+	    TA(1)=0.0_LDP
+	    TC(1)=1.0_LDP/DTAU(1)
+	    TB(1)=-1.0_LDP-TC(1)
 	    DO I=2,NI-1
-	      TC(I)=1.0D0/DTAU(I)
+	      TC(I)=1.0_LDP/DTAU(I)
 	    END DO
 	    DO I=2,NI-1
 	      TA(I)=TC(I-1)
-	      TB(I)=-0.5D0*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
-	      XM(I)=-SOURCE(I)*(DTAU(I-1)+DTAU(I))*0.5D0
+	      TB(I)=-0.5_LDP*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
+	      XM(I)=-SOURCE(I)*(DTAU(I-1)+DTAU(I))*0.5_LDP
 	    END DO
 C
 	    IF(LS .LE. NC .AND. DIF)THEN
@@ -101,14 +101,14 @@ C
 	      XM(NI)=DBC
 	    ELSE IF(LS .GT. NC)THEN
 	      TA(NI)=-TC(NI-1)
-	      TB(NI)=-TA(NI)+DTAU(NI-1)/2.0D0
-	      XM(NI)=0.5D0*DTAU(NI-1)*SOURCE(NI)
+	      TB(NI)=-TA(NI)+DTAU(NI-1)/2.0_LDP
+	      XM(NI)=0.5_LDP*DTAU(NI-1)*SOURCE(NI)
 	    ELSE
 	      TA(NI)=-TC(NI-1)
-	      TB(NI)=1.0D0-TA(NI)
+	      TB(NI)=1.0_LDP-TA(NI)
 	      XM(NI)=IC
 	    END IF
-	    TC(NI)=0.0D0
+	    TC(NI)=0.0_LDP
 C
 C Solve the tridiagonal system of equations.
 C
@@ -132,9 +132,9 @@ C
 	      TB(I)=(DTAU(I-1)*TC(I)+DTAU(I)*TC(I-1))
 	1           /(DTAU(I-1)+DTAU(I))
 	    END DO
-	    TB(1)=(TC(1)*(2.0D0*DTAU(1)+DTAU(2))-DTAU(1)*TC(2))
+	    TB(1)=(TC(1)*(2.0_LDP*DTAU(1)+DTAU(2))-DTAU(1)*TC(2))
 	1              /(DTAU(1)+DTAU(2))
-	    TB(NI)=(TC(NI-1)*(2.0D0*DTAU(NI-1)+DTAU(NI-2))-
+	    TB(NI)=(TC(NI-1)*(2.0_LDP*DTAU(NI-1)+DTAU(NI-2))-
 	1               DTAU(NI-1)*TC(NI-2))
 	1              /(DTAU(NI-1)+DTAU(NI-2))
 C
@@ -148,17 +148,17 @@ C
 C
 	ELSE IF(NI .EQ. 2)THEN
 	  E1=EXP(-DTAU(1))
-	  E2=1.0D0-(1.0D0-E1)/DTAU(1)
-	  E3=(1.0D0-E1)/DTAU(1)-E1
-	  IF(DTAU(1) .LT. 1.0D-03)THEN
-	    E2=DTAU(1)*0.5D0+DTAU(1)*DTAU(1)/6.0D0
-	    E3=DTAU(1)*0.5D0-DTAU(1)*DTAU(1)/3.0D0
+	  E2=1.0_LDP-(1.0_LDP-E1)/DTAU(1)
+	  E3=(1.0_LDP-E1)/DTAU(1)-E1
+	  IF(DTAU(1) .LT. 1.0E-03_LDP)THEN
+	    E2=DTAU(1)*0.5_LDP+DTAU(1)*DTAU(1)/6.0_LDP
+	    E3=DTAU(1)*0.5_LDP-DTAU(1)*DTAU(1)/3.0_LDP
 	  END IF
 C
 	  XM(2)=IBOUND*E1+SOURCE(2)*E2+SOURCE(1)*E3
-          XM(1)=0.5D0*(IBOUND+XM(2)*E1+SOURCE(1)*E2+SOURCE(2)*E3)
-	  TB(1)=XM(1)-0.5D0*IBOUND
-	  TB(2)=0.0D0
+          XM(1)=0.5_LDP*(IBOUND+XM(2)*E1+SOURCE(1)*E2+SOURCE(2)*E3)
+	  TB(1)=XM(1)-0.5_LDP*IBOUND
+	  TB(2)=0.0_LDP
 C
 	  SOB(1)=SOB(1)+TB(1)*HAQW(1,LS)
 	  SOB(2)=SOB(2)+XM(1)*HAQW(1,LS)

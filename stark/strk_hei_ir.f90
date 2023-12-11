@@ -60,14 +60,14 @@
 	REAL(KIND=LDP) TMP
 	REAL(KIND=LDP) CLIGHT,SRT
 	CHARACTER*80 STRING
-	DATA CLIGHT/2.997925D18/
-	DATA SRT/1.414213562D0/
+	DATA CLIGHT/2.997925E18_LDP/
+	DATA SRT/1.414213562_LDP/
 !
 	REAL(KIND=LDP) VOIGTN
 	EXTERNAL VOIGTN
 !
-	FT=NU_ZERO*1.D15
-	RFT=1.D0/FT
+	FT=NU_ZERO*1.E15_LDP
+	RFT=1._LDP/FT
 !
 ! Obtain profile information: At present this is slow, since it may
 ! necessitate reading the entire file. We skipe over comments, indicated
@@ -105,18 +105,18 @@
 !
 ! Now compute the profile.
 !
-	FT=NU_ZERO*1.0D15
-	RFT=1.0D0/FT
+	FT=NU_ZERO*1.0E15_LDP
+	RFT=1.0_LDP/FT
 !	
 !-----Doppler quantities
 !
 	WT=CLIGHT*RFT
 	RWT=FT/CLIGHT
 	DO IDE=1,ND
-	  TT=TE(IDE)*1.0D4
+	  TT=TE(IDE)*1.0E4_LDP
 	  EE=ED(IDE)
-	  VMOT=12.8D0*SQRT(TE(IDE)/AMASS+(VTURB(IDE)/12.85D0)**2.)/2.997925D5
-	  VMOT=1.0D0/VMOT	! (CLIGHT/(Vth+Vtur)) with Amass
+	  VMOT=12.8_LDP*SQRT(TE(IDE)/AMASS+(VTURB(IDE)/12.85_LDP)**2._LDP)/2.997925E5_LDP
+	  VMOT=1.0_LDP/VMOT	! (CLIGHT/(Vth+Vtur)) with Amass
 	  RBHZ=VMOT*RFT
 	  RBA=VMOT*RWT
 !
@@ -129,10 +129,10 @@
 	  IB=IA-1
 	  WF=(TT-STKTB_TS(IB))/(STKTB_TS(IA)-STKTB_TS(IB))
 	  IF(TT.LT.STKTB_TS(IB)) THEN
-	    WF = 0.0D0
+	    WF = 0.0_LDP
 	  ENDIF
 	  IF(TT.GT.STKTB_TS(IA)) THEN
-	    WF = 1.0D0
+	    WF = 1.0_LDP
 	  ENDIF
 !
 !-----Perturber quantities
@@ -178,12 +178,12 @@
 !-----Total shift in doppler units
 !
 	  DLS=D*RBA					
-	  FOS=1.0D0
+	  FOS=1.0_LDP
 !
 !-----Satellite components
 !
 	  X=FOS
-	  CON=5.6418958D-1*RBHZ/X
+	  CON=5.6418958E-1_LDP*RBHZ/X
 !							
 ! -----Compute profile
 !

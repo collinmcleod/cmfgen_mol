@@ -36,7 +36,7 @@
 	LOGICAL LOGX,LOGY
 !
 	REAL(KIND=LDP) ONE
-	PARAMETER (ONE=1.0D0)
+	PARAMETER (ONE=1.0_LDP)
 	INTEGER I,J,M
 	REAL(KIND=LDP) T1
 	REAL(KIND=LDP) HI,HIM1,HIP1
@@ -56,12 +56,12 @@
 	IF(LOGY)THEN
 	  DO J=1,LIN_END
 	    DO I=1,ND
-	      IF(VIN(I,J) .GT. 0.0D0)THEN
+	      IF(VIN(I,J) .GT. 0.0_LDP)THEN
 	        VARRAY(I,J)=LOG(VIN(I,J))
-	      ELSE IF(VIN(I,J) .EQ. 0.0D0)THEN
-	        VARRAY(I,J)=1.0D-60
+	      ELSE IF(VIN(I,J) .EQ. 0.0_LDP)THEN
+	        VARRAY(I,J)=1.0E-60_LDP
 	      ELSE
-	        VARRAY(I,J)=LOG(ABS(VIN(I,J)/10.0D0))
+	        VARRAY(I,J)=LOG(ABS(VIN(I,J)/10.0_LDP))
 	      END IF
 	    END DO
 	  END DO
@@ -102,12 +102,12 @@
                 DYI=SI +(SI-SIP1)*HI/(HI+HIP1)
                 DYIP1=(SI*HIP1+SIP1*HI)/(HI+HIP1)
 	        DYI=( SIGN(ONE,SI)+SIGN(ONE,DYI) )*
-	1            MIN(ABS(SI),0.5D0*ABS(DYI))
+	1            MIN(ABS(SI),0.5_LDP*ABS(DYI))
 	        DYIP1=( SIGN(ONE,SI)+SIGN(ONE,SIP1) )*
-	1            MIN(ABS(SI),ABS(SIP1),0.5D0*ABS(DYIP1))
+	1            MIN(ABS(SI),ABS(SIP1),0.5_LDP*ABS(DYIP1))
 	        T1=(QZR(M)-R(I))
-                A=(DYI+DYIP1-2.0D0*SI)/HI/HI
-	        B=(3.0D0*SI-2.0D0*DYI-DYIP1)/HI
+                A=(DYI+DYIP1-2.0_LDP*SI)/HI/HI
+	        B=(3.0_LDP*SI-2.0_LDP*DYI-DYIP1)/HI
 	        C=DYI
 	        D=VARRAY(I,J)
                 QZ(M,J)=((A*T1+B)*T1+C)*T1+D
@@ -121,12 +121,12 @@
                 DYI=(SIM1*HI+SI*HIM1)/(HIM1+HI)
                 DYIP1=SI+(SI-SIM1)*HI/(HIM1+HI)
 	        DYI=( SIGN(ONE,SIM1)+SIGN(ONE,SI) )*
-	1            MIN(ABS(SIM1),ABS(SI),0.5D0*ABS(DYI))
+	1            MIN(ABS(SIM1),ABS(SI),0.5_LDP*ABS(DYI))
 	        DYIP1=( SIGN(ONE,SI)+SIGN(ONE,DYIP1) )*
-	1            MIN(ABS(SI),0.5D0*ABS(DYIP1))
+	1            MIN(ABS(SI),0.5_LDP*ABS(DYIP1))
 	        T1=(QZR(M)-R(I))
-                A=(DYI+DYIP1-2.0D0*SI)/HI/HI
-	        B=(3.0D0*SI-2.0D0*DYI-DYIP1)/HI
+                A=(DYI+DYIP1-2.0_LDP*SI)/HI/HI
+	        B=(3.0_LDP*SI-2.0_LDP*DYI-DYIP1)/HI
 	        C=DYI
 	        D=VARRAY(I,J)
                 QZ(M,J)=((A*T1+B)*T1+C)*T1+D
@@ -147,12 +147,12 @@
 	        DYI=(SIM1*HI+SI*HIM1)/(HIM1+HI)
                 DYIP1=(SI*HIP1+SIP1*HI)/(HI+HIP1)
 	        DYI=( SIGN(ONE,SIM1)+SIGN(ONE,SI) )*
-	1            MIN(ABS(SIM1),ABS(SI),0.5D0*ABS(DYI))
+	1            MIN(ABS(SIM1),ABS(SI),0.5_LDP*ABS(DYI))
 	        DYIP1=( SIGN(ONE,SI)+SIGN(ONE,SIP1) )*
-	1            MIN(ABS(SI),ABS(SIP1),0.5D0*ABS(DYIP1))
+	1            MIN(ABS(SI),ABS(SIP1),0.5_LDP*ABS(DYIP1))
 	        T1=(QZR(M)-R(I))
-                A=(DYI+DYIP1-2.0D0*SI)/HI/HI
-	        B=(3.0D0*SI-2.0D0*DYI-DYIP1)/HI
+                A=(DYI+DYIP1-2.0_LDP*SI)/HI/HI
+	        B=(3.0_LDP*SI-2.0_LDP*DYI-DYIP1)/HI
 	        C=DYI
 	        D=VARRAY(I,J)
                 QZ(M,J)=((A*T1+B)*T1+C)*T1+D

@@ -48,7 +48,7 @@
 !
 	INTEGER NREC
 	INTEGER IOS
-	INTEGER I,L,K,IBEG
+	INTEGER I,J,L,K,IBEG
 	INTEGER IST,IEND
 	INTEGER ND
 	INTEGER LUM_STAR
@@ -65,6 +65,7 @@
 	LOGICAL USE_DECAY
 	LOGICAL READ_RATE
 	LOGICAL FIRST_TIME
+	LOGICAL OMIT
 	CHARACTER(LEN=3) XAX_VAR
 !
 	FIRST_TIME=.TRUE.
@@ -100,7 +101,7 @@
 	ALLOCATE (RATE(NREC_MAX,ND))
 	ALLOCATE (VRATE(NREC_MAX,ND))
 	ALLOCATE (dLUM(NREC_MAX,ND))
-	RATE=0.0D0; VRATE=0.0D0; dLUM=0.0D0
+	RATE=0.0_LDP; VRATE=0.0_LDP; dLUM=0.0_LDP
 !
  	FILENAME='GENCOOL_SORT'
 	CALL GEN_IN(FILENAME,'GENCOOL_SORT file with data to be plotted')
@@ -109,7 +110,7 @@
 	OPEN(UNIT=LU_RD,FILE=FILENAME,STATUS='OLD',ACTION='READ')
 !
 	  NREC=0
-	  RATE=0.0D0
+	  RATE=0.0_LDP
 	  DO IBEG=1,ND,10
 	    DO WHILE(1 .EQ. 1)
 	      READ(LU_RD,'(A)')STRING
@@ -160,6 +161,18 @@
 	WRITE(6,*)'ND=',ND
 	WRITE(6,*)'NREC=',NREC
 !
+	I=0; J=0;
+	DO L=1,NREC
+	  IF(LABEL(L) .EQ. 'AC.R(V).')I=L
+	  IF(LABEL(L) .EQ. 'AC.R(dT).')J=L
+	END DO
+	IF(I .NE. 0 .AND. J .NE. 0)THEN
+	  RATE(I,:)=RATE(I,:)+RATE(J,:)
+	  LABEL(I)='Ad. Cool.'
+	  RATE(J,:)=0.0D0
+	  WRITE(6,*)'Adiabatic terms combined'
+	END IF
+!
 ! Fix label names.
 !
 	DO L=1,NREC
@@ -193,16 +206,16 @@
 !
 	XV(1:ND)=V(1:ND)
 	XAXIS='V(km/s)'
-	IF(V(1) .GT. 10000.0D0)THEN
+	IF(V(1) .GT. 10000.0_LDP)THEN
 	  XAXIS='V(Mm/s)'
-	  XV(1:ND)=1.0D-03*V(1:ND)
+	  XV(1:ND)=1.0E-03_LDP*V(1:ND)
 	END IF
 !
 ! Determine integrated luminosities
 !
-	dLUM=0.0D0
-	T1=4.0D0*3.1459*1.0D+30
-	T2=1.0D0
+	dLUM=0.0_LDP
+	T1=4.0_LDP*3.1459_LDP*1.0E+30_LDP
+	T2=1.0_LDP
 	IF(I_DECAY .EQ. 0)T2=LSUN
 	DO L=1,NREC
 	  YV(1:ND)=T1*RATE(L,1:ND)*R(1:ND)*R(1:ND)
@@ -231,13 +244,13 @@
 	      TOTAL(1:ND)=RATE(I_DECAY,1:ND)
 	      YAXIS='Cooling rate/E[decay]'
 	    ELSE
-	      TOTAL=0.0D0
+	      TOTAL=0.0_LDP
 	      DO I=1,ND
 	        DO L=1,NREC
 	          TOTAL(I)=TOTAL(I)+ABS(RATE(L,I))
 	        END DO
 	      END DO
-	      TOTAL(1:ND)=0.5D0*TOTAL(1:ND)                !Average of heating and cooling rate
+	      TOTAL(1:ND)=0.5_LDP*TOTAL(1:ND)                !Average of heating and cooling rate
 	      YAXIS='Cooling rate/E[heat]'
 	    END IF
 	    WRITE(6,*)'Computed total cooling/heating rate'
@@ -256,9 +269,9 @@
 	  ELSE IF(PLT_OPT .EQ. 'XVEL')THEN
 	    XV(1:ND)=V(1:ND)
 	    XAXIS='V(km/s)'
-	    IF(V(1) .GT. 10000.0D0)THEN
+	    IF(V(1) .GT. 10000.0_LDP)THEN
 	      XAXIS='V(Mm/s)'
-	      XV(1:ND)=1.0D-03*V(1:ND)
+	      XV(1:ND)=1.0E-03_LDP*V(1:ND)
 	    END IF
 	  ELSE IF(PLT_OPT .EQ. 'XR')THEN
 	    XV(1:ND)=R(1:ND)/R(ND)
@@ -272,6 +285,7 @@
 	  ELSE IF(PLT_OPT .EQ. 'COOL')THEN
 	    NPLT=10
 	    CALL GEN_IN(NPLT,'Number of cooling curves to be illustrated (0 to read from file')
+	    CALL GEN_IN(OMIT,'Omit depth from plotting?')
 	    WRITE(6,'(A,A)')'X vector is ',TRIM(XAXIS)
 	    IF(XV(1) .LT. XV(ND))THEN
 	      T1=XV(1);  CALL GEN_IN(T1,'First depth for plotting')
@@ -295,20 +309,25 @@
 	    WRITE(6,*)'Deallocated TMP_RATE'
 	    ALLOCATE(TMP_RATE(NREC,IEND-IST+1))
 	    WRITE(6,*)'Allocated TMP_RATE'
-	    TMP_RATE=0.0D0; TMP_RATE=VRATE(1:NREC,IST:IEND)
+	    TMP_RATE=0.0_LDP; TMP_RATE=VRATE(1:NREC,IST:IEND)
 	    OPEN(UNIT=20,FILE='POINTER',STATUS='UNKNOWN',ACTION='WRITE',POSITION='APPEND')
 	    WRITE(20,*)NPLT
 	    DO L=1,NPLT
 	      INDX=MAXLOC(ABS(TMP_RATE))
 	      POINT(L)=INDX(1)
 	      WRITE(6,'(A,20X,ES12.4)')TRIM(LABEL(POINT(L))),VRATE(INDX(1),INDX(2))
-	      TMP_RATE(INDX(1),:)=0.0D0
+	      TMP_RATE(INDX(1),:)=0.0_LDP
 	      WRITE(20,*)TRIM(LABEL(POINT(L)))
 	    END DO
 	    DO L=1,NPLT
 	      IF(POINT(L) .NE. 0)THEN
-	        YV(1:ND)=100.0D0*RATE(POINT(L),1:ND)/TOTAL(1:ND)
-	        CALL DP_CURVE_LAB(ND,XV,YV,LABEL(L))
+	        IF(OMIT)THEN
+	          YV(1:ND-1)=100.0_LDP*RATE(POINT(L),2:ND)/TOTAL(2:ND)
+	          I=ND-1; CALL DP_CURVE_LAB(I,XV,YV,LABEL(POINT(L)))
+	        ELSE
+	          YV(1:ND)=100.0_LDP*RATE(POINT(L),1:ND)/TOTAL(1:ND)
+	          CALL DP_CURVE_LAB(ND,XV,YV,LABEL(POINT(L)))
+	        END IF
 	      END IF
 	    END DO
 !

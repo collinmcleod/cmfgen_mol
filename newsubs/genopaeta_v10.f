@@ -126,7 +126,7 @@ C Add in free-free contribution. Because SN can be dominated by elements other
 C than H and He, we now sum over all levels. To make sure that we only do this
 C one, we only include the FREE-FREE contribution for the ion when PHOT_ID is one.
 C
-	IF(ZION .EQ. 0.0D0)THEN
+	IF(ZION .EQ. 0.0_LDP)THEN
 	  I=7
 	  IF(LST_DEPTH_ONLY)THEN
 	    K=ND_LOC
@@ -164,7 +164,7 @@ C
 	  TETA1=CHIFF*ZION*ZION*TWOHCSQ
 	  DO K=K_ST,ND
 	    ALPHA=ED(K)*COR_FAC(K)*GFF_VAL(K)/SQRT(T(K))
-	    CHI(K)=CHI(K)+TCHI1*ALPHA*(1.0D0-EMHNUKT(K))
+	    CHI(K)=CHI(K)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(K))
 	    ETA(K)=ETA(K)+TETA1*ALPHA*EMHNUKT(K)
 	  END DO
 	END IF
@@ -199,21 +199,21 @@ C
 	ELSE
 	  CALL SUB_PHOT_GEN(ID,ALPHA_VEC,NU,EDGE,N,PHOT_ID,L_FALSE)
 	END IF
-	NO_NON_ZERO_PHOT=COUNT(ALPHA_VEC .GT. 0.0D0)
+	NO_NON_ZERO_PHOT=COUNT(ALPHA_VEC .GT. 0.0_LDP)
 	IF(NO_NON_ZERO_PHOT .EQ. 0)RETURN
 C
 C DIS_CONST is the constant K appearing in the expression for level dissolution.
 C A negative value for DIS_CONST implies that the cross-section is zero.
 C
-	DIS_CONST(1:N)=-1.0D0
+	DIS_CONST(1:N)=-1.0_LDP
 	IF(MOD_DO_LEV_DIS .AND. PHOT_ID .EQ. 1)THEN
 	  ZION_CUBED=ZION*ZION*ZION
 	  DO I=1,N
 	    IF(NU .LT. EDGE(I) .AND. ALPHA_VEC(I) .NE. 0)THEN
-	      NEFF=SQRT(3.289395D0*ZION*ZION/(EDGE(I)-NU))
+	      NEFF=SQRT(3.289395_LDP*ZION*ZION/(EDGE(I)-NU))
 	      IF(NEFF .GT. 2*ZION)THEN
-	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
-	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
+	        T1=MIN(1.0_LDP,16.0_LDP*NEFF/(1+NEFF)/(1+NEFF)/3.0_LDP)
+	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5_LDP
 	      END IF
 	    END IF
 	  END DO
@@ -223,7 +223,7 @@ C Compute dissolution vectors that are independent of level.
 C
 	IF(MOD_DO_LEV_DIS)THEN
 	  DO K=K_ST,ND
-	    YDIS(K)=1.091D0*(X_LEV_DIS(K)+4.0D0*(ZION-1)*A_LEV_DIS(K))*
+	    YDIS(K)=1.091_LDP*(X_LEV_DIS(K)+4.0_LDP*(ZION-1)*A_LEV_DIS(K))*
 	1                 B_LEV_DIS(K)*B_LEV_DIS(K)
 	    XDIS(K)=B_LEV_DIS(K)*X_LEV_DIS(K)
 	  END DO
@@ -241,20 +241,20 @@ C
 	TETA1=TWOHCSQ*(NU**3)
 	IF( NO_NON_ZERO_PHOT .LT. 2*(ND-K_ST+1) )THEN
 	  DO I=1,N
-	    IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0D0)THEN
+	    IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0_LDP)THEN
 	      TETA2=TETA1*ALPHA_VEC(I)
 	      DO K=K_ST,ND
 	        T1=EXP(LOG_COR_FAC(K)+LOG_HNST(I,K))
 	        CHI(K)=CHI(K)+ALPHA_VEC(I)*(HN(I,K)-T1)
 	        ETA(K)=ETA(K)+TETA2*T1
 	      END DO
-	    ELSE IF(DIS_CONST(I) .GE. 0.0D0)THEN
+	    ELSE IF(DIS_CONST(I) .GE. 0.0_LDP)THEN
 C
 C Add in BOUND-FREE contributions due to level dissolution.
 C
 	      TETA2=TETA1*ALPHA_VEC(I)
 	      DO K=K_ST,ND
-	        T1=7.782D0+XDIS(K)*DIS_CONST(I)
+	        T1=7.782_LDP+XDIS(K)*DIS_CONST(I)
 	        T2=T1/(T1+YDIS(K)*DIS_CONST(I)*DIS_CONST(I))
 	        IF(T2 .GT. PHOT_DIS_PARAMETER)THEN
 	          T1=EXP(LOG_HNST(I,K)-HDKT*NU/T(K))
@@ -272,18 +272,18 @@ C
 CC!$OMP PARALLEL PRIVATE(TMP_ETA,TMP_CHI,T1,T2,I,K)
 CC!$OMP DO
 	  DO K=K_ST,ND
-	    TMP_CHI(1:N)=0.0D0
-	    TMP_ETA(1:N)=0.0D0
+	    TMP_CHI(1:N)=0.0_LDP
+	    TMP_ETA(1:N)=0.0_LDP
 	    DO I=1,N
-	      IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0D0)THEN
+	      IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0_LDP)THEN
 	        T1=EXP(LOG_COR_FAC(K)+LOG_HNST(I,K))
 	        TMP_CHI(I)=ALPHA_VEC(I)*(HN(I,K)-T1)
 	        TMP_ETA(I)=ALPHA_VEC(I)*T1
-	      ELSE IF(DIS_CONST(I) .GE. 0.0D0)THEN
+	      ELSE IF(DIS_CONST(I) .GE. 0.0_LDP)THEN
 C
 C Add in BOUND-FREE contributions due to level dissolution.
 C
-	        T1=7.782D0+XDIS(K)*DIS_CONST(I)
+	        T1=7.782_LDP+XDIS(K)*DIS_CONST(I)
 	        T2=T1/(T1+YDIS(K)*DIS_CONST(I)*DIS_CONST(I))
 	        IF(T2 .GT. PHOT_DIS_PARAMETER)THEN
 	          T1=EXP(LOG_HNST(I,K)-HDKT*NU/T(K))

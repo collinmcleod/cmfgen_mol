@@ -50,7 +50,7 @@
 !
 	NEWNAME=TRIM(FILENAME)
 !
-	LOG_TEN=LOG(10.0D0)
+	LOG_TEN=LOG(10.0_LDP)
 !
 	  IF(DHYD(1,ND) .NE. 0)THEN
 !
@@ -85,7 +85,7 @@
 !
 ! Determine if we will output DC's in LOG format.
 !
-	      T1=1.0D0
+	      T1=1.0_LDP
 	      DO I=1,ND
 	        DO J=1,NHYD
 	          T2=LOG(HYD(J,I))-LOG_HYDLTE(J,I)
@@ -93,7 +93,7 @@
 	        END DO
 	      END DO
 	      T1=T1/LOG_TEN
-	      IF(T1 .LT. -290.0D0)THEN
+	      IF(T1 .LT. -290.0_LDP)THEN
 	        LOG_OUTPUT=.TRUE.
 	        WRITE(LU_OUT,'(/,1X,A,T40,A)')'10-Dec-2010','!Format date'
 	      ELSE
@@ -104,8 +104,8 @@
 !
 	      DO I=1,ND
 	        IF(DO_DPTH(I))THEN
-	          T1=0.0D0
-	          T2=0.0D0
+	          T1=0.0_LDP
+	          T2=0.0_LDP
 	          DO J=1,NHYD
 	            T1=T1+HYD(J,I)
 	          END DO
@@ -126,8 +126,8 @@
 	      WRITE(LU_OUT,2120)RCORE,LUM,NHYD,ND_CNT
 	      DO I=1,ND
 	        IF(DO_DPTH(I))THEN
-	          T1=0.0D0
-	          T2=0.0D0
+	          T1=0.0_LDP
+	          T2=0.0_LDP
 	          DO J=1,NHYD
 	            T1=T1+HYD(J,I)
 	          END DO
@@ -138,21 +138,21 @@
 	          WRITE(LU_OUT,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I),I
 	          DO J=1,NHYD
 	            T2=HDKT*EDGEHYD(J)
-	            CONST=HYD(J,I)*(T2**1.5)*GION/GHYD(J)/WHYD(J,I)/2.07078D-22/ED(I)/DHYD(1,I)
-	            IF(CONST .LT. 2.8)THEN
-	               TEXCITE(J)=CONST**(0.67)
+	            CONST=HYD(J,I)*(T2**1.5_LDP)*GION/GHYD(J)/WHYD(J,I)/2.07078E-22_LDP/ED(I)/DHYD(1,I)
+	            IF(CONST .LT. 2.8_LDP)THEN
+	               TEXCITE(J)=CONST**(0.67_LDP)
 	            ELSE
 	               TEXCITE(J)=LOG(CONST)
 	            END IF
 	            COUNT=0
-	            DELTA_T=1.0D+10
-	            DO WHILE( ABS(DELTA_T/TEXCITE(J)) .GT. 1.0E-08 .AND. COUNT .LT. 100 )
+	            DELTA_T=1.0E+10_LDP
+	            DO WHILE( ABS(DELTA_T/TEXCITE(J)) .GT. 1.0E-08_LDP .AND. COUNT .LT. 100 )
 	              COUNT=COUNT+1
 	              T1=SQRT(TEXCITE(J))
 	              T3=EXP(TEXCITE(J))
-	              DELTA_T=(T1*TEXCITE(J)*T3 - CONST)/T3/T1/(1.5D0+TEXCITE(J))
-	              IF(DELTA_T .GT. 0.8*TEXCITE(J))DELTA_T=0.8*TEXCITE(J)
-	              IF(DELTA_T .LT. -0.8*TEXCITE(J))DELTA_T=-0.8*TEXCITE(J)
+	              DELTA_T=(T1*TEXCITE(J)*T3 - CONST)/T3/T1/(1.5_LDP+TEXCITE(J))
+	              IF(DELTA_T .GT. 0.8_LDP*TEXCITE(J))DELTA_T=0.8_LDP*TEXCITE(J)
+	              IF(DELTA_T .LT. -0.8_LDP*TEXCITE(J))DELTA_T=-0.8_LDP*TEXCITE(J)
 	              TEXCITE(J)=TEXCITE(J)-DELTA_T
 	              IF(I .EQ. ND .AND. J .EQ. 1)THEN
 	                 WRITE(101,'(6ES14.4)')T2,CONST,TEXCITE(J),T1,T2,DELTA_T
@@ -173,8 +173,8 @@
 	      WRITE(LU_OUT,2120)RCORE,LUM,NHYD,ND_CNT
 	      DO I=1,ND
 	        IF(DO_DPTH(I))THEN
-	          T1=0.0D0
-	          T2=0.0D0
+	          T1=0.0_LDP
+	          T2=0.0_LDP
 	          DO J=1,NHYD
 	            T1=T1+HYD(J,I)
 	          END DO

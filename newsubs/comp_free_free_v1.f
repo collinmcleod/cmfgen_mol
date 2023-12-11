@@ -48,11 +48,11 @@
         T1=-HDKT*NU
         DO I=1,ND
           EMHNUKT(I)=EXP(T1/T(I))
-          CHI_FF(I)=0.0D0
-          ETA_FF(I)=0.0D0
+          CHI_FF(I)=0.0_LDP
+          ETA_FF(I)=0.0_LDP
         END DO
-	VCHI_FF=0.0D0
-	VETA_FF=0.0D0
+	VCHI_FF=0.0_LDP
+	VETA_FF=0.0_LDP
 !
 ! Add in free-free contribution. Because SN can be dominated by elements other
 ! than H and He, we now sum over all levels. To make sure that we only do this
@@ -60,7 +60,7 @@
 !
 	DO ID=1,NUM_IONS
 	  IF(.NOT. ATM(ID)%XzV_PRES)THEN
-	  ELSE IF(ATM(ID)%ZXzV .EQ. 0.0D0)THEN
+	  ELSE IF(ATM(ID)%ZXzV .EQ. 0.0_LDP)THEN
 	    POP_SUM=ATM(ID)%XzV_F(1,1:ND)
 	    I=7                                 !Used to read in data on first entry (will not be used here.)
 	    CALL DO_H0_FF(ETA_FF,CHI_FF,POP_SUM,ED,T,EMHNUKT,NU,I,ND)
@@ -79,7 +79,7 @@
 	    TETA1=CHIFF*ATM(ID)%ZXzV*ATM(ID)%ZXzV*TWOHCSQ
 	    DO I=1,ND
 	      ALPHA=ED(I)*POP_SUM(I)*GFF_VAL(I)/SQRT(T(I))
-	      CHI_FF(I)=CHI_FF(I)+TCHI1*ALPHA*(1.0D0-EMHNUKT(I))
+	      CHI_FF(I)=CHI_FF(I)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(I))
 	      ETA_FF(I)=ETA_FF(I)+TETA1*ALPHA*EMHNUKT(I)
 	    END DO
 !
@@ -87,10 +87,10 @@
 	      EQION=ATM(ID+1)%EQXzV
 	      DO I=1,ND
 	        ALPHA=POP_SUM(I)*GFF_VAL(I)/SQRT(T(I))
-	        VCHI_FF(NT-1,I)=VCHI_FF(NT-1,I)+TCHI1*ALPHA*(1.0D0-EMHNUKT(I))
+	        VCHI_FF(NT-1,I)=VCHI_FF(NT-1,I)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(I))
 	        VETA_FF(NT-1,I)=VETA_FF(NT-1,I)+TETA1*ALPHA*EMHNUKT(I)
 !
-	        ALPHA=TCHI1*ED(I)*GFF_VAL(I)*(1.0D0-EMHNUKT(I))/SQRT(T(I))
+	        ALPHA=TCHI1*ED(I)*GFF_VAL(I)*(1.0_LDP-EMHNUKT(I))/SQRT(T(I))
 	        EMIS=TETA1*ED(I)*GFF_VAL(I)*EMHNUKT(I)/SQRT(T(I))
 	        DO L=1,ATM(ID+1)%NXzV
 	           K=EQION+L-1
@@ -100,8 +100,8 @@
 !
 	        HNUONKT=HDKT*NU/T(I)
 	        ALPHA=ED(I)*POP_SUM(I)*GFF_VAL(I)/SQRT(T(I))/T(I)
-		VCHI_FF(NT,I)=VCHI_FF(NT,I)-TCHI1*ALPHA*(0.5D0+(HNUONKT-0.5D0)*EMHNUKT(I))
-		VETA_FF(NT,I)=VETA_FF(NT,I)+TETA1*ALPHA*(HNUONKT-0.5D0)*EMHNUKT(I)
+		VCHI_FF(NT,I)=VCHI_FF(NT,I)-TCHI1*ALPHA*(0.5_LDP+(HNUONKT-0.5_LDP)*EMHNUKT(I))
+		VETA_FF(NT,I)=VETA_FF(NT,I)+TETA1*ALPHA*(HNUONKT-0.5_LDP)*EMHNUKT(I)
 	      END DO
 	    END IF
 	  END IF

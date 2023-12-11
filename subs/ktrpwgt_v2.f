@@ -19,22 +19,22 @@
 	EXTERNAL ERROR_LU
 	LOGICAL, SAVE :: CHECK=.FALSE.
 !
-	W(:)=0.0D0
+	W(:)=0.0_LDP
 	DO I=1,N-1
-	  T1=X(I)*X(I)+2.0D0*X(I)*X(I+1)+X(I+1)*X(I+1)
-	  W(I)=W(I) + dX(I)*(T1+2.0D0*X(I)*X(I))/12.0D0
-	  W(I+1)=W(I+1) + dX(I)*(T1+2.0D0*X(I+1)*X(I+1))/12.0D0
+	  T1=X(I)*X(I)+2.0_LDP*X(I)*X(I+1)+X(I+1)*X(I+1)
+	  W(I)=W(I) + dX(I)*(T1+2.0_LDP*X(I)*X(I))/12.0_LDP
+	  W(I+1)=W(I+1) + dX(I)*(T1+2.0_LDP*X(I+1)*X(I+1))/12.0_LDP
 	END DO
 !
 ! Assumes that du/dmu=0 at mu=0.
 !
-	IF(X(N) .NE. 0.0D0)THEN
+	IF(X(N) .NE. 0.0_LDP)THEN
 !
 ! Integral from X(N) to 0
 !
 	  T1=( X(N)**3 )/( X(N-1)*X(N-1)-X(N)*X(N) )
-	  W(N-1)=W(N-1)-2.0D0*T1*X(N)*X(N)/15.0D0
-	  W(N)=W(N)+T1*(X(N-1)*X(N-1)/3.0D0-0.2D0*X(N)*X(N))
+	  W(N-1)=W(N-1)-2.0_LDP*T1*X(N)*X(N)/15.0_LDP
+	  W(N)=W(N)+T1*(X(N-1)*X(N-1)/3.0_LDP-0.2_LDP*X(N)*X(N))
 !
 	END IF
 !
@@ -43,26 +43,26 @@
 ! the correct answer is given for a linear variation. Because of the
 ! assumption that du/dmu=0 at mu=0 we have to fiddle with the last check.
 !
-	SUM=0.0D0
+	SUM=0.0_LDP
 	DO I=1,N
 	  SUM=SUM+W(I)
 	END DO
-	SUM=1.0D0/SUM/3.0D0
+	SUM=1.0_LDP/SUM/3.0_LDP
 !
-	XSUM=0.0D0
+	XSUM=0.0_LDP
 	DO I=1,N
 	  XSUM=XSUM+W(I)*X(I)
 	END DO
 	IF(X(N) .EQ. 0)THEN
-	  T1=0.25D0
+	  T1=0.25_LDP
 	ELSE
 	  T1=( X(N)**3 )/( X(N-1)*X(N-1)-X(N)*X(N) )
-	  T1=T1*( X(N)*(X(N-1)*X(N-1)/3.0D0-0.2D0*X(N)*X(N))
-	1          -2.0D0*X(N)*X(N)*X(N-1)/15.0D0 )
-	  T1=0.25D0*( 1.0D0-X(N)**4 ) + T1
+	  T1=T1*( X(N)*(X(N-1)*X(N-1)/3.0_LDP-0.2_LDP*X(N)*X(N))
+	1          -2.0_LDP*X(N)*X(N)*X(N-1)/15.0_LDP )
+	  T1=0.25_LDP*( 1.0_LDP-X(N)**4 ) + T1
 	END IF
 	XSUM=XSUM/T1
-	IF(ABS(XSUM-1.0D0) .GT. 1.0D-12 .OR. ABS(SUM-1.0D0) .GT. 1.0D-12)THEN
+	IF(ABS(XSUM-1.0_LDP) .GT. 1.0E-12_LDP .OR. ABS(SUM-1.0_LDP) .GT. 1.0E-12_LDP)THEN
 	  LUER=ERROR_LU()
 	  WRITE(LUER,*)' Warning - weights require normalization in KTRPWGT_V2'
 	  WRITE(LUER,*)' Expected normalized  Sum(W) is 1:  Sum(w)-1 =',SUM-1.0D0
@@ -72,7 +72,7 @@
         IF(CHECK)THEN
           WRITE(6,*)'Check on K weights in KTRPWGT_V2'
 	  WRITE(6,'(18X,A,11X,A,14X,A,21X,A,18X,A)')'MU','dMU','dMU(acc)','W','Wsum'
-	  SUM=0.0D0
+	  SUM=0.0_LDP
 	  DO I=1,N-1
 	    T1=X(I)-X(I+1)
 	    SUM=SUM+W(I)

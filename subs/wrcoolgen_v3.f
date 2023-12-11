@@ -86,7 +86,7 @@
 !
 ! Output Non-thermal cooling
 !
-	IF(SUM(NT_COOL) .NE. 0.0D0)THEN
+	IF(SUM(NT_COOL) .NE. 0.0_LDP)THEN
 	  WRITE( LU,'(/,3X,A,'' Non-thermal cooling'')' )DESC(1:L)
 	  WRITE(LU,999)(NT_COOL(J),J=MS,MF)
 	END IF
@@ -137,8 +137,8 @@
 	END IF
 !
 	DO I=MS,MF
-	  NETRR(I)=0.0D0
-	  TOTRR(I)=0.0D0
+	  NETRR(I)=0.0_LDP
+	  TOTRR(I)=0.0_LDP
 	END DO
 	IF(MS .NE. 1)WRITE(LU,'(A)')FORMFEED
 	WRITE(LU,'(/,3X,''Depth'')')

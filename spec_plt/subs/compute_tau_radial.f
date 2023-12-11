@@ -97,11 +97,11 @@
 !
 ! We now need to put verything on the same frequency grid.
 !
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 !
 !$OMP PARALLEL DO PRIVATE(TMP_FREQ, TMP_CHI, WRK_VEC, T1, I, ML, ML_END, NF_INT)
 	DO I=1,NX
-	  T1=SQRT( (1.0+NEW_VEL(I)/C_KMS)/(1.0-NEW_VEL(I)/C_KMS) )
+	  T1=SQRT( (1.0_LDP+NEW_VEL(I)/C_KMS)/(1.0_LDP-NEW_VEL(I)/C_KMS) )
 	  TMP_FREQ(1:NF)=NU(1:NF)*T1
 	  DO ML=NF,1,-1
 	   IF(TMP_FREQ(NF) .LE. NU(ML))THEN
@@ -117,17 +117,17 @@
 	END DO
 !$OMP END PARALLEL DO
 !
-	TAU(1:NF)=NEW_CHI(1,1:NF)*R(1)/10.0D0
+	TAU(1:NF)=NEW_CHI(1,1:NF)*R(1)/10.0_LDP
 !$OMP PARALLEL DO PRIVATE(ML,I)
 	DO ML=1,NF
 	  DO I=2,NX
-	    TAU(ML)=TAU(ML)+0.5D0*(NEW_R(I-1)-NEW_R(I))*(NEW_CHI(I-1,ML)+NEW_CHI(I,ML))
+	    TAU(ML)=TAU(ML)+0.5_LDP*(NEW_R(I-1)-NEW_R(I))*(NEW_CHI(I-1,ML)+NEW_CHI(I,ML))
 	    IF(NEW_VEL(I) .LT. VMIN)EXIT
 	  END DO
 	END DO
 !$OMP END PARALLEL DO
 !
-	T1=0.0D0	
+	T1=0.0_LDP	
 	DO I=2,NX
 	  IF(NEW_VEL(I) .LT. VMIN)THEN
 	    T1=NEW_VEL(I)
@@ -135,7 +135,7 @@
 	  END IF
 	END DO
 !
-	IF(T1 .EQ. 0.0D0)THEN
+	IF(T1 .EQ. 0.0_LDP)THEN
 	  WRITE(6,*)'Computed optical depth to the core'
 	ELSE
 	  WRITE(6,'(A,ES14.4,A)')'Computed optical depth down to a velcoity of ',T1,' kms'

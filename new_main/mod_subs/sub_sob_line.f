@@ -154,8 +154,8 @@ C
 	  DO SIM_INDX=1,NUM_SIM_LINES
 	    DO I=1,ND
 	      IF(NEG_OPACITY(I))THEN
-	        VB_SIM(I,SIM_INDX)=0.0D0
-	        VB_2(I)=0.0D0
+	        VB_SIM(I,SIM_INDX)=0.0_LDP
+	        VB_2(I)=0.0_LDP
 	      END IF
 	    END DO
 	  END DO
@@ -201,7 +201,7 @@ C
 	      T1=FL_SIM(SIM_INDX)*EMLIN
 	      DO L=1,ND	  		  	!S.E. equation depth
 	        T2=ETAL_MAT(L,SIM_INDX)*BETAC_SIM(L,SIM_INDX)
-	        T3=1.0D-06*RJ(L)
+	        T3=1.0E-06_LDP*RJ(L)
 	        DO K=BNDST(L),BNDEND(L)	 	!Variable depth.
 	          LS=BND_TO_FULL(K,L)
 !**********************************
@@ -229,14 +229,14 @@ C
 	  DO SIM_INDX=1,NUM_SIM_LINES
 	    DO I=1,ND
 	      VB_SIM(I,SIM_INDX)=-JBAR(I)/ETAL_MAT(I,SIM_INDX)
-	      IF(NEG_OPACITY(I))VB_SIM(I,SIM_INDX)=0.0D0
+	      IF(NEG_OPACITY(I))VB_SIM(I,SIM_INDX)=0.0_LDP
 	      VC_SIM(I,SIM_INDX)=JBAR(I)*CHIL_MAT(I,SIM_INDX)/
 	1                 ETAL_MAT(I,SIM_INDX)/ETAL_MAT(I,SIM_INDX)
 	    END DO
 	  END DO
 	  DO I=1,ND
-	    VB_2(I)=0.0D0
-	    VC_2(I)=0.0D0
+	    VB_2(I)=0.0_LDP
+	    VC_2(I)=0.0_LDP
 	  END DO
 	END IF
 C

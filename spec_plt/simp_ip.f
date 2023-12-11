@@ -52,7 +52,7 @@
 !
 	EXTERNAL GET_INDX_DP
 !
-	ANG_TO_HZ=2.99792458D+10*1.0D-07  	!10^8/10^15
+	ANG_TO_HZ=2.99792458E+10_LDP*1.0E-07_LDP  	!10^8/10^15
 !
 !  Read in model with I(p). P is in units of 10^10 cm, NU in units
 ! of 10^15 Hz, and I(p) is in cgs units.
@@ -113,17 +113,17 @@
 !
 ! In this case we return linear axes --- usefule for SN.
 !
-	 XV(1:NP)=P(1:NP)*1.0D+10          !in cm
+	 XV(1:NP)=P(1:NP)*1.0E+10_LDP          !in cm
 !
 	IF(LAM_END .GT. LAM_ST)THEN
 !
 ! Average I(p) over frequnecy.
 !
-	  YV(:)=0.0D0
+	  YV(:)=0.0_LDP
 	  K=MIN(INDX_ST,INDX_END); J=MAX(INDX_ST,INDX_END); I=K
 	  IF(J .EQ. I)J=I+1
 	  DO K=I,J-1
-	    YV(1:NP-1)=YV(1:NP-1)+0.5D0*(IP(1:NP-1,K)+IP(1:NP-1,K+1))*
+	    YV(1:NP-1)=YV(1:NP-1)+0.5_LDP*(IP(1:NP-1,K)+IP(1:NP-1,K+1))*
 	1                                 (NU(K)-NU(K+1))
 	  END DO
 	  T1=ABS(NU(I)-NU(J))
@@ -153,20 +153,20 @@
 	IF(LAM_END .GT. LAM_ST)THEN
 	  NX=INDX_END-INDX_ST+1
 	  ALLOCATE (YV(NX))
-          ZV(1:NX)=0.0D0
+          ZV(1:NX)=0.0_LDP
           DO I=1,NCF
 	    XV(I)=ANG_TO_HZ/NU(INDX_ST+I-1)
 	    DO J=1,NP-1
-              ZV(I)=ZV(I)+0.5D0*(IP(J,INDX_ST+I-1)*P(J)+IP(J+1,INDX_ST+I-1)*
+              ZV(I)=ZV(I)+0.5_LDP*(IP(J,INDX_ST+I-1)*P(J)+IP(J+1,INDX_ST+I-1)*
 	1             P(J+1))*(P(J+1)-P(J))
             END DO
           END DO
 !
-	  DISTANCE=2.3                           !kpc
-	  PARSEC=3.0856D+18                      !cm
-	  PI=4.0D0*ATAN(1.0D0)
-	  T1=DISTANCE*1.0E+03*PARSEC
-          T1=2.0D0*PI*1.0D+23*(1.0E+10/T1)**2
+	  DISTANCE=2.3_LDP                           !kpc
+	  PARSEC=3.0856E+18_LDP                      !cm
+	  PI=4.0_LDP*ATAN(1.0_LDP)
+	  T1=DISTANCE*1.0E+03_LDP*PARSEC
+          T1=2.0_LDP*PI*1.0E+23_LDP*(1.0E+10_LDP/T1)**2
           ZV=ZV*T1
 !
 	  OPEN(UNIT=12,FILE='SPECTRUM',ACTION='WRITE',STATUS='UNKNOWN')

@@ -34,13 +34,13 @@ C
         SAVE IDLIST
 
         IF (FIRSTTIME) THEN
-          OVERHEAD=0.D0
+          OVERHEAD=0._LDP
           FIRSTTIME=.FALSE.
           DO  I=1,MAX_IDS
-              BEFORE(I)=0.D0
-              AFTER(I)=0.D0
-              CPUTOT(I)=0.D0
-              RUNTOT(I)=0.D0
+              BEFORE(I)=0._LDP
+              AFTER(I)=0._LDP
+              CPUTOT(I)=0._LDP
+              RUNTOT(I)=0._LDP
 	      IDLIST(I)=' '
           END DO
         ENDIF

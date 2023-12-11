@@ -46,7 +46,7 @@ C
 	  ID_LENGTH=LEN(LEVEL_ID(1))
 	  DO I=1,NCI
      	     J=ICHRLEN(LEVEL_ID(EQCI+I-1))
-	     K=LOG10(0.1D0+I)+1
+	     K=LOG10(0.1_LDP+I)+1
 	     IF( J+K+2 .GT. ID_LENGTH)THEN
 	       LUER=ERROR_LU()
 	       WRITE(LUER,*)'Error in SET_GM_ALL --- LEVEL_ID is too short'

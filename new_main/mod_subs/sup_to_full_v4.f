@@ -36,9 +36,9 @@
 ! and are required by SUP_TO_FULL. We first need to revise POPION.
 !
 	  DO J=1,ND
-	    POPION(J)=0.0D0
+	    POPION(J)=0.0_LDP
 	    DO I=1,NT
-	      IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
+	      IF(Z_POP(I) .GT. 0.01_LDP)POPION(J)=POPION(J)+POPS(I,J)
 	    END DO
 	  END DO
 !

@@ -31,7 +31,7 @@ C
 	  IF(NW .GT. NP)NW=NP
 	  T1=R(I)*R(I)
 	  DO 100 J=1,NW
-	    TB(J)=0.0D0
+	    TB(J)=0.0_LDP
 	    IF(R(I) .NE. P(J))TB(J)=SQRT(T1-TA(J))/R(I)
 100	  CONTINUE
 	  CALL MOMWEIGHT(TB,TC,NW)

@@ -102,10 +102,10 @@
 !
 ! Compute the total excitation energy of each level.
 !
-	TOT_ENERGY(1:NT)=0.0D0
+	TOT_ENERGY(1:NT)=0.0_LDP
 	DO ISPEC=1,NUM_SPECIES
-	  T1=0.0D0
-	  T2=0.0D0
+	  T1=0.0_LDP
+	  T2=0.0_LDP
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	    T2=T2+AVE_ENERGY(ATM(ID)%EQXzV)
 	    DO I=1,ATM(ID)%NXzV
@@ -131,7 +131,7 @@
 	1      L_TRUE,L_TRUE,L_TRUE,TIME_SEQ_NO,ND,NT,LU)
 	OLD_ED(:)=OLD_POPS(NT-1,:)
 	OLD_T(:)=OLD_POPS(NT,:)
-	OLD_POP_ATOM=0.0D0
+	OLD_POP_ATOM=0.0_LDP
 	DO I=1,ND
 	  DO J=1,NT-2
 	    OLD_POP_ATOM(I)=OLD_POP_ATOM(I)+OLD_POPS(J,I)
@@ -140,8 +140,8 @@
 !
 	DO ISPEC=1,NUM_SPECIES
 	  DO J=1,ND
-	    T1=0.0D0
-	    T2=0.0D0
+	    T1=0.0_LDP
+	    T2=0.0_LDP
 	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	      DO I=1,ATM(ID)%NXzV
 	        K=ATM(ID)%EQXzV+I-1
@@ -161,12 +161,12 @@
 ! Compute time step. The factor of 10^5 arises because R is in units of 10^10 cm, and
 ! V is in units of km/s.
 !
-	DELTA_T_SECS=1.0D+05*(R(ND)-OLD_R(ND))/V(ND)
+	DELTA_T_SECS=1.0E+05_LDP*(R(ND)-OLD_R(ND))/V(ND)
 !
 ! Compute the mean energy per atom. At first it is units of 10^15Hz.
 !
-	INT_EN(:)=0.0D0
-	OLD_INT_EN(:)=0.0D0
+	INT_EN(:)=0.0_LDP
+	OLD_INT_EN(:)=0.0_LDP
 	DO I=1,ND
 	  DO J=1,NT-2
 	     INT_EN(I)=INT_EN(I)+POPS(J,I)*TOT_ENERGY(J)
@@ -191,10 +191,10 @@
 ! in units of 10^4K.
 !
 	PI=FUN_PI()
-	EHB_CONSTANT=4.0D-10*PI
-	SCALE=1.0D+14*BOLTZMANN_CONSTANT()/4.0D0/PI
+	EHB_CONSTANT=4.0E-10_LDP*PI
+	SCALE=1.0E+14_LDP*BOLTZMANN_CONSTANT()/4.0_LDP/PI
 	DO I=1,ND
-	  EK_VEC(I)=1.5D0*SCALE*POP_ATOM(I)/DELTA_T_SECS
+	  EK_VEC(I)=1.5_LDP*SCALE*POP_ATOM(I)/DELTA_T_SECS
 	  EI_VEC(I)=SCALE*POP_ATOM(I)/DELTA_T_SECS
           P_VEC(I)=SCALE*(POP_ATOM(I)+ED(I))*T(I)/DELTA_T_SECS
 	END DO
@@ -208,7 +208,7 @@
 !
 	IF(INCL_ADIABATIC)THEN
 	  DO I=1,ND
- 	    WORK(I)=EK_VEC(I)*( (1.0D0+GAMMA(I))*T(I)- (1.0D0+OLD_GAMMA(I))*OLD_T(I) ) +
+ 	    WORK(I)=EK_VEC(I)*( (1.0_LDP+GAMMA(I))*T(I)- (1.0_LDP+OLD_GAMMA(I))*OLD_T(I) ) +
 	1           P_VEC(I)*LOG(VOL_EXP_FAC(I))
 	    STEQ_T_EHB(I)=STEQ_T_EHB(I)-EHB_CONSTANT*WORK(I)
  	    WORK(I)=WORK(I) + EI_VEC(I)*(INT_EN(I)-OLD_INT_EN(I))
@@ -247,7 +247,7 @@
 !
 	DO I=1,ND
 	  AD_CR_V(I) =P_VEC(I)*LOG(VOL_EXP_FAC(I))
-	  AD_CR_DT(I)=EK_VEC(I)*( (1.0D0+GAMMA(I))*T(I)- (1.0D0+OLD_GAMMA(I))*OLD_T(I) )
+	  AD_CR_DT(I)=EK_VEC(I)*( (1.0_LDP+GAMMA(I))*T(I)- (1.0_LDP+OLD_GAMMA(I))*OLD_T(I) )
 	END DO
 	AD_CR_V=AD_CR_V*EHB_CONSTANT
 	AD_CR_DT=AD_CR_DT*EHB_CONSTANT
@@ -270,12 +270,12 @@
 	   WRITE(7,'(A,7(7X,A7))')'     ',' Ek(ev)',' Ei(ev)','    dEk','    dEI',
 	1                    ' DEk/Dt',' DEI/Dt','?DP/Dt'
 	   DO I=1,ND
-	    T1=EK_VEC(I)*(1.0D0+GAMMA(I))*T(I)
+	    T1=EK_VEC(I)*(1.0_LDP+GAMMA(I))*T(I)
 	    T2=EI_VEC(I)*INT_EN(I)
-	    T3=EK_VEC(I)*( (1.0D0+GAMMA(I))*T(I)-(1.0D0+OLD_GAMMA(I))*OLD_T(I) )
+	    T3=EK_VEC(I)*( (1.0_LDP+GAMMA(I))*T(I)-(1.0_LDP+OLD_GAMMA(I))*OLD_T(I) )
 	    T4=EI_VEC(I)*(INT_EN(I)-OLD_INT_EN(I))
 	    WRITE(7,'(I5,8ES14.5)')I,V(I),R(I),OLD_R(I),T(I),OLD_T(I),GAMMA(I),OLD_GAMMA(I),
-	1                    (POP_ATOM(I)/OLD_POP_ATOM(I))-1.0D0
+	1                    (POP_ATOM(I)/OLD_POP_ATOM(I))-1.0_LDP
 	    WRITE(7,'(5X,7ES14.5)')1.5D0*T(I)*8.6174D-01,INT_EN(I)*8.6174D-01,T1,T2,T3,T4,
 	1                    P_VEC(I)*LOG(VOL_EXP_FAC(I))
 	   END DO
@@ -293,11 +293,11 @@
 	    WRITE(7,'(A,3(14X,A),6(3X,A))')'Depth','R','V','T',
 	1                 ' Ek(ejecta)','Ek(thermal)','E(internal)',
 	1                 '       Erad','     Enuc/s','       Enuc'
-	    T1=4*ACOS(-1.0D0)*1.0D-10
+	    T1=4*ACOS(-1.0_LDP)*1.0E-10_LDP
 	    DO I=1,ND
-	      T2=T1*EK_VEC(I)*(1.0D0+GAMMA(I))*T(I)*DELTA_T_SECS
+	      T2=T1*EK_VEC(I)*(1.0_LDP+GAMMA(I))*T(I)*DELTA_T_SECS
 	      T3=T1*EI_VEC(I)*INT_EN(I)*DELTA_T_SECS
-	      T4=4.0D+16*STEFAN_BOLTZ()*(T(I)**4)/SPEED_OF_LIGHT()
+	      T4=4.0E+16_LDP*STEFAN_BOLTZ()*(T(I)**4)/SPEED_OF_LIGHT()
 	      WRITE(7,'(I5,3ES15.5,6ES14.5)')I,R(I),V(I),T(I),0.5D+10*DENSITY(I)*(V(I)**2),T2,T3,T4,
 	1		RADIOACTIVE_DECAY_ENERGY(I),RADIOACTIVE_DECAY_ENERGY(I)*DELTA_T_SECS
 	    END DO

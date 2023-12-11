@@ -115,7 +115,7 @@
 	REAL(KIND=LDP) LAMC
 	LOGICAL AIR_LAM
 !
-	REAL(KIND=LDP), PARAMETER :: RZERO=0.0D0
+	REAL(KIND=LDP), PARAMETER :: RZERO=0.0_LDP
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: T_IN=5		!For file I/O
@@ -150,18 +150,18 @@
 ! 
 ! Set constants.
 !
-	CHIBF=2.815D-06
-	CHIFF=3.69D-29
-	HDKT=4.7994145D0
-	TWOHCSQ=0.0147452575D0
-	OPLIN=2.6540081D+08
-	EMLIN=5.27296D-03
-	OPLIN=2.6540081D+08
-	EMLIN=5.27296D-03
+	CHIBF=2.815E-06_LDP
+	CHIFF=3.69E-29_LDP
+	HDKT=4.7994145_LDP
+	TWOHCSQ=0.0147452575_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
 !
 	C_CMS=SPEED_OF_LIGHT()
-	C_KMS=1.0D-05*C_CMS
-	PI=ACOS(-1.0D0)
+	C_KMS=1.0E-05_LDP*C_CMS
+	PI=ACOS(-1.0_LDP)
 !
 ! Set defaults.
 !
@@ -176,13 +176,13 @@
 	X_UNIT='ANG'
 	Y_PLT_OPT='FNU'
 !
-	DISTANCE=1.0D0		!kpc
+	DISTANCE=1.0_LDP		!kpc
 !
 ! Conversion factor from Kev to units of 10^15 Hz.
 ! Conversion factor from Angstroms to units of 10^15 Hz.
 !
-	KEV_TO_HZ=0.241838D+03
-	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07  	!10^8/10^15
+	KEV_TO_HZ=0.241838E+03_LDP
+	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0E-07_LDP  	!10^8/10^15
 !
 !  Read in model.
 !
@@ -254,7 +254,7 @@
 	CLOSE(LU_IN)
 !
 	DO I=1,ND
-	  IF(ND .NE. ND2 .OR.  ABS(1.0D0-R(I)/R_RVTJ(I)) .GT. 1.0D-08 )THEN
+	  IF(ND .NE. ND2 .OR.  ABS(1.0_LDP-R(I)/R_RVTJ(I)) .GT. 1.0E-08_LDP )THEN
 	    WRITE(6,*)' '
 	    WRITE(6,*)' ERORR -- R in dFR_DATA not the same as in RVTJ'
 	    WRITE(6,*)' The may cause unexpected an wrong bahaviour'
@@ -267,16 +267,16 @@
 	 ALLOCATE (TA(ND))
 	 ALLOCATE (TB(ND))
 	 ALLOCATE (TC(ND))
-	 ALLOCATE (TAU_ROSS(ND)); TAU_ROSS=0.0D0
-	 ALLOCATE (TAU_FLUX(ND)); TAU_FLUX=0.0D0
-	 ALLOCATE (TAU_ES(ND));   TAU_ES=0.0D0
+	 ALLOCATE (TAU_ROSS(ND)); TAU_ROSS=0.0_LDP
+	 ALLOCATE (TAU_FLUX(ND)); TAU_FLUX=0.0_LDP
+	 ALLOCATE (TAU_ES(ND));   TAU_ES=0.0_LDP
 	 IF(ROSS_MEAN(ND) .NE. 0)THEN
 	   TA(1:ND2)=ROSS_MEAN(1:ND2)*CLUMP_FAC(1:ND2)
 	   CALL TORSCL(TAU_ROSS,TA,R,TB,TC,ND2,METHOD,TYPETM)
-	   T1=2.0D0/3.0D0
+	   T1=2.0_LDP/3.0_LDP
 	   I=GET_INDX_DP(T1,TAU_ROSS,ND2)
 	   T2=(TAU_ROSS(I+1)-T1)/(TAU_ROSS(I+1)-TAU_ROSS(I))
-	   RPHOT_ROSS=T2*R(I)+(1.0D0-T2)*R(I+1)
+	   RPHOT_ROSS=T2*R(I)+(1.0_LDP-T2)*R(I+1)
 	   INDX_RPHOT_ROSS=I
 	 END IF
 	 IF(FLUX_MEAN(ND2) .NE. 0)THEN
@@ -287,12 +287,12 @@
 	     CALL TORSCL(TAU_FLUX,TA,R,TB,TC,ND2,METHOD,TYPETM)
 	   END IF
 	 END IF
-	 TA(1:ND2)=6.65D-15*ED(1:ND2)*CLUMP_FAC(1:ND2)
+	 TA(1:ND2)=6.65E-15_LDP*ED(1:ND2)*CLUMP_FAC(1:ND2)
 	 CALL TORSCL(TAU_ES,TA,R,TB,TC,ND2,METHOD,TYPETM)
-	 T1=2.0D0/3.0D0
+	 T1=2.0_LDP/3.0_LDP
 	 I=GET_INDX_DP(T1,TAU_ES,ND2)
 	 T2=(TAU_ES(I+1)-T1)/(TAU_ES(I+1)-TAU_ES(I))
-	 RPHOT_ES=T2*R(I)+(1.0D0-T2)*R(I+1)
+	 RPHOT_ES=T2*R(I)+(1.0_LDP-T2)*R(I+1)
 	 INDX_RPHOT_ES=I
 !
 	I=MAX(ND,NCF)
@@ -364,7 +364,7 @@
 	  XV_SAV(1:ND)=LOG10(R/R(ND))
 	  XAXIS_SAV='Log R/R\d*\u)'
 	ELSE IF(X(1:3) .EQ. 'XAU')THEN
-	  XV_SAV(1:ND)=LOG10(R/1.4959787D+03)	!Recall R is in units of 10^10 cm
+	  XV_SAV(1:ND)=LOG10(R/1.4959787E+03_LDP)	!Recall R is in units of 10^10 cm
 	  XAXIS_SAV='Log R(AU)'
 	ELSE IF(X(1:5) .EQ. 'XLINR')THEN
 	  XV_SAV(1:ND)=R/R(ND)
@@ -376,15 +376,15 @@
 	  XV_SAV(1:ND)=LOG10(ED)
 	  XAXIS_SAV='Log Ne(cm\u-3\d)'
 	ELSE IF(X(1:2) .EQ. 'XV')THEN
-	  IF(V(1) .GT. 10000.0D0)THEN
-	    XV_SAV(1:ND)=1.0D-03*V
+	  IF(V(1) .GT. 10000.0_LDP)THEN
+	    XV_SAV(1:ND)=1.0E-03_LDP*V
 	    XAXIS_SAV='V(Mm\u \ds\u-1\d)'
 	  ELSE
 	    XV_SAV(1:ND)=V
 	    XAXIS_SAV='V(km\u \ds\u-1\d)'
 	  END IF
 	ELSE IF(X(1:5) .EQ. 'XROSS')THEN
-	  IF(TAU_ROSS(10) .NE. 0.0D0)THEN
+	  IF(TAU_ROSS(10) .NE. 0.0_LDP)THEN
 	    XV_SAV(1:ND)=LOG10(TAU_ROSS)
 	    XAXIS_SAV='Log \gt(Ross)'
 	  ELSE
@@ -504,7 +504,7 @@
 	ELSE IF(X(1:2) .EQ. 'OR' .OR. X(1:2) .EQ. 'OV' .OR. X(1:2) .EQ. 'OD')THEN
 	  WRITE(6,*)'Option to plot the radius for a given fractional contribution'
 	  CALL USR_OPTION(FRAC,'FRAC',' ','Fractional value')
-	  IF(FRAC .LE. 0 .OR. FRAC .GT. 1.0)THEN
+	  IF(FRAC .LE. 0 .OR. FRAC .GT. 1.0_LDP)THEN
 	    WRITE(T_OUT,*)'Invalid fractional value'
 	    GOTO 1
 	  END IF
@@ -516,7 +516,7 @@
 	  XV(1:NCF)=NU(1:NCF)
 	  DO ML=1,NCF
 	    TA(1)=0
-	    IF(ZV(ML) .GT. 0.0D0)THEN
+	    IF(ZV(ML) .GT. 0.0_LDP)THEN
 	      DO I=2,ND
 	        TA(I)=TA(I-1)+dFR(I,ML)
 	        IF(TA(I) .GT. FRAC*ZV(ML))THEN
@@ -524,17 +524,17 @@
 	          T2=TA(I)/ZV(ML)
 	          T3=(FRAC-T1)/(T2-T1)
 	          IF(X(1:2) .EQ. 'OR')THEN
-	            YV(ML)=(T3*R(I)+(1.0D0-T3)*R(I-1))/R(ND)
+	            YV(ML)=(T3*R(I)+(1.0_LDP-T3)*R(I-1))/R(ND)
 	          ELSE IF(X(1:2) .EQ. 'OD')THEN
-	            YV(ML)=(T3*I+(1.0D0-T3)*(I-1))
+	            YV(ML)=(T3*I+(1.0_LDP-T3)*(I-1))
 	          ELSE
-	            YV(ML)=1.0D-03*(T3*V(I)+(1.0D0-T3)*V(I-1))
+	            YV(ML)=1.0E-03_LDP*(T3*V(I)+(1.0_LDP-T3)*V(I-1))
 	          END IF
 	          EXIT
 	        END IF
 	      END DO
 	    ELSE
-	      YV(ML)=0.0D0
+	      YV(ML)=0.0_LDP
 	    END IF
 	  END DO
 !
@@ -546,7 +546,7 @@
 	    YAXIS='V(Mm/s)'
 	  END IF
 !
-	  T1=0.0D0; T2=0.0D0
+	  T1=0.0_LDP; T2=0.0_LDP
 	  DO ML=2,NCF
 	    T1=T1+(ZV(ML+1)+ZV(ML))*(XV(ML)-XV(ML+1))
 	    T2=T2+(YV(ML+1)*ZV(ML+1)+YV(ML)*ZV(ML))*(XV(ML)-XV(ML+1))
@@ -570,9 +570,9 @@
 	  ELSE IF(X(1:2) .EQ. 'OV')THEN
 	    VPHOT=T2/T1
 	    DO I=2,ND
-	      IF(VPHOT .GE. 0.001D0*V(I))EXIT
+	      IF(VPHOT .GE. 0.001_LDP*V(I))EXIT
 	    END DO
-	    T3=(1000.0D0*VPHOT-V(I-1))/(V(I)-V(I-1))
+	    T3=(1000.0_LDP*VPHOT-V(I-1))/(V(I)-V(I-1))
 	    RPHOT=R(I-1)+T3*(R(I)-R(I-1))
 	    WRITE(6,'(A,ES14.4,2A)')' The flux weighted photospheric  velocity is',VPHOT,' Mm/s'
 	    WRITE(6,'(A,ES14.4,2A)')' The flux weighted photospheric   radius  is',RPHOT,' 10^10 cm'
@@ -590,12 +590,12 @@
 !
 	ELSE IF(X .EQ. 'WF2')THEN
 	  CALL USR_OPTION(T1,'lam_st',' ','Start wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  T1=0.299794E+04_LDP/T1
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
 	  CALL USR_OPTION(T1,'lam_end',' ','End wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  T1=0.299794E+04_LDP/T1
           J=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
 !
@@ -603,22 +603,22 @@
 	  WRITE(30,'(1000ES14.6)')(R(L),L=1,ND)
 	  WRITE(30,'(1000ES15.7)')ANG_TO_HZ/NU(I:J+1)
 	  DO K=I,J+1
-	    TA(1:ND)=0.0D0
+	    TA(1:ND)=0.0_LDP
 	    DO ML=K-4,K+3
 	      TA(1:ND-1)=TA(1:ND-1)+(dFR(1:ND-1,ML)+dFR(1:ND-1,ML+1))*(NU(ML)-NU(ML+1))
 	    END DO
-	    TA(1:ND-1)=0.5D0*TA(1:ND-1)/(NU(K-4)-NU(K+4))
+	    TA(1:ND-1)=0.5_LDP*TA(1:ND-1)/(NU(K-4)-NU(K+4))
 	    WRITE(30,'(500ES12.4)')(TA(L),L=1,ND-1)
 	  END DO
 !
 	ELSE IF(X .EQ. 'DF2' .OR. X .EQ. 'DDF2')THEN
 	  CALL USR_OPTION(T1,'lam_st',' ','Start wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  T1=0.299794E+04_LDP/T1
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
 	  CALL USR_OPTION(T1,'lam_end',' ','End wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  T1=0.299794E+04_LDP/T1
           J=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
 !
@@ -626,24 +626,24 @@
 !
 	  XV(1:ND)=XV_SAV(1:ND)
 	  XAXIS=XAXIS_SAV
-	  YV(1:ND)=0.0D0
+	  YV(1:ND)=0.0_LDP
 	  K=MIN(I,J); J=MAX(I,J); I=K
 	  IF(J .EQ. I)J=I+1
 	  DO K=I,J-1
-	    YV(1:ND)=YV(1:ND)+0.5D0*(dFR(1:ND,K)+dFR(1:ND,K+1))*(NU(K)-NU(K+1))
+	    YV(1:ND)=YV(1:ND)+0.5_LDP*(dFR(1:ND,K)+dFR(1:ND,K+1))*(NU(K)-NU(K+1))
 	  END DO
 	  T1=ABS(NU(I)-NU(J))
 	  YV(1:ND)=YV(1:ND)/T1
 	  WRITE(6,*)'Start wavelength of interval is (AIR if > 2000A)',LAMVACAIR(NU(I))
 	  WRITE(6,*)'  End wavelength of interval is (AIR if > 2000A)',LAMVACAIR(NU(J))
 !
-	  FREQ=0.5D0*(NU(I)+NU(J))
+	  FREQ=0.5_LDP*(NU(I)+NU(J))
 	  IF(Y_PLT_OPT .EQ. 'NU_FNU')THEN
-	    T1=FREQ*1.0D-08
+	    T1=FREQ*1.0E-08_LDP
 	    YV(1:ND)=YV(1:ND)*T1
 	    YAXIS='\gvF\d\gv\u(ergs\d cm\u-2 \ds kpc\u2\d)'
 	  ELSE IF(Y_PLT_OPT .EQ. 'FLAM')THEN
-	    T1=T1*T1*1.0D-01/C_CMS
+	    T1=T1*T1*1.0E-01_LDP/C_CMS
 	    YV(1:ND)=YV(1:ND)*T1
 	    YAXIS='F\d\gl\u(ergs\d cm\u-2 \ds\u-1\da kpc\u2\d\A'
 	  ELSE IF(Y_PLT_OPT .EQ. 'FNU')THEN
@@ -661,7 +661,7 @@
 	  ELSE
 	    YAXIS='\gd'//TRIM(YAXIS)
 	    DO I=1,ND-1
-	      XV(I)=0.5D0*(XV(I+1)+XV(I))
+	      XV(I)=0.5_LDP*(XV(I+1)+XV(I))
 	    END DO
 	    WRITE(6,*)'Use SUM option in PGPLOT to get intgegrated flux'
 	    CALL CURVE(ND-1,XV,YV)
@@ -670,7 +670,7 @@
 	ELSE IF(X .EQ. 'DF' .OR. X .EQ. 'DDF')THEN
 !
 	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
-	  FREQ=0.299794D+04/T1
+	  FREQ=0.299794E+04_LDP/T1
           I=GET_INDX_DP(FREQ,NU,NCF)
 	  IF(NU(I)-FREQ .GT. FREQ-NU(I+1))I=I+1
 !
@@ -678,11 +678,11 @@
 	  XAXIS=XAXIS_SAV
 	  YV(1:ND)=dFR(1:ND,I)
 	  IF(Y_PLT_OPT .EQ. 'NU_FNU')THEN
-	    T1=FREQ*1.0D-08
+	    T1=FREQ*1.0E-08_LDP
 	    YV(1:ND)=YV(1:ND)*T1
 	    YAXIS='\gnF\dgn\u(ergs\d cm\u-2 \ds kpc\u2\d)'
 	  ELSE IF(Y_PLT_OPT .EQ. 'FLAM')THEN
-	    T1=FREQ*FREQ*1.0D-01/C_CMS
+	    T1=FREQ*FREQ*1.0E-01_LDP/C_CMS
 	    YV(1:ND)=YV(1:ND)*T1
 	    YAXIS='F\d\gn\u(ergs\d \ukpc\u^2 \dcm\u-2 \ds\u-1 \d\A\u-1\d)'
 	  ELSE IF(Y_PLT_OPT .EQ. 'FNU')THEN
@@ -699,7 +699,7 @@
 	  ELSE
 	    YAXIS='\gd'//TRIM(YAXIS)
 	    DO I=1,ND-1
-	      XV(I)=0.5D0*(XV(I+1)+XV(I))
+	      XV(I)=0.5_LDP*(XV(I+1)+XV(I))
 	    END DO
 	    WRITE(6,*)'Use SUM option in PGPLOT to get intgegrated flux'
 	    WRITE(6,*)'Use H curve to plot'
@@ -710,12 +710,12 @@
 	  FILENAME=' '
 	  CALL USR_OPTION(FILENAME,'File',' ',' ')
 !
-	  SCALE_FAC=1.0D0
+	  SCALE_FAC=1.0_LDP
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
-	  ADD_FAC=0.0D0
+	  ADD_FAC=0.0_LDP
 	  CALL USR_HIDDEN(ADD_FAC,'ADD','0.0D0',' ')
 !
-	  RAD_VEL=0.0D0
+	  RAD_VEL=0.0_LDP
 	  CALL USR_HIDDEN(RAD_VEL,'RAD_VEL','0.0D0','Radial velcoity (+ve if away)')
 !
 	  CLEAN=.FALSE.
@@ -741,7 +741,7 @@
 !
 	  IF(RAD_VEL .NE. 0)THEN
 	    DO I=1,J
-	      XV(I)=XV(I)*(1.0D0-1.0D+05*RAD_VEL/C_CMS)
+	      XV(I)=XV(I)*(1.0_LDP-1.0E+05_LDP*RAD_VEL/C_CMS)
 	    END DO
 	  END IF
 !
@@ -753,7 +753,7 @@
 	    END DO
 	    DO I=2,J-1
 	      IF(YV(I) .EQ. 0)THEN
-	        YV(I)=0.5D0*(ZV(I-1)+ZV(I+1))
+	        YV(I)=0.5_LDP*(ZV(I-1)+ZV(I+1))
 	      END IF
 	    END DO
 	  END IF
@@ -791,8 +791,8 @@
               END DO
               WRITE(6,*)IST,IEND
               DO I=IST,IEND
-                T1=0.0D0
-                YV(I)=0.0D0
+                T1=0.0_LDP
+                YV(I)=0.0_LDP
                 DO L=MAX(IST,I-K/2),MIN(IEND,I+k/2)
                   ML=L-I+K/2+1
                   T1=T1+WT(ML)
@@ -810,8 +810,8 @@
               WT(I)=FAC(K-1)/FAC(I-1)/FAC(K-I)
             END DO
             DO I=1,J
-              T1=0.0D0
-              YV(I)=0.0D0
+              T1=0.0_LDP
+              YV(I)=0.0_LDP
               DO L=MAX(1,I-K/2),MIN(J,I+k/2)
                 ML=L-I+K/2+1
                 T1=T1+WT(ML)

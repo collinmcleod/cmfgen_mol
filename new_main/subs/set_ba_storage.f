@@ -45,7 +45,7 @@
 !
 ! Will need to add an extra equation for X-rays.
 !
-      MEMORY=0.0D0
+      MEMORY=0.0_LDP
       DO ID=1,NION
 	IF(SE(ID)%XzV_PRES)THEN
 	  NX=SE(ID)%N_SE

@@ -291,7 +291,7 @@ C Thus, dZ/dCHIL and dZ/dETAL is given by the following.
 C
 	    DO I=1,ND
 	      VB(I)=-JBAR(I)/ETAL(I)
-	      IF(NEG_OPACITY(I))VB(I)=0.0D0
+	      IF(NEG_OPACITY(I))VB(I)=0.0_LDP
 	      VC(I)=JBAR(I)*CHIL(I)/ETAL(I)/ETAL(I)
 	    END DO
 C

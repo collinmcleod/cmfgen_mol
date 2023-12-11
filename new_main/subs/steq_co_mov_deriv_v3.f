@@ -62,13 +62,13 @@
 	LOGICAL VERBOSE
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 !
-	SUM(:,:)=0.0D0
+	SUM(:,:)=0.0_LDP
 	DO ID=1,NUM_IONS
-	  SE(ID)%STEQ_ADV(:)=0.0D0
-	  SE(ID)%STRT_ADV_ID(:)=0.0D0
-	  SE(ID)%END_ADV_ID(:)=0.0D0
+	  SE(ID)%STEQ_ADV(:)=0.0_LDP
+	  SE(ID)%STRT_ADV_ID(:)=0.0_LDP
+	  SE(ID)%END_ADV_ID(:)=0.0_LDP
 	END DO
-	BA_ADV_TERM(:,:)=0.0D0
+	BA_ADV_TERM(:,:)=0.0_LDP
 	IF(.NOT. INCL_DT_TERM)RETURN
 	CALL GET_VERBOSE_INFO(VERBOSE)
 	IF(VERBOSE)THEN
@@ -95,7 +95,7 @@
 ! advection terms. It should be 1 for the final model. It should only be used to
 ! help converge a model in which advection terms are very important.
 !
-	DELTA_TIME_SECS=1.0D+05*(R(ND)-OLD_R(ND))/V(ND)
+	DELTA_TIME_SECS=1.0E+05_LDP*(R(ND)-OLD_R(ND))/V(ND)
 	DERIV_CONST=RELAXATION_PARAMETER/DELTA_TIME_SECS
 !
 ! We use backward linear differencing. Since the OLD_POPS were corrected
@@ -117,7 +117,7 @@
 	          SE(ID)%STEQ(I,K)=SE(ID)%STEQ(I,K) - T1
 	          SUM(ID,K)=SUM(ID,K) + T1
 	        ELSE
-	          T1=0.0D0
+	          T1=0.0_LDP
 	        END IF
 	        IF(K .EQ. 1 .AND. VERBOSE)THEN
 	          WRITE(LU_VERB,'(I5,4ES14.6)')I,ATM(ID)%XzV(I,K),OLD_POPS(IVAR+I-1,K),T1,SUM(ID,K)
@@ -157,13 +157,13 @@
 	  ID_END=SPECIES_END_ID(ISPEC)
 	  DO K=1,ND
 	    DO ID=ID_STRT,ID_END-1
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO I=ID_STRT,ID
 	        DO J=1,ATM(I)%NXzV
 	          T1=T1+ATM(I)%XzV(J,K)
 	        END DO
 	      END DO
-	      T2=0.0D0
+	      T2=0.0_LDP
 	      DO I=ID+1,ID_END-1
 	        DO J=1,ATM(I)%NXzV
 	          T2=T2+ATM(I)%XzV(J,K)
@@ -214,7 +214,7 @@
 	        DO I=1,ATM(ID)%NXzV
 	          T1=DERIV_CONST
 	          J=ATM(ID)%EQXzV-1+I                        !ATM(ID)%F_TO_S_XzV(I)
-	          IF(.NOT. OLD_LEV_POP_AVAIL(J))T1=0.0D0
+	          IF(.NOT. OLD_LEV_POP_AVAIL(J))T1=0.0_LDP
 	          SE(ID)%BA(I,I,M,K)=SE(ID)%BA(I,I,M,K)-T1
 	        END DO		!loop over S.E. equation
 	      END DO		!loop over depth

@@ -110,8 +110,8 @@
 	  COUNT(1)=0
 	  DO I=1,ND
 	    DO J=1,NT-1
-	      IF(STEQ(J,I) .GT. 1.1)THEN
-	        STEQ(J,I)=0.999D0
+	      IF(STEQ(J,I) .GT. 1.1_LDP)THEN
+	        STEQ(J,I)=0.999_LDP
 	        COUNT(1)=COUNT(1)+1
 	      END IF
 	    END DO
@@ -135,9 +135,9 @@
 !   STEQ is +ve when the populations are to decrease.
 !   STEQ is -ve when the populations are to increase.
 !
-	DECREASE=0.0D0
+	DECREASE=0.0_LDP
 	IDEC=0
-	INCREASE=0.0D0
+	INCREASE=0.0_LDP
 	IINC=0
 	DO I=1,ND
 	  COUNT(:)=0
@@ -149,7 +149,7 @@
 	      INCREASE=STEQ(J,I)
 	      IINC=I
 	    END IF
-	    T1=1.0D+06*ABS(STEQ(J,I))+1.0D-31		!to ensure non-zero.
+	    T1=1.0E+06_LDP*ABS(STEQ(J,I))+1.0E-31_LDP		!to ensure non-zero.
 	    K=LOG10(T1)+1; K=MIN(7,K)
 	    IF(K > 0)COUNT(1:K)=COUNT(1:K)+1
 	  END DO
@@ -157,8 +157,8 @@
 	END DO
 	CLOSE(LU_SUM)
 !
-	DECREASE=100.0D0*DECREASE
-	INCREASE=100.0D0*INCREASE
+	DECREASE=100.0_LDP*DECREASE
+	INCREASE=100.0_LDP*INCREASE
 	IF(LAMBDA_IT)THEN
  	  WRITE(LUER,9000)IINC,ABS(INCREASE),'  (LAMBDA)'
 	  WRITE(LUER,9200)IDEC,DECREASE,'  (LAMBDA)'
@@ -179,22 +179,22 @@
 ! limit MAXCH to 1.0D+07 - This value does not halt program execution.
 !
 	MAXCH=-INCREASE
-	IF(DECREASE .LT. 99.999D0)THEN
-	  DECREASE=100.0D0*DECREASE/(100.0D0-DECREASE)
+	IF(DECREASE .LT. 99.999_LDP)THEN
+	  DECREASE=100.0_LDP*DECREASE/(100.0_LDP-DECREASE)
 	ELSE
-	  DECREASE=1.0D+07
+	  DECREASE=1.0E+07_LDP
 	END IF
 	MAXCH=MAX(MAXCH,DECREASE)
 !
 !Determine the largest set of changes:
 !We determine the largest NV increases, and the largest NV decreases.
 !
-	MAX_INC_VEC=0.0D0
-	MAX_DEC_VEC=0.0D0
+	MAX_INC_VEC=0.0_LDP
+	MAX_DEC_VEC=0.0_LDP
 	DO J=1,ND
 	  DO I=1,NT
 	    T1=STEQ(I,J)
-	    IF(T1 .LE. 0.0D0)THEN
+	    IF(T1 .LE. 0.0_LDP)THEN
 	      IF(T1 .LT. MAX_INC_VEC(NV))THEN
 	        DO K=NV-1,1,-1
 	          IF(T1 .GT. MAX_INC_VEC(K))THEN
@@ -208,7 +208,7 @@
 	          END IF
 	        END DO
 	      END IF
-	    ELSE IF(STEQ(I,J) .GT. 0.0D0)THEN
+	    ELSE IF(STEQ(I,J) .GT. 0.0_LDP)THEN
 	      IF(T1 .GT. MAX_DEC_VEC(NV))THEN
 	        DO K=NV-1,1,-1
 	          IF(T1 .LT. MAX_DEC_VEC(K))THEN
@@ -233,13 +233,13 @@
 !     (b) Scale the corrections > 10% down by a factor of 3 (-ve relaxation).
 !
 	DO_LEVEL_CHK=.FALSE.
-	IF(MAX_INC_VEC(NV) .GT. -0.1D0 .AND. MAX_DEC_VEC(NV) .LT. 0.1D0)DO_LEVEL_CHK=.TRUE.
+	IF(MAX_INC_VEC(NV) .GT. -0.1_LDP .AND. MAX_DEC_VEC(NV) .LT. 0.1_LDP)DO_LEVEL_CHK=.TRUE.
 !
 ! Rather than return the largest change, return the max/min of the NV correction.
 !
 	IF(DO_LEVEL_CHK)THEN
-	  MAXCH=MAX( ABS(MAX_INC_VEC(NV)), MAX_DEC_VEC(NV)/(1.0D0-MIN(MAX_DEC_VEC(NV),0.9999D0)))
-	  MAXCH=100.0D0*MAXCH
+	  MAXCH=MAX( ABS(MAX_INC_VEC(NV)), MAX_DEC_VEC(NV)/(1.0_LDP-MIN(MAX_DEC_VEC(NV),0.9999_LDP)))
+	  MAXCH=100.0_LDP*MAXCH
 	END IF
 	WRITE(6,*)'Maximm changes as returned by SOLVEBA_V9 is',MAXCH
 	WRITE(6,'(A,10ES10.2)')' DEC_VEC: ',MAX_DEC_VEC(1:10)
@@ -263,15 +263,15 @@
 !**********************************************************************************
 !**********************************************************************************
 
-	IF(CHANGE_LIM .LE. 1.0D0)THEN
+	IF(CHANGE_LIM .LE. 1.0_LDP)THEN
           WRITE(LUER,'(A,1PE12.4)')' Error in SOLVEBA_V9'
           WRITE(LUER,'(A,1PE12.4)')' Maximum change for normal iteration must be > 1.'
 	  STOP
 	END IF
-	BIG_LIM=(CHANGE_LIM-1.0D0)/CHANGE_LIM
+	BIG_LIM=(CHANGE_LIM-1.0_LDP)/CHANGE_LIM
 !	LIT_LIM=-CHANGE_LIM
-	LIT_LIM=1.0D0-CHANGE_LIM
-	MINSCALE=1.0D0
+	LIT_LIM=1.0_LDP-CHANGE_LIM
+	MINSCALE=1.0_LDP
 	IF(SCALE_OPT(1:5) .EQ. 'LOCAL')THEN
 	  DO I=1,ND
 	    T1=BIG_LIM			!Prevents division by zero and insures
@@ -284,16 +284,16 @@
 !
 ! Limit the change in T to a maximum of 20%, and ensure T > T_MIN.
 !
-	    T1=0.2D0
+	    T1=0.2_LDP
 	    T3=MAX( T1,ABS(STEQ(NT,I)) )
 	    SCALE=MIN( T1/T3,SCALE )
 	    IF(STEQ(NT,I) .NE. 0 .AND. POPS(NT,I) .GT. T_MIN .AND.
-	1                      POPS(NT,I)*(1.0D0-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
-	      SCALE=(1.0D0-T_MIN/POPS(NT,I))/STEQ(NT,I)
+	1                      POPS(NT,I)*(1.0_LDP-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
+	      SCALE=(1.0_LDP-T_MIN/POPS(NT,I))/STEQ(NT,I)
 	    END IF
 !
 	    DO J=1,NT
-	      POPS(J,I)=POPS(J,I)*(1.0D0-STEQ(J,I)*SCALE)
+	      POPS(J,I)=POPS(J,I)*(1.0_LDP-STEQ(J,I)*SCALE)
 	    END DO
 	    MINSCALE=MIN(SCALE,MINSCALE)
 	  END DO
@@ -305,21 +305,21 @@
 	  DO I=1,ND
 	    DO J=1,NT-1
 	      IF(STEQ(J,I) .GT. BIG_LIM)THEN
-	        POPS(J,I)=POPS(J,I)*(1.0D0-BIG_LIM)
+	        POPS(J,I)=POPS(J,I)*(1.0_LDP-BIG_LIM)
 	        MINSCALE=MIN( BIG_LIM/STEQ(J,I),MINSCALE )
 	      ELSE IF(STEQ(J,I) .LT. LIT_LIM)THEN
-	        POPS(J,I)=POPS(J,I)*(1.0D0-LIT_LIM)
+	        POPS(J,I)=POPS(J,I)*(1.0_LDP-LIT_LIM)
 	        MINSCALE=MIN( LIT_LIM/STEQ(J,I),MINSCALE )
 	      ELSE
-	        POPS(J,I)=POPS(J,I)*(1.0D0-STEQ(J,I))
+	        POPS(J,I)=POPS(J,I)*(1.0_LDP-STEQ(J,I))
 	      END IF
 	    END DO
 	    IF(POPS(NT,I) .LT. T_MIN)POPS(NT,I)=T_MIN
 !
 ! Limit T to a 20% change if it is a variable.
 !
-	    SCALE=0.2D0/MAX( 0.2D0,ABS(STEQ(NT,I)) )
-	    POPS(NT,I)=POPS(NT,I)*(1.0D0-STEQ(NT,I)*SCALE)
+	    SCALE=0.2_LDP/MAX( 0.2_LDP,ABS(STEQ(NT,I)) )
+	    POPS(NT,I)=POPS(NT,I)*(1.0_LDP-STEQ(NT,I)*SCALE)
 	    MINSCALE=MIN(SCALE,MINSCALE)
 	  END DO
 !
@@ -381,24 +381,24 @@
 	  SCALE=MIN( BIG_LIM/T1, LIT_LIM/T2)
 	  DO I=1,ND
 	    IF(STEQ(NT,I) .NE. 0 .AND. POPS(NT,I) .GT. T_MIN .AND.
-	1                      POPS(NT,I)*(1.0D0-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
-	        SCALE=(1.0D0-T_MIN/POPS(NT,I))/STEQ(NT,I)
+	1                      POPS(NT,I)*(1.0_LDP-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
+	        SCALE=(1.0_LDP-T_MIN/POPS(NT,I))/STEQ(NT,I)
 	    END IF
 	  END DO
 !
 ! Limit the change in T to a maximum of 20%.
 !
 	  DO I=1,ND
-	    T3=MAX( 0.2D0,ABS(STEQ(NT,I)) )
+	    T3=MAX( 0.2_LDP,ABS(STEQ(NT,I)) )
 	  END DO
-	  SCALE=MIN( 0.2D0/T3,SCALE )
+	  SCALE=MIN( 0.2_LDP/T3,SCALE )
 	  WRITE(LUER,'(A,1PE12.4)')' The value of scale is:',SCALE
 !
 ! Update the population levels (and the temperature) .
 !
 	  DO I=1,ND
 	    DO J=1,NT
-	      POPS(J,I)=POPS(J,I)*(1.0D0-STEQ(J,I)*SCALE)
+	      POPS(J,I)=POPS(J,I)*(1.0_LDP-STEQ(J,I)*SCALE)
 	    END DO
 	  END DO
 	END IF

@@ -89,14 +89,14 @@
 	1           'Scale Height (in R*) of photosphere')
 	    CALL RD_STORE_DBLE(V_BETA1,'BETA',L_TRUE,
 	1           'Speed of velocity Law')
-	    V_EPPS1=1.0D0
+	    V_EPPS1=1.0_LDP
 	    VINF=VINF1
 	    VINF2=VINF1                !i.e. no 2nd component
-	    V_BETA2=1.0D0
-	    V_EPPS2=1.0D0
+	    V_BETA2=1.0_LDP
+	    V_EPPS2=1.0_LDP
 	    N_OB_INS=1                 !Old default
-	    CONS_FOR_R_GRID=1.0D0
-	    EXP_FOR_R_GRID=0.0D0
+	    CONS_FOR_R_GRID=1.0_LDP
+	    EXP_FOR_R_GRID=0.0_LDP
 	  ELSE IF(VELTYPE .EQ. 4)THEN
 !
 ! No parameters required
@@ -127,7 +127,7 @@
 !
 	    N_OB_INS=1          !Old default
 	    N_IB_INS=2
-	    CONS_FOR_R_GRID=-1.0D0
+	    CONS_FOR_R_GRID=-1.0_LDP
 	    CALL RD_STORE_INT(N_OB_INS,'NBND_INS',L_FALSE,
 	1           'Number of additional points to insert in radius grid at boundary')
 	    CALL RD_STORE_DBLE(CONS_FOR_R_GRID,'C_R_GRID',L_FALSE,
@@ -136,8 +136,8 @@
 	      CALL RD_STORE_DBLE(EXP_FOR_R_GRID,'E_R_GRID',L_TRUE,
 	1           'Constant to allow improved shoice of R grid')
 	    ELSE
-	      CONS_FOR_R_GRID=1.0D0
-	      EXP_FOR_R_GRID=0.0D0
+	      CONS_FOR_R_GRID=1.0_LDP
+	      EXP_FOR_R_GRID=0.0_LDP
 	    END IF
 !
 ! !Required by routines other than STARPCYG
@@ -147,22 +147,22 @@
 	    CALL RD_STORE_NCHAR(VEL_OPTION,'VEL_OPT',ITEN,L_TRUE,
 	1                        'Velocity option: RVSIG_COL or deKOTER')
 	    CALL RD_STORE_DBLE(VINF1,'VINF',L_TRUE,'Terminal velocity (km/s)')
-	    VCORE=0.0D0		!Not used but initialized
-	    VPHOT=0.0D0
-	    SCL_HT=0.0D0
-	    V_BETA1=0.0D0
-	    V_EPPS1=1.0D0
+	    VCORE=0.0_LDP		!Not used but initialized
+	    VPHOT=0.0_LDP
+	    SCL_HT=0.0_LDP
+	    V_BETA1=0.0_LDP
+	    V_EPPS1=1.0_LDP
 	    VINF=VINF1
 	    VINF2=VINF1		!i.e. no 2nd component
-	    V_BETA2=1.0D0
-	    V_EPPS2=1.0D0
+	    V_BETA2=1.0_LDP
+	    V_EPPS2=1.0_LDP
 	  ELSE IF(VELTYPE .EQ. 10)THEN
 	    SN_MODEL=.TRUE.
 	    CALL RD_STORE_DBLE(VCORE,'VCORE',L_TRUE,'Initial velocity (km/s)')
 	    CALL RD_STORE_DBLE(V_BETA1,'BETA1',L_TRUE,'Power of velocity Law')
-	    RHO_ZERO=0.0D0
+	    RHO_ZERO=0.0_LDP
 	    CALL RD_STORE_DBLE(RHO_ZERO,'RHO_ZERO',L_FALSE,'Initial density (gm/cm^3)')
-	    IF(RHO_ZERO .EQ. 0.0D0)THEN
+	    IF(RHO_ZERO .EQ. 0.0_LDP)THEN
 	      CALL RD_STORE_DBLE(RCUB_RHO_ZERO,'RCUB_RHO',L_TRUE,'r^3 . initial density 10^{-30} gm)')
 	      RHO_ZERO=RCUB_RHO_ZERO/(RP**3)
 	    END IF
@@ -190,15 +190,15 @@
 	  END IF
 !
 	  IF(VAR_MDOT .OR. SN_MODEL)THEN
-	    RMDOT=1.0D-20
+	    RMDOT=1.0E-20_LDP
 	  ELSE
 	    CALL RD_STORE_DBLE(RMDOT,'MDOT',L_TRUE,'Mass Loss rate (Msun/yr) ')
 	  END IF
 	  CALL RD_STORE_DBLE(LUM,'LSTAR',L_TRUE,'Stellar luminosity (Lsun)')
 !
-	  NC_PNT_SRCE=0.0D0
-	  R_PNT_SRCE=0.0D0
-	  TEFF_PNT_SRCE=0.0D0
+	  NC_PNT_SRCE=0.0_LDP
+	  R_PNT_SRCE=0.0_LDP
+	  TEFF_PNT_SRCE=0.0_LDP
 	  PNT_SRCE_MOD=.FALSE.
 	  CALL RD_STORE_LOG(PNT_SRCE_MOD,'PNT_SRCE',L_FALSE,'Include point source with hollow shell')
 	  IF(PNT_SRCE_MOD)THEN
@@ -210,15 +210,15 @@
 ! TEFF and LOGG only need to be present if DO_HYDRO is TRUE. Values will still be read
 ! in when available if DO_HYDRO is FALSE.
 !
-	  TEFF=0.0D0; LOGG=0.0D0
+	  TEFF=0.0_LDP; LOGG=0.0_LDP
 	  IF(DO_HYDRO)THEN
 	    CALL RD_STORE_DBLE(TEFF,'TEFF',DO_HYDRO,'Effective temperature (10^4 K)')
 	    CALL RD_STORE_DBLE(LOGG,'LOGG',DO_HYDRO,'Log surface gravity (cgs units)')
 	    CALL RD_STORE_DBLE(V_BETA1,'BETA',DO_HYDRO,'Beta exponent for velocity law')
-	    PRESSURE_VTURB=0.0D0
+	    PRESSURE_VTURB=0.0_LDP
 	    CALL RD_STORE_DBLE(PRESSURE_VTURB,'P_VTURB',L_FALSE,'Pressure trubulent velocity')
 	  END IF
-	  IF(TEFF .NE. 0.0D0 .AND. .NOT. DO_HYDRO)THEN
+	  IF(TEFF .NE. 0.0_LDP .AND. .NOT. DO_HYDRO)THEN
 	    WRITE(LUER,'(A)')' Possible Error in VADAT file.'
 	    WRITE(LUER,'(A)')' You have set TEFF in VADAT but DO_HYDRO is false.'
             WRITE(LUER,'(A)')' TEFF will not be VALID unless hydro-iterations are performed.'
@@ -243,7 +243,7 @@
 	    WRITE(LUER,*)'N_CLUMP_PAR too large: N_CLUMP_PAR=',N_CLUMP_PAR
 	    STOP
 	  END IF
-	  CLUMP_PAR(:)=0.0D0
+	  CLUMP_PAR(:)=0.0_LDP
 	  DO I=1,N_CLUMP_PAR			!Should be less than 10
 	    TEMP_CHAR='CL_PAR_'
 	    WRITE(TEMP_CHAR(8:8),'(I1)')I
@@ -262,7 +262,7 @@
 	  PURE_HUBBLE_FLOW=.FALSE.
 	  COMP_GREY_LST_IT=.TRUE.
 	  N_RG_PAR=0
-	  TIME_SEQ_NO=0.0D0
+	  TIME_SEQ_NO=0.0_LDP
 	  IF(SN_MODEL)THEN
 !
 	    JGREY_WITH_V_TERMS=.TRUE.
@@ -285,11 +285,11 @@
 	1            'Treat non-thermal electrons')
 	    SCL_NT_CROSEC=.FALSE.
 	    SCL_NT_ION_CROSEC=.FALSE.
-	    NT_OMIT_ION_SCALE=1.0D-03
-	    NT_OMIT_LEV_SCALE=1.0D-04
+	    NT_OMIT_ION_SCALE=1.0E-03_LDP
+	    NT_OMIT_LEV_SCALE=1.0E-04_LDP
 	    NT_NKT=1000                 !Number of energy bins
-	    NT_EMAX=1000.0D0            !eV
-	    NT_EMIN=1.0D0               !ev
+	    NT_EMAX=1000.0_LDP            !eV
+	    NT_EMIN=1.0_LDP               !ev
 	    NON_THERMAL_IT_CNTRL=1
 	    NT_SOURCE_TYPE='BELL_SHAPE'
 	    READ_NON_THERM_SPEC=.FALSE.
@@ -343,7 +343,7 @@
 	     CALL RD_STORE_LOG(LIN_INTERP_RD_SN_DATA,'LIN_RD_SN_DATA',L_FALSE,'Linear interpolaton in RD_SN_DATA?')
 	   ENDIF
 !
-	    MINIMUM_ISO_POP=1.0D-20
+	    MINIMUM_ISO_POP=1.0E-20_LDP
 	    CALL RD_STORE_DBLE(MINIMUM_ISO_POP,'MIN_ISO_POP',L_FALSE,'Minimum population for ant ISOTOPE')
 !
 	    CALL RD_STORE_LOG(COMP_GREY_LST_IT,'COMP_GREY_LST_IT',L_FALSE,'Compute grey solution on last iteration?')
@@ -357,7 +357,7 @@
 !
 	    N_IB_INS=2
 	    N_OB_INS=3
-	    RMAX_ON_RCORE=-1.0D0		!Implies use default.
+	    RMAX_ON_RCORE=-1.0_LDP		!Implies use default.
 	    CALL RD_STORE_INT(N_IB_INS,'N_IB_INS',L_FALSE,'# of points for fine grid at inner boundary')
 	    CALL RD_STORE_INT(N_OB_INS,'N_OB_INS',L_FALSE,'# of points for fine grid at outer boundary')
 	    CALL RD_STORE_DBLE(RMAX_ON_RCORE,'RMAX_ON_RCORE',L_FALSE,'RMAX/RCORE for SN if shrinking radius')
@@ -433,10 +433,10 @@
 	1        'Velocity (km/s) for smoothing dielectronic transitions')
 	  CALL RD_STORE_DBLE(SIG_GAU_KMS,'SIG_GAU_KMS',L_TRUE,
 	1        'Sigma of Gaussian used to smooth photoionization data')
-	  FRAC_SIG_GAU=0.25D0
+	  FRAC_SIG_GAU=0.25_LDP
 	  CALL RD_STORE_DBLE(FRAC_SIG_GAU,'FRAC_SIG',L_FALSE,
 	1        'Fractional spacing a across smoothing Gauusian (use 0.25)')
-	  CUT_ACCURACY=0.02D0
+	  CUT_ACCURACY=0.02_LDP
 	  CALL RD_STORE_DBLE(CUT_ACCURACY,'CUT_ACC',L_FALSE,
 	1        'Accuracy to retain data when omitting data points to save space (use 0.02)')
 	  ABOVE_EDGE=.TRUE.
@@ -446,7 +446,7 @@
 	  CALL RD_STORE_DBLE(EXT_LINE_VAR,'EXT_LINE_VAR',L_TRUE,
 	1        'Extent of line variation zone (V/INF) beyond'//
 	1        'the resonancze zone')
-          IF(EXT_LINE_VAR .LT. 0.0D0 .OR. EXT_LINE_VAR .GT. 2.0D0)THEN
+          IF(EXT_LINE_VAR .LT. 0.0_LDP .OR. EXT_LINE_VAR .GT. 2.0_LDP)THEN
 	    WRITE(LUER,*)'Error in CMFGEN --- invalid range for EXT_LINE_VAR'
 	    STOP
 	  END IF
@@ -465,7 +465,7 @@
 	  CALL RD_STORE_LOG(WEAK_WITH_NET,'WNET',L_TRUE,'Use Lambda iteration for weak lines?')
 	  CALL RD_STORE_DBLE(WEAK_LINE_LIMIT,'WK_LIM',L_TRUE,'Maximum opacity ratio for weak lines (0.01)?')
 !
-	  USE_WEAK_TAU_LIM=.FALSE.; WEAK_TAU_LINE_LIMIT=0.01D0
+	  USE_WEAK_TAU_LIM=.FALSE.; WEAK_TAU_LINE_LIMIT=0.01_LDP
 	  CALL RD_STORE_LOG(USE_WEAK_TAU_LIM,'WK_TAU',L_FALSE,'Use TAU(SOB) to decide weak lines?')
 	  CALL RD_STORE_DBLE(WEAK_TAU_LINE_LIMIT,'WK_TAU_LIM',USE_WEAK_TAU_LIM,
 	1                      'Maximum TAU for weak lines (0.01)?')
@@ -486,8 +486,8 @@
 	    CALL RD_STORE_CHAR(INNER_BND_METH,'IB_METH',L_TRUE,
 	1           'Inner boundary method (DIFUSION, HOLLOW, or ZERO_FLUX)')
 	  END IF
-	  IB_STAB_FACTOR=0.1D0
-	  IF(INNER_BND_METH .EQ. 'DIFFUSION')IB_STAB_FACTOR=0.0D0
+	  IB_STAB_FACTOR=0.1_LDP
+	  IF(INNER_BND_METH .EQ. 'DIFFUSION')IB_STAB_FACTOR=0.0_LDP
 	  CALL RD_STORE_DBLE(IB_STAB_FACTOR,'IB_STAB',L_FALSE,'Inner boundary stabilization factor')
 	  OUTER_BND_METH='HONJ'
 	  CALL RD_STORE_CHAR(OUTER_BND_METH,'OB_METH',L_FALSE,'Outer boundary method (HONJ or HALF_MOM)')
@@ -535,10 +535,10 @@
 	  CALL RD_STORE_LOG(RDTHK_CONT,'THK_CONT',L_TRUE,'Use thick boundary condition for continuum ? ')
 	  RD_OUT_BC_TYPE=1
 	  OUT_BC_TYPE=1
-	  OUT_BC_PARAM_ONE=0.299794D0
+	  OUT_BC_PARAM_ONE=0.299794_LDP
 	  CALL RD_STORE_INT(RD_OUT_BC_TYPE,'OBC_TYPE',L_FALSE,'Outer boundary condition type: 1=def=old')
 	  CALL RD_STORE_DBLE(OUT_BC_PARAM_ONE,'BC_PAR1',L_FALSE,'Frequency to switch to new BC')
-	  REXT_FAC=0.0D0
+	  REXT_FAC=0.0_LDP
 	  CALL RD_STORE_DBLE(REXT_FAC,'REXT_FAC',L_FALSE,'Factor ot extend R grid by for thick continuum')
 !
 	  INCL_INCID_RAD=.FALSE.
@@ -552,7 +552,7 @@
 !
 	  WRITE(LUSCR,'()')
 	  FIX_DOP=.TRUE.
-	  AMASS_DOP=1.0D0
+	  AMASS_DOP=1.0_LDP
 	  CALL RD_STORE_LOG(FIX_DOP,'FIX_DOP',L_FALSE,
 	1      'Use the same turbulent velocity for all species?')
 	  CALL RD_STORE_DBLE(TDOP,'TDOP',L_TRUE,
@@ -605,8 +605,8 @@
 !
 ! The following options do not apply to a Doppler profile.
 !
-	  V_PROF_LIMIT=3000.0D0
-	  MAX_PROF_ED=1.0D+16
+	  V_PROF_LIMIT=3000.0_LDP
+	  MAX_PROF_ED=1.0E+16_LDP
 	  NORM_PROFILE=.TRUE.
 	  CALL RD_STORE_DBLE(MAX_PROF_ED,'MAX_PROF_ED',L_FALSE,
 	1           'Maximum electron density for Stark profile computation')
@@ -719,7 +719,7 @@
 	1           'Allow for overlap of close lines (SOB only) ?')
 	  CALL RD_STORE_DBLE(OVER_FREQ_DIF,'OL_DIF',L_TRUE,
 	1           'Max. difference (in km/s) for overlap')
-	  OVER_FREQ_DIF=OVER_FREQ_DIF/2.998D+05
+	  OVER_FREQ_DIF=OVER_FREQ_DIF/2.998E+05_LDP
 !
 	  CALL RD_STORE_LOG(INCL_CHG_EXCH,'INC_CHG',L_TRUE,'Include charge exchange reactions?')
 	  CALL RD_STORE_LOG(INCL_TWO_PHOT,'INC_TWO',L_TRUE,'Include two photon transitions?')
@@ -746,7 +746,7 @@
 	  END IF
 	  CALL RD_STORE_DBLE(SCL_LINE_HT_FAC,'SCL_LN_FAC',L_TRUE,
 	1            'Scale line cooling rate for Rad. Eq. equation?')
-	  SCL_LINE_DENSITY_LIMIT=1.0D+30
+	  SCL_LINE_DENSITY_LIMIT=1.0E+30_LDP
 	  CALL RD_STORE_DBLE(SCL_LINE_DENSITY_LIMIT,'SCL_DEN_LIM',L_FALSE,
 	1            'Density beyond which line cooling scaling is switched off')
 	  INCLUDE_dSLdT=.FALSE.
@@ -762,14 +762,14 @@
 	  LINEAR_ADV=.TRUE.
 	  CALL RD_STORE_LOG(LINEAR_ADV,'LIN_ADV',L_FALSE,
 	1           'Compute advection terms using derivatives in linear plane?')
-	  ADVEC_RELAX_PARAM=1.0D0
+	  ADVEC_RELAX_PARAM=1.0_LDP
 	  CALL RD_STORE_DBLE(ADVEC_RELAX_PARAM,'ADV_RELAX',L_FALSE,
 	1           'Parameter to allow advection terms to be included slowly')
 !
 ! Except for the X-ray switch, the X-ray options are only needed if we
 ! are including X-rays.
 !
-	  VSMOOTH_XRAYS=3000.0D0
+	  VSMOOTH_XRAYS=3000.0_LDP
 	  CALL RD_STORE_LOG(XRAYS,'INC_XRAYS',L_TRUE,
 	1           'Include X-ray emission')
 	  CALL RD_STORE_LOG(FF_XRAYS,'FF_XRAYS',XRAYS,
@@ -800,7 +800,7 @@
 	1           'Rate to increase X-ray filling factor')
 !
 	  SCALE_XRAY_LUM=.FALSE.
-	  ALLOWED_XRAY_FLUX_ERROR=0.1D0
+	  ALLOWED_XRAY_FLUX_ERROR=0.1_LDP
 	  CALL RD_STORE_LOG(SCALE_XRAY_LUM,'SCL_XLUM',L_FALSE,
 	1           'Scale X-ray emissivities to get a specified X-ray luminosiity')
 	  CALL RD_STORE_DBLE(DESIRED_XRAY_LUM,'XRAY_LUM',SCALE_XRAY_LUM,
@@ -808,11 +808,11 @@
 	  CALL RD_STORE_DBLE(ALLOWED_XRAY_FLUX_ERROR,'XRAY_ERR',L_FALSE,
 	1           'Fractional error allowed in observed X-ray luminosity')
 !
-	  DELV_XRAY=0.5D0*VSMOOTH_XRAYS
+	  DELV_XRAY=0.5_LDP*VSMOOTH_XRAYS
 	  CALL RD_STORE_DBLE(DELV_XRAY,'V_XRAY',L_FALSE,
 	1            'Max. vel. sep. (km/s) between evaluations of '//
 	1            '  phot. cross-sections in X-ray region?')
-	  NU_XRAY_END=100.0D0
+	  NU_XRAY_END=100.0_LDP
 	  CALL RD_STORE_DBLE(NU_XRAY_END,'NU_XRAY',L_FALSE,
 	1            'End of X-ray region for continuum definition')
 !	
@@ -955,18 +955,18 @@
 	1            'Fix the Temperature automatically ?')
 	  CALL RD_STORE_DBLE(TAU_SCL_T,'TAU_SCL_T',L_TRUE,
 	1      'Electron scattering optical depth from which to fix T')
-	  IF(TAU_SCL_T .EQ. 0.0D0)THEN
-	    CON_SCL_T=0.0D0
+	  IF(TAU_SCL_T .EQ. 0.0_LDP)THEN
+	    CON_SCL_T=0.0_LDP
 	  ELSE
-	    CON_SCL_T=1000.0D0
+	    CON_SCL_T=1000.0_LDP
 	  END IF
-	  T_MIN=0.0D0
+	  T_MIN=0.0_LDP
 	  CALL RD_STORE_DBLE(T_MIN,'T_MIN',L_FALSE,'Minimum electron temperature')
 	  DO_SRCE_VAR_ONLY=.FALSE.
 	  CALL RD_STORE_LOG(DO_SRCE_VAR_ONLY,'SRCE_ONLY',L_FALSE,
 	1            'Allow only ths source function to vary?')
 	  ADD_ADDITIONAL_OPACITY=.FALSE.
-	  ADD_OPAC_SCL_FAC=0.0D0
+	  ADD_OPAC_SCL_FAC=0.0_LDP
 	  CALL RD_STORE_LOG(ADD_ADDITIONAL_OPACITY,'ADD_OPAC',L_FALSE,
 	1            'Add additional pacity to help converge model?')
 	  CALL RD_STORE_DBLE(ADD_OPAC_SCL_FAC,'OP_SCL_FAC',ADD_ADDITIONAL_OPACITY,
@@ -1002,10 +1002,10 @@
 	1      'Maximum fractional change for linearization ')
 	  CALL RD_STORE_DBLE(MAX_LAM_COR,'MAX_LAM',L_TRUE,
 	1      'Maximum fractional change for lambda iteration ')
-	  MAX_dT_COR=0.2D0
+	  MAX_dT_COR=0.2_LDP
 	  CALL RD_STORE_DBLE(MAX_dT_COR,'MAX_dT',L_FALSE,
 	1      'Maximum fractional change in the temperature')
-	  IF(MAX_dT_COR .LE. 0.0D0 .OR. MAX_dT_COR .GT. 0.201D0)THEN
+	  IF(MAX_dT_COR .LE. 0.0_LDP .OR. MAX_dT_COR .GT. 0.201_LDP)THEN
 	    WRITE(LUER,*)' Error: MAX_dT in VADAT has an invalid value of',MAX_dT_COR
 	    WRITE(LUER,*)' Require 0 < MAX_dT_COR < 0.2'
 	    STOP
@@ -1067,7 +1067,7 @@
 	    CALL RD_STORE_LOG(USE_DJDT_RTE,'USE_DJDT_RTE',L_FALSE,
 	1    'Use solver which has DJDt terms in transfer equaton for SN models?')
 	  END IF
-	  DJDT_RELAX_PARAM=1.0D0
+	  DJDT_RELAX_PARAM=1.0_LDP
 	  CALL RD_STORE_DBLE(DJDT_RELAX_PARAM,'DJDT_RELAX',L_FALSE,
 	1          'Factor to scale DJDT terms to assist initial convergence')
 !

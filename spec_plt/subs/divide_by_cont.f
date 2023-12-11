@@ -21,7 +21,7 @@
 !
 	INTEGER, PARAMETER :: IONE=1
 !	
-	T1=1.0D-08
+	T1=1.0E-08_LDP
 	I=1
 	UNEQUAL=.FALSE.
 	IF(NCF_CONT .NE. NCF)UNEQUAL=.TRUE.
@@ -45,11 +45,11 @@
 	        L=L+1
 	      END DO
 	      T1=(NU(I)-NU_CONT(L+1))/(NU_CONT(L)-NU_CONT(L+1))
-	      T2=(1.0D0-T1)*OBSF_CONT(L+1)+T1*OBSF_CONT(L)
+	      T2=(1.0_LDP-T1)*OBSF_CONT(L+1)+T1*OBSF_CONT(L)
 	      YV(I)=0.0
 	      IF(T2 .NE. 0)THEN
 	        T2=OBSF(I)/T2
-	        IF(T2 .LT. 1.0E+020)YV(I)=T2
+	        IF(T2 .LT. 1.0E+020_LDP)YV(I)=T2
 	      END IF
 	    END IF
 	  END DO
@@ -70,13 +70,13 @@
 	  END DO
 	  J=J-I+1
 !
-	  YV(1:NCF)=0.0D0				!Temporary usage
+	  YV(1:NCF)=0.0_LDP				!Temporary usage
 	  CALL MON_INTERP(YV(I),J,IONE,NU(I),J,
 	1            OBSF_CONT,NCF_CONT,NU_CONT,NCF_CONT)
 	  DO I=1,NCF
 	    IF(YV(I) .GT. 0)THEN
 	      T2=OBSF(I)/YV(I)
-	      IF(T2 .LT. 1.0E+30)YV(I)=T2
+	      IF(T2 .LT. 1.0E+30_LDP)YV(I)=T2
 	    ELSE
 	      YV(I)=0
 	    END IF
@@ -86,7 +86,7 @@
 	    YV(I)=0
 	    IF(OBSF_CONT(I) .GT. 0)THEN
 	      T2=OBSF(I)/OBSF_CONT(I)
-	      IF(T2 .LT. 1.0E+20)YV(I)=T2
+	      IF(T2 .LT. 1.0E+20_LDP)YV(I)=T2
 	    ELSE
 	      YV(I)=0
 	    END IF

@@ -185,17 +185,17 @@
 	  END IF
 	END IF
 !
-        FEDD_PREV(:)=0.0D0
-        GEDD_PREV(:)=0.0D0
-        H_ON_J_PREV(:)=0.0D0
-        N_ON_J_PREV(:)=0.0D0
-        RSQN_ON_RSQJ_PREV(:)=0.0D0
-        KMID_ON_J_PREV(:)=0.0D0
-        JNU_PREV(:)=0.0D0
-        GAM_RSQHNU_PREV(:)=0.0D0
-	HBC_PREV=0.0D0
-	NBC_PREV=0.0D0
-	IN_HBC_PREV=0.0D0
+        FEDD_PREV(:)=0.0_LDP
+        GEDD_PREV(:)=0.0_LDP
+        H_ON_J_PREV(:)=0.0_LDP
+        N_ON_J_PREV(:)=0.0_LDP
+        RSQN_ON_RSQJ_PREV(:)=0.0_LDP
+        KMID_ON_J_PREV(:)=0.0_LDP
+        JNU_PREV(:)=0.0_LDP
+        GAM_RSQHNU_PREV(:)=0.0_LDP
+	HBC_PREV=0.0_LDP
+	NBC_PREV=0.0_LDP
+	IN_HBC_PREV=0.0_LDP
 !
 	IF(ND_SAV .EQ. ND)THEN
 	  RETURN

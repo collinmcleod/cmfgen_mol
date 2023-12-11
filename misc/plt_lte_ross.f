@@ -124,7 +124,7 @@
 !
 	WRITE(6,*)' Atom density'
 	DO I_D=1,N_D
-	  IF(POP_ATOM(1,I_D) .GT. 1.0D+10)EXIT
+	  IF(POP_ATOM(1,I_D) .GT. 1.0E+10_LDP)EXIT
 	END DO
 	ID_MIN=I_D; D_ID=2
 	XAXIS='TEMP'
@@ -197,7 +197,7 @@
           READ(5,*)ALPHA
 	  DO I_D=ID_MIN,N_D,D_ID
 	   XV(1:N_T)=TEMP(1:N_T)
-	   YV(1:N_T)=(TEMP(1:N_T)**3.5)*(KAP(1:N_T,I_D)/KES(1:N_T,I_D))/RHO(I_D)**ALPHA
+	   YV(1:N_T)=(TEMP(1:N_T)**3.5_LDP)*(KAP(1:N_T,I_D)/KES(1:N_T,I_D))/RHO(I_D)**ALPHA
 	   CALL DP_CURVE(N_T,XV,YV)
 	  END DO
 	  WRITE(YLAB,'(F5.2)')ALPHA; YLAB=ADJUSTL(YLAB)
@@ -213,7 +213,7 @@
 	  WRITE(6,'(/,A,/)')' Plotting T^{3.5}.(Kappa(Ross)/K(es)-1)/rho**alpha versus the electron temperature '
 	  DO I_D=ID_MIN,N_D,D_ID
 	     XV(1:N_T)=TEMP(1:N_T)
-	     YV(1:N_T)=(TEMP(1:N_T)**3.5)*(KAP(1:N_T,I_D)/KES(1:N_T,I_D)-1.0D0)/RHO(I_D)**ALPHA
+	     YV(1:N_T)=(TEMP(1:N_T)**3.5_LDP)*(KAP(1:N_T,I_D)/KES(1:N_T,I_D)-1.0_LDP)/RHO(I_D)**ALPHA
 	     CALL DP_CURVE(N_T,XV,YV)
 	  END DO
 	  WRITE(YLAB,'(F5.2)')ALPHA; YLAB=ADJUSTL(YLAB)

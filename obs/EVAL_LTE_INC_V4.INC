@@ -1,6 +1,6 @@
 !
 ! This include file evaluates the LTE populations with respect to
-! the ground state for 
+! the ground state for
 !
 !  (a) The full atoms.
 !  (B) The Super-Level model atom.
@@ -29,7 +29,7 @@
 	      DO I=1,ND
 	        ATM(ID+1)%XzV(1,I)=ATM(ID)%DXzV_F(I)		!True if not present.
 	        ATM(ID+1)%XzVLTE(1,I)=ATM(ID)%DXzV_F(I)		!True if not present.
-	        ATM(ID+1)%dlnXzVLTE_dlnT(1,I)=0.0D0
+	        ATM(ID+1)%dlnXzVLTE_dlnT(1,I)=0.0_LDP
 	      END DO
 	    END IF
 	  END IF

@@ -86,7 +86,7 @@
 ! Get the number of data points in the HYDRO model, and the number
 ! of species.
 !
-	NX=0; NSP=0; OLD_SN_AGE_DAYS=0.0D0
+	NX=0; NSP=0; OLD_SN_AGE_DAYS=0.0_LDP
 	DO WHILE (1 .EQ. 1)
 	  STRING=' '
 	  DO WHILE (STRING(1:1) .EQ. '!' .OR. STRING .EQ. ' ')
@@ -115,17 +115,17 @@
 !
 	SN_EXP_FACTOR=SN_AGE_DAYS/OLD_SN_AGE_DAYS
 !
-	ALLOCATE (V_HYDRO(NX));          V_HYDRO=0.0D0
-	ALLOCATE (SIGMA_HYDRO(NX));      SIGMA_HYDRO=0.0D0
-	ALLOCATE (DENSITY_HYDRO(NX));    DENSITY_HYDRO=0.0D0
-	ALLOCATE (KAPPA_HYDRO(NX));      KAPPA_HYDRO=0.0D0
-	ALLOCATE (R_HYDRO(NX));          R_HYDRO=0.0D0
-	ALLOCATE (LOG_R_HYDRO(NX));      LOG_R_HYDRO=0.0D0
-	ALLOCATE (TAU_HYDRO(NX));        TAU_HYDRO=0.0D0
+	ALLOCATE (V_HYDRO(NX));          V_HYDRO=0.0_LDP
+	ALLOCATE (SIGMA_HYDRO(NX));      SIGMA_HYDRO=0.0_LDP
+	ALLOCATE (DENSITY_HYDRO(NX));    DENSITY_HYDRO=0.0_LDP
+	ALLOCATE (KAPPA_HYDRO(NX));      KAPPA_HYDRO=0.0_LDP
+	ALLOCATE (R_HYDRO(NX));          R_HYDRO=0.0_LDP
+	ALLOCATE (LOG_R_HYDRO(NX));      LOG_R_HYDRO=0.0_LDP
+	ALLOCATE (TAU_HYDRO(NX));        TAU_HYDRO=0.0_LDP
 !
-	ALLOCATE (OLD_R(NX));		 OLD_R=0.0D0
-	ALLOCATE (LOG_OLD_R(NX));        LOG_OLD_R=0.0D0
-	ALLOCATE (OLD_TAU(NX));		 OLD_TAU=0.0D0
+	ALLOCATE (OLD_R(NX));		 OLD_R=0.0_LDP
+	ALLOCATE (LOG_OLD_R(NX));        LOG_OLD_R=0.0_LDP
+	ALLOCATE (OLD_TAU(NX));		 OLD_TAU=0.0_LDP
 !
 ! Get basic HYDRO grid vectors.
 !
@@ -144,14 +144,14 @@
 	  ELSE IF(INDEX(STRING,'Kappa') .NE. 0)THEN
 	    READ(LU,*)KAPPA_HYDRO
 	  ELSE IF(INDEX(STRING,'ass fraction') .NE. 0)THEN
-	    IF(R_HYDRO(1) .EQ. 0.0D0 .OR.
-	1             V_HYDRO(1) .EQ. 0.0D0 .OR.
-	1             DENSITY_HYDRO(1) .EQ. 0.0D0)THEN
+	    IF(R_HYDRO(1) .EQ. 0.0_LDP .OR.
+	1             V_HYDRO(1) .EQ. 0.0_LDP .OR.
+	1             DENSITY_HYDRO(1) .EQ. 0.0_LDP)THEN
 	      LUER=ERROR_LU()
 	      WRITE(LUER,*)'Error reading SN data in SET_RV_HYDRO_MODEL'
 	      WRITE(LUER,*)'R, V, the DENSITY is zero'
 	      STOP
-	    ELSE IF(KAPPA_HYDRO(1) .EQ. 0.0D0)THEN
+	    ELSE IF(KAPPA_HYDRO(1) .EQ. 0.0_LDP)THEN
 	      LUER=ERROR_LU()
 	      WRITE(LUER,*)'Warning: reading SN data in SET_RV_HYDRO_MODEL'
 	      WRITE(LUER,*)'KAPPA is zero'
@@ -169,10 +169,10 @@
         PURE_HUBBLE=.FALSE.  !.TRUE.
         IF(PURE_HUBBLE)THEN
 	  WRITE(6,*)'Setting Velocity so pure Hubble law in SET_RV_HYDRO_V2'
-          T1=24.0D0*3600.0D0*1.0D+05*OLD_SN_AGE_DAYS/1.0D+10
+          T1=24.0_LDP*3600.0_LDP*1.0E+05_LDP*OLD_SN_AGE_DAYS/1.0E+10_LDP
           DO I=1,NX
             V_HYDRO(I)=R_HYDRO(I)/T1
-            SIGMA_HYDRO(I)=0.0D0
+            SIGMA_HYDRO(I)=0.0_LDP
           END DO
         END IF
 !
@@ -186,10 +186,10 @@
 ! In the constant T1 we convert from days to seconds, and allow for the units of
 ! V (km/s) and R (10^10 cm).
 !
-	T1=24.0D0*3600.0D0*1.0D+05*(SN_AGE_DAYS-OLD_SN_AGE_DAYS)/1.0D+10
+	T1=24.0_LDP*3600.0_LDP*1.0E+05_LDP*(SN_AGE_DAYS-OLD_SN_AGE_DAYS)/1.0E+10_LDP
 	DO I=1,NX
-	  DEN_SCL_FAC=1.0D0/(1.0D0+T1*V_HYDRO(I)/R_HYDRO(I)*(SIGMA_HYDRO(I)+1.0D0))/
-	1                   (1.0D0+T1*V_HYDRO(I)/R_HYDRO(I))**2
+	  DEN_SCL_FAC=1.0_LDP/(1.0_LDP+T1*V_HYDRO(I)/R_HYDRO(I)*(SIGMA_HYDRO(I)+1.0_LDP))/
+	1                   (1.0_LDP+T1*V_HYDRO(I)/R_HYDRO(I))**2
 	  DENSITY_HYDRO(I)=DEN_SCL_FAC*DENSITY_HYDRO(I)
 	  R_HYDRO(I)=R_HYDRO(I)+T1*V_HYDRO(I)
 	END DO
@@ -249,9 +249,9 @@
 	    END IF
           END DO
 !
-	  T1=ABS(R(1)/R_HYDRO(1)-1.0D0)
-	  T2=ABS(R(ND)/R_HYDRO(NX)-1.0D0)
-	  IF( T1 .GT. 1.0D-06 .OR. T2 .GT. 1.0D-06)THEN
+	  T1=ABS(R(1)/R_HYDRO(1)-1.0_LDP)
+	  T2=ABS(R(ND)/R_HYDRO(NX)-1.0_LDP)
+	  IF( T1 .GT. 1.0E-06_LDP .OR. T2 .GT. 1.0E-06_LDP)THEN
 	    WRITE(LUER,*)'Warning: need to scale R in SET_RV_HYDRO_MODEL'
 	    WRITE(LUER,*)'ABS(R(1)/R_HYDRO(1)-1.0D0)=',T1
 	    WRITE(LUER,*)'ABS(R(ND)/R_HYDRO(ND)-1.0D0)=',T2
@@ -260,7 +260,7 @@
 ! In the constant T1 we convert from days to seconds, and allow for the units of
 ! V (km/s) and R (10^10 cm).
 !
-	  T1=24.0D0*3600.0D0*1.0D+05*(SN_AGE_DAYS-OLD_SN_AGE_DAYS)/1.0D+10
+	  T1=24.0_LDP*3600.0_LDP*1.0E+05_LDP*(SN_AGE_DAYS-OLD_SN_AGE_DAYS)/1.0E+10_LDP
 	  DO I=1,ND
 	    R(I)=R(I)+T1*V(I)
 	  END DO
@@ -277,14 +277,14 @@
 ! Set RMAX and RCORE. These are returned.
 !
 	  RCORE=R_HYDRO(NX)
-	  IF(RMAX_ON_RCORE .GT. 1.0D0)THEN
+	  IF(RMAX_ON_RCORE .GT. 1.0_LDP)THEN
 	    RMAX=RMAX_ON_RCORE*RCORE
-	    IF(RMAX .GT. (1.0D0+1.0D-07)*R_HYDRO(1))THEN
+	    IF(RMAX .GT. (1.0_LDP+1.0E-07_LDP)*R_HYDRO(1))THEN
 	      WRITE(LUER,'(A)')' Error is SET_RV_HYDRO_MODEL'
 	      WRITE(LUER,'(A)')' RMAX_ON_RCORE is too large'
 	      WRITE(LUER,'(A,F20.10)')' RMAX_ON_RCORE must be =< ',R_HYDRO(1)/R_HYDRO(NX)
 	      STOP
-	    ELSE IF(RMAX .GT. (1.0D0-1.0D-07)*R_HYDRO(1))THEN
+	    ELSE IF(RMAX .GT. (1.0_LDP-1.0E-07_LDP)*R_HYDRO(1))THEN
 	      RMAX=R_HYDRO(1)
 	    END IF
 	  ELSE
@@ -295,12 +295,12 @@
 ! rule integration will suffice. We assume KAPPA does not change during
 ! the expansion.
 !
-	  KAPPA_HYDRO=1.0D+10*KAPPA_HYDRO*DENSITY_HYDRO
+	  KAPPA_HYDRO=1.0E+10_LDP*KAPPA_HYDRO*DENSITY_HYDRO
 	  TAU_HYDRO(1)=KAPPA_HYDRO(1)*R_HYDRO(1)
 	  T1=LOG(KAPPA_HYDRO(2)/KAPPA_HYDRO(1))/LOG(R_HYDRO(1)/R_HYDRO(2))
-	  IF(T1 .GT. 1.5D0)TAU_HYDRO(1)=TAU_HYDRO(1)/(T1-1)
+	  IF(T1 .GT. 1.5_LDP)TAU_HYDRO(1)=TAU_HYDRO(1)/(T1-1)
 	  DO I=2,NX
-	    TAU_HYDRO(I)=TAU_HYDRO(I-1)+0.5D0*(KAPPA_HYDRO(I-1)+KAPPA_HYDRO(I))*
+	    TAU_HYDRO(I)=TAU_HYDRO(I-1)+0.5_LDP*(KAPPA_HYDRO(I-1)+KAPPA_HYDRO(I))*
 	1                  (R_HYDRO(I-1)-R_HYDRO(I))
 	  END DO
 !
@@ -316,7 +316,7 @@
 	    OLD_R(1)=RMAX
 	    OLD_TAU(2:NS)=TAU_HYDRO(J:NX)
 	    T1=(RMAX-R_HYDRO(J))/(R_HYDRO(J-1)-R_HYDRO(J))
-	    OLD_TAU(1)=T1*TAU_HYDRO(J-1)+(1.0D0-T1)*TAU_HYDRO(J)
+	    OLD_TAU(1)=T1*TAU_HYDRO(J-1)+(1.0_LDP-T1)*TAU_HYDRO(J)
 	  ELSE
 	    NS=NX
 	    OLD_R(1:NS)=R_HYDRO(1:NX)
@@ -354,7 +354,7 @@
 	      J=J+1
 	    END DO
 	    T1=(LOG_R(I-1)-LOG_OLD_R(J+1))/(LOG_OLD_R(J)-LOG_OLD_R(J+1))
-	    TAU_BEG=T1*OLD_TAU(J)+(1.0D0-T1)*OLD_TAU(J+1)
+	    TAU_BEG=T1*OLD_TAU(J)+(1.0_LDP-T1)*OLD_TAU(J+1)
 !
 ! Compute dTAU step, and check to see if we need to use that.
 !
@@ -364,7 +364,7 @@
 	      J=J+1
 	    END DO
 	    T1=(NEXT_R-LOG_OLD_R(J+1))/(LOG_OLD_R(J)-LOG_OLD_R(J+1))
-	    TAU_END=T1*OLD_TAU(J)+(1.0D0-T1)*OLD_TAU(J+1)
+	    TAU_END=T1*OLD_TAU(J)+(1.0_LDP-T1)*OLD_TAU(J+1)
 !
 	    IF(TAU_END-TAU_BEG .GT. dTAU)THEN
 	      NEXT_R=LOG_R(I-1)-dLOGR*dTAU/(TAU_END-TAU_BEG)
@@ -374,7 +374,7 @@
 !
 ! Check whether close enough to Outer Bondary.
 !
-	    IF(LOG_R(I)-1.5*dLOGR .LT. LOG_OLD_R(NS))EXIT
+	    IF(LOG_R(I)-1.5_LDP*dLOGR .LT. LOG_OLD_R(NS))EXIT
 	  END DO
 !
 ! Add extra points at outer boundary.
@@ -382,16 +382,16 @@
 	  T1=LOG_R(I)-LOG_OLD_R(NS)
 	  IF(N_IB_INS .LE. 1)THEN
 	    ND_TMP=I+2
-	    LOG_R(I+1)=LOG_OLD_R(NS)+0.2D0*T1
+	    LOG_R(I+1)=LOG_OLD_R(NS)+0.2_LDP*T1
 	  ELSE IF(N_IB_INS .EQ. 2)THEN
 	    ND_TMP=I+3
-	    LOG_R(I+2)=LOG_OLD_R(NS)+0.1D0*T1
-	    LOG_R(I+1)=LOG_OLD_R(NS)+0.4D0*T1
+	    LOG_R(I+2)=LOG_OLD_R(NS)+0.1_LDP*T1
+	    LOG_R(I+1)=LOG_OLD_R(NS)+0.4_LDP*T1
 	  ELSE IF(N_IB_INS .GE. 3)THEN
 	    ND_TMP=I+4
-	    LOG_R(I+3)=LOG_OLD_R(NS)+0.06D0*T1
-	    LOG_R(I+2)=LOG_OLD_R(NS)+0.16D0*T1
-	    LOG_R(I+1)=LOG_OLD_R(NS)+0.4D0*T1
+	    LOG_R(I+3)=LOG_OLD_R(NS)+0.06_LDP*T1
+	    LOG_R(I+2)=LOG_OLD_R(NS)+0.16_LDP*T1
+	    LOG_R(I+1)=LOG_OLD_R(NS)+0.4_LDP*T1
 	  END IF
 	  LOG_R(ND_TMP)=LOG_OLD_R(NS)
 !
@@ -400,26 +400,26 @@
 	  T1=LOG_R(1)-LOG_R(2)
 	  IF(N_OB_INS .GE. 4)THEN
 	    LOG_R(6:ND_TMP+4)=LOG_R(2:ND_TMP)
-	    LOG_R(2)=LOG_OLD_R(1)-0.01D0*T1
-	    LOG_R(3)=LOG_OLD_R(1)-0.03D0*T1
-	    LOG_R(4)=LOG_OLD_R(1)-0.1D0*T1
-	    LOG_R(5)=LOG_OLD_R(1)-0.4D0*T1
+	    LOG_R(2)=LOG_OLD_R(1)-0.01_LDP*T1
+	    LOG_R(3)=LOG_OLD_R(1)-0.03_LDP*T1
+	    LOG_R(4)=LOG_OLD_R(1)-0.1_LDP*T1
+	    LOG_R(5)=LOG_OLD_R(1)-0.4_LDP*T1
 	    WRITE(6,*)LOG_R(1:7)
 	    ND_TMP=ND_TMP+4
 	  ELSE IF(N_OB_INS .EQ. 3)THEN
 	    LOG_R(5:ND_TMP+3)=LOG_R(2:ND_TMP)
-	    LOG_R(2)=LOG_OLD_R(1)-0.01D0*T1
-	    LOG_R(3)=LOG_OLD_R(1)-0.1D0*T1
-	    LOG_R(4)=LOG_OLD_R(1)-0.3D0*T1
+	    LOG_R(2)=LOG_OLD_R(1)-0.01_LDP*T1
+	    LOG_R(3)=LOG_OLD_R(1)-0.1_LDP*T1
+	    LOG_R(4)=LOG_OLD_R(1)-0.3_LDP*T1
 	    ND_TMP=ND_TMP+3
 	  ELSE IF(N_OB_INS .EQ. 2)THEN
 	    LOG_R(4:ND_TMP+2)=LOG_R(2:ND_TMP)
-	    LOG_R(2)=LOG_OLD_R(1)-0.01D0*T1
-	    LOG_R(3)=LOG_OLD_R(1)-0.3D0*T1
+	    LOG_R(2)=LOG_OLD_R(1)-0.01_LDP*T1
+	    LOG_R(3)=LOG_OLD_R(1)-0.3_LDP*T1
 	    ND_TMP=ND_TMP+2
 	  ELSE IF(N_OB_INS .LE. 1)THEN
 	    LOG_R(3:ND_TMP+1)=LOG_R(2:ND_TMP)
-	    LOG_R(2)=LOG_OLD_R(1)-0.01D0*T1
+	    LOG_R(2)=LOG_OLD_R(1)-0.01_LDP*T1
 	    ND_TMP=ND_TMP+1
 	  END IF
 !
@@ -427,7 +427,7 @@
 !
 	  DO I=1,ND_TMP; TAU(I)=I; END DO
 	  DO I=1,ND
-	    XN(I)=1.0D0+(I-1.0D0)*(ND_TMP-1.0D0)/(ND-1.0D0)
+	    XN(I)=1.0_LDP+(I-1.0_LDP)*(ND_TMP-1.0_LDP)/(ND-1.0_LDP)
 	  END DO
 	  CALL MON_INTERP(R,ND,IONE,XN,ND,LOG_R,ND_TMP,TAU,ND_TMP)
 !
@@ -447,7 +447,7 @@
 500	  IF(R(I) .GE. R_HYDRO(J+1))THEN
 	    T1=R(I)-R_HYDRO(J)
 	    V(I)=((COEF(J,1)*T1+COEF(J,2))*T1+COEF(J,3))*T1+COEF(J,4)
-	    SIGMA(I)=((3.0D0*COEF(J,1)*T1+2.0D0*COEF(J,2))*T1+COEF(J,3))*R(I)/V(I)-1.0D0
+	    SIGMA(I)=((3.0_LDP*COEF(J,1)*T1+2.0_LDP*COEF(J,2))*T1+COEF(J,3))*R(I)/V(I)-1.0_LDP
 	  ELSE
 	    J=J+1
 	    GOTO 500
@@ -456,16 +456,16 @@
 !
 ! If very close to Hubble law, we set SIGMA to zero.
 !
-	IF(MAXVAL(ABS(SIGMA)) .LT. 1.0D-04)SIGMA(1:ND)=0.0D0
+	IF(MAXVAL(ABS(SIGMA)) .LT. 1.0E-04_LDP)SIGMA(1:ND)=0.0_LDP
 !
 	LOG_R(1:ND)=LOG(R(1:ND))
 	LOG_R_HYDRO(1:NX)=LOG(R_HYDRO(1:NX))
 	CALL MON_INTERP(KAPPA,ND,IONE,LOG_R,ND,KAPPA_HYDRO,NX,LOG_R_HYDRO,NX)
 	TAU(1)=KAPPA(1)*R(1)
 	T1=LOG(KAPPA(2)/KAPPA(1))/LOG(R(1)/R(2))
-	IF(T1 .GT. 1.5D0)TAU(1)=TAU(1)/(T1-1)
+	IF(T1 .GT. 1.5_LDP)TAU(1)=TAU(1)/(T1-1)
 	DO I=2,ND
-	  TAU(I)=TAU(I-1)+0.5D0*(KAPPA(I-1)+KAPPA(I))*(R(I-1)-R(I))
+	  TAU(I)=TAU(I-1)+0.5_LDP*(KAPPA(I-1)+KAPPA(I))*(R(I-1)-R(I))
 	END DO
 !
 	OPEN(UNIT=LU,FILE='NEW_SN_R_GRID',STATUS='UNKNOWN')

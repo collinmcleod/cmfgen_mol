@@ -113,7 +113,7 @@ C
 C PROGDESC is a variable use to confirm that the scratch block is not
 C being used by some other routine.
 C
-	PROGDESC=79765231.0D0		!Must be unique
+	PROGDESC=79765231.0_LDP		!Must be unique
 C
 	IF(ND .GT. NV)THEN
 	  WRITE(6,*)'Error in HAM_FORMSOL - NV not large enough'
@@ -124,14 +124,14 @@ C DNU is the frequency bandwidth over which we integrate to obtain
 C JINT and is determined by the maximum expansion velocity of the
 C atmosphere. We define DNU with out the factor FL.
 C
-	DNU=3.33564D-06*V(1)*2.0D0
+	DNU=3.33564E-06_LDP*V(1)*2.0_LDP
 C
 C JINT contains the hand integration of the line from the redmost
 C side of the lineprofile (vred) to vred+DNU. If JINT(ND) is zero,
 C we assume that this is the first iteration, and set it equal to
 C the integral of the continuum intensity.
 C
-	IF(JINT(ND) .EQ. 0.0D0)THEN
+	IF(JINT(ND) .EQ. 0.0_LDP)THEN
 	  DO I=1,ND
 	    JINT_PREV(I)=JCONT(I)*DNU
 	  END DO
@@ -197,14 +197,14 @@ C Determine boundary condition for continuum intensity.
 C
 	  IF(THK_CONT)THEN
 	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF
-	    IBOUND=ETA(1)*(1.0D0-EXP(-TOR))/CHI(1)
+	    IBOUND=ETA(1)*(1.0_LDP-EXP(-TOR))/CHI(1)
 	  ELSE
-	    TOR=0.0D0
-	    IBOUND=0.0D0
+	    TOR=0.0_LDP
+	    IBOUND=0.0_LDP
 	  END IF
 C
 C 
@@ -214,9 +214,9 @@ C
 	  OLDCHI=CHI(NI)
 	  DO ML=1,NLF
 	    IF(ML .EQ. 1)THEN
-	      MID_PRO=0.0D0
+	      MID_PRO=0.0_LDP
 	    ELSE
-	      MID_PRO=0.50D0*( PROF(ML)+PROF(ML-1) )
+	      MID_PRO=0.50_LDP*( PROF(ML)+PROF(ML-1) )
 	    END IF
 	    DO I=1,NIEXT
 	      DEPTH_PRO(I)=MID_PRO	  	  !Used for dJBARdS
@@ -227,12 +227,12 @@ C
 	    IF(DIF .AND. LS .LE. NC)THEN
 	      T1=CHI(ND)+CHIL(ND)*PROF(ML)
 	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
-	1            *( 1.0D0+Q(ND)*TCHI(ND)*(1.0D0/T1-1.0D0/OLDCHI) )
+	1            *( 1.0_LDP+Q(ND)*TCHI(ND)*(1.0_LDP/T1-1.0_LDP/OLDCHI) )
 C
 C Variation with respect to T1 and OLDCHI only.
 C
 	      IF(ML .EQ. 1)THEN
-	        VDBC=0.0D0
+	        VDBC=0.0_LDP
 	      ELSE
 	        VDBC=DBB*Q(ND)*(PROF(ML-1)/OLDCHI/OLDCHI-PROF(ML)/T1/T1)
 	1            *SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)
@@ -259,9 +259,9 @@ C
 C	I(incident)=ETAL(I)/CHIL(I)*(1.0D0-WERF_EXP)+IBOUND*WERF_EXP
 C
 	    IF(THK_LINE .AND. ML .NE. 1)THEN
-	      WERF_EXP=EXP( 1.0D-15*CHIL(1)/FL/GAM(1)*
-	1                      0.5D0*(WERFC(ML)+WERFC(ML-1)) )
-	      XM(1)=(CHI(1)/TCHI(1)*WERF_EXP-1.0D0)*ETAL(1)/CHIL(1)
+	      WERF_EXP=EXP( 1.0E-15_LDP*CHIL(1)/FL/GAM(1)*
+	1                      0.5_LDP*(WERFC(ML)+WERFC(ML-1)) )
+	      XM(1)=(CHI(1)/TCHI(1)*WERF_EXP-1.0_LDP)*ETAL(1)/CHIL(1)
 	1              -IBOUND*CHI(1)/TCHI(1)*WERF_EXP
 	    ELSE
 	      XM(1)=-IBOUND
@@ -317,7 +317,7 @@ C
 C Compute the Opacity and the Source variation vectors (diagonal
 C operators).
 C
-	      T1=1.0D-15/FL/GAM(1)*( WERFC(ML)+WERFC(ML-1) )*0.5D0
+	      T1=1.0E-15_LDP/FL/GAM(1)*( WERFC(ML)+WERFC(ML-1) )*0.5_LDP
 	      CALL HAM_VARLAM(VKI,VSRCE,RKB,
 	1              DEPTH_PRO,DTAU,R,Z,
 	1              GB,Q,QH,AV,AVM1,CVM1,
@@ -471,7 +471,7 @@ C
 C
 	    DO I=1,NI-1
 	      Q(I)=GAM(I)*( AV(I)-AVCONT(I) )/CHI(I)
-	      QH(I)=2.0D0*GAMH(I)*( CV(I)-CVCONT(I) )/(CHI(I)+CHI(I+1))
+	      QH(I)=2.0_LDP*GAMH(I)*( CV(I)-CVCONT(I) )/(CHI(I)+CHI(I+1))
 	    END DO
 	    Q(NI)=GAM(NI)*( AV(NI)-AVCONT(NI) )/CHI(NI)
 C
@@ -483,38 +483,38 @@ C Note that WERF_EXP must be evaluate at NLF - not NLF-0.5 .
 C
 	    XM(1)=-Q(1)-IBOUND*DNU
 	    IF(THK_LINE)THEN
-	      WERF_EXP=EXP( 1.0D-15*CHIL(1)/FL/GAM(1)*WERFC(NLF) )
+	      WERF_EXP=EXP( 1.0E-15_LDP*CHIL(1)/FL/GAM(1)*WERFC(NLF) )
 	      XM(1)=XM(1)+GAM(1)*
-	1                 (ETAL(1)/CHIL(1)-IBOUND)*(1.0D0-WERF_EXP)
+	1                 (ETAL(1)/CHIL(1)-IBOUND)*(1.0_LDP-WERF_EXP)
 	    END IF
-	    VSRCE(1)=0.0D0
-	    TA(1)=0.0D0
-	    TC(1)=1./DTAU(1)
-	    TB(1)=-1.0D0-TC(1)
+	    VSRCE(1)=0.0_LDP
+	    TA(1)=0.0_LDP
+	    TC(1)=1._LDP/DTAU(1)
+	    TB(1)=-1.0_LDP-TC(1)
 	    DO I=2,NI-1
 	      TA(I)=TC(I-1)
-	      TC(I)=1.0D0/DTAU(I)
-	      TB(I)=-0.5D0*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
-	      XM(I)=-0.5D0*( SOURCE(I)+Q(I) )*( DTAU(I-1)+DTAU(I) )
+	      TC(I)=1.0_LDP/DTAU(I)
+	      TB(I)=-0.5_LDP*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
+	      XM(I)=-0.5_LDP*( SOURCE(I)+Q(I) )*( DTAU(I-1)+DTAU(I) )
 	1               -QH(I)+QH(I-1)
-	      VSRCE(I)=-0.5D0*( DTAU(I-1)+DTAU(I) )
+	      VSRCE(I)=-0.5_LDP*( DTAU(I-1)+DTAU(I) )
 	    END DO
 C
 	    IF(LS .LE. NC .AND. DIF)THEN
 	      TA(NI)=-TC(NI-1)
 	      TB(NI)=TC(NI-1)
 	      XM(NI)=DBC			!DNU include in definition of DBC.
-	      VSRCE(NI)=0.0D0
+	      VSRCE(NI)=0.0_LDP
 	    ELSE IF(LS .GT. NC)THEN
 	      TA(NI)=-TC(NI-1)
-	      TB(NI)=-TA(NI)+DTAU(NI-1)*0.5D0
-	      XM(NI)=0.5D0*DTAU(NI-1)*(SOURCE(NI)+Q(NI))-QH(NI-1)
-	      VSRCE(NI)=0.5D0*DTAU(NI-1)
+	      TB(NI)=-TA(NI)+DTAU(NI-1)*0.5_LDP
+	      XM(NI)=0.5_LDP*DTAU(NI-1)*(SOURCE(NI)+Q(NI))-QH(NI-1)
+	      VSRCE(NI)=0.5_LDP*DTAU(NI-1)
 	    ELSE
 	      TA(NI)=-TC(NI-1)
 	      TB(NI)=1-TA(NI)
 	      XM(NI)=IC*DNU+Q(NI)
-	      VSRCE(NI)=0.0D0
+	      VSRCE(NI)=0.0_LDP
 	    END IF
 	    TC(NI)=0.0
 C
@@ -553,17 +553,17 @@ C Scale JBLANK and HBLANK to allow for the fact that the
 C LFQW dont necessarily add to v*(PF(1)-PF(NLF)) (since LFQW is
 C normalized so that integral over the line profile is unity).
 C
-	  SCALE=0.0D0
+	  SCALE=0.0_LDP
 	  DO ML=1,NLF
 	    SCALE=SCALE+LFQW(ML)
 	  END DO
-	  SCALE=1.0D+15*FL*(PF(1)-PF(NLF))/SCALE
+	  SCALE=1.0E+15_LDP*FL*(PF(1)-PF(NLF))/SCALE
 	  DO I=1,ND
 	    JBLANK(I)=JBLANK(I)*SCALE
 	    HBLANK(I)=HBLANK(I)*SCALE
 	  END DO
 	  IF(FULL_ES)THEN
-	    T1=1.0D-15/FL
+	    T1=1.0E-15_LDP/FL
 	    T2=PF(1)-PF(NLF)
 	    DO I=1,ND
 	      JEX_SCAT(I)=JBLANK(I)*T1-JCONT(I)*T2
@@ -577,7 +577,7 @@ C HBLANK is similarly defined. Note that we need to keep JINT since this
 C is used in the electron scattering integral. The frequency factor of
 C 10^15 is included in the JBLANK (and HBLANK) definition.
 C
-	  T1=1.0D+15*FL
+	  T1=1.0E+15_LDP*FL
 	  DO I=1,ND
 	    JBLANK(I)=JBLANK(I)+JINT(I)*T1
 	    HBLANK(I)=HBLANK(I)+HINT(I)*T1
@@ -593,16 +593,16 @@ C
 	  DO I=1,ND
 	    JINT(I)=JINT(I)+JEX_SCAT(I)
 	    T1=dJINTdS(I)*ESEC(I)/CHI(I)
-	    JINT(I)=(JINT(I)-T1*JINT_PREV(I))/(1.0D0-T1)
+	    JINT(I)=(JINT(I)-T1*JINT_PREV(I))/(1.0_LDP-T1)
 	  END DO
 C
 C Evaluate the line EW. The units are Angstroms. Also evaluate
 C the continuum intensity ( Jys/kpc/kpc ). Note that H is
 C defined midway between R(1) and R(2).
 C
-	  T1=( (PF(1)-PF(NLF))+DNU )*FL*1.0D+15
-	  EW=2.99794D-12*( HBLANK(1)-HCONT(1)*T1 )/HCONT(1)/FL/FL
-	  CONT_INT=13.19868*HCONT(1)*( (R(1)+R(2))**2 )/4.0D0
+	  T1=( (PF(1)-PF(NLF))+DNU )*FL*1.0E+15_LDP
+	  EW=2.99794E-12_LDP*( HBLANK(1)-HCONT(1)*T1 )/HCONT(1)/FL/FL
+	  CONT_INT=13.19868_LDP*HCONT(1)*( (R(1)+R(2))**2 )/4.0_LDP
 C
 C Change HBLANK and JBLANK to be the int{across line -Jc} (i.e
 C integral of J or H above the continuum). Thus, for a weak line,
@@ -620,7 +620,7 @@ C Evaluate ZNET, dZdCHIL and dZdETAL from JBAR, dJBARdS (=LAMLINE) and
 C dJBARdKI.
 C
 	DO I=1,ND
-	  ZNET(I)=1.0D0-JBAR(I)*CHIL(I)/ETAL(I)
+	  ZNET(I)=1.0_LDP-JBAR(I)*CHIL(I)/ETAL(I)
 	END DO
 C
 	IF(COMPUTE_LAM)THEN
@@ -631,7 +631,7 @@ C
 	  END DO
 	END IF
 C
-	IF(PROGDESC .NE. 79765231.0D0)THEN
+	IF(PROGDESC .NE. 79765231.0_LDP)THEN
 	  WRITE(6,*)'Error - Scratch Block Corrupted in FORMSOL'
 	  STOP
 	END IF

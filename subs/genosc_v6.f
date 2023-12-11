@@ -73,7 +73,7 @@ C
 C
 C Initialize arrays.
 C
-	EINA(1:N,1:N)=0.0D0
+	EINA(1:N,1:N)=0.0_LDP
 C
 C CUT_CNT is used to determine the number of transitions cut from the
 C calculations due to low oscilator values.
@@ -202,7 +202,7 @@ C
 	    STAT_WT(I)=RD_FREE_VAL(STRING,L1+1,STR_LEN,NEXT,DESC)
 	    DESC='FEDGE read in GENOSCIL-'//FILNAME
 	    FEDGE(I)=RD_FREE_VAL(STRING,NEXT,STR_LEN,NEXT,DESC)
-	    FEDGE(I)=(IONIZATION_EN-FEDGE(I))*SPEED_LIGHT*1.0D-15
+	    FEDGE(I)=(IONIZATION_EN-FEDGE(I))*SPEED_LIGHT*1.0E-15_LDP
 	    BIGLEN=MAX(BIGLEN,L1)
 	  END DO
 C
@@ -234,7 +234,7 @@ C
 !
 ! If GF_CUT is large, we assume we just want the ENERGY levels.
 !
-	IF(GF_CUT .GT. 1000.0D0 .OR. NTRET .EQ. 0)THEN
+	IF(GF_CUT .GT. 1000.0_LDP .OR. NTRET .EQ. 0)THEN
 	  CLOSE(LUIN)
 	  NTRET=0
 	  RETURN
@@ -321,7 +321,7 @@ C
 ! Delete very weak transitions from the line list. We first ensure that all
 ! parameters are reasonable.
 !
-	IF(GF_CUT .GT. 0.0D0 .AND. MAX(MIN_NUM_TRANS,LEV_CUT) .LT. N)THEN
+	IF(GF_CUT .GT. 0.0_LDP .AND. MAX(MIN_NUM_TRANS,LEV_CUT) .LT. N)THEN
 !
 	  IF(GF_ACTION .NE. 'SET_NEG' .AND. GF_ACTION .NE. 'SET_ZERO')THEN
 	    WRITE(LUER,'(1X,A)')'Error in GENOSC_V6'
@@ -344,21 +344,21 @@ C
 	        IF(GF_ACTION .EQ. 'SET_NEG')THEN
 	          EINA(I,J)=-EINA(I,J)
 	        ELSE
-	          EINA(I,J)=0.0D0
-	          EINA(J,I)=0.0D0
+	          EINA(I,J)=0.0_LDP
+	          EINA(J,I)=0.0_LDP
 	        END IF
 	      END IF
 	    END DO
 	  END DO
 !
-	  IF(CUT_CNT .NE. 0.0D0)THEN
+	  IF(CUT_CNT .NE. 0.0_LDP)THEN
 	    WRITE(LUER,'(1X,A,I5,A,A)')'***Warning**** --- ',CUT_CNT,
 	1     ' weak transitions cut in GENOSC_V6 --- ',TRIM(FILNAME)
  	  END IF
 	END IF
 !
 !
-	NTRET=0.0D0			!Number of principal transitions
+	NTRET=0.0_LDP			!Number of principal transitions
 	DO J=2,N
 	  DO I=1,J-1
 	    IF(EINA(I,J) .GT. 0)NTRET=NTRET+1

@@ -63,13 +63,13 @@ C
 	  WRITE(I,*)'NM_KI='
 	  STOP
 	END IF
-	VK(:,:,:)=0.0D0
-	RHS_dHdCHI(:,:)=0.0D0
+	VK(:,:,:)=0.0_LDP
+	RHS_dHdCHI(:,:)=0.0_LDP
 C
 	IF(COHERENT)THEN
 	  ES_COH_VEC(1:ND)=ESEC(1:ND)/CHI(1:ND)
 	ELSE
-	  ES_COH_VEC(1:ND)=0.0D0
+	  ES_COH_VEC(1:ND)=0.0_LDP
 	END IF
 C
 C Compute the dTAUdCHI matrix.
@@ -79,13 +79,13 @@ C
 C The following derivatives are valid for all ML.
 C
 	DO I=1,ND-1
-	  T1=(1.0D0+W(I))*(CHI(I)+CHI(I+1))
+	  T1=(1.0_LDP+W(I))*(CHI(I)+CHI(I+1))
 	  dHUdCHI(I)=HU(I)*W(I)/T1
 	  dHUdTAU(I)=-HU(I)/DTAU(I)
 	  dHLdCHI(I)=HL(I)*W(I)/T1
 	  dHLdTAU(I)=-HL(I)/DTAU(I)
 	  dHSdCHI(I)=-HS(I)/T1
-	  EPS_FAC(I)=-1.0D0/T1
+	  EPS_FAC(I)=-1.0_LDP/T1
 	END DO
 C
 C 
@@ -100,11 +100,11 @@ C
 	  K=I+1
 	  dTAdCHI_J=-dHLdTAU(J)
 	  dTCdCHI_I=-dHUdTAU(I)
-	  T1=0.5D0*R(I)*R(I)/Q(I)
+	  T1=0.5_LDP*R(I)*R(I)/Q(I)
 	  dTBdCHI_I=dHLdTAU(I)+PSI(I)/(DTAU(J)+DTAU(I)) +
-	1                    0.5D0*(1.0D0-ES_COH_VEC(I))*R(I)*R(I)/Q(I)
+	1                    0.5_LDP*(1.0_LDP-ES_COH_VEC(I))*R(I)*R(I)/Q(I)
 	  dTBdCHI_J=dHUdTAU(J)+PSI(I)/(DTAU(J)+DTAU(I))+
-	1                    0.5D0*(1.0D0-ES_COH_VEC(I))*R(I)*R(I)/Q(I)
+	1                    0.5_LDP*(1.0_LDP-ES_COH_VEC(I))*R(I)*R(I)/Q(I)
 C
 C dDELUB is use as correction because UB(I)=-TB(I)-PSI(I)-PSIPREV(I)
 C
@@ -134,7 +134,7 @@ C
 	DO I=2,ND-1
 	  J=I-1
 	  K=I+1
-	  T1=0.5D0*R(I)*R(I)/Q(I)
+	  T1=0.5_LDP*R(I)*R(I)/Q(I)
 C
 	  dTAdCHI_J=-dHLdCHI(J)
 	  dTAdCHI_I=-dHLdCHI(J)
@@ -200,7 +200,7 @@ C
 	    VK(ND,L,1)=VK(ND,L,1)+T1*dTAUdCHI(ND-1,L)
 	  END DO
 	  VK(ND,ND,1)=VK(ND,ND,1)-
-	1               DBB*R(ND)*R(ND)/3.0D0/CHI(ND)/CHI(ND)
+	1               DBB*R(ND)*R(ND)/3.0_LDP/CHI(ND)/CHI(ND)
 	ELSE
 	  T1= ( R(ND)*R(ND)*MIDF(ND)*JNU(ND) -
 	1           R(ND-1)*R(ND-1)*MIDF(ND-1)*Q(ND-1)*JNU(ND-1) )

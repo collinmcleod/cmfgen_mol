@@ -99,11 +99,11 @@
 ! Note FOUR_PI_D_H differs by 10^-15 from original constant in QUADGEN because
 ! FQW has C units of Hz, not 10^15 Hz.
 !
-	FOUR_PI_D_H=1.0D0/5.27296D-03                    !1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
+	FOUR_PI_D_H=1.0_LDP/5.27296E-03_LDP                    !1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
 !
-	WSE_S(:,:)=0.0D0
-	WSE_CR_S(:,:)=0.0D0
-	dWSE_SdT(:,:)=0.0D0
+	WSE_S(:,:)=0.0_LDP
+	WSE_CR_S(:,:)=0.0_LDP
+	dWSE_SdT(:,:)=0.0_LDP
 !
 ! Get photoionization cross-sections for all levels. The first call returns
 ! the threshold cross-section when NU < EDGE.
@@ -117,15 +117,15 @@
 ! DIS_CONST is the constant K appearing in the expression for level dissolution.
 ! A negative value for DIS_CONST implies that the cross-section is zero.
 !
-	DIS_CONST(1:N_F)=-1.0D0
+	DIS_CONST(1:N_F)=-1.0_LDP
 	IF(MOD_DO_LEV_DIS .AND. PHOT_ID .EQ. 1)THEN
 	  ZION_CUBED=ZION*ZION*ZION
 	  DO I_F=1,N_F
 	    IF(NU_CONT .LT. EDGE_F(I_F) .AND. ALPHA_VEC(I_F) .NE. 0)THEN
-	      NEFF=SQRT(3.289395D0*ZION*ZION/(EDGE_F(I_F)-NU_CONT))
+	      NEFF=SQRT(3.289395_LDP*ZION*ZION/(EDGE_F(I_F)-NU_CONT))
 	      IF(NEFF .GT. 2*ZION)THEN
-	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
-	         DIS_CONST(I_F)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
+	        T1=MIN(1.0_LDP,16.0_LDP*NEFF/(1+NEFF)/(1+NEFF)/3.0_LDP)
+	         DIS_CONST(I_F)=( T1*ZION_CUBED/(NEFF**4) )**1.5_LDP
 	      END IF
 	    END IF
 	  END DO
@@ -135,7 +135,7 @@
 !
 	IF(MOD_DO_LEV_DIS)THEN
 	  DO J=1,ND
-	    YDIS(J)=1.091D0*(X_LEV_DIS(J)+4.0D0*(ZION-1)*A_LEV_DIS(J))*
+	    YDIS(J)=1.091_LDP*(X_LEV_DIS(J)+4.0_LDP*(ZION-1)*A_LEV_DIS(J))*
 	1               B_LEV_DIS(J)*B_LEV_DIS(J)
 	    XDIS(J)=B_LEV_DIS(J)*X_LEV_DIS(J)
 	  END DO
@@ -152,21 +152,21 @@
 	      WSE_S(I_S,J)=WSE_S(I_S,J) + T1*HNST_F_ON_S(I_F,J)
 	      WSE_CR_S(I_S,J)=WSE_CR_S(I_S,J) - EDGE_F(I_F)*T1*HNST_F_ON_S(I_F,J)
 	      dWSE_SdT(I_S,J)=dWSE_SdT(I_S,J) - T1*HNST_F_ON_S(I_F,J)*
-	1        (dlnHNST_S_dlnT(I_S,J)+1.5D0+HDKT*EDGE_F(I_F)/T(J))/T(J)
+	1        (dlnHNST_S_dlnT(I_S,J)+1.5_LDP+HDKT*EDGE_F(I_F)/T(J))/T(J)
 	    END DO
 !
 ! We only allow for level dissolutions when the ionizations are occurring to
 ! the ground state.
 !
-	  ELSE IF(DIS_CONST(I_F) .GE. 0.0D0)THEN
+	  ELSE IF(DIS_CONST(I_F) .GE. 0.0_LDP)THEN
 	    T1=FOUR_PI_D_H*ALPHA_VEC(I_F)
 	    DO J=1,ND
-	      T2=7.782D0+XDIS(J)*DIS_CONST(I_F)
+	      T2=7.782_LDP+XDIS(J)*DIS_CONST(I_F)
 	      T3=T1*T2/(T2+YDIS(J)*DIS_CONST(I_F)*DIS_CONST(I_F))
 	      WSE_S(I_S,J)=WSE_S(I_S,J) + T3*HNST_F_ON_S(I_F,J)
 	      WSE_CR_S(I_S,J)=WSE_CR_S(I_S,J) - EDGE_F(I_F)*T3*HNST_F_ON_S(I_F,J)
 	      dWSE_SdT(I_S,J)=dWSE_SdT(I_S,J) - T3*HNST_F_ON_S(I_F,J)*
-	1          (dlnHNST_S_dlnT(I_S,J)+1.5D0+HDKT*EDGE_F(I_F)/T(J))/T(J)
+	1          (dlnHNST_S_dlnT(I_S,J)+1.5_LDP+HDKT*EDGE_F(I_F)/T(J))/T(J)
 	    END DO
 	  END IF
 	END DO

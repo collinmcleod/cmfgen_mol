@@ -72,8 +72,8 @@
 !
 ! These parameters (except Hz_TO_eV) probably only need to be changed if performing tests.
 !
-	REAL(KIND=LDP), PARAMETER :: Hz_to_eV=13.60569253D0/3.289841960D0
-	REAL(KIND=LDP), PARAMETER :: DELTA_ENR_SOURCE=30.0D0
+	REAL(KIND=LDP), PARAMETER :: Hz_to_eV=13.60569253_LDP/3.289841960_LDP
+	REAL(KIND=LDP), PARAMETER :: DELTA_ENR_SOURCE=30.0_LDP
 	LOGICAL, PARAMETER :: INCLUDE_EXCITATION=.TRUE.
 	LOGICAL, PARAMETER :: INCLUDE_IONIZATION=.TRUE.
 	CHARACTER(LEN=3), PARAMETER :: XKT_METHOD='lin'
@@ -155,7 +155,7 @@
             WRITE(LU_ER,*) 'Error allocating XKT',IOS
 	    STOP
 	  END IF
-	  XKT(1:NKT)=0.0D0; dXKT(1:NKT)=0.0D0
+	  XKT(1:NKT)=0.0_LDP; dXKT(1:NKT)=0.0_LDP
 	END IF
 !
 ! The following vectors/arrrays are local:
@@ -220,10 +220,10 @@
 	  RETURN
 	END IF
 !
-	FRAC_ELEC_HEATING=0.0D0
-	FRAC_ION_HEATING=0.0D0
-	FRAC_EXCITE_HEATING=0.0D0
-	YE=0.0D0
+	FRAC_ELEC_HEATING=0.0_LDP
+	FRAC_ION_HEATING=0.0_LDP
+	FRAC_EXCITE_HEATING=0.0_LDP
+	YE=0.0_LDP
 	dXKT_MIN=(XKT_MAX-XKT_MIN)/(NKT-1)
 	IF(METHOD .EQ. 'log')dXKT_MIN=XKT(2)-XKT(1)
 !
@@ -232,17 +232,17 @@
 ! E_INIT will be a normalisation constant to yield fractions for ionization etc.
 !
 	WRITE(LU_TH,*)'Constructing SOURCE'
-	SOURCE=0.0D0
+	SOURCE=0.0_LDP
 	IF (INJECT_DIRAC_AT_EMAX) THEN ! zero otherwise
 	  E_INIT = XKT_MAX
 	  WRITE(LU_TH,*)'Using Dirac delta function injection'
 	ELSE
-	  T1 = 0.0D0
+	  T1 = 0.0_LDP
 	  T2 = DELTA_ENR_SOURCE
        	  IF (SOURCE_TYPE .EQ. 'CONSTANT')THEN
 	    DO IKT=1,NKT
 	      IF (XKT(IKT) .GE. (XKT_MAX-T2)) THEN
-	        SOURCE(IKT) = 1.0D0
+	        SOURCE(IKT) = 1.0_LDP
 	        T1 = T1 + SOURCE(IKT)*dXKT(IKT)
               END IF
 	    END DO
@@ -250,7 +250,7 @@
 	  ELSE IF(SOURCE_TYPE .EQ. 'BELL_SHAPE')THEN
 	    DO IKT=1,NKT
 	      IF (XKT(IKT) .GE. (XKT_MAX-T2)) THEN
-                SOURCE(IKT) = 6.0D0 / T2**3 * (T2**2/4.D0 - (XKT(IKT)-XKT_MAX+T2/2.0D0)**2)
+                SOURCE(IKT) = 6.0_LDP / T2**3 * (T2**2/4._LDP - (XKT(IKT)-XKT_MAX+T2/2.0_LDP)**2)
 	        T1 = T1 + SOURCE(IKT)*dXKT(IKT)
               END IF
 	    END DO
@@ -258,8 +258,8 @@
           END IF
 	  SOURCE(:) = SOURCE(:) / T1
 !
-	  T1 = 0.0D0
-	  T2 = 0.0D0
+	  T1 = 0.0_LDP
+	  T2 = 0.0_LDP
 	  DO IKT=1,NKT
 	    T1 = T1 + SOURCE(IKT)*dXKT(IKT)
 	    T2 = T2 + XKT(IKT)*SOURCE(IKT)*dXKT(IKT)
@@ -275,10 +275,10 @@
             XION_POT = THD(IT)%ION_POT
 	    IF(XION_POT .LT. XKT(1))THEN
 	      IST=1
-	      SIG1=THD(IT)%CROSS_SEC(1); SIG2=0.0D0
+	      SIG1=THD(IT)%CROSS_SEC(1); SIG2=0.0_LDP
 	    ELSE IF(XION_POT .GT. XKT(NKT))THEN
 	      IST=NKT+1
-	      SIG1=0.0D0; SIG2=0.0D0
+	      SIG1=0.0_LDP; SIG2=0.0_LDP
 	    ELSE
 	      IST=GET_INDX_DP(XION_POT,XKT,NKT)
 	      SIG1=THD(IT)%CROSS_SEC(IST); SIG2=THD(IT)%CROSS_SEC(IST+1)
@@ -300,7 +300,7 @@
 ! be independent of the SL assignments.
 !
 	  DO IT=1,NUM_THD
-	    THD(IT)%N_ATOM=0.0D0
+	    THD(IT)%N_ATOM=0.0_LDP
 	    IF(THD(IT)%PRES)THEN
 	      ID=THD(IT)%LNK_TO_ION
 	      DO J=1,THD(IT)%N_STATES
@@ -346,7 +346,7 @@
 ! Initialize MAT, and the add Diagonal term for Coulomb interaction with
 ! thermal electrons.
 !
-	  MAT=0.0D0
+	  MAT=0.0_LDP
 	  DO IKT=1,NKT
 	    MAT(IKT,IKT) = LELEC(IKT)
 	  END DO
@@ -374,9 +374,9 @@
 !$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(IKT,IKTP,EKT,EKTP,EMIN,EMAX,XCROSS,NA_dX_CROSS)
 	        DO IKTP=IST,NKT
                   XCROSS = THD(IT)%CROSS_SEC(IKTP)
-	          IF(XCROSS .GT. 0.0D0)THEN
+	          IF(XCROSS .GT. 0.0_LDP)THEN
 	            EKTP = XKT(IKTP)
-                    EMAX = MIN(0.5d0*(EKTP+XION_POT),XKT(NKT))
+                    EMAX = MIN(0.5_LDP*(EKTP+XION_POT),XKT(NKT))
 	            NA_dX_CROSS=NATOM*dXKT(IKTP)*XCROSS
 !
 	            DO IKT=1,IKTP
@@ -386,7 +386,7 @@
 	                MAT(IKT,IKTP) = MAT(IKT,IKTP) + NA_dX_CROSS*INTSIGC(EKTP,XION_POT,EMIN,EMAX)
 	              END IF
 !
-                      IF (EKTP .GT. (2.0D0*EKT+XION_POT)) THEN
+                      IF (EKTP .GT. (2.0_LDP*EKT+XION_POT)) THEN
                         EMIN = EKT+XION_POT
                         MAT(IKT,IKTP) = MAT(IKT,IKTP) - NA_dX_CROSS*INTSIGC(EKTP,XION_POT,EMIN,EMAX)
                       END IF
@@ -410,10 +410,10 @@
 ! We exclude the final ion when computing the species and fractional population.
 ! We do at least one ionization stage for each species.
 !
-	  ION_SUM(:)=0.0D0
+	  ION_SUM(:)=0.0_LDP
 	  DO_THIS_ION_EXC(:)=.FALSE.
 	  DO ISPEC=1,NUM_SPECIES
-	    T1=0.0D0
+	    T1=0.0_LDP
 	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	     IF(ATM(ID)%XzV_PRES)ION_SUM(ID)=SUM(ATM(ID)%XzV_F(:,DPTH_INDX))
 	     T1=T1+ION_SUM(ID)
@@ -447,16 +447,16 @@
 ! oscilator strength is zero.
 !
 	          CALL BETHE_APPROX_V5(Qnn,NL,NUP,XKT,dXKT_ON_XKT,NKT,ID,DPTH_INDX)
-	          IF(Qnn(NKT) .GT. 0.0D0)THEN
+	          IF(Qnn(NKT) .GT. 0.0_LDP)THEN
 	            dE=Qnn(NKT)*Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(J))
 	            QSUM=Qnn(NKT)
 	            K=J
 	            DO WHILE(K+1 .LE. ATM(ID)%NXzV_F)
-	              IF(Hz_TO_eV*(ATM(ID)%EDGEXZV_F(K+1)-ATM(ID)%EDGEXZV_F(J)) .GE. 1.0)EXIT
+	              IF(Hz_TO_eV*(ATM(ID)%EDGEXZV_F(K+1)-ATM(ID)%EDGEXZV_F(J)) .GE. 1.0_LDP)EXIT
 	              K=K+1
 	              NUP=K
 	              CALL BETHE_APPROX_V5(Qnn_TMP,NL,NUP,XKT,dXKT_ON_XKT,NKT,ID,DPTH_INDX)
-	              IF(Qnn_TMP(NKT) .GT. 0.0D0)THEN
+	              IF(Qnn_TMP(NKT) .GT. 0.0_LDP)THEN
 	                CALL PAR_VEC_SUM(QNN,Qnn_TMP,NKT)
 	                dE=dE+Qnn_TMP(NKT)*Hz_TO_eV*(ATM(ID)%EDGEXZV_F(NL)-ATM(ID)%EDGEXZV_F(K))
 	                QSUM=QSUM+Qnn_TMP(NKT)
@@ -506,7 +506,7 @@
 ! Check no diagonal term of mat is zero
 !
 	 DO IKT=1,NKT
-	   IF (MAT(IKT,IKT) .EQ. 0.0D0) THEN
+	   IF (MAT(IKT,IKT) .EQ. 0.0_LDP) THEN
 	     WRITE(LU_ER,*) 'Zero diagonal element in mat ',IKT,SOURCE(IKT)
 	     STOP
 	   END IF
@@ -516,9 +516,9 @@
 ! Eq.7 of KF92.
 !
 	 IF (INJECT_DIRAC_AT_EMAX) THEN
-	   RHS(1:NKT) = 1.0D0
+	   RHS(1:NKT) = 1.0_LDP
 	 ELSE
-	   RHS(NKT) = 0.0D0
+	   RHS(NKT) = 0.0_LDP
 	   IF (SOURCE_TYPE .EQ. 'CONSTANT') RHS(NKT) = SOURCE(NKT) * dXKT(NKT)
 	   DO IKT=NKT-1,1,-1
 	     RHS(IKT) = RHS(IKT+1) + SOURCE(IKT) * dXKT(IKT)
@@ -527,10 +527,10 @@
 !
 ! Solve for the degradation function YE
 !
-	 YE(NKT,DPTH_INDX)=0.0D0
-	 IF(INJECT_DIRAC_AT_EMAX)YE(NKT,DPTH_INDX)=1.0D0/LELEC(NKT)
+	 YE(NKT,DPTH_INDX)=0.0_LDP
+	 IF(INJECT_DIRAC_AT_EMAX)YE(NKT,DPTH_INDX)=1.0_LDP/LELEC(NKT)
 	 DO IKT=NKT-1,1,-1
-	   T1 = 0.0D0
+	   T1 = 0.0_LDP
 	   DO IKTP=IKT+1,NKT
 	      T1 = T1 + MAT(IKT,IKTP)*YE(IKTP,DPTH_INDX)
 	   END DO
@@ -562,15 +562,15 @@
 !
 	          IF(XION_POT .LT. XKT(1))THEN
 	             IST=1
-	             SIG1=THD(IT)%CROSS_SEC(1); SIG2=0.0D0
+	             SIG1=THD(IT)%CROSS_SEC(1); SIG2=0.0_LDP
 	          ELSE IF(XION_POT .GT. XKT(NKT))THEN
 	             IST=NKT+1
-	             SIG1=0.0D0; SIG2=0.0D0
+	             SIG1=0.0_LDP; SIG2=0.0_LDP
 	          ELSE
 	             IST=GET_INDX_DP(XION_POT,XKT,NKT)
 	             SIG1=THD(IT)%CROSS_SEC(IST); SIG2=THD(IT)%CROSS_SEC(IST+1)
 	          END IF
-	          T1 = 0.0D0
+	          T1 = 0.0_LDP
 	          DO IKTP=IST,NKT
 	            XCROSS = THD(IT)%CROSS_SEC(IKTP)
 	            DETAI_DE(IKTP) = DETAI_DE(IKTP) + &
@@ -593,7 +593,7 @@
 !
 	  DO DPTH_INDX=1,ND
 	    DO ISPEC=1,NUM_SPECIES
-	      SCALER_SPEC_SUM=0.0D0
+	      SCALER_SPEC_SUM=0.0_LDP
 	      DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	        T1=SUM(ATM(ID)%XzV_F(:,DPTH_INDX))
 	        SCALER_SPEC_SUM=SCALER_SPEC_SUM+T1
@@ -647,11 +647,11 @@
 	WRITE(LU_TH,*)'Integral of normalized YE as a function of depth'
 	WRITE(LU_TH,'(1X,A,5X,A,10X,A)')'Depth','Int(YE)','Ne'
 	DO DPTH_INDX=1,ND
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  DO IKT=1,NKT
 	   T1=T1+YE(IKT,DPTH_INDX)/SQRT(XKT(IKT))*dXKT(IKT)
 	  END DO
-	  T1=T1*SQRT(9.109389D-28/2.0D0/1.602177D-12)/E_INIT
+	  T1=T1*SQRT(9.109389E-28_LDP/2.0_LDP/1.602177E-12_LDP)/E_INIT
 	  WRITE(LU_TH,'(I6,2ES12.3)')DPTH_INDX,T1,ED(DPTH_INDX)
 	END DO
 !

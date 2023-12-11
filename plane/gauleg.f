@@ -16,7 +16,7 @@
 !
 ! Local variables.
 !
-	REAL(KIND=LDP), PARAMETER :: EPS=3.0D-14
+	REAL(KIND=LDP), PARAMETER :: EPS=3.0E-14_LDP
 !
 	REAL(KIND=LDP) XM,XL
 	REAL(KIND=LDP) P1,P2,P3,dP
@@ -35,20 +35,20 @@
 ! XM and XL are used to convert the abscissa and weights to the desired
 ! integration interval.
 !
-	XM=0.5D0*(X2+X1)
-	XL=0.5D0*(X2-X1)
+	XM=0.5_LDP*(X2+X1)
+	XL=0.5_LDP*(X2-X1)
 !
 	M=(N+1)/2
 	DO I=1,M			!Loop to find desired roots.
-	  Z=COS(3.141592654D0*(I-.25D0)/(N+.5D0))
+	  Z=COS(3.141592654_LDP*(I-.25_LDP)/(N+.5_LDP))
 	  Z1=100.0
 !
 ! starting with the approximation Z given above we reine the Roots using
 ! Newton's method.
 !
 	  DO WHILE( ABS(Z-Z1).GT.EPS)
-	    P1=1.D0
-	    P2=0.D0
+	    P1=1._LDP
+	    P2=0._LDP
 !
 ! Loop to evaluate the recurrance relation to get the Legendre polynomial
 ! evaluated at Z.
@@ -59,18 +59,18 @@
 	    DO J=1,N
 	      P3=P2
 	      P2=P1
-	      P1=((2.D0*J-1.D0)*Z*P2-(J-1.D0)*P3)/J
+	      P1=((2._LDP*J-1._LDP)*Z*P2-(J-1._LDP)*P3)/J
 	    END DO
 !
 ! Copute the derivative, dP, of P1
 !
-	    dP=N*(Z*P1-P2)/(Z*Z-1.D0)
+	    dP=N*(Z*P1-P2)/(Z*Z-1._LDP)
 	    Z1=Z
 	    Z=Z1-P1/dP
 	  END DO
 	  X(I)=XM-XL*Z
 	  X(N+1-I)=XM+XL*Z
-	  W(I)=2.D0*XL/((1.D0-Z*Z)*dP*dP)
+	  W(I)=2._LDP*XL/((1._LDP-Z*Z)*dP*dP)
 	  W(N+1-I)=W(I)
 	END DO
 !
@@ -82,13 +82,13 @@
 ! as a temporary variable.
 !
 	DO J=0,2*N-1
-	  SUM=0.0D0
+	  SUM=0.0_LDP
 	  DO I=1,N
 	    SUM=SUM+W(I)*(X(I)**J)
 	  END DO
 	  ANS=(X2**(J+1)-X1**(J+1))/(J+1)
 	  P1=MAX( ABS(X2**(J+1)), ABS(X1**(J+1)) )/(J+1)
-	  IF( ABS(ANS-SUM)/P1 .GT. 1.0D-12)THEN
+	  IF( ABS(ANS-SUM)/P1 .GT. 1.0E-12_LDP)THEN
 	    WRITE(6,*)'Error in GAULEG --- bad quadrature computation.'
 	    WRITE(6,*)'J=',J,'ANS=',ANS,'SUM=',SUM
 	  END IF

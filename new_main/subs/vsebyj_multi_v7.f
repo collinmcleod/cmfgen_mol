@@ -92,11 +92,11 @@
 	DO K=DST,DEND			!Which depth point.
 	  IF(ION_LEV .NE. 1)THEN
 	    LOG_B_RAT=LOG(DI(ION_LEV,K)/DI(1,K))+LOG_DIST(1,K)-LOG_DIST(ION_LEV,K)
-	    B_RAT=0.0D0
-	    IF(LOG_B_RAT .LT. 780.0D0)B_RAT=EXP(LOG_B_RAT)
+	    B_RAT=0.0_LDP
+	    IF(LOG_B_RAT .LT. 780.0_LDP)B_RAT=EXP(LOG_B_RAT)
 	  ELSE
-	    B_RAT=1.0D0
-	    LOG_B_RAT=0.0D0
+	    B_RAT=1.0_LDP
+	    LOG_B_RAT=0.0_LDP
 	  END IF
 
 	  DO J=1,NLEV			!Which equation (for S.E. only)

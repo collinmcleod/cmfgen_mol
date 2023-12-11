@@ -65,7 +65,7 @@
 *
 *     .. Parameters ..
       REAL(KIND=LDP)   ONE
-      PARAMETER          ( ONE = 1.0D+0 )
+      PARAMETER          ( ONE = 1.0_LDP )
 *     ..
 *     .. Local Scalars ..
       LOGICAL            NOTRAN

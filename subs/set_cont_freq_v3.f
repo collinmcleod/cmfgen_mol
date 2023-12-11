@@ -93,7 +93,7 @@ C
 	  STOP
 	END IF
 C
-	EQUAL_FAC=1.0D-11
+	EQUAL_FAC=1.0E-11_LDP
 	FAC = RONE + EQUAL_FAC
 C
 C SMAL_FAC is the ratio used to set the frequency spacing for
@@ -215,7 +215,7 @@ C
 	      dV_NEW=dV*(AMP_DIS-RONE)/(AMP_DIS**(J+1) -RONE)
 	      UP=NEW_FREQ(K)
 	      NEW_FREQ(K_BEG+J+1)=UP
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO L=J,1,-1
 	        T1=T1+dV_NEW*(AMP_DIS**(J-L))/C_KMS
 	        NEW_FREQ(K_BEG+L)=UP*(RONE-T1)
@@ -246,7 +246,7 @@ C
 	 FREQ(I)=NEW_FREQ(I)	
 	END DO
 	K=1
-	T1=1.0D-04
+	T1=1.0E-04_LDP
 	DO I=2,NCF
 	  IF( EQUAL(FREQ(I),FREQ(I-1), T1) )THEN
 	    K=K+1
@@ -276,19 +276,19 @@ C
         K=1
         DO ML=2,NCF
           T1=C_KMS*(FREQ(ML-1)-FREQ(ML))/FREQ(ML)
-          IF(T1 .GT. 1.25D0*DELV_XRAY .AND. FREQ(ML) .GT. NU_END_XRAY)THEN
-            J=T1/DELV_XRAY/1.2D0
+          IF(T1 .GT. 1.25_LDP*DELV_XRAY .AND. FREQ(ML) .GT. NU_END_XRAY)THEN
+            J=T1/DELV_XRAY/1.2_LDP
             DO L=1,J
               K=K+1
               IF(K .GT. NCF_MAX)EXIT
-              NEW_FREQ(K)=FREQ(ML-1)-L*(FREQ(ML-1)-FREQ(ML))/(J+1.0D0)
+              NEW_FREQ(K)=FREQ(ML-1)-L*(FREQ(ML-1)-FREQ(ML))/(J+1.0_LDP)
             END DO
-          ELSE IF(T1 .GT. 1.25D0*DELV_CONT .AND. FREQ(ML) .LE. NU_END_XRAY)THEN
-            J=T1/DELV_CONT/1.2D0
+          ELSE IF(T1 .GT. 1.25_LDP*DELV_CONT .AND. FREQ(ML) .LE. NU_END_XRAY)THEN
+            J=T1/DELV_CONT/1.2_LDP
             DO L=1,J
               K=K+1
               IF(K .GT. NCF_MAX)EXIT
-              NEW_FREQ(K)=FREQ(ML-1)-L*(FREQ(ML-1)-FREQ(ML))/(J+1.0D0)
+              NEW_FREQ(K)=FREQ(ML-1)-L*(FREQ(ML-1)-FREQ(ML))/(J+1.0_LDP)
             END DO
           END IF
           K=K+1
@@ -319,7 +319,7 @@ C
 C Ensure FREQ array is zeroed (as probably will use OBSF).
 C
 	DO I=1,NCF
-	  FREQ(I)=0.0D0
+	  FREQ(I)=0.0_LDP
 	END DO
 C
 	RETURN

@@ -72,7 +72,7 @@
 !
 	DO I=1,ND
 	  HIGH_POP(I)=DHE2(I)
-	  IF(W_HE2(1,I) .NE. 1.0)THEN
+	  IF(W_HE2(1,I) .NE. 1.0_LDP)THEN
 	    WRITE(LUER,*)'Error in PAR_FUN --- occupation probability for ',
 	1               'ground state must be unity.'
 	    WRITE(LUER,*)'N=',N
@@ -111,21 +111,21 @@
 !
 	    DO J=1,N
 	      T2=HDKT*EDGE(J)
-	      CONST=HE2(J,I)*(T2**1.5D0)*GION/GHE2(J)/W_HE2(J,I)/2.07078D-22/OLD_ED(I)/DHE2(I)
-	      IF(CONST .LT. 2.8)THEN
-	        TEXCITE(J)=CONST**(0.67)
+	      CONST=HE2(J,I)*(T2**1.5_LDP)*GION/GHE2(J)/W_HE2(J,I)/2.07078E-22_LDP/OLD_ED(I)/DHE2(I)
+	      IF(CONST .LT. 2.8_LDP)THEN
+	        TEXCITE(J)=CONST**(0.67_LDP)
 	      ELSE
 	        TEXCITE(J)=LOG(CONST)
 	      END IF
               COUNT=0
-	      DELTA_T=1.0D+10
-	      DO WHILE( ABS(DELTA_T/TEXCITE(J)) .GT. 1.0E-10)
+	      DELTA_T=1.0E+10_LDP
+	      DO WHILE( ABS(DELTA_T/TEXCITE(J)) .GT. 1.0E-10_LDP)
 	        COUNT=COUNT+1
 	        T1=SQRT(TEXCITE(J))
 	        T3=EXP(TEXCITE(J))
-	        DELTA_T=(T1*TEXCITE(J)*T3 - CONST)/T3/T1/(1.5D0+TEXCITE(J))
-	        IF(DELTA_T .GT. 0.8*TEXCITE(J))DELTA_T=0.8*TEXCITE(J)
-	        IF(DELTA_T .LT. -0.8*TEXCITE(J))DELTA_T=-0.8*TEXCITE(J)
+	        DELTA_T=(T1*TEXCITE(J)*T3 - CONST)/T3/T1/(1.5_LDP+TEXCITE(J))
+	        IF(DELTA_T .GT. 0.8_LDP*TEXCITE(J))DELTA_T=0.8_LDP*TEXCITE(J)
+	        IF(DELTA_T .LT. -0.8_LDP*TEXCITE(J))DELTA_T=-0.8_LDP*TEXCITE(J)
 	        TEXCITE(J)=TEXCITE(J)-DELTA_T
 	        IF(COUNT .GE. 100)THEN
 	          WRITE(LUER,*)'Error in PAR_FUN_V3'
@@ -135,8 +135,8 @@
 	      END DO
               TEXCITE(J)=T2/TEXCITE(J)
 	      TEXCITE(J)=T(I)+(TEXCITE(J)-OLD_T(I))
-	      HE2(J,I)=EXP(HDKT*EDGE(J)*(1.0D0/TEXCITE(J)-1.0D0/T(I)))*
-	1                    (T(I)/TEXCITE(J))**1.5D0
+	      HE2(J,I)=EXP(HDKT*EDGE(J)*(1.0_LDP/TEXCITE(J)-1.0_LDP/T(I)))*
+	1                    (T(I)/TEXCITE(J))**1.5_LDP
 	    END DO
 	  END DO
 	ELSE
@@ -153,8 +153,8 @@
 	DO I=1,ND
 	  U(I,NSPEC)=GHE2(1)
 	  U(I,NSPEC+1)=GION
-	  PHI(I,NSPEC+1)=0.0D0
-	  LOG_RGU=2.07078D-22*HE2(1,I)
+	  PHI(I,NSPEC+1)=0.0_LDP
+	  LOG_RGU=2.07078E-22_LDP*HE2(1,I)
 	  LOG_RGU=LOG(LOG_RGU)
 	  PHI(I,NSPEC)=EXP( LOG_RGU+T1/T(I) )/T(I)/SQRT(T(I))
 	  DO J=2,N

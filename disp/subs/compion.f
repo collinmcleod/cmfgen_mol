@@ -13,11 +13,11 @@ C
 	  IF(HYD(1,ND) .NE. 0
 	1              .AND. DHYD(1,ND) .NE. 0)THEN
 	    DO J=1,ND
-	      YV(J)=0.0D0
+	      YV(J)=0.0_LDP
 	      DO I=1,NHYD
 	        YV(J)=YV(J)+HYD(I,J)
 	      END DO
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO I=1,NION
 	        T1=T1+DHYD(I,J)
 	      END DO

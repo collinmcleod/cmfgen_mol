@@ -66,13 +66,13 @@
 ! and DDBBDT= dB/dTR .
 !
 	T1=HDKT*FL/T(ND)
-	T2=1.0D0-EMHNUKT(ND)
+	T2=1.0_LDP-EMHNUKT(ND)
 	BNUE=TWOHCSQ*( FL**3 )*EMHNUKT(ND)/T2
 	DBB=TWOHCSQ*( FL**3 )*T1*DTDR/T(ND)*EMHNUKT(ND)/(T2**2)
-	DDBBDT=DBB*(T1*(1.0D0+EMHNUKT(ND))/T2-2.0D0)/T(ND)
-        HFLUX_AT_IB=DBB/CHI(ND)/3.0D0
+	DDBBDT=DBB*(T1*(1.0_LDP+EMHNUKT(ND))/T2-2.0_LDP)/T(ND)
+        HFLUX_AT_IB=DBB/CHI(ND)/3.0_LDP
 	IF(SN_MODEL .AND. .NOT. DIF)THEN
-	  BNUE=0.0D0; DBB=0.0D0; DDBBDT=0.0D0
+	  BNUE=0.0_LDP; DBB=0.0_LDP; DDBBDT=0.0_LDP
 	  IF(FIRST_FREQ)WRITE(LUER,*)'Setting flux for hollow core in CMF_FLUX_SUB_V5'
 	END IF
 !
@@ -92,17 +92,17 @@
 	    CALL RD_CONT_J_OBS(RJEXT,FL,FREQ_INDX,FIRST_FREQ,
 	1          LST_ITERATION,LUER,LU_EDD,ACCESS_F,NDEXT)
 	    CALL UNGRID(RJ,ND,RJEXT,NDEXT,POS_IN_NEW_GRID)
-	    RSQHNU(1:NDEXT)=1.0D-20
+	    RSQHNU(1:NDEXT)=1.0E-20_LDP
 	  ELSE
 	    CALL RD_CONT_J_OBS(RJ,FL,FREQ_INDX,FIRST_FREQ,
 	1          LST_ITERATION,LUER,LU_EDD,ACCESS_F,ND)
-	    RSQHNU(1:ND)=1.0D-20
+	    RSQHNU(1:ND)=1.0E-20_LDP
 	  END IF
 !
 ! Evaluate other quantities that are set but not really needed.
 !
 	  RJ_ES(1:ND)=RJ(1:ND)
-	  K_MOM(1:ND)=RJ(1:ND)/3.0D0
+	  K_MOM(1:ND)=RJ(1:ND)/3.0_LDP
           SOURCE(1:ND)=ZETA(1:ND)+THETA(1:ND)*RJ(1:ND)
 !
 ! So as defined for normal OBSFLUX calculation.
@@ -113,8 +113,8 @@
 	    RMAX_OBS=R(1)
 	    V_AT_RMAX=V(1)
 	  END IF
-	  IPLUS(1:NP)=1.0D-10             !Arbitrary value
-	  HBC_CMF(1)=1.0D0
+	  IPLUS(1:NP)=1.0E-10_LDP             !Arbitrary value
+	  HBC_CMF(1)=1.0_LDP
 !
 	ELSE IF(.NOT. CONT_VEL .AND. THIS_FREQ_EXT)THEN
 !
@@ -135,12 +135,12 @@
 !
 	  IF(COMPUTE_EDDFAC)THEN
 	    DO I=1,NDEXT
-	      RJEXT(I)=0.0D0
-	      FOLD(I)=0.0D0
+	      RJEXT(I)=0.0_LDP
+	      FOLD(I)=0.0_LDP
 	    END DO
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJEXT(I),I=1,NDEXT),T1
-	    IF(ABS(T1-FL)/FL .GT. 1.0D-14)THEN
+	    IF(ABS(T1-FL)/FL .GT. 1.0E-14_LDP)THEN
 	      WRITE(LUER,*)'Error - 1 incorrect reading of mean intensity'
 	      WRITE(LUER,*)'Intensity is ',FL,'Old Intensity is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
@@ -173,7 +173,7 @@
 !
 	      INACCURATE=.FALSE.
 	      IF(L .LT. 3 .OR. COMPUTE_EDDFAC)THEN	!Chnaged 8-Feb-95
-	        T1=0.0D0
+	        T1=0.0_LDP
 	        DO I=1,NDEXT
 	          T1=MAX(ABS(FOLD(I)-FEXT(I)),T1)
 	          FOLD(I)=FEXT(I)
@@ -235,17 +235,17 @@
 	    CHI_PREV(1:ND)=CHI(1:ND)
 	    ETA_PREV(1:ND)=ETA(1:ND)
 !
-	    FEDD_PREV(1:NDEXT)=0.0D0		!Not required.
-	    GEDD_PREV(1:NDEXT)=0.0D0
-	    JNU_PREV(1:NDEXT)=0.0D0
-	    N_ON_J_PREV(1:NDEXT)=0.0D0
-	    RSQHNU_PREV(1:NDEXT)=0.0D0
+	    FEDD_PREV(1:NDEXT)=0.0_LDP		!Not required.
+	    GEDD_PREV(1:NDEXT)=0.0_LDP
+	    JNU_PREV(1:NDEXT)=0.0_LDP
+	    N_ON_J_PREV(1:NDEXT)=0.0_LDP
+	    RSQHNU_PREV(1:NDEXT)=0.0_LDP
 !
-	    HBC_PREV(:)=0.0D0		!1:3
-	    NBC_PREV(:)=0.0D0		!1:3
-	    HBC_CMF(:)=0.0D0		!1:3
-	    NBC_CMF(:)=0.0D0		!1:3
-	    FG_COUNT=0.0D0
+	    HBC_PREV(:)=0.0_LDP		!1:3
+	    NBC_PREV(:)=0.0_LDP		!1:3
+	    HBC_CMF(:)=0.0_LDP		!1:3
+	    NBC_CMF(:)=0.0_LDP		!1:3
+	    FG_COUNT=0.0_LDP
 	  ELSE
 	    dLOG_NU=LOG(FL_OLD/FL)
 	    FEDD_PREV(1:NDEXT)=FEDD(1:NDEXT)
@@ -260,13 +260,13 @@
 !
 	  IF(COMPUTE_EDDFAC)THEN
 	    IF(FIRST_FREQ)THEN
-	      RJEXT(1:NDEXT)=0.0D0
-	      RJEXT_ES(1:NDEXT)=0.0D0
-	      FOLD(1:NDEXT)=0.0D0
+	      RJEXT(1:NDEXT)=0.0_LDP
+	      RJEXT_ES(1:NDEXT)=0.0_LDP
+	      FOLD(1:NDEXT)=0.0_LDP
 	    END IF
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJEXT(I),I=1,NDEXT),T1
-	    IF(ABS(T1-FL)/FL .GT. 1.0D-14)THEN
+	    IF(ABS(T1-FL)/FL .GT. 1.0E-14_LDP)THEN
 	      WRITE(LUER,*)'Error - 2 incorrect reading of'//
 	1                  ' the mean intensity'
 	      WRITE(LUER,*)'Intensity is ',FL,'Old Intensity is ',T1
@@ -279,7 +279,7 @@
 !
 	  IF(.NOT. COHERENT_ES)THEN
 	    READ(LU_ES,REC=ACCESS_F)(RJEXT_ES(I),I=1,NDEXT),T1
-	    IF(ABS(T1-FL)/FL .GT. 1.0D-14)THEN
+	    IF(ABS(T1-FL)/FL .GT. 1.0E-14_LDP)THEN
 	      WRITE(LUER,*)'Error - 3 incorrect reading of'//
 	1                ' the mean intensity'
 	      WRITE(LUER,*)'Intensity is ',FL,'Old Intensity is ',T1
@@ -366,7 +366,7 @@
 	1                  FL,DIF,DBB,IC,METHOD,L_TRUE,
 	1                  IZERO,FIRST_FREQ,NEW_FREQ,NDEXT)
 	       HFLUX_AT_OB=HBC_CMF(1)*RJ(1)-HBC_CMF(2)
-	       IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+	       IF(.NOT. DIF)HFLUX_AT_OB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
              ELSE IF(PLANE_PARALLEL)THEN
 	       IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling PP_MOM_CMF_V1 with accurate grid'
                CALL PP_MOM_CMF_V1(TA,CHIEXT,TB,VEXT,SIGMAEXT,REXT,
@@ -377,7 +377,7 @@
 	1                  N_TYPE,METHOD,L_TRUE,
 	1                  FIRST_FREQ,NEW_FREQ,NDEXT)
 	       HFLUX_AT_OB=HBC_CMF(1)*RJ(1)-HBC_CMF(2)
-	       IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+	       IF(.NOT. DIF)HFLUX_AT_OB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
 	     ELSE IF(USE_DJDT_RTE)THEN
 	      IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling MOM_J_DDT_V6'
 	      CALL MOM_J_DDT_V6(TA,CHIEXT,TB,
@@ -408,9 +408,9 @@
 	        END IF
 	     ELSE IF(USE_LAM_ES)THEN
 	       IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Using J from formal-solution for ray-by-ray solution'
-	       RJEXT(1:NDEXT)=TC(1:NDEXT); RSQHNU(1:NDEXT)=0.0D0
+	       RJEXT(1:NDEXT)=TC(1:NDEXT); RSQHNU(1:NDEXT)=0.0_LDP
 	       CALL GET_RSQH_REL(RSQHNU, REXT, VEXT, FL, NDEXT)
-	       IF(L .LT. 3)FOLD(1:ND)=0.0D0
+	       IF(L .LT. 3)FOLD(1:ND)=0.0_LDP
 	     ELSE
 	       IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling MOM_J_CMF_V8 with accurate grid'
 	       CALL MOM_J_CMF_V8(TA,CHIEXT,TB,VEXT,SIGMAEXT,REXT,
@@ -420,7 +420,7 @@
 	1              FIRST_FREQ,NEW_FREQ,
 	1              NCEXT,NPEXT,NDEXT)
 	       FLUSH(LUER)
-	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJEXT(ND)
+	       IF(.NOT. DIF)HFLUX_AT_IB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJEXT(ND)
 	       HFLUX_AT_OB=HBC_CMF(1)*RJEXT(1)
 	     END IF
 	     CALL TUNE(ITWO,'MOM_J_CMF_ACC')
@@ -439,7 +439,7 @@
 !
 	      INACCURATE=.FALSE.
 	      IF(L .LT. 20 .OR. COMPUTE_EDDFAC)THEN
-	        T1=0.0D0
+	        T1=0.0_LDP
 	        DO I=1,NDEXT
 	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)
 	          FOLD(I)=FEDD(I)
@@ -487,9 +487,9 @@
 !
 	  IF(LST_ITERATION)THEN
 	    T1=ABS(RJ(1))+ABS(TC(1))
-	    IF(T1 .NE. 0)T1=200.0D0*(RJ(1)-TC(1))/T1
+	    IF(T1 .NE. 0)T1=200.0_LDP*(RJ(1)-TC(1))/T1
 	    T2=ABS(RJ(ND))+ABS(TC(NDEXT))
-	    IF(T2 .NE. 0)T2=200.0D0*(RJ(ND)-TC(NDEXT))/T2
+	    IF(T2 .NE. 0)T2=200.0_LDP*(RJ(ND)-TC(NDEXT))/T2
 	    IF(FIRST_FREQ)THEN
 	      OPEN(UNIT=LU_JCOMP,STATUS='UNKNOWN',FILE='J_COMP')
 	      WRITE(LU_JCOMP,'(A)')' '
@@ -530,7 +530,7 @@
 	        HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*MU_AT_RMAX(1:NC)
 	        RMAX_OBS=R(ND)
 	        V_AT_RMAX=V(1)
-	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0D0
+	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0_LDP
 	      END IF
 	    ELSE IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
 	1         MAXCH .LT. VAL_DO_NG .AND. .NOT. USE_FORMAL_REL)  )THEN
@@ -588,17 +588,17 @@
 	    DO I=1,ND
 	      CHI_PREV(I)=CHI(I)
 	      ETA_PREV(I)=ETA(I)
-	      FEDD_PREV(I)=0.0D0		!Not required.
-	      GEDD_PREV(I)=0.0D0
-	      JNU_PREV(I)=0.0D0
-	      N_ON_J_PREV(I)=0.0D0
-	      RSQHNU_PREV(I)=0.0D0
+	      FEDD_PREV(I)=0.0_LDP		!Not required.
+	      GEDD_PREV(I)=0.0_LDP
+	      JNU_PREV(I)=0.0_LDP
+	      N_ON_J_PREV(I)=0.0_LDP
+	      RSQHNU_PREV(I)=0.0_LDP
 	    END DO
-	    HBC_PREV(:)=0.0D0		!1:3
-	    NBC_PREV(:)=0.0D0		!1:3
-	    HBC_CMF(:)=0.0D0		!1:3
-	    NBC_CMF(:)=0.0D0		!1:3
-	    FG_COUNT=0.0D0
+	    HBC_PREV(:)=0.0_LDP		!1:3
+	    NBC_PREV(:)=0.0_LDP		!1:3
+	    HBC_CMF(:)=0.0_LDP		!1:3
+	    NBC_CMF(:)=0.0_LDP		!1:3
+	    FG_COUNT=0.0_LDP
 	  ELSE
 	    dLOG_NU=LOG(FL_OLD/FL)
 	    DO I=1,ND
@@ -615,14 +615,14 @@
 	  IF(COMPUTE_EDDFAC)THEN
 	    IF(FIRST_FREQ)THEN
 	      DO I=1,ND
-	        RJ(I)=0.0D0
-	        RJ_ES(I)=0.0D0
-	        FOLD(I)=0.0D0
+	        RJ(I)=0.0_LDP
+	        RJ_ES(I)=0.0_LDP
+	        FOLD(I)=0.0_LDP
 	      END DO
 	    END IF
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJ(I),I=1,ND),T1
-	    IF(ABS(T1-FL)/FL .GT. 1.0D-14)THEN
+	    IF(ABS(T1-FL)/FL .GT. 1.0E-14_LDP)THEN
 	      WRITE(LUER,*)'Error - 4 incorrect reading of'//
 	1                  ' the mean intensity'
 	      WRITE(LUER,*)'Intensity is ',FL,'Old Intensity is ',T1
@@ -635,7 +635,7 @@
 !
 	  IF(.NOT. COHERENT_ES)THEN
 	    READ(LU_ES,REC=ACCESS_F)(RJ_ES(I),I=1,ND),T1
-	    IF(ABS(T1-FL)/FL .GT. 1.0D-14)THEN
+	    IF(ABS(T1-FL)/FL .GT. 1.0E-14_LDP)THEN
 	      WRITE(LUER,*)'Error - 5 incorrect reading of'//
 	1                ' the mean intensity'
 	      WRITE(LUER,*)'Intensity is ',FL,'Old Intensity is ',T1
@@ -683,7 +683,7 @@
 	1                  INNER_BND_METH,THK_CONT,
 	1                  VDOP_VEC,DELV_FRAC_FG,REXT_FAC,
 	1                  METHOD,FIRST_FREQ,NEW_FREQ,NC,NP,ND)
-	       INBC=0.0D0
+	       INBC=0.0_LDP
 	     ELSE
 	        IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling FG_J_CMF_V12'
 	        CALL FG_J_CMF_V12(TA,CHI_CLUMP,CHI_SCAT_CLUMP,V,SIGMA,R,P,
@@ -716,7 +716,7 @@
 	1                  FL,DIF,DBB,IC,METHOD,L_TRUE,
 	1                  IZERO,FIRST_FREQ,NEW_FREQ,ND)
 	       HFLUX_AT_OB=HBC_CMF(1)*RJ(1)-HBC_CMF(2)
-	       IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+	       IF(.NOT. DIF)HFLUX_AT_OB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
              ELSE IF(PLANE_PARALLEL)THEN
 	       IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling PP_MOM_CMF_V1'
 	       CALL PP_MOM_CMF_V1(TA,CHI_CLUMP,TB,V,SIGMA,R,
@@ -727,7 +727,7 @@
 	1                  N_TYPE,METHOD,L_TRUE,
 	1                  FIRST_FREQ,NEW_FREQ,ND)
                HFLUX_AT_OB=HBC_CMF(1)*RJ(1)-HBC_CMF(2)
-               IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+               IF(.NOT. DIF)HFLUX_AT_OB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
 !
 	    ELSE IF(USE_DJDT_RTE)THEN
 	      IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling MOM_J_DDT_V6'
@@ -759,9 +759,9 @@
                END IF
 	     ELSE IF(USE_LAM_ES)THEN
 	       IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Using J from formal-solution for ray-by-ray solution'
-	       RJ(1:ND)=TC(1:ND); RSQHNU(1:ND)=0.0D0
+	       RJ(1:ND)=TC(1:ND); RSQHNU(1:ND)=0.0_LDP
 	       CALL GET_RSQH_REL(RSQHNU, R, V, FL, ND)
-	       IF(L .LT. 3)FOLD(1:ND)=0.0D0
+	       IF(L .LT. 3)FOLD(1:ND)=0.0_LDP
 	     ELSE
 	       IF(FG_COUNT .EQ. 1)WRITE(LUER,*)'Calling MOM_J_CMF_V8'
 	       CALL MOM_J_CMF_V8(TA,CHI_CLUMP,TB,V,SIGMA,R,
@@ -769,7 +769,7 @@
 	1              FL,dLOG_NU,DIF,DBB,IC,
 	1              N_TYPE,METHOD,L_TRUE,IONE,
 	1              FIRST_FREQ,NEW_FREQ,NC,NP,ND)
-               IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+               IF(.NOT. DIF)HFLUX_AT_OB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
                HFLUX_AT_OB=HBC_CMF(1)*RJ(1)
 	     END IF
 	     CALL TUNE(ITWO,'MOM_J_CMF')
@@ -788,7 +788,7 @@
 !
 	      INACCURATE=.FALSE.
 	      IF(L .LT. 20 .OR. COMPUTE_EDDFAC)THEN
-	        T1=0.0D0
+	        T1=0.0_LDP
 	        DO I=1,ND
 	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)
 	          FOLD(I)=FEDD(I)
@@ -844,7 +844,7 @@
 	        HQW_AT_RMAX(1:NC)=HQW_AT_RMAX(1:NC)*MU_AT_RMAX(1:NC)
 	        RMAX_OBS=R(ND)
 	        V_AT_RMAX=V(1)
-	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0D0
+	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0_LDP
 	      END IF
 	    ELSE IF( (LST_ITERATION .AND. .NOT. LAMBDA_ITERATION .AND.
 	1         MAXCH .LT. VAL_DO_NG .AND. .NOT. USE_FORMAL_REL) )THEN
@@ -879,9 +879,9 @@
 !
 	  IF(LST_ITERATION)THEN
 	    T1=ABS(RJ(1))+ABS(TC(1))
-	    IF(T1 .NE. 0)T1=200.0D0*(RJ(1)-TC(1))/T1
+	    IF(T1 .NE. 0)T1=200.0_LDP*(RJ(1)-TC(1))/T1
 	    T2=ABS(RJ(ND))+ABS(TC(ND))
-	    IF(T2 .NE. 0)T2=200.0D0*(RJ(ND)-TC(ND))/T2
+	    IF(T2 .NE. 0)T2=200.0_LDP*(RJ(ND)-TC(ND))/T2
 	    IF(FIRST_FREQ)THEN
 	      OPEN(UNIT=LU_JCOMP,STATUS='UNKNOWN',FILE='J_COMP')
 	      WRITE(LU_JCOMP,'(A)')' '
@@ -913,12 +913,12 @@
 	  CALL TUNE(IONE,'JFEAU')
 	  IF(COMPUTE_EDDFAC)THEN
 	    DO I=1,ND
-	      RJ(I)=0.0D0
+	      RJ(I)=0.0_LDP
               FOLD(I)=FEDD(I)
 	    END DO
 	  ELSE
 	    READ(LU_EDD,REC=ACCESS_F)(RJ(I),I=1,ND),T1
-	    IF(ABS(T1-FL)/FL .GT. 1.0D-14)THEN
+	    IF(ABS(T1-FL)/FL .GT. 1.0E-14_LDP)THEN
 	      WRITE(LUER,*)'Error - incorrect reading of Mean Intensity'
 	      WRITE(LUER,*)'Intensity is ',FL,'Old Intensity is ',T1
 	      WRITE(LUER,*)'Error occurred in '//SECTION
@@ -952,7 +952,7 @@
 !
 	      INACCURATE=.FALSE.
 	      IF(L .LT. 3 .OR. COMPUTE_EDDFAC)THEN
-	        T1=0.0D0
+	        T1=0.0_LDP
 	        DO I=1,ND
 	          T1=MAX(ABS(FOLD(I)-FEDD(I)),T1)
 	          FOLD(I)=FEDD(I)
@@ -1005,7 +1005,7 @@
 	  END DO
 	END IF
 !
-	IF(ABS(RJ(1)) .GT. 1.0D+30)THEN
+	IF(ABS(RJ(1)) .GT. 1.0E+30_LDP)THEN
 	  WRITE(LUER,*)' '
 	  WRITE(LUER,*)' '
 	  WRITE(LUER,*)('*',I=1,80)

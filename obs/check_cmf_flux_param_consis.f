@@ -79,12 +79,12 @@
 !
 ! Testing gneric parameters, valid for all models.
 !
-	IF(OBS_TAU_MAX .LT. 10.0)THEN
+	IF(OBS_TAU_MAX .LT. 10.0_LDP)THEN
 	  WRITE(LUER,*)'Error in control parameters in CMF_FLUX_PARAM_INIT'
 	  WRITE(LUER,*)'OBS_TAU_MAX should be > 10.0'
 	  IF(STOP_IF_BAD_PARAM)STOP
 	END IF
-	IF(OBS_ES_DTAU .GT. 0.2)THEN
+	IF(OBS_ES_DTAU .GT. 0.2_LDP)THEN
 	  WRITE(LUER,*)'Error in control parameters in CMF_FLUX_PARAM_INIT'
 	  WRITE(LUER,*)'OBS_ES_DTAU should be < 0.2 '
 	  IF(STOP_IF_BAD_PARAM)STOP

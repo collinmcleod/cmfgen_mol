@@ -176,7 +176,7 @@
 	  IF(INITIALIZE_TWO)THEN
 	    A_LOW_NAME_TWO(:)=' '
 	    A_UP_NAME_TWO(:)=' '
-	    COEF_TWO(:,:)=0.0D0
+	    COEF_TWO(:,:)=0.0_LDP
 	  END IF
 	  TWO_PHOT_COEF_FIXED(:)=.FALSE.
 !

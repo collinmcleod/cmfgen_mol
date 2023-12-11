@@ -71,8 +71,8 @@
 	  WRITE(I,*)'NM_KI='
 	  STOP
 	END IF
-	VK(:,:,:)=0.0D0
-	RHS_dHdCHI(:,:)=0.0D0
+	VK(:,:,:)=0.0_LDP
+	RHS_dHdCHI(:,:)=0.0_LDP
 !
 ! Compute the dTAUdCHI matrix.
 !
@@ -81,7 +81,7 @@
 ! The following derivatives are valid for all ML.
 !
 	DO I=1,ND-1
-	  T1=(1.0D0+W(I))*(CHI(I)+CHI(I+1))
+	  T1=(1.0_LDP+W(I))*(CHI(I)+CHI(I+1))
 	  dHUdCHI(I)=HU(I)*W(I)/T1
 	  dHUdTAU(I)=-HU(I)/DTAU(I)
 	  dHLdCHI(I)=HL(I)*W(I)/T1
@@ -106,8 +106,8 @@
 	  dTCdCHI_I=-dHUdTAU(I)
 	  dTBdCHI_I=dHLdTAU(I)
 	  dTBdCHI_J=dHUdTAU(J)
-	  T1=0.5D0*R(I)*R(I)/Q(I)
-	  dTBdCHI=(PSI(I)+DJDT(I))/(DTAU(J)+DTAU(I))+T1*(1.0D0-ES_COH_VEC(I))
+	  T1=0.5_LDP*R(I)*R(I)/Q(I)
+	  dTBdCHI=(PSI(I)+DJDT(I))/(DTAU(J)+DTAU(I))+T1*(1.0_LDP-ES_COH_VEC(I))
 !
 	  dUdCHI=(PSIPREV(I)*JNUM1(I)+DJDT_OLDT(I)*JNU_OLDT(I))/(DTAU(J)+DTAU(I))
 	  dRHSdJ(I)=  T1*SOURCE(I)
@@ -135,7 +135,7 @@
 	DO I=2,ND-1
 	  J=I-1
 	  K=I+1
-	  T1=0.5D0*R(I)*R(I)/Q(I)
+	  T1=0.5_LDP*R(I)*R(I)/Q(I)
 !
 	  dTAdCHI_J=-dHLdCHI(J)
 	  dTAdCHI_I=-dHLdCHI(J)

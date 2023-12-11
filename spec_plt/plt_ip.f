@@ -143,8 +143,8 @@
 	LOGICAL MULT_BY_P
 	LOGICAL PLANE_PARALLEL_MOD
 !
-	REAL(KIND=LDP),  PARAMETER :: RZERO=0.0D0
-	REAL(KIND=LDP),  PARAMETER :: RONE=1.0D0
+	REAL(KIND=LDP),  PARAMETER :: RZERO=0.0_LDP
+	REAL(KIND=LDP),  PARAMETER :: RONE=1.0_LDP
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 	INTEGER, PARAMETER :: T_IN=5		!For file I/O
@@ -179,18 +179,18 @@
 ! 
 ! Set constants.
 !
-	CHIBF=2.815D-06
-	CHIFF=3.69D-29
-	HDKT=4.7994145D0
-	TWOHCSQ=0.0147452575D0
-	OPLIN=2.6540081D+08
-	EMLIN=5.27296D-03
-	OPLIN=2.6540081D+08
-	EMLIN=5.27296D-03
+	CHIBF=2.815E-06_LDP
+	CHIFF=3.69E-29_LDP
+	HDKT=4.7994145_LDP
+	TWOHCSQ=0.0147452575_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
 !
 	C_CMS=SPEED_OF_LIGHT()
-	C_KMS=1.0D-05*C_CMS
-	PI=ACOS(-1.0D0)
+	C_KMS=1.0E-05_LDP*C_CMS
+	PI=ACOS(-1.0_LDP)
 !
 ! Set defaults.
 !
@@ -206,15 +206,15 @@
 	X_UNIT='ANG'
 	Y_PLT_OPT='FNU'
 !
-	DISTANCE=1.0D0		  !kpc
-	SLIT_WIDTH=0.1D0          !arcseconds
-	PIXEL_LENGTH=0.0254D0     !arcseconds
+	DISTANCE=1.0_LDP		  !kpc
+	SLIT_WIDTH=0.1_LDP          !arcseconds
+	PIXEL_LENGTH=0.0254_LDP     !arcseconds
 !
 ! Conversion factor from Kev to units of 10^15 Hz.
 ! Conversion factor from Angstroms to units of 10^15 Hz.
 !
-	KEV_TO_HZ=0.241838D+03
-	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07  	!10^8/10^15
+	KEV_TO_HZ=0.241838E+03_LDP
+	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0E-07_LDP  	!10^8/10^15
 !
 !  Read in model.
 !
@@ -230,7 +230,7 @@
 	  READ(LU_IN,REC=3)ST_REC,NCF,NP
 	  ALLOCATE (IP(NP,NCF))
 	  ALLOCATE (P(NP))
-	  ALLOCATE (MU(NP)); MU=0.0D0
+	  ALLOCATE (MU(NP)); MU=0.0_LDP
 	  ALLOCATE (NU(NCF))
 	  ALLOCATE (LAM(NCF))
 	  IF( INDEX(FILE_DATE,'20-Aug-2000') .NE. 0)THEN
@@ -309,7 +309,7 @@
 	 IF(ROSS_MEAN(ND) .NE. 0)THEN
 	   CALL TORSCL(TAU_ROSS,ROSS_MEAN,R,TB,TC,ND,METHOD,TYPETM)
 	 END IF
-	 TA(1:ND)=6.65D-15*ED(1:ND)
+	 TA(1:ND)=6.65E-15_LDP*ED(1:ND)
 	 CALL TORSCL(TAU_ES,TA,R,TB,TC,ND,METHOD,TYPETM)
 !
 	 IF(COMPUTE_P)THEN
@@ -329,7 +329,7 @@
 	  WRITE(6,*)'Model assumed to be plane-parallel'
 	ELSE
 	  ALLOCATE (HQW_AT_RMAX(NP))
-	  IF(MU(5) .EQ. 0.0D0)THEN
+	  IF(MU(5) .EQ. 0.0_LDP)THEN
 	    DO I=1,NP
 	      MU(I)=SQRT(R(1)*R(1)-P(I)*P(I))/R(1)
 	    END DO
@@ -424,9 +424,9 @@
 	     CALL USR_OPTION(LAMC,'LAMC','0.0D0',
 	1             'Central Lambda(Ang) [-ve for frequency (10^15 Hz)]')
 	     IF(LAMC .LT. 0)THEN
-	       LAMC=1.0D-07*C_CMS/ABS(LAMC)
+	       LAMC=1.0E-07_LDP*C_CMS/ABS(LAMC)
 	     ELSE
-	       IF(LAMC .GT. 2000.0D0)THEN
+	       IF(LAMC .GT. 2000.0_LDP)THEN
                  CALL USR_OPTION(AIR_LAM,'AIR','T',
 	1                'Air wavelength [only for Lam > 2000A]?')
 	       ELSE
@@ -465,16 +465,16 @@
 	  ALLOCATE (YV(NCF))
 !
 	  XV(1:NCF)=NU(1:NCF)
-	  YV(1:NCF)=0.0D0
+	  YV(1:NCF)=0.0_LDP
 	  DO J=1,NP
 	    WRITE(50,*)J,MU(J),HQW_AT_RMAX(J)
 	    YV(1:NCF)=YV(1:NCF)+HQW_AT_RMAX(J)*IP(J,1:NCF)
 	  END DO
-          T1=DISTANCE*1.0D+03*PARSEC()
+          T1=DISTANCE*1.0E+03_LDP*PARSEC()
 	  IF(PLANE_PARALLEL_MOD)THEN
-	    T1=2.0D0*R(ND)*R(ND)*PI*1.0D+23*(1.0E+10/T1)**2
+	    T1=2.0_LDP*R(ND)*R(ND)*PI*1.0E+23_LDP*(1.0E+10_LDP/T1)**2
 	  ELSE
-	    T1=2.0D0*R(1)*R(1)*PI*1.0D+23*(1.0E+10/T1)**2
+	    T1=2.0_LDP*R(1)*R(1)*PI*1.0E+23_LDP*(1.0E+10_LDP/T1)**2
 	  END IF
 	  YV(1:NCF)=YV(1:NCF)*T1
 	  WRITE(6,*)T1
@@ -494,7 +494,7 @@
 	    GOTO 1
 	  END IF
 !
-	  T1=P(I)*1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	  T1=P(I)*1.0E+10_LDP*206265.0_LDP/(DISTANCE*1.0E+03_LDP*PARSEC())
 	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',P(I)*1.0E+10,' cm'
 	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',P(I)*1.0E+10/1.495978D+13,' AU'
 	  WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',T1,' arcsec'
@@ -513,12 +513,12 @@
 	  ALLOCATE (YV(NCF))
 !
 	  XV(1:NCF)=NU(1:NCF)
-	  YV(1:NCF)=0.0D0
+	  YV(1:NCF)=0.0_LDP
 	  DO J=1,I-1
-	    YV(1:NCF)=YV(1:NCF)+0.5D0*(IP(J,1:NCF)*P(J)+IP(J+1,1:NCF)*P(J+1))*(P(J+1)-P(J))
+	    YV(1:NCF)=YV(1:NCF)+0.5_LDP*(IP(J,1:NCF)*P(J)+IP(J+1,1:NCF)*P(J+1))*(P(J+1)-P(J))
 	  END DO
-          T1=DISTANCE*1.0D+03*PARSEC()
-	  T1=2.0D0*PI*1.0D+23*(1.0E+10/T1)**2
+          T1=DISTANCE*1.0E+03_LDP*PARSEC()
+	  T1=2.0_LDP*PI*1.0E+23_LDP*(1.0E+10_LDP/T1)**2
 	  YV(1:NCF)=YV(1:NCF)*T1
 !
 	  CALL DP_CNVRT(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
@@ -527,12 +527,12 @@
 	  CALL DP_CURVE(NCF,XV,YV)
 !
 	  XV(1:NCF)=NU(1:NCF)
-	  YV(1:NCF)=0.0D0
+	  YV(1:NCF)=0.0_LDP
 	  DO J=I,NP-1
-	    YV(1:NCF)=YV(1:NCF)+0.5D0*(IP(J,1:NCF)*P(J)+IP(J+1,1:NCF)*P(J+1))*(P(J+1)-P(J))
+	    YV(1:NCF)=YV(1:NCF)+0.5_LDP*(IP(J,1:NCF)*P(J)+IP(J+1,1:NCF)*P(J+1))*(P(J+1)-P(J))
 	  END DO
-          T1=DISTANCE*1.0D+03*PARSEC()
-	  T1=2.0D0*PI*1.0D+23*(1.0E+10/T1)**2
+          T1=DISTANCE*1.0E+03_LDP*PARSEC()
+	  T1=2.0_LDP*PI*1.0E+23_LDP*(1.0E+10_LDP/T1)**2
 	  YV(1:NCF)=YV(1:NCF)*T1
 !
 ! NB: J and I have the same units, apart from per steradian/
@@ -563,7 +563,7 @@
 	    WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       MU(I)=',MU(I)
 	    WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'  P(I)/R(ND)=',P(I)/R(ND)
 	  ELSE
-	    T1=P(I)*1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	    T1=P(I)*1.0E+10_LDP*206265.0_LDP/(DISTANCE*1.0E+03_LDP*PARSEC())
 	    WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',P(I)*1.0E+10,' cm'
 	    WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'       P(I)=',T1,' arcsec'
 	    WRITE(T_OUT,'(1X,A,1P,E14.6)')'    P(I)/R*=',P(I)/R(ND)
@@ -583,13 +583,13 @@
 !
 ! Convert to flux per/pixel
 !
-	    YV=YV*SLIT_WIDTH*PIXEL_LENGTH*2.3504D-11
+	    YV=YV*SLIT_WIDTH*PIXEL_LENGTH*2.3504E-11_LDP
 !
 	  ELSE IF(X(1:3) .EQ. 'FAP')THEN
 !
 ! Convert to flux per/arcsecond.
 !
-	    YV=YV*2.3504D-11
+	    YV=YV*2.3504E-11_LDP
 	  END IF
 !
 ! NB: J and I have the same units, apart from per steradian/
@@ -602,13 +602,13 @@
             IF(Y_PLT_OPT .EQ. 'FNU')THEN
 	      YAXIS='F(Jy\d \upixel\u-1\d)'
               IF(LOG_Y)YAXIS='Log F(Jy\d \upixel\u-1\d)'
-	      YV(1:NCF)=YV(1:NCF)*1.0D+23
+	      YV(1:NCF)=YV(1:NCF)*1.0E+23_LDP
 	    END IF
 	  ELSE IF(X(1:3) .EQ. 'FAP')THEN
             IF(Y_PLT_OPT .EQ. 'FNU')THEN
 	      YAXIS='F(Jy\d \uarcsec\u-2\d)'
               IF(LOG_Y)YAXIS='Log F(Jy\d \uarcsec\u-2\d)'
-	      YV(1:NCF)=YV(1:NCF)*1.0D+23
+	      YV(1:NCF)=YV(1:NCF)*1.0E+23_LDP
 	    END IF
 	  ELSE
 	    YAXIS(J:J)='I'
@@ -626,12 +626,12 @@
 	  WRITE(6,'(A)')DEF_PEN
 	
 	  CALL USR_OPTION(T1,'LAM_ST',' ','Start wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  T1=0.299794E+04_LDP/T1
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
 	  CALL USR_OPTION(T1,'LAM_END',' ','End wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  T1=0.299794E+04_LDP/T1
           J=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
 !
@@ -651,31 +651,31 @@
 	  ALLOCATE (ZV(NP))
 	  ALLOCATE (WV(NP))
 !
-	  T1=1.0D-05*SPEED_OF_LIGHT()
+	  T1=1.0E-05_LDP*SPEED_OF_LIGHT()
           WRITE(6,*)'Allocated arrays'
           WRITE(6,*)'Frequency limits:',NU(K_ST),NU(K_END)
           WRITE(6,*)'Wavelength limits:',T1/NU(K_ST),T1/NU(K_END)
 !
 	  DO K=K_ST,K_END
-	    XV(K-K_ST+1)=0.299794D+04/NU(K)
+	    XV(K-K_ST+1)=0.299794E+04_LDP/NU(K)
 !
-	    IF(DELV .EQ. 0.0D0)THEN
+	    IF(DELV .EQ. 0.0_LDP)THEN
 	      ZV(1:NP)=IP(1:NP,K)
 	    ELSE
-	      ZV(:)=0.0D0
+	      ZV(:)=0.0_LDP
 	      DO ML=K-1,1,-1
-	        IF( C_KMS*(NU(ML)/NU(K)-1.0D0) .GT. DELV)EXIT
-                ZV(1:NP)=ZV(1:NP)+0.5D0*(NU(ML)-NU(ML+1))*(IP(1:NP,ML)+IP(1:NP,ML+1))
+	        IF( C_KMS*(NU(ML)/NU(K)-1.0_LDP) .GT. DELV)EXIT
+                ZV(1:NP)=ZV(1:NP)+0.5_LDP*(NU(ML)-NU(ML+1))*(IP(1:NP,ML)+IP(1:NP,ML+1))
 	      END DO
 	      DO ML=K+1,NCF
-	        IF( C_KMS*(NU(K)/NU(ML)-1.0D0) .GT. DELV)EXIT
-                ZV(1:NP)=ZV(1:NP)+0.5D0*(NU(ML-1)-NU(ML))*(IP(1:NP,ML)+IP(1:NP,ML-1))
+	        IF( C_KMS*(NU(K)/NU(ML)-1.0_LDP) .GT. DELV)EXIT
+                ZV(1:NP)=ZV(1:NP)+0.5_LDP*(NU(ML-1)-NU(ML))*(IP(1:NP,ML)+IP(1:NP,ML-1))
 	      END DO
 	    END IF
 !
-	    WV(1:NP)=0.0D0
+	    WV(1:NP)=0.0_LDP
 	    DO I=1,NP-1
-	      T1=0.5D0*(P(I)*ZV(I)+P(I+1)*ZV(I+1))*(P(I+1)-P(I))
+	      T1=0.5_LDP*(P(I)*ZV(I)+P(I+1)*ZV(I+1))*(P(I+1)-P(I))
 	      WV(I+1)=WV(I)+T1
 	    END DO
 !
@@ -689,7 +689,7 @@
 	    DO I=2,NP
 	      IF(WV(I) .GT. FRAC)THEN
                  T1=(FRAC-WV(I-1))/(WV(I)-WV(I-1))
-	         YV(K-K_ST+1)=(1.0D0-T1)*P(I-1)+T1*P(I)
+	         YV(K-K_ST+1)=(1.0_LDP-T1)*P(I-1)+T1*P(I)
 	         EXIT
 	      END IF
 	    END DO
@@ -700,7 +700,7 @@
 !
 	  YUNIT=ADJUSTL(YUNIT)
 	  IF(UC(YUNIT(1:3)) .EQ. 'ARC')THEN
-	    T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	    T1=1.0E+10_LDP*206265.0_LDP/(DISTANCE*1.0E+03_LDP*PARSEC())
 	    DO K=1,NX
 	      YV(K)=LOG10(YV(K)*T1)
 	    END DO
@@ -710,11 +710,11 @@
 	    YV(1:NX)=LOG10(YV(1:NX)/T2)
 	    YAXIS='Log p/R\d*\u'
 	  ELSE IF(UC(YUNIT(1:1)) .EQ. 'P')THEN
-	    T1=6.96D0
+	    T1=6.96_LDP
 	    YV(1:NX)=LOG10(YV(1:NX)/T1)
 	    YAXIS='Log p(R\dsun\u)'
 	  ELSE IF(UC(YUNIT(1:2)) .EQ. 'AU')THEN
-	    T1=1.496D+03                           !1AU=1.496D+13 cm
+	    T1=1.496E+03_LDP                           !1AU=1.496D+13 cm
 	    YV(1:NX)=LOG10(YV(1:NX)/T1)
 	    YAXIS='Log p(AU)'
 	  ELSE IF(UC(YUNIT(1:1)) .EQ. 'V')THEN
@@ -740,12 +740,12 @@
 !
 	ELSE IF(X(1:4) .EQ. 'IF2')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Start wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  T1=0.299794E+04_LDP/T1
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
 	  CALL USR_OPTION(T1,'Lambda',' ','End wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  T1=0.299794E+04_LDP/T1
           J=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
 !
@@ -757,24 +757,24 @@
 	  ALLOCATE (ZV(NP))
 	  CALL SET_IP_XSPAT_UNIT(XV,P,XAXIS,R(ND),DISTANCE,NP)
 !
-	  YV(:)=0.0D0
+	  YV(:)=0.0_LDP
 	  DO K=MIN(I,J),MAX(I,J)
-	    YV(1:NP)=YV(1:NP)+IP(1:NP,K)*0.5D0*(NU(K-1)-NU(K+1))
+	    YV(1:NP)=YV(1:NP)+IP(1:NP,K)*0.5_LDP*(NU(K-1)-NU(K+1))
 	  END DO
 	  T1=ABS(NU(I)-NU(J))
 	  YV(1:NP)=YV(1:NP)/T1		!Normalize so per Hz
 !
-	  ZV(1:NP)=0.0D0
+	  ZV(1:NP)=0.0_LDP
 	  DO I=1,NP-1
-	    T1=0.5D0*(P(I)*YV(I)+P(I+1)*YV(I+1))*(P(I+1)-P(I))
+	    T1=0.5_LDP*(P(I)*YV(I)+P(I+1)*YV(I+1))*(P(I+1)-P(I))
 	    ZV(I+1)=ZV(I)+T1
 	  END DO
 	  T1=ZV(NP)
 	  DO I=2,NP
 	    ZV(I-1)=ZV(I)/T1
 	  END DO
-          T2=DISTANCE*1.0E+03*PARSEC()
-	  T2=2.0D0*PI*1.0D+23*(1.0E+10/T2)**2
+          T2=DISTANCE*1.0E+03_LDP*PARSEC()
+	  T2=2.0_LDP*PI*1.0E+23_LDP*(1.0E+10_LDP/T2)**2
 	  WRITE(6,'(A,ES12.3,A)')'The average flux in band is',T1*T2,'Jy'
 !
 	  YAXIS='F(p)'
@@ -782,12 +782,12 @@
 !
 	ELSE IF(X(1:4) .EQ. 'INU2' .OR. X(1:5) .EQ. 'WINU2')THEN
 	  CALL USR_OPTION(T1,'lam_st',' ','Start wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  T1=0.299794E+04_LDP/T1
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
 	  CALL USR_OPTION(T1,'lam_end',' ','End wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  T1=0.299794E+04_LDP/T1
           J=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
 !
@@ -808,11 +808,11 @@
 !
 ! Average I(p) over frequnecy.
 !
-	    YV(:)=0.0D0
+	    YV(:)=0.0_LDP
 	    K=MIN(I,J); J=MAX(I,J); I=K
 	    IF(J .EQ. I)J=I+1
 	    DO K=I,J-1
-	      YV(1:NP-1)=YV(1:NP-1)+0.5D0*(IP(1:NP-1,K)+IP(1:NP-1,K+1))*
+	      YV(1:NP-1)=YV(1:NP-1)+0.5_LDP*(IP(1:NP-1,K)+IP(1:NP-1,K+1))*
 	1                                 (NU(K)-NU(K+1))
 	    END DO
 	    T1=ABS(NU(I)-NU(J))
@@ -827,7 +827,7 @@
 !
 	  ELSE
 !
-	    YV(:)=0.0D0
+	    YV(:)=0.0_LDP
 	    K=MIN(I,J); J=MAX(I,J); I=K
 	    IF(J .EQ. I)J=I+1
 !
@@ -841,14 +841,14 @@
 	      END DO
 	    ELSE
 	      DO K=I,J-1
-	        YV(1:NP-2)=YV(1:NP-2)+0.5D0*(IP(2:NP-1,K)+IP(2:NP-1,K+1))*
+	        YV(1:NP-2)=YV(1:NP-2)+0.5_LDP*(IP(2:NP-1,K)+IP(2:NP-1,K+1))*
 	1                                 (NU(K)-NU(K+1))
 	      END DO
 	      T1=ABS(NU(I)-NU(J))
 	      YV(1:NP-2)=LOG10(YV(1:NP-2)/T1)
 	      IF(MULT_BY_PSQ)THEN
 	        DO I=1,NP-2
-	          YV(I)=YV(I)+2.0D0*LOG10(P(I+1))+20.0D0
+	          YV(I)=YV(I)+2.0_LDP*LOG10(P(I+1))+20.0_LDP
 	        END DO
 	        YAXIS='Log p\u2\dI\gn\u(ergs s\u-1\d Hz\u-1\d steradian\u-1\d)'
 	      ELSE
@@ -860,7 +860,7 @@
 !
 	ELSE IF(X(1:3) .EQ. 'IMU')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
-	  T1=0.299794E+04/T1
+	  T1=0.299794E+04_LDP/T1
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
@@ -870,21 +870,21 @@
 	  ALLOCATE (YV(NP))
 	  YV(1:NP)=IP(1:NP,I)
 !
-	  IF(MU(1) .EQ. 0.0D0)THEN
+	  IF(MU(1) .EQ. 0.0_LDP)THEN
 	    CALL USR_OPTION(T1,'Rstar',' ','Radius of star in units of 10^10cm')
 	    DO I=1,NP
-	      T2=1.0D0-(P(I)/T1)**2
-	      IF(T2 .GT. 0.0D0)MU(I)=SQRT(T2)
-	      IF(T2 .LT. 0.0D0)MU(I)=-SQRT(-T2)
+	      T2=1.0_LDP-(P(I)/T1)**2
+	      IF(T2 .GT. 0.0_LDP)MU(I)=SQRT(T2)
+	      IF(T2 .LT. 0.0_LDP)MU(I)=-SQRT(-T2)
 	    END DO
 	    XV(1:NP)=MU(1:NP)
-	    MU=0.0D0
+	    MU=0.0_LDP
 	  ELSE
 	    XV(1:NP)=MU(1:NP)
 	  END IF
 	  T1=MAXVAL(YV(1:NP))
 	  YAXIS='I(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)'
-	  IF(T1 .LT. 1.0D-03 .OR. T1 .GT. 1.0D+04)THEN
+	  IF(T1 .LT. 1.0E-03_LDP .OR. T1 .GT. 1.0E+04_LDP)THEN
 	    J=-LOG10(T1)
 	    YV(1:NP)=YV(1:NP)*(10**J)
 	    WRITE(TMP_STR,*)J; TMP_STR=ADJUSTL(TMP_STR)
@@ -895,7 +895,7 @@
 	ELSE IF(X(1:3) .EQ. 'INU')THEN
 	  CALL USR_OPTION(T1,'Lambda',' ','Wavelength in Ang')
 	  CALL USR_OPTION(T2,'Velocity offset','0.0D0','V in lm/s')
-	  T1=0.299794E+04/T1/(1.0D0+T2/C_KMS)
+	  T1=0.299794E+04_LDP/T1/(1.0_LDP+T2/C_KMS)
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
@@ -911,10 +911,10 @@
 	    CALL USR_OPTION(MULT_BY_P,'P','F','Multiply by P?')
 	  END IF
 	  IF(MULT_BY_PSQ)THEN
-	    YV(1:NP-1)=1.0D+20*P(1:NP-1)*P(1:NP-1)*IP(1:NP-1,I)
+	    YV(1:NP-1)=1.0E+20_LDP*P(1:NP-1)*P(1:NP-1)*IP(1:NP-1,I)
 	    YAXIS='p\u2\d.I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)'
 	  ELSE IF(MULT_BY_P)THEN
-	    YV(1:NP-1)=1.0D+10*P(1:NP-1)*IP(1:NP-1,I)
+	    YV(1:NP-1)=1.0E+10_LDP*P(1:NP-1)*IP(1:NP-1,I)
 	    YAXIS='p.I\d\gn\u(ergs cm\u-2\d s\u-1\d Hz\u-1\d steradian\u-1\d)'
 	  ELSE
 	    YV(1:NP-1)=IP(1:NP-1,I)
@@ -930,10 +930,10 @@
 	  IF(ALLOCATED(YV))DEALLOCATE(YV)
 	  ALLOCATE (XV(NP))
 	  ALLOCATE (YV(NP))
-	  LAMBDA=NINT(T1-1.0D0)
+	  LAMBDA=NINT(T1-1.0_LDP)
 	  DO WHILE(LAMBDA .LE. T2)
 	    LAMBDA=LAMBDA+1
-	    T1=0.299794E+04/LAMBDA
+	    T1=0.299794E+04_LDP/LAMBDA
             I=GET_INDX_DP(T1,NU,NCF)
 	    IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 	    YV(1:NP-2)=IP(2:NP-1,I)
@@ -956,9 +956,9 @@
 	  ALLOCATE (YV(NP))
 	  ALLOCATE (TA(NP))
 !
-	  TA(1:ND)=0.0D0
+	  TA(1:ND)=0.0_LDP
 	  DO ML=1,NCF-1
-	    T1=0.5D0*(NU(ML)-NU(ML+1))
+	    T1=0.5_LDP*(NU(ML)-NU(ML+1))
 	    DO I=1,NP
 	      TA(I)=TA(I)+T1*(IP(I,ML)+IP(I,ML+1))
 	    END DO
@@ -966,7 +966,7 @@
 !
 	  CALL USR_OPTION(USE_ARCSEC,'Arcsec','T','Use arcseconds?')
 	  IF(USE_ARCSEC)THEN
-	    T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	    T1=1.0E+10_LDP*206265.0_LDP/(DISTANCE*1.0E+03_LDP*PARSEC())
 	    DO K=1,NP-2
 	      XV(K)=LOG10(P(K+1)*T1)
 	    END DO
@@ -992,12 +992,12 @@
 	  FILENAME=' '
 	  CALL USR_OPTION(FILENAME,'File',' ',' ')
 !
-	  SCALE_FAC=1.0D0
+	  SCALE_FAC=1.0_LDP
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0',' ')
-	  ADD_FAC=0.0D0
+	  ADD_FAC=0.0_LDP
 	  CALL USR_HIDDEN(ADD_FAC,'ADD','0.0D0',' ')
 !
-	  RAD_VEL=0.0D0
+	  RAD_VEL=0.0_LDP
 	  CALL USR_HIDDEN(RAD_VEL,'RAD_VEL','0.0D0',
 	1             'Radial velcoity (+ve if away)')
 !
@@ -1030,7 +1030,7 @@
 !
 	  IF(RAD_VEL .NE. 0)THEN
 	    DO I=1,J
-	      XV(I)=XV(I)*(1.0D0-1.0D+05*RAD_VEL/C_CMS)
+	      XV(I)=XV(I)*(1.0_LDP-1.0E+05_LDP*RAD_VEL/C_CMS)
 	    END DO
 	  END IF
 !
@@ -1042,7 +1042,7 @@
 	    END DO
 	    DO I=2,J-1
 	      IF(YV(I) .EQ. 0)THEN
-	        YV(I)=0.5D0*(ZV(I-1)+ZV(I+1))
+	        YV(I)=0.5_LDP*(ZV(I-1)+ZV(I+1))
 	      END IF
 	    END DO
 	  END IF
@@ -1080,8 +1080,8 @@
               END DO
               WRITE(6,*)IST,IEND
               DO I=IST,IEND
-                T1=0.0D0
-                YV(I)=0.0D0
+                T1=0.0_LDP
+                YV(I)=0.0_LDP
                 DO L=MAX(IST,I-K/2),MIN(IEND,I+k/2)
                   ML=L-I+K/2+1
                   T1=T1+WT(ML)
@@ -1099,8 +1099,8 @@
               WT(I)=FAC(K-1)/FAC(I-1)/FAC(K-I)
             END DO
             DO I=1,J
-              T1=0.0D0
-              YV(I)=0.0D0
+              T1=0.0_LDP
+              YV(I)=0.0_LDP
               DO L=MAX(1,I-K/2),MIN(J,I+k/2)
                 ML=L-I+K/2+1
                 T1=T1+WT(ML)
@@ -1124,12 +1124,12 @@
 	  CALL USR_OPTION(NINS,'NINS','2','# of points to insert to improve accuracy')
 !
 	  CALL USR_OPTION(T1,'lam_st',' ','Start wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  T1=0.299794E+04_LDP/T1
           I=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(I)-T1 .GT. T1-NU(I+1))I=I+1
 !
 	  CALL USR_OPTION(T1,'lam_end',' ','End wavelength in Ang')
-	  T1=0.299794D+04/T1
+	  T1=0.299794E+04_LDP/T1
           J=GET_INDX_DP(T1,NU,NCF)
 	  IF(NU(J)-T1 .GT. T1-NU(J+1))J=J+1
 !
@@ -1138,10 +1138,10 @@
 	  IF(ALLOCATED(P_NEW))DEALLOCATE(P_NEW)
 	  IF(ALLOCATED(IP_NEW))DEALLOCATE(IP_NEW)
 !
-	  IF(TEL_FWHM .EQ. 0.0D0)THEN
+	  IF(TEL_FWHM .EQ. 0.0_LDP)THEN
 	    ALLOCATE (P_NEW(NP))
 	    ALLOCATE (IP_NEW(NP))
-	    IP_NEW=0.0D0
+	    IP_NEW=0.0_LDP
 	    DO ML=I,J
 	      IP_NEW(:)=IP_NEW(:)+IP(:,ML)
 	    END DO
@@ -1152,7 +1152,7 @@
 	    NP_NEW=2*NP-1
 	    ALLOCATE (P_NEW(NP_NEW))
 	    ALLOCATE (IP_NEW(NP_NEW))
-	    IP_NEW=0.0D0
+	    IP_NEW=0.0_LDP
 	    DO ML=I,J
 	      DO LS=1,NP
 	        IP_NEW(NP+LS-1)=IP_NEW(NP+LS-1)+IP(LS,ML)
@@ -1164,8 +1164,8 @@
 	      P_NEW(NP-LS+1)=-P_NEW(NP+LS-1)
 	    END DO
 !
-	    T1=1.0D+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
-	    MOD_RES=0.1D0*TEL_FWHM
+	    T1=1.0E+10_LDP*206265.0_LDP/(DISTANCE*1.0E+03_LDP*PARSEC())
+	    MOD_RES=0.1_LDP*TEL_FWHM
 	    WRITE(6,*)'MOD_RES=',MOD_RES
 	    NTMP=T1*2*P(NP)/MOD_RES+1
 	    IF(NTMP .LT. 2*NP)NTMP=2*NP
@@ -1181,13 +1181,13 @@
 	    WRITE(6,*)'Begin linearize'
 	    CALL LINEARIZE_V2(TEMP_P,TEMP_IP,NP_NEW,NTMP,MOD_RES)
 	    WRITE(6,*)'Done linearize'
-	    T1=TEL_FWHM/2.35482
+	    T1=TEL_FWHM/2.35482_LDP
 	    CALL CONVOLVE(TEMP_P,TEMP_IP,NTMP,T1,RZERO,RZERO,L_FALSE)
 	    CALL DP_CURVE(NTMP,TEMP_P,TEMP_IP)
 	    WRITE(6,*)'Done convolution'
-	    T1=1.0D+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	    T1=1.0E+10_LDP*206265.0_LDP/(DISTANCE*1.0E+03_LDP*PARSEC())
 	    TEMP_P=TEMP_P/T1
-	    IP_NEW=0.0D0
+	    IP_NEW=0.0_LDP
 	    CALL MAP(TEMP_P,TEMP_IP,NTMP,P,IP_NEW,NP)
 	    TEMP_P(1:NP)=P(1:NP)*T1
 	    CALL DP_CURVE(NP,TEMP_P,IP_NEW)
@@ -1205,8 +1205,8 @@
 	  WRITE(6,*)'Calling INT_SEQ'
 	  WRITE(6,*)X_CENT,Y_CENT,S_WIDTH,S_LNGTH
 !
-	  K=1.0D0/S_WIDTH+1
-	  T1=1.0D+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	  K=1.0_LDP/S_WIDTH+1
+	  T1=1.0E+10_LDP*206265.0_LDP/(DISTANCE*1.0E+03_LDP*PARSEC())
 	  Y_CENT=Y_CENT/T1	
 	  S_WIDTH=S_WIDTH/T1	
 	  S_LNGTH=S_LNGTH/T1	
@@ -1227,7 +1227,7 @@
 	  APP_SIZE=S_WIDTH*S_LNGTH 		!In square arcseconds
 	  CALL USR_OPTION(NINS,'NINS','2','# of points to insert to improve accuracy')
 !
-	  T1=1.0D+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	  T1=1.0E+10_LDP*206265.0_LDP/(DISTANCE*1.0E+03_LDP*PARSEC())
 	  X_CENT=X_CENT/T1	
 	  Y_CENT=Y_CENT/T1	
 	  S_WIDTH=S_WIDTH/T1	
@@ -1249,11 +1249,11 @@
 	  CALL DP_CNVRT_J(XV,YV,NCF,LOG_X,LOG_Y,X_UNIT,Y_PLT_OPT,
 	1         LAMC,XAXIS,YAXIS,L_FALSE)
 !
-	  T2=1.0D+03*PARSEC()*DISTANCE
-	  T1=1.0D+20/T2/T2/APP_SIZE
+	  T2=1.0E+03_LDP*PARSEC()*DISTANCE
+	  T1=1.0E+20_LDP/T2/T2/APP_SIZE
 	  YV(1:NCF)=YV(1:NCF)*T1
           IF(Y_PLT_OPT .EQ. 'FNU')THEN
-	    YV(1:NCF)=YV(1:NCF)*1.0D+23
+	    YV(1:NCF)=YV(1:NCF)*1.0E+23_LDP
 	    YAXIS='F(Jy\d \uarcsec\u-2\d)'
             IF(LOG_Y)YAXIS='Log F(Jy\d \uarcsec\u-2\d)'
 	  END IF

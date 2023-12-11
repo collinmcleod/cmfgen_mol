@@ -44,7 +44,7 @@
 	CHARACTER(LEN=30) UC
 	EXTERNAL SPEED_OF_LIGHT,GET_INDX_DP,UC
 !
-	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07      !10^8/10^1
+	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0E-07_LDP      !10^8/10^1
 !
 	WRITE(6,*)' '	
 	WRITE(6,*)'Use default so line wavelenth requested'
@@ -69,7 +69,7 @@
 !
 	CNT=0
 	DO J=K,1,-1
-	  IF(ABS(FREQ-VEC_FREQ(J))/FREQ .GT. 0.001D0)EXIT
+	  IF(ABS(FREQ-VEC_FREQ(J))/FREQ .GT. 0.001_LDP)EXIT
 	  IF( UC(VEC_SPEC(J)) .EQ. XSPEC)THEN
 	    CNT=CNT+1
 	    PNT(CNT)=J
@@ -80,7 +80,7 @@
 ! Get nearby lines at lower frequencies (maximum of 5).
 !
 	DO J=K+1,NLINE_FREQ
-	  IF(ABS(FREQ-VEC_FREQ(J))/FREQ .GT. 0.001D0)EXIT
+	  IF(ABS(FREQ-VEC_FREQ(J))/FREQ .GT. 0.001_LDP)EXIT
 	  IF( UC(VEC_SPEC(J)) .EQ. XSPEC)THEN
 	    CNT=CNT+1
 	    PNT(CNT)=J
@@ -109,7 +109,7 @@
 !
 	WRITE(6,*)'The program found the following lines belonging to species ',TRIM(VEC_SPEC(PNT(1)))
 	WRITE(6,'(A,3X,A,4X,A,3X,A)')' Lambda(A)','dLAM(A)','NL','NUP'
-	T1=100.0D0
+	T1=100.0_LDP
 	DO K=1,CNT
 	  IF( ABS(FREQ-VEC_FREQ(PNT(K))) .LT. T1)THEN
 	    T1= ABS(FREQ-VEC_FREQ(PNT(K)))

@@ -38,7 +38,7 @@ C
 	  ELSE
 	    M=(NUM_BNDS/2)+1
 	  END IF
-	  BA(NT-1,NT-1,M,K)=BA(NT-1,NT-1,M,K)-1.0D0
+	  BA(NT-1,NT-1,M,K)=BA(NT-1,NT-1,M,K)-1.0_LDP
 	  STEQ(NT-1,K)=STEQ(NT-1,K)-ED(K)
 	END DO
 C

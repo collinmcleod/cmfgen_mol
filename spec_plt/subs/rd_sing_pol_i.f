@@ -46,7 +46,7 @@
         END DO
         READ(LU,*)(OBSF(I),I=1,NBETA)
 	WRITE(6,*)'Viewing angles are as folows:'
-	T1=180.0D0/ACOS(-1.0D0)
+	T1=180.0_LDP/ACOS(-1.0_LDP)
 	DO I=1,NBETA
 	  WRITE(6,'(2X,I3,3X,ES12.4,3X,F8.2)')I,OBSF(I),OBSF(I)*T1
 	END DO

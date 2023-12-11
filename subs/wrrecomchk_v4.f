@@ -50,8 +50,8 @@ C
 	INTEGER, PARAMETER :: IZERO=0
 	EXTERNAL ERROR_LU
 C
-	NETRR(:)=0.0D0                 !ND
-	TOTRR(:)=0.0D0                 !ND
+	NETRR(:)=0.0_LDP                 !ND
+	TOTRR(:)=0.0_LDP                 !ND
 	ADVEC_SUM=SUM(ADVEC_RR)
 C
 	CALL GEN_ASCI_OPEN(LU,FILNAM,'UNKNOWN',' ',' ',IZERO,IOS)
@@ -145,7 +145,7 @@ C
 	  FLUSH(LU)
 C
 	  DO J=MS,MF
-	    ABS_SUM=0.0D0
+	    ABS_SUM=0.0_LDP
 	    DO I=1,N
 	      NETRR(J)=NETRR(J)+(RR(I,J)-PR(I,J))
 	      TOTRR(J)=TOTRR(J)+RR(I,J)
@@ -156,7 +156,7 @@ C
 	1             ABS(DIERECOM(J))+ABS(ADDRECOM(J))+ABS(ADVEC_RR(J))+
 	1             ABS(X_RECOM_1(J))+ABS(X_RECOM_2(J))+
 	1             ABS(NT_ION_RATE(J))
-	    NETRR(J)=200.0D0*(NETRR(J)+(CRR(J)-CPR(J))+
+	    NETRR(J)=200.0_LDP*(NETRR(J)+(CRR(J)-CPR(J))+
 	1                    (CHG_RR(J)-CHG_PR(J))+
 	1                    DIERECOM(J)+ADDRECOM(J)+ADVEC_RR(J)+
 	1                    X_RECOM_1(J)+X_RECOM_2(J)-

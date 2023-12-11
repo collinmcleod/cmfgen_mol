@@ -75,7 +75,7 @@
 ! Perform iniilizations.
 !
         LEV_CNT(:,:)=0
-        G_SUM(:,:)=0.0D0
+        G_SUM(:,:)=0.0_LDP
 	ID_POINTER(:,:)=0
 !
 ! Count actual number of reactions. This is to allow for split J levels.
@@ -208,10 +208,10 @@
 !
 ! Real variables
 !
-	Z_CHG(:,:)=0.0D0
-        AI_AR_CHG(:,:)=0.0D0
-        dlnAI_AR_CHG_dlnT(:,:)=0.0D0
-        COOL_CHG(:,:)=0.0D0
+	Z_CHG(:,:)=0.0_LDP
+        AI_AR_CHG(:,:)=0.0_LDP
+        dlnAI_AR_CHG_dlnT(:,:)=0.0_LDP
+        COOL_CHG(:,:)=0.0_LDP
 	INITIALIZE_ARRAYS=.TRUE.
 !
 !
@@ -245,7 +245,7 @@
 ! the initial states, and proportional to the statistical weight of the final
 ! state.
 !
-	  TMP_G=0.0D0
+	  TMP_G=0.0_LDP
 	  DO K=1,4
 	    IF(K .EQ. 1 .OR. K .EQ. 4)THEN
 	      IF(K .EQ. 1)ID=ID_POINTER(J,3)
@@ -286,7 +286,7 @@
 	        TMP_ID_ION(ML,K)=ID
 	        TMP_LEV_IN_ION(ML,K)=I_S
 	        TMP_LEV_IN_POPS(ML,K)=ATM(ID)%EQXzV+I_S-1
-	        TMP_Z(ML,K)=ATM(ID)%ZXzV-1.0D0
+	        TMP_Z(ML,K)=ATM(ID)%ZXzV-1.0_LDP
 	        TMP_G(ML,K)=TMP_G(ML,K)+ATM(ID)%GXzV_F(I_F)
 	      END IF
 	    END DO
@@ -345,7 +345,7 @@
 	  END DO
 	  J=CHG_ID(K,1)
 	  T1=T1/COEF_CHG_RD(J,1)/G_SUM(J,1)/G_SUM(J,2)
-	  IF( ABS(T1-1.0D0) .GT. 1.0D-05)THEN
+	  IF( ABS(T1-1.0_LDP) .GT. 1.0E-05_LDP)THEN
 	    WRITE(6,*)'Error in SETLEV_ID_V4 --- reaction rates do not agree'
 	    WRITE(6,'(A,I3)')'  Reaction is:',K
 	    WRITE(6,'(A,4A8)')'  Reactants are:',SPEC_ID_CHG(K,1:4)

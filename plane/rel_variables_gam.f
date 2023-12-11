@@ -74,7 +74,7 @@ c Use Fortran 90 array operations
 c
 c            chi_tau = alpha+chi_prime
 c
-      chi_tau=(nu_dnu+3.0d0)*b+chi
+      chi_tau=(nu_dnu+3.0_LDP)*b+chi
 c
 c            source_prime = (eta+alpha*I_prev)/(alpha+chi_prime)
 c

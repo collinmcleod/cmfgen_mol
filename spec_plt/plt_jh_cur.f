@@ -174,20 +174,20 @@
 ! 
 ! Set constants.
 !
-	CHIBF=2.815D-06
-	CHIFF=3.69D-29
-	HDKT=4.7994145D0
-	TWOHCSQ=0.0147452575D0
-	OPLIN=2.6540081D+08
-	EMLIN=5.27296D-03
-	OPLIN=2.6540081D+08
-	EMLIN=5.27296D-03
-	PI=ACOS(-1.0D0)
+	CHIBF=2.815E-06_LDP
+	CHIFF=3.69E-29_LDP
+	HDKT=4.7994145_LDP
+	TWOHCSQ=0.0147452575_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
+	PI=ACOS(-1.0_LDP)
 !
 	C_CMS=SPEED_OF_LIGHT()
-	C_KMS=1.0D-05*C_CMS
+	C_KMS=1.0E-05_LDP*C_CMS
 	XAX_OPTION='XLOGR'
-	LAMBDA=5000.0D0
+	LAMBDA=5000.0_LDP
 !
         CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
 !
@@ -208,9 +208,9 @@
 ! Conversion factor from Kev to units of 10^15 Hz.
 ! Conversion factor from Angstroms to units of 10^15 Hz.
 !
-	KEV_TO_HZ=0.241838D+03
-	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07  	!10^8/10^15
-	RADIUS=1.0D0; DTDR=1.0D0; TEMP=5.0D0 	!Non zero defaults
+	KEV_TO_HZ=0.241838E+03_LDP
+	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0E-07_LDP  	!10^8/10^15
+	RADIUS=1.0_LDP; DTDR=1.0_LDP; TEMP=5.0_LDP 	!Non zero defaults
 !
 !  Read in default model.
 !
@@ -323,20 +323,20 @@
 	ELSE
 	  ND_ATM=10
 	END IF
-	ALLOCATE (R(ND_ATM));			R=0.0D0
-	ALLOCATE (V(ND_ATM));			V=0.0D0
-	ALLOCATE (SIGMA(ND_ATM));		SIGMA=0.0D0
-	ALLOCATE (T(ND_ATM));			T=0.0D0
-	ALLOCATE (ED(ND_ATM));			ED=0.0D0
-	ALLOCATE (TGREY(ND_ATM));		TGREY=0.0D0
-	ALLOCATE (dE_RAD_DECAY(ND_ATM));	dE_RAD_DECAY=0.0D0
-	ALLOCATE (ROSS_MEAN(ND_ATM));		ROSS_MEAN=0.0D0
-	ALLOCATE (FLUX_MEAN(ND_ATM));		FLUX_MEAN=0.0D0
-	ALLOCATE (PLANCK_MEAN(ND_ATM));		PLANCK_MEAN=0.0D0
-	ALLOCATE (POP_ATOM(ND_ATM));		POP_ATOM=0.0D0
-	ALLOCATE (MASS_DENSITY(ND_ATM));	MASS_DENSITY=0.0D0
-	ALLOCATE (POPION(ND_ATM));		POPION=0.0D0
-	ALLOCATE (CLUMP_FAC(ND_ATM));		CLUMP_FAC=1.0D0
+	ALLOCATE (R(ND_ATM));			R=0.0_LDP
+	ALLOCATE (V(ND_ATM));			V=0.0_LDP
+	ALLOCATE (SIGMA(ND_ATM));		SIGMA=0.0_LDP
+	ALLOCATE (T(ND_ATM));			T=0.0_LDP
+	ALLOCATE (ED(ND_ATM));			ED=0.0_LDP
+	ALLOCATE (TGREY(ND_ATM));		TGREY=0.0_LDP
+	ALLOCATE (dE_RAD_DECAY(ND_ATM));	dE_RAD_DECAY=0.0_LDP
+	ALLOCATE (ROSS_MEAN(ND_ATM));		ROSS_MEAN=0.0_LDP
+	ALLOCATE (FLUX_MEAN(ND_ATM));		FLUX_MEAN=0.0_LDP
+	ALLOCATE (PLANCK_MEAN(ND_ATM));		PLANCK_MEAN=0.0_LDP
+	ALLOCATE (POP_ATOM(ND_ATM));		POP_ATOM=0.0_LDP
+	ALLOCATE (MASS_DENSITY(ND_ATM));	MASS_DENSITY=0.0_LDP
+	ALLOCATE (POPION(ND_ATM));		POPION=0.0_LDP
+	ALLOCATE (CLUMP_FAC(ND_ATM));		CLUMP_FAC=1.0_LDP
 	IF(ND_ATM .GT. 10)THEN
 	  CALL RD_RVTJ_VEC_V4(R,V,SIGMA,ED,T,TGREY,dE_RAD_DECAY,
 	1       ROSS_MEAN,FLUX_MEAN,PLANCK_MEAN,
@@ -355,9 +355,9 @@
 	   IF(ROSS_MEAN(ND_ATM) .NE. 0)THEN
 	     CALL TORSCL(TAU_ROSS,ROSS_MEAN,R,TB,TC,ND_ATM,METHOD,TYPE_ATM)
 	   ELSE
-	     TAU_ROSS(1:ND)=0.0D0
+	     TAU_ROSS(1:ND)=0.0_LDP
 	   END IF
-	   TA(1:ND_ATM)=6.65D-15*ED(1:ND_ATM)
+	   TA(1:ND_ATM)=6.65E-15_LDP*ED(1:ND_ATM)
 	   CALL TORSCL(TAU_ES,TA,R,TB,TC,ND_ATM,METHOD,TYPE_ATM)
 	 ELSE
 
@@ -441,9 +441,9 @@
 	     CALL USR_OPTION(LAMC,'LAMC','0.0D0',
 	1             'Central Lambda(Ang) [-ve for frequency (10^15 Hz)]')
 	     IF(LAMC .LT. 0)THEN
-	       LAMC=1.0D-07*C_CMS/ABS(LAMC)
+	       LAMC=1.0E-07_LDP*C_CMS/ABS(LAMC)
 	     ELSE
-	       IF(LAMC .GT. 2000.0D0)THEN
+	       IF(LAMC .GT. 2000.0_LDP)THEN
                  CALL USR_OPTION(AIR_LAM,'AIR','T',
 	1                'Air wavelength [only for Lam > 2000A]?')
 	       ELSE
@@ -548,12 +548,12 @@
 	  ND=ZM(ID)%ND
 	  DO ID=1,NUM_FILES
 	    ZV(1)=ZM(ID)%NU(1); YV(1)=ZM(ID)%H_OUTBC(1)
-	    T1=0.0D0
+	    T1=0.0_LDP
 	    DO ML=1,NCF
 	      YV(ML)=ZM(ID)%H_OUTBC(ML)
-	      T1=T1+0.5D0*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML+1))*ZM(ID)%H_OUTBC(ML)*ZM(ID)%RJ(1,ML)
+	      T1=T1+0.5_LDP*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML+1))*ZM(ID)%H_OUTBC(ML)*ZM(ID)%RJ(1,ML)
 	    END DO
-	    T2=1.0D+20*16.0D0*PI*PI/3.286D+33
+	    T2=1.0E+20_LDP*16.0_LDP*PI*PI/3.286E+33_LDP
 	    WRITE(6,*)'Integrated HFLUX is',1.0D+15*T1,1.0D+15*T1*T2
 	    WRITE(6,*)'      Grey HFLUX is',ZM(ID)%HGREY(1),ZM(ID)%HGREY(1)*T2
 	    CALL DP_CURVE(NCF,ZM(ID)%NU,YV)
@@ -562,15 +562,15 @@
 	ELSE IF(X(1:6) .EQ. 'H_INBC')THEN
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND
-	    T1=0.0D0
+	    T1=0.0_LDP
 	    ZV(1)=ZM(ID)%NU(1); YV(1)=ZM(ID)%H_INBC(1)
 	    DO ML=2,NCF-1
 	      ZV(ML)=ZM(ID)%NU(ML)
 	      YV(ML)=ZM(ID)%H_INBC(ML)
-	      T1=T1+0.5D0*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML+1))*ZM(ID)%H_INBC(ML)
+	      T1=T1+0.5_LDP*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML+1))*ZM(ID)%H_INBC(ML)
 	    END DO
 	    ZV(NCF)=ZM(ID)%NU(NCF); YV(NCF)=ZM(ID)%H_INBC(NCF)
-	    T2=1.0D+20*16.0D0*PI*PI/3.286D+33
+	    T2=1.0E+20_LDP*16.0_LDP*PI*PI/3.286E+33_LDP
 	    WRITE(6,*)' '
 	    WRITE(6,*)'The following are evaluated for the inner boundary.'
 	    WRITE(6,*)' '
@@ -620,7 +620,7 @@
 !
 	ELSE IF(X(1:2) .EQ. 'JD' .OR. X(1:2) .EQ. 'HD')THEN
 !
-	  SCALE_FAC=1.0D0
+	  SCALE_FAC=1.0_LDP
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0','Scale factor to prevent overflow')
 	  CALL USR_OPTION(I,'Depth',' ','Depth index')
 	  ISAV=I
@@ -654,7 +654,7 @@
 !
 	ELSE IF(X(1:2) .EQ. 'DJ' .OR. X(1:2) .EQ. 'DH')THEN
 !
-	  SCALE_FAC=1.0D0
+	  SCALE_FAC=1.0_LDP
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0','Scale factor to prevent overflow')
 	  CALL USR_OPTION(I,'Depth',' ','Depth index')
 	  ISAV=I
@@ -678,7 +678,7 @@
 	      WRITE(T_OUT,'(X,A,1P,E14.6)')'  TAU_ES(I)=',TAU_ES(I)
 	    END IF
 !
-	    YV(1)=0.0D0
+	    YV(1)=0.0_LDP
 	    ZV(1:NCF)=ZM(ID)%NU(1:NCF)
 	    DO J=2,NCF
 	      IF(X(1:2) .EQ.  'DJ')YV(J)=ABS(ZM(ID)%RJ(I,J+1)-ZM(ID)%RJ(I,J))/MIN(ZM(ID)%RJ(I,J+1),ZM(ID)%RJ(I,J))
@@ -692,16 +692,16 @@
 	ELSE IF(X(1:3) .EQ. 'JNU' .OR. X(1:3) .EQ. 'HNU')THEN
 	  DEFAULT=WR_STRING(LAMBDA)
 	  CALL USR_OPTION(LAMBDA,'Lambda',DEFAULT,'Wavelength in Ang (-ve for 10^15 Hz)')
-	  IF(LAMBDA .EQ. 0.0D0)THEN
+	  IF(LAMBDA .EQ. 0.0_LDP)THEN
 	    WRITE(6,*)'Invalid wavelength -- cannot be zero'
 	    GOTO 3						!return to get new option
-	  ELSE IF(LAMBDA .LT. 0.0D0)THEN
+	  ELSE IF(LAMBDA .LT. 0.0_LDP)THEN
 	    T1=ABS(LAMBDA)
 	  ELSE
-	     T1=0.299794D+04/LAMBDA
+	     T1=0.299794E+04_LDP/LAMBDA
 	  END IF
 !
-	  SCALE_FAC=1.0D0
+	  SCALE_FAC=1.0_LDP
 	  CALL USR_HIDDEN(SCALE_FAC,'SCALE','1.0D0','Scale factor to prevent overflow')
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
@@ -719,7 +719,7 @@
 	    END DO
 	    IF(LOG_Y)THEN
 	      DO J=1,ND
-	        IF(YV(J) .GT. 0.0D0)THEN
+	        IF(YV(J) .GT. 0.0_LDP)THEN
 	          YV(J)=LOG10(YV(J))
 	        ELSE
 	          YV(J)=-200.0
@@ -742,16 +742,16 @@
 	    IF(ALLOCATED(TA))DEALLOCATE(TA)
 	    ALLOCATE (TA(NCF))
 !
-	    TA(1:NCF)=0.0D0
+	    TA(1:NCF)=0.0_LDP
 	    IF(PLT_H)THEN
 	      DO ML=2,NCF
-	        T1=0.5D0*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML))
+	        T1=0.5_LDP*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML))
 	        TA(ML)=TA(ML-1)+T1*(ZM(ID)%HFLUX(I,ML-1)+ZM(ID)%HFLUX(I,ML))
 	      END DO
 	      WRITE(T_OUT,'(/,A,ES11.4)')' Luminosity(Lsun) is:',TA(NCF)*4.1274D+03
 	    ELSE
 	      DO ML=2,NCF
-	        T1=0.5D0*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML))
+	        T1=0.5_LDP*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML))
 	        TA(ML)=TA(ML-1)+T1*(ZM(ID)%RJ(I,ML-1)+ZM(ID)%RJ(I,ML))
 	      END DO
 	      WRITE(T_OUT,'(/,A,ES11.4)')' J(Lsun) is:',TA(NCF)*4.1274D+03
@@ -762,7 +762,7 @@
 ! At the outer boudary, we will assume H=J+K (since we don't have K).
 !
 	    IF(I .EQ. 1 .AND. PLT_H)THEN
-	      T1=(1.0D0+2.0D0*V(1)/2.99792458D+05)*TA(NCF)
+	      T1=(1.0_LDP+2.0_LDP*V(1)/2.99792458E+05_LDP)*TA(NCF)
 	      WRITE(T_OUT,'(/,A,ES11.4)')'Observer''s frame luminosity(Lsun) is:',T1*4.1274D+03
 	    END IF
 !
@@ -790,10 +790,10 @@
 	    ALLOCATE (TA(ND))
 !
 	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
-	    TA(1:ND)=0.0D0
+	    TA(1:ND)=0.0_LDP
 	    IF(PLT_H)THEN
 	      DO ML=1,NCF-1
-	        T1=0.5D0*(ZM(ID)%NU(ML)-ZM(ID)%NU(ML+1))
+	        T1=0.5_LDP*(ZM(ID)%NU(ML)-ZM(ID)%NU(ML+1))
 	        DO I=1,ND
 	          TA(I)=TA(I)+T1*(ZM(ID)%HFLUX(I,ML)+ZM(ID)%HFLUX(I,ML+1))
 	        END DO
@@ -804,7 +804,7 @@
 	      IF(TMP_LOG)YAXIS='H/B'
 	    ELSE
 	      DO ML=1,NCF-1
-	        T1=0.5D0*(ZM(ID)%NU(ML)-ZM(ID)%NU(ML+1))
+	        T1=0.5_LDP*(ZM(ID)%NU(ML)-ZM(ID)%NU(ML+1))
 	        DO I=1,ND
 	          TA(I)=TA(I)+T1*(ZM(ID)%RJ(I,ML)+ZM(ID)%RJ(I,ML+1))
 	        END DO
@@ -818,7 +818,7 @@
 	    CALL SET_X_AXIS_V2(XV,XV_MID,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
 	    IF(TMP_LOG)THEN
 	      DO I=1,ND
-	        YV(I)=0.1D0*PI*TA(I)/R(I)/R(I)/5.670400D-05/(T(I)**4)
+	        YV(I)=0.1_LDP*PI*TA(I)/R(I)/R(I)/5.670400E-05_LDP/(T(I)**4)
 	      END DO
 	    ELSE
 	      DO I=1,ND
@@ -840,10 +840,10 @@
           CALL USR_OPTION(TEMP,'TEMP',DEFAULT,' ')
           DO I=1,ZM(1)%NCF
             T3=HDKT*ZM(1)%NU(I)/TEMP
-            IF(T3 .GT. 1.0D0)THEN
-              YV(I)=RVAL*RVAL*TWOHCSQ*(ZM(1)%NU(I)**3)*EXP(-T3)/(1.0D0-EXP(-T3))
+            IF(T3 .GT. 1.0_LDP)THEN
+              YV(I)=RVAL*RVAL*TWOHCSQ*(ZM(1)%NU(I)**3)*EXP(-T3)/(1.0_LDP-EXP(-T3))
             ELSE
-              YV(I)=RVAL*RVAL*TWOHCSQ*(ZM(1)%NU(I)**3)/(EXP(T3)-1.0D0)
+              YV(I)=RVAL*RVAL*TWOHCSQ*(ZM(1)%NU(I)**3)/(EXP(T3)-1.0_LDP)
             END IF
             XV(I)=ZM(1)%NU(I)
          END DO
@@ -858,13 +858,13 @@
 	    ND=ZM(ID)%ND; NCF=ZM(ID)%NCF
 	    DO ML=1,NCF-1
 	      DO J=1,ND
-	        T1=(ZM(ID)%HFLUX(J,ML)+ZM(ID)%HFLUX(J,ML+1))*2.0D0*ZM(ID)%V(J)/C_KMS
+	        T1=(ZM(ID)%HFLUX(J,ML)+ZM(ID)%HFLUX(J,ML+1))*2.0_LDP*ZM(ID)%V(J)/C_KMS
 	        YV(J)=YV(J)+(ZM(ID)%NU(ML)-ZM(ID)%NU(ML+1))*(ZM(ID)%RJ(J,ML)+ZM(ID)%RJ(J,ML+1)+T1)
 	      END DO
 	    END DO
-	    T1=1.6D+16*ATAN(1.0D0)*1/SPEED_OF_LIGHT()      !4*PI*1.0D+15
-	    YV(1:ND)=0.5D0*T1*YV(1:ND)
-	    YV(1:ND)=3.280D-03*YV(1:ND)                    !(4*PI*Dex(+30)/L(sun)
+	    T1=1.6E+16_LDP*ATAN(1.0_LDP)*1/SPEED_OF_LIGHT()      !4*PI*1.0D+15
+	    YV(1:ND)=0.5_LDP*T1*YV(1:ND)
+	    YV(1:ND)=3.280E-03_LDP*YV(1:ND)                    !(4*PI*Dex(+30)/L(sun)
 	    CALL LUM_FROM_ETA(YV,R,ND)
 	    DO I=ND-1,1,-1
 	      YV(I)=YV(I+1)+YV(I)
@@ -879,7 +879,7 @@
 	      VADAT_FILE='../VADAT'
 	      INQUIRE(FILE=VADAT_FILE,EXIST=VADAT_EXISTS)
 	    END IF
-	    SN_AGE=0.0D0
+	    SN_AGE=0.0_LDP
 	    IF(VADAT_EXISTS)THEN
 	     CALL READ_KEYWORD(SN_AGE,'[SN_AGE]',L_FALSE,VADAT_FILE,L_TRUE,L_TRUE,7)
 	    END IF
@@ -887,8 +887,8 @@
 	    WRITE(6,'(A)')RED_PEN
 	    WRITE(6,'(A,ES12.4,A)')'   Integerated energy is',YV(1),' s.Lsun'
 	    WRITE(6,'(A,ES12.4,A)')'   Integerated energy is',YV(1)*3.826D+33,' ergs'
-	    IF(SN_AGE .NE. 0.0D0)THEN
-	      T1=YV(1)*SN_AGE*24.0D0*3600.0D0*3.826D+33
+	    IF(SN_AGE .NE. 0.0_LDP)THEN
+	      T1=YV(1)*SN_AGE*24.0_LDP*3600.0_LDP*3.826E+33_LDP
 	      WRITE(6,'(A,ES12.4,A,F10.4,A)')' t.Integerated energy is',T1,
 	1                     ' s ergs [SN age =',SN_AGE,' d]'
 	    END IF
@@ -902,7 +902,7 @@
 	  DO ID=1,NUM_FILES
 	    ND=ZM(ID)%ND
             XV(1:ND)=R(1:ND)/R(ND)
-            YV(1:ND)=0.0D0; ZV(1:ND)=0.0D0
+            YV(1:ND)=0.0_LDP; ZV(1:ND)=0.0_LDP
             DO ML=2,NCF-1
               DO I=1,ND
                 YV(I)=YV(I)+ZM(ID)%RJ(I,ML)*(ZM(ID)%NU(ML-1)-ZM(ID)%NU(ML+1))
@@ -911,7 +911,7 @@
               END DO
             END DO
 	    CALL SET_X_AXIS_V2(XV,XV_MID,XAXIS,ZM(ID)%R,ZM(ID)%V,XAX_OPTION,ND)
-            YV=0.5D+15*YV; ZV=0.5D+15*ZV
+            YV=0.5E+15_LDP*YV; ZV=0.5E+15_LDP*ZV
             CALL DP_CURVE(ND,XV,YV)
             CALL DP_CURVE(ND,XV,ZV)
           END DO
@@ -1006,33 +1006,33 @@
 	IF(XAX_OPTION .EQ. 'XLOGR')THEN
 	  DO I=1,ND-1
 	    XV(I)=LOG10(R(I))
-	    XV_MID(I)=LOG10(0.5D0*(R(I)+R(I+1)))
+	    XV_MID(I)=LOG10(0.5_LDP*(R(I)+R(I+1)))
 	  END DO
 	  XV(ND)=LOG10(R(ND))
 	  XAXIS='Log R(10\u10\d cm)'
 	ELSE IF(XAX_OPTION .EQ. 'XLOGV')THEN
 	  DO I=1,ND-1
 	    XV(I)=LOG10(V(I))
-	    XV_MID(I)=LOG10(0.5D0*(V(I)+V(I+1)))
+	    XV_MID(I)=LOG10(0.5_LDP*(V(I)+V(I+1)))
 	  END DO
 	  XV(ND)=LOG10(V(ND))
 	  XAXIS='Log V(km/s)'
 	ELSE IF(XAX_OPTION .EQ. 'XLINR')THEN
 	  DO I=1,ND-1
 	    XV(I)=R(I)
-	    XV_MID(I)=0.5D0*(R(I)+R(I+1))
+	    XV_MID(I)=0.5_LDP*(R(I)+R(I+1))
 	  END DO
 	  XV(ND)=R(ND)
 	  XAXIS='R(10\u10\d cm)'
 	ELSE IF(XAX_OPTION .EQ. 'XVEL')THEN
 	  DO I=1,ND-1
 	    XV(I)=V(I)
-	    XV_MID(I)=0.5D0*(V(I)+V(I+1))
+	    XV_MID(I)=0.5_LDP*(V(I)+V(I+1))
 	  END DO
 	ELSE IF(XAX_OPTION .EQ. 'XN')THEN
 	  DO I=1,ND-1
 	    XV(I)=I
-	    XV_MID(I)=I+0.5D0
+	    XV_MID(I)=I+0.5_LDP
 	  END DO
 	  XV(ND)=ND
 	  XAXIS='I'

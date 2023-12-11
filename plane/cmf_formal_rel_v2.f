@@ -126,9 +126,9 @@
 !
 !
 	IF(INITIALIZE)THEN
-	  NU_ON_dNU=0.0D0
+	  NU_ON_dNU=0.0_LDP
 	ELSE
-	  NU_ON_dNU=1.0D0/dLOG_NU
+	  NU_ON_dNU=1.0_LDP/dLOG_NU
 	END IF
 !
 ! Allocate data for moments which will be used to construct the Eddington
@@ -148,10 +148,10 @@
 !
 	IF(INITIALIZE)THEN
 	  R_STORE(1:ND)=R(1:ND)
-	  GAM_REL_STORE(1:ND)=1.0D0/SQRT(1.0D0-(V(1:ND)/2.99792458D+05)**2)
+	  GAM_REL_STORE(1:ND)=1.0_LDP/SQRT(1.0_LDP-(V(1:ND)/2.99792458E+05_LDP)**2)
 	  DO I=1,ND-1
-	    RMID_STORE(I)=0.5D0*(R(I)+R(I+1))
-	    EXT_RMID_STORE(I+1)=0.5D0*(R(I)+R(I+1))
+	    RMID_STORE(I)=0.5_LDP*(R(I)+R(I+1))
+	    EXT_RMID_STORE(I+1)=0.5_LDP*(R(I)+R(I+1))
 	  END DO
 	  EXT_RMID_STORE(1)=R(1); EXT_RMID_STORE(ND+1)=R(ND)
 	END IF
@@ -224,27 +224,27 @@
 	    R_EXT(ND_ADD+I)=R(I)
 	  END DO
 	  IF(THICK_OB)THEN
-	    IF(V(ND) .LT. 10.0D0 .AND. R(1)/R(ND) .GE. 9.99D0)THEN
-	      RMAX=10.0D0*R(1)		!Stellar wind
-	    ELSE IF(V(ND) .GT. 10.0D0 .OR. V(1) .GT. 2.0D+04)THEN
-	      RMAX=1.5D0*R(1)		!SN model
+	    IF(V(ND) .LT. 10.0_LDP .AND. R(1)/R(ND) .GE. 9.99_LDP)THEN
+	      RMAX=10.0_LDP*R(1)		!Stellar wind
+	    ELSE IF(V(ND) .GT. 10.0_LDP .OR. V(1) .GT. 2.0E+04_LDP)THEN
+	      RMAX=1.5_LDP*R(1)		!SN model
 	    ELSE
-	      RMAX=MIN(10.0D0,SQRT(R(1)/R(ND)))*R(1)
+	      RMAX=MIN(10.0_LDP,SQRT(R(1)/R(ND)))*R(1)
 	    END IF
 	    ALPHA=R(1)+(R(1)-R(2))
 	    DEL_R_FAC=EXP( LOG(RMAX/ALPHA)/(ND_ADD-4) )
 	    R_EXT(1)=RMAX
 	    R_EXT(5)=RMAX/DEL_R_FAC
-	    R_EXT(2)=R_EXT(1)-0.001*(R_EXT(1)-R_EXT(5))
-	    R_EXT(3)=R_EXT(1)-0.1*(R_EXT(1)-R_EXT(5))
-	    R_EXT(4)=R_EXT(1)-0.4*(R_EXT(1)-R_EXT(5))
+	    R_EXT(2)=R_EXT(1)-0.001_LDP*(R_EXT(1)-R_EXT(5))
+	    R_EXT(3)=R_EXT(1)-0.1_LDP*(R_EXT(1)-R_EXT(5))
+	    R_EXT(4)=R_EXT(1)-0.4_LDP*(R_EXT(1)-R_EXT(5))
 	    DO I=5,ND_ADD-1
 	      R_EXT(I)=R_EXT(I-1)/DEL_R_FAC
 	    END DO
 	    R_EXT(ND_ADD)=ALPHA
 !
 	  END IF
-	  C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	  C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 !
 !
 ! Compute VEXT and R_EXT. We assume a BETA velocity law at large R.
@@ -253,11 +253,11 @@
 	  VDOP_VEC_EXT(ND_ADD+1:ND_EXT)=VDOP_VEC(1:ND)
 	  SIGMA_EXT(ND_ADD+1:ND_EXT)=SIGMA(1:ND)
 	  IF(THICK_OB)THEN
-	    BETA=(SIGMA(1)+1.0D0)*(R(1)/R(ND)-1.0D0)
+	    BETA=(SIGMA(1)+1.0_LDP)*(R(1)/R(ND)-1.0_LDP)
             VINF=V(1)/(1-R(ND)/R(1))**BETA
 	    DO I=1,ND_ADD
-	      V_EXT(I)=VINF*(1.0D0-R_EXT(ND_EXT)/R_EXT(I))**BETA
-	      SIGMA_EXT(I)=BETA/(R_EXT(I)/R_EXT(ND_EXT)-1.0D0)-1.0D0
+	      V_EXT(I)=VINF*(1.0_LDP-R_EXT(ND_EXT)/R_EXT(I))**BETA
+	      SIGMA_EXT(I)=BETA/(R_EXT(I)/R_EXT(ND_EXT)-1.0_LDP)-1.0_LDP
 	    END DO
 	    VDOP_VEC_EXT(1:ND_ADD)=VDOP_VEC(1)
 	    WRITE(LUER,'(A)')' '
@@ -273,7 +273,7 @@
 	    IDMIN=1
 	    T1=R_EXT(1)/R(1)
 	    IF(T1 .LT. R(1)/R(ND/3))THEN
-	      T1=MIN(3.0D0,T1)
+	      T1=MIN(3.0_LDP,T1)
 	      DO I=1,ND
 	        IF(R(1)/R(I) .GT. T1)THEN
 	          IDMAX=MAX(4,I)
@@ -305,16 +305,16 @@
 	IF(ND_ADD .NE. 0)THEN
 	  IF(CHI(IDMIN) .LE. ESEC(IDMIN) .OR. CHI(IDMAX) .LE. ESEC(IDMAX))THEN
 	    ESEC_POW=LOG(ESEC(IDMAX)/ESEC(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
-	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
+	    IF(ESEC_POW .LT. 2._LDP)ESEC_POW=2
 	    DO I=1,ND_ADD
 	      CHI_EXT(I)=CHI(IDMIN)*(R(IDMIN)/R_EXT(I))**ESEC_POW
 	    END DO
 	  ELSE
 	    ALPHA=LOG( (CHI(IDMAX)-ESEC(IDMAX)) / (CHI(IDMIN)-ESEC(IDMIN)) )
 	1          /LOG(R(IDMIN)/R(IDMAX))
-	    IF(ALPHA .LT. 2.)ALPHA=2.0
+	    IF(ALPHA .LT. 2._LDP)ALPHA=2.0
 	    ESEC_POW=LOG(ESEC(IDMAX)/ESEC(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
-	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
+	    IF(ESEC_POW .LT. 2._LDP)ESEC_POW=2
    	    DO I=1,ND_ADD
 	      T1=(CHI(IDMIN)-ESEC(IDMIN))*(R(IDMIN)/R_EXT(I))**ALPHA
 	      T2=ESEC(IDMIN)*(R(IDMIN)/R_EXT(I))**ESEC_POW
@@ -329,10 +329,10 @@
 ! 3 we would get a logarithmic flux divergence as we increase the volume.
 !
 	  ALPHA=LOG(ETA(IDMAX)/ETA(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
-	  IF(ALPHA .LT. 3.5)ALPHA=3.5
+	  IF(ALPHA .LT. 3.5_LDP)ALPHA=3.5
 	  DO I=1,ND_ADD
 	    ETA_EXT(I)=ETA(IDMIN)*(R(IDMIN)/R_EXT(I))**ALPHA
-	    IF(ETA_EXT(I) .LE. 1.0D-280)ETA_EXT(I)=1.0D-280
+	    IF(ETA_EXT(I) .LE. 1.0E-280_LDP)ETA_EXT(I)=1.0E-280_LDP
 	  END DO
 	  DO I=ND_ADD+1,ND_EXT
 	    ETA_EXT(I)=ETA(I-ND_ADD)
@@ -354,11 +354,11 @@
 	  WRITE(7,'(A)')' The second MU(obs) is simply computed from P(ip) and RMAX'
 	  WRITE(7,'(A)')' '
 	  WRITE(7,'(2X,A,4(6X,A,2X))')'IP',' MU(cmf)',' HQW(cmf)',' MU(obs)',' MU(obs)'
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  DO IP=1,NP
 	    J=MAX(J,RAY(IP)%NZ)
 	    MU_AT_RMAX=RAY(IP)%MU_P(RAY(IP)%LNK(1))
-	    HQW_AT_RMAX=2.0D0*HQW_P(1,IP)
+	    HQW_AT_RMAX=2.0_LDP*HQW_P(1,IP)
 	    WRITE(7,'(I4,4ES16.6)')IP,MU_AT_RMAX,HQW_AT_RMAX,
 	1                 (MU_AT_RMAX+V(1)/C_KMS)/(1.0D0+MU_AT_RMAX*V(1)/C_KMS),
 	1                 SQRT( (R(1)-P(IP))*(R(1)+P(IP)) )/R(1)
@@ -377,28 +377,28 @@
 	ELSE
 	  BOUNDARY='hollow'
 	  IF(.NOT. ALLOCATED(FREQ_STORE))THEN
-	    N_STORE=2.0D0*V(ND)/5.0D0
+	    N_STORE=2.0_LDP*V(ND)/5.0_LDP
 	    WRITE(6,*)'N_STORE=',N_STORE
 	    ALLOCATE (FREQ_STORE(0:N_STORE-1))
 	    DO IP=1,NC
 	      ALLOCATE (RAY(IP)%I_IN_BND_STORE(0:N_STORE-1))
 	    END DO
 	    IF(FIRST_TIME .OR. NEW_R_GRID)THEN
-	      BETA=V(ND)/2.99792458D+05
+	      BETA=V(ND)/2.99792458E+05_LDP
 	      DO IP=1,NC
 	        T1=SQRT( (R(ND)-P(IP))*(R(ND)+P(IP)) )/R(ND)
-	        T2=1.0D0-BETA*(T1+BETA)/(1.0D0+BETA*T1)
-	        RAY(IP)%FREQ_CONV_FAC=1.0D0/GAM_REL_STORE(ND)/GAM_REL_STORE(ND)/T2/(1.0D0-BETA*T1)
+	        T2=1.0_LDP-BETA*(T1+BETA)/(1.0_LDP+BETA*T1)
+	        RAY(IP)%FREQ_CONV_FAC=1.0_LDP/GAM_REL_STORE(ND)/GAM_REL_STORE(ND)/T2/(1.0_LDP-BETA*T1)
 	        WRITE(6,'(5ES14.4)')RAY(IP)%FREQ_CONV_FAC,GAM_REL_STORE(ND),T1,T2,BETA
 	      END DO
 	    END IF
 	  END IF
 	  IF(INITIALIZE)THEN
 	    CUR_LOC=-1
-	    FREQ_STORE=0.0D0
+	    FREQ_STORE=0.0_LDP
 	    DO IP=1,NP
 	      DO I=1,NC
-	        RAY(IP)%I_IN_BND_STORE=0.0D0
+	        RAY(IP)%I_IN_BND_STORE=0.0_LDP
 	      END DO
 	    END DO
 	  END IF
@@ -413,15 +413,15 @@
 !
 	IF(INITIALIZE)THEN
 	  DO IP=1,NP
-	    RAY(IP)%I_P=0.0D0; RAY(IP)%I_M=0.0D0
-	    RAY(IP)%I_P_PREV=0.0D0; RAY(IP)%I_M_PREV=0.0D0
-	    RAY(IP)%I_P_SAVE=0.0D0; RAY(IP)%I_M_SAVE=0.0D0
-	    HNU_AT_OB_PREV=0.0D0; NNU_AT_OB_PREV=0.0D0
-	    HNU_AT_IB_PREV=0.0D0; NNU_AT_IB_PREV=0.0D0
+	    RAY(IP)%I_P=0.0_LDP; RAY(IP)%I_M=0.0_LDP
+	    RAY(IP)%I_P_PREV=0.0_LDP; RAY(IP)%I_M_PREV=0.0_LDP
+	    RAY(IP)%I_P_SAVE=0.0_LDP; RAY(IP)%I_M_SAVE=0.0_LDP
+	    HNU_AT_OB_PREV=0.0_LDP; NNU_AT_OB_PREV=0.0_LDP
+	    HNU_AT_IB_PREV=0.0_LDP; NNU_AT_IB_PREV=0.0_LDP
 	  END DO	
 	ELSE IF(NEW_FREQ)THEN
 	  DO IP=1,NP
-	    RAY(IP)%I_P=0.0D0; RAY(IP)%I_M=0.0D0
+	    RAY(IP)%I_P=0.0_LDP; RAY(IP)%I_M=0.0_LDP
 	    RAY(IP)%I_P_PREV=RAY(IP)%I_P_SAVE
 	    RAY(IP)%I_M_PREV=RAY(IP)%I_M_SAVE
 	  END DO	
@@ -437,8 +437,8 @@
 	  ETA_RAY(1:ND_EXT)=ETA_EXT(1:ND_EXT)
 	END IF
 !
-	Jnu_store=0.0D0; Hnu_store=0.0D0
-	Knu_store=0.0D0; Nnu_store=0.0D0
+	Jnu_store=0.0_LDP; Hnu_store=0.0_LDP
+	Knu_store=0.0_LDP; Nnu_store=0.0_LDP
 !
 ! Determine radiative transfer along each p-ray
 !
@@ -451,7 +451,7 @@
 !	  WRITE(LUER,*)'Specifying intensity (i.e., Ic) at inner boundary not implemented'
 !	  STOP
 !	END IF
-	IPLUS=0.0D0
+	IPLUS=0.0_LDP
 	DO IP=1,NP_LIMIT
 !
 	  NRAY=RAY(IP)%NZ
@@ -483,7 +483,7 @@
 	  DO ID=1,MIN(ND,NP-IP+1)
 	    I_P_GRID(ID)=RAY(IP)%I_P(RAY(IP)%LNK(ID))
 	    I_M_GRID(ID)=RAY(IP)%I_M(RAY(IP)%LNK(ID))
-	    IF( I_P_GRID(ID) .LT. 0 .OR. I_M_GRID(ID) .LT. 0.0D0)THEN
+	    IF( I_P_GRID(ID) .LT. 0 .OR. I_M_GRID(ID) .LT. 0.0_LDP)THEN
 	      WRITE(LUER,*)'Error: invalid intensities in CMF_FORMAL_REL_V2'
 	      WRITE(LUER,*)'Check file CMF_FORMAL_REL_ERRORS'
 	      OPEN(UNIT=7,FILE='CMF_FORMAL_REL_ERRORS',STATUS='UNKNOWN')
@@ -533,8 +533,8 @@
 !
         HBC=HNU_AT_OB/JNU_STORE(1)
         NBC=NNU_AT_OB/JNU_STORE(1)
-	IF(HBC .LT. 0.0D0)HBC=0.0D0
-	IF(NBC .LT. 0.0D0)NBC=0.0D0
+	IF(HBC .LT. 0.0_LDP)HBC=0.0_LDP
+	IF(NBC .LT. 0.0_LDP)NBC=0.0_LDP
         IN_HBC=HNU_STORE(ND)
 !        IN_HBC=JNU_STORE(ND)
 !        IN_HBC=HNU_STORE(ND)/JNU_STORE(ND)

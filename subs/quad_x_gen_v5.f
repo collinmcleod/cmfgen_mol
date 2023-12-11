@@ -62,8 +62,8 @@
 !
 ! NB: WSE represents the statistical weight
 !
-	WSE(:,:)=0.0D0		!N_S,ND
-	WCR(:,:)=0.0D0		!N_S,ND
+	WSE(:,:)=0.0_LDP		!N_S,ND
+	WCR(:,:)=0.0_LDP		!N_S,ND
 !
 ! NB: Because SUM[HNST_F] = HNST_S and the cross section is independent of
 ! the level under consideration, WSE_S will just be = WEIGHT. [Because
@@ -76,7 +76,7 @@
 !       arises from the 1/nu term. [Change made when we removed the
 !       frequency index from the WSE array].
 !
-	FOUR_PI_ON_H=1.8965D+02		!4*PI/H*DEX(-10)/1.0D+15
+	FOUR_PI_ON_H=1.8965E+02_LDP		!4*PI/H*DEX(-10)/1.0D+15
 	WEIGHT=FOUR_PI_ON_H*XCROSS_V2(NU_CONT,ZCORE,NUM_ELEC,
 	1                                   IZERO,IZERO,L_FALSE,L_FALSE)
 	IF(WEIGHT .EQ. 0)RETURN

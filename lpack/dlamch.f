@@ -49,7 +49,7 @@
 *
 *     .. Parameters ..
       REAL(KIND=LDP)   ONE, ZERO
-      PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
+      PARAMETER          ( ONE = 1.0_LDP, ZERO = 0.0_LDP )
 *     ..
 *     .. Local Scalars ..
       LOGICAL            FIRST, LRND
@@ -754,7 +754,7 @@
 *
 *     .. Parameters ..
       REAL(KIND=LDP)   ZERO, ONE
-      PARAMETER          ( ZERO = 0.0D0, ONE = 1.0D0 )
+      PARAMETER          ( ZERO = 0.0_LDP, ONE = 1.0_LDP )
 *     ..
 *     .. Local Scalars ..
       INTEGER            EXBITS, EXPSUM, I, LEXP, NBITS, TRY, UEXP

@@ -54,8 +54,8 @@
 	  WRITE(I,*)'NM_KI='
 	  STOP
 	END IF
-	VK(:,:,:)=0.0D0
-	RHS_dHdCHI(:,:)=0.0D0
+	VK(:,:,:)=0.0_LDP
+	RHS_dHdCHI(:,:)=0.0_LDP
 !
 ! NB: The dTAUdCHI_J & dTAUdCHI_H matrices were computed in the calling routine..
 !
@@ -68,7 +68,7 @@
 	  dHLdCHI(I)=HL(I)*W(I)/T1
 	  dHLdTAU(I)=-HL(I)/DTAU_H(I)
 	  dHSdCHI(I)=-P_H(I)*HS(I)/T1
-	  EPS_FAC(I)=-1.0D0/T1
+	  EPS_FAC(I)=-1.0_LDP/T1
 	END DO
 !
 ! 
@@ -101,7 +101,7 @@
 !
 	DO I=2,ND-1
 	  J=I-1
-	  T1=0.5D0*R(I)*R(I)/Q(I)
+	  T1=0.5_LDP*R(I)*R(I)/Q(I)
 	  dTBdCHI=PSI(I)/(DTAU_J(J)+DTAU_J(I)) +
 	1          T1*(P_J(I)-COH_VEC(I))*GAM_REL(I)
 !
@@ -165,7 +165,7 @@
 !
 	DO I=2,ND-1
 	  J=I-1
-	  T1=0.5D0*R(I)*R(I)/Q(I)
+	  T1=0.5_LDP*R(I)*R(I)/Q(I)
 !
 	  dTBdCHI= -PSI(I)/CHI_J(I)+GAM_RSQ_DTAUONQ(I)*(COH_VEC(I)-VdJdR_TERM(I))/CHI_J(I)
 	  dUdCHI=-PSIPREV(I)/CHI_J(I)
@@ -200,7 +200,7 @@
 	  DO L=1,ND
 	    VK(ND,L,1)=VK(ND,L,1)+T1*dTAUdCHI_H(ND-1,L)
 	  END DO
-	  VK(ND,ND,1)=VK(ND,ND,1)-GAM_RSQ(ND)*GAM_REL(ND)*DBB/3.0D0/CHI(ND)/CHI(ND)
+	  VK(ND,ND,1)=VK(ND,ND,1)-GAM_RSQ(ND)*GAM_REL(ND)*DBB/3.0_LDP/CHI(ND)/CHI(ND)
 !
 	ELSE IF(INNER_BND_METH .EQ. 'ZERO_FLUX')THEN
 	  T1 = GAM_RSQ(ND-1)*(FEDD(ND-1)+VdHdR_TERM(ND-1))*Q(ND-1)

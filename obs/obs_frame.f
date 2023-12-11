@@ -126,18 +126,18 @@ C
 C
 C Set constants.
 C
-	CHIBF=2.815E-06
-	CHIFF=3.69E-29
-	HDKT=4.7994145
-	TWOHCSQ=0.0147452575
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
+	CHIBF=2.815E-06_LDP
+	CHIFF=3.69E-29_LDP
+	HDKT=4.7994145_LDP
+	TWOHCSQ=0.0147452575_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
 C
 	CONT_REC=3
 	LUER=ERROR_LU()
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 C
 	CALL GEN_ASCI_OPEN(LUIN,'OBS_INP','OLD',' ','READ',IZERO,IOS)
 	IF(IOS .NE. 0)THEN
@@ -275,7 +275,7 @@ C
 	END IF
 C
 	ALLOCATE (ESEC(ND))
-	ESEC(1:ND)=6.65D-15*ED(1:ND)
+	ESEC(1:ND)=6.65E-15_LDP*ED(1:ND)
 C
 C Detemine if RJ_CMF is on same grid as ETA and CHI. If not put on same grid
 C via interpolation. We then combine RJ with ETA.
@@ -339,7 +339,7 @@ C NB: ETA and CHI read from the files do NOT contain the clumping factor.
 C
 	DO_CLUMP=.FALSE.
 	DO I=1,ND
-	  IF( ABS(CLUMP_FAC(I)-1.0D0) .GT. 1.0D-06)DO_CLUMP=.TRUE.
+	  IF( ABS(CLUMP_FAC(I)-1.0_LDP) .GT. 1.0E-06_LDP)DO_CLUMP=.TRUE.
 	END DO
 C
 	IF(DO_CLUMP)THEN
@@ -371,7 +371,7 @@ C
 	DO I=2,NC-1
 	  P(I)=P(I-1)+T1
 	END DO
-	P(NC)=P(NC+1)-0.001*(P(NC+1)-P(NC))
+	P(NC)=P(NC+1)-0.001_LDP*(P(NC+1)-P(NC))
 C
 C By definition, p * dp equals R**2 * mu * dmu. Integration over mu is
 C more stable, and is to be preferred. To get better accuracy with the
@@ -395,16 +395,16 @@ C ***************************************************************************
 C
 C 0.01D0=(1.0D+3/1.0D-10)/1.0D+15
 C
-	MAX_FREQ=0.01D0*C_KMS/MIN_WAVE
-	MIN_FREQ=0.01D0*C_KMS/MAX_WAVE
-	NOS=LOG(MAX_FREQ/MIN_FREQ)/LOG(1.0D0+DEL_V_OBS/C_KMS)-1
+	MAX_FREQ=0.01_LDP*C_KMS/MIN_WAVE
+	MIN_FREQ=0.01_LDP*C_KMS/MAX_WAVE
+	NOS=LOG(MAX_FREQ/MIN_FREQ)/LOG(1.0_LDP+DEL_V_OBS/C_KMS)-1
 C
 	ALLOCATE (OBS_FLUX(NOS))
 	ALLOCATE (OBS_FREQ(NOS))
 C
 	OBS_FREQ(1)=MAX_FREQ
 	DO I=2,NOS
-	  OBS_FREQ(I)=MAX_FREQ/(1.0+DEL_V_OBS/C_KMS)**(I-1)
+	  OBS_FREQ(I)=MAX_FREQ/(1.0_LDP+DEL_V_OBS/C_KMS)**(I-1)
 	END DO
 C
 	WRITE(LUER,*)' '

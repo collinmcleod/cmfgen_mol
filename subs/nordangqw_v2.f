@@ -36,7 +36,7 @@
 	  IF(NW .GT. NP)NW=NP
 	  T1=R(I)*R(I)
 	  DO J=1,NW
-	    MU(J)=0.0D0
+	    MU(J)=0.0_LDP
 	    IF(R(I) .NE. P(J))MU(J)=SQRT(T1-PSQ(J))/R(I)
 	  END DO
 	  CALL SET_ACC_dMU(MU,dMU,P,R(I),NW)

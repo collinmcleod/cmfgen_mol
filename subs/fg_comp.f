@@ -64,13 +64,13 @@ C
 	REAL(KIND=LDP) OLDCHI,DBC,SCALE,HBLANK,IBOUND,IMIN,IMINOLD,IMIN_dSL
 	REAL(KIND=LDP) T1,TOR,DNU,WERF_EXP
 C
-	TA(:)=0.0D0;      TB(:)=0.0D0;     TC(:)=0.0D0;  AV(:)=0.0D0;
-        CV(:)=0.0D0;      DTAU(:)=0.0D0;   Z(:)=0.0D0
-	TCHI(:)=0.0D0;    XM(:)=0.0D0;     SOURCE(:)=0.0D0
-	U(:)=0.0D0;       VB(:)=0.0D0;     VC(:)=0.0D0
-	GB(:)=0.0D0;      H(:)=0.0D0;      GAM(:)=0.0D0; GAMH(:)=0.0D0
-	Q(:)=0.0D0;       QH(:)=0.0D0;     JPREV(:)=0.0D0
-	AVCONT(:)=0.0D0;  CVCONT(:)=0.0D0; dCHIdR(:)=0.0D0
+	TA(:)=0.0_LDP;      TB(:)=0.0_LDP;     TC(:)=0.0_LDP;  AV(:)=0.0_LDP;
+        CV(:)=0.0_LDP;      DTAU(:)=0.0_LDP;   Z(:)=0.0_LDP
+	TCHI(:)=0.0_LDP;    XM(:)=0.0_LDP;     SOURCE(:)=0.0_LDP
+	U(:)=0.0_LDP;       VB(:)=0.0_LDP;     VC(:)=0.0_LDP
+	GB(:)=0.0_LDP;      H(:)=0.0_LDP;      GAM(:)=0.0_LDP; GAMH(:)=0.0_LDP
+	Q(:)=0.0_LDP;       QH(:)=0.0_LDP;     JPREV(:)=0.0_LDP
+	AVCONT(:)=0.0_LDP;  CVCONT(:)=0.0_LDP; dCHIdR(:)=0.0_LDP
 
 C
 C 
@@ -80,13 +80,13 @@ C JINT and is determined by the maximum expansion velocity of the
 C atmosphere. We define DNU with out the factor FL. Must be identical
 C to that in MOMJBAR.
 C
-	DNU=3.33564D-06*V(1)*2.0D0
+	DNU=3.33564E-06_LDP*V(1)*2.0_LDP
 C
 C Save the line intensity in the large frequency band so that it can be
 C used when we correct for electron scattering. If JNU has not been determined
 C by a call to MOMJBAR, we set it equal to the continuum intensity.
 C
-	IF( JNU(1,NLF+1) .EQ. 0.0D0 .AND. JNU(ND,NLF+1) .EQ. 0.0D0 )THEN
+	IF( JNU(1,NLF+1) .EQ. 0.0_LDP .AND. JNU(ND,NLF+1) .EQ. 0.0_LDP )THEN
 	  DO I=1,ND
 	    JPREV(I)=JCONT(I)*DNU
 	  END DO
@@ -98,18 +98,18 @@ C
 C
 C Zero intenisty matrices. All are dimensions (ND,NLF+1)
 C
-	JNU(:,:)=0.0D0
-	HNU(:,:)=0.0D0
-	KNU(:,:)=0.0D0
-	NNU(:,:)=0.0D0
+	JNU(:,:)=0.0_LDP
+	HNU(:,:)=0.0_LDP
+	KNU(:,:)=0.0_LDP
+	NNU(:,:)=0.0_LDP
 C
 C Zero boundary condition vectors. Dimensioned (3,NLF+1)
 C
-	HBC(:,:)=0.0D0
-	NBC(:,:)=0.0D0
+	HBC(:,:)=0.0_LDP
+	NBC(:,:)=0.0_LDP
 C
 	DO ML=1,NLF+1
-	  IN_HBC(ML)=0.0D0
+	  IN_HBC(ML)=0.0_LDP
 	END DO
 C
 C Enter loop to perform integration along each ray.
@@ -125,8 +125,8 @@ C
 C
 C Zero AV and CV vectors.
 C
-	  AV(1:NI)=0.0D0
-	  CV(1:NI)=0.0D0
+	  AV(1:NI)=0.0_LDP
+	  CV(1:NI)=0.0_LDP
 C
 	  CALL ZALONGP(R,Z,P(LS),NI)
 	  CALL GAMMA(GAM,GAMH,SIGMA,Z,R,V,ND,NI)
@@ -134,15 +134,15 @@ C
 C Determine boundary condition for continuum intensity.
 C
 	  IF(THK_CONT)THEN
-	    IF(P(LS) .GT. 0.0D0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796D0-ACOS(P(LS)/R(1)))/P(LS)
+	    IF(P(LS) .GT. 0.0_LDP)THEN
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF
-	    IBOUND=ETA(1)*(1.0D0-EXP(-TOR))/CHI(1)
+	    IBOUND=ETA(1)*(1.0_LDP-EXP(-TOR))/CHI(1)
 	  ELSE
-	    TOR=0.0D0
-	    IBOUND=0.0D0
+	    TOR=0.0_LDP
+	    IBOUND=0.0_LDP
 	  END IF
 C
 C 
@@ -157,7 +157,7 @@ C evaluating TCHI and SOURCE we ensure a pure continuum calculation
 C for the first frequency.
 C
 	    IF(ML .EQ. 1)THEN
-	      T1=0.0D0
+	      T1=0.0_LDP
 	    ELSE
 	      T1=PROF(ML)
 	    END IF
@@ -168,7 +168,7 @@ C
 	    CALL QKIM(Q,QH,GAM,GAMH,TCHI,PF,ML,NI,NLF)
 	    IF(DIF .AND. LS .LE. NC)THEN
 	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
-	1   *(1.0D0+Q(NI)*(1.0D0-TCHI(NI)/OLDCHI))
+	1   *(1.0_LDP+Q(NI)*(1.0_LDP-TCHI(NI)/OLDCHI))
 	    END IF
 C
 	    IF(METHOD .EQ. 'ZERO')THEN
@@ -215,19 +215,19 @@ C	    IF(WERFC(ML) .LT. -0.5D0)WERF_EXP=-1.0D0-WERFC(ML)
 C	    WERF_EXP=EXP( 1.0D-15*CHIL(1)/FL/GAM(1)*WERF_EXP )
 C
 	    IF(THK_LINE)THEN
-	      WERF_EXP=EXP( 1.0D-15*CHIL(1)/FL/GAM(1)*WERFC(ML) )
+	      WERF_EXP=EXP( 1.0E-15_LDP*CHIL(1)/FL/GAM(1)*WERFC(ML) )
 	      IF(ML .EQ. 1)THEN
-	        IMINOLD=0.0D0
+	        IMINOLD=0.0_LDP
 	      ELSE
 	        IMINOLD=IMIN
 	      END IF
-	      IMIN=ETAL(1)/CHIL(1)*(1.0D0-WERF_EXP)+IBOUND*WERF_EXP
-	      IMIN_dSL=(1.0D0-WERF_EXP)
+	      IMIN=ETAL(1)/CHIL(1)*(1.0_LDP-WERF_EXP)+IBOUND*WERF_EXP
+	      IMIN_dSL=(1.0_LDP-WERF_EXP)
 	      XM(1)=Q(1)*(IMINOLD-IMIN)-IMIN
 	    ELSE
 	      XM(1)=-IBOUND
 	      IMIN=IBOUND
-	      IMIN_dSL=0.0D0
+	      IMIN_dSL=0.0_LDP
 	    END IF
 C
 C Update AV matrix.
@@ -337,7 +337,7 @@ C in the line section of the program.
 C
 	    DO I=1,NI-1
 	      Q(I)=GAM(I)*( AV(I)-AVCONT(I) )/CHI(I)
-	      QH(I)=2.0D0*GAMH(I)*( CV(I)-CVCONT(I) )/(CHI(I)+CHI(I+1))
+	      QH(I)=2.0_LDP*GAMH(I)*( CV(I)-CVCONT(I) )/(CHI(I)+CHI(I+1))
 	    END DO
 	    Q(NI)=GAM(NI)*( AV(NI)-AVCONT(NI) )/CHI(NI)
 C
@@ -348,15 +348,15 @@ C added for the case of a thick line is GAM''*(I(blue) - Icont).
 C
 	    XM(1)=-Q(1)-IBOUND*DNU
 	    IF(THK_LINE)XM(1)=XM(1)+GAM(1)*
-	1            (ETAL(1)/CHIL(1)-IBOUND)*(1.0D0-WERF_EXP)/CHI(1)
-	    TA(1)=0.0D0
-	    TC(1)=1.0D0/DTAU(1)
-	    TB(1)=-1.0D0-TC(1)
+	1            (ETAL(1)/CHIL(1)-IBOUND)*(1.0_LDP-WERF_EXP)/CHI(1)
+	    TA(1)=0.0_LDP
+	    TC(1)=1.0_LDP/DTAU(1)
+	    TB(1)=-1.0_LDP-TC(1)
 	    DO I=2,NI-1
 	      TA(I)=TC(I-1)
-	      TC(I)=1.0D0/DTAU(I)
-	      TB(I)=-0.5D0*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
-	      XM(I)=-0.5D0*( SOURCE(I)+Q(I) )*( DTAU(I-1)+DTAU(I) )
+	      TC(I)=1.0_LDP/DTAU(I)
+	      TB(I)=-0.5_LDP*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
+	      XM(I)=-0.5_LDP*( SOURCE(I)+Q(I) )*( DTAU(I-1)+DTAU(I) )
 	1               -QH(I)+QH(I-1)
 	    END DO
 C
@@ -366,14 +366,14 @@ C
 	      XM(NI)=DBC			!DNU include in definition of DBC.
 	    ELSE IF(LS .GT. NC)THEN
 	      TA(NI)=-TC(NI-1)
-	      TB(NI)=-TA(NI)+DTAU(NI-1)*0.5D0
-	      XM(NI)=0.5D0*DTAU(NI-1)*(SOURCE(NI)+Q(NI))-QH(NI-1)
+	      TB(NI)=-TA(NI)+DTAU(NI-1)*0.5_LDP
+	      XM(NI)=0.5_LDP*DTAU(NI-1)*(SOURCE(NI)+Q(NI))-QH(NI-1)
 	    ELSE
 	      TA(NI)=-TC(NI-1)
-	      TB(NI)=1.0D0-TA(NI)
+	      TB(NI)=1.0_LDP-TA(NI)
 	      XM(NI)=IC*DNU+Q(NI)
 	    END IF
-	    TC(NI)=0.0D0
+	    TC(NI)=0.0_LDP
 C
 C Solve the tridiagonal system of equations.
 C
@@ -425,15 +425,15 @@ C
 	  HBC(1,ML)=HBC(1,ML)/JNU(1,ML)
 	  NBC(1,ML)=NBC(1,ML)/JNU(1,ML)
 	  IF(ML .EQ. NLF+1)THEN
-	    IN_HBC(ML)=IN_HBC(ML)/(2.0D0*JNU(ND,ML)-IC*DNU)
+	    IN_HBC(ML)=IN_HBC(ML)/(2.0_LDP*JNU(ND,ML)-IC*DNU)
 	  ELSE
-	    IN_HBC(ML)=IN_HBC(ML)/(2.0D0*JNU(ND,ML)-IC)
+	    IN_HBC(ML)=IN_HBC(ML)/(2.0_LDP*JNU(ND,ML)-IC)
 	  END IF
 	END DO
 C
 	IF(LINE_BL)THEN
 C
-	  HBLANK=0.0D0
+	  HBLANK=0.0_LDP
 	  DO ML=1,NLF
 	    HBLANK=HBLANK+LFQW(ML)*HNU(1,ML)
 	  END DO
@@ -442,30 +442,30 @@ C Scale JBLANK and HBLANK to allow for the fact that the
 C LFQW dont necessarily add to v*(PF(1)-PF(NLF)) (since LFQW is
 C normalized so that integral over the line profile is unity).
 C
-	  SCALE=0.0D0
+	  SCALE=0.0_LDP
 	  DO ML=1,NLF
 	    SCALE=SCALE+LFQW(ML)
 	  END DO
-  	  SCALE=1.0D+15*FL*(PF(1)-PF(NLF))/SCALE
+  	  SCALE=1.0E+15_LDP*FL*(PF(1)-PF(NLF))/SCALE
 C
 C Evaluate JBLANK which is deined by Int{Jv dv} over the WHOLE line.
 C HBLANK is similarly defined. WE first scale JBLANK and HBLANK for
 C the reasons givem above. The frequency factor of
 C 10^15 is included in the JBLANK (and HBLANK) definition.
 C
-	  T1=1.0D+15*FL
+	  T1=1.0E+15_LDP*FL
 	  HBLANK=HBLANK*SCALE+HNU(1,NLF+1)*T1
 C
 C Evaluate the line EW. The units are Angstroms. Also evaluate
 C the continuum intensity ( Jys/kpc/kpc ). Note that H is
 C defined midway between R(1) and R(2).
 C
-	  T1=( (PF(1)-PF(NLF))+DNU )*FL*1.0D+15
-	  EW=2.99794D-12*( HBLANK-HNU(1,1)*T1 )/HNU(1,1)/FL/FL
-	  CONT_INT=13.19868D0*HNU(1,1)*( (R(1)+R(2))**2 )/4.0D0
+	  T1=( (PF(1)-PF(NLF))+DNU )*FL*1.0E+15_LDP
+	  EW=2.99794E-12_LDP*( HBLANK-HNU(1,1)*T1 )/HNU(1,1)/FL/FL
+	  CONT_INT=13.19868_LDP*HNU(1,1)*( (R(1)+R(2))**2 )/4.0_LDP
 	ELSE
-	  EW=0.0D0
-	  CONT_INT=0.0D0
+	  EW=0.0_LDP
+	  CONT_INT=0.0_LDP
 	END IF
 C
 	RETURN

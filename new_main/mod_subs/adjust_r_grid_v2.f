@@ -83,10 +83,10 @@
 !
 	DO I=1,ND
 	  TA(I)=FLUXMEAN(I)
-	  IF(TA(I) .LE. 0.0D0)TA(I)=ESEC(I)
+	  IF(TA(I) .LE. 0.0_LDP)TA(I)=ESEC(I)
 	  TA(I)=TA(I)*CLUMP_FAC(I)
 	END DO
-        TB(1:ND)=0.0D0                              !Used for dCHIdR
+        TB(1:ND)=0.0_LDP                              !Used for dCHIdR
         CALL NORDTAU(dTAU_OLD,TA,R,R,TB,ND)
 !
 ! Save existing grid, which will be used for the interplations.
@@ -97,7 +97,7 @@
 ! Compute optical depth scale. Note that we are passed the optical detph
 ! increments, not the optical depth scale.
 !
-	TAU_OLD(1:ND)=0.0D0
+	TAU_OLD(1:ND)=0.0_LDP
 	DO I=2,ND
 	  TAU_OLD(I)=TAU_OLD(I-1)+dTAU_OLD(I-1)
 	END DO
@@ -109,8 +109,8 @@
 	TAU_OLD(2)=TAU_OLD(3)*R_OLD(2)/R_OLD(1)
 	TAU_OLD(1:ND)=LOG10(TAU_OLD(1:ND))
 !
-	FG_MIN=-3.0D0
-	FG_MAX=1.50D0
+	FG_MIN=-3.0_LDP
+	FG_MAX=1.50_LDP
 	FG_RANGE=FG_MAX-FG_MIN
 !
 	IF( TRIM(GRID_TYPE(1:6)) .EQ. 'UNIFOR')THEN
@@ -120,7 +120,7 @@
 	    FG_MAX=RG_PARS(2)
 	    FG_RANGE=FG_MAX-FG_MIN
 	  END IF
-	  NX=(FG_RANGE+0.7D0*DTAU)/DTAU
+	  NX=(FG_RANGE+0.7_LDP*DTAU)/DTAU
 	ELSE IF( TRIM(GRID_TYPE) .EQ. 'FIX_NX')THEN
 	  NX=RG_PARS(1)
 	  IF(N_PARS .EQ. 3)THEN
@@ -148,8 +148,8 @@
 	DO I=4,I1
 	  TAU(I)=TAU_OLD(1)+DTAU*(I-3)
 	END DO
-        TAU(2)=MIN(TAU_OLD(2),TAU(1)+0.1D0*DTAU)
-        TAU(3)=MIN(TAU_OLD(3),TAU(1)+0.3D0*DTAU)
+        TAU(2)=MIN(TAU_OLD(2),TAU(1)+0.1_LDP*DTAU)
+        TAU(3)=MIN(TAU_OLD(3),TAU(1)+0.3_LDP*DTAU)
 !
 ! Do the insertion in the crtical section.
 !
@@ -174,10 +174,10 @@
 	  TAU(I)=TAU(I-1)+DTAU
 	END DO
 	TAU(ND)=TAU_OLD(ND)
-	T1=1.0D0-10.0D0**(-DTAU)
-	TAU(ND-1)=MAX(TAU_OLD(ND-1),TAU(ND)+LOG10(1.0D0-0.0667D0*T1))
-	TAU(ND-2)=TAU(ND)+LOG10(1.0D0-0.201D0*T1)
-	TAU(ND-3)=TAU(ND)+LOG10(1.0D0-0.467D0*T1)
+	T1=1.0_LDP-10.0_LDP**(-DTAU)
+	TAU(ND-1)=MAX(TAU_OLD(ND-1),TAU(ND)+LOG10(1.0_LDP-0.0667_LDP*T1))
+	TAU(ND-2)=TAU(ND)+LOG10(1.0_LDP-0.201_LDP*T1)
+	TAU(ND-3)=TAU(ND)+LOG10(1.0_LDP-0.467_LDP*T1)
 !
 !	DO I=1,ND
 !	  WRITE(6,'(I4,4E16.8)')I,TAU(I),TAU_OLD(I),LOG_R_OLD(I)

@@ -250,13 +250,13 @@
 	    LOCINC=MAX(LOCINC,T1)
 	    LOCDEC=MIN(LOCDEC,T1)
 	  END DO
-	  VEC_INC(L)=100.0D0*(LOCINC-1.0D0)
-	  VEC_DEC(L)=100.0D0*(1.0D0/LOCDEC-1.0D0)
+	  VEC_INC(L)=100.0_LDP*(LOCINC-1.0_LDP)
+	  VEC_DEC(L)=100.0_LDP*(1.0_LDP/LOCDEC-1.0_LDP)
 !
 ! Before storing the NG acceleration at this depth, we check to
 ! see whether the predicted corrections are "reasonable".
 !
-	  IF(LOCINC .GT. 10.1D0 .OR. LOCDEC .LT. 0.09D0)THEN
+	  IF(LOCINC .GT. 10.1_LDP .OR. LOCDEC .LT. 0.09_LDP)THEN
 	    NUM_BAD_NG=NUM_BAD_NG+1
 	    WRITE(LUER,*)'NUM_BAD_NG=',NUM_BAD_NG
 	    WRITE(LUER,9000)L,LOCINC,LOCDEC
@@ -299,8 +299,8 @@
 ! defined for successful NG accelerations (does not include any depths
 ! at which NG acceleration did not work).
 !
-	MAXINC=100.0D0*(MAXINC-1.0D0)
-	MAXDEC=100.0D0*(1.0D0/MAXDEC-1.0D0)
+	MAXINC=100.0_LDP*(MAXINC-1.0_LDP)
+	MAXDEC=100.0_LDP*(1.0_LDP/MAXDEC-1.0_LDP)
 	WRITE(LUER,'(A,I3)')' NG Acceleration performed using NG_BAND=',LOC_NBAND
 	WRITE(LUER,'(A,I3,A,ES10.2)')
 	1  ' Max NG % increase at depth ',INC_LOC,' is',MAXINC

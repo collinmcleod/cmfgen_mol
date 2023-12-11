@@ -38,7 +38,7 @@
 	INTEGER IVEC(NX)
 !
 	REAL(KIND=LDP) ONE
-	PARAMETER (ONE=1.0D0)
+	PARAMETER (ONE=1.0_LDP)
 	INTEGER I,J,ML
 	REAL(KIND=LDP) T1
 	REAL(KIND=LDP) RMIN,RMAX
@@ -82,7 +82,7 @@
 	    WRITE(LUER,*)'R values must be monotonic'
 	    WRITE(LUER,*)'I value is',I
 	    WRITE(LUER,'(A)')' IDENT=',TRIM(IDENT)
-	    H(ND)=0.0D0
+	    H(ND)=0.0_LDP
 	    WRITE(LUER,*)'J, R, dR follows'
 	    DO J=1,ND
 	      WRITE(LUER,*)J,R(J),H(J)
@@ -133,10 +133,10 @@
 !
 ! Adjust first derivatives so that function is monotonic  in each interval.
 !
-	  D(1)=( SIGN(ONE,S(1))+SIGN(ONE,D(1)) )*MIN(ABS(S(1)),0.5D0*ABS(D(1)))
+	  D(1)=( SIGN(ONE,S(1))+SIGN(ONE,D(1)) )*MIN(ABS(S(1)),0.5_LDP*ABS(D(1)))
 	  DO I=2,MIN(ND-1,ND_SM)
 	    D(I)=( SIGN(ONE,S(I-1))+SIGN(ONE,S(I)) )*
-	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5D0*ABS(D(I)))
+	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5_LDP*ABS(D(I)))
 	  END DO
 !
 ! Special treatment for computing slope at end point of R.
@@ -144,7 +144,7 @@
 	  IF(ND .EQ. ND_SM)THEN
             D(ND)=S(ND-1)+(S(ND-1)-S(ND-2))*H(ND-1)/(H(ND-2)+H(ND-1))
 	    D(ND)=( SIGN(ONE,S(ND-1))+SIGN(ONE,D(ND)) )*
-	1      MIN(ABS(S(ND-1)),0.5D0*ABS(D(ND)))
+	1      MIN(ABS(S(ND-1)),0.5_LDP*ABS(D(ND)))
 	  END IF
 !
 ! Determine the ciefficients of the monotonic cubic polynomial.
@@ -153,8 +153,8 @@
 !             Y=A(I)*T1^3 + B(I)*T1^3 + C(I)*T1 + E(I)
 !
 	  DO I=1,ND_SM-1
-            A(I)=(D(I)+D(I+1)-2.0D0*S(I))/H(I)/H(I)
-	    B(I)=(3.0*S(I)-2.0D0*D(I)-D(I+1))/H(I)
+            A(I)=(D(I)+D(I+1)-2.0_LDP*S(I))/H(I)/H(I)
+	    B(I)=(3.0_LDP*S(I)-2.0_LDP*D(I)-D(I+1))/H(I)
 	    C(I)=D(I)
 	    E(I)=VARRAY(I,ML)
 	  END DO

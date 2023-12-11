@@ -36,10 +36,10 @@ C
 C Compute quantities that will be used repeatedly if the same tridiagonal
 C system is used for many R.H. Sides.
 C
-	B(1)=1.0D0/B(1)
+	B(1)=1.0_LDP/B(1)
 	C(1)=-C(1)*B(1)
 	DO I=2,N1
-	  B(I)=1.0D0/(B(I)+A(I)*C(I-1))
+	  B(I)=1.0_LDP/(B(I)+A(I)*C(I-1))
 	  C(I)=-C(I)*B(I)
 	END DO
 C

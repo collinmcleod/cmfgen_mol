@@ -13,11 +13,11 @@ C
 C
 	DO I=1,N
 	  T1=SQRT(FLOAT(I))
-	  A(I)=-0.48*T1
-	  C(I)=-0.49*T1
+	  A(I)=-0.48_LDP*T1
+	  C(I)=-0.49_LDP*T1
 	  B(I)=T1-A(I)-C(I)
-	  X(I)=SQRT(2*I+0.5)
-	  D(I)=0.0D0
+	  X(I)=SQRT(2*I+0.5_LDP)
+	  D(I)=0.0_LDP
 	END DO
 	A(1)=0.0
 	C(N)=0.0
@@ -29,7 +29,7 @@ C
 	D(N)=D(N)+A(N)*X(N-1)+B(N)*X(N)
 !
 	DO J=1,NRHS
-	  W(:,J)=D(:)+0.1*(J-1)
+	  W(:,J)=D(:)+0.1_LDP*(J-1)
 	END DO
 !
 	CALL TUNE(1,'LAP')
@@ -44,11 +44,11 @@ C
 C
 	DO I=1,N
 	  T1=SQRT(FLOAT(I))
-	  A(I)=-0.48*T1
-	  C(I)=-0.49*T1
+	  A(I)=-0.48_LDP*T1
+	  C(I)=-0.49_LDP*T1
 	  B(I)=T1-A(I)-C(I)
-	  X(I)=SQRT(2*I+0.5)
-	  D(I)=0.0D0
+	  X(I)=SQRT(2*I+0.5_LDP)
+	  D(I)=0.0_LDP
 	END DO
 	A(1)=0.0
 	C(N)=0.0
@@ -60,7 +60,7 @@ C
 	D(N)=D(N)+A(N)*X(N-1)+B(N)*X(N)
 !
 	DO J=1,NRHS
-	  W(:,J)=D(:)+0.1*(J-1)
+	  W(:,J)=D(:)+0.1_LDP*(J-1)
 	END DO
 !
 	CALL TUNE(1,'TH')
@@ -148,15 +148,15 @@ C
         IF (FIRSTTIME)THEN
           FIRSTTIME=.FALSE.
           DO  I=1,MAX_IDS
-            ST_CPU(I)=0.D0
-            IST_WALL(I)=0.D0
-            CPUTOT(I)=0.D0
-            WALLTOT(I)=0.D0
+            ST_CPU(I)=0._LDP
+            IST_WALL(I)=0._LDP
+            CPUTOT(I)=0._LDP
+            WALLTOT(I)=0._LDP
 	    IDLIST(I)=' '
           END DO
 	  CALL SYSTEM_CLOCK(IC0,IR0,IM0);    RR0=IR0
           T0=ETIME(TARRY)
-          OVERHEAD=2.0D0*(ETIME(TARRY)-T0)
+          OVERHEAD=2.0_LDP*(ETIME(TARRY)-T0)
 !	  OPEN(UNIT=LUOUT,STATUS='REPLACE',FILE='TIMING')
 	  WRITE(LUOUT,*)' '
 	  WRITE(LUOUT,*)'Overhead is ',OVERHEAD
@@ -213,10 +213,10 @@ C
           END DO
 	ELSE IF(LRUN .EQ. 0) THEN
           DO  I=1,MAX_IDS
-            ST_CPU(I)=0.D0
-            IST_WALL(I)=0.D0
-            CPUTOT(I)=0.D0
-            WALLTOT(I)=0.D0
+            ST_CPU(I)=0._LDP
+            IST_WALL(I)=0._LDP
+            CPUTOT(I)=0._LDP
+            WALLTOT(I)=0._LDP
 	    IDLIST(I)=' '
           END DO
 	ELSE
@@ -264,10 +264,10 @@ C
 C Compute quantities that will be used repeatedly if the same tridiagonal
 C system is used for many R.H. Sides.
 C
-	B(1)=1.0/B(1)
+	B(1)=1.0_LDP/B(1)
 	C(1)=-C(1)*B(1)
 	DO I=2,N1
-	  B(I)=1.0/(B(I)+A(I)*C(I-1))
+	  B(I)=1.0_LDP/(B(I)+A(I)*C(I-1))
 	  C(I)=-C(I)*B(I)
 	END DO
 C

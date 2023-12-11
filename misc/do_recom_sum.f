@@ -34,7 +34,7 @@
 	CHARACTER(LEN=100) FILE_NAME
 	CHARACTER(LEN=100) STRING
 !
-	DATA T_REC_CHK/0.1D0,0.2D0,0.5D0,1.0D0,2.0D0,5.0D0,10.0D0/
+	DATA T_REC_CHK/0.1_LDP,0.2_LDP,0.5_LDP,1.0_LDP,2.0_LDP,5.0_LDP,10.0_LDP/
 !
 ! This is the same ID used in CMFGEN, and used to read files etc.
 !
@@ -128,12 +128,12 @@
 	        READ(LUIN,*)(RECOM_RATE(I),I=L,LEND)
 	      END DO
 !
-	     RECOM_CHK=0.0D0
+	     RECOM_CHK=0.0_LDP
 	     DO K=KST,LEND
                DO I=1,ND-1
                  IF( (T_REC_CHK(K)-T(I))*(T(I+1)-T_REC_CHK(K)) .GE. 0 )THEN
                     T1=(T_REC_CHK(K)-T(I))/(T(I+1)-T(I))
-                    RECOM_CHK(K)=(1.0D0-T1)*RECOM_RATE(I)+T1*RECOM_RATE(I+1)
+                    RECOM_CHK(K)=(1.0_LDP-T1)*RECOM_RATE(I)+T1*RECOM_RATE(I+1)
                     EXIT
                  END IF
                END DO

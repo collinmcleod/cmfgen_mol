@@ -57,7 +57,7 @@ C
 C
 C Compute WM matrix (variation of eta).
 C
-	FC(:,:)=0.0D0
+	FC(:,:)=0.0_LDP
 	FC(1,1)=-HBC_S*R(1)*R(1)/CHI(1)
 	DO I=2,ND-1
 	  FC(I,I)=R(I)*R(I)/Q(I)/CHI(I)
@@ -81,7 +81,7 @@ C that of PERTJD.
 C
 	IF(DIFF)THEN
 	  CALL DP_ZERO(FA,ND)
-	  FA(ND)=R(ND)*R(ND)/CHI(ND)/3.0D0
+	  FA(ND)=R(ND)*R(ND)/CHI(ND)/3.0_LDP
 	  CALL SIMPTH(TA,TB,TC,FA,ND,IONE)
 	ELSE
 	  LUER=ERROR_LU()

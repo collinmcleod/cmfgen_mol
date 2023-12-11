@@ -70,7 +70,7 @@
 !
 	LOG_OLD_TAU=LOG(OLD_TAU)
 	LOG_OLD_R=LOG(OLD_R)
-	IF(dLOGT_MAX .GT. 0 .AND. dLOGT_MAX .LT. 1.D0)THEN
+	IF(dLOGT_MAX .GT. 0 .AND. dLOGT_MAX .LT. 1._LDP)THEN
 	  CHECK_T=.TRUE.
 	  LOG_OLD_T(1:NS)=LOG(OLD_T(1:NS))
 	ELSE
@@ -155,14 +155,14 @@
 !
 	    NEXT_R=MAX(LOG_R(I-1)-dLOGR,LOG_OLD_R(NS))
 	    dTAU_COMP=dTAU
-	    IF(I .GT. 4)dTAU_COMP=MIN( dTAU,1.3D0*(LOG_TAU(I-1)-lOG_TAU(I-2)))
+	    IF(I .GT. 4)dTAU_COMP=MIN( dTAU,1.3_LDP*(LOG_TAU(I-1)-lOG_TAU(I-2)))
 	    TAU_END=LOG_TAU(I-1)+dTAU_COMP
 	    J=1
 	    DO WHILE(LOG_OLD_R(J+1) .GT. NEXT_R)
 	      J=J+1
 	    END DO
 	    T1=(NEXT_R-LOG_OLD_R(J))/(LOG_OLD_R(J+1)-LOG_OLD_R(J))
-	    T2=T1*LOG_OLD_TAU(J+1)+(1.0D0-T1)*LOG_OLD_TAU(J)
+	    T2=T1*LOG_OLD_TAU(J+1)+(1.0_LDP-T1)*LOG_OLD_TAU(J)
 	    T2=T2-LOG_TAU(I-1)
 	    IF(T2 .GT. dTAU_COMP)THEN
 	        J=1
@@ -170,7 +170,7 @@
 	        J=J+1
 	      END DO
 	      T1=(TAU_END-LOG_OLD_TAU(J))/(LOG_OLD_TAU(J+1)-LOG_OLD_TAU(J))
-	      LOG_R(I)=T1*LOG_OLD_R(J+1)+(1.0D0-T1)*LOG_OLD_R(J)
+	      LOG_R(I)=T1*LOG_OLD_R(J+1)+(1.0_LDP-T1)*LOG_OLD_R(J)
 	      LOG_TAU(I)=TAU_END
 	    ELSE
 	      LOG_R(I)=NEXT_R
@@ -179,27 +179,27 @@
 	        J=J+1
 	      END DO
 	      T1=(NEXT_R-LOG_OLD_R(J))/(LOG_OLD_R(J+1)-LOG_OLD_R(J))
-	      LOG_TAU(I)=T1*LOG_OLD_TAU(J+1)+(1.0D0-T1)*LOG_OLD_TAU(J)
+	      LOG_TAU(I)=T1*LOG_OLD_TAU(J+1)+(1.0_LDP-T1)*LOG_OLD_TAU(J)
 	    END IF
 !
 ! We have to be careful as T may not be monotonic.
 !
 	    IF(CHECK_T)THEN
 	      T1=(LOG_R(I)-LOG_OLD_R(J))/(LOG_OLD_R(J+1)-LOG_OLD_R(J))
-	      LOG_T(I)=T1*LOG_OLD_T(J+1)+(1.0D0-T1)*LOG_OLD_T(J)
+	      LOG_T(I)=T1*LOG_OLD_T(J+1)+(1.0_LDP-T1)*LOG_OLD_T(J)
 	      DO WHILE(ABS(LOG_T(I)-LOG_T(I-1)) .GT. dLOGT)
-	        LOG_R(I)=LOG_R(I)+0.1D0*(LOG_R(I-1)-LOG_R(I))
+	        LOG_R(I)=LOG_R(I)+0.1_LDP*(LOG_R(I-1)-LOG_R(I))
 	        J=1
 	        DO WHILE(LOG_OLD_R(J+1) .GT. LOG_R(I))
 	          J=J+1
 	        END DO
 	        T1=(LOG_R(I)-LOG_OLD_R(J))/(LOG_OLD_R(J+1)-LOG_OLD_R(J))
-	        LOG_TAU(I)=T1*LOG_OLD_TAU(J+1)+(1.0D0-T1)*LOG_OLD_TAU(J)
-	        LOG_T(I)=T1*LOG_OLD_T(J+1)+(1.0D0-T1)*LOG_OLD_T(J)
+	        LOG_TAU(I)=T1*LOG_OLD_TAU(J+1)+(1.0_LDP-T1)*LOG_OLD_TAU(J)
+	        LOG_T(I)=T1*LOG_OLD_T(J+1)+(1.0_LDP-T1)*LOG_OLD_T(J)
 	      END DO
 	    ELSE
 	      T1=(LOG_R(I)-LOG_OLD_R(J))/(LOG_OLD_R(J+1)-LOG_OLD_R(J))
-	      LOG_T(I)=T1*LOG_OLD_T(J+1)+(1.0D0-T1)*LOG_OLD_T(J)
+	      LOG_T(I)=T1*LOG_OLD_T(J+1)+(1.0_LDP-T1)*LOG_OLD_T(J)
 	    END IF
 !
 ! Check whether close enough to inner bondary.
@@ -229,7 +229,7 @@
 	1           ' Depth','R','Ln(R)','dLn(R)','Tau','dTAU','Ln(Tau)','dLn(Tau)','dTAU[I/I-1]'
 	  TAU(1:ND_TMP)=EXP(LOG_TAU(1:ND_TMP))
 	  DO I=1,ND_TMP-1
-	    IF(I .NE. 1)T1=(TAU(I+1)-TAU(I))/MAX(TAU(I)-TAU(I-1),1.0D-10)
+	    IF(I .NE. 1)T1=(TAU(I+1)-TAU(I))/MAX(TAU(I)-TAU(I-1),1.0E-10_LDP)
 	    WRITE(LU,'(I6,ES18.8,9ES14.4)')I,EXP(LOG_R(I)),LOG_R(I),LOG_R(I+1)-LOG_R(I),
 	1              TAU(I),TAU(I+1)-TAU(I),LOG_TAU(I),LOG_TAU(I+1)-LOG_TAU(I),T1,EXP(LOG_T(I+1)-LOG_T(I))
 	  END DO
@@ -250,7 +250,7 @@
 	IF(ND_TMP .NE. J)THEN
 	  DO I=1,ND_TMP; ZN(I)=I; END DO
 	  DO I=1,J
-	    XN(I)=1.0D0+(I-1.0D0)*(ND_TMP-1.0D0)/(J-1.0D0)
+	    XN(I)=1.0_LDP+(I-1.0_LDP)*(ND_TMP-1.0_LDP)/(J-1.0_LDP)
 	  END DO
 	  CALL MON_INTERP(R,J,IONE,XN,J,LOG_R,ND_TMP,ZN,ND_TMP)
 	  LOG_R=R
@@ -264,23 +264,23 @@
 	I=ND_TMP
 	T1=LOG_R(ND_TMP-1)-LOG_R(ND_TMP)
 	T2=LOG_TAU(ND_TMP-1)-LOG_TAU(ND_TMP)
-	IF(N_IB_INS .EQ. 1 .AND. IB_RAT .EQ. 0.0D0)THEN
-	  LOG_R(I)=LOG_OLD_R(NS)+0.2D0*T1
-	  LOG_TAU(I)=LOG_OLD_TAU(NS)+0.2D0*T2
+	IF(N_IB_INS .EQ. 1 .AND. IB_RAT .EQ. 0.0_LDP)THEN
+	  LOG_R(I)=LOG_OLD_R(NS)+0.2_LDP*T1
+	  LOG_TAU(I)=LOG_OLD_TAU(NS)+0.2_LDP*T2
 	  ND_TMP=I+1
-	ELSE IF(N_IB_INS .EQ. 2 .AND. IB_RAT .EQ. 0.0D0)THEN
-	  LOG_R(I+1)=LOG_OLD_R(NS)+0.1D0*T1     !0.1D0
-	  LOG_R(I)=LOG_OLD_R(NS)+0.4D0*T1      !0.4D0
-	  LOG_TAU(I+1)=LOG_OLD_TAU(NS)+0.1D0*T2     !0.1D0
-	  LOG_TAU(I)=LOG_OLD_TAU(NS)+0.4D0*T2      !0.4D0
+	ELSE IF(N_IB_INS .EQ. 2 .AND. IB_RAT .EQ. 0.0_LDP)THEN
+	  LOG_R(I+1)=LOG_OLD_R(NS)+0.1_LDP*T1     !0.1D0
+	  LOG_R(I)=LOG_OLD_R(NS)+0.4_LDP*T1      !0.4D0
+	  LOG_TAU(I+1)=LOG_OLD_TAU(NS)+0.1_LDP*T2     !0.1D0
+	  LOG_TAU(I)=LOG_OLD_TAU(NS)+0.4_LDP*T2      !0.4D0
 	  ND_TMP=I+2
-	ELSE IF(N_IB_INS .EQ. 3 .AND. IB_RAT .EQ. 0.0D0)THEN
-	  LOG_R(I+2)=LOG_OLD_R(NS)+0.06D0*T1
-	  LOG_R(I+1)=LOG_OLD_R(NS)+0.16D0*T1
-	  LOG_R(I)=LOG_OLD_R(NS)+0.4D0*T1
-	  LOG_TAU(I+2)=LOG_OLD_TAU(NS)+0.06D0*T2
-	  LOG_TAU(I+1)=LOG_OLD_TAU(NS)+0.16D0*T2
-	  LOG_TAU(I)=LOG_OLD_TAU(NS)+0.4D0*T2
+	ELSE IF(N_IB_INS .EQ. 3 .AND. IB_RAT .EQ. 0.0_LDP)THEN
+	  LOG_R(I+2)=LOG_OLD_R(NS)+0.06_LDP*T1
+	  LOG_R(I+1)=LOG_OLD_R(NS)+0.16_LDP*T1
+	  LOG_R(I)=LOG_OLD_R(NS)+0.4_LDP*T1
+	  LOG_TAU(I+2)=LOG_OLD_TAU(NS)+0.06_LDP*T2
+	  LOG_TAU(I+1)=LOG_OLD_TAU(NS)+0.16_LDP*T2
+	  LOG_TAU(I)=LOG_OLD_TAU(NS)+0.4_LDP*T2
 	  ND_TMP=I+3
 	ELSE
 	  T1=EXP(LOG_TAU(ND_TMP))
@@ -312,7 +312,7 @@
 ! set right at the outer boudary.
 !
 	K=0
-	IF(DTAU2_ON_DTAU1 .LT. 2.0D0)K=1
+	IF(DTAU2_ON_DTAU1 .LT. 2.0_LDP)K=1
 	T1=EXP(LOG_TAU(1))
 	T2=EXP(LOG_TAU(1))-EXP(LOG_TAU(2))
 	T3=T2*(OB_RAT-1)/(OB_RAT**(N_OB_INS+K)-1)
@@ -355,9 +355,9 @@
 	WRITE(LU,'(A)')' '
 	WRITE(LU,'(A,17X,A,9X,A,8X,A,11X,A,10X,A,7X,A,6X,A,3X,A)')
 	1           ' Depth','R','Ln(R)','dLn(R)','Tau','dTau','Ln(Tau)','dLn(Tau)','dTAU[I/I-1]'
-	T1=0.0D0
+	T1=0.0_LDP
 	DO I=1,ND-1
-	  IF(I .NE. 1)T1=(TAU(I+1)-TAU(I))/MAX(TAU(I)-TAU(I-1),1.0D-10)
+	  IF(I .NE. 1)T1=(TAU(I+1)-TAU(I))/MAX(TAU(I)-TAU(I-1),1.0E-10_LDP)
 	  WRITE(LU,'(I6,ES18.8,7ES14.4)')I,R(I),LOG_R(I),LOG_R(I+1)-LOG_R(I),
 	1              TAU(I),TAU(I+1)-TAU(I),LOG_TAU(I),LOG_TAU(I+1)-LOG_TAU(I),T1
 	END DO

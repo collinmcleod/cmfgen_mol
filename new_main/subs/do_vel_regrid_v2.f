@@ -68,7 +68,7 @@
 	IN_BND_OPT='DEFAULT'
 	IV1=1; IV2=21
 	NMAX=NM*ND
-	dV_MAX=500.0D0
+	dV_MAX=500.0_LDP
 !
 	CALL RD_STORE_DBLE(VLOW,'VLOW',L_TRUE,'Minimum velocity (km/s) of zone to be regridded')
 	CALL RD_STORE_DBLE(VHIGH,'VHIGH',L_TRUE,'Maximum velocity (km/s) of zone to be regridded')
@@ -146,8 +146,8 @@
 	DO I=2,ND
 	  WRITE(LU,'(I6,3X,ES12.6,3(6X,ES12.6,5X,F10.3))')
 	1             I,R(I),V(I),V(I-1)-V(I),
-	1             TA(I),TA(I)/TA(I-1)-1.0D0,
-	1             TB(I),TB(I)/TB(I-1)-1.0D0
+	1             TA(I),TA(I)/TA(I-1)-1.0_LDP,
+	1             TB(I),TB(I)/TB(I-1)-1.0_LDP
 	END DO
 !
 ! Find the interval over which we will adjust the grid.
@@ -180,8 +180,8 @@
 	NI=JEND-JST+1
 	IF(JST .EQ. 1)NI=NI-NOB
 	IF(JEND .EQ. ND)NI=NI-NIB
-	dV=EXP(2.0D0*LOG(V(JST)/V(JEND))/(NI-1))
-	dV=1.04D0
+	dV=EXP(2.0_LDP*LOG(V(JST)/V(JEND))/(NI-1))
+	dV=1.04_LDP
 !
 	WRITE(LUER,'(A)')' '
 	WRITE(LUER,'(2(A,I4,14X))')    '    JST=',   JST,'   JEND=',JEND
@@ -207,12 +207,12 @@
 	    WRITE(LUER,*)'Error in DO_VEL_REGRID -- NMAX not sufficently large'
 	    WRITE(LUER,*)'Adjusting dV and starting again'
 	    WRITE(LUER,*)'L=',L
-	    dV=dV*1.02D0
+	    dV=dV*1.02_LDP
 	    GOTO 100
 	  END IF
 !
 	  VNEW(L)=VNEW(L-1)/dV
-	  IF(VNEW(L)-0.2D0*(VNEW(L-1)-VNEW(L)) .LE. V(JEND))THEN
+	  IF(VNEW(L)-0.2_LDP*(VNEW(L-1)-VNEW(L)) .LE. V(JEND))THEN
 	    VNEW(L)=V(JEND)
 	    EXIT
 	  END IF
@@ -229,12 +229,12 @@
 	    K=K+1
 	  END DO
 	  T1=(VNEW(L)-V(K))/(V(K+1)-V(K))
-	  LOG_ATOM_DEN=T1*LOG(POP_ATOM(K+1))+(1.0D0-T1)*LOG(POP_ATOM(K))
-	  T2=-1000.0D0
+	  LOG_ATOM_DEN=T1*LOG(POP_ATOM(K+1))+(1.0_LDP-T1)*LOG(POP_ATOM(K))
+	  T2=-1000.0_LDP
 	  DO J=1,NVAR
 	    I=IVAR(J)
-	    CUR_LOG_POP(I)=T1*LOG(POPS(I,K+1))+(1.0D0-T1)*LOG(POPS(I,K))
-	    IF(CUR_LOG_POP(I) .GT. LOG_ATOM_DEN-12.0D0)THEN
+	    CUR_LOG_POP(I)=T1*LOG(POPS(I,K+1))+(1.0_LDP-T1)*LOG(POPS(I,K))
+	    IF(CUR_LOG_POP(I) .GT. LOG_ATOM_DEN-12.0_LDP)THEN
 	      T2=MAX(T2,ABS(CUR_LOG_POP(I)-OLD_LOG_POP(I)))
 	      WRITE(70,*)I,L,LOG_ATOM_DEN,CUR_LOG_POP(I)
 	    END IF
@@ -245,7 +245,7 @@
 ! varies slowly to an interval where it varies rapidly.
 !
 	  IF(T2 .GT. dDEN)THEN
-	    VNEW(L)=VNEW(L-1)+0.95D0*(VNEW(L)-VNEW(L-1))
+	    VNEW(L)=VNEW(L-1)+0.95_LDP*(VNEW(L)-VNEW(L-1))
 	    GOTO 1000
 	  END IF
 	END DO
@@ -258,7 +258,7 @@
 	WRITE(LUER,*)'Number of points in old interval inclusive was',JEND-JST+1
 	WRITE(LUER,*)' Number of points in new interval inclusive is ',L
 !
-	TA=0.0D0; TB=0.0D0
+	TA=0.0_LDP; TB=0.0_LDP
 	TA(1:ND)=LOG(POPS(IV1,1:ND))
 	TB(1:ND)=LOG(POPS(IV2,1:ND))
 	CALL LIN_INTERP(VNEW,RTA,L,V,TA,ND)
@@ -275,8 +275,8 @@
 	DO I=2,L
 	  WRITE(LU,'(I6,3X,ES12.6,3(6X,ES12.6,5X,F10.3))')
 	1            I,RNEW(I),VNEW(I),VNEW(I-1)-VNEW(I),
-	1             RTA(I),RTA(I)/RTA(I-1)-1.0D0,
-	1             RTB(I),RTB(I)/RTB(I-1)-1.0D0
+	1             RTA(I),RTA(I)/RTA(I-1)-1.0_LDP,
+	1             RTB(I),RTB(I)/RTB(I-1)-1.0_LDP
 	END DO
 !
 ! Adjust the number of points so that it matches the number of points in the original
@@ -284,7 +284,7 @@
 !
 	DO I=1,NI
 	  T1=FLOAT((I-1)*(L-1))
-	  REVX(I)=1.0D0+T1/(NI-1)
+	  REVX(I)=1.0_LDP+T1/(NI-1)
 	END DO
 	DO I=1,L
 	  XNEW(I)=I
@@ -309,8 +309,8 @@
 !
 	IF(JST .EQ. 1)THEN
 	  IF(OUT_BND_OPT .EQ. 'DEFAULT')THEN
-	    R(2)=R(1)-0.02D0*(REVR(1)-REVR(2))
-	    R(3)=R(1)-0.30D0*(REVR(1)-REVR(2))
+	    R(2)=R(1)-0.02_LDP*(REVR(1)-REVR(2))
+	    R(3)=R(1)-0.30_LDP*(REVR(1)-REVR(2))
 	  ELSE IF(OUT_BND_OPT .EQ. 'SPECIFY')THEN
 	    DO J=1,NOB
 	      R(J+1)=R(1)-(REVR(1)-REVR(2))/OBND_PARAMS(J)
@@ -320,8 +320,8 @@
 !
 	IF(JEND  .EQ. ND)THEN
 	  IF(IN_BND_OPT .EQ. 'DEFAULT')THEN
-	    R(ND-2)=R(ND)+0.4D0*(REVR(NI-1)-REVR(NI))
-	    R(ND-1)=R(ND)+0.1D0*(REVR(NI-1)-REVR(NI))
+	    R(ND-2)=R(ND)+0.4_LDP*(REVR(NI-1)-REVR(NI))
+	    R(ND-1)=R(ND)+0.1_LDP*(REVR(NI-1)-REVR(NI))
 	  ELSE IF(IN_BND_OPT .EQ. 'SPECIFY')THEN
 	    DO J=1,NOB
 	      R(ND-J)=R(ND)+(REVR(NI-1)-REVR(NI))/IBND_PARAMS(J)
@@ -351,8 +351,8 @@
 	DO I=2,ND
 	  WRITE(LU,'(I6,3X,ES12.6,3(6X,ES12.6,5X,F10.3))')
 	1            I,R(I),VNEW(I),VNEW(I-1)-VNEW(I),
-	1             RTA(I),RTA(I)/RTA(I-1)-1.0D0,
-	1             RTB(I),RTB(I)/RTB(I-1)-1.0D0
+	1             RTA(I),RTA(I)/RTA(I-1)-1.0_LDP,
+	1             RTB(I),RTB(I)/RTB(I-1)-1.0_LDP
 	END DO
 !
 	CALL GET_LU(LU_RGRID)
@@ -363,8 +363,8 @@
 	WRITE(LU_RGRID,'(1X,ES15.7,4X,1PE11.4,5X,0P,I4,5X,I4,5X,I4)')R(ND),0.0D0,1,ND
 	DO I=1,ND
           WRITE(LU_RGRID,'(A)')' '
-          WRITE(LU_RGRID,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),1.0D0,1.0D0,1.0D0,1.0D0,VNEW(I),1.0D0,I
-          WRITE(LU_RGRID,'(F7.1)')1.0D0
+          WRITE(LU_RGRID,'(1X,1P,E15.7,6E15.5,2X,I4,A1)')R(I),1.0_LDP,1.0_LDP,1.0_LDP,1.0_LDP,VNEW(I),1.0_LDP,I
+          WRITE(LU_RGRID,'(F7.1)')1.0_LDP
 	END DO
 	CLOSE(UNIT=LU_RGRID)
 	DONE_R_REV=.TRUE.

@@ -25,15 +25,15 @@
 	    END DO
 	  END DO
 	END DO
-	VJ_SUM(:,:,:)=0.0D0
-	VJ_SUM2(:,:,:)=0.0D0
-	RJ(:)=0.0D0
+	VJ_SUM(:,:,:)=0.0_LDP
+	VJ_SUM2(:,:,:)=0.0_LDP
+	RJ(:)=0.0_LDP
 !
 	CALL TUNE(1,'LOOP:')
 	DO I=1,100
 	  DO L=1,ND
 	     VJ_SUM(:,:,L)=VJ_SUM(:,:,L)+VJ(:,:,L)
-	     VJ_SUM2(:,:,L)=VJ_SUM2(:,:,L)-2.0D0*VJ(:,:,L)
+	     VJ_SUM2(:,:,L)=VJ_SUM2(:,:,L)-2.0_LDP*VJ(:,:,L)
 	     RJ(L)=RJ(L)+OLDJ(L)
 	  END DO
 	END DO
@@ -47,7 +47,7 @@
 	    DO K=1,NB
 	      DO J=1,NT
 	        VJ_SUM(J,K,L)=VJ_SUM(J,K,L)+VJ(J,K,L)
-	        VJ_SUM2(J,K,L)=VJ_SUM2(J,K,L)-2.0D0*VJ(J,K,L)
+	        VJ_SUM2(J,K,L)=VJ_SUM2(J,K,L)-2.0_LDP*VJ(J,K,L)
 	      END DO
 	    END DO
 	    RJ(L)=RJ(L)+OLDJ(L)
@@ -63,7 +63,7 @@
 	    DO K=1,NB
 	      DO J=1,NT
 	        VJ_SUM(J,K,L)=VJ_SUM(J,K,L)+VJ(J,K,L)
-	        VJ_SUM2(J,K,L)=VJ_SUM2(J,K,L)-2.0D0*VJ(J,K,L)
+	        VJ_SUM2(J,K,L)=VJ_SUM2(J,K,L)-2.0_LDP*VJ(J,K,L)
 	      END DO
 	    END DO
 	    RJ(L)=RJ(L)+OLDJ(L)
@@ -75,7 +75,7 @@
 	DO I=1,100
 	  DO L=1,ND
 	     VJ_SUM(:,:,L)=VJ_SUM(:,:,L)+VJ(:,:,L)
-	     VJ_SUM2(:,:,L)=VJ_SUM2(:,:,L)-2.0D0*VJ(:,:,L)
+	     VJ_SUM2(:,:,L)=VJ_SUM2(:,:,L)-2.0_LDP*VJ(:,:,L)
 	     RJ(L)=RJ(L)+OLDJ(L)
 	  END DO
 	END DO

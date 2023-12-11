@@ -51,7 +51,7 @@
 	INTEGER J,L,ML
 	INTEGER NL,NUP
 !
-	PI=4.0D0*ATAN(1.0D0)
+	PI=4.0_LDP*ATAN(1.0_LDP)
 	LUER=ERROR_LU()
 	IF(TWO_METHOD .NE. TWO_PHOTON_METHOD)THEN
 	  TWO_METHOD=TWO_PHOTON_METHOD
@@ -64,7 +64,7 @@
 ! We don't have to worry about the frequency units, as it is
 ! multilplied by a ratio of 2 frequencies.
 !
-	CONST=1.0D+10*PLANCKS_CONSTANT()/4.0D0/PI
+	CONST=1.0E+10_LDP*PLANCKS_CONSTANT()/4.0_LDP/PI
 !
 	DO J=1,N_TWO
 	  IF(TWO_PHOT_AVAILABLE(J) .AND. FREQ .LT. FREQ_TWO(J))THEN
@@ -75,10 +75,10 @@
 !
 	    IF(TYPE_TWO(J) .EQ. 1)THEN
 	      Y=FREQ/FREQ_TWO(J)
-	      U=Y*(1.0D0-Y)
-	      FU=4.0D0*U
-	      AY=24.56D0*COEF_TWO(J,1)*( U*(1.0D0-FU**0.8D0) +
-	1                 0.88D0*(U**1.53D0)*(FU**0.8D0) )
+	      U=Y*(1.0_LDP-Y)
+	      FU=4.0_LDP*U
+	      AY=24.56_LDP*COEF_TWO(J,1)*( U*(1.0_LDP-FU**0.8_LDP) +
+	1                 0.88_LDP*(U**1.53_LDP)*(FU**0.8_LDP) )
 	    ELSE
 	      WRITE(LUER,*)'Error in TWO_PHOT_OPAC'
 	      WRITE(LUER,*)'Unrecognized two photon transition'
@@ -100,10 +100,10 @@
 	    ELSE IF(TWO_METHOD .EQ. 'LTE')THEN
 	      DO L=1,ND
 	        T1=EXP(-HDKT*FREQ_B/T(L))
-	        PHOT_OC_TWO(L,J)=T1/(1.0D0-T1)
+	        PHOT_OC_TWO(L,J)=T1/(1.0_LDP-T1)
 	      END DO
 	    ELSE IF(TWO_METHOD .EQ. 'NOSTIM')THEN
-	      PHOT_OC_TWO(:,J)=0.0D0
+	      PHOT_OC_TWO(:,J)=0.0_LDP
 	    ELSE IF(TWO_METHOD .EQ. 'OLD_DEFAULT')THEN
 	    ELSE
 	      WRITE(LUER,*)'Unrecognized option in TWO_PHOT_OPAC_V3'
@@ -134,10 +134,10 @@
 ! When PHOT_OC_TWO is correctly set, these expressions are exact.
 !
 	      DO L=1,ND
-	        ETA(L)=ETA(L) + ETA_CONST*AY*POPS(NUP,L)*FS_RAT_UP(L,J)*(1.0D0+PHOT_OC_TWO(L,J))
+	        ETA(L)=ETA(L) + ETA_CONST*AY*POPS(NUP,L)*FS_RAT_UP(L,J)*(1.0_LDP+PHOT_OC_TWO(L,J))
 	        CHI(L)=CHI(L) + CHI_CONST*AY*(
 	1                 POPS(NL,L)*FS_RAT_LOW(L,J)*PHOT_OC_TWO(L,J)/G_LOW_TWO(J)-
-	1                 POPS(NUP,L)*FS_RAT_UP(L,J)/G_UP_TWO(J)*(1.0D0+PHOT_OC_TWO(L,J)) )
+	1                 POPS(NUP,L)*FS_RAT_UP(L,J)/G_UP_TWO(J)*(1.0_LDP+PHOT_OC_TWO(L,J)) )
 	      END DO
 !
 	    END IF

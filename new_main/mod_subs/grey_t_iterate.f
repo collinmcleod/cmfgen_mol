@@ -168,7 +168,7 @@
 !
 	    CALL DP_ZERO(ROSSMEAN,ND)
 	    TSTAR=T(ND)			!Required for IC in OPACITIES
-	    CONT_FREQ=0.0D0
+	    CONT_FREQ=0.0_LDP
 	    DO ML=1,NCF
 	      FREQ_INDX=ML
 	      FL=NU(ML)
@@ -207,9 +207,9 @@
 ! CHECK for negative line opacities.
 !
 	      DO I=1,ND
-	        IF(CHI(I) .LT. 0.1D0*ESEC(I))THEN
+	        IF(CHI(I) .LT. 0.1_LDP*ESEC(I))THEN
 	          T1=CHI(I)
-	          CHI(I)=0.1D0*ESEC(I)
+	          CHI(I)=0.1_LDP*ESEC(I)
 	        END IF
 	      END DO
 !
@@ -219,7 +219,7 @@
 	      T2=-T1*FQW(ML)*TWOHCSQ*(NU(ML)**3)
 	      DO I=1,ND
 	        ROSSMEAN(I)=ROSSMEAN(I) +
-	1           T2*EMHNUKT(I)/CHI(I)/(1.0D0-EMHNUKT(I))**2
+	1           T2*EMHNUKT(I)/CHI(I)/(1.0_LDP-EMHNUKT(I))**2
 	      END DO
 	    END DO
 !
@@ -232,9 +232,9 @@
 ! for clumping. Since it is a simple scale factor at each depth, we can do
 ! it here, rather than adjust CHI for each frequency.
 !
-	    T1=1.8047D+11
+	    T1=1.8047E+11_LDP
 	    DO I=1,ND
-	      ROSSMEAN(I)=4.0D0*CLUMP_FAC(I)*T1*(T(I)**5)/ROSSMEAN(I)
+	      ROSSMEAN(I)=4.0_LDP*CLUMP_FAC(I)*T1*(T(I)**5)/ROSSMEAN(I)
 	    END DO
 !
 	    CALL WRITV(T,ND,'Current temperature',88)
@@ -258,7 +258,7 @@
 	      WRITE(LUER,'(A,ES10.3)')' Rosseland optical depth at inner boundary is:          ',TA(ND)
 	      WRITE(LUER,'(A,ES10.3)')' Rosseland optical depth at outer boundary is:          ',TA(1)
 	      WRITE(LUER,*)' '
-	      IF(TA(ND) .LT. 10.0D0)THEN
+	      IF(TA(ND) .LT. 10.0_LDP)THEN
 	        WRITE(LUER,*)('*',I=1,70)
 	        WRITE(LUER,*)('*',I=1,70)
 	        WRITE(LUER,*)' '
@@ -305,17 +305,17 @@
  	    T2=0.0
 	    DO I=1,ND
 	      IF(GREY_PAR .LE. 0)then
-	        T1=1.0D0
+	        T1=1.0_LDP
 	      ELSE
-	        T1=1.0D0-EXP(-TA(I)/GREY_PAR)
+	        T1=1.0_LDP-EXP(-TA(I)/GREY_PAR)
 	      END IF
-	      IF(T1 .LT. 0.1D0*GREY_PAR)THEN
-	        T(I)=MAX(T(I),0.95D0*T_MIN)
-	        T2=0.0D0
+	      IF(T1 .LT. 0.1_LDP*GREY_PAR)THEN
+	        T(I)=MAX(T(I),0.95_LDP*T_MIN)
+	        T2=0.0_LDP
 	      ELSE
 	        T3=ABS( T1*(TGREY(I)-T(I)) )
-	        T(I)=T1*TGREY(I)+(1.0-T1)*T_SAVE(I)
-	        T(I)=MAX(T(I),0.95D0*T_MIN)
+	        T(I)=T1*TGREY(I)+(1.0_LDP-T1)*T_SAVE(I)
+	        T(I)=MAX(T(I),0.95_LDP*T_MIN)
 	        T2=MAX(T3/T(I),T2)
 	      END IF
 	    END DO
@@ -350,9 +350,9 @@
 ! We use H for ED(est)
 ! We use QH for dED(est)/dT.
 !
-	    T1=1.0D0
+	    T1=1.0_LDP
 	    J=0
-	    DO WHILE (T1 .GT. 1.0D-04)
+	    DO WHILE (T1 .GT. 1.0E-04_LDP)
 	      FIRST=.TRUE.
 !
 ! Recall GAM_SPECIES is set to be the population of the highest ionization
@@ -368,13 +368,13 @@
 	        END IF
 	      END DO
 !
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO I=1,ND
-	        TA(I)=-(H(I)-ED(I))/(QH(I)-1.0D0)/ED(I)
+	        TA(I)=-(H(I)-ED(I))/(QH(I)-1.0_LDP)/ED(I)
 	        T1=MAX(T1,ABS(TA(I)))
-	        IF(TA(I) .LT. -0.9D0)TA(I)=-0.9D0
-	        IF(TA(I) .GT. 9.0D0)TA(I)=9.0D0
-	        ED(I)=ED(I)*(1.0D0+TA(I))
+	        IF(TA(I) .LT. -0.9_LDP)TA(I)=-0.9_LDP
+	        IF(TA(I) .GT. 9.0_LDP)TA(I)=9.0_LDP
+	        ED(I)=ED(I)*(1.0_LDP+TA(I))
 	      END DO
 	      J=J+1
 	      IF(J .GT. 20)THEN
@@ -453,9 +453,9 @@
 ! These are required when evaluation the occupation probabilities.
 !
 	    DO J=1,ND
-	      POPION(J)=0.0D0
+	      POPION(J)=0.0_LDP
 	      DO I=1,NT
-	        IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
+	        IF(Z_POP(I) .GT. 0.01_LDP)POPION(J)=POPION(J)+POPS(I,J)
 	      END DO
 	    END DO
 !

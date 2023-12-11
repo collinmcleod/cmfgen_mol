@@ -57,8 +57,8 @@ C
 C
 C NB: WSE represents the statistical weight
 C
-	WSE(:,:)=0.0D0		!N_S,ND
-	WCR(:,:)=0.0D0		!N_S,ND
+	WSE(:,:)=0.0_LDP		!N_S,ND
+	WCR(:,:)=0.0_LDP		!N_S,ND
 C
 C NB: Because SUM[HNST_F] = HNST_S and the cross section is independent of
 C the level under consideration, WSE_S will just be = WEIGHT. [Because
@@ -71,7 +71,7 @@ C       is now in units of Hz, not 10^15 Hz. The factor of 10^{-15}
 C       arises from the 1/nu term. [Change made when we removed the
 C       frequency index from the WSE array].
 C
-	FOUR_PI_ON_H=1.8965D+02		!4*PI/H*DEX(-10)/1.0D+15
+	FOUR_PI_ON_H=1.8965E+02_LDP		!4*PI/H*DEX(-10)/1.0D+15
 	WEIGHT=FOUR_PI_ON_H*XCROSS_V2(NU_CONT,ZCORE,NUM_ELEC,
 	1                                   IZERO,IZERO,L_FALSE,L_FALSE)
 	IF(WEIGHT .EQ. 0)RETURN

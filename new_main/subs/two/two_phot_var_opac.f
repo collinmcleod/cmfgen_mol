@@ -46,8 +46,8 @@
 	INTEGER NL,NUP
 	
 	h=PLANCKS_CONSTANT()			!cgs units
-	PI=4.0D0*ATAN(1.0D0)
-	CONST=1.0D+10*H/4.0D0/PI
+	PI=4.0_LDP*ATAN(1.0_LDP)
+	CONST=1.0E+10_LDP*H/4.0_LDP/PI
 !
 	DO J=1,N_TWO
 	  IF(TWO_PHOT_AVAILABLE(J) .AND. FREQ .LT. FREQ_TWO(J))THEN
@@ -57,10 +57,10 @@
 	    NUP=UP_LEV_TWO(J)
 	    IF(TYPE_TWO(J) .EQ. 1)THEN
 	      Y=FREQ/FREQ_TWO(J)
-	      U=Y*(1.0D0-Y)
-	      FU=4.0D0*U
-	      AY=24.56D0*COEF_TWO(J,1)*( U*(1.0D0-FU**0.8D0) +
-	1                 0.88D0*(U**1.53D0)*(FU**0.8D0) )
+	      U=Y*(1.0_LDP-Y)
+	      FU=4.0_LDP*U
+	      AY=24.56_LDP*COEF_TWO(J,1)*( U*(1.0_LDP-FU**0.8_LDP) +
+	1                 0.88_LDP*(U**1.53_LDP)*(FU**0.8_LDP) )
 	    ELSE
 	      WRITE(6,'(/,1X,A)')'Error in TWO_PHOT_VAR_OPAC -- unrecognized type for TWO_PHOTON transition'
 	      STOP
@@ -77,9 +77,9 @@
 	      END DO
 	    ELSE
 	      DO L=1,ND
-	        VETA(NUP,L)=VETA(NUP,L) + ETA_CONST*AY*FS_RAT_UP(L,J)*(1.0D0+PHOT_OC_TWO(L,J))
+	        VETA(NUP,L)=VETA(NUP,L) + ETA_CONST*AY*FS_RAT_UP(L,J)*(1.0_LDP+PHOT_OC_TWO(L,J))
 	        VCHI(NL,L)=VCHI(NL,L)   + CHI_CONST*AY*FS_RAT_LOW(L,J)*PHOT_OC_TWO(L,J)/G_LOW_TWO(J)
-	        VCHI(NUP,L)=VCHI(NUP,L) - CHI_CONST*AY*FS_RAT_UP(L,J)/G_UP_TWO(J)*(1.0D0+PHOT_OC_TWO(L,J))
+	        VCHI(NUP,L)=VCHI(NUP,L) - CHI_CONST*AY*FS_RAT_UP(L,J)/G_UP_TWO(J)*(1.0_LDP+PHOT_OC_TWO(L,J))
 	      END DO
 	    END IF
 	  END IF

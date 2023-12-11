@@ -59,8 +59,8 @@
 	REAL(KIND=LDP) Q
 	LOGICAL, SAVE :: FIRST=.TRUE.
 !
-	XCROSS_V2=0.0D0
-	CON_FAC=1.0D0/0.24191D0			!10^15 Hz to ev
+	XCROSS_V2=0.0_LDP
+	CON_FAC=1.0_LDP/0.24191_LDP			!10^15 Hz to ev
 	NU_EV=FREQ*CON_FAC
 !
 ! Define for ease of typing.
@@ -84,8 +84,8 @@
 	1                       ' with Z > ',ATNO_MAX_X
 	    FIRST=.FALSE.
 	  END IF
-	  SIG_0_X(IZ,NE,:,:)=0.0D0
-	  XCROSS_V2=0.0D0
+	  SIG_0_X(IZ,NE,:,:)=0.0_LDP
+	  XCROSS_V2=0.0_LDP
 	  RETURN
 	END IF
 !
@@ -96,7 +96,7 @@
 	IF(PQN .NE. 0)THEN
 	  J=ANG
 	  I=PQN
-	  IF(I .GT. SQRT(IZ/2.0D0)+2 .OR. ANG .LT. 0 .OR. ANG .GE. PQN)THEN
+	  IF(I .GT. SQRT(IZ/2.0_LDP)+2 .OR. ANG .LT. 0 .OR. ANG .GE. PQN)THEN
 	    LUER=ERROR_LU()
 	    WRITE(LUER,*)'Error in XCROSS_V2'
 	    WRITE(LUER,*)'Invalid PQN or ANG'
@@ -110,11 +110,11 @@
 	  IF( SIG_0_X(IZ,NE,I,J) .NE. 0 .AND.
 	1         NU_EV .GE. E_THRESH_X(IZ,NE,I,J) )THEN
 	    Y=NU_EV/E_0_X(IZ,NE,I,J)
-	    Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)
+	    Q=5.5_LDP+J-0.5_LDP*P_X(IZ,NE,I,J)
 	    XCROSS_V2=XCROSS_V2+
 	1   SIG_0_X(IZ,NE,I,J) *
-	1       ((Y-1.0D0)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
-	1       (1.0D0+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
+	1       ((Y-1.0_LDP)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
+	1       (1.0_LDP+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
 	  END IF
 !
 ! Return the the photoionzation cors-section, summed over all shells.
@@ -126,11 +126,11 @@
 	      IF( SIG_0_X(IZ,NE,I,J) .NE. 0 .AND.
 	1         NU_EV .GE. E_THRESH_X(IZ,NE,I,J) )THEN
 	        Y=NU_EV/E_0_X(IZ,NE,I,J)
-	        Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)
+	        Q=5.5_LDP+J-0.5_LDP*P_X(IZ,NE,I,J)
 	        XCROSS_V2=XCROSS_V2+
 	1       SIG_0_X(IZ,NE,I,J) *
-	1          ((Y-1.0D0)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
-	1          (1.0D0+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
+	1          ((Y-1.0_LDP)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
+	1          (1.0_LDP+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
 	      END IF
 	    END DO
 	  END DO
@@ -159,17 +159,17 @@
 	1         N_ED_EJ(IZ,NE,I,J) .GT. 1 .AND.
 	1         NU_EV .GE. E_THRESH_X(IZ,NE,I,J) )THEN
 	        Y=NU_EV/E_0_X(IZ,NE,I,J)
-	        Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)
+	        Q=5.5_LDP+J-0.5_LDP*P_X(IZ,NE,I,J)
 	        XCROSS_V2=XCROSS_V2+
 	1       SIG_0_X(IZ,NE,I,J) *
-	1          ((Y-1.0D0)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
-	1          (1.0D0+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
+	1          ((Y-1.0_LDP)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
+	1          (1.0_LDP+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
 	      END IF
 	    END DO
 	  END DO
 	END IF
 !
-	XCROSS_V2=XCROSS_V2*1.0D-08
+	XCROSS_V2=XCROSS_V2*1.0E-08_LDP
 !
 	RETURN
 	END

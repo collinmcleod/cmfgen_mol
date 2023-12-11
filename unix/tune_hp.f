@@ -46,14 +46,14 @@ C
         IF (FIRSTTIME) THEN
           FIRSTTIME=.FALSE.
           DO  I=1,MAX_IDS
-            BEFORE(I)=0.D0
-            AFTER(I)=0.D0
-            CPUTOT(I)=0.D0
-            RUNTOT(I)=0.D0
+            BEFORE(I)=0._LDP
+            AFTER(I)=0._LDP
+            CPUTOT(I)=0._LDP
+            RUNTOT(I)=0._LDP
 	    IDLIST(I)=' '
           END DO
           T0=MCLOCK()
-          OVERHEAD=2.0D-06*(MCLOCK()-T0)
+          OVERHEAD=2.0E-06_LDP*(MCLOCK()-T0)
 	  OPEN(UNIT=LUOUT,STATUS='REPLACE',FILE='TIMING')
 	  WRITE(LUOUT,*)' '
 	  WRITE(LUOUT,*)'Overhead is ',OVERHEAD
@@ -66,12 +66,12 @@ C
 	IF (LRUN.EQ.1) THEN
 	  DO I=1,MAX_IDS
             IF (IDENT .EQ. IDLIST(I))THEN
-	      BEFORE(I)=1.0D-06*MCLOCK()
+	      BEFORE(I)=1.0E-06_LDP*MCLOCK()
 	      RETURN	
 	    END IF
 	    IF (IDLIST(I) .EQ. ' ') THEN
 	      IDLIST(I)=IDENT
-	      BEFORE(I)=1.0D-06*MCLOCK()
+	      BEFORE(I)=1.0E-06_LDP*MCLOCK()
 	      RETURN	
 	    END IF
 	  END DO
@@ -82,7 +82,7 @@ C
 ! If LRUN=2, we are ending the TIME bracket. Therefore we call the timing
 ! routine first.
 !
-          T0=1.0D-06*MCLOCK()
+          T0=1.0E-06_LDP*MCLOCK()
           DO I=1,MAX_IDS
 	    IF (IDENT.EQ.IDLIST(I))THEN
               AFTER(I)=T0

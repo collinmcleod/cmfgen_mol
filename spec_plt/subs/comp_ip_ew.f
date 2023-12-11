@@ -51,7 +51,7 @@
 !	WRITE(T_OUT,'(1X,A,1P,E14.6,A)')'          d=',DISTANCE,' kpc'
 !
 
-	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07      !10^8/10^15
+	ANG_TO_HZ=SPEED_OF_LIGHT()*1.0E-07_LDP      !10^8/10^15
 	CALL USR_OPTION(CONT_LAM_B,'CLAMB',' ','Continuum wavelength on blue side')
 	CALL USR_OPTION(CONT_LAM_R,'CLAMR',' ','Continuum wavelength on red  side')
 	CALL USR_OPTION(LINE_LAM_B,'LLAMB',' ','Line wavelength on blue side')
@@ -76,33 +76,33 @@
 	WRITE(6,*)'SM_NP=',SM_NP
 	DO P_INDX=1,SM_NP
 !
-	  YV(1:NCF)=0.0D0
+	  YV(1:NCF)=0.0_LDP
 	  DO ML=MAX(1,ICONT_B-5),MIN(NCF,ICONT_R+5)
 	    DO J=P_INDX,NP-1
-	      YV(ML)=YV(ML)+0.5D0*(IP(J,ML)*P(J)+IP(J+1,ML)*P(J+1))*(P(J+1)-P(J))
+	      YV(ML)=YV(ML)+0.5_LDP*(IP(J,ML)*P(J)+IP(J+1,ML)*P(J+1))*(P(J+1)-P(J))
 	    END DO
 	  END DO
 !
 ! Converted to Jy.
 !
-	  PI=4.0D0*ATAN(1.0D0)
-          T1=DISTANCE*1.0D+03*PARSEC()
-	  T1=2.0D0*PI*1.0D+23*(1.0E+10/T1)**2
+	  PI=4.0_LDP*ATAN(1.0_LDP)
+          T1=DISTANCE*1.0E+03_LDP*PARSEC()
+	  T1=2.0_LDP*PI*1.0E+23_LDP*(1.0E+10_LDP/T1)**2
 	  YV(1:NCF)=YV(1:NCF)*T1
 !
 ! Now convert to erg/cm^/s/Ang
 !
-	  T1=1.0D-23*1.0D+15
+	  T1=1.0E-23_LDP*1.0E+15_LDP
 	  YV(1:NCF)=T1*YV(1:NCF)*NU(1:NCF)/LAM(1:NCF)
 !
-	  L=0; CONT_FLUX_B=0.0D0
+	  L=0; CONT_FLUX_B=0.0_LDP
 	  DO ML=MAX(1,ICONT_B-1),MIN(NCF,ICONT_B+1)
 	    L=L+1
 	    CONT_FLUX_B=CONT_FLUX_B+YV(ML)
 	  END DO
 	  CONT_FLUX_B=CONT_FLUX_B/L
 !
-	  L=0; CONT_FLUX_R=0.0D0
+	  L=0; CONT_FLUX_R=0.0_LDP
 	  DO ML=MAX(1,ICONT_R-1),MIN(NCF,ICONT_R+1)
 	    L=L+1
 	    CONT_FLUX_R=CONT_FLUX_R+YV(ML)
@@ -121,14 +121,14 @@
 !
 	  DO ML=MAX(1,ICONT_B-1),MIN(NCF,ICONT_R+1)
 	     T2=CONT_FLUX_B+CONT_SLOPE*(LAM(ML)-CONT_LAM_B)
-	     YV(ML)=YV(ML)/T2-1.0D0
+	     YV(ML)=YV(ML)/T2-1.0_LDP
 	   END DO
 !
 ! Compute the line equivalent width.
 !
-	   EW(P_INDX)=0.0D0
+	   EW(P_INDX)=0.0_LDP
 	   DO ML=ILINE_B,ILINE_R-1
-	     EW(P_INDX)=EW(P_INDX)+0.5D0*(YV(ML)+YV(ML+1))*(LAM(ML+1)-LAM(ML))
+	     EW(P_INDX)=EW(P_INDX)+0.5_LDP*(YV(ML)+YV(ML+1))*(LAM(ML+1)-LAM(ML))
 	   END DO
 !
 ! Get next index
@@ -136,12 +136,12 @@
 	END DO
 !
 	CALL USR_OPTION(XUNIT,'XUNIT',' ','Unit for X-axis - AU, arc(sec), PONR, N')
-	P(1)=0.1*P(2)
+	P(1)=0.1_LDP*P(2)
 	IF( UC(XUNIT) .EQ. 'AU')THEN
-	  XV(1:NP)=LOG10(P(1:NP)*1.0D+10/1.49597D+13)
+	  XV(1:NP)=LOG10(P(1:NP)*1.0E+10_LDP/1.49597E+13_LDP)
 	  XLAB='Log d(AU)'
 	ELSE IF(UC(XUNIT(1:3)) .EQ. 'ARC')THEN
-	  T1=1.0E+10*206265.0D0/(DISTANCE*1.0E+03*PARSEC())
+	  T1=1.0E+10_LDP*206265.0_LDP/(DISTANCE*1.0E+03_LDP*PARSEC())
 	  XV(1:NP)=LOG10(T1*P(1:NP))
 	  XLAB='Log(arc seconds)'
 	ELSE IF( UC(XUNIT) .EQ. 'PONR')THEN
@@ -166,7 +166,7 @@
 !
 	CALL USR_OPTION(FLUX_OPT,'FLUX_OPT',' ','Flux option -- J(y) , E(rg) or skip')
 	IF(UC(FLUX_OPT(1:1)) .EQ. 'J')THEN
-	  CONT_FLUX=1.0D+23*CONT_FLUX*LINE_WAVELENGTH/(1.0D+15*LINE_FREQUENCY)
+	  CONT_FLUX=1.0E+23_LDP*CONT_FLUX*LINE_WAVELENGTH/(1.0E+15_LDP*LINE_FREQUENCY)
 	  CALL DP_CURVE(SM_NP,XV,CONT_FLUX)
 	  CALL GRAMON_PGPLOT(XLAB,'Jy',' ',' ')
 	ELSE IF(UC(FLUX_OPT(1:1)) .EQ. 'E')THEN

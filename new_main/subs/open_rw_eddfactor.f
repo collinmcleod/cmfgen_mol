@@ -83,7 +83,7 @@
 	  IF(IOS .EQ. 0)THEN
 	    READ(LU_EDD,REC=FINISH_REC,IOSTAT=IOS)T1
 	    IF(FILENAME .EQ. FILENAME .OR. FILENAME .EQ. 'ES_J_CONV')THEN
-	      IF(T1 .EQ. 0.0D0 .OR. IOS .NE. 0)THEN
+	      IF(T1 .EQ. 0.0_LDP .OR. IOS .NE. 0)THEN
 	        WRITE(LUER,'(/,A)')' Warning --- All values not'//
 	1                      ' computed - will compute new F'
 	        WRITE(LUER,'(A)')'Currently trying to read ',TRIM(FILENAME)
@@ -122,7 +122,7 @@
 ! have successfully been computed. (Consistent with old Eddfactor
 ! format a EDD_FAC can never be zero : Reason write a real number).
 !
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  WRITE(LU_EDD,REC=FINISH_REC)T1
 	  ACCESS_F=INITIAL_ACCESS_REC
 !

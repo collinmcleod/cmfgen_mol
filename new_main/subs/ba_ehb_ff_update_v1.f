@@ -65,7 +65,7 @@
 	CALL TUNE(IONE,'BA_EHB_UP')
 	DIAG_INDX=(NUM_BNDS+1)/2
 !
-	FOUR_PI=16.0D0*ATAN(1.0D0)
+	FOUR_PI=16.0_LDP*ATAN(1.0_LDP)
 	IF(.NOT. ALLOCATED(VJ_T))THEN
 	  ALLOCATE (VJ_T(NT,NUM_BNDS,ND),STAT=IOS)
 	  IF(IOS .NE. 0)THEN
@@ -89,7 +89,7 @@
 ! Perform the frequency integral of dJ over. Procedure depends on whether
 ! this is a new frequency of part of a band.
 !
-	T1=1.0D-10*FOUR_PI*FQW
+	T1=1.0E-10_LDP*FOUR_PI*FQW
 	IF(NEW_CONT)THEN
 !$OMP PARALLEL DO PRIVATE(L,K)
 	  DO L=DST,DEND

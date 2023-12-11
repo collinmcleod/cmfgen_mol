@@ -6,6 +6,7 @@
 	USE CONTROL_VARIABLE_MOD
 	IMPLICIT NONE
 !
+! Altered 04-Dec-2023: Moved initialization of Z_POP so it was still being set.
 ! Altered 25-Nov-2023: Now initialize Z_POP (NT and NT-1 wer not set), and added LU_VB.
 ! Altered 27-Mar-2023: Added VERBOSE_OUTPUT to most of the output options.
 !                        File 175 now has name (HYDRO_GRID_SUMMARIES).
@@ -47,12 +48,12 @@
 	  OLD_TAU(I)=OLD_TAU(I-1)+0.5_LDP*(OLD_R(I-1)-OLD_R(I))*(TB(I-1)+TB(I))
 	END DO
 !
-	VERBOSE_OUTPUT=.TRUE.
+	VERBOSE_OUTPUT=.FALSE.
 	IF(VERBOSE_OUTPUT)THEN
 	  CALL GET_LU(LU_VB,'Verbose information in ADJUST_POPS')
 	  OPEN(UNIT=LU_VB,FILE='RGRID_INFO',STATUS='UNKNOWN',ACTION='WRITE',POSITION='APPEND')
 	  WRITE(LU_VB,*)ND
-	  WRITE(LU_VB,*)OLD_TAU
+	  J=5; CALL WRITV_V2(OLD_TAU,ND,J,'OLD_TAU',LU_VB)
 	  FLUSH(UNIT=LU_VB)
 	END IF
 !
@@ -73,10 +74,10 @@
 !
 	IF(VERBOSE_OUTPUT)THEN
 	  WRITE(LU_VB,*)ND
-	  WRITE(LU_VB,*)'R',R
-	  WRITE(LU_VB,*)'ROSS_MEAN',ROSS_MEAN
-	  WRITE(LU_VB,*)'TAU',TAU
-	  FLUSH(UNIT=lU_VB)
+	  CALL WRITV_V2(R,ND,J,'R',LU_VB)
+	  CALL WRITV_V2(ROSS_MEAN,ND,J,'ROSS_MEAN',LU_VB)
+	  CALL WRITV_V2(TAU,ND,J,'TAU',LU_VB)
+	  FLUSH(UNIT=LU_VB)
 	END IF
 !
 ! Find indices for new tau grid contained in old tau grid.
@@ -103,8 +104,8 @@
 !
 	IF(VERBOSE_OUTPUT)THEN
 	  WRITE(LU_VB,*)ND
-	  WRITE(LU_VB,*)T
-	  WRITE(LU_VB,*)CLUMP_FAC
+	  J=5;  CALL WRITV_V2(T,ND,J,'T',LU_VB)
+	  J=10; CALL WRITV_V2(CLUMP_FAC,ND,J,'CLUMP_FAC',LU_VB)
 	  FLUSH(UNIT=LU_VB)
 	END IF
 !
@@ -230,23 +231,29 @@
 	      IF(ID .NE. SPECIES_BEG_ID(ISPEC))ATM(ID-1)%DXzV_F(1:ND)=TB(1:ND)
 	    END IF
 	  END DO
-	  WRITE(6,*)'Finalized DC interpolation in ADJUST_POPS'; FLUSH(UNIT=6)
 !
 ! Scale the populatons to match the actual density.
 !
 	  IF(VERBOSE_OUTPUT)THEN
-	    CALL WRITE_VEC(TA,ND,SPECIES(ISPEC),LU_VB); FLUSH(UNIT=LU_VB)
-	    CLOSE(LU_VB)
+	    J=5; CALL WRITV_V2(TA,ND,J,SPECIES(ISPEC),LU_VB); FLUSH(UNIT=LU_VB)
+	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
+	      CALL WRITEDC_V3( ATM(ID)%XzV_F, ATM(ID)%LOG_XzVLTE_F,
+	1            ATM(ID)%NXzV_F, ATM(ID)%DXzV_F,IONE,
+	1            R,T,ED,V,CLUMP_FAC,LUM,ND,
+	1            TRIM(ION_ID(ID))//'OUTDC','DC',IONE)
+	      CALL WRITEDC_V3( ATM(ID)%XzV_F, ATM(ID)%LOG_XzVLTE_F,
+	1            ATM(ID)%NXzV_F, ATM(ID)%DXzV_F,IONE,
+	1            R,T,ED,V,CLUMP_FAC,LUM,ND,
+	1            TRIM(ION_ID(ID))//'POPS','POP',IONE)
+	    END DO
 	  END IF
+!
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
-!	    CALL WRITEDC_V3( ATM(ID)%XzV_F, ATM(ID)%LOG_XzVLTE_F,
-!	1          ATM(ID)%NXzV_F, ATM(ID)%DXzV_F,IONE,
-!	1          R,T,ED,V,CLUMP_FAC,LUM,ND,
-!	1          TRIM(ION_ID(ID))//'OUT','DC',IONE)
 	    CALL SCALE_POPS(ATM(ID)%XzV_F,ATM(ID)%DXzV_F,
 	1              POP_SPECIES(1,ISPEC),TA,ATM(ID)%NXzV_F,ND)
 	  END DO
 	END DO		!Loop over species
+	IF(VERBOSE_OUTPUT)CLOSE(LU_VB)
 !
 ! We now need to compute the populations for the model atom with Super-levels.
 ! We do this in reverse order (i.e. highest ionization stage first) in order
@@ -274,12 +281,12 @@
 ! Compute the ion population at each depth.
 ! These are required when evaluation the occupation probabilities.
 !
+	Z_POP=0.0_LDP
         DO ID=1,NUM_IONS-1
 	  CALL SET_Z_POP(Z_POP, ATM(ID)%ZXzV, ATM(ID)%EQXzV,
 	1              ATM(ID)%NXzV, NT, ATM(ID)%XzV_PRES)
         END DO
 !
-	Z_POP=0.0_LDP
 	DO J=1,ND
 	  POPION(J)=0.0_LDP
 	  DO I=1,NT

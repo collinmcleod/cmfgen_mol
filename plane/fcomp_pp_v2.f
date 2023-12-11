@@ -34,8 +34,8 @@
 	INTEGER, SAVE :: NP_SAV=0
 	LOGICAL, SAVE :: FIRST_TIME
 !
-	REAL(KIND=LDP), PARAMETER :: RZERO=0.0D0
-	REAL(KIND=LDP), PARAMETER :: RONE=1.0D0
+	REAL(KIND=LDP), PARAMETER :: RZERO=0.0_LDP
+	REAL(KIND=LDP), PARAMETER :: RONE=1.0_LDP
 	INTEGER, PARAMETER :: IONE=1
 !
 	INTEGER I,LS,NP_LOC
@@ -54,18 +54,18 @@
 !
 ! Zero all arrays
 !
-	NEWRJ(1:ND)=0.0D0
-	NEWRK(1:ND)=0.0D0
-	HBC_J=0.0D0
-	HBC_S=0.0D0
-	INBCNEW=0.0D0
+	NEWRJ(1:ND)=0.0_LDP
+	NEWRK(1:ND)=0.0_LDP
+	HBC_J=0.0_LDP
+	HBC_S=0.0_LDP
+	INBCNEW=0.0_LDP
 !
 ! Compute radial optical depth scale.
 !
 	CALL DERIVCHI(dCHIdr,CHI,R,ND,METHOD)
 	DO I=1,ND-1
-	  DTAU_RAD(I)=0.5D0*(R(I)-R(I+1))*( CHI(I)+CHI(I+1)+(R(I)-R(I+1))*
-	1     (dCHIdR(I+1)-dCHIdR(I))/6.0D0)
+	  DTAU_RAD(I)=0.5_LDP*(R(I)-R(I+1))*( CHI(I)+CHI(I+1)+(R(I)-R(I+1))*
+	1     (dCHIdR(I+1)-dCHIdR(I))/6.0_LDP)
 	END DO
 !
 ! Enter loop for each angle.
@@ -78,10 +78,10 @@
 !
 	    IF(THK)THEN
 	      TOR=CHI(1)*(R(1)-R(3))/LOG(CHI(3)/CHI(1))
-	      IF(TOR .LT. 0)TOR=0.0D0
-	      IBOUND=SOURCE(1)*(1.0D0-EXP(-TOR/MU(LS)))
+	      IF(TOR .LT. 0)TOR=0.0_LDP
+	      IBOUND=SOURCE(1)*(1.0_LDP-EXP(-TOR/MU(LS)))
 	    ELSE
-	      IBOUND=0.0D0
+	      IBOUND=0.0_LDP
 	    END IF
 !
 ! Compute optical depth along ray.
@@ -94,14 +94,14 @@
 ! TA,TB and TC . This code is a combined version of XVECD and TCOMPD.
 !
 	    XM(1)=-IBOUND
-	    TA(1)=0.0D0
-	    TC(1)=1.0D0/DTAU(1)
-	    TB(1)=-1.0D0-TC(1)
+	    TA(1)=0.0_LDP
+	    TC(1)=1.0_LDP/DTAU(1)
+	    TB(1)=-1.0_LDP-TC(1)
 	    DO I=2,ND-1
 	      TA(I)=TC(I-1)
-	      TC(I)=1.0D0/DTAU(I)
-	      TB(I)=-0.5D0*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
-	      XM(I)=-SOURCE(I)*(DTAU(I-1)+DTAU(I))*0.5D0
+	      TC(I)=1.0_LDP/DTAU(I)
+	      TB(I)=-0.5_LDP*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
+	      XM(I)=-SOURCE(I)*(DTAU(I-1)+DTAU(I))*0.5_LDP
 	    END DO
 !
 	    IF(DIFF)THEN
@@ -110,10 +110,10 @@
 	      XM(ND)=DBC
 	    ELSE
 	      TA(ND)=-TC(ND-1)
-	      TB(ND)=1.0D0-TA(ND)
+	      TB(ND)=1.0_LDP-TA(ND)
 	      XM(ND)=IC
 	    END IF
-	    TC(ND)=0.0D0
+	    TC(ND)=0.0_LDP
 !
 ! Solve the tridiagonal system of equations.
 !
@@ -130,7 +130,7 @@
 	    HBC_S=HBC_S+JQW(LS)*IBOUND*MU(LS)
 	    INBCNEW=INBCNEW + JQW(LS)*MU(LS)*
 	1      (XM(ND)-(XM(ND)-XM(ND-1))/DTAU(ND-1))
-	    IPLUS(LS)=2.0D0*(XM(1)-IBOUND)
+	    IPLUS(LS)=2.0_LDP*(XM(1)-IBOUND)
 	  ELSE
 	    DO I=1,ND
 	      NEWRJ(I)=NEWRJ(I)+JQW(LS)*SOURCE(I)
@@ -140,7 +140,7 @@
 	    HBC_S=HBC_S+JQW(LS)*IBOUND*MU(LS)
 	    INBCNEW=INBCNEW + JQW(LS)*MU(LS)*
 	1       (SOURCE(ND)-(SOURCE(ND)-SOURCE(ND-1))/DTAU(ND-1))
-	    IPLUS(LS)=0.0D0
+	    IPLUS(LS)=0.0_LDP
 	  END IF
 !
 2000	CONTINUE
@@ -149,7 +149,7 @@
 !
 	HBC_J=HBC_J/NEWRJ(1)
 	HBC_S=HBC_S/SOURCE(1)
-	INBCNEW=INBCNEW/(2.0D0*NEWRJ(ND)-IC)
+	INBCNEW=INBCNEW/(2.0_LDP*NEWRJ(ND)-IC)
 !
 ! Compute the new Feautrier factors.
 !

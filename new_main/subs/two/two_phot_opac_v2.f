@@ -55,8 +55,8 @@
 	INTEGER NL,NUP
 !
 	TWO_METHOD=TWO_PHOTON_METHOD
-	PLANKS_CONSTANT=6.626D-27			!cgs units
-	PI=4.0D0*ATAN(1.0D0)
+	PLANKS_CONSTANT=6.626E-27_LDP			!cgs units
+	PI=4.0_LDP*ATAN(1.0_LDP)
 !
 ! The factor 10^10 arises since R is units of 10^10cm, and we
 ! scale CHI (and ETA) so that R.CHI is dimensionless, and
@@ -64,7 +64,7 @@
 ! We don't have to worry about the frequency units, as it multilplied
 ! by a ratio of 2 frequencies.
 !
-	CONST=1.0D+10*PLANKS_CONSTANT/4.0D0/PI
+	CONST=1.0E+10_LDP*PLANKS_CONSTANT/4.0_LDP/PI
 !
 	DO J=1,N_TWO
 	  IF(TWO_PHOT_AVAILABLE(J) .AND. FREQ .LT. FREQ_TWO(J))THEN
@@ -75,10 +75,10 @@
 !
 	    IF(TYPE_TWO(J) .EQ. 1)THEN
 	      Y=FREQ/FREQ_TWO(J)
-	      U=Y*(1.0D0-Y)
-	      FU=4.0D0*U
-	      AY=24.56D0*COEF_TWO(J,1)*( U*(1.0D0-FU**0.8D0) +
-	1                 0.88D0*(U**1.53D0)*(FU**0.8D0) )
+	      U=Y*(1.0_LDP-Y)
+	      FU=4.0_LDP*U
+	      AY=24.56_LDP*COEF_TWO(J,1)*( U*(1.0_LDP-FU**0.8_LDP) +
+	1                 0.88_LDP*(U**1.53_LDP)*(FU**0.8_LDP) )
 	    ELSE
 	      LUER=ERROR_LU()
 	      WRITE(LUER,*)'Error in TWO_PHOT_OPAC'
@@ -114,7 +114,7 @@
 	          WRITE(6,*)FREQ_B,T2
 	        END IF
 	        T1=(FREQ_B-NU(ML+1))/(NU(ML)-NU(ML+1))
-	        RJ_TWO(:,J)=(1.0D0-T1)*TA+T1*TB
+	        RJ_TWO(:,J)=(1.0_LDP-T1)*TA+T1*TB
 	      END IF
 	      LST_FREQ_INDX_TWO(J)=ML
 	      T1=TWOHCSQ*(FREQ_B**3)
@@ -122,16 +122,16 @@
 	    ELSE IF(TWO_METHOD .EQ. 'USE_W')THEN
 	      DO L=1,ND
 	        T1=EXP(-HDKT*FREQ_B/T(L))
-	        RJ_TWO(L,J)=W_TWO(L)*T1/(1.0D0-T1)
+	        RJ_TWO(L,J)=W_TWO(L)*T1/(1.0_LDP-T1)
 	      END DO
 	    END IF
 !
 	    IF(TWO_METHOD .EQ. 'USE_RAD' .OR. TWO_METHOD .EQ. 'USE_W')THEN
 	      DO L=1,ND
-	        ETA(L)=ETA(L) + ETA_CONST*AY*POPS(NUP,L)*FS_RAT_UP(L,J)*(1.0D0+RJ_TWO(L,J))
+	        ETA(L)=ETA(L) + ETA_CONST*AY*POPS(NUP,L)*FS_RAT_UP(L,J)*(1.0_LDP+RJ_TWO(L,J))
 	        CHI(L)=CHI(L) + CHI_CONST*AY*(
 	1                 POPS(NL,L)*FS_RAT_LOW(L,J)*RJ_TWO(L,J)/G_LOW_TWO(J)-
-	1                 POPS(NUP,L)*FS_RAT_UP(L,J)/G_UP_TWO(J)*(1.0D0+RJ_TWO(L,J)) )
+	1                 POPS(NUP,L)*FS_RAT_UP(L,J)/G_UP_TWO(J)*(1.0_LDP+RJ_TWO(L,J)) )
 	      END DO
 	    ELSE
 !

@@ -95,7 +95,7 @@
 	WRITE(LU,'(A)')' '
 	WRITE(LU,'(A,L1)')'Verbose Output= ',VERBOSE_OUTPUT
 !
-	IF(T_FROM_J(1) .EQ. 0.0D0)THEN
+	IF(T_FROM_J(1) .EQ. 0.0_LDP)THEN
 	  TCUR(1:ND)=T(1:ND)
 	  T_FROM_J(1:ND)=T(1:ND)
 	ELSE
@@ -105,8 +105,8 @@
 	IF(.NOT. ALLOCATED(T_STORE))THEN
 	  ALLOCATE (T_STORE(ND,20))
 	  ALLOCATE (INT_EN_STORE(ND,20))
-	  T_STORE=0.0D0
-	  INT_EN_STORE=0.0D0
+	  T_STORE=0.0_LDP
+	  INT_EN_STORE=0.0_LDP
 	END IF
 !
 ! Define the average energy of each super level. At present this is
@@ -117,7 +117,7 @@
 ! arises when levels within a super level have a 'relatively large'
 ! energy separation, and the dominat rates are scattering.
 !
-        AVE_ENERGY(:)=0.0D0
+        AVE_ENERGY(:)=0.0_LDP
 	DO ID=1,NUM_IONS-1
 	  CALL AVE_LEVEL_ENERGY(AVE_ENERGY, ATM(ID)%EDGEXzV_F,
 	1         ATM(ID)%GXzV_F, ATM(ID)%F_TO_S_XzV, ATM(ID)%EQXzV,
@@ -126,11 +126,11 @@
 !
 ! Compute the total excitation energy of each level.
 !
-	TOT_ENERGY(1:NT)=0.0D0
-	ION_EN(1:NT)=0.0D0
+	TOT_ENERGY(1:NT)=0.0_LDP
+	ION_EN(1:NT)=0.0_LDP
 	DO ISPEC=1,NUM_SPECIES
-	  T1=0.0D0
-	  T2=0.0D0
+	  T1=0.0_LDP
+	  T2=0.0_LDP
 	  DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	    T2=T2+AVE_ENERGY(ATM(ID)%EQXzV)
 	    DO I=1,ATM(ID)%NXzV
@@ -158,7 +158,7 @@
 	1      L_FALSE,L_FALSE,L_FALSE,TIME_SEQ_NO,ND,NT,LUIN)
 	OLD_ED(:)=OLD_POPS(NT-1,:)
 	OLD_T(:)=OLD_POPS(NT,:)
-	OLD_POP_ATOM=0.0D0
+	OLD_POP_ATOM=0.0_LDP
 	DO I=1,ND
 	  DO J=1,NT-2
 	    OLD_POP_ATOM(I)=OLD_POP_ATOM(I)+OLD_POPS(J,I)
@@ -173,8 +173,8 @@
 !
 	DO ISPEC=1,NUM_SPECIES
 	  DO J=1,ND
-	    T1=0.0D0
-	    T2=0.0D0
+	    T1=0.0_LDP
+	    T2=0.0_LDP
 	    DO ID=SPECIES_BEG_ID(ISPEC),SPECIES_END_ID(ISPEC)-1
 	      DO I=1,ATM(ID)%NXzV
 	        K=ATM(ID)%EQXzV+I-1
@@ -194,12 +194,12 @@
 ! Compute time step. The factor of 10^5 arises because R is in units of 10^10 cm, and
 ! V is in units of km/s.
 !
-	DELTA_T_SECS=1.0D+05*(R(ND)-OLD_R(ND))/V(ND)
+	DELTA_T_SECS=1.0E+05_LDP*(R(ND)-OLD_R(ND))/V(ND)
 !
 ! Compute the mean energy per atom. At first it is units of 10^15Hz.
 !
-	INT_EN(:)=0.0D0
-	OLD_INT_EN(:)=0.0D0
+	INT_EN(:)=0.0_LDP
+	OLD_INT_EN(:)=0.0_LDP
 	DO I=1,ND
 	  DO J=1,NT-2
 	     INT_EN(I)=INT_EN(I)+POPS(J,I)*TOT_ENERGY(J)
@@ -223,7 +223,7 @@
 	  END DO
 	  IF(.NOT. MATCH)THEN
 	    DO J=1,20
-	      IF(T_STORE(I,J) .EQ. 0.0D0)THEN
+	      IF(T_STORE(I,J) .EQ. 0.0_LDP)THEN
 	        T_STORE(I,J)=T(I)
 	        INT_EN_STORE(I,J)=INT_EN(I)
 	        EXIT
@@ -257,25 +257,25 @@
 ! of 2.
 !
 	DO I=1,ND
-	  IF(T_STORE(I,2) .EQ. 0.0D0)THEN
+	  IF(T_STORE(I,2) .EQ. 0.0_LDP)THEN
 	  ELSE IF(TCUR(I) .LT. T_STORE(I,1))THEN
 	    T1=(TCUR(I)-T_STORE(I,1))/(T_STORE(I,2)-T_STORE(I,1))
-	    INT_EN(I)=INT_EN_STORE(I,2)*T1+INT_EN_STORE(I,1)*(1.0D0-T1)
-	    T2=2.0D0*MAX(INT_EN_STORE(I,2),INT_EN_STORE(I,1))
+	    INT_EN(I)=INT_EN_STORE(I,2)*T1+INT_EN_STORE(I,1)*(1.0_LDP-T1)
+	    T2=2.0_LDP*MAX(INT_EN_STORE(I,2),INT_EN_STORE(I,1))
 	    IF(INT_EN(I) .GT.  T2)INT_EN(I)=T2
-	    T2=0.5D0*MIN(INT_EN_STORE(I,2),INT_EN_STORE(I,1))
+	    T2=0.5_LDP*MIN(INT_EN_STORE(I,2),INT_EN_STORE(I,1))
 	    IF(INT_EN(I) .LT.  T2)INT_EN(I)=T2
 	  ELSE
 	    DO J=2,20
-	      IF(T_STORE(I,J) .EQ. 0.0D0)THEN
+	      IF(T_STORE(I,J) .EQ. 0.0_LDP)THEN
 !
 ! Need to extrapolate.
 !
 	        T1=(TCUR(I)-T_STORE(I,J-2))/(T_STORE(I,J-1)-T_STORE(I,J-2))
-	        INT_EN(I)=INT_EN_STORE(I,J-1)*T1+INT_EN_STORE(I,J-2)*(1.0D0-T1)
-	        T2=2.0D0*MAX(INT_EN_STORE(I,J-1),INT_EN_STORE(I,J-2))
+	        INT_EN(I)=INT_EN_STORE(I,J-1)*T1+INT_EN_STORE(I,J-2)*(1.0_LDP-T1)
+	        T2=2.0_LDP*MAX(INT_EN_STORE(I,J-1),INT_EN_STORE(I,J-2))
 	        IF(INT_EN(I) .GT.  T2)INT_EN(I)=T2
-	        T2=0.5D0*MIN(INT_EN_STORE(I,J-1),INT_EN_STORE(I,J-2))
+	        T2=0.5_LDP*MIN(INT_EN_STORE(I,J-1),INT_EN_STORE(I,J-2))
 	        IF(INT_EN(I) .LT.  T2)INT_EN(I)=T2
 	        EXIT
 	      ELSE IF(TCUR(I) .LE. T_STORE(I,J))THEN
@@ -283,7 +283,7 @@
 ! Can use linear interpolaton.
 !
 	        T1=(TCUR(I)-T_STORE(I,J-1))/(T_STORE(I,J)-T_STORE(I,J-1))
-	        INT_EN(I)=INT_EN_STORE(I,J)*T1+INT_EN_STORE(I,J-1)*(1.0D0-T1)
+	        INT_EN(I)=INT_EN_STORE(I,J)*T1+INT_EN_STORE(I,J-1)*(1.0_LDP-T1)
                 EXIT
 	      END IF
  	    END DO
@@ -300,9 +300,9 @@
 ! in units of 10^4K.
 !
 	PI=FUN_PI()
-	SCALE=1.0D+14*BOLTZMANN_CONSTANT()/4.0D0/PI
+	SCALE=1.0E+14_LDP*BOLTZMANN_CONSTANT()/4.0_LDP/PI
 	DO I=1,ND
-	  EK_VEC(I)=1.5D0*SCALE*POP_ATOM(I)/DELTA_T_SECS
+	  EK_VEC(I)=1.5_LDP*SCALE*POP_ATOM(I)/DELTA_T_SECS
 	  EI_VEC(I)=SCALE*POP_ATOM(I)/DELTA_T_SECS
           P_VEC(I)=-SCALE*(POP_ATOM(I)+ED(I))*TCUR(I)/DELTA_T_SECS
 	END DO
@@ -313,7 +313,7 @@
 	END DO
 !
 	DO I=1,ND
- 	    WORK(I)=EK_VEC(I)*( (1.0D0+GAMMA(I))*TCUR(I)- (1.0D0+OLD_GAMMA(I))*OLD_T(I) ) +
+ 	    WORK(I)=EK_VEC(I)*( (1.0_LDP+GAMMA(I))*TCUR(I)- (1.0_LDP+OLD_GAMMA(I))*OLD_T(I) ) +
 	1           EI_VEC(I)*(INT_EN(I)-OLD_INT_EN(I))      +
 	1           P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I))
 	END DO
@@ -328,14 +328,14 @@
 	WRITE(LU,'(A,14(4X,A))')'   I','  Cur. T','   Old T',' ER(cur)',' ER(old)',
 	1                   ' Ek(cur)',' Ek(old)',' IE(cur)',' IE(old)',
 	1                   'Rek(cur)','Rek(old)','RIE(cur)','RIE(old)','   Pterm','    Work'
-	T1=4.0D0*1.0D+16*5.67D-05/2.998D+10
+	T1=4.0_LDP*1.0E+16_LDP*5.67E-05_LDP/2.998E+10_LDP
 	DO I=1,ND
-	    T2=1.0D+04*BOLTZMANN_CONSTANT()*POP_ATOM(I)
+	    T2=1.0E+04_LDP*BOLTZMANN_CONSTANT()*POP_ATOM(I)
 	    WRITE(LU,'(I4,14ES12.4)')I,TCUR(I),OLD_T(I),
 	1           T1*TCUR(I)**4,T1*OLD_T(I)**4,
-	1           1.5D0*T2*(1.0D0+GAMMA(I))*TCUR(I), 1.5D0*T2*(1.0D0+OLD_GAMMA(I))*OLD_T(I),
+	1           1.5_LDP*T2*(1.0_LDP+GAMMA(I))*TCUR(I), 1.5_LDP*T2*(1.0D0+OLD_GAMMA(I))*OLD_T(I),
 	1           T2*INT_EN(I), T2*OLD_INT_EN(I),
-	1           EK_VEC(I)*(1.0D0+GAMMA(I))*TCUR(I), EK_VEC(I)*(1.0D0+OLD_GAMMA(I))*OLD_T(I),
+	1           EK_VEC(I)*(1.0_LDP+GAMMA(I))*TCUR(I), EK_VEC(I)*(1.0_LDP+OLD_GAMMA(I))*OLD_T(I),
 	1           EI_VEC(I)*INT_EN(I), EI_VEC(I)*OLD_INT_EN(I),
 	1           P_VEC(I)*LOG(POP_ATOM(I)/OLD_POP_ATOM(I)),WORK(I)
 	END DO

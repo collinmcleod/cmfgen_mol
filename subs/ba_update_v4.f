@@ -121,7 +121,7 @@ C
 C
 C dJ_CHK_FAC
 C
-	IF(dJ_CHK_FAC .LT. 1.0D-10 .OR. dJ_CHK_FAC .GT. 0.1)THEN
+	IF(dJ_CHK_FAC .LT. 1.0E-10_LDP .OR. dJ_CHK_FAC .GT. 0.1_LDP)THEN
 	  I=ERROR_LU()
 	  WRITE(I,*)'Error in BA_UPDATE_V4'
 	  WRITE(I,*)'Invalid value for dJ_CHK_FAC: dJ_CHK_FAC=',dJ_CHK_FAC
@@ -209,7 +209,7 @@ C
 	      END DO
 	      IF(K .EQ. DIAG_INDX)THEN
    	         DO  J=1,NT	  	  	  !Variable
-                   IF( COMP_VEC(J) .GE. 0.0D0 )THEN
+                   IF( COMP_VEC(J) .GE. 0.0_LDP )THEN
 	             DO  I=1,NT-1	  	  !Which S.E.
 	               BA_PAR(I,J,L)=BA_PAR(I,J,L) +
 	1                               QFV_R(I,L)*VJ(J,K,L)
@@ -218,7 +218,7 @@ C
 	        END DO
 	      ELSE
    	        DO  J=1,NT	  	  	  !Variable
-                  IF( COMP_VEC(J) .GE. 0.0D0)THEN
+                  IF( COMP_VEC(J) .GE. 0.0_LDP)THEN
 	            DO  I=1,NT-1	  	  !Which S.E.
 	              BA(I,J,K,L)=BA(I,J,K,L)+QFV_R(I,L)*VJ(J,K,L)
 	            END DO
@@ -256,7 +256,7 @@ C
 	      END DO
 	      IF(K .EQ. DIAG_INDX)THEN
    	         DO  J=1,NT	  	  	  !Variable
-                   IF( COMP_VEC(J) .GE. 0.0D0 )THEN
+                   IF( COMP_VEC(J) .GE. 0.0_LDP )THEN
 	             DO  I=1,NT-1	  	  !Which S.E.
 	               BA_PAR(I,J,L)=BA_PAR(I,J,L) +
 	1               ( QFV_R(I,L)*VJ_R(J,K,L) - QFV_P(I,L)*VJ_P(J,K,L) )
@@ -265,7 +265,7 @@ C
 	        END DO
 	      ELSE
    	        DO  J=1,NT	  	  	  !Variable
-                  IF( COMP_VEC(J) .GE. 0.0D0)THEN
+                  IF( COMP_VEC(J) .GE. 0.0_LDP)THEN
 	            DO  I=1,NT-1	  	  !Which S.E.
 	              BA(I,J,K,L)=BA(I,J,K,L)+
 	1               ( QFV_R(I,L)*VJ_R(J,K,L) - QFV_P(I,L)*VJ_P(J,K,L) )

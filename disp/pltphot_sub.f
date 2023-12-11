@@ -71,8 +71,8 @@
 ! Conversion factor from Angstroms to units of 10^15 Hz.
 !
 	DO_EV=.TRUE.
-        EV_TO_HZ=0.241838D+00
-        ANG_TO_HZ=SPEED_OF_LIGHT()*1.0D-07      !10^8/10^15
+        EV_TO_HZ=0.241838E+00_LDP
+        ANG_TO_HZ=SPEED_OF_LIGHT()*1.0E-07_LDP      !10^8/10^15
         C_CMS=SPEED_OF_LIGHT()
 !
 	WRITE(6,*)NSPEC,XSPEC
@@ -89,14 +89,14 @@
 	END DO
 !
 	CALL USR_OPTION(PHOT_ID,'PHOT_ID','1','Photoionization route')
-	FREQ_RES=MIN(3000.0D0,VSM_DIE_KMS)/2.0D0
+	FREQ_RES=MIN(3000.0_LDP,VSM_DIE_KMS)/2.0_LDP
 	DEFAULT=WR_STRING(FREQ_RES)
 	CALL USR_OPTION(FREQ_RES,'FREQ_RES',DEFAULT,'Frequency resolution in km/s')
-	FREQ_RES=FREQ_RES/3.0D+05
+	FREQ_RES=FREQ_RES/3.0E+05_LDP
 !
 	IF(DO_SPECIES)THEN
 	  XAXIS='\gn(10\u15 \dHz)'
-	  FREQ_MAX=1000.0D0
+	  FREQ_MAX=1000.0_LDP
 	  DEFAULT=WR_STRING(FREQ_MAX)
 	  CALL USR_OPTION(FREQ_MAX,'FREQ_MAX',DEFAULT,'Maximum frequency in units of 10^15 Hz')
 	  DEFAULT='T'
@@ -112,15 +112,15 @@
 	        CALL SUB_PHOT_GEN(ID,CROSS,FREQ,ATM(ID)%EDGEXzV_F,ATM(ID)%NXzV_F,PHOT_ID,FLAG)
 	        YV(J)=CROSS(1)
 	      ELSE
-	        YV(J)=0.0D0
+	        YV(J)=0.0_LDP
 	      END IF
 	      IF(XRAYS .AND. ATM(ID)%XzV_PRES .AND. ATM(ID+1)%XzV_PRES)THEN
                 T2=AT_NO(SPECIES_LNK(ID))+1-ATM(ID)%ZXzV
                 T1=XCROSS_V2(FREQ,AT_NO(SPECIES_LNK(ID)),T2,IZERO,IZERO,L_FALSE,L_FALSE)
 	        YV(J)=YV(J)+T1
 	      END IF
-	      YV(J)=1.0D+08*YV(J)
-	      FREQ=FREQ*(1.0D0+FREQ_RES)
+	      YV(J)=1.0E+08_LDP*YV(J)
+	      FREQ=FREQ*(1.0_LDP+FREQ_RES)
 	    END DO
 	    IF(DO_EV)THEN
 	      ZV(1:J)=ZV(1:J)/EV_TO_HZ
@@ -134,7 +134,7 @@
 	END IF
 !
 	CALL USR_OPTION(I,'LEV','1','Level ID: Use WRID to check levs')
-	ED_VAL=0.0D0
+	ED_VAL=0.0_LDP
 	WRITE(T_OUT,'(A)')' '
 	WRITE(T_OUT,'(A)')' Input non-zero Ne for level-dissolution.'
 	WRITE(T_OUT,'(A)')' ED is resticted to the range covered by the model atmosphere.'
@@ -161,10 +161,10 @@
 	  END IF
 	END IF
 !
-	FREQ_RES=MIN(3000.0D0,VSM_DIE_KMS)/2.0D0
+	FREQ_RES=MIN(3000.0_LDP,VSM_DIE_KMS)/2.0_LDP
 	DEFAULT=WR_STRING(FREQ_RES)
 	CALL USR_HIDDEN(FREQ_RES,'FREQ_RES',DEFAULT,'Frequency resolution in km/s')
-	FREQ_RES=FREQ_RES/3.0D+05
+	FREQ_RES=FREQ_RES/3.0E+05_LDP
 !
 	DO ID=1,NUM_IONS
 	  IF(XSPEC .EQ. UC(ION_ID(ID)))THEN
@@ -175,36 +175,36 @@
 	      WRITE(T_OUT,*)RED_PEN
 	      WRITE(T_OUT,*)'Level is: ',ATM(ID)%XzVLEVNAME_F(I)
 	      WRITE(T_OUT,'(A,F11.8)')'Ionization energy to g.s. (in 10^15 Hz) is: ',ATM(ID)%EDGEXzV_F(I)
-	      IF(ED_VAL .NE. 0.0D0)THEN
+	      IF(ED_VAL .NE. 0.0_LDP)THEN
 	        WRITE(T_OUT,'(A,ES10.2)')' Photoionization cross-section evaluated at Ne=',ED(CNT)
 	      END IF
 	      WRITE(T_OUT,*)DEF_PEN
 	    END IF
 	    FLAG=.FALSE.				!Don't return edge value.
-	    IF(ED_VAL .NE. 0.0D0)FLAG=.TRUE.
+	    IF(ED_VAL .NE. 0.0_LDP)FLAG=.TRUE.
 	    FREQ=ATM(ID)%EDGEXzV_F(I)
-	    IF(FLAG)FREQ=0.7D0*ATM(ID)%EDGEXzV_F(I)
+	    IF(FLAG)FREQ=0.7_LDP*ATM(ID)%EDGEXzV_F(I)
 	    J=0
-	    FREQ_MAX=20.0D0*ATM(ID)%EDGEXzV_F(I)
+	    FREQ_MAX=20.0_LDP*ATM(ID)%EDGEXzV_F(I)
 	    DEFAULT=WR_STRING(FREQ_MAX)
 	    CALL USR_HIDDEN(FREQ_MAX,'FREQ_MAX',DEFAULT,'Maximum frequency in units of 10^15 Hz')
 	    DO WHILE(FREQ .LT. FREQ_MAX)
 	      CALL SUB_PHOT_GEN(ID,CROSS,FREQ,ATM(ID)%EDGEXzV_F,ATM(ID)%NXzV_F,PHOT_ID,FLAG)
 	      IF(FLAG .AND. FREQ .LT. ATM(ID)%EDGEXzV_F(I))THEN
 	        T1=ATM(ID)%ZXzV**3
-	        T2=SQRT(3.289395*ATM(ID)%ZXzV*ATM(ID)%ZXzV/(ATM(ID)%EDGEXzV_F(I)-FREQ))
+	        T2=SQRT(3.289395_LDP*ATM(ID)%ZXzV*ATM(ID)%ZXzV/(ATM(ID)%EDGEXzV_F(I)-FREQ))
 	        IF(T2 .GT. 2*ATM(ID)%ZXzV)THEN
-	          T3=MIN(1.0D0,16.0D0*T1/(1.0D0+T2)/(1.0D0+T2)/3.0D0)
-	          DIS_CONST=( T3*ATM(ID)%ZXzV*T1/(T2**4) )**1.5D0
+	          T3=MIN(1.0_LDP,16.0_LDP*T1/(1.0_LDP+T2)/(1.0_LDP+T2)/3.0_LDP)
+	          DIS_CONST=( T3*ATM(ID)%ZXzV*T1/(T2**4) )**1.5_LDP
 	          K=CNT
-	          YDIS=1.091*(X_LEV_DIS(K)+4.0D0*(ATM(ID)%ZXzV-1)*A_LEV_DIS(K))*
+	          YDIS=1.091_LDP*(X_LEV_DIS(K)+4.0_LDP*(ATM(ID)%ZXzV-1)*A_LEV_DIS(K))*
 	1                         B_LEV_DIS(K)*B_LEV_DIS(K)
 	          XDIS=B_LEV_DIS(K)*X_LEV_DIS(K)
-	          T1=7.782+XDIS*DIS_CONST
+	          T1=7.782_LDP+XDIS*DIS_CONST
 	          T2=T1/(T1+YDIS*DIS_CONST*DIS_CONST)
 	          CROSS(I)=CROSS(I)*T2
 	        ELSE
-	          CROSS(I)=0.0D0
+	          CROSS(I)=0.0_LDP
 	        END IF
 	      END IF
 !
@@ -216,12 +216,12 @@
 !
 	      J=J+1
 	      ZV(J)=FREQ/ATM(ID)%EDGEXzV_F(I)
-	      YV(J)=1.0D+08*CROSS(I)
+	      YV(J)=1.0E+08_LDP*CROSS(I)
 	      IF(J .EQ. NF_MAX)EXIT
 	      IF(FREQ .LT. ATM(ID)%EDGEXzV_F(I))THEN
-	        FREQ=FREQ*(1.0D0+10.0D0/3.0D+05)
+	        FREQ=FREQ*(1.0_LDP+10.0_LDP/3.0E+05_LDP)
 	      ELSE
-	         FREQ=FREQ*(1.0D0+FREQ_RES)
+	         FREQ=FREQ*(1.0_LDP+FREQ_RES)
 	      END IF
 	    END DO
 	    EDGE_FREQ=ATM(ID)%EDGEXzV_F(I)
@@ -233,26 +233,26 @@
 	CALL USR_OPTION(DIE_REG,'CUM','F','Plot recombination cummulative function?')
 	IF(DIE_REG)THEN
 	  CALL USR_OPTION(FREQ,'T','1.0','Input T (in 10^4 K)')
-	  EXC_EN=0.0D0
+	  EXC_EN=0.0_LDP
           IF(PHOT_ID .NE. 1)THEN
 	    CALL USR_OPTION(EXC_EN,'EXC_EN',' ','Excitaiton Energy (cm^-1) of final state')
 	  END IF
-	  EXC_EN=1.0D-15*C_CMS*EXC_EN
+	  EXC_EN=1.0E-15_LDP*C_CMS*EXC_EN
 	  CALL USR_OPTION(TMP_GION,'GION',' ','G for ION (No def)')
 !
 	  T1=HDKT*ATM(ID)%EDGEXzV_F(I)/FREQ
-	  WV(1:J)=0.0D0
-	  T3=YV(1)*ZV(1)*ZV(1)*EXP(-T1*(ZV(1)-1.0D0))
+	  WV(1:J)=0.0_LDP
+	  T3=YV(1)*ZV(1)*ZV(1)*EXP(-T1*(ZV(1)-1.0_LDP))
 	  DO K=2,J
 	    T2=T3
-	    T3=YV(K)*ZV(K)*ZV(K)*EXP(-T1*(ZV(K)-1.0D0))
-	    WV(K)=WV(K-1)+0.5D0*(T2+T3)*(ZV(K)-ZV(K-1))
+	    T3=YV(K)*ZV(K)*ZV(K)*EXP(-T1*(ZV(K)-1.0_LDP))
+	    WV(K)=WV(K-1)+0.5_LDP*(T2+T3)*(ZV(K)-ZV(K-1))
 	  END DO
 !
 ! Not that YV above is in Mbarns.
 !
-          T2=5.7885E-15*WV(J)*(ATM(ID)%EDGEXzV_F(I)**3)*ATM(ID)%GXzV_F(I)/TMP_GION
-          T2=T2*EXP(-HDKT*EXC_EN/T1)/(FREQ**1.5)
+          T2=5.7885E-15_LDP*WV(J)*(ATM(ID)%EDGEXzV_F(I)**3)*ATM(ID)%GXzV_F(I)/TMP_GION
+          T2=T2*EXP(-HDKT*EXC_EN/T1)/(FREQ**1.5_LDP)
           WRITE(6,*)'The recomination rate is:',T2
 	  DO K=1,J
 	    WV(K)=WV(K)/WV(J)

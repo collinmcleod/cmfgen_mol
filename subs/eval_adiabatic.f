@@ -59,10 +59,10 @@ C The 10^9 arises since T is in units of 10^4K, and V in units of 10^5 km/s.
 C
 	IF(INCL_ADIABATIC)THEN
 	  PI=FUN_PI()
-	  SCALE=1.0D+09*BOLTZMANN_CONSTANT()/4.0D0/PI
+	  SCALE=1.0E+09_LDP*BOLTZMANN_CONSTANT()/4.0_LDP/PI
 	  DO I=1,ND
  	    WORK(I)=(POPION(I)+ED(I))*SCALE*VEL(I)*
-	1                (1.5D0*AD_CR_DT(I)+SIGMA(I)+3.0D0)/R(I)
+	1                (1.5_LDP*AD_CR_DT(I)+SIGMA(I)+3.0_LDP)/R(I)
  	  END DO
 	  DO I=1,ND
 	    STEQ(NT,I)=STEQ(NT,I)-WORK(I)*T(I)
@@ -73,10 +73,10 @@ C
 	    BA(NT,NT-1,L,1)=BA(NT,NT-1,L,1)-WORK(1)*T(1)/(POPION(1)+ED(1))
 	    IF(NUM_BNDS .GE. 3)THEN
 	      BA(NT,NT,L,1)=BA(NT,NT,L,1)-
-	1                         1.5D0*(POPION(1)+ED(1))*SCALE*VEL(1)/
+	1                         1.5_LDP*(POPION(1)+ED(1))*SCALE*VEL(1)/
 	1                             R(1)/LOG(R(1)/R(2))
 	      BA(NT,NT,L+1,1)=BA(NT,NT,L+1,1)+
-	1                         1.5D0*(POPION(1)+ED(1))*SCALE*VEL(1)*
+	1                         1.5_LDP*(POPION(1)+ED(1))*SCALE*VEL(1)*
 	1                             T(1)/R(1)/T(2)/LOG(R(1)/R(2))
   	    END IF
 	    DO I=2,ND-1
@@ -85,14 +85,14 @@ C
 	      BA(NT,NT-1,L,I)=BA(NT,NT-1,L,I)-WORK(I)*T(I)/(POPION(I)+ED(I))
 	      IF(NUM_BNDS .GE. 3)THEN
 	        BA(NT,NT,L-1,I)=BA(NT,NT,L-1,I)-
-	1                           1.5D0*(POPION(I)+ED(I))*SCALE*VEL(I)*
+	1                           1.5_LDP*(POPION(I)+ED(I))*SCALE*VEL(I)*
 	1                             T(I)/R(I)/T(I-1)/LOG(R(I-1)/R(I+1))
 	        BA(NT,NT,L+1,I)=BA(NT,NT,L+1,I)+
-	1                           1.5D0*(POPION(I)+ED(I))*SCALE*VEL(I)*
+	1                           1.5_LDP*(POPION(I)+ED(I))*SCALE*VEL(I)*
 	1                             T(I)/R(I)/T(I+1)/LOG(R(I-1)/R(I+1))
 	      END IF
 	    END DO
-	    T1=1.5D0*POPION(1)*SCALE*VEL(1)/R(1)
+	    T1=1.5_LDP*POPION(1)*SCALE*VEL(1)/R(1)
 	    L=GET_DIAG(ND)
 	    DO J=1,NT
 	      BA(NT,J,L,ND)=BA(NT,J,L,ND)-T1*DIFFW(J)
@@ -112,12 +112,12 @@ C
 C We split the adiabatic terms into 2 parts: The velocity term, and the
 C dTdR term. This split is useful for diagnostic purposes.
 C
-	SCALE=0.1D0*BOLTZMANN_CONSTANT()
+	SCALE=0.1_LDP*BOLTZMANN_CONSTANT()
 	DO I=1,ND
 	  AD_CR_V(I)= SCALE*(POPION(I)+ED(I))*
-	1                VEL(I)*T(I)/R(I)*(3.0D0+SIGMA(I))
+	1                VEL(I)*T(I)/R(I)*(3.0_LDP+SIGMA(I))
 	  AD_CR_DT(I)=SCALE*(POPION(I)+ED(I))*VEL(I)*T(I)/R(I)*
-	1                (1.5D0*AD_CR_DT(I))
+	1                (1.5_LDP*AD_CR_DT(I))
 	END DO
 C
 	RETURN

@@ -47,7 +47,7 @@
 	  END IF
 	  DO J=1,ND
 	    YV(J)=LOG10(HE2(LEV,J)/HE2(1,J)) -
-	1             (LOG_HE2LTE(LEV,J)-LOG_HE2LTE(1,J))/LOG(10.0D0)
+	1             (LOG_HE2LTE(LEV,J)-LOG_HE2LTE(1,J))/LOG(10.0_LDP)
 	  END DO
 	  LOCAL=.TRUE.
 	ELSE IF(X(1:2) .EQ. 'DC' .AND. XSPEC .EQ. DESC)THEN
@@ -58,7 +58,7 @@
 	    RETURN
 	  END IF
 	  DO J=1,ND
-	    YV(J)=LOG10(HE2(LEV,J))-LOG_HE2LTE(LEV,J)/LOG(10.0D0)
+	    YV(J)=LOG10(HE2(LEV,J))-LOG_HE2LTE(LEV,J)/LOG(10.0_LDP)
 	  END DO
 	  LOCAL=.TRUE.
 	ELSE IF(X(1:2) .EQ. 'TX' .AND. XSPEC .EQ. DESC)THEN
@@ -72,10 +72,10 @@
 	  I=LEV
 	  DO J=ND,1,-1
 	    DELTA_T=100
-	    DO WHILE(DELTA_T .GT. 1.0E-08)
-	      T1=EXP( LOG(He2(I,J))-LOG_He2LTE(I,J)+HDKT*EDGEHE2(I)*(1.0D0/T(J)-1.0D0/T_EXCITE) )*
-	1           (T_EXCITE/T(J))**1.5D0
-	      DELTA_T=(T1-1.0D0)*T_EXCITE/T1/(1.5D0+HDKT*EDGEHE2(I)/T_EXCITE)
+	    DO WHILE(DELTA_T .GT. 1.0E-08_LDP)
+	      T1=EXP( LOG(He2(I,J))-LOG_He2LTE(I,J)+HDKT*EDGEHE2(I)*(1.0_LDP/T(J)-1.0_LDP/T_EXCITE) )*
+	1           (T_EXCITE/T(J))**1.5_LDP
+	      DELTA_T=(T1-1.0_LDP)*T_EXCITE/T1/(1.5_LDP+HDKT*EDGEHE2(I)/T_EXCITE)
 	      T_EXCITE=T_EXCITE-DELTA_T
 	    END DO
 	    YV(J)=T_EXCITE
@@ -84,7 +84,7 @@
 	ELSE IF(X(1:3) .EQ. 'RAT' .AND. LEV .GT. NHE2
 	1      .AND. XSPEC .EQ. DESC)THEN
 	  DO J=1,ND
-	    T1=0.0		!By using T1 advoids log(ZERO).
+	    T1=0.0_LDP		!By using T1 advoids log(ZERO).
 	    DO I=1,NHE2
 	      T1=T1+HE2(I,J)
 	    END DO

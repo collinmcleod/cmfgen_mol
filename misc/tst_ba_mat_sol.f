@@ -115,7 +115,7 @@
 	LOGICAL USE_DC
 	LOGICAL FILE_EXISTS
 !
-	HDKT=4.7994145
+	HDKT=4.7994145_LDP
 !
 	WRITE(FILENAME,*)ID
 	FILENAME=ADJUSTL(FILENAME)
@@ -193,16 +193,16 @@
 	END IF
 !
 	IF(USE_DC)THEN
-	  IONIZATION_ENERGY=109678.7640D0
+	  IONIZATION_ENERGY=109678.7640_LDP
 	  DO I=1,10
-	    EDGE(I)=IONIZATION_ENERGY*SPEED_OF_LIGHT()*1.0D-15/I/I
-	    STAT_WT(I)=2.0D0*I*I
+	    EDGE(I)=IONIZATION_ENERGY*SPEED_OF_LIGHT()*1.0E-15_LDP/I/I
+	    STAT_WT(I)=2.0_LDP*I*I
 	  END DO
-	  GION=1.0D0
+	  GION=1.0_LDP
 !
-	  RGU=LOG(2.07078D-22)
+	  RGU=LOG(2.07078E-22_LDP)
           X=HDKT/POPS(N)
-	  Y=POPS(N-1)*POPS(N-2)*( POPS(N)**(-1.5D0) )/GION
+	  Y=POPS(N-1)*POPS(N-2)*( POPS(N)**(-1.5_LDP) )/GION
           WRITE(6,*)RGU,X,Y
           DO I=1,N-3
             PLTE(I)=STAT_WT(I)*Y*EXP(EDGE(I)*X+RGU)
@@ -213,7 +213,7 @@
 	    DO J=1,10
 	      CMAT(I,N-2)=CMAT(I,N-2)+CMAT(I,J)
 	      CMAT(I,N-1)=CMAT(I,N-1)+CMAT(I,J)
-	      CMAT(I,N)=CMAT(I,N)-(1.5D0+HDKT*EDGE(J)/POPS(N))*CMAT(I,J)
+	      CMAT(I,N)=CMAT(I,N)-(1.5_LDP+HDKT*EDGE(J)/POPS(N))*CMAT(I,J)
 	    END DO
 	  END DO
 	  SAV_CMAT=CMAT
@@ -227,6 +227,7 @@
 	WRITE(6,*)'Normalizing the matrix to get more accurate solution'
 	CALL DGEEQU(N,N,CMAT,N,ROW_SF,COL_SF,
 	1               ROW_CND,COL_CND,MAX_VAL,IFAIL)
+	WRITE(6,*)'Normlalization successful'
         DO J=1,N
           STEQ(J)=STEQ(J)*ROW_SF(J)
           DO I=1,N
@@ -253,8 +254,8 @@
 ! Check to see whether solution is accurate, by computing RHS with
 ! the newly determined solutions.
 !
-	RHS=0.0D0
-	LARGEST_VAL=1.0D-42
+	RHS=0.0_LDP
+	LARGEST_VAL=1.0E-42_LDP
 	DO J=1,N
 	  DO I=1,N
 	    T1=SAV_CMAT(I,J)*STEQ(J)
@@ -264,7 +265,7 @@
 	  END DO
 	END DO
 !
-	T1=0.0D0
+	T1=0.0_LDP
 	DO IEQ=335,391
 	DO J=335,394     !1,N
 	  IF(SAV_STEQ(IEQ) .NE. 0)THEN
@@ -284,17 +285,17 @@
 	END DO
 !
 	IF(USE_DC)THEN
-	  DI_NEW=POPS(N-2)*(1.0D0-STEQ(N-2))
-	  ED_NEW=POPS(N-1)*(1.0D0-STEQ(N-1))
-	  T_NEW=POPS(N)*(1.0D0-STEQ(N))
-	  RGU=LOG(2.07078D-22)
+	  DI_NEW=POPS(N-2)*(1.0_LDP-STEQ(N-2))
+	  ED_NEW=POPS(N-1)*(1.0_LDP-STEQ(N-1))
+	  T_NEW=POPS(N)*(1.0_LDP-STEQ(N))
+	  RGU=LOG(2.07078E-22_LDP)
           X=HDKT/T_NEW
-	  Y=ED_NEW*DI_NEW*( T_NEW**(-1.5D0) )/GION
+	  Y=ED_NEW*DI_NEW*( T_NEW**(-1.5_LDP) )/GION
           DO I=1,N-3
             NEW_LTE(I)=STAT_WT(I)*Y*EXP(EDGE(I)*X+RGU)
 	  END DO
 	  DO I=1,N-3
-	    NEW_POPS(I)=(POPS(I)/PLTE(I))*(1.0-STEQ(I))*NEW_LTE(I)
+	    NEW_POPS(I)=(POPS(I)/PLTE(I))*(1.0_LDP-STEQ(I))*NEW_LTE(I)
 	  END DO
 	  NEW_POPS(N-2)=DI_NEW
 	  NEW_POPS(N-1)=ED_NEW
@@ -323,10 +324,10 @@
 	WRITE(6,*)'Check fort.12 for accuracy check'
 !
 	DO J=1,N
-	  POP_SOLS(J,1)=POPS(J)*(1.0D0-STEQ(J))
+	  POP_SOLS(J,1)=POPS(J)*(1.0_LDP-STEQ(J))
 	END DO
 !
-	I=164; T2=0.0D0
+	I=164; T2=0.0_LDP
 	DO J=1,N
 	  T1=SAV_CMAT(I,J)*STEQ(J)
 	  T2=T2+T1
@@ -347,8 +348,8 @@
           STEQ(J)=STEQ(J)+RHS(J)*COL_SF(J)
         END DO
 !
-	RHS=0.0D0
-	LARGEST_VAL=1.0D-42
+	RHS=0.0_LDP
+	LARGEST_VAL=1.0E-42_LDP
 	DO J=1,N
 	  DO I=1,N
 	    T1=SAV_CMAT(I,J)*STEQ(J)
@@ -367,7 +368,7 @@
 	END DO
 !
 	DO J=1,N
-	  POP_SOLS(J,2)=POPS(J)*(1.0D0-STEQ(J))
+	  POP_SOLS(J,2)=POPS(J)*(1.0_LDP-STEQ(J))
 	END DO
 !
 ! Try a different scaling of CMAT to see if this makes any difference to the
@@ -376,7 +377,7 @@
 	CMAT=SAV_CMAT
 	STEQ=SAV_STEQ
 	DO I=1,N
-	  OLD_SOL(I)=MAX(1.0D0,ABS(STEQ(I)))
+	  OLD_SOL(I)=MAX(1.0_LDP,ABS(STEQ(I)))
 !	  OLD_SOL(I)=2.0D0
 	END DO
 !
@@ -407,14 +408,14 @@
         END DO
 !
 	DO J=1,N
-	  POP_SOLS(J,3)=POPS(J)*(1.0D0-STEQ(J))
+	  POP_SOLS(J,3)=POPS(J)*(1.0_LDP-STEQ(J))
 	END DO
 !
 ! Check to see whether solution is accurate, by computing RHS with
 ! the newly determined solutions.
 !
-	RHS=0.0D0
-	LARGEST_VAL=1.0D-42
+	RHS=0.0_LDP
+	LARGEST_VAL=1.0E-42_LDP
 	DO J=1,N
 	  DO I=1,N
 	    T1=SAV_CMAT(I,J)*STEQ(J)
@@ -449,10 +450,10 @@
 	  END DO
 	END DO
 	IF(N .EQ. NT)THEN
-	   CMAT(:,N-1)=0.0D0
-	   CMAT(:,N)=0.0D0
-	   CMAT(N-1,N-1)=1.0;
-	   CMAT(N,N)=1.0;
+	   CMAT(:,N-1)=0.0_LDP
+	   CMAT(:,N)=0.0_LDP
+	   CMAT(N-1,N-1)=1.0_LDP;
+	   CMAT(N,N)=1.0_LDP;
 	END IF
 	WRITE(36,*)CMAT(N-1,1:N)
 	WRITE(36,*)CMAT(N,1:N)
@@ -490,13 +491,13 @@
 !
 	CMAT=SAV_CMAT
 	IF(N .EQ. NT)THEN
-	   CMAT(:,N-1)=0.0D0
-	   CMAT(:,N)=0.0D0
-	   CMAT(N-1,N-1)=1.0;
-	   CMAT(N,N)=1.0;
+	   CMAT(:,N-1)=0.0_LDP
+	   CMAT(:,N)=0.0_LDP
+	   CMAT(N-1,N-1)=1.0_LDP;
+	   CMAT(N,N)=1.0_LDP;
 	END IF
 
-	COL_SF=0.0D0
+	COL_SF=0.0_LDP
 	DO I=1,N
 	  DO J=1,N
 	    COL_SF(I)=COL_SF(I)+CMAT(I,J)

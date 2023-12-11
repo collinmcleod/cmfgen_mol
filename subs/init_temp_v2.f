@@ -111,7 +111,7 @@ C
 	    DO I=1,NDOLD
 	      READ(LU,*)ROLD(I),DI,EDOLD(I),TOLD(I)
 	      READ(LU,*)(T1,K=1,NOLD)
-	      CLUMP_FAC_OLD(I)=1.0D0
+	      CLUMP_FAC_OLD(I)=1.0_LDP
 	    END DO
 	  END IF
 	CLOSE(UNIT=LU)
@@ -120,18 +120,18 @@ C Determine radius at which optical depth is unity. We use NEWED as a
 C temporary vector for ED*CLUMP_FAC.
 C
         NEWED(1:ND)=ED(1:ND)*CLUMP_FAC(1:ND)
-        TAU(1)=6.65D-15*NEWED(1)*R(1)
+        TAU(1)=6.65E-15_LDP*NEWED(1)*R(1)
 	K=0
 	DO I=2,ND
-          TAU(I)=TAU(I-1)+6.65D-15*(NEWED(I-1)+NEWED(I))*(R(I-1)-R(I))*0.5D0
-          IF(TAU(I) .LE. 1.0D0)K=I
+          TAU(I)=TAU(I-1)+6.65E-15_LDP*(NEWED(I-1)+NEWED(I))*(R(I-1)-R(I))*0.5_LDP
+          IF(TAU(I) .LE. 1.0_LDP)K=I
         END DO
 	IF(K .EQ. 0)THEN
 	  WRITE(6,*)'Error -- computed TAU is < 1 in INIT_TEMP_V2'
 	  STOP
 	END IF
-        T1=(1.0D0-TAU(K))/(TAU(K+1)-TAU(K))
-        RTAU1=T1*R(K+1)+(1.0D0-T1)*R(K)
+        T1=(1.0_LDP-TAU(K))/(TAU(K+1)-TAU(K))
+        RTAU1=T1*R(K+1)+(1.0_LDP-T1)*R(K)
 C
 C Compute the spherical optical depth scale. Assume atmosphere has constant
 C V at outer boundary.
@@ -139,33 +139,33 @@ C
         DO I=1,ND
           NEWED(I)=NEWED(I)*RTAU1*RTAU1/R(I)/R(I)
 	END DO
-        TAU(1)=6.65D-15*NEWED(1)*R(1)/3.0D0
+        TAU(1)=6.65E-15_LDP*NEWED(1)*R(1)/3.0_LDP
 	DO I=2,ND
-          TAU(I)=TAU(I-1)+6.65D-15*(NEWED(I-1)+NEWED(I))*(R(I-1)-R(I))*0.5D0
+          TAU(I)=TAU(I-1)+6.65E-15_LDP*(NEWED(I-1)+NEWED(I))*(R(I-1)-R(I))*0.5_LDP
 	END DO
 C
 C Determine radius at which optical depth is unity in old model. We first
 C need to allow for clumping.
 C
         EDOLD(1:NDOLD)=CLUMP_FAC_OLD(1:NDOLD)*EDOLD(1:NDOLD)
-        TAUOLD(1)=6.65D-15*EDOLD(1)*ROLD(1)
+        TAUOLD(1)=6.65E-15_LDP*EDOLD(1)*ROLD(1)
 	DO I=2,NDOLD
-          TAUOLD(I)=TAUOLD(I-1)+6.65D-15*(EDOLD(I-1)+EDOLD(I))*
-	1             (ROLD(I-1)-ROLD(I))*0.5D0
-          IF(TAUOLD(I) .LE. 1.0D0)K=I
+          TAUOLD(I)=TAUOLD(I-1)+6.65E-15_LDP*(EDOLD(I-1)+EDOLD(I))*
+	1             (ROLD(I-1)-ROLD(I))*0.5_LDP
+          IF(TAUOLD(I) .LE. 1.0_LDP)K=I
         END DO
-        T1=(1.0D0-TAUOLD(K))/(TAUOLD(K+1)-TAUOLD(K))
-        RTAU1_OLD=T1*ROLD(K+1)+(1.0D0-T1)*ROLD(K)
+        T1=(1.0_LDP-TAUOLD(K))/(TAUOLD(K+1)-TAUOLD(K))
+        RTAU1_OLD=T1*ROLD(K+1)+(1.0_LDP-T1)*ROLD(K)
 C
 C Compute the spherical optical depth scale.
 C
         DO I=1,NDOLD
           EDOLD(I)=EDOLD(I)*(RTAU1_OLD/ROLD(I))**2
         END DO
-        TAUOLD(1)=6.65D-15*EDOLD(1)*ROLD(1)/3.0D0
+        TAUOLD(1)=6.65E-15_LDP*EDOLD(1)*ROLD(1)/3.0_LDP
 	DO I=2,NDOLD
-          TAUOLD(I)=TAUOLD(I-1)+6.65D-15*(EDOLD(I-1)+EDOLD(I))*
-	1            (ROLD(I-1)-ROLD(I))*0.5D0
+          TAUOLD(I)=TAUOLD(I-1)+6.65E-15_LDP*(EDOLD(I-1)+EDOLD(I))*
+	1            (ROLD(I-1)-ROLD(I))*0.5_LDP
 	END DO
 C
 C Interpolat the temperature onto the new grid, using the spherical optical
@@ -176,7 +176,7 @@ C reduce the correction, so that we keep the old temperature scale at small
 C optical depths.
 C
 	K=2
-        LDL=(LUM*RTAU1_OLD*RTAU1_OLD/LUMOLD/RTAU1/RTAU1)**0.25D0
+        LDL=(LUM*RTAU1_OLD*RTAU1_OLD/LUMOLD/RTAU1/RTAU1)**0.25_LDP
 	DO I=1,ND
 	  IF(TAU(I) .LT. TAU_SWITCH)THEN
 	    MLDL=1+(LDL-1)*TAU(I)/TAU_SWITCH
@@ -194,7 +194,7 @@ C
 	      GOTO 10
 	    END IF
 	  ELSE
-	    T(I)=MLDL*TOLD(NDOLD)*(TAU(I)/TAUOLD(NDOLD))**0.25D0
+	    T(I)=MLDL*TOLD(NDOLD)*(TAU(I)/TAUOLD(NDOLD))**0.25_LDP
 	  END IF
 	END DO
 C

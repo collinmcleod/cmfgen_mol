@@ -46,8 +46,8 @@ C
 C
 	DO K=1,ND
 	  DO L=1,N_S
-	    HNST_S(L,K)=0.0D0
-	    dlnHNST_S_dlnT(L,K)=0.0D0
+	    HNST_S(L,K)=0.0_LDP
+	    dlnHNST_S_dlnT(L,K)=0.0_LDP
 	  END DO
 	END DO
 C
@@ -64,7 +64,7 @@ C
 C
 	DO K=1,ND
 	  DO L=1,N_S
-	    IF(HNST_S(L,K) .NE. 0.0D0)dlnHNST_S_dlnT(L,K)=-1.5D0 -
+	    IF(HNST_S(L,K) .NE. 0.0_LDP)dlnHNST_S_dlnT(L,K)=-1.5_LDP -
 	1          HDKT*dlnHNST_S_dlnT(L,K)/T(K)/HNST_S(L,K)
 	  END DO
 	END DO

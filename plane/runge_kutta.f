@@ -32,8 +32,8 @@ c
       REAL(KIND=LDP),  dimension(n) :: dydx,y
       REAL(KIND=LDP) h,x,beta,dbetadr,gamma
 c
-      hh=h*0.5d0
-      h6=h/6.0d0
+      hh=h*0.5_LDP
+      h6=h/6.0_LDP
       xh=x+hh
       x=x+h
       do i=1,n
@@ -50,7 +50,7 @@ c
       enddo
       call deriv(x,yt,dyt,beta,dbetadr,gamma)
       do i=1,n
-        y(i)=y(i)+h6*(dydx(i)+dyt(i)+2.0d0*dym(i))
+        y(i)=y(i)+h6*(dydx(i)+dyt(i)+2.0_LDP*dym(i))
       enddo
 c
       return

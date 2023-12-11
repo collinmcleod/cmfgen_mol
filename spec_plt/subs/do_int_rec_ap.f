@@ -56,16 +56,16 @@
 	LINEAR=.TRUE.
 !	LINEAR=.FALSE.
 !	NINS=(2*NINS+1)/2
-	PI=ACOS(-1.0D0)
+	PI=ACOS(-1.0_LDP)
 !
-	IF(A .LT. 0.0D0 .OR. B .LT. 0.0D0)THEN
+	IF(A .LT. 0.0_LDP .OR. B .LT. 0.0_LDP)THEN
 	  WRITE(6,*)'Error in DO_INT_REC_AP'
 	  WRITE(6,*)'Aperture must be preferentially centered in top right quadrant'
 	  STOP
 	END IF
 !
-	IF(A .EQ. 0.0D0 .AND. B .EQ. 0.0D0)THEN
-	ELSE IF(B-0.5D0*LENGTH .LT. 0.0D0)THEN
+	IF(A .EQ. 0.0_LDP .AND. B .EQ. 0.0_LDP)THEN
+	ELSE IF(B-0.5_LDP*LENGTH .LT. 0.0_LDP)THEN
 	  WRITE(6,*)'Error in DO_INT_REC_AP'
 	  WRITE(6,*)'Aperture must be above X axis'
 	  WRITE(6,*)'Call INT_RREC_AP first'
@@ -74,21 +74,21 @@
 	  STOP
 	END IF
 !	
-	LEFT_EDGE=A-0.5D0*WIDTH
-	RIGHT_EDGE=A+0.5D0*WIDTH
-	BOT_EDGE=B-0.5D0*LENGTH
-	TOP_EDGE=B+0.5D0*LENGTH
+	LEFT_EDGE=A-0.5_LDP*WIDTH
+	RIGHT_EDGE=A+0.5_LDP*WIDTH
+	BOT_EDGE=B-0.5_LDP*LENGTH
+	TOP_EDGE=B+0.5_LDP*LENGTH
 !
 	WRITE(6,*)'Enterered DO_INT_REC_AP'
 !
-	IF(A .EQ. 0.0D0 .AND. B .EQ. 0.0D0)THEN
+	IF(A .EQ. 0.0_LDP .AND. B .EQ. 0.0_LDP)THEN
 !
 ! Aperture is centered on the star.
 !
-	   PMIN=0.0D0
-	   P1=0.5D0*MIN(WIDTH,LENGTH)
-	   P2=0.5D0*MAX(WIDTH,LENGTH)
-           PMAX=0.5D0*SQRT(WIDTH*WIDTH+LENGTH*LENGTH)
+	   PMIN=0.0_LDP
+	   P1=0.5_LDP*MIN(WIDTH,LENGTH)
+	   P2=0.5_LDP*MAX(WIDTH,LENGTH)
+           PMAX=0.5_LDP*SQRT(WIDTH*WIDTH+LENGTH*LENGTH)
 	   P_INS(1)=P1
 	   P_INS(2)=P2
 	   P_INS(3)=PMAX
@@ -98,7 +98,7 @@
 !
 ! Aperture is entirely within the right quadrant.
 !
-	ELSE IF(LEFT_EDGE .GE. 0.0D0 .AND. BOT_EDGE .GE. 0.0D0)THEN
+	ELSE IF(LEFT_EDGE .GE. 0.0_LDP .AND. BOT_EDGE .GE. 0.0_LDP)THEN
 	   P1=SQRT( LEFT_EDGE**2 + BOT_EDGE** 2)
 	   P2=SQRT( LEFT_EDGE**2 + TOP_EDGE** 2)
 	   P3=SQRT( RIGHT_EDGE**2 + TOP_EDGE** 2)
@@ -214,10 +214,10 @@
 	ALLOCATE (QW(NP_REV))
 	ALLOCATE (dTHETA(NP_REV))
 !
-	IF(A .EQ. 0.0D0 .AND. B .EQ. 0.0D0)THEN
+	IF(A .EQ. 0.0_LDP .AND. B .EQ. 0.0_LDP)THEN
 	  I=1
 	  DO WHILE(P_REV(I) .LE. P1)
-	    dTHETA(I)=2.0D0*PI
+	    dTHETA(I)=2.0_LDP*PI
 	    IMIN=I
 	    I=I+1
 	  END DO
@@ -225,7 +225,7 @@
 !
 	  I=IMIN+1
 	  DO WHILE(P_REV(I) .LE. P2)
-	    dTHETA(I)=4.0D0*(0.5D0*PI-ACOS(0.5D0*WIDTH/P_REV(I)))
+	    dTHETA(I)=4.0_LDP*(0.5_LDP*PI-ACOS(0.5_LDP*WIDTH/P_REV(I)))
 	    IMIN=I
 	    I=I+1
 	  END DO
@@ -233,7 +233,7 @@
 !
 	  I=IMIN+1
 	  DO WHILE(I .LE. NP_REV)
-	    dTHETA(I)=4.0D0*( ASIN(0.5D0*LENGTH/P_REV(I)) - ACOS(0.5D0*WIDTH/P_REV(I)) )
+	    dTHETA(I)=4.0_LDP*( ASIN(0.5_LDP*LENGTH/P_REV(I)) - ACOS(0.5_LDP*WIDTH/P_REV(I)) )
 	    I=I+1
 	  END DO
 	  WRITE(6,*)'Done Theta 3'
@@ -242,14 +242,14 @@
 	  WRITE(6,*)'Beginning dTHETA comp.'
 	  DO I=1,NP_REV
 	    IF(P_REV(I) .EQ. 0)THEN
-	      T1=0.0D0
+	      T1=0.0_LDP
 	    ELSE IF(P_REV(I) .LE. P2)THEN
 	      T1=ACOS(LEFT_EDGE/P_REV(I))
 	    ELSE
 	      T1=ASIN(TOP_EDGE/P_REV(I))
 	    END IF
 	    IF(P_REV(I) .EQ. 0)THEN
-	      T2=0.0D0
+	      T2=0.0_LDP
 	    ELSE IF(P_REV(I) .LE. P4)THEN
 	      T2=ASIN(BOT_EDGE/P_REV(I))
 	    ELSE
@@ -264,16 +264,16 @@
 	  WRITE(6,*)'Beginning dTHETA comp.'
 	  DO I=1,NP_REV
 	    IF(P_REV(I) .EQ. 0)THEN
-	      T1=0.0D0
+	      T1=0.0_LDP
 	    ELSE IF(P_REV(I) .LE. P1)THEN
-	      T1=0.5D0*PI+ACOS(BOT_EDGE/P_REV(I))
+	      T1=0.5_LDP*PI+ACOS(BOT_EDGE/P_REV(I))
 	    ELSE IF(P_REV(I) .LE. P2)THEN
-	      T1=0.5D0*PI+ASIN(ABS(LEFT_EDGE)/P_REV(I))
+	      T1=0.5_LDP*PI+ASIN(ABS(LEFT_EDGE)/P_REV(I))
 	    ELSE
 	      T1=ASIN(ABS(TOP_EDGE)/P_REV(I))
 	    END IF
 	    IF(P_REV(I) .EQ. 0)THEN
-	      T2=0.0D0
+	      T2=0.0_LDP
 	    ELSE IF(P_REV(I) .LE. P4)THEN
 	      T2=ASIN(BOT_EDGE/P_REV(I))
 	    ELSE
@@ -282,7 +282,7 @@
 	    dTHETA(I)=T1-T2
 	    IF(P_REV(I) .LT. P2 .AND. P_REV(I) .GT. TOP_EDGE)THEN
 	       T1=ACOS(TOP_EDGE/P_REV(I))
-	       dTHETA(I)=dTHETA(I)-2.0D0*T1
+	       dTHETA(I)=dTHETA(I)-2.0_LDP*T1
 	    END IF
 	  END DO
 	END IF
@@ -293,25 +293,25 @@
 	  WRITE(71,*)I,P_REV(I),dTHETA(I)
 	END DO
 !
-	QW(:)=0.0D0
+	QW(:)=0.0_LDP
 	IF(LINEAR)THEN
 	  DO I=1,NP_REV-1
-	    T1=0.5D0*(P_REV(I+1)-P_REV(I))
+	    T1=0.5_LDP*(P_REV(I+1)-P_REV(I))
 	    QW(I)=QW(I)+dTHETA(I)*P_REV(I)*T1
 	    QW(I+1)=QW(I+1)+dTHETA(I+1)*P_REV(I+1)*T1
 	  END DO
 	ELSE
 	  DO I=1,NP_REV-2,2
-	    T1=(P_REV(I+1)-P_REV(I))/3.0D0
+	    T1=(P_REV(I+1)-P_REV(I))/3.0_LDP
 	    QW(I)=QW(I)+dTHETA(I)*P_REV(I)*T1
-	    QW(I+1)=QW(I+1)+dTHETA(I+1)*P_REV(I+1)*T1*4.0D0
+	    QW(I+1)=QW(I+1)+dTHETA(I+1)*P_REV(I+1)*T1*4.0_LDP
 	    QW(I+2)=QW(I+2)+dTHETA(I+2)*P_REV(I+2)*T1
 	  END DO
 	END IF
 !
 	WRITE(71,*)' '
 	WRITE(71,*)'QW'
-	T1=0.0D0
+	T1=0.0_LDP
 	DO I=1,NP_REV
 	  WRITE(71,'(I3,2X,3ES16.8)')I,P_REV(I),dTHETA(I),QW(I)
 	  T1=T1+QW(I)
@@ -321,7 +321,7 @@
 	 WRITE(6,*)'Computed the quadrature weights'
 !	
 	IF(ZERO_YV)THEN
-	  YV(1:NCF)=0.0D0	
+	  YV(1:NCF)=0.0_LDP	
 	  WRITE(6,*)'Zeroed YV'
 	END IF
 	IF(ALLOCATED(IP_REV))DEALLOCATE(IP_REV)
@@ -355,7 +355,7 @@
           DO I=1,NP_REV
 	    J=INDX(I)
 	    T1=INT_COEF(I)
-	    IP_REV(I)=(1.0D0-T1)*IP(J,ML)+T1*IP(J+1,ML)
+	    IP_REV(I)=(1.0_LDP-T1)*IP(J,ML)+T1*IP(J+1,ML)
 	  END DO
 !
 !	WRITE(71,*)' '

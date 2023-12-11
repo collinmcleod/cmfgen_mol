@@ -40,12 +40,12 @@ C 5 = HeI (Singlets and Triplets)
 C
 	    IF(FORM .EQ. 1)FMT='(1X,1P5E15.5)'
 	    IF(FORM .EQ. 2)FMT='(1X,1P1E15.5,:/,1X,2E15.5,:/,1X,3E15.5,
-	1                        :/,(1X,4E15.5))'
+	1                        :/,(1X,4E15.5_LDP))'
 	    IF(FORM .EQ. 3)FMT='(1X,1P2E15.5,:/,1X,3E15.5,:/,(1X,4E15.5))'
 	    IF(FORM .EQ. 4)FMT='(1X,1P1E15.5,:/,1X,2E15.5,:/,1X,3E15.5,
-	1                        :/,(1X,6E15.5))'
+	1                        :/,(1X,6E15.5_LDP))'
 	    IF(FORM .EQ. 5)FMT='(1X,1P1E15.5,:/,1X,2E15.5,:/,1X,2E15.5,:/,1X,
-	1            3E15.5,:/,1X,3E15.5,/:,(1X,6E15.5))'
+	1            3E15.5_LDP,:/,1X,3E15.5_LDP,/:,(1X,6E15.5_LDP))'
 C
 	    OPEN(UNIT=9,STATUS='NEW',FILE=NEWNAME)
 C
@@ -53,8 +53,8 @@ C
 	    WRITE(9,2120)R(ND),LUM,NHYD,ND
 	    IF(OPTION .EQ. 'DC')THEN
 	      DO I=1,ND
-	        T1=0.0D0
-	        T2=0.0D0
+	        T1=0.0_LDP
+	        T2=0.0_LDP
 	        DO J=1,NHYD
 	          T1=T1+HYD(J,I)
 	        END DO
@@ -67,8 +67,8 @@ C
 	      END DO
 	    ELSE IF(OPTION .EQ. 'TX')THEN
 	      DO I=1,ND
-	        T1=0.0D0
-	        T2=0.0D0
+	        T1=0.0_LDP
+	        T2=0.0_LDP
 	        DO J=1,NHYD
 	          T1=T1+HYD(J,I)
 	        END DO
@@ -79,16 +79,16 @@ C
 	        WRITE(9,2122)R(I),DHYD(1,I),ED(I),T(I),T1,V(I),CLUMP_FAC(I)
 	        DO J=1,NHYD
 	          T1=LOG( HYD(J,I)*GION/GHYD(J)/WHYD(J,I)/
-	1                             2.07078D-22/ED(I)/DHYD(1,I) )
+	1                             2.07078E-22_LDP/ED(I)/DHYD(1,I) )
 	          T2=HDKT*EDGEHYD(J)
-	          DELTA_T=10.0D0
+	          DELTA_T=10.0_LDP
 		  COUNT=0
 	          TEXCITE(J)=T(I)
-	          DO WHILE( ABS(DELTA_T) .GT. 1.0E-06 .AND. COUNT .LT. 100 )
+	          DO WHILE( ABS(DELTA_T) .GT. 1.0E-06_LDP .AND. COUNT .LT. 100 )
 	            COUNT=COUNT+1
-	            DELTA_T=( T1- T2/TEXCITE(J) + 1.5D0*LOG(TEXCITE(J)) )*
-	1                     TEXCITE(J)/(T2/TEXCITE(J)+1.5D0)
-	            IF(ABS(DELTA_T) .GT. 0.8*TEXCITE(J))DELTA_T=0.5D0*DELTA_T
+	            DELTA_T=( T1- T2/TEXCITE(J) + 1.5_LDP*LOG(TEXCITE(J)) )*
+	1                     TEXCITE(J)/(T2/TEXCITE(J)+1.5_LDP)
+	            IF(ABS(DELTA_T) .GT. 0.8_LDP*TEXCITE(J))DELTA_T=0.5_LDP*DELTA_T
 	            TEXCITE(J)=TEXCITE(J)-DELTA_T
 	          END DO
 	          IF(COUNT .EQ. 100)THEN
@@ -101,8 +101,8 @@ C
 	      END DO
 	    ELSE
 	      DO I=1,ND
-	        T1=0.0D0
-	        T2=0.0D0
+	        T1=0.0_LDP
+	        T2=0.0_LDP
 	        DO J=1,NHYD
 	          T1=T1+HYD(J,I)
 	        END DO

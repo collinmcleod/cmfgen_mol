@@ -75,7 +75,7 @@ C
 	REAL(KIND=LDP) DBB,IC,FREQ,dLOG_NU
 	CHARACTER*6 METHOD
 C
-	REAL(KIND=LDP), PARAMETER :: PROG_ID=1.46310043D+08  !Must be unique (MOM_J_CM)
+	REAL(KIND=LDP), PARAMETER :: PROG_ID=1.46310043E+08_LDP  !Must be unique (MOM_J_CM)
 C
 C INIT is used to indicate that there is no coupling to the previous frequency.
 C We are thus solving the normal continuum transfer equation (i.e. the absence
@@ -130,8 +130,8 @@ C
 C Zero common block. There is currently 23 vectors in the common block.
 C TA must be the first vector, and PSIPREV the last.
 C
-	PSIPREV(NV-1)=1.0D0
-	PSIPREV(NV)=1.0D0
+	PSIPREV(NV-1)=1.0_LDP
+	PSIPREV(NV)=1.0_LDP
 	I=(NV*23)-1
 	CALL DP_ZERO(TA,I)
 	IF(PSIPREV(NV-1) .NE. 0 .AND. PSIPREV(NV) .NE. 1)THEN
@@ -139,7 +139,7 @@ C
 	  WRITE(LUER,*)'Error in zeroing SCRATCH block in MOMJBAR'
 	  STOP
 	ELSE
-	  PSIPREV(NV)=0.0D0
+	  PSIPREV(NV)=0.0_LDP
 	END IF
 C
 C 
@@ -151,7 +151,7 @@ C
 C
 	IF(INIT)THEN
 	  DO I=1,N_ERR_MAX
-	    MOM_ERR_ON_FREQ(I)=0.0D0
+	    MOM_ERR_ON_FREQ(I)=0.0_LDP
 	  END DO
 	  MOM_ERR_CNT=0
 	END IF
@@ -167,12 +167,12 @@ C
 	  END DO
 	ELSE
 	  DO I=1,ND
-	    COH_VEC(I)=0.0D0
+	    COH_VEC(I)=0.0_LDP
 	  END DO
 	END IF
 !
 	DO I=1,ND
-	  IF(G(I) .GT. 1.0D0)G(I)=1.0D0
+	  IF(G(I) .GT. 1.0_LDP)G(I)=1.0_LDP
 	END DO
 C
 C NB: We actually solve for r^2 J, not J.
@@ -188,16 +188,16 @@ C
 C
 	IF(INIT)THEN
 	  DO I=1,ND
-	    GAMH(I)=0.0D0
-	    GAM(I)=0.0D0
-	    W(I)=0.0D0
-	    WPREV(I)=0.0D0
-	    PSI(I)=0.0D0
-	    PSIPREV(I)=0.0D0
-	    JNU_PREV(I)=0.0D0
-	    RSQHNU_PREV(I)=0.0D0
-	    EPS(I)=0.0D0
-	    EPS_PREV(I)=0.0D0
+	    GAMH(I)=0.0_LDP
+	    GAM(I)=0.0_LDP
+	    W(I)=0.0_LDP
+	    WPREV(I)=0.0_LDP
+	    PSI(I)=0.0_LDP
+	    PSIPREV(I)=0.0_LDP
+	    JNU_PREV(I)=0.0_LDP
+	    RSQHNU_PREV(I)=0.0_LDP
+	    EPS(I)=0.0_LDP
+	    EPS_PREV(I)=0.0_LDP
 	  END DO
 C
 C Assume (1)	SIGMAd+1/2 = 0.5*( SIGMAd+1+SIGMAd )
@@ -205,11 +205,11 @@ C 	 (2)	Vd+1/2=0.5*( Vd + Vd+1 )
 C Note that V is in km/s and SIGMA=(dlnV/dlnR-1.0)
 C
 	  DO I=1,ND-1
-	    CON_GAMH(I)=2.0D0*3.33564D-06*(V(I)+V(I+1))/(R(I)+R(I+1))
-	    AV_SIGMA(I)=0.5D0*(SIGMA(I)+SIGMA(I+1))
-	    CON_GAM(I)=3.33564D-06*V(I)/R(I)
+	    CON_GAMH(I)=2.0_LDP*3.33564E-06_LDP*(V(I)+V(I+1))/(R(I)+R(I+1))
+	    AV_SIGMA(I)=0.5_LDP*(SIGMA(I)+SIGMA(I+1))
+	    CON_GAM(I)=3.33564E-06_LDP*V(I)/R(I)
 	  END DO
-	  CON_GAM(ND)=3.33564D-06*V(ND)/R(ND)
+	  CON_GAM(ND)=3.33564E-06_LDP*V(ND)/R(ND)
 	ELSE
 C
 C Since we are intgerating from blue to red, FL_PREV is always larger than
@@ -220,10 +220,10 @@ C useful as H can approach zero, and hence N/H is undefined.
 C
 	  DO I=1,ND-1
 	    GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
-	    W(I)=GAMH(I)*( 1.0D0+AV_SIGMA(I)*G(I) )
-	    WPREV(I)=GAMH(I)*( 1.0D0+AV_SIGMA(I)*G_PREV(I) )
-	    EPS(I)=GAMH(I)*AV_SIGMA(I)*RSQN_ON_RSQJ(I)/(1.0D0+W(I))
-	    EPS_PREV(I)=GAMH(I)*AV_SIGMA(I)*RSQN_ON_RSQJ_PREV(I)/(1.0D0+W(I))
+	    W(I)=GAMH(I)*( 1.0_LDP+AV_SIGMA(I)*G(I) )
+	    WPREV(I)=GAMH(I)*( 1.0_LDP+AV_SIGMA(I)*G_PREV(I) )
+	    EPS(I)=GAMH(I)*AV_SIGMA(I)*RSQN_ON_RSQJ(I)/(1.0_LDP+W(I))
+	    EPS_PREV(I)=GAMH(I)*AV_SIGMA(I)*RSQN_ON_RSQJ_PREV(I)/(1.0_LDP+W(I))
 	  END DO
 C
 	  DO I=1,ND
@@ -237,9 +237,9 @@ C
 	END IF
 C
 	DO I=2,ND
-	  DTAUONQ(I)=0.5D0*(DTAU(I)+DTAU(I-1))/Q(I)
-	  PSI(I)=DTAUONQ(I)*GAM(I)*( 1.0D0+SIGMA(I)*F(I) )
-	  PSIPREV(I)=DTAUONQ(I)*GAM(I)*(  1.0D0+SIGMA(I)*F_PREV(I) )
+	  DTAUONQ(I)=0.5_LDP*(DTAU(I)+DTAU(I-1))/Q(I)
+	  PSI(I)=DTAUONQ(I)*GAM(I)*( 1.0_LDP+SIGMA(I)*F(I) )
+	  PSIPREV(I)=DTAUONQ(I)*GAM(I)*(  1.0_LDP+SIGMA(I)*F_PREV(I) )
 	END DO
 C
 C NB: We are initiually computing  R^2 J. We need to multiply the
@@ -255,9 +255,9 @@ C
 C Compute vectors used to compute the flux vector H.
 C
 	DO I=1,ND-1
-	  HU(I)=F(I+1)*Q(I+1)/(1.0D0+W(I))/DTAU(I)
-	  HL(I)=F(I)*Q(I)/(1.0D0+W(I))/DTAU(I)
-	  HS(I)=WPREV(I)/(1.0D0+W(I))
+	  HU(I)=F(I+1)*Q(I+1)/(1.0_LDP+W(I))/DTAU(I)
+	  HL(I)=F(I)*Q(I)/(1.0_LDP+W(I))/DTAU(I)
+	  HS(I)=WPREV(I)/(1.0_LDP+W(I))
 	END DO
 C
 C Compute the TRIDIAGONAL operators, and the RHS source vector.
@@ -265,7 +265,7 @@ C
 	DO I=2,ND-1
 	  TA(I)=-HL(I-1)-EPS(I-1)
 	  TC(I)=-HU(I)+EPS(I)
-	  TB(I)=DTAUONQ(I)*(1.0D0-COH_VEC(I)) + PSI(I) + HL(I) + HU(I-1)
+	  TB(I)=DTAUONQ(I)*(1.0_LDP-COH_VEC(I)) + PSI(I) + HL(I) + HU(I-1)
 	1             -EPS(I-1)+EPS(I)
 	  VB(I)=-HS(I-1)
 	  VC(I)=HS(I)
@@ -276,23 +276,23 @@ C Evaluate TA,TB,TC for boudary conditions
 C
 	TC(1)=-F(2)*Q(2)/DTAU(1)
 	TB(1)=F(1)*Q(1)/DTAU(1) + PSI(1) + HBC
-	XM(1)=0.0D0
-	TA(1)=0.0D0
-	VB(1)=0.0D0
-	VC(1)=0.0D0
+	XM(1)=0.0_LDP
+	TA(1)=0.0_LDP
+	VB(1)=0.0_LDP
+	VC(1)=0.0_LDP
 C
 	TA(ND)=-F(ND-1)*Q(ND-1)/DTAU(ND-1)
 	IF(DIF)THEN
 	  TB(ND)=F(ND)/DTAU(ND-1)
-	  XM(ND)=DBB*R(ND)*R(ND)/3.0D0/CHI(ND)
+	  XM(ND)=DBB*R(ND)*R(ND)/3.0_LDP/CHI(ND)
 	ELSE
 	  TB(ND)=F(ND)/DTAU(ND-1)+IN_HBC
-	  XM(ND)=R(ND)*R(ND)*IC*(0.25D0+0.5D0*IN_HBC)
+	  XM(ND)=R(ND)*R(ND)*IC*(0.25_LDP+0.5_LDP*IN_HBC)
 	END IF
-	TC(ND)=0.0D0
-	VB(ND)=0.0D0
-	VC(ND)=0.0D0
-	PSIPREV(ND)=0.0D0
+	TC(ND)=0.0_LDP
+	VB(ND)=0.0_LDP
+	VC(ND)=0.0_LDP
+	PSIPREV(ND)=0.0_LDP
 C
 C Note that often EPS and EPS_PREV will be zero hence we could speed this
 C section up. However, MOM_J_XMF is much faster than FG_J_CMF anyway, hence
@@ -326,7 +326,7 @@ C
 !
 	DO I=1,ND
 	  IF(XM(I) .LT. 0)THEN
-	    XM(I)=ABS(XM(I))/10.0D0
+	    XM(I)=ABS(XM(I))/10.0_LDP
 	    RECORDED_ERROR=.FALSE.
 	    J=1
 	    DO WHILE (J .LE. MOM_ERR_CNT .AND. .NOT. RECORDED_ERROR)

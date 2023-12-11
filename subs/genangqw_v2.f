@@ -32,7 +32,7 @@ C
 C
 C Initialization section
 C
-	QW(:,:)=0.0D0
+	QW(:,:)=0.0_LDP
 	DO I=1,NP
 	  PSQ(I)=P(I)*P(I)
 	END DO
@@ -67,19 +67,19 @@ C
 	  NW=NC+MAXND-I+1
 	  IF(NW .GT. NP)NW=NP
 	  IF(AT_HALF)THEN
-	    T2=0.5D0*( R(I)+R(I+1) )
+	    T2=0.5_LDP*( R(I)+R(I+1) )
 	    T1=T2*T2
 	  ELSE
 	    T2=R(I)
 	    T1=T2*T2
 	  END IF
 	  DO J=1,NW
-	    MU(J)=0.0D0
+	    MU(J)=0.0_LDP
 	    IF(R(I) .NE. P(J))MU(J)=SQRT(T1-PSQ(J))/T2
 	  END DO
 	  CALL SET_ACC_dMU(MU,dMU,P,T2,NW)
 	  CALL MOMWEIGHT(MU,dMU,WEIGHT,NW)
-	  IF(MU(NW) .NE. 0.0D0)COUNTER=COUNTER+1
+	  IF(MU(NW) .NE. 0.0_LDP)COUNTER=COUNTER+1
 	  DO J=1,NW
 	    QW(I,J)=WEIGHT(J)
 	  END DO

@@ -112,8 +112,8 @@ C
 	  END IF
 C
 	  DO I=MS,MF
-	    NETRR(I)=0.0D0
-	    TOTRR(I)=0.0D0
+	    NETRR(I)=0.0_LDP
+	    TOTRR(I)=0.0_LDP
 	  END DO
 	  IF(MS .NE. 1)WRITE(LU,'(A)')FORMFEED
 	  WRITE(LU,'(/,3X,''Radius [1.0E+10cm] '')')

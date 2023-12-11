@@ -166,8 +166,8 @@
 ! We use arrays (even though of length 1) so that some F90 compilers
 ! don't give an error message because a scaler is passed a vector.
 !
-	  TMP_VEC_ED(1)=1.0D0		!Electron density
-	  TMP_VEC_COOL(1)=0.0D0		!Initialize cooling rate even
+	  TMP_VEC_ED(1)=1.0_LDP		!Electron density
+	  TMP_VEC_COOL(1)=0.0_LDP		!Initialize cooling rate even
 !                                                        though not used here.
           CALL TUNE(1,'SUBCOL')
 	  CALL SUBCOL_MULTI_V6(
@@ -189,7 +189,7 @@
 ! We use L  for the lower level (JL  refers to the same state in the full vector).
 ! We use UP for the upper level (JUP refers to the same state in the full vector).
 !
-	  T1=1.0D+15*PLANCKS_CONSTANT()*ED(I)              !1.0D+15 due to units of NU.
+	  T1=1.0E+15_LDP*PLANCKS_CONSTANT()*ED(I)              !1.0D+15 due to units of NU.
 	  DO L=1,N_S
 	    STEQ_T_EHB(I)=STEQ_T_EHB(I)+T1*CNM(L,L)*(HNST_S(L,I)-HN_S(L,I))*AVE_ENERGY(L)
 	    DO UP=L+1,N_S
@@ -222,8 +222,8 @@
 ! *********************** End Code for Electron Energy Balance **********************************
 !
 	  DO J=1,N_S			!Which S.E. equation
-	    T1=0.0D0
-	    T2=0.0D0
+	    T1=0.0_LDP
+	    T2=0.0_LDP
 	    DO L=1,N_S
 	      T1=T1+( HN_S(L,I)*CNM(L,J)-HN_S(J,I)*CNM(J,L) )
 	      T2=T2+( HN_S(L,I)*DCNM(L,J)-HN_S(J,I)*DCNM(J,L) )
@@ -235,7 +235,7 @@
 	    DO J=1,N_S			!Which S.E. equation
 	      DO K=1,N_S			!Which variable
 	        IF(K.EQ.J)THEN
-	          T1=0.0D0
+	          T1=0.0_LDP
 	          DO L=1,N_S
 		    T1=T1+CNM(J,L)
 	          END DO
@@ -245,8 +245,8 @@
 	        END IF
 	      END DO
 !
-	      T1=0.0D0
-	      T2=0.0D0
+	      T1=0.0_LDP
+	      T2=0.0_LDP
 	      DO L=1,N_S
 	        T1=T1+( HN_S(L,I)*CNM(L,J)-HN_S(J,I)*CNM(J,L) )
 	        T2=T2+( HN_S(L,I)*DCNM(L,J)-HN_S(J,I)*DCNM(J,L) )
@@ -262,8 +262,8 @@
 !
 ! EQION is the ion equation
 !
-	  T1=0.0D0
-	  T2=0.0D0
+	  T1=0.0_LDP
+	  T2=0.0_LDP
 	  DO J=1,N_S
 	    T1=T1+(HNST_S(J,I)-HN_S(J,I))*CNM(J,J)
 	    T2=T2+HNST_S(J,I)*CNM(J,J)
@@ -285,17 +285,17 @@
           IF(COMPUTE_BA)THEN
 	    DO J=1,N_S
               JJ=EQGS+J-1;
-	      BA_ED(JJ,M,I)=BA_ED(JJ,M,I)+(ZION-1.0D0)
-	      SE(ID)%BA(EQ_NUM_CONV,J,M,I)=SE(ID)%BA(EQ_NUM_CONV,J,M,I)+1.0D0
+	      BA_ED(JJ,M,I)=BA_ED(JJ,M,I)+(ZION-1.0_LDP)
+	      SE(ID)%BA(EQ_NUM_CONV,J,M,I)=SE(ID)%BA(EQ_NUM_CONV,J,M,I)+1.0_LDP
 	    END DO
 	  END IF
 !
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  DO L=1,N_S
 	    T1=T1+HN_S(L,I)
 	  END DO
 	  SE(ID)%STEQ(EQ_NUM_CONV,I)=SE(ID)%STEQ(EQ_NUM_CONV,I)+T1
-	  STEQ_ED(I)=STEQ_ED(I)+(ZION-1.0D0)*T1
+	  STEQ_ED(I)=STEQ_ED(I)+(ZION-1.0_LDP)*T1
 !
 ! We only include DI in the population and charge conservation equations
 ! if the higher ionization species is not present. Necessary to do this as
@@ -312,7 +312,7 @@
 	  END IF
 	  IF(COMPUTE_BA .AND. .NOT. NEXT_PRES)THEN
 	    JJ=EQ_NUM_CONV
-	    SE(ID)%BA(JJ,VION,M,I)=SE(ID)%BA(JJ,VION,M,I)+1.0D0
+	    SE(ID)%BA(JJ,VION,M,I)=SE(ID)%BA(JJ,VION,M,I)+1.0_LDP
 	    JJ=EQGS+N_S
 	    BA_ED(JJ,M,I)=BA_ED(JJ,M,I)+ZION
 	  END IF

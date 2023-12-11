@@ -31,7 +31,7 @@
 	REAL(KIND=LDP) SIGMA
 	LOGICAL NEW_FILE
 !
-	REAL(KIND=LDP), PARAMETER :: OPLIN=2.6540081D+08
+	REAL(KIND=LDP), PARAMETER :: OPLIN=2.6540081E+08_LDP
 !
 ! Internal variables.
 !
@@ -84,10 +84,10 @@
 	WRITE(C2,'(I3)')2*LMAX+6;   C2=ADJUSTL(C2)
 	OUT_FORM='(1X,A,T'//TRIM(C1)//',A,T'//TRIM(C2)//',2I5,2ES14.4)'
 	HEAD_FORM='(1X,A,T'//TRIM(C1)//',A,T'//TRIM(C2)//',2A,7X,A,6X,A)'
-	COOLING_CONSTANT=6.6261965D-12
+	COOLING_CONSTANT=6.6261965E-12_LDP
 !
-	COOL=0.0D0
-	NET=0.0D0
+	COOL=0.0_LDP
+	NET=0.0_LDP
 !
 ! Determine net number of collisional transitions into each level.
 !
@@ -102,7 +102,7 @@
 !
 ! Compute collisional cooling assuming ionization cooling is unimportant.
 !
-	T1=0.0D0
+	T1=0.0_LDP
 	DO LEVEL=1,N
 	  DO NL=1,N
 	    T1 = T1 + (EDGE(NL)-EDGE(LEVEL))*OMEGA(NL,LEVEL)*XzV(NL)
@@ -118,28 +118,28 @@
 ! Compute the fraction that decay to each lower level. To do this will first
 ! need to compute the total number of decays.
 !
-	  TOTAL=0.0D0
-	  FRACTION=0.0D0
+	  TOTAL=0.0_LDP
+	  FRACTION=0.0_LDP
 	  DO NL=1,NUP-1
 	    FREQ=EDGE(NL)-EDGE(NUP)
-	    IF(FREQ .NE. 0.0D0 .AND. AXzV(NL,NUP) .NE. 0.0D0)THEN
+	    IF(FREQ .NE. 0.0_LDP .AND. AXzV(NL,NUP) .NE. 0.0_LDP)THEN
               T1=W_XzV(NUP)/W_XzV(NL)
               GLDGU=GXzV(NL)/GXzV(NUP)
               CHIL=OPLIN*AXzV(NL,NUP)*(T1*XzV(NL)-GLDGU*XzV(NUP))
-	      TAUL=CHIL*R*2.998D-10/FREQ/V
-	      ESCAPE_PROB=(1.0D0-EXP(-TAUL))/TAUL
+	      TAUL=CHIL*R*2.998E-10_LDP/FREQ/V
+	      ESCAPE_PROB=(1.0_LDP-EXP(-TAUL))/TAUL
 	      FRACTION(NL)=AXzV(NUP,NL)*ESCAPE_PROB
 	      TOTAL=TOTAL+FRACTION(NL)
 	    END IF
 	  END DO
-	  IF(TOTAL .EQ. 0.0D0)TOTAL=1.0D0
+	  IF(TOTAL .EQ. 0.0_LDP)TOTAL=1.0_LDP
 	  FRACTION=FRACTION/TOTAL
 !
 ! Work out cascades.
 !
 	  DO NL=1,NUP-1
 	    FREQ=EDGE(NL)-EDGE(NUP)
-	    IF(FREQ .NE. 0.0D0 .AND. AXzV(NL,NUP) .NE. 0.0D0)THEN
+	    IF(FREQ .NE. 0.0_LDP .AND. AXzV(NL,NUP) .NE. 0.0_LDP)THEN
 	      NET(NL)=NET(NL)+NET(NUP)*FRACTION(NL)
 	    END IF
 	  END DO
@@ -148,14 +148,14 @@
 !
 	  DO NL=1,NUP-1
 	    FREQ=EDGE(NL)-EDGE(NUP)
-	    IF(FREQ .NE. 0.0D0 .AND. AXzV(NL,NUP) .NE. 0.0D0)THEN
+	    IF(FREQ .NE. 0.0_LDP .AND. AXzV(NL,NUP) .NE. 0.0_LDP)THEN
 	      COOL(NUP,NL)=FRACTION(NL)*(EDGE(NL)-EDGE(NUP))*COOLING_CONSTANT*NET(NUP)
 	    END IF
 	  END DO
 !
 	END DO
 !
-	T1=0.0D0
+	T1=0.0_LDP
 	DO I=1,N
 	  T1=T1+COOLING_CONSTANT*EDGE(NL)*(XzV(NL)-XzVLTE(NL))*OMEGA(NL,NL)
 	END DO
@@ -182,8 +182,8 @@
 	  NL=LOCATION(2); NUP=LOCATION(1)
 	  WRITE(LU,OUT_FORM)TRIM(LEV_NAME(NUP)),TRIM(LEV_NAME(NL)),NUP,NL,
 	1                      COOL(NUP,NL),COOL(NUP,NL)/TOTAL_COOLING
-	  IF(COOL(NUP,NL)/TOTAL_COOLING .LT. 0.01D0)EXIT
-	  COOL(NUP,NL)=0.0D0			!or use MASK option.
+	  IF(COOL(NUP,NL)/TOTAL_COOLING .LT. 0.01_LDP)EXIT
+	  COOL(NUP,NL)=0.0_LDP			!or use MASK option.
 	END DO
 !
 	RETURN

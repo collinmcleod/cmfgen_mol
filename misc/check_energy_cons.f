@@ -88,11 +88,11 @@
 	LOGICAL, PARAMETER :: L_FALSE=.FALSE.
 	LOGICAL, PARAMETER :: L_TRUE=.TRUE.
 !
-	SN_AGE=0.0D0
-	VINF=0.0D0
+	SN_AGE=0.0_LDP
+	VINF=0.0_LDP
 	ND=0
-	C_MMS=1.0D-08*SPEED_OF_LIGHT()
-	PI=4.0D0*ATAN(1.0D0)
+	C_MMS=1.0E-08_LDP*SPEED_OF_LIGHT()
+	PI=4.0_LDP*ATAN(1.0_LDP)
 !
 	FILE_NAME='DIRECTORIES'
 	WRITE(6,*)' '
@@ -152,7 +152,7 @@
 	  DONL_DECAY_LUM=.FALSE.
 	  DONL_DR4J_LUM=.FALSE.
 	  DONL_INTERN_LUM=.FALSE.
-          LUM_CONV_FACTOR=16*ATAN(1.0D0)*1.0D+15*1.0D-23*((3.0856D+21)**2)/3.826D+33
+          LUM_CONV_FACTOR=16*ATAN(1.0_LDP)*1.0E+15_LDP*1.0E-23_LDP*((3.0856E+21_LDP)**2)/3.826E+33_LDP
 !
 	  FILE_NAME=TRIM(DIR_NAME(I))//'OBSFLUX'
 	  OPEN(UNIT=LUIN,FILE=FILE_NAME,STATUS='OLD',ACTION='READ')
@@ -162,10 +162,10 @@
 	      K=INDEX(STRING,'(')+1
 	      IF(K .EQ. 1)THEN
 	        WRITE(6,*)'Assuming maximum number of frequenices is ',NCF_MAX
-	        ALLOCATE(OBS_FREQ(NCF_MAX)); OBS_FREQ=0.0D0
+	        ALLOCATE(OBS_FREQ(NCF_MAX)); OBS_FREQ=0.0_LDP
 	        READ(LUIN,*,ERR=50)(OBS_FREQ(J),J=1,NCF_MAX)
 50	        NCF=NCF_MAX
-	        DO WHILE(OBS_FREQ(NCF) .EQ. 0.0D0)
+	        DO WHILE(OBS_FREQ(NCF) .EQ. 0.0_LDP)
 	          NCF=NCF-1
 	        END DO
 	        BACKSPACE(LUIN)		!as may have read in obs. intensity record.
@@ -178,11 +178,11 @@
 	    END IF
 	    IF(INDEX(STRING,'Observed intensity') .NE. 0 .AND. .NOT. DONL_CMF_LUM)THEN
 	      READ(LUIN,*)OBS_FLUX(1:NCF)
-              L_OBS(I)=0.0D0
+              L_OBS(I)=0.0_LDP
               DO K=2,NCF
                  L_OBS(I)=L_OBS(I)+(OBS_FREQ(K-1)-OBS_FREQ(K))*(OBS_FLUX(K)+OBS_FLUX(K+1))
               END DO
-              L_OBS(I)=LUM_CONV_FACTOR*L_OBS(I)*0.5D0
+              L_OBS(I)=LUM_CONV_FACTOR*L_OBS(I)*0.5_LDP
 	      DEALLOCATE(OBS_FREQ,OBS_FLUX)
 	    END IF
 	    IF(INDEX(STRING,'Luminosity') .NE. 0 .AND. .NOT. DONL_CMF_LUM)THEN
@@ -253,7 +253,7 @@
 ! Compare R in RVTJ with that in the JH file.
 !
 	  DO J=1,ND
-	    IF( ABS(1.0D0-R_RVTJ(J)/R(J)) .GT. 1.0D-07)THEN
+	    IF( ABS(1.0_LDP-R_RVTJ(J)/R(J)) .GT. 1.0E-07_LDP)THEN
 	      WRITE(6,*)'Error R grid does not match'
 	      WRITE(6,*)R(J)
 	      WRITE(6,*)R_RVTJ(J)
@@ -262,7 +262,7 @@
 	    END IF
 	  END DO
 !
-	  YV=0.0D0
+	  YV=0.0_LDP
           DO ML=1,NCF-1
             DO J=1,ND
               YV(J)=YV(J)+(NU(ML)-NU(ML+1))*(RJ(J,ML)+RJ(J,ML+1))
@@ -274,7 +274,7 @@
 	  K=LEN_TRIM(DIR_NAME(I)); J=MAX(1,K-15)
 	  WRITE(6,'(1X,A,T21,A,F9.4,3X,A,I4)')DIR_NAME(I)(J:K),'AGE(d)=',SN_AGE(I),'ND=',ND            !YV(1),YV(ND)
 	  CALL LUM_FROM_ETA(YV,R,ND)
-	  E_RAD(I)=2.0D0*PI*4.0D+37*PI*SUM(YV(1:ND))/C_MMS
+	  E_RAD(I)=2.0_LDP*PI*4.0E+37_LDP*PI*SUM(YV(1:ND))/C_MMS
 !
 	  WRITE(LUOUT,'(F10.4,7ES14.4,4X,A)')SN_AGE(I),L_OBS(I),L_CMF(I),L_MECH(I),L_DR4J(I),
 	1               L_INTERN(I),L_DECAY(I),E_RAD(I),DIR_NAME(I)(MAX(1,K-10):K)
@@ -285,8 +285,8 @@
 	WRITE(6,*)'Output is to TIME_INTEGRATED_ENERGY_CHK'
 	WRITE(6,'(A)')DEF_PEN
 !
-	SN_AGE(1:NMOD)=SN_AGE(1:NMOD)*24.0D0*3600.0D0
-	T1=0.0D0; T2=0.0D0; T3=0.0D0
+	SN_AGE(1:NMOD)=SN_AGE(1:NMOD)*24.0_LDP*3600.0_LDP
+	T1=0.0_LDP; T2=0.0_LDP; T3=0.0_LDP
 	WRITE(LUOUT,*)' '
 	WRITE(LUOUT,*)' '
 	WRITE(LUOUT,*)' The 6th and 7th (i.e., second last) columns should be identical'
@@ -298,13 +298,13 @@
 	1              'Int(L-Q+I)t+t.E','t(1).E(1)','% Change', ' % Error',' % E'
 	E_CONS(1)=SN_AGE(1)*E_RAD(1)
 	DO I=2,NMOD
-	   T1=T1+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_CMF(I)+SN_AGE(I-1)*L_CMF(I-1))*0.5D0*3.826D+33
-	   T2=T2+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_DECAY(I)+SN_AGE(I-1)*L_DECAY(I-1))*0.5D0*3.826D+33
-	   T3=T3+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_INTERN(I)+SN_AGE(I-1)*L_INTERN(I-1))*0.5D0*3.826D+33
+	   T1=T1+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_CMF(I)+SN_AGE(I-1)*L_CMF(I-1))*0.5_LDP*3.826E+33_LDP
+	   T2=T2+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_DECAY(I)+SN_AGE(I-1)*L_DECAY(I-1))*0.5_LDP*3.826E+33_LDP
+	   T3=T3+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_INTERN(I)+SN_AGE(I-1)*L_INTERN(I-1))*0.5_LDP*3.826E+33_LDP
 	   E_CONS(I)=T1-T2+T3+SN_AGE(I)*E_RAD(I)
-	   T5=100.0D0*(E_CONS(I)-SN_AGE(1)*E_RAD(1))
+	   T5=100.0_LDP*(E_CONS(I)-SN_AGE(1)*E_RAD(1))
 	   T4=T5/SN_AGE(1)/E_RAD(1)
-	   T5=2.0D0*T5/(ABS(T1)+ABS(T2)+ABS(T3)+SN_AGE(I)*E_RAD(I)+SN_AGE(1)*E_RAD(1))
+	   T5=2.0_LDP*T5/(ABS(T1)+ABS(T2)+ABS(T3)+SN_AGE(I)*E_RAD(I)+SN_AGE(1)*E_RAD(1))
 	   K=LEN_TRIM(DIR_NAME(I)); J=MAX(1,K-15)
 	   WRITE(LUOUT,'(F10.4,4ES14.4,ES16.4,ES14.4,3ES12.2,3X,A)')SN_AGE(I)/24.0D0/3600.0D0,
 	1              T1,T2,T3,SN_AGE(I)*E_RAD(I),
@@ -315,7 +315,7 @@
 !
 ! Same quantities as above, but a different grouping.
 !
-	T1=0.0D0; T2=0.0D0; T3=0.0D0
+	T1=0.0_LDP; T2=0.0_LDP; T3=0.0_LDP
 	WRITE(LUOUT,*)' '
 	WRITE(LUOUT,*)' '
 	WRITE(LUOUT,*)' The last two columns should be compared.'
@@ -325,9 +325,9 @@
 	1              '  Int(tL)+t.E','Int(Q-I)t'
 	E_CONS(1)=SN_AGE(1)*E_RAD(1)
 	DO I=2,NMOD
-	   T1=T1+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_CMF(I)+SN_AGE(I-1)*L_CMF(I-1))*0.5D0*3.826D+33
-	   T2=T2+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_DECAY(I)+SN_AGE(I-1)*L_DECAY(I-1))*0.5D0*3.826D+33
-	   T3=T3+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_INTERN(I)+SN_AGE(I-1)*L_INTERN(I-1))*0.5D0*3.826D+33
+	   T1=T1+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_CMF(I)+SN_AGE(I-1)*L_CMF(I-1))*0.5_LDP*3.826E+33_LDP
+	   T2=T2+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_DECAY(I)+SN_AGE(I-1)*L_DECAY(I-1))*0.5_LDP*3.826E+33_LDP
+	   T3=T3+(SN_AGE(I)-SN_AGE(I-1))*(SN_AGE(I)*L_INTERN(I)+SN_AGE(I-1)*L_INTERN(I-1))*0.5_LDP*3.826E+33_LDP
 	   E_CONS(I)=T1+SN_AGE(I)*E_RAD(I)
 	   WRITE(LUOUT,'(F10.4,6ES13.4)')SN_AGE(I)/24.0D0/3600.0D0,
 	1              T1,T2,T3,SN_AGE(I)*E_RAD(I),
@@ -338,7 +338,7 @@
 ! This gives an alterative energy constraint that is useful for checking the modeling, but is less
 ! useful observationlly.
 !
-	T1=0.0D0; T2=0.0D0; T3=0.0D0
+	T1=0.0_LDP; T2=0.0_LDP; T3=0.0_LDP
 	WRITE(LUOUT,*)' '
 	WRITE(LUOUT,*)' '
 	WRITE(LUOUT,*)' The last columns should be compared.'
@@ -348,12 +348,12 @@
 	WRITE(LUOUT,'(4X,A,5(4X,A),2X,A,2X,A,X,A,5X,A)')
 	1              'AGE(d)','Int(L.dt)','Int(Q.dt)','Int(I.dt)','E(rad)(1)',
 	1              'E(rad)(I)','Int(E/t.dt)','Q-I-S+E1-EI','Int(L.dt)+EI','Q-I+S+EI'
-	E_CONS(1)=0.0D0
+	E_CONS(1)=0.0_LDP
 	DO I=2,NMOD
-	   T1=T1+(SN_AGE(I)-SN_AGE(I-1))*(L_CMF(I)+L_CMF(I-1))*0.5D0*3.826D+33
-	   T2=T2+(SN_AGE(I)-SN_AGE(I-1))*(L_DECAY(I)+L_DECAY(I-1))*0.5D0*3.826D+33
-	   T3=T3+(SN_AGE(I)-SN_AGE(I-1))*(L_INTERN(I)+L_INTERN(I-1))*0.5D0*3.826D+33
-	   E_CONS(I)=E_CONS(I-1)+(SN_AGE(I)-SN_AGE(I-1))*(E_RAD(I)/SN_AGE(I)+E_RAD(I-1)/SN_AGE(I-1))*0.5D0
+	   T1=T1+(SN_AGE(I)-SN_AGE(I-1))*(L_CMF(I)+L_CMF(I-1))*0.5_LDP*3.826E+33_LDP
+	   T2=T2+(SN_AGE(I)-SN_AGE(I-1))*(L_DECAY(I)+L_DECAY(I-1))*0.5_LDP*3.826E+33_LDP
+	   T3=T3+(SN_AGE(I)-SN_AGE(I-1))*(L_INTERN(I)+L_INTERN(I-1))*0.5_LDP*3.826E+33_LDP
+	   E_CONS(I)=E_CONS(I-1)+(SN_AGE(I)-SN_AGE(I-1))*(E_RAD(I)/SN_AGE(I)+E_RAD(I-1)/SN_AGE(I-1))*0.5_LDP
 	   WRITE(LUOUT,'(F10.4,9ES13.4)')SN_AGE(I)/24.0D0/3600.0D0,
 	1              T1,T2,T3,E_RAD(1),E_RAD(I),
 	1              E_CONS(I),T2-T3+(E_RAD(1)-E_RAD(I)-E_CONS(I)),

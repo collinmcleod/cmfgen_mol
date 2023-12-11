@@ -57,8 +57,8 @@
 	    END DO
 	    IF(INDEX(STRING,'Energy grids') .NE. 0)THEN
 	      READ(LU,*)(LOC_XKT(I),I=1,NKT)
-	      LOC_XKT=ABS(1.0D0-LOC_XKT/XKT)
-	      IF(MAXVAL(LOC_XKT) .GT. 1.0D-07)THEN
+	      LOC_XKT=ABS(1.0_LDP-LOC_XKT/XKT)
+	      IF(MAXVAL(LOC_XKT) .GT. 1.0E-07_LDP)THEN
 	        WRITE(6,*)'Error with XKT -- inconsistent energy grid'
 	        WRITE(6,*)'Maximum fractional difference is',MAXVAL(LOC_XKT)
 	        STOP

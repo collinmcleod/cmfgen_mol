@@ -199,8 +199,8 @@
 	  ALLOCATE ( ESEC(ND) )
 	  ALLOCATE ( CHI(ND) )
 !
-	  ALLOCATE ( JNU(ND) )             ; JNU(1:ND)=0.0D0
-	  ALLOCATE ( HNU(ND) )             ; HNU(1:ND)=0.0D0
+	  ALLOCATE ( JNU(ND) )             ; JNU(1:ND)=0.0_LDP
+	  ALLOCATE ( HNU(ND) )             ; HNU(1:ND)=0.0_LDP
 	  ALLOCATE ( F(ND) )
 !
 	  ALLOCATE ( DTAU(ND) )
@@ -258,7 +258,7 @@
 	  H_INDX(1:ND_SM)=0
 	  K=1
 	  DO I=1,ND_SM-1
-	    T1=0.5D0*(R_SM(I)+R_SM(I+1))
+	    T1=0.5_LDP*(R_SM(I)+R_SM(I+1))
 	    DO WHILE(H_INDX(I) .EQ. 0)
 	      IF(T1 .LT. R(K) .AND. T1 .GT. R(K+1))THEN
 	        H_INDX(I)=K
@@ -305,7 +305,7 @@
 !
 	IF(INIT)THEN
 	  DO I=1,N_ERR_MAX
-	    MOM_ERR_ON_FREQ(I)=0.0D0
+	    MOM_ERR_ON_FREQ(I)=0.0_LDP
 	  END DO
 	  MOM_ERR_CNT=0
 	END IF
@@ -319,7 +319,7 @@
 	  END DO
 	ELSE
 	  DO I=1,ND
-	    COH_VEC(I)=0.0D0
+	    COH_VEC(I)=0.0_LDP
 	  END DO
 	END IF
 !
@@ -331,7 +331,7 @@
 	CALL NORDTAU(DTAU,CHI,R,R,DD,ND)
 !
 	DO I=2,ND
-	  MID_DTAU(I)=0.5D0*(DTAU(I)+DTAU(I-1))
+	  MID_DTAU(I)=0.5_LDP*(DTAU(I)+DTAU(I-1))
 	END DO
 !
 ! Compute vectors used to compute the flux vector H.
@@ -346,7 +346,7 @@
 	DO I=2,ND-1
 	  TA(I)=-F(I-1)/DTAU(I-1)
 	  TC(I)=-F(I+1)/DTAU(I)
-	  DD(I)=-MID_DTAU(I)*(1.0D0-COH_VEC(I)) - (F(I)-F(I-1))/DTAU(I-1) -
+	  DD(I)=-MID_DTAU(I)*(1.0_LDP-COH_VEC(I)) - (F(I)-F(I-1))/DTAU(I-1) -
 	1                                        (F(I)-F(I+1))/DTAU(I)
 	  XM(I)=MID_DTAU(I)*SOURCE(I)
 	END DO
@@ -354,20 +354,20 @@
 ! Second order boundary conditions.
 !
 	TC(1)=-F(2)/DTAU(1)
-	DD(1)=(F(2)-F(1))/DTAU(1) -0.5D0*DTAU(1)*(1.0D0-COH_VEC(1)) -
+	DD(1)=(F(2)-F(1))/DTAU(1) -0.5_LDP*DTAU(1)*(1.0_LDP-COH_VEC(1)) -
 	1           HBC_J + HBC_S*COH_VEC(1)
-	XM(1)=0.5D0*DTAU(1)*SOURCE(1)+HBC_S*SOURCE(1)
-	TA(1)=0.0D0
+	XM(1)=0.5_LDP*DTAU(1)*SOURCE(1)+HBC_S*SOURCE(1)
+	TA(1)=0.0_LDP
 !
 	TA(ND)=-F(ND-1)/DTAU(ND-1)
 	IF(DIF)THEN
-	  DD(ND)=-(F(ND)-F(ND-1))/DTAU(ND-1)-0.5D0*DTAU(ND-1)*(1.0D0-COH_VEC(ND))
-	  XM(ND)=DBB/3.0D0/CHI(ND)+0.5D0*DTAU(ND-1)*SOURCE(ND)
+	  DD(ND)=-(F(ND)-F(ND-1))/DTAU(ND-1)-0.5_LDP*DTAU(ND-1)*(1.0_LDP-COH_VEC(ND))
+	  XM(ND)=DBB/3.0_LDP/CHI(ND)+0.5_LDP*DTAU(ND-1)*SOURCE(ND)
 	ELSE
-	  DD(ND)=-(F(ND)-F(ND-1))/DTAU(ND-1)-0.5D0*DTAU(ND-1)*(1.0D0-COH_VEC(ND))-IN_HBC
-	  XM(ND)=IC*(0.25D0+0.5D0*IN_HBC)+0.5D0*DTAU(ND-1)*SOURCE(ND)
+	  DD(ND)=-(F(ND)-F(ND-1))/DTAU(ND-1)-0.5_LDP*DTAU(ND-1)*(1.0_LDP-COH_VEC(ND))-IN_HBC
+	  XM(ND)=IC*(0.25_LDP+0.5_LDP*IN_HBC)+0.5_LDP*DTAU(ND-1)*SOURCE(ND)
 	END IF
-	TC(ND)=0.0D0
+	TC(ND)=0.0_LDP
 !
 ! Solve for the radiation field along ray for this frequency.
 !
@@ -387,7 +387,7 @@
 !
 	DO I=1,ND
 	  IF(XM(I) .LT. 0)THEN
-	    XM(I)=ABS(XM(I))/10.0D0
+	    XM(I)=ABS(XM(I))/10.0_LDP
 	    RECORDED_ERROR=.FALSE.
 	    J=1
 	    DO WHILE (J .LE. MOM_ERR_CNT .AND. .NOT. RECORDED_ERROR)

@@ -26,7 +26,7 @@
 !
 ! Get maximum number of frequencies required by any intrinsic line profile.
 !
-	NFREQ_MAX=0.0D0
+	NFREQ_MAX=0.0_LDP
 	DO NL=1,NLINES
 	  IF(PROF_TYPE(NL)(1:3) .NE. 'DOP' .AND. PROF_TYPE(NL) .NE. 'VOIGT')
 	1      NFREQ_MAX=MAX(NFREQ_MAX,LINE_END_INDX_IN_NU(NL)-LINE_ST_INDX_IN_NU(NL)+1)

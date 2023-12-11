@@ -130,9 +130,9 @@
 	      ELSE IF(TYPE_CHG(J) .EQ. 2)THEN
 	         T1=COEF_CHG(J,3)*EXP(COEF_CHG(J,4)*TVAL)
 	         ALPHA_REC=COEF_CHG(J,1)*(TVAL**COEF_CHG(J,2))*
-	1             (1.0D0+T1)
+	1             (1.0_LDP+T1)
 	         dlnALPHA_RECdlnT=COEF_CHG(J,2) +
-	1              COEF_CHG(J,4)*T1*TVAL/(1.0D0+T1)
+	1              COEF_CHG(J,4)*T1*TVAL/(1.0_LDP+T1)
 	      ELSE IF(TYPE_CHG(J) .EQ. 3)THEN
 	         T1=EXP(COEF_CHG(J,3)*TVAL)
                  ALPHA_REC=COEF_CHG(J,1)*(TVAL**COEF_CHG(J,2))*T1
@@ -144,8 +144,8 @@
 		WRITE(LU_ER,*)'Type of charge reaction=',TYPE_CHG(J)
 	        STOP
 	      END IF
-	      IF(TVAL .GT. THI_CHG(J))dlnALPHA_RECdlnT=0.0D0
-	      IF(TVAL .LT. TLO_CHG(J))dlnALPHA_RECdlnT=0.0D0
+	      IF(TVAL .GT. THI_CHG(J))dlnALPHA_RECdlnT=0.0_LDP
+	      IF(TVAL .LT. TLO_CHG(J))dlnALPHA_RECdlnT=0.0_LDP
 !
 	      ALPHA_ION=ALPHA_REC*AI_AR_CHG(J,L)
 	      dlnALPHA_IONdlnT=dlnALPHA_RECdlnT+dlnAI_AR_CHG_dlnT(J,L)

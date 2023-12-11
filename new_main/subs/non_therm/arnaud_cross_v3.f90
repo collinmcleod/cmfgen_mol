@@ -28,21 +28,21 @@
 	DO IT=1,NUM_THD
 	  IF(THD(IT)%PRES)THEN
 	    NEGATIVE_CROSS_SEC=.FALSE.
-	    THD(IT)%CROSS_SEC=0.0D0
+	    THD(IT)%CROSS_SEC=0.0_LDP
 	    ID=THD(IT)%LNK_TO_ION
 !
 	    IF(THD(IT)%NTAB .EQ. 0)THEN
 	      DO IKT=1,NKT
 	        U1 = XKT(IKT) / THD(IT)%ION_POT
-	        IF (U1 .GT. 1.0D0) THEN
-	          T1=(1.0D0-1.0D0/U1)
+	        IF (U1 .GT. 1.0_LDP) THEN
+	          T1=(1.0_LDP-1.0_LDP/U1)
 	          T2=LOG(U1)
-	          T3 = 1.0D-14 * ( THD(IT)%A_COL*T1 + THD(IT)%B_COL*T1*T1 + &
+	          T3 = 1.0E-14_LDP * ( THD(IT)%A_COL*T1 + THD(IT)%B_COL*T1*T1 + &
 	              THD(IT)%C_COL*T2 + THD(IT)%D_COL*T2/U1  ) / U1 / THD(IT)%ION_POT**2
-	          IF(T3 .GE. 0.0D0)THEN
+	          IF(T3 .GE. 0.0_LDP)THEN
 	            THD(IT)%CROSS_SEC(IKT)=T3
 	          ELSE
-	            THD(IT)%CROSS_SEC(IKT)=0.0D0
+	            THD(IT)%CROSS_SEC(IKT)=0.0_LDP
 	            NEGATIVE_CROSS_SEC=.TRUE.
 	          END IF
 	        END IF
@@ -69,7 +69,7 @@
 	          J=J+1
 	        END DO
 	        T1=LOG(XKT(IKT)/THD(IT)%XTAB(J))/LOG(THD(IT)%XTAB(J+1)/THD(IT)%XTAB(J))
-	        THD(IT)%CROSS_SEC(IKT)=EXP( T1*LOG(THD(IT)%YTAB(J+1)) + (1.0D0-T1)*LOG(THD(IT)%YTAB(J)) )
+	        THD(IT)%CROSS_SEC(IKT)=EXP( T1*LOG(THD(IT)%YTAB(J+1)) + (1.0_LDP-T1)*LOG(THD(IT)%YTAB(J)) )
 	      END DO
 	      I=THD(IT)%NTAB
 	      T1=LOG(THD(IT)%YTAB(I)/THD(IT)%YTAB(I-1))/LOG(THD(IT)%XTAB(I)/THD(IT)%XTAB(I-1))

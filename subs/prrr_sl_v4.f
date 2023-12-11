@@ -68,16 +68,16 @@ C
 C 4PI*1.0E-10 (R scaling) Note that ordering is important or get underflow.
 C FQW is approximately 10^15.
 C
-	H=6.6261965D-12					!ergs/s (*1.0E+15 due to *nu)
+	H=6.6261965E-12_LDP					!ergs/s (*1.0E+15 due to *nu)
 C
 C If ML=1 and and PHOT_ID .EQ. 1 then initialize all arrays. This routine
 C should be called first for ionizations to the ground state.
 C
 	IF(INIT_ARRAYS .AND. PHOT_ID .EQ. 1)THEN
-	  PR(:,:)=0.0D0				!NLEV,ND
-	  RR(:,:)=0.0D0				!NLEV,ND
-	  BFCR(:,:)=0.0D0			!NLEV,ND
-	  FF(:)=0.0D0				!ND
+	  PR(:,:)=0.0_LDP				!NLEV,ND
+	  RR(:,:)=0.0_LDP				!NLEV,ND
+	  BFCR(:,:)=0.0_LDP			!NLEV,ND
+	  FF(:)=0.0_LDP				!ND
 	END IF
 C
 C Note that JREC     = Int [ (2hv^3/c^2 +J) exp(-hv/kT)/v dv ]
@@ -105,11 +105,11 @@ C
 C Now compute Free-Free cooling.
 C Compute free-free gaunt factors. Replaces call to GFF in following DO loop.
 C
-	T2=1.256637E-09*ZHYD*ZHYD*CHIFF/(NU_CONT**3)
+	T2=1.256637E-09_LDP*ZHYD*ZHYD*CHIFF/(NU_CONT**3)
 	CALL GFF_VEC(GFF_VAL,NU_CONT,T,ZHYD,ND)
 	DO J=1,ND
 	  A1=EXP(-HDKT*NU_CONT/T(J))
-	  FF(J) =FF(J)+T2*ED(J)*DI(ION_LEV,J)/SQRT(T(J))*(1.0D0-A1)
+	  FF(J) =FF(J)+T2*ED(J)*DI(ION_LEV,J)/SQRT(T(J))*(1.0_LDP-A1)
 	1       *GFF_VAL(J)*( BPHOT_CR(J)-JPHOT_CR(J) )
 	END DO
 C

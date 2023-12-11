@@ -40,7 +40,7 @@ C
 	    STOP
 	  END IF
 	  T1=ABS(U(2)-U(1))
-	  W(1)=0.5D0*T1
+	  W(1)=0.5_LDP*T1
 	  W(N)=W(1)
 	  DO I=2,N-1
 	    W(I)=T1
@@ -55,10 +55,10 @@ C
 	    STOP
 	  END IF
 	  DO I=2,N-1
-	     W(I)=ABS(U(I+1)-U(I-1))*0.5D0
+	     W(I)=ABS(U(I+1)-U(I-1))*0.5_LDP
 	  END DO
-	  W(1)=ABS(U(2)-U(1))*0.5D0
-	  W(N)=ABS(U(N)-U(N-1))*0.5D0
+	  W(1)=ABS(U(2)-U(1))*0.5_LDP
+	  W(N)=ABS(U(N)-U(N-1))*0.5_LDP
 	RETURN
 C
 C
@@ -68,18 +68,18 @@ C
 	    WRITE(LUER,*)'Error in SIMPEQ: N < 3'
 	    STOP
 	  END IF
-	  T1=ABS(U(2)-U(1))/3.0D0
-	  T2=4.0D0*T1
-	  W(:)=0.0D0
+	  T1=ABS(U(2)-U(1))/3.0_LDP
+	  T2=4.0_LDP*T1
+	  W(:)=0.0_LDP
 	  DO I=1,N-2,2
 	    W(I)=W(I)+T1
 	    W(I+1)=T2
 	    W(I+2)=W(I+2)+T1
 	  END DO
 	  IF( (N/2)*2 .EQ. N)THEN
-	    W(N)=1.25D0*T1
-	    W(N-1)=W(N-1)+2.0D0*T1
-	    W(N-2)=W(N-2)-0.25D0*T1
+	    W(N)=1.25_LDP*T1
+	    W(N-1)=W(N-1)+2.0_LDP*T1
+	    W(N-2)=W(N-2)-0.25_LDP*T1
 	  END IF
 	RETURN
 C
@@ -89,17 +89,17 @@ C
 	    WRITE(LUER,*)'Error in SIMPUNEQ: N < 3'
 	    STOP
 	  END IF
-	  W(:)=0.0D0
+	  W(:)=0.0_LDP
 	  DO I=1,N-2,2
 	    T1=ABS(U(I+1)-U(I))
 	    T2=ABS(U(I+2)-U(I+1))
 	    TT=T1+T2
-	    W(I)=W(I)+(2.0D0*T1-T2)*TT/(6.0D0*T1)
-	    W(I+1)=TT*TT*TT/(6.0D0*T1*T2)
-	    W(I+2)=(2.0D0*T2-T1)*TT/(6.0D0*T2)
+	    W(I)=W(I)+(2.0_LDP*T1-T2)*TT/(6.0_LDP*T1)
+	    W(I+1)=TT*TT*TT/(6.0_LDP*T1*T2)
+	    W(I+2)=(2.0_LDP*T2-T1)*TT/(6.0_LDP*T2)
 	  END DO
 	  IF(N/2*2 .EQ. N)THEN
-	    W(N)=ABS(U(N)-U(N-1))*0.5D0
+	    W(N)=ABS(U(N)-U(N-1))*0.5_LDP
 	    W(N-1)=W(N-1)+W(N)
 	  END IF
 	RETURN
@@ -114,19 +114,19 @@ C
 	    WRITE(LUER,*)'Error in SIMTRP: N < 4'
 	    STOP
 	  END IF
-	  W(:)=0.0D0
+	  W(:)=0.0_LDP
 	  I=N
 	  DO WHILE (I .GE. 2)
 	    T1=ABS(U(I-1)-U(I))
-	    IF(I .NE. 2)T2=ABS(ABS(U(I-2)-U(I-1))/T1-1.0D0)
-	    IF(T2 .LT. 1.0D-06 .AND. I .NE. 2)THEN
-	      W(I)=W(I)+T1/3.0D0
-	      W(I-1)=W(I-1)+4.0D0*T1/3.0D0
-	      W(I-2)=W(I-2)+T1/3.0D0
+	    IF(I .NE. 2)T2=ABS(ABS(U(I-2)-U(I-1))/T1-1.0_LDP)
+	    IF(T2 .LT. 1.0E-06_LDP .AND. I .NE. 2)THEN
+	      W(I)=W(I)+T1/3.0_LDP
+	      W(I-1)=W(I-1)+4.0_LDP*T1/3.0_LDP
+	      W(I-2)=W(I-2)+T1/3.0_LDP
 	      I=I-2
 	    ELSE
-	      W(I)=W(I)+T1*0.5D0
-	      W(I-1)=W(I-1)+T1*0.50D0
+	      W(I)=W(I)+T1*0.5_LDP
+	      W(I-1)=W(I-1)+T1*0.50_LDP
 	      I=I-1
 	    END IF
 	  END DO

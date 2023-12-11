@@ -59,15 +59,15 @@ C
         IF (FIRSTTIME)THEN
           FIRSTTIME=.FALSE.
           DO  I=1,MAX_IDS
-            ST_CPU(I)=0.D0
-            IST_WALL(I)=0.D0
-            CPUTOT(I)=0.D0
-            WALLTOT(I)=0.D0
+            ST_CPU(I)=0._LDP
+            IST_WALL(I)=0._LDP
+            CPUTOT(I)=0._LDP
+            WALLTOT(I)=0._LDP
 	    IDLIST(I)=' '
           END DO
 	  CALL SYSTEM_CLOCK(IC0,IR0,IM0);    RR0=IR0
           T0=ETIME(TARRY)
-          OVERHEAD=2.0D0*(ETIME(TARRY)-T0)
+          OVERHEAD=2.0_LDP*(ETIME(TARRY)-T0)
 	  OPEN(UNIT=LUOUT,STATUS='REPLACE',FILE='TIMING')
 	  WRITE(LUOUT,*)' '
 	  WRITE(LUOUT,*)'Overhead is ',OVERHEAD
@@ -127,10 +127,10 @@ C
           END DO
 	ELSE IF(LRUN .EQ. 0) THEN
           DO  I=1,MAX_IDS
-            ST_CPU(I)=0.D0
-            IST_WALL(I)=0.D0
-            CPUTOT(I)=0.D0
-            WALLTOT(I)=0.D0
+            ST_CPU(I)=0._LDP
+            IST_WALL(I)=0._LDP
+            CPUTOT(I)=0._LDP
+            WALLTOT(I)=0._LDP
 	    IDLIST(I)=' '
           END DO
 	ELSE

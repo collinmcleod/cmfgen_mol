@@ -17,12 +17,12 @@
 	INTEGER I,J
 !
 	DO I=1,ND
-	  DXzV(I)=1.0D0
+	  DXzV(I)=1.0_LDP
 	  IF(T(I) .GT. TMIN)THEN
-	    XzVLTE(:,I)=1.0D0
+	    XzVLTE(:,I)=1.0_LDP
 	  ELSE
 	    DO J=1,NXzV
-	      XzVLTE(J,I)=EXP(HDKT*EDGE(J)*(1.0D0/TMIN-1.0D0/T(I)))
+	      XzVLTE(J,I)=EXP(HDKT*EDGE(J)*(1.0_LDP/TMIN-1.0_LDP/T(I)))
 	    END DO
 	  END IF
 	END DO

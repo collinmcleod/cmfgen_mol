@@ -7,7 +7,7 @@ C
 C
 C Altered 28-May-1996 : F90 updated, IMPLCIT NONE installed.
 C
-	Z(:)=0.0D0
+	Z(:)=0.0_LDP
 C
 	RETURN
 	END

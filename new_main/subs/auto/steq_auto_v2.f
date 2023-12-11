@@ -81,7 +81,7 @@
 	INTEGER I,J,K,M,IBEG_AUTO
 	LOGICAL AUTO_FILE_EXISTS
 !
-	PLNCKS_CONST=6.6261965D-12         !H*1.0E+15  (1.0E+15 due to times frequency)
+	PLNCKS_CONST=6.6261965E-12_LDP         !H*1.0E+15  (1.0E+15 due to times frequency)
 !
 ! The autoionization probabilities are depth independent, and hence can be
 ! read in at the beginning.
@@ -91,13 +91,13 @@
           CALL RD_AUTO_V1(AUTO,FEDGE_F,G_F,LEVNAME_F,N_F,AUTO_FILE)
 	  IBEG_AUTO=0
 	  DO I=1,N_F
-	    IF(AUTO(I) .GT. 0.0D0)THEN
+	    IF(AUTO(I) .GT. 0.0_LDP)THEN
 	      IBEG_AUTO=I
 	      EXIT
 	    END IF
 	  END DO
 	  IF(IBEG_AUTO .EQ. 0)RETURN
-        ELSE IF(FEDGE_F(N_F) .LT. 0.0D0)THEN
+        ELSE IF(FEDGE_F(N_F) .LT. 0.0_LDP)THEN
           LUER=ERROR_LU()
           WRITE(LUER,*)' '
           WRITE(LUER,*)'Warning: possible error in STEQ_AUTO_V1'
@@ -144,9 +144,9 @@
 	      SE(ID)%BA(EQION,VED,M,I) =SE(ID)%BA(EQION,VED,M,I)  -AUTO(K)*HNST_F(K,I)/ED(I)
 !
 	      SE(ID)%BA(J,VT,M,I)      =SE(ID)%BA(J,VT,M,I)       -AUTO(K)*HNST_F(K,I)*
-	1                                                               (1.5D0+HDKT*FEDGE_F(K)/T(I))/T(I)
+	1                                                               (1.5_LDP+HDKT*FEDGE_F(K)/T(I))/T(I)
 	      SE(ID)%BA(EQION,VT,M,I)  =SE(ID)%BA(EQION,VT,M,I)   +AUTO(K)*HNST_F(K,I)*
-	1                                                               (1.5D0+HDKT*FEDGE_F(K)/T(I))/T(I)
+	1                                                               (1.5_LDP+HDKT*FEDGE_F(K)/T(I))/T(I)
 !
 	     END DO          		!Over level variable
 	  END IF

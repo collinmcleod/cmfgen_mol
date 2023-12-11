@@ -21,7 +21,7 @@ C
 C
 	INTEGER I,J,K,L,M,JM,MAT
 	REAL(KIND=LDP) TOL,BIG,RBIG,T1
-	PARAMETER (TOL=1.0D-30)
+	PARAMETER (TOL=1.0E-30_LDP)
 C
 	INTEGER ERROR_LU,LUER
 	EXTERNAL ERROR_LU
@@ -43,7 +43,7 @@ C
 C
 C Find maximum coefficient in column I
 C
-	    BIG=0.0D0
+	    BIG=0.0_LDP
 	    JM=I
 	    DO J=I,N					!Equation
 	      IF(ABS(BIG).LT.ABS(BA(J,I,K,K)))THEN
@@ -59,8 +59,8 @@ C Check that pivot is > TOL.
 	    END IF
 C
 	    BA(JM,I,K,K)=BA(I,I,K,K)
-	    RBIG=1.0D0/BIG
-	    BA(I,I,K,K)=1.0D0
+	    RBIG=1.0_LDP/BIG
+	    BA(I,I,K,K)=1.0_LDP
 C
 C Store column elements
 C
@@ -104,7 +104,7 @@ C
 	          DO M=I+1,N
 	            BA(M,J,K,K)=BA(M,J,K,K)-C(M)*BA(I,J,K,K)
 	          END DO
-	          BA(J,I,K,K)=0.0D0			!Need to set zero.
+	          BA(J,I,K,K)=0.0_LDP			!Need to set zero.
 	        END DO
 	      ELSE
 	        DO J=1,N

@@ -52,7 +52,7 @@
 	IF(INIT)THEN
 	  IF(.NOT. ALLOCATED(POP_SUM))ALLOCATE(POP_SUM(ND,NUM_IONS))
 	  IF(.NOT. ALLOCATED(GFF_STORE))ALLOCATE(GFF_STORE(ND,20))
-	  POP_SUM=0.0D0
+	  POP_SUM=0.0_LDP
 	  DO ID=1,NUM_IONS
 	    IF(ATM(ID)%XzV_PRES)THEN
 	      POP_SUM(1:ND,ID)=SUM(ATM(ID+1)%XzV,1)
@@ -60,7 +60,7 @@
 	  END DO
 	END IF
 !
-	GFF_STORE=0.0D0
+	GFF_STORE=0.0_LDP
 	DO ID=1,NUM_IONS
 	  IF(ATM(ID)%XzV_PRES)THEN
 	    I=NINT(ATM(ID)%ZXzV)
@@ -68,7 +68,7 @@
 	      WRITE(6,*)'Insufficient storage for GFF_STORE in COMP_FREE_FREE_V2'
 	      STOP
 	    ELSE IF(I .LE. 0)THEN
-	    ELSE IF(GFF_STORE(1,I) .EQ. 0.0D0)THEN
+	    ELSE IF(GFF_STORE(1,I) .EQ. 0.0_LDP)THEN
 	      CALL GFF_VEC(GFF_STORE(1,I),FREQ,T,ATM(ID)%ZXzV,ND)
 	    END IF
 	  END IF
@@ -77,11 +77,11 @@
         T1=-HDKT*FREQ
         DO I=1,ND
           EMHNUKT(I)=EXP(T1/T(I))
-          CHI_FF(I)=0.0D0
-          ETA_FF(I)=0.0D0
+          CHI_FF(I)=0.0_LDP
+          ETA_FF(I)=0.0_LDP
         END DO
-	VCHI_FF=0.0D0
-	VETA_FF=0.0D0
+	VCHI_FF=0.0_LDP
+	VETA_FF=0.0_LDP
 !
 ! Add in free-free contribution. Because SN can be dominated by elements other
 ! than H and He, we now sum over all levels. To make sure that we only do this
@@ -94,7 +94,7 @@
 	  ELSE IF(ION_ID(ID) .EQ. 'H0')THEN
 	    I=7                                 !Used to read in data on first entry (will not be used here.)
 	    CALL DO_H0_FF(ETA_FF,CHI_FF,POP_SUM(1,ID),ED,T,EMHNUKT,FREQ,I,ND)
-	  ELSE IF(NINT(ATM(ID)%ZXzV) .GT. 0.0D0)THEN
+	  ELSE IF(NINT(ATM(ID)%ZXzV) .GT. 0.0_LDP)THEN
 !
 ! Compute free-free gaunt factors. Replaces call to GFF in following DO loop.
 !
@@ -108,7 +108,7 @@
 	    TETA1=CHIFF*ATM(ID)%ZXzV*ATM(ID)%ZXzV*TWOHCSQ
 	    DO I=1,ND
 	      ALPHA=ED(I)*POP_SUM(I,ID)*GFF_VAL(I)/SQRT(T(I))
-	      CHI_FF(I)=CHI_FF(I)+TCHI1*ALPHA*(1.0D0-EMHNUKT(I))
+	      CHI_FF(I)=CHI_FF(I)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(I))
 	      ETA_FF(I)=ETA_FF(I)+TETA1*ALPHA*EMHNUKT(I)
 	    END DO
 	  END IF
@@ -126,10 +126,10 @@
 	      TETA1=CHIFF*ATM(ID)%ZXzV*ATM(ID)%ZXzV*TWOHCSQ
 	      DO I=1,ND
 	        ALPHA=POP_SUM(I,ID)*GFF_VAL(I)/SQRT(T(I))
-	        VCHI_FF(NT-1,I)=VCHI_FF(NT-1,I)+TCHI1*ALPHA*(1.0D0-EMHNUKT(I))
+	        VCHI_FF(NT-1,I)=VCHI_FF(NT-1,I)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(I))
 	        VETA_FF(NT-1,I)=VETA_FF(NT-1,I)+TETA1*ALPHA*EMHNUKT(I)
 !
-	        ALPHA=TCHI1*ED(I)*GFF_VAL(I)*(1.0D0-EMHNUKT(I))/SQRT(T(I))
+	        ALPHA=TCHI1*ED(I)*GFF_VAL(I)*(1.0_LDP-EMHNUKT(I))/SQRT(T(I))
 	        EMIS=TETA1*ED(I)*GFF_VAL(I)*EMHNUKT(I)/SQRT(T(I))
 	        DO L=1,ATM(ID+1)%NXzV
 	           K=EQION+L-1
@@ -139,8 +139,8 @@
 !
 	        HNUONKT=HDKT*FREQ/T(I)
 	        ALPHA=ED(I)*POP_SUM(I,ID)*GFF_VAL(I)/SQRT(T(I))/T(I)
-		VCHI_FF(NT,I)=VCHI_FF(NT,I)-TCHI1*ALPHA*(0.5D0+(HNUONKT-0.5D0)*EMHNUKT(I))
-		VETA_FF(NT,I)=VETA_FF(NT,I)+TETA1*ALPHA*(HNUONKT-0.5D0)*EMHNUKT(I)
+		VCHI_FF(NT,I)=VCHI_FF(NT,I)-TCHI1*ALPHA*(0.5_LDP+(HNUONKT-0.5_LDP)*EMHNUKT(I))
+		VETA_FF(NT,I)=VETA_FF(NT,I)+TETA1*ALPHA*(HNUONKT-0.5_LDP)*EMHNUKT(I)
 	      END DO
 	    END IF
 	  END DO

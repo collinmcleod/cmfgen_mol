@@ -54,9 +54,9 @@
 	REAL(KIND=LDP) dV_CONT                  !Maximum spacing in arbitrary section of
                                         !  continuum (km/s)
 !
-	INTEGER, PARAMETER :: RZERO=0.0D0
-	INTEGER, PARAMETER :: RONE=1.0D0
-	INTEGER, PARAMETER :: RTWO=2.0D0
+	INTEGER, PARAMETER :: RZERO=0.0_LDP
+	INTEGER, PARAMETER :: RONE=1.0_LDP
+	INTEGER, PARAMETER :: RTWO=2.0_LDP
 !
 ! N+2 as we insert MAX_FREQ and MIN_FREQ into the array.
 !
@@ -80,7 +80,7 @@
 	REAL(KIND=LDP) SWITCH_FREQ
 !
 	LUER=ERROR_LU()
-	COINCIDENT_FRAC=0.2D0
+	COINCIDENT_FRAC=0.2_LDP
 !
 ! Sort frequencies into numerical order. NEW_FREQ is used as a
 ! work array.
@@ -116,7 +116,7 @@
 	  STOP
 	END IF
 !
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 	EQUAL_FAC=COINCIDENT_FRAC*dV_DOP/C_KMS
 	FAC = RONE + EQUAL_FAC
 !
@@ -197,7 +197,7 @@
 !
 	  IF(DEL_NU .GT. DNU_MAX .AND. NEW_FREQ(K) .GT. SWITCH_FREQ)THEN
 	    T1=(NEW_FREQ(K)-EDGE(I-1))/DNU_MAX
-	    RN=LOG( 1.0D0+T1*(BIG_AMP-1.0D0))/LOG(BIG_AMP) - 1.0D0
+	    RN=LOG( 1.0_LDP+T1*(BIG_AMP-1.0_LDP))/LOG(BIG_AMP) - 1.0_LDP
 	    T1=DNU_MAX*(BIG_AMP**RN)
 	    IF(T1 .LT. DEL_NU)DEL_NU=T1
 	  END IF
@@ -205,7 +205,7 @@
 ! Small frequencies where we use a fixed velocity spacing. dV_CONT
 ! has essentially the same meaning, and may supercede SMALL_RAT.
 !
-	  T1=NEW_FREQ(K)*(SMALL_RAT-1.0D0)
+	  T1=NEW_FREQ(K)*(SMALL_RAT-1.0_LDP)
 	  IF(DEL_NU .GT. T1 .AND. NEW_FREQ(K) .LE. SWITCH_FREQ)THEN
 	    DEL_NU=T1
 	  END IF
@@ -216,7 +216,7 @@
 	  IF(EDGE(INDX_DIS) .GT. MIN_FREQ_LEV_DIS .AND. INDX_DIS .NE. N)THEN
 	    T2=EDGE(INDX_DIS)*dV_LEV/C_KMS
 	    T1=(EDGE(INDX_DIS)-NEW_FREQ(K))/T2
-	    RN=LOG( 1.0D0+T1*(AMP_DIS-1.0D0))/LOG(AMP_DIS) - 1.0D0
+	    RN=LOG( 1.0_LDP+T1*(AMP_DIS-1.0_LDP))/LOG(AMP_DIS) - 1.0_LDP
 	    T1=T2*(AMP_DIS**RN)
 	    IF(T1 .LT. DEL_NU)DEL_NU=T1
 	  END IF
@@ -283,7 +283,7 @@
 ! Ensure FREQ array is zeroed (as probably will use OBSF).
 !
 	DO I=1,NCF
-	  EDGE(I)=0.0D0
+	  EDGE(I)=0.0_LDP
 	END DO
 	WRITE(6,*)'Returning'
 !

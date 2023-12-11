@@ -110,35 +110,35 @@ C
 	REAL(KIND=LDP) SPEED_OF_LIGHT
 	EXTERNAL ERROR_LU,SPEED_OF_LIGHT
 C
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 	LU_ER=ERROR_LU()
 C
 C Check validity of some of the parameters.
 C
-	IF(R_CMF_WING_EXT .LT. 2.0D0 .OR. R_CMF_WING_EXT .GT. 20.0D0)THEN
+	IF(R_CMF_WING_EXT .LT. 2.0_LDP .OR. R_CMF_WING_EXT .GT. 20.0_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for R_CMF_WING_EXT in INS_LINE'
 	  WRITE(LU_ER,*)'R_CMF_WING_EXT=',R_CMF_WING_EXT
 	  STOP
 	END IF
-	IF(ES_WING_EXT .LT. 0.0D0 .OR. ES_WING_EXT .GT. 20000.0D0)THEN
+	IF(ES_WING_EXT .LT. 0.0_LDP .OR. ES_WING_EXT .GT. 20000.0_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for ES_WING_EXT in INS_LINE'
 	  WRITE(LU_ER,*)'ES_WING_EXT=',ES_WING_EXT
 	  STOP
 	END IF
-	IF(dV_CMF_PROF .LT. 1.0D0 .OR. dV_CMF_PROF .GT. 1.0D+05)THEN
+	IF(dV_CMF_PROF .LT. 1.0_LDP .OR. dV_CMF_PROF .GT. 1.0E+05_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for dV_CMF_PROF in INS_LINE'
 	  WRITE(LU_ER,*)'dV_CMF_PROF=',dV_CMF_PROF
 	  STOP
      	END IF
-	IF(dV_CMF_WING .LT. 1.0D0 .OR. dV_CMF_WING .GT. 1.0D+05)THEN
+	IF(dV_CMF_WING .LT. 1.0_LDP .OR. dV_CMF_WING .GT. 1.0E+05_LDP)THEN
 	  WRITE(LU_ER,*)'Invalid value for dV_CMF_WING in INS_LINE'
 	  WRITE(LU_ER,*)'dV_CMF_WING=',dV_CMF_WING
 	  STOP
 	END IF
 C
-	T1=1.0D0-(6.0D0*MAXVAL(VEC_MIN_VDOP)+3.0D0*VINF)/C_KMS
-	T1=1.0D0/(1.0D0+(6.0D0*MAXVAL(VEC_MIN_VDOP)+3.0D0*VINF)/C_KMS)
-	IF(T1 .LT. 0.5D0)T1=0.5D0
+	T1=1.0_LDP-(6.0_LDP*MAXVAL(VEC_MIN_VDOP)+3.0_LDP*VINF)/C_KMS
+	T1=1.0_LDP/(1.0_LDP+(6.0_LDP*MAXVAL(VEC_MIN_VDOP)+3.0_LDP*VINF)/C_KMS)
+	IF(T1 .LT. 0.5_LDP)T1=0.5_LDP
 	LOCAL_N_LINES=N_LINES
 	DO WHILE(NU_CONT(NCF) .GT. NU_LINE(LOCAL_N_LINES)*T1)
 	  LOCAL_N_LINES=LOCAL_N_LINES-1
@@ -197,14 +197,14 @@ C edge are EDGE_SEP_FAC*FRAC_DOP Doppler widths appart. We adjust the lower
 C frequency to ensure this. MIN_FREQ_RAT is the minimum ratio allowed between
 C successive frequencies.
 C
-	EDGE_SEP_FAC=0.5D0                              !was 0.1
-	MIN_FREQ_RAT=1.0D0+EDGE_SEP_FAC*dNU_on_NU
+	EDGE_SEP_FAC=0.5_LDP                              !was 0.1
+	MIN_FREQ_RAT=1.0_LDP+EDGE_SEP_FAC*dNU_on_NU
 C
 C Define edges of the e.s blue and red wings. The form of ES_RED_WING_EXTENT
 C ensures that it is always positive, even when VINF is clse to c.
 C
-	ES_BLUE_WING_EXT=1.0D0+ES_WING_EXT/C_KMS		!v/v(o)
-	ES_RED_WING_EXT=1.0D0/( 1.0D0+(ES_WING_EXT+R_CMF_WING_EXT*VINF)/C_KMS)
+	ES_BLUE_WING_EXT=1.0_LDP+ES_WING_EXT/C_KMS		!v/v(o)
+	ES_RED_WING_EXT=1.0_LDP/( 1.0_LDP+(ES_WING_EXT+R_CMF_WING_EXT*VINF)/C_KMS)
 C
 C Determine continuum frequencies bracketing bound-free edges. We keep
 C these in our final continuum list. To avoid numerical instabilities
@@ -215,7 +215,7 @@ C
 	EDGE_FREQ(1:NCF)=.FALSE.
 	I=2
 	DO WHILE (I .LT. NCF)
-	  IF( ABS(NU_CONT(I-1)/NU_CONT(I)-1.0D0) .LT. 1.0D-06)THEN
+	  IF( ABS(NU_CONT(I-1)/NU_CONT(I)-1.0_LDP) .LT. 1.0E-06_LDP)THEN
 !	  IF( ABS(NU_CONT(I-1)/NU_CONT(I)-1.0D0) .LT. 1.0D-04)THEN
 	    IF(NU_CONT(I)/MIN_FREQ_RAT .GT. MIN_FREQ_RAT*NU_CONT(I+1))THEN
 	      EDGE_FREQ(I-1)=.TRUE.
@@ -293,7 +293,7 @@ C
 	ML=1
 	INDX=1
 	FREQ(1)=NU_CONT(1)
-	CUR_RED_PROF_EXT=10.0D0*NU_CONT(1)
+	CUR_RED_PROF_EXT=10.0_LDP*NU_CONT(1)
 C
 	LINES_THIS_FREQ(:)=0
 	LINE_ST_INDX(:)=0
@@ -312,7 +312,7 @@ C If continuum frequency is within 0.2*FRAC_DOP doppler widths of the last set
 C frequency, C there is no need to use it, unless it is a bound-free edge
 C frequency.
 C
-          ELSE IF( NU_CONT(ML) .GE. FREQ(INDX)/(1.0D0+0.2D0*dNU_on_NU) )THEN
+          ELSE IF( NU_CONT(ML) .GE. FREQ(INDX)/(1.0_LDP+0.2_LDP*dNU_on_NU) )THEN
 !	1                       .AND. .NOT. EDGE_FREQ(ML) )THEN
 	     ML=ML+1			!Use current set frequency.
 C
@@ -320,14 +320,14 @@ C
 !
 	    dNU_NEXT=FREQ(INDX)-NU_CONT(ML)
 	    IF(INDX .GT. 1)THEN
-	      T1=2.0D0*(FREQ(INDX-1)-FREQ(INDX))
+	      T1=2.0_LDP*(FREQ(INDX-1)-FREQ(INDX))
 	      dNU_NEXT=MIN(dNU_NEXT,T1)
 	    END IF
 	    IF(NU_CONT(ML) .GT. CUR_RED_PROF_EXT)THEN
 	      T1=FREQ(INDX)*dV_CMF_PROF/C_KMS
 	      dNU_NEXT=MIN(dNU_NEXT,T1)
 	    ELSE IF(NU_CONT(ML) .GT. CUR_RED_PROF_EXT*ES_RED_WING_EXT*
-	1                    (1.0D0+2.0D0*VINF/C_KMS) )THEN
+	1                    (1.0_LDP+2.0_LDP*VINF/C_KMS) )THEN
 	      T1=FREQ(INDX)*dV_CMF_WING/C_KMS
 	      dNU_NEXT=MIN(dNU_NEXT,T1)
 	    END IF
@@ -338,7 +338,7 @@ C
 C
 	    dNU_NEXT=FREQ(INDX)-NU_CONT(ML)
 	    IF(INDX .GT. 1)THEN
-	      T1=2.0D0*(FREQ(INDX-1)-FREQ(INDX))
+	      T1=2.0_LDP*(FREQ(INDX-1)-FREQ(INDX))
 	      dNU_NEXT=MIN(dNU_NEXT,T1)
 	    END IF
 C
@@ -363,8 +363,8 @@ C
 	    K=LN_INDX
 	    DO WHILE( (FREQ(INDX)-dNU_NEXT) .LE. NU_STRT_LINE(K) )
 	      IF(TRANS_TYPE(K)(1:3) .EQ. 'BLA')THEN
-	        dNU=0.5D0*FREQ(INDX)*FRAC_DOP*VEC_MIN_VDOP(K)*
-	1             SQRT( 1.0D0+ C_KMS*ABS(1.0D0-NU_LINE(K)/FREQ(INDX))/
+	        dNU=0.5_LDP*FREQ(INDX)*FRAC_DOP*VEC_MIN_VDOP(K)*
+	1             SQRT( 1.0_LDP+ C_KMS*ABS(1.0_LDP-NU_LINE(K)/FREQ(INDX))/
 	1                   VEC_MIN_VDOP(K) )/C_KMS
 	        dNU_NEXT=MIN(dNU,dNU_NEXT)
 	        LINES_THIS_FREQ(INDX+1)=LINES_THIS_FREQ(INDX+1)+1
@@ -386,7 +386,7 @@ C
 	      DO K=LN_INDX,LN_INDX+NUM_RES_LINES-1
 	         IF(TRANS_TYPE(K)(1:3) .EQ. 'BLA')THEN
 	           dNU=FREQ(INDX)-NU_LINE(K)
-	           IF(dNU .GT. FRAC_DOP*VEC_MIN_VDOP(K)*FREQ(INDX)*0.1D0)THEN
+	           IF(dNU .GT. FRAC_DOP*VEC_MIN_VDOP(K)*FREQ(INDX)*0.1_LDP)THEN
 	             dNU_NEXT=MIN(dNU_NEXT,dNU)
 	           END IF
 	         END IF
@@ -415,7 +415,7 @@ C
 	    DO WHILE( LN_INDX .LE. N_LINES .AND. FREQ(INDX) .LE.
 	1         NU_END_LINE(LN_INDX) )
 	      IF(TRANS_TYPE(LN_INDX)(1:3) .EQ. 'BLA')THEN
-	        T1=NU_END_LINE(LN_INDX)/(1.0D0+2.0D0*VINF/C_KMS)
+	        T1=NU_END_LINE(LN_INDX)/(1.0_LDP+2.0_LDP*VINF/C_KMS)
 	        CUR_RED_PROF_EXT=MIN(CUR_RED_PROF_EXT,T1)
 	      END IF
 	      LN_INDX=LN_INDX+1
@@ -438,7 +438,7 @@ C
 C Test for monotocity of frequencies, and determine MINIMUM frequency
 C spacing in velocity space.
 C
-	T1=10000.0D0
+	T1=10000.0_LDP
 	DO ML=1,NFREQ-1
 	  T1=MIN( T1 , C_KMS*(FREQ(ML)-FREQ(ML+1))/FREQ(ML) )
 	  IF(FREQ(ML) .LE. FREQ(ML+1))THEN

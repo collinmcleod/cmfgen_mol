@@ -40,13 +40,13 @@
 	NON_ZERO_VJ(200)=.TRUE.
 	NON_ZERO_VJ(300)=.TRUE.
 !
-	T2=2.345D00
-	T1=4.345D00
+	T2=2.345E00_LDP
+	T1=4.345E00_LDP
 	CALL TUNE(1,'STANDARD')
 	DO K=1,100
-	  VJ(10,2,30)=1.1*VJ(10,2,30)
+	  VJ(10,2,30)=1.1_LDP*VJ(10,2,30)
 	  DO L=1,ND
-	    T1=4.345D00+0.001*(L-1)
+	    T1=4.345E00_LDP+0.001_LDP*(L-1)
 	     DO J=1,NUM_BNDS
 	       DO I=1,NT
 	           VJ_P(I,J,L)=VJ_P(I,J,L)+T2*VJ(I,J,L)
@@ -57,11 +57,11 @@
  	END DO
 	CALL TUNE(2,'STANDARD')
 !
-	T2=2.345D00
-	T1=4.345D00
+	T2=2.345E00_LDP
+	T1=4.345E00_LDP
 	CALL TUNE(1,'STAND_SPLIT')
 	DO K=1,100
-	  VJ(10,2,30)=1.1*VJ(10,2,30)
+	  VJ(10,2,30)=1.1_LDP*VJ(10,2,30)
 	  DO L=1,ND
 	     DO J=1,NUM_BNDS
 	       DO I=1,NT
@@ -72,9 +72,9 @@
  	END DO
 !
 	DO K=1,100
-	  VJ(10,2,30)=1.1*VJ(10,2,30)
+	  VJ(10,2,30)=1.1_LDP*VJ(10,2,30)
 	  DO L=1,ND
-	    T1=4.345D00+0.001*(L-1)
+	    T1=4.345E00_LDP+0.001_LDP*(L-1)
 	     DO J=1,NUM_BNDS
 	       DO I=1,NT
 	           VJ_R(I,J,L)=VJ_R(I,J,L)+T1*VJ(I,J,L)
@@ -103,13 +103,13 @@
 	  END DO
 	END DO
 !
-	T2=2.345D00
-	T1=4.345D00
+	T2=2.345E00_LDP
+	T1=4.345E00_LDP
 	CALL TUNE(1,'STAND3')
 	DO K=1,100
-	  VJ(10,2,30)=1.1*VJ(10,2,30)
+	  VJ(10,2,30)=1.1_LDP*VJ(10,2,30)
 	  DO L=1,ND
-	    T1=4.345D00+0.001*(L-1)
+	    T1=4.345E00_LDP+0.001_LDP*(L-1)
 	    VJ_P(:,:,L)=VJ_P(:,:,L)+T2*VJ(:,:,L)
 	    VJ_R(:,:,L)=VJ_R(:,:,L)+T1*VJ(:,:,L)
 	  END DO
@@ -126,8 +126,8 @@
 	  END DO
 	END DO
 !
-	T2=2.345D00
-	T1=4.345D00
+	T2=2.345E00_LDP
+	T1=4.345E00_LDP
 	CALL TUNE(1,'BLAS')
 	NVEC=NT*ND*NUM_BNDS
 	DO K=1,100
@@ -136,11 +136,11 @@
 	END DO
 	CALL TUNE(2,'BLAS')
 !
-	T2=2.345D00
+	T2=2.345E00_LDP
 	CALL TUNE(1,'STAND2')
 	DO K=1,100
 	  DO L=1,ND
-	     T2=2.345D0+(L-1)*0.001D0
+	     T2=2.345_LDP+(L-1)*0.001_LDP
 	     DO J=1,NUM_BNDS
 	       DO I=1,NT
 	         VJ_P(I,J,L)=VJ_P(I,J,L)+T2*VJ(I,J,L)
@@ -160,12 +160,12 @@
 	  END DO
 	END DO
 !
-	T2=2.345D00
+	T2=2.345E00_LDP
 	CALL TUNE(1,'BLAS2')
 	NVEC=NT*NUM_BNDS
 	DO K=1,100
 	   DO L=1,ND
-	     T2=2.345D0+(L-1)*0.001D0
+	     T2=2.345_LDP+(L-1)*0.001_LDP
 	     CALL DAXPY(NVEC,T2,VJ(1,1,L),IONE,VJ_P(1,1,L),IONE)
 	  END DO
 	END DO
@@ -236,15 +236,15 @@ C
         IF (FIRSTTIME)THEN
           FIRSTTIME=.FALSE.
           DO  I=1,MAX_IDS
-            ST_CPU(I)=0.D0
-            IST_WALL(I)=0.D0
-            CPUTOT(I)=0.D0
-            WALLTOT(I)=0.D0
+            ST_CPU(I)=0._LDP
+            IST_WALL(I)=0._LDP
+            CPUTOT(I)=0._LDP
+            WALLTOT(I)=0._LDP
 	    IDLIST(I)=' '
           END DO
 	  CALL SYSTEM_CLOCK(IC0,IR0,IM0);    RR0=IR0
           T0=ETIME(TARRY)
-          OVERHEAD=2.0D0*(ETIME(TARRY)-T0)
+          OVERHEAD=2.0_LDP*(ETIME(TARRY)-T0)
 !	  OPEN(UNIT=LUOUT,STATUS='REPLACE',FILE='TIMING')
 	  WRITE(LUOUT,*)' '
 	  WRITE(LUOUT,*)'Overhead is ',OVERHEAD
@@ -303,10 +303,10 @@ C
 	  OPEN(UNIT=LUOUT,STATUS='OLD',FILE='TIMING',POSITION='APPEND')
 	ELSE IF(LRUN .EQ. 0) THEN
           DO  I=1,MAX_IDS
-            ST_CPU(I)=0.D0
-            IST_WALL(I)=0.D0
-            CPUTOT(I)=0.D0
-            WALLTOT(I)=0.D0
+            ST_CPU(I)=0._LDP
+            IST_WALL(I)=0._LDP
+            CPUTOT(I)=0._LDP
+            WALLTOT(I)=0._LDP
 	    IDLIST(I)=' '
           END DO
 	ELSE

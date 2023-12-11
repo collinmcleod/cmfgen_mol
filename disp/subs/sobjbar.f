@@ -67,13 +67,13 @@ C Zero arrays which are incremented as we integrate over angle.
 C Evaluate the SOBOLEV optical depth (GAMH) without angle factor.
 C
 	DO I=1,ND
-	  JBAR(I)=0.0D0
-	  ZNET(I)=0.0D0
-	  VB(I)=0.0D0
-	  VC(I)=0.0D0
-	  BETA(I)=0.0D0
-	  BETAC(I)=0.0D0
-	  GAMH(I)=CHIL(I)*3.0D-10*R(I)/V(I)/FL    	!C/dex(15)/dex(5)
+	  JBAR(I)=0.0_LDP
+	  ZNET(I)=0.0_LDP
+	  VB(I)=0.0_LDP
+	  VC(I)=0.0_LDP
+	  BETA(I)=0.0_LDP
+	  BETAC(I)=0.0_LDP
+	  GAMH(I)=CHIL(I)*3.0E-10_LDP*R(I)/V(I)/FL    	!C/dex(15)/dex(5)
 	END DO
 C
 	CALL DERIVCHI(dCHIdR,CHI,R,ND,METHOD)
@@ -92,7 +92,7 @@ C
 C
 	  CALL ZALONGP(R,Z,P(LS),NI)
 	  DO I=1,NI
-	    GAM(I)=GAMH(I)/(1.0D0+Z(I)*Z(I)/R(I)/R(I)*SIGMA(I))
+	    GAM(I)=GAMH(I)/(1.0_LDP+Z(I)*Z(I)/R(I)/R(I)*SIGMA(I))
 	  END DO
 C
 	  IF(DIF .AND. LS .LE. NC)THEN
@@ -106,11 +106,11 @@ C SOURCE(1) is the boundary continuum source function.
 C
 	  IF(THICK)THEN
 	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
 	      TOR=CHI(1)*R(1)
 	    END IF
-	    AV(1)=-SOURCE(1)*(1.0D0-EXP(-TOR))
+	    AV(1)=-SOURCE(1)*(1.0_LDP-EXP(-TOR))
 	  END IF
 C
 C Solve for the radiation field along ray for this frequency.
@@ -123,7 +123,7 @@ C functions are called to allow for cancellation when X is small. Note
 C GAM(I)/CHIL(I) = d_GAM(I)/d_CHIL(I) .
 C
 	  DO I=1,NI
-	    T1=1.0D0-AV(I)*CHIL(I)/ETAL(I)
+	    T1=1.0_LDP-AV(I)*CHIL(I)/ETAL(I)
 	    T2=EXPONX(GAM(I))
 	    ZNET(I)=ZNET(I)+T1*T2*AQW(I,LS)
 C
@@ -141,7 +141,7 @@ C
 C Compute the mean line intensity
 C
 	DO I=1,ND
-	  JBAR(I)=(1.0D0-ZNET(I))*ETAL(I)/CHIL(I)
+	  JBAR(I)=(1.0_LDP-ZNET(I))*ETAL(I)/CHIL(I)
 	END DO
 C
 	RETURN

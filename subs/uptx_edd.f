@@ -30,7 +30,7 @@ C Local varables.
 C
 	INTEGER I,J,K
 C
-	IF( .NOT. ML_NE_ONE)TX(:,:,:)=0.0D0
+	IF( .NOT. ML_NE_ONE)TX(:,:,:)=0.0_LDP
 C
 	DO K=1,NM
 C

@@ -73,7 +73,7 @@
 	    IF(INDEX(STRING,'Format date:') .NE. 0)NEW_FORMAT=.TRUE.
 	  END DO
 !
-	  SIG_0_X(:,:,:,:)=0.0D0
+	  SIG_0_X(:,:,:,:)=0.0_LDP
 	  N_ED_EJ(:,:,:,:)=0
 !
 	  DO WHILE(1 .EQ. 1)	

@@ -50,10 +50,10 @@
 ! for each line (JBAR_SIM).
 !
 	    DO I=1,ND
-	      ZNET_SIM(I,SIM_INDX)=0.0D0
-	      JBAR_SIM(I,SIM_INDX)=0.0D0
+	      ZNET_SIM(I,SIM_INDX)=0.0_LDP
+	      JBAR_SIM(I,SIM_INDX)=0.0_LDP
 	    END DO
-	    LINE_QW_SUM(1:ND,SIM_INDX)=0.0D0
+	    LINE_QW_SUM(1:ND,SIM_INDX)=0.0_LDP
 !
 ! Decide if line is weak, and hence whether we can iterate on the net rates
 ! rather than use a full linearization.
@@ -64,7 +64,7 @@
 ! Compute Sobolev optical depth. Note: 2.998D+10 = C(km/s) / 1.0D+15
 !
 	        WEAK_LINE(SIM_INDX)=.TRUE.
-	        T1=2.998D-10/FL_SIM(SIM_INDX)
+	        T1=2.998E-10_LDP/FL_SIM(SIM_INDX)
 	        DO I=1,ND
 	          T2=ABS(CHIL_MAT(I,SIM_INDX))*T1*R(I)/V(I)
 	          IF(T2 .GT. WEAK_TAU_LINE_LIMIT)WEAK_LINE(SIM_INDX)=.FALSE.
@@ -73,9 +73,9 @@
 !
 ! Compute opacity at line center.
 !
-	        T1=1.0D-15/1.77245385095516D0		!1.0D-15/SQRT(PI)
-	        NU_DOP=FL_SIM(SIM_INDX)*12.85D0*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
-	1                        (VTURB/12.85D0)**2 )/2.998D+05
+	        T1=1.0E-15_LDP/1.77245385095516_LDP		!1.0D-15/SQRT(PI)
+	        NU_DOP=FL_SIM(SIM_INDX)*12.85_LDP*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
+	1                        (VTURB/12.85_LDP)**2 )/2.998E+05_LDP
 	        T2=T1/NU_DOP
 	        WEAK_LINE(SIM_INDX)=.TRUE.
 	        DO I=1,ND
@@ -236,7 +236,7 @@
 !$OMP PARALLEL DO
 	DO L=1,M
 	  DO K=1,NX
-	     dZ(J,K,L)=0.0D0
+	     dZ(J,K,L)=0.0_LDP
 	  END DO
 	END DO
 !

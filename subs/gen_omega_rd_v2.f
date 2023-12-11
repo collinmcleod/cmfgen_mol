@@ -144,7 +144,7 @@
 	  END IF
 	END DO
 	LOC_INDX(:,:)=0
-	OMEGA_TABLE(:)=0.0D0
+	OMEGA_TABLE(:)=0.0_LDP
 !
 ! Open file with collisional data.
 !
@@ -246,7 +246,7 @@
 	READ(STRING(L+5:),*)(T_TABLE(I),I=1,NUM_TVALS )
 !
 	DO I=1,NUM_TVALS-1
-	  IF(T_TABLE(1) .LE. 0.0D0 .OR. T_TABLE(I) .GE. T_TABLE(I+1))THEN
+	  IF(T_TABLE(1) .LE. 0.0_LDP .OR. T_TABLE(I) .GE. T_TABLE(I+1))THEN
 	    WRITE(LUER,*)'Error in T values in ',TRIM(FILE_NAME)
 	    WRITE(LUER,*)'Values are not positive, or not monotonic increasing: I=',I
 	    WRITE(LUER,*)T_TABLE(I),T_TABLE(I+1)
@@ -291,7 +291,7 @@
 !
 	  K=INDEX(LOW_LEV,'[')
 	  NL_CNT=0
-	  GL_SUM=0.0D0
+	  GL_SUM=0.0_LDP
 	  IF(K .NE. 0)THEN
 !
 ! Only a single unique match is possible.
@@ -356,13 +356,13 @@
 !
 	  K=INDEX(UP_LEV,'[')
 	  NUP_CNT=0
-	  GU_SUM=0.0D0
+	  GU_SUM=0.0_LDP
 	  IF(NL_VEC(1) .NE. LST_NL)LST_NUP=NL_VEC(1)
 	  IF(UP_LEV .EQ. 'I')THEN
 !
 ! Collisional ionization terms.
 !
-	    GU_SUM=1.0D0
+	    GU_SUM=1.0_LDP
 	    GOTO 200
 	  ELSE IF(K .NE. 0)THEN
 	    DO LOOP=1,NLEV
@@ -410,7 +410,7 @@
 	    GOTO 500		!No match
 	  END IF
 !
-200	  NORM_FAC=1.0D0/GL_SUM/GU_SUM
+200	  NORM_FAC=1.0_LDP/GL_SUM/GU_SUM
 	  LST_NL=NL_VEC(1)
 	  IF(UP_LEV .NE. 'I')LST_NUP=NUP_VEC(1)
 	  STRING(1:)=STRING(L:)
@@ -434,7 +434,7 @@
 	    WRITE(LUER,*)'IOS=',IOS
 	    STOP
 	  END IF
-	  IF( MINVAL(COL_VEC(1:NUM_TVALS)) .LE. 0.0D0 )THEN
+	  IF( MINVAL(COL_VEC(1:NUM_TVALS)) .LE. 0.0_LDP )THEN
 	    WRITE(LUER,*)'Error in GEN_OMEGA_RD_V2'
 	    WRITE(LUER,*)'Error in collisional data for',FILE_NAME
 	    WRITE(LUER,*)'Tabulated values are -ve or zero'

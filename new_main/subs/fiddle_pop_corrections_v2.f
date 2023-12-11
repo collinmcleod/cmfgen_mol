@@ -62,23 +62,23 @@
 	INTEGER, PARAMETER :: IZERO=0
 	INTEGER, PARAMETER :: IONE=1
 !
-	BIG_LIM=(CHANGE_LIM-1.0D0)/CHANGE_LIM
-        LIT_LIM=1.0D0-CHANGE_LIM
-	MIN_SCALE=1.0D+20
+	BIG_LIM=(CHANGE_LIM-1.0_LDP)/CHANGE_LIM
+        LIT_LIM=1.0_LDP-CHANGE_LIM
+	MIN_SCALE=1.0E+20_LDP
 !
 ! Set default parameters.
 !
 	L_ST=1; L_END=ND
-	RELAX_VARIABLE=1.0D0
+	RELAX_VARIABLE=1.0_LDP
 	T_LIM_VARIABLE=MAX_dT_COR
-	POP_LIM_VARIABLE=100.0D0*CHANGE_LIM		!=>implies no effect
+	POP_LIM_VARIABLE=100.0_LDP*CHANGE_LIM		!=>implies no effect
 	DO I=1,ND
 	  RELAX_PARAM(I)=RELAX_VARIABLE
 	  T_LIM(I)=T_LIM_VARIABLE
 	  POP_LIM(I)=POP_LIM_VARIABLE
 	END DO
-	BAD_DECREASE_LIMIT=1.0D0-1.0D-10
-	BAD_INCREASE_LIMIT=-1.0D+10
+	BAD_DECREASE_LIMIT=1.0_LDP-1.0E-10_LDP
+	BAD_INCREASE_LIMIT=-1.0E+10_LDP
 	CONSISTENCY_CNT=0
 !
 ! Valid ranges:
@@ -107,35 +107,35 @@
 	    WRITE(6,*)'Error in depth indices in ADJUST_CORRECTIONS -- invalid range'
 	    WRITE(6,*)'Depth indices=',L_ST,L_END
 	    L_ST=1; L_END=ND
-	    RELAX_VARIABLE=1.0D0; T_LIM_VARIABLE=0.2D0
-	    POP_LIM_VARIABLE=100.0D0*CHANGE_LIM		!=>implies no effect
+	    RELAX_VARIABLE=1.0_LDP; T_LIM_VARIABLE=0.2_LDP
+	    POP_LIM_VARIABLE=100.0_LDP*CHANGE_LIM		!=>implies no effect
 	  END IF
 !
-	  IF(T_LIM_VARIABLE .LT. 0.0D0 .OR. T_LIM_VARIABLE .GT. 0.20D0)THEN
+	  IF(T_LIM_VARIABLE .LT. 0.0_LDP .OR. T_LIM_VARIABLE .GT. 0.20_LDP)THEN
 	    WRITE(6,*)'Error for T LIMIT in ADJUST_CORRECTIONS -- invalid value'
 	    WRITE(6,*)'Valid range is 0.0 to 0.2'
 	    WRITE(6,*)'T LIMIT parameter read in is',T_LIM_VARIABLE
-	    T_LIM_VARIABLE=0.2D0
+	    T_LIM_VARIABLE=0.2_LDP
 	  END IF
 	  DO L=L_ST,L_END
 	    T_LIM(L)=T_LIM_VARIABLE
 	  END DO
 !
-	  IF(POP_LIM_VARIABLE .LE. 1.0D0)THEN
+	  IF(POP_LIM_VARIABLE .LE. 1.0_LDP)THEN
 	    WRITE(6,*)'Error for POP LIMIT in ADJUST_CORRECTIONS -- invalid value'
 	    WRITE(6,*)'Valid range is > 1.0'
 	    WRITE(6,*)'POP LIMIT parameter read in',POP_LIM_VARIABLE
-	    POP_LIM_VARIABLE=100.0D0*CHANGE_LIM		!=>implies no effect
+	    POP_LIM_VARIABLE=100.0_LDP*CHANGE_LIM		!=>implies no effect
 	  END IF
 	  DO L=L_ST,L_END
 	    POP_LIM(L)=POP_LIM_VARIABLE
 	  END DO
 !
-	  IF(RELAX_VARIABLE .LT. 0.0D0 .OR. RELAX_VARIABLE .GT. 2.0D0)THEN
+	  IF(RELAX_VARIABLE .LT. 0.0_LDP .OR. RELAX_VARIABLE .GT. 2.0_LDP)THEN
 	    WRITE(6,*)'Error for relaxation parameter in ADJUST_CORRECTIONS -- invalid value'
 	    WRITE(6,*)'Valid range is 0.0 to 2.0 '
 	    WRITE(6,*)'Relaxation parameter read in is',RELAX_VARIABLE
-	    RELAX_VARIABLE=1.0D0
+	    RELAX_VARIABLE=1.0_LDP
 	  END IF
 	  DO L=L_ST,L_END
 	    RELAX_PARAM(L)=RELAX_VARIABLE
@@ -144,8 +144,8 @@
 !
 	INQUIRE(UNIT=LU_SUM,OPENED=FILE_OPEN)
 	IF(FILE_OPEN)CLOSE(LU_SUM)
-	IF(LAMBDA_IT)RELAX_PARAM(1:ND)=1.0D0
-	IF(LAMBDA_IT)POP_LIM(1:ND)=100.0D0*CHANGE_LIM
+	IF(LAMBDA_IT)RELAX_PARAM(1:ND)=1.0_LDP
+	IF(LAMBDA_IT)POP_LIM(1:ND)=100.0_LDP*CHANGE_LIM
 !
 	IF(SCALE_OPT(1:5) .EQ. 'MAJOR')THEN
 	  DO I=1,ND
@@ -153,7 +153,7 @@
 	    T1=BIG_LIM                  !Prevents division by zero and insures
 	    T2=LIT_LIM                  !SCALE=1 if small changes.
 	    DO J=1,NT-1
-	      IF(POPS(J,I) .GT. 1.0D-10*POPS(NT-1,I))THEN
+	      IF(POPS(J,I) .GT. 1.0E-10_LDP*POPS(NT-1,I))THEN
 	        T1=MAX(T1,STEQ(J,I))            !Note + means decrease
 	        T2=MIN(T2,STEQ(J,I))            !Note - means increase
 	      END IF
@@ -166,29 +166,29 @@
 	    SCALE=MIN( T_LIM(I)/T3,SCALE )
 	    MIN_SCALE=MIN(SCALE,MIN_SCALE)
 	    IF(STEQ(NT,I) .NE. 0 .AND. POPS(NT,I) .GT. T_MIN .AND.
-	1                      POPS(NT,I)*(1.0D0-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
-	      SCALE=(1.0D0-T_MIN/POPS(NT,I))/STEQ(NT,I)
+	1                      POPS(NT,I)*(1.0_LDP-STEQ(NT,I)*SCALE) .LT. T_MIN)THEN
+	      SCALE=(1.0_LDP-T_MIN/POPS(NT,I))/STEQ(NT,I)
 	    END IF
-	    IF(SCALE .GT. 1.0D0)SCALE=1.0D0             !i.e., will not force T to T_MIN
+	    IF(SCALE .GT. 1.0_LDP)SCALE=1.0_LDP             !i.e., will not force T to T_MIN
 !
 ! RELAX_PARAM allows for the use of successive over or under relaxation.
 ! When RELAX_PARAM > 1, BIG_LIM and LIT_LIM ensure that we don't get
 ! negatve populations.
 !
-	    IF(SCALE .EQ. 1.0D0)SCALE=RELAX_PARAM(I)
+	    IF(SCALE .EQ. 1.0_LDP)SCALE=RELAX_PARAM(I)
 !
 ! Ensure population change doesn't change population by too large an amount.
 ! POP_LIM allows us to force smaller corrections at some depths even while
 ! CMFGEN is running.
 !
-	    T2=(POP_LIM(I)-1.0D0)/POP_LIM(I)
+	    T2=(POP_LIM(I)-1.0_LDP)/POP_LIM(I)
 	    DPTH_BIG_LIM=MIN(BIG_LIM,T2)
-	    DPTH_LIT_LIM=MAX(LIT_LIM,1.0D0-POP_LIM(I))
+	    DPTH_LIT_LIM=MAX(LIT_LIM,1.0_LDP-POP_LIM(I))
 	    DO J=1,NT
 	      T1=STEQ(J,I)*SCALE
 	      IF(T1 .GT. DPTH_BIG_LIM)T1=DPTH_BIG_LIM
 	      IF(T1 .LT. DPTH_LIT_LIM)T1=DPTH_LIT_LIM
-	      POPS(J,I)=POPS(J,I)*(1.0D0-T1)
+	      POPS(J,I)=POPS(J,I)*(1.0_LDP-T1)
 	    END DO
 	  END DO
 	  WRITE(6,'(A,ES12.4)')' The minimum value of scale for Major species is:',MIN_SCALE

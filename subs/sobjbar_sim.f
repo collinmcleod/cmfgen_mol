@@ -88,13 +88,13 @@ C Zero arrays which are incremented as we integrate over angle.
 C Evaluate the SOBOLEV optical depth (GAMH) without angle factor.
 C
 	DO I=1,ND
-	  JBAR(I)=0.0D0
-	  BETA(I)=0.0D0
-	  GAMH(I)=CHIL(I)*3.0D-10*R(I)/V(I)/FL    	!C/dex(15)/dex(5)
-	  ZNET_BL(I)=0.0D0
-	  VB_BL(I)=0.0D0
-	  VC_BL(I)=0.0D0
-	  BETAC_BL(I)=0.0D0
+	  JBAR(I)=0.0_LDP
+	  BETA(I)=0.0_LDP
+	  GAMH(I)=CHIL(I)*3.0E-10_LDP*R(I)/V(I)/FL    	!C/dex(15)/dex(5)
+	  ZNET_BL(I)=0.0_LDP
+	  VB_BL(I)=0.0_LDP
+	  VC_BL(I)=0.0_LDP
+	  BETAC_BL(I)=0.0_LDP
 	END DO
 C
 	CALL DERIVCHI(dCHIdR,CHI,R,ND,METHOD)
@@ -107,21 +107,21 @@ C
 C
 C Initialize AV vector. GAM is the ANGLE DEPENDENT Sobolev optical depth.
 C
-	  AV(1:NI)=0.0D0
+	  AV(1:NI)=0.0_LDP
 	  CALL ZALONGP(R,Z,P(LS),NI)
 	  DO I=1,NI
-	    GAM(I)=GAMH(I)/ABS(1.0D0+Z(I)*Z(I)/R(I)/R(I)*SIGMA(I))
+	    GAM(I)=GAMH(I)/ABS(1.0_LDP+Z(I)*Z(I)/R(I)/R(I)*SIGMA(I))
 	  END DO
 C
 C SOURCE(1) is the boundary continuum source function.
 C
 	  IF(THICK)THEN
 	    IF(P(LS) .GT. 0)THEN
-	      TOR=CHI(1)*R(1)*R(1)*(1.570796-ACOS(P(LS)/R(1)))/P(LS)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
 	    ELSE
  	      TOR=CHI(1)*R(1)
 	    END IF
-	    IBOUND=SOURCE(1)*(1.0D0-EXP(-TOR))
+	    IBOUND=SOURCE(1)*(1.0_LDP-EXP(-TOR))
 	  END IF
 C
 C For NI=1 and 2 AV reprents the intensity variable U (the average
@@ -133,14 +133,14 @@ C
 	  ELSE IF(NI .EQ. 2)THEN
 	    CALL NORDTAU(DTAU,CHI,Z,R,dCHIdR,NI)
 	    E1=EXP(-DTAU(1))
-	    E2=1.0D0-(1.0D0-E1)/DTAU(1)
-	    E3=(1.0D0-E1)/DTAU(1)-E1
-	    IF(DTAU(1) .LT. 1.0D-03)THEN
-	      E2=DTAU(1)*0.5+DTAU(1)*DTAU(1)/6.0D0
-	      E3=DTAU(1)*0.5-DTAU(1)*DTAU(1)/3.0D0
+	    E2=1.0_LDP-(1.0_LDP-E1)/DTAU(1)
+	    E3=(1.0_LDP-E1)/DTAU(1)-E1
+	    IF(DTAU(1) .LT. 1.0E-03_LDP)THEN
+	      E2=DTAU(1)*0.5_LDP+DTAU(1)*DTAU(1)/6.0_LDP
+	      E3=DTAU(1)*0.5_LDP-DTAU(1)*DTAU(1)/3.0_LDP
 	    END IF
 	    AV(2)=IBOUND*E1+SOURCE(2)*E2+SOURCE(1)*E3
-            AV(1)=0.5*(IBOUND+AV(2)*E1+SOURCE(1)*E2+SOURCE(2)*E3)
+            AV(1)=0.5_LDP*(IBOUND+AV(2)*E1+SOURCE(1)*E2+SOURCE(2)*E3)
 	  ELSE
 	    IF(DIF .AND. LS .LE. NC)THEN
 	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI(ND)
@@ -168,7 +168,7 @@ C
 C
 	  DO I=1,NI
 	    T2=AV(I)*CHIL(I)/ETAL(I)
-	    T1=1.0D0-T2
+	    T1=1.0_LDP-T2
 C
 	    ZNET_BL(I)=ZNET_BL(I)+T1*EX_VEC(I)
 	    BETAC_BL(I)=BETAC_BL(I)+EX_VEC(I)*AV(I)
@@ -188,25 +188,25 @@ C
 	  DO I=1,ND
             ST_ON_SL=(ETAL(I)/ETAL_MAT(I,J))*
 	1               (CHIL_MAT(I,J)/CHIL(I))/BBCOR(I,J)
-	    ZNET(I,J)=ST_ON_SL*ZNET_BL(I)+(1.0D0-ST_ON_SL)
+	    ZNET(I,J)=ST_ON_SL*ZNET_BL(I)+(1.0_LDP-ST_ON_SL)
 	    BETAC(I,J)=BETAC_BL(I)*CHIL_MAT(I,J)/ETAL_MAT(I,J)/BBCOR(I,J)
-            VB(I,J)=ST_ON_SL*( VB_BL(I)+(ZNET_BL(I)-1.0D0)*
-	1                      (1.0D0/CHIL_MAT(I,J)-1.0D0/CHIL(I)) )
-            VC(I,J)=ST_ON_SL*( VC_BL(I)+(ZNET_BL(I)-1.0D0)*
-	1                      (BBCOR(I,J)/ETAL(I)-1.0D0/ETAL_MAT(I,J)) )
+            VB(I,J)=ST_ON_SL*( VB_BL(I)+(ZNET_BL(I)-1.0_LDP)*
+	1                      (1.0_LDP/CHIL_MAT(I,J)-1.0_LDP/CHIL(I)) )
+            VC(I,J)=ST_ON_SL*( VC_BL(I)+(ZNET_BL(I)-1.0_LDP)*
+	1                      (BBCOR(I,J)/ETAL(I)-1.0_LDP/ETAL_MAT(I,J)) )
 	  END DO
 	END DO
 C
 	DO I=1,ND
-          VB_2(I)=VB_BL(I)-(ZNET_BL(I)-1.0D0)/CHIL(I)
-          VC_2(I)=VC_BL(I)+(ZNET_BL(I)-1.0D0)/ETAL(I)
+          VB_2(I)=VB_BL(I)-(ZNET_BL(I)-1.0_LDP)/CHIL(I)
+          VC_2(I)=VC_BL(I)+(ZNET_BL(I)-1.0_LDP)/ETAL(I)
 	END DO
 C
 C Compute the mean line intensity. This is not very accurate, and
 C fails if CHIL(I,1) .EQ. 0
 C
 	DO I=1,ND
-	  JBAR(I)=(1.0D0-ZNET_BL(I))*ETAL(I)/CHIL(I)
+	  JBAR(I)=(1.0_LDP-ZNET_BL(I))*ETAL(I)/CHIL(I)
 	END DO
 C
 	RETURN

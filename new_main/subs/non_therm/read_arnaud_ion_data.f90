@@ -21,7 +21,7 @@
 	INTEGER, PARAMETER :: LU_IN=7
 	INTEGER, PARAMETER :: LU_OUT=10
 !
-	REAL(KIND=LDP), PARAMETER :: Hz_TO_eV=4.1356691D0
+	REAL(KIND=LDP), PARAMETER :: Hz_TO_eV=4.1356691_LDP
 	REAL(KIND=LDP) T1,T2
 !
 	LOGICAL MATCH_FOUND
@@ -144,7 +144,7 @@
 	               THD(IT)%N_ION_ROUTES=1
 	               THD(IT)%ION_LEV(1)=1
 	             ELSE
-	               THD(IT)%SUM_GION=0.0D0
+	               THD(IT)%SUM_GION=0.0_LDP
 	               THD(IT)%N_ION_ROUTES=0
 	               ID_ION=ID+1
 	               DO I=1,ATM(ID_ION)%NXzV_F

@@ -30,8 +30,8 @@ C
 C The initialization required for when I find out how many numbers I have
 C read in.
 C
-	OBS_FREQ(1:NCF_MAX)=0.0D0
-	OBS_FLUX(1:NCF_MAX)=0.0D0
+	OBS_FREQ(1:NCF_MAX)=0.0_LDP
+	OBS_FLUX(1:NCF_MAX)=0.0_LDP
 C
 C Continue reading observed frequencies until we hit FLUX header string.
 C

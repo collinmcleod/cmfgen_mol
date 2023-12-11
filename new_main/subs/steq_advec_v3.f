@@ -60,11 +60,11 @@
 	WRITE(6,*)'WARNNG IN STEQ_ADVEC_V3 --- reduced advection TERMS'
 	WRITE(6,*)'**************************'
 	WRITE(6,*)'**************************'
-	DERIV_FAC=1.0D-05                         !Should be 1.0D-05
+	DERIV_FAC=1.0E-05_LDP                         !Should be 1.0D-05
 !
 	IF(LINEAR)THEN
 	  DO K=1,ND
-	    ADVEC_RR(K)=0.0D0
+	    ADVEC_RR(K)=0.0_LDP
 	    KP1=K+1
 	    IF(K .EQ. ND)KP1=ND-1
 	    DERIV_CONST=DERIV_FAC/R(K)/R(K)/(R(K)-R(KP1))
@@ -113,7 +113,7 @@
 ! for adiabatic cooling was included.
 !
 	  DO K=1,ND
-	    ADVEC_RR(K)=0.0D0
+	    ADVEC_RR(K)=0.0_LDP
 	    KP1=K+1
 	    IF(K .EQ. ND)KP1=ND-1
 	    DERIV_CONST=DERIV_FAC*VEL(K)/R(K)

@@ -85,12 +85,12 @@
 !$OMP PARALLEL DO PRIVATE(I,J,RECIP_B_ION,BSTIM,WSE_BY_RJ,T3,T4,DI_FAC,ED_FAC,T_FAC)
 !
 	DO I=DST,DEND			!Which depth point.
-	  IF(JREC(I) .NE. 0.0D0 .AND. WSE_X(1,1) .NE. 0.0D0)THEN
+	  IF(JREC(I) .NE. 0.0_LDP .AND. WSE_X(1,1) .NE. 0.0_LDP)THEN
 	    RECIP_B_ION=HNST_B(1,I)/HN_B(1,I)
 	    BSTIM=JREC(I)*RECIP_B_ION
 	  ELSE
-	    RECIP_B_ION=0.0D0
-	    BSTIM=0.0D0
+	    RECIP_B_ION=0.0_LDP
+	    BSTIM=0.0_LDP
 	  END IF
 	  DO J=1,N_A			!Which equation (for S.E. only)
 	    IF(WSE_X(J,I) .NE. 0)THEN
@@ -108,9 +108,9 @@
 	      T3=HNST_A(J,I)*WSE_X(J,I)*BSTIM
 	      T4=HNST_A(J,I)*WSE_X(J,I)*RECIP_B_ION
 	      DI_FAC=T3/DI(I)
-	      ED_FAC=2.0D0*T3/ED(I)
+	      ED_FAC=2.0_LDP*T3/ED(I)
 	      T_FAC=T3*( dlnHNST_AdlnT(J,I) -
-	1             HDKT*(EDGE_B(1)+1.5D0)/T(I) )/T(I) + T4*dJRECdT(I)
+	1             HDKT*(EDGE_B(1)+1.5_LDP)/T(I) )/T(I) + T4*dJRECdT(I)
 !
 	      SE(ID)%BA_PAR(J,ION_V,I)=SE(ID)%BA_PAR(J,ION_V,I) +DI_FAC
 	      SE(ID)%BA_PAR(J,NIV-1,I)=SE(ID)%BA_PAR(J,NIV-1,I) +ED_FAC

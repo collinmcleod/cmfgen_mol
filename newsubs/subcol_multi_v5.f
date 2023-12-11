@@ -91,8 +91,8 @@
 	REAL(KIND=LDP) BRAT
 	REAL(KIND=LDP) CIJ,CJI,CII
 !
-	COL_S(:,:,:)=0.0D0  		!N_S, N_S, ND
-	dCOL_S(:,:,:)=0.0D0  		!N_S, N_S, ND
+	COL_S(:,:,:)=0.0_LDP  		!N_S, N_S, ND
+	dCOL_S(:,:,:)=0.0_LDP  		!N_S, N_S, ND
 !
 ! Loop over all depths. This is provided for consistency with other collisonal
 ! routines. We operate on a single depth at a time to minimize the size of
@@ -103,8 +103,8 @@
 ! The following correspond to the collision rates between levels I and J in
 ! the FULL atom.
 !
-	  OMEGA_F(:,:)=0.0D0
-	  dln_OMEGA_dlnT(:,:)=0.0D0
+	  OMEGA_F(:,:)=0.0_LDP
+	  dln_OMEGA_dlnT(:,:)=0.0_LDP
 !
 	  CALL OMEGA_COL(OMEGA_F,dln_OMEGA_dlnT,EDGE_F,AHYD_F,GHYD_F,
 	1                  LEVNAME_F,ZION,N_F,T(K),
@@ -113,7 +113,7 @@
 	  DO I=1,N_F-1
 	    DO J=I+1,N_F
 !
-	      CIJ=8.63D-08*ED(K)*OMEGA_F(I,J)/SQRT(T(K))
+	      CIJ=8.63E-08_LDP*ED(K)*OMEGA_F(I,J)/SQRT(T(K))
 	      CJI=CIJ/GHYD_F(J)
 	      X=HDKT*(EDGE_F(I)-EDGE_F(J))/T(K)
 	      CIJ=CIJ*EXP(-X)/GHYD_F(I)
@@ -121,10 +121,10 @@
 ! Allow for collisional ionization through level dissolution.
 !
 	      L=F_TO_S_MAPPING(I)
-	      CII=CIJ*HNST_F_ON_S(I,K)*(1.0D0-W_F(J,K)/W_F(I,K))
+	      CII=CIJ*HNST_F_ON_S(I,K)*(1.0_LDP-W_F(J,K)/W_F(I,K))
 	      COL_S(L,L,K)=COL_S(L,L,K)+CII
 	      DCOL_S(L,L,K)=DCOL_S(L,L,K)+CII*( dln_OMEGA_dlnT(I,J) +
-	1        X -2.0D0 - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+	1        X -2.0_LDP - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
 !
 ! We use the full ionization energy because of the following argument.
 ! We think of the ionization as a 3 body process. The extra ionization
@@ -158,9 +158,9 @@
 ! We now compute the derivatives of the collision rates with respect to T.
 !
 	        DCOL_S(L,U,K)=DCOL_S(L,U,K)+CIJ*( dln_OMEGA_dlnT(I,J) + X -
-	1           2.0D0 - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+	1           2.0_LDP - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
 	        DCOL_S(U,L,K)=DCOL_S(U,L,K)+CJI*( dln_OMEGA_dlnT(I,J) -
-	1           2.0D0 - HDKT*EDGE_F(J)/T(K)-dlnHNST_S_dlnT(U,K) )/T(K)
+	1           2.0_LDP - HDKT*EDGE_F(J)/T(K)-dlnHNST_S_dlnT(U,K) )/T(K)
 !
 	        COOL(K)=COOL(K)+(HN_S(L,K)*CIJ-HN_S(U,K)*CJI)*
 	1                          (EDGE_F(I)-EDGE_F(J))
@@ -175,12 +175,12 @@
 !
 	  DO I=1,N_F
 	    L=F_TO_S_MAPPING(I)
-	    CII=8.63D-08*ED(K)*OMEGA_F(I,I)/GHYD_F(I)/SQRT(T(K))
+	    CII=8.63E-08_LDP*ED(K)*OMEGA_F(I,I)/GHYD_F(I)/SQRT(T(K))
 	    X=HDKT*EDGE_F(I)/T(K)
 	    CII=CII*EXP(-X)*HNST_F_ON_S(I,K)
 	    COL_S(L,L,K)=COL_S(L,L,K)+CII
 	    DCOL_S(L,L,K)=DCOL_S(L,L,K)+
-	1       CII*( dln_OMEGA_dlnT(I,I) - 2.0D0 - dlnHNST_S_dlnT(L,K) )/T(K)
+	1       CII*( dln_OMEGA_dlnT(I,I) - 2.0_LDP - dlnHNST_S_dlnT(L,K) )/T(K)
 	    COOL(K)=COOL(K)+EDGE_F(I)*CII*(HN_S(L,K)-HNST_S(L,K))
 	  END DO
 !

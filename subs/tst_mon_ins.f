@@ -23,9 +23,9 @@ C
 	DO I=1, 100 ; CHI(1)=RAN(ISEED); END DO
 C
 	DO I=1,ND
-	  R(I)=1.0+0.1D0*(I**2)
- 	  CHI(I)=3.0*(R(I)/R(1))**4.0
- 	  CHI(I)=2.0D0+RAN(ISEED)
+	  R(I)=1.0_LDP+0.1_LDP*(I**2)
+ 	  CHI(I)=3.0_LDP*(R(I)/R(1))**4.0
+ 	  CHI(I)=2.0_LDP+RAN(ISEED)
 	END DO
 C	DO I=ND,1,-1
 C	  R(I)=1.0+0.1D0*((ND-I)**2)
@@ -35,10 +35,10 @@ C	END DO
 C
 	DO I=1,ND-1
 	  DELR=R(I+1)-R(I)
-	  R_INS(I,1)=R(I)+0.04*DELR
-	  R_INS(I,2)=R(I)+0.16*DELR
-	  R_INS(I,3)=R(I)+0.40*DELR
-	  R_INS(I,4)=R(I)+0.70*DELR
+	  R_INS(I,1)=R(I)+0.04_LDP*DELR
+	  R_INS(I,2)=R(I)+0.16_LDP*DELR
+	  R_INS(I,3)=R(I)+0.40_LDP*DELR
+	  R_INS(I,4)=R(I)+0.70_LDP*DELR
 	END DO
 C
 	LOGX=.FALSE.

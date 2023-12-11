@@ -28,8 +28,8 @@ C The initialization required for when I find out how many numbers I have
 C read in.
 C
 	DO J=1,NL_MAX
-	  LAM(J)=0.0D0
-	  EW(J)=0.0D0
+	  LAM(J)=0.0_LDP
+	  EW(J)=0.0_LDP
 	END DO
 C
 	NL=0

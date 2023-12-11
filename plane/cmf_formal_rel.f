@@ -145,9 +145,9 @@
 !
 !
 	IF(INITIALIZE)THEN
-	  NU_ON_dNU=0.0D0
+	  NU_ON_dNU=0.0_LDP
 	ELSE
-	  NU_ON_dNU=1.0D0/dLOG_NU
+	  NU_ON_dNU=1.0_LDP/dLOG_NU
 	END IF
 !	IF(dLOG_NU .NE. 0.0D0)NU_ON_dNU=1.0D0/dLOG_NU
 !
@@ -222,20 +222,20 @@
 	    R_EXT(ND_ADD+I)=R(I)
 	  END DO
 	  IF(THICK_OB)THEN
-	    IF(V(ND) .LT. 10.0D0 .AND. R(1)/R(ND) .GE. 9.99D0)THEN
-	      RMAX=10.0D0*R(1)		!Stellar wind
-	    ELSE IF(V(ND) .GT. 10.0D0 .OR. V(1) .GT. 2.0D+04)THEN
-	      RMAX=1.5D0*R(1)		!SN model
+	    IF(V(ND) .LT. 10.0_LDP .AND. R(1)/R(ND) .GE. 9.99_LDP)THEN
+	      RMAX=10.0_LDP*R(1)		!Stellar wind
+	    ELSE IF(V(ND) .GT. 10.0_LDP .OR. V(1) .GT. 2.0E+04_LDP)THEN
+	      RMAX=1.5_LDP*R(1)		!SN model
 	    ELSE
-	      RMAX=MIN(10.0D0,SQRT(R(1)/R(ND)))*R(1)
+	      RMAX=MIN(10.0_LDP,SQRT(R(1)/R(ND)))*R(1)
 	    END IF
 	    ALPHA=R(1)+(R(1)-R(2))
 	    DEL_R_FAC=EXP( LOG(RMAX/ALPHA)/(ND_ADD-4) )
 	    R_EXT(1)=RMAX
 	    R_EXT(5)=RMAX/DEL_R_FAC
-	    R_EXT(2)=R_EXT(1)-0.001*(R_EXT(1)-R_EXT(5))
-	    R_EXT(3)=R_EXT(1)-0.1*(R_EXT(1)-R_EXT(5))
-	    R_EXT(4)=R_EXT(1)-0.4*(R_EXT(1)-R_EXT(5))
+	    R_EXT(2)=R_EXT(1)-0.001_LDP*(R_EXT(1)-R_EXT(5))
+	    R_EXT(3)=R_EXT(1)-0.1_LDP*(R_EXT(1)-R_EXT(5))
+	    R_EXT(4)=R_EXT(1)-0.4_LDP*(R_EXT(1)-R_EXT(5))
 	    DO I=5,ND_ADD-1
 	      R_EXT(I)=R_EXT(I-1)/DEL_R_FAC
 	    END DO
@@ -245,10 +245,10 @@
 !
 	  WRITE(6,'(5ES14.4)')(R_EXT(I),I=1,ND_EXT)
 !
-	  C_KMS=1.0D-05*SPEED_OF_LIGHT()
-	  GAM_REL(1:ND)=1.0D0/SQRT(1.0D0-(V(1:ND)/C_KMS)**2)
+	  C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
+	  GAM_REL(1:ND)=1.0_LDP/SQRT(1.0_LDP-(V(1:ND)/C_KMS)**2)
 	  DO I=1,ND-1
-	    MIDR(I)=0.5D0*(R(I)+R(I+1))
+	    MIDR(I)=0.5_LDP*(R(I)+R(I+1))
 	  END DO
 !
 !
@@ -258,11 +258,11 @@
 	  VDOP_VEC_EXT(ND_ADD+1:ND_EXT)=VDOP_VEC(1:ND)
 	  SIGMA_EXT(ND_ADD+1:ND_EXT)=SIGMA(1:ND)
 	  IF(THICK_OB)THEN
-	    BETA=(SIGMA(1)+1.0D0)*(R(1)/R(ND)-1.0D0)
+	    BETA=(SIGMA(1)+1.0_LDP)*(R(1)/R(ND)-1.0_LDP)
             VINF=V(1)/(1-R(ND)/R(1))**BETA
 	    DO I=1,ND_ADD
-	      V_EXT(I)=VINF*(1.0D0-R_EXT(ND_EXT)/R_EXT(I))**BETA
-	      SIGMA_EXT(I)=BETA/(R_EXT(I)/R_EXT(ND_EXT)-1.0D0)-1.0D0
+	      V_EXT(I)=VINF*(1.0_LDP-R_EXT(ND_EXT)/R_EXT(I))**BETA
+	      SIGMA_EXT(I)=BETA/(R_EXT(I)/R_EXT(ND_EXT)-1.0_LDP)-1.0_LDP
 	    END DO
 	    VDOP_VEC_EXT(1:ND_ADD)=VDOP_VEC(1)
 	    WRITE(LUER,'(A)')' '
@@ -291,16 +291,16 @@
 	  IDMIN=1; IDMAX=4
 	  IF(CHI(IDMIN) .LE. ESEC(IDMIN) .OR. CHI(IDMAX) .LE. ESEC(IDMAX))THEN
 	    ESEC_POW=LOG(ESEC(IDMAX)/ESEC(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
-	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
+	    IF(ESEC_POW .LT. 2._LDP)ESEC_POW=2
 	    DO I=1,ND_ADD
 	      CHI_EXT(I)=CHI(IDMIN)*(R(IDMIN)/R_EXT(I))**ESEC_POW
 	    END DO
 	  ELSE
 	    ALPHA=LOG( (CHI(IDMAX)-ESEC(IDMAX)) / (CHI(IDMIN)-ESEC(IDMIN)) )
 	1          /LOG(R(IDMIN)/R(IDMAX))
-	    IF(ALPHA .LT. 2.)ALPHA=2.0
+	    IF(ALPHA .LT. 2._LDP)ALPHA=2.0
 	    ESEC_POW=LOG(ESEC(IDMAX)/ESEC(IDMIN))/LOG(R(IDMIN)/R(IDMAX))
-	    IF(ESEC_POW .LT. 2.)ESEC_POW=2
+	    IF(ESEC_POW .LT. 2._LDP)ESEC_POW=2
    	    DO I=1,ND_ADD
 	      T1=(CHI(IDMIN)-ESEC(IDMIN))*(R(IDMIN)/R_EXT(I))**ALPHA
 	      T2=ESEC(IDMIN)*(R(IDMIN)/R_EXT(I))**ESEC_POW
@@ -315,10 +315,10 @@
 ! 3 we would get a logarithmic flux divergence as we increase the volume.
 !
 	  ALPHA=LOG(ETA(4)/ETA(1))/LOG(R(1)/R(4))
-	  IF(ALPHA .LT. 3.5)ALPHA=3.5
+	  IF(ALPHA .LT. 3.5_LDP)ALPHA=3.5
 	  DO I=1,ND_ADD
 	    ETA_EXT(I)=ETA(1)*(R(1)/R_EXT(I))**ALPHA
-	    IF(ETA_EXT(I) .LE. 1.0D-280)ETA_EXT(I)=1.0D-280
+	    IF(ETA_EXT(I) .LE. 1.0E-280_LDP)ETA_EXT(I)=1.0E-280_LDP
 	  END DO
 	  DO I=ND_ADD+1,ND_EXT
 	    ETA_EXT(I)=ETA(I-ND_ADD)
@@ -332,7 +332,7 @@
 	  CALL DEFINE_GRID_V2(R_EXT,V_EXT,VDOP_VEC_EXT,VDOP_FRAC,ND_EXT,R,P,ND,NC,NP)
 	  J=0
 !	  OPEN(UNIT=7,FILE='MU_VALUES',STATUS='UNKNOWN')
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  DO IP=1,NP
 	    J=MAX(J,RAY(IP)%NZ)
 !	    MU_AT_RMAX(IP)=RAY(IP)%MU_P(RAY(IP)%LNK(1))
@@ -358,20 +358,20 @@
 	END IF
 !
 !
-	JNU(:)=0.0D0
-	HNU(:)=0.0D0
-	KNU(:)=0.0D0
-	NNU(:)=0.0D0
+	JNU(:)=0.0_LDP
+	HNU(:)=0.0_LDP
+	KNU(:)=0.0_LDP
+	NNU(:)=0.0_LDP
 !
 	IF(INITIALIZE)THEN
 	  DO IP=1,NP
-	    RAY(IP)%I_P=0.0D0; RAY(IP)%I_M=0.0D0
-	    RAY(IP)%I_P_PREV=0.0D0; RAY(IP)%I_M_PREV=0.0D0
-	    RAY(IP)%I_P_SAVE=0.0D0; RAY(IP)%I_M_SAVE=0.0D0
+	    RAY(IP)%I_P=0.0_LDP; RAY(IP)%I_M=0.0_LDP
+	    RAY(IP)%I_P_PREV=0.0_LDP; RAY(IP)%I_M_PREV=0.0_LDP
+	    RAY(IP)%I_P_SAVE=0.0_LDP; RAY(IP)%I_M_SAVE=0.0_LDP
 	  END DO	
 	ELSE IF(NEW_FREQ)THEN
 	  DO IP=1,NP
-	    RAY(IP)%I_P=0.0D0; RAY(IP)%I_M=0.0D0
+	    RAY(IP)%I_P=0.0_LDP; RAY(IP)%I_M=0.0_LDP
 	    RAY(IP)%I_P_PREV=RAY(IP)%I_P_SAVE
 	    RAY(IP)%I_M_PREV=RAY(IP)%I_M_SAVE
 	  END DO	
@@ -391,7 +391,7 @@
 	IF(THICK_OB)NP_LIMIT=NP
 	T1=DBB/CHI(ND)			!dB/dTAU
 	BOUNDARY='diffusion'
-	IF(.not. DIF)T1=0.0D0
+	IF(.not. DIF)T1=0.0_LDP
 	DO IP=1,NP_LIMIT
 !
 	  NRAY=RAY(IP)%NZ
@@ -423,7 +423,7 @@
 	  DO ID=1,MIN(ND,NP-IP+1)
 	    I_P_GRID(ID)=RAY(IP)%I_P(RAY(IP)%LNK(ID))
 	    I_M_GRID(ID)=RAY(IP)%I_M(RAY(IP)%LNK(ID))
-	    IF( I_P_GRID(ID) .LT. 0 .OR. I_M_GRID(ID) .LT. 0.0D0)THEN
+	    IF( I_P_GRID(ID) .LT. 0 .OR. I_M_GRID(ID) .LT. 0.0_LDP)THEN
 	      WRITE(145,*)'Error: invalid intensities is SOVE_CMF_REL'
 	      WRITE(145,*)IP,NRAY
 	      WRITE(145,'(4ES14.4)')FREQ,dLOG_NU,B_PLANCK,DBB
@@ -495,17 +495,17 @@
 	    RSQN_MID_ON_RSQJ(I)=NNU_MID(I)/(TMP_VEC(I)+TMP_VEC(I+1))
 	  END DO
 	ELSE IF(N_TYPE .EQ. 'MIXED')THEN
-	  RSQN_MID_ON_RSQJ(1:NDM1)=0.0D0
+	  RSQN_MID_ON_RSQJ(1:NDM1)=0.0_LDP
 !	  N_ON_H_MID(1)=NNU_MID(1)/HNU_MID(1)
 	  DO I=1,NDM1
 	    IF(HNU_MID(I) .NE. 0)THEN
 	      T1=NNU_MID(I)/HNU_MID(I)
 	    ELSE
-	      T1=100.0D0
+	      T1=100.0_LDP
 	    END IF
-	    IF(T1 .GT. 1.1 .OR. T1 .LT. 0.05)THEN
+	    IF(T1 .GT. 1.1_LDP .OR. T1 .LT. 0.05_LDP)THEN
 	      RSQN_MID_ON_RSQJ(I)=NNU_MID(I)/(TMP_VEC(I)+TMP_VEC(I+1))
-	      N_ON_H_MID(I)=0.0D0
+	      N_ON_H_MID(I)=0.0_LDP
 	    ELSE
 	      N_ON_H_MID(I)=T1
 	    END IF
@@ -516,17 +516,17 @@
 ! the Eddington factor in case strange values are occurring because H
 ! is near zero (switching sign?).
 !
-	  RSQN_MID_ON_RSQJ(1:NDM1)=0.0D0
+	  RSQN_MID_ON_RSQJ(1:NDM1)=0.0_LDP
 	  DO I=1,NDM1
 	    IF(HNU_MID(I) .NE. 0)THEN
 	       N_ON_H_MID(I)=NNU_MID(I)/HNU_MID(I)
-	       IF(N_ON_H_MID(I) .GT. 1.0D0)THEN
-	         N_ON_H_MID(I)=1.0D0
-	       ELSE IF( NNU_MID(I) .LT. 0.01) THEN
-	         N_ON_H_MID(I)=0.01D0
+	       IF(N_ON_H_MID(I) .GT. 1.0_LDP)THEN
+	         N_ON_H_MID(I)=1.0_LDP
+	       ELSE IF( NNU_MID(I) .LT. 0.01_LDP) THEN
+	         N_ON_H_MID(I)=0.01_LDP
 	       END IF
 	    ELSE
-	      N_ON_H_MID(I)=0.0D0              !Later replaced by average.
+	      N_ON_H_MID(I)=0.0_LDP              !Later replaced by average.
 	      WRITE(LUER,'(1X,A,1PE16.8)')'HNU zero for frequency:',FREQ
 	      WRITE(LUER,'(1X,A,I4)')'Error occurred at depth:',I
 	     END IF

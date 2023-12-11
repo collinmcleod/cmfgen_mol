@@ -47,12 +47,12 @@ c
 c Compute number of digits to be written
 c
       default=' '
-      if((abs(input).ge.1.0d+06).or.(abs(input).le.1.0d-3))then
+      if((abs(input).ge.1.0E+06_LDP).or.(abs(input).le.1.0E-3_LDP))then
 c
 c E format
 c
         num_char=6+num_e_decimal
-        if(input.lt.0.0)num_char=num_char+1       !minus sign
+        if(input.lt.0.0_LDP)num_char=num_char+1       !minus sign
         write(fmt,'(a5,i2.2,a1,i2.2,a1)')
      *       '(1p,e',num_char,'.',num_e_decimal,')'
         write(default,fmt)input
@@ -71,11 +71,11 @@ c F format
 c
         t1=abs(input)
         num_char=2
-        if(t1.gt.1.0)then
+        if(t1.gt.1.0_LDP)then
           num_char=num_char+log10(t1)
         end if
         num_char=num_char+num_f_decimal
-        if(input.lt.0.0)num_char=num_char+1       !minus sign
+        if(input.lt.0.0_LDP)num_char=num_char+1       !minus sign
 c
         if(num_char.lt.10)then
           write(fmt,"('(f',i1,'.',i1,')')")num_char,num_f_decimal
@@ -136,7 +136,7 @@ c Loop over dimension of array "input"
 c
       do j=1,dim
 c
-        if((abs(input(j)).ge.1.0d+06).or.(abs(input(j)).le.1.0d-3))then
+        if((abs(input(j)).ge.1.0E+06_LDP).or.(abs(input(j)).le.1.0E-3_LDP))then
 c
 c E format
 c
@@ -160,7 +160,7 @@ c F format
 c
           t1=abs(input(j))
           num_char=2
-          if(t1.gt.1.0)then
+          if(t1.gt.1.0_LDP)then
             num_char=num_char+log10(t1)
           end if
           num_char=num_char+num_f_decimal
@@ -227,7 +227,7 @@ c
 c
       t1=abs(float(input))
       num_char=1
-      if(t1.gt.1.0)then
+      if(t1.gt.1.0_LDP)then
         num_char=num_char+log10(t1)
       end if
       if(input.lt.0)num_char=num_char+1    !minus sign
@@ -280,7 +280,7 @@ c
 c
         t1=abs(float(input(j)))
         num_char=1
-        if(t1.gt.1.0)then
+        if(t1.gt.1.0_LDP)then
           num_char=num_char+log10(t1)
         end if
         num_char=num_char

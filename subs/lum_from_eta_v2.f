@@ -42,10 +42,10 @@
 	END IF
 !
 	DO I=1,ND-1
-	  LINE_LUM(I)=0.5D0*(R(I)-R(I+1))*( LINE_LUM(I)+LINE_LUM(I+1)
-	1            +(R(I)-R(I+1))*(DERIV(I+1)-DERIV(I))/6.0D0 )
+	  LINE_LUM(I)=0.5_LDP*(R(I)-R(I+1))*( LINE_LUM(I)+LINE_LUM(I+1)
+	1            +(R(I)-R(I+1))*(DERIV(I+1)-DERIV(I))/6.0_LDP )
 	END DO
-	LINE_LUM(ND)=0.0D0
+	LINE_LUM(ND)=0.0_LDP
 !
 	RETURN
 	END

@@ -84,7 +84,7 @@
 	        CNT=0
 	        DO NL=1,NF-1
 	          DO NUP=2,NF
-	            IF(ATM(ID)%AXzV_F(NUP,NL) .GT. 0.0D0)CNT=CNT+1
+	            IF(ATM(ID)%AXzV_F(NUP,NL) .GT. 0.0_LDP)CNT=CNT+1
 	          END DO
 	        END DO
 	        CALL LATEX_NAME(MOD_NAME,VERBOSE,LU_DIAG)

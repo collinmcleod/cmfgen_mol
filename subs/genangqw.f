@@ -31,7 +31,7 @@ C
 C
 C Initialization section
 C
-	QW(:,:)=0.0D0
+	QW(:,:)=0.0_LDP
 	DO 10 I=1,NP
 	  TA(I)=P(I)*P(I)
 10	CONTINUE
@@ -66,18 +66,18 @@ C
 	  NW=NC+MAXND-I+1
 	  IF(NW .GT. NP)NW=NP
 	  IF(AT_HALF)THEN
-	    T2=0.5D0*( R(I)+R(I+1) )
+	    T2=0.5_LDP*( R(I)+R(I+1) )
 	    T1=T2*T2
 	  ELSE
 	    T2=R(I)
 	    T1=T2*T2
 	  END IF
 	  DO 100 J=1,NW
-	    TB(J)=0.0D0
+	    TB(J)=0.0_LDP
 	    IF(R(I) .NE. P(J))TB(J)=SQRT(T1-TA(J))/T2
 100	  CONTINUE
 	  CALL MOMWEIGHT(TB,TC,NW)
-	  IF(TB(NW) .NE. 0.0D0)COUNTER=COUNTER+1
+	  IF(TB(NW) .NE. 0.0_LDP)COUNTER=COUNTER+1
 	  DO 200 J=1,NW
 	    QW(I,J)=TC(J)
 200	  CONTINUE

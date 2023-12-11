@@ -52,7 +52,7 @@ C
 	  ALLOCATE (NEW_GAM(ND))
 	  ALLOCATE (NEW_ED(ND))
 C
-	  OLD_GAM(:,:)=0.0D0
+	  OLD_GAM(:,:)=0.0_LDP
 C
 	  STRING=' '
 	  DO WHILE( INDEX(STRING,'!Electron density') .EQ. 0)
@@ -83,7 +83,7 @@ C
 !
 ! Estimate the GAMMAS by simply using the grid index.
 !
-	ED(:)=0.0D0	
+	ED(:)=0.0_LDP	
 	DO ID=1,N_SPEC
 	  DO I=1,ND
 	    J=I+(NGAM-ND)
@@ -127,7 +127,7 @@ C
 	  END IF
 	  WRITE(LUER,*)EXP(ED(XST)),EXP(ED(XEND))
 C
-	  NEW_ED(1:ND)=0.0D0
+	  NEW_ED(1:ND)=0.0_LDP
 	  DO J=1,N_SPEC
 	    CALL LIN_INTERP(ED(XST),NEW_GAM(XST),NX,
 	1             OLD_ED,OLD_GAM(1,J),NGAM)
@@ -139,8 +139,8 @@ C
 C For the extrapolation, we assume constant ionization.
 C
 	  DO I=1,XST-1
-	    T1=0.0D0
-	    T2=0.0D0
+	    T1=0.0_LDP
+	    T2=0.0_LDP
 	    DO J=1,N_SPEC
 	      T1=T1+SPEC_DENS(I,J)
 	      T2=T2+SPEC_DENS(XST,J)
@@ -149,8 +149,8 @@ C
 	  END DO
 C
 	  DO I=XEND+1,ND
-	    T1=0.0D0
-	    T2=0.0D0
+	    T1=0.0_LDP
+	    T2=0.0_LDP
 	    DO J=1,N_SPEC
 	      T1=T1+SPEC_DENS(I,J)
 	      T2=T2+SPEC_DENS(XEND,J)
@@ -158,16 +158,16 @@ C
 	    NEW_ED(I)=NEW_ED(XEND)*T1/T2
 	  END DO
 C
-	  CHANGE=0.0D0
+	  CHANGE=0.0_LDP
 	  DO I=1,ND
 	    T1=LOG(NEW_ED(I))
 	    CHANGE=MAX( CHANGE,ABS(ED(I)-T1) )
 	    ED(I)=T1
 	  END DO
-	  IF(CHANGE .LT. 0.01)GOTO 500
+	  IF(CHANGE .LT. 0.01_LDP)GOTO 500
 	END DO
 	WRITE(LUER,*)'Warning ED calculation has not converged',
-	1               ' % change is ',CHANGE*LOG(10.0)
+	1               ' % change is ',CHANGE*LOG(10.0_LDP)
 C
 500	CONTINUE
 C

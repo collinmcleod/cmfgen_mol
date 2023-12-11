@@ -204,10 +204,10 @@
 !
 	CALL TUNE(1,'OBS_FRAME_SUB')
 !
-	C_KMS=SPEED_OF_LIGHT()*1.0D-05
+	C_KMS=SPEED_OF_LIGHT()*1.0E-05_LDP
 	PI=FUN_PI()
 	LUER=ERROR_LU()
-	OBS_FLUX(1:NOS)=0.0D0
+	OBS_FLUX(1:NOS)=0.0_LDP
 	ERR_COUNT=0
 !
 	IF(INT_METHOD .NE. 'STAU' .AND.
@@ -217,7 +217,7 @@
 	  WRITE(LUER,*)'Integration Method =',INT_METHOD
 	  STOP
 	END IF
-	IF(TAU_MAX .LT. 10 .OR. TAU_MAX .GT. 30.0D0)THEN
+	IF(TAU_MAX .LT. 10 .OR. TAU_MAX .GT. 30.0_LDP)THEN
 	  WRITE(LUER,*)'Warning in OBS_FRAME_SUB_V4'
 	  WRITE(LUER,*)'TAU_MAX is outside the recommended range of (10,20)'
 	  WRITE(LUER,*)'TAU_MAX=',TAU_MAX
@@ -230,7 +230,7 @@
 !
 ! Ideally ES_DTAU should be 0.1 to 0.25
 !
-	IF(ES_DTAU .LT. 0.001 .OR. ES_DTAU .GT. 1.0D0)THEN
+	IF(ES_DTAU .LT. 0.001_LDP .OR. ES_DTAU .GT. 1.0_LDP)THEN
 	  WRITE(LUER,*)'Warning in OBS_FRAME_SUB_V4'
 	  WRITE(LUER,*)'ES_DTAU is outside the recommended range'
 	  WRITE(LUER,*)'ES_DTAU=',ES_DTAU
@@ -256,7 +256,7 @@
 	    WRITE(LUER,*)'STATUS=',IOS
 	    STOP
 	  END IF
-	  IP_OBS=0.0D0
+	  IP_OBS=0.0_LDP
 	END IF
 !
 	IF(WRITE_RTAU)THEN
@@ -276,7 +276,7 @@
 	      WRITE(LUER,*)'STATUS=',IOS
 	      STOP
 	   END IF
-	   ZTAU=0.0D0; RTAU=0.0D0
+	   ZTAU=0.0_LDP; RTAU=0.0_LDP
 	END IF
 !
 	IF(WRITE_dFR)THEN
@@ -288,7 +288,7 @@
 	     WRITE(LUER,*)'STATUS=',IOS
 	     STOP
 	  END IF
-	  dI_R=0.0D0
+	  dI_R=0.0_LDP
 	END IF
 !
 ! Check that frequencies are monotonically decreasing.
@@ -336,24 +336,24 @@
 !
 ! Compute electron scattering opacity.
 !
-	ESEC(1:ND)=6.65D-15*ED(1:ND)
+	ESEC(1:ND)=6.65E-15_LDP*ED(1:ND)
 !
 ! If we have a SN model, we determine if we have a hollow core.
 ! We use TAU_MAX.
 !
-	TAU_ES(1)=0.0D0
+	TAU_ES(1)=0.0_LDP
 	DO I=2,ND
-	   TAU_ES(I)=TAU_ES(I-1)+0.5D0*(ESEC(I-1)+ESEC(I))*(R(I-1)-R(I))
+	   TAU_ES(I)=TAU_ES(I-1)+0.5_LDP*(ESEC(I-1)+ESEC(I))*(R(I-1)-R(I))
 	END DO
 	HOLLOW_CORE=.FALSE.
-	IF(V(ND) .GT. 100.0D0 .AND. TAU_ES(ND) .LT. TAU_MAX)HOLLOW_CORE=.TRUE.
+	IF(V(ND) .GT. 100.0_LDP .AND. TAU_ES(ND) .LT. TAU_MAX)HOLLOW_CORE=.TRUE.
 !
 ! 2* since ray can extend across whole atmosphere. The 2TAU_MAX/ES_DTAU is
 ! for the insertion of extra continuum points if DTAU_ES > ES_DTAU (for
 ! TAU_ES < TAU_MAX).
 !
 	T1=MINVAL(MAX_DEL_V_RES_ZONE)
-	NI_MAX=2*( (V(1)/T1)+ (N_INS_OBS+1)*ND + 2.0D0*TAU_MAX/ES_DTAU )
+	NI_MAX=2*( (V(1)/T1)+ (N_INS_OBS+1)*ND + 2.0_LDP*TAU_MAX/ES_DTAU )
 	IF(ALLOCATED(Z_RAY))DEALLOCATE(Z_RAY)
 	ALLOCATE (Z_RAY(NI_MAX),STAT=IOS)
 	IF(IOS .NE. 0)THEN
@@ -386,19 +386,19 @@
 	    END DO
 	    IF(LS .GT. NC .AND. P(LS) .NE. R(NI))NI=NI+1
 	    IF(LS .GT. NC)THEN
-	      Z(NI)=0.0D0
-	      VMU(NI)=0.0D0
+	      Z(NI)=0.0_LDP
+	      VMU(NI)=0.0_LDP
 	    END IF
 	  END IF
 !
 ! Compute optical depth increments in Electron scattering optical depth.
 !
-	  TAU_ES(1)=0.0D0
+	  TAU_ES(1)=0.0_LDP
 	  DO I=2,NI
-	   DTAU_ES(I-1)=0.5D0*(ESEC(I-1)+ESEC(I))*(Z(I-1)-Z(I))
+	   DTAU_ES(I-1)=0.5_LDP*(ESEC(I-1)+ESEC(I))*(Z(I-1)-Z(I))
 	   TAU_ES(I)=TAU_ES(I-1)+DTAU_ES(I-1)
 	  END DO
-	  DTAU_ES(NI)=0.0D0
+	  DTAU_ES(NI)=0.0_LDP
 !
 	  Z_RAY(1)=Z(1)
 	  J=1
@@ -556,21 +556,21 @@
 !
 	  IF(DO_REL_CORRECTIONS)THEN
 	    DO I=1,NRAY
-	      GAM_RAY(I)=1.0D0/SQRT(1.0D0-V_RAY(I)*V_RAY(I)/C_KMS/C_KMS)
-	      NU_ON_NU0_RAY(I)=1.0D0/GAM_RAY(I)/(1.0D0-VMU_RAY(I))
+	      GAM_RAY(I)=1.0_LDP/SQRT(1.0_LDP-V_RAY(I)*V_RAY(I)/C_KMS/C_KMS)
+	      NU_ON_NU0_RAY(I)=1.0_LDP/GAM_RAY(I)/(1.0_LDP-VMU_RAY(I))
 	    END DO
 	  ELSE
-	     GAM_RAY(:)=1.0D0
-	     NU_ON_NU0_RAY(:)=1.0D0
+	     GAM_RAY(:)=1.0_LDP
+	     NU_ON_NU0_RAY(:)=1.0_LDP
 	  END IF
 !
 	  DO J=1,NRAY-1
 	    dZ(J)=Z_RAY(J)-Z_RAY(J+1)
-	    HALF_DZ(J)=0.5D0*DZ(J)
-	    DZSQ_ON_12(J)=HALF_DZ(J)*HALF_DZ(J)/3.0D0		!ie. DZ/12.0D0
+	    HALF_DZ(J)=0.5_LDP*DZ(J)
+	    DZSQ_ON_12(J)=HALF_DZ(J)*HALF_DZ(J)/3.0_LDP		!ie. DZ/12.0D0
 	  END DO
 	  DO J=2,NRAY-1
-	    RECIP_DEL_Z(J)=1.0D0/(Z_RAY(J-1)-Z_RAY(J+1))
+	    RECIP_DEL_Z(J)=1.0_LDP/(Z_RAY(J-1)-Z_RAY(J+1))
 	  END DO
 !
 ! 
@@ -596,10 +596,10 @@
 ! window slightly.
 !
 	    MAX_VMU=MAXVAL(VMU_RAY)
-	    T2=1.0D0+1.2D0*MAX_VMU
+	    T2=1.0_LDP+1.2_LDP*MAX_VMU
 	    IF(DO_REL_CORRECTIONS)THEN
 !	       T2=(MAXVAL((1.0D0-VMU_RAY)*GAM_RAY) -1.0D0)*1.05D0+1.0D0
-	       T2=MAXVAL((1.0D0-VMU_RAY)*GAM_RAY)
+	       T2=MAXVAL((1.0_LDP-VMU_RAY)*GAM_RAY)
 	    END IF
 	    I=MIN(NOS,1+(OUT_ML-1)*NOS_INC)
 	    T1=OBS_FREQ(I)*T2
@@ -609,10 +609,10 @@
 	    END DO
 	    STRT_INDX_CMF(OUT_ML)=MAX(1,J-10)
 !
-	    T2=1.0D0-1.2D0*MAX_VMU
+	    T2=1.0_LDP-1.2_LDP*MAX_VMU
 	    IF(DO_REL_CORRECTIONS)THEN
 !	      T2=(MINVAL((1.0D0-VMU_RAY)*GAM_RAY) -1.0D0)*1.05D0+1.0D0
-	      T2=MINVAL((1.0D0-VMU_RAY)*GAM_RAY)
+	      T2=MINVAL((1.0_LDP-VMU_RAY)*GAM_RAY)
 	    END IF
 	    I=MIN(NOS,OUT_ML*NOS_INC)
 	    T1=OBS_FREQ(I)*T2
@@ -651,8 +651,8 @@
 	    SM_NCF=END_INDX_CMF(OUT_ML)-STRT_INDX_CMF(OUT_ML)+1
 !
 	    CALL TUNE(1,'MON_INTERP')
-	      ETA_CMF_RAY(:,:)=0.0D0
-	      CHI_CMF_RAY(:,:)=0.0D0
+	      ETA_CMF_RAY(:,:)=0.0_LDP
+	      CHI_CMF_RAY(:,:)=0.0_LDP
 	      CALL MON_INTERP_FAST(ETA_CMF_RAY,NR,SM_NCF,
 	1            R_RAY,NR,ETA_CMF(1,STRT_INDX_CMF(OUT_ML)),ND,R,ND)
 	      CALL MON_INTERP_FAST(CHI_CMF_RAY,NR,SM_NCF,
@@ -674,13 +674,13 @@
 !$OMP DO
 	  DO 40000 ML=1+(OUT_ML-1)*NOS_INC,MIN(NOS,OUT_ML*NOS_INC)
 !
-	    ETA_VEC(1:NRAY)=0.0D0
-	    CHI_VEC(1:NRAY)=0.0D0
+	    ETA_VEC(1:NRAY)=0.0_LDP
+	    CHI_VEC(1:NRAY)=0.0_LDP
 !
 !	    K=INDX(1)
 	    K=1   !INDX(1)
 	    INDX(1)=1
-	    T1=OBS_FREQ(ML)*(1.0D0-VMU_RAY(1))*GAM_RAY(1)
+	    T1=OBS_FREQ(ML)*(1.0_LDP-VMU_RAY(1))*GAM_RAY(1)
 	    DO WHILE(T1 .LT. SM_FREQ_CMF(K))
 	      K=K+1
 	      IF(K .GT. SM_NCF)THEN
@@ -723,7 +723,7 @@
 !
 	      K=INDX(I-1)      !INDX(I)
 !	      K=INDX(I)
-	      T1=OBS_FREQ(ML)*(1.0D0-VMU_RAY(I))*GAM_RAY(I)
+	      T1=OBS_FREQ(ML)*(1.0_LDP-VMU_RAY(I))*GAM_RAY(I)
 !	      DO WHILE(T1 .LT. SM_FREQ_CMF(K))
 	      DO WHILE(T1 .GT. SM_FREQ_CMF(K-1))
 	        K=K-1
@@ -809,7 +809,7 @@
 	    IST=1; IEND=SM_NRAY
 	    BACK_SIDE=.FALSE.
 	    IF(LS .LE. NC .AND. HOLLOW_CORE)BACK_SIDE=.TRUE.
-	    IF(WRITE_dFR)dI_RAY=0.0D0
+	    IF(WRITE_dFR)dI_RAY=0.0_LDP
 35000	    CONTINUE
 !
 ! Check whether we need to do the BACK_SIDE loop.
@@ -818,7 +818,7 @@
 	        IST=1; IEND=MIN(NR,SM_NRAY)
 	        IF(BACK_SIDE .AND. SM_NRAY .LE. NR)THEN
 	          BACK_SIDE=.FALSE.
-	          PAR_FLUX=0.0D0
+	          PAR_FLUX=0.0_LDP
 	        ELSE IF(BACK_SIDE)THEN
 	          IST=NR+1; IEND=SM_NRAY
 	        END IF
@@ -847,13 +847,13 @@
 ! Adjust the first derivatives so that function is monotonic in each interval.
 !
 	      dS(IST)=( SIGN(ONE,S(IST))+SIGN(ONE,dS(IST)) )*
-	1                      MIN(ABS(S(IST)),0.5D0*ABS(dS(IST)))
+	1                      MIN(ABS(S(IST)),0.5_LDP*ABS(dS(IST)))
 	      DO I=IST+1,IEND-1
 	        dS(I)=( SIGN(ONE,S(I-1))+SIGN(ONE,S(I)) )*
-	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5D0*ABS(dS(I)))
+	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5_LDP*ABS(dS(I)))
 	      END DO
 	      dS(IEND)=( SIGN(ONE,S(IEND-1))+SIGN(ONE,dS(IEND)) )*
-	1            MIN(ABS(S(IEND-1)),0.5D0*ABS(dS(IEND)))
+	1            MIN(ABS(S(IEND-1)),0.5_LDP*ABS(dS(IEND)))
 !
 ! Compute the revised optical depth scale.
 !
@@ -882,38 +882,38 @@
 !
 	      DO I=IST,IEND-1
 	        T1=DTAU(I)
-	        IF(T1 .GT. 0.5)THEN
+	        IF(T1 .GT. 0.5_LDP)THEN
 	          EE(I)=EXP(-T1)
-	          E0(I)=1.0D0-EE(I)
-	          E1(I)=1.0D0-E0(I)/T1
-	          E2(I)=1.0D0-2.0D0*E1(I)/T1
-	          E3(I)=1.0D0-3.0D0*E2(I)/T1
-	        ELSE IF(T1 .GT. 0.1)THEN
-	          E3(I)=0.25D0*T1*( 1.0D0-0.20*T1*
-	1               (1.0D0-T1/6.0D0*(1.0D0-T1/7.0D0*
-	1               (1.0D0-T1/8.0D0*(1.0D0-T1/9.0D0*
-	1               (1.0D0-T1/10.0D0*(1.0D0-T1/11.0D0*
-	1               (1.0D0-T1/12.0D0*(1.0D0-T1/13.0D0)))))))) )
-	          E2(I)=T1*( 1.0D0-E3(I) )/3.0D0
-	          E1(I)=T1*( 1.0D0-E2(I) )/2.0D0
-	          E0(I)=T1*( 1.0D0-E1(I) )
-	          EE(I)=1.0D0-E0(I)
+	          E0(I)=1.0_LDP-EE(I)
+	          E1(I)=1.0_LDP-E0(I)/T1
+	          E2(I)=1.0_LDP-2.0_LDP*E1(I)/T1
+	          E3(I)=1.0_LDP-3.0_LDP*E2(I)/T1
+	        ELSE IF(T1 .GT. 0.1_LDP)THEN
+	          E3(I)=0.25_LDP*T1*( 1.0_LDP-0.20_LDP*T1*
+	1               (1.0_LDP-T1/6.0_LDP*(1.0_LDP-T1/7.0_LDP*
+	1               (1.0_LDP-T1/8.0_LDP*(1.0_LDP-T1/9.0_LDP*
+	1               (1.0_LDP-T1/10.0_LDP*(1.0_LDP-T1/11.0_LDP*
+	1               (1.0_LDP-T1/12.0_LDP*(1.0_LDP-T1/13.0_LDP)))))))) )
+	          E2(I)=T1*( 1.0_LDP-E3(I) )/3.0_LDP
+	          E1(I)=T1*( 1.0_LDP-E2(I) )/2.0_LDP
+	          E0(I)=T1*( 1.0_LDP-E1(I) )
+	          EE(I)=1.0_LDP-E0(I)
 	        ELSE
-	          E3(I)=0.25D0*T1*( 1.0D0-0.20*T1*
-	1               (1.0D0-T1/6.0D0*(1.0D0-T1/7.0D0*
-	1               (1.0D0-T1/8.0D0*(1.0D0-T1/9.0D0) ))))
-	          E2(I)=T1*( 1.0D0-E3(I) )/3.0D0
-	          E1(I)=T1*( 1.0D0-E2(I) )/2.0d0
-	          E0(I)=T1*( 1.0D0-E1(I) )
-	          EE(I)=1.0D0-E0(I)
+	          E3(I)=0.25_LDP*T1*( 1.0_LDP-0.20_LDP*T1*
+	1               (1.0_LDP-T1/6.0_LDP*(1.0_LDP-T1/7.0_LDP*
+	1               (1.0_LDP-T1/8.0_LDP*(1.0_LDP-T1/9.0_LDP) ))))
+	          E2(I)=T1*( 1.0_LDP-E3(I) )/3.0_LDP
+	          E1(I)=T1*( 1.0_LDP-E2(I) )/2.0_LDP
+	          E0(I)=T1*( 1.0_LDP-E1(I) )
+	          EE(I)=1.0_LDP-E0(I)
 	        END IF
 	      END DO
 !
               DO I=IST,IEND-1
 	        A0(I)=EE(I)
-	        A1(I)=E0(I)-3.0D0*E2(I)+2.0D0*E3(I)
-	        A2(I)=3.0D0*E2(I)-2.0D0*E3(I)
-	        A3(I)=DTAU(I)*(E1(I)-2.0D0*E2(I)+E3(I))
+	        A1(I)=E0(I)-3.0_LDP*E2(I)+2.0_LDP*E3(I)
+	        A2(I)=3.0_LDP*E2(I)-2.0_LDP*E3(I)
+	        A3(I)=DTAU(I)*(E1(I)-2.0_LDP*E2(I)+E3(I))
 	        A4(I)=DTAU(I)*(E3(I)-E2(I))
 	      END DO
 !
@@ -931,16 +931,16 @@
 ! Adjust the first derivatives so that function is monotonic in each interval.
 !
 	      dS(IST)=( SIGN(ONE,S(IST))+SIGN(ONE,dS(IST)) )*
-	1                      MIN(ABS(S(IST)),0.5D0*ABS(dS(IST)))
+	1                      MIN(ABS(S(IST)),0.5_LDP*ABS(dS(IST)))
 	      DO I=IST+1,IEND-1
 	        dS(I)=( SIGN(ONE,S(I-1))+SIGN(ONE,S(I)) )*
-	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5D0*ABS(dS(I)))
+	1          MIN(ABS(S(I-1)),ABS(S(I)),0.5_LDP*ABS(dS(I)))
 	      END DO
 	      dS(IEND)=( SIGN(ONE,S(IEND-1))+SIGN(ONE,dS(IEND)) )*
-	1            MIN(ABS(S(IEND-1)),0.5D0*ABS(dS(IEND)))
+	1            MIN(ABS(S(IEND-1)),0.5_LDP*ABS(dS(IEND)))
 !
 	      IF(LS .GT. NC .OR. BACK_SIDE)THEN
-	        PAR_FLUX=0.0D0			!No incident radiation
+	        PAR_FLUX=0.0_LDP			!No incident radiation
 	      ELSE IF(LS .LE. NC .AND. HOLLOW_CORE)THEN
 !
 ! PAR_FLUX was computed for this option of the previous loop.
@@ -963,7 +963,7 @@
 ! the hollow core is zero. The optical depth of the near side has not yet
 ! been computed, and will be taken into account later.
 !
-	      IF(IST .NE. 1)TAU(IST)=CHI_VEC(IST)*0.5D0*dZ(IST)
+	      IF(IST .NE. 1)TAU(IST)=CHI_VEC(IST)*0.5_LDP*dZ(IST)
 	      IF(IST .EQ. 1)TAU(1)=CHI_VEC(1)*HALF_DZ(2)
 	      DO I=IST,IEND-1
 	        TAU(I+1)=TAU(I)+DTAU(I)
@@ -983,7 +983,7 @@
 	      IF(HOLLOW_CORE .AND. LS .LE. NC .AND. .NOT. BACK_SIDE)THEN
 	        PAR_FLUX=PAR_FLUX*EXP(-TAU(IEND))
 	      ELSE
-	        PAR_FLUX=0.0D0
+	        PAR_FLUX=0.0_LDP
 	      END IF
 	      T2=(ETA_VEC(IST)-ETA_VEC(IST+1))/dZ(IST)
 	      DO I=IST+1,IEND-1
@@ -991,7 +991,7 @@
 	        T2=(ETA_VEC(I-1)-ETA_VEC(I+1))*RECIP_DEL_Z(I)
 	        T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
 	        T4=DZSQ_ON_12(I-1)*(T2-T1)
-	        IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
+	        IF(ABS(T4) .GT. 0.9_LDP*T3)T4=SIGN(0.9_LDP*T3,T4)
 	        PAR_FLUX=PAR_FLUX + T3 + T4
 	      END DO
 	      I=IEND
@@ -999,7 +999,7 @@
 	      T2=(ETA_VEC(I-1)-ETA_VEC(I))/dZ(I-1)
 	      T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
 	      T4=DZSQ_ON_12(I-1)*(T2-T1)
-	      IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
+	      IF(ABS(T4) .GT. 0.9_LDP*T3)T4=SIGN(0.9_LDP*T3,T4)
 	      PAR_FLUX=PAR_FLUX + (T3+T4)
 !
 !	      CALL TUNE(2,'FLUX INTEG')
@@ -1026,7 +1026,7 @@
 	        T2=(ETA_VEC(I-1)-ETA_VEC(I+1))*RECIP_DEL_Z(I)
 	        T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
 	        T4=DZSQ_ON_12(I-1)*(T2-T1)
-	        IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
+	        IF(ABS(T4) .GT. 0.9_LDP*T3)T4=SIGN(0.9_LDP*T3,T4)
 	        dI_RAY(I)=T3 + T4
 	      END DO
 	      I=IEND
@@ -1034,20 +1034,20 @@
 	      T2=(ETA_VEC(I-1)-ETA_VEC(I))/dZ(I-1)
 	      T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
 	      T4=DZSQ_ON_12(I-1)*(T2-T1)
-	      IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
+	      IF(ABS(T4) .GT. 0.9_LDP*T3)T4=SIGN(0.9_LDP*T3,T4)
 	      dI_RAY(I)=T3 + T4
 !
 ! Check to see if core was hollow.
 !
 	      IF(SM_NRAY .GT. NR .AND. LS .LE. NC)THEN
-	        dI_RAY(NR+1)=0.0D0
+	        dI_RAY(NR+1)=0.0_LDP
 	        T2=(ETA_VEC(NR+1)-ETA_VEC(NR+2))/dZ(NR+1)
 	        DO I=NR+2,SM_NRAY-1
 	          T1=T2
 	          T2=(ETA_VEC(I-1)-ETA_VEC(I+1))*RECIP_DEL_Z(I)
 	          T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
 	          T4=DZSQ_ON_12(I-1)*(T2-T1)
-	          IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
+	          IF(ABS(T4) .GT. 0.9_LDP*T3)T4=SIGN(0.9_LDP*T3,T4)
 	          dI_RAY(I)=T3 + T4
 	        END DO
 	        I=SM_NRAY
@@ -1055,7 +1055,7 @@
 	        T2=(ETA_VEC(I-1)-ETA_VEC(I))/dZ(I-1)
 	        T3=HALF_DZ(I-1)*(ETA_VEC(I-1)+ETA_VEC(I))
 	        T4=DZSQ_ON_12(I-1)*(T2-T1)
-	        IF(ABS(T4) .GT. 0.9*T3)T4=SIGN(0.9*T3,T4)
+	        IF(ABS(T4) .GT. 0.9_LDP*T3)T4=SIGN(0.9_LDP*T3,T4)
 	        dI_RAY(I)=T3 + T4
 	     END IF
 !
@@ -1064,7 +1064,7 @@
 !
 	      J=2
 	      DO I=1,SM_NRAY
-	        IF(Z_RAY(I) .GE. 0.0D0)THEN
+	        IF(Z_RAY(I) .GE. 0.0_LDP)THEN
 	          IF(R_RAY(I) .LT. R(J))J=J+1
 	        ELSE
 	          IF(HOLLOW_CORE .AND. LS .LE. NC .AND. TAU(IEND) .GT. 0)dI_RAY(I)=dI_RAY(I)*EXP(-TAU(IEND))
@@ -1097,7 +1097,7 @@
 	    END DO
 	  ELSE IF(INT_METHOD .EQ. 'STAU')THEN
 	    TAU(1)=CHI_VEC(1)*HALF_DZ(2)
-	    DTAU(NR)=0.0D0
+	    DTAU(NR)=0.0_LDP
 	    DO I=1,SM_NRAY-1
 	      TAU(I+1)=TAU(I)+DTAU(I)
 	      K=I
@@ -1112,7 +1112,7 @@
 	    ZTAU(LS,ML) = Z_RAY(SM_NRAY)
 	  ELSE
 	    T1=(TAU_REF-TAU(K))/(TAU(K+1)-TAU(K))
-	    T2=(1.0D0-T1)*Z_RAY(K)+T1*Z_RAY(K+1)
+	    T2=(1.0_LDP-T1)*Z_RAY(K)+T1*Z_RAY(K+1)
 	    ZTAU(LS,ML) = T2
 	    RTAU(LS,ML) = SQRT(T2*T2+P(LS)*P(LS))
 	  END IF
@@ -1138,7 +1138,7 @@
 !
 ! NB: HQW_AT_RMAX is MU dMU and that PdP is R^2 MU dMU.
 !
-	OBS_FLUX=OBS_FLUX*6.59934D0*R(1)*R(1)          !Jansky's (1kpc)
+	OBS_FLUX=OBS_FLUX*6.59934_LDP*R(1)*R(1)          !Jansky's (1kpc)
 !
 ! Output IP_OBS, if saved.
 !
@@ -1189,7 +1189,7 @@
 	END IF
 !
 	IF(WRITE_dFR)THEN
-	   dI_R=dI_R*6.59934D0*R(1)*R(1)          !Jansky's (1kpc)
+	   dI_R=dI_R*6.59934_LDP*R(1)*R(1)          !Jansky's (1kpc)
 	   CALL DIR_ACC_PARS(REC_SIZE,UNIT_SIZE,WORD_SIZE,N_PER_REC)
 	   ACCESS_F=5
 	   I=WORD_SIZE*(ND+1)/UNIT_SIZE; J=82
@@ -1209,18 +1209,18 @@
 	     WRITE(82,*)'!'
 	     DO ML=1,NOS
 	       T1=SUM(dI_R(:,ML))
-	       IF(T1 .NE. 0.0D0)THEN
-	         T2=0.0D0
+	       IF(T1 .NE. 0.0_LDP)THEN
+	         T2=0.0_LDP
 	         DO J=1,ND
 	           T2=T2+dI_R(J,ML)/T1
-	           IF(T2 .GE. 0.5D0)EXIT
+	           IF(T2 .GE. 0.5_LDP)EXIT
 	           T3=T2
 	         END DO
-	         RPHOT=R(J-1)+(R(J)-R(J-1))*(0.5D0-T3)/(T2-T3)
-	         VPHOT=V(J-1)+(V(J)-V(J-1))*(0.5D0-T3)/(T2-T3)
+	         RPHOT=R(J-1)+(R(J)-R(J-1))*(0.5_LDP-T3)/(T2-T3)
+	         VPHOT=V(J-1)+(V(J)-V(J-1))*(0.5_LDP-T3)/(T2-T3)
 	       ELSE
-	         RPHOT=0.0D0
-	         VPHOT=0.0D0
+	         RPHOT=0.0_LDP
+	         VPHOT=0.0_LDP
 	       END IF
 	       WRITE(82,'(4ES19.8)')OBS_FREQ(ML),T1,RPHOT,VPHOT
 	     END DO

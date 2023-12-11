@@ -186,7 +186,7 @@ C
 	ELSE IF(PLT_OPT(1:5) .EQ. 'RIV_D')THEN
 	  CALL GEN_IN(IT,'Iteration number')
 	  CALL GEN_IN(IV,'Variable')
-	  YV(1:ND)=SIGN(ABS(ST(IT)%STEQ(IV,:))**0.25,ST(IT)%STEQ(IV,:))
+	  YV(1:ND)=SIGN(ABS(ST(IT)%STEQ(IV,:))**0.25_LDP,ST(IT)%STEQ(IV,:))
 	  DO I=1,ND
 	    XV(I)=I
 	  END DO
@@ -213,11 +213,11 @@ C
 	  ELSE
 	   IF(IV .EQ. NT)THEN
 	      DO I=1,NIT
-	        YV(I)=SIGN(ABS(ST(I)%RE(ID))**0.25,ST(I)%RE(ID))
+	        YV(I)=SIGN(ABS(ST(I)%RE(ID))**0.25_LDP,ST(I)%RE(ID))
 	      END DO
 	    ELSE
 	      DO I=1,NIT
-	        YV(I)=SIGN(ABS(ST(I)%STEQ(IV,ID))**0.25,ST(I)%STEQ(IV,ID))
+	        YV(I)=SIGN(ABS(ST(I)%STEQ(IV,ID))**0.25_LDP,ST(I)%STEQ(IV,ID))
 	      END DO
 	    END IF
 	    YLABEL='dN/dt\u1/4\d'
@@ -233,7 +233,7 @@ C
 	  ID=1; IT=NIT
 	  CALL GEN_IN(ID,'Depth')
 	  CALL GEN_IN(IT,'Iteration number')
-	  YV(:)=SIGN(ABS(ST(IT)%STEQ(:,ID))**0.25,ST(IT)%STEQ(:,ID))
+	  YV(:)=SIGN(ABS(ST(IT)%STEQ(:,ID))**0.25_LDP,ST(IT)%STEQ(:,ID))
 	  DO I=1,NT
 	    XV(I)=I
 	  END DO
@@ -251,7 +251,7 @@ C
 	    IF(ST(K)%STEQ(I,ID) .NE. 0)THEN
 	      YV(I)=ST(IT)%STEQ(I,ID)/ST(K)%STEQ(I,ID)
 	    ELSE
-	      YV(I)=1.0D+10
+	      YV(I)=1.0E+10_LDP
 	    END IF
 	  END DO
 	  YV(NT)=ST(IT)%RE(ID)/ST(K)%RE(ID)
@@ -274,7 +274,7 @@ C
 	      IF(ST(K)%STEQ(IV,I) .NE. 0)THEN
 	        YV(I)=ST(IT)%STEQ(IV,I)/ST(K)%STEQ(IV,I)
 	      ELSE
-	        YV(I)=1.0D+10
+	        YV(I)=1.0E+10_LDP
 	      END IF
 	    END DO
 	  ELSE

@@ -163,20 +163,20 @@
 !
 ! Set constants.
 !
-	CHIBF=2.815E-06
-	CHIFF=3.69E-29
-	HDKT=4.7994145
-	TWOHCSQ=0.0147452575
-	OPLIN=2.6540081E+08
-	EMLIN=5.27296E-03
+	CHIBF=2.815E-06_LDP
+	CHIFF=3.69E-29_LDP
+	HDKT=4.7994145_LDP
+	TWOHCSQ=0.0147452575_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
 	FORMFEED=''
 !
 ! Set temperature (units of 10^4 K) at which recombination rates are to be evaluated.
 !
-	TEMP(1)=1.0D0
-	TEMP(2)=2.0D0
-	TEMP(3)=4.0D0
-	TEMP(4)=8.0D0
+	TEMP(1)=1.0_LDP
+	TEMP(2)=2.0_LDP
+	TEMP(3)=4.0_LDP
+	TEMP(4)=8.0_LDP
 !
 	WRITE(T_OUT,'()')
 	WRITE(T_OUT,'(70A)')('*',I=1,70)
@@ -229,7 +229,7 @@
 ! Now read in all the atomic data. Some of these are superfluous.
 !
 	ALLOCATE (FOSC(NLEV,NLEV))
-	GF_CUT=0.0D0			!These ensure we get all transitions.
+	GF_CUT=0.0_LDP			!These ensure we get all transitions.
 	GF_LEV_CUT=NLEV+1
 	MIN_NUM_TRANS=NLEV*NLEV
 	EN_DATE=' '
@@ -310,7 +310,7 @@
 	    IF(NAME(I)(K:K) .EQ. 'W' .OR. NAME(I)(K:K) .EQ. 'Z')THEN
 	      LEV_ANG(I)=NAME(I)(K:K)
 	    ELSE
-	      T1=0.0D0
+	      T1=0.0_LDP
 	      DO J=1,NANG
 	        IF(NAME(I)(K:K) .EQ. ANG_STR(J))THEN
 	          LEV_ANG(I)=ANG_STR(J)
@@ -442,7 +442,7 @@
 	  ALLOCATE (EDGE_PACK(CNT))
 	  ALLOCATE (G_PACK(CNT))
 	  ALLOCATE (FOSC_PACK(CNT,CNT))
-	  EDGE_PACK(:)=0.0D0; G_PACK(:)=0.0D0; FOSC_PACK(:,:)=0.0D0
+	  EDGE_PACK(:)=0.0_LDP; G_PACK(:)=0.0_LDP; FOSC_PACK(:,:)=0.0_LDP
 	  DO I=1,NLEV
 	    J=F_TO_S(I)
 	    G_PACK(J)=G_PACK(J)+G(I)
@@ -476,7 +476,7 @@
 	  ALLOCATE (GAM4(CNT))
 	  ALLOCATE (TRANS(CNT,CNT))
 	  ALLOCATE (SECND(CNT,CNT))
-	  ARAD=0.0D0; GAM2=0.0D0; GAM4=0.0D0
+	  ARAD=0.0_LDP; GAM2=0.0_LDP; GAM4=0.0_LDP
 	  KNOWN_ENERGY_LEVEL=.TRUE.
 	  FILENAME='PACK_CHK_FOR_'//TRIM(ION_ID)
 	  CALL WRITE_OSC_V2(FOSC_PACK,TRANS,SECND,EDGE_PACK,G_PACK,
@@ -492,7 +492,7 @@
 !
 	XRAYS=.FALSE.
 	ID=1
-	AT_NO=12.0D0
+	AT_NO=12.0_LDP
 	ZION_RD=0
 	CALL GEN_IN(AT_NO,'Atomic number')
 	CALL GEN_IN(ZION_RD,'Charge on ion')
@@ -507,11 +507,11 @@
 	  STOP
 	END IF
 !
-	SIG_GAU_KMS=3000.0D0
+	SIG_GAU_KMS=3000.0_LDP
 	CALL GEN_IN(SIG_GAU_KMS,'Sigma of Gaussian used to smooth photoionization data')
-	FRAC_SIG_GAU=0.25D0
+	FRAC_SIG_GAU=0.25_LDP
 	CALL GEN_IN(FRAC_SIG_GAU,'Fractional spacing across smoothing Gaussian')
-	CUT_ACCURACY=0.02
+	CUT_ACCURACY=0.02_LDP
 	CALL GEN_IN(CUT_ACCURACY,'Accuracy to retain data when omitting data points to save space')
 	ABOVE_EDGE=.TRUE.
 	CALL GEN_IN(ABOVE_EDGE,'Use only data above edge when smoothing')
@@ -554,7 +554,7 @@
 	1       'Include dielectronic lines for levels permitted to autoionize in LS coupling')
 	  CALL GEN_IN(DO_DIE_WI,
 	1       'Include dielectronic lines for levels NOT permitted to autoionize in LS coupling (ie WI option)')
-	  VSM_DIE_KMS=3000.0D0
+	  VSM_DIE_KMS=3000.0_LDP
 	  CALL GEN_IN(VSM_DIE_KMS,'Smoothing width in km/s')
 	  ID=1
 	  IF(DO_DIE_REG .OR. DO_DIE_WI)THEN
@@ -616,7 +616,7 @@
 ! To get the recombination relative to per ion in the ground state,
 ! we need to make a correction.
 !
-	  IF(EXC_EN .NE. 0.0D0)THEN
+	  IF(EXC_EN .NE. 0.0_LDP)THEN
 	    WRITE(6,'(5(5X,A))')'        T','     GION','PHOT_GION','   EXC_EN','       T1'
 	    DO I=1,N_TEMP
 	      T1=PHOT_GION*EXP(-HDKT*EXC_EN/TEMP(I))/GION
@@ -654,7 +654,7 @@
 	      ALLOCATE(RECOM_PACK(CNT,N_TEMP))
 	      ALLOCATE(CROSS_TYPE_PACK(CNT))
 	    END IF
-	    RECOM_PACK(:,:)=0.0D0
+	    RECOM_PACK(:,:)=0.0_LDP
 	    DO J=1,4
 	      DO I=1,NLEV
 	        IS=F_TO_S(I)

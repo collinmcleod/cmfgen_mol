@@ -116,8 +116,8 @@ C
 	INTEGER NCOEF
 	PARAMETER (NCOEF=2)
 	REAL(KIND=LDP) ACOEF(2),BCOEF(2)
-	DATA ACOEF/1.690703717290D0,-0.690703717290D0/
-	DATA BCOEF/1.614249968779D0,2.154326524957D0/
+	DATA ACOEF/1.690703717290_LDP,-0.690703717290_LDP/
+	DATA BCOEF/1.614249968779_LDP,2.154326524957_LDP/
 C
 	IF(FILE_IN .EQ. 'J PASSED VIA CALL')THEN
 	  IF(J_SIZE .NE. NCF*ND)THEN
@@ -245,17 +245,17 @@ C
 C Compute those parts of the TRIDIAGONAL vectors which are independent of
 C depth, and the fitting parameters.
 C
-	A_STORE(1)=0.0D0
-	C_STORE(1)=-2.0D0/( LOG(NU(1)/NU(2)) )**2
+	A_STORE(1)=0.0_LDP
+	C_STORE(1)=-2.0_LDP/( LOG(NU(1)/NU(2)) )**2
 	DO ML=2,NCF-1
 	  D1=LOG(NU(ML-1)/NU(ML))
 	  D2=LOG(NU(ML)/NU(ML+1))
-	  DH=0.5D0*(D1+D2)
-	  A_STORE(ML)=-1.0D0/D1/DH
-	  C_STORE(ML)=-1.0D0/D2/DH
+	  DH=0.5_LDP*(D1+D2)
+	  A_STORE(ML)=-1.0_LDP/D1/DH
+	  C_STORE(ML)=-1.0_LDP/D2/DH
 	END DO
-	A_STORE(NCF)=-2.0D0/( LOG(NU(NCF-1)/NU(NCF)) )**2
-	C_STORE(NCF)=0.0D0
+	A_STORE(NCF)=-2.0_LDP/( LOG(NU(NCF-1)/NU(NCF)) )**2
+	C_STORE(NCF)=0.0_LDP
 C
 C Compute the triadiagonal quantities for performing the convolution, and
 C perform the convolution. Due to the depth dependence of BETA, the vectors
@@ -266,23 +266,23 @@ C
 !
 	DO K=1,ND
 C
-	  BETA=1.84D-03*SQRT(TEMP(K))
-	  T3=0.5D0*HDKT*NU(1)/TEMP(K)
-	  IF(T3 .LT. 1)T3=0.0D0
-	  IF(T3 .GT. 700.0D0)T3=700.0D0
+	  BETA=1.84E-03_LDP*SQRT(TEMP(K))
+	  T3=0.5_LDP*HDKT*NU(1)/TEMP(K)
+	  IF(T3 .LT. 1)T3=0.0_LDP
+	  IF(T3 .GT. 700.0_LDP)T3=700.0_LDP
 	  DO ML=1,NCF
 	    T1=EXP( -HDKT*NU(ML)/TEMP(K) )
 	    T2=EXP( T3-HDKT*NU(ML)/TEMP(K) )
-	    PLANCK_FN(ML)=TWOHCSQ*(NU(ML)**3)*T2/ (1.0D0-T1)
+	    PLANCK_FN(ML)=TWOHCSQ*(NU(ML)**3)*T2/ (1.0_LDP-T1)
 	  END DO
 C
-	  J_ES(:)=0.0D0
-	  PLANCK_ES(:)=0.0D0
+	  J_ES(:)=0.0_LDP
+	  PLANCK_ES(:)=0.0_LDP
 C
 	  DO L=1,NCOEF
 	    T1=BETA*BETA/BCOEF(L)/BCOEF(L)
 	    A(:)=T1*A_STORE(:)			!Over frequency
-	    H(:)=-1.0D0
+	    H(:)=-1.0_LDP
 	    C(:)=T1*C_STORE(:)
 	    D(1:J_DIM)=J_STORE(K,1:J_DIM)
 	    IF(J_DIM .LT. NCF)D(J_DIM+1:NCF)=EXTRA_J_ST(K,J_DIM+1:NCF)
@@ -299,14 +299,14 @@ C BB curve. At longer wavelengths we will use a simple scaling.
 C
 C Because of the steep variation of B on the Wien side, we operate on Log(B).
 C
-	  IF( MINVAL(PLANCK_FN) .GT. 0.0D0 .AND. MINVAL(PLANCK_ES) .GT. 0.0D0)THEN
+	  IF( MINVAL(PLANCK_FN) .GT. 0.0_LDP .AND. MINVAL(PLANCK_ES) .GT. 0.0_LDP)THEN
 	    PLANCK_ES(:)=LOG(PLANCK_ES(:))
 	    PLANCK_FN(:)=LOG(PLANCK_FN(:))
 C
 	    PLANCK_NU(1)=NU(1)
 	    I=2
 	    ML=1
-	    DO WHILE(NU(I) .GT. 1.5D0*TEMP(K))
+	    DO WHILE(NU(I) .GT. 1.5_LDP*TEMP(K))
 	      DO WHILE(PLANCK_ES(I) .GT. PLANCK_FN(ML))
 	        ML=ML+1
 	      END DO
@@ -314,16 +314,16 @@ C
 	         ML=ML+1
 	      END DO
 	      T1=(PLANCK_ES(I)-PLANCK_FN(ML))/(PLANCK_FN(ML-1)-PLANCK_FN(ML))
-              PLANCK_NU(I)=T1*NU(ML-1)+(1.0D0-T1)*NU(ML)
+              PLANCK_NU(I)=T1*NU(ML-1)+(1.0_LDP-T1)*NU(ML)
 	      I=I+1
 	    END DO
 C
 C Apply same wavelength shift as for our last (i.e. lowest)
 C frequency as determined by matching the Planck function.
 C
-	    T1=1.0D0/NU(I-1)-1.0D0/PLANCK_NU(I-1)		!Wavelength shift
+	    T1=1.0_LDP/NU(I-1)-1.0_LDP/PLANCK_NU(I-1)		!Wavelength shift
 	    DO ML=I,NCF
-	      PLANCK_NU(ML)=1.0D0/( 1.0D0/NU(ML) - T1)
+	      PLANCK_NU(ML)=1.0_LDP/( 1.0_LDP/NU(ML) - T1)
 	    END DO
 C
 C We now perform a simple linear interpolation of the electron scattered
@@ -344,8 +344,8 @@ C
 	         I=I+1
 	      END DO
 	      T1=(NU(ML)-PLANCK_NU(I))/(PLANCK_NU(I+1)-PLANCK_NU(I))
-	      PLANCK_ES(ML)=T1*C(I+1)+(1.0D0-T1)*C(I)
-	      J_ES(ML)=T1*A(I+1)+(1.0D0-T1)*A(I)
+	      PLANCK_ES(ML)=T1*C(I+1)+(1.0_LDP-T1)*C(I)
+	      J_ES(ML)=T1*A(I+1)+(1.0_LDP-T1)*A(I)
 	    END DO
 C
 C To remove any residual variations (primarily at low frequencies) we now
@@ -389,7 +389,7 @@ C
 	  END DO
 	  CLOSE(UNIT=LU_OUT)
 C
-	  J_STORE(:,1:J_DIM)=0.0D0
+	  J_STORE(:,1:J_DIM)=0.0_LDP
 	  IF(J_DIM .NE. NCF)DEALLOCATE (EXTRA_J_ST)
 	END IF
 C

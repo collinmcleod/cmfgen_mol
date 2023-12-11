@@ -48,7 +48,7 @@
       INTEGER, PARAMETER :: NS=20
       INTEGER, PARAMETER :: IONE=1
 !
-      REAL(KIND=LDP), PARAMETER ::  MU_STEP=0.005D0
+      REAL(KIND=LDP), PARAMETER ::  MU_STEP=0.005_LDP
 !
 ! Number of equations in Runge-Kutta solution
 !
@@ -156,7 +156,7 @@
 ! variable 'direction'.  Set to +1 now, and will set to -1 at the end
 ! of the ip do loop
 !
-      DIRECTION=1.0D0
+      DIRECTION=1.0_LDP
       RAY_POINTS_INSERTED=.FALSE.       !Will be reset, if necessary
 !
 !--------------------------------------------------------------------
@@ -178,7 +178,7 @@
       ID=1
       DO I=1,ND-1
         dV=ABS(V_GRID(I)-V_GRID(I+1))
-	IF(dV .GT. 1.25D0*VDOP_FRAC*VDOP_VEC(I))THEN
+	IF(dV .GT. 1.25_LDP*VDOP_FRAC*VDOP_VEC(I))THEN
           RAY_POINTS_INSERTED=.TRUE.
 	  NINS=dV/(VDOP_FRAC*VDOP_VEC(I))
           dR=(R_GRID(I)-R_GRID(I+1))/(NINS+1)
@@ -211,14 +211,14 @@
       CALL VELOCITY_LAW(RR,IDM1,R,V,NRAY,VEL,BETA,DBETADR,GAMMA)
       S(ID)=DIRECTION*R(ID)
       MU(ID)=DIRECTION
-      B(ID)=GAMMA*((1.0D0-MU(ID)**2)*BETA/R(ID)+GAMMA**2*MU(ID)*(MU(ID)+BETA)*DBETADR)
+      B(ID)=GAMMA*((1.0_LDP-MU(ID)**2)*BETA/R(ID)+GAMMA**2*MU(ID)*(MU(ID)+BETA)*DBETADR)
 !
-      A(1)=0.0D0
+      A(1)=0.0_LDP
       A(2)=DIRECTION
       SS=DIRECTION*R(ID)
       DO JD=IDM1,1,-1
         RR=R(JD+1)
-        DR=(R(JD)-R(JD+1))/10.0D0
+        DR=(R(JD)-R(JD+1))/10.0_LDP
         DO IS=1,10
           CALL VELOCITY_LAW(RR,JD,R,V,NRAY,VEL,BETA,DBETADR,GAMMA)
           CALL DERIVR(RR,A,DADR,BETA,DBETADR,GAMMA)
@@ -231,7 +231,7 @@
         CALL VELOCITY_LAW(RR,JD,R,V,NRAY,VEL,BETA,DBETADR,GAMMA)
         S(JD)=SS
         MU(JD)=DIRECTION
-        B(JD)=GAMMA*((1.0D0-MU(JD)**2)*BETA/R(JD)+
+        B(JD)=GAMMA*((1.0_LDP-MU(JD)**2)*BETA/R(JD)+
      *          GAMMA**2*MU(JD)*(MU(JD)+BETA)*DBETADR)
       END DO
 !
@@ -289,7 +289,7 @@
         ID=1
         DO I=1,NRAY_SM-1
           dV=Z(I)*V_GRID(I)/R_GRID(I)-Z(I+1)*V_GRID(I+1)/R_GRID(I+1)
-          IF(dV .GT. 1.25D0*VDOP_FRAC*VDOP_VEC(I))THEN
+          IF(dV .GT. 1.25_LDP*VDOP_FRAC*VDOP_VEC(I))THEN
             RAY_POINTS_INSERTED=.TRUE.
             NINS=dV/(VDOP_FRAC*VDOP_VEC(I))
             dZ=(Z(I)-Z(I+1))/(NINS+1)
@@ -326,41 +326,41 @@
           RR=R(ID+1)
           CALL VELOCITY_LAW(RR,ID,R,V,NRAY,VEL,BETA,DBETADR,GAMMA)
           RAY(IP)%NZ=NRAY
-          S(ID+1)=0.0D0
+          S(ID+1)=0.0_LDP
           MU(ID+1)=-BETA
-          B(ID+1)=GAMMA*((1.0D0-MU(ID+1)**2)*BETA/R(ID+1)+
+          B(ID+1)=GAMMA*((1.0_LDP-MU(ID+1)**2)*BETA/R(ID+1)+
      *       GAMMA**2*MU(ID+1)*(MU(ID+1)+BETA)*DBETADR)
           DS_1=DIRECTION*(R(ID)-R(ID+1))/FLOAT(NS)
 	END IF
 !
 ! Determine ds by using dmu*ds/dmu at mu=-beta
 !
-        DADS(2)=(1.0D0-BETA*BETA)**1.5D0/P(IP)
+        DADS(2)=(1.0_LDP-BETA*BETA)**1.5_LDP/P(IP)
         DS=DIRECTION*MU_STEP/DADS(2)
         IF(ABS(DS_1).LT.ABS(DS))DS=DS_1
 !
-        SS=0.0D0
+        SS=0.0_LDP
 !
 ! Boundary conditions on r and dr/ds
 !
         A(1)=P(IP)
-        DADS(1)=0.0D0
+        DADS(1)=0.0_LDP
 !
 ! Boundary conditions on mu and dmu/ds
 !
         CALL VELOCITY_LAW(A(1),MIN(ID,NRAY-1),R,V,NRAY,VEL,BETA,DBETADR,GAMMA)
         A(2)=-BETA
-        DADS(2)=(1.0D0-BETA*BETA)**1.5D0/P(IP)
+        DADS(2)=(1.0_LDP-BETA*BETA)**1.5_LDP/P(IP)
 !
 ! Storage of change in r [a(1)_new-a(2)_new)]
 !
-        DR_OLD=0.0D0
+        DR_OLD=0.0_LDP
         A_OLD=A(1)
 !
 ! Integrate with s as independent variable.  Must do several
 ! steps away from s=0 in order to find dmu/dr.
 !
-        DO WHILE((R(ID)-A(1)-DR_OLD).GT.(DR_OLD*1.0D-3))
+        DO WHILE((R(ID)-A(1)-DR_OLD).GT.(DR_OLD*1.0E-3_LDP))
           CALL RUNGE_KUTTA(A,DADS,EQU,SS,DS,BETA,DBETADR,GAMMA,DERIVS)
           DR_OLD=A(1)-A_OLD
           A_OLD=A(1)
@@ -374,7 +374,7 @@
 !
         RR=A(1)
         A(1)=SS
-        DADR(1)=1.0D0/DADS(1)
+        DADR(1)=1.0_LDP/DADS(1)
         DADR(2)=DADS(2)/DADS(1)
 !
 ! Choose increment dr to finish integration to r(id).
@@ -388,14 +388,14 @@
         CALL DERIVR(RR,A,DADR,BETA,DBETADR,GAMMA)
         S(ID)=A(1)
         MU(ID)=A(2)
-        B(ID)=GAMMA*((1.0D0-MU(ID)**2)*BETA/R(ID)+
+        B(ID)=GAMMA*((1.0_LDP-MU(ID)**2)*BETA/R(ID)+
      *       GAMMA**2*MU(ID)*(MU(ID)+BETA)*DBETADR)
 !
 ! Integrate along the p-ray to determine s and mu at each grid point r.
 ! Thus integrate with r as the independent variable.  For a ray there will
 ! be nz(ip)-1 such increments
 !
-        DR_OLD=0.0D0
+        DR_OLD=0.0_LDP
         A_OLD=R(ID)
 !
         DO JD=ID-1,1,-1
@@ -406,13 +406,13 @@
           DR=ABS(MU_STEP/DADR(2))
           IF(DR_1.LT.DR)DR=DR_1
 !
-          DO WHILE((R(JD)-RR-DR_OLD).GT.(DR_OLD*1.0D-3))
+          DO WHILE((R(JD)-RR-DR_OLD).GT.(DR_OLD*1.0E-3_LDP))
             CALL RUNGE_KUTTA(A,DADR,EQU,RR,DR,BETA,DBETADR,GAMMA,DERIVR)
             DR_OLD=RR-A_OLD
             A_OLD=RR
             CALL VELOCITY_LAW(RR,JD,R,V,NRAY,VEL,BETA,DBETADR,GAMMA)
             CALL DERIVR(RR,A,DADR,BETA,DBETADR,GAMMA)
-            DR=ABS(MU_STEP/DADR(2)/4.0D0)
+            DR=ABS(MU_STEP/DADR(2)/4.0_LDP)
             IF(DR_1.LT.DR)DR=DR_1
           END DO
 !
@@ -428,7 +428,7 @@
 !
           S(JD)=A(1)
           MU(JD)=A(2)
-          B(JD)=GAMMA*((1.0D0-MU(JD)**2)*BETA/R(JD)+
+          B(JD)=GAMMA*((1.0_LDP-MU(JD)**2)*BETA/R(JD)+
      *          GAMMA**2*MU(JD)*(MU(JD)+BETA)*DBETADR)
 !
         END DO
@@ -485,9 +485,9 @@
 	    WRITE(LUER,*)'STAT=',IOS
 	    STOP
 	  END IF
-         RAY(NP)%S_P(1)=0.0D0
+         RAY(NP)%S_P(1)=0.0_LDP
          RAY(NP)%MU_P(1)=-BETA
-         RAY(NP)%B_P(1)=GAMMA*((1.0D0-RAY(NP)%MU_P(1)**2)*BETA/R(1)+
+         RAY(NP)%B_P(1)=GAMMA*((1.0_LDP-RAY(NP)%MU_P(1)**2)*BETA/R(1)+
      *       GAMMA**2*RAY(NP)%MU_P(1)*(RAY(NP)%MU_P(1)+BETA)*DBETADR)
          RAY(NP)%R_RAY(1)=R(1)
        ELSE
@@ -501,9 +501,9 @@
 	    WRITE(LUER,*)'STAT=',IOS
 	    STOP
 	  END IF
-          RAY(NP)%S_M(1)=0.0D0
+          RAY(NP)%S_M(1)=0.0_LDP
           RAY(NP)%MU_M(1)=-BETA
-          RAY(NP)%B_M(1)=GAMMA*((1.0D0-RAY(NP)%MU_M(1)**2)*BETA/R(1)+
+          RAY(NP)%B_M(1)=GAMMA*((1.0_LDP-RAY(NP)%MU_M(1)**2)*BETA/R(1)+
      *       GAMMA**2*RAY(NP)%MU_M(1)*(RAY(NP)%MU_M(1)+BETA)*DBETADR)
         END IF
       END IF
@@ -514,8 +514,8 @@
 !
 ! Do loop a second time for s<0
 !
-      IF(DIRECTION .GT. 0.0D0)THEN
-        DIRECTION=-1.0D0
+      IF(DIRECTION .GT. 0.0_LDP)THEN
+        DIRECTION=-1.0_LDP
         GOTO 100
       END IF
 !

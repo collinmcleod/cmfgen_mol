@@ -53,7 +53,7 @@
 	  DO K=1,ND
 	    DO IV=1,SE(ID)%N_IV
 	      DO IS=1,SE(ID)%N_SE
-	         SE(ID)%BA_PAR(IS,IV,K)=0.0D0
+	         SE(ID)%BA_PAR(IS,IV,K)=0.0_LDP
 	      END DO
 	    END DO
 	  END DO
@@ -61,7 +61,7 @@
 	END DO
 !
 	BA_T(:,DIAG_INDX,:)=BA_T(:,DIAG_INDX,:)+BA_T_PAR
-	BA_T_PAR=0.0D0
+	BA_T_PAR=0.0_LDP
 !
 	RETURN
 	END

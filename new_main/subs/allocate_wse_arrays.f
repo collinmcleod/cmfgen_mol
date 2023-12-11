@@ -18,7 +18,7 @@
             IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%WCRXzV(NS,ND,J),STAT=IOS)
             IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%dWSXzVdT(NS,ND,J),STAT=IOS)
             IF(IOS .EQ. 0)ALLOCATE (ATM(ID)%dWCRXzVdT(NS,ND,J),STAT=IOS)
-	    IF(IOS .NE. 0)THEN 
+	    IF(IOS .NE. 0)THEN
 	      LUER=ERROR_LU()
 	      WRITE(LUER,*)'Error -- unable to allocate quarature arrays in allocate_wse_arrays.f'
 	      WRITE(LUER,*)'IOS=',IOS

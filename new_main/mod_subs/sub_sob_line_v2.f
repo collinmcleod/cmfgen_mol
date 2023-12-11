@@ -156,8 +156,8 @@ C
 	  DO SIM_INDX=1,NUM_SIM_LINES
 	    DO I=1,ND
 	      IF(NEG_OPACITY(I))THEN
-	        VB_SIM(I,SIM_INDX)=0.0D0
-	        VB_2(I)=0.0D0
+	        VB_SIM(I,SIM_INDX)=0.0_LDP
+	        VB_2(I)=0.0_LDP
 	      END IF
 	    END DO
 	  END DO
@@ -203,7 +203,7 @@ C
 	      T1=FL_SIM(SIM_INDX)*EMLIN
 	      DO L=1,ND	  		  	!S.E. equation depth
 	        T2=ETAL_MAT(L,SIM_INDX)*BETAC_SIM(L,SIM_INDX)
-	        T3=1.0D-06*RJ(L)
+	        T3=1.0E-06_LDP*RJ(L)
 	        DO K=BNDST(L),BNDEND(L)	 	!Variable depth.
 	          LS=BND_TO_FULL(K,L)
 !**********************************
@@ -231,14 +231,14 @@ C
 	  DO SIM_INDX=1,NUM_SIM_LINES
 	    DO I=1,ND
 	      VB_SIM(I,SIM_INDX)=-JBAR(I)/ETAL_MAT(I,SIM_INDX)
-	      IF(NEG_OPACITY(I))VB_SIM(I,SIM_INDX)=0.0D0
+	      IF(NEG_OPACITY(I))VB_SIM(I,SIM_INDX)=0.0_LDP
 	      VC_SIM(I,SIM_INDX)=JBAR(I)*CHIL_MAT(I,SIM_INDX)/
 	1                 ETAL_MAT(I,SIM_INDX)/ETAL_MAT(I,SIM_INDX)
 	    END DO
 	  END DO
 	  DO I=1,ND
-	    VB_2(I)=0.0D0
-	    VC_2(I)=0.0D0
+	    VB_2(I)=0.0_LDP
+	    VC_2(I)=0.0_LDP
 	  END DO
 	END IF
 C
@@ -255,9 +255,9 @@ C
 	  MNUP_F=VEC_MNUP_F(I);   MNUP=ATM(ID)%F_TO_S_XzV(MNUP_F)
 	  IF(SCL_LINE_COOL_RATES)THEN
               T3=(AVE_ENERGY(NL)-AVE_ENERGY(NUP))/FL_SIM(SIM_INDX)
-              IF(ABS(T3-1.0D0) .GT. SCL_LINE_HT_FAC)T3=1.0D0
+              IF(ABS(T3-1.0_LDP) .GT. SCL_LINE_HT_FAC)T3=1.0_LDP
             ELSE
-              T3=1.0D0
+              T3=1.0_LDP
 	  END IF
           DO K=1,ND
 	    T2=ETAL_MAT(K,SIM_INDX)*ZNET_SIM(K,SIM_INDX)

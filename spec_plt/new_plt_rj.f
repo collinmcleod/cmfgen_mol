@@ -84,15 +84,15 @@ C
 C
 C Set constants.
 C
-	CHIBF=2.815D-06
-	CHIFF=3.69D-29
-	HDKT=4.7994145D0
-	TWOHCSQ=0.0147452575D0
-	OPLIN=2.6540081D+08
-	EMLIN=5.27296D-03
-	OPLIN=2.6540081D+08
-	EMLIN=5.27296D-03
-	C_KMS=SPEED_OF_LIGHT()/1.0D+05
+	CHIBF=2.815E-06_LDP
+	CHIFF=3.69E-29_LDP
+	HDKT=4.7994145_LDP
+	TWOHCSQ=0.0147452575_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
+	OPLIN=2.6540081E+08_LDP
+	EMLIN=5.27296E-03_LDP
+	C_KMS=SPEED_OF_LIGHT()/1.0E+05_LDP
 C
 	WRITE(T_OUT,*)
 	1  ' Routine to plot J from EDDFACTOR file. This J is convolved'
@@ -107,7 +107,7 @@ C
 !	CALL GEN_IN(NCF,'Number of model frequency points')
 !
 	LU_IN=35
-	T_elec=1.0D0		!10^4 K
+	T_elec=1.0_LDP		!10^4 K
 C
 C Open EDDFACTOR file.
 C
@@ -162,8 +162,8 @@ C
 C
 C Compute integrals as a function of depth to check flux conservation.
 C
-	FLUX_RJ(1:ND)=+0.0D0
-	FLUX_ES(1:ND)=+0.0D0
+	FLUX_RJ(1:ND)=+0.0_LDP
+	FLUX_ES(1:ND)=+0.0_LDP
 	DO ML=2,NCF-1
 	  DO I=1,ND
 	    FLUX_RJ(I)=FLUX_RJ(I)+(NU(ML)-NU(ML+1))*(RJ(I,ML)+
@@ -176,8 +176,8 @@ C
 	WRITE(9,'(1P,5E12.5)')200.0D0*(FLUX_RJ(1:ND)-FLUX_ES(1:ND))/
 	1                    (FLUX_RJ(1:ND)+FLUX_ES(1:ND))
 C
-	FLUX_RJ(1:ND)=+0.0D0
-	FLUX_ES(1:ND)=+0.0D0
+	FLUX_RJ(1:ND)=+0.0_LDP
+	FLUX_ES(1:ND)=+0.0_LDP
 	DO ML=2,NCF-1
 	  DO I=1,ND
 	    T1=LOG(NU(ML)/NU(ML+1))
@@ -281,29 +281,29 @@ C
 !
 ! Compute integrals as a function of depth to check flux conservation.
 !
-	  RJ_FLUX=+0.0D0
-	  ES_FLUX=+0.0D0
-	  ES2_FLUX=+0.0D0
+	  RJ_FLUX=+0.0_LDP
+	  ES_FLUX=+0.0_LDP
+	  ES2_FLUX=+0.0_LDP
 	  DO ML=2,NCF-1
 	    RJ_FLUX=RJ_FLUX+(NU(ML)-NU(ML+1))*(RJ(K,ML)+RJ(K,ML+1))
 	    ES_FLUX=ES_FLUX+(NU(ML)-NU(ML+1))*(RJ_ES_RD(K,ML)+RJ_ES_RD(K,ML+1))
 	    ES2_FLUX=ES2_FLUX+(NU(ML)-NU(ML+1))*(J_ES(ML)+J_ES(ML+1))
 	  END DO
-	  ES_FLUX=200.0D0*(RJ_FLUX-ES_FLUX)/(RJ_FLUX+ES_FLUX)
-	  ES2_FLUX=200.0D0*(RJ_FLUX-ES2_FLUX)/(RJ_FLUX+ES2_FLUX)
+	  ES_FLUX=200.0_LDP*(RJ_FLUX-ES_FLUX)/(RJ_FLUX+ES_FLUX)
+	  ES2_FLUX=200.0_LDP*(RJ_FLUX-ES2_FLUX)/(RJ_FLUX+ES2_FLUX)
 	  WRITE(5,'(A,1X,1P,2E13.5)')'  %Flux errors:  ',ES_FLUX,ES2_FLUX
 C
-	  RJ_FLUX=+0.0D0
-	  ES_FLUX=+0.0D0
-	  ES2_FLUX=+0.0D0
+	  RJ_FLUX=+0.0_LDP
+	  ES_FLUX=+0.0_LDP
+	  ES2_FLUX=+0.0_LDP
 	  DO ML=2,NCF-1
 	    T1=LOG(NU(ML)/NU(ML+1))
 	    RJ_FLUX=RJ_FLUX+T1*(RJ(K,ML)+RJ(K,ML+1))
 	    ES_FLUX=ES_FLUX+T1*(RJ_ES_RD(K,ML)+RJ_ES_RD(K,ML+1))
 	    ES2_FLUX=ES2_FLUX+T1*(J_ES(ML)+J_ES(ML+1))
 	  END DO
-	  ES_FLUX=200.0D0*(RJ_FLUX-ES_FLUX)/(RJ_FLUX+ES_FLUX)
-	  ES2_FLUX=200.0D0*(RJ_FLUX-ES2_FLUX)/(RJ_FLUX+ES2_FLUX)
+	  ES_FLUX=200.0_LDP*(RJ_FLUX-ES_FLUX)/(RJ_FLUX+ES_FLUX)
+	  ES2_FLUX=200.0_LDP*(RJ_FLUX-ES2_FLUX)/(RJ_FLUX+ES2_FLUX)
 	  WRITE(5,'(A,1X,1P,2E13.5)')'  %Photon errors:',ES_FLUX,ES2_FLUX
 !
 	ELSE IF(X(1:2) .EQ. 'C%')THEN
@@ -332,37 +332,37 @@ C
 !
 ! Compute integrals as a function of depth to check flux conservation.
 !
-	  RJ_FLUX=+0.0D0
-	  ES_FLUX=+0.0D0
-	  ES2_FLUX=+0.0D0
+	  RJ_FLUX=+0.0_LDP
+	  ES_FLUX=+0.0_LDP
+	  ES2_FLUX=+0.0_LDP
 	  DO ML=2,NCF-1
 	    RJ_FLUX=RJ_FLUX+(NU(ML)-NU(ML+1))*(RJ_TMP(ML)+RJ_TMP(ML+1))
 	    ES_FLUX=ES_FLUX+(NU(ML)-NU(ML+1))*(A(ML)+A(ML+1))
 	    ES2_FLUX=ES2_FLUX+(NU(ML)-NU(ML+1))*(J_ES(ML)+J_ES(ML+1))
 	  END DO
-	  ES_FLUX=200.0D0*(RJ_FLUX-ES_FLUX)/(RJ_FLUX+ES_FLUX)
-	  ES2_FLUX=200.0D0*(RJ_FLUX-ES2_FLUX)/(RJ_FLUX+ES2_FLUX)
+	  ES_FLUX=200.0_LDP*(RJ_FLUX-ES_FLUX)/(RJ_FLUX+ES_FLUX)
+	  ES2_FLUX=200.0_LDP*(RJ_FLUX-ES2_FLUX)/(RJ_FLUX+ES2_FLUX)
 	  WRITE(5,'(A,1X,1P,2E13.5)')'  %Flux errors:  ',ES_FLUX,ES2_FLUX
 C
-	  RJ_FLUX=+0.0D0
-	  ES_FLUX=+0.0D0
-	  ES2_FLUX=+0.0D0
+	  RJ_FLUX=+0.0_LDP
+	  ES_FLUX=+0.0_LDP
+	  ES2_FLUX=+0.0_LDP
 	  DO ML=2,NCF-1
 	      T1=LOG(NU(ML)/NU(ML+1))
 	      RJ_FLUX=RJ_FLUX+T1*(RJ_TMP(ML)+RJ_TMP(ML+1))
 	      ES_FLUX=ES_FLUX+T1*(A(ML)+A(ML+1))
 	      ES2_FLUX=ES2_FLUX+T1*(J_ES(ML)+J_ES(ML+1))
 	  END DO
-	  ES_FLUX=200.0D0*(RJ_FLUX-ES_FLUX)/(RJ_FLUX+ES_FLUX)
-	  ES2_FLUX=200.0D0*(RJ_FLUX-ES2_FLUX)/(RJ_FLUX+ES2_FLUX)
+	  ES_FLUX=200.0_LDP*(RJ_FLUX-ES_FLUX)/(RJ_FLUX+ES_FLUX)
+	  ES2_FLUX=200.0_LDP*(RJ_FLUX-ES2_FLUX)/(RJ_FLUX+ES2_FLUX)
 	  WRITE(5,'(A,1X,1P,2E13.5)')'  %Photon errors:',ES_FLUX,ES2_FLUX
 !
 	  CALL USR_OPTION(ONE_PAR,'FLUX_PLOT','.TRUE.','FLux plot?')
 !
 	  IF(ONE_PAR)THEN
-	    C(:)=0.0D0
-	    D(:)=0.0D0
-	    RJ_FLUX=0.0D0
+	    C(:)=0.0_LDP
+	    D(:)=0.0_LDP
+	    RJ_FLUX=0.0_LDP
 	    DO ML=2,NCF-1
 	      RJ_FLUX=RJ_FLUX+(NU(ML)-NU(ML+1))*(RJ_TMP(ML)+RJ_TMP(ML+1))
 	      C(ML)=C(ML-1)+(NU(ML)-NU(ML+1))*
@@ -370,16 +370,16 @@ C
 	      D(ML)=D(ML-1)+(NU(ML)-NU(ML+1))*
 	1              ( (RJ_TMP(ML)-J_ES(ML)) +(RJ_TMP(ML+1)-J_ES(ML+1)) )
 	    END DO
-	    YV(:)=100.0D0*C(:)/RJ_FLUX
+	    YV(:)=100.0_LDP*C(:)/RJ_FLUX
 	    CALL CURVE(NCF,XV,YV)
-	    YV(:)=100.0D0*D(:)/RJ_FLUX
+	    YV(:)=100.0_LDP*D(:)/RJ_FLUX
 	    CALL CURVE(NCF,XV,YV)
 	    YAXIS='%Flux Diff'
 	  ELSE
 	    I=NCF-1
-	    YV(:)=100.0D0*(A(:)-RJ_TMP(:))/RJ_TMP(:)
+	    YV(:)=100.0_LDP*(A(:)-RJ_TMP(:))/RJ_TMP(:)
 	    CALL CURVE(I,XV,YV)
-	    YV(:)=100.0D0*(J_ES(:)-RJ_TMP(:))/RJ_TMP(:)
+	    YV(:)=100.0_LDP*(J_ES(:)-RJ_TMP(:))/RJ_TMP(:)
 	    CALL CURVE(I,XV,YV)
 	    YAXIS='%Diff'
 	  END IF
@@ -399,13 +399,13 @@ C
 	  CALL USR_OPTION(K,'DEPTH',DEFAULT,'Depth for plotting')
 	  DEPTH_VAR=K
 	  RJ_TMP(:)=RJ(K,:)
-	  C(:)=0.0D0
+	  C(:)=0.0_LDP
 	  DO ML=2,NCF-1
 	    C(ML)=C(ML-1)+(NU(ML)-NU(ML+1))*( RJ_TMP(ML)+RJ_TMP(ML+1))
 	  END DO
 	  I=NCF-1
 	  T1=C(I)
-	  YV(:)=100.0D0*C(:)/T1
+	  YV(:)=100.0_LDP*C(:)/T1
 	  XV(:)=NU(:)
 	  CALL CURVE(I,XV,YV)
 	  YAXIS='%Flux'
@@ -416,7 +416,7 @@ C
 	  CALL USR_OPTION(K,'DEPTH',DEFAULT,'Depth for plotting')
 	  DEPTH_VAR=K
 	  DO ML=1,NCF
-	     YV(ML)=100.0D0*(RJ(K,ML)-RJ_ES_RD(K,ML))/RJ(K,ML)
+	     YV(ML)=100.0_LDP*(RJ(K,ML)-RJ_ES_RD(K,ML))/RJ(K,ML)
 	  END DO
 	  CALL CURVE(NCF,XV,YV)
 	  YAXIS='%Difference'
@@ -433,7 +433,7 @@ C
 	1                      (EXP(HDKT*NU(1:NCF)/T_ELEC)-1)
 	  DEPTH_VAR=K
 	  DO ML=1,NCF
-	     YV(ML)=100.0D0*(RJ(K,ML)-PLANCK_FN(ML))/RJ(K,ML)
+	     YV(ML)=100.0_LDP*(RJ(K,ML)-PLANCK_FN(ML))/RJ(K,ML)
 	  END DO
 	  CALL CURVE(NCF,XV,YV)
 	  YAXIS='%Difference'
@@ -452,9 +452,9 @@ C
 ! Convolve Planck function and plot
 !
 	  IF(SET_CONST)THEN
-	    PLANCK_FN(1:NCF)=1.0D0
+	    PLANCK_FN(1:NCF)=1.0_LDP
 	  ELSE
-	    PLANCK_FN(1:NCF)=NU(1:NCF)**3/(EXP(4.7994*NU(1:NCF)/T_ELEC)-1)
+	    PLANCK_FN(1:NCF)=NU(1:NCF)**3/(EXP(4.7994_LDP*NU(1:NCF)/T_ELEC)-1)
 	  END IF
 	  IF(ONE_PAR)THEN
 	    CALL CNVLV_ES_ONE_PAR_V2(NU,PLANCK_FN,D,T_elec,T_OUT,NCF)
@@ -465,7 +465,7 @@ C
 	  D=LOG10(D)
 C
 	  XV(1:NCF)=NU(1:NCF)
-	  YV(1:NCF)=2302.5D0*(D(1:NCF)-PLANCK_FN(1:NCF))	!% Error
+	  YV(1:NCF)=2302.5_LDP*(D(1:NCF)-PLANCK_FN(1:NCF))	!% Error
 	  CALL CURVE(NCF,XV,YV)
 	  IF(SET_CONST)GOTO 1
 !
@@ -474,7 +474,7 @@ C
 	  A(1)=NU(1)
 	  I=2
 	  ML=1
-	  DO WHILE(NU(I) .GT. 1.5D0*T_ELEC)
+	  DO WHILE(NU(I) .GT. 1.5_LDP*T_ELEC)
 	    DO WHILE(D(I) .GT. PLANCK_FN(ML))
 	      ML=ML+1
 	    END DO
@@ -482,7 +482,7 @@ C
 	      ML=ML+1
 	    END DO
 	    T1=(D(I)-PLANCK_FN(ML))/(PLANCK_FN(ML-1)-PLANCK_FN(ML))
-            A(I)=T1*NU(ML-1)+(1.0D0-T1)*NU(ML)
+            A(I)=T1*NU(ML-1)+(1.0_LDP-T1)*NU(ML)
 	    I=I+1
 	  END DO
 C
@@ -501,11 +501,11 @@ C
 	     I=I+1
 	    END DO
 	    T1=(NU(ML)-A(I))/(A(I+1)-A(I))
-	    B(ML)=T1*D(I+1)+(1.0D0-T1)*D(I)
+	    B(ML)=T1*D(I+1)+(1.0_LDP-T1)*D(I)
 	  END DO
 	  B(NCF-1:NCF)=D(NCF-1:NCF)
 C
-	  YV(1:NCF)=2302.5D0*(B(1:NCF)-PLANCK_FN(1:NCF))	!% Error
+	  YV(1:NCF)=2302.5_LDP*(B(1:NCF)-PLANCK_FN(1:NCF))	!% Error
 	  CALL CURVE(NCF,XV,YV)
 	  YAXIS='%Diff'
 C
@@ -576,11 +576,11 @@ C Compute quantities that will be used repeatedly if the same tridiagonal
 C system is used for many R.H. Sides.
 C
 	C(N1)=0				!As used.
-	DIV(1)=1.0/(C(1)+H(1))
+	DIV(1)=1.0_LDP/(C(1)+H(1))
 	C(1)=C(1)*DIV(1)
 	H(1)=H(1)*DIV(1)
 	DO I=2,N1
-	  DIV(I)=1.0D0/(A(I)*H(I-1)+H(I)+C(I))
+	  DIV(I)=1.0_LDP/(A(I)*H(I-1)+H(I)+C(I))
 	  H(I)=(A(I)*H(I-1)+H(I))*DIV(I)
 	  C(I)=C(I)*DIV(I)
 	END DO

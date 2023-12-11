@@ -147,7 +147,7 @@
 	      READ(20,*)RTMP(I),J,OLD_TAU(I),TAU_SAV(I)
 	      J=MAX(I,2)
 	      T1=R(J-1)-R(J)
-	      IF( ABS(RTMP(I)-R(I))/T1 .GT. 2.0D-03 .AND. .NOT. ROUND_ERROR)THEN
+	      IF( ABS(RTMP(I)-R(I))/T1 .GT. 2.0E-03_LDP .AND. .NOT. ROUND_ERROR)THEN
 	        WRITE(6,*)' '
 	        WRITE(6,*)'Possible eror with MEANOPAC -- inconsistent R grid'
 	        WRITE(6,*)'Error could simply be a lack of sig. digits in MEANOPAC'
@@ -193,10 +193,10 @@
 	  NIB=2; NOB=1
 	  NEW_ND=ND
 	  R_SCALE_FAC=1.4
-	  IB_RAT=2.0D0; OB_RAT=1.5D0
-	  SCL_FAC=0.0D0
-	  DTAU2_ON_DTAU1=100.0D0
-	  dLOGT_MAX=0.05D0
+	  IB_RAT=2.0_LDP; OB_RAT=1.5_LDP
+	  SCL_FAC=0.0_LDP
+	  DTAU2_ON_DTAU1=100.0_LDP
+	  dLOGT_MAX=0.05_LDP
 !
 	  WRITE(6,'(A)')BLUE_PEN
 	  WRITE(6,'(A)')' '
@@ -218,7 +218,7 @@
 	  WRITE(6,'(A)')' are placed near the outer boundary (>=0 & < 1):'
 	  WRITE(6,'(A)')BLUE_PEN
 	  CALL GEN_IN(SCL_FAC,'Factor to scale optical depth at OUTER boundary: TAU=TAU-SF*TAU(1)')
-	  IF(SCL_FAC .LT. 0.0D0 .OR. SCL_FAC .GE. 1.0D0)THEN
+	  IF(SCL_FAC .LT. 0.0_LDP .OR. SCL_FAC .GE. 1.0_LDP)THEN
 	    WRITE(6,*)'Invalid scale factor: should be >=0 and < 1.0'
 	    STOP
 	  END IF
@@ -262,7 +262,7 @@
 	  END IF
 	  NEW_ND=ND
 	  NEW_TAU(1:ND)=OLD_TAU(1:ND)
-	  DO WHILE(TAU_MIN .GT. 0.0D0)
+	  DO WHILE(TAU_MIN .GT. 0.0_LDP)
 2000	    CALL GEN_IN(TAU_MAX,'Maximum of Tau range for revision')
 	    IF(TAU_MAX .LT. OLD_TAU(1) .OR. TAU_MAX .GT. OLD_TAU(ND))THEN
 	      WRITE(6,'(A)')RED_PEN
@@ -352,7 +352,7 @@
 !
 ! We can do anther region if desired.
 !
-	    TAU_MIN=0.0D0
+	    TAU_MIN=0.0_LDP
 	    CALL GEN_IN(TAU_MIN,'Minimum of TAU range for revision (=<0) to exit.')
 	  END DO
 !
@@ -445,12 +445,12 @@
 	  CALL OUT_RGRID(RTMP,NEW_ND,R,DI,ED,T,IRAT,VEL,CLUMP_FAC,OLD_TAU,ND,RMIN,LUM,RD_MEANOPAC)
 !
 	ELSE IF(OPTION .EQ. 'SCALE_R')THEN
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  CALL GEN_IN(T1,'New RMIN')
-	  IF(T1 .NE. 0.0D0)THEN
+	  IF(T1 .NE. 0.0_LDP)THEN
 	    SCALE_FACTOR=T1/RMIN
 	  ELSE
-	    SCALE_FACTOR=1.0D0
+	    SCALE_FACTOR=1.0_LDP
 	    CALL GEN_IN(SCALE_FACTOR,'Factor to scale RMIN by')
 	  END IF
 	  DO I=1,ND
@@ -521,7 +521,7 @@
 	  WRITE(6,*)' Grid is extended logarithmically in Log r'
 	  WRITE(6,*)' '
 !
-	  RMAX=2.0D0
+	  RMAX=2.0_LDP
 	  CALL GEN_IN(RMAX,'Factor to extend RMAX by')
           RMAX=RMAX*R(1)
 !
@@ -555,17 +555,17 @@
 	    I=I+1
 	    R(I)=R(I-1)*GRID_RATIO
 	  END DO
-	  IF( R(I)*(1.0D0+(GRID_RATIO-1.0D0)/3) .GT. RMAX)I=I-1
+	  IF( R(I)*(1.0_LDP+(GRID_RATIO-1.0_LDP)/3) .GT. RMAX)I=I-1
 	  NEW_ND=I
 !
 	  NI=4
 	  CALL GEN_IN(NI,'Number of points used at outer boundary to refine grid')
 !
 	  DO J=1,NI-1
-	    R(NEW_ND+J)=R(NEW_ND+J-1)+0.6D0*(RMAX-R(NEW_ND+J-1))
+	    R(NEW_ND+J)=R(NEW_ND+J-1)+0.6_LDP*(RMAX-R(NEW_ND+J-1))
 	  END DO
 	  NEW_ND=NEW_ND+NI
-	  R(NEW_ND)=RMAX-0.01D0*(RMAX-R(NEW_ND-1))
+	  R(NEW_ND)=RMAX-0.01_LDP*(RMAX-R(NEW_ND-1))
 	  NEW_ND=NEW_ND+1
 	  R(NEW_ND)=RMAX
 !
@@ -616,9 +616,9 @@
 	    END DO
 	    I=IST
 	    DO WHILE(1 .EQ. 1)
-	      NEW_XV(I+1)=0.0D0
+	      NEW_XV(I+1)=0.0_LDP
 	      CALL GEN_IN(NEW_XV(I+1),'Next velocity value')
-	      IF(NEW_XV(I+1) .EQ. 0.0D0)EXIT
+	      IF(NEW_XV(I+1) .EQ. 0.0_LDP)EXIT
 	      I=I+1
 	    END DO
 	    NEW_ND=I+ND-IEND+1
@@ -634,7 +634,7 @@
 	    DO I=1,IST
 	      NEW_XV(I)=I
 	    END DO
-	    T1=(IEND-IST)/(NG+1.0D0)
+	    T1=(IEND-IST)/(NG+1.0_LDP)
 	    DO I=1,NG
 	      NEW_XV(IST+I)=IST+I*T1
 	    END DO
@@ -653,22 +653,22 @@
 	    DO I=1,IST
 	      NEW_XV(I)=I
 	    END DO
-	    T1=IST+0.9;  NEW_XV(IST+1)=T1
-	    T1=T1 +0.8;  NEW_XV(IST+2)=T1
-	    T1=T1 +0.7;  NEW_XV(IST+3)=T1
-	    T1=T1 +0.6;  NEW_XV(IST+4)=T1
+	    T1=IST+0.9_LDP;  NEW_XV(IST+1)=T1
+	    T1=T1 +0.8_LDP;  NEW_XV(IST+2)=T1
+	    T1=T1 +0.7_LDP;  NEW_XV(IST+3)=T1
+	    T1=T1 +0.6_LDP;  NEW_XV(IST+4)=T1
 	    K=IST+4
 !
 	    I=IST+3; T1=I
 	    DO WHILE(I .LT. IEND-4)
 	      I=I+1
-	      K=K+1; T1=T1+0.5; NEW_XV(K)=T1
-	      K=K+1; T1=T1+0.5; NEW_XV(K)=T1
+	      K=K+1; T1=T1+0.5_LDP; NEW_XV(K)=T1
+	      K=K+1; T1=T1+0.5_LDP; NEW_XV(K)=T1
 	    END DO
-	    K=K+1; T1=T1+0.6; NEW_XV(K)=T1
-	    K=K+1; T1=T1+0.7; NEW_XV(K)=T1
-	    K=K+1; T1=T1+0.8; NEW_XV(K)=T1
-	    K=K+1; T1=T1+0.9; NEW_XV(K)=T1
+	    K=K+1; T1=T1+0.6_LDP; NEW_XV(K)=T1
+	    K=K+1; T1=T1+0.7_LDP; NEW_XV(K)=T1
+	    K=K+1; T1=T1+0.8_LDP; NEW_XV(K)=T1
+	    K=K+1; T1=T1+0.9_LDP; NEW_XV(K)=T1
 !
 	    IEND=NINT(T1)+1
 	    K=K+1
@@ -693,25 +693,25 @@
 	    DO I=1,IST
 	      NEW_XV(I)=I
 	    END DO
-	    T1=IST+0.8;  NEW_XV(IST+1)=T1
-	    T1=T1 +0.7;  NEW_XV(IST+2)=T1
-	    T1=T1 +0.6;  NEW_XV(IST+3)=T1
-	    T1=T1 +0.5;  NEW_XV(IST+4)=T1
-	    T1=T1 +0.4;  NEW_XV(IST+5)=T1
+	    T1=IST+0.8_LDP;  NEW_XV(IST+1)=T1
+	    T1=T1 +0.7_LDP;  NEW_XV(IST+2)=T1
+	    T1=T1 +0.6_LDP;  NEW_XV(IST+3)=T1
+	    T1=T1 +0.5_LDP;  NEW_XV(IST+4)=T1
+	    T1=T1 +0.4_LDP;  NEW_XV(IST+5)=T1
 	    K=IST+5
 !
-	    I=IST+3; T1=I; T2=1.0D0/3.0D0
+	    I=IST+3; T1=I; T2=1.0_LDP/3.0_LDP
 	    DO WHILE(I .LT. IEND-4)
 	      I=I+1
 	      K=K+1; T1=T1+T2; NEW_XV(K)=T1
 	      K=K+1; T1=T1+T2; NEW_XV(K)=T1
 	      K=K+1; T1=T1+T2; NEW_XV(K)=T1
 	    END DO
-	    K=K+1; T1=T1+0.4; NEW_XV(K)=T1
-	    K=K+1; T1=T1+0.5; NEW_XV(K)=T1
-	    K=K+1; T1=T1+0.6; NEW_XV(K)=T1
-	    K=K+1; T1=T1+0.7; NEW_XV(K)=T1
-	    K=K+1; T1=T1+0.8; NEW_XV(K)=T1
+	    K=K+1; T1=T1+0.4_LDP; NEW_XV(K)=T1
+	    K=K+1; T1=T1+0.5_LDP; NEW_XV(K)=T1
+	    K=K+1; T1=T1+0.6_LDP; NEW_XV(K)=T1
+	    K=K+1; T1=T1+0.7_LDP; NEW_XV(K)=T1
+	    K=K+1; T1=T1+0.8_LDP; NEW_XV(K)=T1
 !
 	    IEND=NINT(T1)+1
 	    K=K+1
@@ -733,7 +733,7 @@
 	    DO I=1,IST
 	      NEW_XV(I)=R(I)
 	    END DO
-	    T1=EXP( LOG(R(IEND)/R(IST))/(NG+1.0D0) )
+	    T1=EXP( LOG(R(IEND)/R(IST))/(NG+1.0_LDP) )
 	    DO I=1,NG
 	      NEW_XV(IST+I)=NEW_XV(IST+I-1)*T1
 	    END DO
@@ -746,7 +746,7 @@
 	    DO I=1,IST
 	      NEW_XV(I)=R(I)
 	    END DO
-	    T1=(R(IEND)-R(IST))/(NG+1.0D0)
+	    T1=(R(IEND)-R(IST))/(NG+1.0_LDP)
 	    DO I=1,NG
 	      NEW_XV(IST+I)=R(IST)+I*T1
 	    END DO
@@ -771,9 +771,9 @@
 	  CALL GEN_IN(NG,'Numer of additional points:')
 	  CALL GEN_IN(GRID_RATIO,'Ratio of succesive interval sizes: > 1:')
 !
-	  GRID_RATIO=1.0D0/GRID_RATIO
+	  GRID_RATIO=1.0_LDP/GRID_RATIO
 	  RTMP(1:ND)=R(1:ND)
-	  DELR=(R(NI-1)-R(ND))*(1.0D0-GRID_RATIO)/(1.0D0-GRID_RATIO**(ND-NI+NG+1))
+	  DELR=(R(NI-1)-R(ND))*(1.0_LDP-GRID_RATIO)/(1.0_LDP-GRID_RATIO**(ND-NI+NG+1))
 	  DO I=NI,ND+NG-1
 	    RTMP(I)=RTMP(I-1)-DELR
 	    DELR=DELR*GRID_RATIO
@@ -797,11 +797,11 @@
 	    WRITE(6,'(I3,4ES18.8)')I,R(I),R(I+1),R(I)-R(I+1),(R(I+2)-R(I+1))/(R(I+1)-R(I))
 	  END DO
 	  WRITE(6,*)' '
-	  NI=2; NG=3; GRID_RATIO=2.0D0
+	  NI=2; NG=3; GRID_RATIO=2.0_LDP
 	  CALL GEN_IN(NI,'Last depth to replace (e.g. 2):'); NI=NI-1
 	  CALL GEN_IN(NG,'Numer of ADDITIONAL points:')
 	  CALL GEN_IN(GRID_RATIO,'Ratio of succesive interval sizes: > 1:')
-	  GRID_RATIO=1.0D0/GRID_RATIO
+	  GRID_RATIO=1.0_LDP/GRID_RATIO
 !
 	  RTMP(1)=R(1)
 !
@@ -810,8 +810,8 @@
 	  T1=R(NI+2)
 	  DELR=R(NI+2)-R(NI+3)
 	  DO I=NI+NG,1,-1
-	    T2=(R(1)-T1)*(1.0D0-GRID_RATIO)/(1.0D0-GRID_RATIO**(I+1))
-	    DELR=MIN(T2,1.2D0*DELR)
+	    T2=(R(1)-T1)*(1.0_LDP-GRID_RATIO)/(1.0_LDP-GRID_RATIO**(I+1))
+	    DELR=MIN(T2,1.2_LDP*DELR)
 	    T1=T1+DELR
 	    RTMP(I+1)=T1
 	  END DO
@@ -906,7 +906,7 @@
 	END DO
 	CLOSE(UNIT=10)
 !
-	NEW_TAU=0.0D0
+	NEW_TAU=0.0_LDP
 	IF(RD_MEANOPAC)THEN
 	  CALL MON_INTERP(NEW_TAU,NEW_ND,IONE,RTMP,NEW_ND,OLD_TAU,ND,R,ND)
 	  OPEN(UNIT=LU,FILE='R_GRID_CHK',STATUS='UNKNOWN')
@@ -915,7 +915,7 @@
           WRITE(LU,'(A)')' '
           WRITE(LU,'(A,17X,A,9X,A,8X,A,11X,A,10X,A,7X,A,6X,A,3X,A,13X,A,3X,A)')
 	1           ' Depth','R','Ln(R)','dLn(R)','Tau','dTau','Ln(Tau)','dLn(Tau)','dTAU[I/I-1]','T','dT/T(I)'
-	  T1=0.0D0
+	  T1=0.0_LDP
 	  DO I=1,NEW_ND-1
 	    IF(I .NE. 1)T1=(NEW_TAU(I+1)-NEW_TAU(I))/(NEW_TAU(I)-NEW_TAU(I-1))
 	    WRITE(LU,'(I6,ES18.8,9ES14.4)')I,RTMP(I),LOG(RTMP(I)),LOG(RTMP(I+1)/RTMP(I)),
@@ -930,7 +930,7 @@
         CALL MON_INT_FUNS_V2(COEF,NEW_VEL,RTMP,NEW_ND)
         DO I=1,NEW_ND
           NEW_SIGMA(I)=COEF(I,3)
-	  NEW_SIGMA(I)=RTMP(I)*NEW_SIGMA(I)/NEW_VEL(I)-1.0D0
+	  NEW_SIGMA(I)=RTMP(I)*NEW_SIGMA(I)/NEW_VEL(I)-1.0_LDP
 	END DO
         OPEN(UNIT=10,FILE='RVSIG_HOPE',STATUS='UNKNOWN')
 	  WRITE(10,'(A)')'!'

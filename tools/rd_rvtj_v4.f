@@ -123,8 +123,8 @@
 ! This format will allow new variables to be added after the temperature
 ! without affecting the reading of RVTJ.
 !
-	TGREY=0.0D0; dE_RAD_DECAY=0.0D0; ROSS_MEAN=0.0D0
-	FLUX_MEAN=0.0D0; PLANCK_MEAN=0.0D0
+	TGREY=0.0_LDP; dE_RAD_DECAY=0.0_LDP; ROSS_MEAN=0.0_LDP
+	FLUX_MEAN=0.0_LDP; PLANCK_MEAN=0.0_LDP
 	STRING=' '
 	DO WHILE(INDEX(STRING,'Atom Density') .EQ. 0)
 	  READ(LUIN,'(A)')STRING

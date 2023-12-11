@@ -92,24 +92,24 @@
 !
 ! Initialize values.
 !
-	PI=ACOS(-1.0D0)
+	PI=ACOS(-1.0_LDP)
 	LUER=ERROR_LU()
-	C_KMS=1.0D-05*SPEED_OF_LIGHT()
+	C_KMS=1.0E-05_LDP*SPEED_OF_LIGHT()
 	DO I=1,ND
 	  BETA(I)=VEL(I)/C_KMS
 	END DO
-	IBOUND=0.0D0
+	IBOUND=0.0_LDP
 !
-	FS_J(:)=0.0D0
-	FS_H(:)=0.0D0
-	FS_K(:)=0.0D0
-	H_INBC=0.0D0
-	H_OUTBC=0.0D0
+	FS_J(:)=0.0_LDP
+	FS_H(:)=0.0_LDP
+	FS_K(:)=0.0_LDP
+	H_INBC=0.0_LDP
+	H_OUTBC=0.0_LDP
 !
 ! DBB =3L/16(piR)**2 and is used for the lower boundary diffusion approximation.
 !
-	T1=3.826D+13*LUMINOSITY/16.0D0/PI/PI
-	DBB=3.0D0*T1/R(ND)/R(ND)
+	T1=3.826E+13_LDP*LUMINOSITY/16.0_LDP/PI/PI
+	DBB=3.0_LDP*T1/R(ND)/R(ND)
 !
 	CALL DERIVCHI(dCHIdr,CHI,R,ND,METHOD)
 !
@@ -129,7 +129,7 @@
 	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
 	      T1=Z(I)/R(I)
 	      TA(I)=BETA(I)/R(I)
-	      TA(I)=4.0D0*TA(I)*( (1.0D0-T1)**2 + T1*T1*TA(I) )
+	      TA(I)=4.0_LDP*TA(I)*( (1.0_LDP-T1)**2 + T1*T1*TA(I) )
 	      CHI_MOD(I)=CHI(I)  + TA(I)
 	    END DO
 	  END IF
@@ -145,8 +145,8 @@
 !
 	  IF(NI .GT. 2)THEN
 	    DO I=1,NI-1
-	      DTAU(I)=0.5D0*(Z(I)-Z(I+1))*(CHI_MOD(I)+CHI_MOD(I+1)+(Z(I)-Z(I+1))
-	1       *(dCHI_MODdR(I+1)*Z(I+1)/R(I+1)-dCHI_MODdR(I)*Z(I)/R(I))/6.0D0)
+	      DTAU(I)=0.5_LDP*(Z(I)-Z(I+1))*(CHI_MOD(I)+CHI_MOD(I+1)+(Z(I)-Z(I+1))
+	1       *(dCHI_MODdR(I+1)*Z(I+1)/R(I+1)-dCHI_MODdR(I)*Z(I)/R(I))/6.0_LDP)
 	    END DO
 	  END IF
 !
@@ -156,18 +156,18 @@
 	  IF(NI .GT. 2)THEN
 !
 	    DO I=1,NI-1
-	      VU(I)=1.0D0/DTAU(I)
+	      VU(I)=1.0_LDP/DTAU(I)
 	    END DO
 !
 	    XM(1)=-IBOUND
-	    TA(1)=0.0D0
-	    TC(1)=1.0D0/DTAU(1)
-	    TB(1)=-1.0D0-TC(1)
+	    TA(1)=0.0_LDP
+	    TC(1)=1.0_LDP/DTAU(1)
+	    TB(1)=-1.0_LDP-TC(1)
 	    DO I=2,NI-1
 	      TA(I)=VU(I-1)
 	      TC(I)=VU(I)
-	      TB(I)=-0.5D0*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
-	      XM(I)=-RJ(I)*CHI(I)*(DTAU(I-1)+DTAU(I))*0.5D0/CHI_MOD(I)
+	      TB(I)=-0.5_LDP*(DTAU(I-1)+DTAU(I))-TA(I)-TC(I)
+	      XM(I)=-RJ(I)*CHI(I)*(DTAU(I-1)+DTAU(I))*0.5_LDP/CHI_MOD(I)
 	    END DO
 !
 	    IF(LS .LE. NC .AND. DIFF_APPROX)THEN
@@ -176,37 +176,37 @@
 	      XM(NI)=DBC
 	    ELSE IF(LS .GT. NC)THEN
 	      TA(NI)=-TC(NI-1)
-	      TB(NI)=-TA(NI)+DTAU(NI-1)/2.0D0
-	      XM(NI)=0.5D0*DTAU(NI-1)*RJ(NI)*CHI(NI)/CHI_MOD(NI)
+	      TB(NI)=-TA(NI)+DTAU(NI-1)/2.0_LDP
+	      XM(NI)=0.5_LDP*DTAU(NI-1)*RJ(NI)*CHI(NI)/CHI_MOD(NI)
 	    ELSE
 	      TA(NI)=-VU(NI-1)
-	      TB(NI)=1.0D0+VU(NI-1)
+	      TB(NI)=1.0_LDP+VU(NI-1)
 	      XM(NI)=IC
 	    END IF
-	    TC(NI)=0.0D0
+	    TC(NI)=0.0_LDP
 !
 ! Solve the tridiagonal system of equations.
 !
 	    CALL THOMAS(TA,TB,TC,XM,NI,IONE)
 !
 	  ELSE IF(NI .EQ. 1)THEN
-	    XM(1)=0.0D0
+	    XM(1)=0.0_LDP
 	  ELSE IF(NI .EQ. 2)THEN
 	    Z(1)=SQRT(R(1)*R(1)-P(LS)*P(LS))
-	    DTAU(1)=0.5D0*Z(1)*(CHI_MOD(1)+CHI_MOD(2))		!Z(2)=0.0
+	    DTAU(1)=0.5_LDP*Z(1)*(CHI_MOD(1)+CHI_MOD(2))		!Z(2)=0.0
 	    E1=EXP(-DTAU(1))
-	    E2=1.0D0-(1.0D0-E1)/DTAU(1)
-	    E3=(1.0D0-E1)/DTAU(1)-E1
-	    IF(DTAU(1) .LT. 1.0D-03)THEN
-	      E2=DTAU(1)*0.5D0+DTAU(1)*DTAU(1)/6.0D0
-	      E3=DTAU(1)*0.5D0-DTAU(1)*DTAU(1)/3.0D0
+	    E2=1.0_LDP-(1.0_LDP-E1)/DTAU(1)
+	    E3=(1.0_LDP-E1)/DTAU(1)-E1
+	    IF(DTAU(1) .LT. 1.0E-03_LDP)THEN
+	      E2=DTAU(1)*0.5_LDP+DTAU(1)*DTAU(1)/6.0_LDP
+	      E3=DTAU(1)*0.5_LDP-DTAU(1)*DTAU(1)/3.0_LDP
 	    END IF
 C
-	    VU(1)=1.0D0/DTAU(1)
+	    VU(1)=1.0_LDP/DTAU(1)
 	    TA(2)=CHI(2)*RJ(2)/CHI_MOD(2)
 	    TA(1)=CHI(1)*RJ(1)/CHI_MOD(1)
 	    XM(2)=TA(2)*E2+TA(1)*E3
-            XM(1)=0.5D0*(XM(2)*E1+TA(1)*E2+TA(2)*E3)
+            XM(1)=0.5_LDP*(XM(2)*E1+TA(1)*E2+TA(2)*E3)
 	  END IF
 !
 ! Update J, H, K, & N for this angle.
@@ -232,7 +232,7 @@ C
 !
 	FEDD=FS_K/FS_J
 	DO I=1,ND-1
-	  TA(I)=0.25D0*FS_H(I)*(R(I)+R(I+1))**2
+	  TA(I)=0.25_LDP*FS_H(I)*(R(I)+R(I+1))**2
 	END DO
 	CALL REGRID_H(H_ON_J,R,TA,H_OUTBC,DBB,ND,TB)
 	H_ON_J=H_ON_J/FS_J/R/R
@@ -251,11 +251,11 @@ C
 	    WRITE(LS,'(I5,ES14.5,11ES13.4)')I,R(I),VEL(I),CHI(I),VEL(I)/R(I)/C_KMS,
 	1                                RJ(I),FS_J(I),FS_H(I),FEDD(I),H_ON_J(I)
 	  END DO
-	  T1=4.1274D-12*R(1)*R(1)*( FS_H(1)+BETA(1)*FS_J(1)*
-	1         (1.0D0+FEDD(1))/(1.0D0-BETA(1)*BETA(1)) )
+	  T1=4.1274E-12_LDP*R(1)*R(1)*( FS_H(1)+BETA(1)*FS_J(1)*
+	1         (1.0_LDP+FEDD(1))/(1.0_LDP-BETA(1)*BETA(1)) )
 	  WRITE(LS,'(A)')' '
 	  WRITE(LS,'(A,ES14.5)')' Observed flux computed by EDD routine is ',T1
-	  T1=4.1274D-12*R(1)*R(1)*FS_H(1)
+	  T1=4.1274E-12_LDP*R(1)*R(1)*FS_H(1)
 	  WRITE(LS,'(A,ES14.5)')' Comoving-frame flux computed by EDD routine is ',T1
 	  WRITE(LS,'(A)')' '
 	CLOSE(UNIT=LS)

@@ -197,31 +197,31 @@
 !
 	  ELSE IF(CONT_VEL .AND. .NOT. ACCURATE)THEN
 	    IF(FIRST_FREQ)THEN
-	      TX(:,:,:)=0.0D0
-	      TVX(:,:,:)=0.0D0
-	      dJ_DIF_d_T(:)=0.0D0
-	      dJ_DIF_d_dTdR(:)=0.0D0
-	      dRSQH_DIF_d_T=0.0D0
-	      dRSQH_DIF_d_dTdR=0.0D0
+	      TX(:,:,:)=0.0_LDP
+	      TVX(:,:,:)=0.0_LDP
+	      dJ_DIF_d_T(:)=0.0_LDP
+	      dJ_DIF_d_dTdR(:)=0.0_LDP
+	      dRSQH_DIF_d_T=0.0_LDP
+	      dRSQH_DIF_d_dTdR=0.0_LDP
 	      FL_OLD=FL
 	    ELSE
 	      RAT_TOO_BIG=.FALSE.
 	      DO L=1,ND
 	        TA(L)=CHI_NOSCAT_PREV(L)/CHI_NOSCAT(L)
-	        IF(ETA_CONT(L) .EQ. 0.0D0)THEN
-                  TB(L)=1.0D0
+	        IF(ETA_CONT(L) .EQ. 0.0_LDP)THEN
+                  TB(L)=1.0_LDP
 	        ELSE
 	          TB(L)=ETA_PREV(L)/ETA_CONT(L)
 	        END IF
-	        IF(TA(L) .GT. 5.0D0)THEN
-	          TA(L)=0.0D0; TB(L)=0.0D0
+	        IF(TA(L) .GT. 5.0_LDP)THEN
+	          TA(L)=0.0_LDP; TB(L)=0.0_LDP
 	        END IF
 !	        IF(TA(L) .GT. 1.5)RAT_TOO_BIG=.TRUE.
 	      END DO
 	      IF(RAT_TOO_BIG)THEN
 	        DO L=1,ND
-	          TA(L)=0.0D0
-	          TB(L)=0.0D0
+	          TA(L)=0.0_LDP
+	          TB(L)=0.0_LDP
 	        END DO
 	      END IF
 !$OMP PARALLEL DO PRIVATE(J,K,T1)
@@ -287,7 +287,7 @@
 !	    END IF
 !
 	      IF(MIXED_ES_VAR)THEN
-	        T1=2.0D0
+	        T1=2.0_LDP
 	        DO I=1,ND
 	          IF(RJ_ES(I) .GT. RJ(I))THEN
 	            TA(I)=ETA_CLUMP(I)+ESEC_CLUMP(I)*
@@ -300,7 +300,7 @@
 	          END IF
 	        END DO
 	      ELSE
-	        ES_COH_VEC(1:ND)=0.0D0
+	        ES_COH_VEC(1:ND)=0.0_LDP
 	        TA(1:ND)=ETA_CLUMP(1:ND)+ESEC_CLUMP(1:ND)*RJ_ES(1:ND)
 	      END IF
 	   END IF
@@ -504,26 +504,26 @@
 ! Now zero dCHI and dETA storage locations. These refer to the TOTAL
 ! opacity and emissivity.
 !
-	    TX(:,:,1:2)=0.0D0
-	    TVX(:,:,1:2)=0.0D0
+	    TX(:,:,1:2)=0.0_LDP
+	    TVX(:,:,1:2)=0.0_LDP
 !
 ! 
 !
 	  ELSE IF(CONT_VEL .AND. ACCURATE)THEN
 	    IF(FIRST_FREQ)THEN
-	      TX_EXT(:,:,:)=0.0D0
-	      TVX_EXT(:,:,:)=0.0D0
+	      TX_EXT(:,:,:)=0.0_LDP
+	      TVX_EXT(:,:,:)=0.0_LDP
 	    ELSE
 	      RAT_TOO_BIG=.FALSE.
 	      DO L=1,ND
 	        TA(L)=CHI_NOSCAT_PREV(L)/CHI_NOSCAT(L)
 	        TB(L)=ETA_PREV(L)/ETA_CONT(L)
-	        IF(TA(L) .GT. 1.5)RAT_TOO_BIG=.TRUE.
+	        IF(TA(L) .GT. 1.5_LDP)RAT_TOO_BIG=.TRUE.
 	      END DO
 	      IF(RAT_TOO_BIG)THEN
 	        DO L=1,ND
-	          TA(L)=0.0D0
-	          TB(L)=0.0D0
+	          TA(L)=0.0_LDP
+	          TB(L)=0.0_LDP
 	        END DO
 	      END IF
 !$OMP PARALLEL DO
@@ -689,8 +689,8 @@
 ! Now zero dCHI and dETA storage locations. These refer to the TOTAL
 ! opacity and emissivity.
 !
-	    TX_EXT(:,:,1:2)=0.0D0		!dCHI,dETA
-	    TVX_EXT(:,:,1:2)=0.0D0		!dCHI,dETA
+	    TX_EXT(:,:,1:2)=0.0_LDP		!dCHI,dETA
+	    TVX_EXT(:,:,1:2)=0.0_LDP		!dCHI,dETA
 !
 ! Compute dJ/d? just on the small grid. We don't need dH/d? since the
 ! statistical and radiative equilibrium equations depend only on J.
@@ -763,7 +763,7 @@
 !	  IF(FIRST_FREQ)WRITE(6,*)'ERROR REMOVED dVCHI in DO_VAR_CONT'
 !	  DO X_INDX=4,NM
 !
-	  dJ_LOC=0.0D0
+	  dJ_LOC=0.0_LDP
 	  DO X_INDX=3,NM
 	    IF(DO_THIS_TX_MATRIX(X_INDX))THEN
 	      DO K=1,ND
