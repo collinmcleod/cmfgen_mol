@@ -1,0 +1,54 @@
+
+add_auto_rates.f
+
+        ELSE IF(FEDGE_F(N_F) .LT. 0.0_LDP)THEN
+        ELSE IF(FEDGE_F(N_F) .LT. 0.0D0)THEN
+
+
+rd_auto_v1.f
+
+	AUTO(1:NLEV)=0.0_LDP
+	AUTO(1:NLEV)=0.0D0
+
+	TMP_AUTO=0.0_LDP
+	TMP_AUTO=0.0D0
+
+	G_SUM(1:NLEV)=0.0_LDP
+	G_SUM(1:NLEV)=0.0D0
+
+	T1=1000.0_LDP*2.998E+10_LDP/1.0E+15_LDP
+	T1=1000.0D0*2.998D+10/1.0D+15
+
+	  IF(G_SUM(I) .NE. 0.0_LDP)AUTO(I)=AUTO(I)/G_SUM(I)
+	  IF(G_SUM(I) .NE. 0.0D0)AUTO(I)=AUTO(I)/G_SUM(I)
+
+	    IF(AUTO(I) .LE. 1.0E-20_LDP .AND. FEDGE(I) .LT. 0.0_LDP)AUTO(I)=DEFAULT_AUTO_RATE
+	    IF(AUTO(I) .LE. 1.0D-20 .AND. FEDGE(I) .LT. 0.0D0)AUTO(I)=DEFAULT_AUTO_RATE
+
+
+steq_auto_v1.f
+
+	1                                                               (1.5_LDP+HDKT*FEDGE_F(K)/T(I))/T(I)
+	1                                                               (1.5D0+HDKT*FEDGE_F(K)/T(I))/T(I)
+
+	1                                                               (1.5_LDP+HDKT*FEDGE_F(K)/T(I))/T(I)
+	1                                                               (1.5D0+HDKT*FEDGE_F(K)/T(I))/T(I)
+
+
+steq_auto_v2.f
+
+	PLNCKS_CONST=6.6261965E-12_LDP         !H*1.0E+15  (1.0E+15 due to times frequency)
+	PLNCKS_CONST=6.6261965D-12         !H*1.0E+15  (1.0E+15 due to times frequency)
+
+	    IF(AUTO(I) .GT. 0.0_LDP)THEN
+	    IF(AUTO(I) .GT. 0.0D0)THEN
+
+        ELSE IF(FEDGE_F(N_F) .LT. 0.0_LDP)THEN
+        ELSE IF(FEDGE_F(N_F) .LT. 0.0D0)THEN
+
+	1                                                               (1.5_LDP+HDKT*FEDGE_F(K)/T(I))/T(I)
+	1                                                               (1.5D0+HDKT*FEDGE_F(K)/T(I))/T(I)
+
+	1                                                               (1.5_LDP+HDKT*FEDGE_F(K)/T(I))/T(I)
+	1                                                               (1.5D0+HDKT*FEDGE_F(K)/T(I))/T(I)
+

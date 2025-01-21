@@ -1,0 +1,40 @@
+      PROGRAM TIMING_TESTING
+      USE SET_KIND_MODULE
+      IMPLICIT NONE
+      
+      REAL(KIND=LDP),ALLOCATABLE :: R1(:),R2(:),R3(:)
+      INTEGER I,NLOOP,J,LOOPSCALE
+      INTEGER, PARAMETER :: IONE=1
+      INTEGER, PARAMETER :: ITWO=2
+      INTEGER, PARAMETER :: ITHREE=3
+
+      NLOOP = 10000000
+      LOOPSCALE = 100
+      ALLOCATE(R1(NLOOP))
+      ALLOCATE(R2(NLOOP))
+      ALLOCATE(R3(NLOOP))
+
+      WRITE(*,*) 'KIND IS ',KIND(R1)
+
+      CALL TUNE(IONE,'ADDN LOOP')
+      R1 = 1.0_LDP
+      R2 = 2.0_LDP
+      DO J=1,LOOPSCALE
+         DO I=1,NLOOP
+            R3(I) = R1(I)+R2(I)
+         END DO
+      END DO
+      CALL TUNE(ITWO,'ADDN LOOP')
+!      CALL TUNE(ITHREE,'TERMINAL')
+
+      CALL TUNE(IONE,'MULT LOOP')
+      DO J=1,LOOPSCALE
+         DO I=1,NLOOP
+            R3(I) = R1(I)*R2(I)
+         END DO
+      END DO
+      CALL TUNE(ITWO,'MULT LOOP')
+
+      CALL TUNE(ITHREE,'TERMINAL')
+
+      END PROGRAM 

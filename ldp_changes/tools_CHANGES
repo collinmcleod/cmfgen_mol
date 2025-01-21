@@ -1,0 +1,372 @@
+
+check_vec_nan.f
+
+
+chk_little_endian.f
+
+
+chk_string.f
+
+
+condit_string.f
+
+
+constants_mod.f
+
+	REAL(KIND=LDP), PARAMETER :: SPEED_OF_LIGHT         = 2.99792458E+10_LDP      !Exact cm/s
+	REAL(KIND=LDP), PARAMETER :: SPEED_OF_LIGHT         = 2.99792458D+10      !Exact cm/s
+
+	REAL(KIND=LDP), PARAMETER :: ELECTRON_VOLT          = 1.60217733E-12_LDP      !ergs
+	REAL(KIND=LDP), PARAMETER :: ELECTRON_VOLT          = 1.60217733D-12      !ergs
+
+	REAL(KIND=LDP), PARAMETER :: GRAVITATIONAL_CONSTANT = 6.67259E-08_LDP         !cm^3/gm/s
+	REAL(KIND=LDP), PARAMETER :: GRAVITATIONAL_CONSTANT = 6.67259D-08         !cm^3/gm/s
+
+	REAL(KIND=LDP), PARAMETER :: PLANCKS_CONSTANT       = 6.62607015E-27_LDP      !erg sec
+	REAL(KIND=LDP), PARAMETER :: PLANCKS_CONSTANT       = 6.62607015D-27      !erg sec
+
+	REAL(KIND=LDP), PARAMETER :: ATOMIC_MASS_UNIT       = 1.6605390666E-24_LDP    !gm
+	REAL(KIND=LDP), PARAMETER :: ATOMIC_MASS_UNIT       = 1.6605390666D-24    !gm
+
+	REAL(KIND=LDP), PARAMETER :: ELECTRON_MASS          = 9.1093837015E-28_LDP    !gm
+	REAL(KIND=LDP), PARAMETER :: ELECTRON_MASS          = 9.1093837015D-28    !gm
+
+	REAL(KIND=LDP), PARAMETER :: ELECTRON_CHARGE        = 4.80320427E-10_LDP      !esu
+	REAL(KIND=LDP), PARAMETER :: ELECTRON_CHARGE        = 4.80320427E-10      !esu
+
+	REAL(KIND=LDP), PARAMETER :: BOLTZMANN_CONSTANT     = 1.380649E-16_LDP        !erg/K
+	REAL(KIND=LDP), PARAMETER :: BOLTZMANN_CONSTANT     = 1.380649D-16        !erg/K
+
+	REAL(KIND=LDP), PARAMETER :: STEFAN_BOLTZ           = 5.670374419E-05_LDP     !ergs/cm^2/K^4
+	REAL(KIND=LDP), PARAMETER :: STEFAN_BOLTZ           = 5.670374419D-05     !ergs/cm^2/K^4
+
+	REAL(KIND=LDP), PARAMETER :: RYDBERG_INF     =109737.31534_LDP		!/cm
+	REAL(KIND=LDP), PARAMETER :: RYDBERG_INF     =109737.31534D0		!/cm
+
+	REAL(KIND=LDP), PARAMETER :: RYDBERG_HYDROGEN=109677.6_LDP		!/cm
+	REAL(KIND=LDP), PARAMETER :: RYDBERG_HYDROGEN=109677.6D0		!/cm
+
+	REAL(KIND=LDP), PARAMETER :: RYDBERG_HELIUM  =109722.3_LDP		!/cm
+	REAL(KIND=LDP), PARAMETER :: RYDBERG_HELIUM  =109722.3D0		!/cm
+
+	REAL(KIND=LDP), PARAMETER :: RYDBERG_CARBON  =109732.3_LDP		!/cm
+	REAL(KIND=LDP), PARAMETER :: RYDBERG_CARBON  =109732.3D0		!/cm
+
+	REAL(KIND=LDP), PARAMETER :: RYDBERG_NITROGEN=109733.0_LDP		!/cm
+	REAL(KIND=LDP), PARAMETER :: RYDBERG_NITROGEN=109733.0D0		!/cm
+
+	REAL(KIND=LDP), PARAMETER :: RYDBERG_OXYGEN  =109733.5_LDP		!/cm
+	REAL(KIND=LDP), PARAMETER :: RYDBERG_OXYGEN  =109733.5D0		!/cm
+
+	REAL(KIND=LDP), PARAMETER :: MASS_SUN=1.989E+33_LDP  			!gm
+	REAL(KIND=LDP), PARAMETER :: MASS_SUN=1.989D+33  			!gm
+
+	REAL(KIND=LDP), PARAMETER :: RAD_SUN =6.9599E+10_LDP			!cm (changed 7-Jan-2008)
+	REAL(KIND=LDP), PARAMETER :: RAD_SUN =6.9599D+10			!cm (changed 7-Jan-2008)
+
+	REAL(KIND=LDP), PARAMETER :: LUM_SUN =3.826E+33_LDP				!erg/s
+	REAL(KIND=LDP), PARAMETER :: LUM_SUN =3.826D+33				!erg/s
+
+	REAL(KIND=LDP), PARAMETER :: TEFF_SUN=5770.0_LDP				!K
+	REAL(KIND=LDP), PARAMETER :: TEFF_SUN=5770.0D0				!K
+
+	REAL(KIND=LDP), PARAMETER :: ASTRONOMICAL_UNIT=1.49597892E+13_LDP		!cm
+	REAL(KIND=LDP), PARAMETER :: ASTRONOMICAL_UNIT=1.49597892D+13		!cm
+
+	REAL(KIND=LDP), PARAMETER :: PARSEC           =3.0856E+18_LDP       	!cm
+	REAL(KIND=LDP), PARAMETER :: PARSEC           =3.0856D+18       	!cm
+
+	REAL(KIND=LDP), PARAMETER :: JANSKY           =1.0E-23_LDP			!ergs/cm^2/s/Hz
+	REAL(KIND=LDP), PARAMETER :: JANSKY           =1.0D-23			!ergs/cm^2/s/Hz
+
+	REAL(KIND=LDP), PARAMETER ::           PI=3.141592653589793238462643_LDP
+	REAL(KIND=LDP), PARAMETER ::           PI=3.141592653589793238462643D0
+
+	REAL(KIND=LDP), PARAMETER ::       FUN_PI=3.141592653589793238462643_LDP
+	REAL(KIND=LDP), PARAMETER ::       FUN_PI=3.141592653589793238462643D0
+
+	REAL(KIND=LDP), PARAMETER :: SECS_IN_YEAR=31557600.0_LDP     		!365.25*24*60*60
+	REAL(KIND=LDP), PARAMETER :: SECS_IN_YEAR=31557600.0D0     		!365.25*24*60*60
+
+
+count_occur.f
+
+
+form_sp_num.f
+
+
+gen_in.f
+
+
+get_indx.f
+
+
+get_lu.f
+
+
+lambert_wm_fun.f
+
+	T1=-EXP(-1.0_LDP)
+	T1=-EXP(-1.0D0)
+
+	  W=W-LOG(-W)*(1.0_LDP-1.0_LDP/W)
+	  W=W-LOG(-W)*(1.0D0-1.0D0/W)
+
+	  W=-1.0_LDP
+	  W=-1.0D0
+
+	  IF(Z .GT. -0.15_LDP)THEN
+	  IF(Z .GT. -0.15D0)THEN
+
+	    W=W-LOG(-W)*(1.0_LDP-1.0_LDP/W)
+	    W=W-LOG(-W)*(1.0D0-1.0D0/W)
+
+	    W=-1.0_LDP-9.1_LDP*(EXP(-1.0_LDP)+Z)
+	    W=-1.0D0-9.1D0*(EXP(-1.0D0)+Z)
+
+	    QN=2*(1+W)*(1+W+2*ZN/3.0_LDP)
+	    QN=2*(1+W)*(1+W+2*ZN/3.0D0)
+
+	    W=W*(1.0_LDP+EN)
+	    W=W*(1.0D0+EN)
+
+	    IF(W .GT. 0.0_LDP)W=-W
+	    IF(W .GT. 0.0D0)W=-W
+
+	    IF( ABS( (W-WOLD)/WOLD ) .LT. 1.0E-08_LDP)EXIT
+	    IF( ABS( (W-WOLD)/WOLD ) .LT. 1.0D-08)EXIT
+
+
+mod_color_pen_def.f
+
+
+new_gen_in.f
+
+
+num_constants.f
+
+
+rd_energy.f
+
+	    FEDGE(I)=(IONIZATION_EN-ENERGY(I))*SPEED_LIGHT*1.0E-15_LDP
+	    FEDGE(I)=(IONIZATION_EN-ENERGY(I))*SPEED_LIGHT*1.0D-15
+
+
+rd_energy_v2.f
+
+	    FEDGE(I)=(IONIZATION_EN-ENERGY(I))*SPEED_LIGHT*1.0E-15_LDP
+	    FEDGE(I)=(IONIZATION_EN-ENERGY(I))*SPEED_LIGHT*1.0D-15
+
+
+rd_rvtj.f
+
+
+rd_rvtj_v2.f
+
+	  TGREY(1:ND)=0.0_LDP
+	  TGREY(1:ND)=0.0D0
+
+	  dE_RAD_DECAY(1:ND)=0.0_LDP
+	  dE_RAD_DECAY(1:ND)=0.0D0
+
+
+rd_rvtj_v4.f
+
+	TGREY=0.0_LDP; dE_RAD_DECAY=0.0_LDP; ROSS_MEAN=0.0_LDP
+	TGREY=0.0D0; dE_RAD_DECAY=0.0D0; ROSS_MEAN=0.0D0
+
+	FLUX_MEAN=0.0_LDP; PLANCK_MEAN=0.0_LDP
+	FLUX_MEAN=0.0D0; PLANCK_MEAN=0.0D0
+
+
+rd_rvtj_v5.f
+
+	TGREY=0.0_LDP; dE_RAD_DECAY=0.0_LDP; ROSS_MEAN=0.0_LDP
+	TGREY=0.0D0; dE_RAD_DECAY=0.0D0; ROSS_MEAN=0.0D0
+
+	FLUX_MEAN=0.0_LDP; PLANCK_MEAN=0.0_LDP
+	FLUX_MEAN=0.0D0; PLANCK_MEAN=0.0D0
+
+
+rd_sing_vec_rvtj.f
+
+	XV=0.0_LDP
+	XV=0.0D0
+
+
+read_chi_data_file.f
+
+
+read_keyword.f
+
+
+set_case_fn.f
+
+
+set_kind_module.f
+
+
+sm_phot_v3.f
+
+	PTS_PER_SIG=4.0_LDP			!Used for the convolution.
+	PTS_PER_SIG=4.0D0			!Used for the convolution.
+
+	SIG_GAU=SIG_GAU_KMS/2.998E+05_LDP		!C does not need to be accurate
+	SIG_GAU=SIG_GAU_KMS/2.998D+05		!C does not need to be accurate
+
+	    T1=(NU(I)-NU(I-1))/0.05_LDP
+	    T1=(NU(I)-NU(I-1))/0.05D0
+
+	    IF(T1 .GT. 1.0_LDP .AND. NU_FINE(MAX(1,K-1)) .LT. 2.0_LDP)THEN
+	    IF(T1 .GT. 1.0D0 .AND. NU_FINE(MAX(1,K-1)) .LT. 2.0D0)THEN
+
+	  DO WHILE(NU_FINE(I) .LT. 1.0_LDP)
+	  DO WHILE(NU_FINE(I) .LT. 1.0D0)
+
+	    IF(ABS(NU_FINE(K)-1.0_LDP) .LT. 1.0E-07_LDP)THEN
+	    IF(ABS(NU_FINE(K)-1.0D0) .LT. 1.0D-07)THEN
+
+	      NU_FINE(K)=1.0_LDP
+	      NU_FINE(K)=1.0D0
+
+	  IF(ABS(NU_FINE(IBEG)-1.0_LDP) .LT. 1.0E-07_LDP)NU_FINE(IBEG)=1.0_LDP
+	  IF(ABS(NU_FINE(IBEG)-1.0D0) .LT. 1.0D-07)NU_FINE(IBEG)=1.0D0
+
+	  DO WHILE(NU_FINE(I) .LT. 1.0_LDP+6.0_LDP*SIG_GAU)
+	  DO WHILE(NU_FINE(I) .LT. 1.0D0+6.0D0*SIG_GAU)
+
+	  IF(NU_FINE(IBEG) .NE. 1.0_LDP)THEN
+	  IF(NU_FINE(IBEG) .NE. 1.0D0)THEN
+
+	      T2=0.0_LDP
+	      T2=0.0D0
+
+	      T1=(NU_FINE(IBEG-1)-1.0_LDP)/(NU_FINE(IBEG-1)-NU_FINE(IBEG))
+	      T1=(NU_FINE(IBEG-1)-1.0D0)/(NU_FINE(IBEG-1)-NU_FINE(IBEG))
+
+	      T2=(1.0_LDP-T1)*CROSS_FINE(IBEG-1)+T1*CROSS_FINE(IBEG)
+	      T2=(1.0D0-T1)*CROSS_FINE(IBEG-1)+T1*CROSS_FINE(IBEG)
+
+	    NU(N_INS)=1.0_LDP
+	    NU(N_INS)=1.0D0
+
+	      NU(J)=2.0_LDP-NU_FINE(K)
+	      NU(J)=2.0D0-NU_FINE(K)
+
+	      NU(J)=2.0_LDP-NU_FINE(K)
+	      NU(J)=2.0D0-NU_FINE(K)
+
+	 IF(NU(1) .GT. 1.0_LDP-6.0_LDP*SIG_GAU)THEN
+	 IF(NU(1) .GT. 1.0D0-6.0D0*SIG_GAU)THEN
+
+	   NU(1)=1.0_LDP-6.0_LDP*SIG_GAU
+	   NU(1)=1.0D0-6.0D0*SIG_GAU
+
+	NU(NCROSS)=NU(NCROSS-1)*(1.0_LDP+6.0_LDP*SIG_GAU)
+	NU(NCROSS)=NU(NCROSS-1)*(1.0D0+6.0D0*SIG_GAU)
+
+	IF(T2 .GT. -1.0_LDP)T2=-1.0_LDP
+	IF(T2 .GT. -1.0D0)T2=-1.0D0
+
+	  IF(NU(ML) .LE. 1.0_LDP)MAX_DEL=SIG_GAU/PTS_PER_SIG
+	  IF(NU(ML) .LE. 1.0D0)MAX_DEL=SIG_GAU/PTS_PER_SIG
+
+	      CROSS_FINE(I+K)=(1.0_LDP-T1)*CROSS(ML-1)+T1*CROSS(ML)
+	      CROSS_FINE(I+K)=(1.0D0-T1)*CROSS(ML-1)+T1*CROSS(ML)
+
+	NU_SM(1)=1.0_LDP
+	NU_SM(1)=1.0D0
+
+	  NU_SM(NSM+1)=NU_SM(1)*(1.0_LDP+DNU)**NSM
+	  NU_SM(NSM+1)=NU_SM(1)*(1.0D0+DNU)**NSM
+
+	  DO WHILE (NU_FINE(IST) .LT. NU_SM(ML)-5.0_LDP*SIG_NEW)
+	  DO WHILE (NU_FINE(IST) .LT. NU_SM(ML)-5.0D0*SIG_NEW)
+
+	  DO WHILE ( (NU_FINE(IEND)-NU_SM(ML)) .LT. 5.0_LDP*SIG_NEW)
+	  DO WHILE ( (NU_FINE(IEND)-NU_SM(ML)) .LT. 5.0D0*SIG_NEW)
+
+            Z(J)=EXP( -0.5_LDP*( (NU_SM(ML)-NU_FINE(I))/SIG_NEW )**2 )
+            Z(J)=EXP( -0.5D0*( (NU_SM(ML)-NU_FINE(I))/SIG_NEW )**2 )
+
+	  CROSS_SM(ML)=0.0_LDP
+	  CROSS_SM(ML)=0.0D0
+
+	  SUM=0.0_LDP
+	  SUM=0.0D0
+
+	  IF(SUM .NE. 0.0_LDP)THEN
+	  IF(SUM .NE. 0.0D0)THEN
+
+
+sve_file.f
+
+
+test_usr_option.f
+
+
+tst_gen_in.f
+
+
+tst_get_indx.f
+
+	VALD=100.0_LDP
+	VALD=100.0D0
+
+
+tst_new_gen.f
+
+
+update_keyword.f
+
+	    IF(ABS(VALUE) .GT. 0.01_LDP .AND. ABS(VALUE) .LT. 1.0E+05_LDP)THEN
+	    IF(ABS(VALUE) .GT. 0.01 .AND. ABS(VALUE) .LT. 1.0D+05)THEN
+
+
+upper_case.f
+
+
+usr_hidden.f
+
+          if(input(i).ne.0.0_LDP)exit
+          if(input(i).ne.0.0)exit
+
+
+usr_option.f
+
+          if(input(i).ne.0.0_LDP)exit
+          if(input(i).ne.0.0)exit
+
+
+wr_col_str.f
+
+
+wr_fmt_string.f
+
+
+wr_string.f
+
+      if((abs(input).ge.1.0E+06_LDP).or.(abs(input).le.1.0E-3_LDP))then
+      if((abs(input).ge.1.0d+06).or.(abs(input).le.1.0d-3))then
+
+        if(input.lt.0.0_LDP)num_char=num_char+1       !minus sign
+        if(input.lt.0.0)num_char=num_char+1       !minus sign
+
+        if(t1.gt.1.0_LDP)then
+        if(t1.gt.1.0)then
+
+        if(input.lt.0.0_LDP)num_char=num_char+1       !minus sign
+        if(input.lt.0.0)num_char=num_char+1       !minus sign
+
+        if((abs(input(j)).ge.1.0E+06_LDP).or.(abs(input(j)).le.1.0E-3_LDP))then
+        if((abs(input(j)).ge.1.0d+06).or.(abs(input(j)).le.1.0d-3))then
+
+          if(t1.gt.1.0_LDP)then
+          if(t1.gt.1.0)then
+
+      if(t1.gt.1.0_LDP)then
+      if(t1.gt.1.0)then
+
+        if(t1.gt.1.0_LDP)then
+        if(t1.gt.1.0)then
+

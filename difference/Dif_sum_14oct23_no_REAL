@@ -1,0 +1,3615 @@
+ 
+Current directory is:
+/home/hillier/wnode04/cmf_testing
+ 
+ 
+Comparing files in ./com with those in  /home/hillier/wnode04/cmf_testing_real8//com
+ 
+./com/aliases_for_cmfgen.sh
+    setenv cmfdist  ~hillier/wnode04/cur_cmf							   |	    setenv cmfdist  ~hillier/wnode04/cmf_testing
+    setenv CMFDIST  ~hillier/wnode04/cur_cmf							   |	    setenv CMFDIST  ~hillier/wnode04/cmf_testing
+./com/assign_txt_files.sh
+./com/assign_txt_files_tcsh.sh
+./com/clean.sh
+./com/com_diff.sh
+./com/cpmod.sh
+												   >	if(-e $1/current_nonlocal_decay_energy.dat)then
+												   >	  cp $1/current_nonlocal_decay_energy.dat  $2/
+												   >	  echo " "
+												   >	  echo " Copyed current_nonlocal_decay_energy.dat"
+												   >	endif
+												   >
+./com/drad_cpmod.sh
+./com/for_diff.sh
+./com/for_to_f.sh
+./com/full_diff.sh
+./com/in2in.sh
+./com/inc2inc.sh
+./com/INC_diff.sh
+./com/main_diff.sh
+./com/mv_n.sh
+./com/mvscr.sh
+./com/out2in.sh
+./com/sm_inc_diff.sh
+./com/sn_update.sh
+ 
+Comparing files in ./blas with those in  /home/hillier/wnode04/cmf_testing_real8//blas
+ 
+./blas/Makefile
+./blas/caxpy.f
+./blas/ccopy.f
+./blas/cdotc.f
+./blas/cdotu.f
+./blas/cgbmv.f
+./blas/cgemm.f
+./blas/cgemv.f
+./blas/cgerc.f
+./blas/cgeru.f
+./blas/chbmv.f
+./blas/chemm.f
+./blas/chemv.f
+./blas/cher2.f
+./blas/cher2k.f
+./blas/cher.f
+./blas/cherk.f
+./blas/chpmv.f
+./blas/chpr2.f
+./blas/chpr.f
+./blas/crotg.f
+./blas/cscal.f
+./blas/csscal.f
+./blas/cswap.f
+./blas/csymm.f
+./blas/csyr2k.f
+./blas/csyrk.f
+./blas/ctbmv.f
+./blas/ctbsv.f
+./blas/ctpmv.f
+./blas/ctpsv.f
+./blas/ctrmm.f
+./blas/ctrmv.f
+./blas/ctrsm.f
+./blas/ctrsv.f
+./blas/dasum.f
+        dtemp = dtemp + abs(dx(i))								   |	        dtemp = dtemp + dabs(dx(i))
+        dtemp = dtemp + abs(dx(i))								   |	        dtemp = dtemp + dabs(dx(i))
+        dtemp = dtemp + abs(dx(i)) + abs(dx(i + 1)) + abs(dx(i + 2))				   |	        dtemp = dtemp + dabs(dx(i)) + dabs(dx(i + 1)) + dabs(dx(i + 2))
+     *  + abs(dx(i + 3)) + abs(dx(i + 4)) + abs(dx(i + 5))					   |	     *  + dabs(dx(i + 3)) + dabs(dx(i + 4)) + dabs(dx(i + 5))
+./blas/daxpy.f
+./blas/dcabs1.f
+      dcabs1 = abs(t(1)) + abs(t(2))								   |	      dcabs1 = dabs(t(1)) + dabs(t(2))
+./blas/dcopy.f
+./blas/ddot.f
+./blas/dgbmv.f
+./blas/dgemm.f
+./blas/dgemv.f
+./blas/dger.f
+./blas/dnrm2.f
+./blas/drot.f
+./blas/drotg.f
+      if( abs(da) .gt. abs(db) ) roe = da							   |	      if( dabs(da) .gt. dabs(db) ) roe = da
+      scale = abs(da) + abs(db)									   |	      scale = dabs(da) + dabs(db)
+   10 r = scale*sqrt((da/scale)**2 + (db/scale)**2)						   |	   10 r = scale*dsqrt((da/scale)**2 + (db/scale)**2)
+      r = sign(r,roe)     !sign(1.0d0,roe)*r							   |	      r = dsign(1.0d0,roe)*r
+      if( abs(da) .gt. abs(db) ) z = s								   |	      if( dabs(da) .gt. dabs(db) ) z = s
+      if( abs(db) .ge. abs(da) .and. c .ne. 0.0d0 ) z = 1.0d0/c					   |	      if( dabs(db) .ge. dabs(da) .and. c .ne. 0.0d0 ) z = 1.0d0/c
+./blas/dsbmv.f
+./blas/dscal.f
+./blas/dspmv.f
+./blas/dspr2.f
+./blas/dspr.f
+./blas/dswap.f
+./blas/dsymm.f
+./blas/dsymv.f
+./blas/dsyr2.f
+./blas/dsyr2k.f
+./blas/dsyr.f
+./blas/dsyrk.f
+./blas/dtbmv.f
+./blas/dtbsv.f
+./blas/dtpmv.f
+./blas/dtpsv.f
+./blas/dtrmm.f
+./blas/dtrmv.f
+./blas/dtrsm.f
+./blas/dtrsv.f
+./blas/dzasum.f
+./blas/dznrm2.f
+./blas/icamax.f
+./blas/idamax.f
+      dmax = abs(dx(1))										   |	      dmax = dabs(dx(1))
+         if(abs(dx(ix)).le.dmax) go to 5							   |	         if(dabs(dx(ix)).le.dmax) go to 5
+         dmax = abs(dx(ix))									   |	         dmax = dabs(dx(ix))
+   20 dmax = abs(dx(1))										   |	   20 dmax = dabs(dx(1))
+         if(abs(dx(i)).le.dmax) go to 30							   |	         if(dabs(dx(i)).le.dmax) go to 30
+         dmax = abs(dx(i))									   |	         dmax = dabs(dx(i))
+./blas/isamax.f
+./blas/izamax.f
+./blas/lsame.f
+./blas/sasum.f
+./blas/saxpy.f
+./blas/scasum.f
+./blas/scnrm2.f
+./blas/scopy.f
+./blas/sdot.f
+./blas/sgbmv.f
+./blas/sgemm.f
+./blas/sgemv.f
+./blas/sger.f
+./blas/snrm2.f
+./blas/srot.f
+./blas/srotg.f
+./blas/ssbmv.f
+./blas/sscal.f
+./blas/sspmv.f
+./blas/sspr2.f
+./blas/sspr.f
+./blas/sswap.f
+./blas/ssymm.f
+./blas/ssymv.f
+./blas/ssyr2.f
+./blas/ssyr2k.f
+./blas/ssyr.f
+./blas/ssyrk.f
+./blas/stbmv.f
+./blas/stbsv.f
+./blas/stpmv.f
+./blas/stpsv.f
+./blas/strmm.f
+./blas/strmv.f
+./blas/strsm.f
+./blas/strsv.f
+./blas/xerbla.f
+./blas/zaxpy.f
+./blas/zcopy.f
+./blas/zdotc.f
+./blas/zdotu.f
+./blas/zdscal.f
+./blas/zgbmv.f
+./blas/zgemm.f
+./blas/zgemv.f
+./blas/zgerc.f
+./blas/zgeru.f
+./blas/zhbmv.f
+./blas/zhemm.f
+./blas/zhemv.f
+./blas/zher2.f
+./blas/zher2k.f
+./blas/zher.f
+./blas/zherk.f
+./blas/zhpmv.f
+./blas/zhpr2.f
+./blas/zhpr.f
+./blas/zrotg.f
+./blas/zscal.f
+./blas/zswap.f
+./blas/zsymm.f
+./blas/zsyr2k.f
+./blas/zsyrk.f
+./blas/ztbmv.f
+./blas/ztbsv.f
+./blas/ztpmv.f
+./blas/ztpsv.f
+./blas/ztrmm.f
+./blas/ztrmv.f
+./blas/ztrsm.f
+./blas/ztrsv.f
+ 
+Comparing files in ./disp with those in  /home/hillier/wnode04/cmf_testing_real8//disp
+ 
+./disp/Makefile
+	$(F90) -c  $(FD) maingen.f 								   |		$(F90) -c  $(FD) -fbounds-check  maingen.f 
+./disp/dispgen.f
+	ALLOCATE (POPDUM(ND,NSPEC),STAT=IOS) 							   |		ALLOCATE (POPDUM(ND,NSPEC),STAT=IOS); POPDUM=0.0D0
+./disp/maingen.f
+!												   |	!
+	  XV(I)=LOG10(R(I)/R(ND))								   |		  XV(I)=DLOG10(R(I)/R(ND))
+	  CALL LOGVEC(V,XV,ND)									   |		  CALL DLOGVEC(V,XV,ND)
+	    XV(I)=LOG10(TA(I))									   |		    XV(I)=DLOG10(TA(I))
+	      XV(I)=LOG10(TA(I)/TA(ND))								   |		      XV(I)=DLOG10(TA(I)/TA(ND))
+	    XV(I)=LOG10(TA(I))									   |		    XV(I)=DLOG10(TA(I))
+!	    XV(I)=LOG10(6.65D-15*T1/T2)								   |	!	    XV(I)=DLOG10(6.65D-15*T1/T2)
+	    XV(I)=LOG10(6.65D-15*ED(I)*CLUMP_FAC(I)*T1/T2)					   |		    XV(I)=DLOG10(6.65D-15*ED(I)*CLUMP_FAC(I)*T1/T2)
+	1                  1.0D0,THK_LINE,THK_CONT,NLF,NC,NP,ND,METHOD)				   |		1                  RONE,THK_LINE,THK_CONT,NLF,NC,NP,ND,METHOD)
+	1                  1.0D0,THK_LINE,THK_CONT,NLF,NC,NP,ND,METHOD)				   |		1                  RONE,THK_LINE,THK_CONT,NLF,NC,NP,ND,METHOD)
+	        ZV(I)=LOG10(TA(I))								   |		        ZV(I)=DLOG10(TA(I))
+	        ZV(I)=LOG10(TA(I))								   |		        ZV(I)=DLOG10(TA(I))
+	          CHI(I)=CHI(I)+COEF(J,I)*LOG( CHIROSS(J+INDX(I)) )				   |		          CHI(I)=CHI(I)+COEF(J,I)*DLOG( CHIROSS(J+INDX(I)) )
+	        CHI(I)=EXP(CHI(I))								   |		        CHI(I)=DEXP(CHI(I))
+	        ZV(I)=LOG10(TA(I))								   |		        ZV(I)=DLOG10(TA(I))
+	          YV(I)=LOG10(TA(I))								   |		          YV(I)=DLOG10(TA(I))
+	    YV(I)=LOG10(R(I)/R(ND))								   |		    YV(I)=DLOG10(R(I)/R(ND))
+	    YV(I)=LOG10(ED(I))									   |		    YV(I)=DLOG10(ED(I))
+	    YV(I)=LOG10(MASS_DENSITY(I))							   |		    YV(I)=DLOG10(MASS_DENSITY(I))
+	    YV(I)=LOG10(TA(I))									   |		    YV(I)=DLOG10(TA(I))
+												   >		    WRITE(6,'(A,ES10.3,A)')' Mass of envelope (ejecta) is',TA(1),' Msun'
+												   >		  ELSE
+												   >		    WRITE(6,'(A,ES10.3,A)')' Mass of envelope (ejecta) is',TA(ND),' Msun'
+	  WRITE(6,'(A,ES10.3,A)')'Mass of envelope (ejecta) is',TA(ND),' Msun'			   <
+												   >		        WRITE(6,'( A,A4,A,ES9.2,A)',ADVANCE='NO')' Mass of ',TRIM(SPECIES(ISPEC)),' is',
+												   >		      ELSE 
+												   >		        WRITE(6,'( A,A4,A,ES9.2,A)',ADVANCE='NO')' Mass of ',TRIM(SPECIES(ISPEC)),' is',
+	      WRITE(6,'( A,A4,A,ES9.2,A)',ADVANCE='NO')' Mass of ',TRIM(SPECIES(ISPEC)),' is',TA   <
+	  CALL LOGVEC(T,YV,ND)									   |		  CALL DLOGVEC(T,YV,ND)
+	  TA(1:ND)=LOG( TA(1:ND) )								   |		  TA(1:ND)=DLOG( TA(1:ND) )
+	  TB(1:ND)=LOG( T(1:ND) )								   |		  TB(1:ND)=DLOG( T(1:ND) )
+	    YV(1:ND)=LOG10(dE_RAD_DECAY(1:ND))							   |		    YV(1:ND)=DLOG10(dE_RAD_DECAY(1:ND))
+	    YV(1:ND)=LOG10(YV(1:ND))								   |		    YV(1:ND)=DLOG10(YV(1:ND))
+	    YV(1:ND-1)=LOG10(YV(1:ND-1))							   |		    YV(1:ND-1)=DLOG10(YV(1:ND-1))
+	    YV(1:ND)=LOG10(YV(1:ND))								   |		    YV(1:ND)=DLOG10(YV(1:ND))
+	    YV(1:ND)=LOG10(YV(1:ND))								   |		    YV(1:ND)=DLOG10(YV(1:ND))
+	  YV(1:ND-1)=LOG10(YV(1:ND-1))								   |		  YV(1:ND-1)=DLOG10(YV(1:ND-1))
+	  CALL LOGVEC(V,YV,ND)									   |		  CALL DLOGVEC(V,YV,ND)
+	    Z(1:ND)=LOG10(Z(1:ND)/R(ND))							   |		    Z(1:ND)=DLOG10(Z(1:ND)/R(ND))
+	    Z(1:ND-1)=LOG10(Z(1:ND-1)/R(ND)-1)							   |		    Z(1:ND-1)=DLOG10(Z(1:ND-1)/R(ND)-1)
+	    CALL LOGVEC(DTAU,YV,ND)								   |		    CALL DLOGVEC(DTAU,YV,ND)
+	    YV(1:ND)=LOG10(ZV(1:ND)+1.0D0)							   |		    YV(1:ND)=DLOG10(ZV(1:ND)+1.0D0)
+	    YV(I)=LOG10(SIGMA(I)+1.0)								   |		    YV(I)=DLOG10(SIGMA(I)+1.0)
+	    TC(I)=LOG10(LOG(V(I+1)/V(I-1))/LOG(R(I+1)/R(I-1)))					   |		    TC(I)=DLOG10(LOG(V(I+1)/V(I-1))/LOG(R(I+1)/R(I-1)))
+	    YV(I)=LOG10(6.65D-15*ED(I)*CLUMP_FAC(I)*T1/T2)					   |		    YV(I)=DLOG10(6.65D-15*ED(I)*CLUMP_FAC(I)*T1/T2)
+                    I=(LOG10(TAU_SOB)-TAU_BEG)/DELTA_TAU+1					   |	                    I=(DLOG10(TAU_SOB)-TAU_BEG)/DELTA_TAU+1
+                    I=(LOG10(TAU_SOB)-TAU_BEG+0.5D0*DELTA_TAU)/DELTA_TAU+1			   |	                    I=(DLOG10(TAU_SOB)-TAU_BEG+0.5D0*DELTA_TAU)/DELTA_TAU+1
+	            YV(2*CNT)=LOG10(T1)								   |		            YV(2*CNT)=DLOG10(T1)
+	            YV(2*CNT)=-60.0D0-LOG10(-T1)						   |		            YV(2*CNT)=-60.0D0-DLOG10(-T1)
+	            YV(2*CNT)=LOG10(TAU_SOB)							   |		            YV(2*CNT)=DLOG10(TAU_SOB)
+	            YV(2*CNT)=-10.0D0-LOG10(-1.0D+10*TAU_SOB)					   |		            YV(2*CNT)=-10.0D0-DLOG10(-1.0D+10*TAU_SOB)
+	              YV(I)=YV(I)+(1.0-EXP(-T1))						   |		              YV(I)=YV(I)+(1.0-DEXP(-T1))
+	        YV(I)=LOG10(YV(I)/DELTA_TAU)							   |		        YV(I)=DLOG10(YV(I)/DELTA_TAU)
+	       YV(2*I)=LOG10(T1)								   |		       YV(2*I)=DLOG10(T1)
+	      YV(I)=LOG10( RJ(I)*CHI(I)/ETA_WITH_ES(I) )					   |		      YV(I)=DLOG10( RJ(I)*CHI(I)/ETA_WITH_ES(I) )
+	      YV(I)=LOG10(RJ(I))								   |		      YV(I)=DLOG10(RJ(I))
+	      YV(I)=LOG10(ETA_WITH_ES(I)/CHI(I))						   |		      YV(I)=DLOG10(ETA_WITH_ES(I)/CHI(I))
+	      YV(I)=LOG10( RJ(I)*								   |		      YV(I)=DLOG10( RJ(I)*
+	      ZV(I)=LOG10(TA(I))								   |		      ZV(I)=DLOG10(TA(I))
+! TA is used for the line flux. Integral of TA log(r) is					   |	! TA is used for the line flux. Integral of TA dlog(r) is
+	      YV(I)=LOG10(  ETAL(I)/CHIL(I)*							   |		      YV(I)=DLOG10(  ETAL(I)/CHIL(I)*
+	      YV(I)=LOG10( ETAL(I)/CHIL(I)/RJ(I) )						   |		      YV(I)=DLOG10( ETAL(I)/CHIL(I)/RJ(I) )
+	        YV(I)=LOG10( ETAL(I)/CHIL(I) )							   |		        YV(I)=DLOG10( ETAL(I)/CHIL(I) )
+	      CALL LOGVEC(ATM(ID)%DXzV_F,YV,ND)							   |		      CALL DLOGVEC(ATM(ID)%DXzV_F,YV,ND)
+	  IF(LOC_ION_ID .NE. ' ')THEN								   |		  IF(LOC_ION_ID .NE. '$$')THEN
+												   >		    WRITE(6,*)'Allocated CHI_LAM and ETA_LAM'
+												   >		    WRITE(6,*)'NLAM=',NLAM
+												   >		    WRITE(6,*)'N_PLT_MAX=',N_PLT_MAX
+	    WRITE(6,*)'ML=',ML									   |		    IF(MOD(ML-1,100) .EQ. 0)THEN
+												   >		       IF(ML .NE. 1)WRITE(6,*)' '
+												   >		       WRITE(6,'(A,I6)',ADVANCE='NO')'ML=',ML
+												   >		    ELSE IF(MOD(ML-1,10) .EQ. 0)THEN
+												   >		       WRITE(6,'(I6)',ADVANCE='NO')ML
+												   >		    END IF
+												   >		    IF(ML .EQ. NLAM)WRITE(6,*)' '
+	        CALL DP_CURVE(NLAM,LAM_VEC,YV)							   |		        CALL DP_CURVE_LAB(NLAM,LAM_VEC,YV,SPECIES(ISPEC))
+												   >		    XAXSAV=XAXIS; XAXIS='\gl(\A)' 
+												   >		    DEALLOCATE (CHI_LAM,ETA_LAM,LAM_VEC)
+												   >		    WRITE(6,*)'Deallocated CHI_LAM etc'
+!												   |		    DEALLOCATE (CHI_LAM,ETA_LAM,LAM_VEC)
+	    DEALLOCATE (CHI_LAM)								   <
+	    DEALLOCATE (ETA_LAM)								   <
+	    DEALLOCATE (LAM_VEC)								   <
+	    TB(I)=LOG10(ED(I))									   |		    TB(I)=DLOG10(ED(I))
+	      IF(XSPEC .EQ. ION_ID(ID))THEN							   |		      IF(XSPEC .EQ. UC(ION_ID(ID)))THEN
+	    J=J+1										   <
+												   >		    J=J+1
+												   >		    IF(J .GT. 10)EXIT
+	              YV(J)=YV(J)-LOG10(POP_ATOM(J))						   |		              YV(J)=YV(J)-DLOG10(POP_ATOM(J))
+	      YV(I)=LOG10(R(I)*R(I)*R(I)*ETA(I)+1.0D-250)+20.0D0				   |		      YV(I)=DLOG10(R(I)*R(I)*R(I)*ETA(I)+1.0D-250)+20.0D0
+	      YV(I)=LOG10(ETA(I)+1.0D-250)-10.0D0						   |		      YV(I)=DLOG10(ETA(I)+1.0D-250)-10.0D0
+	      YV(I)=LOG10(TA(I))								   |		      YV(I)=DLOG10(TA(I))
+	      YV(I)=LOG10(TA(I+1)-TA(I))							   |		      YV(I)=DLOG10(TA(I+1)-TA(I))
+	      YV(I)=LOG10(CHI(I))-10.0								   |		      YV(I)=DLOG10(CHI(I))-10.0
+	        YV(I)=LOG10(TA(I))								   |		        YV(I)=DLOG10(TA(I))
+	    XNU(I)=LOG10( REXT(I)/REXT(NDX) )							   |		    XNU(I)=DLOG10( REXT(I)/REXT(NDX) )
+	    TA(I)=LOG10(TA(I))									   |		    TA(I)=DLOG10(TA(I))
+! TA is used for the line flux. Integral of TA log(r) is					   |	! TA is used for the line flux. Integral of TA dlog(r) is
+	        ZV(I)=LOG10(R(I)/R(ND))								   |		        ZV(I)=DLOG10(R(I)/R(ND))
+!	        YV(I)=ETA(I)*R(I)*R(I)*R(I)*ETAL(I)*EXP(-TA(I))					   |	!	        YV(I)=ETA(I)*R(I)*R(I)*R(I)*ETAL(I)*DEXP(-TA(I))
+	      ZV(I)=LOG10(R(I)/R(ND))								   |		      ZV(I)=DLOG10(R(I)/R(ND))
+	    ZV(I)=LOG10(R(I)/R(ND))								   |		    ZV(I)=DLOG10(R(I)/R(ND))
+	      T1=LOG10(1.6914D-11/FREQ)								   |		      T1=DLOG10(1.6914D-11/FREQ)
+	          YV(I)=T1+LOG10(TA(I))								   |		          YV(I)=T1+DLOG10(TA(I))
+	          YV(I)=T1+LOG10(-TA(I))-20.0D0							   |		          YV(I)=T1+DLOG10(-TA(I))-20.0D0
+	    T1=LOG10(1.6914D-11/FREQ)-10.0D0							   |		    T1=DLOG10(1.6914D-11/FREQ)-10.0D0
+	        YV(I)=T1+LOG10(CHIL(I))								   |		        YV(I)=T1+DLOG10(CHIL(I))
+	        ZV(I)=T1+LOG10(-CHIL(I))							   |		        ZV(I)=T1+DLOG10(-CHIL(I))
+	    REXT(1:ND_TMP)=R; VEXT(1:ND_TMP)=V; SIGMAEXT(1:ND_TMP)=SIGMA;  TEXT(1:ND_TMP)=T 	   |		    REXT(1:ND)=R(1:ND); VEXT(1:ND)=V(1:ND); SIGMAEXT(1:ND)=SIGMA(1:ND);  TEXT(1:ND)=T(1:
+	    ETAEXT(1:ND_TMP)=ETA; CHIEXT(1:ND_TMP)=CHI; ESECEXT(1:ND_TMP)=ESEC			   |		    ETAEXT(1:ND)=ETA(1:ND); CHIEXT(1:ND)=CHI(1:ND); ESECEXT(1:ND)=ESEC(1:ND)
+	    ETALEXT(1:ND_TMP)=ETAL; CHILEXT(1:ND_TMP)=CHIL					   |		    ETALEXT(1:ND)=ETAL(1:ND); CHILEXT(1:ND)=CHIL(1:ND)
+	    MASS_DENSITYEXT(1:ND_TMP)=MASS_DENSITY; CLUMP_FACEXT(1:ND_TMP)=CLUMP_FAC		   |		    MASS_DENSITYEXT(1:ND)=MASS_DENSITY(1:ND); CLUMP_FACEXT(1:ND)=CLUMP_FAC(1:ND)
+./disp/mod_disp.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+./disp/pltphot_sub.f
+./disp/EVAL_LTE_FULL.INC
+./disp/OPACITIES.INC
+./disp/PAR_OPACITIES.INC
+	    CHI_PAR(:,ID)=CHI(:)								   |		    CHI_PAR(1:ND,ID)=CHI(1:ND)
+	    ETA_PAR(:,ID)=ETA(:)								   |		    ETA_PAR(1:ND,ID)=ETA(1:ND)
+./disp/PAR_XOPAC.INC
+./disp/XOPAC.INC
+ 
+Comparing files in ./disp/subs with those in  /home/hillier/wnode04/cmf_testing_real8//disp/subs
+ 
+./disp/subs/Makefile
+./disp/subs/betanew.f
+./disp/subs/branch_rat.f
+./disp/subs/compion.f
+./disp/subs/comp_jbar.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	    dLOG_NU=LOG(FL_OLD/FL)								   |		    dLOG_NU=dLOG(FL_OLD/FL)
+./disp/subs/determ_clump_pos.f
+./disp/subs/disp_bethe_approx_v5.f
+./disp/subs/dlogvec.f
+	SUBROUTINE LOGVEC(X,YV,ND)								   |		SUBROUTINE DLOGVEC(X,YV,ND)
+	  YV(I)=LOG10(X(I))									   |		  YV(I)=DLOG10(X(I))
+./disp/subs/edgewr.f
+./disp/subs/fg_ham.f
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796-COS(P(LS)/R(1)))/P(LS)				   |		      TOR=CHI(1)*R(1)*R(1)*(1.570796-DACOS(P(LS)/R(1)))/P(LS)
+	    IBOUND=ETA(1)*(1.0D0-EXP(-TOR))/CHI(1)						   |		    IBOUND=ETA(1)*(1.0D0-DEXP(-TOR))/CHI(1)
+	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)				   |		      DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
+	      WERF_EXP=EXP( 1.0D-15*CHIL(1)/FL/GAM(1)*						   |		      WERF_EXP=DEXP( 1.0D-15*CHIL(1)/FL/GAM(1)*
+	      DBC=DBB*DNU*SQRT(R(ND)*R(ND)-P(LS)*P(LS))						   |		      DBC=DBB*DNU*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))
+	      WERF_EXP=EXP( 1.0D-15*CHIL(1)/FL/GAM(1)*WERFC(NLF) )				   |		      WERF_EXP=DEXP( 1.0D-15*CHIL(1)/FL/GAM(1)*WERFC(NLF) )
+./disp/subs/fqcomp.f
+	    DBC=DBB*SQRT( (R(ND)-P(LS))*(R(ND)+P(LS)) )						   |		    DBC=DBB*DSQRT( (R(ND)-P(LS))*(R(ND)+P(LS)) )
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796-COS(P(LS)/R(1)))/P(LS)				   |		      TOR=CHI(1)*R(1)*R(1)*(1.570796-DACOS(P(LS)/R(1)))/P(LS)
+	    IBOUND=S1*(1.0D0-EXP(-TOR))								   |		    IBOUND=S1*(1.0D0-DEXP(-TOR))
+	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )						   |		      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
+	    E1=EXP(-DTAU(1))									   |		    E1=DEXP(-DTAU(1))
+./disp/subs/fqcomp_v2.f
+	    DBC=DBB*SQRT( (R(ND)-P(LS))*(R(ND)+P(LS)) )/R(ND)/CHI(ND)				   |		    DBC=DBB*DSQRT( (R(ND)-P(LS))*(R(ND)+P(LS)) )/R(ND)/CHI(ND)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796-COS(P(LS)/R(1)))/P(LS)				   |		      TOR=CHI(1)*R(1)*R(1)*(1.570796-DACOS(P(LS)/R(1)))/P(LS)
+	    IBOUND=S1*(1.0D0-EXP(-TOR))								   |		    IBOUND=S1*(1.0D0-DEXP(-TOR))
+	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )						   |		      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
+	    E1=EXP(-DTAU(1))									   |		    E1=DEXP(-DTAU(1))
+./disp/subs/gam_abs.f
+./disp/subs/get_col_summary_v1.f
+	  T1=LOG(T_TABLE(L)/T_TABLE(L-1))							   |		  T1=DLOG(T_TABLE(L)/T_TABLE(L-1))
+	    ALPHA=LOG(ALPHA)/T1									   |		    ALPHA=DLOG(ALPHA)/T1
+./disp/subs/get_dtaulam.f
+./disp/subs/get_filename.f
+./disp/subs/get_flux_deficit.f
+./disp/subs/get_line_indices.f
+./disp/subs/ham_formsol.f
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796-COS(P(LS)/R(1)))/P(LS)				   |		      TOR=CHI(1)*R(1)*R(1)*(1.570796-DACOS(P(LS)/R(1)))/P(LS)
+	    IBOUND=ETA(1)*(1.0D0-EXP(-TOR))/CHI(1)						   |		    IBOUND=ETA(1)*(1.0D0-DEXP(-TOR))/CHI(1)
+	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)				   |		      DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
+	1            *SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)					   |		1            *DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)
+	      WERF_EXP=EXP( 1.0D-15*CHIL(1)/FL/GAM(1)*						   |		      WERF_EXP=DEXP( 1.0D-15*CHIL(1)/FL/GAM(1)*
+	      DBC=DBB*DNU*SQRT(R(ND)*R(ND)-P(LS)*P(LS))						   |		      DBC=DBB*DNU*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))
+	      WERF_EXP=EXP( 1.0D-15*CHIL(1)/FL/GAM(1)*WERFC(NLF) )				   |		      WERF_EXP=DEXP( 1.0D-15*CHIL(1)/FL/GAM(1)*WERFC(NLF) )
+./disp/subs/hamtuvgh.f
+./disp/subs/ham_varlam.f
+	  T1=EXP(TERF*CHIL(1))*CHI(1)/TCHI(1)*(ETAL(1)/CHIL(1)-IBOUND)				   |		  T1=DEXP(TERF*CHIL(1))*CHI(1)/TCHI(1)*(ETAL(1)/CHIL(1)-IBOUND)
+	  VSRCE(1)=VSRCE(1)+( CHI(1)/TCHI(1)*EXP(TERF*CHIL(1))-1.0D0 )				   |		  VSRCE(1)=VSRCE(1)+( CHI(1)/TCHI(1)*DEXP(TERF*CHIL(1))-1.0D0 )
+./disp/subs/jfeaunew.f
+./disp/subs/log_mon_interp.f
+./disp/subs/map_plot.f
+./disp/subs/modify_density.f
+./disp/subs/momham.f
+./disp/subs/new_writedc_v3.f
+./disp/subs/new_writedc_v4.f
+./disp/subs/new_writedc_v5.f
+./disp/subs/op_spec_file_v2.f
+./disp/subs/pallet.f
+./disp/subs/plt_profs.f
+./disp/subs/rd_ion_pop_v3.f
+./disp/subs/rd_non_therm_spec.f
+./disp/subs/rd_pop_dim.f
+./disp/subs/recom_chk.f
+C												   |	C
+	RGU=LOG(2.07078D-22)									   |		RGU=DLOG(2.07078D-22)
+./disp/subs/recom_chk_v2.f
+C												   |	C
+	RGU=LOG(2.07078D-22)									   |		RGU=DLOG(2.07078D-22)
+./disp/subs/setdc_or_pop.f
+./disp/subs/set_dc_or_pop_or_tx.f
+./disp/subs/set_dc_or_pop_or_tx_v2.f
+./disp/subs/set_fine_ray_grid.f
+./disp/subs/setforng.f
+./disp/subs/setrec.f
+./disp/subs/set_two_phot_disp_v3.f
+./disp/subs/setvec.f
+./disp/subs/smooth.f
+./disp/subs/smooth_v2.f
+./disp/subs/sobjbar.f
+	   DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI(ND)					   |		   DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI(ND)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796-COS(P(LS)/R(1)))/P(LS)				   |		      TOR=CHI(1)*R(1)*R(1)*(1.570796-DACOS(P(LS)/R(1)))/P(LS)
+	    AV(1)=-SOURCE(1)*(1.0D0-EXP(-TOR))							   |		    AV(1)=-SOURCE(1)*(1.0D0-DEXP(-TOR))
+./disp/subs/starpcyg_tst.f
+./disp/subs/terminal_lu.f
+./disp/subs/tst_clump_law.f
+./disp/subs/tst_wr_col.f
+./disp/subs/two_phot_opac_disp_v3.f
+./disp/subs/update_pops.f
+./disp/subs/wr_atom_sum.f
+./disp/subs/wrbeta.f
+	Y(K)=(1.0-EXP(-TAU/X))*X/TAU								   |		Y(K)=(1.0-DEXP(-TAU/X))*X/TAU
+	S=SQRT(ABS(SIGMA(I)))									   |		S=DSQRT(DABS(SIGMA(I)))
+			VV=0.5*LOG((1.0+S)/(1.0-S))/S						   |				VV=0.5*DLOG((1.0+S)/(1.0-S))/S
+./disp/subs/wr_col.f
+./disp/subs/wr_col_lines.f
+!												   |	!
+!												   |	!
+./disp/subs/wr_col_rates.f
+./disp/subs/wr_col_sl.f
+!	  WRITE(LU,'(ES14.4,F8.3,2ES14.4,T60,A)')NET_IN,NET_IN/T1,RATE_IN,RATE_OUT,TRIM(LEV_NAME   |		  WRITE(LU,'(ES14.4,F8.3,2ES14.4,T60,A)')NET_IN,NET_IN/T1,RATE_IN,RATE_OUT,TRIM(LEV_NAME
+	  WRITE(LU,'(ES14.4,F8.3,2ES14.4,T60,A)')NET_IN,T1,RATE_IN,RATE_OUT,TRIM(LEV_NAME(I))	   <
+	FLUSH(LU)										   <
+./disp/subs/wr_crit.f
+./disp/subs/write_line_12may98.f
+./disp/subs/write_line.f
+./disp/subs/write_line_multi.f
+./disp/subs/write_line_old.f
+./disp/subs/writscrat.f
+./disp/subs/wr_spec_sum.f
+./disp/subs/wr_spec_sum_v2.f
+./disp/subs/xvecfeau.f
+./disp/subs/arnaud_cross_v3_disp.f90
+	          T2=LOG(U1)									   |		          T2=DLOG(U1)
+	        T1=LOG(XKT(IKT)/THD(IT)%XTAB(J))/LOG(THD(IT)%XTAB(J+1)/THD(IT)%XTAB(J))		   |		        T1=DLOG(XKT(IKT)/THD(IT)%XTAB(J))/DLOG(THD(IT)%XTAB(J+1)/THD(IT)%XTAB(J))
+	        THD(IT)%CROSS_SEC(IKT)=EXP( T1*LOG(THD(IT)%YTAB(J+1)) + (1.0D0-T1)*LOG(THD(IT)%Y   |		        THD(IT)%CROSS_SEC(IKT)=EXP( T1*DLOG(THD(IT)%YTAB(J+1)) + (1.0D0-T1)*DLOG(THD(IT)
+	      T1=LOG(THD(IT)%YTAB(I)/THD(IT)%YTAB(I-1))/LOG(THD(IT)%XTAB(I)/THD(IT)%XTAB(I-1))	   |		      T1=DLOG(THD(IT)%YTAB(I)/THD(IT)%YTAB(I-1))/DLOG(THD(IT)%XTAB(I)/THD(IT)%XTAB(I-1))
+./disp/subs/plt_arn.f90
+./disp/subs/read_arnaud_ion_data_disp.f90
+ 
+Comparing files in ./lpack with those in  /home/hillier/wnode04/cmf_testing_real8//lpack
+ 
+./lpack/Makefile
+./lpack/dgeequ.f
+./lpack/dgetf2.f
+./lpack/dgetrf.f
+./lpack/dgetrs.f
+./lpack/dlamch.f
+./lpack/dlaswp.f
+./lpack/ieeeck.f
+./lpack/ilaenv.f
+./lpack/lsame.f
+ 
+Comparing files in ./lte_hydro with those in  /home/hillier/wnode04/cmf_testing_real8//lte_hydro
+ 
+./lte_hydro/Makefile
+./lte_hydro/det_ed.f
+!												   |	!
+!												   |	!
+	          FSAHA(ID) = (XG1*XGE/XG0) * T1 * EXP(-ATM(ID)%EDGEXzV_F(1)*T2)  		   |		          FSAHA(ID) = (XG1*XGE/XG0) * T1 * DEXP(-ATM(ID)%EDGEXzV_F(1)*T2)  
+                XERR = ABS(1.0D0-XED_OLD/XEDW)							   |	                XERR = DABS(1.0D0-XED_OLD/XEDW)
+./lte_hydro/det_r_grid_v1.f
+./lte_hydro/det_r_grid_v2.f
+./lte_hydro/det_r_grid_v3.f
+./lte_hydro/genopaeta_v8.f
+./lte_hydro/get_lte_ross_v2.f
+./lte_hydro/lte.f
+./lte_hydro/lte_pop_sl.f
+./lte_hydro/ltepop_wld_v1.f
+	RGU=LOG(2.07078D-22)									   |		RGU=DLOG(2.07078D-22)
+./lte_hydro/lte_sub.f
+./lte_hydro/set_line_opac.f
+./lte_hydro/set_lte_est.f
+./lte_hydro/wind_hyd.f
+!												   |	!
+!												   |	!
+!												   |	!
+./lte_hydro/wind_vel_law_v1.f
+./lte_hydro/wind_vel_law_v2.f
+./lte_hydro/wind_vel_law_v3.f
+./lte_hydro/writedc_v2.f
+ 
+Comparing files in ./main with those in  /home/hillier/wnode04/cmf_testing_real8//main
+ 
+ 
+Comparing files in ./misc with those in  /home/hillier/wnode04/cmf_testing_real8//misc
+ 
+./misc/Makefile
+./misc/adjust_atm_r_grid.f
+!												   |	!
+!												   |	!
+!												   |	!
+./misc/adjust_sn_r_grid.f
+./misc/append_dc.f
+./misc/append_r_dc.f
+./misc/ave_dc.f
+!												   |	!
+!												   |	!
+./misc/check_ba_estimates.f
+./misc/check_energy_cons.f
+!												   |	!
+!												   |	!
+./misc/chk_ba_est.f
+./misc/chk_phot.f
+./misc/comp_ba_mat_sol.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	  RGU=LOG(2.07078D-22)									   |		  RGU=DLOG(2.07078D-22)
+	  RGU=LOG(2.07078D-22)									   |		  RGU=DLOG(2.07078D-22)
+./misc/count_phot_data.f
+./misc/create_batch_ins.f
+./misc/create_batobs_ins.f
+./misc/create_if_file.f
+./misc/create_kappa_file.f
+./misc/create_mod_sum.f
+./misc/create_pp_mod_sum.f
+./misc/do_ng_v2.f
+!												   |	!
+!												   |	!
+./misc/do_recom_sum.f
+./misc/ed_vadat.f
+./misc/extrap_scr.f
+	  X1=LOG(SCR(1)%V)									   |		  X1=DLOG(SCR(1)%V)
+	  X2=LOG(SCR(2)%V); X1(1)=X2(1); X1(SCR(1)%ND)=X2(SCR(2)%ND)				   |		  X2=DLOG(SCR(2)%V); X1(1)=X2(1); X1(SCR(1)%ND)=X2(SCR(2)%ND)
+	    Y1=LOG(SCR(1)%POPS(I,:))								   |		    Y1=DLOG(SCR(1)%POPS(I,:))
+./misc/get_exc_freq.f
+./misc/guess_dc.f
+!												   |	!
+	    T1=LOG(2.07078D-22*ED(I)*DC(1,I))							   |		    T1=DLOG(2.07078D-22*ED(I)*DC(1,I))
+./misc/land_col_merge.f
+./misc/land_multi_merge.f
+./misc/mass_sc.f
+./misc/merge_scr.f
+	  X1=LOG(SCR(1)%V)									   |		  X1=DLOG(SCR(1)%V)
+	  X2=LOG(SCR(2)%V); X1(1)=X2(1); X1(SCR(1)%ND)=X2(SCR(2)%ND)				   |		  X2=DLOG(SCR(2)%V); X1(1)=X2(1); X1(SCR(1)%ND)=X2(SCR(2)%ND)
+	    Y1=LOG(SCR(1)%POPS(I,:))								   |		    Y1=DLOG(SCR(1)%POPS(I,:))
+./misc/mod_cool.f
+												   >	! Altered: 24-Sep-2023  Added SHOCK_POWER term (5-Sep-2023).
+!												   |	!
+												   >		REAL*8, ALLOCATABLE :: AC_RdT(:)
+	ALLOCATE (RAD_DECAY(ND)); RAD_DECAY=0.0D0						   |		ALLOCATE (RAD_DECAY(ND));    RAD_DECAY=0.0D0
+	ALLOCATE (COL_RATE(ND));   COL_RATE=0.0D0						   |		ALLOCATE (SHOCK_POWER(ND)); SHOCK_POWER=0.0D0
+	ALLOCATE (BF_RATE(ND));     BF_RATE=0.0D0						   |		ALLOCATE (COL_RATE(ND));       COL_RATE=0.0D0
+	ALLOCATE (FF_RATE(ND));     FF_RATE=0.0D0						   |		ALLOCATE (BF_RATE(ND));        BF_RATE=0.0D0
+	ALLOCATE (NT_RATE(ND));     NT_RATE=0.0D0						   |		ALLOCATE (FF_RATE(ND));        FF_RATE=0.0D0
+	ALLOCATE (XKS_RATE(ND));   XKS_RATE=0.0D0						   |		ALLOCATE (NT_RATE(ND));        NT_RATE=0.0D0
+	ALLOCATE (ART_HT(ND));       ART_HT=0.0D0						   |		ALLOCATE (XKS_RATE(ND));      XKS_RATE=0.0D0
+	ALLOCATE (CHG_RATE(ND));   CHG_RATE=0.0D0						   |		ALLOCATE (ART_HT(ND));          ART_HT=0.0D0
+	ALLOCATE (AC_RV(ND));         AC_RV=0.0D0						   |		ALLOCATE (CHG_RATE(ND));      CHG_RATE=0.0D0
+	ALLOCATE (AC_RdT(ND));       AC_RDT=0.0D0						   |		ALLOCATE (AC_RV(ND));            AC_RV=0.0D0
+												   >		ALLOCATE (AC_RdT(ND));          AC_RDT=0.0D0
+												   >		      ELSE IF( INDEX(STRING,'Shock Power Term') .NE. 0)THEN
+												   >		        TMP_STR=STRING
+												   >		        TMP_STR=ADJUSTL(TMP_STR)
+												   >		        K=INDEX(TMP_STR,' ')
+												   >		        READ(20,'(A)')STRING
+												   >		        CALL SUM_RATES(TOTAL_RATE,SHOCK_POWER,STRING,ID,ND)
+												   >		        WRITE(21,'(A,T12,A)')'|Sh. Pow.|',TRIM(STRING)
+	TOTAL_RATE=TOTAL_RATE+AC_RdT+CHG_RATE-RAD_DECAY-ART_HT					   |		TOTAL_RATE=TOTAL_RATE+AC_RdT+CHG_RATE-RAD_DECAY-ART_HT-SHOCK_POWER
+												   >		  WRITE(22,'(A,T12,10ES12.4)')' |Sh. Pow.|',(SHOCK_POWER(K),K=ID,MIN(ID+9,ND))
+./misc/mod_prrr.f
+!												   |	!
+!												   |	!
+./misc/n_col_merge.f
+./misc/n_multi_merge.f
+./misc/n_pair_merge.f
+./misc/output_term_seq.f
+./misc/pack_osc.f
+!												   |	!
+./misc/plt_alpha.f
+./misc/plt_cmf_lum.f
+												   >	! Altered: 30-Aug-2023 -- Added LOC_SHOCK and cleaned up curve labeling.
+												   >	!                            Zero curves now omitted from plots.
+!												   |	!
+												   >		REAL*8, ALLOCATABLE :: WRK_VEC(:)
+	LOGICAL HJ_NOT_ZERO									   |		LOGICAL NON_ZERO_HJ_LUM
+												   >		LOGICAL NON_ZERO_MECH
+												   >		LOGICAL NON_ZERO_ADI
+												   >		LOGICAL NON_ZERO_DJDt
+												   >		LOGICAL NON_ZERO_LOC_SHOCK
+												   >		LOGICAL NON_ZERO_RAD_DECAY
+												   >		IF(IOS .EQ. 0)ALLOCATE (LOC_SHOCK(ND),STAT=IOS)
+	LUM=0.0D0; HJ_LUM=0.0D0; MECH=0.0D0; DJDT=0.0D0; ADI=0.0D0				   |		LUM=0.0D0; HJ_LUM=0.0D0; MECH=0.0D0; DJDT=0.0D0; ADI=0.0D0; LOC_SHOCK=0.0D0
+	HJ_NOT_ZERO=.FALSE.									   <
+												   >		  NON_ZERO_MECH=.FALSE.; NON_ZERO_LOC_SHOCK=.FALSE.
+												   >		  NON_ZERO_ADI=.FALSE.; NON_ZERO_DJDT=.FALSE.
+												   >		  NON_ZERO_HJ_LUM=.FALSE.; NON_ZERO_RAD_DECAY=.FALSE.
+												   >		      IF(MAXVAL(ABS(MECH)) .GT. 0.0D0)NON_ZERO_MECH=.TRUE.
+												   >		    ELSE IF(INDEX(STRING,'locally by the shock') .NE. 0)THEN
+												   >		      READ(20,*)(LOC_SHOCK(I),I=1,ND)
+												   >		      IF(MAXVAL(ABS(LOC_SHOCK)) .GT. 0.0D0)NON_ZERO_LOC_SHOCK=.TRUE.
+												   >		      IF(MAXVAL(ABS(ADI)) .GT. 0.0D0)NON_ZERO_ADI=.TRUE.
+												   >		      IF(MAXVAL(ABS(HJ_LUM)) .GT. 0.0D0)NON_ZERO_HJ_LUM=.TRUE.
+												   >		      IF(MAXVAL(ABS(DJDt)) .GT. 0.0D0)NON_ZERO_DJDt=.TRUE.
+												   >		      IF(MAXVAL(ABS(RAD_DECAY)) .GT. 0.0D0)NON_ZERO_RAD_DECAY=.TRUE.
+	IF(SUM(HJ_LUM) .NE. 0.0D0)HJ_NOT_ZERO=.TRUE.						   <
+	IF(HJ_NOT_ZERO)TOTAL=HJ_LUM								   |		IF(NON_ZERO_HJ_LUM)TOTAL=HJ_LUM
+	  T1=T1+RAD_DECAY(I)-MECH(I)-ADI(I)-DJDT(I)						   |		  T1=T1+LOC_SHOCK(I)+RAD_DECAY(I)-MECH(I)-ADI(I)-DJDT(I)
+	CALL DP_CURVE(ND,XAXIS,LUM)								   |		CALL DP_CURVE_LAB(ND,XAXIS,LUM,'L(cmf)')
+	CALL DP_CURVE(ND,XAXIS,TOTAL)								   |		CALL DP_CURVE_LAB(ND,XAXIS,TOTAL,'L(cons)')
+	CALL DP_CURVE(ND,XAXIS,dT_ON_T)								   |		CALL DP_CURVE_LAB(ND,XAXIS,dT_ON_T,'dT/T')
+	CALL DP_CURVE(ND,XAXIS,WRK_VEC)								   |		CALL DP_CURVE_LAB(ND,XAXIS,WRK_VEC,'L(cons)')
+	WRITE(6,'(3A)')PG_PEN(2)//' The "mechanical" luminosity contribution at each depth is pl   |		I=1
+	WRITE(6,'(3A)')PG_PEN(3)//' The "adiabatic" luminosity contribution at each depth is plo   |		IF(NON_ZERO_RAD_DECAY)THEN
+	WRITE(6,'(3A)')PG_PEN(4)//' The "DJDTt" luminosity contribution at each depth is plotted   |		  CALL DP_CURVE_LAB(ND,XAXIS,RAD_DECAY,'Rad. Dec.'); I=I+1
+	WRITE(6,'(3A)')PG_PEN(5)//' The "radioactove"  contribution at each depth is plotted in    |		  WRITE(6,'(3A)')PG_PEN(I)//' The "radioactive decay" contribution at each depth.',DEF_P
+	WRITE(6,*)' '										   |		END IF
+	CALL DP_CURVE(ND,XAXIS,MECH)								   |		IF(NON_ZERO_LOC_SHOCK)THEN
+	CALL DP_CURVE(ND,XAXIS,ADI)								   |		  CALL DP_CURVE_LAB(ND,XAXIS,LOC_SHOCK,'Shock');  I=I+1
+	CALL DP_CURVE(ND,XAXIS,DJDT)								   |		  WRITE(6,'(3A)')PG_PEN(I)//' The "local shock" contribution at each depth.',DEF_PEN
+	CALL DP_CURVE(ND,XAXIS,RAD_DECAY)							   |		END IF
+												   >		IF(NON_ZERO_MECH)THEN
+												   >		  CALL DP_CURVE_LAB(ND,XAXIS,MECH,'Mechanical');  I=I+1
+												   >		  WRITE(6,'(3A)')PG_PEN(I)//' The "mechanical" luminosity contribution at each depth.',D
+												   >		END IF
+												   >		IF(NON_ZERO_ADI)THEN
+												   >		  CALL DP_CURVE_LAB(ND,XAXIS,ADI,'Adibat.');    I=I+1
+												   >		  WRITE(6,'(3A)')PG_PEN(I)//' The "adiabatic" luminosity contribution at each depth.',DE
+												   >		END IF
+												   >		IF(NON_ZERO_ADI)THEN
+												   >		  CALL DP_CURVE_LAB(ND,XAXIS,DJDT,'DJDt');   I=I+1
+												   >		  WRITE(6,'(3A)')PG_PEN(I)//' The "DJDt" luminosity contribution at each depth. ',DEF_PE
+												   >		END IF
+												   >		WRITE(6,*)' '
+												   >		LOC_SHOCK(2:ND)=LOC_SHOCK(1:ND-1); LOC_SHOCK(1)=0.0D0
+												   >		  LOC_SHOCK(I)=LOC_SHOCK(I)+LOC_SHOCK(I-1)
+												   >		WRITE(6,*)
+												   >		I=2
+	CALL DP_CURVE(ND,XAXIS,TOTAL)								   |		CALL DP_CURVE_LAB(ND,XAXIS,TOTAL,'Cor. Lum.')
+	WRITE(6,'(3A)')PG_PEN(3)//'    The term due to radioactive decay is in blue',DEF_PEN	   |		IF(NON_ZERO_RAD_DECAY)THEN
+	CALL DP_CURVE(ND,XAXIS,RAD_DECAY)							   |		  CALL DP_CURVE_LAB(ND,XAXIS,RAD_DECAY,'Rad. decay'); I=I+1
+												   >		  WRITE(6,'(3A)')PG_PEN(I)//'    The term due to radioactive decay',DEF_PEN
+												   >		END IF
+												   >	!
+												   >		IF(NON_ZERO_LOC_SHOCK)THEN
+												   >		  CALL DP_CURVE_LAB(ND,XAXIS,LOC_SHOCK,'Shock');  I=I+1
+												   >		WRITE(6,'(3A)')PG_PEN(I)//'  Local shock energy is in yellow',DEF_PEN
+												   >		END IF
+	WRITE(6,'(3A)')PG_PEN(4)//'                       The DJDT term is in green',DEF_PEN	   |		IF(NON_ZERO_DJDt)THEN
+	CALL DP_CURVE(ND,XAXIS,DJDT)								   |		  CALL DP_CURVE_LAB(ND,XAXIS,DJDT,'DJDt');   I=I+1
+												   >		  WRITE(6,'(3A)')PG_PEN(I)//'                       The DJDT term is in green',DEF_PEN
+												   >		END IF
+	WRITE(6,'(3A)')PG_PEN(5)//'      The work on the gas term (MECH) is in purple',DEF_PEN	   |		IF(NON_ZERO_MECH)THEN
+	CALL DP_CURVE(ND,XAXIS,MECH)								   |		  CALL DP_CURVE_LAB(ND,XAXIS,MECH,'Mech.');    I=I+1
+												   >		  WRITE(6,'(3A)')PG_PEN(I)//'      The work on the gas term (MECH) is in purple',DEF_PEN
+												   >		END IF
+	WRITE(6,'(3A)')PG_PEN(6)//'  Adiabatic cooling/internal energy is in pink',DEF_PEN	   |		IF(NON_ZERO_ADI)THEN
+	CALL DP_CURVE(ND,XAXIS,ADI)								   |		  CALL DP_CURVE_LAB(ND,XAXIS,ADI,'Adiab.');  I=I+1
+												   >		  WRITE(6,'(3A)')PG_PEN(I)//'  Adiabatic cooling/internal energy is in pink',DEF_PEN
+												   >		END IF
+	WRITE(6,'(3A)')PG_PEN(7)//' The total of the corrections terms in in yellow',DEF_PEN	   |		I=I+1
+	CHANGE=MECH+ADI+DJDT+RAD_DECAY								   |		WRITE(6,'(3A)')PG_PEN(I)//' The total of the corrections terms in in yellow',DEF_PEN
+												   >		CHANGE=MECH+ADI+DJDT+RAD_DECAY+LOC_SHOCK
+												   >		CALL DP_CURVE_LAB(ND,XAXIS,CHANGE,'Total Cor.')
+												   >		WRITE(6,*)'MECH',MECH(ND)
+												   >		WRITE(6,*)'ADI',ADI(ND)
+												   >		WRITE(6,*)'DJDT',DJDT(ND)
+												   >		WRITE(6,*)'RAD_DECAY',RAD_DECAY(ND)
+												   >		WRITE(6,*)'LOC_SHOCK',LOC_SHOCK(ND)
+	CALL DP_CURVE(ND,XAXIS,CHANGE)								   <
+	CALL DP_CURVE(ND,XAXIS,TOTAL)								   |		CALL DP_CURVE_LAB(ND,XAXIS,TOTAL,'Cor. Lum.')
+	CALL DP_CURVE(ND,XAXIS,CHANGE)								   |		CALL DP_CURVE_LAB(ND,XAXIS,CHANGE,'Total Cor.')
+./misc/plt_cool.f
+	  ED(1:ND)=LOG10(ED(1:ND))								   |		  ED(1:ND)=DLOG10(ED(1:ND))
+./misc/plt_cool_sort.f
+												   >	! Altered: 24-Sep-2023  Added ATOM_DEN and SHOCK_POWER as variables (5-Sep-2023).
+												   >	!                         NSH option added.
+												   >	! Altered: 11-Sep-2024 -- Fixed labeling bug
+!												   |		REAL*8 LSTAR,LSUN
+												   >		REAL*8, ALLOCATABLE :: TMP_RATE(:,:)
+	WRITE(6,'(A)')' This routine is still in devlopment and may need'			   |		WRITE(6,'(A)')' This routine is still in devlopment and may need further changes.'
+	WRITE(6,'(A)')' further changes.'							   <
+												   >	        CALL RD_SING_VEC_RVTJ(ATOM_DEN,ND,'Atom Density','RVTJ',LU_RD,IOS)
+	WRITE(6,*)'Read in data'								   |		WRITE(6,'(/,2A,I4,3X,A,I3,A,/)')RED_PEN,' Read in data: ND=', ND,'NREC=',NREC,DEF_PEN
+	WRITE(6,*)'ND=',ND									   <
+	WRITE(6,*)'NREC=',NREC									   <
+          PLT_OPT='P'										   |		  IF(FIRST_TIME)THEN
+          CALL GEN_IN(PLT_OPT,'Plot option')							   |		  ELSE
+	  CALL SET_CASE_UP(PLT_OPT,IZERO,IZERO)							   |	            PLT_OPT='P'
+												   >	            CALL GEN_IN(PLT_OPT,'Plot option')
+												   >		    CALL SET_CASE_UP(PLT_OPT,IZERO,IZERO)
+												   >		  END IF
+												   >	!
+												   >		  ELSE IF(PLT_OPT .EQ. 'XLOGR')THEN
+												   >		    XV(1:ND)=LOG10(R(1:ND)/R(ND))
+												   >		    XAXIS='Log R/R(ND)'
+												   >	!
+	    WRITE(6,'(A,A)')'X vector is ',TRIM(XAXIS)						   |		    WRITE(6,'(/,A,A)')' X vector is ',TRIM(XAXIS)
+	      T1=XV(1);  CALL GEN_IN(T1,'First depth for plotting')				   |		      T1=XV(1);  CALL GEN_IN(T1,'First depth for cooling selection')
+	      T2=XV(ND); CALL GEN_IN(T2,'Last depth for plotting')				   |		      T2=XV(ND); CALL GEN_IN(T2,'Last depth for cooling slection')
+	      T1=XV(ND); CALL GEN_IN(T1,'First depth for plotting')				   |		      T1=XV(ND); CALL GEN_IN(T1,'First depth for cooling selecton')
+	      T2=XV(1);  CALL GEN_IN(T2,'Last depth for plotting')				   |		      T2=XV(1);  CALL GEN_IN(T2,'Last depth for cooling selection')
+												   >		      IF(IST .GT. IEND)THEN
+												   >		        I=IEND; IEND=IST; IST=I
+												   >		      END IF
+												   >	!
+	    WRITE(6,*)'Deallocated TMP_RATE'							   <
+	    WRITE(6,*)'Allocated TMP_RATE'							   <
+												   >	!
+	        CALL DP_CURVE_LAB(ND,XV,YV,LABEL(L))						   |		        CALL DP_CURVE_LAB(ND,XV,YV,LABEL(POINT(L)))
+	    WRITE(6,*)IVEC									   <
+												   >		  ELSE IF(PLT_OPT .EQ. 'NSH')THEN
+												   >		    DO I=1,NREC
+												   >		      IF(LABEL(I) .EQ. '|Sh. Pow.|')THEN
+												   >		        DO K=1,ND
+												   >		          YV(K)=RATE(I,K)/ED(K)/ATOM_DEN(K)
+												   >		        END DO
+												   >		        CALL DP_CURVE(ND,XV,YV)
+												   >		      END IF
+												   >		    END DO
+												   >	!
+												   >		     WRITE(6,'(A)')'XLOGR      Set X axis to Log R/R*'
+												   >		     WRITE(6,'(A)')'NSH        Plot shock power normalized by density'
+./misc/plt_ddt_work.f
+./misc/plt_gf.f
+./misc/plt_hydro.f
+												   >		ELSE IF(XOPT .EQ. 'DGRADV')THEN
+												   >		  DO ID=1,NMOD
+												   >		    ND=ATM(ID)%ND
+												   >		    ATM(ID)%ZVEC=ATM(ID)%GRAD-0.99D0*MINVAL(ATM(ID)%GRAD)
+												   >		    CALL DERIVCHI(ATM(ID)%YVEC,ATM(ID)%ZVEC,ATM(ID)%VEL,ND,'LINMON')
+												   >		    ATM(ID)%YVEC=ATM(ID)%YVEC*ATM(ID)%VEL/ATM(ID)%ZVEC
+												   >		    CALL DP_CURVE(ATM(ID)%ND,ATM(ID)%XVEC,ATM(ID)%YVEC)
+												   >		  END DO
+												   >		  YLAB=TRIM(YLAB)//'dln(Grad-Gmin)/dln(V)'
+												   >	!
+												   >	!
+												   >	!
+												   >		ELSE IF(XOPT .EQ. 'DPGAS')THEN
+												   >		  DO ID=1,NMOD
+												   >		    ND=ATM(ID)%ND
+												   >		    IF(ALLOCATED(COEF))DEALLOCATE(COEF)
+												   >		    ALLOCATE (COEF(ND,4))
+												   >		    ATM(ID)%TA=ATM(ID)%GAS_PRES*ATM(ID)%CLUMP_FAC
+												   >	            CALL MON_INT_FUNS_V2(COEF,ATM(ID)%TA,ATM(ID)%R,ND)
+												   >		    ATM(ID)%YVEC=1.0D-10*COEF(:,3)/(ATM(ID)%DENSITY*ATM(ID)%CLUMP_FAC)
+												   >		    CALL DP_CURVE(ND,ATM(ID)%XVEC,ATM(ID)%YVEC)
+												   >		    ATM(ID)%REQ=ATM(ID)%VdVdR+ATM(ID)%YVEC+ATM(ID)%dTPdR+ATM(ID)%GRAV
+												   >		  END DO
+												   >		  YLAB=TRIM(YLAB)//'; dg\dPgas/dr'
+./misc/plt_ion_mf.f
+!												   |	!
+./misc/plt_j_comp.f
+!												   |	!
+!												   |	!
+./misc/plt_ln_heat.f
+./misc/plt_lte_ross.f
+!												   |	!
+./misc/plt_net.f
+!												   |	!
+!												   |	!
+!												   |	!
+./misc/plt_non_therm.f
+./misc/plt_q_col.f
+!												   |	!
+!												   |	!
+	    T2=LOG(U1)										   |		    T2=DLOG(U1)
+./misc/plt_rates.f
+	  ELSE IF(UC(PLT_OPT(1:3)) .EQ. 'LID')THEN						   |		  ELSE IF(UC(PLT_OPT(1:4)) .EQ. 'LID')THEN
+	    MAX_RATE=MAX(MAX_RATE,T1)								   <
+												   >		    MAX_RATE=MAX(MAX_RATE,T1)
+	    TMP_STR='(1X,A,T'//TMP_STR(1:2)//',ES15.4E5,3X,ES15.4E5,3X,F9.5)'			   |		    TMP_STR='(1X,A,T'//TMP_STR(1:2)//',F8.5,3X,F12.5,3X,F9.5)'
+./misc/plt_raw_xray.f
+./misc/rd_ba_mat.f
+./misc/rd_f_to_s_ids.f
+./misc/rd_f_to_s_ids_v2.f
+./misc/recom_chk_v2.f
+C												   |	C
+	RGU=LOG(2.07078D-22)									   |		RGU=DLOG(2.07078D-22)
+./misc/recomz.f
+./misc/rev_hydro_file.f
+./misc/rev_hydro_turb.f
+!												   |	!
+./misc/rev_rdinr.f
+!												   |	!
+!												   |	!
+!												   |	!
+./misc/rev_rvsig.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	  T1=EXP(LOG(V_MAX*OLD_R(I_ST)*OLD_R(I_ST)/V_MIN/OLD_R(I_END)/OLD_R(I_END))/(N_ADD+1))	   |		  T1=EXP(DLOG(V_MAX*OLD_R(I_ST)*OLD_R(I_ST)/V_MIN/OLD_R(I_END)/OLD_R(I_END))/(N_ADD+1))
+!												   |	!
+./misc/rewrite_dc.f
+./misc/rewrite_dc_v2.f
+./misc/rewrite_scr.f
+./misc/scale_omega_v1.f
+./misc/set_hydro_hd_loc.f
+./misc/set_new_sn_mod.f
+./misc/solve_ba_mat.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	  RGU=LOG(2.07078D-22)									   |		  RGU=DLOG(2.07078D-22)
+	  RGU=LOG(2.07078D-22)									   |		  RGU=DLOG(2.07078D-22)
+./misc/tlusty_vel.f
+!												   |	!
+!												   |	!
+!												   |	!
+	  TEMP_F(1:NF)=LOG(TAUR_F(1:NF))							   |		  TEMP_F(1:NF)=DLOG(TAUR_F(1:NF))
+	    TEMP_F(1:NF)=LOG( TAUR_F(1:NF)/(CONS+VW_F(1:NF))**EPS )				   |		    TEMP_F(1:NF)=DLOG( TAUR_F(1:NF)/(CONS+VW_F(1:NF))**EPS )
+./misc/tst_ba_mat_sol.f
+	CHARACTER(LEN=200) STRING								   |		CHARACTER(LEN=80) STRING
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	  RGU=LOG(2.07078D-22)									   |		  RGU=DLOG(2.07078D-22)
+	  RGU=LOG(2.07078D-22)									   |		  RGU=DLOG(2.07078D-22)
+	I=164; T2=0.0D0										   <
+	DO J=1,N										   <
+	  T1=SAV_CMAT(I,J)*STEQ(J)								   <
+	  T2=T2+T1										   <
+	  WRITE(175,'(I6,6ES15.4E4)')J,STEQ(J),SAV_CMAT(I,J),T1,T2,POPS(J),POP_SOLS(J,1)	   <
+	END DO											   <
+	WRITE(175,*)I,'RHS(I)=',RHS(I)								   <
+	FLUSH(UNIT=175)										   <
+!												   <
+!	DO I=1,NT										   |		DO I=1,NT
+!	  WRITE(30,'(1X,I5,3ES14.4)')I,STEQ(I),STEQ(I)*CMAT_RD(NT,I)				   |		  WRITE(30,'(1X,I5,3ES14.4)')I,STEQ(I),STEQ(I)*CMAT_RD(NT,I)
+!	END DO											   |		END DO
+./misc/tst_char_v2.f
+./misc/update_pg_filename.f
+./misc/wr_f_to_s.f
+./misc/write_osc_v2.f
+./misc/tmp_ng_ed.txt
+ 
+Comparing files in ./new_main with those in  /home/hillier/wnode04/cmf_testing_real8//new_main
+ 
+./new_main/Makefile
+./new_main/cmfgen.f
+												   >	! Altered 02-Sep-2023: Now zero ABS_MEAN
+												   >	! Altered 24-Sep-2023: Updated phsical and opacity constants.
+	INTEGER LUER,LUWARN									   |		INTEGER  LUER,LUWARN
+	INTEGER ERROR_LU,WARNING_LU								   |		INTEGER  ERROR_LU,WARNING_LU
+	EXTERNAL ERROR_LU,WARNING_LU								   |		REAL*8   PLANCKS_CONSTANT, FUN_PI, SPEED_OF_LIGHT, BOLTZMANN_CONSTANT
+												   >		REAL*8   ELECTRON_MASS, ELECTRON_CHARGE
+												   >		EXTERNAL ERROR_LU,WARNING_LU, PLANCKS_CONSTANT, FUN_PI
+												   >		EXTERNAL SPEED_OF_LIGHT, BOLTZMANN_CONSTANT, ELECTRON_CHARGE, ELECTRON_MASS
+! Set constants.										   |	! Open output files for all errors and comments. Change DO_TERM_OUT to
+!												   <
+	CHIBF=2.815D-06										   <
+	CHIFF=3.69D-29										   <
+	HDKT=4.7994145D0									   <
+	TWOHCSQ=0.0147452575D0									   <
+	OPLIN=2.6540081D+08									   <
+	EMLIN=5.27296D-03									   <
+	LUER=ERROR_LU()										   <
+	LUWARN=WARNING_LU()									   <
+!												   <
+! Open output file for all errors and comments. Change DO_TERM_OUT to				   <
+												   >		LUER=ERROR_LU()
+												   >		LUWARN=WARNING_LU()
+												   >	!
+												   >	! Set constants.
+												   >	!
+												   >		CHIBF=2.815D-06
+												   >		CHIFF=3.69D-29
+												   >		HDKT=1.0D+11*PLANCKS_CONSTANT()/BOLTZMANN_CONSTANT()                                  !O
+												   >		TWOHCSQ=2.0D45*PLANCKS_CONSTANT()/(SPEED_OF_LIGHT())**2                               !O
+												   >		OPLIN=1.0D+10*FUN_PI()*(ELECTRON_CHARGE())**2/ELECTRON_MASS()/SPEED_OF_LIGHT()        !O
+												   >		EMLIN=1.0D+25*PLANCKS_CONSTANT()/4.0D0/FUN_PI()                                       !O
+												   >	!
+												   >		WRITE(LUER,*)' '
+												   >		WRITE(LUER,*)' Opacity/excitaion parameters adopted in CMFGEN are:'
+												   >		WRITE(LUER,'(30X,A,ES16.8)')'     CHIBF=',CHIBF
+												   >		WRITE(LUER,'(30X,A,ES16.8)')'     CHIFF=',CHIFF
+												   >		WRITE(LUER,'(30X,A,ES16.8)')'      HDKT=',HDKT
+												   >		WRITE(LUER,'(30X,A,ES16.8)')' TWOHONCSQ=',TWOHCSQ
+												   >		WRITE(LUER,'(30X,A,ES16.8)')'     OPLIN=',OPLIN
+												   >		WRITE(LUER,'(30X,A,ES16.8)')'     EMLIN=',EMLIN
+												   >		WRITE(LUER,*)' '
+												   >		
+./new_main/cmfgen_sub.f
+												   >	! Altered 24-Sep-2023 : Adding consistency checks betwwen radiative equilibrium and electron coo
+												   >		REAL*8 STEQ_T_NO_LINES(ND)
+	OPEN(UNIT=173,FILE='SOL_LINKS',STATUS='UNKNOWN')					   <
+        DO ID=1,NUM_IONS									   <
+           IF(ATM(ID)%XzV_PRES)THEN								   <
+             DO J=1,ATM(ID)%NXzV_F								   <
+               WRITE(173,'(1X,A10,A40,I6)')ION_ID(ID),ATM(ID)%XzVLEVNAME_F(J),			   <
+	1                   ATM(ID)%F_TO_S_XzV(J)						   <
+             END DO										   <
+           END IF										   <
+        END DO											   <
+	CLOSE(UNIT=173)										   <
+!												   <
+	CLOSE(UNIT=LUMOD)									   |		FLUSH(LUMOD)
+												   >	!CLOSE(UNIT=LUMOD)
+												   >	! 
+												   >	!
+												   >	! Compute CLUMP_FAC(1:ND) which allow for the possibility that the wind is
+												   >	! clumped. At the sime time, we compute the vectors which give the density,
+												   >	! the atom density, and the species density at each depth.
+												   >	!
+												   >		CALL SET_ABUND_CLUMP(MEAN_ATOMIC_WEIGHT,ABUND_SUM,LUER,ND)
+												   >	!
+	VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*V(1:ND)/V(1)				   <
+! Compute CLUMP_FAC(1:ND) which allow for the possibility that the wind is			   <
+! clumped. At the sime time, we compute the vectors which give the density,			   <
+! the atom density, and the species density at each depth.					   <
+!												   <
+	CALL SET_ABUND_CLUMP(MEAN_ATOMIC_WEIGHT,ABUND_SUM,LUER,ND)				   <
+!												   <
+! 												   <
+!												   <
+	  DO SIM_INDX=1,MAX_SIM									   |		      DO SIM_INDX=1,MAX_SIM
+	    IF(RESONANCE_ZONE(SIM_INDX))THEN							   |		        IF(RESONANCE_ZONE(SIM_INDX))THEN
+	      NL=SIM_NL(SIM_INDX)								   |		          NL=SIM_NL(SIM_INDX)
+	      NUP=SIM_NUP(SIM_INDX)								   |		          NUP=SIM_NUP(SIM_INDX)
+	      VCHI(NL,ND)=VCHI(NL,ND)+LINE_PROF_SIM(ND,SIM_INDX)*				   |		          VCHI(NL,ND)=VCHI(NL,ND)+LINE_PROF_SIM(ND,SIM_INDX)*
+	1        LINE_OPAC_CON(SIM_INDX)*L_STAR_RATIO(ND,SIM_INDX)				   |		1            LINE_OPAC_CON(SIM_INDX)*L_STAR_RATIO(ND,SIM_INDX)
+	      VCHI(NUP,ND)=VCHI(NUP,ND)-LINE_PROF_SIM(ND,SIM_INDX)*				   |		          VCHI(NUP,ND)=VCHI(NUP,ND)-LINE_PROF_SIM(ND,SIM_INDX)*
+	1        LINE_OPAC_CON(SIM_INDX)*U_STAR_RATIO(ND,SIM_INDX)*				   |		1            LINE_OPAC_CON(SIM_INDX)*U_STAR_RATIO(ND,SIM_INDX)*
+	1        GLDGU(SIM_INDX)								   |		1            GLDGU(SIM_INDX)
+												   >		        END IF
+												   >		      END DO
+	  END DO										   |	!
+	END IF											   |	! Update DTDR
+												   >	!
+												   >		    T1=HDKT*NU(ML)/T(ND)
+												   >		    T3=FQW(ML)*TWOHCSQ*( NU(ML)**3 )*T1*EMHNUKT(ND)/
+												   >		1         CHI(ND)/T(ND)/(1.0D0-EMHNUKT(ND))**2
+												   >		    DTDR=DTDR+T3
+	    CALL TUNE(IONE,'DTDR_VEC')								   <
+	    DO I=1,NT										   |		      CALL TUNE(IONE,'DTDR_VEC')
+	      TA(I)=VCHI(I,ND)									   |		      DO I=1,NT
+	    END DO										   |		        TA(I)=VCHI(I,ND)
+	    END IF										   |		      END DO
+	    T1=HDKT*NU(ML)/T(ND)								   |		      T1=HDKT*NU(ML)/T(ND)
+	    T3=FQW(ML)*TWOHCSQ*( NU(ML)**3 )*T1*EMHNUKT(ND)/					   |		      T3=FQW(ML)*TWOHCSQ*( NU(ML)**3 )*T1*EMHNUKT(ND)/
+	1         CHI(ND)/T(ND)/(1.0_DP-EMHNUKT(ND))**2						   |		1         CHI(ND)/T(ND)/(1.0D0-EMHNUKT(ND))**2
+	    DTDR=DTDR+T3									   <
+	    IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN					   <
+	       END DO										   |		      END DO
+	       DIFFW(NT)=DIFFW(NT)+T3*(TA(NT)/CHI(ND)-(T1*(1.0_DP+EMHNUKT(ND))			   |		      DIFFW(NT)=DIFFW(NT)+T3*(TA(NT)/CHI(ND)-(T1*(1.0D0+EMHNUKT(ND))
+	1           /(1.0_DP-EMHNUKT(ND))-2.0_DP)/T(ND))					   |		1           /(1.0D0-EMHNUKT(ND))-2.0D0)/T(ND))
+												   >		      CALL TUNE(ITWO,'DTDR_VEC')
+	    CALL TUNE(ITWO,'DTDR_VEC')								   <
+	  T1=( DTDR**2 )/T1									   |		  IF(.NOT. LAMBDA_ITERATION .AND. COMPUTE_BA)THEN
+	  DO I=1,NT										   |		    T1=( DTDR**2 )/T1
+	    DIFFW(I)=DIFFW(I)*T1								   |		    DO I=1,NT
+	  END DO										   |		      DIFFW(I)=DIFFW(I)*T1
+												   >		    END DO
+												   >		  END IF
+												   >		STEQ_T_NO_LINES=0.0D0
+	      IF(ION_ID(ID) .EQ. 'CIII')THEN							   <
+	          WRITE(173,'(A,3X,ES16.5E4)')'COL',SE(ID)%STEQ(56,5)				   <
+	      END IF										   <
+	          IF(ION_ID(ID) .EQ. 'CIII')THEN						   <
+	            WRITE(173,'(A,3X,ES16.5E4)')'COL',SE(ID)%STEQ(56,5)				   <
+	            FLUSH(UNIT=173)								   <
+	          END IF									   <
+!												   <
+												   >	!	WRITE(171,'(I7,5ES15.5)')ML,FL,STEQ_T(5)
+												   >	!	WRITE(166,'(I7,3ES16.6,5X,A)')ML,FL,STEQ_T_EHB(5),STEQ_T_EHB(35),'STEQ'!
+												   >	!	STEQ_T_EHB(5)=0.0D0; STEQ_T_EHB(35)=0.0D0
+	    WRITE(190,'(ES18.8)')EMHNUKT(1:5); FLUSH(UNIT=190)					   <
+												   >		  DO K=1,ND
+												   >		    STEQ_T_NO_LINES(K)=STEQ_T_NO_LINES(K)+ FQW(ML)*(CHI_NOSCAT(K)*RJ(K) - ETA_NOSCAT(K))
+												   >		  END DO
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(ID_SAV)						   |	!!$OMP PARALLEL DO SCHEDULE(DYNAMIC) PRIVATE(ID_SAV)
+!$OMP END PARALLEL DO										   |	!!$OMP END PARALLEL DO
+												   >	!	  WRITE(166,'(I7,3ES16.6,5X,A)')ML,FL,STEQ_T_EHB(5),STEQ_T_EHB(35),'BF'
+												   >		  WRITE(841,'(I7,2ES15.5,I7)')ML,FL,STEQ_T(5),ID
+												   >	!	WRITE(172,'(I7,2ES15.5)')ML,FL,STEQ_T(5),ID
+												   >	!	WRITE(173,'(I7,2ES15.5)')ML,FL,STEQ_T(5),ID
+	    T2=EINA(SIM_INDX)*ATM(ID)%XzV_F(MNUP_F,5)*ZNET_SIM(5,SIM_INDX)			   <
+	    IF(NL .EQ. 284 .OR. NUP .EQ. 284)THEN						   <
+	      WRITE(173,'(I7,3ES16.5E3,3X,A50)')ML,T2,SE(ID)%STEQ(MNL,5),			   <
+	1       SE(ID)%STEQ(MNUP,5),TRIM(TRANS_NAME_SIM(SIM_INDX))				   <
+	      FLUSH(UNIT=173)									   <
+	    END IF    										   <
+												   >	!	WRITE(174,'(I7,2ES15.5)')ML,FL,STEQ_T(5),ID
+												   >		  IF(ML .EQ. 1)FF_SUM=0.0D0
+												   >		  IF(ML .EQ. 1)FF_SUM2=0.0D0
+												   >		  FF_SUM=FF_SUM+T1*(CHI(5)*RJ(5)-ETA(5))
+												   >		  FF_SUM2=FF_SUM2-T1*ETA(5)
+												   >		  IF(ML .EQ. NCF)WRITE(6,*)'At depth 5 FF_SUM=',FF_SUM,FF_SUM2
+												   >		TA=0.0D0
+												   >		DO ID=1,NUM_IONS
+												   >		  IF(TRIM(ION_ID(ID)) .EQ. 'HeI')THEN
+												   >		    J=ID; T1=SUM(ATM(ID)%BFCRXzV(:,5)); T3=SUM(ATM(ID)%BFCRXzV(:,35))
+												   >		  ELSE IF(TRIM(ION_ID(ID)) .EQ. 'C2')THEN
+												   >		    K=ID; T2=SUM(ATM(ID)%BFCRXzV(:,5)); T4=SUM(ATM(ID)%BFCRXzV(:,35))
+												   >		  ELSE IF(TRIM(ION_ID(ID)) .EQ. 'O2')THEN
+												   >		    L=ID; TA(1)=SUM(ATM(ID)%BFCRXzV(:,5)); TA(2)=SUM(ATM(ID)%BFCRXzV(:,35))
+												   >		  END IF
+												   >		  IF(ATM(ID)%XzV_PRES)THEN
+												   >		    TA(3)=TA(3)+SUM(ATM(ID)%BFCRXzV(:,5))
+												   >		    TA(4)=TA(4)+SUM(ATM(ID)%BFCRXzV(:,35))
+												   >		    TA(5)=TA(5)+ATM(ID)%FFXzV(5)
+												   >		  END IF
+												   >		END DO
+												   >	!	WRITE(168,'(I7,10ES15.5,5X,A)')ML,FL,STEQ_T_EHB(5),T1,T2,TA(1),T1+T2+TA(1),ATM(J)%BFCRXz
+												   >	!	WRITE(169,'(I7,10ES15.5,5X,A)')ML,FL,STEQ_T_EHB(35),T3,T4,TA(2),T3+T4+TA(2),ATM(K)%BFCRX
+												   >	!	WRITE(170,'(I7,10ES15.5,5X,A)')ML,FL,STEQ_T_EHB(5),TA(3),TA(4),FF_SUM,TA(5),STEQ_T_EHB(5
+												   >	!
+												   >	!	WRITE(175,'(I7,5ES15.5)')ML,FL,STEQ_T(5),STEQ_T_NO_LINES(5),TA(3),TA(5)
+												   >	!
+												   >		I=178
+												   >		CALL CHK_COOL_RATE_CONSIS(AVE_ENERGY, STEQ_T_NO_LINES, NU, ML, NCF, ND, I)
+												   >	!
+												   >		I=178
+												   >		CALL CHK_COOL_RATE_CONSIS(AVE_ENERGY, STEQ_T_NO_LINES, NU, NCF, NCF, ND, I)
+												   >		IF(INC_SHOCK_POWER)THEN
+												   >		  CALL EVAL_SHOCK_POWER(dE_SHOCK_POWER,ND,SHOCK_POWER_FAC)
+												   >		  STEQ_T_EHB=STEQ_T_EHB+SHOCK_POWER_FAC*dE_SHOCK_POWER
+												   >		END IF
+												   >	!
+	    IF (INC_SHOCK_POWER)CALL EVAL_SHOCK_POWER(dE_SHOCK_POWER,ND,SHOCK_POWER_FAC)	   <
+												   >		I=178
+												   >		CALL CHK_COOL_RATE_CONSIS(AVE_ENERGY, STEQ_T_NO_LINES, NU, NCF, NCF, ND, I)
+												   >	!
+												   >		  CLOSE(LUMOD)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(FLUX_MEAN(I),I=1,ND); FLUSH(LU_POP)			   |		    WRITE(LU_POP,'(1X,1P8E16.7)')(FLUX_MEAN(I),I=1,ND)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(PLANCK_MEAN(I),I=1,ND); FLUSH(LU_POP)			   |		    WRITE(LU_POP,'(1X,1P8E16.7)')(PLANCK_MEAN(I),I=1,ND)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(ABS_MEAN(I),I=1,ND); FLUSH(LU_POP)			   |		    WRITE(LU_POP,'(1X,1P8E16.7)')(ABS_MEAN(I),I=1,ND)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(J_INT(I)/LUM_SCL_FAC,I=1,ND); FLUSH(LU_POP)		   |		    WRITE(LU_POP,'(1X,1P8E16.7)')(J_INT(I)/LUM_SCL_FAC,I=1,ND)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(H_INT(I)/LUM_SCL_FAC,I=1,ND); FLUSH(LU_POP)		   |		    WRITE(LU_POP,'(1X,1P8E16.7)')(H_INT(I)/LUM_SCL_FAC,I=1,ND)
+	    WRITE(LU_POP,'(1X,1P8E16.7)')(K_INT(I)/LUM_SCL_FAC,I=1,ND); FLUSH(LU_POP)		   |		    WRITE(LU_POP,'(1X,1P8E16.7)')(K_INT(I)/LUM_SCL_FAC,I=1,ND)
+./new_main/GET_J_CHI.INC
+ 
+Comparing files in ./new_main/mod_subs with those in  /home/hillier/wnode04/cmf_testing_real8//new_main/mod_subs
+ 
+./new_main/mod_subs/Makefile
+./new_main/mod_subs/adjust_den_vecs.f
+./new_main/mod_subs/adjust_r_grid.f
+	TAU_OLD(1:ND)=LOG10(TAU_OLD(1:ND))							   |		TAU_OLD(1:ND)=DLOG10(TAU_OLD(1:ND))
+./new_main/mod_subs/adjust_r_grid_v2.f
+	TAU_OLD(1:ND)=LOG10(TAU_OLD(1:ND))							   |		TAU_OLD(1:ND)=DLOG10(TAU_OLD(1:ND))
+./new_main/mod_subs/adjust_r_grid_v3.f
+!												   |	!
+	TAU_OLD(1:ND)=LOG10(TAU_OLD(1:ND))							   |		TAU_OLD(1:ND)=DLOG10(TAU_OLD(1:ND))
+	  LOG_TAU=(TAU_OLD(ND)-TAU_OLD(1))/(ND-NUM_OBND_PARAMS-NUM_IBND_PARAMS-1)		   |		  DLOG_TAU=(TAU_OLD(ND)-TAU_OLD(1))/(ND-NUM_OBND_PARAMS-NUM_IBND_PARAMS-1)
+	    TAU(I)=TAU_OLD(1)+LOG_TAU*(I-NUM_IBND_PARAMS-1)					   |		    TAU(I)=TAU_OLD(1)+DLOG_TAU*(I-NUM_IBND_PARAMS-1)
+          LOG_TAU=T1/(ND-NUM_IBND_PARAMS-NUM_OBND_PARAMS-NX)					   |	          DLOG_TAU=T1/(ND-NUM_IBND_PARAMS-NUM_OBND_PARAMS-NX)
+	  I1=(FG_MIN-TAU_OLD(1))/LOG_TAU							   |		  I1=(FG_MIN-TAU_OLD(1))/DLOG_TAU
+	  LOG_TAU=(FG_MIN-TAU_OLD(1))/I1							   |		  DLOG_TAU=(FG_MIN-TAU_OLD(1))/I1
+	    TAU(I)=TAU_OLD(1)+LOG_TAU*(I-3)							   |		    TAU(I)=TAU_OLD(1)+DLOG_TAU*(I-3)
+	  LOG_TAU=FG_RANGE/(NX-1)								   |		  DLOG_TAU=FG_RANGE/(NX-1)
+	    TAU(I)=FG_MIN+LOG_TAU*(I-I1-1)							   |		    TAU(I)=FG_MIN+DLOG_TAU*(I-I1-1)
+	  LOG_TAU=(TAU_OLD(ND)-FG_MAX)/I2							   |		  dLOG_TAU=(TAU_OLD(ND)-FG_MAX)/I2
+	    TAU(I)=TAU(I-1)+LOG_TAU								   |		    TAU(I)=TAU(I-1)+DLOG_TAU
+	LOG_TAU=TAU(ND)-TAU(ND-NUM_IBND_PARAMS-1)						   |		dLOG_TAU=TAU(ND)-TAU(ND-NUM_IBND_PARAMS-1)
+	  TAU(ND-1)=TAU(ND)-0.1D0*LOG_TAU							   |		  TAU(ND-1)=TAU(ND)-0.1D0*dLOG_TAU
+	  TAU(ND-2)=TAU(ND)-0.35D0*LOG_TAU							   |		  TAU(ND-2)=TAU(ND)-0.35D0*dLOG_TAU
+	    TAU(ND-J)=TAU(ND)-LOG_TAU/IBND_PARAMS(J)						   |		    TAU(ND-J)=TAU(ND)-dLOG_TAU/IBND_PARAMS(J)
+	LOG_TAU=TAU(NUM_OBND_PARAMS+2)-TAU(1)							   |		dLOG_TAU=TAU(NUM_OBND_PARAMS+2)-TAU(1)
+	  TAU(2)=TAU(1)+0.02D0*LOG_TAU								   |		  TAU(2)=TAU(1)+0.02D0*dLOG_TAU
+	  TAU(3)=TAU(1)+0.2D0*LOG_TAU								   |		  TAU(3)=TAU(1)+0.2D0*dLOG_TAU
+	    WRITE(6,*)J,TAU(1),LOG_TAU,OBND_PARAMS(J)						   |		    WRITE(6,*)J,TAU(1),dLOG_TAU,OBND_PARAMS(J)
+	    TAU(1+J)=TAU(1)+LOG_TAU/OBND_PARAMS(J)						   |		    TAU(1+J)=TAU(1)+dLOG_TAU/OBND_PARAMS(J)
+./new_main/mod_subs/adjust_r_grid_v4.f
+!												   |	!
+!												   |	!
+!												   |	!
+												   >		REAL*8 STRETCH_POW		!Power law exponent to stretch tau scale about 1
+												   >		INTEGER NLEV
+												   >		INTEGER LEVELS(10)
+												   >
+	1            'Regridding method: TAU_SPACE, VEL_SPACE, FULL_R')				   |		1            'Regridding method: TAU_SPACE, VEL_SPACE, FULL_R, RATIO')
+!												   |		IF(REGRIDDING_METHOD .EQ. 'RATIO')THEN
+												   >		  CALL RD_STORE_INT(NLEV,'NLEV',L_TRUE,'Number of pops to be use  todefine R grid')
+												   >		  DO J=1,NLEV
+												   >		     WRITE(TMP_STR,*)NLEV; TMP_STR='LEV'//ADJUSTL(TMP_STR)
+												   >		     CALL RD_STORE_INT(LEVELS,TMP_STR,L_TRUE,'Population level ID in POPS')
+												   >		  END DO
+												   >		  MAX_RATIO=1.2D0; DR_STEP=0.0D0; DR_FAC=0.0D0
+												   >		END IF
+												   >		ELSE IF(REGRIDDING_METHOD .EQ. 'RATIO')THEN
+												   >		 CALL DEF_NEW_RG_V1(R,R_OLD,POPS,LEVELS,MAX_RATIO,DR_STEP,DR_FAC,DONE_R_REV,I,NT,ND)
+./new_main/mod_subs/ang_qw_mod.f
+./new_main/mod_subs/check_param_consistency.f
+./new_main/mod_subs/chg_exch_mod_v3.f
+./new_main/mod_subs/cmf_sob_mod.f
+./new_main/mod_subs/comp_grey.f
+!												   |	!
+!												   |	!
+!												   |	!
+./new_main/mod_subs/comp_grey_v2.f
+!												   |	!
+!												   |	!
+!												   |	!
+./new_main/mod_subs/comp_grey_v3.f
+!												   |	!
+!												   |	!
+!												   |	!
+./new_main/mod_subs/comp_grey_v4.f
+!												   |	!
+!												   |	!
+!												   |	!
+./new_main/mod_subs/comp_j_blank.f
+	    LOG_NU=LOG(FL_OLD/FL)								   |		    dLOG_NU=dLOG(FL_OLD/FL)
+	1            INBC,HBC_CMF(1),IPLUS,FL,LOG_NU,						   |		1            INBC,HBC_CMF(1),IPLUS,FL,dLOG_NU,
+	1              FL,LOG_NU,INNER_BND_METH,DBB,IC,IB_STAB_FACTOR,				   |		1              FL,dLOG_NU,INNER_BND_METH,DBB,IC,IB_STAB_FACTOR,
+	1                 FL,LOG_NU,DIF,DBB,IC,METHOD,						   |		1                 FL,dLOG_NU,DIF,DBB,IC,METHOD,
+	    LOG_NU=LOG(FL_OLD/FL)								   |		    dLOG_NU=dLOG(FL_OLD/FL)
+	1               IPLUS,FL,LOG_NU,DIF,DBB,IC,VDOP_VEC,DELV_FRAC_FG,			   |		1               IPLUS,FL,dLOG_NU,DIF,DBB,IC,VDOP_VEC,DELV_FRAC_FG,
+	1                  FL,LOG_NU,BNUE,DBB,							   |		1                  FL,dLOG_NU,BNUE,DBB,
+	1                  INBC,HBC_CMF(1),IPLUS,FL,LOG_NU,					   |		1                  INBC,HBC_CMF(1),IPLUS,FL,dLOG_NU,
+	1                  FL,LOG_NU,DIF,DBB,IC,						   |		1                  FL,dLOG_NU,DIF,DBB,IC,
+	1              VDOP_VEC,DELV_FRAC_MOM,FL,LOG_NU,DBB,					   |		1              VDOP_VEC,DELV_FRAC_MOM,FL,dLOG_NU,DBB,
+	1             FL,LOG_NU,DBB,								   |		1             FL,dLOG_NU,DBB,
+	1              FL,LOG_NU,INNER_BND_METH,DBB,IC,IB_STAB_FACTOR,				   |		1              FL,dLOG_NU,INNER_BND_METH,DBB,IC,IB_STAB_FACTOR,
+	1                 FL,LOG_NU,DIF,DBB,IC,METHOD,						   |		1                 FL,dLOG_NU,DIF,DBB,IC,METHOD,
+./new_main/mod_subs/comp_opac.f
+./new_main/mod_subs/comp_var_opac.f
+./new_main/mod_subs/control_variable_mod.f
+	INTEGER, PARAMETER :: DP=SELECTED_REAL_KIND(15,3000)					   |		REAL*8, PARAMETER :: RZERO=0.0D0
+												   >		CHARACTER(LEN=10) VTURB_LAW
+./new_main/mod_subs/do_var_cont.f
+	1           FIRST_FREQ,L_FALSE,LOG_NU,DIF,dTdR,DBB,dDBBdT,IC,				   |		1           FIRST_FREQ,L_FALSE,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
+	1                  FIRST_FREQ,FL,LOG_NU,						   |		1                  FIRST_FREQ,FL,dLOG_NU,
+	1           INCL_DJDT_TERMS,USE_DR4JDT,DJDT_RELAX_PARAM,FIRST_FREQ,FL,LOG_NU,		   |		1           INCL_DJDT_TERMS,USE_DR4JDT,DJDT_RELAX_PARAM,FIRST_FREQ,FL,dLOG_NU,
+	1           FIRST_FREQ,LOG_NU,								   |		1           FIRST_FREQ,dLOG_NU,
+	1                  FIRST_FREQ,LOG_NU,DIF,dTdR,DBB,dDBBdT,IC,				   |		1                  FIRST_FREQ,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
+./new_main/mod_subs/eddfac_rec_defs_mod.f
+./new_main/mod_subs/eval_lte_v4.f
+./new_main/mod_subs/eval_lte_v5.f
+./new_main/mod_subs/grey_t_iterate.f
+!												   |	!
+!												   |	!
+!												   |	!
+./new_main/mod_subs/init_line_opac_var.f
+./new_main/mod_subs/init_line_opac_var_v2.f
+./new_main/mod_subs/init_opac_mod.f
+./new_main/mod_subs/line_mod.f
+!												   |	!
+!												   |	!
+!												   |	!
+./new_main/mod_subs/line_vec_mod.f
+./new_main/mod_subs/mod_cmfgen.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+./new_main/mod_subs/mod_lev_dis_blk.f
+./new_main/mod_subs/nuc_iso_mod.f
+./new_main/mod_subs/opac_mod.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+./new_main/mod_subs/radiation_mod.f
+!												   |	!
+./new_main/mod_subs/rd_cont_j.f
+./new_main/mod_subs/rd_control_variables.f
+	    VTURB_MIN=VTURB; VTURB_MAX=VTURB							   |		    VTURB_MIN=VTURB; VTURB_MAX=VTURB; VTURB_POW=1; VTURB_LAW='POW'
+												   >		    VTURB_LAW='POW'; VTURB_POW=1
+												   >		    CALL RD_STORE_NCHAR(VTURB_LAW,'VTURB_LAW',ITEN,L_FALSE,
+												   >		1      'Law describing variation of turbulent velocity with V')
+												   >		    CALL RD_STORE_DBLE(VTURB_POW,'VTURB_POW',L_FALSE,
+												   >		1      'Power describing variation of turbulent velocity with V')
+												   >		    IF(VTURB_LAW .EQ. 'TRUNC_POW')THEN
+												   >		      CALL RD_STORE_DBLE(VTURB_VEND,'VTURB_VEND',L_TRUE,
+												   >		1        'V(km/s) at which lineare increase in Vturb ends')
+												   >		    END IF
+./new_main/mod_subs/set_abund_clump.f
+												   >	! Altered 29-Jul-2023 : Update VTURB_VEC -- now allow for POW law option.
+												   >		IF(VTURB_LAW .EQ. 'POW')THEN
+												   >		  VTURB_VEC(1:ND)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*(V(1:ND)/V(1))**VTURB_POW
+												   >		ELSE IF(VTURB_LAW .EQ. 'TRUNC_POW')THEN
+												   >		  DO I=1,ND
+												   >		    T1=MIN(V(I),VTURB_VEND)/VTURB_VEND
+												   >		    VTURB_VEC(I)=VTURB_MIN+(VTURB_MAX-VTURB_MIN)*(T1**VTURB_POW)
+												   >		  END DO
+												   >		ELSE
+												   >		  WRITE(6,*)'Error VTURB law not recognized in SET_ABUND_CLUMP'
+												   >		  STOP
+												   >		END IF
+												   >	!	
+./new_main/mod_subs/set_ang_qw.f
+./new_main/mod_subs/set_ang_qw_v2.f
+./new_main/mod_subs/set_frequency_grid.f
+./new_main/mod_subs/set_frequency_grid_v2.f
+	T3=1.0D0										   <
+	1               T3,dV_OBS_PROF,dV_OBS_WING,dV_OBS_BIG,					   |		1               1.0D0,dV_OBS_PROF,dV_OBS_WING,dV_OBS_BIG,
+./new_main/mod_subs/set_line_opac.f
+./new_main/mod_subs/set_new_model_estimates.f
+!												   |	!
+!												   |	!
+!												   |	!
+	WRITE(6,*)'Calling AUTO_ADD_ION'							   |		WRITE(6,*)'Calling AUTO_ADD_ION';  FLUSH(UNIT=6)
+	FLUSH(UNIT=6)										   <
+! We use TA for ED and TB for T since ED and T have already been set.				   |		    TC(1:ND)=ED(1:ND)*CLUMP_FAC(1:ND)
+!												   |		    IF(DC_INTERP_METHOD .EQ. 'R')THEN
+	    WRITE(LUER,*)'Departure coefficients assumed to be function of R.'			   |		      WRITE(LUER,*)'Departure coefficients assumed to be function of R.'
+												   >		    ELSE
+												   >		      WRITE(LUER,*)'Departure coefficients assumed to be function of R and T.'
+												   >		    END IF
+	        CALL REGRID_LOG_DC_V1( ATM(ID)%XzV_F,R,ED,T, ATM(ID)%DXzV_F,CLUMP_FAC,		   |		        CALL REGRID_LOG_DC_V1( ATM(ID)%XzV_F,R,TC,T, ATM(ID)%DXzV_F,CLUMP_FAC,
+./new_main/mod_subs/shock_power_mod.f
+./new_main/mod_subs/solve_for_pops.f
+./new_main/mod_subs/steq_data_mod.f
+./new_main/mod_subs/sub_cmf_line.f
+./new_main/mod_subs/sub_sob_line.f
+!	            IF( ABS(VJ(J,K,L)*POPS(J,LS)) .GE. T3 )THEN					   |	!	            IF( DABS(VJ(J,K,L)*POPS(J,LS)) .GE. T3 )THEN
+./new_main/mod_subs/sub_sob_line_v2.f
+!	            IF( ABS(VJ(J,K,L)*POPS(J,LS)) .GE. T3 )THEN					   |	!	            IF( DABS(VJ(J,K,L)*POPS(J,LS)) .GE. T3 )THEN
+./new_main/mod_subs/sub_sob_line_v3.f
+!	            IF( ABS(VJ(J,K,L)*POPS(J,LS)) .GE. T3 )THEN					   |	!	            IF( DABS(VJ(J,K,L)*POPS(J,LS)) .GE. T3 )THEN
+./new_main/mod_subs/sup_to_full_v4.f
+./new_main/mod_subs/two_phot_mod.f
+!												   |	!
+./new_main/mod_subs/var_rad_mod.f
+!												   |	!
+!												   |	!
+!												   |	!
+./new_main/mod_subs/wind_scale_pops_v1.f
+./new_main/mod_subs/gam_mu_mod.f90
+./new_main/mod_subs/mod_gamma_trans_v3.f90
+./new_main/mod_subs/mod_rd_gamray_cntrl_variables.f90
+./new_main/mod_subs/mod_read_nuc_decay_data_v2.f90
+./new_main/mod_subs/LINEGEN.INC
+ 
+Comparing files in ./new_main/gam_transport with those in  /home/hillier/wnode04/cmf_testing_real8//new_main/gam_transport
+ 
+./new_main/gam_transport/Makefile
+./new_main/gam_transport/gamma_xray_opac_v4_test.f
+!												   |	!
+./new_main/gam_transport/electron_density_calc_v2.f90
+./new_main/gam_transport/eta_scat_v6.f90
+!												   |	!
+!												   |	!
+./new_main/gam_transport/gamma_emiss_eta_v9.f90
+	GAUSS_INT=EXP( -(X-XO)*(X-XO)/TWO/SIGMA/SIGMA )/SIGMA/SQRT(TWO*PI)			   |		GAUSS_INT=DEXP( -(X-XO)*(X-XO)/TWO/SIGMA/SIGMA )/SIGMA/SQRT(TWO*PI)
+./new_main/gam_transport/gamma_energy_dep_v5.f90
+./new_main/gam_transport/gamma_energy_dep_v7.f90
+./new_main/gam_transport/gamma_nu_grid_v16.f90
+./new_main/gam_transport/gamma_nu_grid_v17.f90
+./new_main/gam_transport/gamray_sub_v3.f90
+!												   |	!
+!												   |	!
+	    dLOG_NU=LOG(NU_GRID_VEC(FI-1)/NU_GRID_VEC(FI))					   |		    dLOG_NU=DLOG(NU_GRID_VEC(FI-1)/NU_GRID_VEC(FI))
+./new_main/gam_transport/klein_freq.f90
+./new_main/gam_transport/rd_gamray_cntrl_v2.f90
+./new_main/gam_transport/read_nuc_decay_data_v3.f90
+./new_main/gam_transport/write_array_v2.f90
+./new_main/gam_transport/write_array_v2_ISO.f90
+ 
+Comparing files in ./new_main/subs with those in  /home/hillier/wnode04/cmf_testing_real8//new_main/subs
+ 
+./new_main/subs/Makefile
+OPTION=$(FG)											   |	OPTION=$(FD)
+												   >	      $(LIB)(chk_cool_rates_consis.o)\
+												   >	      $(LIB)(def_new_rg_v1.o)\
+./new_main/subs/add_par_to_full_v2.f
+./new_main/subs/adjust_cmat_to_lte.f
+./new_main/subs/adjust_pops.f
+./new_main/subs/adjust_sn_r_grid.f
+./new_main/subs/auto_add_ion.f
+./new_main/subs/auto_clump_rev.f
+./new_main/subs/ba_ehb_bf_update_v1.f
+!												   |	!
+!												   |	!
+./new_main/subs/ba_ehb_ff_update_v1.f
+!												   |	!
+./new_main/subs/ba_replace_v2.f
+./new_main/subs/ba_update_v6.f
+!                         ABS changed to ABS.							   |	!                         DABS changed to ABS.
+!												   |	!
+./new_main/subs/ba_update_v7.f
+!                         ABS changed to ABS.							   |	!                         DABS changed to ABS.
+!												   |	!
+./new_main/subs/check_hydro_def.f
+./new_main/subs/check_ions_present.f
+./new_main/subs/check_tmin.f
+./new_main/subs/cmf_blkband_v2.f
+./new_main/subs/cmf_blkband_v3.f
+!												   |	!
+./new_main/subs/cmf_hydro_module.f
+./new_main/subs/create_iv_links_v2.f
+./new_main/subs/ddt_work.f
+!												   |	!
+!												   |	!
+./new_main/subs/determine_nse.f
+./new_main/subs/det_lte_ed.f
+!												   |	!
+!												   |	!
+	          FSAHA(ID) = (XG1*XGE/XG0) * T1 * EXP(-ATM(ID)%EDGEXzV_F(1)*T2)  		   |		          FSAHA(ID) = (XG1*XGE/XG0) * T1 * DEXP(-ATM(ID)%EDGEXzV_F(1)*T2)  
+                XERR = ABS(1.0D0-XED_OLD/XEDW)							   |	                XERR = DABS(1.0D0-XED_OLD/XEDW)
+./new_main/subs/do_cmf_hydro.f
+!												   |	!
+!												   |	!
+!												   |	!
+./new_main/subs/do_cmf_hydro_v2.f
+!												   |	!
+!												   |	!
+!												   |	!
+./new_main/subs/do_full_r_grid_v1.f
+./new_main/subs/do_gam_abs_approx.f
+./new_main/subs/do_gam_abs_approx_v2.f
+												   >	! Altered: 26-Aug-2023 -- Updated to use new JTRPWGT_V2 and KTRPWGT_V2.
+        EXTERNAL JTRPWGT,HTRPWGT,KTRPWGT,NTRPWGT						   |	        EXTERNAL JTRPWGT_V2,HTRPWGT_V2,KTRPWGT_V2,NTRPWGT_V2
+        CALL GENANGQW(JQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,JTRPWGT,.FALSE.)			   |	        CALL GENANGQW_V2(JQW,R,P,NC,ND,NP,JTRPWGT_V2,.FALSE.)
+        CALL GENANGQW(KQW,R,P,WM(1,1),WM(1,3),WM(1,5),NC,ND,NP,KTRPWGT,.FALSE.)			   |	        CALL GENANGQW_V2(KQW,R,P,NC,ND,NP,KTRPWGT_V2,.FALSE.)
+./new_main/subs/do_lev_pop_decays.f
+./new_main/subs/do_ng_accel_band_v1.f
+./new_main/subs/do_ng_accel_band_v2.f
+./new_main/subs/do_ng_accel_band_v4.f
+./new_main/subs/do_species_decays.f
+./new_main/subs/do_species_decays_v2.f
+./new_main/subs/do_tau_regrid.f
+!												   |	!
+	TAU_OLD(1:ND)=LOG10(TAU_OLD(1:ND))							   |		TAU_OLD(1:ND)=DLOG10(TAU_OLD(1:ND))
+	  LOG_TAU=(TAU_OLD(ND)-TAU_OLD(1))/(ND-NUM_OBND_PARAMS-NUM_IBND_PARAMS-1)		   |		  DLOG_TAU=(TAU_OLD(ND)-TAU_OLD(1))/(ND-NUM_OBND_PARAMS-NUM_IBND_PARAMS-1)
+	    TAU(I)=TAU_OLD(1)+LOG_TAU*(I-NUM_IBND_PARAMS-1)					   |		    TAU(I)=TAU_OLD(1)+DLOG_TAU*(I-NUM_IBND_PARAMS-1)
+          LOG_TAU=T1/(ND-NUM_IBND_PARAMS-NUM_OBND_PARAMS-NX)					   |	          DLOG_TAU=T1/(ND-NUM_IBND_PARAMS-NUM_OBND_PARAMS-NX)
+	  I1=(FG_MIN-TAU_OLD(1))/LOG_TAU							   |		  I1=(FG_MIN-TAU_OLD(1))/DLOG_TAU
+	  LOG_TAU=(FG_MIN-TAU_OLD(1))/I1							   |		  DLOG_TAU=(FG_MIN-TAU_OLD(1))/I1
+	    TAU(I)=TAU_OLD(1)+LOG_TAU*(I-3)							   |		    TAU(I)=TAU_OLD(1)+DLOG_TAU*(I-3)
+	  LOG_TAU=FG_RANGE/(NX-1)								   |		  DLOG_TAU=FG_RANGE/(NX-1)
+	    TAU(I)=FG_MIN+LOG_TAU*(I-I1-1)							   |		    TAU(I)=FG_MIN+DLOG_TAU*(I-I1-1)
+	    TAU(I)=TAU(I-1)+LOG_TAU								   |		    TAU(I)=TAU(I-1)+DLOG_TAU
+./new_main/subs/do_tau_regrid_v2.f
+!												   |	!
+	TAU_OLD(1:ND)=LOG10(TAU_OLD(1:ND))							   |		TAU_OLD(1:ND)=DLOG10(TAU_OLD(1:ND))
+!	  TAU_OLD(1:ND)=LOG10( TAU_OLD(1:ND)/(0.1D0+V(1:ND)) )					   |	!	  TAU_OLD(1:ND)=DLOG10( TAU_OLD(1:ND)/(0.1D0+V(1:ND)) )
+	  TAU_OLD(1:ND)=LOG10( TAU_OLD(1:ND)/(1.0D0 + MIN(20.0D0,V(1:ND))) )   !(0.1D0+MIN(V(1)/   |		  TAU_OLD(1:ND)=DLOG10( TAU_OLD(1:ND)/(1.0D0 + MIN(20.0D0,V(1:ND))) )   !(0.1D0+MIN(V(1)
+	  DLOG_TAU=(TAU_OLD(ND)-FG_MAX)/I2							   |		  dLOG_TAU=(TAU_OLD(ND)-FG_MAX)/I2
+	        TAU(I)=EXP(LOG(TAU(IEND-4))+(I+4-IEND)*T1)					   |		        TAU(I)=EXP(DLOG(TAU(IEND-4))+(I+4-IEND)*T1)
+	  DLOG_TAU=TAU(ND)-TAU(ND-NUM_IBND_PARAMS-1)						   |		  dLOG_TAU=TAU(ND)-TAU(ND-NUM_IBND_PARAMS-1)
+	    TAU(ND-1)=TAU(ND)-0.1D0*DLOG_TAU							   |		    TAU(ND-1)=TAU(ND)-0.1D0*dLOG_TAU
+	    TAU(ND-2)=TAU(ND)-0.35D0*DLOG_TAU							   |		    TAU(ND-2)=TAU(ND)-0.35D0*dLOG_TAU
+	      TAU(ND-J)=TAU(ND)-DLOG_TAU/IBND_PARAMS(J)						   |		      TAU(ND-J)=TAU(ND)-dLOG_TAU/IBND_PARAMS(J)
+	  DLOG_TAU=TAU(NUM_OBND_PARAMS+2)-TAU(1)						   |		  dLOG_TAU=TAU(NUM_OBND_PARAMS+2)-TAU(1)
+	    TAU(2)=TAU(1)+0.02D0*DLOG_TAU							   |		    TAU(2)=TAU(1)+0.02D0*dLOG_TAU
+	    TAU(3)=TAU(1)+0.2D0*DLOG_TAU							   |		    TAU(3)=TAU(1)+0.2D0*dLOG_TAU
+	      WRITE(LU,'(A,I3,3ES14.4)')'! ',J,TAU(1),DLOG_TAU,OBND_PARAMS(J)			   |		      WRITE(LU,'(A,I3,3ES14.4)')'! ',J,TAU(1),dLOG_TAU,OBND_PARAMS(J)
+	      TAU(1+J)=TAU(1)+DLOG_TAU/OBND_PARAMS(J)						   |		      TAU(1+J)=TAU(1)+dLOG_TAU/OBND_PARAMS(J)
+./new_main/subs/do_vel_regrid.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	TA(1:ND)=LOG(POPS(IV1,1:ND))								   |		TA(1:ND)=DLOG(POPS(IV1,1:ND))
+	TB(1:ND)=LOG(POPS(IV2,1:ND))								   |		TB(1:ND)=DLOG(POPS(IV2,1:ND))
+	TA(1:ND)=LOG(POPS(IV1,1:ND))								   |		TA(1:ND)=DLOG(POPS(IV1,1:ND))
+	TB(1:ND)=LOG(POPS(IV2,1:ND))								   |		TB(1:ND)=DLOG(POPS(IV2,1:ND))
+./new_main/subs/do_vel_regrid_v2.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	TA(1:ND)=LOG(POPS(IV1,1:ND))								   |		TA(1:ND)=DLOG(POPS(IV1,1:ND))
+	TB(1:ND)=LOG(POPS(IV2,1:ND))								   |		TB(1:ND)=DLOG(POPS(IV2,1:ND))
+	TA(1:ND)=LOG(POPS(IV1,1:ND))								   |		TA(1:ND)=DLOG(POPS(IV1,1:ND))
+	TB(1:ND)=LOG(POPS(IV2,1:ND))								   |		TB(1:ND)=DLOG(POPS(IV2,1:ND))
+./new_main/subs/do_wind_vel_v1.f
+!												   |	!
+!												   |	!
+./new_main/subs/eval_adiabatic_v2.f
+./new_main/subs/eval_adiabatic_v3.f
+./new_main/subs/eval_rad_decay_v1.f
+./new_main/subs/evalse_lowt_v1.f
+!												   |	!
+./new_main/subs/evalse_lowt_v2.f
+!												   |	!
+./new_main/subs/evalse_qwvj_v6.f
+./new_main/subs/evalse_qwvj_v7.f
+./new_main/subs/evalse_qwvj_v8.f
+												   >	!	WRITE(120,*)NLEV,'I,J,B_RAT,HNST(I,J),WSE(I,J),REV_HNST,JREC(J),HN(I,J),JPHOT(J)'
+												   >		SUMD5=0.0D0
+	  B_RAT=EXP(LOG_DIST(1,J)-LOG_DIST(ION_LEV,J))*(DI(ION_LEV,J)/DI(1,J))			   |	!	  B_RAT=EXP(LOG_DIST(1,J)-LOG_DIST(ION_LEV,J))*(DI(ION_LEV,J)/DI(1,J))
+												   >		  B_RAT=EXP( LOG_DIST(1,J)-LOG_DIST(ION_LEV,J)+LOG(DI(ION_LEV,J))-LOG(DI(1,J)) )
+												   >	!	      WRITE(120,'(2I5,7E16.8)')I,J,B_RAT,HNST(I,J),WSE(I,J),REV_HNST,JREC(J),HN(I,J),JPH
+												   >	!	      FLUSH(120)
+												   >		      IF(J .EQ. 5)THEN
+												   >		        SUMD5=SUMD5+PC*(T1+T2)
+												   >	!	        WRITE(185,*)I,PC*(T1+T2),WSE(I,J)
+												   >		      END IF
+												   >		    ELSE
+												   >	!	      IF(J .EQ. 5)THEN
+												   >	!	        WRITE(185,*)I,WSE(I,J)
+												   >	!	      END IF
+												   >	!	  IF(J .EQ. 5)THEN
+												   >	!	     WRITE(185,*)NLEV,SUMD5; FLUSH(UNIT=185)
+												   >	!	  END IF
+./new_main/subs/evalse_x_qwvj_v4.f
+./new_main/subs/eval_shock_power.f
+./new_main/subs/eval_temp_ddt_v1.f
+!												   |	!
+./new_main/subs/eval_temp_ddt_v2.f
+!												   |	!
+./new_main/subs/fiddle_pop_corrections.f
+./new_main/subs/fiddle_pop_corrections_v2.f
+./new_main/subs/fixpop_in_ba_v2.f
+./new_main/subs/fixpop_in_ba_v3.f
+./new_main/subs/fixpop_t.f
+./new_main/subs/generate_full_matrix.f
+./new_main/subs/generate_full_matrix_v2.f
+./new_main/subs/generate_full_matrix_v3.f
+./new_main/subs/get_decay_lum_v1.f
+./new_main/subs/get_edep_shock_power.f
+      ! set up the deposition profile												   |	! set up the deposition profile													
+												   >	!													
+         write(6,*) 'In get_edep i, V, FCL: ',i,v(i),clump_fac(i)												   <
+         call flush(6)												   <
+         if (abs(t1).lt.8.d0) wgt(i) = exp(-t1*t1)												   |	         if (dabs(t1).lt.8.d0) wgt(i) = exp(-t1*t1)													
+         ! dividing by clump_fac makes the shock edep max in clumped regions 												   |	!													
+         ! since CMFGEN scales the edep by clump_fac												   |	! dividing by clump_fac makes the shock edep max in clumped regions 													
+												   >	! since CMFGEN scales the edep by clump_fac													
+												   >	!													
+./new_main/subs/get_non_loc_gamma_energy.f
+./new_main/subs/get_non_loc_gamma_energy_v2.f
+./new_main/subs/get_pops_at_prev_time_step_v2.f
+./new_main/subs/get_pops_at_prev_time_step_v3.f
+./new_main/subs/get_pops_at_prev_time_step_v4.f
+./new_main/subs/get_pops_at_prev_time_step_v5.f
+./new_main/subs/get_rad_decay_energy.f
+./new_main/subs/new_ba_up_tst.f
+!                         ABS changed to ABS.							   |	!                         DABS changed to ABS.
+!												   |	!
+./new_main/subs/old_grid_module.f
+./new_main/subs/open_rw_eddfactor.f
+!												   |	!
+!												   |	!
+./new_main/subs/out_line_force.f
+./new_main/subs/out_sn_pops.f
+./new_main/subs/out_sn_pops_v2.f
+./new_main/subs/out_sn_pops_v3.f
+./new_main/subs/par_gen_mat.f
+./new_main/subs/prevent_low_t.f
+./new_main/subs/rd_nuc_decay_data.f
+./new_main/subs/rd_nuc_decay_data_v2.f
+./new_main/subs/rd_sn_data.f
+! Altered: 17-Apr-2023 : MASS frcation now outout to MASS_FRACTION_SUMMARY_CHK rather than OUTGE   |	! Altered: 24-Sep-2023 : Now scale ISO pops so mass fractions add correctly (08-Sep-2023)
+												   >	! Altered: 17-Apr-2023 : MASS fraction now output to MASS_FRACTION_SUMMARY_CHK rather than OUTGE
+	WRITE(LUER,'(/,A)')' Entering RD_SN_DATA'						   |		WRITE(LUER,'(/,A)')' Entering RD_SN_DATA';    FLUSH(LUER)
+												   >		WRITE(LUER,*)'NUM_SPECIES=',NUM_SPECIES
+												   >		FLUSH(LUER)
+												   >		  WRITE(LUER,*)'Read in SN_HYDRO_DATA data headers'
+												   >		  FLUSH(UNIT=LUER)
+												   >		 FLUSH(LUER)
+												   >		  FLUSH(UNIT=LUER)
+	WRITE(LUER,*)'   Read SN populations in RD_SN_DATA'					   |		WRITE(LUER,*)'   Read SN populations in RD_SN_DATA'; FLUSH(UNIT=LUER)
+												   >		WRITE(LUER,*)'NUM_SPECIES=',NUM_SPECIES,NSP
+												   >		FLUSH(LUER)
+	DO K=1,NUM_SPECIES									   |		DO K=1,NSP                               !NUM_SPECIES
+												   >		FLUSH(UNIT=LUER)
+												   >	! Write -- also scaling ISO pops so MF conserved.
+												   >	!
+												   >		DO IS=1,NUM_ISOTOPES
+												   >		  ISO(IS)%OLD_POP=ISO(IS)%OLD_POP/WRK
+												   >		END DO
+												   >	!
+												   >		          FLUSH(LUER)
+./new_main/subs/read_ba_data_v2.f
+./new_main/subs/read_ba_data_v3.f
+./new_main/subs/read_bcd_mat.f
+./new_main/subs/read_seq_time_file_v1.f
+./new_main/subs/read_time_model_v1.f
+./new_main/subs/rv_sn_model_sniin.f
+!												   |	!
+./new_main/subs/set_ba_storage.f
+./new_main/subs/set_depth_consistency.f
+./new_main/subs/set_imp_vec.f
+./new_main/subs/set_new_grid.f
+./new_main/subs/set_new_grid_v2.f
+./new_main/subs/set_pops_to_pure_lte.f
+./new_main/subs/set_rv_hydro_model.f
+./new_main/subs/set_rv_hydro_model_v2.f
+!												   |	!
+!												   |	!
+./new_main/subs/set_rv_hydro_model_v3.f
+!												   |	!
+!												   |	!
+!												   |	!
+./new_main/subs/set_sn_r_grid.f
+./new_main/subs/smooth_pops_as_we_iterate.f
+./new_main/subs/solveba_v10.f
+./new_main/subs/solveba_v11.f
+./new_main/subs/solveba_v12.f
+./new_main/subs/solveba_v13.f
+./new_main/subs/solveba_v6.f
+./new_main/subs/solveba_v7.f
+./new_main/subs/solveba_v8.f
+./new_main/subs/solveba_v9.f
+./new_main/subs/spl_clump.f
+./new_main/subs/steq_advec_v1.f
+./new_main/subs/steq_advec_v2.f
+./new_main/subs/steq_advec_v3.f
+./new_main/subs/steq_advec_v4.f
+./new_main/subs/steq_co_mov_deriv_v1.f
+./new_main/subs/steq_co_mov_deriv_v2.f
+./new_main/subs/steq_co_mov_deriv_v3.f
+./new_main/subs/steq_multi_v10.f
+!												   |	!
+!												   |	!
+!	    IF(ZION .EQ. 3 .AND. J .EQ. 56 .AND. I .EQ. 5)THEN					   <
+!	      WRITE(174,'(F5.1,I5,7ES16.5E4)')ZION,ID,T1,HNST_S(J,I),HN_S(J,I),CNM(J,J),ED(I),SE   <
+!	      FLUSH(UNIT=174)									   <
+!	     END IF										   <
+	  END IF										   <
+	  IF(ZION .EQ. 3 .AND.  I .EQ. 5)THEN							   <
+	    WRITE(174,'(F5.1,I5,6ES16.5E4)')ZION,ID,SE(ID)%STEQ(56,I)				   <
+	    FLUSH(UNIT=174)									   <
+./new_main/subs/steq_multi_v10_save.f
+./new_main/subs/steq_multi_v7.f
+C												   |	C
+C												   |	C
+./new_main/subs/steq_multi_v8.f
+!												   |	!
+!												   |	!
+./new_main/subs/steq_multi_v9.f
+!												   |	!
+!												   |	!
+./new_main/subs/steqne_v4.f
+./new_main/subs/store_ba_data_v2.f
+./new_main/subs/store_ba_data_v3.f
+./new_main/subs/store_old_grid.f
+./new_main/subs/sub_guess_dc.f
+												   >	! Altered 24-Sep-2023 - Can now work with Log of the departure coefficients to improve dynamic r
+!												   |	!
+!												   |	!
+												   >		REAL*8 T1,T2,T3,T4
+	IF(ALLOCATED(DC))DEALLOCATE(DC)								   |		IF(ALLOCATED(LN_DC))DEALLOCATE(LN_DC)
+	ALLOCATE (DC(NLEV,ND))									   |		ALLOCATE (LN_DC(NLEV,ND))
+	   DC(J,I)=((T(I)/T_EXC(I))**1.5 )*EXP(HDKT*FEDGE(J)*(1.0D0/T_EXC(I)-1.0D0/T(I)))	   |		   LN_DC(J,I)=1.5D0*LOG(T(I)/T_EXC(I))+(HDKT*FEDGE(J)*(1.0D0/T_EXC(I)-1.0D0/T(I)))
+	    T1=LOG(2.07078D-22*ED(I)*DC(1,I))							   |		    T1=DLOG(2.07078D-22*ED(I))+LN_DC(1,I)
+	    WRITE(6,'(4ES16.4)')ED(I),DC(1,I),T1,HDKT*FEDGE(1)/T(I)				   <
+	    IF(ION_POP(I) .LT. 1.0D-10*GS_ION_POP(I))THEN					   |		    IF(ION_POP(I) .LT. 1.0D-30*GS_ION_POP(I))THEN
+	      T1=1.0D-10*GS_ION_POP(I)/ION_POP(I)						   |		      T1=1.0D-30*GS_ION_POP(I)/ION_POP(I)
+	        DC(J,I)=DC(J,I)/T1								   |		        LN_DC(J,I)=LN_DC(J,I)-LOG(T1)
+												   >		T1=10.0D0; LN_TEN=LOG(T1)
+	  WRITE(LU_OUT,'(/,1X,A,T40,A)')'07-Jul-1997','!Format date'				   |		  WRITE(LU_OUT,'(/,1X,A,T40,A)')'10-Dec-2010','!Format date'
+	    WRITE(LU_OUT,'(1X,1P,5E17.7)')(DC(J,I),J=1,NLEV)					   |		    WRITE(LU_OUT,'(1X,1P,5E17.7)')(LN_DC(J,I)/LN_TEN,J=1,NLEV)
+	IF(ALLOCATED(DC))DEALLOCATE(DC)								   |		IF(ALLOCATED(LN_DC))DEALLOCATE(LN_DC)
+./new_main/subs/sum_steq_sol.f
+./new_main/subs/tst_1.f
+./new_main/subs/tst_2.f
+./new_main/subs/tst_add.f
+./new_main/subs/tst_ba_1.f
+!                         ABS changed to ABS.							   |	!                         DABS changed to ABS.
+!												   |	!
+./new_main/subs/tst_loop.f
+./new_main/subs/tst_loop_v2.f
+./new_main/subs/tst_mat.f
+./new_main/subs/tst_rd_seq.f
+./new_main/subs/update_ba_for_line.f
+./new_main/subs/var_op_v10.f
+C												   |	C
+C												   |	C
+./new_main/subs/var_op_v7.f
+C												   |	C
+./new_main/subs/var_op_v8.f
+C												   |	C
+C												   |	C
+./new_main/subs/var_x_opa_eta_v3.f
+./new_main/subs/var_x_opa_eta_v4.f
+./new_main/subs/vehb_byj_v1.f
+!												   |	!
+./new_main/subs/vsebyj_multi_v6.f
+./new_main/subs/vsebyj_multi_v7.f
+!												   |	!
+./new_main/subs/vsebyj_multi_v8.f
+!												   |	!
+./new_main/subs/vsebyj_x_v5.f
+!												   |	!
+./new_main/subs/vsebyj_x_v6.f
+!												   |	!
+./new_main/subs/vsebyj_x_v7.f
+!												   |	!
+./new_main/subs/wr_asci_steq.f
+./new_main/subs/write_cmat.f
+./new_main/subs/write_seq_time_file_v1.f
+ 
+Comparing files in ./new_main/subs/auto with those in  /home/hillier/wnode04/cmf_testing_real8//new_main/subs/auto
+ 
+./new_main/subs/auto/Makefile
+./new_main/subs/auto/add_auto_rates.f
+./new_main/subs/auto/rd_auto_v1.f
+./new_main/subs/auto/steq_auto_v1.f
+./new_main/subs/auto/steq_auto_v2.f
+ 
+Comparing files in ./new_main/subs/chg with those in  /home/hillier/wnode04/cmf_testing_real8//new_main/subs/chg
+ 
+./new_main/subs/chg/Makefile
+./new_main/subs/chg/do_penning_ion.f
+./new_main/subs/chg/eval_chg_rates_v3.f
+												   >	! Altered 24-Dec-2024 : Now used call to get Planck's constant.
+												   >		REAL*8 PLANCKS_CONSTANT
+												   >		EXTERNAL PLANCKS_CONSTANT
+												   >		H=1.0D+15*PLANCKS_CONSTANT()
+	          COOL_CHG(J,L)=COOL_CHG(J,L)*(FRD_R-REV_R)*H*1.0D+15				   |		          COOL_CHG(J,L)=COOL_CHG(J,L)*(FRD_R-REV_R)*H
+./new_main/subs/chg/rd_chg_exch_v3.f
+./new_main/subs/chg/set_chg_exch_v3.f
+./new_main/subs/chg/set_chg_exch_v4.f
+./new_main/subs/chg/set_chg_lev_id_v3.f
+./new_main/subs/chg/set_chg_lev_id_v4.f
+./new_main/subs/chg/steq_ba_chg_exch_v3.f
+./new_main/subs/chg/verify_chg_exch_v3.f
+./new_main/subs/chg/wr_chg_cool_v3.f
+ 
+Comparing files in ./new_main/subs/two with those in  /home/hillier/wnode04/cmf_testing_real8//new_main/subs/two
+ 
+./new_main/subs/two/Makefile
+./new_main/subs/two/get_j_for_two_phot.f
+./new_main/subs/two/get_two_indx.f
+./new_main/subs/two/set_two_phot_v2.f
+./new_main/subs/two/set_two_phot_v3.f
+./new_main/subs/two/steq_ba_two_phot_rate_v3.f
+./new_main/subs/two/tst_two.f
+./new_main/subs/two/two_phot_opac.f
+./new_main/subs/two/two_phot_opac_v2.f
+./new_main/subs/two/two_phot_opac_v3.f
+												   >	! Altered 24-Sep-2023: Updated to use consistent physical constants (24-Sep-223).
+												   >		REAL*8 PLANCKS_CONSTANT	!cgs units
+	PLANKS_CONSTANT=6.626D-27			!cgs units				   <
+	CONST=1.0D+10*PLANKS_CONSTANT/4.0D0/PI							   |		CONST=1.0D+10*PLANCKS_CONSTANT()/4.0D0/PI
+./new_main/subs/two/two_phot_rate.f
+./new_main/subs/two/two_phot_var_opac.f
+												   >	! Altered 24-Sep-2023: Updated to use consistent physical constants (24-Sep-223).
+												   >		REAL*8 PLANCKS_CONSTANT
+												   >		EXTERNAL PLANCKS_CONSTANT
+	h=6.626D-27			!cgs units						   |		h=PLANCKS_CONSTANT()			!cgs units
+ 
+Comparing files in ./new_main/subs/non_therm with those in  /home/hillier/wnode04/cmf_testing_real8//new_main/subs/non_therm
+ 
+./new_main/subs/non_therm/Makefile
+      $(LIB)(rd_non_therm_elec_spec_v1.o)\							   |	      $(LIB)(rd_non_therm_elec_spec_v2.o)\
+./new_main/subs/non_therm/arnaud_cross.f90
+	        T2=LOG(U1)									   |		        T2=DLOG(U1)
+./new_main/subs/non_therm/arnaud_cross_v3.f90
+	          T2=LOG(U1)									   |		          T2=DLOG(U1)
+	        T1=LOG(XKT(IKT)/THD(IT)%XTAB(J))/LOG(THD(IT)%XTAB(J+1)/THD(IT)%XTAB(J))		   |		        T1=DLOG(XKT(IKT)/THD(IT)%XTAB(J))/DLOG(THD(IT)%XTAB(J+1)/THD(IT)%XTAB(J))
+	        THD(IT)%CROSS_SEC(IKT)=EXP( T1*LOG(THD(IT)%YTAB(J+1)) + (1.0D0-T1)*LOG(THD(IT)%Y   |		        THD(IT)%CROSS_SEC(IKT)=EXP( T1*DLOG(THD(IT)%YTAB(J+1)) + (1.0D0-T1)*DLOG(THD(IT)
+	      T1=LOG(THD(IT)%YTAB(I)/THD(IT)%YTAB(I-1))/LOG(THD(IT)%XTAB(I)/THD(IT)%XTAB(I-1))	   |		      T1=DLOG(THD(IT)%YTAB(I)/THD(IT)%YTAB(I-1))/DLOG(THD(IT)%XTAB(I)/THD(IT)%XTAB(I-1))
+./new_main/subs/non_therm/bethe_approx.f90
+./new_main/subs/non_therm/bethe_approx_v3.f90
+./new_main/subs/non_therm/bethe_approx_v4.f90
+./new_main/subs/non_therm/bethe_approx_v5.f90
+./new_main/subs/non_therm/electron_non_therm_spec.f90
+												   >	! Altered 24-Oct-2023 : Now call V2 of RD_NON_THERM_ELEC_SPEC_V2 (7-Sep-2023).
+!												   |	!
+	  CALL RD_NON_THERM_ELEC_SPEC_V1(ND,LU_BETHE)						   |		  CALL RD_NON_THERM_ELEC_SPEC_V2(ND,LU_BETHE,IOS)
+	  RETURN										   |		  IF(IOS .EQ. 0)RETURN
+./new_main/subs/non_therm/get_lelec.f90
+	             log( ELECTRON_MASS * xv**3/ gamma_euler / ELECTRON_CHARGE**2 / plasma_freq    |		             dlog( ELECTRON_MASS * xv**3/ gamma_euler / ELECTRON_CHARGE**2 / plasma_freq
+	             log(2.0D0 * xe_cgs / xi_e)							   |		             dlog(2.0D0 * xe_cgs / xi_e)
+./new_main/subs/non_therm/intsigc.f90
+	   INTSIGC = (ATAN((EMAX-XION_POT)*ONEOVERJ)-ATAN((EMIN-XION_POT)*ONEOVERJ) ) &		   |		   INTSIGC = (DATAN((EMAX-XION_POT)*ONEOVERJ)-DATAN((EMIN-XION_POT)*ONEOVERJ) ) &
+	          / ATAN((ENR-XION_POT)*ONEOVERJ/2.0D0)						   |		          / DATAN((ENR-XION_POT)*ONEOVERJ/2.0D0)
+./new_main/subs/non_therm/mod_non_therm.f90
+./new_main/subs/non_therm/par_vec_sum.f90
+./new_main/subs/non_therm/rd_non_therm_elec_spec_v1.f90
+./new_main/subs/non_therm/rd_nt_crosec_sclfac_v2.f90
+./new_main/subs/non_therm/read_arnaud_ion_data.f90
+./new_main/subs/non_therm/read_nt_omega_data.f90
+./new_main/subs/non_therm/se_ba_non_therm.f90
+./new_main/subs/non_therm/se_ba_non_therm_v2.f90
+./new_main/subs/non_therm/se_ba_non_therm_v3.f90
+./new_main/subs/non_therm/set_xkt_array.f90
+        t1 = log(x11/x0) / dble(n-2)								   |	        t1 = dlog(x11/x0) / dble(n-2)
+./new_main/subs/non_therm/total_bethe_rate.f90
+./new_main/subs/non_therm/total_bethe_rate_v2.f90
+./new_main/subs/non_therm/total_bethe_rate_v3.f90
+./new_main/subs/non_therm/total_bethe_rate_v4.f90
+./new_main/subs/non_therm/tst_set.f90
+./new_main/subs/non_therm/write_non_therm_v1.f90
+ 
+Comparing files in ./newsubs with those in  /home/hillier/wnode04/cmf_testing_real8//newsubs
+ 
+./newsubs/Makefile
+./newsubs/ave_level_energy.f
+./newsubs/colcool_sl_v4.f
+C												   |	C
+C												   |	C
+./newsubs/colcool_sl_v5.f
+												   >	! Altered 20-Sec-2023 : Updated to use standard value for Planck's constant.
+	EXTERNAL OMEGA_COL									   |		REAL*8 PLANCKS_CONSTANT
+												   >		EXTERNAL OMEGA_COL, PLANCKS_CONSTANT
+!												   |	!
+!												   |	!
+	H=6.6261965D-12		!H*1.0E+15  (1.0E+15 due to times frequency)			   |		H=PLANCKS_CONSTANT()*1.0D+15             !ergs/s (*1.0E+15 due to *nu)
+./newsubs/comp_free_free_v1.f
+./newsubs/comp_free_free_v2.f
+./newsubs/cut_points_v3.f
+./newsubs/do_h0_ff.f
+./newsubs/do_hmi_ff.f
+./newsubs/ff_res_gaunt.f
+./newsubs/genopaeta_v10.f
+./newsubs/genopaeta_v7.f
+./newsubs/genopaeta_v8.f
+./newsubs/genosc_v8.f
+./newsubs/genosc_v9.f
+./newsubs/get_scl_xray_fluxes_v1.f
+./newsubs/newpertjd.f
+./newsubs/old_comp_free_free_v2.f
+./newsubs/omega_gen_v3.f
+	  T1=LOG(T_TABLE(L)/T_TABLE(L-1))							   |		  T1=DLOG(T_TABLE(L)/T_TABLE(L-1))
+	    ALPHA=LOG(ALPHA)/T1									   |		    ALPHA=DLOG(ALPHA)/T1
+./newsubs/phot_data_mod.f
+!												   |	!
+./newsubs/quad_multi_v10.f
+												   >		REAL*8 LOCAL_EDGE_F(N_F)
+												   >		IF(PHOT_ID .EQ. 1)THEN
+												   >		    LOCAL_EDGE_F=EDGE_F
+												   >		ELSE
+												   >		  T1=0.0D0; J=-PHOT_ID
+												   >	!	  WRITE(211,*)ID,N_F,PHOT_ID
+												   >		  CALL SUB_PHOT_GEN(ID,LOCAL_EDGE_F,T1,EDGE_F,N_F,J,L_TRUE)
+												   >	!	  DO J=1,N_F
+												   >	!	    WRITE(211,*)J,EDGE_F(J),LOCAL_EDGE_F(J)
+												   >	!	  END DO
+												   >		END IF
+												   >	!
+	    IF(NU_CONT .GE. EDGE_F(I_F))THEN							   |		    IF(NU_CONT .GE. LOCAL_EDGE_F(I_F))THEN
+	        WCR(I_S,J)=WCR(I_S,J) - EDGE_F(I_F)*T1*HNST_F_ON_S(I_F,J)			   |		        WCR(I_S,J)=WCR(I_S,J) - LOCAL_EDGE_F(I_F)*T1*HNST_F_ON_S(I_F,J)
+	        dWCRdT(I_S,J)=dWCRdT(I_S,J) + EDGE_F(I_F)*T2					   |		        dWCRdT(I_S,J)=dWCRdT(I_S,J) + LOCAL_EDGE_F(I_F)*T2
+	    IF(NU_CONT .GE. EDGE_F(I_F))THEN							   |		    IF(NU_CONT .GE. LOCAL_EDGE_F(I_F))THEN
+	        WCR(I_S,J)=WCR(I_S,J) - EDGE_F(I_F)*T1*HNST_F_ON_S(I_F,J)			   |		        WCR(I_S,J)=WCR(I_S,J) - LOCAL_EDGE_F(I_F)*T1*HNST_F_ON_S(I_F,J)
+./newsubs/quad_multi_v7.f
+./newsubs/quad_multi_v8.f
+./newsubs/quad_multi_v9.f
+./newsubs/rayleigh_scat.f
+./newsubs/rd_hyd_bf_data.f
+./newsubs/rd_mod_density.f
+./newsubs/rd_phot_die_v1.f
+./newsubs/rdphot_gen_v1.f
+	    IF(T1 .GT. 0)PD(ID)%NEF(I,PHOT_ID)=ZXzV*SQRT(T1)					   |		    IF(T1 .GT. 0)PD(ID)%NEF(I,PHOT_ID)=ZXzV*DSQRT(T1)
+./newsubs/rdphot_gen_v2.f
+	    IF(T1 .GT. 0.0D0)PD(ID)%NEF(I,PHOT_ID)=ZXzV*SQRT(T1)				   |		    IF(T1 .GT. 0.0D0)PD(ID)%NEF(I,PHOT_ID)=ZXzV*DSQRT(T1)
+./newsubs/rd_rv_file_v2.f
+./newsubs/rd_store_log.f
+./newsubs/rd_xray_spec.f
+./newsubs/set_edge_freq_v3.f
+./newsubs/set_edge_freq_v4.f
+./newsubs/set_x_freq_v2.f
+./newsubs/steq_multi_v4.f
+C												   |	C
+C												   |	C
+./newsubs/subcol_multi_v4.f
+C												   |	C
+	      WRITE(180,*)I,J,K,HNST_S(L,K),HNST_F(I,K),W_F(I,K); FLUSH(UNIT=180)		   <
+!	      WRITE(180,*)I,J,K,COOL(K),EDGE_F(I),CII,HN_S(L,K),HNST_F(I,K); FLUSH(UNIT=180)	   |		      COOL(K)=COOL(K)+EDGE_F(I)*CII*(HN_S(L,K)-HNST_S(L,K))
+!	      COOL(K)=COOL(K)+EDGE_F(I)*CII*(HN_S(L,K)-HNST_S(L,K))				   <
+!	        COOL(K)=COOL(K)+(HN_S(L,K)*CIJ-HN_S(U,K)*CJI)*					   |		        COOL(K)=COOL(K)+(HN_S(L,K)*CIJ-HN_S(U,K)*CJI)*
+!	1                          (EDGE_F(I)-EDGE_F(J))					   |		1                          (EDGE_F(I)-EDGE_F(J))
+!	    COOL(K)=COOL(K)+EDGE_F(I)*CII*(HN_S(L,K)-HNST_S(L,K))				   |		    COOL(K)=COOL(K)+EDGE_F(I)*CII*(HN_S(L,K)-HNST_S(L,K))
+./newsubs/subcol_multi_v5.f
+!												   |	!
+./newsubs/subcol_multi_v6.f
+!												   |	!
+!												   |	!
+./newsubs/sub_phot_gen.f
+												   >	! Altered 20-Aug-2023 : Error check added for Type 8 cross-section.
+												   >		            IF(N .GT. MAX_N_PQN)THEN
+												   >		              WRITE(6,*)'Error in SUB_PHOT_GEN -- invalid N value for cross-section type
+												   >		              WRITE(6,*)'Maximum N value is ',MAX_N_PQN
+												   >		              WRITE(6,*)'N,LST,LEND=',N,LST,LEND
+												   >		              WRITE(6,*)'ID=',ID,'NLEVS=',NLEVS
+												   >		              WRITE(6,*)'PHOT_ID=',PHOT_ID,'SET_TO_EDGE=',SET_TO_EDGE
+												   >		              WRITE(6,*)'TERM=',TERM,K,PD(ID)%CROSS_TYPE(TERM,K)
+												   >		              FLUSH(UNIT=6)
+												   >		              STOP
+												   >		            END IF
+												   >	!
+												   >		            IF(LST .GT. MAX_L_PQN .OR. LEND .GT. MAX_L_PQN)THEN
+												   >		              WRITE(6,*)'Error in SUB_PHOT_GEN -- invalid L value for cross-section type
+												   >		              WRITE(6,*)'Maximum L value is ',MAX_L_PQN
+												   >		              WRITE(6,*)'N,LST,LEND=',N,LST,LEND
+												   >		              WRITE(6,*)'ID=',ID,'NLEVS=',NLEVS
+												   >		              WRITE(6,*)'PHOT_ID=',PHOT_ID,'SET_TO_EDGE=',SET_TO_EDGE
+												   >		              WRITE(6,*)'TERM=',TERM,K,PD(ID)%CROSS_TYPE(TERM,K)
+												   >		              FLUSH(UNIT=6)
+												   >		              STOP
+												   >		            END IF
+												   >	!
+	          X=LOG10(X)									   |		          X=DLOG10(X)
+./newsubs/var_op_v6.f
+C												   |	C
+./newsubs/xcross_v2.f
+./newsubs/xray_data_mod.f
+ 
+Comparing files in ./obs with those in  /home/hillier/wnode04/cmf_testing_real8//obs
+ 
+./obs/Makefile
+./obs/check_cmf_flux_param_consis.f
+./obs/cmf_flux_cntrl_var_mod.f
+./obs/cmf_flux_sub_v5.f
+	N_FORCE=LOG(NU(NCF)/NU(1))/LOG(1.0D0-500.0D0/C_KMS)					   |		N_FORCE=DLOG(NU(NCF)/NU(1))/DLOG(1.0D0-500.0D0/C_KMS)
+	N_FORCE=LOG(NU(NCF)/NU(1))/LOG(1.0D0- 500.0D0/C_KMS)					   |		N_FORCE=DLOG(NU(NCF)/NU(1))/DLOG(1.0D0- 500.0D0/C_KMS)
+./obs/cmf_flux_v5.f
+./obs/comp_ew_abs_ew.f
+!												   |	!
+	        DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI(ND)				   |		        DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI(ND)
+	        DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)				   |		        DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
+	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI(ND)				   |		      DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI(ND)
+./obs/form_ew.f
+	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)				   |		      DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
+	      DBC=DBB*DNU*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI(ND)				   |		      DBC=DBB*DNU*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/CHI(ND)
+./obs/ins_line_obs_v4.f
+!												   |	!
+./obs/ins_line_v5.f
+./obs/mod_cmf_obs.f
+!												   |	!
+!												   |	!
+!												   |	!
+./obs/mod_freq_obs.f
+./obs/obs_frame.f
+C												   |	C
+C												   |	C
+	NOS=LOG(MAX_FREQ/MIN_FREQ)/LOG(1.0D0+DEL_V_OBS/C_KMS)-1					   |		NOS=DLOG(MAX_FREQ/MIN_FREQ)/DLOG(1.0D0+DEL_V_OBS/C_KMS)-1
+./obs/obs_frame_sub_v2.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	        ETA_VEC(I)=ETA_VEC(I)*EXP(-TAU(I))						   |		        ETA_VEC(I)=ETA_VEC(I)*DEXP(-TAU(I))
+./obs/obs_frame_sub_v3.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	        ETA_VEC(I)=ETA_VEC(I)*EXP(-TAU(I))						   |		        ETA_VEC(I)=ETA_VEC(I)*DEXP(-TAU(I))
+./obs/obs_frame_sub_v4.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	        ETA_VEC(I)=ETA_VEC(I)*EXP(-TAU(I))						   |		        ETA_VEC(I)=ETA_VEC(I)*DEXP(-TAU(I))
+./obs/obs_frame_sub_v5.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	        ETA_VEC(I)=ETA_VEC(I)*EXP(-TAU(I))						   |		        ETA_VEC(I)=ETA_VEC(I)*DEXP(-TAU(I))
+./obs/obs_frame_sub_v6.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	        ETA_VEC(I)=ETA_VEC(I)*EXP(-TAU(I))						   |		        ETA_VEC(I)=ETA_VEC(I)*DEXP(-TAU(I))
+./obs/obs_frame_sub_v7.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	        ETA_VEC(I)=ETA_VEC(I)*EXP(-TAU(I))						   |		        ETA_VEC(I)=ETA_VEC(I)*DEXP(-TAU(I))
+./obs/obs_frame_sub_v8.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	        ETA_VEC(I)=ETA_VEC(I)*EXP(-TAU(I))						   |		        ETA_VEC(I)=ETA_VEC(I)*DEXP(-TAU(I))
+./obs/obs_frame_sub_v9.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	        ETA_VEC(I)=ETA_VEC(I)*EXP(-TAU(I))						   |		        ETA_VEC(I)=ETA_VEC(I)*DEXP(-TAU(I))
+./obs/obs_frame_v2.f
+!												   |	!
+!												   |	!
+	NOS=LOG(MAX_FREQ/MIN_FREQ)/LOG(1.0D0+DEL_V_OBS/C_KMS)-1					   |		NOS=DLOG(MAX_FREQ/MIN_FREQ)/DLOG(1.0D0+DEL_V_OBS/C_KMS)-1
+./obs/rd_cmf_flux_controls.f
+./obs/rd_cont_j_obs.f
+./obs/rd_model_file.f
+./obs/revise_obs_p.f
+												   >	! Altered: 24-Sep-2023. Cleand up option messaging.
+												   >	!
+	  CALL RD_STORE_INT(NC_INS,'NC_INS',L_FALSE,'Number of hydro iterations remaining')	   |		  CALL RD_STORE_INT(NC_INS,'NC_INS',L_FALSE,'Number of ray to be insert inside core.')
+            CALL RD_STORE_INT(NP_INS,'NP_INS',L_TRUE,'Number of extra rays to insert')		   |	            CALL RD_STORE_INT(NP_INS,'NP_INS',L_TRUE,'Number of extra rays to insert outside cor
+            CALL RD_STORE_DBLE(dR,'dR_FRAC',L_TRUE,'Fraction change in R befre inserting new ray   |	            CALL RD_STORE_DBLE(dR,'dR_FRAC',L_TRUE,'Fractional change in R befre inserting new r
+./obs/set_forbid_zero.f
+./obs/ABS_EW.INC
+./obs/CMF_ABS_EW.INC
+./obs/COMP_JCONT_V4.INC
+./obs/EVAL_LTE_INC_V4.INC
+./obs/EVAL_LTE_INC_V5.INC
+./obs/OPACITIES_V4.INC
+./obs/OPACITIES_V5.INC
+./obs/XOPAC_V4.INC
+ 
+Comparing files in ./pgplt with those in  /home/hillier/wnode04/cmf_testing_real8//pgplt
+ 
+./pgplt/Makefile
+												   >	      $(LIB)(change_xaxis_gridding.o)\
+./pgplt/adjust_id_waves.f
+./pgplt/amoeba.f
+./pgplt/amotry.f
+./pgplt/arrange_pg_curve_ids.f
+./pgplt/change_color.f
+./pgplt/change_pen.f
+./pgplt/cursor_gaus_fit.f
+	        FWHM=2.0D0*T1*(LOG(2.0D0))**(1.0D0/PAR(K+3))					   |		        FWHM=2.0D0*T1*(DLOG(2.0D0))**(1.0D0/PAR(K+3))
+	   FWHM=2.0D0*T1*(LOG(2.0D0))**(1.0D0/SIM(I,K+3))					   |		   FWHM=2.0D0*T1*(DLOG(2.0D0))**(1.0D0/SIM(I,K+3))
+./pgplt/curve.f
+./pgplt/curve_lab.f
+./pgplt/cut_points_from_plot.f
+./pgplt/define_more_pens.f
+./pgplt/do_cursor_balmer.f
+./pgplt/do_cursor_ew.f
+./pgplt/do_cursor_ew_v2.f
+./pgplt/do_cursor_ew_v3.f
+./pgplt/do_file_balmer_v1.f
+./pgplt/do_file_ew_v1.f
+./pgplt/do_fill.f
+./pgplt/do_gaus_fit.f
+	  FWHM=2.0D0*T1*(LOG(2.0D0))**(1.0D0/PAR(K+3))						   |		  FWHM=2.0D0*T1*(DLOG(2.0D0))**(1.0D0/PAR(K+3))
+	     FWHM=2.0D0*T1*(LOG(2.0D0))**(1.0D0/SIM(I,K+3))					   |		     FWHM=2.0D0*T1*(DLOG(2.0D0))**(1.0D0/SIM(I,K+3))
+./pgplt/do_gauss_smooth.f
+./pgplt/do_many_ew.f
+./pgplt/do_mult_gf.f
+./pgplt/do_pg_deriv.f
+./pgplt/do_pg_regrid.f
+./pgplt/do_vec_op.f
+C I & J are temporary variables for the callt o MON_INTERP. I denotes the 			   |	C I & J are temporary variables for the call to MON_INTERP. I denotes the 
+./pgplt/draw_ew_ids.f
+./pgplt/draw_ew_lines.f
+./pgplt/draw_line_ids.f
+./pgplt/draw_line_ids_v2.f
+./pgplt/draw_right_y_axis.f
+./pgplt/ed_gaus_fit.f
+./pgplt/ed_gauss_fit.f
+./pgplt/ew_group.f
+./pgplt/find_lines.f
+./pgplt/fntick.f
+./pgplt/gaus_fit_data.f
+./pgplt/gaus_fit_er.f
+./pgplt/gaus_fit_func.f
+./pgplt/gaus_romb.f
+./pgplt/gauss_fit_data.f
+./pgplt/gauss_fit_er.f
+./pgplt/gauss_fit.f
+	        FWHM=2.0D0*T1*(2.0D0*LOG(2.0D0))**(1.0D0/PAR(K+3))        !Sigma in km/s	   |		        FWHM=2.0D0*T1*(2.0D0*DLOG(2.0D0))**(1.0D0/PAR(K+3))        !Sigma in km/s
+	   FWHM=2.0D0*T1*(LOG(2.0D0))**(1.0D0/SIM(I,K+3))					   |		   FWHM=2.0D0*T1*(DLOG(2.0D0))**(1.0D0/SIM(I,K+3))
+./pgplt/gauss_fit_func.f
+./pgplt/gauss_romb_v2.f
+./pgplt/get_gramon_min_max.f
+./pgplt/get_line_id_pg.f
+./pgplt/get_pgi_file_info.f
+./pgplt/get_titles.f
+./pgplt/gramon_pgplot.f
+												   >	! Altered:  24-Sep-2023 : Added abillity to disallow data initialiazation using PASSED_OPT (05-S
+!												   |	!
+	INITIALIZE_ON_EXIT=.TRUE.								   <
+												   >		IF(OPTION(1:3) .EQ. 'NOI')THEN  !Don't initialize plots on exit
+												   >		  INITIALIZE_ON_EXIT=.FALSE.
+												   >		ELSE
+												   >		  INITIALIZE_ON_EXIT=.TRUE.
+												   >		END IF
+	  CALL NEW_GEN_IN(NPTS(IP),'Number of data points')					   |		  IF(CNT .EQ. 0)THEN
+												   >		    CALL NEW_GEN_IN(NPTS(IP),'Number of data points')
+												   >		    FILNAME='Skip this record: '//TRIM(FILNAME)
+												   >		    CALL NEW_GEN_IN(TMP_LOG,FILNAME)
+												   >		    IF(TMP_LOG)READ(30,'(A200)',IOSTAT=IOS)FILNAME
+												   >		  END IF
+./pgplt/hist_adj.f
+./pgplt/justify_convert_v2.f
+./pgplt/line_id_mod.f
+./pgplt/mod_curve_data.f
+./pgplt/mod_ew_variables.f
+./pgplt/modify_curve.f
+./pgplt/modify_pgi_ps.f
+./pgplt/mod_smear_pg.f
+	 inst_res = log((two*resolution+one)/(two*resolution-one))				   |		 inst_res = dlog((two*resolution+one)/(two*resolution-one))
+	  wave(i) = log(wave(i))								   |		  wave(i) = dlog(wave(i))
+	  wave(i) = exp(wave(i))								   |		  wave(i) = dexp(wave(i))
+./pgplt/monbord_v3.f
+./pgplt/monbord_v4.f
+./pgplt/moninside.f
+./pgplt/mon_interp_sp.f
+./pgplt/mon_num.f
+./pgplt/pg_add_noise.f
+./pgplt/pg_def_continuum.f
+./pgplt/pg_mod_cont_nodes.f
+./pgplt/pg_regrid.f
+./pgplt/pg_replace_data_int.f
+./pgplt/pg_set_curve_tit_length.f
+./pgplt/put_text.f
+./pgplt/rd_ew_id.f
+./pgplt/rd_line_ids.f
+./pgplt/set_pg_titles.f
+./pgplt/set_upper_axis.f
+	  TB(I)=LOG10(ED(I))									   |		  TB(I)=DLOG10(ED(I))
+./pgplt/shrink_vectors.f
+./pgplt/simp_ew.f
+./pgplt/smooth_plt.f
+./pgplt/spacing.f
+./pgplt/step_plot_v1.f
+./pgplt/strip_slash_p.f
+./pgplt/tst_pg.f
+./pgplt/vectorpen.f
+./pgplt/wr_gaus_fit.f
+	   FWHM=2.0D0*T1*(LOG(2.0D0))**(1.0D0/SIM(I,K+3))					   |		   FWHM=2.0D0*T1*(DLOG(2.0D0))**(1.0D0/SIM(I,K+3))
+./pgplt/write_line_lambdas.f
+ 
+Comparing files in ./plane with those in  /home/hillier/wnode04/cmf_testing_real8//plane
+ 
+./plane/Makefile
+./plane/characteristics_v2.f
+./plane/characteristics_v2_gam.f
+./plane/cmf_formal_rel.f
+!												   |	!
+	1                  FREQ,LOG_NU,DIF,B_PLANCK,DBB,IC,THICK_OB,				   |		1                  FREQ,dLOG_NU,DIF,B_PLANCK,DBB,IC,THICK_OB,
+!												   |	!
+!												   |	!
+!												   |	!
+	  NU_ON_dNU=1.0D0/LOG_NU								   |		  NU_ON_dNU=1.0D0/dLOG_NU
+!	IF(LOG_NU .NE. 0.0D0)NU_ON_dNU=1.0D0/LOG_NU						   |	!	IF(dLOG_NU .NE. 0.0D0)NU_ON_dNU=1.0D0/dLOG_NU
+	      WRITE(145,'(4ES14.4)')FREQ,LOG_NU,B_PLANCK,DBB					   |		      WRITE(145,'(4ES14.4)')FREQ,dLOG_NU,B_PLANCK,DBB
+./plane/cmf_formal_rel_v2.f
+	1            FREQ,LOG_NU,DIF,B_PLANCK,DBB,IC,THICK_OB,					   |		1            FREQ,dLOG_NU,DIF,B_PLANCK,DBB,IC,THICK_OB,
+!												   |	!
+	  NU_ON_dNU=1.0D0/LOG_NU								   |		  NU_ON_dNU=1.0D0/dLOG_NU
+	        WRITE(7,'(6ES14.4)')FREQ,LOG_NU,NU_ON_dNU,B_PLANCK,DBB,IC			   |		        WRITE(7,'(6ES14.4)')FREQ,dLOG_NU,NU_ON_dNU,B_PLANCK,DBB,IC
+./plane/cmf_formal_rel_v3.f
+	1            FREQ,LOG_NU,B_PLANCK,DBB,							   |		1            FREQ,dLOG_NU,B_PLANCK,DBB,
+!												   |	!
+	  NU_ON_dNU=1.0D0/LOG_NU								   |		  NU_ON_dNU=1.0D0/dLOG_NU
+	        WRITE(7,'(6ES14.4)')FREQ,LOG_NU,NU_ON_dNU,B_PLANCK,DBB				   |		        WRITE(7,'(6ES14.4)')FREQ,dLOG_NU,NU_ON_dNU,B_PLANCK,DBB
+./plane/cmf_formal_rel_v4.f
+	1            FREQ,LOG_NU,B_PLANCK,DBB,							   |		1            FREQ,dLOG_NU,B_PLANCK,DBB,
+!												   |	!
+	  NU_ON_dNU=1.0D0/LOG_NU								   |		  NU_ON_dNU=1.0D0/dLOG_NU
+!	        WRITE(7,'(6ES14.4)')FREQ,LOG_NU,NU_ON_dNU,B_PLANCK,DBB				   |	!	        WRITE(7,'(6ES14.4)')FREQ,dLOG_NU,NU_ON_dNU,B_PLANCK,DBB
+./plane/cmf_formal_rel_v4_gam.f
+	1            FREQ,LOG_NU,B_PLANCK,DBB,							   |		1            FREQ,dLOG_NU,B_PLANCK,DBB,
+!												   |	!
+	  NU_ON_dNU=1.0D0/LOG_NU								   |		  NU_ON_dNU=1.0D0/dLOG_NU
+!	        WRITE(7,'(6ES14.4)')FREQ,LOG_NU,NU_ON_dNU,B_PLANCK,DBB				   |	!	        WRITE(7,'(6ES14.4)')FREQ,dLOG_NU,NU_ON_dNU,B_PLANCK,DBB
+./plane/comp_add_edd_facs.f
+./plane/create_incid_inten.f
+./plane/define_grid_v2.f
+./plane/define_grid_v2_gam.f
+./plane/derivr.f
+./plane/derivs.f
+./plane/drhsdchi_pp.f
+./plane/edd_j_hub_var_v1.f
+./plane/edd_j_hub_var_v2.f
+./plane/edd_j_hub_var_v3.f
+./plane/edd_jrel_var_v1.f
+./plane/edd_jrel_var_v2.f
+./plane/edd_jrel_var_v3.f
+./plane/expint.f
+./plane/expn_approx.f
+./plane/expn.f
+./plane/fcomp_pp_v2.f
+./plane/fg_j_cmf_v11.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  FREQ,LOG_NU,DIF,DBB,IC,						   |		1                  FREQ,dLOG_NU,DIF,DBB,IC,
+!												   |	!
+!												   |	!
+!												   |	!
+! NB: dCHIdR = LOG(CHI)/LOG(R) * CHI/R								   |	! NB: dCHIdR = dLOG(CHI)/dLOG(R) * CHI/R
+	        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*LOG_NU)			   |		        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*dLOG_NU)
+	        Q(I)=GAM(I,LS)/(CHI_RAY(I)*LOG_NU)						   |		        Q(I)=GAM(I,LS)/(CHI_RAY(I)*dLOG_NU)
+	      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)						   |		      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)
+	      IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)	     !Q(NI)			   |		      IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)	     !Q(NI)
+! NB: dCHIdR = LOG(CHI)/LOG(R) * CHI/R								   |	! NB: dCHIdR = dLOG(CHI)/dLOG(R) * CHI/R
+	      Q(1:NI)=GAM(1:NI,LS)/LOG_NU							   |		      Q(1:NI)=GAM(1:NI,LS)/dLOG_NU
+	      dCHIdR_RAY(1:NI)=dCHIdR_RAY(1:NI)+dGAMdR(1:NI,LS)/LOG_NU				   |		      dCHIdR_RAY(1:NI)=dCHIdR_RAY(1:NI)+dGAMdR(1:NI,LS)/dLOG_NU
+./plane/fg_j_cmf_v12.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  FREQ,LOG_NU,DIF,DBB,IC,						   |		1                  FREQ,dLOG_NU,DIF,DBB,IC,
+!												   |	!
+!												   |	!
+!												   |	!
+! NB: dCHIdR = LOG(CHI)/LOG(R) * CHI/R								   |	! NB: dCHIdR = dLOG(CHI)/dLOG(R) * CHI/R
+	        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*LOG_NU)			   |		        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*dLOG_NU)
+	        Q(I)=GAM(I,LS)/(CHI_RAY(I)*LOG_NU)						   |		        Q(I)=GAM(I,LS)/(CHI_RAY(I)*dLOG_NU)
+	      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)						   |		      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)
+	      IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)	     !Q(NI)			   |		      IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)	     !Q(NI)
+! NB: dCHIdR = LOG(CHI)/LOG(R) * CHI/R								   |	! NB: dCHIdR = dLOG(CHI)/dLOG(R) * CHI/R
+	      Q(1:NI)=GAM(1:NI,LS)/LOG_NU							   |		      Q(1:NI)=GAM(1:NI,LS)/dLOG_NU
+	      dCHIdR_RAY(1:NI)=dCHIdR_RAY(1:NI)+dGAMdR(1:NI,LS)/LOG_NU				   |		      dCHIdR_RAY(1:NI)=dCHIdR_RAY(1:NI)+dGAMdR(1:NI,LS)/dLOG_NU
+./plane/fg_j_cmf_v13.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  FREQ,LOG_NU,INNER_BND_METH,DBB,IC,					   |		1                  FREQ,dLOG_NU,INNER_BND_METH,DBB,IC,
+!												   |	!
+!												   |	!
+!												   |	!
+! NB: dCHIdR = LOG(CHI)/LOG(R) * CHI/R								   |	! NB: dCHIdR = dLOG(CHI)/dLOG(R) * CHI/R
+	        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*LOG_NU)			   |		        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*dLOG_NU)
+	        Q(I)=GAM(I,LS)/(CHI_RAY(I)*LOG_NU)						   |		        Q(I)=GAM(I,LS)/(CHI_RAY(I)*dLOG_NU)
+	      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)						   |		      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)
+	        IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)	     !Q(NI)		   |		        IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)	     !Q(NI)
+! NB: dCHIdR = LOG(CHI)/LOG(R) * CHI/R								   |	! NB: dCHIdR = dLOG(CHI)/dLOG(R) * CHI/R
+	      Q(1:NI)=GAM(1:NI,LS)/LOG_NU							   |		      Q(1:NI)=GAM(1:NI,LS)/dLOG_NU
+	      dCHIdR_RAY(1:NI)=dCHIdR_RAY(1:NI)+dGAMdR(1:NI,LS)/LOG_NU				   |		      dCHIdR_RAY(1:NI)=dCHIdR_RAY(1:NI)+dGAMdR(1:NI,LS)/dLOG_NU
+./plane/fgrey_norel_v1.f
+!												   |	!
+!												   |	!
+!												   |	!
+	    DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)						   |		    DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)
+	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )						   |		      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
+	    E1=EXP(-DTAU(1))									   |		    E1=DEXP(-DTAU(1))
+./plane/fine_chi_grid.f
+./plane/fine_r_grid.f
+!												   |	!
+!												   |	!
+./plane/gauleg.f
+./plane/get_ibound.f
+./plane/get_ibound_old.f
+./plane/get_jh_at_prev_time_step.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+./plane/get_moms_ddt.f
+./plane/get_moms_non_rel.f
+./plane/get_moms_rel.f
+./plane/get_rsqh_rel.f
+./plane/get_rsqj_from_j.f
+./plane/h_weight.f
+./plane/jgrey_hub_ddt.f
+!												   |	!
+!												   |	!
+!												   |	!
+	    DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)						   |		    DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)
+	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )						   |		      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
+	    E1=EXP(-DTAU(1))									   |		    E1=DEXP(-DTAU(1))
+./plane/jgrey_hub_ddt_v2.f
+!												   |	!
+!												   |	!
+!												   |	!
+	    DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)						   |		    DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)
+	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )						   |		      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
+	    E1=EXP(-DTAU(1))									   |		    E1=DEXP(-DTAU(1))
+./plane/jgrey_hub_ddt_v3.f
+!												   |	!
+!												   |	!
+!												   |	!
+	    DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)						   |		    DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)
+	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )						   |		      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
+	    E1=EXP(-DTAU(1))									   |		    E1=DEXP(-DTAU(1))
+./plane/jgrey_hub_ddt_v4.f
+!												   |	!
+!												   |	!
+!												   |	!
+	    DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)						   |		    DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)
+	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )						   |		      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
+	    E1=EXP(-DTAU(1))									   |		    E1=DEXP(-DTAU(1))
+./plane/jgrey_hub_ddt_v5.f
+!												   |	!
+!												   |	!
+!												   |	!
+	    DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)						   |		    DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)
+	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )						   |		      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
+	    E1=EXP(-DTAU(1))									   |		    E1=DEXP(-DTAU(1))
+./plane/j_weight.f
+./plane/k_weight.f
+./plane/mod_ray_mom_store.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+./plane/mod_space_grid_v2.f
+!												   |	!
+./plane/mod_space_grid_v2_gam.f
+!												   |	!
+./plane/mod_var_jrel.f
+!												   |	!
+!												   |	!
+!												   |	!
+./plane/mod_var_jrel_v2.f
+./plane/mod_var_mom_j_cmf.f
+./plane/mom_j_cmf_v10.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  FREQ,LOG_NU,								   |		1                  FREQ,dLOG_NU,
+! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.				   |	! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
+	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	    GAM(I)=CON_GAM(I)/CHI(I)/LOG_NU							   |		    GAM(I)=CON_GAM(I)/CHI(I)/dLOG_NU
+./plane/mom_j_cmf_v11.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  FREQ,LOG_NU,								   |		1                  FREQ,dLOG_NU,
+! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.				   |	! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
+	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	    GAM(I)=CON_GAM(I)/CHI(I)/LOG_NU							   |		    GAM(I)=CON_GAM(I)/CHI(I)/dLOG_NU
+./plane/mom_j_cmf_v8.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  FREQ,LOG_NU,DIF,DBB,IC,						   |		1                  FREQ,dLOG_NU,DIF,DBB,IC,
+! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.				   |	! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
+	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	    GAM(I)=CON_GAM(I)/CHI(I)/LOG_NU							   |		    GAM(I)=CON_GAM(I)/CHI(I)/dLOG_NU
+./plane/mom_j_cmf_v9.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  FREQ,LOG_NU,DIF,DBB,IC,						   |		1                  FREQ,dLOG_NU,DIF,DBB,IC,
+! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.				   |	! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
+	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	    GAM(I)=CON_GAM(I)/CHI(I)/LOG_NU							   |		    GAM(I)=CON_GAM(I)/CHI(I)/dLOG_NU
+./plane/mom_j_ddt_v1.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  FREQ,LOG_NU,DIF,DBB,IC,						   |		1                  FREQ,dLOG_NU,DIF,DBB,IC,
+! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.				   |	! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
+	    GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		    GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	  GAM(:)=CON_GAM(:)/CHI(:)/LOG_NU							   |		  GAM(:)=CON_GAM(:)/CHI(:)/dLOG_NU
+	1        V(I)*(XM(I)-RSQJNU_PREV(I))/R(I)/LOG_NU/C_KMS/T2,				   |		1        V(I)*(XM(I)-RSQJNU_PREV(I))/R(I)/dLOG_NU/C_KMS/T2,
+	1        V(I)*(XM(I)-RSQJNU_PREV(I))/R(I)/LOG_NU/C_KMS/CHI(I)/T2,			   |		1        V(I)*(XM(I)-RSQJNU_PREV(I))/R(I)/dLOG_NU/C_KMS/CHI(I)/T2,
+./plane/mom_j_ddt_v2.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1            VDOP_VEC,VDOP_FRAC,FREQ,LOG_NU,DBB,					   |		1            VDOP_VEC,VDOP_FRAC,FREQ,dLOG_NU,DBB,
+! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.				   |	! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
+	    GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		    GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	  GAM(:)=CON_GAM(:)/CHI(:)/LOG_NU							   |		  GAM(:)=CON_GAM(:)/CHI(:)/dLOG_NU
+./plane/mom_j_ddt_v3.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1            VDOP_VEC,VDOP_FRAC,FREQ,LOG_NU,DBB,					   |		1            VDOP_VEC,VDOP_FRAC,FREQ,dLOG_NU,DBB,
+! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.				   |	! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
+	    GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		    GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	  GAM(:)=CON_GAM(:)/CHI(:)/LOG_NU							   |		  GAM(:)=CON_GAM(:)/CHI(:)/dLOG_NU
+./plane/mom_j_ddt_v4.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1            VDOP_VEC,VDOP_FRAC,FREQ,LOG_NU,DBB,					   |		1            VDOP_VEC,VDOP_FRAC,FREQ,dLOG_NU,DBB,
+! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.				   |	! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
+	    GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		    GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	  GAM(:)=CON_GAM(:)/CHI(:)/LOG_NU							   |		  GAM(:)=CON_GAM(:)/CHI(:)/dLOG_NU
+./plane/mom_j_ddt_v5.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1            VDOP_VEC,VDOP_FRAC,FREQ,LOG_NU,DBB,					   |		1            VDOP_VEC,VDOP_FRAC,FREQ,dLOG_NU,DBB,
+! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.				   |	! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
+	    GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		    GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	  GAM(:)=CON_GAM(:)/CHI(:)/LOG_NU							   |		  GAM(:)=CON_GAM(:)/CHI(:)/dLOG_NU
+./plane/mom_j_ddt_v6.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1            VDOP_VEC,VDOP_FRAC,FREQ,LOG_NU,DBB,					   |		1            VDOP_VEC,VDOP_FRAC,FREQ,dLOG_NU,DBB,
+												   >	! Altered: 20-Aug-2023 : Fixed out-of bound issue with MOM_ERR_ON_FREQ in first error.
+! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.				   |	! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
+	    GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		    GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	  GAM(:)=CON_GAM(:)/CHI(:)/LOG_NU							   |		  GAM(:)=CON_GAM(:)/CHI(:)/dLOG_NU
+	      IF(MOM_ERR_CNT .GT. N_ERR_MAX)THEN						   |		      IF(MOM_ERR_CNT .EQ. 0)THEN
+												   >		        MOM_ERR_CNT=MOM_ERR_CNT+1
+												   >		        MOM_ERR_ON_FREQ(MOM_ERR_CNT)=FREQ
+												   >		      ELSE IF(MOM_ERR_CNT .GT. N_ERR_MAX)THEN
+./plane/mom_j_pp_v1.f
+!												   |	!
+!												   |	!
+./plane/mom_jrel_grey_v1.f
+./plane/mom_jrel_grey_v2.f
+./plane/mom_j_rel_v2.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  HBC,IN_HBC,NBC,FREQ,LOG_NU,						   |		1                  HBC,IN_HBC,NBC,FREQ,dLOG_NU,
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+./plane/mom_jrel_v3.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1               HBC,IN_HBC,NBC,FREQ,LOG_NU,						   |		1               HBC,IN_HBC,NBC,FREQ,dLOG_NU,
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+./plane/mom_jrel_v4.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1               HBC,IN_HBC,NBC,FREQ,LOG_NU,						   |		1               HBC,IN_HBC,NBC,FREQ,dLOG_NU,
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+./plane/mom_jrel_v5.f
+!												   |	!
+!												   |	!
+!												   |	!
+	1               FREQ,LOG_NU,DIF,DBB,IC,METHOD,COHERENT,N_TYPE,				   |		1               FREQ,dLOG_NU,DIF,DBB,IC,METHOD,COHERENT,N_TYPE,
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+	      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/LOG_NU	   |		      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/DLOG_NU
+	      XM(ND)=XM(ND)+GAM_REL(ND)*R(ND)*BETA(ND)*( (HNU_AT_IB-HNU_AT_IB_PREV) + T1*(NNU_AT   |		      XM(ND)=XM(ND)+GAM_REL(ND)*R(ND)*BETA(ND)*( (HNU_AT_IB-HNU_AT_IB_PREV) + T1*(NNU_AT
+./plane/mom_jrel_v6.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1               FREQ,LOG_NU,DBB,INNER_BND_METH,OUTER_BND_METH,METHOD,COHERENT,N_TYPE,	   |		1               FREQ,dLOG_NU,DBB,INNER_BND_METH,OUTER_BND_METH,METHOD,COHERENT,N_TYPE,
+! Altered: 28-Jan-2012 : Minor bug fix. LOG_NU was being used with HOLLOW option when INIT was t   |	! Altered: 28-Jan-2012 : Minor bug fix. dLOG_NU was being used with HOLLOW option when INIT was 
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+	      T1=CON_DELTA(ND)/LOG_NU/CHI(ND)							   |		      T1=CON_DELTA(ND)/dLOG_NU/CHI(ND)
+	      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/LOG_NU	   |		      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/DLOG_NU
+	1                   T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/LOG_NU			   |		1                   T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/DLOG_NU
+./plane/mom_jrel_v7.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1               FREQ,LOG_NU,DBB,IB_STAB_FACTOR,						   |		1               FREQ,dLOG_NU,DBB,IB_STAB_FACTOR,
+! Altered: 28-Jan-2012 : Minor bug fix. LOG_NU was being used with HOLLOW option when INIT was t   |	! Altered: 28-Jan-2012 : Minor bug fix. dLOG_NU was being used with HOLLOW option when INIT was 
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+	      T1=CON_DELTA(ND)/LOG_NU/CHI(ND)							   |		      T1=CON_DELTA(ND)/dLOG_NU/CHI(ND)
+	      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/LOG_NU	   |		      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/DLOG_NU
+	1                   T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/LOG_NU			   |		1                   T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/DLOG_NU
+./plane/mom_jrel_v8.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1               FREQ,LOG_NU,DBB,H_CHK_OPTION,IB_STAB_FACTOR,				   |		1               FREQ,dLOG_NU,DBB,H_CHK_OPTION,IB_STAB_FACTOR,
+! Altered: 28-Jan-2012 : Minor bug fix. LOG_NU was being used with HOLLOW option when INIT was t   |	! Altered: 28-Jan-2012 : Minor bug fix. dLOG_NU was being used with HOLLOW option when INIT was 
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+	      T1=CON_DELTA(ND)/LOG_NU/CHI(ND)							   |		      T1=CON_DELTA(ND)/dLOG_NU/CHI(ND)
+	      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/LOG_NU	   |		      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/DLOG_NU
+	1                   T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/LOG_NU			   |		1                   T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/DLOG_NU
+./plane/mom_jrel_v9.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1               FREQ,LOG_NU,DBB,							   |		1               FREQ,dLOG_NU,DBB,
+! Altered: 28-Jan-2012 : Minor bug fix. LOG_NU was being used with HOLLOW option when INIT was t   |	! Altered: 28-Jan-2012 : Minor bug fix. dLOG_NU was being used with HOLLOW option when INIT was 
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+	      T1=CON_DELTA(ND)/LOG_NU/CHI(ND)							   |		      T1=CON_DELTA(ND)/dLOG_NU/CHI(ND)
+	      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/LOG_NU	   |		      T1=BETA(ND)*BETA(ND)*GAM_REL_SQ(ND)*(SIGMA(ND)+1.0D0)/CHI_H(ND)/R(ND)/DLOG_NU
+	1                   T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/LOG_NU			   |		1                   T1*(NNU_AT_IB-NNU_AT_IB_PREV) )/CHI_H(ND)/DLOG_NU
+./plane/n_weight.f
+./plane/optdepth_v2.f
+./plane/optdepth_v3.f
+./plane/optdepth_v4.f
+./plane/optdepth_v4_gam.f
+./plane/out_jh.f
+./plane/pp_edd_var_cmf_v1.f
+./plane/pp_form_cmf_v2.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1               IPLUS_P,FREQ,LOG_NU,DIF,DBB,IC,						   |		1               IPLUS_P,FREQ,dLOG_NU,DIF,DBB,IC,
+!												   |	!
+	        DTAU(I,LS)=TMPV(I)/MU(LS)+ 3.33564D-06*MU(LS)*(V_RAY(I)-V_RAY(I+1))/LOG_NU	   |		        DTAU(I,LS)=TMPV(I)/MU(LS)+ 3.33564D-06*MU(LS)*(V_RAY(I)-V_RAY(I+1))/dLOG_NU
+	        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*LOG_NU)			   |		        QH(I)=GAMH(I,LS)*2.0D0/((CHI_RAY(I)+CHI_RAY(I+1))*dLOG_NU)
+	        Q(I)=GAM(I,LS)/(CHI_RAY(I)*LOG_NU)						   |		        Q(I)=GAM(I,LS)/(CHI_RAY(I)*dLOG_NU)
+	      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)						   |		      Q(NI)=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)
+	      IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*LOG_NU)	     !Q(NI)			   |		      IF(.NOT. INIT)T1=GAM(NI,LS)/(CHI_RAY(NI)*dLOG_NU)	     !Q(NI)
+	      Q(1:NI)=GAM(1:NI,LS)/LOG_NU							   |		      Q(1:NI)=GAM(1:NI,LS)/dLOG_NU
+./plane/pp_mom_cmf_v1.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  FREQ,LOG_NU,DIF,DBB,IC,						   |		1                  FREQ,dLOG_NU,DIF,DBB,IC,
+! FL. LOG_NU is define as vd / dv which is the same as d / d ln v.				   |	! FL. dLOG_NU is define as vd / dv which is the same as d / d ln v.
+	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	      GAMH(I)=CON_GAMH(I)/LOG_NU/( CHI(I)+CHI(I+1) )					   |		      GAMH(I)=CON_GAMH(I)/dLOG_NU/( CHI(I)+CHI(I+1) )
+	    GAM(I)=CON_GAM(I)/CHI(I)/LOG_NU							   |		    GAM(I)=CON_GAM(I)/CHI(I)/dLOG_NU
+./plane/pp_var_mom_cmf_v1.f
+!												   |	!
+!												   |	!
+!												   |	!
+	1              LOG_NU,DIF,dTdR,DBB,dDBBdT,IC,						   |		1              dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
+!												   |	!
+	1         /LOG_NU/(CHI(I)+CHI(I+1))							   |		1         /dLOG_NU/(CHI(I)+CHI(I+1))
+	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/LOG_NU						   |		    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/dLOG_NU
+./plane/rel_variables.f
+./plane/rel_variables_gam.f
+./plane/runge_kutta.f
+./plane/solve_cmf_formal_v2.f
+./plane/solve_cmf_formal_v3_gam.f
+./plane/tst_exp.f
+./plane/tst_get_ib.f
+./plane/var_jrel_v1.f
+	1                  HBC,IN_HBC,NBC,INIT,FREQ,LOG_NU,					   |		1                  HBC,IN_HBC,NBC,INIT,FREQ,dLOG_NU,
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+./plane/var_jrel_v2.f
+	1                  INIT,FREQ,LOG_NU,DIF,dTdR,DBB,dDBBdT,IC,				   |		1                  INIT,FREQ,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+./plane/var_jrel_v3.f
+	1                  INIT,FREQ,LOG_NU,							   |		1                  INIT,FREQ,dLOG_NU,
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+            T1=CON_DELTA(ND)/LOG_NU/CHI(ND)							   |	            T1=CON_DELTA(ND)/dLOG_NU/CHI(ND)
+./plane/var_jrel_v4.f
+	1                  INIT,FREQ,LOG_NU,H_CHK_OPTION,					   |		1                  INIT,FREQ,dLOG_NU,H_CHK_OPTION,
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+            T1=CON_DELTA(ND)/LOG_NU/CHI(ND)							   |	            T1=CON_DELTA(ND)/dLOG_NU/CHI(ND)
+./plane/var_jrel_v5.f
+	1                  INIT,FREQ,LOG_NU,							   |		1                  INIT,FREQ,dLOG_NU,
+! We are integrating from blue to red. LOG_NU is define as vd / dv which is 			   |	! We are integrating from blue to red. dLOG_NU is define as vd / dv which is 
+	    DELTAH(I)=CON_DELTAH(I)/LOG_NU/(CHI_H(I)+CHI_H(I+1))				   |		    DELTAH(I)=CON_DELTAH(I)/dLOG_NU/(CHI_H(I)+CHI_H(I+1))
+	    DELTA(I)=CON_DELTA(I)/CHI_J(I)/LOG_NU						   |		    DELTA(I)=CON_DELTA(I)/CHI_J(I)/dLOG_NU
+	  DELTA(1)=CON_DELTA(1)/CHI_H(1)/LOG_NU							   |		  DELTA(1)=CON_DELTA(1)/CHI_H(1)/dLOG_NU
+            T1=CON_DELTA(ND)/LOG_NU/CHI(ND)							   |	            T1=CON_DELTA(ND)/dLOG_NU/CHI(ND)
+./plane/var_mom_j_cmf_v10.f
+	1               INIT,LOG_NU,DIF,dTdR,DBB,dDBBdT,IC,					   |		1               INIT,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
+	1         /LOG_NU/( CHI(I)+CHI(I+1) )							   |		1         /dLOG_NU/( CHI(I)+CHI(I+1) )
+	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/LOG_NU						   |		    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/dLOG_NU
+./plane/var_mom_j_cmf_v11.f
+	1               INIT,LOG_NU,								   |		1               INIT,dLOG_NU,
+	1         /LOG_NU/( CHI(I)+CHI(I+1) )							   |		1         /dLOG_NU/( CHI(I)+CHI(I+1) )
+	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/LOG_NU						   |		    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/dLOG_NU
+./plane/var_mom_j_cmf_v12.f
+	1               INIT,LOG_NU,								   |		1               INIT,dLOG_NU,
+	1         /LOG_NU/( CHI(I)+CHI(I+1) )							   |		1         /dLOG_NU/( CHI(I)+CHI(I+1) )
+	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/LOG_NU						   |		    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/dLOG_NU
+./plane/var_mom_j_cmf_v9.f
+	1               INIT,LOG_NU,DIF,dTdR,DBB,dDBBdT,IC,					   |		1               INIT,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
+	1         /LOG_NU/( CHI(I)+CHI(I+1) )							   |		1         /dLOG_NU/( CHI(I)+CHI(I+1) )
+	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/LOG_NU						   |		    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/dLOG_NU
+./plane/var_mom_j_ddt_v1.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  DO_TIME_VAR,RELAX_PARAM,INIT,FREQ,LOG_NU,				   |		1                  DO_TIME_VAR,RELAX_PARAM,INIT,FREQ,dLOG_NU,
+!												   |	!
+	    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/LOG_NU/( CHI(I)+CHI(I+1) )/C_KMS		   |		    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/dLOG_NU/( CHI(I)+CHI(I+1) )/C_KMS
+	    GAM(I)=V(I)/R(I)/CHI(I)/LOG_NU/C_KMS						   |		    GAM(I)=V(I)/R(I)/CHI(I)/dLOG_NU/C_KMS
+	1        V(I)*(XM(I)-JNUM1(I))/R(I)/LOG_NU/C_KMS,					   |		1        V(I)*(XM(I)-JNUM1(I))/R(I)/dLOG_NU/C_KMS,
+	1        V(I)*(XM(I)-JNUM1(I))/R(I)/LOG_NU/C_KMS/CHI(I),				   |		1        V(I)*(XM(I)-JNUM1(I))/R(I)/dLOG_NU/C_KMS/CHI(I),
+./plane/var_mom_j_ddt_v2.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  DO_TIME_VAR,RELAX_PARAM,INIT,FREQ,LOG_NU,				   |		1                  DO_TIME_VAR,RELAX_PARAM,INIT,FREQ,dLOG_NU,
+!												   |	!
+	    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/LOG_NU/( CHI(I)+CHI(I+1) )/C_KMS		   |		    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/dLOG_NU/( CHI(I)+CHI(I+1) )/C_KMS
+	    GAM(I)=V(I)/R(I)/CHI(I)/LOG_NU/C_KMS						   |		    GAM(I)=V(I)/R(I)/CHI(I)/dLOG_NU/C_KMS
+./plane/var_mom_j_ddt_v3.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,INIT,FREQ,LOG_NU,			   |		1                  DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,INIT,FREQ,dLOG_NU,
+!												   |	!
+	    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/LOG_NU/( CHI(I)+CHI(I+1) )/C_KMS		   |		    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/dLOG_NU/( CHI(I)+CHI(I+1) )/C_KMS
+	    GAM(I)=V(I)/R(I)/CHI(I)/LOG_NU/C_KMS						   |		    GAM(I)=V(I)/R(I)/CHI(I)/dLOG_NU/C_KMS
+./plane/var_mom_j_ddt_v4.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,INIT,FREQ,LOG_NU,			   |		1                  DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,INIT,FREQ,dLOG_NU,
+!												   |	!
+	    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/LOG_NU/( CHI(I)+CHI(I+1) )/C_KMS		   |		    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/dLOG_NU/( CHI(I)+CHI(I+1) )/C_KMS
+	    GAM(I)=V(I)/R(I)/CHI(I)/LOG_NU/C_KMS						   |		    GAM(I)=V(I)/R(I)/CHI(I)/dLOG_NU/C_KMS
+./plane/var_mom_j_ddt_v5.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,INIT,FREQ,LOG_NU,			   |		1                  DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,INIT,FREQ,dLOG_NU,
+!												   |	!
+	    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/LOG_NU/( CHI(I)+CHI(I+1) )/C_KMS		   |		    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/dLOG_NU/( CHI(I)+CHI(I+1) )/C_KMS
+	    GAM(I)=V(I)/R(I)/CHI(I)/LOG_NU/C_KMS						   |		    GAM(I)=V(I)/R(I)/CHI(I)/dLOG_NU/C_KMS
+./plane/var_mom_j_ddt_v6.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+	1                  DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,INIT,FREQ,LOG_NU,			   |		1                  DO_TIME_VAR,USE_DR4JDT,RELAX_PARAM,INIT,FREQ,dLOG_NU,
+!												   |	!
+	    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/LOG_NU/( CHI(I)+CHI(I+1) )/C_KMS		   |		    GAMH(I)=2.0D0*(V(I)+V(I+1))/(R(I)+R(I+1))/dLOG_NU/( CHI(I)+CHI(I+1) )/C_KMS
+	    GAM(I)=V(I)/R(I)/CHI(I)/LOG_NU/C_KMS						   |		    GAM(I)=V(I)/R(I)/CHI(I)/dLOG_NU/C_KMS
+./plane/var_mom_jext_cmf_v3.f
+	1                  INIT,LOG_NU,DIF,dTdR,DBB,dDBBdT,IC,					   |		1                  INIT,dLOG_NU,DIF,dTdR,DBB,dDBBdT,IC,
+	1         /LOG_NU/( CHI(I)+CHI(I+1) )							   |		1         /dLOG_NU/( CHI(I)+CHI(I+1) )
+	    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/LOG_NU						   |		    GAM(I)=3.33564D-06*V(I)/R(I)/CHI(I)/dLOG_NU
+./plane/var_mom_pp_v1.f
+!												   |	!
+./plane/velocity_law.f
+ 
+Comparing files in ./spec_plt with those in  /home/hillier/wnode04/cmf_testing_real8//spec_plt
+ 
+./spec_plt/Makefile
+#       $(EXE_DIR)plt_ip.exe\									   <
+												   >	       $(EXE_DIR)plt_ip.exe\
+												   >	       $(EXE_DIR)plt_spec.exe\
+												   <
+#       $(EXE_DIR)plt_spec.exe\									   <
+./spec_plt/get_indx_dp.f
+./spec_plt/new_plt_rj.f
+C												   |	C
+	  YV(1:NCF)=LOG10(J_ES(1:NCF))								   |		  YV(1:NCF)=DLOG10(J_ES(1:NCF))
+	  YV(1:NCF)=LOG10( RJ_ES_RD(K,1:NCF) )							   |		  YV(1:NCF)=DLOG10( RJ_ES_RD(K,1:NCF) )
+./spec_plt/plt_delta.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+./spec_plt/plt_dfr.f
+!												   |	!
+./spec_plt/plt_ip.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+./spec_plt/plt_jh_cur.f
+!												   |	!
+              YV(I)=RVAL*RVAL*TWOHCSQ*(ZM(1)%NU(I)**3)*EXP(-T3)/(1.0D0-EXP(-T3))		   |	              YV(I)=RVAL*RVAL*TWOHCSQ*(ZM(1)%NU(I)**3)*DEXP(-T3)/(1.0D0-DEXP(-T3))
+              YV(I)=RVAL*RVAL*TWOHCSQ*(ZM(1)%NU(I)**3)/(EXP(T3)-1.0D0)				   |	              YV(I)=RVAL*RVAL*TWOHCSQ*(ZM(1)%NU(I)**3)/(DEXP(T3)-1.0D0)
+	    XV(1:ND)=LOG10(R(1:ND)/T2)								   |		    XV(1:ND)=DLOG10(R(1:ND)/T2)
+./spec_plt/plt_jh.f
+!												   |	!
+              YV(I)=TWOHCSQ*(ZM(1)%NU(I)**3)*EXP(-T3)/(1.0D0-EXP(-T3))				   |	              YV(I)=TWOHCSQ*(ZM(1)%NU(I)**3)*DEXP(-T3)/(1.0D0-DEXP(-T3))
+              YV(I)=TWOHCSQ*(ZM(1)%NU(I)**3)/(EXP(T3)-1.0D0)					   |	              YV(I)=TWOHCSQ*(ZM(1)%NU(I)**3)/(DEXP(T3)-1.0D0)
+	      YV(I)=YV(I)*EXP(-T3)/(1.0D0-EXP(-T3))/(1.0D0-EXP(-T3))				   |		      YV(I)=YV(I)*DEXP(-T3)/(1.0D0-DEXP(-T3))/(1.0D0-DEXP(-T3))
+	      YV(I)=YV(I)*EXP(T3)/(EXP(T3)-1.0D0)/(EXP(T3)-1.0D0)				   |		      YV(I)=YV(I)*DEXP(T3)/(DEXP(T3)-1.0D0)/(DEXP(T3)-1.0D0)
+./spec_plt/plt_many_mod.f
+./spec_plt/plt_many_sn_spec.f
+	WRITE(6,'(A,T20,A,4X,A,3X,A)')'Model','Age(days)','logt','Vinf(kms)'			   |		WRITE(6,'(A,T20,A,4X,A,3X,A)')'Model','Age(days)','dlogt','Vinf(kms)'
+./spec_plt/plt_phot_raw.f
+!												   |	!
+./spec_plt/plt_rj.f
+	  YV(I)=LOG10(D(I))									   |		  YV(I)=DLOG10(D(I))
+./spec_plt/plt_scr.f
+												   >	! Altered 24-Sep-2023: Added SFDG option (needs work) - 7sep23.
+												   >	!                      Added DREP option -- allows one depth to replace other depths.
+												   >	!                      Added (modified) DNRG option -- designed to allow testing of subroutine.
+												   >	!                      Added CNRG option -- designed to allow modification of R grid using curso
+!												   |	!
+C												   |	C
+												   >		REAL*8, ALLOCATABLE :: TA(:)			!
+												   >		REAL*8, ALLOCATABLE :: TB(:)			!
+												   >	!
+												   >		INTEGER, PARAMETER :: NLEV_MAX=10
+												   >		INTEGER LEVELS(NLEV_MAX)
+												   >		LOGICAL TMP_LOG
+												   >		ALLOCATE (TA(J))
+												   >		ALLOCATE (TB(J))
+												   >		ELSE IF(PLT_OPT(1:4) .EQ. 'SFDG')THEN
+												   >		  FDG_COUNTER=FDG_COUNTER+1
+												   >		  IT=NIT; ID=ND; IVAR=NT
+												   >		  CALL GEN_IN(IT,'Iteration # (zero to exit) - default is last iteration',
+												   >		1                   LOW_LIM=IZERO,UP_LIM=NIT)
+												   >		  DO K=1,16
+												   >		    DO J=1,26
+												   >		       POPS(27,K,IT)=POPS(27,K,IT)+POPS(J,K,IT)
+												   >		       POPS(J,K,IT)=POPS(J,K,IT)/100.0D0
+												   >		    END DO
+												   >		  END DO
+												   >		  IREC=NIT			!IREC is updated on write
+												   >	          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
+												   >		  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
+												   >		1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+												   >		1              NT,ND,LUSCR,NEWMOD)
+												   >	!
+												   >		ELSE IF(PLT_OPT(1:4) .EQ. 'DREP')THEN
+												   >		  FDG_COUNTER=FDG_COUNTER+1
+												   >		  IT=NIT; ID=ND; IVAR=NT
+												   >		  CALL GEN_IN(IT,'Iteration # (zero to exit) - default is last iteration',
+												   >		1                   LOW_LIM=IZERO,UP_LIM=NIT)
+												   >		  CALL GEN_IN(ID1,'Depth to be used for replacement')
+												   >		  CALL GEN_IN(ID2,'ID2: Depths ID2 to ID1 pm 1 to be replaced')
+												   >		  I=1
+												   >		  IF(ID2 .LT. ID1)I=-1
+												   >		  DO K=ID1+I,ID2,I
+												   >		    DO J=1,NT
+												   >		       POPS(J,K,IT)=POPS(J,ID1,IT)
+												   >		    END DO
+												   >		  END DO
+												   >		  IREC=NIT			!IREC is updated on write
+												   >	          IF(FDG_COUNTER .EQ. 1)NITSF=NITSF+1
+												   >		  CALL SCR_RITE_V2(R,V,SIGMA,POPS(1,1,IT),IREC,NITSF,
+												   >		1              RITE_N_TIMES,LST_NG,WRITE_RVSIG,
+												   >		1              NT,ND,LUSCR,NEWMOD)
+												   >	!
+	        T2=LOG10(POPS(IVAR,ID,IT)/POPS(IVAR,ID+1,IT))					   |		        T2=DLOG10(POPS(IVAR,ID,IT)/POPS(IVAR,ID+1,IT))
+	        T2=LOG10(POPS(IVAR,ID,IT)/POPS(IVAR,ID+1,IT))					   |		        T2=DLOG10(POPS(IVAR,ID,IT)/POPS(IVAR,ID+1,IT))
+	          T3=10**(LOG10(POPS(IVAR,ID+1,IT))+T1)						   |		          T3=10**(DLOG10(POPS(IVAR,ID+1,IT))+T1)
+												   >	!
+												   >		ELSE IF(PLT_OPT(1:4) .EQ. 'DNRG')THEN
+												   >		  LEVELS=0; T1=1.2D0; T2=0.0D0; T3=0.0D0
+												   >		  CALL GEN_IN(LEVELS,I,NLEV_MAX,'Levels for defining new r grid')
+												   >		  CALL GEN_IN(T1,'Max ratio of level populations between cons. grid points')
+												   >		  CALL DEF_NEW_RG_V1(Y,R,POPS(1,1,NIT),LEVELS,T1,T2,T3,TMP_LOG,I,NT,ND)
+												   >		  IF(TMP_LOG)THEN
+												   >		    DO J=1,I
+												   >		      TA(1:ND)=LOG10(POPS(LEVELS(J),1:ND,NIT))
+												   >		      WRITE(STRING,*)LEVELS(J); STRING='OLD '//ADJUSTL(STRING)
+												   >		      CALL DP_CURVE_LAB(ND,R,TA,STRING)
+												   >		      CALL MON_INTERP(TB,ND,IONE,Y,ND,TA,ND,R,ND)
+												   >		      WRITE(STRING,*)LEVELS(J); STRING='NEW '//ADJUSTL(STRING)
+												   >		      CALL DP_CURVE_LAB(ND,Y,TB,STRING)
+												   >		    END DO
+												   >		    CALL GRAMON_PGPLOT(' ',' ',' ',' ')
+												   >	!
+												   >		    DO I=2,ND-1
+												   >		      TA(I)=(Y(I-1)-Y(I))/(Y(I)-Y(I+1))
+												   >		    END DO
+												   >		    CALL DP_CURVE(ND-2,Y(2:ND-1),TA(2:ND-1))
+												   >		    CALL GRAMON_PGPLOT('R','dR/dR',' ',' ')
+												   >		  ELSE
+												   >		    WRITE(6,*)'Construction of a new R Grid failed'
+												   >		    WRITE(6,*)'Iteration failed to converge to required number of grid points'
+												   >		    WRITE(6,'(A)',ADVANCE='NO')' Enter any character to continue: '; READ(5,*)TMP_STR
+												   >		  END IF
+												   >		  GOTO 200
+												   >	!
+												   >		ELSE IF(PLT_OPT(1:4) .EQ. 'CNRG')THEN
+												   >	!
+												   >		   WRITE(6,*)RED_PEN
+												   >		   WRITE(6,*)'This option assumes you have created plots using the PR option'
+												   >		   WRITE(6,*)'It also assumes that you used the NOI option so that the plots were not in
+												   >		   WRITE(6,*)DEF_PEN
+												   >	! 
+												   >		   I=MIN(3*ND,SIZE(TA))
+												   >		   CALL CHANGE_XAXIS_GRIDDING(TA,K,I)
+												   >	!
+												   >	! For SN models, we sometimes plot in uts of 10^14 cm.
+												   >	! We also ensure boundary vales are absolutely correct.
+												   >	!
+												   >		   IF(R(1) .GT. 1.0D+04)TA(1:K)=1.0D+04*TA(1:K)
+												   >		   TA(1)=R(1); TA(K)=R(ND)
+												   >		   OPEN(UNIT=LU_OUT,FILE='NEW_RDINR',STATUS='UNKNOWN',ACTION='WRITE')
+												   >		   WRITE(LU_OUT,'(/,2X,A,10X,A,/)')'24-FEB-2004','!Format date'
+												   >		   WRITE(LU_OUT,'(2ES14.5,3X,I5,3X,I5,/)')1.0E+05,1.0D0,1,K
+												   >		   DO I=1,K
+												   >		     WRITE(LU_OUT,'(ES20.12,6ES14.7,3X,I5)')TA(I),(1.0D0, J=1,6),I
+												   >		     WRITE(LU_OUT,'(F12.4,/)')1.0D0
+												   >		   END DO
+												   >		   CLOSE(LU_OUT)
+												   >		   GOTO 200
+./spec_plt/plt_spec.f
+C												   |	C
+												   >		LOGICAL FIRST
+	LOGICAL WR_PLT,OVER									   |		LOGICAL WR_PLT,OVER,ABS_VALUE
+!												   |	!
+												   >	! If logy is set, the logarithm of the y data is taken.
+												   >	!
+												   >		  CALL USR_HIDDEN(ABS_VALUE,'ABSR','F','Use absolute values when taking log')
+												   >		    IF(LOG_Y .AND. ABS_VALUE)THEN
+												   >		      OBSF_CONT(1:NCF_CONT)=LOG10(ABS(OBSF_CONT(1:NCF_CONT)))
+												   >		    ELSE IF(LOG_Y)THEN 
+												   >		      FIRST=.TRUE.
+												   >		      DO I=1,NCF_CONT
+												   >		        IF(OBSF_CONT(I) .GT. 0)THEN 
+												   >		          OBSF_CONT(I)=LOG10(OBSF_CONT(I)) 
+												   >		        ELSE
+												   >		          OBSF_CONT(I)=-200
+												   >		          IF(FIRST)THEN
+												   >		             FIRST=.FALSE.
+												   >		             WRITE(6,*)'Warning -- zero or neagtive values encountered'
+												   >		 	     WRITE(6,*)'Log set to -200'
+												   >		          END IF 
+												   >		        END IF
+												   >		      END DO
+												   >		    END IF
+	    N_PHOT=47.2566+LOG10(N_PHOT) !LOG10(4pi*(1kpc)**2*(1D-23)/h)			   |		    N_PHOT=47.2566+DLOG10(N_PHOT) !DLOG10(4pi*(1kpc)**2*(1D-23)/h)
+	    YV(ML)=47.2566D0+LOG10(YV(ML)) 		!LOG10(4pi*(1kpc)**2*(1E-23)/h)		   |		    YV(ML)=47.2566D0+LOG10(YV(ML)) 		!DLOG10(4pi*(1kpc)**2*(1E-23)/h)
+!	        T1=LOG10(OBSF(ML-1))-LOG10(NU(ML-1)*FILTLAM(L)/0.2998)				   |	!	        T1=DLOG10(OBSF(ML-1))-DLOG10(NU(ML-1)*FILTLAM(L)/0.2998)
+!	1       *(LOG10(OBSF(ML)/OBSF(ML-1))/(LOG10(NU(ML)/NU(ML-1))))				   |	!	1       *(DLOG10(OBSF(ML)/OBSF(ML-1))/(DLOG10(NU(ML)/NU(ML-1))))
+!	        T1=5.0*LOG10(DIST)-2.5*T1+2.5*LOG10(FILTZP(L))					   |	!	        T1=5.0*DLOG10(DIST)-2.5*T1+2.5*DLOG10(FILTZP(L))
+!	        T1=LOG10(OBSF(ML-1))-LOG10(NU(ML-1)*FLAM(L)/0.2998)				   |	!	        T1=DLOG10(OBSF(ML-1))-DLOG10(NU(ML-1)*FLAM(L)/0.2998)
+!	1       *(LOG10(OBSF(ML)/OBSF(ML-1))/(LOG10(NU(ML)/NU(ML-1))))				   |	!	1       *(DLOG10(OBSF(ML)/OBSF(ML-1))/(DLOG10(NU(ML)/NU(ML-1))))
+!	        T1=5.0*LOG10(DIST)-2.5*T1+2.5*LOG10(ZERO_POINT)					   |	!	        T1=5.0*DLOG10(DIST)-2.5*T1+2.5*DLOG10(ZERO_POINT)
+	         YV(I)=TWOHCSQ*(NU(I)**3)*EXP(-T3)/(1.0D0-EXP(-T3))				   |		         YV(I)=TWOHCSQ*(NU(I)**3)*DEXP(-T3)/(1.0D0-DEXP(-T3))
+	         YV(I)=TWOHCSQ*(NU(I)**3)/(EXP(T3)-1.0D0)					   |		         YV(I)=TWOHCSQ*(NU(I)**3)/(DEXP(T3)-1.0D0)
+	    DNU=LOG10(NU(NCF)/NU(1))/(NBB-1)							   |		    DNU=DLOG10(NU(NCF)/NU(1))/(NBB-1)
+	         YV(I)=TWOHCSQ*(T1**3)*EXP(-T3)/(1.0D0-EXP(-T3))				   |		         YV(I)=TWOHCSQ*(T1**3)*DEXP(-T3)/(1.0D0-DEXP(-T3))
+	         YV(I)=TWOHCSQ*(T1**3)/(EXP(T3)-1.0D0)						   |		         YV(I)=TWOHCSQ*(T1**3)/(DEXP(T3)-1.0D0)
+	      BB_FLUX=TWOHCSQ*(NORM_FREQ**3)/(EXP(HDKT*NORM_FREQ/TEMP)-1.0D0)			   |		      BB_FLUX=TWOHCSQ*(NORM_FREQ**3)/(DEXP(HDKT*NORM_FREQ/TEMP)-1.0D0)
+./spec_plt/plt_steq.f
+./spec_plt/scr_plt.f
+./spec_plt/simp_ip.f
+./spec_plt/fint.inc
+ 
+Comparing files in ./spec_plt/subs with those in  /home/hillier/wnode04/cmf_testing_real8//spec_plt/subs
+ 
+./spec_plt/subs/Makefile
+##         $(LIB)(num_rec.o)\									   <
+#												   <
+												   >	         $(LIB)(num_rec.o)\
+	$(F90) -c $(FG)  $<									   |		$(F90) -c $(FD)  $<
+	$(F90) -c $(FG)  $<									   |		$(F90) -c $(FD)  $<
+./spec_plt/subs/adjust_jes.f
+./spec_plt/subs/adjust_jes_v2.f
+./spec_plt/subs/clip.f
+./spec_plt/subs/cnvlv_es_one_par_v2.f
+./spec_plt/subs/cnvlv_es_two_par_v2.f
+./spec_plt/subs/cnvrt.f
+./spec_plt/subs/cnvrt_j.f
+./spec_plt/subs/cnvrt_j_v2.f
+./spec_plt/subs/comp_ip_ew.f
+./spec_plt/subs/compute_tau_radial.f
+!												   |	!
+./spec_plt/subs/convolve.f
+	 inst_res = log((two*resolution+one)/(two*resolution-one))				   |		 inst_res = dlog((two*resolution+one)/(two*resolution-one))
+./spec_plt/subs/create_gauss.f
+./spec_plt/subs/determ_reddening.f
+./spec_plt/subs/divide_by_cont.f
+./spec_plt/subs/do_int_rec_ap.f
+!												   |	!
+!												   |	!
+./spec_plt/subs/dp_cnvrt.f
+./spec_plt/subs/dp_cnvrt_j.f
+./spec_plt/subs/dp_cnvrt_j_v2.f
+./spec_plt/subs/dp_rd_obs_data_v2.f
+./spec_plt/subs/filt_pass_band.f
+./spec_plt/subs/filt_pass_band_v2.f
+./spec_plt/subs/fix_pop_oscillations.f
+./spec_plt/subs/get_mag.f
+./spec_plt/subs/get_nd_nt_nit.f
+./spec_plt/subs/get_prof_params.f
+./spec_plt/subs/get_prof_params_v2.f
+./spec_plt/subs/h2abs.f
+./spec_plt/subs/hiabs.f
+C												   |	C
+C												   |	C
+./spec_plt/subs/int_rec_ap.f
+./spec_plt/subs/is_line_abs.f
+C												   |	C
+C												   |	C
+./spec_plt/subs/is_line_abs_v2.f
+C												   |	C
+C												   |	C
+./spec_plt/subs/num_rec.f
+          IF (CABS(ANS(I)) .EQ. zero)THEN							   |	          IF (CDABS(ANS(I)) .EQ. zero)THEN
+      WPR=-2.0D0*SIN(HALF*THETA)**2d0								   |	      WPR=-2.0D0*DSIN(0.5D0*THETA)**2d0
+      WPI=SIN(THETA)										   |	      WPI=DSIN(THETA)
+        WPR=-2.D0*SIN(HALF*THETA)**2d0								   |	        WPR=-2.D0*DSIN(0.5D0*THETA)**2d0
+        WPI=SIN(THETA)										   |	        WPI=DSIN(THETA)
+./spec_plt/subs/plt_jh_opt_desc.f
+./spec_plt/subs/poidev.f
+./spec_plt/subs/ran2.f
+./spec_plt/subs/raw_subphot.f
+!												   |	!
+	    X=LOG10(X)										   |		    X=DLOG10(X)
+./spec_plt/subs/raw_subphot_v2.f
+!												   |	!
+	    X=LOG10(X)										   |		    X=DLOG10(X)
+./spec_plt/subs/rd_ew.f
+./spec_plt/subs/rd_ion_locations.f
+./spec_plt/subs/rd_ion_locations_v2.f
+./spec_plt/subs/rd_mod.f
+./spec_plt/subs/rd_monte_line.f
+./spec_plt/subs/rd_obs_data_v2.f
+./spec_plt/subs/rd_row_data.f
+./spec_plt/subs/rd_sing_pol_i.f
+./spec_plt/subs/rd_xy_data.f
+												   >	! Altered: 24-Sep-2023 _ Added option to set data index as x variable (18-Sep0-2023)
+	      XVEC(NX+1)=TEMP_VAR(COLUMN(1))							   |		      IF(COLUMN(1) .EQ. 0)THEN
+												   >		        XVEC(NX+1)=NX+1
+												   >		      ELSE
+												   >		        XVEC(NX+1)=TEMP_VAR(COLUMN(1))
+												   >		      END IF
+./spec_plt/subs/rd_xy_data_usr.f
+												   >	! Altered: 24-Sep-2023 _ Added option to set data index as x variable (18-Sep0-2023)
+	      XVEC(NX+1)=TEMP_VAR(COLUMN(1))							   |		      IF(COLUMN(1) .EQ. 0)THEN
+												   >		        XVEC(NX+1)=NX+1
+												   >		      ELSE
+												   >		        XVEC(NX+1)=TEMP_VAR(COLUMN(1))
+												   >		      END IF
+./spec_plt/subs/read_corrections.f
+./spec_plt/subs/recom_opac.f
+./spec_plt/subs/recom_opac_v2.f
+./spec_plt/subs/set_ip_xspat_unit.f
+./spec_plt/subs/uvabs.f
+!												   |	!
+	  wave(i) = log(wave(i))								   |		  wave(i) = dlog(wave(i))
+	  wave(i) = exp(wave(i))								   |		  wave(i) = dexp(wave(i))
+./spec_plt/subs/uvabs_v2.f
+!												   |	!
+	  wave(i) = log(wave(i))								   |		  wave(i) = dlog(wave(i))
+	  wave(i) = exp(wave(i))								   |		  wave(i) = dexp(wave(i))
+./spec_plt/subs/constants.inc
+./spec_plt/subs/parameters.inc
+ 
+Comparing files in ./subs with those in  /home/hillier/wnode04/cmf_testing_real8//subs
+ 
+./subs/Makefile
+./subs/add_par_to_full.f
+./subs/adjust_line_freq.f
+./subs/adjust_line_freq_v2.f
+./subs/ave_flips.f
+./subs/baion_update_v4.f
+C Altered   24-May-1996  -- Cleaning (IONE, RMAX_FAC etc, no ABS)				   |	C Altered   24-May-1996  -- Cleaning (IONE, RMAX_FAC etc, no DABS)
+./subs/ba_replace.f
+./subs/ba_update_v4.f
+C                         ABS changed to ABS.							   |	C                         DABS changed to ABS.
+C												   |	C
+./subs/blkband.f
+./subs/check_line_overlap.f
+./subs/check_spec_conv.f
+./subs/chk_col_name.f
+./subs/chk_eq_num.f
+./subs/cmf_form_sol.f
+C												   |	C
+C												   |	C
+C												   |	C
+C												   |	C
+C												   |	C
+./subs/cmf_form_sol_v2.f
+C												   |	C
+C												   |	C
+C												   |	C
+C												   |	C
+./subs/cmf_form_sol_v3.f
+C												   |	C
+C												   |	C
+C												   |	C
+C												   |	C
+./subs/cnvt_fr_dc.f
+./subs/cnvt_fr_dc_v2.f
+./subs/colcool_sl_v3.f
+												   >	C Altered 24-Sep-2023 : Adjusted constants for consistency.
+	EXTERNAL ERROR_LU									   |		EXTERNAL ERROR_LU, PLANCKS_CONSTANT
+												   >	        REAL*8 PLANCKS_CONSTANT
+C												   |	C
+C												   |	C
+	H=6.6261965D-12		!H*1.0E+15  (1.0E+15 due to times frequency)			   |		H=PLANCKS_CONSTANT()*1.0D+15		!H*1.0E+15  (1.0E+15 due to times frequency)
+./subs/comp_j_conv.f
+C												   |	C
+C												   |	C
+	  A(:)=LOG(J_ES(:))									   |		  A(:)=DLOG(J_ES(:))
+./subs/comp_j_conv_v2.f
+C												   |	C
+C												   |	C
+	    A(:)=LOG(J_ES(:))									   |		    A(:)=DLOG(J_ES(:))
+./subs/comp_lev_dis.f
+./subs/comp_obs.f
+./subs/comp_obs_v2.f
+./subs/comp_var_jrec.f
+./subs/comp_var_jrec_v2.f
+	WRITE(187,'(10ES18.8)')NU,FQW,HDKT,TWOHCSQ,RJ(5),EMHNUKT(5)				   <
+./subs/det_main_cont_freq.f
+./subs/dop_pro.f
+C Altered 24-May-1996 : EXP removed								   |	C Altered 24-May-1996 : DEXP removed
+./subs/do_sl_ls_split.f
+./subs/dp_zero.f
+./subs/dspheredchi.f
+./subs/edd_j_var_v4.f
+./subs/edd_j_var_v5.f
+./subs/edd_j_var_v6.f
+./subs/eddline_var.f
+./subs/elec_prep.f
+./subs/equal.f
+./subs/esopac.f
+./subs/estau.f
+./subs/estau_v2.f
+./subs/eval_adiabatic.f
+./subs/eval_ed.f
+./subs/evalse_qwvj_v5.f
+./subs/evalse_x_qwvj_v3.f
+C												   |	C
+./subs/ew_format.f
+./subs/ew_format_v2.f
+./subs/ew_format_v3.f
+./subs/ex_e1x_fun.f
+./subs/exponx.f
+./subs/extend3opac.f
+./subs/extend_opac.f
+./subs/extend_vtsigma.f
+./subs/fdg_f_to_s_ns_v1.f
+./subs/fg_comp.f
+	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)				   |		      DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
+	      DBC=DBB*DNU*SQRT(R(ND)*R(ND)-P(LS)*P(LS))						   |		      DBC=DBB*DNU*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))
+./subs/fg_comp_tst.f
+	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)				   |		      DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
+	      DBC=DBB*DNU*SQRT(R(ND)*R(ND)-P(LS)*P(LS))						   |		      DBC=DBB*DNU*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))
+./subs/fg_j_cmf_v10.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+./subs/fg_j_cmf_v7.f
+C												   |	C
+C												   |	C
+C												   |	C
+C												   |	C
+./subs/fg_j_cmf_v9.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+./subs/fix_dchi.f
+./subs/fixpop.f
+./subs/formsol.f
+	      DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)				   |		      DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
+	      DBC=DBB*DNU*SQRT(R(ND)*R(ND)-P(LS)*P(LS))						   |		      DBC=DBB*DNU*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))
+./subs/fqcomp_ibc.f
+	    DBC=DBB*SQRT( (R(ND)-P(LS))*(R(ND)+P(LS)) )/R(ND)/CHI(ND)				   |		    DBC=DBB*DSQRT( (R(ND)-P(LS))*(R(ND)+P(LS)) )/R(ND)/CHI(ND)
+	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )						   |		      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
+./subs/fqcomp_ibc_v2.f
+	    DBC=DBB*SQRT( (R(ND)-P(LS))*(R(ND)+P(LS)) )/R(ND)/CHI(ND)				   |		    DBC=DBB*DSQRT( (R(ND)-P(LS))*(R(ND)+P(LS)) )/R(ND)/CHI(ND)
+	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )						   |		      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
+./subs/fqnew.f
+./subs/full_to_sup.f
+./subs/gamma.f
+./subs/gausel.f
+./subs/gbf.f
+./subs/genaccel.f
+./subs/genangqw.f
+./subs/genangqw_v2.f
+./subs/gen_omega_rd_v2.f
+./subs/genopaeta_v6.f
+./subs/genosc_v5.f
+./subs/genosc_v6.f
+./subs/get_col_ref.f
+./subs/getelec_v2.f
+./subs/gff.f
+C Altered 21-Jun-1998 : E0_DP's inserted.							   |	C Altered 21-Jun-1998 : D0's inserted.
+	INTEGER, PARAMETER :: DP=SELECTED_REAL_KIND(15,3000)					   |		REAL*8, SAVE :: A(12,11)
+	1/ 5.53E0_DP,4.91E0_DP,4.29E0_DP,3.64E0_DP,3.00E0_DP,2.41E0_DP,1.87E0_DP,1.33E0_DP,0.90E   |		1/ 5.53D0,4.91D0,4.29D0,3.64D0,3.00D0,2.41D0,1.87D0,1.33D0,0.90D0,0.55D0,0.33D0,0.19D0
+	1, 5.49E0_DP,4.87E0_DP,4.25E0_DP,3.61E0_DP,2.98E0_DP,2.41E0_DP,1.89E0_DP,1.39E0_DP,0.95E   |		1, 5.49D0,4.87D0,4.25D0,3.61D0,2.98D0,2.41D0,1.89D0,1.39D0,0.95D0,0.59D0,0.36D0,0.21D0
+	1, 5.46E0_DP,4.84E0_DP,4.22E0_DP,3.59E0_DP,2.97E0_DP,2.41E0_DP,1.91E0_DP,1.44E0_DP,1.00E   |		1, 5.46D0,4.84D0,4.22D0,3.59D0,2.97D0,2.41D0,1.91D0,1.44D0,1.00D0,0.63D0,0.39D0,0.24D0
+	1, 5.43E0_DP,4.80E0_DP,4.18E0_DP,3.56E0_DP,2.95E0_DP,2.41E0_DP,1.93E0_DP,1.49E0_DP,1.08E   |		1, 5.43D0,4.80D0,4.18D0,3.56D0,2.95D0,2.41D0,1.93D0,1.49D0,1.08D0,0.72D0,0.46D0,0.28D0
+	1, 5.40E0_DP,4.77E0_DP,4.15E0_DP,3.54E0_DP,2.94E0_DP,2.41E0_DP,1.95E0_DP,1.55E0_DP,1.17E   |		1, 5.40D0,4.77D0,4.15D0,3.54D0,2.94D0,2.41D0,1.95D0,1.55D0,1.17D0,0.86D0,0.59D0,0.38D0
+	1, 5.25E0_DP,4.63E0_DP,4.02E0_DP,3.41E0_DP,2.81E0_DP,2.32E0_DP,1.90E0_DP,1.56E0_DP,1.30E   |		1, 5.25D0,4.63D0,4.02D0,3.41D0,2.81D0,2.32D0,1.90D0,1.56D0,1.30D0,1.01D0,0.76D0,0.53D0
+	1, 5.00E0_DP,4.40E0_DP,3.80E0_DP,3.22E0_DP,2.65E0_DP,2.19E0_DP,1.80E0_DP,1.51E0_DP,1.32E   |		1, 5.00D0,4.40D0,3.80D0,3.22D0,2.65D0,2.19D0,1.80D0,1.51D0,1.32D0,1.14D0,0.97D0,0.76D0
+	1, 4.69E0_DP,4.13E0_DP,3.57E0_DP,2.97E0_DP,2.44E0_DP,2.02E0_DP,1.68E0_DP,1.42E0_DP,1.30E   |		1, 4.69D0,4.13D0,3.57D0,2.97D0,2.44D0,2.02D0,1.68D0,1.42D0,1.30D0,1.18D0,1.09D0,0.96D0
+	1, 4.48E0_DP,3.87E0_DP,3.27E0_DP,2.70E0_DP,2.21E0_DP,1.84E0_DP,1.52E0_DP,1.33E0_DP,1.20E   |		1, 4.48D0,3.87D0,3.27D0,2.70D0,2.21D0,1.84D0,1.52D0,1.33D0,1.20D0,1.15D0,1.13D0,1.08D0
+	1, 4.16E0_DP,3.52E0_DP,2.98E0_DP,2.45E0_DP,2.01E0_DP,1.67E0_DP,1.41E0_DP,1.25E0_DP,1.15E   |		1, 4.16D0,3.52D0,2.98D0,2.45D0,2.01D0,1.67D0,1.41D0,1.25D0,1.15D0,1.11D0,1.10D0,1.09D0
+	1, 3.85E0_DP,3.27E0_DP,2.70E0_DP,2.20E0_DP,1.81E0_DP,1.50E0_DP,1.30E0_DP,1.17E0_DP,1.11E   |		1, 3.85D0,3.27D0,2.70D0,2.20D0,1.81D0,1.50D0,1.30D0,1.17D0,1.11D0,1.08D0,1.08D0,1.09D0/
+C												   |	C
+	U=4.7994E0_DP; U=LOG10(U*RNU/T)								   |		U=LOG10(4.7994D0*RNU/T)
+	U=MAX(-3.99999999E0_DP,U)								   |		U=MAX(-3.99999999D0,U)
+	U=MIN(1.499999E0_DP,U)									   |		U=MIN(1.499999D0,U)
+	GB=15.789E0_DP; GB=LOG10(GB*ZION*ZION/T)						   |		GB=LOG10(15.789D0*ZION*ZION/T)
+	GB=MAX(-2.99999999E0_DP,GB)								   |		GB=MAX(-2.99999999D0,GB)
+	GB=MIN(1.999999E0_DP,GB)								   |		GB=MIN(1.999999D0,GB)
+	IU=INT(U*2+9.0E0_DP)									   |		IU=INT(U*2+9.0D0)
+	IGB=INT(GB*2+7.0E0_DP)									   |		IGB=INT(GB*2+7.0D0)
+	DU=2*U+9.0E0_DP-IU									   |		DU=2*U+9.0D0-IU
+	DGB=2*GB+7.0E0_DP-IGB									   |		DGB=2*GB+7.0D0-IGB
+	GFF=((1.0E0_DP-DU)*A(IU,IGB)+DU*A(IU+1,IGB))*(1.0E0_DP-DGB)				   |		GFF=((1.0D0-DU)*A(IU,IGB)+DU*A(IU+1,IGB))*(1.0D0-DGB)
+	1 +((1.0E0_DP-DU)*A(IU,IGB+1)+DU*A(IU+1,IGB+1))*DGB					   |		1 +((1.0D0-DU)*A(IU,IGB+1)+DU*A(IU+1,IGB+1))*DGB
+	INTEGER, PARAMETER :: DP=SELECTED_REAL_KIND(15,3000)					   |		REAL*8, SAVE :: A(12,11)
+	1/ 5.53E0_DP,4.91E0_DP,4.29E0_DP,3.64E0_DP,3.00E0_DP,2.41E0_DP,1.87E0_DP,1.33E0_DP,0.90E   |		1/ 5.53D0,4.91D0,4.29D0,3.64D0,3.00D0,2.41D0,1.87D0,1.33D0,0.90D0,0.55D0,0.33D0,0.19D0
+	1, 5.49E0_DP,4.87E0_DP,4.25E0_DP,3.61E0_DP,2.98E0_DP,2.41E0_DP,1.89E0_DP,1.39E0_DP,0.95E   |		1, 5.49D0,4.87D0,4.25D0,3.61D0,2.98D0,2.41D0,1.89D0,1.39D0,0.95D0,0.59D0,0.36D0,0.21D0
+	1, 5.46E0_DP,4.84E0_DP,4.22E0_DP,3.59E0_DP,2.97E0_DP,2.41E0_DP,1.91E0_DP,1.44E0_DP,1.00E   |		1, 5.46D0,4.84D0,4.22D0,3.59D0,2.97D0,2.41D0,1.91D0,1.44D0,1.00D0,0.63D0,0.39D0,0.24D0
+	1, 5.43E0_DP,4.80E0_DP,4.18E0_DP,3.56E0_DP,2.95E0_DP,2.41E0_DP,1.93E0_DP,1.49E0_DP,1.08E   |		1, 5.43D0,4.80D0,4.18D0,3.56D0,2.95D0,2.41D0,1.93D0,1.49D0,1.08D0,0.72D0,0.46D0,0.28D0
+	1, 5.40E0_DP,4.77E0_DP,4.15E0_DP,3.54E0_DP,2.94E0_DP,2.41E0_DP,1.95E0_DP,1.55E0_DP,1.17E   |		1, 5.40D0,4.77D0,4.15D0,3.54D0,2.94D0,2.41D0,1.95D0,1.55D0,1.17D0,0.86D0,0.59D0,0.38D0
+	1, 5.25E0_DP,4.63E0_DP,4.02E0_DP,3.41E0_DP,2.81E0_DP,2.32E0_DP,1.90E0_DP,1.56E0_DP,1.30E   |		1, 5.25D0,4.63D0,4.02D0,3.41D0,2.81D0,2.32D0,1.90D0,1.56D0,1.30D0,1.01D0,0.76D0,0.53D0
+	1, 5.00E0_DP,4.40E0_DP,3.80E0_DP,3.22E0_DP,2.65E0_DP,2.19E0_DP,1.80E0_DP,1.51E0_DP,1.32E   |		1, 5.00D0,4.40D0,3.80D0,3.22D0,2.65D0,2.19D0,1.80D0,1.51D0,1.32D0,1.14D0,0.97D0,0.76D0
+	1, 4.69E0_DP,4.13E0_DP,3.57E0_DP,2.97E0_DP,2.44E0_DP,2.02E0_DP,1.68E0_DP,1.42E0_DP,1.30E   |		1, 4.69D0,4.13D0,3.57D0,2.97D0,2.44D0,2.02D0,1.68D0,1.42D0,1.30D0,1.18D0,1.09D0,0.96D0
+	1, 4.48E0_DP,3.87E0_DP,3.27E0_DP,2.70E0_DP,2.21E0_DP,1.84E0_DP,1.52E0_DP,1.33E0_DP,1.20E   |		1, 4.48D0,3.87D0,3.27D0,2.70D0,2.21D0,1.84D0,1.52D0,1.33D0,1.20D0,1.15D0,1.13D0,1.08D0
+	1, 4.16E0_DP,3.52E0_DP,2.98E0_DP,2.45E0_DP,2.01E0_DP,1.67E0_DP,1.41E0_DP,1.25E0_DP,1.15E   |		1, 4.16D0,3.52D0,2.98D0,2.45D0,2.01D0,1.67D0,1.41D0,1.25D0,1.15D0,1.11D0,1.10D0,1.09D0
+	1, 3.85E0_DP,3.27E0_DP,2.70E0_DP,2.20E0_DP,1.81E0_DP,1.50E0_DP,1.30E0_DP,1.17E0_DP,1.11E   |		1, 3.85D0,3.27D0,2.70D0,2.20D0,1.81D0,1.50D0,1.30D0,1.17D0,1.11D0,1.08D0,1.08D0,1.09D0/
+	A1=4.7994E0_DP; A1=LOG10(A1*RNU)							   |		A1=LOG10(4.7994D0*RNU)
+	A2=15.789E0_DP; A2=LOG10(A2*ZION*ZION)							   |		A2=LOG10(15.789D0*ZION*ZION)
+	  U=MAX(-3.99999999E0_DP,U)								   |		  U=MAX(-3.99999999D0,U)
+	  U=MIN(1.499999E0_DP,U)								   |		  U=MIN(1.499999D0,U)
+	  GB=MAX(-2.99999999E0_DP,GB)								   |		  GB=MAX(-2.99999999D0,GB)
+	  GB=MIN(1.999999E0_DP,GB)								   |		  GB=MIN(1.999999D0,GB)
+	 											   |	C
+C												   |		  IU=INT(U*2+9.0D0)
+	  IU=INT(U*2+9.0E0_DP)									   |		  IGB=INT(GB*2+7.0D0)
+	  IGB=INT(GB*2+7.0E0_DP)								   |		  DU=2*U+9.0D0-IU
+	  DU=2*U+9.0E0_DP-IU									   |		  DGB=2*GB+7.0D0-IGB
+	  DGB=2*GB+7.0E0_DP-IGB									   |		  GFF_VAL(I)=((1.0D0-DU)*A(IU,IGB)+DU*A(IU+1,IGB))*(1.0D0-DGB)
+	  GFF_VAL(I)=((1.0E0_DP-DU)*A(IU,IGB)+DU*A(IU+1,IGB))*(1.0E0_DP-DGB)			   |		1               +((1.0D0-DU)*A(IU,IGB+1)+DU*A(IU+1,IGB+1))*DGB
+	1               +((1.0E0_DP-DU)*A(IU,IGB+1)+DU*A(IU+1,IGB+1))*DGB			   <
+./subs/gnthydl.f
+./subs/htrpwgt.f
+	LOGICAL, SAVE :: CHECK									   |		LOGICAL, SAVE :: CHECK = .FALSE.
+./subs/htrpwgt_v2.f
+./subs/hweight.f
+./subs/hweight_v2.f
+./subs/hydanggaunt.f
+./subs/hydcrossl.f
+./subs/hydro_terms.f
+C												   |	C
+./subs/hydro_terms_v2.f
+!												   |	!
+./subs/hydro_terms_v3.f
+!												   |	!
+!												   |	!
+./subs/hydro_terms_v4.f
+!												   |	!
+!												   |	!
+./subs/hydro_terms_v5.f
+!												   |	!
+!												   |	!
+!												   |	!
+./subs/hyper.f
+./subs/ichrlen.f
+./subs/impar.f
+./subs/impar_with_pnt_srce.f
+./subs/indexx.f
+./subs/init_temp.f
+./subs/init_temp_v2.f
+./subs/ins_line_obs_v2.f
+C												   |	C
+./subs/ins_line_obs_v3.f
+C												   |	C
+./subs/ins_line_obs_v5.f
+!												   |	!
+	  T3=1.0D0										   <
+	          T3=1.0D0 + C_KMS*ABS(T3-NU_LINE(K)/FREQ(INDX))/VEC_VMIN_VDOP(K)		   |		          T2=FREQ(INDX)*FRAC_DOP_OBS*VEC_VMIN_VDOP(K)*
+	          T2=FREQ(INDX)*FRAC_DOP_OBS*VEC_VMIN_VDOP(K)*SQRT(T3)/C_KMS			   |		1               SQRT( 1.0D0+ C_KMS*ABS(1.0D0-NU_LINE(K)/FREQ(INDX))/
+												   >		1                     VEC_VMIN_VDOP(K) )/C_KMS
+./subs/ins_line_v4.f
+./subs/ins_line_v6.f
+./subs/integrate.f
+./subs/interp_knowncoeef.f
+./subs/jfeau_ibc.f
+./subs/jfeau_ibc_v2.f
+./subs/jgrey.f
+	  E1=EXP(-DTAU(1))									   |		  E1=DEXP(-DTAU(1))
+./subs/jgrey_with_fvt.f
+!												   |	!
+!												   |	!
+!												   |	!
+	    DBC=DBB*SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)						   |		    DBC=DBB*DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)
+	      Z(I)=SQRT( (R(I)-P(LS))*(R(I)+P(LS)) )						   |		      Z(I)=DSQRT( (R(I)-P(LS))*(R(I)+P(LS)) )
+	    E1=EXP(-DTAU(1))									   |		    E1=DEXP(-DTAU(1))
+./subs/jtrpwgt.f
+	LOGICAL, SAVE :: CHECK=.TRUE.								   |		LOGICAL, SAVE :: CHECK=.FALSE.
+./subs/jtrpwgt_v2.f
+./subs/jweight.f
+./subs/jweight_v2.f
+./subs/kivarnm.f
+./subs/ktrpwgt.f
+	LOGICAL, SAVE :: CHECK=.TRUE.								   |		LOGICAL, SAVE :: CHECK=.FALSE.
+./subs/ktrpwgt_v2.f
+./subs/kweight.f
+./subs/kweight_v2.f
+./subs/lamvacair.f
+./subs/lam_vac.f
+./subs/last2rays.f
+C Altered 24-May-1996. - EXP replaced by EXP							   |	C Altered 24-May-1996. - DEXP replaced by EXP
+./subs/last2vki.f
+C Altered 24-May-1996 -EXP replaced bu EXP							   |	C Altered 24-May-1996 -DEXP replaced bu EXP
+./subs/lin_interp.f
+./subs/locsolut.f
+./subs/ltepop.f
+./subs/lte_pop_sl.f
+./subs/lte_pop_sl_v2.f
+./subs/ltepop_wld_v1.f
+	    RGU=LOG(RGU)									   |		    RGU=DLOG(RGU)
+	  RGU=LOG(2.07078D-22)									   |		  RGU=DLOG(2.07078D-22)
+./subs/ltepop_wld_v2.f
+	 RGU=LOG(RGU)										   |		 RGU=DLOG(RGU)
+./subs/lum_from_eta.f
+./subs/lum_from_eta_v2.f
+./subs/marupv.f
+./subs/mat5pen.f
+./subs/mess.f
+./subs/modifyba.f
+./subs/mod_trap_derivatives.f
+./subs/momjbar.f
+./subs/mom_j_cmf_v5.f
+./subs/mom_j_cmf_v6.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+./subs/mom_j_cmf_v7.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+./subs/mon_interp.f
+./subs/mon_interp_fast.f
+./subs/mon_interp_fast_v2.f
+./subs/mon_interp_nonmon.f
+./subs/mon_int_funs_v2.f
+./subs/mon_int_ins_v1.f
+./subs/monotonic_integrate.f
+./subs/mult2d.f
+./subs/multvec.f
+./subs/nagminsol.f
+./subs/newgsit.f
+./subs/newjsold.f
+./subs/newpertjd.f
+./subs/new_r_scale_v2.f
+./subs/newvkimd.f
+./subs/newwmat.f
+./subs/ngaccel_arb_ord.f
+./subs/ngaccel.f
+./subs/nordangqw.f
+./subs/nordangqw_v2.f
+./subs/nordflux.f
+C                       EXP etc replaced by GENRIC calls.					   |	C                       DEXP etc replaced by GENRIC calls.
+./subs/nordtau.f
+./subs/ntrpwgt.f
+	LOGICAL, SAVE :: CHECK=.TRUE.								   |		LOGICAL, SAVE :: CHECK=.FALSE.
+./subs/ntrpwgt_v2.f
+./subs/nweight.f
+./subs/nweight_v2.f
+./subs/occupation_prob.f
+	        IF(W_C2(LEV,I) .GT. 0.99999999D0)W_C2(LEV,I)=1.0D0				   <
+./subs/omega_gen_v2.f
+	  T1=LOG(T_TABLE(L)/T_TABLE(L-1))							   |		  T1=DLOG(T_TABLE(L)/T_TABLE(L-1))
+	    ALPHA=LOG(ALPHA)/T1									   |		    ALPHA=DLOG(ALPHA)/T1
+./subs/open_dir_acc_v1.f
+./subs/par_fun_v2.f
+./subs/par_fun_v3.f
+./subs/par_fun_v4.f
+./subs/pertjfeau_ibc.f
+./subs/phys_con.f
+												   >	C Altered 22-Sep-2023: Revised physical constants.
+	ELECTRON_VOLT=1.60217733D-12                    !ergs					   |		ELECTRON_VOLT=1.602176634D-12                    !ergs
+	PLANCKS_CONSTANT=6.626075D-27			!erg sec				   |		PLANCKS_CONSTANT=6.62607015D-27			!erg sec
+	ATOMIC_MASS_UNIT=1.660540D-24			!gm					   |		ATOMIC_MASS_UNIT=1.6605390666D-24		!gm
+	ELECTRON_MASS=9.109389D-28			!gm					   |		ELECTRON_MASS=9.1093837015D-28			!gm
+												   >		RETURN
+												   >		END
+												   >	!
+												   >		FUNCTION ELECTRON_CHARGE()
+												   >		IMPLICIT NONE
+												   >		REAL*8 ELECTRON_CHARGE
+												   >		ELECTRON_CHARGE=4.80320427E-10                    !esu
+	BOLTZMANN_CONSTANT=1.380658D-16			!erg/K					   |		BOLTZMANN_CONSTANT=1.380649D-16			!erg/K
+	STEFAN_BOLTZ=5.670400D-05			!ergs/cm^2/K^4				   |		STEFAN_BOLTZ=5.670374419D-05			!ergs/cm^2/K^4
+./subs/poptoion.f
+./subs/prrr_lowt_v1.f
+./subs/prrr_lowt_v2.f
+												   >	! Altered 24-Sep-2023 : Adjusted constants for consistency.
+												   >	        REAL*8 PLANCKS_CONSTANT
+												   >	        EXTERNAL PLANCKS_CONSTANT
+        H=6.6261965D-12                                 !ergs/s (*1.0E+15 due to *nu)		   |	        H=PLANCKS_CONSTANT()*1.0D+15                                 !ergs/s (*1.0E+15 due to *n
+./subs/prrr_sl_v3.f
+./subs/prrr_sl_v4.f
+./subs/prrr_sl_v5.f
+	REAL*8 PLANCKS_CONSTANT									   <
+	EXTERNAL PLANCKS_CONSTANT								   <
+./subs/prrr_sl_v6.f
+												   >	! Altered 24-Sep-2023 : Adjusted constants for consistency. Some data ouput for checking between
+												   >	!                            RE and EHB equations.
+!												   |	!
+	H=PLANCKS_CONSTANT()*1.0D+15   		!ergs/s (*1.0E+15 due to *nu)			   |		H=PLANCKS_CONSTANT()*1.0D+15   		 !ergs/s (*1.0E+15 due to *nu)
+												   >	!	      IF(J .EQ. 5 .AND. I .EQ. 2)THEN
+												   >	!		WRITE(184,*)I,( HNST(I,J)*(WCR(I,J)*JB_RAT+WSE(I,J)*JC_RAT)
+												   >	!	1              -HN(I,J)*(WCR(I,J)*JPHOT(J)+WSE(I,J)*JPHOT_CR(J)) )*H,WSE(I,J)
+												   >	!	      END IF
+!	WRITE(186,'(I5,2X,I3,2X,F5.1,3X,ES16.8,7ES16.6E3)')NLEV,PHOT_ID,ZHYD,NU,WSE(1:2,5),WCR(1   |	!	WRITE(186,'(I5,2X,I3,2X,F5.1,3X,ES16.8,6ES14.6)')NLEV,PHOT_ID,ZHYD,NU,WSE(1:2,5),WCR(1:2
+!	WRITE(184,'(I5,2X,I3,2X,F5.1,3X,ES16.8,7ES16.6E3)')NLEV,PHOT_ID,ZHYD,NU,BFCR(1:5,5),SUM(   |	!	WRITE(184,'(I5,2X,I3,2X,F5.1,3X,ES16.8,6ES14.6)')NLEV,PHOT_ID,ZHYD,NU,BFCR(1:5,5),SUM(BF
+												   >	!	  WRITE(185,*)NU,FF(5)
+./subs/qfromf.f
+C Altered 26-May-1996 - GENERIC calls now used for LOG and DEXp					   |	C Altered 26-May-1996 - GENERIC calls now used for DLOG and DEXp
+./subs/qkim.f
+./subs/quad_multi_v5.f
+./subs/quad_x_gen_v4.f
+./subs/quad_x_gen_v5.f
+./subs/quad_x_lit_v3.f
+./subs/rd_free_val.f
+./subs/rd_f_to_s_ids.f
+./subs/rd_f_to_s_ids_v2.f
+./subs/rd_f_to_s_ids_v3.f
+./subs/rdgendie_v3.f
+./subs/rdgendie_v4.f
+./subs/rd_log.f
+C 24-Mar-1993 : Created - Based on routines in RLOG.						   |	C 24-Mar-1993 : Created - Based on routines in RDLOG.
+./subs/rd_sol_abund_scale.f
+./subs/rd_t_ed.f
+./subs/readba.f
+./subs/regrid_b_on_ne.f
+	SUBROUTINE REGRID_B_ON_NE(DHEN,ED,ION,ELOG,N,NST,NFIN,ND,				   |		SUBROUTINE REGRID_B_ON_NE(DHEN,ED,ION,EDLOG,N,NST,NFIN,ND,
+	  ELOG(I)=LOG(ED(I))									   |		  EDLOG(I)=LOG(ED(I))
+	DO WHILE (ELOG(NXST) .LT. OLDED(1))							   |		DO WHILE (EDLOG(NXST) .LT. OLDED(1))
+	DO WHILE (ELOG(NX_END) .GT. OLDED(NDOLD))						   |		DO WHILE (EDLOG(NX_END) .GT. OLDED(NDOLD))
+	  CALL LINPOP(ELOG(NXST),TA(NXST),NX,OLDED,TB,NDOLD)					   |		  CALL LINPOP(EDLOG(NXST),TA(NXST),NX,OLDED,TB,NDOLD)
+	      DHEN(J,I)=EXP(TB(3)+(ELOG(I)-OLDED(3))						   |		      DHEN(J,I)=EXP(TB(3)+(EDLOG(I)-OLDED(3))
+	CALL LINPOP(ELOG(NXST),ION(NXST),NX,OLDED,OLDION,NDOLD)					   |		CALL LINPOP(EDLOG(NXST),ION(NXST),NX,OLDED,OLDION,NDOLD)
+	    ION(I)=OLDION(3)+(ELOG(I)-OLDED(3))							   |		    ION(I)=OLDION(3)+(EDLOG(I)-OLDED(3))
+./subs/regrid_b_on_sph_tau.f
+./subs/regrid_dchi.f
+./subs/regrid_h.f
+./subs/regrid_log_dc_v1.f
+												   >	! Altered 21-Aug-2023 - Fixed issue with TR option and rounding.
+!												   |	!
+	IF( ABS( TA(NOLD) ) .LT. 0.2D0 .AND. CHECK_DC)DPOP=DPOP+1.0D0				   |		IF( DABS( TA(NOLD) ) .LT. 0.2D0 .AND. CHECK_DC)DPOP=DPOP+1.0D0
+	  DPOP=LOG(DPOP)									   |		  DPOP=DLOG(DPOP)
+	  IF(ABS(OLD_R(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN					   |		  IF(DABS(OLD_R(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
+	  IF(ABS(OLD_R(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN					   |		  IF(DABS(OLD_R(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
+												   >	! This code may have issues if T is very nomonotonic.
+												   >	!
+												   >		  OLD_X=LOG(OLD_ED*OLD_CLUMP_FAC)
+	    IF(T(I) .LT. TMIN)THEN								   |		    IF(T(I) .LT. TMIN .AND. ABS(LOG(OLD_X(JMIN)/ED(I))) .LT. 1.0D0)THEN
+	        IF( (T(I)-OLD_T(J))*(OLD_T(J+1)-T(I)) .GE. 0)THEN				   |		        IF( (T(I)-OLD_T(J))*(OLD_T(J+1)-T(I)) .GE. -1.0D-10)THEN
+	            WRITE(6,'(/,A)')'Warning: T at outer boundary outside old model range in REG   |		            WRITE(6,'(/,A)')'Warning: T outside old model range in REGRID_LOG_DC_V1'
+	      DPOP(I,J)=LOG(T_EXCITE)								   |		      DPOP(I,J)=DLOG(T_EXCITE)
+./subs/regrid_t_ed.f
+!												   |	!
+	IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN					   |		IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
+./subs/regrid_t_ed_v2.f
+!												   |	!
+	IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN					   |		IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
+./subs/regrid_t_ed_v3.f
+	  IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN					   |		  IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
+./subs/regrid_tx_r.f
+	IF( ABS( TA(NOLD) ) .LT. 0.2D0 .AND. CHECK_DC)DPOP=DPOP+1.0D0				   |		IF( DABS( TA(NOLD) ) .LT. 0.2D0 .AND. CHECK_DC)DPOP=DPOP+1.0D0
+	IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN					   |		IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
+./subs/regridwsc.f
+	IF( ABS( TA(NOLD) ) .LT. 0.2 )ADD1=1.0D0						   |		IF( DABS( TA(NOLD) ) .LT. 0.2 )ADD1=1.0D0
+	IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN					   |		IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN
+./subs/regridwsc_v2.f
+	IF( ABS( TA(NOLD) ) .LT. 0.2 .AND. CHECK_DC)ADD1=1.0D0					   |		IF( DABS( TA(NOLD) ) .LT. 0.2 .AND. CHECK_DC)ADD1=1.0D0
+	IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN					   |		IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001)THEN
+./subs/regridwsc_v3.f
+	IF( ABS( TA(NOLD) ) .LT. 0.2D0 .AND. CHECK_DC)DPOP=DPOP+1.0D0				   |		IF( DABS( TA(NOLD) ) .LT. 0.2D0 .AND. CHECK_DC)DPOP=DPOP+1.0D0
+	IF(ABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN					   |		IF(DABS(OLDR(NDOLD)/R(ND)-1.0D0) .GT. 0.0001D0)THEN
+	    T2=MIN(1.0D0, ABS(LOG(DPOP(J,1)))/ABS(LOG(DPOP(1,1))) )				   |		    T2=MIN(1.0D0, ABS(LOG(DPOP(J,1)))/ABS(DLOG(DPOP(1,1))) )
+./subs/rext_coef_v2.f
+./subs/rite_asc.f
+./subs/rite_atmdes_v2.f
+./subs/rite_atmdes_v3.f
+./subs/rite_gam_v2.f
+./subs/rv_sn_model.f
+./subs/rv_sn_model_v2.f
+./subs/s15adf.f
+   60 RES = RES*EXP(-XSQ)                                              				   |	   60 RES = RES*DEXP(-XSQ)                                              
+./subs/same_n.f
+./subs/scale_grey.f
+./subs/scale_pops.f
+./subs/scr_read_v2.f
+./subs/set_acc_dmu.f
+./subs/set_case.f
+./subs/set_cont_freq.f
+./subs/set_cont_freq_v2.f
+./subs/set_cont_freq_v3.f
+C												   |	C
+./subs/set_cont_freq_v4.f
+!												   |	!
+./subs/set_dc_lte.f
+./subs/set_dc_lte_v2.f
+./subs/set_edge_freq_v2.f
+./subs/set_gf_values_small.f
+./subs/set_gm_all.f
+./subs/set_t_ed_grid.f
+./subs/set_x_freq.f
+./subs/set_z_pop.f
+./subs/simq.f
+./subs/sobew.f
+./subs/sobew_grad.f
+./subs/sobew_grad_v2.f
+./subs/sobew_grad_v3.f
+./subs/sobjbar_sim.f
+C												   |	C
+./subs/solveba_v2.f
+./subs/solveba_v3.f
+./subs/specfy_it_cycle.f
+./subs/specify_it_cycle_v2.f
+./subs/specify_it_cycle_v3.f
+./subs/starfin.f
+./subs/starnew.f
+./subs/starpcyg.f
+./subs/starpcyg_v2.f
+./subs/starpcyg_v3.f
+./subs/starpcyg_v4.f
+./subs/starrave.f
+./subs/steq_multi_v3.f
+C												   |	C
+C												   |	C
+./subs/steqne.f
+./subs/storeba.f
+./subs/subcol_multi_v3.f
+C												   |	C
+./subs/sup_to_full_v3b.f
+./subs/sup_to_full_v3.f
+./subs/tau.f
+./subs/tcompd.f
+./subs/term_io.f
+./subs/tfeau.f
+./subs/thomas.f
+./subs/thomas_pone.f
+./subs/thomas_rh.f
+./subs/torscl.f
+./subs/torscl_v2.f
+	  T1=LOG(CHI(1)/CHI(INDX))/LOG(R(INDX)/R(1))						   |		  T1=DLOG(CHI(1)/CHI(INDX))/DLOG(R(INDX)/R(1))
+./subs/torscl_v3.f
+	    T1=LOG(CHI(1)/CHI(INDX))/LOG(R(INDX)/R(1))						   |		    T1=DLOG(CHI(1)/CHI(INDX))/DLOG(R(INDX)/R(1))
+./subs/transposeba.f
+./subs/tst_ins.f
+./subs/tst_mon.f
+./subs/tst_mon_ins.f
+./subs/tst_set_cont.f
+./subs/tst_tri.f
+./subs/tst_tri_v.f
+./subs/tst_wr2d.f
+./subs/tst_wr.f
+./subs/tst_z.f
+./subs/tuvghd.f
+./subs/tuvghd_rh.f
+./subs/undo_it.f
+./subs/ungrid.f
+./subs/update_gam.f
+./subs/updateu.f
+./subs/uptvx_edd.f
+./subs/uptx_edd.f
+./subs/up_tx_tvx_ext_v1.f
+./subs/up_tx_tvx.f
+./subs/up_tx_tvx_noeps.f
+./subs/up_tx_tvx_v2.f
+./subs/upvnot.f
+./subs/var_formsol.f
+	      DBC_ON_DBB=SQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)				   |		      DBC_ON_DBB=DSQRT(R(ND)*R(ND)-P(LS)*P(LS))/R(ND)/TCHI(ND)
+./subs/varlamki.f
+./subs/var_momjbar.f
+./subs/var_mom_j_cmf_v6.f
+./subs/var_mom_j_cmf_v7.f
+./subs/var_mom_j_cmf_v8.f
+!												   |	!
+./subs/var_mom_jext_cmf_v2.f
+./subs/var_op_v4.f
+C												   |	C
+./subs/var_x_opa_eta_v2.f
+./subs/vkifeau_ibc.f
+./subs/voigt_1p0.f
+./subs/vsebyj_multi_v4.f
+./subs/vsebyj_x_v3.f
+C												   |	C
+./subs/vsebyj_x_v4.f
+C												   |	C
+./subs/weight.f
+	    T1=ABS(U(I-1)-U(I))									   |		    T1=DABS(U(I-1)-U(I))
+	    IF(I .NE. 2)T2=ABS(ABS(U(I-2)-U(I-1))/T1-1.0D0)					   |		    IF(I .NE. 2)T2=DABS(DABS(U(I-2)-U(I-1))/T1-1.0D0)
+./subs/wr2d.f
+./subs/wr2d_ma.f
+110	FORMAT(1X,I4,'* ',1P,5E30.14E5)								   |	110	FORMAT(1X,I4,'* ',1P,5E26.14)
+./subs/wr2d_v2.f
+./subs/wr_ad_cool.f
+./subs/wr_art_heat.f
+./subs/wrcoolgen.f
+./subs/wrcoolgen_v2.f
+./subs/wrcoolgen_v3.f
+./subs/wr_cooling_term.f
+./subs/writedc.f
+./subs/writedc_v2.f
+./subs/writedc_v3.f
+./subs/write_direct_info.f
+./subs/write_direct_info_v2.f
+./subs/write_direct_info_v3.f
+./subs/write_j_cmf_err.f
+./subs/write_out_ew.f
+./subs/write_vec.f
+./subs/writv.f
+./subs/writv_v2.f
+./subs/wrrecomchk.f
+./subs/wrrecomchk_v2.f
+./subs/wrrecomchk_v3.f
+./subs/wrrecomchk_v4.f
+./subs/wr_x_info.f
+./subs/x02ajf.f
+./subs/xcross.f
+./subs/x_rrr_cool_v4.f
+./subs/x_rrr_cool_v5.f
+./subs/x_rrr_cool_v6.f
+												   >	! Altered 24-Sep-2023 : Adjusted constants for consistency.
+												   >		REAL*8 PLANCKS_CONSTANT
+												   >		EXTERNAL PLANCKS_CONSTANT
+        H=6.6261965D-12 									   |	        H=PLANCKS_CONSTANT()*1.0D+15
+./subs/xvecd.f
+./subs/zalongp.f
+./subs/zero_2d_mat.f
+./subs/zero.f
+ 
+Comparing files in ./subs/chg with those in  /home/hillier/wnode04/cmf_testing_real8//subs/chg
+ 
+./subs/chg/Makefile
+./subs/chg/chg_exch_mod.f
+./subs/chg/eval_chg_rates.f
+./subs/chg/set_chg_exch_v2.f
+./subs/chg/steq_ba_chg_exch.f
+./subs/chg/verify_chg_exch.f
+./subs/chg/wr_chg_cool.f
+ 
+Comparing files in ./subs/two with those in  /home/hillier/wnode04/cmf_testing_real8//subs/two
+ 
+./subs/two/Makefile
+./subs/two/ba_replace.f
+./subs/two/set_two_phot.f
+./subs/two/steq_ba_two_phot.f
+./subs/two/tst_two.f
+./subs/two/two_phot_opac.f
+./subs/two/two_phot_rate.f
+./subs/two/two_phot_var_opac.f
+ 
+Comparing files in ./stark with those in  /home/hillier/wnode04/cmf_testing_real8//stark
+ 
+./stark/Makefile
+./stark/conv_strk_v1.f
+	  STARK_INT(1:NI)=LOG10(STARK_INT(1:NI))						   |		  STARK_INT(1:NI)=DLOG10(STARK_INT(1:NI))
+./stark/conv_strk_v2.f
+	  STARK_INT(1:NI)=LOG10(STARK_INT(1:NI))						   |		  STARK_INT(1:NI)=DLOG10(STARK_INT(1:NI))
+./stark/get_prof_storage_limits.f
+./stark/get_prof_storage_limits_v2.f
+./stark/griem.f
+./stark/griem_stark_mod.f
+./stark/griem_v2.f
+!												   |	!
+!												   |	!
+!												   |	!
+!												   |	!
+./stark/init_prof_module.f
+./stark/init_prof_module_v2.f
+./stark/prof_mod.f
+./stark/rd_bs_strk_tab.f
+./stark/rd_strk_list.f
+./stark/set_griem.f
+./stark/set_prof.f
+./stark/set_prof_limits_v1.f
+./stark/set_prof_limits_v2.f
+!												   |	!
+./stark/set_prof_limits_v3.f
+!												   |	!
+./stark/set_prof_limits_v4.f
+!												   |	!
+./stark/set_prof_v2.f
+./stark/set_prof_v3.f
+./stark/set_prof_v4.f
+./stark/set_prof_v5.f
+./stark/set_prof_v6.f
+!												   |	!
+!												   |	!
+!												   |	!
+./stark/strk_bs_hhe.f
+./stark/tst_griem.f
+./stark/tst_set_prof.f
+./stark/voigtn.f
+./stark/strk_ds.f90
+./stark/strk_hei_ir.f90
+ 
+Comparing files in ./txt_files with those in  /home/hillier/wnode04/cmf_testing_real8//txt_files
+ 
+./txt_files/Makefile
+./txt_files/maingen_opt_desc.txt
+./txt_files/maingen_options.txt
+./txt_files/plt_jh_opt_desc.txt
+./txt_files/plt_jh_options.txt
+./txt_files/plt_spec_opt_desc.txt
+./txt_files/plt_spec_options.txt
+./txt_files/wr_f_opt_desc.txt
+./txt_files/wr_f_options.txt
+ 
+Comparing files in ./tools with those in  /home/hillier/wnode04/cmf_testing_real8//tools
+ 
+./tools/Makefile
+./tools/check_vec_nan.f
+./tools/chk_little_endian.f
+./tools/chk_string.f
+./tools/condit_string.f
+./tools/constants_mod.f
+! Created 7-Jan-2008 :: Based on cur_cmf/subs/phys_con.f					   |	! Altered 15-Sep-2023 :" Updated values of several constants.
+												   >	! Created  7-Jan-2008 :: Based on cur_cmf/subs/phys_con.f
+												   >		REAL*8, PARAMETER :: STEFAN_BOLTZ           = 5.670374419D-05     !ergs/cm^2/K^4
+./tools/count_occur.f
+./tools/form_sp_num.f
+./tools/gen_in.f
+./tools/get_indx.f
+./tools/get_lu.f
+./tools/lambert_wm_fun.f
+./tools/mod_color_pen_def.f
+./tools/new_gen_in.f
+./tools/rd_energy.f
+./tools/rd_energy_v2.f
+./tools/rd_rvtj.f
+./tools/rd_rvtj_v2.f
+./tools/rd_rvtj_v4.f
+./tools/rd_rvtj_v5.f
+./tools/rd_sing_vec_rvtj.f
+./tools/read_chi_data_file.f
+./tools/read_keyword.f
+./tools/set_case_fn.f
+./tools/sm_phot_v3.f
+./tools/sve_file.f
+./tools/test_usr_option.f
+./tools/tst_gen_in.f
+./tools/tst_get_indx.f
+./tools/tst_new_gen.f
+./tools/update_keyword.f
+./tools/upper_case.f
+./tools/usr_hidden_4.f
+./tools/usr_hidden.f
+./tools/usr_option_4.f
+./tools/usr_option.f
+./tools/wr_col_str.f
+./tools/wr_fmt_string.f
+./tools/wr_string_4.f
+./tools/wr_string.f
+ 
+Comparing files in ./unix with those in  /home/hillier/wnode04/cmf_testing_real8//unix
+ 
+./unix/Makefile
+./unix/date_time.f
+./unix/dir_acc_pars_gen.f
+	WORD_SIZE=16										   |		WORD_SIZE=8
+./unix/dir_delimiter.f
+./unix/f01btf.f
+./unix/f04ayf.f
+./unix/gen_asci_open.f
+./unix/set_line_buffering.f
+./unix/term_io.f
+./unix/tst_mon.f
+./unix/tst_sec.f
+./unix/tst_tune.f
+./unix/tune.f
+./unix/tune_hp.f
+./unix/tune_intel.f
+./unix/tune_osf.f
+./unix/tune_osf_garb.f
+./unix/tune_osf_old.f
+./unix/verbose_info.f
+./unix/wr_pwd.f

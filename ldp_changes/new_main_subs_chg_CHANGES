@@ -1,0 +1,141 @@
+
+do_penning_ion.f
+
+	REAL(KIND=LDP), PARAMETER :: ALPHA=7.5E-10_LDP
+	REAL(KIND=LDP), PARAMETER :: ALPHA=7.5D-10
+
+	REAL(KIND=LDP), PARAMETER :: CI=2.07078E-22_LDP
+	REAL(KIND=LDP), PARAMETER :: CI=2.07078D-22
+
+	          REV_RATE_COEF=ALPHA*6.0_LDP*CI*EXP(T1)
+	          REV_RATE_COEF=ALPHA*6.0D0*CI*EXP(T1)
+
+	            REV_RATE_COEF=ALPHA*6.0_LDP*CI*EXP(T1)
+	            REV_RATE_COEF=ALPHA*6.0D0*CI*EXP(T1)
+
+
+eval_chg_rates_v3.f
+
+	H=1.0E+15_LDP*PLANCKS_CONSTANT()
+	H=1.0D+15*PLANCKS_CONSTANT()
+
+	CHG_PR(:)=0.0_LDP
+	CHG_PR(:)=0.0D0
+
+	CHG_RR(:)=0.0_LDP
+	CHG_RR(:)=0.0D0
+
+	           ALPHA_REC=COEF_CHG(J,1)*(TVAL**COEF_CHG(J,2))*(1.0_LDP+T1)
+	           ALPHA_REC=COEF_CHG(J,1)*(TVAL**COEF_CHG(J,2))*(1.0D0+T1)
+
+
+rd_chg_exch_v3.f
+
+	    TLO_CHG_RD(I)=0.0_LDP
+	    TLO_CHG_RD(I)=0.0D0
+
+	    THI_CHG_RD(I)=100.0_LDP
+	    THI_CHG_RD(I)=100.0D0
+
+
+set_chg_exch_v3.f
+
+	  AI_AR_CHG(:,:)=1.0_LDP
+	  AI_AR_CHG(:,:)=1.0D0
+
+	  dlnAI_AR_CHG_dlnT(:,:)=0.0_LDP
+	  dlnAI_AR_CHG_dlnT(:,:)=0.0D0
+
+	  COOL_CHG(:,:)=0.0_LDP
+	  COOL_CHG(:,:)=0.0D0
+
+	    G_CHG_VEC(1:ND)=0.0_LDP
+	    G_CHG_VEC(1:ND)=0.0D0
+
+	    dG_CHG_VEC(1:ND)=0.0_LDP
+	    dG_CHG_VEC(1:ND)=0.0D0
+
+
+set_chg_exch_v4.f
+
+	  AI_AR_CHG(:,:)=1.0_LDP
+	  AI_AR_CHG(:,:)=1.0D0
+
+	  dlnAI_AR_CHG_dlnT(:,:)=0.0_LDP
+	  dlnAI_AR_CHG_dlnT(:,:)=0.0D0
+
+	  COOL_CHG(:,:)=0.0_LDP
+	  COOL_CHG(:,:)=0.0D0
+
+	  G_CHG_VEC(1:ND)=0.0_LDP
+	  G_CHG_VEC(1:ND)=0.0D0
+
+	  dG_CHG_VEC(1:ND)=0.0_LDP
+	  dG_CHG_VEC(1:ND)=0.0D0
+
+
+set_chg_lev_id_v3.f
+
+	  Z_CHG(:,:)=0.0_LDP
+	  Z_CHG(:,:)=0.0D0
+
+          AI_AR_CHG(:,:)=0.0_LDP
+          AI_AR_CHG(:,:)=0.0D0
+
+          dlnAI_AR_CHG_dlnT(:,:)=0.0_LDP
+          dlnAI_AR_CHG_dlnT(:,:)=0.0D0
+
+          COOL_CHG(:,:)=0.0_LDP
+          COOL_CHG(:,:)=0.0D0
+
+	            Z_CHG(J,K)=ZION-1.0_LDP
+	            Z_CHG(J,K)=ZION-1.0D0
+
+
+set_chg_lev_id_v4.f
+
+        G_SUM(:,:)=0.0_LDP
+        G_SUM(:,:)=0.0D0
+
+	Z_CHG(:,:)=0.0_LDP
+	Z_CHG(:,:)=0.0D0
+
+        AI_AR_CHG(:,:)=0.0_LDP
+        AI_AR_CHG(:,:)=0.0D0
+
+        dlnAI_AR_CHG_dlnT(:,:)=0.0_LDP
+        dlnAI_AR_CHG_dlnT(:,:)=0.0D0
+
+        COOL_CHG(:,:)=0.0_LDP
+        COOL_CHG(:,:)=0.0D0
+
+	  TMP_G=0.0_LDP
+	  TMP_G=0.0D0
+
+	        TMP_Z(ML,K)=ATM(ID)%ZXzV-1.0_LDP
+	        TMP_Z(ML,K)=ATM(ID)%ZXzV-1.0D0
+
+	  IF( ABS(T1-1.0_LDP) .GT. 1.0E-05_LDP)THEN
+	  IF( ABS(T1-1.0D0) .GT. 1.0D-05)THEN
+
+
+steq_ba_chg_exch_v3.f
+
+	1             (1.0_LDP+T1)
+	1             (1.0D0+T1)
+
+	1              COEF_CHG(J,4)*T1*TVAL/(1.0_LDP+T1)
+	1              COEF_CHG(J,4)*T1*TVAL/(1.0D0+T1)
+
+	      IF(TVAL .GT. THI_CHG(J))dlnALPHA_RECdlnT=0.0_LDP
+	      IF(TVAL .GT. THI_CHG(J))dlnALPHA_RECdlnT=0.0D0
+
+	      IF(TVAL .LT. TLO_CHG(J))dlnALPHA_RECdlnT=0.0_LDP
+	      IF(TVAL .LT. TLO_CHG(J))dlnALPHA_RECdlnT=0.0D0
+
+
+verify_chg_exch_v3.f
+
+
+wr_chg_cool_v3.f
+

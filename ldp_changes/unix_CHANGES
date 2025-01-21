@@ -1,0 +1,231 @@
+
+date_time.f
+
+
+dir_acc_pars_gen.f
+
+
+dir_delimiter.f
+
+
+f01btf.f
+
+
+f04ayf.f
+
+
+gen_asci_open.f
+
+
+set_line_buffering.f
+
+
+term_io.f
+
+
+tst_mon.f
+
+        DO I=1, ND ; CHI(I)= ( (I+1.0_LDP)**2 )/ND; END DO
+        DO I=1, ND ; CHI(I)= ( (I+1.0D0)**2 )/ND; END DO
+
+          R(I)=1.0_LDP+0.1_LDP*(I**2)
+          R(I)=1.0+0.1D0*(I**2)
+
+          QZR(J+1)=R(I)+0.04_LDP*DELR
+          QZR(J+1)=R(I)+0.04*DELR
+
+          QZR(J+2)=R(I)+0.16_LDP*DELR
+          QZR(J+2)=R(I)+0.16*DELR
+
+          QZR(J+3)=R(I)+0.40_LDP*DELR
+          QZR(J+3)=R(I)+0.40*DELR
+
+          QZR(J+4)=R(I)+0.70_LDP*DELR
+          QZR(J+4)=R(I)+0.70*DELR
+
+
+tst_sec.f
+
+
+tst_tune.f
+
+	  A(I)=5.0_LDP*I/FLOAT(NMAX)
+	  A(I)=5.0D0*I/FLOAT(NMAX)
+
+	  B(I)=2.0_LDP*I/FLOAT(NMAX)
+	  B(I)=2.0D0*I/FLOAT(NMAX)
+
+        SUM=0.0_LDP
+        SUM=0.0D0
+
+
+tune.f
+
+            ST_CPU(I)=0._LDP
+            ST_CPU(I)=0.D0
+
+            IST_WALL(I)=0._LDP
+            IST_WALL(I)=0.D0
+
+            CPUTOT(I)=0._LDP
+            CPUTOT(I)=0.D0
+
+            WALLTOT(I)=0._LDP
+            WALLTOT(I)=0.D0
+
+          OVERHEAD=2.0_LDP*(ETIME(TARRY)-T0)
+          OVERHEAD=2.0D0*(ETIME(TARRY)-T0)
+
+            ST_CPU(I)=0._LDP
+            ST_CPU(I)=0.D0
+
+            IST_WALL(I)=0._LDP
+            IST_WALL(I)=0.D0
+
+            CPUTOT(I)=0._LDP
+            CPUTOT(I)=0.D0
+
+            WALLTOT(I)=0._LDP
+            WALLTOT(I)=0.D0
+
+
+tune_hp.f
+
+            BEFORE(I)=0._LDP
+            BEFORE(I)=0.D0
+
+            AFTER(I)=0._LDP
+            AFTER(I)=0.D0
+
+            CPUTOT(I)=0._LDP
+            CPUTOT(I)=0.D0
+
+            RUNTOT(I)=0._LDP
+            RUNTOT(I)=0.D0
+
+          OVERHEAD=2.0E-06_LDP*(MCLOCK()-T0)
+          OVERHEAD=2.0D-06*(MCLOCK()-T0)
+
+	      BEFORE(I)=1.0E-06_LDP*MCLOCK()
+	      BEFORE(I)=1.0D-06*MCLOCK()
+
+	      BEFORE(I)=1.0E-06_LDP*MCLOCK()
+	      BEFORE(I)=1.0D-06*MCLOCK()
+
+          T0=1.0E-06_LDP*MCLOCK()
+          T0=1.0D-06*MCLOCK()
+
+
+tune_intel.f
+
+            ST_CPU(I)=0._LDP
+            ST_CPU(I)=0.D0
+
+            IST_WALL(I)=0._LDP
+            IST_WALL(I)=0.D0
+
+            CPUTOT(I)=0._LDP
+            CPUTOT(I)=0.D0
+
+            WALLTOT(I)=0._LDP
+            WALLTOT(I)=0.D0
+
+          OVERHEAD=2.0_LDP*(StopTime - StartTime)
+          OVERHEAD=2.0D0*(StopTime - StartTime)
+
+            ST_CPU(I)=0._LDP
+            ST_CPU(I)=0.D0
+
+            IST_WALL(I)=0._LDP
+            IST_WALL(I)=0.D0
+
+            CPUTOT(I)=0._LDP
+            CPUTOT(I)=0.D0
+
+            WALLTOT(I)=0._LDP
+            WALLTOT(I)=0.D0
+
+
+tune_osf.f
+
+            ST_CPU(I)=0._LDP
+            ST_CPU(I)=0.D0
+
+            IST_WALL(I)=0._LDP
+            IST_WALL(I)=0.D0
+
+            CPUTOT(I)=0._LDP
+            CPUTOT(I)=0.D0
+
+            WALLTOT(I)=0._LDP
+            WALLTOT(I)=0.D0
+
+          OVERHEAD=2.0_LDP*(ETIME(TARRY)-T0)
+          OVERHEAD=2.0D0*(ETIME(TARRY)-T0)
+
+            ST_CPU(I)=0._LDP
+            ST_CPU(I)=0.D0
+
+            IST_WALL(I)=0._LDP
+            IST_WALL(I)=0.D0
+
+            CPUTOT(I)=0._LDP
+            CPUTOT(I)=0.D0
+
+            WALLTOT(I)=0._LDP
+            WALLTOT(I)=0.D0
+
+
+tune_osf_garb.f
+
+            ST_CPU(I)=0._LDP
+            ST_CPU(I)=0.D0
+
+            IST_WALL(I)=0._LDP
+            IST_WALL(I)=0.D0
+
+            CPUTOT(I)=0._LDP
+            CPUTOT(I)=0.D0
+
+            WALLTOT(I)=0._LDP
+            WALLTOT(I)=0.D0
+
+          OVERHEAD=2.0_LDP*(ETIME(TARRY)-T0)
+          OVERHEAD=2.0D0*(ETIME(TARRY)-T0)
+
+            ST_CPU(I)=0._LDP
+            ST_CPU(I)=0.D0
+
+            IST_WALL(I)=0._LDP
+            IST_WALL(I)=0.D0
+
+            CPUTOT(I)=0._LDP
+            CPUTOT(I)=0.D0
+
+            WALLTOT(I)=0._LDP
+            WALLTOT(I)=0.D0
+
+
+tune_osf_old.f
+
+          OVERHEAD=0._LDP
+          OVERHEAD=0.D0
+
+              BEFORE(I)=0._LDP
+              BEFORE(I)=0.D0
+
+              AFTER(I)=0._LDP
+              AFTER(I)=0.D0
+
+              CPUTOT(I)=0._LDP
+              CPUTOT(I)=0.D0
+
+              RUNTOT(I)=0._LDP
+              RUNTOT(I)=0.D0
+
+
+verbose_info.f
+
+
+wr_pwd.f
+

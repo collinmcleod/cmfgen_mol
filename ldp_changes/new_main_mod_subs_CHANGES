@@ -1,0 +1,1875 @@
+
+adjust_den_vecs.f
+
+	  IF(POP_SPECIES(1,ISPEC) .NE. 0.0_LDP)THEN
+	  IF(POP_SPECIES(1,ISPEC) .NE. 0.0D0)THEN
+
+
+adjust_r_grid.f
+
+	  IF(TA(I) .LE. 0.0_LDP)TA(I)=ESEC(I)
+	  IF(TA(I) .LE. 0.0D0)TA(I)=ESEC(I)
+
+        TB(1:ND)=0.0_LDP                              !Used for dCHIdR
+        TB(1:ND)=0.0D0                              !Used for dCHIdR
+
+	TAU_OLD(1:ND)=0.0_LDP
+	TAU_OLD(1:ND)=0.0D0
+
+	FG_MIN=-3.0_LDP
+	FG_MIN=-3.0D0
+
+	FG_MAX=1.50_LDP
+	FG_MAX=1.50D0
+
+	  NX=(FG_RANGE+0.7_LDP*DTAU)/DTAU
+	  NX=(FG_RANGE+0.7D0*DTAU)/DTAU
+
+        TAU(2)=MIN(TAU_OLD(2),TAU(1)+0.1_LDP*DTAU)
+        TAU(2)=MIN(TAU_OLD(2),TAU(1)+0.1D0*DTAU)
+
+        TAU(3)=MIN(TAU_OLD(3),TAU(1)+0.3_LDP*DTAU)
+        TAU(3)=MIN(TAU_OLD(3),TAU(1)+0.3D0*DTAU)
+
+	DTAU=4.5_LDP/(NX-1)
+	DTAU=4.5D0/(NX-1)
+
+	TAU(ND-1)=MAX(TAU_OLD(ND-1),TAU(ND)-0.1E00_LDP*DTAU)
+	TAU(ND-1)=MAX(TAU_OLD(ND-1),TAU(ND)-0.1D00*DTAU)
+
+	TAU(ND-2)=TAU(ND)-0.5E00_LDP*DTAU
+	TAU(ND-2)=TAU(ND)-0.5D00*DTAU
+
+	  IF(POP_SPECIES(1,ISPEC) .NE. 0.0_LDP)THEN
+	  IF(POP_SPECIES(1,ISPEC) .NE. 0.0D0)THEN
+
+	  MU_AT_RMAX(LS)=SQRT( 1.0_LDP -(P(LS)/R(1))**2 )
+	  MU_AT_RMAX(LS)=SQRT( 1.0D0 -(P(LS)/R(1))**2 )
+
+
+adjust_r_grid_v2.f
+
+	  IF(TA(I) .LE. 0.0_LDP)TA(I)=ESEC(I)
+	  IF(TA(I) .LE. 0.0D0)TA(I)=ESEC(I)
+
+        TB(1:ND)=0.0_LDP                              !Used for dCHIdR
+        TB(1:ND)=0.0D0                              !Used for dCHIdR
+
+	TAU_OLD(1:ND)=0.0_LDP
+	TAU_OLD(1:ND)=0.0D0
+
+	FG_MIN=-3.0_LDP
+	FG_MIN=-3.0D0
+
+	FG_MAX=1.50_LDP
+	FG_MAX=1.50D0
+
+	  NX=(FG_RANGE+0.7_LDP*DTAU)/DTAU
+	  NX=(FG_RANGE+0.7D0*DTAU)/DTAU
+
+        TAU(2)=MIN(TAU_OLD(2),TAU(1)+0.1_LDP*DTAU)
+        TAU(2)=MIN(TAU_OLD(2),TAU(1)+0.1D0*DTAU)
+
+        TAU(3)=MIN(TAU_OLD(3),TAU(1)+0.3_LDP*DTAU)
+        TAU(3)=MIN(TAU_OLD(3),TAU(1)+0.3D0*DTAU)
+
+	T1=1.0_LDP-10.0_LDP**(-DTAU)
+	T1=1.0D0-10.0D0**(-DTAU)
+
+	TAU(ND-1)=MAX(TAU_OLD(ND-1),TAU(ND)+LOG10(1.0_LDP-0.0667_LDP*T1))
+	TAU(ND-1)=MAX(TAU_OLD(ND-1),TAU(ND)+LOG10(1.0D0-0.0667D0*T1))
+
+	TAU(ND-2)=TAU(ND)+LOG10(1.0_LDP-0.201_LDP*T1)
+	TAU(ND-2)=TAU(ND)+LOG10(1.0D0-0.201D0*T1)
+
+	TAU(ND-3)=TAU(ND)+LOG10(1.0_LDP-0.467_LDP*T1)
+	TAU(ND-3)=TAU(ND)+LOG10(1.0D0-0.467D0*T1)
+
+
+adjust_r_grid_v3.f
+
+	  STRETCH_POW=1.5_LDP
+	  STRETCH_POW=1.5D0
+
+	  STRETCH_POW=1.0_LDP
+	  STRETCH_POW=1.0D0
+
+	  FG_MIN=-2.0_LDP; FG_MAX=1.0_LDP
+	  FG_MIN=-2.0D0; FG_MAX=1.0D0
+
+        TB(1:ND)=0.0_LDP                              !Used for dCHIdR
+        TB(1:ND)=0.0D0                              !Used for dCHIdR
+
+	IF(T1 .GT. 0.0_LDP)THEN
+	IF(T1 .GT. 0.0D0)THEN
+
+	  T1=8.0_LDP
+	  T1=8.0D0
+
+	IF(T1 .LT. 2.0_LDP)T1=2.0_LDP
+	IF(T1 .LT. 2.0D0)T1=2.0D0
+
+	TAU_OLD(1)=FLUX_MEAN(1)*R(1)/(T1-1.0_LDP)
+	TAU_OLD(1)=FLUX_MEAN(1)*R(1)/(T1-1.0D0)
+
+	  IF(STRETCH_POW .GT. 5 .OR. STRETCH_POW .LT. 1.0_LDP)THEN
+	  IF(STRETCH_POW .GT. 5 .OR. STRETCH_POW .LT. 1.0D0)THEN
+
+	  TAU(ND-1)=TAU(ND)-0.1_LDP*LOG_TAU
+	  TAU(ND-1)=TAU(ND)-0.1D0*LOG_TAU
+
+	  TAU(ND-2)=TAU(ND)-0.35_LDP*LOG_TAU
+	  TAU(ND-2)=TAU(ND)-0.35D0*LOG_TAU
+
+	  TAU(2)=TAU(1)+0.02_LDP*LOG_TAU
+	  TAU(2)=TAU(1)+0.02D0*LOG_TAU
+
+	  TAU(3)=TAU(1)+0.2_LDP*LOG_TAU
+	  TAU(3)=TAU(1)+0.2D0*LOG_TAU
+
+	T1=0.0_LDP
+	T1=0.0D0
+
+	T1=T1*2.0_LDP
+	T1=T1*2.0D0
+
+	IF(T1 .LT. 1.0E-03_LDP)THEN
+	IF(T1 .LT. 1.0D-03)THEN
+
+
+adjust_r_grid_v4.f
+
+	  T1=0.5_LDP*(ROSS_MEAN(1)*CLUMP_FAC(1)+ROSS_MEAN(2)*CLUMP_FAC(2))
+	  T1=0.5D0*(ROSS_MEAN(1)*CLUMP_FAC(1)+ROSS_MEAN(2)*CLUMP_FAC(2))
+
+	  T2=0.5_LDP*(ROSS_MEAN(2)*CLUMP_FAC(2)+ROSS_MEAN(3)*CLUMP_FAC(3))
+	  T2=0.5D0*(ROSS_MEAN(2)*CLUMP_FAC(2)+ROSS_MEAN(3)*CLUMP_FAC(3))
+
+	T1=0.0_LDP
+	T1=0.0D0
+
+	T1=T1*2.0_LDP
+	T1=T1*2.0D0
+
+	IF(T1 .LT. 1.0E-03_LDP .AND. .NOT. ONLY_OB_DONE)THEN
+	IF(T1 .LT. 1.0D-03 .AND. .NOT. ONLY_OB_DONE)THEN
+
+	    SIGMA(I)=COEF(J,3)+T1*(2.0_LDP*COEF(J,2)+3.0_LDP*T1*COEF(J,1))
+	    SIGMA(I)=COEF(J,3)+T1*(2.0D0*COEF(J,2)+3.0D0*T1*COEF(J,1))
+
+	    SIGMA(I)=SIGMA(I)-1.0_LDP
+	    SIGMA(I)=SIGMA(I)-1.0D0
+
+	    IF(SIGMA(I) .LT. -1.0_LDP .AND. V(I) .LT. 0.2E00_LDP)THEN
+	    IF(SIGMA(I) .LT. -1.0D0 .AND. V(I) .LT. 0.2D00)THEN
+
+	      SIGMA(I)=-0.999_LDP
+	      SIGMA(I)=-0.999D0
+
+	    ELSE IF(SIGMA(I) .LT. -1.0_LDP)THEN
+	    ELSE IF(SIGMA(I) .LT. -1.0D0)THEN
+
+
+ang_qw_mod.f
+
+
+check_param_consistency.f
+
+
+chg_exch_mod_v3.f
+
+
+cmf_sob_mod.f
+
+
+comp_grey.f
+
+	PI=4.0_LDP*ATAN(1.0_LDP)
+	PI=4.0D0*ATAN(1.0D0)
+
+           FEDD=0.3333_LDP
+           FEDD=0.3333D0
+
+	   HBC_CMF=0.7_LDP; NBC_CMF=0.0_LDP; FL=1.0_LDP; INBC=0.1_LDP
+	   HBC_CMF=0.7D0; NBC_CMF=0.0D0; FL=1.0D0; INBC=0.1D0
+
+	   HFLUX=3.826E+13_LDP*LUM/16.0_LDP/PI**2/R(ND)/R(ND)
+	   HFLUX=3.826D+13*LUM/16.0D0/PI**2/R(ND)/R(ND)
+
+           DBB=3.0_LDP*CHI(ND)*HFLUX
+           DBB=3.0D0*CHI(ND)*HFLUX
+
+	   T1=1000.0_LDP
+	   T1=1000.0D0
+
+	   DO WHILE(T1 .GT. 1.0E-08_LDP)
+	   DO WHILE(T1 .GT. 1.0D-08)
+
+	     T1=0.0_LDP
+	     T1=0.0D0
+
+	   T2=1.0E-05_LDP		!Accuracy to converge f
+	   T2=1.0D-05		!Accuracy to converge f
+
+	  FEDD(1:ND)=0.3_LDP		!Initial guess
+	  FEDD(1:ND)=0.3D0		!Initial guess
+
+	  H_ON_J(1:ND)=0.0_LDP		!Initial guess
+	  H_ON_J(1:ND)=0.0D0		!Initial guess
+
+	  GAMH(1:ND)=0.0_LDP		!Old FEDD
+	  GAMH(1:ND)=0.0D0		!Old FEDD
+
+	  XM(1:ND)=0.0_LDP		!As grey solution, not needed (ETA)
+	  XM(1:ND)=0.0D0		!As grey solution, not needed (ETA)
+
+	  dlnJdlnR=0.0_LDP
+	  dlnJdlnR=0.0D0
+
+	  HFLUX=3.826E+13_LDP*LUM/(4.0_LDP*PI*R(ND))**2
+	  HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
+
+          DBB=3.0_LDP*HFLUX*CHI(ND)
+          DBB=3.0D0*HFLUX*CHI(ND)
+
+	  T1=1.0_LDP
+	  T1=1.0D0
+
+	  DO WHILE(T1 .GT. 1.0E-05_LDP)
+	  DO WHILE(T1 .GT. 1.0D-05)
+
+	    T1=0.0_LDP
+	    T1=0.0D0
+
+	   T2=1.0E-06_LDP		!Accuracy to converge f
+	   T2=1.0D-06		!Accuracy to converge f
+
+	      FEDD(I)=1.0_LDP/3.0_LDP
+	      FEDD(I)=1.0D0/3.0D0
+
+	    HBC_J=1.0_LDP
+	    HBC_J=1.0D0
+
+	    T1=1000.0_LDP
+	    T1=1000.0D0
+
+	    DO WHILE(T1 .GT. 1.0E-06_LDP)
+	    DO WHILE(T1 .GT. 1.0D-06)
+
+	      T1=0.0_LDP
+	      T1=0.0D0
+
+	  TGREY(I)=((PI/5.67E-05_LDP*RJ(I))**0.25_LDP)*1.0E-04_LDP
+	  TGREY(I)=((PI/5.67D-05*RJ(I))**0.25D0)*1.0D-04
+
+
+comp_grey_v2.f
+
+	PI=4.0_LDP*ATAN(1.0_LDP)
+	PI=4.0D0*ATAN(1.0D0)
+
+	  IF(CHI(J)/CHI(1) .GT. 5.0_LDP)EXIT
+	  IF(CHI(J)/CHI(1) .GT. 5.0D0)EXIT
+
+           FEDD=0.3333_LDP
+           FEDD=0.3333D0
+
+	   HBC_CMF=0.7_LDP; NBC_CMF=0.0_LDP; FL=1.0_LDP; INBC=0.1_LDP
+	   HBC_CMF=0.7D0; NBC_CMF=0.0D0; FL=1.0D0; INBC=0.1D0
+
+	   HFLUX=3.826E+13_LDP*LUM/16.0_LDP/PI**2/R(ND)/R(ND)
+	   HFLUX=3.826D+13*LUM/16.0D0/PI**2/R(ND)/R(ND)
+
+           DBB=3.0_LDP*CHI(ND)*HFLUX
+           DBB=3.0D0*CHI(ND)*HFLUX
+
+	   T1=1000.0_LDP
+	   T1=1000.0D0
+
+	   DO WHILE(T1 .GT. 1.0E-08_LDP)
+	   DO WHILE(T1 .GT. 1.0D-08)
+
+	     T1=0.0_LDP
+	     T1=0.0D0
+
+	   T2=1.0E-05_LDP		!Accuracy to converge f
+	   T2=1.0D-05		!Accuracy to converge f
+
+	  FEDD(1:ND)=0.3_LDP		!Initial guess
+	  FEDD(1:ND)=0.3D0		!Initial guess
+
+	  H_ON_J(1:ND)=0.0_LDP		!Initial guess
+	  H_ON_J(1:ND)=0.0D0		!Initial guess
+
+	  GAMH(1:ND)=0.0_LDP		!Old FEDD
+	  GAMH(1:ND)=0.0D0		!Old FEDD
+
+	  XM(1:ND)=0.0_LDP		!As grey solution, not needed (ETA)
+	  XM(1:ND)=0.0D0		!As grey solution, not needed (ETA)
+
+	  dlnJdlnR=0.0_LDP
+	  dlnJdlnR=0.0D0
+
+	  HFLUX=3.826E+13_LDP*LUM/(4.0_LDP*PI*R(ND))**2
+	  HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
+
+          DBB=3.0_LDP*HFLUX*CHI(ND)
+          DBB=3.0D0*HFLUX*CHI(ND)
+
+	  T1=1.0_LDP
+	  T1=1.0D0
+
+	  DO WHILE(T1 .GT. 1.0E-05_LDP)
+	  DO WHILE(T1 .GT. 1.0D-05)
+
+	    T1=0.0_LDP
+	    T1=0.0D0
+
+	   T2=1.0E-06_LDP		!Accuracy to converge f
+	   T2=1.0D-06		!Accuracy to converge f
+
+	      FEDD(I)=1.0_LDP/3.0_LDP
+	      FEDD(I)=1.0D0/3.0D0
+
+	    HBC_J=1.0_LDP
+	    HBC_J=1.0D0
+
+	    T1=1000.0_LDP
+	    T1=1000.0D0
+
+	    DO WHILE(T1 .GT. 1.0E-06_LDP)
+	    DO WHILE(T1 .GT. 1.0D-06)
+
+	      T1=0.0_LDP
+	      T1=0.0D0
+
+	  TGREY(I)=((PI/5.67E-05_LDP*RJ(I))**0.25_LDP)*1.0E-04_LDP
+	  TGREY(I)=((PI/5.67D-05*RJ(I))**0.25D0)*1.0D-04
+
+
+comp_grey_v3.f
+
+	PI=4.0_LDP*ATAN(1.0_LDP)
+	PI=4.0D0*ATAN(1.0D0)
+
+           FEDD=0.3333_LDP
+           FEDD=0.3333D0
+
+	   HBC_CMF=0.7_LDP; NBC_CMF=0.0_LDP; FL=1.0_LDP; INBC=0.1_LDP
+	   HBC_CMF=0.7D0; NBC_CMF=0.0D0; FL=1.0D0; INBC=0.1D0
+
+	   HFLUX=3.826E+13_LDP*LUM/16.0_LDP/PI**2/R(ND)/R(ND)
+	   HFLUX=3.826D+13*LUM/16.0D0/PI**2/R(ND)/R(ND)
+
+           DBB=3.0_LDP*CHI(ND)*HFLUX
+           DBB=3.0D0*CHI(ND)*HFLUX
+
+	   T1=1000.0_LDP
+	   T1=1000.0D0
+
+	   DO WHILE(T1 .GT. 1.0E-08_LDP)
+	   DO WHILE(T1 .GT. 1.0D-08)
+
+	     T1=0.0_LDP
+	     T1=0.0D0
+
+	   T2=1.0E-05_LDP		!Accuracy to converge f
+	   T2=1.0D-05		!Accuracy to converge f
+
+	  FEDD(1:ND)=0.3_LDP		!Initial guess
+	  FEDD(1:ND)=0.3D0		!Initial guess
+
+	  H_ON_J(1:ND)=0.0_LDP		!Initial guess
+	  H_ON_J(1:ND)=0.0D0		!Initial guess
+
+	  GAMH(1:ND)=0.0_LDP		!Old FEDD
+	  GAMH(1:ND)=0.0D0		!Old FEDD
+
+	  XM(1:ND)=0.0_LDP		!As grey solution, not needed (ETA)
+	  XM(1:ND)=0.0D0		!As grey solution, not needed (ETA)
+
+	  dlnJdlnR=0.0_LDP
+	  dlnJdlnR=0.0D0
+
+	  HFLUX=3.826E+13_LDP*LUM/(4.0_LDP*PI*R(ND))**2
+	  HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
+
+          DBB=3.0_LDP*HFLUX*CHI(ND)
+          DBB=3.0D0*HFLUX*CHI(ND)
+
+	  T1=1.0_LDP
+	  T1=1.0D0
+
+	  DO WHILE(T1 .GT. 1.0E-05_LDP)
+	  DO WHILE(T1 .GT. 1.0D-05)
+
+	    T1=0.0_LDP
+	    T1=0.0D0
+
+	   T2=1.0E-06_LDP		!Accuracy to converge f
+	   T2=1.0D-06		!Accuracy to converge f
+
+	      FEDD(I)=1.0_LDP/3.0_LDP
+	      FEDD(I)=1.0D0/3.0D0
+
+	    HBC_J=1.0_LDP
+	    HBC_J=1.0D0
+
+	    T1=1000.0_LDP
+	    T1=1000.0D0
+
+	    DO WHILE(T1 .GT. 1.0E-06_LDP)
+	    DO WHILE(T1 .GT. 1.0D-06)
+
+	      T1=0.0_LDP
+	      T1=0.0D0
+
+	  TGREY(I)=((PI/5.67E-05_LDP*RJ(I))**0.25_LDP)*1.0E-04_LDP
+	  TGREY(I)=((PI/5.67D-05*RJ(I))**0.25D0)*1.0D-04
+
+
+comp_grey_v4.f
+
+	PI=4.0_LDP*ATAN(1.0_LDP)
+	PI=4.0D0*ATAN(1.0D0)
+
+	  IF(CHI(J)/CHI(1) .GT. 5.0_LDP)EXIT
+	  IF(CHI(J)/CHI(1) .GT. 5.0D0)EXIT
+
+           FEDD=0.3333_LDP
+           FEDD=0.3333D0
+
+	   HBC_CMF=0.7_LDP; NBC_CMF=0.0_LDP; FL=1.0_LDP; INBC=0.1_LDP
+	   HBC_CMF=0.7D0; NBC_CMF=0.0D0; FL=1.0D0; INBC=0.1D0
+
+	   HFLUX=3.826E+13_LDP*LUM/16.0_LDP/PI**2/R(ND)/R(ND)
+	   HFLUX=3.826D+13*LUM/16.0D0/PI**2/R(ND)/R(ND)
+
+           DBB=3.0_LDP*CHI(ND)*HFLUX
+           DBB=3.0D0*CHI(ND)*HFLUX
+
+	   T1=1000.0_LDP
+	   T1=1000.0D0
+
+	   DO WHILE(T1 .GT. 1.0E-08_LDP)
+	   DO WHILE(T1 .GT. 1.0D-08)
+
+	     T1=0.0_LDP
+	     T1=0.0D0
+
+	   T2=1.0E-05_LDP		!Accuracy to converge f
+	   T2=1.0D-05		!Accuracy to converge f
+
+	  FEDD(1:ND)=0.3_LDP		!Initial guess
+	  FEDD(1:ND)=0.3D0		!Initial guess
+
+	  H_ON_J(1:ND)=0.0_LDP		!Initial guess
+	  H_ON_J(1:ND)=0.0D0		!Initial guess
+
+	  GAMH(1:ND)=0.0_LDP		!Old FEDD
+	  GAMH(1:ND)=0.0D0		!Old FEDD
+
+	  XM(1:ND)=0.0_LDP		!As grey solution, not needed (ETA)
+	  XM(1:ND)=0.0D0		!As grey solution, not needed (ETA)
+
+	  dlnJdlnR=0.0_LDP
+	  dlnJdlnR=0.0D0
+
+	  HFLUX=3.826E+13_LDP*LUM/(4.0_LDP*PI*R(ND))**2
+	  HFLUX=3.826D+13*LUM/(4.0D0*PI*R(ND))**2
+
+          DBB=3.0_LDP*HFLUX*CHI(ND)
+          DBB=3.0D0*HFLUX*CHI(ND)
+
+	  T1=1.0_LDP
+	  T1=1.0D0
+
+	  DO WHILE(T1 .GT. 1.0E-05_LDP)
+	  DO WHILE(T1 .GT. 1.0D-05)
+
+	    T1=0.0_LDP
+	    T1=0.0D0
+
+	   T2=1.0E-06_LDP		!Accuracy to converge f
+	   T2=1.0D-06		!Accuracy to converge f
+
+	      FEDD(I)=1.0_LDP/3.0_LDP
+	      FEDD(I)=1.0D0/3.0D0
+
+	    HBC_J=1.0_LDP
+	    HBC_J=1.0D0
+
+	    T1=1000.0_LDP
+	    T1=1000.0D0
+
+	    DO WHILE(T1 .GT. 1.0E-06_LDP)
+	    DO WHILE(T1 .GT. 1.0D-06)
+
+	      T1=0.0_LDP
+	      T1=0.0D0
+
+	  TGREY(I)=((PI/5.67E-05_LDP*RJ(I))**0.25_LDP)*1.0E-04_LDP
+	  TGREY(I)=((PI/5.67D-05*RJ(I))**0.25D0)*1.0D-04
+
+
+comp_j_blank.f
+
+	T2=1.0_LDP-EMHNUKT(ND)
+	T2=1.0D0-EMHNUKT(ND)
+
+	DDBBDT=DBB*(T1*(1.0_LDP+EMHNUKT(ND))/T2-2.0_LDP)/T(ND)
+	DDBBDT=DBB*(T1*(1.0D0+EMHNUKT(ND))/T2-2.0D0)/T(ND)
+
+	HFLUX_AT_IB=DBB/CHI(ND)/3.0_LDP
+	HFLUX_AT_IB=DBB/CHI(ND)/3.0D0
+
+	  IC=TWOHCSQ*( FL**3 )*EXP(T1)/(1.0_LDP-EXP(T1))
+	  IC=TWOHCSQ*( FL**3 )*EXP(T1)/(1.0D0-EXP(T1))
+
+	  RSQHNU=1.0_LDP; HFLUX_AT_OB=0.001_LDP; HFLUX_AT_IB=0.0_LDP
+	  RSQHNU=1.0D0; HFLUX_AT_OB=0.001D0; HFLUX_AT_IB=0.0D0
+
+	  IF(SECTION .EQ. 'CONTINUUM' .AND. FREQ_INDX .EQ. 1)FEDD=0.0_LDP
+	  IF(SECTION .EQ. 'CONTINUUM' .AND. FREQ_INDX .EQ. 1)FEDD=0.0D0
+
+	      RJEXT(I)=0.0_LDP
+	      RJEXT(I)=0.0D0
+
+	      FOLD(I)=0.0_LDP
+	      FOLD(I)=0.0D0
+
+	    IF(ABS(T1/FL-1.0_LDP) .GT. 1.0E-10_LDP)THEN
+	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
+
+	        T1=0.0_LDP
+	        T1=0.0D0
+
+	    FEDD_PREV(1:NDEXT)=0.0_LDP		!Not required.
+	    FEDD_PREV(1:NDEXT)=0.0D0		!Not required.
+
+	    GEDD_PREV(1:NDEXT)=0.0_LDP
+	    GEDD_PREV(1:NDEXT)=0.0D0
+
+	    JNU_PREV(1:NDEXT)=0.0_LDP
+	    JNU_PREV(1:NDEXT)=0.0D0
+
+	    N_ON_J_PREV(1:NDEXT)=0.0_LDP
+	    N_ON_J_PREV(1:NDEXT)=0.0D0
+
+	    RSQHNU_PREV(1:NDEXT)=0.0_LDP
+	    RSQHNU_PREV(1:NDEXT)=0.0D0
+
+	    HBC_PREV(:)=0.0_LDP		!1:3
+	    HBC_PREV(:)=0.0D0		!1:3
+
+	    NBC_PREV(:)=0.0_LDP		!1:3
+	    NBC_PREV(:)=0.0D0		!1:3
+
+	    HBC_CMF(:)=0.0_LDP		!1:3
+	    HBC_CMF(:)=0.0D0		!1:3
+
+	    NBC_CMF(:)=0.0_LDP		!1:3
+	    NBC_CMF(:)=0.0D0		!1:3
+
+	      RJEXT(1:NDEXT)=0.0_LDP
+	      RJEXT(1:NDEXT)=0.0D0
+
+	      RJEXT_ES(1:NDEXT)=0.0_LDP
+	      RJEXT_ES(1:NDEXT)=0.0D0
+
+	      FOLD(1:NDEXT)=0.0_LDP
+	      FOLD(1:NDEXT)=0.0D0
+
+	    IF(ABS(T1/FL-1.0_LDP) .GT. 1.0E-10_LDP)THEN
+	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
+
+	    IF(ABS(T1/FL-1.0_LDP) .GT. 1.0E-10_LDP)THEN
+	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
+
+             IF(.NOT. DIF)HFLUX_AT_IB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJEXT(NDEXT)
+             IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJEXT(NDEXT)
+
+	        T1=0.0_LDP
+	        T1=0.0D0
+
+	    IF(T1 .NE. 0)T1=200.0_LDP*(RJ(1)-TC(1))/T1
+	    IF(T1 .NE. 0)T1=200.0D0*(RJ(1)-TC(1))/T1
+
+	    IF(T2 .NE. 0)T2=200.0_LDP*(RJ(ND)-TC(NDEXT))/T2
+	    IF(T2 .NE. 0)T2=200.0D0*(RJ(ND)-TC(NDEXT))/T2
+
+	    IF(T1 .NE. 0)T1=ABS(200.0_LDP*(RJ(1)-TC(1))/T1)
+	    IF(T1 .NE. 0)T1=ABS(200.0D0*(RJ(1)-TC(1))/T1)
+
+	    IF(T1 .GT. 100.0_LDP)THEN
+	    IF(T1 .GT. 100.0D0)THEN
+
+	    ELSE IF(T1 .GT. 50.0_LDP)THEN
+	    ELSE IF(T1 .GT. 50.0D0)THEN
+
+	    ELSE IF(T1 .GT. 20.0_LDP)THEN
+	    ELSE IF(T1 .GT. 20.0D0)THEN
+
+	1         MAXCH .LT. 100.0_LDP .AND. .NOT. SN_MODEL) )THEN
+	1         MAXCH .LT. 100.0D0 .AND. .NOT. SN_MODEL) )THEN
+
+	      FEDD_PREV(I)=0.0_LDP		!Not required.
+	      FEDD_PREV(I)=0.0D0		!Not required.
+
+	      GEDD_PREV(I)=0.0_LDP
+	      GEDD_PREV(I)=0.0D0
+
+	      JNU_PREV(I)=0.0_LDP
+	      JNU_PREV(I)=0.0D0
+
+	      N_ON_J_PREV(I)=0.0_LDP
+	      N_ON_J_PREV(I)=0.0D0
+
+	      RSQHNU_PREV(I)=0.0_LDP
+	      RSQHNU_PREV(I)=0.0D0
+
+	    HBC_PREV(:)=0.0_LDP		!1:3
+	    HBC_PREV(:)=0.0D0		!1:3
+
+	    NBC_PREV(:)=0.0_LDP		!1:3
+	    NBC_PREV(:)=0.0D0		!1:3
+
+	    HBC_CMF(:)=0.0_LDP		!1:3
+	    HBC_CMF(:)=0.0D0		!1:3
+
+	    NBC_CMF(:)=0.0_LDP		!1:3
+	    NBC_CMF(:)=0.0D0		!1:3
+
+	        RJ(I)=0.0_LDP
+	        RJ(I)=0.0D0
+
+	        RJ_ES(I)=0.0_LDP
+	        RJ_ES(I)=0.0D0
+
+	        FOLD(I)=0.0_LDP
+	        FOLD(I)=0.0D0
+
+	    IF(ABS(T1/FL-1.0_LDP) .GT. 1.0E-10_LDP)THEN
+	    IF(ABS(T1/FL-1.0D0) .GT. 1.0D-10)THEN
+
+	       IF(.NOT. DIF)HFLUX_AT_IB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
+	       IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+
+	       IF(.NOT. DIF)HFLUX_AT_OB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
+	       IF(.NOT. DIF)HFLUX_AT_OB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+
+	          HFLUX_AT_IB=0.0_LDP
+	          HFLUX_AT_IB=0.0D0
+
+	            HFLUX_AT_IB=HFLUX_AT_IB+0.5_LDP*HQW(ND,I)*IC
+	            HFLUX_AT_IB=HFLUX_AT_IB+0.5D0*HQW(ND,I)*IC
+
+	          HFLUX_AT_IB=0.0_LDP
+	          HFLUX_AT_IB=0.0D0
+
+	         IF(.NOT. DIF)HFLUX_AT_IB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
+	         IF(.NOT. DIF)HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+
+	          HFLUX_AT_IB=0.0_LDP
+	          HFLUX_AT_IB=0.0D0
+
+	            HFLUX_AT_IB=HFLUX_AT_IB+0.5_LDP*HQW(ND,I)*IC
+	            HFLUX_AT_IB=HFLUX_AT_IB+0.5D0*HQW(ND,I)*IC
+
+	          HFLUX_AT_IB=0.0_LDP
+	          HFLUX_AT_IB=0.0D0
+
+	          HFLUX_AT_IB=0.5_LDP*IC*(0.5_LDP+INBC)-INBC*RJ(ND)
+	          HFLUX_AT_IB=0.5D0*IC*(0.5D0+INBC)-INBC*RJ(ND)
+
+	        T1=0.0_LDP
+	        T1=0.0D0
+
+	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0_LDP
+	        IF(PLANE_PARALLEL_NO_V)V_AT_RMAX=0.0D0
+
+	1         MAXCH .LT.  100.0_LDP .AND. .NOT. SN_MODEL .AND. ND .LT. 200) )THEN
+	1         MAXCH .LT.  100.0D0 .AND. .NOT. SN_MODEL .AND. ND .LT. 200) )THEN
+
+	    IF(T1 .NE. 0)T1=200.0_LDP*(RJ(1)-TC(1))/T1
+	    IF(T1 .NE. 0)T1=200.0D0*(RJ(1)-TC(1))/T1
+
+	    IF(T2 .NE. 0)T2=200.0_LDP*(RJ(ND)-TC(ND))/T2
+	    IF(T2 .NE. 0)T2=200.0D0*(RJ(ND)-TC(ND))/T2
+
+	    IF(T1 .NE. 0)T1=ABS(200.0_LDP*(RJ(1)-TC(1))/T1)
+	    IF(T1 .NE. 0)T1=ABS(200.0D0*(RJ(1)-TC(1))/T1)
+
+	    IF(T1 .GT. 100.0_LDP)THEN
+	    IF(T1 .GT. 100.0D0)THEN
+
+	    ELSE IF(T1 .GT. 50.0_LDP)THEN
+	    ELSE IF(T1 .GT. 50.0D0)THEN
+
+	    ELSE IF(T1 .GT. 20.0_LDP)THEN
+	    ELSE IF(T1 .GT. 20.0D0)THEN
+
+	  IF(SECTION .EQ. 'CONTINUUM' .AND. FREQ_INDX .EQ. 1)FEDD=0.0_LDP
+	  IF(SECTION .EQ. 'CONTINUUM' .AND. FREQ_INDX .EQ. 1)FEDD=0.0D0
+
+	      RJ(I)=0.0_LDP
+	      RJ(I)=0.0D0
+
+	        T1=0.0_LDP
+	        T1=0.0D0
+
+	IF(ABS(RJ(1)) .GT. 1.0E+30_LDP)THEN
+	IF(ABS(RJ(1)) .GT. 1.0D+30)THEN
+
+
+comp_opac.f
+
+	    CHI(I)=0.0_LDP
+	    CHI(I)=0.0D0
+
+	    ESEC(I)=0.0_LDP
+	    ESEC(I)=0.0D0
+
+	    ETA(I)=0.0_LDP
+	    ETA(I)=0.0D0
+
+	  IC=TWOHCSQ*T1*(CONT_FREQ**3)/(1.0_LDP-T1)
+	  IC=TWOHCSQ*T1*(CONT_FREQ**3)/(1.0D0-T1)
+
+	       T1=ADD_OPAC_SCL_FAC*6.65E-15_LDP*POP_ATOM(I)
+	       T1=ADD_OPAC_SCL_FAC*6.65D-15*POP_ATOM(I)
+
+	       ETA(I)=ETA(I)+T1*TWOHCSQ*(CONT_FREQ**3)*EMHNUKT_CONT(I)/(1.0_LDP-EMHNUKT_CONT(I))
+	       ETA(I)=ETA(I)+T1*TWOHCSQ*(CONT_FREQ**3)*EMHNUKT_CONT(I)/(1.0D0-EMHNUKT_CONT(I))
+
+	        IF(T1 .NE. 0.0_LDP)THEN
+	        IF(T1 .NE. 0.0D0)THEN
+
+	            T2=0.0_LDP			!Temporary CHI
+	            T2=0.0D0			!Temporary CHI
+
+	            T3=0.0_LDP			!Temporary ETA
+	            T3=0.0D0			!Temporary ETA
+
+	  CHI_RAY(1:ND)=0.0_LDP
+	  CHI_RAY(1:ND)=0.0D0
+
+	  IC=TWOHCSQ*T1*(FL**3)/(1.0_LDP-T1)
+	  IC=TWOHCSQ*T1*(FL**3)/(1.0D0-T1)
+
+	    IF(T_SHOCK_1 .NE. 0.0_LDP)THEN
+	    IF(T_SHOCK_1 .NE. 0.0D0)THEN
+
+	      T2=1.0_LDP ; TA(1)=GFF(CONT_FREQ,T_SHOCK_1,T2)
+	      T2=1.0D0 ; TA(1)=GFF(CONT_FREQ,T_SHOCK_1,T2)
+
+	      T2=2.0_LDP ; TA(2)=4.0_LDP*GFF(CONT_FREQ,T_SHOCK_1,T2)
+	      T2=2.0D0 ; TA(2)=4.0D0*GFF(CONT_FREQ,T_SHOCK_1,T2)
+
+	      T2=6.0_LDP ; TA(3)=36.0_LDP*GFF(CONT_FREQ,T_SHOCK_1,T2)
+	      T2=6.0D0 ; TA(3)=36.0D0*GFF(CONT_FREQ,T_SHOCK_1,T2)
+
+	1          6.0_LDP*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
+	1          6.0D0*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
+
+	    IF(T_SHOCK_2 .NE. 0.0_LDP)THEN
+	    IF(T_SHOCK_2 .NE. 0.0D0)THEN
+
+	      T2=1.0_LDP ; TA(1)=GFF(CONT_FREQ,T_SHOCK_2,T2)
+	      T2=1.0D0 ; TA(1)=GFF(CONT_FREQ,T_SHOCK_2,T2)
+
+	      T2=2.0_LDP ; TA(2)=4.0_LDP*GFF(CONT_FREQ,T_SHOCK_2,T2)
+	      T2=2.0D0 ; TA(2)=4.0D0*GFF(CONT_FREQ,T_SHOCK_2,T2)
+
+	      T2=6.0_LDP ; TA(3)=36.0_LDP*GFF(CONT_FREQ,T_SHOCK_2,T2)
+	      T2=6.0D0 ; TA(3)=36.0D0*GFF(CONT_FREQ,T_SHOCK_2,T2)
+
+	1          6.0_LDP*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
+	1          6.0D0*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
+
+	      T3=POP_SPECIES(I,1)+2.0_LDP*POP_SPECIES(I,2)+
+	      T3=POP_SPECIES(I,1)+2.0D0*POP_SPECIES(I,2)+
+
+	1              6.0_LDP*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
+	1              6.0D0*(POP_ATOM(I)-POP_SPECIES(I,1)-POP_SPECIES(I,2))
+
+	  T1=0.241838_LDP		!eV to 10^15Hz
+	  T1=0.241838D0		!eV to 10^15Hz
+
+	       XRAY_LUM_TOT(1:ND)=0.0_LDP
+	       XRAY_LUM_TOT(1:ND)=0.0D0
+
+	       XRAY_LUM_0P1(1:ND)=0.0_LDP
+	       XRAY_LUM_0P1(1:ND)=0.0D0
+
+	       XRAY_LUM_1KEV(1:ND)=0.0_LDP
+	       XRAY_LUM_1KEV(1:ND)=0.0D0
+
+	    IF(FL .GE. 100.0_LDP*T1)XRAY_LUM_0P1(1:ND)=XRAY_LUM_0P1(1:ND)+TA(1:ND)
+	    IF(FL .GE. 100.0D0*T1)XRAY_LUM_0P1(1:ND)=XRAY_LUM_0P1(1:ND)+TA(1:ND)
+
+	    IF(FL .GE. 1000.0_LDP*T1)XRAY_LUM_1KEV(1:ND)=XRAY_LUM_1KEV(1:ND)+TA(1:ND)
+	    IF(FL .GE. 1000.0D0*T1)XRAY_LUM_1KEV(1:ND)=XRAY_LUM_1KEV(1:ND)+TA(1:ND)
+
+	  ETA_MECH(1:ND)=0.0_LDP
+	  ETA_MECH(1:ND)=0.0D0
+
+	  IF(ETA(I) .LT. 1.0E-280_LDP)THEN
+	  IF(ETA(I) .LT. 1.0D-280)THEN
+
+	    ETA(I)=1.0E-280_LDP
+	    ETA(I)=1.0D-280
+
+	    ETA_NOSCAT(I)=1.0E-280_LDP
+	    ETA_NOSCAT(I)=1.0D-280
+
+
+comp_var_opac.f
+
+	    T1=ADD_OPAC_SCL_FAC*6.65E-15_LDP*POP_ATOM(L)
+	    T1=ADD_OPAC_SCL_FAC*6.65D-15*POP_ATOM(L)
+
+	1                   (1.0_LDP-EMHNUKT_CONT(L))**2
+	1                   (1.0D0-EMHNUKT_CONT(L))**2
+
+
+control_variable_mod.f
+
+
+do_var_cont.f
+
+	      TX(:,:,:)=0.0_LDP
+	      TX(:,:,:)=0.0D0
+
+	      TVX(:,:,:)=0.0_LDP
+	      TVX(:,:,:)=0.0D0
+
+	      dJ_DIF_d_T(:)=0.0_LDP
+	      dJ_DIF_d_T(:)=0.0D0
+
+	      dJ_DIF_d_dTdR(:)=0.0_LDP
+	      dJ_DIF_d_dTdR(:)=0.0D0
+
+	      dRSQH_DIF_d_T=0.0_LDP
+	      dRSQH_DIF_d_T=0.0D0
+
+	      dRSQH_DIF_d_dTdR=0.0_LDP
+	      dRSQH_DIF_d_dTdR=0.0D0
+
+	        IF(ETA_CONT(L) .EQ. 0.0_LDP)THEN
+	        IF(ETA_CONT(L) .EQ. 0.0D0)THEN
+
+                  TB(L)=1.0_LDP
+                  TB(L)=1.0D0
+
+	        IF(TA(L) .GT. 5.0_LDP)THEN
+	        IF(TA(L) .GT. 5.0D0)THEN
+
+	          TA(L)=0.0_LDP; TB(L)=0.0_LDP
+	          TA(L)=0.0D0; TB(L)=0.0D0
+
+	          TA(L)=0.0_LDP
+	          TA(L)=0.0D0
+
+	          TB(L)=0.0_LDP
+	          TB(L)=0.0D0
+
+	        T1=2.0_LDP
+	        T1=2.0D0
+
+	        ES_COH_VEC(1:ND)=0.0_LDP
+	        ES_COH_VEC(1:ND)=0.0D0
+
+	    TX(:,:,1:2)=0.0_LDP
+	    TX(:,:,1:2)=0.0D0
+
+	    TVX(:,:,1:2)=0.0_LDP
+	    TVX(:,:,1:2)=0.0D0
+
+	      TX_EXT(:,:,:)=0.0_LDP
+	      TX_EXT(:,:,:)=0.0D0
+
+	      TVX_EXT(:,:,:)=0.0_LDP
+	      TVX_EXT(:,:,:)=0.0D0
+
+	        IF(TA(L) .GT. 1.5_LDP)RAT_TOO_BIG=.TRUE.
+	        IF(TA(L) .GT. 1.5)RAT_TOO_BIG=.TRUE.
+
+	          TA(L)=0.0_LDP
+	          TA(L)=0.0D0
+
+	          TB(L)=0.0_LDP
+	          TB(L)=0.0D0
+
+	    TX_EXT(:,:,1:2)=0.0_LDP		!dCHI,dETA
+	    TX_EXT(:,:,1:2)=0.0D0		!dCHI,dETA
+
+	    TVX_EXT(:,:,1:2)=0.0_LDP		!dCHI,dETA
+	    TVX_EXT(:,:,1:2)=0.0D0		!dCHI,dETA
+
+	  dJ_LOC=0.0_LDP
+	  dJ_LOC=0.0D0
+
+
+eddfac_rec_defs_mod.f
+
+
+eval_lte_v4.f
+
+	        ATM(ID+1)%dlnXzVLTE_dlnT(1,I)=0.0_LDP
+	        ATM(ID+1)%dlnXzVLTE_dlnT(1,I)=0.0D0
+
+
+eval_lte_v5.f
+
+	        ATM(ID+1)%dlnXzVLTE_dlnT(1,I)=0.0_LDP
+	        ATM(ID+1)%dlnXzVLTE_dlnT(1,I)=0.0D0
+
+
+gam_mu_mod.f90
+
+
+grey_t_iterate.f
+
+	    CONT_FREQ=0.0_LDP
+	    CONT_FREQ=0.0D0
+
+	        IF(CHI(I) .LT. 0.1_LDP*ESEC(I))THEN
+	        IF(CHI(I) .LT. 0.1D0*ESEC(I))THEN
+
+	          CHI(I)=0.1_LDP*ESEC(I)
+	          CHI(I)=0.1D0*ESEC(I)
+
+	1           T2*EMHNUKT(I)/CHI(I)/(1.0_LDP-EMHNUKT(I))**2
+	1           T2*EMHNUKT(I)/CHI(I)/(1.0D0-EMHNUKT(I))**2
+
+	    T1=1.8047E+11_LDP
+	    T1=1.8047D+11
+
+	      ROSSMEAN(I)=4.0_LDP*CLUMP_FAC(I)*T1*(T(I)**5)/ROSSMEAN(I)
+	      ROSSMEAN(I)=4.0D0*CLUMP_FAC(I)*T1*(T(I)**5)/ROSSMEAN(I)
+
+	      IF(TA(ND) .LT. 10.0_LDP)THEN
+	      IF(TA(ND) .LT. 10.0D0)THEN
+
+	        T1=1.0_LDP
+	        T1=1.0D0
+
+	        T1=1.0_LDP-EXP(-TA(I)/GREY_PAR)
+	        T1=1.0D0-EXP(-TA(I)/GREY_PAR)
+
+	      IF(T1 .LT. 0.1_LDP*GREY_PAR)THEN
+	      IF(T1 .LT. 0.1D0*GREY_PAR)THEN
+
+	        T(I)=MAX(T(I),0.95_LDP*T_MIN)
+	        T(I)=MAX(T(I),0.95D0*T_MIN)
+
+	        T2=0.0_LDP
+	        T2=0.0D0
+
+	        T(I)=T1*TGREY(I)+(1.0_LDP-T1)*T_SAVE(I)
+	        T(I)=T1*TGREY(I)+(1.0-T1)*T_SAVE(I)
+
+	        T(I)=MAX(T(I),0.95_LDP*T_MIN)
+	        T(I)=MAX(T(I),0.95D0*T_MIN)
+
+	    T1=1.0_LDP
+	    T1=1.0D0
+
+	    DO WHILE (T1 .GT. 1.0E-04_LDP)
+	    DO WHILE (T1 .GT. 1.0D-04)
+
+	      T1=0.0_LDP
+	      T1=0.0D0
+
+	        TA(I)=-(H(I)-ED(I))/(QH(I)-1.0_LDP)/ED(I)
+	        TA(I)=-(H(I)-ED(I))/(QH(I)-1.0D0)/ED(I)
+
+	        IF(TA(I) .LT. -0.9_LDP)TA(I)=-0.9_LDP
+	        IF(TA(I) .LT. -0.9D0)TA(I)=-0.9D0
+
+	        IF(TA(I) .GT. 9.0_LDP)TA(I)=9.0_LDP
+	        IF(TA(I) .GT. 9.0D0)TA(I)=9.0D0
+
+	        ED(I)=ED(I)*(1.0_LDP+TA(I))
+	        ED(I)=ED(I)*(1.0D0+TA(I))
+
+	      POPION(J)=0.0_LDP
+	      POPION(J)=0.0D0
+
+	        IF(Z_POP(I) .GT. 0.01_LDP)POPION(J)=POPION(J)+POPS(I,J)
+	        IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
+
+
+init_line_opac_var.f
+
+	    ZNET_SIM(I,SIM_INDX)=0.0_LDP
+	    ZNET_SIM(I,SIM_INDX)=0.0D0
+
+	    JBAR_SIM(I,SIM_INDX)=0.0_LDP
+	    JBAR_SIM(I,SIM_INDX)=0.0D0
+
+	  LINE_QW_SUM(SIM_INDX)=0.0_LDP
+	  LINE_QW_SUM(SIM_INDX)=0.0D0
+
+	    T1=1.0E-15_LDP/1.77245385095516_LDP		!1.0D-15/SQRT(PI)
+	    T1=1.0D-15/1.77245385095516D0		!1.0D-15/SQRT(PI)
+
+	    NU_DOP=FL_SIM(SIM_INDX)*12.85_LDP*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
+	    NU_DOP=FL_SIM(SIM_INDX)*12.85D0*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
+
+	1                        (VTURB/12.85_LDP)**2 )/2.998E+05_LDP
+	1                        (VTURB/12.85D0)**2 )/2.998D+05
+
+	      TX(:,:,J)=0.0_LDP
+	      TX(:,:,J)=0.0D0
+
+	      TVX(:,:,J)=0.0_LDP
+	      TVX(:,:,J)=0.0D0
+
+	      IF(ACCURATE)TX_EXT(:,:,J)=0.0_LDP
+	      IF(ACCURATE)TX_EXT(:,:,J)=0.0D0
+
+	      IF(ACCURATE)TVX_EXT(:,:,J)=0.0_LDP
+	      IF(ACCURATE)TVX_EXT(:,:,J)=0.0D0
+
+	      TX(:,:,J)=0.0_LDP
+	      TX(:,:,J)=0.0D0
+
+	      TVX(:,:,J)=0.0_LDP
+	      TVX(:,:,J)=0.0D0
+
+	      IF(ACCURATE)TX_EXT(:,:,J)=0.0_LDP
+	      IF(ACCURATE)TX_EXT(:,:,J)=0.0D0
+
+	      IF(ACCURATE)TVX_EXT(:,:,J)=0.0_LDP
+	      IF(ACCURATE)TVX_EXT(:,:,J)=0.0D0
+
+	      dZ(J,:,:,:)=0.0_LDP		!NM,NUM_BANDS,ND,MAX_SIM
+	      dZ(J,:,:,:)=0.0D0		!NM,NUM_BANDS,ND,MAX_SIM
+
+	      dZ(J,:,:,:)=0.0_LDP		!NM,NUM_BANDS,ND,MAX_SIM
+	      dZ(J,:,:,:)=0.0D0		!NM,NUM_BANDS,ND,MAX_SIM
+
+	    dZ(:,:,:,SIM_INDX)=0.0_LDP	!NM,NUM_BANDS,ND,MAX_SIM	
+	    dZ(:,:,:,SIM_INDX)=0.0D0	!NM,NUM_BANDS,ND,MAX_SIM	
+
+
+init_line_opac_var_v2.f
+
+	      ZNET_SIM(I,SIM_INDX)=0.0_LDP
+	      ZNET_SIM(I,SIM_INDX)=0.0D0
+
+	      JBAR_SIM(I,SIM_INDX)=0.0_LDP
+	      JBAR_SIM(I,SIM_INDX)=0.0D0
+
+	    LINE_QW_SUM(1:ND,SIM_INDX)=0.0_LDP
+	    LINE_QW_SUM(1:ND,SIM_INDX)=0.0D0
+
+	        T1=2.998E-10_LDP/FL_SIM(SIM_INDX)
+	        T1=2.998D-10/FL_SIM(SIM_INDX)
+
+	        T1=1.0E-15_LDP/1.77245385095516_LDP		!1.0D-15/SQRT(PI)
+	        T1=1.0D-15/1.77245385095516D0		!1.0D-15/SQRT(PI)
+
+	        NU_DOP=FL_SIM(SIM_INDX)*12.85_LDP*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
+	        NU_DOP=FL_SIM(SIM_INDX)*12.85D0*SQRT( TDOP/AMASS_SIM(SIM_INDX) +
+
+	1                        (VTURB/12.85_LDP)**2 )/2.998E+05_LDP
+	1                        (VTURB/12.85D0)**2 )/2.998D+05
+
+	     dZ(J,K,L)=0.0_LDP
+	     dZ(J,K,L)=0.0D0
+
+
+init_opac_mod.f
+
+
+line_mod.f
+
+
+line_vec_mod.f
+
+
+mod_cmfgen.f
+
+
+mod_gamma_trans_v3.f90
+
+	REAL(KIND=LDP), PARAMETER :: PLANCK = 4.135668E-21_LDP ! UNITS OF MeV*s SINCE PHOTON ENERGIES IN MeV
+	REAL(KIND=LDP), PARAMETER :: PLANCK = 4.135668D-21 ! UNITS OF MeV*s SINCE PHOTON ENERGIES IN MeV
+
+	REAL(KIND=LDP), PARAMETER :: home = 8.09330118E-21_LDP	! home = h/mc^2 in units of seconds
+	REAL(KIND=LDP), PARAMETER :: home = 8.09330118D-21	! home = h/mc^2 in units of seconds
+
+
+mod_lev_dis_blk.f
+
+	REAL(KIND=LDP), PARAMETER :: PHOT_DIS_PARAMETER=1.0E-04_LDP		!Was 1.0E-06 (29-May-2019)
+	REAL(KIND=LDP), PARAMETER :: PHOT_DIS_PARAMETER=1.0D-04		!Was 1.0E-06 (29-May-2019)
+
+	  B_LEV_DIS=( 8.589E+14_LDP*(POPION**0.333333_LDP)/ED)**1.5_LDP
+	  B_LEV_DIS=( 8.589D+14*(POPION**0.333333D0)/ED)**1.5D0
+
+	  A_LEV_DIS=0.0009_LDP*(ED**0.1667_LDP)/SQRT(T)
+	  A_LEV_DIS=0.0009D0*(ED**0.1667D0)/SQRT(T)
+
+	  X_LEV_DIS=(1.0_LDP+A_LEV_DIS)**3.15_LDP
+	  X_LEV_DIS=(1.0D0+A_LEV_DIS)**3.15D0
+
+	  B_LEV_DIS=1.0E+30_LDP		!Large number
+	  B_LEV_DIS=1.0D+30		!Large number
+
+	  A_LEV_DIS=0.0_LDP
+	  A_LEV_DIS=0.0D0
+
+	  X_LEV_DIS=1.0_LDP
+	  X_LEV_DIS=1.0D0
+
+
+mod_rd_gamray_cntrl_variables.f90
+
+
+mod_read_nuc_decay_data_v2.f90
+
+
+nuc_iso_mod.f
+
+
+opac_mod.f
+
+
+radiation_mod.f
+
+	IF(IOS .EQ. 0)ALLOCATE ( LANG_COORDEXT(NDMAX),STAT=IOS ); LANG_COORDEXT=0.0_LDP
+	IF(IOS .EQ. 0)ALLOCATE ( LANG_COORDEXT(NDMAX),STAT=IOS ); LANG_COORDEXT=0.0D0
+
+	J_INT=0.0_LDP; H_INT=0.0_LDP; K_INT=0.0_LDP
+	J_INT=0.0D0; H_INT=0.0D0; K_INT=0.0D0
+
+
+rd_cont_j.f
+
+	IPLUS(1:NP)=1.0E-10_LDP		!Arbitrary value
+	IPLUS(1:NP)=1.0D-10		!Arbitrary value
+
+	HBC_CMF(1)=1.0_LDP
+	HBC_CMF(1)=1.0D0
+
+	    RJ(I)=(1.0_LDP-T1)*RJ_LOW(I)+T1*RJ_HIGH(I)
+	    RJ(I)=(1.0D0-T1)*RJ_LOW(I)+T1*RJ_HIGH(I)
+
+	K_MOM(1:ND)=RJ(1:ND)/3.0_LDP
+	K_MOM(1:ND)=RJ(1:ND)/3.0D0
+
+	RSQHNU(1:ND)=1.0E-20_LDP
+	RSQHNU(1:ND)=1.0D-20
+
+	HBC_CMF(:)=1.0_LDP
+	HBC_CMF(:)=1.0D0
+
+
+rd_control_variables.f
+
+	    V_EPPS1=1.0_LDP
+	    V_EPPS1=1.0D0
+
+	    V_BETA2=1.0_LDP
+	    V_BETA2=1.0D0
+
+	    V_EPPS2=1.0_LDP
+	    V_EPPS2=1.0D0
+
+	    CONS_FOR_R_GRID=1.0_LDP
+	    CONS_FOR_R_GRID=1.0D0
+
+	    EXP_FOR_R_GRID=0.0_LDP
+	    EXP_FOR_R_GRID=0.0D0
+
+	    CONS_FOR_R_GRID=-1.0_LDP
+	    CONS_FOR_R_GRID=-1.0D0
+
+	      CONS_FOR_R_GRID=1.0_LDP
+	      CONS_FOR_R_GRID=1.0D0
+
+	      EXP_FOR_R_GRID=0.0_LDP
+	      EXP_FOR_R_GRID=0.0D0
+
+	    VCORE=0.0_LDP		!Not used but initialized
+	    VCORE=0.0D0		!Not used but initialized
+
+	    VPHOT=0.0_LDP
+	    VPHOT=0.0D0
+
+	    SCL_HT=0.0_LDP
+	    SCL_HT=0.0D0
+
+	    V_BETA1=0.0_LDP
+	    V_BETA1=0.0D0
+
+	    V_EPPS1=1.0_LDP
+	    V_EPPS1=1.0D0
+
+	    V_BETA2=1.0_LDP
+	    V_BETA2=1.0D0
+
+	    V_EPPS2=1.0_LDP
+	    V_EPPS2=1.0D0
+
+	    RHO_ZERO=0.0_LDP
+	    RHO_ZERO=0.0D0
+
+	    IF(RHO_ZERO .EQ. 0.0_LDP)THEN
+	    IF(RHO_ZERO .EQ. 0.0D0)THEN
+
+	    RMDOT=1.0E-20_LDP
+	    RMDOT=1.0D-20
+
+	  NC_PNT_SRCE=0.0_LDP
+	  NC_PNT_SRCE=0.0D0
+
+	  R_PNT_SRCE=0.0_LDP
+	  R_PNT_SRCE=0.0D0
+
+	  TEFF_PNT_SRCE=0.0_LDP
+	  TEFF_PNT_SRCE=0.0D0
+
+	  TEFF=0.0_LDP; LOGG=0.0_LDP
+	  TEFF=0.0D0; LOGG=0.0D0
+
+	    PRESSURE_VTURB=0.0_LDP
+	    PRESSURE_VTURB=0.0D0
+
+	  IF(TEFF .NE. 0.0_LDP .AND. .NOT. DO_HYDRO)THEN
+	  IF(TEFF .NE. 0.0D0 .AND. .NOT. DO_HYDRO)THEN
+
+	  CLUMP_PAR(:)=0.0_LDP
+	  CLUMP_PAR(:)=0.0D0
+
+	  TIME_SEQ_NO=0.0_LDP
+	  TIME_SEQ_NO=0.0D0
+
+	    NT_OMIT_ION_SCALE=1.0E-03_LDP
+	    NT_OMIT_ION_SCALE=1.0D-03
+
+	    NT_OMIT_LEV_SCALE=1.0E-04_LDP
+	    NT_OMIT_LEV_SCALE=1.0D-04
+
+	    NT_EMAX=1000.0_LDP            !eV
+	    NT_EMAX=1000.0D0            !eV
+
+	    NT_EMIN=1.0_LDP               !ev
+	    NT_EMIN=1.0D0               !ev
+
+	    MINIMUM_ISO_POP=1.0E-20_LDP
+	    MINIMUM_ISO_POP=1.0D-20
+
+	    RMAX_ON_RCORE=-1.0_LDP		!Implies use default.
+	    RMAX_ON_RCORE=-1.0D0		!Implies use default.
+
+	  FRAC_SIG_GAU=0.25_LDP
+	  FRAC_SIG_GAU=0.25D0
+
+	  CUT_ACCURACY=0.02_LDP
+	  CUT_ACCURACY=0.02D0
+
+          IF(EXT_LINE_VAR .LT. 0.0_LDP .OR. EXT_LINE_VAR .GT. 2.0_LDP)THEN
+          IF(EXT_LINE_VAR .LT. 0.0D0 .OR. EXT_LINE_VAR .GT. 2.0D0)THEN
+
+	  USE_WEAK_TAU_LIM=.FALSE.; WEAK_TAU_LINE_LIMIT=0.01_LDP
+	  USE_WEAK_TAU_LIM=.FALSE.; WEAK_TAU_LINE_LIMIT=0.01D0
+
+	  IB_STAB_FACTOR=0.1_LDP
+	  IB_STAB_FACTOR=0.1D0
+
+	  IF(INNER_BND_METH .EQ. 'DIFFUSION')IB_STAB_FACTOR=0.0_LDP
+	  IF(INNER_BND_METH .EQ. 'DIFFUSION')IB_STAB_FACTOR=0.0D0
+
+	  OUT_BC_PARAM_ONE=0.299794_LDP
+	  OUT_BC_PARAM_ONE=0.299794D0
+
+	  REXT_FAC=0.0_LDP
+	  REXT_FAC=0.0D0
+
+	  AMASS_DOP=1.0_LDP
+	  AMASS_DOP=1.0D0
+
+	  V_PROF_LIMIT=3000.0_LDP
+	  V_PROF_LIMIT=3000.0D0
+
+	  MAX_PROF_ED=1.0E+16_LDP
+	  MAX_PROF_ED=1.0D+16
+
+	  OVER_FREQ_DIF=OVER_FREQ_DIF/2.998E+05_LDP
+	  OVER_FREQ_DIF=OVER_FREQ_DIF/2.998D+05
+
+	  SCL_LINE_DENSITY_LIMIT=1.0E+30_LDP
+	  SCL_LINE_DENSITY_LIMIT=1.0D+30
+
+	  ADVEC_RELAX_PARAM=1.0_LDP
+	  ADVEC_RELAX_PARAM=1.0D0
+
+	  VSMOOTH_XRAYS=3000.0_LDP
+	  VSMOOTH_XRAYS=3000.0D0
+
+	  ALLOWED_XRAY_FLUX_ERROR=0.1_LDP
+	  ALLOWED_XRAY_FLUX_ERROR=0.1D0
+
+	  DELV_XRAY=0.5_LDP*VSMOOTH_XRAYS
+	  DELV_XRAY=0.5D0*VSMOOTH_XRAYS
+
+	  NU_XRAY_END=100.0_LDP
+	  NU_XRAY_END=100.0D0
+
+	  IF(TAU_SCL_T .EQ. 0.0_LDP)THEN
+	  IF(TAU_SCL_T .EQ. 0.0D0)THEN
+
+	    CON_SCL_T=0.0_LDP
+	    CON_SCL_T=0.0D0
+
+	    CON_SCL_T=1000.0_LDP
+	    CON_SCL_T=1000.0D0
+
+	  T_MIN=0.0_LDP
+	  T_MIN=0.0D0
+
+	  ADD_OPAC_SCL_FAC=0.0_LDP
+	  ADD_OPAC_SCL_FAC=0.0D0
+
+	  MAX_dT_COR=0.2_LDP
+	  MAX_dT_COR=0.2D0
+
+	  IF(MAX_dT_COR .LE. 0.0_LDP .OR. MAX_dT_COR .GT. 0.201_LDP)THEN
+	  IF(MAX_dT_COR .LE. 0.0D0 .OR. MAX_dT_COR .GT. 0.201D0)THEN
+
+	  DJDT_RELAX_PARAM=1.0_LDP
+	  DJDT_RELAX_PARAM=1.0D0
+
+
+set_abund_clump.f
+
+	    IF(CLUMP_PAR(3) .EQ. 0.0_LDP)CLUMP_PAR(4)=1.0_LDP
+	    IF(CLUMP_PAR(3) .EQ. 0.0D0)CLUMP_PAR(4)=1.0D0
+
+	      IF(N_CLUMP_PAR .EQ. 6)T1=LOG(1.0_LDP+EXP(T2*(V(K)-CLUMP_PAR(5))))/T2
+	      IF(N_CLUMP_PAR .EQ. 6)T1=LOG(1.0D0+EXP(T2*(V(K)-CLUMP_PAR(5))))/T2
+
+	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0_LDP-CLUMP_PAR(1)-CLUMP_PAR(3))*
+	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1)-CLUMP_PAR(3))*
+
+	      T1=1.0_LDP-(MAX(1.0_LDP,CLUMP_PAR(4)*R(1)/R(K)))**CLUMP_PAR(5)
+	      T1=1.0D0-(MAX(1.0D0,CLUMP_PAR(4)*R(1)/R(K)))**CLUMP_PAR(5)
+
+	      CLUMP_FAC(K)=(CLUMP_PAR(1)+(1.0_LDP-CLUMP_PAR(1))*EXP(-V(K)/CLUMP_PAR(2)))/
+	      CLUMP_FAC(K)=(CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*EXP(-V(K)/CLUMP_PAR(2)))/
+
+	1                     (1.0_LDP+CLUMP_PAR(3)*EXP(T1))
+	1                     (1.0D0+CLUMP_PAR(3)*EXP(T1))
+
+	      T1=10.0_LDP/CLUMP_PAR(4)
+	      T1=10.0D0/CLUMP_PAR(4)
+
+	      T2=10.0_LDP/CLUMP_PAR(3)
+	      T2=10.0D0/CLUMP_PAR(3)
+
+	1             + (CLUMP_PAR(2)-CLUMP_PAR(1))/(1.0_LDP+EXP( T1*(V(K)-CLUMP_PAR(4)) ) )
+	1             + (CLUMP_PAR(2)-CLUMP_PAR(1))/(1.0D0+EXP( T1*(V(K)-CLUMP_PAR(4)) ) )
+
+	1             + (1.0_LDP-CLUMP_PAR(2)-CLUMP_PAR(1))/(1.0_LDP+EXP( T2*(V(K)-CLUMP_PAR(3)) ) )
+	1             + (1.0D0-CLUMP_PAR(2)-CLUMP_PAR(1))/(1.0D0+EXP( T2*(V(K)-CLUMP_PAR(3)) ) )
+
+	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0_LDP-CLUMP_PAR(1))*
+	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
+
+	1	   (1.0_LDP-CLUMP_PAR(1))*EXP( (V(K)-V(1))/CLUMP_PAR(3))
+	1	   (1.0D0-CLUMP_PAR(1))*EXP( (V(K)-V(1))/CLUMP_PAR(3))
+
+	     CLUMP_FAC(K)=1.0_LDP-(1.0_LDP-CLUMP_PAR(1))*(V(K)/V(1))**CLUMP_PAR(2)
+	     CLUMP_FAC(K)=1.0D0-(1.0D0-CLUMP_PAR(1))*(V(K)/V(1))**CLUMP_PAR(2)
+
+	      CLUMP_PAR(3)=0.0_LDP; CLUMP_PAR(4)=1.0_LDP
+	      CLUMP_PAR(3)=0.0D0; CLUMP_PAR(4)=1.0D0
+
+	      T1=1.0_LDP/CLUMP_PAR(1)-1.0_LDP
+	      T1=1.0D0/CLUMP_PAR(1)-1.0D0
+
+	      CLUMP_FAC(K)=1.0_LDP/(1.0_LDP+T1*(V(K)/V(1))**CLUMP_PAR(2))/
+	      CLUMP_FAC(K)=1.0D0/(1.0D0+T1*(V(K)/V(1))**CLUMP_PAR(2))/
+
+	1               (1.0_LDP+CLUMP_PAR(3)*(V(K)/V(1))**CLUMP_PAR(4))
+	1               (1.0D0+CLUMP_PAR(3)*(V(K)/V(1))**CLUMP_PAR(4))
+
+	    IF (CLUMP_PAR(3) .EQ. 0.0_LDP) THEN
+	    IF (CLUMP_PAR(3) .EQ. 0.0D0) THEN
+
+		  CLUMP_FAC(K)=1.0_LDP + (CLUMP_PAR(1)-1.0_LDP)*EXP(-T1*T1)
+		  CLUMP_FAC(K)=1.0D0 + (CLUMP_PAR(1)-1.0d0)*EXP(-T1*T1)
+
+		     CLUMP_FAC(K)=1.0_LDP + (CLUMP_PAR(1)-1.0_LDP)*EXP(-T1*T1)
+		     CLUMP_FAC(K)=1.0D0 + (CLUMP_PAR(1)-1.0d0)*EXP(-T1*T1)
+
+	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0_LDP-CLUMP_PAR(1))*
+	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
+
+	      IF(CLUMP_FAC(K).GT. 1._LDP) CLUMP_FAC(K)=1.0_LDP
+	      IF(CLUMP_FAC(K).GT. 1.D0) CLUMP_FAC(K)=1.0D0
+
+	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0_LDP-CLUMP_PAR(1))*
+	      CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
+
+	1          EXP(-(V(K)/CLUMP_PAR(2))**2._LDP)+
+	1          EXP(-(V(K)/CLUMP_PAR(2))**2.)+
+
+	1	   (1.0_LDP-CLUMP_PAR(1))*EXP(-((V(K)-V(1))/CLUMP_PAR(3))**2.)
+	1	   (1.0D0-CLUMP_PAR(1))*EXP(-((V(K)-V(1))/CLUMP_PAR(3))**2.)
+
+              IF(CLUMP_FAC(K).GT. 1._LDP) CLUMP_FAC(K)=1.0_LDP
+              IF(CLUMP_FAC(K).GT. 1.D0) CLUMP_FAC(K)=1.0D0
+
+              CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0_LDP-CLUMP_PAR(1))*
+              CLUMP_FAC(K)=CLUMP_PAR(1)+(1.0D0-CLUMP_PAR(1))*
+
+     &          EXP(-(V(K)/CLUMP_PAR(2))**2._LDP)+
+     &          EXP(-(V(K)/CLUMP_PAR(2))**2.)+
+
+              IF(CLUMP_FAC(K).GT. 1._LDP) CLUMP_FAC(K)=1.0_LDP
+              IF(CLUMP_FAC(K).GT. 1.D0) CLUMP_FAC(K)=1.0D0
+
+	    PI=ACOS(-1.0_LDP)
+	    PI=ACOS(-1.0D0)
+
+	      IF(CLUMP_FAC(K).GT. 1._LDP) CLUMP_FAC(K)=1.0_LDP
+	      IF(CLUMP_FAC(K).GT. 1.D0) CLUMP_FAC(K)=1.0D0
+
+	    CLUMP_FAC(K)=1.0_LDP
+	    CLUMP_FAC(K)=1.0D0
+
+	T1=0.0_LDP		!Sum of abundance fractions (-> N#)
+	T1=0.0D0		!Sum of abundance fractions (-> N#)
+
+	T2=0.0_LDP		!Sum of A_i * abundance fractions
+	T2=0.0D0		!Sum of A_i * abundance fractions
+
+	T3=0.0_LDP		!Sum of mass fractions      (-> F#)
+	T3=0.0D0		!Sum of mass fractions      (-> F#)
+
+	T4=0.0_LDP                !Sum of f/A
+	T4=0.0D0                !Sum of f/A
+
+	IF(T1 .NE. 0.0_LDP .AND. T3 .GT. 1.0_LDP)THEN
+	IF(T1 .NE. 0.0D0 .AND. T3 .GT. 1.0D0)THEN
+
+	IF(T1 .EQ. 0.0_LDP .AND. ABS(T3-1.0_LDP) .GT. 0.001_LDP)THEN
+	IF(T1 .EQ. 0.0D0 .AND. ABS(T3-1.0D0) .GT. 0.001D0)THEN
+
+	IF(T2 .NE. 0.0_LDP)T2=(1.0_LDP-T3)*T1/T2		!f#/mu#
+	IF(T2 .NE. 0.0D0)T2=(1.0D0-T3)*T1/T2		!f#/mu#
+
+	MEAN_ATOMIC_WEIGHT=1.0_LDP/(T2+T4)
+	MEAN_ATOMIC_WEIGHT=1.0D0/(T2+T4)
+
+	ABUND_SUM=0.0_LDP
+	ABUND_SUM=0.0D0
+
+	IF(T1 .EQ. 0.0_LDP)T1=1.0_LDP
+	IF(T1 .EQ. 0.0D0)T1=1.0D0
+
+	  IF(T2 .EQ. 0.0_LDP)T2=ABS(AT_ABUND(ISPEC))/AT_MASS(ISPEC)
+	  IF(T2 .EQ. 0.0D0)T2=ABS(AT_ABUND(ISPEC))/AT_MASS(ISPEC)
+
+	  IF(AT_ABUND(ISPEC) .LT. 0.0_LDP)AT_ABUND(ISPEC)=
+	  IF(AT_ABUND(ISPEC) .LT. 0.0D0)AT_ABUND(ISPEC)=
+
+
+set_ang_qw.f
+
+	    MU_AT_RMAX(LS)=SQRT( 1.0_LDP -(PEXT(LS)/REXT(1))**2 )
+	    MU_AT_RMAX(LS)=SQRT( 1.0D0 -(PEXT(LS)/REXT(1))**2 )
+
+	    MU_AT_RMAX(LS)=SQRT( 1.0_LDP -(P(LS)/R(1))**2 )
+	    MU_AT_RMAX(LS)=SQRT( 1.0D0 -(P(LS)/R(1))**2 )
+
+
+set_ang_qw_v2.f
+
+	    MU_AT_RMAX(LS)=SQRT( 1.0_LDP -(PEXT(LS)/REXT(1))**2 )
+	    MU_AT_RMAX(LS)=SQRT( 1.0D0 -(PEXT(LS)/REXT(1))**2 )
+
+	    MU_AT_RMAX(LS)=SQRT( 1.0_LDP -(P(LS)/R(1))**2 )
+	    MU_AT_RMAX(LS)=SQRT( 1.0D0 -(P(LS)/R(1))**2 )
+
+
+set_frequency_grid.f
+
+	    T2=2.998E+05_LDP*(VEC_FREQ(ML-1)-VEC_FREQ(ML))/VEC_FREQ(ML)
+	    T2=2.998D+05*(VEC_FREQ(ML-1)-VEC_FREQ(ML))/VEC_FREQ(ML)
+
+	    IF(T2 .GT. 2.998E+05_LDP)T2=2.998E+05_LDP
+	    IF(T2 .GT. 2.998D+05)T2=2.998D+05
+
+	    IF(T1 .LT. 1.0E+04_LDP)THEN
+	    IF(T1 .LT. 1.0D+04)THEN
+
+	  T1=SPEED_OF_LIGHT()*1.0E-07_LDP
+	  T1=SPEED_OF_LIGHT()*1.0D-07
+
+	    IF(BIG_FREQ_AMP .LT. 0.0_LDP .OR. BIG_FREQ_AMP .GT. 1.0_LDP)THEN
+	    IF(BIG_FREQ_AMP .LT. 0.0D0 .OR. BIG_FREQ_AMP .GT. 1.0D0)THEN
+
+	      BIG_FREQ_AMP=0.5_LDP
+	      BIG_FREQ_AMP=0.5D0
+
+	V_DOP=12.85_LDP*SQRT( TDOP/AMASS_DOP + (VTURB/12.85_LDP)**2 )
+	V_DOP=12.85D0*SQRT( TDOP/AMASS_DOP + (VTURB/12.85D0)**2 )
+
+	  FQW(ML)=FQW(ML)*1.0E+15_LDP
+	  FQW(ML)=FQW(ML)*1.0D+15
+
+	  IF(VEC_FREQ(ML) .GT. MIN_CONT_FREQ*(1.0_LDP+1.1_LDP*VINF/2.998E+05_LDP))EXIT
+	  IF(VEC_FREQ(ML) .GT. MIN_CONT_FREQ*(1.0D0+1.1D0*VINF/2.998D+05))EXIT
+
+	T1=NU(NCF)*(1.0_LDP+2.0_LDP*VINF/2.998E+05_LDP)
+	T1=NU(NCF)*(1.0D0+2.0D0*VINF/2.998D+05)
+
+
+set_frequency_grid_v2.f
+
+
+set_line_opac.f
+
+          NUM_OF_WEAK_LINES=0.0_LDP
+          NUM_OF_WEAK_LINES=0.0D0
+
+	      T1=1.0E+08_LDP
+	      T1=1.0D+08
+
+	    L_STAR_RATIO(K,SIM_INDX)=1.0_LDP
+	    L_STAR_RATIO(K,SIM_INDX)=1.0D0
+
+	    U_STAR_RATIO(K,SIM_INDX)=1.0_LDP
+	    U_STAR_RATIO(K,SIM_INDX)=1.0D0
+
+	1         (-1.5_LDP-HDKT*ATM(ID)%EDGEXzV_F(MNL_F)/T(K)-ATM(ID)%dlnXzVLTE_dlnT(MNL,K))/T(K)
+	1         (-1.5D0-HDKT*ATM(ID)%EDGEXzV_F(MNL_F)/T(K)-ATM(ID)%dlnXzVLTE_dlnT(MNL,K))/T(K)
+
+	1         (-1.5_LDP-HDKT*ATM(ID)%EDGEXzV_F(MNUP_F)/T(K)-ATM(ID)%dlnXzVLTE_dlnT(MNUP,K))/T(K)
+	1         (-1.5D0-HDKT*ATM(ID)%EDGEXzV_F(MNUP_F)/T(K)-ATM(ID)%dlnXzVLTE_dlnT(MNUP,K))/T(K)
+
+	      dU_RAT_dT(K,SIM_INDX)=0.0_LDP
+	      dU_RAT_dT(K,SIM_INDX)=0.0D0
+
+	      dL_RAT_dT(K,SIM_INDX)=0.0_LDP
+	      dL_RAT_dT(K,SIM_INDX)=0.0D0
+
+	  T3=1.0_LDP
+	  T3=1.0D0
+
+	    IF(ABS(T3-1.0_LDP) .GT. SCL_LINE_HT_FAC)T3=1.0_LDP
+	    IF(ABS(T3-1.0D0) .GT. SCL_LINE_HT_FAC)T3=1.0D0
+
+	      CHIL_MAT(I,SIM_INDX)=0.01_LDP*T1*POPS(NL,I)*L_STAR_RATIO(I,SIM_INDX)
+	      CHIL_MAT(I,SIM_INDX)=0.01D0*T1*POPS(NL,I)*L_STAR_RATIO(I,SIM_INDX)
+
+	  T1=1.0E-15_LDP/1.77245385095516_LDP		!1.0D-15/SQRT(PI)
+	  T1=1.0D-15/1.77245385095516D0		!1.0D-15/SQRT(PI)
+
+	      NU_DOP=FL_SIM(SIM_INDX)*12.85_LDP*SQRT( TDOP/AMASS_SIM(SIM_INDX) + (VTURB/12.85_LDP)**2 )/2.998E+05_LDP
+	      NU_DOP=FL_SIM(SIM_INDX)*12.85D0*SQRT( TDOP/AMASS_SIM(SIM_INDX) + (VTURB/12.85D0)**2 )/2.998D+05
+
+	      LINE_PROF_SIM(ND,SIM_INDX)=0.0_LDP
+	      LINE_PROF_SIM(ND,SIM_INDX)=0.0D0
+
+	    ND_SMALL=1; TB(1)=0.0_LDP; TC(1)=0.0_LDP
+	    ND_SMALL=1; TB(1)=0.0D0; TC(1)=0.0D0
+
+	        ID=VEC_ID(J); T3=0.0_LDP
+	        ID=VEC_ID(J); T3=0.0D0
+
+	        LINE_PROF_SIM(ND,SIM_INDX)=0.0_LDP
+	        LINE_PROF_SIM(ND,SIM_INDX)=0.0D0
+
+	    TB(1:ND)=0.0_LDP; TC(1:ND)=0.0_LDP
+	    TB(1:ND)=0.0D0; TC(1:ND)=0.0D0
+
+	        ID=VEC_ID(J); T3=0.0_LDP
+	        ID=VEC_ID(J); T3=0.0D0
+
+	        LINE_PROF_SIM(1:ND,SIM_INDX)=0.0_LDP
+	        LINE_PROF_SIM(1:ND,SIM_INDX)=0.0D0
+
+	  T1=(NU(1)-NU(2))*0.5E+15_LDP
+	  T1=(NU(1)-NU(2))*0.5D+15
+
+	  T1=(NU(NCF-1)-NU(NCF))*0.5E+15_LDP
+	  T1=(NU(NCF-1)-NU(NCF))*0.5D+15
+
+	  T1=(NU(FREQ_INDX-1)-NU(FREQ_INDX+1))*0.5E+15_LDP
+	  T1=(NU(FREQ_INDX-1)-NU(FREQ_INDX+1))*0.5D+15
+
+
+set_new_model_estimates.f
+
+	        ATM(ID)%DXzV_F=1.0E-200_LDP
+	        ATM(ID)%DXzV_F=1.0D-200
+
+	  POPION(J)=0.0_LDP
+	  POPION(J)=0.0D0
+
+	     IF(Z_POP(I) .GT. 0.01_LDP)POPION(J)=POPION(J)+POPS(I,J)
+	     IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
+
+	    CONT_FREQ=0.0_LDP
+	    CONT_FREQ=0.0D0
+
+	        CHI_NOSCAT(I)=MAX(0.0_LDP,CHI(I)-ESEC(I))
+	        CHI_NOSCAT(I)=MAX(0.0D0,CHI(I)-ESEC(I))
+
+	        IF(CHI(I) .LT. 0.1_LDP*ESEC(I))CHI(I)=0.1_LDP*ESEC(I)
+	        IF(CHI(I) .LT. 0.1D0*ESEC(I))CHI(I)=0.1D0*ESEC(I)
+
+	        PLANCKMEAN(I)=PLANCKMEAN(I) + T2*CHI_NOSCAT(I)*EMHNUKT(I)/(1.0_LDP-EMHNUKT(I))
+	        PLANCKMEAN(I)=PLANCKMEAN(I) + T2*CHI_NOSCAT(I)*EMHNUKT(I)/(1.0D0-EMHNUKT(I))
+
+	        ROSSMEAN(I)=ROSSMEAN(I) + T3*EMHNUKT(I)/CHI(I)/(1.0_LDP-EMHNUKT(I))**2
+	        ROSSMEAN(I)=ROSSMEAN(I) + T3*EMHNUKT(I)/CHI(I)/(1.0D0-EMHNUKT(I))**2
+
+	    T1=1.8047E+11_LDP
+	    T1=1.8047D+11
+
+	      ROSSMEAN(I)=4.0_LDP*CLUMP_FAC(I)*T1*(T(I)**5)/ROSSMEAN(I)
+	      ROSSMEAN(I)=4.0D0*CLUMP_FAC(I)*T1*(T(I)**5)/ROSSMEAN(I)
+
+	    TA(1:ND)=1.0E-10_LDP*ROSSMEAN(1:ND)/DENSITY(1:ND)
+	    TA(1:ND)=1.0D-10*ROSSMEAN(1:ND)/DENSITY(1:ND)
+
+	    TB(1:ND)=1.0E-10_LDP*PLANCKMEAN(1:ND)/DENSITY(1:ND)
+	    TB(1:ND)=1.0D-10*PLANCKMEAN(1:ND)/DENSITY(1:ND)
+
+	      IF(TA(ND) .LT. 10.0_LDP)THEN
+	      IF(TA(ND) .LT. 10.0D0)THEN
+
+ 	    T2=0.0_LDP
+ 	    T2=0.0D0
+
+	        T1=1.0_LDP
+	        T1=1.0D0
+
+	        T1=1.0_LDP-EXP(-TA(I)/GREY_PAR)
+	        T1=1.0D0-EXP(-TA(I)/GREY_PAR)
+
+	      IF(TA(I) .LT. 0.1_LDP*GREY_PAR)T1=0.0_LDP     !Changed T1 to TA(I) [14-Jan-2009]
+	      IF(TA(I) .LT. 0.1D0*GREY_PAR)T1=0.0D0     !Changed T1 to TA(I) [14-Jan-2009]
+
+	      T(I)=T1*TGREY(I)+(1.0_LDP-T1)*T_SAVE(I)
+	      T(I)=T1*TGREY(I)+(1.0D0-T1)*T_SAVE(I)
+
+	      T(I)=MAX(T(I),0.95_LDP*T_MIN)
+	      T(I)=MAX(T(I),0.95D0*T_MIN)
+
+	    T1=1.0_LDP
+	    T1=1.0D0
+
+	    DO WHILE (T1 .GT. 1.0E-04_LDP)
+	    DO WHILE (T1 .GT. 1.0D-04)
+
+	        TA(I)=-(H(I)-ED(I))/(QH(I)-1.0_LDP)/ED(I)
+	        TA(I)=-(H(I)-ED(I))/(QH(I)-1.0D0)/ED(I)
+
+	        IF(TA(I) .LT. -0.9_LDP)TA(I)=-0.9_LDP
+	        IF(TA(I) .LT. -0.9D0)TA(I)=-0.9D0
+
+	        IF(TA(I) .GT. 9.0_LDP)TA(I)=9.0_LDP
+	        IF(TA(I) .GT. 9.0D0)TA(I)=9.0D0
+
+	        ED(I)=ED(I)*(1.0_LDP+TA(I))
+	        ED(I)=ED(I)*(1.0D0+TA(I))
+
+	      POPION(J)=0.0_LDP
+	      POPION(J)=0.0D0
+
+	        IF(Z_POP(I) .GT. 0.01_LDP)POPION(J)=POPION(J)+POPS(I,J)
+	        IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
+
+
+shock_power_mod.f
+
+
+solve_for_pops.f
+
+	REAL(KIND=LDP), SAVE :: MAXCH_SUM=0.0_LDP
+	REAL(KIND=LDP), SAVE :: MAXCH_SUM=0.0D0
+
+	ELSE IF(VARFIXT .AND. CON_SCL_T .NE. 0.0_LDP)THEN
+	ELSE IF(VARFIXT .AND. CON_SCL_T .NE. 0.0D0)THEN
+
+	    MAXCH_SUM=0.0_LDP
+	    MAXCH_SUM=0.0D0
+
+	  IF(CNT_FIX_BA .GT. N_ITS_TO_FIX_BA .AND. MAXCH_SUM .GT. 3.0_LDP*VAL_FIX_BA)THEN
+	  IF(CNT_FIX_BA .GT. N_ITS_TO_FIX_BA .AND. MAXCH_SUM .GT. 3.0D0*VAL_FIX_BA)THEN
+
+	    MAXCH_SUM=0.0_LDP
+	    MAXCH_SUM=0.0D0
+
+	  IF(CON_SCL_T .NE. 0.0_LDP)THEN
+	  IF(CON_SCL_T .NE. 0.0D0)THEN
+
+	    MAXCH_SUM=1000.0_LDP*VAL_FIX_BA
+	    MAXCH_SUM=1000.0D0*VAL_FIX_BA
+
+	1          .AND. CON_SCL_T .EQ. 0.0_LDP)THEN
+	1          .AND. CON_SCL_T .EQ. 0.0D0)THEN
+
+	  IF(WRBAMAT_RDIN .AND. MAXCH .LT. 2.0_LDP*VAL_FIX_BA
+	  IF(WRBAMAT_RDIN .AND. MAXCH .LT. 2.0D0*VAL_FIX_BA
+
+	1          .AND. CON_SCL_T .EQ. 0.0_LDP)THEN
+	1          .AND. CON_SCL_T .EQ. 0.0D0)THEN
+
+	  CON_SCL_T=0.0_LDP
+	  CON_SCL_T=0.0D0
+
+	      IF( (SOL(J,I) .GT. 0.8_LDP .OR.
+	      IF( (SOL(J,I) .GT. 0.8D0 .OR.
+
+	1          SOL(J,I) .LT. -5.0_LDP) .AND. TA(I) .LT. 1.0_LDP)THEN
+	1          SOL(J,I) .LT. -5.0D0) .AND. TA(I) .LT. 1.0D0)THEN
+
+	            CON_SCL_T=1000.0_LDP
+	            CON_SCL_T=1000.0D0
+
+	      IF( (SOL(J,I) .GT. 10.0_LDP .OR.
+	      IF( (SOL(J,I) .GT. 10.0D0 .OR.
+
+	1          SOL(J,I) .LT. -20.0_LDP) .AND. TA(I) .GE. 1.0_LDP)THEN
+	1          SOL(J,I) .LT. -20.0D0) .AND. TA(I) .GE. 1.0D0)THEN
+
+	            CON_SCL_T=1000.0_LDP
+	            CON_SCL_T=1000.0D0
+
+	     IF(MAXCH .GT. 1.0E+05_LDP)THEN
+	     IF(MAXCH .GT. 1.0D+05)THEN
+
+	    IF(T1 .GT. 50.0_LDP .AND. T2 .GT. 50.0_LDP)THEN
+	    IF(T1 .GT. 50.0D0 .AND. T2 .GT. 50.0D0)THEN
+
+
+steq_data_mod.f
+
+
+sub_cmf_line.f
+
+	      IF(NEG_OPACITY(I))VB(I)=0.0_LDP
+	      IF(NEG_OPACITY(I))VB(I)=0.0D0
+
+
+sub_sob_line.f
+
+	        VB_SIM(I,SIM_INDX)=0.0_LDP
+	        VB_SIM(I,SIM_INDX)=0.0D0
+
+	        VB_2(I)=0.0_LDP
+	        VB_2(I)=0.0D0
+
+	        T3=1.0E-06_LDP*RJ(L)
+	        T3=1.0D-06*RJ(L)
+
+	      IF(NEG_OPACITY(I))VB_SIM(I,SIM_INDX)=0.0_LDP
+	      IF(NEG_OPACITY(I))VB_SIM(I,SIM_INDX)=0.0D0
+
+	    VB_2(I)=0.0_LDP
+	    VB_2(I)=0.0D0
+
+	    VC_2(I)=0.0_LDP
+	    VC_2(I)=0.0D0
+
+
+sub_sob_line_v2.f
+
+	        VB_SIM(I,SIM_INDX)=0.0_LDP
+	        VB_SIM(I,SIM_INDX)=0.0D0
+
+	        VB_2(I)=0.0_LDP
+	        VB_2(I)=0.0D0
+
+	        T3=1.0E-06_LDP*RJ(L)
+	        T3=1.0D-06*RJ(L)
+
+	      IF(NEG_OPACITY(I))VB_SIM(I,SIM_INDX)=0.0_LDP
+	      IF(NEG_OPACITY(I))VB_SIM(I,SIM_INDX)=0.0D0
+
+	    VB_2(I)=0.0_LDP
+	    VB_2(I)=0.0D0
+
+	    VC_2(I)=0.0_LDP
+	    VC_2(I)=0.0D0
+
+              IF(ABS(T3-1.0_LDP) .GT. SCL_LINE_HT_FAC)T3=1.0_LDP
+              IF(ABS(T3-1.0D0) .GT. SCL_LINE_HT_FAC)T3=1.0D0
+
+              T3=1.0_LDP
+              T3=1.0D0
+
+
+sub_sob_line_v3.f
+
+	        VB_SIM(I,SIM_INDX)=0.0_LDP
+	        VB_SIM(I,SIM_INDX)=0.0D0
+
+	        VB_2(I)=0.0_LDP
+	        VB_2(I)=0.0D0
+
+	        T3=1.0E-06_LDP*RJ(L)
+	        T3=1.0D-06*RJ(L)
+
+	      IF(NEG_OPACITY(I))VB_SIM(I,SIM_INDX)=0.0_LDP
+	      IF(NEG_OPACITY(I))VB_SIM(I,SIM_INDX)=0.0D0
+
+	    VB_2(I)=0.0_LDP
+	    VB_2(I)=0.0D0
+
+	    VC_2(I)=0.0_LDP
+	    VC_2(I)=0.0D0
+
+              IF(ABS(T3-1.0_LDP) .GT. SCL_LINE_HT_FAC)T3=1.0_LDP
+              IF(ABS(T3-1.0D0) .GT. SCL_LINE_HT_FAC)T3=1.0D0
+
+              T3=1.0_LDP
+              T3=1.0D0
+
+
+sup_to_full_v4.f
+
+	    POPION(J)=0.0_LDP
+	    POPION(J)=0.0D0
+
+	      IF(Z_POP(I) .GT. 0.01_LDP)POPION(J)=POPION(J)+POPS(I,J)
+	      IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
+
+
+two_phot_mod.f
+
+	    COEF_TWO(:,:)=0.0_LDP
+	    COEF_TWO(:,:)=0.0D0
+
+
+var_rad_mod.f
+
+
+wind_scale_pops_v1.f
+
+	  T1=0.0_LDP
+	  T1=0.0D0
+
+	  TA(J)=0.0_LDP
+	  TA(J)=0.0D0
+
+	    IF(Z_POP(I) .GT. 0.01_LDP)TA(J)=TA(J)+POPS(I,J)
+	    IF(Z_POP(I) .GT. 0.01D0)TA(J)=TA(J)+POPS(I,J)
+
+	  POPION(J)=0.0_LDP
+	  POPION(J)=0.0D0
+
+	    IF(Z_POP(I) .GT. 0.01_LDP)POPION(J)=POPION(J)+POPS(I,J)
+	    IF(Z_POP(I) .GT. 0.01D0)POPION(J)=POPION(J)+POPS(I,J)
+

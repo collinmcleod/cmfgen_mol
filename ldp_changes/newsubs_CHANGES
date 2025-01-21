@@ -1,0 +1,1386 @@
+
+ave_level_energy.f
+
+	  G_SUM(:)=0.0_LDP
+	  G_SUM(:)=0.0D0
+
+	  EDGE_SUM(:)=0.0_LDP
+	  EDGE_SUM(:)=0.0D0
+
+
+colcool_sl_v4.f
+
+	H=6.6261965E-12_LDP		!H*1.0E+15  (1.0E+15 due to times frequency)
+	H=6.6261965D-12		!H*1.0E+15  (1.0E+15 due to times frequency)
+
+	TMP_ED=1.0_LDP
+	TMP_ED=1.0D0
+
+	  COOL(I)=0.0_LDP
+	  COOL(I)=0.0D0
+
+	  CPR(I)=0.0_LDP
+	  CPR(I)=0.0D0
+
+	  CRR(I)=0.0_LDP
+	  CRR(I)=0.0D0
+
+
+colcool_sl_v5.f
+
+	H=PLANCKS_CONSTANT()*1.0E+15_LDP             !ergs/s (*1.0E+15 due to *nu)
+	H=PLANCKS_CONSTANT()*1.0D+15             !ergs/s (*1.0E+15 due to *nu)
+
+	TMP_ED=1.0_LDP
+	TMP_ED=1.0D0
+
+	  COOL(I)=0.0_LDP
+	  COOL(I)=0.0D0
+
+	  CPR(I)=0.0_LDP
+	  CPR(I)=0.0D0
+
+	  CRR(I)=0.0_LDP
+	  CRR(I)=0.0D0
+
+
+comp_free_free_v1.f
+
+          CHI_FF(I)=0.0_LDP
+          CHI_FF(I)=0.0D0
+
+          ETA_FF(I)=0.0_LDP
+          ETA_FF(I)=0.0D0
+
+	VCHI_FF=0.0_LDP
+	VCHI_FF=0.0D0
+
+	VETA_FF=0.0_LDP
+	VETA_FF=0.0D0
+
+	  ELSE IF(ATM(ID)%ZXzV .EQ. 0.0_LDP)THEN
+	  ELSE IF(ATM(ID)%ZXzV .EQ. 0.0D0)THEN
+
+	      CHI_FF(I)=CHI_FF(I)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(I))
+	      CHI_FF(I)=CHI_FF(I)+TCHI1*ALPHA*(1.0D0-EMHNUKT(I))
+
+	        VCHI_FF(NT-1,I)=VCHI_FF(NT-1,I)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(I))
+	        VCHI_FF(NT-1,I)=VCHI_FF(NT-1,I)+TCHI1*ALPHA*(1.0D0-EMHNUKT(I))
+
+	        ALPHA=TCHI1*ED(I)*GFF_VAL(I)*(1.0_LDP-EMHNUKT(I))/SQRT(T(I))
+	        ALPHA=TCHI1*ED(I)*GFF_VAL(I)*(1.0D0-EMHNUKT(I))/SQRT(T(I))
+
+		VCHI_FF(NT,I)=VCHI_FF(NT,I)-TCHI1*ALPHA*(0.5_LDP+(HNUONKT-0.5_LDP)*EMHNUKT(I))
+		VCHI_FF(NT,I)=VCHI_FF(NT,I)-TCHI1*ALPHA*(0.5D0+(HNUONKT-0.5D0)*EMHNUKT(I))
+
+		VETA_FF(NT,I)=VETA_FF(NT,I)+TETA1*ALPHA*(HNUONKT-0.5_LDP)*EMHNUKT(I)
+		VETA_FF(NT,I)=VETA_FF(NT,I)+TETA1*ALPHA*(HNUONKT-0.5D0)*EMHNUKT(I)
+
+
+comp_free_free_v2.f
+
+	  POP_SUM=0.0_LDP
+	  POP_SUM=0.0D0
+
+	GFF_STORE=0.0_LDP
+	GFF_STORE=0.0D0
+
+	    ELSE IF(GFF_STORE(1,I) .EQ. 0.0_LDP)THEN
+	    ELSE IF(GFF_STORE(1,I) .EQ. 0.0D0)THEN
+
+          CHI_FF(I)=0.0_LDP
+          CHI_FF(I)=0.0D0
+
+          ETA_FF(I)=0.0_LDP
+          ETA_FF(I)=0.0D0
+
+	VCHI_FF=0.0_LDP
+	VCHI_FF=0.0D0
+
+	VETA_FF=0.0_LDP
+	VETA_FF=0.0D0
+
+	  ELSE IF(NINT(ATM(ID)%ZXzV) .GT. 0.0_LDP)THEN
+	  ELSE IF(NINT(ATM(ID)%ZXzV) .GT. 0.0D0)THEN
+
+	      CHI_FF(I)=CHI_FF(I)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(I))
+	      CHI_FF(I)=CHI_FF(I)+TCHI1*ALPHA*(1.0D0-EMHNUKT(I))
+
+	        VCHI_FF(NT-1,I)=VCHI_FF(NT-1,I)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(I))
+	        VCHI_FF(NT-1,I)=VCHI_FF(NT-1,I)+TCHI1*ALPHA*(1.0D0-EMHNUKT(I))
+
+	        ALPHA=TCHI1*ED(I)*GFF_VAL(I)*(1.0_LDP-EMHNUKT(I))/SQRT(T(I))
+	        ALPHA=TCHI1*ED(I)*GFF_VAL(I)*(1.0D0-EMHNUKT(I))/SQRT(T(I))
+
+		VCHI_FF(NT,I)=VCHI_FF(NT,I)-TCHI1*ALPHA*(0.5_LDP+(HNUONKT-0.5_LDP)*EMHNUKT(I))
+		VCHI_FF(NT,I)=VCHI_FF(NT,I)-TCHI1*ALPHA*(0.5D0+(HNUONKT-0.5D0)*EMHNUKT(I))
+
+		VETA_FF(NT,I)=VETA_FF(NT,I)+TETA1*ALPHA*(HNUONKT-0.5_LDP)*EMHNUKT(I)
+		VETA_FF(NT,I)=VETA_FF(NT,I)+TETA1*ALPHA*(HNUONKT-0.5D0)*EMHNUKT(I)
+
+
+cut_points_v3.f
+
+      IF(CROSS_SM(2) .EQ. 0.0_LDP)THEN
+      IF(CROSS_SM(2) .EQ. 0.0D0)THEN
+
+          IF(CROSS_SM(I) .NE. 0.0_LDP)GOTO 400
+          IF(CROSS_SM(I) .NE. 0.0D0)GOTO 400
+
+        IF((DERIV(1)*DERIV(2)) .LT. 0.0_LDP)GOTO 300
+        IF((DERIV(1)*DERIV(2)) .LT. 0.0D0)GOTO 300
+
+          IF((DERIV(I-1)*DERIV(I)) .LE. 0.0_LDP)GOTO 300
+          IF((DERIV(I-1)*DERIV(I)) .LE. 0.0D0)GOTO 300
+
+          IF((DERIV(I-1)*DERIV(I)) .LE. 0.0_LDP)GOTO 300
+          IF((DERIV(I-1)*DERIV(I)) .LE. 0.0D0)GOTO 300
+
+	IF(COMP_VAL .EQ. 0.0_LDP)COMP_VAL=1.0E-06_LDP
+	IF(COMP_VAL .EQ. 0.0D0)COMP_VAL=1.0d-06
+
+        ELSE IF( NU_SM(HIGH)/NU_SM(LOW) .GT. 1.1_LDP
+        ELSE IF( NU_SM(HIGH)/NU_SM(LOW) .GT. 1.1D0
+
+     *                         .AND. COMP_VAL .EQ. 1.0E-06_LDP)THEN
+     *                         .AND. COMP_VAL .EQ. 1.0d-06)THEN
+
+
+do_h0_ff.f
+
+	  LOG_T_TAB=LOG(0.504_LDP/LOG_T_TAB)
+	  LOG_T_TAB=LOG(0.504D0/LOG_T_TAB)
+
+	    LOG_NU_TAB(J)=LOG(2997.94_LDP/LOG_NU_TAB(J))	!Convert from Ang to 10^15Hz
+	    LOG_NU_TAB(J)=LOG(2997.94D0/LOG_NU_TAB(J))	!Convert from Ang to 10^15Hz
+
+	  T1=1.0E+04_LDP*1.0E-16_LDP*BOLTZMANN_CONSTANT()
+	  T1=1.0D+04*1.0D-16*BOLTZMANN_CONSTANT()
+
+	  T2=(1.0_LDP-T1)*CROSS(T_INDX,NU_INDX)+T1*CROSS(T_INDX,NU_INDX+1)
+	  T2=(1.0D0-T1)*CROSS(T_INDX,NU_INDX)+T1*CROSS(T_INDX,NU_INDX+1)
+
+	  T3=(1.0_LDP-T1)*CROSS(T_INDX+1,NU_INDX)+T1*CROSS(T_INDX+1,NU_INDX+1)
+	  T3=(1.0D0-T1)*CROSS(T_INDX+1,NU_INDX)+T1*CROSS(T_INDX+1,NU_INDX+1)
+
+	  T1=TEMP(I)*EXP( (1.0_LDP-T1)*T2+T1*T3 )*ED(I)*ION_DEN(I)
+	  T1=TEMP(I)*EXP( (1.0D0-T1)*T2+T1*T3 )*ED(I)*ION_DEN(I)
+
+	  ETA(I)=ETA(I)+T1*TWOHCSQ*(CONT_FREQ**3)*EMHNUKT(I)/(1.0_LDP-EMHNUKT(I))
+	  ETA(I)=ETA(I)+T1*TWOHCSQ*(CONT_FREQ**3)*EMHNUKT(I)/(1.0D0-EMHNUKT(I))
+
+	  T2=(1.0_LDP-T1)*CROSS(T_INDX,NU_INDX)+T1*CROSS(T_INDX,NU_INDX+1)
+	  T2=(1.0D0-T1)*CROSS(T_INDX,NU_INDX)+T1*CROSS(T_INDX,NU_INDX+1)
+
+	  T3=(1.0_LDP-T1)*CROSS(T_INDX+1,NU_INDX)+T1*CROSS(T_INDX+1,NU_INDX+1)
+	  T3=(1.0D0-T1)*CROSS(T_INDX+1,NU_INDX)+T1*CROSS(T_INDX+1,NU_INDX+1)
+
+	  T1=TEMP(I)*EXP( (1.0_LDP-T1)*T2+T1*T3 )*ED(I)*ION_DEN(I)
+	  T1=TEMP(I)*EXP( (1.0D0-T1)*T2+T1*T3 )*ED(I)*ION_DEN(I)
+
+	  FF(I)=FF(I)+1.256637061E-09_LDP*T1*(BPHOT_CR(I)-JPHOT_CR(I))
+	  FF(I)=FF(I)+1.256637061D-09*T1*(BPHOT_CR(I)-JPHOT_CR(I))
+
+
+do_hmi_ff.f
+
+	  LOG_T_TAB=LOG(0.504_LDP/LOG_T_TAB)
+	  LOG_T_TAB=LOG(0.504D0/LOG_T_TAB)
+
+	    LOG_NU_TAB(J)=LOG(2997.94_LDP/LOG_NU_TAB(J))	!Convert from Ang to 10^15Hz
+	    LOG_NU_TAB(J)=LOG(2997.94D0/LOG_NU_TAB(J))	!Convert from Ang to 10^15Hz
+
+	  T1=1.0E+04_LDP*1.0E-16_LDP*BOLTZMANN_CONSTANT()
+	  T1=1.0D+04*1.0D-16*BOLTZMANN_CONSTANT()
+
+	  T2=(1.0_LDP-T1)*CROSS(T_INDX,NU_INDX)+T1*CROSS(T_INDX,NU_INDX+1)
+	  T2=(1.0D0-T1)*CROSS(T_INDX,NU_INDX)+T1*CROSS(T_INDX,NU_INDX+1)
+
+	  T3=(1.0_LDP-T1)*CROSS(T_INDX+1,NU_INDX)+T1*CROSS(T_INDX+1,NU_INDX+1)
+	  T3=(1.0D0-T1)*CROSS(T_INDX+1,NU_INDX)+T1*CROSS(T_INDX+1,NU_INDX+1)
+
+	  T1=TEMP(I)*EXP( (1.0_LDP-T1)*T2+T1*T3 )*ED(I)*ION_DEN(I)
+	  T1=TEMP(I)*EXP( (1.0D0-T1)*T2+T1*T3 )*ED(I)*ION_DEN(I)
+
+	  ETA(I)=ETA(I)+T1*TWOHCSQ*(CONT_FREQ**3)*EMHNUKT(I)/(1.0_LDP-EMHNUKT(I))
+	  ETA(I)=ETA(I)+T1*TWOHCSQ*(CONT_FREQ**3)*EMHNUKT(I)/(1.0D0-EMHNUKT(I))
+
+	  T2=(1.0_LDP-T1)*CROSS(T_INDX,NU_INDX)+T1*CROSS(T_INDX,NU_INDX+1)
+	  T2=(1.0D0-T1)*CROSS(T_INDX,NU_INDX)+T1*CROSS(T_INDX,NU_INDX+1)
+
+	  T3=(1.0_LDP-T1)*CROSS(T_INDX+1,NU_INDX)+T1*CROSS(T_INDX+1,NU_INDX+1)
+	  T3=(1.0D0-T1)*CROSS(T_INDX+1,NU_INDX)+T1*CROSS(T_INDX+1,NU_INDX+1)
+
+	  T1=TEMP(I)*EXP( (1.0_LDP-T1)*T2+T1*T3 )*ED(I)*ION_DEN(I)
+	  T1=TEMP(I)*EXP( (1.0D0-T1)*T2+T1*T3 )*ED(I)*ION_DEN(I)
+
+	  FF(I)=FF(I)+1.256637061E-09_LDP*T1*(BPHOT_CR(I)-JPHOT_CR(I))
+	  FF(I)=FF(I)+1.256637061D-09*T1*(BPHOT_CR(I)-JPHOT_CR(I))
+
+
+ff_res_gaunt.f
+
+            DOP_NU=PD(ID)%NU_ZERO(I)*PD(ID)%VSM_KMS/2.998E+05_LDP
+            DOP_NU=PD(ID)%NU_ZERO(I)*PD(ID)%VSM_KMS/2.998D+05
+
+	    CONST=1.489E+15_LDP*PD(ID)%FF_GF(I)*(PD(ID)%FF_NU_ZERO(I)**3)/GION/ZION/ZION
+	    CONST=1.489D+15*PD(ID)%FF_GF(I)*(PD(ID)%FF_NU_ZERO(I)**3)/GION/ZION/ZION
+
+            PHI_VOIGT=1.0E-15_LDP*VOIGT(A_VOIGT,V_VOIGT)/DOP_NU
+            PHI_VOIGT=1.0D-15*VOIGT(A_VOIGT,V_VOIGT)/DOP_NU
+
+
+genopaeta_v10.f
+
+	IF(ZION .EQ. 0.0_LDP)THEN
+	IF(ZION .EQ. 0.0D0)THEN
+
+	    CHI(K)=CHI(K)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(K))
+	    CHI(K)=CHI(K)+TCHI1*ALPHA*(1.0D0-EMHNUKT(K))
+
+	NO_NON_ZERO_PHOT=COUNT(ALPHA_VEC .GT. 0.0_LDP)
+	NO_NON_ZERO_PHOT=COUNT(ALPHA_VEC .GT. 0.0D0)
+
+	DIS_CONST(1:N)=-1.0_LDP
+	DIS_CONST(1:N)=-1.0D0
+
+	      NEFF=SQRT(3.289395_LDP*ZION*ZION/(EDGE(I)-NU))
+	      NEFF=SQRT(3.289395D0*ZION*ZION/(EDGE(I)-NU))
+
+	        T1=MIN(1.0_LDP,16.0_LDP*NEFF/(1+NEFF)/(1+NEFF)/3.0_LDP)
+	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
+
+	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5_LDP
+	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
+
+	    YDIS(K)=1.091_LDP*(X_LEV_DIS(K)+4.0_LDP*(ZION-1)*A_LEV_DIS(K))*
+	    YDIS(K)=1.091D0*(X_LEV_DIS(K)+4.0D0*(ZION-1)*A_LEV_DIS(K))*
+
+	    IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0_LDP)THEN
+	    IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0D0)THEN
+
+	    ELSE IF(DIS_CONST(I) .GE. 0.0_LDP)THEN
+	    ELSE IF(DIS_CONST(I) .GE. 0.0D0)THEN
+
+	        T1=7.782_LDP+XDIS(K)*DIS_CONST(I)
+	        T1=7.782D0+XDIS(K)*DIS_CONST(I)
+
+	    TMP_CHI(1:N)=0.0_LDP
+	    TMP_CHI(1:N)=0.0D0
+
+	    TMP_ETA(1:N)=0.0_LDP
+	    TMP_ETA(1:N)=0.0D0
+
+	      IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0_LDP)THEN
+	      IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0D0)THEN
+
+	      ELSE IF(DIS_CONST(I) .GE. 0.0_LDP)THEN
+	      ELSE IF(DIS_CONST(I) .GE. 0.0D0)THEN
+
+	        T1=7.782_LDP+XDIS(K)*DIS_CONST(I)
+	        T1=7.782D0+XDIS(K)*DIS_CONST(I)
+
+
+genopaeta_v7.f
+
+	    CHI(K)=CHI(K)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(K))
+	    CHI(K)=CHI(K)+TCHI1*ALPHA*(1.0D0-EMHNUKT(K))
+
+	NO_NON_ZERO_PHOT=COUNT(ALPHA_VEC .GT. 0.0_LDP)
+	NO_NON_ZERO_PHOT=COUNT(ALPHA_VEC .GT. 0.0D0)
+
+	DIS_CONST(1:N)=-1.0_LDP
+	DIS_CONST(1:N)=-1.0D0
+
+	      NEFF=SQRT(3.289395_LDP*ZION*ZION/(EDGE(I)-NU))
+	      NEFF=SQRT(3.289395*ZION*ZION/(EDGE(I)-NU))
+
+	        T1=MIN(1.0_LDP,16.0_LDP*NEFF/(1+NEFF)/(1+NEFF)/3.0_LDP)
+	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
+
+	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5_LDP
+	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
+
+	    YDIS(K)=1.091_LDP*(X_LEV_DIS(K)+4.0_LDP*(ZION-1)*A_LEV_DIS(K))*
+	    YDIS(K)=1.091*(X_LEV_DIS(K)+4.0D0*(ZION-1)*A_LEV_DIS(K))*
+
+	    IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0_LDP)THEN
+	    IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0D0)THEN
+
+	        T1=7.782_LDP+XDIS(K)*DIS_CONST(I)
+	        T1=7.782+XDIS(K)*DIS_CONST(I)
+
+	    TMP_CHI(1:N)=0.0_LDP
+	    TMP_CHI(1:N)=0.0D0
+
+	    TMP_ETA(1:N)=0.0_LDP
+	    TMP_ETA(1:N)=0.0D0
+
+	      IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0_LDP)THEN
+	      IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0D0)THEN
+
+	        T1=7.782_LDP+XDIS(K)*DIS_CONST(I)
+	        T1=7.782+XDIS(K)*DIS_CONST(I)
+
+
+genopaeta_v8.f
+
+	    CHI(K)=CHI(K)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(K))
+	    CHI(K)=CHI(K)+TCHI1*ALPHA*(1.0D0-EMHNUKT(K))
+
+	NO_NON_ZERO_PHOT=COUNT(ALPHA_VEC .GT. 0.0_LDP)
+	NO_NON_ZERO_PHOT=COUNT(ALPHA_VEC .GT. 0.0D0)
+
+	DIS_CONST(1:N)=-1.0_LDP
+	DIS_CONST(1:N)=-1.0D0
+
+	      NEFF=SQRT(3.289395_LDP*ZION*ZION/(EDGE(I)-NU))
+	      NEFF=SQRT(3.289395D0*ZION*ZION/(EDGE(I)-NU))
+
+	        T1=MIN(1.0_LDP,16.0_LDP*NEFF/(1+NEFF)/(1+NEFF)/3.0_LDP)
+	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
+
+	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5_LDP
+	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
+
+	    YDIS(K)=1.091_LDP*(X_LEV_DIS(K)+4.0_LDP*(ZION-1)*A_LEV_DIS(K))*
+	    YDIS(K)=1.091D0*(X_LEV_DIS(K)+4.0D0*(ZION-1)*A_LEV_DIS(K))*
+
+	    IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0_LDP)THEN
+	    IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0D0)THEN
+
+	    ELSE IF(DIS_CONST(I) .GE. 0.0_LDP)THEN
+	    ELSE IF(DIS_CONST(I) .GE. 0.0D0)THEN
+
+	        T1=7.782_LDP+XDIS(K)*DIS_CONST(I)
+	        T1=7.782D0+XDIS(K)*DIS_CONST(I)
+
+	    TMP_CHI(1:N)=0.0_LDP
+	    TMP_CHI(1:N)=0.0D0
+
+	    TMP_ETA(1:N)=0.0_LDP
+	    TMP_ETA(1:N)=0.0D0
+
+	      IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0_LDP)THEN
+	      IF(NU .GE. EDGE(I) .AND. ALPHA_VEC(I) .GT. 0.0D0)THEN
+
+	      ELSE IF(DIS_CONST(I) .GE. 0.0_LDP)THEN
+	      ELSE IF(DIS_CONST(I) .GE. 0.0D0)THEN
+
+	        T1=7.782_LDP+XDIS(K)*DIS_CONST(I)
+	        T1=7.782D0+XDIS(K)*DIS_CONST(I)
+
+
+genosc_v8.f
+
+	EINA(1:N,1:N)=0.0_LDP
+	EINA(1:N,1:N)=0.0D0
+
+	GAM2(1:N)=0.0_LDP
+	GAM2(1:N)=0.0D0
+
+	GAM4(1:N)=0.0_LDP
+	GAM4(1:N)=0.0D0
+
+	ARAD(1:N)=0.0_LDP
+	ARAD(1:N)=0.0D0
+
+	    FEDGE(I)=(IONIZATION_EN-FEDGE(I))*SPEED_LIGHT*1.0E-15_LDP
+	    FEDGE(I)=(IONIZATION_EN-FEDGE(I))*SPEED_LIGHT*1.0D-15
+
+	IF(GF_CUT .GT. 1000.0_LDP .OR. NTRET .EQ. 0)THEN
+	IF(GF_CUT .GT. 1000.0D0 .OR. NTRET .EQ. 0)THEN
+
+	  GAM2(1:N)=0.0_LDP
+	  GAM2(1:N)=0.0D0
+
+	  GAM4(1:N)=0.0_LDP
+	  GAM4(1:N)=0.0D0
+
+	  ARAD(1:N)=0.0_LDP
+	  ARAD(1:N)=0.0D0
+
+	          EINA(I,J)=0.0_LDP
+	          EINA(I,J)=0.0D0
+
+	          EINA(J,I)=0.0_LDP
+	          EINA(J,I)=0.0D0
+
+	NTRET=0.0_LDP			!Number of principal transitions
+	NTRET=0.0D0			!Number of principal transitions
+
+
+genosc_v9.f
+
+
+get_num_phot_routes_v1.f
+
+	  GSUM(PHOT_ID)=0.0_LDP
+	  GSUM(PHOT_ID)=0.0D0
+
+	    EION=1.0E-15_LDP*T1*SPEED_OF_LIGHT()
+	    EION=1.0D-15*T1*SPEED_OF_LIGHT()
+
+
+get_scl_xray_fluxes_v1.f
+
+	  HIGH_F=0.5_LDP*(PREV_CONT_FREQ+CUR_CONT_FREQ)
+	  HIGH_F=0.5D0*(PREV_CONT_FREQ+CUR_CONT_FREQ)
+
+	  LOW_F=0.5_LDP*(NEXT_CONT_FREQ+CUR_CONT_FREQ)
+	  LOW_F=0.5D0*(NEXT_CONT_FREQ+CUR_CONT_FREQ)
+
+	  HIGH_F=CUR_CONT_FREQ*(1.0_LDP+0.5_LDP*VSMOOTH/2.99E+05_LDP)
+	  HIGH_F=CUR_CONT_FREQ*(1.0D0+0.5D0*VSMOOTH/2.99D+05)
+
+	  LOW_F=CUR_CONT_FREQ*(1.0_LDP-0.5_LDP*VSMOOTH/2.99E+05_LDP)
+	  LOW_F=CUR_CONT_FREQ*(1.0D0-0.5D0*VSMOOTH/2.99D+05)
+
+	EMISS1=0.0_LDP
+	EMISS1=0.0D0
+
+	EMISS2=0.0_LDP
+	EMISS2=0.0D0
+
+	    EMISS1=X_EMISS1(LOC_LF)*(0.5_LDP*BIN_SIZE+NU_LF_BIN-LOW_F)
+	    EMISS1=X_EMISS1(LOC_LF)*(0.5D0*BIN_SIZE+NU_LF_BIN-LOW_F)
+
+	1                   (0.5_LDP*BIN_SIZE+HIGH_F-NU_HF_BIN)
+	1                   (0.5D0*BIN_SIZE+HIGH_F-NU_HF_BIN)
+
+	    EMISS2=X_EMISS2(LOC_LF)*(0.5_LDP*BIN_SIZE+NU_Lf_BIN-LOW_F)
+	    EMISS2=X_EMISS2(LOC_LF)*(0.5D0*BIN_SIZE+NU_Lf_BIN-LOW_F)
+
+	1                   (0.5_LDP*BIN_SIZE+HIGH_F-NU_HF_BIN)
+	1                   (0.5D0*BIN_SIZE+HIGH_F-NU_HF_BIN)
+
+
+newpertjd.f
+
+	F2DA(:,:)=0.0_LDP
+	F2DA(:,:)=0.0D0
+
+	FC(:,:)=0.0_LDP
+	FC(:,:)=0.0D0
+
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796_LDP-ACOS(P(LS)/R(1)))/P(LS)
+	      TOR=CHI(1)*R(1)*R(1)*(1.570796D0-ACOS(P(LS)/R(1)))/P(LS)
+
+	    TOR=0.0_LDP
+	    TOR=0.0D0
+
+	  IF(TOR .GT. 0.01_LDP)THEN
+	  IF(TOR .GT. 0.01D0)THEN
+
+	    IBOUND=SOURCE(1)*(1.0_LDP-EXP(-TOR))
+	    IBOUND=SOURCE(1)*(1.0D0-EXP(-TOR))
+
+	1             (1._LDP-TOR/2.0_LDP*(1.0_LDP-TOR/3.0_LDP*(1.0_LDP-TOR/4.0_LDP)))
+	1             (1.D0-TOR/2.0D0*(1.0D0-TOR/3.0D0*(1.0D0-TOR/4.0D0)))
+
+	      VK(1,1)=SOURCE(1)*(1.0_LDP-EXP(-TOR))/CHI(1)
+	      VK(1,1)=SOURCE(1)*(1.0D0-EXP(-TOR))/CHI(1)
+
+	        XM(I)=0.0_LDP
+	        XM(I)=0.0D0
+
+	  FB(I,I)=FB(I,I)+1.0_LDP
+	  FB(I,I)=FB(I,I)+1.0D0
+
+
+old_comp_free_free_v2.f
+
+	  GFF_STORE=0.0_LDP
+	  GFF_STORE=0.0D0
+
+	  POP_SUM=0.0_LDP
+	  POP_SUM=0.0D0
+
+	      ELSE IF(GFF_STORE(1,I) .EQ. 0.0_LDP)THEN
+	      ELSE IF(GFF_STORE(1,I) .EQ. 0.0D0)THEN
+
+          CHI_FF(I)=0.0_LDP
+          CHI_FF(I)=0.0D0
+
+          ETA_FF(I)=0.0_LDP
+          ETA_FF(I)=0.0D0
+
+	VCHI_FF=0.0_LDP
+	VCHI_FF=0.0D0
+
+	VETA_FF=0.0_LDP
+	VETA_FF=0.0D0
+
+	  ELSE IF(NINT(ATM(ID)%ZXzV) .GT. 0.0_LDP)THEN
+	  ELSE IF(NINT(ATM(ID)%ZXzV) .GT. 0.0D0)THEN
+
+	      CHI_FF(I)=CHI_FF(I)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(I))
+	      CHI_FF(I)=CHI_FF(I)+TCHI1*ALPHA*(1.0D0-EMHNUKT(I))
+
+	        VCHI_FF(NT-1,I)=VCHI_FF(NT-1,I)+TCHI1*ALPHA*(1.0_LDP-EMHNUKT(I))
+	        VCHI_FF(NT-1,I)=VCHI_FF(NT-1,I)+TCHI1*ALPHA*(1.0D0-EMHNUKT(I))
+
+	        ALPHA=TCHI1*ED(I)*GFF_VAL(I)*(1.0_LDP-EMHNUKT(I))/SQRT(T(I))
+	        ALPHA=TCHI1*ED(I)*GFF_VAL(I)*(1.0D0-EMHNUKT(I))/SQRT(T(I))
+
+		VCHI_FF(NT,I)=VCHI_FF(NT,I)-TCHI1*ALPHA*(0.5_LDP+(HNUONKT-0.5_LDP)*EMHNUKT(I))
+		VCHI_FF(NT,I)=VCHI_FF(NT,I)-TCHI1*ALPHA*(0.5D0+(HNUONKT-0.5D0)*EMHNUKT(I))
+
+		VETA_FF(NT,I)=VETA_FF(NT,I)+TETA1*ALPHA*(HNUONKT-0.5_LDP)*EMHNUKT(I)
+		VETA_FF(NT,I)=VETA_FF(NT,I)+TETA1*ALPHA*(HNUONKT-0.5D0)*EMHNUKT(I)
+
+
+omega_gen_v3.f
+
+	REAL(KIND=LDP), PARAMETER :: THREE=3.0_LDP
+	REAL(KIND=LDP), PARAMETER :: THREE=3.0D0
+
+	REAL(KIND=LDP), PARAMETER :: ZERO=0.0_LDP
+	REAL(KIND=LDP), PARAMETER :: ZERO=0.0D0
+
+	OMEGA(:,:)=0.0_LDP			!NLEV*NLEV
+	OMEGA(:,:)=0.0D0			!NLEV*NLEV
+
+	dln_OMEGA_dlnT(:,:)=0.0_LDP		!NLEV*NLEV
+	dln_OMEGA_dlnT(:,:)=0.0D0		!NLEV*NLEV
+
+	    IF(OMEGA(I,J) .EQ. 0.0_LDP .AND. EIN_A(I,J) .LE. 1.0E-05_LDP)THEN
+	    IF(OMEGA(I,J) .EQ. 0.0D0 .AND. EIN_A(I,J) .LE. 1.0D-05)THEN
+
+	      dln_OMEGA_dlnT(I,J)=0.0_LDP
+	      dln_OMEGA_dlnT(I,J)=0.0D0
+
+	    ELSE IF(OMEGA(I,J) .EQ. 0.0_LDP .AND. EIN_A(I,J) .NE. 0.0_LDP)THEN
+	    ELSE IF(OMEGA(I,J) .EQ. 0.0D0 .AND. EIN_A(I,J) .NE. 0.0D0)THEN
+
+	        IF(X .LE. 14.0_LDP)THEN
+	        IF(X .LE. 14.0D0)THEN
+
+	          GBAR=0.276_LDP*EX_E1X
+	          GBAR=0.276D0*EX_E1X
+
+	          dln_GBAR_dlnT=(1.0_LDP/EX_E1X-X)
+	          dln_GBAR_dlnT=(1.0D0/EX_E1X-X)
+
+	          GBAR=0.066_LDP*(1.0_LDP+1.5_LDP/X)/SQRT(X)
+	          GBAR=0.066D0*(1.0D0+1.5D0/X)/SQRT(X)
+
+	          dln_GBAR_dlnT=-0.5_LDP+0.099_LDP/X/GBAR
+	          dln_GBAR_dlnT=-0.5D0+0.099D0/X/GBAR
+
+	        G1=0.2_LDP
+	        G1=0.2D0
+
+	        IF( SAME_N(LEVELNAME(I),LEVELNAME(J)) )G1=0.7_LDP
+	        IF( SAME_N(LEVELNAME(I),LEVELNAME(J)) )G1=0.7D0
+
+	        G2=0.276_LDP*EX_E1X
+	        G2=0.276D0*EX_E1X
+
+	          dln_GBAR_dlnT=0.0_LDP
+	          dln_GBAR_dlnT=0.0D0
+
+	          dln_GBAR_dlnT=(1.0_LDP/EX_E1X-X)
+	          dln_GBAR_dlnT=(1.0D0/EX_E1X-X)
+
+	      OMEGA(I,J)=47.972_LDP*OMEGA_SCALE*GBAR*EIN_A(I,J)*STAT_WT(I)/FL
+	      OMEGA(I,J)=47.972D0*OMEGA_SCALE*GBAR*EIN_A(I,J)*STAT_WT(I)/FL
+
+	    ELSE IF(OMEGA(I,J) .EQ. 0.0_LDP)THEN
+	    ELSE IF(OMEGA(I,J) .EQ. 0.0D0)THEN
+
+	      dln_OMEGA_dlnT(I,J)=0.0_LDP
+	      dln_OMEGA_dlnT(I,J)=0.0D0
+
+	PHOT_CONST=0.1_LDP*MIN(ZION,THREE)*3.23_LDP/8.63E-08_LDP
+	PHOT_CONST=0.1D0*MIN(ZION,THREE)*3.23D0/8.63D-08
+
+	  IF(OMEGA(I,I) .EQ. 0.0_LDP)THEN
+	  IF(OMEGA(I,I) .EQ. 0.0D0)THEN
+
+	    dln_OMEGA_dlnT(I,I)=1.0_LDP
+	    dln_OMEGA_dlnT(I,I)=1.0D0
+
+
+phot_data_mod.f
+
+	PARAMETER (CONV_FAC=1.0E-08_LDP)
+	PARAMETER (CONV_FAC=1.0D-08)
+
+	PARAMETER (LG10_CONV_FAC=-8.0_LDP)
+	PARAMETER (LG10_CONV_FAC=-8.0D0)
+
+
+quad_multi_v10.f
+
+	FOUR_PI_D_H=1.0_LDP/5.27296E-03_LDP                    !1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
+	FOUR_PI_D_H=1.0D0/5.27296D-03                    !1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
+
+	WSE_S(:,:)=0.0_LDP
+	WSE_S(:,:)=0.0D0
+
+	WCR(:,:)=0.0_LDP
+	WCR(:,:)=0.0D0
+
+	dWSE_SdT(:,:)=0.0_LDP
+	dWSE_SdT(:,:)=0.0D0
+
+	dWCRdT(:,:)=0.0_LDP
+	dWCRdT(:,:)=0.0D0
+
+	DIS_CONST(1:N_F)=-1.0_LDP
+	DIS_CONST(1:N_F)=-1.0D0
+
+	    IF(NU_CONT .LT. EDGE_F(I_F) .AND. ALPHA_VEC(I_F) .NE. 0 .AND. NU_CONT .GT. 0.8_LDP*EDGE_F(I_F))THEN
+	    IF(NU_CONT .LT. EDGE_F(I_F) .AND. ALPHA_VEC(I_F) .NE. 0 .AND. NU_CONT .GT. 0.8D0*EDGE_F(I_F))THEN
+
+	      NEFF=SQRT(3.289395_LDP*ZION*ZION/(EDGE_F(I_F)-NU_CONT))
+	      NEFF=SQRT(3.289395D0*ZION*ZION/(EDGE_F(I_F)-NU_CONT))
+
+	        T1=MIN(1.0_LDP,16.0_LDP*NEFF/(1+NEFF)/(1+NEFF)/3.0_LDP)
+	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
+
+	         DIS_CONST(I_F)=( T1*ZION_CUBED/(NEFF**4) )**1.5_LDP
+	         DIS_CONST(I_F)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
+
+	    YDIS(J)=1.091_LDP*(X_LEV_DIS(J)+4.0_LDP*(ZION-1)*A_LEV_DIS(J))*
+	    YDIS(J)=1.091D0*(X_LEV_DIS(J)+4.0D0*(ZION-1)*A_LEV_DIS(J))*
+
+	        T2=T1*HNST_F_ON_S(I_F,J)*(dlnHNST_S_dlnT(I_S,J)+1.5_LDP+HDKT*EDGE_F(I_F)/T(J))/T(J)
+	        T2=T1*HNST_F_ON_S(I_F,J)*(dlnHNST_S_dlnT(I_S,J)+1.5D0+HDKT*EDGE_F(I_F)/T(J))/T(J)
+
+	    ELSE IF(DIS_CONST(I_F) .GE. 0.0_LDP)THEN
+	    ELSE IF(DIS_CONST(I_F) .GE. 0.0D0)THEN
+
+	        T2=7.782_LDP+XDIS(J)*DIS_CONST(I_F)
+	        T2=7.782D0+XDIS(J)*DIS_CONST(I_F)
+
+	          T2=T3*HNST_F_ON_S(I_F,J)*(dlnHNST_S_dlnT(I_S,J)+1.5_LDP+HDKT*EDGE_F(I_F)/T(J))/T(J)
+	          T2=T3*HNST_F_ON_S(I_F,J)*(dlnHNST_S_dlnT(I_S,J)+1.5D0+HDKT*EDGE_F(I_F)/T(J))/T(J)
+
+	    ELSE IF(DIS_CONST(I_F) .GE. 0.0_LDP)THEN
+	    ELSE IF(DIS_CONST(I_F) .GE. 0.0D0)THEN
+
+	        T2=7.782_LDP+XDIS(J)*DIS_CONST(I_F)
+	        T2=7.782D0+XDIS(J)*DIS_CONST(I_F)
+
+
+quad_multi_v7.f
+
+	FOUR_PI_D_H=1.0_LDP/5.27296E-03_LDP                    !1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
+	FOUR_PI_D_H=1.0D0/5.27296D-03                    !1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
+
+	WSE_S(:,:)=0.0_LDP
+	WSE_S(:,:)=0.0D0
+
+	WSE_CR_S(:,:)=0.0_LDP
+	WSE_CR_S(:,:)=0.0D0
+
+	dWSE_SdT(:,:)=0.0_LDP
+	dWSE_SdT(:,:)=0.0D0
+
+	DIS_CONST(1:N_F)=-1.0_LDP
+	DIS_CONST(1:N_F)=-1.0D0
+
+	      NEFF=SQRT(3.289395_LDP*ZION*ZION/(EDGE_F(I_F)-NU_CONT))
+	      NEFF=SQRT(3.289395*ZION*ZION/(EDGE_F(I_F)-NU_CONT))
+
+	        T1=MIN(1.0_LDP,16.0_LDP*NEFF/(1+NEFF)/(1+NEFF)/3.0_LDP)
+	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
+
+	         DIS_CONST(I_F)=( T1*ZION_CUBED/(NEFF**4) )**1.5_LDP
+	         DIS_CONST(I_F)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
+
+	    YDIS(J)=1.091_LDP*(X_LEV_DIS(J)+4.0_LDP*(ZION-1)*A_LEV_DIS(J))*
+	    YDIS(J)=1.091*(X_LEV_DIS(J)+4.0D0*(ZION-1)*A_LEV_DIS(J))*
+
+	1        (dlnHNST_S_dlnT(I_S,J)+1.5_LDP+HDKT*EDGE_F(I_F)/T(J))/T(J)
+	1        (dlnHNST_S_dlnT(I_S,J)+1.5D0+HDKT*EDGE_F(I_F)/T(J))/T(J)
+
+	      T2=7.782_LDP+XDIS(J)*DIS_CONST(I_F)
+	      T2=7.782+XDIS(J)*DIS_CONST(I_F)
+
+	1          (dlnHNST_S_dlnT(I_S,J)+1.5_LDP+HDKT*EDGE_F(I_F)/T(J))/T(J)
+	1          (dlnHNST_S_dlnT(I_S,J)+1.5D0+HDKT*EDGE_F(I_F)/T(J))/T(J)
+
+
+quad_multi_v8.f
+
+	FOUR_PI_D_H=1.0_LDP/5.27296E-03_LDP                    !1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
+	FOUR_PI_D_H=1.0D0/5.27296D-03                    !1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
+
+	WSE_S(:,:)=0.0_LDP
+	WSE_S(:,:)=0.0D0
+
+	WSE_CR_S(:,:)=0.0_LDP
+	WSE_CR_S(:,:)=0.0D0
+
+	dWSE_SdT(:,:)=0.0_LDP
+	dWSE_SdT(:,:)=0.0D0
+
+	DIS_CONST(1:N_F)=-1.0_LDP
+	DIS_CONST(1:N_F)=-1.0D0
+
+	      NEFF=SQRT(3.289395_LDP*ZION*ZION/(EDGE_F(I_F)-NU_CONT))
+	      NEFF=SQRT(3.289395D0*ZION*ZION/(EDGE_F(I_F)-NU_CONT))
+
+	        T1=MIN(1.0_LDP,16.0_LDP*NEFF/(1+NEFF)/(1+NEFF)/3.0_LDP)
+	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
+
+	         DIS_CONST(I_F)=( T1*ZION_CUBED/(NEFF**4) )**1.5_LDP
+	         DIS_CONST(I_F)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
+
+	    YDIS(J)=1.091_LDP*(X_LEV_DIS(J)+4.0_LDP*(ZION-1)*A_LEV_DIS(J))*
+	    YDIS(J)=1.091D0*(X_LEV_DIS(J)+4.0D0*(ZION-1)*A_LEV_DIS(J))*
+
+	1        (dlnHNST_S_dlnT(I_S,J)+1.5_LDP+HDKT*EDGE_F(I_F)/T(J))/T(J)
+	1        (dlnHNST_S_dlnT(I_S,J)+1.5D0+HDKT*EDGE_F(I_F)/T(J))/T(J)
+
+	  ELSE IF(DIS_CONST(I_F) .GE. 0.0_LDP)THEN
+	  ELSE IF(DIS_CONST(I_F) .GE. 0.0D0)THEN
+
+	      T2=7.782_LDP+XDIS(J)*DIS_CONST(I_F)
+	      T2=7.782D0+XDIS(J)*DIS_CONST(I_F)
+
+	1          (dlnHNST_S_dlnT(I_S,J)+1.5_LDP+HDKT*EDGE_F(I_F)/T(J))/T(J)
+	1          (dlnHNST_S_dlnT(I_S,J)+1.5D0+HDKT*EDGE_F(I_F)/T(J))/T(J)
+
+
+quad_multi_v9.f
+
+	FOUR_PI_D_H=1.0_LDP/5.27296E-03_LDP                    !1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
+	FOUR_PI_D_H=1.0D0/5.27296D-03                    !1.8965D+02		!4*PI/H*DEX(-10)*DEX(-15)
+
+	WSE_S(:,:)=0.0_LDP
+	WSE_S(:,:)=0.0D0
+
+	WSE_CR_S(:,:)=0.0_LDP
+	WSE_CR_S(:,:)=0.0D0
+
+	dWSE_SdT(:,:)=0.0_LDP
+	dWSE_SdT(:,:)=0.0D0
+
+	DIS_CONST(1:N_F)=-1.0_LDP
+	DIS_CONST(1:N_F)=-1.0D0
+
+	    IF(NU_CONT .LT. EDGE_F(I_F) .AND. ALPHA_VEC(I_F) .NE. 0 .AND. NU_CONT .GT. 0.8_LDP*EDGE_F(I_F))THEN
+	    IF(NU_CONT .LT. EDGE_F(I_F) .AND. ALPHA_VEC(I_F) .NE. 0 .AND. NU_CONT .GT. 0.8D0*EDGE_F(I_F))THEN
+
+	      NEFF=SQRT(3.289395_LDP*ZION*ZION/(EDGE_F(I_F)-NU_CONT))
+	      NEFF=SQRT(3.289395D0*ZION*ZION/(EDGE_F(I_F)-NU_CONT))
+
+	        T1=MIN(1.0_LDP,16.0_LDP*NEFF/(1+NEFF)/(1+NEFF)/3.0_LDP)
+	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
+
+	         DIS_CONST(I_F)=( T1*ZION_CUBED/(NEFF**4) )**1.5_LDP
+	         DIS_CONST(I_F)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
+
+	    YDIS(J)=1.091_LDP*(X_LEV_DIS(J)+4.0_LDP*(ZION-1)*A_LEV_DIS(J))*
+	    YDIS(J)=1.091D0*(X_LEV_DIS(J)+4.0D0*(ZION-1)*A_LEV_DIS(J))*
+
+	1          (dlnHNST_S_dlnT(I_S,J)+1.5_LDP+HDKT*EDGE_F(I_F)/T(J))/T(J)
+	1          (dlnHNST_S_dlnT(I_S,J)+1.5D0+HDKT*EDGE_F(I_F)/T(J))/T(J)
+
+	    ELSE IF(DIS_CONST(I_F) .GE. 0.0_LDP)THEN
+	    ELSE IF(DIS_CONST(I_F) .GE. 0.0D0)THEN
+
+	        T2=7.782_LDP+XDIS(J)*DIS_CONST(I_F)
+	        T2=7.782D0+XDIS(J)*DIS_CONST(I_F)
+
+	1            (dlnHNST_S_dlnT(I_S,J)+1.5_LDP+HDKT*EDGE_F(I_F)/T(J))/T(J)
+	1            (dlnHNST_S_dlnT(I_S,J)+1.5D0+HDKT*EDGE_F(I_F)/T(J))/T(J)
+
+	    ELSE IF(DIS_CONST(I_F) .GE. 0.0_LDP)THEN
+	    ELSE IF(DIS_CONST(I_F) .GE. 0.0D0)THEN
+
+	        T2=7.782_LDP+XDIS(J)*DIS_CONST(I_F)
+	        T2=7.782D0+XDIS(J)*DIS_CONST(I_F)
+
+
+rayleigh_scat.f
+
+	DATA FOSC(2:20)/4.162E-01_LDP,7.910E-02_LDP,2.899E-02_LDP,1.394E-02_LDP,7.799E-03_LDP,
+	DATA FOSC(2:20)/4.162D-01,7.910D-02,2.899D-02,1.394D-02,7.799D-03,
+
+	1         4.814E-03_LDP,3.183E-03_LDP,2.216E-03_LDP,1.605E-03_LDP,1.201E-03_LDP,
+	1         4.814D-03,3.183D-03,2.216D-03,1.605D-03,1.201D-03,
+
+	1         9.214E-04_LDP,7.227E-04_LDP,5.774E-04_LDP,4.686E-04_LDP,3.856E-04_LDP,
+	1         9.214D-04,7.227D-04,5.774D-04,4.686D-04,3.856D-04,
+
+	1         3.211E-04_LDP,2.702E-04_LDP,2.296E-04_LDP,1.967E-04_LDP/
+	1         3.211D-04,2.702D-04,2.296D-04,1.967D-04/
+
+	  RKI(1:ND)=RKI(1:ND)+6.65E-15_LDP*HYD(1,1:ND)*(1.0_LDP+1.66_LDP/SQRT(T1))
+	  RKI(1:ND)=RKI(1:ND)+6.65D-15*HYD(1,1:ND)*(1.0D0+1.66D0/SQRT(T1))
+
+	ELSE IF(FREQ .LT. 0.647_LDP*EDGE_HYD(1))THEN
+	ELSE IF(FREQ .LT. 0.647D0*EDGE_HYD(1))THEN
+
+	  RKI(1:ND)=RKI(1:ND)+6.65E-15_LDP*HYD(1,1:ND)*
+	  RKI(1:ND)=RKI(1:ND)+6.65D-15*HYD(1,1:ND)*
+
+	1               T1*T1*(1.26_LDP+5.068_LDP*T1+708.3_LDP*(T1**5))
+	1               T1*T1*(1.26D0+5.068D0*T1+708.3D0*(T1**5))
+
+	T1=0.0_LDP
+	T1=0.0D0
+
+	  EDGE_FREQ=EDGE_HYD(1)*(1.0_LDP-1.0_LDP/I/I)
+	  EDGE_FREQ=EDGE_HYD(1)*(1.0D0-1.0D0/I/I)
+
+	  T2=(EDGE_FREQ/FREQ)**2-1.0_LDP
+	  T2=(EDGE_FREQ/FREQ)**2-1.0D0
+
+	  T2=MAX(ABS(T2),0.0001_LDP)		!Prevent overflow
+	  T2=MAX(ABS(T2),0.0001D0)		!Prevent overflow
+
+	T1=T1*T1+0.35_LDP
+	T1=T1*T1+0.35D0
+
+	T1=MIN(1.0E4_LDP*FOSC(IRES)*FOSC(IRES),T1)
+	T1=MIN(1.0D4*FOSC(IRES)*FOSC(IRES),T1)
+
+	RKI(1:ND)=RKI(1:ND)+6.65E-15_LDP*T1*HYD(1,1:ND)
+	RKI(1:ND)=RKI(1:ND)+6.65D-15*T1*HYD(1,1:ND)
+
+
+rd_hyd_bf_data.f
+
+
+rd_mod_density.f
+
+	    IF( ABS(T1-R(I))/R(I) .GT. 1.0E-06_LDP)THEN
+	    IF( ABS(T1-R(I))/R(I) .GT. 1.0D-06)THEN
+
+
+rd_phot_die_v1.f
+
+	    WIM1=100.0_LDP*WIM1/(WIA1+WIM1)
+	    WIM1=100.0*WIM1/(WIA1+WIM1)
+
+	    WIM2=100.0_LDP*WIM2/(WIA2+WIM2)
+	    WIM2=100.0*WIM2/(WIA2+WIM2)
+
+	    WIM3=100.0_LDP*WIM3/(WIA3+WIM3)
+	    WIM3=100.0*WIM3/(WIA3+WIM3)
+
+
+rdphot_gen_v1.f
+
+	PD(ID)%EXC_FREQ(:)=0.0_LDP
+	PD(ID)%EXC_FREQ(:)=0.0D0
+
+	PD(ID)%EXC_FREQ(1)=0.0_LDP
+	PD(ID)%EXC_FREQ(1)=0.0D0
+
+	    LOC_EXC_FREQ_ION=1.0E-15_LDP*LOC_EXC_FREQ_ION*SPEED_OF_LIGHT()
+	    LOC_EXC_FREQ_ION=1.0D-15*LOC_EXC_FREQ_ION*SPEED_OF_LIGHT()
+
+	    PD(ID)%EXC_FREQ(PHOT_ID)=0.0_LDP
+	    PD(ID)%EXC_FREQ(PHOT_ID)=0.0D0
+
+	    TOTAL_WT=0.0_LDP
+	    TOTAL_WT=0.0D0
+
+	  NU_INF=1.0E-15_LDP*109737.31_LDP*SPEED_OF_LIGHT()
+	  NU_INF=1.0D-15*109737.31*SPEED_OF_LIGHT()
+
+	    NU_INF=NU_INF/(1+5.48597E-04_LDP)
+	    NU_INF=NU_INF/(1+5.48597D-04)
+
+	    NU_INF=NU_INF/(1+5.48597E-04_LDP/(2*PD(ID)%AT_NO))
+	    NU_INF=NU_INF/(1+5.48597D-04/(2*PD(ID)%AT_NO))
+
+	    PD(ID)%NEF(I,PHOT_ID)=0.0_LDP
+	    PD(ID)%NEF(I,PHOT_ID)=0.0D0
+
+	PD(ID)%ALPHA_BF=2.815E-06_LDP*(PD(ID)%ZION)**4
+	PD(ID)%ALPHA_BF=2.815D-06*(PD(ID)%ZION)**4
+
+	PD(ID)%LST_CROSS(:,:)=0._LDP
+	PD(ID)%LST_CROSS(:,:)=0.D0
+
+	PD(ID)%LST_FREQ(:,:)=0._LDP
+	PD(ID)%LST_FREQ(:,:)=0.D0
+
+
+rdphot_gen_v2.f
+
+	    IF(SIG_SM .GE. 0.9_LDP*SIG_GAU_KMS)THEN
+	    IF(SIG_SM .GE. 0.9D0*SIG_GAU_KMS)THEN
+
+
+rd_rv_file_v2.f
+
+	    IF(V(I) .LE. V(I+1) .AND. V(I) .LT. 0.1_LDP)THEN
+	    IF(V(I) .LE. V(I+1) .AND. V(I) .LT. 0.1D0)THEN
+
+	      SIGMA(I)=-0.999_LDP
+	      SIGMA(I)=-0.999D0
+
+	  IF(ABS(R(1)-RMAX) .GT. 0.1_LDP*(R(1)-R(2)))THEN
+	  IF(ABS(R(1)-RMAX) .GT. 0.1D0*(R(1)-R(2)))THEN
+
+	  R(1)=(HT(1)+1.0_LDP)*RP
+	  R(1)=(HT(1)+1.0D0)*RP
+
+	  SIGMA(1)=dVDR(1)*(HT(1)+1.0_LDP)/VEL(1)-1.0_LDP
+	  SIGMA(1)=dVDR(1)*(HT(1)+1.0D0)/VEL(1)-1.0D0
+
+	    R(I)=(HT(I-1)+1.0_LDP)*RP
+	    R(I)=(HT(I-1)+1.0D0)*RP
+
+	    SIGMA(I)=dVDR(I-1)*(HT(I-1)+1.0_LDP)/VEL(I-1)-1.0_LDP
+	    SIGMA(I)=dVDR(I-1)*(HT(I-1)+1.0D0)/VEL(I-1)-1.0D0
+
+	  R(2)=R(1)-0.1_LDP*(R(1)-R(3))
+	  R(2)=R(1)-0.1*(R(1)-R(3))
+
+	  V(2)=V(1)+0.1_LDP*(V(1)-V(3))
+	  V(2)=V(1)+0.1*(V(1)-V(3))
+
+	  SIGMA(2)=SIGMA(1)+0.1_LDP*(SIGMA(1)-SIGMA(3))
+	  SIGMA(2)=SIGMA(1)+0.1*(SIGMA(1)-SIGMA(3))
+
+	IF( ABS(V(1)-VINF)/V(1) .GT. 0.1_LDP .AND. VINF .GT. 0.1_LDP)THEN
+	IF( ABS(V(1)-VINF)/V(1) .GT. 0.1 .AND. VINF .GT. 0.1D0)THEN
+
+
+rd_store_log.f
+
+	IF( ABS(VALUE1) .LT. 100.0_LDP .AND. ABS(VALUE2) .LT. 100.00_LDP)THEN
+	IF( ABS(VALUE1) .LT. 100.0 .AND. ABS(VALUE2) .LT. 100.00D0)THEN
+
+
+rd_xray_spec.f
+
+	REAL(KIND=LDP), PARAMETER :: EV_TO_HZ=0.241838_LDP
+	REAL(KIND=LDP), PARAMETER :: EV_TO_HZ=0.241838D0
+
+	  LOG_T_MIN=LOG_T_MIN-4.0_LDP		!Convert from K to units of 10^4 K
+	  LOG_T_MIN=LOG_T_MIN-4.0D0		!Convert from K to units of 10^4 K
+
+	    XRAY_FLUXES(:,:,:)=1.0E-28_LDP*XRAY_FLUXES(:,:,:)/(PI*4.0_LDP)/BIN_SIZE
+	    XRAY_FLUXES(:,:,:)=1.0D-28*XRAY_FLUXES(:,:,:)/(PI*4.0D0)/BIN_SIZE
+
+	IF(T_SHOCK1 .EQ. 0.0_LDP)THEN
+	IF(T_SHOCK1 .EQ. 0.0D0)THEN
+
+	  X_EMISS1(1:N_BINS)=0.0_LDP
+	  X_EMISS1(1:N_BINS)=0.0D0
+
+	    X_EMISS1(I)=(1.0_LDP-T1)*XRAY_FLUXES(I,T_INDX,ED_INDX)
+	    X_EMISS1(I)=(1.0D0-T1)*XRAY_FLUXES(I,T_INDX,ED_INDX)
+
+	IF(T_SHOCK2 .EQ. 0.0_LDP)THEN
+	IF(T_SHOCK2 .EQ. 0.0D0)THEN
+
+	  X_EMISS2(1:N_BINS)=0.0_LDP
+	  X_EMISS2(1:N_BINS)=0.0D0
+
+	    X_EMISS2(I)=(1.0_LDP-T1)*XRAY_FLUXES(I,T_INDX,ED_INDX)
+	    X_EMISS2(I)=(1.0D0-T1)*XRAY_FLUXES(I,T_INDX,ED_INDX)
+
+
+set_edge_freq_v3.f
+
+	REAL(KIND=LDP), PARAMETER :: ZERO=0.0_LDP
+	REAL(KIND=LDP), PARAMETER :: ZERO=0.0D0
+
+
+set_edge_freq_v4.f
+
+	REAL(KIND=LDP), PARAMETER :: ZERO=0.0_LDP
+	REAL(KIND=LDP), PARAMETER :: ZERO=0.0D0
+
+
+set_x_freq_v2.f
+
+	CONV_FAC=0.24191_LDP				!ev to 10^15 Hz
+	CONV_FAC=0.24191				!ev to 10^15 Hz
+
+
+steq_multi_v4.f
+
+	  TMP_VEC_ED(1)=1.0_LDP		!Electron density
+	  TMP_VEC_ED(1)=1.0D0		!Electron density
+
+	  TMP_VEC_COOL(1)=0.0_LDP		!Initialize cooling rate even
+	  TMP_VEC_COOL(1)=0.0D0		!Initialize cooling rate even
+
+	 	T1=0.0_LDP
+	 	T1=0.0D0
+
+	    T1=0.0_LDP
+	    T1=0.0D0
+
+	    T2=0.0_LDP
+	    T2=0.0D0
+
+	    T1=0.0_LDP
+	    T1=0.0D0
+
+	    T2=0.0_LDP
+	    T2=0.0D0
+
+	    BA(NW-1,L,M,I)=BA(NW-1,L,M,I)+(ZION-1.0_LDP)
+	    BA(NW-1,L,M,I)=BA(NW-1,L,M,I)+(ZION-1.0D0)
+
+	    BA(EQPOP-NST+1,L,M,I)=BA(EQPOP-NST+1,L,M,I)+1.0_LDP
+	    BA(EQPOP-NST+1,L,M,I)=BA(EQPOP-NST+1,L,M,I)+1.0D0
+
+	  SE(NW-1,I)=SE(NW-1,I)+(ZION-1.0_LDP)*T1
+	  SE(NW-1,I)=SE(NW-1,I)+(ZION-1.0D0)*T1
+
+	    BA(J,J,M,I)=BA(J,J,M,I)+1.0_LDP
+	    BA(J,J,M,I)=BA(J,J,M,I)+1.0D0
+
+
+subcol_multi_v4.f
+
+	COL_S(:,:,:)=0.0_LDP  		!N_S, N_S, ND
+	COL_S(:,:,:)=0.0D0  		!N_S, N_S, ND
+
+	dCOL_S(:,:,:)=0.0_LDP  		!N_S, N_S, ND
+	dCOL_S(:,:,:)=0.0D0  		!N_S, N_S, ND
+
+	  OMEGA_F(:,:)=0.0_LDP
+	  OMEGA_F(:,:)=0.0D0
+
+	  dln_OMEGA_dlnT(:,:)=0.0_LDP
+	  dln_OMEGA_dlnT(:,:)=0.0D0
+
+	      CIJ=8.63E-08_LDP*ED(K)*OMEGA_F(I,J)/SQRT(T(K))
+	      CIJ=8.63D-08*ED(K)*OMEGA_F(I,J)/SQRT(T(K))
+
+	      CII=CIJ*HNST_F(I,K)/HNST_S(L,K)*(1.0_LDP-W_F(J,K)/W_F(I,K))
+	      CII=CIJ*HNST_F(I,K)/HNST_S(L,K)*(1.0D0-W_F(J,K)/W_F(I,K))
+
+	1        X -2.0_LDP - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+	1        X -2.0D0 - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+
+	1           2.0_LDP - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+	1           2.0D0 - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+
+	1           2.0_LDP - HDKT*EDGE_F(J)/T(K)-dlnHNST_S_dlnT(U,K) )/T(K)
+	1           2.0D0 - HDKT*EDGE_F(J)/T(K)-dlnHNST_S_dlnT(U,K) )/T(K)
+
+	    CII=8.63E-08_LDP*ED(K)*OMEGA_F(I,I)/GHYD_F(I)/SQRT(T(K))
+	    CII=8.63D-08*ED(K)*OMEGA_F(I,I)/GHYD_F(I)/SQRT(T(K))
+
+	1       CII*( dln_OMEGA_dlnT(I,I) - 2.0_LDP - dlnHNST_S_dlnT(L,K) )/T(K)
+	1       CII*( dln_OMEGA_dlnT(I,I) - 2.0D0 - dlnHNST_S_dlnT(L,K) )/T(K)
+
+
+subcol_multi_v5.f
+
+	COL_S(:,:,:)=0.0_LDP  		!N_S, N_S, ND
+	COL_S(:,:,:)=0.0D0  		!N_S, N_S, ND
+
+	dCOL_S(:,:,:)=0.0_LDP  		!N_S, N_S, ND
+	dCOL_S(:,:,:)=0.0D0  		!N_S, N_S, ND
+
+	  OMEGA_F(:,:)=0.0_LDP
+	  OMEGA_F(:,:)=0.0D0
+
+	  dln_OMEGA_dlnT(:,:)=0.0_LDP
+	  dln_OMEGA_dlnT(:,:)=0.0D0
+
+	      CIJ=8.63E-08_LDP*ED(K)*OMEGA_F(I,J)/SQRT(T(K))
+	      CIJ=8.63D-08*ED(K)*OMEGA_F(I,J)/SQRT(T(K))
+
+	      CII=CIJ*HNST_F_ON_S(I,K)*(1.0_LDP-W_F(J,K)/W_F(I,K))
+	      CII=CIJ*HNST_F_ON_S(I,K)*(1.0D0-W_F(J,K)/W_F(I,K))
+
+	1        X -2.0_LDP - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+	1        X -2.0D0 - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+
+	1           2.0_LDP - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+	1           2.0D0 - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+
+	1           2.0_LDP - HDKT*EDGE_F(J)/T(K)-dlnHNST_S_dlnT(U,K) )/T(K)
+	1           2.0D0 - HDKT*EDGE_F(J)/T(K)-dlnHNST_S_dlnT(U,K) )/T(K)
+
+	    CII=8.63E-08_LDP*ED(K)*OMEGA_F(I,I)/GHYD_F(I)/SQRT(T(K))
+	    CII=8.63D-08*ED(K)*OMEGA_F(I,I)/GHYD_F(I)/SQRT(T(K))
+
+	1       CII*( dln_OMEGA_dlnT(I,I) - 2.0_LDP - dlnHNST_S_dlnT(L,K) )/T(K)
+	1       CII*( dln_OMEGA_dlnT(I,I) - 2.0D0 - dlnHNST_S_dlnT(L,K) )/T(K)
+
+
+subcol_multi_v6.f
+
+	COL_S(:,:,:)=0.0_LDP  		!N_S, N_S, ND
+	COL_S(:,:,:)=0.0D0  		!N_S, N_S, ND
+
+	dCOL_S(:,:,:)=0.0_LDP  		!N_S, N_S, ND
+	dCOL_S(:,:,:)=0.0D0  		!N_S, N_S, ND
+
+	  OMEGA_F(:,:)=0.0_LDP
+	  OMEGA_F(:,:)=0.0D0
+
+	  dln_OMEGA_dlnT(:,:)=0.0_LDP
+	  dln_OMEGA_dlnT(:,:)=0.0D0
+
+	  COL_F(:,:)=0.0_LDP
+	  COL_F(:,:)=0.0D0
+
+	  DCOL_F(:,:)=0.0_LDP
+	  DCOL_F(:,:)=0.0D0
+
+	    CII=8.63E-08_LDP*ED(K)*OMEGA_F(I,I)/GHYD_F(I)/SQRT(T(K))
+	    CII=8.63D-08*ED(K)*OMEGA_F(I,I)/GHYD_F(I)/SQRT(T(K))
+
+	1       CII*( dln_OMEGA_dlnT(I,I) - 2.0_LDP - dlnHNST_S_dlnT(L,K) )/T(K)
+	1       CII*( dln_OMEGA_dlnT(I,I) - 2.0D0 - dlnHNST_S_dlnT(L,K) )/T(K)
+
+	  K_COOL=0.0_LDP
+	  K_COOL=0.0D0
+
+	    I_COOL=0.0_LDP
+	    I_COOL=0.0D0
+
+	      CIJ=8.63E-08_LDP*ED(K)*OMEGA_F(I,J)/SQRT(T(K))
+	      CIJ=8.63D-08*ED(K)*OMEGA_F(I,J)/SQRT(T(K))
+
+	      CII=CIJ*HNST_F_ON_S(I,K)*(1.0_LDP-W_F(J,K)/W_F(I,K))
+	      CII=CIJ*HNST_F_ON_S(I,K)*(1.0D0-W_F(J,K)/W_F(I,K))
+
+	1        X -2.0_LDP - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+	1        X -2.0D0 - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+
+	1             2.0_LDP - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+	1             2.0D0 - HDKT*EDGE_F(I)/T(K)-dlnHNST_S_dlnT(L,K) )/T(K)
+
+	1           2.0_LDP - HDKT*EDGE_F(J)/T(K)-dlnHNST_S_dlnT(U,K) )/T(K)
+	1           2.0D0 - HDKT*EDGE_F(J)/T(K)-dlnHNST_S_dlnT(U,K) )/T(K)
+
+
+sub_phot_gen.f
+
+	REAL(KIND=LDP), PARAMETER :: EV_TO_HZ=0.241798840766_LDP
+	REAL(KIND=LDP), PARAMETER :: EV_TO_HZ=0.241798840766D0
+
+	REAL(KIND=LDP), PARAMETER :: EQUAL_COR_FAC=1.0_LDP+1.0E-14_LDP
+	REAL(KIND=LDP), PARAMETER :: EQUAL_COR_FAC=1.0D0+1.0D-14
+
+	  IF(SET_TO_EDGE .AND. FREQ .EQ. 0.0_LDP)THEN
+	  IF(SET_TO_EDGE .AND. FREQ .EQ. 0.0D0)THEN
+
+	PHOT(1:NLEVS)=0.0_LDP
+	PHOT(1:NLEVS)=0.0D0
+
+	          SUM=0.0_LDP
+	          SUM=0.0D0
+
+	              T2=T1*BF_L_CROSS(J+1)+(1.0_LDP-T1)*BF_L_CROSS(J)
+	              T2=T1*BF_L_CROSS(J+1)+(1.0D0-T1)*BF_L_CROSS(J)
+
+	            SUM=SUM+(2*L+1)*(10.0_LDP**T2)
+	            SUM=SUM+(2*L+1)*(10.0D0**T2)
+
+	            SUM=0.0_LDP
+	            SUM=0.0D0
+
+	                T2=T1*BF_L_CROSS(J+1)+(1.0_LDP-T1)*BF_L_CROSS(J)
+	                T2=T1*BF_L_CROSS(J+1)+(1.0D0-T1)*BF_L_CROSS(J)
+
+	              SUM=SUM+(2*L+1)*(10.0_LDP**T2)
+	              SUM=SUM+(2*L+1)*(10.0D0**T2)
+
+	1              (1.0_LDP-T1)*PD(ID)%CROSS_A(LMAX)+T1*PD(ID)%CROSS_A(LMIN)  )
+	1              (1.0D0-T1)*PD(ID)%CROSS_A(LMAX)+T1*PD(ID)%CROSS_A(LMIN)  )
+
+	1             (1.0_LDP-PD(ID)%CROSS_A(LMIN+1))*RU )*( RU**PD(ID)%CROSS_A(LMIN+2) )
+	1             (1.0D0-PD(ID)%CROSS_A(LMIN+1))*RU )*( RU**PD(ID)%CROSS_A(LMIN+2) )
+
+	            T1=1.0_LDP
+	            T1=1.0D0
+
+	              T1=T1*BF_N_GAUNT(J+1)+(1.0_LDP-T1)*BF_N_GAUNT(J)
+	              T1=T1*BF_N_GAUNT(J+1)+(1.0D0-T1)*BF_N_GAUNT(J)
+
+1                     T1=BF_N_GAUNT(J)*( 10.0_LDP**(T1*(N_PER_N-RJ)) )
+1                     T1=BF_N_GAUNT(J)*( 10.0D0**(T1*(N_PER_N-RJ)) )
+
+	          IF(T1 .GT. 0.0_LDP)PHOT(I)=PHOT(I)+T1
+	          IF(T1 .GT. 0.0D0)PHOT(I)=PHOT(I)+T1
+
+	          X=LOG10(U+3.0_LDP*SPACING(U))
+	          X=LOG10(U+3.0D0*SPACING(U))
+
+	          IF(X .GE. 0.0_LDP)THEN
+	          IF(X .GE. 0.0D0)THEN
+
+	            PHOT(I)=PHOT(I)+10.0_LDP**(T1+LG10_CONV_FAC)
+	            PHOT(I)=PHOT(I)+10.0D0**(T1+LG10_CONV_FAC)
+
+	          IF(RU .LE. 1.0_LDP)THEN
+	          IF(RU .LE. 1.0D0)THEN
+
+	1               (1.0_LDP-PD(ID)%CROSS_A(LMIN+1))*RU )*( RU**PD(ID)%CROSS_A(LMIN+2) )
+	1               (1.0D0-PD(ID)%CROSS_A(LMIN+1))*RU )*( RU**PD(ID)%CROSS_A(LMIN+2) )
+
+	            IF(J .NE. 1)EDGE=0.241798840766_LDP*PD(ID)%CROSS_A(LMIN+2)
+	            IF(J .NE. 1)EDGE=0.241798840766D0*PD(ID)%CROSS_A(LMIN+2)
+
+                      T1=(U-1.0_LDP)**2 + PD(ID)%CROSS_A(LMIN+7)**2
+                      T1=(U-1.0D0)**2 + PD(ID)%CROSS_A(LMIN+7)**2
+
+                      T2=U**( 5.5_LDP+PD(ID)%CROSS_A(LMIN+1)-0.5_LDP*PD(ID)%CROSS_A(LMIN+6) )
+                      T2=U**( 5.5D0+PD(ID)%CROSS_A(LMIN+1)-0.5D0*PD(ID)%CROSS_A(LMIN+6) )
+
+                      T3=( 1.0_LDP+SQRT(U/PD(ID)%CROSS_A(LMIN+5)) )**PD(ID)%CROSS_A(LMIN+6)
+                      T3=( 1.0D0+SQRT(U/PD(ID)%CROSS_A(LMIN+5)) )**PD(ID)%CROSS_A(LMIN+6)
+
+                      PHOT(I)=PHOT(I)+1.0E-08_LDP*T1*PD(ID)%CROSS_A(LMIN+4)/T2/T3
+                      PHOT(I)=PHOT(I)+1.0D-08*T1*PD(ID)%CROSS_A(LMIN+4)/T2/T3
+
+	          T1=PD(ID)%AT_NO+1.0_LDP-PD(ID)%ZION	!# of elec. in species.
+	          T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION	!# of elec. in species.
+
+	          T1=PD(ID)%AT_NO+1.0_LDP-PD(ID)%ZION	!# of elec. in species.
+	          T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION	!# of elec. in species.
+
+	        DOP_NU=PD(ID)%NU_ZERO(J)*PD(ID)%VSM_KMS/2.998E+05_LDP
+	        DOP_NU=PD(ID)%NU_ZERO(J)*PD(ID)%VSM_KMS/2.998D+05
+
+	1             1.0E-15_LDP*OPLIN*PD(ID)%OSC(J)*VOIGT(A_VOIGT,V_VOIGT)/DOP_NU
+	1             1.0D-15*OPLIN*PD(ID)%OSC(J)*VOIGT(A_VOIGT,V_VOIGT)/DOP_NU
+
+	  T1=PD(ID)%AT_NO+1.0_LDP-PD(ID)%ZION			!Number of electrons in species.
+	  T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION			!Number of electrons in species.
+
+	T1=PD(ID)%AT_NO+1.0_LDP-PD(ID)%ZION			!Number of electrons in species.
+	T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION			!Number of electrons in species.
+
+	  IF(T2 .GT. 0.0_LDP)THEN
+	  IF(T2 .GT. 0.0D0)THEN
+
+	T1=PD(ID)%AT_NO+1.0_LDP-PD(ID)%ZION			!Number of electrons in species.
+	T1=PD(ID)%AT_NO+1.0D0-PD(ID)%ZION			!Number of electrons in species.
+
+	  T2=0.0_LDP
+	  T2=0.0D0
+
+	  IF(T2 .GT. 0.0_LDP)THEN
+	  IF(T2 .GT. 0.0D0)THEN
+
+
+var_op_v6.f
+
+	    VCHI(EQION,K)=VCHI(EQION,K)+ED(K)*TCHI2*(1.0_LDP-EMHNUKT(K))
+	    VCHI(EQION,K)=VCHI(EQION,K)+ED(K)*TCHI2*(1.0D0-EMHNUKT(K))
+
+	    VCHI(NT-1,K)=VCHI(NT-1,K)+DI_S(ION_LEV,K)*TCHI2*(1.0_LDP-EMHNUKT(K))
+	    VCHI(NT-1,K)=VCHI(NT-1,K)+DI_S(ION_LEV,K)*TCHI2*(1.0D0-EMHNUKT(K))
+
+	1        ( -0.5_LDP+(0.5_LDP-HNUONK/T(K))*EMHNUKT(K) )
+	1        ( -0.5D0+(0.5D0-HNUONK/T(K))*EMHNUKT(K) )
+
+	1        ( 0.5_LDP-HNUONK/T(K) )/T(K)
+	1        ( 0.5D0-HNUONK/T(K) )/T(K)
+
+	DIS_CONST(1:N_F)=-1.0_LDP
+	DIS_CONST(1:N_F)=-1.0D0
+
+	      NEFF=SQRT(3.289395_LDP*Z*Z/(EDGE_F(I)-NU))
+	      NEFF=SQRT(3.289395*Z*Z/(EDGE_F(I)-NU))
+
+	        T1=MIN(1.0_LDP,16.0_LDP*NEFF/(1+NEFF)/(1+NEFF)/3.0_LDP)
+	        T1=MIN(1.0D0,16.0D0*NEFF/(1+NEFF)/(1+NEFF)/3.0D0)
+
+	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5_LDP
+	        DIS_CONST(I)=( T1*ZION_CUBED/(NEFF**4) )**1.5D0
+
+	        ALPHA_VEC(I)=0.0_LDP
+	        ALPHA_VEC(I)=0.0D0
+
+	    YDIS(K)=1.091_LDP*(X_LEV_DIS(K)+4.0_LDP*(Z-1)*A_LEV_DIS(K))*
+	    YDIS(K)=1.091*(X_LEV_DIS(K)+4.0D0*(Z-1)*A_LEV_DIS(K))*
+
+	  DT_TERM(K)=( 1.5_LDP +
+	  DT_TERM(K)=( 1.5D0 +
+
+	          T1=7.782_LDP+XDIS(K)*DIS_CONST(I)
+	          T1=7.782+XDIS(K)*DIS_CONST(I)
+
+	1           (1.5_LDP+HDKT_ON_T(K)*EDGE_F(I)+dlnHNST_S_dlnT(L,K))/T(K)
+	1           (1.5D0+HDKT_ON_T(K)*EDGE_F(I)+dlnHNST_S_dlnT(L,K))/T(K)
+
+	  VCHI_TMP(:,:)=0.0_LDP
+	  VCHI_TMP(:,:)=0.0D0
+
+	    VCHI_ION(:)=0.0_LDP
+	    VCHI_ION(:)=0.0D0
+
+	    VCHI_T1(:)=0.0_LDP
+	    VCHI_T1(:)=0.0D0
+
+	    VCHI_T2(:)=0.0_LDP
+	    VCHI_T2(:)=0.0D0
+
+	          T1=7.782_LDP+XDIS(K)*DIS_CONST(I)
+	          T1=7.782+XDIS(K)*DIS_CONST(I)
+
+	1           (1.5_LDP+HDKT_ON_T(K)*EDGE_F(I)+dlnHNST_S_dlnT(L,K))
+	1           (1.5D0+HDKT_ON_T(K)*EDGE_F(I)+dlnHNST_S_dlnT(L,K))
+
+
+xcross_v2.f
+
+	XCROSS_V2=0.0_LDP
+	XCROSS_V2=0.0D0
+
+	CON_FAC=1.0_LDP/0.24191_LDP			!10^15 Hz to ev
+	CON_FAC=1.0D0/0.24191D0			!10^15 Hz to ev
+
+	  SIG_0_X(IZ,NE,:,:)=0.0_LDP
+	  SIG_0_X(IZ,NE,:,:)=0.0D0
+
+	  XCROSS_V2=0.0_LDP
+	  XCROSS_V2=0.0D0
+
+	  IF(I .GT. SQRT(IZ/2.0_LDP)+2 .OR. ANG .LT. 0 .OR. ANG .GE. PQN)THEN
+	  IF(I .GT. SQRT(IZ/2.0D0)+2 .OR. ANG .LT. 0 .OR. ANG .GE. PQN)THEN
+
+	    Q=5.5_LDP+J-0.5_LDP*P_X(IZ,NE,I,J)
+	    Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)
+
+	1       ((Y-1.0_LDP)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
+	1       ((Y-1.0D0)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
+
+	1       (1.0_LDP+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
+	1       (1.0D0+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
+
+	        Q=5.5_LDP+J-0.5_LDP*P_X(IZ,NE,I,J)
+	        Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)
+
+	1          ((Y-1.0_LDP)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
+	1          ((Y-1.0D0)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
+
+	1          (1.0_LDP+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
+	1          (1.0D0+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
+
+	        Q=5.5_LDP+J-0.5_LDP*P_X(IZ,NE,I,J)
+	        Q=5.5D0+J-0.5D0*P_X(IZ,NE,I,J)
+
+	1          ((Y-1.0_LDP)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
+	1          ((Y-1.0D0)**2 +Y_W_X(IZ,NE,I,J)**2)/ (Y**Q) /
+
+	1          (1.0_LDP+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
+	1          (1.0D0+SQRT(Y/Y_A_X(IZ,NE,I,J)) )**P_X(IZ,NE,I,J)
+
+	XCROSS_V2=XCROSS_V2*1.0E-08_LDP
+	XCROSS_V2=XCROSS_V2*1.0D-08
+
+
+x.f
+
+
+xray_data_mod.f
+
+	  SIG_0_X(:,:,:,:)=0.0_LDP
+	  SIG_0_X(:,:,:,:)=0.0D0
+
